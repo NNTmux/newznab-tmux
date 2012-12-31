@@ -27,7 +27,6 @@ $TMUX splitw -h -p 66 'echo "processAdditional Working......" && sleep 35 && $PH
 $TMUX splitw -h -p 50 'echo "postProcessing Working......" && sleep 40 && $PHP bin/postprocessing.php'
 $TMUX selectp -t 3
 $TMUX splitw -h -p 50 #'$BWMNG'
-$TMUX splitw -h -p 50 #'$MYTOP -u $DB_USER -p '$DB_PASSWORD' -d $DB_NAME -h $DB_HOST'
 $TMUX selectp -t 5
 $TMUX splitw -h -p 50 'cd bin && echo "create Releases Working......" && ./cleanup_scripts.sh'
 
