@@ -9,7 +9,7 @@ fi
 cp $TESTING_PATH/nzb-importmodified.php $NEWZPATH/www/admin/
 
 if [ -d "/home/$USERNAME" ]; then
-        $SED -i -e "s/'changeme',1/'$NZBPATH',0/" conf/.tmux.conf
+        $SED -i -e "s/changeme/$NZBPATH/" conf/.tmux.conf
         cp conf/.tmux.conf /home/$USERNAME/.tmux.conf
 fi
 
