@@ -29,5 +29,5 @@ chmod -R 777 $NEWZPATH/www/covers
 chmod 777 $NEWZPATH/www
 chmod 777 $NEWZPATH/www/install
 chmod -R 777 $NEWZPATH/nzbfiles
-chown -R www-data:www-data /var/www/
+#chown -R www-data:www-data /var/www/
 chmod 777 $NEWZPATH/nzbfiles/tmpunrar/
