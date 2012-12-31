@@ -9,8 +9,8 @@ fi
 cp $TESTING_PATH/nzb-importmodified.php $NEWZPATH/www/admin/
 
 if [ -d "/home/$USERNAME" ]; then
-        sed -i 's,'changeme,"$NZBS"',' "conf/.tmux.conf"
         cp conf/.tmux.conf /home/$USERNAME/.tmux.conf
+        sed -i 's,'changeme,"$NZBS"',' "/home/$USERNAME/.tmux.conf"
 fi
 
 $SED -i -e 's/$this->processAdditional();/\/\/$this->>processAdditional();/' $NEWZPATH/www/lib/postprocess.php
