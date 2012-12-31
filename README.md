@@ -41,7 +41,7 @@
 
  * If you notice that the pane middle right is empty, that is intentional. I have bwm-ng ready to go into that spot, if you have it installed. Once it is installed run these commands as root from the nix_scripts/tmux folder:
  
-    `sed -i -e 's/#'$BWMNG'/'$BWMNG'/' start.sh`
+    `sed -i -e "s/#'$BWMNG'/'$BWMNG'/" start.sh`
     
     `sed -i -e 's/#command/command/' edit_these.sh`
     
