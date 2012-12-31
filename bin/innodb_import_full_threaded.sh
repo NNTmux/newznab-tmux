@@ -3,7 +3,7 @@
 set -e
 
 source ../edit_these.sh
-eval $( sed -n "/^define/ { s/.*('\([^']*\)', '*\([^']*\)'*);/\1=\"\2\"/; p }" ../../../../../www/config.php )
+eval $( sed -n "/^define/ { s/.*('\([^']*\)', '*\([^']*\)'*);/export \1=\"\2\"/; p }" ../../../../www/config.php )
 
 export MYSQL_CMD="UPDATE groups set backfill_target=backfill_target+1 where active=1 and backfill_target<$MAXDAYS;"
 
