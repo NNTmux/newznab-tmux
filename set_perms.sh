@@ -1,7 +1,7 @@
 #!/bin/bash
 source edit_these.sh
 
-if [[ "AGREED" == "no"]]; then
+if [[ AGREED == "no"]]; then
         echo "Please edit the edit_these.sh file"
         exit
 fi
