@@ -33,5 +33,6 @@
     
  * If you connect using putty, then under Window/Translation set Remote character set to UTF-8.
 
- * If something looks stalled, it probably isn't. If all 5 panes are still there, it is most likely, as it should be.
-
+ * If something looks stalled, it probably isn't. If all 7 panes are still there, it is most likely, as it should be.
+ 
+ * update_cleanup needs to be uncommented to actually do something, and update_parsing is good for fixing a few releases everytime it runs, not a silver bullet though
