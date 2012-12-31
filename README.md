@@ -13,8 +13,6 @@
     
     `php5 innodb/lib/innodb/convertToInnoDB.php`
 
- * Create a folder.
- * Move to that folder.
  * Clone my github
 
     `cd /var/www/newznab/misc/update_scripts/nix_scripts/`
