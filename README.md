@@ -44,6 +44,8 @@
     `sed -i -e "s/#'$BWMNG'/'$BWMNG'/" start.sh`
     
     `sed -i -e 's/#command/command/' edit_these.sh`
+
+ * If you are running this on an OVH or kimsufi server, you may need to run sudo ./start.sh because they built grsecurity into the kernel.
     
  * Now all panes should be running smoothly.
 
