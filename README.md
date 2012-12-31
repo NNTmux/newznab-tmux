@@ -48,8 +48,10 @@
 
 
 
-<iframe style="border: 0; margin: 0; padding: 0;"
-        src="https://www.gittip.com/jonnyboy/widget.html"
-        width="48pt" height="22pt"></iframe>
+<span class="gittip-0001" gittip-username="jonnyboy">
+</span>
+<script id="gittip-0001"
+  src="https://www.gittip.com/assets/widgets/0001.js">
+</script>
 <hr>
 <a href='http://www.pledgie.com/campaigns/18980'><img alt='Click here to lend your support to: Newznab-tmux and make a donation at www.pledgie.com !' src='http://www.pledgie.com/campaigns/18980.png?skin_name=chrome' border='0' /></a>
