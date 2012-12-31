@@ -1,5 +1,7 @@
 # SETUP
 
+ * These scripts were written and tested on Ubuntu 12.10 where bash is located at /bin/bash. You may need to create a symlink or edit these script accordingly.
+
  * Please backup your database first. Something like this should do it.
 
     `mysqldump --opt -u root -p newznab > ~/newznab_backup.sql`
