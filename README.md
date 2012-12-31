@@ -41,9 +41,17 @@
 
  * If you notice that the pane middle right is empty, that is intentional. I have bwm-ng ready to go into that spot, if you have it installed. Once it is installed run these commands as root from the nix_scripts/tmux folder:
  
-    `sed -i -e "s/#'$BWMNG'/'$BWMNG'/" start.sh`
+    `sed -i -e "s/$TMUX splitw -h -p 50 '$BWMNG'/$TMUX splitw -h -p 50 '$BWMNG'/" start.sh`
     
     `sed -i -e 's/#command/command/' edit_these.sh`
+
+ * If you have mytop installed and would like to display it, run these commands as root from the nix_scripts/tmux folder:
+ 
+    `sed -i -e "s/#'$BWMNG'/'$TMUX splitw -h -p 75 '$MYTOP -u $DB_USER -p '$DB_PASSWORD' -d $DB_NAME -h $DB_HOST''/" start.sh`
+    
+    `sed -i -e 's/#command/command/' edit_these.sh`
+
+ * Don't do both at some time, one or the other.
 
  * If you are running this on an OVH or kimsufi server, you may need to run sudo ./start.sh because they built grsecurity into the kernel.
     
