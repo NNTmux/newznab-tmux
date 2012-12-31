@@ -39,5 +39,17 @@
  
  * update_cleanup needs to be uncommented to actually do something, and update_parsing is good for fixing a few releases everytime it runs, not a silver bullet though
 
+ * If you notice that the pane middle right is empty, that is intentional. I have bwm-ng ready to go into that spot, if you have it installed. Once installed run these as root from the nix_scripts/tmux folder:
+ 
+    `sed -i -e 's/#'$BWMNG'/'$BWMNG'/' start.sh`
+    `sed -i -e 's/#command/command/' edit_these.sh`
+    
+ * Now all panes should be running smoothly.
 
+
+
+<iframe style="border: 0; margin: 0; padding: 0;"
+        src="https://www.gittip.com/jonnyboy/widget.html"
+        width="48pt" height="22pt"></iframe>
+<hr>
 <a href='http://www.pledgie.com/campaigns/18980'><img alt='Click here to lend your support to: Newznab-tmux and make a donation at www.pledgie.com !' src='http://www.pledgie.com/campaigns/18980.png?skin_name=chrome' border='0' /></a>
