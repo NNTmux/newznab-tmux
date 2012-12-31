@@ -4,7 +4,7 @@
 
     `mysqldump --opt -u root -p newznab > ~/newznab_backup.sql`
 
- * This first step will modify your setup using [andrewit's github](https://github.com/itandrew/Newznab-InnoDB-Dropin.git)
+ * This first step will modify your setup using [andrewit's github](https://github.com/itandrew/Newznab-InnoDB-Dropin.git), if you want. If you do not convert, then use then use myisam when editing.
  * convert database to innodb, edit path if necessary
 
     `cd /var/www/newznab/misc/testing/`
