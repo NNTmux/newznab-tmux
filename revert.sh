@@ -3,10 +3,10 @@ source edit_these.sh
 
 
 
-if [ -f $NEWZPATH/www/lib/postprocess.php.orig ]; thne
+if [ -f $NEWZPATH/www/lib/postprocess.php.orig ]; then
   cp $NEWZPATH/www/lib/postprocess.php.orig $NEWZPATH/www/lib/postprocess.php
 else
-  $SED -i -e 's/\/\/$this->processAdditional();/$this->>processAdditional();/' $NEWZPATH/www/lib/postprocess.php
+  $SED -i -e 's/\/\/$this->processAdditional();/$this->processAdditional();/' $NEWZPATH/www/lib/postprocess.php
   $SED -i -e 's/\/\/$this->processNfos();/$this->processNfos();/' $NEWZPATH/www/lib/postprocess.php
   $SED -i -e 's/\/\/$this->processUnwanted();/$this->processUnwanted();/' $NEWZPATH/www/lib/postprocess.php
   $SED -i -e 's/\/\/$this->processMovies();/$this->processMovies();/' $NEWZPATH/www/lib/postprocess.php
