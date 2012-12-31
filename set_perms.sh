@@ -1,12 +1,17 @@
 #!/bin/bash
 source edit_these.sh
 
-if [ "$AGREED" == "no" ]; then
+if [[ "AGREED" == "no"]]; then
         echo "Please edit the edit_these.sh file"
         exit
 fi
 
 cp $TESTING_PATH/nzb-importmodified.php $NEWZPATH/www/admin/
+
+if [ -d "/home/$USERNAME" ]; then
+        cp conf/.tmux.conf /home/$USERNAME/.tmux.conf
+fi
+
 cp conf/.tmux.conf /home/$USERNAME/.tmux.conf
 $SED -i -e "s/'changeme',1/'$NZBPATH',0/" conf/.tmux.conf
 $SED -i -e 's/$this->processAdditional();/\/\/$this->>processAdditional();/' $NEWZPATH/www/lib/postprocess.php
