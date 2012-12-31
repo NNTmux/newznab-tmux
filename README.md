@@ -39,7 +39,7 @@
  
  * update_cleanup needs to be uncommented to actually do something, and update_parsing is good for fixing a few releases everytime it runs, not a silver bullet though
 
- * If you notice that the pane middle right is empty, that is intentional. I have bwm-ng ready to go into that spot, if you have it installed. Once installed run these as root from the nix_scripts/tmux folder:
+ * If you notice that the pane middle right is empty, that is intentional. I have bwm-ng ready to go into that spot, if you have it installed. Once it is installed run these commands as root from the nix_scripts/tmux folder:
  
     `sed -i -e 's/#'$BWMNG'/'$BWMNG'/' start.sh`
     
