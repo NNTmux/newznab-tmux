@@ -1,33 +1,75 @@
 #!/bin/bash
+SOURCE="${BASH_SOURCE[0]}"
+DIR="$( dirname "$SOURCE" )"
+while [ -h "$SOURCE" ]
+do
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
+  DIR="$( cd -P "$( dirname "$SOURCE"  )" && pwd )"
+done
+DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+
 source edit_these.sh
+clear
 
 if [[ $AGREED == "no" ]]; then
         echo "Please edit the edit_these.sh file"
         exit
 fi
 
+echo -e "\033[38;5;148mcp $TESTING_PATH/nzb-importmodified.php $NEWZPATH/www/admin/"
 cp $TESTING_PATH/nzb-importmodified.php $NEWZPATH/www/admin/
 
-if [ -d "/home/$USERNAME" ]; then
-        cp conf/.tmux.conf /home/$USERNAME/.tmux.conf
-        sed -i 's,'changeme,"$NZBS"',' "/home/$USERNAME/.tmux.conf"
+if [ -d "$HOME" ]; then
+	echo "cp conf/.tmux.conf $HOME/.tmux.conf"
+        cp conf/.tmux.conf $HOME/.tmux.conf
+        sed -i 's,'changeme,"$NZBS"',' "$HOME/.tmux.conf"
 fi
 
-cp $NEWZPATH/www/lib/postprocess.php $NEWZPATH/www/lib/postprocess.php.orig
-$SED -i -e 's/$this->processAdditional();/\/\/$this->processAdditional();/' $NEWZPATH/www/lib/postprocess.php
-$SED -i -e 's/$this->processNfos();/\/\/$this->processNfos();/' $NEWZPATH/www/lib/postprocess.php
-$SED -i -e 's/$this->processUnwanted();/\/\/$this->processUnwanted();/' $NEWZPATH/www/lib/postprocess.php
-$SED -i -e 's/$this->processMovies();/\/\/$this->processMovies();/' $NEWZPATH/www/lib/postprocess.php
-$SED -i -e 's/$this->processMusic();/\/\/$this->processMusic();/' $NEWZPATH/www/lib/postprocess.php
-$SED -i -e 's/$this->processBooks();/\/\/$this->processBooks();/' $NEWZPATH/www/lib/postprocess.php
-$SED -i -e 's/$this->processGames();/\/\/$this->processGames();/' $NEWZPATH/www/lib/postprocess.php
-$SED -i -e 's/$this->processTv();/\/\/$this->processTv();/' $NEWZPATH/www/lib/postprocess.php
-$SED -i -e 's/$this->processMusicFromMediaInfo();/\/\/$this->processMusicFromMediaInfo();/' $NEWZPATH/www/lib/postprocess.php
-$SED -i -e 's/$this->processOtherMiscCategory();/\/\/$this->processOtherMiscCategory();/' $NEWZPATH/www/lib/postprocess.php
-$SED -i -e 's/$this->processUnknownCategory();/\/\/$this->processUnknownCategory();/' $NEWZPATH/www/lib/postprocess.php
+echo "Editing $NEWZPATH/www/lib/postprocess.php"
+if [ ! -f $NEWZPATH/www/lib/postprocess.php.orig ]; then
+	cp $NEWZPATH/www/lib/postprocess.php $NEWZPATH/www/lib/postprocess.php.orig
+fi
+if ! grep -q '//$this->processAdditional();' "$NEWZPATH/www/lib/postprocess.php" ; then
+	$SED -i -e 's/$this->processAdditional();/\/\/$this->processAdditional();/' $NEWZPATH/www/lib/postprocess.php
+fi
+if ! grep -q '//$this->processNfos();' "$NEWZPATH/www/lib/postprocess.php" ; then
+	$SED -i -e 's/$this->processNfos();/\/\/$this->processNfos();/' $NEWZPATH/www/lib/postprocess.php
+fi
+if ! grep -q '//$this->processUnwanted();' "$NEWZPATH/www/lib/postprocess.php" ; then
+	$SED -i -e 's/$this->processUnwanted();/\/\/$this->processUnwanted();/' $NEWZPATH/www/lib/postprocess.php
+fi
+if ! grep -q '//$this->processMovies();' "$NEWZPATH/www/lib/postprocess.php" ; then
+	$SED -i -e 's/$this->processMovies();/\/\/$this->processMovies();/' $NEWZPATH/www/lib/postprocess.php
+fi
+if ! grep -q '//$this->processMusic();' "$NEWZPATH/www/lib/postprocess.php" ; then
+	$SED -i -e 's/$this->processMusic();/\/\/$this->processMusic();/' $NEWZPATH/www/lib/postprocess.php
+fi
+if ! grep -q '//$this->processBooks();' "$NEWZPATH/www/lib/postprocess.php" ; then
+	$SED -i -e 's/$this->processBooks();/\/\/$this->processBooks();/' $NEWZPATH/www/lib/postprocess.php
+fi
+if ! grep -q '//$this->processGames();' "$NEWZPATH/www/lib/postprocess.php" ; then
+	$SED -i -e 's/$this->processGames();/\/\/$this->processGames();/' $NEWZPATH/www/lib/postprocess.php
+fi
+if ! grep -q '//$this->processTv();' "$NEWZPATH/www/lib/postprocess.php" ; then
+	$SED -i -e 's/$this->processTv();/\/\/$this->processTv();/' $NEWZPATH/www/lib/postprocess.php
+fi
+if ! grep -q '//$this->processMusicFromMediaInfo();' "$NEWZPATH/www/lib/postprocess.php" ; then
+	$SED -i -e 's/$this->processMusicFromMediaInfo();/\/\/$this->processMusicFromMediaInfo();/' $NEWZPATH/www/lib/postprocess.php
+fi
+if ! grep -q '//$this->processOtherMiscCategory();' "$NEWZPATH/www/lib/postprocess.php" ; then
+	$SED -i -e 's/$this->processOtherMiscCategory();/\/\/$this->processOtherMiscCategory();/' $NEWZPATH/www/lib/postprocess.php
+fi
+if ! grep -q '//$this->processUnknownCategory();' "$NEWZPATH/www/lib/postprocess.php" ; then
+	$SED -i -e 's/$this->processUnknownCategory();/\/\/$this->processUnknownCategory();/' $NEWZPATH/www/lib/postprocess.php
+fi
+
+echo "Fixing permisions, this can take some time if you have a large set of releases"
 chmod 777 $NEWZPATH/www/lib/smarty/templates_c
 chmod -R 777 $NEWZPATH/www/covers
 chmod 777 $NEWZPATH/www
 chmod 777 $NEWZPATH/www/install
 chmod -R 777 $NEWZPATH/nzbfiles
 chmod 777 $NEWZPATH/nzbfiles/tmpunrar/
+
+echo -e "\033[38;5;160mCompleted\033[39m"
