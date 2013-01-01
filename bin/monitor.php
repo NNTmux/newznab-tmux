@@ -19,10 +19,14 @@ while ($row = mysql_fetch_assoc($result_begin)) {
 }
 
 $i=1;
-while($i=1)
+while($i>0)
 {
   $result_inner_loop = mysql_query($query);
-  sleep(60);
+
+  if ($i>1) {
+    sleep(60);
+  }
+
   $result_loop = mysql_query($query);
 
   if (!$result_inner_loop) {
@@ -54,6 +58,8 @@ while($i=1)
   printf("$count_loop releases currently in your database\n\n");
   printf("***Info***\n");
   printf("Above left shows the current NFO's being analyzed. Above middle shows the the processing for. Above right show the lookups for TVRage, music, etc. Below left shows the activity of imports - it is looping nzb import, backfill and current fill. Below right shows the activity of applying regex's and creating releases.\n");
+
+  $i++;
 }
 
 mysql_free_result($result_begin);

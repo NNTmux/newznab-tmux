@@ -39,15 +39,15 @@
  
  * update_cleanup needs to be uncommented to actually do something, and update_parsing is good for fixing a few releases everytime it runs, not a silver bullet though
 
- * If you notice that the pane middle right is empty, that is intentional. I have bwm-ng ready to go into that spot, if you have it installed. Once it is installed run these commands as root from the nix_scripts/tmux folder:
- 
-    `sed -i -e "s/$TMUX splitw -h -p 50 '$BWMNG'/$TMUX splitw -h -p 50 '$BWMNG'/" start.sh`
-    
-    `sed -i -e 's/#command/command/' edit_these.sh`
+ * You have two choices for monitoring activity. Mytop monitors the sctivity of you mysql database and bwm-ng monitors your current traffic. Theses are selected in the edit_these.sh file. Only one can be selected at a time.
+
+
 
  * If you are running this on an OVH or kimsufi server, you may need to run sudo ./start.sh because they built grsecurity into the kernel.
     
  * Now all panes should be running smoothly.
+
+
 
 <hr>
 <a href='http://www.pledgie.com/campaigns/18980'><img alt='Click here to lend your support to: Newznab-tmux and make a donation at www.pledgie.com !' src='http://www.pledgie.com/campaigns/18980.png?skin_name=chrome' border='0' /></a>

@@ -7,26 +7,19 @@ if [[ $AGREED == "no" ]]; then
 	exit
 fi
 
-$TMUX new-session -d -s NewzNab -n NewzNab 'echo "processNfos Working......" && sleep 30 && $PHP bin/postprocess_nfo.php'
+$TMUX new-session -d -s NewzNab -n NewzNab 'echo "processNfos Working......" && $PHP bin/postprocess_nfo.php'
 $TMUX selectp -t 0
 $TMUX splitw -v -p 82 'echo "monitor Working......" && $PHP bin/monitor.php'
-
-
-if [ "$THREADS" == "true"  -a "$INNODB" == "true" ]; then
-	$TMUX splitw -v -p 66 'cd bin && echo "imports Working......" && sleep 45 && ./innodb_import_full_threaded.sh'
-elif [ "$THREADS" != "true" -a "$INNODB" == "true" ]; then
-	$TMUX splitw -v -p 66 'cd bin && echo "imports Working......" && sleep 45 && ./innodb_import_threaded.sh'
-elif [ "$THREADS" == "true" -a "$INNODB" != "true" ]; then
-	$TMUX splitw -v -p 66 'cd bin && echo "imports Working......" && sleep 45 && ./myisam_import_full_threaded.sh'
-else
-	$TMUX splitw -v -p 66 'cd bin && echo "imports Working......" && sleep 45 && ./myisam_import_threaded.sh'
-fi
-
+$TMUX splitw -v -p 66 'cd bin && echo "imports Working......" && ./workhorse.sh'
 $TMUX selectp -t 0
-$TMUX splitw -h -p 66 'echo "processAdditional Working......" && sleep 35 && $PHP bin/processAlternate.php'
-$TMUX splitw -h -p 50 'echo "postProcessing Working......" && sleep 40 && $PHP bin/postprocessing.php'
+$TMUX splitw -h -p 66 'echo "processAdditional Working......" && $PHP bin/processAlternate.php'
+$TMUX splitw -h -p 50 'echo "postProcessing Working......" && $PHP bin/postprocessing.php'
 $TMUX selectp -t 3
-$TMUX splitw -h -p 50 #'$BWMNG'
+if [[ $CHOICE_APP == "mytop" ]]; then
+        $TMUX splitw -h -p 50 '$MYTOP -u $DB_USER -p $DB_PASSWORD -d $DB_NAME -h $DB_HOST'
+else
+	$TMUX splitw -h -p 50 '$BWMNG'
+fi
 $TMUX selectp -t 5
 $TMUX splitw -h -p 50 'cd bin && echo "create Releases Working......" && ./cleanup_scripts.sh'
 

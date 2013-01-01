@@ -22,6 +22,12 @@ export THREADS='true'
 #Choose your database, comment the one true/false
 export INNODB='true'
 
+#Choose which app to run in the middle right pane, of course it must be installed. Your choices are mytop and bwm-ng.
+#Only have 1 uncommented at a time.
+
+export CHOICE_APP='bwm-ng'
+#export CHOICE_APP='mytop'
+
 #By using this script you understand that the programmer is not responsible for any loss of data, users, or sanity.
 #You also agree that you were smart enough to make a backup of your database and files. Do you agree? yes/no
 
@@ -33,6 +39,6 @@ export AGREED='no'
 export MYSQL=`which mysql`
 export SED=`which sed`
 command -v php5 >/dev/null && export PHP=`which php5` || { export PHP=`which php`; }
-command -v tmux >/dev/null && export TMUX=`which tmux` || { echo tmux command not found.\n apt-get install tmux\n or if on a real server yum install tmux; exit 1; }
-#command -v bwm-ng >/dev/null && export BWMNG=`which bwm-ng` || { echo bwm-ng command not found.\n apt-get install bwm-ng; exit 1; }
-
+command -v tmux >/dev/null && export TMUX=`which tmux`
+command -v bwm-ng >/dev/null && export BWMNG=`which bwm-ng`
+command -v mytop >/dev/null && export MYTOP=`which mytop`
