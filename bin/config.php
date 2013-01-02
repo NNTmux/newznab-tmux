@@ -1,6 +1,8 @@
 <?php
 
-require_once(dirname(__FILE__)."/../../../../../www/config.php");
+$newzpath = getenv('NEWZPATH');
+require_once("$newzpath/www/config.php");
 require_once(WWW_DIR."/lib/postprocess.php");
 
 ?>
+
