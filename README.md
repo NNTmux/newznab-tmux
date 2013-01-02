@@ -52,7 +52,7 @@
 <hr>
  * Donations help to pay my hosting fees and server costs. Thank you
 
-<center>![My donate button](https://github.com/ttscoff/JekyllPlugins/blob/master/Donation/DonateButton.gif?raw=true)</center>
-{% donate N4AJV5FHZDBFE "Buy me some coffee, ok?" %}
+<center>![{% donate N4AJV5FHZDBFE "Buy me some coffee, ok?" %}](https://github.com/ttscoff/JekyllPlugins/blob/master/Donation/DonateButton.gif?raw=true)</center>
+
 <center><a href='http://www.pledgie.com/campaigns/18980'><img alt='Click here to lend your support to: Newznab-tmux and make a donation at www.pledgie.com !' src='http://www.pledgie.com/campaigns/18980.png?skin_name=chrome' border='0' /></a></center>
 
