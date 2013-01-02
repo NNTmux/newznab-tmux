@@ -1,52 +1,53 @@
 <?php
- 
+
 require("config.php");
 require_once(WWW_DIR."/lib/postprocess.php");
- 
+$_php = getenv("PHP");
+
 $db = new DB();
 $query = "select count(*) from releases";
- 
+
 $result_begin = mysql_query($query);
- 
+
 if (!$result_begin) {
   $message  = 'Invalid query: ' . mysql_error() . "\n";
   $message .= 'Whole query: ' . $query;
   die($message);
 }
- 
+
 while ($row = mysql_fetch_assoc($result_begin)) {
   $count_begin = $row['count(*)'];
 }
- 
+
 $time = TIME();
- 
+
 $i=1;
 while($i=1)
 {
   $result_inner_loop = mysql_query($query);
   sleep(60);
   $result_loop = mysql_query($query);
- 
+
   if (!$result_inner_loop) {
     $message  = 'Invalid query: ' . mysql_error() . "\n";
     $message .= 'Whole query: ' . $query;
     die($message);
   }
- 
+
   while ($row = mysql_fetch_assoc($result_inner_loop)) {
     $count_inner_loop = $row['count(*)'];
   }
- 
+
   if (!$result_loop) {
     $message  = 'Invalid query: ' . mysql_error() . "\n";
     $message .= 'Whole query: ' . $query;
     die($message);
   }
- 
+
   while ($row = mysql_fetch_assoc($result_loop)) {
     $count_loop = $row['count(*)'];
   }
- 
+
   $secs = TIME() - $time;
   $mins = floor($secs / 60);
   $hrs = floor($mins / 60);
@@ -67,10 +68,28 @@ while($i=1)
   printf("$count_loop releases currently in your database\n\n");
   printf("***Info***\n");
   printf("Above left shows the current NFO's being analyzed. Above middle shows the the processing for. Above right show the lookups for TVRage, music, etc. Below left shows the activity of imports - it is looping nzb import, backfill and current fill. Below right shows the activity of applying regex's and creating releases.\n");
+
+
+ //check if scripts are running
+  exec("pgrep -f postprocess_nfo", $pids1);
+  if (empty($pids1)) {
+    echo "postprocess_nfo.php is not running, restarting\n";
+    exec("tmux send-keys -t NewzNab:0.0 'clear && cd bin && $_php postprocess_nfo.php' C-m");
+  }
+  exec("pgrep -f processAlternate", $pids2);
+  if (empty($pids2)) {
+    echo "processAlternate.php is not running, restarting\n";
+    exec("tmux send-keys -t NewzNab:0.1 'clear && cd bin && $_php processAlternate.php' C-m");
+  }
+  exec("pgrep -f postprocessing", $pids3);
+  if (empty($pids3)) {
+    echo "postprocessing.php is not running, restarting\n";
+    exec("tmux send-keys -t NewzNab:0.2 'clear && cd bin && $_php postprocessing.php' C-m");
+  }
 }
- 
+
 mysql_free_result($result_begin);
 mysql_free_result($result_loop);
- 
+
 ?>
 
