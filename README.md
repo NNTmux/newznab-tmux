@@ -52,16 +52,7 @@
 <hr>
  * Donations help to pay my hosting fees and server costs. Thank you
 
-<center>![My donate button](https://github.com/ttscoff/JekyllPlugins/blob/master/Donation/DonateButton.gif?raw=true)
-<a href='http://www.pledgie.com/campaigns/18980'><img alt='Click here to lend your support to: Newznab-tmux and make a donation at www.pledgie.com !' src='http://www.pledgie.com/campaigns/18980.png?skin_name=chrome' border='0' /></a></center>
-```html
-<form class="paypalform" action="https://www.paypal.com/cgi-bin/webscr" method="post">
-  <input type="hidden" name="cmd" value="_s-xclick">
-  <input type="hidden" name="hosted_button_id" value="N4AJV5FHZDBFE">
-  <button class="paypalbutton" name="submit">
-    <span>Buy me coffee</span>
-  </button>
-  <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1">
-</form>
-```
+{% donate N4AJV5FHZDBFE "Buy me some coffee, ok?" %}
+<center>![My donate button](https://github.com/ttscoff/JekyllPlugins/blob/master/Donation/DonateButton.gif?raw=true)</center>
+<center><a href='http://www.pledgie.com/campaigns/18980'><img alt='Click here to lend your support to: Newznab-tmux and make a donation at www.pledgie.com !' src='http://www.pledgie.com/campaigns/18980.png?skin_name=chrome' border='0' /></a></center>
 
