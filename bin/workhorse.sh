@@ -78,7 +78,7 @@ elif [ "$THREADS" == "true" -a "$INNODB" != "true" ]; then
 	    wait
 
 	    #increment backfill days
-	    #$MYSQL -u$DB_USER -h $DB_HOST --password=$DB_PASSWORD $DB_NAME -e "${MYSQL_CMD}"
+	    $MYSQL -u$DB_USER -h $DB_HOST --password=$DB_PASSWORD $DB_NAME -e "${MYSQL_CMD}"
 
 	    echo "imports waiting $NEWZNAB_IMPORT_SLEEP_TIME seconds..."
 	    sleep $NEWZNAB_IMPORT_SLEEP_TIME
