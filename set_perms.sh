@@ -27,6 +27,11 @@ if [ -d "/home/$USERNAME" ]; then
         cp conf/.tmux.conf /home/$USERNAME/.tmux.conf
         sed -i 's,'changeme,"$NZBS"',' "/home/$USERNAME/.tmux.conf"
 fi
+if [ -d "$HOME" ]; then
+        echo "cp conf/.tmux.conf $HOME/.tmux.conf"
+        cp conf/.tmux.conf $HOME/.tmux.conf
+        sed -i 's,'changeme,"$NZBS"',' "$HOME/.tmux.conf"
+fi
 
 echo "Editing $NEWZPATH/www/lib/postprocess.php"
 if [ ! -f $NEWZPATH/www/lib/postprocess.php.orig ]; then
