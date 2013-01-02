@@ -1,4 +1,4 @@
-<?
+<?php
   class pidfile {
     private $_file;
     private $_running;
