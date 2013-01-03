@@ -18,13 +18,16 @@ $query = "select count(rn.releaseID) from releasenfo rn left outer join releases
 $i=1;
 while($i=1)
 {
-  //$result = mysql_query($query);
-  $result = $db->queryDirect($query);
+  $result = mysql_query($query);
+  //$result = $db->queryDirect($query);
 
-  if (!$result) {
-    $message  = 'Invalid query: ' . mysql_error() . "\n";
-    $message .= 'Whole query: ' . $query;
-    die($message);
+  if (empty($result)) {
+    $result = $db->queryDirect($query);
+    if (empty($result)) {
+      $message  = 'Invalid query: ' . mysql_error() . "\n";
+      $message .= 'Whole query: ' . $query;
+      die($message);
+    }
   }
 
   while ($row = mysql_fetch_assoc($result)) {

@@ -8,13 +8,16 @@ $db = new DB();
 $query = "select count(*) from releases";
 //$query2 = "select format(count(*),0) from releases r left join category c on c.ID = r.categoryID where ((r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0))";
 
-//$result_begin = mysql_query($query);
-$result_begin = $db->queryDirect($query);
+$result_begin = mysql_query($query);
+//$result_begin = $db->queryDirect($query);
 
-if (!$result_begin) {
-  $message  = 'Invalid query: ' . mysql_error() . "\n";
-  $message .= 'Whole query: ' . $query;
-  die($message);
+if (empty($result_begin)) {
+  $result_begin = $db->queryDirect($query);
+  if (empty($result_begin)) {
+    $message  = 'Invalid query: ' . mysql_error() . "\n";
+    $message .= 'Whole query: ' . $query;
+    die($message);
+  }
 }
 
 while ($row = mysql_fetch_assoc($result_begin)) {
@@ -26,27 +29,33 @@ $time = TIME();
 $i=1;
 while($i=1)
 {
-  //$result_inner_loop = mysql_query($query);
-  $result_inner_loop = $db->queryDirect($query);
+  $result_inner_loop = mysql_query($query);
+  //$result_inner_loop = $db->queryDirect($query);
 
   sleep(60);
-  //$result_loop = mysql_query($query);
-  $result_loop = $db->queryDirect($query);
+  $result_loop = mysql_query($query);
+  //$result_loop = $db->queryDirect($query);
 
-  if (!$result_inner_loop) {
-    $message  = 'Invalid query: ' . mysql_error() . "\n";
-    $message .= 'Whole query: ' . $query;
-    die($message);
-  }
+  if (empty($result_inner_loop)) {
+    $result_inner_loop = $db->queryDirect($query);
+    if (empty($result_inner_loop)) {
+      $message  = 'Invalid query: ' . mysql_error() . "\n";
+      $message .= 'Whole query: ' . $query;
+      die($message);
+    }
+ }
 
   while ($row = mysql_fetch_assoc($result_inner_loop)) {
     $count_inner_loop = $row['count(*)'];
   }
 
-  if (!$result_loop) {
-    $message  = 'Invalid query: ' . mysql_error() . "\n";
-    $message .= 'Whole query: ' . $query;
-    die($message);
+  if (empty($result_loop)) {
+    $result_loop = $db->queryDirect($query);
+    if (empty($result_loop)) {
+      $message  = 'Invalid query: ' . mysql_error() . "\n";
+      $message .= 'Whole query: ' . $query;
+      die($message);
+    }
   }
 
   while ($row = mysql_fetch_assoc($result_loop)) {
