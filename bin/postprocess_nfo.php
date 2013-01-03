@@ -34,7 +34,7 @@ while($i=1)
     $postprocess = new PostProcess(true);
     $postprocess->processNfos();
   } else {
-    echo "$count releases available for processing.....\n";
+    echo "NfoPrc  : Processing $count nfos\n";
     sleep(10);
   }
 }
