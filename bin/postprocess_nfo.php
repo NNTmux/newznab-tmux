@@ -30,11 +30,11 @@ while($i=1)
     $count = $row['count(rn.releaseID)'];
   }
 
-  if ($count > 10) {
+  if ($count > 0) {
     $postprocess = new PostProcess(true);
     $postprocess->processNfos();
   } else {
-    echo "sleeping.....\n";
+    echo "$count releases available for processing.....\n";
     sleep(10);
   }
 }
