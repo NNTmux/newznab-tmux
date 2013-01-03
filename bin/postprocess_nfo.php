@@ -18,7 +18,8 @@ $query = "select count(rn.releaseID) from releasenfo rn left outer join releases
 $i=1;
 while($i=1)
 {
-  $result = mysql_query($query);
+  //$result = mysql_query($query);
+  $result = $db->queryDirect($query);
 
   if (!$result) {
     $message  = 'Invalid query: ' . mysql_error() . "\n";
@@ -30,11 +31,11 @@ while($i=1)
     $count = $row['count(rn.releaseID)'];
   }
 
-  if ($count > 10) {
+  if ($count > 0) {
     $postprocess = new PostProcess(true);
     $postprocess->processNfos();
   } else {
-    echo "sleeping.....\n";
+    echo "NfoPrc  : Processing $count nfos\n";
     sleep(10);
   }
 }
