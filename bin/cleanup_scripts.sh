@@ -27,7 +27,6 @@ then
         [ -f $NEWZNAB_PATH/update_predb.php ] && $PHP $NEWZNAB_PATH/update_predb.php true
 fi
 
-
 CURRTIME=`date +%s`
 #every 2 hours and during first loop
 DIFF=$(($CURRTIME-$LASTOPTIMIZE2))
@@ -37,7 +36,9 @@ then
         cd $TESTING_PATH
         [ -f $TESTING_PATH/update_parsing.php ] && $PHP $TESTING_PATH/update_parsing.php
         [ -f $TESTING_PATH/removespecial.php ] && $PHP $TESTING_PATH/removespecial.php
-        [ -f $TESTING_PATH/update_cleanup.php ] && $PHP $TESTING_PATH/update_cleanup.php
+	if [[ $CLEANUP == "true" ]]; then
+	        [ -f $TESTING_PATH/update_cleanup.php ] && $PHP $TESTING_PATH/update_cleanup.php
+	fi
 fi
 
 CURRTIME=`date +%s`

@@ -20,6 +20,9 @@ export THREADS="true"
 #Choose your database, comment the one true/false
 export INNODB="true"
 
+#Choose to run update_cleanup.php true/false
+export CLEANUP="true"
+
 #Choose which app to run in the middle right pane, of course it must be installed. Your choices are mytop and bwm-ng.
 #Only have 1 uncommented at a time.
 
