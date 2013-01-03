@@ -20,8 +20,6 @@ fi
 echo -e "\033[38;5;148mcp $TESTING_PATH/nzb-importmodified.php $NEWZPATH/www/admin/"
 cp $TESTING_PATH/nzb-importmodified.php $NEWZPATH/www/admin/
 
-sed -i 's,'changeme,"$NZBS"',' "/home/$USERNAME/.tmux.conf"
-
 if [ -d "/home/$USERNAME" ]; then
 	echo "cp conf/.tmux.conf /home/$USERNAME/.tmux.conf"
         cp conf/.tmux.conf /home/$USERNAME/.tmux.conf
