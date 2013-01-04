@@ -37,9 +37,14 @@ export AGREED="no"
 ##END OF EDITS##
 
 
-export MYSQL=`which mysql`
-export SED=`which sed`
-command -v php5 >/dev/null && export PHP=`which php5` || { export PHP=`which php`; }
-command -v tmux >/dev/null && export TMUX=`which tmux`
-command -v bwm-ng >/dev/null && export BWMNG=`which bwm-ng`
-command -v mytop >/dev/null && export MYTOP=`which mytop`
+command -v mysql >/dev/null 2>&1 || { echo >&2 "I require mysql but it's not installed.  Aborting."; exit 1; } && export MYSQL=`command -v mysql`
+command -v sed >/dev/null 2>&1 || { echo >&2 "I require sed but it's not installed.  Aborting."; exit 1; } && export SED=`command -v sed`
+command -v php5 >/dev/null 2>&1 && export PHP=`command -v php5` || { export PHP=`command -v php`; }
+command -v tmux >/dev/null 2>&1 || { echo >&2 "I require tmux but it's not installed.  Aborting."; exit 1; } && export TMUX=`command -v tmux`
+if [[ $CHOICE_APP == "bwm-ng" ]]; then
+  command -v bwm-ng >/dev/null 2>&1 || { echo >&2 "I require bwm-ng but it's not installed.  Aborting."; exit 1; } && export BWMNG=`command -v bwm-ng`
+fi
+if [[ $CHOICE_APP == "mytop" ]]; then
+  command -v mytop >/dev/null 2>&1|| { echo >&2 "I require mytop but it's not installed.  Aborting."; exit 1; } && export MYTOP=`command -v mytop`
+fi
+
