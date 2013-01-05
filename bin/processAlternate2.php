@@ -5,11 +5,10 @@ require_once("$newzpath/www/config.php");
 require_once("lib/postprocess2.php");
 
 $db = new DB();
-$query = "select format(count(*),0) from releases r left join category c on c.ID = r.categoryID where ((r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0))";
+$query = "select count(*) from releases r left join category c on c.ID = r.categoryID where ((r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0))";
 
 $i=1;
 while($i=1)
-
 {
   $result = mysql_query($query);
 
@@ -23,15 +22,15 @@ while($i=1)
   }
 
   while ($row = mysql_fetch_assoc($result)) {
-    $count = $row['format(count(*),0)'];
+    $count = $row['count(*)'];
   }
 
-  if ($count > 50) {
+  if ($count > 10) {
     $postprocess = new PostProcess2(true);
     $postprocess->processAdditional2();
   } else {
     echo "$count releases left to process\n";
-    sleep(10);
+    sleep(15);
   }
 }
 
