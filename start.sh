@@ -39,9 +39,9 @@ $TMUX splitw -v -p 50 'cd bin && echo "Processing Other....." && sleep 27 && ./p
 $TMUX selectp -t 9
 $TMUX splitw -v -p 63 'cd bin && echo "imports Working......" && ./workhorse.sh;exec bash -i'
 $TMUX selectp -t 9
-$TMUX splitw -h -p 67 'nmon'
-$TMUX splitw -h -p 50 '$MYTOP -u $DB_USER -p $DB_PASSWORD -d $DB_NAME -h $DB_HOST'
-$TMUX selectp -t 12
+#$TMUX splitw -h -p 67 'nmon'
+$TMUX splitw -h -p 67 '$MYTOP -u $DB_USER -p $DB_PASSWORD -d $DB_NAME -h $DB_HOST'
+$TMUX selectp -t 11
 $TMUX splitw -h -p 50 'cd bin && echo "create Releases Working......" && ./cleanup_scripts.sh;exec bash -i'
 
 $TMUX select-window -tNewzNab:0
