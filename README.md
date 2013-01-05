@@ -18,16 +18,12 @@
 
     `php bpinnodb_compressed.php`    
 
- * Or, you can use [andrewit's github](https://github.com/itandrew/Newznab-InnoDB-Dropin.git). If you are using Innodb, this script uses some of [andrewit's](https://github.com/itandrew/Newznab-InnoDB-Dropin.git), so you will need to follow at least the next 2 commands.
-
- * convert database to innodb, edit path if necessary
+ * Now clone [keven123's github](https://github.com/kevinlekiller/Newznab-InnoDB-Dropin.git) and get the scripts.
 
     `cd /var/www/newznab/misc/testing/`
     
-    `git clone git://github.com/itandrew/Newznab-InnoDB-Dropin.git innodb`
+    `git clone https://github.com/kevinlekiller/Newznab-InnoDB-Dropin.git innodb`
     
-    `php5 innodb/lib/innodb/convertToInnoDB.php`
-
  * Clone my github
 
     `cd /var/www/newznab/misc/update_scripts/nix_scripts/`

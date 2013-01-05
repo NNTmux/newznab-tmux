@@ -23,6 +23,13 @@ export INNODB="true"
 #Choose to run update_cleanup.php true/false
 export CLEANUP="true"
 
+#Choose to run backfill script true/false
+export BACKFILL="true"
+
+#Choose to run import nzb script true/false
+export IMPORT="true"
+
+
 #By using this script you understand that the programmer is not responsible for any loss of data, users, or sanity.
 #You also agree that you were smart enough to make a backup of your database and files. Do you agree? yes/no
 
