@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 set -e
 
 source ../edit_these.sh
@@ -111,4 +110,4 @@ else
 	done
 
 fi
-
+exit

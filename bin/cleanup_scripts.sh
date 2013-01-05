@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 set -e
 
 source ../edit_these.sh
@@ -69,3 +68,4 @@ sleep $NEWZNAB_POST_SLEEP_TIME
 
 done
 
+exit

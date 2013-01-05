@@ -78,3 +78,12 @@ chmod -R 777 $NEWZPATH/nzbfiles
 chmod 777 $NEWZPATH/nzbfiles/tmpunrar/
 
 echo -e "\033[38;5;160mCompleted\033[39m"
+
+echo -e "This script includes nmon and mytop. Please install them prior to running ./start.sh."
+echo -e "If the nmon pane close when you select networking, then you will need to  use sudo or su."
+echo -e "Tmux is very easy to use. To detach from the current session, use Ctrl-a d. You can select"
+echo -e "simply by clicking in it and you can resize by dragging the borders."
+
+
+exit
+

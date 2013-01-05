@@ -30,3 +30,5 @@ else
 fi
 
 echo "my edits have been removed"
+
+exit

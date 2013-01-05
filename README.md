@@ -6,7 +6,20 @@
 
     `mysqldump --opt -u root -p newznab > ~/newznab_backup.sql`
 
- * This first step will modify your setup using [andrewit's github](https://github.com/itandrew/Newznab-InnoDB-Dropin.git), if you want. If you do not convert, then use then use myisam when editing.
+ * The first step is to decide whether or not you will convert your database to the InnoDB engine. The InnoDB has a lot of benefits, too many to list here, but more ram is required. How much exactly, depends on too many things to list here.
+
+ * If you decide to convert your database, I recommend using [kevein123's github](https://github.com/kevinlekiller/Newznab-Barracuda.git). I recommend only converting the binaries a parts table, using compressed tables. But, there are many choices. I suggest you read his README and follow his recommendations. Or, simply:
+
+    `cd to a location to store the git git repository.`
+
+    `git clone https://github.com/kevinlekiller/Newznab-Barracuda.git`
+
+    `cd Newznab-Barracuda/B\ +\ P/`
+
+    `php bpinnodb_compressed.php`    
+
+ * Or, you can use [andrewit's github](https://github.com/itandrew/Newznab-InnoDB-Dropin.git). If you are using Innodb, this script uses some of [andrewit's](https://github.com/itandrew/Newznab-InnoDB-Dropin.git), so you will need to follow at least the next 2 commands.
+
  * convert database to innodb, edit path if necessary
 
     `cd /var/www/newznab/misc/testing/`
@@ -47,9 +60,11 @@
     
  * Now all panes should be running smoothly. If any of the scriptns in the top 3 panes crash, the panes should remain open and you should be able to view the error messages. I hope this helps.
 
+ * Join in the converstion at irc://moonlight.se.eu.synirc.net/newznab-tmux.
 
+ * Thanks go to all who offered their assistance and improvement to these scripts.
 
 <hr>
- * Donations help to pay my hosting fees and server costs. Thank you
+ * IOf, you find these scripts useful and would like to offer a donation. Danotions are greatly appreciated. Thank you
 
 <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=N4AJV5FHZDBFE"><img src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" alt="PayPal - The safer, easier way to pay online!" /></a><a href='http://www.pledgie.com/campaigns/18980'><img alt='Click here to lend your support to: Newznab-tmux and make a donation at www.pledgie.com !' src='http://www.pledgie.com/campaigns/18980.png?skin_name=chrome' border='0' /></a>
