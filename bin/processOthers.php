@@ -8,6 +8,10 @@ while($i=1)
 {
   {
     $postprocess = new PostProcess(true);
+    $postprocess->processUnwanted();
+  }
+  {
+    $postprocess = new PostProcess(true);
     $postprocess->processMusicFromMediaInfo();
   }
   {
@@ -18,6 +22,7 @@ while($i=1)
     $postprocess = new PostProcess(true);
     $postprocess->processUnknownCategory();
   }
+  sleep(30);
 }
 
 ?>

@@ -7,8 +7,7 @@ eval $( sed -n "/^define/ { s/.*('\([^']*\)', '*\([^']*\)'*);/export \1=\"\2\"/;
 while :
 do
 
-  echo "Processing TV....." && $PHP processTv.php
-  sleep 30
+  $PHP processTv.php
 
 done
 exit
