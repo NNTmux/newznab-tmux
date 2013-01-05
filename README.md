@@ -8,7 +8,7 @@
 
  * The first step is to decide whether or not you will convert your database to the InnoDB engine. The InnoDB has a lot of benefits, too many to list here, but more ram is required. How much exactly, depends on too many things to list here.
 
- * If you decide to convert your database, I recommend using [kevein123's github](https://github.com/kevinlekiller/Newznab-Barracuda.git). I recommend only converting the binaries a parts table, using compressed tables. But, there are many choices. I suggest you read his README and follow his recommendations. Or, simply:
+ * If you decide to convert your database, I recommend using [kevin123's github](https://github.com/kevinlekiller/Newznab-Barracuda.git). I recommend only converting the binaries a parts table, using compressed tables. But, there are many choices. I suggest you read his README and follow his recommendations. Or, simply:
 
     `cd to a location to store the git git repository.`
 
@@ -16,14 +16,16 @@
 
     `cd Newznab-Barracuda/B\ +\ P/`
 
-    `php bpinnodb_compressed.php`    
+    `php bpinnodb_compressed.php`
 
- * Now clone [keven123's github](https://github.com/kevinlekiller/Newznab-InnoDB-Dropin.git) and get the scripts.
+
+ * Now clone [kevin123's github](https://github.com/kevinlekiller/Newznab-InnoDB-Dropin.git) and get the scripts.
 
     `cd /var/www/newznab/misc/testing/`
     
     `git clone https://github.com/kevinlekiller/Newznab-InnoDB-Dropin.git innodb`
     
+
  * Clone my github
 
     `cd /var/www/newznab/misc/update_scripts/nix_scripts/`
@@ -34,21 +36,22 @@
     
     `nano edit_these.sh`
 
+
  * Edit some permissions, run as root.
 
     `./set_perms.sh`
+
 
  * Run my script, as user.
 
     `./start.sh`
     
+
  * If you connect using **putty**, then under Window/Translation set Remote character set to UTF-8.
 
- * If something looks stalled, it probably isn't. If all 7 panes are still there, it is most likely, as it should be.
+ * If something looks stalled, it probably isn't. If all 14 panes are still there, it is most likely, as it should be.
  
  * update_cleanup needs to be uncommented to actually do something, and update_parsing is good for fixing a few releases everytime it runs, not a silver bullet though
-
- * You have two choices for monitoring activity. Mytop monitors the sctivity of you mysql database and nmon does the rest.
 
  * If you are running this on an OVH or kimsufi server, you may need to run sudo ./start.sh because they built grsecurity into the kernel.
     
