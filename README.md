@@ -46,15 +46,13 @@
 
     `./start.sh`
     
- * If you connect using putty, then under Window/Translation set Remote character set to UTF-8.
+ * If you connect using **putty**, then under Window/Translation set Remote character set to UTF-8.
 
  * If something looks stalled, it probably isn't. If all 7 panes are still there, it is most likely, as it should be.
  
  * update_cleanup needs to be uncommented to actually do something, and update_parsing is good for fixing a few releases everytime it runs, not a silver bullet though
 
- * You have two choices for monitoring activity. Mytop monitors the sctivity of you mysql database and bwm-ng monitors your current traffic. Theses are selected in the edit_these.sh file. Only one can be selected at a time.
-
-
+ * You have two choices for monitoring activity. Mytop monitors the sctivity of you mysql database and nmon does the rest.
 
  * If you are running this on an OVH or kimsufi server, you may need to run sudo ./start.sh because they built grsecurity into the kernel.
     
@@ -65,6 +63,6 @@
  * Thanks go to all who offered their assistance and improvement to these scripts.
 
 <hr>
- * IOf, you find these scripts useful and would like to offer a donation. Danotions are greatly appreciated. Thank you
+ * If, you find these scripts useful and would like to offer a donation. Danotions are greatly appreciated. Thank you
 
 <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=N4AJV5FHZDBFE"><img src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" alt="PayPal - The safer, easier way to pay online!" /></a><a href='http://www.pledgie.com/campaigns/18980'><img alt='Click here to lend your support to: Newznab-tmux and make a donation at www.pledgie.com !' src='http://www.pledgie.com/campaigns/18980.png?skin_name=chrome' border='0' /></a>
