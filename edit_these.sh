@@ -8,11 +8,11 @@ export NEWZNAB_PATH=$NEWZPATH"/misc/update_scripts"
 export INNODB_PATH=$NEWZPATH"/misc/testing/innodb"
 export TESTING_PATH=$NEWZPATH"/misc/testing"
 export ADMIN_PATH=$NEWZPATH"/www/admin"
-export USERNAME="jonnyboy" # this is the user name that will run these scripts
+export USERNAME="what is you name" # this is the user name that will run these scripts
 export NEWZNAB_IMPORT_SLEEP_TIME="60" # in seconds - this includes import_nzb backfill and current fill
 export NEWZNAB_POST_SLEEP_TIME="1" # in seconds - this is for post processing - sleep between loops
 export MAXDAYS="200"  #max days for backfill
-export NZBS="/home/jonnyboy/nzbs/batch"  #path to your nzb files to be imported
+export NZBS="/path/to/nzbs"  #path to your nzb files to be imported
 
 #Choose to run the threaded or non-threaded newznab scripts true/false
 export THREADS="true"
@@ -26,7 +26,7 @@ export CLEANUP="true"
 #By using this script you understand that the programmer is not responsible for any loss of data, users, or sanity.
 #You also agree that you were smart enough to make a backup of your database and files. Do you agree? yes/no
 
-export AGREED="yes"
+export AGREED="no"
 
 ##END OF EDITS##
 
