@@ -6,20 +6,21 @@
 
     `mysqldump --opt -u root -p newznab > ~/newznab_backup.sql`
 
+
  * The first step is to decide whether or not you will convert your database to the InnoDB engine. The InnoDB has a lot of benefits, too many to list here, but more ram is required. How much exactly, depends on too many things to list here.
 
  * If you decide to convert your database, I recommend using [kevin123's github](https://github.com/kevinlekiller/Newznab-Barracuda.git). I recommend only converting the binaries a parts table, using compressed tables. But, there are many choices. I suggest you read his README and follow his recommendations. Or, simply:
 
-    `cd to a location to store the git repository.`
+    `cd /var/www/newznab/misc/testing/`
+ 
+    `git clone https://github.com/kevinlekiller/Newznab-InnoDB-Dropin.git innodb`
 
-    `git clone https://github.com/kevinlekiller/Newznab-Barracuda.git`
+    `cd innodb/lib/innodb`
 
-    `cd Newznab-Barracuda/B\ +\ P/`
-
-    `php bpinnodb_compressed.php`
+    `php convertToInnoDB.php`
 
 
- * Now clone [kevin123's github](https://github.com/kevinlekiller/Newznab-InnoDB-Dropin.git) and get the scripts.
+ * If, you have already converted your database, and didn't to the steps above. You will need to clone [kevin123's github](https://github.com/kevinlekiller/Newznab-InnoDB-Dropin.git) and get the scripts.
 
     `cd /var/www/newznab/misc/testing/`
     
