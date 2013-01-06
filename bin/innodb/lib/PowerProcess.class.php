@@ -129,7 +129,7 @@ class PowerProcess {
 	 * 
 	 * @var integer
 	 */
-	private $tickCount = 30000;
+	private $tickCount = 10000;
 	
 	/**
 	 * Whether to add a timestamp to log output
@@ -512,9 +512,7 @@ class PowerProcess {
 	 * 
 	 * @param boolean $exit When set to true, Shutdown causes the script to exit
 	 */
-	public function Shutdown($exit = false) {
-		$this->Log("Initiating shutdown",true);
-		
+	public function Shutdown($exit = true) {
 		while ($this->ThreadCount()) {
 			$this->CheckThreads();
 			$this->Tick();
@@ -525,7 +523,6 @@ class PowerProcess {
 		// Send custom shutdown signal
 		$this->SignalDispatch('shutdown');
 		
-		$this->Log("Shutdown Complete");
 		if ($exit) exit;
 		
 		return self::CALLBACK_IGNORE;
@@ -806,3 +803,4 @@ class PowerProcess {
 	}
 	
 }
+

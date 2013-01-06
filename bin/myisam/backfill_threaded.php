@@ -1,5 +1,7 @@
 <?php
-require("config.php");
+
+$newzpath = getenv('NEWZPATH');
+require_once("$newzpath/www/config.php");
 require_once(WWW_DIR."/lib/groups.php");
 require_once(WWW_DIR."/lib/binaries.php");
 require_once('PowerProcess.class.php');
@@ -26,13 +28,13 @@ while ($ps->RunControlCode())
 			// Spawn another thread
 			$ps->threadData = array_pop($groupList);
 			echo "[Thread-MASTER] Spawning new thread.  Still have " . count($groupList) ." group(s) to update after this\n";
-			$ps->spawnThread();
+			$ps->SpawnThread();
 		} 
 		else 
 		{
 			// There are no more slots available to run
 			$ps->Tick();
-			echo ".\n";
+			echo ". \n";
 		}
 	} 
 	else 
@@ -73,5 +75,5 @@ function psUpdateComplete()
 	echo "[Thread-MASTER] Threaded backfill process complete\n";
 }
 
-
 ?>
+

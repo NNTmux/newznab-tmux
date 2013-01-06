@@ -1,5 +1,8 @@
 <?php
-require("config.php");
+
+
+$newzpath = getenv('NEWZPATH');
+require("$newzpath/www/config.php");
 require_once(WWW_DIR."/lib/groups.php");
 require_once(WWW_DIR."/lib/binaries.php");
 require_once('PowerProcess.class.php');
@@ -26,7 +29,7 @@ while ($ps->RunControlCode())
 			// Spawn another thread
 			$ps->threadData = array_pop($groupList);
 			echo "[Thread-MASTER] Spawning new thread.  Still have " . count($groupList) ." group(s) to update after this\n";
-			$ps->spawnThread();
+			$ps->SpawnThread();
 		}
 		else 
 		{
@@ -67,12 +70,11 @@ if ($ps->RunThreadCode())
 // Exit to call back to parent - Let know that child has completed
 exit(0);
 
-
-
 // Create callback function
 function psUpdateComplete() 
 {
-	echo "Threaded update process complete\n";
+	echo "[Thread-MASTER] Threaded update process complete\n";
 }
 
 ?>
+
