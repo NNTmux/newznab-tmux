@@ -1,8 +1,7 @@
 <?php
 
-$newzpath = getenv('NEWZPATH');
-require_once("$newzpath/www/config.php");
-require_once("lib/postprocess2.php");
+require_once("config.php");
+require_once(WWW_DIR."/lib/postprocess.php");
 
 $db = new DB();
 $query = "select count(*) from releases r left join category c on c.ID = r.categoryID where ((r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0))";
@@ -26,8 +25,8 @@ while($i=1)
   }
 
   if ($count > 10) {
-    $postprocess = new PostProcess2(true);
-    $postprocess->processAdditional2();
+    $postprocess = new PostProcess(true);
+    $postprocess->processAdditional();
   } else {
     echo "$count releases left to process\n";
     sleep(15);

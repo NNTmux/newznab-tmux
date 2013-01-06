@@ -1,10 +1,12 @@
 <?php
-require_once(dirname(__FILE__)."/innodb/config.php");
-require_once(dirname(__FILE__)."/framework/db.php");
-require_once(dirname(__FILE__)."/groups.php");
-require_once(dirname(__FILE__)."/site.php");
-require_once(dirname(__FILE__)."/nntp.php");
-require_once(dirname(__FILE__)."/innodb/binaries.php");
+
+$newzpath = getenv('NEWZPATH');
+require_once("$newzpath/www/config.php");
+require_once("framework/db.php");
+require_once("groups.php");
+require_once("site.php");
+require_once("nntp.php");
+require_once("binaries.php");
 
 /**
  * Retrieves messages from usenet based on provided backfill-to date.

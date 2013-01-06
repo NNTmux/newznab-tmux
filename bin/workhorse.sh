@@ -13,17 +13,17 @@ if [ "$THREADS" == "true"  -a "$INNODB" == "true" ]; then
             #import nzb's
 	    if [[ $IMPORT == "true" ]] ; then
                 cd $INNODB_PATH
-            	[ -f $INNODB_PATH/nzb-import.php ] && $PHP $INNODB_PATH/nzb-import.php ${NZBS} &
+            	[ -f nzb-import.php ] && $PHP nzb-import.php ${NZBS} &
             fi
 
 	    #make active groups current
             cd $INNODB_PATH
-	    [ -f $INNODB_PATH/update_binaries_threaded.php ] && $PHP $INNODB_PATH/update_binaries_threaded.php &
+	    [ -f update_binaries_threaded.php ] && $PHP update_binaries_threaded.php &
 
 	    #get backfill for all active groups
             if [[ $BACKFILL == "true" ]] ; then
                 cd $INNODB_PATH
-	        [ -f $INNODB_PATH/backfill_threaded.php ] && $PHP $INNODB_PATH/backfill_threaded.php &
+	        [ -f backfill_threaded.php ] && $PHP backfill_threaded.php &
 
                 #increment backfill days
                 $MYSQL -u$DB_USER -h $DB_HOST --password=$DB_PASSWORD $DB_NAME -e "${MYSQL_CMD}"

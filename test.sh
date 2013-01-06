@@ -18,9 +18,6 @@ if [[ $AGREED == "no" ]]; then
 	exit
 fi
 
-export INNODB_PATH=$DIR"/bin/innodb"
-export POWERPROCESS_PATH=$DIR"/bin/powerprocess"
-export START_PATH=$DIR
 
 $TMUX new-session -d -s NewzNab -n NewzNab 'echo "monitor Working......" && nice -n 19 $PHP bin/monitor.php;nice -n 19 $PHP bin/monitor.php;exec bash -i'
 $TMUX selectp -t 0

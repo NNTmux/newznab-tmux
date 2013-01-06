@@ -1,6 +1,7 @@
 <?php
-require_once("/var/www/newznab/www/config.php");
-require_once("/var/www/newznab/www/lib/framework/db.php");
+$newzpath = getenv('NEWZPATH');
+require_once("$newzpath/www/config.php");
+require_once(WWW_DIR."/lib/framework/db.php");
 
 $db = new DB();
 

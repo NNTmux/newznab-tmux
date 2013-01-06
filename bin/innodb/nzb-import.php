@@ -1,6 +1,7 @@
 <?php
 
-require_once("lib/innodb/config.php");
+$newzpath = getenv('NEWZPATH');
+require_once("$newzpath/www/config.php");
 require_once("lib/framework/db.php");
 
 $db = new DB();

@@ -1,8 +1,10 @@
 <?php
-require("config.php");
+
+$newzpath = getenv('NEWZPATH');
+require_once("$newzpath/www/config.php");
 require_once("lib/groups.php");
-require_once("lib/innodb/binaries.php");
-require_once(dirname(__FILE__)."/../../../www/lib/powerspawn.php");
+require_once("lib/binaries.php");
+require_once(WWW_DIR."lib/powerspawn.php");
 
 $groups = new Groups;
 $groupList = $groups->getActive();

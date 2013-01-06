@@ -1,9 +1,11 @@
 <?php
-require("config.php");
-require_once(dirname(__FILE__)."/lib/framework/db.php");
-require_once(dirname(__FILE__)."/lib/groups.php");
-require_once(dirname(__FILE__)."/lib/innodb/binaries.php");
-require_once(dirname(__FILE__)."/lib/PowerProcess.class.php");
+
+$newzpath = getenv('NEWZPATH');
+require("$newzpath/www/config.php");
+require_once("lib/framework/db.php");
+require_once("lib/groups.php");
+require_once("lib/binaries.php");
+require_once("lib/PowerProcess.class.php");
 
 $groups = new Groups;
 $groupList = $groups->getActive();
