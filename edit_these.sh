@@ -5,7 +5,7 @@
 export NEWZPATH="/var/www/newznab"
 
 export NEWZNAB_PATH=$NEWZPATH"/misc/update_scripts"
-export INNODB_PATH=$NEWZPATH"/misc/testing/innodb"
+export INNODB_PATH="bin/innodb"
 export TESTING_PATH=$NEWZPATH"/misc/testing"
 export ADMIN_PATH=$NEWZPATH"/www/admin"
 export USERNAME="what is your name" # this is the user name that will run these scripts
