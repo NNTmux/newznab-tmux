@@ -43,17 +43,17 @@ elif [ "$THREADS" != "true" -a "$INNODB" == "true" ]; then
 	    #import nzb's
             if [[ $IMPORT == "true" ]] ; then
 	        cd $INNODB_PATH
-	        [ -f $INNODB_PATH/nzb-import.php ] && $PHP $INNODB_PATH/nzb-import.php ${NZBS} &
+	        [ -f nzb-import.php ] && $PHP nzb-import.php ${NZBS} &
             fi
 
 	    #make active groups current
             cd $INNODB_PATH
-	    [ -f $INNODB_PATH/update_binaries.php ] && $PHP $INNODB_PATH/update_binaries.php &
+	    [ -f update_binaries.php ] && $PHP update_binaries.php &
 
 	    #get backfill for all active groups
             if [[ $BACKFILL == "true" ]] ; then
 	        cd $INNODB_PATH
-	        [ -f $INNODB_PATH/backfill.php ] && $PHP $INNODB_PATH/backfill.php &
+	        [ -f backfill.php ] && $PHP backfill.php &
 
                 #increment backfill days
                 $MYSQL -u$DB_USER -h $DB_HOST --password=$DB_PASSWORD $DB_NAME -e "${MYSQL_CMD}"
@@ -72,17 +72,17 @@ elif [ "$THREADS" == "true" -a "$INNODB" != "true" ]; then
 	    #import nzb's
             if [[ $IMPORT == "true" ]] ; then
 	        cd $ADMIN_PATH
-	        [ -f $ADMIN_PATH/nzb-importmodified.php ] && $PHP $ADMIN_PATH/nzb-importmodified.php ${NZBS} &
+	        [ -f nzb-importmodified.php ] && $PHP nzb-importmodified.php ${NZBS} &
             fi
 
             #make active groups current
-	    cd $NEWZNAB_PATH
-	    [ -f $NEWZNAB_PATH/update_binaries_threaded.php ] && $PHP $NEWZNAB_PATH/update_binaries_threaded.php &
+	    cd $MYISAM_PATH
+	    [ -f update_binaries_threaded.php ] && $PHP update_binaries_threaded.php &
 
 	    #get backfill for all active groups
             if [[ $BACKFILL == "true" ]] ; then
-	        cd $NEWZNAB_PATH
-                [ -f $NEWZNAB_PATH/backfill_threaded.php ] && $PHP $NEWZNAB_PATH/backfill_threaded.php &
+	        cd $MYISAM_PATH
+                [ -f backfill_threaded.php ] && $PHP backfill_threaded.php &
                 #increment backfill days
                 $MYSQL -u$DB_USER -h $DB_HOST --password=$DB_PASSWORD $DB_NAME -e "${MYSQL_CMD}"
             fi
@@ -100,17 +100,17 @@ else
 	    #import nzb's
             if [[ $IMPORT == "true" ]] ; then
 	        cd $ADMIN_PATH
-	        [ -f $ADMIN_PATH/nzb-importmodified.php ] && $PHP $ADMIN_PATH/nzb-importmodified.php ${NZBS} &
+	        [ -f nzb-importmodified.php ] && $PHP nzb-importmodified.php ${NZBS} &
             fi
 
 	    #make active groups current
 	    cd $NEWZNAB_PATH
-	    [ -f $NEWZNAB_PATH/update_binaries.php ] && $PHP $NEWZNAB_PATH/update_binaries.php &
+	    [ -f update_binaries.php ] && $PHP update_binaries.php &
 
 	    #get backfill for all active groups
             if [[ $BACKFILL == "true" ]] ; then
     	        cd $NEWZNAB_PATH
-	        [ -f $NEWZNAB_PATH/backfill.php ] && $PHP $NEWZNAB_PATH/backfill.php &
+	        [ -f backfill.php ] && $PHP backfill.php &
                 #increment backfill days
                 $MYSQL -u$DB_USER -h $DB_HOST --password=$DB_PASSWORD $DB_NAME -e "${MYSQL_CMD}"
             fi
