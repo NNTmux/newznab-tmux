@@ -23,6 +23,7 @@ if [ "$THREADS" == "true"  -a "$INNODB" == "true" ]; then
 	    #get backfill for all active groups
             if [[ $BACKFILL == "true" ]] ; then
                 cd $INNODB_PATH
+                echo "Crap!"
 	        [ -f backfill_threaded.php ] && $PHP backfill_threaded.php &
 
                 #increment backfill days
@@ -93,7 +94,8 @@ elif [ "$THREADS" == "true" -a "$INNODB" != "true" ]; then
 	    sleep $NEWZNAB_IMPORT_SLEEP_TIME
 
 	done
-else
+
+elif [ "$THREADS" != "true"  -a "$INNODB" != "true" ]; then
 	while :
 	 do
 
@@ -123,4 +125,3 @@ else
 	done
 
 fi
-exit
