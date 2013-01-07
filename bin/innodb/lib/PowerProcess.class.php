@@ -129,7 +129,7 @@ class PowerProcess {
 	 * 
 	 * @var integer
 	 */
-	private $tickCount = 150000;
+	private $tickCount = 300000;
 	
 	/**
 	 * Whether to add a timestamp to log output
