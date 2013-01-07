@@ -129,7 +129,7 @@ class PowerProcess {
 	 * 
 	 * @var integer
 	 */
-	private $tickCount = 200000;
+	private $tickCount = 500000;
 	
 	/**
 	 * Whether to add a timestamp to log output
@@ -172,8 +172,6 @@ class PowerProcess {
 	 * 
 	 * @var array
 	 */
-	private $shutdownCallback = null;
-
 	private $signalArray = array(
 		SIGUSR1,	// User-Defined 1
 		SIGUSR2		// User-Defined 2
@@ -271,7 +269,7 @@ class PowerProcess {
 	 * 
 	 * @return object	Instanced PowerProcess object
 	 */
-	public function __construct($maxThreads = 10, $threadTimeLimit = 300, $daemon = false, $logTo = false, $debugLogging = false) {
+	public function __construct($maxThreads = 10, $threadTimeLimit = 0, $daemon = false, $logTo = false, $debugLogging = false) {
 		if (function_exists('pcntl_fork') && function_exists('posix_getpid')) {
 			// Set the current thread name
 			$this->currentThread = 'CONTROL';
@@ -467,20 +465,6 @@ class PowerProcess {
 			return false;
 		}
 	}
-
-	public function setCallback($callback = null) {
-		$this->shutdownCallback = $callback;
-	}
-
-	public function runParentCode() {
-		if (!$this->complete) {
-			return $this->parentCheck();
-		} else {
-			if ($this->shutdownCallback !== null)
-				call_user_func($this->shutdownCallback);
-			return false;
-		}
-	}
 	
 	/**
 	 * Determines whether we should be running the child code
@@ -519,7 +503,7 @@ class PowerProcess {
 	 * 
 	 * @param integer $threadTimeLimit The max number of seconds a thread can run
 	 */
-	public function SetThreadTimeLimit($threadTimeLimit = 300) {
+	public function SetThreadTimeLimit($threadTimeLimit = 0) {
 		$this->threadTimeLimit = $threadTimeLimit;
 	}
 	
@@ -528,12 +512,23 @@ class PowerProcess {
 	 * 
 	 * @param boolean $exit When set to true, Shutdown causes the script to exit
 	 */
-	public function Shutdown() {
-		while($this->ThreadCount()) {
+	public function Shutdown($exit = false) {
+		$this->Log("Initiating shutdown",true);
+		
+		while ($this->ThreadCount()) {
 			$this->CheckThreads();
 			$this->Tick();
 		}
+		
 		$this->complete = true;
+		
+		// Send custom shutdown signal
+		$this->SignalDispatch('shutdown');
+		
+		$this->Log("Shutdown Complete");
+		if ($exit) exit;
+		
+		return self::CALLBACK_IGNORE;
 	}
 	
 	/**

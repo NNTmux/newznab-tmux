@@ -10,9 +10,9 @@ $groupList = $groups->getActive();
 unset($groups);
 
 $ps = new PowerProcess;
-$ps->setCallback('psUpdateComplete');
-$ps->maxChildren = 10;
-$ps->timeLimit = 0;	// Disable child timeout
+$ps->RegisterCallback('psUpdateComplete');
+$ps->SetMaxThreads = 5;
+$ps->SetThreadTimeLimit = 0;	// Disable child timeout
 
 echo "Starting threaded binary update process\n";
 
