@@ -129,7 +129,7 @@ class PowerProcess {
 	 * 
 	 * @var integer
 	 */
-	private $tickCount = 300000;
+	private $tickCount = 200000;
 	
 	/**
 	 * Whether to add a timestamp to log output
@@ -269,7 +269,7 @@ class PowerProcess {
 	 * 
 	 * @return object	Instanced PowerProcess object
 	 */
-	public function __construct($maxThreads = 10, $threadTimeLimit = 300, $daemon = false, $logTo = false, $debugLogging = false) {
+	public function __construct($maxThreads = 20, $threadTimeLimit = 0, $daemon = false, $logTo = false, $debugLogging = false) {
 		if (function_exists('pcntl_fork') && function_exists('posix_getpid')) {
 			// Set the current thread name
 			$this->currentThread = 'CONTROL';
@@ -494,7 +494,7 @@ class PowerProcess {
 	 * 
 	 * @param integer $maxThreads The max number of threads to run concurrently
 	 */
-	public function SetMaxThreads($maxThreads = 10) {
+	public function SetMaxThreads($maxThreads = 0) {
 		$this->maxThreads = $maxThreads;
 	}
 	
@@ -503,7 +503,7 @@ class PowerProcess {
 	 * 
 	 * @param integer $threadTimeLimit The max number of seconds a thread can run
 	 */
-	public function SetThreadTimeLimit($threadTimeLimit = 300) {
+	public function SetThreadTimeLimit($threadTimeLimit = 0) {
 		$this->threadTimeLimit = $threadTimeLimit;
 	}
 	
