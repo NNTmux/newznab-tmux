@@ -34,7 +34,7 @@ while ($ps->RunControlCode())
 		{
 			// There are no more slots available to run
 			$ps->Tick();
-			echo ". \n";
+			#echo ". \n";
 		}
 	} 
 	else 
