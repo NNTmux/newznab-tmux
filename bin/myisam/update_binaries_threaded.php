@@ -1,6 +1,4 @@
 <?php
-
-
 $newzpath = getenv('NEWZPATH');
 require("$newzpath/www/config.php");
 require_once(WWW_DIR."/lib/groups.php");
@@ -12,9 +10,9 @@ $groupList = $groups->getActive();
 unset($groups);
 
 $ps = new PowerProcess;
-$ps->setCallback('psUpdateComplete');
-$ps->maxChildren = 10;
-$ps->timeLimit = 0;	// Disable child timeout
+$ps->RegisterCallback('psUpdateComplete');
+$ps->SetMaxThreads = 10;
+$ps->SetThreadTimeLimit = 0;	// Disable child timeout
 
 echo "Starting threaded binary update process\n";
 
@@ -77,4 +75,3 @@ function psUpdateComplete()
 }
 
 ?>
-
