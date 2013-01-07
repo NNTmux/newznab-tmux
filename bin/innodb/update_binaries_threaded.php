@@ -11,7 +11,7 @@ unset($groups);
 
 $ps = new PowerProcess;
 $ps->RegisterCallback('psUpdateComplete');
-$ps->SetMaxThreads = 10;
+$ps->SetMaxThreads = 6;
 $ps->SetThreadTimeLimit = 0;	// Disable child timeout
 
 echo "Starting threaded binary update process\n";
