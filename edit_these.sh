@@ -8,9 +8,9 @@ export NEWZNAB_PATH=$NEWZPATH"/misc/update_scripts"
 export TESTING_PATH=$NEWZPATH"/misc/testing"
 export ADMIN_PATH=$NEWZPATH"/www/admin"
 export USERNAME="what is your name" # this is the user name that will run these scripts
-export NEWZNAB_IMPORT_SLEEP_TIME="60" # in seconds - this includes import_nzb backfill and current fill
-export NEWZNAB_POST_SLEEP_TIME="1" # in seconds - this is for post processing - sleep between loops
-export MAXDAYS="200"  #max days for backfill
+export NEWZNAB_IMPORT_SLEEP_TIME="1" # in seconds - this includes import_nzb backfill and current fill, 0 may cause errors
+export NEWZNAB_POST_SLEEP_TIME="1" # in seconds - this is for post processing - sleep between loops, 0 may cause errors
+export MAXDAYS="210"  #max days for backfill
 export NZBS="/path/to/nzbs"  #path to your nzb files to be imported
 
 #Choose to run the threaded or non-threaded newznab scripts true/false
@@ -21,6 +21,9 @@ export INNODB="true"
 
 #Choose to run update_cleanup.php true/false
 export CLEANUP="true"
+
+#Choose to run update_binaries true/false
+export BINARIES="true"
 
 #Choose to run backfill script true/false
 export BACKFILL="true"

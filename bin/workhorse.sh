@@ -23,7 +23,6 @@ if [ "$THREADS" == "true"  -a "$INNODB" == "true" ]; then
 	    #get backfill for all active groups
             if [[ $BACKFILL == "true" ]] ; then
                 cd $INNODB_PATH
-                echo "Crap!"
 	        [ -f backfill_threaded.php ] && $PHP backfill_threaded.php &
 
                 #increment backfill days
@@ -102,19 +101,19 @@ elif [ "$THREADS" != "true"  -a "$INNODB" != "true" ]; then
 	    #import nzb's
             if [[ $IMPORT == "true" ]] ; then
 	        cd $ADMIN_PATH
-	        [ -f nzb-importmodified.php ] && $PHP nzb-importmodified.php ${NZBS} &
+#	        [ -f nzb-importmodified.php ] && $PHP nzb-importmodified.php ${NZBS} &
             fi
 
 	    #make active groups current
 	    cd $NEWZNAB_PATH
-	    [ -f update_binaries.php ] && $PHP update_binaries.php &
+#	    [ -f update_binaries.php ] && $PHP update_binaries.php &
 
 	    #get backfill for all active groups
             if [[ $BACKFILL == "true" ]] ; then
     	        cd $NEWZNAB_PATH
-	        [ -f backfill.php ] && $PHP backfill.php &
+#	        [ -f backfill.php ] && $PHP backfill.php &
                 #increment backfill days
-                $MYSQL -u$DB_USER -h $DB_HOST --password=$DB_PASSWORD $DB_NAME -e "${MYSQL_CMD}"
+#                $MYSQL -u$DB_USER -h $DB_HOST --password=$DB_PASSWORD $DB_NAME -e "${MYSQL_CMD}"
             fi
 
 	    wait

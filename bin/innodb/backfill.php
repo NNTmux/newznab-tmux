@@ -1,7 +1,6 @@
 <?php
 
-$newzpath = getenv('NEWZPATH');
-require_once("$newzpath/www/config.php");
+require_once("config.php");
 require_once("lib/backfill.php");
 
 if (isset($argv[1]))

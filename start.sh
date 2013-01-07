@@ -24,7 +24,7 @@ export START_PATH=$DIR
 
 $TMUX new-session -d -s NewzNab -n NewzNab 'echo "monitor Working......" && nice -n 19 $PHP bin/monitor.php;nice -n 19 $PHP bin/monitor.php;exec bash -i'
 $TMUX selectp -t 0
-$TMUX splitw -h -p 67 'cd bin && echo "Processing Books....." && sleep 12 && nice -n 19 ./postProcessing1.sh;nice -n 19 ./postProcessing1.sh;exec bash -i'
+$TMUX splitw -h -p 72 'cd bin && echo "Processing Books....." && sleep 12 && nice -n 19 ./postProcessing1.sh;nice -n 19 ./postProcessing1.sh;exec bash -i'
 $TMUX splitw -h -p 50 'cd bin && echo "imports Working......" && nice -n 10 ./workhorse.sh;nice -n 10 ./workhorse.sh;exec bash -i'
 $TMUX selectp -t 0
 $TMUX splitw -v -p 65 'echo "processNfos Working......" && sleep 3 && nice -n 19 $PHP bin/postprocess_nfo.php;nice -n 19 $PHP bin/postprocess_nfo.php;exec bash -i'

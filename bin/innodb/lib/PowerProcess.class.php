@@ -129,7 +129,7 @@ class PowerProcess {
 	 * 
 	 * @var integer
 	 */
-	private $tickCount = 10000;
+	private $tickCount = 200000;
 	
 	/**
 	 * Whether to add a timestamp to log output
@@ -172,6 +172,8 @@ class PowerProcess {
 	 * 
 	 * @var array
 	 */
+	private $shutdownCallback = null;
+
 	private $signalArray = array(
 		SIGUSR1,	// User-Defined 1
 		SIGUSR2		// User-Defined 2
@@ -465,6 +467,20 @@ class PowerProcess {
 			return false;
 		}
 	}
+
+	public function setCallback($callback = null) {
+		$this->shutdownCallback = $callback;
+	}
+
+	public function runParentCode() {
+		if (!$this->complete) {
+			return $this->parentCheck();
+		} else {
+			if ($this->shutdownCallback !== null)
+				call_user_func($this->shutdownCallback);
+			return false;
+		}
+	}
 	
 	/**
 	 * Determines whether we should be running the child code
@@ -512,20 +528,12 @@ class PowerProcess {
 	 * 
 	 * @param boolean $exit When set to true, Shutdown causes the script to exit
 	 */
-	public function Shutdown($exit = true) {
-		while ($this->ThreadCount()) {
+	public function Shutdown() {
+		while($this->ThreadCount()) {
 			$this->CheckThreads();
 			$this->Tick();
 		}
-		
 		$this->complete = true;
-		
-		// Send custom shutdown signal
-		$this->SignalDispatch('shutdown');
-		
-		if ($exit) exit;
-		
-		return self::CALLBACK_IGNORE;
 	}
 	
 	/**
@@ -803,4 +811,3 @@ class PowerProcess {
 	}
 	
 }
-

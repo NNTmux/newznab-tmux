@@ -1,9 +1,8 @@
 <?php
 
-$newzpath = getenv('NEWZPATH');
-require_once("$newzpath/www/config.php");
+require("config.php");
 require_once("lib/groups.php");
-require_once("lib/binaries.php");
+require_once("lib/innodb/binaries.php");
 
 if (isset($argv[1]))
 {

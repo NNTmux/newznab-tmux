@@ -1,5 +1,5 @@
 <?php
-require_once("binaries.php");
+require_once("innodb/binaries.php");
 require_once("framework/db.php");
 require_once(WWW_DIR."/lib/Net_NNTP/NNTP/Client.php");
 

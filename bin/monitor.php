@@ -210,7 +210,7 @@ while($i>0)
   }
 
   while ($brow = mysql_fetch_assoc($book_count_inner_loop)) {
-    $bcount_loop = $brow['count(searchname)'];
+    $book_count_now = $brow['count(searchname)'];
   }
 
   ///////////////////gresult_loop/////////////////////////
@@ -224,7 +224,7 @@ while($i>0)
   }
 
   while ($grow = mysql_fetch_assoc($console_count_inner_loop)) {
-    $gcount_loop = $grow['count(searchname)'];
+    $console_count_now = $grow['count(searchname)'];
   }
 
   ///////////////////moresult_loop/////////////////////////
@@ -238,7 +238,7 @@ while($i>0)
   }
 
   while ($morow = mysql_fetch_assoc($movies_count_inner_loop)) {
-    $mocount_loop = $morow['count(searchname)'];
+    $movies_count_now = $morow['count(searchname)'];
   }
 
   ///////////////////muresult_loop/////////////////////////
@@ -252,7 +252,7 @@ while($i>0)
   }
 
   while ($murow = mysql_fetch_assoc($music_count_inner_loop)) {
-    $mucount_loop = $murow['count(searchname)'];
+    $music_count_now = $murow['count(searchname)'];
   }
 
   ////////////////presult_inner_loop///////////////////////
@@ -336,21 +336,23 @@ while($i>0)
   }
 
   while ($trow = mysql_fetch_assoc($tvrage_count_inner_loop)) {
-    $tcount_loop = $trow['count(searchname)'];
+    $tvrage_count_now = $trow['count(searchname)'];
   }
 
-  $btotal_start = $bcount_loop - $bcount_begin;if ($btotal_start < 0) $btotal_start = 0;
-  $gtotal_start = $gcount_loop - $gcount_begin;if ($gtotal_start < 0) $gtotal_start = 0;
-  $mototal_start = $mocount_loop - $mocount_begin;if ($mototal_start < 0) $mototal_start = 0;
-  $mutotal_start = $mucount_loop - $mucount_begin;if ($mutotal_start < 0) $mutotal_start = 0;
+  $btotal_start = $bcount_begin - $book_count_now;//if ($btotal_start < 0) $btotal_start = 0;
+  $gtotal_start = $gcount_begin - $console_count_now;//if ($gtotal_start < 0) $gtotal_start = 0;
+  $mototal_start = $mocount_begin - $movies_count_now;//if ($mototal_start < 0) $mototal_start = 0;
+  $mutotal_start = $mucount_begin - $music_count_now;//if ($mutotal_start < 0) $mutotal_start = 0;
+  $ttotal_start = $tcount_begin - $tvrage_count_now;//if ($ttotal_start < 0) $ttotal_start = 0;
+  $ptotal_start = $postprocessing_remaining_count_loop_start - $postprocessing_count_remaining_this_loop;//if ($ptotal_start < 0) $ptotal_start = 0;
+  $other_count_now = $ptotal_start - $ttotal_start - $mutotal_start - $mototal_start - $gtotal_start - $btotal_start;//if ($other_count_now < 0) $other_count_now = 0;
 
   //calculate the difference from start to now
-  $ptotal_start = $postprocessing_count_remaining_this_loop - $postprocessing_remaining_count_loop_start;if ($ptotal_start < 0) $ptotal_start = 0;
-
   $ptotal_loop = $postprocessing_count_remaining_this_loop - $pcount_inner_loop;if ($ptotal_loop < 0) $ptotal_loop = 0;
   $total_start = $count_loop - $count_begin;if ($total_start < 0) $total_start = 0;
   $total_loop = $count_loop - $count_inner_loop;if ($total_loop < 0) $total_loop = 0;
-  $ttotal_start = $tcount_loop - $tcount_begin;if ($ttotal_start < 0) $ttotal_start = 0;
+  $other_total_count_now = $postprocessing_count_remaining_this_loop - $tvrage_count_now - $tvrage_count_now - $music_count_now - $movies_count_now - $console_count_now - $book_count_now;if ($other_total_count_now < 0) $other_total_count_now = 0;
+
   $sleeptext = "in the past $sleeptime seconds.";
 
   passthru('clear');
@@ -362,16 +364,23 @@ while($i>0)
   printf("\033[38;5;063m$sec\033[0m");printf(" Seconds Ago.\n");
   printf("The script updates every $sleeptime seconds.\n");
   printf("$ptotal_loop releases post processed since last update.\n");
-  printf("$total_loop releases added since last update.\n");
+  printf("$total_loop releases added since last update.\n\n");
 
-  //printf("$ccount_begin releases at start.\n");
-  //printf("$count_loop releases in your database.\n");
-  //printf("$total_start releases have been added.\n\n");
-  //printf("$btotal_start1 books, $gtotal_start1 games, $mototal_start1 movies, $mutotal_start1 music, $ttotal_start1 TV shows have been processed.\n\n");
-  //printf("Adittional Post Processing:\n");
-  //printf("$ptotal_start1 since script start.\n");
-  //printf("$postprocessing_count_remaining_this_loop left to do.\n");
-  //printf("$plcount_loop since installing newznab.\n");
+  printf("$ccount_begin releases at start.\n");
+  printf("$count_loop releases in your database.\n");
+  printf("$total_start releases have been added.\n\n");
+
+  $mask = "%10s %10s %10s \n";
+  printf($mask, "Category", "Processed", "Remaining");
+  printf($mask, "Books", "$btotal_start", "$book_count_now");
+  printf($mask, "Console", "$gtotal_start", "$console_count_now");
+  printf($mask, "Movies", "$mototal_start", "$movies_count_now");
+  printf($mask, "Music", "$mutotal_start", "$music_count_now");
+  printf($mask, "TV Shows", "$ttotal_start", "$tvrage_count_now");
+  printf($mask, "Other", "$other_count_now", "$other_total_count_now");
+  printf($mask, "Total", "$ptotal_start", "$postprocessing_count_remaining_this_loop");
+
+
 
   $i=$i+1;
 }

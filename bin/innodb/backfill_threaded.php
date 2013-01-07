@@ -1,58 +1,56 @@
 <?php
-
-$newzpath = getenv('NEWZPATH');
-require_once("$newzpath/www/config.php");
-require_once("lib/groups.php");
-require_once("lib/binaries.php");
-require_once(WWW_DIR."lib/powerspawn.php");
+require_once("config.php");
+require_once(dirname(__FILE__)."/lib/groups.php");
+require_once(dirname(__FILE__)."/lib/innodb/binaries.php");
+require_once(dirname(__FILE__)."/lib/PowerProcess.class.php");
 
 $groups = new Groups;
 $groupList = $groups->getActive();
 unset($groups);
 
-$ps = new PowerSpawn;
-$ps->setCallback('psUpdateComplete');
+$ps = new PowerProcess;
+$ps->RegisterCallback('psUpdateComplete');
 $ps->maxChildren = 10;
 $ps->timeLimit = 0;	// Disable child timeout
 
 echo "Starting threaded backfill process\n";
 
-while ($ps->runParentCode()) 
+while ($ps->RunControlCode()) 
 {
 	// Start the parent loop
 	if (count($groupList)) 
 	{
 		// We still have groups to process
-		if ($ps->spawnReady()) 
+		if ($ps->SpawnReady()) 
 		{
 			// Spawn another thread
-			$ps->childData = array_pop($groupList);
+			$ps->threadData = array_pop($groupList);
 			echo "[Thread-MASTER] Spawning new thread.  Still have " . count($groupList) ." group(s) to update after this\n";
-			$ps->spawnChild();
+			$ps->SpawnThread();
 		} 
 		else 
 		{
 			// There are no more slots available to run
-			$ps->tick();
-			echo ".\n";
+			$ps->Tick();
+			echo ". \n";
 		}
 	} 
 	else 
 	{
 		// No more groups to process
 		echo "No more groups to process - Initiating shutdown\n";
-		$ps->shutdown();
+		$ps->Shutdown();
 		echo "Shutdown complete\n";
 	}
 }
 
 unset($groupList);
 
-if ($ps->runChildCode()) 
+if ($ps->RunThreadCode()) 
 {
-	$group = $ps->childData;
+	$group = $ps->threadData;
 	
-	$thread = sprintf("%05d",$ps->myPID());
+	$thread = sprintf("%05d",$ps->GetPID());
 	
 	echo "[Thread-{$thread}] Begining backfill processing for group {$group['name']}\n";
 	
@@ -74,6 +72,5 @@ function psUpdateComplete()
 {
 	echo "[Thread-MASTER] Threaded backfill process complete\n";
 }
-
 
 ?>

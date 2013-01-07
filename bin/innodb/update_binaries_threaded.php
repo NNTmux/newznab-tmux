@@ -1,11 +1,9 @@
 <?php
-
-$newzpath = getenv('NEWZPATH');
-require("$newzpath/www/config.php");
-require_once("lib/framework/db.php");
-require_once("lib/groups.php");
-require_once("lib/binaries.php");
-require_once("lib/PowerProcess.class.php");
+require("config.php");
+require_once(dirname(__FILE__)."/lib/framework/db.php");
+require_once(dirname(__FILE__)."/lib/groups.php");
+require_once(dirname(__FILE__)."/lib/innodb/binaries.php");
+require_once(dirname(__FILE__)."/lib/PowerProcess.class.php");
 
 $groups = new Groups;
 $groupList = $groups->getActive();
@@ -29,7 +27,7 @@ while ($ps->RunControlCode())
 			// Spawn another thread
 			$ps->threadData = array_pop($groupList);
 			echo "[Thread-MASTER] Spawning new thread.  Still have " . count($groupList) ." group(s) to update after this\n";
-			$ps->spawnThread();
+			$ps->SpawnThread();
 		}
 		else 
 		{
@@ -73,7 +71,7 @@ exit(0);
 // Create callback function
 function psUpdateComplete() 
 {
-	echo "Threaded update process complete\n";
+	echo "[Thread-MASTER] Threaded update process complete\n";
 }
 
 ?>
