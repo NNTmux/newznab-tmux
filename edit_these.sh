@@ -11,7 +11,7 @@ export USERNAME="what is your name" # this is the user name that will run these 
 export NEWZNAB_IMPORT_SLEEP_TIME="1" # in seconds - this includes import_nzb backfill and current fill, 0 may cause errors
 export NEWZNAB_POST_SLEEP_TIME="1" # in seconds - this is for post processing - sleep between loops, 0 may cause errors
 export MAXDAYS="210"  #max days for backfill
-export NZBS="/path/to/nzbs"  #path to your nzb files to be imported
+export NZBS="/path/to/nzbs"  #The path to the nzb dump you downloaded from torrents
 
 #Choose to run the threaded or non-threaded newznab scripts true/false
 export THREADS="true"
