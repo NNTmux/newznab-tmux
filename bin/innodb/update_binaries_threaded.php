@@ -10,7 +10,7 @@ $groupList = $groups->getActive();
 unset($groups);
 
 $ps = new PowerProcess;
-$ps->RegisterCallback('psUpdateComplete');
+$ps->setCallback('psUpdateComplete');
 $ps->maxChildren = 10;
 $ps->timeLimit = 0;	// Disable child timeout
 
