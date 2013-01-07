@@ -4,7 +4,7 @@ $newzpath = getenv('NEWZPATH');
 require_once("$newzpath/www/config.php");
 require_once(WWW_DIR."/lib/groups.php");
 require_once(WWW_DIR."/lib/binaries.php");
-require_once('PowerProcess.class.php');
+require_once("PowerProcess.class.php");
 
 $groups = new Groups;
 $groupList = $groups->getActive();
