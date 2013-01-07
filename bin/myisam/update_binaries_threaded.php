@@ -57,7 +57,7 @@ if ($ps->RunThreadCode())
 	
 	$param = $group['name'];
 	
-	$dir = dirname(__FILE__);
+	$dir = "$newzpath/misc/update_scripts/";
 	$file = 'update_binaries.php';
 	
 	$output = shell_exec("php {$dir}/{$file} {$param}");

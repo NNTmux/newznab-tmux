@@ -1,5 +1,4 @@
 <?php
-
 $newzpath = getenv('NEWZPATH');
 require_once("$newzpath/www/config.php");
 require_once(WWW_DIR."/lib/groups.php");
@@ -58,7 +57,7 @@ if ($ps->RunThreadCode())
 	
 	$param = $group['name'];
 	
-	$dir = dirname(__FILE__);
+	$dir = "$newzpath/misc/update_scripts/";
 	$file = 'backfill.php';
 	
 	$output = shell_exec("php {$dir}/{$file} {$param}");
