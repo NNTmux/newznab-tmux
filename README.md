@@ -30,6 +30,10 @@
  * Clone my github
 
     `cd /var/www/newznab/misc/update_scripts/nix_scripts/`
+    
+    `git clone https://github.com/jonnyboy/newznab-tmux.git tmux`
+    
+    -or-
 
     `git clone https://github.com/kevinlekiller/newznab-tmux tmux`
     
