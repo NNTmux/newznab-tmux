@@ -57,7 +57,7 @@ if ($ps->RunThreadCode())
 	
 	$param = $group['name'];
 	
-	$dir = "$newzpath/misc/update_scripts/";
+	$dir = dirname(__FILE__);
 	$file = 'backfill.php';
 	
 	$output = shell_exec("php {$dir}/{$file} {$param}");
