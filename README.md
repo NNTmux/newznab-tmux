@@ -1,6 +1,6 @@
 # SETUP
 
- * These scripts were written and tested on Ubuntu 12.10 where bash is located at /bin/bash. You may need to create a symlink or edit these script accordingly.
+ * These scripts were written and tested on Ubuntu 12.10 where bash is located at /bin/bash. You may need to create a symlink or edit these scripts accordingly.
 
  * Please backup your database first. Something like this should do it.
 
@@ -11,16 +11,16 @@
 
  * If you decide to convert your database, I recommend using [kevin123's github](https://github.com/kevinlekiller/Newznab-Barracuda.git). I recommend only converting the binaries a parts table, using compressed tables. But, there are many choices. I suggest you read his README and follow his recommendations. Or, simply:
 
-    `cd /var/www/newznab/misc/testing/`
+    `cd /var/www/newznab/misc/testing`
  
-    `git clone https://github.com/kevinlekiller/Newznab-InnoDB-Dropin.git innodb`
+    `git clone https://github.com/kevinlekiller/Newznab-InnoDB-Dropin.git kev-innodb`
 
-    `cd innodb/lib/innodb`
+    `cd innodb/lib/kev-innodb`
 
     `php convertToInnoDB.php`
 
 
- * If, you have already converted your database, and didn't to the steps above. You will need to clone [kevin123's github](https://github.com/kevinlekiller/Newznab-InnoDB-Dropin.git) and get the scripts.
+ * Now, you will need to clone [andrewit's github](https://github.com/itandrew/Newznab-InnoDB-Dropin.git) and get his scripts.
 
     `cd /var/www/newznab/misc/testing/`
     
@@ -32,10 +32,6 @@
     `cd /var/www/newznab/misc/update_scripts/nix_scripts/`
     
     `git clone https://github.com/jonnyboy/newznab-tmux.git tmux`
-    
-    -or-
-
-    `git clone https://github.com/kevinlekiller/newznab-tmux tmux`
     
     `cd tmux`
     
@@ -56,13 +52,15 @@
 
  * If something looks stalled, it probably isn't. If all 13 panes are still there, it is most likely, as it should be.
  
- * update_cleanup needs to be uncommented to actually do something, and update_parsing is good for fixing a few releases everytime it runs, not a silver bullet though
+ * **misc/testing/update_cleanup.php** needs to be edited to actually do something, and update_parsing is good for fixing a few releases everytime it runs, not a silver bullet though
 
  * If you are running this on an OVH or kimsufi server, you may need to run sudo ./start.sh because they built grsecurity into the kernel.
     
  * Now all panes should be running smoothly. If any of the scriptns in the top 3 panes crash, the panes should remain open and you should be able to view the error messages. I hope this helps.
 
  * Join in the converstion at irc://moonlight.se.eu.synirc.net/newznab-tmux.
+
+ * The development branch of this git is still under heavy development.
 
  * Thanks go to all who offered their assistance and improvement to these scripts.
 

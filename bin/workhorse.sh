@@ -18,20 +18,19 @@ if [ "$THREADS" == "true"  -a "$INNODB" == "true" ]; then
 
 	    #make active groups current
             if [[ $BINARIES == "true" ]] ; then
-                cd $INNODB_PATH
+                cd $NEWZNAB_PATH
 	        [ -f update_binaries_threaded.php ] && $PHP update_binaries_threaded.php
             fi
 
 	    #get backfill for all active groups
             if [[ $BACKFILL == "true" ]] ; then
-                cd $INNODB_PATH
+                cd $NEWZNAB_PATH
 	        [ -f backfill_threaded.php ] && $PHP backfill_threaded.php
             fi
 
 	    wait
 
             if [[ $BACKFILL == "true" ]] ; then
-                cd $INNODB_PATH
                 #increment backfill days
                 $MYSQL -u$DB_USER -h $DB_HOST --password=$DB_PASSWORD $DB_NAME -e "${MYSQL_CMD}"
             fi
@@ -65,7 +64,6 @@ elif [ "$THREADS" != "true" -a "$INNODB" == "true" ]; then
 	    wait
 
             if [[ $BACKFILL == "true" ]] ; then
-                cd $INNODB_PATH
                 #increment backfill days
                 $MYSQL -u$DB_USER -h $DB_HOST --password=$DB_PASSWORD $DB_NAME -e "${MYSQL_CMD}"
             fi
@@ -87,20 +85,19 @@ elif [ "$THREADS" == "true" -a "$INNODB" != "true" ]; then
 
             #make active groups current
             if [[ $BINARIES == "true" ]] ; then
-    	        cd $MYISAM_PATH
+    	        cd $NEWZNAB_PATH
 	        [ -f update_binaries_threaded.php ] && $PHP update_binaries_threaded.php
             fi
 
 	    #get backfill for all active groups
             if [[ $BACKFILL == "true" ]] ; then
-	        cd $MYISAM_PATH
+	        cd $NEWZNAB_PATH
                 [ -f backfill_threaded.php ] && $PHP backfill_threaded.php
             fi
 
 	    wait
 
             if [[ $BACKFILL == "true" ]] ; then
-                cd $INNODB_PATH
                 #increment backfill days
                 $MYSQL -u$DB_USER -h $DB_HOST --password=$DB_PASSWORD $DB_NAME -e "${MYSQL_CMD}"
             fi
@@ -135,7 +132,6 @@ elif [ "$THREADS" != "true"  -a "$INNODB" != "true" ]; then
 	    wait
 
             if [[ $BACKFILL == "true" ]] ; then
-                cd $INNODB_PATH
                 #increment backfill days
                 $MYSQL -u$DB_USER -h $DB_HOST --password=$DB_PASSWORD $DB_NAME -e "${MYSQL_CMD}"
             fi

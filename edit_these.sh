@@ -7,6 +7,7 @@ export NEWZPATH="/var/www/newznab"
 export NEWZNAB_PATH=$NEWZPATH"/misc/update_scripts"
 export TESTING_PATH=$NEWZPATH"/misc/testing"
 export ADMIN_PATH=$NEWZPATH"/www/admin"
+export INNODB_PATH=$TESTING_PATH"/innodb"
 export USERNAME="what is your name" # this is the user name that will run these scripts
 export NEWZNAB_IMPORT_SLEEP_TIME="1" # in seconds - this includes import_nzb backfill and current fill, 0 may cause errors
 export NEWZNAB_POST_SLEEP_TIME="1" # in seconds - this is for post processing - sleep between loops, 0 may cause errors
@@ -14,16 +15,16 @@ export MAXDAYS="210"  #max days for backfill
 export NZBS="/path/to/nzbs"  #The path to the nzb dump you downloaded from torrents
 
 #Choose to run the threaded or non-threaded newznab scripts true/false
-export THREADS="true"
+export THREADS="false"
 
 #Choose your database, comment the one true/false
-export INNODB="true"
+export INNODB="false"
 
 #Choose to run update_cleanup.php true/false
-export CLEANUP="true"
+export CLEANUP="false"
 
 #Choose to run update_binaries true/false
-export BINARIES="true"
+export BINARIES="false"
 
 #Choose to run backfill script true/false
 export BACKFILL="true"
@@ -32,11 +33,11 @@ export BACKFILL="true"
 export IMPORT="true"
 
 #Select some monitoring script, if they are not installed, it will not affect the running of the scripts
-export USE_HTOP="true"
-export USE_NMON="true"
-export USE_BWMNG="true"
-export USE_IOTOP="true"
-export USE_MYTOP="true"
+export USE_HTOP="false"
+export USE_NMON="false"
+export USE_BWMNG="false"
+export USE_IOTOP="false"
+export USE_MYTOP="false"
 
 #By using this script you understand that the programmer is not responsible for any loss of data, users, or sanity.
 #You also agree that you were smart enough to make a backup of your database and files. Do you agree? yes/no

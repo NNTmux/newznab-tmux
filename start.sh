@@ -18,10 +18,6 @@ if [[ $AGREED == "no" ]]; then
 	exit
 fi
 
-export INNODB_PATH=$DIR"/bin/innodb"
-export MYISAM_PATH=$DIR"/bin/myisam"
-export START_PATH=$DIR
-
 #delete some files
 [ -f bin/lib/postprocess4.php ];rm bin/lib/postprocess4.php
 [ -f bin/processAlternate4.php ];rm bin/processAlternate4.php
