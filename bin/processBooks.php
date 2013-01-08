@@ -27,6 +27,7 @@ while($i=1)
     $postprocess = new PostProcess(true);
     $postprocess->processBooks();
   } else {
+    printf("BokProc : no work to be done\n");
     sleep(15);
   }
 }

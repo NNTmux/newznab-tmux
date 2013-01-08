@@ -28,6 +28,7 @@ while($i=1)
     $postprocess = new PostProcess(true);
     $postprocess->processMovies();
   } else {
+    printf("MovProc : no work to be done\n");
     sleep(15);
   }
 }

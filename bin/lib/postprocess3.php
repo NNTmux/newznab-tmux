@@ -2,13 +2,13 @@
 require_once(WWW_DIR."/lib/framework/db.php");
 require_once(WWW_DIR."/lib/site.php");
 require_once(WWW_DIR."/lib/util.php");
-require_once("releases3.php");
+require_once(WWW_DIR."/lib/releases.php");
 require_once(WWW_DIR."/lib/rarinfo.php");
 require_once(WWW_DIR."/lib/releasefiles.php");
 require_once(WWW_DIR."/lib/releaseextra.php");
 require_once(WWW_DIR."/lib/releaseimage.php");
 require_once(WWW_DIR."/lib/tvrage.php");
-require_once("thetvdb3.php");
+require_once(WWW_DIR."/lib/thetvdb.php");
 require_once(WWW_DIR."/lib/anidb.php");
 require_once(WWW_DIR."/lib/movie.php");
 require_once(WWW_DIR."/lib/music.php");

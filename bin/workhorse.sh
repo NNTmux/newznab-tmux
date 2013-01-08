@@ -18,12 +18,12 @@ if [ "$THREADS" == "true"  -a "$INNODB" == "true" ]; then
 
 	    #make active groups current
             cd $INNODB_PATH
-	    [ -f update_binaries_threaded.php ] && $PHP update_binaries_threaded.php &
+	    [ -f update_binaries_threaded.php ] && $PHP update_binaries_threaded.php
 
 	    #get backfill for all active groups
             if [[ $BACKFILL == "true" ]] ; then
                 cd $INNODB_PATH
-	        [ -f backfill_threaded.php ] && $PHP backfill_threaded.php &
+	        [ -f backfill_threaded.php ] && $PHP backfill_threaded.php
             fi
 
 	    wait
@@ -51,12 +51,12 @@ elif [ "$THREADS" != "true" -a "$INNODB" == "true" ]; then
 
 	    #make active groups current
             cd $INNODB_PATH
-	    [ -f update_binaries.php ] && $PHP update_binaries.php &
+	    [ -f update_binaries.php ] && $PHP update_binaries.php
 
 	    #get backfill for all active groups
             if [[ $BACKFILL == "true" ]] ; then
 	        cd $INNODB_PATH
-	        [ -f backfill.php ] && $PHP backfill.php &
+	        [ -f backfill.php ] && $PHP backfill.php
             fi
 	    wait
 
@@ -83,12 +83,12 @@ elif [ "$THREADS" == "true" -a "$INNODB" != "true" ]; then
 
             #make active groups current
 	    cd $MYISAM_PATH
-	    [ -f update_binaries_threaded.php ] && $PHP update_binaries_threaded.php &
+	    [ -f update_binaries_threaded.php ] && $PHP update_binaries_threaded.php
 
 	    #get backfill for all active groups
             if [[ $BACKFILL == "true" ]] ; then
 	        cd $MYISAM_PATH
-                [ -f backfill_threaded.php ] && $PHP backfill_threaded.php &
+                [ -f backfill_threaded.php ] && $PHP backfill_threaded.php
             fi
 
 	    wait
@@ -116,12 +116,12 @@ elif [ "$THREADS" != "true"  -a "$INNODB" != "true" ]; then
 
 	    #make active groups current
 	    cd $NEWZNAB_PATH
-	    [ -f update_binaries.php ] && $PHP update_binaries.php &
+	    [ -f update_binaries.php ] && $PHP update_binaries.php
 
 	    #get backfill for all active groups
             if [[ $BACKFILL == "true" ]] ; then
     	        cd $NEWZNAB_PATH
-	        [ -f backfill.php ] && $PHP backfill.php &
+	        [ -f backfill.php ] && $PHP backfill.php
             fi
 
 	    wait

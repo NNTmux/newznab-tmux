@@ -22,7 +22,7 @@ while($i=1)
     $postprocess = new PostProcess(true);
     $postprocess->processUnknownCategory();
   }
-  sleep(30);
+  sleep(5);
 }
 
 ?>

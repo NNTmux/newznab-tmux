@@ -23,10 +23,11 @@ while($i=1)
   while ($row = mysql_fetch_assoc($result)) {
     $count = $row['count(searchname)'];
   }
-  if ($count > 50) {
+  if ($count > 0) {
     $postprocess = new PostProcess(true);
     $postprocess->processTv();
   } else {
+    printf("TVRage : no work to be done\n");
     sleep(15);
   }
 }
