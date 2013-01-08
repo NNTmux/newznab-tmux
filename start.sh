@@ -18,20 +18,7 @@ if [[ $AGREED == "no" ]]; then
 	exit
 fi
 
-#delete some files
-[ -f bin/lib/postprocess4.php ];rm bin/lib/postprocess4.php
-[ -f bin/processAlternate4.php ];rm bin/processAlternate4.php
-[ -f bin/lib/postprocess5.php ];rm bin/lib/postprocess5.php
-[ -f bin/processAlternate5.php ];rm bin/processAlternate5.php
-[ -f bin/lib/postprocess6.php ];rm bin/lib/postprocess6.php
-[ -f bin/processAlternate6.php ];rm bin/processAlternate6.php
-[ -f bin/lib/postprocess7.php ];rm bin/lib/postprocess7.php
-[ -f bin/processAlternate7.php ];rm bin/processAlternate7.php
-
-
-
-
-
+x
 $TMUX new-session -d -s NewzNab -n NewzNab 'echo "monitor Working......" && nice -n 19 $PHP bin/monitor.php && exec bash -i'
 $TMUX selectp -t 0
 $TMUX splitw -h -p 72 'cd bin && echo "Processing Books....." && sleep 12 && nice -n 19 ./postProcessing1.sh && exec bash -i'
