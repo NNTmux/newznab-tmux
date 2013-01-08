@@ -60,7 +60,10 @@
 
  * Join in the converstion at irc://moonlight.se.eu.synirc.net/newznab-tmux.
 
- * The development branch of this git is still under heavy development.
+ * The development branch of this git is still under heavy development. To run the development branch:
+
+    `git checkout dev`
+
 
  * Thanks go to all who offered their assistance and improvement to these scripts.
 
