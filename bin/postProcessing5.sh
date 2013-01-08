@@ -10,5 +10,3 @@ do
   $PHP processTv.php
 
 done
-exit
-

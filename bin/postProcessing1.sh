@@ -10,4 +10,3 @@ do
   $PHP processBooks.php
 
 done
-exit

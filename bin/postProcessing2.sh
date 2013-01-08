@@ -10,4 +10,3 @@ do
   $PHP processGames.php
 
 done
-exit

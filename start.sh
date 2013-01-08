@@ -22,6 +22,20 @@ export INNODB_PATH=$DIR"/bin/innodb"
 export MYISAM_PATH=$DIR"/bin/myisam"
 export START_PATH=$DIR
 
+#delete some files
+[ -f bin/lib/postprocess4.php ];rm bin/lib/postprocess4.php
+[ -f bin/processAlternate4.php ];rm bin/processAlternate4.php
+[ -f bin/lib/postprocess5.php ];rm bin/lib/postprocess5.php
+[ -f bin/processAlternate5.php ];rm bin/processAlternate5.php
+[ -f bin/lib/postprocess6.php ];rm bin/lib/postprocess6.php
+[ -f bin/processAlternate6.php ];rm bin/processAlternate6.php
+[ -f bin/lib/postprocess7.php ];rm bin/lib/postprocess7.php
+[ -f bin/processAlternate7.php ];rm bin/processAlternate7.php
+
+
+
+
+
 $TMUX new-session -d -s NewzNab -n NewzNab 'echo "monitor Working......" && nice -n 19 $PHP bin/monitor.php && exec bash -i'
 $TMUX selectp -t 0
 $TMUX splitw -h -p 72 'cd bin && echo "Processing Books....." && sleep 12 && nice -n 19 ./postProcessing1.sh && exec bash -i'
@@ -60,6 +74,7 @@ if [[ $USE_MYTOP == "true" ]]; then
       $TMUX new-window -n mytop '$MYTOP -u $DB_USER -p $DB_PASSWORD -d $DB_NAME -h $DB_HOST'
 fi
 
+$TMUX new-window -n Console 'bash -i'
 $TMUX select-window -tNewzNab:0
 $TMUX attach-session -d -tNewzNab
 

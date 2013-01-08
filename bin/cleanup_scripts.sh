@@ -67,5 +67,3 @@ echo "waiting $NEWZNAB_POST_SLEEP_TIME seconds..."
 sleep $NEWZNAB_POST_SLEEP_TIME
 
 done
-
-exit

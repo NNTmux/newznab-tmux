@@ -27,7 +27,7 @@ while($i=1)
     $postprocess = new PostProcess(true);
     $postprocess->processGames();
   } else {
-    printf("ConProc : no work to be done\n");
+    printf("ConsPrc : no work to be done\n");
     sleep(15);
   }
 }

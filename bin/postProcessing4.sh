@@ -10,4 +10,3 @@ do
   $PHP processMusic.php
 
 done
-exit

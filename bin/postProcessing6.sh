@@ -10,4 +10,3 @@ do
   $PHP processOthers.php
 
 done
-exit

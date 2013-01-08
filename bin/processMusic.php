@@ -27,7 +27,7 @@ while($i=1)
     $postprocess = new PostProcess(true);
     $postprocess->processMusic();
   } else {
-    printf("MusProc : no work to be done\n");
+    printf("MusicPr : no work to be done\n");
     sleep(15);
   }
 }

@@ -27,7 +27,7 @@ while($i=1)
     $postprocess = new PostProcess(true);
     $postprocess->processTv();
   } else {
-    printf("TVRage : no work to be done\n");
+    printf("TVRage  : no work to be done\n");
     sleep(15);
   }
 }

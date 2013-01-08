@@ -10,4 +10,3 @@ do
   $PHP processMovies.php
 
 done
-exit
