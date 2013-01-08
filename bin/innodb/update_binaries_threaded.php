@@ -27,7 +27,7 @@ while ($ps->runParentCode())
 			// Spawn another thread
 			$ps->childData = array_pop($groupList);
 			echo "[Thread-MASTER] Spawning new thread.  Still have " . count($groupList) ." group(s) to update after this\n";
-			$ps->spawnchild();
+			$ps->spawnChild();
 		}
 		else 
 		{
