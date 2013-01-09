@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-##EDIT THESE##
+#STOP, DO not edit edit_these.sh. Please copy this file and name the copy edited.sh and make edits to that file
 
 export NEWZPATH="/var/www/newznab"
 
@@ -8,11 +8,21 @@ export NEWZNAB_PATH=$NEWZPATH"/misc/update_scripts"
 export TESTING_PATH=$NEWZPATH"/misc/testing"
 export ADMIN_PATH=$NEWZPATH"/www/admin"
 export INNODB_PATH=$TESTING_PATH"/innodb"
-export USERNAME="what is your name" # this is the user name that will run these scripts
-export NEWZNAB_IMPORT_SLEEP_TIME="60" # in seconds - this includes import_nzb backfill and current fill, 0 may cause errors
-export NEWZNAB_POST_SLEEP_TIME="1" # in seconds - this is for post processing - sleep between loops, 0 may cause errors
-export MAXDAYS="210"  #max days for backfill
-export NZBS="/path/to/nzbs"  #The path to the nzb dump you downloaded from torrents
+
+#Select the user name that will run these scripts
+export USERNAME="what is your name"
+
+#Set, in seconds - this includes import_nzb, backfill and current fill, 0 may cause errors
+export NEWZNAB_IMPORT_SLEEP_TIME="60"
+
+#Set, in seconds - this is for post processing - sleep between loops, 0 may cause errors
+export NEWZNAB_POST_SLEEP_TIME="1"
+
+#Set the maximum days tp backfill
+export MAXDAYS="210"
+
+#Set the path to the nzb dump you downloaded from torrents
+export NZBS="/path/to/nzbs"
 
 #Choose to run the threaded or non-threaded newznab scripts true/false
 export THREADS="true"
@@ -45,7 +55,7 @@ export USE_MYTOP="true"
 #By using this script you understand that the programmer is not responsible for any loss of data, users, or sanity.
 #You also agree that you were smart enough to make a backup of your database and files. Do you agree? yes/no
 
-export AGREED="no"
+export AGREED="yes"
 
 ##END OF EDITS##
 

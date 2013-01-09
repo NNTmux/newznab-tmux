@@ -18,7 +18,6 @@ if [ "$THREADS" == "true"  -a "$INNODB" == "true" ]; then
         		cd $NEWZNAB_PATH
                 	[ -f update_binaries_threaded.php ] && $PHP update_binaries_threaded.php
 	        fi
-
 		if [ $RELEASE_COUNT -le $MAX_RELEASES ]; then
 			#import nzb's
 			if [[ $IMPORT == "true" ]] ; then
