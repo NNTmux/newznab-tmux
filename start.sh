@@ -18,7 +18,7 @@ if [[ $AGREED == "no" ]]; then
 	exit
 fi
 
-$TMUX new-session -d -s NewzNab -n NewzNab 'echo "monitor Working......" && nice -n 19 $PHP bin/monitor.php && exec bash -i'
+$TMUX new-session -d -s NewzNab -n $TMUX_SESSION 'echo "monitor Working......" && nice -n 19 $PHP bin/monitor.php && exec bash -i'
 $TMUX selectp -t 0
 $TMUX splitw -h -p 72 'cd bin && echo "Processing Books....." && sleep 12 && nice -n 19 ./postProcessing1.sh && exec bash -i'
 $TMUX splitw -h -p 50 'cd bin && echo "imports Working......" && nice -n 10 ./workhorse.sh && exec bash -i'
