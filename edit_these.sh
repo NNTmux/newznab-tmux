@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#STOP, DO not edit edit_these.sh. Please copy this file and name the copy edited.sh and make edits to that file
+#EDIT THESE#
 
 export NEWZPATH="/var/www/newznab"
 
