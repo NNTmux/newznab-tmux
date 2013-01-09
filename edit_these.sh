@@ -12,6 +12,9 @@ export INNODB_PATH=$TESTING_PATH"/innodb"
 #Select the user name that will run these scripts
 export USERNAME="what is your name"
 
+#Enter the session name to be used by tmux
+export TMUX_SESSION="Newznab-tmux"
+
 #Set, in seconds - this includes import_nzb, backfill and current fill, 0 may cause errors
 export NEWZNAB_IMPORT_SLEEP_TIME="60"
 
