@@ -10,7 +10,7 @@ export ADMIN_PATH=$NEWZPATH"/www/admin"
 export INNODB_PATH=$TESTING_PATH"/innodb"
 
 #Select the user name that will run these scripts
-export USERNAME="jonnyboy"
+export USERNAME="what is you name"
 
 #Enter the session name to be used by tmux
 export TMUX_SESSION="Newznab-tmux"
@@ -25,7 +25,7 @@ export NEWZNAB_POST_SLEEP_TIME="1"
 export MAXDAYS="210"
 
 #Set the path to the nzb dump you downloaded from torrents
-export NZBS="/home/jonnyboy/nzbs/batch"
+export NZBS="/path/to/nzbs"
 
 #Choose to run the threaded or non-threaded newznab scripts true/false
 export THREADS="true"
@@ -62,7 +62,7 @@ export AGREED="yes"
 
 ##END OF EDITS##
 
-
+export GIT_REV=`git describe`
 command -v mysql >/dev/null 2>&1 || { echo >&2 "I require mysql but it's not installed.  Aborting."; exit 1; } && export MYSQL=`command -v mysql`
 command -v sed >/dev/null 2>&1 || { echo >&2 "I require sed but it's not installed.  Aborting."; exit 1; } && export SED=`command -v sed`
 command -v php5 >/dev/null 2>&1 && export PHP=`command -v php5` || { export PHP=`command -v php`; }

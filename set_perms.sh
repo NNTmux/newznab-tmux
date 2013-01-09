@@ -74,8 +74,9 @@ chmod 777 $NEWZPATH/www/lib/smarty/templates_c
 chmod -R 777 $NEWZPATH/www/covers
 chmod 777 $NEWZPATH/www
 chmod 777 $NEWZPATH/www/install
+mkdir -p $NEWZPATH/nzbfiles/tmpunrar2/
+mkdir -p $NEWZPATH/nzbfiles/tmpunrar3/
 chmod -R 777 $NEWZPATH/nzbfiles
-chmod 777 $NEWZPATH/nzbfiles/tmpunrar/
 
 echo -e "\033[38;5;160mCompleted\033[39m"
 
