@@ -18,7 +18,7 @@ if [[ $AGREED == "no" ]]; then
 	exit
 fi
 
-printf "\033]0; $TMUX_SESSION $GIT_REV\007\003\n"
+printf "\033]0; $TMUX_SESSION\007\003\n"
 $TMUX new-session -d -s NewzNab -n $TMUX_SESSION 'echo "monitor Working......" && nice -n 19 $PHP bin/monitor.php && exec bash -i'
 $TMUX selectp -t 0
 $TMUX splitw -h -p 72 'cd bin && echo "Processing Books....." && sleep 12 && nice -n 19 ./postProcessing1.sh && exec bash -i'
@@ -42,7 +42,7 @@ if [[ $USE_HTOP == "true" ]]; then
 fi
 
 if [[ $USE_NMON == "true" ]]; then
-      $TMUX new-window -n nmom '$NMON'
+      $TMUX new-window -n nmom '$NMON -t'
 fi
 
 if [[ $USE_BWMNG == "true" ]]; then
