@@ -15,6 +15,9 @@ export USERNAME="what is your name"
 #Enter the session name to be used by tmux
 export TMUX_SESSION="Newznab-tmux"
 
+#Set, in seconds - how often the monitor.php script should up, 0 may cause errors
+export MONITOR_UPDATE="15"
+
 #Set, in seconds - this includes import_nzb, backfill and current fill, 0 may cause errors
 export NEWZNAB_IMPORT_SLEEP_TIME="60"
 

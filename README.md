@@ -35,15 +35,18 @@
     
     `cd tmux`
     
+
+ * Edit the paths, timers, user name, what to run and then accept.
+
     `nano edit_these.sh`
 
 
- * Edit some permissions, run as root.
+ * Edit some permissions, run as root. The file .tmux.conf will be copied to the users home folder. If, when you run ./start.sh you see 0 nzb's and you are sure there are more than 0 left to import, verify the path to the nzb's in .tmux.conf in the home folder of the user.
 
     `./set_perms.sh`
 
 
- * Run my script, as user.
+ * Run my script, as user. If, you have grsecurity in you kernel, you will need to run using sudo if you use nmon or bwm-ng.
 
     `./start.sh`
     
@@ -52,20 +55,18 @@
 
  * If something looks stalled, it probably isn't. If all 12 panes are still there, it is most likely, as it should be.
  
- * **misc/testing/update_cleanup.php** needs to be edited to actually do something, and update_parsing is good for fixing a few releases everytime it runs, not a silver bullet though
+ * You must edit **misc/testing/update_cleanup.php** in order for it to actually do something, and update_parsing is good for fixing a few releases everytime it runs, not a silver bullet though.
 
- * If you are running this on an OVH or kimsufi server, you may need to run sudo ./start.sh because they built grsecurity into the kernel.
-    
- * Now all panes should be running smoothly. If any of the scriptns in the top 3 panes crash, the panes should remain open and you should be able to view the error messages. I hope this helps.
+ * Now all panes should be running smoothly. If any pane crashes, it should remain open and return to the prompt. You should also be able to see the error that caused it to crash.
 
  * Join in the converstion at irc://moonlight.se.eu.synirc.net/newznab-tmux.
 
- * The development branch of this git is still under heavy development. To run the development branch:
+ * The development branch of this git is still under heavy development. To run the development branch, type the command below and repeat then edit the edit_these.sh file.
 
     `git checkout dev`
 
 
- * Thanks go to all who offered their assistance and improvement to these scripts.
+ * Thanks go to all who offered their assistance and improvement to these scripts, especially kevin123.
 
 <hr>
  * If, you find these scripts useful and would like to offer a donation, they are greatly appreciated. Thank you

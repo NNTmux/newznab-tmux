@@ -2,7 +2,6 @@
 
 require("config.php");
 require_once(WWW_DIR."/lib/postprocess.php");
-$_php = getenv("PHP");
 
 $db = new DB();
  /////////////amount of books left to do//////
@@ -98,7 +97,7 @@ while($i>0)
 
 
   //////////////////Change this for sleep time////////////
-  $sleeptime = "15";
+  $sleeptime = getenv('MONITOR_UPDATE');
   if ($i!=1) {
     sleep($sleeptime);
   }
