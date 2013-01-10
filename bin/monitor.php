@@ -36,15 +36,10 @@ $release_count_query = "select count(*) from releases";
 
 //////////////set up initial counts////
 $book_count_start = mysql_query($book_query);
-$book_releases_now = mysql_query($book_query2);
 $console_count_start = mysql_query($console_query);
-$console_releases_now = mysql_query($console_query2);
 $movie_count_start = mysql_query($movies_query);
-$movie_releases_now = mysql_query($movies_query2);
 $music_count_start = mysql_query($music_query);
-$music_releases_now = mysql_query($music_query2);
 $tvrage_count_start = mysql_query($tvrage_query);
-$tvrage_relases_now = mysql_query($tvrage_query2);
 $postprocessing_remaining_count_start = mysql_query($postprocessing_count_remaining_query);
 $postprocessing_completed_count_start = mysql_query($postprocessing_completed_count_query);
 $releases_count_start = mysql_query($release_count_query);
