@@ -36,15 +36,15 @@ $release_count_query = "select count(*) from releases";
 
 //////////////set up initial counts////
 $book_count_start = mysql_query($book_query);
-$book_count_start2 = mysql_query($book_query2);
+$book_releases_now = mysql_query($book_query2);
 $console_count_start = mysql_query($console_query);
-$console_count_start2 = mysql_query($console_query2);
+$console_releases_now = mysql_query($console_query2);
 $movie_count_start = mysql_query($movies_query);
-$movie_count_start2 = mysql_query($movies_query2);
+$movie_releases_now = mysql_query($movies_query2);
 $music_count_start = mysql_query($music_query);
-$music_count_start2 = mysql_query($music_query2);
+$music_releases_now = mysql_query($music_query2);
 $tvrage_count_start = mysql_query($tvrage_query);
-$tvrage_count_start2 = mysql_query($tvrage_query2);
+$tvrage_relases_now = mysql_query($tvrage_query2);
 $postprocessing_remaining_count_start = mysql_query($postprocessing_count_remaining_query);
 $postprocessing_completed_count_start = mysql_query($postprocessing_completed_count_query);
 $releases_count_start = mysql_query($release_count_query);
@@ -240,72 +240,72 @@ while($i>0)
   }
 
   /////////////////book total////////////////////////
-  if (empty($book_count_start2)) {
-    $book_count_start2 = $db->queryDirect($book_query2);
-    if (empty($book_count_start2)) {
+  if (empty($book_releases_now)) {
+    $book_releases_now = $db->queryDirect($book_query2);
+    if (empty($book_releases_now)) {
       $message = 'Invalid query: ' . mysql_error() . "\n";
       $message .= 'Whole query: ' . $book_query2;
       die($message);
     }
   }
 
-  while ($row = mysql_fetch_assoc($book_count_start2)) {
+  while ($row = mysql_fetch_assoc($book_releases_now)) {
     $book_count_begin = $row['count(*)'];
   }
 
   /////////////////console total////////////////////////
-  if (empty($console_count_start2)) {
-    $console_count_start2 = $db->queryDirect($console_query2);
-    if (empty($console_count_start2)) {
+  if (empty($console_releases_now)) {
+    $console_releases_now = $db->queryDirect($console_query2);
+    if (empty($console_releases_now)) {
       $message = 'Invalid query: ' . mysql_error() . "\n";
       $message .= 'Whole query: ' . $console_query2;
       die($message);
     }
   }
 
-  while ($row = mysql_fetch_assoc($console_count_start2)) {
+  while ($row = mysql_fetch_assoc($console_releases_now)) {
     $console_count_begin = $row['count(searchname)'];
   }
 
   /////////////////movie total////////////////////////
-  if (empty($movie_count_start2)) {
-    $movie_count_start2 = $db->queryDirect($movies_query2);
-    if (empty($movie_count_start2)) {
+  if (empty($movie_releases_now)) {
+    $movie_releases_now = $db->queryDirect($movies_query2);
+    if (empty($movie_releases_now)) {
       $message = 'Invalid query: ' . mysql_error() . "\n";
       $message .= 'Whole query: ' . $movies_query2;
       die($message);
     }
   }
 
-  while ($row = mysql_fetch_assoc($movie_count_start2)) {
+  while ($row = mysql_fetch_assoc($movie_releases_now)) {
     $movie_count_begin = $row['count(searchname)'];
   }
 
   /////////////////music total////////////////////////
-  if (empty($music_count_start2)) {
-    $music_count_start2 = $db->queryDirect($music_query2);
-    if (empty($music_count_start2)) {
+  if (empty($music_releases_now)) {
+    $music_releases_now = $db->queryDirect($music_query2);
+    if (empty($music_releases_now)) {
       $message = 'Invalid query: ' . mysql_error() . "\n";
       $message .= 'Whole query: ' . $music_query2;
       die($message);
     }
   }
 
-  while ($row = mysql_fetch_assoc($music_count_start2)) {
+  while ($row = mysql_fetch_assoc($music_releases_now)) {
     $music_count_begin = $row['count(searchname)'];
   }
 
   /////////////////tv total////////////////////////
-  if (empty($tvrage_count_start2)) {
-    $tvrage_count_start2 = $db->queryDirect($tvrage_query2);
-    if (empty($tvrage_count_start2)) {
+  if (empty($tvrage_relases_now)) {
+    $tvrage_relases_now = $db->queryDirect($tvrage_query2);
+    if (empty($tvrage_relases_now)) {
       $message = 'Invalid query: ' . mysql_error() . "\n";
       $message .= 'Whole query: ' . $tvrage_query2;
       die($message);
     }
   }
 
-  while ($row = mysql_fetch_assoc($tvrage_count_start2)) {
+  while ($row = mysql_fetch_assoc($tvrage_relases_now)) {
     $tv_count_begin = $row['count(searchname)'];
   }
 
