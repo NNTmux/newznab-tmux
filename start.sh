@@ -19,7 +19,7 @@ if [[ $AGREED == "no" ]]; then
 fi
 
 printf "\033]0; $TMUX_SESSION\007\003\n"
-$TMUX new-session -d -s NewzNab -n $TMUX_SESSION 'echo "monitor Working......" && nice -n 19 $PHP bin/monitor.php && exec bash -i'
+$TMUX new-session -d -s $TMUX_SESSION -n NewzNab 'echo "monitor Working......" && nice -n 19 $PHP bin/monitor.php && exec bash -i'
 $TMUX selectp -t 0
 $TMUX splitw -h -p 72 'cd bin && echo "Processing Books....." && sleep 12 && nice -n 19 ./postProcessing1.sh && exec bash -i'
 $TMUX splitw -h -p 50 'cd bin && echo "imports Working......" && nice -n 10 ./workhorse.sh && exec bash -i'
@@ -58,6 +58,6 @@ if [[ $USE_MYTOP == "true" ]]; then
 fi
 
 $TMUX new-window -n Console 'bash -i'
-$TMUX select-window -tNewzNab:0
-$TMUX attach-session -d -tNewzNab
+$TMUX select-window -t$TMUX_SESSION:0
+$TMUX attach-session -d -t$TMUX_SESSION
 
