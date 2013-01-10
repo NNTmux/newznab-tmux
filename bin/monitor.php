@@ -94,7 +94,7 @@ while($i>0)
 
 
   //////////////////Change this for sleep time////////////
-  $sleeptime = "60";
+  $sleeptime = "15";
   if ($i!=1) {
     sleep($sleeptime);
   }
@@ -171,20 +171,6 @@ while($i>0)
 
   while ($row = mysql_fetch_assoc($music_count_inner_loop)) {
     $music_count_now = $row['count(searchname)'];
-  }
-
-  ////////////////presult_inner_loop///////////////////////
-  if (empty($postprocessing_count_remaining_loop_start)) {
-    $postprocessing_count_remaining_loop_start = $db->queryDirect($postprocessing_count_remaining_query);
-    if (empty($postprocessing_count_remaining_loop_start)) {
-      $message = 'Invalid query: ' . mysql_error() . "\n";
-      $message .= 'Whole query: ' . $postprocessing_count_remaining_query;
-      die($message);
-    }
- }
-
-  while ($row = mysql_fetch_assoc($postprocessing_count_remaining_loop_start)) {
-    $pcount_inner_loop = $row['count(*)'];
   }
 
   ///////////////////presult_loop////////////////////////
@@ -316,7 +302,6 @@ while($i>0)
   $other_total = $total_release_now - $tv_count_begin - $music_count_begin - $movie_count_begin - $console_count_begin - $book_count_begin;
 
   //calculate the difference from start to now
-  $ptotal_loop = $postprocessing_count_remaining_this_loop - $pcount_inner_loop;if ($ptotal_loop < 0) $ptotal_loop = 0;
   $total_release_added = $total_release_now - $count_begin;if ($total_release_added < 0) $total_release_added = 0;
   $total_release_added_loop = $total_release_now - $count_inner_loop;if ($total_release_added_loop < 0) $total_release_added_loop = 0;
 
@@ -330,7 +315,6 @@ while($i>0)
   printf("\033[38;5;020m$min\033[0m");printf(" Minutes ");
   printf("\033[38;5;063m$sec\033[0m");printf(" Seconds Ago.\n");
   printf("The script updates every $sleeptime seconds.\n");
-  printf("$ptotal_loop releases post processed since last update.\n");
   printf("$total_release_added_loop releases added since last update.\n\n");
 
   printf("$count_begin releases at start.\n");
