@@ -113,6 +113,15 @@ while($i>0)
   $releases_count_inner_loop = mysql_query($release_count_query);
   $tvrage_count_inner_loop = mysql_query($tvrage_query);
 
+
+
+  //////////////counts in loop////
+  $book_releases_now = mysql_query($book_query2);
+  $console_releases_now = mysql_query($console_query2);
+  $movie_releases_now = mysql_query($movies_query2);
+  $music_releases_now = mysql_query($music_query2);
+  $tvrage_relases_now = mysql_query($tvrage_query2);
+
   ///////////////////bresult_loop/////////////////////////
   if (empty($book_count_inner_loop)) {
     $book_count_inner_loop = $db->queryDirect($book_query);
