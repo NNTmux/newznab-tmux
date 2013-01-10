@@ -15,7 +15,7 @@
  
     `git clone https://github.com/kevinlekiller/Newznab-InnoDB-Dropin.git kev-innodb`
 
-    `cd innodb/lib/kev-innodb`
+    `cd kev-innodb/lib/innodb`
 
     `php convertToInnoDB.php`
 
