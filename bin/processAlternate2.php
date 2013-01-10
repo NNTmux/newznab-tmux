@@ -25,7 +25,7 @@ while($i=1)
     $count = $row['count(*)'];
   }
 
-  if ($count > 10) {
+  if ($count > 0) {
     $postprocess = new PostProcess2(true);
     $postprocess->processAdditional2();
   } else {
