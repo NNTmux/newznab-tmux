@@ -43,7 +43,7 @@ if [[ $USE_HTOP == "true" ]]; then
 fi
 
 if [[ $USE_NMON == "true" ]]; then
-      $TMUX new-window -n nmom '$NMON -t'
+      $TMUX new-window -n nmon '$NMON -t'
 fi
 
 if [[ $USE_BWMNG == "true" ]]; then
