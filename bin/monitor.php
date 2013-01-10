@@ -345,13 +345,11 @@ while($i>0)
   $mutotal_start = $mucount_begin - $music_count_now;//if ($mutotal_start < 0) $mutotal_start = 0;
   $ttotal_start = $tcount_begin - $tvrage_count_now;//if ($ttotal_start < 0) $ttotal_start = 0;
   $ptotal_start = $postprocessing_remaining_count_loop_start - $postprocessing_count_remaining_this_loop;//if ($ptotal_start < 0) $ptotal_start = 0;
-  $other_count_now = $ptotal_start - $ttotal_start - $mutotal_start - $mototal_start - $gtotal_start - $btotal_start;//if ($other_count_now < 0) $other_count_now = 0;
 
   //calculate the difference from start to now
   $ptotal_loop = $postprocessing_count_remaining_this_loop - $pcount_inner_loop;if ($ptotal_loop < 0) $ptotal_loop = 0;
   $total_start = $count_loop - $count_begin;if ($total_start < 0) $total_start = 0;
   $total_loop = $count_loop - $count_inner_loop;if ($total_loop < 0) $total_loop = 0;
-  $other_total_count_now = $postprocessing_count_remaining_this_loop - $tvrage_count_now - $tvrage_count_now - $music_count_now - $movies_count_now - $console_count_now - $book_count_now;if ($other_total_count_now < 0) $other_total_count_now = 0;
 
   $sleeptext = "in the past $sleeptime seconds.";
 
@@ -370,15 +368,15 @@ while($i>0)
   printf("$count_loop releases in your database.\n");
   printf("$total_start releases have been added.\n\n");
 
-  $mask = "%10s %10s %10s \n";
-  printf($mask, "Category", "Processed", "Remaining");
-  printf($mask, "Books", "$btotal_start", "$book_count_now");
-  printf($mask, "Console", "$gtotal_start", "$console_count_now");
-  printf($mask, "Movies", "$mototal_start", "$movies_count_now");
-  printf($mask, "Music", "$mutotal_start", "$music_count_now");
-  printf($mask, "TV Shows", "$ttotal_start", "$tvrage_count_now");
-  printf($mask, "Other", "$other_count_now", "$other_total_count_now");
-  printf($mask, "Total", "$ptotal_start", "$postprocessing_count_remaining_this_loop");
+  $mask = "%8s %6s %6s %6s \n";
+  printf($mask, "Cat", "Proc", "Remain", "In DB");
+  printf($mask, "========", "======", "======", "======");
+  printf($mask, "Books", "$btotal_start", "$book_count_now", "0");
+  printf($mask, "Console", "$gtotal_start", "$console_count_now", "0");
+  printf($mask, "Movies", "$mototal_start", "$movies_count_now", "0");
+  printf($mask, "Music", "$mutotal_start", "$music_count_now", "0");
+  printf($mask, "TVShows", "$ttotal_start", "$tvrage_count_now", "0");
+  printf($mask, "Add'l", "$ptotal_start", "$postprocessing_count_remaining_this_loop", "0");
 
 
 
