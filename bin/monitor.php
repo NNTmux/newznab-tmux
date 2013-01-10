@@ -21,6 +21,10 @@ $movies_query2 = "SELECT count(searchname), ID from releases use index (ix_relea
 $music_query = "SELECT count(searchname), ID from releases use index (ix_releases_categoryID) where musicinfoID IS NULL and categoryID in ( select ID from category where parentID = 3000 );";
 $music_query2 = "SELECT count(searchname), ID from releases use index (ix_releases_categoryID) where categoryID in ( select ID from category where parentID = 3000 );";
 
+ /////////////amount of movies left to do//////
+$pc_query = "select count(*) from releases r left join category c on c.ID = r.categoryID where (categoryID in ( select ID from category where parentID = 4000)) and ((r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0));";
+$pc_query2 = "SELECT count(searchname), ID from releases use index (ix_releases_categoryID) where categoryID in ( select ID from category where parentID = 4000);";
+
  /////////////amount of tv left to do/////////
 $tvrage_query = "SELECT count(searchname), ID from releases where rageID = -1 and categoryID in ( select ID from category where parentID = 5000 );";
 $tvrage_query2 = "SELECT count(searchname), ID from releases where categoryID in ( select ID from category where parentID = 5000 );";
@@ -107,7 +111,7 @@ while($i>0)
   $postprocessing_count_completed_inner_loop = mysql_query($postprocessing_completed_count_query);
   $releases_count_inner_loop = mysql_query($release_count_query);
   $tvrage_count_inner_loop = mysql_query($tvrage_query);
-
+  $pc_count_inner_loop = mysql_query($pc_query);
 
 
   //////////////counts in loop////
@@ -116,6 +120,35 @@ while($i>0)
   $movie_releases_now = mysql_query($movies_query2);
   $music_releases_now = mysql_query($music_query2);
   $tvrage_relases_now = mysql_query($tvrage_query2);
+  $pc_releases_now = mysql_query($pc_query2);
+
+  ///////////////////pc releases to process/////////////////////////
+  if (empty($pc_count_inner_loop)) {
+    $pc_count_inner_loop = $db->queryDirect($pc_query);
+    if (empty($pc_count_inner_loop)) {
+      $message = 'Invalid query: ' . mysql_error() . "\n";
+      $message .= 'Whole query: ' . $pc_query;
+      die($message);
+    }
+  }
+
+  while ($row = mysql_fetch_assoc($pc_count_inner_loop)) {
+    $pc_count_now = $row['count(*)'];
+  }
+
+  ///////////////////pc releases in database/////////////////////////
+  if (empty($pc_releases_now)) {
+    $pc_releases_now = $db->queryDirect($pc_query2);
+    if (empty($pc_releases_now)) {
+      $message = 'Invalid query: ' . mysql_error() . "\n";
+      $message .= 'Whole query: ' . $pc_query2;
+      die($message);
+    }
+  }
+
+  while ($row = mysql_fetch_assoc($pc_releases_now)) {
+    $pc_releases_now = $row['count(searchname)'];
+  }
 
   ///////////////////bresult_loop/////////////////////////
   if (empty($book_count_inner_loop)) {
@@ -299,7 +332,7 @@ while($i>0)
     $tv_count_begin = $row['count(searchname)'];
   }
 
-  $other_total = $total_release_now - $tv_count_begin - $music_count_begin - $movie_count_begin - $console_count_begin - $book_count_begin;
+  $other_total = $total_release_now - $tv_count_begin - $music_count_begin - $movie_count_begin - $console_count_begin - $book_count_begin - $pc_releases_now;
 
   //calculate the difference from start to now
   $total_release_added = $total_release_now - $count_begin;if ($total_release_added < 0) $total_release_added = 0;
@@ -321,21 +354,24 @@ while($i>0)
   printf("$total_release_now releases in your database.\n");
   printf("$total_release_added releases have been added.\n\n");
 
-  $mask = "%10s %10s %10s \n";
+  $mask = "%16s %10s %10s \n";
   printf($mask, "Category", "In Process", "In Database");
-  printf($mask, "==========", "==========", "==========");
-  printf($mask, "Books", "$book_count_now", "$book_count_begin");
-  printf($mask, "Console", "$console_count_now", "$console_count_begin");
-  printf($mask, "Movie", "$movies_count_now", "$movie_count_begin");
-  printf($mask, "Audio", "$music_count_now", "$music_count_begin");
-  printf($mask, "TVShows", "$tvrage_count_now", "$tv_count_begin");
-  printf($mask, "Add'l", "$postprocessing_count_remaining_this_loop", "$other_total");
+  printf($mask, "===============", "==========", "==========");
+  printf($mask, "Books(7020)", "$book_count_now", "$book_count_begin");
+  printf($mask, "Console(1000)", "$console_count_now", "$console_count_begin");
+  printf($mask, "Movie(2000)", "$movies_count_now", "$movie_count_begin");
+  printf($mask, "Audio(3000)", "$music_count_now", "$music_count_begin");
+  printf($mask, "PC(4000)", "$pc_count_now", "$pc_releases_now");
+  printf($mask, "TVShows(5000)", "$tvrage_count_now", "$tv_count_begin");
+  printf($mask, "Additional Proc", "$postprocessing_count_remaining_this_loop", "$other_total");
 
 
 
   $i=$i+1;
 }
 
+mysql_free_result($pc_count_now);
+mysql_free_result($pc_releases_now);
 mysql_free_result($book_count_inner_loop);
 mysql_free_result($console_count_inner_loop);
 mysql_free_result($movies_count_inner_loop);
