@@ -38,7 +38,7 @@ if [ "$THREADS" == "true"  -a "$INNODB" == "true" ]; then
                 		$MYSQL -u$DB_USER -h $DB_HOST --password=$DB_PASSWORD $DB_NAME -e "${MYSQL_CMD}"
 			fi
 		else
-			echo "Unprocessed releases exceeds your threshold of $MAX_RELEASES..."
+			echo "$RELEASE_COUNT unprocessed releases exceeds your threshold of $MAX_RELEASES..."
 		fi
 
 		echo "Import scripts waiting $NEWZNAB_IMPORT_SLEEP_TIME seconds..."
@@ -76,7 +76,7 @@ elif [ "$THREADS" != "true" -a "$INNODB" == "true" ]; then
 				$MYSQL -u$DB_USER -h $DB_HOST --password=$DB_PASSWORD $DB_NAME -e "${MYSQL_CMD}"
 			fi
                 else
-                        echo "Unprocessed releases exceeds your threshold of $MAX_RELEASES..."
+                        echo "$RELEASE_COUNT unprocessed releases exceeds your threshold of $MAX_RELEASES..."
 		fi
 
 		echo "Import scripts waiting $NEWZNAB_IMPORT_SLEEP_TIME seconds..."
@@ -120,7 +120,7 @@ elif [ "$THREADS" == "true" -a "$INNODB" != "true" ]; then
 				$MYSQL -u$DB_USER -h $DB_HOST --password=$DB_PASSWORD $DB_NAME -e "${MYSQL_CMD}"
 			fi
                 else
-                        echo "Unprocessed releases exceeds your threshold of $MAX_RELEASES..."
+                        echo "$RELEASE_COUNT unprocessed releases exceeds your threshold of $MAX_RELEASES..."
 		fi
 
 		echo "Import scripts waiting $NEWZNAB_IMPORT_SLEEP_TIME seconds..."
@@ -160,7 +160,7 @@ elif [ "$THREADS" != "true"  -a "$INNODB" != "true" ]; then
 			fi
 
                 else
-                        echo "Unprocessed releases exceeds your threshold of $MAX_RELEASES..."
+                        echo "$RELEASE_COUNT unprocessed releases exceeds your threshold of $MAX_RELEASES..."
 		fi
 
 		echo "Import scripts waiting $NEWZNAB_IMPORT_SLEEP_TIME seconds..."

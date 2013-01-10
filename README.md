@@ -50,7 +50,7 @@
 
  * If you connect using **putty**, then under Window/Translation set Remote character set to UTF-8.
 
- * If something looks stalled, it probably isn't. If all 13 panes are still there, it is most likely, as it should be.
+ * If something looks stalled, it probably isn't. If all 12 panes are still there, it is most likely, as it should be.
  
  * **misc/testing/update_cleanup.php** needs to be edited to actually do something, and update_parsing is good for fixing a few releases everytime it runs, not a silver bullet though
 

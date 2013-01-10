@@ -27,7 +27,7 @@ while($i=1)
     $postprocess = new PostProcess(true);
     $postprocess->processBooks();
   } else {
-    printf("BokProc : Processing $count book releases\n");
+    printf("BookPrc : Processing $count book releases\n");
     sleep(15);
   }
 }
