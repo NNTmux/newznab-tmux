@@ -16,7 +16,9 @@ pc_query="SELECT COUNT(*) from releases r left join category c on c.ID = r.categ
 tvrage_query="SELECT COUNT(*) from releases where rageID = -1 and categoryID in ( select ID from category where parentID = 5000 );"
 work_remaining_query="SELECT COUNT(*) from releases r left join category c on c.ID = r.categoryID where (r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0);"
 
+
 #query db for totals
+function getCount() {
 RELEASE_COUNT1=`$MYSQL -u$DB_USER -h $DB_HOST --password=$DB_PASSWORD $DB_NAME -s -N -e "${book_query}"`
 RELEASE_COUNT2=`$MYSQL -u$DB_USER -h $DB_HOST --password=$DB_PASSWORD $DB_NAME -s -N -e "${console_query}"`
 RELEASE_COUNT3=`$MYSQL -u$DB_USER -h $DB_HOST --password=$DB_PASSWORD $DB_NAME -s -N -e "${movie_query}"`
@@ -24,15 +26,16 @@ RELEASE_COUNT4=`$MYSQL -u$DB_USER -h $DB_HOST --password=$DB_PASSWORD $DB_NAME -
 RELEASE_COUNT5=`$MYSQL -u$DB_USER -h $DB_HOST --password=$DB_PASSWORD $DB_NAME -s -N -e "${pc_query}"`
 RELEASE_COUNT6=`$MYSQL -u$DB_USER -h $DB_HOST --password=$DB_PASSWORD $DB_NAME -s -N -e "${tvrage_query}"`
 RELEASE_COUNT7=`$MYSQL -u$DB_USER -h $DB_HOST --password=$DB_PASSWORD $DB_NAME -s -N -e "${work_remaining_query}"`
-
-#sum of totals
-export TOTAL_COUNT=$(($RELEASE_COUNT1 + $RELEASE_COUNT2 + $RELEASE_COUNT3 + $RELEASE_COUNT4 + $RELEASE_COUNT5 + $RELEASE_COUNT6 + $RELEASE_COUNT7))
+}
 
 if [ "$THREADS" == "true"  -a "$INNODB" == "true" ]; then
 	while :
 	 do
+		#sum of totals
+		getCount
+		TOTAL_COUNT=$(($RELEASE_COUNT1 + $RELEASE_COUNT2 + $RELEASE_COUNT3 + $RELEASE_COUNT4 + $RELEASE_COUNT5 + $RELEASE_COUNT6 + $RELEASE_COUNT7))
 
-               #make active groups current
+                #make active groups current
 		if [[ $BINARIES == "true" ]] ; then
         		cd $NEWZNAB_PATH
                 	[ -f update_binaries_threaded.php ] && $PHP update_binaries_threaded.php
@@ -68,6 +71,9 @@ if [ "$THREADS" == "true"  -a "$INNODB" == "true" ]; then
 elif [ "$THREADS" != "true" -a "$INNODB" == "true" ]; then
 	while :
 	 do
+                #sum of totals
+                getCount
+                TOTAL_COUNT=$(($RELEASE_COUNT1 + $RELEASE_COUNT2 + $RELEASE_COUNT3 + $RELEASE_COUNT4 + $RELEASE_COUNT5 + $RELEASE_COUNT6 + $RELEASE_COUNT7))
 
 		#make active groups current
 		if [[ $BINARIES == "true" ]] ; then
@@ -106,6 +112,9 @@ elif [ "$THREADS" != "true" -a "$INNODB" == "true" ]; then
 elif [ "$THREADS" == "true" -a "$INNODB" != "true" ]; then
 	while :
 	 do
+                #sum of totals
+                getCount
+                TOTAL_COUNT=$(($RELEASE_COUNT1 + $RELEASE_COUNT2 + $RELEASE_COUNT3 + $RELEASE_COUNT4 + $RELEASE_COUNT5 + $RELEASE_COUNT6 + $RELEASE_COUNT7))
 
 		#make active groups current
 		if [[ $BINARIES == "true" ]] ; then
@@ -150,6 +159,10 @@ elif [ "$THREADS" == "true" -a "$INNODB" != "true" ]; then
 elif [ "$THREADS" != "true"  -a "$INNODB" != "true" ]; then
 	while :
 	 do
+
+                #sum of totals
+                getCount
+                TOTAL_COUNT=$(($RELEASE_COUNT1 + $RELEASE_COUNT2 + $RELEASE_COUNT3 + $RELEASE_COUNT4 + $RELEASE_COUNT5 + $RELEASE_COUNT6 + $RELEASE_COUNT7))
 
 		#make active groups current
 		if [[ $BINARIES == "true" ]] ; then
