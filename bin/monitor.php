@@ -1,6 +1,6 @@
 <?php
 
-require("config.php");
+require_once("config.php");
 require_once(WWW_DIR."/lib/postprocess.php");
 
 $db = new DB();
