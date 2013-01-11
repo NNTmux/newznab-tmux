@@ -23,12 +23,12 @@ cp $TESTING_PATH/nzb-importmodified.php $NEWZPATH/www/admin/
 if [ -d "/home/$USERNAME" ]; then
 	echo "cp conf/.tmux.conf /home/$USERNAME/.tmux.conf"
         cp conf/.tmux.conf /home/$USERNAME/.tmux.conf
-        sed -i 's,'changeme,"$NZBS"',' "/home/$USERNAME/.tmux.conf"
+        $SED -i 's,'changeme,"$NZBS"',' "/home/$USERNAME/.tmux.conf"
 fi
 if [ -d "$HOME" ]; then
         echo "cp conf/.tmux.conf $HOME/.tmux.conf"
         cp conf/.tmux.conf $HOME/.tmux.conf
-        sed -i 's,'changeme,"$NZBS"',' "$HOME/.tmux.conf"
+        $SED -i 's,'changeme,"$NZBS"',' "$HOME/.tmux.conf"
 fi
 
 echo "Editing $NEWZPATH/www/lib/postprocess.php"

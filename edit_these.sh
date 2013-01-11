@@ -51,6 +51,10 @@ export IMPORT="true"
 #Set the max amount of unprocessed releases and still allow import or backfill to run
 export MAX_RELEASES="1000"
 
+#Specify your SED binary
+export SED="/bin/sed"
+#export SED="/usr/local/bin/gsed"
+
 #Select some monitoring script, if they are not installed, it will not affect the running of the scripts
 export USE_HTOP="true"
 export USE_NMON="true"
@@ -66,7 +70,6 @@ export AGREED="no"
 ##END OF EDITS##
 
 command -v mysql >/dev/null 2>&1 || { echo >&2 "I require mysql but it's not installed.  Aborting."; exit 1; } && export MYSQL=`command -v mysql`
-command -v sed >/dev/null 2>&1 || { echo >&2 "I require sed but it's not installed.  Aborting."; exit 1; } && export SED=`command -v sed`
 command -v php5 >/dev/null 2>&1 && export PHP=`command -v php5` || { export PHP=`command -v php`; }
 command -v tmux >/dev/null 2>&1 || { echo >&2 "I require tmux but it's not installed.  Aborting."; exit 1; } && export TMUX=`command -v tmux`
 
