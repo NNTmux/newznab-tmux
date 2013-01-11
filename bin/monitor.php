@@ -78,26 +78,19 @@ while($i>0)
   $tvrage_releases_now = $tvrage_releases_now[0]['cnt'];
   $releases_now = $db->query($releases_query);
   $releases_now = $releases_now[0]['cnt'];
-
   $work_remaining_now = $db->query($work_remaining_query);
   $work_remaining_now = $work_remaining_now[0]['cnt'];
-
-
-
   $releases_since_start = $releases_now - $releases_start;
   $releases_since_loop = $releases_now - $releases_loop;
   $additional_releases_now = $releases_now - $book_releases_now - $console_releases_now - $movie_releases_now - $music_releases_now - $pc_releases_now - $tvrage_releases_now;
 
   passthru('clear');
-  printf("Monitoring the releases in your database.\n\n");
-  printf("The script was started: \033[38;5;160m$day\033[0m");printf(" Days ");
-  printf("\033[38;5;208m$hr\033[0m");printf(" Hours ");
-  printf("\033[38;5;020m$min\033[0m");printf(" Minutes ");
-  printf("\033[38;5;063m$sec\033[0m");printf(" Seconds Ago.\n");
+  printf("\033[1;34mMonitor\033[0m has been running for: \033[38;5;160m$day\033[0m");printf(" days, ");
+  printf("\033[38;5;208m$hr\033[0m");printf(" hrs, ");
+  printf("\033[38;5;020m$min\033[0m");printf(" min\n");
   printf("The script updates every $sleeptime seconds.\n");
   printf("$releases_since_loop releases added since last update.\n\n");
 
-  printf("$releases_start releases at start.\n");
   printf("$releases_now releases in your database.\n");
   printf("$releases_since_start releases have been added.\n\n");
 
