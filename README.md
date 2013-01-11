@@ -24,7 +24,7 @@
 
     `cd /var/www/newznab/misc/testing/`
     
-    `git clone https://github.com/kevinlekiller/Newznab-InnoDB-Dropin.git innodb`
+    `git clone https://github.com/itandrew/Newznab-InnoDB-Dropin.git innodb`
     
 
  * Clone my github
