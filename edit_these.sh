@@ -16,7 +16,7 @@ export USERNAME="what is your name"
 export TMUX_SESSION="Newznab-tmux"
 
 #Set, in seconds - how often the monitor.php script should up, 0 may cause errors
-export MONITOR_UPDATE="15"
+export MONITOR_UPDATE="60"
 
 #Set, in seconds - this includes import_nzb, backfill and current fill, 0 may cause errors
 export NEWZNAB_IMPORT_SLEEP_TIME="60"
@@ -49,7 +49,7 @@ export BACKFILL="true"
 export IMPORT="true"
 
 #Set the max amount of unprocessed releases and still allow import or backfill to run
-export MAX_RELEASES="1000"
+export MAX_RELEASES="30000"
 
 #Specify your SED binary
 export SED="/bin/sed"

@@ -25,17 +25,17 @@ $TMUX splitw -h -p 72 'cd bin && echo "Processing Books....." && sleep 12 && nic
 $TMUX splitw -h -p 50 'cd bin && echo "imports Working......" && nice -n 10 ./workhorse.sh && exec bash -i'
 $TMUX selectp -t 0
 $TMUX splitw -v -p 65 'cd bin && echo "processNfos Working......" && sleep 3 && nice -n 19 ./postprocess_nfo.sh && exec bash -i'
-$TMUX splitw -v -p 67 'cd bin && echo "processAdditional Thread #1 Working......" && sleep 6 && nice -n 19 ./processAlternate2.sh && exec bash -i'
-$TMUX splitw -v -p 50 'cd bin && echo "processAdditional Thread #2 Working......" && sleep 9 && nice -n 19 ./processAlternate3.sh && exec bash -i'
-$TMUX selectp -t 4
+$TMUX splitw -v -p 75 'cd bin && echo "processAdditional Thread #1 Working......" && sleep 6 && nice -n 19 ./processAlternate2.sh && exec bash -i'
+$TMUX splitw -v -p 67 'cd bin && echo "processAdditional Thread #2 Working......" && sleep 9 && nice -n 19 ./processAlternate3.sh && exec bash -i'
+$TMUX splitw -v -p 50 'cd bin && echo "processAdditional Thread #3 Working......" && sleep 12 && nice -n 19 ./processAlternate4.sh && exec bash -i'
+$TMUX selectp -t 5
 $TMUX splitw -v -p 83 'cd bin && echo "Processing Games....." && sleep 15 && nice -n 19 ./postProcessing2.sh && exec bash -i'
 $TMUX splitw -v -p 80 'cd bin && echo "Processing Movies....." && sleep 18 && nice -n 19  ./postProcessing3.sh && exec bash -i'
 $TMUX splitw -v -p 75 'cd bin && echo "Processing Music....." && sleep 21 && nice -n 19 ./postProcessing4.sh && exec bash -i'
 $TMUX splitw -v -p 67 'cd bin && echo "Processing TV....." && sleep 24 && nice -n 19 ./postProcessing5.sh && exec bash -i'
 $TMUX splitw -v -p 50 'cd bin && echo "Processing Other....." && sleep 27 && nice -n 19 ./postProcessing6.sh && exec bash -i'
-$TMUX selectp -t 10
+$TMUX selectp -t 11
 $TMUX splitw -v -p 50 'cd bin && echo "create Releases Working......" && nice -n 15 ./cleanup_scripts.sh && exec bash -i'
-
 
 if [[ $USE_HTOP == "true" ]]; then
       $TMUX new-window -n htop '$HTOP'
