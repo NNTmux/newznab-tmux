@@ -25,7 +25,7 @@ while($i=1)
     $count = $row['count(*)'];
   }
 
-  if ($count > 300) {
+  if ($count > 1000) {
     $postprocess = new PostProcess4(true);
     $postprocess->processAdditional4();
   } else {

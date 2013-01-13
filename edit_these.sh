@@ -57,11 +57,12 @@ export SED="/bin/sed"
 #export SED="/usr/local/bin/gsed"
 
 #Select some monitoring script, if they are not installed, it will not affect the running of the scripts
-export USE_HTOP="true"
-export USE_NMON="true"
-export USE_BWMNG="true"
-export USE_IOTOP="true"
-export USE_MYTOP="true"
+export USE_HTOP="false"
+export USE_NMON="false"
+export USE_BWMNG="false"
+export USE_IOTOP="false"
+export USE_MYTOP="false"
+export USE_VNSTAT="false"
 
 #By using this script you understand that the programmer is not responsible for any loss of data, users, or sanity.
 #You also agree that you were smart enough to make a backup of your database and files. Do you agree? yes/no
@@ -82,11 +83,14 @@ if [[ $USE_NMON == "true" ]]; then
       command -v nmon >/dev/null 2>&1 || { echo >&2 "I require nmon but it's not installed.  Aborting."; exit 1; } && export NMON=`command -v nmon`
 fi
 if [[ $USE_BWMNG == "true" ]]; then
-     command -v bwm-ng >/dev/null 2>&1|| { echo >&2 "I require bwm-ng but it's not installed.  Aborting."; exit 1; } && export BWMNG=`command -v bwm-ng`
+      command -v bwm-ng >/dev/null 2>&1|| { echo >&2 "I require bwm-ng but it's not installed.  Aborting."; exit 1; } && export BWMNG=`command -v bwm-ng`
 fi
 if [[ $USE_IOTOP == "true" ]]; then
       command -v iotop >/dev/null 2>&1|| { echo >&2 "I require iotop but it's not installed.  Aborting."; exit 1; } && export IOTOP=`command -v iotop`
 fi
 if [[ $USE_MYTOP == "true" ]]; then
       command -v mytop >/dev/null 2>&1|| { echo >&2 "I require mytop but it's not installed.  Aborting."; exit 1; } && export MYTOP=`command -v mytop`
+fi
+if [[ $USE_VNSTAT == "true" ]]; then
+      command -v vnstat >/dev/null 2>&1|| { echo >&2 "I require vnstat but it's not installed. Aborting."; exit 1; } && export VNSTAT=`command -v vnstat`
 fi
