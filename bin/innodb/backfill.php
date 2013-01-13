@@ -1,6 +1,6 @@
 <?php
 
-require_once("config.php");
+require("lib/innodb/config.php");
 require_once("lib/backfill.php");
 
 if (isset($argv[1]))

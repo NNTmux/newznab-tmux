@@ -7,6 +7,7 @@ eval $( $SED -n "/^define/ { s/.*('\([^']*\)', '*\([^']*\)'*);/export \1=\"\2\"/
 while :
 do
 
-  $PHP processGames.php
+  $PHP processAlternate4.php
 
 done
+

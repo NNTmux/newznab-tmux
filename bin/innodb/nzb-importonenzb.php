@@ -1,6 +1,6 @@
 <?php
 
-require_once("lib/innodb/config.php");
+require("lib/innodb/config.php");
 require_once("lib/framework/db.php");
 
 $db = new DB();
@@ -131,7 +131,7 @@ if (!isset($groups) || count($groups) == 0) {
             echo ("imported " . $nzbFile . $strTerminator);
             flush();
         }
-        if ($nzbCount == 100) {
+        if ($nzbCount == 1) {
             break;
         }
     }

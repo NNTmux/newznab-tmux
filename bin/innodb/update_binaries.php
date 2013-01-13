@@ -1,6 +1,6 @@
 <?php
 
-require("config.php");
+require("lib/innodb/config.php");
 require_once("lib/groups.php");
 require_once("lib/innodb/binaries.php");
 

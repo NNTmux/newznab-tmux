@@ -82,19 +82,40 @@ class DB
 	}	
 
 
-	public function optimise() 
+	public function optimise($force = false) 
 	{
 		$ret = array();
-		$alltables = $this->query("SHOW TABLES"); 
+		if ($force)
+			$alltables = $this->query("show table status where `Engine` = 'MyISAM'"); 
+		else
+			$alltables = $this->query("show table status where `Engine` = 'MyISAM' and Data_free != 0"); 
 
 		foreach ($alltables as $tablename) 
 		{
-			$ret[] = $tablename['Tables_in_'.DB_NAME];
-			$this->queryDirect("REPAIR TABLE `".$tablename['Tables_in_'.DB_NAME]."`"); 
-			$this->queryDirect("OPTIMIZE TABLE `".$tablename['Tables_in_'.DB_NAME]."`"); 
+			$ret[] = $tablename['Name'];
+			$this->queryDirect("REPAIR TABLE `".$tablename['Name']."`"); 
+			$this->queryDirect("OPTIMIZE TABLE `".$tablename['Name']."`"); 
+			$this->queryDirect("ANALYZE TABLE `".$tablename['Name']."`"); 
 		}
 			
 		return $ret;
+	}
+
+	public function optimiseinnodb($iforce = false) 
+	{
+		$iret = array();
+		if ($iforce)
+			$ialltables = $this->query("show table status where `Engine` = 'InnoDB'"); 
+		else
+			$ialltables = $this->query("show table status where `Engine` = 'InnoDB' and Data_free != 0"); 
+
+		foreach ($ialltables as $itablename) 
+		{
+			$iret[] = $itablename['Name'];
+			$this->queryDirect("OPTIMIZE TABLE `".$itablename['Name']."`"); 
+		}
+			
+		return $iret;
 	}
 
     /* Mysqli Functions */

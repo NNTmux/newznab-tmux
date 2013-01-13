@@ -1,17 +1,35 @@
 #!/usr/bin/env bash
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-##EDIT THESE##
+#EDIT THESE#
 
 export NEWZPATH="/var/www/newznab"
 
 export NEWZNAB_PATH=$NEWZPATH"/misc/update_scripts"
 export TESTING_PATH=$NEWZPATH"/misc/testing"
 export ADMIN_PATH=$NEWZPATH"/www/admin"
-export USERNAME="what is your name" # this is the user name that will run these scripts
-export NEWZNAB_IMPORT_SLEEP_TIME="1" # in seconds - this includes import_nzb backfill and current fill, 0 may cause errors
-export NEWZNAB_POST_SLEEP_TIME="1" # in seconds - this is for post processing - sleep between loops, 0 may cause errors
-export MAXDAYS="210"  #max days for backfill
-export NZBS="/path/to/nzbs"  #The path to the nzb dump you downloaded from torrents
+export INNODB_PATH=$DIR"/bin/innodb"
+
+#Select the user name that will run these scripts
+export USERNAME="jonnyboy"
+
+#Enter the session name to be used by tmux
+export TMUX_SESSION="Newznab-dev"
+
+#Set, in seconds - how often the monitor.php script should up, 0 may cause errors
+export MONITOR_UPDATE="60"
+
+#Set, in seconds - this includes import_nzb, backfill and current fill, 0 may cause errors
+export NEWZNAB_IMPORT_SLEEP_TIME="60"
+
+#Set, in seconds - this is for post processing - sleep between loops, 0 may cause errors
+export NEWZNAB_POST_SLEEP_TIME="1"
+
+#Set the maximum days tp backfill
+export MAXDAYS="210"
+
+#Set the path to the nzb dump you downloaded from torrents
+export NZBS="/home/jonnyboy/nzbs/batch"
 
 #Choose to run the threaded or non-threaded newznab scripts true/false
 export THREADS="true"
@@ -31,6 +49,13 @@ export BACKFILL="true"
 #Choose to run import nzb script true/false
 export IMPORT="true"
 
+#Set the max amount of unprocessed releases and still allow import or backfill to run
+export MAX_RELEASES="30000"
+
+#Specify your SED binary
+export SED="/bin/sed"
+#export SED="/usr/local/bin/gsed"
+
 #Select some monitoring script, if they are not installed, it will not affect the running of the scripts
 export USE_HTOP="true"
 export USE_NMON="true"
@@ -41,13 +66,11 @@ export USE_MYTOP="true"
 #By using this script you understand that the programmer is not responsible for any loss of data, users, or sanity.
 #You also agree that you were smart enough to make a backup of your database and files. Do you agree? yes/no
 
-export AGREED="no"
+export AGREED="yes"
 
 ##END OF EDITS##
 
-
 command -v mysql >/dev/null 2>&1 || { echo >&2 "I require mysql but it's not installed.  Aborting."; exit 1; } && export MYSQL=`command -v mysql`
-command -v sed >/dev/null 2>&1 || { echo >&2 "I require sed but it's not installed.  Aborting."; exit 1; } && export SED=`command -v sed`
 command -v php5 >/dev/null 2>&1 && export PHP=`command -v php5` || { export PHP=`command -v php`; }
 command -v tmux >/dev/null 2>&1 || { echo >&2 "I require tmux but it's not installed.  Aborting."; exit 1; } && export TMUX=`command -v tmux`
 

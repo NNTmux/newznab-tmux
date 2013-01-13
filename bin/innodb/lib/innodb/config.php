@@ -1,3 +1,7 @@
 <?php
-require_once(dirname(__FILE__)."/../../../config.php");
+
+$newzpath = getenv('NEWZPATH');
+require_once("$newzpath/www/config.php");
+
 ?>
+

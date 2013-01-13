@@ -1,8 +1,8 @@
 <?php
-require_once("config.php");
+require("lib/innodb/config.php");
 require_once(dirname(__FILE__)."/lib/groups.php");
 require_once(dirname(__FILE__)."/lib/innodb/binaries.php");
-require_once(dirname(__FILE__)."/lib/powerspawn.php");
+require_once(WWW_DIR.'/lib/powerspawn.php');
 
 $groups = new Groups;
 $groupList = $groups->getActive();
@@ -25,20 +25,20 @@ while ($ps->runParentCode())
 		{
 			// Spawn another thread
 			$ps->childData = array_pop($groupList);
-			echo "[Thread-MASTER] Spawning new thread.  Still have " . count($groupList) ." group(s) to update after this\n";
+			echo "[Thread-MASTER] Spawning new thread.  Still have " . count($groupList) ." group(s) to backfill after this\n";
 			$ps->spawnChild();
 		} 
 		else 
 		{
 			// There are no more slots available to run
 			$ps->tick();
-			#echo ". \n";
+			echo "Still have " . count($groupList) ." group(s) to backfill. \n";
 		}
 	} 
 	else 
 	{
 		// No more groups to process
-		echo "No more groups to process - Initiating shutdown\n";
+		echo "No more groups to backfill - Initiating shutdown\n";
 		$ps->shutdown();
 		echo "Shutdown complete\n";
 	}
@@ -61,7 +61,7 @@ if ($ps->runChildCode())
 	
 	$output = shell_exec("php {$dir}/{$file} {$param}");
 	
-	echo "[Thread-{$thread}] Completed update for group {$group['name']}\n";
+	echo "[Thread-{$thread}] Completed backfill for group {$group['name']}\n";
 }
 
 // Exit to call back to parent - Let know that child has completed

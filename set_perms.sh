@@ -23,12 +23,12 @@ cp $TESTING_PATH/nzb-importmodified.php $NEWZPATH/www/admin/
 if [ -d "/home/$USERNAME" ]; then
 	echo "cp conf/.tmux.conf /home/$USERNAME/.tmux.conf"
         cp conf/.tmux.conf /home/$USERNAME/.tmux.conf
-        sed -i 's,'changeme,"$NZBS"',' "/home/$USERNAME/.tmux.conf"
+        $SED -i 's,'changeme,"$NZBS"',' "/home/$USERNAME/.tmux.conf"
 fi
 if [ -d "$HOME" ]; then
         echo "cp conf/.tmux.conf $HOME/.tmux.conf"
         cp conf/.tmux.conf $HOME/.tmux.conf
-        sed -i 's,'changeme,"$NZBS"',' "$HOME/.tmux.conf"
+        $SED -i 's,'changeme,"$NZBS"',' "$HOME/.tmux.conf"
 fi
 
 echo "Editing $NEWZPATH/www/lib/postprocess.php"
@@ -74,8 +74,9 @@ chmod 777 $NEWZPATH/www/lib/smarty/templates_c
 chmod -R 777 $NEWZPATH/www/covers
 chmod 777 $NEWZPATH/www
 chmod 777 $NEWZPATH/www/install
+mkdir -p $NEWZPATH/nzbfiles/tmpunrar2/
+mkdir -p $NEWZPATH/nzbfiles/tmpunrar3/
 chmod -R 777 $NEWZPATH/nzbfiles
-chmod 777 $NEWZPATH/nzbfiles/tmpunrar/
 
 echo -e "\033[38;5;160mCompleted\033[39m"
 

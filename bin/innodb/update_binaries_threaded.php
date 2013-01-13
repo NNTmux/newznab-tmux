@@ -1,9 +1,9 @@
 <?php
-require("config.php");
+require("lib/innodb/config.php");
 require_once(dirname(__FILE__)."/lib/framework/db.php");
 require_once(dirname(__FILE__)."/lib/groups.php");
 require_once(dirname(__FILE__)."/lib/innodb/binaries.php");
-require_once(dirname(__FILE__)."/lib/powerspawn.php");
+require_once(WWW_DIR.'/lib/powerspawn.php');
 
 $groups = new Groups;
 $groupList = $groups->getActive();
@@ -33,7 +33,7 @@ while ($ps->runParentCode())
 		{
 			// There are no more slots available to run
 			$ps->tick();
-			#echo "- \n";
+			echo "Still have " . count($groupList) ." group(s) to update.\n";
 		}
 	} 
 	else 
