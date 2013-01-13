@@ -7,6 +7,7 @@
     `mysqldump --opt -u root -p newznab > ~/newznab_backup.sql`
 
 
+
  * The first step is to decide whether or not you will convert your database to the InnoDB engine. The InnoDB has a lot of benefits, too many to list here, but more ram is required. How much exactly, depends on too many things to list here.
 
  * If you decide to convert your database, I recommend using [kevin123's github](https://github.com/kevinlekiller/Newznab-Barracuda.git). I recommend only converting the binaries a parts table, using compressed tables. But, there are many choices. I suggest you read his README and follow his recommendations. Or, simply:
@@ -20,14 +21,18 @@
     `php convertToInnoDB.php`
 
 
- * Now, you will need to clone [andrewit's github](https://github.com/itandrew/Newznab-InnoDB-Dropin.git) and get his scripts.
+
+ * Now, you need to decide which branch you will use, the master branch uses scripts written by andrewit and the dev branch uses scripts written by kevin123. If, you choose the dev branch, skip the next step.
+
+ * If, you stay on the master branch, you will need to clone [andrewit's github](https://github.com/itandrew/Newznab-InnoDB-Dropin.git) and get his scripts.
 
     `cd /var/www/newznab/misc/testing/`
     
     `git clone https://github.com/itandrew/Newznab-InnoDB-Dropin.git innodb`
     
 
- * Clone my github
+
+ * Now, Clone my github. Theses scripts should be able to run from any path, but this location is where I was asked to put it.
 
     `cd /var/www/newznab/misc/update_scripts/nix_scripts/`
     
@@ -36,24 +41,34 @@
     `cd tmux`
     
 
- * Edit the paths, timers, user name, what to run and then accept.
+
+ * If, you choose the the dev branch, run:
+
+    `git checkout dev`
+
+
+
+ * Edit the paths, timers, username, what to run and then accept.
 
     `nano edit_these.sh`
 
 
- * Edit some permissions, run as root. The file .tmux.conf will be copied to the users home folder. If, when you run ./start.sh you see 0 nzb's and you are sure there are more than 0 left to import, verify the path to the nzb's in .tmux.conf in the home folder of the user.
+
+ * Edit some permissions, run this as root. The file .tmux.conf will be copied to the users home folder. If, when you run ./start.sh you see 0 nzb's and you are sure there are more than 0 left to import, verify the path to the nzb's in .tmux.conf in the home folder of the user.
 
     `./set_perms.sh`
+
 
 
  * Run my script, as user. If, you have grsecurity in you kernel, you will need to run using sudo if you use nmon or bwm-ng.
 
     `./start.sh`
+
     
 
  * If you connect using **putty**, then under Window/Translation set Remote character set to UTF-8.
 
- * If something looks stalled, it probably isn't. If all 12 panes are still there, it is most likely, as it should be.
+ * If something looks stalled, it probably isn't. If all 13 panes are still there, it is most likely, as it should be.
  
  * You must edit **misc/testing/update_cleanup.php** in order for it to actually do something, and update_parsing is good for fixing a few releases everytime it runs, not a silver bullet though.
 
@@ -61,9 +76,7 @@
 
  * Join in the converstion at irc://moonlight.se.eu.synirc.net/newznab-tmux.
 
- * The development branch of this git is still under heavy development. To run the development branch, type the command below and repeat then edit the edit_these.sh file.
 
-    `git checkout dev`
 
 
  * Thanks go to all who offered their assistance and improvement to these scripts, especially kevin123.
