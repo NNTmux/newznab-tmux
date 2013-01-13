@@ -5,7 +5,7 @@
  * Please backup your database first. Something like this should do it.
  
   ```bash
-mysqldump --opt -u root -p newznab > ~/newznab_backup.sql```
+  mysqldump --opt -u root -p newznab > ~/newznab_backup.sql```
 
 
 
@@ -13,11 +13,11 @@ mysqldump --opt -u root -p newznab > ~/newznab_backup.sql```
 
  * If you decide to convert your database, I recommend using [kevin123's github](https://github.com/kevinlekiller/Newznab-Barracuda.git). I recommend only converting the binaries a parts table, using compressed tables. But, there are many choices. I suggest you read his README and follow his recommendations. Or, simply:
 
-  ```bash
-cd /var/www/newznab/misc/testing
-git clone https://github.com/kevinlekiller/Newznab-InnoDB-Dropin.git kev-innodb
-cd kev-innodb/lib/innodb
-php convertToInnoDB.php```
+```bash
+  cd /var/www/newznab/misc/testing
+  git clone https://github.com/kevinlekiller/Newznab-InnoDB-Dropin.git kev-innodb
+  cd kev-innodb/lib/innodb
+  php convertToInnoDB.php```
 
 
  * Now, you need to decide which branch you will use, the master branch uses scripts written by andrewit and the dev branch uses scripts written by kevin123. If, you choose the dev branch, skip the next step.
