@@ -4,9 +4,9 @@
 
  * Please backup your database first. Something like this should do it.
  
-```bash
-mysqldump --opt -u root -p newznab > ~/newznab_backup.sql
-```
+  ```bash
+  mysqldump --opt -u root -p newznab > ~/newznab_backup.sql
+  ```
 
 
  * The first step is to decide whether or not you will convert your database to the InnoDB engine. The InnoDB has a lot of benefits, too many to list here, but more ram is required. How much exactly, depends on too many things to list here.
