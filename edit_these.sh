@@ -11,7 +11,7 @@ export ADMIN_PATH=$NEWZPATH"/www/admin"
 export INNODB_PATH=$DIR"/bin/innodb"
 
 #Select the user name that will run these scripts
-export USERNAME="jonnyboy"
+export USERNAME="what is your username"
 
 #Enter the session name to be used by tmux
 export TMUX_SESSION="Newznab-dev"
@@ -29,7 +29,7 @@ export NEWZNAB_POST_SLEEP_TIME="1"
 export MAXDAYS="210"
 
 #Set the path to the nzb dump you downloaded from torrents
-export NZBS="/home/jonnyboy/nzbs/batch"
+export NZBS="/path/to/nzbs"
 
 #Choose to run the threaded or non-threaded newznab scripts true/false
 export THREADS="true"
@@ -66,7 +66,7 @@ export USE_MYTOP="true"
 #By using this script you understand that the programmer is not responsible for any loss of data, users, or sanity.
 #You also agree that you were smart enough to make a backup of your database and files. Do you agree? yes/no
 
-export AGREED="yes"
+export AGREED="no"
 
 ##END OF EDITS##
 
