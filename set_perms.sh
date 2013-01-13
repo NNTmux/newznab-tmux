@@ -76,6 +76,7 @@ chmod 777 $NEWZPATH/www
 chmod 777 $NEWZPATH/www/install
 mkdir -p $NEWZPATH/nzbfiles/tmpunrar2/
 mkdir -p $NEWZPATH/nzbfiles/tmpunrar3/
+mkdir -p $NEWZPATH/nzbfiles/tmpunrar4/
 chmod -R 777 $NEWZPATH/nzbfiles
 
 echo -e "\033[38;5;160mCompleted\033[39m"
