@@ -57,6 +57,10 @@ if [[ $USE_MYTOP == "true" ]]; then
       $TMUX new-window -n mytop '$MYTOP -u $DB_USER -p $DB_PASSWORD -d $DB_NAME -h $DB_HOST'
 fi
 
+if [[ $USE_VNSTAT == "true" ]]; then
+      $TMUX new-window -n vnstat '$VNSTAT'
+fi
+
 $TMUX new-window -n Console 'bash -i'
 $TMUX select-window -t$TMUX_SESSION:0
 $TMUX attach-session -d -t$TMUX_SESSION

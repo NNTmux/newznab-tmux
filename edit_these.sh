@@ -57,11 +57,12 @@ export SED="/bin/sed"
 #export SED="/usr/local/bin/gsed"
 
 #Select some monitoring script, if they are not installed, it will not affect the running of the scripts
-export USE_HTOP="true"
-export USE_NMON="true"
-export USE_BWMNG="true"
-export USE_IOTOP="true"
-export USE_MYTOP="true"
+export USE_HTOP="false"
+export USE_NMON="false"
+export USE_BWMNG="false"
+export USE_IOTOP="false"
+export USE_MYTOP="false"
+export USE_VNSTAT="false"
 
 #By using this script you understand that the programmer is not responsible for any loss of data, users, or sanity.
 #You also agree that you were smart enough to make a backup of your database and files. Do you agree? yes/no
@@ -90,3 +91,7 @@ fi
 if [[ $USE_MYTOP == "true" ]]; then
       command -v mytop >/dev/null 2>&1|| { echo >&2 "I require mytop but it's not installed.  Aborting."; exit 1; } && export MYTOP=`command -v mytop`
 fi
+if [[ $USE_VNSTAT == "true" ]]; then
+      command -v vnstat >/dev/null 2>&1|| { echo >&2 "I require vnstat but it's not installed.  Aborting."; exit 1; } && export VNSTAT=`command -v vnstat`
+fi
+
