@@ -5,8 +5,8 @@
  * Please backup your database first. Something like this should do it.
  
   ```bash
-mysqldump --opt -u root -p newznab > ~/newznab_backup.sql```
-
+  mysqldump --opt -u root -p newznab > ~/newznab_backup.sql
+  ```
 
 
  * The first step is to decide whether or not you will convert your database to the InnoDB engine. The InnoDB has a lot of benefits, too many to list here, but more ram is required. How much exactly, depends on too many things to list here.
@@ -14,52 +14,52 @@ mysqldump --opt -u root -p newznab > ~/newznab_backup.sql```
  * If you decide to convert your database, I recommend using [kevin123's github](https://github.com/kevinlekiller/Newznab-Barracuda.git). I recommend only converting the binaries a parts table, using compressed tables. But, there are many choices. I suggest you read his README and follow his recommendations. Or, simply:
 
   ```bash
-cd /var/www/newznab/misc/testing
-git clone https://github.com/kevinlekiller/Newznab-InnoDB-Dropin.git kev-innodb
-cd kev-innodb/lib/innodb
-php convertToInnoDB.php```
-
+  cd /var/www/newznab/misc/testing
+  git clone https://github.com/kevinlekiller/Newznab-InnoDB-Dropin.git kev-innodb
+  cd kev-innodb/lib/innodb
+  php convertToInnoDB.php
+  ```
 
  * Now, you need to decide which branch you will use, the master branch uses scripts written by andrewit and the dev branch uses scripts written by kevin123. If, you choose the dev branch, skip the next step.
 
  * If, you stay on the master branch, you will need to clone [andrewit's github](https://github.com/itandrew/Newznab-InnoDB-Dropin.git) and get his scripts.
 
   ```bash
-cd /var/www/newznab/misc/testing/
-git clone https://github.com/itandrew/Newznab-InnoDB-Dropin.git innodb```
-    
+  cd /var/www/newznab/misc/testing/
+  git clone https://github.com/itandrew/Newznab-InnoDB-Dropin.git innodb
+  ```  
 
  * Now, Clone my github. Theses scripts should be able to run from any path, but this location is where I was asked to put it.
 
   ```bash
-cd /var/www/newznab/misc/update_scripts/nix_scripts/
-git clone https://github.com/jonnyboy/newznab-tmux.git tmux
-cd tmux```
-    
+  cd /var/www/newznab/misc/update_scripts/nix_scripts/
+  git clone https://github.com/jonnyboy/newznab-tmux.git tmux
+  cd tmux
+  ```  
 
  * If, you choose the the dev branch, run:
 
   ```bash
-git checkout dev```
-
+  git checkout dev
+  ```
 
  * Edit the paths, timers, username, what to run and then accept.
 
   ```bash
-nano edit_these.sh```
-
+  nano edit_these.sh
+  ```
 
  * Edit some permissions, run this as root. The file .tmux.conf will be copied to the users home folder. If, when you run ./start.sh you see 0 nzb's and you are sure there are more than 0 left to import, verify the path to the nzb's in .tmux.conf in the home folder of the user.
 
   ```bash
-./set_perms.sh```
-
+  ./set_perms.sh
+  ```
 
  * Run my script, as user. If, you have grsecurity in you kernel, you will need to run using sudo if you use nmon or bwm-ng.
 
   ```bash
-./start.sh```
-
+  ./start.sh
+  ```
 
  * If you connect using **putty**, then under Window/Translation set Remote character set to UTF-8.
 
