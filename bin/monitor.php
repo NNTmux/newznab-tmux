@@ -28,13 +28,30 @@ $backfill_increment = "UPDATE groups set backfill_target=backfill_target+1 where
 $releases_start = $db->query($releases_query);
 $releases_start = $releases_start[0]['cnt'];
 
-//functions
-function games()
-{
-  $postprocess = new PostProcess(true);
-  $postprocess->processGames();
-}
+//environment
+$_DB_USER = getenv('DB_USER');
+$_DB_HOST = getenv('DB_HOST');
+$_DB_PASSWORD = getenv('DB_PASSWORD');
+$_DB_NAME = getenv('DB_NAME');
+$_backfill = getenv('BACKFILL');
+$_binaries = getenv('BINARIES');
+$_import = getenv('IMPORT');
+$_cleanup = getenv('CLEANUP');
+$_optimise = getenv('OPTIMISE');
 
+$_innodb_path = getenv('INNODB_PATH');
+$_admin_path = getenv('ADMIN_PATH');
+$_max_releases = getenv('MAX_RELEASES');
+$_nzbs = getenv('NZBS');
+$_newznab_path = getenv('NEWZNAB_PATH');
+$_testing_path = getenv('TESTING_PATH');
+$_mysql = getenv('MYSQL');
+$_php = getenv('PHP');
+$_nntp = getenv('NNTP_SLEEP');
+$_threads = getenv('THREADS');
+$_innodb = getenv('INNODB');
+
+$_string = "\033[1;34mPane is dead?\033[0m Exactly as it should be.";
 
 $time = TIME();
 $time2 = TIME();
@@ -121,84 +138,67 @@ while($i>0)
   printf($mask, "TVShows(5000)","$tvrage_releases_proc","$tvrage_releases_now");
   printf($mask, "Additional Proc","$work_remaining_now","$additional_releases_now");
 
-  printf("Pane is dead = dormant, no work to be done");
-
-  //environment
-  $_DB_USER = getenv('DB_USER');
-  $_DB_HOST = getenv('DB_HOST');
-  $_DB_PASSWORD = getenv('DB_PASSWORD');
-  $_DB_NAME = getenv('DB_NAME');
-  $_backfill = getenv('BACKFILL');
-  $_binaries = getenv('BINARIES');
-  $_import = getenv('IMPORT');
-  $_cleanup = getenv('CLEANUP');
-
-  $_innodb_path = getenv('INNODB_PATH');
-  $_admin_path = getenv('ADMIN_PATH');
-  $_max_releases = getenv('MAX_RELEASES');
-  $_nzbs = getenv('NZBS');
-  $_newznab_path = getenv('NEWZNAB_PATH');
-  $_testing_path = getenv('TESTING_PATH');
-  $_mysql = getenv('MYSQL');
-  $_php = getenv('PHP');
-
-
   if ((TIME() - $time2) >= 900 ) {
-    shell_exec("tmux respawnp -t Newznab-dev:1.0 'cd $_newznab_path && $_php update_predb.php true' 2>&1 1> /dev/null");
+    shell_exec("tmux respawnp -t Newznab-dev:1.0 'cd $_newznab_path && $_php update_predb.php true && date && echo \"$_string\"' 2>&1 1> /dev/null");
     $time2 = TIME();
   }
   if (((TIME() - $time3) >= 7200 ) && ($_cleanup == "true" )) {
-    shell_exec("tmux respawnp -t Newznab-dev:1.1 'cd $_testing_path && $_php update_parsing.php && $_php removespecial.php && $_php update_cleanup.php' 2>&1 1> /dev/null");
+    shell_exec("tmux respawnp -t Newznab-dev:1.1 'cd $_testing_path && $_php update_parsing.php && $_php removespecial.php && $_php update_cleanup.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
     $time3 = TIME();
   }
   if ((TIME() - $time4) >= 43200) {
-    shell_exec("tmux respawnp -t Newznab-dev:1.2 'cd $_newznab_path && $_php update_tvschedule.php && $_php update_theaters.php' 2>&1 1> /dev/null");
+    shell_exec("tmux respawnp -t Newznab-dev:1.2 'cd $_newznab_path && $_php update_tvschedule.php && $_php update_theaters.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
+    if (( $_innodb== "true" ) && ( $_optimise == "true" )) {
+      shell_exec("tmux respawnp -t Newznab-dev:1.3 'cd $_innodb_path && $_php optimise_myisam.php && $_php optimise_innodb.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
+    } elseif (( $_innodb== "false" ) && ( $_optimise == "true" )) {
+      shell_exec("tmux respawnp -t Newznab-dev:1.3 'cd $_innodb_path && $_php optimise_myisam.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
+    }
     $time4 = TIME();
   }
 
   //check if scripts need to be started
   if ( $nfo_remaining_now > 0 ) {
-    shell_exec("tmux respawnp -t Newznab-dev:0.1 'cd bin && $_php postprocess_nfo.php && clear' 2>&1 1> /dev/null");
+    shell_exec("tmux respawnp -t Newznab-dev:0.1 'cd bin && $_php postprocess_nfo.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
   }
   if ( $work_remaining_now > 0 ) {
-    shell_exec("tmux respawnp -t Newznab-dev:0.2 'cd bin && $_php processAlternate2.php && clear' 2>&1 1> /dev/null");
+    shell_exec("tmux respawnp -t Newznab-dev:0.2 'cd bin && $_php processAlternate2.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
   }
   if ( $work_remaining_now > 200 ) {
-    shell_exec("tmux respawnp -t Newznab-dev:0.3 'cd bin && $_php processAlternate3.php && clear' 2>&1 1> /dev/null");
+    shell_exec("tmux respawnp -t Newznab-dev:0.3 'cd bin && $_php processAlternate3.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
   }
   if ( $work_remaining_now > 400 ) {
-    shell_exec("tmux respawnp -t Newznab-dev:0.4 'cd bin && $_php processAlternate4.php && clear' 2>&1 1> /dev/null");
+    shell_exec("tmux respawnp -t Newznab-dev:0.4 'cd bin && $_php processAlternate4.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
   }
   if ( $book_releases_proc > 0 ) {
-    shell_exec("tmux respawnp -t Newznab-dev:0.5 'cd bin && $_php processBooks.php && clear' 2>&1 1> /dev/null");
+    shell_exec("tmux respawnp -t Newznab-dev:0.5 'cd bin && $_php processBooks.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
   }
   if ( $console_releases_proc > 0 ) {
-    shell_exec("tmux respawnp -t Newznab-dev:0.6 'cd bin && $_php processGames.php && clear' 2>&1 1> /dev/null");
+    shell_exec("tmux respawnp -t Newznab-dev:0.6 'cd bin && $_php processGames.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
   }
   if ( $movie_releases_proc > 0 ) {
-    shell_exec("tmux respawnp -t Newznab-dev:0.7 'cd bin && $_php processMovies.php && clear' 2>&1 1> /dev/null");
+    shell_exec("tmux respawnp -t Newznab-dev:0.7 'cd bin && $_php processMovies.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
   }
   if ( $music_releases_proc > 0 ) {
-    shell_exec("tmux respawnp -t Newznab-dev:0.8 'cd bin && $_php processMusic.php && clear' 2>&1 1> /dev/null");
+    shell_exec("tmux respawnp -t Newznab-dev:0.8 'cd bin && $_php processMusic.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
   }
   if ( $tvrage_releases_proc > 0 ) {
-    shell_exec("tmux respawnp -t Newznab-dev:0.9 'cd bin && $_php processTv.php && clear' 2>&1 1> /dev/null");
+    shell_exec("tmux respawnp -t Newznab-dev:0.9 'cd bin && $_php processTv.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
   }
-  shell_exec("tmux respawnp -t Newznab-dev:0.10 'cd bin && $_php processOthers.php && clear' 2>&1 1> /dev/null");
+  shell_exec("tmux respawnp -t Newznab-dev:0.10 'cd bin && $_php processOthers.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
 
-  if (( getenv('INNODB') == "true" ) && ( getenv('THREADS') == "true" )) {
+  if (( $_innodb == "true" ) && ( $_threads == "true" )) {
     $_import_path = $_innodb_path;
     $_update_path = $_innodb_path;
     $_import_cmd = 'nzb-import.php';
     $_backfill_cmd = 'backfill_threaded.php';
     $_update_cmd = 'update_binaries_threaded.php';
-  } elseif (( getenv('INNODB') == "true" ) && ( getenv('THREADS') != "true" )) {
+  } elseif (( $_innodb == "true" ) && ( $_threads != "true" )) {
     $_import_path = $_admin_path;
     $_update_path = $_innodb_path;
     $_import_cmd = 'nzb-importmodified.php';
     $_backfill_cmd = 'backfill.php';
     $_update_cmd = 'update_binaries.php';
-  } elseif (( getenv('INNODB') != "true" ) && ( getenv('THREADS') == "true" )) {
+  } elseif (( $_innodb != "true" ) && ( $_threads == "true" )) {
     $_import_path = $_admin_path;
     $_update_path = $_newznab_path;
     $_import_cmd = 'nzb-importmodified.php';
@@ -214,20 +214,19 @@ while($i>0)
 
 
   if (( $total_work_now < $_max_releases )  && ( $_binaries == "true" )) {
-    shell_exec("tmux respawnp -t Newznab-dev:0.11 'cd $_update_path && $_php $_update_cmd && clear' 2>&1 1> /dev/null");
+    shell_exec("tmux respawnp -t Newznab-dev:0.11 'cd $_update_path && $_php $_update_cmd && date && sleep $_nntp && echo \"$_string\"' 2>&1 1> /dev/null");
   }
   if (( $total_work_now < $_max_releases ) && ( $_backfill == "true" )) {
     shell_exec("tmux respawnp -t Newznab-dev:0.12 '$_mysql -u$_DB_USER -h $_DB_HOST --password=$_DB_PASSWORD $_DB_NAME -e \"${backfill_increment}\"' 2>&1 1> /dev/null");
-    shell_exec("tmux respawnp -t Newznab-dev:0.12 'cd $_update_path && $_php $_backfill_cmd && clear' 2>&1 1> /dev/null");
+    shell_exec("tmux respawnp -t Newznab-dev:0.12 'cd $_update_path && $_php $_backfill_cmd && date && sleep $_nntp && echo \"$_string\"' 2>&1 1> /dev/null");
   }
   if (( $total_work_now < $_max_releases )  && ( $_import == "true" )) {
-    shell_exec("tmux respawnp -t Newznab-dev:0.13 'cd $_import_path && $_php $_import_cmd \"$_nzbs\" && clear' 2>&1 1> /dev/null");
+    shell_exec("tmux respawnp -t Newznab-dev:0.13 'cd $_import_path && $_php $_import_cmd \"$_nzbs\" && date && echo \"$_string\"' 2>&1 1> /dev/null");
   }
-  shell_exec("tmux respawnp -t Newznab-dev:0.14 'cd $_newznab_path && $_php update_releases.php && clear' 2>&1 1> /dev/null");
+  shell_exec("tmux respawnp -t Newznab-dev:0.14 'cd $_newznab_path && $_php update_releases.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
 
   $i=$i+1;
 }
 
 ?>
-
 

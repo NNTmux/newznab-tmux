@@ -19,6 +19,9 @@ export TMUX_SESSION="Newznab-dev"
 #Set, in seconds - how often the monitor.php script should up, 0 may cause errors
 export MONITOR_UPDATE="20"
 
+#Set, in seconds - how long the update_binaries and backfill should sleep between runs, 0 may cause errors
+export NNTP_SLEEP="60"
+
 #Set the maximum days tp backfill
 export MAXDAYS="210"
 
@@ -32,7 +35,7 @@ export THREADS="true"
 export INNODB="true"
 
 #Choose to run update_cleanup.php true/false
-export CLEANUP="true"
+export CLEANUP="false"
 
 #Choose to run update_binaries true/false
 export BINARIES="true"
@@ -43,8 +46,11 @@ export BACKFILL="true"
 #Choose to run import nzb script true/false
 export IMPORT="true"
 
+#Choose to run optimise_db script true/false
+export OMPTIMISE="false"
+
 #Set the max amount of unprocessed releases and still allow import or backfill to run
-export MAX_RELEASES="30000"
+export MAX_RELEASES="100000"
 
 #Specify your SED binary
 export SED="/bin/sed"

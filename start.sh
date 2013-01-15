@@ -40,8 +40,12 @@ $TMUX -q splitw -v -p 67 'echo "..."'
 $TMUX -q splitw -v -p 50 'echo "..."'
 $TMUX new-window -n cleanup 'echo "..."'
 $TMUX selectp -t 0
-$TMUX -q splitw -h -p 67 'echo "..."'
 $TMUX -q splitw -h -p 50 'echo "..."'
+$TMUX selectp -t 0
+$TMUX -q splitw -v -p 50 'echo "..."'
+$TMUX selectp -t 2
+$TMUX -q splitw -v -p 50 'echo "..."'
+
 
 if [[ $USE_HTOP == "true" ]]; then
       $TMUX new-window -n htop '$HTOP'
