@@ -1,5 +1,7 @@
 # SETUP
 
+ * tmux 1.6 or newer is needed to runs these scripts.
+
  * These scripts were written and tested on Ubuntu 12.10 where bash is located at /bin/bash. You may need to create a symlink or edit these scripts accordingly.
 
  * Please backup your database first. Something like this should do it.
