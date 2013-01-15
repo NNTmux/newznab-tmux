@@ -64,7 +64,7 @@ if [[ $USE_MYTOP == "true" ]]; then
 fi
 
 if [[ $USE_VNSTAT == "true" ]]; then
-      $TMUX new-window -n vnstat '$VNSTAT'
+      $TMUX new-window -n vnstat 'watch $VNSTAT'
 fi
 
 $TMUX new-window -n Console 'bash -i'
