@@ -17,13 +17,7 @@ export USERNAME="what is your username"
 export TMUX_SESSION="Newznab-dev"
 
 #Set, in seconds - how often the monitor.php script should up, 0 may cause errors
-export MONITOR_UPDATE="60"
-
-#Set, in seconds - this includes import_nzb, backfill and current fill, 0 may cause errors
-export NEWZNAB_IMPORT_SLEEP_TIME="60"
-
-#Set, in seconds - this is for post processing - sleep between loops, 0 may cause errors
-export NEWZNAB_POST_SLEEP_TIME="1"
+export MONITOR_UPDATE="20"
 
 #Set the maximum days tp backfill
 export MAXDAYS="210"
