@@ -67,9 +67,9 @@ while($i>0)
   $days = floor($hrs / 24);
   $sec = floor($secs % 60);
   $min = ($mins % 60);
-  $hr = ($hrs % 60);
   $day = ($days % 24);
-
+  $hr = (($hrs % 60) - $day);
+  
   //loop counts
   $releases_loop = $db->query($releases_query);
   $releases_loop = $releases_loop[0]['cnt'];
@@ -225,7 +225,7 @@ while($i>0)
   }
   shell_exec("tmux respawnp -t Newznab-dev:0.14 'cd $_newznab_path && $_php update_releases.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
 
-  $i=$i+1;
+  $i++;
 }
 
 ?>
