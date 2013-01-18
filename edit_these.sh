@@ -20,7 +20,7 @@ export TMUX_SESSION="Newznab-dev"
 export MONITOR_UPDATE="20"
 
 #Set, in seconds - how long the update_binaries and backfill should sleep between runs, 0 may cause errors
-export NNTP_SLEEP="60"
+export NNTP_SLEEP="10"
 
 #Set the maximum days tp backfill
 export MAXDAYS="210"

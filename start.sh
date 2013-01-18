@@ -17,35 +17,40 @@ if [[ $AGREED == "no" ]]; then
 	echo "Please edit the edit_these.sh file"
 	exit
 fi
+TMPUNRAR_QUERY="SELECT value from site where ID = 66;"
+TMPUNRAR_PATH=`$MYSQL -u$DB_USER -h $DB_HOST --password=$DB_PASSWORD $DB_NAME -s -N -e "${TMPUNRAR_PATH}"`
+echo "$TMPUNRAR_PATH";
+
+cp conf/tmux.conf conf/tmux_user.conf
+$SED -i 's,'changeme,"$NZBS"',' "conf/tmux_user.conf"
 
 printf "\033]0; $TMUX_SESSION\007\003\n"
-$TMUX -q -2 new-session -d -s $TMUX_SESSION -n NewzNab-dev 'cd bin && echo "monitor Working......" && nice -n 19 $PHP monitor.php -i'
+$TMUX -f conf/tmux_user.conf new-session -d -s $TMUX_SESSION -n NewzNab-dev 'cd bin && echo "monitor Working......" && nice -n 19 $PHP monitor.php -i'
 $TMUX selectp -t 0
-$TMUX -q splitw -h -p 72 'echo "..."'
-$TMUX -q splitw -h -p 50 'echo "..."'
+$TMUX splitw -h -p 72 'echo "..."'
+$TMUX splitw -h -p 50 'echo "..."'
 $TMUX selectp -t 0
-$TMUX -q splitw -v -p 65 'echo "..."'
-$TMUX -q splitw -v -p 75 'echo "..."'
-$TMUX -q splitw -v -p 67 'echo "..."'
-$TMUX -q splitw -v -p 50 'echo "..."'
+$TMUX splitw -v -p 65 'echo "..."'
+$TMUX splitw -v -p 75 'echo "..."'
+$TMUX splitw -v -p 67 'echo "..."'
+$TMUX splitw -v -p 50 'echo "..."'
 $TMUX selectp -t 5
-$TMUX -q splitw -v -p 83 'echo "..."'
-$TMUX -q splitw -v -p 80 'echo "..."'
-$TMUX -q splitw -v -p 75 'echo "..."'
-$TMUX -q splitw -v -p 67 'echo "..."'
-$TMUX -q splitw -v -p 50 'echo "..."'
+$TMUX splitw -v -p 83 'echo "..."'
+$TMUX splitw -v -p 80 'echo "..."'
+$TMUX splitw -v -p 75 'echo "..."'
+$TMUX splitw -v -p 67 'echo "..."'
+$TMUX splitw -v -p 50 'echo "..."'
 $TMUX selectp -t 11
-$TMUX -q splitw -v -p 75 'echo "..."'
-$TMUX -q splitw -v -p 67 'echo "..."'
-$TMUX -q splitw -v -p 50 'echo "..."'
+$TMUX splitw -v -p 75 'echo "..."'
+$TMUX splitw -v -p 67 'echo "..."'
+$TMUX splitw -v -p 50 'echo "..."'
 $TMUX new-window -n cleanup 'echo "..."'
 $TMUX selectp -t 0
-$TMUX -q splitw -h -p 50 'echo "..."'
+$TMUX splitw -h -p 50 'echo "..."'
 $TMUX selectp -t 0
-$TMUX -q splitw -v -p 50 'echo "..."'
+$TMUX splitw -v -p 50 'echo "..."'
 $TMUX selectp -t 2
-$TMUX -q splitw -v -p 50 'echo "..."'
-
+$TMUX splitw -v -p 50 'echo "..."'
 
 if [[ $USE_HTOP == "true" ]]; then
       $TMUX new-window -n htop '$HTOP'

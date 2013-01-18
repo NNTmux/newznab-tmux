@@ -38,6 +38,7 @@ $_binaries = getenv('BINARIES');
 $_import = getenv('IMPORT');
 $_cleanup = getenv('CLEANUP');
 $_optimise = getenv('OPTIMISE');
+$_inno_test = shell_exec('svn info /var/www/newznab | grep inno');
 
 $_innodb_path = getenv('INNODB_PATH');
 $_admin_path = getenv('ADMIN_PATH');
@@ -117,15 +118,27 @@ while($i>0)
   $additional_releases_now = $releases_now - $book_releases_now - $console_releases_now - $movie_releases_now - $music_releases_now - $pc_releases_now - $tvrage_releases_now;
   $total_work_now = $work_remaining_now + $tvrage_releases_proc + $music_releases_proc + $movie_releases_proc + $console_releases_proc + $book_releases_proc;
 
-  passthru('clear');
-  printf("\033[1;34mMonitor\033[0m has been running for: \033[38;5;160m$day\033[0m");printf(" days, ");
-  printf("\033[38;5;208m$hr\033[0m");printf(" hrs, ");
-  printf("\033[38;5;020m$min\033[0m");printf(" min\n");
-  printf("The script updates every $sleeptime seconds.\n");
-  printf("$releases_since_loop releases added since last update.\n\n");
+  if ( $releases_since_start > 0 ) { $signed = "+"; }
+  else { $signed = ""; }
 
-  printf("$releases_now releases in your database.\n");
-  printf("$releases_since_start releases have been added.\n\n");
+  if ( $min != 1 ) { $string_min = "mins"; }
+  else { $string_min = "min"; }
+
+  if ( $hr != 1 ) { $string_hr = "hrs"; }
+  else { $string_hr = "hr"; }
+
+  if ( $day != 1 ) { $string_day = "days"; }
+  else { $string_day = "day"; }
+
+  if ( $day > 0 ) { $time_string = "\033[38;5;160m$day\033[0m $string_day, \033[38;5;208m$hr\033[0m $string_hr, \033[38;5;020m$min\033[0m $string_min."; }
+  elseif ( $hr > 0 ) { $time_string = "\033[38;5;208m$hr\033[0m $string_hr, \033[38;5;020m$min\033[0m $string_min."; }
+  else { $time_string = "\033[38;5;020m$min\033[0m $string_min."; }
+
+
+  passthru('clear');
+  printf("\033[1;34mMonitor\033[0m has been running for: $time_string\n");
+  printf("$releases_since_loop releases added in the previous $sleeptime seconds.\n");
+  printf("$releases_now($signed$releases_since_start) releases in your database.\n\n");
 
   $mask = "%16s %10s %10s \n";
   printf($mask, "Category", "In Process", "In Database");
@@ -186,42 +199,60 @@ while($i>0)
   }
   shell_exec("tmux respawnp -t Newznab-dev:0.10 'cd bin && $_php processOthers.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
 
-  if (( $_innodb == "true" ) && ( $_threads == "true" )) {
-    $_import_path = $_innodb_path;
-    $_update_path = $_innodb_path;
-    $_import_cmd = 'nzb-import.php';
-    $_backfill_cmd = 'backfill_threaded.php';
-    $_update_cmd = 'update_binaries_threaded.php';
-  } elseif (( $_innodb == "true" ) && ( $_threads != "true" )) {
-    $_import_path = $_admin_path;
-    $_update_path = $_innodb_path;
-    $_import_cmd = 'nzb-importmodified.php';
-    $_backfill_cmd = 'backfill.php';
-    $_update_cmd = 'update_binaries.php';
-  } elseif (( $_innodb != "true" ) && ( $_threads == "true" )) {
-    $_import_path = $_admin_path;
-    $_update_path = $_newznab_path;
-    $_import_cmd = 'nzb-importmodified.php';
-    $_backfill_cmd = 'backfill_threaded.php';
-    $_update_cmd = 'update_binaries_threaded.php';
-  } else {
-    $_import_path = $_admin_path;
-    $_update_path = $_newznab_path;
-    $_import_cmd = 'nzb-importmodified.php';
-    $_backfill_cmd = 'backfill.php';
-    $_update_cmd = 'update_binaries.php';
-  }
 
+if ( ! $_inno_test ) {
+  if (( $_innodb == "true" ) && ( $_threads == "true" )) {
+	$_import_path = $_innodb_path;
+	$_update_path = $_innodb_path;
+	$_import_cmd = 'nzb-import.php';
+	$_backfill_cmd = 'backfill_threaded.php';
+	$_update_cmd = 'update_binaries_threaded.php';
+  } elseif (( $_innodb == "true" ) && ( $_threads != "true" )) {
+	$_import_path = $_admin_path;
+	$_update_path = $_innodb_path;
+	$_import_cmd = 'nzb-importmodified.php';
+	$_backfill_cmd = 'backfill.php';
+	$_update_cmd = 'update_binaries.php';
+  } elseif (( $_innodb != "true" ) && ( $_threads == "true" )) {
+	$_import_path = $_admin_path;
+	$_update_path = $_newznab_path;
+	$_import_cmd = 'nzb-importmodified.php';
+	$_backfill_cmd = 'backfill_threaded.php';
+	$_update_cmd = 'update_binaries_threaded.php';
+  } else {
+	$_import_path = $_admin_path;
+	$_update_path = $_newznab_path;
+	$_import_cmd = 'nzb-importmodified.php';
+	$_backfill_cmd = 'backfill.php';
+	$_update_cmd = 'update_binaries.php';
+  }
+} else {
+  if ( $_threads == "true" ) {
+	$_import_path = $_newznab_path;
+	$_update_path = $_newznab_path;
+	$_import_cmd = 'nzb-import.php';
+	$_backfill_cmd = 'backfill_threaded.php';
+	$_update_cmd = 'update_binaries_threaded.php';
+  } else {
+	$_import_path = $_newznab_path;
+	$_update_path = $_newznab_path;
+	$_import_cmd = 'nzb-import.php';
+	$_backfill_cmd = 'backfill.php';
+	$_update_cmd = 'update_binaries.php';
+  }
+}
 
   if (( $total_work_now < $_max_releases )  && ( $_binaries == "true" )) {
-    shell_exec("tmux respawnp -t Newznab-dev:0.11 'cd $_update_path && $_php $_update_cmd && date && sleep $_nntp && echo \"$_string\"' 2>&1 1> /dev/null");
+    shell_exec("tmux respawnp -t Newznab-dev:0.11 'cd $_update_path && $_php $_update_cmd && date && echo \"sleeping $_nntp seconds...\" && sleep $_nntp && echo \"$_string\"' 2>&1 1> /dev/null");
   }
   if (( $total_work_now < $_max_releases ) && ( $_backfill == "true" )) {
-    shell_exec("tmux respawnp -t Newznab-dev:0.12 '$_mysql -u$_DB_USER -h $_DB_HOST --password=$_DB_PASSWORD $_DB_NAME -e \"${backfill_increment}\"' 2>&1 1> /dev/null");
-    shell_exec("tmux respawnp -t Newznab-dev:0.12 'cd $_update_path && $_php $_backfill_cmd && date && sleep $_nntp && echo \"$_string\"' 2>&1 1> /dev/null");
+    //shell_exec("tmux respawnp -t Newznab-dev:0.12 '$_mysql -u$_DB_USER -h $_DB_HOST --password=$_DB_PASSWORD $_DB_NAME -e \"${backfill_increment}\"' 2>&1 1> /dev/null");
+    shell_exec("tmux respawnp -t Newznab-dev:0.12 'cd $_update_path && $_php $_backfill_cmd && \
+                                                   $_mysql -u$_DB_USER -h $_DB_HOST --password=$_DB_PASSWORD $_DB_NAME -e \"${backfill_increment}\" && \
+                                                   date && echo \"sleeping $_nntp seconds...\" && sleep $_nntp && echo \"$_string\"' 2>&1 1> /dev/null");
   }
   if (( $total_work_now < $_max_releases )  && ( $_import == "true" )) {
-    shell_exec("tmux respawnp -t Newznab-dev:0.13 'cd $_import_path && $_php $_import_cmd \"$_nzbs\" && date && echo \"$_string\"' 2>&1 1> /dev/null");
+    shell_exec("tmux respawnp -t Newznab-dev:0.13 'cd $_import_path && $_php $_import_cmd \"$_nzbs\" true && date && echo \"$_string\"' 2>&1 1> /dev/null");
   }
   shell_exec("tmux respawnp -t Newznab-dev:0.14 'cd $_newznab_path && $_php update_releases.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
 
