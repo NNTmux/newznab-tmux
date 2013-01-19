@@ -38,8 +38,8 @@ while($i>0)
   $days = floor($hrs / 24);
   $sec = floor($secs % 60);
   $min = ($mins % 60);
-  $hr = ($hrs % 60);
   $day = ($days % 24);
+  $hr = ($hrs % 24);
 
   //loop counts
   $releases_loop = $db->query($releases_query);
