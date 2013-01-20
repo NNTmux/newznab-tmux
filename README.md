@@ -76,7 +76,7 @@
 
 
 
- * Thanks go to all who offered their assistance and improvement to these scripts, especially kevin123.
+ * Thanks go to all who offered their assistance and improvement to these scripts, especially kevin123, zombu2, epsol, DejaVu, ajeffco, pcmerc, zDefect, shat, evermind, coolcheat, sy, ll, crunch, ixio, AlienX, Solution-X, cryogenx. If, your nick is missing from this this, PM and I'll fix it quick.
 
 <hr>
  * If, you find these scripts useful and would like to offer a donation, they are greatly appreciated. Thank you
