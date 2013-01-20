@@ -5,6 +5,9 @@ require_once("lib/framework/db.php");
 
 $force = false;
 
+echo "Optmze  : Going to repair, optimize and analyze the myisam table(s).\n";
+echo "PLEASE DO NOT INTERRUPT THE SCRIPT!\n";
+
 if (isset($argv[1]))
 	$force = ($argv[1] == "true");
 
@@ -17,6 +20,6 @@ if (count($ret) > 0)
 }
 else
 {
-	echo "Optmze  : Nothing required optimisation.".(!$force?" Try using force (optimise_db.php true)":"")."\n";
+	echo "Optmze  : Nothing required optimisation.".(!$force?" Try using force (optimise_myisam.php true)":"")."\n";
 }
 ?>

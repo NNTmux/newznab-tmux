@@ -12,7 +12,7 @@ unset($groups);
 $ps = new PowerSpawn;
 $ps->setCallback('psUpdateComplete');
 $ps->maxChildren = 10;
-$ps->timelimit = 0;	// Disable child timeout
+$ps->timeLimit = 0;	// Disable child timeout
 
 echo "Starting threaded binary update process\n";
 
