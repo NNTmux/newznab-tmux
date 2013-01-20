@@ -49,6 +49,7 @@ $_testing_path = getenv('TESTING_PATH');
 $_mysql = getenv('MYSQL');
 $_php = getenv('PHP');
 $_nntp = getenv('NNTP_SLEEP');
+$_rel_sleep = getenv('RELEASES_SLEEP');
 $_threads = getenv('THREADS');
 $_innodb = getenv('INNODB');
 
@@ -138,7 +139,10 @@ while($i>0)
   passthru('clear');
   printf("\033[1;34mMonitor\033[0m has been running for: $time_string\n");
   printf("$releases_since_loop releases added in the previous $sleeptime seconds.\n");
-  printf("$releases_now($signed$releases_since_start) releases in your database.\n\n");
+  printf("$releases_now($signed$releases_since_start) releases in your database.\n");
+  printf("$total_work_now releases left to postprocess.");
+  if ( $_max_releases != 0 ) { printf(" update_binaries, backfill and nzb-import will stop running when you exceed $_max_releases\n\n"); }
+  else { printf("\n\n"); }
 
   $mask = "%16s %10s %10s \n";
   printf($mask, "Category", "In Process", "In Database");
@@ -150,6 +154,7 @@ while($i>0)
   printf($mask, "PC(4000)","$pc_releases_proc","$pc_releases_now");
   printf($mask, "TVShows(5000)","$tvrage_releases_proc","$tvrage_releases_now");
   printf($mask, "Additional Proc","$work_remaining_now","$additional_releases_now");
+  printf($mask, "Total Releases","$total_work_now","$releases_now");
 
   if ((TIME() - $time2) >= 900 ) {
     shell_exec("tmux respawnp -t Newznab-dev:1.0 'cd $_newznab_path && $_php update_predb.php true && date && echo \"$_string\"' 2>&1 1> /dev/null");
@@ -242,19 +247,19 @@ if ( ! $_inno_test ) {
   }
 }
 
-  if (( $total_work_now < $_max_releases )  && ( $_binaries == "true" )) {
+  if (( $total_work_now < $_max_releases ) || ( $_max_releases == 0 ) && ( $_binaries == "true" )) {
     shell_exec("tmux respawnp -t Newznab-dev:0.11 'cd $_update_path && $_php $_update_cmd && date && echo \"sleeping $_nntp seconds...\" && sleep $_nntp && echo \"$_string\"' 2>&1 1> /dev/null");
   }
-  if (( $total_work_now < $_max_releases ) && ( $_backfill == "true" )) {
+  if (( $total_work_now < $_max_releases ) || ( $_max_releases == 0 ) && ( $_backfill == "true" )) {
     //shell_exec("tmux respawnp -t Newznab-dev:0.12 '$_mysql -u$_DB_USER -h $_DB_HOST --password=$_DB_PASSWORD $_DB_NAME -e \"${backfill_increment}\"' 2>&1 1> /dev/null");
     shell_exec("tmux respawnp -t Newznab-dev:0.12 'cd $_update_path && $_php $_backfill_cmd && \
                                                    $_mysql -u$_DB_USER -h $_DB_HOST --password=$_DB_PASSWORD $_DB_NAME -e \"${backfill_increment}\" && \
                                                    date && echo \"sleeping $_nntp seconds...\" && sleep $_nntp && echo \"$_string\"' 2>&1 1> /dev/null");
   }
-  if (( $total_work_now < $_max_releases )  && ( $_import == "true" )) {
+  if (( $total_work_now < $_max_releases ) || ( $_max_releases == 0 ) && ( $_import == "true" )) {
     shell_exec("tmux respawnp -t Newznab-dev:0.13 'cd $_import_path && $_php $_import_cmd \"$_nzbs\" true && date && echo \"$_string\"' 2>&1 1> /dev/null");
   }
-  shell_exec("tmux respawnp -t Newznab-dev:0.14 'cd $_newznab_path && $_php update_releases.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
+  shell_exec("tmux respawnp -t Newznab-dev:0.14 'cd $_newznab_path && $_php update_releases.php && date && echo \"sleeping $_rel_sleep seconds...\" && sleep $_rel_sleep && echo \"$_string\"' 2>&1 1> /dev/null");
 
   $i++;
 }
