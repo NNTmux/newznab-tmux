@@ -53,8 +53,8 @@ $_rel_sleep = getenv('RELEASES_SLEEP');
 $_threads = getenv('THREADS');
 $_innodb = getenv('INNODB');
 
-$_string = "\033[1;34mPane is dead?\033[1;33m This means that the script has exited and the pane is idle until the next time the script is called.\033[0m";
-$_sleep_string = "\033[1;34msleeping\033[0m  ";
+$_string = "\033[1;34mPane is dead?\033[1;33m This means that the script has finished and the pane is idle until the next time the script is called.\033[0m";
+$_sleep_string = "\033[1;34msleeping\033[0m ";
 
 $time = TIME();
 $time2 = TIME();

@@ -17,9 +17,15 @@ if [[ $AGREED == "no" ]]; then
 	echo "Please edit the edit_these.sh file"
 	exit
 fi
-TMPUNRAR_QUERY="SELECT value from site where ID = 66;"
-TMPUNRAR_PATH=`$MYSQL -u$DB_USER -h $DB_HOST --password=$DB_PASSWORD $DB_NAME -s -N -e "${TMPUNRAR_PATH}"`
-echo "$TMPUNRAR_PATH";
+#TMPUNRAR_QUERY="SELECT value from site where ID = 66;"
+#TMPUNRAR_PATH=`$MYSQL -u$DB_USER -h $DB_HOST --password=$DB_PASSWORD $DB_NAME -s -N -e "${TMPUNRAR_PATH}"`
+#echo "$TMPUNRAR_PATH";
+
+#echo $POST_TO_RUN
+#echo $NEWZPATH/lib
+#cp $NEWZPATH/www/lib/postprocess.php bin/lib/postprocess1.php
+
+#exit
 
 cp conf/tmux.conf conf/tmux_user.conf
 $SED -i 's,'changeme,"$NZBS"',' "conf/tmux_user.conf"
@@ -34,12 +40,14 @@ $TMUX splitw -v -p 65 'echo "..."'
 $TMUX splitw -v -p 75 'echo "..."'
 $TMUX splitw -v -p 67 'echo "..."'
 $TMUX splitw -v -p 50 'echo "..."'
+#$TMUX selectp -t 3
 $TMUX selectp -t 5
 $TMUX splitw -v -p 83 'echo "..."'
 $TMUX splitw -v -p 80 'echo "..."'
 $TMUX splitw -v -p 75 'echo "..."'
 $TMUX splitw -v -p 67 'echo "..."'
 $TMUX splitw -v -p 50 'echo "..."'
+#$TMUX selectp -t 9
 $TMUX selectp -t 11
 $TMUX splitw -v -p 75 'echo "..."'
 $TMUX splitw -v -p 67 'echo "..."'
