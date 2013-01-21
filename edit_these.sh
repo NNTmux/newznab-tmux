@@ -17,7 +17,7 @@ export INNODB_PATH=$DIR"/bin/innodb"
 export POST_TO_RUN="1";
 
 #Enter the session name to be used by tmux
-export TMUX_SESSION="Newznab-dev"
+export TMUX_SESSION="Newznab-master"
 
 #Set, in seconds - how often the monitor.php (left top pane) script should update, 0 may cause errors
 export MONITOR_UPDATE="20"
