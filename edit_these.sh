@@ -22,11 +22,17 @@ export TMUX_SESSION="Newznab-master"
 #Set, in seconds - how often the monitor.php (left top pane) script should update, 0 may cause errors
 export MONITOR_UPDATE="20"
 
-#Set, in seconds - how long the update_binaries and backfill should sleep between runs, 0 may cause errors
+#Set, in seconds - how long the update_binaries should sleep between runs, 0 may cause errors
 export NNTP_SLEEP="20"
+
+#Set, in seconds - how long the backfill should sleep between runs, 0 may cause errors
+export BACKFILL_SLEEP="20"
 
 #Set, in seconds - how long the update_release should sleep between runs, 0 may cause errors
 export RELEASES_SLEEP="20"
+
+#Set, in seconds - how long the nzb-import should sleep between runs, 0 may cause errors
+export IMPORT_SLEEP="20"
 
 #Set the maximum days to backfill, you set the nn+ admin/edit backfill to 1
 #this will increment your database by 1 after each backfill loop

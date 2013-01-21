@@ -67,6 +67,8 @@ $_mysql = getenv('MYSQL');
 $_php = getenv('PHP');
 $_nntp = getenv('NNTP_SLEEP');
 $_rel_sleep = getenv('RELEASES_SLEEP');
+$_import_sleep = getenv('IMPORT_SLEEP');
+$_backfill_sleep = getenv('BACKFILL_SLEEP');
 $_threads = getenv('THREADS');
 $_innodb = getenv('INNODB');
 $_tmux_session = getenv('TMUX_SESSION');
@@ -271,12 +273,12 @@ while($i>0)
   if (( $total_work_now < $_max_releases ) || ( $_max_releases == 0 ) && ( $_backfill == "true" )) {
     shell_exec("tmux respawnp -t $_tmux_session:0.13 'echo -e \"\033[1;32m\" && cd $_update_path && $_php $_backfill_cmd && \
                                                    $_mysql -u$_DB_USER -h $_DB_HOST --password=$_DB_PASSWORD $_DB_NAME -e \"${backfill_increment}\" && \
-                                                   date && echo \"$_sleep_string $_nntp seconds...\" && sleep $_nntp && echo \"$_string\"' 2>&1 1> /dev/null");
+                                                   date && echo \"$_sleep_string $_backfill_sleep seconds...\" && sleep $_backfill_sleep && echo \"$_string\"' 2>&1 1> /dev/null");
   } else {
    shell_exec("tmux respawnp -t $_tmux_session:0.13 'echo \"$_string2\"' 2>&1 1> /dev/null");
   }
   if (( $total_work_now < $_max_releases ) || ( $_max_releases == 0 ) && ( $_import == "true" )) {
-    shell_exec("tmux respawnp -t $_tmux_session:0.14 'echo -e \"\033[1;31m\" && cd $_import_path && $_php $_import_cmd \"$_nzbs\" true && date && echo \"$_sleep_string $_rel_sleep seconds...\" && sleep $_rel_sleep && echo \"$_string\"' 2>&1 1> /dev/null");
+    shell_exec("tmux respawnp -t $_tmux_session:0.14 'echo -e \"\033[1;31m\" && cd $_import_path && $_php $_import_cmd \"$_nzbs\" true && date && echo \"$_sleep_string $_import_sleep seconds...\" && sleep $_import_sleep && echo \"$_string\"' 2>&1 1> /dev/null");
   } else {
    shell_exec("tmux respawnp -t $_tmux_session:0.14 'echo \"$_string2\"' 2>&1 1> /dev/null");
   }
