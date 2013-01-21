@@ -3,6 +3,7 @@
 require_once("config.php");
 require_once(WWW_DIR."/lib/postprocess.php");
 
+<<<<<<< HEAD
 $db = new DB();
 $query = "SELECT COUNT(*) AS cnt, ID from releases where rageID = -1 and categoryID in ( select ID from category where parentID = 5000 );";
 
@@ -22,6 +23,10 @@ while($i=1)
 }
 
 mysql_free_result($result);
+=======
+$postprocess = new PostProcess(true);
+$postprocess->processTv();
+>>>>>>> dev
 
 ?>
 

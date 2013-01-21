@@ -1,9 +1,9 @@
 <?php
 
-$newzpath = getenv('NEWZPATH');
-require_once("$newzpath/www/config.php");
+require_once("config.php");
 require_once("lib/postprocess2.php");
 
+<<<<<<< HEAD
 $db = new DB();
 $query = "select count(*) from releases r left join category c on c.ID = r.categoryID where ((r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0))";
 
@@ -35,6 +35,10 @@ while($i=1)
 }
 
 mysql_free_result($result);
+=======
+$postprocess = new PostProcess2(true);
+$postprocess->processAdditional2();
+>>>>>>> dev
 
 ?>
 

@@ -1,5 +1,6 @@
 <?php
 
+<<<<<<< HEAD
 $newzpath = getenv('NEWZPATH');
 require_once("$newzpath/www/config.php");
 require_once("lib/postprocess4.php");
@@ -35,6 +36,13 @@ while($i=1)
 }
 
 mysql_free_result($result);
+=======
+require_once("config.php");
+require_once("lib/postprocess4.php");
+
+$postprocess = new PostProcess4(true);
+$postprocess->processAdditional4();
+>>>>>>> dev
 
 ?>
 
