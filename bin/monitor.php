@@ -41,6 +41,8 @@ $nfo_query = "SELECT count(*) AS cnt FROM releases WHERE releasenfoID not in (0,
 
 //parts row count
 $parts_query = "SELECT COUNT(*) AS cnt from parts;";
+//parts table size
+$parts_size = "SELECT concat(round((data_length+index_length)/(1024*1024*1024),2),'GB') AS cnt FROM information_schema.tables where table_name = 'parts';";
 
 $_maxdays = getenv('MAXDAYS');
 $backfill_increment = "UPDATE groups set backfill_target=backfill_target+1 where active=1 and backfill_target<$_maxdays;";
@@ -161,6 +163,8 @@ while($i>0)
 
   $parts_rows = $db->query($parts_query);
   $parts_rows = $parts_rows[0]['cnt'];
+  $parts_size_gb = $db->query($parts_size);
+  $parts_size_gb = $parts_size_gb[0]['cnt'];
 
   if ( $releases_since_start > 0 ) { $signed = "+"; }
   else { $signed = ""; }
@@ -200,7 +204,7 @@ while($i>0)
   printf($mask, "TVShows(5000)","$tvrage_releases_proc","$tvrage_releases_now");
   printf($mask, "Additional Proc","$work_remaining_now","$additional_releases_now");
   $parts_rows = number_format("$parts_rows");
-  printf("\n \033[1;31m$parts_rows\033[0m rows in parts table\n");
+  printf("\n \033[0mThe parts table has \033[1;31m$parts_rows\033[0m rows and is \033[1;31m$parts_size_gb\n");
 
   if ((TIME() - $time2) >= 900 ) {
     shell_exec("tmux respawnp -t $_tmux_session:1.0 'echo -e \"\033[1;33m\" && cd $_newznab_path && $_php update_predb.php true && date && echo \"$_string\"' 2>&1 1> /dev/null");
