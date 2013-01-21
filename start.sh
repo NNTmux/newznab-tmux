@@ -17,11 +17,6 @@ if [[ $AGREED == "no" ]]; then
 	echo "Please edit the edit_these.sh file"
 	exit
 fi
-<<<<<<< HEAD
-
-printf "\033]0; $TMUX_SESSION\007\003\n"
-$TMUX new-session -d -s $TMUX_SESSION -n NewzNab 'cd bin && echo "monitor Working......" && nice -n 19 ./monitor.sh && exec bash -i'
-=======
 #TMPUNRAR_QUERY="SELECT value from site where ID = 66;"
 #TMPUNRAR_PATH=`$MYSQL -u$DB_USER -h $DB_HOST --password=$DB_PASSWORD $DB_NAME -s -N -e "${TMPUNRAR_PATH}"`
 #echo "$TMPUNRAR_PATH";
@@ -72,25 +67,10 @@ $SED -i 's,'changeme,"$NZBS"',' "conf/tmux_user.conf"
 
 printf "\033]0; $TMUX_SESSION\007\003\n"
 $TMUX -f conf/tmux_user.conf new-session -d -s $TMUX_SESSION -n $TMUX_SESSION 'cd bin && echo "monitor Working......" && nice -n 19 $PHP monitor.php -i'
->>>>>>> dev
 $TMUX selectp -t 0
 $TMUX splitw -h -p 72 'echo "..."'
 $TMUX splitw -h -p 50 'echo "..."'
 $TMUX selectp -t 0
-<<<<<<< HEAD
-$TMUX splitw -v -p 65 'cd bin && echo "processNfos Working......" && sleep 3 && nice -n 19 ./postprocess_nfo.sh && exec bash -i'
-$TMUX splitw -v -p 75 'cd bin && echo "processAdditional Thread #1 Working......" && sleep 6 && nice -n 19 ./processAlternate2.sh && exec bash -i'
-$TMUX splitw -v -p 67 'cd bin && echo "processAdditional Thread #2 Working......" && sleep 9 && nice -n 19 ./processAlternate3.sh && exec bash -i'
-$TMUX splitw -v -p 50 'cd bin && echo "processAdditional Thread #3 Working......" && sleep 12 && nice -n 19 ./processAlternate4.sh && exec bash -i'
-$TMUX selectp -t 5
-$TMUX splitw -v -p 83 'cd bin && echo "Processing Games....." && sleep 15 && nice -n 19 ./postProcessing2.sh && exec bash -i'
-$TMUX splitw -v -p 80 'cd bin && echo "Processing Movies....." && sleep 18 && nice -n 19  ./postProcessing3.sh && exec bash -i'
-$TMUX splitw -v -p 75 'cd bin && echo "Processing Music....." && sleep 21 && nice -n 19 ./postProcessing4.sh && exec bash -i'
-$TMUX splitw -v -p 67 'cd bin && echo "Processing TV....." && sleep 24 && nice -n 19 ./postProcessing5.sh && exec bash -i'
-$TMUX splitw -v -p 50 'cd bin && echo "Processing Other....." && sleep 27 && nice -n 19 ./postProcessing6.sh && exec bash -i'
-$TMUX selectp -t 11
-$TMUX splitw -v -p 50 'cd bin && echo "create Releases Working......" && nice -n 15 ./cleanup_scripts.sh && exec bash -i'
-=======
 $TMUX splitw -v -p 65 'echo "..."'
 $TMUX splitw -v -p 80 'echo "..."'
 $TMUX splitw -v -p 75 'echo "..."'
@@ -113,7 +93,6 @@ $TMUX selectp -t 0
 $TMUX splitw -v -p 50 'echo "..."'
 $TMUX selectp -t 2
 $TMUX splitw -v -p 50 'echo "..."'
->>>>>>> dev
 
 if [[ $USE_HTOP == "true" ]]; then
       $TMUX new-window -n htop '$HTOP'

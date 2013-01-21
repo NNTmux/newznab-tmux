@@ -17,25 +17,7 @@ if [[ $AGREED == "no" ]]; then
         exit
 fi
 
-<<<<<<< HEAD
-echo -e "\033[38;5;148mcp $TESTING_PATH/nzb-importmodified.php $NEWZPATH/www/admin/"
-cp $TESTING_PATH/nzb-importmodified.php $NEWZPATH/www/admin/
-
-if [ -d "/home/$USERNAME" ]; then
-	echo "cp conf/.tmux.conf /home/$USERNAME/.tmux.conf"
-        cp conf/.tmux.conf /home/$USERNAME/.tmux.conf
-        $SED -i 's,'changeme,"$NZBS"',' "/home/$USERNAME/.tmux.conf"
-fi
-if [ -d "$HOME" ]; then
-        echo "cp conf/.tmux.conf $HOME/.tmux.conf"
-        cp conf/.tmux.conf $HOME/.tmux.conf
-        $SED -i 's,'changeme,"$NZBS"',' "$HOME/.tmux.conf"
-fi
-
-echo "Editing $NEWZPATH/www/lib/postprocess.php"
-=======
 echo -e "\033[38;5;148mEditing $NEWZPATH/www/lib/postprocess.php"
->>>>>>> dev
 if [ ! -f $NEWZPATH/www/lib/postprocess.php.orig ]; then
 	cp $NEWZPATH/www/lib/postprocess.php $NEWZPATH/www/lib/postprocess.php.orig
 fi
