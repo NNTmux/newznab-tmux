@@ -31,7 +31,7 @@ $tvrage_query = "SELECT COUNT(*) AS cnt, ID from releases where rageID = -1 and 
 //tv in db
 $tvrage_query2 = "SELECT COUNT(*) AS cnt, ID from releases where categoryID in ( select ID from category where parentID = 5000 );";
 //total releases in db
-$releases_query = "SELECT concat(table_rows) AS cnt FROM information_schema.TABLES where table_name = 'parts';";
+$releases_query = "SELECT COUNT(*) AS cnt from releases;";
 //realeases to postprocess
 $work_remaining_query = "SELECT COUNT(*) AS cnt from releases r left join category c on c.ID = r.categoryID where (r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0);";
 //nfos to process
@@ -40,7 +40,7 @@ $nfo_remaining_query = "SELECT COUNT(*) AS cnt FROM releases r WHERE r.releasenf
 $nfo_query = "SELECT count(*) AS cnt FROM releases WHERE releasenfoID not in (0, -1);";
 
 //parts row count
-$parts_query = "SELECT COUNT(*) AS cnt from parts;";
+$parts_query = "SELECT concat(table_rows) AS cnt FROM information_schema.TABLES where table_name = 'parts';";
 //parts table size
 $parts_size = "SELECT concat(round((data_length+index_length)/(1024*1024*1024),2),'GB') AS cnt FROM information_schema.tables where table_name = 'parts';";
 
@@ -258,7 +258,7 @@ while($i>0)
    shell_exec("tmux respawnp -t $_tmux_session:0.6 'echo \"\033[1;31m\n$book_releases_proc\033[1;33m books to process. $_string1\"' 2>&1 1> /dev/null");
   }
   if ( $console_releases_proc > 0 ) {
-    shell_exec("tmux respawnp -t $_tmux_session:0.7 'echo -e \"\033[0;37m\" && cd bin && $_php processGames.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
+    shell_exec("tmux respawnp -t $_tmux_session:0.7 'echo -e \"\033[1;37m\" && cd bin && $_php processGames.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
   } else {
    shell_exec("tmux respawnp -t $_tmux_session:0.7 'echo \"\033[1;31m\n$console_releases_proc\033[1;33m console to process. $_string1\"' 2>&1 1> /dev/null");
   }
