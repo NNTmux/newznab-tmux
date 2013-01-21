@@ -59,6 +59,8 @@ $_optimise = getenv('OPTIMISE');
 $_innodb_path = getenv('INNODB_PATH');
 $_admin_path = getenv('ADMIN_PATH');
 $_max_releases = getenv('MAX_RELEASES');
+$_import_max_releases = getenv('IMPORT_MAX_RELEASES');
+$_backfill_max_releases = getenv('BACKFILL_MAX_RELEASES');
 $_nzbs = getenv('NZBS');
 $_nzbs_to_import_begin = count(glob($_nzbs."/*.nzb"));
 $_newznab_path = getenv('NEWZNAB_PATH');
@@ -270,14 +272,14 @@ while($i>0)
   } else {
    shell_exec("tmux respawnp -t $_tmux_session:0.12 'echo \"$_string2\"' 2>&1 1> /dev/null");
   }
-  if (( $total_work_now < $_max_releases ) || ( $_max_releases == 0 ) && ( $_backfill == "true" )) {
+  if (( $total_work_now < $_backfill_max_releases ) || ( $_backfill_max_releases == 0 ) && ( $_backfill == "true" )) {
     shell_exec("tmux respawnp -t $_tmux_session:0.13 'echo -e \"\033[1;32m\" && cd $_update_path && $_php $_backfill_cmd && \
                                                    $_mysql -u$_DB_USER -h $_DB_HOST --password=$_DB_PASSWORD $_DB_NAME -e \"${backfill_increment}\" && \
                                                    date && echo \"$_sleep_string $_backfill_sleep seconds...\" && sleep $_backfill_sleep && echo \"$_string\"' 2>&1 1> /dev/null");
   } else {
    shell_exec("tmux respawnp -t $_tmux_session:0.13 'echo \"$_string2\"' 2>&1 1> /dev/null");
   }
-  if (( $total_work_now < $_max_releases ) || ( $_max_releases == 0 ) && ( $_import == "true" )) {
+  if (( $total_work_now < $_import_max_releases ) || ( $_import_max_releases == 0 ) && ( $_import == "true" )) {
     shell_exec("tmux respawnp -t $_tmux_session:0.14 'echo -e \"\033[1;31m\" && cd $_import_path && $_php $_import_cmd \"$_nzbs\" true && date && echo \"$_sleep_string $_import_sleep seconds...\" && sleep $_import_sleep && echo \"$_string\"' 2>&1 1> /dev/null");
   } else {
    shell_exec("tmux respawnp -t $_tmux_session:0.14 'echo \"$_string2\"' 2>&1 1> /dev/null");
