@@ -243,7 +243,7 @@ while($i>0)
    shell_exec("tmux respawnp -t $_tmux_session:0.3 'echo \"\033[1;34m\nOnly active when releases to postprocess exceed 200. $_string1\"' 2>&1 1> /dev/null");
   }
   if ( $work_remaining_now > 400 ) {
-    shell_exec("tmux respawnp -t $_tmux_session:0.4 'echo -e \"\033[0;34m\" && cd bin && $_php processAlternate4.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
+    shell_exec("tmux respawnp -t $_tmux_session:0.4 'echo -e \"\033[0;36m\" && cd bin && $_php processAlternate4.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
   } else {
    shell_exec("tmux respawnp -t $_tmux_session:0.4 'echo \"\033[0;34m\nOnly active when releases to postprocess exceed 400. $_string1\"' 2>&1 1> /dev/null");
   }
