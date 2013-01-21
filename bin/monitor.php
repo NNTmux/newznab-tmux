@@ -185,9 +185,9 @@ while($i>0)
 
   passthru('clear');
   printf("\033[1;31mMonitor\033[0m has been running for: $time_string\n");
-  printf("$releases_since_loop releases added in the previous $sleeptime seconds.\n");
-  printf("$releases_now($signed$releases_since_start) releases in your database.\n");
-  printf("$total_work_now releases left to postprocess.");
+  printf("\033[1;31m$releases_since_loop\033[0m releases added in the previous \033[1;31m$sleeptime\033[0m seconds.\n");
+  printf("\033[1;31m$releases_now($signed$releases_since_start)\033[0m releases in your database.\n");
+  printf("\033[1;31m$total_work_now\033[0m releases left to postprocess.");
   if ( $_max_releases != 0 ) { printf(" update_binaries, backfill and nzb-import will stop running when you exceed $_max_releases\n\n\033[1;33m"); }
   else { printf("\n\n\033[1;33m"); }
 
