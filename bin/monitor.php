@@ -199,6 +199,7 @@ while($i>0)
   printf($mask, "PC(4000)","$pc_releases_proc","$pc_releases_now");
   printf($mask, "TVShows(5000)","$tvrage_releases_proc","$tvrage_releases_now");
   printf($mask, "Additional Proc","$work_remaining_now","$additional_releases_now");
+  $parts_rows = number_format("$parts_rows");
   printf("\n \033[1;31m$parts_rows\033[0m rows in parts table\n");
 
   if ((TIME() - $time2) >= 900 ) {
