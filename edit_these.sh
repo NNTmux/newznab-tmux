@@ -62,7 +62,7 @@ export IMPORT="true"
 
 #Choose to run optimise_db script true/false
 #set to false by default, you should test the optimse scripts in bin/innodb first
-export OMPTIMISE="false"
+export OPTIMISE="true"
 
 #Set the max amount of unprocessed releases and still allow nzb-import, backfill and update_releases to run
 #set to 0 to disable
