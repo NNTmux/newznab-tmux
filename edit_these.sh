@@ -17,7 +17,7 @@ export INNODB_PATH=$DIR"/bin/innodb"
 export POST_TO_RUN="1";
 
 #Enter the session name to be used by tmux
-export TMUX_SESSION="Newznab-master"
+export TMUX_SESSION="Newznab-dev"
 
 #Set, in seconds - how often the monitor.php (left top pane) script should update, 0 may cause errors
 export MONITOR_UPDATE="20"
@@ -68,7 +68,7 @@ export IMPORT="true"
 
 #Choose to run optimise_db script true/false
 #set to false by default, you should test the optimse scripts in bin/innodb first
-export OPTIMISE="true"
+export OPTIMISE="false"
 
 #Set the max amount of unprocessed releases and still allow nzb-import to run
 #set to 0 to disable
