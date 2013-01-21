@@ -35,7 +35,7 @@ $releases_query = "SELECT COUNT(*) AS cnt from releases;";
 //realeases to postprocess
 $work_remaining_query = "SELECT COUNT(*) AS cnt from releases r left join category c on c.ID = r.categoryID where (r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0);";
 //nfos to process
-$nfo_remaining_query = "SELECT COUNT(*) AS cnt from releasenfo rn left outer join releases r ON r.ID = rn.releaseID WHERE rn.nfo IS NULL AND rn.attempts < 5;";
+//$nfo_remaining_query = "SELECT COUNT(*) AS cnt from releasenfo rn left outer join releases r ON r.ID = rn.releaseID WHERE rn.nfo IS NULL AND rn.attempts < 5;";
 
 $_maxdays = getenv('MAXDAYS');
 $backfill_increment = "UPDATE groups set backfill_target=backfill_target+1 where active=1 and backfill_target<$_maxdays;";
@@ -102,8 +102,8 @@ while($i>0)
   $short_sleep = $sleeptime;
 
   //get totals inside loop
-  $nfo_remaining_now = $db->query($nfo_remaining_query);
-  $nfo_remaining_now = $nfo_remaining_now[0]['cnt'];
+  //$nfo_remaining_now = $db->query($nfo_remaining_query);
+  //$nfo_remaining_now = $nfo_remaining_now[0]['cnt'];
   $book_releases_proc = $db->query($book_query);
   $book_releases_proc = $book_releases_proc[0]['cnt'];
   $book_releases_now = $db->query($book_query2);
