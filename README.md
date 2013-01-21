@@ -51,7 +51,7 @@
   nano edit_these.sh
   ```
 
- * Edit some permissions, run this as root. The file .tmux.conf will be copied to the users home folder. If, when you run ./start.sh you see 0 nzb's and you are sure there are more than 0 left to import, verify the path to the nzb's in .tmux.conf in the home folder of the user.
+ * Edit some permissions and a file, run this as root. If, when you run ./start.sh you see 0 nzb's and you are sure there are more than 0 left to import, verify the path to the nzb's in .tmux_user.conf in the conf folder and is created at first run.
 
   ```bash
   ./set_perms.sh
