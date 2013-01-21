@@ -31,7 +31,7 @@ $tvrage_query = "SELECT COUNT(*) AS cnt, ID from releases where rageID = -1 and 
 //tv in db
 $tvrage_query2 = "SELECT COUNT(*) AS cnt, ID from releases where categoryID in ( select ID from category where parentID = 5000 );";
 //total releases in db
-$releases_query = "SELECT COUNT(*) AS cnt from releases;";
+$releases_query = "SELECT concat(table_rows) AS cnt FROM information_schema.TABLES where table_name = 'parts';";
 //realeases to postprocess
 $work_remaining_query = "SELECT COUNT(*) AS cnt from releases r left join category c on c.ID = r.categoryID where (r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0);";
 //nfos to process
