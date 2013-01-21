@@ -17,10 +17,7 @@ if [[ $AGREED == "no" ]]; then
         exit
 fi
 
-echo -e "\033[38;5;148mcp $TESTING_PATH/nzb-importmodified.php $NEWZPATH/www/admin/"
-cp $TESTING_PATH/nzb-importmodified.php $NEWZPATH/www/admin/
-
-echo "Editing $NEWZPATH/www/lib/postprocess.php"
+echo -e "\033[38;5;148mEditing $NEWZPATH/www/lib/postprocess.php"
 if [ ! -f $NEWZPATH/www/lib/postprocess.php.orig ]; then
 	cp $NEWZPATH/www/lib/postprocess.php $NEWZPATH/www/lib/postprocess.php.orig
 fi

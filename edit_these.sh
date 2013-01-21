@@ -13,6 +13,7 @@ export INNODB_PATH=$DIR"/bin/innodb"
 #Post Processing Additional is the processing that downloads rar and attempts to get info for your site
 #you are able to set the number of process to be run from 1-12
 #trial and error for this and do to the sorting method 1 runs always, 2 if more than 200, 3 more than 300 and so on.
+#not implemented, yet
 export POST_TO_RUN="1";
 
 #Enter the session name to be used by tmux
@@ -35,7 +36,7 @@ export MAXDAYS="210"
 
 #Set the path to the nzb dump you downloaded from torrents, theis is the path to bulk files folder of nzbs
 #this does not recurse through subfolders
-export NZBS="/home/jonnyboy/nzbs/batch"
+export NZBS="/path/to/nzbs"
 
 #Choose to run the threaded or non-threaded newznab scripts true/false
 #such as update_binaries.php or update_binaries_threaded.php
@@ -61,7 +62,7 @@ export IMPORT="true"
 
 #Choose to run optimise_db script true/false
 #set to false by default, you should test the optimse scripts in bin/innodb first
-export OMPTIMISE="true"
+export OMPTIMISE="false"
 
 #Set the max amount of unprocessed releases and still allow nzb-import, backfill and update_releases to run
 #set to 0 to disable
@@ -83,7 +84,7 @@ export USE_VNSTAT="false"
 #By using this script you understand that the programmer is not responsible for any loss of data, users, or sanity.
 #You also agree that you were smart enough to make a backup of your database and files. Do you agree? yes/no
 
-export AGREED="yes"
+export AGREED="no"
 
 ##END OF EDITS##
 
