@@ -54,7 +54,7 @@ $_binaries = getenv('BINARIES');
 $_import = getenv('IMPORT');
 $_cleanup = getenv('CLEANUP');
 $_optimise = getenv('OPTIMISE');
-$_inno_test = shell_exec('svn info /var/www/newznab | grep inno');
+//$_inno_test = shell_exec('svn info /var/www/newznab | grep inno');
 
 $_innodb_path = getenv('INNODB_PATH');
 $_admin_path = getenv('ADMIN_PATH');
