@@ -37,7 +37,7 @@ $work_remaining_query = "SELECT COUNT(*) AS cnt from releases r left join catego
 //nfos to process
 $nfo_remaining_query = "SELECT COUNT(*) AS cnt FROM releases r WHERE r.releasenfoID = 0;";
 //nfos in db
-$nfo_query = "SELECT COUNT(*) AS cnt FROM releases r WHERE r.releasenfoID != 0;";
+$nfo_query = "SELECT count(*) FROM releases WHERE releasenfoID not in (0, -1);"
 
 //parts row count
 $parts_query = "SELECT COUNT(*) AS cnt from parts;";
