@@ -37,6 +37,9 @@ $work_remaining_query = "SELECT COUNT(*) AS cnt from releases r left join catego
 //nfos to process
 //$nfo_remaining_query = "SELECT COUNT(*) AS cnt from releasenfo rn left outer join releases r ON r.ID = rn.releaseID WHERE rn.nfo IS NULL AND rn.attempts < 5;";
 
+//parts row count
+$parts_query = "SELECT COUNT(*) AS cnt from parts;";
+
 $_maxdays = getenv('MAXDAYS');
 $backfill_increment = "UPDATE groups set backfill_target=backfill_target+1 where active=1 and backfill_target<$_maxdays;";
 
@@ -74,11 +77,18 @@ $_backfill_sleep = getenv('BACKFILL_SLEEP');
 $_threads = getenv('THREADS');
 $_innodb = getenv('INNODB');
 $_tmux_session = getenv('TMUX_SESSION');
+$_show_why = getenv('SHOW_WHY');
 
-$_string = "\033[1;34mPane is dead?\033[1;33m This means that the script has finished and the pane is idle until the next time the script is called.\033[0m";
-$_string1 = "\033[1;33mThis means that the script has no work to do and the pane is idle until the next time the script is called.\033[0m";
-$_string2 = "\033[1;33mYou have disabled this in edit_these.sh and therefore has no work to do and the pane is idle until the next time the script is called.\033[0m";
-$_sleep_string = "\033[1;34msleeping\033[0m ";
+if ( $_show_why=="true" ) {
+  $_string = "\033[1;31mPane is dead?\033[1;33m This means that the script has finished and the pane is idle until the next time the script is called.\033[0m";
+  $_string1 = "\033[1;33mThis means that the script has no work to do and the pane is idle until the next time the script is called.\033[0m";
+  $_string2 = "\033[1;33mYou have disabled this in edit_these.sh and therefore has no work to do and the pane is idle until the next time the script is called.\033[0m";
+} else {
+  $_string = "";
+  $_string1 = "";
+  $_string2 = "";
+}
+$_sleep_string = "\033[1;31msleeping\033[0m ";
 
 $time = TIME();
 $time2 = TIME();
@@ -100,7 +110,6 @@ while($i>0)
   //loop counts
   $releases_loop = $db->query($releases_query);
   $releases_loop = $releases_loop[0]['cnt'];
-
 
   $sleeptime = getenv('MONITOR_UPDATE');
   if ($i!=1) {
@@ -146,6 +155,9 @@ while($i>0)
   $_nzbs_to_import_now = count(glob($_nzbs."/*.nzb"));
   $_nzbs_process = $_nzbs_to_import_begin - $_nzbs_to_import_now;
 
+  $parts_rows = $db->query($parts_query);
+  $parts_rows = $parts_rows[0]['cnt'];
+
   if ( $releases_since_start > 0 ) { $signed = "+"; }
   else { $signed = ""; }
 
@@ -164,7 +176,7 @@ while($i>0)
 
 
   passthru('clear');
-  printf("\033[1;34mMonitor\033[0m has been running for: $time_string\n");
+  printf("\033[1;31mMonitor\033[0m has been running for: $time_string\n");
   printf("$releases_since_loop releases added in the previous $sleeptime seconds.\n");
   printf("$releases_now($signed$releases_since_start) releases in your database.\n");
   printf("$total_work_now releases left to postprocess.");
@@ -182,6 +194,7 @@ while($i>0)
   printf($mask, "PC(4000)","$pc_releases_proc","$pc_releases_now");
   printf($mask, "TVShows(5000)","$tvrage_releases_proc","$tvrage_releases_now");
   printf($mask, "Additional Proc","$work_remaining_now","$additional_releases_now");
+  printf("\n  \033[1;31m$parts_rows\033[0m rows in parts table\n");
 
   if ((TIME() - $time2) >= 900 ) {
     shell_exec("tmux respawnp -t $_tmux_session:1.0 'echo -e \"\033[1;33m\" && cd $_newznab_path && $_php update_predb.php true && date && echo \"$_string\"' 2>&1 1> /dev/null");
@@ -228,27 +241,27 @@ while($i>0)
   if ( $book_releases_proc > 0 ) {
     shell_exec("tmux respawnp -t $_tmux_session:0.6 'echo -e \"\033[1;35m\" && cd bin && $_php processBooks.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
   } else {
-   shell_exec("tmux respawnp -t $_tmux_session:0.6 'echo \"\033[1;34m\n$book_releases_proc\033[1;33m books to process. $_string1\"' 2>&1 1> /dev/null");
+   shell_exec("tmux respawnp -t $_tmux_session:0.6 'echo \"\033[1;31m\n$book_releases_proc\033[1;33m books to process. $_string1\"' 2>&1 1> /dev/null");
   }
   if ( $console_releases_proc > 0 ) {
     shell_exec("tmux respawnp -t $_tmux_session:0.7 'echo -e \"\033[1;36m\" && cd bin && $_php processGames.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
   } else {
-   shell_exec("tmux respawnp -t $_tmux_session:0.7 'echo \"\033[1;34m\n$console_releases_proc\033[1;33m console to process. $_string1\"' 2>&1 1> /dev/null");
+   shell_exec("tmux respawnp -t $_tmux_session:0.7 'echo \"\033[1;31m\n$console_releases_proc\033[1;33m console to process. $_string1\"' 2>&1 1> /dev/null");
   }
   if ( $movie_releases_proc > 0 ) {
     shell_exec("tmux respawnp -t $_tmux_session:0.8 'echo -e \"\033[1;37m\" && cd bin && $_php processMovies.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
   } else {
-   shell_exec("tmux respawnp -t $_tmux_session:0.8 'echo \"\033[1;34m\n$movie_releases_proc\033[1;33m movies to process. $_string1\"' 2>&1 1> /dev/null");
+   shell_exec("tmux respawnp -t $_tmux_session:0.8 'echo \"\033[1;31m\n$movie_releases_proc\033[1;33m movies to process. $_string1\"' 2>&1 1> /dev/null");
   }
   if ( $music_releases_proc > 0 ) {
     shell_exec("tmux respawnp -t $_tmux_session:0.9 'echo -e \"\033[1;38m\" && cd bin && $_php processMusic.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
   } else {
-   shell_exec("tmux respawnp -t $_tmux_session:0.9 'echo \"\033[1;34m\n$music_releases_proc\033[1;33m music to process. $_string1\"' 2>&1 1> /dev/null");
+   shell_exec("tmux respawnp -t $_tmux_session:0.9 'echo \"\033[1;31m\n$music_releases_proc\033[1;33m music to process. $_string1\"' 2>&1 1> /dev/null");
   }
   if ( $tvrage_releases_proc > 0 ) {
     shell_exec("tmux respawnp -t $_tmux_session:0.10 'echo -e \"\033[1;39m\" && cd bin && $_php processTv.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
   } else {
-   shell_exec("tmux respawnp -t $_tmux_session:0.10 'echo \"\033[1;34m\n$tvrage_releases_proc\033[1;33m tv shows to process. $_string1\"' 2>&1 1> /dev/null");
+   shell_exec("tmux respawnp -t $_tmux_session:0.10 'echo \"\033[1;31m\n$tvrage_releases_proc\033[1;33m tv shows to process. $_string1\"' 2>&1 1> /dev/null");
   }
   shell_exec("tmux respawnp -t $_tmux_session:0.11 'echo -e \"\033[1;40m\" && cd bin && $_php processOthers.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
 

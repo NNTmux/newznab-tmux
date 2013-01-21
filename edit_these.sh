@@ -95,6 +95,10 @@ export USE_IOTOP="false"
 export USE_MYTOP="false"
 export USE_VNSTAT="false"
 
+#Each pane may have periods of inactivity, at the time "Pane iis Dead" will be displayed.
+#To disable my notes about why this is ok, change to false
+export SHOW_WHY="true"
+
 #By using this script you understand that the programmer is not responsible for any loss of data, users, or sanity.
 #You also agree that you were smart enough to make a backup of your database and files. Do you agree? yes/no
 
