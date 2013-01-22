@@ -6,7 +6,7 @@ require_once("lib/framework/db.php");
 $iforce = false;
 
 echo "Inno Optmze  : Going to recreate and analyze the innodb table(s).\n";
-echo "PLEASE DO NOT INTERRUPT THE SCRIPT!\n";
+echo "\033[1;33;41mPLEASE DO NOT INTERRUPT THE SCRIPT!\n\033[0m";
 
 if (isset($argv[1]))
 	$iforce = ($argv[1] == "true");
