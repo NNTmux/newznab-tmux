@@ -216,14 +216,7 @@ while($i>0)
   }
   if (((TIME() - $time4) >= 43200) || ($i == 1 )) {
     shell_exec("tmux respawnp -t $_tmux_session:1.2 'echo \"\033[1;35m\" && cd $_newznab_path && $_php update_tvschedule.php && $_php update_theaters.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
-    if ($i > 1 ) {
-      if (( $_innodb== "true" ) && ( $_optimise == "true" )) {
-        shell_exec("tmux respawnp -t $_tmux_session:1.3 'echo \"\033[1;36m\" && cd $_innodb_path && $_php optimise_myisam.php && $_php optimise_innodb.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
-      } elseif (( $_innodb== "false" ) && ( $_optimise == "true" )) {
-        shell_exec("tmux respawnp -t $_tmux_session:1.3 'echo \"\033[1;37m\" && cd $_innodb_path && $_php optimise_myisam.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
-      }
-      $time4 = TIME();
-    }
+    $time4 = TIME();
   }
 
   //check if scripts need to be started
@@ -319,7 +312,13 @@ while($i>0)
      shell_exec("tmux respawnp -t $_tmux_session:0.14 'echo \"$_string2\"' 2>&1 1> /dev/null");
     }
   }
-  shell_exec("tmux respawnp -t $_tmux_session:0.15 'echo \"\033[1;37m\" && cd $_newznab_path && $_php update_releases.php && date && echo \"$_sleep_string $_rel_sleep seconds...\" && sleep $_rel_sleep && echo \"$_string\"' 2>&1 1> /dev/null");
+  if (( $_innodb== "true" ) && ( $_optimise == "true" )) {
+    shell_exec("tmux respawnp -t $_tmux_session:0.15 'echo \"\033[1;36m\" && cd $_newznab_path && $_php update_releases.php && cd $_innodb_path && $_php optimise_myisam.php && $_php optimise_innodb.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
+  } elseif (( $_innodb== "false" ) && ( $_optimise == "true" )) {
+    shell_exec("tmux respawnp -t $_tmux_session:0.15 'echo \"\033[1;37m\" && cd $_newznab_path && $_php update_releases.php && cd $_innodb_path && $_php optimise_myisam.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
+  } else { 
+    shell_exec("tmux respawnp -t $_tmux_session:0.15 'echo \"\033[1;37m\" && cd $_newznab_path && $_php update_releases.php && date && echo \"$_sleep_string $_rel_sleep seconds...\" && sleep $_rel_sleep && echo \"$_string\"' 2>&1 1> /dev/null");
+  }
 
   $i++;
 }
