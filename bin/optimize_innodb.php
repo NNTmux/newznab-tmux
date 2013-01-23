@@ -40,7 +40,7 @@
  
             $force = ((isset($argv[1]) && ($argv[1] == "true")));
             $db = new DB;
-            echo "\033[1;41;33mOptmze  : OPTIMIZATION OF THE MYISAM MYSQL TABLES HAS STARTED, DO NOT STOP THIS SCRIPT!\033[1;33m\n\n";
+            echo "\033[1;41;33mOptmze  : OPTIMIZATION OF THE INNODB MYSQL TABLES HAS STARTED, DO NOT STOP THIS SCRIPT!\033[1;33m\n\n";
             $qret = quantity($force);
             echo "Optmze  : Going to start optimizing ".count($qret)." InnoDB tables (if you have InnoDB tables).\n";
             $ret = ioptimise($force);
