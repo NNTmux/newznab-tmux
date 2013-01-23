@@ -40,12 +40,12 @@ sed -i -e "s/\$tmpPath = \$this->site->tmpunrarpath;/\$tmpPath = \$this->site->t
 sed -i -e "s/order by r.postdate desc limit %d.*\$/order by r.guid asc limit %d, %d \", (\$maxattemptstocheckpassworded + 1) * -1, $c * \$numtoProcess, \$numtoProcess));/g" bin/lib/postprocess$c.php
 sed -i -e "s/PostPrc : Performing additional post processing.*\$/PostPrc : Performing additional post processing by guid on \".\$rescount.\" releases, starting at $d ...\";/g" bin/lib/postprocess$c.php
 
-cp bin/lib/processAlternate bin/processAlternate$c.php
+cp bin/lib/alternate bin/processAlternate$c.php
 sed -i -e "s/1/$c/g" bin/processAlternate$c.php
 done
 
 cp $NEWZPATH/www/lib/postprocess.php bin/lib/postprocess1.php
-cp bin/lib/processAlternate bin/processAlternate1.php
+cp bin/lib/alternate bin/processAlternate1.php
 
 #edit postprocessing scripts
 sed -i -e 's/PostProcess/PostProcess1/g' bin/lib/postprocess1.php
