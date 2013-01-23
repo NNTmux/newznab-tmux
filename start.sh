@@ -2,7 +2,7 @@
 SOURCE="${BASH_SOURCE[0]}"
 DIR="$( dirname "$SOURCE" )"
 while [ -h "$SOURCE" ]
-do 
+do
   SOURCE="$(readlink "$SOURCE")"
   [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
   DIR="$( cd -P "$( dirname "$SOURCE"  )" && pwd )"
@@ -14,8 +14,8 @@ source edit_these.sh
 eval $( $SED -n "/^define/ { s/.*('\([^']*\)', '*\([^']*\)'*);/export \1=\"\2\"/; p }" "$NEWZPATH"/www/config.php )
 
 if [[ $AGREED == "no" ]]; then
-	echo "Please edit the edit_these.sh file"
-	exit
+        echo "Please edit the edit_these.sh file"
+        exit
 fi
 #TMPUNRAR_QUERY="SELECT value from site where ID = 66;"
 #TMPUNRAR_PATH=`$MYSQL -u$DB_USER -h $DB_HOST --password=$DB_PASSWORD $DB_NAME -s -N -e "${TMPUNRAR_PATH}"`
