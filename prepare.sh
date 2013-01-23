@@ -18,7 +18,7 @@ if grep -q '/path/to/nzbs' "edit_these.sh" ; then
   sed -i -e 's/SLEEP=.*$/SLEEP="1"/' edit_these.sh
   sed -i -e 's/export SHOW_WHY=.*$/export SHOW_WHY="false"/' edit_these.sh
   sed -i -e 's/export PARSING=.*$/export PARSING="true"/' edit_these.sh
-  sed -i -e 's/export PASSWORD=.*$/export PASSWORD="svnplu5"/' svn.sh
+  sed -i -e 's/export PASSWORD=.*$/export PASSWORD="password"/' svn.sh
   sed -i -e 's/RELEASES_SLEEP=.*$/RELEASES_SLEEP="20"/' edit_these.sh
 else
   sed -i -e 's/export NZBS=.*$/export NZBS="\/path\/to\/nzbs"/' edit_these.sh
