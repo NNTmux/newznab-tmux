@@ -263,14 +263,14 @@ while($i>0)
 
   if (TIME() - $time5 >= 7200) {
     if (( $_innodb== "true" ) && ( $_optimise == "true" )) {
-    shell_exec("tmux respawnp -t $_tmux_session:1.4 'echo \"\033[1;36m\" && cd bin && $_php optimise_innodb.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
+    shell_exec("tmux respawnp -t $_tmux_session:1.4 'echo \"\033[1;36m\" && cd bin && $_php optimize_innodb.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
     $time5 = TIME();
     }
   }
 
   if (TIME() - $time6 >= 86400) {
     if (( $_innodb== "true" ) && ( $_optimise == "true" )) {
-    shell_exec("tmux respawnp -k -t $_tmux_session:1.5 'echo \"\033[1;37m\" && cd bin && $_php optimise_myisam.php true && $_php optimise_innodb.php true && date && echo \"$_string\"' 2>&1 1> /dev/null");
+    shell_exec("tmux respawnp -k -t $_tmux_session:1.5 'echo \"\033[1;37m\" && cd bin && $_php optimize_myisam.php true && $_php optimize_innodb.php true && date && echo \"$_string\"' 2>&1 1> /dev/null");
     $time6 = TIME();
     }
   }
