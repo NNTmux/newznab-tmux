@@ -106,7 +106,8 @@ $time7 = TIME();
 
 //create new window for addition postprocessing
 if ( $_post_to_run > 1 ) {
-  shell_exec("tmux neww -n postprocessing 'echo \"...\"' && tmux swap-window -t 2");
+  shell_exec("tmux neww -n postprocessing 'echo \"...\"'");
+  shell_exec("tmux swap-window -t 2");
 }
 if ( $_post_to_run > 2 ) {
   shell_exec("tmux select-pane -t $_tmux_session:2.0 && tmux splitw -h -p 50 'echo \"...\"'");
