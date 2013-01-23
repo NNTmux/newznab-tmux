@@ -63,7 +63,6 @@ $_cleanup = getenv('CLEANUP');
 $_optimise = getenv('OPTIMISE');
 //$_inno_test = shell_exec('svn info /var/www/newznab | grep inno');
 
-$_innodb_path = getenv('INNODB_PATH');
 $_admin_path = getenv('ADMIN_PATH');
 $_max_releases = getenv('MAX_RELEASES');
 $_import_max_releases = getenv('IMPORT_MAX_RELEASES');
@@ -72,6 +71,7 @@ $_nzbs = getenv('NZBS');
 $_nzbs_to_import_begin = count(glob($_nzbs."/*.nzb"));
 $_newznab_path = getenv('NEWZNAB_PATH');
 $_testing_path = getenv('TESTING_PATH');
+$_current_path = getenv('CURRENT_DIR');
 $_mysql = getenv('MYSQL');
 $_php = getenv('PHP');
 $_nntp = getenv('NNTP_SLEEP');
@@ -98,6 +98,9 @@ $time = TIME();
 $time2 = TIME();
 $time3 = TIME();
 $time4 = TIME();
+$time5 = TIME();
+$time6 = TIME();
+$time7 = TIME();
 
 $i=1;
 while($i>0)
@@ -207,93 +210,103 @@ while($i>0)
   printf("\n \033[0mThe parts table has \033[1;31m$parts_rows\033[0m rows and is \033[1;31m$parts_size_gb\n");
 
   if ((TIME() - $time2) >= 900 ) {
-    shell_exec("tmux respawnp -t $_tmux_session:1.0 'echo \"\033[1;33m\" && cd $_newznab_path && $_php update_predb.php true && date && echo \"$_string\"' 2>&1 1> /dev/null");
+    shell_exec("tmux respawnp -t $_tmux_session:1.0 'echo \"\033[1;31m\" && cd $_newznab_path && $_php update_predb.php true && date && echo \"$_string\"' 2>&1 1> /dev/null");
     $time2 = TIME();
   }
-  if (((TIME() - $time3) >= 7200 ) && ($_cleanup == "true" )) {
-    shell_exec("tmux respawnp -t $_tmux_session:1.1 'echo \"\033[1;34m\" && cd $_testing_path && $_php update_parsing.php && $_php removespecial.php && $_php update_cleanup.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
+  if (((TIME() - $time3) >= 3600 ) && ($_parsing == "true" )) {
+    shell_exec("tmux respawnp -t $_tmux_session:1.1 'echo \"\033[1;32m\" && cd $_testing_path && $_php update_parsing.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
     $time3 = TIME();
   }
+  if (((TIME() - $time7) >= 3600 ) && ($_cleanup == "true" )) {
+    shell_exec("tmux respawnp -t $_tmux_session:1.2 'echo \"\033[1;33m\" && cd $_testing_path && $_php removespecial.php && $_php update_cleanup.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
+    $time7 = TIME();
+  }
   if (((TIME() - $time4) >= 43200) || ($i == 1 )) {
-    shell_exec("tmux respawnp -t $_tmux_session:1.2 'echo \"\033[1;35m\" && cd $_newznab_path && $_php update_tvschedule.php && $_php update_theaters.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
+    shell_exec("tmux respawnp -t $_tmux_session:1.3 'echo \"\033[1;34m\" && cd $_newznab_path && $_php update_tvschedule.php && $_php update_theaters.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
     $time4 = TIME();
+  }
+  if (TIME() - $time5 >= 7200) {
+    if (( $_innodb== "true" ) && ( $_optimise == "true" )) {
+    shell_exec("tmux respawnp -t $_tmux_session:1.4 'echo \"\033[1;36m\" && cd bin && $_php optimise_innodb.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
+    $time5 = TIME();
+    }
+  }
+  if (TIME() - $time6 >= 86400) {
+    if (( $_innodb== "true" ) && ( $_optimise == "true" )) {
+    shell_exec("tmux respawnp -k -t $_tmux_session:1.5 'echo \"\033[1;37m\" && cd bin && $_php optimise_myisam.php true && $_php optimise_innodb.php true && date && echo \"$_string\"' 2>&1 1> /dev/null");
+    $time6 = TIME();
+    }
   }
 
   //check if scripts need to be started
   if ( $nfo_remaining_now > 0 ) {
     shell_exec("tmux respawnp -t $_tmux_session:0.1 'echo \"\033[0;31m\" && cd bin && $_php postprocess_nfo.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
   } else {
-   shell_exec("tmux respawnp -t $_tmux_session:0.6 'echo \"\033[1;31m\n$nfo_remaining_now\033[1;33m nfos to process. $_string1\"' 2>&1 1> /dev/null");
+    shell_exec("tmux respawnp -t $_tmux_session:0.6 'echo \"\033[1;31m\n$nfo_remaining_now\033[1;33m nfos to process. $_string1\"' 2>&1 1> /dev/null");
   }
-
-
   if ( $work_remaining_now > 0 ) {
     shell_exec("tmux respawnp -t $_tmux_session:0.2 'echo \"\033[0;32m\" && cd bin && $_php processAlternate2.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
   } else {
-   shell_exec("tmux respawnp -t $_tmux_session:0.2 'echo \"$_string1\"' 2>&1 1> /dev/null");
+    shell_exec("tmux respawnp -t $_tmux_session:0.2 'echo \"$_string1\"' 2>&1 1> /dev/null");
   }
   if ( $work_remaining_now > 200 ) {
     shell_exec("tmux respawnp -t $_tmux_session:0.3 'echo \"\033[0;33m\" && cd bin && $_php processAlternate3.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
   } else {
-   shell_exec("tmux respawnp -t $_tmux_session:0.3 'echo \"\033[1;34m\nOnly active when releases to postprocess exceed 200. $_string1\"' 2>&1 1> /dev/null");
+    shell_exec("tmux respawnp -t $_tmux_session:0.3 'echo \"\033[1;34m\nOnly active when releases to postprocess exceed 200. $_string1\"' 2>&1 1> /dev/null");
   }
   if ( $work_remaining_now > 400 ) {
     shell_exec("tmux respawnp -t $_tmux_session:0.4 'echo \"\033[0;36m\" && cd bin && $_php processAlternate4.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
   } else {
-   shell_exec("tmux respawnp -t $_tmux_session:0.4 'echo \"\033[0;34m\nOnly active when releases to postprocess exceed 400. $_string1\"' 2>&1 1> /dev/null");
+    shell_exec("tmux respawnp -t $_tmux_session:0.4 'echo \"\033[0;34m\nOnly active when releases to postprocess exceed 400. $_string1\"' 2>&1 1> /dev/null");
   }
   if ( $work_remaining_now > 600 ) {
     shell_exec("tmux respawnp -t $_tmux_session:0.5 'echo \"\033[0;35m\" && cd bin && $_php processAlternate5.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
   } else {
-   shell_exec("tmux respawnp -t $_tmux_session:0.5 'echo \"\033[1;34m\nOnly active when releases to postprocess exceed 600. $_string1\"' 2>&1 1> /dev/null");
+    shell_exec("tmux respawnp -t $_tmux_session:0.5 'echo \"\033[1;34m\nOnly active when releases to postprocess exceed 600. $_string1\"' 2>&1 1> /dev/null");
   }
   if ( $book_releases_proc > 0 ) {
     shell_exec("tmux respawnp -t $_tmux_session:0.6 'echo \"\033[0;36m\" && cd bin && $_php processBooks.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
   } else {
-   shell_exec("tmux respawnp -t $_tmux_session:0.6 'echo \"\033[1;31m\n$book_releases_proc\033[1;33m books to process. $_string1\"' 2>&1 1> /dev/null");
+    shell_exec("tmux respawnp -t $_tmux_session:0.6 'echo \"\033[1;31m\n$book_releases_proc\033[1;33m books to process. $_string1\"' 2>&1 1> /dev/null");
   }
   if ( $console_releases_proc > 0 ) {
     shell_exec("tmux respawnp -t $_tmux_session:0.7 'echo \"\033[1;37m\" && cd bin && $_php processGames.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
   } else {
-   shell_exec("tmux respawnp -t $_tmux_session:0.7 'echo \"\033[1;31m\n$console_releases_proc\033[1;33m console to process. $_string1\"' 2>&1 1> /dev/null");
+    shell_exec("tmux respawnp -t $_tmux_session:0.7 'echo \"\033[1;31m\n$console_releases_proc\033[1;33m console to process. $_string1\"' 2>&1 1> /dev/null");
   }
   if ( $movie_releases_proc > 0 ) {
     shell_exec("tmux respawnp -t $_tmux_session:0.8 'echo \"\033[1;31m\" && cd bin && $_php processMovies.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
   } else {
-   shell_exec("tmux respawnp -t $_tmux_session:0.8 'echo \"\033[1;31m\n$movie_releases_proc\033[1;33m movies to process. $_string1\"' 2>&1 1> /dev/null");
+    shell_exec("tmux respawnp -t $_tmux_session:0.8 'echo \"\033[1;31m\n$movie_releases_proc\033[1;33m movies to process. $_string1\"' 2>&1 1> /dev/null");
   }
   if ( $music_releases_proc > 0 ) {
     shell_exec("tmux respawnp -t $_tmux_session:0.9 'echo \"\033[1;32m\" && cd bin && $_php processMusic.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
   } else {
-   shell_exec("tmux respawnp -t $_tmux_session:0.9 'echo \"\033[1;31m\n$music_releases_proc\033[1;33m music to process. $_string1\"' 2>&1 1> /dev/null");
+    shell_exec("tmux respawnp -t $_tmux_session:0.9 'echo \"\033[1;31m\n$music_releases_proc\033[1;33m music to process. $_string1\"' 2>&1 1> /dev/null");
   }
   if ( $tvrage_releases_proc > 0 ) {
     shell_exec("tmux respawnp -t $_tmux_session:0.10 'echo \"\033[1;33m\" && cd bin && $_php processTv.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
   } else {
-   shell_exec("tmux respawnp -t $_tmux_session:0.10 'echo \"\033[1;31m\n$tvrage_releases_proc\033[1;33m tv shows to process. $_string1\"' 2>&1 1> /dev/null");
+    shell_exec("tmux respawnp -t $_tmux_session:0.10 'echo \"\033[1;31m\n$tvrage_releases_proc\033[1;33m tv shows to process. $_string1\"' 2>&1 1> /dev/null");
   }
   shell_exec("tmux respawnp -t $_tmux_session:0.11 'echo \"\033[1;34m\" && cd bin && $_php processOthers.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
 
 
   if ( $_threads == "true" ) {
-	$_import_path = $_innodb_path;
-	$_update_path = $_newznab_path;
-	$_import_cmd = 'nzb-import.php';
-	$_backfill_cmd = 'backfill_threaded.php';
-	$_update_cmd = 'update_binaries_threaded.php';
+    $_update_path = $_newznab_path;
+    $_backfill_cmd = 'backfill_threaded.php';
+    $_update_cmd = 'update_binaries_threaded.php';
   } else {
-	$_import_path = $_innodb_path;
-	$_update_path = $_newznab_path;
-	$_import_cmd = 'nzb-import.php';
-	$_backfill_cmd = 'backfill.php';
-	$_update_cmd = 'update_binaries.php';
+    $_update_path = $_newznab_path;
+    $_backfill_cmd = 'backfill.php';
+    $_update_cmd = 'update_binaries.php';
   }
 
   if ( $_binaries == "true" ) {
     if (( $total_work_now < $_max_releases ) || ( $_max_releases == 0 )) {
       shell_exec("tmux respawnp -t $_tmux_session:0.12 'echo \"\033[1;34m\" && cd $_update_path && $_php $_update_cmd && date && echo \"$_sleep_string $_nntp seconds...\" && sleep $_nntp && echo \"$_string\"' 2>&1 1> /dev/null");
     } else {
-     shell_exec("tmux respawnp -t $_tmux_session:0.12 'echo \"$_string2\"' 2>&1 1> /dev/null");
+      shell_exec("tmux respawnp -t $_tmux_session:0.12 'echo \"$_string2\"' 2>&1 1> /dev/null");
     }
   }
   if ( $_backfill == "true" ) {
@@ -302,20 +315,18 @@ while($i>0)
                                                    $_mysql -u$_DB_USER -h $_DB_HOST --password=$_DB_PASSWORD $_DB_NAME -e \"${backfill_increment}\" && \
                                                    date && echo \"$_sleep_string $_backfill_sleep seconds...\" && sleep $_backfill_sleep && echo \"$_string\"' 2>&1 1> /dev/null");
     } else {
-     shell_exec("tmux respawnp -t $_tmux_session:0.13 'echo \"$_string2\"' 2>&1 1> /dev/null");
+      shell_exec("tmux respawnp -t $_tmux_session:0.13 'echo \"$_string2\"' 2>&1 1> /dev/null");
     }
   }
   if ( $_import == "true" ) {
     if (( $total_work_now < $_import_max_releases ) || ( $_import_max_releases == 0 )) {
-      shell_exec("tmux respawnp -t $_tmux_session:0.14 'echo \"\033[1;36m\" && cd $_import_path && $_php $_import_cmd \"$_nzbs\" true && date && echo \"$_sleep_string $_import_sleep seconds...\" && sleep $_import_sleep && echo \"$_string\"' 2>&1 1> /dev/null");
+      shell_exec("tmux respawnp -t $_tmux_session:0.14 'echo \"\033[1;36m\" && cd bin && $_php nzb-import.php \"$_nzbs\" true && date && echo \"$_sleep_string $_import_sleep seconds...\" && sleep $_import_sleep && echo \"$_string\"' 2>&1 1> /dev/null");
     } else {
-     shell_exec("tmux respawnp -t $_tmux_session:0.14 'echo \"$_string2\"' 2>&1 1> /dev/null");
+      shell_exec("tmux respawnp -t $_tmux_session:0.14 'echo \"$_string2\"' 2>&1 1> /dev/null");
     }
   }
-  if (( $_innodb== "true" ) && ( $_optimise == "true" )) {
-    shell_exec("tmux respawnp -t $_tmux_session:0.15 'echo \"\033[1;36m\" && cd $_newznab_path && $_php update_releases.php && cd $_innodb_path && $_php optimise_myisam.php && $_php optimise_innodb.php && date && echo \"$_sleep_string $_rel_sleep seconds...\" && sleep $_rel_sleep && echo \"$_string\"' 2>&1 1> /dev/null");
-  } elseif (( $_innodb== "false" ) && ( $_optimise == "true" )) {
-    shell_exec("tmux respawnp -t $_tmux_session:0.15 'echo \"\033[1;37m\" && cd $_newznab_path && $_php update_releases.php && cd $_innodb_path && $_php optimise_myisam.php && date && echo \"$_sleep_string $_rel_sleep seconds...\" && sleep $_rel_sleep && echo \"$_string\"' 2>&1 1> /dev/null");
+  if ( $_optimise == "true" ) {
+    shell_exec("tmux respawnp -t $_tmux_session:0.15 'echo \"\033[1;37m\" && cd $_newznab_path && $_php update_releases.php && cd $_current_path/bin && $_php optimize_myisam.php && date && echo \"$_sleep_string $_rel_sleep seconds...\" && sleep $_rel_sleep && echo \"$_string\"' 2>&1 1> /dev/null");
   } else {
     shell_exec("tmux respawnp -t $_tmux_session:0.15 'echo \"\033[1;37m\" && cd $_newznab_path && $_php update_releases.php && date && echo \"$_sleep_string $_rel_sleep seconds...\" && sleep $_rel_sleep && echo \"$_string\"' 2>&1 1> /dev/null");
   }

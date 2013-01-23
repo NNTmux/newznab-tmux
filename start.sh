@@ -25,7 +25,7 @@ fi
 #echo $NEWZPATH/lib
 
 #remove postprocessing scripts
-rm -f bin/lib/*
+rm -f bin/lib/post*
 
 #create postprocessing scripts
 cp $NEWZPATH/www/lib/postprocess.php bin/lib/postprocess2.php
@@ -66,7 +66,7 @@ cp conf/tmux.conf conf/tmux_user.conf
 $SED -i 's,'changeme,"$NZBS"',' "conf/tmux_user.conf"
 
 printf "\033]0; $TMUX_SESSION\007\003\n"
-$TMUX -f conf/tmux_user.conf new-session -d -s $TMUX_SESSION -n $TMUX_SESSION 'cd bin && echo "monitor Working......" && nice -n 19 $PHP monitor.php -i'
+$TMUX -f conf/tmux_user.conf new-session -d -s $TMUX_SESSION -n $TMUX_SESSION 'cd bin && echo "monitor Working......" && nice -n 19 $PHP monitor.php -i 2> /dev/null'
 $TMUX selectp -t 0
 $TMUX splitw -h -p 72 'echo "..."'
 $TMUX splitw -h -p 50 'echo "..."'
@@ -88,10 +88,13 @@ $TMUX splitw -v -p 67 'echo "..."'
 $TMUX splitw -v -p 50 'echo "..."'
 $TMUX new-window -n cleanup 'echo "..."'
 $TMUX selectp -t 0
+$TMUX splitw -h -p 67 'echo "..."'
 $TMUX splitw -h -p 50 'echo "..."'
 $TMUX selectp -t 0
 $TMUX splitw -v -p 50 'echo "..."'
 $TMUX selectp -t 2
+$TMUX splitw -v -p 50 'echo "..."'
+$TMUX selectp -t 4
 $TMUX splitw -v -p 50 'echo "..."'
 
 if [[ $USE_HTOP == "true" ]]; then
