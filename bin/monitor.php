@@ -60,6 +60,7 @@ $_backfill = getenv('BACKFILL');
 $_binaries = getenv('BINARIES');
 $_import = getenv('IMPORT');
 $_cleanup = getenv('CLEANUP');
+$_parsing = getenv('PARSING');
 $_optimise = getenv('OPTIMISE');
 //$_inno_test = shell_exec('svn info /var/www/newznab | grep inno');
 
