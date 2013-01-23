@@ -17,26 +17,26 @@ export CURRENT_DIR=$DIR
 export POST_TO_RUN="1";
 
 #Enter the session name to be used by tmux
-export TMUX_SESSION="Newznab-dev"
+export TMUX_SESSION="Newznab-master"
 
 #Set, in seconds - how often the monitor.php (left top pane) script should update, 0 may cause errors
 export MONITOR_UPDATE="20"
 
 #Set, in seconds - how long the update_binaries should sleep between runs, 0 may cause errors
 #top right pane
-export NNTP_SLEEP="40"
+export NNTP_SLEEP="20"
 
 #Set, in seconds - how long the backfill should sleep between runs, 0 may cause errors
 #below update_binaries
-export BACKFILL_SLEEP="40"
+export BACKFILL_SLEEP="20"
 
 #Set, in seconds - how long the nzb-import should sleep between runs, 0 may cause errors
 #below backfill
-export IMPORT_SLEEP="40"
+export IMPORT_SLEEP="20"
 
 #Set, in seconds - how long the update_release should sleep between runs, 0 may cause errors
 #bottom right
-export RELEASES_SLEEP="40"
+export RELEASES_SLEEP="20"
 
 #Set the maximum days to backfill, you set the nn+ admin/edit backfill to 1
 #this will increment your database by 1 after each backfill loop
@@ -46,7 +46,7 @@ export MAXDAYS="210"
 
 #Set the path to the nzb dump you downloaded from torrents, theis is the path to bulk files folder of nzbs
 #this does not recurse through subfolders
-export NZBS="/home/jonnyboy/nzbs/batch"
+export NZBS="/path/to/nzbs"
 
 #Choose to run the threaded or non-threaded newznab scripts true/false
 #such as update_binaries.php or update_binaries_threaded.php
@@ -54,7 +54,7 @@ export THREADS="true"
 
 #Choose your database engine, comment the one true/false
 #you should have already converted your database to InnoDB engine, if you select true here
-export INNODB="false"
+export INNODB="true"
 
 #Choose to run update_cleanup.php and removespecial.php true/false
 #set to false by default, you will need to edit /misc/testing/update_cleanup.php and /misc/testing/removespecial.php
@@ -62,9 +62,9 @@ export INNODB="false"
 export CLEANUP="false"
 
 #Choose to run update_parsing.php true/false
-#set to false by default, you will need to edit /misc/testing/removespecial.php
+#set to false by default, you will need to edit /misc/testing/update_parsing.php
 #to actually do anything, directions are in the file
-export PARSING="true"
+export PARSING="false"
 
 #Choose to run update_binaries true/false
 export BINARIES="true"
@@ -77,7 +77,7 @@ export IMPORT="true"
 
 #Choose to run optimise_db script true/false
 #set to false by default, you should test the optimse scripts in bin/innodb first
-export OPTIMISE="true"
+export OPTIMISE="false"
 
 #Set the max amount of unprocessed releases and still allow nzb-import to run
 #set to 0 to disable
@@ -106,11 +106,11 @@ export USE_VNSTAT="false"
 
 #Each pane may have periods of inactivity, at the time "Pane is Dead" will be displayed.
 #To disable my notes about why this is ok, change to false
-export SHOW_WHY="false"
+export SHOW_WHY="true"
 
 #By using this script you understand that the programmer is not responsible for any loss of data, users, or sanity.
 #You also agree that you were smart enough to make a backup of your database and files. Do you agree? yes/no
-export AGREED="yes"
+export AGREED="no"
 
 ##END OF EDITS##
 
