@@ -54,7 +54,8 @@ $releases_start = $releases_start[0]['cnt'];
 //environment
 $_DB_USER = getenv('DB_USER');
 $_DB_HOST = getenv('DB_HOST');
-$_DB_PASSWORD = getenv('DB_PASSWORD');
+//$_DB_PASSWORD = getenv('DB_PASSWORD');
+$_DB_PASSWORD = escapeshellarg(getenv('DB_PASSWORD'));
 $_DB_NAME = getenv('DB_NAME');
 $_backfill = getenv('BACKFILL');
 $_binaries = getenv('BINARIES');
@@ -62,6 +63,7 @@ $_import = getenv('IMPORT');
 $_cleanup = getenv('CLEANUP');
 $_parsing = getenv('PARSING');
 $_optimise = getenv('OPTIMISE');
+$_nzbmulti = getenv('NZBMULTI');
 //$_inno_test = shell_exec('svn info /var/www/newznab | grep inno');
 
 $_admin_path = getenv('ADMIN_PATH');
@@ -212,6 +214,10 @@ while($i>0)
   $parts_rows = number_format("$parts_rows");
   printf("\n \033[0mThe parts table has \033[1;31m$parts_rows\033[0m rows and is \033[1;31m$parts_size_gb\n");
 
+  if ($i==1) {
+    sleep(10);
+  }
+
   //run update_predb.php in 1.0 ever 15 minutes
   if ((TIME() - $time2) >= 900 ) {
     shell_exec("$_tmux respawnp -t $_tmux_session:1.0 'echo \"\033[1;31m\" && cd $_newznab_path && $_php update_predb.php true && date && echo \"$_string\"' 2>&1 1> /dev/null");
@@ -299,6 +305,11 @@ while($i>0)
     $_backfill_cmd = 'backfill.php';
     $_update_cmd = 'update_binaries.php';
   }
+  if ( $_nzbmulti == "true" ){
+    $nzb_cmd = "$_php nzb-import-sub.php \"$_nzbs\"";
+  } else {
+    $nzb_cmd = "$_php nzb-import.php \"$_nzbs\" true";
+  }
 
   if ( $_binaries == "true" ) {
     if (( $total_work_now < $_max_releases ) || ( $_max_releases == 0 )) {
@@ -320,13 +331,13 @@ while($i>0)
 
   if ( $_import == "true" ) {
     if (( $total_work_now < $_import_max_releases ) || ( $_import_max_releases == 0 )) {
-      shell_exec("$_tmux respawnp -t $_tmux_session:0.11 'echo \"\033[1;36m\" && cd bin && $_php nzb-import.php \"$_nzbs\" true && echo \" \" && date && echo \"$_sleep_string $_import_sleep seconds...\" && sleep $_import_sleep && echo \"$_string\"' 2>&1 1> /dev/null");
+      shell_exec("$_tmux respawnp -t $_tmux_session:0.11 'echo \"\033[1;36m\" && cd bin && $nzb_cmd && echo \" \" && date && echo \"$_sleep_string $_import_sleep seconds...\" && sleep $_import_sleep && echo \"$_string\"' 2>&1 1> /dev/null");
     } else {
       shell_exec("$_tmux respawnp -t $_tmux_session:0.11 'echo \"\n$_string2\"' 2>&1 1> /dev/null");
     }
   }
   if (( $_optimise == "true" ) && ( ($i % 5) == 0 )) {
-    shell_exec("$_tmux respawnp -t $_tmux_session:0.12 'echo \"\033[1;37m\" && cd $_newznab_path && $_php update_releases.php && cd $_current_path && $_php optimize_myisam.php && ./mem_usage.sh && date && echo \"$_sleep_string $_rel_sleep seconds...\" && sleep $_rel_sleep && echo \"$_string\"' 2>&1 1> /dev/null");
+    shell_exec("$_tmux respawnp -t $_tmux_session:0.12 'echo \"\033[1;37m\" && cd $_newznab_path && $_php update_releases.php && cd $_current_path && $_php optimize_myisam.php && date && echo \"$_sleep_string $_rel_sleep seconds...\" && sleep $_rel_sleep && echo \"$_string\"' 2>&1 1> /dev/null");
   } else {
     shell_exec("$_tmux respawnp -t $_tmux_session:0.12 'echo \"\033[1;37m\" && cd $_newznab_path && $_php update_releases.php && cd $_current_path && ./mem_usage.sh && date && echo \"$_sleep_string $_rel_sleep seconds...\" && sleep $_rel_sleep && echo \"$_string\"' 2>&1 1> /dev/null");
   }

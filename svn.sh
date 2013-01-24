@@ -1,6 +1,6 @@
 #EDIT_THESE
 export NEWZPATH="/var/www/newznab"
-export PASSWORD="password"
+export PASSWORD="svnplu5"
 
 svn export --force --username svnplus --password $PASSWORD svn://svn.newznab.com/nn/branches/nnplus $NEWZPATH/
 
