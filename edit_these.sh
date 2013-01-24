@@ -8,7 +8,6 @@ export NEWZPATH="/var/www/newznab"
 export NEWZNAB_PATH=$NEWZPATH"/misc/update_scripts"
 export TESTING_PATH=$NEWZPATH"/misc/testing"
 export ADMIN_PATH=$NEWZPATH"/www/admin"
-export CURRENT_DIR=$DIR
 
 #Post Processing Additional is the processing that downloads rar and attempts to get info for your site
 #you are able to set the number of process to be run from 1-9
@@ -18,7 +17,7 @@ export CURRENT_DIR=$DIR
 export POST_TO_RUN="1"
 
 #Enter the session name to be used by tmux
-export TMUX_SESSION="Newznab-master1"
+export TMUX_SESSION="Newznab-master"
 
 #Set, in seconds - how often the monitor.php (left top pane) script should update, 0 may cause errors
 export MONITOR_UPDATE="20"
