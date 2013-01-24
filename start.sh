@@ -21,9 +21,6 @@ fi
 #TMPUNRAR_PATH=`$MYSQL -u$DB_USER -h $DB_HOST --password=$DB_PASSWORD $DB_NAME -s -N -e "${TMPUNRAR_PATH}"`
 #echo "$TMPUNRAR_PATH";
 
-#echo $POST_TO_RUN
-#echo $NEWZPATH/lib
-
 #remove postprocessing scripts
 rm -f bin/lib/post*
 rm -f bin/processAlternate*
@@ -59,94 +56,94 @@ cp conf/tmux.conf conf/tmux_user.conf
 $SED -i 's,'changeme,"$NZBS"',' "conf/tmux_user.conf"
 
 printf "\033]0; $TMUX_SESSION\007\003\n"
-$TMUX -f conf/tmux_user.conf new-session -d -s $TMUX_SESSION -n $TMUX_SESSION 'cd bin && echo "Monitor Started" && echo "It might take a minute for everything to spinup......" && nice -n 19 $PHP monitor.php'
-$TMUX selectp -t 0
-$TMUX splitw -h -p 72 'echo "..."'
-$TMUX splitw -h -p 50 'echo "..."'
-$TMUX selectp -t 0
-$TMUX splitw -v -p 67 'echo "..."'
-$TMUX splitw -v -p 50 'echo "..."'
-#$TMUX splitw -v -p 75 'echo "..."'
-#$TMUX splitw -v -p 67 'echo "..."'
-#$TMUX splitw -v -p 50 'echo "..."'
-$TMUX selectp -t 3
-$TMUX splitw -v -p 83 'echo "..."'
-$TMUX splitw -v -p 80 'echo "..."'
-$TMUX splitw -v -p 75 'echo "..."'
-$TMUX splitw -v -p 67 'echo "..."'
-$TMUX splitw -v -p 50 'echo "..."'
-$TMUX selectp -t 9
-$TMUX splitw -v -p 75 'echo "..."'
-$TMUX splitw -v -p 67 'echo "..."'
-$TMUX splitw -v -p 50 'echo "..."'
-$TMUX new-window -n cleanup 'echo "..."'
-$TMUX selectp -t 0
-$TMUX splitw -h -p 67 'echo "..."'
-$TMUX splitw -h -p 50 'echo "..."'
-$TMUX selectp -t 0
-$TMUX splitw -v -p 50 'echo "..."'
-$TMUX selectp -t 2
-$TMUX splitw -v -p 50 'echo "..."'
-$TMUX selectp -t 4
-$TMUX splitw -v -p 50 'echo "..."'
-$TMUX new-window -n postprocessing 'echo "..."'
+$TMUXCMD -f conf/tmux_user.conf new-session -d -s $TMUX_SESSION -n $TMUX_SESSION 'cd bin && echo "Monitor Started" && echo "It might take a minute for everything to spinup......" && nice -n 19 $PHP monitor.php'
+$TMUXCMD selectp -t 0
+$TMUXCMD splitw -h -p 72 'echo "..."'
+$TMUXCMD splitw -h -p 50 'echo "..."'
+$TMUXCMD selectp -t 0
+$TMUXCMD splitw -v -p 67 'echo "..."'
+$TMUXCMD splitw -v -p 50 'echo "..."'
+#$TMUXCMD splitw -v -p 75 'echo "..."'
+#$TMUXCMD splitw -v -p 67 'echo "..."'
+#$TMUXCMD splitw -v -p 50 'echo "..."'
+$TMUXCMD selectp -t 3
+$TMUXCMD splitw -v -p 83 'echo "..."'
+$TMUXCMD splitw -v -p 80 'echo "..."'
+$TMUXCMD splitw -v -p 75 'echo "..."'
+$TMUXCMD splitw -v -p 67 'echo "..."'
+$TMUXCMD splitw -v -p 50 'echo "..."'
+$TMUXCMD selectp -t 9
+$TMUXCMD splitw -v -p 75 'echo "..."'
+$TMUXCMD splitw -v -p 67 'echo "..."'
+$TMUXCMD splitw -v -p 50 'echo "..."'
+$TMUXCMD new-window -n cleanup 'echo "..."'
+$TMUXCMD selectp -t 0
+$TMUXCMD splitw -h -p 67 'echo "..."'
+$TMUXCMD splitw -h -p 50 'echo "..."'
+$TMUXCMD selectp -t 0
+$TMUXCMD splitw -v -p 50 'echo "..."'
+$TMUXCMD selectp -t 2
+$TMUXCMD splitw -v -p 50 'echo "..."'
+$TMUXCMD selectp -t 4
+$TMUXCMD splitw -v -p 50 'echo "..."'
+$TMUXCMD new-window -n postprocessing 'echo "..."'
 
 if [[ $POST_TO_RUN > 2 ]]; then
-  $TMUX selectp -t 0
-  $TMUX splitw -h -p 50 'echo "..."'
+  $TMUXCMD selectp -t 0
+  $TMUXCMD splitw -h -p 50 'echo "..."'
 fi
 if [[ $POST_TO_RUN > 3 ]]; then
-  $TMUX selectp -t 0
-  $TMUX splitw -v -p 50 'echo "..."'
+  $TMUXCMD selectp -t 0
+  $TMUXCMD splitw -v -p 50 'echo "..."'
 fi
 if [[ $POST_TO_RUN > 4 ]]; then
-  $TMUX selectp -t 2
-  $TMUX splitw -v -p 50 'echo "..."'
+  $TMUXCMD selectp -t 2
+  $TMUXCMD splitw -v -p 50 'echo "..."'
 fi
 if [[ $POST_TO_RUN > 5 ]]; then
-  $TMUX selectp -t 0
-  $TMUX splitw -h -p 50 'echo "..."'
+  $TMUXCMD selectp -t 0
+  $TMUXCMD splitw -h -p 50 'echo "..."'
 fi
 if [[ $POST_TO_RUN > 6 ]]; then
-  $TMUX selectp -t 2
-  $TMUX splitw -h -p 50 'echo "..."'
+  $TMUXCMD selectp -t 2
+  $TMUXCMD splitw -h -p 50 'echo "..."'
 fi
 if [[ $POST_TO_RUN > 7 ]]; then
-  $TMUX selectp -t 4
-  $TMUX splitw -h -p 50 'echo "..."'
+  $TMUXCMD selectp -t 4
+  $TMUXCMD splitw -h -p 50 'echo "..."'
 fi
 if [[ $POST_TO_RUN > 8 ]]; then
-  $TMUX selectp -t 6
-  $TMUX splitw -h -p 50 'echo "..."'
+  $TMUXCMD selectp -t 6
+  $TMUXCMD splitw -h -p 50 'echo "..."'
 fi
 
 
 if [[ $USE_HTOP == "true" ]]; then
-      $TMUX new-window -n htop '$HTOP'
+      $TMUXCMD new-window -n htop '$HTOP'
 fi
 
 if [[ $USE_NMON == "true" ]]; then
-      $TMUX new-window -n nmon '$NMON -t'
+      $TMUXCMD new-window -n nmon '$NMON -t'
 fi
 
 if [[ $USE_BWMNG == "true" ]]; then
-      $TMUX new-window -n bwm-ng '$BWMNG'
+      $TMUXCMD new-window -n bwm-ng '$BWMNG'
 fi
 
 if [[ $USE_IOTOP == "true" ]]; then
-      $TMUX new-window -n iotop '$IOTOP -o'
+      $TMUXCMD new-window -n iotop '$IOTOP -o'
 fi
 
 if [[ $USE_MYTOP == "true" ]]; then
-      $TMUX new-window -n mytop '$MYTOP -u $DB_USER -p $DB_PASSWORD -d $DB_NAME -h $DB_HOST'
+      $TMUXCMD new-window -n mytop '$MYTOP -u $DB_USER -p $DB_PASSWORD -d $DB_NAME -h $DB_HOST'
 fi
 
 if [[ $USE_VNSTAT == "true" ]]; then
-      $TMUX new-window -n vnstat 'watch $VNSTAT'
+      $TMUXCMD new-window -n vnstat 'watch $VNSTAT'
 fi
 
-$TMUX new-window -n Console 'bash -i'
-$TMUX select-window -t$TMUX_SESSION:0
-$TMUX attach-session -d -t$TMUX_SESSION
+$TMUXCMD new-window -n Console 'bash -i'
+$TMUXCMD select-window -t$TMUX_SESSION:0
+$TMUXCMD attach-session -d -t$TMUX_SESSION
 
 exit
