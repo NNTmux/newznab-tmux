@@ -89,6 +89,37 @@ $TMUX selectp -t 2
 $TMUX splitw -v -p 50 'echo "..."'
 $TMUX selectp -t 4
 $TMUX splitw -v -p 50 'echo "..."'
+$TMUX new-window -n postprocessing 'echo "..."'
+
+if [[ $POST_TO_RUN > 2 ]]; then
+  $TMUX selectp -t 0
+  $TMUX splitw -h -p 50 'echo "..."'
+fi
+if [[ $POST_TO_RUN > 3 ]]; then
+  $TMUX selectp -t 0
+  $TMUX splitw -v -p 50 'echo "..."'
+fi
+if [[ $POST_TO_RUN > 4 ]]; then
+  $TMUX selectp -t 2
+  $TMUX splitw -v -p 50 'echo "..."'
+fi
+if [[ $POST_TO_RUN > 5 ]]; then
+  $TMUX selectp -t 0
+  $TMUX splitw -h -p 50 'echo "..."'
+fi
+if [[ $POST_TO_RUN > 6 ]]; then
+  $TMUX selectp -t 2
+  $TMUX splitw -h -p 50 'echo "..."'
+fi
+if [[ $POST_TO_RUN > 7 ]]; then
+  $TMUX selectp -t 4
+  $TMUX splitw -h -p 50 'echo "..."'
+fi
+if [[ $POST_TO_RUN > 8 ]]; then
+  $TMUX selectp -t 6
+  $TMUX splitw -h -p 50 'echo "..."'
+fi
+
 
 if [[ $USE_HTOP == "true" ]]; then
       $TMUX new-window -n htop '$HTOP'
