@@ -211,7 +211,7 @@ while($i>0)
   printf($mask, "Additional Proc","$work_remaining_now","$additional_releases_now");
   $parts_rows = number_format("$parts_rows");
   printf("\n \033[0mThe parts table has \033[1;31m$parts_rows\033[0m rows and is \033[1;31m$parts_size_gb\n");
-  printf("$_tmux");
+
   //run update_predb.php in 1.0 ever 15 minutes
   if ((TIME() - $time2) >= 900 ) {
     shell_exec("$_tmux respawnp -t $_tmux_session:1.0 'echo \"\033[1;31m\" && cd $_newznab_path && $_php update_predb.php true && date && echo \"$_string\"' 2>&1 1> /dev/null");
