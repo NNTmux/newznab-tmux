@@ -48,8 +48,8 @@ export MAXDAYS="210"
 #this does not recurse through subfolders
 export NZBS="/path/to/nzbs"
 
-#If you have all of your nzbs in one folder select true
-#If, you have all of you nzbs split into separate in with the root at $NZBS then selct false
+#If you have all of your nzbs in one folder select false
+#If, you have all of you nzbs split into separate in with the root at $NZBS then select true
 #and 10 nzbs will be imported from each subfolder per loop.
 export NZBMULTI="false"
 
