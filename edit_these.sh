@@ -81,15 +81,15 @@ export OPTIMISE="false"
 
 #Set the max amount of unprocessed releases and still allow nzb-import to run
 #set to 0 to disable
-export IMPORT_MAX_RELEASES="30000"
+export IMPORT_MAX_RELEASES="0"
 
 #Set the max amount of unprocessed releases and still allow backfill to run
 #set to 0 to disable
-export BACKFILL_MAX_RELEASES="30000"
+export BACKFILL_MAX_RELEASES="0"
 
 #Set the max amount of unprocessed releases and still allow update_releases to run
 #set to 0 to disable
-export MAX_RELEASES="30000"
+export MAX_RELEASES="0"
 
 #Specify your SED binary
 export SED="/bin/sed"
@@ -116,7 +116,7 @@ export AGREED="no"
 
 command -v mysql >/dev/null 2>&1 || { echo >&2 "I require mysql but it's not installed.  Aborting."; exit 1; } && export MYSQL=`command -v mysql`
 command -v php5 >/dev/null 2>&1 && export PHP=`command -v php5` || { export PHP=`command -v php`; }
-command -v tmux >/dev/null 2>&1 || { echo >&2 "I require tmux but it's not installed.  Aborting."; exit 1; } && export TMUX=`command -v tmux`
+command -v tmux >/dev/null 2>&1 || { echo >&2 "I require tmux but it's not installed.  Aborting."; exit 1; } && export TMUXCMD=`command -v tmux`
 
 
 if [[ $USE_HTOP == "true" ]]; then

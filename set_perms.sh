@@ -72,7 +72,7 @@ echo -e "Tmux is very easy to use. To detach from the current session, use Ctrl-
 echo -e "simply by clicking in it and you can resize by dragging the borders."
 echo -e "To reattach to a running session, tmux att."
 echo -e "To navigate between panes, Ctrl-a q then the number of the pane."
-echo -e "To navigate between windows, Ctrl-a then the number of the window.\n\n\033[0m"
-
+echo -e "To navigate between windows, Ctrl-a then the number of the window."
+echo -e "To create a new window, Ctrl-a c \n\n\033[0m"
 exit
 
