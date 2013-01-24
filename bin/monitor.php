@@ -324,10 +324,10 @@ while($i>0)
       shell_exec("tmux respawnp -t $_tmux_session:0.11 'echo \"\n$_string2\"' 2>&1 1> /dev/null");
     }
   }
-  if ( $_optimise == "true" ) {
-    shell_exec("tmux respawnp -t $_tmux_session:0.12 'echo \"\033[1;37m\" && cd $_newznab_path && $_php update_releases.php && cd $_current_path && $_php optimize_myisam.php && date && echo \"$_sleep_string $_rel_sleep seconds...\" && sleep $_rel_sleep && echo \"$_string\"' 2>&1 1> /dev/null");
+  if (( $_optimise == "true" ) && ( ($i % 5) == 0 )) {
+    shell_exec("tmux respawnp -t $_tmux_session:0.12 'echo \"\033[1;37m\" && cd $_newznab_path && $_php update_releases.php && cd $_current_path && $_php optimize_myisam.php && ./mem_usage.sh && date && echo \"$_sleep_string $_rel_sleep seconds...\" && sleep $_rel_sleep && echo \"$_string\"' 2>&1 1> /dev/null");
   } else {
-    shell_exec("tmux respawnp -t $_tmux_session:0.12 'echo \"\033[1;37m\" && cd $_newznab_path && $_php update_releases.php && date && echo \"$_sleep_string $_rel_sleep seconds...\" && sleep $_rel_sleep && echo \"$_string\"' 2>&1 1> /dev/null");
+    shell_exec("tmux respawnp -t $_tmux_session:0.12 'echo \"\033[1;37m\" && cd $_newznab_path && $_php update_releases.php && cd $_current_path && ./mem_usage.sh && date && echo \"$_sleep_string $_rel_sleep seconds...\" && sleep $_rel_sleep && echo \"$_string\"' 2>&1 1> /dev/null");
   }
 
   if ( $_post_to_run >= 2 ) {

@@ -18,7 +18,7 @@ export CURRENT_DIR=$DIR
 export POST_TO_RUN="1"
 
 #Enter the session name to be used by tmux
-export TMUX_SESSION="Newznab-master"
+export TMUX_SESSION="Newznab-master1"
 
 #Set, in seconds - how often the monitor.php (left top pane) script should update, 0 may cause errors
 export MONITOR_UPDATE="20"
@@ -82,15 +82,15 @@ export OPTIMISE="false"
 
 #Set the max amount of unprocessed releases and still allow nzb-import to run
 #set to 0 to disable
-export IMPORT_MAX_RELEASES="0"
+export IMPORT_MAX_RELEASES="30000"
 
 #Set the max amount of unprocessed releases and still allow backfill to run
 #set to 0 to disable
-export BACKFILL_MAX_RELEASES="0"
+export BACKFILL_MAX_RELEASES="30000"
 
 #Set the max amount of unprocessed releases and still allow update_releases to run
 #set to 0 to disable
-export MAX_RELEASES="0"
+export MAX_RELEASES="30000"
 
 #Specify your SED binary
 export SED="/bin/sed"
