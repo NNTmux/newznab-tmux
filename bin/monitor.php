@@ -104,34 +104,6 @@ $time5 = TIME();
 $time6 = TIME();
 $time7 = TIME();
 
-//create new window for addition postprocessing
-if ( $_post_to_run > 1 ) {
-  shell_exec("tmux neww -n postprocessing 'echo \"...\"'");
-  shell_exec("tmux swap-window -t 2");
-}
-if ( $_post_to_run > 2 ) {
-  shell_exec("tmux select-pane -t $_tmux_session:2.0 && tmux splitw -h -p 50 'echo \"...\"'");
-}
-if ( $_post_to_run > 3 ) {
-  shell_exec("tmux select-pane -t $_tmux_session:2.0 && tmux splitw -v -p 50 'echo \"...\"'");
-}
-if ( $_post_to_run > 4 ) {
-  shell_exec("tmux select-pane -t $_tmux_session:2.2 && tmux splitw -v -p 50 'echo \"...\"'");
-}
-if ( $_post_to_run > 5 ) {
-  shell_exec("tmux select-pane -t $_tmux_session:2.0 && tmux splitw -h -p 50 'echo \"...\"'");
-}
-if ( $_post_to_run > 6 ) {
-  shell_exec("tmux select-pane -t $_tmux_session:2.2 && tmux splitw -h -p 50 'echo \"...\"'");
-}
-if ( $_post_to_run > 7 ) {
-  shell_exec("tmux select-pane -t $_tmux_session:2.4 && tmux splitw -h -p 50 'echo \"...\"'");
-}
-if ( $_post_to_run > 8 ) {
-  shell_exec("tmux select-pane -t $_tmux_session:2.6 && tmux splitw -h -p 50 'echo \"...\"'");
-}
-shell_exec("tmux select-window -t $_tmux_session:0");
-
 $i=1;
 while($i>0)
 {
@@ -360,56 +332,56 @@ while($i>0)
 
   if ( $_post_to_run >= 2 ) {
     if ( $work_remaining_now > 200 ) {
-      shell_exec("tmux respawnp -t $_tmux_session:2.0 'echo \"\033[0;33m\" && $_php processAlternate2.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
+      shell_exec("tmux respawnp -t $_tmux_session:2.0 'echo \"\033[0;33m\" && cd bin && $_php processAlternate2.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
     } else {
       shell_exec("tmux respawnp -t $_tmux_session:2.0 'echo \"\033[1;34m\nOnly active when releases to postprocess exceed 200. $_string1\"' 2>&1 1> /dev/null");
     }
   }
   if ( $_post_to_run >= 3 ) {
     if ( $work_remaining_now > 300 ) {
-      shell_exec("tmux respawnp -t $_tmux_session:2.1 'echo \"\033[0;33m\" && $_php processAlternate3.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
+      shell_exec("tmux respawnp -t $_tmux_session:2.1 'echo \"\033[0;33m\" && cd bin && $_php processAlternate3.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
     } else {
       shell_exec("tmux respawnp -t $_tmux_session:2.1 'echo \"\033[1;34m\nOnly active when releases to postprocess exceed 300. $_string1\"' 2>&1 1> /dev/null");
     }
   }
   if ( $_post_to_run >= 4 ) {
     if ( $work_remaining_now > 400 ) {
-      shell_exec("tmux respawnp -t $_tmux_session:2.2 'echo \"\033[0;33m\" && $_php processAlternate4.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
+      shell_exec("tmux respawnp -t $_tmux_session:2.2 'echo \"\033[0;33m\" && cd bin && $_php processAlternate4.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
     } else {
       shell_exec("tmux respawnp -t $_tmux_session:2.2 'echo \"\033[1;34m\nOnly active when releases to postprocess exceed 400. $_string1\"' 2>&1 1> /dev/null");
     }
   }
   if ( $_post_to_run >= 5 ) {
     if ( $work_remaining_now > 500 ) {
-      shell_exec("tmux respawnp -t $_tmux_session:2.3 'echo \"\033[0;33m\" && $_php processAlternate5.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
+      shell_exec("tmux respawnp -t $_tmux_session:2.3 'echo \"\033[0;33m\" && cd bin && $_php processAlternate5.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
     } else {
       shell_exec("tmux respawnp -t $_tmux_session:2.3 'echo \"\033[1;34m\nOnly active when releases to postprocess exceed 500. $_string1\"' 2>&1 1> /dev/null");
     }
   }
   if ( $_post_to_run >= 6 ) {
     if ( $work_remaining_now > 600 ) {
-      shell_exec("tmux respawnp -t $_tmux_session:2.4 'echo \"\033[0;33m\" && $_php processAlternate6.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
+      shell_exec("tmux respawnp -t $_tmux_session:2.4 'echo \"\033[0;33m\" && cd bin && $_php processAlternate6.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
     } else {
       shell_exec("tmux respawnp -t $_tmux_session:2.4 'echo \"\033[1;34m\nOnly active when releases to postprocess exceed 600. $_string1\"' 2>&1 1> /dev/null");
     }
   }
   if ( $_post_to_run >= 7 ) {
     if ( $work_remaining_now > 700 ) {
-      shell_exec("tmux respawnp -t $_tmux_session:2.5 'echo \"\033[0;33m\" && $_php processAlternate7.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
+      shell_exec("tmux respawnp -t $_tmux_session:2.5 'echo \"\033[0;33m\" && cd bin && $_php processAlternate7.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
     } else {
       shell_exec("tmux respawnp -t $_tmux_session:2.5 'echo \"\033[1;34m\nOnly active when releases to postprocess exceed 700. $_string1\"' 2>&1 1> /dev/null");
     }
   }
   if ( $_post_to_run >= 8 ) {
     if ( $work_remaining_now > 800 ) {
-      shell_exec("tmux respawnp -t $_tmux_session:2.6 'echo \"\033[0;33m\" && $_php processAlternate8.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
+      shell_exec("tmux respawnp -t $_tmux_session:2.6 'echo \"\033[0;33m\" && cd bin && $_php processAlternate8.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
     } else {
       shell_exec("tmux respawnp -t $_tmux_session:2.6 'echo \"\033[1;34m\nOnly active when releases to postprocess exceed 800. $_string1\"' 2>&1 1> /dev/null");
     }
   }
   if ( $_post_to_run >= 9 ) {
     if ( $work_remaining_now > 900 ) {
-      shell_exec("tmux respawnp -t $_tmux_session:2.7 'echo \"\033[0;33m\" && $_php processAlternate9.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
+      shell_exec("tmux respawnp -t $_tmux_session:2.7 'echo \"\033[0;33m\" && cd bin && $_php processAlternate9.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
     } else {
       shell_exec("tmux respawnp -t $_tmux_session:2.7 'echo \"\033[1;34m\nOnly active when releases to postprocess exceed 900. $_string1\"' 2>&1 1> /dev/null");
     }
