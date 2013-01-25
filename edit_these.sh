@@ -112,7 +112,7 @@ export MAX_RELEASES="0"
 export PREDB_TIMER="900"
 
 #How often to update the TV Schedule and the In Theaters in seconds
-export TVRAGE_TIMER="43200"
+export TVRAGE_TIMER="10"
 
 #Specify your SED binary
 export SED="/bin/sed"

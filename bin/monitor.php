@@ -63,6 +63,7 @@ $_DB_HOST = getenv('DB_HOST');
 $_DB_PASSWORD = escapeshellarg(getenv('DB_PASSWORD'));
 $_DB_NAME = getenv('DB_NAME');
 $_nzbs_to_import_begin = count(glob($array['NZBS']."/*.nzb"));
+
 $_current_path = dirname(__FILE__);
 $_mysql = getenv('MYSQL');
 $_php = getenv('PHP');
@@ -203,7 +204,8 @@ while($i>0)
   $parts_rows = number_format("$parts_rows");
   printf("\n \033[0mThe parts table has \033[1;31m$parts_rows\033[0m rows and is \033[1;31m$parts_size_gb\n");
 
-  $NNPATH="{$array['NEWZPATH']}/{$array['NEWZNAB_PATH']}";
+  $NNPATH="{$array['NEWZPATH']}{$array['NEWZNAB_PATH']}";
+  $TESTING="{$array['NEWZPATH']}{$array['TESTING_PATH']}";
 
   //run update_predb.php in 1.0 ever 15 minutes
   if ((TIME() - $time2) >= $array['PREDB_TIMER'] ) {
@@ -215,7 +217,7 @@ while($i>0)
 
   //run $_php update_parsing.php in 1.1 every 1 hour
   if (((TIME() - $time3) >= $array['PARSING_TIMER'] ) && ($array['PARSING'] == "true" )) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.1 'echo \"\033[1;32m\" && cd {$array['TESTING_PATH']} && $_php update_parsing.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.1 'echo \"\033[1;32m\" && cd $TESTING && $_php update_parsing.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
     $time3 = TIME();
   } else {
     shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.1 'echo \"\033[1;32m\\n\n\nThis pane runs update_parsing.php and cycles every {$array['PARSING_TIMER']} seconds.\"'");
