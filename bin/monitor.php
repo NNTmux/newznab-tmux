@@ -64,18 +64,17 @@ $_DB_PASSWORD = escapeshellarg(getenv('DB_PASSWORD'));
 $_DB_NAME = getenv('DB_NAME');
 
 function getFileCount($directory) {
-  $include = array('*.nzb','*.NZB');
+  $include = "*.{nzb,NZB}";
   $filecount=0;
-  foreach (glob($directory . "*",GLOB_ONLYDIR) as $subDir){
-    $filecount += getFileCount($subDir . "/");
+  foreach (glob($directory . "*",GLOB_ONLYDIR|GLOB_MARK) as $subDir){
+    $filecount += getFileCount($subDir);
   }
-  foreach($include as $fileEnd){
-    if (glob($directory . $fileEnd) != false) {
-      $filecount += count(glob($directory . $fileEnd));
-    }
-  }
+  $filecount += count(glob($directory . $include,GLOB_BRACE));
   return $filecount;
 }
+
+
+
 
 $_nzbs_to_import_begin=getFileCount($array['NZBS']);
 
