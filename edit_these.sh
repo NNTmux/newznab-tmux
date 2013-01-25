@@ -20,7 +20,7 @@ export ADMIN_PATH=$NEWZPATH"/www/admin"
 #trial and error for this and do to the sorting method 1 runs always, 2 if more than 200, 3 more than 300 and so on.
 #At some point, increasing this begins to slow things down. It will need to be adjusted for your system
 #to get the desired performance
-export POST_TO_RUN="1"
+export POST_TO_RUN="5"
 
 #Enter the session name to be used by tmux
 export TMUX_SESSION="Newznab-master"
@@ -52,20 +52,20 @@ export MAXDAYS="210"
 
 #Set the path to the nzb dump you downloaded from torrents, theis is the path to bulk files folder of nzbs
 #this does not recurse through subfolders
-export NZBS="/path/to/nzbs"
+export NZBS="/home/jonnyboy/nzbs/test"
 
 #If you have all of your nzbs in one folder select false
 #If, you have all of you nzbs split into separate in with the root at $NZBS then select true
 #and 10 nzbs will be imported from each subfolder per loop.
-export NZBMULTI="false"
+export NZBMULTI="true"
 
 #Choose to run the threaded or non-threaded newznab scripts true/false
 #such as update_binaries.php or update_binaries_threaded.php
-export THREADS="true"
+export THREADS="false"
 
 #Choose your database engine, comment the one true/false
 #you should have already converted your database to InnoDB engine, if you select true here
-export INNODB="true"
+export INNODB="false"
 
 #Choose to run update_cleanup.php and removespecial.php true/false
 #set to false by default, you will need to edit /misc/testing/update_cleanup.php and /misc/testing/removespecial.php
@@ -78,7 +78,7 @@ export CLEANUP_TIMER="3600"
 #Choose to run update_parsing.php true/false
 #set to false by default, you will need to edit /misc/testing/update_parsing.php
 #to actually do anything, directions are in the file
-export PARSING="false"
+export PARSING="true"
 
 #How oftern do you want update_parsing.php to run, in seconds
 export PARSING_TIMER="3600"
@@ -94,7 +94,7 @@ export IMPORT="true"
 
 #Choose to run optimise_db script true/false
 #set to false by default, you should test the optimse scripts in bin/innodb first
-export OPTIMISE="false"
+export OPTIMISE="true"
 
 #Set the max amount of unprocessed releases and still allow nzb-import to run
 #set to 0 to disable
@@ -129,11 +129,11 @@ export USE_VNSTAT="false"
 
 #Each pane may have periods of inactivity, at the time "Pane is Dead" will be displayed.
 #To disable my notes about why this is ok, change to false
-export SHOW_WHY="true"
+export SHOW_WHY="false"
 
 #By using this script you understand that the programmer is not responsible for any loss of data, users, or sanity.
 #You also agree that you were smart enough to make a backup of your database and files. Do you agree? yes/no
-export AGREED="no"
+export AGREED="yes"
 
 ##END OF EDITS##
 

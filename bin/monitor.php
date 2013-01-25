@@ -62,7 +62,30 @@ $_DB_USER = getenv('DB_USER');
 $_DB_HOST = getenv('DB_HOST');
 $_DB_PASSWORD = escapeshellarg(getenv('DB_PASSWORD'));
 $_DB_NAME = getenv('DB_NAME');
-$_nzbs_to_import_begin = count(glob($array['NZBS']."/*.nzb"));
+
+
+function getFileCount($path) {
+  $size = 0;
+  $ignore = array('.','..','cgi-bin','.DS_STORE');
+  $include = array('.nzb','.NZB');
+  $files = scandir($path);
+  foreach($files as $t) {
+    if(in_array($t, $ignore)) continue;
+    if (is_dir(rtrim($path, '/') . '/' . $t)) {
+      $size += getFileCount(rtrim($path, '/') . '/' . $t);
+    } else {
+      foreach($include as $needle){
+        if(strpos($t,$needle)!==false) {
+          $size++;
+          continue;
+        }
+      }//if(in_array($t,$include)) $size++;
+    }
+  }
+  return $size;
+}
+
+$_nzbs_to_import_begin=getFileCount('/home/jonnyboy/nzbs/test/');
 
 $_current_path = dirname(__FILE__);
 $_mysql = getenv('MYSQL');
@@ -156,7 +179,7 @@ while($i>0)
   $releases_since_loop = $releases_now - $releases_loop;
   $additional_releases_now = $releases_now - $book_releases_now - $console_releases_now - $movie_releases_now - $music_releases_now - $pc_releases_now - $tvrage_releases_now;
   $total_work_now = $work_remaining_now + $tvrage_releases_proc + $music_releases_proc + $movie_releases_proc + $console_releases_proc + $book_releases_proc;
-  $_nzbs_to_import_now = count(glob($array['NZBS']."/*.nzb"));
+  $_nzbs_to_import_now=getFileCount('/home/jonnyboy/nzbs/test/');
   $_nzbs_process = $_nzbs_to_import_begin - $_nzbs_to_import_now;
 
   $parts_rows = $db->query($parts_query);
