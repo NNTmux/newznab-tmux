@@ -131,7 +131,15 @@ if (!isset($groups) || count($groups) == 0) {
             echo ("imported " . $nzbFile . $strTerminator);
             flush();
         }
-        if ($nzbCount == 100) {
+
+	$varnames = shell_exec("cat ../edit_these.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
+	$vardata = shell_exec('cat ../edit_these.sh | grep ^export | cut -d \" -f2 | awk "{print $1;}"');
+	$varnames = explode("\n", $varnames);
+	$vardata = explode("\n", $vardata);
+	$array = array_combine($varnames, $vardata);
+	unset($array['']);
+
+        if ($nzbCount == $array['NZBCOUNT']) {
             break;
         }
     }

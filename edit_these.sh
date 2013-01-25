@@ -59,6 +59,9 @@ export NZBS="/path/to/nzbs"
 #and 10 nzbs will be imported from each subfolder per loop.
 export NZBMULTI="false"
 
+#How many nzbs to import per loop, if using NZBMULTI="true" the per folder
+export NZBCOUNT="10"
+
 #Choose to run the threaded or non-threaded newznab scripts true/false
 #such as update_binaries.php or update_binaries_threaded.php
 export THREADS="true"

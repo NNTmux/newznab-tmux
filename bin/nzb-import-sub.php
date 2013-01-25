@@ -24,7 +24,14 @@ $ps->maxThreads = 20;
 $ps->threadTimeLimit = 0;
 $selected = $subdir_count-1;
 
-echo "Starting threaded import process\n";
+$varnames = shell_exec("cat ../edit_these.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
+$vardata = shell_exec('cat ../edit_these.sh | grep ^export | cut -d \" -f2 | awk "{print $1;}"');
+$varnames = explode("\n", $varnames);
+$vardata = explode("\n", $vardata);
+$array = array_combine($varnames, $vardata);
+unset($array['']);
+
+echo "Starting threaded import process, {$array['NZBCOUNT']} per thread\n";
 
 while ($ps->RunControlCode()) 
 {
