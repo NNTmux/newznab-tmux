@@ -120,7 +120,7 @@ while($i>0)
 
   if ($i!=1) {
     sleep($array['MONITOR_UPDATE']);
-    $time_loop_start=$time_loop_start-$array['MONITOR_UPDATE'];
+    $time_loop_start=$time_loop_start+$array['MONITOR_UPDATE'];
   }
   $short_sleep = $array['MONITOR_UPDATE'];
 
