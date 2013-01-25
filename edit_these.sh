@@ -95,8 +95,8 @@ export BACKFILL="true"
 #Choose to run import nzb script true/false
 export IMPORT="true"
 
-#Choose to run optimise_db script true/false
-#set to false by default, you should test the optimse scripts in bin/innodb first
+#Choose to run optimise_innodb.php or optimise_mysiam.php script true/false
+#set to false by default, you should test the optimse scripts in bin first
 export OPTIMISE="false"
 
 #Set the max amount of unprocessed releases and still allow nzb-import to run
