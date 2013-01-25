@@ -105,6 +105,7 @@ $time7 = TIME();
 $i=1;
 while($i>0)
 {
+  $time_loop_start=TIME();
   $varnames = shell_exec("cat ../edit_these.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
   $vardata = shell_exec('cat ../edit_these.sh | grep ^export | cut -d \" -f2 | awk "{print $1;}"');
   $varnames = explode("\n", $varnames);
@@ -216,8 +217,7 @@ while($i>0)
   printf($mask, "TVShows(5000)","$tvrage_releases_proc","$tvrage_releases_now");
   printf($mask, "Additional Proc","$work_remaining_now","$additional_releases_now");
   $parts_rows = number_format("$parts_rows");
-  printf("\n \033[0mThe parts table has \033[1;31m$parts_rows\033[0m rows and is \033[1;31m$parts_size_gb\n");
-
+  printf("\n \033[0mThe parts table has \033[1;31m$parts_rows\033[0m rows and is \033[1;31m$parts_size_gb\033[0m\n");
   $NNPATH="{$array['NEWZPATH']}{$array['NEWZNAB_PATH']}";
   $TESTING="{$array['NEWZPATH']}{$array['TESTING_PATH']}";
 
@@ -226,7 +226,7 @@ while($i>0)
     shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.0 'echo \"\033[1;31m\" && cd $NNPATH && $_php update_predb.php true && date && echo \"$_string\"' 2>&1 1> /dev/null");
     $time2 = TIME();
   } else {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.0 'echo \"\033[1;31m\\n\n\nThis pane runs update_predb.php and cycles every {$array['PREDB_TIMER']}/60 seconds.\"'");
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.0 'echo \"\033[1;31m\\n\n\nThis pane runs update_predb.php and cycles every {$array['PREDB_TIMER']} seconds.\"'");
   }
 
   //run $_php update_parsing.php in 1.1 every 1 hour
@@ -411,6 +411,8 @@ while($i>0)
       shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.7 'echo \"\033[1;34m\nOnly active when releases to postprocess exceed 900. $_string1\"' 2>&1 1> /dev/null");
     }
   }
+  $lagg=(TIME()-$time_loop_start);
+  printf(" Current lag(processing time) is \033[1;31m$lagg\033[0m seconds per loop.");
   if ( $array['RUNNING'] == "true" ) {
     $i++;
   } else {
