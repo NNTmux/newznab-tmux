@@ -116,9 +116,13 @@ while($i>0)
   $vardata = explode("\n", $vardata);
   $array = array_combine($varnames, $vardata);
   unset($array['']);
-
   $getvars_timer = microtime_float()-$time_loop_start;
 
+  if ($i!=1) {
+    sleep($array['MONITOR_UPDATE']);
+    $time_loop_start=$time_loop_start-$array['MONITOR_UPDATE'];
+  }
+  $short_sleep = $array['MONITOR_UPDATE'];
 
   $secs = TIME() - $time;
   $mins = floor($secs / 60);
@@ -132,11 +136,6 @@ while($i>0)
   //loop counts
   $releases_loop = $db->query($releases_query);
   $releases_loop = $releases_loop[0]['cnt'];
-
-  if ($i!=1) {
-    sleep($array['MONITOR_UPDATE']);
-  }
-  $short_sleep = $array['MONITOR_UPDATE'];
 
   //get totals inside loop
   $nfo_remaining_now = $db->query($nfo_remaining_query);
@@ -435,7 +434,7 @@ while($i>0)
   $start_timer=$lagg-$render_timer-$nzb_timer_end-$query_timer-$getvars_timer;
   printf($mask, "Check Scripts","$start_timer","rendered");
   printf($mask, "Total Lagg","$lagg","running");
-  $loop_time=$lagg+$array['MONITOR_UPDATE'];
+  $loop_time=$lagg+$short_sleep;
   printf($mask, "Total loop","$loop_time","running");
 
 
