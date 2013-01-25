@@ -87,6 +87,9 @@ $_tmux_session = getenv('TMUX_SESSION');
 $_show_why = getenv('SHOW_WHY');
 $_post_to_run = getenv('POST_TO_RUN');
 $_tmux = getenv('TMUXCMD');
+$_cleanup_timer = ('CLEANUP_TIMER');
+$_parsing_timer = ('PARSING_TIMER');
+$_predb_timer = ('PARSING_TIMER');
 
 if ( $_show_why=="true" ) {
   $_string = "\033[1;31mPane is dead?\033[1;33m This means that the script has finished and the pane is idle until the next time the script is called.\033[0m";
@@ -219,19 +222,19 @@ while($i>0)
   }
 
   //run update_predb.php in 1.0 ever 15 minutes
-  if ((TIME() - $time2) >= 900 ) {
+  if ((TIME() - $time2) >= $_predb_timer ) {
     shell_exec("$_tmux respawnp -t $_tmux_session:1.0 'echo \"\033[1;31m\" && cd $_newznab_path && $_php update_predb.php true && date && echo \"$_string\"' 2>&1 1> /dev/null");
     $time2 = TIME();
   }
 
   //run $_php update_parsing.php in 1.1 every 1 hour
-  if (((TIME() - $time3) >= 3600 ) && ($_parsing == "true" )) {
+  if (((TIME() - $time3) >= $_parsing_timer ) && ($_parsing == "true" )) {
     shell_exec("$_tmux respawnp -t $_tmux_session:1.1 'echo \"\033[1;32m\" && cd $_testing_path && $_php update_parsing.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
     $time3 = TIME();
   }
 
   //run $_php removespecial.php and $_php update_cleanup.php in 1.2 ever 1 hour
-  if (((TIME() - $time7) >= 3600 ) && ($_cleanup == "true" )) {
+  if (((TIME() - $time7) >= $_cleanup_timer ) && ($_cleanup == "true" )) {
     shell_exec("$_tmux respawnp -t $_tmux_session:1.2 'echo \"\033[1;33m\" && cd $_testing_path && $_php removespecial.php && $_php update_cleanup.php && date && echo \"$_string\"' 2>&1 1> /dev/null");
     $time7 = TIME();
   }
@@ -339,7 +342,7 @@ while($i>0)
   if (( $_optimise == "true" ) && ( ($i % 5) == 0 )) {
     shell_exec("$_tmux respawnp -t $_tmux_session:0.12 'echo \"\033[1;37m\" && cd $_newznab_path && $_php update_releases.php && cd $_current_path && $_php optimize_myisam.php && date && echo \"$_sleep_string $_rel_sleep seconds...\" && sleep $_rel_sleep && echo \"$_string\"' 2>&1 1> /dev/null");
   } else {
-    shell_exec("$_tmux respawnp -t $_tmux_session:0.12 'echo \"\033[1;37m\" && cd $_newznab_path && $_php update_releases.php && cd $_current_path && ./mem_usage.sh && date && echo \"$_sleep_string $_rel_sleep seconds...\" && sleep $_rel_sleep && echo \"$_string\"' 2>&1 1> /dev/null");
+    shell_exec("$_tmux respawnp -t $_tmux_session:0.12 'echo \"\033[1;37m\" && cd $_newznab_path && $_php update_releases.php && cd $_current_path && date && echo \"$_sleep_string $_rel_sleep seconds...\" && sleep $_rel_sleep && echo \"$_string\"' 2>&1 1> /dev/null");
   }
 
   if ( $_post_to_run >= 2 ) {
