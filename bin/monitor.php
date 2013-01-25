@@ -201,10 +201,7 @@ while($i>0)
   printf($mask, "TVShows(5000)","$tvrage_releases_proc","$tvrage_releases_now");
   printf($mask, "Additional Proc","$work_remaining_now","$additional_releases_now");
   $parts_rows = number_format("$parts_rows");
-
-  if ($i!=1) {
-    printf("\n \033[0mThe parts table has \033[1;31m$parts_rows\033[0m rows and is \033[1;31m$parts_size_gb\n");
-  }
+  printf("\n \033[0mThe parts table has \033[1;31m$parts_rows\033[0m rows and is \033[1;31m$parts_size_gb\n");
 
   $NNPATH="{$array['NEWZPATH']}/{$array['NEWZNAB_PATH']}";
 
@@ -398,7 +395,7 @@ while($i>0)
       shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.7 'echo \"\033[1;34m\nOnly active when releases to postprocess exceed 900. $_string1\"' 2>&1 1> /dev/null");
     }
   }
-  if ( $array['SHUTDOWN'] == "on" ) {
+  if ( $array['RUNNING'] == "true" ) {
     $i++;
   } else {
     $i=0;
