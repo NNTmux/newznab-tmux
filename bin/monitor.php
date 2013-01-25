@@ -77,7 +77,7 @@ function getFileCount($directory) {
   return $filecount;
 }
 
-$_nzbs_to_import_begin=getFileCount('/home/jonnyboy/nzbs/test/');
+$_nzbs_to_import_begin=getFileCount($array['NZBS']);
 
 $_current_path = dirname(__FILE__);
 $_mysql = getenv('MYSQL');
@@ -171,7 +171,7 @@ while($i>0)
   $releases_since_loop = $releases_now - $releases_loop;
   $additional_releases_now = $releases_now - $book_releases_now - $console_releases_now - $movie_releases_now - $music_releases_now - $pc_releases_now - $tvrage_releases_now;
   $total_work_now = $work_remaining_now + $tvrage_releases_proc + $music_releases_proc + $movie_releases_proc + $console_releases_proc + $book_releases_proc;
-  $_nzbs_to_import_now=getFileCount('/home/jonnyboy/nzbs/test/');
+  $_nzbs_to_import_now=getFileCount($array['NZBS']);
   $_nzbs_process = $_nzbs_to_import_begin - $_nzbs_to_import_now;
 
   $parts_rows = $db->query($parts_query);
