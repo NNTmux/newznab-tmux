@@ -3,9 +3,9 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 #EDIT THESE#
 
-#This is the shutdown, on/off
+#This is the shutdown, true/false
 #on, it runs, off and no scripts will be restarted, when all panes are dead, killall tmux
-export SHUTDOWN="on"
+export RUNNING="true"
 
 #paths
 export NEWZPATH="/var/www/newznab"
