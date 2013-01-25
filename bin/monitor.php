@@ -63,26 +63,18 @@ $_DB_HOST = getenv('DB_HOST');
 $_DB_PASSWORD = escapeshellarg(getenv('DB_PASSWORD'));
 $_DB_NAME = getenv('DB_NAME');
 
-
-function getFileCount($path) {
-  $size = 0;
-  $ignore = array('.','..','cgi-bin','.DS_STORE');
-  $include = array('.nzb','.NZB');
-  $files = scandir($path);
-  foreach($files as $t) {
-    if(in_array($t, $ignore)) continue;
-    if (is_dir(rtrim($path, '/') . '/' . $t)) {
-      $size += getFileCount(rtrim($path, '/') . '/' . $t);
-    } else {
-      foreach($include as $needle){
-        if(strpos($t,$needle)!==false) {
-          $size++;
-          continue;
-        }
-      }//if(in_array($t,$include)) $size++;
+function getFileCount($directory) {
+  $include = array('*.nzb','*.NZB');
+  $filecount=0;
+  foreach (glob($directory . "*",GLOB_ONLYDIR) as $subDir){
+    $filecount += getFileCount($subDir . "/");
+  }
+  foreach($include as $fileEnd){
+    if (glob($directory . $fileEnd) != false) {
+      $filecount += count(glob($directory . $fileEnd));
     }
   }
-  return $size;
+  return $filecount;
 }
 
 $_nzbs_to_import_begin=getFileCount('/home/jonnyboy/nzbs/test/');
@@ -235,7 +227,7 @@ while($i>0)
     shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.0 'echo \"\033[1;31m\" && cd $NNPATH && $_php update_predb.php true && date && echo \"$_string\"' 2>&1 1> /dev/null");
     $time2 = TIME();
   } else {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.0 'echo \"\033[1;31m\\n\n\nThis pane runs update_predb.php and cycles every {$array['PREDB_TIMER']} seconds.\"'");
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.0 'echo \"\033[1;31m\\n\n\nThis pane runs update_predb.php and cycles every {$array['PREDB_TIMER']}/60 seconds.\"'");
   }
 
   //run $_php update_parsing.php in 1.1 every 1 hour
