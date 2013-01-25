@@ -26,7 +26,7 @@ rm -f bin/lib/post*
 rm -f bin/processAlternate*
 
 #create postprocessing scripts
-for (( c=2; c<=$POST_TO_RUN; c++ ))
+for (( c=2; c<=9; c++ ))
 do
 d=$((($c - 1) * 100))
 cp $NEWZPATH/www/lib/postprocess.php bin/lib/postprocess$c.php
@@ -88,35 +88,20 @@ $TMUXCMD selectp -t 4
 $TMUXCMD splitw -v -p 50 'echo "..."'
 $TMUXCMD new-window -n postprocessing 'echo "..."'
 
-if [[ $POST_TO_RUN > 2 ]]; then
-  $TMUXCMD selectp -t 0
-  $TMUXCMD splitw -h -p 50 'echo "..."'
-fi
-if [[ $POST_TO_RUN > 3 ]]; then
-  $TMUXCMD selectp -t 0
-  $TMUXCMD splitw -v -p 50 'echo "..."'
-fi
-if [[ $POST_TO_RUN > 4 ]]; then
-  $TMUXCMD selectp -t 2
-  $TMUXCMD splitw -v -p 50 'echo "..."'
-fi
-if [[ $POST_TO_RUN > 5 ]]; then
-  $TMUXCMD selectp -t 0
-  $TMUXCMD splitw -h -p 50 'echo "..."'
-fi
-if [[ $POST_TO_RUN > 6 ]]; then
-  $TMUXCMD selectp -t 2
-  $TMUXCMD splitw -h -p 50 'echo "..."'
-fi
-if [[ $POST_TO_RUN > 7 ]]; then
-  $TMUXCMD selectp -t 4
-  $TMUXCMD splitw -h -p 50 'echo "..."'
-fi
-if [[ $POST_TO_RUN > 8 ]]; then
-  $TMUXCMD selectp -t 6
-  $TMUXCMD splitw -h -p 50 'echo "..."'
-fi
-
+$TMUXCMD selectp -t 0
+$TMUXCMD splitw -h -p 50 'echo "..."'
+$TMUXCMD selectp -t 0
+$TMUXCMD splitw -v -p 50 'echo "..."'
+$TMUXCMD selectp -t 2
+$TMUXCMD splitw -v -p 50 'echo "..."'
+$TMUXCMD selectp -t 0
+$TMUXCMD splitw -h -p 50 'echo "..."'
+$TMUXCMD selectp -t 2
+$TMUXCMD splitw -h -p 50 'echo "..."'
+$TMUXCMD selectp -t 4
+$TMUXCMD splitw -h -p 50 'echo "..."'
+$TMUXCMD selectp -t 6
+$TMUXCMD splitw -h -p 50 'echo "..."'
 
 if [[ $USE_HTOP == "true" ]]; then
       $TMUXCMD new-window -n htop '$HTOP'
