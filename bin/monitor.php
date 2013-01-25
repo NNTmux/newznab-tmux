@@ -412,7 +412,7 @@ while($i>0)
     }
   }
   $lagg=(TIME()-$time_loop_start);
-  printf(" Current lag(processing time) is \033[1;31m$lagg\033[0m seconds per loop.");
+  printf(" Current lag(processing time) is \033[1;31m$lagg\033[0m seconds per loop\, after  \033[1;31m$i\033[0m loops.");
   if ( $array['RUNNING'] == "true" ) {
     $i++;
   } else {
