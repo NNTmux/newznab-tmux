@@ -24,15 +24,6 @@
   php convertToInnoDB.php
   ```
 
- * Now, you need to decide which branch you will use, the master branch uses scripts written by andrewit and the dev branch uses scripts written by kevin123. If, you choose the dev branch, skip the next step.
-
- * If, you stay on the master branch, you will need to clone [andrewit's github](https://github.com/itandrew/Newznab-InnoDB-Dropin.git) and get his scripts.
-
-  ```bash
-  cd /var/www/newznab/misc/testing/
-  git clone https://github.com/itandrew/Newznab-InnoDB-Dropin.git innodb
-  ```  
-
  * Now, Clone my github. Theses scripts should be able to run from any path, but this location is where I was asked to put it.
 
   ```bash
@@ -40,12 +31,6 @@
   git clone https://github.com/jonnyboy/newznab-tmux.git tmux
   cd tmux
   ```  
-
- * If, you choose the the dev branch, run:
-
-  ```bash
-  git checkout dev
-  ```
 
  * Edit the paths, timers, username, what to run and then accept.
 
@@ -65,20 +50,20 @@
   ./start.sh
   ```
 
+ * Additional files. I have included prepare.sh to make updating these sctipts alittle easier. I also included a svn updater, svn.sh. It performs a forced updated, which overwrites any changes you may have may to the stock nn+ scripts.
+
  * If you connect using **putty**, then under Window/Translation set Remote character set to UTF-8.
 
- * If something looks stalled, it probably isn't. If all 13 panes are still there, it is most likely, as it should be.
- 
- * You must edit **misc/testing/update_cleanup.php** in order for it to actually do something, and update_parsing is good for fixing a few releases everytime it runs, not a silver bullet though.
+ * You must edit any file that is called from **misc/testing/** in order for it to actually do something, and update_parsing is good for fixing a few releases everytime it runs, not a silver bullet though.
 
- * Now all panes should be running smoothly. If any pane crashes, it should remain open and return to the prompt. You should also be able to see the error that caused it to crash.
+ * Now all panes should be running smoothly. If any script exits early, the error message should be displayed. It will run again during the next monitor cycle.
 
  * Join in the converstion at irc://moonlight.se.eu.synirc.net/newznab-tmux.
 
 
 
 
- * Thanks go to all who offered their assistance and improvement to these scripts, especially kevin123, zombu2, epsol, DejaVu, ajeffco, pcmerc, zDefect, shat, evermind, coolcheat, sy, ll, crunch, ixio, AlienX, Solution-X, cryogenx. If, your nick is missing from this this, PM and I'll fix it quick.
+ * Thanks go to all who offered their assistance and improvement to these scripts, especially kevin123, zombu2, epsol, DejaVu, ajeffco, pcmerc, zDefect, shat, evermind, coolcheat, sy, ll, crunch, ixio, AlienX, Solution-X, cryogenx, convict, wicked and McFuzz. If, your nick is missing from this this, PM and I'll fix it quick.
 
 <hr>
 ![Newznab-tmux](https://raw.github.com/jonnyboy/newznab-tmux/master/images/newznab-tmux.png)

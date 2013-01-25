@@ -3,6 +3,11 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 #EDIT THESE#
 
+#This is the shutdown, on/off
+#on, it runs, off and no scripts will be restarted, when all panes are dead, killall tmux
+export SHUTDOWN="on"
+
+#paths
 export NEWZPATH="/var/www/newznab"
 
 export NEWZNAB_PATH=$NEWZPATH"/misc/update_scripts"
@@ -104,6 +109,9 @@ export MAX_RELEASES="0"
 
 #How often to update the PreDB in seconds
 export PREDB_TIMER="900"
+
+#How often to update the TV Schedule and the In Theaters in seconds
+export TVRAGE_TIMER="43200"
 
 #Specify your SED binary
 export SED="/bin/sed"
