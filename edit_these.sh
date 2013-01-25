@@ -66,10 +66,16 @@ export INNODB="true"
 #to actually do anything, directions are in the file
 export CLEANUP="false"
 
+#How oftern do you want  update_cleanup.php and removespecial.php to run, in seconds
+export CLEANUP_TIMER="3600"
+
 #Choose to run update_parsing.php true/false
 #set to false by default, you will need to edit /misc/testing/update_parsing.php
 #to actually do anything, directions are in the file
 export PARSING="false"
+
+#How oftern do you want update_parsing.php to run, in seconds
+export PARSING_TIMER="3600"
 
 #Choose to run update_binaries true/false
 export BINARIES="true"
@@ -95,6 +101,9 @@ export BACKFILL_MAX_RELEASES="0"
 #Set the max amount of unprocessed releases and still allow update_releases to run
 #set to 0 to disable
 export MAX_RELEASES="0"
+
+#How often to update the PreDB in seconds
+export PREDB_TIMER="900"
 
 #Specify your SED binary
 export SED="/bin/sed"
