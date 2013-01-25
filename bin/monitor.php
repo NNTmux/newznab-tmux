@@ -73,7 +73,11 @@ function getFileCount($directory) {
   return $filecount;
 }
 
-
+function microtime_float()
+{
+  list($usec, $sec) = explode(" ", microtime());
+  return ((float)$usec + (float)$sec);
+}
 
 
 $_nzbs_to_import_begin=getFileCount($array['NZBS']);
@@ -105,7 +109,7 @@ $time7 = TIME();
 $i=1;
 while($i>0)
 {
-  $time_loop_start=TIME();
+  $time_loop_start=microtime_float();
   $varnames = shell_exec("cat ../edit_these.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
   $vardata = shell_exec('cat ../edit_these.sh | grep ^export | cut -d \" -f2 | awk "{print $1;}"');
   $varnames = explode("\n", $varnames);
@@ -113,6 +117,7 @@ while($i>0)
   $array = array_combine($varnames, $vardata);
   unset($array['']);
 
+  $getvars_timer = microtime_float()-$time_loop_start;
 
 
   $secs = TIME() - $time;
@@ -128,11 +133,10 @@ while($i>0)
   $releases_loop = $db->query($releases_query);
   $releases_loop = $releases_loop[0]['cnt'];
 
-  $sleeptime = getenv('MONITOR_UPDATE');
   if ($i!=1) {
-    sleep($sleeptime);
+    sleep($array['MONITOR_UPDATE']);
   }
-  $short_sleep = $sleeptime;
+  $short_sleep = $array['MONITOR_UPDATE'];
 
   //get totals inside loop
   $nfo_remaining_now = $db->query($nfo_remaining_query);
@@ -171,13 +175,19 @@ while($i>0)
   $releases_since_loop = $releases_now - $releases_loop;
   $additional_releases_now = $releases_now - $book_releases_now - $console_releases_now - $movie_releases_now - $music_releases_now - $pc_releases_now - $tvrage_releases_now;
   $total_work_now = $work_remaining_now + $tvrage_releases_proc + $music_releases_proc + $movie_releases_proc + $console_releases_proc + $book_releases_proc;
-  $_nzbs_to_import_now=getFileCount($array['NZBS']);
-  $_nzbs_process = $_nzbs_to_import_begin - $_nzbs_to_import_now;
 
   $parts_rows = $db->query($parts_query);
   $parts_rows = $parts_rows[0]['cnt'];
   $parts_size_gb = $db->query($parts_size);
   $parts_size_gb = $parts_size_gb[0]['cnt'];
+
+  $query_timer = microtime_float()-$time_loop_start-$getvars_timer;
+
+
+  $nzb_timer_start=microtime_float();
+  $_nzbs_to_import_now=getFileCount($array['NZBS']);
+  $_nzbs_process = $_nzbs_to_import_begin - $_nzbs_to_import_now;
+  $nzb_timer_end=microtime_float()-$nzb_timer_start;
 
   if ( $releases_since_start > 0 ) { $signed = "+"; }
   else { $signed = ""; }
@@ -195,10 +205,9 @@ while($i>0)
   elseif ( $hr > 0 ) { $time_string = "\033[38;5;208m$hr\033[0m $string_hr, \033[1;31m$min\033[0m $string_min."; }
   else { $time_string = "\033[1;31m$min\033[0m $string_min."; }
 
-
   passthru('clear');
   printf("\033[1;31mMonitor\033[0m has been running for: $time_string\n");
-  printf("\033[1;31m$releases_since_loop\033[0m releases added in the previous \033[1;31m$sleeptime\033[0m seconds.\n");
+  printf("\033[1;31m$releases_since_loop\033[0m releases added in the previous \033[1;31m{$array['MONITOR_UPDATE']}\033[0m seconds.\n");
   printf("\033[1;31m$releases_now($signed$releases_since_start)\033[0m releases in your database.\n");
   printf("\033[1;31m$total_work_now\033[0m releases left to postprocess.");
   if ( $array['MAX_RELEASES'] != 0 ) { printf(" update_binaries, backfill and nzb-import will stop running when you exceed {$array['MAX_RELEASES']}\n\n\033[1;33m"); }
@@ -220,6 +229,8 @@ while($i>0)
   printf("\n \033[0mThe parts table has \033[1;31m$parts_rows\033[0m rows and is \033[1;31m$parts_size_gb\033[0m\n");
   $NNPATH="{$array['NEWZPATH']}{$array['NEWZNAB_PATH']}";
   $TESTING="{$array['NEWZPATH']}{$array['TESTING_PATH']}";
+  $render_timer=microtime_float()-$time_loop_start-$getvars_timer-$query_timer-$nzb_timer_end;
+
 
   //run update_predb.php in 1.0 ever 15 minutes
   if ((TIME() - $time2) >= $array['PREDB_TIMER'] ) {
@@ -411,8 +422,26 @@ while($i>0)
       shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.7 'echo \"\033[1;34m\nOnly active when releases to postprocess exceed 900. $_string1\"' 2>&1 1> /dev/null");
     }
   }
-  $lagg=(TIME()-$time_loop_start);
-  printf(" Current lag(processing time) is \033[1;31m$lagg\033[0m seconds per loop, after  \033[1;31m$i\033[0m loops.");
+
+  $mask = "%16s %10.10s %10s \n";
+  printf("\n\n\033[1;33m");
+  printf($mask, "Category", "Time", "Status");
+  printf($mask, "===============", "==========", "==========\033[0m");
+  printf($mask, "Get Environ","$getvars_timer","available");
+  printf($mask, "Queries","$query_timer","queried");
+  printf($mask, "Count NZBs","$nzb_timer_end", "counted");
+  printf($mask, "Render 1st","$render_timer","rendered");
+  $lagg=microtime_float()-$time_loop_start;
+  $start_timer=$lagg-$render_timer-$nzb_timer_end-$query_timer-$getvars_timer;
+  printf($mask, "Check Scripts","$start_timer","rendered");
+  printf($mask, "Total Lagg","$lagg","running");
+  $loop_time=$lagg+$array['MONITOR_UPDATE'];
+  printf($mask, "Total loop","$loop_time","running");
+
+
+
+
+
   if ( $array['RUNNING'] == "true" ) {
     $i++;
   } else {

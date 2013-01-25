@@ -58,7 +58,7 @@ $TMUXCMD selectp -t 0
 $TMUXCMD splitw -h -p 72 'echo "..."'
 $TMUXCMD splitw -h -p 50 'echo "..."'
 $TMUXCMD selectp -t 0
-$TMUXCMD splitw -v -p 67 'echo "..."'
+$TMUXCMD splitw -v -p 50 'echo "..."'
 $TMUXCMD splitw -v -p 50 'echo "..."'
 #$TMUXCMD splitw -v -p 75 'echo "..."'
 #$TMUXCMD splitw -v -p 67 'echo "..."'
