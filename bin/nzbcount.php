@@ -17,9 +17,9 @@ while ($i==0) {
     $subdir_count_loop = 0;
     system("clear");
     printf("\033[1;33m");
-    $mask = "%16s %10.10s %10.10s \n";
+    $mask = "%16s %10.10s %10s \n";
     printf($mask, "Folder Name", "In Folder", "Processed");
-    printf($mask, "===============", "==========", "==========");
+    printf($mask, "===============", "==========", "==========\033[0m");
     foreach($subdirs AS $subdir){
       $folder=basename("$subdir");
       $filecount = count(glob($subdir."/*.nzb"));
@@ -35,9 +35,9 @@ while ($i==0) {
     $folder=basename("$path");
     system("clear");
     printf("\033[1;33m");
-    $mask = "%16s %10.10s %10.10s \n";
+    $mask = "%16s %10.10s %10s \n";
     printf($mask, "Folder Name", "In Folder", "Processed");
-    printf($mask, "===============", "==========", "==========");
+    printf($mask, "===============", "==========", "==========\033[0m");
     printf($mask, "$folder","$filecount","$processed");
   }
   sleep(30);

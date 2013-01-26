@@ -427,7 +427,7 @@ while($i>0)
 
   $script_timer = microtime_float() - $script_timer_start;
 
-  $mask = "%16.16s %10.10s %10.10s \n";
+  $mask = "%16s %10.10s %10s \n";
   printf("\n\033[1;33m");
   printf($mask, "Category", "Time", "Status");
   printf($mask, "===============", "==========", "==========\033[0m");
