@@ -26,23 +26,23 @@ export POST_TO_RUN="1"
 export TMUX_SESSION="Newznab-master"
 
 #Set, in seconds - how often the monitor.php (left top pane) script should update, 0 may cause errors
-export MONITOR_UPDATE="10"
+export MONITOR_UPDATE="30"
 
 #Set, in seconds - how long the update_binaries should sleep between runs, 0 may cause errors
 #top right pane
-export NNTP_SLEEP="20"
+export NNTP_SLEEP="40"
 
 #Set, in seconds - how long the backfill should sleep between runs, 0 may cause errors
 #below update_binaries
-export BACKFILL_SLEEP="20"
+export BACKFILL_SLEEP="40"
 
 #Set, in seconds - how long the nzb-import should sleep between runs, 0 may cause errors
 #below backfill
-export IMPORT_SLEEP="20"
+export IMPORT_SLEEP="40"
 
 #Set, in seconds - how long the update_release should sleep between runs, 0 may cause errors
 #bottom right
-export RELEASES_SLEEP="20"
+export RELEASES_SLEEP="40"
 
 #Set the maximum days to backfill, you set the nn+ admin/edit backfill to 1
 #this will increment your database by 1 after each backfill loop
@@ -50,7 +50,7 @@ export RELEASES_SLEEP="20"
 #backfill will continue to run, and do no work, at that point you should disable backfill, below
 export MAXDAYS="210"
 
-#Set the path to the nzb dump you downloaded from torrents, theis is the path to bulk files folder of nzbs
+#Set the path to the nzb dump you downloaded from torrents, this is the path to bulk files folder of nzbs
 #this does not recurse through subfolders
 export NZBS="/path/to/nzbs"
 
@@ -60,7 +60,7 @@ export NZBS="/path/to/nzbs"
 export NZBMULTI="false"
 
 #How many nzbs to import per loop, if using NZBMULTI="true" the per folder
-export NZBCOUNT="10"
+export NZBCOUNT="50"
 
 #Choose to run the threaded or non-threaded newznab scripts true/false
 #such as update_binaries.php or update_binaries_threaded.php
@@ -84,7 +84,7 @@ export CLEANUP_TIMER="3600"
 export PARSING="false"
 
 #How oftern do you want update_parsing.php to run, in seconds
-export PARSING_TIMER="10"
+export PARSING_TIMER="3600"
 
 #Choose to run update_binaries true/false
 export BINARIES="true"
