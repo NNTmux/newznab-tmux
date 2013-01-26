@@ -17,7 +17,7 @@ export ADMIN_PATH=$NEWZPATH"/www/admin"
 
 #Post Processing Additional is the processing that downloads rar files and attempts to get info for your site
 #you are able to set the number of process to be run from 1-9
-#trial and error for this and do to the sorting method 1 runs always, 2 if more than 200, 3 more than 300 and so on.
+#trial and error for this, 1 runs always, 2 if more than 200, 3 more than 300 and so on.
 #At some point, increasing this begins to slow things down. It will need to be adjusted for your system
 #to get the desired performance
 export POST_TO_RUN="1"
@@ -84,7 +84,7 @@ export CLEANUP_TIMER="3600"
 export PARSING="false"
 
 #How oftern do you want update_parsing.php to run, in seconds
-export PARSING_TIMER="3600"
+export PARSING_TIMER="30"
 
 #Choose to run update_binaries true/false
 export BINARIES="true"
@@ -115,7 +115,7 @@ export MAX_RELEASES="0"
 export PREDB_TIMER="900"
 
 #How often to update the TV Schedule and the In Theaters in seconds
-export TVRAGE_TIMER="10"
+export TVRAGE_TIMER="43200"
 
 #Specify your SED binary
 export SED="/bin/sed"
