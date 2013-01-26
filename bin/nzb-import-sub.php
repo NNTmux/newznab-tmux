@@ -2,15 +2,15 @@
 require_once("config.php");
 require_once(WWW_DIR.'/lib/powerprocess.php');
 $dirroot = $argv[1];
-$subdirs = array_filter(glob($dirroot."/*"), 'is_dir');
+$subdirs = array_filter(glob($dirroot."/*", GLOB_ONLYDIR|GLOB_NOSORT));
 $subdir_count = 0;
 
 foreach($subdirs AS $subdir){
-	$filecount = count(glob($subdir."/*.nzb"));
-	if($filecount > 0){
-		echo "Directory {$subdir} contains {$filecount} nzb's.\n";
+	//$filecount = count(glob($subdir."/*.nzb"));
+	//if($filecount > 0){
+		//echo "Directory {$subdir} contains {$filecount} nzb's.\n";
 		$subdir_count++;
-	}
+	//}
 }
 
 if($subdir_count == 0){
@@ -22,7 +22,7 @@ $ps = new PowerProcess;
 $ps->RegisterCallback('psUpdateComplete');
 $ps->maxThreads = 20;
 $ps->threadTimeLimit = 0;
-$selected = $subdir_count-1;
+$selected = $subdir_count - 1;
 
 $varnames = shell_exec("cat ../edit_these.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
 $vardata = shell_exec('cat ../edit_these.sh | grep ^export | cut -d \" -f2 | awk "{print $1;}"');

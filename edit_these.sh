@@ -26,7 +26,7 @@ export POST_TO_RUN="1"
 export TMUX_SESSION="Newznab-master"
 
 #Set, in seconds - how often the monitor.php (left top pane) script should update, 0 may cause errors
-export MONITOR_UPDATE="20"
+export MONITOR_UPDATE="10"
 
 #Set, in seconds - how long the update_binaries should sleep between runs, 0 may cause errors
 #top right pane
@@ -84,7 +84,7 @@ export CLEANUP_TIMER="3600"
 export PARSING="false"
 
 #How oftern do you want update_parsing.php to run, in seconds
-export PARSING_TIMER="30"
+export PARSING_TIMER="10"
 
 #Choose to run update_binaries true/false
 export BINARIES="true"

@@ -58,18 +58,23 @@ $TMUXCMD selectp -t 0
 $TMUXCMD splitw -h -p 72 'echo "..."'
 $TMUXCMD splitw -h -p 50 'echo "..."'
 $TMUXCMD selectp -t 0
-$TMUXCMD splitw -v -p 50 'echo "..."'
+$TMUXCMD splitw -v -p 60 'echo "..."'
+if [[ $NZBMULTI == "true" ]]; then
+  $TMUXCMD splitw -v -p 60 'echo "..."'
+else
+  $TMUXCMD splitw -v -p 85 'echo "..."'
+fi
 $TMUXCMD splitw -v -p 50 'echo "..."'
 #$TMUXCMD splitw -v -p 75 'echo "..."'
 #$TMUXCMD splitw -v -p 67 'echo "..."'
 #$TMUXCMD splitw -v -p 50 'echo "..."'
-$TMUXCMD selectp -t 3
+$TMUXCMD selectp -t 4
 $TMUXCMD splitw -v -p 83 'echo "..."'
 $TMUXCMD splitw -v -p 80 'echo "..."'
 $TMUXCMD splitw -v -p 75 'echo "..."'
 $TMUXCMD splitw -v -p 67 'echo "..."'
 $TMUXCMD splitw -v -p 50 'echo "..."'
-$TMUXCMD selectp -t 9
+$TMUXCMD selectp -t 10
 $TMUXCMD splitw -v -p 75 'echo "..."'
 $TMUXCMD splitw -v -p 67 'echo "..."'
 $TMUXCMD splitw -v -p 50 'echo "..."'
