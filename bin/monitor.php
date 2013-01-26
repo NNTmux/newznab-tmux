@@ -132,6 +132,7 @@ while($i>0)
   $pc_releases_now = $initquery['4000'];
   $tvrage_releases_now = $initquery['5000'];
   $book_releases_now = $initquery['7000'];
+  $misc_releases_now = $initquery['8000'];
 
   $console_releases_proc = $db->query($console_query);
   $console_releases_proc = $console_releases_proc[0]['cnt'];
@@ -149,7 +150,6 @@ while($i>0)
   $work_remaining_now = $work_remaining_now[0]['cnt'];
   $releases_since_start = $releases_now - $releases_start;
   $releases_since_loop = $releases_now - $releases_loop;
-  $additional_releases_now = $releases_now - $book_releases_now - $console_releases_now - $movie_releases_now - $music_releases_now - $pc_releases_now - $tvrage_releases_now;
   $total_work_now = $work_remaining_now + $tvrage_releases_proc + $music_releases_proc + $movie_releases_proc + $console_releases_proc + $book_releases_proc;
 
   $parts_rows = $db->query($parts_query);
@@ -196,15 +196,14 @@ while($i>0)
   printf($mask, "Category", "In Process", "In Database");
   printf($mask, "===============", "==========", "==========\033[0m");
   printf($mask, "NFO's","$nfo_remaining_now","$nfo_now");
-  printf($mask, "Books(7020)","$book_releases_proc","$book_releases_now");
   printf($mask, "Console(1000)","$console_releases_proc","$console_releases_now");
   printf($mask, "Movie(2000)","$movie_releases_proc","$movie_releases_now");
   printf($mask, "Audio(3000)","$music_releases_proc","$music_releases_now");
   printf($mask, "PC(4000)","$pc_releases_proc","$pc_releases_now");
   printf($mask, "TVShows(5000)","$tvrage_releases_proc","$tvrage_releases_now");
-  printf($mask, "Additional Proc","$work_remaining_now","$additional_releases_now");
-  $parts_rows = number_format("$parts_rows");
-  printf("\n \033[0mThe parts table has \033[1;31m$parts_rows\033[0m rows and is \033[1;31m$parts_size_gb\033[0m\n");
+  printf($mask, "Books(7000)","$book_releases_proc","$book_releases_now");
+  printf($mask, "Misc(8000)","$work_remaining_now","$misc_releases_now");
+
   $NNPATH="{$array['NEWZPATH']}{$array['NEWZNAB_PATH']}";
   $TESTING="{$array['NEWZPATH']}{$array['TESTING_PATH']}";
 
@@ -435,6 +434,8 @@ while($i>0)
   printf($mask, "Check Scripts","$script_timer","started");
   $lagg=microtime_float()-$time_loop_start;
   printf($mask, "Total Lagg","$lagg","complete");
+  $parts_rows = number_format("$parts_rows");
+  printf("\n \033[0mThe parts table has \033[1;31m$parts_rows\033[0m rows and is \033[1;31m$parts_size_gb\033[0m\n");
 
   if ( $array['RUNNING'] == "true" ) {
     $i++;
