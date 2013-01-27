@@ -57,7 +57,7 @@ export NZBS="/path/to/nzbs"
 #If you have all of your nzbs in one folder select false
 #If, you have all of you nzbs split into separate in with the root at $NZBS then select true
 #and 10 nzbs will be imported from each subfolder per loop.
-export NZBMULTI="false"
+export NZB_THREADS="true"
 
 #How many nzbs to import per loop, if using NZBMULTI="true" the per folder
 export NZBCOUNT="10"
@@ -91,7 +91,7 @@ export PARSING="false"
 export PARSING_TIMER="3600"
 
 #Choose to run update_binaries true/false
-export BINARIES="true"
+export BINARIES="false"
 
 #Choose to run backfill script true/false
 export BACKFILL="true"
@@ -134,6 +134,10 @@ export USE_IOTOP="false"
 export USE_MYTOP="false"
 export USE_VNSTAT="false"
 export USE_IFTOP="false"
+
+#Enable logging, this is pretty basic logging, a timpstamp and numbers from db
+#logs are kept in log folder
+export LOGGING="false"
 
 #By using this script you understand that the programmer is not responsible for any loss of data, users, or sanity.
 #You also agree that you were smart enough to make a backup of your database and files. Do you agree? yes/no
