@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 #EDIT_THESE
 export NEWZPATH="/var/www/newznab"
 export PASSWORD="password"

@@ -59,7 +59,7 @@ export NZBS="/path/to/nzbs"
 #and 10 nzbs will be imported from each subfolder per loop.
 export NZB_THREADS="true"
 
-#How many nzbs to import per loop, if using NZBMULTI="true" the per folder
+#How many nzbs to import per loop, if using NZBMULTI=true the per folder
 export NZBCOUNT="10"
 
 #Choose to run the threaded or non-threaded newznab binaries scripts true/false
@@ -91,7 +91,7 @@ export PARSING="false"
 export PARSING_TIMER="3600"
 
 #Choose to run update_binaries true/false
-export BINARIES="false"
+export BINARIES="true"
 
 #Choose to run backfill script true/false
 export BACKFILL="true"
