@@ -19,7 +19,7 @@ export ADMIN_PATH=$NEWZPATH"/www/admin"
 #you are able to set the number of process to be run from 1-9
 #trial and error for this, 1 runs always, 2 if more than 200, 3 more than 300 and so on.
 #At some point, increasing this begins to slow things down. It will need to be adjusted for your system
-#to get the desired performance
+#to get the desired performance, 0 will disable all post processing
 export POST_TO_RUN="1"
 
 #Enter the session name to be used by tmux
@@ -62,9 +62,13 @@ export NZBMULTI="false"
 #How many nzbs to import per loop, if using NZBMULTI="true" the per folder
 export NZBCOUNT="50"
 
-#Choose to run the threaded or non-threaded newznab scripts true/false
-#such as update_binaries.php or update_binaries_threaded.php
-export THREADS="true"
+#Choose to run the threaded or non-threaded newznab binaries scripts true/false
+#update_binaries.php or update_binaries_threaded.php
+export UPDATE_THREADS="true"
+
+#Choose to run the threaded or non-threaded newznab backfill scripts true/false
+#backfill.php or backfill_threaded.php
+export BACKFILL_THREADS="true"
 
 #Choose your database engine, comment the one true/false
 #you should have already converted your database to InnoDB engine, if you select true here
@@ -87,7 +91,7 @@ export PARSING="false"
 export PARSING_TIMER="3600"
 
 #Choose to run update_binaries true/false
-export BINARIES="true"
+export BINARIES="false"
 
 #Choose to run backfill script true/false
 export BACKFILL="true"
