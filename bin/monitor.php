@@ -11,10 +11,10 @@ $qry="SELECT COUNT( releases.categoryID ) AS cnt, parentID FROM releases JOIN ca
 
 //needs to be processed query
 $_DB_NAME = getenv('DB_NAME');
-$proc="SELECT ( SELECT COUNT( releasenfoID ) AS cnt from releases where consoleinfoID IS NULL and categoryID BETWEEN 1000 AND 1999 ) AS console, ( SELECT COUNT( releasenfoID ) AS cnt from releases where imdbID IS NULL and categoryID BETWEEN 2000 AND 2999 ) AS movies, ( SELECT COUNT( releasenfoID ) AS cnt from releases where musicinfoID IS NULL and categoryID BETWEEN 3000 AND 3999 ) AS audio, ( SELECT COUNT( releasenfoID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (categoryID BETWEEN 4000 AND 4999 and ((r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)))) AS pc, ( SELECT COUNT( releasenfoID ) AS cnt from releases where rageID = -1 and categoryID BETWEEN 5000 AND 5999 ) AS tv, ( SELECT COUNT( releasenfoID ) AS cnt from releases where bookinfoID IS NULL and categoryID = 7020 ) AS book, ( SELECT COUNT( releasenfoID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)) AS work, ( SELECT COUNT( releasenfoID ) AS cnt from releases) AS releases, ( SELECT COUNT( releasenfoID ) AS cnt FROM releases r WHERE r.releasenfoID = 0) AS nforemains, ( SELECT count( releasenfoID ) AS cnt FROM releases WHERE releasenfoID not in (0, -1)) AS nfo, ( SELECT table_rows AS cnt FROM information_schema.TABLES where table_name = 'parts' AND TABLE_SCHEMA = '".$_DB_NAME."' ) AS parts, ( SELECT concat(round((data_length+index_length)/(1024*1024*1024),2),'GB') AS cnt FROM information_schema.tables where table_name = 'parts' AND TABLE_SCHEMA = '".$_DB_NAME."' ) AS partsize;";
+$proc="SELECT ( SELECT COUNT( groupID ) AS cnt from releases where consoleinfoID IS NULL and categoryID BETWEEN 1000 AND 1999 ) AS console, ( SELECT COUNT( groupID ) AS cnt from releases where imdbID IS NULL and categoryID BETWEEN 2000 AND 2999 ) AS movies, ( SELECT COUNT( groupID ) AS cnt from releases where musicinfoID IS NULL and categoryID BETWEEN 3000 AND 3999 ) AS audio, ( SELECT COUNT( groupID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (categoryID BETWEEN 4000 AND 4999 and ((r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)))) AS pc, ( SELECT COUNT( groupID ) AS cnt from releases where rageID = -1 and categoryID BETWEEN 5000 AND 5999 ) AS tv, ( SELECT COUNT( groupID ) AS cnt from releases where bookinfoID IS NULL and categoryID = 7020 ) AS book, ( SELECT COUNT( groupID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)) AS work, ( SELECT COUNT( groupID ) AS cnt from releases) AS releases, ( SELECT COUNT( groupID ) AS cnt FROM releases r WHERE r.releasenfoID = 0) AS nforemains, ( SELECT COUNT( groupID ) AS cnt FROM releases WHERE releasenfoID not in (0, -1)) AS nfo, ( SELECT table_rows AS cnt FROM information_schema.TABLES where table_name = 'parts' AND TABLE_SCHEMA = '".$_DB_NAME."' ) AS parts, ( SELECT concat(round((data_length+index_length)/(1024*1024*1024),2),'GB') AS cnt FROM information_schema.tables where table_name = 'parts' AND TABLE_SCHEMA = '".$_DB_NAME."' ) AS partsize;";
 
 //initial query for total releases
-$releases_query = "SELECT COUNT( releasenfoID ) AS cnt from releases;";
+$releases_query = "SELECT COUNT( groupID ) AS cnt from releases;";
 $releases_start = $db->query($releases_query);
 $releases_start = $releases_start[0]['cnt'];
 
@@ -258,7 +258,7 @@ while($i>0)
   }
 
   //set command for running update_binaries
-  if ( $array['UPDATE_THREADS'] == "true" ) {
+  if ( $array['BINARIES_THREADS'] == "true" ) {
     $_update_cmd = 'update_binaries_threaded.php';
   } else {
     $_update_cmd = 'update_binaries.php';
@@ -280,7 +280,7 @@ while($i>0)
 
   //runs update_binaries in 0.10 once if needed and exits
   if (( $array['BINARIES'] == "true" ) && (( $total_work_now < $array['MAX_RELEASES'] ) || ( $array['MAX_RELEASES'] == 0 ))) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.10 'echo \"\033[1;34m\" && cd $NNPATH && $_php $_update_cmd && date && echo \"$_sleep_string {$array['NNTP_SLEEP']} seconds...\" && sleep {$array['NNTP_SLEEP']}' 2>&1 1> /dev/null");
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.10 'echo \"\033[1;34m\" && cd $NNPATH && $_php $_update_cmd && date && echo \"$_sleep_string {$array['BINARIES_SLEEP']} seconds...\" && sleep {$array['BINARIES_SLEEP']}' 2>&1 1> /dev/null");
   }
 
   //runs backfill in 0.11 once if needed and exits
