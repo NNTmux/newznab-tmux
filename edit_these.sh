@@ -29,7 +29,7 @@ export TMUX_SESSION="Newznab"
 export MONITOR_UPDATE="30"
 
 #Choose to run update_binaries true/false
-export BINARIES="true"
+export BINARIES="false"
 
 #Choose to run the threaded or non-threaded newznab binaries scripts true/false
 #update_binaries.php or update_binaries_threaded.php
@@ -93,12 +93,6 @@ export RELEASES_SLEEP="40"
 #Set the max amount of unprocessed releases and still allow update_releases to run
 #set to 0 to disable
 export MAX_RELEASES="0"
-
-#Set the maximum days to backfill, you set the nn+ admin/edit backfill to 1
-#this will increment your database by 1 after each backfill loop
-#once your backfill numbers reach $MAXDAYS, then it will no long increment the database
-#backfill will continue to run, and do no work, at that point you should disable backfill, below
-export MAXDAYS="210"
 
 #Choose your database engine, comment the one true/false
 #you should have already converted your database to InnoDB engine, if you select true here
