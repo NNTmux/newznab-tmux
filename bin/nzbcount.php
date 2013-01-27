@@ -1,6 +1,7 @@
 <?php
 
 $subdir_count_now = 0;
+$filecount=0;
 
 $i=0;
 while ($i==0) {
@@ -47,15 +48,15 @@ while ($i==0) {
     printf($mask, "Total","$toprocess","$totalproc");
   } else {
     $filecount0 = count(glob($path.'/*.nzb'));
-    $filecount = count(glob($path.'/*.nzb'));
-    $processed=$filecount0-$filecount;
+    if ( $filecount == 0 ) { $filecount = $filecount0; }
+    $processed=$filecount-$filecount0;
     $folder=basename("$path");
     system('clear');
     printf("\n\033[1;33m");
     $mask = "%16s %10.10s %10s \n";
     printf($mask, "Folder Name", "In Folder", "Imported");
     printf($mask, "===============", "==========", "==========\033[0m");
-    printf($mask, "$folder","$filecount","$processed");
+    printf($mask, "$folder","$filecount0","$processed");
   }
-  sleep(90);
+  sleep(5);
 }
