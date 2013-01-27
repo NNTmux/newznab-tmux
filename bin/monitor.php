@@ -5,52 +5,18 @@ require_once(WWW_DIR."/lib/postprocess.php");
 
 $db = new DB();
 
+//totals per category in db, results by parentID
 $qry="SELECT COUNT( releases.categoryID ) AS cnt, parentID FROM releases JOIN category ON releases.categoryID = category.ID GROUP BY parentID;";
 
-$result = $db->query($qry);
+//needs to be processed query
+$proc="SELECT ( SELECT COUNT( releasenfoID ) AS cnt from releases where consoleinfoID IS NULL and categoryID BETWEEN 1000 AND 1999 ) AS console, ( SELECT COUNT( releasenfoID ) AS cnt from releases where imdbID IS NULL and categoryID BETWEEN 2000 AND 2999 ) AS movies, ( SELECT COUNT( releasenfoID ) AS cnt from releases where musicinfoID IS NULL and categoryID BETWEEN 3000 AND 3999 ) AS audio, ( SELECT COUNT( releasenfoID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (categoryID BETWEEN 3000 AND 3999 and ((r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)))) AS pc, ( SELECT COUNT( releasenfoID ) AS cnt from releases where rageID IS NULL and categoryID BETWEEN 5000 AND 5999 ) AS tv, ( SELECT COUNT( releasenfoID ) from releases where bookinfoID IS NULL and categoryID = 7020 ) AS book, (SELECT COUNT( releasenfoID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)) AS work, (SELECT COUNT( releasenfoID ) AS cnt from releases) AS releases, (SELECT COUNT( releasenfoID ) AS cnt FROM releases r WHERE r.releasenfoID = 0) AS nforemains, (SELECT count( releasenfoID ) AS cnt FROM releases WHERE releasenfoID not in (0, -1)) AS nfo, (SELECT table_rows AS cnt FROM information_schema.TABLES where table_name = 'parts') AS parts, (SELECT concat(round((data_length+index_length)/(1024*1024*1024),2),'GB') AS cnt FROM information_schema.tables where table_name = 'parts') AS partsize;";
 
-$initquery = array();
-foreach ($result as $cat=>$sub)
-{
-
-$initquery[$sub['parentID']] = $sub['cnt'];
-}
-
-
-//initial queries
-//books to process
-$book_query = "SELECT COUNT( releasenfoID ) AS cnt from releases where bookinfoID IS NULL and categoryID = 7020;";
-//console to process
-$console_query = "SELECT COUNT( releasenfoID ) AS cnt from releases where consoleinfoID IS NULL and categoryID in ( select ID from category where parentID = 1000 );";
-//movie to process
-$movie_query = "SELECT COUNT( releasenfoID ) AS cnt from releases where imdbID IS NULL and categoryID in ( select ID from category where parentID = 2000 );";
-//music to process
-$music_query = "SELECT COUNT( releasenfoID ) AS cnt from releases where musicinfoID IS NULL and categoryID in ( select ID from category where parentID = 3000 );";
-//pc to process
-$pc_query = "SELECT COUNT( releasenfoID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (categoryID in ( select ID from category where parentID = 4000)) and ((r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0));";
-//tv to process
-$tvrage_query = "SELECT COUNT( releasenfoID ) AS cnt from releases where rageID = -1 and categoryID in ( select ID from category where parentID = 5000 );";
-//tv in db
-
-
+//initial query for total releases
 $releases_query = "SELECT COUNT( releasenfoID ) AS cnt from releases;";
-//realeases to postprocess
-$work_remaining_query = "SELECT COUNT( releasenfoID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0);";
-//nfos to process
-$nfo_remaining_query = "SELECT COUNT( releasenfoID ) AS cnt FROM releases r WHERE r.releasenfoID = 0;";
-//nfos in db
-$nfo_query = "SELECT count( releasenfoID ) AS cnt FROM releases WHERE releasenfoID not in (0, -1);";
-
-//parts row count
-$parts_query = "SELECT table_rows AS cnt FROM information_schema.TABLES where table_name = 'parts';";
-//parts table size
-$parts_size = "SELECT concat(round((data_length+index_length)/(1024*1024*1024),2),'GB') AS cnt FROM information_schema.tables where table_name = 'parts';";
-
-//initial counts
 $releases_start = $db->query($releases_query);
 $releases_start = $releases_start[0]['cnt'];
 
-
+//get variables from edit_these.sh
 $varnames = shell_exec("cat ../edit_these.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
 $vardata = shell_exec('cat ../edit_these.sh | grep ^export | cut -d \" -f2 | awk "{print $1;}"');
 $varnames = explode("\n", $varnames);
@@ -99,6 +65,7 @@ while($i>0)
 {
   $time_loop_start = microtime_float();
 
+  //chack variables again during loop
   $varnames = shell_exec("cat ../edit_these.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
   $vardata = shell_exec('cat ../edit_these.sh | grep ^export | cut -d \" -f2 | awk "{print $1;}"');
   $varnames = explode("\n", $varnames);
@@ -114,18 +81,14 @@ while($i>0)
 
   $query_timer_start=microtime_float();
 
-  //loop counts
-  $releases_loop = $db->query($releases_query);
-  $releases_loop = $releases_loop[0]['cnt'];
-
-  //get totals inside loop
-  $nfo_remaining_now = $db->query($nfo_remaining_query);
-  $nfo_remaining_now = $nfo_remaining_now[0]['cnt'];
-  $nfo_now = $db->query($nfo_query);
-  $nfo_now = $nfo_now[0]['cnt'];
-  $book_releases_proc = $db->query($book_query);
-  $book_releases_proc = $book_releases_proc[0]['cnt'];
-
+  //new queries
+  $result = $db->query($qry);
+  $initquery = array();
+  foreach ($result as $cat=>$sub)
+  {
+    $initquery[$sub['parentID']] = $sub['cnt'];
+  }
+  $proc_result = $db->query($proc);
   $console_releases_now = $initquery['1000'];
   $movie_releases_now = $initquery['2000'];
   $music_releases_now = $initquery['3000'];
@@ -133,29 +96,23 @@ while($i>0)
   $tvrage_releases_now = $initquery['5000'];
   $book_releases_now = $initquery['7000'];
   $misc_releases_now = $initquery['8000'];
+  $console_releases_proc = $proc_result[0]['console'];
+  $movie_releases_proc = $proc_result[0]['movies'];
+  $music_releases_proc = $proc_result[0]['audio'];
+  $pc_releases_proc = $proc_result[0]['pc'];
+  $tvrage_releases_proc = $proc_result[0]['tv'];
+  $work_remaining_now = $proc_result[0]['work'];
+  $book_releases_proc = $proc_result[0]['book'];
+  $releases_loop = $proc_result[0]['releases'];
+  $nfo_remaining_now = $proc_result[0]['nforemains'];
+  $nfo_now = $proc_result[0]['nfo'];
+  $parts_rows = $proc_result[0]['parts'];
+  $parts_size_gb = $proc_result[0]['partsize'];
+  $releases_now = $proc_result[0]['releases'];
 
-  $console_releases_proc = $db->query($console_query);
-  $console_releases_proc = $console_releases_proc[0]['cnt'];
-  $movie_releases_proc = $db->query($movie_query);
-  $movie_releases_proc = $movie_releases_proc[0]['cnt'];
-  $music_releases_proc = $db->query($music_query);
-  $music_releases_proc = $music_releases_proc[0]['cnt'];
-  $pc_releases_proc = $db->query($pc_query);
-  $pc_releases_proc = $pc_releases_proc[0]['cnt'];
-  $tvrage_releases_proc = $db->query($tvrage_query);
-  $tvrage_releases_proc = $tvrage_releases_proc[0]['cnt'];
-  $releases_now = $db->query($releases_query);
-  $releases_now = $releases_now[0]['cnt'];
-  $work_remaining_now = $db->query($work_remaining_query);
-  $work_remaining_now = $work_remaining_now[0]['cnt'];
+  //calculate releases difference
   $releases_since_start = $releases_now - $releases_start;
-  $releases_since_loop = $releases_now - $releases_loop;
   $total_work_now = $work_remaining_now + $tvrage_releases_proc + $music_releases_proc + $movie_releases_proc + $console_releases_proc + $book_releases_proc;
-
-  $parts_rows = $db->query($parts_query);
-  $parts_rows = $parts_rows[0]['cnt'];
-  $parts_size_gb = $db->query($parts_size);
-  $parts_size_gb = $parts_size_gb[0]['cnt'];
 
   $query_timer = microtime_float()-$query_timer_start;
 
@@ -186,7 +143,6 @@ while($i>0)
 
   passthru('clear');
   printf("\033[1;31mMonitor\033[0m has been running for: $time_string\n");
-  printf("\033[1;31m$releases_since_loop\033[0m releases added in the previous \033[1;31m{$array['MONITOR_UPDATE']}\033[0m seconds.\n");
   printf("\033[1;31m$releases_now($signed$releases_since_start)\033[0m releases in your database.\n");
   printf("\033[1;31m$total_work_now\033[0m releases left to postprocess.");
   if ( $array['MAX_RELEASES'] != 0 ) { printf(" update_binaries, backfill and nzb-import will stop running when you exceed {$array['MAX_RELEASES']}\n\n\033[1;33m"); }
@@ -206,6 +162,12 @@ while($i>0)
 
   $NNPATH="{$array['NEWZPATH']}{$array['NEWZNAB_PATH']}";
   $TESTING="{$array['NEWZPATH']}{$array['TESTING_PATH']}";
+
+  $mask = "%16s %10.10s %10s \n";
+  printf("\n\033[1;33m");
+  printf($mask, "Category", "Time", "Status");
+  printf($mask, "===============", "==========", "==========\033[0m");
+  printf($mask, "Queries","$query_timer","queried");
 
   $script_timer_start = microtime_float();
   //run update_predb.php in 1.0 ever 15 minutes
@@ -426,11 +388,6 @@ while($i>0)
 
   $script_timer = microtime_float() - $script_timer_start;
 
-  $mask = "%16s %10.10s %10s \n";
-  printf("\n\033[1;33m");
-  printf($mask, "Category", "Time", "Status");
-  printf($mask, "===============", "==========", "==========\033[0m");
-  printf($mask, "Queries","$query_timer","queried");
   printf($mask, "Check Scripts","$script_timer","started");
   $lagg=microtime_float()-$time_loop_start;
   printf($mask, "Total Lagg","$lagg","complete");
