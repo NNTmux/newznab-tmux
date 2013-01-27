@@ -28,21 +28,31 @@ export TMUX_SESSION="Newznab"
 #Set, in seconds - how often the monitor.php (left top pane) script should update, 0 may cause errors
 export MONITOR_UPDATE="30"
 
+#Choose to run update_binaries true/false
+export BINARIES="true"
+
+#Choose to run the threaded or non-threaded newznab binaries scripts true/false
+#update_binaries.php or update_binaries_threaded.php
+export BINARIES_THREADS="true"
+
 #Set, in seconds - how long the update_binaries should sleep between runs, 0 may cause errors
 #top right pane
-export NNTP_SLEEP="40"
+export BINARIES_SLEEP="40"
+
+#Choose to run backfill script true/false
+export BACKFILL="true"
+
+#Choose to run the threaded or non-threaded newznab backfill scripts true/false
+#backfill.php or backfill_threaded.php
+export BACKFILL_THREADS="true"
 
 #Set, in seconds - how long the backfill should sleep between runs, 0 may cause errors
 #below update_binaries
 export BACKFILL_SLEEP="40"
 
-#Set, in seconds - how long the nzb-import should sleep between runs, 0 may cause errors
-#below backfill
-export IMPORT_SLEEP="40"
-
-#Set, in seconds - how long the update_release should sleep between runs, 0 may cause errors
-#bottom right
-export RELEASES_SLEEP="40"
+#Set the max amount of unprocessed releases and still allow backfill to run
+#set to 0 to disable
+export BACKFILL_MAX_RELEASES="0"
 
 #Set the maximum days to backfill, you set the nn+ admin/edit backfill to 1
 #this will increment your database by 1 after each backfill loop
@@ -54,6 +64,9 @@ export MAXDAYS="210"
 #this does not recurse through subfolders
 export NZBS="/path/to/nzbs"
 
+#Choose to run import nzb script true/false
+export IMPORT="true"
+
 #If you have all of your nzbs in one folder select false
 #If, you have all of you nzbs split into separate in with the root at $NZBS then select true
 #and 10 nzbs will be imported from each subfolder per loop.
@@ -62,13 +75,30 @@ export NZB_THREADS="true"
 #How many nzbs to import per loop, if using NZBMULTI=true the per folder
 export NZBCOUNT="10"
 
-#Choose to run the threaded or non-threaded newznab binaries scripts true/false
-#update_binaries.php or update_binaries_threaded.php
-export UPDATE_THREADS="true"
+#Set the max amount of unprocessed releases and still allow nzb-import to run
+#set to 0 to disable
+export IMPORT_MAX_RELEASES="0"
 
-#Choose to run the threaded or non-threaded newznab backfill scripts true/false
-#backfill.php or backfill_threaded.php
-export BACKFILL_THREADS="true"
+#Set, in seconds - how long the nzb-import should sleep between runs, 0 may cause errors
+#below backfill
+export IMPORT_SLEEP="40"
+
+#Create releases, this is really only necessary to tuen off when you only want to postprocess
+export RELEASES="true"
+
+#Set, in seconds - how long the update_release should sleep between runs, 0 may cause errors
+#bottom right
+export RELEASES_SLEEP="40"
+
+#Set the max amount of unprocessed releases and still allow update_releases to run
+#set to 0 to disable
+export MAX_RELEASES="0"
+
+#Set the maximum days to backfill, you set the nn+ admin/edit backfill to 1
+#this will increment your database by 1 after each backfill loop
+#once your backfill numbers reach $MAXDAYS, then it will no long increment the database
+#backfill will continue to run, and do no work, at that point you should disable backfill, below
+export MAXDAYS="210"
 
 #Choose your database engine, comment the one true/false
 #you should have already converted your database to InnoDB engine, if you select true here
@@ -90,30 +120,9 @@ export PARSING="false"
 #How oftern do you want update_parsing.php to run, in seconds
 export PARSING_TIMER="3600"
 
-#Choose to run update_binaries true/false
-export BINARIES="false"
-
-#Choose to run backfill script true/false
-export BACKFILL="true"
-
-#Choose to run import nzb script true/false
-export IMPORT="true"
-
 #Choose to run optimise_innodb.php or optimise_mysiam.php script true/false
 #set to false by default, you should test the optimse scripts in bin first
 export OPTIMISE="false"
-
-#Set the max amount of unprocessed releases and still allow nzb-import to run
-#set to 0 to disable
-export IMPORT_MAX_RELEASES="0"
-
-#Set the max amount of unprocessed releases and still allow backfill to run
-#set to 0 to disable
-export BACKFILL_MAX_RELEASES="0"
-
-#Set the max amount of unprocessed releases and still allow update_releases to run
-#set to 0 to disable
-export MAX_RELEASES="0"
 
 #How often to update the PreDB in seconds
 export PREDB_TIMER="900"
