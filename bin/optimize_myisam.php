@@ -1,7 +1,7 @@
 <?php
-    require("config.php");
-    require_once(WWW_DIR . "/lib/framework/cache.php");
-    require_once(WWW_DIR . "/lib/framework/db.php");
+    require('config.php');
+    require(WWW_DIR . '/lib/framework/cache.php');
+    require_once(WWW_DIR . '/lib/framework/db.php');
  
             function quantity($force = false)
             {

@@ -1,6 +1,6 @@
 <?php
-require_once("config.php");
-require_once(WWW_DIR.'/lib/powerprocess.php');
+require('config.php');
+require(WWW_DIR.'/lib/powerprocess.php');
 $dirroot = $argv[1];
 $subdirs = array_filter(glob($dirroot."/*", GLOB_ONLYDIR|GLOB_NOSORT));
 $subdir_count = 0;
@@ -70,4 +70,5 @@ function psUpdateComplete()
 }
 
 ?>
+
 

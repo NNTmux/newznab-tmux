@@ -65,9 +65,6 @@ else
   $TMUXCMD splitw -v -p 85 'echo "..."'
 fi
 $TMUXCMD splitw -v -p 50 'echo "..."'
-#$TMUXCMD splitw -v -p 75 'echo "..."'
-#$TMUXCMD splitw -v -p 67 'echo "..."'
-#$TMUXCMD splitw -v -p 50 'echo "..."'
 $TMUXCMD selectp -t 4
 $TMUXCMD splitw -v -p 83 'echo "..."'
 $TMUXCMD splitw -v -p 80 'echo "..."'
@@ -127,6 +124,10 @@ fi
 
 if [[ $USE_VNSTAT == "true" ]]; then
       $TMUXCMD new-window -n vnstat 'watch $VNSTAT'
+fi
+
+if [[ $USE_IFTOP == "true" ]]; then
+      $TMUXCMD new-window -n iftop '$IFTOP'
 fi
 
 $TMUXCMD new-window -n Console 'bash -i'
