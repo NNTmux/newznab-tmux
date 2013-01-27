@@ -70,7 +70,7 @@ export IMPORT="true"
 #If you have all of your nzbs in one folder select false
 #If, you have all of you nzbs split into separate in with the root at $NZBS then select true
 #and 10 nzbs will be imported from each subfolder per loop.
-export NZB_THREADS="true"
+export NZB_THREADS="false"
 
 #How many nzbs to import per loop, if using NZBMULTI=true the per folder
 export NZBCOUNT="10"

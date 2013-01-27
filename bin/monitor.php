@@ -186,7 +186,7 @@ while($i>0)
 
   //run $_php removespecial.php and $_php update_cleanup.php in 1.2 ever 1 hour
   if (((TIME() - $time7) >= $array['CLEANUP_TIMER'] ) && ($array['CLEANUP'] == "true" )) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.2 'echo \"\033[1;33m\" && cd $TESTING_PATH && $_php removespecial.php && $_php update_cleanup.php && date' 2>&1 1> /dev/null");
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.2 'echo \"\033[1;33m\" && cd $TESTING && $_php removespecial.php && $_php update_cleanup.php && date' 2>&1 1> /dev/null");
     $time7 = TIME();
   }
 
