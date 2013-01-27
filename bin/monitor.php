@@ -9,7 +9,7 @@ $db = new DB();
 $qry="SELECT COUNT( releases.categoryID ) AS cnt, parentID FROM releases JOIN category ON releases.categoryID = category.ID GROUP BY parentID;";
 
 //needs to be processed query
-$proc="SELECT ( SELECT COUNT( releasenfoID ) AS cnt from releases where consoleinfoID IS NULL and categoryID BETWEEN 1000 AND 1999 ) AS console, ( SELECT COUNT( releasenfoID ) AS cnt from releases where imdbID IS NULL and categoryID BETWEEN 2000 AND 2999 ) AS movies, ( SELECT COUNT( releasenfoID ) AS cnt from releases where musicinfoID IS NULL and categoryID BETWEEN 3000 AND 3999 ) AS audio, ( SELECT COUNT( releasenfoID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (categoryID BETWEEN 3000 AND 3999 and ((r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)))) AS pc, ( SELECT COUNT( releasenfoID ) AS cnt from releases where rageID IS NULL and categoryID BETWEEN 5000 AND 5999 ) AS tv, ( SELECT COUNT( releasenfoID ) from releases where bookinfoID IS NULL and categoryID = 7020 ) AS book, (SELECT COUNT( releasenfoID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)) AS work, (SELECT COUNT( releasenfoID ) AS cnt from releases) AS releases, (SELECT COUNT( releasenfoID ) AS cnt FROM releases r WHERE r.releasenfoID = 0) AS nforemains, (SELECT count( releasenfoID ) AS cnt FROM releases WHERE releasenfoID not in (0, -1)) AS nfo, (SELECT table_rows AS cnt FROM information_schema.TABLES where table_name = 'parts') AS parts, (SELECT concat(round((data_length+index_length)/(1024*1024*1024),2),'GB') AS cnt FROM information_schema.tables where table_name = 'parts') AS partsize;";
+$proc="SELECT ( SELECT COUNT( releasenfoID ) AS cnt from releases where consoleinfoID IS NULL and categoryID BETWEEN 1000 AND 1999 ) AS console, ( SELECT COUNT( releasenfoID ) AS cnt from releases where imdbID IS NULL and categoryID BETWEEN 2000 AND 2999 ) AS movies, ( SELECT COUNT( releasenfoID ) AS cnt from releases where musicinfoID IS NULL and categoryID BETWEEN 3000 AND 3999 ) AS audio, ( SELECT COUNT( releasenfoID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (categoryID BETWEEN 4000 AND 4999 and ((r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)))) AS pc, ( SELECT COUNT( releasenfoID ) AS cnt from releases where rageID = -1 and categoryID BETWEEN 5000 AND 5999 ) AS tv, ( SELECT COUNT( releasenfoID ) from releases where bookinfoID IS NULL and categoryID = 7020 ) AS book, (SELECT COUNT( releasenfoID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)) AS work, (SELECT COUNT( releasenfoID ) AS cnt from releases) AS releases, (SELECT COUNT( releasenfoID ) AS cnt FROM releases r WHERE r.releasenfoID = 0) AS nforemains, (SELECT count( releasenfoID ) AS cnt FROM releases WHERE releasenfoID not in (0, -1)) AS nfo, (SELECT table_rows AS cnt FROM information_schema.TABLES where table_name = 'parts') AS parts, (SELECT concat(round((data_length+index_length)/(1024*1024*1024),2),'GB') AS cnt FROM information_schema.tables where table_name = 'parts') AS partsize;";
 
 //initial query for total releases
 $releases_query = "SELECT COUNT( releasenfoID ) AS cnt from releases;";
@@ -271,7 +271,7 @@ while($i>0)
   }
 
   //set command for nzb-import
-  if ( $array['NZBMULTI'] == "true" ){
+  if ( $array['NZB_THREADS'] == "true" ){
     $nzb_cmd = "$_php nzb-import-sub.php \"{$array['NZBS']}\"";
   } else {
     $nzb_cmd = "$_php nzb-import.php \"{$array['NZBS']}\" true";
@@ -352,6 +352,10 @@ while($i>0)
   //get parts size and display
   $parts_rows = number_format("$parts_rows");
   printf("\n \033[0mThe parts table has \033[1;31m$parts_rows\033[0m rows and is \033[1;31m$parts_size_gb\033[0m\n");
+
+  //write output to log
+
+
 
   //turn of monitor if set to false
   if ( $array['RUNNING'] == "true" ) {

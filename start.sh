@@ -59,7 +59,7 @@ $TMUXCMD splitw -h -p 72 'echo "..."'
 $TMUXCMD splitw -h -p 50 'echo "..."'
 $TMUXCMD selectp -t 0
 $TMUXCMD splitw -v -p 60 'echo "..."'
-if [[ $NZBMULTI == "true" ]]; then
+if [[ $NZB_THREADS == "true" ]]; then
   $TMUXCMD splitw -v -p 60 'echo "..."'
 else
   $TMUXCMD splitw -v -p 85 'echo "..."'
