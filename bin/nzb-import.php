@@ -1,7 +1,7 @@
 <?php
 
-require_once("config.php");
-require_once("lib/db.php");
+require('config.php');
+require_once('lib/db.php');
 
 $db = new DB();
 

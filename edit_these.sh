@@ -4,8 +4,8 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 #EDIT THESE#
 
 #This is the shutdown, true/false
-#on, it runs, off and no scripts will be restarted, when all panes are dead, killall tmux
-#if this is set to false, the script will run 1 look and terminate
+#on, it runs, off and no scripts will be RESTARTED, when all panes are DEAD, killall tmux
+#if this is set to false, the script will run 1 loop and terminate
 export RUNNING="true"
 
 #paths
@@ -60,7 +60,7 @@ export NZBS="/path/to/nzbs"
 export NZBMULTI="false"
 
 #How many nzbs to import per loop, if using NZBMULTI="true" the per folder
-export NZBCOUNT="3"
+export NZBCOUNT="50"
 
 #Choose to run the threaded or non-threaded newznab scripts true/false
 #such as update_binaries.php or update_binaries_threaded.php
@@ -129,10 +129,7 @@ export USE_BWMNG="false"
 export USE_IOTOP="false"
 export USE_MYTOP="false"
 export USE_VNSTAT="false"
-
-#Each pane may have periods of inactivity, at the time "Pane is Dead" will be displayed.
-#To disable my notes about why this is ok, change to false
-export SHOW_WHY="true"
+export USE_IFTOP="false"
 
 #By using this script you understand that the programmer is not responsible for any loss of data, users, or sanity.
 #You also agree that you were smart enough to make a backup of your database and files. Do you agree? yes/no
@@ -163,5 +160,8 @@ if [[ $USE_MYTOP == "true" ]]; then
 fi
 if [[ $USE_VNSTAT == "true" ]]; then
       command -v vnstat >/dev/null 2>&1|| { echo >&2 "I require vnstat but it's not installed. Aborting."; exit 1; } && export VNSTAT=`command -v vnstat`
+fi
+if [[ $USE_IFTOP == "true" ]]; then
+      command -v iftop >/dev/null 2>&1|| { echo >&2 "I require iftop but it's not installed. Aborting."; exit 1; } && export IFTOP=`command -v iftop`
 fi
 

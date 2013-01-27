@@ -1,7 +1,7 @@
 <?php
 
-require_once("config.php");
-require_once("lib/postprocess1.php");
+require('config.php');
+require('lib/postprocess1.php');
 
 $postprocess = new PostProcess1(true);
 $postprocess->processAdditional1();

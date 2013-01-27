@@ -3,9 +3,9 @@
 //This id a modified copy of nzb-import.php, to run this you need to copy it to your /www/admin folder. This script will only import 100 nzb's at a time.
 //The idea is that you can call this script from your update script every run, and your import will go smooth without babysitting. 
 
-require_once("config.php");
-require_once(WWW_DIR."/lib/adminpage.php");
-require_once(WWW_DIR."/lib/framework/db.php");
+require('config.php');
+require(WWW_DIR.'/lib/adminpage.php');
+require_once(WWW_DIR.'/lib/framework/db.php');
 $db = new DB();
 $using_cli = false;
 
@@ -219,4 +219,5 @@ if ($using_cli || $page->isPostBack() )
 $page->title = "Import Nzbs";
 $page->content = $page->smarty->fetch('nzb-import.tpl');
 $page->render();
+
 
