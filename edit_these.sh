@@ -23,7 +23,7 @@ export ADMIN_PATH=$NEWZPATH"/www/admin"
 export POST_TO_RUN="1"
 
 #Enter the session name to be used by tmux
-export TMUX_SESSION="Newznab-master"
+export TMUX_SESSION="Newznab"
 
 #Set, in seconds - how often the monitor.php (left top pane) script should update, 0 may cause errors
 export MONITOR_UPDATE="30"
@@ -60,7 +60,7 @@ export NZBS="/path/to/nzbs"
 export NZBMULTI="false"
 
 #How many nzbs to import per loop, if using NZBMULTI="true" the per folder
-export NZBCOUNT="50"
+export NZBCOUNT="10"
 
 #Choose to run the threaded or non-threaded newznab binaries scripts true/false
 #update_binaries.php or update_binaries_threaded.php
@@ -91,7 +91,7 @@ export PARSING="false"
 export PARSING_TIMER="3600"
 
 #Choose to run update_binaries true/false
-export BINARIES="false"
+export BINARIES="true"
 
 #Choose to run backfill script true/false
 export BACKFILL="true"
