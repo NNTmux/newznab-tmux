@@ -146,8 +146,8 @@ export USE_VNSTAT="false"
 export USE_IFTOP="false"
 
 #Enable logging, this is pretty basic logging, a timpstamp and numbers from db
-#logs are kept in log folder
-export LOGGING="false"
+#Use powerline scripts to display the status bar
+export POWERLINE="true"
 
 #By using this script you understand that the programmer is not responsible for any loss of data, users, or sanity.
 #You also agree that you were smart enough to make a backup of your database and files. Do you agree? yes/no

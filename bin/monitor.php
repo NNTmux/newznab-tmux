@@ -15,7 +15,7 @@ $proc="SELECT ( SELECT COUNT( groupID ) AS cnt from releases where consoleinfoID
 
 //initial query for total releases
 $releases_query = "SELECT COUNT( groupID ) AS cnt from releases;";
-$releases_start = $db->query($releases_query);
+$releases_start = @$db->query($releases_query);
 $releases_start = $releases_start[0]['cnt'];
 
 //get variables from edit_these.sh
@@ -78,37 +78,37 @@ while($i>0)
   $query_timer_start=microtime_float();
 
   //run queries
-  $result = $db->query($qry) or die ();
+  $result = @$db->query($qry) or die ();
   $initquery = array();
   foreach ($result as $cat=>$sub)
   {
     $initquery[$sub['parentID']] = $sub['cnt'];
   }
-  $proc_result = $db->query($proc) or die ();
+  $proc_result = @$db->query($proc) or die ();
 
   //get values from $qry
-  $console_releases_now = $initquery['1000'];
-  $movie_releases_now = $initquery['2000'];
-  $music_releases_now = $initquery['3000'];
-  $pc_releases_now = $initquery['4000'];
-  $tvrage_releases_now = $initquery['5000'];
-  $book_releases_now = $initquery['7000'];
-  $misc_releases_now = $initquery['8000'];
+  if ( $initquery['1000'] != NULL ) { $console_releases_now = $initquery['1000']; }
+  if ( $initquery['2000'] != NULL ) { $movie_releases_now = $initquery['2000']; }
+  if ( $initquery['3000'] != NULL ) { $music_releases_now = $initquery['3000']; }
+  if ( $initquery['4000'] != NULL ) { $pc_releases_now = $initquery['4000']; }
+  if ( $initquery['5000'] != NULL ) { $tvrage_releases_now = $initquery['5000']; }
+  if ( $initquery['7000'] != NULL ) { $book_releases_now = $initquery['7000']; }
+  if ( $initquery['8000'] != NULL ) { $misc_releases_now = $initquery['8000']; }
 
   //get values from $proc
-  $console_releases_proc = $proc_result[0]['console'];
-  $movie_releases_proc = $proc_result[0]['movies'];
-  $music_releases_proc = $proc_result[0]['audio'];
-  $pc_releases_proc = $proc_result[0]['pc'];
-  $tvrage_releases_proc = $proc_result[0]['tv'];
-  $work_remaining_now = $proc_result[0]['work'];
-  $book_releases_proc = $proc_result[0]['book'];
-  $releases_loop = $proc_result[0]['releases'];
-  $nfo_remaining_now = $proc_result[0]['nforemains'];
-  $nfo_now = $proc_result[0]['nfo'];
-  $parts_rows = $proc_result[0]['parts'];
-  $parts_size_gb = $proc_result[0]['partsize'];
-  $releases_now = $proc_result[0]['releases'];
+  if ( $proc_result[0]['console'] != NULL ) { $console_releases_proc = $proc_result[0]['console']; }
+  if ( $proc_result[0]['movies'] != NULL ) { $movie_releases_proc = $proc_result[0]['movies']; }
+  if ( $proc_result[0]['audio'] != NULL ) { $music_releases_proc = $proc_result[0]['audio']; }
+  if ( $proc_result[0]['pc'] != NULL ) { $pc_releases_proc = $proc_result[0]['pc']; }
+  if ( $proc_result[0]['tv'] != NULL ) { $tvrage_releases_proc = $proc_result[0]['tv']; }
+  if ( $proc_result[0]['work'] != NULL ) { $work_remaining_now = $proc_result[0]['work']; }
+  if ( $proc_result[0]['book'] != NULL ) { $book_releases_proc = $proc_result[0]['book']; }
+  if ( $proc_result[0]['releases'] != NULL ) { $releases_loop = $proc_result[0]['releases']; }
+  if ( $proc_result[0]['nforemains'] != NULL ) { $nfo_remaining_now = $proc_result[0]['nforemains']; }
+  if ( $proc_result[0]['nfo'] != NULL ) { $nfo_now = $proc_result[0]['nfo']; }
+  if ( $proc_result[0]['parts'] != NULL ) { $parts_rows = number_format($proc_result[0]['parts']); }
+  if ( $proc_result[0]['partsize'] != NULL ) { $parts_size_gb = $proc_result[0]['partsize']; }
+  if ( $proc_result[0]['releases'] ) { $releases_now = $proc_result[0]['releases']; }
 
   //calculate releases difference
   $releases_since_start = $releases_now - $releases_start;
@@ -358,7 +358,6 @@ while($i>0)
   printf($mask, "Total Lagg","$lagg","complete");
 
   //get parts size and display
-  $parts_rows = number_format("$parts_rows");
   printf("\n \033[0mThe parts table has \033[1;31m$parts_rows\033[0m rows and is \033[1;31m$parts_size_gb\033[0m\n");
 
   //turn of monitor if set to false
