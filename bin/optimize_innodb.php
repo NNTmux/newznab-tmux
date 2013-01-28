@@ -32,7 +32,7 @@ function ioptimise($force = false)
   foreach ($alltables as $tablename)
   {
     $ret[] = $tablename['table_name'];
-    echo "Optmze  : Optimizing " . $tablename['rable_name'] . " InnoDB table.\n";
+    echo "Optmze  : Optimizing " . $tablename['table_name'] . " InnoDB table.\n";
     $db->queryDirect("OPTIMIZE TABLE `" . $tablename['table_name'] . "`");
   }
 

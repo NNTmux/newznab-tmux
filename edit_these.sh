@@ -47,7 +47,7 @@ export BACKFILL="true"
 export BACKFILL_THREADS="true"
 
 #Set, in seconds - how long the backfill should sleep between runs, 0 may cause errors
-#below update_binaries
+#in pane below update_binaries
 export BACKFILL_SLEEP="40"
 
 #Set the max amount of unprocessed releases and still allow backfill to run
@@ -70,10 +70,10 @@ export IMPORT="true"
 #If you have all of your nzbs in one folder select false
 #If, you have all of you nzbs split into separate in with the root at $NZBS then select true
 #and 10 nzbs will be imported from each subfolder per loop.
-export NZB_THREADS="false"
+export NZB_THREADS="true"
 
 #How many nzbs to import per loop, if using NZBMULTI=true the per folder
-export NZBCOUNT="10"
+export NZBCOUNT="25"
 
 #Set the max amount of unprocessed releases and still allow nzb-import to run
 #set to 0 to disable

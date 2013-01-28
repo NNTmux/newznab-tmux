@@ -296,7 +296,7 @@ while($i>0)
   }
 
   //runs update_release and optimise_myisam.php in 0.13 once if needed and exits
-  if (( $array['OPTIMISE'] == "true" ) && ( ($i % 5) == 0 )) {
+  if ((( $array['OPTIMISE'] == "true" ) && ( $array['RELEASES'] == "true" ) && ( ($i % 5) == 0 ))) {
     shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.13 'echo \"\033[1;37m\" && cd $NNPATH && $_php update_releases.php && cd $_current_path && $_php optimize_myisam.php && date && echo \"$_sleep_string {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']}' 2>&1 1> /dev/null");
   } else {
     shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.13 'echo \"\033[1;37m\" && cd $NNPATH && $_php update_releases.php && cd $_current_path && date && echo \"$_sleep_string {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']}' 2>&1 1> /dev/null");
