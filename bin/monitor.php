@@ -205,19 +205,19 @@ while($i>0)
 
   //run optimize_myisam.php in pane 1.5 every 2 hours
   if ((TIME() - $time6 >= 3600 ) && ( $array['OPTIMISE'] == "true" )) {
-    shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:1.5 'echo \"\033[1;37m\" && cd bin && $_php optimize_myisam.php true && date' 2>&1 1> /dev/null");
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.5 'echo \"\033[1;37m\" && cd bin && $_php optimize_myisam.php true && date' 2>&1 1> /dev/null");
     $time6 = TIME();
   }
 
   //run optimize_innodb.php in pane 1.6 every 24 hours
   if ((TIME() - $time8 >= 86400 ) && ($array['INNODB'] == "true") && ( $array['OPTIMISE'] == "true" )) {
-    shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:1.6 'echo \"\033[1;37m\" && cd bin && $_php optimize_myisam.php true && $_php optimize_innodb.php true && date' 2>&1 1> /dev/null");
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.6 'echo \"\033[1;37m\" && cd bin && $_php optimize_myisam.php true && $_php optimize_innodb.php true && date' 2>&1 1> /dev/null");
     $time8 = TIME();
   }
 
   //run optimize_innodb.php in pane 1.7 every 1 hour
   if ((TIME() - $time9 >= $array['SPHINX_TIMER'] ) && ( $array['SPHINX'] == "true")) {
-    shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:1.7 'echo \"\033[1;37m\" && cd bin && $_php sphinx.php && date' 2>&1 1> /dev/null");
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.7 'echo \"\033[1;37m\" && cd bin && $_php sphinx.php && date' 2>&1 1> /dev/null");
     $time9 = TIME();
   }
 
