@@ -53,6 +53,7 @@ $time5 = TIME();
 $time6 = TIME();
 $time7 = TIME();
 $time8 = TIME();
+$time9 = TIME();
 
 $i=1;
 while($i>0)
@@ -208,10 +209,16 @@ while($i>0)
     $time6 = TIME();
   }
 
-  //run optimize_innodb.php in pane 1.5 every 24 hours
+  //run optimize_innodb.php in pane 1.6 every 24 hours
   if ((TIME() - $time8 >= 86400 ) && ($array['INNODB'] == "true") && ( $array['OPTIMISE'] == "true" )) {
-    shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:1.5 'echo \"\033[1;37m\" && cd bin && $_php optimize_myisam.php true && $_php optimize_innodb.php true && date' 2>&1 1> /dev/null");
+    shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:1.6 'echo \"\033[1;37m\" && cd bin && $_php optimize_myisam.php true && $_php optimize_innodb.php true && date' 2>&1 1> /dev/null");
     $time8 = TIME();
+  }
+
+  //run optimize_innodb.php in pane 1.7 every 1 hour
+  if ((TIME() - $time9 >= $array['SPHINX_TIMER'] ) && ( $array['SPHINX'] == "true")) {
+    shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:1.7 'echo \"\033[1;37m\" && cd bin && $_php sphinx.php && date' 2>&1 1> /dev/null");
+    $time9 = TIME();
   }
 
   // runs nzbcount.php in pane 0.1 continuous loop
@@ -297,9 +304,9 @@ while($i>0)
 
   //runs update_release and optimise_myisam.php in 0.13 once if needed and exits
   if ((( $array['OPTIMISE'] == "true" ) && ( $array['RELEASES'] == "true" ) && ( ($i % 5) == 0 ))) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.13 'echo \"\033[1;37m\" && cd $NNPATH && $_php update_releases.php && cd $_current_path && $_php optimize_myisam.php && date && echo \"$_sleep_string {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']}' 2>&1 1> /dev/null");
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.13 'echo \"\033[1;37m\" && cd $_current_path && $_php update_releases.php && cd $_current_path && $_php optimize_myisam.php && date && echo \"$_sleep_string {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']}' 2>&1 1> /dev/null");
   } else {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.13 'echo \"\033[1;37m\" && cd $NNPATH && $_php update_releases.php && cd $_current_path && date && echo \"$_sleep_string {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']}' 2>&1 1> /dev/null");
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.13 'echo \"\033[1;37m\" && cd $_current_path && $_php update_releases.php && cd $_current_path && date && echo \"$_sleep_string {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']}' 2>&1 1> /dev/null");
   }
 
   //runs processAlternate2.php in 2.0 once if needed and exits
