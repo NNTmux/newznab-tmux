@@ -73,15 +73,15 @@ export IMPORT="true"
 export NZB_THREADS="true"
 
 #How many nzbs to import per loop, if using NZBMULTI=true the per folder
-export NZBCOUNT="25"
-
-#Set the max amount of unprocessed releases and still allow nzb-import to run
-#set to 0 to disable
-export IMPORT_MAX_RELEASES="0"
+export NZBCOUNT="20"
 
 #Set, in seconds - how long the nzb-import should sleep between runs, 0 may cause errors
 #below backfill
 export IMPORT_SLEEP="40"
+
+#Set the max amount of unprocessed releases and still allow nzb-import to run
+#set to 0 to disable
+export IMPORT_MAX_RELEASES="0"
 
 #Create releases, this is really only necessary to tuen off when you only want to postprocess
 export RELEASES="true"
@@ -123,6 +123,13 @@ export PREDB_TIMER="900"
 
 #How often to update the TV Schedule and the In Theaters in seconds
 export TVRAGE_TIMER="43200"
+
+#Choose to run sphinx.php script true/false
+#set to false by default, you should test the script first, php sphinx.php from the bin folder
+export SPHINX="true"
+
+#How often to run sphinx in seconds
+export SPHINX_TIMER="3600"
 
 #Specify your SED binary
 export SED="/bin/sed"

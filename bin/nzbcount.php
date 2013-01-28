@@ -58,5 +58,5 @@ while ($i==0) {
     printf($mask, "===============", "==========", "==========\033[0m");
     printf($mask, "$folder","$filecount0","$processed");
   }
-  sleep(5);
+  sleep(90);
 }
