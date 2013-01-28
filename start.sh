@@ -53,7 +53,11 @@ sed -i -e 's/order by r.postdate desc limit %d.*$/order by r.guid desc limit %d 
 sed -i -e 's/PostPrc : Performing additional post processing.*$/PostPrc : Performing additional post processing by guid on ".$rescount." releases ...";/g' bin/lib/postprocess1.php
 
 printf "\033]0; $TMUX_SESSION\007\003\n"
-$TMUXCMD -f conf/tmux.conf new-session -d -s $TMUX_SESSION -n $TMUX_SESSION 'cd bin && echo "Monitor Started" && echo "It might take a minute for everything to spinup......" && $NICE -n 19 $PHP monitor.php'
+if [[ $POWERLINE == "true" ]];  then
+  $TMUXCMD -f powerline/tmux.conf new-session -d -s $TMUX_SESSION -n $TMUX_SESSION 'cd bin && echo "Monitor Started" && echo "It might take a minute for everything to spinup......" && $NICE -n 19 $PHP monitor.php'
+else
+  $TMUXCMD -f conf/tmux.conf new-session -d -s $TMUX_SESSION -n $TMUX_SESSION 'cd bin && echo "Monitor Started" && echo "It might take a minute for everything to spinup......" && $NICE -n 19 $PHP monitor.php'
+fi
 $TMUXCMD selectp -t 0
 $TMUXCMD splitw -h -p 72 'echo "..."'
 $TMUXCMD splitw -h -p 50 'echo "..."'
