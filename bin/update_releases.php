@@ -7,7 +7,7 @@ require_once(WWW_DIR."/lib/releases.php");
 $releases = new Releases;
 //$sphinx = new Sphinx();
 $releases->processReleases();
-$sphinx->update();
+//$sphinx->update();
 
 ?>
 
