@@ -62,7 +62,7 @@ export BACKFILL_THREADS="true"
 
 #Set, in seconds - how long the backfill should sleep between runs, 0 may cause errors
 #in pane below update_binaries
-export BACKFILL_SLEEP="20"
+export BACKFILL_SLEEP="40"
 
 #Set the max amount of unprocessed releases and still allow backfill to run
 #set to 0 to disable
@@ -89,7 +89,7 @@ export IMPORT="true"
 export NZB_THREADS="true"
 
 #How many nzbs to import per loop, if using NZB_THREADS=true the per folder
-export NZBCOUNT="120"
+export NZBCOUNT="10"
 
 #Set, in seconds - how long the nzb-import should sleep between runs, 0 may cause errors
 #below backfill
@@ -121,8 +121,8 @@ export MYISAM_LARGE="600"
 #How often to run optimize_innodb on small tables in seconds
 export INNODB_SMALL="7200"
 
-#How often to run optimize_innodb on large tables in seconds
-export INNODB_LARGE="43200"
+#How often to run optimize_innodb on large tables in seconds, default is 48 hours
+export INNODB_LARGE="172800"
 
 ############################################################
 
