@@ -27,7 +27,10 @@ unset($array['']);
 
 //environment
 $backfill_increment = "UPDATE groups set backfill_target=backfill_target+1 where active=1 and backfill_target<{$array['MAXDAYS']};";
-$_current_path = dirname(__FILE__);
+$_DB_NAME = getenv('DB_NAME');
+$_DB_USER = getenv('DB_USER');
+$_DB_HOST = getenv('DB_HOST');
+$_DB_PASSWORD = escapeshellarg(getenv('DB_PASSWORD'));$_current_path = dirname(__FILE__);
 $_mysql = getenv('MYSQL');
 $_php = getenv('PHP');
 $_tmux = getenv('TMUXCMD');
@@ -312,7 +315,7 @@ while($i>0)
   //runs backfill in 0.11 once if needed and exits
   if (( $array['BACKFILL'] == "true" ) && (( $total_work_now < $array['BACKFILL_MAX_RELEASES'] ) || ( $array['BACKFILL_MAX_RELEASES'] == 0 ))) {
     shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.11 'echo \"\033[1;35m\" && cd $NNPATH && $_php $_backfill_cmd && \
-    $_mysql -uDB_USER -h DB_HOST --password=DB_PASSWORD DB_NAME -e \"${backfill_increment}\" && \
+    $_mysql -u$_DB_USER -h $_DB_HOST --password=$_DB_PASSWORD $_DB_NAME -e \"${backfill_increment}\" && \
     date && echo \"$_sleep_string {$array['BACKFILL_SLEEP']} seconds...\" && sleep {$array['BACKFILL_SLEEP']}' 2>&1 1> /dev/null");
   }
 
