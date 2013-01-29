@@ -143,6 +143,9 @@ export OPTIMISE="false"
 #How often to run optimise_myisam on large tables seconds
 export MYISAM_LARGE="3600"
 
+#How often to run optimise_innodb on small tables in seconds
+export INNODB_SMALL="7200"
+
 #How often to run optimise_innodb on large tables in seconds
 export INNODB_LARGE="43200"
 
