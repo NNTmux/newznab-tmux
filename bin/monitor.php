@@ -55,6 +55,29 @@ $time7 = TIME();
 $time8 = TIME();
 $time9 = TIME();
 
+//init to 0
+$console_releases_now = 0;
+$movie_releases_now = 0;
+$music_releases_now = 0;
+$pc_releases_now = 0;
+$tvrage_releases_now = 0;
+$book_releases_now = 0;
+$misc_releases_now = 0;
+$console_releases_proc = 0;
+$movie_releases_proc = 0;
+$music_releases_proc = 0;
+$pc_releases_proc = 0;
+$tvrage_releases_proc = 0;
+$work_remaining_now = 0;
+$book_releases_proc = 0;
+$releases_loop = 0;
+$nfo_remaining_now = 0;
+$nfo_now = 0;
+$parts_rows = 0;
+$parts_size_gb = 0;
+$releases_now = 0;
+
+
 $i=1;
 while($i>0)
 {
@@ -78,13 +101,13 @@ while($i>0)
   $query_timer_start=microtime_float();
 
   //run queries
-  $result = @$db->query($qry) or die ();
+  $result = @$db->query($qry);
   $initquery = array();
   foreach ($result as $cat=>$sub)
   {
     $initquery[$sub['parentID']] = $sub['cnt'];
   }
-  $proc_result = @$db->query($proc) or die ();
+  $proc_result = @$db->query($proc);
 
   //get values from $qry
   if ( $initquery['1000'] != NULL ) { $console_releases_now = $initquery['1000']; }
@@ -303,10 +326,12 @@ while($i>0)
   }
 
   //runs update_release and optimise_myisam.php in 0.13 once if needed and exits
-  if ((( $array['OPTIMISE'] == "true" ) && ( $array['RELEASES'] == "true" ) && ( ($i % 5) == 0 ))) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.13 'echo \"\033[1;37m\" && cd $_current_path && $_php update_releases.php && cd $_current_path && $_php optimize_myisam.php && date && echo \"$_sleep_string {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']}' 2>&1 1> /dev/null");
-  } else {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.13 'echo \"\033[1;37m\" && cd $_current_path && $_php update_releases.php && cd $_current_path && date && echo \"$_sleep_string {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']}' 2>&1 1> /dev/null");
+  if ( $array['RELEASES'] == "true" ) {
+    if ((( $array['OPTIMISE'] == "true" ) && ( ($i % 5) == 0 ))) {
+      shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.13 'echo \"\033[1;37m\" && cd $_current_path && $_php update_releases.php && cd $_current_path && $_php optimize_myisam.php && date && echo \"$_sleep_string {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']}' 2>&1 1> /dev/null");
+    } else {
+      shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.13 'echo \"\033[1;37m\" && cd $_current_path && $_php update_releases.php && cd $_current_path && date && echo \"$_sleep_string {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']}' 2>&1 1> /dev/null");
+    }
   }
 
   //runs processAlternate2.php in 2.0 once if needed and exits

@@ -29,7 +29,7 @@ export TMUX_SESSION="Newznab"
 export MONITOR_UPDATE="30"
 
 #Choose to run update_binaries true/false
-export BINARIES="false"
+export BINARIES="true"
 
 #Choose to run the threaded or non-threaded newznab binaries scripts true/false
 #update_binaries.php or update_binaries_threaded.php
