@@ -256,29 +256,29 @@ while($i>0)
     shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.3 'echo \"\033[0;33m\" && cd bin && $_php processAlternate1.php && date' 2>&1 1> /dev/null");
   }
 
-  //runs processBooks.php in pane 0.4 once if needed then exits
-  if (( $book_releases_proc > 0 ) && ( $array['POST_TO_RUN'] != 0 )) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.4 'echo \"\033[0;34m\" && cd bin && $_php processBooks.php && date' 2>&1 1> /dev/null");
-  }
-
-  //runs processGames.php in pane 0.5 once if needed then exits
+  //runs processGames.php in pane 0.4 once if needed then exits
   if (( $console_releases_proc > 0 ) && ( $array['POST_TO_RUN'] != 0 )) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.5 'echo \"\033[1;35m\" && cd bin && $_php processGames.php && date' 2>&1 1> /dev/null");
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.4 'echo \"\033[1;35m\" && cd bin && $_php processGames.php && date' 2>&1 1> /dev/null");
   }
 
-  //runs processMovies.php in pane 0.6 once if needed then exits
+  //runs processMovies.php in pane 0.5 once if needed then exits
   if (( $movie_releases_proc > 0 ) && ( $array['POST_TO_RUN'] != 0 )) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.6 'echo \"\033[1;37m\" && cd bin && $_php processMovies.php && date' 2>&1 1> /dev/null");
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.5 'echo \"\033[1;37m\" && cd bin && $_php processMovies.php && date' 2>&1 1> /dev/null");
   }
 
-  //runs processMusic.php in pane 0.7 once if needed then exits
+  //runs processMusic.php in pane 0.6 once if needed then exits
   if (( $music_releases_proc > 0 ) && ( $array['POST_TO_RUN'] != 0 )) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.7 'echo \"\033[1;31m\" && cd bin && $_php processMusic.php && date' 2>&1 1> /dev/null");
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.6 'echo \"\033[1;31m\" && cd bin && $_php processMusic.php && date' 2>&1 1> /dev/null");
   }
 
-  //runs processTv.php in pane 0.8 once if needed then exits
+  //runs processTv.php in pane 0.7 once if needed then exits
   if (( $tvrage_releases_proc > 0 ) && ( $array['POST_TO_RUN'] != 0 )) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.8 'echo \"\033[1;32m\" && cd bin && $_php processTv.php && date' 2>&1 1> /dev/null");
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.7 'echo \"\033[1;32m\" && cd bin && $_php processTv.php && date' 2>&1 1> /dev/null");
+  }
+
+  //runs processBooks.php in pane 0.8 once if needed then exits
+  if (( $book_releases_proc > 0 ) && ( $array['POST_TO_RUN'] != 0 )) {
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.8 'echo \"\033[0;34m\" && cd bin && $_php processBooks.php && date' 2>&1 1> /dev/null");
   }
 
   //runs processOthers.php in pane 0.9 once if needed then exits
