@@ -6,7 +6,7 @@ require(WWW_DIR.'/lib/postprocess.php');
 $db = new DB();
 
 //totals per category in db, results by parentID
-$qry="SELECT COUNT( releases.categoryID ) AS cnt, parentID FROM releases JOIN category ON releases.categoryID = category.ID GROUP BY parentID;";
+$qry="SELECT COUNT( releases.categoryID ) AS cnt, parentID FROM releases RIGHT JOIN category ON releases.categoryID = category.ID WHERE parentID IS NOT NULL GROUP BY parentID;";
 
 
 //needs to be processed query
@@ -221,19 +221,19 @@ while($i>0)
   }
 
   //run optimize_innodb.php in pane 1.4 every 2 hours
-  if ((TIME() - $time5 >= 7200 ) && ( $array['INNODB']== "true" ) && ( $array['OPTIMISE'] == "true" )) {
+  if ((TIME() - $time5 >= $array['INNODB_SMALL'] ) && ( $array['INNODB']== "true" ) && ( $array['OPTIMISE'] == "true" )) {
       shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.4 'echo \"\033[1;36m\" && cd bin && $_php optimize_innodb.php && date' 2>&1 1> /dev/null");
       $time5 = TIME();
   }
 
   //run optimize_myisam.php in pane 1.5 every 2 hours
-  if ((TIME() - $time6 >= 3600 ) && ( $array['OPTIMISE'] == "true" )) {
+  if ((TIME() - $time6 >= $array['MYISAM_LARGE'] ) && ( $array['OPTIMISE'] == "true" )) {
     shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.5 'echo \"\033[1;37m\" && cd bin && $_php optimize_myisam.php true && date' 2>&1 1> /dev/null");
     $time6 = TIME();
   }
 
   //run optimize_innodb.php in pane 1.6 every 24 hours
-  if ((TIME() - $time8 >= 86400 ) && ($array['INNODB'] == "true") && ( $array['OPTIMISE'] == "true" )) {
+  if ((TIME() - $time8 >= $array['INNODB_LARGE'] ) && ($array['INNODB'] == "true") && ( $array['OPTIMISE'] == "true" )) {
     shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.6 'echo \"\033[1;37m\" && cd bin && $_php optimize_myisam.php true && $_php optimize_innodb.php true && date' 2>&1 1> /dev/null");
     $time8 = TIME();
   }
@@ -325,7 +325,7 @@ while($i>0)
     shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.12 'echo \"\033[1;36m\" && cd bin && $nzb_cmd && echo \" \" && date && echo \"$_sleep_string {$array['IMPORT_SLEEP']} seconds...\" && sleep {$array['IMPORT_SLEEP']}' 2>&1 1> /dev/null");
   }
 
-  //runs update_release and optimise_myisam.php in 0.13 once if needed and exits
+  //runs update_release and optimize_myisam.php in 0.13 once if needed and exits
   if ( $array['RELEASES'] == "true" ) {
     if ((( $array['OPTIMISE'] == "true" ) && ( ($i % 5) == 0 ))) {
       shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.13 'echo \"\033[1;37m\" && cd $_current_path && $_php update_releases.php && cd $_current_path && $_php optimize_myisam.php && date && echo \"$_sleep_string {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']}' 2>&1 1> /dev/null");
