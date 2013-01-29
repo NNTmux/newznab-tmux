@@ -47,6 +47,10 @@ export BINARIES_THREADS="true"
 #top right pane
 export BINARIES_SLEEP="40"
 
+#Set the max amount of unprocessed releases and still allow update_releases to run
+#set to 0 to disable
+export MAX_RELEASES="0"
+
 ############################################################
 
 #Choose to run backfill script true/false
@@ -97,16 +101,28 @@ export IMPORT_MAX_RELEASES="0"
 
 ############################################################
 
-#Create releases, this is really only necessary to tuen off when you only want to postprocess
+#Create releases, this is really only necessary to turn off when you only want to postprocess
 export RELEASES="true"
 
 #Set, in seconds - how long the update_release should sleep between runs, 0 may cause errors
 #bottom right
 export RELEASES_SLEEP="40"
 
-#Set the max amount of unprocessed releases and still allow update_releases to run
-#set to 0 to disable
-export MAX_RELEASES="0"
+############################################################
+
+#Choose to run optimize_innodb.php or optimize_mysiam.php script true/false
+#set to false by default, you should test the optimse scripts in bin first
+#optimize_myisam on small tables runs after every 5th loop of update_releases
+export OPTIMIZE="false"
+
+#How often to run optimize_myisam on large tables seconds
+export MYISAM_LARGE="3600"
+
+#How often to run optimize_innodb on small tables in seconds
+export INNODB_SMALL="7200"
+
+#How often to run optimize_innodb on large tables in seconds
+export INNODB_LARGE="43200"
 
 ############################################################
 
@@ -133,21 +149,6 @@ export PARSING="false"
 
 #How oftern do you want update_parsing.php to run, in seconds
 export PARSING_TIMER="3600"
-
-############################################################
-
-#Choose to run optimise_innodb.php or optimise_mysiam.php script true/false
-#set to false by default, you should test the optimse scripts in bin first
-export OPTIMISE="false"
-
-#How often to run optimise_myisam on large tables seconds
-export MYISAM_LARGE="3600"
-
-#How often to run optimise_innodb on small tables in seconds
-export INNODB_SMALL="7200"
-
-#How often to run optimise_innodb on large tables in seconds
-export INNODB_LARGE="43200"
 
 ############################################################
 
