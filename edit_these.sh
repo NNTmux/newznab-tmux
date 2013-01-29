@@ -89,7 +89,7 @@ export IMPORT="true"
 export NZB_THREADS="true"
 
 #How many nzbs to import per loop, if using NZB_THREADS=true the per folder
-export NZBCOUNT="20"
+export NZBCOUNT="120"
 
 #Set, in seconds - how long the nzb-import should sleep between runs, 0 may cause errors
 #below backfill
@@ -113,10 +113,10 @@ export RELEASES_SLEEP="40"
 #Choose to run optimize_innodb.php or optimize_mysiam.php script true/false
 #set to false by default, you should test the optimse scripts in bin first
 #optimize_myisam on small tables runs after every 5th loop of update_releases
-export OPTIMIZE="false"
+export OPTIMIZE="true"
 
 #How often to run optimize_myisam on large tables seconds
-export MYISAM_LARGE="3600"
+export MYISAM_LARGE="600"
 
 #How often to run optimize_innodb on small tables in seconds
 export INNODB_SMALL="7200"
@@ -162,7 +162,7 @@ export TVRAGE_TIMER="43200"
 
 #Choose to run sphinx.php script true/false
 #set to false by default, you should test the script first, php sphinx.php from the bin folder
-export SPHINX="true"
+export SPHINX="false"
 
 #How often to run sphinx in seconds
 export SPHINX_TIMER="3600"
