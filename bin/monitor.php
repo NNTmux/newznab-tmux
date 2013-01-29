@@ -10,8 +10,7 @@ $qry="SELECT COUNT( releases.categoryID ) AS cnt, parentID FROM releases RIGHT J
 
 
 //needs to be processed query
-$_DB_NAME = getenv('DB_NAME');
-$proc="SELECT ( SELECT COUNT( groupID ) AS cnt from releases where consoleinfoID IS NULL and categoryID BETWEEN 1000 AND 1999 ) AS console, ( SELECT COUNT( groupID ) AS cnt from releases where imdbID IS NULL and categoryID BETWEEN 2000 AND 2999 ) AS movies, ( SELECT COUNT( groupID ) AS cnt from releases where musicinfoID IS NULL and categoryID BETWEEN 3000 AND 3999 ) AS audio, ( SELECT COUNT( groupID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (categoryID BETWEEN 4000 AND 4999 and ((r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)))) AS pc, ( SELECT COUNT( groupID ) AS cnt from releases where rageID = -1 and categoryID BETWEEN 5000 AND 5999 ) AS tv, ( SELECT COUNT( groupID ) AS cnt from releases where bookinfoID IS NULL and categoryID = 7020 ) AS book, ( SELECT COUNT( groupID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)) AS work, ( SELECT COUNT( groupID ) AS cnt from releases) AS releases, ( SELECT COUNT( groupID ) AS cnt FROM releases r WHERE r.releasenfoID = 0) AS nforemains, ( SELECT COUNT( groupID ) AS cnt FROM releases WHERE releasenfoID not in (0, -1)) AS nfo, ( SELECT table_rows AS cnt FROM information_schema.TABLES where table_name = 'parts' AND TABLE_SCHEMA = '".$_DB_NAME."' ) AS parts, ( SELECT concat(round((data_length+index_length)/(1024*1024*1024),2),'GB') AS cnt FROM information_schema.tables where table_name = 'parts' AND TABLE_SCHEMA = '".$_DB_NAME."' ) AS partsize;";
+$proc="SELECT ( SELECT COUNT( groupID ) AS cnt from releases where consoleinfoID IS NULL and categoryID BETWEEN 1000 AND 1999 ) AS console, ( SELECT COUNT( groupID ) AS cnt from releases where imdbID IS NULL and categoryID BETWEEN 2000 AND 2999 ) AS movies, ( SELECT COUNT( groupID ) AS cnt from releases where musicinfoID IS NULL and categoryID BETWEEN 3000 AND 3999 ) AS audio, ( SELECT COUNT( groupID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (categoryID BETWEEN 4000 AND 4999 and ((r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)))) AS pc, ( SELECT COUNT( groupID ) AS cnt from releases where rageID = -1 and categoryID BETWEEN 5000 AND 5999 ) AS tv, ( SELECT COUNT( groupID ) AS cnt from releases where bookinfoID IS NULL and categoryID = 7020 ) AS book, ( SELECT COUNT( groupID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)) AS work, ( SELECT COUNT( groupID ) AS cnt from releases) AS releases, ( SELECT COUNT( groupID ) AS cnt FROM releases r WHERE r.releasenfoID = 0) AS nforemains, ( SELECT COUNT( groupID ) AS cnt FROM releases WHERE releasenfoID not in (0, -1)) AS nfo, ( SELECT table_rows AS cnt FROM information_schema.TABLES where table_name = 'parts' AND TABLE_SCHEMA = '".DB_NAME."' ) AS parts, ( SELECT concat(round((data_length+index_length)/(1024*1024*1024),2),'GB') AS cnt FROM information_schema.tables where table_name = 'parts' AND TABLE_SCHEMA = '".DB_NAME."' ) AS partsize;";
 
 //initial query for total releases
 $releases_query = "SELECT COUNT( groupID ) AS cnt from releases;";
@@ -28,9 +27,6 @@ unset($array['']);
 
 //environment
 $backfill_increment = "UPDATE groups set backfill_target=backfill_target+1 where active=1 and backfill_target<{$array['MAXDAYS']};";
-$_DB_USER = getenv('DB_USER');
-$_DB_HOST = getenv('DB_HOST');
-$_DB_PASSWORD = escapeshellarg(getenv('DB_PASSWORD'));
 $_current_path = dirname(__FILE__);
 $_mysql = getenv('MYSQL');
 $_php = getenv('PHP');
@@ -221,19 +217,19 @@ while($i>0)
   }
 
   //run optimize_innodb.php in pane 1.4 every 2 hours
-  if ((TIME() - $time5 >= $array['INNODB_SMALL'] ) && ( $array['INNODB']== "true" ) && ( $array['OPTIMISE'] == "true" )) {
+  if ((TIME() - $time5 >= $array['INNODB_SMALL'] ) && ( $array['INNODB']== "true" ) && ( $array['OPTIMIZE'] == "true" )) {
       shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.4 'echo \"\033[1;36m\" && cd bin && $_php optimize_innodb.php && date' 2>&1 1> /dev/null");
       $time5 = TIME();
   }
 
   //run optimize_myisam.php in pane 1.5 every 2 hours
-  if ((TIME() - $time6 >= $array['MYISAM_LARGE'] ) && ( $array['OPTIMISE'] == "true" )) {
+  if ((TIME() - $time6 >= $array['MYISAM_LARGE'] ) && ( $array['OPTIMIZE'] == "true" )) {
     shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.5 'echo \"\033[1;37m\" && cd bin && $_php optimize_myisam.php true && date' 2>&1 1> /dev/null");
     $time6 = TIME();
   }
 
   //run optimize_innodb.php in pane 1.6 every 24 hours
-  if ((TIME() - $time8 >= $array['INNODB_LARGE'] ) && ($array['INNODB'] == "true") && ( $array['OPTIMISE'] == "true" )) {
+  if ((TIME() - $time8 >= $array['INNODB_LARGE'] ) && ($array['INNODB'] == "true") && ( $array['OPTIMIZE'] == "true" )) {
     shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.6 'echo \"\033[1;37m\" && cd bin && $_php optimize_myisam.php true && $_php optimize_innodb.php true && date' 2>&1 1> /dev/null");
     $time8 = TIME();
   }
@@ -316,7 +312,7 @@ while($i>0)
   //runs backfill in 0.11 once if needed and exits
   if (( $array['BACKFILL'] == "true" ) && (( $total_work_now < $array['BACKFILL_MAX_RELEASES'] ) || ( $array['BACKFILL_MAX_RELEASES'] == 0 ))) {
     shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.11 'echo \"\033[1;35m\" && cd $NNPATH && $_php $_backfill_cmd && \
-    $_mysql -u$_DB_USER -h $_DB_HOST --password=$_DB_PASSWORD $_DB_NAME -e \"${backfill_increment}\" && \
+    $_mysql -uDB_USER -h DB_HOST --password=DB_PASSWORD DB_NAME -e \"${backfill_increment}\" && \
     date && echo \"$_sleep_string {$array['BACKFILL_SLEEP']} seconds...\" && sleep {$array['BACKFILL_SLEEP']}' 2>&1 1> /dev/null");
   }
 
@@ -327,7 +323,7 @@ while($i>0)
 
   //runs update_release and optimize_myisam.php in 0.13 once if needed and exits
   if ( $array['RELEASES'] == "true" ) {
-    if ((( $array['OPTIMISE'] == "true" ) && ( ($i % 5) == 0 ))) {
+    if ((( $array['OPTIMIZE'] == "true" ) && ( ($i % 5) == 0 ))) {
       shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.13 'echo \"\033[1;37m\" && cd $_current_path && $_php update_releases.php && cd $_current_path && $_php optimize_myisam.php && date && echo \"$_sleep_string {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']}' 2>&1 1> /dev/null");
     } else {
       shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.13 'echo \"\033[1;37m\" && cd $_current_path && $_php update_releases.php && cd $_current_path && date && echo \"$_sleep_string {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']}' 2>&1 1> /dev/null");
