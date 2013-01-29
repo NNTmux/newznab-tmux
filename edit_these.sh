@@ -62,7 +62,7 @@ export BACKFILL_THREADS="true"
 
 #Set, in seconds - how long the backfill should sleep between runs, 0 may cause errors
 #in pane below update_binaries
-export BACKFILL_SLEEP="20"
+export BACKFILL_SLEEP="40"
 
 #Set the max amount of unprocessed releases and still allow backfill to run
 #set to 0 to disable
