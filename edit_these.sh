@@ -86,6 +86,8 @@ export IMPORT="true"
 #If you have all of your nzbs in one folder select false
 #If, you have all of you nzbs split into separate in with the root at $NZBS then select true
 #and 10 nzbs will be imported from each subfolder per loop.
+#Importing this way, allows all postprocessing scripts to run, such as book, music, movies
+#Instead of doing all 1 tye at once, spread the load
 export NZB_THREADS="true"
 
 #How many nzbs to import per loop, if using NZB_THREADS=true the per folder
@@ -188,7 +190,16 @@ export USE_IFTOP="false"
 ############################################################
 
 #Use powerline scripts to display the status bar
+#To display properly, you need a modified font, download and install the font and then select that font in your terminal
+#This is done on the terminal computer, not the newznab++ server
+#download fonts from https://github.com/jonnyboy/powerline-fonts
+#I recommend Consolas if you are using putty in Win7
 export POWERLINE="true"
+
+############################################################
+
+#Use tmpfs to run postprocessing on true/false
+export RAMDISK="true"
 
 ############################################################
 
@@ -207,24 +218,29 @@ command -v nice >/dev/null 2>&1 || { echo >&2 "I require nice but it's not insta
 
 
 if [[ $USE_HTOP == "true" ]]; then
-      command -v htop >/dev/null 2>&1|| { echo >&2 "I require htop but it's not installed.  Aborting."; exit 1; } && export HTOP=`command -v htop`
+  command -v htop >/dev/null 2>&1|| { echo >&2 "I require htop but it's not installed.  Aborting."; exit 1; } && export HTOP=`command -v htop`
 fi
 if [[ $USE_NMON == "true" ]]; then
-      command -v nmon >/dev/null 2>&1 || { echo >&2 "I require nmon but it's not installed.  Aborting."; exit 1; } && export NMON=`command -v nmon`
+  command -v nmon >/dev/null 2>&1 || { echo >&2 "I require nmon but it's not installed.  Aborting."; exit 1; } && export NMON=`command -v nmon`
 fi
 if [[ $USE_BWMNG == "true" ]]; then
-      command -v bwm-ng >/dev/null 2>&1|| { echo >&2 "I require bwm-ng but it's not installed.  Aborting."; exit 1; } && export BWMNG=`command -v bwm-ng`
+  command -v bwm-ng >/dev/null 2>&1|| { echo >&2 "I require bwm-ng but it's not installed.  Aborting."; exit 1; } && export BWMNG=`command -v bwm-ng`
 fi
 if [[ $USE_IOTOP == "true" ]]; then
-      command -v iotop >/dev/null 2>&1|| { echo >&2 "I require iotop but it's not installed.  Aborting."; exit 1; } && export IOTOP=`command -v iotop`
+  command -v iotop >/dev/null 2>&1|| { echo >&2 "I require iotop but it's not installed.  Aborting."; exit 1; } && export IOTOP=`command -v iotop`
 fi
 if [[ $USE_MYTOP == "true" ]]; then
-      command -v mytop >/dev/null 2>&1|| { echo >&2 "I require mytop but it's not installed.  Aborting."; exit 1; } && export MYTOP=`command -v mytop`
+  command -v mytop >/dev/null 2>&1|| { echo >&2 "I require mytop but it's not installed.  Aborting."; exit 1; } && export MYTOP=`command -v mytop`
 fi
 if [[ $USE_VNSTAT == "true" ]]; then
-      command -v vnstat >/dev/null 2>&1|| { echo >&2 "I require vnstat but it's not installed. Aborting."; exit 1; } && export VNSTAT=`command -v vnstat`
+  command -v vnstat >/dev/null 2>&1|| { echo >&2 "I require vnstat but it's not installed. Aborting."; exit 1; } && export VNSTAT=`command -v vnstat`
 fi
 if [[ $USE_IFTOP == "true" ]]; then
-      command -v iftop >/dev/null 2>&1|| { echo >&2 "I require iftop but it's not installed. Aborting."; exit 1; } && export IFTOP=`command -v iftop`
+  command -v iftop >/dev/null 2>&1|| { echo >&2 "I require iftop but it's not installed. Aborting."; exit 1; } && export IFTOP=`command -v iftop`
+fi
+if [[ $POWERLINE == "true" ]]; then
+  export TMUX_CONF="powerline/tmux.conf"
+else
+  export TMUX_CONF="conf/tmux.conf"
 fi
 
