@@ -199,7 +199,7 @@ export POWERLINE="true"
 ############################################################
 
 #Use tmpfs to run postprocessing on true/false
-export RAMDISK="true"
+export RAMDISK="false"
 
 ############################################################
 
