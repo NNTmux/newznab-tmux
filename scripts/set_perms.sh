@@ -9,7 +9,7 @@ do
 done
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
-source edit_these.sh
+source ../edit_these.sh
 clear
 
 if [[ $AGREED == "no" ]]; then
