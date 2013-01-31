@@ -24,8 +24,7 @@ echo -e '[client]\npassword='$DB_PASSWORD > ./conf/my.cnf
 chmod 600 ./conf/my.cnf
 
 #create powerline default.sh
-powerline/powerline/themes/default.start.sh
-if [ ! -f powerline/powerline/themes/default.sh ]; then
+if [ ! -f "powerline/powerline/themes/default.sh" ]; then
   cp powerline/powerline/themes/default.start.sh powerline/powerline/themes/default.sh
 fi
 
