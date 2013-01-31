@@ -82,7 +82,7 @@ class DB
 	}	
 
 
-	public function optimise($force = false) 
+	public function optimize($force = false) 
 	{
 		$ret = array();
 		if ($force)
@@ -101,7 +101,7 @@ class DB
 		return $ret;
 	}
 
-	public function optimiseinnodb($iforce = false) 
+	public function optimizeinnodb($iforce = false) 
 	{
 		$iret = array();
 		if ($iforce)
