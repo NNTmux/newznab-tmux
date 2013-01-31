@@ -30,7 +30,7 @@ while ($i==0) {
     $toprocess=0;
     system('clear');
     printf("\n\033[1;33m");
-    $mask = "%16s %10.10s %10s \n";
+    $mask = "%20s %10.10s %10s \n";
     printf($mask, "Folder Name", "In Folder", "Imported");
     printf($mask, "===============", "==========", "==========\033[0m");
     foreach($subdirs AS $subdir){
@@ -53,7 +53,7 @@ while ($i==0) {
     $folder=basename("$path");
     system('clear');
     printf("\n\033[1;33m");
-    $mask = "%16s %10.10s %10s \n";
+    $mask = "%20s %10.10s %10s \n";
     printf($mask, "Folder Name", "In Folder", "Imported");
     printf($mask, "===============", "==========", "==========\033[0m");
     printf($mask, "$folder","$filecount0","$processed");
