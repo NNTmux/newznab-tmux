@@ -31,14 +31,11 @@ fi
 if [[ $RAMDISK == "true" ]]; then
   TMPUNRAR_QUERY="SELECT value from site where ID = 66;"
   TMPUNRAR_PATH=`$MYSQL --defaults-extra-file=conf/my.cnf -u$DB_USER -h$DB_HOST $DB_NAME -s -N -e "${TMPUNRAR_QUERY}"`
-  for i in {1..9}
-  do
-    umount $TMPUNRAR_PATH$i &> /dev/null
-    rm -fr $TMPUNRAR_PATH$i
-    mkdir $TMPUNRAR_PATH$i
-    chmod 777 $TMPUNRAR_PATH$i
-    mount -t tmpfs -o size=256M tmpfs $TMPUNRAR_PATH$i 2>&1 > /dev/null
-  done
+  umount $TMPUNRAR_PATH &> /dev/null
+  rm -fr $TMPUNRAR_PATH
+  mkdir $TMPUNRAR_PATH
+  chmod 777 $TMPUNRAR_PATH
+  mount -t tmpfs -o size=256M tmpfs $TMPUNRAR_PATH 2>&1 > /dev/null
 fi
 
 #remove postprocessing scripts
@@ -53,7 +50,7 @@ for (( c=2; c<=9; c++ ))
   sed -i -e "s/PostProcess/PostProcess$c/g" bin/lib/postprocess$c.php
   sed -i -e "s/processAdditional/processAdditional$c/g" bin/lib/postprocess$c.php
   sed -i -e "s/\$tmpPath = \$this->site->tmpunrarpath;/\$tmpPath = \$this->site->tmpunrarpath; \\
-                  \$tmpPath .= '$c';/g" bin/lib/postprocess$c.php
+                  \$tmpPath .= '\/tmp$c';/g" bin/lib/postprocess$c.php
   sed -i -e "s/order by r.postdate desc limit %d.*\$/order by r.guid asc limit %d, %d \", (\$maxattemptstocheckpassworded + 1) * -1, $c * \$numtoProcess, \$numtoProcess));/g" bin/lib/postprocess$c.php
   sed -i -e "s/PostPrc : Performing additional post processing.*\$/PostPrc : Performing additional post processing by guid on \".\$rescount.\" releases, starting at $d ...\";/g" bin/lib/postprocess$c.php
 
@@ -67,8 +64,8 @@ cp bin/lib/alternate bin/processAlternate1.php
 #edit postprocessing scripts
 sed -i -e 's/PostProcess/PostProcess1/g' bin/lib/postprocess1.php
 sed -i -e 's/processAdditional/processAdditional1/g' bin/lib/postprocess1.php
-sed -i -e 's/$tmpPath = $this->site->tmpunrarpath;/$tmpPath = $this->site->tmpunrarpath; \
-               $tmpPath .= '1';/g' bin/lib/postprocess1.php
+sed -i -e "s/\$tmpPath = \$this->site->tmpunrarpath;/\$tmpPath = \$this->site->tmpunrarpath; \\
+                \$tmpPath .= '\/tmp1';/g" bin/lib/postprocess1.php
 sed -i -e 's/order by r.postdate desc limit %d.*$/order by r.guid desc limit %d ", ($maxattemptstocheckpassworded + 1) * -1, $numtoProcess));/g' bin/lib/postprocess1.php
 sed -i -e 's/PostPrc : Performing additional post processing.*$/PostPrc : Performing additional post processing by guid on ".$rescount." releases ...";/g' bin/lib/postprocess1.php
 
