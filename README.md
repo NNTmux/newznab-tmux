@@ -41,16 +41,16 @@
  * Edit some permissions and a file, run this as root. If, when you run ./start.sh you see 0 nzb's and you are sure there are more than 0 left to import, verify the path to the nzb's in .tmux_user.conf in the conf folder and is created at first run.
 
   ```bash
-  ./set_perms.sh
+  cd scripts && ./set_perms.sh
   ```
 
  * Run my script, as user. If, you have grsecurity in you kernel, you will need to run using sudo if you use nmon or bwm-ng.
 
   ```bash
-  ./start.sh
+  cd ../ && ./start.sh
   ```
 
- * Additional files. I have included prepare.sh to make updating these sctipts alittle easier. I also included a svn updater, svn.sh. It performs a forced updated, which overwrites any changes you may have may to the stock nn+ scripts.
+ * Additional scripts included in the script folder. I have included prepare.sh to make updating these sctipts alittle easier. I also included a svn updater, svn.sh. It performs a forced updated, which overwrites any changes you may have may to the stock nn+ scripts.
 
  * If you connect using **putty**, then under Window/Translation set Remote character set to UTF-8.
 
