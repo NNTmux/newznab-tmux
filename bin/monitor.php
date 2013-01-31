@@ -8,14 +8,8 @@ $db = new DB();
 //totals per category in db, results by parentID
 $qry="SELECT COUNT( releases.categoryID ) AS cnt, parentID FROM releases RIGHT JOIN category ON releases.categoryID = category.ID WHERE parentID IS NOT NULL GROUP BY parentID;";
 
-
 //needs to be processed query
 $proc="SELECT ( SELECT COUNT( groupID ) AS cnt from releases where consoleinfoID IS NULL and categoryID BETWEEN 1000 AND 1999 ) AS console, ( SELECT COUNT( groupID ) AS cnt from releases where imdbID IS NULL and categoryID BETWEEN 2000 AND 2999 ) AS movies, ( SELECT COUNT( groupID ) AS cnt from releases where musicinfoID IS NULL and categoryID BETWEEN 3000 AND 3999 ) AS audio, ( SELECT COUNT( groupID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (categoryID BETWEEN 4000 AND 4999 and ((r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)))) AS pc, ( SELECT COUNT( groupID ) AS cnt from releases where rageID = -1 and categoryID BETWEEN 5000 AND 5999 ) AS tv, ( SELECT COUNT( groupID ) AS cnt from releases where bookinfoID IS NULL and categoryID = 7020 ) AS book, ( SELECT COUNT( groupID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)) AS work, ( SELECT COUNT( groupID ) AS cnt from releases) AS releases, ( SELECT COUNT( groupID ) AS cnt FROM releases r WHERE r.releasenfoID = 0) AS nforemains, ( SELECT COUNT( groupID ) AS cnt FROM releases WHERE releasenfoID not in (0, -1)) AS nfo, ( SELECT table_rows AS cnt FROM information_schema.TABLES where table_name = 'parts' AND TABLE_SCHEMA = '".DB_NAME."' ) AS parts, ( SELECT concat(round((data_length+index_length)/(1024*1024*1024),2),'GB') AS cnt FROM information_schema.tables where table_name = 'parts' AND TABLE_SCHEMA = '".DB_NAME."' ) AS partsize;";
-
-//initial query for total releases
-$releases_query = "SELECT COUNT( groupID ) AS cnt from releases;";
-$releases_start = @$db->query($releases_query);
-$releases_start = $releases_start[0]['cnt'];
 
 //get variables from edit_these.sh
 $varnames = shell_exec("cat ../edit_these.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
@@ -54,28 +48,9 @@ $time7 = TIME();
 $time8 = TIME();
 $time9 = TIME();
 
-//init to 0
-$console_releases_now = 0;
-$movie_releases_now = 0;
-$music_releases_now = 0;
-$pc_releases_now = 0;
-$tvrage_releases_now = 0;
-$book_releases_now = 0;
-$misc_releases_now = 0;
-$console_releases_proc = 0;
-$movie_releases_proc = 0;
-$music_releases_proc = 0;
-$pc_releases_proc = 0;
-$tvrage_releases_proc = 0;
-$work_remaining_now = 0;
-$book_releases_proc = 0;
-$releases_loop = 0;
-$nfo_remaining_now = 0;
-$nfo_now = 0;
-$parts_rows = 0;
-$parts_size_gb = 0;
-$releases_now = 0;
-
+//init start values
+$work_start = 0;
+$releases_start = 0;
 
 $i=1;
 while($i>0)
@@ -91,11 +66,6 @@ while($i>0)
   $array = array_combine($varnames, $vardata);
   unset($array['']);
 
-  //if ($i!=1) {
-    //sleep($array['MONITOR_UPDATE']);
-    //$time_loop_start=$time_loop_start+$array['MONITOR_UPDATE'];
-  //}
-
   //get microtime to at start of queries
   $query_timer_start=microtime_float();
 
@@ -107,6 +77,10 @@ while($i>0)
     $initquery[$sub['parentID']] = $sub['cnt'];
   }
   $proc_result = @$db->query($proc);
+
+  //initial query for total releases
+  if (( $proc_result[0]['work'] != NULL ) && ( $work_start == 0 )) { $work_start = $proc_result[0]['work']; }
+  if (( $proc_result[0]['releases'] ) && ( $releases_start == 0 )) { $releases_start = $proc_result[0]['releases']; }
 
   //get values from $qry
   if ( $initquery['1000'] != NULL ) { $console_releases_now = $initquery['1000']; }
@@ -123,8 +97,8 @@ while($i>0)
   if ( $proc_result[0]['audio'] != NULL ) { $music_releases_proc = $proc_result[0]['audio']; }
   if ( $proc_result[0]['pc'] != NULL ) { $pc_releases_proc = $proc_result[0]['pc']; }
   if ( $proc_result[0]['tv'] != NULL ) { $tvrage_releases_proc = $proc_result[0]['tv']; }
-  if ( $proc_result[0]['work'] != NULL ) { $work_remaining_now = $proc_result[0]['work']; }
   if ( $proc_result[0]['book'] != NULL ) { $book_releases_proc = $proc_result[0]['book']; }
+  if ( $proc_result[0]['work'] != NULL ) { $work_remaining_now = $proc_result[0]['work']; }
   if ( $proc_result[0]['releases'] != NULL ) { $releases_loop = $proc_result[0]['releases']; }
   if ( $proc_result[0]['nforemains'] != NULL ) { $nfo_remaining_now = $proc_result[0]['nforemains']; }
   if ( $proc_result[0]['nfo'] != NULL ) { $nfo_now = $proc_result[0]['nfo']; }
@@ -134,6 +108,7 @@ while($i>0)
 
   //calculate releases difference
   $releases_since_start = $releases_now - $releases_start;
+  $work_since_start = $work_remaining_now - $work_start;
   $total_work_now = $work_remaining_now + $tvrage_releases_proc + $music_releases_proc + $movie_releases_proc + $console_releases_proc + $book_releases_proc;
 
   //get microtime at end of queries
@@ -151,6 +126,9 @@ while($i>0)
   if ( $releases_since_start > 0 ) { $signed = "+"; }
   else { $signed = ""; }
 
+  if ( $work_since_start > 0 ) { $signed1 = "+"; }
+  else { $signed1 = ""; }
+
   if ( $min != 1 ) { $string_min = "mins"; }
   else { $string_min = "min"; }
 
@@ -165,13 +143,11 @@ while($i>0)
   else { $time_string = "\033[1;31m$min\033[0m $string_min."; }
 
   passthru('clear');
-  printf("\033[1;31mMonitor\033[0m has been running for: $time_string\n");
-  printf("\033[1;31m$releases_now($signed$releases_since_start)\033[0m releases in your database.\n");
-  printf("\033[1;31m$total_work_now\033[0m releases left to postprocess.");
-  if ( $array['MAX_RELEASES'] != 0 ) { printf(" update_binaries, backfill and nzb-import will stop running when you exceed {$array['MAX_RELEASES']}\n\n\033[1;33m"); }
-  else { printf("\n\n\033[1;33m"); }
+  printf("\033[1;31m  Monitor\033[0m has been running for: $time_string\n");
+  printf("\033[1;31m  $releases_now($signed$releases_since_start)\033[0m releases in your database.\n");
+  printf("\033[1;31m  $total_work_now($signed1$work_since_start)\033[0m releases left to postprocess.\033[1;33m\n");
 
-  $mask = "%16s %10s %10s \n";
+  $mask = "%20s %10s %10s \n";
   printf($mask, "Category", "In Process", "In Database");
   printf($mask, "===============", "==========", "==========\033[0m");
   printf($mask, "NFO's","$nfo_remaining_now","$nfo_now");
@@ -186,7 +162,7 @@ while($i>0)
   $NNPATH="{$array['NEWZPATH']}{$array['NEWZNAB_PATH']}";
   $TESTING="{$array['NEWZPATH']}{$array['TESTING_PATH']}";
 
-  $mask = "%16s %10.10s %10s \n";
+  $mask = "%20s %10.10s %10s \n";
   printf("\n\033[1;33m");
   printf($mask, "Category", "Time", "Status");
   printf($mask, "===============", "==========", "==========\033[0m");
@@ -315,7 +291,7 @@ while($i>0)
   //runs backfill in 0.11 once if needed and exits
   if (( $array['BACKFILL'] == "true" ) && (( $total_work_now < $array['BACKFILL_MAX_RELEASES'] ) || ( $array['BACKFILL_MAX_RELEASES'] == 0 ))) {
     shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.11 'echo \"\033[1;35m\" && cd $NNPATH && $_php $_backfill_cmd && \
-    $_mysql -u$_DB_USER -h $_DB_HOST --password=$_DB_PASSWORD $_DB_NAME -e \"${backfill_increment}\" && \
+    $_mysql --defaults-extra-file=$_current_path/../conf/my.cnf -u$_DB_USER -h $_DB_HOST $_DB_NAME -e \"${backfill_increment}\" && \
     date && echo \"$_sleep_string {$array['BACKFILL_SLEEP']} seconds...\" && sleep {$array['BACKFILL_SLEEP']}' 2>&1 1> /dev/null");
   }
 

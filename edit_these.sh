@@ -83,7 +83,7 @@ export NZBS="/path/to/nzbs"
 #Choose to run import nzb script true/false
 export IMPORT="true"
 
-#If you have all of your nzbs in one folder select false
+#If, you have all of your nzbs in one folder select false
 #If, you have all of you nzbs split into separate in with the root at $NZBS then select true
 #and 10 nzbs will be imported from each subfolder per loop.
 #Importing this way, allows all postprocessing scripts to run, such as book, music, movies
@@ -115,7 +115,7 @@ export RELEASES_SLEEP="40"
 #Choose to run optimize_innodb.php or optimize_mysiam.php script true/false
 #set to false by default, you should test the optimse scripts in bin first
 #optimize_myisam on small tables runs after every 5th loop of update_releases
-export OPTIMIZE="true"
+export OPTIMIZE="false"
 
 #How often to run optimize_myisam on large tables seconds
 export MYISAM_LARGE="600"

@@ -18,9 +18,20 @@ if [[ $AGREED == "no" ]]; then
         exit
 fi
 
+#create mysql my.conf
+#this keeps your password from being displayed in ps, htop and others
+echo -e '[client]\npassword='$DB_PASSWORD > ./conf/my.cnf
+chmod 600 ./conf/my.cnf
+
+#create powerline default.sh
+powerline/powerline/themes/default.start.sh
+if [ ! -f powerline/powerline/themes/default.sh ]; then
+  cp powerline/powerline/themes/default.start.sh powerline/powerline/themes/default.sh
+fi
+
 if [[ $RAMDISK == "true" ]]; then
   TMPUNRAR_QUERY="SELECT value from site where ID = 66;"
-  TMPUNRAR_PATH=`$MYSQL -u$DB_USER -h$DB_HOST --password=$DB_PASSWORD $DB_NAME -s -N -e "${TMPUNRAR_QUERY}"`
+  TMPUNRAR_PATH=`$MYSQL --defaults-extra-file=conf/my.cnf -u$DB_USER -h$DB_HOST $DB_NAME -s -N -e "${TMPUNRAR_QUERY}"`
   for i in {1..9}
   do
     umount $TMPUNRAR_PATH$i &> /dev/null
