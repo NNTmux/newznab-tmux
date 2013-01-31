@@ -27,10 +27,11 @@ chmod 600 ./conf/my.cnf
 if [ ! -f "powerline/powerline/themes/default.sh" ]; then
   cp powerline/powerline/themes/default.start.sh powerline/powerline/themes/default.sh
 fi
+#Get the path to tmpunrar
+TMPUNRAR_QUERY="SELECT value from site where ID = 66;"
+TMPUNRAR_PATH=`$MYSQL --defaults-extra-file=conf/my.cnf -u$DB_USER -h$DB_HOST $DB_NAME -s -N -e "${TMPUNRAR_QUERY}"`
 
 if [[ $RAMDISK == "true" ]]; then
-  TMPUNRAR_QUERY="SELECT value from site where ID = 66;"
-  TMPUNRAR_PATH=`$MYSQL --defaults-extra-file=conf/my.cnf -u$DB_USER -h$DB_HOST $DB_NAME -s -N -e "${TMPUNRAR_QUERY}"`
   umount $TMPUNRAR_PATH &> /dev/null
   rm -fr $TMPUNRAR_PATH
   mkdir $TMPUNRAR_PATH
@@ -43,7 +44,7 @@ rm -f bin/lib/post*
 rm -f bin/processAlternate*
 
 #create postprocessing scripts
-for (( c=2; c<=9; c++ ))
+for (( c=2; c<=32; c++ ))
   do
   d=$((($c - 1) * 100))
   cp $NEWZPATH/www/lib/postprocess.php bin/lib/postprocess$c.php
@@ -78,19 +79,14 @@ $TMUXCMD splitw -h -p 72 'echo "..."'
 $TMUXCMD splitw -h -p 50 'echo "..."'
 $TMUXCMD selectp -t 0
 $TMUXCMD splitw -v -p 60 'echo "..."'
-if [[ $NZB_THREADS == "true" ]]; then
-  $TMUXCMD splitw -v -p 60 'echo "..."'
-else
-  $TMUXCMD splitw -v -p 85 'echo "..."'
-fi
 $TMUXCMD splitw -v -p 50 'echo "..."'
-$TMUXCMD selectp -t 4
+$TMUXCMD selectp -t 3
 $TMUXCMD splitw -v -p 83 'echo "..."'
 $TMUXCMD splitw -v -p 80 'echo "..."'
 $TMUXCMD splitw -v -p 75 'echo "..."'
 $TMUXCMD splitw -v -p 67 'echo "..."'
 $TMUXCMD splitw -v -p 50 'echo "..."'
-$TMUXCMD selectp -t 10
+$TMUXCMD selectp -t 9
 $TMUXCMD splitw -v -p 75 'echo "..."'
 $TMUXCMD splitw -v -p 67 'echo "..."'
 $TMUXCMD splitw -v -p 50 'echo "..."'
@@ -107,22 +103,48 @@ $TMUXCMD selectp -t 4
 $TMUXCMD splitw -v -p 50 'echo "..."'
 $TMUXCMD selectp -t 6
 $TMUXCMD splitw -v -p 50 'echo "..."'
+
 $TMUXCMD new-window -n postprocessing 'echo "..."'
 
 $TMUXCMD selectp -t 0
-$TMUXCMD splitw -h -p 50 'echo "..."'
-$TMUXCMD selectp -t 0
-$TMUXCMD splitw -v -p 50 'echo "..."'
-$TMUXCMD selectp -t 2
+$TMUXCMD splitw -v -p 75 'echo "..."'
+$TMUXCMD splitw -v -p 67 'echo "..."'
 $TMUXCMD splitw -v -p 50 'echo "..."'
 $TMUXCMD selectp -t 0
+$TMUXCMD splitw -h -p 88 'echo "..."'
+$TMUXCMD splitw -h -p 85 'echo "..."'
+$TMUXCMD splitw -h -p 83 'echo "..."'
+$TMUXCMD splitw -h -p 80 'echo "..."'
+$TMUXCMD splitw -h -p 75 'echo "..."'
+$TMUXCMD splitw -h -p 67 'echo "..."'
 $TMUXCMD splitw -h -p 50 'echo "..."'
-$TMUXCMD selectp -t 2
+$TMUXCMD selectp -t 8
+$TMUXCMD splitw -h -p 88 'echo "..."'
+$TMUXCMD splitw -h -p 85 'echo "..."'
+$TMUXCMD splitw -h -p 83 'echo "..."'
+$TMUXCMD splitw -h -p 80 'echo "..."'
+$TMUXCMD splitw -h -p 75 'echo "..."'
+$TMUXCMD splitw -h -p 67 'echo "..."'
 $TMUXCMD splitw -h -p 50 'echo "..."'
-$TMUXCMD selectp -t 4
+$TMUXCMD selectp -t 16
+$TMUXCMD splitw -h -p 88 'echo "..."'
+$TMUXCMD splitw -h -p 85 'echo "..."'
+$TMUXCMD splitw -h -p 83 'echo "..."'
+$TMUXCMD splitw -h -p 80 'echo "..."'
+$TMUXCMD splitw -h -p 75 'echo "..."'
+$TMUXCMD splitw -h -p 67 'echo "..."'
 $TMUXCMD splitw -h -p 50 'echo "..."'
-$TMUXCMD selectp -t 6
+$TMUXCMD selectp -t 24
+$TMUXCMD splitw -h -p 88 'echo "..."'
+$TMUXCMD splitw -h -p 85 'echo "..."'
+$TMUXCMD splitw -h -p 83 'echo "..."'
+$TMUXCMD splitw -h -p 80 'echo "..."'
+$TMUXCMD splitw -h -p 75 'echo "..."'
+$TMUXCMD splitw -h -p 67 'echo "..."'
 $TMUXCMD splitw -h -p 50 'echo "..."'
+
+
+
 
 if [[ $USE_HTOP == "true" ]]; then
       $TMUXCMD new-window -n htop '$HTOP'

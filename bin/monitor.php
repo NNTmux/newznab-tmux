@@ -47,6 +47,7 @@ $time6 = TIME();
 $time7 = TIME();
 $time8 = TIME();
 $time9 = TIME();
+$time10 = TIME();
 
 //init start values
 $work_start = 0;
@@ -227,39 +228,34 @@ while($i>0)
     shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.2 'echo \"\033[0;32m\" && cd bin && $_php postprocess_nfo.php && date' 2>&1 1> /dev/null");
   }
 
-  //runs processAlternate1.php in pane 0.3 once if needed then exits
-  if (( $work_remaining_now > 0 ) && ( $array['POST_TO_RUN'] != 0 )) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.3 'echo \"\033[0;33m\" && cd bin && $_php processAlternate1.php && date' 2>&1 1> /dev/null");
-  }
-
-  //runs processGames.php in pane 0.4 once if needed then exits
+  //runs processGames.php in pane 0.3 once if needed then exits
   if (( $console_releases_proc > 0 ) && ( $array['POST_TO_RUN'] != 0 )) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.4 'echo \"\033[1;35m\" && cd bin && $_php processGames.php && date' 2>&1 1> /dev/null");
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.3 'echo \"\033[1;35m\" && cd bin && $_php processGames.php && date' 2>&1 1> /dev/null");
   }
 
-  //runs processMovies.php in pane 0.5 once if needed then exits
+  //runs processMovies.php in pane 0.4 once if needed then exits
   if (( $movie_releases_proc > 0 ) && ( $array['POST_TO_RUN'] != 0 )) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.5 'echo \"\033[1;37m\" && cd bin && $_php processMovies.php && date' 2>&1 1> /dev/null");
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.4 'echo \"\033[1;37m\" && cd bin && $_php processMovies.php && date' 2>&1 1> /dev/null");
   }
 
-  //runs processMusic.php in pane 0.6 once if needed then exits
+  //runs processMusic.php in pane 0.5 once if needed then exits
   if (( $music_releases_proc > 0 ) && ( $array['POST_TO_RUN'] != 0 )) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.6 'echo \"\033[1;31m\" && cd bin && $_php processMusic.php && date' 2>&1 1> /dev/null");
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.5 'echo \"\033[1;31m\" && cd bin && $_php processMusic.php && date' 2>&1 1> /dev/null");
   }
 
-  //runs processTv.php in pane 0.7 once if needed then exits
+  //runs processTv.php in pane 0.6 once if needed then exits
   if (( $tvrage_releases_proc > 0 ) && ( $array['POST_TO_RUN'] != 0 )) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.7 'echo \"\033[1;32m\" && cd bin && $_php processTv.php && date' 2>&1 1> /dev/null");
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.6 'echo \"\033[1;32m\" && cd bin && $_php processTv.php && date' 2>&1 1> /dev/null");
   }
 
-  //runs processBooks.php in pane 0.8 once if needed then exits
+  //runs processBooks.php in pane 0.7 once if needed then exits
   if (( $book_releases_proc > 0 ) && ( $array['POST_TO_RUN'] != 0 )) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.8 'echo \"\033[0;34m\" && cd bin && $_php processBooks.php && date' 2>&1 1> /dev/null");
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.7 'echo \"\033[0;34m\" && cd bin && $_php processBooks.php && date' 2>&1 1> /dev/null");
   }
 
-  //runs processOthers.php in pane 0.9 once if needed then exits
+  //runs processOthers.php in pane 0.8 once if needed then exits
   if  ( $array['POST_TO_RUN'] != 0 ) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.9 'echo \"\033[1;33m\" && cd bin && $_php processOthers.php && date' 2>&1 1> /dev/null");
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.8 'echo \"\033[1;33m\" && cd bin && $_php processOthers.php && date' 2>&1 1> /dev/null");
   }
 
   //set command for running update_binaries
@@ -283,70 +279,52 @@ while($i>0)
     $nzb_cmd = "$_php nzb-import.php \"{$array['NZBS']}\" true";
   }
 
-  //runs update_binaries in 0.10 once if needed and exits
+  //runs update_binaries in 0.9 once if needed and exits
   if (( $array['BINARIES'] == "true" ) && (( $total_work_now < $array['MAX_RELEASES'] ) || ( $array['MAX_RELEASES'] == 0 ))) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.10 'echo \"\033[1;34m\" && cd $NNPATH && $_php $_update_cmd && date && echo \"$_sleep_string {$array['BINARIES_SLEEP']} seconds...\" && sleep {$array['BINARIES_SLEEP']}' 2>&1 1> /dev/null");
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.9 'echo \"\033[1;34m\" && cd $NNPATH && $_php $_update_cmd && date && echo \"$_sleep_string {$array['BINARIES_SLEEP']} seconds...\" && sleep {$array['BINARIES_SLEEP']}' 2>&1 1> /dev/null");
   }
 
-  //runs backfill in 0.11 once if needed and exits
+  //runs backfill in 0.10 once if needed and exits
   if (( $array['BACKFILL'] == "true" ) && (( $total_work_now < $array['BACKFILL_MAX_RELEASES'] ) || ( $array['BACKFILL_MAX_RELEASES'] == 0 ))) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.11 'echo \"\033[1;35m\" && cd $NNPATH && $_php $_backfill_cmd && \
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.10 'echo \"\033[1;35m\" && cd $NNPATH && $_php $_backfill_cmd && \
     $_mysql --defaults-extra-file=$_current_path/../conf/my.cnf -u$_DB_USER -h $_DB_HOST $_DB_NAME -e \"${backfill_increment}\" && \
     date && echo \"$_sleep_string {$array['BACKFILL_SLEEP']} seconds...\" && sleep {$array['BACKFILL_SLEEP']}' 2>&1 1> /dev/null");
   }
 
-  //runs nzb-import in 0.12 once if needed and exits
+  //runs nzb-import in 0.11 once if needed and exits
   if (( $array['IMPORT'] == "true" ) && (( $total_work_now < $array['IMPORT_MAX_RELEASES'] ) || ( $array['IMPORT_MAX_RELEASES'] == 0 ))) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.12 'echo \"\033[1;36m\" && cd bin && $nzb_cmd && echo \" \" && date && echo \"$_sleep_string {$array['IMPORT_SLEEP']} seconds...\" && sleep {$array['IMPORT_SLEEP']}' 2>&1 1> /dev/null");
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.11 'echo \"\033[1;36m\" && cd bin && $nzb_cmd && echo \" \" && date && echo \"$_sleep_string {$array['IMPORT_SLEEP']} seconds...\" && sleep {$array['IMPORT_SLEEP']}' 2>&1 1> /dev/null");
   }
 
-  //runs update_release and optimize_myisam.php in 0.13 once if needed and exits
+  //runs update_release and optimize_myisam.php in 0.12 once if needed and exits
   if ( $array['RELEASES'] == "true" ) {
     if ((( $array['OPTIMIZE'] == "true" ) && ( ($i % 5) == 0 ))) {
-      shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.13 'echo \"\033[1;37m\" && cd $_current_path && $_php update_releases.php && cd $_current_path && $_php optimize_myisam.php && date && echo \"$_sleep_string {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']}' 2>&1 1> /dev/null");
+      shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.12 'echo \"\033[1;37m\" && cd $_current_path && $_php update_releases.php && cd $_current_path && $_php optimize_myisam.php && date && echo \"$_sleep_string {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']}' 2>&1 1> /dev/null");
     } else {
-      shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.13 'echo \"\033[1;37m\" && cd $_current_path && $_php update_releases.php && cd $_current_path && date && echo \"$_sleep_string {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']}' 2>&1 1> /dev/null");
+      shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.12 'echo \"\033[1;37m\" && cd $_current_path && $_php update_releases.php && cd $_current_path && date && echo \"$_sleep_string {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']}' 2>&1 1> /dev/null");
     }
   }
 
-  //runs processAlternate2.php in 2.0 once if needed and exits
-  if (( $array['POST_TO_RUN'] >= 2 ) && ( $work_remaining_now > 200 )) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.0 'echo \"\033[0;31m\" && cd bin && $_php processAlternate2.php && date' 2>&1 1> /dev/null");
-  }
-
-  //runs processAlternate3.php in 2.1 once if needed and exits
-  if (( $array['POST_TO_RUN'] >= 3 ) && ( $work_remaining_now > 300 )) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.1 'echo \"\033[0;32m\" && cd bin && $_php processAlternate3.php && date' 2>&1 1> /dev/null");
-  }
-
-  //runs processAlternate4.php in 2.2 once if needed and exits
-  if (( $array['POST_TO_RUN'] >= 4 ) && ( $work_remaining_now > 400 )) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.2 'echo \"\033[0;33m\" && cd bin && $_php processAlternate4.php && date' 2>&1 1> /dev/null");
-  }
-
-  //runs processAlternate5.php in 2.3 once if needed and exits
-  if (( $array['POST_TO_RUN'] >= 5 ) && ( $work_remaining_now > 500 )) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.3 'echo \"\033[0;34m\" && cd bin && $_php processAlternate5.php && date' 2>&1 1> /dev/null");
-  }
-
-  //runs processAlternate6.php in 2.4 once if needed and exits
-  if (( $array['POST_TO_RUN'] >= 6 ) && ( $work_remaining_now > 600 )) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.4 'echo \"\033[0;35m\" && cd bin && $_php processAlternate6.php && date' 2>&1 1> /dev/null");
-  }
-
-  //runs processAlternate7.php in 2.5 once if needed and exits
-  if (( $array['POST_TO_RUN'] >= 7 ) && ( $work_remaining_now > 700 )) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.5 'echo \"\033[0;36m\" && cd bin && $_php processAlternate7.php && date' 2>&1 1> /dev/null");
-  }
-
-  //runs processAlternate8.php in 2.6 once if needed and exits
-  if (( $array['POST_TO_RUN'] >= 8 ) && ( $work_remaining_now > 800 )) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.6 'echo \"\033[0;37m\" && cd bin && $_php processAlternate8.php && date' 2>&1 1> /dev/null");
-  }
-
-  //runs processAlternate9.php in 2.7 once if needed and exits
-  if (( $array['POST_TO_RUN'] >= 9 ) && ( $work_remaining_now > 900 )) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.7 'echo \"\033[0;38m\" && cd bin && $_php processAlternate9.php && date' 2>&1 1> /dev/null");
+  //start posproceesing in window 2
+  if ((TIME() - $time10) <= 600) {
+    for ($g=1; $g<=32; $g++)
+    {
+      $h=$g-1;
+      $f=$g*100;
+      if (( $array['POST_TO_RUN'] >= $g ) && ( $work_remaining_now > $f )) {
+        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.$h 'echo \"\033[0;33m\" && cd bin && $_php processAlternate$g.php && date' 2>&1 1> /dev/null");
+      }
+    }
+  } else {
+    for ($g=1; $g<=32; $g++)
+    {
+      $h=$g-1;
+      $f=$g*100;
+      if (( $array['POST_TO_RUN'] >= $g ) && ( $work_remaining_now > $f )) {
+        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:2.$h 'echo \"\033[0;33m\" && cd bin && $_php processAlternate$g.php && date' 2>&1 1> /dev/null");
+      }
+    }
+   $time10 = TIME();
   }
 
   //get microtime and calcutlat time

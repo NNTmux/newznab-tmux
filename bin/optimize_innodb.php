@@ -20,7 +20,7 @@ function quantity($force = false)
   return $ret;
 }
 
-function ioptimise($force = false)
+function ioptimize($force = false)
 {
   $db = new DB;
   $ret = array();
@@ -44,11 +44,11 @@ $db = new DB;
 echo "\033[1;41;33mOptmze  : OPTIMIZATION OF THE INNODB MYSQL TABLES HAS STARTED, DO NOT STOP THIS SCRIPT!\033[1;33m\n\n";
 $qret = quantity($force);
 echo "Optmze  : Going to start optimizing ".count($qret)." InnoDB tables (if you have InnoDB tables).\n";
-$ret = ioptimise($force);
+$ret = ioptimize($force);
 echo "Optmze  : Finished optimizing ".count($ret)." InnoDB tables.\n";
 
 if (count($ret) > 0)
   echo "Optmze  : Optimization completed.\033[1;37m\n";
 else
-  echo "Optmze  : Nothing requires optimization.".(!$force ? " Try using force (optimise_inno.php true)" : "")."\033[1;37m\n";
+  echo "Optmze  : Nothing requires optimization.".(!$force ? " Try using force (optimize_inno.php true)" : "")."\033[1;37m\n";
 

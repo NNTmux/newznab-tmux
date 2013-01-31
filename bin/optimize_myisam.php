@@ -20,7 +20,7 @@ function quantity($force = false)
   return $ret;
 }
 
-function moptimise($force = false)
+function moptimize($force = false)
 {
   $db = new DB;
   $ret = array();
@@ -46,11 +46,11 @@ $db = new DB;
 echo "\033[1;41;33mOptmze  : OPTIMIZATION OF THE MYISAM MYSQL TABLES HAS STARTED, DO NOT STOP THIS SCRIPT!\033[1;0;33m\n\n";
 $qret = quantity($force);
 echo "Optmze  : Going to start optimizing ".count($qret)." MyISAM tables (if you have MyISAM tables).\n";
-$ret = moptimise($force);
+$ret = moptimize($force);
 echo "Optmze  : Finished optimizing ".count($ret)." MyISAM tables.\n";
 
 if (count($ret) > 0)
   echo "Optmze  : Optimization completed.\033[1;37m\n";
 else
-  echo "Optmze  : Nothing requires optimization.".(!$force ? " Try using force (optimise_myisam.php true)" : "")."\033[1;37m\n";
+  echo "Optmze  : Nothing requires optimization.".(!$force ? " Try using force (optimize_myisam.php true)" : "")."\033[1;37m\n";
 
