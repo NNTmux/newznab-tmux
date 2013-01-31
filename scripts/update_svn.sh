@@ -9,6 +9,6 @@ svn export --force --username svnplus --password $PASSWORD svn://svn.newznab.com
 cd $NEWZPATH"/misc/update_scripts"
 php5 update_database_version.php
 
-cd $NEWZPATH"/misc/update_scripts/nix_scripts/tmux/"
+cd $NEWZPATH"/misc/update_scripts/nix_scripts/tmux/scripts"
 ./set_perms.sh
 
