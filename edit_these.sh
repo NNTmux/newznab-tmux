@@ -93,7 +93,7 @@ export IMPORT="true"
 export NZB_THREADS="true"
 
 #How many nzbs to import per loop, if using NZB_THREADS=true the per folder
-export NZBCOUNT="5"
+export NZBCOUNT="10"
 
 #Set, in seconds - how long the nzb-import should sleep between runs, 0 may cause errors
 #below backfill
