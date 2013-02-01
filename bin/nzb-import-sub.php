@@ -57,8 +57,8 @@ if ($ps->RunThreadCode())
 
 	$dir = dirname(__FILE__);
 	$file = 'nzb-importonenzb.php';
+	echo "[Thread-{$thread}] Started importing from {$subdir}\n";
 	$output = shell_exec("php {$dir}/{$file} {$subdir} true");
-
 	echo "[Thread-{$thread}] Completed importing from {$subdir}\n";
 }
 exit(0);
