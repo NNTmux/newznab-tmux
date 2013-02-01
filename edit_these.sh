@@ -79,7 +79,7 @@ export MAXDAYS="210"
 ############################################################
 
 #Set the path to the nzb dump you downloaded from torrents, this is the path to bulk files folder of nzbs
-#this does not recurse through subfolders
+#this does not recurse through subfolders, unless you set NZB_THREADS to true
 export NZBS="/path/to/nzbs"
 
 #Choose to run import nzb script true/false
