@@ -32,7 +32,7 @@ while ($i==0) {
 
     if ($subdir_count_now != $subdir_count ) {
         system('clear');
-        printf("\n\n\033[1;41;33mYou change folder contents.");
+        printf("\n\n\033[1;41;33mYour folder contents changed.");
         break;
     }
 
