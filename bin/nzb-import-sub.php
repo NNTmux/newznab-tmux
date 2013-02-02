@@ -20,7 +20,7 @@ if($subdir_count == 0){
 
 $ps = new PowerProcess;
 $ps->RegisterCallback('psUpdateComplete');
-$ps->maxThreads = 20;
+$ps->maxThreads = 30;
 $ps->threadTimeLimit = 0;
 $selected = $subdir_count - 1;
 
