@@ -54,6 +54,8 @@
  * Additional scripts included in the script folder. I have included prepare.sh to make updating these sctipts alittle easier. I also included a svn updater, svn.sh. It performs a forced updated, which overwrites any changes you may have may to the stock nn+ scripts.
 
  * If you connect using **putty**, then under Window/Translation set Remote character set to UTF-8.
+ 
+ * If you are using the powerline statusbar, you will most likely need a patch font. The ttf Consolas from [powerline-fonts](https://github.com/Lokaltog/powerline-fonts) is the only one that I have found to be nearly complete and work with putty and Win7. The otf fonts should be fine, although I am not able to test.
 
  * You must edit any file that is called from **misc/testing/** in order for it to actually do something, and update_parsing is good for fixing a few releases everytime it runs, not a silver bullet though.
 
