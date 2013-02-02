@@ -221,7 +221,7 @@ export AGREED="no"
 
 command -v mysql >/dev/null 2>&1 || { echo >&2 "I require mysql but it's not installed.  Aborting."; exit 1; } && export MYSQL=`command -v mysql`
 command -v php5 >/dev/null 2>&1 && export PHP=`command -v php5` || { export PHP=`command -v php`; }
-command -v tmux >/dev/null 2>&1 || { echo >&2 "I require tmux but it's not installed.  Aborting."; exit 1; } && export TMUXCMD=`command -v tmux`
+command -v tmux >/dev/null 2>&1 || { echo >&2 "I require tmux but it's not installed.  Aborting."; exit 1; } && export TMUXCMD=`command -v tmux -2`
 command -v nice >/dev/null 2>&1 || { echo >&2 "I require nice but it's not installed.  Aborting."; exit 1; } && export NICE=`command -v nice`
 
 

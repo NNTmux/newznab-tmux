@@ -55,15 +55,15 @@
  
  * Any variable in defaults.sh can be changed, except the paths to the commands, and the changed will take effect on the next loop of the monitor. By default, the monitor loops every 30 seconds
 
- * If you connect using **putty**, then under Window/Translation set Remote character set to UTF-8.
+ * If you connect using **putty**, then under Window/Translation set Remote character set to UTF-8. To use 256 colors, you must set Connection/Data Terminal-type string to "xterm-256color" and in Window/Colours check the top three boxes, otherwise only 16 colors are displayed.
  
  * If you are using the powerline statusbar, you will most likely need a patch font. The Consolas ttf from [powerline-fonts](https://github.com/Lokaltog/powerline-fonts) is the only one that I have found to be nearly complete and work with putty and Win7. The otf fonts should be fine, although I am not able to test.
 
  * You must edit any file that is called from **misc/testing/** in order for it to actually do something, and update_parsing is good for fixing a few releases everytime it runs, not a silver bullet though.
 
- * Now all panes should be running smoothly. If any script exits early, the error message should be displayed. It will run again during the next monitor cycle.
+ * Take caution that Optimize is not running when you shut down the scripts, Optimize runs in window 2, pane 4.
 
- * Join in the converstion at irc://moonlight.se.eu.synirc.net/newznab-tmux.
+ * Join in the converstion at irc://irc.synirc.net/newznab-tmux.
 
 
 
