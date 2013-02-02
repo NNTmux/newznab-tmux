@@ -52,6 +52,8 @@
   ```
 
  * Additional scripts included in the script folder. I have included prepare.sh to make updating these sctipts alittle easier. I also included a svn updater, svn.sh. It performs a forced updated, which overwrites any changes you may have may to the stock nn+ scripts.
+ 
+ * Any variable in defaults.sh can be changed, except the paths to the commands, and the changed will take effect on the next loop of the monitor. By default, the monitor loops every 30 seconds
 
  * If you connect using **putty**, then under Window/Translation set Remote character set to UTF-8.
  
