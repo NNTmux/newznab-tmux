@@ -6,7 +6,7 @@ source "${TMUX_POWERLINE_DIR_LIB}/tmux_adapter.sh"
 
 run_segment() {
 	tmux_path=$(get_tmux_cwd)
-	cd "$tmux_path"
+	cd "/var/www/newznab/"
 
 	stats=""
 	if [[ -n "${svn_stats=$(__parse_svn_stats)}" ]]; then

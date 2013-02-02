@@ -9,50 +9,12 @@ do
 done
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
-source ../edit_these.sh
+source ../defaults.sh
 clear
 
 if [[ $AGREED == "no" ]]; then
-        echo "Please edit the edit_these.sh file"
+        echo "Please edit the defaults.sh file"
         exit
-fi
-
-echo -e "\033[38;5;148mEditing $NEWZPATH/www/lib/postprocess.php"
-if [ ! -f $NEWZPATH/www/lib/postprocess.php.orig ]; then
-	cp $NEWZPATH/www/lib/postprocess.php $NEWZPATH/www/lib/postprocess.php.orig
-fi
-if ! grep -q '//$this->processAdditional();' "$NEWZPATH/www/lib/postprocess.php" ; then
-	$SED -i -e 's/$this->processAdditional();/\/\/$this->processAdditional();/' $NEWZPATH/www/lib/postprocess.php
-fi
-if ! grep -q '//$this->processNfos();' "$NEWZPATH/www/lib/postprocess.php" ; then
-	$SED -i -e 's/$this->processNfos();/\/\/$this->processNfos();/' $NEWZPATH/www/lib/postprocess.php
-fi
-if ! grep -q '//$this->processUnwanted();' "$NEWZPATH/www/lib/postprocess.php" ; then
-	$SED -i -e 's/$this->processUnwanted();/\/\/$this->processUnwanted();/' $NEWZPATH/www/lib/postprocess.php
-fi
-if ! grep -q '//$this->processMovies();' "$NEWZPATH/www/lib/postprocess.php" ; then
-	$SED -i -e 's/$this->processMovies();/\/\/$this->processMovies();/' $NEWZPATH/www/lib/postprocess.php
-fi
-if ! grep -q '//$this->processMusic();' "$NEWZPATH/www/lib/postprocess.php" ; then
-	$SED -i -e 's/$this->processMusic();/\/\/$this->processMusic();/' $NEWZPATH/www/lib/postprocess.php
-fi
-if ! grep -q '//$this->processBooks();' "$NEWZPATH/www/lib/postprocess.php" ; then
-	$SED -i -e 's/$this->processBooks();/\/\/$this->processBooks();/' $NEWZPATH/www/lib/postprocess.php
-fi
-if ! grep -q '//$this->processGames();' "$NEWZPATH/www/lib/postprocess.php" ; then
-	$SED -i -e 's/$this->processGames();/\/\/$this->processGames();/' $NEWZPATH/www/lib/postprocess.php
-fi
-if ! grep -q '//$this->processTv();' "$NEWZPATH/www/lib/postprocess.php" ; then
-	$SED -i -e 's/$this->processTv();/\/\/$this->processTv();/' $NEWZPATH/www/lib/postprocess.php
-fi
-if ! grep -q '//$this->processMusicFromMediaInfo();' "$NEWZPATH/www/lib/postprocess.php" ; then
-	$SED -i -e 's/$this->processMusicFromMediaInfo();/\/\/$this->processMusicFromMediaInfo();/' $NEWZPATH/www/lib/postprocess.php
-fi
-if ! grep -q '//$this->processOtherMiscCategory();' "$NEWZPATH/www/lib/postprocess.php" ; then
-	$SED -i -e 's/$this->processOtherMiscCategory();/\/\/$this->processOtherMiscCategory();/' $NEWZPATH/www/lib/postprocess.php
-fi
-if ! grep -q '//$this->processUnknownCategory();' "$NEWZPATH/www/lib/postprocess.php" ; then
-	$SED -i -e 's/$this->processUnknownCategory();/\/\/$this->processUnknownCategory();/' $NEWZPATH/www/lib/postprocess.php
 fi
 
 echo "Fixing permisions, this can take some time if you have a large set of releases"
