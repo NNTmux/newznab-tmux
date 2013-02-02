@@ -119,6 +119,15 @@ while($i>0)
   $work_since_start = $work_remaining_now - $work_start;
   $total_work_now = $work_remaining_now + $tvrage_releases_proc + $music_releases_proc + $movie_releases_proc + $console_releases_proc + $book_releases_proc;
 
+  $nfo_percent = floor(( $nfo_now / $releases_now) * 100 );
+  $console_percent = floor(( $console_releases_now / $releases_now) * 100 );
+  $movie_percent = floor(( $movie_releases_now / $releases_now) * 100 );
+  $music_percent = floor(( $music_releases_now / $releases_now) * 100 );
+  $pc_percent = floor(( $pc_releases_now / $releases_now) * 100 );
+  $tvrage_percent = floor(( $tvrage_releases_now / $releases_now) * 100 );
+  $book_percent = floor(( $book_releases_now / $releases_now) * 100 );
+  $misc_percent = floor(( $misc_releases_now / $releases_now) * 100 );
+
   //get microtime at end of queries
   $query_timer = microtime_float()-$query_timer_start;
 
@@ -155,25 +164,25 @@ while($i>0)
   printf("\033[1;31m  $releases_now($signed$releases_since_start)\033[0m releases in your database.\n");
   printf("\033[1;31m  $total_work_now($signed1$work_since_start)\033[0m releases left to postprocess.\033[1;33m\n");
 
-  $mask = "%20s %10s %10s \n";
+  $mask = "%20s %10s %13s \n";
   printf($mask, "Category", "In Process", "In Database");
-  printf($mask, "===============", "==========", "==========\033[0m");
-  printf($mask, "NFO's","$nfo_remaining_now","$nfo_now");
-  printf($mask, "Console(1000)","$console_releases_proc","$console_releases_now");
-  printf($mask, "Movie(2000)","$movie_releases_proc","$movie_releases_now");
-  printf($mask, "Audio(3000)","$music_releases_proc","$music_releases_now");
-  printf($mask, "PC(4000)","$pc_releases_proc","$pc_releases_now");
-  printf($mask, "TVShows(5000)","$tvrage_releases_proc","$tvrage_releases_now");
-  printf($mask, "Books(7000)","$book_releases_proc","$book_releases_now");
-  printf($mask, "Misc(8000)","$work_remaining_now","$misc_releases_now");
+  printf($mask, "===============", "==========", "=============\033[0m");
+  printf($mask, "NFO's","$nfo_remaining_now","$nfo_now($nfo_percent%)");
+  printf($mask, "Console(1000)","$console_releases_proc","$console_releases_now($console_percent%)");
+  printf($mask, "Movie(2000)","$movie_releases_proc","$movie_releases_now($movie_percent%)");
+  printf($mask, "Audio(3000)","$music_releases_proc","$music_releases_now($music_percent%)");
+  printf($mask, "PC(4000)","$pc_releases_proc","$pc_releases_now($pc_percent%)");
+  printf($mask, "TVShows(5000)","$tvrage_releases_proc","$tvrage_releases_now($tvrage_percent%)");
+  printf($mask, "Books(7000)","$book_releases_proc","$book_releases_now($book_percent%)");
+  printf($mask, "Misc(8000)","$work_remaining_now","$misc_releases_now($misc_percent%)");
 
   $NNPATH="{$array['NEWZPATH']}{$array['NEWZNAB_PATH']}";
   $TESTING="{$array['NEWZPATH']}{$array['TESTING_PATH']}";
 
-  $mask = "%20s %10.10s %10s \n";
+  $mask = "%20s %10.10s %13s \n";
   printf("\n\033[1;33m");
   printf($mask, "Category", "Time", "Status");
-  printf($mask, "===============", "==========", "==========\033[0m");
+  printf($mask, "===============", "==========", "=============\033[0m");
   printf($mask, "Queries","$query_timer","queried");
 
   //get microtime for timing script check

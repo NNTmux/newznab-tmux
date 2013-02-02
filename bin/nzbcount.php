@@ -15,9 +15,9 @@ $i=0;
 while ($i==0) {
     system('clear');
     printf("\n\033[1;33m");
-    $mask = "%20s %10.10s %10s \n";
+    $mask = "%20s %10.10s %13s \n";
     printf($mask, "Folder Name", "In Folder", "Imported");
-    printf($mask, "===============", "==========", "==========\033[0m");
+    printf($mask, "===============", "==========", "=============\033[0m");
 
     $subdir_count = 0;
     $path = $array['NZBS'];

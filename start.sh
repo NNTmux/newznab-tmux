@@ -25,40 +25,40 @@ if [[ $AGREED == "no" ]]; then
 fi
 
 if [ ! -f $NEWZPATH/www/lib/postprocess.php.orig ]; then
-        cp $NEWZPATH/www/lib/postprocess.php $NEWZPATH/www/lib/postprocess.php.orig
+  sudo cp $NEWZPATH/www/lib/postprocess.php $NEWZPATH/www/lib/postprocess.php.orig
 fi
 if ! grep -q '//$this->processAdditional();' "$NEWZPATH/www/lib/postprocess.php" ; then
-        $SED -i -e 's/$this->processAdditional();/\/\/$this->processAdditional();/' $NEWZPATH/www/lib/postprocess.php
+  sudo $SED -i -e 's/$this->processAdditional();/\/\/$this->processAdditional();/' $NEWZPATH/www/lib/postprocess.php
 fi
 if ! grep -q '//$this->processNfos();' "$NEWZPATH/www/lib/postprocess.php" ; then
-        $SED -i -e 's/$this->processNfos();/\/\/$this->processNfos();/' $NEWZPATH/www/lib/postprocess.php
+  sudo $SED -i -e 's/$this->processNfos();/\/\/$this->processNfos();/' $NEWZPATH/www/lib/postprocess.php
 fi
 if ! grep -q '//$this->processUnwanted();' "$NEWZPATH/www/lib/postprocess.php" ; then
-        $SED -i -e 's/$this->processUnwanted();/\/\/$this->processUnwanted();/' $NEWZPATH/www/lib/postprocess.php
+  sudo $SED -i -e 's/$this->processUnwanted();/\/\/$this->processUnwanted();/' $NEWZPATH/www/lib/postprocess.php
 fi
 if ! grep -q '//$this->processMovies();' "$NEWZPATH/www/lib/postprocess.php" ; then
-        $SED -i -e 's/$this->processMovies();/\/\/$this->processMovies();/' $NEWZPATH/www/lib/postprocess.php
+  sudo $SED -i -e 's/$this->processMovies();/\/\/$this->processMovies();/' $NEWZPATH/www/lib/postprocess.php
 fi
 if ! grep -q '//$this->processMusic();' "$NEWZPATH/www/lib/postprocess.php" ; then
-        $SED -i -e 's/$this->processMusic();/\/\/$this->processMusic();/' $NEWZPATH/www/lib/postprocess.php
+  sudo $SED -i -e 's/$this->processMusic();/\/\/$this->processMusic();/' $NEWZPATH/www/lib/postprocess.php
 fi
 if ! grep -q '//$this->processBooks();' "$NEWZPATH/www/lib/postprocess.php" ; then
-        $SED -i -e 's/$this->processBooks();/\/\/$this->processBooks();/' $NEWZPATH/www/lib/postprocess.php
+  sudo $SED -i -e 's/$this->processBooks();/\/\/$this->processBooks();/' $NEWZPATH/www/lib/postprocess.php
 fi
 if ! grep -q '//$this->processGames();' "$NEWZPATH/www/lib/postprocess.php" ; then
-        $SED -i -e 's/$this->processGames();/\/\/$this->processGames();/' $NEWZPATH/www/lib/postprocess.php
+  sudo $SED -i -e 's/$this->processGames();/\/\/$this->processGames();/' $NEWZPATH/www/lib/postprocess.php
 fi
 if ! grep -q '//$this->processTv();' "$NEWZPATH/www/lib/postprocess.php" ; then
-        $SED -i -e 's/$this->processTv();/\/\/$this->processTv();/' $NEWZPATH/www/lib/postprocess.php
+  sudo $SED -i -e 's/$this->processTv();/\/\/$this->processTv();/' $NEWZPATH/www/lib/postprocess.php
 fi
 if ! grep -q '//$this->processMusicFromMediaInfo();' "$NEWZPATH/www/lib/postprocess.php" ; then
-        $SED -i -e 's/$this->processMusicFromMediaInfo();/\/\/$this->processMusicFromMediaInfo();/' $NEWZPATH/www/lib/postprocess.php
+  sudo $SED -i -e 's/$this->processMusicFromMediaInfo();/\/\/$this->processMusicFromMediaInfo();/' $NEWZPATH/www/lib/postprocess.php
 fi
 if ! grep -q '//$this->processOtherMiscCategory();' "$NEWZPATH/www/lib/postprocess.php" ; then
-        $SED -i -e 's/$this->processOtherMiscCategory();/\/\/$this->processOtherMiscCategory();/' $NEWZPATH/www/lib/postprocess.php
+  sudo $SED -i -e 's/$this->processOtherMiscCategory();/\/\/$this->processOtherMiscCategory();/' $NEWZPATH/www/lib/postprocess.php
 fi
 if ! grep -q '//$this->processUnknownCategory();' "$NEWZPATH/www/lib/postprocess.php" ; then
-        $SED -i -e 's/$this->processUnknownCategory();/\/\/$this->processUnknownCategory();/' $NEWZPATH/www/lib/postprocess.php
+  sudo $SED -i -e 's/$this->processUnknownCategory();/\/\/$this->processUnknownCategory();/' $NEWZPATH/www/lib/postprocess.php
 fi
 
 #create mysql my.conf
@@ -70,20 +70,19 @@ chmod 600 ./conf/my.cnf
 if [ ! -f "powerline/powerline/themes/default.sh" ]; then
   cp powerline/powerline/themes/default.start.sh powerline/powerline/themes/default.sh
 fi
+
 #Get the path to tmpunrar
-TMPUNRAR_QUERY="SELECT value from site where ID = 66;"
+TMPUNRAR_QUERY="SELECT value from site where setting = \"tmpunrarpath\";"
 TMPUNRAR_PATH=`$MYSQL --defaults-extra-file=conf/my.cnf -u$DB_USER -h$DB_HOST $DB_NAME -s -N -e "${TMPUNRAR_QUERY}"`
 TMPUNRAR_PATH=$TMPUNRAR_PATH"1"
+sudo mkdir -p $TMPUNRAR_PATH
 
+#create a ramdisk
 if [[ $RAMDISK == "true" ]]; then
-  umount $TMPUNRAR_PATH &> /dev/null
-  mkdir -p $TMPUNRAR_PATH
-  chmod 777 $TMPUNRAR_PATH
-  mount -t tmpfs -o size=256M tmpfs $TMPUNRAR_PATH 2>&1 > /dev/null
-else
-  mkdir -p $TMPUNRAR_PATH
-  chmod 777 $TMPUNRAR_PATH
+  mountpoint -q $TMPUNRAR_PATH || sudo mount -t tmpfs -o size=32M tmpfs $TMPUNRAR_PATH 2>&1 > /dev/null
 fi
+
+sudo chmod -R 777 $TMPUNRAR_PATH
 
 #remove postprocessing scripts
 rm -f bin/lib/post*
@@ -116,7 +115,7 @@ sed -i -e "s/\$tmpPath = \$this->site->tmpunrarpath;/\$tmpPath = \$this->site->t
 sed -i -e 's/order by r.postdate desc limit %d.*$/order by r.guid desc limit %d ", ($maxattemptstocheckpassworded + 1) * -1, $numtoProcess));/g' bin/lib/postprocess1.php
 sed -i -e 's/PostPrc : Performing additional post processing.*$/PostPrc : Performing additional post processing by guid on ".$rescount." releases ...";/g' bin/lib/postprocess1.php
 
-chmod -R 777 $TMPUNRAR_PATH
+sudo chmod -R 777 $TMPUNRAR_PATH
 
 printf "\033]0; $TMUX_SESSION\007\003\n"
 $TMUXCMD -f $TMUX_CONF new-session -d -s $TMUX_SESSION -n $TMUX_SESSION 'cd bin && echo "Monitor Started" && echo "It might take a minute for everything to spinup......" && $NICE -n 19 $PHP monitor.php'
