@@ -77,10 +77,12 @@ TMPUNRAR_PATH=$TMPUNRAR_PATH"1"
 
 if [[ $RAMDISK == "true" ]]; then
   umount $TMPUNRAR_PATH &> /dev/null
-  rm -fr $TMPUNRAR_PATH
-  mkdir $TMPUNRAR_PATH
+  mkdir -p $TMPUNRAR_PATH
   chmod 777 $TMPUNRAR_PATH
   mount -t tmpfs -o size=256M tmpfs $TMPUNRAR_PATH 2>&1 > /dev/null
+else
+  mkdir -p $TMPUNRAR_PATH
+  chmod 777 $TMPUNRAR_PATH
 fi
 
 #remove postprocessing scripts
