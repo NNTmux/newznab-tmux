@@ -11,16 +11,16 @@ $qry="SELECT COUNT( releases.categoryID ) AS cnt, parentID FROM releases RIGHT J
 //needs to be processed query
 $proc="SELECT ( SELECT COUNT( groupID ) AS cnt from releases where consoleinfoID IS NULL and categoryID BETWEEN 1000 AND 1999 ) AS console, ( SELECT COUNT( groupID ) AS cnt from releases where imdbID IS NULL and categoryID BETWEEN 2000 AND 2999 ) AS movies, ( SELECT COUNT( groupID ) AS cnt from releases where musicinfoID IS NULL and categoryID BETWEEN 3000 AND 3999 ) AS audio, ( SELECT COUNT( groupID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (categoryID BETWEEN 4000 AND 4999 and ((r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)))) AS pc, ( SELECT COUNT( groupID ) AS cnt from releases where rageID = -1 and categoryID BETWEEN 5000 AND 5999 ) AS tv, ( SELECT COUNT( groupID ) AS cnt from releases where bookinfoID IS NULL and categoryID = 7020 ) AS book, ( SELECT COUNT( groupID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)) AS work, ( SELECT COUNT( groupID ) AS cnt from releases) AS releases, ( SELECT COUNT( groupID ) AS cnt FROM releases r WHERE r.releasenfoID = 0) AS nforemains, ( SELECT COUNT( groupID ) AS cnt FROM releases WHERE releasenfoID not in (0, -1)) AS nfo, ( SELECT table_rows AS cnt FROM information_schema.TABLES where table_name = 'parts' AND TABLE_SCHEMA = '".DB_NAME."' ) AS parts, ( SELECT concat(round((data_length+index_length)/(1024*1024*1024),2),'GB') AS cnt FROM information_schema.tables where table_name = 'parts' AND TABLE_SCHEMA = '".DB_NAME."' ) AS partsize;";
 
-//get variables from edit_these.sh
-$varnames = shell_exec("cat ../edit_these.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
-$vardata = shell_exec('cat ../edit_these.sh | grep ^export | cut -d \" -f2 | awk "{print $1;}"');
+//get variables from defaults.sh
+$varnames = shell_exec("cat ../defaults.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
+$vardata = shell_exec('cat ../defaults.sh | grep ^export | cut -d \" -f2 | awk "{print $1;}"');
 $varnames = explode("\n", $varnames);
 $vardata = explode("\n", $vardata);
 $array = array_combine($varnames, $vardata);
 unset($array['']);
 
 //environment
-$backfill_increment = "UPDATE groups set backfill_target=backfill_target+1 where active=1 and backfill_target<{$array['MAXDAYS']};";
+$_backfill_increment = "UPDATE groups set backfill_target=backfill_target+1 where active=1 and backfill_target<{$array['MAXDAYS']};";
 $_DB_NAME = getenv('DB_NAME');
 $_DB_USER = getenv('DB_USER');
 $_DB_HOST = getenv('DB_HOST');
@@ -28,6 +28,7 @@ $_DB_PASSWORD = escapeshellarg(getenv('DB_PASSWORD'));$_current_path = dirname(_
 $_mysql = getenv('MYSQL');
 $_php = getenv('PHP');
 $_tmux = getenv('TMUXCMD');
+$_count_releases = 0;
 
 //got microtime
 function microtime_float()
@@ -37,6 +38,11 @@ function microtime_float()
 }
 
 $_sleep_string = "\033[1;31msleeping\033[0m ";
+
+function get_color()
+{
+  return (mt_rand(1,230));
+}
 
 $time = TIME();
 $time2 = TIME();
@@ -48,6 +54,7 @@ $time7 = TIME();
 $time8 = TIME();
 $time9 = TIME();
 $time10 = TIME();
+$time11 = TIME();
 
 //init start values
 $work_start = 0;
@@ -60,8 +67,8 @@ while($i>0)
   $time_loop_start = microtime_float();
 
   //chack variables again during loop
-  $varnames = shell_exec("cat ../edit_these.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
-  $vardata = shell_exec('cat ../edit_these.sh | grep ^export | cut -d \" -f2 | awk "{print $1;}"');
+  $varnames = shell_exec("cat ../defaults.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
+  $vardata = shell_exec('cat ../defaults.sh | grep ^export | cut -d \" -f2 | awk "{print $1;}"');
   $varnames = explode("\n", $varnames);
   $vardata = explode("\n", $vardata);
   $array = array_combine($varnames, $vardata);
@@ -174,88 +181,102 @@ while($i>0)
 
   //run update_predb.php in 1.0 ever 15 minutes
   if ((TIME() - $time2) >= $array['PREDB_TIMER'] ) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.0 'echo \"\033[1;31m\" && cd $NNPATH && $_php update_predb.php true && date' 2>&1 1> /dev/null");
+    $color = get_color();
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.0 'echo \"\033[38;5;\"$color\"m\" && cd $NNPATH && $_php update_predb.php true && echo \" \033[1;0;33m\" && date' 2>&1 1> /dev/null");
     $time2 = TIME();
   }
 
   //run $_php update_parsing.php in 1.1 every 1 hour
   if (((TIME() - $time3) >= $array['PARSING_TIMER'] ) && ($array['PARSING'] == "true" )) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.1 'echo \"\033[1;32m\" && cd $TESTING && $_php update_parsing.php && date' 2>&1 1> /dev/null");
+    $color = get_color();
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.1 'echo \"\033[38;5;\"$color\"m\" && cd $TESTING && $_php update_parsing.php && echo \" \033[1;0;33m\" && date' 2>&1 1> /dev/null");
     $time3 = TIME();
   }
 
   //run $_php removespecial.php and $_php update_cleanup.php in 1.2 ever 1 hour
   if (((TIME() - $time7) >= $array['CLEANUP_TIMER'] ) && ($array['CLEANUP'] == "true" )) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.2 'echo \"\033[1;33m\" && cd $TESTING && $_php removespecial.php && $_php update_cleanup.php && date' 2>&1 1> /dev/null");
+    $color = get_color();
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.2 'echo \"\033[38;5;\"$color\"m\" && cd $TESTING && $_php removespecial.php && $_php update_cleanup.php && echo \" \033[1;0;33m\" && date' 2>&1 1> /dev/null");
     $time7 = TIME();
   }
 
   //run update_tvschedule.php and $_php update_theaters.php in 1.3 every 12 hours and first loop
   if (((TIME() - $time4) >= $array['TVRAGE_TIMER']) || ($i == 1 )) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.3 'echo \"\033[1;34m\" && cd $NNPATH && $_php update_tvschedule.php && $_php update_theaters.php && date' 2>&1 1> /dev/null");
+    $color = get_color();
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.3 'echo \"\033[38;5;\"$color\"m\" && cd $NNPATH && $_php update_tvschedule.php && $_php update_theaters.php && echo \" \033[1;0;33m\" && date' 2>&1 1> /dev/null");
     $time4 = TIME();
   }
 
-  //run optimize_innodb.php in pane 1.4 every 2 hours
-  if ((TIME() - $time5 >= $array['INNODB_SMALL'] ) && ( $array['INNODB']== "true" ) && ( $array['OPTIMIZE'] == "true" )) {
-      shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.4 'echo \"\033[1;36m\" && cd bin && $_php optimize_innodb.php && date' 2>&1 1> /dev/null");
-      $time5 = TIME();
-  }
-
-  //run optimize_myisam.php in pane 1.5 every 2 hours
-  if ((TIME() - $time6 >= $array['MYISAM_LARGE'] ) && ( $array['OPTIMIZE'] == "true" )) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.5 'echo \"\033[1;37m\" && cd bin && $_php optimize_myisam.php true && date' 2>&1 1> /dev/null");
+  //run optimize in pane 1.4
+  if (( TIME() - $time6 >= $array['MYISAM_LARGE'] ) && ( $array['OPTIMIZE'] == "true" )) {
+    $color = get_color();
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.4 'echo \"\033[38;5;\"$color\"m\" && cd bin && $_php optimize_myisam.php true && echo \" \033[1;0;33m\" && date' 2>&1 1> /dev/null");
     $time6 = TIME();
-  }
-
-  //run optimize_innodb.php in pane 1.6 every 24 hours
-  if ((TIME() - $time8 >= $array['INNODB_LARGE'] ) && ($array['INNODB'] == "true") && ( $array['OPTIMIZE'] == "true" )) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.6 'echo \"\033[1;37m\" && cd bin && $_php optimize_myisam.php true && $_php optimize_innodb.php true && date' 2>&1 1> /dev/null");
+  } elseif (( TIME() - $time8 >= $array['INNODB_LARGE'] ) && ($array['INNODB'] == "true") && ( $array['OPTIMIZE'] == "true" )) {
+    $color = get_color();
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.4 'echo \"\033[38;5;\"$color\"m\" && cd bin && $_php optimize_myisam.php true && $_php optimize_innodb.php true && echo \" \033[1;0;33m\" && date' 2>&1 1> /dev/null");
     $time8 = TIME();
+  } elseif (( TIME() - $time5 >= $array['INNODB_SMALL'] ) && ( $array['INNODB']== "true" ) && ( $array['OPTIMIZE'] == "true" )) {
+    $color = get_color();
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.4 'echo \"\033[38;5;\"$color\"m\" && cd bin && $_php optimize_innodb.php  && echo \" \033[1;0;33m\" && date' 2>&1 1> /dev/null");
+    $time5 = TIME();
+  } elseif (( TIME() - $time11 >= $array['MYISAM_SMALL'] ) &&  ( $array['OPTIMIZE'] == "true" )) {
+    $color = get_color();
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.4 'echo \"\033[38;5;\"$color\"m\" && cd bin && $_php optimize_myisam.php && echo \" \033[1;0;33m\" && date' 2>&1 1> /dev/null");
+    $time11 = TIME();
   }
 
-  //run optimize_innodb.php in pane 1.7 every 1 hour
+  //run optimize_innodb.php in pane 1.5 every 1 hour
   if ((TIME() - $time9 >= $array['SPHINX_TIMER'] ) && ( $array['SPHINX'] == "true")) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.7 'echo \"\033[1;37m\" && cd bin && $_php sphinx.php && date' 2>&1 1> /dev/null");
+    $color=get_color();
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.5 'echo \"\033[38;5;\"$color\"m\" && cd bin && $_php sphinx.php && echo \" \033[1;0;33m\" && date' 2>&1 1> /dev/null");
     $time9 = TIME();
   }
 
-  // runs nzbcount.php in pane 0.1 continuous loop
-  shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.1 'echo \"\033[0;32m\" && cd bin && $_php nzbcount.php' 2>&1 1> /dev/null");
+  // runs nzbcount.php in pane 0.1
+  $color = get_color();
+  shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.1 'echo \"\033[38;5;\"$color\"m\" && cd bin && $_php nzbcount.php' 2>&1 1> /dev/null");
 
   //runs postprocess_nfo.php in pane 0.2 once if needed then exits
   if (( $nfo_remaining_now > 0 ) && ( $array['POST_TO_RUN'] != 0 )) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.2 'echo \"\033[0;32m\" && cd bin && $_php postprocess_nfo.php && date' 2>&1 1> /dev/null");
+    $color = get_color();
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.2 'echo \"\033[38;5;\"$color\"m\" && cd bin && $_php postprocess_nfo.php && echo \" \033[1;0;33m\" && date' 2>&1 1> /dev/null");
   }
 
   //runs processGames.php in pane 0.3 once if needed then exits
   if (( $console_releases_proc > 0 ) && ( $array['POST_TO_RUN'] != 0 )) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.3 'echo \"\033[1;35m\" && cd bin && $_php processGames.php && date' 2>&1 1> /dev/null");
+    $color = get_color();
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.3 'echo \"\033[38;5;\"$color\"m\" && cd bin && $_php processGames.php && echo \" \033[1;0;33m\" && date' 2>&1 1> /dev/null");
   }
 
   //runs processMovies.php in pane 0.4 once if needed then exits
   if (( $movie_releases_proc > 0 ) && ( $array['POST_TO_RUN'] != 0 )) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.4 'echo \"\033[1;37m\" && cd bin && $_php processMovies.php && date' 2>&1 1> /dev/null");
+    $color = get_color();
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.4 'echo \"\033[38;5;\"$color\"\" && cd bin && $_php processMovies.php && echo \" \033[1;0;33m\" && date' 2>&1 1> /dev/null");
   }
 
   //runs processMusic.php in pane 0.5 once if needed then exits
   if (( $music_releases_proc > 0 ) && ( $array['POST_TO_RUN'] != 0 )) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.5 'echo \"\033[1;31m\" && cd bin && $_php processMusic.php && date' 2>&1 1> /dev/null");
+    $color = get_color();
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.5 'echo \"\033[38;5;\"$color\"m\" && cd bin && $_php processMusic.php && echo \" \033[1;0;33m\" && date' 2>&1 1> /dev/null");
   }
 
   //runs processTv.php in pane 0.6 once if needed then exits
   if (( $tvrage_releases_proc > 0 ) && ( $array['POST_TO_RUN'] != 0 )) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.6 'echo \"\033[1;32m\" && cd bin && $_php processTv.php && date' 2>&1 1> /dev/null");
+    $color = get_color();
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.6 'echo \"\033[38;5;\"$color\"m\" && cd bin && $_php processTv.php && echo \" \033[1;0;33m\" && date' 2>&1 1> /dev/null");
   }
 
   //runs processBooks.php in pane 0.7 once if needed then exits
   if (( $book_releases_proc > 0 ) && ( $array['POST_TO_RUN'] != 0 )) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.7 'echo \"\033[0;34m\" && cd bin && $_php processBooks.php && date' 2>&1 1> /dev/null");
+    $color = get_color();
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.7 'echo \"\033[38;5;\"$color\"m\" && cd bin && $_php processBooks.php && echo \" \033[1;0;33m\" && date' 2>&1 1> /dev/null");
   }
 
   //runs processOthers.php in pane 0.8 once if needed then exits
   if  ( $array['POST_TO_RUN'] != 0 ) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.8 'echo \"\033[1;33m\" && cd bin && $_php processOthers.php && date' 2>&1 1> /dev/null");
+    $color = get_color();
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.8 'echo \"\033[38;5;\"$color\"m\" && cd bin && $_php processOthers.php && echo \" \033[1;0;33m\" && date' 2>&1 1> /dev/null");
   }
 
   //set command for running update_binaries
@@ -281,28 +302,28 @@ while($i>0)
 
   //runs update_binaries in 0.9 once if needed and exits
   if (( $array['BINARIES'] == "true" ) && (( $total_work_now < $array['MAX_RELEASES'] ) || ( $array['MAX_RELEASES'] == 0 ))) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.9 'echo \"\033[1;34m\" && cd $NNPATH && $_php $_update_cmd && date && echo \"$_sleep_string {$array['BINARIES_SLEEP']} seconds...\" && sleep {$array['BINARIES_SLEEP']}' 2>&1 1> /dev/null");
+    $color = get_color();
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.9 'echo \"\033[38;5;\"$color\"m\" && cd $NNPATH && $_php $_update_cmd && echo \" \033[1;0;33m\" && date && echo \"$_sleep_string {$array['BINARIES_SLEEP']} seconds...\" && sleep {$array['BINARIES_SLEEP']}' 2>&1 1> /dev/null");
   }
 
   //runs backfill in 0.10 once if needed and exits
   if (( $array['BACKFILL'] == "true" ) && (( $total_work_now < $array['BACKFILL_MAX_RELEASES'] ) || ( $array['BACKFILL_MAX_RELEASES'] == 0 ))) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.10 'echo \"\033[1;35m\" && cd $NNPATH && $_php $_backfill_cmd && \
-    $_mysql --defaults-extra-file=$_current_path/../conf/my.cnf -u$_DB_USER -h $_DB_HOST $_DB_NAME -e \"${backfill_increment}\" && \
-    date && echo \"$_sleep_string {$array['BACKFILL_SLEEP']} seconds...\" && sleep {$array['BACKFILL_SLEEP']}' 2>&1 1> /dev/null");
+    $color = get_color();
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.10 'echo \"\033[38;5;\"$color\"m\" && cd $NNPATH && $_php $_backfill_cmd && \
+    $_mysql --defaults-extra-file=$_current_path/../conf/my.cnf -u$_DB_USER -h $_DB_HOST $_DB_NAME -e \"$_backfill_increment\" && \
+    echo \" \033[1;0;33m\" && date && echo \"$_sleep_string {$array['BACKFILL_SLEEP']} seconds...\" && sleep {$array['BACKFILL_SLEEP']}' 2>&1 1> /dev/null");
   }
 
   //runs nzb-import in 0.11 once if needed and exits
   if (( $array['IMPORT'] == "true" ) && (( $total_work_now < $array['IMPORT_MAX_RELEASES'] ) || ( $array['IMPORT_MAX_RELEASES'] == 0 ))) {
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.11 'echo \"\033[1;36m\" && cd bin && $nzb_cmd && echo \" \" && date && echo \"$_sleep_string {$array['IMPORT_SLEEP']} seconds...\" && sleep {$array['IMPORT_SLEEP']}' 2>&1 1> /dev/null");
+    $color = get_color();
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.11 'echo \"\033[38;5;\"$color\"m\" && cd bin && $nzb_cmd && echo \" \" && echo \" \033[1;0;33m\" && date && echo \"$_sleep_string {$array['IMPORT_SLEEP']} seconds...\" && sleep {$array['IMPORT_SLEEP']}' 2>&1 1> /dev/null");
   }
 
   //runs update_release and optimize_myisam.php in 0.12 once if needed and exits
   if ( $array['RELEASES'] == "true" ) {
-    if ((( $array['OPTIMIZE'] == "true" ) && ( ($i % 5) == 0 ))) {
-      shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.12 'echo \"\033[1;37m\" && cd $_current_path && $_php update_releases.php && cd $_current_path && $_php optimize_myisam.php && date && echo \"$_sleep_string {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']}' 2>&1 1> /dev/null");
-    } else {
-      shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.12 'echo \"\033[1;37m\" && cd $_current_path && $_php update_releases.php && cd $_current_path && date && echo \"$_sleep_string {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']}' 2>&1 1> /dev/null");
-    }
+    $color = get_color();
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.12 'echo \"\033[38;5;\"$color\"m\" && cd $_current_path && $_php update_releases.php && cd $_current_path && echo \" \033[1;0;33m\" && date && echo \"$_sleep_string {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']}' 2>&1 1> /dev/null");
   }
 
   //start posproceesing in window 2
@@ -312,7 +333,8 @@ while($i>0)
       $h=$g-1;
       $f=$g*100;
       if (( $array['POST_TO_RUN'] >= $g ) && ( $work_remaining_now > $f )) {
-        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.$h 'echo \"\033[0;33m\" && cd bin && $_php processAlternate$g.php && date' 2>&1 1> /dev/null");
+        $color = get_color();
+        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.$h 'echo \"\033[38;5;\"$color\"m\" && cd bin && $_php processAlternate$g.php && echo \" \033[1;0;33m\" && date' 2>&1 1> /dev/null");
       }
     }
   } else {
@@ -321,7 +343,8 @@ while($i>0)
       $h=$g-1;
       $f=$g*100;
       if (( $array['POST_TO_RUN'] >= $g ) && ( $work_remaining_now > $f )) {
-        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:2.$h 'echo \"\033[0;33m\" && cd bin && $_php processAlternate$g.php && date' 2>&1 1> /dev/null");
+        $color = get_color();
+        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:2.$h 'echo \"\033[38;5;\"$color\"m\" && cd bin && $_php processAlternate$g.php && echo \" \033[1;0;33m\" && date' 2>&1 1> /dev/null");
       }
     }
    $time10 = TIME();

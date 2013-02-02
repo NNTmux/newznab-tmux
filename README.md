@@ -35,7 +35,8 @@
  * Edit the paths, timers, username, what to run and then accept.
 
   ```bash
-  nano edit_these.sh
+  cp config.sh defaults.sh
+  nano config.sh
   ```
 
  * Edit some permissions and a file, run this as root. If, when you run ./start.sh you see 0 nzb's and you are sure there are more than 0 left to import, verify the path to the nzb's in .tmux_user.conf in the conf folder and is created at first run.

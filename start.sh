@@ -9,13 +9,56 @@ do
 done
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
-source edit_these.sh
+if [ ! -f defaults.sh ]; then
+	clear
+        echo "Please copy config.sh to defaults.sh"
+        exit
+fi
+
+source defaults.sh
 
 eval $( $SED -n "/^define/ { s/.*('\([^']*\)', '*\([^']*\)'*);/export \1=\"\2\"/; p }" "$NEWZPATH"/www/config.php )
 
 if [[ $AGREED == "no" ]]; then
-        echo "Please edit the edit_these.sh file"
+        echo "Please edit the defaults.sh file"
         exit
+fi
+
+if [ ! -f $NEWZPATH/www/lib/postprocess.php.orig ]; then
+        cp $NEWZPATH/www/lib/postprocess.php $NEWZPATH/www/lib/postprocess.php.orig
+fi
+if ! grep -q '//$this->processAdditional();' "$NEWZPATH/www/lib/postprocess.php" ; then
+        $SED -i -e 's/$this->processAdditional();/\/\/$this->processAdditional();/' $NEWZPATH/www/lib/postprocess.php
+fi
+if ! grep -q '//$this->processNfos();' "$NEWZPATH/www/lib/postprocess.php" ; then
+        $SED -i -e 's/$this->processNfos();/\/\/$this->processNfos();/' $NEWZPATH/www/lib/postprocess.php
+fi
+if ! grep -q '//$this->processUnwanted();' "$NEWZPATH/www/lib/postprocess.php" ; then
+        $SED -i -e 's/$this->processUnwanted();/\/\/$this->processUnwanted();/' $NEWZPATH/www/lib/postprocess.php
+fi
+if ! grep -q '//$this->processMovies();' "$NEWZPATH/www/lib/postprocess.php" ; then
+        $SED -i -e 's/$this->processMovies();/\/\/$this->processMovies();/' $NEWZPATH/www/lib/postprocess.php
+fi
+if ! grep -q '//$this->processMusic();' "$NEWZPATH/www/lib/postprocess.php" ; then
+        $SED -i -e 's/$this->processMusic();/\/\/$this->processMusic();/' $NEWZPATH/www/lib/postprocess.php
+fi
+if ! grep -q '//$this->processBooks();' "$NEWZPATH/www/lib/postprocess.php" ; then
+        $SED -i -e 's/$this->processBooks();/\/\/$this->processBooks();/' $NEWZPATH/www/lib/postprocess.php
+fi
+if ! grep -q '//$this->processGames();' "$NEWZPATH/www/lib/postprocess.php" ; then
+        $SED -i -e 's/$this->processGames();/\/\/$this->processGames();/' $NEWZPATH/www/lib/postprocess.php
+fi
+if ! grep -q '//$this->processTv();' "$NEWZPATH/www/lib/postprocess.php" ; then
+        $SED -i -e 's/$this->processTv();/\/\/$this->processTv();/' $NEWZPATH/www/lib/postprocess.php
+fi
+if ! grep -q '//$this->processMusicFromMediaInfo();' "$NEWZPATH/www/lib/postprocess.php" ; then
+        $SED -i -e 's/$this->processMusicFromMediaInfo();/\/\/$this->processMusicFromMediaInfo();/' $NEWZPATH/www/lib/postprocess.php
+fi
+if ! grep -q '//$this->processOtherMiscCategory();' "$NEWZPATH/www/lib/postprocess.php" ; then
+        $SED -i -e 's/$this->processOtherMiscCategory();/\/\/$this->processOtherMiscCategory();/' $NEWZPATH/www/lib/postprocess.php
+fi
+if ! grep -q '//$this->processUnknownCategory();' "$NEWZPATH/www/lib/postprocess.php" ; then
+        $SED -i -e 's/$this->processUnknownCategory();/\/\/$this->processUnknownCategory();/' $NEWZPATH/www/lib/postprocess.php
 fi
 
 #create mysql my.conf
@@ -30,6 +73,7 @@ fi
 #Get the path to tmpunrar
 TMPUNRAR_QUERY="SELECT value from site where ID = 66;"
 TMPUNRAR_PATH=`$MYSQL --defaults-extra-file=conf/my.cnf -u$DB_USER -h$DB_HOST $DB_NAME -s -N -e "${TMPUNRAR_QUERY}"`
+TMPUNRAR_PATH=$TMPUNRAR_PATH"1"
 
 if [[ $RAMDISK == "true" ]]; then
   umount $TMPUNRAR_PATH &> /dev/null
@@ -78,31 +122,32 @@ $TMUXCMD selectp -t 0
 $TMUXCMD splitw -h -p 72 'echo "..."'
 $TMUXCMD splitw -h -p 50 'echo "..."'
 $TMUXCMD selectp -t 0
-$TMUXCMD splitw -v -p 60 'echo "..."'
+$TMUXCMD splitw -v -p 50 'echo "..."'
+$TMUXCMD splitw -v -p 40 'echo "..."'
+
+$TMUXCMD selectp -t 3
 $TMUXCMD splitw -v -p 50 'echo "..."'
 $TMUXCMD selectp -t 3
-$TMUXCMD splitw -v -p 83 'echo "..."'
-$TMUXCMD splitw -v -p 80 'echo "..."'
-$TMUXCMD splitw -v -p 75 'echo "..."'
 $TMUXCMD splitw -v -p 67 'echo "..."'
 $TMUXCMD splitw -v -p 50 'echo "..."'
+$TMUXCMD selectp -t 6
+$TMUXCMD splitw -v -p 67 'echo "..."'
+$TMUXCMD splitw -v -p 50 'echo "..."'
+
 $TMUXCMD selectp -t 9
 $TMUXCMD splitw -v -p 75 'echo "..."'
 $TMUXCMD splitw -v -p 67 'echo "..."'
 $TMUXCMD splitw -v -p 50 'echo "..."'
+
 $TMUXCMD new-window -n cleanup 'echo "..."'
 $TMUXCMD selectp -t 0
-$TMUXCMD splitw -h -p 75 'echo "..."'
+$TMUXCMD splitw -v -p 50 'echo "..."'
+$TMUXCMD selectp -t 0
 $TMUXCMD splitw -h -p 67 'echo "..."'
 $TMUXCMD splitw -h -p 50 'echo "..."'
-$TMUXCMD selectp -t 0
-$TMUXCMD splitw -v -p 50 'echo "..."'
-$TMUXCMD selectp -t 2
-$TMUXCMD splitw -v -p 50 'echo "..."'
-$TMUXCMD selectp -t 4
-$TMUXCMD splitw -v -p 50 'echo "..."'
-$TMUXCMD selectp -t 6
-$TMUXCMD splitw -v -p 50 'echo "..."'
+$TMUXCMD selectp -t 3
+$TMUXCMD splitw -h -p 67 'echo "..."'
+$TMUXCMD splitw -h -p 50 'echo "..."'
 
 $TMUXCMD new-window -n postprocessing 'echo "..."'
 
