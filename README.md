@@ -66,12 +66,12 @@
 
  * Thanks go to all who offered their assistance and improvement to these scripts, especially kevin123, zombu2, epsol, DejaVu, ajeffco, pcmerc, zDefect, shat, evermind, coolcheat, sy, ll, crunch, ixio, AlienX, Solution-X, cryogenx, convict, wicked, McFuzz, pyr2044 and Kragger. If, your nick is missing from this this, PM and I'll fix it quick.
  
- * These scripts include scripts written by [kevin123's](https://github.com/kevinlekiller), [itandrew's](https://github.com/itandrew/Newznab-InnoDB-Dropin) and [tmux-powerline](https://github.com/erikw/tmux-powerline).
+ * These scripts include scripts written by [kevin123's](https://github.com/kevinlekiller), [itandrew's](https://github.com/itandrew/Newznab-InnoDB-Dropin), [tmux-powerline](https://github.com/erikw/tmux-powerline)[thewtex](git://github.com/thewtex/tmux-mem-cpu-load.git).
 
 <hr>
 ![Newznab-tmux](https://raw.github.com/jonnyboy/newznab-tmux/master/images/newznab-tmux.png)
 
 <hr>
- * If, you find these scripts useful and would like to offer a donation, they are greatly appreciated. Thank you
+ * If, you find these scripts useful and would like to show your support, please use one of the donation links below. Donations are greatly appreciated. Thank you
 
 <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=N4AJV5FHZDBFE"><img src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" alt="PayPal - The safer, easier way to pay online!" /></a><a href='http://www.pledgie.com/campaigns/18980'><img alt='Click here to lend your support to: Newznab-tmux and make a donation at www.pledgie.com !' src='http://www.pledgie.com/campaigns/18980.png?skin_name=chrome' border='0' /></a>
