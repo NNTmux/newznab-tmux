@@ -340,7 +340,7 @@ while($i>0)
     for ($g=1; $g<=32; $g++)
     {
       $h=$g-1;
-      $f=$g*100;
+      $f=$h*100;
       if (( $array['POST_TO_RUN'] >= $g ) && ( $work_remaining_now > $f )) {
         $color = get_color();
         shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.$h 'echo \"\033[38;5;\"$color\"m\" && cd bin && $_php processAlternate$g.php && echo \" \033[1;0;33m\" && date' 2>&1 1> /dev/null");
@@ -350,7 +350,7 @@ while($i>0)
     for ($g=1; $g<=32; $g++)
     {
       $h=$g-1;
-      $f=$g*100;
+      $f=$h*100;
       if (( $array['POST_TO_RUN'] >= $g ) && ( $work_remaining_now > $f )) {
         $color = get_color();
         shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:2.$h 'echo \"\033[38;5;\"$color\"m\" && cd bin && $_php processAlternate$g.php && echo \" \033[1;0;33m\" && date' 2>&1 1> /dev/null");
