@@ -19,9 +19,9 @@
 
   ```bash
   cd /var/www/newznab/misc/testing
-  git clone https://github.com/kevinlekiller/Newznab-InnoDB-Dropin.git kev-innodb
-  cd kev-innodb/lib/innodb
-  php convertToInnoDB.php
+  git clone https://github.com/kevinlekiller/Newznab-Barracuda barracuda
+  cd barracuda/B\ +\ P/
+  php bpinnodb_compressed.php
   ```
 
  * Now, Clone my github. Theses scripts should be able to run from any path, but this location is where I was asked to put it.
