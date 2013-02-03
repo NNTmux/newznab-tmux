@@ -51,7 +51,9 @@
   cd ../ && ./start.sh
   ```
 
- * Additional scripts included in the script folder. I have included prepare.sh to make updating these sctipts alittle easier. I also included a svn updater, svn.sh. It performs a forced updated, which overwrites any changes you may have may to the stock nn+ scripts.
+ * Several commands require root priviledges, such as editing files, chmod the paths, creating the ramdisk. If you have grsec compiled into your kernel, you will also need root priviledges for nmon and any other network monitoring app.
+
+ * Additional scripts included in the script folder. I have included prepare.sh to make updating these scripts a little easier. I also included an svn updater, update_svn.sh. It performs a forced svn update, which overwrites any changes you may have may to the stock nn+ scripts and the updates the database. Also, included is revert.sh. This file removes the changes made to postprocess.sh and you need to run this before running stock update_releases.php.
  
  * Any variable in defaults.sh can be changed, except the paths to the commands, and the changed will take effect on the next loop of the monitor. By default, the monitor loops every 30 seconds
 
@@ -62,6 +64,8 @@
  * You must edit any file that is called from **misc/testing/** in order for it to actually do something, and update_parsing is good for fixing a few releases everytime it runs, not a silver bullet though.
 
  * Take caution that Optimize is not running when you shut down the scripts, Optimize runs in window 2, pane 4.
+
+ * Before submitting a bug report, please verify that you are running the current revision of nn+ and these scripts. Then include as much detail as possible.
 
  * Join in the converstion at irc://irc.synirc.net/newznab-tmux.
 
