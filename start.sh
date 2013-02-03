@@ -105,7 +105,7 @@ for (( c=2; c<=32; c++ ))
   sed -i -e "s/PostProcess/PostProcess$c/g" bin/lib/postprocess$c.php
   sed -i -e "s/processAdditional/processAdditional$c/g" bin/lib/postprocess$c.php
   sed -i -e "s/\$tmpPath = \$this->site->tmpunrarpath;/\$tmpPath = \$this->site->tmpunrarpath; \\
-                  \$tmpPath .= '\/tmp$c';/g" bin/lib/postprocess$c.php
+                  \$tmpPath .= '1\/tmp$c';/g" bin/lib/postprocess$c.php
   sed -i -e "s/order by r.postdate desc limit %d.*\$/order by r.guid asc limit %d, %d \", (\$maxattemptstocheckpassworded + 1) * -1, $c * \$numtoProcess, \$numtoProcess));/g" bin/lib/postprocess$c.php
   sed -i -e "s/PostPrc : Performing additional post processing.*\$/PostPrc : Performing additional post processing by guid on \".\$rescount.\" releases, starting at $d ...\";/g" bin/lib/postprocess$c.php
 
@@ -120,7 +120,7 @@ cp bin/lib/alternate bin/processAlternate1.php
 sed -i -e 's/PostProcess/PostProcess1/g' bin/lib/postprocess1.php
 sed -i -e 's/processAdditional/processAdditional1/g' bin/lib/postprocess1.php
 sed -i -e "s/\$tmpPath = \$this->site->tmpunrarpath;/\$tmpPath = \$this->site->tmpunrarpath; \\
-                \$tmpPath .= '\/tmp1';/g" bin/lib/postprocess1.php
+                \$tmpPath .= '1\/tmp1';/g" bin/lib/postprocess1.php
 sed -i -e 's/order by r.postdate desc limit %d.*$/order by r.guid desc limit %d ", ($maxattemptstocheckpassworded + 1) * -1, $numtoProcess));/g' bin/lib/postprocess1.php
 sed -i -e 's/PostPrc : Performing additional post processing.*$/PostPrc : Performing additional post processing by guid on ".$rescount." releases ...";/g' bin/lib/postprocess1.php
 
