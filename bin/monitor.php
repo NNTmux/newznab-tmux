@@ -41,7 +41,9 @@ $_sleep_string = "\033[1;31msleeping\033[0m ";
 
 function get_color()
 {
-  return (mt_rand(1,230));
+  $number = mt_rand(1,230);
+  if ( $number == 16 || $number == 17 ) { get_color(); }
+  return($number);
 }
 
 $time = TIME();
