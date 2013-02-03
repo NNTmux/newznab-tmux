@@ -9,9 +9,14 @@ do
 done
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
+# Make sure only root can run our script
+if [[ $EUID -ne 0 ]]; then
+   echo "This script must be run as root" 1>&2
+   exit 1
+fi
+
 source ../defaults.sh
-
-
+eval $( $SED -n "/^define/ { s/.*('\([^']*\)', '*\([^']*\)'*);/export \1=\"\2\"/; p }" "$NEWZPATH"/www/config.php )
 
 if [ -f $NEWZPATH/www/lib/postprocess.php ]; then
   sudo $SED -i -e 's/\/\/$this->processAdditional();/$this->processAdditional();/' $NEWZPATH/www/lib/postprocess.php
@@ -27,6 +32,19 @@ if [ -f $NEWZPATH/www/lib/postprocess.php ]; then
   sudo $SED -i -e 's/\/\/$this->processUnknownCategory();/$this->processUnknownCategory();/' $NEWZPATH/www/lib/postprocess.php
 fi
 
-echo "my edits have been removed"
+#Get the path to tmpunrar
+TMPUNRAR_QUERY="SELECT value from site where setting = \"tmpunrarpath\";"
+TMPUNRAR_PATH=`$MYSQL --defaults-extra-file=../conf/my.cnf -u$DB_USER -h$DB_HOST $DB_NAME -s -N -e "${TMPUNRAR_QUERY}"`
+TMPUNRAR_PATH=$TMPUNRAR_PATH"1"
+
+#remove the ramdisk
+if [[ ! `mountpoint -q $TMPUNRAR_PATH` ]]; then
+  umount $TMPUNRAR_PATH
+fi
+
+#remove the temp folder
+rm -r $TMPUNRAR_PATH
+
+echo "My edits have been removed"
 
 exit

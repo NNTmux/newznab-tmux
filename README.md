@@ -45,7 +45,7 @@
   cd scripts && ./set_perms.sh
   ```
 
- * Run my script, as user. If, you have grsecurity in you kernel, you will need to run using sudo if you use nmon or bwm-ng.
+ * Run my script, as user. There are many parts that require sudo or root, especially if you have grsec compliled into the kernel. I have put checks in that will require elevated priviledges.
 
   ```bash
   cd ../ && ./start.sh
