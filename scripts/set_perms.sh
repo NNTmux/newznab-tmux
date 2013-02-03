@@ -18,14 +18,10 @@ if [[ $AGREED == "no" ]]; then
 fi
 
 echo "Fixing permisions, this can take some time if you have a large set of releases"
-chmod 777 $NEWZPATH/www/lib/smarty/templates_c
-chmod -R 777 $NEWZPATH/www/covers
-chmod 777 $NEWZPATH/www
-chmod 777 $NEWZPATH/www/install
-mkdir -p $NEWZPATH/nzbfiles/tmpunrar2/
-mkdir -p $NEWZPATH/nzbfiles/tmpunrar3/
-mkdir -p $NEWZPATH/nzbfiles/tmpunrar4/
-chmod -R 777 $NEWZPATH/nzbfiles
+sudo chmod 777 $NEWZPATH/www/lib/smarty/templates_c
+sudo chmod -R 777 $NEWZPATH/www/covers
+sudo chmod 777 $NEWZPATH/www
+sudo chmod 777 $NEWZPATH/www/install
 
 echo -e "\033[38;5;160mCompleted\033[39m"
 
