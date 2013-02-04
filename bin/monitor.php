@@ -61,6 +61,26 @@ $time11 = TIME();
 //init start values
 $work_start = 0;
 $releases_start = 0;
+$console_releases_now = 0;
+$movie_releases_now = 0;
+$music_releases_now = 0;
+$pc_releases_now = 0;
+$tvrage_releases_now = 0;
+$book_releases_now = 0;
+$misc_releases_now = 0;
+$console_releases_proc = 0;
+$movie_releases_proc = 0;
+$music_releases_proc = 0;
+$pc_releases_proc = 0;
+$tvrage_releases_proc = 0;
+$work_remaining_now = 0;
+$book_releases_proc = 0;
+$releases_loop = 0;
+$nfo_remaining_now = 0;
+$nfo_now = 0;
+$parts_rows = 0;
+$parts_size_gb = 0;
+$releases_now = 0;
 
 $i=1;
 while($i>0)
@@ -112,6 +132,7 @@ while($i>0)
   if ( $proc_result[0]['releases'] != NULL ) { $releases_loop = $proc_result[0]['releases']; }
   if ( $proc_result[0]['nforemains'] != NULL ) { $nfo_remaining_now = $proc_result[0]['nforemains']; }
   if ( $proc_result[0]['nfo'] != NULL ) { $nfo_now = $proc_result[0]['nfo']; }
+  if ( $proc_result[0]['parts'] != NULL ) { $parts_rows_unformated = $proc_result[0]['parts']; }
   if ( $proc_result[0]['parts'] != NULL ) { $parts_rows = number_format($proc_result[0]['parts']); }
   if ( $proc_result[0]['partsize'] != NULL ) { $parts_size_gb = $proc_result[0]['partsize']; }
   if ( $proc_result[0]['releases'] ) { $releases_now = $proc_result[0]['releases']; }
@@ -121,14 +142,25 @@ while($i>0)
   $work_since_start = $work_remaining_now - $work_start;
   $total_work_now = $work_remaining_now + $tvrage_releases_proc + $music_releases_proc + $movie_releases_proc + $console_releases_proc + $book_releases_proc;
 
-  $nfo_percent = floor(( $nfo_now / $releases_now) * 100 );
-  $console_percent = floor(( $console_releases_now / $releases_now) * 100 );
-  $movie_percent = floor(( $movie_releases_now / $releases_now) * 100 );
-  $music_percent = floor(( $music_releases_now / $releases_now) * 100 );
-  $pc_percent = floor(( $pc_releases_now / $releases_now) * 100 );
-  $tvrage_percent = floor(( $tvrage_releases_now / $releases_now) * 100 );
-  $book_percent = floor(( $book_releases_now / $releases_now) * 100 );
-  $misc_percent = floor(( $misc_releases_now / $releases_now) * 100 );
+  if ( $releases_now != 0 ) { 
+    $nfo_percent = floor(( $nfo_now / $releases_now) * 100 );
+    $console_percent = floor(( $console_releases_now / $releases_now) * 100 );
+    $movie_percent = floor(( $movie_releases_now / $releases_now) * 100 );
+    $music_percent = floor(( $music_releases_now / $releases_now) * 100 );
+    $pc_percent = floor(( $pc_releases_now / $releases_now) * 100 );
+    $tvrage_percent = floor(( $tvrage_releases_now / $releases_now) * 100 );
+    $book_percent = floor(( $book_releases_now / $releases_now) * 100 );
+    $misc_percent = floor(( $misc_releases_now / $releases_now) * 100 );
+  } else {
+    $nfo_percent = 0;
+    $console_percent = 0;
+    $movie_percent = 0;
+    $music_percent = 0;
+    $pc_percent = 0;
+    $tvrage_percent = 0;
+    $book_percent = 0;
+    $misc_percent = 0;
+  }
 
   //get microtime at end of queries
   $query_timer = microtime_float()-$query_timer_start;
@@ -166,7 +198,7 @@ while($i>0)
   printf("\033[1;31m  $releases_now($signed$releases_since_start)\033[0m releases in your database.\n");
   printf("\033[1;31m  $total_work_now($signed1$work_since_start)\033[0m releases left to postprocess.\033[1;33m\n");
 
-  $mask = "%20s %10s %13s \n";
+  $mask = "%20s %10s %13.13s \n";
   printf($mask, "Category", "In Process", "In Database");
   printf($mask, "===============", "==========", "=============\033[0m");
   printf($mask, "NFO's","$nfo_remaining_now","$nfo_now($nfo_percent%)");
@@ -312,13 +344,13 @@ while($i>0)
   }
 
   //runs update_binaries in 0.9 once if needed and exits
-  if (( $array['BINARIES'] == "true" ) && (( $total_work_now < $array['MAX_RELEASES'] ) || ( $array['MAX_RELEASES'] == 0 ))) {
+  if (( $array['BINARIES'] == "true" ) && (( $total_work_now < $array['MAX_RELEASES'] ) || ( $array['MAX_RELEASES'] == 0 )) && (( $parts_rows_unformated < $array['BINARIES_MAX_ROWS'] ) || ( $array['BINARIES_MAX_ROWS'] == 0 ))) {
     $color = get_color();
     shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.9 'echo \"\033[38;5;\"$color\"m\" && cd $NNPATH && $_php $_update_cmd && echo \" \033[1;0;33m\" && date && echo \"$_sleep_string {$array['BINARIES_SLEEP']} seconds...\" && sleep {$array['BINARIES_SLEEP']}' 2>&1 1> /dev/null");
   }
 
   //runs backfill in 0.10 once if needed and exits
-  if (( $array['BACKFILL'] == "true" ) && (( $total_work_now < $array['BACKFILL_MAX_RELEASES'] ) || ( $array['BACKFILL_MAX_RELEASES'] == 0 ))) {
+  if (( $array['BACKFILL'] == "true" ) && (( $total_work_now < $array['BACKFILL_MAX_RELEASES'] ) || ( $array['BACKFILL_MAX_RELEASES'] == 0 )) && (( $parts_rows_unformated < $array['BACKFILL_MAX_ROWS'] ) || ( $array['BACKFILL_MAX_ROWS'] == 0 ))) {
     $color = get_color();
     shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.10 'echo \"\033[38;5;\"$color\"m\" && cd $NNPATH && $_php $_backfill_cmd && \
     $_mysql --defaults-extra-file=$_current_path/../conf/my.cnf -u$_DB_USER -h $_DB_HOST $_DB_NAME -e \"$_backfill_increment\" && \
@@ -326,7 +358,7 @@ while($i>0)
   }
 
   //runs nzb-import in 0.11 once if needed and exits
-  if (( $array['IMPORT'] == "true" ) && (( $total_work_now < $array['IMPORT_MAX_RELEASES'] ) || ( $array['IMPORT_MAX_RELEASES'] == 0 ))) {
+  if (( $array['IMPORT'] == "true" ) && (( $total_work_now < $array['IMPORT_MAX_RELEASES'] ) || ( $array['IMPORT_MAX_RELEASES'] == 0 )) && (( $parts_rows_unformated < $array['IMPORT_MAX_ROWS'] ) || ( $array['IMPORT_MAX_ROWS'] == 0 ))) {
     $color = get_color();
     shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.11 'echo \"\033[38;5;\"$color\"m\" && cd bin && $nzb_cmd && echo \" \" && echo \" \033[1;0;33m\" && date && echo \"$_sleep_string {$array['IMPORT_SLEEP']} seconds...\" && sleep {$array['IMPORT_SLEEP']}' 2>&1 1> /dev/null");
   }
@@ -337,28 +369,15 @@ while($i>0)
     shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.12 'echo \"\033[38;5;\"$color\"m\" && cd $_current_path && $_php update_releases.php && cd $_current_path && echo \" \033[1;0;33m\" && date && echo \"$_sleep_string {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']}' 2>&1 1> /dev/null");
   }
 
-  //start posproceesing in window 2
-  if ((TIME() - $time10) <= 600) {
-    for ($g=1; $g<=32; $g++)
-    {
-      $h=$g-1;
-      $f=$h*100;
-      if (( $array['POST_TO_RUN'] >= $g ) && ( $work_remaining_now > $f )) {
-        $color = get_color();
-        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.$h 'echo \"\033[38;5;\"$color\"m\" && cd bin && $_php processAlternate$g.php && echo \" \033[1;0;33m\" && date' 2>&1 1> /dev/null");
-      }
+  //start postprocessing in window 2
+  for ($g=1; $g<=32; $g++)
+  {
+    $h=$g-1;
+    $f=$h*100;
+    if (( $array['POST_TO_RUN'] >= $g ) && ( $work_remaining_now > $f )) {
+      $color = get_color();
+      shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.$h 'echo \"\033[38;5;\"$color\"m\" && cd bin && $_php processAlternate$g.php && echo \" \033[1;0;33m\" && date' 2>&1 1> /dev/null");
     }
-  } else {
-    for ($g=1; $g<=32; $g++)
-    {
-      $h=$g-1;
-      $f=$h*100;
-      if (( $array['POST_TO_RUN'] >= $g ) && ( $work_remaining_now > $f )) {
-        $color = get_color();
-        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:2.$h 'echo \"\033[38;5;\"$color\"m\" && cd bin && $_php processAlternate$g.php && echo \" \033[1;0;33m\" && date' 2>&1 1> /dev/null");
-      }
-    }
-   $time10 = TIME();
   }
 
   //get microtime and calcutlat time
