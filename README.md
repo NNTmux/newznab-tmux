@@ -67,7 +67,7 @@
 
  * Before submitting a bug report, please verify that you are running the current revision of nn+ and these scripts. Then include as much detail as possible.
 
- * Some scripts written by [cj](https://github.com/NNScripts/nn-custom-scripts) can help cleanup your db and remove unlinked parts.
+ * Some scripts written by [cj](https://github.com/NNScripts/nn-custom-scripts) can help cleanup your db and remove unlinked parts. Another script [nevermind](http://pastebin.com/ibpi71iE) will help your db run a little faster/easier.
 
  * Join in the converstion at irc://irc.synirc.net/newznab-tmux.
 
