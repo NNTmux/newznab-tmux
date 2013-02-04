@@ -52,9 +52,13 @@ export BINARIES_THREADS="false"
 #top right pane
 export BINARIES_SLEEP="40"
 
-#Set the max amount of unprocessed releases and still allow update_releases to run
+#Set the max amount of unprocessed releases and still allow update_binaries to run
 #set to 0 to disable
 export MAX_RELEASES="0"
+
+#Set the max amount of of rows in the parts table and still allow update_binaries to run
+#set to 0 to disable
+export BINARIES_MAX_ROWS="0"
 
 ############################################################
 
@@ -72,6 +76,10 @@ export BACKFILL_SLEEP="40"
 #Set the max amount of unprocessed releases and still allow backfill to run
 #set to 0 to disable
 export BACKFILL_MAX_RELEASES="0"
+
+#Set the max amount of of rows in the parts table and still allow backfill to run
+#set to 0 to disable
+export BACKFILL_MAX_ROWS="0"
 
 #Set the maximum days to backfill, you set the nn+ admin/edit backfill to 1
 #this will increment your database by 1 after each backfill loop
@@ -105,6 +113,10 @@ export IMPORT_SLEEP="40"
 #Set the max amount of unprocessed releases and still allow nzb-import to run
 #set to 0 to disable
 export IMPORT_MAX_RELEASES="0"
+
+#Set the max amount of of rows in the parts table and still allow nzb-import to run
+#set to 0 to disable
+export IMPORT_MAX_ROWS="0"
 
 ############################################################
 
