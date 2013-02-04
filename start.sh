@@ -90,11 +90,19 @@ fi
 TMPUNRAR_QUERY="SELECT value from site where setting = \"tmpunrarpath\";"
 TMPUNRAR_PATH=`$MYSQL --defaults-extra-file=conf/my.cnf -u$DB_USER -h$DB_HOST $DB_NAME -s -N -e "${TMPUNRAR_QUERY}"`
 TMPUNRAR_PATH=$TMPUNRAR_PATH"1"
+
+#remove the ramdisk, previous versions were smaller
+if [[ ! `mountpoint -q $TMPUNRAR_PATH` ]]; then
+  umount $TMPUNRAR_PATH
+fi
+
+#remove and recreate
+rm -rf $TMPUNRAR_PATH
 mkdir -p $TMPUNRAR_PATH
 
 #create a ramdisk
 if [[ $RAMDISK == "true" ]]; then
-  mountpoint -q $TMPUNRAR_PATH || mount -t tmpfs -o size=32M tmpfs $TMPUNRAR_PATH 2>&1 > /dev/null
+  mountpoint -q $TMPUNRAR_PATH || mount -t tmpfs -o size=256M tmpfs $TMPUNRAR_PATH 2>&1 > /dev/null
 fi
 
 chmod -R 777 $TMPUNRAR_PATH
