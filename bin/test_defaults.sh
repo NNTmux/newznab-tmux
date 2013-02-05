@@ -59,4 +59,6 @@ if [ -z "$NZBS" ]; then export ALLOW_START="false"; fi
 if [ -z "$IMPORT_MAX_ROWS" ]; then export ALLOW_START="false"; fi
 if [ -z "$BINARIES_MAX_ROWS" ]; then export ALLOW_START="false"; fi
 if [ -z "$BACKFILL_MAX_ROWS" ]; then export ALLOW_START="false"; fi
+if [ -z "$KILL_PROCESS" ]; then export ALLOW_START="false"; fi
+
 

@@ -27,18 +27,24 @@ source defaults.sh
 #verify all variables exist
 source bin/test_defaults.sh
 if [[ $ALLOW_START == "false" ]]; then
-        clear
-        echo "Please copy config.sh to defaults.sh, your current copy is outdated."
-        exit
+  clear
+  echo "Please copy config.sh to defaults.sh, your current copy is outdated."
+  exit
 fi
-
 
 eval $( $SED -n "/^define/ { s/.*('\([^']*\)', '*\([^']*\)'*);/export \1=\"\2\"/; p }" "$NEWZPATH"/www/config.php )
 
 if [[ $AGREED == "no" ]]; then
-        echo "Please edit the defaults.sh file"
-        exit
+  echo "Please edit the defaults.sh file"
+  exit
 fi
+
+#check if tmux session exists, attach if exists, create new if not exist
+if $TMUXCMD has-session -t $TMUX_SESSION; then
+  $TMUXCMD attach-session -t $TMUX_SESSION
+else
+printf "\033]0; $TMUX_SESSION\007\003\n"
+$TMUXCMD -f $TMUX_CONF new-session -d -s $TMUX_SESSION -n $TMUX_SESSION 'cd bin && echo "Monitor Started" && echo "It might take a minute for everything to spinup......" && $NICE -n 19 $PHP monitor.php'
 
 if [ ! -f $NEWZPATH/www/lib/postprocess.php.orig ]; then
   cp $NEWZPATH/www/lib/postprocess.php $NEWZPATH/www/lib/postprocess.php.orig
@@ -141,8 +147,9 @@ sed -i -e 's/PostPrc : Performing additional post processing.*$/PostPrc : Perfor
 
 chmod -R 777 $TMPUNRAR_PATH
 
-printf "\033]0; $TMUX_SESSION\007\003\n"
-$TMUXCMD -f $TMUX_CONF new-session -d -s $TMUX_SESSION -n $TMUX_SESSION 'cd bin && echo "Monitor Started" && echo "It might take a minute for everything to spinup......" && $NICE -n 19 $PHP monitor.php'
+#start tmux
+#printf "\033]0; $TMUX_SESSION\007\003\n"
+#$TMUXCMD -f $TMUX_CONF attach-session - $TMUX_SESSION || new-session -d -s $TMUX_SESSION -n $TMUX_SESSION 'cd bin && echo "Monitor Started" && echo "It might take a minute for everything to spinup......" && $NICE -n 19 $PHP monitor.php'
 $TMUXCMD selectp -t 0
 $TMUXCMD splitw -h -p 72 'echo "..."'
 $TMUXCMD splitw -h -p 50 'echo "..."'
@@ -248,4 +255,5 @@ $TMUXCMD new-window -n Console 'bash -i'
 $TMUXCMD select-window -t$TMUX_SESSION:0
 $TMUXCMD attach-session -d -t$TMUX_SESSION
 
+fi
 exit
