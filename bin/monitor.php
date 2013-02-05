@@ -29,6 +29,7 @@ $_mysql = getenv('MYSQL');
 $_php = getenv('PHP');
 $_tmux = getenv('TMUXCMD');
 $_count_releases = 0;
+$_tmux_test = $array['POWERLINE'];
 
 //got microtime
 function microtime_float()
@@ -198,7 +199,7 @@ while($i>0)
   printf("\033[1;31m  $releases_now($signed$releases_since_start)\033[0m releases in your database.\n");
   printf("\033[1;31m  $total_work_now($signed1$work_since_start)\033[0m releases left to postprocess.\033[1;33m\n");
 
-  $mask = "%20s %10s %13.13s \n";
+  $mask = "%20s %10s %13s \n";
   printf($mask, "Category", "In Process", "In Database");
   printf($mask, "===============", "==========", "=============\033[0m");
   printf($mask, "NFO's","$nfo_remaining_now","$nfo_now($nfo_percent%)");
@@ -221,6 +222,16 @@ while($i>0)
 
   //get microtime for timing script check
   $script_timer_start = microtime_float();
+
+  //see if tmux.conf needs to be reloaded
+  if ( $_tmux_test != $array['POWERLINE'] ) {
+    if ( $array['POWERLINE'] == "true" ) {
+      shell_exec("$_tmux source-file powerline/tmux.conf");
+    } else {
+      shell_exec("$_tmux source-file conf/tmux.conf");
+    }
+    $_tmux_test = $array['POWERLINE'];
+  }
 
   //run update_predb.php in 1.0 ever 15 minutes
   if ((TIME() - $time2) >= $array['PREDB_TIMER'] ) {
@@ -275,10 +286,6 @@ while($i>0)
     shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.5 'echo \"\033[38;5;\"$color\"m\" && cd bin && $_php sphinx.php && echo \" \033[1;0;33m\" && date' 2>&1 1> /dev/null");
     $time9 = TIME();
   }
-
-  // runs nzbcount.php in pane 0.1
-  $color = get_color();
-  shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.1 'echo \"\033[38;5;\"$color\"m\" && cd bin && $_php nzbcount.php' 2>&1 1> /dev/null");
 
   //runs postprocess_nfo.php in pane 0.2 once if needed then exits
   if (( $nfo_remaining_now > 0 ) && ( $array['POST_TO_RUN'] != 0 )) {
@@ -361,6 +368,8 @@ while($i>0)
   if (( $array['IMPORT'] == "true" ) && (( $total_work_now < $array['IMPORT_MAX_RELEASES'] ) || ( $array['IMPORT_MAX_RELEASES'] == 0 )) && (( $parts_rows_unformated < $array['IMPORT_MAX_ROWS'] ) || ( $array['IMPORT_MAX_ROWS'] == 0 ))) {
     $color = get_color();
     shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.11 'echo \"\033[38;5;\"$color\"m\" && cd bin && $nzb_cmd && echo \" \" && echo \" \033[1;0;33m\" && date && echo \"$_sleep_string {$array['IMPORT_SLEEP']} seconds...\" && sleep {$array['IMPORT_SLEEP']}' 2>&1 1> /dev/null");
+    $color = get_color();
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.1 'echo \"\033[38;5;\"$color\"m\" && cd bin && $_php nzbcount.php' 2>&1 1> /dev/null");
   }
 
   //runs update_release and optimize_myisam.php in 0.12 once if needed and exits
