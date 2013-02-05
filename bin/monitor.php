@@ -280,7 +280,7 @@ while($i>0)
     $time11 = TIME();
   }
 
-  //run optimize_innodb.php in pane 1.5 every 1 hour
+  //run sphinx in pane 1.5
   if ((TIME() - $time9 >= $array['SPHINX_TIMER'] ) && ( $array['SPHINX'] == "true")) {
     $color=get_color();
     shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.5 'echo \"\033[38;5;\"$color\"m\" && cd bin && $_php sphinx.php && echo \" \033[1;0;33m\" && date' 2>&1 1> /dev/null");
@@ -375,7 +375,7 @@ while($i>0)
   //runs update_release and optimize_myisam.php in 0.12 once if needed and exits
   if ( $array['RELEASES'] == "true" ) {
     $color = get_color();
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.12 'echo \"\033[38;5;\"$color\"m\" && cd $_current_path && $_php update_releases.php && cd $_current_path && echo \" \033[1;0;33m\" && date && echo \"$_sleep_string {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']}' 2>&1 1> /dev/null");
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.12 'echo \"\033[38;5;\"$color\"m\" && cd bin && $_php update_releases.php && echo \" \033[1;0;33m\" && date && echo \"$_sleep_string {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']}' 2>&1 1> /dev/null");
   }
 
   //start postprocessing in window 2
@@ -399,6 +399,12 @@ while($i>0)
 
   //get parts size and display
   printf("\n \033[0mThe parts table has \033[1;31m$parts_rows\033[0m rows and is \033[1;31m$parts_size_gb\033[0m\n");
+
+  //check ffmpeg and mediainfo, kill if necessary
+  if ( $array['KILL_PROCESS'] != "0" ) {
+    shell_exec("./check_process.sh mediainfo {$array['KILL_PROCESS']}");
+    shell_exec("./check_process.sh ffmpeg {$array['KILL_PROCESS']}");
+  }
 
   //turn of monitor if set to false
   if ( $array['RUNNING'] == "true" ) {

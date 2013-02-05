@@ -191,6 +191,11 @@ export SPHINX_TIMER="3600"
 
 ############################################################
 
+#mediainfo and ffmpeg can hang occasionally, set timer, in minutes, to anything other than 0 to enable
+export KILL_PROCESS="0"
+
+############################################################
+
 #Specify your SED binary
 export SED="/bin/sed"
 #export SED="/usr/local/bin/gsed"
