@@ -8,7 +8,8 @@ flat_symbol="⤚"
 
 run_segment() {
 	tmux_path=$(get_tmux_cwd)
-	cd /var/www/newznab
+	cd "/var/www/newznab/"
+
 	stats=""
 	if [ -n "${git_stats=$(__parse_git_stats)}" ]; then
 		stats="$git_stats"
@@ -64,5 +65,19 @@ __parse_svn_stats() {
 	if [ "$?" -ne 0 ]; then
 		return
 	fi
-	# not yet implemented
+
+        local svn_info=$(svn info 2>/dev/null)
+        if [ -z "${svn_info}" ]; then
+                return
+        fi
+
+        local svn_ref=$(echo "${svn_info}" | sed -ne 's#^Revision: ##p')
+	REVISION=`svn info svn://svn.newznab.com/nn/branches/nnplus |grep '^Revision:' | sed -e 's/^Revision: //'`
+	
+        if [[ $REVISION -gt 0 ]] ; then
+		behind=($REVISION-$svn_ref)
+                local ret="↓ $behind"
+        fi
+        echo "$ret"
 }
+
