@@ -38,6 +38,13 @@ __parse_svn_stats(){
 	fi
 
 	local svn_ref=$(echo "${svn_info}" | sed -ne 's#^Revision: ##p')
+        REVISION=`svn info svn://svn.newznab.com/nn/branches/nnplus |grep '^Revision:' | sed -e 's/^Revision: //'`
 
-	echo "r${svn_ref}"
+        if [[ $REVISION -gt 0 ]] ; then
+                local ret=" ↓ $REVISION"
+	        echo "r${svn_ref}${ret}"
+	else
+	        echo "r${svn_ref}"
+        fi
+
 }

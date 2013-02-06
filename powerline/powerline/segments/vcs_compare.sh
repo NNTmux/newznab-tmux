@@ -8,7 +8,7 @@ flat_symbol="⤚"
 
 run_segment() {
 	tmux_path=$(get_tmux_cwd)
-	cd "$tmux_path"
+	cd "/var/www/newznab/misc/update_scripts/nix_scripts/tmux/"
 	stats=""
 	if [ -n "${git_stats=$(__parse_git_stats)}" ]; then
 		stats="$git_stats"
