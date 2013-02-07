@@ -103,6 +103,9 @@ export IMPORT="false"
 #Instead of doing all 1 tye at once, spread the load
 export NZB_THREADS="false"
 
+#Set max number of folders to process per loop. This includes empty folders.
+export NZB_FOLDER_COUNT="20"
+
 #How many nzbs to import per loop, if using NZB_THREADS=true the per folder
 export NZBCOUNT="10"
 
