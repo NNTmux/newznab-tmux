@@ -18,18 +18,18 @@ if($subdir_count == 0){
 	die();
 }
 
-$ps = new PowerProcess;
-$ps->RegisterCallback('psUpdateComplete');
-$ps->maxThreads = 30;
-$ps->threadTimeLimit = 0;
-$selected = $subdir_count - 1;
-
 $varnames = shell_exec("cat ../defaults.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
 $vardata = shell_exec('cat ../defaults.sh | grep ^export | cut -d \" -f2 | awk "{print $1;}"');
 $varnames = explode("\n", $varnames);
 $vardata = explode("\n", $vardata);
 $array = array_combine($varnames, $vardata);
 unset($array['']);
+
+$ps = new PowerProcess;
+$ps->RegisterCallback('psUpdateComplete');
+$ps->maxThreads = $array['NZB_FOLDER_COUNT'];
+$ps->threadTimeLimit = 0;
+$selected = $subdir_count - 1;
 
 echo "Starting threaded import process, {$array['NZBCOUNT']} per thread\n";
 
