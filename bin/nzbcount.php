@@ -11,9 +11,12 @@ $vardata = explode("\n", $vardata);
 $array = array_combine($varnames, $vardata);
 unset($array['']);
 
+$current = $array['NZB_THREADS'];
+
 $i=0;
 while ($i==0) {
     system('clear');
+
     printf("\n\033[1;33m");
     $mask = "%20s %10.10s %13s \n";
     printf($mask, "Folder Name", "In Folder", "Imported");
@@ -30,9 +33,17 @@ while ($i==0) {
         $subdir_count_now=$subdir_count;
     }
 
-    if ($subdir_count_now != $subdir_count ) {
+    //get variables from defaults.sh
+    $varnames = shell_exec("cat ../defaults.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
+    $vardata = shell_exec('cat ../defaults.sh | grep ^export | cut -d \" -f2 | awk "{print $1;}"');
+    $varnames = explode("\n", $varnames);
+    $vardata = explode("\n", $vardata);
+    $array = array_combine($varnames, $vardata);
+    unset($array['']);
+
+    if (($subdir_count_now != $subdir_count ) || ( $current != $array['NZB_THREADS'] )) {
         system('clear');
-        printf("\n\n\033[1;41;33mYour folder contents changed.");
+        printf("\n\n\033[1;41;33mYour imports settings have changed.");
         break;
     }
 
