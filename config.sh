@@ -27,7 +27,7 @@ export ADMIN_PATH=$NEWZPATH"/www/admin"
 #Post Processing Additional is the post processing that downloads rar files and attempts to get info for your site
 #you are able to set the number of process to be run from 1-32, remember that each process uses 1 of your nntp connections
 #so, if you have 20, and you set this to 32, you will have errors, lots of errors, nfo lookup uses 1 connection
-#binaries and backfill threaded default to 10 connections each, so understand how many connections you are using when setting
+#binaries and backfill threaded default to 10 connections each and predb uses 1, so understand how many connections you are using when setting
 #trial and error for this, 1 runs always, 2 if more than 200, 3 more than 300 and so on.
 #At some point, increasing this begins to slow things down. It will need to be adjusted for your system
 #to get the desired performance, 0 will disable all post processing

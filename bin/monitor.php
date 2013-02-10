@@ -11,6 +11,9 @@ $qry="SELECT COUNT( releases.categoryID ) AS cnt, parentID FROM releases RIGHT J
 //needs to be processed query
 $proc="SELECT ( SELECT COUNT( groupID ) AS cnt from releases where consoleinfoID IS NULL and categoryID BETWEEN 1000 AND 1999 ) AS console, ( SELECT COUNT( groupID ) AS cnt from releases where imdbID IS NULL and categoryID BETWEEN 2000 AND 2999 ) AS movies, ( SELECT COUNT( groupID ) AS cnt from releases where musicinfoID IS NULL and categoryID BETWEEN 3000 AND 3999 ) AS audio, ( SELECT COUNT( groupID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (categoryID BETWEEN 4000 AND 4999 and ((r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)))) AS pc, ( SELECT COUNT( groupID ) AS cnt from releases where rageID = -1 and categoryID BETWEEN 5000 AND 5999 ) AS tv, ( SELECT COUNT( groupID ) AS cnt from releases where bookinfoID IS NULL and categoryID = 7020 ) AS book, ( SELECT COUNT( groupID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)) AS work, ( SELECT COUNT( groupID ) AS cnt from releases) AS releases, ( SELECT COUNT( groupID ) AS cnt FROM releases r WHERE r.releasenfoID = 0) AS nforemains, ( SELECT COUNT( groupID ) AS cnt FROM releases WHERE releasenfoID not in (0, -1)) AS nfo, ( SELECT table_rows AS cnt FROM information_schema.TABLES where table_name = 'parts' AND TABLE_SCHEMA = '".DB_NAME."' ) AS parts, ( SELECT concat(round((data_length+index_length)/(1024*1024*1024),2),'GB') AS cnt FROM information_schema.tables where table_name = 'parts' AND TABLE_SCHEMA = '".DB_NAME."' ) AS partsize;";
 
+//get first release inserted datetime and oldest posted datetime
+$posted_date="SELECT(select UNIX_TIMESTAMP(adddate) from releases order by adddate asc limit 1) AS adddate, (select name from releases order by adddate asc limit 1) AS adddatename, (select UNIX_TIMESTAMP(postdate) from releases order by postdate asc limit 1) AS postdate, (select name from releases order by postdate asc limit 1) AS postdatename;";
+
 //get variables from defaults.sh
 $varnames = shell_exec("cat ../combined.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
 $vardata = shell_exec('cat ../combined.sh | grep ^export | cut -d \" -f2 | awk "{print $1;}"');
@@ -40,6 +43,35 @@ function microtime_float()
 }
 
 $_sleep_string = "\033[1;31msleeping\033[0m ";
+
+function relativeTime($_time) {
+  $d[0] = array(1,"sec");
+  $d[1] = array(60,"min");
+  $d[2] = array(3600,"hr");
+  $d[3] = array(86400,"day");
+  $d[4] = array(2592000,"mon");
+  $d[5] = array(31104000,"yr");
+
+  $w = array();
+
+  $return = "";
+  $now = TIME();
+  $diff = ($now-$_time);
+  $secondsLeft = $diff;
+
+  for($i=5;$i>-1;$i--)
+  {
+    $w[$i] = intval($secondsLeft/$d[$i][0]);
+    $secondsLeft -= ($w[$i]*$d[$i][0]);
+    if($w[$i]!=0)
+    {
+      $return.= "\033[1;31m".abs($w[$i])."\033[0m" . " " . $d[$i][1] . (($w[$i]>1)?'s':'') ." ";
+    }
+  }
+
+  //$return .= ($diff>0)?"ago":"left";
+  return $return;
+}
 
 function get_color()
 {
@@ -84,6 +116,18 @@ $nfo_now = 0;
 $parts_rows = 0;
 $parts_size_gb = 0;
 $releases_now = 0;
+$firstname = 0;
+$firstdate = 0;
+$oldestname = 0;
+$oldestdate = 0;
+
+//get valuses from $posted_date
+$posted_date_result = @$db->query($posted_date);
+if ( $posted_date_result[0]['adddatename'] ) { $firstname = $posted_date_result[0]['adddatename']; }
+if ( $posted_date_result[0]['adddate'] ) { $firstdate = $posted_date_result[0]['adddate']; }
+if ( $posted_date_result[0]['postdatename'] ) { $oldestname = $posted_date_result[0]['postdatename']; }
+if ( $posted_date_result[0]['postdate'] ) { $oldestdate = $posted_date_result[0]['postdate']; }
+
 
 $i=1;
 while($i>0)
@@ -178,36 +222,17 @@ while($i>0)
   //get microtime at end of queries
   $query_timer = microtime_float()-$query_timer_start;
 
-  $secs = TIME() - $time;
-  $mins = floor($secs / 60);
-  $hrs = floor($mins / 60);
-  $days = floor($hrs / 24);
-  $sec = floor($secs % 60);
-  $min = ($mins % 60);
-  $day = ($days % 24);
-  $hr = ($hrs % 24);
-
   if ( $releases_since_start > 0 ) { $signed = "+"; }
   else { $signed = ""; }
 
   if ( $work_since_start > 0 ) { $signed1 = "+"; }
   else { $signed1 = ""; }
 
-  if ( $min != 1 ) { $string_min = "mins"; }
-  else { $string_min = "min"; }
-
-  if ( $hr != 1 ) { $string_hr = "hrs"; }
-  else { $string_hr = "hr"; }
-
-  if ( $day != 1 ) { $string_day = "days"; }
-  else { $string_day = "day"; }
-
-  if ( $day > 0 ) { $time_string = "\033[38;5;160m$day\033[0m $string_day, \033[38;5;208m$hr\033[0m $string_hr, \033[1;31m$min\033[0m $string_min."; }
-  elseif ( $hr > 0 ) { $time_string = "\033[38;5;208m$hr\033[0m $string_hr, \033[1;31m$min\033[0m $string_min."; }
-  else { $time_string = "\033[1;31m$min\033[0m $string_min."; }
-
   passthru('clear');
-  printf("\033[1;31m  Monitor\033[0m has been running for: $time_string\n");
+  printf("\033[1;31m  Monitor\033[0m has been running for:\033[0m ".relativeTime("$time")."\n");
+  printf("\033[1;31m  First insert:\033[0m ".relativeTime("$firstdate")."\n");
+  printf("\033[1;31m  Oldest Release:\033[0m ".relativeTime("$oldestdate")."\n");
+  printf("\033[1;31m  Oldest Release:\033[0m $oldestname\n");
   printf("\033[1;31m  $releases_now($signed$releases_since_start)\033[0m releases in your database.\n");
   printf("\033[1;31m  $total_work_now($signed1$work_since_start)\033[0m releases left to postprocess.\033[1;33m\n");
 
@@ -299,7 +324,7 @@ while($i>0)
     $time9 = TIME();
   } elseif (((TIME() - $time12 >= $array['SPOTNAB_TIMER'] ) && ( $array['SPOTNAB'] == "true")) || ( $i == 1 )) {
     $color=get_color();
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.5 'echo \"\033[38;5;\"$color\"m\" && cd bin && $_php spotnab.php -G && echo \" \033[1;0;33m\" && date' 2>&1 1> /dev/null");
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.5 'echo \"\033[38;5;\"$color\"m\" && cd bin && $_php spotnab.php -G && $_php spotnab.php -f && echo \" \033[1;0;33m\" && date' 2>&1 1> /dev/null");
     $time12 = TIME();
   }
 
