@@ -255,6 +255,11 @@ export KEVIN_COMP="false"
 
 ############################################################
 
+#set your LANG to which ever you like, only effects these scripts
+export LANG="en_US.UTF-8"
+
+############################################################
+
 #By using this script you understand that the programmer is not responsible for any loss of data, users, or sanity.
 #You also agree that you were smart enough to make a backup of your database and files. Do you agree? yes/no
 export AGREED="no"
