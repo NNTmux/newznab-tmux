@@ -30,6 +30,7 @@ $_php = getenv('PHP');
 $_tmux = getenv('TMUXCMD');
 $_count_releases = 0;
 $_tmux_test = $array['POWERLINE'];
+$_imports = $array['NZB_THREADS'];
 
 //got microtime
 function microtime_float()
@@ -343,8 +344,15 @@ while($i>0)
     $_backfill_cmd = 'backfill.php';
   }
 
+  //kill panes if user changed
+  if ( $_imports != $array['NZB_THREADS'] ) {
+    shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.11");
+    shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.1");
+    $_imports = $array['NZB_THREADS'];
+  }
+
   //set command for nzb-import
-  if ( $array['NZB_THREADS'] == "true" ){
+  if ( $array['NZB_THREADS'] == "true" ) {
     $nzb_cmd = "$_php nzb-import-sub.php \"{$array['NZBS']}\"";
   } else {
     $nzb_cmd = "$_php nzb-import.php \"{$array['NZBS']}\" \"{$array['IMPORT_TRUE']}\"";
@@ -419,4 +427,5 @@ while($i>0)
 shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.0 'echo \"\033[1;41;33m\n\n\n\nNewznab-tmux is shutting down\n\nPlease wait for all panes to report \n\n\"Pane is dead\" before terminating this session.\n\nTo terminate this session press Ctrl-a c \n\nand at the prompt type \n\ntmux kill-session -t {$array['TMUX_SESSION']}\"'");
 
 ?>
+
 
