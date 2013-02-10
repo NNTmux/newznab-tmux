@@ -248,6 +248,13 @@ export SPOTNAB_TIMER="300"
 
 ############################################################
 
+#use kevin123's compression mod true/false
+#this will copy kevin123's compression mod to the correct location when you update_svn.sh
+#this ensures that kevin123's files are present after updaing svn
+export KEVIN_COMP="false"
+
+############################################################
+
 #By using this script you understand that the programmer is not responsible for any loss of data, users, or sanity.
 #You also agree that you were smart enough to make a backup of your database and files. Do you agree? yes/no
 export AGREED="no"

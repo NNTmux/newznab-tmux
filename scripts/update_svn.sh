@@ -8,6 +8,7 @@ fi
 
 #EDIT_THESE
 export NEWZPATH="/var/www/newznab"
+source $NEWZPATH"/misc/update_scripts/nix_scripts/tmux/defaults.sh"
 export PASSWORD="password"
 
 svn co --force --username svnplus --password $PASSWORD svn://svn.newznab.com/nn/branches/nnplus $NEWZPATH/
@@ -15,6 +16,12 @@ svn export --force --username svnplus --password $PASSWORD svn://svn.newznab.com
 
 cd $NEWZPATH"/misc/update_scripts"
 php5 update_database_version.php
+
+
+if [[ $KEVINS_COMP == "true" ]]; then
+  cd $NEWZPATH"/misc/update_scripts/nix_scripts/tmux/scripts"
+  cp -fr ../kevin123/* $NEWZPATH/www/lib/
+fi
 
 cd $NEWZPATH"/misc/update_scripts/nix_scripts/tmux/scripts"
 ./set_perms.sh
