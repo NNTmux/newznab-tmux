@@ -42,8 +42,8 @@ $_sleep_string = "\033[1;31msleeping\033[0m ";
 
 function get_color()
 {
-  $number = mt_rand(1,230);
-  if ( $number == 16 || $number == 17 ) { get_color(); }
+  $number = mt_rand(1,231);
+  if ( $number == 16 || $number == 17 || $number == 52 || $number == 53 ) { get_color(); }
   return($number);
 }
 
@@ -347,7 +347,7 @@ while($i>0)
   if ( $array['NZB_THREADS'] == "true" ){
     $nzb_cmd = "$_php nzb-import-sub.php \"{$array['NZBS']}\"";
   } else {
-    $nzb_cmd = "$_php nzb-import.php \"{$array['NZBS']}\" true";
+    $nzb_cmd = "$_php nzb-import.php \"{$array['NZBS']}\" \"{$array['IMPORT_TRUE']}\"";
   }
 
   //runs update_binaries in 0.9 once if needed and exits

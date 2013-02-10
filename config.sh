@@ -121,6 +121,9 @@ export IMPORT_MAX_RELEASES="0"
 #set to 0 to disable
 export IMPORT_MAX_ROWS="0"
 
+#import nzbs using the filename as the release name true/false
+export IMPORT_TRUE="false"
+
 ############################################################
 
 #Create releases, this is really only necessary to turn off when you only want to postprocess
@@ -158,7 +161,7 @@ export INNODB="false"
 ############################################################
 
 #Choose to run update_cleanup.php and removespecial.php true/false
-#set to false by default, you will need to edit /misc/testing/update_cleanup.php and /misc/testing/removespecial.php
+#set to false by default, you will need to edit /misc/testing/update_cleanup.php and /misc/testing/update_parsing.php
 #to actually do anything, directions are in the file
 export CLEANUP="false"
 
@@ -196,6 +199,12 @@ export SPHINX_TIMER="3600"
 
 #mediainfo and ffmpeg can hang occasionally, set timer, in minutes, to anything other than 0 to enable
 export KILL_PROCESS="0"
+
+############################################################
+
+#Delete parts and binaries older than retention days, which is set in edit - site
+#NOT IMPLEMENTED YET
+export DELETE_PARTS="true"
 
 ############################################################
 
