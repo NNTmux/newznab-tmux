@@ -22,15 +22,8 @@ if [[ $EUID -ne 0 ]]; then
    #exit 1
 fi
 
-source defaults.sh
-
-#verify all variables exist
-source bin/test_defaults.sh
-if [[ $ALLOW_START == "false" ]]; then
-  clear
-  echo "Please copy config.sh to defaults.sh, your current copy is outdated."
-  exit
-fi
+cat config.sh defaults.sh > combined.sh
+source combined.sh
 
 eval $( $SED -n "/^define/ { s/.*('\([^']*\)', '*\([^']*\)'*);/export \1=\"\2\"/; p }" "$NEWZPATH"/www/config.php )
 

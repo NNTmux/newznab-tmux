@@ -132,8 +132,8 @@ if (!isset($groups) || count($groups) == 0) {
             flush();
         }
 
-	$varnames = shell_exec("cat ../defaults.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
-	$vardata = shell_exec('cat ../defaults.sh | grep ^export | cut -d \" -f2 | awk "{print $1;}"');
+	$varnames = shell_exec("cat ../combined.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
+	$vardata = shell_exec('cat ../combined.sh | grep ^export | cut -d \" -f2 | awk "{print $1;}"');
 	$varnames = explode("\n", $varnames);
 	$vardata = explode("\n", $vardata);
 	$array = array_combine($varnames, $vardata);
