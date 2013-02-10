@@ -61,3 +61,7 @@ if [ -z "$BINARIES_MAX_ROWS" ]; then export ALLOW_START="false"; fi
 if [ -z "$BACKFILL_MAX_ROWS" ]; then export ALLOW_START="false"; fi
 if [ -z "$KILL_PROCESS" ]; then export ALLOW_START="false"; fi
 if [ -z "NZB_FOLDER_COUNT" ]; then export ALLOW_START="false"; fi
+if [ -z "DELETE_PARTS" ]; then export ALLOW_START="false"; fi
+if [ -z "IMPORT_TRUE" ]; then export ALLOW_START="false"; fi
+
+

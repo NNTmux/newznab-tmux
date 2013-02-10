@@ -17,7 +17,7 @@ fi
 
 # Make sure only root can run our script
 if [[ $EUID -ne 0 ]]; then
-   echo "This script must be run as root" 1>&2
+   echo "This script must be run as root"
    #This was removed by popular request, so don't complain
    #exit 1
 fi
@@ -40,7 +40,7 @@ if [[ $AGREED == "no" ]]; then
 fi
 
 #check if tmux session exists, attach if exists, create new if not exist
-if $TMUXCMD has-session -t $TMUX_SESSION; then
+if $TMUXCMD -q has-session -t $TMUX_SESSION; then
   $TMUXCMD attach-session -t $TMUX_SESSION
 else
 printf "\033]0; $TMUX_SESSION\007\003\n"
