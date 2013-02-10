@@ -59,6 +59,7 @@ $time8 = TIME();
 $time9 = TIME();
 $time10 = TIME();
 $time11 = TIME();
+$time12 = TIME();
 
 //init start values
 $work_start = 0;
@@ -101,16 +102,15 @@ while($i>0)
   $array = array_combine($varnames, $vardata);
   unset($array['']);
 
-  //get microtime to at start of queries
-  $query_timer_start=microtime_float();
-
   //kill panes if user changed to/from nzb import threaded
   if ( $_imports != $array['NZB_THREADS'] ) {
-    shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.11");
-    shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.1");
-    shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.11");
+    shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.11 'sleep 5'");
+    shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.1 'sleep 5'");
     $_imports = $array['NZB_THREADS'];
   }
+
+  //get microtime to at start of queries
+  $query_timer_start=microtime_float();
 
   //run queries
   $result = @$db->query($qry);
@@ -297,7 +297,12 @@ while($i>0)
     $color=get_color();
     shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.5 'echo \"\033[38;5;\"$color\"m\" && cd bin && $_php sphinx.php && echo \" \033[1;0;33m\" && date' 2>&1 1> /dev/null");
     $time9 = TIME();
+  } elseif (((TIME() - $time12 >= $array['SPOTNAB_TIMER'] ) && ( $array['SPOTNAB'] == "true")) || ( $i == 1 )) {
+    $color=get_color();
+    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.5 'echo \"\033[38;5;\"$color\"m\" && cd bin && $_php spotnab.php -G && echo \" \033[1;0;33m\" && date' 2>&1 1> /dev/null");
+    $time12 = TIME();
   }
+
 
   //runs postprocess_nfo.php in pane 0.2 once if needed then exits
   if (( $nfo_remaining_now > 0 ) && ( $array['POST_TO_RUN'] != 0 )) {
@@ -384,7 +389,7 @@ while($i>0)
     shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.1 'echo \"\033[38;5;\"$color\"m\" && cd bin && $_php nzbcount.php' 2>&1 1> /dev/null");
   }
 
-  //runs update_release and optimize_myisam.php in 0.12 once if needed and exits
+  //runs update_release and in 0.12 once if needed and exits
   if ( $array['RELEASES'] == "true" ) {
     $color = get_color();
     shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.12 'echo \"\033[38;5;\"$color\"m\" && cd bin && $_php update_releases.php && echo \" \033[1;0;33m\" && date && echo \"$_sleep_string {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']}' 2>&1 1> /dev/null");

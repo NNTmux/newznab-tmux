@@ -240,6 +240,14 @@ export RAMDISK="false"
 
 ############################################################
 
+#Use spotnab to share comments between other nn+ true/false
+#to use you need to modify the newznab db, run this command
+#mysql -uUSERNAME -p NAMEOFDATABASE < bin/spotnab.sql
+export SPOTNAB="false"
+export SPOTNAB_TIMER="300"
+
+############################################################
+
 #By using this script you understand that the programmer is not responsible for any loss of data, users, or sanity.
 #You also agree that you were smart enough to make a backup of your database and files. Do you agree? yes/no
 export AGREED="no"
