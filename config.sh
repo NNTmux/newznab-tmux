@@ -204,7 +204,7 @@ export KILL_PROCESS="0"
 
 #Delete parts and binaries older than retention days, which is set in edit - site
 #NOT IMPLEMENTED YET
-export DELETE_PARTS="true"
+export DELETE_PARTS="false"
 
 ############################################################
 

@@ -12,8 +12,8 @@ $qry="SELECT COUNT( releases.categoryID ) AS cnt, parentID FROM releases RIGHT J
 $proc="SELECT ( SELECT COUNT( groupID ) AS cnt from releases where consoleinfoID IS NULL and categoryID BETWEEN 1000 AND 1999 ) AS console, ( SELECT COUNT( groupID ) AS cnt from releases where imdbID IS NULL and categoryID BETWEEN 2000 AND 2999 ) AS movies, ( SELECT COUNT( groupID ) AS cnt from releases where musicinfoID IS NULL and categoryID BETWEEN 3000 AND 3999 ) AS audio, ( SELECT COUNT( groupID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (categoryID BETWEEN 4000 AND 4999 and ((r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)))) AS pc, ( SELECT COUNT( groupID ) AS cnt from releases where rageID = -1 and categoryID BETWEEN 5000 AND 5999 ) AS tv, ( SELECT COUNT( groupID ) AS cnt from releases where bookinfoID IS NULL and categoryID = 7020 ) AS book, ( SELECT COUNT( groupID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)) AS work, ( SELECT COUNT( groupID ) AS cnt from releases) AS releases, ( SELECT COUNT( groupID ) AS cnt FROM releases r WHERE r.releasenfoID = 0) AS nforemains, ( SELECT COUNT( groupID ) AS cnt FROM releases WHERE releasenfoID not in (0, -1)) AS nfo, ( SELECT table_rows AS cnt FROM information_schema.TABLES where table_name = 'parts' AND TABLE_SCHEMA = '".DB_NAME."' ) AS parts, ( SELECT concat(round((data_length+index_length)/(1024*1024*1024),2),'GB') AS cnt FROM information_schema.tables where table_name = 'parts' AND TABLE_SCHEMA = '".DB_NAME."' ) AS partsize;";
 
 //get variables from defaults.sh
-$varnames = shell_exec("cat ../defaults.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
-$vardata = shell_exec('cat ../defaults.sh | grep ^export | cut -d \" -f2 | awk "{print $1;}"');
+$varnames = shell_exec("cat ../combined.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
+$vardata = shell_exec('cat ../combined.sh | grep ^export | cut -d \" -f2 | awk "{print $1;}"');
 $varnames = explode("\n", $varnames);
 $vardata = explode("\n", $vardata);
 $array = array_combine($varnames, $vardata);
@@ -90,9 +90,12 @@ while($i>0)
   //get microtime at start of loop
   $time_loop_start = microtime_float();
 
+  //recreate the combined.sh
+  shell_exec("cat ../config.sh ../defaults.sh > ../combined.sh");
+
   //chack variables again during loop
-  $varnames = shell_exec("cat ../defaults.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
-  $vardata = shell_exec('cat ../defaults.sh | grep ^export | cut -d \" -f2 | awk "{print $1;}"');
+  $varnames = shell_exec("cat ../combined.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
+  $vardata = shell_exec('cat ../combined.sh | grep ^export | cut -d \" -f2 | awk "{print $1;}"');
   $varnames = explode("\n", $varnames);
   $vardata = explode("\n", $vardata);
   $array = array_combine($varnames, $vardata);
@@ -100,6 +103,14 @@ while($i>0)
 
   //get microtime to at start of queries
   $query_timer_start=microtime_float();
+
+  //kill panes if user changed to/from nzb import threaded
+  if ( $_imports != $array['NZB_THREADS'] ) {
+    shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.11");
+    shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.1");
+    shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.11");
+    $_imports = $array['NZB_THREADS'];
+  }
 
   //run queries
   $result = @$db->query($qry);
@@ -342,13 +353,6 @@ while($i>0)
     $_backfill_cmd = 'backfill_threaded.php';
   } else {
     $_backfill_cmd = 'backfill.php';
-  }
-
-  //kill panes if user changed
-  if ( $_imports != $array['NZB_THREADS'] ) {
-    shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.11");
-    shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.1");
-    $_imports = $array['NZB_THREADS'];
   }
 
   //set command for nzb-import
