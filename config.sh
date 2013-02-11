@@ -243,7 +243,7 @@ export RAMDISK="false"
 #use kevin123's compression mod true/false
 #this will copy kevin123's compression mod to the correct location when you update_svn.sh
 #this ensures that kevin123's files are present after updaing svn
-export KEVIN_COMP="false"
+export KEVINS_COMP="false"
 
 ############################################################
 

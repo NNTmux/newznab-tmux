@@ -119,6 +119,7 @@ $firstname = 0;
 $firstdate = 0;
 $oldestname = 0;
 $oldestdate = 0;
+$parts_rows_unformated = 0;
 
 //get valuses from $posted_date
 $posted_date_result = @$db->query($posted_date);
