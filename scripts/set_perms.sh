@@ -16,7 +16,6 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 source ../defaults.sh
-clear
 
 if [[ $AGREED == "no" ]]; then
         echo "Please edit the defaults.sh file"

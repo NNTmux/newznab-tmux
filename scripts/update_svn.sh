@@ -20,7 +20,7 @@ php5 update_database_version.php
 
 if [[ $KEVINS_COMP == "true" ]]; then
   cd $NEWZPATH"/misc/update_scripts/nix_scripts/tmux/scripts"
-  cp -fr ../kevin123/* $NEWZPATH/www/lib/
+  cp -frv ../kevin123/* $NEWZPATH/www/lib/
 fi
 
 cd $NEWZPATH"/misc/update_scripts/nix_scripts/tmux/scripts"
