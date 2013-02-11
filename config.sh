@@ -240,14 +240,6 @@ export RAMDISK="false"
 
 ############################################################
 
-#Use spotnab to share comments between other nn+ true/false
-#to use you need to modify the newznab db, run this command
-#mysql -uUSERNAME -p NAMEOFDATABASE < bin/spotnab.sql
-export SPOTNAB="false"
-export SPOTNAB_TIMER="300"
-
-############################################################
-
 #use kevin123's compression mod true/false
 #this will copy kevin123's compression mod to the correct location when you update_svn.sh
 #this ensures that kevin123's files are present after updaing svn

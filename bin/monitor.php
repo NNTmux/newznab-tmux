@@ -322,12 +322,7 @@ while($i>0)
     $color=get_color();
     shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.5 'echo \"\033[38;5;\"$color\"m\" && cd bin && $_php sphinx.php && echo \" \033[1;0;33m\" && date' 2>&1 1> /dev/null");
     $time9 = TIME();
-  } elseif (((TIME() - $time12 >= $array['SPOTNAB_TIMER'] ) && ( $array['SPOTNAB'] == "true")) || ( $i == 1 )) {
-    $color=get_color();
-    shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.5 'echo \"\033[38;5;\"$color\"m\" && cd bin && $_php spotnab.php -G && $_php spotnab.php -f && echo \" \033[1;0;33m\" && date' 2>&1 1> /dev/null");
-    $time12 = TIME();
   }
-
 
   //runs postprocess_nfo.php in pane 0.2 once if needed then exits
   if (( $nfo_remaining_now > 0 ) && ( $array['POST_TO_RUN'] != 0 )) {
