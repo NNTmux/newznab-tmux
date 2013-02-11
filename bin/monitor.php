@@ -49,8 +49,7 @@ function relativeTime($_time) {
   $d[1] = array(60,"min");
   $d[2] = array(3600,"hr");
   $d[3] = array(86400,"day");
-  $d[4] = array(2592000,"mon");
-  $d[5] = array(31104000,"yr");
+  $d[4] = array(31104000,"yr");
 
   $w = array();
 
@@ -59,7 +58,7 @@ function relativeTime($_time) {
   $diff = ($now-$_time);
   $secondsLeft = $diff;
 
-  for($i=5;$i>-1;$i--)
+  for($i=4;$i>-1;$i--)
   {
     $w[$i] = intval($secondsLeft/$d[$i][0]);
     $secondsLeft -= ($w[$i]*$d[$i][0]);
