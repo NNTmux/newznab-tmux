@@ -19,7 +19,7 @@ cd $NEWZPATH"/misc/update_scripts"
 php5 update_database_version.php
 
 #purge smarty cache
-rm -v /www/lib/smarty/templates_c/*
+rm -v $NEWZPATH"/www/lib/smarty/templates_c/*"
 
 echo " "
 
