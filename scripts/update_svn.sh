@@ -18,10 +18,10 @@ svn export --force --username svnplus --password $PASSWORD svn://svn.newznab.com
 cd $NEWZPATH"/misc/update_scripts"
 php5 update_database_version.php
 
-#purge smarty cache
-rm -v $NEWZPATH"/www/lib/smarty/templates_c/*"
-
 echo " "
+
+#purge smarty cache
+rm -fv $NEWZPATH"/www/lib/smarty/templates_c/*"
 
 if [[ $KEVINS_COMP == "true" ]]; then
   cd $NEWZPATH"/misc/update_scripts/nix_scripts/tmux/scripts"
