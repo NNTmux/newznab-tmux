@@ -279,7 +279,7 @@ while($i>0)
   }
 
   //run $_php update_parsing.php in 1.1 every 1 hour
-  if (((TIME() - $time3) >= $array['PARSING_TIMER'] ) && ($array['PARSING'] == "true" )) {
+  if ((((TIME() - $time3) >= $array['PARSING_TIMER'] ) || ($i == 1 )) && ($array['PARSING'] == "true" )) {
     $color = get_color();
     shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.1 'echo \"\033[38;5;\"$color\"m\" && cd $TESTING && $_php update_parsing.php && echo \" \033[1;0;33m\" && date' 2>&1 1> /dev/null");
     $time3 = TIME();
