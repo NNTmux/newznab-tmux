@@ -22,8 +22,8 @@ if [[ $EUID -ne 0 ]]; then
    #exit 1
 fi
 
-cat config.sh defaults.sh > combined.sh
-source combined.sh
+source config.sh
+source defaults.sh
 
 eval $( $SED -n "/^define/ { s/.*('\([^']*\)', '*\([^']*\)'*);/export \1=\"\2\"/; p }" "$NEWZPATH"/www/config.php )
 

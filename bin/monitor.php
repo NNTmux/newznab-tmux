@@ -14,9 +14,11 @@ $proc="SELECT ( SELECT COUNT( groupID ) AS cnt from releases where consoleinfoID
 //get first release inserted datetime and oldest posted datetime
 $posted_date="SELECT(select UNIX_TIMESTAMP(adddate) from releases order by adddate asc limit 1) AS adddate, (select name from releases order by adddate asc limit 1) AS adddatename, (select UNIX_TIMESTAMP(postdate) from releases order by postdate asc limit 1) AS postdate, (select name from releases order by postdate asc limit 1) AS postdatename;";
 
-//get variables from defaults.sh
-$varnames = shell_exec("cat ../combined.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
-$vardata = shell_exec('cat ../combined.sh | grep ^export | cut -d \" -f2 | awk "{print $1;}"');
+//get variables from config.sh and defaults.sh
+$varnames = shell_exec("cat ../config.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
+$varnames .= shell_exec("cat ../defaults.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
+$vardata = shell_exec('cat ../config.sh | grep ^export | cut -d \" -f2 | awk "{print $1;}"');
+$vardata .= shell_exec('cat ../defaults.sh | grep ^export | cut -d \" -f2 | awk "{print $1;}"');
 $varnames = explode("\n", $varnames);
 $vardata = explode("\n", $vardata);
 $array = array_combine($varnames, $vardata);
@@ -135,12 +137,11 @@ while($i>0)
   //get microtime at start of loop
   $time_loop_start = microtime_float();
 
-  //recreate the combined.sh
-  shell_exec("cat ../config.sh ../defaults.sh > ../combined.sh");
-
   //chack variables again during loop
-  $varnames = shell_exec("cat ../combined.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
-  $vardata = shell_exec('cat ../combined.sh | grep ^export | cut -d \" -f2 | awk "{print $1;}"');
+  $varnames = shell_exec("cat ../config.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
+  $varnames .= shell_exec("cat ../defaults.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
+  $vardata = shell_exec('cat ../config.sh | grep ^export | cut -d \" -f2 | awk "{print $1;}"');
+  $vardata .= shell_exec('cat ../defaults.sh | grep ^export | cut -d \" -f2 | awk "{print $1;}"');
   $varnames = explode("\n", $varnames);
   $vardata = explode("\n", $vardata);
   $array = array_combine($varnames, $vardata);

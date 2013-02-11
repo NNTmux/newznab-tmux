@@ -12,11 +12,13 @@ source $NEWZPATH"/misc/update_scripts/nix_scripts/tmux/defaults.sh"
 export PASSWORD="password"
 
 svn co --force --username svnplus --password $PASSWORD svn://svn.newznab.com/nn/branches/nnplus $NEWZPATH/
+sleep 2
 svn export --force --username svnplus --password $PASSWORD svn://svn.newznab.com/nn/branches/nnplus $NEWZPATH/
 
 cd $NEWZPATH"/misc/update_scripts"
 php5 update_database_version.php
 
+echo " "
 
 if [[ $KEVINS_COMP == "true" ]]; then
   cd $NEWZPATH"/misc/update_scripts/nix_scripts/tmux/scripts"
