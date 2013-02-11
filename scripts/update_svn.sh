@@ -21,7 +21,8 @@ php5 update_database_version.php
 echo " "
 
 #purge smarty cache
-rm -fv $NEWZPATH"/www/lib/smarty/templates_c/*"
+cd $NEWZPATH"/www/lib/smarty/templates_c/"
+rm -fv *
 
 if [[ $KEVINS_COMP == "true" ]]; then
   cd $NEWZPATH"/misc/update_scripts/nix_scripts/tmux/scripts"
