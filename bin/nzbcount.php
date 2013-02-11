@@ -3,9 +3,11 @@
 $subdir_count_now = 0;
 $filecount=0;
 
-//get variables from defaults.sh
-$varnames = shell_exec("cat ../combined.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
-$vardata = shell_exec('cat ../combined.sh | grep ^export | cut -d \" -f2 | awk "{print $1;}"');
+//get variables from config.sh and defaults.sh
+$varnames = shell_exec("cat ../config.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
+$varnames .= shell_exec("cat ../defaults.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
+$vardata = shell_exec('cat ../config.sh | grep ^export | cut -d \" -f2 | awk "{print $1;}"');
+$vardata .= shell_exec('cat ../defaults.sh | grep ^export | cut -d \" -f2 | awk "{print $1;}"');
 $varnames = explode("\n", $varnames);
 $vardata = explode("\n", $vardata);
 $array = array_combine($varnames, $vardata);
@@ -33,9 +35,11 @@ while ($i==0) {
         $subdir_count_now=$subdir_count;
     }
 
-    //get variables from defaults.sh
-    $varnames = shell_exec("cat ../combined.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
-    $vardata = shell_exec('cat ../combined.sh | grep ^export | cut -d \" -f2 | awk "{print $1;}"');
+    //get variables from config.sh and defaults.sh
+    $varnames = shell_exec("cat ../config.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
+    $varnames .= shell_exec("cat ../defaults.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
+    $vardata = shell_exec('cat ../config.sh | grep ^export | cut -d \" -f2 | awk "{print $1;}"');
+    $vardata .= shell_exec('cat ../defaults.sh | grep ^export | cut -d \" -f2 | awk "{print $1;}"');
     $varnames = explode("\n", $varnames);
     $vardata = explode("\n", $vardata);
     $array = array_combine($varnames, $vardata);
