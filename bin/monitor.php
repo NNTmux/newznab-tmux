@@ -394,7 +394,7 @@ while($i>0)
     if (( $array['BINARIES'] == "true" ) && (( $total_work_now < $array['MAX_RELEASES'] ) || ( $array['MAX_RELEASES'] == 0 )) && (( $parts_rows_unformated < $array['BINARIES_MAX_ROWS'] ) || ( $array['BINARIES_MAX_ROWS'] == 0 ))) {
       $color = get_color();
       shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.9 'echo \"\033[38;5;\"$color\"m\" && cd $NNPATH && $_php $_update_cmd && echo \" \033[1;0;33m\" && date && echo \"$_sleep_string {$array['BINARIES_SLEEP']} seconds...\" && sleep {$array['BINARIES_SLEEP']}' 2>&1 1> /dev/null");
-    } elseif ( $parts_rows_unformated > $array['BINARIES_MAX_ROWS'] ) {
+    } elseif (( $parts_rows_unformated > $array['BINARIES_MAX_ROWS'] ) && ( $array['BINARIES_MAX_ROWS'] != 0 )) {
       $color = get_color();
       shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.9 'echo \"\033[38;5;\"$color\"m\n\nBINARIES_MAX_ROWS exceeded\"'");
     } elseif (( $total_work_now > $array['MAX_RELEASES'] ) && ( $array['MAX_RELEASES'] != 0 )) {
@@ -408,7 +408,7 @@ while($i>0)
       shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.10 'echo \"\033[38;5;\"$color\"m\" && cd $NNPATH && $_php $_backfill_cmd && \
       $_mysql --defaults-extra-file=$_current_path/../conf/my.cnf -u$_DB_USER -h $_DB_HOST $_DB_NAME -e \"$_backfill_increment\" && \
       echo \" \033[1;0;33m\" && date && echo \"$_sleep_string {$array['BACKFILL_SLEEP']} seconds...\" && sleep {$array['BACKFILL_SLEEP']}' 2>&1 1> /dev/null");
-    } elseif ( $parts_rows_unformated > $array['BACKFILL_MAX_ROWS'] ) {
+    } elseif (( $parts_rows_unformated > $array['BACKFILL_MAX_ROWS'] ) && ( $array['BACKFILL_MAX_ROWS'] != 0 )) {
       $color = get_color();
       shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.10 'echo \"\033[38;5;\"$color\"m\n\nBACKFILL_MAX_ROWS exceeded\"'");
     } elseif (( $total_work_now > $array['BACKFILL_MAX_RELEASES'] ) && ( $array['BACKFILL_MAX_RELEASES'] != 0 )) {
@@ -422,7 +422,7 @@ while($i>0)
       $color = get_color();
       shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.9 'echo \"\033[38;5;\"$color\"m\" && cd $NNPATH && $_php $_update_cmd && echo \" \033[1;0;33m\" && date && echo \"$_sleep_string {$array['BINARIES_SLEEP']} seconds...\" && sleep {$array['BINARIES_SLEEP']}' 2>&1 1> /dev/null");
       $time13 = TIME();
-    } elseif ( $parts_rows_unformated > $array['BINARIES_MAX_ROWS'] ) {
+    } elseif (( $parts_rows_unformated > $array['BINARIES_MAX_ROWS'] ) && ( $array['BINARIES_MAX_ROWS'] != 0 )) {
       $color = get_color();
       shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.9 'echo \"\033[38;5;\"$color\"m\n\nBINARIES_MAX_ROWS exceeded\"'");
     } elseif (( $total_work_now > $array['MAX_RELEASES'] ) && ( $array['MAX_RELEASES'] != 0 )) {
@@ -437,7 +437,7 @@ while($i>0)
       $_mysql --defaults-extra-file=$_current_path/../conf/my.cnf -u$_DB_USER -h $_DB_HOST $_DB_NAME -e \"$_backfill_increment\" && \
       echo \" \033[1;0;33m\" && date && echo \"$_sleep_string {$array['BACKFILL_SLEEP']} seconds...\" && sleep {$array['BACKFILL_SLEEP']}' 2>&1 1> /dev/null");
       $time14 = TIME();
-    } elseif ( $parts_rows_unformated > $array['BACKFILL_MAX_ROWS'] ) {
+    } elseif (( $parts_rows_unformated > $array['BACKFILL_MAX_ROWS'] ) && ( $array['BACKFILL_MAX_ROWS'] != 0 )) {
       $color = get_color();
       shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.10 'echo \"\033[38;5;\"$color\"m\n\nBACKFILL_MAX_ROWS exceeded\"'");
     } elseif (( $total_work_now > $array['BACKFILL_MAX_RELEASES'] ) && ( $array['BACKFILL_MAX_RELEASES'] != 0 )) {
@@ -452,7 +452,7 @@ while($i>0)
     shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.11 'echo \"\033[38;5;\"$color\"m\" && cd bin && $nzb_cmd && echo \" \" && echo \" \033[1;0;33m\" && date && echo \"$_sleep_string {$array['IMPORT_SLEEP']} seconds...\" && sleep {$array['IMPORT_SLEEP']}' 2>&1 1> /dev/null");
     $color = get_color();
     shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.1 'echo \"\033[38;5;\"$color\"m\" && cd bin && $_php nzbcount.php' 2>&1 1> /dev/null");
-  } elseif ( $parts_rows_unformated > $array['IMPORT_MAX_ROWS'] ) {
+  } elseif (( $parts_rows_unformated > $array['IMPORT_MAX_ROWS'] ) && ( $array['IMPORT_MAX_ROWS'] != 0 )) {
     $color = get_color();
     shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.11 'echo \"\033[38;5;\"$color\"m\n\nIMPORT_MAX_ROWS exceeded\"'");
   } elseif (( $total_work_now > $array['IMPORT_MAX_RELEASES'] ) && ( $array['IMPORT_MAX_RELEASES'] != 0 )) {
@@ -479,7 +479,7 @@ while($i>0)
 
   //kills postprocessing in window 2
   $post = $array['POST_TO_RUN'];
-  for ($g=$post; $g<=32; $g++)
+  for ($g=$post; $g<=31; $g++)
   {
     $color = get_color();
     shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:2.$g 'echo \"\033[38;5;\"$color\"m\n\nThis is color #\"$color'");
