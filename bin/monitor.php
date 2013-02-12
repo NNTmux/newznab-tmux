@@ -418,18 +418,18 @@ while($i>0)
   } else {
     //runs based on timers and all other limiters
     //runs update_binaries and backfill ensures not at same time in 0.9 once if needed and exits
-    if ( shell_exec("$_tmux list-panes -t {$array['TMUX_SESSION']}:0 | grep 9: | grep dead") ) { 
-
-    if (( TIME() - $time13 >= $array['BINARIES_SEQ_TIMER'] ) && ( $array['BINARIES'] == "true" ) && (( $total_work_now < $array['MAX_RELEASES'] ) || ( $array['MAX_RELEASES'] == 0 )) && (( $parts_rows_unformated < $array['BINARIES_MAX_ROWS'] ) || ( $array['BINARIES_MAX_ROWS'] == 0 ))) {
-      $color = get_color();
-      shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.9 'echo \"\033[38;5;\"$color\"m\" && cd $NNPATH && $_php $_update_cmd && echo \" \033[1;0;33m\" && date' 2>&1 1> /dev/null");
-      $time13 = TIME();
-    } elseif (( TIME() - $time14 >= $array['BACKFILL_SEQ_TIMER'] ) && ( $array['BACKFILL'] == "true" ) && (( $total_work_now < $array['BACKFILL_MAX_RELEASES'] ) || ( $array['BACKFILL_MAX_RELEASES'] == 0 )) && (( $parts_rows_unformated < $array['BACKFILL_MAX_ROWS'] ) || ( $array['BACKFILL_MAX_ROWS'] == 0 ))) {
-      $color = get_color();
-      shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.9 'echo \"\033[38;5;\"$color\"m\" && cd $NNPATH && $_php $_backfill_cmd && \
-      $_mysql --defaults-extra-file=$_current_path/../conf/my.cnf -u$_DB_USER -h $_DB_HOST $_DB_NAME -e \"$_backfill_increment\" && \
-      echo \" \033[1;0;33m\" && date' 2>&1 1> /dev/null");
-      $time14 = TIME();
+    if ( shell_exec("$_tmux list-panes -t {$array['TMUX_SESSION']}:0 | grep 9: | grep dead") ) {
+      if (( TIME() - $time13 >= $array['BINARIES_SEQ_TIMER'] ) && ( $array['BINARIES'] == "true" ) && (( $total_work_now < $array['MAX_RELEASES'] ) || ( $array['MAX_RELEASES'] == 0 )) && (( $parts_rows_unformated < $array['BINARIES_MAX_ROWS'] ) || ( $array['BINARIES_MAX_ROWS'] == 0 ))) {
+        $color = get_color();
+        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.9 'echo \"\033[38;5;\"$color\"m\" && cd $NNPATH && $_php $_update_cmd && echo \" \033[1;0;33m\" && date' 2>&1 1> /dev/null");
+        $time13 = TIME();
+      } elseif (( TIME() - $time14 >= $array['BACKFILL_SEQ_TIMER'] ) && ( $array['BACKFILL'] == "true" ) && (( $total_work_now < $array['BACKFILL_MAX_RELEASES'] ) || ( $array['BACKFILL_MAX_RELEASES'] == 0 )) && (( $parts_rows_unformated < $array['BACKFILL_MAX_ROWS'] ) || ( $array['BACKFILL_MAX_ROWS'] == 0 ))) {
+        $color = get_color();
+        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.9 'echo \"\033[38;5;\"$color\"m\" && cd $NNPATH && $_php $_backfill_cmd && \
+        $_mysql --defaults-extra-file=$_current_path/../conf/my.cnf -u$_DB_USER -h $_DB_HOST $_DB_NAME -e \"$_backfill_increment\" && \
+        echo \" \033[1;0;33m\" && date' 2>&1 1> /dev/null");
+        $time14 = TIME();
+      }
     } elseif (( $parts_rows_unformated > $array['BINARIES_MAX_ROWS'] ) && ( $array['BINARIES_MAX_ROWS'] != 0 )) {
       $color = get_color();
       shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.9 'echo \"\033[38;5;\"$color\"m\n\nBINARIES_MAX_ROWS exceeded\"'");
@@ -443,7 +443,6 @@ while($i>0)
       $color = get_color();
       shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.9 'echo \"\033[38;5;\"$color\"m\n\nBACKFILL_MAX_RELEASES exceeded\"'");
     }
-  }
   }
 
   //runs nzb-import in 0.11 once if needed and exits
