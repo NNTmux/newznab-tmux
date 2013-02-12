@@ -41,6 +41,20 @@ export MONITOR_UPDATE="30"
 
 ############################################################
 
+#binaries and backfill will run in there own pane, separately. You can force them not to run at same time
+#by setting this next to true, if true, the normal backfill pane will be dead true/false
+export SEQUENTIAL="false"
+
+#time between loop start for update_binaries, in seconds
+#default is 12 hours
+export BINARIES_SEQ_TIMER="43200"
+
+#this will not run on first loop, time between loop start for backfill, in seconds
+#default is 30 minutes
+export BACKFILL_SEQ_TIMER="1800"
+
+############################################################
+
 #Choose to run update_binaries true/false
 export BINARIES="false"
 
