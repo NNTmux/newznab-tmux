@@ -394,6 +394,10 @@ while($i>0)
     shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.9 'echo \"\033[38;5;\"$color\"m\" && cd $NNPATH && $_php $_update_cmd && echo \" \033[1;0;33m\" && date && echo \"$_sleep_string {$array['BINARIES_SLEEP']} seconds...\" && sleep {$array['BINARIES_SLEEP']}' 2>&1 1> /dev/null");
   }
 
+  if ( $parts_rows_unformated > $array['BINARIES_MAX_ROWS'] ) {
+    shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.9 'echo \"BINARIES_MAX_ROWS exceeded\"'");
+  }
+
   //runs backfill in 0.10 once if needed and exits
   if (( $array['BACKFILL'] == "true" ) && (( $total_work_now < $array['BACKFILL_MAX_RELEASES'] ) || ( $array['BACKFILL_MAX_RELEASES'] == 0 )) && (( $parts_rows_unformated < $array['BACKFILL_MAX_ROWS'] ) || ( $array['BACKFILL_MAX_ROWS'] == 0 ))) {
     $color = get_color();
@@ -402,12 +406,20 @@ while($i>0)
     echo \" \033[1;0;33m\" && date && echo \"$_sleep_string {$array['BACKFILL_SLEEP']} seconds...\" && sleep {$array['BACKFILL_SLEEP']}' 2>&1 1> /dev/null");
   }
 
+  if ( $parts_rows_unformated > $array['BACKFILL_MAX_ROWS'] ) {
+    shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.10 'echo \"BACKFILL_MAX_ROWS exceeded\"'");
+  }
+
   //runs nzb-import in 0.11 once if needed and exits
   if (( $array['IMPORT'] == "true" ) && (( $total_work_now < $array['IMPORT_MAX_RELEASES'] ) || ( $array['IMPORT_MAX_RELEASES'] == 0 )) && (( $parts_rows_unformated < $array['IMPORT_MAX_ROWS'] ) || ( $array['IMPORT_MAX_ROWS'] == 0 ))) {
     $color = get_color();
     shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.11 'echo \"\033[38;5;\"$color\"m\" && cd bin && $nzb_cmd && echo \" \" && echo \" \033[1;0;33m\" && date && echo \"$_sleep_string {$array['IMPORT_SLEEP']} seconds...\" && sleep {$array['IMPORT_SLEEP']}' 2>&1 1> /dev/null");
     $color = get_color();
     shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.1 'echo \"\033[38;5;\"$color\"m\" && cd bin && $_php nzbcount.php' 2>&1 1> /dev/null");
+  }
+
+  if ( $parts_rows_unformated > $array['IMPORT_MAX_ROWS'] ) {
+    shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.11 'echo \"IMPORT_MAX_ROWS exceeded\"'");
   }
 
   //runs update_release and in 0.12 once if needed and exits
