@@ -29,7 +29,7 @@ $_backfill_increment = "UPDATE groups set backfill_target=backfill_target+1 wher
 $_DB_NAME = getenv('DB_NAME');
 $_DB_USER = getenv('DB_USER');
 $_DB_HOST = getenv('DB_HOST');
-$_DB_PASSWORD = escapeshellarg(getenv('DB_PASSWORD'));$_current_path = dirname(__FILE__);
+$_DB_PASSWORD = escapeshellarg(getenv('DB_PASSWORD'));
 $_mysql = getenv('MYSQL');
 $_php = getenv('PHP');
 $_tmux = getenv('TMUXCMD');
@@ -38,7 +38,7 @@ $_tmux_test = $array['POWERLINE'];
 $_imports = $array['NZB_THREADS'];
 $_bin = dirname(__FILE__)."/../bin";
 $_alienx = dirname(__FILE__)."/../alienx";
-
+$_conf = dirname(__FILE__)."/../conf";
 //got microtime
 function microtime_float()
 {
@@ -378,9 +378,9 @@ while($i>0)
 
     //set command for running update_binaries
     if ( $array['BINARIES_THREADS'] == "true" ) {
-        $_update_cmd = "cd $_bin && update_binaries_threaded.php";
+        $_update_cmd = "cd $_bin && $_php update_binaries_threaded.php";
     } else {
-        $_update_cmd = "cd $NNPATH update_binaries.php";
+        $_update_cmd = "cd $NNPATH && $_php update_binaries.php";
     }
 
     //set command for running backfill
@@ -415,7 +415,7 @@ while($i>0)
         if (( $array['BACKFILL'] == "true" ) && (( $total_work_now < $array['BACKFILL_MAX_RELEASES'] ) || ( $array['BACKFILL_MAX_RELEASES'] == 0 )) && (( $parts_rows_unformated < $array['BACKFILL_MAX_ROWS'] ) || ( $array['BACKFILL_MAX_ROWS'] == 0 ))) {
             $color = get_color();
             shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.10 'echo \"\033[38;5;\"$color\"m\" && $ds1 backfill $ds2 && cd $NNPATH && $_php $_backfill_cmd && \
-            $_mysql --defaults-extra-file=$_current_path/../conf/my.cnf -u\"$_DB_USER\" -h $_DB_HOST $_DB_NAME -e \"$_backfill_increment\" && \
+            $_mysql --defaults-extra-file=$_conf/my.cnf -u\"$_DB_USER\" -h $_DB_HOST $_DB_NAME -e \"$_backfill_increment\" && \
             echo \" \033[1;0;33m\" && echo \"$_sleep_string {$array['BACKFILL_SLEEP']} seconds...\" && sleep {$array['BACKFILL_SLEEP']} && $ds1 backfill $ds3' 2>&1 1> /dev/null");
         } elseif (( $parts_rows_unformated > $array['BACKFILL_MAX_ROWS'] ) && ( $array['BACKFILL_MAX_ROWS'] != 0 )) {
             $color = get_color();
@@ -437,7 +437,7 @@ while($i>0)
             } elseif (( TIME() - $time14 >= $array['BACKFILL_SEQ_TIMER'] ) && ( $array['BACKFILL'] == "true" ) && (( $total_work_now < $array['BACKFILL_MAX_RELEASES'] ) || ( $array['BACKFILL_MAX_RELEASES'] == 0 )) && (( $parts_rows_unformated < $array['BACKFILL_MAX_ROWS'] ) || ( $array['BACKFILL_MAX_ROWS'] == 0 ))) {
                 $color = get_color();
                 shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.9 'echo \"\033[38;5;\"$color\"m\" && $ds1 backfill $ds2 && cd $NNPATH && $_php $_backfill_cmd && \
-                $_mysql --defaults-extra-file=$_current_path/../conf/my.cnf -u\"$_DB_USER\" -h $_DB_HOST $_DB_NAME -e \"$_backfill_increment\" && \
+                $_mysql --defaults-extra-file=$_conf/my.cnf -u\"$_DB_USER\" -h $_DB_HOST $_DB_NAME -e \"$_backfill_increment\" && \
                 echo \" \033[1;0;33m\" && $ds1 backfill $ds3' 2>&1 1> /dev/null");
                 $time14 = TIME();
             }
