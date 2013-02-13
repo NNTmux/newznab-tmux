@@ -275,6 +275,7 @@ export LANG="en_US.UTF-8"
 export NEWZDASH_SHARED_SECRET="mkghjryrvyevoiuylnhelihs"
 
 #the url of your newzdash install, ensure it include HTTP:// or HTTPS:// or it will fail
+#to disable leave blank ie. export NEWZDASH_URL=""
 export NEWZDASH_URL="http://dashboard.your.site.com"
 
 ###########################################################
