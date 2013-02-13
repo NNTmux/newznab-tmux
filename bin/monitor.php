@@ -39,6 +39,7 @@ $_imports = $array['NZB_THREADS'];
 $_bin = dirname(__FILE__)."/../bin";
 $_alienx = dirname(__FILE__)."/../alienx";
 $_conf = dirname(__FILE__)."/../conf";
+
 //got microtime
 function microtime_float()
 {
@@ -149,7 +150,6 @@ while($i>0)
     $array = array_combine($varnames, $vardata);
     unset($array['']);
 
-    //commands for start/stop newzdash tracking
     //commands for start/stop newzdash tracking
     $ds1 = "cd $_alienx && $_php tmux_to_newzdash.php";
     $ds2 = "started";
@@ -492,9 +492,7 @@ while($i>0)
     for ($g=$post; $g<=31; $g++)
     {
         $color = get_color();
-        if ( shell_exec("$_tmux list-panes -t {$array['TMUX_SESSION']}:2 | grep $g: | grep dead") ) {
-            shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:2.$g 'echo \"\033[38;5;\"$color\"m\n\nThis is color #\"$color && $ds1 postprocess_$g $ds4'");
-        }
+        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:2.$g 'echo \"\033[38;5;\"$color\"m\n\nThis is color #\"$color'");
     }
 
     //get microtime and calcutlat time
@@ -515,8 +513,8 @@ while($i>0)
 
     //check ffmpeg and mediainfo, kill if necessary
     if ( $array['KILL_PROCESS'] != "0" ) {
-        shell_exec("./check_process.sh mediainfo {$array['KILL_PROCESS']} && $ds1 mediainfo $ds4");
-        shell_exec("./check_process.sh ffmpeg {$array['KILL_PROCESS']} && $ds1 ffmpeg $ds4");
+        shell_exec("./check_process.sh mediainfo {$array['KILL_PROCESS']}");
+        shell_exec("./check_process.sh ffmpeg {$array['KILL_PROCESS']}");
     }
 
     //turn of monitor if set to false
