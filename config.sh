@@ -272,10 +272,10 @@ export LANG="en_US.UTF-8"
 #to use, you must first install from https://github.com/AlienXAXS/newzdash
 
 #this is YOUR shared key and allows these scripts to communicate with newzdash
-export NEWZDASH_SHARED_SECRET="4ncr37of348ofc4msoy4of8yc4noo4chm4o8csf348sc4"
+export NEWZDASH_SHARED_SECRET="UXR7GbmS6HYQEydEiidzUBjcH"
 
-#the url of your newzdash install, do not include HTTP:// or it will fail
-export NEWZDASH_URL="dashboard.hereisyourdeliveryoffail.co.uk"
+#the url of your newzdash install, ensure it include HTTP:// or HTTPS:// or it will fail
+export NEWZDASH_URL="http://dashboard.hereisyourdeliveryoffail.co.uk"
 
 ###########################################################
 

@@ -12,7 +12,7 @@ $qry="SELECT COUNT( releases.categoryID ) AS cnt, parentID FROM releases RIGHT J
 $proc="SELECT ( SELECT COUNT( groupID ) AS cnt from releases where consoleinfoID IS NULL and categoryID BETWEEN 1000 AND 1999 ) AS console, ( SELECT COUNT( groupID ) AS cnt from releases where imdbID IS NULL and categoryID BETWEEN 2000 AND 2999 ) AS movies, ( SELECT COUNT( groupID ) AS cnt from releases where musicinfoID IS NULL and categoryID BETWEEN 3000 AND 3999 ) AS audio, ( SELECT COUNT( groupID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (categoryID BETWEEN 4000 AND 4999 and ((r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)))) AS pc, ( SELECT COUNT( groupID ) AS cnt from releases where rageID = -1 and categoryID BETWEEN 5000 AND 5999 ) AS tv, ( SELECT COUNT( groupID ) AS cnt from releases where bookinfoID IS NULL and categoryID = 7020 ) AS book, ( SELECT COUNT( groupID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)) AS work, ( SELECT COUNT( groupID ) AS cnt from releases) AS releases, ( SELECT COUNT( groupID ) AS cnt FROM releases r WHERE r.releasenfoID = 0) AS nforemains, ( SELECT COUNT( groupID ) AS cnt FROM releases WHERE releasenfoID not in (0, -1)) AS nfo, ( SELECT table_rows AS cnt FROM information_schema.TABLES where table_name = 'parts' AND TABLE_SCHEMA = '".DB_NAME."' ) AS parts, ( SELECT concat(round((data_length+index_length)/(1024*1024*1024),2),'GB') AS cnt FROM information_schema.tables where table_name = 'parts' AND TABLE_SCHEMA = '".DB_NAME."' ) AS partsize;";
 
 //get first release inserted datetime and oldest posted datetime
-$posted_date="SELECT(select UNIX_TIMESTAMP(adddate) from releases order by adddate asc limit 1) AS adddate, (select UNIX_TIMESTAMP(postdate) from releases order by postdate asc limit 1) AS postdate, (select name from releases order by postdate asc limit 1) AS postdatename;";
+$posted_date="SELECT(select UNIX_TIMESTAMP(adddate) from releases order by adddate asc limit 1) AS adddate, (select UNIX_TIMESTAMP(postdate) from releases order by postdate desc limit 1) AS postdate, (select name from releases order by postdate desc limit 1) AS postdatename;";
 
 //get variables from config.sh and defaults.sh
 $varnames = shell_exec("cat ../config.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
@@ -123,14 +123,15 @@ $parts_size_gb = 0;
 $releases_now = 0;
 $firstdate = 0;
 $oldestname = 0;
-$oldestdate = 0;
+$newestdate = 0;
 $parts_rows_unformated = 0;
 
 //get valuses from $posted_date
 $posted_date_result = @$db->query($posted_date);
 if ( $posted_date_result[0]['adddate'] ) { $firstdate = $posted_date_result[0]['adddate']; }
 if ( $posted_date_result[0]['postdatename'] ) { $oldestname = $posted_date_result[0]['postdatename']; }
-if ( $posted_date_result[0]['postdate'] ) { $oldestdate = $posted_date_result[0]['postdate']; }
+if ( $posted_date_result[0]['postdate'] ) { $newestdate = $posted_date_result[0]['postdate']; }
+
 
 $i=1;
 while($i>0)
@@ -149,10 +150,11 @@ while($i>0)
     unset($array['']);
 
     //commands for start/stop newzdash tracking
+    //commands for start/stop newzdash tracking
     $ds1 = "cd $_alienx && $_php tmux_to_newzdash.php";
-    $ds2 = "started ${array['NEWZDASH_SHARED_SECRET']} ${array['NEWZDASH_URL']}";
-    $ds3 = "stopped ${array['NEWZDASH_SHARED_SECRET']} ${array['NEWZDASH_URL']}";
-    $ds4 = "killed ${array['NEWZDASH_SHARED_SECRET']} ${array['NEWZDASH_URL']}";
+    $ds2 = "started";
+    $ds3 = "stopped";
+    $ds4 = "killed";
 
     //kill panes if user changed to/from nzb import threaded
     if ( $_imports != $array['NZB_THREADS'] ) {
@@ -239,8 +241,8 @@ while($i>0)
     passthru('clear');
     printf("\033[1;31m  Monitor\033[0m has been running for:\033[0m ".relativeTime("$time")."\n");
     printf("\033[1;31m  First insert:\033[0m ".relativeTime("$firstdate")."\n");
-    printf("\033[1;31m  Oldest Release:\033[0m ".relativeTime("$oldestdate")."\n");
-    printf("\033[1;31m  Oldest Release:\033[0m $oldestname\n");
+    printf("\033[1;31m  Newest Release:\033[0m ".relativeTime("$newestdate")."\n");
+    printf("\033[1;31m  Newest Release:\033[0m $oldestname\n");
     printf("\033[1;31m  $releases_now($signed$releases_since_start)\033[0m releases in your database.\n");
     printf("\033[1;31m  $total_work_now($signed1$work_since_start)\033[0m releases left to postprocess.\033[1;33m\n");
 
@@ -376,9 +378,9 @@ while($i>0)
 
     //set command for running update_binaries
     if ( $array['BINARIES_THREADS'] == "true" ) {
-        $_update_cmd = 'update_binaries_threaded.php';
+        $_update_cmd = "cd $_bin && update_binaries_threaded.php";
     } else {
-        $_update_cmd = 'update_binaries.php';
+        $_update_cmd = "cd $NNPATH update_binaries.php";
     }
 
     //set command for running backfill
@@ -400,7 +402,7 @@ while($i>0)
         //runs update_binaries in 0.9 once if needed and exits
         if (( $array['BINARIES'] == "true" ) && (( $total_work_now < $array['BINARIES_MAX_RELEASES'] ) || ( $array['BINARIES_MAX_RELEASES'] == 0 )) && (( $parts_rows_unformated < $array['BINARIES_MAX_ROWS'] ) || ( $array['BINARIES_MAX_ROWS'] == 0 ))) {
             $color = get_color();
-            shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.9 'echo \"\033[38;5;\"$color\"m\" && $ds1 binaries $ds2 && cd $NNPATH && $_php $_update_cmd && echo \" \033[1;0;33m\" && echo \"$_sleep_string {$array['BINARIES_SLEEP']} seconds...\" && sleep {$array['BINARIES_SLEEP']} && $ds1 binaries $ds3' 2>&1 1> /dev/null");
+            shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.9 'echo \"\033[38;5;\"$color\"m\" && $ds1 binaries $ds2 && $_update_cmd && echo \" \033[1;0;33m\" && echo \"$_sleep_string {$array['BINARIES_SLEEP']} seconds...\" && sleep {$array['BINARIES_SLEEP']} && $ds1 binaries $ds3' 2>&1 1> /dev/null");
         } elseif (( $parts_rows_unformated > $array['BINARIES_MAX_ROWS'] ) && ( $array['BINARIES_MAX_ROWS'] != 0 )) {
             $color = get_color();
             shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.9 'echo \"\033[38;5;\"$color\"m\n\nBINARIES_MAX_ROWS exceeded\" && $ds1 binaries $ds4'");
@@ -413,7 +415,7 @@ while($i>0)
         if (( $array['BACKFILL'] == "true" ) && (( $total_work_now < $array['BACKFILL_MAX_RELEASES'] ) || ( $array['BACKFILL_MAX_RELEASES'] == 0 )) && (( $parts_rows_unformated < $array['BACKFILL_MAX_ROWS'] ) || ( $array['BACKFILL_MAX_ROWS'] == 0 ))) {
             $color = get_color();
             shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.10 'echo \"\033[38;5;\"$color\"m\" && $ds1 backfill $ds2 && cd $NNPATH && $_php $_backfill_cmd && \
-            $_mysql --defaults-extra-file=$_current_path/../conf/my.cnf -u$_DB_USER -h $_DB_HOST $_DB_NAME -e \"$_backfill_increment\" && \
+            $_mysql --defaults-extra-file=$_current_path/../conf/my.cnf -u\"$_DB_USER\" -h $_DB_HOST $_DB_NAME -e \"$_backfill_increment\" && \
             echo \" \033[1;0;33m\" && echo \"$_sleep_string {$array['BACKFILL_SLEEP']} seconds...\" && sleep {$array['BACKFILL_SLEEP']} && $ds1 backfill $ds3' 2>&1 1> /dev/null");
         } elseif (( $parts_rows_unformated > $array['BACKFILL_MAX_ROWS'] ) && ( $array['BACKFILL_MAX_ROWS'] != 0 )) {
             $color = get_color();
@@ -430,12 +432,12 @@ while($i>0)
             shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.10 'echo \"\033[38;5;\"$color\"m\n\nBINARIES and BACKFILL running sequentally\"'");
             if (( TIME() - $time13 >= $array['BINARIES_SEQ_TIMER'] ) && ( $array['BINARIES'] == "true" ) && (( $total_work_now < $array['BINARIES_MAX_RELEASES'] ) || ( $array['BINARIES_MAX_RELEASES'] == 0 )) && (( $parts_rows_unformated < $array['BINARIES_MAX_ROWS'] ) || ( $array['BINARIES_MAX_ROWS'] == 0 ))) {
                 $color = get_color();
-                shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.9 'echo \"\033[38;5;\"$color\"m\" && $ds1 binaries $ds2 && cd $NNPATH && $_php $_update_cmd && echo \" \033[1;0;33m\" && $ds1 binaries $ds3' 2>&1 1> /dev/null");
+                shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.9 'echo \"\033[38;5;\"$color\"m\" && $ds1 binaries $ds2 && $_update_cmd && echo \" \033[1;0;33m\" && $ds1 binaries $ds3' 2>&1 1> /dev/null");
                 $time13 = TIME();
             } elseif (( TIME() - $time14 >= $array['BACKFILL_SEQ_TIMER'] ) && ( $array['BACKFILL'] == "true" ) && (( $total_work_now < $array['BACKFILL_MAX_RELEASES'] ) || ( $array['BACKFILL_MAX_RELEASES'] == 0 )) && (( $parts_rows_unformated < $array['BACKFILL_MAX_ROWS'] ) || ( $array['BACKFILL_MAX_ROWS'] == 0 ))) {
                 $color = get_color();
                 shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.9 'echo \"\033[38;5;\"$color\"m\" && $ds1 backfill $ds2 && cd $NNPATH && $_php $_backfill_cmd && \
-                $_mysql --defaults-extra-file=$_current_path/../conf/my.cnf -u$_DB_USER -h $_DB_HOST $_DB_NAME -e \"$_backfill_increment\" && \
+                $_mysql --defaults-extra-file=$_current_path/../conf/my.cnf -u\"$_DB_USER\" -h $_DB_HOST $_DB_NAME -e \"$_backfill_increment\" && \
                 echo \" \033[1;0;33m\" && $ds1 backfill $ds3' 2>&1 1> /dev/null");
                 $time14 = TIME();
             }
@@ -490,7 +492,9 @@ while($i>0)
     for ($g=$post; $g<=31; $g++)
     {
         $color = get_color();
-        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:2.$g 'echo \"\033[38;5;\"$color\"m\n\nThis is color #\"$color && $ds1 postprocess_$g $ds4'");
+        if ( shell_exec("$_tmux list-panes -t {$array['TMUX_SESSION']}:2 | grep $g: | grep dead") ) {
+            shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:2.$g 'echo \"\033[38;5;\"$color\"m\n\nThis is color #\"$color && $ds1 postprocess_$g $ds4'");
+        }
     }
 
     //get microtime and calcutlat time
@@ -503,6 +507,11 @@ while($i>0)
 
     //get parts size and display
     printf("\n \033[0mThe parts table has \033[1;31m$parts_rows\033[0m rows and is \033[1;31m$parts_size_gb\033[0m\n");
+
+    //notify monitor that optimize is running
+    if ( ! shell_exec("$_tmux list-panes -t {$array['TMUX_SESSION']}:1 | grep 4: | grep dead") ) {
+        echo "\033[1;41;33mOptmze  : OPTIMIZATION OF THE MYSQL TABLES HAS STARTED, DO NOT STOP THIS SCRIPT!\033[1;0;33m\n\n";
+    }
 
     //check ffmpeg and mediainfo, kill if necessary
     if ( $array['KILL_PROCESS'] != "0" ) {

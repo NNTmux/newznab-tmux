@@ -78,7 +78,7 @@ fi
 
 #create mysql my.conf
 #this keeps your password from being displayed in ps, htop and others
-echo -e '[client]\npassword='$DB_PASSWORD > ./conf/my.cnf
+echo -e '[client]\npassword='\"$DB_PASSWORD\" > ./conf/my.cnf
 chmod 600 ./conf/my.cnf
 
 #create powerline default.sh
