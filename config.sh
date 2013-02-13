@@ -64,11 +64,12 @@ export BINARIES_THREADS="false"
 
 #Set, in seconds - how long the update_binaries should sleep between runs, 0 may cause errors
 #top right pane
+#sleep timers are not used when using SEQ
 export BINARIES_SLEEP="40"
 
 #Set the max amount of unprocessed releases and still allow update_binaries to run
 #set to 0 to disable
-export MAX_RELEASES="0"
+export BINARIES_MAX_RELEASES="0"
 
 #Set the max amount of of rows in the parts table and still allow update_binaries to run
 #set to 0 to disable
@@ -85,6 +86,7 @@ export BACKFILL_THREADS="false"
 
 #Set, in seconds - how long the backfill should sleep between runs, 0 may cause errors
 #in pane below update_binaries
+#sleep timers are not used when using SEQ
 export BACKFILL_SLEEP="40"
 
 #Set the max amount of unprocessed releases and still allow backfill to run
@@ -265,6 +267,17 @@ export KEVINS_COMP="false"
 export LANG="en_US.UTF-8"
 
 ############################################################
+
+#newzdash is a web front end to show statistics of your nn+ install
+#to use, you must first install from https://github.com/AlienXAXS/newzdash
+
+#this is YOUR shared key and allows these scripts to communicate with newzdash
+export NEWZDASH_SHARED_SECRET="4ncr37of348ofc4msoy4of8yc4noo4chm4o8csf348sc4"
+
+#the url of your newzdash install, do not include HTTP:// or it will fail
+export NEWZDASH_URL="dashboard.hereisyourdeliveryoffail.co.uk"
+
+###########################################################
 
 #By using this script you understand that the programmer is not responsible for any loss of data, users, or sanity.
 #You also agree that you were smart enough to make a backup of your database and files. Do you agree? yes/no
