@@ -9,7 +9,7 @@ $db = new DB();
 $qry="SELECT COUNT( releases.categoryID ) AS cnt, parentID FROM releases RIGHT JOIN category ON releases.categoryID = category.ID WHERE parentID IS NOT NULL GROUP BY parentID;";
 
 //needs to be processed query
-$proc="SELECT ( SELECT COUNT( groupID ) AS cnt from releases where consoleinfoID IS NULL and categoryID BETWEEN 1000 AND 1999 ) AS console, ( SELECT COUNT( groupID ) AS cnt from releases where imdbID IS NULL and categoryID BETWEEN 2000 AND 2999 ) AS movies, ( SELECT COUNT( groupID ) AS cnt from releases where musicinfoID IS NULL and categoryID BETWEEN 3000 AND 3999 ) AS audio, ( SELECT COUNT( groupID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (categoryID BETWEEN 4000 AND 4999 and ((r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)))) AS pc, ( SELECT COUNT( groupID ) AS cnt from releases where rageID = -1 and categoryID BETWEEN 5000 AND 5999 ) AS tv, ( SELECT COUNT( groupID ) AS cnt from releases where bookinfoID IS NULL and categoryID = 7020 ) AS book, ( SELECT COUNT( groupID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)) AS work, ( SELECT COUNT( groupID ) AS cnt from releases) AS releases, ( SELECT COUNT( groupID ) AS cnt FROM releases r WHERE r.releasenfoID = 0) AS nforemains, ( SELECT COUNT( groupID ) AS cnt FROM releases WHERE releasenfoID not in (0, -1)) AS nfo, ( SELECT table_rows AS cnt FROM information_schema.TABLES where table_name = 'parts' AND TABLE_SCHEMA = '".DB_NAME."' ) AS parts, ( SELECT concat(round((data_length+index_length)/(1024*1024*1024),2),'GB') AS cnt FROM information_schema.tables where table_name = 'parts' AND TABLE_SCHEMA = '".DB_NAME."' ) AS partsize, ( SELECT UNIX_TIMESTAMP(adddate) from releases order by adddate desc limit 1 ) AS newestadd, ( SELECT name from releases order by adddate desc limit 1 ) AS newestaddname, ( SELECT value from site where setting = 'rawretentiondays') AS rawretention;";
+$proc="SELECT ( SELECT COUNT( groupID ) AS cnt from releases where consoleinfoID IS NULL and categoryID BETWEEN 1000 AND 1999 ) AS console, ( SELECT COUNT( groupID ) AS cnt from releases where imdbID IS NULL and categoryID BETWEEN 2000 AND 2999 ) AS movies, ( SELECT COUNT( groupID ) AS cnt from releases where musicinfoID IS NULL and categoryID BETWEEN 3000 AND 3999 ) AS audio, ( SELECT COUNT( groupID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (categoryID BETWEEN 4000 AND 4999 and ((r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)))) AS pc, ( SELECT COUNT( groupID ) AS cnt from releases where rageID = -1 and categoryID BETWEEN 5000 AND 5999 ) AS tv, ( SELECT COUNT( groupID ) AS cnt from releases where bookinfoID IS NULL and categoryID = 7020 ) AS book, ( SELECT COUNT( groupID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)) AS work, ( SELECT COUNT( groupID ) AS cnt from releases) AS releases, ( SELECT COUNT( groupID ) AS cnt FROM releases r WHERE r.releasenfoID = 0) AS nforemains, ( SELECT COUNT( groupID ) AS cnt FROM releases WHERE releasenfoID not in (0, -1)) AS nfo, ( SELECT table_rows AS cnt FROM information_schema.TABLES where table_name = 'parts' AND TABLE_SCHEMA = '".DB_NAME."' ) AS parts, ( SELECT concat(round((data_length+index_length)/(1024*1024*1024),2),'GB') AS cnt FROM information_schema.tables where table_name = 'parts' AND TABLE_SCHEMA = '".DB_NAME."' ) AS partsize, ( SELECT UNIX_TIMESTAMP(adddate) from releases order by adddate desc limit 1 ) AS newestadd, ( SELECT name from releases order by adddate desc limit 1 ) AS newestaddname";
 
 //get first release inserted datetime and oldest posted datetime
 $posted_date="SELECT(select UNIX_TIMESTAMP(adddate) from releases order by adddate asc limit 1) AS adddate;";
@@ -127,7 +127,6 @@ $firstdate = 0;
 $newestname = 0;
 $newestdate = 0;
 $parts_rows_unformated = 0;
-$rawretention = 0;
 
 //get valuses from $posted_date
 $posted_date_result = @$db->query($posted_date);
@@ -205,15 +204,11 @@ while($i>0)
     if ( $proc_result[0]['releases'] ) { $releases_now = $proc_result[0]['releases']; }
     if ( $proc_result[0]['newestaddname'] ) { $newestname = $proc_result[0]['newestaddname']; }
     if ( $proc_result[0]['newestadd'] ) { $newestdate = $proc_result[0]['newestadd']; }
-    if ( $proc_result[0]['rawretention'] ) { $rawretention = $proc_result[0]['rawretention']; }
 
     //build queries for shell
     $_backfill_increment = "UPDATE groups set backfill_target=backfill_target+1 where active=1 and backfill_target<{$array['MAXDAYS']};";
-    //$_delete_raw_binaries = "DELETE from binaries WHERE (dateadded < NOW() - INTERVAL '$rawretention' HOUR);";
     //$mysql_command_1 = "$_mysql --defaults-extra-file=$_conf/my.cnf -u$_DB_USER -h $_DB_HOST $_DB_NAME -e \"$_backfill_increment\"";
-    //$mysql_command_2 = "$_mysql --defaults-extra-file=$_conf/my.cnf -u$_DB_USER -h $_DB_HOST $_DB_NAME -e \"$_delete_raw_binaries\"";
     $mysql_command_1 = "$_mysql -u$_DB_USER -p $_DB_PASSWORD -h $_DB_HOST $_DB_NAME -e \"$_backfill_increment\"";
-    //$mysql_command_2 = "$_mysql -u$_DB_USER -p $_DB_PASSWORD -h $_DB_HOST $_DB_NAME -e \"$_delete_raw_binaries\"";
 
     //calculate releases difference
     $releases_since_start = $releases_now - $releases_start;
@@ -484,7 +479,7 @@ while($i>0)
     if (( $array['RELEASES'] == "true" ) && ( $array['DELETE_PARTS'] == "true" ) && ( $i % 5 == 0 )) {
         $color = get_color();
         shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.12 'echo \"\033[38;5;\"$color\"m\" && $ds1 releases $ds2 && cd $_bin && $_php update_releases.php && $ds1 delete_parts $ds2 && cd $_cj && $_php remove_parts_without_releases.php && $ds1 delete_parts $ds3 && echo \" \033[1;0;33m\" && echo \"$_sleep_string {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']} && $ds1 releases $ds3' 2>&1 1> /dev/null");
-    } elseif (( $array['RELEASES'] == "true" ) && ( $array['DELETE_PARTS'] == "true" )) {
+    } elseif (( $array['RELEASES'] == "true" ) && ( $array['DELETE_PARTS'] != "true" )) {
         $color = get_color();
         shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.12 'echo \"\033[38;5;\"$color\"m\" && $ds1 releases $ds2 && cd $_bin && $_php update_releases.php && echo \" \033[1;0;33m\" && echo \"$_sleep_string {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']} && $ds1 releases $ds3' 2>&1 1> /dev/null");
     }
