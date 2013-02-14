@@ -214,6 +214,22 @@ else
     $TMUXCMD splitw -h -p 67 'echo "..."'
     $TMUXCMD splitw -h -p 50 'echo "..."'
 
+    $TMUXCMD new-window -n binaries_threaded 'echo "..."'
+    $TMUXCMD splitw -v -p 83 'echo "..."'
+    $TMUXCMD splitw -v -p 75 'echo "..."'
+    $TMUXCMD splitw -v -p 67 'echo "..."'
+    $TMUXCMD splitw -v -p 50 'echo "..."'
+    $TMUXCMD selectp -t 0
+    $TMUXCMD splitw -h -p 50 'echo "..."'
+    $TMUXCMD selectp -t 2
+    $TMUXCMD splitw -h -p 50 'echo "..."'
+    $TMUXCMD selectp -t 4
+    $TMUXCMD splitw -h -p 50 'echo "..."'
+    $TMUXCMD selectp -t 6
+    $TMUXCMD splitw -h -p 50 'echo "..."'
+    $TMUXCMD selectp -t 8
+    $TMUXCMD splitw -h -p 50 'echo "..."'
+
     if [[ $USE_HTOP == "true" ]]; then
         $TMUXCMD new-window -n htop '$HTOP'
     fi
