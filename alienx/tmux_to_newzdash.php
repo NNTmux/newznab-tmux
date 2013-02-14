@@ -18,8 +18,7 @@
 	DEFINE ( 'ARG_NDURL', 4 );
 
 	$ndComms = new newzdashComms();
-	echo "Pane State Changed [" . $argv[2] . "]\n > " . date("D jS M Y - H:i:s") . "";
-	:)
+	echo "Pane State Changed [" . $argv[2] . "]\n" . date("D jS M Y - H:i:s") . "";
 	if ( !$ndComms->init() )
 		die();
 		
