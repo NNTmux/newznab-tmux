@@ -219,7 +219,8 @@ export KILL_PROCESS="0"
 ############################################################
 
 #Delete parts and binaries older than retention days, which is set in edit - site
-#NOT IMPLEMENTED YET
+#this uses a script posted by cj https://github.com/NNScripts/nn-custom-scripts
+#this will run after each 5th loop of update_binaries
 export DELETE_PARTS="false"
 
 ############################################################
