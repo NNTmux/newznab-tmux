@@ -36,6 +36,7 @@ fi
 if $TMUXCMD -q has-session -t $TMUX_SESSION; then
   $TMUXCMD attach-session -t $TMUX_SESSION
 else
+printf "The above is just a notice, it is saying, that you do not have a session currently running. It is not an error."
 printf "\033]0; $TMUX_SESSION\007\003\n"
 $TMUXCMD -f $TMUX_CONF new-session -d -s $TMUX_SESSION -n $TMUX_SESSION 'cd bin && echo "Monitor Started" && echo "It might take a minute for everything to spinup......" && $NICE -n 19 $PHP monitor.php'
 

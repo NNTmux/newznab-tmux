@@ -77,7 +77,7 @@ if ($ps->RunThreadCode())
 	
 	$param = $group['name'];
 	
-	$dir = dirname(__FILE__);
+	$dir = dirname(__FILE__).'/../../../';
 	$file = 'update_binaries.php';
 	
 	$output = shell_exec("php {$dir}/{$file} {$param}");
