@@ -9,7 +9,7 @@ fi
 #EDIT_THESE
 export NEWZPATH="/var/www/newznab"
 source $NEWZPATH"/misc/update_scripts/nix_scripts/tmux/defaults.sh"
-export PASSWORD="password"
+export PASSWORD="svnplu5"
 
 svn co --force --username svnplus --password $PASSWORD svn://svn.newznab.com/nn/branches/nnplus $NEWZPATH/
 sleep 2
@@ -25,8 +25,8 @@ cd $NEWZPATH"/www/lib/smarty/templates_c/"
 rm -fv *
 
 if [[ $KEVINS_COMP == "true" ]]; then
-  cd $NEWZPATH"/misc/update_scripts/nix_scripts/tmux/scripts"
-  cp -frv ../kevin123/* $NEWZPATH/www/lib/
+  cd $NEWZPATH"/misc/update_scripts/nix_scripts/tmux/kevin123"
+  cp -frv * $NEWZPATH/www/lib/
 fi
 
 cd $NEWZPATH"/misc/update_scripts/nix_scripts/tmux/scripts"
