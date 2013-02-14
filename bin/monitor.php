@@ -207,8 +207,8 @@ while($i>0)
 
     //build queries for shell
     $_backfill_increment = "UPDATE groups set backfill_target=backfill_target+1 where active=1 and backfill_target<{$array['MAXDAYS']};";
-    //$mysql_command_1 = "$_mysql --defaults-extra-file=$_conf/my.cnf -u$_DB_USER -h $_DB_HOST $_DB_NAME -e \"$_backfill_increment\"";
-    $mysql_command_1 = "$_mysql -u$_DB_USER -p $_DB_PASSWORD -h $_DB_HOST $_DB_NAME -e \"$_backfill_increment\"";
+    $mysql_command_1 = "$_mysql --defaults-extra-file=$_conf/my.cnf -u$_DB_USER -h $_DB_HOST $_DB_NAME -e \"$_backfill_increment\"";
+    //$mysql_command_1 = "$_mysql -u$_DB_USER -p $_DB_PASSWORD -h $_DB_HOST $_DB_NAME -e \"$_backfill_increment\"";
 
     //calculate releases difference
     $releases_since_start = $releases_now - $releases_start;
