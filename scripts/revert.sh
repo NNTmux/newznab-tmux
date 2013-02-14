@@ -39,7 +39,7 @@ TMPUNRAR_PATH=$TMPUNRAR_PATH"1"
 
 #remove the ramdisk
 if [[ ! `mountpoint -q $TMPUNRAR_PATH` ]]; then
-  umount $TMPUNRAR_PATH
+  umount $TMPUNRAR_PATH &> /dev/null
 fi
 
 #remove the temp folder
