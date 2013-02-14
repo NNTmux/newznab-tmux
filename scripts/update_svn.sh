@@ -9,7 +9,7 @@ fi
 #EDIT_THESE
 export NEWZPATH="/var/www/newznab"
 source $NEWZPATH"/misc/update_scripts/nix_scripts/tmux/defaults.sh"
-export PASSWORD="svnplu5"
+export PASSWORD="password"
 
 svn co --force --username svnplus --password $PASSWORD svn://svn.newznab.com/nn/branches/nnplus $NEWZPATH/
 sleep 2
