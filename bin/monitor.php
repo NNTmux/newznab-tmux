@@ -479,7 +479,7 @@ while($i>0)
     if (( $array['RELEASES'] == "true" ) && ( $array['DELETE_PARTS'] == "true" ) && ( $i % 5 == 0 )) {
         $color = get_color();
         shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.12 'echo \"\033[38;5;\"$color\"m\" && $ds1 releases $ds2 && cd $_bin && $_php update_releases.php && $ds1 delete_parts $ds2 && cd $_cj && $_php remove_parts_without_releases.php && $ds1 delete_parts $ds3 && echo \" \033[1;0;33m\" && echo \"$_sleep_string {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']} && $ds1 releases $ds3' 2>&1 1> /dev/null");
-    } elseif (( $array['RELEASES'] == "true" ) && ( $array['DELETE_PARTS'] != "true" )) {
+    } elseif ( $array['RELEASES'] == "true" ) {
         $color = get_color();
         shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.12 'echo \"\033[38;5;\"$color\"m\" && $ds1 releases $ds2 && cd $_bin && $_php update_releases.php && echo \" \033[1;0;33m\" && echo \"$_sleep_string {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']} && $ds1 releases $ds3' 2>&1 1> /dev/null");
     }
