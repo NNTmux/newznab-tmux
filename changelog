@@ -1,3 +1,8 @@
+0.1r2
+02-14-13
+removed rawretentiondays query from monitor
+fixed bug releases not running
+
 0.1r1
 02-14-13
 added cj's script to remove parts
