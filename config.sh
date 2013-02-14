@@ -273,11 +273,11 @@ export LANG="en_US.UTF-8"
 #to use, you must first install from https://github.com/AlienXAXS/newzdash
 
 #this is YOUR shared key and allows these scripts to communicate with newzdash
-export NEWZDASH_SHARED_SECRET="mkghjryrvyevoiuylnhelihs"
+export NEWZDASH_SHARED_SECRET=""
 
 #the url of your newzdash install, ensure it include HTTP:// or HTTPS:// or it will fail
 #to disable leave blank ie. export NEWZDASH_URL=""
-export NEWZDASH_URL="http://dashboard.your.site.com"
+export NEWZDASH_URL=""
 
 ###########################################################
 
