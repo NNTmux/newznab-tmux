@@ -1,3 +1,7 @@
+0.1r3
+02-15-13
+corrected issue with password in update_svn.sh
+
 0.1r2
 02-14-13
 removed rawretentiondays query from monitor

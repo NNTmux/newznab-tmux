@@ -281,6 +281,11 @@ export NEWZDASH_URL=""
 
 ###########################################################
 
+#set svn password, for use with scripts/update_svn.sh
+#update_svn.sh is destructive, it update your version to match th esvn version
+export SVN_PASSWORD="password"
+
+###########################################################
 #By using this script you understand that the programmer is not responsible for any loss of data, users, or sanity.
 #You also agree that you were smart enough to make a backup of your database and files. Do you agree? yes/no
 export AGREED="no"
