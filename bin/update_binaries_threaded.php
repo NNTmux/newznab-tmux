@@ -88,6 +88,7 @@ if ($ps->RunThreadCode())
 	//Newzdash
 	if ( $ndCommAllowed )
 	{
+		unset($args);
 		$args[] = null;
 		$args[] = "update_binaries on " . $group['name'];
 		$args[] = "stopped";
