@@ -439,7 +439,7 @@ while($i>0)
         if ( shell_exec("$_tmux list-panes -t {$array['TMUX_SESSION']}:0 | grep 9: | grep dead" ) ) {
             $color = get_color();
             shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.10 'echo \"\033[38;5;\"$color\"m\n\nBINARIES and BACKFILL running sequentally\"'");
-            if (( TIME() - $time13 >= $array['BINARIES_SEQ_TIMER'] ) && ( $array['BINARIES'] == "true" ) && (( $total_work_now < $array['BINARIES_MAX_RELEASES'] ) || ( $array['BINARIES_MAX_RELEASES'] == 0 )) && (( $parts_rows_unformated < $array['BINARIES_MAX_ROWS'] ) || ( $array['BINARIES_MAX_ROWS'] == 0 ))) {
+            if ((( $i == 1 ) || ( TIME() - $time13 >= $array['BINARIES_SEQ_TIMER'] )) && ( $array['BINARIES'] == "true" ) && (( $total_work_now < $array['BINARIES_MAX_RELEASES'] ) || ( $array['BINARIES_MAX_RELEASES'] == 0 )) && (( $parts_rows_unformated < $array['BINARIES_MAX_ROWS'] ) || ( $array['BINARIES_MAX_ROWS'] == 0 ))) {
                 $color = get_color();
                 shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.9 'echo \"\033[38;5;\"$color\"m\" && $ds1 binaries $ds2 && $_update_cmd && echo \" \033[1;0;33m\" && $ds1 binaries $ds3' 2>&1 1> /dev/null");
                 $time13 = TIME();
