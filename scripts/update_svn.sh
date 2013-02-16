@@ -36,10 +36,10 @@ rm -fv *
 
 #edit cleanup scripts
 if [[ $CLEANUP_EDIT  == "true" ]]; then
-    sed -i -e 's/$echo =.*$/$echo = false;/' $TESTING_PATH/update_parsing.php
-    sed -i -e 's/$limited =.*$/$limited = false;/' $TESTING_PATH/update_parsing.php
-    sed -i -e 's/$echo =.*$/$echo = false;/' $TESTING_PATH/update_cleanup.php
-    sed -i -e 's/$limited =.*$/$limited = false;/' $TESTING_PATH/update_cleanup.php
+    sed -i -e 's/^$echo =.*$/$echo = false;/' $TESTING_PATH/update_parsing.php
+    sed -i -e 's/^$limited =.*$/$limited = false;/' $TESTING_PATH/update_parsing.php
+    sed -i -e 's/^$echo =.*$/$echo = false;/' $TESTING_PATH/update_cleanup.php
+    sed -i -e 's/^$limited =.*$/$limited = false;/' $TESTING_PATH/update_cleanup.php
 fi
 
 #import kevin123's compression mod
