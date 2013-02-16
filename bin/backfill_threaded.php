@@ -59,7 +59,7 @@ if ($ps->RunThreadCode())
 	
 	$param = $group['name'];
 	
-	$dir = dirname(__FILE__);
+	$dir = dirname(__FILE__) . '/../../../';
 	$file = 'backfill.php';
 	
 	//NewzDash
