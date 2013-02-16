@@ -67,7 +67,6 @@ if ($ps->RunThreadCode())
 	
 	if ( $ndCommAllowed )
 	{
-		echo "Doing a run on " . $group['name'] . " to newzdash\n";
 		$args[] = null;
 		$args[] = "update_binaries on " . $group['name'];
 		$args[] = "started";
