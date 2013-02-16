@@ -238,6 +238,51 @@ while($i>0)
         $misc_percent = 0;
     }
 
+    //get state for binaries
+    if ( $array['BINARIES'] != "true" ) {
+        $binaries_state="disabled";
+        $binaries_reason="disabled";
+    } elseif (( $total_work_now > $array['BINARIES_MAX_RELEASES'] ) && ( $array['BINARIES_MAX_RELEASES'] != 0 )) {
+        $binaries_state="pp-exceeded";
+        $binaries_reason="${array['BINARIES_MAX_RELEASES']}";
+    } elseif (( $parts_rows_unformated > $array['BINARIES_MAX_ROWS'] ) && ( $array['BINARIES_MAX_ROWS'] != 0 )) {
+        $binaries_state="rows-exceeded";
+        $binaries_reason="${array['BINARIES_MAX_ROWS']}";
+    } else {
+        $binaries_state="enabled";
+        $binaries_reason="enabled";
+    }
+
+    //get state for backfill
+    if ( $array['BACKFILL'] != "true" ) {
+        $backfill_state="disabled";
+        $backfill_reason="disabled";
+    } elseif (( $total_work_now > $array['BACKFILL_MAX_RELEASES'] ) && ( $array['BACKFILL_MAX_RELEASES'] != 0 )) {
+        $backfill_state="pp-exceeded";
+        $backfill_reason="${array['BACKFILL_MAX_RELEASES']}";
+    } elseif (( $parts_rows_unformated > $array['BACKFILL_MAX_ROWS'] ) && ( $array['BACKFILL_MAX_ROWS'] != 0 )) {
+        $backfill_state="rows-exceeded";
+        $backfill_reason="${array['BACKFILL_MAX_ROWS']}";
+    } else {
+        $backfill_state="enabled";
+        $backfill_reason="enabled";
+    }
+
+    //get state for import
+    if ( $array['IMPORT'] != "true" ) {
+        $import_state="disabled";
+        $import_reason="disabled";
+    } elseif (( $total_work_now > $array['IMPORT_MAX_RELEASES'] ) && ( $array['IMPORT_MAX_RELEASES'] != 0 )) {
+        $import_state="pp-exceeded";
+        $import_reason="${array['IMPORT_MAX_RELEASES']}";
+    } elseif (( $parts_rows_unformated > $array['IMPORT_MAX_ROWS'] ) && ( $array['IMPORT_MAX_ROWS'] != 0 )) {
+        $import_state="rows-exceeded";
+        $import_reason="${array['IMPORT_MAX_ROWS']}";
+    } else {
+        $import_state="enabled";
+        $import_reason="enabled";
+    }
+
     //get microtime at end of queries
     $query_timer = microtime_float()-$query_timer_start;
 
@@ -255,9 +300,17 @@ while($i>0)
     printf("\033[1;31m  $releases_now_formatted($signed$releases_since_start)\033[0m releases in your database.\n");
     printf("\033[1;31m  $total_work_now_formatted($signed1$work_since_start)\033[0m releases left to postprocess.\033[1;33m\n");
 
-    $mask = "%20s %10s %13s \n";
+    $mask = "%20s %15.15s %15s \n";
+    printf($mask, "Category", "State", "Reason");
+    printf($mask, "===============", "===============", "===============\033[0m");
+    printf($mask, "Binaries", "$binaries_state", "$binaries_reason");
+    printf($mask, "Backfill", "$backfill_state", "$backfill_reason");
+    printf($mask, "Import", "$import_state", "$import_reason");
+    printf($mask, "Parts", "$parts_rows", "$parts_size_gb");
+
+    printf("\033[1;33m\n");
     printf($mask, "Category", "In Process", "In Database");
-    printf($mask, "===============", "==========", "=============\033[0m");
+    printf($mask, "===============", "===============", "===============\033[0m");
     printf($mask, "NFO's","$nfo_remaining_now","$nfo_now($nfo_percent%)");
     printf($mask, "Console(1000)","$console_releases_proc","$console_releases_now($console_percent%)");
     printf($mask, "Movie(2000)","$movie_releases_proc","$movie_releases_now($movie_percent%)");
@@ -270,10 +323,9 @@ while($i>0)
     $NNPATH="{$array['NEWZPATH']}{$array['NEWZNAB_PATH']}";
     $TESTING="{$array['NEWZPATH']}{$array['TESTING_PATH']}";
 
-    $mask = "%20s %10.10s %13s \n";
     printf("\n\033[1;33m");
     printf($mask, "Category", "Time", "Status");
-    printf($mask, "===============", "==========", "=============\033[0m");
+    printf($mask, "===============", "===============", "===============\033[0m");
     printf($mask, "Queries","$query_timer","queried");
 
     //get microtime for timing script check
@@ -487,7 +539,6 @@ while($i>0)
         shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.12 'echo \"\033[38;5;\"$color\"m\" && $ds1 releases $ds2 && cd $_bin && $_php update_releases.php && echo \" \033[1;0;33m\" && echo \"$_sleep_string {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']} && $ds1 releases $ds3' 2>&1 1> /dev/null");
     }
 
-
     //start postprocessing in window 2/3
     for ($g=1; $g<=32; $g++)
     {
@@ -517,16 +568,13 @@ while($i>0)
         }
     }
 
-    //get microtime and calcutlat time
+    //get microtime and calculate time
     $script_timer = microtime_float() - $script_timer_start;
 
     //continue table
     printf($mask, "Check Scripts","$script_timer","started");
     $lagg=microtime_float()-$time_loop_start;
     printf($mask, "Total Lagg","$lagg","complete");
-
-    //get parts size and display
-    printf("\n \033[0mThe parts table has \033[1;31m$parts_rows\033[0m rows and is \033[1;31m$parts_size_gb\033[0m\n");
 
     //notify monitor that optimize is running
     if ( ! shell_exec("$_tmux list-panes -t {$array['TMUX_SESSION']}:1 | grep 4: | grep dead") ) {
@@ -552,3 +600,4 @@ while($i>0)
 shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.0 'echo \"\033[1;41;33m\n\n\n\nNewznab-tmux is shutting down\n\nPlease wait for all panes to report \n\n\"Pane is dead\" before terminating this session.\n\nTo terminate this session press Ctrl-a c \n\nand at the prompt type \n\ntmux kill-session -t {$array['TMUX_SESSION']}\"'");
 
 ?>
+

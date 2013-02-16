@@ -145,11 +145,11 @@ else
     #printf "\033]0; $TMUX_SESSION\007\003\n"
     #$TMUXCMD -f $TMUX_CONF attach-session - $TMUX_SESSION || new-session -d -s $TMUX_SESSION -n $TMUX_SESSION 'cd bin && echo "Monitor Started" && echo "It might take a minute for everything to spinup......" && $NICE -n 19 $PHP monitor.php'
     $TMUXCMD selectp -t 0
-    $TMUXCMD splitw -h -p 72 'echo "..."'
-    $TMUXCMD splitw -h -p 50 'echo "..."'
+    $TMUXCMD splitw -h -p 65 'echo "..."'
+    $TMUXCMD splitw -h -p 60 'echo "..."'
     $TMUXCMD selectp -t 0
+    $TMUXCMD splitw -v -p 30 'echo "..."'
     $TMUXCMD splitw -v -p 50 'echo "..."'
-    $TMUXCMD splitw -v -p 40 'echo "..."'
 
     $TMUXCMD selectp -t 3
     $TMUXCMD splitw -v -p 50 'echo "..."'
@@ -217,21 +217,21 @@ else
     $TMUXCMD splitw -h -p 50 'echo "..."'
     $TMUXCMD select-layout tiled
 
-    $TMUXCMD new-window -n binaries_threaded 'echo "..."'
-    $TMUXCMD splitw -v -p 83 'echo "..."'
-    $TMUXCMD splitw -v -p 75 'echo "..."'
-    $TMUXCMD splitw -v -p 67 'echo "..."'
-    $TMUXCMD splitw -v -p 50 'echo "..."'
-    $TMUXCMD selectp -t 0
-    $TMUXCMD splitw -h -p 50 'echo "..."'
-    $TMUXCMD selectp -t 2
-    $TMUXCMD splitw -h -p 50 'echo "..."'
-    $TMUXCMD selectp -t 4
-    $TMUXCMD splitw -h -p 50 'echo "..."'
-    $TMUXCMD selectp -t 6
-    $TMUXCMD splitw -h -p 50 'echo "..."'
-    $TMUXCMD selectp -t 8
-    $TMUXCMD splitw -h -p 50 'echo "..."'
+#    $TMUXCMD new-window -n binaries_threaded 'echo "..."'
+#    $TMUXCMD splitw -v -p 83 'echo "..."'
+#    $TMUXCMD splitw -v -p 75 'echo "..."'
+#    $TMUXCMD splitw -v -p 67 'echo "..."'
+#    $TMUXCMD splitw -v -p 50 'echo "..."'
+#    $TMUXCMD selectp -t 0
+#    $TMUXCMD splitw -h -p 50 'echo "..."'
+#    $TMUXCMD selectp -t 2
+#    $TMUXCMD splitw -h -p 50 'echo "..."'
+#    $TMUXCMD selectp -t 4
+#    $TMUXCMD splitw -h -p 50 'echo "..."'
+#    $TMUXCMD selectp -t 6
+#    $TMUXCMD splitw -h -p 50 'echo "..."'
+#    $TMUXCMD selectp -t 8
+#    $TMUXCMD splitw -h -p 50 'echo "..."'
 
     if [[ $USE_HTOP == "true" ]]; then
         $TMUXCMD new-window -n htop '$HTOP'
