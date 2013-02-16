@@ -41,7 +41,7 @@ export MONITOR_UPDATE="30"
 
 ############################################################
 
-#You can have backfill loop constantly and interject binaries every so oftern
+#You can have backfill loop constantly and interject binaries every so often
 #by setting this next to true, if true, the normal backfill pane will be dead
 #this may be the preferred method, going foward
 export SEQUENTIAL="true"
@@ -183,7 +183,10 @@ export INNODB="false"
 #to actually do anything, directions are in the file
 export CLEANUP="false"
 
-#How oftern do you want  update_cleanup.php and removespecial.php to run, in seconds
+#edit update_cleanup.php and update_parsing.php and svn up
+export CLEANUP_EDIT="false"
+
+#How often do you want  update_cleanup.php and removespecial.php to run, in seconds
 export CLEANUP_TIMER="3600"
 
 ############################################################
@@ -193,7 +196,7 @@ export CLEANUP_TIMER="3600"
 #to actually do anything, directions are in the file
 export PARSING="false"
 
-#How oftern do you want update_parsing.php to run, in seconds
+#How often do you want update_parsing.php to run, in seconds
 export PARSING_TIMER="3600"
 
 ############################################################

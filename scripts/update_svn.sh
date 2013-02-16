@@ -34,10 +34,18 @@ echo " "
 cd $NEWZPATH"/www/lib/smarty/templates_c/"
 rm -fv *
 
+#edit cleanup scripts
+if [[ $CLEANUP_EDIT  == "true" ]]; then
+    sed -i -e 's/$echo =.*$/$echo = false;/' $TESTING_PATH/update_parsing.php
+    sed -i -e 's/$limited =.*$/$limited = false;/' $TESTING_PATH/update_parsing.php
+    sed -i -e 's/$echo =.*$/$echo = false;/' $TESTING_PATH/update_cleanup.php
+    sed -i -e 's/$limited =.*$/$limited = false;/' $TESTING_PATH/update_cleanup.php
+fi
+
 #import kevin123's compression mod
 if [[ $KEVINS_COMP == "true" ]]; then
-  cd $NEWZPATH"/misc/update_scripts/nix_scripts/tmux/kevin123"
-  cp -frv * $NEWZPATH/www/lib/
+    cd $NEWZPATH"/misc/update_scripts/nix_scripts/tmux/kevin123"
+    cp -frv * $NEWZPATH/www/lib/
 fi
 
 #set prmission
