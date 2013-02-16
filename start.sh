@@ -175,11 +175,8 @@ else
     $TMUXCMD splitw -h -p 67 'echo "..."'
     $TMUXCMD splitw -h -p 50 'echo "..."'
 
-    $TMUXCMD new-window -n postprocessing 'echo "..."'
-
+    $TMUXCMD new-window -n postprocessing1 'echo "..."'
     $TMUXCMD selectp -t 0
-    $TMUXCMD splitw -v -p 75 'echo "..."'
-    $TMUXCMD splitw -v -p 67 'echo "..."'
     $TMUXCMD splitw -v -p 50 'echo "..."'
     $TMUXCMD selectp -t 0
     $TMUXCMD splitw -h -p 88 'echo "..."'
@@ -197,7 +194,12 @@ else
     $TMUXCMD splitw -h -p 75 'echo "..."'
     $TMUXCMD splitw -h -p 67 'echo "..."'
     $TMUXCMD splitw -h -p 50 'echo "..."'
-    $TMUXCMD selectp -t 16
+    $TMUXCMD select-layout tiled
+
+    $TMUXCMD new-window -n postprocessing2 'echo "..."'
+    $TMUXCMD selectp -t 0
+    $TMUXCMD splitw -v -p 50 'echo "..."'
+    $TMUXCMD selectp -t 0
     $TMUXCMD splitw -h -p 88 'echo "..."'
     $TMUXCMD splitw -h -p 85 'echo "..."'
     $TMUXCMD splitw -h -p 83 'echo "..."'
@@ -205,7 +207,7 @@ else
     $TMUXCMD splitw -h -p 75 'echo "..."'
     $TMUXCMD splitw -h -p 67 'echo "..."'
     $TMUXCMD splitw -h -p 50 'echo "..."'
-    $TMUXCMD selectp -t 24
+    $TMUXCMD selectp -t 8
     $TMUXCMD splitw -h -p 88 'echo "..."'
     $TMUXCMD splitw -h -p 85 'echo "..."'
     $TMUXCMD splitw -h -p 83 'echo "..."'
@@ -213,6 +215,7 @@ else
     $TMUXCMD splitw -h -p 75 'echo "..."'
     $TMUXCMD splitw -h -p 67 'echo "..."'
     $TMUXCMD splitw -h -p 50 'echo "..."'
+    $TMUXCMD select-layout tiled
 
     $TMUXCMD new-window -n binaries_threaded 'echo "..."'
     $TMUXCMD splitw -v -p 83 'echo "..."'
