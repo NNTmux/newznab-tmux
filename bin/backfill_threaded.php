@@ -13,12 +13,11 @@ unset($groups);
 
 $ps = new PowerProcess;
 $ps->RegisterCallback('psUpdateComplete');
-$ps->maxThreads = 4;
+$ps->maxThreads = 10;
 $ps->threadTimeLimit = 0;	// Disable child timeout
 
-echo "Starting threaded binary update process\n";
+echo "Starting threaded backfill process\n";
 
-//while ($ps->runParentCode()) 
 while ($ps->RunControlCode()) 
 {
 	// Start the parent loop
@@ -29,15 +28,14 @@ while ($ps->RunControlCode())
 		{
 			// Spawn another thread
 			$ps->threadData = array_pop($groupList);
-			
 			echo "[Thread-MASTER] Spawning new thread.  Still have " . count($groupList) ." group(s) to update after this\n";
 			$ps->spawnThread();
-		}
+		} 
 		else 
 		{
 			// There are no more slots available to run
 			//$ps->tick();
-			//echo "- \n";
+			//echo ".\n";
 		}
 	} 
 	else 
@@ -57,7 +55,12 @@ if ($ps->RunThreadCode())
 	
 	$thread = sprintf("%05d",$ps->GetPID());
 	
-	echo "[Thread-{$thread}] Begining processing for group {$group['name']}\n";
+	echo "[Thread-{$thread}] Begining backfill processing for group {$group['name']}\n";
+	
+	$param = $group['name'];
+	
+	$dir = dirname(__FILE__);
+	$file = 'backfill.php';
 	
 	//NewzDash
 	$ndComm = new newzdashComms;
@@ -68,43 +71,36 @@ if ($ps->RunThreadCode())
 	if ( $ndCommAllowed )
 	{
 		$args[] = null;
-		$args[] = "update_binaries on " . $group['name'];
+		$args[] = "backfill on " . $group['name'];
 		$args[] = "started";
 		$ndComm->broadcast($args);
 	}
 	//End Newzdash
 	
-	$param = $group['name'];
-	
-	$dir = dirname(__FILE__).'/../../../';
-	$file = 'update_binaries.php';
-	
 	$output = shell_exec("php {$dir}/{$file} {$param}");
-	//$output = shell_exec("/usr/bin/php -c /etc/php5/cli/php.ini {$dir}/{$file} {$param}");
-	
-	echo "[Thread-{$thread}] Completed update for group {$group['name']}\n";
 	
 	//Newzdash
 	if ( $ndCommAllowed )
 	{
 		unset($args);
 		$args[] = null;
-		$args[] = "update_binaries on " . $group['name'];
+		$args[] = "backfill on " . $group['name'];
 		$args[] = "stopped";
 		$ndComm->broadcast($args);
 	}
 	//End Newzdash
+	
+	echo "[Thread-{$thread}] Completed update for group {$group['name']}\n";
 }
 
 // Exit to call back to parent - Let know that child has completed
 exit(0);
 
-
-
 // Create callback function
 function psUpdateComplete() 
 {
-	echo "Threaded update process complete\n";
+	echo "[Thread-MASTER] Threaded backfill process complete\n";
 }
+
 
 ?>
