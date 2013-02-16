@@ -3,7 +3,6 @@ require_once(WWW_DIR."/lib/framework/db.php");
 require_once(WWW_DIR."/lib/nntp.php");
 require_once(WWW_DIR."/lib/groups.php");
 require_once(WWW_DIR."/lib/backfill.php");
-require_once(WWW_DIR."/lib/Net_NNTP/NNTP/Client.php");
 
 /**
  * This class manages the downloading of binaries and parts from usenet, and the 
@@ -246,32 +245,33 @@ class Binaries
 		$n = $this->n;
 		$this->startHeaders = microtime(true);
 		
-			if ($this->compressedHeaders) 
+			if ($this->compressedHeaders)
 			{
-				$nntpc = new Nntp();
-				$nntpc->doNXFConnect();
-				$response = $nntpc->_sendCommand('XFEATURE COMPRESS GZIP');
+				$nntpn = new Nntp();
+				$nntpn->doConnect(1,true);
+				$response = $nntpn->_sendCommand('XFEATURE COMPRESS GZIP');
 				if (PEAR::isError($response) || $response != 290)
 					{
-						$response2 = $nntpc->_sendCommand('XZVER');
-						if (PEAR::isError($response2) || $response2 != 412)
+						$response2 = $nntpn->_sendCommand('group alt.binaries.multimedia');
+						$response3 = $nntpn->_sendCommand('xzver');
+						if (PEAR::isError($response3) || $response3 != 224)
 							{
+								$nntpn->doQuit();
 								$msgs = $nntp->getOverview($first."-".$last, true, false);
-								$nntpc->doQuit();
 							}
 						else
 							{
+								$nntpn->doQuit();
 								$msgs = $nntp->getXOverview($first."-".$last, true, false);
-								$nntpc->doQuit();
-							}	
-					} 
+							}
+					}
 				else
 					{
-						$msgs = $nntp->getOverview($first."-".$last, true, false); 
-						$nntpc->doQuit();
+						$nntpn->doQuit();
+						$msgs = $nntp->getOverview($first."-".$last, true, false);
 					}
 			}
-			else 
+			else
 				$msgs = $nntp->getOverview($first."-".$last, true, false);
 		
 		if (PEAR::isError($msgs) && ($msgs->code == 400 || $msgs->code == 503))
@@ -283,34 +283,36 @@ class Binaries
 				return;
 			}
 			$nntp->selectGroup($groupArr['name']);
-			if ($this->compressedHeaders) 
+			if ($this->compressedHeaders)
 			{
-				$nntpc = new Nntp();
-				$nntpc->doNXFConnect();
-				$response = $nntpc->_sendCommand('XFEATURE COMPRESS GZIP');
+				$nntpn = new Nntp();
+				$nntpn->doConnect(1,true);
+				$response = $nntpn->_sendCommand('XFEATURE COMPRESS GZIP');
 				if (PEAR::isError($response) || $response != 290)
 					{
-						$response2 = $nntpc->_sendCommand('XZVER');
-						if (PEAR::isError($response2) || $response2 != 412)
+						$response2 = $nntpn->_sendCommand('group alt.binaries.multimedia');
+						$response3 = $nntpn->_sendCommand('xzver');
+						if (PEAR::isError($response3) || $response3 != 224)
 							{
+								$nntpn->doQuit();
 								$msgs = $nntp->getOverview($first."-".$last, true, false);
-								$nntpc->doQuit();
 							}
 						else
 							{
+								$nntpn->doQuit();
 								$msgs = $nntp->getXOverview($first."-".$last, true, false);
-								$nntpc->doQuit();
-							}	
-					} 
+							}
+					}
 				else
 					{
-						$msgs = $nntp->getOverview($first."-".$last, true, false); 
-						$nntpc->doQuit();
+						$nntpn->doQuit();
+						$msgs = $nntp->getOverview($first."-".$last, true, false);
 					}
 			}
-			else 
-				$msgs = $nntp->getOverview($first."-".$last, true, false); 
+			else
+				$msgs = $nntp->getOverview($first."-".$last, true, false);
 		}
+		
 		$rangerequested = range($first, $last);
 		$msgsreceived = array();
 		$msgsblacklisted = array();
@@ -512,7 +514,6 @@ class Binaries
         
         $result = $db->query($query);
         if (!count($result))
-
             return false;
             
         foreach ($result as $item)
@@ -748,6 +749,7 @@ class Binaries
 	}
 
 	/**
+
 	 * Get a binary row.
 	 */			
 	public function getById($id)

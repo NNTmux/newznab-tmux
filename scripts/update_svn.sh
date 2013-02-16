@@ -17,14 +17,16 @@ fi
 
 source $DIR/../defaults.sh
 
-#EDIT_THESE
-
+#updates to newest svn
 svn co --force --username svnplus --password $SVN_PASSWORD svn://svn.newznab.com/nn/branches/nnplus $NEWZPATH/
 sleep 2
+
+#force download/overwrite of current svn
 svn export --force --username svnplus --password $SVN_PASSWORD svn://svn.newznab.com/nn/branches/nnplus $NEWZPATH/
 
+#update db to current rev
 cd $NEWZPATH"/misc/update_scripts"
-php5 update_database_version.php
+$PHP update_database_version.php
 
 echo " "
 
@@ -32,12 +34,13 @@ echo " "
 cd $NEWZPATH"/www/lib/smarty/templates_c/"
 rm -fv *
 
+#import kevin123's compression mod
 if [[ $KEVINS_COMP == "true" ]]; then
   cd $NEWZPATH"/misc/update_scripts/nix_scripts/tmux/kevin123"
   cp -frv * $NEWZPATH/www/lib/
 fi
 
+#set prmission
 cd $NEWZPATH"/misc/update_scripts/nix_scripts/tmux/scripts"
-
 ./set_perms.sh
 

@@ -8,11 +8,11 @@ require_once(WWW_DIR."/lib/Net_NNTP/NNTP/Client.php");
  */
 class Nntp extends Net_NNTP_Client
 {    
-	public $XFCompression = false;
 	/**
-	 * Start an NNTP connection. With Xfeature compression.
+	 * Start an NNTP connection.
 	 */
-	function doConnect($attempt=1) 
+	public $XFCompression = false;
+	function doConnect($attempt=1, $overridecompression=false) 
 	{
 		if ($this->_isConnected()) {
 			return true;
@@ -47,7 +47,7 @@ class Nntp extends Net_NNTP_Client
 				$connected = false;
 			}
 		}
-		if ($this->compressedHeaders)
+		if ($this->compressedHeaders && !$overridecompression)
 		{
 			$response = $this->_sendCommand('XFEATURE COMPRESS GZIP');
 			if (PEAR::isError($response) || $response != 290) 
@@ -70,54 +70,6 @@ class Nntp extends Net_NNTP_Client
 		
 		return $connected;
 	}	
-
-	/**
-	 * Start an NNTP connection. Without Xfeature compression.
-	 */
-	function doNXFConnect($attempt=1) 
-	{
-		if ($this->_isConnected()) {
-			return true;
-		}
-
-		// Attempt to connect up to 5 times before giving up.
-		$maxAttempts = 5;
-		
-		$connected = true;
-		
-		$enc = false;
-		if (defined("NNTP_SSLENABLED") && NNTP_SSLENABLED == true)
-			$enc = 'ssl';
-
-		$ret = $this->connect(NNTP_SERVER, $enc, NNTP_PORT);
-		if(PEAR::isError($ret))
-		{
-			$err = "Cannot connect to server ".NNTP_SERVER.(!$enc?" (nonssl) ":"(ssl) ").": ". $ret->getMessage();
-			echo $err;
-			$connected = false;
-		}
-		if(!defined(NNTP_USERNAME) && NNTP_USERNAME!="" )
-		{
-			$ret2 = $this->authenticate(NNTP_USERNAME, NNTP_PASSWORD);
-			if(PEAR::isError($ret2)) 
-			{
-				$err = "Cannot authenticate to server ".NNTP_SERVER.(!$enc?" (nonssl) ":" (ssl) ")." - ". NNTP_USERNAME." (".$ret2->getMessage().")";
-				echo $err;
-				$connected = false;
-			}
-		}
-		if ($attempt < $maxAttempts && !$connected) {
-			sleep(5);
-			$connected = $this->doConnect($attempt+1);
-		}
-		
-		if (!$connected && $attempt == 1) {
-			echo "\nTried to connect ".$maxAttempts." times, but couldn't. Check your settings and connection.\n";
-		}
-		
-		return $connected;
-	}
-
 	/**
 	 * End an NNTP connection.
 	 */
@@ -139,12 +91,14 @@ class Nntp extends Net_NNTP_Client
 			echo "NntpPrc : ".substr($summary->getMessage(), 0, 30)."\n";
 			return false;
 		}
+
 		$body = $this->getBody('<'.$partMsgId.'>', true);
 		if (PEAR::isError($body)) 
 		{
             printf("NntpPrc : Error fetching part number %s in %s (Server response: %s)\n", $partMsgId, $groupname, $body->getMessage());
             return false;
 		}
+		
 		$message = $this->decodeYenc($body);
 		if (!$message) 
 		{
@@ -153,6 +107,7 @@ class Nntp extends Net_NNTP_Client
 			//
 			return false;
 		}
+
 		return $message;
 	}
 	
@@ -169,6 +124,7 @@ class Nntp extends Net_NNTP_Client
 			echo "NntpPrc : ".substr($summary->getMessage(), 0, 30)."\n";
 			return false;
 		}
+		
 		foreach($msgIds as $msgId) 
 		{
 			$messageID = '<'.$msgId.'>';
@@ -178,6 +134,7 @@ class Nntp extends Net_NNTP_Client
                 printf("NntpPrc : Error fetching part number %s in %s (Server response: %s)\n", $messageID, $groupname, $body->getMessage());
                 return false;
 			}
+			
 			$dec = $this->decodeYenc($body);
 			if (!$dec) 
 			{
@@ -186,6 +143,7 @@ class Nntp extends Net_NNTP_Client
 				//			
 				return false;
 			}
+
 			$message .= $dec;
 		}
 		return $message;
@@ -205,6 +163,7 @@ class Nntp extends Net_NNTP_Client
             printf("NntpPrc: Unable to locate binary: %s\n", $binaryId);
 			return false;
         }
+		
 		$summary = $this->selectGroup($binary['groupname']);
 		$message = $dec = '';
 
@@ -213,14 +172,18 @@ class Nntp extends Net_NNTP_Client
 			echo "NntpPrc : ".substr($summary->getMessage(), 0, 30)."\n";
 			return false;
 		}
+
 		$resparts = $db->query(sprintf("SELECT size, partnumber, messageID FROM parts WHERE binaryID = %d ORDER BY partnumber", $binaryId));
 		
+		//
 		// Dont attempt to download nfos which are larger than one part.
+		//
 		if (sizeof($resparts) > 1 && $isNfo === true)
 		{
 			echo "NntpPrc : Error Nfo is too large... skipping.\n";
 			return false;
 		}
+		
 		foreach($resparts as $part) 
 		{
 			$messageID = '<'.$part['messageID'].'>';
@@ -230,47 +193,33 @@ class Nntp extends Net_NNTP_Client
                 printf("NntpPrc : Error fetching part number %s in %s (Server response: %s)\n", $part['messageID'], $binary['groupname'], $body->getMessage());
 				return false;
 			}
+
 			$dec = $this->decodeYenc($body);
 			if (!$dec) 
 			{
                 printf("NntpPrc: Unable to decode body of binary: %s\n", $binaryId);
                 
-				// Yenc decode failed		
+				//
+				// Yenc decode failed
+				//			
 				return false;
 			}
+
 			$message .= $dec;
 		}
 		return $message;
 	}
-
-	/**
-	 * Decode a yenc encoded string.
-	 */	
-	function decodeYenc($yencodedvar)
-	{
-		$input = array();
-		preg_match("/^(=ybegin.*=yend[^$]*)$/ims", $yencodedvar, $input);
-		if (isset($input[1]))
-		{        
-			$ret = "";
-			$input = trim(preg_replace("/\r\n/im", "",  preg_replace("/(^=yend.*)/im", "", preg_replace("/(^=ypart.*\\r\\n)/im", "", preg_replace("/(^=ybegin.*\\r\\n)/im", "", $input[1], 1), 1), 1)));
-				
-			for( $chr = 0; $chr < strlen($input) ; $chr++)
-				$ret .= ($input[$chr] != "=" ? chr(ord($input[$chr]) - 42) : chr((ord($input[++$chr]) - 64) - 42));
-				
-			return $ret;
-		}
-		return false;
-	}
-
+	
 	/**
 	 * Get XZVER for a range of NNTP messages.
 	 */
 	function getXOverview($range, $_names = true, $_forceNames = true)
     {
-		$overview = $this->cmdXOver($range);
+    	// Fetch overview from server
+    	$overview = $this->cmdXZver($range);
     	if (PEAR::isError($overview)) {
-    	    return $overview; }
+    	    return $overview;
+    	}
 
     	// Use field names from overview format as keys?
     	if ($_names) 
@@ -282,6 +231,7 @@ class Nntp extends Net_NNTP_Client
     	        if (PEAR::isError($format)){
     	            return $format;
     	        }
+				
     	    	// Prepend 'Number' field
     	    	$format = array_merge(array('Number' => false), $format);
 				
@@ -292,6 +242,7 @@ class Nntp extends Net_NNTP_Client
     	    {
     	        $format = $this->_overviewFormatCache;
     	    }
+			
     	    // Loop through all articles
             foreach ($overview as $key => $article) 
             {	
@@ -311,6 +262,7 @@ class Nntp extends Net_NNTP_Client
 				}
     	    }
     	}
+
     	switch (true)
     	{
     	    // Expect one article
@@ -331,6 +283,26 @@ class Nntp extends Net_NNTP_Client
     	}
     }
 	
+	/**
+	 * Decode a yenc encoded string.
+	 */	
+	function decodeYenc($yencodedvar)
+	{
+		$input = array();
+		preg_match("/^(=ybegin.*=yend[^$]*)$/ims", $yencodedvar, $input);
+		if (isset($input[1]))
+		{        
+			$ret = "";
+			$input = trim(preg_replace("/\r\n/im", "",  preg_replace("/(^=yend.*)/im", "", preg_replace("/(^=ypart.*\\r\\n)/im", "", preg_replace("/(^=ybegin.*\\r\\n)/im", "", $input[1], 1), 1), 1)));
+				
+			for( $chr = 0; $chr < strlen($input) ; $chr++)
+				$ret .= ($input[$chr] != "=" ? chr(ord($input[$chr]) - 42) : chr((ord($input[++$chr]) - 64) - 42));
+				
+			return $ret;
+		}
+		return false;
+	}	
+
     // }}}
     // {{{ cmdXZver()
 	/*

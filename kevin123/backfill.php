@@ -20,7 +20,7 @@ class Backfill
 	/**
 	 * Update all active groups categories and descriptions.
 	 */
-	function backfillAllGroups($groupName='', $groupPost='', $backfillDate=null, $backfillPost=null)
+	function backfillAllGroups($groupName='', $backfillDate=null)
 	{
 		$n = $this->n;
 		$groups = new Groups;
@@ -39,12 +39,12 @@ class Backfill
 		if ($res)
 		{
 			$nntp = new Nntp();
-			if ($nntp->doNXFConnect()) {
+			if ($nntp->doConnect(1, true)) {
 				$nntpc = new Nntp();
 				$nntpc->doConnect();
 				foreach($res as $groupArr)
 				{
-					$this->backfillGroup($nntp, $nntpc, $groupArr, $backfillDate, $backfillPost=$groupPost);
+					$this->backfillGroup($nntp, $nntpc, $groupArr, $backfillDate);
 				}
 	
 				$nntp->doQuit();
@@ -62,10 +62,11 @@ class Backfill
 	/**
 	 * Update a group back to a specified date.
 	 */	
-	function backfillGroup($nntp, $nntpc, $groupArr, $backfillDate=null, $backfillPost=null)
+	function backfillGroup($nntp, $nntpc, $groupArr, $backfillDate=null)
 	{
 		$db = new DB();
         $db->disableAutoCommit();
+
 		$binaries = new Binaries();
 		$n = $this->n;
 		$this->startGroup = microtime(true);
@@ -79,44 +80,34 @@ class Backfill
             $db->rollback();
 			return;
 		}
-		$datat = $nntpc->selectGroup($groupArr['name']);
-		if(PEAR::isError($datat))
+		$datac = $nntpc->selectGroup($groupArr['name']);
+		if(PEAR::isError($datac))
 		{
 			echo "Could not select group (bad name?): {$groupArr['name']}$n";
             $db->rollback();
 			return;
 		}
-		if ($backfillPost) {
-		$targetpost = round($groupArr['first_record'] - $backfillPost);
-		} else {
-		
 		if ($backfillDate)
 			$targetpost = $this->daytopost($nntp,$groupArr['name'],$this->dateToDays($backfillDate),TRUE); // get targetpost based on date
 		else
 			$targetpost = $this->daytopost($nntp,$groupArr['name'],$groupArr['backfill_target'],TRUE); //get targetpost based on days target
-		}	
 		if($groupArr['first_record'] == 0 || $groupArr['backfill_target'] == 0)
 		{
 			echo "Group ".$groupArr['name']." has invalid numbers.  Have you run update on it?  Have you set the backfill days amount?$n";
             $db->rollback();
 			return;
 		}
-
+		
 		echo "Group ".$data["group"].": server has ".$data['first']." - ".$data['last'].", or ~";
 		echo((int) (($this->postdate($nntp,$data['last'],FALSE) - $this->postdate($nntp,$data['first'],FALSE))/86400));
 		echo " days.".$n."Local first = ".$groupArr['first_record']." (";
 		echo((int) ((date('U') - $this->postdate($nntp,$groupArr['first_record'],FALSE))/86400));
-		echo " days). Going to backfill $backfillPost posts, which is post $targetpost.$n";
-		if ($backfillPost) 
-			{
-			echo " days). Going to backfill $backfillPost posts, which is post $targetpost.$n";
-			} 
-		else { echo " days).  Backfill target of ".$groupArr['backfill_target']."days is post $targetpost.$n"; }
+		echo " days).  Backfill target of ".$groupArr['backfill_target']."days is post $targetpost.$n";
 
 		if($targetpost >= $groupArr['first_record'])	//if our estimate comes back with stuff we already have, finish
 		{
 			echo "Nothing to do, we already have the target post.$n $n";
-           	$db->commit(); //Not an error so commit and re-enable autocommitting
+            $db->commit(); //Not an error so commit and re-enable autocommitting
 			return "";
 		}
 		//get first and last part numbers from newsgroup

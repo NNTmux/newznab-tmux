@@ -202,6 +202,7 @@ while($i>0)
     if ( $proc_result[0]['parts'] != NULL ) { $parts_rows = number_format($proc_result[0]['parts']); }
     if ( $proc_result[0]['partsize'] != NULL ) { $parts_size_gb = $proc_result[0]['partsize']; }
     if ( $proc_result[0]['releases'] ) { $releases_now = $proc_result[0]['releases']; }
+    if ( $proc_result[0]['releases'] ) { $releases_now_formatted = number_format($proc_result[0]['releases']); }
     if ( $proc_result[0]['newestaddname'] ) { $newestname = $proc_result[0]['newestaddname']; }
     if ( $proc_result[0]['newestadd'] ) { $newestdate = $proc_result[0]['newestadd']; }
 
@@ -212,8 +213,10 @@ while($i>0)
 
     //calculate releases difference
     $releases_since_start = $releases_now - $releases_start;
+    $releases_since_start = number_format($releases_since_start);
     $work_since_start = $work_remaining_now - $work_start;
     $total_work_now = $work_remaining_now + $tvrage_releases_proc + $music_releases_proc + $movie_releases_proc + $console_releases_proc + $book_releases_proc;
+    $total_work_now_formatted = number_format($total_work_now);
 
     if ( $releases_now != 0 ) { 
         $nfo_percent = floor(( $nfo_now / $releases_now) * 100 );
@@ -249,8 +252,8 @@ while($i>0)
     printf("\033[1;31m  First insert:\033[0m ".relativeTime("$firstdate")."\n");
     printf("\033[1;31m  Newest Release:\033[0m $newestname\n");
     printf("\033[1;31m  Added:\033[0m ".relativeTime("$newestdate")."\n");
-    printf("\033[1;31m  $releases_now($signed$releases_since_start)\033[0m releases in your database.\n");
-    printf("\033[1;31m  $total_work_now($signed1$work_since_start)\033[0m releases left to postprocess.\033[1;33m\n");
+    printf("\033[1;31m  $releases_now_formatted($signed$releases_since_start)\033[0m releases in your database.\n");
+    printf("\033[1;31m  $total_work_now_formatted($signed1$work_since_start)\033[0m releases left to postprocess.\033[1;33m\n");
 
     $mask = "%20s %10s %13s \n";
     printf($mask, "Category", "In Process", "In Database");
