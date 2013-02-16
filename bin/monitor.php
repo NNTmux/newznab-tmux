@@ -394,9 +394,9 @@ while($i>0)
 
     //set command for running backfill
     if ( $array['BACKFILL_THREADS'] == "true" ) {
-        $_backfill_cmd = 'cd $_bin && $_php backfill_threaded.php';
+        $_backfill_cmd = "cd $_bin && $_php backfill_threaded.php";
     } else {
-        $_backfill_cmd = 'cd $NNPATH && $_php backfill.php';
+        $_backfill_cmd = "cd $NNPATH && $_php backfill.php";
     }
 
     //set command for nzb-import
