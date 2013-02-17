@@ -80,7 +80,7 @@ function relativeTime($_time) {
 function get_color()
 {
     $number = mt_rand(1,231);
-    if ( $number == 16 || $number == 17 || $number == 18 || $number == 52 || $number == 53 || $number == 67 ) { get_color(); }
+    if ( $number == 4 || $number == 16 || $number == 17 || $number == 18 || $number == 19 || $number == 52 || $number == 53 || $number == 67 ) { get_color(); }
     return($number);
 }
 
