@@ -48,6 +48,15 @@ if [[ $KEVINS_COMP == "true" ]]; then
     cp -frv * $NEWZPATH/www/lib/
 fi
 
+#set user/group to www
+if [[ $CHOWN_TRUE == "true" ]]; then
+    chown -c $WWW_USER $NEWZPATH
+    chown -Rc $WWW_USER $NEWZPATH/www/
+    chown -Rc $WWW_USER $NEWZPATH/db/
+    chown -Rc $WWW_USER $NEWZPATH/docs/
+    chown -Rc $WWW_USER $NEWZPATH/misc/
+fi
+
 #set prmission
 cd $NEWZPATH"/misc/update_scripts/nix_scripts/tmux/scripts"
 ./set_perms.sh

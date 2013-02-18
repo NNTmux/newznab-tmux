@@ -1,18 +1,18 @@
 <?php
 
-require('config.php');
+require(dirname(__FILE__) . '/config.php');
 require(WWW_DIR.'/lib/postprocess.php');
 
 $db = new DB();
 
 //totals per category in db, results by parentID
-$qry="SELECT COUNT( releases.categoryID ) AS cnt, parentID FROM releases RIGHT JOIN category ON releases.categoryID = category.ID WHERE parentID IS NOT NULL GROUP BY parentID;";
+$qry = "SELECT COUNT( releases.categoryID ) AS cnt, parentID FROM releases RIGHT JOIN category ON releases.categoryID = category.ID WHERE parentID IS NOT NULL GROUP BY parentID;";
 
 //needs to be processed query
-$proc="SELECT ( SELECT COUNT( groupID ) AS cnt from releases where consoleinfoID IS NULL and categoryID BETWEEN 1000 AND 1999 ) AS console, ( SELECT COUNT( groupID ) AS cnt from releases where imdbID IS NULL and categoryID BETWEEN 2000 AND 2999 ) AS movies, ( SELECT COUNT( groupID ) AS cnt from releases where musicinfoID IS NULL and categoryID BETWEEN 3000 AND 3999 ) AS audio, ( SELECT COUNT( groupID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (categoryID BETWEEN 4000 AND 4999 and ((r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)))) AS pc, ( SELECT COUNT( groupID ) AS cnt from releases where rageID = -1 and categoryID BETWEEN 5000 AND 5999 ) AS tv, ( SELECT COUNT( groupID ) AS cnt from releases where bookinfoID IS NULL and categoryID = 7020 ) AS book, ( SELECT COUNT( groupID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)) AS work, ( SELECT COUNT( groupID ) AS cnt from releases) AS releases, ( SELECT COUNT( groupID ) AS cnt FROM releases r WHERE r.releasenfoID = 0) AS nforemains, ( SELECT COUNT( groupID ) AS cnt FROM releases WHERE releasenfoID not in (0, -1)) AS nfo, ( SELECT table_rows AS cnt FROM information_schema.TABLES where table_name = 'parts' AND TABLE_SCHEMA = '".DB_NAME."' ) AS parts, ( SELECT concat(round((data_length+index_length)/(1024*1024*1024),2),'GB') AS cnt FROM information_schema.tables where table_name = 'parts' AND TABLE_SCHEMA = '".DB_NAME."' ) AS partsize, ( SELECT UNIX_TIMESTAMP(adddate) from releases order by adddate desc limit 1 ) AS newestadd, ( SELECT name from releases order by adddate desc limit 1 ) AS newestaddname";
+$proc = "SELECT ( SELECT COUNT( groupID ) AS cnt from releases where consoleinfoID IS NULL and categoryID BETWEEN 1000 AND 1999 ) AS console, ( SELECT COUNT( groupID ) AS cnt from releases where imdbID IS NULL and categoryID BETWEEN 2000 AND 2999 ) AS movies, ( SELECT COUNT( groupID ) AS cnt from releases where musicinfoID IS NULL and categoryID BETWEEN 3000 AND 3999 ) AS audio, ( SELECT COUNT( groupID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (categoryID BETWEEN 4000 AND 4999 and ((r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)))) AS pc, ( SELECT COUNT( groupID ) AS cnt from releases where rageID = -1 and categoryID BETWEEN 5000 AND 5999 ) AS tv, ( SELECT COUNT( groupID ) AS cnt from releases where bookinfoID IS NULL and categoryID = 7020 ) AS book, ( SELECT COUNT( groupID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)) AS work, ( SELECT COUNT( groupID ) AS cnt from releases) AS releases, ( SELECT COUNT( groupID ) AS cnt FROM releases r WHERE r.releasenfoID = 0) AS nforemains, ( SELECT COUNT( groupID ) AS cnt FROM releases WHERE releasenfoID not in (0, -1)) AS nfo, ( SELECT table_rows AS cnt FROM information_schema.TABLES where table_name = 'parts' AND TABLE_SCHEMA = '".DB_NAME."' ) AS parts, ( SELECT concat(round((data_length+index_length)/(1024*1024*1024),2),'GB') AS cnt FROM information_schema.tables where table_name = 'parts' AND TABLE_SCHEMA = '".DB_NAME."' ) AS partsize, ( SELECT UNIX_TIMESTAMP(adddate) from releases order by adddate desc limit 1 ) AS newestadd, ( SELECT name from releases order by adddate desc limit 1 ) AS newestaddname";
 
 //get first release inserted datetime and oldest posted datetime
-$posted_date="SELECT(select UNIX_TIMESTAMP(adddate) from releases order by adddate asc limit 1) AS adddate;";
+$posted_date = "SELECT(select UNIX_TIMESTAMP(adddate) from releases order by adddate asc limit 1) AS adddate;";
 
 //get variables from config.sh and defaults.sh
 $varnames = shell_exec("cat ../config.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
@@ -29,6 +29,7 @@ $_DB_NAME = getenv('DB_NAME');
 $_DB_USER = getenv('DB_USER');
 $_DB_HOST = getenv('DB_HOST');
 $_DB_PASSWORD = escapeshellarg(getenv('DB_PASSWORD'));
+$_DB_PASS = getenv('DB_PASSWORD');
 $_mysql = getenv('MYSQL');
 $_php = getenv('PHP');
 $_tmux = getenv('TMUXCMD');
@@ -39,6 +40,14 @@ $_bin = dirname(__FILE__)."/../bin";
 $_alienx = dirname(__FILE__)."/../alienx";
 $_conf = dirname(__FILE__)."/../conf";
 $_cj = dirname(__FILE__)."/../nnscripts";
+$use_addtional=$array['USE_ADDITIONAL'];
+$NNPATH="{$array['NEWZPATH']}{$array['NEWZNAB_PATH']}";
+$TESTING="{$array['NEWZPATH']}{$array['TESTING_PATH']}";
+
+//build queries for shell
+$_backfill_increment = "UPDATE groups set backfill_target=backfill_target+1 where active=1 and backfill_target<{$array['MAXDAYS']};";
+$mysql_command_1 = "$_mysql --defaults-extra-file=$_conf/my.cnf -u$_DB_USER -h $_DB_HOST $_DB_NAME -e \"$_backfill_increment\"";
+//$mysql_command_1 = "$_mysql -u$_DB_USER -p $_DB_PASSWORD -h $_DB_HOST $_DB_NAME -e \"$_backfill_increment\"";
 
 //got microtime
 function microtime_float()
@@ -80,8 +89,10 @@ function relativeTime($_time) {
 function get_color()
 {
     $number = mt_rand(1,231);
-    if ( $number == 4 || $number == 16 || $number == 17 || $number == 18 || $number == 19 || $number == 52 || $number == 53 || $number == 67 ) { get_color(); }
-    return($number);
+    if ( $number != 4 && $number != 16 && $number != 17 && $number != 18 && $number != 19 && $number != 52 && $number != 53 && $number != 67 ) {
+        return($number);
+    }
+    get_color();
 }
 
 $time = TIME();
@@ -123,19 +134,122 @@ $nfo_now = 0;
 $parts_rows = 0;
 $parts_size_gb = 0;
 $releases_now = 0;
-$firstdate = 0;
-$newestname = 0;
-$newestdate = 0;
+$firstdate = TIME() - 10;
+$newestname = "Unknown";
+$newestdate = TIME() - 10;
 $parts_rows_unformated = 0;
+$releases_now_formatted = 0;
+$nfo_percent = 0;
+$console_percent = 0;
+$movie_percent = 0;
+$music_percent = 0;
+$pc_percent = 0;
+$tvrage_percent = 0;
+$book_percent = 0;
+$misc_percent = 0;
+$releases_since_start = 0;
+$work_since_start = 0;
+$work_since_start_formatted = number_format( $work_since_start );
+$total_work_now = 0;
+$total_work_now_formatted = 0;
+$binaries_state = "disabled";
+$binaries_reason = "disabled";
+$backfill_state = "disabled";
+$backfill_reason = "disabled";
+$import_state = "disabled";
+$import_reason = "disabled";
+$query_timer_start = 0;
+$query_timer = 0;
+$script_timer = 0;
+$script_timer_start = 0;
+$lagg=0;
+$console_releases_start = 0;
+$movie_releases_start = 0;
+$music_releases_start = 0;
+$pc_releases_start = 0;
+$tvrage_releases_start = 0;
+$book_releases_start = 0;
+$misc_releases_start = 0;
+$nfo_start = 0;
+$nfo_remaining_start = 0;
+$console_releases_proc_start = 0;
+$movie_releases_proc_start = 0;
+$music_releases_proc_start = 0;
+$pc_releases_proc_start = 0;
+$tvrage_releases_proc_start = 0;
+$book_releases_proc_start = 0;
+$work_remaining_start = 0;
 
-//get valuses from $posted_date
-$posted_date_result = @$db->query($posted_date);
-if ( $posted_date_result[0]['adddate'] ) { $firstdate = $posted_date_result[0]['adddate']; }
+//formatted  output
+$nfo_remaining_since_start = number_format( $nfo_remaining_now - $nfo_remaining_start );
+$console_remaining_since_start = number_format( $console_releases_proc - $console_releases_proc_start );
+$movie_remaining_since_start = number_format( $movie_releases_proc - $movie_releases_proc_start );
+$music_remaining_since_start = number_format( $music_releases_proc - $music_releases_proc_start );
+$pc_remaining_since_start = number_format( $pc_releases_proc - $pc_releases_proc_start );
+$tvrage_remaining_since_start = number_format( $tvrage_releases_proc - $tvrage_releases_proc_start );
+$book_remaining_since_start = number_format( $book_releases_proc - $book_releases_proc_start );
+$remaning_since_start = number_format( $work_remaining_now - $work_remaining_start );
+$console_releases_proc_formatted = number_format( $console_releases_proc );
+$movie_releases_proc_formatted = number_format( $movie_releases_proc );
+$music_releases_proc_formatted = number_format( $music_releases_proc );
+$pc_releases_proc_formatted = number_format( $pc_releases_proc );
+$tvrage_releases_proc_formatted = number_format( $tvrage_releases_proc );
+$work_remaining_now_formatted = number_format( $work_remaining_now );
+$book_releases_proc_formatted = number_format( $book_releases_proc );
+$nfo_remaining_now_formatted = number_format( $nfo_remaining_now );
+$nfo_now_formatted = number_format( $nfo_now );
+$console_releases_now_formatted = number_format( $console_releases_now );
+$movie_releases_now_formatted = number_format( $movie_releases_now );
+$music_releases_now_formatted = number_format( $music_releases_now );
+$pc_releases_now_formatted = number_format( $pc_releases_now );
+$tvrage_releases_now_formatted = number_format( $tvrage_releases_now );
+$book_releases_now_formatted = number_format( $book_releases_now );
+$misc_releases_now_formatted = number_format( $misc_releases_now );
 
+//create initial display
+passthru('clear');
+printf("\033[1;31m  Monitor\033[0m has been running for:\033[0m ".relativeTime("$time")."\n");
+printf("\033[1;31m  First insert:\033[0m ".relativeTime("$firstdate")."\n");
+printf("\033[1;31m  Newest Release:\033[0m $newestname\n");
+printf("\033[1;31m  Added:\033[0m ".relativeTime("$newestdate")."\n");
 
-$i=1;
-while($i>0)
+$mask = "%20s %20.20s %20.20s\n";
+printf("\033[1;33m\n");
+printf($mask, "Category", "State", "Reason");
+printf($mask, "==================", "==================", "==================");
+printf("\033[38;5;214m");
+printf($mask, "Binaries", "$binaries_state", "$binaries_reason");
+printf($mask, "Backfill", "$backfill_state", "$backfill_reason");
+printf($mask, "Import", "$import_state", "$import_reason");
+printf($mask, "Parts", "$parts_size_gb", "$parts_rows rows");
+
+printf("\033[1;33m\n");
+printf($mask, "Category", "In Process", "In Database");
+printf($mask, "==================", "==================", "==================");
+printf("\033[38;5;214m");
+printf($mask, "NFO's","$nfo_remaining_now_formatted($nfo_remaining_since_start)","$nfo_now_formatted($nfo_percent%)");
+printf($mask, "Console(1000)","$console_releases_proc_formatted($console_remaining_since_start)","$console_releases_now_formatted($console_percent%)");
+printf($mask, "Movie(2000)","$movie_releases_proc_formatted($movie_remaining_since_start)","$movie_releases_now_formatted($movie_percent%)");
+printf($mask, "Audio(3000)","$music_releases_proc_formatted($music_remaining_since_start)","$music_releases_now_formatted($music_percent%)");
+printf($mask, "PC(4000)","$pc_releases_proc_formatted($pc_remaining_since_start)","$pc_releases_now_formatted($pc_percent%)");
+printf($mask, "TVShows(5000)","$tvrage_releases_proc_formatted($tvrage_remaining_since_start)","$tvrage_releases_now_formatted($tvrage_percent%)");
+printf($mask, "Books(7000)","$book_releases_proc_formatted($book_remaining_since_start)","$book_releases_now_formatted($book_percent%)");
+printf($mask, "Misc(8000)","$work_remaining_now_formatted($remaning_since_start)","$misc_releases_now_formatted($misc_percent%)");
+printf($mask, "Total", "$total_work_now_formatted($work_since_start_formatted)", "$releases_now_formatted($releases_since_start)");
+
+printf("\n\033[1;33m");
+printf($mask, "Category", "Time", "Status");
+printf($mask, "==================", "==================", "==================");
+printf("\033[38;5;214m");
+printf($mask, "Queries","$query_timer","queried");
+
+printf($mask, "Check Scripts","$script_timer","started");
+printf($mask, "Total Lagg","$lagg","complete");
+
+$i = 1;
+while( $i > 0 )
 {
+
     //get microtime at start of loop
     $time_loop_start = microtime_float();
 
@@ -174,9 +288,26 @@ while($i>0)
     }
     $proc_result = @$db->query($proc);
 
+    //get valuses from $posted_date
+    $posted_date_result = @$db->query($posted_date);
+    if ( $posted_date_result[0]['adddate'] ) { $firstdate = $posted_date_result[0]['adddate']; }
+
     //initial query for total releases
     if (( $proc_result[0]['work'] != NULL ) && ( $work_start == 0 )) { $work_start = $proc_result[0]['work']; }
     if (( $proc_result[0]['releases'] ) && ( $releases_start == 0 )) { $releases_start = $proc_result[0]['releases']; }
+
+    //get start values from $qry
+    if ( $i == "1" ) 
+    {
+        if ( $proc_result[0]['nforemains'] != NULL ) { $nfo_remaining_start = $proc_result[0]['nforemains']; }
+        if ( $proc_result[0]['console'] != NULL ) { $console_releases_proc_start = $proc_result[0]['console']; }
+        if ( $proc_result[0]['movies'] != NULL ) { $movie_releases_proc_start = $proc_result[0]['movies']; }
+        if ( $proc_result[0]['audio'] != NULL ) { $music_releases_proc_start = $proc_result[0]['audio']; }
+        if ( $proc_result[0]['pc'] != NULL ) { $pc_releases_proc_start = $proc_result[0]['pc']; }
+        if ( $proc_result[0]['tv'] != NULL ) { $tvrage_releases_proc_start = $proc_result[0]['tv']; }
+        if ( $proc_result[0]['book'] != NULL ) { $book_releases_proc_start = $proc_result[0]['book']; }
+        if ( $proc_result[0]['work'] != NULL ) { $work_remaining_start = $proc_result[0]['work']; }
+    }
 
     //get values from $qry
     if ( $initquery['1000'] != NULL ) { $console_releases_now = $initquery['1000']; }
@@ -189,6 +320,7 @@ while($i>0)
 
     //get values from $proc
     if ( $proc_result[0]['console'] != NULL ) { $console_releases_proc = $proc_result[0]['console']; }
+    if ( $proc_result[0]['console'] != NULL ) { $console_releases_proc_formatted = number_format($proc_result[0]['console']); }
     if ( $proc_result[0]['movies'] != NULL ) { $movie_releases_proc = $proc_result[0]['movies']; }
     if ( $proc_result[0]['audio'] != NULL ) { $music_releases_proc = $proc_result[0]['audio']; }
     if ( $proc_result[0]['pc'] != NULL ) { $pc_releases_proc = $proc_result[0]['pc']; }
@@ -206,19 +338,46 @@ while($i>0)
     if ( $proc_result[0]['newestaddname'] ) { $newestname = $proc_result[0]['newestaddname']; }
     if ( $proc_result[0]['newestadd'] ) { $newestdate = $proc_result[0]['newestadd']; }
 
-    //build queries for shell
-    $_backfill_increment = "UPDATE groups set backfill_target=backfill_target+1 where active=1 and backfill_target<{$array['MAXDAYS']};";
-    $mysql_command_1 = "$_mysql --defaults-extra-file=$_conf/my.cnf -u$_DB_USER -h $_DB_HOST $_DB_NAME -e \"$_backfill_increment\"";
-    //$mysql_command_1 = "$_mysql -u$_DB_USER -p $_DB_PASSWORD -h $_DB_HOST $_DB_NAME -e \"$_backfill_increment\"";
-
     //calculate releases difference
-    $releases_since_start = $releases_now - $releases_start;
-    $releases_since_start = number_format($releases_since_start);
-    $work_since_start = $work_remaining_now - $work_start;
+    $releases_remaining_since_start = number_format( $releases_now - $releases_start );
+    $releases_since_start = number_format( $releases_now - $releases_start );
+    $work_remaining_since_start = $work_remaining_now - $work_remaining_start;
+    $work_since_start = $work_remaining_now - $work_remaining_start;
+    $work_since_start_formatted = number_format($work_since_start);
     $total_work_now = $work_remaining_now + $tvrage_releases_proc + $music_releases_proc + $movie_releases_proc + $console_releases_proc + $book_releases_proc;
     $total_work_now_formatted = number_format($total_work_now);
 
-    if ( $releases_now != 0 ) { 
+
+    $nfo_remaining_since_start = ( $nfo_remaining_now - $nfo_remaining_start );
+    $console_remaining_since_start = ( $console_releases_proc - $console_releases_proc_start );
+    $movie_remaining_since_start = ( $movie_releases_proc - $movie_releases_proc_start );
+    $music_remaining_since_start = ( $music_releases_proc - $music_releases_proc_start );
+    $pc_remaining_since_start = ( $pc_releases_proc - $pc_releases_proc_start );
+    $tvrage_remaining_since_start = ( $tvrage_releases_proc - $tvrage_releases_proc_start );
+    $book_remaining_since_start = ( $book_releases_proc - $book_releases_proc_start );
+    $remaning_since_start = ( $work_remaining_now - $work_remaining_start );
+
+
+    //formatted  output
+    $console_releases_proc_formatted = number_format( $console_releases_proc );
+    $movie_releases_proc_formatted = number_format( $movie_releases_proc );
+    $music_releases_proc_formatted = number_format( $music_releases_proc );
+    $pc_releases_proc_formatted = number_format( $pc_releases_proc );
+    $tvrage_releases_proc_formatted = number_format( $tvrage_releases_proc );
+    $work_remaining_now_formatted = number_format( $work_remaining_now );
+    $book_releases_proc_formatted = number_format( $book_releases_proc );
+    $nfo_remaining_now_formatted = number_format( $nfo_remaining_now );
+    $nfo_now_formatted = number_format( $nfo_now );
+    $console_releases_now_formatted = number_format( $console_releases_now );
+    $movie_releases_now_formatted = number_format( $movie_releases_now );
+    $music_releases_now_formatted = number_format( $music_releases_now );
+    $pc_releases_now_formatted = number_format( $pc_releases_now );
+    $tvrage_releases_now_formatted = number_format( $tvrage_releases_now );
+    $book_releases_now_formatted = number_format( $book_releases_now );
+    $misc_releases_now_formatted = number_format( $misc_releases_now );
+
+
+    if ( $releases_now != 0 ) {
         $nfo_percent = floor(( $nfo_now / $releases_now) * 100 );
         $console_percent = floor(( $console_releases_now / $releases_now) * 100 );
         $movie_percent = floor(( $movie_releases_now / $releases_now) * 100 );
@@ -286,46 +445,40 @@ while($i>0)
     //get microtime at end of queries
     $query_timer = microtime_float()-$query_timer_start;
 
-    if ( $releases_since_start > 0 ) { $signed = "+"; }
-    else { $signed = ""; }
-
-    if ( $work_since_start > 0 ) { $signed1 = "+"; }
-    else { $signed1 = ""; }
-
+    //update display
     passthru('clear');
     printf("\033[1;31m  Monitor\033[0m has been running for:\033[0m ".relativeTime("$time")."\n");
     printf("\033[1;31m  First insert:\033[0m ".relativeTime("$firstdate")."\n");
     printf("\033[1;31m  Newest Release:\033[0m $newestname\n");
     printf("\033[1;31m  Added:\033[0m ".relativeTime("$newestdate")."\n");
-    printf("\033[1;31m  $releases_now_formatted($signed$releases_since_start)\033[0m releases in your database.\n");
-    printf("\033[1;31m  $total_work_now_formatted($signed1$work_since_start)\033[0m releases left to postprocess.\033[1;33m\n");
 
-    $mask = "%20s %15.15s %15s \n";
+    printf("\033[1;33m\n");
     printf($mask, "Category", "State", "Reason");
-    printf($mask, "===============", "===============", "===============\033[0m");
+    printf($mask, "==================", "==================", "==================");
+    printf("\033[38;5;214m");
     printf($mask, "Binaries", "$binaries_state", "$binaries_reason");
     printf($mask, "Backfill", "$backfill_state", "$backfill_reason");
     printf($mask, "Import", "$import_state", "$import_reason");
-    printf($mask, "Parts", "$parts_rows", "$parts_size_gb");
+    printf($mask, "Parts", "$parts_size_gb", "$parts_rows rows");
 
     printf("\033[1;33m\n");
     printf($mask, "Category", "In Process", "In Database");
-    printf($mask, "===============", "===============", "===============\033[0m");
-    printf($mask, "NFO's","$nfo_remaining_now","$nfo_now($nfo_percent%)");
-    printf($mask, "Console(1000)","$console_releases_proc","$console_releases_now($console_percent%)");
-    printf($mask, "Movie(2000)","$movie_releases_proc","$movie_releases_now($movie_percent%)");
-    printf($mask, "Audio(3000)","$music_releases_proc","$music_releases_now($music_percent%)");
-    printf($mask, "PC(4000)","$pc_releases_proc","$pc_releases_now($pc_percent%)");
-    printf($mask, "TVShows(5000)","$tvrage_releases_proc","$tvrage_releases_now($tvrage_percent%)");
-    printf($mask, "Books(7000)","$book_releases_proc","$book_releases_now($book_percent%)");
-    printf($mask, "Misc(8000)","$work_remaining_now","$misc_releases_now($misc_percent%)");
-
-    $NNPATH="{$array['NEWZPATH']}{$array['NEWZNAB_PATH']}";
-    $TESTING="{$array['NEWZPATH']}{$array['TESTING_PATH']}";
+    printf($mask, "==================", "==================", "==================");
+    printf("\033[38;5;214m");
+    printf($mask, "NFO's","$nfo_remaining_now_formatted($nfo_remaining_since_start)","$nfo_now_formatted($nfo_percent%)");
+    printf($mask, "Console(1000)","$console_releases_proc_formatted($console_remaining_since_start)","$console_releases_now_formatted($console_percent%)");
+    printf($mask, "Movie(2000)","$movie_releases_proc_formatted($movie_remaining_since_start)","$movie_releases_now_formatted($movie_percent%)");
+    printf($mask, "Audio(3000)","$music_releases_proc_formatted($music_remaining_since_start)","$music_releases_now_formatted($music_percent%)");
+    printf($mask, "PC(4000)","$pc_releases_proc_formatted($pc_remaining_since_start)","$pc_releases_now_formatted($pc_percent%)");
+    printf($mask, "TVShows(5000)","$tvrage_releases_proc_formatted($tvrage_remaining_since_start)","$tvrage_releases_now_formatted($tvrage_percent%)");
+    printf($mask, "Books(7000)","$book_releases_proc_formatted($book_remaining_since_start)","$book_releases_now_formatted($book_percent%)");
+    printf($mask, "Misc(8000)","$work_remaining_now_formatted($remaning_since_start)","$misc_releases_now_formatted($misc_percent%)");
+    printf($mask, "Total", "$total_work_now_formatted($work_since_start_formatted)", "$releases_now_formatted($releases_since_start)");
 
     printf("\n\033[1;33m");
     printf($mask, "Category", "Time", "Status");
-    printf($mask, "===============", "===============", "===============\033[0m");
+    printf($mask, "==================", "==================", "==================");
+    printf("\033[38;5;214m");
     printf($mask, "Queries","$query_timer","queried");
 
     //get microtime for timing script check
@@ -547,7 +700,7 @@ while($i>0)
         if (( $array['POST_TO_RUN'] >= $g ) && ( $work_remaining_now > $f ) && ( $g <= 16 )) {
             $color = get_color();
             shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.$h 'echo \"\033[38;5;\"$color\"m\" && $ds1 postprocess_$g $ds2 && cd $_bin && $_php processAlternate$g.php && echo \" \033[1;0;33m\" && $ds1 postprocess_$g $ds3' 2>&1 1> /dev/null");
-        } elseif (( $array['POST_TO_RUN'] >= $g ) && ( $work_remaining_now > $f ) && ( $g > 16 )) {
+        } elseif (( $array['POST_TO_RUN'] >= $g ) && ( $work_remaining_now > $f ) && ( $g > 16 ) && ( $use_addtional == "true" )) {
             $h=$g-17;
             $color = get_color();
             shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.$h 'echo \"\033[38;5;\"$color\"m\" && $ds1 postprocess_$g $ds2 && cd $_bin && $_php processAlternate$g.php && echo \" \033[1;0;33m\" && $ds1 postprocess_$g $ds3' 2>&1 1> /dev/null");
@@ -561,7 +714,7 @@ while($i>0)
         if ( $g <= 15 ) {
             $color = get_color();
             shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:2.$g 'echo \"\033[38;5;\"$color\"m\n\nThis is color #\"$color'");
-        } elseif ( $g > 15 ) {
+        } elseif (( $g > 15 ) && ( $use_addtional == "true" )) {
             $h=$g-16;
             $color = get_color();
             shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:3.$h 'echo \"\033[38;5;\"$color\"m\n\nThis is color #\"$color'");
@@ -570,6 +723,11 @@ while($i>0)
 
     //get microtime and calculate time
     $script_timer = microtime_float() - $script_timer_start;
+
+    //display all 256 colors
+    if ( $array['SHOW_COLORS'] == "true" ) {
+        shell_exec("$_tmux new-window -t {$array['TMUX_SESSION']} -n Colors 'cd $_bin && ./show_colors.sh'");
+    }
 
     //continue table
     printf($mask, "Check Scripts","$script_timer","started");
@@ -595,9 +753,4 @@ while($i>0)
     }
     sleep($array['MONITOR_UPDATE']);
 }
-
-//shutdown message
-shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.0 'echo \"\033[1;41;33m\n\n\n\nNewznab-tmux is shutting down\n\nPlease wait for all panes to report \n\n\"Pane is dead\" before terminating this session.\n\nTo terminate this session press Ctrl-a c \n\nand at the prompt type \n\ntmux kill-session -t {$array['TMUX_SESSION']}\"'");
-
 ?>
-

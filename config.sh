@@ -25,13 +25,18 @@ export ADMIN_PATH=$NEWZPATH"/www/admin"
 ############################################################
 
 #Post Processing Additional is the post processing that downloads rar files and attempts to get info for your site
-#you are able to set the number of process to be run from 1-32, remember that each process uses 1 of your nntp connections
-#so, if you have 20, and you set this to 32, you will have errors, lots of errors, nfo lookup uses 1 connection
+#you are able to set the number of process to be run from 1-16, remember that each process uses 1 of your nntp connections
+#so, if you have 20, and you set this to 16, you will have errors, lots of errors, nfo lookup uses 1 connection
 #binaries and backfill threaded default to 10 connections each and predb uses 1, so understand how many connections you are using when setting
 #trial and error for this, 1 runs always, 2 if more than 200, 3 more than 300 and so on.
 #At some point, increasing this begins to slow things down. It will need to be adjusted for your system
 #to get the desired performance, 0 will disable all post processing
 export POST_TO_RUN="1"
+
+#there can be an addition 16 postprocesses for 32 postprocess to run, if you are enable this, then another window will be created
+#to run the additional processes, if you are using less than 16, this window will be idle
+#this can not be changed while script is running, any change will be ignored
+export USE_ADDITIONAL="false"
 
 #Enter the session name to be used by tmux
 export TMUX_SESSION="Newznab"
@@ -246,6 +251,9 @@ export USE_MYTOP="false"
 export USE_VNSTAT="false"
 export USE_IFTOP="false"
 
+#an additional window can be created manually with Ctrl-a c or it can be created at start of script
+export USE_CONSOLE="false"
+
 ############################################################
 
 #Use powerline scripts to display the status bar
@@ -290,7 +298,20 @@ export NEWZDASH_URL=""
 #update_svn.sh is destructive, it update your version to match th esvn version
 export SVN_PASSWORD="password"
 
+#running update_svn as root will change file ownership of every file in the svn path
+#to chown -R the path, enable and set user/group
+#newznab/nzbfiles is not chown'd
+export CHOWN_TRUE="false"
+export WWW_USER="www-data:www-data"
+
 ###########################################################
+
+#colors display differently on every monitor, if you are having difficulty seeing a particular
+#color, set this to true, get the colors number and report is to me, I will remove it
+export SHOW_COLORS="false"
+
+###########################################################
+
 #By using this script you understand that the programmer is not responsible for any loss of data, users, or sanity.
 #You also agree that you were smart enough to make a backup of your database and files. Do you agree? yes/no
 export AGREED="no"

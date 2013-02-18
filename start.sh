@@ -38,7 +38,7 @@ if $TMUXCMD -q has-session -t $TMUX_SESSION; then
 else
     printf "The above is just a notice, it is saying, that you do not have a session currently running. It is not an error."
     printf "\033]0; $TMUX_SESSION\007\003\n"
-    $TMUXCMD -f $TMUX_CONF new-session -d -s $TMUX_SESSION -n $TMUX_SESSION 'cd bin && echo "Monitor Started" && echo "It might take a minute for everything to spinup......" && $NICE -n 19 $PHP monitor.php'
+    $TMUXCMD -f $TMUX_CONF new-session -d -s $TMUX_SESSION -n Monitor 'cd bin && echo "Monitor Started" && echo "It might take a minute for everything to spinup......" && $NICE -n 19 $PHP monitor.php'
 
     if [ ! -f $NEWZPATH/www/lib/postprocess.php.orig ]; then
         cp $NEWZPATH/www/lib/postprocess.php $NEWZPATH/www/lib/postprocess.php.orig
@@ -148,7 +148,7 @@ else
     $TMUXCMD splitw -h -p 65 'echo "..."'
     $TMUXCMD splitw -h -p 60 'echo "..."'
     $TMUXCMD selectp -t 0
-    $TMUXCMD splitw -v -p 30 'echo "..."'
+    $TMUXCMD splitw -v -p 50 'echo "..."'
     $TMUXCMD splitw -v -p 50 'echo "..."'
 
     $TMUXCMD selectp -t 3
@@ -161,8 +161,10 @@ else
     $TMUXCMD splitw -v -p 50 'echo "..."'
 
     $TMUXCMD selectp -t 9
-    $TMUXCMD splitw -v -p 75 'echo "..."'
-    $TMUXCMD splitw -v -p 67 'echo "..."'
+    $TMUXCMD splitw -v -p 50 'echo "..."'
+    $TMUXCMD selectp -t 9
+    $TMUXCMD splitw -v -p 50 'echo "..."'
+    $TMUXCMD selectp -t 11
     $TMUXCMD splitw -v -p 50 'echo "..."'
 
     $TMUXCMD new-window -n cleanup 'echo "..."'
@@ -175,7 +177,7 @@ else
     $TMUXCMD splitw -h -p 67 'echo "..."'
     $TMUXCMD splitw -h -p 50 'echo "..."'
 
-    $TMUXCMD new-window -n postprocessing1 'echo "..."'
+    $TMUXCMD new-window -n post1 'echo "..."'
     $TMUXCMD selectp -t 0
     $TMUXCMD splitw -v -p 50 'echo "..."'
     $TMUXCMD selectp -t 0
@@ -196,26 +198,28 @@ else
     $TMUXCMD splitw -h -p 50 'echo "..."'
     $TMUXCMD select-layout tiled
 
-    $TMUXCMD new-window -n postprocessing2 'echo "..."'
-    $TMUXCMD selectp -t 0
-    $TMUXCMD splitw -v -p 50 'echo "..."'
-    $TMUXCMD selectp -t 0
-    $TMUXCMD splitw -h -p 88 'echo "..."'
-    $TMUXCMD splitw -h -p 85 'echo "..."'
-    $TMUXCMD splitw -h -p 83 'echo "..."'
-    $TMUXCMD splitw -h -p 80 'echo "..."'
-    $TMUXCMD splitw -h -p 75 'echo "..."'
-    $TMUXCMD splitw -h -p 67 'echo "..."'
-    $TMUXCMD splitw -h -p 50 'echo "..."'
-    $TMUXCMD selectp -t 8
-    $TMUXCMD splitw -h -p 88 'echo "..."'
-    $TMUXCMD splitw -h -p 85 'echo "..."'
-    $TMUXCMD splitw -h -p 83 'echo "..."'
-    $TMUXCMD splitw -h -p 80 'echo "..."'
-    $TMUXCMD splitw -h -p 75 'echo "..."'
-    $TMUXCMD splitw -h -p 67 'echo "..."'
-    $TMUXCMD splitw -h -p 50 'echo "..."'
-    $TMUXCMD select-layout tiled
+    if [[ $USE_ADDITIONAL == "true" ]]; then
+        $TMUXCMD new-window -n post2 'echo "..."'
+        $TMUXCMD selectp -t 0
+        $TMUXCMD splitw -v -p 50 'echo "..."'
+        $TMUXCMD selectp -t 0
+        $TMUXCMD splitw -h -p 88 'echo "..."'
+        $TMUXCMD splitw -h -p 85 'echo "..."'
+        $TMUXCMD splitw -h -p 83 'echo "..."'
+        $TMUXCMD splitw -h -p 80 'echo "..."'
+        $TMUXCMD splitw -h -p 75 'echo "..."'
+        $TMUXCMD splitw -h -p 67 'echo "..."'
+        $TMUXCMD splitw -h -p 50 'echo "..."'
+        $TMUXCMD selectp -t 8
+        $TMUXCMD splitw -h -p 88 'echo "..."'
+        $TMUXCMD splitw -h -p 85 'echo "..."'
+        $TMUXCMD splitw -h -p 83 'echo "..."'
+        $TMUXCMD splitw -h -p 80 'echo "..."'
+        $TMUXCMD splitw -h -p 75 'echo "..."'
+        $TMUXCMD splitw -h -p 67 'echo "..."'
+        $TMUXCMD splitw -h -p 50 'echo "..."'
+        $TMUXCMD select-layout tiled
+    fi
 
 #    $TMUXCMD new-window -n binaries_threaded 'echo "..."'
 #    $TMUXCMD splitw -v -p 83 'echo "..."'
@@ -261,7 +265,9 @@ else
         $TMUXCMD new-window -n iftop '$IFTOP'
     fi
 
-    $TMUXCMD new-window -n Console 'bash -i'
+    if [[ $USE_CONSOLE == "true" ]]; then
+        $TMUXCMD new-window -n Console 'bash -i'
+    fi
     $TMUXCMD select-window -t$TMUX_SESSION:0
     $TMUXCMD attach-session -d -t$TMUX_SESSION
 
