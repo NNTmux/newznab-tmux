@@ -378,14 +378,14 @@ while( $i > 0 )
 
 
     if ( $releases_now != 0 ) {
-        $nfo_percent = floor(( $nfo_now / $releases_now) * 100 );
-        $console_percent = floor(( $console_releases_now / $releases_now) * 100 );
-        $movie_percent = floor(( $movie_releases_now / $releases_now) * 100 );
-        $music_percent = floor(( $music_releases_now / $releases_now) * 100 );
-        $pc_percent = floor(( $pc_releases_now / $releases_now) * 100 );
-        $tvrage_percent = floor(( $tvrage_releases_now / $releases_now) * 100 );
-        $book_percent = floor(( $book_releases_now / $releases_now) * 100 );
-        $misc_percent = floor(( $misc_releases_now / $releases_now) * 100 );
+        $nfo_percent = sprintf( "%02s", floor(( $nfo_now / $releases_now) * 100 ));
+        $console_percent = sprintf( "%02s", floor(( $console_releases_now / $releases_now) * 100 ));
+        $movie_percent = sprintf( "%02s", floor(( $movie_releases_now / $releases_now) * 100 ));
+        $music_percent = sprintf( "%02s", floor(( $music_releases_now / $releases_now) * 100 ));
+        $pc_percent = sprintf( "%02s", floor(( $pc_releases_now / $releases_now) * 100 ));
+        $tvrage_percent = sprintf( "%02s", floor(( $tvrage_releases_now / $releases_now) * 100 ));
+        $book_percent = sprintf( "%02s", floor(( $book_releases_now / $releases_now) * 100 ));
+        $misc_percent = sprintf( "%02s", floor(( $misc_releases_now / $releases_now) * 100 ));
     } else {
         $nfo_percent = 0;
         $console_percent = 0;
