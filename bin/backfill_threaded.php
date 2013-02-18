@@ -13,7 +13,7 @@ unset($groups);
 
 $ps = new PowerProcess;
 $ps->RegisterCallback('psUpdateComplete');
-$ps->maxThreads = 10;
+$ps->maxThreads = 4;
 $ps->threadTimeLimit = 0;	// Disable child timeout
 
 echo "Starting threaded backfill process\n";

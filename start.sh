@@ -118,6 +118,7 @@ else
         d=$((($c - 1) * 100))
         cp $NEWZPATH/www/lib/postprocess.php bin/lib/postprocess$c.php
         $SED -i -e "s/PostProcess/PostProcess$c/g" bin/lib/postprocess$c.php
+        $SED -i -e "s/echo \$iteration.*$/echo \$iteration --.\"    .\".\$rel['ID'].\" : \".\$rel['name'].\"\\\n\";/" bin/lib/postprocess$c.php
         $SED -i -e "s/processAdditional/processAdditional$c/g" bin/lib/postprocess$c.php
         $SED -i -e "s/\$tmpPath = \$this->site->tmpunrarpath;/\$tmpPath = \$this->site->tmpunrarpath; \\
                         \$tmpPath .= '1\/tmp$c';/g" bin/lib/postprocess$c.php
