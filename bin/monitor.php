@@ -726,8 +726,9 @@ while( $i > 0 )
     $script_timer = microtime_float() - $script_timer_start;
 
     //display all 256 colors
-    if ( $array['SHOW_COLORS'] == "true" ) {
+    if (( $array['SHOW_COLORS'] == "true" ) && ( $i == 1 )) {
         shell_exec("$_tmux new-window -t {$array['TMUX_SESSION']} -n Colors 'cd $_bin && ./show_colors.sh'");
+        shell_exec("$_tmux select-window -t {$array['TMUX_SESSION']}:0");
     }
 
     //continue table
