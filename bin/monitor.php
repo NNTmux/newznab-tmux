@@ -149,7 +149,7 @@ $book_percent = 0;
 $misc_percent = 0;
 $releases_since_start = 0;
 $work_since_start = 0;
-$work_since_start_formatted = number_format( $work_since_start );
+$work_diff = number_format( $work_since_start );
 $total_work_now = 0;
 $total_work_now_formatted = 0;
 $binaries_state = "disabled";
@@ -179,22 +179,23 @@ $pc_releases_proc_start = 0;
 $tvrage_releases_proc_start = 0;
 $book_releases_proc_start = 0;
 $work_remaining_start = 0;
+$misc_diff = 0;
 
 //formatted  output
-$nfo_remaining_since_start = number_format( $nfo_remaining_now - $nfo_remaining_start );
-$console_remaining_since_start = number_format( $console_releases_proc - $console_releases_proc_start );
-$movie_remaining_since_start = number_format( $movie_releases_proc - $movie_releases_proc_start );
-$music_remaining_since_start = number_format( $music_releases_proc - $music_releases_proc_start );
-$pc_remaining_since_start = number_format( $pc_releases_proc - $pc_releases_proc_start );
-$tvrage_remaining_since_start = number_format( $tvrage_releases_proc - $tvrage_releases_proc_start );
-$book_remaining_since_start = number_format( $book_releases_proc - $book_releases_proc_start );
+$nfo_diff = number_format( $nfo_remaining_now - $nfo_remaining_start );
+$console_diff = number_format( $console_releases_proc - $console_releases_proc_start );
+$movie_diff = number_format( $movie_releases_proc - $movie_releases_proc_start );
+$music_diff = number_format( $music_releases_proc - $music_releases_proc_start );
+$pc_diff = number_format( $pc_releases_proc - $pc_releases_proc_start );
+$tvrage_diff = number_format( $tvrage_releases_proc - $tvrage_releases_proc_start );
+$book_diff = number_format( $book_releases_proc - $book_releases_proc_start );
 $remaning_since_start = number_format( $work_remaining_now - $work_remaining_start );
 $console_releases_proc_formatted = number_format( $console_releases_proc );
 $movie_releases_proc_formatted = number_format( $movie_releases_proc );
 $music_releases_proc_formatted = number_format( $music_releases_proc );
 $pc_releases_proc_formatted = number_format( $pc_releases_proc );
 $tvrage_releases_proc_formatted = number_format( $tvrage_releases_proc );
-$work_remaining_now_formatted = number_format( $work_remaining_now );
+$misc_remaining_now_formatted = number_format( $work_remaining_now );
 $book_releases_proc_formatted = number_format( $book_releases_proc );
 $nfo_remaining_now_formatted = number_format( $nfo_remaining_now );
 $nfo_now_formatted = number_format( $nfo_now );
@@ -227,15 +228,15 @@ printf("\033[1;33m\n");
 printf($mask, "Category", "In Process", "In Database");
 printf($mask, "==================", "==================", "==================");
 printf("\033[38;5;214m");
-printf($mask, "NFO's","$nfo_remaining_now_formatted($nfo_remaining_since_start)","$nfo_now_formatted($nfo_percent%)");
-printf($mask, "Console(1000)","$console_releases_proc_formatted($console_remaining_since_start)","$console_releases_now_formatted($console_percent%)");
-printf($mask, "Movie(2000)","$movie_releases_proc_formatted($movie_remaining_since_start)","$movie_releases_now_formatted($movie_percent%)");
-printf($mask, "Audio(3000)","$music_releases_proc_formatted($music_remaining_since_start)","$music_releases_now_formatted($music_percent%)");
-printf($mask, "PC(4000)","$pc_releases_proc_formatted($pc_remaining_since_start)","$pc_releases_now_formatted($pc_percent%)");
-printf($mask, "TVShows(5000)","$tvrage_releases_proc_formatted($tvrage_remaining_since_start)","$tvrage_releases_now_formatted($tvrage_percent%)");
-printf($mask, "Books(7000)","$book_releases_proc_formatted($book_remaining_since_start)","$book_releases_now_formatted($book_percent%)");
-printf($mask, "Misc(8000)","$work_remaining_now_formatted($remaning_since_start)","$misc_releases_now_formatted($misc_percent%)");
-printf($mask, "Total", "$total_work_now_formatted($work_since_start_formatted)", "$releases_now_formatted($releases_since_start)");
+printf($mask, "NFO's","$nfo_remaining_now_formatted($nfo_diff)","$nfo_now_formatted($nfo_percent%)");
+printf($mask, "Console(1000)","$console_releases_proc_formatted($console_diff)","$console_releases_now_formatted($console_percent%)");
+printf($mask, "Movie(2000)","$movie_releases_proc_formatted($movie_diff)","$movie_releases_now_formatted($movie_percent%)");
+printf($mask, "Audio(3000)","$music_releases_proc_formatted($music_diff)","$music_releases_now_formatted($music_percent%)");
+printf($mask, "PC(4000)","$pc_releases_proc_formatted($pc_diff)","$pc_releases_now_formatted($pc_percent%)");
+printf($mask, "TVShows(5000)","$tvrage_releases_proc_formatted($tvrage_diff)","$tvrage_releases_now_formatted($tvrage_percent%)");
+printf($mask, "Books(7000)","$book_releases_proc_formatted($book_diff)","$book_releases_now_formatted($book_percent%)");
+printf($mask, "Misc(8000)","$misc_remaining_now_formatted($misc_diff)","$misc_releases_now_formatted($misc_percent%)");
+printf($mask, "Total", "$total_work_now_formatted($work_diff)", "$releases_now_formatted($releases_since_start)");
 
 printf("\n\033[1;33m");
 printf($mask, "Category", "Time", "Status");
@@ -339,24 +340,20 @@ while( $i > 0 )
     if ( $proc_result[0]['newestadd'] ) { $newestdate = $proc_result[0]['newestadd']; }
 
     //calculate releases difference
-    $releases_remaining_since_start = number_format( $releases_now - $releases_start );
+    $releases_misc_diff = number_format( $releases_now - $releases_start );
     $releases_since_start = number_format( $releases_now - $releases_start );
-    $work_remaining_since_start = $work_remaining_now - $work_remaining_start;
-    $work_since_start = $work_remaining_now - $work_remaining_start;
-    $work_since_start_formatted = number_format($work_since_start);
-    $total_work_now = $work_remaining_now + $tvrage_releases_proc + $music_releases_proc + $movie_releases_proc + $console_releases_proc + $book_releases_proc;
+    $work_misc_diff = $work_remaining_now - $work_remaining_start;
+
+    $total_work_now = $work_remaining_now + $tvrage_releases_proc + $music_releases_proc + $movie_releases_proc + $console_releases_proc + $book_releases_proc + $nfo_remaining_now;
     $total_work_now_formatted = number_format($total_work_now);
 
-
-    $nfo_remaining_since_start = ( $nfo_remaining_now - $nfo_remaining_start );
-    $console_remaining_since_start = ( $console_releases_proc - $console_releases_proc_start );
-    $movie_remaining_since_start = ( $movie_releases_proc - $movie_releases_proc_start );
-    $music_remaining_since_start = ( $music_releases_proc - $music_releases_proc_start );
-    $pc_remaining_since_start = ( $pc_releases_proc - $pc_releases_proc_start );
-    $tvrage_remaining_since_start = ( $tvrage_releases_proc - $tvrage_releases_proc_start );
-    $book_remaining_since_start = ( $book_releases_proc - $book_releases_proc_start );
-    $remaning_since_start = ( $work_remaining_now - $work_remaining_start );
-
+    $nfo_diff = number_format( $nfo_remaining_now - $nfo_remaining_start );
+    $console_diff = number_format( $console_releases_proc - $console_releases_proc_start );
+    $movie_diff = number_format( $movie_releases_proc - $movie_releases_proc_start );
+    $music_diff = number_format( $music_releases_proc - $music_releases_proc_start );
+    $pc_diff = number_format( $pc_releases_proc - $pc_releases_proc_start );
+    $tvrage_diff = number_format( $tvrage_releases_proc - $tvrage_releases_proc_start );
+    $book_diff = number_format( $book_releases_proc - $book_releases_proc_start );
 
     //formatted  output
     $console_releases_proc_formatted = number_format( $console_releases_proc );
@@ -364,7 +361,7 @@ while( $i > 0 )
     $music_releases_proc_formatted = number_format( $music_releases_proc );
     $pc_releases_proc_formatted = number_format( $pc_releases_proc );
     $tvrage_releases_proc_formatted = number_format( $tvrage_releases_proc );
-    $work_remaining_now_formatted = number_format( $work_remaining_now );
+    $misc_remaining_now_formatted = number_format( $work_remaining_now );
     $book_releases_proc_formatted = number_format( $book_releases_proc );
     $nfo_remaining_now_formatted = number_format( $nfo_remaining_now );
     $nfo_now_formatted = number_format( $nfo_now );
@@ -375,6 +372,10 @@ while( $i > 0 )
     $tvrage_releases_now_formatted = number_format( $tvrage_releases_now );
     $book_releases_now_formatted = number_format( $book_releases_now );
     $misc_releases_now_formatted = number_format( $misc_releases_now );
+    $misc_diff = number_format( $work_remaining_now - $work_start );
+
+    $work_since_start = $nfo_diff + $console_diff + $movie_diff + $music_diff + $tvrage_diff + $book_diff + $misc_diff;
+    $work_diff = number_format($work_since_start);
 
 
     if ( $releases_now != 0 ) {
@@ -465,15 +466,15 @@ while( $i > 0 )
     printf($mask, "Category", "In Process", "In Database");
     printf($mask, "==================", "==================", "==================");
     printf("\033[38;5;214m");
-    printf($mask, "NFO's","$nfo_remaining_now_formatted($nfo_remaining_since_start)","$nfo_now_formatted($nfo_percent%)");
-    printf($mask, "Console(1000)","$console_releases_proc_formatted($console_remaining_since_start)","$console_releases_now_formatted($console_percent%)");
-    printf($mask, "Movie(2000)","$movie_releases_proc_formatted($movie_remaining_since_start)","$movie_releases_now_formatted($movie_percent%)");
-    printf($mask, "Audio(3000)","$music_releases_proc_formatted($music_remaining_since_start)","$music_releases_now_formatted($music_percent%)");
-    printf($mask, "PC(4000)","$pc_releases_proc_formatted($pc_remaining_since_start)","$pc_releases_now_formatted($pc_percent%)");
-    printf($mask, "TVShows(5000)","$tvrage_releases_proc_formatted($tvrage_remaining_since_start)","$tvrage_releases_now_formatted($tvrage_percent%)");
-    printf($mask, "Books(7000)","$book_releases_proc_formatted($book_remaining_since_start)","$book_releases_now_formatted($book_percent%)");
-    printf($mask, "Misc(8000)","$work_remaining_now_formatted($remaning_since_start)","$misc_releases_now_formatted($misc_percent%)");
-    printf($mask, "Total", "$total_work_now_formatted($work_since_start_formatted)", "$releases_now_formatted($releases_since_start)");
+    printf($mask, "NFO's","$nfo_remaining_now_formatted($nfo_diff)","$nfo_now_formatted($nfo_percent%)");
+    printf($mask, "Console(1000)","$console_releases_proc_formatted($console_diff)","$console_releases_now_formatted($console_percent%)");
+    printf($mask, "Movie(2000)","$movie_releases_proc_formatted($movie_diff)","$movie_releases_now_formatted($movie_percent%)");
+    printf($mask, "Audio(3000)","$music_releases_proc_formatted($music_diff)","$music_releases_now_formatted($music_percent%)");
+    printf($mask, "PC(4000)","$pc_releases_proc_formatted($pc_diff)","$pc_releases_now_formatted($pc_percent%)");
+    printf($mask, "TVShows(5000)","$tvrage_releases_proc_formatted($tvrage_diff)","$tvrage_releases_now_formatted($tvrage_percent%)");
+    printf($mask, "Books(7000)","$book_releases_proc_formatted($book_diff)","$book_releases_now_formatted($book_percent%)");
+    printf($mask, "Misc(8000)","$misc_remaining_now_formatted($misc_diff)","$misc_releases_now_formatted($misc_percent%)");
+    printf($mask, "Total", "$total_work_now_formatted($work_diff)", "$releases_now_formatted($releases_since_start)");
 
     printf("\n\033[1;33m");
     printf($mask, "Category", "Time", "Status");
