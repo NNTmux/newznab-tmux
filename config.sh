@@ -312,6 +312,12 @@ export SHOW_COLORS="false"
 
 ###########################################################
 
+#if you have a ramdisk and would like to monitor it's use, set path here
+#this is not the same as RAMDISK above, I keep my parts table on a ramdisk
+export RAMDISK_PATH=""
+
+###########################################################
+
 #By using this script you understand that the programmer is not responsible for any loss of data, users, or sanity.
 #You also agree that you were smart enough to make a backup of your database and files. Do you agree? yes/no
 export AGREED="no"

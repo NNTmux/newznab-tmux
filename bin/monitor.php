@@ -95,6 +95,13 @@ function get_color()
     get_color();
 }
 
+function decodeSize( $bytes )
+{
+    $types = array( 'B', 'KB', 'MB', 'GB', 'TB' );
+    for( $i = 0; $bytes >= 1024 && $i < ( count( $types ) -1 ); $bytes /= 1024, $i++ );
+    return( round( $bytes, 2 ) . " " . $types[$i] );
+}
+
 $time = TIME();
 $time2 = TIME();
 $time3 = TIME();
@@ -180,6 +187,8 @@ $tvrage_releases_proc_start = 0;
 $book_releases_proc_start = 0;
 $work_remaining_start = 0;
 $misc_diff = 0;
+$disk_use = 0;
+$disk_free = 0;
 
 //formatted  output
 $nfo_diff = number_format( $nfo_remaining_now - $nfo_remaining_start );
@@ -223,6 +232,9 @@ printf($mask, "Binaries", "$binaries_state", "$binaries_reason");
 printf($mask, "Backfill", "$backfill_state", "$backfill_reason");
 printf($mask, "Import", "$import_state", "$import_reason");
 printf($mask, "Parts", "$parts_size_gb", "$parts_rows rows");
+if ( $array['RAMDISK_PATH'] != "" ) {
+    printf($mask, "Ramdisk", "$disk_use", "$disk_free");
+}
 
 printf("\033[1;33m\n");
 printf($mask, "Category", "In Process", "In Database");
@@ -377,6 +389,10 @@ while( $i > 0 )
     $work_since_start = $nfo_diff + $console_diff + $movie_diff + $music_diff + $tvrage_diff + $book_diff + $misc_diff;
     $work_diff = number_format($work_since_start);
 
+    if ( $array['RAMDISK_PATH'] != "" ) {
+        $disk_use =  decodeSize( disk_total_space("${array['RAMDISK_PATH']}") - disk_free_space("${array['RAMDISK_PATH']}") );
+        $disk_free = decodeSize( disk_free_space("${array['RAMDISK_PATH']}") );
+    }
 
     if ( $releases_now != 0 ) {
         $nfo_percent = sprintf( "%02s", floor(( $nfo_now / $releases_now) * 100 ));
@@ -461,6 +477,9 @@ while( $i > 0 )
     printf($mask, "Backfill", "$backfill_state", "$backfill_reason");
     printf($mask, "Import", "$import_state", "$import_reason");
     printf($mask, "Parts", "$parts_size_gb", "$parts_rows rows");
+    if ( $array['RAMDISK_PATH'] != "" ) {
+        printf($mask, "Ramdisk", "$disk_use used", "$disk_free free");
+    }
 
     printf("\033[1;33m\n");
     printf($mask, "Category", "In Process", "In Database");
