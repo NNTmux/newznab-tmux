@@ -37,5 +37,5 @@ function relativeTime($_time) {
     return $return;
 }
 
-echo "\033[1;33mThis loop completed in: .relativeTime(\"$time\").\033[0m";
+echo "\033[1;33mThis loop completed in: " .relativeTime($time). "\033[0m\n";
 ?>
