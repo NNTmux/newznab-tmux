@@ -189,6 +189,7 @@ $work_remaining_start = 0;
 $misc_diff = 0;
 $disk_use = 0;
 $disk_free = 0;
+$total_work_start = 0;
 
 //formatted  output
 $nfo_diff = number_format( $nfo_remaining_now - $nfo_remaining_start );
@@ -357,6 +358,7 @@ while( $i > 0 )
     $work_misc_diff = $work_remaining_now - $work_remaining_start;
 
     $total_work_now = $work_remaining_now + $tvrage_releases_proc + $music_releases_proc + $movie_releases_proc + $console_releases_proc + $book_releases_proc + $nfo_remaining_now;
+    if ( $i == 1 ) { $total_work_start = $total_work_now; }
     $total_work_now_formatted = number_format($total_work_now);
 
     $nfo_diff = number_format( $nfo_remaining_now - $nfo_remaining_start );
@@ -386,13 +388,8 @@ while( $i > 0 )
     $misc_releases_now_formatted = number_format( $misc_releases_now );
     $misc_diff = number_format( $work_remaining_now - $work_start );
 
-    $work_since_start = $nfo_diff + $console_diff + $movie_diff + $music_diff + $tvrage_diff + $book_diff + $misc_diff;
+    $work_since_start = ( $total_work_now - $total_work_start );
     $work_diff = number_format($work_since_start);
-
-    if ( $array['RAMDISK_PATH'] != "" ) {
-        $disk_use =  decodeSize( disk_total_space("${array['RAMDISK_PATH']}") - disk_free_space("${array['RAMDISK_PATH']}") );
-        $disk_free = decodeSize( disk_free_space("${array['RAMDISK_PATH']}") );
-    }
 
     if ( $releases_now != 0 ) {
         $nfo_percent = sprintf( "%02s", floor(( $nfo_now / $releases_now) * 100 ));
@@ -461,6 +458,11 @@ while( $i > 0 )
 
     //get microtime at end of queries
     $query_timer = microtime_float()-$query_timer_start;
+
+    if ( $array['RAMDISK_PATH'] != "" ) {
+        $disk_use =  decodeSize( disk_total_space("${array['RAMDISK_PATH']}") - disk_free_space("${array['RAMDISK_PATH']}") );
+        $disk_free = decodeSize( disk_free_space("${array['RAMDISK_PATH']}") );
+    }
 
     //update display
     passthru('clear');
