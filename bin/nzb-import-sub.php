@@ -1,5 +1,5 @@
 <?php
-require('config.php');
+require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/powerprocess.php');
 $dirroot = $argv[1];
 $subdirs = array_filter(glob($dirroot."/*", GLOB_ONLYDIR|GLOB_NOSORT));

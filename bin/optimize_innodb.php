@@ -1,5 +1,5 @@
 <?php
-require('config.php');
+require(dirname(__FILE__)."/config.php");
 require(WWW_DIR . '/lib/framework/cache.php');
 require_once(WWW_DIR . '/lib/framework/db.php');
 

@@ -58,7 +58,7 @@ class Backfill
 			echo "No groups specified. Ensure groups are added to newznab's database for updating.$n";
 		}
 	}
-	
+
 	/**
 	 * Update a group back to a specified date.
 	 */	
@@ -287,5 +287,151 @@ class Backfill
 	private function dateToDays($backfillDate) 
 	{
 		return floor(-($backfillDate - time())/(60*60*24));
+	}
+
+	/**
+	 * Update groups by post vs date categories and descriptions.
+	 */
+	function backfillPostAllGroups($groupName='', $backfillPost='')
+	{
+		$n = $this->n;
+		$groups = new Groups;
+		$res = false;
+		if ($groupName != '') 
+		{
+			$grp = $groups->getByName($groupName);
+			if ($grp)
+				$res = array($grp);
+		} 
+		else 
+		{
+			$res = $groups->getActive();
+		}
+				
+		if ($res)
+		{
+			$nntp = new Nntp();
+			if ($nntp->doConnect(1, true)) {
+				$nntpc = new Nntp();
+				$nntpc->doConnect();
+				foreach($res as $groupArr)
+				{
+					$this->backfillPostGroup($nntp, $nntpc, $groupArr, $backfillPost);
+				}
+	
+				$nntp->doQuit();
+				$nntpc->doQuit();
+			} else {
+				echo "Failed to get NNTP connection.$n";
+			}
+		}
+		else
+		{
+			echo "No groups specified. Ensure you have spelled the group name right and the group is enabled.$n";
+		}
+	}
+
+	/**
+	 * Update a group back to a specified post.
+	 */	
+	function backfillPostGroup($nntp, $nntpc, $groupArr, $backfillPost)
+	{
+		$db = new DB();
+        $db->disableAutoCommit();
+
+		$binaries = new Binaries();
+		$n = $this->n;
+		$this->startGroup = microtime(true);
+		
+		echo 'Processing '.$groupArr['name'].$n;
+		
+		$data = $nntp->selectGroup($groupArr['name']);
+		if(PEAR::isError($data))
+		{
+			echo "Could not select group (bad name?): {$groupArr['name']}$n";
+            $db->rollback();
+			return;
+		}
+		$datac = $nntpc->selectGroup($groupArr['name']);
+		if(PEAR::isError($datac))
+		{
+			echo "Could not select group (bad name?): {$groupArr['name']}$n";
+            $db->rollback();
+			return;
+		}
+		if ($backfillPost)
+			$targetpost = round($groupArr['first_record'] - $backfillPost);
+		else
+		{
+			echo "You must set a target post. ex: php ".$groupArr['name']." 20000$n";
+			die;
+		}
+		if($groupArr['first_record'] == 0)
+		{
+			echo "Group ".$groupArr['name']." has invalid numbers.  Have you run update_binaires on it?$n";
+            $db->rollback();
+			return;
+		}
+		
+		echo "Group ".$data["group"].": server has ".$data['first']." - ".$data['last'].", or ~";
+		echo((int) (($this->postdate($nntp,$data['last'],FALSE) - $this->postdate($nntp,$data['first'],FALSE))/86400));
+		echo " days.".$n."Local first = ".$groupArr['first_record']." (";
+		echo((int) ((date('U') - $this->postdate($nntp,$groupArr['first_record'],FALSE))/86400));
+		echo " days). Going to backfill $backfillPost posts, which is post $targetpost.$n";
+
+		if($targetpost >= $groupArr['first_record'])	//if our estimate comes back with stuff we already have, finish
+		{
+			echo "Nothing to do, we already have the target post.$n $n";
+            $db->commit(); //Not an error so commit and re-enable autocommitting
+			return "";
+		}
+		//get first and last part numbers from newsgroup
+		if($targetpost < $data['first'])
+		{
+			echo "WARNING: Backfill came back as before server's first.  Setting targetpost to server first.$n";
+			echo "Skipping Group $n";
+            $db->rollback();
+			return "";
+		}
+		//calculate total number of parts
+		$total = $groupArr['first_record'] - $targetpost;
+		$done = false;
+		//set first and last, moving the window by maxxMssgs
+		$last = $groupArr['first_record'] - 1;
+		$first = $last - $binaries->messagebuffer + 1; //set initial "chunk"
+		if($targetpost > $first)	//just in case this is the last chunk we needed
+			$first = $targetpost;
+		while($done === false)
+		{
+			$binaries->startLoop = microtime(true);
+			echo "Getting ".($last-$first+1)." parts (".($first-$targetpost)." in queue)".$n;
+			flush();
+			$success = $binaries->scan($nntpc, $groupArr, $first, $last, 'backfill');
+			if (!$success)
+			{
+                $db->rollback();
+				return "";
+			}
+
+			$db->query(sprintf("UPDATE groups SET first_record = %s, last_updated = now() WHERE ID = %d", $db->escapeString($first), $groupArr['ID']));
+            $db->commit(false);
+
+			if($first==$targetpost)
+				$done = true;
+			else
+			{	//Keep going: set new last, new first, check for last chunk.
+				$last = $first - 1;
+				$first = $last - $binaries->messagebuffer + 1;
+				if($targetpost > $first)
+					$first = $targetpost;
+			}
+		}
+		$first_record_postdate = $this->postdate($nntp,$first,false);
+		$db->query(sprintf("UPDATE groups SET first_record_postdate = FROM_UNIXTIME(".$first_record_postdate."), last_updated = now() WHERE ID = %d", $groupArr['ID']));  //Set group's first postdate
+
+        $db->commit();
+
+		$timeGroup = number_format(microtime(true) - $this->startGroup, 2);
+		echo "Group processed in $timeGroup seconds $n";
 	}
 }

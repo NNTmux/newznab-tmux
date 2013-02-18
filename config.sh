@@ -91,6 +91,9 @@ export BACKFILL="false"
 #backfill.php or backfill_threaded.php
 export BACKFILL_THREADS="false"
 
+#use kevin123's safer_backfill_parts.php instead of normal backfill or backfill threaded
+export KEVIN_SAFER="false"
+
 #Set, in seconds - how long the backfill should sleep between runs, 0 may cause errors
 #in pane below update_binaries
 #sleep timers are not used when using SEQ
@@ -303,6 +306,10 @@ export SVN_PASSWORD="password"
 #newznab/nzbfiles is not chown'd
 export CHOWN_TRUE="false"
 export WWW_USER="www-data:www-data"
+
+#MyISAM table inserts can be improved slightly by modifying each "INSERT INTO" to "INSERT DELAYED INTO"
+#this will break your install if enable and have InnoDB tables
+export MOD_INSERT="false"
 
 ###########################################################
 

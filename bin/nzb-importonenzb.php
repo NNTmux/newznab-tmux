@@ -3,7 +3,7 @@
 //This id a modified copy of nzb-import.php, to run this you need to copy it to your /www/admin folder. This script will only import 100 nzb's at a time.
 //The idea is that you can call this script from your update script every run, and your import will go smooth without babysitting. 
 
-require('config.php');
+require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/adminpage.php');
 require_once(WWW_DIR.'/lib/framework/db.php');
 $db = new DB();
@@ -126,7 +126,7 @@ if ($using_cli || $page->isPostBack() )
 					
 					//insert binary
 					$binaryHash = md5($name.$fromname.$groupID);
-					$binarySql = sprintf("INSERT INTO binaries (name, fromname, date, xref, totalParts, groupID, binaryhash, dateadded, importname) values (%s, %s, %s, %s, %s, %s, %s, NOW(), %s)", 
+					$binarySql = sprintf("INSERT DELAYED INTO binaries (name, fromname, date, xref, totalParts, groupID, binaryhash, dateadded, importname) values (%s, %s, %s, %s, %s, %s, %s, NOW(), %s)", 
 							$db->escapeString($name), $db->escapeString($fromname), $db->escapeString($date),
 							$db->escapeString($xref), $db->escapeString($totalParts), $db->escapeString($groupID), $db->escapeString($binaryHash), $db->escapeString($nzbFile) );
 					
@@ -143,7 +143,7 @@ if ($using_cli || $page->isPostBack() )
 					//segments (i.e. parts)
 					if (count($file->segments->segment) > 0)
 					{
-						$partsSql = "INSERT INTO parts (binaryID, messageID, number, partnumber, size, dateadded) values ";
+						$partsSql = "INSERT DELAYED INTO parts (binaryID, messageID, number, partnumber, size, dateadded) values ";
 						foreach($file->segments->segment as $segment) 
 						{
 							$messageId = (string)$segment;

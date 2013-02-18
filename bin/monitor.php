@@ -1,6 +1,6 @@
 <?php
 
-require(dirname(__FILE__) . '/config.php');
+require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
 
 $db = new DB();
@@ -620,10 +620,12 @@ while( $i > 0 )
     }
 
     //set command for running backfill
-    if ( $array['BACKFILL_THREADS'] == "true" ) {
-        $_backfill_cmd = "cd $_bin && $_php backfill_threaded.php";
+    if ( $array['KEVIN_SAFER'] == "true" ) {
+        $_backfill_cmd = "cd $_bin && $_php safer_backfill_parts.php";
+    } elseif ( $array['BACKFILL_THREADS'] == "true" ) {
+        $_backfill_cmd = "cd $_bin && $_php backfill_threaded.php && $mysql_command_1";
     } else {
-        $_backfill_cmd = "cd $NNPATH && $_php backfill.php";
+        $_backfill_cmd = "cd $NNPATH && $_php backfill.php && $mysql_command_1";
     }
 
     //set command for nzb-import
@@ -651,7 +653,6 @@ while( $i > 0 )
         if (( $array['BACKFILL'] == "true" ) && (( $total_work_now < $array['BACKFILL_MAX_RELEASES'] ) || ( $array['BACKFILL_MAX_RELEASES'] == 0 )) && (( $parts_rows_unformated < $array['BACKFILL_MAX_ROWS'] ) || ( $array['BACKFILL_MAX_ROWS'] == 0 ))) {
             $color = get_color();
             shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.10 'echo \"\033[38;5;\"$color\"m\" && $ds1 backfill $ds2 && $_backfill_cmd && \
-            $mysql_command_1 && \
             echo \" \033[1;0;33m\" && echo \"$_sleep_string {$array['BACKFILL_SLEEP']} seconds...\" && sleep {$array['BACKFILL_SLEEP']} && $ds1 backfill $ds3' 2>&1 1> /dev/null");
         } elseif (( $parts_rows_unformated > $array['BACKFILL_MAX_ROWS'] ) && ( $array['BACKFILL'] == "true" ) && ( $array['BACKFILL_MAX_ROWS'] != 0 )) {
             $color = get_color();
@@ -672,8 +673,7 @@ while( $i > 0 )
                 $time13 = TIME();
             } elseif (( TIME() - $time14 >= $array['BACKFILL_SEQ_TIMER'] ) && ( $array['BACKFILL'] == "true" ) && (( $total_work_now < $array['BACKFILL_MAX_RELEASES'] ) || ( $array['BACKFILL_MAX_RELEASES'] == 0 )) && (( $parts_rows_unformated < $array['BACKFILL_MAX_ROWS'] ) || ( $array['BACKFILL_MAX_ROWS'] == 0 ))) {
                 $color = get_color();
-                shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.9 'echo \"\033[38;5;\"$color\"m\" && $ds1 backfill $ds2 && $_backfill_cmd && \
-                $mysql_command_1 && echo \" \033[1;0;33m\" && $ds1 backfill $ds3' 2>&1 1> /dev/null");
+                shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.9 'echo \"\033[38;5;\"$color\"m\" && $ds1 backfill $ds2 && $_backfill_cmd && echo \" \033[1;0;33m\" && $ds1 backfill $ds3' 2>&1 1> /dev/null");
                 $time14 = TIME();
             }
         } elseif (( $parts_rows_unformated > $array['BINARIES_MAX_ROWS'] ) && ( $array['BINARIES'] == "true" ) && ( $array['BINARIES_MAX_ROWS'] != 0 )) {

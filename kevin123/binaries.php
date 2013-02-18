@@ -426,7 +426,7 @@ class Binaries
 						$res = $db->queryOneRow(sprintf("SELECT ID FROM binaries WHERE binaryhash = %s", $db->escapeString($binaryHash)));
 						if(!$res)
 						{
-							$sql = sprintf("INSERT INTO binaries (name, fromname, date, xref, totalparts, groupID, binaryhash, dateadded) VALUES (%s, %s, FROM_UNIXTIME(%s), %s, %s, %d, %s, now())", $db->escapeString($subject), $db->escapeString($data['From']), $db->escapeString($data['Date']), $db->escapeString($data['Xref']), $db->escapeString($data['MaxParts']), $groupArr['ID'], $db->escapeString($binaryHash));
+							$sql = sprintf("INSERT DELAYED INTO binaries (name, fromname, date, xref, totalparts, groupID, binaryhash, dateadded) VALUES (%s, %s, FROM_UNIXTIME(%s), %s, %s, %d, %s, now())", $db->escapeString($subject), $db->escapeString($data['From']), $db->escapeString($data['Date']), $db->escapeString($data['Xref']), $db->escapeString($data['MaxParts']), $groupArr['ID'], $db->escapeString($binaryHash));
 							$binaryID = $db->queryInsert($sql);
 							$count++;
 							if ($count%500==0) echo "$count bin adds...";
@@ -452,7 +452,7 @@ class Binaries
                             if (!count($result))
                             {
                                 $partcount++;
-                                $pidata = $db->queryInsert(sprintf("INSERT INTO parts (binaryID, messageID, number, partnumber, size, dateadded) VALUES (%d, %s, %s, %s, %s, now())", $binaryID, $db->escapeString($partdata['Message-ID']), $db->escapeString($partdata['number']), $db->escapeString(round($partdata['part'])), $db->escapeString($partdata['size'])), false);
+                                $pidata = $db->queryInsert(sprintf("INSERT DELAYED INTO parts (binaryID, messageID, number, partnumber, size, dateadded) VALUES (%d, %s, %s, %s, %s, now())", $binaryID, $db->escapeString($partdata['Message-ID']), $db->escapeString($partdata['number']), $db->escapeString(round($partdata['part'])), $db->escapeString($partdata['size'])), false);
                                 if (!$pidata) {
                                    $msgsnotinserted[] = $partdata['number'];
                                 } else {
@@ -606,7 +606,7 @@ class Binaries
 	{
 		$db = new DB;
 		$added = false;
-		$insertStr = "INSERT INTO partrepair (numberID, groupID) VALUES ";
+		$insertStr = "INSERT DELAYED INTO partrepair (numberID, groupID) VALUES ";
 		foreach($numbers as $number)
 		{
 			if ($number > 0)
@@ -829,7 +829,7 @@ class Binaries
 			$groupname = sprintf("%s", $db->escapeString($groupname));
 		}
 			
-		return $db->queryInsert(sprintf("insert into binaryblacklist (groupname, regex, status, description, optype, msgcol) values (%s, %s, %d, %s, %d, %d) ", 
+		return $db->queryInsert(sprintf("INSERT DELAYED INTO binaryblacklist (groupname, regex, status, description, optype, msgcol) values (%s, %s, %d, %s, %d, %d) ", 
 			$groupname, $db->escapeString($regex["regex"]), $regex["status"], $db->escapeString($regex["description"]), $regex["optype"], $regex["msgcol"]));	
 	}	
 	

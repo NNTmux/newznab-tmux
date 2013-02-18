@@ -1,6 +1,6 @@
 <?php
 
-require('config.php');
+require(dirname(__FILE__)."/config.php");
 require_once('lib/db.php');
 
 $db = new DB();
@@ -79,7 +79,7 @@ if (!isset($groups) || count($groups) == 0) {
                 if ($usenzbname) { //Use the binary names
                     $usename = str_replace('.nzb', '', basename($nzbFile));
 
-                    $binarySql = sprintf("INSERT INTO binaries (name, fromname, date, xref, totalParts, groupID, binaryhash, dateadded, importname, relname, relpart, reltotalpart, procstat, categoryID, regexID, reqID) values (%s, %s, %s, %s, %s, %s, %s, NOW(), %s, replace(%s, '_', ' '), %d, %d, %d, %s, %d, %s);",
+                    $binarySql = sprintf("INSERT DELAYED INTO binaries (name, fromname, date, xref, totalParts, groupID, binaryhash, dateadded, importname, relname, relpart, reltotalpart, procstat, categoryID, regexID, reqID) values (%s, %s, %s, %s, %s, %s, %s, NOW(), %s, replace(%s, '_', ' '), %d, %d, %d, %s, %d, %s);",
                         $db->escapeString($name), $db->escapeString($fromname), $db->escapeString($date),
                         $db->escapeString($xref), $db->escapeString($totalParts), $db->escapeString($groupID), $db->escapeString($binaryHash), $db->escapeString($nzbFile),
                         $db->escapeString($usename), 1, 1, 5, "null", "null", "null");
@@ -87,7 +87,7 @@ if (!isset($groups) || count($groups) == 0) {
                     $transaction = $transaction . $binarySql;
 
                 } else { //Don't use the binary names
-                    $binarySql = sprintf("INSERT INTO binaries (name, fromname, date, xref, totalParts, groupID, binaryhash, dateadded, importname) values (%s, %s, %s, %s, %s, %s, %s, NOW(), %s);",
+                    $binarySql = sprintf("INSERT DELAYED INTO binaries (name, fromname, date, xref, totalParts, groupID, binaryhash, dateadded, importname) values (%s, %s, %s, %s, %s, %s, %s, NOW(), %s);",
                         $db->escapeString($name), $db->escapeString($fromname), $db->escapeString($date),
                         $db->escapeString($xref), $db->escapeString($totalParts), $db->escapeString($groupID), $db->escapeString($binaryHash), $db->escapeString($nzbFile));
 
@@ -99,7 +99,7 @@ if (!isset($groups) || count($groups) == 0) {
 
                 //segments (i.e. parts)
                 if (count($file->segments->segment) > 0) {
-                    $partsSql = "INSERT INTO parts (binaryID, messageID, number, partnumber, size, dateadded) values ";
+                    $partsSql = "INSERT DELAYED INTO parts (binaryID, messageID, number, partnumber, size, dateadded) values ";
                     foreach ($file->segments->segment as $segment) {
                         $messageId = (string)$segment;
                         $partnumber = $segment->attributes()->number;

@@ -1,11 +1,11 @@
 <?php
-require("config.php");
+require(dirname(__FILE__)."/config.php");
 require_once(WWW_DIR."/lib/groups.php");
 require_once(WWW_DIR."/lib/binaries.php");
-require_once(WWW_DIR.'/lib/powerprocess.php');
+require_once(WWW_DIR."/lib/powerprocess.php");
 
 //Include AlienX's NewzDash Comms Class.
-require_once(dirname(__FILE__) . '/../alienx/ndComms.php');
+require_once(dirname(__FILE__)."/../alienx/ndComms.php");
 
 $groups = new Groups;
 $groupList = $groups->getActive();
@@ -76,7 +76,7 @@ if ($ps->RunThreadCode())
 	
 	$param = $group['name'];
 	
-	$dir = dirname(__FILE__).'/../../../';
+	$dir = WWW_DIR.'/../misc/update_scripts/';
 	$file = 'update_binaries.php';
 	
 	//$output = shell_exec("php {$dir}/{$file} {$param}");
