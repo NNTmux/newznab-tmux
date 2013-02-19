@@ -110,6 +110,7 @@ else
 
     #remove postprocessing scripts
     rm -f bin/lib/post*
+    rm -f bin/processAdditional*
     rm -f bin/processAlternate*
 
     #create postprocessing scripts
@@ -125,12 +126,12 @@ else
         $SED -i -e "s/order by r.postdate desc limit %d.*\$/order by r.guid asc limit %d, %d \", (\$maxattemptstocheckpassworded + 1) * -1, $c * \$numtoProcess, \$numtoProcess));/g" bin/lib/postprocess$c.php
         $SED -i -e "s/PostPrc : Performing additional post processing.*\$/PostPrc : Performing additional post processing by guid on \".\$rescount.\" releases, starting at $d ...\";/g" bin/lib/postprocess$c.php
 
-        cp bin/lib/alternate bin/processAlternate$c.php
-        $SED -i -e "s/1/$c/g" bin/processAlternate$c.php
+        cp bin/lib/additional bin/processAdditional$c.php
+        $SED -i -e "s/1/$c/g" bin/processAdditional$c.php
     done
 
     cp $NEWZPATH/www/lib/postprocess.php bin/lib/postprocess1.php
-    cp bin/lib/alternate bin/processAlternate1.php
+    cp bin/lib/additional bin/processAdditional1.php
 
     #edit postprocessing scripts
     $SED -i -e 's/PostProcess/PostProcess1/g' bin/lib/postprocess1.php
@@ -154,19 +155,18 @@ else
     $TMUXCMD splitw -v -p 50 'echo "..."'
 
     $TMUXCMD selectp -t 3
-    $TMUXCMD splitw -v -p 50 'echo "..."'
-    $TMUXCMD selectp -t 3
-    $TMUXCMD splitw -v -p 67 'echo "..."'
-    $TMUXCMD splitw -v -p 50 'echo "..."'
-    $TMUXCMD selectp -t 6
+    $TMUXCMD splitw -v -p 86 'echo "..."'
+    $TMUXCMD splitw -v -p 83 'echo "..."'
+    $TMUXCMD splitw -v -p 80 'echo "..."'
+    $TMUXCMD splitw -v -p 75 'echo "..."'
     $TMUXCMD splitw -v -p 67 'echo "..."'
     $TMUXCMD splitw -v -p 50 'echo "..."'
 
-    $TMUXCMD selectp -t 9
+    $TMUXCMD selectp -t 10
     $TMUXCMD splitw -v -p 50 'echo "..."'
-    $TMUXCMD selectp -t 9
+    $TMUXCMD selectp -t 10
     $TMUXCMD splitw -v -p 50 'echo "..."'
-    $TMUXCMD selectp -t 11
+    $TMUXCMD selectp -t 12
     $TMUXCMD splitw -v -p 50 'echo "..."'
 
     $TMUXCMD new-window -n cleanup 'echo "..."'
@@ -179,8 +179,11 @@ else
     $TMUXCMD splitw -h -p 67 'echo "..."'
     $TMUXCMD splitw -h -p 50 'echo "..."'
 
-    $TMUXCMD new-window -n post1 'echo "..."'
+    $TMUXCMD new-window -n post 'echo "..."'
+
     $TMUXCMD selectp -t 0
+    $TMUXCMD splitw -v -p 75 'echo "..."'
+    $TMUXCMD splitw -v -p 67 'echo "..."'
     $TMUXCMD splitw -v -p 50 'echo "..."'
     $TMUXCMD selectp -t 0
     $TMUXCMD splitw -h -p 88 'echo "..."'
@@ -198,30 +201,22 @@ else
     $TMUXCMD splitw -h -p 75 'echo "..."'
     $TMUXCMD splitw -h -p 67 'echo "..."'
     $TMUXCMD splitw -h -p 50 'echo "..."'
-    $TMUXCMD select-layout tiled
-
-    if [[ $USE_ADDITIONAL == "true" ]]; then
-        $TMUXCMD new-window -n post2 'echo "..."'
-        $TMUXCMD selectp -t 0
-        $TMUXCMD splitw -v -p 50 'echo "..."'
-        $TMUXCMD selectp -t 0
-        $TMUXCMD splitw -h -p 88 'echo "..."'
-        $TMUXCMD splitw -h -p 85 'echo "..."'
-        $TMUXCMD splitw -h -p 83 'echo "..."'
-        $TMUXCMD splitw -h -p 80 'echo "..."'
-        $TMUXCMD splitw -h -p 75 'echo "..."'
-        $TMUXCMD splitw -h -p 67 'echo "..."'
-        $TMUXCMD splitw -h -p 50 'echo "..."'
-        $TMUXCMD selectp -t 8
-        $TMUXCMD splitw -h -p 88 'echo "..."'
-        $TMUXCMD splitw -h -p 85 'echo "..."'
-        $TMUXCMD splitw -h -p 83 'echo "..."'
-        $TMUXCMD splitw -h -p 80 'echo "..."'
-        $TMUXCMD splitw -h -p 75 'echo "..."'
-        $TMUXCMD splitw -h -p 67 'echo "..."'
-        $TMUXCMD splitw -h -p 50 'echo "..."'
-        $TMUXCMD select-layout tiled
-    fi
+    $TMUXCMD selectp -t 16
+    $TMUXCMD splitw -h -p 88 'echo "..."'
+    $TMUXCMD splitw -h -p 85 'echo "..."'
+    $TMUXCMD splitw -h -p 83 'echo "..."'
+    $TMUXCMD splitw -h -p 80 'echo "..."'
+    $TMUXCMD splitw -h -p 75 'echo "..."'
+    $TMUXCMD splitw -h -p 67 'echo "..."'
+    $TMUXCMD splitw -h -p 50 'echo "..."'
+    $TMUXCMD selectp -t 24
+    $TMUXCMD splitw -h -p 88 'echo "..."'
+    $TMUXCMD splitw -h -p 85 'echo "..."'
+    $TMUXCMD splitw -h -p 83 'echo "..."'
+    $TMUXCMD splitw -h -p 80 'echo "..."'
+    $TMUXCMD splitw -h -p 75 'echo "..."'
+    $TMUXCMD splitw -h -p 67 'echo "..."'
+    $TMUXCMD splitw -h -p 50 'echo "..."'
 
 #    $TMUXCMD new-window -n binaries_threaded 'echo "..."'
 #    $TMUXCMD splitw -v -p 83 'echo "..."'

@@ -31,12 +31,7 @@ export ADMIN_PATH=$NEWZPATH"/www/admin"
 #trial and error for this, 1 runs always, 2 if more than 200, 3 more than 300 and so on.
 #At some point, increasing this begins to slow things down. It will need to be adjusted for your system
 #to get the desired performance, 0 will disable all post processing
-export POST_TO_RUN="1"
-
-#there can be an addition 16 postprocesses for 32 postprocess to run, if you are enable this, then another window will be created
-#to run the additional processes, if you are using less than 16, this window will be idle
-#this can not be changed while script is running, any change will be ignored
-export USE_ADDITIONAL="false"
+export POST_TO_RUN="0"
 
 #Enter the session name to be used by tmux
 export TMUX_SESSION="Newznab"
@@ -48,8 +43,7 @@ export MONITOR_UPDATE="30"
 
 #You can have backfill loop constantly and interject binaries every so often
 #by setting this next to true, if true, the normal backfill pane will be dead
-#this may be the preferred method, going foward
-export SEQUENTIAL="true"
+export SEQUENTIAL="false"
 
 #time between loop start for update_binaries, in seconds
 #default is 30 minutes
