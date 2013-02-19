@@ -417,10 +417,10 @@ while( $i > 0 )
         $binaries_reason="disabled";
     } elseif (( $total_work_now > $array['BINARIES_MAX_RELEASES'] ) && ( $array['BINARIES_MAX_RELEASES'] != 0 )) {
         $binaries_state="pp-exceeded";
-        $binaries_reason="${array['BINARIES_MAX_RELEASES']}";
+        $binaries_reason=number_format("${array['BINARIES_MAX_RELEASES']}");
     } elseif (( $parts_rows_unformated > $array['BINARIES_MAX_ROWS'] ) && ( $array['BINARIES_MAX_ROWS'] != 0 )) {
         $binaries_state="rows-exceeded";
-        $binaries_reason="${array['BINARIES_MAX_ROWS']}";
+        $binaries_reason=number_format("${array['BINARIES_MAX_ROWS']}");
     } else {
         $binaries_state="enabled";
         $binaries_reason="enabled";
@@ -432,10 +432,10 @@ while( $i > 0 )
         $backfill_reason="disabled";
     } elseif (( $total_work_now > $array['BACKFILL_MAX_RELEASES'] ) && ( $array['BACKFILL_MAX_RELEASES'] != 0 )) {
         $backfill_state="pp-exceeded";
-        $backfill_reason="${array['BACKFILL_MAX_RELEASES']}";
+        $backfill_reason=number_format("${array['BACKFILL_MAX_RELEASES']}");
     } elseif (( $parts_rows_unformated > $array['BACKFILL_MAX_ROWS'] ) && ( $array['BACKFILL_MAX_ROWS'] != 0 )) {
         $backfill_state="rows-exceeded";
-        $backfill_reason="${array['BACKFILL_MAX_ROWS']}";
+        $backfill_reason=number_format("${array['BACKFILL_MAX_ROWS']}");
     } else {
         $backfill_state="enabled";
         $backfill_reason="enabled";
@@ -447,10 +447,10 @@ while( $i > 0 )
         $import_reason="disabled";
     } elseif (( $total_work_now > $array['IMPORT_MAX_RELEASES'] ) && ( $array['IMPORT_MAX_RELEASES'] != 0 )) {
         $import_state="pp-exceeded";
-        $import_reason="${array['IMPORT_MAX_RELEASES']}";
+        $import_reason=number_format("${array['IMPORT_MAX_RELEASES']}");
     } elseif (( $parts_rows_unformated > $array['IMPORT_MAX_ROWS'] ) && ( $array['IMPORT_MAX_ROWS'] != 0 )) {
         $import_state="rows-exceeded";
-        $import_reason="${array['IMPORT_MAX_ROWS']}";
+        $import_reason=number_format("${array['IMPORT_MAX_ROWS']}");
     } else {
         $import_state="enabled";
         $import_reason="enabled";
@@ -674,6 +674,15 @@ while( $i > 0 )
             $color = get_color();
             shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.9 'echo \"\033[38;5;\"$color\"m\" && $ds1 backfill $ds2 && $_backfill_cmd && echo \" \033[1;0;33m\" && $ds1 backfill $ds3' 2>&1 1> /dev/null");
             $time14 = TIME();
+        } elseif (( $array['BINARIES'] != "true" ) && ( $array['BACKFILL'] != "true" )) {
+            $color = get_color();
+            shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.9 'echo \"\033[38;5;\"$color\"m\n\nBINARIES and BACKFILL have been disabled\" && $ds1 backfill $ds4'");
+        } elseif ( $array['BINARIES'] != "true" ) {
+            $color = get_color();
+            shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.9 'echo \"\033[38;5;\"$color\"m\n\nBINARIES have been disabled\" && $ds1 backfill $ds4'");
+        } elseif ( $array['BACKFILL'] != "true" ) {
+            $color = get_color();
+            shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.9 'echo \"\033[38;5;\"$color\"m\n\nBACKFILL have been disabled\" && $ds1 backfill $ds4'");
         }
     } elseif (( $parts_rows_unformated > $array['BINARIES_MAX_ROWS'] ) && ( $array['BINARIES'] == "true" ) && ( $array['BINARIES_MAX_ROWS'] != 0 )) {
         $color = get_color();
