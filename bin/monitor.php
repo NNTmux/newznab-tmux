@@ -92,8 +92,9 @@ function get_color()
     $number = mt_rand(1,231);
     if ( $number != 4 && $number != 8 && $number != 16 && $number != 17 && $number != 18 && $number != 19 && $number != 52 && $number != 53 && $number != 59 && $number != 67 ) {
         return($number);
+    } else {
+        get_color();
     }
-    get_color();
 }
 
 function decodeSize( $bytes )

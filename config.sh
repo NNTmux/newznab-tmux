@@ -85,17 +85,6 @@ export BACKFILL="false"
 #backfill.php or backfill_threaded.php
 export BACKFILL_THREADS="false"
 
-#use kevin123's safer_backfill_parts.php instead of normal backfill or backfill threaded
-#This backfills groups by parts, skipping interval, making backfill a little
-#faster (especially when the interval does set interval 1 article over and over for 20-30 minutes).
-export KEVIN_SAFER="false"
-
-#set the date to go back to, must be in the format of YYYY-MM-DD, like 2012-06-24
-export KEVIN_DATE="2012-06-24"
-
-#set the number of articles/headers to download at one time
-export KEVIN_PARTS="100000"
-
 #Set, in seconds - how long the backfill should sleep between runs, 0 may cause errors
 #in pane below update_binaries
 #sleep timers are not used when using SEQ
@@ -114,6 +103,21 @@ export BACKFILL_MAX_ROWS="0"
 #once your backfill numbers reach $MAXDAYS, then it will no long increment the database
 #backfill will continue to run, and do no work, at that point you should disable backfill, below
 export MAXDAYS="210"
+
+############################################################
+
+#use kevin123's safer_backfill_parts.php instead of normal backfill or backfill threaded
+#this is the script I use, it does 1 group at a time from z to a (wanted to start with tv groups first) 100k parts,
+#then the script stops (once per loop), if your first_record_postdate on the group is 2012-06-24
+#it will be skipped (target reached). When that group is done, it will do another ( again from z to a).
+#this does not use increment, it works by the date set below
+export KEVIN_SAFER="false"
+
+#set the date to go back to, must be in the format of YYYY-MM-DD, like 2012-06-24
+export KEVIN_DATE="2012-06-24"
+
+#set the number of articles/headers to download at one time
+export KEVIN_PARTS="100000"
 
 ############################################################
 
