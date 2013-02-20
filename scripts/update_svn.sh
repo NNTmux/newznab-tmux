@@ -48,12 +48,6 @@ if [[ $KEVINS_COMP == "true" ]]; then
     cp -frv * $NEWZPATH/www/lib/
 fi
 
-#mod INSERT INTO
-if [[ $MOD_INSERT == "true" ]]; then
-    find $NEWZPATH/www -name "*.php" -exec sed -i -e "s/insert into/INSERT DELAYED INTO/gI" {} \;
-    find $NEWZPATH/misc -name "*.php" -exec sed -i -e "s/insert into/INSERT DELAYED INTO/gI" {} \;
-fi
-
 #set user/group to www
 if [[ $CHOWN_TRUE == "true" ]]; then
     chown -c $WWW_USER $NEWZPATH

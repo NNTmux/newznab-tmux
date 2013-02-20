@@ -315,10 +315,6 @@ export SVN_PASSWORD="password"
 export CHOWN_TRUE="false"
 export WWW_USER="www-data:www-data"
 
-#MyISAM table inserts can be improved slightly by modifying each "INSERT INTO" to "INSERT DELAYED INTO"
-#this will break your install if enable and have InnoDB tables
-export MOD_INSERT="false"
-
 ###########################################################
 
 #colors display differently on every monitor, if you are having difficulty seeing a particular
