@@ -199,9 +199,6 @@ export CLEANUP_EDIT="false"
 #How often do you want  update_cleanup.php and removespecial.php to run, in seconds
 export CLEANUP_TIMER="3600"
 
-#processUnwanted is the process that delets audio previews and spam, you can run one cycle each loop or run contunous
-export CONTINUOUS="false"
-
 ############################################################
 
 #Choose to run update_parsing.php true/false
