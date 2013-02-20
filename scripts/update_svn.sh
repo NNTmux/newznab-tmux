@@ -61,9 +61,14 @@ if [[ $CHOWN_TRUE == "true" ]]; then
     chown -Rc $WWW_USER $NEWZPATH/db/
     chown -Rc $WWW_USER $NEWZPATH/docs/
     chown -Rc $WWW_USER $NEWZPATH/misc/
+    chmod 775 $NEWZPATH/www/lib/smarty/templates_c
+    chmod -R 775 $NEWZPATH/www/covers
+    chmod 775 $NEWZPATH/www
+    chmod 775 $NEWZPATH/www/install
+else
+    chmod 777 $NEWZPATH/www/lib/smarty/templates_c
+    chmod -R 777 $NEWZPATH/www/covers
+    chmod 777 $NEWZPATH/www
+    chmod 777 $NEWZPATH/www/install
 fi
-
-#set prmission
-cd $NEWZPATH"/misc/update_scripts/nix_scripts/tmux/scripts"
-./set_perms.sh
 
