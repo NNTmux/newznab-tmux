@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+stead of doing all 1 tye at oncstead of doing all 1 tye at onc#!/usr/bin/env bash
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 #Copy this file to defaults.sh
@@ -120,7 +120,7 @@ export IMPORT="false"
 #If, you have all of you nzbs split into separate in with the root at $NZBS then select true
 #and 10 nzbs will be imported from each subfolder per loop.
 #Importing this way, allows all postprocessing scripts to run, such as book, music, movies
-#Instead of doing all 1 tye at once, spread the load
+#Instead of doing all 1 type at once, spread the load
 export NZB_THREADS="false"
 
 #Set max number of folders to process per loop. This includes empty folders.

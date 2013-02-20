@@ -546,22 +546,22 @@ while( $i > 0 )
         $time2 = TIME();
     } else {
         $color = get_color();
-        $run_time = ( relativeTime( $array['PREDB_TIMER'] + $time2 ) * -1 );
-        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:1.0 'echo \"\033[38;5;\"$color\"m\nupdate_predb will run in $run_time\nThis is color #$color\"' 2>&1 1> /dev/null");
+        $run_time = relativeTime( $array['PREDB_TIMER'] + $time2 );
+        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.0 'echo \"\033[38;5;\"$color\"m\nupdate_predb will run in $run_time\nThis is color #$color\"' 2>&1 1> /dev/null");
     }
 
     //run $_php update_parsing.php in 1.1 every 1 hour
-    if (((( TIME() - $time3 ) >= $array['PARSING_TIMER'] ) || ($i == 1 )) && ($array['PARSING'] == "true" )) {
+    if (((( TIME() - $time3 ) >= $array['PARSING_TIMER'] ) || ( $i == 1 )) && ($array['PARSING'] == "true" )) {
         $color = get_color();
         shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.1 'echo \"\033[38;5;\"$color\"m\" && $ds1 update_parsing $ds2 && cd $TESTING && $_php update_parsing.php && echo \" \033[1;0;33m\" && $ds1 update_parsing $ds3' 2>&1 1> /dev/null");
         $time3 = TIME();
     } elseif ( $array['PARSING'] != "true" ) {
         $color = get_color();
-        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:1.1 'echo \"\033[38;5;\"$color\"m\nupdate_parsing Disabled by PARSING\nThis is color #$color\"' 2>&1 1> /dev/null");
+        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.1 'echo \"\033[38;5;\"$color\"m\nupdate_parsing Disabled by PARSING\nThis is color #$color\"' 2>&1 1> /dev/null");
     } else {
         $color = get_color();
-        $run_time = relativeTime( $array['PARSING'] + $time3 );
-        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:1.1 'echo \"\033[38;5;\"$color\"m\nupdate_parsing will run in $run_time\nThis is color #$color\"' 2>&1 1> /dev/null");
+        $run_time = relativeTime( $array['PARSING_TIMER'] + $time3 );
+        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.1 'echo \"\033[38;5;\"$color\"m\nupdate_parsing will run in $run_time\nThis is color #$color\"' 2>&1 1> /dev/null");
     }
 
     //run $_php removespecial.php and $_php update_cleanup.php in 1.2 ever 1 hour
@@ -571,22 +571,22 @@ while( $i > 0 )
         $time7 = TIME();
     } elseif ( $array['CLEANUP'] != "true" ) {
         $color = get_color();
-        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:1.2 'echo \"\033[38;5;\"$color\"m\nupdate_cleanup Disabled by CLEANUP\nThis is color #$color\"' 2>&1 1> /dev/null");
+        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.2 'echo \"\033[38;5;\"$color\"m\nupdate_cleanup Disabled by CLEANUP\nThis is color #$color\"' 2>&1 1> /dev/null");
     } else {
         $color = get_color();
-        $run_time = relativeTime( $array['CLEANUP'] + $time7 );
-        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:1.2 'echo \"\033[38;5;\"$color\"m\nupdate_cleanup will run in $run_time\nThis is color #$color\"' 2>&1 1> /dev/null");
+        $run_time = relativeTime( $array['CLEANUP_TIMER'] + $time7 );
+        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.2 'echo \"\033[38;5;\"$color\"m\nupdate_cleanup will run in $run_time\nThis is color #$color\"' 2>&1 1> /dev/null");
     }
 
     //run update_tvschedule.php and $_php update_theaters.php in 1.3 every 12 hours and first loop
-    if ((( TIME() - $time4 ) >= $array['TVRAGE_TIMER']) || ($i == 1 )) {
+    if ((( TIME() - $time4 ) >= $array['TVRAGE_TIMER']) || ( $i == 1 )) {
         $color = get_color();
         shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.3 'echo \"\033[38;5;\"$color\"m\" && $ds1 update_tvschedule $ds2 && cd $NNPATH && $_php update_tvschedule.php && $_php update_theaters.php && echo \" \033[1;0;33m\" && $ds1 update_tvschedule $ds3' 2>&1 1> /dev/null");
         $time4 = TIME();
     } else {
         $color = get_color();
         $run_time = relativeTime( $array['TVRAGE_TIMER'] + $time4 );
-        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:1.3 'echo \"\033[38;5;\"$color\"m\nupdate_tvschedule and update_theaters will run in $run_time\nThis is color #$color\"' 2>&1 1> /dev/null");
+        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.3 'echo \"\033[38;5;\"$color\"m\nupdate_tvschedule and update_theaters will run in $run_time\nThis is color #$color\"' 2>&1 1> /dev/null");
     }
 
     //run optimize in pane 1.4
@@ -608,14 +608,14 @@ while( $i > 0 )
         $time11 = TIME();
     } elseif ( $array['OPTIMIZE'] != "true" ) {
         $color = get_color();
-        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:1.4 'echo \"\033[38;5;\"$color\"m\nOptimize Disabled by OPTIMIZE\nThis is color #$color\"' 2>&1 1> /dev/null");
+        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.4 'echo \"\033[38;5;\"$color\"m\nOptimize Disabled by OPTIMIZE\nThis is color #$color\"' 2>&1 1> /dev/null");
     } else {
         $color = get_color();
         $run_time1 = relativeTime( $array['MYISAM_LARGE'] + $time6 );
         $run_time2 = relativeTime( $array['INNODB_LARGE'] + $time8 );
         $run_time3 = relativeTime( $array['INNODB_SMALL'] + $time5 );
         $run_time4 = relativeTime( $array['MYISAM_SMALL'] + $time11 );
-        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:1.4 'echo \"\033[38;5;\"$color\"m\nMYISAM_LARGE will run in $run_time1 \nINNODB_LARGE will run in $run_time2 \nINNODB_SMALL will run in $run_time3 \nMYISAM_SMALL will run in $run_time4\nThis is color #$color\"' 2>&1 1> /dev/null");
+        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.4 'echo \"\033[38;5;\"$color\"m\nMYISAM_LARGE will run in $run_time1 \nINNODB_LARGE will run in $run_time2 \nINNODB_SMALL will run in $run_time3 \nMYISAM_SMALL will run in $run_time4\nThis is color #$color\"' 2>&1 1> /dev/null");
     }
 
     //run sphinx in pane 1.5
@@ -625,11 +625,11 @@ while( $i > 0 )
         $time9 = TIME();
     } elseif ( $array['SPHINX'] != "true" ) {
         $color = get_color();
-        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:1.5 'echo \"\033[38;5;\"$color\"m\nsphinx Disabled by SPHINX\nThis is color #$color\"' 2>&1 1> /dev/null");
+        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.5 'echo \"\033[38;5;\"$color\"m\nsphinx Disabled by SPHINX\nThis is color #$color\"' 2>&1 1> /dev/null");
     } else {
         $color = get_color();
         $run_time = relativeTime( $array['SPHINX_TIMER'] + $time9 );
-        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:1.5 'echo \"\033[38;5;\"$color\"m\nsphinx will run in $run_time\nThis is color #$color\"' 2>&1 1> /dev/null");
+        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.5 'echo \"\033[38;5;\"$color\"m\nsphinx will run in $run_time\nThis is color #$color\"' 2>&1 1> /dev/null");
     }
 
     //run delete parts in pane 1.6
@@ -638,11 +638,11 @@ while( $i > 0 )
         $time16 = TIME();
     } elseif ( $array['DELETE_PARTS'] != "true" ) {
         $color = get_color();
-        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:1.6 'echo \"\033[38;5;\"$color\"m\ndelete_parts Disabled by DELETE_PARTS\nThis is color #$color\"' 2>&1 1> /dev/null");
+        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.6 'echo \"\033[38;5;\"$color\"m\ndelete_parts Disabled by DELETE_PARTS\nThis is color #$color\"' 2>&1 1> /dev/null");
     } else {
         $color = get_color();
         $run_time = relativeTime( $array['DELETE_TIMER'] + $time16 );
-        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:1.6 'echo \"\033[38;5;\"$color\"m\ndelete_parts will run in $run_time\nThis is color #$color\"' 2>&1 1> /dev/null");
+        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.6 'echo \"\033[38;5;\"$color\"m\ndelete_parts will run in $run_time\nThis is color #$color\"' 2>&1 1> /dev/null");
     }
 
     //runs postprocess_nfo.php in pane 3.0 once if needed then exits
@@ -651,7 +651,7 @@ while( $i > 0 )
         shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.0 'echo \"\033[38;5;\"$color\"m\" && $ds1 postprocess_nfo $ds2 && cd $_bin && $_php postprocess_nfo.php && echo \" \033[1;0;33m\" && $ds1 postprocess_nfo $ds3' 2>&1 1> /dev/null");
     } else {
         $color = get_color();
-        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:3.0 'echo \"\033[38;5;\"$color\"m\nprocess_Nfo Has no work to process \nThis is color #$color\"' 2>&1 1> /dev/null");
+        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.0 'echo \"\033[38;5;\"$color\"m\nprocess_Nfo Has no work to process \nThis is color #$color\"' 2>&1 1> /dev/null");
     }
 
     //runs processGames.php in pane y3.1 once if needed then exits
@@ -660,7 +660,7 @@ while( $i > 0 )
         shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.1 'echo \"\033[38;5;\"$color\"m\" && $ds1 processGames $ds2 && cd $_bin && $_php processGames.php && echo \" \033[1;0;33m\" && $ds1 processGames $ds3' 2>&1 1> /dev/null");
     } else {
         $color = get_color();
-        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:3.1 'echo \"\033[38;5;\"$color\"m\nprocessGames Has no work to process \nThis is color #$color\"' 2>&1 1> /dev/null");
+        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.1 'echo \"\033[38;5;\"$color\"m\nprocessGames Has no work to process \nThis is color #$color\"' 2>&1 1> /dev/null");
     }
 
     //runs processMovies.php in pane 3.2 once if needed then exits
@@ -669,7 +669,7 @@ while( $i > 0 )
         shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.2 'echo \"\033[38;5;\"$color\"\" && $ds1 processMovies $ds2 && cd $_bin && $_php processMovies.php && echo \" \033[1;0;33m\" && $ds1 processMovies $ds3' 2>&1 1> /dev/null");
     } else {
         $color = get_color();
-        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:3.2 'echo \"\033[38;5;\"$color\"m\nprocessMovies Has no work to process \nThis is color #$color\"' 2>&1 1> /dev/null");
+        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.2 'echo \"\033[38;5;\"$color\"m\nprocessMovies Has no work to process \nThis is color #$color\"' 2>&1 1> /dev/null");
     }
 
     //runs processMusic.php in pane 3.3 once if needed then exits
@@ -678,7 +678,7 @@ while( $i > 0 )
         shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.3 'echo \"\033[38;5;\"$color\"m\" && $ds1 processMusic $ds2 && cd $_bin && $_php processMusic.php && echo \" \033[1;0;33m\" && $ds1 processMusic $ds3' 2>&1 1> /dev/null");
     } else {
         $color = get_color();
-        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:3.3 'echo \"\033[38;5;\"$color\"m\nprocessMusic Has no work to process \nThis is color #$color\"' 2>&1 1> /dev/null");
+        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.3 'echo \"\033[38;5;\"$color\"m\nprocessMusic Has no work to process \nThis is color #$color\"' 2>&1 1> /dev/null");
     }
 
     //runs processTv.php in pane 3.4 once if needed then exits
@@ -687,7 +687,7 @@ while( $i > 0 )
         shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.4 'echo \"\033[38;5;\"$color\"m\" && $ds1 processTv $ds2 && cd $_bin && $_php processTv.php && echo \" \033[1;0;33m\" && $ds1 processTv $ds3' 2>&1 1> /dev/null");
     } else {
         $color = get_color();
-        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:3.4 'echo \"\033[38;5;\"$color\"m\nprocessTv Has no work to process \nThis is color #$color\"' 2>&1 1> /dev/null");
+        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.4 'echo \"\033[38;5;\"$color\"m\nprocessTv Has no work to process \nThis is color #$color\"' 2>&1 1> /dev/null");
     }
 
     //runs processBooks.php in pane 3.5 once if needed then exits
@@ -696,7 +696,7 @@ while( $i > 0 )
         shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 processBooks $ds2 && cd $_bin && $_php processBooks.php && echo \" \033[1;0;33m\" && $ds1 processBooks $ds3' 2>&1 1> /dev/null");
     } else {
         $color = get_color();
-        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:3.5 'echo \"\033[38;5;\"$color\"m\nprocessBooks Has no work to process \nThis is color #$color\"' 2>&1 1> /dev/null");
+        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.5 'echo \"\033[38;5;\"$color\"m\nprocessBooks Has no work to process \nThis is color #$color\"' 2>&1 1> /dev/null");
     }
 
     //runs processOthers.php in pane 3.6 once if needed then exits
@@ -705,7 +705,7 @@ while( $i > 0 )
         shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.6 'echo \"\033[38;5;\"$color\"m\" && $ds1 processOthers $ds2 && cd $_bin && $_php processOthers.php && echo \" \033[1;0;33m\" && $ds1 processOthers $ds3' 2>&1 1> /dev/null");
     } else {
         $color = get_color();
-        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:3.6 'echo \"\033[38;5;\"$color\"m\nprocessOthers Has no work to process \nThis is color #$color\"' 2>&1 1> /dev/null");
+        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.6 'echo \"\033[38;5;\"$color\"m\nprocessOthers Has no work to process \nThis is color #$color\"' 2>&1 1> /dev/null");
     }
 
     //runs processUnwanted.php in pane 3.7 in continuous loop, will restart if exits
@@ -714,7 +714,7 @@ while( $i > 0 )
         shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.7 'echo \"\033[38;5;\"$color\"m\" && $ds1 processUnwanted $ds2 && cd $_bin && $_php processUnwanted.php && echo \" \033[1;0;33;33m\" && $ds1 processUnwanted $ds3' 2>&1 1> /dev/null");
     } else {
         $color = get_color();
-        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:3.7 'echo \"\033[38;5;\"$color\"m\nprocessUnwanted Has no work to process \nThis is color #$color\"' 2>&1 1> /dev/null");
+        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.7 'echo \"\033[38;5;\"$color\"m\nprocessUnwanted Has no work to process \nThis is color #$color\"' 2>&1 1> /dev/null");
     }
 
     //set command for running update_binaries
@@ -849,7 +849,7 @@ while( $i > 0 )
         shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 releases $ds2 && cd $_bin && $_php update_releases.php && echo \" \033[1;0;33m\" && echo \"$_sleep_string {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']} && $ds1 releases $ds3' 2>&1 1> /dev/null");
     } elseif ( $array['RELEASES'] != "true" ) {
         $color = get_color();
-        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.5 'echo \"\033[38;5;\"$color\"m\nupdate_releases Disabled by RELEASES\nThis is color #$color\"' 2>&1 1> /dev/null");
+        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.5 'echo \"\033[38;5;\"$color\"m\nupdate_releases Disabled by RELEASES\nThis is color #$color\"' 2>&1 1> /dev/null");
     }
 
     //start postprocessing in window 2
