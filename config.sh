@@ -1,4 +1,4 @@
-stead of doing all 1 tye at oncstead of doing all 1 tye at onc#!/usr/bin/env bash
+#!/usr/bin/env bash
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 #Copy this file to defaults.sh
