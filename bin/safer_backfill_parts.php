@@ -6,13 +6,26 @@ require(dirname(__FILE__)."/config.php");
 require_once(WWW_DIR."/lib/backfill.php");
 require_once(WWW_DIR."/lib/framework/db.php");
 
-	$db = new DB;
-	$parts = "100000";
-	$query = $db->queryOneRow(sprintf("select name from groups WHERE (first_record_postdate BETWEEN '2012-06-24' and now()) and (active = 1) order by name desc"));
+//get variables from config.sh and defaults.sh
+$varnames = shell_exec("cat ../config.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
+$varnames .= shell_exec("cat ../defaults.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
+$vardata = shell_exec('cat ../config.sh | grep ^export | cut -d \" -f2 | awk "{print $1;}"');
+$vardata .= shell_exec('cat ../defaults.sh | grep ^export | cut -d \" -f2 | awk "{print $1;}"');
+$varnames = explode("\n", $varnames);
+$vardata = explode("\n", $vardata);
+$array = array_combine($varnames, $vardata);
+unset($array['']);
 
-	$groupPost = $parts;
-	$groupName = $query['name'];
+$_date = $array['KEVIN_DATE'];
+$_parts = $array['KEVIN_PARTS'];
 
-	$backfill = new Backfill();
-	$backfill->backfillPostAllGroups($groupName, $groupPost);
+$db = new DB;
+$parts = "$_parts";
+$query = $db->queryOneRow(sprintf("select name from groups WHERE (first_record_postdate BETWEEN '$_date' and now()) and (active = 1) order by name desc"));
+
+$groupPost = $parts;
+$groupName = $query['name'];
+
+$backfill = new Backfill();
+$backfill->backfillPostAllGroups($groupName, $groupPost);
 ?>

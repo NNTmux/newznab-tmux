@@ -90,6 +90,12 @@ export BACKFILL_THREADS="false"
 #faster (especially when the interval does set interval 1 article over and over for 20-30 minutes).
 export KEVIN_SAFER="false"
 
+#set the date to go back to, must be in the format of YYYY-MM-DD, like 2012-06-24
+export KEVIN_DATE="2012-06-24"
+
+#set the number of articles/headers to download at one time
+export KEVIN_PARTS="100000"
+
 #Set, in seconds - how long the backfill should sleep between runs, 0 may cause errors
 #in pane below update_binaries
 #sleep timers are not used when using SEQ
