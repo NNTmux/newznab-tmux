@@ -86,6 +86,8 @@ export BACKFILL="false"
 export BACKFILL_THREADS="false"
 
 #use kevin123's safer_backfill_parts.php instead of normal backfill or backfill threaded
+#This backfills groups by parts, skipping interval, making backfill a little
+#faster (especially when the interval does set interval 1 article over and over for 20-30 minutes).
 export KEVIN_SAFER="false"
 
 #Set, in seconds - how long the backfill should sleep between runs, 0 may cause errors

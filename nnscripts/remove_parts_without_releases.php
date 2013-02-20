@@ -24,7 +24,7 @@ define('DISPLAY', true);
 // Time limit on releases to remove in hours
 // example: 24 for 1 day old releases (based on add date)
 // false or 0 to disable
-define('LIMIT', 48);
+define('LIMIT', 36);
 
 // The number of parts that should be grouped when removing
 define('QUERYLIMIT', 10000);

@@ -830,10 +830,10 @@ while( $i > 0 )
         $color = get_color();
         shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.4 'echo \"\033[38;5;\"$color\"m\nIMPORT_MAX_ROWS exceeded\" && $ds1 import $ds4'");
         $color = get_color();
-        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.1 'echo \"\033[38;5;\"$color\"m\nIMPORT_MAX_ROWS exceeded\" && $ds1 import $ds4'");
+        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.1 'echo \"\033[38;5;\"$color\"m\nIMPORT_MAX_ROWS exceeded\" && $ds1 nzbcount $ds4'");
     } elseif (( $total_work_now > $array['IMPORT_MAX_RELEASES'] ) && ( $array['IMPORT'] == "true" ) && ( $array['IMPORT_MAX_RELEASES'] != 0 )) {
         $color = get_color();
-        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.4 'echo \"\033[38;5;\"$color\"m\nIMPORT_MAX_RELEASES exceeded\" && $ds1 nzbcount $ds4'");
+        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.4 'echo \"\033[38;5;\"$color\"m\nIMPORT_MAX_RELEASES exceeded\" && $ds1 import $ds4'");
         $color = get_color();
         shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.1 'echo \"\033[38;5;\"$color\"m\nIMPORT_MAX_RELEASES exceeded\" && $ds1 nzbcount $ds4'");
     } elseif ( $array['IMPORT'] != "true" ) {
