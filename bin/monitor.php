@@ -649,48 +649,72 @@ while( $i > 0 )
     if (( $nfo_remaining_now > 0 ) && ( $array['POST_TO_RUN'] != 0 )) {
         $color = get_color();
         shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.0 'echo \"\033[38;5;\"$color\"m\" && $ds1 postprocess_nfo $ds2 && cd $_bin && $_php postprocess_nfo.php && echo \" \033[1;0;33m\" && $ds1 postprocess_nfo $ds3' 2>&1 1> /dev/null");
+    } else {
+        $color = get_color();
+        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:3.0 'echo \"\033[38;5;\"$color\"m\nprocess_Nfo Has no work to process \nThis is color #$color\"' 2>&1 1> /dev/null");
     }
 
     //runs processGames.php in pane y3.1 once if needed then exits
     if (( $console_releases_proc > 0 ) && ( $array['POST_TO_RUN'] != 0 )) {
         $color = get_color();
         shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.1 'echo \"\033[38;5;\"$color\"m\" && $ds1 processGames $ds2 && cd $_bin && $_php processGames.php && echo \" \033[1;0;33m\" && $ds1 processGames $ds3' 2>&1 1> /dev/null");
+    } else {
+        $color = get_color();
+        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:3.1 'echo \"\033[38;5;\"$color\"m\nprocessGames Has no work to process \nThis is color #$color\"' 2>&1 1> /dev/null");
     }
 
     //runs processMovies.php in pane 3.2 once if needed then exits
     if (( $movie_releases_proc > 0 ) && ( $array['POST_TO_RUN'] != 0 )) {
         $color = get_color();
         shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.2 'echo \"\033[38;5;\"$color\"\" && $ds1 processMovies $ds2 && cd $_bin && $_php processMovies.php && echo \" \033[1;0;33m\" && $ds1 processMovies $ds3' 2>&1 1> /dev/null");
+    } else {
+        $color = get_color();
+        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:3.2 'echo \"\033[38;5;\"$color\"m\nprocessMovies Has no work to process \nThis is color #$color\"' 2>&1 1> /dev/null");
     }
 
     //runs processMusic.php in pane 3.3 once if needed then exits
     if (( $music_releases_proc > 0 ) && ( $array['POST_TO_RUN'] != 0 )) {
         $color = get_color();
         shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.3 'echo \"\033[38;5;\"$color\"m\" && $ds1 processMusic $ds2 && cd $_bin && $_php processMusic.php && echo \" \033[1;0;33m\" && $ds1 processMusic $ds3' 2>&1 1> /dev/null");
+    } else {
+        $color = get_color();
+        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:3.3 'echo \"\033[38;5;\"$color\"m\nprocessMusic Has no work to process \nThis is color #$color\"' 2>&1 1> /dev/null");
     }
 
     //runs processTv.php in pane 3.4 once if needed then exits
     if (( $tvrage_releases_proc > 0 ) && ( $array['POST_TO_RUN'] != 0 )) {
         $color = get_color();
         shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.4 'echo \"\033[38;5;\"$color\"m\" && $ds1 processTv $ds2 && cd $_bin && $_php processTv.php && echo \" \033[1;0;33m\" && $ds1 processTv $ds3' 2>&1 1> /dev/null");
+    } else {
+        $color = get_color();
+        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:3.4 'echo \"\033[38;5;\"$color\"m\nprocessTv Has no work to process \nThis is color #$color\"' 2>&1 1> /dev/null");
     }
 
     //runs processBooks.php in pane 3.5 once if needed then exits
     if (( $book_releases_proc > 0 ) && ( $array['POST_TO_RUN'] != 0 )) {
         $color = get_color();
         shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 processBooks $ds2 && cd $_bin && $_php processBooks.php && echo \" \033[1;0;33m\" && $ds1 processBooks $ds3' 2>&1 1> /dev/null");
+    } else {
+        $color = get_color();
+        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:3.5 'echo \"\033[38;5;\"$color\"m\nprocessBooks Has no work to process \nThis is color #$color\"' 2>&1 1> /dev/null");
     }
 
     //runs processOthers.php in pane 3.6 once if needed then exits
     if  ( $array['POST_TO_RUN'] != 0 ) {
         $color = get_color();
         shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.6 'echo \"\033[38;5;\"$color\"m\" && $ds1 processOthers $ds2 && cd $_bin && $_php processOthers.php && echo \" \033[1;0;33m\" && $ds1 processOthers $ds3' 2>&1 1> /dev/null");
+    } else {
+        $color = get_color();
+        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:3.6 'echo \"\033[38;5;\"$color\"m\nprocessOthers Has no work to process \nThis is color #$color\"' 2>&1 1> /dev/null");
     }
 
     //runs processUnwanted.php in pane 3.7 in continuous loop, will restart if exits
     if  ( $array['POST_TO_RUN'] != 0 ) {
         $color = get_color();
         shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.7 'echo \"\033[38;5;\"$color\"m\" && $ds1 processUnwanted $ds2 && cd $_bin && $_php processUnwanted.php && echo \" \033[1;0;33;33m\" && $ds1 processUnwanted $ds3' 2>&1 1> /dev/null");
+    } else {
+        $color = get_color();
+        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:3.7 'echo \"\033[38;5;\"$color\"m\nprocessUnwanted Has no work to process \nThis is color #$color\"' 2>&1 1> /dev/null");
     }
 
     //set command for running update_binaries
