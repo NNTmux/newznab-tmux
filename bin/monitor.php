@@ -737,6 +737,8 @@ while( $i > 0 )
     //set command for nzb-import
     if ( $array['NZB_THREADS'] == "true" ) {
         $nzb_cmd = "$_php nzb-import-sub.php \"{$array['NZBS']}\"";
+    } else {
+        $nzb_cmd = "$_php nzb-import.php \"{$array['NZBS']}\" \"{$array['IMPORT_TRUE']}\"";
     }
 
     //check if sequential is set
