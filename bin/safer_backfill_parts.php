@@ -21,10 +21,10 @@ $_date = $array['KEVIN_DATE'];
 $_parts = $array['KEVIN_PARTS'];
 
 $db = new DB;
-$parts = "$_parts";
-$query = $db->queryOneRow(sprintf("select name from groups WHERE (first_record_postdate BETWEEN '$_date' and now()) and (active = 1) order by name desc"));
 
-$groupPost = $parts;
+$query = $db->queryOneRow(sprintf("select name from groups WHERE (first_record_postdate BETWEEN '${_date}' and now()) and (active = 1) order by name desc"));
+
+$groupPost = $_parts;
 $groupName = $query['name'];
 
 $backfill = new Backfill();
