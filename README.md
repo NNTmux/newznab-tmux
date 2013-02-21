@@ -80,6 +80,9 @@
 
 <hr>
 ![Newznab-tmux](https://raw.github.com/jonnyboy/newznab-tmux/master/images/newznab-tmux.png)
+![Newznab-tmux](https://raw.github.com/jonnyboy/newznab-tmux/master/images/newznab-tmux-1.png)
+![Newznab-tmux](https://raw.github.com/jonnyboy/newznab-tmux/master/images/newznab-tmux-2.png)
+![Newznab-tmux](https://raw.github.com/jonnyboy/newznab-tmux/master/images/newznab-tmux-3.png)
 
 <hr>
  * If you find these scripts useful and would like to show your support, please use one of the donation links below. Donations are greatly appreciated. Thank you
