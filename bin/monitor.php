@@ -15,10 +15,11 @@ $proc = "SELECT ( SELECT COUNT( groupID ) AS cnt from releases where consoleinfo
 $posted_date = "SELECT(SELECT UNIX_TIMESTAMP(adddate) from releases order by adddate asc limit 1) AS adddate;";
 
 //get variables from config.sh and defaults.sh
-$varnames = shell_exec("cat ../config.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
-$varnames .= shell_exec("cat ../defaults.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
-$vardata = shell_exec('cat ../config.sh | grep ^export | cut -d \" -f2 | awk "{print $1;}"');
-$vardata .= shell_exec('cat ../defaults.sh | grep ^export | cut -d \" -f2 | awk "{print $1;}"');
+$path = dirname(__FILE__);
+$varnames = shell_exec("cat ".$path."/../config.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
+$varnames .= shell_exec("cat ".$path."/../defaults.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
+$vardata = shell_exec("cat ".$path."/../config.sh | grep ^export | cut -d \\\" -f2 | awk '{print $1;}'");
+$vardata .= shell_exec("cat ".$path."/../defaults.sh | grep ^export | cut -d \\\" -f2 | awk '{print $1;}'");
 $varnames = explode("\n", $varnames);
 $vardata = explode("\n", $vardata);
 $array = array_combine($varnames, $vardata);
@@ -89,12 +90,19 @@ function relativeTime($_time) {
 
 function get_color()
 {
-    $number = mt_rand(1,231);
-    if ( $number != 4 && $number != 8 && $number != 16 && $number != 17 && $number != 18 && $number != 19 && $number != 52 && $number != 53 && $number != 59 && $number != 67 ) {
-        return($number);
-    } else {
-        get_color();
+    $from = 1;
+    $to = 231;
+    $exceptions = array( 4, 8, 16, 17, 18, 19, 52, 53, 59, 67 );
+    sort($exceptions); // lets us use break; in the foreach reliably
+    $number = mt_rand($from, $to - count($exceptions)); // or mt_rand()
+    foreach ($exceptions as $exception) {
+        if ($number >= $exception) {
+            $number++; // make up for the gap
+        } else /*if ($number < $exception)*/ {
+            break;
+        }
     }
+    return $number;
 }
 
 function decodeSize( $bytes )
@@ -265,16 +273,6 @@ while( $i > 0 )
     //get microtime at start of loop
     $time_loop_start = microtime_float();
 
-    //chack variables again during loop
-    $varnames = shell_exec("cat ../config.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
-    $varnames .= shell_exec("cat ../defaults.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
-    $vardata = shell_exec('cat ../config.sh | grep ^export | cut -d \" -f2 | awk "{print $1;}"');
-    $vardata .= shell_exec('cat ../defaults.sh | grep ^export | cut -d \" -f2 | awk "{print $1;}"');
-    $varnames = explode("\n", $varnames);
-    $vardata = explode("\n", $vardata);
-    $array = array_combine($varnames, $vardata);
-    unset($array['']);
-
     //commands for start/stop newzdash tracking
     $ds1 = "cd $_alienx && $_php tmux_to_newzdash.php";
     $ds2 = "started";
@@ -299,6 +297,17 @@ while( $i > 0 )
         $initquery[$sub['parentID']] = $sub['cnt'];
     }
     $proc_result = @$db->query($proc);
+
+    //refresh variables
+    $path = dirname(__FILE__);
+    $varnames = shell_exec("cat ".$path."/../config.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
+    $varnames .= shell_exec("cat ".$path."/../defaults.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
+    $vardata = shell_exec("cat ".$path."/../config.sh | grep ^export | cut -d \\\" -f2 | awk '{print $1;}'");
+    $vardata .= shell_exec("cat ".$path."/../defaults.sh | grep ^export | cut -d \\\" -f2 | awk '{print $1;}'");
+    $varnames = explode("\n", $varnames);
+    $vardata = explode("\n", $vardata);
+    $array = array_combine($varnames, $vardata);
+    unset($array['']);
 
     //get valuses from $posted_date
     $posted_date_result = @$db->query($posted_date);

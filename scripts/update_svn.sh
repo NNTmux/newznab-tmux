@@ -50,7 +50,7 @@ fi
 
 #set user/group to www
 if [[ $CHOWN_TRUE == "true" ]]; then
-    chown -c $WWW_USER $NEWZPATH
+    chown -c $WWW_USER $NEWZPATH/*
     chown -Rc $WWW_USER $NEWZPATH/www/
     chown -Rc $WWW_USER $NEWZPATH/db/
     chown -Rc $WWW_USER $NEWZPATH/docs/
