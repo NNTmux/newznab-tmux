@@ -128,6 +128,7 @@ $time13 = TIME();
 $time14 = TIME();
 $time15 = TIME();
 $time16 = TIME();
+$time17 = TIME();
 
 //init start values
 $work_start = 0;
@@ -653,6 +654,19 @@ while( $i > 0 )
         $color = get_color();
         $run_time = relativeTime( $array['DELETE_TIMER'] + $time16 );
         shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.6 'echo \"\033[38;5;\"$color\"m\ndelete_parts will run in $run_time\nThis is color #$color\"' 2>&1 1> /dev/null");
+    }
+
+    //run update_missing_movie_info  parts in pane 1.7
+    if (((( TIME() - $time17 ) >= $array['MOVIE_TIMER'] ) || ( $i == 1 )) && ( $array['FETCH_MOVIE'] == "true" )) {
+        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.7 'echo \"\033[38;5;\"$color\"m\" && $ds1 fetch movie $ds2 && cd $_cj && $_php update_missing_movie_info.php && $ds1 fetch movie $ds3' 2>&1 1> /dev/null");
+        $time17 = TIME();
+    } elseif ( $array['FETCH_MOVIE'] != "true" ) {
+        $color = get_color();
+        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.7 'echo \"\033[38;5;\"$color\"m\nfetch movie Disabled by FETCH_MOVIE\nThis is color #$color\"' 2>&1 1> /dev/null");
+    } else {
+        $color = get_color();
+        $run_time = relativeTime( $array['MOVIE_TIMER'] + $time17 );
+        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.7 'echo \"\033[38;5;\"$color\"m\nfetch movie will run in $run_time\nThis is color #$color\"' 2>&1 1> /dev/null");
     }
 
     //runs postprocess_nfo.php in pane 3.0 once if needed then exits

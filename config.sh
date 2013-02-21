@@ -244,6 +244,13 @@ export DELETE_PARTS="false"
 #how often should this be run, default it 1 hr
 export DELETE_TIMER="3600"
 
+#Releases may be added/eddited with an imdb-id that does not exists in the movieinfo table. This script, update_missing_movie_info,
+#will fetch all the missing imdb id's from the releases table.
+export FETCH_MOVIE="false"
+
+#how often should this be run, default it 12 hr
+export MOVIE_TIMER="43200"
+
 ############################################################
 
 #Specify your SED binary
