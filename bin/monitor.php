@@ -820,7 +820,7 @@ while( $i > 0 )
             $color = get_color();
             $run_time1 = relativeTime( $array['BACKFILL_SEQ_TIMER'] + $time14 );
             $run_time2 = relativeTime( $array['BINARIES_SEQ_TIMER'] + $time13 );
-            shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.2 'echo \"\033[38;5;\"$color\"m\nupdate_binaries will run in $run_time \nbackfill will run in $run_time1 \nThis is color #$color\"' 2>&1 1> /dev/null");
+            shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.2 'echo \"\033[38;5;\"$color\"m\nupdate_binaries will run in $run_time2 \nbackfill will run in $run_time1 \nThis is color #$color\"' 2>&1 1> /dev/null");
         } elseif ( $array['BACKFILL'] == "true" ) {
             $color = get_color();
             $run_time = relativeTime( $array['BACKFILL_SEQ_TIMER'] + $time14 );
@@ -837,15 +837,15 @@ while( $i > 0 )
         if (( $array['BACKFILL'] == "true" ) && ( $array['BINARIES'] == "true" )) {
             $color = get_color();
             $run_time1 = relativeTime( $array['BACKFILL_SEQ_TIMER'] + $time14 );
-            $run_time2 = relativeTime( $array['BINARIES_SEQ_TIMER'] + $time14 );
-            shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.3 'echo \"\033[38;5;\"$color\"m\nupdate_binaries will run in $run_time \nbackfill will run in $run_time1 \nThis is color #$color\"' 2>&1 1> /dev/null");
+            $run_time2 = relativeTime( $array['BINARIES_SEQ_TIMER'] + $time13 );
+            shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.3 'echo \"\033[38;5;\"$color\"m\nupdate_binaries will run in $run_time2 \nbackfill will run in $run_time1 \nThis is color #$color\"' 2>&1 1> /dev/null");
         } elseif ( $array['BACKFILL'] == "true" ) {
             $color = get_color();
             $run_time = relativeTime( $array['BACKFILL_SEQ_TIMER'] + $time14 );
             shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.3 'echo \"\033[38;5;\"$color\"m\nbackfill will run in $run_time\nThis is color #$color\"' 2>&1 1> /dev/null");
         } elseif ( $array['BINARIES'] == "true" ) {
             $color = get_color();
-            $run_time = relativeTime( $array['BINARIES_SEQ_TIMER'] + $time14 );
+            $run_time = relativeTime( $array['BINARIES_SEQ_TIMER'] + $time13 );
             shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.3 'echo \"\033[38;5;\"$color\"m\nupdate_binaries will run in $run_time\nThis is color #$color\"' 2>&1 1> /dev/null");
         }
     }
