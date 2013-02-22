@@ -490,7 +490,7 @@ while( $i > 0 )
     if ( $array['RAMDISK_PATH'] != "" ) {
         printf($mask, "Ramdisk", "$disk_use used", "$disk_free free");
     }
-echo $_DB_USER;
+
     printf("\033[1;33m\n");
     printf($mask, "Category", "In Process", "In Database");
     printf($mask, "====================", "====================", "====================");
@@ -819,7 +819,7 @@ echo $_DB_USER;
         } elseif (( $array['BACKFILL'] == "true" ) && ( $array['BINARIES'] == "true" )) {
             $color = get_color();
             $run_time1 = relativeTime( $array['BACKFILL_SEQ_TIMER'] + $time14 );
-            $run_time2 = relativeTime( $array['BINARIES_SEQ_TIMER'] + $time14 );
+            $run_time2 = relativeTime( $array['BINARIES_SEQ_TIMER'] + $time13 );
             shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.2 'echo \"\033[38;5;\"$color\"m\nupdate_binaries will run in $run_time \nbackfill will run in $run_time1 \nThis is color #$color\"' 2>&1 1> /dev/null");
         } elseif ( $array['BACKFILL'] == "true" ) {
             $color = get_color();
@@ -827,7 +827,7 @@ echo $_DB_USER;
             shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.2 'echo \"\033[38;5;\"$color\"m\nbackfill will run in $run_time\nThis is color #$color\"' 2>&1 1> /dev/null");
         } elseif ( $array['BINARIES'] == "true" ) {
             $color = get_color();
-            $run_time = relativeTime( $array['BINARIES_SEQ_TIMER'] + $time14 );
+            $run_time = relativeTime( $array['BINARIES_SEQ_TIMER'] + $time13 );
             shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.2 'echo \"\033[38;5;\"$color\"m\nupdate_binaries will run in $run_time\nThis is color #$color\"' 2>&1 1> /dev/null");
         }
     }
@@ -898,6 +898,11 @@ echo $_DB_USER;
     if ( $array['KILL_PROCESS'] != "0" ) {
         shell_exec("./check_process.sh mediainfo {$array['KILL_PROCESS']}");
         shell_exec("./check_process.sh ffmpeg {$array['KILL_PROCESS']}");
+    }
+
+    //notify monitor that optimize is running
+    if ( ! shell_exec("$_tmux list-panes -t {$array['TMUX_SESSION']}:1 | grep 4: | grep dead") ) {
+        echo "\033[1;41;33mOPTIMIZATION OF THE MYSQL TABLES HAS STARTED, DO NOT STOP THIS SCRIPT!\033[1;0;33m\n\n";
     }
 
     //turn of monitor if set to false
