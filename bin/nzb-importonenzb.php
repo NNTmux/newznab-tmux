@@ -17,7 +17,7 @@ elseif ($argc == 1)
 {
 	echo "no arguments specified - php nzb-import.php /path/to/nzb bool_use_filenames\n";
 	return;
-}	
+}
 else
 {
 	$using_cli = true;
@@ -28,11 +28,11 @@ $browserpostednames = Array();
 
 if ($using_cli || $page->isPostBack() )
 {
-	$retval = "";	
+	$retval = "";
 
 	//
 	// Via browser, build an array of all the nzb files uploaded into php /tmp location
-	//	
+	//
 	if (isset($_FILES["uploadedfiles"]))
 	{
 		foreach ($_FILES["uploadedfiles"]["error"] as $key => $error)
@@ -53,13 +53,13 @@ if ($using_cli || $page->isPostBack() )
 		$path = $argv[1];
 		$usenzbname = (isset($argv[2]) && $argv[2] == 'true') ? true : false;
 	}
-	else		
+	else
 	{
 		$strTerminator = "<br />";
 		$path = (isset($_POST["folder"]) ? $_POST["folder"] : "");
 		$usenzbname = (isset($_POST['usefilename']) && $_POST["usefilename"] == 'on') ? true : false;
 	}
-		
+
 	if (substr($path, strlen($path) - 1) != '/')
 		$path = $path."/";
 
@@ -75,21 +75,21 @@ if ($using_cli || $page->isPostBack() )
 			$retval.= "no groups available in the database, add first.".$strTerminator;
 	}
 	else
-	{	
+	{
 		$nzbCount = 0;
-	
+
 		//
 		// read from the path, if no files submitted via the browser
-		//		
+		//
 		if (count($filestoprocess) == 0)
 			$filestoprocess = glob($path."*.nzb"); 
 		$start=date('Y-m-d H:i:s');
-		
+
 		foreach($filestoprocess as $nzbFile) 
 		{
 			$importfailed = false;
 			$nzb = file_get_contents($nzbFile);
-			
+
 			$xml = @simplexml_load_string($nzb);
 			if (!$xml || strtolower($xml->getName()) != 'nzb') 
 			{
@@ -105,7 +105,7 @@ if ($using_cli || $page->isPostBack() )
 				$fromname = (string)$file->attributes()->poster;
 				$unixdate = (string)$file->attributes()->date;
 				$date = date("Y-m-d H:i:s", (string)$file->attributes()->date);
-				
+
 				//groups
 				$groupArr = array();
 				foreach($file->groups->group as $group) 
@@ -117,39 +117,39 @@ if ($using_cli || $page->isPostBack() )
 					}
 					$groupArr[] = $group;
 				}
-				
+
 				if ($groupID != -1)
 				{
 					$xref = implode(': ', $groupArr).':';
-							
+
 					$totalParts = sizeof($file->segments->segment);
-					
+
 					//insert binary
 					$binaryHash = md5($name.$fromname.$groupID);
-					$binarySql = sprintf("INSERT DELAYED INTO binaries (name, fromname, date, xref, totalParts, groupID, binaryhash, dateadded, importname) values (%s, %s, %s, %s, %s, %s, %s, NOW(), %s)", 
+					$binarySql = sprintf("INSERT INTO binaries (name, fromname, date, xref, totalParts, groupID, binaryhash, dateadded, importname) values (%s, %s, %s, %s, %s, %s, %s, NOW(), %s)", 
 							$db->escapeString($name), $db->escapeString($fromname), $db->escapeString($date),
 							$db->escapeString($xref), $db->escapeString($totalParts), $db->escapeString($groupID), $db->escapeString($binaryHash), $db->escapeString($nzbFile) );
-					
+
 					$binaryId = $db->queryInsert($binarySql);
-					
+
 					if ($usenzbname) 
 					{
 						$usename = str_replace('.nzb', '', (!$using_cli ? $browserpostednames[$nzbFile] : basename($nzbFile)));
-						
+
 						$db->query(sprintf("update binaries set relname = replace(%s, '_', ' '), relpart = %d, reltotalpart = %d, procstat=%d, categoryID=%s, regexID=%d, reqID=%s where ID = %d", 
 							$db->escapeString($usename), 1, 1, 5, "null", "null", "null", $binaryId));
 					}
-					
+
 					//segments (i.e. parts)
 					if (count($file->segments->segment) > 0)
 					{
-						$partsSql = "INSERT DELAYED INTO parts (binaryID, messageID, number, partnumber, size, dateadded) values ";
+						$partsSql = "INSERT INTO parts (binaryID, messageID, number, partnumber, size, dateadded) values ";
 						foreach($file->segments->segment as $segment) 
 						{
 							$messageId = (string)$segment;
 							$partnumber = $segment->attributes()->number;
 							$size = $segment->attributes()->bytes;
-							
+
 							$partsSql .= sprintf("(%s, %s, 0, %s, %s, NOW()),", 
 									$db->escapeString($binaryId), $db->escapeString($messageId), $db->escapeString($partnumber), 
 									$db->escapeString($size));
@@ -173,7 +173,7 @@ if ($using_cli || $page->isPostBack() )
 					break;
 				}
 			}
-			
+
 			if (!$importfailed)
 			{
 				$nzbCount++;
@@ -216,8 +216,8 @@ if ($using_cli || $page->isPostBack() )
 		echo $retval;
 		die();
 	}
-	
-	$page->smarty->assign('output', $retval);	
+
+	$page->smarty->assign('output', $retval);
 }
 
 $page->title = "Import Nzbs";

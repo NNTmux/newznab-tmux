@@ -324,12 +324,6 @@ export WWW_USER="www-data:www-data"
 
 ###########################################################
 
-#colors display differently on every monitor, if you are having difficulty seeing a particular
-#color, set this to true, get the colors number and report is to me, I will remove it
-export SHOW_COLORS="false"
-
-###########################################################
-
 #if you have a ramdisk and would like to monitor it's use, set path here
 #this is not the same as RAMDISK above, I keep my parts table on a ramdisk
 export RAMDISK_PATH=""
