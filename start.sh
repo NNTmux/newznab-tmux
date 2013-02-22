@@ -36,7 +36,7 @@ fi
 if $TMUXCMD -q has-session -t $TMUX_SESSION; then
     $TMUXCMD attach-session -t $TMUX_SESSION
 else
-    printf "The above is just a notice, it is saying, that you do not have a session currently running. It is not an error."
+    printf "The above is just a TMUX notice, it is saying TMUX, that you do not have a TMUX session currently running. It is not an error. It is TMUX"
     printf "\033]0; $TMUX_SESSION\007\003\n"
     $TMUXCMD -f $TMUX_CONF new-session -d -s $TMUX_SESSION -n Monitor 'cd bin && echo "Monitor Started" && echo "It might take a minute for everything to spinup......" && $NICE -n 19 $PHP monitor.php'
 
@@ -89,7 +89,7 @@ else
 
     #Get the path to tmpunrar
     TMPUNRAR_QUERY="SELECT value from site where setting = \"tmpunrarpath\";"
-    TMPUNRAR_PATH=`$MYSQL --defaults-extra-file=conf/my.cnf -u$DB_USER -h$DB_HOST $DB_NAME -s -N -e "${TMPUNRAR_QUERY}"`
+    TMPUNRAR_PATH=`$MYSQL --defaults-file=conf/my.cnf -u$DB_USER -h$DB_HOST $DB_NAME -s -N -e "${TMPUNRAR_QUERY}"`
     TMPUNRAR_PATH=$TMPUNRAR_PATH"1"
 
     #remove the ramdisk, previous versions were smaller
@@ -97,13 +97,13 @@ else
         umount $TMPUNRAR_PATH &> /dev/null
     fi
 
-    #remove and recreate
+    #remove and recreate, this is to ensure an empty folder for moounting into
     rm -rf $TMPUNRAR_PATH
     mkdir -p $TMPUNRAR_PATH
 
     #create a ramdisk
     if [[ $RAMDISK == "true" ]]; then
-        mountpoint -q $TMPUNRAR_PATH || mount -t tmpfs -o size=256M tmpfs $TMPUNRAR_PATH 2>&1 > /dev/null
+        mountpoint -q $TMPUNRAR_PATH || mount -t tmpfs -o size=256M tmpfs $TMPUNRAR_PATH
     fi
 
     chmod -R 777 $TMPUNRAR_PATH

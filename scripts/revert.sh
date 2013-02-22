@@ -34,7 +34,7 @@ fi
 
 #Get the path to tmpunrar
 TMPUNRAR_QUERY="SELECT value from site where setting = \"tmpunrarpath\";"
-TMPUNRAR_PATH=`$MYSQL --defaults-extra-file=../conf/my.cnf -u$DB_USER -h$DB_HOST $DB_NAME -s -N -e "${TMPUNRAR_QUERY}"`
+TMPUNRAR_PATH=`$MYSQL --defaults-file=../conf/my.cnf -u$DB_USER -h$DB_HOST $DB_NAME -s -N -e "${TMPUNRAR_QUERY}"`
 TMPUNRAR_PATH=$TMPUNRAR_PATH"1"
 
 #remove the ramdisk

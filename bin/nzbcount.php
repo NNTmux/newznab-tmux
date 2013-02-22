@@ -26,8 +26,8 @@ while ($i==0) {
     printf($mask, "===============", "==========", "=============\033[0m");
 
     $subdir_count = 0;
-    $path = $array['NZBS'];
-    $subdirs = array_filter(glob($path.'/*', GLOB_ONLYDIR|GLOB_NOSORT));
+    $subpath = $array['NZBS'];
+    $subdirs = array_filter(glob($subpath.'/*', GLOB_ONLYDIR|GLOB_NOSORT));
     foreach($subdirs AS $subdir){
         $subdir_count++;
     }
@@ -74,10 +74,10 @@ while ($i==0) {
         echo ("\033[1;33m");
         printf($mask, "Total","$toprocess","$totalproc");
     } else {
-        $filecount0 = count(glob($path.'/*.nzb'));
+        $filecount0 = count(glob($subpath.'/*.nzb'));
         if ( $filecount == 0 ) { $filecount = $filecount0; }
         $processed=$filecount-$filecount0;
-        $folder=basename("$path");
+        $folder=basename("$subpath");
         printf($mask, "$folder","$filecount0","$processed");
     }
     sleep(90);

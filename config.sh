@@ -197,7 +197,7 @@ export INNODB="false"
 #to actually do anything, directions are in the file
 export CLEANUP="false"
 
-#edit update_cleanup.php and update_parsing.php and svn up
+#edit update_cleanup.php and update_parsing.php and svn up, this will only mod files when you run scripts/update_svn.sh or scripts/fix_files.sh
 export CLEANUP_EDIT="false"
 
 #How often do you want  update_cleanup.php and removespecial.php to run, in seconds
@@ -289,7 +289,7 @@ export RAMDISK="false"
 ############################################################
 
 #use kevin123's compression mod true/false
-#this will copy kevin123's compression mod to the correct location when you update_svn.sh
+#this will copy kevin123's compression mod to the correct location when you update_svn.sh or fix_files.sh
 #this ensures that kevin123's files are present after updaing svn
 export KEVINS_COMP="false"
 

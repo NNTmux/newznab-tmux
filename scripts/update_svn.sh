@@ -28,41 +28,6 @@ svn export --force --username svnplus --password $SVN_PASSWORD svn://svn.newznab
 cd $NEWZPATH"/misc/update_scripts"
 $PHP update_database_version.php
 
-echo " "
-
-#purge smarty cache
-cd $NEWZPATH"/www/lib/smarty/templates_c/"
-rm -fv *
-
-#edit cleanup scripts
-if [[ $CLEANUP_EDIT  == "true" ]]; then
-    sed -i -e 's/^$echo =.*$/$echo = false;/' $TESTING_PATH/update_parsing.php
-    sed -i -e 's/^$limited =.*$/$limited = false;/' $TESTING_PATH/update_parsing.php
-    sed -i -e 's/^$echo =.*$/$echo = false;/' $TESTING_PATH/update_cleanup.php
-    sed -i -e 's/^$limited =.*$/$limited = false;/' $TESTING_PATH/update_cleanup.php
-fi
-
-#import kevin123's compression mod
-if [[ $KEVINS_COMP == "true" ]]; then
-    cd $NEWZPATH"/misc/update_scripts/nix_scripts/tmux/kevin123"
-    cp -frv * $NEWZPATH/www/lib/
-fi
-
-#set user/group to www
-if [[ $CHOWN_TRUE == "true" ]]; then
-    chown -c $WWW_USER $NEWZPATH/*
-    chown -Rc $WWW_USER $NEWZPATH/www/
-    chown -Rc $WWW_USER $NEWZPATH/db/
-    chown -Rc $WWW_USER $NEWZPATH/docs/
-    chown -Rc $WWW_USER $NEWZPATH/misc/
-    chmod 775 $NEWZPATH/www/lib/smarty/templates_c
-    chmod -R 775 $NEWZPATH/www/covers
-    chmod 775 $NEWZPATH/www
-    chmod 775 $NEWZPATH/www/install
-else
-    chmod 777 $NEWZPATH/www/lib/smarty/templates_c
-    chmod -R 777 $NEWZPATH/www/covers
-    chmod 777 $NEWZPATH/www
-    chmod 777 $NEWZPATH/www/install
-fi
-
+cd $DIR/scripts
+ls -al
+./fix_files.sh
