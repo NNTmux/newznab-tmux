@@ -69,7 +69,7 @@
 
  * Some scripts written by [cj](https://github.com/NNScripts/nn-custom-scripts) can help cleanup your db and remove unlinked parts. Another script [nevermind](http://pastebin.com/ibpi71iE) will help your db run a little faster/easier.
 
- * I havew included the [mysql-tuning-primer](https://launchpad.net/mysql-tuning-primer) to assist in tuning your msql installation.
+ * I have included a few mysql scripts, [mysql-tuning-primer](https://launchpad.net/mysql-tuning-primer), [mysqlreport](http://hackmysql.com/mysqlreport) and [mysqltuner.pl](https://github.com/sunfoxcz/MySQLTuner-perl/blob/master/mysqltuner.pl) to assist in tuning your msql installation. They are locatated in the scripts folder.
 
  * Join in the converstion at irc://irc.synirc.net/newznab-tmux.
 
