@@ -31,7 +31,7 @@ fi
 
 #import kevin123's compression mod
 if [[ $KEVINS_COMP == "true" ]]; then
-    cd $NEWZPATH"/misc/update_scripts/nix_scripts/tmux/kevin123"
+    cd $DIR"/kevin123"
     cp -frv * $NEWZPATH/www/lib/
 fi
 
