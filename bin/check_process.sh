@@ -23,8 +23,8 @@ for proc in "${time[@]}"
 do
   if [ $proc -ge $threshold ]; then
     if [ ${pid[$i]} -gt "1000" ]; then
-      echo "\033[1;31m $process pid ${pid[$i]} has been running for ${real_time[$i]} and will be killed.\033[0m && $ds1 $ds4"
-      kill -s 9 ${pid[$i]}
+      echo "\033[1;31m $process pid ${pid[$i]} has been running for ${real_time[$i]} and will be killed.\033[0m"
+      kill -s 9 ${pid[$i]} && $ds1 $ds4
     fi
   fi
   i=$i+1
