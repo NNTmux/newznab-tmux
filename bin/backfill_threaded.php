@@ -77,8 +77,7 @@ if ($ps->RunThreadCode())
 	}
 	//End Newzdash
 	
-	//$output = shell_exec("php {$dir}/{$file} {$param}");
-	$output = passthru("php {$dir}/{$file} {$param}");
+	$output = shell_exec("php {$dir}/{$file} {$param}");
 	
 	//Newzdash
 	if ( $ndCommAllowed )

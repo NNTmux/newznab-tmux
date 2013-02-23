@@ -467,6 +467,9 @@ while( $i > 0 )
     //get microtime at end of queries
     $query_timer = microtime_float()-$query_timer_start;
 
+    //add sleep to new installs, so everything spins up properly
+    if (( $query_timer < 10 ) && ( $i == 1 )) { sleep(10); }
+
     if ( $array['RAMDISK_PATH'] != "" ) {
         $disk_use =  decodeSize( disk_total_space("${array['RAMDISK_PATH']}") - disk_free_space("${array['RAMDISK_PATH']}") );
         $disk_free = decodeSize( disk_free_space("${array['RAMDISK_PATH']}") );
@@ -510,11 +513,6 @@ while( $i > 0 )
     printf($mask, "====================", "====================", "====================");
     printf("\033[38;5;214m");
     printf($mask, "Queries","$query_timer","queried");
-
-    //notify monitor that optimize is running
-    if ( ! shell_exec("$_tmux list-panes -t {$array['TMUX_SESSION']}:1 | grep 4: | grep dead") ) {
-        echo "\033[1;41;33mOPTIMIZATION OF THE MYSQL TABLES HAS STARTED, DO NOT STOP THIS SCRIPT!\033[1;0;33m\n\n";
-    }
 
     //see if tmux.conf needs to be reloaded
     if ( $_tmux_test != $array['POWERLINE'] ) {
