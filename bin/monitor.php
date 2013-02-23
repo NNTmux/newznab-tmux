@@ -880,7 +880,7 @@ while( $i > 0 )
     {
         $h=$g-1;
         $f=$h*100;
-        $j=$g/10;
+        $j=$g*2;
         if (( $array['POST_TO_RUN'] >= $g ) && ( $work_remaining_now > $f )) {
             $color = get_color();
             shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.$h 'echo \"\033[38;5;\"$color\"m\" && $ds1 postprocess_$g $ds2 && cd $_bin && sleep $j && $_php processAdditional$g.php && echo \" \033[1;0;33m\" && $ds1 postprocess_$g $ds3' 2>&1 1> /dev/null");
