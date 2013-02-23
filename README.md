@@ -1,5 +1,7 @@
 # SETUP
 
+ * This is a series of scripts that break down the stock processes of a typical Newznab+ installation and perform each task separately and at the same time. Tmux allows for several windows and panes to be created to allow the monitoring of each script as it performs its task. Each task is started by monitor.php. The postprocessing has also been enhanced to allow upto 32 simultaneous postprocesses plus another 8 for each category of releases, for a total of 40 possible postprocessing at once. The scripts are started by either timers, set in defaults.sh or started automatically and then sleeps for a time set in defaults.sh. Almost everything can be stopped/started from the defaults.sh without restarting the scripts.
+
  * tmux 1.6 or newer is needed to runs these scripts. This script relies on tmux reporting that the "Pane is dead". That is how the script knows that is nothing running in that pane and to restart it for another loop. Seeing "Pane is dead" is normal and expected.
 
  * To exit the scripts without any worry of causing problems. Click into the Monitor pane, top left and Ctrl-c, or edit defaults.sh and set running="false". This will stop the monitor script. When all of the other panes show dead, then it is ok to run Ctrl-a c and in new window run killall tmux.
