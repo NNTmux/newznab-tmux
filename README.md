@@ -69,6 +69,8 @@
 
  * Some scripts written by [cj](https://github.com/NNScripts/nn-custom-scripts) can help cleanup your db and remove unlinked parts. Another script [nevermind](http://pastebin.com/ibpi71iE) will help your db run a little faster/easier.
 
+ * I havew included the [mysql-tuning-primer](https://launchpad.net/mysql-tuning-primer) to assist in tuning your msql installation.
+
  * Join in the converstion at irc://irc.synirc.net/newznab-tmux.
 
 
@@ -79,12 +81,13 @@
  * These scripts include scripts written by [kevin123's](https://github.com/kevinlekiller), [itandrew's](https://github.com/itandrew/Newznab-InnoDB-Dropin), [tmux-powerline](https://github.com/erikw/tmux-powerline) and [thewtex](git://github.com/thewtex/tmux-mem-cpu-load.git).
 
 <hr>
+ * If you find these scripts useful and would like to show your support, please use one of the donation links below. Donations are greatly appreciated. Thank you
+
+<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=N4AJV5FHZDBFE"><img src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" alt="PayPal - The safer, easier way to pay online!" /></a><a href='http://www.pledgie.com/campaigns/18980'><img alt='Click here to lend your support to: Newznab-tmux and make a donation at www.pledgie.com !' src='http://www.pledgie.com/campaigns/18980.png?skin_name=chrome' border='0' /></a>
+
+<hr>
 ![Newznab-tmux](https://raw.github.com/jonnyboy/newznab-tmux/master/images/newznab-tmux.png)
 ![Newznab-tmux](https://raw.github.com/jonnyboy/newznab-tmux/master/images/newznab-tmux-1.png)
 ![Newznab-tmux](https://raw.github.com/jonnyboy/newznab-tmux/master/images/newznab-tmux-2.png)
 ![Newznab-tmux](https://raw.github.com/jonnyboy/newznab-tmux/master/images/newznab-tmux-3.png)
 
-<hr>
- * If you find these scripts useful and would like to show your support, please use one of the donation links below. Donations are greatly appreciated. Thank you
-
-<center><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=N4AJV5FHZDBFE"><img src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" alt="PayPal - The safer, easier way to pay online!" /></a><a href='http://www.pledgie.com/campaigns/18980'><img alt='Click here to lend your support to: Newznab-tmux and make a donation at www.pledgie.com !' src='http://www.pledgie.com/campaigns/18980.png?skin_name=chrome' border='0' /></a></center>
