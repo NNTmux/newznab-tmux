@@ -880,16 +880,18 @@ while( $i > 0 )
     {
         $h=$g-1;
         $f=$h*100;
+        $j=$g/10;
         if (( $array['POST_TO_RUN'] >= $g ) && ( $work_remaining_now > $f )) {
             $color = get_color();
-            shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.$h 'echo \"\033[38;5;\"$color\"m\" && $ds1 postprocess_$g $ds2 && cd $_bin && $_php processAdditional$g.php && echo \" \033[1;0;33m\" && $ds1 postprocess_$g $ds3' 2>&1 1> /dev/null");
+            shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.$h 'echo \"\033[38;5;\"$color\"m\" && $ds1 postprocess_$g $ds2 && cd $_bin && sleep $j && $_php processAdditional$g.php && echo \" \033[1;0;33m\" && $ds1 postprocess_$g $ds3' 2>&1 1> /dev/null");
         }
     }
 
     //check ffmpeg and mediainfo, kill if necessary
     if ( $array['KILL_PROCESS'] != "0" ) {
-        shell_exec("./check_process.sh mediainfo {$array['KILL_PROCESS']}");
-        shell_exec("./check_process.sh ffmpeg {$array['KILL_PROCESS']}");
+        echo "\n";
+        shell_exec("killall --older-than {$array['KILL_PROCESS']}s -9 mediainfo 2>&1 1> /dev/null");
+        shell_exec("killall --older-than {$array['KILL_PROCESS']}s -9 ffmpg 2>&1 1> /dev/null");
     }
 
     //notify monitor that optimize is running
