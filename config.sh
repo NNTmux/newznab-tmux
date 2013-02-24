@@ -111,6 +111,7 @@ export MAXDAYS="210"
 #then the script stops (once per loop), if your first_record_postdate on the group is 2012-06-24
 #it will be skipped (target reached). When that group is done, it will do another ( again from z to a).
 #this does not use increment, it works by the date set below
+#you also need to enable kevin's compression mod, those files are needed
 export KEVIN_SAFER="false"
 
 #set the date to go back to, must be in the format of YYYY-MM-DD, like 2012-06-24
