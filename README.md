@@ -14,18 +14,6 @@
   mysqldump --opt -u root -p newznab > ~/newznab_backup.sql
   ```
 
-
- * The first step is to decide whether or not you will convert your database to the InnoDB engine. The InnoDB has a lot of benefits, too many to list here, but more ram is required. How much exactly, depends on too many things to list here.
-
- * If you decide to convert your database, I recommend using [kevin123's github](https://github.com/kevinlekiller/Newznab-Barracuda.git). I recommend only converting the binaries a parts table, using compressed tables. But, there are many choices. I suggest you read his README and follow his recommendations. Or, simply:
-
-  ```bash
-  cd /var/www/newznab/misc/testing
-  git clone https://github.com/kevinlekiller/Newznab-Barracuda barracuda
-  cd barracuda/B\ +\ P/
-  php bpinnodb_compressed.php
-  ```
-
  * Now, Clone my github. Theses scripts should be able to run from any path, but this location is where I was asked to put it.
 
   ```bash
@@ -45,6 +33,10 @@
 
   ```bash
   cd scripts && ./set_perms.sh
+  or
+  cd scripts && ./update_svn.php   #this will completely erase any changes you have made to you nn+ install and reset to stock files, then it set permissions and make the necessary file edits
+  or
+  cd scripts && ./fix_files        # same as above, but will not update svn
   ```
 
  * Run my script, as user. There are many parts that require sudo or root, especially if you have grsec compliled into the kernel. I have put checks in that will require elevated priviledges.
