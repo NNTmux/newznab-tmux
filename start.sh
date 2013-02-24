@@ -93,8 +93,10 @@ else
     TMPUNRAR_PATH=$TMPUNRAR_PATH"1"
 
     #remove the ramdisk, previous versions were smaller
-    if [[ ! `mountpoint -q $TMPUNRAR_PATH` ]]; then
-        umount $TMPUNRAR_PATH &> /dev/null
+    if [[ $RAMDISK == "true" ]]; then
+        if [[ ! `mountpoint -q $TMPUNRAR_PATH` ]]; then
+            umount $TMPUNRAR_PATH &> /dev/null
+        fi
     fi
 
     #remove and recreate, this is to ensure an empty folder for moounting into
