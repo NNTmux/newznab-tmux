@@ -36,6 +36,7 @@ if [[ $KEVINS_COMP == "true" ]]; then
 fi
 
 #set user/group to www
+echo "Fixing permisions, this can take some time if you have a large set of releases"
 if [[ $CHOWN_TRUE == "true" ]]; then
     chown -c $WWW_USER $NEWZPATH/*
     chown -Rc $WWW_USER $NEWZPATH/www/
@@ -52,3 +53,16 @@ else
     chmod 777 $NEWZPATH/www
     chmod 777 $NEWZPATH/www/install
 fi
+
+echo -e "\033[38;5;160mCompleted\033[39m"
+
+echo -e "\033[1;33m\n\nIf the nmon, bwg-nm windows close when you select networking, then you will need to use sudo or su."
+echo -e "or add them to sudo for your user.\n"
+echo -e "Tmux is very easy to use. To detach from the current session, use Ctrl-a d. You can select"
+echo -e "simply by clicking in it and you can resize by dragging the borders.\n"
+echo -e "To reattach to a running session, tmux att."
+echo -e "To navigate between panes, Ctrl-a q then the number of the pane."
+echo -e "To navigate between windows, Ctrl-a then the number of the window."
+echo -e "To create a new window, Ctrl-a c \n\n\033[0m"
+exit
+
