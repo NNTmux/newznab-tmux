@@ -829,7 +829,7 @@ while( $i > 0 )
         }
     }
 
-    //display runtime infor for seq in pane 0.3
+    //display runtime information for seq in pane 0.3
     if ( $array['SEQUENTIAL'] == "true" ) {
         if (( $array['BACKFILL'] == "true" ) && ( $array['BINARIES'] == "true" )) {
             $color = get_color();
@@ -847,6 +847,14 @@ while( $i > 0 )
         }
     }
 
+    //kill panes for sequential
+    if ( $array['SEQUENTIAL'] == "true" ) {
+        if (( $parts_rows_unformated > $array['BINARIES_MAX_ROWS'] ) && ( $array['BINARIES'] == "true" ) && ( $array['BINARIES_MAX_ROWS'] != 0 ) && ( $parts_rows_unformated > $array['BACKFILL_MAX_ROWS'] ) && ( $array['BACKFILL'] == "true" ) && ( $array['BACKFILL_MAX_ROW$
+            $color = get_color();
+            shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.2 'echo \"\033[38;5;\"$color\"m\nBINARIES_MAX_ROWS and BACKFILL_MAX_ROWS exceeded\" && $ds1 binaries $ds4'");
+            shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.3 'echo \"\033[38;5;\"$color\"m\nBINARIES_MAX_ROWS and BACKFILL_MAX_ROWS exceeded\" && $ds1 backfill $ds4'");
+        }
+    }
 
     //runs nzb-import in 0.4 once if needed and exits
     if (( $array['IMPORT'] == "true" ) && (( $total_work_now < $array['IMPORT_MAX_RELEASES'] ) || ( $array['IMPORT_MAX_RELEASES'] == 0 )) && (( $parts_rows_unformated < $array['IMPORT_MAX_ROWS'] ) || ( $array['IMPORT_MAX_ROWS'] == 0 ))) {
