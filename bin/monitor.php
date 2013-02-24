@@ -41,7 +41,6 @@ $_bin = dirname(__FILE__)."/../bin";
 $_alienx = dirname(__FILE__)."/../alienx";
 $_conf = dirname(__FILE__)."/../conf";
 $_cj = dirname(__FILE__)."/../nnscripts";
-$use_addtional=$array['USE_ADDITIONAL'];
 $NNPATH="{$array['NEWZPATH']}{$array['NEWZNAB_PATH']}";
 $TESTING="{$array['NEWZPATH']}{$array['TESTING_PATH']}";
 

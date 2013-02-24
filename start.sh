@@ -92,23 +92,12 @@ else
     TMPUNRAR_PATH=`$MYSQL --defaults-file=conf/my.cnf -u$DB_USER -h$DB_HOST $DB_NAME -s -N -e "${TMPUNRAR_QUERY}"`
     TMPUNRAR_PATH=$TMPUNRAR_PATH"1"
 
-    #remove the ramdisk, previous versions were smaller
-    if [[ $RAMDISK == "true" ]]; then
-        if [[ ! `mountpoint -q $TMPUNRAR_PATH` ]]; then
-            umount $TMPUNRAR_PATH &> /dev/null
-        fi
-    fi
-
-    #remove and recreate, this is to ensure an empty folder for moounting into
-    rm -rf $TMPUNRAR_PATH
-    mkdir -p $TMPUNRAR_PATH
-
-    #create a ramdisk
-    if [[ $RAMDISK == "true" ]]; then
+    #determine if ramdisk is in fstab
+    if [[ `grep "$TMPUNRAR_PATH" /etc/fstab` ]]; then
+        mountpoint -q $TMPUNRAR_PATH || mount "$TMPUNRAR_PATH"
+    elif [[ $RAMDISK == "true" ]]; then
         mountpoint -q $TMPUNRAR_PATH || mount -t tmpfs -o size=256M tmpfs $TMPUNRAR_PATH
     fi
-
-    chmod -R 777 $TMPUNRAR_PATH
 
     #remove postprocessing scripts
     rm -f bin/lib/post*
@@ -143,8 +132,6 @@ else
                     \$tmpPath .= '1\/tmp1';/g" bin/lib/postprocess1.php
     $SED -i -e 's/order by r.postdate desc limit %d.*$/order by r.guid desc limit %d ", ($maxattemptstocheckpassworded + 1) * -1, $numtoProcess));/g' bin/lib/postprocess1.php
     $SED -i -e 's/PostPrc : Performing additional post processing.*$/PostPrc : Performing additional post processing by guid on ".$rescount." releases ...";/g' bin/lib/postprocess1.php
-
-    chmod -R 777 $TMPUNRAR_PATH
 
     #start tmux
     #printf "\033]0; $TMUX_SESSION\007\003\n"

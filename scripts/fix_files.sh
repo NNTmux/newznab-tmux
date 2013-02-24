@@ -35,6 +35,13 @@ if [[ $KEVINS_COMP == "true" ]]; then
     cp -frv * $NEWZPATH/www/lib/
 fi
 
+#determine if ramdisk is in fstab and mount
+if [[ `grep "$TMPUNRAR_PATH" /etc/fstab` ]]; then
+    mountpoint -q $TMPUNRAR_PATH || mount "$TMPUNRAR_PATH"
+elif [[ $RAMDISK == "true" ]]; then
+    mountpoint -q $TMPUNRAR_PATH || mount -t tmpfs -o size=256M tmpfs $TMPUNRAR_PATH
+fi
+
 #set user/group to www
 if [[ $CHOWN_TRUE == "true" ]]; then
     chown -c $WWW_USER $NEWZPATH/*
@@ -46,10 +53,12 @@ if [[ $CHOWN_TRUE == "true" ]]; then
     chmod -R 775 $NEWZPATH/www/covers
     chmod 775 $NEWZPATH/www
     chmod 775 $NEWZPATH/www/install
+    chmod -R 777 $TMPUNRAR_PATH
 else
     chmod 777 $NEWZPATH/www/lib/smarty/templates_c
     chmod -R 777 $NEWZPATH/www/covers
     chmod 777 $NEWZPATH/www
     chmod 777 $NEWZPATH/www/install
+    chmod -R 777 $TMPUNRAR_PATH
 fi
 

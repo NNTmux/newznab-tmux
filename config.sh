@@ -284,11 +284,6 @@ export POWERLINE="false"
 
 ############################################################
 
-#Use tmpfs to run postprocessing on true/false
-export RAMDISK="false"
-
-############################################################
-
 #use kevin123's compression mod true/false
 #this will copy kevin123's compression mod to the correct location when you update_svn.sh or fix_files.sh
 #this ensures that kevin123's files are present after updaing svn
@@ -313,6 +308,15 @@ export NEWZDASH_URL=""
 
 ###########################################################
 
+#Use tmpfs to run postprocessing on true/false
+#to keep from running scripts as root, you can create your own ramdisk by adding the next line to /etc/fstab
+#tmpfs /var/www/newznab/nzbfiles/tmpunrar1 tmpfs nodev,nodiratime,nosuid,size=256M 0 0
+#edit the path, the path MUST be the path in site edit with a "1" appended to the end, like above
+#you still need to set this to true or mount it manually as your user, not as root
+export RAMDISK="false"
+
+############################################################
+
 #set svn password, for use with scripts/update_svn.sh
 #update_svn.sh is destructive, it update your version to match th esvn version
 export SVN_PASSWORD="password"
@@ -321,6 +325,9 @@ export SVN_PASSWORD="password"
 #to chown -R the path, enable and set user/group
 #newznab/nzbfiles is not chown'd
 export CHOWN_TRUE="false"
+
+#set CHOWN_TRUE="true" and WWW_USER="{youruser}:www-data" and run update_svn.sh or fix_files.sh
+#and you will will not need root to run these scripts
 export WWW_USER="www-data:www-data"
 
 ###########################################################
