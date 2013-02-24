@@ -159,6 +159,12 @@ export IMPORT_TRUE="false"
 
 ############################################################
 
+#MAX_RELEASES for each can be calculated on the total postprocessing or just the Misc category
+#to calculate on just the Misc, enable this
+export MISC_ONLY="false"
+
+############################################################
+
 #Create releases, this is really only necessary to turn off when you only want to postprocess
 export RELEASES="false"
 
