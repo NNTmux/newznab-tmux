@@ -32,20 +32,18 @@
  * Edit some permissions and a file, run this as root. If, when you run ./start.sh you see 0 nzb's and you are sure there are more than 0 left to import, verify the path to the nzb's in .tmux_user.conf in the conf folder and is created at first run.
 
   ```bash
-  cd scripts && ./set_perms.sh
-  or
   cd scripts && ./update_svn.php   #this will completely erase any changes you have made to you nn+ install and reset to stock files, then it set permissions and make the necessary file edits
   or
   cd scripts && ./fix_files        # same as above, but will not update svn
   ```
 
- * Run my script, as user. There are many parts that require sudo or root, especially if you have grsec compliled into the kernel. I have put checks in that will require elevated priviledges.
+ * Run my script, as user. I have made it as easy as possible to run these scripts without the need for root or sudo. You just need to read the defaults.sh file ramdisk and chown sections.
 
   ```bash
   cd ../ && ./start.sh
   ```
 
- * Several commands require root priviledges, such as editing files, chmod the paths, creating the ramdisk. If you have grsec compiled into your kernel, you will also need root priviledges for nmon and any other network monitoring app.
+ * If you have grsec compiled into your kernel, you may still need root priviledges for nmon and any other network monitoring app.
 
  * Additional scripts included in the script folder. I have included prepare.sh to make updating these scripts a little easier. I also included an svn updater, update_svn.sh. It performs a forced svn update, which overwrites any changes you may have may to the stock nn+ scripts and the updates the database. Also, included is revert.sh. This file removes the changes made to postprocess.sh and you need to run this before running stock update_releases.php.
  
