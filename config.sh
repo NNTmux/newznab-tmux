@@ -310,7 +310,7 @@ export NEWZDASH_URL=""
 
 #Use tmpfs to run postprocessing on true/false
 #to keep from running scripts as root, you can create your own ramdisk by adding the next line to /etc/fstab
-#tmpfs /var/www/newznab/nzbfiles/tmpunrar1 tmpfs nodev,nodiratime,nosuid,size=256M 0 0
+#tmpfs /var/www/newznab/nzbfiles/tmpunrar1 tmpfs nodev,nodiratime,nosuid,size=256M,mode=777 0 0
 #edit the path, the path MUST be the path in site edit with a "1" appended to the end, like above
 #you still need to set this to true or mount it manually as your user, not as root
 export RAMDISK="false"
