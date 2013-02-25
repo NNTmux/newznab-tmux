@@ -520,8 +520,6 @@ while( $i > 0 )
     printf("\033[38;5;214m");
     printf($mask, "Queries","$query_timer","queried");
 
-echo $total_work_now;
-echo $total_work_used;
     //see if tmux.conf needs to be reloaded
     if ( $_tmux_test != $array['POWERLINE'] ) {
         if ( $array['POWERLINE'] == "true" ) {
