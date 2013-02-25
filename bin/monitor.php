@@ -905,7 +905,7 @@ while( $i > 0 )
     if ( $array['KILL_PROCESS'] != "0" ) {
         echo "\n";
         shell_exec("killall -q -o {$array['KILL_PROCESS']}s -9 mediainfo");
-        shell_exec("killall -q -o {$array['KILL_PROCESS']}s -9 ffmpg");
+        shell_exec("killall -q -o {$array['KILL_PROCESS']}s -9 ffmpeg");
     }
 
     //notify monitor that optimize is running
