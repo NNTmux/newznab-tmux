@@ -904,8 +904,8 @@ while( $i > 0 )
     //check ffmpeg and mediainfo, kill if necessary
     if ( $array['KILL_PROCESS'] != "0" ) {
         echo "\n";
-        shell_exec("killall --older-than {$array['KILL_PROCESS']}s -9 mediainfo 2>&1 1> /dev/null");
-        shell_exec("killall --older-than {$array['KILL_PROCESS']}s -9 ffmpg 2>&1 1> /dev/null");
+        shell_exec("killall -q -o {$array['KILL_PROCESS']}s -9 mediainfo");
+        shell_exec("killall -q -o {$array['KILL_PROCESS']}s -9 ffmpg");
     }
 
     //notify monitor that optimize is running
