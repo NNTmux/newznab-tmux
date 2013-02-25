@@ -366,12 +366,6 @@ while( $i > 0 )
     $work_misc_diff = $work_remaining_now - $work_remaining_start;
 
     $total_work_now = $work_remaining_now + $tvrage_releases_proc + $music_releases_proc + $movie_releases_proc + $console_releases_proc + $book_releases_proc + $nfo_remaining_now;
-    if ( $array['MISC_ONLY'] == "true" ) {
-        $total_work_used = $misc_releases_now;
-    } else {
-        $total_work_used = $total_work_now;
-    }
-
     if ( $i == 1 ) { $total_work_start = $total_work_now; }
     $total_work_now_formatted = number_format($total_work_now);
 
@@ -423,6 +417,12 @@ while( $i > 0 )
         $tvrage_percent = 0;
         $book_percent = 0;
         $misc_percent = 0;
+    }
+
+    if ( $array['MISC_ONLY'] == "true" ) {
+        $total_work_used = $work_remaining_now;
+    } else {
+        $total_work_used = $total_work_now;
     }
 
     //get state for binaries
@@ -520,6 +520,8 @@ while( $i > 0 )
     printf("\033[38;5;214m");
     printf($mask, "Queries","$query_timer","queried");
 
+echo $total_work_now;
+echo $total_work_used;
     //see if tmux.conf needs to be reloaded
     if ( $_tmux_test != $array['POWERLINE'] ) {
         if ( $array['POWERLINE'] == "true" ) {
