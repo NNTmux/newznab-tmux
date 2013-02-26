@@ -334,6 +334,11 @@ export NEWZDASH_URL=""
 #you still need to set this to true or mount it manually as your user, not as root
 export RAMDISK="false"
 
+#for freebsd, it is just a little different, you can either create the ramdisk and mount it by adding the next line to /etc/fstab
+#tmpfs /var/www/newznab/nzbfiles/tmpunrar1 tmpfs rw,size=256M,mode=777 0 0
+#or, give users the permission to mount it by running sudo sysctl vfs.usermount=1 and then add the next line to /etc/fstab
+#tmpfs /var/www/newznab/nzbfiles/tmpunrar1 tmpfs rw,noauto,size=256M,mode=777 0 0
+
 ############################################################
 
 #set svn password, for use with scripts/update_svn.sh

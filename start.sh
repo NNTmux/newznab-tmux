@@ -94,9 +94,13 @@ else
 
     #determine if ramdisk is in fstab
     if [[ `grep "$TMPUNRAR_PATH" /etc/fstab` ]]; then
-        mountpoint -q $TMPUNRAR_PATH || mount "$TMPUNRAR_PATH"
+        if [[ ! `mount | grep "$TMPUNRAR_PATH"` ]]; then
+            mount "$TMPUNRAR_PATH"
+        fi
     elif [[ $RAMDISK == "true" ]]; then
-        mountpoint -q $TMPUNRAR_PATH || mount -t tmpfs -o size=256M tmpfs $TMPUNRAR_PATH
+        if [[ ! `mount | grep "$TMPUNRAR_PATH"` ]]; then
+            mount -t tmpfs -o size=256M tmpfs $TMPUNRAR_PATH
+        fi
     fi
 
     #remove postprocessing scripts
