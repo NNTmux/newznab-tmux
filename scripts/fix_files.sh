@@ -38,11 +38,11 @@ fi
 #set user/group to www
 echo "Fixing permisions, this can take some time if you have a large set of releases"
 if [[ $CHOWN_TRUE == "true" ]]; then
-    chown -c $WWW_USER $NEWZPATH/*
-    chown -Rc $WWW_USER $NEWZPATH/www/
-    chown -Rc $WWW_USER $NEWZPATH/db/
-    chown -Rc $WWW_USER $NEWZPATH/docs/
-    chown -Rc $WWW_USER $NEWZPATH/misc/
+    chown -vv $WWW_USER $NEWZPATH/*
+    chown -Rvv $WWW_USER $NEWZPATH/www/
+    chown -Rvv $WWW_USER $NEWZPATH/db/
+    chown -Rvv $WWW_USER $NEWZPATH/docs/
+    chown -Rvv $WWW_USER $NEWZPATH/misc/
     chmod 775 $NEWZPATH/www/lib/smarty/templates_c
     chmod -R 775 $NEWZPATH/www/covers
     chmod 775 $NEWZPATH/www
