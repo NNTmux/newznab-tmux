@@ -261,21 +261,33 @@ export MOVIE_TIMER="43200"
 
 ############################################################
 
-#Specify your SED binary
+#Specify your SED binary, if you are using freebsd or mac, you need to install gnu sed (gsed) and adjust the path
 export SED="/bin/sed"
 #export SED="/usr/local/bin/gsed"
+
+#freebsd, and maybe mac, does not contain SIGSTKFLT, SIGCLD, SIGPOLL, SIGPWR
+#and powerprocess.php will error on one of those, but appears to work if they
+#are commented out, enable to have the script comment them out while running update_svn
+export FIX_POSIX="false"
 
 ############################################################
 
 #Select some monitoring script, if they are not installed, it will not affect the running of the scripts
 #these are set to false by default, enable if you want them
 export USE_HTOP="false"
-export USE_NMON="false"
 export USE_BWMNG="false"
-export USE_IOTOP="false"
 export USE_MYTOP="false"
 export USE_VNSTAT="false"
+export USE_ATOP="false"
+export USE_NMON="false"
+export USE_IOTOP="false"
+
+#freebsd does not have iotop, but can run top -m io -o total
+export USE_TOP="false"
+
 export USE_IFTOP="false"
+#select interface to listen, only 1 interface
+export INTERFACE="eth0"
 
 #an additional window can be created manually with Ctrl-a c or it can be created at start of script
 export USE_CONSOLE="false"
@@ -353,32 +365,38 @@ export AGREED="no"
 
 ##END OF EDITS##
 
-command -v mysql >/dev/null 2>&1 || { echo >&2 "I require mysql but it's not installed.  Aborting."; exit 1; } && export MYSQL=`command -v mysql`
+command -v mysql >/dev/null 2>&1 || { echo >&2 "I require mysql but it's not installed. Aborting."; exit 1; } && export MYSQL=`command -v mysql`
 command -v php5 >/dev/null 2>&1 && export PHP=`command -v php5` || { export PHP=`command -v php`; }
-command -v tmux >/dev/null 2>&1 || { echo >&2 "I require tmux but it's not installed.  Aborting."; exit 1; } && export TMUXCMD=`command -v tmux`
-command -v nice >/dev/null 2>&1 || { echo >&2 "I require nice but it's not installed.  Aborting."; exit 1; } && export NICE=`command -v nice`
+command -v tmux >/dev/null 2>&1 || { echo >&2 "I require tmux but it's not installed. Aborting."; exit 1; } && export TMUXCMD=`command -v tmux`
+command -v nice >/dev/null 2>&1 || { echo >&2 "I require nice but it's not installed. Aborting."; exit 1; } && export NICE=`command -v nice`
 
 
 if [[ $USE_HTOP == "true" ]]; then
-  command -v htop >/dev/null 2>&1|| { echo >&2 "I require htop but it's not installed.  Aborting."; exit 1; } && export HTOP=`command -v htop`
+  command -v htop >/dev/null 2>&1|| { echo >&2 "I require htop but it's not installed. Aborting."; exit 1; } && export HTOP=`command -v htop`
 fi
 if [[ $USE_NMON == "true" ]]; then
-  command -v nmon >/dev/null 2>&1 || { echo >&2 "I require nmon but it's not installed.  Aborting."; exit 1; } && export NMON=`command -v nmon`
+  command -v nmon >/dev/null 2>&1 || { echo >&2 "I require nmon but it's not installed. Aborting."; exit 1; } && export NMON=`command -v nmon`
 fi
 if [[ $USE_BWMNG == "true" ]]; then
-  command -v bwm-ng >/dev/null 2>&1|| { echo >&2 "I require bwm-ng but it's not installed.  Aborting."; exit 1; } && export BWMNG=`command -v bwm-ng`
+  command -v bwm-ng >/dev/null 2>&1|| { echo >&2 "I require bwm-ng but it's not installed. Aborting."; exit 1; } && export BWMNG=`command -v bwm-ng`
 fi
 if [[ $USE_IOTOP == "true" ]]; then
-  command -v iotop >/dev/null 2>&1|| { echo >&2 "I require iotop but it's not installed.  Aborting."; exit 1; } && export IOTOP=`command -v iotop`
+  command -v iotop >/dev/null 2>&1|| { echo >&2 "I require iotop but it's not installed. Aborting."; exit 1; } && export IOTOP=`command -v iotop`
+fi
+if [[ $USE_TOP == "true" ]]; then
+  command -v top >/dev/null 2>&1|| { echo >&2 "I require top but it's not installed. Aborting."; exit 1; } && export TOP=`command -v top`
 fi
 if [[ $USE_MYTOP == "true" ]]; then
-  command -v mytop >/dev/null 2>&1|| { echo >&2 "I require mytop but it's not installed.  Aborting."; exit 1; } && export MYTOP=`command -v mytop`
+  command -v mytop >/dev/null 2>&1|| { echo >&2 "I require mytop but it's not installed. Aborting."; exit 1; } && export MYTOP=`command -v mytop`
 fi
 if [[ $USE_VNSTAT == "true" ]]; then
   command -v vnstat >/dev/null 2>&1|| { echo >&2 "I require vnstat but it's not installed. Aborting."; exit 1; } && export VNSTAT=`command -v vnstat`
 fi
 if [[ $USE_IFTOP == "true" ]]; then
   command -v iftop >/dev/null 2>&1|| { echo >&2 "I require iftop but it's not installed. Aborting."; exit 1; } && export IFTOP=`command -v iftop`
+fi
+if [[ $USE_ATOP == "true" ]]; then
+  command -v atop >/dev/null 2>&1|| { echo >&2 "I require atop but it's not installed. Aborting."; exit 1; } && export ATOP=`command -v atop`
 fi
 if [[ $POWERLINE == "true" ]]; then
   export TMUX_CONF="powerline/tmux.conf"

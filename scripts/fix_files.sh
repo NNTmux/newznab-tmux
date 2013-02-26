@@ -29,6 +29,18 @@ if [[ $CLEANUP_EDIT  == "true" ]]; then
     sed -i -e 's/^$limited =.*$/$limited = false;/' $TESTING_PATH/update_cleanup.php
 fi
 
+#edit powerprocess.php
+if [[ $FIX_POSIX  == "true" ]]; then
+    sed -i -e 's/case SIGSTKFLT:/\/\/case SIGSTKFLT:/' $NEWZPATH/www/lib/powerprocess.php
+    sed -i -e 's/return 'SIGSTKFLT';/\/\/return 'SIGSTKFLT';/' $NEWZPATH/www/lib/powerprocess.php
+    sed -i -e 's/case SIGCLD:/\/\/case SIGCLD:/' $NEWZPATH/www/lib/powerprocess.php
+    sed -i -e 's/return 'SIGCLD';/\/\/return 'SIGCLD';/' $NEWZPATH/www/lib/powerprocess.php
+    sed -i -e 's/case SIGPOLL:/\/\/case SIGPOLL:/' $NEWZPATH/www/lib/powerprocess.php
+    sed -i -e 's/return 'SIGPOLL';/\/\/return 'SIGPOLL';/' $NEWZPATH/www/lib/powerprocess.php
+    sed -i -e 's/case SIGPWR:/\/\/case SIGPWR:/' $NEWZPATH/www/lib/powerprocess.php
+    sed -i -e 's/return 'SIGPWR';/\/\/return 'SIGPWR';/' $NEWZPATH/www/lib/powerprocess.php
+fi
+
 #import kevin123's compression mod
 if [[ $KEVINS_COMP == "true" ]]; then
     cd $DIR"/kevin123"

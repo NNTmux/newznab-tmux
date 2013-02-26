@@ -239,6 +239,10 @@ else
         $TMUXCMD new-window -n iotop '$IOTOP -o'
     fi
 
+    if [[ $USE_TOP == "true" ]]; then
+        $TMUXCMD new-window -n top '$TOP -m io -zto total'
+    fi
+
     if [[ $USE_MYTOP == "true" ]]; then
         $TMUXCMD new-window -n mytop '$MYTOP -u $DB_USER -p $DB_PASSWORD -d $DB_NAME -h $DB_HOST'
     fi
@@ -248,12 +252,17 @@ else
     fi
 
     if [[ $USE_IFTOP == "true" ]]; then
-        $TMUXCMD new-window -n iftop '$IFTOP'
+        $TMUXCMD new-window -n iftop '$IFTOP -i $INTERFACE'
+    fi
+
+    if [[ $USE_ATOP == "true" ]]; then
+        $TMUXCMD new-window -n atop '$ATOP'
     fi
 
     if [[ $USE_CONSOLE == "true" ]]; then
         $TMUXCMD new-window -n Console 'bash -i'
     fi
+
     $TMUXCMD select-window -t$TMUX_SESSION:0
     $TMUXCMD attach-session -d -t$TMUX_SESSION
 

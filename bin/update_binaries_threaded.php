@@ -80,7 +80,7 @@ if ($ps->RunThreadCode())
 	$file = 'update_binaries.php';
 	
 	//$output = shell_exec("php {$dir}/{$file} {$param}");
-	$output = shell_exec("php {$dir}/{$file} {$param}");
+	$output = shell_exec("cd {$dir}/ && php {$file} {$param}");
 	//$output = shell_exec("/usr/bin/php -c /etc/php5/cli/php.ini {$dir}/{$file} {$param}");
 	
 	echo "[Thread-{$thread}] Completed update for group {$group['name']}\n";

@@ -880,6 +880,15 @@ while( $i > 0 )
         shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.4 'echo \"\033[38;5;\"$color\"m\nnzb-import Disabled by IMPORT\nThis is color #$color\"' 2>&1 1> /dev/null");
     }
 
+    //runs nzbcount in 0.1 loops
+    if ( $array['IMPORT'] == "true" ) {
+        $color = get_color();
+        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.1 'echo \"\033[38;5;\"$color\"m\" && $ds1 nzbcount $ds2 && cd $_bin && $_php nzbcount.php' 2>&1 1> /dev/null");
+    } else {
+        $color = get_color();
+        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.1 'echo \"\033[38;5;\"$color\"m\nnzbcount Disabled by IMPORT\" && $ds1 nzbcount $ds4'");
+    }
+
     //runs update_release and in 0.5 once if needed and exits
     if ( $array['RELEASES'] == "true" ) {
         $color = get_color();
@@ -898,6 +907,9 @@ while( $i > 0 )
         if (( $array['POST_TO_RUN'] >= $g ) && ( $work_remaining_now > $f )) {
             $color = get_color();
             shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.$h 'echo \"\033[38;5;\"$color\"m\" && $ds1 postprocess_$g $ds2 && cd $_bin && sleep $j && $_php processAdditional$g.php && echo \" \033[1;0;33m\" && $ds1 postprocess_$g $ds3' 2>&1 1> /dev/null");
+        } elseif (( $array['POST_TO_RUN'] >= $g ) && ( $work_remaining_now <= $f )) {
+            $color = get_color();
+            shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.$h 'echo \"\033[38;5;\"$color\"m\npostprocess_$g \n$work_remaining_now < $f\nHas no work to process \nThis is color #$color\"' 2>&1 1> /dev/null");
         }
     }
 
