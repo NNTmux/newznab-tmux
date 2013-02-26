@@ -909,7 +909,7 @@ while( $i > 0 )
     }
 
     //notify monitor that optimize is running
-    if ( ! shell_exec("$_tmux list-panes -t {$array['TMUX_SESSION']}:1 | grep 4: | grep dead") ) {
+    if (( ! shell_exec("$_tmux list-panes -t {$array['TMUX_SESSION']}:1 | grep 4: | grep dead") && ( $array['OPTIMIZE'] == "true" )) {
         echo "\033[1;41;33mOPTIMIZATION OF THE MYSQL TABLES HAS STARTED, DO NOT STOP THIS SCRIPT!\033[1;0;33m\n\n";
     }
 
