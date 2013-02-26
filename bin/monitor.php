@@ -667,7 +667,7 @@ while( $i > 0 )
 
     //run update_missing_movie_info  parts in pane 1.7
     if (((( TIME() - $time17 ) >= $array['MOVIE_TIMER'] ) || ( $i == 1 )) && ( $array['FETCH_MOVIE'] == "true" )) {
-        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.7 'echo \"\033[38;5;\"$color\"m\" && $ds1 fetch movie $ds2 && cd $_cj && $_php update_missing_movie_info.php && $ds1 fetch movie $ds3' 2>&1 1> /dev/null");
+        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.7 'echo \"\033[38;5;\"$color\"m\" && $ds1 fetch_movie $ds2 && cd $_cj && $_php update_missing_movie_info.php && $ds1 fetch_movie $ds3' 2>&1 1> /dev/null");
         $time17 = TIME();
     } elseif ( $array['FETCH_MOVIE'] != "true" ) {
         $color = get_color();
