@@ -531,7 +531,7 @@ class Nntp extends Net_NNTP_Client
 				if ($totalbytesreceived > 10240)
 				if ($totalbytesreceived%128 == 0)
 				{
-					echo "bytes recived: ";
+					echo "bytes received: ";
 					echo $totalbytesreceived;
 					echo "\r";
 				}

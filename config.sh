@@ -251,6 +251,9 @@ export SPHINX_TIMER="3600"
 #it should not need to run longer that 120 seconds
 export KILL_PROCESS="0"
 
+#look at man killall - if you have the -q option, enable this, otherwise leave it disabled
+export KILL_QUIET="false"
+
 ############################################################
 
 #Delete parts and binaries older than retention days, which is set in edit - site
@@ -321,8 +324,8 @@ export KEVINS_COMP="false"
 #set your LANG to which ever you like, only effects these scripts
 export LANG="en_US.UTF-8"
 
-#to help IMDB return only english titles, enable this, you will need to run update_svn.php or fix_files.php
-export EN_IMDB="true"
+#to help IMDB return only english titles, enable this, you will need to run update_svn.php or fix_files.sh
+export EN_IMDB="false"
 
 ############################################################
 
