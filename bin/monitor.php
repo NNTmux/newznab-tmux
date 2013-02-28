@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.1r688";
+$version="0.1r670";
 
 $db = new DB();
 
@@ -945,7 +945,7 @@ while( $i > 0 )
         $j=$g*2;
         if (( $array['POST_TO_RUN'] >= $g ) && ( $work_remaining_now > $f )) {
             $color = get_color();
-            shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.$h 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes2[$h] $ds2 && cd $_bin && sleep $j && $_php processAdditional$g.php |& tee -a $path/../logs/$panes2[$h]-$getdate.log && echo \" \033[1;0;33m\" && $ds1 $panes1[$g] $ds3' 2>&1 1> /dev/null");
+            shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.$h 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes2[$h] $ds2 && cd $_bin && sleep $j && $_php processAdditional$g.php |& tee -a $path/../logs/$panes2[$h]-$getdate.log && echo \" \033[1;0;33m\" && $ds1 $panes2[$h] $ds3' 2>&1 1> /dev/null");
         } elseif (( $array['POST_TO_RUN'] >= $g ) && ( $work_remaining_now <= $f )) {
             $color = get_color();
             shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.$h 'echo \"\033[38;5;\"$color\"m\n$panes2[$h]\n$work_remaining_now < $f\nHas no work to process \nThis is color #$color\"' 2>&1 1> /dev/null");
