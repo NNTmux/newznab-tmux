@@ -162,19 +162,19 @@ else
     $TMUXCMD splitw -v -p 67 'printf "\033]2;delete_parts\033\\"'
     $TMUXCMD splitw -v -p 50 'printf "\033]2;update_missing_movie_info\033\\"'
 
-    $TMUXCMD new-window -n post1 'printf "\033]2;postprocessing[1]\033\\"'
+    $TMUXCMD new-window -n post1 'printf "\033]2;postprocessing[01]\033\\"'
     $TMUXCMD selectp -t 0
-    $TMUXCMD splitw -v -p 75 'printf "\033]2;postprocessing[9]\033\\"'
+    $TMUXCMD splitw -v -p 75 'printf "\033]2;postprocessing[09]\033\\"'
     $TMUXCMD splitw -v -p 67 'printf "\033]2;postprocessing[17]\033\\"'
     $TMUXCMD splitw -v -p 50 'printf "\033]2;postprocessing[25]\033\\"'
     $TMUXCMD selectp -t 0
-    $TMUXCMD splitw -h -p 88 'printf "\033]2;postprocessing[2]\033\\"'
-    $TMUXCMD splitw -h -p 85 'printf "\033]2;postprocessing[3]\033\\"'
-    $TMUXCMD splitw -h -p 83 'printf "\033]2;postprocessing[4]\033\\"'
-    $TMUXCMD splitw -h -p 80 'printf "\033]2;postprocessing[5]\033\\"'
-    $TMUXCMD splitw -h -p 75 'printf "\033]2;postprocessing[6]\033\\"'
-    $TMUXCMD splitw -h -p 67 'printf "\033]2;postprocessing[7]\033\\"'
-    $TMUXCMD splitw -h -p 50 'printf "\033]2;postprocessing[8]\033\\"'
+    $TMUXCMD splitw -h -p 88 'printf "\033]2;postprocessing[02]\033\\"'
+    $TMUXCMD splitw -h -p 85 'printf "\033]2;postprocessing[03]\033\\"'
+    $TMUXCMD splitw -h -p 83 'printf "\033]2;postprocessing[04]\033\\"'
+    $TMUXCMD splitw -h -p 80 'printf "\033]2;postprocessing[05]\033\\"'
+    $TMUXCMD splitw -h -p 75 'printf "\033]2;postprocessing[06]\033\\"'
+    $TMUXCMD splitw -h -p 67 'printf "\033]2;postprocessing[07]\033\\"'
+    $TMUXCMD splitw -h -p 50 'printf "\033]2;postprocessing[08]\033\\"'
     $TMUXCMD selectp -t 8
     $TMUXCMD splitw -h -p 88 'printf "\033]2;postprocessing[10]\033\\"'
     $TMUXCMD splitw -h -p 85 'printf "\033]2;postprocessing[11]\033\\"'
