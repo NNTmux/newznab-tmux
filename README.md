@@ -18,7 +18,7 @@
   mysqldump --opt -u username -p newznab > ~/newznab_backup.sql
   ```
 
- * If, you have just created your Newznab+ database, you can save yourself some time by importing a sql file, written by \_zoggy\_ and updating your TvRage database. **DO NOT ** run this if your database has any releases in it.
+ * If, you have just created your Newznab+ database, you can save yourself some time by importing a sql file, written by \_zoggy\_ and updating your TvRage database. **DO NOT** run this if your database has any releases in it.
  
    ```bash
   mysql -u username -p newznab < scripts/tvrage-latest.sql
