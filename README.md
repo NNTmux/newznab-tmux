@@ -1,6 +1,6 @@
 # Newznab-tmux
 
- * Screen shots idententifying each pane and the process it runs is located at the bottom of this page.
+ * Screen shots identifying each pane and the process it runs is located at the bottom of this page.
  
  * Before submitting a bug report, please verify that you are running the current revision of Newznab+ and these scripts. Then include as much detail as possible. A screen shot is extremely telling and very helpful.
 
