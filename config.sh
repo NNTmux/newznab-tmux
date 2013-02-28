@@ -39,7 +39,7 @@ export TMUX_SESSION="Newznab"
 #Set, in seconds - how often the monitor.php (left top pane) script should update, 0 may cause errors
 export MONITOR_UPDATE="30"
 
-#you may want to kill the update_bianries, backfill and import if no releases have been add in x minutes, set the timer to anything other than 0 to enable
+#you may want to kill the update_binaries, backfill and import if no releases have been add in x minutes, set the timer to anything other than 0 to enable
 #this will only run every 5 loops of monitor
 export KILL_UPDATES="0"
 
@@ -59,7 +59,7 @@ export SEQUENTIAL="false"
 export BINARIES_SEQ_TIMER="1800"
 
 #this will not run on first loop, time between loop start for backfill, in seconds
-#default is 10 seconds, this will run after time has expired, binaries will take precedance and run before this, if its time has expired
+#default is 10 seconds, this will run after time has expired, binaries will take precedence and run before this, if its time has expired
 export BACKFILL_SEQ_TIMER="10"
 
 ############################################################
@@ -106,7 +106,7 @@ export BACKFILL_MAX_RELEASES="0"
 #set to 0 to disable
 export BACKFILL_MAX_ROWS="0"
 
-#Set the maximum days to backfill, you set the nn+ admin/edit backfill to 1
+#Set the maximum days to backfill, you set the Newznab+ admin/edit backfill to 1
 #this will increment your database by 1 after each backfill loop
 #once your backfill numbers reach $MAXDAYS, then it will no long increment the database
 #backfill will continue to run, and do no work, at that point you should disable backfill, below
@@ -140,7 +140,7 @@ export IMPORT="false"
 #If, you have all of your nzbs in one folder select false
 #If, you have all of you nzbs split into separate in with the root at $NZBS then select true
 #and 10 nzbs will be imported from each subfolder per loop.
-#Importing this way, allows all postprocessing scripts to run, such as book, music, movies
+#Importing this way, allows all post processing scripts to run, such as book, music, movies
 #Instead of doing all 1 type at once, spread the load
 export NZB_THREADS="false"
 
@@ -167,13 +167,13 @@ export IMPORT_TRUE="false"
 
 ############################################################
 
-#MAX_RELEASES for each can be calculated on the total postprocessing or just the Misc category
+#MAX_RELEASES for each can be calculated on the total post processing or just the Misc category
 #to calculate on just the Misc, enable this
 export MISC_ONLY="false"
 
 ############################################################
 
-#Create releases, this is really only necessary to turn off when you only want to postprocess
+#Create releases, this is really only necessary to turn off when you only want to post process
 export RELEASES="false"
 
 #Set, in seconds - how long the update_release should sleep between runs, 0 may cause errors
@@ -183,7 +183,7 @@ export RELEASES_SLEEP="40"
 ############################################################
 
 #Choose to run optimize_innodb.php or optimize_mysiam.php script true/false
-#set to false by default, you should test the optimse scripts in bin first
+#set to false by default, you should test the optimize scripts in bin first
 #optimize_myisam on small tables runs after every 5th loop of update_releases
 export OPTIMIZE="false"
 
@@ -263,7 +263,7 @@ export DELETE_PARTS="false"
 #how often should this be run, default it 1 hr
 export DELETE_TIMER="3600"
 
-#Releases may be added/eddited with an imdb-id that does not exists in the movieinfo table. This script, update_missing_movie_info,
+#Releases may be added/edited with an imdb-id that does not exists in the movieinfo table. This script, update_missing_movie_info,
 #will fetch all the missing imdb id's from the releases table.
 export FETCH_MOVIE="false"
 
@@ -316,7 +316,7 @@ export POWERLINE="false"
 
 #use kevin123's compression mod true/false
 #this will copy kevin123's compression mod to the correct location when you update_svn.sh or fix_files.sh
-#this ensures that kevin123's files are present after updaing svn
+#this ensures that kevin123's files are present after updating svn
 export KEVINS_COMP="false"
 
 ############################################################
@@ -324,12 +324,12 @@ export KEVINS_COMP="false"
 #set your LANG to which ever you like, only effects these scripts
 export LANG="en_US.UTF-8"
 
-#to help IMDB return only english titles, enable this, you will need to run update_svn.php or fix_files.sh
+#to help IMDB return only English titles, enable this, you will need to run update_svn.php or fix_files.sh
 export EN_IMDB="false"
 
 ############################################################
 
-#newzdash is a web front end to show statistics of your nn+ install
+#newzdash is a web front end to show statistics of your Newznab+ install
 #to use, you must first install from https://github.com/AlienXAXS/newzdash
 
 #this is YOUR shared key and allows these scripts to communicate with newzdash
@@ -341,7 +341,7 @@ export NEWZDASH_URL=""
 
 ###########################################################
 
-#Use tmpfs to run postprocessing on true/false
+#Use tmpfs to run post processing on true/false
 #to keep from running scripts as root, you can create your own ramdisk by adding the next line to /etc/fstab
 #tmpfs /var/www/newznab/nzbfiles/tmpunrar1 tmpfs user,nodev,nodiratime,nosuid,size=256M,mode=777 0 0
 #edit the path, the path MUST be the path in site edit with a "1" appended to the end, like above
@@ -356,7 +356,7 @@ export RAMDISK="false"
 ############################################################
 
 #set svn password, for use with scripts/update_svn.sh
-#update_svn.sh is destructive, it update your version to match th esvn version
+#update_svn.sh is destructive, it update your version to match the svn version
 export SVN_PASSWORD="password"
 
 #running update_svn as root will change file ownership of every file in the svn path
