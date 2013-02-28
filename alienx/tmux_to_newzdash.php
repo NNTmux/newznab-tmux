@@ -22,7 +22,7 @@
 	echo "[" . $argv[2] . "] " . date("D jS M Y - H:i:s") . "\n";
         if ( !$ndComms->init() )
 		die();
-		
+
 	$ndComms->broadcast($argv);
 
 ?>

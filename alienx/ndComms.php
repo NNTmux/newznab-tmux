@@ -1,10 +1,10 @@
 <?php
 	class newzdashComms
 	{
-		
+
 		public $URL;
 		public $SHARED_SECRET;
-		
+
 		public function init()
 		{
 			$varnames = null;
@@ -20,15 +20,15 @@
 			}
 			if ( ($vardata == null) || ($varnames == null) )
 				die();
-				
+
 			$varnames = explode("\n", $varnames);
 			$vardata = explode("\n", $vardata);
 			$array = array_combine($varnames, $vardata);
 			unset ( $array[''] );
-			
+
 			$this->URL = $array['NEWZDASH_URL'];
 			$this->SHARED_SECRET = $array['NEWZDASH_SHARED_SECRET'];
-			
+
 			if ( $this->URL == "" )
 			{
 				return false;
@@ -36,17 +36,17 @@
 				return true;
 			}
 		}
-		
+
 		public function broadcast ( $arguments )
 		{
 			if ( count($arguments) < 2 )
 				die ( "Invalid arguments count given in newzdash comms class\n" );
-			
+
 			$pane = $arguments[1];
 			$state = $arguments[2];
-			
+
 			//pname, pstate, ndsharedsecret
-			
+
 			$URL = $this->URL . "/tmuxapi.php?pname=" . urlencode($pane) . "&pstate=" . urlencode($state) . "&ndsharedsecret=" . urlencode($this->SHARED_SECRET);
 			$handle=fopen($URL, "r");
 			$ret = fread($handle, 8192);
@@ -64,6 +64,6 @@
 				default:
 					printf("NewzDash could not accept our communication:\nSomething went wrong!\n");
 			}
-		}	
+		}
 	}
 ?>

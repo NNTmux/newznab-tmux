@@ -38,7 +38,7 @@ if $TMUXCMD -q has-session -t $TMUX_SESSION; then
 else
     printf "The above is just a TMUX notice, it is saying TMUX, that you do not have a TMUX session currently running. It is not an error. It is TMUX"
     printf "\033]0; $TMUX_SESSION\007\003\n"
-    $TMUXCMD -f $TMUX_CONF new-session -d -s $TMUX_SESSION -n Monitor 'cd bin && echo "Monitor Started" && echo "It might take a minute for everything to spinup......" && $NICE -n 19 $PHP monitor.php'
+    $TMUXCMD -f $TMUX_CONF new-session -d -s $TMUX_SESSION -n Monitor 'printf "\033]2;Monitor\033\\" && cd bin && echo "Monitor Started" && echo "It might take a minute for everything to spinup......" && $NICE -n 19 $PHP monitor.php'
 
     if [ ! -f $NEWZPATH/www/lib/postprocess.php.orig ]; then
         cp $NEWZPATH/www/lib/postprocess.php $NEWZPATH/www/lib/postprocess.php.orig
@@ -141,91 +141,75 @@ else
     #printf "\033]0; $TMUX_SESSION\007\003\n"
     #$TMUXCMD -f $TMUX_CONF attach-session - $TMUX_SESSION || new-session -d -s $TMUX_SESSION -n $TMUX_SESSION 'cd bin && echo "Monitor Started" && echo "It might take a minute for everything to spinup......" && $NICE -n 19 $PHP monitor.php'
     $TMUXCMD selectp -t 0
-    $TMUXCMD splitw -h -p 67 'echo "..."'
+    $TMUXCMD splitw -h -p 67 'printf "\033]2;update_binaries\033\\"'
 
     $TMUXCMD selectp -t 0
-    $TMUXCMD splitw -v -p 33 'echo "..."'
+    $TMUXCMD splitw -v -p 33 'printf "\033]2;nzbcount\033\\"'
 
     $TMUXCMD selectp -t 2
-    $TMUXCMD splitw -v -p 75 'echo "..."'
-    $TMUXCMD splitw -v -p 67 'echo "..."'
-    $TMUXCMD splitw -v -p 50 'echo "..."'
+    $TMUXCMD splitw -v -p 75 'printf "\033]2;backfill\033\\"'
+    $TMUXCMD splitw -v -p 67 'printf "\033]2;import-nzb\033\\"'
+    $TMUXCMD splitw -v -p 50 'printf "\033]2;update_releases\033\\"'
 
-    $TMUXCMD new-window -n other 'echo "..."'
-    $TMUXCMD splitw -h -p 50 'echo "..."'
+    $TMUXCMD new-window -n other 'printf "\033]2;update_predb\033\\"'
+    $TMUXCMD splitw -h -p 50 'printf "\033]2;optimise\033\\"'
     $TMUXCMD selectp -t 0
-    $TMUXCMD splitw -v -p 75 'echo "..."'
-    $TMUXCMD splitw -v -p 67 'echo "..."'
-    $TMUXCMD splitw -v -p 50 'echo "..."'
+    $TMUXCMD splitw -v -p 75 'printf "\033]2;update_parsing\033\\"'
+    $TMUXCMD splitw -v -p 67 'printf "\033]2;update_cleanup\033\\"'
+    $TMUXCMD splitw -v -p 50 'printf "\033]2;update_tv\033\\"'
     $TMUXCMD selectp -t 4
-    $TMUXCMD splitw -v -p 75 'echo "..."'
-    $TMUXCMD splitw -v -p 67 'echo "..."'
-    $TMUXCMD splitw -v -p 50 'echo "..."'
+    $TMUXCMD splitw -v -p 75 'printf "\033]2;sphinx\033\\"'
+    $TMUXCMD splitw -v -p 67 'printf "\033]2;delete_parts\033\\"'
+    $TMUXCMD splitw -v -p 50 'printf "\033]2;update_missing_movie_info\033\\"'
 
-    $TMUXCMD new-window -n post1 'echo "..."'
+    $TMUXCMD new-window -n post1 'printf "\033]2;postprocessing[1]\033\\"'
     $TMUXCMD selectp -t 0
-    $TMUXCMD splitw -v -p 75 'echo "..."'
-    $TMUXCMD splitw -v -p 67 'echo "..."'
-    $TMUXCMD splitw -v -p 50 'echo "..."'
+    $TMUXCMD splitw -v -p 75 'printf "\033]2;postprocessing[9]\033\\"'
+    $TMUXCMD splitw -v -p 67 'printf "\033]2;postprocessing[17]\033\\"'
+    $TMUXCMD splitw -v -p 50 'printf "\033]2;postprocessing[25]\033\\"'
     $TMUXCMD selectp -t 0
-    $TMUXCMD splitw -h -p 88 'echo "..."'
-    $TMUXCMD splitw -h -p 85 'echo "..."'
-    $TMUXCMD splitw -h -p 83 'echo "..."'
-    $TMUXCMD splitw -h -p 80 'echo "..."'
-    $TMUXCMD splitw -h -p 75 'echo "..."'
-    $TMUXCMD splitw -h -p 67 'echo "..."'
-    $TMUXCMD splitw -h -p 50 'echo "..."'
+    $TMUXCMD splitw -h -p 88 'printf "\033]2;postprocessing[2]\033\\"'
+    $TMUXCMD splitw -h -p 85 'printf "\033]2;postprocessing[3]\033\\"'
+    $TMUXCMD splitw -h -p 83 'printf "\033]2;postprocessing[4]\033\\"'
+    $TMUXCMD splitw -h -p 80 'printf "\033]2;postprocessing[5]\033\\"'
+    $TMUXCMD splitw -h -p 75 'printf "\033]2;postprocessing[6]\033\\"'
+    $TMUXCMD splitw -h -p 67 'printf "\033]2;postprocessing[7]\033\\"'
+    $TMUXCMD splitw -h -p 50 'printf "\033]2;postprocessing[8]\033\\"'
     $TMUXCMD selectp -t 8
-    $TMUXCMD splitw -h -p 88 'echo "..."'
-    $TMUXCMD splitw -h -p 85 'echo "..."'
-    $TMUXCMD splitw -h -p 83 'echo "..."'
-    $TMUXCMD splitw -h -p 80 'echo "..."'
-    $TMUXCMD splitw -h -p 75 'echo "..."'
-    $TMUXCMD splitw -h -p 67 'echo "..."'
-    $TMUXCMD splitw -h -p 50 'echo "..."'
+    $TMUXCMD splitw -h -p 88 'printf "\033]2;postprocessing[10]\033\\"'
+    $TMUXCMD splitw -h -p 85 'printf "\033]2;postprocessing[11]\033\\"'
+    $TMUXCMD splitw -h -p 83 'printf "\033]2;postprocessing[12]\033\\"'
+    $TMUXCMD splitw -h -p 80 'printf "\033]2;postprocessing[13]\033\\"'
+    $TMUXCMD splitw -h -p 75 'printf "\033]2;postprocessing[14]\033\\"'
+    $TMUXCMD splitw -h -p 67 'printf "\033]2;postprocessing[15]\033\\"'
+    $TMUXCMD splitw -h -p 50 'printf "\033]2;postprocessing[16]\033\\"'
     $TMUXCMD selectp -t 16
-    $TMUXCMD splitw -h -p 88 'echo "..."'
-    $TMUXCMD splitw -h -p 85 'echo "..."'
-    $TMUXCMD splitw -h -p 83 'echo "..."'
-    $TMUXCMD splitw -h -p 80 'echo "..."'
-    $TMUXCMD splitw -h -p 75 'echo "..."'
-    $TMUXCMD splitw -h -p 67 'echo "..."'
-    $TMUXCMD splitw -h -p 50 'echo "..."'
+    $TMUXCMD splitw -h -p 88 'printf "\033]2;postprocessing[18]\033\\"'
+    $TMUXCMD splitw -h -p 85 'printf "\033]2;postprocessing[19]\033\\"'
+    $TMUXCMD splitw -h -p 83 'printf "\033]2;postprocessing[20]\033\\"'
+    $TMUXCMD splitw -h -p 80 'printf "\033]2;postprocessing[21]\033\\"'
+    $TMUXCMD splitw -h -p 75 'printf "\033]2;postprocessing[22]\033\\"'
+    $TMUXCMD splitw -h -p 67 'printf "\033]2;postprocessing[23]\033\\"'
+    $TMUXCMD splitw -h -p 50 'printf "\033]2;postprocessing[24]\033\\"'
     $TMUXCMD selectp -t 24
-    $TMUXCMD splitw -h -p 88 'echo "..."'
-    $TMUXCMD splitw -h -p 85 'echo "..."'
-    $TMUXCMD splitw -h -p 83 'echo "..."'
-    $TMUXCMD splitw -h -p 80 'echo "..."'
-    $TMUXCMD splitw -h -p 75 'echo "..."'
-    $TMUXCMD splitw -h -p 67 'echo "..."'
-    $TMUXCMD splitw -h -p 50 'echo "..."'
+    $TMUXCMD splitw -h -p 88 'printf "\033]2;postprocessing[26]\033\\"'
+    $TMUXCMD splitw -h -p 85 'printf "\033]2;postprocessing[27]\033\\"'
+    $TMUXCMD splitw -h -p 83 'printf "\033]2;postprocessing[28]\033\\"'
+    $TMUXCMD splitw -h -p 80 'printf "\033]2;postprocessing[29]\033\\"'
+    $TMUXCMD splitw -h -p 75 'printf "\033]2;postprocessing[30]\033\\"'
+    $TMUXCMD splitw -h -p 67 'printf "\033]2;postprocessing[31]\033\\"'
+    $TMUXCMD splitw -h -p 50 'printf "\033]2;postprocessing[32]\033\\"'
 
-    $TMUXCMD new-window -n post2 'echo "..."'
-    $TMUXCMD splitw -h -p 50 'echo "..."'
+    $TMUXCMD new-window -n post2 'printf "\033]2;processNfos\033\\"'
+    $TMUXCMD splitw -h -p 50 'printf "\033]2;processTv\033\\"'
     $TMUXCMD selectp -t 0
-    $TMUXCMD splitw -v -p 75 'echo "..."'
-    $TMUXCMD splitw -v -p 67 'echo "..."'
-    $TMUXCMD splitw -v -p 50 'echo "..."'
+    $TMUXCMD splitw -v -p 75 'printf "\033]2;processGames\033\\"'
+    $TMUXCMD splitw -v -p 67 'printf "\033]2;processMovies\033\\"'
+    $TMUXCMD splitw -v -p 50 'printf "\033]2;processMusic\033\\"'
     $TMUXCMD selectp -t 4
-    $TMUXCMD splitw -v -p 75 'echo "..."'
-    $TMUXCMD splitw -v -p 67 'echo "..."'
-    $TMUXCMD splitw -v -p 50 'echo "..."'
-
-#    $TMUXCMD new-window -n binaries_threaded 'echo "..."'
-#    $TMUXCMD splitw -v -p 83 'echo "..."'
-#    $TMUXCMD splitw -v -p 75 'echo "..."'
-#    $TMUXCMD splitw -v -p 67 'echo "..."'
-#    $TMUXCMD splitw -v -p 50 'echo "..."'
-#    $TMUXCMD selectp -t 0
-#    $TMUXCMD splitw -h -p 50 'echo "..."'
-#    $TMUXCMD selectp -t 2
-#    $TMUXCMD splitw -h -p 50 'echo "..."'
-#    $TMUXCMD selectp -t 4
-#    $TMUXCMD splitw -h -p 50 'echo "..."'
-#    $TMUXCMD selectp -t 6
-#    $TMUXCMD splitw -h -p 50 'echo "..."'
-#    $TMUXCMD selectp -t 8
-#    $TMUXCMD splitw -h -p 50 'echo "..."'
+    $TMUXCMD splitw -v -p 75 'printf "\033]2;processBooks\033\\"'
+    $TMUXCMD splitw -v -p 67 'printf "\033]2;processOther\033\\"'
+    $TMUXCMD splitw -v -p 50 'printf "\033]2;processUnwanted\033\\"'
 
     if [[ $USE_HTOP == "true" ]]; then
         $TMUXCMD new-window -n htop '$HTOP'

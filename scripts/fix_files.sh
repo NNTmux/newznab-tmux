@@ -41,6 +41,15 @@ if [[ $FIX_POSIX  == "true" ]]; then
     sed -i -e 's/return 'SIGPWR';/\/\/return 'SIGPWR';/' $NEWZPATH/www/lib/powerprocess.php
 fi
 
+#attempt to get english only from IMDB
+if [[ $EN_IMDB == "true" ]]; then
+    sed -i -e 's/akas.imdb/www.imdb/g' $NEWZPATH/www/lib/movie.php
+    sed -i -e 's/akas.imdb/www.imdb/g' $TESTING_PATH/update_parsing.php
+    sed -i -e 's/curl_setopt($ch, CURLOPT_URL, $url);/curl_setopt($ch, CURLOPT_URL, $url);\
+    $header[] = "Accept-Language: en-us";\
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $header);/' $NEWZPATH/www/lib/util.php
+fi
+
 #import kevin123's compression mod
 if [[ $KEVINS_COMP == "true" ]]; then
     cd $DIR"/kevin123"

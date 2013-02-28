@@ -39,6 +39,14 @@ export TMUX_SESSION="Newznab"
 #Set, in seconds - how often the monitor.php (left top pane) script should update, 0 may cause errors
 export MONITOR_UPDATE="30"
 
+#you may want to kill the update_bianries, backfill and import if no releases have been add in x minutes, set the timer to anything other than 0 to enable
+#this will only run every 5 loops of monitor
+export KILL_UPDATES="0"
+
+#do you want to just cause it to restart or keep off until a release is created, true for off until a release is created
+#this will stop all downloads and imports
+export KEEP_KILLED="false"
+
 ############################################################
 
 #You can have backfill loop constantly and interject binaries every so often
@@ -312,6 +320,9 @@ export KEVINS_COMP="false"
 
 #set your LANG to which ever you like, only effects these scripts
 export LANG="en_US.UTF-8"
+
+#to help IMDB return only english titles, enable this, you will need to run update_svn.php or fix_files.php
+export EN_IMDB="true"
 
 ############################################################
 
