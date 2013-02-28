@@ -1,5 +1,7 @@
-# SETUP
+# Newznab-tmux
 
+ * Screen shots idententifying each pane and the process it runs is located at the bottom of this page.
+ 
  * Before submitting a bug report, please verify that you are running the current revision of Newznab+ and these scripts. Then include as much detail as possible. A screen shot is extremely telling and very helpful.
 
  * This is a series of scripts that break down the stock processes of a typical Newznab+ installation and perform each task separately and at the same time. Tmux allows for several windows and panes to be created to allow the monitoring of each script as it performs its task. Each task is started by monitor.php. The post processing has also been enhanced to allow up to 32 simultaneous post processes plus another 8 for each category of releases, for a total of 40 possible post processing at once. The scripts are started by either timers, set in defaults.sh or started automatically and then sleeps for a time set in defaults.sh. Almost everything can be stopped/started from the defaults.sh without restarting the scripts.
@@ -13,11 +15,16 @@
  * Please backup your database first. Something like this should do it.
  
   ```bash
-  mysqldump --opt -u root -p newznab > ~/newznab_backup.sql
+  mysqldump --opt -u username -p newznab > ~/newznab_backup.sql
   ```
 
+ * If, you have just created your Newznab+ database, you can save yourself some time by importing a sql file, written by _zoggy_ and updating your TvRage database.
+ 
+   ```bash
+  mysql -u username -p newznab < scripts/tvrage-latest.sql
+  ```
 
- * Now, Clone my github. Theses scripts should be able to run from any path, but this location is where I was asked to put it.
+ * Now, Clone my github. These scripts need to run from this location and this is where I was asked to put them. If you decided to use an alternate location, you will need to edit the file bin/config.php to point to the file www/config.php. If you do not, these scripts will not run.
 
   ```bash
   cd /var/www/newznab/misc/update_scripts/nix_scripts/
@@ -25,20 +32,20 @@
   cd tmux
   ```  
 
- * Edit the paths, timers, username, what to run and then accept.
+ * Please read the defaults.sh file very carefully. There are a lot of settings and options. Most of the questions asked by new users can be answered by reading this file.
 
   ```bash
   cp config.sh defaults.sh
   nano defaults.sh
   ```
 
- * Now, you need to update your Newznab+ installation and copy some files. This is destructive and will overwrite any changes you have made to you Newznab+ files.
+ * Now, you need to update your Newznab+ installation, copy some files and edit others. This is destructive and will overwrite any changes you have made to you Newznab+ files. If you do not want to update or overwrite you Newznab+ installation, skip this step, but not the next step.
 
   ```bash
   cd scripts && sudo ./update_svn.sh
   ```
 
- * Or, if you do not want to update your Newznab+ install, you still need to copy and edit files.
+ * Or, if you do not want to update your Newznab+ install, you still need to copy and edit files. Before proceeding you must run this or the previous script.
  
   ```bash
   cd scripts && sudo ./fix_files.sh
@@ -50,31 +57,30 @@
   cd ../ && ./start.sh
   ```
 
- *  If you have grsec compiled into your kernel, you will also need root privileges for nmon and any other network monitoring app.
+ *  If you have grsec compiled into your kernel, you may need root privileges for nmon, bwm-ng and any other app that accesses the /proc folder.
 
- * Included in the scripts folder is revert.sh. This file removes the changes made to post process.sh and you need to run this before running stock update_releases.php.
+ * Included in the scripts folder is revert.sh. This file will update your Newznab+ installation and overwrite the changes from these scripts.
  
- * Any variable in defaults.sh can be changed, except the paths to the commands, and the changed will take effect on the next loop of the monitor. By default, the monitor loops every 30 seconds
+ * Almost any variable in defaults.sh can be changed, except the paths to the commands, and the changed will take effect on the next loop of the monitor.
 
  * If you connect using **putty**, then under Window/Translation set Remote character set to UTF-8 and check "Copy and paste line drawing characters". To use 256 colors, you must set Connection/Data Terminal-type string to "xterm-256color" and in Window/Colours check the top three boxes, otherwise only 16 colors are displayed.
  
- * If you are using the powerline status bar, you will most likely need a patch font. The Consolas ttf from [powerline-fonts](https://github.com/jonnyboy/powerline-fonts) is the only one that I have found to be nearly complete and work with putty and Win7. The otf fonts should be fine, although I am not able to test.
+ * If you are using the powerline status bar, you will most likely need a patched font. The Consolas ttf from [powerline-fonts](https://github.com/jonnyboy/powerline-fonts) is the only one that I have found to be nearly complete and work with putty and Win7. The otf fonts should be fine, although I am not able to test.
 
- * Another script [nevermind](http://pastebin.com/ibpi71iE) will help your db run a little faster/easier.
+ * I have included a few scripts for mysql, [mysql-tuning-primer](https://launchpad.net/mysql-tuning-primer), [mysqlreport](http://hackmysql.com/mysqlreport) and [mysqltuner.pl](https://github.com/sunfoxcz/MySQLTuner-perl/blob/master/mysqltuner.pl) to assist in tuning your mysql installation. They are located in the scripts folder.
 
- * I have included a few mysql scripts, [mysql-tuning-primer](https://launchpad.net/mysql-tuning-primer), [mysqlreport](http://hackmysql.com/mysqlreport) and [mysqltuner.pl](https://github.com/sunfoxcz/MySQLTuner-perl/blob/master/mysqltuner.pl) to assist in tuning your mysql installation. They are lactated in the scripts folder.
-
+ * A how-to from [nevermind](http://pastebin.com/ibpi71iE) will help your db run a little faster/easier. It can be damaging if you make a mistake while doing this.
+ 
  * Join in the conversation at irc://irc.synirc.net/newznab-tmux.
 
 
 
-
- * Thanks go to all who offered their assistance and improvement to these scripts, especially kevin123, zombu2, epsol, DejaVu, ajeffco, pcmerc, zDefect, shat, evermind, coolcheat, sy, ll, crunch, ixio, AlienX, Solution-X, cryogenx, convict, wicked, McFuzz, pyr2044 and Kragger. If, your nick is missing from this this list, PM and I'll fix it quick.
+ * Thanks go to all who offered their assistance and improvement to these scripts, especially kevin123, zombu2, epsol, DejaVu, ajeffco, pcmerc, zDefect, shat, evermind, coolcheat, sy, ll, crunch, ixio, AlienX, Solution-X, cryogenx, convict, wicked, McFuzz, pyr2044, Kragger and _zoggy_. If, your nick is missing from this this list, PM and I'll fix it quick.
  
- * These scripts include scripts written by [kevin123's](https://github.com/kevinlekiller), [itandrew's](https://github.com/itandrew/Newznab-InnoDB-Dropin), [tmux-powerline](https://github.com/erikw/tmux-powerline), [thewtex](git://github.com/thewtex/tmux-mem-cpu-load.git) and [cj](https://github.com/NNScripts/nn-custom-scripts).
+ * These scripts include scripts written by [kevin123's](https://github.com/kevinlekiller), [itandrew's](https://github.com/itandrew/Newznab-InnoDB-Dropin), [tmux-powerline](https://github.com/erikw/tmux-powerline), [thewtex](git://github.com/thewtex/tmux-mem-cpu-load.git), [cj](https://github.com/NNScripts/nn-custom-scripts) and [_zoggy_](http://zoggy.net/tvrage-latest.sql).
 
 <hr>
- * If you find these scripts useful and would like to show your support, please use one of the donation links below. Donations are greatly appreciated. Thank you
+ * If you find these scripts useful and would like to show your support or just buy me a beer, please use one of the donation links below. Donations are greatly appreciated. Thank you
 
 <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=N4AJV5FHZDBFE"><img src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" alt="PayPal - The safer, easier way to pay online!" /></a><a href='http://www.pledgie.com/campaigns/18980'><img alt='Click here to lend your support to: Newznab-tmux and make a donation at www.pledgie.com !' src='http://www.pledgie.com/campaigns/18980.png?skin_name=chrome' border='0' /></a>
 
