@@ -22,7 +22,7 @@ $_parts = $array['KEVIN_PARTS'];
 
 $db = new DB;
 
-$query = $db->queryOneRow(sprintf("select name from groups WHERE (first_record_postdate BETWEEN '${_date}' and now()) and (active = 1) order by name desc"));
+$query = $db->queryOneRow(sprintf("select name from groups WHERE (first_record_postdate BETWEEN '${_date}' and now()) and (active = 1) order by name ASC"));
 
 $groupPost = $_parts;
 $groupName = $query['name'];

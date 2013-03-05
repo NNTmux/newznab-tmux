@@ -33,7 +33,8 @@ export ADMIN_PATH=$NEWZPATH"/www/admin"
 #to get the desired performance, 0 will disable all post processing
 export POST_TO_RUN="0"
 
-#Enter the session name to be used by tmux
+#Enter the session name to be used by tmux, no spaces allowed in the name, this can be changed after scripts start
+#if you are running multiple servers, you could put your hostname here
 export TMUX_SESSION="Newznab"
 
 #Set, in seconds - how often the monitor.php (left top pane) script should update, 0 may cause errors
@@ -51,9 +52,12 @@ export KEEP_KILLED="false"
 
 #You can have backfill loop constantly and interject binaries every so often
 #by setting this next to true, if true, the normal backfill pane will be dead
+#this works by setting the 2 start timers and which is run at the start of the loop is determined like this
+#if at the start of the loop, the BINARIES_SEQ_TIMER has expired, then update_binaries will run and the BINARIES_SEQ_TIMER timer is reset
+#if BINARIES_SEQ_TIMER has not expired, then if BACKFILL_SEQ_TIMER has expired, the backfill will run and BACKFILL_SEQ_TIMER timer is reset
 export SEQUENTIAL="false"
 
-#time between loop start for update_binaries, in seconds
+#time between loop start for update_binaries, in seconds, this is a countdown timer, not a sleep after it runs
 #default is 30 minutes
 #will run on first loop and then not again for at least 1800 seconds
 export BINARIES_SEQ_TIMER="1800"
@@ -119,7 +123,7 @@ export MAXDAYS="210"
 #then the script stops (once per loop), if your first_record_postdate on the group is 2012-06-24
 #it will be skipped (target reached). When that group is done, it will do another ( again from z to a).
 #this does not use increment, it works by the date set below
-#you also need to enable kevin's compression mod, those files are needed
+#you also need to enable kevin's compression mod, those files are needed and you still need to enable BACKFILL
 export KEVIN_SAFER="false"
 
 #set the date to go back to, must be in the format of YYYY-MM-DD, like 2012-06-24
@@ -187,6 +191,10 @@ export RELEASES_SLEEP="40"
 #optimize_myisam on small tables runs after every 5th loop of update_releases
 export OPTIMIZE="false"
 
+#optimize can wait, patiently while all other panes stop and then run
+#or, forcefully terminate all panes while it runs, to kill all panes and run optimize, enable
+export OPTIMIZE_KILL="false"
+
 #How often to run optimize_myisam on small tables seconds, default is 10 min
 export MYISAM_SMALL="600"
 
@@ -225,13 +233,24 @@ export CLEANUP_TIMER="3600"
 #to actually do anything, directions are in the file
 export PARSING="false"
 
+#choose to use kevin123's update_parsing script
+export PARSING_MOD="false"
+
 #How often do you want update_parsing.php to run, in seconds
 export PARSING_TIMER="3600"
 
 ############################################################
 
+#Choose to run update_predb.php
+export PREDB="false"
+
 #How often to update the PreDB in seconds
 export PREDB_TIMER="900"
+
+############################################################
+
+#update the tv schedule and in theaters listings
+export TV_SCHEDULE="false"
 
 #How often to update the TV Schedule and the In Theaters in seconds
 export TVRAGE_TIMER="43200"

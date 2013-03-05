@@ -29,5 +29,4 @@ cd $NEWZPATH"/misc/update_scripts"
 $PHP update_database_version.php
 
 cd $DIR/scripts
-ls -al
 ./fix_files.sh

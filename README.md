@@ -24,6 +24,12 @@
   mysql -u username -p newznab < scripts/tvrage-latest.sql
   ```
 
+ * You can also import [kevin123's binaryblacklist](https://github.com/kevinlekiller/Newznab-Blacklist). This will overwrite all blacklists currently in you db.
+
+   ```bash
+  mysql -u username -p newznab < scripts/binaryblacklist.sql
+  ```
+
  * Now, Clone my github. These scripts need to run from this location and this is where I was asked to put them. If you have decided to use an alternate location, you will need to edit the file bin/config.php to point to the file neqznab/www/config.php. If you do not, these scripts will not run.
 
   ```bash
@@ -57,13 +63,13 @@
   cd ../ && ./start.sh
   ```
 
- *  If you have grsec compiled into your kernel, you may need root privileges for nmon, bwm-ng and any other app that accesses the /proc folder.
+ * If you have grsec compiled into your kernel, you may need root privileges for nmon, bwm-ng and any other app that accesses the /proc folder.
 
  * Included in the scripts folder is revert.sh. This file will update your Newznab+ installation and overwrite the changes from these scripts.
  
  * Almost any variable in defaults.sh can be changed, except the paths to the commands, and the changes will take effect on the next loop of the Monitor.
 
- * If you connect using **putty**, then under Window/Translation set Remote character set to UTF-8 and check "Copy and paste line drawing characters". To use 256 colors, you must set Connection/Data Terminal-type string to "xterm-256color" and in Window/Colours check the top three boxes, otherwise only 16 colors are displayed.
+ * If you connect using **putty**, then under Window/Translation set Remote character set to UTF-8 and check "Copy and paste line drawing characters". To use 256 colors, you must set Connection/Data Terminal-type string to "xterm-256color" and in Window/Colours check the top three boxes, otherwise only 16 colors are displayed. If you are using FreeBSD, you will need to add export TERM=xterm-256color to your .bashrc file to show 256 colors.
  
  * If you are using the powerline status bar, you will most likely need a patched font. The Consolas ttf from [powerline-fonts](https://github.com/jonnyboy/powerline-fonts) is the only one that I have found to be nearly complete and work with putty and Win7. The otf fonts should be fine, although I am not able to test.
 
