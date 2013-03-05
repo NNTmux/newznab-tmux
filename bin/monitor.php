@@ -671,9 +671,9 @@ while( $i > 0 )
         $color = get_color();
         shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.1 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes1[1] $ds2 && cd $TESTING && $_php update_parsing.php 2>&1 | tee -a $path/../logs/$panes1[1]-$getdate.log && echo \" \033[1;0;33m\" && $ds1 $panes1[1] $ds3' 2>&1 1> /dev/null");
         $time3 = TIME();
-    } elseif (((( TIME() - $time3 ) >= $array['PARSING_TIMER'] ) || ( $i == 1 )) && ($array['PARSING_MOD'] == "true" )&& ($array['PARSING'] == "true" )  && ( $optimize_safe_$
+    } elseif (((( TIME() - $time3 ) >= $array['PARSING_TIMER'] ) || ( $i == 1 )) && ( $array['PARSING_MOD'] == "true" ) && ( $array['PARSING'] == "true" )  && ( $optimize_safe_to_run != "true" )) {
         $color = get_color();
-        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.1 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes1[1] $ds2 && cd $_bin && $_php update_parsing.php $
+        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.1 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes1[1] $ds2 && cd $_bin && $_php update_parsing.php 2>&1 | tee -a $path/../logs/$panes1[1]-$getdate.log && echo \" \033[1;0;33m\" && $ds1 $panes1[1] $ds3' 2>&1 1> /dev/null");
         $time3 = TIME();
     }  elseif (( $array['PARSING'] != "true" ) && ( $optimize_safe_to_run != "true" )) {
         $color = get_color();
