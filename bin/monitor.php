@@ -233,7 +233,8 @@ $misc_releases_now_formatted = number_format( $misc_releases_now );
 passthru('clear');
 //printf("\033[1;31m  First insert:\033[0m ".relativeTime("$firstdate")."\n");
 $mask1 = "\033[1;33m%-16s \033[38;5;214m%-44.44s \n";
-printf($mask1, "Monitor Running v$version: ", relativeTime("$time"));
+$mask2 = "\033[1;33m%-16s \033[38;5;214m%-34.34s \n";
+printf($mask2, "Monitor Running v$version: ", relativeTime("$time"));
 printf($mask1, "Newest Release:", "$newestname");
 printf($mask1, "Release Added:", relativeTime("$newestdate")."ago");
 
@@ -528,7 +529,7 @@ while( $i > 0 )
     //update display
     passthru('clear');
     //printf("\033[1;31m  First insert:\033[0m ".relativeTime("$firstdate")."\n");
-    printf($mask1, "Monitor Running v$version:", relativeTime("$time"));
+    printf($mask2, "Monitor Running v$version: ", relativeTime("$time"));
     printf($mask1, "Newest Release:", "$newestname");
     printf($mask1, "Release Added:", relativeTime("$newestdate")."ago");
 
@@ -575,7 +576,7 @@ while( $i > 0 )
     }
 
     $forcekill="false";
-    $ok_to_run="false";
+    $optimize_safe_to_run="false";
     if (( $array['OPTIMIZE_KILL'] == "true" ) && ( $array['OPTIMIZE'] == "true" )) {
         $forcekill="true";
     }
@@ -587,9 +588,9 @@ while( $i > 0 )
         $dead3 = str_replace( " ", '', `tmux list-panes -t {$array['TMUX_SESSION']}:2 | grep dead | wc -l` );
         $dead4 = str_replace( " ", '', `tmux list-panes -t {$array['TMUX_SESSION']}:3 | grep dead | wc -l` );
         if (( $dead1 == 5 ) && ( $dead2 == 8 ) && ( $dead3 == 32 ) && ( $dead4 == 8 )) {
-            $ok_to_run="true";
+            $optimize_safe_to_run="true";
         } else {
-            $ok_to_run="false";
+            $optimize_safe_to_run="false";
         }
     } elseif ((( TIME() - $time6 >= $array['MYISAM_LARGE'] ) || ( TIME() - $time8 >= $array['INNODB_LARGE'] ) || ( TIME() - $time5 >= $array['INNODB_SMALL'] ) || ( TIME() - $time11 >= $array['MYISAM_SMALL'] )) && ( $forcekill == "true")) {
         for ($g=1; $g<=5; $g++)
@@ -610,23 +611,23 @@ while( $i > 0 )
             shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.$g 'echo \"\033[38;5;\"$color\"m\n$panes0[$g]\nKilled in prep for \nOptimization\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
         }
         sleep(10);
-        $ok_to_run="true";
+        $optimize_safe_to_run="true";
     }
 
     //run optimize in pane 1.4
-    if (( TIME() - $time6 >= $array['MYISAM_LARGE'] ) && ( $array['OPTIMIZE'] == "true" ) && ( $ok_to_run == "true" )) {
+    if (( TIME() - $time6 >= $array['MYISAM_LARGE'] ) && ( $array['OPTIMIZE'] == "true" ) && ( $optimize_safe_to_run == "true" )) {
         $color = get_color();
         shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.4 'echo \"\033[38;5;\"$color\"m\" && $ds1 MYISAM_LARGE $ds2 && cd $_bin && $_php optimize_myisam.php true 2>&1 | tee -a $path/../logs/$panes1[4]-$getdate.log && echo \" \033[1;0;33m\" && $ds1 MYISAM_LARGE $ds3' 2>&1 1> /dev/null");
         $time6 = TIME();
-    } elseif (( TIME() - $time8 >= $array['INNODB_LARGE'] ) && ($array['INNODB'] == "true") && ( $array['OPTIMIZE'] == "true" ) && ( $ok_to_run == "true" )) {
+    } elseif (( TIME() - $time8 >= $array['INNODB_LARGE'] ) && ($array['INNODB'] == "true") && ( $array['OPTIMIZE'] == "true" ) && ( $optimize_safe_to_run == "true" )) {
         $color = get_color();
         shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.4 'echo \"\033[38;5;\"$color\"m\" && $ds1 INNODB_LARGE $ds2 && cd $_bin && $_php optimize_myisam.php true 2>&1 | tee -a $path/../logs/$panes1[4]-$getdate.log && $_php optimize_innodb.php true 2>&1 | tee -a $path/../logs/$panes1[4]-$getdate.log && echo \" \033[1;0;33m\" && $ds1 INNODB_LARGE $ds3' 2>&1 1> /dev/null");
         $time8 = TIME();
-    } elseif (( TIME() - $time5 >= $array['INNODB_SMALL'] ) && ( $array['INNODB']== "true" ) && ( $array['OPTIMIZE'] == "true" ) && ( $ok_to_run == "true" )) {
+    } elseif (( TIME() - $time5 >= $array['INNODB_SMALL'] ) && ( $array['INNODB']== "true" ) && ( $array['OPTIMIZE'] == "true" ) && ( $optimize_safe_to_run == "true" )) {
         $color = get_color();
         shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.4 'echo \"\033[38;5;\"$color\"m\" && $ds1 INNODB_SMALL $ds2 && cd $_bin && $_php optimize_innodb.php 2>&1 | tee -a $path/../logs/$panes1[4]-$getdate.log && echo \" \033[1;0;33m\" && $ds1 INNODB_SMALL $ds3' 2>&1 1> /dev/null");
         $time5 = TIME();
-    } elseif (( TIME() - $time11 >= $array['MYISAM_SMALL'] ) && ( $array['OPTIMIZE'] == "true" ) && ( $ok_to_run == "true" )) {
+    } elseif (( TIME() - $time11 >= $array['MYISAM_SMALL'] ) && ( $array['OPTIMIZE'] == "true" ) && ( $optimize_safe_to_run == "true" )) {
         $color = get_color();
         shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.4 'echo \"\033[38;5;\"$color\"m\" && $ds1 MYISAM_SMALL $ds2 && cd $_bin && $_php optimize_myisam.php 2>&1 | tee -a $path/../logs/$panes1[4]-$getdate.log && echo \" \033[1;0;33m\" && $ds1 MYISAM_SMALL $ds3' 2>&1 1> /dev/null");
         $time11 = TIME();
@@ -639,14 +640,14 @@ while( $i > 0 )
         $run_time2 = relativeTime( $array['INNODB_LARGE'] + $time8 );
         $run_time3 = relativeTime( $array['INNODB_SMALL'] + $time5 );
         $run_time4 = relativeTime( $array['MYISAM_SMALL'] + $time11 );
-        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.4 'echo \"\033[38;5;\"$color\"m\nMYISAM_LARGE will run in T[$run_time]1 \nINNODB_LARGE will run in T[$run_time]2\nINNODB_SMALL will run in T[$run_time]3 \nMYISAM_SMALL will run in T[$run_time]4\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
+        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.4 'echo \"\033[38;5;\"$color\"m\nMYISAM_LARGE will run in T[$run_time1]\nINNODB_LARGE will run in T[$run_time2]\nINNODB_SMALL will run in T[$run_time3]\nMYISAM_SMALL will run in T[$run_time4]\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
     }
 
-    if (( shell_exec("$_tmux list-panes -t {$array['TMUX_SESSION']}:1 | grep 4: | grep dead")) && ( $array['OPTIMIZE'] == "true" )) {
-        $optimize_safe_to_run="true";
-    } else {
-        $optimize_safe_to_run="false";
-    }
+//    if (( shell_exec("$_tmux list-panes -t {$array['TMUX_SESSION']}:1 | grep 4: | grep dead")) && ( $array['OPTIMIZE'] == "true" )) {
+//        $optimize_safe_to_run="true";
+//    } else {
+//        $optimize_safe_to_run="false";
+//    }
 
     //run update_predb.php in 1.0 ever 15 minutes and on first loop
     if (((( TIME() - $time2 ) >= $array['PREDB_TIMER'] ) || ( $i == 1 )) && ( $array['PREDB'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
