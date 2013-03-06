@@ -56,6 +56,7 @@ while ($i==0) {
     if($subdir_count != 0){
         foreach($subdirs AS $subdir){
             $filecount0[] = count(glob($subdir.'/*.nzb'));
+	    sleep(1);
         }
         $subdir_count_loop = 0;
         $totalproc=0;

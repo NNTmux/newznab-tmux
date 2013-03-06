@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.1r701";
+$version="0.1r702";
 
 $db = new DB();
 
@@ -575,19 +575,15 @@ while( $i > 0 )
         $_tmux_test = $array['POWERLINE'];
     }
 
-    $forcekill="false";
     $optimize_safe_to_run="false";
     $optimize_run="false";
     $dead1=0;
     $dead2=0;
     $dead3=0;
     $dead4=0;
-    if (( $array['OPTIMIZE_KILL'] == "true" ) && ( $array['OPTIMIZE'] == "true" )) {
-        $forcekill="true";
-    }
 
     //kill all panes to run optimize if OPTIMIZE_KILL is true
-    if ((( TIME() - $time6 >= $array['MYISAM_LARGE'] ) || ( TIME() - $time8 >= $array['INNODB_LARGE'] ) || ( TIME() - $time5 >= $array['INNODB_SMALL'] ) || ( TIME() - $time11 >= $array['MYISAM_SMALL'] )) && ( $forcekill == "false")) {
+    if ((( TIME() - $time6 >= $array['MYISAM_LARGE'] ) || ( TIME() - $time8 >= $array['INNODB_LARGE'] ) || ( TIME() - $time5 >= $array['INNODB_SMALL'] ) || ( TIME() - $time11 >= $array['MYISAM_SMALL'] )) && ( $array['OPTIMIZE'] == "true" ) && ( $array['OPTIMIZE_KILL'] != "true" )) {
         $optimize_safe_to_run="true";
         $dead1 = str_replace( " ", '', `tmux list-panes -t {$array['TMUX_SESSION']}:0 | grep dead | wc -l` );
         $dead2 = str_replace( " ", '', `tmux list-panes -t {$array['TMUX_SESSION']}:1 | grep dead | wc -l` );
@@ -598,7 +594,7 @@ while( $i > 0 )
         } else {
             $optimize_run="false";
         }
-    } elseif ((( TIME() - $time6 >= $array['MYISAM_LARGE'] ) || ( TIME() - $time8 >= $array['INNODB_LARGE'] ) || ( TIME() - $time5 >= $array['INNODB_SMALL'] ) || ( TIME() - $time11 >= $array['MYISAM_SMALL'] )) && ( $forcekill == "true")) {
+    } elseif ((( TIME() - $time6 >= $array['MYISAM_LARGE'] ) || ( TIME() - $time8 >= $array['INNODB_LARGE'] ) || ( TIME() - $time5 >= $array['INNODB_SMALL'] ) || ( TIME() - $time11 >= $array['MYISAM_SMALL'] )) && ( $array['OPTIMIZE'] == "true" ) && ( $array['OPTIMIZE_KILL'] == "true" )) {
         for ($g=1; $g<=5; $g++)
         {
             $color = get_color();
@@ -611,10 +607,10 @@ while( $i > 0 )
             $color = get_color();
             shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:3.$g 'echo \"\033[38;5;\"$color\"m\n$panes3[$g]\nKilled in prep for \nOptimization\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
         }
-        for ($g=0; $g<=32; $g++)
+        for ($g=0; $g<=31; $g++)
         {
             $color = get_color();
-            shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.$g 'echo \"\033[38;5;\"$color\"m\n$panes0[$g]\nKilled in prep for \nOptimization\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
+            shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:2.$g 'echo \"\033[38;5;\"$color\"m\n$panes2[$g]\nKilled in prep for \nOptimization\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
         }
         sleep(10);
         $optimize_run="true";
@@ -1101,8 +1097,8 @@ while( $i > 0 )
     //check ffmpeg and mediainfo, kill if necessary
     if (( $array['KILL_PROCESS'] != "0" ) && ( $array['KILL_QUIET'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
         echo "\n";
-        shell_exec("killall -qo {$array['KILL_PROCESS']}s -9 mediainfo");
-        shell_exec("killall -qo {$array['KILL_PROCESS']}s -9 ffmpeg");
+        shell_exec("killall -qo {$array['KILL_PROCESS']}s -9 mediainfo 2>&1 1> /dev/null");
+        shell_exec("killall -qo {$array['KILL_PROCESS']}s -9 ffmpeg 2>&1 1> /dev/null");
     } else {
         echo "\n";
         shell_exec("killall -o {$array['KILL_PROCESS']}s -9 mediainfo 2>&1 1> /dev/null");
@@ -1111,8 +1107,8 @@ while( $i > 0 )
 
     if (( $array['KILL_QUIET'] == "true" ) && ( $optimize_safe_to_run == "true" )) {
         echo "\n";
-        shell_exec("killall -q mediainfo");
-        shell_exec("killall -q ffmpeg");
+        shell_exec("killall -q mediainfo 2>&1 1> /dev/null");
+        shell_exec("killall -q ffmpeg 2>&1 1> /dev/null");
     } else {
         echo "\n";
         shell_exec("killall mediainfo 2>&1 1> /dev/null");
