@@ -35,6 +35,7 @@ $_DB_PASS = getenv('DB_PASSWORD');
 $_mysql = getenv('MYSQL');
 $_php = getenv('PHP');
 $_tmux = getenv('TMUXCMD');
+$_sed = getenv('SED');
 $_count_releases = 0;
 $_tmux_test = $array['POWERLINE'];
 $_imports = $array['NZB_THREADS'];
@@ -595,7 +596,7 @@ while( $i > 0 )
             $dead2 = str_replace( " ", '', `tmux list-panes -t {$array['TMUX_SESSION']}:1 | grep dead | wc -l` );
             $dead3 = str_replace( " ", '', `tmux list-panes -t {$array['TMUX_SESSION']}:2 | grep dead | wc -l` );
             $dead4 = str_replace( " ", '', `tmux list-panes -t {$array['TMUX_SESSION']}:3 | grep dead | wc -l` );
-            if (( $dead1 == 4 ) && ( $dead2 == 8 ) && ( $dead3 == 32 ) && ( $dead4 == 8 )) {
+            if (( $dead1 >= 4 ) && ( $dead2 == 8 ) && ( $dead3 == 32 ) && ( $dead4 == 8 )) {
                 $optimize_run="true";
             } else {
                 $optimize_run="false";
@@ -629,7 +630,7 @@ while( $i > 0 )
             $dead2 = str_replace( " ", '', `tmux list-panes -t {$array['TMUX_SESSION']}:1 | grep dead | wc -l` );
             $dead3 = str_replace( " ", '', `tmux list-panes -t {$array['TMUX_SESSION']}:2 | grep dead | wc -l` );
             $dead4 = str_replace( " ", '', `tmux list-panes -t {$array['TMUX_SESSION']}:3 | grep dead | wc -l` );
-            if (( $dead1 == 4 ) && ( $dead2 == 8 ) && ( $dead3 == 32 ) && ( $dead4 == 8 )) {
+            if (( $dead1 >= 4 ) && ( $dead2 == 8 ) && ( $dead3 == 32 ) && ( $dead4 == 8 )) {
                 $optimize_run="true";
             } else {
                 $optimize_run="false";
