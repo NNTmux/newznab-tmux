@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.1r703";
+$version="0.1r705";
 
 $db = new DB();
 
@@ -133,7 +133,7 @@ $time16 = TIME();
 $time17 = TIME();
 
 if ( $array['INNODB'] == "true" ) {
-    $time8 = TIME();
+    $time5 = TIME();
     $time8 = TIME();
 }
 
