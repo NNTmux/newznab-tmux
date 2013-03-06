@@ -1,9 +1,9 @@
 <?php
 
-require("config.php");
-require(WWW_DIR."/lib/postprocess.php");
+require('config.php');
+require('lib/postprocess1.php');
 
-$postprocess = new PostProcess(true);
+$postprocess = new PostProcess1(true);
 $postprocess->processNfos();
 
 ?>

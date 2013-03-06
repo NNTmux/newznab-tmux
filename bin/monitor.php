@@ -589,7 +589,7 @@ while( $i > 0 )
 
     //kill all panes to run optimize if OPTIMIZE_KILL is true
     if ( $array['INNODB'] == "true" ) {
-        if ((( TIME() - $time6 >= $array['MYISAM_LARGE'] ) || ( TIME() - $time8 >= $array['INNODB_LARGE'] ) || ( TIME() - $time5 >= $array['INNODB_SMALL'] ) || ( TIME() - $time11 >= $array['MYISAM_SMALL'] )) && ( $array['OPTIMIZE_KILL'] != "true" )) {
+        if ((( TIME() - $time6 >= $array['MYISAM_LARGE'] ) || ( TIME() - $time8 >= $array['INNODB_LARGE'] ) || ( TIME() - $time5 >= $array['INNODB_SMALL'] ) || ( TIME() - $time11 >= $array['MYISAM_SMALL'] )) && ( $array['OPTIMIZE_KILL'] != "true" ) && ( $array['OPTIMIZE'] == "true" )) {
             $optimize_safe_to_run="true";
             $dead1 = str_replace( " ", '', `tmux list-panes -t {$array['TMUX_SESSION']}:0 | grep dead | wc -l` );
             $dead2 = str_replace( " ", '', `tmux list-panes -t {$array['TMUX_SESSION']}:1 | grep dead | wc -l` );
@@ -600,7 +600,7 @@ while( $i > 0 )
             } else {
                 $optimize_run="false";
             }
-        } elseif ((( TIME() - $time6 >= $array['MYISAM_LARGE'] ) || ( TIME() - $time8 >= $array['INNODB_LARGE'] ) || ( TIME() - $time5 >= $array['INNODB_SMALL'] ) || ( TIME() - $time11 >= $array['MYISAM_SMALL'] )) && ( $array['OPTIMIZE_KILL'] == "true" )) {
+        } elseif ((( TIME() - $time6 >= $array['MYISAM_LARGE'] ) || ( TIME() - $time8 >= $array['INNODB_LARGE'] ) || ( TIME() - $time5 >= $array['INNODB_SMALL'] ) || ( TIME() - $time11 >= $array['MYISAM_SMALL'] )) && ( $array['OPTIMIZE_KILL'] == "true" ) && ( $array['OPTIMIZE'] == "true" )) {
             for ($g=1; $g<=5; $g++)
             {
                 $color = get_color();
@@ -623,7 +623,7 @@ while( $i > 0 )
             $optimize_safe_to_run="true";
         }
     } else {
-        if ((( TIME() - $time6 >= $array['MYISAM_LARGE'] ) || ( TIME() - $time11 >= $array['MYISAM_SMALL'] )) && ( $array['OPTIMIZE_KILL'] != "true" )) {
+        if ((( TIME() - $time6 >= $array['MYISAM_LARGE'] ) || ( TIME() - $time11 >= $array['MYISAM_SMALL'] )) && ( $array['OPTIMIZE_KILL'] != "true" ) && ( $array['OPTIMIZE'] == "true" )) {
             $optimize_safe_to_run="true";
             $dead1 = str_replace( " ", '', `tmux list-panes -t {$array['TMUX_SESSION']}:0 | grep dead | wc -l` );
             $dead2 = str_replace( " ", '', `tmux list-panes -t {$array['TMUX_SESSION']}:1 | grep dead | wc -l` );
@@ -634,7 +634,7 @@ while( $i > 0 )
             } else {
                 $optimize_run="false";
             }
-        } elseif ((( TIME() - $time6 >= $array['MYISAM_LARGE'] ) || ( TIME() - $time11 >= $array['MYISAM_SMALL'] )) && ( $array['OPTIMIZE_KILL'] == "true" )) {
+        } elseif ((( TIME() - $time6 >= $array['MYISAM_LARGE'] ) || ( TIME() - $time11 >= $array['MYISAM_SMALL'] )) && ( $array['OPTIMIZE_KILL'] == "true" ) && ( $array['OPTIMIZE'] == "true" )) {
             for ($g=1; $g<=5; $g++)
             {
                 $color = get_color();

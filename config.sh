@@ -33,6 +33,9 @@ export ADMIN_PATH=$NEWZPATH"/www/admin"
 #to get the desired performance, 0 will disable all post processing
 export POST_TO_RUN="0"
 
+#set numbers of releases to process for nfos per loop
+export NFO_COUNT="500"
+
 #Enter the session name to be used by tmux, no spaces allowed in the name, this can be changed after scripts start
 #if you are running multiple servers, you could put your hostname here
 export TMUX_SESSION="Newznab"

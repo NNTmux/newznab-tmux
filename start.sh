@@ -136,6 +136,7 @@ else
                     \$tmpPath .= '1\/tmp1';/g" bin/lib/postprocess1.php
     $SED -i -e 's/order by r.postdate desc limit %d.*$/order by r.guid desc limit %d ", ($maxattemptstocheckpassworded + 1) * -1, $numtoProcess));/g' bin/lib/postprocess1.php
     $SED -i -e 's/PostPrc : Performing additional post processing.*$/PostPrc : Performing additional post processing by guid on ".$rescount." releases ...";/g' bin/lib/postprocess1.php
+    $SED -i -e "s/500/$NFO_COUNT/" bin/lib/postprocess1.php
 
     #start tmux
     #printf "\033]0; $TMUX_SESSION\007\003\n"
