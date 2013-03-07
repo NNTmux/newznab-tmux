@@ -47,7 +47,7 @@ def gitCurrentVersion():
 	return current_commit
 
 def latestCommit():
-	url = 'https://api.github.com/repos/jonnyboy/newznab-tmux/commits/dev'
+	url = 'https://api.github.com/repos/jonnyboy/newznab-tmux/commits/master'
 	result = urllib2.urlopen(url).read()
 	git = json.JSONDecoder().decode(result)
 	return git['sha']

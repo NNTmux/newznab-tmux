@@ -602,7 +602,7 @@ while( $i > 0 )
                 $optimize_run="false";
             }
         } elseif ((( TIME() - $time6 >= $array['MYISAM_LARGE'] ) || ( TIME() - $time8 >= $array['INNODB_LARGE'] ) || ( TIME() - $time5 >= $array['INNODB_SMALL'] ) || ( TIME() - $time11 >= $array['MYISAM_SMALL'] )) && ( $array['OPTIMIZE_KILL'] == "true" ) && ( $array['OPTIMIZE'] == "true" )) {
-            for ($g=1; $g<=5; $g++)
+            for ($g=2; $g<=5; $g++)
             {
                 $color = get_color();
                 shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.$g 'echo \"\033[38;5;\"$color\"m\n$panes0[$g]\nKilled in prep for \nOptimization\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
@@ -636,7 +636,7 @@ while( $i > 0 )
                 $optimize_run="false";
             }
         } elseif ((( TIME() - $time6 >= $array['MYISAM_LARGE'] ) || ( TIME() - $time11 >= $array['MYISAM_SMALL'] )) && ( $array['OPTIMIZE_KILL'] == "true" ) && ( $array['OPTIMIZE'] == "true" )) {
-            for ($g=1; $g<=5; $g++)
+            for ($g=2; $g<=5; $g++)
             {
                 $color = get_color();
                 shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.$g 'echo \"\033[38;5;\"$color\"m\n$panes0[$g]\nKilled in prep for \nOptimization\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
