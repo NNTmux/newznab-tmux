@@ -153,7 +153,8 @@ else
     cp -f $NEWZPATH/www/lib/console.php bin/lib/console.php
     cp -f $NEWZPATH/www/lib/book.php bin/lib/book.php
 
-    $SED -i -e "s/500/100/" bin/lib/postprocess1.php
+    $SED -i -e "s/500/250/" bin/lib/postprocess1.php
+    $SED -i -e "s/500/250/" bin/lib/postprocess2.php
 
     $SED -i -e "s/class Nfo/class Nfo1/" bin/lib/nfo.php
     $SED -i -e "s/class TvRage/class TvRage1/" bin/lib/tvrage.php

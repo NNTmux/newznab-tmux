@@ -63,6 +63,15 @@
   cd ../ && ./start.sh
   ```
 
+ * Updating these scripts is very simple.
+
+  ```bash
+  git pull
+  sudo scripts/update_svn.sh
+  or
+  sudo scripts/fix_files.sh
+  ```
+
  * If you have grsec compiled into your kernel, you may need root privileges for nmon, bwm-ng and any other app that accesses the /proc folder.
 
  * Included in the scripts folder is revert.sh. This file will update your Newznab+ installation and overwrite the changes from these scripts.

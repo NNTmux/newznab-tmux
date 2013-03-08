@@ -237,8 +237,8 @@ export PARSING="false"
 #this also includes kevin123's categorymod.php, you must run either update_svn.sh or fix_files.sh to copy the file into placeo
 export PARSING_MOD="false"
 
-#How often do you want update_parsing.php to run, in seconds
-export PARSING_TIMER="3600"
+#How often do you want update_parsing.php to run, in seconds. this takes alot of memory and processing time, default is every 12 hrs
+export PARSING_TIMER="43200"
 
 ############################################################
 
@@ -396,6 +396,11 @@ export RAMDISK_PATH=""
 
 ###########################################################
 
+#logs can be written, per pane, to the logs folder
+export WRITE_LOGS="false"
+
+###########################################################
+
 #By using this script you understand that the programmer is not responsible for any loss of data, users, or sanity.
 #You also agree that you were smart enough to make a backup of your database and files. Do you agree? yes/no
 export AGREED="no"
@@ -408,7 +413,7 @@ command -v mysql >/dev/null 2>&1 || { echo >&2 "I require mysql but it's not ins
 command -v php5 >/dev/null 2>&1 && export PHP=`command -v php5` || { export PHP=`command -v php`; }
 command -v tmux >/dev/null 2>&1 || { echo >&2 "I require tmux but it's not installed. Aborting."; exit 1; } && export TMUXCMD=`command -v tmux`
 command -v nice >/dev/null 2>&1 || { echo >&2 "I require nice but it's not installed. Aborting."; exit 1; } && export NICE=`command -v nice`
-
+command -v tee >/dev/null 2>&1 || { echo >&2 "I require tee but it's not installed. Aborting."; exit 1; } && export TEE=`command -v tee`
 
 if [[ $USE_HTOP == "true" ]]; then
   command -v htop >/dev/null 2>&1|| { echo >&2 "I require htop but it's not installed. Aborting."; exit 1; } && export HTOP=`command -v htop`
