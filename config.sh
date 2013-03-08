@@ -33,9 +33,6 @@ export ADMIN_PATH=$NEWZPATH"/www/admin"
 #to get the desired performance, 0 will disable all post processing
 export POST_TO_RUN="0"
 
-#set numbers of releases to process for nfos per loop
-export NFO_COUNT="500"
-
 #Enter the session name to be used by tmux, no spaces allowed in the name, this can be changed after scripts start
 #if you are running multiple servers, you could put your hostname here
 export TMUX_SESSION="Newznab"
@@ -237,6 +234,7 @@ export CLEANUP_TIMER="3600"
 export PARSING="false"
 
 #choose to use kevin123's update_parsing script
+#this also includes kevin123's categorymod.php, you must run either update_svn.sh or fix_files.sh to copy the file into placeo
 export PARSING_MOD="false"
 
 #How often do you want update_parsing.php to run, in seconds

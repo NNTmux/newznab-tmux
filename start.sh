@@ -105,6 +105,13 @@ else
 
     #remove postprocessing scripts
     rm -f bin/lib/post*
+    rm -f bin/lib/book.php
+    rm -f bin/lib/console.php
+    rm -f bin/lib/movie.php
+    rm -f bin/lib/music.php
+    rm -f bin/lib/music1.php
+    rm -f bin/lib/nfo.php
+    rm -f bin/lib/tvrage.php
     rm -f bin/processAdditional*
     rm -f bin/processAlternate*
 
@@ -136,7 +143,93 @@ else
                     \$tmpPath .= '1\/tmp1';/g" bin/lib/postprocess1.php
     $SED -i -e 's/order by r.postdate desc limit %d.*$/order by r.guid desc limit %d ", ($maxattemptstocheckpassworded + 1) * -1, $numtoProcess));/g' bin/lib/postprocess1.php
     $SED -i -e 's/PostPrc : Performing additional post processing.*$/PostPrc : Performing additional post processing by guid on ".$rescount." releases ...";/g' bin/lib/postprocess1.php
-    $SED -i -e "s/500/$NFO_COUNT/" bin/lib/postprocess1.php
+
+
+    cp -f $NEWZPATH/www/lib/nfo.php bin/lib/nfo.php
+    cp -f $NEWZPATH/www/lib/tvrage.php bin/lib/tvrage.php
+    cp -f $NEWZPATH/www/lib/movie.php bin/lib/movie.php
+    cp -f $NEWZPATH/www/lib/music.php bin/lib/music.php
+    cp -f $NEWZPATH/www/lib/music.php bin/lib/music1.php
+    cp -f $NEWZPATH/www/lib/console.php bin/lib/console.php
+    cp -f $NEWZPATH/www/lib/book.php bin/lib/book.php
+
+    $SED -i -e "s/500/100/" bin/lib/postprocess1.php
+
+    $SED -i -e "s/class Nfo/class Nfo1/" bin/lib/nfo.php
+    $SED -i -e "s/class TvRage/class TvRage1/" bin/lib/tvrage.php
+    $SED -i -e "s/class Movie/class Movie1/" bin/lib/movie.php
+    $SED -i -e "s/class Music/class Music1/" bin/lib/music.php
+    $SED -i -e "s/class Music/class Music2/" bin/lib/music1.php
+    $SED -i -e "s/class Console/class Console1/" bin/lib/console.php
+    $SED -i -e "s/class Book/class Book1/" bin/lib/book.php
+
+    $SED -i -e "s/function Nfo/function Nfo1/" bin/lib/nfo.php
+    $SED -i -e "s/function TvRage/function TvRage1/" bin/lib/tvrage.php
+    $SED -i -e "s/function Movie/function Movie1/" bin/lib/movie.php
+    $SED -i -e "s/function Music/function Music1/" bin/lib/music.php
+    $SED -i -e "s/function Music/function Music2/" bin/lib/music1.php
+    $SED -i -e "s/function Console/function Console1/" bin/lib/console.php
+    $SED -i -e "s/function Book/function Book1/" bin/lib/book.php
+
+    $SED -i -e "s/processNfoFiles/processNfoFiles1/" bin/lib/nfo.php
+    $SED -i -e "s/processMovieReleases/processMovieReleases1/" bin/lib/movie.php
+    $SED -i -e "s/processMusicReleases/processMusicReleases1/" bin/lib/music.php
+    $SED -i -e "s/processMusicReleases/processMusicReleases2/" bin/lib/music1.php
+    $SED -i -e "s/processBookReleases/processBookReleases1/" bin/lib/book.php
+    $SED -i -e "s/processConsoleReleases/processConsoleReleases1/" bin/lib/console.php
+
+    $SED -i -e "s/nfoHandleError/nfoHandleError1/" bin/lib/nfo.php
+    $SED -i -e "s/ORDER BY postdate DESC/ORDER BY postdate ASC/" bin/lib/nfo.php
+
+    $SED -i -e 's/WWW_DIR."\/lib\/nfo.php"/"nfo.php"/g' bin/lib/postprocess2.php
+    $SED -i -e 's/WWW_DIR."\/lib\/movie.php"/"movie.php"/g' bin/lib/postprocess2.php
+    $SED -i -e 's/WWW_DIR."\/lib\/music.php"/"music.php"/g' bin/lib/postprocess1.php
+    $SED -i -e 's/WWW_DIR."\/lib\/music.php"/"music1.php"/g' bin/lib/postprocess2.php
+    $SED -i -e 's/WWW_DIR."\/lib\/console.php"/"console.php"/g' bin/lib/postprocess2.php
+    $SED -i -e 's/WWW_DIR."\/lib\/book.php"/"book.php"/g' bin/lib/postprocess2.php
+    $SED -i -e 's/WWW_DIR."\/lib\/tvrage.php"/"tvrage.php"/g' bin/lib/postprocess2.php
+
+    $SED -i -e "s/processNfos()/processNfos1()/g" bin/lib/postprocess2.php
+    $SED -i -e "s/processMovies()/processMovies1()/g" bin/lib/postprocess2.php
+    $SED -i -e "s/processMusic()/processMusic1()/g" bin/lib/postprocess1.php
+    $SED -i -e "s/processMusic()/processMusic2()/g" bin/lib/postprocess2.php
+    $SED -i -e "s/processBooks()/processBooks1()/g" bin/lib/postprocess2.php
+    $SED -i -e "s/processGames()/processGames1()/g" bin/lib/postprocess2.php
+    $SED -i -e "s/processTv()/processTv1()/g" bin/lib/postprocess2.php
+
+    $SED -i -e "s/new Nfo/new Nfo1/" bin/lib/postprocess2.php
+    $SED -i -e "s/new Movie/new Movie1/" bin/lib/postprocess2.php
+    $SED -i -e "s/new Music/new Music1/" bin/lib/postprocess1.php
+    $SED -i -e "s/new Music/new Music2/" bin/lib/postprocess2.php
+    $SED -i -e "s/new Book/new Book1/" bin/lib/postprocess2.php
+    $SED -i -e "s/new Console/new Console1/" bin/lib/postprocess2.php
+
+    $SED -i -e "s/processNfoFiles/processNfoFiles1/" bin/lib/postprocess2.php
+    $SED -i -e "s/processMovieReleases()/processMovieReleases1()/" bin/lib/postprocess2.php
+    $SED -i -e "s/processMusicReleases()/processMusicReleases1()/" bin/lib/postprocess1.php
+    $SED -i -e "s/processMusicReleases()/processMusicReleases2()/" bin/lib/postprocess2.php
+    $SED -i -e "s/processBookReleases()/processBookReleases1()/" bin/lib/postprocess2.php
+    $SED -i -e "s/processConsoleReleases()/processConsoleReleases1()/" bin/lib/postprocess2.php
+
+    $SED -i -e "s/ORDER BY postdate DESC/ORDER BY postdate ASC/" bin/lib/nfo.php
+    $SED -i -e "s/ORDER BY postdate DESC/ORDER BY postdate ASC/" bin/lib/movie.php
+    $SED -i -e "s/ORDER BY createddate DESC/ORDER BY createddate ASC/" bin/lib/movie.php
+    $SED -i -e "s/ORDER BY postdate DESC LIMIT 1000/ORDER BY postdate DESC LIMIT 100/" bin/lib/music.php
+    $SED -i -e "s/ORDER BY postdate DESC LIMIT 1000/ORDER BY postdate ASC LIMIT 100/" bin/lib/music1.php
+    $SED -i -e "s/ORDER BY createddate DESC/ORDER BY createddate DESC/" bin/lib/music.php
+    $SED -i -e "s/ORDER BY createddate DESC/ORDER BY createddate ASC/" bin/lib/music1.php
+    $SED -i -e "s/ORDER BY postdate DESC/ORDER BY postdate ASC/" bin/lib/book.php
+    $SED -i -e "s/ORDER BY postdate DESC/ORDER BY postdate ASC/" bin/lib/console.php
+    $SED -i -e "s/ORDER BY createddate DESC/ORDER BY createddate ASC/" bin/lib/console.php
+
+#    $SED -i -e "s/order by postdate desc/ORDER BY postdate ASC/" bin/lib/tvrage.php
+#    $SED -i -e "s/order by rageID asc/order by rageID DESC/" bin/lib/tvrage.php
+#    $SED -i -e "s/order by airdate asc/order by airdate DESC/" bin/lib/tvrage.php
+#    $SED -i -e "s/order by tvrage.releasetitle asc/order by tvrage.releasetitle DESC/" bin/lib/tvrage.php
+
+
+
+
 
     #start tmux
     #printf "\033]0; $TMUX_SESSION\007\003\n"
@@ -201,15 +294,26 @@ else
     $TMUXCMD splitw -h -p 67 'printf "\033]2;postprocessing[31]\033\\"'
     $TMUXCMD splitw -h -p 50 'printf "\033]2;postprocessing[32]\033\\"'
 
-    $TMUXCMD new-window -n post2 'printf "\033]2;processNfos\033\\"'
-    $TMUXCMD splitw -h -p 50 'printf "\033]2;processTv\033\\"'
+    $TMUXCMD new-window -n post2a 'printf "\033]2;processNfos1\033\\"'
+    $TMUXCMD splitw -h -p 50 'printf "\033]2;processNfos2\033\\"'
     $TMUXCMD selectp -t 0
-    $TMUXCMD splitw -v -p 75 'printf "\033]2;processGames\033\\"'
-    $TMUXCMD splitw -v -p 67 'printf "\033]2;processMovies\033\\"'
-    $TMUXCMD splitw -v -p 50 'printf "\033]2;processMusic\033\\"'
+    $TMUXCMD splitw -v -p 75 'printf "\033]2;processGames1\033\\"'
+    $TMUXCMD splitw -v -p 67 'printf "\033]2;processMovies1\033\\"'
+    $TMUXCMD splitw -v -p 50 'printf "\033]2;processMusic1\033\\"'
     $TMUXCMD selectp -t 4
-    $TMUXCMD splitw -v -p 75 'printf "\033]2;processBooks\033\\"'
-    $TMUXCMD splitw -v -p 67 'printf "\033]2;processOther\033\\"'
+    $TMUXCMD splitw -v -p 75 'printf "\033]2;processGames2\033\\"'
+    $TMUXCMD splitw -v -p 67 'printf "\033]2;processMovies2\033\\"'
+    $TMUXCMD splitw -v -p 50 'printf "\033]2;processMusic2\033\\"'
+
+    $TMUXCMD new-window -n post2b 'printf "\033]2;processTv1\033\\"'
+    $TMUXCMD splitw -h -p 50 'printf "\033]2;processTv2\033\\"'
+    $TMUXCMD selectp -t 0
+    $TMUXCMD splitw -v -p 75 'printf "\033]2;processTv3\033\\"'
+    $TMUXCMD splitw -v -p 67 'printf "\033]2;processBooks1\033\\"'
+    $TMUXCMD splitw -v -p 50 'printf "\033]2;processOther\033\\"'
+    $TMUXCMD selectp -t 4
+    $TMUXCMD splitw -v -p 75 'printf "\033]2;processTv4\033\\"'
+    $TMUXCMD splitw -v -p 67 'printf "\033]2;processBooks2\033\\"'
     $TMUXCMD splitw -v -p 50 'printf "\033]2;processUnwanted\033\\"'
 
     if [[ $USE_HTOP == "true" ]]; then
@@ -257,3 +361,4 @@ else
 
 fi
 exit
+

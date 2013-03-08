@@ -7,12 +7,10 @@ require(WWW_DIR.'/lib/tvrage.php');
 $s = new Sites();
 $site = $s->get();
 
-if ( $site->lookupanidb == 1)
+if ( $site->lookuptvrage == 1)
 {
-    $anidb = new AniDB(true);
-    $anidb->animetitlesUpdate();
-    $anidb->processAnimeReleases();
+    $tvrage = new TVRage(true);
+    $tvrage->processTvReleases(($site->lookuptvrage==1));
 }
 
 ?>
-
