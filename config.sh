@@ -234,8 +234,11 @@ export CLEANUP_TIMER="3600"
 export PARSING="false"
 
 #choose to use kevin123's update_parsing script
-#this also includes kevin123's categorymod.php, you must run either update_svn.sh or fix_files.sh to copy the file into placeo
+#this also includes kevin123's categorymod.php, you must run either update_svn.sh or fix_files.sh to copy the file into place
 export PARSING_MOD="false"
+
+#run update_parsing.php against the whole db or kust the last 24 hours
+export WHOLE_DB="false"
 
 #How often do you want update_parsing.php to run, in seconds. this takes alot of memory and processing time, default is every 12 hrs
 export PARSING_TIMER="43200"

@@ -146,7 +146,7 @@ else
 
 
     cp -f $NEWZPATH/www/lib/nfo.php bin/lib/nfo.php
-    cp -f $NEWZPATH/www/lib/tvrage.php bin/lib/tvrage.php
+    #cp -f $NEWZPATH/www/lib/tvrage.php bin/lib/tvrage.php
     cp -f $NEWZPATH/www/lib/movie.php bin/lib/movie.php
     cp -f $NEWZPATH/www/lib/music.php bin/lib/music.php
     cp -f $NEWZPATH/www/lib/music.php bin/lib/music1.php
@@ -157,7 +157,7 @@ else
     $SED -i -e "s/500/250/" bin/lib/postprocess2.php
 
     $SED -i -e "s/class Nfo/class Nfo1/" bin/lib/nfo.php
-    $SED -i -e "s/class TvRage/class TvRage1/" bin/lib/tvrage.php
+    #$SED -i -e "s/class TvRage/class TvRage1/" bin/lib/tvrage.php
     $SED -i -e "s/class Movie/class Movie1/" bin/lib/movie.php
     $SED -i -e "s/class Music/class Music1/" bin/lib/music.php
     $SED -i -e "s/class Music/class Music2/" bin/lib/music1.php
@@ -165,7 +165,7 @@ else
     $SED -i -e "s/class Book/class Book1/" bin/lib/book.php
 
     $SED -i -e "s/function Nfo/function Nfo1/" bin/lib/nfo.php
-    $SED -i -e "s/function TvRage/function TvRage1/" bin/lib/tvrage.php
+    #$SED -i -e "s/function TvRage/function TvRage1/" bin/lib/tvrage.php
     $SED -i -e "s/function Movie/function Movie1/" bin/lib/movie.php
     $SED -i -e "s/function Music/function Music1/" bin/lib/music.php
     $SED -i -e "s/function Music/function Music2/" bin/lib/music1.php
@@ -188,7 +188,7 @@ else
     $SED -i -e 's/WWW_DIR."\/lib\/music.php"/"music1.php"/g' bin/lib/postprocess2.php
     $SED -i -e 's/WWW_DIR."\/lib\/console.php"/"console.php"/g' bin/lib/postprocess2.php
     $SED -i -e 's/WWW_DIR."\/lib\/book.php"/"book.php"/g' bin/lib/postprocess2.php
-    $SED -i -e 's/WWW_DIR."\/lib\/tvrage.php"/"tvrage.php"/g' bin/lib/postprocess2.php
+    #$SED -i -e 's/WWW_DIR."\/lib\/tvrage.php"/"tvrage.php"/g' bin/lib/postprocess2.php
 
     $SED -i -e "s/processNfos()/processNfos1()/g" bin/lib/postprocess2.php
     $SED -i -e "s/processMovies()/processMovies1()/g" bin/lib/postprocess2.php

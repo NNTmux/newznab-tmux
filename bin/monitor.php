@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.1r709";
+$version="0.1r710";
 
 $db = new DB();
 
@@ -1342,8 +1342,8 @@ while( $i > 0 )
     //check ffmpeg and mediainfo, kill if necessary
     if (( $array['KILL_PROCESS'] != "0" ) && ( $array['KILL_QUIET'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
         echo "\n";
-        shell_exec("killall -qo {$array['KILL_PROCESS']}s -9 mediainfo 2>&1 1> /dev/null");
-        shell_exec("killall -qo {$array['KILL_PROCESS']}s -9 ffmpeg 2>&1 1> /dev/null");
+        shell_exec("killall -qo {$array['KILL_PROCESS']}s -9 mediainfo");
+        shell_exec("killall -qo {$array['KILL_PROCESS']}s -9 ffmpeg");
     } else {
         echo "\n";
         shell_exec("killall -o {$array['KILL_PROCESS']}s -9 mediainfo 2>&1 1> /dev/null");
@@ -1352,8 +1352,8 @@ while( $i > 0 )
 
     if (( $array['KILL_QUIET'] == "true" ) && ( $optimize_safe_to_run == "true" )) {
         echo "\n";
-        shell_exec("killall -q mediainfo 2>&1 1> /dev/null");
-        shell_exec("killall -q ffmpeg 2>&1 1> /dev/null");
+        shell_exec("killall -q mediainfo");
+        shell_exec("killall -q ffmpeg");
     } else {
         echo "\n";
         shell_exec("killall mediainfo 2>&1 1> /dev/null");

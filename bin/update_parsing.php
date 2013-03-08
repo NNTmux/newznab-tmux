@@ -10,6 +10,18 @@ require_once (WWW_DIR."/lib/categorymod.php");
 require_once (WWW_DIR."/lib/movie.php");
 
 
+//get variables from config.sh and defaults.sh
+$path = dirname(__FILE__);
+$varnames = shell_exec("cat ".$path."/../config.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
+$varnames .= shell_exec("cat ".$path."/../defaults.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
+$vardata = shell_exec("cat ".$path."/../config.sh | grep ^export | cut -d \\\" -f2 | awk '{print $1;}'");
+$vardata .= shell_exec("cat ".$path."/../defaults.sh | grep ^export | cut -d \\\" -f2 | awk '{print $1;}'");
+$varnames = explode("\n", $varnames);
+$vardata = explode("\n", $vardata);
+$array = array_combine($varnames, $vardata);
+unset($array['']);
+
+
 //This script updates release names for releases in 'TV > Other', 'Movie > Other', 'XXX > Other', and 'Other > Misc' categories.
 //It first attempts to extract the release name from the NFO, falling back to rarset filename -- the ReleaseFiles.
 //If the new releasename is the same as the old name, OR the name is different but still doesnt match a new category, it will skip the release.
@@ -24,7 +36,7 @@ $echo = false;
 /// Set this to true to echo only
 
 /// The following value sets the amount of time to either 24 hours or the Whole DB
-$limited = true;
+$limited = $array['WHOLE_DB'];
 /// Set to true for 24 hours, false for whole db. 
 
 /// WARNING!!!!!!!!The following value runs update_parsing either against "other categories", or all categories, do not use this if $echo is false. This is for testing.
