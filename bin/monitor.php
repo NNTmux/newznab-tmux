@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.1r714";
+$version="0.1r715";
 
 $db = new DB();
 
@@ -228,6 +228,8 @@ $run_time1 = 0;
 $run_time2 = 0;
 $run_time3 = 0;
 $run_time4 = 0;
+$optimize_safe_to_run = "false";
+$optimize_run = "false";
 
 //formatted  output
 $nfo_diff = number_format( $nfo_remaining_now - $nfo_remaining_start );
@@ -612,8 +614,6 @@ while( $i > 0 )
         $_tmux_test = $array['POWERLINE'];
     }
 
-    $optimize_safe_to_run="false";
-    $optimize_run="false";
     $dead1=0;
     $dead2=0;
     $dead3=0;
@@ -658,7 +658,7 @@ while( $i > 0 )
                 $color = get_color();
                 shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:3.$g 'echo \"\033[38;5;\"$color\"m\n$panes3[$g]\nKilled in prep for \nOptimization\" && date +\"%D %T\" && echo \"This is color #$color\" && $ds1 $panes3[$g] $ds4'");
             }
-            sleep(3);
+            sleep(5);
             $optimize_run="true";
             $optimize_safe_to_run="true";
         }
@@ -698,7 +698,7 @@ while( $i > 0 )
                 $color = get_color();
                 shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:3.$g 'echo \"\033[38;5;\"$color\"m\n$panes3[$g]\nKilled in prep for \nOptimization\" && date +\"%D %T\" && echo \"This is color #$color\" && $ds1 $panes3[$g] $ds4'");
             }
-            sleep(10);
+            sleep(5);
             $optimize_run="true";
             $optimize_safe_to_run="true";
         }
@@ -1402,6 +1402,9 @@ while( $i > 0 )
     //notify monitor that optimize is running
     if (( ! shell_exec("$_tmux list-panes -t {$array['TMUX_SESSION']}:1 | grep 4: | grep dead" )) && ( $array['OPTIMIZE'] == "true" )) {
         echo "\033[1;41;33mOPTIMIZATION OF THE MYSQL TABLES HAS STARTED, DO NOT STOP THIS SCRIPT!\033[1;0;33m\n\n";
+    } else {
+        $optimize_safe_to_run = "false";
+        $optimize_run = "false";
     }
 
     //turn of monitor if set to false
