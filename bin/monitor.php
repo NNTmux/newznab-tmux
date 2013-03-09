@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.1r712";
+$version="0.1r713";
 
 $db = new DB();
 
@@ -224,6 +224,10 @@ $misc_diff = 0;
 $disk_use = 0;
 $disk_free = 0;
 $total_work_start = 0;
+$run_time1 = 0;
+$run_time2 = 0;
+$run_time3 = 0;
+$run_time4 = 0;
 
 //formatted  output
 $nfo_diff = number_format( $nfo_remaining_now - $nfo_remaining_start );
@@ -627,7 +631,7 @@ while( $i > 0 )
             $dead4 = str_replace( " ", '', `tmux list-panes -t {$array['TMUX_SESSION']}:3 | grep dead | wc -l` );
             $dead5 = str_replace( " ", '', `tmux list-panes -t {$array['TMUX_SESSION']}:4 | grep dead | wc -l` );
             $dead6 = str_replace( " ", '', `tmux list-panes -t {$array['TMUX_SESSION']}:5 | grep dead | wc -l` );
-            if (( $dead1 >= 4 ) && ( $dead2 == 8 ) && ( $dead3 == 32 ) && ( $dead4 == 16 ) && ( $dead5 == 8 ) && ( $dead6 == 8 )) {
+            if (( $dead1 >= 4 ) && ( $dead2 == 8 ) && ( $dead3 == 16 ) && ( $dead4 == 16 ) && ( $dead5 == 8 ) && ( $dead6 == 8 )) {
                 $optimize_run="true";
             } else {
                 $optimize_run="false";
@@ -667,7 +671,7 @@ while( $i > 0 )
             $dead4 = str_replace( " ", '', `tmux list-panes -t {$array['TMUX_SESSION']}:3 | grep dead | wc -l` );
             $dead5 = str_replace( " ", '', `tmux list-panes -t {$array['TMUX_SESSION']}:4 | grep dead | wc -l` );
             $dead6 = str_replace( " ", '', `tmux list-panes -t {$array['TMUX_SESSION']}:5 | grep dead | wc -l` );
-            if (( $dead1 >= 4 ) && ( $dead2 == 8 ) && ( $dead3 == 32 ) && ( $dead4 == 16 ) && ( $dead5 == 8 ) && ( $dead6 == 8 )) {
+            if (( $dead1 >= 4 ) && ( $dead2 == 8 ) && ( $dead3 == 16 ) && ( $dead4 == 16 ) && ( $dead5 == 8 ) && ( $dead6 == 8 )) {
                 $optimize_run="true";
             } else {
                 $optimize_run="false";
@@ -1069,21 +1073,21 @@ while( $i > 0 )
         shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:5.4 'echo \"\033[38;5;\"$color\"m\n$panes5[4] Disabled by OPTIMIZE\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
     }
 
-    //runs processTv.php in pane 4.5 once if needed then exits
+    //runs processTv.php in pane 5.5 once if needed then exits
     if (( $tvrage_releases_proc >= 200 ) && ( $array['POST_TO_RUN'] != 0 ) && ( $array['POST_TO_RUN'] >=2 ) && ( $optimize_safe_to_run != "true" )) {
         $color = get_color();
-        $log = writelog($panes4[5]);
-        //shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:4.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes4[5] $ds2 && cd $_bin && $_php processTv3.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes4[5] $ds3' 2>&1 1> /dev/null");
-        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:4.5 'echo \"\033[38;5;\"$color\"m\n$panes4[5] Not completed, yet.\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
+        $log = writelog($panes5[5]);
+        //shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:4.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes5[5] $ds2 && cd $_bin && $_php processTv3.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes5[5] $ds3' 2>&1 1> /dev/null");
+        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:5.5 'echo \"\033[38;5;\"$color\"m\n$panes5[5] Not completed, yet.\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
     } elseif (( $array['POST_TO_RUN'] == 0 ) && ( $optimize_safe_to_run != "true" )) {
         $color = get_color();
-        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:4.5 'echo \"\033[38;5;\"$color\"m\n$panes4[5] Disabled by POST_TO_RUN\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
+        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:5.5 'echo \"\033[38;5;\"$color\"m\n$panes5[5] Disabled by POST_TO_RUN\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
     } elseif ( $optimize_safe_to_run != "true" ) {
         $color = get_color();
-        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:4.5 'echo \"\033[38;5;\"$color\"m\n$panes4[5] Has no work to process \" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
+        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:5.5 'echo \"\033[38;5;\"$color\"m\n$panes5[5] Has no work to process \" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
     } elseif ( $optimize_safe_to_run == "true" ) {
         $color = get_color();
-        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:4.5 'echo \"\033[38;5;\"$color\"m\n$panes4[5] Disabled by OPTIMIZE\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
+        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:5.5 'echo \"\033[38;5;\"$color\"m\n$panes5[5] Disabled by OPTIMIZE\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
     }
 
     //runs processBooks.php in pane 5.2 once if needed then exits
