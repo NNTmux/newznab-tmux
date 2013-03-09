@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.1r711";
+$version="0.1r712";
 
 $db = new DB();
 
@@ -13,7 +13,7 @@ $qry = "SELECT COUNT( releases.categoryID ) AS cnt, parentID FROM releases RIGHT
 $proc = "SELECT ( SELECT COUNT( groupID ) AS cnt from releases where consoleinfoID IS NULL and categoryID BETWEEN 1000 AND 1999 ) AS console, ( SELECT COUNT( groupID ) AS cnt from releases where imdbID IS NULL and categoryID BETWEEN 2000 AND 2999 ) AS movies, ( SELECT COUNT( groupID ) AS cnt from releases where musicinfoID IS NULL and categoryID BETWEEN 3000 AND 3999 ) AS audio, ( SELECT COUNT( groupID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (categoryID BETWEEN 4000 AND 4999 and ((r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)))) AS pc, ( SELECT COUNT( groupID ) AS cnt from releases where rageID = -1 and categoryID BETWEEN 5000 AND 5999 ) AS tv, ( SELECT COUNT( groupID ) AS cnt from releases where bookinfoID IS NULL and categoryID = 7020 ) AS book, ( SELECT COUNT( groupID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)) AS work, ( SELECT COUNT( groupID ) AS cnt from releases) AS releases, ( SELECT COUNT( groupID ) AS cnt FROM releases r WHERE r.releasenfoID = 0) AS nforemains, ( SELECT COUNT( groupID ) AS cnt FROM releases WHERE releasenfoID not in (0, -1)) AS nfo, ( SELECT table_rows AS cnt FROM information_schema.TABLES where table_name = 'parts' AND TABLE_SCHEMA = '".DB_NAME."' ) AS parts, ( SELECT concat(round((data_length+index_length)/(1024*1024*1024),2),'GB') AS cnt FROM information_schema.tables where table_name = 'parts' AND TABLE_SCHEMA = '".DB_NAME."' ) AS partsize, ( SELECT UNIX_TIMESTAMP(adddate) from releases order by adddate desc limit 1 ) AS newestadd, ( SELECT name from releases order by adddate desc limit 1 ) AS newestaddname;";
 
 //get first release inserted datetime and oldest posted datetime
-$posted_date = "SELECT(SELECT UNIX_TIMESTAMP(adddate) from releases order by adddate asc limit 1) AS adddate;";
+//$posted_date = "SELECT(SELECT UNIX_TIMESTAMP(adddate) from releases order by adddate asc limit 1) AS adddate;";
 
 //get variables from config.sh and defaults.sh
 $path = dirname(__FILE__);
@@ -177,7 +177,7 @@ $nfo_now = 0;
 $parts_rows = 0;
 $parts_size_gb = 0;
 $releases_now = 0;
-$firstdate = TIME();
+//$firstdate = TIME();
 $newestname = "Unknown";
 $newestdate = TIME();
 $parts_rows_unformated = 0;
@@ -308,6 +308,13 @@ while( $i > 0 )
     $ds3 = "stopped";
     $ds4 = "killed";
 
+    //kill panes if user changed to/from nzb import threaded
+    if ( $_imports != $array['NZB_THREADS'] ) {
+        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.4 'sleep 5' && $ds1 $panes0[4] $ds4");
+        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.1 'sleep 5' && $ds1 $panes0[1] $ds4");
+        $_imports = $array['NZB_THREADS'];
+    }
+
     //get microtime to at start of queries
     $query_timer_start=microtime_float();
 
@@ -342,8 +349,8 @@ while( $i > 0 )
     printf("\033]0;{$array['TMUX_SESSION']}\007\003\n");
 
     //get valuses from $posted_date
-    $posted_date_result = @$db->query($posted_date);
-    if ( $posted_date_result[0]['adddate'] ) { $firstdate = $posted_date_result[0]['adddate']; }
+    //$posted_date_result = @$db->query($posted_date);
+    //if ( $posted_date_result[0]['adddate'] ) { $firstdate = $posted_date_result[0]['adddate']; }
 
     //initial query for total releases
     if (( $proc_result[0]['work'] != NULL ) && ( $work_start == 0 )) { $work_start = $proc_result[0]['work']; }

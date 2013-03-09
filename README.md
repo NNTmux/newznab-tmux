@@ -2,7 +2,7 @@
 
  * Screen shots identifying each pane and the process it runs are located at the bottom of this page.
  
- * Before submitting a bug report, please verify that you are running the current revision of Newznab+ and these scripts. Then include as much detail as possible. A screen shot is am extremely telling and very usefull tool.
+ * Before submitting a bug report, please verify that you are running the current revision of Newznab+ and these scripts. Then include as much detail as possible. A screen shot is an extremely telling and very usefull tool.
 
  * This is a series of scripts that break down the stock processes of a typical Newznab+ installation and perform each task separately and at the same time. Tmux allows for several windows and panes to be created to allow the monitoring of each script as it performs its task. Each task is started and restarted by monitor.php. The post processing has also been enhanced to allow up to 32 simultaneous post processes plus another 8 for each category of releases, for a total of 40 possible post processing at once. The scripts are started by either timers, set in defaults.sh or started automatically and then sleeps for a time set in defaults.sh. Almost everything can be stopped/started from the defaults.sh without restarting the scripts.
 

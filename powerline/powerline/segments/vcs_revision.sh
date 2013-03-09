@@ -37,8 +37,8 @@ __parse_svn_stats(){
 		return
 	fi
 
-	local svn_ref=$(echo "${svn_info}" | sed -ne 's#^Revision: ##p')
-        local REVISION=`svn info svn://svn.newznab.com/nn/branches/nnplus |grep '^Revision:' | sed -e 's/^Revision: //'`
+	local svn_ref=$(echo "${svn_info}" | sed -ne 's#^Last Changed Rev: ##p')
+        local REVISION=`svn info svn://svn.newznab.com/nn/branches/nnplus |grep '^Last Changed Rev:' | sed -e 's/^Last Changed Rev: //'`
 
         if [[ $REVISION -gt 0 ]] ; then
 		local calc=`expr ${REVISION} - ${svn_ref}`
