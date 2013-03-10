@@ -10,11 +10,11 @@ $releases->processReleases();
 //$sphinx->update();
 
 function relativeTime($_time) {
-    $d[0] = array(1,"sec");
-    $d[1] = array(60,"min");
-    $d[2] = array(3600,"hr");
-    $d[3] = array(86400,"day");
-    $d[4] = array(31104000,"yr");
+    $d[0] = array(1,"\033[1;33msec");
+    $d[1] = array(60,"\033[1;33mmin");
+    $d[2] = array(3600,"\033[1;33mhr");
+    $d[3] = array(86400,"\033[1;33mday");
+    $d[4] = array(31104000,"\033[1;33myr");
 
     $w = array();
 
@@ -29,7 +29,8 @@ function relativeTime($_time) {
         $secondsLeft -= ($w[$i]*$d[$i][0]);
         if($w[$i]!=0)
         {
-            $return.= "\033[1;31m".abs($w[$i])."\033[0m" . " " . $d[$i][1] . (($w[$i]>1)?'s':'') ." ";
+            //$return.= abs($w[$i]). " " . $d[$i][1] . (($w[$i]>1)?'s':'') ." ";
+            $return.= $w[$i]. " " . $d[$i][1] . (($w[$i]>1)?'s':'') ." ";
         }
     }
 
@@ -37,5 +38,5 @@ function relativeTime($_time) {
     return $return;
 }
 
-echo "\033[1;33mThis loop completed in: " .relativeTime($time). "\033[0m\n";
+echo "\033[1;33mThis loop completed in: " .relativeTime($time). "\n";
 ?>

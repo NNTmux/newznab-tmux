@@ -1320,7 +1320,7 @@ check_innodb_status () {
 
 		else
 		cecho "Cannot parse InnoDB stats prior to 5.0.x" red
-		$mysql -s -e "SHOW /*!50000 ENGINE */ INNODB STATUS\G"
+		#$mysql -s -e "SHOW /*!50000 ENGINE */ INNODB STATUS\G"
 		fi
 
 		human_readable $innodb_buffer_pool_size innodb_buffer_pool_sizeHR

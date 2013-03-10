@@ -20,10 +20,11 @@ $i=0;
 while ($i==0) {
     system('clear');
 
-    printf("\n\033[1;33m");
-    $mask = "%20s %10.10s %13s \n";
+    printf("\033[1;33m");
+    $mask = "%-15.15s %22.22s %22.22s\n";
     printf($mask, "Folder Name", "In Folder", "Imported");
-    printf($mask, "===============", "==========", "=============\033[0m");
+    printf($mask, "====================", "====================", "====================");
+    printf("\033[38;5;214m");
 
     $subdir_count = 0;
     $subpath = $array['NZBS'];
@@ -49,7 +50,7 @@ while ($i==0) {
 
     if (($subdir_count_now != $subdir_count ) || ( $current != $array['NZB_THREADS'] )) {
         system('clear');
-        printf("\n\n\033[1;41;33mYour imports settings have changed.");
+        printf("\n\033[1;41;33mYour imports settings have changed.");
         break;
     }
 
@@ -64,7 +65,7 @@ while ($i==0) {
             $folder=basename("$subdir");
             $filecount = count(glob($subdir.'/*.nzb'));
             $processed=$filecount0[$subdir_count_loop]-$filecount;
-            printf("\033[0m");
+            printf("\033[38;5;214m");
             if ( $filecount > 0)
                 printf($mask, "{$folder}","$filecount","$processed");
             $totalproc=$totalproc+$processed;
@@ -72,6 +73,7 @@ while ($i==0) {
             $subdir_count_loop++;
         }
         echo ("\033[1;33m");
+        printf($mask, "____________________", "____________________", "____________________");
         printf($mask, "Total","$toprocess","$totalproc");
     } else {
         $filecount0 = count(glob($subpath.'/*.nzb'));
