@@ -12,6 +12,10 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 #if this is set to false, the script will run 1 loop and terminate
 export RUNNING="true"
 
+#these scripts set the 'nice'ness of each script, default is 19, the lowest, the highest is -20
+#anything between -1 and -20 require root/sudo to run
+export NICENESS="19"
+
 ############################################################
 
 #Set paths
@@ -147,22 +151,6 @@ export BACKFILL_MAX_ROWS="0"
 #once your backfill numbers reach $MAXDAYS, then it will no long increment the database
 #backfill will continue to run, and do no work, at that point you should disable backfill, below
 export MAXDAYS="210"
-
-############################################################
-
-#use kevin123's safer_backfill_parts.php instead of normal backfill or backfill threaded
-#this is the script I use, it does 1 group at a time from z to a (wanted to start with tv groups first) 100k parts,
-#then the script stops (once per loop), if your first_record_postdate on the group is 2012-06-24
-#it will be skipped (target reached). When that group is done, it will do another ( again from z to a).
-#this does not use increment, it works by the date set below
-#you also need to enable kevin's compression mod, those files are needed and you still need to enable BACKFILL
-export KEVIN_SAFER="false"
-
-#set the date to go back to, must be in the format of YYYY-MM-DD, like 2012-06-24
-export KEVIN_DATE="2012-06-24"
-
-#set the number of articles/headers to download at one time
-export KEVIN_PARTS="100000"
 
 ############################################################
 
@@ -366,13 +354,6 @@ export USE_CONSOLE="false"
 #download fonts from https://github.com/jonnyboy/powerline-fonts
 #I recommend Consolas if you are using putty in Win7
 export POWERLINE="false"
-
-############################################################
-
-#use kevin123's compression mod true/false
-#this will copy kevin123's compression mod to the correct location when you update_svn.sh or fix_files.sh
-#this ensures that kevin123's files are present after updating svn
-export KEVINS_COMP="false"
 
 ############################################################
 

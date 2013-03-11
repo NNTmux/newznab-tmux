@@ -23,6 +23,7 @@ rm -fv *
 
 #edit cleanup scripts
 if [[ $CLEANUP_EDIT  == "true" ]]; then
+    echo "editing cleanup scripts"
     sed -i -e 's/^$echo =.*$/$echo = false;/' $TESTING_PATH/update_parsing.php
     sed -i -e 's/^$limited =.*$/$limited = false;/' $TESTING_PATH/update_parsing.php
     sed -i -e 's/^$echo =.*$/$echo = false;/' $TESTING_PATH/update_cleanup.php
@@ -31,6 +32,7 @@ fi
 
 #edit powerprocess.php
 if [[ $FIX_POSIX  == "true" ]]; then
+    echo "editing powerprocess"
     sed -i -e 's/case SIGSTKFLT:/\/\/case SIGSTKFLT:/' $NEWZPATH/www/lib/powerprocess.php
     sed -i -e 's/return 'SIGSTKFLT';/\/\/return 'SIGSTKFLT';/' $NEWZPATH/www/lib/powerprocess.php
     sed -i -e 's/case SIGCLD:/\/\/case SIGCLD:/' $NEWZPATH/www/lib/powerprocess.php
@@ -43,6 +45,7 @@ fi
 
 #attempt to get english only from IMDB
 if [[ $EN_IMDB == "true" ]]; then
+    echo "edit movie language"
     sed -i -e 's/akas.imdb/www.imdb/g' $NEWZPATH/www/lib/movie.php
     sed -i -e 's/akas.imdb/www.imdb/g' $TESTING_PATH/update_parsing.php
     sed -i -e 's/curl_setopt($ch, CURLOPT_URL, $url);/curl_setopt($ch, CURLOPT_URL, $url);\

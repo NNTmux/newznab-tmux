@@ -38,7 +38,7 @@ if $TMUXCMD -q has-session -t $TMUX_SESSION; then
 else
     printf "The above is just a TMUX notice, it is saying TMUX, that you do not have a TMUX session currently running. It is not an error. It is TMUX"
     printf "\033]0; $TMUX_SESSION\007\003\n"
-    $TMUXCMD -f $TMUX_CONF new-session -d -s $TMUX_SESSION -n Monitor 'printf "\033]2;Monitor\033\\" && cd bin && echo "Monitor Started" && echo "It might take a minute for everything to spinup......" && $NICE -n 19 $PHP monitor.php'
+    $TMUXCMD -f $TMUX_CONF new-session -d -s $TMUX_SESSION -n Monitor 'printf "\033]2;Monitor\033\\" && cd bin && echo "Monitor Started" && echo "It might take a minute for everything to spinup......" && $NICE -n$NICENESS $PHP monitor.php'
 
     if [ ! -f $NEWZPATH/www/lib/postprocess.php.orig ]; then
         cp $NEWZPATH/www/lib/postprocess.php $NEWZPATH/www/lib/postprocess.php.orig
@@ -227,9 +227,6 @@ else
 #    $SED -i -e "s/order by rageID asc/order by rageID DESC/" bin/lib/tvrage.php
 #    $SED -i -e "s/order by airdate asc/order by airdate DESC/" bin/lib/tvrage.php
 #    $SED -i -e "s/order by tvrage.releasetitle asc/order by tvrage.releasetitle DESC/" bin/lib/tvrage.php
-
-
-
 
 
     #start tmux
