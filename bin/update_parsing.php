@@ -25,9 +25,9 @@ unset($array['']);
 //This script updates release names for releases in 'TV > Other', 'Movie > Other', 'XXX > Other', and 'Other > Misc' categories.
 //It first attempts to extract the release name from the NFO, falling back to rarset filename -- the ReleaseFiles.
 //If the new releasename is the same as the old name, OR the name is different but still doesnt match a new category, it will skip the release.
-//Configure the script using the options below. 
+//Configure the script using the options below.
 
-/// The following value either shows or hides the releases that failed to find a new name and category. 
+/// The following value either shows or hides the releases that failed to find a new name and category.
 $debug = false;
 /// Set this to true to see fails
 
@@ -37,7 +37,7 @@ $echo = false;
 
 /// The following value sets the amount of time to either 24 hours or the Whole DB
 $limited = $array['WHOLE_DB'];
-/// Set to true for 24 hours, false for whole db. 
+/// Set to true for 24 hours, false for whole db.
 
 /// WARNING!!!!!!!!The following value runs update_parsing either against "other categories", or all categories, do not use this if $echo is false. This is for testing.
 /// WARNING!!!!!!!!Make sure memory_limit in php has no limit ( -1 ) if you are running against all categories
@@ -63,7 +63,7 @@ $updated = 0;
 if($othercats == true) //Only Other categories
 {
         // Default query for both full db and last 24 hours.
-        $sql = "SELECT r.searchname, r.name, r.ID as RID, r.categoryID, r.guid, r.postdate,
+        $sql = "SELECT r.searchname, r.name, r.fromname, r.ID as RID, r.categoryID, r.guid, r.postdate,
 			   rn.ID as nfoID,
 			   g.name as groupname,
 			   GROUP_CONCAT(rf.name) as filenames
@@ -71,14 +71,14 @@ if($othercats == true) //Only Other categories
 		LEFT JOIN releasenfo rn ON (rn.releaseID = r.ID)
 		LEFT JOIN groups g ON (g.ID = r.groupID)
 		LEFT JOIN releasefiles rf ON (rf.releaseID = r.ID)
-		WHERE r.categoryID in (".Category::CAT_TV_OTHER.",".Category::CAT_MOVIE_OTHER.",".Category::CAT_MISC_OTHER.",".Category::CAT_XXX_OTHER.")
+		WHERE r.categoryID in (".Category2::CAT_TV_OTHER.",".Category2::CAT_MOVIE_OTHER.",".Category2::CAT_MISC_OTHER.",".Category2::CAT_XXX_OTHER.")
 		%s
 		GROUP BY r.ID";
 }
 else //All categories
 {
         // Modified query to run against all categories, USE WITH CAUTION.
-        $sql = "SELECT r.searchname, r.name, r.ID as RID, r.categoryID, r.guid, r.postdate,
+        $sql = "SELECT r.searchname, r.name, r.fromname, r.ID as RID, r.categoryID, r.guid, r.postdate,
 			   rn.ID as nfoID,
 			   g.name as groupname,
 			   GROUP_CONCAT(rf.name) as filenames
@@ -87,19 +87,19 @@ else //All categories
 		LEFT JOIN groups g ON (g.ID = r.groupID)
 		LEFT JOIN releasefiles rf ON (rf.releaseID = r.ID)
 		WHERE r.categoryID in
-        (".Category::CAT_GAME_NDS.",".Category::CAT_GAME_PSP.",".Category::CAT_MOVIE_HD.",
-        ".Category::CAT_GAME_WII.",".Category::CAT_GAME_XBOX.",".Category::CAT_GAME_XBOX360.",
-        ".Category::CAT_GAME_WIIWARE.",".Category::CAT_GAME_XBOX360DLC.",".Category::CAT_MOVIE_FOREIGN.",
-        ".Category::CAT_MOVIE_OTHER.",".Category::CAT_MOVIE_SD.",".Category::CAT_MOVIE_BLURAY.",
-        ".Category::CAT_MOVIE_3D.",".Category::CAT_MUSIC_MP3.",".Category::CAT_MUSIC_VIDEO.",
-        ".Category::CAT_MUSIC_AUDIOBOOK.",".Category::CAT_MUSIC_LOSSLESS.",".Category::CAT_PC_0DAY.",
-        ".Category::CAT_PC_ISO.",".Category::CAT_PC_MAC.",".Category::CAT_PC_MOBILEOTHER.",
-        ".Category::CAT_PC_GAMES.",".Category::CAT_PC_MOBILEIOS.",".Category::CAT_PC_MOBILEANDROID.",
-        ".Category::CAT_TV_FOREIGN.",".Category::CAT_TV_SD.",".Category::CAT_TV_HD.",
-        ".Category::CAT_TV_OTHER.",".Category::CAT_TV_SPORT.",".Category::CAT_TV_ANIME.",
-        ".Category::CAT_TV_DOCU.",".Category::CAT_XXX_DVD.",".Category::CAT_XXX_WMV.",
-        ".Category::CAT_XXX_XVID.",".Category::CAT_XXX_X264.",".Category::CAT_XXX_IMAGESET.",
-        ".Category::CAT_XXX_OTHER.",".Category::CAT_BOOK_MAGS.",".Category::CAT_BOOK_EBOOK.",".Category::CAT_BOOK_COMICS.")
+        (".Category2::CAT_GAME_NDS.",".Category2::CAT_GAME_PSP.",".Category2::CAT_MOVIE_HD.",
+        ".Category2::CAT_GAME_WII.",".Category2::CAT_GAME_XBOX.",".Category2::CAT_GAME_XBOX360.",
+        ".Category2::CAT_GAME_WIIWARE.",".Category2::CAT_GAME_XBOX360DLC.",".Category2::CAT_MOVIE_FOREIGN.",
+        ".Category2::CAT_MOVIE_OTHER.",".Category2::CAT_MOVIE_SD.",".Category2::CAT_MOVIE_BLURAY.",
+        ".Category2::CAT_MOVIE_3D.",".Category2::CAT_MUSIC_MP3.",".Category2::CAT_MUSIC_VIDEO.",
+        ".Category2::CAT_MUSIC_AUDIOBOOK.",".Category2::CAT_MUSIC_LOSSLESS.",".Category2::CAT_PC_0DAY.",
+        ".Category2::CAT_PC_ISO.",".Category2::CAT_PC_MAC.",".Category2::CAT_PC_MOBILEOTHER.",
+        ".Category2::CAT_PC_GAMES.",".Category2::CAT_PC_MOBILEIOS.",".Category2::CAT_PC_MOBILEANDROID.",
+        ".Category2::CAT_TV_FOREIGN.",".Category2::CAT_TV_SD.",".Category2::CAT_TV_HD.",
+        ".Category2::CAT_TV_OTHER.",".Category2::CAT_TV_SPORT.",".Category2::CAT_TV_ANIME.",
+        ".Category2::CAT_TV_DOCU.",".Category2::CAT_XXX_DVD.",".Category2::CAT_XXX_WMV.",
+        ".Category2::CAT_XXX_XVID.",".Category2::CAT_XXX_X264.",".Category2::CAT_XXX_IMAGESET.",
+        ".Category2::CAT_XXX_OTHER.",".Category2::CAT_BOOK_MAGS.",".Category2::CAT_BOOK_EBOOK.",".Category2::CAT_BOOK_COMICS.")
 		%s
 		GROUP BY r.ID";
 }
@@ -130,14 +130,15 @@ function determineCategory($rel,$foundName)
 
 function updateCategory($rel,$foundName,$methodused)
 {
-	global $updated,$echo;
+	global $updated,$echo,$methodused,$foundName;
 	$categoryID = null;
 	$category = new Category2();
 	$categoryID = $category->determineCategory($rel['groupname'], $foundName);
-	if(($methodused == 'a.b.hdtv.x264') && ($rel['groupname'] == 'alt.binaries.hdtv.x264')) { $categoryID = Category::CAT_MOVIE_HD; }
+	if(($methodused == 'a.b.hdtv.x264') && ($rel['groupname'] == 'alt.binaries.hdtv.x264')) { $categoryID = Category2::CAT_MOVIE_HD; }
 	if(($categoryID == $rel['categoryID'] || $categoryID == '7900'))
 	{
 		$foundName = null;
+		$methodused = null;
 	}
 	else
 	{
@@ -200,21 +201,6 @@ if ($res)
 				}
 				$foundName = $title;
 				$methodused = "Release names 1: Knoc.One";
-				if (determineCategory($rel,$foundName) === true)
-				{
-					updateCategory($rel,$foundName,$methodused);
-				}
-				else
-				{
-					$foundName = null;
-				}
-			}
-						
-			//QoQ releases
-			if (preg_match('/^QoQ\-(.*)$/', $rel['name']))
-			{
-				$foundName = strrev( $rel['name'] );
-				$methodused = "Release names 2: QoQ";
 				if (determineCategory($rel,$foundName) === true)
 				{
 					updateCategory($rel,$foundName,$methodused);
@@ -1249,6 +1235,62 @@ if ($res)
 							{
 								$foundName = null;
 							}						
+						}
+					}
+					// Petje Releases
+					if (preg_match('/Petje \<petje\@pietamientje\.com\>/', $rel['fromname'], $matches3) && $foundName == '')
+					{
+						if (preg_match('/.*\.(mkv|avi|mp4|wmv|divx)/', $file, $matches4))
+						{
+							$array_new = explode('\\', $matches4[0]);
+							foreach($array_new as $item)
+							{
+								if (preg_match('/.*\((19|20\d{2})\)$/', $item, $matched))
+								{
+										$foundName = $matched[0].".720p.x264-Petje";
+										$methodused = "Petje";
+										if (determineCategory($rel,$foundName) === true)
+										{
+											updateCategory($rel,$foundName,$methodused);
+										}
+										else
+										{
+											$foundName = null;
+										}
+										break 2;
+								}
+							}
+						}
+					}
+				
+					//3D Remux
+					if (preg_match('/.*Remux\.mkv/', $file, $matches4))
+					{
+							$foundName = str_replace(".mkv", "", $matches4[0]);
+							$methodused = "3D Remux";
+							if (determineCategory($rel,$foundName) === true)
+							{
+								updateCategory($rel,$foundName,$methodused);
+							}
+							else
+							{
+								$foundName = null;
+							}
+					}													
+					//QoQ Extended
+					if (preg_match('/Q\-sbuSLN.*/i', $file, $matches4))
+					{
+						$new1 = preg_match('/( )?(\.wmv|\.divx|\.avi|\.mkv)/i', $matches4[0], $matched);
+						$new2 = str_replace($matched[0], "", $matches4[0]);
+						$foundName = strrev($new2);
+						$methodused = "QoQ Extended";
+						if (determineCategory($rel,$foundName) === true)
+						{
+							updateCategory($rel,$foundName,$methodused);
+						}
+						else
+						{
+							$foundName = null;
 						}
 					}
 				}
@@ -2528,4 +2570,3 @@ echo $rescount. " releases checked\n";
 echo $Nfocount." of ".$rescount." releases had Nfo's processed\n";
 echo $Filecount." of ".$rescount." releases had ReleaseFiles processed\n";
 echo $updated. " releases Changed\n";
-
