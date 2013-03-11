@@ -67,8 +67,8 @@ export UNWANTED="false"
 export TMUX_SESSION="Newznab"
 
 #Set, in seconds - how often the monitor.php (left top pane) script should update run the queries against the database
-#the monitor script will update itself and each pane, once every 2 seconds plus the lagg time time on the loop the db is queried
-#to press the point, the db is not queried any sooner than the time set below, but the script loops each iteration once every 2 seconds
+#the monitor script will update itself and each pane, once every 5 seconds plus the lagg time time on the loop the db is queried
+#to press the point, the db is not queried any sooner than the time set below, but the script loops each iteration once every 5 seconds
 #this makes it more responsive to stop/kill without slamming the db with needless queries, starts are still controlled by the queries
 export MONITOR_UPDATE="30"
 

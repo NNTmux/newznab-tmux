@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.1r717";
+$version="0.1r718";
 
 $db = new DB();
 
@@ -460,7 +460,7 @@ while( $i > 0 )
     }
 
     //add sleep to new installs, so everything spins up properly
-    if (( $query_timer < 3 ) && ( $i == 1 )) { sleep(3); }
+    if (( $query_timer < 5 ) && ( $i == 1 )) { sleep(5); }
 
     if ( $array['RAMDISK_PATH'] != "" ) {
         $disk_use =  decodeSize( disk_total_space("${array['RAMDISK_PATH']}") - disk_free_space("${array['RAMDISK_PATH']}") );
@@ -1426,7 +1426,7 @@ while( $i > 0 )
     if ( $array['RUNNING'] != "true" ) {
         $i=0;
     }
-    sleep(1.75);
+    sleep(5);
 
     while (( ! shell_exec("$_tmux list-panes -t {$array['TMUX_SESSION']}:1 | grep 4: | grep dead" )) && ( $array['OPTIMIZE'] == "true" ))
     {
