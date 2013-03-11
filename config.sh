@@ -25,19 +25,51 @@ export ADMIN_PATH=$NEWZPATH"/www/admin"
 ############################################################
 
 #Post Processing Additional is the post processing that downloads rar files and attempts to get info for your site
-#you are able to set the number of process to be run from 1-16, remember that each process uses 1 of your nntp connections
-#so, if you have 20, and you set this to 16, you will have errors, lots of errors, nfo lookup uses 1 connection
-#binaries and backfill threaded default to 10 connections each and predb uses 1, so understand how many connections you are using when setting
-#trial and error for this, 1 runs always, 2 if more than 200, 3 more than 300 and so on.
+#you are able to set the number of process to be run from 1-32, remember that each process uses 1 of your nntp connections
+#so, if you have 20, and you set this to 32, you will have errors, lots of errors, nfo lookup uses 1 -3 connections
+#binaries and backfill threaded default up to 10 connections each and predb uses 1, so understand how many connections you are using when setting
+#trial and error for this, set to 1 will run > 0, set to 2 will run > 200, 3 will run > 300 and so on.
 #At some point, increasing this begins to slow things down. It will need to be adjusted for your system
 #to get the desired performance, 0 will disable all post processing
 export POST_TO_RUN="0"
+
+############################################################
+
+#post processing per category, setting the above to 0 does not disable these
+#run processNfos
+export NFOS="false"
+
+#run processGames
+export GAMES="false"
+
+#run processMovies
+export MOVIES="false"
+
+#run processMusic
+export MUSIC="false"
+
+#run processTV
+export TVRAGE="false"
+
+#run processEbook
+export EBOOK="false"
+
+#run processOther
+export OTHERS="false"
+
+#run processUnwanted
+export UNWANTED="false"
+
+############################################################
 
 #Enter the session name to be used by tmux, no spaces allowed in the name, this can be changed after scripts start
 #if you are running multiple servers, you could put your hostname here
 export TMUX_SESSION="Newznab"
 
-#Set, in seconds - how often the monitor.php (left top pane) script should update, 0 may cause errors
+#Set, in seconds - how often the monitor.php (left top pane) script should update run the queries against the database
+#the monitor script will update itself and each pane, once every 2 seconds plus the lagg time time on the loop the db is queried
+#to press the point, the db is not queried any sooner than the time set below, but the script loops each iteration once every 2 seconds
+#this makes it more responsive to stop/kill without slamming the db with needless queries, starts are still controlled by the queries
 export MONITOR_UPDATE="30"
 
 #you may want to kill the update_binaries, backfill and import if no releases have been add in x minutes, set the timer to anything other than 0 to enable
@@ -75,7 +107,7 @@ export BINARIES="false"
 #update_binaries.php or update_binaries_threaded.php
 export BINARIES_THREADS="false"
 
-#Set, in seconds - how long the update_binaries should sleep between runs, 0 may cause errors
+#Set, in seconds - how long the update_binaries should sleep between runs
 #top right pane
 #sleep timers are not used when using SEQ
 export BINARIES_SLEEP="40"
@@ -97,7 +129,7 @@ export BACKFILL="false"
 #backfill.php or backfill_threaded.php
 export BACKFILL_THREADS="false"
 
-#Set, in seconds - how long the backfill should sleep between runs, 0 may cause errors
+#Set, in seconds - how long the backfill should sleep between runs
 #in pane below update_binaries
 #sleep timers are not used when using SEQ
 export BACKFILL_SLEEP="40"
@@ -154,7 +186,7 @@ export NZB_FOLDER_COUNT="20"
 #How many nzbs to import per loop, if using NZB_THREADS=true the per folder
 export NZBCOUNT="10"
 
-#Set, in seconds - how long the nzb-import should sleep between runs, 0 may cause errors
+#Set, in seconds - how long the nzb-import should sleep between runs
 #below backfill
 export IMPORT_SLEEP="40"
 
@@ -180,7 +212,7 @@ export MISC_ONLY="false"
 #Create releases, this is really only necessary to turn off when you only want to post process
 export RELEASES="false"
 
-#Set, in seconds - how long the update_release should sleep between runs, 0 may cause errors
+#Set, in seconds - how long the update_release should sleep between runs
 #bottom right
 export RELEASES_SLEEP="40"
 

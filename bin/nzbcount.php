@@ -82,6 +82,6 @@ while ($i==0) {
         $folder=basename("$subpath");
         printf($mask, "$folder","$filecount0","$processed");
     }
-    sleep(90);
+    sleep(120);
 }
 
