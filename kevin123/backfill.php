@@ -332,7 +332,7 @@ class Backfill
 				$nntpc->doConnect();
 				foreach($res as $groupArr)
 				{
-					$this->backfillGroup($nntp, $nntpc, $groupArr, $backfillPost);
+					$this->backfillPostGroup($nntp, $nntpc, $groupArr, $backfillPost);
 				}
 
 				$nntp->doQuit();
@@ -350,7 +350,7 @@ class Backfill
 	/**
 	 * Update a group back to a specified date.
 	 */	
-	function backfillPostGroup($nntp, $nntpc, $groupArr, $backfillDate=null)
+	function backfillPostGroup($nntp, $nntpc, $groupArr, $backfillPost)
 	{
 
 		$db = new DB();
