@@ -154,6 +154,22 @@ export MAXDAYS="210"
 
 ############################################################
 
+#use kevin123's safer_backfill_parts.php instead of normal backfill or backfill threaded
+#this is the script I use, it does 1 group at a time from z to a (wanted to start with tv groups first) 100k parts,
+#then the script stops (once per loop), if your first_record_postdate on the group is 2012-06-24
+#it will be skipped (target reached). When that group is done, it will do another ( again from z to a).
+#this does not use increment, it works by the date set below
+#you also need to enable kevin's compression mod, those files are needed and you still need to enable BACKFILL
+export KEVIN_SAFER="false"
+
+#set the date to go back to, must be in the format of YYYY-MM-DD, like 2012-06-24
+export KEVIN_DATE="2012-06-24"
+
+#set the number of articles/headers to download at one time
+export KEVIN_PARTS="100000"
+
+############################################################
+
 #Set the path to the nzb dump you downloaded from torrents, this is the path to bulk files folder of nzbs
 #this does not recurse through subfolders, unless you set NZB_THREADS to true
 export NZBS="/path/to/nzbs"
