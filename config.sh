@@ -274,7 +274,7 @@ export PARSING="false"
 export PARSING_MOD="false"
 
 #run update_parsing.php against the whole db or just the last 24 hours
-export 24_HOURS="true"
+export PAST_24_HOURS="true"
 
 #How often do you want update_parsing.php to run, in seconds. this takes alot of memory and processing time, default is every 12 hrs
 export PARSING_TIMER="43200"

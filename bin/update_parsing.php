@@ -36,7 +36,7 @@ $echo = false;
 /// Set this to true to echo only
 
 /// The following value sets the amount of time to either 24 hours or the Whole DB
-if ( $array['24_HOURS'] == "true" ) {
+if ( $array['PAST_24_HOURS'] == "true" ) {
     $limited = true;
 } else {
     $limited = false;
