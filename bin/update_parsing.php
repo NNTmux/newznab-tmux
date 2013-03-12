@@ -36,7 +36,11 @@ $echo = false;
 /// Set this to true to echo only
 
 /// The following value sets the amount of time to either 24 hours or the Whole DB
-$limited = $array['WHOLE_DB'];
+if ( $array['24_HOURS'] == "true" ) {
+    $limited = true;
+} else {
+    $limited = false;
+}
 /// Set to true for 24 hours, false for whole db.
 
 /// WARNING!!!!!!!!The following value runs update_parsing either against "other categories", or all categories, do not use this if $echo is false. This is for testing.
