@@ -49,6 +49,9 @@ else
     if ! grep -q '//$this->processNfos();' "$NEWZPATH/www/lib/postprocess.php" ; then
         $SED -i -e 's/$this->processNfos();/\/\/$this->processNfos();/' $NEWZPATH/www/lib/postprocess.php
     fi
+    if ! grep -q '//$this->processSpotNab();' "$NEWZPATH/www/lib/postprocess.php" ; then
+        $SED -i -e 's/$this->processSpotNab();/\/\/$this->processSpotNab();/' $NEWZPATH/www/lib/postprocess.php
+    fi
     if ! grep -q '//$this->processUnwanted();' "$NEWZPATH/www/lib/postprocess.php" ; then
         $SED -i -e 's/$this->processUnwanted();/\/\/$this->processUnwanted();/' $NEWZPATH/www/lib/postprocess.php
     fi
@@ -315,14 +318,14 @@ else
     $TMUXCMD splitw -v -p 67 'printf "\033]2;processMovies2\033\\"'
     $TMUXCMD splitw -v -p 50 'printf "\033]2;processMusic2\033\\"'
 
-    $TMUXCMD new-window -n post2b 'printf "\033]2;processAnime\033\\"'
-    $TMUXCMD splitw -h -p 50 'printf "\033]2;processTVRage\033\\"'
+    $TMUXCMD new-window -n post2b 'printf "\033]2;processSpotnab\033\\"'
+    $TMUXCMD splitw -h -p 50 'printf "\033]2;processAnime\033\\"'
     $TMUXCMD selectp -t 0
-    $TMUXCMD splitw -v -p 75 'printf "\033]2;processTheTVDB\033\\"'
+    $TMUXCMD splitw -v -p 75 'printf "\033]2;processTVRage\033\\"'
     $TMUXCMD splitw -v -p 67 'printf "\033]2;processBooks1\033\\"'
     $TMUXCMD splitw -v -p 50 'printf "\033]2;processOther\033\\"'
     $TMUXCMD selectp -t 4
-    $TMUXCMD splitw -v -p 75 'printf "\033]2;processTv4\033\\"'
+    $TMUXCMD splitw -v -p 75 'printf "\033]2;processTheTVDB\033\\"'
     $TMUXCMD splitw -v -p 67 'printf "\033]2;processBooks2\033\\"'
     $TMUXCMD splitw -v -p 50 'printf "\033]2;processUnwanted\033\\"'
 

@@ -289,6 +289,14 @@ export PREDB_TIMER="900"
 
 ############################################################
 
+#Choose to run processSpotnab.php
+export SPOTNAB="false"
+
+#How often to update the PreDB in seconds
+export SPOTNAB_TIMER="900"
+
+############################################################
+
 #update the tv schedule and in theaters listings
 export TV_SCHEDULE="false"
 
