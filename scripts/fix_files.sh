@@ -54,7 +54,7 @@ if [[ $EN_IMDB == "true" ]]; then
 fi
 
 #import kevin123's compression mod
-if [[ $KEVINS_COMP == "true" ]]; then
+if [[ $KEVIN_SAFER == "true" ]] || [[ $PARSING_MOD == "true" ]]; then
     cd $DIR"/kevin123"
     cp -frv * $NEWZPATH/www/lib/
 fi
