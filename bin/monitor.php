@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.1r722";
+$version="0.1r723";
 
 $db = new DB();
 
@@ -1180,11 +1180,10 @@ while( $i > 0 )
     }
 
     //set command for running backfill
-    //if (( $array['KEVIN_SAFER'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
-    //if ( $optimize_safe_to_run != "true" ) {
-        //$log = writelog($panes0[3]);
-        //$_backfill_cmd = "cd $_bin && $_php safer_backfill_parts.php 2>&1 $log";
-    //} else
+    if (( $array['KEVIN_SAFER'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
+        $log = writelog($panes0[3]);
+        $_backfill_cmd = "cd $_bin && $_php safer_backfill_parts.php 2>&1 $log";
+    } else
     if ( $array['BACKFILL_THREADS'] == "true" ) {
         $log = writelog($panes0[3]);
         $_backfill_cmd = "cd $_bin && $_php backfill_threaded.php 2>&1 $log && $mysql_command_1 2>&1 $log";

@@ -96,9 +96,9 @@ else
     TMPUNRAR_PATH=$TMPUNRAR_PATH"1"
 
     #determine if ramdisk is in fstab
-    if [[ `grep "$TMPUNRAR_PATH" /etc/fstab` ]]; then
-        if [[ ! `mount | grep "$TMPUNRAR_PATH"` ]]; then
-            if [[ $RAMDISK == "true" ]]; then
+    if [[ $RAMDISK == "true" ]]; then
+        if [[ `grep "$TMPUNRAR_PATH" /etc/fstab` ]]; then
+            if [[ ! `mount | grep "$TMPUNRAR_PATH"` ]]; then
                 mount "$TMPUNRAR_PATH"
             fi
         fi
