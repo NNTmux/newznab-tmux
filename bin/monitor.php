@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.1r728";
+$version="0.1r729";
 
 $db = new DB();
 
@@ -398,13 +398,13 @@ while( $i > 0 )
     }
 
     //get values from $qry
-    if ( $initquery['1000'] != NULL ) { $console_releases_now = $initquery['1000']; }
-    if ( $initquery['2000'] != NULL ) { $movie_releases_now = $initquery['2000']; }
-    if ( $initquery['3000'] != NULL ) { $music_releases_now = $initquery['3000']; }
-    if ( $initquery['4000'] != NULL ) { $pc_releases_now = $initquery['4000']; }
-    if ( $initquery['5000'] != NULL ) { $tvrage_releases_now = $initquery['5000']; }
-    if ( $initquery['7000'] != NULL ) { $book_releases_now = $initquery['7000']; }
-    if ( $initquery['8000'] != NULL ) { $misc_releases_now = $initquery['8000']; }
+    if ( @$initquery['1000'] != NULL ) { $console_releases_now = $initquery['1000']; }
+    if ( @$initquery['2000'] != NULL ) { $movie_releases_now = $initquery['2000']; }
+    if ( @$initquery['3000'] != NULL ) { $music_releases_now = $initquery['3000']; }
+    if ( @$initquery['4000'] != NULL ) { $pc_releases_now = $initquery['4000']; }
+    if ( @$initquery['5000'] != NULL ) { $tvrage_releases_now = $initquery['5000']; }
+    if ( @$initquery['7000'] != NULL ) { $book_releases_now = $initquery['7000']; }
+    if ( @$initquery['8000'] != NULL ) { $misc_releases_now = $initquery['8000']; }
 
     //get values from $proc
     if ( $proc_result[0]['console'] != NULL ) { $console_releases_proc = $proc_result[0]['console']; }

@@ -85,7 +85,9 @@
  * I have included a few scripts for mysql, [mysql-tuning-primer](https://launchpad.net/mysql-tuning-primer), [mysqlreport](http://hackmysql.com/mysqlreport) and [mysqltuner.pl](https://github.com/sunfoxcz/MySQLTuner-perl/blob/master/mysqltuner.pl) to assist in tuning your mysql installation. They are located in the scripts folder.
 
  * A how-to from [nevermind](http://pastebin.com/ibpi71iE) will help your db run a little faster/easier. It can be damaging if you make a mistake while doing this.
- 
+
+ * A couple of autoinstallers are available to completely install everything needed for Ubuntu 12.10 Newznab+ installation. [zombu2](https://github.com/zombu2/nninstall) and [convict](https://github.com/rcconvict/nninstaller) each have simlar installers and can be found in the gits.
+  
  * Join in the conversation at irc://irc.synirc.net/newznab-tmux.
 
 

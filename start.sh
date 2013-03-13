@@ -82,7 +82,8 @@ else
 
     #create mysql my.conf
     #this keeps your password from being displayed in ps, htop and others
-    echo -e '[client]\npassword='\"$DB_PASSWORD\" > ./conf/my.cnf
+    echo "[client]" > ./conf/my.cnf
+    echo "password=$DB_PASSWORD" >> ./conf/my.cnf
     chmod 600 ./conf/my.cnf
 
     #create powerline default.sh
@@ -94,6 +95,10 @@ else
     TMPUNRAR_QUERY="SELECT value from site where setting = \"tmpunrarpath\";"
     TMPUNRAR_PATH=`$MYSQL --defaults-file=conf/my.cnf -u$DB_USER -h$DB_HOST $DB_NAME -s -N -e "${TMPUNRAR_QUERY}"`
     TMPUNRAR_PATH=$TMPUNRAR_PATH"1"
+
+    if [ ! -d "$TMPUNRAR_PATH" ]; then
+        mkdir -p $TMPUNRAR_PATH
+    fi
 
     #determine if ramdisk is in fstab
     if [[ $RAMDISK == "true" ]]; then
