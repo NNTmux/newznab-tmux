@@ -295,6 +295,9 @@ export SPOTNAB="false"
 #How often to update the PreDB in seconds
 export SPOTNAB_TIMER="900"
 
+#automatically set ALL sources to active after retrieving sources
+export SPOTNAB_ACTIVE="false"
+
 ############################################################
 
 #update the tv schedule and in theaters listings
