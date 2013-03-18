@@ -18,7 +18,7 @@
   mysqldump --opt -u username -p newznab > ~/newznab_backup.sql
   ```
 
- * Now, Clone my github. These scripts need to run from this location and this is where I was asked to put them. If you have decided to use an alternate location, you will need to edit the file bin/config.php to point to the file neqznab/www/config.php. If you do not, these scripts will not run.
+ * Now, Clone my github. These scripts need to run from this location and this is where I was asked to put them. If you have decided to use an alternate location, you will need to edit the file bin/config.php to point to the file newznab/www/config.php. If you do not, these scripts will not run.
 
   ```bash
   cd /var/www/newznab/misc/update_scripts/nix_scripts/
