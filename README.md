@@ -18,6 +18,14 @@
   mysqldump --opt -u username -p newznab > ~/newznab_backup.sql
   ```
 
+ * Now, Clone my github. These scripts need to run from this location and this is where I was asked to put them. If you have decided to use an alternate location, you will need to edit the file bin/config.php to point to the file neqznab/www/config.php. If you do not, these scripts will not run.
+
+  ```bash
+  cd /var/www/newznab/misc/update_scripts/nix_scripts/
+  git clone https://github.com/jonnyboy/newznab-tmux.git tmux
+  cd tmux
+  ```  
+
  * If, you have just created your Newznab+ database, you can save yourself some time by importing a sql file, written by \_zoggy\_ and updating your TvRage database. **DO NOT** run this if your database has any releases in it.
  
    ```bash
@@ -29,15 +37,7 @@
    ```bash
   mysql -u username -p newznab < scripts/binaryblacklist.sql
   ```
-
- * Now, Clone my github. These scripts need to run from this location and this is where I was asked to put them. If you have decided to use an alternate location, you will need to edit the file bin/config.php to point to the file neqznab/www/config.php. If you do not, these scripts will not run.
-
-  ```bash
-  cd /var/www/newznab/misc/update_scripts/nix_scripts/
-  git clone https://github.com/jonnyboy/newznab-tmux.git tmux
-  cd tmux
-  ```  
-
+  
  * Please read the defaults.sh file very carefully. There are a lot of settings and options. Most of the questions asked by new users can be answered by reading this file.
 
   ```bash
