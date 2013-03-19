@@ -3,7 +3,7 @@ This is a set of scripts for making a nice and dynamic tmux statusbar consisting
 
 The following segments exists for now:
 * LAN & WAN IP addresses.
-* Now Playing for MPD, Spotify (GNU/Linux native or wine, OS X), iTunes (OS X), Rhythmbox, Banshee, MOC, Audacious, Rdio (OS X), cmus and Last.fm (last scrobbled track).
+* Now Playing for MPD, Spotify (GNU/Linux native or wine, OS X), iTunes (OS X), Rhythmbox, Banshee, MOC, Audacious, Rdio (OS X), cmus, Pithos and Last.fm (last scrobbled track).
 * New mail count for GMail, Maildir, mbox and Apple Mail.
 * GNU/Linux and Macintosh OS X battery status (uses [richo/dotfiles/bin/battery](https://github.com/richoH/dotfiles/blob/master/bin/battery)).
 * Weather in Celsius, Fahrenheit and Kelvin using Yahoo Weather.
@@ -20,37 +20,37 @@ The following segments exists for now:
 # Screenshots
 **Full screenshot**
 
-![Full screenshot](https://github.com/erikw/tmux-powerline/raw/master/img/full.png)
+![Full screenshot](img/full.png)
 
 **left-status**
 
 Current tmux session, window and pane, hostname and LAN & WAN IP address.
 
-![left-status](https://github.com/erikw/tmux-powerline/raw/master/img/left-status.png)
+![left-status](img/left-status.png)
 
 **right-status**
 
 New mails, now playing, average load, weather, date and time.
 
-![right-status](https://github.com/erikw/tmux-powerline/raw/master/img/right-status.png)
+![right-status](img/right-status.png)
 
 Now I've read my inbox so the mail segment disappears!
 
-![right-status, no mail](https://github.com/erikw/tmux-powerline/raw/master/img/right-status_no_mail.png)
+![right-status, no mail](img/right-status_no_mail.png)
 
 After pausing the music there's no need for showing NP anymore. Also the weather has become much nicer!
 
-![right-status, no mpd](https://github.com/erikw/tmux-powerline/raw/master/img/right-status_no_mpd.png)
+![right-status, no mpd](img/right-status_no_mpd.png)
 
 Remaining battery.
 
-![right-status, weather and battery](https://github.com/erikw/tmux-powerline/raw/master/img/right-status_weather_battery.png)
+![right-status, weather and battery](img/right-status_weather_battery.png)
 
 # Requirements
 Requirements for the lib to work are:
 
 * Recent tmux version
-* `bash --version` >= 3.2
+* `bash --version` >= 3.2 (Does not have to be your default shell.)
 * A patched font. Follow instructions at [Lokaltog/vim-powerline/fontpatcher](https://github.com/Lokaltog/vim-powerline/tree/develop/fontpatcher) or [download](https://github.com/Lokaltog/vim-powerline/wiki/Patched-fonts) a new one. However you can use other substitute symbols as well; see `config.sh`.
 
 ## Segment Requirements
@@ -62,15 +62,23 @@ Requirements for some segments. You only need to fulfill the requirements for th
 * `mailcount.sh` (gmail): wget.
 * `ifstat.sh`: ifstat (there is a simpler segment not using ifstat but samples /sys/class/net)
 * `tmux_mem_cpu_load.sh`: [tmux-mem-cpu-load](https://github.com/thewtex/tmux-mem-cpu-load)
+* `rainbarf.sh`: [rainbarf](https://github.com/creaktive/rainbarf)
 * `weather.sh`: GNU `grep` with Perl regexp enabled (FreeBSD specific)
 
 ## OS X specific requirements
 
-The `grep` tool is outdated on OS X 10.8 Mountain Lion so you might have to upgrade it. Unfortunately the main homebrew repo 
+The `grep` tool is outdated on OS X 10.8 Mountain Lion so you might have to upgrade it. Unfortunately the main homebrew repo
 [does not contain grep](https://github.com/mxcl/homebrew/pull/3473) so use the following command to get the lastest version.
 
 ```bash
 brew install https://raw.github.com/Homebrew/homebrew-dupes/master/grep.rb
+```
+
+or if you have heightened security set up, just tap the homebrew dupes and install grep
+
+```bash
+brew tap homebrew/dupes
+brew install homebrew/dupes/grep
 ```
 
 ## FreeBSD specific requirements
@@ -123,7 +131,7 @@ PS1="$PS1"'$([ -n "$TMUX" ] && tmux setenv TMUXPWD_$(tmux display -p "#D" | tr -
 
 # Configuration
 
-The default segments that are shown are defined in `themes/default.sh`. You will probably want to change those to fit your needs. To do so you can edit that file directly but preferable, for easier updating of the repo, you can make a copy and edit that one (or see how to use custom themes directory below).
+The default segments that are shown are defined in `themes/default.sh`. You will probably want to change those to fit your needs. To do so you can edit that file directly but preferable, for easier updating of the repo, you can make a copy and edit that one (or see how to use custom themes directory below). A palette of colors that can be used can be obtained by running the script `color_palette.sh`.
 
 ```console
 $ cp themes/default.sh themes/mytheme.sh
@@ -146,6 +154,22 @@ Some segments might not work on your system for various reasons such as missing 
 $ bash -x powerline.sh (left|right)
 ```
 
+To debug smaller portions of code, say if you think the problem lies in a specific segment, insert these lines at the top and bottom of that file (or region you want to inspect there)
+
+```bash
+set -x
+exec 2>/tmp/tmux-powerline.log
+<code to debug>
+set +x
+```
+
+and then inspect the outputs like
+
+```console
+less /tmp/tmux-powerline.log
+tail -f /tmp/tmux-powerline.log # or follow output like this.
+```
+
 If you can not solve the problems you can post an [issue](https://github.com/erikw/tmux-powerline/issues?state=open) and be sure to include relevant information about your system and script output (from bash -x) and/or screenshots if needed.
 
 ## Common problems
@@ -159,6 +183,8 @@ You have edited `~/.tmux.conf` but no powerline is displayed. This might be beca
 ```console
 $ tmux source-file ~/.tmux.conf
 ```
+### Multiple lines in bash or no powerline in zsh using iTerm (OS X)
+If your tmux looks like [this](https://github.com/erikw/tmux-powerline/issues/125) then you may have to in iTerm uncheck [Unicode East Asian Ambiguous characters are wide] in Preferences -> Settings -> Advanced.
 
 # Hacking
 
@@ -169,4 +195,4 @@ If you want to (of course you do!) send a pull request for a cool segment you wr
 
 Usage of helper function to organize the work of a segment is encourage and should be named in the format `__helper_func`. If a segment has settings it should have a function `generate_rc` which outputs default values of all settings and a short explanation of the setting and its values. Study e.g. `segments/now_playing.sh` to see how it is done. A segment having settings should typically call a helper function `__process_settings` as the first statement in `run_segment` that sets default values to the settings that has not been set by the user.
 
-Also, don't use bash4 features as requiring bash4 complicates installation for OS X user quite a bit. Use tabs for indentation ([discussion](https://github.com/erikw/tmux-powerline/pull/92)), 
+Also, don't use bash4 features as requiring bash4 complicates installation for OS X user quite a bit. Use tabs for indentation ([discussion](https://github.com/erikw/tmux-powerline/pull/92)),

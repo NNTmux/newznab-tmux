@@ -9,7 +9,7 @@
 	# Use patched font symbols.
 	export TMUX_POWERLINE_PATCHED_FONT_IN_USE="true"
 	# The theme to use.
-	export TMUX_POWERLINE_THEME="default"
+	export TMUX_POWERLINE_THEME="tmux"
 	# Overlay dirctory to look for themes. There you can put your own themes outside the repo. Fallback will still be the "themes" directory in the repo.
 	export TMUX_POWERLINE_DIR_USER_THEMES=""
 	# Overlay dirctory to look for segments. There you can put your own segments outside the repo. Fallback will still be the "segments" directory in the repo.
@@ -24,7 +24,7 @@
 # }
 
 # date.sh {
-	# date(1) format for the date. If you don't, for some reason like ISO 8601 format, you might want to have "%D" or "%m/%d/%Y".
+	# date(1) format for the date. If you don't, for some reason, like ISO 8601 format you might want to have "%D" or "%m/%d/%Y".
 	export TMUX_POWERLINE_SEG_DATE_FORMAT="%F"
 # }
 
@@ -46,7 +46,7 @@
 # }
 
 # hostname.sh {
-	# Use short or long format for the hostname. Can be "short, long"
+	# Use short or long format for the hostname. Can be {"short, long"}.
 	export TMUX_POWERLINE_SEG_HOSTNAME_FORMAT="short"
 # }
 
@@ -71,15 +71,15 @@
 	
 	## Maildir
 	# Path to the maildir to check.
-	export TMUX_POWERLINE_SEG_MAILCOUNT_MAILDIR_INBOX="/home/xihuitl/.mail/inbox/new"
+	export TMUX_POWERLINE_SEG_MAILCOUNT_MAILDIR_INBOX="/home/jonnyboy/.mail/inbox/new"
 	
 	## mbox
 	# Path to the mbox to check.
-	export TMUX_POWERLINE_SEG_MAILCOUNT_MBOX_INBOX="/var/mail/xihuitl"
+	export TMUX_POWERLINE_SEG_MAILCOUNT_MBOX_INBOX="/var/mail/jonnyboy"
 # }
 
 # now_playing.sh {
-	# Music player to use. Can be any of {audacious, banshee, cmus, itunes, lastfm, mocp, mpd, mpd_simple, rdio, rhythmbox, spotify, spotify_wine}.
+	# Music player to use. Can be any of {audacious, banshee, cmus, itunes, lastfm, mocp, mpd, mpd_simple, pithos, rdio, rhythmbox, spotify, spotify_wine}.
 	export TMUX_POWERLINE_SEG_NOW_PLAYING_MUSIC_PLAYER=""
 	# Maximum output length.
 	export TMUX_POWERLINE_SEG_NOW_PLAYING_MAX_LEN="40"
@@ -92,6 +92,8 @@
 	export TMUX_POWERLINE_SEG_NOW_PLAYING_MPD_HOST="localhost"
 	# Port the MPD server is running on.
 	export TMUX_POWERLINE_SEG_NOW_PLAYING_MPD_PORT="6600"
+	# Song display format for mpd_simple. See mpc(1) for delimiters.
+	export TMUX_POWERLINE_SEG_NOW_PLAYING_MPD_SIMPLE_FORMAT="%artist% - %title%"
 	
 	# Username for Last.fm if that music player is used.
 	export TMUX_POWERLINE_SEG_NOW_PLAYING_LASTFM_USERNAME=""

@@ -6,22 +6,28 @@ run_segment() {
 		return 1
 	fi
 
-	data=$(ifstat -S -q 1 1)
+	sed="sed"
+	type gsed >/dev/null 2>&1
+	if [ "$?" -eq 0 ]; then
+		sed="gsed"
+	fi
+
+	data=$(ifstat -z -S -q 1 1)
 	interfaces=$(echo -e "${data}" | head -n 1)
-	flow_data=$(echo -e "${data}" | tail -n 1 | sed "s/\s\{1,\}/,/g")
+	flow_data=$(echo -e "${data}" | tail -n 1 | ${sed} "s/\s\{1,\}/,/g")
 	index=1
 	for inf in ${interfaces}; do
 		type=""
 		case ${inf} in
-			eth*) type="⎆"
+			eth*) type="♠"
 				;;
-			wlan*) type="☫"
+			wlan*) type="♦"
 				;;
 			en*) type=" "
 				;;
 		esac
 		if [ -n "${type}" ]; then
-			formate=$(echo "${formate} ${type} ↓%.2f ↑%.2f")
+			formate=$(echo "${formate} ↑%.2f ↓%.2f")
 			holder=$(echo "${holder},\$$((index)),\$$((index+1))")
 		fi
 		index=$((index+2))

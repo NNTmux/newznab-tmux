@@ -78,7 +78,6 @@ run_segment() {
 		return $exitcode
 	fi
 
-
 	if [[ -n "$count"  && "$count" -gt 0 ]]; then
 		echo "✉ ${count}"
 	fi
@@ -97,7 +96,7 @@ __count_gmail() {
 	local override_passget="false"	# When true a force reloaded will be done.
 
 	# Create the cache file if it doesn't exist.
-	if [ ! -f $tmp_file ]; then
+	if [ ! -f "$tmp_file" ]; then
 		touch $tmp_file
 		override_passget=true
 	fi
@@ -135,7 +134,6 @@ __count_gmail() {
 		fi
 	fi
 
-	# echo "$(( $(date +"%s") - $(stat -f %m $tmp_file) ))"
 	count=$(cat $tmp_file)
 	echo "$count"
 	return 0;
@@ -165,12 +163,9 @@ __count_mbox() {
 	# This matches the From_ line (see man 5 mbox) e.g.
 	# From noreply@github.com  Sun Dec	2 03:52:25 2012
 	# See https://github.com/erikw/tmux-powerline/pull/91#issuecomment-10926053 for discussion.
-	nbr_new=$(grep -c '^From [^[:space:]]\+  ... ... .. ..:..:.. ....$' ${TMUX_POWERLINE_SEG_MAILCOUNT_MBOX_INBOX})
+	count=$(grep -c '^From [^[:space:]]\+  ... ... .. ..:..:.. ....$' ${TMUX_POWERLINE_SEG_MAILCOUNT_MBOX_INBOX})
 
-	if [ "${nbr_new}" -gt "0" ]; then
-		echo "✉ ${nbr_new}"
-	fi
-
+	echo "$count"
 	return 0;
 }
 

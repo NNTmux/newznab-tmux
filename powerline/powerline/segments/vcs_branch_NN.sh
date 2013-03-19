@@ -88,3 +88,4 @@ __parse_hg_branch() {
 	local branch=$(echo "$summary" | grep 'branch:' | cut -d ' ' -f2)
 	echo  "#[fg=colour${hg_colour}]${branch_symbol} #[fg=colour${TMUX_POWERLINE_CUR_SEGMENT_FG}]${branch}"
 }
+

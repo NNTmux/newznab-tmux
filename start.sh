@@ -86,9 +86,9 @@ else
     echo "password=$DB_PASSWORD" >> ./conf/my.cnf
     chmod 600 ./conf/my.cnf
 
-    #create powerline default.sh
-    if [ ! -f "powerline/powerline/themes/default.sh" ]; then
-        cp powerline/powerline/themes/default.start.sh powerline/powerline/themes/default.sh
+    #create powerline tmux.sh
+    if [ ! -f "powerline/powerline/themes/tmux.sh" ]; then
+        cp powerline/powerline/themes/default.sh powerline/powerline/themes/tmux.sh
     fi
 
     #Get the path to tmpunrar
