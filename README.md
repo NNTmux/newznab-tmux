@@ -102,10 +102,10 @@
 <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=N4AJV5FHZDBFE"><img src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" alt="PayPal - The safer, easier way to pay online!" /></a><a href='http://www.pledgie.com/campaigns/18980'><img alt='Click here to lend your support to: Newznab-tmux and make a donation at www.pledgie.com !' src='http://www.pledgie.com/campaigns/18980.png?skin_name=chrome' border='0' /></a>
 
 <hr>
-![Newznab-tmux](https://raw.github.com/jonnyboy/newznab-tmux/master/images/newznab-tmux-1.png)
-![Newznab-tmux](https://raw.github.com/jonnyboy/newznab-tmux/master/images/newznab-tmux-2.png)
-![Newznab-tmux](https://raw.github.com/jonnyboy/newznab-tmux/master/images/newznab-tmux-3.png)
-![Newznab-tmux](https://raw.github.com/jonnyboy/newznab-tmux/master/images/newznab-tmux-4.png)
-![Newznab-tmux](https://raw.github.com/jonnyboy/newznab-tmux/master/images/newznab-tmux-5.png)
-![Newznab-tmux](https://raw.github.com/jonnyboy/newznab-tmux/master/images/newznab-tmux-6.png)
+![Newznab-tmux](https://raw.github.com/jonnyboy/newznab-tmux/master/image/newznab-tmux-1.png)
+![Newznab-tmux](https://raw.github.com/jonnyboy/newznab-tmux/master/image/newznab-tmux-2.png)
+![Newznab-tmux](https://raw.github.com/jonnyboy/newznab-tmux/master/image/newznab-tmux-3.png)
+![Newznab-tmux](https://raw.github.com/jonnyboy/newznab-tmux/master/image/newznab-tmux-4.png)
+![Newznab-tmux](https://raw.github.com/jonnyboy/newznab-tmux/master/image/newznab-tmux-5.png)
+![Newznab-tmux](https://raw.github.com/jonnyboy/newznab-tmux/master/image/newznab-tmux-6.png)
 
