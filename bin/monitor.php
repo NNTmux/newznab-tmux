@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.1r737";
+$version="0.1r738";
 
 $db = new DB();
 
@@ -43,11 +43,11 @@ $_tmux = getenv('TMUXCMD');
 $_sed = getenv('SED');
 $_tee = getenv('TEE');
 $_count_releases = 0;
-$_tmux_test = $array['POWERLINE'];
 $_imports = $array['NZB_THREADS'];
 $_bin = dirname(__FILE__)."/../bin";
 $_alienx = dirname(__FILE__)."/../alienx";
 $_conf = dirname(__FILE__)."/../conf";
+$_powerline = dirname(__FILE__)."/../powerline";
 $_cj = dirname(__FILE__)."/../nnscripts";
 $NNPATH="{$array['NEWZPATH']}{$array['NEWZNAB_PATH']}";
 $TESTING="{$array['NEWZPATH']}{$array['TESTING_PATH']}";
@@ -315,13 +315,6 @@ while( $i > 0 )
     $ds3 = "stopped";
     $ds4 = "killed";
 
-    //kill panes if user changed to/from nzb import threaded
-    if ( $_imports != $array['NZB_THREADS'] ) {
-        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.4 'sleep 5' && $ds1 $panes0[4] $ds4");
-        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.1 'sleep 5' && $ds1 $panes0[1] $ds4");
-        $_imports = $array['NZB_THREADS'];
-    }
-
     //refresh variables
     $path = dirname(__FILE__);
     $varnames = shell_exec("cat ".$path."/../config.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
@@ -343,6 +336,35 @@ while( $i > 0 )
         }
     }
 
+    //defrag the query cache every 15 minutes
+    if (( TIME() - $time18 >= 900 ) || ( $i == 1 ))
+    {
+        $result = @$db->query($qcache);
+    }
+
+    //rename the session
+    if ( $old_session != $array['TMUX_SESSION'] ) {
+        shell_exec("$_tmux rename-session -t $old_session {$array['TMUX_SESSION']}");
+    }
+    $old_session="{$array['TMUX_SESSION']}";
+
+    //reload tmux.conf
+    if ( $array['POWERLINE'] == "true" ) {
+        shell_exec("$_tmux source-file $_powerline/tmux.conf");
+    } else {
+        shell_exec("$_tmux source-file $_conf/tmux.conf");
+    }
+
+    //reset title, might rename in some terminals
+    printf("\033]0;{$array['TMUX_SESSION']}\007\003\n");
+
+    //kill panes if user changed to/from nzb import threaded
+    if ( $_imports != $array['NZB_THREADS'] ) {
+        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.4 'sleep 5' && $ds1 $panes0[4] $ds4");
+        shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.1 'sleep 5' && $ds1 $panes0[1] $ds4");
+        $_imports = $array['NZB_THREADS'];
+    }
+
     //run queries
     if ((( TIME() - $time19 ) >= $array['MONITOR_UPDATE'] ) || ( $i == 1 )) {
         //get microtime to at start of queries
@@ -360,28 +382,7 @@ while( $i > 0 )
         $runloop = "false";
     }
 
-    //defrag the query cache every 15 minutes
-    if (( TIME() - $time18 >= 900 ) || ( $i == 1 ))
-    {
-        $result = @$db->query($qcache);
-    }
-
-    //rename the seesion
-    if ( $old_session =! $array['TMUX_SESSION'] ) {
-        shell_exec("$_tmux rename-session -t $old_session {$array['TMUX_SESSION']}");
-        sleep(2);
-    }
-    $old_session="{$array['TMUX_SESSION']}";
-
-    //reset title
-    printf("\033]0;{$array['TMUX_SESSION']}\007\003\n");
-
-    //get values from $posted_date
-    //$posted_date_result = @$db->query($posted_date);
-    //if ( $posted_date_result[0]['adddate'] ) { $firstdate = $posted_date_result[0]['adddate']; }
-
     //initial query for total releases
-
     if (( @$proc_result[0]['work'] != NULL ) && ( $work_start == 0 )) { $work_start = $proc_result[0]['work']; }
     if (( @$proc_result[0]['releases'] ) && ( $releases_start == 0 )) { $releases_start = $proc_result[0]['releases']; }
 
@@ -625,16 +626,6 @@ while( $i > 0 )
     printf($mask, "====================", "====================", "====================");
     printf("\033[38;5;214m");
     printf($mask, "DB Lagg","$query_timer","query time");
-
-    //see if tmux.conf needs to be reloaded
-    if ( $_tmux_test != $array['POWERLINE'] ) {
-        if ( $array['POWERLINE'] == "true" ) {
-            shell_exec("$_tmux source-file powerline/tmux.conf");
-        } else {
-            shell_exec("$_tmux source-file conf/tmux.conf");
-        }
-        $_tmux_test = $array['POWERLINE'];
-    }
 
     $optimize_safe_to_run = "false";
     $optimize_run = "false";
