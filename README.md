@@ -86,6 +86,8 @@
 
  * I have included a few scripts for mysql, [mysql-tuning-primer](https://launchpad.net/mysql-tuning-primer), [mysqlreport](http://hackmysql.com/mysqlreport) and [mysqltuner.pl](https://github.com/sunfoxcz/MySQLTuner-perl/blob/master/mysqltuner.pl) to assist in tuning your mysql installation. They are located in the scripts folder.
 
+ * I have include 2 scripts to create and remove a ramdisk and put the parts, partrepair and binaries onto it. This should be considered use at your own risk. There are risks involved with running these tables on a ramdisk, but if you should lose the tables, it is not a total loss.
+
  * A how-to from [nevermind](http://pastebin.com/ibpi71iE) will help your db run a little faster/easier. It can be damaging if you make a mistake while doing this.
 
  * A couple of autoinstallers are available to completely install everything needed for Ubuntu 12.10 Newznab+ installation. [zombu2](https://github.com/zombu2/nninstall) and [convict](https://github.com/rcconvict/nninstaller) each have simlar installers and can be found in the gits.
@@ -96,7 +98,7 @@
 
  * Thanks go to all who have offered their assistance and improvement to these scripts, especially kevin123, zombu2, epsol, DejaVu, ajeffco, pcmerc, zDefect, shat, evermind, coolcheat, sy, ll, crunch, ixio, AlienX, Solution-X, cryogenx, convict, wicked, McFuzz, pyr2044, Kragger and \_zoggy\_. If your nick is missing from this this list, PM and I'll fix it quick.
  
- * These scripts include scripts written by [kevin123's](https://github.com/kevinlekiller), [itandrew's](https://github.com/itandrew/Newznab-InnoDB-Dropin), [tmux-powerline](https://github.com/erikw/tmux-powerline), [thewtex](git://github.com/thewtex/tmux-mem-cpu-load.git), [cj](https://github.com/NNScripts/nn-custom-scripts) and [\_zoggy\_](http://zoggy.net/tvrage-latest.sql).
+ * These scripts include scripts written by [kevin123's](https://github.com/kevinlekiller), [itandrew's](https://github.com/itandrew/Newznab-InnoDB-Dropin), [tmux-powerline](https://github.com/erikw/tmux-powerline), [thewtex](https://github.com/thewtex/tmux-mem-cpu-load), [cj](https://github.com/NNScripts/nn-custom-scripts) and [\_zoggy\_](http://zoggy.net/tvrage-latest.sql).
 
 <hr>
  * If you find these scripts useful and would like to show your support or just buy me a beer, please use one of the donation links below. Donations are greatly appreciated. Thank you
