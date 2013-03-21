@@ -76,6 +76,8 @@
 
  * Included in the scripts folder is revert.sh. This file will update your Newznab+ installation and overwrite the changes from these scripts.
  
+ * It is recommended, with stock scripts, that when backfilling or importing you set header retention to 0. This is not recommended when you are using these scripts. Let me explain why. If you start with empty parts/binaries tables and you import 100 nzbs, and at the same time you start update_releases, when update_releases finishes its loop, it deletes everything in the parts/binaries tables because you have header retention set to 0. But, heres where the problem is, youcontinued to import 200 nzbs while update_releases was running, they did not get imported as a release, they were deleted at the end of update_releases loop. So, I recommend you set header retention to at least .1, that is 2.4 hours, when only backfilling or importing.
+
  * Almost any variable in defaults.sh can be changed, except the paths to the commands, and the changes will take effect on the next loop of the Monitor.
 
  * If you connect using **putty**, then under Window/Translation set Remote character set to UTF-8 and check "Copy and paste line drawing characters". To use 256 colors, you must set Connection/Data Terminal-type string to "xterm-256color" and in Window/Colours check the top three boxes, otherwise only 16 colors are displayed. If you are using FreeBSD, you will need to add export TERM=xterm-256color to your .bashrc file to show 256 colors.
