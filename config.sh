@@ -221,6 +221,8 @@ export MISC_ONLY="false"
 
 #run ugo's automake.php script to create releases, this does not use regexes and will run in a loop prior
 #to update_releases.php, this can be considerably slower, but may give you release that were being missed
+#this might just overwhelm your db, so expect things to move slower, but you might get more in return
+#still a wip
 export UGO="false"
 
 #run automake_threaded.php

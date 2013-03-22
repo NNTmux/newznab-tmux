@@ -1,13 +1,12 @@
 <?php
 //define('FS_ROOT', realpath(dirname(__FILE__)));
-//require_once(FS_ROOT."/../bin/config.php");
-require(dirname(__FILE__).'/../../../../../www/config.php');
+require(dirname(__FILE__)."/../../../../../www/config.php");
 require_once(WWW_DIR."/lib/binaries.php");
-require_once(WWW_DIR."/lib/powerprocess.php");
+require_once(WWW_DIR.'/lib/powerprocess.php');
 require_once(WWW_DIR."/lib/framework/db.php");
 
 $time = microtime(true);
-$db = new Db;
+$db = new DB();
 
 if (isset($argv[1]))
 {
@@ -22,15 +21,12 @@ var_dump($argv);
 
 $rel = $db->query("UPDATE `binaries` SET `procstat`=0,`procattempts`=0,`regexID`=NULL, `relpart`=0,`reltotalpart`=0,`relname`=NULL WHERE procstat = -6");
 
-$query = "SELECT count(*), groups.`name`, groups.ID";
-$query = $query." FROM binaries INNER JOIN groups ON binaries.groupID = groups.ID";
-$query = $query." WHERE binaries.procstat = 0";
-$query = $query." GROUP BY groups.ID ORDER BY count(*) asc";
+$query = "SELECT ID FROM binaries WHERE `procstat` = 0 GROUP BY binaryhash order by ID";
 
-$groupList = $db->query($query);
+$theList = $db->query($query);
 unset($db);
 
-$ps = new PowerProcess;
+$ps = new PowerProcess();
 $ps->RegisterCallback('psUpdateComplete');
 $ps->maxChildren = 8;
 $ps->tickCount = 10000;	// value in usecs. change this to 1000000 (one second) to reduce cpu use
@@ -44,14 +40,14 @@ echo "Starting threaded assembly process\n";
 while ($ps->RunControlCode())
 {
 	// Start the parent loop
-	if (count($groupList))
+	if (count($theList))
 	{
 		// We still have groups to process
 		if ($ps->SpawnReady())
 		{
 			// Spawn another thread
-			$ps->threadData = array_pop($groupList);
-			echo "[Thread-MASTER] Spawning new thread.  Still have " . count($groupList) ." group(s) to update after this\n";
+			$ps->threadData = array_pop($theList);
+			echo "[Thread-MASTER] Spawning new thread.  Still have " . count($theList) ." post(s) to update after this\n";
 			$ps->spawnThread();
 		}
 		else
@@ -64,31 +60,31 @@ while ($ps->RunControlCode())
 	else
 	{
 		// No more groups to process
-		echo "No more groups to process - Initiating shutdown\n";
+		echo "No more posts to process - Initiating shutdown\n";
 		$ps->Shutdown();
 		echo "Shutdown complete\n";
 	}
 }
 $tim = microtime(true) - $time;
 echo "time = ".$tim."\n";
-unset($groupList);
+unset($theList);
 
 if ($ps->RunThreadCode())
 {
-	$group = $ps->threadData;
+	$post = $ps->threadData;
 
 	$thread = sprintf("%05d",$ps->GetPID());
 
-	echo "[Thread-{$thread}] Begining assembly processing for group {$group['name']}\n";
+	echo "[Thread-{$thread}] Begining assembly processing for post {$post['ID']}\n";
 
-	$param = $group['ID'];
+	$param = $post['ID'];
 
 	$dir = dirname(__FILE__);
 	$file = 'automake.php';
 
 	$output = shell_exec("php {$dir}/{$file} {$param}");
 
-	echo "[Thread-{$thread}] Completed update for group {$group['name']}\n";
+	echo "[Thread-{$thread}] Completed update for post {$post['ID']}\n";
 	$tim = microtime(true) - $time;
 	echo "time = ".$tim."\n";
 }
@@ -101,5 +97,7 @@ function psUpdateComplete()
 {
 	echo "[Thread-MASTER] Threaded assembly process complete\n";
 }
+
+
 
 ?>

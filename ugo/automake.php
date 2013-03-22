@@ -1,6 +1,6 @@
 <?php
 //define('FS_ROOT', realpath(dirname(__FILE__)));
-require(dirname(__FILE__).'/../../../../../www/config.php');
+require(dirname(__FILE__)."/../../../../../www/config.php");
 //require_once(FS_ROOT."/../bin/config.php");
 require_once(WWW_DIR."/lib/nntp.php");
 
@@ -12,10 +12,14 @@ function makerelease ($results, $parent, $name, $db, $sect, $mail)
 	global $qual;
 	$PROCSTAT_TITLEMATCHED = 5;
 
+	echo $name."\n";
+
 	if ($relname != '' && strlen($relname) > 3)
 	{
 		$name = $relname;
 	}
+
+	echo "Rname: ".$name."\n";
 
 	$name = cleanstr($name);
 
@@ -26,6 +30,8 @@ function makerelease ($results, $parent, $name, $db, $sect, $mail)
 	$name = preg_replace("/\[(?![^\[]+\])|\((?![^\(]+\))|\{(?![^\{]+\})/i", " ", $name);
 
 	$name = preg_replace("/^\(?\?+\)/i", " ", $name);
+
+//	$name = preg_replace('/ \b(rar|zip|avi|mp3|mp4|dmg|tar|nfo|nzb|par2)\b/iU','.$1',$name);
 
 	$name  = preg_replace('/\bmac[\. ]osx|mac[\. ]os[\. ]x\b|macos[\. ]x\b/iU', 'macosx', $name);
 
@@ -56,6 +62,10 @@ function makerelease ($results, $parent, $name, $db, $sect, $mail)
 	$i = 1;
 	$parts = count($results);
 	$notyet = true;
+//	echo $parts."\n";
+
+//	echo $results[0]['reltotalpart']."\n";
+//	echo $results[0]['ID']."\n";
 
 	if (isset($results[0]) && ($results[0]['reltotalpart'] <= $parts) && $parts > 0 && is_string($name))
 	{
@@ -64,7 +74,7 @@ function makerelease ($results, $parent, $name, $db, $sect, $mail)
 
 		$parts = count($results);
 
-		$query = "Select * from `binaries` where `relname`= ".$db->escapeString($name).";";
+		$query = "Select * from `binaries` where `relname`= ".$db->escapeString($name)." and procstat = 5;";
 
 		$count = $db->query($query);
 
@@ -73,18 +83,26 @@ function makerelease ($results, $parent, $name, $db, $sect, $mail)
 			$nombre = $db->escapeString($name." ".$parent["ID"]);
 			$notyet = clearmatches ($name, $results, $code = -6);
 			return $notyet;
+	echo "duplicate $nombre\n";
 		} else {
 			$nombre = $db->escapeString($name);
 		}
 
 		foreach ($results as $r)
 		{
-			$query = sprintf("UPDATE `binaries` SET `relname`=%s, `relpart`=%d, `reltotalpart`=%d, `procstat`=%d, `regexID`=%d, `fromname`='%s' where procstat != 5 AND `ID` = %d", $nombre, $i++, $parts, $PROCSTAT_TITLEMATCHED, -(ord($sect) - ord("A") + 1), $mail, $r["ID"] );
+			$query = sprintf("UPDATE `binaries` SET `relname`=%s, `relpart`=%d, `reltotalpart`=%d, `procstat`=%d, `regexID`=%d, `fromname`='%s' where procstat != 5 AND `ID` = %d;", utf8_encode($nombre), $i++, $parts, $PROCSTAT_TITLEMATCHED, -(ord($sect) - ord("A") + 1), $mail, $r["ID"]);
 
-			$db->queryDirect($query);
+		echo "doing update: ".$r['name']."\n";
+	echo $query."\n";
+
+			var_dump($db->query($query));
+
+			var_dump($db->getLastError());
+			var_dump($db->getAffectedRows());
 
 		}
 	} else if ($parts == 1){
+		//$notyet = clearmatches('', $results, $db);
 	}
 
 	return $notyet;
@@ -92,9 +110,12 @@ function makerelease ($results, $parent, $name, $db, $sect, $mail)
 
 function cleanstr ($str = '', $full = false)
 {
+//	echo "CS1: ".$str."\n";
 
+//	$str = preg_replace('/\(\?\?\?\?\)/iU', '', $str);
 	$str = preg_replace('/\(??yenc\)??/iU', '', $str);
  	$str = preg_replace('/(?<=\.\b[a-z][a-z0-9]{2})(\.\b\d{1,4}?\b)(?!\.[0-9])/U', ' ', $str);
+// 	$str = preg_replace('/^\s*(<*?(www\.)?[^\[\"]+?(\.\b(com|net|org|info)\b[^\[\(\"]*?))/iU','', $str);
 	$str1 = preg_replace('/\s*([<>]*?(www\.)?[^\[\<>"]+?(\.\b(com|net|org|info)\b(?!\.[a-zA-Z][a-zA-Z0-9]{2})[^\[\(\"<>]*?))/U',' ', $str);
 
 	if (strlen($str1)>0)
@@ -105,13 +126,20 @@ function cleanstr ($str = '', $full = false)
 
 $str = preg_replace('/[\<\>]/iU', ' ', $str);
 
+	//$str = preg_replace('/[\-\"\:]|(?![a-z0-9])\'(?![a-z0-9])/',' ',$str);
 	$str = preg_replace('/[\"\:]|(?![a-z0-9])\'(?![a-z0-9])/',' ',$str);
 	$str = preg_replace('/\-(?!\d\d)/',' ',$str);
-	$str = preg_replace('/[\.](?!\d)(?<!\d)/iU', ' ', $str);
+	$str = preg_replace('/[\.](?!\d|\b[a-z]\b)(?<!\d|\b[a-z]\b)/iU', ' ', $str);
 	$str = preg_replace('/[\s\.\-]{2,}?/iU', ' ', $str);
 	$str = preg_replace('/^[\s\.\]\}\)]+?(?!\d+\])|[\s\.\[\{\(]+?$/iU', '', $str);
 	$str = preg_replace('/(\d+?) ?[o0]f ?(\d+?)/iU', '\1 of \2', $str);
 
+// 	do {
+// 		$str =  preg_replace('/^[\[\{\(]|[\]\}\)]$|^ | $/iU','', $str, -1, $count);
+//	} while ($count > 0);
+
+
+//	echo "CS2: ".$str."\n";
 	return $str;
 
 }
@@ -120,19 +148,28 @@ function getname ($namemat = array())
 {
 	$name = $namemat[0];
 
+//	echo "G1: ".$name."\n";
+
+//	$name = preg_replace('/[\(\{\[]\d{1,4}?(?!\d\)?)/iU','',$name);
 	$name = preg_replace('/^re:|Repost\b(:?)/iU','',$name);
 	$name = preg_replace('/^AutoRarPar\d{3,5} /iU','',$name);
-
+	$name = preg_replace('/[\x01-\x1f]/iU',' ',$name);
 
 	if (strlen($name) <= 3)
 	{
 		$name = $namemat[count($namemat)-1];
 	}
+//	$name = preg_replace('/\bmac[\. ]osx|mac[\. ]os[\. ]x\b|macos[\. ]x\b/iU', 'macosx', $name);
+//	$name = preg_replace('/(\.\b[a-z][a-z0-9]{2}\b|\.part[0-9]{1,4}?)(?<!\d)/iU',' ', $name);
 
 	$name = preg_replace('/^[\]\}\)]/iU','', $name);
 	$name = preg_replace('/^ +/iU','', $name);
 
+//	echo "G2: ".$name."\n";
+
 	$name = cleanstr($name);
+
+//	echo "G3: ".$name."\n";
 
 	if (strlen($name) <= 3)
 	{
@@ -143,19 +180,32 @@ function getname ($namemat = array())
 		$name = cleanstr($name);
 	}
 
+//	echo "G4: ".$name."\n";
+
 return cleanstr($name);
 }
 
 function splitarray($str)
 {
+//	echo "\n";
+//	echo "S1 :".$str."\n";
+
+
 	$str = cleanstr($str);
+	//$str = preg_replace('/ [o0]f \d{1,4}?/iU',' ',$str);
+	//$str = preg_replace('/(\d{1,4}?)\.(\d{1,4}?)/iU','$1$2', $str);
 	$str = preg_replace('/[\(\)\[\]\{\}\+\"]/',' ',$str);
 	$str = preg_replace('/\-(?!\d\d)/',' ',$str);
 
 	$str = preg_replace('/[\(\{\[]\d{1,4}?(?!\d\)?)(?! segs| parts)/iU','', $str);
+//	$str = preg_replace('//'," ",$str);
 	$str = preg_replace('/(\d*?([\.\,]\d*?)?) ?([kmg]b)/iU','$1$2',$str);
 
+//	echo "S2 :".$str."\n";
+
 	$str = cleanstr($str);
+
+//	echo "S3 :".$str."\n";
 
 	$arr = preg_split("/[\s_]+/", $str, 0, PREG_SPLIT_DELIM_CAPTURE);
 	sort($arr);
@@ -185,6 +235,8 @@ function splitarray($str)
 		} while ($i < count($arr));
 	}
 
+//	var_dump($arr);
+//	echo "\n";
 	return $arr;
 }
 
@@ -211,14 +263,25 @@ function checknames ($post, $matches, $fullname, $parts, $r, $db, $mail)
 	if (preg_match('/^[\{\[\(]?(attn|att|attention)\:?/iU', $post))
 	{
 		$str =  preg_replace('/\batt[^ \:]*?\:?/iU','', $post);
+//	 	do {
+// 			$str =  preg_replace('/^[\[\{\(]|[\]\}\)]$|^ | $/iU','', $str, -1, $count);
+// 		} while ($count > 0);
+// 		if (preg_match('/ /iU', $str))
+// 		{
+// 			$str = $fullname;
+// 		} else {
+// 			$str = $post;
+// 		}
 
 		echo "attn: ".$str."\n";
 	}
 
 	if (!preg_match('/\d{1,4}?\/\d{1,4}?/iU', $fullname) || preg_match('/(File|Post) \d{1,4}? ?[o0]f ?\d{1,4}?/iU', $fullname))
 	{
+		//$str = preg_replace('/\d{1,4}? ?([o0]f ?\d{1,4}?)/iU','$1', $post);
 		$str = preg_replace('/\d{1,4}? ?([o0]f ?\d{1,4}?)/iU','$1', $post);
 	} else {
+		//$str = $post;
 		if (preg_match('/\d{1,4}?\/\d{1,4}?[\]\}\)]/iU', $fullname) && preg_match('/ ?[o0]f ?\d{1,4}?/iU', $fullname))
 		{
 			$str = preg_replace('/[\{\{\(]\d{1,4}?\/(\d{1,4}?)[\]\}\)]/iU','', $str);
@@ -230,7 +293,18 @@ function checknames ($post, $matches, $fullname, $parts, $r, $db, $mail)
 		}
 	}
 
+// 	$str = preg_replace('/(?<=\.\b[a-z][a-z0-9]{2})(\.\b\d{1,4}?\b)/iU','', $str);
+// 	$str = preg_replace('/(\.(par2|\b[a-z][a-z0-9]{2}?\b|vol\d{1,4}?\+\d{1,4}?))+?(\.\d{1,4}?)?/iU',' ',$str);
+// 	$str = preg_replace('/(\binfo\b|\"|\-|  +)/iU',' ',$str);
+// 	$str = preg_replace('/[\(\[\{]??\d{1,4}?\/\d{1,4}?[\]\)\}]??/iU','', $str);
+
 	$postwords = $namemat = splitarray($str);
+
+
+//	echo count($matches);
+//	print_r($postwords);
+//	echo "Name: ".cleanstr($str)."\n";
+//	echo "\n";
 
 	$actual = array();
 
@@ -271,16 +345,29 @@ function checknames ($post, $matches, $fullname, $parts, $r, $db, $mail)
 			}
 		}
 
+
+// 		$str = preg_replace('/(?<=\.\b[a-z][a-z0-9]{2})(\.\b\d{1,4}?\b)/iU','', $str);
+// 		$str = preg_replace('/(\.(par2|\b[a-z][a-z0-9]{2}?\b|vol\d{1,4}?\+\d{1,4}?))+?(\.\d{1,4}?)?/iU',' ',$str);
+// 		$str = preg_replace('/(\binfo\b|\"|\-|  +)/iU',' ',$str);
+// 		$str = preg_replace('/[\(\[\{]??\d{1,4}?\/\d{1,4}?[\]\)\}]??/iU','', $str);
+
+//		$str = cleanstr($str);
+
 		$keywords = splitarray($str);
+
+//	print_r($keywords);
+//	echo "m ".$str."\n";
 
 		$i = 0;
 		foreach ($postwords as $p)
 		{
 			foreach ($keywords as $k)
 			{
+//	echo $p." ".$k."\n";
 
 				if (strcmp($p,$k) == 0)
 				{
+//	echo $p." ".$k."\n";
 					$i++;
 				}
 			}
@@ -290,6 +377,9 @@ function checknames ($post, $matches, $fullname, $parts, $r, $db, $mail)
 
 $mode = array_count_values($mode);
 ksort($mode);
+
+//	echo "mode\n";
+//	var_dump($mode);
 
 end($mode);
 $index = 0;
@@ -330,9 +420,19 @@ if (current($mode) === false)
 echo "g".current($mode)."\n";
 }
 
+// if (end($mode) > prev($mode) || current($mode) > 1000)
+// {
+// 	end($mode);
+// }
+
 $index = key($mode);
 
 echo "index ".$index."\n";
+
+// if ($index < 5)
+// {
+// 	$index = count($postwords);
+// }
 
 foreach ($matches as $m)
 {
@@ -371,31 +471,41 @@ foreach ($matches as $m)
 
 				if (strcmp($p,$k) == 0)
 				{
+//	echo $p." ".$k."\n";
 					$i++;
 				}
 			}
 		}
 
+
+//	echo $i." ".$index." ".$m['name']." ".$m['ID']."\n";
 		if ($i >= $index && $index > 0)
 		{
 
+//	echo $i." ".$index." ".$m['name']." ".$m['ID']."\n";
+
 			$actual[] =$m;
-			$str = preg_replace('/[\.](?!\d)(?<!\d)/iU',' ', $m['name']);
+			$str = preg_replace('/[\.](?!\d|\b[a-z]\b)(?<!\d|\b[a-z]\b)/iU',' ', $m['name']);
 
 			if (preg_match('/vol\d{1,4}?\+\d{1,4}?|p\d{2,3}?/iU', $str) >= 1)
 			{
 				$pars = $pars + $m['totalParts'];
 				$extras++;
+//	echo "pars: ".$m['name']." ".$n."\n";
 
 			} else if (preg_match('/sfv|\bnfo\b|\bnzb\b|par2/Ui', $str) >= 1)
 			{
 				$extras++;
+//	echo "extra: ".$m['name']." ".$n."\n";
 			} else
 			{
 				$segsarr[] = $m['totalParts'];
+//	echo "segs: ".$m['name']." ".$n."\n";
 			}
 
 			$str = cleanstr($str);
+
+//echo $str."\n";
 
 			$str = preg_split("/[\s_\"]+/", $str, 0, PREG_SPLIT_DELIM_CAPTURE);
 			foreach ($str as $n)
@@ -408,8 +518,13 @@ foreach ($matches as $m)
 				{
 					$nzb = $m['ID'];
 				}
+//	echo $n."\n";
 			}
 		}
+//	print_r($actual);
+//	echo "\n";
+
+//	echo "suffix".$suffix."\n";
 }
 
 echo "p2: ".$pars." files: ".array_sum($segsarr)." e: ".$extras."\n";
@@ -427,6 +542,7 @@ echo "p2: ".$pars." files: ".$files."\n";
 
 $namemat = array_count_values($namemat);
 asort($namemat);
+//var_dump($namemat);
 
 if (count($namemat) > 1)
 {
@@ -436,10 +552,13 @@ if (count($namemat) > 1)
 
 	while (next($namemat) < $max && current($namemat) !== false)
 	{
+//echo current($namemat)." ".$i."\n";
 		$i++;
 	}
 
 	$namemat = array_slice($namemat, $i,count($namemat), true);
+
+//	var_dump($namemat);
 
 	$j = 0;
 	$name = '';
@@ -452,11 +571,14 @@ if (count($namemat) > 1)
 		{
 			$str = $m['name'];
 			$str = preg_replace('/(\.(vol\d{1,4}?\+\d{1,4}?|sfv|part\d{1,4}?|nfo|\bnzb\b|par2))/iU','', $str);
+			//$str = preg_replace('/[\[\{\(]??\d{1,4}?\/\d{1,4}?[\]\}\)]??/iU','', $str);
+			//$str = preg_replace('/[\[\{\(]??\d{1,4}?(\/\d{1,4}?| [o0]f \d{1,4}?)[\]\}\)]??/iU','$1', $str);
 			if(strripos($str, $key) !== false)
 			{
 				$i++;
 			}
 		}
+//	echo $i." ".$j." ".$str."\n";
 		$imat[] = $i;
 		if ($i > $j)
 		{
@@ -471,7 +593,7 @@ if (count($namemat) > 1)
 
 	$name2 = '';
 
-	$name = preg_replace('/[\.\-](?!\d)(?<!\d)/iU',' ', $name);
+	$name = preg_replace('/[\.](?!\d|\b[a-z]\b)(?<!\d|\b[a-z]\b)/iU',' ', $name);
 
 	echo 'name = '.$name."\n";
 
@@ -482,8 +604,10 @@ if (count($namemat) > 1)
 		foreach ($namemat as $key => $value)
 		{
 
+//	echo $n." ".$key."\n";
 			if (strcmp($key,$n) == 0)
 			{
+//	echo $n."\n";
 				$name2 = $name2.' '.$n;
 				unset($namemat[$key]);
 			}
@@ -498,12 +622,15 @@ if (count($namemat) > 1)
 		$relname = cleanstr($name2);
 	echo "relname = ".$relname."\n";
 
+//var_dump($namemat);
+
 	$qual = '';
 
 	foreach ($namemat as $key => $value)
 	{
 		foreach($qualities as $q)
 		{
+//	echo $key." ".$q."\n";
 			if (stripos ($key , $q) !== false)
 			{
 					$qual = $qual.' '.$q;
@@ -511,6 +638,10 @@ if (count($namemat) > 1)
 			}
 		}
 	}
+
+
+
+//	var_dump($namemat);
 
 	if ($nfo == 0)
 	{
@@ -520,7 +651,9 @@ if (count($namemat) > 1)
 
 		if (isset($tmp))
 		{
+//			$actual[] = $tmp;
 
+		//	var_dump($actual);
 		}
 	}
 }
@@ -593,6 +726,8 @@ global $db;
 	$matches = $db->query($query);
 	}
 
+
+	echo $query."\n";
 	return $matches;
 }
 
@@ -601,8 +736,13 @@ function makenzb ($nzb, $nzb1, $nfo, $nfo1)
 	global $nntpconnected, $nntp;
 	global $relname;
 
+
+//echo $nzb." ".$nfo."\n";
+
 	if (!$nntpconnected)
 	{
+		//$nntp->doConnect();
+		//$nntpconnected = true;
 	}
 	if ($nzb == 0)
 	{
@@ -620,6 +760,8 @@ echo "getting nzb\n";
 	$relname = preg_replace('/( \d{1,4}?)? ?[o0]f ?\d{1,4}?$/iU','', $relname);
 	$relname = cleanstr($relname);
 
+	//$bin =  $nntp->getBinary($nzb);
+	//file_put_contents(FS_ROOT."/nzbs/".$relname.".nzb", $bin);
 	}
 	if ($nfo == 0)
 	{
@@ -630,6 +772,9 @@ echo "getting nzb\n";
 	{
 echo "getting nfo\n";
 
+	// $bin =  $nntp->getBinary($nfo);
+
+	// file_put_contents(FS_ROOT."/nzbs/".$relname.".nfo", $bin);
 	}
 }
 
@@ -661,6 +806,27 @@ function addnfo ($mail, $r, $db, $relname)
 	}
 }
 
+function removemail($name, $mail)
+{
+	$poster = preg_split('/@/', $mail, 0, PREG_SPLIT_DELIM_CAPTURE);
+
+//	var_dump($poster);
+
+	$poster =  preg_replace('/[\.\_\-\']/','.?', $poster[0]);
+
+	$poster = str_replace('/', ' ', $poster);
+
+	$poster = str_replace('\\', ' ',  $poster);
+
+	$poster = preg_quote($poster);
+
+	echo "mail ".$mail."\n";
+
+	echo "poster $poster\n";
+
+	return preg_replace('/'.$poster.'/', '', $name);
+}
+
 function okresults (&$results, &$cuenta, $parts, $i, $patern, $patern2, $r, $mail, $dogn = true)
 {
 	global $pars, $relname;
@@ -672,9 +838,13 @@ function okresults (&$results, &$cuenta, $parts, $i, $patern, $patern2, $r, $mai
 	{
 		$cuenta1 = preg_split($patern, $r['name'], 0, PREG_SPLIT_DELIM_CAPTURE);
 
+echo "cuenta1 ".$i." ".$dogn;
+//var_dump($cuenta1);
+
 		if (isset($cuenta1) && $dogn)
 		{
 			$cuenta1[0] = getname($cuenta1);
+//var_dump($cuenta1);
 		}
 
 		if (!isset($cuenta1[$i]) || strlen($cuenta1[$i]) < 3)
@@ -685,8 +855,10 @@ function okresults (&$results, &$cuenta, $parts, $i, $patern, $patern2, $r, $mai
 		$cuenta1[0] = preg_replace($patern2 ,'', $cuenta1[$i]);
 
 echo "ok: ".$cuenta1[0]."\n";
+//	var_dump($cuenta1);
 
-		$query = "SELECT * FROM `binaries` where name like '%".preg_replace('/\'/','\\\'', $cuenta1[0])."%'";
+
+		$query = "SELECT * FROM `binaries` where name like '%".preg_replace('/\'/','\\\'', removemail($cuenta1[0], $mail))."%'";
 
 		$query = $query." AND `fromname` like '%".$mail."%'";
 
@@ -753,12 +925,23 @@ function domatching ($pattern, $db, $r, $oldname, $sect)
 
 	global $relname;
 
-	$cuenta = preg_split($pattern, $r['name'], 0, PREG_SPLIT_DELIM_CAPTURE);
+	$mail = preg_split('/(\b[a-z0-9\.\_\-\' ]+?\b@\b[a-z0-9\.\_\-\' ]+?\b)/Ui', $r['fromname'], 0, PREG_SPLIT_DELIM_CAPTURE);
+
+	if (!isset($mail[1]))
+	{
+		$mail[1] = $r['fromname'];
+	}
+
+	$mail[1] = preg_replace('/^\'|\'$/','', $db->escapeString($mail[1]));
+
+	$cuenta = preg_split($pattern, removemail($r['name'], $mail[1]), 0, PREG_SPLIT_DELIM_CAPTURE);
 
 	if (isset($cuenta[1]) && $notyet)
 	{
 
 	echo "doing ".$sect."\n";
+//	var_dump($cuenta);
+//	echo "\n";
 
 	echo "1: ".$r['name']."\n";
 	echo "2: ".$cuenta[0]."\n";
@@ -767,20 +950,13 @@ function domatching ($pattern, $db, $r, $oldname, $sect)
 
 		if (strlen($cuenta[0]) <= 3)
 		{
+			//$cuenta[0] = $cuenta[count($cuenta)-1];
 		}
 
-	echo "3: ".$cuenta[0]."\n";
+	echo "3: ".preg_quote($cuenta[0])."\n";
 
-		$query = "SELECT * FROM `binaries` where match (name) against (".$db->escapeString($cuenta[0])." IN NATURAL LANGUAGE MODE)";
-
-		$mail = preg_split('/(\b[a-z0-9\.\_\-\' ]+?\b@\b[a-z0-9\.\_\-\' ]+?\b)/Ui', $r['fromname'], 0, PREG_SPLIT_DELIM_CAPTURE);
-
-		if (!isset($mail[1]))
-		{
-			$mail[1] = $r['fromname'];
-		}
-
-		$mail[1] = preg_replace('/^\'|\'$/','', $db->escapeString($mail[1]));
+		$query = "SELECT * FROM `binaries` where match (name) against (".$db->escapeString(removemail($cuenta[0], $mail[1]))." IN NATURAL LANGUAGE MODE)";
+//		$query = "SELECT * FROM `binaries` where match (name) against (".$db->escapeString($r['name'])." IN NATURAL LANGUAGE MODE)";
 
 		$query = $query." AND `fromname` like '%".$mail[1]."%'";
 
@@ -790,6 +966,9 @@ function domatching ($pattern, $db, $r, $oldname, $sect)
 
 		$parts = intval(preg_replace('/[^\d]/','', $cuenta[1]));
 
+//	echo $query."\n";
+
+//	echo count($matches)."\n";
 	echo $cuenta[1]."\n";
 
 		$results = checknames($cuenta[0] , $matches, $r['name'], $parts, $r, $db, $mail[1]);
@@ -828,12 +1007,22 @@ echo "OK end CR: ".count($results)." P: ". $parts." P2: ".$pars."\n";
 
 echo "OK end CR: ".count($results)." P: ". $parts." P2: ".$pars."\n";
 
+//	echo "6: ".$cuenta[0]."\n";
 		$name = getname($cuenta);
 
+//	echo "7: ".$name."\n";
+
+		//$results = checknames($name, $matches, $r['name'], $parts, $r, $db, $mail[1]);
+
+
 	echo $ptr." N:".$name." CM:".count($matches)." P:".$parts." CR:".count($results)." ".$r['age']." days ".$sect." ".$r['ID']."\n";
+//	echo $query."\n";
+
 
 	echo "stats: P2:".$pars." CR:".count($results)." P:".$parts." F:".$files." N:".$nzb."\n";
 
+
+		//if ((count($results) +1 >= $parts || ($nzb && $nfo && $parts < 4)) && $oldname != $name)
 		if (($nzb != 0 || $nzb1 != 0) && $files == 0)
 		{
 echo "D1\n";
@@ -841,6 +1030,7 @@ echo "D1\n";
 			$jump = $jump && clearmatches($name, $results, -3);
 		} else if (((((count($results) + $pars >= $parts) && ($files > 0 || count($results) == $parts)) || (count($results) >= $parts && ($files > 0 || count($results) == $parts))) && ($files <= 2 * $parts)) && $oldname != $name)
 		{
+//	echo "makerelease ".$sect."\n";
 echo "D2\n";
 			$jump = $jump && makerelease($results, $r, $name, $db, $sect, $mail[1]);
 		} else if ((((count($results) + $pars >= $parts) && $files > 2) || (count($results) >= $parts && $files > 2)) && ($files < 2 * $parts))
@@ -870,6 +1060,249 @@ echo "stats: ".$pars." ".count($results)." ".$parts." ".$files." ".$nzb."\n";
 	}
 }
 
+function domatching2 ($pattern, $db, $r, $oldname, $sect)
+{
+	global $notyet, $jump;
+
+//	global $ptr;
+
+//	global $nzb, $nfo;
+
+//	global $pars, $files;
+
+	global $relname;
+
+	$mail = preg_split('/(\b[a-z0-9\.\_\-\' ]+?\b@\b[a-z0-9\.\_\-\' ]+?\b)/Ui', $r['fromname'], 0, PREG_SPLIT_DELIM_CAPTURE);
+
+	if (!isset($mail[1]))
+	{
+		$mail[1] = $r['fromname'];
+	}
+
+	$mail[1] = preg_replace('/^\'|\'$/','', $db->escapeString($mail[1]));
+
+	$cuenta = preg_split($pattern, removemail($r['name'], $mail[1]), 0, PREG_SPLIT_DELIM_CAPTURE);
+
+var_dump($cuenta);
+
+	if (isset($cuenta[1]) && $notyet)
+	{
+		echo "d2 1: ".$r['name']."\n";
+		echo "d2 2: ".$cuenta[0]."\n";
+		if (strlen($cuenta[0]) <= 3)
+		{
+			$cuenta[0] = $cuenta[1];
+		}
+
+	echo "doing ".$sect."\n";
+		$oldname = $cuenta[0];
+//		$cuenta[0] = getname($cuenta);
+		$query = "SELECT * FROM `binaries` where match (name) against (".$db->escapeString($cuenta[0])." IN NATURAL LANGUAGE MODE)";
+
+		if ($pattern == '/^(\[\d+\])/')
+		{
+			$query = "SELECT * FROM `binaries` where name regexp '^".preg_quote($cuenta[0])."' ";
+			$query = str_replace('\\', "\\\\", $query);
+		}
+
+
+		$query = $query." AND `fromname` like '%".$mail[1]."%'";
+
+		$matches = checkmatches($query, $r);
+
+echo "CM ".count($matches)."\n";
+
+		if (count($matches) == 0)
+		{
+			$cuenta = preg_split($pattern, $r['name'], 0, PREG_SPLIT_DELIM_CAPTURE);
+
+			if (strlen($cuenta[0]) <= 3)
+			{
+				$cuenta[0] = $cuenta[1];
+			}
+
+			$oldname = $cuenta[0];
+
+			$query = "SELECT * FROM `binaries` where match (name) against (".$db->escapeString($cuenta[0])." IN NATURAL LANGUAGE MODE)";
+
+			$query = $query." AND `fromname` like '%".$mail[1]."%'";
+
+			$matches = checkmatches($query, $r);
+		}
+
+		$arr = array();
+
+		foreach ($matches as $value)
+			$arr[] = $value['name'];
+		natcasesort($arr);
+		$arr = array_values($arr);
+
+		$files = array();
+
+		foreach ($matches as $value)
+		{
+			$key = array_search($value['name'], $arr);
+
+			$files[$key] = $value;
+		}
+
+		ksort($files);
+
+		$matches = $files;
+
+		$i = 0;
+		$k = 0;
+		$q = 0;
+		$par = 0;
+		$arr = array();
+		$files = array();
+
+		foreach ($matches as $value)
+		{
+
+			$tmp = str_replace('/', ' ',  $oldname);
+			$tmp = str_replace('\\', ' ',  $tmp);
+
+			$tmp = preg_replace('/(\.[a-z][a-z0-9]{2,3})+$/', '', $tmp);
+
+	echo "1100 	".preg_quote($tmp)."\n";
+	echo "1100 	".$value['name']."\n";
+
+			if (preg_match('/('.preg_quote($tmp).')/iU', str_replace('/', ' ',  $value['name']), $tmp))
+			{
+	echo "1101";
+	var_dump($tmp);
+				preg_match('/^(.+)(?|(?:\.(?:part|r)(\d{1,4}?))|\.(\d{1,4}?)[\]"]|\.(\d{1,4}?)$)/iU', $value['name'], $tmp);
+	echo "1102";
+	var_dump($tmp);
+				if (isset($tmp[2]) && !preg_match('/\.(par2|vol\d{1,4}?\+\d{1,4}?|nzb|nfo)/iU', $value['name']))
+				{
+					$j = similar_text($cuenta[0], $tmp[1], $p);
+
+					$p = floor($p);
+
+					$a = strval($tmp[2]) + 0;
+
+//	echo "j = $j, p = $p, a= $a\n";
+
+					if ($j > $k || $p > $q)
+					{
+//	echo "reset\n";
+						$i = $a - 1;
+						$k = $j;
+						$q = $p;
+						$arr = array();
+					}
+
+
+					if ($a > $i && $j >= $k && $p >= $q)
+					{
+						$i = $a;
+						$k = $j;
+						$q = $p;
+						$arr[] = $value;
+					}
+				} else {
+					$par = $par + $value['totalParts'];
+					$files[] = $value;
+				}
+			}
+		}
+
+		if (count($arr) > 0 && preg_match('/^(.+)(?|(?:\.(?:part|r)(\d{1,4}?))|\.(\d{1,4}?)[\]"]|\.(\d{1,4}?)$)/iU', $arr[0]['name'], $tmp))
+		{
+			$arr1 = array();
+
+			foreach ($arr as $value)
+				$arr1[] = $value['name'];
+			natcasesort($arr1);
+			$arr1 = array_values($arr1);
+
+			$files1 = array();
+
+			foreach ($arr as $value)
+			{
+				$key = array_search($value['name'], $arr1);
+
+				$files1[$key] = $value;
+			}
+
+			ksort($files1);
+
+			$arr = $files1;
+
+			$j = $tmp[2] - 1;
+			$missing = $j;
+
+			$l = end($arr);
+
+			$l = $l['totalParts'];
+
+			$s = prev($arr);
+
+			$s = $s['totalParts'];
+
+			$tmp= prev($arr);
+
+			$tmp = $tmp['totalParts'];
+
+			if ($tmp > $s)
+				$s = $tmp;
+
+			if ($s == 0)
+				$s = 1;
+
+			$missing = $missing - ($par / $s);
+
+			foreach ($arr as $a)
+			{
+				preg_match('/^(.+)(?|(?:\.(?:part|r)(\d{1,4}?))|\.(\d{1,4}?)[\]"]|\.(\d{1,4}?)$)/iU', $a['name'], $tmp);
+				{
+					if ($tmp[2] -$j != 1)
+						$missing = $missing - ($tmp[2] -$j) + 1;
+					if ($a['totalParts'] != $s)
+						$missing = $missing + 1;
+					$l = $a['totalParts'];
+				}
+				$j = $tmp[2] + 0;
+			}
+
+			if ($l < $s)
+				$missing = $missing - 1;
+			else
+				echo "last not smaller\n";
+
+			echo "$i\n";
+			if ($missing)
+				echo "missing $missing\n";
+
+			$arr = array_merge($arr, $files);
+
+			$name = getname($cuenta);
+
+			$results = checknames($oldname , $arr, $r['name'], count($arr), $r, $db, $mail[1]);
+
+		echo "CR= ".count($results)." AR= ".count($arr)." missing= $missing age= ".$r['age']." l= $l s= $s\n";
+
+			if ($missing <= 0 && $l < $s && $r['age'] > .25 && count($results) == count($arr) && count($results) > 3)
+			{
+				$jump = $jump && makerelease($results, $r, $name, $db, $sect, $mail[1]);
+			} else if ($missing <= 0 && $r['age'] > 2.5 && count($results) == count($arr) && count($results) > 3) {
+				$jump = $jump && makerelease($results, $r, $name, $db, $sect, $mail[1]);
+			} else
+				$jump = $jump && clearmatches('', $results);
+		}
+
+//		echo "relname $relname * * * name $name\n";
+
+//		var_dump($results);
+
+//		var_dump($files);
+		$notyet = false;
+	}
+}
+
+
 $nzb = 0;
 $nfo = 0;
 $pars = 0;
@@ -880,6 +1313,8 @@ $nntpconnected = false;
 
 $db = new Db;
 $nntp = new Nntp;
+
+//$db->query("UPDATE `binaries` SET `procstat`=0 WHERE  `procstat`=-1");
 
 echo "starting auto matcher\n";
 $time = microtime(true);
@@ -893,24 +1328,44 @@ $oldid = 0;
 
 if (isset($argv[1]))
 	{
-		echo "doing group ".$argv[1]."\n";
+		echo "doing ID ".$argv[1]."\n";
 	}
 
 do {
 
+$time2 = microtime(true);
+
+echo "\nptr $ptr\n";
+
 if (isset($argv[1]))
 	{
-		$query = "SELECT *, hour(TIMEDIFF(now(), `date`))/24 as age from binaries b where b.`ID` in (select a.ID from binaries a where a.`procstat`=0 AND a.groupID = ".$argv[1]." AND a.`name` REGEXP '([0-9] ?([o0]f|\\\\/) ?[0-9])|([\\\\(\\\\{\\\\[]?[0-9]+ *(segs|parts))' group by a.binaryhash order by null) limit ".$ptr.", 2";
+//		$query = "SELECT *, hour(TIMEDIFF(now(), `date`))/24 as age from binaries b where b.`ID` in (select a.ID from binaries a where a.`procstat`=0 AND a.groupID = ".$argv[1]." AND a.`name` REGEXP '^\\\\[[0-9]+\\\\]|\\\\.[0-9]{3}\"|\\\\.[0-9]{3}$|\\\\.r[0-9]+\\\\b|\\\\.part[0-9]+|([0-9] ?([o0]f|\\\\/) ?[0-9])|([\\\\(\\\\{\\\\[]?[0-9]+ *(segs|parts))' group by a.binaryhash order by null) limit ".$ptr.", 2";
+		$query = "SELECT *, hour(TIMEDIFF(now(), `date`))/24 as age from binaries where `ID` = ".$argv[1];
+		$argv[1] = -1;
 
 		$rel = $db->query($query);
+
 	} else {
 
 		$rel = $db->query("UPDATE `binaries` SET `procstat`=0,`procattempts`=0,`regexID`=NULL, `relpart`=0,`reltotalpart`=0,`relname`=NULL WHERE procstat = -6");
 
-		$query = "SELECT *, hour(TIMEDIFF(now(), `date`))/24 as age from binaries b where b.`ID` in (select a.ID from binaries a where a.`procstat`=0 AND a.`name` REGEXP '([0-9] ?([o0]f|\\\\/) ?[0-9])|([\\\\(\\\\{\\\\[]?[0-9]+ *(segs|parts))' order by a.`groupID`, a.`name`) group by binaryhash order by null limit ".$ptr.", 2";
+//		$query = "SELECT *, hour(TIMEDIFF(now(), `date`))/24 as age from binaries b where b.`ID` in (select a.ID from binaries a where a.`procstat`=0 AND a.`name` REGEXP '^\\\\[[0-9]+\\\\]|\\\\.[0-9]{3}\"|\\\\.[0-9]{3}$|\\\\.r[0-9]+\\\\b|\\\\.part[0-9]+|([0-9] ?([o0]f|\\\\/) ?[0-9])|([\\\\(\\\\{\\\\[]?[0-9]+ *(segs|parts))' order by a.`groupID`, a.`name`) group by binaryhash order by null limit ".$ptr.", 2";
+		$query = "SELECT *, HOUR (TIMEDIFF(now(), `date`)) / 24 AS age FROM binaries b where b.`ID` in ( SELECT a.ID FROM binaries a WHERE a.`procstat` = 0 GROUP BY a.binaryhash order by a.ID)  limit ".$ptr.", 2";
+//		$query = "SELECT *,  hour(TIMEDIFF(now(), `date`))/24 as age from binaries b where b.ID in (select a.ID from binaries a where a.`procstat`=0 AND a.name REGEXP '([0-9] ?([o0]f|\\/) ?[0-9])|([\\(\\{\\[]?[0-9]+ *(segs|parts))' order by a.`groupID`, a.`name`) order by null limit ".$ptr.", 2";
+//		$query = "SELECT *, HOUR (TIMEDIFF(now(), `date`)) / 24 AS age FROM binaries b where b.`ID` = 4724491";
 
 		$rel = $db->query($query);
 	}
+
+	//$rel = $db->query("SELECT *,  hour(TIMEDIFF(now(), `date`))/24 as age FROM `binaries` where `ID` = 2060224 order by `groupID`, `name` limit ".$ptr.", 5");
+	//$rel = $db->query("SELECT *,  hour(TIMEDIFF(now(), `date`))/24 as age FROM `binaries` where `name` LIKE '%Red Dwarf S10E05 %' order by `groupID`, `name` limit ".$ptr.", 5");
+	//
+
+	$patern = '/^\[[0-9]+\]|\.[0-9]{3}\"|\.[0-9]{3}$|\.r[0-9]+\b|\.part[0-9]+|([0-9] ?([o0]f|\/) ?[0-9])|([\(\{\[]?[0-9]+ *(segs|parts))/';
+
+
+$tim = microtime(true) - $time2;
+echo "time1 = ".$tim."\n";
 
 echo " * *\n";
 echo " * * * \n";
@@ -921,6 +1376,7 @@ echo " * * * *\n";
 		if ($oldid == $rel[0]['ID'])
 		{
 			$ptr++;
+			//$rel = $db->query("SELECT *  FROM `binaries` WHERE `procstat`=0 and `name` REGEXP '(File|Post) [0-9]+ [o0]f [0-9]+' order by `groupID`, `name` limit ".$ptr.", 5");
 			continue;
 		}
 		$oldid = $rel[0]['ID'];
@@ -928,65 +1384,128 @@ echo " * * * *\n";
 
 	$relnum = count($rel);
 
+	//echo "doing select 1 ".$relnum."\n";
+
 	if ($relnum > 0)
 	{
+//echo "ptr = ".$ptr."\n";
 echo "relnum is $relnum\n";
 		foreach ($rel as $r)
 		{
-		$j++;
+//			trigger_error($r['procstat']);
+			if ($r['procstat'] != 0)
+				break;
 
-		$suffix = '';
-		$notyet = true;
-		$jump = true;
+//			trigger_error($r['name']);
 
-	echo "name: ".$r['name']." ".$r['ID']."\n";
+			$relnum = $relnum - 1;
 
-		$relname = '';
+			$j++;
+
+			$suffix = '';
+			$notyet = true;
+			$jump = true;
+
+
+	//			$r['name'] = preg_replace('/\'/','',$r['name']);
+
+
+
+
+		echo "name: ".$r['name']." ".$r['ID']."\n";
+
+			$relname = '';
 
 			$pattern = '/[\{\[\(]0*?1\/'.$r['totalParts'].'??[\]\}\)]$/iU';
 
 			$r['name'] = preg_replace($pattern, '', $r['name']);
 
-		$pattern = '/(?:File|Post) \d{1,4}? ?[o0]f ?(\d{1,4}?)/iU';
+//	echo "name: ".$r['name']."\n";
 
-			domatching($pattern, $db, $r, $oldname, "A");
+//WHERE  `name` REGEXP CONCAT(  '[\{\[\(]0*1\/',  `totalParts` ,  '[\]\}\)]$' ) AND  `totalParts` >10
 
-		$pattern = '/(?<![a-zA-Z])\d{1,4}? ?(\/ ?\d{1,4}?)/iU';
+			$pattern = '/(?:File|Post) \d{1,4}? ?[o0]f ?(\d{1,4}?)/iU';
 
-			domatching($pattern, $db, $r, $oldname, "C");
-
-
-		$pattern = '/\[\d{1,4}?( ?[o0]f ?\d{1,4}?)\]$/iU';
-
-			domatching($pattern, $db, $r, $oldname, "D");
+				domatching($pattern, $db, $r, $oldname, "A");
 
 
-		$pattern = '/\d{1,4}?( ?[o0]f ?\d{1,4}?)/iU';
+	//			$pattern = '/\d{1,3}? ?[o0]f ?(\d{1,3}?) ?.*[\[\{\(]\d{1,3}?\/\d{1,3}?[\}\]\)]/iU';
 
-			domatching($pattern, $db, $r, $oldname, "E");
+	//			domatching($pattern, $db, $r, $oldname, "B");
 
-		$pattern = '/[\[\(\{]\s*(\d{1,4}?)[^\]\}\)]*(?:segs|parts)/iU';
 
-			domatching($pattern, $db, $r, $oldname, "F");
+			$pattern = '/(?<![a-zA-Z])\d{1,4}? ?(\/ ?\d{1,4}?)/iU';
 
-		$oldname = $name;
+				domatching($pattern, $db, $r, $oldname, "C");
 
-		if ($notyet)
-		{
-			$ptr++;
-			echo "*****";
-				echo $r['name'];
-			echo "*****\n";
-				$oldname = $r['name'];
-			$jump = false;
-		}
-		if (!$jump) {
+
+			$pattern = '/\[\d{1,4}?( ?[o0]f ?\d{1,4}?)\]$/iU';
+
+				domatching($pattern, $db, $r, $oldname, "D");
+
+
+			$pattern = '/\d{1,4}?( ?[o0]f ?\d{1,4}?)/iU';
+
+				domatching($pattern, $db, $r, $oldname, "E");
+
+			$pattern = '/[\[\(\{]\s*(\d{1,4}?)[^\]\}\)]*(?:segs|parts)/iU';
+
+				domatching($pattern, $db, $r, $oldname, "F");
+
+
+			$pattern = '/\.(?:part|r)(\d{1,4}?\b)(?![a-z\.])/iU';
+
+				domatching2($pattern, $db, $r, $oldname, "T");
+
+			$pattern = '/\.(?:part|r)(\d{1,4}?\b)\.rar/iU';
+
+				domatching2($pattern, $db, $r, $oldname, "U");
+
+			$pattern = '/(\.\d{2,3}\")|(\.\d{2,3}$)/iU';
+
+				domatching2($pattern, $db, $r, $oldname, "V");
+
+			$pattern = '/^(\[\d+\])/';
+
+				domatching2($pattern, $db, $r, $oldname, "W");
+
+			$pattern = '/(\d{1,2}?-\d{1,2}?\-(?:19|20)\d\d)|((?:19|20)\d\d\-\d{1,2}?-\d{1,2}?)/';
+				if (preg_match($pattern, $r['name'])  && $notyet)
+					echo "name to match X: ".$r['name']."\n";
+				domatching2($pattern, $db, $r, $oldname, "X");
+
+			$pattern = '/(\.rar)/';
+				if (preg_match($pattern, $r['name'])  && $notyet)
+	//				echo "name to match Z: ".$r['name']."\n";
+				if (!preg_match('/(part\d{1,4}?|vol\d{1,4}?\+\d{1,4}?|\.zip|\.p\d{1,4}?|\.\d{1,4}?\"?$)/iU', $r['fromname']))
+	//				domatching2($pattern, $db, $r, $oldname, "Z");
+
+
+
+			$oldname = $name;
+
+	$tim = microtime(true) - $time2;
+	echo "time 2= ".$tim."\n";
+
+
+			if ($notyet)
+			{
+				$ptr++;
+				echo "*****";
+					echo $r['name'];
+				echo "*****\n";
+					$oldname = $r['name'];
+				$jump = false;
+			}
+			if (!$jump)
+			{
+	//	echo "doing continue\n";
+				//$ptr++;
 				continue 2;
 			}
-
 		}
 	}
-} while ($relnum > 0 && $ptr <10000);
+} while ($relnum > 0 && $ptr <100000);
 echo "finnis ". $i." ".$j."\n";
 if ($nntpconnected)
 {
@@ -994,7 +1513,7 @@ if ($nntpconnected)
 	$nntpconnected = false;
 }
 
-unset($db);
+//unset($db);
 unset($nntp);
 $time = microtime(true) - $time;
 echo "time = ".$time."\n";
@@ -1023,7 +1542,6 @@ echo "time = ".$time."\n";
 //delete  FROM parts WHERE `binaryID` NOT IN (SELECT b.id FROM binaries b)
 
 //select * FROM `parts` WHERE NOT EXISTS(SELECT ID FROM `binaries`);
-
 //ALTER TABLE  `newznab`.`binaries` ADD INDEX (  `binaryhash` )
 
 ?>
