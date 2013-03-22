@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.1r743";
+$version="0.1r744";
 
 $db = new DB();
 
@@ -10,7 +10,7 @@ $db = new DB();
 $qry = "SELECT COUNT( releases.categoryID ) AS cnt, parentID FROM releases INNER JOIN category ON releases.categoryID = category.ID WHERE parentID IS NOT NULL GROUP BY parentID";
 
 //needs to be processed query
-$proc = "SELECT ( SELECT COUNT( groupID ) AS cnt from releases where consoleinfoID IS NULL and categoryID BETWEEN 1000 AND 1999 ) AS console, ( SELECT COUNT( groupID ) AS cnt from releases where imdbID IS NULL and categoryID BETWEEN 2000 AND 2999 ) AS movies, ( SELECT COUNT( groupID ) AS cnt from releases where musicinfoID IS NULL and categoryID BETWEEN 3000 AND 3999 ) AS audio, ( SELECT COUNT( groupID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (categoryID BETWEEN 4000 AND 4999 and ((r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)))) AS pc, ( SELECT COUNT( groupID ) AS cnt from releases where rageID = -1 and categoryID BETWEEN 5000 AND 5999 ) AS tv, ( SELECT COUNT( groupID ) AS cnt from releases where bookinfoID IS NULL and categoryID = 7020 ) AS book, ( SELECT COUNT( groupID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)) AS work, ( SELECT COUNT( groupID ) AS cnt from releases) AS releases, ( SELECT COUNT( groupID ) AS cnt FROM releases r WHERE r.releasenfoID = 0) AS nforemains, ( SELECT COUNT( groupID ) AS cnt FROM releases WHERE releasenfoID not in (0, -1)) AS nfo, ( SELECT table_rows AS cnt FROM information_schema.TABLES where table_name = 'parts' AND TABLE_SCHEMA = '".DB_NAME."' ) AS parts, ( SELECT concat(round((data_length+index_length)/(1024*1024*1024),2),'GB') AS cnt FROM information_schema.tables where table_name = 'parts' AND TABLE_SCHEMA = '".DB_NAME."' ) AS partsize, ( SELECT UNIX_TIMESTAMP(adddate) from releases order by adddate desc limit 1 ) AS newestadd, ( SELECT name from releases order by adddate desc limit 1 ) AS newestaddname";
+$proc = "SELECT ( SELECT COUNT( groupID ) AS cnt from releases where consoleinfoID IS NULL and categoryID BETWEEN 1000 AND 1999 ) AS console, ( SELECT COUNT( groupID ) AS cnt from releases where imdbID IS NULL and categoryID BETWEEN 2000 AND 2999 ) AS movies, ( SELECT COUNT( groupID ) AS cnt from releases where musicinfoID IS NULL and categoryID BETWEEN 3000 AND 3999 ) AS audio, ( SELECT COUNT( groupID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (categoryID BETWEEN 4000 AND 4999 and ((r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)))) AS pc, ( SELECT COUNT( groupID ) AS cnt from releases where rageID = -1 and categoryID BETWEEN 5000 AND 5999 ) AS tv, ( SELECT COUNT( groupID ) AS cnt from releases where bookinfoID IS NULL and categoryID = 7020 ) AS book, ( SELECT COUNT( groupID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)) AS work, ( SELECT COUNT( groupID ) AS cnt from releases) AS releases, ( SELECT COUNT( groupID ) AS cnt FROM releases r WHERE r.releasenfoID = 0) AS nforemains, ( SELECT COUNT( groupID ) AS cnt FROM releases WHERE releasenfoID not in (0, -1)) AS nfo, ( SELECT table_rows AS cnt FROM information_schema.TABLES where table_name = 'parts' AND TABLE_SCHEMA = '".DB_NAME."' ) AS parts, ( SELECT table_rows AS cnt FROM information_schema.TABLES where table_name = 'binaries' AND TABLE_SCHEMA = '".DB_NAME."' ) AS binaries, ( SELECT concat(round((data_length+index_length)/(1024*1024*1024),2),'GB') AS cnt FROM information_schema.tables where table_name = 'parts' AND TABLE_SCHEMA = '".DB_NAME."' ) AS partsize, ( SELECT concat(round((data_length+index_length)/(1024*1024*1024),2),'GB') AS cnt FROM information_schema.tables where table_name = 'binaries' AND TABLE_SCHEMA = '".DB_NAME."' ) AS binariessize, ( SELECT UNIX_TIMESTAMP(adddate) from releases order by adddate desc limit 1 ) AS newestadd, ( SELECT name from releases order by adddate desc limit 1 ) AS newestaddname";
 //$proc = "SELECT * FROM procCnt;";
 
 //get first release inserted datetime and oldest posted datetime
@@ -49,6 +49,7 @@ $_alienx = dirname(__FILE__)."/../alienx";
 $_conf = dirname(__FILE__)."/../conf";
 $_powerline = dirname(__FILE__)."/../powerline";
 $_cj = dirname(__FILE__)."/../nnscripts";
+$_ugo = dirname(__FILE__)."/../ugo";
 $NNPATH="{$array['NEWZPATH']}{$array['NEWZNAB_PATH']}";
 $TESTING="{$array['NEWZPATH']}{$array['TESTING_PATH']}";
 $killed="false";
@@ -179,11 +180,14 @@ $nfo_remaining_now = 0;
 $nfo_now = 0;
 $parts_rows = 0;
 $parts_size_gb = 0;
+$binaries_rows = 0;
+$binaries_size_gb = 0;
 $releases_now = 0;
 //$firstdate = TIME();
 $newestname = "Unknown";
 $newestdate = TIME();
 $parts_rows_unformated = 0;
+$binaries_rows_unformated = 0;
 $releases_now_formatted = 0;
 $nfo_percent = 0;
 $console_percent = 0;
@@ -276,6 +280,7 @@ printf($mask, "Binaries", "$binaries_state", "$binaries_reason");
 printf($mask, "Backfill", "$backfill_state", "$backfill_reason");
 printf($mask, "Import", "$import_state", "$import_reason");
 printf($mask, "Parts", "$parts_size_gb", "$parts_rows rows");
+printf($mask, "Binaries", "$binaries_size_gb", "$binaries_rows bins");
 if ( $array['RAMDISK_PATH'] != "" ) {
     printf($mask, "Ramdisk", "$disk_use", "$disk_free");
 }
@@ -329,7 +334,7 @@ while( $i > 0 )
     //allow tmux to create panes before running queries
     if ( $i == 1 ) {
         printf("\n\033[1;31mTmux panes safely created in ");
-        for($a=15;$a>-1;$a--)
+        for($a=10;$a>-1;$a--)
         {
             printf("$a..");
             sleep(1);
@@ -423,6 +428,11 @@ while( $i > 0 )
     if ( @$proc_result[0]['parts'] != NULL ) { $parts_rows_unformated = $proc_result[0]['parts']; }
     if ( @$proc_result[0]['parts'] != NULL ) { $parts_rows = number_format($proc_result[0]['parts']); }
     if ( @$proc_result[0]['partsize'] != NULL ) { $parts_size_gb = $proc_result[0]['partsize']; }
+
+    if ( @$proc_result[0]['binaries'] != NULL ) { $binaries_rows_unformated = $proc_result[0]['binaries']; }
+    if ( @$proc_result[0]['binaries'] != NULL ) { $binaries_rows = number_format($proc_result[0]['binaries']); }
+    if ( @$proc_result[0]['binariessize'] != NULL ) { $binaries_size_gb = $proc_result[0]['binariessize']; }
+
     if ( @$proc_result[0]['releases'] ) { $releases_now = $proc_result[0]['releases']; }
     if ( @$proc_result[0]['releases'] ) { $releases_now_formatted = number_format($proc_result[0]['releases']); }
     if ( @$proc_result[0]['newestaddname'] ) { $newestname = $proc_result[0]['newestaddname']; }
@@ -603,6 +613,7 @@ while( $i > 0 )
     printf($mask, "Backfill", "$backfill_state", "$backfill_reason");
     printf($mask, "Import", "$import_state", "$import_reason");
     printf($mask, "Parts", "$parts_size_gb", "$parts_rows rows");
+    printf($mask, "Binaries", "$binaries_size_gb", "$binaries_rows bins");
     if ( $array['RAMDISK_PATH'] != "" ) {
         printf($mask, "Ramdisk", "$disk_use used", "$disk_free free");
     }
@@ -1179,11 +1190,16 @@ while( $i > 0 )
     }
 
     //set command for running backfill
-    if (( $array['KEVIN_SAFER'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
+    if ( $array['KEVIN_SAFER'] == "true" ) {
         $log = writelog($panes0[3]);
         $_backfill_cmd = "cd $_bin && $_php safer_backfill_parts.php 2>&1 $log";
-    } else
-    if ( $array['BACKFILL_THREADS'] == "true" ) {
+    } elseif ( $array['KEVIN_BACKFILL_PARTS'] == "true" ) {
+        $log = writelog($panes0[3]);
+        $_backfill_cmd = "cd $_bin && $_php backfill_parts.php 2>&1 $log";
+    } elseif ( $array['KEVIN_THREADED'] == "true" ) {
+        $log = writelog($panes0[3]);
+        $_backfill_cmd = "cd $_bin && $_php backfill_parts_threaded.php 2>&1 $log";
+    } elseif ( $array['BACKFILL_THREADS'] == "true" ) {
         $log = writelog($panes0[3]);
         $_backfill_cmd = "cd $_bin && $_php backfill_threaded.php 2>&1 $log && $mysql_command_1 2>&1 $log";
     } else {
@@ -1346,7 +1362,15 @@ while( $i > 0 )
     }
 
     //runs update_release and in 0.5 once if needed and exits
-    if (( $array['RELEASES'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
+    if (( $array['RELEASES'] == "true" ) && ( $array['UGO_THREADED'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
+        $color = get_color();
+        $log = writelog($panes0[5]);
+        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[5] $ds2 && cd $_ugo && $_php automake.php reset && $_php automake_threaded.php && cd $_bin && $_php update_releases.php 2>&1 $log && echo \" \033[1;0;33m\" && echo \"sleeping\033[38;5;\"$color\"m {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']} && $ds1 $panes0[5] $ds3' 2>&1 1> /dev/null");
+    } elseif (( $array['RELEASES'] == "true" ) && ( $array['UGO'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
+        $color = get_color();
+        $log = writelog($panes0[5]);
+        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[5] $ds2 && cd $_ugo && $_php automake.php reset && $_php automake.php && cd $_bin && $_php update_releases.php 2>&1 $log && echo \" \033[1;0;33m\" && echo \"sleeping\033[38;5;\"$color\"m {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']} && $ds1 $panes0[5] $ds3' 2>&1 1> /dev/null");
+    } elseif (( $array['RELEASES'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
         $color = get_color();
         $log = writelog($panes0[5]);
         shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[5] $ds2 && cd $_bin && $_php update_releases.php 2>&1 $log && echo \" \033[1;0;33m\" && echo \"sleeping\033[38;5;\"$color\"m {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']} && $ds1 $panes0[5] $ds3' 2>&1 1> /dev/null");

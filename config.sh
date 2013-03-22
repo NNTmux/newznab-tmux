@@ -162,7 +162,13 @@ export MAXDAYS="210"
 #you also need to enable kevin's compression mod, those files are needed and you still need to enable BACKFILL
 export KEVIN_SAFER="false"
 
-#set the date to go back to, must be in the format of YYYY-MM-DD, like 2012-06-24
+#use kevin123's backfill_parts.php instead of normal backfill
+export KEVIN_BACKFILL_PARTS="false"
+
+#use kevin123's backfill_parts_threaded.php instead of normal backfill_threaded
+export KEVIN_THREADED="false"
+
+#set the date to go back to, must be in the format of YYYY-MM-DD, like 2012-06-24, this is the date of the posted nzbs
 export KEVIN_DATE="2012-06-24"
 
 #set the number of articles/headers to download at one time
@@ -210,6 +216,15 @@ export IMPORT_TRUE="false"
 #MAX_RELEASES for each can be calculated on the total post processing or just the Misc category
 #to calculate on just the Misc, enable this
 export MISC_ONLY="false"
+
+############################################################
+
+#run ugo's automake.php script to create releases, this does not use regexes and will run in a loop prior
+#to update_releases.php, this can be considerably slower, but may give you release that were being missed
+export UGO="false"
+
+#run automake_threaded.php
+export UGO_THREADED="false"
 
 ############################################################
 
