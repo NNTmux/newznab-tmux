@@ -5,6 +5,7 @@ require_once(WWW_DIR."/lib/binaries.php");
 require_once(WWW_DIR."/lib/powerprocess.php");
 require_once(WWW_DIR."/lib/framework/db.php");
 
+$time = microtime(true);
 $db = new DB();
 
 if (isset($argv[1]))
@@ -20,47 +21,39 @@ if (isset($argv[1]))
 }
 
 $rel = $db->query("UPDATE `binaries` SET `procstat`=0,`procattempts`=0,`regexID`=NULL, `relpart`=0,`reltotalpart`=0,`relname`=NULL WHERE procstat = -6");
+
 $query = "SELECT ID FROM binaries WHERE `procstat` = 0 GROUP BY binaryhash order by ID";
 
-echo "Starting threaded assembly process\n";
-
 $theList = $db->query($query);
-$start_count = count($theList);
 unset($db);
 
-$time = microtime(true);
+$theCount = count($theList);
 
 $ps = new PowerProcess();
 $ps->RegisterCallback('psUpdateComplete');
-//these next 2 settings have been tuned by jonnyboy to be under 2.0 load with nothing else running
-$ps->maxChildren = 10;
-$ps->tickCount = 25000;	// value in usecs. change this to 1000000 (one second) to reduce cpu use
+$ps->maxChildren = 8;
+$ps->tickCount = 10000;	// value in usecs. change this to 1000000 (one second) to reduce cpu use
 $ps->threadTimeLimit = 0;	// Disable child timeout
 
-//$tim = microtime(true) - $time;
-//echo "time = ".$tim."\n";
+$tim = microtime(true) - $time;
+echo "time = ".$tim."\n";
 
-//echo "Starting threaded assembly process\n";
+echo "Starting threaded assembly process\n";
+echo "\nToday will be doing $theCount binaries\n";
+echo "      0\t";
 
 while ($ps->RunControlCode())
 {
+	$listcount = count($theList);
 	// Start the parent loop
-	if (count($theList))
+	if ($listcount)
 	{
 		// We still have groups to process
 		if ($ps->SpawnReady())
 		{
 			// Spawn another thread
 			$ps->threadData = array_pop($theList);
-			$tim = microtime(true) - $time;
-			//echo "[Thread-MASTER] Spawning new thread. Still have " . count($theList) ." post(s) remaining. $tim\n";
-			if(( count($theList) % 100 == 0 ) || ( count($theList) == ( $start_count - 1 ))) {
-				$completion = (($tim / ($start_count - count($theList))) * $start_count);
-				$time_complete = date("M jS Y - H:i:s", TIME() + $completion);
-				echo "\n".count($theList)."/".$start_count." - $tim - est complete at ".$time_complete."\n";
-			} else {
-				echo ".";
-			}
+//			echo "[Thread-MASTER] Spawning new thread.  Still have " . count($theList) ." post(s) to update after this\n";
 			$ps->spawnThread();
 		}
 		else
@@ -78,8 +71,8 @@ while ($ps->RunControlCode())
 		echo "Shutdown complete\n";
 	}
 }
-//$tim = microtime(true) - $time;
-//echo "time = ".$tim."\n";
+$tim = microtime(true) - $time;
+// echo "time = ".$tim."\n";
 unset($theList);
 
 if ($ps->RunThreadCode())
@@ -88,7 +81,7 @@ if ($ps->RunThreadCode())
 
 	$thread = sprintf("%05d",$ps->GetPID());
 
-	//echo "[Thread-{$thread}] Begining assembly processing for post {$post['ID']}\n";
+//	echo "[Thread-{$thread}] Begining assembly processing for post {$post['ID']}\n";
 
 	$param = $post['ID'];
 
@@ -97,9 +90,26 @@ if ($ps->RunThreadCode())
 
 	$output = shell_exec("php {$dir}/{$file} {$param}");
 
-	//echo "[Thread-{$thread}] Completed update for post {$post['ID']}\n";
-	//$tim = microtime(true) - $time;
-        //echo "[Thread-{$thread}] Completed update for post {$post['ID']} in $tim\n";
+	$count = $theCount - $listcount;
+	$countpct = $count / $theCount;
+
+	if ($count % 100 == 0 && $count > 0)
+	{
+		$tim = microtime(true) - $time;
+		echo "\t\tt = ".str_pad(number_format($tim, 1), 8, " ", STR_PAD_LEFT);
+		$tim = number_format(($listcount * $tim) / 60 / $count, 1);
+		if ($countpct > 0.1 || $count > 1500)
+			echo "\t".$tim."m to go" ;
+		echo "\n".str_pad($count,7, " ", STR_PAD_LEFT)."\t";
+
+	}
+	if ($count % 10 == 0)
+		echo " .";
+
+
+//	echo "[Thread-{$thread}] Completed update for post {$post['ID']}\n";
+	$tim = microtime(true) - $time;
+//	echo "time = ".$tim."\n";
 }
 
 // Exit to call back to parent - Let know that child has completed
@@ -108,10 +118,10 @@ exit(0);
 // Create callback function
 function psUpdateComplete()
 {
-        $tim = microtime(true) - $time;
-	echo "[Thread-MASTER] Threaded assembly process complete in $tim\n";
+	echo "[Thread-MASTER] Threaded assembly process complete\n";
 }
-sleep(5);
+
 
 
 ?>
+
