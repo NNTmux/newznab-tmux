@@ -2,42 +2,45 @@
 //define('FS_ROOT', realpath(dirname(__FILE__)));
 require(dirname(__FILE__)."/../../../../../www/config.php");
 require_once(WWW_DIR."/lib/binaries.php");
-require_once(WWW_DIR.'/lib/powerprocess.php');
+require_once(WWW_DIR."/lib/powerprocess.php");
 require_once(WWW_DIR."/lib/framework/db.php");
 
-$time = microtime(true);
 $db = new DB();
 
 if (isset($argv[1]))
 {
-var_dump($argv);
+//var_dump($argv);
 
 	if ($argv[1] == "reset")
 	{
-		echo "binaries have been reset\n";
+		echo "resetting binaries\n";
 		$rel = $db->query("UPDATE `binaries` SET `procstat`=0,`procattempts`=0,`regexID`=NULL, `relpart`=0,`reltotalpart`=0,`relname`=NULL WHERE procstat not in (4, 6)");
+		echo "binaries have been reset\n";
 	}
 }
 
 $rel = $db->query("UPDATE `binaries` SET `procstat`=0,`procattempts`=0,`regexID`=NULL, `relpart`=0,`reltotalpart`=0,`relname`=NULL WHERE procstat = -6");
-
 $query = "SELECT ID FROM binaries WHERE `procstat` = 0 GROUP BY binaryhash order by ID";
+
+echo "Starting threaded assembly process\n";
 
 $theList = $db->query($query);
 $start_count = count($theList);
 unset($db);
 
+$time = microtime(true);
+
 $ps = new PowerProcess();
 $ps->RegisterCallback('psUpdateComplete');
 //these next 2 settings have been tuned by jonnyboy to be under 2.0 load with nothing else running
-$ps->maxChildren = 20;
-$ps->tickCount = 20000;	// value in usecs. change this to 1000000 (one second) to reduce cpu use
+$ps->maxChildren = 10;
+$ps->tickCount = 25000;	// value in usecs. change this to 1000000 (one second) to reduce cpu use
 $ps->threadTimeLimit = 0;	// Disable child timeout
 
 //$tim = microtime(true) - $time;
 //echo "time = ".$tim."\n";
 
-echo "Starting threaded assembly process\n";
+//echo "Starting threaded assembly process\n";
 
 while ($ps->RunControlCode())
 {
@@ -51,8 +54,12 @@ while ($ps->RunControlCode())
 			$ps->threadData = array_pop($theList);
 			$tim = microtime(true) - $time;
 			//echo "[Thread-MASTER] Spawning new thread. Still have " . count($theList) ." post(s) remaining. $tim\n";
-			if( count($theList) % 20 == 0 ) {
-				echo count($theList)."/".$start_count." - $tim\n";
+			if(( count($theList) % 100 == 0 ) || ( count($theList) == ( $start_count - 1 ))) {
+				$completion = (($tim / ($start_count - count($theList))) * $start_count);
+				$time_complete = date("M jS Y - H:i:s", TIME() + $completion);
+				echo "\n".count($theList)."/".$start_count." - $tim - est complete at ".$time_complete."\n";
+			} else {
+				echo ".";
 			}
 			$ps->spawnThread();
 		}

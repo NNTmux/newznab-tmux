@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.1r746";
+$version="0.1r747";
 
 $db = new DB();
 
@@ -1365,11 +1365,11 @@ while( $i > 0 )
     if (( $array['RELEASES'] == "true" ) && ( $array['UGO_THREADED'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
         $color = get_color();
         $log = writelog($panes0[5]);
-        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[5] $ds2 && cd $_ugo && $_php automake.php reset && $_php automake_threaded.php && cd $_bin && $_php update_releases.php 2>&1 $log && echo \" \033[1;0;33m\" && echo \"sleeping\033[38;5;\"$color\"m {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']} && $ds1 $panes0[5] $ds3' 2>&1 1> /dev/null");
+        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[5] $ds2 && cd $_ugo && $_php automake_threaded.php reset && cd $_bin && $_php update_releases.php 2>&1 $log && echo \" \033[1;0;33m\" && echo \"sleeping\033[38;5;\"$color\"m {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']} && $ds1 $panes0[5] $ds3' 2>&1 1> /dev/null");
     } elseif (( $array['RELEASES'] == "true" ) && ( $array['UGO'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
         $color = get_color();
         $log = writelog($panes0[5]);
-        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[5] $ds2 && cd $_ugo && $_php automake.php reset && $_php automake.php && cd $_bin && $_php update_releases.php 2>&1 $log && echo \" \033[1;0;33m\" && echo \"sleeping\033[38;5;\"$color\"m {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']} && $ds1 $panes0[5] $ds3' 2>&1 1> /dev/null");
+        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[5] $ds2 && cd $_ugo && $_php automake.php reset && cd $_bin && $_php update_releases.php 2>&1 $log && echo \" \033[1;0;33m\" && echo \"sleeping\033[38;5;\"$color\"m {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']} && $ds1 $panes0[5] $ds3' 2>&1 1> /dev/null");
     } elseif (( $array['RELEASES'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
         $color = get_color();
         $log = writelog($panes0[5]);
