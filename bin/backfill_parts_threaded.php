@@ -3,6 +3,7 @@ require(dirname(__FILE__)."/config.php");
 require_once(WWW_DIR."/lib/groups.php");
 require_once(WWW_DIR."/lib/binaries.php");
 require_once(WWW_DIR."/lib/powerprocess.php");
+$time = TIME();
 
 $groups = new Groups;
 $groupList = $groups->getActive();
@@ -42,6 +43,7 @@ while ($ps->RunControlCode())
 		echo "No more groups to process - Initiating shutdown\n";
 		$ps->Shutdown();
 		echo "Shutdown complete\n";
+		echo "\n\033[1;33m[Thread-MASTER] Kevin123's threaded backfill parts process completed in: " .relativeTime($time). "\n";
 	}
 }
 
@@ -66,13 +68,42 @@ if ($ps->RunThreadCode())
 	echo "[Thread-{$thread}] Completed update for group {$group['name']}\n";
 }
 
+function relativeTime($_time) {
+    $d[0] = array(1,"sec");
+    $d[1] = array(60,"min");
+    $d[2] = array(3600,"hr");
+    $d[3] = array(86400,"day");
+    $d[4] = array(31104000,"yr");
+
+    $w = array();
+
+    $return = "";
+    $now = TIME();
+    $diff = ($now-$_time);
+    $secondsLeft = $diff;
+
+    for($i=4;$i>-1;$i--)
+    {
+        $w[$i] = intval($secondsLeft/$d[$i][0]);
+        $secondsLeft -= ($w[$i]*$d[$i][0]);
+        if($w[$i]!=0)
+        {
+            //$return.= abs($w[$i]). " " . $d[$i][1] . (($w[$i]>1)?'s':'') ." ";
+            $return.= $w[$i]. " " . $d[$i][1] . (($w[$i]>1)?'s':'') ." ";
+        }
+    }
+
+    //$return .= ($diff>0)?"ago":"left";
+    return $return;
+}
+
 // Exit to call back to parent - Let know that child has completed
 exit(0);
 
 // Create callback function
-function psUpdateComplete() 
+function psUpdateComplete()
 {
-	echo "[Thread-MASTER] Threaded backfill process complete\n";
+        echo "\n\033[1;33m[Thread-MASTER] Kevin123's threaded backfill parts process completed in: " .relativeTime($time). "\n";
 }
 
 

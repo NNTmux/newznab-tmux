@@ -356,7 +356,7 @@ else
     fi
 
     if [[ $USE_MYTOP == "true" ]]; then
-        $TMUXCMD new-window -n mytop '$MYTOP -u $DB_USER -p $DB_PASSWORD -d $DB_NAME -h $DB_HOST'
+        $TMUXCMD new-window -n mytop '$MYTOP -u $DB_USER -p $DB_PASSWORD -d $DB_NAME -h $DB_HOST -s1'
     fi
 
     if [[ $USE_VNSTAT == "true" ]]; then

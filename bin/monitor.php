@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.1r745";
+$version="0.1r746";
 
 $db = new DB();
 
@@ -1186,7 +1186,7 @@ while( $i > 0 )
         $_update_cmd = "cd $_bin && $_php update_binaries_threaded.php 2>&1 $log";
     } else {
         $log = writelog($panes0[2]);
-        $_update_cmd = "cd $NNPATH && $_php update_binaries.php 2>&1 $log";
+        $_update_cmd = "cd $_bin && $_php update_binaries.php 2>&1 $log";
     }
 
     //set command for running backfill
@@ -1204,7 +1204,7 @@ while( $i > 0 )
         $_backfill_cmd = "cd $_bin && $_php backfill_threaded.php 2>&1 $log && $mysql_command_1 2>&1 $log";
     } else {
         $log = writelog($panes0[3]);
-        $_backfill_cmd = "cd $NNPATH && $_php backfill.php 2>&1 $log && $mysql_command_1 2>&1 $log";
+        $_backfill_cmd = "cd $_bin && $_php backfill.php 2>&1 $log && $mysql_command_1 2>&1 $log";
     }
 
     //set command for nzb-import
