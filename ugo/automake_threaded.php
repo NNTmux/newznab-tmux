@@ -21,9 +21,9 @@ if (isset($argv[1]))
 }
 
 $rel = $db->query("UPDATE `binaries` SET `procstat`=0,`procattempts`=0,`regexID`=NULL, `relpart`=0,`reltotalpart`=0,`relname`=NULL WHERE procstat = -6");
-
 $query = "SELECT ID FROM binaries WHERE `procstat` = 0 GROUP BY binaryhash order by ID";
 
+echo "Getting work to be done\n";
 $theList = $db->query($query);
 unset($db);
 
@@ -31,15 +31,16 @@ $theCount = count($theList);
 
 $ps = new PowerProcess();
 $ps->RegisterCallback('psUpdateComplete');
-$ps->maxChildren = 8;
-$ps->tickCount = 10000;	// value in usecs. change this to 1000000 (one second) to reduce cpu use
+$ps->maxChildren = 10;
+$ps->tickCount = 20000;	// value in usecs. change this to 1000000 (one second) to reduce cpu use
 $ps->threadTimeLimit = 0;	// Disable child timeout
 
 $tim = microtime(true) - $time;
-echo "time = ".$tim."\n";
+echo "Query time = ".$tim."\n";
 
 echo "Starting threaded assembly process\n";
 echo "\nToday will be doing $theCount binaries\n";
+
 echo "      0\t";
 
 while ($ps->RunControlCode())
@@ -66,7 +67,7 @@ while ($ps->RunControlCode())
 	else
 	{
 		// No more groups to process
-		echo "No more posts to process - Initiating shutdown\n";
+		echo "\nNo more posts to process - Initiating shutdown\n";
 		$ps->Shutdown();
 		echo "Shutdown complete\n";
 	}
@@ -92,21 +93,18 @@ if ($ps->RunThreadCode())
 
 	$count = $theCount - $listcount;
 	$countpct = $count / $theCount;
-
-	if ($count % 100 == 0 && $count > 0)
+	$cleanpct = str_pad(number_format(($countpct * 100), 1), 7, " ", STR_PAD_LEFT);
+	if ($count % 200 == 0 && $count > 0)
 	{
 		$tim = microtime(true) - $time;
-		echo "\t\tt = ".str_pad(number_format($tim, 1), 8, " ", STR_PAD_LEFT);
+		echo "\t".$cleanpct."% = ".str_pad(number_format($tim, 1), 7, " ", STR_PAD_LEFT);
 		$tim = number_format(($listcount * $tim) / 60 / $count, 1);
-		if ($countpct > 0.1 || $count > 1500)
+		if ($countpct > .95 || ($count > 1000 && ($count-100) % 1000 == 0))
 			echo "\t".$tim."m to go" ;
 		echo "\n".str_pad($count,7, " ", STR_PAD_LEFT)."\t";
-
-	}
-	if ($count % 10 == 0)
+	} elseif (($count % 25 == 0) && ($count != 0)) {
 		echo " .";
-
-
+        }
 //	echo "[Thread-{$thread}] Completed update for post {$post['ID']}\n";
 	$tim = microtime(true) - $time;
 //	echo "time = ".$tim."\n";

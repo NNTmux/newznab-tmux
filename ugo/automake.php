@@ -95,10 +95,10 @@ function makerelease ($results, $parent, $name, $db, $sect, $mail)
 		echo "doing update: ".$r['name']."\n";
 	echo $query."\n";
 
-			var_dump($db->query($query));
+			//var_dump($db->query($query));
 
-			var_dump($db->getLastError());
-			var_dump($db->getAffectedRows());
+			//var_dump($db->getLastError());
+			//var_dump($db->getAffectedRows());
 
 		}
 	} else if ($parts == 1){

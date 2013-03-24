@@ -16,6 +16,16 @@ export RUNNING="true"
 #anything between -1 and -20 require root/sudo to run
 export NICENESS="19"
 
+#these scripts can add some serious load to your system, without proper monitoring it can be
+#to much, you can set the max load that any pane will be started at
+#for example, if you set load to 2, no pane will start when your system load exceeds 2
+#this does not mean the the desired load will not be exceeded, just that no panes will be be restarted
+#this one is for all panes except update_releases
+export MAX_LOAD="2.0"
+
+#this one is for update_releases
+export MAX_LOAD_RELEASES="2.0"
+
 ############################################################
 
 #Set paths
@@ -223,9 +233,6 @@ export MISC_ONLY="false"
 #to update_releases.php, this can be considerably slower, but may give you release that were being missed
 #this might just overwhelm your db, so expect things to move slower, but you might get more in return
 #still a wip
-export UGO="false"
-
-#run automake_threaded.php
 export UGO_THREADED="false"
 
 ############################################################
