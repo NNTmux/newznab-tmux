@@ -40,6 +40,11 @@ else
     printf "\033]0; $TMUX_SESSION\007\003\n"
     #$TMUXCMD -f $TMUX_CONF new-session -d -s $TMUX_SESSION -n Monitor 'printf "\033]2;Monitor\033\\" && cd bin && echo "Monitor Started" && echo "It might take a minute for everything to spinup......" && $NICE -n$NICENESS $PHP monitor.php'
 
+    if [ -f user_scripts/$USER_DEF_ONE ]; then
+	cd user_scripts && ./$USER_DEF_ONE
+	cd ../
+    fi
+
     if [ ! -f $NEWZPATH/www/lib/postprocess.php.orig ]; then
         cp $NEWZPATH/www/lib/postprocess.php $NEWZPATH/www/lib/postprocess.php.orig
     fi

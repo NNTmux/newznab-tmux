@@ -468,6 +468,20 @@ export WRITE_LOGS="false"
 
 ###########################################################
 
+#user defined scripts, you can define 3 scripts to run at specific times
+#you must have them in the user_scripts, no other location
+#This one will run before tmux creates the ui, so if you want to run something before the scripts add here
+#it is assumed that the script is a bash script and has been chmod +x
+export USER_DEF_ONE=""
+
+#this one will run before MyIsam Large
+export USER_DEF_TWO=""
+
+#this one will run after MyIsam Large
+export USER_DEF_THREE=""
+
+###########################################################
+
 #By using this script you understand that the programmer is not responsible for any loss of data, users, or sanity.
 #You also agree that you were smart enough to make a backup of your database and files. Do you agree? yes/no
 export AGREED="no"
