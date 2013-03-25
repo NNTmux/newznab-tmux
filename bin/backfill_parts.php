@@ -18,22 +18,23 @@ unset($array['']);
 $_date = $array['KEVIN_DATE'];
 $_parts = $array['KEVIN_PARTS'];
 
-echo "Starting kevin123's backfill process\n\n";
 	$groupPost = $_parts;
 	if (isset($argv[1])) 
 	{
 		$groupName = $argv[1];
+		echo "\n\n===>Starting kevin123's backfill process for ".$groupName."<===\n\n";
+
 		$db = new DB;
 		$query = $db->queryOneRow(sprintf("select name from groups WHERE (first_record_postdate BETWEEN '${_date}' and now()) and (name = '$groupName')")) or die(mysql_error());
 		if (isset($query)) 
 		{
 			$backfill = new Backfill();
 			$backfill->backfillPostAllGroups($groupName, $groupPost);
-			echo "Backfilling completed.\n";
+			echo "\n===>Backfilling completed for ".$groupName."\n";
 		} 
 		else 
 		{ 
-			echo "Already have the target post, skipping the group.\n"; 
+			echo "\nAlready have the target post, skipping the ".$groupName."\n"; 
 		}
 	} 
 	else 
@@ -72,8 +73,7 @@ function relativeTime($_time) {
     return $return;
 }
 
-echo "\n\033[1;33mThis loop completed in: " .relativeTime($time). "\n";
-echo "\n\033[1;33mKevin123's backfill parts process completed in: " .relativeTime($time). "\n";
+echo "\nKevin123's backfill parts process completed in: " .relativeTime($time);
 
 ?>
 

@@ -12,9 +12,10 @@ $groups = new Groups;
 $groupList = $groups->getActive();
 unset($groups);
 
-$ps = new PowerProcess;
+$ps = new PowerProcess();
 $ps->RegisterCallback('psUpdateComplete');
-$ps->maxThreads = 8;
+$ps->maxThreads = 5;
+$ps->tickCount = 500000;
 $ps->threadTimeLimit = 0;	// Disable child timeout
 
 echo "Starting threaded binary update process\n";
@@ -82,7 +83,7 @@ if ($ps->RunThreadCode())
 	$file = 'update_binaries.php';
 	
 	//$output = shell_exec("php {$dir}/{$file} {$param}");
-	$output = shell_exec("cd {$dir}/ && php {$file} {$param}");
+	$output = passthru("cd {$dir}/ && php {$file} {$param}");
 	//$output = shell_exec("/usr/bin/php -c /etc/php5/cli/php.ini {$dir}/{$file} {$param}");
 	
 	echo "[Thread-{$thread}] Completed update for group {$group['name']}\n";
@@ -134,7 +135,7 @@ exit(0);
 // Create callback function
 function psUpdateComplete()
 {
-        echo "[Thread-MASTER] Threaded backfill process completed in: " .relativeTime($time). "\n";
+        echo "Threaded stock binaries update completed in: " .relativeTime($time). "\n";
 }
 
 

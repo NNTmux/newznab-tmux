@@ -12,9 +12,10 @@ $groups = new Groups;
 $groupList = $groups->getActive();
 unset($groups);
 
-$ps = new PowerProcess;
+$ps = new PowerProcess();
 $ps->RegisterCallback('psUpdateComplete');
-$ps->maxThreads = 8;
+$ps->maxThreads = 5;
+$ps->tickCount = 500000;
 $ps->threadTimeLimit = 0;	// Disable child timeout
 
 echo "Starting threaded backfill process\n";
@@ -79,7 +80,7 @@ if ($ps->RunThreadCode())
 	}
 	//End Newzdash
 	
-	$output = shell_exec("cd {$dir}/ && php {$file} {$param}");
+	$output = passthru("cd {$dir}/ && php {$file} {$param}");
 	
 	//Newzdash
 	if ( $ndCommAllowed )
@@ -130,7 +131,7 @@ exit(0);
 // Create callback function
 function psUpdateComplete()
 {
-        echo "\n\033[1;33m[Thread-MASTER] Threaded backfill process completed in: " .relativeTime($time). "\n";
+        echo "\n\033[1;33mThreaded stock backfill process completed in: " .relativeTime($time). "\n";
 }
 
 ?>

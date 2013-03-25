@@ -9,10 +9,10 @@ $groups = new Groups;
 $groupList = $groups->getActive();
 unset($groups);
 
-$ps = new PowerProcess;
+$ps = new PowerProcess();
 $ps->RegisterCallback('psUpdateComplete');
 $ps->maxThreads = 5;
-$ps->tickCount = 50000;	// value in usecs. change this to 1000000 (one second) to reduce cpu use
+$ps->tickCount = 500000;	// value in usecs. change this to 1000000 (one second) to reduce cpu use
 $ps->threadTimeLimit = 0;	// Disable child timeout
 
 echo "Starting kevin123's threaded backfill process\n\n";
@@ -27,22 +27,22 @@ while ($ps->RunControlCode())
 		{
 			// Spawn another thread
 			$ps->threadData = array_pop($groupList);
-			echo "[Thread-MASTER] Spawning new thread.  Still have " . count($groupList) ." group(s) to update after this\n";
+			echo "\n[Thread-MASTER] Spawning new thread.  Still have " . count($groupList) ." group(s) to update after this\n";
 			$ps->spawnThread();
 		} 
 		else 
 		{
 			// There are no more slots available to run
 			//$ps->tick();
-			//echo ".\n";
+			//echo "No threads avaialble.\n";
 		}
 	} 
 	else 
 	{
 		// No more groups to process
-		echo "No more groups to process - Initiating shutdown\n";
+		echo "\nNo more groups to process - Initiating shutdown\n";
 		$ps->Shutdown();
-		echo "Shutdown complete\n";
+		echo "\nShutdown complete\n";
 		echo "\n\033[1;33m[Thread-MASTER] Kevin123's threaded backfill parts process completed in: " .relativeTime($time). "\n";
 	}
 }
@@ -55,17 +55,17 @@ if ($ps->RunThreadCode())
 
 	$thread = sprintf("%05d",$ps->GetPID());
 
-	echo "[Thread-{$thread}] Begining backfill processing for group {$group['name']}\n";
+	echo "\n[Thread-{$thread}] Begining backfill processing for group {$group['name']}\n";
 
 	$param = $group['name'];
 
 	$dir = dirname(__FILE__);
 	$file = 'backfill_parts.php';
 
-	$output = shell_exec("php {$dir}/{$file} {$param}");
+	$output = passthru("php {$dir}/{$file} {$param}");
 	//$output = shell_exec("/usr/bin/php -c /etc/php5/cli/php.ini {$dir}/{$file} {$param}");
 
-	echo "[Thread-{$thread}] Completed update for group {$group['name']}\n";
+	echo "\n[Thread-{$thread}] Completed update for group {$group['name']}\n";
 }
 
 function relativeTime($_time) {
@@ -103,7 +103,7 @@ exit(0);
 // Create callback function
 function psUpdateComplete()
 {
-        echo "\n\033[1;33m[Thread-MASTER] Kevin123's threaded backfill parts process completed in: " .relativeTime($time). "\n";
+        echo "\n\033[1;33mKevin123's threaded backfill parts process completed in: " .relativeTime($time). "\n";
 }
 
 
