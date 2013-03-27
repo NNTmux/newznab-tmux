@@ -1,7 +1,6 @@
 <?php
-//define('FS_ROOT', realpath(dirname(__FILE__)));
-//require_once(FS_ROOT."/config.php");
-require(dirname(__FILE__).'/../../../../../www/config.php');
+define('FS_ROOT', realpath(dirname(__FILE__)));
+require_once(FS_ROOT."/config.php");
 require_once(WWW_DIR."/lib/nntp.php");
 require_once(WWW_DIR."/lib/framework/db.php");
 
@@ -11,8 +10,11 @@ function makenzb($id, $name = '')
 	$ok = true;
 	$path = FS_ROOT."/nzbs/";
 
+//	$query = "SELECT *  FROM `binaries` WHERE `ID` = ".$id;
 	$query = "SELECT *, sum(parts.size) AS size FROM binaries INNER JOIN parts ON binaries.ID = parts.binaryID WHERE binaries.ID = ".$id;
 	$row = $db->queryOneRow($query);
+
+	echo $row['name']." is ".($row['size']/1024/1024)." MB\n";
 
 	if (!isset($name))
 	{
@@ -27,6 +29,8 @@ echo "doing nzb\n";
 		{
 			$bin =  $nntp->getBinary($id);
 
+	echo strlen($bin)."\n";
+
 			$name = preg_replace('/ /','_',$name);
 
 			if (file_exists($path.$name.".nzb"))
@@ -34,11 +38,16 @@ echo "doing nzb\n";
 				$name = $name." ".$id;
 			}
 
+	echo $name." ".strlen($bin)."\n";
+
+
 			if (strlen($bin) == 0)
 				$ok = false;
 			elseif (file_put_contents($path.$name.".nzb", $bin) == 0)
 				$ok = false;
 
+
+	echo $ok."\n";
 		}
 		$nntp->doQuit();
 
@@ -51,6 +60,7 @@ echo "doing nzb\n";
 	echo "clearing \n";
 		$query = "UPDATE `binaries` SET `procstat` = 6 WHERE ID = ".$id;
 
+	echo $query."\n";
 		$db->query($query);
 
 	}

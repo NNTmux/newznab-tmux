@@ -95,10 +95,10 @@ function makerelease ($results, $parent, $name, $db, $sect, $mail)
 		echo "doing update: ".$r['name']."\n";
 	echo $query."\n";
 
-			//var_dump($db->query($query));
+			var_dump($db->query($query));
 
-			//var_dump($db->getLastError());
-			//var_dump($db->getAffectedRows());
+			var_dump($db->getLastError());
+			var_dump($db->getAffectedRows());
 
 		}
 	} else if ($parts == 1){
@@ -712,7 +712,14 @@ global $db;
 
 	$query = $query." ORDER BY name;";
 
+	$time = microtime(true);
+
 	$matches = $db->query($query);
+
+	$time = microtime(true) - $time;
+
+	if ($time > .1)
+//		trigger_error("\ntime = $time \tmatches = ".count($matches)."\nquery = ".$query."\n");
 
 	echo count($matches)." ".$query."\n";
 
@@ -1028,18 +1035,23 @@ echo "OK end CR: ".count($results)." P: ". $parts." P2: ".$pars."\n";
 echo "D1\n";
 			makenzb($nzb, $nzb1, $nfo, $nfo1);
 			$jump = $jump && clearmatches($name, $results, -3);
+		} else if (substr_count($r['xref'], ":") > 5) {
+echo "D2\n";
+			// spam if in more than five groups
+			echo "cleaning spam ".$r['ID']."\n";
+			$jump = $jump && clearmatches($name, $results, -2);
 		} else if (((((count($results) + $pars >= $parts) && ($files > 0 || count($results) == $parts)) || (count($results) >= $parts && ($files > 0 || count($results) == $parts))) && ($files <= 2 * $parts)) && $oldname != $name)
 		{
 //	echo "makerelease ".$sect."\n";
-echo "D2\n";
+echo "D3\n";
 			$jump = $jump && makerelease($results, $r, $name, $db, $sect, $mail[1]);
 		} else if ((((count($results) + $pars >= $parts) && $files > 2) || (count($results) >= $parts && $files > 2)) && ($files < 2 * $parts))
 		{
-echo "D3\n";
+echo "D4\n";
 			$jump = $jump && makerelease($results, $r, $name, $db, $sect, $mail[1]);
 		} else if (($nzb != 0 || $nzb1 != 0) && ($r['age'] >= 3 || $files == 0))
 		{
-echo "D4\n";
+echo "D5\n";
 			makenzb($nzb, $nzb1, $nfo, $nfo1);
 			$jump = $jump && clearmatches($name, $results, -3);
 		} else if (count($results) >= $parts && $parts == 2 && $files == 2) {
@@ -1284,7 +1296,11 @@ echo "CM ".count($matches)."\n";
 
 		echo "CR= ".count($results)." AR= ".count($arr)." missing= $missing age= ".$r['age']." l= $l s= $s\n";
 
-			if ($missing <= 0 && $l < $s && $r['age'] > .25 && count($results) == count($arr) && count($results) > 3)
+			if (substr_count($r['xref'], ":") > 5) {
+			// spam if in more than five groups
+				echo "cleaning spam ".$r['ID']."\n";
+				$jump = $jump && clearmatches($name, $results, -2);
+			} else if ($missing <= 0 && $l < $s && $r['age'] > .25 && count($results) == count($arr) && count($results) > 3)
 			{
 				$jump = $jump && makerelease($results, $r, $name, $db, $sect, $mail[1]);
 			} else if ($missing <= 0 && $r['age'] > 2.5 && count($results) == count($arr) && count($results) > 3) {
@@ -1301,7 +1317,6 @@ echo "CM ".count($matches)."\n";
 		$notyet = false;
 	}
 }
-
 
 $nzb = 0;
 $nfo = 0;
@@ -1392,6 +1407,9 @@ echo " * * * *\n";
 echo "relnum is $relnum\n";
 		foreach ($rel as $r)
 		{
+
+		echo "spam count ".substr_count($r['xref'], ":")."\n";
+
 //			trigger_error($r['procstat']);
 			if ($r['procstat'] != 0)
 				break;
@@ -1480,13 +1498,16 @@ echo "relnum is $relnum\n";
 				if (!preg_match('/(part\d{1,4}?|vol\d{1,4}?\+\d{1,4}?|\.zip|\.p\d{1,4}?|\.\d{1,4}?\"?$)/iU', $r['fromname']))
 	//				domatching2($pattern, $db, $r, $oldname, "Z");
 
-
+			if (substr_count($r['xref'], ":") > 5) {
+			// spam if in more than five groups
+			echo "cleaning spam ".$r['ID']."\n";
+				$jump = $jump && clearmatches($r['name'], array('ID' => $r['ID'], 'binaryhash' => $r['binaryhash']), -2);
+			}
 
 			$oldname = $name;
 
 	$tim = microtime(true) - $time2;
 	echo "time 2= ".$tim."\n";
-
 
 			if ($notyet)
 			{
@@ -1542,6 +1563,6 @@ echo "time = ".$time."\n";
 //delete  FROM parts WHERE `binaryID` NOT IN (SELECT b.id FROM binaries b)
 
 //select * FROM `parts` WHERE NOT EXISTS(SELECT ID FROM `binaries`);
-//ALTER TABLE  `newznab`.`binaries` ADD INDEX (  `binaryhash` )
 
 ?>
+//ALTER TABLE  `newznab`.`binaries` ADD INDEX (  `binaryhash` )

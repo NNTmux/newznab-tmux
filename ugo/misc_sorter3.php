@@ -1,6 +1,5 @@
 <?php
-define('FS_ROOT', realpath(dirname(__FILE__)));
-require_once(FS_ROOT."/config.php");
+require_once("config.php");
 require_once(WWW_DIR."/lib/framework/db.php");
 require_once(WWW_DIR."/lib/releases.php");
 require_once(WWW_DIR."/lib/movie.php");
@@ -94,7 +93,6 @@ function findmusicname($row, $cat = 3010)
 	$bookId = 0;
 	$musicId = 0;
 
-
 	if (count($rel) > 0)
 	{
 		echo "findmusicname ".$row['ID']." ".count($rel)."\n";
@@ -104,7 +102,7 @@ function findmusicname($row, $cat = 3010)
 
 			$sub = preg_replace('/[\x01-\x1f]/', '', $sub);
 
-			$sub = preg_replace('/(?<!\d)\.(?!(.{3,4}$))/', ' ', $sub);
+			$sub = preg_replace('/(?<!\d|\b[a-z]\b)\.(?!(.{3,4}$)|\b[a-z]\b)/', ' ', $sub);
 
 			$a = preg_replace('/[\/\_]/', ' ', $row['name']);
 
@@ -129,7 +127,7 @@ function findmusicname($row, $cat = 3010)
 				$folder = preg_replace('/\\\\$/', '', $sub);
 			}
 
-			if (preg_match('/\.mp3/', $sub, $matches))
+			if (preg_match('/\.mp3|\.flac/', $sub, $matches))
 			{
 				$mp3name = preg_replace('/(?iU)^[^\"]+\"(0\d+?-?(00)??)??/iU', '', $sub);
 
@@ -230,6 +228,10 @@ echo "2artist = $artist album = $album\n";
 			}
 //var_dump($musicId);
 		}
+
+if (preg_match('/\.flac/', $mp3name))
+		$cat = 3040;
+
 echo "music name: $name $musicId $bookId\n";
 		if ($musicId > 1)
 		{
@@ -250,6 +252,8 @@ echo "music name: $name $musicId $bookId\n";
 
 function stripname($name)
 {
+	if (is_array($name))
+		return $name;
 
 	global $qualities;
 
@@ -275,7 +279,7 @@ function stripname($name)
 		$name1 = preg_replace("/^\(?\?+?\)/iU", " ", $name1);
 		$name1 = preg_replace("/[\x01-\x1f\_\!\?\[\{\}\]\/\:\|]/iU", " ", $name1);
 		$name1 = preg_replace("/(?<![a-z0-9])(\.)(?!\.[0-9])/iU", " ", $name1);
-		$name1 = preg_replace("/(?<=[a-z])(\.)(?!\.[0-9])/iU", " ", $name1);
+		$name1 = preg_replace("/(?<=[a-z])(\.)(?!\.[0-9]|\b[a-z]\b)/iU", " ", $name1);
 		$name1 = preg_replace("/[\[\{\(]??\d{1,4}?\/\d{1,4}?[\]\}\)]??/iU", "", $name1);
 		$name1 = preg_replace("/^[\?\)\,\.\- \"\']+|[\,\(\?\.\- \"\']+$/iU", "", $name1);
 		$name1 = preg_replace("/  +?/iU", " ", $name1);
@@ -364,7 +368,8 @@ echo "clean ".$showinfo['cleanname']."\n";
 				echo 'Caught exception: ',  $e->getMessage(), "\n";
 			}
 		}
-		$tvrage->updateRageInfo($rageID, $showinfo, $tvrShow, null);
+		if (isset($tvrShow) && $rageID > 0)
+			$tvrage->updateRageInfo($rageID, $showinfo, $tvrShow, null);
 	}
 
 //	echo "2 $name\n";
@@ -388,7 +393,7 @@ echo "clean ".$showinfo['cleanname']."\n";
 
 		foreach($rel as $r)
 		{
-			$name1 = preg_replace('/(?<!\d)[\.\_]/', ' ', $r['name']);
+			$name1 = preg_replace('/(?<!\d)[\.\_](?!\b[a-z]\b)/', ' ', $r['name']);
 
 //			echo $name1."\n";
 
@@ -536,7 +541,7 @@ function cleanname($name)
 		$name = preg_replace("/^\(?\?+?\)/iU", " ", $name);
 		$name = preg_replace("/[\x01-\x1f\_\!\?\[\{\}\]\/\:\|]/iU", " ", $name);
 		$name = preg_replace("/(?<![a-z0-9])(\.)(?!\.[0-9])/iU", " ", $name);
-		$name = preg_replace("/(?<=[a-z])(\.)(?!\.[0-9])/iU", " ", $name);
+		$name = preg_replace("/(?<=[a-z])(\.)(?!\.[0-9]|\b[a-z]\b)/iU", " ", $name);
 		$name = preg_replace("/[\[\{\(]??\d{1,4}?\/\d{1,4}?[\]\}\)]??/iU", "", $name);
 		$name = preg_replace("/^[\?\)\,\.\- ]+|[\,\(\?\.\- ]+$/iU", "", $name);
 		$name = preg_replace("/  +?/iU", " ", $name);
@@ -638,7 +643,7 @@ function updateTV ($name, $id, $row, $cat = 5000, $nfo = '')
 		$name1 = $set[1];
 	}
 
-	$name1 = preg_replace('/[\-\.\_]/iU', ' ', $name1);
+	$name1 = preg_replace('/(?<=[a-z])(\.)(?!\.[0-9]|\b[a-z]\b)/iU', ' ', $name1);
 	$name1 = preg_replace('/  +/iU', ' ', $name1);
 	$name1 = trim($name1);
 
@@ -680,7 +685,7 @@ function updateTV ($name, $id, $row, $cat = 5000, $nfo = '')
 	return $ok;
 }
 
-function doAmazon ($name, $id, $nfo = "", $q, $region = 'com', $upc = false, $nfo ='', $row = '')
+function doAmazon ($name, $id, $nfo = "", $q, $region = 'com', $case = false, $nfo ='', $row = '')
 {
 	global $db;
 	$s = new Sites();
@@ -690,11 +695,17 @@ function doAmazon ($name, $id, $nfo = "", $q, $region = 'com', $upc = false, $nf
 
 
 	try {
-		if ($upc)
+		switch ($case)
 		{
-			$amaz = $amazon->getItemByUpc(trim($q), $region);
-		} else {
-			$amaz = $amazon->getItemByAsin(trim($q), $region);
+			case 'upc':
+				$amaz = $amazon->getItemByUpc(trim($q), $region);
+				break;
+			case 'asin':
+				$amaz = $amazon->getItemByAsin(trim($q), $region);
+				break;
+			case 'isbn':
+				$amaz = $amazon->searchProducts(trim($q), '', "ISBN");
+				break;
 		}
 	} catch (Exception $e) {
 		echo 'Caught exception: ',  $e->getMessage(), "\n";
@@ -704,11 +715,15 @@ function doAmazon ($name, $id, $nfo = "", $q, $region = 'com', $upc = false, $nf
 		return $ok;
 	}
 
+	if (!isset($amaz->Items->Item))
+		return $ok;
+
 	$type = $amaz->Items->Item->ItemAttributes->ProductGroup;
 
 	switch ($type)
 	{
 		case 'Book':
+		case 'eBooks':
 			$new = (string) $amaz->Items->Item->ItemAttributes->Author;
 			$new = $new . " - ". (string) $amaz->Items->Item->ItemAttributes->Title;
 			$name = matchnames($name, $new);
@@ -972,9 +987,10 @@ function domusicfiles ($row)
 				$alt = preg_replace('/(\.vol\d{1,3}?\+\d{1,3}?|\.par2|\.[a-z][a-z0-9]{2})+?".+?/iU', '', $sub);
 			}
 
-			if (preg_match('/\.mp3/', $sub, $matches))
+			if (preg_match('/\.mp3|\.flac/', $sub, $matches))
 			{
 				$mp3name = preg_replace('/(\.mp3".+?)/iU', '.mp3', $sub);
+				$mp3name = preg_replace('/(\.flac".+?)/iU', '.flac', $sub);
 				$mp3name = preg_replace('/(?iU)^[^\"]+\"(0\d+?-?(00)??)??/iU', '', $mp3name);
 
 				$mp3 = true;
@@ -996,25 +1012,30 @@ function domusicfiles ($row)
 	}
 	$name = '';
 
-	echo (($m3u != '' || ($files + $extras) / count($nzbinfo->nzb) > 0.7) && $mp3)." ".$mp3." ".$m3u."\n";
-
-	if (($m3u != '' || (($files + $extras) / count($nzbinfo->nzb) > 0.7)) && $mp3)
+	if ( count($nzbinfo->nzb) > 0)
 	{
-		$name = $m3u;
 
-		if ($files == 1)
-			$name = $mp3name;
+		echo (($m3u != '' || ($files + $extras) / count($nzbinfo->nzb) > 0.7) && $mp3)." ".$mp3." ".$m3u."\n";
 
-		if (empty($name))
+		if (($m3u != '' || (($files + $extras) / count($nzbinfo->nzb) > 0.7)) && $mp3)
 		{
-			$name = matchnames($row['name'], $alt);
+			$name = $m3u;
+
+			if ($files == 1)
+				$name = $mp3name;
+
+			if (empty($name))
+			{
+				$name = matchnames($row['name'], $alt);
+			}
+
+			echo $row['guid']." ".$name.' '.$mp3.' '.($files + $extras) / count($nzbinfo->nzb)."\n";
+
 		}
 
-		echo $row['guid']." ".$name.' '.$mp3.' '.($files + $extras) / count($nzbinfo->nzb)."\n";
+		echo (($m3u != '' || ($files + $extras) / count($nzbinfo->nzb) > 0.7) && $mp3)." ".$mp3." ".$m3u."\n";
 
 	}
-
-	echo (($m3u != '' || ($files + $extras) / count($nzbinfo->nzb) > 0.7) && $mp3)." ".$mp3." ".$m3u."\n";
 
 echo "music files $name\n";
 	$name = cleanname($name);
@@ -1030,8 +1051,6 @@ echo "cleaned name $name\n";
 function findquality ($nfo, $name)
 {
 	global $qualities;
-//	$qualities = array('\b480[ip]?\b', '\b640[ip]?\b', '\b720[ip]?\b', '1080[ip]?\b', 'audio_ts', '\bavi\b', 'bd..\b', 'bdrip', 'bluray', 'BR\-?Disk', 'br\-?rip', 'cam', 'divx', 'dvd', 'hd\-?tv', 'iso\b', 'm2ts', 'mkv', 'mpeg', 'mpg', 'ntsc', 'pal', 'ppv', 'r\d\b', '\bscr\b', '\bscreener\b', 'tc\b', 'telecine', 'telesync', '\bts\b', '\b(..)?tv\b', 'tv\-?rip', 'video_ts', 'x264', 'xvid');
-//	$qualities = array('(..)?tv', '480[ip]?', '640[ip]?', '720[ip]?', '1080[ip]?', 'audio_ts', 'avi', 'bd[\- ]?rip', 'bd25', 'bd50', 'bdmv', 'blu ?ray', 'br[\- ]?disk', 'br[\- ]?rip', 'cam', 'cam[\- ]?rip', 'divx', 'dvd', 'dvd[\- ]?r', 'dvd[\- ]?rip', 'dvd[\- ]?scr', 'hd', 'hd[\- ]?tv', 'hd[\- ]?cam', 'hd[\- ]?ts', 'iso', 'm2ts', 'mkv', 'mpeg(\-\d)?', 'mpg', 'ntsc', 'pal', 'ppv', 'ppv[\- ]?rip', 'r\d{1}', 'scr', 'screener', 'tc', 'telecine', 'telesync', 'ts', 'tv[\- ]?rip', 'video_ts', 'x264', 'xvid');
 	$qual = array();
 //	echo "$name\n";
 	foreach ($qualities as $quality)
@@ -1489,6 +1508,8 @@ echo cleanname($name1)."\n";
 				foreach ($arr as $r)
 					{
 echo preg_quote($r)."\n";
+						$r = str_replace("/", " ", $r);
+						$r = str_replace("\\", " ", $r);
 						if (preg_match('/'.preg_quote($r).'/i', $name))
 							$i++;
 					}
@@ -1534,7 +1555,7 @@ function matchvideo($row, $nfo)
 		{
 			if(preg_match('/\.(iso|mkv|mp4|iso|divx)$|\.([^\.]+)$/', $rel['name'], $ext))
 			{
-				echo "ext = ".$ext[1]."\n";
+				echo "ext = ".$ext[1]." ".$row['guid']."\n";
 				var_dump($ext);
 				$cont = true;
 			}
@@ -1707,332 +1728,393 @@ echo "doing updates";
 	return $ok;
 }
 
-mysql_query("SET NAMES 'utf8'");
-mysql_query("SET CHARACTER SET 'utf8'");
+
+echo "starting\n";
+$db = new DB();
+
+$res = $db->query("SET NAMES 'utf8'");
+$res = $db->query("SET CHARACTER SET 'utf8'");
+
+//mysql_query("SET NAMES 'utf8'");
+//mysql_query("SET CHARACTER SET 'utf8'");
 mb_internal_encoding("UTF-8");
 mb_regex_encoding("UTF-8");
 mb_http_output("UTF-8");
 mb_language("uni");
 
-$db = new DB();
+$query = "SELECT ID FROM category WHERE parentID = 8000";  // OR parentID = 2000 OR parentID = 5000
 
+$res = $db->query($query);
 
-$query = "SELECT uncompress(releasenfo.nfo) AS nfo, releases.ID, releases.guid, releases.`name`, releases.searchname, groups.`name` AS gname FROM releasenfo INNER JOIN releases ON releasenfo.releaseID = releases.ID INNER JOIN groups ON releases.groupID = groups.ID WHERE releases.categoryID IN ( SELECT ID FROM category WHERE parentID = 8000 )";
+$thecategory = $res[0]['ID'];
+
+unset($res[0]);
+
+foreach($res as $r)
+	$thecategory = $thecategory.", ".$r['ID'];
+
+if (isset($argv[1]))
+{
+	$query = "SELECT uncompress(releasenfo.nfo) AS nfo, releases.ID, releases.guid, releases.`name`, releases.searchname, groups.`name` AS gname FROM releasenfo INNER JOIN releases ON releasenfo.releaseID = releases.ID INNER JOIN groups ON releases.groupID = groups.ID WHERE releases.ID = ".$argv[1];
+} else {
+	$query = "SELECT uncompress(releasenfo.nfo) AS nfo, releases.ID, releases.guid, releases.`name`, releases.searchname, groups.`name` AS gname FROM releasenfo INNER JOIN releases ON releasenfo.releaseID = releases.ID INNER JOIN groups ON releases.groupID = groups.ID WHERE releases.categoryID IN ( $thecategory )";
+}
 //$query = "SELECT uncompress(releasenfo.nfo) AS nfo, releases.ID, releases.guid, releases.`name`, releases.searchname, groups.`name` AS gname FROM releasenfo INNER JOIN releases ON releasenfo.releaseID = releases.ID INNER JOIN groups ON releases.groupID = groups.ID";
-//$query = "SELECT uncompress(releasenfo.nfo) AS nfo, releases.ID, releases.guid, releases.`name`, releases.searchname, groups.`name` AS gname FROM releasenfo INNER JOIN releases ON releasenfo.releaseID = releases.ID INNER JOIN groups ON releases.groupID = groups.ID WHERE releases.guid = 'e4c785818de8184770f5bf7b1f383863'";
+//$query = "SELECT uncompress(releasenfo.nfo) AS nfo, releases.ID, releases.guid, releases.`name`, releases.searchname, groups.`name` AS gname FROM releasenfo INNER JOIN releases ON releasenfo.releaseID = releases.ID INNER JOIN groups ON releases.groupID = groups.ID WHERE releases.guid = '6dc77dc7fb48745ee76ec345c4fe789b'";
 //
 //echo $query."\n";
 
 $res = $db->queryDirect($query);
 
+echo "got matches\n";
+
 while ($row =  $db->getAssocArray($res))
 {
 	$nfo = utf8_decode($row['nfo']);
-	$pattern = '/(imdb)\.[a-z0-9\.\_\-\/]+?(tt|\?)(\d+?)\/?|(tvrage)|(\bASIN)|(isbn)|(UPC\b)|(comic book)|(comix)|(tv series)|(\bos\b)|(documentaries)|(documentary)|(doku)|(macintosh)|(dmg)|(mac[ _\.\-]??os[ _\.\-]??x??)|(\bos\b\s??x??)|(\bosx\b)';
-	$pattern = $pattern . '|(\bios\b)|(iphone)|(ipad)|(ipod)|(pdtv)|(hdtv)|(video streams)|(movie)|(audiobook)|(audible)|(recorded books)|(spoken book)|(speech)|(read by)\:?|(narrator)\:?|(narrated by)';
-	$pattern = $pattern . '|(avi\b)|(xvid)|(divx)|(mkv)|(amazon\.)[a-z]{2,3}.*\/dp\/|(anidb.net).*aid=|(\blame\b)|(\btrack)|(t r a c k)|music|type:(game)|(game) Type|(platform)|\b(win(?:dows|all|xp)\b)|(\bwin\b)';
-	$pattern = $pattern . '|(application)|(plugin)|(\bcrack)|(install)|(setup)|(magazin)|(x264)|(itunes\.apple\.com\/)|(sports)|(deportes)|(nhl)|(nfl)|(\bnba)|ncaa|(album)/iU';
-
-	$matches = preg_split($pattern, $nfo, -1, PREG_SPLIT_NO_EMPTY|PREG_SPLIT_DELIM_CAPTURE);
-
-	$matches = doarray($matches);
-
-if (count($matches) > 0)
-{
-//	var_dump($matches);
-}
-
-
-	foreach($matches as $m)
+	if (strlen($nfo) > 0)
 	{
+//		trigger_error("doing nfo ".$row['ID']." ".$row['name']);
 
-		if (isset($m)) {
-			$case = preg_replace('/ /', '', $m);
-		} else {
-			$case = '';
-		}
-if ($row['name'] == '4d5bdbf0da623fb9cf849b8b745c60e9')
-print_r($matches);
+		$pattern = '/(imdb)\.[a-z0-9\.\_\-\/]+?(tt|\?)(\d+?)\/?|(tvrage)|(\bASIN)|(isbn)|(UPC\b)|(comic book)|(comix)|(tv series)|(\bos\b)|(documentaries)|(documentary)|(doku)|(macintosh)|(dmg)|(mac[ _\.\-]??os[ _\.\-]??x??)|(\bos\b\s??x??)|(\bosx\b)';
+		$pattern = $pattern . '|(\bios\b)|(iphone)|(ipad)|(ipod)|(pdtv)|(hdtv)|(video streams)|(movie)|(audiobook)|(audible)|(recorded books)|(spoken book)|(speech)|(read by)\:?|(narrator)\:?|(narrated by)';
+		$pattern = $pattern . '|(dvd)|(ntsc)|(m4v)|(mov\b)|(avi\b)|(xvid)|(divx)|(mkv)|(amazon\.)[a-z]{2,3}.*\/dp\/|(anidb.net).*aid=|(\blame\b)|(\btrack)|(t r a c k)|(music)|(44.1kHz)|type:(game)|(game) Type|(platform)|\b(win(?:dows|all|xp)\b)|(\bwin\b)';
+		$pattern = $pattern . '|(m3u)|(flac\b)|(application)|(plugin)|(\bcrack)|(install)|(setup)|(magazin)|(x264)|(itunes\.apple\.com\/)|(sports)|(deportes)|(nhl)|(nfl)|(\bnba)|(ncaa)|(album)|(epub)|(mobi)/iU';
 
-		if (($m == 'os' || $m == 'platform') && preg_match('/(?:\bos\b(?: type)??|platform)[ \.\:\}]+(\w+?).??(\w*?)/iU', $nfo, $set))
+		$matches = preg_split($pattern, $nfo, -1, PREG_SPLIT_NO_EMPTY|PREG_SPLIT_DELIM_CAPTURE);
+
+		$matches = doarray($matches);
+
+		if (count($matches) > 0)
 		{
-
-			if (isset($set[1]))
-			{
-//	var_dump($set);
-				$case = strtolower($set[1]);
-			}
-			if (strlen($set[2]) && (stripos($set[2], 'mac') !== false || stripos($set[2], 'osx') !== false))
-			{
-				$case = strtolower($set[2]);
-			}
+		//	var_dump($matches);
 		}
 
 
-		echo "\n".$case." ".$row['guid']."\n";
-//		echo $row['name']."\n";
-//		echo $row['searchname']."\n";
-//		echo "$case ".$row['guid']."\n";
-
-		switch (strtolower($case))
+		foreach($matches as $m)
 		{
-			case 'itunes.apple.com/':
-				echo $row['guid']."\n";
-				preg_match('/itunes\.apple\.com\/(.*)/iU', $nfo, $set);
-				echo 'itunes.apple.com'.$set[1]."\n";
-				break;
+			if (isset($m)) {
+				$case = preg_replace('/ /', '', $m);
+			} else {
+				$case = '';
+			}
+	if ($row['name'] == '4d5bdbf0da623fb9cf849b8b745c60e9')
+	print_r($matches);
 
-			case 'imdb':
-				if (matchimdb($nfo, $row))
-					break(2);
-				break;
-
-
-			case "asin":
-			case "isbn":
-			case "amazon.":
-			case "upc":
-				if ($case == 'asin' || $case == 'isbn')
-				{
-					preg_match('/(?:isbn|asin)[ \:]*? *?([a-zA-Z0-9]{8,13}?)/iU', $nfo, $set);
-					if (isset($set[1]))
-					{
-						if (strlen($set[1])>10)
-							break;
-						if (isset($set[1]))
-						{
-							$set[2] = $set[1];
-							$set[1] = "com";
-						}
-					}
-				} else if ($case == 'amazon.') {
-					preg_match('/amazon\.([a-z]*?\.?[a-z]{2,3}?)\/.*\/dp\/([a-zA-Z0-9]{8,10}?)/iU', $nfo, $set);
-				} else if ($case == 'upc') {
-					preg_match('/UPC\:?? *?([a-zA-Z0-9]*?)/iU', $nfo, $set);
-						if (isset($set[1]))
-						{
-							$set[2] = $set[1];
-							$set[1] = "All";
-						}
-				} else {
-					echo "* * * * * error in amazon";
-					break;
-				}
-
-				if (count($set) > 1)
-				{
-					if (doAmazon ($row['name'], $row['ID'], $nfo, $set[2], $set[1], $case == 'upc', $nfo, $row))
-					{
-						break(2);
-					}
-				}
-				break;
-			case 'comicbook':
-			case 'comix':
- 				if (dodbupdate($row['ID'], 7030))
- 					break(2);
-				break;
-			case 'audiobook':
-			case 'audible':
-			case 'recordedbooks':
-			case 'spokenbook':
-			case 'readby':
-			case 'narratedby':
-			case 'narrator':
-			case 'speech':
-				if (matchaudiobook ($nfo, $row['ID'], $row['name'], $row))
-					break(2);
-				break;
-
-			case 't r a c k':
-			case 'track':
-			case 'lame':
-			case 'album':
-			case 'music':
-				if (preg_match('/(a\s?r\s?t\s?i\s?s\s?t|l\s?a\s?b\s?e\s?l|mp3|e\s?n\s?c\s?o\s?d\s?e\s?r|rip|stereo|mono)/i', $nfo))
-				{
-					if (!preg_match('/(\bavi\b|x\.?264|divx|mvk|xvid|install|Setup\.exe|unzip|unrar)/i', $nfo))
-					{
-						if (matchmusic($nfo, $row))
-						{
-	//						echo "breaking 2\n";
-							break(2);
-						}
-					} else {
-//					echo "$case ".$row['guid']."\n";
-					if (findmusicname($row, 3010))
-						break (2);
-					}
-				}
-				break;
-
-			case 'magazin':
-//				echo "magazin\n";
-				if (matchmag($nfo, $row))
-					break(2);
-				break;
-
-			case 'dmg':
-			case 'mac':
-			case 'macintosh':
-			case 'macos':
-			case 'macosx':
-			case 'osx':
-				if (doOS($nfo, $row['name'], 4030, $row['ID']))
-					break(2);
-				break;
-
-			case 'ios':
-			case 'iphone':
-			case 'ipad':
-			case 'ipod':
-
-				if (doOS($nfo, $row['name'], 4060, $row['ID']))
-					break(2);
-				break;
-
-			case 'application':
-			case 'install':
-			case 'setup':
-				if (!preg_match('/(Setup(\.exe)?|unzip|unrar)/i', $nfo))
-					continue;
-				if (preg_match('/(\bavi\b|x\.?264|divx|mvk|xvid|install)/i', $nfo))
-					continue;
-
-			case 'windows':
-			case 'win':
-			case 'winall':
-			case 'winxp':
-			case 'plugin':
-			case 'crack':
-				if (doOS($nfo, $row['name'], 4020, $row['ID']))
-					break(2);
-				break;
-
-			case 'android':
-				if (doOS($nfo, $row['name'], 4070, $row['ID']))
-					break(2);
-				break;
-
-			case 'game':
-				$set = preg_split('/\>(.*)\</Ui',  $nfo, 0, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
+			if (($m == 'os' || $m == 'platform') && preg_match('/(?:\bos\b(?: type)??|platform)[ \.\:\}]+(\w+?).??(\w*?)/iU', $nfo, $set))
+			{
 
 				if (isset($set[1]))
 				{
-					$name = matchnames($row['name'], $set[1]);
-					if (dodbupdate($row['ID'], 4050, $name))
+	//	var_dump($set);
+					$case = strtolower($set[1]);
+				}
+				if (strlen($set[2]) && (stripos($set[2], 'mac') !== false || stripos($set[2], 'osx') !== false))
+				{
+					$case = strtolower($set[2]);
+				}
+			}
+
+
+			echo "\n".$case." ".$row['guid']."\n";
+	//		echo $row['name']."\n";
+	//		echo $row['searchname']."\n";
+			echo "$case ".$row['guid']."\n";
+
+			switch (strtolower($case))
+			{
+				case 'itunes.apple.com/':
+					echo $row['guid']."\n";
+					preg_match('/itunes\.apple\.com\/(.*)/iU', $nfo, $set);
+					echo 'itunes.apple.com'.$set[1]."\n";
+					break;
+
+				case 'imdb':
+					if (matchimdb($nfo, $row))
 						break(2);
-				} else {
-					if (doOS($nfo, $row['name'], 4050, $row['ID']))
+					break;
+
+
+				case "asin":
+				case "isbn":
+				case "amazon.":
+				case "upc":
+					if ($case == 'asin' || $case == 'isbn')
+					{
+						preg_match('/(?:isbn|asin)[ \:]*? *?([a-zA-Z0-9\-\.]{8,20}?)/iU', $nfo, $set);
+		var_dump($set);
+						if (isset($set[1]))
+						{
+							$set[1] = preg_replace('/[\-\.]/', '', $set[1]);
+	echo "asin ".$set[1]."\n";
+							if (strlen($set[1])>13)
+								break;
+							if (isset($set[1]))
+							{
+								$set[2] = $set[1];
+								$set[1] = "com";
+							}
+						}
+					} else if ($case == 'amazon.') {
+						preg_match('/amazon\.([a-z]*?\.?[a-z]{2,3}?)\/.*\/dp\/([a-zA-Z0-9]{8,10}?)/iU', $nfo, $set);
+					} else if ($case == 'upc') {
+						preg_match('/UPC\:?? *?([a-zA-Z0-9]*?)/iU', $nfo, $set);
+							if (isset($set[1]))
+							{
+								$set[2] = $set[1];
+								$set[1] = "All";
+							}
+					} else {
+						echo "* * * * * error in amazon";
 						break;
-				}
-				break;
+					}
 
-			case 'anidb.net':
-				if (matchanime ($nfo, $row['ID'], $row['name']))
-					break(2);
-				break;
-
-			case 'sports':
-			case 'deportes':
-			case 'nhl':
-			case 'nfl':
-			case 'nba':
-			case 'ncaa':
-				if (doOS($nfo, $row['name'], 5060, $row['ID']))
-				{
-					break(2);
-				}
-				break;
-
-			case 'tvrage':
-			case 'documentaries':
-			case 'documentary':
-			case 'tvseries':
-			case 'hdtv':
-			case 'pdtv':
-
-				$cat = 5050;
-
-				if (preg_match('/hdtv/', $case))
-					$cat = 5040;
-				elseif (preg_match('/documentar/', $case))
-					$cat = 5080;
-
-				$name = '';
-//				$title = preg_match('/(?:\btitle\b)+?(?! *[^ \.\:\}\]]{2,}?\b)(?:[\|\;\:\.\[\}\]\( \xb0-\x{3000}]+?)[ \.]([a-z0-9](?!:)(?:.(?!\s\s+))+?[^\s]+?)/Uuim',  $nfo, 0, PREG_SPLIT_DELIM_CAPTURE);
-				if (preg_match('/(?:\btitle\b)+?(?! *[^ \.\:\}\]]{2,}?\b)(?:[\|\;\:\.\[\}\]\( \xb0-\x{3000}]+?)[ \.]([a-z0-9](?!:)(?:.(?!\s\s+))+?[^\s]+?)/Uuim',  $nfo, $title))
-					$name = $title[1];
-				elseif (preg_match('/^(.*(19|20)\d{2}[ \_\.]\d{1,2}[ \_\.]\d{1,2})[ \_\.]?/', $nfo, $title))
-					$name = $title[1];
-				elseif (preg_match('/^(.*\d{1,2}[ \_\.]\d{1,2}[ \_\.](19|20)\d{2})[ \_\.]?/', $nfo, $title))
-					$name = $title[1];
-				elseif (preg_match('/^(.*(19|20)\d{2}[\]\}\)]?)[ \_\.]/', $nfo, $title))
-					$name = $title[1];
-
-	echo "doing tv ".$name." ".$row['guid']."\n";
-				if ($name != '')
-				{
-					if (lookupTV($name, $nfo, $row, $cat) !== false)
+					if (count($set) > 1)
+					{
+						if (doAmazon ($row['name'], $row['ID'], $nfo, $set[2], $set[1], $case, $nfo, $row))
+						{
+							break(2);
+						}
+					}
+					break;
+				case 'comicbook':
+				case 'comix':
+					if (dodbupdate($row['ID'], 7030))
 						break(2);
-				}
+					break;
+				case 'audiobook':
+				case 'audible':
+				case 'recordedbooks':
+				case 'spokenbook':
+				case 'readby':
+				case 'narratedby':
+				case 'narrator':
+				case 'speech':
+					if (matchaudiobook ($nfo, $row['ID'], $row['name'], $row))
+						break(2);
+					break;
 
-//				break;
-			case 'movie':
-			case 'videostreams':
-			case 'x264':
-			case 'avi':
-			case 'mkv':
-			case 'xvid':
-echo "doing movie\n";
-				if (matchvideo($row, $nfo))
-					break(2);
+				case 't r a c k':
+				case 'track':
+				case 'lame':
+				case 'album':
+				case 'music':
+				case '44.1kHz':
+				case 'm3u':
+				case 'flac':
+					if (preg_match('/(a\s?r\s?t\s?i\s?s\s?t|l\s?a\s?b\s?e\s?l|mp3|e\s?n\s?c\s?o\s?d\s?e\s?r|rip|stereo|mono)/i', $nfo))
+					{
+						if (!preg_match('/(\bavi\b|x\.?264|divx|mvk|xvid|install|Setup\.exe|unzip|unrar)/i', $nfo))
+						{
+							if (matchmusic($nfo, $row))
+							{
+		//						echo "breaking 2\n";
+								break(2);
+							}
+						} else {
+	//					echo "$case ".$row['guid']."\n";
+						if (findmusicname($row, 3010))
+							break (2);
+						}
+					}
+					break;
+
+				case 'magazin':
+	//				echo "magazin\n";
+					if (matchmag($nfo, $row))
+						break(2);
+					break;
+
+				case 'dmg':
+				case 'mac':
+				case 'macintosh':
+				case 'macos':
+				case 'macosx':
+				case 'osx':
+					if (doOS($nfo, $row['name'], 4030, $row['ID']))
+						break(2);
+					break;
+
+				case 'ios':
+				case 'iphone':
+				case 'ipad':
+				case 'ipod':
+
+					if (doOS($nfo, $row['name'], 4060, $row['ID']))
+						break(2);
+					break;
+
+				case 'application':
+				case 'install':
+				case 'setup':
+					if (!preg_match('/(Setup(\.exe)?|unzip|unrar)/i', $nfo))
+						continue;
+					if (preg_match('/(\bavi\b|x\.?264|divx|mvk|xvid|install)/i', $nfo))
+						continue;
+
+				case 'windows':
+				case 'win':
+				case 'winall':
+				case 'winxp':
+				case 'plugin':
+				case 'crack':
+					if (doOS($nfo, $row['name'], 4020, $row['ID']))
+						break(2);
+					break;
+
+				case 'android':
+					if (doOS($nfo, $row['name'], 4070, $row['ID']))
+						break(2);
+					break;
+
+				case 'game':
+					$set = preg_split('/\>(.*)\</Ui',  $nfo, 0, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
+
+					if (isset($set[1]))
+					{
+						$name = matchnames($row['name'], $set[1]);
+						if (dodbupdate($row['ID'], 4050, $name))
+							break(2);
+					} else {
+						if (doOS($nfo, $row['name'], 4050, $row['ID']))
+							break;
+					}
+					break;
+
+				case 'anidb.net':
+					if (matchanime ($nfo, $row['ID'], $row['name']))
+						break(2);
+					break;
+
+				case 'sports':
+				case 'deportes':
+				case 'nhl':
+				case 'nfl':
+				case 'nba':
+				case 'ncaa':
+					if (doOS($nfo, $row['name'], 5060, $row['ID']))
+					{
+						break(2);
+					}
+					break;
+
+				case 'tvrage':
+				case 'documentaries':
+				case 'documentary':
+				case 'tvseries':
+				case 'hdtv':
+				case 'pdtv':
+
+					$cat = 5050;
+
+					if (preg_match('/hdtv/', $case))
+						$cat = 5040;
+					elseif (preg_match('/documentar/', $case))
+						$cat = 5080;
+
+					$name = '';
+	//				$title = preg_match('/(?:\btitle\b)+?(?! *[^ \.\:\}\]]{2,}?\b)(?:[\|\;\:\.\[\}\]\( \xb0-\x{3000}]+?)[ \.]([a-z0-9](?!:)(?:.(?!\s\s+))+?[^\s]+?)/Uuim',  $nfo, 0, PREG_SPLIT_DELIM_CAPTURE);
+					if (preg_match('/(?:\btitle\b)+?(?! *[^ \.\:\}\]]{2,}?\b)(?:[\|\;\:\.\[\}\]\( \xb0-\x{3000}]+?)[ \.]([a-z0-9](?!:)(?:.(?!\s\s+))+?[^\s]+?)/Uuim',  $nfo, $title))
+						$name = $title[1];
+					elseif (preg_match('/^(.*(19|20)\d{2}[ \_\.]\d{1,2}[ \_\.]\d{1,2})[ \_\.]?/', $nfo, $title))
+						$name = $title[1];
+					elseif (preg_match('/^(.*\d{1,2}[ \_\.]\d{1,2}[ \_\.](19|20)\d{2})[ \_\.]?/', $nfo, $title))
+						$name = $title[1];
+					elseif (preg_match('/^(.*(19|20)\d{2}[\]\}\)]?)[ \_\.]/', $nfo, $title))
+						$name = $title[1];
+
+		echo "doing tv ".$name." ".$row['guid']."\n";
+					if ($name != '')
+					{
+						if (lookupTV($name, $nfo, $row, $cat) !== false)
+							break(2);
+					}
+
+	//				break;
+				case 'movie':
+				case 'videostreams':
+				case 'x264':
+				case 'avi':
+				case 'mkv':
+				case 'xvid':
+				case 'dvd':
+				case 'ntsc':
+				case 'm4v':
+				case 'mov':
+	echo "doing movie\n";
+					if (matchvideo($row, $nfo))
+						break(2);
 
 
-				break;
+					break;
 
-			default:
-	//echo "$case ".$row['guid']."\n";
-				break;
+				default:
+		//echo "$case ".$row['guid']."\n";
+					break;
 
+			}
 		}
+		echo $row['guid']."\n";
 	}
-echo $row['guid']."\n";
-
 }
 
 //exit(0);
+echo "done nfos\n";
 
 
-
-$query = "SELECT *, groups.`name` AS gname FROM releases INNER JOIN groups ON releases.groupID = groups.ID WHERE releases.ID NOT IN ( SELECT releasevideo.releaseID FROM releasevideo ) AND releases.categoryID IN ( SELECT ID FROM category WHERE parentID = 8000 )" ;
-//$query = "SELECT * FROM releases WHERE releases.ID NOT IN ( SELECT releasevideo.releaseID FROM releasevideo )" ;
-
-$res = $db->queryDirect($query);
-while ($row =  $db->getAssocArray($res))
+if (isset($argv[1]))
 {
-echo "\n".$row['guid']."\n";
-
-$query = 'SELECT releasenfo.releaseID, uncompress(releasenfo.nfo) AS nfo FROM releasenfo WHERE releasenfo.releaseID = '.$row['ID'];
-$rel = $db->queryOneRow($query);
-
-$nfo = '';
-if ($rel !== false)
-	if ($rel['releaseID'] == $row['ID'])
-		$nfo = $rel['nfo'];
-
-	 matchmusic($nfo, $row);
-	//findmusicname($row, 3010);
+	$query = "SELECT releases.*, g.`name` AS gname FROM releases INNER JOIN groups g ON releases.groupID = g.ID WHERE releases.ID = ".$argv[1]."";
+} else {
+	$query = "SELECT releases.*, g.`name` AS gname FROM releases INNER JOIN groups g ON releases.groupID = g.ID WHERE releases.ID NOT IN ( SELECT releasevideo.releaseID FROM releasevideo ) AND releases.categoryID IN ($thecategory)" ;
+//$query = "SELECT * FROM releases WHERE releases.ID NOT IN ( SELECT releasevideo.releaseID FROM releasevideo )" ;
 }
 
-$query = "SELECT releasefiles.`name` AS rname, releasefiles.size, releases.*, groups.`name` AS gname FROM releasefiles INNER JOIN releases ON releasefiles.releaseID = releases.ID INNER JOIN groups ON releases.groupID = groups.ID WHERE releases.categoryID IN ( SELECT ID FROM category WHERE parentID = 8000 ) ORDER BY releasefiles.releaseID, releasefiles.`name`";
 $res = $db->queryDirect($query);
+
+echo "doing part 2\n";
+
 while ($row =  $db->getAssocArray($res))
 {
+//	trigger_error("doing part 2".$row['ID']);
+	$query = "SELECT releasevideo.releaseID FROM releasevideo WHERE releasevideo.releaseID = ".$row['ID'];
+	$rel = $db->queryOneRow($query);
 
+	if ($rel !== false)
+		continue;
+
+	echo "\n".$row['guid']."\n";
+
+	$query = 'SELECT releasenfo.releaseID, uncompress(releasenfo.nfo) AS nfo FROM releasenfo WHERE releasenfo.releaseID = '.$row['ID'];
+	$rel = $db->queryOneRow($query);
+
+	$nfo = '';
+	if ($rel !== false)
+		if ($rel['releaseID'] == $row['ID'])
+			$nfo = $rel['nfo'];
+
+		 matchmusic($nfo, $row);
+		//findmusicname($row, 3010);
+}
+
+if (isset($argv[1]))
+{
+	$query = "SELECT releasefiles.`name` AS rname, releasefiles.size, releases.*, groups.`name` AS gname FROM releasefiles INNER JOIN releases ON releasefiles.releaseID = releases.ID INNER JOIN groups ON releases.groupID = groups.ID WHERE releases.ID = ".$argv[1]." ORDER BY releasefiles.releaseID, releasefiles.`name`";
+} else {
+	$query = "SELECT releasefiles.`name` AS rname, releasefiles.size, releases.*, groups.`name` AS gname FROM releasefiles INNER JOIN releases ON releasefiles.releaseID = releases.ID INNER JOIN groups ON releases.groupID = groups.ID WHERE releases.categoryID IN ( $thecategory ) ORDER BY releasefiles.releaseID, releasefiles.`name`";
+}
+
+$res = $db->queryDirect($query);
+
+echo "doing part 3\n";
+
+while ($row =  $db->getAssocArray($res))
+{
+//	trigger_error("doing part 3".$row['ID']);
 	if(preg_match('/\.([^\.]{3,4})$/', $row['rname'], $ext))
 	{
-		echo "ext = ".$ext[1]."\n";
+		$ext[1] = strtolower($ext[1]);
+
+		echo "ext = ".$ext[1]." ".$row['guid']."\n";
 //		var_dump($ext);
 		switch ($ext[1])
 		{
@@ -2076,7 +2158,12 @@ while ($row =  $db->getAssocArray($res))
 			case 'mkv':
 			case 'mp4':
 			case 'iso':
+			case 'wmv':
+			case 'mpg':
+			case 'mov':
+			case 'm4v':
 				$tmp = preg_replace("/([^\\\\]+?)\\\\(\\1)/", "\\2", $row['rname']);
+				$tmp = str_replace('/', ' ', $tmp);
 				$tmp = preg_replace("/".preg_quote($row['name'])."/", "", $tmp);
 				$tmp = preg_replace("/\\\\/", " ", $tmp);
 				$tmp = stripname($tmp);
@@ -2104,90 +2191,97 @@ while ($row =  $db->getAssocArray($res))
 
 }
 
+echo "all done\n";
+
 unset($res);
 unset($row);
 unset($matches);
 
-$movie = new Movie();
-$movie->processMovieReleases();
-$movie->updateUpcoming();
+if (!isset($argv[1]))
+{
+	$movie = new Movie();
+	$movie->processMovieReleases();
+	$movie->updateUpcoming();
 
-$music = new Music(true);
-$music->processMusicReleases();
+	$music = new Music(true);
+	$music->processMusicReleases();
 
-$book = new Book(true);
-$book->processBookReleases();
+	$book = new Book(true);
+	$book->processBookReleases();
 
-$anidb = new AniDB(true);
-$anidb->animetitlesUpdate();
-$anidb->processAnimeReleases();
+	$anidb = new AniDB(true);
+	$anidb->animetitlesUpdate();
+	$anidb->processAnimeReleases();
 
-$tvrage = new TVRage(true);
-$tvrage->processTvReleases(true);
+	$tvrage = new TVRage(true);
+	$tvrage->processTvReleases(true);
 
-$thetvdb = new TheTVDB(true);
-$thetvdb->processReleases();
+	$thetvdb = new TheTVDB(true);
+	$thetvdb->processReleases();
 
-$query = "update releases set  releases.categoryID= 5060 WHERE imdbID IN ( SELECT movieinfo.imdbID FROM movieinfo WHERE movieinfo.genre REGEXP 'sport' AND NOT movieinfo.genre REGEXP 'comedy' AND NOT movieinfo.genre REGEXP 'romance' AND NOT movieinfo.genre REGEXP 'drama' )";
+	echo "cleaning 5000\n";
 
-$db->query($query);
+	$query = "update releases set  releases.categoryID= 5060 WHERE imdbID IN ( SELECT movieinfo.imdbID FROM movieinfo WHERE movieinfo.genre REGEXP 'sport' AND NOT movieinfo.genre REGEXP 'comedy' AND NOT movieinfo.genre REGEXP 'romance' AND NOT movieinfo.genre REGEXP 'drama' )";
 
-$query = "update releases set  releases.categoryID= 5000 WHERE imdbID IN ( SELECT movieinfo.imdbID FROM movieinfo WHERE genre REGEXP 'tv|talk\-show|reality|episode' ) AND categoryID NOT IN ( SELECT ID FROM category WHERE parentID = 5000 )";
+	$db->query($query);
 
-$db->query($query);
+	$query = "update releases set  releases.categoryID= 5000 WHERE imdbID IN ( SELECT movieinfo.imdbID FROM movieinfo WHERE genre REGEXP 'tv|talk\-show|reality|episode' ) AND categoryID NOT IN ( SELECT ID FROM category WHERE parentID = 5000 )";
 
-$query = "UPDATE `releases` SET `categoryID`=2050  WHERE (`categoryID` in (SELECT ID FROM category WHERE parentID = 8000 and `imdbID` > 0) OR `categoryID` = 2000)  AND size > 10500000000";
+	$db->query($query);
 
-$db->query($query);
+	$query = "UPDATE `releases` SET `categoryID`=2050  WHERE (`categoryID` in (SELECT ID FROM category WHERE parentID = 8000 and `imdbID` > 0) OR `categoryID` = 2000)  AND size > 10500000000";
 
-$query = "UPDATE `releases` SET `categoryID`=2040  WHERE (`categoryID` in (SELECT ID FROM category WHERE parentID = 8000 and `imdbID` > 0) OR `categoryID` = 2000) AND size > 2500000000";
+	$db->query($query);
 
-$db->query($query);
+	$query = "UPDATE `releases` SET `categoryID`=2040  WHERE (`categoryID` in (SELECT ID FROM category WHERE parentID = 8000 and `imdbID` > 0) OR `categoryID` = 2000) AND size > 2500000000";
 
-$query = "UPDATE `releases` SET `categoryID`=2030  WHERE (`categoryID` in (SELECT ID FROM category WHERE parentID = 8000 and `imdbID` > 0) OR `categoryID` = 2000)  AND size > 500000000";
+	$db->query($query);
 
-$db->query($query);
+	$query = "UPDATE `releases` SET `categoryID`=2030  WHERE (`categoryID` in (SELECT ID FROM category WHERE parentID = 8000 and `imdbID` > 0) OR `categoryID` = 2000)  AND size > 500000000";
 
-$query = "UPDATE `releases` SET `categoryID`=2020  WHERE (`categoryID` in (SELECT ID FROM category WHERE parentID = 8000 and `imdbID` > 0) OR `categoryID` = 2000)";
+	$db->query($query);
 
-$db->query($query);
+	$query = "UPDATE `releases` SET `categoryID`=2020  WHERE (`categoryID` in (SELECT ID FROM category WHERE parentID = 8000 and `imdbID` > 0) OR `categoryID` = 2000)";
 
-$query = "UPDATE `releases` SET `categoryID`=2040  WHERE `categoryID` = 2050 AND size <10000000000";
+	$db->query($query);
 
-$db->query($query);
+	$query = "UPDATE `releases` SET `categoryID`=2040  WHERE `categoryID` = 2050 AND size <10000000000";
 
-$query = "UPDATE `releases` SET `categoryID`=2030  WHERE `categoryID` = 2040 AND size < 2500000000";
+	$db->query($query);
 
-$db->query($query);
+	$query = "UPDATE `releases` SET `categoryID`=2030  WHERE `categoryID` = 2040 AND size < 2500000000";
 
-$query = "UPDATE `releases` SET `categoryID`=5040  WHERE (`categoryID` in (SELECT ID FROM category WHERE parentID = 8000 and `rageID` > 0) OR `categoryID` = 5000) AND size > 1500000000";
+	$db->query($query);
 
-$db->query($query);
+	$query = "UPDATE `releases` SET `categoryID`=5040  WHERE (`categoryID` in (SELECT ID FROM category WHERE parentID = 8000 and `rageID` > 0) OR `categoryID` = 5000) AND size > 1500000000";
 
-$query = "UPDATE `releases` SET `categoryID`=5030  WHERE (`categoryID` in (SELECT ID FROM category WHERE parentID = 8000 and `rageID` > 0) OR `categoryID` = 5000)  AND size > 10000000";
+	$db->query($query);
 
-$db->query($query);
+	$query = "UPDATE `releases` SET `categoryID`=5030  WHERE (`categoryID` in (SELECT ID FROM category WHERE parentID = 8000 and `rageID` > 0) OR `categoryID` = 5000)  AND size > 10000000";
 
-$query = "UPDATE `releases` SET `categoryID`=5050  WHERE (`categoryID` in (SELECT ID FROM category WHERE parentID = 8000 and `rageID` > 0) OR `categoryID` = 5000)";
+	$db->query($query);
 
-$db->query($query);
+	$query = "UPDATE `releases` SET `categoryID`=5050  WHERE (`categoryID` in (SELECT ID FROM category WHERE parentID = 8000 and `rageID` > 0) OR `categoryID` = 5000)";
 
-$query = "UPDATE `releases` SET `categoryID`=5030  WHERE  `categoryID` = 5040 AND size < 1500000000";
+	$db->query($query);
 
-$db->query($query);
+	$query = "UPDATE `releases` SET `categoryID`=5030  WHERE  `categoryID` = 5040 AND size < 1500000000";
 
-$query = "UPDATE `releases` SET `categoryID`=5050  WHERE  `categoryID` = 5030 AND size < 1000000";
+	$db->query($query);
 
-$db->query($query);
+	$query = "UPDATE `releases` SET `categoryID`=5050  WHERE  `categoryID` = 5030 AND size < 1000000";
 
-$query = "UPDATE releases SET categoryID = 5070 WHERE rageID IN ( SELECT tvrage.rageID FROM tvrage WHERE tvrage.genre REGEXP 'animat' )";
+	$db->query($query);
 
-$db->query($query);
+	$query = "UPDATE releases SET categoryID = 5070 WHERE rageID IN ( SELECT tvrage.rageID FROM tvrage WHERE tvrage.genre REGEXP 'animat' )";
 
-$query = "update releases set  releases.categoryID= 5080 WHERE imdbID IN ( SELECT movieinfo.imdbID FROM movieinfo WHERE genre REGEXP 'docum' )";
+	$db->query($query);
 
-$db->query($query);
+	$query = "update releases set  releases.categoryID= 5080 WHERE imdbID IN ( SELECT movieinfo.imdbID FROM movieinfo WHERE genre REGEXP 'docum' )";
 
+	$db->query($query);
+
+}
 //ALTER TABLE  `movieinfo` CHANGE  `genre`  `genre` VARCHAR( 256 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL
 
 ?>
