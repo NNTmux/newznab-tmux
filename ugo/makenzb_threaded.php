@@ -56,9 +56,13 @@ while ($ps->RunControlCode())
 //		$query = "UPDATE `binaries` SET `procstat` = 6 WHERE `procstat` = -3 OR `procstat` = -2";
 //		$db = new Db();
 //		var_dump($db->query($query));
-		echo "No more nzbs to process - Initiating shutdown\n";
+		echo "\nNo more nzbs to process - Initiating shutdown\n";
+		$ps->threadTimeLimit = 200;
+		do {
+			$ps->tick();
+		} while ($ps->myThreads);
 		$ps->Shutdown();
-		echo "Shutdown complete\n";
+		echo "\nShutdown complete\n";
 
 
 		$path = FS_ROOT."/nzbs/";
@@ -127,7 +131,6 @@ echo "marker "."/(".preg_quote($marker)."\s*\R+)/iU\n";
 		 echo "final time = ".$tim."\n";
 	}
 }
-
 $tim = microtime(true) - $time;
 // echo "time = ".$tim."\n";
 unset($theList);
@@ -182,7 +185,7 @@ if ($ps->RunThreadCode())
 	{
 		$tim = microtime(true) - $time;
 		echo "\t\tt = ".str_pad(number_format($tim, 1), 8, " ", STR_PAD_LEFT);
-		$tim = ($listcount * $tim) / $count + time();
+		$tim = ((1 + 0.3 * (1 - $countpct)) * ($listcount * $tim) / $count) + time();
 //		$tim = number_format(($listcount * $tim) / 60 / $count, 1);
 		if ($countpct > 0.1 || $count > 1500)
 			echo "\t".date('H:i:s', $tim);

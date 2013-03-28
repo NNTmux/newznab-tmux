@@ -20,9 +20,12 @@ function watchdog ()
 			if ($ps->myThreads[$pid]['time'] != time())
 			{
 				$ps->myThreads[$pid]['time'] = time();
+				$lastto = time();
 				shm_put_var($buffer, 1, $ps);
 	//			trigger_error($pid." ".$ps->myThreads[$pid]['time']);
 			}
+	} else {
+		trigger_error("$pid is orphaned");
 	}
 }
 
@@ -43,6 +46,7 @@ $processPasswords = ($site->unrarpath != '') ? true : false;
 $processAudioSample = ($site->saveaudiopreview == 1) ? true : false;
 
 $nntpconnected = false;
+$lastto = time()+1000;
 
 var_dump($argv);
 

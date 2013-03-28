@@ -1,8 +1,5 @@
 <?php
 require("config.php");
-//define('FS_ROOT', realpath(dirname(__FILE__)));
-//require_once(FS_ROOT."/config.php");
-
 require_once(WWW_DIR.'/lib/powerprocess.php');
 require_once(WWW_DIR."/lib/framework/db.php");
 
@@ -10,7 +7,7 @@ function processchanges ()
 {
 	global $ps, $buffer;
 
-	if (count($ps->myThreads) < 1)
+	if (count($ps->myThreads) < 1 || !isset($buffer))
 		return false;
 
 	$ps1 = shm_get_var($buffer, 1);
@@ -62,7 +59,7 @@ $theCount = count($theList);
 $ps = new PowerProcess();
 $ps->RegisterCallback('psUpdateComplete');
 $ps->maxThreads = 16;
-$ps->tickCount = 100000;	// value in usecs. change this to 1000000 (one second) to reduce cpu use
+$ps->tickCount = 10000;	// value in usecs. change this to 1000000 (one second) to reduce cpu use
 $ps->threadTimeLimit = 250;	// Disable child timeout
 
 
@@ -102,9 +99,13 @@ while ($ps->RunControlCode())
 	else
 	{
 		// No more groups to process
-		echo "No more release to inspect - Initiating shutdown\n";
+		echo "\nNo more release to inspect - Initiating shutdown\n";
+		do {
+			$ps->tick();
+			processchanges();
+		} while ($ps->myThreads);
 		$ps->Shutdown();
-		echo "Shutdown complete\n";
+		echo "\nShutdown complete\n";
 //		var_dump($ps->myThreads);
 		$tim = microtime(true) - $time;
 		 echo "final time = ".$tim."\n";
@@ -139,7 +140,7 @@ if ($ps->RunThreadCode())
 	{
 		$tim = microtime(true) - $time;
 		echo "\t\tt = ".str_pad(number_format($tim, 1), 8, " ", STR_PAD_LEFT);
-		$tim = ($listcount * $tim) / $count + time();
+		$tim = ((1 + 0.3 * (1 - $countpct)) * ($listcount * $tim) / $count) + time();
 //		$tim = number_format(($listcount * $tim) / 60 / $count, 1);
 		if ($countpct > 0.1 || $count > 1500)
 			echo "\t".date('H:i:s', $tim);

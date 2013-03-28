@@ -53,9 +53,9 @@ $vardata = explode("\n", $vardata);
 $array = array_combine($varnames, $vardata);
 unset($array['']);
 
-$ps = new PowerProcess(20,0,false);
+$ps = new PowerProcess(8,0,false);
 $ps->RegisterCallback('psUpdateComplete');
-$ps->maxChildren = 20;
+$ps->maxChildren = 8;
 $ps->tickCount = 10000;	// value in usecs. change this to 1000000 (one second) to reduce cpu use
 $ps->threadTimeLimit = 0;	// Disable child timeout
 

@@ -718,8 +718,8 @@ global $db;
 
 	$time = microtime(true) - $time;
 
-	if ($time > .1)
-//		trigger_error("\ntime = $time \tmatches = ".count($matches)."\nquery = ".$query."\n");
+	if ($time > .5)
+		trigger_error("\ntime = $time \tmatches = ".count($matches)."\nquery = ".$query."\n");
 
 	echo count($matches)." ".$query."\n";
 
@@ -831,7 +831,7 @@ function removemail($name, $mail)
 
 	echo "poster $poster\n";
 
-	return preg_replace('/'.$poster.'/', '', $name);
+	return preg_replace('/\b'.$poster.'\b/', '', $name);
 }
 
 function okresults (&$results, &$cuenta, $parts, $i, $patern, $patern2, $r, $mail, $dogn = true)
@@ -969,6 +969,11 @@ function domatching ($pattern, $db, $r, $oldname, $sect)
 
 		$query = $query." AND name like '%".preg_replace('/\'/','\\\'', $cuenta[1])."%'";
 
+		if (is_null($r['importname']))
+			$query = $query." AND importname is null";
+		else
+			$query = $query." AND importname like '".$r['importname']."'";
+
 		$matches = checkmatches($query, $r);
 
 		$parts = intval(preg_replace('/[^\d]/','', $cuenta[1]));
@@ -1035,23 +1040,18 @@ echo "OK end CR: ".count($results)." P: ". $parts." P2: ".$pars."\n";
 echo "D1\n";
 			makenzb($nzb, $nzb1, $nfo, $nfo1);
 			$jump = $jump && clearmatches($name, $results, -3);
-		} else if (substr_count($r['xref'], ":") > 5) {
-echo "D2\n";
-			// spam if in more than five groups
-			echo "cleaning spam ".$r['ID']."\n";
-			$jump = $jump && clearmatches($name, $results, -2);
 		} else if (((((count($results) + $pars >= $parts) && ($files > 0 || count($results) == $parts)) || (count($results) >= $parts && ($files > 0 || count($results) == $parts))) && ($files <= 2 * $parts)) && $oldname != $name)
 		{
 //	echo "makerelease ".$sect."\n";
-echo "D3\n";
+echo "D2\n";
 			$jump = $jump && makerelease($results, $r, $name, $db, $sect, $mail[1]);
 		} else if ((((count($results) + $pars >= $parts) && $files > 2) || (count($results) >= $parts && $files > 2)) && ($files < 2 * $parts))
 		{
-echo "D4\n";
+echo "D3\n";
 			$jump = $jump && makerelease($results, $r, $name, $db, $sect, $mail[1]);
 		} else if (($nzb != 0 || $nzb1 != 0) && ($r['age'] >= 3 || $files == 0))
 		{
-echo "D5\n";
+echo "D4\n";
 			makenzb($nzb, $nzb1, $nfo, $nfo1);
 			$jump = $jump && clearmatches($name, $results, -3);
 		} else if (count($results) >= $parts && $parts == 2 && $files == 2) {
@@ -1494,15 +1494,12 @@ echo "relnum is $relnum\n";
 
 			$pattern = '/(\.rar)/';
 				if (preg_match($pattern, $r['name'])  && $notyet)
-	//				echo "name to match Z: ".$r['name']."\n";
+					echo "name to match Z: ".$r['name']."\n";
 				if (!preg_match('/(part\d{1,4}?|vol\d{1,4}?\+\d{1,4}?|\.zip|\.p\d{1,4}?|\.\d{1,4}?\"?$)/iU', $r['fromname']))
 	//				domatching2($pattern, $db, $r, $oldname, "Z");
 
-			if (substr_count($r['xref'], ":") > 5) {
-			// spam if in more than five groups
-			echo "cleaning spam ".$r['ID']."\n";
-				$jump = $jump && clearmatches($r['name'], array('ID' => $r['ID'], 'binaryhash' => $r['binaryhash']), -2);
-			}
+			if (preg_match('/(Usenet Index Post)/i', $r['name']))
+				$jump = $jump && clearmatches('', array(array('ID' => $r['ID'], 'binaryhash' => $r['binaryhash'])), -3);
 
 			$oldname = $name;
 

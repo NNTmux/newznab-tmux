@@ -21,10 +21,10 @@ export NICENESS="10"
 #for example, if you set load to 2, no pane will start when your system load exceeds 2
 #this does not mean the the desired load will not be exceeded, just that no panes will be be restarted
 #this one is for all panes except update_releases
-export MAX_LOAD="3.85"
+export MAX_LOAD="4.25"
 
 #this one is for update_releases
-export MAX_LOAD_RELEASES="3.85"
+export MAX_LOAD_RELEASES="4.25"
 
 
 ############################################################
@@ -105,12 +105,12 @@ export KEEP_KILLED="false"
 #this works by setting the 2 start timers and which is run at the start of the loop is determined like this
 #if at the start of the loop, the BINARIES_SEQ_TIMER has expired, then update_binaries will run and the BINARIES_SEQ_TIMER timer is reset
 #if BINARIES_SEQ_TIMER has not expired, then if BACKFILL_SEQ_TIMER has expired, the backfill will run and BACKFILL_SEQ_TIMER timer is reset
-export SEQUENTIAL="tgrue"
+export SEQUENTIAL="true"
 
 #time between loop start for update_binaries, in seconds, this is a countdown timer, not a sleep after it runs
 #default is 30 minutes
 #will run on first loop and then not again for at least 1800 seconds
-export BINARIES_SEQ_TIMER="1800"
+export BINARIES_SEQ_TIMER="900"
 
 #this will not run on first loop, time between loop start for backfill, in seconds
 #default is 10 seconds, this will run after time has expired, binaries will take precedence and run before this, if its time has expired
@@ -162,7 +162,7 @@ export BACKFILL_MAX_RELEASES="0"
 
 #Set the max amount of binaries in the binaries table and still allow backfill to run
 #set to 0 to disable
-export BACKFILL_MAX_BINS="5000"
+export BACKFILL_MAX_BINS="0"
 
 #Set the max amount of of rows in the parts table and still allow backfill to run
 #set to 0 to disable
@@ -172,7 +172,7 @@ export BACKFILL_MAX_ROWS="0"
 #this will increment your database by 1 after each backfill loop
 #once your backfill numbers reach $MAXDAYS, then it will no long increment the database
 #backfill will continue to run, and do no work, at that point you should disable backfill, below
-export MAXDAYS="1676"
+export MAXDAYS="1700"
 
 ############################################################
 
@@ -182,19 +182,19 @@ export MAXDAYS="1676"
 #it will be skipped (target reached). When that group is done, it will do another ( again from z to a).
 #this does not use increment, it works by the date set below
 #you also need to enable kevin's compression mod, those files are needed and you still need to enable BACKFILL
-export KEVIN_SAFER="truef"
+export KEVIN_SAFER="trued"
 
 #use kevin123's backfill_parts.php instead of normal backfill
 export KEVIN_BACKFILL_PARTS="trued"
 
 #use kevin123's backfill_parts_threaded.php instead of normal
-export KEVIN_THREADED="true"
+export KEVIN_THREADED="truef"
 
 #set the date to go back to, must be in the format of YYYY-MM-DD, like 2012-06-24
 export KEVIN_DATE="2008-08-15"
 
 #set the number of articles/headers to download at one time
-export KEVIN_PARTS="100000"
+export KEVIN_PARTS="500000"
 
 ############################################################
 
@@ -243,7 +243,7 @@ export MISC_ONLY="true"
 
 #run ugo's automake.php script to create releases, this does not use regexes and will run in a loop prior
 #to update_releases.php
-export UGO_THREADED="true"
+export UGO_THREADED="truef"
 
 ############################################################
 
@@ -311,7 +311,7 @@ export PARSING_MOD="true"
 export PAST_24_HOURS="false"
 
 #How often do you want update_parsing.php to run, in seconds. this takes alot of memory and processing time, default is every 12 hrs
-export PARSING_TIMER="1800"
+export PARSING_TIMER="300"
 
 ############################################################
 
@@ -482,13 +482,13 @@ export WRITE_LOGS="truel"
 #you must have them in the user_scripts, no other location
 #This one will run before tmux creates the ui, so if you want to run something before the scripts add here
 #it is assumed that the script is a bash script and has been chmod +x
-export USER_DEF_ONE="check_svn.sh"
+export USER_DEF_ONE=""
 
 #this one will run before MyIsam Large
-export USER_DEF_TWO="check_svn.sh"
+export USER_DEF_TWO=""
 
 #this one will run after MyIsam Large
-export USER_DEF_THREE="check_svn.sh"
+export USER_DEF_THREE=""
 
 ###########################################################
 

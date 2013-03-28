@@ -252,7 +252,7 @@ else
     $TMUXCMD splitw -h -p 67 'printf "\033]2;update_binaries\033\\"'
 
     $TMUXCMD selectp -t 0
-    $TMUXCMD splitw -v -p 40 'printf "\033]2;nzbcount\033\\"'
+    $TMUXCMD splitw -v -p 30 'printf "\033]2;nzbcount\033\\"'
 
     $TMUXCMD selectp -t 2
     $TMUXCMD splitw -v -p 75 'printf "\033]2;backfill\033\\"'
