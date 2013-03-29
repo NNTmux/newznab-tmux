@@ -718,7 +718,7 @@ global $db;
 
 	$time = microtime(true) - $time;
 
-	if ($time > .5)
+	if ($time > .75)
 		trigger_error("\ntime = $time \tmatches = ".count($matches)."\nquery = ".$query."\n");
 
 	echo count($matches)." ".$query."\n";

@@ -1,5 +1,5 @@
 <?php
-require_once("config.php");
+require(dirname(__FILE__)."/../../../../../www/config.php");
 require_once(WWW_DIR."/lib/framework/db.php");
 require_once(WWW_DIR."/lib/releases.php");
 require_once(WWW_DIR."/lib/movie.php");
@@ -901,6 +901,8 @@ function doarray($matches)
 				$r[1000] = $m;
 			} else if (preg_match('/avi|xvid|divx|mkv/i', $m)) {
 				$r[1001] = $m;
+			} else if (preg_match('/\.(?:rar|001)/i', $m)) {
+				$r[1002] = $m;
 			} else {
 				$r[] = $m;
 			}
@@ -1255,12 +1257,18 @@ function matchaudiobook ($nfo, $id, $oldname, $row)
 
 function matchmusic($nfo, $row)
 {
-	$artist = $album = '';
+	$artist = $album = $title = '';
 
 	$artist = preg_split('/(?:a\s?r\s?t\s?i\s?s\s?t\b)+? *?(?!(?:[^ \.\:\}\]\*] ?){2,}?\b)(?:[\*\?\-\=\|\;\:\.\[\}\]\( \xb0-\x{3000}]+?)[ \.\>\:]([a-z0-9]?(?!:).+?(?<!\s\s))/Uuim',  $nfo, 0, PREG_SPLIT_DELIM_CAPTURE);
 //	$title = preg_split('/(?:title\b|album\b|release\b)(?![ \.]*(?:notes|\d+\:\d+|size|info|date|time|information|no|number))(?:[\|\;\:\.\[\}\]\(\s\xb0-\x{3000}]+?)(\b.+?$)/Uuim',  $nfo, 0, PREG_SPLIT_DELIM_CAPTURE);
 	$title = preg_split('/(?:t\s?i\s?t\s?l\s?e\b|a\s?l\s?b\s?u\s?m\b)+? *?(?!(?:[^ \.\:\}\]\*] ?){2,}?\b)(?:[\*\?\-\=\|\;\:\.\[\}\]\( \xb0-\x{3000}]+?)[ \.\>\:]([a-z0-9]?(?!:).+?(?<!\s\s))/Uuim',  $nfo, 0, PREG_SPLIT_DELIM_CAPTURE);
 
+	if (!isset($title[1]))
+		if(preg_match('/presents[\W\. \xb0-\x{3000}]+? ([^\-]+?) \- (\w+?)/iuUm', $nfo, $matches))
+		{
+			$artist[1] = $matches[1];
+			$title[1] = $matches[2];
+		}
 
 //	var_dump($artist);
 //	var_dump($title);
@@ -1327,7 +1335,8 @@ echo "3artist = $artist album = $album\n";
 	$album = stripname($album);
 	$artist = stripname($artist);
 
-
+if (is_array($artist))
+	var_dump($artist);
 
 	$tmp = explode(",", $artist);
 
@@ -1722,7 +1731,7 @@ echo "doing updates";
 		elseif (preg_match('/mov/i', $row['gname']))
 			$ok = dodbupdate($row['ID'], 2000, $thename);
 		else
-			$ok = dodbupdate($row['ID'], 5050, $thename);
+			$ok = dodbupdate($row['ID'], 2020, $thename);
 	}
 
 	return $ok;
@@ -1771,14 +1780,15 @@ echo "got matches\n";
 while ($row =  $db->getAssocArray($res))
 {
 	$nfo = utf8_decode($row['nfo']);
+
 	if (strlen($nfo) > 0)
 	{
 //		trigger_error("doing nfo ".$row['ID']." ".$row['name']);
 
-		$pattern = '/(imdb)\.[a-z0-9\.\_\-\/]+?(tt|\?)(\d+?)\/?|(tvrage)|(\bASIN)|(isbn)|(UPC\b)|(comic book)|(comix)|(tv series)|(\bos\b)|(documentaries)|(documentary)|(doku)|(macintosh)|(dmg)|(mac[ _\.\-]??os[ _\.\-]??x??)|(\bos\b\s??x??)|(\bosx\b)';
+		$pattern = '/.+(\.rar|\.001) [0-9a-f]{6,10}?|(imdb)\.[a-z0-9\.\_\-\/]+?(tt|\?)(\d+?)\/?|(tvrage)|(\bASIN)|(isbn)|(UPC\b)|(comic book)|(comix)|(tv series)|(\bos\b)|(documentaries)|(documentary)|(doku)|(macintosh)|(dmg)|(mac[ _\.\-]??os[ _\.\-]??x??)|(\bos\b\s??x??)|(\bosx\b)';
 		$pattern = $pattern . '|(\bios\b)|(iphone)|(ipad)|(ipod)|(pdtv)|(hdtv)|(video streams)|(movie)|(audiobook)|(audible)|(recorded books)|(spoken book)|(speech)|(read by)\:?|(narrator)\:?|(narrated by)';
 		$pattern = $pattern . '|(dvd)|(ntsc)|(m4v)|(mov\b)|(avi\b)|(xvid)|(divx)|(mkv)|(amazon\.)[a-z]{2,3}.*\/dp\/|(anidb.net).*aid=|(\blame\b)|(\btrack)|(t r a c k)|(music)|(44.1kHz)|type:(game)|(game) Type|(platform)|\b(win(?:dows|all|xp)\b)|(\bwin\b)';
-		$pattern = $pattern . '|(m3u)|(flac\b)|(application)|(plugin)|(\bcrack)|(install)|(setup)|(magazin)|(x264)|(itunes\.apple\.com\/)|(sports)|(deportes)|(nhl)|(nfl)|(\bnba)|(ncaa)|(album)|(epub)|(mobi)/iU';
+		$pattern = $pattern . '|(m3u)|(flac\b)|(application)|(plugin)|(\bcrack)|(install)|(setup)|(magazin)|(x264)|(itunes\.apple\.com\/)|(sports)|(deportes)|(nhl)|(nfl)|(\bnba)|(ncaa)|(album)|(epub)|(mobi)|format\W+(pdf)/iU';
 
 		$matches = preg_split($pattern, $nfo, -1, PREG_SPLIT_NO_EMPTY|PREG_SPLIT_DELIM_CAPTURE);
 
@@ -1788,7 +1798,6 @@ while ($row =  $db->getAssocArray($res))
 		{
 		//	var_dump($matches);
 		}
-
 
 		foreach($matches as $m)
 		{
@@ -1840,7 +1849,7 @@ while ($row =  $db->getAssocArray($res))
 				case "upc":
 					if ($case == 'asin' || $case == 'isbn')
 					{
-						preg_match('/(?:isbn|asin)[ \:]*? *?([a-zA-Z0-9\-\.]{8,20}?)/iU', $nfo, $set);
+						preg_match('/(?:isbn|asin)[ \:\.]*? *?([a-zA-Z0-9\-\.]{8,20}?)/iU', $nfo, $set);
 		var_dump($set);
 						if (isset($set[1]))
 						{
@@ -1880,6 +1889,17 @@ while ($row =  $db->getAssocArray($res))
 				case 'comix':
 					if (dodbupdate($row['ID'], 7030))
 						break(2);
+					break;
+				case 'epub':
+				case 'mobi':
+				case 'pdf':
+					echo "ebooks\n";
+					$name = '';
+					if (preg_match('/(?:\btitle\b)+?(?! *[^ \.\:\}\]]{2,}?\b)(?:[\|\;\:\.\[\}\]\( \xb0-\x{3000}]+?)[ \.]([a-z0-9](?!:)(?:.(?!\s\s+))+?[^\s]+?)/Uuim',  $nfo, $title))
+						$name = $title[1];
+					if (dodbupdate($row['ID'], 7020, $name))
+						break(2);
+
 					break;
 				case 'audiobook':
 				case 'audible':
@@ -1957,6 +1977,7 @@ while ($row =  $db->getAssocArray($res))
 				case 'winxp':
 				case 'plugin':
 				case 'crack':
+				case 'linux':
 					if (doOS($nfo, $row['name'], 4020, $row['ID']))
 						break(2);
 					break;
@@ -1992,9 +2013,8 @@ while ($row =  $db->getAssocArray($res))
 				case 'nba':
 				case 'ncaa':
 					if (doOS($nfo, $row['name'], 5060, $row['ID']))
-					{
 						break(2);
-					}
+
 					break;
 
 				case 'tvrage':
@@ -2021,6 +2041,8 @@ while ($row =  $db->getAssocArray($res))
 						$name = $title[1];
 					elseif (preg_match('/^(.*(19|20)\d{2}[\]\}\)]?)[ \_\.]/', $nfo, $title))
 						$name = $title[1];
+					elseif (preg_match('/www\.tvrage\.com\/(\w+?)/', $nfo, $title))
+						$name = preg_replace('/\_/', ' ', $title[1]);
 
 		echo "doing tv ".$name." ".$row['guid']."\n";
 					if ($name != '')
@@ -2046,6 +2068,16 @@ while ($row =  $db->getAssocArray($res))
 
 
 					break;
+				case '.rar':
+				case '.001':
+					preg_match('/(.+)\.(?:rar|001) [0-9a-f]{6,10}?/imU', $nfo, $matches);
+					if (isset($matches[1]))
+					{
+						dodbupdate($row['ID'], 8010, $matches[1]);
+					}
+
+					break;
+
 
 				default:
 		//echo "$case ".$row['guid']."\n";
@@ -2162,9 +2194,9 @@ while ($row =  $db->getAssocArray($res))
 			case 'mpg':
 			case 'mov':
 			case 'm4v':
-				$tmp = preg_replace("/([^\\\\]+?)\\\\(\\1)/", "\\2", $row['rname']);
-				$tmp = str_replace('/', ' ', $tmp);
-				$tmp = preg_replace("/".preg_quote($row['name'])."/", "", $tmp);
+				$tmp = str_replace('/', ' ', $row['rname']);
+				$tmp = preg_replace("/([^\\\\]+?)\\\\(\\1)/", "\\2", $tmp );
+				$tmp = preg_replace("/".preg_quote(str_replace('/', ' ', $row['name']))."/", "", $tmp);
 				$tmp = preg_replace("/\\\\/", " ", $tmp);
 				$tmp = stripname($tmp);
 

@@ -21,10 +21,21 @@ if (isset($argv[1]))
 	}
 }
 
-echo "Getting list of spam\n";
-$rel = $db->query("UPDATE `binaries` SET `procstat`=-2 WHERE `xref` REGEXP '(.+:[0-9]+ ){5,}'");
-echo "spam ".$db->getAffectedRows()."\n";
+echo "cleaning spam..... can take a few moments\n";
 
+//$db->disableAutoCommit();
+//$db->disableForeignKeyChecks();
+
+$rel = $db->query("SELECT `ID` from  `binaries` WHERE  `xref` REGEXP '(.+:[0-9]+ ){5,}' AND `procstat` = 0");
+
+foreach($rel as $r)
+{
+	$db->query("UPDATE `binaries` set `procstat` = -2 WHERE `ID` = ".$r['ID']);
+	if ($db->getLastError() != '')
+		var_dump($db->getLastError());
+}
+
+echo "spam count ".count($rel)."\n";
 
 $rel = $db->query("UPDATE `binaries` SET `procstat`=0,`procattempts`=0,`regexID`=NULL, `relpart`=0,`reltotalpart`=0,`relname`=NULL WHERE procstat = -6");
 
@@ -42,20 +53,9 @@ function get_load() {
         return $load[0];
 }
 
-//get variables from config.sh and defaults.sh
-$path = dirname(__FILE__);
-$varnames = shell_exec("cat ".$path."/../config.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
-$varnames .= shell_exec("cat ".$path."/../defaults.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
-$vardata = shell_exec("cat ".$path."/../config.sh | grep ^export | cut -d \\\" -f2 | awk '{print $1;}'");
-$vardata .= shell_exec("cat ".$path."/../defaults.sh | grep ^export | cut -d \\\" -f2 | awk '{print $1;}'");
-$varnames = explode("\n", $varnames);
-$vardata = explode("\n", $vardata);
-$array = array_combine($varnames, $vardata);
-unset($array['']);
-
-$ps = new PowerProcess(8,0,false);
+$ps = new PowerProcess(4,0,false);
 $ps->RegisterCallback('psUpdateComplete');
-$ps->maxChildren = 8;
+$ps->maxChildren = 4;
 $ps->tickCount = 10000;	// value in usecs. change this to 1000000 (one second) to reduce cpu use
 $ps->threadTimeLimit = 0;	// Disable child timeout
 
@@ -72,6 +72,17 @@ while ($ps->RunControlCode())
 	$listcount = count($theList);
 	if ($listcount)
 	{
+		//get variables from config.sh and defaults.sh
+		$path = dirname(__FILE__);
+		$varnames = shell_exec("cat ".$path."/../config.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
+		$varnames .= shell_exec("cat ".$path."/../defaults.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
+		$vardata = shell_exec("cat ".$path."/../config.sh | grep ^export | cut -d \\\" -f2 | awk '{print $1;}'");
+		$vardata .= shell_exec("cat ".$path."/../defaults.sh | grep ^export | cut -d \\\" -f2 | awk '{print $1;}'");
+		$varnames = explode("\n", $varnames);
+		$vardata = explode("\n", $vardata);
+		$array = array_combine($varnames, $vardata);
+		unset($array['']);
+
 		// We still have groups to process
 		if ( $array['MAX_LOAD_RELEASES'] >= get_load()) {
 			if ($ps->SpawnReady())
@@ -91,6 +102,10 @@ while ($ps->RunControlCode())
 	} else 	{
 		// No more groups to process
 		echo "\nNo more posts to process - Initiating shutdown\n";
+		$ps->threadTimeLimit = 200;
+		do {
+			$ps->tick();
+		} while ($ps->myThreads);
 		$ps->Shutdown();
 		echo "Shutdown complete\n";
 		$tim = microtime(true) - $time;

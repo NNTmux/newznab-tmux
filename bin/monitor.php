@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.1r753";
+$version="0.1r754";
 
 $db = new DB();
 
@@ -61,8 +61,6 @@ $_backfill_increment = "UPDATE groups set backfill_target=backfill_target+1 wher
 $mysql_command_1 = "$_mysql --defaults-file=$_conf/my.cnf -u$_DB_USER -h $_DB_HOST $_DB_NAME -e \"$_backfill_increment\"";
 $reset_bin = "UPDATE binaries SET procstat=0, procattempts=0, regexID=NULL, relpart=0, reltotalpart=0, relname=NULL;";
 $mysql_command_2 = "$_mysql --defaults-file=$_conf/my.cnf -u$_DB_USER -h $_DB_HOST $_DB_NAME -e \"$reset_bin\"";
-
-$rel = $db->query("UPDATE `binaries` SET `procstat`=0,`procattempts`=0,`regexID`=NULL, `relpart`=0,`reltotalpart`=0,`relname`=NULL WHERE procstat not in (4, 6)");
 
 //got microtime
 function microtime_float()
@@ -353,6 +351,7 @@ while( $i > 0 )
 			printf("$a..");
 			sleep(1);
 		}
+		$rel = $db->query("UPDATE `binaries` SET `procstat`=0,`procattempts`=0,`regexID`=NULL, `relpart`=0,`reltotalpart`=0,`relname`=NULL WHERE procstat not in (4, 6)");
 	}
 
 	//defrag the query cache every 15 minutes
@@ -1061,7 +1060,7 @@ while( $i > 0 )
 	if (( $array['MAX_LOAD_RELEASES'] >= get_load()) && ( $array['RELEASES'] == "true" ) && ( $array['UGO_THREADED'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		$log = writelog($panes0[5]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[5] $ds2 && cd $_ugo && $_php automake_threaded.php && cd $_bin && $_php update_releases.php 2>&1 $log && echo \" \033[1;0;33m\" && echo \"sleeping\033[38;5;\"$color\"m {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']} && $ds1 $panes0[5] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[5] $ds2 && cd $_ugo && $_php automake_threaded.php && cd $_bin && $_php update_releases.php && cd $_ugo && php misc_sorter_threaded.php 2>&1 $log && echo \" \033[1;0;33m\" && echo \"sleeping\033[38;5;\"$color\"m {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']} && $ds1 $panes0[5] $ds3' 2>&1 1> /dev/null");
 	} elseif (( $array['MAX_LOAD_RELEASES'] >= get_load()) && ( $array['RELEASES'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		$log = writelog($panes0[5]);
