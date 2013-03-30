@@ -16,6 +16,16 @@ export RUNNING="true"
 #anything between -1 and -20 require root/sudo to run
 export NICENESS="19"
 
+#these scripts can add some serious load to your system, without proper monitoring it can be
+#to much, you can set the max load that any pane will be started at
+#for example, if you set load to 2, no pane will start when your system load exceeds 2
+#this does not mean the the desired load will not be exceeded, just that no panes will be be restarted
+#this one is for all panes except update_releases
+export MAX_LOAD="2.0"
+
+#this one is for update_releases
+export MAX_LOAD_RELEASES="2.0"
+
 ############################################################
 
 #Set paths
@@ -68,7 +78,7 @@ export UNWANTED="false"
 
 #Enter the session name to be used by tmux, no spaces allowed in the name, this can be changed after scripts start
 #if you are running multiple servers, you could put your hostname here
-export TMUX_SESSION="Newznab"
+export TMUX_SESSION="Newznab-dev"
 
 #Set, in seconds - how often the monitor.php (left top pane) script should update run the queries against the database
 #the monitor script will update itself and each pane, once every 5 seconds plus the lagg time time on the loop the db is queried
@@ -120,6 +130,11 @@ export BINARIES_SLEEP="40"
 #set to 0 to disable
 export BINARIES_MAX_RELEASES="0"
 
+#Set the max amount of binaries in the binaries table and still allow update_binaries to run, this is unprocessed binaries, not the total count
+#only usefull when used with ugo's automake_threaded.php
+#set to 0 to disable
+export BINARIES_MAX_BINS="0"
+
 #Set the max amount of of rows in the parts table and still allow update_binaries to run
 #set to 0 to disable
 export BINARIES_MAX_ROWS="0"
@@ -142,6 +157,11 @@ export BACKFILL_SLEEP="40"
 #set to 0 to disable
 export BACKFILL_MAX_RELEASES="0"
 
+#Set the max amount of binaries in the binaries table and still allow backfill to run, this is unprocessed binaries, not the total count
+#only usefull when used with ugo's automake_threaded.php
+#set to 0 to disable
+export BACKFILL_MAX_BINS="0"
+
 #Set the max amount of of rows in the parts table and still allow backfill to run
 #set to 0 to disable
 export BACKFILL_MAX_ROWS="0"
@@ -162,7 +182,13 @@ export MAXDAYS="210"
 #you also need to enable kevin's compression mod, those files are needed and you still need to enable BACKFILL
 export KEVIN_SAFER="false"
 
-#set the date to go back to, must be in the format of YYYY-MM-DD, like 2012-06-24
+#use kevin123's backfill_parts.php instead of normal backfill
+export KEVIN_BACKFILL_PARTS="false"
+
+#use kevin123's backfill_parts_threaded.php instead of normal backfill_threaded
+export KEVIN_THREADED="false"
+
+#set the date to go back to, must be in the format of YYYY-MM-DD, like 2012-06-24, this is the date of the posted nzbs
 export KEVIN_DATE="2012-06-24"
 
 #set the number of articles/headers to download at one time
@@ -210,6 +236,14 @@ export IMPORT_TRUE="false"
 #MAX_RELEASES for each can be calculated on the total post processing or just the Misc category
 #to calculate on just the Misc, enable this
 export MISC_ONLY="false"
+
+############################################################
+
+#run ugo's automake.php script to create releases, this does not use regexes and will run in a loop prior
+#to update_releases.php, this can be considerably slower, but may give you release that were being missed
+#this might just overwhelm your db, so expect things to move slower, but you might get more in return
+#still a wip
+export UGO_THREADED="false"
 
 ############################################################
 
@@ -441,6 +475,20 @@ export RAMDISK_PATH=""
 
 #logs can be written, per pane, to the logs folder
 export WRITE_LOGS="false"
+
+###########################################################
+
+#user defined scripts, you can define 3 scripts to run at specific times
+#you must have them in the user_scripts, no other location
+#This one will run before tmux creates the ui, so if you want to run something before the scripts add here
+#it is assumed that the script is a bash script and has been chmod +x
+export USER_DEF_ONE=""
+
+#this one will run before MyIsam Large
+export USER_DEF_TWO=""
+
+#this one will run after MyIsam Large
+export USER_DEF_THREE=""
 
 ###########################################################
 
