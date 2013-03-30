@@ -479,8 +479,14 @@ export USER_DEF_ONE=""
 #this one will run before MyIsam Large
 export USER_DEF_TWO=""
 
-#this one will run after MyIsam Large
+#this one will run after MyIsam Large, not same process as below
 export USER_DEF_THREE=""
+
+#this one will run before InnoDB Large and MyIsam Large runs in same process, so before MyIsam Large, not same process as above
+export USER_DEF_FOUR=""
+
+#this one will run after InnoDB Large
+export USER_DEF_FIVE=""
 
 ###########################################################
 

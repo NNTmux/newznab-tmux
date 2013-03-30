@@ -467,7 +467,7 @@ export RAMDISK_PATH="/var/ramdisk"
 ###########################################################
 
 #logs can be written, per pane, to the logs folder
-export WRITE_LOGS="truel"
+export WRITE_LOGS="true"
 
 ###########################################################
 

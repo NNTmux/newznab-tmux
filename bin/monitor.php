@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.1r758";
+$version="0.1r759";
 
 $db = new DB();
 
@@ -779,13 +779,13 @@ while( $i > 0 )
 		if (( $array['MAX_LOAD'] >= get_load()) && ( TIME() - $time6 >= $array['MYISAM_LARGE'] ) && ( $array['OPTIMIZE'] == "true" ) && ( $optimize_run == "true" )) {
 			$color = get_color();
 			$log = writelog($panes1[4]);
-			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.4 'echo \"\033[38;5;\"$color\"m\" && $ds1 MYISAM_LARGE $ds2 && cd $_user && ./${array['USER_DEF_TWO']} && cd $_bin && $_php optimize_myisam.php true && cd $_user && ./${array['USER_DEF_THREE']} 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 MYISAM_LARGE $ds3' 2>&1 1> /dev/null");
+			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.4 'echo \"\033[38;5;\"$color\"m\" && $ds1 MYISAM_LARGE $ds2 && cd $_user && ./${array['USER_DEF_TWO']} 2>&1 $log && cd $_bin && $_php optimize_myisam.php true 2>&1 $log && cd $_user && ./${array['USER_DEF_THREE']} 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 MYISAM_LARGE $ds3' 2>&1 1> /dev/null");
 			echo "\033[1;41;33mOPTIMIZATION OF THE MYSQL TABLES HAS STARTED, DO NOT STOP THIS SCRIPT!\033[1;0;33m\n\n";
 			$time6 = TIME();
 		} elseif (( $array['MAX_LOAD'] >= get_load()) && ( TIME() - $time8 >= $array['INNODB_LARGE'] ) && ( $array['OPTIMIZE'] == "true" ) && ( $optimize_run == "true" )) {
 			$color = get_color();
 			$log = writelog($panes1[4]);
-			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.4 'echo \"\033[38;5;\"$color\"m\" && $ds1 INNODB_LARGE $ds2 && cd $_bin && $_php optimize_myisam.php true 2>&1 $log && $_php optimize_innodb.php true 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 INNODB_LARGE $ds3' 2>&1 1> /dev/null");
+			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.4 'echo \"\033[38;5;\"$color\"m\" && $ds1 INNODB_LARGE $ds2 && cd $_user && ./${array['USER_DEF_FOUR']} 2>&1 $log && cd $_bin && $_php optimize_myisam.php true 2>&1 $log && cd $_user && ./${array['USER_DEF_FIVE']} 2>&1 $log && $_php optimize_innodb.php true 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 INNODB_LARGE $ds3' 2>&1 1> /dev/null");
 			echo "\033[1;41;33mOPTIMIZATION OF THE MYSQL TABLES HAS STARTED, DO NOT STOP THIS SCRIPT!\033[1;0;33m\n\n";
 			$time8 = TIME();
 		} elseif (( $array['MAX_LOAD'] >= get_load()) && ( TIME() - $time5 >= $array['INNODB_SMALL'] ) && ( $array['INNODB']== "true" ) && ( $array['OPTIMIZE'] == "true" ) && ( $optimize_run == "true" )) {
@@ -864,9 +864,9 @@ while( $i > 0 )
 
 	//set command for nzb-import
 	if (( $array['NZB_THREADS'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
-		$nzb_cmd = "$_php nzb-import-sub.php \"{$array['NZBS']}\"";
+		$nzb_cmd = "$_php nzb-import-sub.php \"{$array['NZBS']}\" 2>&1 $log";
 	} else {
-		$nzb_cmd = "$_php nzb-import.php \"{$array['NZBS']}\" \"{$array['IMPORT_TRUE']}\"";
+		$nzb_cmd = "$_php nzb-import.php \"{$array['NZBS']}\" \"{$array['IMPORT_TRUE']}\" 2>&1 $log";
 	}
 
 	//check if sequential is set
@@ -894,7 +894,7 @@ while( $i > 0 )
 		if (( $array['MAX_LOAD'] >= get_load()) && ( $killed != "true" ) && ( $array['BACKFILL'] == "true" ) && (( $binaries_rows_unformatted < $array['BACKFILL_MAX_BINS'] ) || ( $array['BACKFILL_MAX_BINS'] == 0 )) && (( $total_work_used < $array['BACKFILL_MAX_RELEASES'] ) || ( $array['BACKFILL_MAX_RELEASES'] == 0 )) && (( $parts_rows_unformatted < $array['BACKFILL_MAX_ROWS'] ) || ( $array['BACKFILL_MAX_ROWS'] == 0 )) && ( $optimize_safe_to_run != "true" )) {
 			$color = get_color();
 			$log = writelog($panes0[3]);
-			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.3 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[3] $ds2 && $_backfill_cmd 2>&1 $log && echo \" \033[1;0;33m\" && echo \"sleeping\033[38;5;\"$color\"m {$array['BACKFILL_SLEEP']} seconds...\" && sleep {$array['BACKFILL_SLEEP']} && $ds1 $panes0[3] $ds3' 2>&1 1> /dev/null");
+			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.3 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[3] $ds2 && $_backfill_cmd && echo \" \033[1;0;33m\" && echo \"sleeping\033[38;5;\"$color\"m {$array['BACKFILL_SLEEP']} seconds...\" && sleep {$array['BACKFILL_SLEEP']} && $ds1 $panes0[3] $ds3' 2>&1 1> /dev/null");
 		} elseif (( $parts_rows_unformatted > $array['BACKFILL_MAX_ROWS'] ) && ( $array['BACKFILL'] == "true" ) && ( $array['BACKFILL_MAX_ROWS'] != 0 ) && ( $optimize_safe_to_run != "true" )) {
 			$color = get_color();
 			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.3 'echo \"\033[38;5;\"$color\"m\nBACKFILL_MAX_ROWS exceeded\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
@@ -985,7 +985,7 @@ while( $i > 0 )
 	if (( $array['MAX_LOAD'] >= get_load()) && ( $killed != "true" ) && ( $array['IMPORT'] == "true" ) && (( $total_work_used < $array['IMPORT_MAX_RELEASES'] ) || ( $array['IMPORT_MAX_RELEASES'] == 0 )) && (( $parts_rows_unformatted < $array['IMPORT_MAX_ROWS'] ) || ( $array['IMPORT_MAX_ROWS'] == 0 )) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		$log = writelog($panes0[4]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.4 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[4] $ds2 && cd $_bin && $nzb_cmd 2>&1 $log && echo \" \" && echo \" \033[1;0;33m\" && echo \"sleeping\033[38;5;\"$color\"m {$array['IMPORT_SLEEP']} seconds...\" && sleep {$array['IMPORT_SLEEP']} && $ds1 $panes0[4] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.4 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[4] $ds2 && cd $_bin && $nzb_cmd && echo \" \" && echo \" \033[1;0;33m\" && echo \"sleeping\033[38;5;\"$color\"m {$array['IMPORT_SLEEP']} seconds...\" && sleep {$array['IMPORT_SLEEP']} && $ds1 $panes0[4] $ds3' 2>&1 1> /dev/null");
 		$color = get_color();
 		$log = writelog($panes0[1]);
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.1 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[1] $ds2 && cd $_bin && $_php nzbcount.php 2>&1 $log' 2>&1 1> /dev/null");
@@ -1064,7 +1064,7 @@ while( $i > 0 )
 	} elseif (( $array['MAX_LOAD_RELEASES'] >= get_load()) && ( $array['RELEASES'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		$log = writelog($panes0[5]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[5] $ds2 && $mysql_command_2 && cd $_bin && $_php update_releases.php && $mysql_command_2 2>&1 $log && echo \" \033[1;0;33m\" && echo \"sleeping\033[38;5;\"$color\"m {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']} && $ds1 $panes0[5] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[5] $ds2 && $mysql_command_2 2>&1 $log && cd $_bin && $_php update_releases.php 2>&1 $log && $mysql_command_2 2>&1 $log && echo \" \033[1;0;33m\" && echo \"sleeping\033[38;5;\"$color\"m {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']} && $ds1 $panes0[5] $ds3' 2>&1 1> /dev/null");
 	} elseif (( $array['RELEASES'] != "true" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.5 'echo \"\033[38;5;\"$color\"m\n$panes0[5] Disabled by RELEASES\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
