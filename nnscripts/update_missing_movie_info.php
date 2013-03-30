@@ -4,52 +4,50 @@
  * 
  * Releases may be added/eddited with an imdb-id that does not exists
  * in the movieinfo table. This script will fetch all the missing imdb
- * id's from the releases table.
- * 
- * The location of the script needs to be "misc/custom" or the
- * "misc/testing" directory. if used from another location,
- * change lines 32 to 35 to require the correct files.
+ * id's from the releases table and updates the movie info.
  *
  * @author    NN Scripts
  * @license   http://opensource.org/licenses/MIT MIT License
  * @copyright (c) 2013 - NN Scripts
  *
  * Changelog:
- * 0.1  - Initial version
+ * 0.2 - Added settings.ini
+ *       Start using nnscript library
+ * 
+ * 0.1 - Initial version
  */
-
-//----------------------------------------------------------------------
-// Settings
-
-// Display settings
-define('DISPLAY', true);
-
-// Should the move info be updated?
-define('UPDATE', true);
-//----------------------------------------------------------------------
-
 // Load the application
-require(dirname(__FILE__)."/../bin/config.php");
-require_once(WWW_DIR."/lib/framework/db.php");
-require_once(WWW_DIR."lib/movie.php");
-require_once('nnscripts.php');
+require_once(dirname(__FILE__)."/../bin/config.php");
+
+// nnscripts includes
+require_once("lib/nnscripts.php");
+
+// newznab includes
+require_once(WWW_DIR."/lib/movie.php"); 
+
 
 /**
- * Update missing movie information
+ * Update missing movie info
  */
-class movieInfo
+class update_missing_movie_info extends NNScripts
 {
     /**
-     * NNScripts class
-     * @var NNScripts
+     * The script name
+     * @var string
      */
-    private $nnscripts;    
+    protected $scriptName = 'Update missing movie information';
     
     /**
-     * The database object
-     * @var DB
+     * The script version
+     * @var string
      */
-    private $db;
+    protected $scriptVersion = '0.2';
+    
+    /**
+     * Allowed settings
+     * @var array
+     */
+    protected $allowedSettings = array('display');
     
     /**
      * The movie object
@@ -57,25 +55,27 @@ class movieInfo
      */
     private $movie;
     
-
+    
+    
     /**
-     * Constructor
-     * 
-     * @param NNScripts $nnscripts
-     * @param DB $db
-     * @param Movie $movie
+     * The constructor
+     *
      */
-    public function __construct( NNScripts $nnscripts, DB $db, Movie $movie )
+    public function __construct()
     {
-        // Set the NNScripts variable
-        $this->nnscripts = $nnscripts;
+        // Call the parent constructor
+        parent::__construct();
         
-        // Set the database variable
-        $this->db = $db;
+        // Set the commandline options
+        $options = array();
+        $this->setCliOptions( $options, array('display', 'help') );
+        
+        // Show the header
+        $this->displayHeader();
         
         // Set the movie variable
-        $this->movie = $movie;
-    }
+        $this->movie = new Movie();
+    } 
     
     
     /**
@@ -105,53 +105,31 @@ class movieInfo
                     $name = sprintf("%s (%s)", str_replace(array('.', '_'), ' ', trim($matches[1])), $matches[2]);
                 }
 
-                $this->nnscripts->display( sprintf( "Updating: %s ", $name ) );
-                if( defined('UPDATE') && true === UPDATE )
-                {
-                    // Update the movie info
-                    $this->movie->updateMovieInfo( $row['imdbID'] );
+                $this->display( sprintf( "Updating: %s ", $name ) );
+
+                // Update the movie info
+                $this->movie->updateMovieInfo( $row['imdbID'] );
                         
-                    // Prevent overloading the remote servers
-                    sleep(2);
-                }
-                $this->nnscripts->display( PHP_EOL );
+                // Prevent overloading the remote servers
+                sleep(2);
+                
+                $this->display( PHP_EOL );
             }
         }
         else
         {
-            $this->nnscripts->display( 'No missing movie information found'. PHP_EOL );
+            $this->display( 'No missing movie information found'. PHP_EOL );
         }
-        
-        $this->nnscripts->display( PHP_EOL );
-    }
+    } 
 }
 
+
+// Main application
 try
 {
-    // Init
-    $scriptName    = 'Update missing movie information';
-    $scriptVersion = '0.1';
-    
-    // Load the NNscript class
-    $nnscripts = new NNScripts( $scriptName, $scriptVersion );
-    
-    // Display the header
-    $nnscripts->displayHeader();
-    
-    // Load the application part
-    $movie = new Movie;
-    if( !$movie )
-        throw new Exception("Error loading movie library");
-    
-    $db = new DB;
-    if( !$db )
-        throw new Exception("Error loading database library");
-        
-    // Load the blacklistReleases class
-    $mi = new movieInfo( $nnscripts, $db, $movie );
-    $mi->update();
-    
+    // Update missing movie information
+    $ummi = new update_missing_movie_info();
+    $ummi->update();
 } catch( Exception $e ) {
     echo $e->getMessage() . PHP_EOL;
 }
-
