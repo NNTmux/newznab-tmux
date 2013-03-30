@@ -239,6 +239,15 @@ export MISC_ONLY="false"
 
 ############################################################
 
+#run ugo's automake.php script to create releases, this does not use regexes and will run in a loop prior
+#to update_releases.php, this can be considerably slower, but may give you release that were being missed
+#this might just overwhelm your db, so expect things to move slower, but you might get more in return
+#this will deactivate all regexes, to reactive the regexes, run scripts/reactivate_regexes.sh
+#still a wip
+export UGO_THREADED="false"
+
+############################################################
+
 #Create releases, this is really only necessary to turn off when you only want to post process
 export RELEASES="false"
 
@@ -298,6 +307,9 @@ export PARSING="false"
 #choose to use kevin123's update_parsing script
 #this also includes kevin123's categorymod.php, you must run either update_svn.sh or fix_files.sh to copy the file into place
 export PARSING_MOD="false"
+
+#choose to use ugo's misc_sorter3.php script also, this will run before update_parsing, in the same loop
+export MISC_SORTER="false"
 
 #run update_parsing.php against the whole db or just the last 24 hours
 export PAST_24_HOURS="true"

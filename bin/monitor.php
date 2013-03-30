@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.1r760";
+$version="0.1r761";
 
 $db = new DB();
 
@@ -49,6 +49,7 @@ $_alienx = dirname(__FILE__)."/../alienx";
 $_conf = dirname(__FILE__)."/../conf";
 $_powerline = dirname(__FILE__)."/../powerline";
 $_cj = dirname(__FILE__)."/../nnscripts";
+$_ugo = dirname(__FILE__)."/../ugo";
 $_user = dirname(__FILE__)."/../user_scripts";
 $NNPATH="{$array['NEWZPATH']}{$array['NEWZNAB_PATH']}";
 $TESTING="{$array['NEWZPATH']}{$array['TESTING_PATH']}";
@@ -61,6 +62,14 @@ $_backfill_increment = "UPDATE groups set backfill_target=backfill_target+1 wher
 $mysql_command_1 = "$_mysql --defaults-file=$_conf/my.cnf -u$_DB_USER -h $_DB_HOST $_DB_NAME -e \"$_backfill_increment\"";
 $reset_bin = "UPDATE binaries SET procstat=0, procattempts=0, regexID=NULL, relpart=0, reltotalpart=0, relname=NULL;";
 $mysql_command_2 = "$_mysql --defaults-file=$_conf/my.cnf -u$_DB_USER -h $_DB_HOST $_DB_NAME -e \"$reset_bin\"";
+$_active_regex = "select ID from releaseregex where status=1;";
+$mysql_command_3 = "$_mysql --defaults-file=$_conf/my.cnf -u$_DB_USER -h $_DB_HOST $_DB_NAME -e \"$_active_regex\" >> ../conf/active_regexes.txt";
+$_disable_regex = "update releaseregex set status=0 where status=1;";
+$mysql_command_4 = "$_mysql --defaults-file=$_conf/my.cnf -u$_DB_USER -h $_DB_HOST $_DB_NAME -e \"$_disable_regex\"";
+
+if ( $array['UGO_THREADED'] == "true" ) {
+	shell_exec("$mysql_command_3 && $mysql_command_4");
+}
 
 //got microtime
 function microtime_float()
@@ -159,6 +168,7 @@ $time17 = TIME();
 $time18 = TIME();
 $time19 = TIME();
 $time20 = TIME();
+$time21 = TIME();
 
 if ( $array['INNODB'] == "true" ) {
 	$time5 = TIME();
@@ -351,7 +361,6 @@ while( $i > 0 )
 			printf("$a..");
 			sleep(1);
 		}
-		$rel = $db->query("UPDATE `binaries` SET `procstat`=0,`procattempts`=0,`regexID`=NULL, `relpart`=0,`reltotalpart`=0,`relname`=NULL WHERE procstat not in (4, 6)");
 	}
 
 	//defrag the query cache every 15 minutes
@@ -542,6 +551,14 @@ while( $i > 0 )
 	$panes3 = str_replace("\n", '', explode(" ", $panes_win_4));
 	$panes4 = str_replace("\n", '', explode(" ", $panes_win_5));
 	$panes5 = str_replace("\n", '', explode(" ", $panes_win_6));
+
+        //reset binaries every 2 hours
+        if ((( TIME() - $time21 >= 7200 ) || ( $i == 1 )) && ($array['UGO_THREADED'] == "true" ))
+        {
+                $color = get_color();
+                $rel = $db->query("UPDATE `binaries` SET `procstat`=0,`procattempts`=0,`regexID`=NULL, `relpart`=0,`reltotalpart`=0,`relname`=NULL WHERE procstat not in (4, 6)");
+                shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.5 'echo \"\033[38;5;\"$color\"m\n$panes0[5]\nKilled in to reset binaries\" && date +\"%D %T\" && echo \"This is color #$color\" && $ds1 $panes0[5] $ds4'");
+        }
 
 	//kill update_binaries.php backfill.php and import-nzb if timer exceeded
 	$killit=explode(" ", relativeTime("$newestdate"));
@@ -1057,10 +1074,10 @@ while( $i > 0 )
 	}
 
 	//runs update_release and in 0.5 once if needed and exits
-	if (( $array['MAX_LOAD_RELEASES'] >= get_load()) && ( $array['RELEASES'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
+	if (( $array['MAX_LOAD_RELEASES'] >= get_load()) && ( $array['RELEASES'] == "true" ) && ( $array['UGO_THREADED'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		$log = writelog($panes0[5]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[5] $ds2 && cd $_bin && $_php update_releases.php && 2>&1 $log && echo \" \033[1;0;33m\" && echo \"sleeping\033[38;5;\"$color\"m {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']} && $ds1 $panes0[5] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[5] $ds2 && cd $_ugo && $_php automake_threaded.php 2>&1 $log && cd $_bin && $_php update_releases.php 2>&1 $log && echo \" \033[1;0;33m\" && echo \"sleeping\033[38;5;\"$color\"m {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']} && $ds1 $panes0[5] $ds3' 2>&1 1> /dev/null");
 	} elseif (( $array['MAX_LOAD_RELEASES'] >= get_load()) && ( $array['RELEASES'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		$log = writelog($panes0[5]);
@@ -1092,12 +1109,22 @@ while( $i > 0 )
 	}
 
 	//run $_php update_parsing.php in 1.1
-	if (( $array['MAX_LOAD'] >= get_load()) && (( TIME() - $time3 ) >= $array['PARSING_TIMER'] ) && ($array['PARSING_MOD'] != "true" ) && ($array['PARSING'] == "true" )  && ( $optimize_safe_to_run != "true" )) {
+	if (( $array['MAX_LOAD'] >= get_load()) && (( TIME() - $time3 ) >= $array['PARSING_TIMER'] ) && ($array['PARSING_MOD'] != "true" ) && ($array['PARSING'] == "true" ) && ($array['MISC_SORTER'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
+                $color = get_color();
+                $log = writelog($panes1[1]);
+                shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.1 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes1[1] $ds2 && cd $_ugo && $_php misc_sorter_threaded.php 2>&1 $log && cd $TESTING && $_php update_parsing.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes1[1] $ds3' 2>&1 1> /dev/null");
+                $time3 = TIME();
+        } elseif (( $array['MAX_LOAD'] >= get_load()) && (( TIME() - $time3 ) >= $array['PARSING_TIMER'] ) && ($array['PARSING_MOD'] != "true" ) && ($array['PARSING'] == "true" ) && ($array['MISC_SORTER'] != "true" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		$log = writelog($panes1[1]);
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.1 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes1[1] $ds2 && cd $TESTING && $_php update_parsing.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes1[1] $ds3' 2>&1 1> /dev/null");
 		$time3 = TIME();
-	} elseif (( $array['MAX_LOAD'] >= get_load()) && (( TIME() - $time3 ) >= $array['PARSING_TIMER'] ) && ( $array['PARSING_MOD'] == "true" ) && ( $array['PARSING'] == "true" )  && ( $optimize_safe_to_run != "true" )) {
+	} elseif (( $array['MAX_LOAD'] >= get_load()) && (( TIME() - $time3 ) >= $array['PARSING_TIMER'] ) && ( $array['PARSING_MOD'] == "true" ) && ( $array['PARSING'] == "true" ) && ($array['MISC_SORTER'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
+                $color = get_color();
+                $log = writelog($panes1[1]);
+                shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.1 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes1[1] $ds2 && cd $_ugo && $_php misc_sorter_threaded.php 2>&1 $log && cd $_bin && $_php update_parsing.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes1[1] $ds3' 2>&1 1> /dev/null");
+                $time3 = TIME();
+        } elseif (( $array['MAX_LOAD'] >= get_load()) && (( TIME() - $time3 ) >= $array['PARSING_TIMER'] ) && ( $array['PARSING_MOD'] == "true" ) && ( $array['PARSING'] == "true" ) && ($array['MISC_SORTER'] != "true" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		$log = writelog($panes1[1]);
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.1 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes1[1] $ds2 && cd $_bin && $_php update_parsing.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes1[1] $ds3' 2>&1 1> /dev/null");
