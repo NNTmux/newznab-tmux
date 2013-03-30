@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.1r755";
+$version="0.1r757";
 
 $db = new DB();
 
@@ -49,7 +49,6 @@ $_alienx = dirname(__FILE__)."/../alienx";
 $_conf = dirname(__FILE__)."/../conf";
 $_powerline = dirname(__FILE__)."/../powerline";
 $_cj = dirname(__FILE__)."/../nnscripts";
-$_ugo = dirname(__FILE__)."/../ugo";
 $_user = dirname(__FILE__)."/../user_scripts";
 $NNPATH="{$array['NEWZPATH']}{$array['NEWZNAB_PATH']}";
 $TESTING="{$array['NEWZPATH']}{$array['TESTING_PATH']}";
@@ -1058,10 +1057,10 @@ while( $i > 0 )
 	}
 
 	//runs update_release and in 0.5 once if needed and exits
-	if (( $array['MAX_LOAD_RELEASES'] >= get_load()) && ( $array['RELEASES'] == "true" ) && ( $array['UGO_THREADED'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
+	if (( $array['MAX_LOAD_RELEASES'] >= get_load()) && ( $array['RELEASES'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		$log = writelog($panes0[5]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[5] $ds2 && cd $_ugo && $_php automake_threaded.php && cd $_bin && $_php update_releases.php && cd $_ugo && php misc_sorter_threaded.php 2>&1 $log && echo \" \033[1;0;33m\" && echo \"sleeping\033[38;5;\"$color\"m {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']} && $ds1 $panes0[5] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[5] $ds2 && cd $_bin && $_php update_releases.php && 2>&1 $log && echo \" \033[1;0;33m\" && echo \"sleeping\033[38;5;\"$color\"m {$array['RELEASES_SLEEP']} seconds...\" && sleep {$array['RELEASES_SLEEP']} && $ds1 $panes0[5] $ds3' 2>&1 1> /dev/null");
 	} elseif (( $array['MAX_LOAD_RELEASES'] >= get_load()) && ( $array['RELEASES'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		$log = writelog($panes0[5]);
