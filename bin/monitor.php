@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.1r761";
+$version="0.1r762";
 
 $db = new DB();
 
@@ -558,6 +558,7 @@ while( $i > 0 )
                 $color = get_color();
                 $rel = $db->query("UPDATE `binaries` SET `procstat`=0,`procattempts`=0,`regexID`=NULL, `relpart`=0,`reltotalpart`=0,`relname`=NULL WHERE procstat not in (4, 6)");
                 shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.5 'echo \"\033[38;5;\"$color\"m\n$panes0[5]\nKilled in to reset binaries\" && date +\"%D %T\" && echo \"This is color #$color\" && $ds1 $panes0[5] $ds4'");
+		$time21 = TIME();
         }
 
 	//kill update_binaries.php backfill.php and import-nzb if timer exceeded
