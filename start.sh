@@ -365,7 +365,7 @@ else
     fi
 
     if [[ $USE_VNSTAT == "true" ]]; then
-        $TMUXCMD new-window -n vnstat 'watch $VNSTAT'
+        $TMUXCMD new-window -n vnstat 'watch $VNSTAT $VNSTAT_ARGS'
     fi
 
     if [[ $USE_IFTOP == "true" ]]; then

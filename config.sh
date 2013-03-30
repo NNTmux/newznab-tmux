@@ -384,10 +384,13 @@ export FIX_POSIX="false"
 export USE_HTOP="false"
 export USE_BWMNG="false"
 export USE_MYTOP="false"
-export USE_VNSTAT="false"
 export USE_ATOP="false"
 export USE_NMON="false"
 export USE_IOTOP="false"
+
+#define vnstat user settings to apply at runtim
+export USE_VNSTAT="false"
+export VNSTAT_ARGS=""
 
 #freebsd does not have iotop, but can run top -m io -o total
 export USE_TOP="false"
