@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.1r762";
+$version="0.1r763";
 
 $db = new DB();
 
@@ -63,12 +63,13 @@ $mysql_command_1 = "$_mysql --defaults-file=$_conf/my.cnf -u$_DB_USER -h $_DB_HO
 $reset_bin = "UPDATE binaries SET procstat=0, procattempts=0, regexID=NULL, relpart=0, reltotalpart=0, relname=NULL;";
 $mysql_command_2 = "$_mysql --defaults-file=$_conf/my.cnf -u$_DB_USER -h $_DB_HOST $_DB_NAME -e \"$reset_bin\"";
 $_active_regex = "select ID from releaseregex where status=1;";
-$mysql_command_3 = "$_mysql --defaults-file=$_conf/my.cnf -u$_DB_USER -h $_DB_HOST $_DB_NAME -e \"$_active_regex\" >> ../conf/active_regexes.txt";
+$mysql_command_3 = "cd $_conf && $_mysql --defaults-file=$_conf/my.cnf -u$_DB_USER -h $_DB_HOST $_DB_NAME -e \"$_active_regex\" >> active_regexes.txt";
 $_disable_regex = "update releaseregex set status=0 where status=1;";
 $mysql_command_4 = "$_mysql --defaults-file=$_conf/my.cnf -u$_DB_USER -h $_DB_HOST $_DB_NAME -e \"$_disable_regex\"";
 
 if ( $array['UGO_THREADED'] == "true" ) {
 	shell_exec("$mysql_command_3 && $mysql_command_4");
+	shell_exec("cd $_conf && $_sed -i -e 's/ID/ /g' active_regexes.txt")
 }
 
 //got microtime

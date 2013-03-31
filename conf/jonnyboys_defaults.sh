@@ -242,7 +242,7 @@ export MISC_ONLY="true"
 
 #run ugo's automake.php script to create releases, this does not use regexes and will run in a loop prior
 #to update_releases.php
-export UGO_THREADED="true"
+export UGO_THREADED="truef"
 
 ############################################################
 
@@ -280,7 +280,7 @@ export INNODB_LARGE="172800"
 
 #Choose your database engine, comment the one true/false
 #you should have already converted your database to InnoDB engine, if you select true here
-export INNODB="false"
+export INNODB="true"
 
 ############################################################
 
@@ -393,7 +393,7 @@ export FIX_POSIX="false"
 #these are set to false by default, enable if you want them
 export USE_HTOP="false"
 export USE_BWMNG="false"
-export USE_MYTOP="false"
+export USE_MYTOP="true"
 export USE_VNSTAT="false"
 export USE_ATOP="false"
 export USE_NMON="false"
