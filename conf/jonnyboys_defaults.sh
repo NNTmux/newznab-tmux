@@ -78,7 +78,7 @@ export UNWANTED="true"
 
 #Enter the session name to be used by tmux, no spaces allowed in the name, this can be changed after scripts start
 #if you are running multiple servers, you could put your hostname here
-export TMUX_SESSION="Newznab"
+export TMUX_SESSION="Newznab-dev"
 
 #Set, in seconds - how often the monitor.php (left top pane) script should update run the queries against the database
 #the monitor script will update itself and each pane, once every 5 seconds plus the lagg time time on the loop the db is queried
@@ -124,7 +124,7 @@ export BINARIES_THREADS="true"
 #Set, in seconds - how long the update_binaries should sleep between runs
 #top right pane
 #sleep timers are not used when using SEQ
-export BINARIES_SLEEP="5"
+export BINARIES_SLEEP="15"
 
 #Set the max amount of unprocessed releases and still allow update_binaries to run
 #set to 0 to disable
@@ -151,7 +151,7 @@ export BACKFILL_THREADS="true"
 #Set, in seconds - how long the backfill should sleep between runs
 #in pane below update_binaries
 #sleep timers are not used when using SEQ
-export BACKFILL_SLEEP="5"
+export BACKFILL_SLEEP="15"
 
 #Set the max amount of unprocessed releases and still allow backfill to run
 #set to 0 to disable
@@ -198,7 +198,7 @@ export KEVIN_PARTS="100000"
 
 #Set the path to the nzb dump you downloaded from torrents, this is the path to bulk files folder of nzbs
 #this does not recurse through subfolders, unless you set NZB_THREADS to true
-export NZBS="/nfs/BooksEbook"
+export NZBS="/nfs/crap2"
 
 #Choose to run import nzb script true/false
 export IMPORT="true"
@@ -208,17 +208,17 @@ export IMPORT="true"
 #and 10 nzbs will be imported from each subfolder per loop.
 #Importing this way, allows all post processing scripts to run, such as book, music, movies
 #Instead of doing all 1 type at once, spread the load
-export NZB_THREADS="truef"
+export NZB_THREADS="true"
 
 #Set max number of folders to process per loop. This includes empty folders.
 export NZB_FOLDER_COUNT="50"
 
 #How many nzbs to import per loop, if using NZB_THREADS=true the per folder
-export NZBCOUNT="1000"
+export NZBCOUNT="20"
 
 #Set, in seconds - how long the nzb-import should sleep between runs
 #below backfill
-export IMPORT_SLEEP="15"
+export IMPORT_SLEEP="5"
 
 #Set the max amount of unprocessed releases and still allow nzb-import to run
 #set to 0 to disable
@@ -336,7 +336,7 @@ export TVRAGE_TIMER="43200"
 
 #Choose to run sphinx.php script true/false
 #set to false by default, you should test the script first, php sphinx.php from the bin folder
-export SPHINX="true"
+export SPHINX="false"
 
 #How often to run sphinx in seconds
 export SPHINX_TIMER="3600"
@@ -464,7 +464,7 @@ export WWW_USER="jonnyboy:www-data"
 
 #if you have a ramdisk and would like to monitor it's use, set path here
 #this is not the same as RAMDISK above, I keep my parts table on a ramdisk
-export RAMDISK_PATH="/"
+export RAMDISK_PATH="/var/ramdisk"
 
 ###########################################################
 
