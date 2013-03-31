@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.1r763";
+$version="0.1r764";
 
 $db = new DB();
 
@@ -69,7 +69,7 @@ $mysql_command_4 = "$_mysql --defaults-file=$_conf/my.cnf -u$_DB_USER -h $_DB_HO
 
 if ( $array['UGO_THREADED'] == "true" ) {
 	shell_exec("$mysql_command_3 && $mysql_command_4");
-	shell_exec("cd $_conf && $_sed -i -e 's/ID/ /g' active_regexes.txt")
+	shell_exec("cd $_conf && $_sed -i -e 's/ID/ /g' active_regexes.txt");
 }
 
 //got microtime
