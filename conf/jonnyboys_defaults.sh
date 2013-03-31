@@ -14,14 +14,14 @@ export RUNNING="true"
 
 #these scripts set the 'nice'ness of each script, default is 19, the lowest, the highest is -20
 #anything between -1 and -20 require root/sudo to run
-export NICENESS="10"
+export NICENESS="1"
 
 #these scripts can add some serious load to your system, without proper monitoring it can be
 #to much, you can set the max load that any pane will be started at
 #for example, if you set load to 2, no pane will start when your system load exceeds 2
 #this does not mean the the desired load will not be exceeded, just that no panes will be be restarted
 #this one is for all panes except update_releases
-export MAX_LOAD="10.0"
+export MAX_LOAD="6.0"
 
 #this one is for update_releases
 export MAX_LOAD_RELEASES="6.0"
@@ -45,7 +45,7 @@ export ADMIN_PATH=$NEWZPATH"/www/admin"
 #trial and error for this, set to 1 will run > 0, set to 2 will run > 200, 3 will run > 300 and so on.
 #At some point, increasing this begins to slow things down. It will need to be adjusted for your system
 #to get the desired performance, 0 will disable all post processing
-export POST_TO_RUN="10"
+export POST_TO_RUN="16"
 
 ############################################################
 
@@ -101,7 +101,7 @@ export KEEP_KILLED="false"
 #this works by setting the 2 start timers and which is run at the start of the loop is determined like this
 #if at the start of the loop, the BINARIES_SEQ_TIMER has expired, then update_binaries will run and the BINARIES_SEQ_TIMER timer is reset
 #if BINARIES_SEQ_TIMER has not expired, then if BACKFILL_SEQ_TIMER has expired, the backfill will run and BACKFILL_SEQ_TIMER timer is reset
-export SEQUENTIAL="true"
+export SEQUENTIAL="truef"
 
 #time between loop start for update_binaries, in seconds, this is a countdown timer, not a sleep after it runs
 #default is 30 minutes
@@ -198,7 +198,7 @@ export KEVIN_PARTS="100000"
 
 #Set the path to the nzb dump you downloaded from torrents, this is the path to bulk files folder of nzbs
 #this does not recurse through subfolders, unless you set NZB_THREADS to true
-export NZBS="/nfs"
+export NZBS="/home/jonnyboy/nzb_files"
 
 #Choose to run import nzb script true/false
 export IMPORT="true"
@@ -214,7 +214,7 @@ export NZB_THREADS="true"
 export NZB_FOLDER_COUNT="50"
 
 #How many nzbs to import per loop, if using NZB_THREADS=true the per folder
-export NZBCOUNT="20"
+export NZBCOUNT="100"
 
 #Set, in seconds - how long the nzb-import should sleep between runs
 #below backfill
@@ -467,7 +467,7 @@ export WWW_USER="jonnyboy:www-data"
 
 #if you have a ramdisk and would like to monitor it's use, set path here
 #this is not the same as RAMDISK above, I keep my parts table on a ramdisk
-export RAMDISK_PATH="/var/ramdisk"
+export RAMDISK_PATH="/"
 
 ###########################################################
 
