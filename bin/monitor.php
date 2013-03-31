@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.1r765";
+$version="0.1r766";
 
 $db = new DB();
 
@@ -66,6 +66,7 @@ $_active_regex = "select ID from releaseregex where status=1;";
 $mysql_command_3 = "cd $_conf && $_mysql --defaults-file=$_conf/my.cnf -u$_DB_USER -h $_DB_HOST $_DB_NAME -e \"$_active_regex\" >> active_regexes.txt";
 $_disable_regex = "update releaseregex set status=0 where status=1;";
 $mysql_command_4 = "$_mysql --defaults-file=$_conf/my.cnf -u$_DB_USER -h $_DB_HOST $_DB_NAME -e \"$_disable_regex\"";
+$mysqladmin = "/usr/bin/mysqladmin --defaults-file=$_conf/my.cnf -u$_DB_USER -h $_DB_HOST status | /usr/bin/awk '{print $22;}'";
 
 if ( $array['UGO_THREADED'] == "true" ) {
 	shell_exec("$mysql_command_3 && $mysql_command_4");
@@ -77,13 +78,6 @@ function microtime_float()
 {
 	list($usec, $sec) = explode(" ", microtime());
 	return ((float)$usec + (float)$sec);
-}
-
-//get qps
-function queries_per_sec()
-{
-	$how_many = shell_exec("/usr/bin/mysqladmin status | /usr/bin/awk '{print $22;}'");
-	return $how_many;
 }
 
 function relativeTime($_time) {
@@ -561,7 +555,7 @@ while( $i > 0 )
 	$panes5 = str_replace("\n", '', explode(" ", $panes_win_6));
 
         //reset binaries every 2 hours
-        if ((( TIME() - $time21 >= 7200 ) || ( $i == 1 )) && ($array['UGO_THREADED'] == "true" ))
+        if ((( TIME() - $time21 >= 43200 ) || ( $i == 1 )) && ($array['UGO_THREADED'] == "true" ))
         {
                 $color = get_color();
                 $rel = $db->query("UPDATE `binaries` SET `procstat`=0,`procattempts`=0,`regexID`=NULL, `relpart`=0,`reltotalpart`=0,`relname`=NULL WHERE procstat not in (4, 6)");
@@ -706,7 +700,7 @@ while( $i > 0 )
 	printf($mask, "Category", "Time", "Status");
 	printf($mask, "====================", "====================", "====================");
 	printf("\033[38;5;214m");
-	$get_current_number = str_replace("\n", '', queries_per_sec()." qps");
+	$get_current_number = str_replace("\n", '', shell_exec($mysqladmin)." qps");
 	printf($mask, "DB Lagg","$query_timer","$get_current_number");
 
 	$optimize_safe_to_run = "false";

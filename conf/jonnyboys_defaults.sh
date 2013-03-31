@@ -21,10 +21,10 @@ export NICENESS="10"
 #for example, if you set load to 2, no pane will start when your system load exceeds 2
 #this does not mean the the desired load will not be exceeded, just that no panes will be be restarted
 #this one is for all panes except update_releases
-export MAX_LOAD="4.85"
+export MAX_LOAD="3.25"
 
 #this one is for update_releases
-export MAX_LOAD_RELEASES="4.85"
+export MAX_LOAD_RELEASES="3.25"
 
 ############################################################
 
@@ -131,7 +131,7 @@ export BINARIES_SLEEP="900"
 
 #Set the max amount of binaries in the binaries table and still allow update_binaries to run
 #set to 0 to disable
-export BINARIES_MAX_BINS="0"
+export BINARIES_MAX_BINS="5000"
 
 #Set the max amount of unprocessed releases and still allow update_binaries to run
 #set to 0 to disable
@@ -161,7 +161,7 @@ export BACKFILL_MAX_RELEASES="0"
 
 #Set the max amount of binaries in the binaries table and still allow backfill to run
 #set to 0 to disable
-export BACKFILL_MAX_BINS="0"
+export BACKFILL_MAX_BINS="5000"
 
 #Set the max amount of of rows in the parts table and still allow backfill to run
 #set to 0 to disable
@@ -242,7 +242,7 @@ export MISC_ONLY="true"
 
 #run ugo's automake.php script to create releases, this does not use regexes and will run in a loop prior
 #to update_releases.php
-export UGO_THREADED="truef"
+export UGO_THREADED="true"
 
 ############################################################
 
@@ -287,13 +287,13 @@ export INNODB="true"
 #Choose to run update_cleanup.php and removespecial.php true/false
 #set to false by default, you will need to edit /misc/testing/update_cleanup.php and /misc/testing/update_parsing.php
 #to actually do anything, directions are in the file
-export CLEANUP="false"
+export CLEANUP="true"
 
 #edit update_cleanup.php and update_parsing.php and svn up, this will only mod files when you run scripts/update_svn.sh or scripts/fix_files.sh
 export CLEANUP_EDIT="true"
 
 #How often do you want  update_cleanup.php and removespecial.php to run, in seconds
-export CLEANUP_TIMER="3600"
+export CLEANUP_TIMER="1800"
 
 ############################################################
 
@@ -313,7 +313,7 @@ export MISC_SORTER="true"
 export PAST_24_HOURS="false"
 
 #How often do you want update_parsing.php to run, in seconds. this takes alot of memory and processing time, default is every 12 hrs
-export PARSING_TIMER="300"
+export PARSING_TIMER="3600"
 
 ############################################################
 

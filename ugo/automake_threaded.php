@@ -57,7 +57,7 @@ unset($db);
 
 $theCount = count($theList);
 
-$ps = new PowerProcess();
+$ps = new PowerProcess(8,0,false);
 $ps->RegisterCallback('psUpdateComplete');
 $ps->maxChildren = 8;
 $ps->tickCount = 10000;	// value in usecs. change this to 1000000 (one second) to reduce cpu use
