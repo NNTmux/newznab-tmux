@@ -21,10 +21,10 @@ export NICENESS="10"
 #for example, if you set load to 2, no pane will start when your system load exceeds 2
 #this does not mean the the desired load will not be exceeded, just that no panes will be be restarted
 #this one is for all panes except update_releases
-export MAX_LOAD="3.85"
+export MAX_LOAD="6.0"
 
 #this one is for update_releases
-export MAX_LOAD_RELEASES="3.85"
+export MAX_LOAD_RELEASES="6.0"
 
 ############################################################
 
@@ -46,9 +46,6 @@ export ADMIN_PATH=$NEWZPATH"/www/admin"
 #At some point, increasing this begins to slow things down. It will need to be adjusted for your system
 #to get the desired performance, 0 will disable all post processing
 export POST_TO_RUN="10"
-
-#or you can run them as they are run in stock, during update releases, this will disable all postprocessing windows and only run during update_releases
-export ALMOST_STOCK="true"
 
 ############################################################
 
@@ -81,7 +78,7 @@ export UNWANTED="true"
 
 #Enter the session name to be used by tmux, no spaces allowed in the name, this can be changed after scripts start
 #if you are running multiple servers, you could put your hostname here
-export TMUX_SESSION="Ubuntu-dev"
+export TMUX_SESSION="Newznab"
 
 #Set, in seconds - how often the monitor.php (left top pane) script should update run the queries against the database
 #the monitor script will update itself and each pane, once every 5 seconds plus the lagg time time on the loop the db is queried
@@ -109,7 +106,7 @@ export SEQUENTIAL="true"
 #time between loop start for update_binaries, in seconds, this is a countdown timer, not a sleep after it runs
 #default is 30 minutes
 #will run on first loop and then not again for at least 1800 seconds
-export BINARIES_SEQ_TIMER="900"
+export BINARIES_SEQ_TIMER="1800"
 
 #this will not run on first loop, time between loop start for backfill, in seconds
 #default is 10 seconds, this will run after time has expired, binaries will take precedence and run before this, if its time has expired
@@ -127,15 +124,16 @@ export BINARIES_THREADS="true"
 #Set, in seconds - how long the update_binaries should sleep between runs
 #top right pane
 #sleep timers are not used when using SEQ
-export BINARIES_SLEEP="900"
-
-#Set the max amount of binaries in the binaries table and still allow update_binaries to run
-#set to 0 to disable
-export BINARIES_MAX_BINS="5000"
+export BINARIES_SLEEP="5"
 
 #Set the max amount of unprocessed releases and still allow update_binaries to run
 #set to 0 to disable
 export BINARIES_MAX_RELEASES="0"
+
+#Set the max amount of binaries in the binaries table and still allow update_binaries to run, this is unprocessed binaries, not the total count
+#only usefull when used with ugo's automake_threaded.php
+#set to 0 to disable
+export BINARIES_MAX_BINS="0"
 
 #Set the max amount of of rows in the parts table and still allow update_binaries to run
 #set to 0 to disable
@@ -159,9 +157,10 @@ export BACKFILL_SLEEP="5"
 #set to 0 to disable
 export BACKFILL_MAX_RELEASES="0"
 
-#Set the max amount of binaries in the binaries table and still allow backfill to run
+#Set the max amount of binaries in the binaries table and still allow backfill to run, this is unprocessed binaries, not the total count
+#only usefull when used with ugo's automake_threaded.php
 #set to 0 to disable
-export BACKFILL_MAX_BINS="5000"
+export BACKFILL_MAX_BINS="0"
 
 #Set the max amount of of rows in the parts table and still allow backfill to run
 #set to 0 to disable
@@ -171,7 +170,7 @@ export BACKFILL_MAX_ROWS="0"
 #this will increment your database by 1 after each backfill loop
 #once your backfill numbers reach $MAXDAYS, then it will no long increment the database
 #backfill will continue to run, and do no work, at that point you should disable backfill, below
-export MAXDAYS="1700"
+export MAXDAYS="210"
 
 ############################################################
 
@@ -181,45 +180,45 @@ export MAXDAYS="1700"
 #it will be skipped (target reached). When that group is done, it will do another ( again from z to a).
 #this does not use increment, it works by the date set below
 #you also need to enable kevin's compression mod, those files are needed and you still need to enable BACKFILL
-export KEVIN_SAFER="truef"
+export KEVIN_SAFER="false"
 
 #use kevin123's backfill_parts.php instead of normal backfill
-export KEVIN_BACKFILL_PARTS="trued"
+export KEVIN_BACKFILL_PARTS="false"
 
-#use kevin123's backfill_parts_threaded.php instead of normal
-export KEVIN_THREADED="truek"
+#use kevin123's backfill_parts_threaded.php instead of normal backfill_threaded
+export KEVIN_THREADED="false"
 
-#set the date to go back to, must be in the format of YYYY-MM-DD, like 2012-06-24
-export KEVIN_DATE="2008-08-15"
+#set the date to go back to, must be in the format of YYYY-MM-DD, like 2012-06-24, this is the date of the posted nzbs
+export KEVIN_DATE="2012-06-24"
 
 #set the number of articles/headers to download at one time
-export KEVIN_PARTS="1000000"
+export KEVIN_PARTS="100000"
 
 ############################################################
 
 #Set the path to the nzb dump you downloaded from torrents, this is the path to bulk files folder of nzbs
 #this does not recurse through subfolders, unless you set NZB_THREADS to true
-export NZBS="/path/to/nzbs"
+export NZBS="/nfs/BooksEbook"
 
 #Choose to run import nzb script true/false
-export IMPORT="false"
+export IMPORT="true"
 
 #If, you have all of your nzbs in one folder select false
 #If, you have all of you nzbs split into separate in with the root at $NZBS then select true
 #and 10 nzbs will be imported from each subfolder per loop.
 #Importing this way, allows all post processing scripts to run, such as book, music, movies
 #Instead of doing all 1 type at once, spread the load
-export NZB_THREADS="false"
+export NZB_THREADS="truef"
 
 #Set max number of folders to process per loop. This includes empty folders.
-export NZB_FOLDER_COUNT="20"
+export NZB_FOLDER_COUNT="50"
 
 #How many nzbs to import per loop, if using NZB_THREADS=true the per folder
-export NZBCOUNT="10"
+export NZBCOUNT="1000"
 
 #Set, in seconds - how long the nzb-import should sleep between runs
 #below backfill
-export IMPORT_SLEEP="40"
+export IMPORT_SLEEP="15"
 
 #Set the max amount of unprocessed releases and still allow nzb-import to run
 #set to 0 to disable
@@ -230,13 +229,13 @@ export IMPORT_MAX_RELEASES="0"
 export IMPORT_MAX_ROWS="0"
 
 #import nzbs using the filename as the release name true/false
-export IMPORT_TRUE="false"
+export IMPORT_TRUE="true"
 
 ############################################################
 
 #MAX_RELEASES for each can be calculated on the total post processing or just the Misc category
 #to calculate on just the Misc, enable this
-export MISC_ONLY="true"
+export MISC_ONLY="false"
 
 ############################################################
 
@@ -245,21 +244,21 @@ export RELEASES="true"
 
 #Set, in seconds - how long the update_release should sleep between runs
 #bottom right
-export RELEASES_SLEEP="5"
+export RELEASES_SLEEP="15"
 
 ############################################################
 
 #Choose to run optimize_innodb.php or optimize_mysiam.php script true/false
 #set to false by default, you should test the optimize scripts in bin first
 #optimize_myisam on small tables runs after every 5th loop of update_releases
-export OPTIMIZE="truej"
+export OPTIMIZE="false"
 
 #optimize can wait, patiently while all other panes stop and then run
 #or, forcefully terminate all panes while it runs, to kill all panes and run optimize, enable
-export OPTIMIZE_KILL="true"
+export OPTIMIZE_KILL="false"
 
 #How often to run optimize_myisam on small tables seconds, default is 10 min
-export MYISAM_SMALL="1800"
+export MYISAM_SMALL="600"
 
 #How often to run optimize_myisam on large tables seconds, default is 1 hr
 export MYISAM_LARGE="3600"
@@ -274,20 +273,20 @@ export INNODB_LARGE="172800"
 
 #Choose your database engine, comment the one true/false
 #you should have already converted your database to InnoDB engine, if you select true here
-export INNODB="false"
+export INNODB="true"
 
 ############################################################
 
 #Choose to run update_cleanup.php and removespecial.php true/false
 #set to false by default, you will need to edit /misc/testing/update_cleanup.php and /misc/testing/update_parsing.php
 #to actually do anything, directions are in the file
-export CLEANUP="false"
+export CLEANUP="true"
 
 #edit update_cleanup.php and update_parsing.php and svn up, this will only mod files when you run scripts/update_svn.sh or scripts/fix_files.sh
 export CLEANUP_EDIT="true"
 
 #How often do you want  update_cleanup.php and removespecial.php to run, in seconds
-export CLEANUP_TIMER="3600"
+export CLEANUP_TIMER="1800"
 
 ############################################################
 
@@ -301,10 +300,10 @@ export PARSING="true"
 export PARSING_MOD="true"
 
 #run update_parsing.php against the whole db or just the last 24 hours
-export PAST_24_HOURS="false"
+export PAST_24_HOURS="true"
 
 #How often do you want update_parsing.php to run, in seconds. this takes alot of memory and processing time, default is every 12 hrs
-export PARSING_TIMER="300"
+export PARSING_TIMER="3600"
 
 ############################################################
 
@@ -319,7 +318,7 @@ export PREDB_TIMER="900"
 #Choose to run processSpotnab.php
 export SPOTNAB="true"
 
-#How often to update the PreDB in seconds
+#How often to update the SpotNab in seconds
 export SPOTNAB_TIMER="900"
 
 #automatically set ALL sources to active after retrieving sources
@@ -337,7 +336,7 @@ export TVRAGE_TIMER="43200"
 
 #Choose to run sphinx.php script true/false
 #set to false by default, you should test the script first, php sphinx.php from the bin folder
-export SPHINX="false"
+export SPHINX="true"
 
 #How often to run sphinx in seconds
 export SPHINX_TIMER="3600"
@@ -355,7 +354,7 @@ export KILL_QUIET="true"
 
 #Delete parts and binaries older than retention days, which is set in edit - site
 #this uses a script posted by cj https://github.com/NNScripts/nn-custom-scripts
-export DELETE_PARTS="trued"
+export DELETE_PARTS="true"
 
 #how often should this be run, default it 1 hr
 export DELETE_TIMER="3600"
@@ -385,10 +384,13 @@ export FIX_POSIX="false"
 export USE_HTOP="false"
 export USE_BWMNG="false"
 export USE_MYTOP="false"
-export USE_VNSTAT="false"
 export USE_ATOP="false"
 export USE_NMON="false"
 export USE_IOTOP="false"
+
+#define vnstat user settings to apply at runtim
+export USE_VNSTAT="false"
+export VNSTAT_ARGS=""
 
 #freebsd does not have iotop, but can run top -m io -o total
 export USE_TOP="false"
@@ -462,12 +464,12 @@ export WWW_USER="jonnyboy:www-data"
 
 #if you have a ramdisk and would like to monitor it's use, set path here
 #this is not the same as RAMDISK above, I keep my parts table on a ramdisk
-export RAMDISK_PATH="/var/ramdisk"
+export RAMDISK_PATH="/"
 
 ###########################################################
 
 #logs can be written, per pane, to the logs folder
-export WRITE_LOGS="truef"
+export WRITE_LOGS="false"
 
 ###########################################################
 
@@ -480,8 +482,14 @@ export USER_DEF_ONE=""
 #this one will run before MyIsam Large
 export USER_DEF_TWO=""
 
-#this one will run after MyIsam Large
+#this one will run after MyIsam Large, not same process as below
 export USER_DEF_THREE=""
+
+#this one will run before InnoDB Large and MyIsam Large runs in same process, so before MyIsam Large, not same process as above
+export USER_DEF_FOUR=""
+
+#this one will run after InnoDB Large
+export USER_DEF_FIVE=""
 
 ###########################################################
 

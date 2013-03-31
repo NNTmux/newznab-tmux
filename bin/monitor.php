@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.1r761";
+$version="0.1r762";
 
 $db = new DB();
 
@@ -61,19 +61,13 @@ $_backfill_increment = "UPDATE groups set backfill_target=backfill_target+1 wher
 $mysql_command_1 = "$_mysql --defaults-file=$_conf/my.cnf -u$_DB_USER -h $_DB_HOST $_DB_NAME -e \"$_backfill_increment\"";
 $reset_bin = "UPDATE binaries SET procstat=0, procattempts=0, regexID=NULL, relpart=0, reltotalpart=0, relname=NULL;";
 $mysql_command_2 = "$_mysql --defaults-file=$_conf/my.cnf -u$_DB_USER -h $_DB_HOST $_DB_NAME -e \"$reset_bin\"";
+$mysqladmin = "/usr/bin/mysqladmin --defaults-file=$_conf/my.cnf -u$_DB_USER -h $_DB_HOST status | /usr/bin/awk '{print $22;}'";
 
 //got microtime
 function microtime_float()
 {
 	list($usec, $sec) = explode(" ", microtime());
 	return ((float)$usec + (float)$sec);
-}
-
-//get qps
-function queries_per_sec()
-{
-        $how_many = shell_exec("/usr/bin/mysqladmin status | /usr/bin/awk '{print $22;}'");
-        return $how_many;
 }
 
 function relativeTime($_time) {
@@ -687,7 +681,7 @@ while( $i > 0 )
 	printf($mask, "Category", "Time", "Status");
 	printf($mask, "====================", "====================", "====================");
 	printf("\033[38;5;214m");
-        $get_current_number = str_replace("\n", '', queries_per_sec()." qps");
+        $get_current_number = str_replace("\n", '', shell_exec($mysqladmin)." qps");
         printf($mask, "DB Lagg","$query_timer","$get_current_number");
 
 	$optimize_safe_to_run = "false";
