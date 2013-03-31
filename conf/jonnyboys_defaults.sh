@@ -21,10 +21,10 @@ export NICENESS="10"
 #for example, if you set load to 2, no pane will start when your system load exceeds 2
 #this does not mean the the desired load will not be exceeded, just that no panes will be be restarted
 #this one is for all panes except update_releases
-export MAX_LOAD="3.85"
+export MAX_LOAD="4.85"
 
 #this one is for update_releases
-export MAX_LOAD_RELEASES="3.85"
+export MAX_LOAD_RELEASES="4.85"
 
 ############################################################
 
@@ -131,7 +131,7 @@ export BINARIES_SLEEP="900"
 
 #Set the max amount of binaries in the binaries table and still allow update_binaries to run
 #set to 0 to disable
-export BINARIES_MAX_BINS="5000"
+export BINARIES_MAX_BINS="0"
 
 #Set the max amount of unprocessed releases and still allow update_binaries to run
 #set to 0 to disable
@@ -161,7 +161,7 @@ export BACKFILL_MAX_RELEASES="0"
 
 #Set the max amount of binaries in the binaries table and still allow backfill to run
 #set to 0 to disable
-export BACKFILL_MAX_BINS="5000"
+export BACKFILL_MAX_BINS="0"
 
 #Set the max amount of of rows in the parts table and still allow backfill to run
 #set to 0 to disable

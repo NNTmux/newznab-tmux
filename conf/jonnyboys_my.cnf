@@ -140,7 +140,7 @@ log_error = /var/lib/mysql/error.log
     innodb_purge_threads = 1
      
     #buffer pool related
-    innodb_buffer_pool_size = 4G
+    innodb_buffer_pool_size = 8G
     innodb_buffer_pool_instances = 8
     innodb_change_buffering = all
     innodb_max_dirty_pages_pct = 90

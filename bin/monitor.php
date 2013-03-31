@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.1r764";
+$version="0.1r765";
 
 $db = new DB();
 
@@ -77,6 +77,13 @@ function microtime_float()
 {
 	list($usec, $sec) = explode(" ", microtime());
 	return ((float)$usec + (float)$sec);
+}
+
+//get qps
+function queries_per_sec()
+{
+	$how_many = shell_exec("/usr/bin/mysqladmin status | /usr/bin/awk '{print $22;}'");
+	return $how_many;
 }
 
 function relativeTime($_time) {
@@ -326,7 +333,7 @@ printf("\n\033[1;33m");
 printf($mask, "Category", "Time", "Status");
 printf($mask, "====================", "====================", "====================");
 printf("\033[38;5;214m");
-printf($mask, "DB Lagg","$query_timer","query time");
+printf($mask, "DB Lagg","$query_timer","0 qps");
 
 $i = 1;
 while( $i > 0 )
@@ -699,7 +706,8 @@ while( $i > 0 )
 	printf($mask, "Category", "Time", "Status");
 	printf($mask, "====================", "====================", "====================");
 	printf("\033[38;5;214m");
-	printf($mask, "DB Lagg","$query_timer","query time");
+	$get_current_number = str_replace("\n", '', queries_per_sec()." qps");
+	printf($mask, "DB Lagg","$query_timer","$get_current_number");
 
 	$optimize_safe_to_run = "false";
 	$optimize_run = "false";
