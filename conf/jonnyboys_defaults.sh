@@ -21,7 +21,7 @@ export NICENESS="10"
 #for example, if you set load to 2, no pane will start when your system load exceeds 2
 #this does not mean the the desired load will not be exceeded, just that no panes will be be restarted
 #this one is for all panes except update_releases
-export MAX_LOAD="6.0"
+export MAX_LOAD="10.0"
 
 #this one is for update_releases
 export MAX_LOAD_RELEASES="6.0"
@@ -78,7 +78,7 @@ export UNWANTED="true"
 
 #Enter the session name to be used by tmux, no spaces allowed in the name, this can be changed after scripts start
 #if you are running multiple servers, you could put your hostname here
-export TMUX_SESSION="Newznab-dev"
+export TMUX_SESSION="Ubuntu-02-HOME"
 
 #Set, in seconds - how often the monitor.php (left top pane) script should update run the queries against the database
 #the monitor script will update itself and each pane, once every 5 seconds plus the lagg time time on the loop the db is queried
@@ -198,7 +198,7 @@ export KEVIN_PARTS="100000"
 
 #Set the path to the nzb dump you downloaded from torrents, this is the path to bulk files folder of nzbs
 #this does not recurse through subfolders, unless you set NZB_THREADS to true
-export NZBS="/nfs/crap2"
+export NZBS="/nfs"
 
 #Choose to run import nzb script true/false
 export IMPORT="true"
@@ -299,11 +299,14 @@ export PARSING="true"
 #this also includes kevin123's categorymod.php, you must run either update_svn.sh or fix_files.sh to copy the file into place
 export PARSING_MOD="true"
 
+#choose to use cj's fix_android_releases.php
+export FIX_DROID="true"
+
 #run update_parsing.php against the whole db or just the last 24 hours
 export PAST_24_HOURS="true"
 
 #How often do you want update_parsing.php to run, in seconds. this takes alot of memory and processing time, default is every 12 hrs
-export PARSING_TIMER="3600"
+export PARSING_TIMER="900"
 
 ############################################################
 

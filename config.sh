@@ -299,6 +299,9 @@ export PARSING="false"
 #this also includes kevin123's categorymod.php, you must run either update_svn.sh or fix_files.sh to copy the file into place
 export PARSING_MOD="false"
 
+#choose to use cj's fix_android_releases.php
+export FIX_DROID="false"
+
 #run update_parsing.php against the whole db or just the last 24 hours
 export PAST_24_HOURS="true"
 

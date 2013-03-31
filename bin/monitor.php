@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.1r763";
+$version="0.1r764";
 
 $db = new DB();
 
@@ -1094,30 +1094,49 @@ while( $i > 0 )
 	}
 
 	//run $_php update_parsing.php in 1.1
-	if (( $array['MAX_LOAD'] >= get_load()) && (( TIME() - $time3 ) >= $array['PARSING_TIMER'] ) && ($array['PARSING_MOD'] != "true" ) && ($array['PARSING'] == "true" )  && ( $optimize_safe_to_run != "true" )) {
+	if (( $array['MAX_LOAD'] >= get_load()) && (( TIME() - $time3 ) >= $array['PARSING_TIMER'] ) && ( $array['PARSING_MOD'] != "true" ) && ( $array['PARSING'] != "true" ) && ( $array['FIX_DROID'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
+                $color = get_color();
+                $log = writelog($panes1[1]);
+                shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.1 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes1[1] $ds2 && cd $_cj && $_php fix_android_releases.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes1[1] $ds3' 2>&1 1> /dev/null");
+                $time3 = TIME();
+        } elseif (( $array['MAX_LOAD'] >= get_load()) && (( TIME() - $time3 ) >= $array['PARSING_TIMER'] ) && ( $array['PARSING_MOD'] == "true" ) && ( $array['PARSING'] == "true" ) && ( $array['FIX_DROID'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
+                $color = get_color();
+                $log = writelog($panes1[1]);
+                shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.1 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes1[1] $ds2 && cd $_cj && $_php fix_android_releases.php 2>&1 $log && cd $_bin && $_php update_parsing.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes1[1] $ds3' 2>&1 1> /dev/null");
+                $time3 = TIME();
+        } elseif (( $array['MAX_LOAD'] >= get_load()) && (( TIME() - $time3 ) >= $array['PARSING_TIMER'] ) && ( $array['PARSING_MOD'] != "true" ) && ( $array['PARSING'] == "true" ) && ( $array['FIX_DROID'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
+                $color = get_color();
+                $log = writelog($panes1[1]);
+                shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.1 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes1[1] $ds2 && cd $_cj && $_php fix_android_releases.php 2>&1 $log && cd $TESTING && $_php update_parsing.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes1[1] $ds3' 2>&1 1> /dev/null");
+                $time3 = TIME();
+        } elseif (( $array['MAX_LOAD'] >= get_load()) && (( TIME() - $time3 ) >= $array['PARSING_TIMER'] ) && ( $array['PARSING_MOD'] != "true" ) && ( $array['PARSING'] == "true" ) && ( $array['FIX_DROID'] != "true" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		$log = writelog($panes1[1]);
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.1 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes1[1] $ds2 && cd $TESTING && $_php update_parsing.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes1[1] $ds3' 2>&1 1> /dev/null");
 		$time3 = TIME();
-	} elseif (( $array['MAX_LOAD'] >= get_load()) && (( TIME() - $time3 ) >= $array['PARSING_TIMER'] ) && ( $array['PARSING_MOD'] == "true" ) && ( $array['PARSING'] == "true" )  && ( $optimize_safe_to_run != "true" )) {
+	} elseif (( $array['MAX_LOAD'] >= get_load()) && (( TIME() - $time3 ) >= $array['PARSING_TIMER'] ) && ( $array['PARSING_MOD'] == "true" ) && ( $array['PARSING'] == "true" ) && ( $array['FIX_DROID'] != "true" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		$log = writelog($panes1[1]);
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.1 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes1[1] $ds2 && cd $_bin && $_php update_parsing.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes1[1] $ds3' 2>&1 1> /dev/null");
 		$time3 = TIME();
-	}  elseif (( $array['PARSING'] != "true" ) && ( $optimize_safe_to_run != "true" )) {
+	} elseif (( $optimize_safe_to_run != "true" ) && ( $array['PARSING'] != "true" ) && ( $array['FIX_DROID'] == "true" )) {
+                $color = get_color();
+                $run_time = relativeTime( $array['PARSING_TIMER'] + $time3 );
+                shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.1 'echo \"\033[38;5;\"$color\"m\nfix_android_releases will run in T[ $run_time]\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
+        } elseif (( $optimize_safe_to_run != "true" ) && (( $array['PARSING_MOD'] == "true" ) || ( $array['PARSING'] == "true" ))) {
+                $color = get_color();
+                $run_time = relativeTime( $array['PARSING_TIMER'] + $time3 );
+                shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.1 'echo \"\033[38;5;\"$color\"m\n$panes1[1] will run in T[ $run_time]\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
+        } elseif (( $array['PARSING'] != "true" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.1 'echo \"\033[38;5;\"$color\"m\n$panes1[1] Disabled by PARSING\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
-	} elseif ( $optimize_safe_to_run != "true" ) {
-		$color = get_color();
-		$run_time = relativeTime( $array['PARSING_TIMER'] + $time3 );
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.1 'echo \"\033[38;5;\"$color\"m\n$panes1[1] will run in T[ $run_time]\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
 	} elseif ( $optimize_safe_to_run == "true" ) {
 		$color = get_color();
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.1 'echo \"\033[38;5;\"$color\"m\n$panes1[1] Disabled by OPTIMIZE\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
 	}
 
 	//run $_php removespecial.php and $_php update_cleanup.php in 1.2 ever 1 hour
-	if (( $array['MAX_LOAD'] >= get_load()) && (( TIME() - $time7 ) >= $array['CLEANUP_TIMER'] ) && ($array['CLEANUP'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
+	if (( $array['MAX_LOAD'] >= get_load()) && (( TIME() - $time7 ) >= $array['CLEANUP_TIMER'] ) && ( $array['CLEANUP'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		$log = writelog($panes1[2]);
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.2 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes1[2] $ds2 && cd $TESTING && $_php removespecial.php 2>&1 $log && $_php update_cleanup.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes1[2] $ds3' 2>&1 1> /dev/null");
