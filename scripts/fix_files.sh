@@ -70,12 +70,12 @@ if [[ $CHOWN_TRUE == "true" ]]; then
     chmod 775 $NEWZPATH/www/lib/smarty/templates_c
     chmod -R 775 $NEWZPATH/www/covers
     chmod 775 $NEWZPATH/www
-    chmod 775 $NEWZPATH/www/install
+    #chmod 775 $NEWZPATH/www/install
 else
     chmod 777 $NEWZPATH/www/lib/smarty/templates_c
     chmod -R 777 $NEWZPATH/www/covers
     chmod 777 $NEWZPATH/www
-    chmod 777 $NEWZPATH/www/install
+    #chmod 777 $NEWZPATH/www/install
 fi
 
 echo -e "\033[38;5;160mCompleted\033[39m"

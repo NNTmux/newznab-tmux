@@ -84,7 +84,7 @@ export TMUX_SESSION="Ubuntu-02-HOME"
 #the monitor script will update itself and each pane, once every 5 seconds plus the lagg time time on the loop the db is queried
 #to press the point, the db is not queried any sooner than the time set below, but the script loops each iteration once every 5 seconds
 #this makes it more responsive to stop/kill without slamming the db with needless queries, starts are still controlled by the queries
-export MONITOR_UPDATE="15"
+export MONITOR_UPDATE="5"
 
 #you may want to kill the update_binaries, backfill and import if no releases have been add in x minutes, set the timer to anything other than 0 to enable
 #this will only run every 5 loops of monitor
@@ -115,7 +115,7 @@ export BACKFILL_SEQ_TIMER="10"
 ############################################################
 
 #Choose to run update_binaries true/false
-export BINARIES="true"
+export BINARIES="trued"
 
 #Choose to run the threaded or non-threaded newznab binaries scripts true/false
 #update_binaries.php or update_binaries_threaded.php
@@ -142,7 +142,7 @@ export BINARIES_MAX_ROWS="0"
 ############################################################
 
 #Choose to run backfill script true/false
-export BACKFILL="true"
+export BACKFILL="trued"
 
 #Choose to run the threaded or non-threaded newznab backfill scripts true/false
 #backfill.php or backfill_threaded.php
@@ -164,7 +164,7 @@ export BACKFILL_MAX_BINS="0"
 
 #Set the max amount of of rows in the parts table and still allow backfill to run
 #set to 0 to disable
-export BACKFILL_MAX_ROWS="5000000"
+export BACKFILL_MAX_ROWS="1200000"
 
 #Set the maximum days to backfill, you set the Newznab+ admin/edit backfill to 1
 #this will increment your database by 1 after each backfill loop
@@ -198,7 +198,7 @@ export KEVIN_PARTS="100000"
 
 #Set the path to the nzb dump you downloaded from torrents, this is the path to bulk files folder of nzbs
 #this does not recurse through subfolders, unless you set NZB_THREADS to true
-export NZBS="/home/jonnyboy/nzb_files2/crap2"
+export NZBS="/home/jonnyboy/nzb_files2"
 
 #Choose to run import nzb script true/false
 export IMPORT="true"
@@ -251,23 +251,23 @@ export RELEASES_SLEEP="0"
 #Choose to run optimize_innodb.php or optimize_mysiam.php script true/false
 #set to false by default, you should test the optimize scripts in bin first
 #optimize_myisam on small tables runs after every 5th loop of update_releases
-export OPTIMIZE="false"
+export OPTIMIZE="true"
 
 #optimize can wait, patiently while all other panes stop and then run
 #or, forcefully terminate all panes while it runs, to kill all panes and run optimize, enable
-export OPTIMIZE_KILL="false"
+export OPTIMIZE_KILL="true"
 
 #How often to run optimize_myisam on small tables seconds, default is 10 min
-export MYISAM_SMALL="600"
+export MYISAM_SMALL="600000"
 
 #How often to run optimize_myisam on large tables seconds, default is 1 hr
-export MYISAM_LARGE="3600"
+export MYISAM_LARGE="600000"
 
 #How often to run optimize_innodb on small tables in seconds, default is 2 hr
 export INNODB_SMALL="7200"
 
 #How often to run optimize_innodb on large tables in seconds, default is 48 hrs
-export INNODB_LARGE="172800"
+export INNODB_LARGE="14400"
 
 ############################################################
 
@@ -306,7 +306,7 @@ export FIX_DROID="true"
 export PAST_24_HOURS="true"
 
 #How often do you want update_parsing.php to run, in seconds. this takes alot of memory and processing time, default is every 12 hrs
-export PARSING_TIMER="300"
+export PARSING_TIMER="900"
 
 ############################################################
 
@@ -392,7 +392,7 @@ export USE_NMON="false"
 export USE_IOTOP="false"
 
 #define tcptrack user settings to apply at runtime
-export USE_TCPTRACK="true"
+export USE_TCPTRACK="false"
 export TRCPTRACK_ARGS="-i eth0 port 563"
 
 #define vnstat user settings to apply at runtim

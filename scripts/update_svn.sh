@@ -28,5 +28,7 @@ svn export --force --username svnplus --password $SVN_PASSWORD svn://svn.newznab
 cd $NEWZPATH"/misc/update_scripts"
 $PHP update_database_version.php
 
+rm -fr $NEWZPATH"/www/install"
+
 cd $DIR/scripts
 ./fix_files.sh
