@@ -513,6 +513,7 @@ command -v php5 >/dev/null 2>&1 && export PHP=`command -v php5` || { export PHP=
 command -v tmux >/dev/null 2>&1 || { echo >&2 "I require tmux but it's not installed. Aborting."; exit 1; } && export TMUXCMD=`command -v tmux`
 command -v nice >/dev/null 2>&1 || { echo >&2 "I require nice but it's not installed. Aborting."; exit 1; } && export NICE=`command -v nice`
 command -v tee >/dev/null 2>&1 || { echo >&2 "I require tee but it's not installed. Aborting."; exit 1; } && export TEE=`command -v tee`
+command -v mysqladmin >/dev/null 2>&1 || { echo >&2 "I require mysqladmin but it's not installed. Aborting."; exit 1; } && export MYSQLADMIN=`command -v mysqladmin`
 
 if [[ $USE_HTOP == "true" ]]; then
   command -v htop >/dev/null 2>&1|| { echo >&2 "I require htop but it's not installed. Aborting."; exit 1; } && export HTOP=`command -v htop`

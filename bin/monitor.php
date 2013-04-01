@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.1r767";
+$version="0.1r768";
 
 $db = new DB();
 
@@ -42,6 +42,7 @@ $_php = $_nice." -n${array['NICENESS']} ".getenv('PHP');
 $_tmux = getenv('TMUXCMD');
 $_sed = getenv('SED');
 $_tee = getenv('TEE');
+$_mysqladmin = getenv('MYSQLADMIN');
 $_count_releases = 0;
 $_imports = $array['NZB_THREADS'];
 $_bin = dirname(__FILE__)."/../bin";
@@ -61,7 +62,7 @@ $_backfill_increment = "UPDATE groups set backfill_target=backfill_target+1 wher
 $mysql_command_1 = "$_mysql --defaults-file=$_conf/my.cnf -u$_DB_USER -h $_DB_HOST $_DB_NAME -e \"$_backfill_increment\"";
 $reset_bin = "UPDATE binaries SET procstat=0, procattempts=0, regexID=NULL, relpart=0, reltotalpart=0, relname=NULL;";
 $mysql_command_2 = "$_mysql --defaults-file=$_conf/my.cnf -u$_DB_USER -h $_DB_HOST $_DB_NAME -e \"$reset_bin\"";
-$mysqladmin = "/usr/bin/mysqladmin --defaults-file=$_conf/my.cnf -u$_DB_USER -h $_DB_HOST status | /usr/bin/awk '{print $22;}'";
+$mysqladmin = "$_mysqladmin --defaults-file=$_conf/my.cnf -u$_DB_USER -h $_DB_HOST status | /usr/bin/awk '{print $22;}'";
 
 //got microtime
 function microtime_float()
