@@ -14,7 +14,7 @@ export RUNNING="true"
 
 #these scripts set the 'nice'ness of each script, default is 19, the lowest, the highest is -20
 #anything between -1 and -20 require root/sudo to run
-export NICENESS="19"
+export NICENESS="10"
 
 #these scripts can add some serious load to your system, without proper monitoring it can be
 #to much, you can set the max load that any pane will be started at

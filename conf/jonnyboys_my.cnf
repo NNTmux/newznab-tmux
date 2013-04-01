@@ -150,9 +150,9 @@ log_error = /var/lib/mysql/error.log
     innodb_flush_log_at_trx_commit = 0
      
     #transaction logs
-    innodb_log_buffer_size = 1G
+    innodb_log_buffer_size = 512M
     innodb_log_files_in_group = 2
-    innodb_log_file_size = 1G
+    innodb_log_file_size = 512M
      
 [mysqldump]
 quick

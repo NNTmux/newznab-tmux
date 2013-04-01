@@ -84,7 +84,7 @@ export TMUX_SESSION="Ubuntu-02-HOME"
 #the monitor script will update itself and each pane, once every 5 seconds plus the lagg time time on the loop the db is queried
 #to press the point, the db is not queried any sooner than the time set below, but the script loops each iteration once every 5 seconds
 #this makes it more responsive to stop/kill without slamming the db with needless queries, starts are still controlled by the queries
-export MONITOR_UPDATE="5"
+export MONITOR_UPDATE="30"
 
 #you may want to kill the update_binaries, backfill and import if no releases have been add in x minutes, set the timer to anything other than 0 to enable
 #this will only run every 5 loops of monitor
@@ -115,7 +115,7 @@ export BACKFILL_SEQ_TIMER="10"
 ############################################################
 
 #Choose to run update_binaries true/false
-export BINARIES="trued"
+export BINARIES="true"
 
 #Choose to run the threaded or non-threaded newznab binaries scripts true/false
 #update_binaries.php or update_binaries_threaded.php
@@ -142,7 +142,7 @@ export BINARIES_MAX_ROWS="0"
 ############################################################
 
 #Choose to run backfill script true/false
-export BACKFILL="trued"
+export BACKFILL="true"
 
 #Choose to run the threaded or non-threaded newznab backfill scripts true/false
 #backfill.php or backfill_threaded.php
@@ -201,7 +201,7 @@ export KEVIN_PARTS="100000"
 export NZBS="/home/jonnyboy/nzb_files2"
 
 #Choose to run import nzb script true/false
-export IMPORT="true"
+export IMPORT="trued"
 
 #If, you have all of your nzbs in one folder select false
 #If, you have all of you nzbs split into separate in with the root at $NZBS then select true
@@ -303,7 +303,7 @@ export PARSING_MOD="true"
 export FIX_DROID="true"
 
 #run update_parsing.php against the whole db or just the last 24 hours
-export PAST_24_HOURS="true"
+export PAST_24_HOURS="false"
 
 #How often do you want update_parsing.php to run, in seconds. this takes alot of memory and processing time, default is every 12 hrs
 export PARSING_TIMER="900"
