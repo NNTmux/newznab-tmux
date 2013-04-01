@@ -376,6 +376,10 @@ else
         $TMUXCMD new-window -n atop '$ATOP'
     fi
 
+    if [[ $USE_TCPTRACK == "true" ]]; then
+        $TMUXCMD new-window -n tcptrack '$TCPTRACK $TRCPTRACK_ARGS'
+    fi
+
     if [[ $USE_CONSOLE == "true" ]]; then
         $TMUXCMD new-window -n Console 'bash -i'
     fi

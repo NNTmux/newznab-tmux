@@ -9,7 +9,7 @@ $groups = new Groups;
 $groupList = $groups->getActive();
 unset($groups);
 
-$ps = new PowerProcess();
+$ps = new PowerProcess(5,0,false);
 $ps->RegisterCallback('psUpdateComplete');
 $ps->maxThreads = 5;
 $ps->tickCount = 500000;	// value in usecs. change this to 1000000 (one second) to reduce cpu use

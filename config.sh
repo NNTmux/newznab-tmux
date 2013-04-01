@@ -391,9 +391,13 @@ export USE_ATOP="false"
 export USE_NMON="false"
 export USE_IOTOP="false"
 
-#define vnstat user settings to apply at runtim
+#define vnstat user settings to apply at runtime
 export USE_VNSTAT="false"
 export VNSTAT_ARGS=""
+
+#define tcptrack user settings to apply at runtime
+export USE_TCPTRACK="false"
+export TRCPTRACK_ARGS="-i eth0 port 443"
 
 #freebsd does not have iotop, but can run top -m io -o total
 export USE_TOP="false"
@@ -537,9 +541,11 @@ fi
 if [[ $USE_ATOP == "true" ]]; then
   command -v atop >/dev/null 2>&1|| { echo >&2 "I require atop but it's not installed. Aborting."; exit 1; } && export ATOP=`command -v atop`
 fi
+if [[ $USE_TCPTRACK == "true" ]]; then
+  command -v tcptrack >/dev/null 2>&1|| { echo >&2 "I require tcptrack but it's not installed. Aborting."; exit 1; } && export TCPTRACK=`command -v tcptrack`
+fi
 if [[ $POWERLINE == "true" ]]; then
   export TMUX_CONF="powerline/tmux.conf"
 else
   export TMUX_CONF="conf/tmux.conf"
 fi
-

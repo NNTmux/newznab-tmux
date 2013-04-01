@@ -51,7 +51,7 @@ bind-address		= 127.0.0.1
 key_buffer		= 16M
 max_allowed_packet	= 16M
 thread_stack		= 192K
-thread_cache_size       = 20
+thread_cache_size       = 40
 group_concat_max_len    = 8192
 
 tmp_table_size		= 512M
@@ -73,7 +73,7 @@ myisam-recover         = BACKUP
 # * Query Cache Configuration
 #
 query_cache_limit	= 128M
-query_cache_size        = 1024M
+query_cache_size        = 256M
 #
 # * Logging and Replication
 #
@@ -140,7 +140,7 @@ log_error = /var/lib/mysql/error.log
     innodb_purge_threads = 1
      
     #buffer pool related
-    innodb_buffer_pool_size = 8G
+    innodb_buffer_pool_size = 4G
     innodb_buffer_pool_instances = 8
     innodb_change_buffering = all
     innodb_max_dirty_pages_pct = 90

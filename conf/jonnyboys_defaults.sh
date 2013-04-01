@@ -21,10 +21,10 @@ export NICENESS="1"
 #for example, if you set load to 2, no pane will start when your system load exceeds 2
 #this does not mean the the desired load will not be exceeded, just that no panes will be be restarted
 #this one is for all panes except update_releases
-export MAX_LOAD="6.0"
+export MAX_LOAD="7.0"
 
 #this one is for update_releases
-export MAX_LOAD_RELEASES="6.0"
+export MAX_LOAD_RELEASES="7.0"
 
 ############################################################
 
@@ -45,7 +45,7 @@ export ADMIN_PATH=$NEWZPATH"/www/admin"
 #trial and error for this, set to 1 will run > 0, set to 2 will run > 200, 3 will run > 300 and so on.
 #At some point, increasing this begins to slow things down. It will need to be adjusted for your system
 #to get the desired performance, 0 will disable all post processing
-export POST_TO_RUN="16"
+export POST_TO_RUN="14"
 
 ############################################################
 
@@ -84,7 +84,7 @@ export TMUX_SESSION="Ubuntu-02-HOME"
 #the monitor script will update itself and each pane, once every 5 seconds plus the lagg time time on the loop the db is queried
 #to press the point, the db is not queried any sooner than the time set below, but the script loops each iteration once every 5 seconds
 #this makes it more responsive to stop/kill without slamming the db with needless queries, starts are still controlled by the queries
-export MONITOR_UPDATE="30"
+export MONITOR_UPDATE="15"
 
 #you may want to kill the update_binaries, backfill and import if no releases have been add in x minutes, set the timer to anything other than 0 to enable
 #this will only run every 5 loops of monitor
@@ -101,7 +101,7 @@ export KEEP_KILLED="false"
 #this works by setting the 2 start timers and which is run at the start of the loop is determined like this
 #if at the start of the loop, the BINARIES_SEQ_TIMER has expired, then update_binaries will run and the BINARIES_SEQ_TIMER timer is reset
 #if BINARIES_SEQ_TIMER has not expired, then if BACKFILL_SEQ_TIMER has expired, the backfill will run and BACKFILL_SEQ_TIMER timer is reset
-export SEQUENTIAL="truef"
+export SEQUENTIAL="true"
 
 #time between loop start for update_binaries, in seconds, this is a countdown timer, not a sleep after it runs
 #default is 30 minutes
@@ -164,13 +164,13 @@ export BACKFILL_MAX_BINS="0"
 
 #Set the max amount of of rows in the parts table and still allow backfill to run
 #set to 0 to disable
-export BACKFILL_MAX_ROWS="0"
+export BACKFILL_MAX_ROWS="5000000"
 
 #Set the maximum days to backfill, you set the Newznab+ admin/edit backfill to 1
 #this will increment your database by 1 after each backfill loop
 #once your backfill numbers reach $MAXDAYS, then it will no long increment the database
 #backfill will continue to run, and do no work, at that point you should disable backfill, below
-export MAXDAYS="210"
+export MAXDAYS="100"
 
 ############################################################
 
@@ -180,7 +180,7 @@ export MAXDAYS="210"
 #it will be skipped (target reached). When that group is done, it will do another ( again from z to a).
 #this does not use increment, it works by the date set below
 #you also need to enable kevin's compression mod, those files are needed and you still need to enable BACKFILL
-export KEVIN_SAFER="false"
+export KEVIN_SAFER="true"
 
 #use kevin123's backfill_parts.php instead of normal backfill
 export KEVIN_BACKFILL_PARTS="false"
@@ -189,7 +189,7 @@ export KEVIN_BACKFILL_PARTS="false"
 export KEVIN_THREADED="false"
 
 #set the date to go back to, must be in the format of YYYY-MM-DD, like 2012-06-24, this is the date of the posted nzbs
-export KEVIN_DATE="2012-06-24"
+export KEVIN_DATE="2013-03-01"
 
 #set the number of articles/headers to download at one time
 export KEVIN_PARTS="100000"
@@ -198,7 +198,7 @@ export KEVIN_PARTS="100000"
 
 #Set the path to the nzb dump you downloaded from torrents, this is the path to bulk files folder of nzbs
 #this does not recurse through subfolders, unless you set NZB_THREADS to true
-export NZBS="/home/jonnyboy/nzb_files"
+export NZBS="/home/jonnyboy/nzb_files2/crap2"
 
 #Choose to run import nzb script true/false
 export IMPORT="true"
@@ -214,7 +214,7 @@ export NZB_THREADS="true"
 export NZB_FOLDER_COUNT="50"
 
 #How many nzbs to import per loop, if using NZB_THREADS=true the per folder
-export NZBCOUNT="100"
+export NZBCOUNT="50"
 
 #Set, in seconds - how long the nzb-import should sleep between runs
 #below backfill
@@ -244,7 +244,7 @@ export RELEASES="true"
 
 #Set, in seconds - how long the update_release should sleep between runs
 #bottom right
-export RELEASES_SLEEP="15"
+export RELEASES_SLEEP="0"
 
 ############################################################
 
@@ -306,7 +306,7 @@ export FIX_DROID="true"
 export PAST_24_HOURS="true"
 
 #How often do you want update_parsing.php to run, in seconds. this takes alot of memory and processing time, default is every 12 hrs
-export PARSING_TIMER="900"
+export PARSING_TIMER="300"
 
 ############################################################
 
@@ -367,7 +367,7 @@ export DELETE_TIMER="3600"
 export FETCH_MOVIE="true"
 
 #how often should this be run, default it 12 hr
-export MOVIE_TIMER="43200"
+export MOVIE_TIMER="3600"
 
 ############################################################
 
@@ -390,6 +390,10 @@ export USE_MYTOP="false"
 export USE_ATOP="false"
 export USE_NMON="false"
 export USE_IOTOP="false"
+
+#define tcptrack user settings to apply at runtime
+export USE_TCPTRACK="true"
+export TRCPTRACK_ARGS="-i eth0 port 563"
 
 #define vnstat user settings to apply at runtim
 export USE_VNSTAT="false"
@@ -536,6 +540,9 @@ if [[ $USE_IFTOP == "true" ]]; then
 fi
 if [[ $USE_ATOP == "true" ]]; then
   command -v atop >/dev/null 2>&1|| { echo >&2 "I require atop but it's not installed. Aborting."; exit 1; } && export ATOP=`command -v atop`
+fi
+if [[ $USE_TCPTRACK == "true" ]]; then
+  command -v tcptrack >/dev/null 2>&1|| { echo >&2 "I require tcptrack but it's not installed. Aborting."; exit 1; } && export TCPTRACK=`command -v tcptrack`
 fi
 if [[ $POWERLINE == "true" ]]; then
   export TMUX_CONF="powerline/tmux.conf"
