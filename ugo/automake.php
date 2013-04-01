@@ -93,12 +93,12 @@ function makerelease ($results, $parent, $name, $db, $sect, $mail)
 			$query = sprintf("UPDATE `binaries` SET `relname`=%s, `relpart`=%d, `reltotalpart`=%d, `procstat`=%d, `regexID`=%d, `fromname`='%s' where procstat != 5 AND `ID` = %d;", utf8_encode($nombre), $i++, $parts, $PROCSTAT_TITLEMATCHED, -(ord($sect) - ord("A") + 1), $mail, $r["ID"]);
 
 		echo "doing update: ".$r['name']."\n";
-		echo $query."\n";
+	echo $query."\n";
 
-			var_dump($db->query($query));
+			//var_dump($db->query($query));
 
-			var_dump($db->getLastError());
-			var_dump($db->getAffectedRows());
+			//var_dump($db->getLastError());
+			//var_dump($db->getAffectedRows());
 
 		}
 	} else if ($parts == 1){
@@ -718,7 +718,7 @@ global $db;
 
 	$time = microtime(true) - $time;
 
-	//if ($time > 1)
+	if ($time > 1)
 		//trigger_error("\ntime = $time \tmatches = ".count($matches)."\nquery = ".$query."\n");
 
 	echo count($matches)." ".$query."\n";
@@ -1093,14 +1093,14 @@ function domatching2 ($pattern, $db, $r, $oldname, $sect, $parts = -1)
 
 	if (isset($cuenta[1]) && $notyet)
 	{
-		//var_dump($cuenta);
+//var_dump($cuenta);
 		echo "d2 1: ".$r['name']."\n";
 		echo "d2 2: ".$cuenta[0]."\n";
 		if (strlen($cuenta[0]) <= 3)
 		{
 			$cuenta[0] = $cuenta[1];
 		}
-		echo "doing ".$sect."\n";
+	echo "doing ".$sect."\n";
 		$oldname = $cuenta[0];
 //		$cuenta[0] = getname($cuenta);
 		$query = "SELECT * FROM `binaries` where match (name) against (".$db->escapeString($cuenta[0])." IN NATURAL LANGUAGE MODE)";
@@ -1499,7 +1499,7 @@ echo "relnum is $relnum\n";
 				if (!preg_match('/(part\d{1,4}?|\.par2|vol\d{1,4}?\+\d{1,4}?|\.zip|\.p\d{1,4}?|\.\d{1,4}?\"?$)/iU', $r['name']))
 				{
 //					echo "name to match Z: ".$r['name']."\n";
-					//domatching2($pattern, $db, $r, $r['name'], "Z", 1);
+//					domatching2($pattern, $db, $r, $r['name'], "Z", 1);
 				}
 
 			$oldname = $name;

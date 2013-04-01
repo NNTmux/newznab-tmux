@@ -5,7 +5,6 @@ require_once(WWW_DIR."/lib/binaries.php");
 require_once(WWW_DIR."/lib/powerprocess.php");
 require_once(WWW_DIR."/lib/framework/db.php");
 
-
 $time = microtime(true);
 $db = new DB();
 $cont = true;
@@ -50,14 +49,15 @@ if ($cont)
 	$rel = $db->query("UPDATE `binaries` SET `procstat`=0,`procattempts`=0,`regexID`=NULL, `relpart`=0,`reltotalpart`=0,`relname`=NULL WHERE procstat = -6");
 
 echo "Getting work to be done\n";
-$query = "SELECT ID FROM binaries WHERE `procstat` = 0 GROUP BY binaryhash order by RAND()";
+//$query = "SELECT ID FROM binaries WHERE `procstat` = 0 GROUP BY binaryhash order by RAND()";
+$query = "SELECT ID FROM binaries WHERE `procstat` = 0 LIMIT 5000";
 
 $theList = $db->query($query);
 unset($db);
 
 $theCount = count($theList);
 
-$ps = new PowerProcess(8,0,false);
+$ps = new PowerProcess();
 $ps->RegisterCallback('psUpdateComplete');
 $ps->maxChildren = 8;
 $ps->tickCount = 10000;	// value in usecs. change this to 1000000 (one second) to reduce cpu use
@@ -120,21 +120,23 @@ if ($ps->RunThreadCode())
 
 	$count = $theCount - $listcount;
 	$countpct = $count / $theCount;
-        $cleanpct = str_pad(number_format(($countpct * 100), 1), 7, " ", STR_PAD_LEFT);
+	$cleanpct = str_pad(number_format(($countpct * 100), 1), 7, " ", STR_PAD_LEFT);
 
-        if ($listcount % 250 == 0 && $listcount > 0)
-        {
-                $tim = microtime(true) - $time;
-                echo "\t\t".$cleanpct."% = ".str_pad(number_format($tim, 1), 8, " ", STR_PAD_LEFT);
-                $tim = ($listcount * $tim) / $count + time();
-//              $tim = number_format(($listcount * $tim) / 60 / $count, 1);
-                if ($countpct > .95 || ($count > 1000 && ($listcount+250) % 1000 == 0))
-                        echo "\t".date('M jS Y H:i:s', $tim);
-//                      echo "\t".$tim."m to go" ;
-                echo "\n".str_pad($listcount, 7, " ", STR_PAD_LEFT)."\t";
+	if ($listcount % 250 == 0 && $count > 0)
+	{
+		$tim = microtime(true) - $time;
+		echo "\t\t".$cleanpct."% = ".str_pad(number_format($tim, 1), 8, " ", STR_PAD_LEFT);
+		$tim = ((1 + 0.2 * (1 - $countpct)) * ($listcount * $tim) / $count) + time();
 
-        } elseif ($listcount % 25 == 0)
-                echo " .";
+//		$tim = number_format(($listcount * $tim) / 60 / $count, 1);
+		if ($countpct > .95 || ($count > 1000 && ($listcount+250) % 1000 == 0))
+			echo "\t".date('M jS Y H:i:s', $tim);
+//			echo "\t".$tim."m to go" ;
+		echo "\n".str_pad($listcount, 7, " ", STR_PAD_LEFT)."\t";
+
+	}
+	if ($listcount % 25 == 0)
+		echo " .";
 
 
 //	echo "[Thread-{$thread}] Completed update for post {$post['ID']}\n";
@@ -152,4 +154,3 @@ function psUpdateComplete()
 }
 
 ?>
-

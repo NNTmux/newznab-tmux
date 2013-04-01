@@ -14,17 +14,17 @@ export RUNNING="true"
 
 #these scripts set the 'nice'ness of each script, default is 19, the lowest, the highest is -20
 #anything between -1 and -20 require root/sudo to run
-export NICENESS="10"
+export NICENESS="1"
 
 #these scripts can add some serious load to your system, without proper monitoring it can be
 #to much, you can set the max load that any pane will be started at
 #for example, if you set load to 2, no pane will start when your system load exceeds 2
 #this does not mean the the desired load will not be exceeded, just that no panes will be be restarted
 #this one is for all panes except update_releases
-export MAX_LOAD="3.25"
+export MAX_LOAD="4.25"
 
 #this one is for update_releases
-export MAX_LOAD_RELEASES="3.25"
+export MAX_LOAD_RELEASES="4.25"
 
 ############################################################
 
@@ -87,7 +87,7 @@ export TMUX_SESSION="Ubuntu-dev"
 #the monitor script will update itself and each pane, once every 5 seconds plus the lagg time time on the loop the db is queried
 #to press the point, the db is not queried any sooner than the time set below, but the script loops each iteration once every 5 seconds
 #this makes it more responsive to stop/kill without slamming the db with needless queries, starts are still controlled by the queries
-export MONITOR_UPDATE="30"
+export MONITOR_UPDATE="10"
 
 #you may want to kill the update_binaries, backfill and import if no releases have been add in x minutes, set the timer to anything other than 0 to enable
 #this will only run every 5 loops of monitor
@@ -131,7 +131,7 @@ export BINARIES_SLEEP="900"
 
 #Set the max amount of binaries in the binaries table and still allow update_binaries to run
 #set to 0 to disable
-export BINARIES_MAX_BINS="5000"
+export BINARIES_MAX_BINS="0"
 
 #Set the max amount of unprocessed releases and still allow update_binaries to run
 #set to 0 to disable
@@ -161,7 +161,7 @@ export BACKFILL_MAX_RELEASES="0"
 
 #Set the max amount of binaries in the binaries table and still allow backfill to run
 #set to 0 to disable
-export BACKFILL_MAX_BINS="5000"
+export BACKFILL_MAX_BINS="0"
 
 #Set the max amount of of rows in the parts table and still allow backfill to run
 #set to 0 to disable
@@ -193,7 +193,7 @@ export KEVIN_THREADED="truek"
 export KEVIN_DATE="2008-08-15"
 
 #set the number of articles/headers to download at one time
-export KEVIN_PARTS="1000000"
+export KEVIN_PARTS="100000"
 
 ############################################################
 
@@ -242,7 +242,7 @@ export MISC_ONLY="true"
 
 #run ugo's automake.php script to create releases, this does not use regexes and will run in a loop prior
 #to update_releases.php
-export UGO_THREADED="true"
+export UGO_THREADED="truef"
 
 ############################################################
 
@@ -251,7 +251,7 @@ export RELEASES="true"
 
 #Set, in seconds - how long the update_release should sleep between runs
 #bottom right
-export RELEASES_SLEEP="5"
+export RELEASES_SLEEP="0"
 
 ############################################################
 
