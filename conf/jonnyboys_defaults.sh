@@ -164,7 +164,7 @@ export BACKFILL_MAX_BINS="0"
 
 #Set the max amount of of rows in the parts table and still allow backfill to run
 #set to 0 to disable
-export BACKFILL_MAX_ROWS="1200000"
+export BACKFILL_MAX_ROWS="0"
 
 #Set the maximum days to backfill, you set the Newznab+ admin/edit backfill to 1
 #this will increment your database by 1 after each backfill loop
@@ -180,7 +180,7 @@ export MAXDAYS="100"
 #it will be skipped (target reached). When that group is done, it will do another ( again from z to a).
 #this does not use increment, it works by the date set below
 #you also need to enable kevin's compression mod, those files are needed and you still need to enable BACKFILL
-export KEVIN_SAFER="true"
+export KEVIN_SAFER="trued"
 
 #use kevin123's backfill_parts.php instead of normal backfill
 export KEVIN_BACKFILL_PARTS="false"
@@ -189,7 +189,7 @@ export KEVIN_BACKFILL_PARTS="false"
 export KEVIN_THREADED="false"
 
 #set the date to go back to, must be in the format of YYYY-MM-DD, like 2012-06-24, this is the date of the posted nzbs
-export KEVIN_DATE="2013-03-01"
+export KEVIN_DATE="2010-01-01"
 
 #set the number of articles/headers to download at one time
 export KEVIN_PARTS="100000"

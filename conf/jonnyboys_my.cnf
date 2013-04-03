@@ -72,8 +72,11 @@ myisam-recover         = BACKUP
 #
 # * Query Cache Configuration
 #
-query_cache_limit	= 128M
-query_cache_size        = 256M
+
+#query_cache_limit	= 256M
+#query_cache_size        = 1G
+query_cache_size        = 0
+
 #
 # * Logging and Replication
 #
@@ -134,13 +137,13 @@ log_error = /var/lib/mysql/error.log
     innodb_use_sys_malloc = 1
      
     #threading
-    innodb_thread_concurrency = 12
-    innodb_read_io_threads = 8
-    innodb_write_io_threads = 8
+    innodb_thread_concurrency = 24
+    innodb_read_io_threads = 12
+    innodb_write_io_threads = 12
     innodb_purge_threads = 1
      
     #buffer pool related
-    innodb_buffer_pool_size = 2G
+    innodb_buffer_pool_size = 6G
     innodb_buffer_pool_instances = 8
     innodb_change_buffering = all
     innodb_max_dirty_pages_pct = 90
@@ -150,9 +153,9 @@ log_error = /var/lib/mysql/error.log
     innodb_flush_log_at_trx_commit = 0
      
     #transaction logs
-    innodb_log_buffer_size = 512M
-    innodb_log_files_in_group = 2
-    innodb_log_file_size = 512M
+    innodb_log_buffer_size = 1G
+    innodb_log_files_in_group = 4
+    innodb_log_file_size = 1G
      
 [mysqldump]
 quick
