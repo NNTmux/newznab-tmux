@@ -8,6 +8,8 @@
 
  * tmux 1.6 or newer is needed to runs these scripts. These scripts relies on tmux reporting that the "Pane is dead". That is how the script knows that is nothing running in that pane and to restart it for another loop. Seeing "Pane is dead" is normal and expected. If, you are using \*bsd or MacOS, you may need to install [gnu sed(gsed)](http://www.gnu.org/software/software.html) and set the path to it in defaults.sh.
 
+ * I have included a deb package to install tmux 1.8. It is located in the packages folder and it can be installed after cloning my git.
+
  * To exit the scripts without any worry of causing problems. Click into the Monitor pane, top left and Ctrl-c, or edit defaults.sh and set running="false". This will stop the monitor script. When all of the other panes show dead, then it is ok to run Ctrl-a c and in new window run killall tmux. The only unsafe time to kill these scripts is when optimize is running. Monitor  will display a warning whenever an optimize is in progress.
 
  * These scripts were written and tested on Ubuntu 12.10 and FreeBSD 9.1. You may need to create a symbolic link or edit these scripts accordingly.
