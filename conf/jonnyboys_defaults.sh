@@ -46,10 +46,10 @@ export ADMIN_PATH=$NEWZPATH"/www/admin"
 #At some point, increasing this begins to slow things down. It will need to be adjusted for your system
 #to get the desired performance, 0 will disable all post processing, but not category processing
 #the first window has up to 16 postprocess and can use primary or alternate NNTP provider
-export POST_TO_RUN_A="8"
+export POST_TO_RUN_A="4"
 
 #The second window also has 16 processes and can use promary or alternate NNTP provider
-export POST_TO_RUN_B="16"
+export POST_TO_RUN_B="0"
 
 #by modifying www/config.php like http://pastebin.com/VgH9DCZw, you can use 1 provider to run update_binaries
 #and backup and another provider to run post processing with. Or, 1 provider to run up to 16 postprocesses and another to run
@@ -61,7 +61,7 @@ export POST_TO_RUN_B="16"
 export USE_TWO_NNTP="true"
 
 #this allows you split the 32 postprocessing into 2 separate providers
-export USE_TWO_PP="true"
+export USE_TWO_PP="truek"
 
 ############################################################
 
@@ -217,7 +217,7 @@ export KEVIN_PARTS="100000"
 export NZBS="/home/jonnyboy/nzb_files2"
 
 #Choose to run import nzb script true/false
-export IMPORT="truef"
+export IMPORT="true"
 
 #If, you have all of your nzbs in one folder select false
 #If, you have all of you nzbs split into separate in with the root at $NZBS then select true
@@ -408,7 +408,7 @@ export USE_NMON="false"
 export USE_IOTOP="false"
 
 #define tcptrack user settings to apply at runtime
-export USE_TCPTRACK="false"
+export USE_TCPTRACK="truek"
 export TRCPTRACK_ARGS="-i eth0 port 563"
 
 #define vnstat user settings to apply at runtim
@@ -492,7 +492,7 @@ export RAMDISK_PATH="/"
 ###########################################################
 
 #logs can be written, per pane, to the logs folder
-export WRITE_LOGS="false"
+export WRITE_LOGS="true"
 
 ###########################################################
 

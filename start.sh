@@ -146,7 +146,7 @@ else
 	$SED -i -e "s/\/\/echo \"PostPrc : Fetching/echo \"PostPrc : Fetching/g" bin/lib/postprocess$c.php
 	if [[ $USE_TWO_NNTP == "true" ]] && [[ $USE_TWO_PP != "true" ]]; then
 		$SED -i -e "s/require_once(WWW_DIR.\"\/lib\/nntp.php\");/require(dirname(__FILE__).\"\/nntp2.php\");/g" bin/lib/postprocess$c.php
-        	$SED -i -e "s/new Nntp;/new Nntp2;/g" bin/lib/postprocess$c.php
+        	$SED -i -e "s/new Nntp;/new GetConnected;/g" bin/lib/postprocess$c.php
 	        $SED -i -e "s/doConnect/doConnect2/g" bin/lib/postprocess$c.php
 	fi
 
@@ -169,7 +169,7 @@ else
         $SED -i -e "s/\/\/echo \"PostPrc : Fetching/echo \"PostPrc : Fetching/g" bin/lib/postprocess$c.php
         if [[ $USE_TWO_NNTP == "true" ]] && [[ $USE_TWO_PP == "true" ]]; then
                 $SED -i -e "s/require_once(WWW_DIR.\"\/lib\/nntp.php\");/require(dirname(__FILE__).\"\/nntp2.php\");/g" bin/lib/postprocess$c.php
-        	$SED -i -e "s/new Nntp;/new Nntp2;/g" bin/lib/postprocess$c.php
+        	$SED -i -e "s/new Nntp;/new GetConnected;/g" bin/lib/postprocess$c.php
 	        $SED -i -e "s/doConnect/doConnect2/g" bin/lib/postprocess$c.php
         fi
 
@@ -193,7 +193,7 @@ else
     $SED -i -e "s/$numtoProcess = 100;/$numtoProcess = 20;/g" bin/lib/postprocess1.php
     if [[ $USE_TWO_NNTP == "true" ]] && [[ $USE_TWO_PP != "true" ]]; then
 	    $SED -i -e "s/require_once(WWW_DIR.\"\/lib\/nntp.php\");/require(dirname(__FILE__).\"\/nntp2.php\");/g" bin/lib/postprocess1.php
-            $SED -i -e "s/new Nntp;/new Nntp2;/g" bin/lib/postprocess1.php
+            $SED -i -e "s/new Nntp;/new GetConnected;/g" bin/lib/postprocess1.php
             $SED -i -e "s/doConnect/doConnect2/g" bin/lib/postprocess1.php
     fi
 
@@ -215,7 +215,7 @@ else
     $SED -i -e "s/NNTP_PORT/NNTP_PORT2/g" bin/lib/nntp2.php
     $SED -i -e "s/NNTP_SSLENABLED/NNTP_SSLENABLED2/g" bin/lib/nntp2.php
     $SED -i -e "s/NNTPException/NNTPException2/g" bin/lib/nntp2.php
-    $SED -i -e "s/class Nntp/class Nntp2/g" bin/lib/nntp2.php
+    $SED -i -e "s/class Nntp/class GetConnected/g" bin/lib/nntp2.php
 
     $SED -i -e "s/500/250/" bin/lib/postprocess1.php
     $SED -i -e "s/500/250/" bin/lib/postprocess2.php
