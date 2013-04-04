@@ -24,17 +24,21 @@ source $DIR/../defaults.sh
 echo "Please edit this script, very carefully!"
 exit
 
-export USER="username"
+export USER="your username"
 export PATH_RAMDISK="/var/ramdisk"
 export MYSQL_PATH="/var/lib/mysql/newznab"
 export SQL_BACKUP="/home/$USER/sql_backup"
+
+#get userid for mysql
+USERID=`id -u mysql`
+GROUPID=`id -g mysql`
 
 /etc/init.d/mysql stop
 
 if ! grep -q '#RAMDISK' "/etc/fstab" ; then
   echo "" | sudo tee -a /etc/fstab
   echo "#RAMDISK" | sudo tee -a /etc/fstab
-  echo "tmpfs $PATH_RAMDISK tmpfs user,nodev,nodiratime,nosuid,size=5G,mode=777 0 0" | sudo tee -a /etc/fstab
+  echo "tmpfs $PATH_RAMDISK tmpfs rw,uid=$USERID,gid=$GROUPID,nodiratime,size=5G,nr_inodes=10k,mode=0700 0 0" | sudo tee -a /etc/fstab
 fi
 
 mkdir -p $PATH_RAMDISK
@@ -49,51 +53,50 @@ if [ ! -d "$SQL_BACKUP" ]; then
 fi
 
 
-if [ ! -h "$MYSQL_PATH/parts.frm" ]; then
+if [ ! -h "$MYSQL_PATH/parts.frm" ] && [ -f $MYSQL_PATH/parts.frm ]; then
     cp $MYSQL_PATH/parts.frm $SQL_BACKUP/
     mv $MYSQL_PATH/parts.frm $PATH_RAMDISK/
     ln -s $PATH_RAMDISK/parts.frm $MYSQL_PATH/
 fi
-if [ ! -h "$MYSQL_PATH/parts.MYD" ]; then
+if [ ! -h "$MYSQL_PATH/parts.MYD" ] && [ -f $MYSQL_PATH/parts.MYD ]; then
     cp $MYSQL_PATH/parts.MYD $SQL_BACKUP/
     mv $MYSQL_PATH/parts.MYD $PATH_RAMDISK/
     ln -s $PATH_RAMDISK/parts.MYD $MYSQL_PATH/
 fi
-if [ ! -h "$MYSQL_PATH/parts.MYI" ]; then
+if [ ! -h "$MYSQL_PATH/parts.MYI" ] && [ -f $MYSQL_PATH/parts.MYI ]; then
     cp $MYSQL_PATH/parts.MYI $SQL_BACKUP/
     mv $MYSQL_PATH/parts.MYI $PATH_RAMDISK/
     ln -s $PATH_RAMDISK/parts.MYI $MYSQL_PATH/
 fi
 
 
-if [ ! -h "$MYSQL_PATH/partrepair.frm" ]; then
+if [ ! -h "$MYSQL_PATH/partrepair.frm" ] && [ -f $MYSQL_PATH/partrepair.frm ]; then
     cp $MYSQL_PATH/partrepair.frm $SQL_BACKUP/
     mv $MYSQL_PATH/partrepair.frm $PATH_RAMDISK/
     ln -s $PATH_RAMDISK/partrepair.frm $MYSQL_PATH/
 fi
-if [ ! -h "$MYSQL_PATH/partrepair.MYD" ]; then
+if [ ! -h "$MYSQL_PATH/partrepair.MYD" ] && [ -f $MYSQL_PATH/partrepair.MYD ]; then
     cp $MYSQL_PATH/partrepair.MYD $SQL_BACKUP/
     mv $MYSQL_PATH/partrepair.MYD $PATH_RAMDISK/
     ln -s $PATH_RAMDISK/partrepair.MYD $MYSQL_PATH/
 fi
-if [ ! -h "$MYSQL_PATH/partrepair.MYI" ]; then
+if [ ! -h "$MYSQL_PATH/partrepair.MYI" ] && [ -f $MYSQL_PATH/partrepair.MYI ]; then
     cp $MYSQL_PATH/partrepair.MYI $SQL_BACKUP/
     mv $MYSQL_PATH/partrepair.MYI $PATH_RAMDISK/
     ln -s $PATH_RAMDISK/partrepair.MYI $MYSQL_PATH/
 fi
 
-
-if [ ! -h "$MYSQL_PATH/binaries.frm" ]; then
+if [ ! -h "$MYSQL_PATH/binaries.frm" ] && [ -f $MYSQL_PATH/binaries.frm ]; then
     cp $MYSQL_PATH/binaries.frm $SQL_BACKUP/
     mv $MYSQL_PATH/binaries.frm $PATH_RAMDISK/
     ln -s $PATH_RAMDISK/binaries.frm $MYSQL_PATH/
 fi
-if [ ! -h "$MYSQL_PATH/binaries.MYD" ]; then
+if [ ! -h "$MYSQL_PATH/binaries.MYD" ] && [ -f $MYSQL_PATH/binaries.MYD ]; then
     cp $MYSQL_PATH/binaries.MYD $SQL_BACKUP/
     mv $MYSQL_PATH/binaries.MYD $PATH_RAMDISK/
     ln -s $PATH_RAMDISK/binaries.MYD $MYSQL_PATH/
 fi
-if [ ! -h "$MYSQL_PATH/binaries.MYI" ]; then
+if [ ! -h "$MYSQL_PATH/binaries.MYI" ] && [ -f $MYSQL_PATH/binaries.MYI ]; then
     cp $MYSQL_PATH/binaries.MYI $SQL_BACKUP/
     mv $MYSQL_PATH/binaries.MYI $PATH_RAMDISK/
     ln -s $PATH_RAMDISK/binaries.MYI $MYSQL_PATH/

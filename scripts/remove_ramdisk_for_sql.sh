@@ -30,43 +30,43 @@ export SQL_BACKUP="/home/$USER/sql_backup"
 
 /etc/init.d/mysql stop
 
-if [ -h "$MYSQL_PATH/parts.frm" ]; then
+if [ -h "$MYSQL_PATH/parts.frm" ] && [ -f $PATH_RAMDISK/parts.frm ]; then
     rm $MYSQL_PATH/parts.frm
     mv $PATH_RAMDISK/parts.frm $MYSQL_PATH/
 fi
-if [ -h "$MYSQL_PATH/parts.MYD" ]; then
+if [ -h "$MYSQL_PATH/parts.MYD" ] && [ -f $PATH_RAMDISK/parts.MYD ]; then
     rm $MYSQL_PATH/parts.MYD
     mv $PATH_RAMDISK/parts.MYD $MYSQL_PATH/
 fi
-if [ -h "$MYSQL_PATH/parts.MYI" ]; then
+if [ -h "$MYSQL_PATH/parts.MYI" ] && [ -f $PATH_RAMDISK/parts.MYI ]; then
     rm $MYSQL_PATH/parts.MYI
     mv $PATH_RAMDISK/parts.MYI $MYSQL_PATH/
 fi
 
 
-if [ -h "$MYSQL_PATH/partrepair.frm" ]; then
+if [ -h "$MYSQL_PATH/partrepair.frm" ] && [ -f $PATH_RAMDISK/partrepair.MYD ]; then
     rm $MYSQL_PATH/partrepair.frm
     mv $PATH_RAMDISK/partrepair.frm $MYSQL_PATH/
 fi
-if [ -h "$MYSQL_PATH/partrepair.MYD" ]; then
+if [ -h "$MYSQL_PATH/partrepair.MYD" ] && [ -f $PATH_RAMDISK/partrepair.MYD ]; then
     rm $MYSQL_PATH/partrepair.MYD
     mv $PATH_RAMDISK/partrepair.MYD $MYSQL_PATH/
 fi
-if [ -h "$MYSQL_PATH/partrepair.MYI" ]; then
+if [ -h "$MYSQL_PATH/partrepair.MYI" ] && [ -f $PATH_RAMDISK/partrepair.MYD ]; then
     rm $MYSQL_PATH/partrepair.MYI
     mv $PATH_RAMDISK/partrepair.MYI $MYSQL_PATH/
 fi
 
 
-if [ -h "$MYSQL_PATH/binaries.frm" ]; then
+if [ -h "$MYSQL_PATH/binaries.frm" ] && [ -f $PATH_RAMDISK/binaries.frm ]; then
     rm $MYSQL_PATH/binaries.frm
     mv $PATH_RAMDISK/binaries.frm $MYSQL_PATH/
 fi
-if [ -h "$MYSQL_PATH/binaries.MYD" ]; then
+if [ -h "$MYSQL_PATH/binaries.MYD" ] && [ -f $PATH_RAMDISK/binaries.MYD ]; then
     rm $MYSQL_PATH/binaries.MYD
     mv $PATH_RAMDISK/binaries.MYD $MYSQL_PATH/
 fi
-if [ -h "$MYSQL_PATH/binaries.MYI" ]; then
+if [ -h "$MYSQL_PATH/binaries.MYI" ] && [ -f $PATH_RAMDISK/binaries.MYI ]; then
     rm $MYSQL_PATH/binaries.MYI
     mv $PATH_RAMDISK/binaries.MYI $MYSQL_PATH/
 fi

@@ -39,13 +39,29 @@ export ADMIN_PATH=$NEWZPATH"/www/admin"
 ############################################################
 
 #Post Processing Additional is the post processing that downloads rar files and attempts to get info for your site
-#you are able to set the number of process to be run from 1-32, remember that each process uses 1 of your nntp connections
-#so, if you have 20, and you set this to 32, you will have errors, lots of errors, nfo lookup uses 1 -3 connections
+#you are able to set the number of processes to be run from 1-32, remember that each process uses 1 of your nntp connections
+#so, if you have 20, and you set this to 32, you will have errors, lots of errors, nfo lookup uses 1-3 connections each
 #binaries and backfill threaded default up to 10 connections each and predb uses 1, so understand how many connections you are using when setting
-#trial and error for this, set to 1 will run > 0, set to 2 will run > 200, 3 will run > 300 and so on.
+#trial and error for this, set to 1 will run > 0, set to 2 will run > 100, 3 will run > 200 and so on.
 #At some point, increasing this begins to slow things down. It will need to be adjusted for your system
-#to get the desired performance, 0 will disable all post processing
-export POST_TO_RUN="14"
+#to get the desired performance, 0 will disable all post processing, but not category processing
+#the first window has up to 16 postprocess and can use primary or alternate NNTP provider
+export POST_TO_RUN_A="8"
+
+#The second window also has 16 processes and can use promary or alternate NNTP provider
+export POST_TO_RUN_B="16"
+
+#by modifying www/config.php like http://pastebin.com/VgH9DCZw, you can use 1 provider to run update_binaries
+#and backup and another provider to run post processing with. Or, 1 provider to run up to 16 postprocesses and another to run
+#up to 16 more postprocesses, or the same provider for everything
+#you can not switch providers without resetting all groups and truncating, I have included a script in scripts folders to reset and truncate
+#sudo scripts/reset_truncate.php
+
+#this one sets 1 provider for everything(false), or first provider for update_binaries and backfill and another for postprocessing(true)
+export USE_TWO_NNTP="true"
+
+#this allows you split the 32 postprocessing into 2 separate providers
+export USE_TWO_PP="true"
 
 ############################################################
 
@@ -115,7 +131,7 @@ export BACKFILL_SEQ_TIMER="10"
 ############################################################
 
 #Choose to run update_binaries true/false
-export BINARIES="true"
+export BINARIES="truef"
 
 #Choose to run the threaded or non-threaded newznab binaries scripts true/false
 #update_binaries.php or update_binaries_threaded.php
@@ -142,7 +158,7 @@ export BINARIES_MAX_ROWS="0"
 ############################################################
 
 #Choose to run backfill script true/false
-export BACKFILL="true"
+export BACKFILL="trued"
 
 #Choose to run the threaded or non-threaded newznab backfill scripts true/false
 #backfill.php or backfill_threaded.php
@@ -201,7 +217,7 @@ export KEVIN_PARTS="100000"
 export NZBS="/home/jonnyboy/nzb_files2"
 
 #Choose to run import nzb script true/false
-export IMPORT="trued"
+export IMPORT="truef"
 
 #If, you have all of your nzbs in one folder select false
 #If, you have all of you nzbs split into separate in with the root at $NZBS then select true
@@ -214,11 +230,11 @@ export NZB_THREADS="true"
 export NZB_FOLDER_COUNT="50"
 
 #How many nzbs to import per loop, if using NZB_THREADS=true the per folder
-export NZBCOUNT="50"
+export NZBCOUNT="5"
 
 #Set, in seconds - how long the nzb-import should sleep between runs
 #below backfill
-export IMPORT_SLEEP="5"
+export IMPORT_SLEEP="0"
 
 #Set the max amount of unprocessed releases and still allow nzb-import to run
 #set to 0 to disable

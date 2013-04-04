@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.1r771";
+$version="0.1r772";
 
 $db = new DB();
 
@@ -1050,20 +1050,20 @@ while( $i > 0 )
 	}
 
 	//start postprocessing in window 2
-	$post = $array['POST_TO_RUN'];
+	$post = $array['POST_TO_RUN_A'];
 	for ($g=1; $g<=16; $g++)
 	{
 		$h=$g-1;
-		$f=$h*100;
-		$j=$g*2;
+		$f=$h*200;
+		$j=$g*1;
 		$color = get_color();
 		$log = writelog($panes2[$h]);
-		if (( $array['MAX_LOAD'] >= get_load()) && ( $array['POST_TO_RUN'] >= $g ) && ( $work_remaining_now > $f ) && ( $optimize_safe_to_run != "true" )) {
-			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.$h 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes2[$h] $ds2 && cd $_bin && sleep $j && $_php processAdditional$g.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes2[$h] $ds3' 2>&1 1> /dev/null");
-		} elseif (( $array['POST_TO_RUN'] >= $g ) && ( $work_remaining_now <= $f ) && ( $optimize_safe_to_run != "true" )) {
+		if (( $array['MAX_LOAD'] >= get_load()) && ( $array['POST_TO_RUN_A'] >= $g ) && ( $work_remaining_now > $f ) && ( $optimize_safe_to_run != "true" )) {
+			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.$h 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes2[$h] $ds2 && cd $_bin && $_php processAdditional$g.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes2[$h] $ds3' 2>&1 1> /dev/null");
+		} elseif (( $array['POST_TO_RUN_A'] >= $g ) && ( $work_remaining_now <= $f ) && ( $optimize_safe_to_run != "true" )) {
 			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.$h 'echo \"\033[38;5;\"$color\"m\n$panes2[$h] $work_remaining_now < $f\nHas no work to process \" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
 		} elseif (( $g > $post ) && ( $optimize_safe_to_run != "true" )) {
-			shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:2.$h 'echo \"\033[38;5;\"$color\"m\n$panes2[$h] Disabled by POST_TO_RUN\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
+			shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:2.$h 'echo \"\033[38;5;\"$color\"m\n$panes2[$h] Disabled by POST_TO_RUN_A\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
 		} elseif (( $optimize_safe_to_run != "true" ) && ( $array['MAX_LOAD'] <= get_load())) {
                         shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.$h 'echo \"\033[38;5;\"$color\"m\n$panes2[$h] Disabled by MAX_LOAD\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
                 } elseif ( $optimize_safe_to_run == "true" ) {
@@ -1072,20 +1072,21 @@ while( $i > 0 )
 	}
 
 	//start postprocessing in window 2
-	$post = $array['POST_TO_RUN'];
-	for ($g=17; $g<=32; $g++)
-	{
-		$h=$g-17;
-		$f=($g-1)*100;
-		$j=$g*2;
-		$color = get_color();
+	$post = $array['POST_TO_RUN_B'];
+        for ($g=1; $g<=16; $g++)
+        {
+                $k=$g+16;
+		$h=$g-1;
+                $f=$h*200;
+                $j=$g*1;
+                $color = get_color();
 		$log = writelog($panes2[$h]);
-		if (( $array['MAX_LOAD'] >= get_load()) && ( $array['POST_TO_RUN'] >= $g ) && ( $work_remaining_now > $f ) && ( $optimize_safe_to_run != "true" )) {
-			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.$h 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes3[$h] $ds2 && cd $_bin && sleep $j && $_php processAdditional$g.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes3[$h] $ds3' 2>&1 1> /dev/null");
-		} elseif (( $array['POST_TO_RUN'] >= $g ) && ( $work_remaining_now <= $f ) && ( $optimize_safe_to_run != "true" )) {
+		if (( $array['MAX_LOAD'] >= get_load()) && ( $array['POST_TO_RUN_B'] >= $g ) && ( $work_remaining_now > $f ) && ( $optimize_safe_to_run != "true" )) {
+			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.$h 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes3[$h] $ds2 && cd $_bin && $_php processAdditional$k.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes3[$h] $ds3' 2>&1 1> /dev/null");
+		} elseif (( $array['POST_TO_RUN_B'] >= $g ) && ( $work_remaining_now <= $f ) && ( $optimize_safe_to_run != "true" )) {
 			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.$h 'echo \"\033[38;5;\"$color\"m\n$panes3[$h]\n$work_remaining_now < $f\nHas no work to process \" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
 		} elseif (( $g > $post ) && ( $optimize_safe_to_run != "true" )) {
-			shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:3.$h 'echo \"\033[38;5;\"$color\"m\n$panes3[$h]\nDisabled by \nPOST_TO_RUN\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
+			shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:3.$h 'echo \"\033[38;5;\"$color\"m\n$panes3[$h]\nDisabled by \nPOST_TO_RUN_B\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
 		} elseif (( $optimize_safe_to_run != "true" ) && ( $array['MAX_LOAD'] <= get_load())) {
                         shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.$h 'echo \"\033[38;5;\"$color\"m\n$panes3[$h] Disabled by MAX_LOAD\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
                 } elseif ( $optimize_safe_to_run == "true" ) {

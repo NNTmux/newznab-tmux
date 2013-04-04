@@ -129,22 +129,53 @@ else
     rm -f bin/lib/tvrage.php
     rm -f bin/processAdditional*
     rm -f bin/processAlternate*
+    rm -f bin/lib/nntp2.php
 
     #create postprocessing scripts
-    for (( c=2; c<=32; c++ ))
+    for (( c=2; c<=16; c++ ))
     do
-        d=$((($c - 1) * 100))
+        d=$((($c - 1) * 200))
         cp $NEWZPATH/www/lib/postprocess.php bin/lib/postprocess$c.php
         $SED -i -e "s/PostProcess/PostProcess$c/g" bin/lib/postprocess$c.php
         $SED -i -e "s/echo \$iteration.*$/echo \$iteration --.\"    \".\$rel['ID'].\" : \".\$rel['name'].\"\\\n\";/" bin/lib/postprocess$c.php
         $SED -i -e "s/processAdditional/processAdditional$c/g" bin/lib/postprocess$c.php
         $SED -i -e "s/\$tmpPath = \$this->site->tmpunrarpath;/\$tmpPath = \$this->site->tmpunrarpath; \\
                         \$tmpPath .= '1\/tmp$c';/g" bin/lib/postprocess$c.php
-        $SED -i -e "s/order by r.postdate desc limit %d.*\$/order by r.guid asc limit %d, %d \", (\$maxattemptstocheckpassworded + 1) * -1, $c * \$numtoProcess, \$numtoProcess));/g" bin/lib/postprocess$c.php
-        $SED -i -e "s/PostPrc : Performing additional post processing.*\$/PostPrc : Performing additional post processing by guid on \".\$rescount.\" releases, starting at $d ...\";/g" bin/lib/postprocess$c.php
+        $SED -i -e "s/order by r.postdate desc limit %d.*\$/order by r.guid asc limit %d, %d \", (\$maxattemptstocheckpassworded + 1) * -1, $c * 200, \$numtoProcess));/g" bin/lib/postprocess$c.php
+        $SED -i -e "s/PostPrc : Performing additional post processing.*\$/PostPrc : Performing additional post processing by guid on \".\$rescount.\" releases, starting at $d ...\\n\";/g" bin/lib/postprocess$c.php
+	$SED -i -e "s/\/\/echo \"PostPrc : Fetching/echo \"PostPrc : Fetching/g" bin/lib/postprocess$c.php
+	if [[ $USE_TWO_NNTP == "true" ]] && [[ $USE_TWO_PP != "true" ]]; then
+		$SED -i -e "s/require_once(WWW_DIR.\"\/lib\/nntp.php\");/require(dirname(__FILE__).\"\/nntp2.php\");/g" bin/lib/postprocess$c.php
+        	$SED -i -e "s/new Nntp;/new Nntp2;/g" bin/lib/postprocess$c.php
+	        $SED -i -e "s/doConnect/doConnect2/g" bin/lib/postprocess$c.php
+	fi
 
         cp bin/lib/additional bin/processAdditional$c.php
         $SED -i -e "s/1/$c/g" bin/processAdditional$c.php
+        $SED -i -e "s/$numtoProcess = 100;/$numtoProcess = 20;/g" bin/lib/postprocess$c.php
+    done
+
+    for (( c=17; c<=32; c++ ))
+    do
+        d=$((($c - 1) * 200))
+        cp $NEWZPATH/www/lib/postprocess.php bin/lib/postprocess$c.php
+        $SED -i -e "s/PostProcess/PostProcess$c/g" bin/lib/postprocess$c.php
+        $SED -i -e "s/echo \$iteration.*$/echo \$iteration --.\"    \".\$rel['ID'].\" : \".\$rel['name'].\"\\\n\";/" bin/lib/postprocess$c.php
+        $SED -i -e "s/processAdditional/processAdditional$c/g" bin/lib/postprocess$c.php
+        $SED -i -e "s/\$tmpPath = \$this->site->tmpunrarpath;/\$tmpPath = \$this->site->tmpunrarpath; \\
+                        \$tmpPath .= '1\/tmp$c';/g" bin/lib/postprocess$c.php
+        $SED -i -e "s/order by r.postdate desc limit %d.*\$/order by r.guid asc limit %d, %d \", (\$maxattemptstocheckpassworded + 1) * -1, ($c + 16) * 200, \$numtoProcess));/g" bin/lib/postprocess$c.php
+        $SED -i -e "s/PostPrc : Performing additional post processing.*\$/PostPrc : Performing additional post processing by guid on \".\$rescount.\" releases, starting at $d ...\\n\";/g" bin/lib/postprocess$c.php
+        $SED -i -e "s/\/\/echo \"PostPrc : Fetching/echo \"PostPrc : Fetching/g" bin/lib/postprocess$c.php
+        if [[ $USE_TWO_NNTP == "true" ]] && [[ $USE_TWO_PP == "true" ]]; then
+                $SED -i -e "s/require_once(WWW_DIR.\"\/lib\/nntp.php\");/require(dirname(__FILE__).\"\/nntp2.php\");/g" bin/lib/postprocess$c.php
+        	$SED -i -e "s/new Nntp;/new Nntp2;/g" bin/lib/postprocess$c.php
+	        $SED -i -e "s/doConnect/doConnect2/g" bin/lib/postprocess$c.php
+        fi
+
+        cp bin/lib/additional bin/processAdditional$c.php
+        $SED -i -e "s/1/$c/g" bin/processAdditional$c.php
+        $SED -i -e "s/$numtoProcess = 100;/$numtoProcess = 20;/g" bin/lib/postprocess$c.php
     done
 
     cp $NEWZPATH/www/lib/postprocess.php bin/lib/postprocess1.php
@@ -157,7 +188,14 @@ else
     $SED -i -e "s/\$tmpPath = \$this->site->tmpunrarpath;/\$tmpPath = \$this->site->tmpunrarpath; \\
                     \$tmpPath .= '1\/tmp1';/g" bin/lib/postprocess1.php
     $SED -i -e 's/order by r.postdate desc limit %d.*$/order by r.guid desc limit %d ", ($maxattemptstocheckpassworded + 1) * -1, $numtoProcess));/g' bin/lib/postprocess1.php
-    $SED -i -e 's/PostPrc : Performing additional post processing.*$/PostPrc : Performing additional post processing by guid on ".$rescount." releases ...";/g' bin/lib/postprocess1.php
+    $SED -i -e 's/PostPrc : Performing additional post processing.*$/PostPrc : Performing additional post processing by guid on ".$rescount." releases ...\\n";/g' bin/lib/postprocess1.php
+    $SED -i -e "s/\/\/echo \"PostPrc : Fetching/echo \"PostPrc : Fetching/g" bin/lib/postprocess1.php
+    $SED -i -e "s/$numtoProcess = 100;/$numtoProcess = 20;/g" bin/lib/postprocess1.php
+    if [[ $USE_TWO_NNTP == "true" ]] && [[ $USE_TWO_PP != "true" ]]; then
+	    $SED -i -e "s/require_once(WWW_DIR.\"\/lib\/nntp.php\");/require(dirname(__FILE__).\"\/nntp2.php\");/g" bin/lib/postprocess1.php
+            $SED -i -e "s/new Nntp;/new Nntp2;/g" bin/lib/postprocess1.php
+            $SED -i -e "s/doConnect/doConnect2/g" bin/lib/postprocess1.php
+    fi
 
 
     cp -f $NEWZPATH/www/lib/nfo.php bin/lib/nfo.php
@@ -167,6 +205,17 @@ else
     cp -f $NEWZPATH/www/lib/music.php bin/lib/music1.php
     cp -f $NEWZPATH/www/lib/console.php bin/lib/console.php
     cp -f $NEWZPATH/www/lib/book.php bin/lib/book.php
+    cp -f $NEWZPATH/www/lib/nntp.php bin/lib/nntp2.php
+
+
+    $SED -i -e "s/function doConnect/function doConnect2/" bin/lib/nntp2.php
+    $SED -i -e "s/NNTP_USERNAME/NNTP_USERNAME2/g" bin/lib/nntp2.php
+    $SED -i -e "s/NNTP_PASSWORD/NNTP_PASSWORD2/g" bin/lib/nntp2.php
+    $SED -i -e "s/NNTP_SERVER/NNTP_SERVER2/g" bin/lib/nntp2.php
+    $SED -i -e "s/NNTP_PORT/NNTP_PORT2/g" bin/lib/nntp2.php
+    $SED -i -e "s/NNTP_SSLENABLED/NNTP_SSLENABLED2/g" bin/lib/nntp2.php
+    $SED -i -e "s/NNTPException/NNTPException2/g" bin/lib/nntp2.php
+    $SED -i -e "s/class Nntp/class Nntp2/g" bin/lib/nntp2.php
 
     $SED -i -e "s/500/250/" bin/lib/postprocess1.php
     $SED -i -e "s/500/250/" bin/lib/postprocess2.php
