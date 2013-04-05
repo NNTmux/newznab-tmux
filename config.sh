@@ -42,7 +42,7 @@ export ADMIN_PATH=$NEWZPATH"/www/admin"
 #you are able to set the number of processes to be run from 1-32, remember that each process uses 1 of your nntp connections
 #so, if you have 20, and you set this to 32, you will have errors, lots of errors, nfo lookup uses 1-3 connections each
 #binaries and backfill threaded default up to 10 connections each and predb uses 1, so understand how many connections you are using when setting
-#trial and error for this, set to 1 will run > 0, set to 2 will run > 200, 3 will run > 400 and so on.
+#trial and error for this, set to 1 will run > 0, set to 2 will run > 100, 3 will run > 200 and so on.
 #At some point, increasing this begins to slow things down. It will need to be adjusted for your system
 #to get the desired performance, 0 will disable all post processing, but not category processing
 #the first window has up to 16 postprocess and can use primary or alternate NNTP provider

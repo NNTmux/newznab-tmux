@@ -46,10 +46,10 @@ export ADMIN_PATH=$NEWZPATH"/www/admin"
 #At some point, increasing this begins to slow things down. It will need to be adjusted for your system
 #to get the desired performance, 0 will disable all post processing, but not category processing
 #the first window has up to 16 postprocess and can use primary or alternate NNTP provider
-export POST_TO_RUN_A="4"
+export POST_TO_RUN_A="16"
 
 #The second window also has 16 processes and can use promary or alternate NNTP provider
-export POST_TO_RUN_B="0"
+export POST_TO_RUN_B="16"
 
 #by modifying www/config.php like http://pastebin.com/VgH9DCZw, you can use 1 provider to run update_binaries
 #and backup and another provider to run post processing with. Or, 1 provider to run up to 16 postprocesses and another to run
@@ -61,7 +61,7 @@ export POST_TO_RUN_B="0"
 export USE_TWO_NNTP="true"
 
 #this allows you split the 32 postprocessing into 2 separate providers
-export USE_TWO_PP="truek"
+export USE_TWO_PP="true"
 
 ############################################################
 
@@ -117,7 +117,7 @@ export KEEP_KILLED="false"
 #this works by setting the 2 start timers and which is run at the start of the loop is determined like this
 #if at the start of the loop, the BINARIES_SEQ_TIMER has expired, then update_binaries will run and the BINARIES_SEQ_TIMER timer is reset
 #if BINARIES_SEQ_TIMER has not expired, then if BACKFILL_SEQ_TIMER has expired, the backfill will run and BACKFILL_SEQ_TIMER timer is reset
-export SEQUENTIAL="true"
+export SEQUENTIAL="false"
 
 #time between loop start for update_binaries, in seconds, this is a countdown timer, not a sleep after it runs
 #default is 30 minutes
@@ -135,7 +135,7 @@ export BINARIES="truef"
 
 #Choose to run the threaded or non-threaded newznab binaries scripts true/false
 #update_binaries.php or update_binaries_threaded.php
-export BINARIES_THREADS="true"
+export BINARIES_THREADS="false"
 
 #Set, in seconds - how long the update_binaries should sleep between runs
 #top right pane
@@ -162,7 +162,7 @@ export BACKFILL="trued"
 
 #Choose to run the threaded or non-threaded newznab backfill scripts true/false
 #backfill.php or backfill_threaded.php
-export BACKFILL_THREADS="true"
+export BACKFILL_THREADS="false"
 
 #Set, in seconds - how long the backfill should sleep between runs
 #in pane below update_binaries
@@ -230,7 +230,7 @@ export NZB_THREADS="true"
 export NZB_FOLDER_COUNT="50"
 
 #How many nzbs to import per loop, if using NZB_THREADS=true the per folder
-export NZBCOUNT="5"
+export NZBCOUNT="50"
 
 #Set, in seconds - how long the nzb-import should sleep between runs
 #below backfill
@@ -267,7 +267,7 @@ export RELEASES_SLEEP="0"
 #Choose to run optimize_innodb.php or optimize_mysiam.php script true/false
 #set to false by default, you should test the optimize scripts in bin first
 #optimize_myisam on small tables runs after every 5th loop of update_releases
-export OPTIMIZE="true"
+export OPTIMIZE="false"
 
 #optimize can wait, patiently while all other panes stop and then run
 #or, forcefully terminate all panes while it runs, to kill all panes and run optimize, enable
@@ -296,7 +296,7 @@ export INNODB="true"
 #Choose to run update_cleanup.php and removespecial.php true/false
 #set to false by default, you will need to edit /misc/testing/update_cleanup.php and /misc/testing/update_parsing.php
 #to actually do anything, directions are in the file
-export CLEANUP="true"
+export CLEANUP="false"
 
 #edit update_cleanup.php and update_parsing.php and svn up, this will only mod files when you run scripts/update_svn.sh or scripts/fix_files.sh
 export CLEANUP_EDIT="true"
@@ -309,14 +309,14 @@ export CLEANUP_TIMER="1800"
 #Choose to run update_parsing.php true/false
 #set to false by default, you will need to edit /misc/testing/update_parsing.php
 #to actually do anything, directions are in the file
-export PARSING="true"
+export PARSING="false"
 
 #choose to use kevin123's update_parsing script
 #this also includes kevin123's categorymod.php, you must run either update_svn.sh or fix_files.sh to copy the file into place
 export PARSING_MOD="true"
 
 #choose to use cj's fix_android_releases.php
-export FIX_DROID="true"
+export FIX_DROID="false"
 
 #run update_parsing.php against the whole db or just the last 24 hours
 export PAST_24_HOURS="false"
@@ -327,7 +327,7 @@ export PARSING_TIMER="900"
 ############################################################
 
 #Choose to run update_predb.php
-export PREDB="true"
+export PREDB="false"
 
 #How often to update the PreDB in seconds
 export PREDB_TIMER="900"
@@ -346,7 +346,7 @@ export SPOTNAB_ACTIVE="true"
 ############################################################
 
 #update the tv schedule and in theaters listings
-export TV_SCHEDULE="true"
+export TV_SCHEDULE="false"
 
 #How often to update the TV Schedule and the In Theaters in seconds
 export TVRAGE_TIMER="43200"
@@ -373,14 +373,14 @@ export KILL_QUIET="true"
 
 #Delete parts and binaries older than retention days, which is set in edit - site
 #this uses a script posted by cj https://github.com/NNScripts/nn-custom-scripts
-export DELETE_PARTS="true"
+export DELETE_PARTS="false"
 
 #how often should this be run, default it 1 hr
 export DELETE_TIMER="3600"
 
 #Releases may be added/edited with an imdb-id that does not exists in the movieinfo table. This script, update_missing_movie_info,
 #will fetch all the missing imdb id's from the releases table.
-export FETCH_MOVIE="true"
+export FETCH_MOVIE="false"
 
 #how often should this be run, default it 12 hr
 export MOVIE_TIMER="3600"
@@ -492,7 +492,7 @@ export RAMDISK_PATH="/"
 ###########################################################
 
 #logs can be written, per pane, to the logs folder
-export WRITE_LOGS="true"
+export WRITE_LOGS="false"
 
 ###########################################################
 
