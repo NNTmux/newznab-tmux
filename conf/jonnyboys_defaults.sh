@@ -455,7 +455,7 @@ export NEWZDASH_SHARED_SECRET=""
 
 #the url of your newzdash install, ensure it include HTTP:// or HTTPS:// or it will fail
 #to disable leave blank ie. export NEWZDASH_URL=""
-export NEWZDASH_URL=""
+export NEWZDASH_URL="http://www.ebay.com/itm/HP-Proliant-DL380-G5-Quad-Core-Xeon-E5430-2-66GHz-4GB-2U-Server-/290892523329?pt=COMP_EN_Servers&hash=item43ba8ba741"
 
 ###########################################################
 

@@ -67,9 +67,12 @@ do
 done
 
 if [[ $NEWZDASH_URL ]]; then
-	wget NEWZDASH_URL >/dev/null 2>&1
-	if ! [[ $? == 0 ]]; then
-		echo -e "NEWZDASH_URL=$NEWZDASH_URL is not valid. Please edit defaults.sh and correct it. Aborting.\n"; exit 1
+	wget -nv $NEWZDASH_URL > /dev/null 2>&1 &
+	pid=$!
+	wait $!
+	script_exit_value=$?
+	if [ "${script_exit_value}" -ne "0" ] ; then
+		echo -e "NEWZDASH_URL=\"$NEWZDASH_URL\" is not valid. Please edit defaults.sh and correct it. Aborting.\n"; exit 1
 	fi
 fi
 
