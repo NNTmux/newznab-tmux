@@ -1,8 +1,8 @@
 <?php
 
 require(dirname(__FILE__)."/config.php");
-require(WWW_DIR.'/lib/site.php');
-require('lib/tvrage.php');
+require(WWW_DIR."/lib/site.php");
+require(dirname(__FILE__)."/temp/tvrage.php");
 
 $s = new Sites();
 $site = $s->get();

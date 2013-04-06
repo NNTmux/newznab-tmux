@@ -15,28 +15,31 @@ if [ ! -f defaults.sh ]; then
     exit
 fi
 
-# Make sure only root can run our script
-#if [[ $EUID -ne 0 ]]; then
-    #echo "This script must be run as root"
-    #This was removed by popular request, so don't complain
-    #exit 1
-#fi
-
 source config.sh
 source defaults.sh
 
 eval $( $SED -n "/^define/ { s/.*('\([^']*\)', '*\([^']*\)'*);/export \1=\"\2\"/; p }" "$NEWZPATH"/www/config.php )
 
 if [[ $AGREED == "no" ]]; then
-    echo "Please edit the defaults.sh file"
-    exit
+	echo "Please edit the defaults.sh file"
+	exit
 fi
-bin/preflight.sh &
+
+$DIR/bin/scripts/check_vars.sh &
+pid=$!
+wait $!
+script_exit_value=$?
+if [ "${script_exit_value}" -ne "0" ] ; then
+        exit 1
+fi
 
 #check if tmux session exists, attach if exists, create new if not exist
 if $TMUXCMD -q has-session -t $TMUX_SESSION; then
-    $TMUXCMD attach-session -t $TMUX_SESSION
+	$TMUXCMD attach-session -t $TMUX_SESSION
 else
+
+    $DIR/bin/scripts/preflight.sh &
+
     printf "The above is just a TMUX notice, it is saying TMUX, that you do not have a TMUX session currently running. It is not an error. It is TMUX"
     printf "\033]0; $TMUX_SESSION\007\003\n"
 
