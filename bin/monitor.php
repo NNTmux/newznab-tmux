@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.1r777";
+$version="0.1r778";
 
 $db = new DB();
 
@@ -19,12 +19,10 @@ $proc = "SELECT ( SELECT COUNT( groupID ) AS cnt from releases where consoleinfo
 //flush query cache
 $qcache = "FLUSH QUERY CACHE";
 
-//get variables from config.sh and defaults.sh
+//get variables from defaults.sh
 $path = dirname(__FILE__);
-$varnames = shell_exec("cat ".$path."/../config.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
-$varnames .= shell_exec("cat ".$path."/../defaults.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
-$vardata = shell_exec("cat ".$path."/../config.sh | grep ^export | cut -d \\\" -f2 | awk '{print $1;}'");
-$vardata .= shell_exec("cat ".$path."/../defaults.sh | grep ^export | cut -d \\\" -f2 | awk '{print $1;}'");
+$varnames = shell_exec("cat ".$path."/../defaults.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
+$vardata = shell_exec("cat ".$path."/../defaults.sh | grep ^export | cut -d \\\" -f2 | awk '{print $1;}'");
 $varnames = explode("\n", $varnames);
 $vardata = explode("\n", $vardata);
 $array = array_combine($varnames, $vardata);
@@ -336,12 +334,10 @@ while( $i > 0 )
 	$ds3 = "stopped";
 	$ds4 = "killed";
 
-	//refresh variables
+	//get variables from defaults.sh
 	$path = dirname(__FILE__);
-	$varnames = shell_exec("cat ".$path."/../config.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
-	$varnames .= shell_exec("cat ".$path."/../defaults.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
-	$vardata = shell_exec("cat ".$path."/../config.sh | grep ^export | cut -d \\\" -f2 | awk '{print $1;}'");
-	$vardata .= shell_exec("cat ".$path."/../defaults.sh | grep ^export | cut -d \\\" -f2 | awk '{print $1;}'");
+	$varnames = shell_exec("cat ".$path."/../defaults.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
+	$vardata = shell_exec("cat ".$path."/../defaults.sh | grep ^export | cut -d \\\" -f2 | awk '{print $1;}'");
 	$varnames = explode("\n", $varnames);
 	$vardata = explode("\n", $vardata);
 	$array = array_combine($varnames, $vardata);
@@ -1073,7 +1069,7 @@ while( $i > 0 )
 		}
 	}
 
-	//start postprocessing in window 2
+	//start postprocessing in window 3
 	$post = $array['POST_TO_RUN_B'];
         for ($g=1; $g<=16; $g++)
         {
@@ -1288,11 +1284,11 @@ while( $i > 0 )
 	}
 
 	//runs postprocess_nfo.php in pane 4.0 once if needed then exits
-	if (( $array['MAX_LOAD'] >= get_load()) && ( $nfo_remaining_now > 0 ) && ( $array['NFOS'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
+	if (( $array['MAX_LOAD'] >= get_load()) && ( $nfo_remaining_now > 0 ) && ( $array['NFOS'] != "0" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		$log = writelog($panes4[0]);
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:4.0 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes4[0] $ds2 && cd $_bin && $_php postprocess_nfo.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes4[0] $ds3' 2>&1 1> /dev/null");
-	} elseif (( $array['NFOS'] != "true" ) && ( $optimize_safe_to_run != "true" )) {
+	} elseif (( $array['NFOS'] == "0" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:4.0 'echo \"\033[38;5;\"$color\"m\n$panes4[0] Disabled by NFOS\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
 	} elseif (( $optimize_safe_to_run != "true" ) && ( $array['MAX_LOAD'] <= get_load())) {
@@ -1307,11 +1303,11 @@ while( $i > 0 )
 	}
 
 	//runs postprocess_nfo1.php in pane 4.4 once if needed then exits
-	if (( $array['MAX_LOAD'] >= get_load()) && ( $nfo_remaining_now >= 500 ) && ( $array['NFOS'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
+	if (( $array['MAX_LOAD'] >= get_load()) && ( $nfo_remaining_now >= 500 ) && ( $array['NFOS'] == "2" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		$log = writelog($panes4[4]);
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:4.4 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes4[4] $ds2 && cd $_bin && $_php postprocess_nfo1.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes4[4] $ds3' 2>&1 1> /dev/null");
-	} elseif (( $array['NFOS'] != "true" ) && ( $optimize_safe_to_run != "true" )) {
+	} elseif (( $array['NFOS'] = "0" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:4.4 'echo \"\033[38;5;\"$color\"m\n$panes4[4] Disabled by NFOS\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
 	} elseif (( $optimize_safe_to_run != "true" ) && ( $array['MAX_LOAD'] <= get_load())) {
@@ -1326,11 +1322,11 @@ while( $i > 0 )
 	}
 
 	//runs processGames.php in pane 4.1 once if needed then exits
-	if (( $array['MAX_LOAD'] >= get_load()) && ( $console_releases_proc > 0 ) && ( $array['GAMES'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
+	if (( $array['MAX_LOAD'] >= get_load()) && ( $console_releases_proc > 0 ) && ( $array['GAMES'] != "0" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		$log = writelog($panes4[1]);
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:4.1 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes4[1] $ds2 && cd $_bin && $_php processGames.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes4[1] $ds3' 2>&1 1> /dev/null");
-	} elseif (( $array['GAMES'] != "true" ) && ( $optimize_safe_to_run != "true" )) {
+	} elseif (( $array['GAMES'] == "0" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:4.1 'echo \"\033[38;5;\"$color\"m\n$panes4[1] Disabled by GAMES\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
 	} elseif (( $optimize_safe_to_run != "true" ) && ( $array['MAX_LOAD'] <= get_load())) {
@@ -1345,11 +1341,11 @@ while( $i > 0 )
 	}
 
 	//runs processGames.php in pane 4.5 once if needed then exits
-	if (( $array['MAX_LOAD'] >= get_load()) && ( $console_releases_proc >= 200 ) && ( $array['GAMES'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
+	if (( $array['MAX_LOAD'] >= get_load()) && ( $console_releases_proc >= 200 ) && ( $array['GAMES'] == "2" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		$log = writelog($panes4[5]);
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:4.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes4[5] $ds2 && cd $_bin && $_php processGames1.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes4[5] $ds3' 2>&1 1> /dev/null");
-	} elseif (( $array['GAMES'] != "true" ) && ( $optimize_safe_to_run != "true" )) {
+	} elseif (( $array['GAMES'] == "0" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:4.5 'echo \"\033[38;5;\"$color\"m\n$panes4[5] Disabled by GAMES\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
 	} elseif (( $optimize_safe_to_run != "true" ) && ( $array['MAX_LOAD'] <= get_load())) {
@@ -1364,11 +1360,11 @@ while( $i > 0 )
 	}
 
 	//runs processMovies.php in pane 4.2 once if needed then exits
-	if (( $array['MAX_LOAD'] >= get_load()) && ( $movie_releases_proc > 0 ) && ( $array['MOVIES'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
+	if (( $array['MAX_LOAD'] >= get_load()) && ( $movie_releases_proc > 0 ) && ( $array['MOVIES'] != "0" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		$log = writelog($panes4[2]);
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:4.2 'echo \"\033[38;5;\"$color\"\" && $ds1 $panes4[2] $ds2 && cd $_bin && $_php processMovies.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes4[2] $ds3' 2>&1 1> /dev/null");
-	} elseif (( $array['MOVIES'] != "true" ) && ( $optimize_safe_to_run != "true" )) {
+	} elseif (( $array['MOVIES'] == "0" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:4.2 'echo \"\033[38;5;\"$color\"m\n$panes4[2] Disabled by MOVIES\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
 	} elseif (( $optimize_safe_to_run != "true" ) && ( $array['MAX_LOAD'] <= get_load())) {
@@ -1383,11 +1379,11 @@ while( $i > 0 )
 	}
 
 	//runs processMovies.php in pane 4.6 once if needed then exits
-	if (( $array['MAX_LOAD'] >= get_load()) && ( $movie_releases_proc >= 200 ) && ( $array['MOVIES'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
+	if (( $array['MAX_LOAD'] >= get_load()) && ( $movie_releases_proc >= 200 ) && ( $array['MOVIES'] == "2" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		$log = writelog($panes4[6]);
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:4.6 'echo \"\033[38;5;\"$color\"\" && $ds1 $panes4[6] $ds2 && cd $_bin && $_php processMovies1.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes4[6] $ds3' 2>&1 1> /dev/null");
-	} elseif (( $array['MOVIES'] != "true" ) && ( $optimize_safe_to_run != "true" )) {
+	} elseif (( $array['MOVIES'] == "0" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:4.6 'echo \"\033[38;5;\"$color\"m\n$panes4[6] Disabled by MOVIES\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
 	} elseif (( $optimize_safe_to_run != "true" ) && ( $array['MAX_LOAD'] <= get_load())) {
@@ -1402,11 +1398,11 @@ while( $i > 0 )
 	}
 
 	//runs processMusic.php in pane 4.3 once if needed then exits
-	if (( $array['MAX_LOAD'] >= get_load()) && ( $music_releases_proc > 0 ) && ( $array['MUSIC'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
+	if (( $array['MAX_LOAD'] >= get_load()) && ( $music_releases_proc > 0 ) && ( $array['MUSIC'] != "0" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		$log = writelog($panes4[3]);
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:4.3 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes4[3] $ds2 && cd $_bin && $_php processMusic.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes4[3] $ds3' 2>&1 1> /dev/null"); 
-	} elseif (( $array['MUSIC'] != "true" ) && ( $optimize_safe_to_run != "true" )) {
+	} elseif (( $array['MUSIC'] == "0" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:4.3 'echo \"\033[38;5;\"$color\"m\n$panes4[3] Disabled by MUSIC\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
 	} elseif (( $optimize_safe_to_run != "true" ) && ( $array['MAX_LOAD'] <= get_load())) {
@@ -1421,11 +1417,11 @@ while( $i > 0 )
 	}
 
 	//runs processMusic.php in pane 4.7 once if needed then exits
-	if (( $array['MAX_LOAD'] >= get_load()) && ( $music_releases_proc >= 200 ) && ( $array['MUSIC'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
+	if (( $array['MAX_LOAD'] >= get_load()) && ( $music_releases_proc >= 200 ) && ( $array['MUSIC'] == "2" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		$log = writelog($panes4[7]);
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:4.7 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes4[7] $ds2 && cd $_bin && $_php processMusic1.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes4[7] $ds3' 2>&1 1> /dev/null");
-	} elseif (( $array['MUSIC'] != "true" ) && ( $optimize_safe_to_run != "true" )) {
+	} elseif (( $array['MUSIC'] == "0" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:4.7 'echo \"\033[38;5;\"$color\"m\n$panes4[7] Disabled by MUSIC\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
 	} elseif (( $optimize_safe_to_run != "true" ) && ( $array['MAX_LOAD'] <= get_load())) {
@@ -1518,11 +1514,11 @@ while( $i > 0 )
 	}
 
 	//runs processBooks.php in pane 5.2 once if needed then exits
-	if (( $array['MAX_LOAD'] >= get_load()) && ( $book_releases_proc > 0 ) && ( $array['EBOOK'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
+	if (( $array['MAX_LOAD'] >= get_load()) && ( $book_releases_proc > 0 ) && ( $array['EBOOK'] != "0" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		$log = writelog($panes5[2]);
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:5.2 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes5[2] $ds2 && cd $_bin && $_php processBooks.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes5[2] $ds3' 2>&1 1> /dev/null");
-	} elseif (( $array['EBOOK'] != "true" ) && ( $optimize_safe_to_run != "true" )) {
+	} elseif (( $array['EBOOK'] == "0" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:5.2 'echo \"\033[38;5;\"$color\"m\n$panes5[2] Disabled by EBOOK\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
 	} elseif (( $optimize_safe_to_run != "true" ) && ( $array['MAX_LOAD'] <= get_load())) {
@@ -1537,11 +1533,11 @@ while( $i > 0 )
 	}
 
 	//runs processBooks.php in pane 5.6 once if needed then exits
-	if (( $array['MAX_LOAD'] >= get_load()) && ( $book_releases_proc >=200 ) && ( $array['EBOOK'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
+	if (( $array['MAX_LOAD'] >= get_load()) && ( $book_releases_proc >=200 ) && ( $array['EBOOK'] == "2" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		$log = writelog($panes5[6]);
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:5.6 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes5[6] $ds2 && cd $_bin && $_php processBooks1.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes5[6] $ds3' 2>&1 1> /dev/null");
-	} elseif (( $array['EBOOK'] != "true" ) && ( $optimize_safe_to_run != "true" )) {
+	} elseif (( $array['EBOOK'] == "0" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:5.6 'echo \"\033[38;5;\"$color\"m\n$panes5[6] Disabled by EBOOK\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
 	} elseif (( $optimize_safe_to_run != "true" ) && ( $array['MAX_LOAD'] <= get_load())) {

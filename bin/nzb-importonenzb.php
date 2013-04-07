@@ -4,8 +4,8 @@
 //The idea is that you can call this script from your update script every run, and your import will go smooth without babysitting. 
 
 require(dirname(__FILE__)."/config.php");
-require(WWW_DIR.'/lib/adminpage.php');
-require_once(WWW_DIR.'/lib/framework/db.php');
+//require(WWW_DIR.'/lib/adminpage.php');
+require_once(WWW_DIR."/lib/framework/db.php");
 $db = new DB();
 $using_cli = false;
 
@@ -191,12 +191,10 @@ if ($using_cli || $page->isPostBack() )
 			}
 
 
-                        //get variables from config.sh and defaults.sh
+                        //get variables from defaults.sh
                         $path = dirname(__FILE__);
-                        $varnames = shell_exec("cat ".$path."/../config.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
-                        $varnames .= shell_exec("cat ".$path."/../defaults.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
-                        $vardata = shell_exec("cat ".$path."/../config.sh | grep ^export | cut -d \\\" -f2 | awk '{print $1;}'");
-                        $vardata .= shell_exec("cat ".$path."/../defaults.sh | grep ^export | cut -d \\\" -f2 | awk '{print $1;}'");
+                        $varnames = shell_exec("cat ".$path."/../defaults.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
+                        $vardata = shell_exec("cat ".$path."/../defaults.sh | grep ^export | cut -d \\\" -f2 | awk '{print $1;}'");
                         $varnames = explode("\n", $varnames);
                         $vardata = explode("\n", $vardata);
                         $array = array_combine($varnames, $vardata);

@@ -1,6 +1,6 @@
 <?php
 require(dirname(__FILE__)."/config.php");
-require(WWW_DIR.'/lib/powerprocess.php');
+require(WWW_DIR."/lib/powerprocess.php");
 $dirroot = $argv[1];
 $subdirs = array_filter(glob($dirroot."/*", GLOB_ONLYDIR|GLOB_NOSORT));
 $subdir_count = 0;
@@ -18,12 +18,10 @@ if($subdir_count == 0){
 	die();
 }
 
-//get variables from config.sh and defaults.sh
+//get variables from defaults.sh
 $path = dirname(__FILE__);
-$varnames = shell_exec("cat ".$path."/../config.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
-$varnames .= shell_exec("cat ".$path."/../defaults.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
-$vardata = shell_exec("cat ".$path."/../config.sh | grep ^export | cut -d \\\" -f2 | awk '{print $1;}'");
-$vardata .= shell_exec("cat ".$path."/../defaults.sh | grep ^export | cut -d \\\" -f2 | awk '{print $1;}'");
+$varnames = shell_exec("cat ".$path."/../defaults.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
+$vardata = shell_exec("cat ".$path."/../defaults.sh | grep ^export | cut -d \\\" -f2 | awk '{print $1;}'");
 $varnames = explode("\n", $varnames);
 $vardata = explode("\n", $vardata);
 $array = array_combine($varnames, $vardata);
@@ -31,7 +29,8 @@ unset($array['']);
 
 $ps = new PowerProcess;
 $ps->RegisterCallback('psUpdateComplete');
-$ps->maxThreads = $array['NZB_FOLDER_COUNT'];
+$ps->maxThreads = 5;
+$ps->tickCount = 50000;
 $ps->threadTimeLimit = 0;
 $selected = $subdir_count - 1;
 

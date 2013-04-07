@@ -69,23 +69,25 @@ export USE_TWO_PP="false"
 ############################################################
 
 #post processing per category, setting the above to 0 does not disable these
+#this now takes 0 for noe, 1 for the first processor or 2 for both processors
 #run processNfos
-export NFOS="false"
+export NFOS="0"
 
 #run processGames
-export GAMES="false"
+export GAMES="0"
 
 #run processMovies
-export MOVIES="false"
+export MOVIES="0"
 
 #run processMusic
-export MUSIC="false"
-
-#run processTV
-export TVRAGE="false"
+export MUSIC="0"
 
 #run processEbook
-export EBOOK="false"
+export EBOOK="0"
+
+#these are true/false
+#run processTV
+export TVRAGE="false"
 
 #run processOther
 export OTHERS="false"
@@ -217,20 +219,18 @@ export KEVIN_PARTS="100000"
 
 #Set the path to the nzb dump you downloaded from torrents, this is the path to bulk files folder of nzbs
 #this does not recurse through subfolders, unless you set NZB_THREADS to true
+#this must be a valid path
 export NZBS="/path/to/nzbs"
 
 #Choose to run import nzb script true/false
 export IMPORT="false"
 
 #If, you have all of your nzbs in one folder select false
-#If, you have all of you nzbs split into separate in with the root at $NZBS then select true
+#If, you have all of you nzbs split into separate folders, with the root at $NZBS then select true
 #and 10 nzbs will be imported from each subfolder per loop.
 #Importing this way, allows all post processing scripts to run, such as book, music, movies
-#Instead of doing all 1 type at once, spread the load
+#Instead of doing all 1 type at once, spreads the work load
 export NZB_THREADS="false"
-
-#Set max number of folders to process per loop. This includes empty folders.
-export NZB_FOLDER_COUNT="20"
 
 #How many nzbs to import per loop, if using NZB_THREADS=true the per folder
 export NZBCOUNT="10"

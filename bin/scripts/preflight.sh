@@ -9,13 +9,6 @@ do
 done
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
-if [ ! -f defaults.sh ]; then
-	clear
-	echo "Please copy config.sh to defaults.sh"
-	exit 1
-fi
-
-source config.sh
 source defaults.sh
 
 eval $( $SED -n "/^define/ { s/.*('\([^']*\)', '*\([^']*\)'*);/export \1=\"\2\"/; p }" "$NEWZPATH"/www/config.php )

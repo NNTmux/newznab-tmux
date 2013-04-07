@@ -4,10 +4,16 @@ require_once(WWW_DIR."/lib/framework/db.php");
 
 $db = new DB;
 
+
 $rel = $db->query("update groups set backfill_target=0, first_record=0, first_record_postdate=null, last_record=0, last_record_postdate=null, last_updated=null");
-$rel = $db->query("truncate table parts");
-$rel = $db->query("truncate table partsrepair");
-$rel = $db->query("truncate table binaries;");
+printf("Reseting all groups completed.\n");
+
+$arr = array("parts", "partrepair", "binaries");
+foreach ($arr as &$value) {
+        $rel = $db->query("truncate table $value");
+        printf("Truncating $value completed.\n");
+}
+unset($value);
 
 //get variables from config.sh and defaults.sh
 $path = dirname(__FILE__);

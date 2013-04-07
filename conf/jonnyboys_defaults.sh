@@ -46,10 +46,10 @@ export ADMIN_PATH=$NEWZPATH"/www/admin"
 #At some point, increasing this begins to slow things down. It will need to be adjusted for your system
 #to get the desired performance, 0 will disable all post processing, but not category processing
 #the first window has up to 16 postprocess and can use primary or alternate NNTP provider
-export POST_TO_RUN_A="16"
+export POST_TO_RUN_A="0"
 
 #The second window also has 16 processes and can use promary or alternate NNTP provider
-export POST_TO_RUN_B="16"
+export POST_TO_RUN_B="0"
 
 #by modifying www/config.php like http://pastebin.com/VgH9DCZw, you can use 1 provider to run update_binaries
 #and backup and another provider to run post processing with. Or, 1 provider to run up to 16 postprocesses and another to run
@@ -70,22 +70,23 @@ export USE_TWO_PP="true"
 
 #post processing per category, setting the above to 0 does not disable these
 #run processNfos
-export NFOS="true"
+export NFOS="2"
 
 #run processGames
-export GAMES="false"
+export GAMES="0"
 
 #run processMovies
-export MOVIES="false"
+export MOVIES="0"
 
 #run processMusic
-export MUSIC="false"
-
-#run processTV
-export TVRAGE="false"
+export MUSIC="0"
 
 #run processEbook
-export EBOOK="false"
+export EBOOK="0"
+
+#these are true/false
+#run processTV
+export TVRAGE="false"
 
 #run processOther
 export OTHERS="false"
@@ -220,7 +221,7 @@ export KEVIN_PARTS="100000"
 export NZBS="/home/jonnyboy/nzb_files2/nzbs"
 
 #Choose to run import nzb script true/false
-export IMPORT="false"
+export IMPORT="true"
 
 #If, you have all of your nzbs in one folder select false
 #If, you have all of you nzbs split into separate in with the root at $NZBS then select true
@@ -228,9 +229,6 @@ export IMPORT="false"
 #Importing this way, allows all post processing scripts to run, such as book, music, movies
 #Instead of doing all 1 type at once, spread the load
 export NZB_THREADS="true"
-
-#Set max number of folders to process per loop. This includes empty folders.
-export NZB_FOLDER_COUNT="50"
 
 #How many nzbs to import per loop, if using NZB_THREADS=true the per folder
 export NZBCOUNT="2"
@@ -495,7 +493,7 @@ export RAMDISK_PATH="/"
 ###########################################################
 
 #logs can be written, per pane, to the logs folder
-export WRITE_LOGS="true"
+export WRITE_LOGS="false"
 
 ###########################################################
 

@@ -4,8 +4,13 @@ require_once(WWW_DIR."/lib/framework/db.php");
 
 $db = new DB;
 
-$rel = $db->query("truncate table parts");
-$rel = $db->query("truncate table partsrepair");
-$rel = $db->query("truncate table binaries;");
+$arr = array("parts", "partrepair", "binaries");
+
+foreach ($arr as &$value) {
+	$rel = $db->query("truncate table $value");
+	printf("Truncating $value completed.\n");
+}
+unset($value);
+
 
 ?>

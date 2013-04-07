@@ -15,7 +15,6 @@ if [ ! -f defaults.sh ]; then
     exit
 fi
 
-source config.sh
 source defaults.sh
 
 eval $( $SED -n "/^define/ { s/.*('\([^']*\)', '*\([^']*\)'*);/export \1=\"\2\"/; p }" "$NEWZPATH"/www/config.php )
