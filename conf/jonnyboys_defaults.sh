@@ -21,10 +21,10 @@ export NICENESS="10"
 #for example, if you set load to 2, no pane will start when your system load exceeds 2
 #this does not mean the the desired load will not be exceeded, just that no panes will be be restarted
 #this one is for all panes except update_releases
-export MAX_LOAD="7.0"
+export MAX_LOAD="3.25"
 
 #this one is for update_releases
-export MAX_LOAD_RELEASES="7.0"
+export MAX_LOAD_RELEASES="4.25"
 
 ############################################################
 
@@ -46,10 +46,10 @@ export ADMIN_PATH=$NEWZPATH"/www/admin"
 #At some point, increasing this begins to slow things down. It will need to be adjusted for your system
 #to get the desired performance, 0 will disable all post processing, but not category processing
 #the first window has up to 16 postprocess and can use primary or alternate NNTP provider
-export POST_TO_RUN_A="16"
+export POST_TO_RUN_A="10"
 
 #The second window also has 16 processes and can use promary or alternate NNTP provider
-export POST_TO_RUN_B="16"
+export POST_TO_RUN_B="10"
 
 #by modifying www/config.php like http://pastebin.com/VgH9DCZw, you can use 1 provider to run update_binaries
 #and backup and another provider to run post processing with. Or, 1 provider to run up to 16 postprocesses and another to run
@@ -60,11 +60,11 @@ export POST_TO_RUN_B="16"
 
 #this one sets 1 provider for everything(false), or first provider for update_binaries and backfill and another for postprocessing(true)
 #this can not be changed after starting scripts
-export USE_TWO_NNTP="true"
+export USE_TWO_NNTP="false"
 
 #this allows you split the 32 postprocessing into 2 separate providers
 #this can not be changed after starting scripts
-export USE_TWO_PP="true"
+export USE_TWO_PP="false"
 
 ############################################################
 
@@ -73,25 +73,25 @@ export USE_TWO_PP="true"
 export NFOS="true"
 
 #run processGames
-export GAMES="false"
+export GAMES="true"
 
 #run processMovies
-export MOVIES="false"
+export MOVIES="true"
 
 #run processMusic
-export MUSIC="false"
+export MUSIC="true"
 
 #run processTV
-export TVRAGE="false"
+export TVRAGE="true"
 
 #run processEbook
-export EBOOK="false"
+export EBOOK="true"
 
 #run processOther
-export OTHERS="false"
+export OTHERS="true"
 
 #run processUnwanted
-export UNWANTED="false"
+export UNWANTED="true"
 
 ############################################################
 
@@ -120,7 +120,7 @@ export KEEP_KILLED="false"
 #this works by setting the 2 start timers and which is run at the start of the loop is determined like this
 #if at the start of the loop, the BINARIES_SEQ_TIMER has expired, then update_binaries will run and the BINARIES_SEQ_TIMER timer is reset
 #if BINARIES_SEQ_TIMER has not expired, then if BACKFILL_SEQ_TIMER has expired, the backfill will run and BACKFILL_SEQ_TIMER timer is reset
-export SEQUENTIAL="false"
+export SEQUENTIAL="true"
 
 #time between loop start for update_binaries, in seconds, this is a countdown timer, not a sleep after it runs
 #default is 30 minutes
@@ -134,11 +134,11 @@ export BACKFILL_SEQ_TIMER="10"
 ############################################################
 
 #Choose to run update_binaries true/false
-export BINARIES="false"
+export BINARIES="true"
 
 #Choose to run the threaded or non-threaded newznab binaries scripts true/false
 #update_binaries.php or update_binaries_threaded.php
-export BINARIES_THREADS="false"
+export BINARIES_THREADS="true"
 
 #Set, in seconds - how long the update_binaries should sleep between runs
 #top right pane
@@ -161,11 +161,11 @@ export BINARIES_MAX_ROWS="0"
 ############################################################
 
 #Choose to run backfill script true/false
-export BACKFILL="false"
+export BACKFILL="true"
 
 #Choose to run the threaded or non-threaded newznab backfill scripts true/false
 #backfill.php or backfill_threaded.php
-export BACKFILL_THREADS="false"
+export BACKFILL_THREADS="true"
 
 #Set, in seconds - how long the backfill should sleep between runs
 #in pane below update_binaries
@@ -217,7 +217,7 @@ export KEVIN_PARTS="100000"
 
 #Set the path to the nzb dump you downloaded from torrents, this is the path to bulk files folder of nzbs
 #this does not recurse through subfolders, unless you set NZB_THREADS to true
-export NZBS="/home/jonnyboy/nzb_files2/nzbs"
+export NZBS="/"
 
 #Choose to run import nzb script true/false
 export IMPORT="false"
@@ -227,17 +227,17 @@ export IMPORT="false"
 #and 10 nzbs will be imported from each subfolder per loop.
 #Importing this way, allows all post processing scripts to run, such as book, music, movies
 #Instead of doing all 1 type at once, spread the load
-export NZB_THREADS="true"
+export NZB_THREADS="false"
 
 #Set max number of folders to process per loop. This includes empty folders.
-export NZB_FOLDER_COUNT="50"
+export NZB_FOLDER_COUNT="20"
 
 #How many nzbs to import per loop, if using NZB_THREADS=true the per folder
-export NZBCOUNT="2"
+export NZBCOUNT="10"
 
 #Set, in seconds - how long the nzb-import should sleep between runs
 #below backfill
-export IMPORT_SLEEP="0"
+export IMPORT_SLEEP="40"
 
 #Set the max amount of unprocessed releases and still allow nzb-import to run
 #set to 0 to disable
@@ -248,7 +248,7 @@ export IMPORT_MAX_RELEASES="0"
 export IMPORT_MAX_ROWS="0"
 
 #import nzbs using the filename as the release name true/false
-export IMPORT_TRUE="true"
+export IMPORT_TRUE="false"
 
 ############################################################
 
@@ -263,7 +263,7 @@ export RELEASES="true"
 
 #Set, in seconds - how long the update_release should sleep between runs
 #bottom right
-export RELEASES_SLEEP="0"
+export RELEASES_SLEEP="40"
 
 ############################################################
 
@@ -299,7 +299,7 @@ export INNODB="true"
 #Choose to run update_cleanup.php and removespecial.php true/false
 #set to false by default, you will need to edit /misc/testing/update_cleanup.php and /misc/testing/update_parsing.php
 #to actually do anything, directions are in the file
-export CLEANUP="false"
+export CLEANUP="true"
 
 #edit update_cleanup.php and update_parsing.php and svn up, this will only mod files when you run scripts/update_svn.sh or scripts/fix_files.sh
 export CLEANUP_EDIT="true"
@@ -322,7 +322,7 @@ export PARSING_MOD="true"
 export FIX_DROID="true"
 
 #run update_parsing.php against the whole db or just the last 24 hours
-export PAST_24_HOURS="false"
+export PAST_24_HOURS="true"
 
 #How often do you want update_parsing.php to run, in seconds. this takes alot of memory and processing time, default is every 12 hrs
 export PARSING_TIMER="43200"
@@ -370,7 +370,7 @@ export SPHINX_TIMER="3600"
 export KILL_PROCESS="0"
 
 #look at man killall - if you have the -q option, enable this, otherwise leave it disabled
-export KILL_QUIET="true"
+export KILL_QUIET="false"
 
 ############################################################
 
@@ -490,12 +490,12 @@ export WWW_USER="jonnyboy:www-data"
 
 #if you have a ramdisk and would like to monitor it's use, set path here
 #this is not the same as RAMDISK above, I keep my parts table on a ramdisk
-export RAMDISK_PATH="/"
+export RAMDISK_PATH=""
 
 ###########################################################
 
 #logs can be written, per pane, to the logs folder
-export WRITE_LOGS="true"
+export WRITE_LOGS="false"
 
 ###########################################################
 
