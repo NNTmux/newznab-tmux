@@ -46,10 +46,10 @@ export ADMIN_PATH=$NEWZPATH"/www/admin"
 #At some point, increasing this begins to slow things down. It will need to be adjusted for your system
 #to get the desired performance, 0 will disable all post processing, but not category processing
 #the first window has up to 16 postprocess and can use primary or alternate NNTP provider
-export POST_TO_RUN_A="0"
+export POST_TO_RUN_A="16"
 
 #The second window also has 16 processes and can use promary or alternate NNTP provider
-export POST_TO_RUN_B="0"
+export POST_TO_RUN_B="16"
 
 #by modifying www/config.php like http://pastebin.com/VgH9DCZw, you can use 1 provider to run update_binaries
 #and backup and another provider to run post processing with. Or, 1 provider to run up to 16 postprocesses and another to run
@@ -70,7 +70,7 @@ export USE_TWO_PP="true"
 
 #post processing per category, setting the above to 0 does not disable these
 #run processNfos
-export NFOS="false"
+export NFOS="true"
 
 #run processGames
 export GAMES="false"
@@ -220,7 +220,7 @@ export KEVIN_PARTS="100000"
 export NZBS="/home/jonnyboy/nzb_files2/nzbs"
 
 #Choose to run import nzb script true/false
-export IMPORT="true"
+export IMPORT="false"
 
 #If, you have all of your nzbs in one folder select false
 #If, you have all of you nzbs split into separate in with the root at $NZBS then select true
@@ -233,7 +233,7 @@ export NZB_THREADS="true"
 export NZB_FOLDER_COUNT="50"
 
 #How many nzbs to import per loop, if using NZB_THREADS=true the per folder
-export NZBCOUNT="10"
+export NZBCOUNT="2"
 
 #Set, in seconds - how long the nzb-import should sleep between runs
 #below backfill
@@ -245,7 +245,7 @@ export IMPORT_MAX_RELEASES="0"
 
 #Set the max amount of of rows in the parts table and still allow nzb-import to run
 #set to 0 to disable
-export IMPORT_MAX_ROWS="10000000"
+export IMPORT_MAX_ROWS="0"
 
 #import nzbs using the filename as the release name true/false
 export IMPORT_TRUE="true"
@@ -455,7 +455,7 @@ export NEWZDASH_SHARED_SECRET=""
 
 #the url of your newzdash install, ensure it include HTTP:// or HTTPS:// or it will fail
 #to disable leave blank ie. export NEWZDASH_URL=""
-export NEWZDASH_URL="http://www.ebay.com/itm/HP-Proliant-DL380-G5-Quad-Core-Xeon-E5430-2-66GHz-4GB-2U-Server-/290892523329?pt=COMP_EN_Servers&hash=item43ba8ba741"
+export NEWZDASH_URL=""
 
 ###########################################################
 
@@ -495,7 +495,7 @@ export RAMDISK_PATH="/"
 ###########################################################
 
 #logs can be written, per pane, to the logs folder
-export WRITE_LOGS="false"
+export WRITE_LOGS="true"
 
 ###########################################################
 
