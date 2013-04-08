@@ -49,7 +49,7 @@ do
 	fi
 done
 
-for vars in NEWZPATH NEWZNAB_PATH TESTING_PATH ADMIN_PATH NZBS RAMDISK_PATH
+for vars in NEWZPATH NEWZNAB_PATH TESTING_PATH ADMIN_PATH RAMDISK_PATH
 do
 	if [ ! -d ${!vars} ]; then
                 clear
@@ -65,7 +65,17 @@ do
         fi
 done
 
-for vars in SED USER_DEF_ONE USER_DEF_TWO USER_DEF_THREE USER_DEF_FOUR USER_DEF_FIVE
+for vars in USER_DEF_ONE USER_DEF_TWO USER_DEF_THREE USER_DEF_FOUR USER_DEF_FIVE
+do
+	if [[ ${!vars} ]]; then
+	        if [[ ! -f $DIR/user_scripts/${!vars} ]]; then
+        	        clear
+                	echo -e "\033[38;5;160m$vars=\"${!vars}\" is not valid. Please edit defaults.sh and correct it. Aborting\033[0m.\n"; exit 1
+		fi
+        fi
+done
+
+for vars in SED
 do
         if [ ! -f ${!vars} ]; then
                 clear

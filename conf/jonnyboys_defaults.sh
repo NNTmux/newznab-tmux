@@ -21,7 +21,7 @@ export NICENESS="10"
 #for example, if you set load to 2, no pane will start when your system load exceeds 2
 #this does not mean the the desired load will not be exceeded, just that no panes will be be restarted
 #this one is for all panes except update_releases
-export MAX_LOAD="7.0"
+export MAX_LOAD="5.0"
 
 #this one is for update_releases
 export MAX_LOAD_RELEASES="7.0"
@@ -46,7 +46,7 @@ export ADMIN_PATH=$NEWZPATH"/www/admin"
 #At some point, increasing this begins to slow things down. It will need to be adjusted for your system
 #to get the desired performance, 0 will disable all post processing, but not category processing
 #the first window has up to 16 postprocess and can use primary or alternate NNTP provider
-export POST_TO_RUN_A="4"
+export POST_TO_RUN_A="13"
 
 #The second window also has 16 processes and can use promary or alternate NNTP provider
 export POST_TO_RUN_B="0"
@@ -60,7 +60,7 @@ export POST_TO_RUN_B="0"
 
 #this one sets 1 provider for everything(false), or first provider for update_binaries and backfill and another for postprocessing(true)
 #this can not be changed after starting scripts
-export USE_TWO_NNTP="true"
+export USE_TWO_NNTP="false"
 
 #this allows you split the 32 postprocessing into 2 separate providers
 #this can not be changed after starting scripts
@@ -453,7 +453,7 @@ export NEWZDASH_SHARED_SECRET=""
 
 #the url of your newzdash install, ensure it include HTTP:// or HTTPS:// or it will fail
 #to disable leave blank ie. export NEWZDASH_URL=""
-export NEWZDASH_URL="http://www.cyberciti.biz/faq/linux-unix-extracting-specific-files/"
+export NEWZDASH_URL=""
 
 ###########################################################
 

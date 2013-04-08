@@ -69,7 +69,7 @@ export USE_TWO_PP="false"
 ############################################################
 
 #post processing per category, setting the above to 0 does not disable these
-#this now takes 0 for noe, 1 for the first processor or 2 for both processors
+#this now takes 0 for none, 1 for the first processor or 2 for both processors
 #run processNfos
 export NFOS="0"
 
@@ -454,6 +454,7 @@ export EN_IMDB="false"
 export NEWZDASH_SHARED_SECRET=""
 
 #the url of your newzdash install, ensure it include HTTP:// or HTTPS:// or it will fail
+#do not include the trailing /
 #to disable leave blank ie. export NEWZDASH_URL=""
 export NEWZDASH_URL=""
 
