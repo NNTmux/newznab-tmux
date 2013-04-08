@@ -306,7 +306,15 @@ $SED -i -e "s/ORDER BY createddate DESC/ORDER BY createddate ASC/" $DIR/bin/temp
 #$SED -i -e "s/order by tvrage.releasetitle asc/order by tvrage.releasetitle DESC/" $DIR/bin/temp/tvrage.php
 
 
+LINE=`grep -Hnm 1 '$this->rarfileregex = ' ../../../../www/lib/nzbinfo.php | cut -d: -f2`
+OCCURRENCES=`grep -in '$this->rarfileregex = ' ../../../../www/lib/nzbinfo.php | cut -d: -f1 | wc -l`
+REMLINE=`expr $LINE + 1`
+
+if [[ $OCCURRENCES -eq 2 ]]; then
+	$SED -i.bak "${REMLINE}d" $NEWZPATH/www/lib/nzbinfo.php
+        $SED -i.bak "${LINE}r ${DIR}/bin/scripts/regex.txt" $NEWZPATH/www/lib/nzbinfo.php
+fi
 if ! grep -q '//$this->rarfileregex =' "$NEWZPATH/www/lib/nzbinfo.php" ; then
         $SED -i -e 's/$this->rarfileregex =/\/\/$this->rarfileregex =/' $NEWZPATH/www/lib/nzbinfo.php
-	$SED -i.bak "39r $DIR/bin/scripts/regex.txt" $NEWZPATH/www/lib/nzbinfo.php
+	$SED -i.bak "${LINE}r ${DIR}/bin/scripts/regex.txt" $NEWZPATH/www/lib/nzbinfo.php
 fi

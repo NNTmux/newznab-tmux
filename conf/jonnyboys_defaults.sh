@@ -21,7 +21,7 @@ export NICENESS="10"
 #for example, if you set load to 2, no pane will start when your system load exceeds 2
 #this does not mean the the desired load will not be exceeded, just that no panes will be be restarted
 #this one is for all panes except update_releases
-export MAX_LOAD="5.0"
+export MAX_LOAD="5.5"
 
 #this one is for update_releases
 export MAX_LOAD_RELEASES="7.0"
@@ -433,7 +433,7 @@ export USE_CONSOLE="false"
 #This is done on the terminal computer, not the newznab++ server
 #download fonts from https://github.com/jonnyboy/powerline-fonts
 #I recommend Consolas if you are using putty in Win7
-export POWERLINE="false"
+export POWERLINE="true"
 
 ############################################################
 

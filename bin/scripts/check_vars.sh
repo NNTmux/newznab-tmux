@@ -75,6 +75,16 @@ do
         fi
 done
 
+if [[ $IMPORT == "true" ]]; then
+	for vars in NZBS
+	do
+		if [[ ! -d ${!vars} ]]; then
+        		clear
+        	        echo -e "\033[38;5;160m$vars=\"${!vars}\" is not valid. Please edit defaults.sh and correct it. Aborting\033[0m.\n"; exit 1
+        	fi
+	done
+fi
+
 for vars in SED
 do
         if [ ! -f ${!vars} ]; then
