@@ -46,7 +46,7 @@ export ADMIN_PATH=$NEWZPATH"/www/admin"
 #At some point, increasing this begins to slow things down. It will need to be adjusted for your system
 #to get the desired performance, 0 will disable all post processing, but not category processing
 #the first window has up to 16 postprocess and can use primary or alternate NNTP provider
-export POST_TO_RUN_A="0"
+export POST_TO_RUN_A="4"
 
 #The second window also has 16 processes and can use promary or alternate NNTP provider
 export POST_TO_RUN_B="0"
@@ -64,7 +64,7 @@ export USE_TWO_NNTP="true"
 
 #this allows you split the 32 postprocessing into 2 separate providers
 #this can not be changed after starting scripts
-export USE_TWO_PP="true"
+export USE_TWO_PP="false"
 
 ############################################################
 
@@ -73,23 +73,23 @@ export USE_TWO_PP="true"
 export NFOS="2"
 
 #run processGames
-export GAMES="0"
+export GAMES="2"
 
 #run processMovies
-export MOVIES="0"
+export MOVIES="2"
 
 #run processMusic
-export MUSIC="0"
+export MUSIC="2"
 
 #run processEbook
-export EBOOK="0"
+export EBOOK="2"
 
 #these are true/false
 #run processTV
-export TVRAGE="false"
+export TVRAGE="true"
 
 #run processOther
-export OTHERS="false"
+export OTHERS="true"
 
 #run processUnwanted
 export UNWANTED="false"
@@ -218,10 +218,10 @@ export KEVIN_PARTS="100000"
 
 #Set the path to the nzb dump you downloaded from torrents, this is the path to bulk files folder of nzbs
 #this does not recurse through subfolders, unless you set NZB_THREADS to true
-export NZBS="/home/jonnyboy/nzb_files2/nzbs"
+export NZBS="/home/jonnyboy/nzb_files/nzbs"
 
 #Choose to run import nzb script true/false
-export IMPORT="true"
+export IMPORT="false"
 
 #If, you have all of your nzbs in one folder select false
 #If, you have all of you nzbs split into separate in with the root at $NZBS then select true
@@ -231,7 +231,7 @@ export IMPORT="true"
 export NZB_THREADS="true"
 
 #How many nzbs to import per loop, if using NZB_THREADS=true the per folder
-export NZBCOUNT="2"
+export NZBCOUNT="5"
 
 #Set, in seconds - how long the nzb-import should sleep between runs
 #below backfill
@@ -433,7 +433,7 @@ export USE_CONSOLE="false"
 #This is done on the terminal computer, not the newznab++ server
 #download fonts from https://github.com/jonnyboy/powerline-fonts
 #I recommend Consolas if you are using putty in Win7
-export POWERLINE="true"
+export POWERLINE="false"
 
 ############################################################
 
@@ -453,7 +453,7 @@ export NEWZDASH_SHARED_SECRET=""
 
 #the url of your newzdash install, ensure it include HTTP:// or HTTPS:// or it will fail
 #to disable leave blank ie. export NEWZDASH_URL=""
-export NEWZDASH_URL=""
+export NEWZDASH_URL="http://www.cyberciti.biz/faq/linux-unix-extracting-specific-files/"
 
 ###########################################################
 
@@ -493,7 +493,7 @@ export RAMDISK_PATH="/"
 ###########################################################
 
 #logs can be written, per pane, to the logs folder
-export WRITE_LOGS="false"
+export WRITE_LOGS="true"
 
 ###########################################################
 

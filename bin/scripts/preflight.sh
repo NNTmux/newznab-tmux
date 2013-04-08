@@ -10,6 +10,7 @@ done
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 source defaults.sh
+$SED -i -e 's/export finished="true"/export finished="false"/' defaults.sh
 
 eval $( $SED -n "/^define/ { s/.*('\([^']*\)', '*\([^']*\)'*);/export \1=\"\2\"/; p }" "$NEWZPATH"/www/config.php )
 
@@ -71,10 +72,6 @@ if ! grep -q '//$this->processUnknownCategory();' "$NEWZPATH/www/lib/postprocess
 	$SED -i -e 's/$this->processUnknownCategory();/\/\/$this->processUnknownCategory();/' $NEWZPATH/www/lib/postprocess.php
 fi
 
-#if ! grep -q '//$this->rarfileregex = ' "$NEWZPATH/www/lib/nzbinfo.php" ; then
-	#$SED -i -e 's/$this->rarfileregex =.*$/\/\/$this->rarfileregex =$1/' $NEWZPATH/www/lib/nzbinfo.php
-#fi
-
 #edit cleanup scripts
 if [[ $CLEANUP_EDIT  == "true" ]]; then
 	$SED -i -e 's/^$echo =.*$/$echo = false;/' $TESTING_PATH/update_parsing.php
@@ -104,11 +101,18 @@ if [[ $EN_IMDB == "true" ]]; then
 	curl_setopt($ch, CURLOPT_HTTPHEADER, $header);/' $NEWZPATH/www/lib/util.php
 fi
 
-#import kevin123's compression mod
-if [[ $KEVIN_SAFER == "true" ]] || [[ $PARSING_MOD == "true" ]]; then
+#import kevin123's category.php
+if [[ $PARSING_MOD == "true" ]]; then
 	cd $DIR"/kevin123"
-	cp -fr * $NEWZPATH/www/lib/
+	cp -f categorymod.php $NEWZPATH/www/lib/
 	cd $DIR
+fi
+
+#import kevin123's category.php and backfill.php
+if [[ $KEVIN_SAFER == "true" || $KEVIN_BACKFILL_PARTS == "true"  || $KEVIN_THREADED == "true" ]]; then
+        cd $DIR"/kevin123"
+        cp -f backfill.php $NEWZPATH/www/lib/
+        cd $DIR
 fi
 
 #create mysql my.conf
@@ -271,7 +275,7 @@ $SED -i -e "s/processBooks()/processBooks1()/g" $DIR/bin/temp/postprocess2.php
 $SED -i -e "s/processGames()/processGames1()/g" $DIR/bin/temp/postprocess2.php
 $SED -i -e "s/processTv()/processTv1()/g" $DIR/bin/temp/postprocess2.php
 
-$SED -i -e "s/new Nfo/new Nfo1/" $DIR/bin/temp/postprocess2.php
+$SED -i -e "s/new Nfo(/new Nfo1(/" $DIR/bin/temp/postprocess2.php
 $SED -i -e "s/new Movie/new Movie1/" $DIR/bin/temp/postprocess2.php
 $SED -i -e "s/new Music/new Music1/" $DIR/bin/temp/postprocess1.php
 $SED -i -e "s/new Music/new Music2/" $DIR/bin/temp/postprocess2.php

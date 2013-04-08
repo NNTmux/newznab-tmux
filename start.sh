@@ -33,7 +33,7 @@ if [ "${script_exit_value}" -ne "0" ] ; then
 fi
 
 #check if tmux session exists, attach if exists, create new if not exist
-if $TMUXCMD -q has-session -t $TMUX_SESSION; then
+if $TMUXCMD has-session -t $TMUX_SESSION; then
 	$TMUXCMD attach-session -t $TMUX_SESSION
 else
 
@@ -42,7 +42,7 @@ else
     printf "The above is just a TMUX notice, it is saying TMUX, that you do not have a TMUX session currently running. It is not an error. It is TMUX"
     printf "\033]0; $TMUX_SESSION\007\003\n"
 
-    $TMUXCMD -f $TMUX_CONF new-session -d -s $TMUX_SESSION -n Monitor 'printf "\033]2;Monitor\033\\" && cd bin && echo "Monitor Started" && echo "It might take a minute for everything to spinup......" && $NICE -n$NICENESS $PHP monitor.php'
+    $TMUXCMD -f $TMUX_CONF new-session -d -s $TMUX_SESSION -n Monitor 'printf "\033]2;Monitor\033\\"'
     $TMUXCMD selectp -t 0
     $TMUXCMD splitw -h -p 67 'printf "\033]2;update_binaries\033\\"'
 
@@ -180,9 +180,11 @@ else
     fi
 
     $TMUXCMD select-window -t$TMUX_SESSION:0
+    $TMUXCMD respawnp -t 0 'cd bin && $NICE -n$NICENESS $PHP monitor.php'
     $TMUXCMD attach-session -d -t$TMUX_SESSION
 
 fi
 exit
+
 
 

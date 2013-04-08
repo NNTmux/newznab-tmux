@@ -74,7 +74,8 @@ do
 done
 
 if [[ $NEWZDASH_URL ]]; then
-	wget -nv $NEWZDASH_URL > /dev/null 2>&1 &
+	cd /tmp
+	wget -nv --no-check-certificate $NEWZDASH_URL > /dev/null 2>&1 &
 	pid=$!
 	wait $!
 	script_exit_value=$?
