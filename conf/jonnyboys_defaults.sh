@@ -21,7 +21,7 @@ export NICENESS="10"
 #for example, if you set load to 2, no pane will start when your system load exceeds 2
 #this does not mean the the desired load will not be exceeded, just that no panes will be be restarted
 #this one is for all panes except update_releases
-export MAX_LOAD="5.5"
+export MAX_LOAD="15.5"
 
 #this one is for update_releases
 export MAX_LOAD_RELEASES="7.0"
@@ -46,10 +46,10 @@ export ADMIN_PATH=$NEWZPATH"/www/admin"
 #At some point, increasing this begins to slow things down. It will need to be adjusted for your system
 #to get the desired performance, 0 will disable all post processing, but not category processing
 #the first window has up to 16 postprocess and can use primary or alternate NNTP provider
-export POST_TO_RUN_A="13"
+export POST_TO_RUN_A="16"
 
 #The second window also has 16 processes and can use promary or alternate NNTP provider
-export POST_TO_RUN_B="0"
+export POST_TO_RUN_B="16"
 
 #by modifying www/config.php like http://pastebin.com/VgH9DCZw, you can use 1 provider to run update_binaries
 #and backup and another provider to run post processing with. Or, 1 provider to run up to 16 postprocesses and another to run
@@ -60,11 +60,11 @@ export POST_TO_RUN_B="0"
 
 #this one sets 1 provider for everything(false), or first provider for update_binaries and backfill and another for postprocessing(true)
 #this can not be changed after starting scripts
-export USE_TWO_NNTP="false"
+export USE_TWO_NNTP="true"
 
 #this allows you split the 32 postprocessing into 2 separate providers
 #this can not be changed after starting scripts
-export USE_TWO_PP="false"
+export USE_TWO_PP="true"
 
 ############################################################
 
@@ -231,7 +231,7 @@ export IMPORT="false"
 export NZB_THREADS="true"
 
 #How many nzbs to import per loop, if using NZB_THREADS=true the per folder
-export NZBCOUNT="5"
+export NZBCOUNT="2"
 
 #Set, in seconds - how long the nzb-import should sleep between runs
 #below backfill
@@ -257,7 +257,7 @@ export MISC_ONLY="false"
 ############################################################
 
 #Create releases, this is really only necessary to turn off when you only want to post process
-export RELEASES="true"
+export RELEASES="false"
 
 #Set, in seconds - how long the update_release should sleep between runs
 #bottom right
@@ -320,10 +320,10 @@ export PARSING_MOD="true"
 export FIX_DROID="true"
 
 #run update_parsing.php against the whole db or just the last 24 hours
-export PAST_24_HOURS="false"
+export PAST_24_HOURS="true"
 
 #How often do you want update_parsing.php to run, in seconds. this takes alot of memory and processing time, default is every 12 hrs
-export PARSING_TIMER="43200"
+export PARSING_TIMER="900"
 
 ############################################################
 
@@ -493,7 +493,7 @@ export RAMDISK_PATH="/"
 ###########################################################
 
 #logs can be written, per pane, to the logs folder
-export WRITE_LOGS="true"
+export WRITE_LOGS="false"
 
 ###########################################################
 

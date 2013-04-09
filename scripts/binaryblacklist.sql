@@ -22,6 +22,7 @@ INSERT INTO `binaryblacklist` (`ID`, `groupname`, `regex`, `msgcol`, `optype`, `
 (100005, 'alt.binaries.*', '[ -._](4u\\.nl|nov[ a]+rip|realco|videomann|vost)[ -._]', 1, 1, 0, 'Blacklists non-english (release group specific) releases.'),
 (100006, 'alt.binaries.*', '[ -.]((bd|dl)mux|doku|\\[foreign\\]|seizoen|staffel)[ -.]', 1, 1, 0, 'Blacklists non-english (lang specific) releases.'),
 (100020, 'alt.binaries.*', '[ -.](imageset|pictureset|xxx)[ -.]', 1, 1, 0, 'Blacklists porn releases.'),
+(100025, 'alt.binaries.*', 'hdnectar|nzbcave', 1, 1, 0, 'Bad releases.'),
 (100030, 'alt.binaries.*', '[ -](de|es|fr|it|ko|nl|pl|se)[ -]((audiobook|cuefix|bonus|bootleg|dirfix|nfofix|dvb|promo|readnfo|real|rerip|repack|proper)[ -])?\\d?(bluray|hddvd|dvd|ddc|cd(s|rs|rep)?|mcd|(\\d_)?(vls|m?lp|ep|vinyl))', 1, 1, 0, 'Blacklists music, music video etc releases.'),
 (100040, 'alt.binaries.*', '[ -.](espn|ultimate.?fighter|mlb|mls|mfc|mma|ncaa|nba|nbl|nfl|nhl|pga|tna|ufc|us.?open|wec|wcw|world.?series|wwe|wwf)[ -.].*((480|720|1080)(i|p)|(d|h|p|s)d?tv|divx|(dvd.?|sat|vhs)rip|(h|x).?264|vcd|xvi ?d)', 1, 1, 0, 'Blacklists american and canadian sports releases.'),
 (100041, 'alt.binaries.*', '[ -.](anz|bundesliga|cfb|epl|fa.?cup|la.?liga|netball|nrl|rugby|serie.?a|supercup|super.?league|uefa|wimbledon)[ -.].*((480|720|1080)(i|p)|(d|h|p|s)d?tv|divx|(dvd.?|sat|vhs)rip|(h|x).?264|xvid)', 1, 1, 0, 'Blacklists european sports releases.'),

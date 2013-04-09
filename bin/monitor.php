@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.1r784";
+$version="0.1r785";
 
 $db = new DB();
 
@@ -1078,7 +1078,7 @@ while( $i > 0 )
                 $f=$h*200;
                 $j=$g*1;
                 $color = get_color();
-		$log = writelog($panes2[$h]);
+		$log = writelog($panes3[$h]);
 		if (( $array['MAX_LOAD'] >= get_load()) && ( $array['POST_TO_RUN_B'] >= $g ) && ( $work_remaining_now > $f ) && ( $optimize_safe_to_run != "true" )) {
 			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.$h 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes3[$h] $ds2 && cd $_temp && $_php processAdditional$k.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes3[$h] $ds3' 2>&1 1> /dev/null");
 		} elseif (( $array['POST_TO_RUN_B'] >= $g ) && ( $work_remaining_now <= $f ) && ( $optimize_safe_to_run != "true" )) {

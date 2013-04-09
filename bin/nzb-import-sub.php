@@ -29,7 +29,7 @@ unset($array['']);
 
 $ps = new PowerProcess;
 $ps->RegisterCallback('psUpdateComplete');
-$ps->maxThreads = 5;
+$ps->maxThreads = 2;
 $ps->tickCount = 50000;
 $ps->threadTimeLimit = 0;
 $selected = $subdir_count - 1;

@@ -51,7 +51,7 @@ $_parts = $array['KEVIN_PARTS'];
 $db = new DB;
 
 echo "Starting kevin123's safer backfill process\n\n";
-$query = $db->queryOneRow(sprintf("select name from groups WHERE (first_record_postdate BETWEEN '${_date}' and now()) and (active = 1) order by name ASC"));
+$query = $db->query(sprintf("select name from groups WHERE (first_record_postdate BETWEEN '${_date}' and now()) and (active = 1) order by name ASC limit 1"));
 
 $groupPost = $_parts;
 $groupName = $query['name'];
