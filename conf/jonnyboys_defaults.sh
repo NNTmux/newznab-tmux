@@ -21,10 +21,10 @@ export NICENESS="10"
 #for example, if you set load to 2, no pane will start when your system load exceeds 2
 #this does not mean the the desired load will not be exceeded, just that no panes will be be restarted
 #this one is for all panes except update_releases
-export MAX_LOAD="15.5"
+export MAX_LOAD="5.5"
 
 #this one is for update_releases
-export MAX_LOAD_RELEASES="7.0"
+export MAX_LOAD_RELEASES="5.5"
 
 ############################################################
 
@@ -135,7 +135,7 @@ export BACKFILL_SEQ_TIMER="10"
 ############################################################
 
 #Choose to run update_binaries true/false
-export BINARIES="false"
+export BINARIES="true"
 
 #Choose to run the threaded or non-threaded newznab binaries scripts true/false
 #update_binaries.php or update_binaries_threaded.php
@@ -144,7 +144,7 @@ export BINARIES_THREADS="false"
 #Set, in seconds - how long the update_binaries should sleep between runs
 #top right pane
 #sleep timers are not used when using SEQ
-export BINARIES_SLEEP="40"
+export BINARIES_SLEEP="600"
 
 #Set the max amount of unprocessed releases and still allow update_binaries to run
 #set to 0 to disable
@@ -162,7 +162,7 @@ export BINARIES_MAX_ROWS="0"
 ############################################################
 
 #Choose to run backfill script true/false
-export BACKFILL="false"
+export BACKFILL="true"
 
 #Choose to run the threaded or non-threaded newznab backfill scripts true/false
 #backfill.php or backfill_threaded.php
@@ -171,7 +171,7 @@ export BACKFILL_THREADS="false"
 #Set, in seconds - how long the backfill should sleep between runs
 #in pane below update_binaries
 #sleep timers are not used when using SEQ
-export BACKFILL_SLEEP="40"
+export BACKFILL_SLEEP="120"
 
 #Set the max amount of unprocessed releases and still allow backfill to run
 #set to 0 to disable
@@ -200,7 +200,7 @@ export MAXDAYS="210"
 #it will be skipped (target reached). When that group is done, it will do another ( again from z to a).
 #this does not use increment, it works by the date set below
 #you also need to enable kevin's compression mod, those files are needed and you still need to enable BACKFILL
-export KEVIN_SAFER="false"
+export KEVIN_SAFER="true"
 
 #use kevin123's backfill_parts.php instead of normal backfill
 export KEVIN_BACKFILL_PARTS="false"
@@ -209,7 +209,7 @@ export KEVIN_BACKFILL_PARTS="false"
 export KEVIN_THREADED="false"
 
 #set the date to go back to, must be in the format of YYYY-MM-DD, like 2012-06-24, this is the date of the posted nzbs
-export KEVIN_DATE="2013-04-08"
+export KEVIN_DATE="2013-01-01"
 
 #set the number of articles/headers to download at one time
 export KEVIN_PARTS="100000"
@@ -257,11 +257,11 @@ export MISC_ONLY="false"
 ############################################################
 
 #Create releases, this is really only necessary to turn off when you only want to post process
-export RELEASES="false"
+export RELEASES="true"
 
 #Set, in seconds - how long the update_release should sleep between runs
 #bottom right
-export RELEASES_SLEEP="0"
+export RELEASES_SLEEP="60"
 
 ############################################################
 

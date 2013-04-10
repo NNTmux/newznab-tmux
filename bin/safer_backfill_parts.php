@@ -45,8 +45,27 @@ function relativeTime($_time) {
     return $return;
 }
 
+function get_color()
+{
+        $from = 1;
+        $to = 231;
+        $exceptions = array( 4, 8, 16, 17, 18, 19, 52, 53, 59, 60, 67 );
+        sort($exceptions); // lets us use break; in the foreach reliably
+        $number = mt_rand($from, $to - count($exceptions)); // or mt_rand()
+        foreach ($exceptions as $exception) {
+                if ($number >= $exception) {
+                        $number++; // make up for the gap
+                } else /*if ($number < $exception)*/ {
+                        break;
+                }
+        }
+        return $number;
+}
+
 $_date = $array['KEVIN_DATE'];
 $_parts = $array['KEVIN_PARTS'];
+
+$color = get_color();
 
 $db = new DB;
 
@@ -65,7 +84,7 @@ $groupName = $query1['name'];
 $groupDate = $query2['first_record_postdate'];
 
 if($query1){
-	echo "\n\033[1;33mStarting kevin123's safer backfill process on $groupName ==> $_date ==> $groupDate\n\033[0m\n\n";
+	echo "\n\033[1;33mStarting kevin123's safer backfill process on $groupName ==> $_date ==> $groupDate\n\033[38;5;${color}m\n\n";
 	sleep(3);
 	$backfill = new Backfill();
 	$backfill->backfillPostAllGroups($groupName, $groupPost);
