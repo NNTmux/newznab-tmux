@@ -209,7 +209,7 @@ export KEVIN_BACKFILL_PARTS="false"
 export KEVIN_THREADED="false"
 
 #set the date to go back to, must be in the format of YYYY-MM-DD, like 2012-06-24, this is the date of the posted nzbs
-export KEVIN_DATE="2012-06-24"
+export KEVIN_DATE="2013-04-08"
 
 #set the number of articles/headers to download at one time
 export KEVIN_PARTS="100000"

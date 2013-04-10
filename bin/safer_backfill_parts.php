@@ -50,15 +50,28 @@ $_parts = $array['KEVIN_PARTS'];
 
 $db = new DB;
 
-echo "Starting kevin123's safer backfill process\n\n";
-$query = $db->query(sprintf("select name from groups WHERE (first_record_postdate BETWEEN '${_date}' and now()) and (active = 1) order by name ASC limit 1"));
+$query1 = $db->queryOneRow("select name from groups WHERE (first_record_postdate BETWEEN '$_date' and now()) and (active = 1) order by name ASC limit 1");
+$query2 = $db->queryOneRow("select first_record_postdate from groups WHERE (first_record_postdate BETWEEN '$_date' and now()) and (active = 1) order by name ASC limit 1");
+
+$groups = $db->query("select name from groups WHERE (first_record_postdate NOT BETWEEN '$_date' and now()) and (active = 1) order by name ASC");
+foreach($groups as $row)
+    {
+        $tbl = $row['name'];
+        echo "\033[1;33m$tbl Completed\n\033[0m";
+    }
 
 $groupPost = $_parts;
-$groupName = $query['name'];
+$groupName = $query1['name'];
+$groupDate = $query2['first_record_postdate'];
 
-$backfill = new Backfill();
-$backfill->backfillPostAllGroups($groupName, $groupPost);
+if($query1){
+	echo "\n\033[1;33mStarting kevin123's safer backfill process on $groupName ==> $_date ==> $groupDate\n\033[0m\n\n";
+	sleep(3);
+	$backfill = new Backfill();
+	$backfill->backfillPostAllGroups($groupName, $groupPost);
+}
 
-echo "\n\033[1;33mKevin123's safer backfill process completed in: " .relativeTime($time). "\n";
+echo "\n\033[1;33mKevin123's safer backfill process completed in: " .relativeTime($time). "\n\033[0m\n";
 
 ?>
+
