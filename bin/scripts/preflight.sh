@@ -212,7 +212,7 @@ do
 done
 
 cp -f $NEWZPATH/www/lib/nfo.php $DIR/bin/temp/nfo.php
-#cp -f $NEWZPATH/www/lib/tvrage.php $DIR/bin/temp/tvrage.php
+cp -f $NEWZPATH/www/lib/tvrage.php $DIR/bin/temp/tvrage.php
 cp -f $NEWZPATH/www/lib/movie.php $DIR/bin/temp/movie.php
 cp -f $NEWZPATH/www/lib/music.php $DIR/bin/temp/music.php
 cp -f $NEWZPATH/www/lib/music.php $DIR/bin/temp/music1.php
@@ -234,7 +234,7 @@ $SED -i -e "s/500/250/" $DIR/bin/temp/postprocess1.php
 $SED -i -e "s/500/250/" $DIR/bin/temp/postprocess2.php
 
 $SED -i -e "s/class Nfo/class Nfo1/" $DIR/bin/temp/nfo.php
-#$SED -i -e "s/class TvRage/class TvRage1/" $DIR/bin/temp/tvrage.php
+$SED -i -e "s/class TvRage/class TvRage1/" $DIR/bin/temp/tvrage.php
 $SED -i -e "s/class Movie/class Movie1/" $DIR/bin/temp/movie.php
 $SED -i -e "s/class Music/class Music1/" $DIR/bin/temp/music.php
 $SED -i -e "s/class Music/class Music2/" $DIR/bin/temp/music1.php
@@ -242,7 +242,7 @@ $SED -i -e "s/class Console/class Console1/" $DIR/bin/temp/console.php
 $SED -i -e "s/class Book/class Book1/" $DIR/bin/temp/book.php
 
 $SED -i -e "s/function Nfo/function Nfo1/" $DIR/bin/temp/nfo.php
-#$SED -i -e "s/function TvRage/function TvRage1/" $DIR/bin/temp/tvrage.php
+$SED -i -e "s/function TvRage/function TvRage1/" $DIR/bin/temp/tvrage.php
 $SED -i -e "s/function Movie/function Movie1/" $DIR/bin/temp/movie.php
 $SED -i -e "s/function Music/function Music1/" $DIR/bin/temp/music.php
 $SED -i -e "s/function Music/function Music2/" $DIR/bin/temp/music1.php
@@ -265,7 +265,7 @@ $SED -i -e 's/WWW_DIR."\/lib\/music.php"/"music.php"/g' $DIR/bin/temp/postproces
 $SED -i -e 's/WWW_DIR."\/lib\/music.php"/"music1.php"/g' $DIR/bin/temp/postprocess2.php
 $SED -i -e 's/WWW_DIR."\/lib\/console.php"/"console.php"/g' $DIR/bin/temp/postprocess2.php
 $SED -i -e 's/WWW_DIR."\/lib\/book.php"/"book.php"/g' $DIR/bin/temp/postprocess2.php
-#$SED -i -e 's/WWW_DIR."\/lib\/tvrage.php"/"tvrage.php"/g' $DIR/bin/temp/postprocess2.php
+$SED -i -e 's/WWW_DIR."\/lib\/tvrage.php"/"tvrage.php"/g' $DIR/bin/temp/postprocess2.php
 
 $SED -i -e "s/processNfos()/processNfos1()/g" $DIR/bin/temp/postprocess2.php
 $SED -i -e "s/processMovies()/processMovies1()/g" $DIR/bin/temp/postprocess2.php

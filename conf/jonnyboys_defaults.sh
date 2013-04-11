@@ -24,7 +24,7 @@ export NICENESS="10"
 export MAX_LOAD="5.5"
 
 #this one is for update_releases
-export MAX_LOAD_RELEASES="5.5"
+export MAX_LOAD_RELEASES="27.5"
 
 ############################################################
 
@@ -46,10 +46,10 @@ export ADMIN_PATH=$NEWZPATH"/www/admin"
 #At some point, increasing this begins to slow things down. It will need to be adjusted for your system
 #to get the desired performance, 0 will disable all post processing, but not category processing
 #the first window has up to 16 postprocess and can use primary or alternate NNTP provider
-export POST_TO_RUN_A="16"
+export POST_TO_RUN_A="0"
 
 #The second window also has 16 processes and can use promary or alternate NNTP provider
-export POST_TO_RUN_B="16"
+export POST_TO_RUN_B="0"
 
 #by modifying www/config.php like http://pastebin.com/VgH9DCZw, you can use 1 provider to run update_binaries
 #and backup and another provider to run post processing with. Or, 1 provider to run up to 16 postprocesses and another to run
@@ -70,26 +70,26 @@ export USE_TWO_PP="true"
 
 #post processing per category, setting the above to 0 does not disable these
 #run processNfos
-export NFOS="2"
+export NFOS="0"
 
 #run processGames
-export GAMES="2"
+export GAMES="0"
 
 #run processMovies
-export MOVIES="2"
+export MOVIES="0"
 
 #run processMusic
-export MUSIC="2"
+export MUSIC="0"
 
 #run processEbook
-export EBOOK="2"
+export EBOOK="0"
 
 #these are true/false
 #run processTV
-export TVRAGE="true"
+export TVRAGE="false"
 
 #run processOther
-export OTHERS="true"
+export OTHERS="false"
 
 #run processUnwanted
 export UNWANTED="false"
@@ -135,7 +135,7 @@ export BACKFILL_SEQ_TIMER="10"
 ############################################################
 
 #Choose to run update_binaries true/false
-export BINARIES="true"
+export BINARIES="false"
 
 #Choose to run the threaded or non-threaded newznab binaries scripts true/false
 #update_binaries.php or update_binaries_threaded.php
@@ -162,7 +162,7 @@ export BINARIES_MAX_ROWS="0"
 ############################################################
 
 #Choose to run backfill script true/false
-export BACKFILL="true"
+export BACKFILL="false"
 
 #Choose to run the threaded or non-threaded newznab backfill scripts true/false
 #backfill.php or backfill_threaded.php
@@ -200,7 +200,7 @@ export MAXDAYS="210"
 #it will be skipped (target reached). When that group is done, it will do another ( again from z to a).
 #this does not use increment, it works by the date set below
 #you also need to enable kevin's compression mod, those files are needed and you still need to enable BACKFILL
-export KEVIN_SAFER="true"
+export KEVIN_SAFER="false"
 
 #use kevin123's backfill_parts.php instead of normal backfill
 export KEVIN_BACKFILL_PARTS="false"
@@ -310,14 +310,14 @@ export CLEANUP_TIMER="3600"
 #Choose to run update_parsing.php true/false
 #set to false by default, you will need to edit /misc/testing/update_parsing.php
 #to actually do anything, directions are in the file
-export PARSING="true"
+export PARSING="false"
 
 #choose to use kevin123's update_parsing script
 #this also includes kevin123's categorymod.php, you must run either update_svn.sh or fix_files.sh to copy the file into place
-export PARSING_MOD="true"
+export PARSING_MOD="false"
 
 #choose to use cj's fix_android_releases.php
-export FIX_DROID="true"
+export FIX_DROID="false"
 
 #run update_parsing.php against the whole db or just the last 24 hours
 export PAST_24_HOURS="true"
@@ -328,7 +328,7 @@ export PARSING_TIMER="900"
 ############################################################
 
 #Choose to run update_predb.php
-export PREDB="true"
+export PREDB="false"
 
 #How often to update the PreDB in seconds
 export PREDB_TIMER="900"
@@ -336,18 +336,18 @@ export PREDB_TIMER="900"
 ############################################################
 
 #Choose to run processSpotnab.php
-export SPOTNAB="true"
+export SPOTNAB="false"
 
 #How often to update the SpotNab in seconds
 export SPOTNAB_TIMER="900"
 
 #automatically set ALL sources to active after retrieving sources
-export SPOTNAB_ACTIVE="true"
+export SPOTNAB_ACTIVE="false"
 
 ############################################################
 
 #update the tv schedule and in theaters listings
-export TV_SCHEDULE="true"
+export TV_SCHEDULE="false"
 
 #How often to update the TV Schedule and the In Theaters in seconds
 export TVRAGE_TIMER="43200"
@@ -374,14 +374,14 @@ export KILL_QUIET="true"
 
 #Delete parts and binaries older than retention days, which is set in edit - site
 #this uses a script posted by cj https://github.com/NNScripts/nn-custom-scripts
-export DELETE_PARTS="true"
+export DELETE_PARTS="false"
 
 #how often should this be run, default it 1 hr
 export DELETE_TIMER="3600"
 
 #Releases may be added/edited with an imdb-id that does not exists in the movieinfo table. This script, update_missing_movie_info,
 #will fetch all the missing imdb id's from the releases table.
-export FETCH_MOVIE="true"
+export FETCH_MOVIE="false"
 
 #how often should this be run, default it 12 hr
 export MOVIE_TIMER="43200"
@@ -433,7 +433,7 @@ export USE_CONSOLE="false"
 #This is done on the terminal computer, not the newznab++ server
 #download fonts from https://github.com/jonnyboy/powerline-fonts
 #I recommend Consolas if you are using putty in Win7
-export POWERLINE="true"
+export POWERLINE="false"
 
 ############################################################
 

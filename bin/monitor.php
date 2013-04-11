@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.1r787";
+$version="0.1r788";
 
 $db = new DB();
 
@@ -787,7 +787,7 @@ while( $i > 0 )
 		} elseif (( $array['MAX_LOAD'] >= get_load()) && ( TIME() - $time8 >= $array['INNODB_LARGE'] ) && ( $array['OPTIMIZE'] == "true" ) && ( $optimize_run == "true" )) {
 			$color = get_color();
 			$log = writelog($panes1[4]);
-			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.4 'echo \"\033[38;5;\"$color\"m\" && $ds1 INNODB_LARGE $ds2 && cd $_user && ./${array['USER_DEF_FOUR']} 2>&1 $log && cd $_bin && $_php optimize_myisam.php true 2>&1 $log && cd $_user && ./${array['USER_DEF_FIVE']} 2>&1 $log && $_php optimize_innodb.php true 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 INNODB_LARGE $ds3' 2>&1 1> /dev/null");
+			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.4 'echo \"\033[38;5;\"$color\"m\" && $ds1 INNODB_LARGE $ds2 && cd $_user && ./${array['USER_DEF_FOUR']} 2>&1 $log && cd $_bin && $_php optimize_myisam.php true 2>&1 $log && $_php optimize_innodb.php true 2>&1 $log && cd $_user && ./${array['USER_DEF_FIVE']} 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 INNODB_LARGE $ds3' 2>&1 1> /dev/null");
 			echo "\033[1;41;33mOPTIMIZATION OF THE MYSQL TABLES HAS STARTED, DO NOT STOP THIS SCRIPT!\033[1;0;33m\n\n";
 			$time8 = TIME();
 		} elseif (( $array['MAX_LOAD'] >= get_load()) && ( TIME() - $time5 >= $array['INNODB_SMALL'] ) && ( $array['INNODB']== "true" ) && ( $array['OPTIMIZE'] == "true" ) && ( $optimize_run == "true" )) {
@@ -820,7 +820,7 @@ while( $i > 0 )
 		if (( $array['MAX_LOAD'] >= get_load()) && ( TIME() - $time6 >= $array['MYISAM_LARGE'] ) && ( $array['OPTIMIZE'] == "true" ) && ( $optimize_run == "true" )) {
 			$color = get_color();
 			$log = writelog($panes1[4]);
-			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.4 'echo \"\033[38;5;\"$color\"m\" && $ds1 MYISAM_LARGE $ds2 && cd $_bin && $_php optimize_myisam.php true 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 MYISAM_LARGE $ds3' 2>&1 1> /dev/null");
+			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.4 'echo \"\033[38;5;\"$color\"m\" && $ds1 MYISAM_LARGE $ds2 && cd $_user && ./${array['USER_DEF_TWO']} 2>&1 $log && cd $_bin && $_php optimize_myisam.php true 2>&1 $log && cd $_user && ./${array['USER_DEF_THREE']} 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 MYISAM_LARGE $ds3' 2>&1 1> /dev/null");
 			echo "\033[1;41;33mOPTIMIZATION OF THE MYSQL TABLES HAS STARTED, DO NOT STOP THIS SCRIPT!\033[1;0;33m\n\n";
 			$time6 = TIME();
 		} elseif (( $array['MAX_LOAD'] >= get_load()) && ( TIME() - $time11 >= $array['MYISAM_SMALL'] ) && ( $array['OPTIMIZE'] == "true" ) && ( $optimize_run == "true" )) {
