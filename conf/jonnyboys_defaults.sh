@@ -21,10 +21,10 @@ export NICENESS="10"
 #for example, if you set load to 2, no pane will start when your system load exceeds 2
 #this does not mean the the desired load will not be exceeded, just that no panes will be be restarted
 #this one is for all panes except update_releases
-export MAX_LOAD="5.5"
+export MAX_LOAD="2.0"
 
 #this one is for update_releases
-export MAX_LOAD_RELEASES="27.5"
+export MAX_LOAD_RELEASES="2.0"
 
 ############################################################
 
@@ -46,7 +46,7 @@ export ADMIN_PATH=$NEWZPATH"/www/admin"
 #At some point, increasing this begins to slow things down. It will need to be adjusted for your system
 #to get the desired performance, 0 will disable all post processing, but not category processing
 #the first window has up to 16 postprocess and can use primary or alternate NNTP provider
-export POST_TO_RUN_A="0"
+export POST_TO_RUN_A="2"
 
 #The second window also has 16 processes and can use promary or alternate NNTP provider
 export POST_TO_RUN_B="0"
@@ -60,36 +60,37 @@ export POST_TO_RUN_B="0"
 
 #this one sets 1 provider for everything(false), or first provider for update_binaries and backfill and another for postprocessing(true)
 #this can not be changed after starting scripts
-export USE_TWO_NNTP="true"
+export USE_TWO_NNTP="false"
 
 #this allows you split the 32 postprocessing into 2 separate providers
 #this can not be changed after starting scripts
-export USE_TWO_PP="true"
+export USE_TWO_PP="false"
 
 ############################################################
 
 #post processing per category, setting the above to 0 does not disable these
+#this now takes 0 for none, 1 for the first processor or 2 for both processors
 #run processNfos
-export NFOS="0"
+export NFOS="1"
 
 #run processGames
-export GAMES="0"
+export GAMES="1"
 
 #run processMovies
-export MOVIES="0"
+export MOVIES="1"
 
 #run processMusic
-export MUSIC="0"
+export MUSIC="1"
 
 #run processEbook
-export EBOOK="0"
+export EBOOK="1"
 
 #these are true/false
 #run processTV
-export TVRAGE="false"
+export TVRAGE="true"
 
 #run processOther
-export OTHERS="false"
+export OTHERS="true"
 
 #run processUnwanted
 export UNWANTED="false"
@@ -135,7 +136,7 @@ export BACKFILL_SEQ_TIMER="10"
 ############################################################
 
 #Choose to run update_binaries true/false
-export BINARIES="false"
+export BINARIES="true"
 
 #Choose to run the threaded or non-threaded newznab binaries scripts true/false
 #update_binaries.php or update_binaries_threaded.php
@@ -144,7 +145,7 @@ export BINARIES_THREADS="false"
 #Set, in seconds - how long the update_binaries should sleep between runs
 #top right pane
 #sleep timers are not used when using SEQ
-export BINARIES_SLEEP="600"
+export BINARIES_SLEEP="40"
 
 #Set the max amount of unprocessed releases and still allow update_binaries to run
 #set to 0 to disable
@@ -171,7 +172,7 @@ export BACKFILL_THREADS="false"
 #Set, in seconds - how long the backfill should sleep between runs
 #in pane below update_binaries
 #sleep timers are not used when using SEQ
-export BACKFILL_SLEEP="120"
+export BACKFILL_SLEEP="40"
 
 #Set the max amount of unprocessed releases and still allow backfill to run
 #set to 0 to disable
@@ -209,7 +210,7 @@ export KEVIN_BACKFILL_PARTS="false"
 export KEVIN_THREADED="false"
 
 #set the date to go back to, must be in the format of YYYY-MM-DD, like 2012-06-24, this is the date of the posted nzbs
-export KEVIN_DATE="2013-01-01"
+export KEVIN_DATE="2012-06-24"
 
 #set the number of articles/headers to download at one time
 export KEVIN_PARTS="100000"
@@ -218,24 +219,25 @@ export KEVIN_PARTS="100000"
 
 #Set the path to the nzb dump you downloaded from torrents, this is the path to bulk files folder of nzbs
 #this does not recurse through subfolders, unless you set NZB_THREADS to true
-export NZBS="/home/jonnyboy/nzb_files/nzbs"
+#this must be a valid path
+export NZBS="/path/to/nzbs"
 
 #Choose to run import nzb script true/false
 export IMPORT="false"
 
 #If, you have all of your nzbs in one folder select false
-#If, you have all of you nzbs split into separate in with the root at $NZBS then select true
+#If, you have all of you nzbs split into separate folders, with the root at $NZBS then select true
 #and 10 nzbs will be imported from each subfolder per loop.
 #Importing this way, allows all post processing scripts to run, such as book, music, movies
-#Instead of doing all 1 type at once, spread the load
-export NZB_THREADS="true"
+#Instead of doing all 1 type at once, spreads the work load
+export NZB_THREADS="false"
 
 #How many nzbs to import per loop, if using NZB_THREADS=true the per folder
-export NZBCOUNT="2"
+export NZBCOUNT="10"
 
 #Set, in seconds - how long the nzb-import should sleep between runs
 #below backfill
-export IMPORT_SLEEP="0"
+export IMPORT_SLEEP="40"
 
 #Set the max amount of unprocessed releases and still allow nzb-import to run
 #set to 0 to disable
@@ -246,7 +248,7 @@ export IMPORT_MAX_RELEASES="0"
 export IMPORT_MAX_ROWS="0"
 
 #import nzbs using the filename as the release name true/false
-export IMPORT_TRUE="true"
+export IMPORT_TRUE="false"
 
 ############################################################
 
@@ -261,7 +263,7 @@ export RELEASES="true"
 
 #Set, in seconds - how long the update_release should sleep between runs
 #bottom right
-export RELEASES_SLEEP="60"
+export RELEASES_SLEEP="40"
 
 ############################################################
 
@@ -290,7 +292,7 @@ export INNODB_LARGE="172800"
 
 #Choose your database engine, comment the one true/false
 #you should have already converted your database to InnoDB engine, if you select true here
-export INNODB="true"
+export INNODB="false"
 
 ############################################################
 
@@ -300,7 +302,7 @@ export INNODB="true"
 export CLEANUP="false"
 
 #edit update_cleanup.php and update_parsing.php and svn up, this will only mod files when you run scripts/update_svn.sh or scripts/fix_files.sh
-export CLEANUP_EDIT="true"
+export CLEANUP_EDIT="false"
 
 #How often do you want  update_cleanup.php and removespecial.php to run, in seconds
 export CLEANUP_TIMER="3600"
@@ -323,7 +325,7 @@ export FIX_DROID="false"
 export PAST_24_HOURS="true"
 
 #How often do you want update_parsing.php to run, in seconds. this takes alot of memory and processing time, default is every 12 hrs
-export PARSING_TIMER="900"
+export PARSING_TIMER="43200"
 
 ############################################################
 
@@ -368,7 +370,7 @@ export SPHINX_TIMER="3600"
 export KILL_PROCESS="0"
 
 #look at man killall - if you have the -q option, enable this, otherwise leave it disabled
-export KILL_QUIET="true"
+export KILL_QUIET="false"
 
 ############################################################
 
@@ -441,7 +443,7 @@ export POWERLINE="false"
 export LANG="en_US.UTF-8"
 
 #to help IMDB return only English titles, enable this, you will need to run update_svn.php or fix_files.sh
-export EN_IMDB="true"
+export EN_IMDB="false"
 
 ############################################################
 
@@ -452,6 +454,7 @@ export EN_IMDB="true"
 export NEWZDASH_SHARED_SECRET=""
 
 #the url of your newzdash install, ensure it include HTTP:// or HTTPS:// or it will fail
+#do not include the trailing /
 #to disable leave blank ie. export NEWZDASH_URL=""
 export NEWZDASH_URL=""
 
@@ -462,7 +465,7 @@ export NEWZDASH_URL=""
 #tmpfs /var/www/newznab/nzbfiles/tmpunrar1 tmpfs user,nodev,nodiratime,nosuid,size=256M,mode=777 0 0
 #edit the path, the path MUST be the path in site edit with a "1" appended to the end, like above
 #you still need to set this to true or mount it manually as your user, not as root
-export RAMDISK="true"
+export RAMDISK="false"
 
 #for freebsd, it is just a little different, you can either create the ramdisk and mount it by adding the next line to /etc/fstab
 #tmpfs /var/www/newznab/nzbfiles/tmpunrar1 tmpfs rw,size=256M,mode=777 0 0
@@ -478,17 +481,17 @@ export SVN_PASSWORD="password"
 #running update_svn as root will change file ownership of every file in the svn path
 #to chown -R the path, enable and set user/group
 #newznab/nzbfiles is not chown'd
-export CHOWN_TRUE="true"
+export CHOWN_TRUE="false"
 
 #set CHOWN_TRUE="true" and WWW_USER="{youruser}:www-data" and run update_svn.sh or fix_files.sh
 #and you will will not need root to run these scripts
-export WWW_USER="jonnyboy:www-data"
+export WWW_USER="www-data:www-data"
 
 ###########################################################
 
 #if you have a ramdisk and would like to monitor it's use, set path here
 #this is not the same as RAMDISK above, I keep my parts table on a ramdisk
-export RAMDISK_PATH="/"
+export RAMDISK_PATH=""
 
 ###########################################################
 
