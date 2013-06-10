@@ -65,7 +65,6 @@ if [[ $CHOWN_TRUE == "true" ]]; then
     chown $WWW_USER $NEWZPATH/*
     chown -R $WWW_USER $NEWZPATH/www/
     chown -R $WWW_USER $NEWZPATH/db/
-    chown -R $WWW_USER $NEWZPATH/docs/
     chown -R $WWW_USER $NEWZPATH/misc/
     chmod 775 $NEWZPATH/www/lib/smarty/templates_c
     chmod -R 775 $NEWZPATH/www/covers
