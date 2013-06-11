@@ -61,7 +61,6 @@ else
     $TMUXCMD selectp -t 4
     $TMUXCMD splitw -v -p 75 'printf "\033]2;sphinx\033\\"'
     $TMUXCMD splitw -v -p 67 'printf "\033]2;delete_parts\033\\"'
-    $TMUXCMD splitw -v -p 50 'printf "\033]2;update_missing_movie_info\033\\"'
 
     $TMUXCMD new-window -n post1a 'printf "\033]2;postprocessing[01]\033\\"'
     $TMUXCMD selectp -t 0
