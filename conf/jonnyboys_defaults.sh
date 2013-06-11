@@ -14,17 +14,17 @@ export RUNNING="true"
 
 #these scripts set the 'nice'ness of each script, default is 19, the lowest, the highest is -20
 #anything between -1 and -20 require root/sudo to run
-export NICENESS="1"
+export NICENESS="10"
 
 #these scripts can add some serious load to your system, without proper monitoring it can be
 #to much, you can set the max load that any pane will be started at
 #for example, if you set load to 2, no pane will start when your system load exceeds 2
 #this does not mean the the desired load will not be exceeded, just that no panes will be be restarted
 #this one is for all panes except update_releases
-export MAX_LOAD="4.25"
+export MAX_LOAD="2.0"
 
 #this one is for update_releases
-export MAX_LOAD_RELEASES="4.25"
+export MAX_LOAD_RELEASES="2.0"
 
 ############################################################
 
@@ -39,55 +39,73 @@ export ADMIN_PATH=$NEWZPATH"/www/admin"
 ############################################################
 
 #Post Processing Additional is the post processing that downloads rar files and attempts to get info for your site
-#you are able to set the number of process to be run from 1-32, remember that each process uses 1 of your nntp connections
-#so, if you have 20, and you set this to 32, you will have errors, lots of errors, nfo lookup uses 1 -3 connections
+#you are able to set the number of processes to be run from 1-32, remember that each process uses 1 of your nntp connections
+#so, if you have 20, and you set this to 32, you will have errors, lots of errors, nfo lookup uses 1-3 connections each
 #binaries and backfill threaded default up to 10 connections each and predb uses 1, so understand how many connections you are using when setting
-#trial and error for this, set to 1 will run > 0, set to 2 will run > 200, 3 will run > 300 and so on.
+#trial and error for this, set to 1 will run > 0, set to 2 will run > 100, 3 will run > 200 and so on.
 #At some point, increasing this begins to slow things down. It will need to be adjusted for your system
-#to get the desired performance, 0 will disable all post processing
-export POST_TO_RUN="10"
+#to get the desired performance, 0 will disable all post processing, but not category processing
+#the first window has up to 16 postprocess and can use primary or alternate NNTP provider
+export POST_TO_RUN_A="2"
 
-#or you can run them as they are run in stock, during update releases, this will disable all postprocessing windows and only run during update_releases
-export ALMOST_STOCK="true"
+#The second window also has 16 processes and can use promary or alternate NNTP provider
+export POST_TO_RUN_B="0"
+
+#by modifying www/config.php like http://pastebin.com/VgH9DCZw, you can use 1 provider to run update_binaries
+#and backup and another provider to run post processing with. Or, 1 provider to run up to 16 postprocesses and another to run
+#up to 16 more postprocesses, or the same provider for everything
+#you can not switch providers without resetting all groups and truncating, I have included a script in scripts folders to reset and truncate
+#sudo scripts/reset_truncate.php
+#it is not necessary to run reset_truncate.php in order to second nntp provider for postprocessing only
+
+#this one sets 1 provider for everything(false), or first provider for update_binaries and backfill and another for postprocessing(true)
+#this can not be changed after starting scripts
+export USE_TWO_NNTP="false"
+
+#this allows you split the 32 postprocessing into 2 separate providers
+#this can not be changed after starting scripts
+export USE_TWO_PP="false"
 
 ############################################################
 
 #post processing per category, setting the above to 0 does not disable these
+#this now takes 0 for none, 1 for the first processor or 2 for both processors
 #run processNfos
-export NFOS="true"
+export NFOS="1"
 
 #run processGames
-export GAMES="true"
+export GAMES="1"
 
 #run processMovies
-export MOVIES="true"
+export MOVIES="1"
 
 #run processMusic
-export MUSIC="true"
-
-#run processTV
-export TVRAGE="true"
+export MUSIC="1"
 
 #run processEbook
-export EBOOK="true"
+export EBOOK="1"
+
+#these are true/false
+#run processTV
+export TVRAGE="true"
 
 #run processOther
 export OTHERS="true"
 
 #run processUnwanted
-export UNWANTED="true"
+export UNWANTED="false"
 
 ############################################################
 
 #Enter the session name to be used by tmux, no spaces allowed in the name, this can be changed after scripts start
 #if you are running multiple servers, you could put your hostname here
-export TMUX_SESSION="Ubuntu-dev"
+export TMUX_SESSION="Newznab"
 
 #Set, in seconds - how often the monitor.php (left top pane) script should update run the queries against the database
 #the monitor script will update itself and each pane, once every 5 seconds plus the lagg time time on the loop the db is queried
 #to press the point, the db is not queried any sooner than the time set below, but the script loops each iteration once every 5 seconds
 #this makes it more responsive to stop/kill without slamming the db with needless queries, starts are still controlled by the queries
-export MONITOR_UPDATE="10"
+export MONITOR_UPDATE="30"
 
 #you may want to kill the update_binaries, backfill and import if no releases have been add in x minutes, set the timer to anything other than 0 to enable
 #this will only run every 5 loops of monitor
@@ -104,12 +122,12 @@ export KEEP_KILLED="false"
 #this works by setting the 2 start timers and which is run at the start of the loop is determined like this
 #if at the start of the loop, the BINARIES_SEQ_TIMER has expired, then update_binaries will run and the BINARIES_SEQ_TIMER timer is reset
 #if BINARIES_SEQ_TIMER has not expired, then if BACKFILL_SEQ_TIMER has expired, the backfill will run and BACKFILL_SEQ_TIMER timer is reset
-export SEQUENTIAL="true"
+export SEQUENTIAL="false"
 
 #time between loop start for update_binaries, in seconds, this is a countdown timer, not a sleep after it runs
 #default is 30 minutes
 #will run on first loop and then not again for at least 1800 seconds
-export BINARIES_SEQ_TIMER="900"
+export BINARIES_SEQ_TIMER="1800"
 
 #this will not run on first loop, time between loop start for backfill, in seconds
 #default is 10 seconds, this will run after time has expired, binaries will take precedence and run before this, if its time has expired
@@ -122,20 +140,21 @@ export BINARIES="true"
 
 #Choose to run the threaded or non-threaded newznab binaries scripts true/false
 #update_binaries.php or update_binaries_threaded.php
-export BINARIES_THREADS="true"
+export BINARIES_THREADS="false"
 
 #Set, in seconds - how long the update_binaries should sleep between runs
 #top right pane
 #sleep timers are not used when using SEQ
-export BINARIES_SLEEP="900"
-
-#Set the max amount of binaries in the binaries table and still allow update_binaries to run
-#set to 0 to disable
-export BINARIES_MAX_BINS="0"
+export BINARIES_SLEEP="40"
 
 #Set the max amount of unprocessed releases and still allow update_binaries to run
 #set to 0 to disable
 export BINARIES_MAX_RELEASES="0"
+
+#Set the max amount of binaries in the binaries table and still allow update_binaries to run, this is unprocessed binaries, not the total count
+#only usefull when used with ugo's automake_threaded.php
+#set to 0 to disable
+export BINARIES_MAX_BINS="0"
 
 #Set the max amount of of rows in the parts table and still allow update_binaries to run
 #set to 0 to disable
@@ -144,22 +163,23 @@ export BINARIES_MAX_ROWS="0"
 ############################################################
 
 #Choose to run backfill script true/false
-export BACKFILL="true"
+export BACKFILL="false"
 
 #Choose to run the threaded or non-threaded newznab backfill scripts true/false
 #backfill.php or backfill_threaded.php
-export BACKFILL_THREADS="true"
+export BACKFILL_THREADS="false"
 
 #Set, in seconds - how long the backfill should sleep between runs
 #in pane below update_binaries
 #sleep timers are not used when using SEQ
-export BACKFILL_SLEEP="5"
+export BACKFILL_SLEEP="40"
 
 #Set the max amount of unprocessed releases and still allow backfill to run
 #set to 0 to disable
 export BACKFILL_MAX_RELEASES="0"
 
-#Set the max amount of binaries in the binaries table and still allow backfill to run
+#Set the max amount of binaries in the binaries table and still allow backfill to run, this is unprocessed binaries, not the total count
+#only usefull when used with ugo's automake_threaded.php
 #set to 0 to disable
 export BACKFILL_MAX_BINS="0"
 
@@ -171,7 +191,7 @@ export BACKFILL_MAX_ROWS="0"
 #this will increment your database by 1 after each backfill loop
 #once your backfill numbers reach $MAXDAYS, then it will no long increment the database
 #backfill will continue to run, and do no work, at that point you should disable backfill, below
-export MAXDAYS="1700"
+export MAXDAYS="210"
 
 ############################################################
 
@@ -181,16 +201,16 @@ export MAXDAYS="1700"
 #it will be skipped (target reached). When that group is done, it will do another ( again from z to a).
 #this does not use increment, it works by the date set below
 #you also need to enable kevin's compression mod, those files are needed and you still need to enable BACKFILL
-export KEVIN_SAFER="truef"
+export KEVIN_SAFER="false"
 
 #use kevin123's backfill_parts.php instead of normal backfill
-export KEVIN_BACKFILL_PARTS="trued"
+export KEVIN_BACKFILL_PARTS="false"
 
-#use kevin123's backfill_parts_threaded.php instead of normal
-export KEVIN_THREADED="truek"
+#use kevin123's backfill_parts_threaded.php instead of normal backfill_threaded
+export KEVIN_THREADED="false"
 
-#set the date to go back to, must be in the format of YYYY-MM-DD, like 2012-06-24
-export KEVIN_DATE="2008-08-15"
+#set the date to go back to, must be in the format of YYYY-MM-DD, like 2012-06-24, this is the date of the posted nzbs
+export KEVIN_DATE="2012-06-24"
 
 #set the number of articles/headers to download at one time
 export KEVIN_PARTS="100000"
@@ -199,20 +219,18 @@ export KEVIN_PARTS="100000"
 
 #Set the path to the nzb dump you downloaded from torrents, this is the path to bulk files folder of nzbs
 #this does not recurse through subfolders, unless you set NZB_THREADS to true
+#this must be a valid path
 export NZBS="/path/to/nzbs"
 
 #Choose to run import nzb script true/false
 export IMPORT="false"
 
 #If, you have all of your nzbs in one folder select false
-#If, you have all of you nzbs split into separate in with the root at $NZBS then select true
+#If, you have all of you nzbs split into separate folders, with the root at $NZBS then select true
 #and 10 nzbs will be imported from each subfolder per loop.
 #Importing this way, allows all post processing scripts to run, such as book, music, movies
-#Instead of doing all 1 type at once, spread the load
+#Instead of doing all 1 type at once, spreads the work load
 export NZB_THREADS="false"
-
-#Set max number of folders to process per loop. This includes empty folders.
-export NZB_FOLDER_COUNT="20"
 
 #How many nzbs to import per loop, if using NZB_THREADS=true the per folder
 export NZBCOUNT="10"
@@ -236,13 +254,7 @@ export IMPORT_TRUE="false"
 
 #MAX_RELEASES for each can be calculated on the total post processing or just the Misc category
 #to calculate on just the Misc, enable this
-export MISC_ONLY="true"
-
-############################################################
-
-#run ugo's automake.php script to create releases, this does not use regexes and will run in a loop prior
-#to update_releases.php
-export UGO_THREADED="truef"
+export MISC_ONLY="false"
 
 ############################################################
 
@@ -251,21 +263,21 @@ export RELEASES="true"
 
 #Set, in seconds - how long the update_release should sleep between runs
 #bottom right
-export RELEASES_SLEEP="0"
+export RELEASES_SLEEP="40"
 
 ############################################################
 
 #Choose to run optimize_innodb.php or optimize_mysiam.php script true/false
 #set to false by default, you should test the optimize scripts in bin first
 #optimize_myisam on small tables runs after every 5th loop of update_releases
-export OPTIMIZE="truej"
+export OPTIMIZE="false"
 
 #optimize can wait, patiently while all other panes stop and then run
 #or, forcefully terminate all panes while it runs, to kill all panes and run optimize, enable
-export OPTIMIZE_KILL="true"
+export OPTIMIZE_KILL="false"
 
 #How often to run optimize_myisam on small tables seconds, default is 10 min
-export MYISAM_SMALL="1800"
+export MYISAM_SMALL="600"
 
 #How often to run optimize_myisam on large tables seconds, default is 1 hr
 export MYISAM_LARGE="3600"
@@ -280,45 +292,17 @@ export INNODB_LARGE="172800"
 
 #Choose your database engine, comment the one true/false
 #you should have already converted your database to InnoDB engine, if you select true here
-export INNODB="true"
+export INNODB="false"
 
 ############################################################
 
-#Choose to run update_cleanup.php and removespecial.php true/false
-#set to false by default, you will need to edit /misc/testing/update_cleanup.php and /misc/testing/update_parsing.php
-#to actually do anything, directions are in the file
-export CLEANUP="true"
-
-#edit update_cleanup.php and update_parsing.php and svn up, this will only mod files when you run scripts/update_svn.sh or scripts/fix_files.sh
-export CLEANUP_EDIT="true"
-
-#How often do you want  update_cleanup.php and removespecial.php to run, in seconds
-export CLEANUP_TIMER="1800"
-
-############################################################
-
-#Choose to run update_parsing.php true/false
-#set to false by default, you will need to edit /misc/testing/update_parsing.php
-#to actually do anything, directions are in the file
-export PARSING="true"
-
-#choose to use kevin123's update_parsing script
-#this also includes kevin123's categorymod.php, you must run either update_svn.sh or fix_files.sh to copy the file into place
-export PARSING_MOD="true"
-
-#choose to use ugo's misc_sorter3.php script also, this will run before update_parsing, in the same loop
-export MISC_SORTER="true"
-
-#run update_parsing.php against the whole db or just the last 24 hours
-export PAST_24_HOURS="false"
-
-#How often do you want update_parsing.php to run, in seconds. this takes alot of memory and processing time, default is every 12 hrs
-export PARSING_TIMER="3600"
+#choose to use cj's fix_android_releases.php
+export FIX_DROID="false"
 
 ############################################################
 
 #Choose to run update_predb.php
-export PREDB="true"
+export PREDB="false"
 
 #How often to update the PreDB in seconds
 export PREDB_TIMER="900"
@@ -326,18 +310,15 @@ export PREDB_TIMER="900"
 ############################################################
 
 #Choose to run processSpotnab.php
-export SPOTNAB="true"
+export SPOTNAB="false"
 
-#How often to update the PreDB in seconds
+#How often to update the SpotNab in seconds
 export SPOTNAB_TIMER="900"
-
-#automatically set ALL sources to active after retrieving sources
-export SPOTNAB_ACTIVE="true"
 
 ############################################################
 
 #update the tv schedule and in theaters listings
-export TV_SCHEDULE="true"
+export TV_SCHEDULE="false"
 
 #How often to update the TV Schedule and the In Theaters in seconds
 export TVRAGE_TIMER="43200"
@@ -355,23 +336,23 @@ export SPHINX_TIMER="3600"
 
 #mediainfo and ffmpeg can hang occasionally, set timer, in seconds, to anything other than 0 to enable
 #it should not need to run longer that 120 seconds
-export KILL_PROCESS="120"
+export KILL_PROCESS="0"
 
 #look at man killall - if you have the -q option, enable this, otherwise leave it disabled
-export KILL_QUIET="true"
+export KILL_QUIET="false"
 
 ############################################################
 
 #Delete parts and binaries older than retention days, which is set in edit - site
 #this uses a script posted by cj https://github.com/NNScripts/nn-custom-scripts
-export DELETE_PARTS="trued"
+export DELETE_PARTS="false"
 
 #how often should this be run, default it 1 hr
 export DELETE_TIMER="3600"
 
 #Releases may be added/edited with an imdb-id that does not exists in the movieinfo table. This script, update_missing_movie_info,
 #will fetch all the missing imdb id's from the releases table.
-export FETCH_MOVIE="true"
+export FETCH_MOVIE="false"
 
 #how often should this be run, default it 12 hr
 export MOVIE_TIMER="43200"
@@ -393,11 +374,18 @@ export FIX_POSIX="false"
 #these are set to false by default, enable if you want them
 export USE_HTOP="false"
 export USE_BWMNG="false"
-export USE_MYTOP="true"
-export USE_VNSTAT="false"
+export USE_MYTOP="false"
 export USE_ATOP="false"
 export USE_NMON="false"
 export USE_IOTOP="false"
+
+#define vnstat user settings to apply at runtime
+export USE_VNSTAT="false"
+export VNSTAT_ARGS=""
+
+#define tcptrack user settings to apply at runtime
+export USE_TCPTRACK="false"
+export TRCPTRACK_ARGS="-i eth0 port 443"
 
 #freebsd does not have iotop, but can run top -m io -o total
 export USE_TOP="false"
@@ -416,7 +404,7 @@ export USE_CONSOLE="false"
 #This is done on the terminal computer, not the newznab++ server
 #download fonts from https://github.com/jonnyboy/powerline-fonts
 #I recommend Consolas if you are using putty in Win7
-export POWERLINE="true"
+export POWERLINE="false"
 
 ############################################################
 
@@ -424,7 +412,7 @@ export POWERLINE="true"
 export LANG="en_US.UTF-8"
 
 #to help IMDB return only English titles, enable this, you will need to run update_svn.php or fix_files.sh
-export EN_IMDB="true"
+export EN_IMDB="false"
 
 ############################################################
 
@@ -435,6 +423,7 @@ export EN_IMDB="true"
 export NEWZDASH_SHARED_SECRET=""
 
 #the url of your newzdash install, ensure it include HTTP:// or HTTPS:// or it will fail
+#do not include the trailing /
 #to disable leave blank ie. export NEWZDASH_URL=""
 export NEWZDASH_URL=""
 
@@ -445,7 +434,7 @@ export NEWZDASH_URL=""
 #tmpfs /var/www/newznab/nzbfiles/tmpunrar1 tmpfs user,nodev,nodiratime,nosuid,size=256M,mode=777 0 0
 #edit the path, the path MUST be the path in site edit with a "1" appended to the end, like above
 #you still need to set this to true or mount it manually as your user, not as root
-export RAMDISK="true"
+export RAMDISK="false"
 
 #for freebsd, it is just a little different, you can either create the ramdisk and mount it by adding the next line to /etc/fstab
 #tmpfs /var/www/newznab/nzbfiles/tmpunrar1 tmpfs rw,size=256M,mode=777 0 0
@@ -461,22 +450,22 @@ export SVN_PASSWORD="password"
 #running update_svn as root will change file ownership of every file in the svn path
 #to chown -R the path, enable and set user/group
 #newznab/nzbfiles is not chown'd
-export CHOWN_TRUE="true"
+export CHOWN_TRUE="false"
 
 #set CHOWN_TRUE="true" and WWW_USER="{youruser}:www-data" and run update_svn.sh or fix_files.sh
 #and you will will not need root to run these scripts
-export WWW_USER="jonnyboy:www-data"
+export WWW_USER="www-data:www-data"
 
 ###########################################################
 
 #if you have a ramdisk and would like to monitor it's use, set path here
 #this is not the same as RAMDISK above, I keep my parts table on a ramdisk
-export RAMDISK_PATH="/var/ramdisk"
+export RAMDISK_PATH=""
 
 ###########################################################
 
 #logs can be written, per pane, to the logs folder
-export WRITE_LOGS="truel"
+export WRITE_LOGS="false"
 
 ###########################################################
 
@@ -489,8 +478,14 @@ export USER_DEF_ONE=""
 #this one will run before MyIsam Large
 export USER_DEF_TWO=""
 
-#this one will run after MyIsam Large
+#this one will run after MyIsam Large, not same process as below
 export USER_DEF_THREE=""
+
+#this one will run before InnoDB Large and MyIsam Large runs in same process, so before MyIsam Large, not same process as above
+export USER_DEF_FOUR=""
+
+#this one will run after InnoDB Large
+export USER_DEF_FIVE=""
 
 ###########################################################
 
@@ -507,6 +502,7 @@ command -v php5 >/dev/null 2>&1 && export PHP=`command -v php5` || { export PHP=
 command -v tmux >/dev/null 2>&1 || { echo >&2 "I require tmux but it's not installed. Aborting."; exit 1; } && export TMUXCMD=`command -v tmux`
 command -v nice >/dev/null 2>&1 || { echo >&2 "I require nice but it's not installed. Aborting."; exit 1; } && export NICE=`command -v nice`
 command -v tee >/dev/null 2>&1 || { echo >&2 "I require tee but it's not installed. Aborting."; exit 1; } && export TEE=`command -v tee`
+command -v mysqladmin >/dev/null 2>&1 || { echo >&2 "I require mysqladmin but it's not installed. Aborting."; exit 1; } && export MYSQLADMIN=`command -v mysqladmin`
 
 if [[ $USE_HTOP == "true" ]]; then
   command -v htop >/dev/null 2>&1|| { echo >&2 "I require htop but it's not installed. Aborting."; exit 1; } && export HTOP=`command -v htop`
@@ -535,9 +531,11 @@ fi
 if [[ $USE_ATOP == "true" ]]; then
   command -v atop >/dev/null 2>&1|| { echo >&2 "I require atop but it's not installed. Aborting."; exit 1; } && export ATOP=`command -v atop`
 fi
+if [[ $USE_TCPTRACK == "true" ]]; then
+  command -v tcptrack >/dev/null 2>&1|| { echo >&2 "I require tcptrack but it's not installed. Aborting."; exit 1; } && export TCPTRACK=`command -v tcptrack`
+fi
 if [[ $POWERLINE == "true" ]]; then
   export TMUX_CONF="powerline/tmux.conf"
 else
   export TMUX_CONF="conf/tmux.conf"
 fi
-
