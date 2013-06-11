@@ -39,34 +39,55 @@ export ADMIN_PATH=$NEWZPATH"/www/admin"
 ############################################################
 
 #Post Processing Additional is the post processing that downloads rar files and attempts to get info for your site
-#you are able to set the number of process to be run from 1-32, remember that each process uses 1 of your nntp connections
-#so, if you have 20, and you set this to 32, you will have errors, lots of errors, nfo lookup uses 1 -3 connections
+#you are able to set the number of processes to be run from 1-32, remember that each process uses 1 of your nntp connections
+#so, if you have 20, and you set this to 32, you will have errors, lots of errors, nfo lookup uses 1-3 connections each
 #binaries and backfill threaded default up to 10 connections each and predb uses 1, so understand how many connections you are using when setting
-#trial and error for this, set to 1 will run > 0, set to 2 will run > 200, 3 will run > 300 and so on.
+#trial and error for this, set to 1 will run > 0, set to 2 will run > 100, 3 will run > 200 and so on.
 #At some point, increasing this begins to slow things down. It will need to be adjusted for your system
-#to get the desired performance, 0 will disable all post processing
-export POST_TO_RUN="0"
+#to get the desired performance, 0 will disable all post processing, but not category processing
+#the first window has up to 16 postprocess and can use primary or alternate NNTP provider
+export POST_TO_RUN_A="0"
+
+#The second window also has 16 processes and can use promary or alternate NNTP provider
+export POST_TO_RUN_B="0"
+
+#by modifying www/config.php like http://pastebin.com/VgH9DCZw, you can use 1 provider to run update_binaries
+#and backup and another provider to run post processing with. Or, 1 provider to run up to 16 postprocesses and another to run
+#up to 16 more postprocesses, or the same provider for everything
+#you can not switch providers without resetting all groups and truncating, I have included a script in scripts folders to reset and truncate
+#sudo scripts/reset_truncate.php
+#it is not necessary to run reset_truncate.php in order to second nntp provider for postprocessing only
+
+#this one sets 1 provider for everything(false), or first provider for update_binaries and backfill and another for postprocessing(true)
+#this can not be changed after starting scripts
+export USE_TWO_NNTP="false"
+
+#this allows you split the 32 postprocessing into 2 separate providers
+#this can not be changed after starting scripts
+export USE_TWO_PP="false"
 
 ############################################################
 
 #post processing per category, setting the above to 0 does not disable these
+#this now takes 0 for none, 1 for the first processor or 2 for both processors
 #run processNfos
-export NFOS="false"
+export NFOS="0"
 
 #run processGames
-export GAMES="false"
+export GAMES="0"
 
 #run processMovies
-export MOVIES="false"
+export MOVIES="0"
 
 #run processMusic
-export MUSIC="false"
-
-#run processTV
-export TVRAGE="false"
+export MUSIC="0"
 
 #run processEbook
-export EBOOK="false"
+export EBOOK="0"
+
+#these are true/false
+#run processTV
+export TVRAGE="false"
 
 #run processOther
 export OTHERS="false"
@@ -78,7 +99,7 @@ export UNWANTED="false"
 
 #Enter the session name to be used by tmux, no spaces allowed in the name, this can be changed after scripts start
 #if you are running multiple servers, you could put your hostname here
-export TMUX_SESSION="Newznab-dev"
+export TMUX_SESSION="Newznab"
 
 #Set, in seconds - how often the monitor.php (left top pane) script should update run the queries against the database
 #the monitor script will update itself and each pane, once every 5 seconds plus the lagg time time on the loop the db is queried
@@ -198,20 +219,18 @@ export KEVIN_PARTS="100000"
 
 #Set the path to the nzb dump you downloaded from torrents, this is the path to bulk files folder of nzbs
 #this does not recurse through subfolders, unless you set NZB_THREADS to true
+#this must be a valid path
 export NZBS="/path/to/nzbs"
 
 #Choose to run import nzb script true/false
 export IMPORT="false"
 
 #If, you have all of your nzbs in one folder select false
-#If, you have all of you nzbs split into separate in with the root at $NZBS then select true
+#If, you have all of you nzbs split into separate folders, with the root at $NZBS then select true
 #and 10 nzbs will be imported from each subfolder per loop.
 #Importing this way, allows all post processing scripts to run, such as book, music, movies
-#Instead of doing all 1 type at once, spread the load
+#Instead of doing all 1 type at once, spreads the work load
 export NZB_THREADS="false"
-
-#Set max number of folders to process per loop. This includes empty folders.
-export NZB_FOLDER_COUNT="20"
 
 #How many nzbs to import per loop, if using NZB_THREADS=true the per folder
 export NZBCOUNT="10"
@@ -236,15 +255,6 @@ export IMPORT_TRUE="false"
 #MAX_RELEASES for each can be calculated on the total post processing or just the Misc category
 #to calculate on just the Misc, enable this
 export MISC_ONLY="false"
-
-############################################################
-
-#run ugo's automake.php script to create releases, this does not use regexes and will run in a loop prior
-#to update_releases.php, this can be considerably slower, but may give you release that were being missed
-#this might just overwhelm your db, so expect things to move slower, but you might get more in return
-#this will deactivate all regexes, to reactive the regexes, run scripts/reactivate_regexes.sh
-#still a wip
-export UGO_THREADED="false"
 
 ############################################################
 
@@ -286,36 +296,10 @@ export INNODB="false"
 
 ############################################################
 
-#Choose to run update_cleanup.php and removespecial.php true/false
-#set to false by default, you will need to edit /misc/testing/update_cleanup.php and /misc/testing/update_parsing.php
-#to actually do anything, directions are in the file
-export CLEANUP="false"
 
-#edit update_cleanup.php and update_parsing.php and svn up, this will only mod files when you run scripts/update_svn.sh or scripts/fix_files.sh
-export CLEANUP_EDIT="false"
+#choose to use cj's fix_android_releases.php
+export FIX_DROID="false"
 
-#How often do you want  update_cleanup.php and removespecial.php to run, in seconds
-export CLEANUP_TIMER="3600"
-
-############################################################
-
-#Choose to run update_parsing.php true/false
-#set to false by default, you will need to edit /misc/testing/update_parsing.php
-#to actually do anything, directions are in the file
-export PARSING="false"
-
-#choose to use kevin123's update_parsing script
-#this also includes kevin123's categorymod.php, you must run either update_svn.sh or fix_files.sh to copy the file into place
-export PARSING_MOD="false"
-
-#choose to use ugo's misc_sorter3.php script also, this will run before update_parsing, in the same loop
-export MISC_SORTER="false"
-
-#run update_parsing.php against the whole db or just the last 24 hours
-export PAST_24_HOURS="true"
-
-#How often do you want update_parsing.php to run, in seconds. this takes alot of memory and processing time, default is every 12 hrs
-export PARSING_TIMER="43200"
 
 ############################################################
 
@@ -332,9 +316,6 @@ export SPOTNAB="false"
 
 #How often to update the SpotNab in seconds
 export SPOTNAB_TIMER="900"
-
-#automatically set ALL sources to active after retrieving sources
-export SPOTNAB_ACTIVE="false"
 
 ############################################################
 
@@ -400,9 +381,13 @@ export USE_ATOP="false"
 export USE_NMON="false"
 export USE_IOTOP="false"
 
-#define vnstat user settings to apply at runtim
+#define vnstat user settings to apply at runtime
 export USE_VNSTAT="false"
 export VNSTAT_ARGS=""
+
+#define tcptrack user settings to apply at runtime
+export USE_TCPTRACK="false"
+export TRCPTRACK_ARGS="-i eth0 port 443"
 
 #freebsd does not have iotop, but can run top -m io -o total
 export USE_TOP="false"
@@ -440,6 +425,7 @@ export EN_IMDB="false"
 export NEWZDASH_SHARED_SECRET=""
 
 #the url of your newzdash install, ensure it include HTTP:// or HTTPS:// or it will fail
+#do not include the trailing /
 #to disable leave blank ie. export NEWZDASH_URL=""
 export NEWZDASH_URL=""
 
@@ -518,6 +504,7 @@ command -v php5 >/dev/null 2>&1 && export PHP=`command -v php5` || { export PHP=
 command -v tmux >/dev/null 2>&1 || { echo >&2 "I require tmux but it's not installed. Aborting."; exit 1; } && export TMUXCMD=`command -v tmux`
 command -v nice >/dev/null 2>&1 || { echo >&2 "I require nice but it's not installed. Aborting."; exit 1; } && export NICE=`command -v nice`
 command -v tee >/dev/null 2>&1 || { echo >&2 "I require tee but it's not installed. Aborting."; exit 1; } && export TEE=`command -v tee`
+command -v mysqladmin >/dev/null 2>&1 || { echo >&2 "I require mysqladmin but it's not installed. Aborting."; exit 1; } && export MYSQLADMIN=`command -v mysqladmin`
 
 if [[ $USE_HTOP == "true" ]]; then
   command -v htop >/dev/null 2>&1|| { echo >&2 "I require htop but it's not installed. Aborting."; exit 1; } && export HTOP=`command -v htop`
@@ -546,9 +533,11 @@ fi
 if [[ $USE_ATOP == "true" ]]; then
   command -v atop >/dev/null 2>&1|| { echo >&2 "I require atop but it's not installed. Aborting."; exit 1; } && export ATOP=`command -v atop`
 fi
+if [[ $USE_TCPTRACK == "true" ]]; then
+  command -v tcptrack >/dev/null 2>&1|| { echo >&2 "I require tcptrack but it's not installed. Aborting."; exit 1; } && export TCPTRACK=`command -v tcptrack`
+fi
 if [[ $POWERLINE == "true" ]]; then
   export TMUX_CONF="powerline/tmux.conf"
 else
   export TMUX_CONF="conf/tmux.conf"
 fi
-
