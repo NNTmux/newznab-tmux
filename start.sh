@@ -57,8 +57,6 @@ else
     $TMUXCMD new-window -n other 'printf "\033]2;update_predb\033\\"'
     $TMUXCMD splitw -h -p 50 'printf "\033]2;optimise\033\\"'
     $TMUXCMD selectp -t 0
-    $TMUXCMD splitw -v -p 75 'printf "\033]2;update_parsing\033\\"'
-    $TMUXCMD splitw -v -p 67 'printf "\033]2;update_cleanup\033\\"'
     $TMUXCMD splitw -v -p 50 'printf "\033]2;update_tv\033\\"'
     $TMUXCMD selectp -t 4
     $TMUXCMD splitw -v -p 75 'printf "\033]2;sphinx\033\\"'
