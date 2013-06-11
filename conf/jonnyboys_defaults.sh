@@ -296,36 +296,8 @@ export INNODB="false"
 
 ############################################################
 
-#Choose to run update_cleanup.php and removespecial.php true/false
-#set to false by default, you will need to edit /misc/testing/update_cleanup.php and /misc/testing/update_parsing.php
-#to actually do anything, directions are in the file
-export CLEANUP="false"
-
-#edit update_cleanup.php and update_parsing.php and svn up, this will only mod files when you run scripts/update_svn.sh or scripts/fix_files.sh
-export CLEANUP_EDIT="false"
-
-#How often do you want  update_cleanup.php and removespecial.php to run, in seconds
-export CLEANUP_TIMER="3600"
-
-############################################################
-
-#Choose to run update_parsing.php true/false
-#set to false by default, you will need to edit /misc/testing/update_parsing.php
-#to actually do anything, directions are in the file
-export PARSING="false"
-
-#choose to use kevin123's update_parsing script
-#this also includes kevin123's categorymod.php, you must run either update_svn.sh or fix_files.sh to copy the file into place
-export PARSING_MOD="false"
-
 #choose to use cj's fix_android_releases.php
 export FIX_DROID="false"
-
-#run update_parsing.php against the whole db or just the last 24 hours
-export PAST_24_HOURS="true"
-
-#How often do you want update_parsing.php to run, in seconds. this takes alot of memory and processing time, default is every 12 hrs
-export PARSING_TIMER="43200"
 
 ############################################################
 
@@ -342,9 +314,6 @@ export SPOTNAB="false"
 
 #How often to update the SpotNab in seconds
 export SPOTNAB_TIMER="900"
-
-#automatically set ALL sources to active after retrieving sources
-export SPOTNAB_ACTIVE="false"
 
 ############################################################
 
