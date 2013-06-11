@@ -72,13 +72,6 @@ if ! grep -q '//$this->processUnknownCategory();' "$NEWZPATH/www/lib/postprocess
 	$SED -i -e 's/$this->processUnknownCategory();/\/\/$this->processUnknownCategory();/' $NEWZPATH/www/lib/postprocess.php
 fi
 
-#edit cleanup scripts
-if [[ $CLEANUP_EDIT  == "true" ]]; then
-	$SED -i -e 's/^$echo =.*$/$echo = false;/' $TESTING_PATH/update_parsing.php
-	$SED -i -e 's/^$limited =.*$/$limited = false;/' $TESTING_PATH/update_parsing.php
-	$SED -i -e 's/^$echo =.*$/$echo = false;/' $TESTING_PATH/update_cleanup.php
-	$SED -i -e 's/^$limited =.*$/$limited = false;/' $TESTING_PATH/update_cleanup.php
-fi
 
 #edit powerprocess.php
 if [[ $FIX_POSIX  == "true" ]]; then
@@ -95,17 +88,9 @@ fi
 #attempt to get english only from IMDB
 if [[ $EN_IMDB == "true" ]]; then
 	$SED -i -e 's/akas.imdb/www.imdb/g' $NEWZPATH/www/lib/movie.php
-	$SED -i -e 's/akas.imdb/www.imdb/g' $TESTING_PATH/update_parsing.php
 	$SED -i -e 's/curl_setopt($ch, CURLOPT_URL, $url);/curl_setopt($ch, CURLOPT_URL, $url);\
 	$header[] = "Accept-Language: en-us";\
 	curl_setopt($ch, CURLOPT_HTTPHEADER, $header);/' $NEWZPATH/www/lib/util.php
-fi
-
-#import kevin123's category.php
-if [[ $PARSING_MOD == "true" ]]; then
-	cd $DIR"/kevin123"
-	cp -f categorymod.php $NEWZPATH/www/lib/
-	cd $DIR
 fi
 
 #import kevin123's category.php and backfill.php
