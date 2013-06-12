@@ -88,8 +88,8 @@ log_error = /var/log/mysql/error.log
 #       other settings you may need to change.
 #server-id		= 1
 #log_bin			= /var/log/mysql/mysql-bin.log
-expire_logs_days	= 10
-max_binlog_size         = 100M
+#expire_logs_days	= 10
+#max_binlog_size         = 100M
 #binlog_do_db		= include_database_name
 #binlog_ignore_db	= include_database_name
 #
@@ -110,7 +110,41 @@ max_binlog_size         = 100M
 # ssl-key=/etc/mysql/server-key.pem
 
 
-
+    max_user_connections = 200
+    table_cache=2000
+     
+    #InnoDB specifics
+     
+    #Engine options
+    innodb = ON
+    innodb_file_format = Barracuda
+    innodb_file_per_table = 1
+     
+    #misc uncategorized
+    innodb_table_locks = false
+    innodb_use_sys_malloc = 1
+     
+    #threading
+    innodb_thread_concurrency = 8
+    innodb_read_io_threads = 4
+    innodb_write_io_threads = 4
+    innodb_purge_threads = 1
+     
+    #buffer pool related
+    innodb_buffer_pool_size = 2G
+    innodb_buffer_pool_instances = 8
+    innodb_change_buffering = all
+    innodb_max_dirty_pages_pct = 90
+     
+    #flush related
+    innodb_flush_method = O_DIRECT
+    innodb_flush_log_at_trx_commit = 0
+     
+    #transaction logs
+    innodb_log_buffer_size = 2G
+    innodb_log_files_in_group = 2
+    innodb_log_file_size = 2G
+     
 [mysqldump]
 quick
 quote-names
