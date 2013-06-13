@@ -57,15 +57,15 @@ else
     $TMUXCMD new-window -n other 'printf "\033]2;update_predb\033\\"'
     $TMUXCMD splitw -h -p 50 'printf "\033]2;optimise\033\\"'
 	$TMUXCMD selectp -t 0
-	$TMUXCMD splitw -v -p 75 'printf "\033]2;fix_prodji_releases\033\\"'
-	$TMUXCMD splitw -v -p 67 'printf "\033]2;fix_android_releases\033\\"'
-	$TMUXCMD splitw -v -p 50 'printf "\033]2;fix_core_releases\033\\"'
-	$TMUXCMD selectp -t 4
-	$TMUXCMD splitw -v -p 75 'printf "\033]2;remove_blacklist_releases\033\\"'
-    $TMUXCMD splitw -v -p 67 'printf "\033]2;update_tv\033\\"'
-    $TMUXCMD splitw -v -p 50 'printf "\033]2;sphinx\033\\"'
-    $TMUXCMD splitw -v -p 33 'printf "\033]2;delete_parts\033\\"'
-	$TMUXCMD splitw -v -p 17 'printf "\033]2;update_missing_movie_info\033\\"'
+	$TMUXCMD splitw -v -p 80 'printf "\033]2;fix_prodji_releases\033\\"'
+	$TMUXCMD splitw -v -p 60 'printf "\033]2;fix_android_releases\033\\"'
+	$TMUXCMD splitw -v -p 40 'printf "\033]2;fix_core_releases\033\\"'
+	$TMUXCMD splitw -v -p 20 'printf "\033]2;remove_blacklist_releases\033\\"'
+	$TMUXCMD selectp -t 5
+    $TMUXCMD splitw -v -p 80 'printf "\033]2;update_tv\033\\"'
+    $TMUXCMD splitw -v -p 60 'printf "\033]2;sphinx\033\\"'
+    $TMUXCMD splitw -v -p 40 'printf "\033]2;delete_parts\033\\"'
+	$TMUXCMD splitw -v -p 20 'printf "\033]2;update_missing_movie_info\033\\"'
 	
 
     $TMUXCMD new-window -n post1a 'printf "\033]2;postprocessing[01]\033\\"'
