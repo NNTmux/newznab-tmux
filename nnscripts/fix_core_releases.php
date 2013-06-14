@@ -169,9 +169,7 @@ try
     // Load the fix_core_releases class
     $fcr = new fix_core_releases();
     $fcr->fix();
-
-    // Update sphinx
-    $sphinx->update();
+	
 } catch( Exception $e ) {
     echo $e->getMessage() . PHP_EOL;
 }

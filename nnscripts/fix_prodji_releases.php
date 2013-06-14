@@ -177,8 +177,6 @@ try
     $fpr = new fix_prodji_releases();
     $fpr->fix();
 
-    // Update sphinx
-    $sphinx->update();
 } catch( Exception $e ) {
     echo $e->getMessage() . PHP_EOL;
 }

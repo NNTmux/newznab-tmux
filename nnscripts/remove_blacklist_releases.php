@@ -608,8 +608,6 @@ try
     $blr = new remove_blacklist_releases();
     $blr->cleanup();
 
-    // Update sphinx
-    $sphinx->update();
 } catch( Exception $e ) {
     echo $e->getMessage() . PHP_EOL;
 }
