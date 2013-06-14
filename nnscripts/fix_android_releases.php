@@ -164,4 +164,8 @@ try
     // Load the blacklistReleases class
     $blr = new fix_android_releases();
     $blr->fix();
+
+} catch( Exception $e ) {
+    echo $e->getMessage() . PHP_EOL;
+
 }
