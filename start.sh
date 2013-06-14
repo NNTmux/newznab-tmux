@@ -59,7 +59,7 @@ else
 	$TMUXCMD splitw -v -p 86 'printf "\033]2;sphinx\033\\"' 
 	$TMUXCMD splitw -v -p 83 'printf "\033]2;update_missing_movie_info\033\\"' 
 	$TMUXCMD splitw -v -p 80 'printf "\033]2;fix_android_releases\033\\"' 
-	$TMUXCMD splitw -v -p 75 'printf "\033]2;fox_prodji_releases\033\\"' 
+	$TMUXCMD splitw -v -p 75 'printf "\033]2;fix_prodji_releases\033\\"' 
 	$TMUXCMD selectp -t 0
     $TMUXCMD splitw -h -p 50 'printf "\033]2;update_tv\033\\"' 
 	$TMUXCMD selectp -t 2
