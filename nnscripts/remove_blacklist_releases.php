@@ -52,10 +52,10 @@
 
 //----------------------------------------------------------------------
 // Load the application
-define( 'FS_ROOT', realpath( dirname(__FILE__) ) );
+require_once(dirname(__FILE__)."/../bin/config.php");
 
 // nnscripts includes
-require_once(FS_ROOT ."/lib/nnscripts.php");
+require_once("lib/nnscripts.php");
 
 // newznab includes
 require_once(WWW_DIR."/lib/releases.php");

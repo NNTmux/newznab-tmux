@@ -7,10 +7,10 @@ if( !defined('FS_ROOT') )
 }
 
 // Load the config
-require_once(FS_ROOT ."/../../www/config.php");
+require_once(dirname(__FILE__)."/../../bin/config.php");
 
 // Require the commandline options script
-require_once(FS_ROOT ."/lib/Getopt.php");
+require_once("Getopt.php");
 
 // Require the newznab site script
 require_once(WWW_DIR."lib/site.php");
@@ -187,7 +187,7 @@ abstract class NNScripts
         );
 
         // Try to read the ini file
-        $settingsFile = FS_ROOT ."/settings.ini";
+        $settingsFile = "/settings.ini";
         $iniArray = $this->parseIniFile( $settingsFile, true );
         
         // Parse the "global" settings
