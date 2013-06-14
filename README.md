@@ -1,4 +1,4 @@
-I have forked jonnyboys newznab-tmux as he and the dev team have moved to another project (https://github.com/nZEDb/nZEDb). I will try as much as i can to maintain and improve where possible and needed these tmux scripts, as they are a valuable addendum to newznab+.
+I have forked jonnyboys newznab-tmux as he and the dev team have moved to another project (https://github.com/nZEDb/nZEDb). I will try as much as i can to maintain and improve, where possible and needed, these tmux scripts, as they are a valuable addendum to newznab+.
 Below is the original readme of newznab-tmux:
 
 # Newznab-tmux
