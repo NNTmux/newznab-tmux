@@ -1,3 +1,6 @@
+I have forked jonnyboys newznab-tmux as he and the dev team have moved to another project (https://github.com/nZEDb/nZEDb). I will try as much as i can to maintain and improve where possible and needed these tmux scripts, as they are a valuable addendum to newznab+.
+Below is the original readme of newznab-tmux:
+
 # Newznab-tmux
 
  * Screen shots identifying each pane and the process it runs are located at the bottom of this page.
@@ -103,10 +106,6 @@
  * These scripts include scripts written by [kevin123's](https://github.com/kevinlekiller), [itandrew's](https://github.com/itandrew/Newznab-InnoDB-Dropin), [tmux-powerline](https://github.com/erikw/tmux-powerline), [thewtex](https://github.com/thewtex/tmux-mem-cpu-load), [cj](https://github.com/NNScripts/nn-custom-scripts) and [\_zoggy\_](http://zoggy.net/tvrage-latest.sql).
 
 <hr>
- * If you find these scripts useful and would like to show your support or just buy me a beer, please use one of the donation links below. Donations are greatly appreciated. Thank you
-
-<a style="float:right;" href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=N4AJV5FHZDBFE"><img src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" alt="PayPal - The safer, easier way to pay online!" /></a>
-<a href='http://www.pledgie.com/campaigns/18980'><img alt='Click here to lend your support to: Newznab-tmux and make a donation at www.pledgie.com !' src='http://www.pledgie.com/campaigns/18980.png?skin_name=chrome' border='0' /></a>
 
 <hr>
 ![Newznab-tmux](https://raw.github.com/jonnyboy/newznab-tmux/master/image/newznab-tmux-1.png)
