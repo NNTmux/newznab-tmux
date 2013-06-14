@@ -1,11 +1,5 @@
 <?php
 
-if( !defined('FS_ROOT') )
-{
-    throw new Exception("Error: FS_ROOT must be defined");
-    die();
-}
-
 // Load the config
 require_once(dirname(__FILE__)."/../../bin/config.php");
 
