@@ -300,6 +300,18 @@ export INNODB="false"
 #choose to use cj's fix_android_releases.php
 export FIX_DROID="false"
 
+#choose to use cj's fix_core_releases.php
+export FIX_CORE="false"
+
+#choose to use cj's fix_prodji_releases.php
+export FIX_PRODJI="false"
+
+#choose to use cj's remove_blacklist_releases.php
+export FIX_BLACKLIST="false"
+
+#How often to run this scripts in seconds
+export FIX_TIMER="3600"
+
 
 ############################################################
 

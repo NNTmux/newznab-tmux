@@ -429,4 +429,3 @@ class Getopt {
         return preg_split("//u", $str, -1, PREG_SPLIT_NO_EMPTY);
     }
 }
-
