@@ -48,6 +48,7 @@ $_alienx = dirname(__FILE__)."/../alienx";
 $_conf = dirname(__FILE__)."/../conf";
 $_powerline = dirname(__FILE__)."/../powerline";
 $_cj = dirname(__FILE__)."/../nnscripts";
+$_core = dirname(_FILE)."/../hashdecrypt";
 $_user = dirname(__FILE__)."/../user_scripts";
 $_temp = dirname(__FILE__)."/../bin/temp";
 
@@ -1296,6 +1297,26 @@ while( $i > 0 )
         } elseif ( $optimize_safe_to_run == "true" ) {
 		$color = get_color();
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.9 'echo \"\033[38;5;\"$color\"m\n$panes1[9] Disabled by OPTIMIZE\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
+	}
+	//run $_php remove_blacklist_releases.php in 1.10
+	if (( $array['MAX_LOAD'] >= get_load()) && ((( TIME() - $time17 ) >= $array['HASH_TIMER'] ) || ( $i == 15 )) && ( $array['HASH'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
+		$color = get_color();
+		$log = writelog($panes1[10]);
+		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.10 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes1[10] $ds2 && cd $_core && $_php nzbx_ws_hashdecrypt.php 2>&1 $log && $ds1 $panes1[10] $ds3' 2>&1 1> /dev/null");
+		$time17 = TIME();
+	} elseif (( $array['HASH'] != "true" ) && ( $optimize_safe_to_run != "true" )) {
+		$color = get_color();
+		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.10 'echo \"\033[38;5;\"$color\"m\n$panes1[9] Disabled by HASH\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
+	} elseif (( $optimize_safe_to_run != "true" ) && ( $array['MAX_LOAD'] >= get_load())) {
+		$color = get_color();
+		$run_time = relativeTime( $array['HASH_TIMER'] + $time17 );
+		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.10 'echo \"\033[38;5;\"$color\"m\n$panes1[10] will run in T[ $run_time]\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
+	} elseif (( $optimize_safe_to_run != "true" ) && ( $array['MAX_LOAD'] <= get_load())) {
+                $color = get_color();
+                shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.10 'echo \"\033[38;5;\"$color\"m\n$panes1[10] Disabled by MAX_LOAD\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
+        } elseif ( $optimize_safe_to_run == "true" ) {
+		$color = get_color();
+		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.10 'echo \"\033[38;5;\"$color\"m\n$panes1[10] Disabled by OPTIMIZE\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
 	}
 	//runs postprocess_nfo.php in pane 4.0 once if needed then exits
 	if (( $array['MAX_LOAD'] >= get_load()) && ( $nfo_remaining_now > 0 ) && ( $array['NFOS'] != "0" ) && ( $optimize_safe_to_run != "true" )) {

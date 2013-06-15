@@ -70,6 +70,9 @@ else
 	$TMUXCMD splitw -h -p 50 'printf "\033]2;fix_core_releases\033\\"' 
 	$TMUXCMD selectp -t 8
 	$TMUXCMD splitw -h -p 50 'printf "\033]2;remove_blacklist_releases\033\\"' 
+	$TMUXCMD selectp -t 10
+	$TMUXCMD splitw -h -p 50 'printf "\033]2;nzbx_ws_hashdecrypt\033\\"' 
+	
 	
 
     $TMUXCMD new-window -n post1a 'printf "\033]2;postprocessing[01]\033\\"'
