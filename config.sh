@@ -315,6 +315,14 @@ export FIX_TIMER="3600"
 
 ############################################################
 
+#choose to use .:[c0r3]:. nzbx_ws_hashdecrypt script
+export HASH="false"
+#How often to run this script in seconds, default is 1 hour
+export HASH_TIMER="3600"
+
+############################################################
+
+
 #Choose to run update_predb.php
 export PREDB="false"
 
