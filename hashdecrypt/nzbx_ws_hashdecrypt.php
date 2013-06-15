@@ -1,10 +1,10 @@
 <?php
 define("ENABLE_ECHO", TRUE);
-define('FS_ROOT', realpath(dirname(__FILE__)));
 require_once(dirname(__FILE__)."/../bin/config.php");
-require_once(FS_ROOT . "/../../../../www/lib/framework/db.php");
-require_once(FS_ROOT . "/../../../../www/lib/releases.php");
-require_once(FS_ROOT . "/../../../../www/lib/category.php");
+require_once(WWW_DIR ."/www/lib/framework/db.php");
+require_once(WWW_DIR ."/www/lib/releases.php");
+require_once(WWW_DIR ."/www/lib/category.php");
+
 
 function getReleaseName($md5)
 {
