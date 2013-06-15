@@ -1,9 +1,9 @@
 <?php
 define("ENABLE_ECHO", TRUE);
 require_once(dirname(__FILE__)."/../bin/config.php");
-require_once(WWW_DIR ."/www/lib/framework/db.php");
-require_once(WWW_DIR ."/www/lib/releases.php");
-require_once(WWW_DIR ."/www/lib/category.php");
+require_once(WWW_DIR ."/lib/framework/db.php");
+require_once(WWW_DIR ."/lib/releases.php");
+require_once(WWW_DIR ."/lib/category.php");
 
 
 function getReleaseName($md5)
