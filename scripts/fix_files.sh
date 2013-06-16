@@ -21,15 +21,6 @@ source $DIR/../defaults.sh
 cd $NEWZPATH"/www/lib/smarty/templates_c/"
 rm -fv *
 
-#edit cleanup scripts
-if [[ $CLEANUP_EDIT  == "true" ]]; then
-    echo "editing cleanup scripts"
-    $SED -i -e 's/^$echo =.*$/$echo = false;/' $TESTING_PATH/update_parsing.php
-    $SED -i -e 's/^$limited =.*$/$limited = false;/' $TESTING_PATH/update_parsing.php
-    $SED -i -e 's/^$echo =.*$/$echo = false;/' $TESTING_PATH/update_cleanup.php
-    $SED -i -e 's/^$limited =.*$/$limited = false;/' $TESTING_PATH/update_cleanup.php
-fi
-
 #edit powerprocess.php
 if [[ $FIX_POSIX  == "true" ]]; then
     echo "editing powerprocess"
