@@ -14,12 +14,5 @@ $varnames = explode("\n", $varnames);
 $vardata = explode("\n", $vardata);
 $array = array_combine($varnames, $vardata);
 unset($array['']);
-
-if ( $array['SPOTNAB_ACTIVE'] == "true" ) {
-	$db = new DB();
-	@$query="UPDATE spotnabsources set active=1 where active=0";
-	@$result = $db->query($query);
-	printf("Don't refresh the spotnab sources page, it will reset the sources that were inactive back to inactive.");
-}
 ?>
 
