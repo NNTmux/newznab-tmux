@@ -165,8 +165,7 @@ try
     $blr = new fix_android_releases();
     $blr->fix();
 
-    // Update sphinx
-    $sphinx->update();
 } catch( Exception $e ) {
     echo $e->getMessage() . PHP_EOL;
+
 }

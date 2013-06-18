@@ -11,10 +11,10 @@
  */
 //----------------------------------------------------------------------
 // Load the application
-define( 'FS_ROOT', realpath( dirname(__FILE__) ) );
+require_once(dirname(__FILE__)."/../bin/config.php");
 
 // nnscripts includes
-require_once(FS_ROOT ."/lib/nnscripts.php");
+require_once("lib/nnscripts.php");
 
 // Sphinx library
 require_once(WWW_DIR ."/lib/sphinx.php");
@@ -177,8 +177,6 @@ try
     $fpr = new fix_prodji_releases();
     $fpr->fix();
 
-    // Update sphinx
-    $sphinx->update();
 } catch( Exception $e ) {
     echo $e->getMessage() . PHP_EOL;
 }

@@ -296,24 +296,35 @@ export INNODB="false"
 
 ############################################################
 
-
 #choose to use cj's fix_android_releases.php
 export FIX_DROID="false"
+#How often to run this script in seconds, default is 1 hour
+export DROID_TIMER="3600"
 
 #choose to use cj's fix_core_releases.php
 export FIX_CORE="false"
+#How often to run this script in seconds, default is one hour
+export CORE_TIMER="3600"
 
 #choose to use cj's fix_prodji_releases.php
 export FIX_PRODJI="false"
+#How often to run this script in seconds, default is one hour
+export PRODJI_TIMER="3600"
 
-#choose to use cj's remove_blacklist_releases.php
+#choose to use cj's remove_blacklist_releases.php. 
 export FIX_BLACKLIST="false"
-
-#How often to run this scripts in seconds
-export FIX_TIMER="3600"
-
+#How often to run this script in seconds, default is one hour
+export BLACKLIST_TIMER="3600"
 
 ############################################################
+
+#choose to use .:[c0r3]:. nzbx_ws_hashdecrypt script
+export HASH="false"
+#How often to run this script in seconds, default is 1 hour
+export HASH_TIMER="3600"
+
+############################################################
+
 
 #Choose to run update_predb.php
 export PREDB="false"
