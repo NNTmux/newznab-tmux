@@ -97,7 +97,7 @@ Below is the original readme of newznab-tmux:
 
  * A couple of autoinstallers are available to completely install everything needed for Ubuntu 12.10 Newznab+ installation. [zombu2](https://github.com/zombu2/nninstall) and [convict](https://github.com/rcconvict/nninstaller) each have simlar installers and can be found in the gits. If you prefor to do things yourself there is an excellent guide [here](http://oizopower.tweakblogs.net/blog/8524/newznab%2B-installatie-%28ubuntu-nginx-percona%29.html).
   
- * Join in the conversation at irc://irc.synirc.net/newznab-tmux.
+ * Join in the conversation at irc://irc.synirc.net/newznab-tmuxd.
 
 
 
