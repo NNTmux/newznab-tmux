@@ -27,7 +27,7 @@ Below is the original readme of newznab-tmux:
 
   ```bash
   cd /var/www/newznab/misc/update_scripts/nix_scripts/
-  git clone https://github.com/jonnyboy/newznab-tmux.git tmux
+  git clone https://github.com/DariusIII/newznab-tmux.git tmux
   cd tmux
   ```  
 
