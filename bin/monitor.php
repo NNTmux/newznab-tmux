@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.1r795";
+$version="0.1r795a";
 
 $db = new DB();
 
@@ -720,7 +720,7 @@ while( $i > 0 )
 				$color = get_color();
 				shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.$g 'echo \"\033[38;5;\"$color\"m\n$panes0[$g]\nKilled in prep for \nOptimization\" && date +\"%D %T\" && echo \"This is color #$color\" && $ds1 $panes0[$g] $ds4'");
 			}
-			for ($g=0; $g<=7; $g++)
+			for ($g=0; $g<=10; $g++)
 			{
 				$color = get_color();
 				shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:1.$g 'echo \"\033[38;5;\"$color\"m\n$panes1[$g]\nKilled in prep for \nOptimization\" && date +\"%D %T\" && echo \"This is color #$color\" && $ds1 $panes1[$g] $ds4'");
@@ -760,7 +760,7 @@ while( $i > 0 )
 				$color = get_color();
 				shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.$g 'echo \"\033[38;5;\"$color\"m\n$panes0[$g]\nKilled in prep for \nOptimization\" && date +\"%D %T\" && echo \"This is color #$color\" && $ds1 $panes0[$g] $ds4'");
 			}
-			for ($g=0; $g<=7; $g++)
+			for ($g=0; $g<=10; $g++)
 			{
 				$color = get_color();
 				shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:1.$g 'echo \"\033[38;5;\"$color\"m\n$panes1[$g]\nKilled in prep for \nOptimization\" && date +\"%D %T\" && echo \"This is color #$color\" && $ds1 $panes1[$g] $ds4'");
