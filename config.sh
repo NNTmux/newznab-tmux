@@ -325,6 +325,28 @@ export HASH_TIMER="3600"
 
 ############################################################
 
+#choose to use aflys md5 matching scripts. Scripts run every 10 minutes, 
+#this value should not be changed, we don't want to hammer information providers. 
+#Before you use these scripts execute php init.php datafile.txt from afly/setup folder
+#this will populate your db with 11000 hashes
+export AFLY="false"
+#How often to run this script in seconds, default is 10 minutes
+export AFLY_TIMER="600"
+#choose to run pre.corrupt-net.org script. this scripts requires an API key
+#otherwise it will give an error and is useless. Edit the pre.php file and enter your
+#API key. Register at pre.corrupt-net.org for an API key
+export PRECORRUPT="false"
+#How often to run this script in seconds, default is 10 minutes
+export PRECORRUPT_TIMER="600"
+#choose to use afly predbhashcompare.php. Use this only if you have access to 
+#nzpre/predb, otherwise it will not work
+#Before you use this, import db.sql from afly folder
+export AFLY_PREDB="false"
+#How often to run this script in seconds, default is 10 minutes
+export AFLY_PREDB_TIMER="600"
+
+############################################################
+
 
 #Choose to run update_predb.php
 export PREDB="false"
