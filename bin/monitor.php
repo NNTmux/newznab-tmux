@@ -1672,7 +1672,7 @@ while( $i > 0 )
 		$color = get_color();
 		$log = writelog($panes6[1]);
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:6.1 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes6[1] $ds2 && cd $_afly && $_php predbHashCompare.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes6[1] $ds3' 2>&1 1> /dev/null");
-		$time26 = TIME();
+		$time28 = TIME();
 	} elseif (( $array['AFLY_PREDB'] == "true" ) && ( $optimize_safe_to_run != "true" ) && ( $array['MAX_LOAD'] >= get_load())) {
 		$color = get_color();
 		$run_time = relativeTime( $array['AFLY_TIMER'] + $time28 );
@@ -1692,7 +1692,7 @@ while( $i > 0 )
 		$color = get_color();
 		$log = writelog($panes6[2]);
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:6.2 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes6[2] $ds2 && cd $_afly && $_php pre.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes6[2] $ds3' 2>&1 1> /dev/null");
-		$time26 = TIME();
+		$time27 = TIME();
 	} elseif (( $array['PRECORRUPT'] == "true" ) && ( $optimize_safe_to_run != "true" ) && ( $array['MAX_LOAD'] >= get_load())) {
 		$color = get_color();
 		$run_time = relativeTime( $array['PRECORRUPT_TIMER'] + $time27 );
