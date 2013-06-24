@@ -146,7 +146,7 @@ else
     $TMUXCMD splitw -v -p 50 'printf "\033]2;processUnwanted\033\\"'
 	
 	$TMUXCMD new-window -n afly 'printf "\033]2;AflyScripts\033\\"'
-    $TMUXCMD splitw -h -p 33 'printf "\033]2;AflyPreDB\033\\"'
+    $TMUXCMD splitw -h -p 66 'printf "\033]2;AflyPreDB\033\\"'
     $TMUXCMD selectp -t 1
     $TMUXCMD splitw -h -p 50 'printf "\033]2;PreCorruptNet\033\\"'
    
