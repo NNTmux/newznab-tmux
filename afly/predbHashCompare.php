@@ -1,9 +1,8 @@
 <?php
-define('FS_ROOT_OVERRIDE', realpath(dirname(__FILE__)));
-require_once (FS_ROOT_OVERRIDE . "/../../www/config.php");
-require_once (FS_ROOT_OVERRIDE . "/../../www/lib/framework/db.php");
-require_once (FS_ROOT_OVERRIDE . "/../../www/lib/releases.php");
-require_once (FS_ROOT_OVERRIDE . "/../../www/lib/category.php");
+require_once(dirname(__FILE__)."/../bin/config.php");
+require_once(WWW_DIR ."/lib/framework/db.php");
+require_once(WWW_DIR ."/lib/releases.php");
+require_once(WWW_DIR ."/lib/category.php");
 		
 		
 	function getNoHash()
