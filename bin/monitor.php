@@ -1648,7 +1648,7 @@ while( $i > 0 )
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:5.7 'echo \"\033[38;5;\"$color\"m\n$panes5[7] Disabled by OPTIMIZE\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
 	}
 	//run omgwtfnzbs.php and rlzlog.php every 10 minutes in pane 6.0
-	if (( $array['MAX_LOAD'] >= get_load()) && (( TIME() - $time26 ) >= $array['AFLY_TIMER'] ) || ( $i == 15 )) && ( $array['AFLY'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
+	if (( $array['MAX_LOAD'] >= get_load()) && (( TIME() - $time26 ) >= $array['AFLY_TIMER'] ) && ( $array['AFLY'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		$log = writelog($panes6[0]);
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:6.0 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes6[0] $ds2 && cd $_afly && $_php omgwtfnzbs.php 2>&1 $log && $_php rlzlog.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes6[0] $ds3' 2>&1 1> /dev/null");
@@ -1668,7 +1668,7 @@ while( $i > 0 )
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:6.0 'echo \"\033[38;5;\"$color\"m\n$panes6[0] Disabled by OPTIMIZE\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
 	}
 	//run predbHashCompare.php every 10 minutes in pane 6.1
-	if (( $array['MAX_LOAD'] >= get_load()) && (( TIME() - $time28 ) >= $array['AFLY_PREDB_TIMER'] ) || ( $i == 15 )) && ( $array['AFLY_PREDB'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
+	if (( $array['MAX_LOAD'] >= get_load()) && (( TIME() - $time28 ) >= $array['AFLY_PREDB_TIMER'] ) && ( $array['AFLY_PREDB'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		$log = writelog($panes6[1]);
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:6.1 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes6[1] $ds2 && cd $_afly && $_php predbHashCompare.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes6[1] $ds3' 2>&1 1> /dev/null");
@@ -1688,7 +1688,7 @@ while( $i > 0 )
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:6.1 'echo \"\033[38;5;\"$color\"m\n$panes6[1] Disabled by OPTIMIZE\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
 	}
 	//run pre.php every 10 minutes in pane 6.2
-	if (( $array['MAX_LOAD'] >= get_load()) && (( TIME() - $time27 ) >= $array['PRECORRUPT_TIMER'] ) || ( $i == 15 )) && ( $array['PRECORRUPT'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
+	if (( $array['MAX_LOAD'] >= get_load()) && (( TIME() - $time27 ) >= $array['PRECORRUPT_TIMER'] ) && ( $array['PRECORRUPT'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		$log = writelog($panes6[2]);
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:6.2 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes6[2] $ds2 && cd $_afly && $_php pre.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes6[2] $ds3' 2>&1 1> /dev/null");
