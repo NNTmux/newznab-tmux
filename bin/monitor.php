@@ -790,7 +790,7 @@ while( $i > 0 )
 				$color = get_color();
 				shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:3.$g 'echo \"\033[38;5;\"$color\"m\n$panes3[$g]\nKilled in prep for \nOptimization\" && date +\"%D %T\" && echo \"This is color #$color\" && $ds1 $panes3[$g] $ds4'");
 			}
-			for ($g=0; $g<=3; $g++)
+			for ($g=0; $g<=2; $g++)
 			{
 				$color = get_color();
 				shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:6.$g 'echo \"\033[38;5;\"$color\"m\n$panes6[$g]\nKilled in prep for \nOptimization\" && date +\"%D %T\" && echo \"This is color #$color\" && $ds1 $panes6[$g] $ds4'");
