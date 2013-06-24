@@ -2,11 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-<<<<<<< HEAD
-$version="0.1r795a";
-=======
 $version="0.1r796";
->>>>>>> origin/test
 
 $db = new DB();
 
