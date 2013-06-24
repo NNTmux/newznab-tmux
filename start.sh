@@ -144,6 +144,12 @@ else
     $TMUXCMD splitw -v -p 75 'printf "\033]2;processTheTVDB\033\\"'
     $TMUXCMD splitw -v -p 67 'printf "\033]2;processBooks2\033\\"'
     $TMUXCMD splitw -v -p 50 'printf "\033]2;processUnwanted\033\\"'
+	
+	$TMUXCMD new-window -n other2 'printf "\033]2;AflyScripts\033\\"'
+    $TMUXCMD splitw -h -p 66 'printf "\033]2;AflyPreDB\033\\"'
+    $TMUXCMD selectp -t 1
+    $TMUXCMD splitw -h -p 50 'printf "\033]2;PreCorruptNet\033\\"'
+   
 
     if [[ $USE_HTOP == "true" ]]; then
         $TMUXCMD new-window -n htop '$HTOP'
