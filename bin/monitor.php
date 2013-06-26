@@ -1675,7 +1675,7 @@ while( $i > 0 )
 		$time28 = TIME();
 	} elseif (( $array['AFLY_PREDB'] == "true" ) && ( $optimize_safe_to_run != "true" ) && ( $array['MAX_LOAD'] >= get_load())) {
 		$color = get_color();
-		$run_time = relativeTime( $array['AFLY_TIMER'] + $time28 );
+		$run_time = relativeTime( $array['AFLY_PREDB_TIMER'] + $time28 );
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:6.1 'echo \"\033[38;5;\"$color\"m\n$panes6[1] will run in T[ $run_time]\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
 	} elseif (( $array['AFLY_PREDB'] != "true" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
