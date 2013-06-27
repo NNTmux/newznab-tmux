@@ -30,20 +30,20 @@ require_once ("hashcompare.php");
 						AddRelease($cleanname, $item->pubDate);
 						//echo "\n Added - ".$cleanname."\n";
 					}
-    		if (strlen($apiresponse)==0)
+    		if (strlen($apiresponse) == 0)
                     {
                     echo "There is no new pre info\n";
                     }
                 }
             }
-            else
-                    {
-				echo "response was zero length :( \n";
-			        }
+##            else
+##                    {
+##				echo "response was zero length :( \n";
+##			        }
 	}
-            else
-            {
-			echo "nothing came :( \n";
-	        }
+##            else
+##           {
+##			echo "nothing came :( \n";
+##	        }
 	
 ?>
