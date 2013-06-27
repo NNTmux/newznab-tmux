@@ -9,7 +9,7 @@ require_once ("hashcompare.php");
 	
 	$src = "https://pre.corrupt-net.org/rss.php?k=".$key;	
 	
-	echo "pre.corrupt.net - request...";
+	echo "Requesting pre info from pre.corrupt.net...";
 	$apiresponse = getUrl($src); 
 		
 	if ($apiresponse)
@@ -17,7 +17,7 @@ require_once ("hashcompare.php");
 			
 			if (strlen($apiresponse) > 0) 
 			{
-				echo "response\n";
+				echo "response received\n";
 				$preinfo = simplexml_load_string($apiresponse);
 		
 				foreach($preinfo->channel->item as $item) 
@@ -30,14 +30,20 @@ require_once ("hashcompare.php");
 						AddRelease($cleanname, $item->pubDate);
 						//echo "\n Added - ".$cleanname."\n";
 					}
-		
-				}
-
-			}else{
+    		if (strlen($apiresponse)==0)
+                    {
+                    echo "There is no new pre info\n";
+                    }
+                }
+            }
+            else
+                    {
 				echo "response was zero length :( \n";
-			}
-	}else{
-			echo "nothing came :( \n";
+			        }
 	}
+            else
+            {
+			echo "nothing came :( \n";
+	        }
 	
 ?>

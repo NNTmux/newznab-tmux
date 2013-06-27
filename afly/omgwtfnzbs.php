@@ -7,7 +7,7 @@ require_once ("hashcompare.php");
 	
 	$src = "http://rss.omgwtfnzbs.org/rss-info.php";	
 	
-	echo "omgwtfnzbs.org - request...";
+	echo "Requesting pre info from omgwtfnzbs.org rss feed ...";
 	$apiresponse = getUrl($src); 
 		
 	if ($apiresponse)
@@ -15,7 +15,7 @@ require_once ("hashcompare.php");
 			
 			if (strlen($apiresponse) > 0) 
 			{
-				echo "response\n";
+				echo "Response received\n";
 				$preinfo = simplexml_load_string($apiresponse);
 		
 				foreach($preinfo->channel->item as $item) 
@@ -30,11 +30,15 @@ require_once ("hashcompare.php");
 		
 				}
 
-			}else{
+			}
+			else
+			{
 				echo "response was zero length :( \n";
 			}
-	}else{
-			echo "nothing came :( \n";
 	}
+	else
+		{
+			echo "nothing came :( \n";
+		}
 	
 ?>
