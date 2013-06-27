@@ -48,18 +48,18 @@ require_once(WWW_DIR ."/lib/category.php");
 			
 		if (CheckExists() !== false)
 		{
-		
+
 			$results = getHashes();
-			
-			foreach($results as $result) 
+
+			foreach($results as $result)
 			{
 				echo "Hash Match! Renaming release... ".$result['releasename']."\n";
 				updaterelease($result['releasename'], $result['ID'], $result['name']);
             }
 		}
-        else
+        if ($results !=getHashes());
         {
-          echo "No hash match found";
+          echo "No hash match found!\n";
         }
       }
 
