@@ -55,13 +55,12 @@ require_once(WWW_DIR ."/lib/category.php");
 			{
 				echo "Hash Match! Renaming release... ".$result['releasename']."\n";
 				updaterelease($result['releasename'], $result['ID'], $result['name']);
-			}
-
-		if (CheckExists() == false)
-			{
-			echo "No matches found!";
-			}
+            }
 		}
+        else
+        {
+          echo "No hash match found";
+        }
       }
 
 	
