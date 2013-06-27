@@ -45,17 +45,19 @@ require_once(WWW_DIR ."/lib/category.php");
 	}
 			
 	//compare with releases
-   	if $results = getHashes();
-		{	
-		foreach($results as $result) 
-		}
-		
+   	if ($results = getHashes());
+		{
+		foreach($results as $result)
+
 		{
 		echo "Hash Match! Renaming release... ".$result['dirname']."\n";
-		updaterelease($result['dirname'], $result['ID'], $result['name']);	
-		}
-	else
-		{
-		echo "No matches found!"
-		}
+		updaterelease($result['dirname'], $result['ID'], $result['name']);
+
+        }
+        }
+     if ($results !=getHashes());
+        {
+          echo "No hash matched!\n";
+        }
+        
 ?>
