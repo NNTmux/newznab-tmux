@@ -55,7 +55,7 @@ require_once(WWW_DIR ."/lib/category.php");
 
         }
         }
-     if ($results !=getHashes());
+     if ($results != getHashes());
         {
           echo "No hash matched!\n";
         }
