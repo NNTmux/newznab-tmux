@@ -1,19 +1,18 @@
 <?php
-define('FS_ROOT', realpath(dirname(__FILE__)));
-require_once (FS_ROOT . '/../../www/config.php');
-require_once (FS_ROOT . '/../../www/lib/framework/db.php');
-require_once (FS_ROOT . '/../../www/lib/util.php');
+require_once(dirname(__FILE__)."/../bin/config.php");
+require_once(WWW_DIR ."/lib/framework/db.php");
+require_once(WWW_DIR ."/lib/util.php");
 require_once ("hashcompare.php");
 
 		$src = 'http://predb.me/?page=1';
-		echo "predb.me - request...";
+		echo "Requesting Pre data from predb.me....";
 		$response = getUrl($src);
 		
 		if ($response)
 		{
 			if (strlen($response) > 0)
 			{
-				echo "response\n";
+				echo "Response received\n";
 					
 				$response = str_replace('&','',$response);
 				$preinfo = simplexml_load_string($response);

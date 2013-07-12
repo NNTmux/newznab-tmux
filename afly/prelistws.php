@@ -1,8 +1,7 @@
 <?php
-define('FS_ROOT', realpath(dirname(__FILE__)));
-require_once (FS_ROOT . "/../../www/config.php");
-require_once (FS_ROOT . "/../../www/lib/framework/db.php");
-require_once (FS_ROOT . "/../../www/lib/util.php");
+require_once(dirname(__FILE__)."/../bin/config.php");
+require_once(WWW_DIR ."/lib/framework/db.php");
+require_once(WWW_DIR ."/lib/util.php");
 require_once ("hashcompare.php");
 
  
@@ -32,7 +31,7 @@ require_once ("hashcompare.php");
 			
 			$src = "http://www.prelist.ws/?start=0";	
 
-			echo "prelist.ws - request...";
+			echo "Requesting Pre data from prelist.ws...";
 			$apiresponse = getUrl($src); 
 		
 			if ($apiresponse)
@@ -40,7 +39,7 @@ require_once ("hashcompare.php");
 			
 				if (strlen($apiresponse) > 0) 
 				{
-					echo "response\n";
+					echo "Response received\n";
 					  foreach(match_all('/<tt id="(.*?)">(.*?)<\/tt>/ms',$apiresponse, 2) as $r) {
 						   $tdcount = 0;
 						   foreach(match_all('/<a href="(.*?)">(.*?)<\/a>/ms',$r, 2) as $p) {
