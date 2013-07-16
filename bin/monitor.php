@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.1r798";
+$version="0.1r799";
 
 $db = new DB();
 
@@ -10,7 +10,27 @@ $db = new DB();
 $qry = "SELECT COUNT( releases.categoryID ) AS cnt, parentID FROM releases INNER JOIN category ON releases.categoryID = category.ID WHERE parentID IS NOT NULL GROUP BY parentID";
 
 //needs to be processed query
-$proc = "SELECT ( SELECT COUNT( groupID ) AS cnt from releases where consoleinfoID IS NULL and categoryID BETWEEN 1000 AND 1999 ) AS console, ( SELECT COUNT( groupID ) AS cnt from releases where imdbID IS NULL and categoryID BETWEEN 2000 AND 2999 ) AS movies, ( SELECT COUNT( groupID ) AS cnt from releases where musicinfoID IS NULL and categoryID BETWEEN 3000 AND 3999 ) AS audio, ( SELECT COUNT( groupID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (categoryID BETWEEN 4000 AND 4999 and ((r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)))) AS pc, ( SELECT COUNT( groupID ) AS cnt from releases where rageID = -1 and categoryID BETWEEN 5000 AND 5999 ) AS tv, ( SELECT COUNT( groupID ) AS cnt from releases where bookinfoID IS NULL and categoryID = 7020 ) AS book, ( SELECT COUNT( groupID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)) AS work, ( SELECT COUNT( groupID ) AS cnt from releases) AS releases, ( SELECT COUNT( groupID ) AS cnt FROM releases r WHERE r.releasenfoID = 0) AS nforemains, ( SELECT COUNT( groupID ) AS cnt FROM releases WHERE releasenfoID not in (0, -1)) AS nfo, ( SELECT table_rows AS cnt FROM information_schema.TABLES where table_name = 'parts' AND TABLE_SCHEMA = '".DB_NAME."' ) AS parts, ( SELECT COUNT(ID) FROM binaries WHERE procstat = 0 ) AS binaries, ( SELECT table_rows AS cnt FROM information_schema.TABLES where table_name = 'binaries' AND TABLE_SCHEMA = '".DB_NAME."' ) AS binaries_total, ( SELECT concat(round((data_length+index_length)/(1024*1024*1024),2),'GB') AS cnt FROM information_schema.tables where table_name = 'parts' AND TABLE_SCHEMA = '".DB_NAME."' ) AS partsize, ( SELECT concat(round((data_length+index_length)/(1024*1024*1024),2),'GB') AS cnt FROM information_schema.tables where table_name = 'binaries' AND TABLE_SCHEMA = '".DB_NAME."' ) AS binariessize, ( SELECT UNIX_TIMESTAMP(adddate) from releases order by adddate desc limit 1 ) AS newestadd, ( SELECT name from releases order by adddate desc limit 1 ) AS newestaddname";
+$proc = "SELECT
+( SELECT COUNT( groupID ) AS cnt from releases where consoleinfoID IS NULL and categoryID BETWEEN 1000 AND 1999 ) AS console,
+( SELECT COUNT( groupID ) AS cnt from releases where imdbID IS NULL and categoryID BETWEEN 2000 AND 2999 ) AS movies,
+( SELECT COUNT( groupID ) AS cnt from releases where musicinfoID IS NULL and categoryID BETWEEN 3000 AND 3999 ) AS audio,
+(SELECT COUNT( groupID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (categoryID BETWEEN 4000 AND 4999 and ((r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)))) AS pc,
+( SELECT COUNT( groupID ) AS cnt from releases where rageID = -1 and categoryID BETWEEN 5000 AND 5999 ) AS tv,
+( SELECT COUNT( groupID ) AS cnt from releases where bookinfoID IS NULL and categoryID = 7020 ) AS book,
+( SELECT COUNT( groupID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)) AS work,
+( SELECT COUNT( groupID ) AS cnt from releases) AS releases,
+( SELECT COUNT( groupID ) AS cnt FROM releases r WHERE r.releasenfoID = 0) AS nforemains,
+( SELECT COUNT( groupID ) AS cnt FROM releases WHERE releasenfoID not in (0, -1)) AS nfo,
+( SELECT table_rows AS cnt FROM information_schema.TABLES where table_name = 'parts' AND TABLE_SCHEMA = '".DB_NAME."' ) AS parts,
+( SELECT COUNT(ID) FROM binaries WHERE procstat = 0 ) AS binaries,
+( SELECT table_rows AS cnt FROM information_schema.TABLES where table_name = 'binaries' AND TABLE_SCHEMA = '".DB_NAME."' ) AS binaries_total,
+( SELECT concat(round((data_length+index_length)/(1024*1024*1024),2),'GB') AS cnt FROM information_schema.tables where table_name = 'parts' AND TABLE_SCHEMA = '".DB_NAME."' ) AS partsize,
+( SELECT concat(round((data_length+index_length)/(1024*1024*1024),2),'GB') AS cnt FROM information_schema.tables where table_name = 'binaries' AND TABLE_SCHEMA = '".DB_NAME."' ) AS binariessize,
+( SELECT UNIX_TIMESTAMP(adddate) from releases order by adddate desc limit 1 ) AS newestadd,
+( SELECT COUNT( ID ) FROM groups WHERE active = 1 ) AS active_groups,
+( SELECT COUNT( ID ) FROM groups WHERE name IS NOT NULL ) AS all_groups,
+(SELECT COUNT( ID ) FROM groups WHERE first_record IS NOT NULL and `backfill_target` > 0 and first_record_postdate != '2000-00-00 00:00:00'  < first_record_postdate) AS backfill_groups,
+( SELECT name from releases order by adddate desc limit 1 ) AS newestaddname";
 //$proc = "SELECT * FROM procCnt;";
 
 //get first release inserted datetime and oldest posted datetime
@@ -258,6 +278,11 @@ $run_time1 = 0;
 $run_time2 = 0;
 $run_time3 = 0;
 $run_time4 = 0;
+$uspactiveconnections = 0;
+$usptotalconnections = 0;
+$active_groups = 0;
+$all_groups = 0;
+$backfill_groups =0;
 
 //formatted  output
 $nfo_diff = number_format( $nfo_remaining_now - $nfo_remaining_start );
@@ -285,12 +310,14 @@ $tvrage_releases_now_formatted = number_format( $tvrage_releases_now );
 $book_releases_now_formatted = number_format( $book_releases_now );
 $misc_releases_now_formatted = number_format( $misc_releases_now );
 
-//create initial display
+
+//create initial display, USP connection count borrowed from nZEDb
 passthru('clear');
 //printf("\033[1;31m  First insert:\033[0m ".relativeTime("$firstdate")."\n");
-$mask1 = "\033[1;33m%-16s \033[38;5;214m%-44.44s \n";
-$mask2 = "\033[1;33m%-16s \033[38;5;214m%-34.34s \n";
+$mask1 = "\033[1;33m%-16s \033[38;5;214m%-49.49s \n";
+$mask2 = "\033[1;33m%-16s \033[38;5;214m%-39.39s \n";
 printf($mask2, "Monitor Running v$version: ", relativeTime("$time"));
+printf($mask1, "USP Connections:" ,$uspactiveconnections." active (".$usptotalconnections." total used) - ".NNTP_SERVER);
 printf($mask1, "Newest Release:", "$newestname");
 printf($mask1, "Release Added:", relativeTime("$newestdate")."ago");
 
@@ -328,6 +355,12 @@ printf($mask, "Category", "Time", "Status");
 printf($mask, "====================", "====================", "====================");
 printf("\033[38;5;214m");
 printf($mask, "DB Lagg","$query_timer","0 qps");
+
+printf("\n\033[1;33m\n");
+printf($mask, "Groups", "Active", "Backfill");
+printf($mask, "====================", "=========================", "=========================");
+printf("\033[38;5;214m");
+printf($mask, "Activated", $active_groups."(".$all_groups.")", $backfill_groups. "(".$all_groups.")");
 
 $i = 1;
 while( $i > 0 )
@@ -464,6 +497,8 @@ while( $i > 0 )
 	if ( @$proc_result[0]['releases'] ) { $releases_now_formatted = number_format($proc_result[0]['releases']); }
 	if ( @$proc_result[0]['newestaddname'] ) { $newestname = $proc_result[0]['newestaddname']; }
 	if ( @$proc_result[0]['newestadd'] ) { $newestdate = $proc_result[0]['newestadd']; }
+    if ( @$proc_result[0]['active_groups'] != NULL ) { $active_groups = $proc_result[0]['active_groups']; }
+    if ( @$proc_result[0]['all_groups'] != NULL ) { $all_groups = $proc_result[0]['all_groups']; }
 
 	//calculate releases difference
 	$releases_misc_diff = number_format( $releases_now - $releases_start );
@@ -654,10 +689,15 @@ while( $i > 0 )
 		$import_reason="enabled";
 	}
 
+    //get usenet connections, borrowed from nZEDb
+$uspactiveconnections = str_replace("\n", '', shell_exec ("ss -n | grep :".NNTP_PORT." | grep -c ESTAB"));
+$usptotalconnections  = str_replace("\n", '', shell_exec ("ss -n | grep -c :".NNTP_PORT.""));
+
 	//update display
 	passthru('clear');
 	//printf("\033[1;31m  First insert:\033[0m ".relativeTime("$firstdate")."\n");
 	printf($mask2, "Monitor Running v$version: ", relativeTime("$time"));
+    printf($mask1, "USP Connections:" ,$uspactiveconnections." active (".$usptotalconnections." total used) - ".NNTP_SERVER);
 	printf($mask1, "Newest Release:", "$newestname");
 	printf($mask1, "Release Added:", relativeTime("$newestdate")."ago");
 
@@ -695,6 +735,12 @@ while( $i > 0 )
 	printf("\033[38;5;214m");
         $get_current_number = str_replace("\n", '', shell_exec($mysqladmin)." qps");
         printf($mask, "DB Lagg","$query_timer","$get_current_number");
+
+    printf("\n\033[1;33m\n");
+    printf($mask, "Groups", "Active", "Backfill");
+    printf($mask, "====================", "=========================", "=========================");
+    printf("\033[38;5;214m");
+    printf($mask, "Activated", $active_groups."(".$all_groups.")", $backfill_groups. "(".$all_groups.")");
 
 	$optimize_safe_to_run = "false";
 	$optimize_run = "false";
