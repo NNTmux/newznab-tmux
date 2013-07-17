@@ -4,6 +4,7 @@ require_once(WWW_DIR ."/lib/framework/db.php");
 require_once(WWW_DIR ."/lib/util.php");
 require_once ("hashcompare.php");
 
+//This script is adapted from nZEDb predb.php script  
 	
         $db = new DB();
 		$newnames = 0;
