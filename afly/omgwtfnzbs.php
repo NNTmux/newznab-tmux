@@ -4,7 +4,7 @@ require_once(WWW_DIR ."/lib/framework/db.php");
 require_once(WWW_DIR ."/lib/util.php");
 require_once ("hashcompare.php");
 
-//This script is adapted from nZEDb predb.php script  
+//This script is adapted from nZEDb predb.php script
 	
         $db = new DB();
 		$newnames = 0;
@@ -40,7 +40,7 @@ require_once ("hashcompare.php");
 							{
 								$size = $db->escapeString(round($matches2["size1"]).$matches2["size2"]);
 
-								$db->query(sprintf("INSERT IGNORE INTO prehash (releasename, size, category, predate, source, hash) VALUES (%s, %s, %s, FROM_UNIXTIME(".strtotime($matches2["date"])."), %s, %s)", $db->escapeString($matches2["releasename"]), $size, $db->escapeString($matches2["category"]), $db->escapeString("omgwtfnzbs"), $db->escapeString(md5($matches2["title"]))));
+								$db->query(sprintf("INSERT IGNORE INTO prehash (releasename, size, category, predate, source, hash) VALUES (%s, %s, %s, FROM_UNIXTIME(".strtotime($matches2["date"])."), %s, %s)", $db->escapeString($matches2["title"]), $size, $db->escapeString($matches2["category"]), $db->escapeString("omgwtfnzbs"), $db->escapeString(md5($matches2["title"]))));
 								$newnames++;
 							}
 						}
