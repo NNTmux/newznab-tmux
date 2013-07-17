@@ -4,75 +4,57 @@ require_once(WWW_DIR ."/lib/framework/db.php");
 require_once(WWW_DIR ."/lib/util.php");
 require_once ("hashcompare.php");
 
- 
-     function match_all_key_value($regex, $str, $keyIndex = 1, $valueIndex = 2){
-        $arr = array();
-        preg_match_all($regex, $str, $matches, PREG_SET_ORDER);
-        foreach($matches as $m){
-            $arr[$m[$keyIndex]] = $m[$valueIndex];
-        }
-        return $arr;
-    }
-     
-     function match_all($regex, $str, $i = 0){
-        if(preg_match_all($regex, $str, $matches) === false)
-            return false;
-        else
-            return $matches[$i];
-    }
- 
-     function match($regex, $str, $i = 0){
-        if(preg_match($regex, $str, $match) == 1)
-            return $match[$i];
-        else
-            return false;
-    }
-	
-			
-			$src = "http://www.prelist.ws/?start=0";	
 
-			echo "Requesting Pre data from prelist.ws...";
-			$apiresponse = getUrl($src); 
-		
-			if ($apiresponse)
+$db = new DB();
+		$newnames = 0;
+
+		$buffer = getUrl("http://www.prelist.ws/");
+
+        echo "Requesting pre info from prelist.ws ...\n";
+
+		if ($buffer !== false && strlen($buffer))
+		{
+			if (preg_match_all('/<small><span.+?<\/span><\/small>/s', $buffer, $matches))
 			{
-			
-				if (strlen($apiresponse) > 0) 
+				foreach ($matches as $match)
 				{
-					echo "Response received\n";
-					  foreach(match_all('/<tt id="(.*?)">(.*?)<\/tt>/ms',$apiresponse, 2) as $r) {
-						   $tdcount = 0;
-						   foreach(match_all('/<a href="(.*?)">(.*?)<\/a>/ms',$r, 2) as $p) {
-							
-							$cleanname = '';
-							if ($tdcount == 1)
+					foreach ($match as $m)
+					{
+						if (!preg_match('/NUKED/', $m) && preg_match('/">\[ (?P<date>.+?) U.+?">(?P<category>.+?)<\/a>.+?">(?P<title>.+?)<\/a>.+?(b>\[ (?P<size>.+?) \]<\/b)?/si', $m, $matches2))
+						{
+							$oldname = $db->queryOneRow(sprintf("SELECT releasename FROM prehash WHERE releasename = %s", $db->escapeString($matches2["title"])));
+							if ($oldname["releasename"] == $matches2["title"])
+								continue;
+							else
 							{
-								
-								$res  = getRelease($p);
-								if (strlen($p) > 0)
-								{
-									if ($res['total'] == 0)
-									{	
-										AddRelease(trim($p), '');
-									//	echo "Added - ".$p."\n";
-									}
-								}
-								
-							}
-							
-							$tdcount = $tdcount + 1;
-					
-						   }
-						   
-					   }
-				
-				}else{
-					echo "response was zero length :( \n";
-				}
-			}else{
-				echo "nothing came :( \n";
-			}
+								if (!isset($matches2["size"]) && empty($matches["size"]))
+									$size = "NULL";
+								else
+									$size = $db->escapeString(round($matches2["size"]));
 
-	
-	
+								$db->query(sprintf("INSERT IGNORE INTO prehash (releasename, size, category, predate, source, hash) VALUES (%s, %s, %s, FROM_UNIXTIME(".strtotime($matches2["date"])."), now(), %s, %s)", $db->escapeString($matches2["releasename"]), $size, $db->escapeString($matches2["category"]), $db->escapeString("prelist"), $db->escapeString(hash($matches2["title"]))));
+								$newnames++;
+							}
+						}
+						else if (preg_match('/">\[ (?P<date>.+?) U.+?">(?P<category>.+?)<\/a>.+?">(?P<category1>.+?)<\/a.+">(?P<title>.+?)<\/a>/si', $m, $matches2))
+						{
+							$oldname = $db->queryOneRow(sprintf("SELECT releasename FROM pre WHERE releasename = %s", $db->escapeString($matches2["title"])));
+							if ($oldname["releasename"] == $matches2["title"])
+								continue;
+							else
+							{
+								$category = $db->escapeString($matches2["category"].", ".$matches2["category1"]);
+
+								$db->query(sprintf("INSERT IGNORE INTO prehash (releasename, category, predate, source, hash) VALUES (%s, %s, FROM_UNIXTIME(".strtotime($matches2["date"])."), %s, %s)", $db->escapeString($matches2["releasename"]), $category, $db->escapeString("prelist"), $db->escapeString(md5($matches2["title"]))));
+								$newnames++;
+							}
+						}
+					}
+				}
+			}
+		}
+		return $newnames;
+
+
+
 ?>

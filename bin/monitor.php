@@ -1697,7 +1697,7 @@ $usptotalconnections  = str_replace("\n", '', shell_exec ("ss -n | grep -c :".NN
 	if (( $array['MAX_LOAD'] >= get_load()) && (( TIME() - $time26 ) >= $array['AFLY_TIMER'] ) && ( $array['AFLY'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		$log = writelog($panes6[0]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:6.0 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes6[0] $ds2 && cd $_afly && $_php omgwtfnzbs.php 2>&1 $log && $_php predbme.php 2>&1 $log && $_php prelistws.php 2>&1 $log && $_php hashcompare-standalone.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes6[0] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:6.0 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes6[0] $ds2 && cd $_afly && $_php womble.php 2>&1 $log && $_php omgwtfnzbs.php 2>&1 $log && $_php predbme.php 2>&1 $log && $_php prelistws.php 2>&1 $log && $_php orlydb.php 2>&1 $log && $_php zenet.php 2>&1 $log && $_php srrdb.php 2>&1 $log && $_php hashcompare-standalone.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes6[0] $ds3' 2>&1 1> /dev/null");
 		$time26 = TIME();
 	} elseif (( $array['AFLY'] == "true" ) && ( $optimize_safe_to_run != "true" ) && ( $array['MAX_LOAD'] >= get_load())) {
 		$color = get_color();

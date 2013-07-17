@@ -9,8 +9,13 @@ require_once(WWW_DIR ."/lib/framework/db.php");
 		return $db->query("CREATE TABLE IF NOT EXISTS `prehash` (
   								`ID` int(11) NOT NULL AUTO_INCREMENT,
 								 `releasename` varchar(1000) COLLATE utf8_unicode_ci NOT NULL,
-								 `hash` varchar(32) COLLATE utf8_unicode_ci DEFAULT NULL,
+                                 `nfo` VARCHAR( 500 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+                                 `size` VARCHAR( 50 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+                                 `category` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
+								 `hash` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '0',
 								 `predate` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+                                 `source` VARCHAR( 50 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+                                 `releaseID` INT( 11 ) NULL DEFAULT NULL,
 								  PRIMARY KEY (`ID`),
 								  UNIQUE KEY `hash` (`hash`),
 								  KEY `release` (`releasename`(333))
