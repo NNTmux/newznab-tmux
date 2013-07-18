@@ -57,12 +57,12 @@ require_once(WWW_DIR ."/lib/category.php");
 				updaterelease($result['releasename'], $result['ID'], $result['name']);
             }
 		}
-            if ($results !=getHashes());
+        else
         {
           echo "No hash match found!\n";
-        }
-      }
 
-	
-	
+        }
+
+
+  }
 ?>
