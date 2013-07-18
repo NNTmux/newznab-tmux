@@ -42,7 +42,7 @@ require_once(WWW_DIR ."/lib/category.php");
 		$db->query(sprintf("UPDATE releases SET name = %s,  searchname = %s, categoryID = %d WHERE ID = %d",  $db->escapeString($cleanRelName),  $db->escapeString($cleanRelName), $catid,  $id));
 		
 	}
-	
+
 	function hashInit()
 	{
 			
@@ -57,7 +57,7 @@ require_once(WWW_DIR ."/lib/category.php");
 				updaterelease($result['releasename'], $result['ID'], $result['name']);
             }
 		}
-        else
+        if (CheckExists() === false)
         {
           echo "No hash match found!\n";
 
