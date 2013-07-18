@@ -14,12 +14,17 @@ require_once(WWW_DIR ."/lib/framework/db.php");
                                  `category` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
 								 `hash` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '0',
 								 `predate` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+                                 'adddate' DATETIME NULL DEFAULT NULL,
                                  `source` VARCHAR( 50 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
                                  `releaseID` INT( 11 ) NULL DEFAULT NULL,
 								  PRIMARY KEY (`ID`),
 								  UNIQUE KEY `hash` (`hash`),
-								  KEY `release` (`releasename`(333))
-								 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");		
+								  KEY `release` (`releasename`(333),
+                                  KEY 'nfo' ('nfo'(333),
+                                  KEY 'source' ('source'),
+                                  KEY 'predate' ('predate'),
+                                  KEY 'adddate' ('adddate')),
+								 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
 	}
 		
 		

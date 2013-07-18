@@ -24,7 +24,7 @@ $db = new DB();
 						continue;
 					else
 					{
-						$db->query(sprintf("INSERT IGNORE INTO prehash (releasename, predate, source, hash) VALUES (%s, now(), %s, %s)", $db->escapeString($release->title), $db->escapeString("predbme"), $db->escapeString(md5($release->title))));
+						$db->query(sprintf("INSERT IGNORE INTO prehash (releasename, predate, adddate, source, hash) VALUES (%s, now(), now(), %s, %s)", $db->escapeString($release->title), $db->escapeString("predbme"), $db->escapeString(md5($release->title))));
 						$newnames++;
 					}
 				}

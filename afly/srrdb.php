@@ -22,7 +22,7 @@ $db = new DB();
 					continue;
 				else
 				{
-					$db->query(sprintf("INSERT IGNORE INTO prehash (releasename, predate, source, hash) VALUES (%s, FROM_UNIXTIME(".strtotime($release->pubDate)."), %s, %s)", $db->escapeString($release->title), $db->escapeString("srrdb"), $db->escapeString(md5($release->title))));
+					$db->query(sprintf("INSERT IGNORE INTO prehash (releasename, predate, adddate, source, hash) VALUES (%s, FROM_UNIXTIME(".strtotime($release->pubDate)."), now(),  %s, %s)", $db->escapeString($release->title), $db->escapeString("srrdb"), $db->escapeString(md5($release->title))));
 					$newnames++;
 				}
 			}
