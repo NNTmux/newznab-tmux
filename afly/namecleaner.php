@@ -1,7 +1,14 @@
 <?php
 require_once(dirname(__FILE__)."/../bin/config.php");    
 require_once(WWW_DIR."lib/groups.php");
-require_once(WWW_DIR."lib/predb.php");
+require_once("womble.php");
+require_once("omgwtfnzbs.php");
+require_once("predbme.php");
+require_once("prelistws.php");
+require_once("orlydb.php");
+require_once("zenet.php");
+require_once("srrdb.php");   
+
 
 //This script is adapted from nZEDb
 //
