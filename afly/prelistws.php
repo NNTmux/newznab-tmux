@@ -5,7 +5,8 @@ require_once(WWW_DIR ."/lib/util.php");
 require_once ("hashcompare.php");
 
 //This script is adapted from nZEDb predb.php script
-
+function Prelist()
+{
 $db = new DB();
 		$newnames = 0;
 
@@ -57,5 +58,5 @@ $db = new DB();
 		return $newnames;
 
 
-
+  }
 ?>

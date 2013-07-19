@@ -7,7 +7,8 @@ require_once ("hashcompare.php");
 
 //This script is adapted from nZEDb predb.php script
 
-
+function Womble ()
+{
 		$db = new DB();
 		$newnames = 0;
 
@@ -72,7 +73,7 @@ require_once ("hashcompare.php");
 		return $newnames;
 
 
-
+   }
 
 
 ?>
