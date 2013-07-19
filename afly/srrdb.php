@@ -6,8 +6,8 @@ require_once(WWW_DIR ."/lib/util.php");
 require_once ("hashcompare.php");
 
 //This script is adapted from nZEDb predb.php script
-function Srrdb()
-{
+//function Srrdb()
+//{
 $db = new DB();
 		$newnames = 0;
 		$releases = @simplexml_load_file('http://www.srrdb.com/feed/srrs');
@@ -29,7 +29,7 @@ $db = new DB();
 			}
 		}
 		return $newnames;
-        }
+//        }
 
 
 ?>
