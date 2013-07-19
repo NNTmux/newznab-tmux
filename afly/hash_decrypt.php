@@ -3,6 +3,8 @@ require_once(dirname(__FILE__)."/../bin/config.php");
 require_once(WWW_DIR ."/lib/framework/db.php");
 require_once(WWW_DIR."lib/category.php");
 require_once(WWW_DIR."lib/groups.php");
+require_once(WWW_DIR."lib/nfo.php");
+require_once(WWW_DIR."lib/site.php");
 require_once ("consoletools.php");
 require_once ("namecleaner.php");
 
@@ -47,4 +49,4 @@ function preName()
     }
 
 
-     
+        ?>

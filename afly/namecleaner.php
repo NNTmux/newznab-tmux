@@ -307,3 +307,4 @@ class nameCleaning
 		return $cleanerName;
 	}
 }
+    ?>
