@@ -70,7 +70,6 @@ $_alienx = dirname(__FILE__)."/../alienx";
 $_conf = dirname(__FILE__)."/../conf";
 $_powerline = dirname(__FILE__)."/../powerline";
 $_cj = dirname(__FILE__)."/../nnscripts";
-$_core = dirname(__FILE__)."/../hashdecrypt";
 $_afly = dirname (__FILE__)."/../afly";
 $_user = dirname(__FILE__)."/../user_scripts";
 $_temp = dirname(__FILE__)."/../bin/temp";
@@ -1382,11 +1381,11 @@ $usptotalconnections  = str_replace("\n", '', shell_exec ("ss -n | grep -c :".NN
 		$color = get_color();
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.9 'echo \"\033[38;5;\"$color\"m\n$panes1[9] Disabled by OPTIMIZE\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
 	}
-	//run $_php nzbx_ws_hashdecrypt.php in 1.10
+	//run $_php hash_decrypt.php in 1.10
 	if (( $array['MAX_LOAD'] >= get_load()) && ((( TIME() - $time24 ) >= $array['HASH_TIMER'] ) || ( $i == 15 )) && ( $array['HASH'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		$log = writelog($panes1[10]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.10 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes1[10] $ds2 && cd $_core && $_php nzbx_ws_hashdecrypt.php 2>&1 $log && $ds1 $panes1[10] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.10 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes1[10] $ds2 && cd $_afly && $_php hash_decrypt.php 2>&1 $log && $ds1 $panes1[10] $ds3' 2>&1 1> /dev/null");
 		$time24 = TIME();
 	} elseif (( $array['HASH'] != "true" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();

@@ -71,7 +71,7 @@ else
 	$TMUXCMD selectp -t 8
 	$TMUXCMD splitw -h -p 50 'printf "\033]2;remove_blacklist_releases\033\\"' 
 	$TMUXCMD selectp -t 10
-	$TMUXCMD splitw -h -p 50 'printf "\033]2;nzbx_ws_hashdecrypt\033\\"' 
+	$TMUXCMD splitw -h -p 50 'printf "\033]2;hash_decrypt\033\\"' 
 	
 	
 
