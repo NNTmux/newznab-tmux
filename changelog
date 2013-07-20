@@ -1,3 +1,4 @@
+20.07.2013 	--> fixed bug in prehash, you will need to run this query: update prehash set title = replace (title, '  - omgwtfnzbs.org', '');
 19.07.2013 	--> Removed nzbx_ws_hashdecrypt.php as it is no longer working.
 				Added standalone hash_decrypt.php as a replacement. 
 				You need do run this sql "ALTER TABLE  `releases` ADD  `dehashstatus` TINYINT( 1 ) NOT NULL DEFAULT  '0' AFTER  `haspreview`;" on newznab database if you want to run this.
