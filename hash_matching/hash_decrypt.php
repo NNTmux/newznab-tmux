@@ -35,7 +35,8 @@ function preName()
 					$db->query(sprintf("update releases set dehashstatus = 1, searchname = %s where ID = %d", $db->escapeString($res1['title']), $row['ID']));
 					if ($db->getAffectedRows() >= 1)
 					{
-						$success = true;
+                        echo "Renamed hashed release: ".$res1['title']."\n";
+                        $success = true;
 						$counter++;
 					}
 				}
