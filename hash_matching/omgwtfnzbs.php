@@ -2,7 +2,6 @@
 require_once(dirname(__FILE__)."/../bin/config.php");
 require_once(WWW_DIR ."/lib/framework/db.php");
 require_once(WWW_DIR ."/lib/util.php");
-require_once ("hashcompare.php");
 
 //This script is adapted from nZEDb predb.php script
 
