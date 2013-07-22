@@ -14,7 +14,7 @@ require_once(WWW_DIR ."/lib/framework/db.php");
                                  `category` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
 								 `hash` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '0',
 								 `predate` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
-                                 'adddate' DATETIME NULL DEFAULT NULL,
+                                 `adddate` DATETIME NULL DEFAULT NULL,
                                  `source` VARCHAR( 50 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
                                  `releaseID` INT( 11 ) NULL DEFAULT NULL,
 								  PRIMARY KEY (`ID`),
@@ -23,8 +23,8 @@ require_once(WWW_DIR ."/lib/framework/db.php");
                                   KEY 'nfo' ('nfo'(333),
                                   KEY 'source' ('source'),
                                   KEY 'predate' ('predate'),
-                                  KEY 'adddate' ('adddate')),
-								 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+                                  KEY 'adddate' ('adddate'),
+								  ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
 	}
 		
 		
@@ -35,14 +35,14 @@ require_once(WWW_DIR ."/lib/framework/db.php");
 	{			
 		$db = new DB();
 
-		return $db->queryOneRow(sprintf("SELECT count(*) as total FROM prehash WHERE releasename =  %s", $db->escapeString($name)));		
+		return $db->queryOneRow(sprintf("SELECT count(*) as total FROM prehash WHERE title =  %s", $db->escapeString($name)));
 	}
 	
 	
 	function AddRelease($name)
 	{			
 		$db = new DB();
-		return $db->queryInsert(sprintf("INSERT INTO prehash (releasename, hash) VALUES (%s, %s)", $db->escapeString($name), $db->escapeString(md5($name))));		
+		return $db->queryInsert(sprintf("INSERT INTO prehash (title, hash) VALUES (%s, %s)", $db->escapeString($name), $db->escapeString(md5($name))));
 	}
 		
 	
