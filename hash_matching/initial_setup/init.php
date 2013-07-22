@@ -42,7 +42,7 @@ require_once(WWW_DIR ."/lib/framework/db.php");
 	function AddRelease($name)
 	{			
 		$db = new DB();
-		return $db->queryInsert(sprintf("INSERT INTO prehash (title, hash) VALUES (%s, %s)", $db->escapeString($name), $db->escapeString(md5($name))));
+		return $db->queryInsert(sprintf("INSERT INTO prehash (title, nfo, size, category, hash, predate, adddate, source, releaseID) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)", $db->escapeString($name), $db->escapeString(md5($name))));
 	}
 		
 	
