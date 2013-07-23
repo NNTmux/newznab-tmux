@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.1r804a";
+$version="0.1r810";
 
 $db = new DB();
 
@@ -1389,7 +1389,7 @@ if (($array ['HASH'] == "true") || ($array ['AFLY'] == "true") || ($array ['FIXR
 	if (( $array['MAX_LOAD'] >= get_load()) && ((( TIME() - $time24 ) >= $array['HASH_TIMER'] ) || ( $i == 15 )) && ( $array['HASH'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		$log = writelog($panes1[10]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.10 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes1[10] $ds2 && cd $_hash && $_php hash_decrypt.php 2>&1 $log && $ds1 $panes1[10] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.10 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes1[10] $ds2 && cd $_test && $_php hash_decrypt.php 2>&1 $log && $ds1 $panes1[10] $ds3' 2>&1 1> /dev/null");
 		$time24 = TIME();
 	} elseif (( $array['HASH'] != "true" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
