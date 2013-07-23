@@ -43,7 +43,7 @@ Class Predb
 		}
 		$matched = $this->matchPredb();
 		if ($matched > 0 && $this->echooutput)
-			echo "\nMatched ".$matched." predhash titles to release search names.\n";
+			echo "\nMatched ".$matched." prehash titles to release search names.\n";
 		$nfos = $this->matchNfo();
 		if ($nfos > 0 && $this->echooutput)
 			echo "\nAdded ".$nfos." missing NFOs from prehash sources.\n";
@@ -408,7 +408,7 @@ Class Predb
 		$db = new DB();
 		$nfos = 0;
 		if($this->echooutput)
-			echo "Matching up predb NFOs with releases missing an NFO.\n";
+			echo "Matching up prehash NFOs with releases missing an NFO.\n";
 
 		if($res = $db->queryDirect("SELECT r.ID, p.nfo from releases r inner join prehash p on r.ID = p.releaseID where p.nfo is not null and r.nfostatus != 1 limit 100"))
 		{
