@@ -43,10 +43,10 @@ Class Predb
 		}
 		$matched = $this->matchPredb();
 		if ($matched > 0 && $this->echooutput)
-			echo "\nMatched ".$matched." predDB titles to release search names.\n";
+			echo "\nMatched ".$matched." predhash titles to release search names.\n";
 		$nfos = $this->matchNfo();
 		if ($nfos > 0 && $this->echooutput)
-			echo "\nAdded ".$nfos." missing NFOs from preDB sources.\n";
+			echo "\nAdded ".$nfos." missing NFOs from prehash sources.\n";
 		return $newnames;
 	}
 
@@ -351,7 +351,7 @@ Class Predb
 		$db = new DB();
 		$updated = 0;
 		if($this->echooutput)
-			echo "Matching up predb titles with release search names.\n";
+			echo "Matching up prehash titles with release search names.\n";
 
 		//do womble first
 		if($res = $db->queryDirect("SELECT p.ID, p.category, r.ID as releaseID from prehash p inner join releases r on p.title = r.searchname where p.releaseID is null and p.source = 'womble'"))
