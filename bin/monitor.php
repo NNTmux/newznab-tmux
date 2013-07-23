@@ -327,8 +327,8 @@ printf($mask1, "Release Added:", relativeTime("$newestdate")."ago");
 if ($array['PREDB'] = "true"){
     printf($mask1, "Predb Updated:", relativeTime("$newestpredb")."ago");
 }
-if (($array ['HASH']) || ($array ['AFLY']) || ($array ['FIXRELEASES']) == "true"){
-printf($mask1, "Prehash Updated:", relativeTime("$newestprehash")."ago");
+if (($array ['HASH'] == "true") || ($array ['AFLY'] = "true") || ($array ['FIXRELEASES']) == "true"){
+    printf($mask1, "Prehash Updated:", relativeTime("$newestprehash")."ago");
 }
 $mask = "%-15.15s %22.22s %22.22s\n";
 printf("\033[1;33m\n");
@@ -714,7 +714,7 @@ $usptotalconnections  = str_replace("\n", '', shell_exec ("ss -n | grep -c :".NN
     if ($array['PREDB'] = "true"){
     printf($mask1, "Predb Updated:", relativeTime("$newestpredb")."ago");
     }
-if (($array ['HASH']) || ($array ['AFLY']) || ($array ['FIXRELEASES']) == "true") {
+if (($array ['HASH'] == "true") || ($array ['AFLY'] == "true") || ($array ['FIXRELEASES']) == "true") {
     printf($mask1, "Prehash Updated:", relativeTime("$newestprehash")."ago");
     }
 
