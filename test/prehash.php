@@ -144,7 +144,7 @@ Class Predb
 							{
 								$size = $db->escapeString(round($matches2["size1"]).$matches2["size2"]);
 								$title = preg_replace("/  - omgwtfnzbs.org/", "", $matches2["title"]);
-								$db->query(sprintf("INSERT IGNORE INTO predb (title, size, category, predate, adddate, source, hash) VALUES (%s, %s, %s, FROM_UNIXTIME(".strtotime($matches2["date"])."), now(), %s, %s)", $db->escapeString($title), $size, $db->escapeString($matches2["category"]), $db->escapeString("omgwtfnzbs"), $db->escapeString(md5($matches2["title"]))));
+								$db->query(sprintf("INSERT IGNORE INTO prehash (title, size, category, predate, adddate, source, hash) VALUES (%s, %s, %s, FROM_UNIXTIME(".strtotime($matches2["date"])."), now(), %s, %s)", $db->escapeString($title), $size, $db->escapeString($matches2["category"]), $db->escapeString("omgwtfnzbs"), $db->escapeString(md5($matches2["title"]))));
 								$newnames++;
 							}
 						}
@@ -188,7 +188,7 @@ Class Predb
 								else
 									$category = "NULL";
 
-								$db->query(sprintf("INSERT IGNORE INTO predb (title, size, category, predate, adddate, source, hash) VALUES (%s, %s, %s, FROM_UNIXTIME(".strtotime($matches2["date"])."), now(), %s, %s)", $db->escapeString($matches2["title"].$matches2["title2"]), $size, $category, $db->escapeString("zenet"), $db->escapeString(md5($matches2["title"].$matches2["title2"]))));
+								$db->query(sprintf("INSERT IGNORE INTO prehash (title, size, category, predate, adddate, source, hash) VALUES (%s, %s, %s, FROM_UNIXTIME(".strtotime($matches2["date"])."), now(), %s, %s)", $db->escapeString($matches2["title"].$matches2["title2"]), $size, $category, $db->escapeString("zenet"), $db->escapeString(md5($matches2["title"].$matches2["title2"]))));
 								$newnames++;
 							}
 						}
@@ -225,7 +225,7 @@ Class Predb
 								else
 									$size = $db->escapeString(round($matches2["size"]));
 
-								$db->query(sprintf("INSERT IGNORE INTO predb (title, size, category, predate, adddate, source, hash) VALUES (%s, %s, %s, FROM_UNIXTIME(".strtotime($matches2["date"])."), now(), %s, %s)", $db->escapeString($matches2["title"]), $size, $db->escapeString($matches2["category"]), $db->escapeString("prelist"), $db->escapeString(md5($matches2["title"]))));
+								$db->query(sprintf("INSERT IGNORE INTO prehash (title, size, category, predate, adddate, source, hash) VALUES (%s, %s, %s, FROM_UNIXTIME(".strtotime($matches2["date"])."), now(), %s, %s)", $db->escapeString($matches2["title"]), $size, $db->escapeString($matches2["category"]), $db->escapeString("prelist"), $db->escapeString(md5($matches2["title"]))));
 								$newnames++;
 							}
 						}
@@ -238,7 +238,7 @@ Class Predb
 							{
 								$category = $db->escapeString($matches2["category"].", ".$matches2["category1"]);
 
-								$db->query(sprintf("INSERT IGNORE INTO predb (title, category, predate, adddate, source, hash) VALUES (%s, %s, FROM_UNIXTIME(".strtotime($matches2["date"])."), now(), %s, %s)", $db->escapeString($matches2["title"]), $category, $db->escapeString("prelist"), $db->escapeString(md5($matches2["title"]))));
+								$db->query(sprintf("INSERT IGNORE INTO prehash (title, category, predate, adddate, source, hash) VALUES (%s, %s, FROM_UNIXTIME(".strtotime($matches2["date"])."), now(), %s, %s)", $db->escapeString($matches2["title"]), $category, $db->escapeString("prelist"), $db->escapeString(md5($matches2["title"]))));
 								$newnames++;
 							}
 						}
@@ -277,7 +277,7 @@ Class Predb
 									else
 										$size = $db->escapeString($matches2["size"]);
 
-									$db->query(sprintf("INSERT IGNORE INTO predb (title, size, category, predate, adddate, source, hash) VALUES (%s, %s, %s, FROM_UNIXTIME(".strtotime($matches2["date"])."), now(), %s, %s)", $db->escapeString($matches2["title"]), $size, $db->escapeString($matches2["category"]), $db->escapeString("orlydb"), $db->escapeString(md5($matches2["title"]))));
+									$db->query(sprintf("INSERT IGNORE INTO prehash (title, size, category, predate, adddate, source, hash) VALUES (%s, %s, %s, FROM_UNIXTIME(".strtotime($matches2["date"])."), now(), %s, %s)", $db->escapeString($matches2["title"]), $size, $db->escapeString($matches2["category"]), $db->escapeString("orlydb"), $db->escapeString(md5($matches2["title"]))));
 									$newnames++;
 								}
 							}
@@ -303,7 +303,7 @@ Class Predb
 					continue;
 				else
 				{
-					$db->query(sprintf("INSERT IGNORE INTO predb (title, predate, adddate, source, hash) VALUES (%s, FROM_UNIXTIME(".strtotime($release->pubDate)."), now(), %s, %s)", $db->escapeString($release->title), $db->escapeString("srrdb"), $db->escapeString(md5($release->title))));
+					$db->query(sprintf("INSERT IGNORE INTO prehash (title, predate, adddate, source, hash) VALUES (%s, FROM_UNIXTIME(".strtotime($release->pubDate)."), now(), %s, %s)", $db->escapeString($release->title), $db->escapeString("srrdb"), $db->escapeString(md5($release->title))));
 					$newnames++;
 				}
 			}
@@ -328,7 +328,7 @@ Class Predb
 						continue;
 					else
 					{
-						$db->query(sprintf("INSERT IGNORE INTO predb (title, predate, adddate, source, hash) VALUES (%s, now(), now(), %s, %s)", $db->escapeString($release->title), $db->escapeString("predbme"), $db->escapeString(md5($release->title))));
+						$db->query(sprintf("INSERT IGNORE INTO prehash (title, predate, adddate, source, hash) VALUES (%s, now(), now(), %s, %s)", $db->escapeString($release->title), $db->escapeString("predbme"), $db->escapeString(md5($release->title))));
 						$newnames++;
 					}
 				}
