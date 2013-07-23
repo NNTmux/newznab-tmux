@@ -36,7 +36,7 @@ require_once(WWW_DIR ."/lib/category.php");
 		$rel = new Releases();
 		$cat = new Category();
 
-		$cleanRelName = $rel->cleantitle($foundName);
+		$cleanRelName = $rel->cleanReleaseName($foundName);
 		$catid = $cat->determineCategory($groupname, $foundName);
 
 		$db->query(sprintf("UPDATE releases SET name = %s,  searchname = %s, categoryID = %d WHERE ID = %d",  $db->escapeString($cleanRelName),  $db->escapeString($cleanRelName), $catid,  $id));
