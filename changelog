@@ -1,3 +1,7 @@
+23.07.2013	--> Adapted fixReleaseName script from nZEDb to scan nfo's and releasenames and fix them as much as they can be fixed. Removed pre.corrupt net script (pre.php) as it is useless now.
+			--> Added test folder with "files to copy" folder. In that folder are located core newznab files, but if you want to use fixReleaseNames script you have to copy them to their respective folders.
+			--> Be aware that any future update to nn+ could render these scripts unusable.Use them at your own risk.
+			--> There is a bug in init.php. I will fix it later, as original aflys init.php can be used to create prehash table, after that you can use prehash*.sql to update it.
 20.07.2013 	--> fixed bug in prehash, you will need to run this query: update prehash set title = replace (title, '  - omgwtfnzbs.org', '');
 19.07.2013 	--> Removed nzbx_ws_hashdecrypt.php as it is no longer working.
 				Added standalone hash_decrypt.php as a replacement. 

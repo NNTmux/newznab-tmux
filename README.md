@@ -1,5 +1,8 @@
 I have forked jonnyboys newznab-tmux as he and the dev team have moved to another project (https://github.com/nZEDb/nZEDb). I will try as much as i can to maintain and improve these tmux scripts, where possible and needed, as they are a valuable addendum to newznab+.
 Support is given on irc.synirc.net #newznab-tmuxd channel and also on original newznab-tmux channel.
+I started adapting some of more interesting scripts from nZEDb, but they require tempering with newznab database and core newznab files, so use them at your own risk. Any update to nn+ db or core files could render them useless.
+
+
 Below is the original readme of newznab-tmux, with changes related to my git and removal of donation links:
 
 # Newznab-tmux
