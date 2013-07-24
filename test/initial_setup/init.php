@@ -8,23 +8,13 @@ require_once(WWW_DIR ."/lib/framework/db.php");
 		$db = new DB();
 		return $db->query("CREATE TABLE IF NOT EXISTS `prehash` (
   								`ID` int(11) NOT NULL AUTO_INCREMENT,
-								 `title` varchar(1000) COLLATE utf8_unicode_ci NOT NULL,
-                                 `nfo` VARCHAR( 500 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
-                                 `size` VARCHAR( 50 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
-                                 `category` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL DEFAULT NULL,
-								 `hash` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '0',
+								 `releasename` varchar(1000) COLLATE utf8_unicode_ci NOT NULL,
+								 `hash` varchar(32) COLLATE utf8_unicode_ci DEFAULT NULL,
 								 `predate` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
-                                 `adddate` DATETIME NULL DEFAULT NULL,
-                                 `source` VARCHAR( 50 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-                                 `releaseID` INT( 11 ) NULL DEFAULT NULL,
 								  PRIMARY KEY (`ID`),
 								  UNIQUE KEY `hash` (`hash`),
-								  KEY `title` (`title`(333),
-                                  KEY 'nfo' ('nfo'(333),
-                                  KEY 'source' ('source'),
-                                  KEY 'predate' ('predate'),
-                                  KEY 'adddate' ('adddate'),
-								  ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+								  KEY `release` (`releasename`(333))
+								 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");		
 	}
 		
 		
@@ -35,14 +25,14 @@ require_once(WWW_DIR ."/lib/framework/db.php");
 	{			
 		$db = new DB();
 
-		return $db->queryOneRow(sprintf("SELECT count(*) as total FROM prehash WHERE title =  %s", $db->escapeString($name)));
+		return $db->queryOneRow(sprintf("SELECT count(*) as total FROM prehash WHERE releasename =  %s", $db->escapeString($name)));		
 	}
 	
 	
 	function AddRelease($name)
 	{			
 		$db = new DB();
-		return $db->queryInsert(sprintf("INSERT INTO prehash (title, nfo, size, category, hash, predate, adddate, source, releaseID) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)", $db->escapeString($name), $db->escapeString(md5($name))));
+		return $db->queryInsert(sprintf("INSERT INTO prehash (releasename, hash) VALUES (%s, %s)", $db->escapeString($name), $db->escapeString(md5($name))));		
 	}
 		
 	
