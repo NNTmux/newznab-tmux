@@ -494,7 +494,7 @@ Class Predb
 			{
 				if (preg_match("/[a-f0-9]{32}/i", $row["name"], $matches))
 				{
-					$a = $db->query("select title, source from prehash where md5 = '".$matches[0]."'");
+					$a = $db->query("select title, source from prehash where hash = '".$matches[0]."'");
 					foreach ($a as $b)
 					{
 						if ($b["title"] !== $row["searchname"])
