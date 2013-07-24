@@ -294,6 +294,7 @@ $prehash = 0
 
 //formatted  output
 $nfo_diff = number_format( $nfo_remaining_now - $nfo_remaining_start );
+$pre_diff = number_format( $prehash_matched - $prehash_start );
 $console_diff = number_format( $console_releases_proc - $console_releases_proc_start );
 $movie_diff = number_format( $movie_releases_proc - $movie_releases_proc_start );
 $music_diff = number_format( $music_releases_proc - $music_releases_proc_start );
