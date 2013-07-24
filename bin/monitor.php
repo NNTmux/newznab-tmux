@@ -294,7 +294,6 @@ $prehash = 0
 
 //formatted  output
 $nfo_diff = number_format( $nfo_remaining_now - $nfo_remaining_start );
-$pre_diff = number_format( $prehash_matched - $prehash_start );
 $console_diff = number_format( $console_releases_proc - $console_releases_proc_start );
 $movie_diff = number_format( $movie_releases_proc - $movie_releases_proc_start );
 $music_diff = number_format( $music_releases_proc - $music_releases_proc_start );
@@ -318,6 +317,7 @@ $pc_releases_now_formatted = number_format( $pc_releases_now );
 $tvrage_releases_now_formatted = number_format( $tvrage_releases_now );
 $book_releases_now_formatted = number_format( $book_releases_now );
 $misc_releases_now_formatted = number_format( $misc_releases_now );
+$pre_diff = number_format( $prehash_matched - $prehash_start );
 
 
 //create initial display, USP connection count borrowed from nZEDb
@@ -530,13 +530,13 @@ while( $i > 0 )
 	$total_work_now_formatted = number_format($total_work_now);
 
 	$nfo_diff = number_format( $nfo_remaining_now - $nfo_remaining_start );
-    $pre_diff = number_format( $prehash_matched - $prehash_start );
 	$console_diff = number_format( $console_releases_proc - $console_releases_proc_start );
 	$movie_diff = number_format( $movie_releases_proc - $movie_releases_proc_start );
 	$music_diff = number_format( $music_releases_proc - $music_releases_proc_start );
 	$pc_diff = number_format( $pc_releases_proc - $pc_releases_proc_start );
 	$tvrage_diff = number_format( $tvrage_releases_proc - $tvrage_releases_proc_start );
 	$book_diff = number_format( $book_releases_proc - $book_releases_proc_start );
+    $pre_diff = number_format( $prehash_matched - $prehash_start );
 
 	//formatted  output
 	$console_releases_proc_formatted = number_format( $console_releases_proc );
