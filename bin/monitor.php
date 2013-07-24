@@ -292,6 +292,7 @@ $all_groups = 0;
 $backfill_groups =0;
 $prehash_matched = 0;
 $prehash = 0;
+$pre_diff = 0;
 
 //formatted  output
 $pre_diff = number_format( $prehash_matched - $prehash_start );
