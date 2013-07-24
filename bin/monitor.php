@@ -237,6 +237,7 @@ $binaries_total_unformatted = 0;
 $binaries_rows_unformatted = 0;
 $releases_now_formatted = 0;
 $nfo_percent = 0;
+$pre_percent = 0;
 $console_percent = 0;
 $movie_percent = 0;
 $music_percent = 0;
@@ -290,9 +291,10 @@ $active_groups = 0;
 $all_groups = 0;
 $backfill_groups =0;
 $prehash_matched = 0;
-$prehash = 0
+$prehash = 0;
 
 //formatted  output
+$pre_diff = number_format( $prehash_matched - $prehash_start );
 $nfo_diff = number_format( $nfo_remaining_now - $nfo_remaining_start );
 $console_diff = number_format( $console_releases_proc - $console_releases_proc_start );
 $movie_diff = number_format( $movie_releases_proc - $movie_releases_proc_start );
@@ -317,7 +319,7 @@ $pc_releases_now_formatted = number_format( $pc_releases_now );
 $tvrage_releases_now_formatted = number_format( $tvrage_releases_now );
 $book_releases_now_formatted = number_format( $book_releases_now );
 $misc_releases_now_formatted = number_format( $misc_releases_now );
-$pre_diff = number_format( $prehash_matched - $prehash_start );
+
 
 
 //create initial display, USP connection count borrowed from nZEDb
@@ -467,7 +469,7 @@ while( $i > 0 )
 	if ( $i == "1" ) 
 	{
 		if ( @$proc_result[0]['nforemains'] != NULL ) { $nfo_remaining_start = $proc_result[0]['nforemains']; }
-        if ( @$proc_result2[0]['prehash_matched'] != NULL ) { $prehash_start = $proc_result2[0]['prehash_matched']; }
+        if ( @$proc_result[0]['prehash_matched'] != NULL ) { $prehash_start = $proc_result[0]['prehash_matched']; }
 		if ( @$proc_result[0]['console'] != NULL ) { $console_releases_proc_start = $proc_result[0]['console']; }
 		if ( @$proc_result[0]['movies'] != NULL ) { $movie_releases_proc_start = $proc_result[0]['movies']; }
 		if ( @$proc_result[0]['audio'] != NULL ) { $music_releases_proc_start = $proc_result[0]['audio']; }
@@ -517,8 +519,8 @@ while( $i > 0 )
     if ( @$proc_result[0]['all_groups'] != NULL ) { $all_groups = $proc_result[0]['all_groups']; }
     if ( @$proc_result[0]['newestprehash'] ) { $newestprehash = $proc_result[0]['newestprehash']; }
     if ( @$proc_result[0]['newestpredb'] ) { $newestpredb = $proc_result[0]['newestpredb']; }
-    if ( @$proc_result2[0]['prehash'] != NULL ) { $prehash = $proc_result2[0]['prehash']; }
-    if ( @$proc_result2[0]['prehash_matched'] != NULL ) { $prehash_matched = $proc_result2[0]['prehash_matched']; }
+    if ( @$proc_result[0]['prehash'] != NULL ) { $prehash = $proc_result[0]['prehash']; }
+    if ( @$proc_result[0]['prehash_matched'] != NULL ) { $prehash_matched = $proc_result[0]['prehash_matched']; }
 
 	//calculate releases difference
 	$releases_misc_diff = number_format( $releases_now - $releases_start );
@@ -582,6 +584,7 @@ while( $i > 0 )
 		$misc_percent = sprintf( "%02s", floor(( $misc_releases_now / $releases_now) * 100 ));
 	} else {
 		$nfo_percent = 0;
+        $pre_percent = 0;
 		$console_percent = 0;
 		$movie_percent = 0;
 		$music_percent = 0;
