@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.1r811";
+$version="0.1r811a";
 
 $db = new DB();
 
@@ -357,7 +357,9 @@ printf("\033[1;33m\n");
 printf($mask, "Category", "In Process", "In Database");
 printf($mask, "====================", "====================", "====================");
 printf("\033[38;5;214m");
+if (($array ['HASH'] == "true") || ($array ['AFLY'] = "true") || ($array ['FIXRELEASES']) == "true"){
 printf($mask, "prehash",number_format($prehash - $prehash_matched)."(".$pre_diff.")",number_format($prehash_matched)."(".$pre_percent."%)");
+}
 printf($mask, "NFO's","$nfo_remaining_now_formatted($nfo_diff)","$nfo_now_formatted($nfo_percent%)");
 printf($mask, "Console(1000)","$console_releases_proc_formatted($console_diff)","$console_releases_now_formatted($console_percent%)");
 printf($mask, "Movie(2000)","$movie_releases_proc_formatted($movie_diff)","$movie_releases_now_formatted($movie_percent%)");
@@ -740,7 +742,7 @@ if (($array ['HASH'] == "true") || ($array ['AFLY'] == "true") || ($array ['FIXR
 	printf($mask, "Binaries", "$binaries_state", "$binaries_reason");
 	printf($mask, "Backfill", "$backfill_state", "$backfill_reason");
 	printf($mask, "Import", "$import_state", "$import_reason");
-        printf($mask, "Releases", "$releases_state", "$releases_reason");
+    printf($mask, "Releases", "$releases_state", "$releases_reason");
 	printf($mask, "Parts", "$parts_size_gb", "$parts_rows rows");
 	printf($mask, "Binaries", "$binaries_size_gb", $binaries_rows."/".$binaries_total." bins");
 	if ( $array['RAMDISK_PATH'] != "" ) {
@@ -751,7 +753,9 @@ if (($array ['HASH'] == "true") || ($array ['AFLY'] == "true") || ($array ['FIXR
 	printf($mask, "Category", "In Process", "In Database");
 	printf($mask, "====================", "====================", "====================");
 	printf("\033[38;5;214m");
+    if (($array ['HASH'] == "true") || ($array ['AFLY'] = "true") || ($array ['FIXRELEASES']) == "true"){
     printf($mask, "prehash","~".number_format($prehash - $prehash_matched)."(".$pre_diff.")",number_format($prehash_matched)."(".$pre_percent."%)");
+}
 	printf($mask, "NFO's","$nfo_remaining_now_formatted($nfo_diff)","$nfo_now_formatted($nfo_percent%)");
 	printf($mask, "Console(1000)","$console_releases_proc_formatted($console_diff)","$console_releases_now_formatted($console_percent%)");
 	printf($mask, "Movie(2000)","$movie_releases_proc_formatted($movie_diff)","$movie_releases_now_formatted($movie_percent%)");
