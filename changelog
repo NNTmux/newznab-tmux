@@ -1,3 +1,6 @@
+24.07.2013	-->	Added lines to fix_files.sh so the needed files are copied when the script is run. Updated monitor.php to show prehash database status.If no hash matching, name fixing scripts are enabled, this information
+			-->	will not be shown.
+			--> Added another prehash table update.
 23.07.2013.1	--> Switched to hash_decrypt.php from testing folder, changes to nn+ db and core files are mandatory for new scripts to work. 
 23.07.2013	--> Adapted fixReleaseName script from nZEDb to scan nfo's and releasenames and fix them as much as they can be fixed. Removed pre.corrupt net script (pre.php) as it is useless now.
 			--> Added test folder with "files to copy" folder. In that folder are located core newznab files, but if you want to use fixReleaseNames script you have to copy them to their respective folders.
