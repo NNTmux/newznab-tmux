@@ -518,7 +518,7 @@ Class Predb
 									"New cat:  ".$category->getNameByID($determinedcat)."\n".
 									"Old cat:  ".$category->getNameByID($row["categoryID"])."\n".
 									"Group:    ".$groups->getByNameByID($row["groupID"])."\n".
-									"Method:   "."prehsh md5 release name: ".$b["source"]."\n"."\n";
+									"Method:   "."prehash md5 release name: ".$b["source"]."\n"."\n";
 							}
 							$updated++;
 						}
