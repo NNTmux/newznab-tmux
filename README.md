@@ -113,7 +113,7 @@ Below is the original readme of newznab-tmux, with changes related to my git and
 If you want to donate please click on donate button
 
 <a style="float:right;" href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=7MQLC6ZLSQMKE"><img src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" alt="PayPal - The safer, easier way to pay online!" /></a>
-
+<a href='http://www.pledgie.com/campaigns/21167'><img alt='Click here to lend your support to: Newznab-tmux continued and make a donation at www.pledgie.com !' src='http://www.pledgie.com/campaigns/21167.png?skin_name=chrome' border='0' /></a>
 
 
 
