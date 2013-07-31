@@ -323,7 +323,7 @@ $misc_releases_now_formatted = number_format( $misc_releases_now );
 
 
 
-//create initial display, USP connection count borrowed from nZEDb
+//create initial display, USP connection count, prehash count and groups count adapted from nZEDb
 passthru('clear');
 //printf("\033[1;31m  First insert:\033[0m ".relativeTime("$firstdate")."\n");
 $mask1 = "\033[1;33m%-16s \033[38;5;214m%-49.49s \n";
