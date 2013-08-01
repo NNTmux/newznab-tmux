@@ -76,7 +76,7 @@ $_hash = dirname (__FILE__)."/../hash_matching";
 $_test = dirname (__FILE__)."/../test";
 $_user = dirname(__FILE__)."/../user_scripts";
 $_temp = dirname(__FILE__)."/../bin/temp";
-$_sleep = "$_php dirname (__FILE__)/../test/showsleep.php";
+$_sleep = "$_php dirname (__FILE__)./../test/showsleep.php";
 
 $NNPATH="{$array['NEWZPATH']}{$array['NEWZNAB_PATH']}";
 $TESTING="{$array['NEWZPATH']}{$array['TESTING_PATH']}";
