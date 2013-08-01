@@ -76,7 +76,7 @@ $_hash = dirname (__FILE__)."/../hash_matching";
 $_test = dirname (__FILE__)."/../test";
 $_user = dirname(__FILE__)."/../user_scripts";
 $_temp = dirname(__FILE__)."/../bin/temp";
-$_sleep = "$_php dirname (__FILE__)./../test/showsleep.php";
+$_sleep = dirname(__FILE__)."/../test/showsleep.php";
 
 $NNPATH="{$array['NEWZPATH']}{$array['NEWZNAB_PATH']}";
 $TESTING="{$array['NEWZPATH']}{$array['TESTING_PATH']}";
@@ -992,7 +992,7 @@ if (($array ['HASH'] == "true") || ($array ['AFLY'] == "true") || ($array ['FIXR
 		if (( $array['MAX_LOAD'] >= get_load()) && ( $killed != "true" ) && ( $array['BINARIES'] == "true" ) && (( $binaries_rows_unformatted < $array['BINARIES_MAX_BINS'] ) || ( $array['BINARIES_MAX_BINS'] == 0 )) && (( $total_work_used < $array['BINARIES_MAX_RELEASES'] ) || ( $array['BINARIES_MAX_RELEASES'] == 0 )) && (( $parts_rows_unformatted < $array['BINARIES_MAX_ROWS'] ) || ( $array['BINARIES_MAX_ROWS'] == 0 )) && ( $optimize_safe_to_run != "true" )) {
 			$color = get_color();
 			$log = writelog($panes0[2]);
-			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.2 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[2] $ds2 && $_update_cmd 2>&1 $log && echo \" \033[1;0;33m\" && echo \"sleeping\033[38;5;\"$color\"m $_sleep {$array['BINARIES_SLEEP']} seconds...\" && sleep {$array['BINARIES_SLEEP']} && $ds1 $panes0[2] $ds3' 2>&1 1> /dev/null");
+			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.2 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[2] $ds2 && $_update_cmd 2>&1 $log && echo \" \033[1;0;33m\" && echo \"sleeping\033[38;5;\"$color\"m $_php $_sleep {$array['BINARIES_SLEEP']} seconds...\" && sleep {$array['BINARIES_SLEEP']} && $ds1 $panes0[2] $ds3' 2>&1 1> /dev/null");
 		} elseif (( $parts_rows_unformatted > $array['BINARIES_MAX_ROWS'] ) && ( $array['BINARIES'] == "true" ) && ( $array['BINARIES_MAX_ROWS'] != 0 ) && ( $optimize_safe_to_run != "true" )) {
 			$color = get_color();
 			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.2 'echo \"\033[38;5;\"$color\"m\nBINARIES_MAX_ROWS exceeded\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
