@@ -325,6 +325,13 @@ export HASH_TIMER="3600"
 
 ############################################################
 
+#run removeCrapRelesases.php every 48 hours.
+export REMOVECRAP="false"
+#How often to run this script in seconds, default is 48 hours
+export REMOVECRAP_TIMER="172800"
+
+############################################################
+
 #choose to use aflys md5 matching scripts. Scripts run every 10 minutes, 
 #this value should not be changed, we don't want to hammer information providers. 
 #Before you use these scripts execute php init.php datafile.txt from /hash_matching/initial_setup/ folder
