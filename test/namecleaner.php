@@ -5,7 +5,7 @@ require_once("prehash.php");
 
 
 
-//This script is adapted from nZEDb
+//  This script is adapted from nZEDb
 //
 //	Cleans names for releases/imports/namefixer
 //
@@ -86,8 +86,8 @@ class nameCleaning
 			//<<<>>>kosova-shqip.eu<<< Deep SWG - 90s Club Megamix 2011 >>>kosova-shqip.eu<<<<<< - (2/4) - "Deep SWG - 90s Club Megamix 2011.rar" yEnc
 			else if (preg_match('/^<<<>>>kosova-shqip\.eu<<< (.+?) >>>kosova-shqip.eu<<<<<< - \(\d+\/\d+\) - ".+?" yEnc$/', $subject, $match))
 				return $match[1];
-			//<Have Fun> [02/39] - SpongeBoZZ yEnc
-			else if (preg_match('/^<Have Fun> \[\d+\/\d+\] - (.+?) yEnc$/', $subject, $match))
+		   //<Have Fun> "Invader.German.2012.PAL.DVDR-MORTAL.nfo" SpongeBoZZ yEnc
+			else if (preg_match('/^<Have Fun> "(.+?)(\.part(\d+)?)?(\.vol.+?"|\.[A-Za-z0-9]{2,4}"|") SpongeBoZZ yEnc$/', $subject, $match))
 				return $match[1].$match[2];
 			else
 				return $this->releaseCleanerHelper($subject);
