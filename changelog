@@ -1,3 +1,6 @@
+05.08.2012	--> Updated namecleaner.php, removed aflys init.php and added new create_prehash_table.sql. 
+			-->	Added prehash sql files to import manualy predb data for prehash table. Do not do it unless you want to mess with prehash table, 
+			-->	as it needs removal of primary key and removal of id column before you can import those. And you need to add those back later (id and primary key).
 24.07.2013	-->	Added lines to fix_files.sh so the needed files are copied when the script is run. Updated monitor.php to show prehash database status.If no hash matching, name fixing scripts are enabled, this information
 			-->	will not be shown.
 			--> Added another prehash table update.
