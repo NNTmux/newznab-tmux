@@ -146,9 +146,13 @@ else
     $TMUXCMD splitw -v -p 50 'printf "\033]2;processUnwanted\033\\"'
 	
 	$TMUXCMD new-window -n other2 'printf "\033]2;PreHashScripts\033\\"'
+	$TMUXCMD selectp -t 0
+	$TMUXCMD splitw -v -p 50 'printf "\033]2;removeCrapReleses\033\\"'
+	$TMUXCMD selectp -t 0
     $TMUXCMD splitw -h -p 66 'printf "\033]2;AflyPreDB\033\\"'
     $TMUXCMD selectp -t 1
     $TMUXCMD splitw -h -p 50 'printf "\033]2;FixReleaseNames\033\\"'
+	
    
 
     if [[ $USE_HTOP == "true" ]]; then
