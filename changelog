@@ -1,3 +1,5 @@
+05.08.2013-1 --> Added removeCrapReleases.php to test folder. It needs a modified releases.php that will be copied if you run fix_files.sh. You can run it manualy, type php removeCrapReleases.php to see all the options. 
+			--> Script runs in true full mode from tmux. If you don't want that, disable it in your defaults.sh and run it manualy.
 05.08.2012	--> Updated namecleaner.php, removed aflys init.php and added new create_prehash_table.sql. 
 			-->	Added prehash sql files to import manualy predb data for prehash table. Do not do it unless you want to mess with prehash table, 
 			-->	as it needs removal of primary key and removal of id column before you can import those. And you need to add those back later (id and primary key).
