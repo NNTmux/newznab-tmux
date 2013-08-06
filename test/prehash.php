@@ -554,14 +554,15 @@ Class Predb
 							}
 							$updated++;
 						}
-                        else
-                             echo "Nothing to fix.\n";
 					}
 				}
 			}
 		}
-		return $updated;
-	}
+        else
+            echo "Nothing to fix.\n";
+    return $updated;
+    }
+
 
 	public function getAll($offset, $offset2)
 	{
