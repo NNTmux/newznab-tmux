@@ -1,3 +1,5 @@
+06.08.2013	-->	Updated namecleaner, changed removecrap timer to 2 hours by default and it is run every 40 seconds, added custom updateCategories.php to test folder - updates categories in last 6 hours, not the whole db. 
+			--> Updated tmux packages to 1.8-4 built on 02.08.2013, install using 'sudo dpkg -i tmux_1.8-4.deb'
 05.08.2013-1 --> Added removeCrapReleases.php to test folder. It needs a modified releases.php that will be copied if you run fix_files.sh. You can run it manualy, type php removeCrapReleases.php to see all the options. 
 			--> Script runs in true full mode from tmux. If you don't want that, disable it in your defaults.sh and run it manualy.
 05.08.2012	--> Updated namecleaner.php, removed aflys init.php and added new create_prehash_table.sql. 

@@ -87,7 +87,7 @@ class Namefixer
             else
                 echo $this->fixed." releases could have their names changed. ".$this->checked." NFO's were checked.\n";
         }
-        else
+        else 
             echo "Nothing to fix.\n";
     }
 

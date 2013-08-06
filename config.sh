@@ -325,10 +325,11 @@ export HASH_TIMER="3600"
 
 ############################################################
 
-#run removeCrapRelesases.php every 48 hours.
+#run removeCrapRelesases.php every 40 seconds. Removes crap in last 2 hours by default.
+#If you want to remove more, run it manually from test folder.
 export REMOVECRAP="false"
-#How often to run this script in seconds, default is 48 hours
-export REMOVECRAP_TIMER="172800"
+#How often to run this script in seconds, default is 40 seconds
+export REMOVECRAP_TIMER="40"
 
 ############################################################
 
