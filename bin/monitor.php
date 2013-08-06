@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.1r812";
+$version="0.1r812a";
 
 $db = new DB();
 
@@ -1776,7 +1776,7 @@ if (($array ['HASH'] == "true") || ($array ['AFLY'] == "true") || ($array ['FIXR
 	if (( $array['MAX_LOAD'] >= get_load()) && (( TIME() - $time27 ) >= $array['FIXRELEASES_TIMER'] ) && ( $array['FIXRELEASES'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		$log = writelog($panes6[2]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:6.2 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes6[2] $ds2 && cd $_test && $_php postprocess_pre.php 2>&1 $log && $_php fixReleaseNames.php 3 true other yes 2>&1 $log && $_php fixReleaseNames.php 5 true other yes 2>&1 $log && cd $TESTING && $_php updateCategories.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes6[2] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:6.2 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes6[2] $ds2 && cd $_test && $_php postprocess_pre.php 2>&1 $log && $_php fixReleaseNames.php 1 true other yes 2>&1 $log && $_php fixReleaseNames.php 3 true other yes 2>&1 $log && $_php fixReleaseNames.php 5 true other yes 2>&1 $log && $_php updateCategories.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes6[2] $ds3' 2>&1 1> /dev/null");
 		$time27 = TIME();
 	} elseif (( $array['FIXRELEASES'] == "true" ) && ( $optimize_safe_to_run != "true" ) && ( $array['MAX_LOAD'] >= get_load())) {
 		$color = get_color();
@@ -1796,7 +1796,7 @@ if (($array ['HASH'] == "true") || ($array ['AFLY'] == "true") || ($array ['FIXR
 	if (( $array['MAX_LOAD'] >= get_load()) && (( TIME() - $time29 ) >= $array['REMOVECRAP_TIMER'] ) && ( $array['REMOVECRAP'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		$log = writelog($panes6[3]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:6.3 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes6[3] $ds2 && cd $_test &&  $_php removeCrapReleases.php true full 2>&1 $log echo \" \033[1;0;33m\" && $ds1 $panes6[3] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:6.3 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes6[3] $ds2 && cd $_test &&  $_php removeCrapReleases.php true 48 2>&1 $log echo \" \033[1;0;33m\" && $ds1 $panes6[3] $ds3' 2>&1 1> /dev/null");
 		$time28 = TIME();
 	} elseif (( $array['REMOVECRAP'] == "true" ) && ( $optimize_safe_to_run != "true" ) && ( $array['MAX_LOAD'] >= get_load())) {
 		$color = get_color();

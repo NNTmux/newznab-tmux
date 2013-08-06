@@ -551,15 +551,18 @@ Class Predb
 									"Old cat:  ".$category->getNameByID($row["categoryID"])."\n".
 									"Group:    ".$groups->getByNameByID($row["groupID"])."\n".
 									"Method:   "."prehash md5 file name: ".$b["source"]."\n"."\n";
-							}
+							} 
 							$updated++;
 						}
 					}
 				}
 			}
 		}
-		return $updated;
-	}
+        else
+            echo "Nothing to fix.\n";
+    return $updated;
+    }
+
 
 	public function getAll($offset, $offset2)
 	{
