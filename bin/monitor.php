@@ -1797,7 +1797,7 @@ if (($array ['HASH'] == "true") || ($array ['AFLY'] == "true") || ($array ['FIXR
 		$color = get_color();
 		$log = writelog($panes6[3]);
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:6.3 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes6[3] $ds2 && cd $_test &&  $_php removeCrapReleases.php true 2 2>&1 $log echo \" \033[1;0;33m\" && $ds1 $panes6[3] $ds3' 2>&1 1> /dev/null");
-		$time28 = TIME();
+		$time29 = TIME();
 	} elseif (( $array['REMOVECRAP'] == "true" ) && ( $optimize_safe_to_run != "true" ) && ( $array['MAX_LOAD'] >= get_load())) {
 		$color = get_color();
 		$run_time = relativeTime( $array['REMOVECRAP_TIMER'] + $time29 );
