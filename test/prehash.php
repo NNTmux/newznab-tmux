@@ -554,6 +554,8 @@ Class Predb
 							}
 							$updated++;
 						}
+                        else
+                             echo "Nothing to fix.\n";
 					}
 				}
 			}
