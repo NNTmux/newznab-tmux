@@ -12,7 +12,7 @@ require_once("prehash.php");
 class nameCleaning
 {
 
-   	//
+   		//
 	//	Cleans a usenet subject before inserting, used for searchname. Also used for imports.
 	//
 	public function releaseCleaner($subject, $groupID)
@@ -406,6 +406,18 @@ class nameCleaning
 				return $match[1];
 			//(28/55) "Ivan Neville - If My Ancestors Could See Me Now.par2" - 624,44 MB - yEnc
 			else if (preg_match('/^\(\d+\/\d+\) "(.+?)(\.part(\d+)?|\.rar)?(\.vol.+?"|\.[A-Za-z0-9]{2,4}"|") - \d+[,.]\d+ [mMkKgG][bB] - yEnc$/', $subject, $match))
+				return $match[1];
+			else
+				return $this->releaseCleanerHelper($subject);
+		}
+		else if ($groupName === "alt.binaries.chello")
+		{
+			//0F623Uv71RHKt0jzA7inbGZLk00[2/5] - "l2iOkRvy80bgLrZm1xxw.par2" yEnc
+			//GMC2G8KixJKy [01/15] - "GMC2G8KixJKy.part1.rar" yEnc
+			if (preg_match('/^([A-Za-z0-9]{5,}) ?\[\d+\/\d+\] - "[A-Za-z0-9]{3,}.+?" yEnc$/', $subject, $match))
+				return $match[1];
+			//Siberian Mouses LS, BD models and special... [150/152] - "Xlola - Luba, Sasha & Vika.avi.jpg" yEnc
+			else if (preg_match('/^([A-Za-z0-9-]+ .+?)[. ]\[\d+\/\d+\] - ".+?" yEnc$/', $subject, $match))
 				return $match[1];
 			else
 				return $this->releaseCleanerHelper($subject);
