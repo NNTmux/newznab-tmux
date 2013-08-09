@@ -1,3 +1,4 @@
+09.08.2013 	-->	Updated monitor and namecleaner
 07.08.2013	--> Updates to namecleaner, changed displayed info in postprocessing panes due to changes to in latest update of nn+
 
 06.08.2013	-->	Updated namecleaner, changed removecrap timer to 2 hours by default and it is run every 40 seconds, added custom updateCategories.php to test folder - updates categories in last 6 hours, not the whole db. 
