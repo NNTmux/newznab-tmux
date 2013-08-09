@@ -1,1 +1,0 @@
-ALTER TABLE  `prehash` CHANGE  `releasename`  `title` VARCHAR( 1000 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL;
