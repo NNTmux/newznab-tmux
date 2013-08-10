@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.1r820b";
+$version="0.1r821";
 
 $db = new DB();
 $DIR = dirname (__FILE__);
@@ -14,6 +14,7 @@ $proc = "SELECT
 ( SELECT COUNT( groupID ) AS cnt from releases where consoleinfoID IS NULL and categoryID BETWEEN 1000 AND 1999 ) AS console,
 ( SELECT COUNT( groupID ) AS cnt from releases where imdbID IS NULL and categoryID BETWEEN 2000 AND 2999 ) AS movies,
 ( SELECT COUNT( groupID ) AS cnt from releases where musicinfoID IS NULL and categoryID BETWEEN 3000 AND 3999 ) AS audio,
+( SELECT COUNT( groupID ) AS cnt from releases where categoryID BETWEEN 6000 AND 6999 ) AS xxx,
 (SELECT COUNT( groupID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (categoryID BETWEEN 4000 AND 4999 and ((r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)))) AS pc,
 ( SELECT COUNT( groupID ) AS cnt from releases where rageID = -1 and categoryID BETWEEN 5000 AND 5999 ) AS tv,
 ( SELECT COUNT( groupID ) AS cnt from releases where bookinfoID IS NULL and categoryID = 7020 ) AS book,
@@ -212,6 +213,7 @@ $movie_releases_now = 0;
 $music_releases_now = 0;
 $pc_releases_now = 0;
 $tvrage_releases_now = 0;
+$xxx_releases_now = 0;
 $book_releases_now = 0;
 $misc_releases_now = 0;
 $console_releases_proc = 0;
@@ -219,6 +221,7 @@ $movie_releases_proc = 0;
 $music_releases_proc = 0;
 $pc_releases_proc = 0;
 $tvrage_releases_proc = 0;
+$xxx_releases_proc = 0;
 $work_remaining_now = 0;
 $book_releases_proc = 0;
 $releases_loop = 0;
@@ -246,6 +249,7 @@ $movie_percent = 0;
 $music_percent = 0;
 $pc_percent = 0;
 $tvrage_percent = 0;
+$xxx_percent = 0;
 $book_percent = 0;
 $misc_percent = 0;
 $releases_since_start = 0;
@@ -269,6 +273,7 @@ $movie_releases_start = 0;
 $music_releases_start = 0;
 $pc_releases_start = 0;
 $tvrage_releases_start = 0;
+$xxx_releases_start = 0;
 $book_releases_start = 0;
 $misc_releases_start = 0;
 $nfo_start = 0;
@@ -278,6 +283,7 @@ $movie_releases_proc_start = 0;
 $music_releases_proc_start = 0;
 $pc_releases_proc_start = 0;
 $tvrage_releases_proc_start = 0;
+$xxx_releases_proc_start = 0;
 $book_releases_proc_start = 0;
 $work_remaining_start = 0;
 $misc_diff = 0;
@@ -305,6 +311,7 @@ $movie_diff = number_format( $movie_releases_proc - $movie_releases_proc_start )
 $music_diff = number_format( $music_releases_proc - $music_releases_proc_start );
 $pc_diff = number_format( $pc_releases_proc - $pc_releases_proc_start );
 $tvrage_diff = number_format( $tvrage_releases_proc - $tvrage_releases_proc_start );
+$xxx_diff = number_format ( $xxx_releases_proc - $xxx_releases_proc_start );
 $book_diff = number_format( $book_releases_proc - $book_releases_proc_start );
 $remaning_since_start = number_format( $work_remaining_now - $work_remaining_start );
 $console_releases_proc_formatted = number_format( $console_releases_proc );
@@ -312,6 +319,7 @@ $movie_releases_proc_formatted = number_format( $movie_releases_proc );
 $music_releases_proc_formatted = number_format( $music_releases_proc );
 $pc_releases_proc_formatted = number_format( $pc_releases_proc );
 $tvrage_releases_proc_formatted = number_format( $tvrage_releases_proc );
+$xxx_releases_proc_formatted = number_format ($xxx_releases_proc );
 $misc_remaining_now_formatted = number_format( $work_remaining_now );
 $book_releases_proc_formatted = number_format( $book_releases_proc );
 $nfo_remaining_now_formatted = number_format( $nfo_remaining_now );
@@ -321,6 +329,7 @@ $movie_releases_now_formatted = number_format( $movie_releases_now );
 $music_releases_now_formatted = number_format( $music_releases_now );
 $pc_releases_now_formatted = number_format( $pc_releases_now );
 $tvrage_releases_now_formatted = number_format( $tvrage_releases_now );
+$xxx_releases_now_formatted = number_format ( $xxx_releases_now );
 $book_releases_now_formatted = number_format( $book_releases_now );
 $misc_releases_now_formatted = number_format( $misc_releases_now );
 
@@ -369,6 +378,7 @@ printf($mask, "Movie(2000)","$movie_releases_proc_formatted($movie_diff)","$movi
 printf($mask, "Audio(3000)","$music_releases_proc_formatted($music_diff)","$music_releases_now_formatted($music_percent%)");
 printf($mask, "PC(4000)","$pc_releases_proc_formatted($pc_diff)","$pc_releases_now_formatted($pc_percent%)");
 printf($mask, "TVShows(5000)","$tvrage_releases_proc_formatted($tvrage_diff)","$tvrage_releases_now_formatted($tvrage_percent%)");
+printf($mask, "XXX(6000)","$xxx_releases_proc_formatted($xxx_diff)","$xxx_releases_now_formatted($xxx_percent%)");
 printf($mask, "Books(7000)","$book_releases_proc_formatted($book_diff)","$book_releases_now_formatted($book_percent%)");
 printf($mask, "Misc(8000)","$misc_remaining_now_formatted($misc_diff)","$misc_releases_now_formatted($misc_percent%)");
 printf($mask, "Total", "$total_work_now_formatted($work_diff)", "$releases_now_formatted($releases_since_start)");
@@ -483,6 +493,7 @@ while( $i > 0 )
 		if ( @$proc_result[0]['tv'] != NULL ) { $tvrage_releases_proc_start = $proc_result[0]['tv']; }
 		if ( @$proc_result[0]['book'] != NULL ) { $book_releases_proc_start = $proc_result[0]['book']; }
 		if ( @$proc_result[0]['work'] != NULL ) { $work_remaining_start = $proc_result[0]['work']; }
+        if ( @$proc_result[0]['xxx'] != NULL ) { $xxx_releases_proc_start = $proc_result[0]['xxx']; }
 	}
 
 	//get values from $qry
@@ -491,6 +502,7 @@ while( $i > 0 )
 	if ( @$initquery['3000'] != NULL ) { $music_releases_now = $initquery['3000']; }
 	if ( @$initquery['4000'] != NULL ) { $pc_releases_now = $initquery['4000']; }
 	if ( @$initquery['5000'] != NULL ) { $tvrage_releases_now = $initquery['5000']; }
+    if ( @$initquery['6000'] != NULL ) { $xxx_releases_now = $initquery['6000']; }
 	if ( @$initquery['7000'] != NULL ) { $book_releases_now = $initquery['7000']; }
 	if ( @$initquery['8000'] != NULL ) { $misc_releases_now = $initquery['8000']; }
 
@@ -501,6 +513,7 @@ while( $i > 0 )
 	if ( @$proc_result[0]['audio'] != NULL ) { $music_releases_proc = $proc_result[0]['audio']; }
 	if ( @$proc_result[0]['pc'] != NULL ) { $pc_releases_proc = $proc_result[0]['pc']; }
 	if ( @$proc_result[0]['tv'] != NULL ) { $tvrage_releases_proc = $proc_result[0]['tv']; }
+    if ( @$proc_result[0]['xxx'] != NULL ) { $xxx_releases_proc = $proc_result[0]['xxx']; }
 	if ( @$proc_result[0]['book'] != NULL ) { $book_releases_proc = $proc_result[0]['book']; }
 	if ( @$proc_result[0]['work'] != NULL ) { $work_remaining_now = $proc_result[0]['work']; }
 	if ( @$proc_result[0]['releases'] != NULL ) { $releases_loop = $proc_result[0]['releases']; }
@@ -533,7 +546,7 @@ while( $i > 0 )
 	$releases_since_start = number_format( $releases_now - $releases_start );
 	$work_misc_diff = $work_remaining_now - $work_remaining_start;
 
-	$total_work_now = $work_remaining_now + $tvrage_releases_proc + $music_releases_proc + $movie_releases_proc + $console_releases_proc + $book_releases_proc + $nfo_remaining_now;
+	$total_work_now = $work_remaining_now + $tvrage_releases_proc + $music_releases_proc + $movie_releases_proc + $console_releases_proc + $book_releases_proc + $xxx_releases_proc + $nfo_remaining_now;
 	if ( $i == 1 ) { $total_work_start = $total_work_now; }
 	$total_work_now_formatted = number_format($total_work_now);
 
@@ -543,6 +556,7 @@ while( $i > 0 )
 	$music_diff = number_format( $music_releases_proc - $music_releases_proc_start );
 	$pc_diff = number_format( $pc_releases_proc - $pc_releases_proc_start );
 	$tvrage_diff = number_format( $tvrage_releases_proc - $tvrage_releases_proc_start );
+    $xxx_diff = number_format (xxx_releases_proc - $xxx_releases_proc_start );
 	$book_diff = number_format( $book_releases_proc - $book_releases_proc_start );
     $pre_diff = number_format( $prehash_matched - $prehash_start );
 
@@ -552,6 +566,7 @@ while( $i > 0 )
 	$music_releases_proc_formatted = number_format( $music_releases_proc );
 	$pc_releases_proc_formatted = number_format( $pc_releases_proc );
 	$tvrage_releases_proc_formatted = number_format( $tvrage_releases_proc );
+    $xxx_releases_proc_formatted = number_format ( $xxx_releases_proc );
 	$misc_remaining_now_formatted = number_format( $work_remaining_now );
 	$book_releases_proc_formatted = number_format( $book_releases_proc );
 	$nfo_remaining_now_formatted = number_format( $nfo_remaining_now );
@@ -561,6 +576,7 @@ while( $i > 0 )
 	$music_releases_now_formatted = number_format( $music_releases_now );
 	$pc_releases_now_formatted = number_format( $pc_releases_now );
 	$tvrage_releases_now_formatted = number_format( $tvrage_releases_now );
+    $xxx_releases_now_formatted = number_format ( $xxx_releases_now );
 	$book_releases_now_formatted = number_format( $book_releases_now );
 	$misc_releases_now_formatted = number_format( $misc_releases_now );
 	$misc_diff = number_format( $work_remaining_now - $work_start );
@@ -586,6 +602,7 @@ while( $i > 0 )
 		$music_percent = sprintf( "%02s", floor(( $music_releases_now / $releases_now) * 100 ));
 		$pc_percent = sprintf( "%02s", floor(( $pc_releases_now / $releases_now) * 100 ));
 		$tvrage_percent = sprintf( "%02s", floor(( $tvrage_releases_now / $releases_now) * 100 ));
+        $xxx_percent = sprintf( "%02s", floor(( $xxx_releases_now / $releases_now) * 100 ));
 		$book_percent = sprintf( "%02s", floor(( $book_releases_now / $releases_now) * 100 ));
 		$misc_percent = sprintf( "%02s", floor(( $misc_releases_now / $releases_now) * 100 ));
 	} else {
@@ -596,6 +613,7 @@ while( $i > 0 )
 		$music_percent = 0;
 		$pc_percent = 0;
 		$tvrage_percent = 0;
+        $xxx_percent = 0;
 		$book_percent = 0;
 		$misc_percent = 0;
 	}
@@ -765,6 +783,7 @@ if (($array ['HASH'] == "true") || ($array ['AFLY'] == "true") || ($array ['FIXR
 	printf($mask, "Audio(3000)","$music_releases_proc_formatted($music_diff)","$music_releases_now_formatted($music_percent%)");
 	printf($mask, "PC(4000)","$pc_releases_proc_formatted($pc_diff)","$pc_releases_now_formatted($pc_percent%)");
 	printf($mask, "TVShows(5000)","$tvrage_releases_proc_formatted($tvrage_diff)","$tvrage_releases_now_formatted($tvrage_percent%)");
+    printf($mask, "XXX(6000)","$xxx_releases_proc_formatted($xxx_diff)","$xxx_releases_now_formatted($xxx_percent%)");
 	printf($mask, "Books(7000)","$book_releases_proc_formatted($book_diff)","$book_releases_now_formatted($book_percent%)");
 	printf($mask, "Misc(8000)","$misc_remaining_now_formatted($misc_diff)","$misc_releases_now_formatted($misc_percent%)");
 	printf($mask, "Total", "$total_work_now_formatted($work_diff)", "$releases_now_formatted($releases_since_start)");
@@ -1510,7 +1529,7 @@ if (($array ['HASH'] == "true") || ($array ['AFLY'] == "true") || ($array ['FIXR
 	if (( $array['MAX_LOAD'] >= get_load()) && ( $music_releases_proc > 0 ) && ( $array['MUSIC'] != "0" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		$log = writelog($panes4[3]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:4.3 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes4[3] $ds2 && cd $_bin && $_php processMusic.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes4[3] $ds3' 2>&1 1> /dev/null"); 
+		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:4.3 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes4[3] $ds2 && cd $_bin && $_php processMusic.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes4[3] $ds3' 2>&1 1> /dev/null");
 	} elseif (( $array['MUSIC'] == "0" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:4.3 'echo \"\033[38;5;\"$color\"m\n$panes4[3] Disabled by MUSIC\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
