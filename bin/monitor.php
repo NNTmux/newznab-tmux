@@ -556,7 +556,7 @@ while( $i > 0 )
 	$music_diff = number_format( $music_releases_proc - $music_releases_proc_start );
 	$pc_diff = number_format( $pc_releases_proc - $pc_releases_proc_start );
 	$tvrage_diff = number_format( $tvrage_releases_proc - $tvrage_releases_proc_start );
-    $xxx_diff = number_format (xxx_releases_proc - $xxx_releases_proc_start );
+    $xxx_diff = number_format ($xxx_releases_proc - $xxx_releases_proc_start );
 	$book_diff = number_format( $book_releases_proc - $book_releases_proc_start );
     $pre_diff = number_format( $prehash_matched - $prehash_start );
 
