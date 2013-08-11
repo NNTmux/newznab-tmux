@@ -1774,7 +1774,7 @@ if (($array ['HASH'] == "true") || ($array ['AFLY'] == "true") || ($array ['FIXR
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:6.3 'echo \"\033[38;5;\"$color\"m\n$panes6[3] Disabled by OPTIMIZE\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
 } else  {
 		$color = get_color();
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:6.3 'echo \"\033[38;5;\"$color\"m\n$panes6[3] Disabled by removeCrapReleases\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:6.3 'echo \"\033[38;5;\"$color\"m\n$panes6[3] Disabled by removeCrapReleases\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
 	}
 
 
