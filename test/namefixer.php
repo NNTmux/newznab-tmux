@@ -211,6 +211,7 @@ class Namefixer
 	public function matchPredbMD5($md5, $release)
 	{
 		$matched = 0;
+        $db = new DB ();
 		$res = $db->query("select title, source from prehash where hash = '".$md5."'");
 		if (count($res) > 0)
 		{
