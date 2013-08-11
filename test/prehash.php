@@ -337,15 +337,15 @@ Class Predb
 		return $newnames;
 	}
 
-	//update a single release as its created
+	// Update a single release as it's created.
 	public function matchPre($cleanerName, $releaseID)
 	{
 		$db = new DB();
-		if($db->query(sprintf("update releaseID = %d from prehash where name = %s and releaseID = null", $releaseID, $db->escapeString($cleanerName))))
-			$db->query(sprintf("update releases set relnamestatus = 6 ID = %d", $releaseID));
+		if($db->query(sprintf("UPDATE prehash SET releaseID = %d WHERE name = %s AND releaseID = NULL", $releaseID, $db->escapeString($cleanerName))))
+			$db->query(sprintf("UPDATE releases SET relnamestatus = 6 WHERE ID = %d", $releaseID));
 	}
 
-	// When a searchname is the same as the title, tie it to the predb.
+	// When a searchname is the same as the title, tie it to the predb. Try to update the categoryID at the same time.
 	public function matchPredb()
 	{
 		$db = new DB();
@@ -353,55 +353,22 @@ Class Predb
 		if($this->echooutput)
 			echo "Matching up prehash titles with release search names.\n";
 
-		//do womble first
-		if($res = $db->queryDirect("SELECT p.ID, p.category, r.ID as releaseID from prehash p inner join releases r on p.title = r.searchname where p.releaseID is null and p.source = 'womble'"))
+		if($res = $db->queryDirect("SELECT p.ID, p.category, r.ID AS releaseID FROM prehash p inner join releases r ON p.title = r.searchname WHERE p.releaseID IS NULL"))
 		{
 			while ($row = mysqli_fetch_assoc($res))
 			{
-				$db->query(sprintf("UPDATE prehash SET releaseID = %d where ID = %d", $row["releaseID"], $row["ID"]));
-				$catName=str_replace("TV-", '', $row["category"]);
-				$catName=str_replace("TV: ", '', $catName);
-				if($catID = $db->queryOneRow(sprintf("select ID from category where title = %s", $db->escapeString($catName))))
-				{
-					//print($row["category"]." - ".$catID["ID"]."\n");
-					$db->query(sprintf("UPDATE releases set categoryID = %d where ID = %d", $db->escapeString($catID["ID"]), $db->escapeString($row["ID"])));
-				}
-				echo ".";
+				$db->query(sprintf("UPDATE prehash SET releaseID = %d WHERE ID = %d", $row["releaseID"], $row["ID"]));
+				$catName=str_replace(array("TV-", "TV: "), '', $row["category"]);
+				if($catID = $db->queryOneRow(sprintf("SELECT ID FROM category WHERE title = %s", $db->escapeString($catName))))
+					$db->query(sprintf("UPDATE releases SET categoryID = %d WHERE ID = %d", $db->escapeString($catID["ID"]), $db->escapeString($row["releaseID"])));
+				$db->query(sprintf("UPDATE releases SET relnamestatus = 6 WHERE ID = %d", $row["releaseID"]));
+				if($this->echooutput)
+					echo ".";
 				$updated++;
 			}
-			return $updated;
 		}
-		elseif($res = $db->queryDirect("SELECT p.ID, p.category, r.ID as releaseID from prehash p inner join releases r on p.title = r.searchname where p.releaseID is null"))
-		{
-			while ($row = mysqli_fetch_assoc($res))
-			{
-				$db->query(sprintf("UPDATE prehash SET releaseID = %d where ID = %d", $row["releaseID"], $row["ID"]));
-				$catName=str_replace("TV-", '', $row["category"]);
-				$catName=str_replace("TV: ", '', $catName);
-				if($catID = $db->queryOneRow(sprintf("select ID from category where title = %s", $db->escapeString($catName))))
-				{
-					//print($row["category"]." - ".$catID["ID"]."\n");
-					$db->query(sprintf("UPDATE releases set categoryID = %d where ID = %d", $db->escapeString($catID["ID"]), $db->escapeString($row["ID"])));
-				}
-				echo ".";
-				$updated++;
-			}
-			return $updated;
-		}
-		elseif($res = $db->queryDirect("SELECT p.ID, r.ID as releaseID from prehash p inner join releases r on p.title = r.name where p.releaseID is null"))
-		{
-			while ($row = mysqli_fetch_assoc($res))
-			{
-				$db->query(sprintf("UPDATE prehash SET releaseID = %d where ID = %d", $row["releaseID"], $row["ID"]));
-				$db->query(sprintf("UPDATE releases SET relnamestatus = 6 where ID = %d", $row["releaseID"]));
-				echo ".";
-				$updated++;
-			}
-			return $updated;
-		}
-
+		return $updated;
 	}
-
 	// Look if the release is missing an nfo.
 	public function matchNfo()
 	{
@@ -410,7 +377,7 @@ Class Predb
 		if($this->echooutput)
 			echo "Matching up prehash NFOs with releases missing an NFO.\n";
 
-		if($res = $db->queryDirect("SELECT r.ID, p.nfo from releases r inner join prehash p on r.ID = p.releaseID where p.nfo is not null and r.nfostatus != 1 limit 100"))
+			if($res = $db->queryDirect("SELECT r.ID, p.nfo FROM releases r inner join predb p ON r.ID = p.releaseID WHERE p.nfo IS NOT NULL AND r.nfostatus != 1 LIMIT 100"))
 		{
 			$nfo = new Nfo($this->echooutput);
 			while ($row = mysqli_fetch_assoc($res))
@@ -421,7 +388,8 @@ Class Predb
 					$nfo->addReleaseNfo($row["ID"]);
 					$db->query(sprintf("UPDATE releasenfo SET nfo = compress(%s) WHERE releaseID = %d", $db->escapeString($buffer), $row["ID"]));
 					$db->query(sprintf("UPDATE releases SET nfostatus = 1 WHERE ID = %d", $row["ID"]));
-					echo ".";
+					if($this->echooutput)
+						echo ".";
 					$nfos++;
 				}
 			}
@@ -429,19 +397,12 @@ Class Predb
 		}
 	}
 
-	// Matches the names within the predb table to release files and subjects (names). In the future, use the MD5.
+	// Matches the MD5 within the prehash table to release files and subjects (names) which are hashed.
 	public function parseTitles($time, $echo, $cats, $namestatus, $md5="")
 	{
 		$db = new DB();
+		$namefixer = new Namefixer();
 		$updated = 0;
-
-		/*if($backfill = "" && $this->echooutput)
-		{
-			$te = "";
-			if ($time == 1)
-				$te = " in the past 3 hours";
-			echo "Fixing search names".$te." using the predb titles.\n";
-		}*/
 
 		$tq = "";
 		if ($time == 1)
@@ -450,37 +411,6 @@ Class Predb
 		if ($cats == 1)
 			$ct = " and r.categoryID in (2020, 5050, 6070, 8010)";
 
-		/*if($backfill = "" && $res = $db->queryDirect("SELECT r.searchname, r.categoryID, r.groupID, p.source, p.title, r.ID from releases r left join releasefiles rf on rf.releaseID = r.ID, predb p where (r.name like concat('%', p.title, '%') or rf.name like concat('%', p.title, '%')) and r.relnamestatus = 1".$tq.$ct))
-		{
-			while ($row = mysqli_fetch_assoc($res))
-			{
-				if ($row["title"] !== $row["searchname"])
-				{
-					$category = new Category();
-					$determinedcat = $category->determineCategory($row["title"], $row["groupID"]);
-
-					if ($echo == 1)
-					{
-						if ($namestatus == 1)
-							$db->query(sprintf("UPDATE releases SET searchname = %s, categoryID = %d, relnamestatus = 3 where ID = %d", $db->escapeString($row["title"]), $determinedcat, $row["ID"]));
-						else
-							$db->query(sprintf("UPDATE releases SET searchname = %s, categoryID = %d where ID = %d", $db->escapeString($row["title"]), $determinedcat, $row["ID"]));
-					}
-					if ($this->echooutput)
-					{
-						$groups = new Groups();
-
-						echo"New name: ".$row["title"]."\n".
-							"Old name: ".$row["searchname"]."\n".
-							"New cat:  ".$category->getNameByID($determinedcat)."\n".
-							"Old cat:  ".$category->getNameByID($row["categoryID"])."\n".
-							"Group:    ".$groups->getByNameByID($row["groupID"])."\n".
-							"Method:   "."predb titles: ".$row["source"]."\n"."\n";
-					}
-					$updated++;
-				}
-			}
-		}*/
 		if($this->echooutput)
 		{
 			$te = "";
@@ -492,78 +422,14 @@ Class Predb
 		{
 			while($row = mysqli_fetch_assoc($res))
 			{
-				if (preg_match("/[a-f0-9]{32}/i", $row["name"], $matches))
-				{
-					$a = $db->query("select title, source from prehash where hash = '".$matches[0]."'");
-					foreach ($a as $b)
-					{
-						if ($b["title"] !== $row["searchname"])
-						{
-							$category = new Category();
-							$determinedcat = $category->determineCategory($b["title"], $row["groupID"]);
-
-							if ($echo == 1)
-							{
-								if ($namestatus == 1)
-									$db->query(sprintf("UPDATE releases SET searchname = %s, categoryID = %d, relnamestatus = 3 where ID = %d", $db->escapeString($b["title"]), $determinedcat, $row["ID"]));
-								else
-									$db->query(sprintf("UPDATE releases SET searchname = %s, categoryID = %d where ID = %d", $db->escapeString($b["title"]), $determinedcat, $row["ID"]));
-							}
-							if ($this->echooutput)
-							{
-								$groups = new Groups();
-
-								echo"New name: ".$b["title"]."\n".
-									"Old name: ".$row["searchname"]."\n".
-									"New cat:  ".$category->getNameByID($determinedcat)."\n".
-									"Old cat:  ".$category->getNameByID($row["categoryID"])."\n".
-									"Group:    ".$groups->getByNameByID($row["groupID"])."\n".
-									"Method:   "."prehash md5 release name: ".$b["source"]."\n"."\n";
-							}
-							$updated++;
-						}
-					}
-				}
+			   if (preg_match("/[a-f0-9]{32}/i", $row["name"], $matches))
+					$updated = $updated + $namefixer->matchPredbMD5($matches[0], $row);
 				else if (preg_match("/[a-f0-9]{32}/i", $row["filename"], $matches))
-				{
-					$a = $db->query("select title, source from prehash where hash = '".$matches[0]."'");
-					foreach ($a as $b)
-					{
-						if ($b["title"] !== $row["searchname"])
-						{
-							$category = new Category();
-							$determinedcat = $category->determineCategory($b["title"], $row["groupID"]);
-
-							if ($echo == 1)
-							{
-								if ($namestatus == 1)
-									$db->query(sprintf("UPDATE releases SET searchname = %s, categoryID = %d, relnamestatus = 3 where ID = %d", $db->escapeString($b["title"]), $determinedcat, $row["ID"]));
-								else
-									$db->query(sprintf("UPDATE releases SET searchname = %s, categoryID = %d where ID = %d", $db->escapeString($b["title"]), $determinedcat, $row["ID"]));
-							}
-							if ($this->echooutput)
-							{
-								$groups = new Groups();
-
-								echo"New name: ".$b["title"]."\n".
-									"Old name: ".$row["searchname"]."\n".
-									"New cat:  ".$category->getNameByID($determinedcat)."\n".
-									"Old cat:  ".$category->getNameByID($row["categoryID"])."\n".
-									"Group:    ".$groups->getByNameByID($row["groupID"])."\n".
-									"Method:   "."prehash md5 file name: ".$b["source"]."\n"."\n";
-							}
-							$updated++;
-						}
-					}
-				}
+					$updated = $updated + $namefixer->matchPredbMD5($matches[0], $row);
 			}
 		}
-        else
-        {
-            echo "Nothing to fix.\n";
-        }
-    return $updated;
-    }
+		return $updated;
+	}
 
 
 	public function getAll($offset, $offset2)
