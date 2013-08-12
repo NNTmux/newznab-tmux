@@ -1,24 +1,26 @@
+12.08.2013	-->	Updates to namecleaning, namefixer and prehash. Reverted behaviour of tmux monitor to old one, fix for postprocessing panes. 
+		-->	Removed folders and files from hash_matching folder that are not used anymore.	
 09.08.2013 	-->	Updated monitor and namecleaner
-07.08.2013	--> Updates to namecleaner, changed displayed info in postprocessing panes due to changes to in latest update of nn+
+07.08.2013	-->	Updates to namecleaner, changed displayed info in postprocessing panes due to changes to in latest update of nn+
 
 06.08.2013	-->	Updated namecleaner, changed removecrap timer to 2 hours by default and it is run every 40 seconds, added custom updateCategories.php to test folder - updates categories in last 6 hours, not the whole db. 
-			--> Updated tmux packages to 1.8-4 built on 02.08.2013, install using 'sudo dpkg -i tmux_1.8-4.deb'
-05.08.2013-1 --> Added removeCrapReleases.php to test folder. It needs a modified releases.php that will be copied if you run fix_files.sh. You can run it manualy, type php removeCrapReleases.php to see all the options. 
-			--> Script runs in true full mode from tmux. If you don't want that, disable it in your defaults.sh and run it manualy.
-05.08.2012	--> Updated namecleaner.php, removed aflys init.php and added new create_prehash_table.sql. 
-			-->	Added prehash sql files to import manualy predb data for prehash table. Do not do it unless you want to mess with prehash table, 
-			-->	as it needs removal of primary key and removal of id column before you can import those. And you need to add those back later (id and primary key).
+		--> 	Updated tmux packages to 1.8-4 built on 02.08.2013, install using 'sudo dpkg -i tmux_1.8-4.deb'
+05.08.2013-1 	--> 	Added removeCrapReleases.php to test folder. It needs a modified releases.php that will be copied if you run fix_files.sh. You can run it manualy, type php removeCrapReleases.php to see all the options. 
+		--> 	Script runs in true full mode from tmux. If you don't want that, disable it in your defaults.sh and run it manualy.
+05.08.2012	--> 	Updated namecleaner.php, removed aflys init.php and added new create_prehash_table.sql. 
+		-->	Added prehash sql files to import manualy predb data for prehash table. Do not do it unless you want to mess with prehash table, 
+		-->	as it needs removal of primary key and removal of id column before you can import those. And you need to add those back later (id and primary key).
 24.07.2013	-->	Added lines to fix_files.sh so the needed files are copied when the script is run. Updated monitor.php to show prehash database status.If no hash matching, name fixing scripts are enabled, this information
-			-->	will not be shown.
-			--> Added another prehash table update.
-23.07.2013.1	--> Switched to hash_decrypt.php from testing folder, changes to nn+ db and core files are mandatory for new scripts to work. 
-23.07.2013	--> Adapted fixReleaseName script from nZEDb to scan nfo's and releasenames and fix them as much as they can be fixed. Removed pre.corrupt net script (pre.php) as it is useless now.
-			--> Added test folder with "files to copy" folder. In that folder are located core newznab files, but if you want to use fixReleaseNames script you have to copy them to their respective folders.
-			--> Be aware that any future update to nn+ could render these scripts unusable.Use them at your own risk.
-			--> There is a bug in init.php. I will fix it later, as original aflys init.php can be used to create prehash table, after that you can use prehash*.sql to update it.
-20.07.2013 	--> fixed bug in prehash, you will need to run this query: update prehash set title = replace (title, '  - omgwtfnzbs.org', '');
-19.07.2013 	--> Removed nzbx_ws_hashdecrypt.php as it is no longer working.
-				Added standalone hash_decrypt.php as a replacement. 
-				You need do run this sql "ALTER TABLE  `releases` ADD  `dehashstatus` TINYINT( 1 ) NOT NULL DEFAULT  '0' AFTER  `haspreview`;" on newznab database if you want to run this.
+		-->	will not be shown.
+		--> 	Added another prehash table update.
+23.07.2013.1	--> 	Switched to hash_decrypt.php from testing folder, changes to nn+ db and core files are mandatory for new scripts to work. 
+23.07.2013	--> 	Adapted fixReleaseName script from nZEDb to scan nfo's and releasenames and fix them as much as they can be fixed. Removed pre.corrupt net script (pre.php) as it is useless now.
+		--> 	Added test folder with "files to copy" folder. In that folder are located core newznab files, but if you want to use fixReleaseNames script you have to copy them to their respective folders.
+		--> 	Be aware that any future update to nn+ could render these scripts unusable.Use them at your own risk.
+		--> 	There is a bug in init.php. I will fix it later, as original aflys init.php can be used to create prehash table, after that you can use prehash*.sql to update it.
+20.07.2013 	--> 	fixed bug in prehash, you will need to run this query: update prehash set title = replace (title, '  - omgwtfnzbs.org', '');
+19.07.2013 	--> 	Removed nzbx_ws_hashdecrypt.php as it is no longer working.
+			Added standalone hash_decrypt.php as a replacement. 
+			You need do run this sql "ALTER TABLE  `releases` ADD  `dehashstatus` TINYINT( 1 ) NOT NULL DEFAULT  '0' AFTER  `haspreview`;" on newznab database if you want to run this.
 				
 				
