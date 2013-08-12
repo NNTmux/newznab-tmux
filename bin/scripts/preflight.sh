@@ -153,16 +153,15 @@ do
 	d=$((($c - 1) * 100))
 	cp $NEWZPATH/www/lib/postprocess.php $DIR/bin/temp/postprocess$c.php
 	$SED -i -e "s/PostProcess/PostProcess$c/g" $DIR/bin/temp/postprocess$c.php
-	## Obsolete with new update 
-	## $SED -i -e "s/echo \$iteration.*$/echo \$iteration --.\"    \".\$rel['ID'].\" : \".\$rel['name'].\"\\\n\";/" $DIR/bin/temp/postprocess$c.php
+	$SED -i -e "s/echo \$iteration.*$/echo \$iteration --.\"    \".\$rel['ID'].\" : \".\$rel['name'].\"\\\n\";/" $DIR/bin/temp/postprocess$c.php
 	$SED -i -e "s/processAdditional/processAdditional$c/g" $DIR/bin/temp/postprocess$c.php
 	$SED -i -e "s/\$tmpPath = \$this->site->tmpunrarpath;/\$tmpPath = \$this->site->tmpunrarpath; \\
 		\$tmpPath .= '1\/tmp$c';/g" $DIR/bin/temp/postprocess$c.php
-	##if [[ $c -eq 1 ]]; then
-	##	$SED -i -e 's/order by r.postdate desc limit %d.*$/order by r.guid desc limit %d ", ($maxattemptstocheckpassworded + 1) * -1, $numtoProcess));/g' $DIR/bin/temp/postprocess$c.php
-	##else
-	##	$SED -i -e "s/order by r.postdate desc limit %d.*\$/order by r.guid asc limit %d, %d \", (\$maxattemptstocheckpassworded + 1) * -1, $c * 100, \$numtoProcess));/g" $DIR/bin/temp/postprocess$c.php
-	##fi
+	if [[ $c -eq 1 ]]; then
+		$SED -i -e 's/order by r.postdate desc limit %d.*$/order by r.guid desc limit %d ", ($maxattemptstocheckpassworded + 1) * -1, $numtoProcess);/g' $DIR/bin/temp/postprocess$c.php
+	else
+		$SED -i -e "s/order by r.postdate desc limit %d.*\$/order by r.guid asc limit %d, %d \", (\$maxattemptstocheckpassworded + 1) * -1, $c * 100, \$numtoProcess);/g" $DIR/bin/temp/postprocess$c.php
+	fi
 	$SED -i -e "s/PostPrc : Performing additional post processing.*\$/PostPrc : Performing additional post processing by guid on \".\$rescount.\" releases, starting at $d ...\\n\";/g" $DIR/bin/temp/postprocess$c.php
 	$SED -i -e "s/\/\/echo \"PostPrc : Fetching/echo \"PostPrc : Fetching/g" $DIR/bin/temp/postprocess$c.php
 	if [[ $USE_TWO_NNTP == "true" ]] && [[ $USE_TWO_PP != "true" ]]; then
@@ -179,13 +178,12 @@ for (( c=17; c<=32; c++ ))
 do
 	d=$((($c - 1) * 100))
 	cp $NEWZPATH/www/lib/postprocess.php $DIR/bin/temp/postprocess$c.php
-	$SED -i -e "s/PostProcess/PostProcess$c/g" $DIR/bin/temp/postprocess$c.php
-	## Obsolete with new update 
-	## $SED -i -e "s/echo \$iteration.*$/echo \$iteration --.\"    \".\$rel['ID'].\" : \".\$rel['name'].\"\\\n\";/" $DIR/bin/temp/postprocess$c.php
+	$SED -i -e "s/PostProcess/PostProcess$c/g" $DIR/bin/temp/postprocess$c.php 
+	$SED -i -e "s/echo \$iteration.*$/echo \$iteration --.\"    \".\$rel['ID'].\" : \".\$rel['name'].\"\\\n\";/" $DIR/bin/temp/postprocess$c.php
 	$SED -i -e "s/processAdditional/processAdditional$c/g" $DIR/bin/temp/postprocess$c.php
 	$SED -i -e "s/\$tmpPath = \$this->site->tmpunrarpath;/\$tmpPath = \$this->site->tmpunrarpath; \\
 		\$tmpPath .= '1\/tmp$c';/g" $DIR/bin/temp/postprocess$c.php
-	##$SED -i -e "s/order by r.postdate desc limit %d.*\$/order by r.guid asc limit %d, %d \", (\$maxattemptstocheckpassworded + 1) * -1, ($c + 16) * 100, \$numtoProcess));/g" $DIR/bin/temp/postprocess$c.php
+	$SED -i -e "s/order by r.postdate desc limit %d.*\$/order by r.guid asc limit %d, %d \", (\$maxattemptstocheckpassworded + 1) * -1, ($c + 16) * 100, \$numtoProcess);/g" $DIR/bin/temp/postprocess$c.php
 	$SED -i -e "s/PostPrc : Performing additional post processing.*\$/PostPrc : Performing additional post processing by guid on \".\$rescount.\" releases, starting at $d ...\\n\";/g" $DIR/bin/temp/postprocess$c.php
 	$SED -i -e "s/\/\/echo \"PostPrc : Fetching/echo \"PostPrc : Fetching/g" $DIR/bin/temp/postprocess$c.php
 	if [[ $USE_TWO_NNTP == "true" ]] && [[ $USE_TWO_PP == "true" ]]; then

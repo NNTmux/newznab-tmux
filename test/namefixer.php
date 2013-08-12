@@ -207,6 +207,45 @@ class Namefixer
         }
     }
 
+     // Match a MD5 from the predb to a release.
+	public function matchPredbMD5($md5, $release, $echo, $namestatus, $echooutput)
+	{
+		$matched = 0;
+        $db = new DB ();
+		$res = $db->query("select title, source from prehash where hash = '".$md5."'");
+		if (count($res) > 0)
+		{
+			foreach ($res as $row)
+			{
+				if ($row["title"] !== $release["searchname"])
+				{
+					$category = new Category();
+					$determinedcat = $category->determineCategory($row["title"], $release["groupID"]);
+
+					if ($echo == 1)
+					{
+						if ($namestatus == 1)
+							$db->query(sprintf("UPDATE releases SET searchname = %s, categoryID = %d, relnamestatus = 3 where ID = %d", $db->escapeString($row["title"]), $determinedcat, $release["ID"]));
+						else
+							$db->query(sprintf("UPDATE releases SET searchname = %s, categoryID = %d where ID = %d", $db->escapeString($row["title"]), $determinedcat, $release["ID"]));
+					}
+				   if ($echooutput) 
+					{
+						$groups = new Groups();
+						echo"New name: ".$row["title"]."\n".
+							"Old name: ".$release["searchname"]."\n".
+							"New cat:  ".$category->getNameByID($determinedcat)."\n".
+							"Old cat:  ".$category->getNameByID($release["categoryID"])."\n".
+							"Group:    ".$groups->getByNameByID($release["groupID"])."\n".
+							"Method:   "."prehash md5 release name: ".$row["source"]."\n"."\n";
+					}
+					$matched++;
+				}
+			}
+		}
+		return $matched;
+	}
+
     //
     //  Check the array using regex for a clean name.
     //
@@ -387,13 +426,10 @@ class Namefixer
     //
     public function nfoCheckMov($release, $echo, $type, $namestatus)
     {
-        echo "1....\n";
         if ($this->relid !== $release["releaseID"] && preg_match('/(?:(\:\s{1,}))(.+?(19|20)\d\d.+?(BDRip|bluray|DVD(R|Rip)?|XVID).+?)(\s{2,}|\r|\n)/i', $release["textstring"], $result))
             $this->updateRelease($release, $result["2"], $methdod="nfoCheck: Generic Movies 1", $echo, $type, $namestatus);
-        echo "2....\n";
         if ($this->relid !== $release["releaseID"] && preg_match('/(?:(\s{2,}))(.+?[\.\-_ ](19|20)\d\d.+?(BDRip|bluray|DVD(R|Rip)?|XVID).+?)(\s{2,}|\r|\n)/i', $release["textstring"], $result))
             $this->updateRelease($release, $result["2"], $methdod="nfoCheck: Generic Movies 2", $echo, $type, $namestatus);
-        echo "3....\n";
         if ($this->relid !== $release["releaseID"] && preg_match('/(?:(\s{2,}))(.+?[\.\-_ ](NTSC|MULTi).+?(MULTi|DVDR)[\.\-_ ].+?)(\s{2,}|\r|\n)/i', $release["textstring"], $result))
             $this->updateRelease($release, $result["2"], $methdod="nfoCheck: Generic Movies 3", $echo, $type, $namestatus);
     }
