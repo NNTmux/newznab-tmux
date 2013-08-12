@@ -183,7 +183,7 @@ do
 	$SED -i -e "s/processAdditional/processAdditional$c/g" $DIR/bin/temp/postprocess$c.php
 	$SED -i -e "s/\$tmpPath = \$this->site->tmpunrarpath;/\$tmpPath = \$this->site->tmpunrarpath; \\
 		\$tmpPath .= '1\/tmp$c';/g" $DIR/bin/temp/postprocess$c.php
-	SED -i -e "s/order by r.postdate desc limit %d.*\$/order by r.guid asc limit %d, %d \", (\$maxattemptstocheckpassworded + 1) * -1, ($c + 16) * 100, \$numtoProcess);/g" $DIR/bin/temp/postprocess$c.php
+	$SED -i -e "s/order by r.postdate desc limit %d.*\$/order by r.guid asc limit %d, %d \", (\$maxattemptstocheckpassworded + 1) * -1, ($c + 16) * 100, \$numtoProcess);/g" $DIR/bin/temp/postprocess$c.php
 	$SED -i -e "s/PostPrc : Performing additional post processing.*\$/PostPrc : Performing additional post processing by guid on \".\$rescount.\" releases, starting at $d ...\\n\";/g" $DIR/bin/temp/postprocess$c.php
 	$SED -i -e "s/\/\/echo \"PostPrc : Fetching/echo \"PostPrc : Fetching/g" $DIR/bin/temp/postprocess$c.php
 	if [[ $USE_TWO_NNTP == "true" ]] && [[ $USE_TWO_PP == "true" ]]; then
