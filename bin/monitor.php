@@ -1821,17 +1821,17 @@ if (($array ['HASH'] == "true") || ($array ['AFLY'] == "true") || ($array ['FIXR
 	} elseif (( $optimize_safe_to_run != "true" ) && ( $array['MAX_LOAD'] <= get_load())) {
                 $color = get_color();
                 shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:6.3 'echo \"\033[38;5;\"$color\"m\n$panes6[3] Disabled by MAX_LOAD\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
-        } elseif (( $array['REMOVECRAP'] == "true" ) && ( $optimize_safe_to_run != "true" ) && ( $array['MAX_LOAD'] >= get_load())) {
+    } elseif (( $array['REMOVECRAP'] != "true" ) && ( $optimize_safe_to_run != "true" )) {
+-		$color = get_color();
+-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:6.3 'echo \"\033[38;5;\"$color\"m\n$panes6[3] Disabled by removeCrapReleases\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
+    } elseif (( $array['REMOVECRAP'] == "true" ) && ( $optimize_safe_to_run != "true" ) && ( $array['MAX_LOAD'] >= get_load())) {
 		$color = get_color();
 		$run_time = relativeTime( $array['REMOVECRAP_TIMER'] + $time29 );
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:6.3 'echo \"\033[38;5;\"$color\"m\n$panes6[3] will run in T[ $run_time]\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
 	} elseif ( $optimize_safe_to_run == "true" ) {
 		$color = get_color();
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:6.3 'echo \"\033[38;5;\"$color\"m\n$panes6[3] Disabled by OPTIMIZE\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
-} else  {
-		$color = get_color();
-		shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:6.3 'echo \"\033[38;5;\"$color\"m\n$panes6[3] Disabled by removeCrapReleases\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
-	}
+}
 
 
 	//check ffmpeg and mediainfo, kill if necessary
