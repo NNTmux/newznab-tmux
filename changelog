@@ -1,5 +1,5 @@
 13.08.2013	-->	Added predb dump with more than 5 million releases for prehash table. Run commands from clean_duplicates_predb.txt first and then from import_predb.txt. PreDB data can be downloaded 	
-			--> from mega.co.nz link
+			--> from https://mega.co.nz/#!xggDlBSC!ZDMDPVzbFY_MrzkWqX2EIFgIX8dV0vBkyQ_RF4SAb1A
 12.08.2013	-->	Updates to namecleaning, namefixer and prehash. Reverted behaviour of tmux monitor to old one, fix for postprocessing panes. 
 		-->	Removed folders and files from hash_matching folder that are not used anymore.	
 09.08.2013 	-->	Updated monitor and namecleaner
