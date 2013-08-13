@@ -21,302 +21,40 @@ $predb = new Predb(true);
 
 if (isset($argv[1]) && isset($argv[2]) && isset($argv[3]) && isset($argv[4]))
 {
-	if ($argv[2] == "true")
+	$update = ($argv[2] == "true") ? 1 : 2;
+	$other = ($argv[3] == "other") ? 1 : 2;
+	$setStatus = ($argv[4] == "yes") ? 1 : 2;
+
+	switch ($argv[1])
 	{
-		if ($argv[3] == "other")
-		{
-			if ($argv[4] == "yes")
-			{
-				if ($argv[1] == 1)
-				{
-					$predb->parseTitles(1,1,1,1);
-				}
-				else if ($argv[1] == 2)
-				{
-					$predb->parseTitles(2,1,1,1);
-				}
-				else if ($argv[1] == 3)
-				{
-					$namefixer->fixNamesWithNfo(1,1,1,1);
-				}
-				else if ($argv[1] == 4)
-				{
-					$namefixer->fixNamesWithNfo(2,1,1,1);
-				}
-				else if ($argv[1] == 5)
-				{
-					$namefixer->fixNamesWithFiles(1,1,1,1);
-				}
-				else if ($argv[1] == 6)
-				{
-					$namefixer->fixNamesWithFiles(2,1,1,1);
-				}
-				else
-				{
-					exit("ERROR: Wrong argument, type php fixReleaseNames.php to see a list of valid arguments.".$n);
-				}
-			}
-			else if ($argv[4] == "no")
-			{
-				if ($argv[1] == 1)
-				{
-					$predb->parseTitles(1,1,1,2);
-				}
-				else if ($argv[1] == 2)
-				{
-					$predb->parseTitles(2,1,1,2);
-				}
-				else if ($argv[1] == 3)
-				{
-					$namefixer->fixNamesWithNfo(1,1,1,2);
-				}
-				else if ($argv[1] == 4)
-				{
-					$namefixer->fixNamesWithNfo(2,1,1,2);
-				}
-				else if ($argv[1] == 5)
-				{
-					$namefixer->fixNamesWithFiles(1,1,1,2);
-				}
-				else if ($argv[1] == 6)
-				{
-					$namefixer->fixNamesWithFiles(2,1,1,2);
-				}
-				else
-				{
-					exit("ERROR: Wrong argument, type php fixReleaseNames.php to see a list of valid arguments.".$n);
-				}
-			}
-			else
-			{
-				exit("ERROR: Wrong argument, type php fixReleaseNames.php to see a list of valid arguments.".$n);
-			}
-		}
-		else if ($argv[3] == "all")
-		{
-			if ($argv[4] == "yes")
-			{
-				if ($argv[1] == 1)
-				{
-					$predb->parseTitles(1,1,2,1);
-				}
-				else if ($argv[1] == 2)
-				{
-					$predb->parseTitles(2,1,2,1);
-				}
-				else if ($argv[1] == 3)
-				{
-					$namefixer->fixNamesWithNfo(1,1,2,1);
-				}
-				else if ($argv[1] == 4)
-				{
-					$namefixer->fixNamesWithNfo(2,1,2,1);
-				}
-				else if ($argv[1] == 5)
-				{
-					$namefixer->fixNamesWithFiles(1,1,2,1);
-				}
-				else if ($argv[1] == 6)
-				{
-					$namefixer->fixNamesWithFiles(2,1,2,1);
-				}
-				else
-				{
-					exit("ERROR: Wrong argument, type php fixReleaseNames.php to see a list of valid arguments.".$n);
-				}
-			}
-			else if ($argv[4] == "no")
-			{
-				if ($argv[1] == 1)
-				{
-					$predb->parseTitles(1,1,2,2);
-				}
-				else if ($argv[1] == 2)
-				{
-					$predb->parseTitles(2,1,2,2);
-				}
-				else if ($argv[1] == 3)
-				{
-					$namefixer->fixNamesWithNfo(1,1,2,2);
-				}
-				else if ($argv[1] == 4)
-				{
-					$namefixer->fixNamesWithNfo(2,1,2,2);
-				}
-				else if ($argv[1] == 5)
-				{
-					$namefixer->fixNamesWithFiles(1,1,2,2);
-				}
-				else if ($argv[1] == 6)
-				{
-					$namefixer->fixNamesWithFiles(2,1,2,2);
-				}
-				else
-				{
-					exit("ERROR: Wrong argument, type php fixReleaseNames.php to see a list of valid arguments.".$n);
-				}
-			}
-			else
-			{
-				exit("ERROR: Wrong argument, type php fixReleaseNames.php to see a list of valid arguments.".$n);
-			}
-		}
-		else
-		{
+		case 1:
+			$predb->parseTitles(1,$update,$other,$setStatus);
+			break;
+		case 2:
+			$predb->parseTitles(2,$update,$other,$setStatus);
+			break;
+		case 3:
+			$namefixer->fixNamesWithNfo(1,$update,$other,$setStatus);
+			break;
+		case 4:
+			$namefixer->fixNamesWithNfo(2,$update,$other,$setStatus);
+			break;
+		case 5:
+			$namefixer->fixNamesWithFiles(1,$update,$other,$setStatus);
+			break;
+		case 6:
+			$namefixer->fixNamesWithFiles(2,$update,$other,$setStatus);
+			break;
+		default :
 			exit("ERROR: Wrong argument, type php fixReleaseNames.php to see a list of valid arguments.".$n);
-		}
-	}
-	else if ($argv[2] == "false")
-	{
-		if ($argv[3] == "other")
-		{
-			if ($argv[4] == "yes")
-			{
-				if ($argv[1] == 1)
-				{
-					$predb->parseTitles(1,2,1,1);
-				}
-				else if ($argv[1] == 2)
-				{
-					$predb->parseTitles(2,2,1,1);
-				}
-				else if ($argv[1] == 3)
-				{
-					$namefixer->fixNamesWithNfo(1,2,1,1);
-				}
-				else if ($argv[1] == 4)
-				{
-					$namefixer->fixNamesWithNfo(2,2,1,1);
-				}
-				else if ($argv[1] == 5)
-				{
-					$namefixer->fixNamesWithFiles(1,2,1,1);
-				}
-				else if ($argv[1] == 6)
-				{
-					$namefixer->fixNamesWithFiles(2,2,1,1);
-				}
-				else
-				{
-					exit("ERROR: Wrong argument, type php fixReleaseNames.php to see a list of valid arguments.".$n);
-				}
-			}
-			else if ($argv[4] == "no")
-			{
-				if ($argv[1] == 1)
-				{
-					$predb->parseTitles(1,2,1,2);
-				}
-				else if ($argv[1] == 2)
-				{
-					$predb->parseTitles(2,2,1,2);
-				}
-				else if ($argv[1] == 3)
-				{
-					$namefixer->fixNamesWithNfo(1,2,1,2);
-				}
-				else if ($argv[1] == 4)
-				{
-					$namefixer->fixNamesWithNfo(2,2,1,2);
-				}
-				else if ($argv[1] == 5)
-				{
-					$namefixer->fixNamesWithFiles(1,2,1,2);
-				}
-				else if ($argv[1] == 6)
-				{
-					$namefixer->fixNamesWithFiles(2,2,1,2);
-				}
-				else
-				{
-					exit("ERROR: Wrong argument, type php fixReleaseNames.php to see a list of valid arguments.".$n);
-				}
-			}
-			else
-			{
-				exit("ERROR: Wrong argument, type php fixReleaseNames.php to see a list of valid arguments.".$n);
-			}
-		}
-		else if ($argv[3] == "all")
-		{
-			if ($argv[4] == "yes")
-			{
-				if ($argv[1] == 1)
-				{
-					$predb->parseTitles(1,2,2,1);
-				}
-				else if ($argv[1] == 2)
-				{
-					$predb->parseTitles(2,2,2,1);
-				}
-				else if ($argv[1] == 3)
-				{
-					$namefixer->fixNamesWithNfo(1,2,2,1);
-				}
-				else if ($argv[1] == 4)
-				{
-					$namefixer->fixNamesWithNfo(2,2,2,1);
-				}
-				else if ($argv[1] == 5)
-				{
-					$namefixer->fixNamesWithFiles(1,2,2,1);
-				}
-				else if ($argv[1] == 6)
-				{
-					$namefixer->fixNamesWithFiles(2,2,2,1);
-				}
-				else
-				{
-					exit("ERROR: Wrong argument, type php fixReleaseNames.php to see a list of valid arguments.".$n);
-				}
-			}
-			else if ($argv[4] == "no")
-			{
-				if ($argv[1] == 1)
-				{
-					$predb->parseTitles(1,2,2,2);
-				}
-				else if ($argv[1] == 2)
-				{
-					$predb->parseTitles(2,2,2,2);
-				}
-				else if ($argv[1] == 3)
-				{
-					$namefixer->fixNamesWithNfo(1,2,2,2);
-				}
-				else if ($argv[1] == 4)
-				{
-					$namefixer->fixNamesWithNfo(2,2,2,2);
-				}
-				else if ($argv[1] == 5)
-				{
-					$namefixer->fixNamesWithFiles(1,2,2,2);
-				}
-				else if ($argv[1] == 6)
-				{
-					$namefixer->fixNamesWithFiles(2,2,2,2);
-				}
-				else
-				{
-					exit("ERROR: Wrong argument, type php fixReleaseNames.php to see a list of valid arguments.".$n);
-				}
-			}
-		}
-		else
-		{
-			exit("ERROR: Wrong argument, type php fixReleaseNames.php to see a list of valid arguments.".$n);
-		}
-	}
-	else
-	{
-		exit("ERROR: Wrong argument, type php fixReleaseNames.php to see a list of valid arguments.".$n);
+			break;
 	}
 }
 else
 {
 	exit("ERROR: You must supply 4 arguments.".$n.
-			"php fixReleaseNames.php 1 false other no ...: Fix release names, using the usenet subject in the past 3 hours with prehash information.".$n.
-			"php fixReleaseNames.php 2 false other no ...: Fix release names, using the usenet subject with prehash information.".$n.
+			"php fixReleaseNames.php 1 false other no ...: Fix release names, using the usenet subject in the past 3 hours with predb information.".$n.
+			"php fixReleaseNames.php 2 false other no ...: Fix release names, using the usenet subject with predb information.".$n.
 			"php fixReleaseNames.php 3 false other no ...: Fix release names using NFO in the past 6 hours.".$n.
 			"php fixReleaseNames.php 4 false other no ...: Fix release names using NFO.".$n.
 			"php fixReleaseNames.php 5 false other no ...: Fix release names in misc categories using File Name in the past 6 hours.".$n.
