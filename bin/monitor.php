@@ -347,7 +347,7 @@ printf($mask1, "Release Added:", relativeTime("$newestdate")."ago");
 if ($array['PREDB'] = "true"){
     printf($mask1, "Predb Updated:", relativeTime("$newestpredb")."ago");
 }
-if (($array ['HASH'] == "true") || ($array ['AFLY'] = "true") || ($array ['FIXRELEASES']) == "true"){
+if  ($array ['FIXRELEASES'] = "true") {
     printf($mask1, "Prehash Updated:", relativeTime("$newestprehash")."ago");
 }
 $mask = "%-15.15s %22.22s %22.22s\n";
@@ -369,7 +369,7 @@ printf("\033[1;33m\n");
 printf($mask, "Category", "In Process", "In Database");
 printf($mask, "====================", "====================", "====================");
 printf("\033[38;5;214m");
-if (($array ['HASH'] == "true") || ($array ['AFLY'] = "true") || ($array ['FIXRELEASES']) == "true"){
+if ($array ['FIXRELEASES'] = "true"){
 printf($mask, "prehash",number_format($prehash - $prehash_matched)."(".$pre_diff.")",number_format($prehash_matched)."(".$pre_percent."%)");
 }
 printf($mask, "NFO's","$nfo_remaining_now_formatted($nfo_diff)","$nfo_now_formatted($nfo_percent%)");
@@ -752,7 +752,7 @@ $usptotalconnections  = str_replace("\n", '', shell_exec ("ss -n | grep -c :".NN
     if ($array['PREDB'] = "true"){
     printf($mask1, "Predb Updated:", relativeTime("$newestpredb")."ago");
     }
-if (($array ['HASH'] == "true") || ($array ['AFLY'] == "true") || ($array ['FIXRELEASES']) == "true") {
+if ($array ['FIXRELEASES'] = "true") {
     printf($mask1, "Prehash Updated:", relativeTime("$newestprehash")."ago");
     }
 
@@ -774,7 +774,7 @@ if (($array ['HASH'] == "true") || ($array ['AFLY'] == "true") || ($array ['FIXR
 	printf($mask, "Category", "In Process", "In Database");
 	printf($mask, "====================", "====================", "====================");
 	printf("\033[38;5;214m");
-    if (($array ['HASH'] == "true") || ($array ['AFLY'] = "true") || ($array ['FIXRELEASES']) == "true"){
+    if ($array ['FIXRELEASES'] = "true"){
     printf($mask, "prehash","~".number_format($prehash - $prehash_matched)."(".$pre_diff.")",number_format($prehash_matched)."(".$pre_percent."%)");
 }
 	printf($mask, "NFO's","$nfo_remaining_now_formatted($nfo_diff)","$nfo_now_formatted($nfo_percent%)");
