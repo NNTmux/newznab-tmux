@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.1r821d";
+$version="0.1r822";
 
 $db = new DB();
 $DIR = dirname (__FILE__);
@@ -1347,7 +1347,7 @@ if (($array ['HASH'] == "true") || ($array ['AFLY'] == "true") || ($array ['FIXR
 		$color = get_color();
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.4 'echo \"\033[38;5;\"$color\"m\n$panes1[4] Disabled by OPTIMIZE\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
 	}
-//run $_php fix_android_releases.php in 1.6
+/*//run $_php fix_android_releases.php in 1.6
 	if (( $array['MAX_LOAD'] >= get_load()) && ((( TIME() - $time25 ) >= $array['DROID_TIMER'] ) || ( $i == 5 )) && ( $array['FIX_DROID'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		$log = writelog($panes1[6]);
@@ -1426,7 +1426,7 @@ if (($array ['HASH'] == "true") || ($array ['AFLY'] == "true") || ($array ['FIXR
         } elseif ( $optimize_safe_to_run == "true" ) {
 		$color = get_color();
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.9 'echo \"\033[38;5;\"$color\"m\n$panes1[9] Disabled by OPTIMIZE\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
-	}
+	} */
 	/*//run $_php hash_decrypt.php in 1.10
 	if (( $array['MAX_LOAD'] >= get_load()) && ((( TIME() - $time24 ) >= $array['HASH_TIMER'] ) || ( $i == 5 )) && ( $array['HASH'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
