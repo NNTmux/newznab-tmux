@@ -72,12 +72,9 @@ class Namefixer
         if ($rowcount > 0)
         {
             while ($relrow = $db->fetchArray($relres))
-            {
+             {
                 echo "Reading NFO => ".$relrow['searchname']."\n";
                 $this->checkName($relrow, $echo, $type, $namestatus);
-                //
-                // If we are here, we have checked a release against it's .nfo so set it as checked in the db
-                $db->queryDirect(sprintf("UPDATE releases set relstatus = relstatus | %d where ID = %d", DB::NFO_PROCESSED_NAMEFIXER, $relrow["releaseID"]));
                 $this->checked++;
                 if ($this->checked % 500 == 0)
                     echo $this->checked." NFOs processed.\n\n";
@@ -229,7 +226,7 @@ class Namefixer
 						else
 							$db->query(sprintf("UPDATE releases SET searchname = %s, categoryID = %d where ID = %d", $db->escapeString($row["title"]), $determinedcat, $release["ID"]));
 					}
-				   if ($echooutput) 
+				   if ($echooutput)
 					{
 						$groups = new Groups();
 						echo"New name: ".$row["title"]."\n".

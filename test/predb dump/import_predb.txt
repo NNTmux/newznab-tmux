@@ -1,0 +1,22 @@
+#Stop all scripts, this will lock the predb table
+
+#Create UNIQUE indexes
+drop index ix_prehash_md5 on prehash;
+drop index ix_prehash_title on prehash;
+CREATE UNIQUE INDEX ix_prehash_md5 ON prehash(`hash`);
+CREATE UNIQUE INDEX ix_prehash_title ON prehash(`title`);
+
+#Uncompress the predb dump file
+gunzip predb_clean.csv.gz
+
+#set ownership to mysql, not sure that this step is needed, so just in case
+sudo chown mysql:mysql predb_clean.csv
+
+#Import the predb dump file, from mysql
+LOAD DATA INFILE 'predb_clean.csv' IGNORE into table `prehash` (title, nfo, size, category, predate, adddate, source, hash);
+
+#Recreate the original indexes, although this will allow duplicates
+drop index ix_prehash_md5 on prehash;
+drop index ix_prehash_title on prehash;
+CREATE INDEX ix_prehash_md5 ON prehash(`hash`);
+CREATE INDEX ix_prehash_title ON prehash(`title`);
