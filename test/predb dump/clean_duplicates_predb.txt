@@ -1,0 +1,25 @@
+#before dumping, correct some previous errors, if not already corrected
+update prehash set title = replace (title, '  - omgwtfnzbs.org', '');
+update prehash set nfo = REPLACE(nfo, 'nzb.isasecret.com', 'www.newshost.co.za');
+
+#create the dump file
+SELECT title, nfo, size, category, predate, adddate, source, hash INTO OUTFILE 'predb_temp.csv' FROM `prehash` order by source desc;
+
+#truncate the table
+truncate table prehash;
+
+#Create UNIQUE indexes
+drop index ix_prehash_md5 on prehash;
+drop index ix_prehash_title on prehash;
+CREATE UNIQUE INDEX ix_prehash_md5 ON prehash(`hash`);
+CREATE UNIQUE INDEX ix_prehash_title ON prehash(`title`);
+
+#Import the predb dump file, from mysql
+LOAD DATA INFILE 'predb_temp.csv' IGNORE into table `prehash` (title, nfo, size, category, predate, adddate, source, hash);
+
+#Remove the UNIQUE index, OPTIONAL
+drop index ix_prehash_md5 on prehash;
+drop index ix_prehash_title on prehash;
+CREATE INDEX ix_prehash_md5 ON prehash(`hash`);
+CREATE INDEX ix_prehash_title ON prehash(`title`);
+
