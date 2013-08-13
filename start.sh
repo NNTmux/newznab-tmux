@@ -70,8 +70,8 @@ else
 	$TMUXCMD splitw -h -p 50 'printf "\033]2;fix_core_releases\033\\"' 
 	$TMUXCMD selectp -t 8
 	$TMUXCMD splitw -h -p 50 'printf "\033]2;remove_blacklist_releases\033\\"' 
-	$TMUXCMD selectp -t 10
-	$TMUXCMD splitw -h -p 50 'printf "\033]2;hash_decrypt\033\\"' 
+	#$TMUXCMD selectp -t 10
+	#$TMUXCMD splitw -h -p 50 'printf "\033]2;hash_decrypt\033\\"' 
 	
 	
 
@@ -145,13 +145,11 @@ else
     $TMUXCMD splitw -v -p 67 'printf "\033]2;processBooks2\033\\"'
     $TMUXCMD splitw -v -p 50 'printf "\033]2;processUnwanted\033\\"'
 	
-	$TMUXCMD new-window -n other2 'printf "\033]2;PreHashScripts\033\\"'
+	$TMUXCMD new-window -n other2 'printf "\033]2;Remove Crap\033\\"'
 	$TMUXCMD selectp -t 0
-	$TMUXCMD splitw -v -p 50 'printf "\033]2;removeCrapReleses\033\\"'
-	$TMUXCMD selectp -t 0
-    $TMUXCMD splitw -h -p 66 'printf "\033]2;AflyPreDB\033\\"'
+    $TMUXCMD splitw -h -p 66 'printf "\033]2;Afly PreDB\033\\"'
     $TMUXCMD selectp -t 1
-    $TMUXCMD splitw -h -p 50 'printf "\033]2;FixReleaseNames\033\\"'
+    $TMUXCMD splitw -h -p 50 'printf "\033]2;Fix Release Names\033\\"'
 	
    
 
