@@ -56,8 +56,8 @@ else
 
     $TMUXCMD new-window -n other 'printf "\033]2;update_predb\033\\"' 
 	$TMUXCMD selectp -t 0
-	$TMUXCMD splitw -v -p 86 'printf "\033]2;sphinx\033\\"' 
-	$TMUXCMD splitw -v -p 83 'printf "\033]2;update_missing_movie_info\033\\"' 
+	$TMUXCMD splitw -v -p 67 'printf "\033]2;sphinx\033\\"' 
+	$TMUXCMD splitw -v -p 75 'printf "\033]2;update_missing_movie_info\033\\"' 
 	#$TMUXCMD splitw -v -p 80 'printf "\033]2;fix_android_releases\033\\"' 
 	#$TMUXCMD splitw -v -p 75 'printf "\033]2;fix_prodji_releases\033\\"' 
 	$TMUXCMD selectp -t 0
