@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.1r822a";
+$version="0.1r822b";
 
 $db = new DB();
 $DIR = dirname (__FILE__);
@@ -300,6 +300,7 @@ $active_groups = 0;
 $all_groups = 0;
 $backfill_groups =0;
 $prehash_matched = 0;
+$prehash_start = 0;
 $prehash = 0;
 $pre_diff = 0;
 
