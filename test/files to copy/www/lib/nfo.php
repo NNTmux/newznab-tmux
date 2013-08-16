@@ -5,6 +5,8 @@ require_once(WWW_DIR."/lib/tvrage.php");
 require_once(WWW_DIR."/lib/nntp.php");
 require_once(WWW_DIR."/lib/nzb.php");
 require_once(WWW_DIR."/lib/nzbinfo.php");
+require_once(WWW_DIR."/lib/rarinfo/par2info.php");
+
 
 // Silent Error Handler (used to shut up noisy XML exceptions)
 // We don't care if the nzb is corrupt with so many additional lines of
@@ -598,6 +600,64 @@ class Nfo
 	}
     // end of imported part
 
+    //Add isNFO, imported from nZEDb
+    // Confirm that the .nfo file is not something else.
+	public function isNFO($possibleNFO)
+	{
+		$ok = false;
+		if ($possibleNFO !== false)
+		{
+			if (!preg_match('/(<?xml|;\s*Generated\sby.+SF\w|^\s*PAR|\.[a-z0-9]{2,7}\s[a-z0-9]{8}|^\s*RAR|\A.{0,10}(JFIF|matroska|ftyp|ID3))/i', $possibleNFO))
+			{
+				if (strlen($possibleNFO) < 45 * 1024)
+				{
+					// exif_imagetype needs a minimum size or else it doesn't work.
+					if (strlen($possibleNFO) > 15)
+					{
+						// Check if it's a picture - EXIF.
+						if (@exif_imagetype($possibleNFO) == false)
+						{
+							// Check if it's a picture - JFIF.
+							if ($this->check_JFIF($possibleNFO) == false)
+							{
+								// Check if it's a par2.
+								$par2info = new Par2Info();
+								$par2info->setData($possibleNFO);
+								if ($par2info->error)
+								{
+									$ok = true;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return $ok;
+	}
+
+	//	Check if the possible NFO is a JFIF.
+	function check_JFIF($filename)
+	{
+		$fp = @fopen($filename, 'r');
+		if ($fp)
+		{
+			// JFIF often (but not always) starts at offset 6.
+			if (fseek($fp, 6) == 0)
+			{
+				// JFIF header is 16 bytes.
+				if (($bytes = fread($fp, 16)) !== false)
+				{
+					// Make sure it is JFIF header.
+					if (substr($bytes, 0, 4) == "JFIF")
+						return true;
+					else
+						return false;
+				}
+			}
+		}
+	}
+    //end of import
 	/**
 	 * Delete a releasenfo row.
 	 */
