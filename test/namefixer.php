@@ -151,7 +151,7 @@ class Namefixer
 				if ($this->echooutput === true)
 				{
 					$groups = new Groups();
-                    $functions = new Functions (),
+                    $functions = new Functions ();
 					$groupname = $functions->getByNameByID($release["groupID"]);
 					$oldcatname = $functions->getNameByID($release["categoryID"]);
 					$newcatname = $functions->getNameByID($determinedcat);
