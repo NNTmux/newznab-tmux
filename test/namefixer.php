@@ -4,6 +4,7 @@ require_once(WWW_DIR. "lib/framework/db.php");
 require_once(WWW_DIR. "lib/category.php");
 require_once(WWW_DIR. "lib/groups.php");
 require_once("namecleaner.php");
+require_once("functions.php");
 
 //This script is adapted from nZEDb
 /* Values of relnamestatus:
@@ -139,6 +140,7 @@ class Namefixer
 				$this->relid = $release["releaseID"];
 
 				$category = new Category();
+                $functions = new Functions ();
 				$determinedcat = $category->determineCategory($newname, $release["groupID"]);
 
 				if ($type === "PAR2, ")
@@ -149,9 +151,9 @@ class Namefixer
 				if ($this->echooutput === true)
 				{
 					$groups = new Groups();
-					$groupname = $groups->getByNameByID($release["groupID"]);
-					$oldcatname = $category->getNameByID($release["categoryID"]);
-					$newcatname = $category->getNameByID($determinedcat);
+					$groupname = $functions->getByNameByID($release["groupID"]);
+					$oldcatname = $functions->getNameByID($release["categoryID"]);
+					$newcatname = $functions->getNameByID($determinedcat);
 
 					if ($type === "PAR2, ")
 						echo $n;
@@ -190,6 +192,7 @@ class Namefixer
 				if ($row["title"] !== $release["searchname"])
 				{
 					$category = new Category();
+                    $functions = new Functions();
 					$determinedcat = $category->determineCategory($row["title"], $release["groupID"]);
 
 					if ($echo == 1)
@@ -204,9 +207,9 @@ class Namefixer
 						$groups = new Groups();
 						echo"New name: ".$row["title"]."\n".
 							"Old name: ".$release["searchname"]."\n".
-							"New cat:  ".$category->getNameByID($determinedcat)."\n".
-							"Old cat:  ".$category->getNameByID($release["categoryID"])."\n".
-							"Group:    ".$groups->getByNameByID($release["groupID"])."\n".
+							"New cat:  ".$functions->getNameByID($determinedcat)."\n".
+							"Old cat:  ".$functions->getNameByID($release["categoryID"])."\n".
+							"Group:    ".$functions->getByNameByID($release["groupID"])."\n".
 							"Method:   "."predb md5 release name: ".$row["source"]."\n"."\n";
 					}
 					$matched++;

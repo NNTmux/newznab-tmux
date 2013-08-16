@@ -13,6 +13,7 @@
 require_once(dirname(__FILE__)."/../bin/config.php");
 require_once("namefixer.php");
 require_once("prehash.php");
+require_once("functions.php");  
 
 
 $n = "\n";

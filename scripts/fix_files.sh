@@ -49,10 +49,10 @@ if [[ $KEVIN_SAFER == "true" ]] || [[ $PARSING_MOD == "true" ]]; then
     cp -frv * $NEWZPATH/www/lib/
 fi
 #copy needed files for hash_decrypt and fixReleaseNames scripts
-if [[ $HASH == "true" ]] || [[ $FIXRELEASES == "true" ]]; then
-	cd $DIR"/test/files to copy/www/lib"
-	cp -frv * $NEWZPATH/www/lib/
-fi	
+#if [[ $HASH == "true" ]] || [[ $FIXRELEASES == "true" ]]; then
+#	cd $DIR"/test/files to copy/www/lib"
+#	cp -frv * $NEWZPATH/www/lib/
+#fi	
 
 #set user/group to www
 echo "Fixing permisions, this can take some time if you have a large set of releases"
