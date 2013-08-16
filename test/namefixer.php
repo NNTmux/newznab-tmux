@@ -4,6 +4,7 @@ require_once(WWW_DIR. "lib/framework/db.php");
 require_once(WWW_DIR. "lib/category.php");
 require_once(WWW_DIR. "lib/groups.php");
 require_once("namecleaner.php");
+require_once("functions.php");
 
 //This script is adapted from nZEDb
 /* Values of relnamestatus:
