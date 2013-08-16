@@ -42,9 +42,10 @@ class Namefixer
 			echo "Fixing search names since the beginning using .nfo files.\n";
 
 		$db = new DB();
+        $functions = new Functions ();
 		$type = "NFO, ";
 		// Only select releases we haven't checked here before
-		$query = "SELECT nfo.releaseID as nfoID, rel.groupID, rel.categoryID, rel.searchname, uncompress(nfo) as textstring, rel.ID as releaseID from releases rel inner join releasenfo nfo on (nfo.releaseID = rel.ID) where relnamestatus = 1 and relstatus & " . DB::NFO_PROCESSED_NAMEFIXER . " = 0";
+		$query = "SELECT nfo.releaseID as nfoID, rel.groupID, rel.categoryID, rel.searchname, uncompress(nfo) as textstring, rel.ID as releaseID from releases rel inner join releasenfo nfo on (nfo.releaseID = rel.ID) where relnamestatus = 1 and relstatus & " . Functions::NFO_PROCESSED_NAMEFIXER . " = 0";
 
 		//24 hours, other cats
 		if ($time == 1 && $cats == 1)
