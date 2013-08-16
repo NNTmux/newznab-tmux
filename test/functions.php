@@ -14,7 +14,7 @@ require_once(WWW_DIR."/lib/groups.php");
 
  //*addedd from nZEDb for testing
 
-class CleanFix
+class Functions
 
 {
     public function fetchArray($result)

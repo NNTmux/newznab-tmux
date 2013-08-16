@@ -8,7 +8,7 @@ require_once(dirname(__FILE__)."/../bin/config.php");
 require_once(WWW_DIR."lib/framework/db.php");
 require_once(WWW_DIR."lib/releases.php");
 require_once(WWW_DIR."lib/site.php");
-require_once("functions.php");  
+require_once("functions.php");
 
 if (!isset($argv[1]) && !isset($argv[2]))
 {
@@ -58,6 +58,7 @@ if (isset($argv[1]) && $argv[1] == "true")
 	{
 	        global $delete;
 		$releases = new Releases();
+        $functions = new Functions ();
 		$s = new Sites();
 		$site = $s->get();
 		
@@ -67,7 +68,7 @@ if (isset($argv[1]) && $argv[1] == "true")
 		  if ($delete == 1)
 		        {
         			echo "Deleting: ".$type.": ".$rel['searchname']."\n";
-			        $releases->fastDelete($rel['ID'], $rel['guid'], $site);
+			        $functions->fastDelete($rel['ID'], $rel['guid'], $site);
 			}
 			else
 			{

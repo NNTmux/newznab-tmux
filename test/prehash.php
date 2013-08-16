@@ -5,7 +5,7 @@ require_once(WWW_DIR."lib/category.php");
 require_once(WWW_DIR."lib/groups.php");
 require_once(WWW_DIR."lib/nfo.php");
 require_once(WWW_DIR."lib/site.php");
-require_once("functions.php");  
+require_once("functions.php");
 
 /*
  * Class for inserting names/categories/md5 etc from predb sources into the DB, also for matching names on files / subjects.
@@ -381,12 +381,13 @@ Class Predb
 			if($res = $db->queryDirect("SELECT r.ID, p.nfo FROM releases r inner join predb p ON r.ID = p.releaseID WHERE p.nfo IS NOT NULL AND r.nfostatus != 1 LIMIT 100"))
 		{
 			$nfo = new Nfo($this->echooutput);
+            $functions = new Functions($this->echooutput);
 			while ($row = mysqli_fetch_assoc($res))
 			{
 				$buffer = getUrl($row["nfo"]);
 				if ($buffer !== false && strlen($buffer))
 				{
-					$nfo->addReleaseNfo($row["ID"]);
+					$functions->addReleaseNfo($row["ID"]);
 					$db->query(sprintf("UPDATE releasenfo SET nfo = compress(%s) WHERE releaseID = %d", $db->escapeString($buffer), $row["ID"]));
 					$db->query(sprintf("UPDATE releases SET nfostatus = 1 WHERE ID = %d", $row["ID"]));
 					if($this->echooutput)
