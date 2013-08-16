@@ -42,9 +42,10 @@ class Namefixer
 			echo "Fixing search names since the beginning using .nfo files.\n";
 
 		$db = new DB();
+        $functions = new Functions ();
 		$type = "NFO, ";
 		// Only select releases we haven't checked here before
-		$query = "SELECT nfo.releaseID as nfoID, rel.groupID, rel.categoryID, rel.searchname, uncompress(nfo) as textstring, rel.ID as releaseID from releases rel inner join releasenfo nfo on (nfo.releaseID = rel.ID) where relnamestatus = 1 and relstatus & " . DB::NFO_PROCESSED_NAMEFIXER . " = 0";
+		$query = "SELECT nfo.releaseID as nfoID, rel.groupID, rel.categoryID, rel.searchname, uncompress(nfo) as textstring, rel.ID as releaseID from releases rel inner join releasenfo nfo on (nfo.releaseID = rel.ID) where relnamestatus = 1 and relstatus & " . Functions::NFO_PROCESSED_NAMEFIXER . " = 0";
 
 		//24 hours, other cats
 		if ($time == 1 && $cats == 1)
@@ -62,7 +63,7 @@ class Namefixer
 		$rowcount = $db->getAffectedRows();
 		if ($rowcount > 0)
 		{
-			while ($relrow = $db->fetchArray($relres))
+			while ($relrow = $functions->fetchArray($relres))
 			{
 				echo "Reading NFO => ".$relrow['searchname']."\n";
 				$this->checkName($relrow, $echo, $type, $namestatus);
@@ -90,6 +91,7 @@ class Namefixer
 			echo "Fixing search names since the beginning using the filename.\n";
 
 		$db = new DB();
+        $functions = new Functions();
 		$type = "Filenames, ";
 		$query = "SELECT relfiles.name as textstring, rel.categoryID, rel.searchname, rel.groupID, relfiles.releaseID as fileID, rel.ID as releaseID from releases rel inner join releasefiles relfiles on (relfiles.releaseID = rel.ID) where relnamestatus = 1";
 
@@ -109,7 +111,7 @@ class Namefixer
 		$rowcount = $db->getAffectedRows();
 		if ($rowcount > 0)
 		{
-			while ($relrow = $db->fetchArray($relres))
+			while ($relrow = $functions->fetchArray($relres))
 			{
 				$this->checkName($relrow, $echo, $type, $namestatus);
 				$this->checked++;
@@ -151,6 +153,7 @@ class Namefixer
 				if ($this->echooutput === true)
 				{
 					$groups = new Groups();
+                    $functions = new Functions ();
 					$groupname = $functions->getByNameByID($release["groupID"]);
 					$oldcatname = $functions->getNameByID($release["categoryID"]);
 					$newcatname = $functions->getNameByID($determinedcat);
