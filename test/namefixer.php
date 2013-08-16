@@ -63,7 +63,7 @@ class Namefixer
 		$rowcount = $db->getAffectedRows();
 		if ($rowcount > 0)
 		{
-			while ($relrow = $db->fetchArray($relres))
+			while ($relrow = $functions->fetchArray($relres))
 			{
 				echo "Reading NFO => ".$relrow['searchname']."\n";
 				$this->checkName($relrow, $echo, $type, $namestatus);
@@ -91,6 +91,7 @@ class Namefixer
 			echo "Fixing search names since the beginning using the filename.\n";
 
 		$db = new DB();
+        $functions = new Functions();
 		$type = "Filenames, ";
 		$query = "SELECT relfiles.name as textstring, rel.categoryID, rel.searchname, rel.groupID, relfiles.releaseID as fileID, rel.ID as releaseID from releases rel inner join releasefiles relfiles on (relfiles.releaseID = rel.ID) where relnamestatus = 1";
 
@@ -110,7 +111,7 @@ class Namefixer
 		$rowcount = $db->getAffectedRows();
 		if ($rowcount > 0)
 		{
-			while ($relrow = $db->fetchArray($relres))
+			while ($relrow = $functions->fetchArray($relres))
 			{
 				$this->checkName($relrow, $echo, $type, $namestatus);
 				$this->checked++;
