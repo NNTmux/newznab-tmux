@@ -17,11 +17,12 @@ require_once(WWW_DIR."/lib/groups.php");
 class Functions
 
 {
+  // database function
     public function fetchArray($result)
 	{
 		return (is_null($result) ? null : $result->fetch_array());
 	}
-
+ //  gets name of category from category.php
     public function getNameByID($ID)
 	{
 		$db = new DB();
@@ -31,7 +32,7 @@ class Functions
 		$cat = array_shift($arr2);
 		return $parent." ".$cat;
 	}
-
+    //deletes from releases
     public function fastDelete($id, $guid, $site)
 	{
 		$db = new DB();
@@ -61,7 +62,7 @@ class Functions
 
 		$ri->delete($guid); // This deletes a file so not in the query
 	}
-
+    //reads name of group
      public function getByNameByID($id)
 	{
 		$db = new DB();
