@@ -15,6 +15,7 @@ require_once("functions.php");
  * 4 : Fixed with misc_sorter.
  * 5 : Fixed with decrypt hashes.
  * 6 : Matched properly in namecleaning.php's releaseCleaner function.
+ * 7 : Fixed with PAR2.
  */
 
 class Namefixer
@@ -138,7 +139,6 @@ class Namefixer
 			$newname = $namecleaning->fixerCleaner($name);
 			if ($newname !== $release["searchname"])
 			{
-				$n = "\n";
 				$this->relid = $release["releaseID"];
 
 				$category = new Category();
@@ -157,6 +157,7 @@ class Namefixer
 					$groupname = $functions->getByNameByID($release["groupID"]);
 					$oldcatname = $functions->getNameByID($release["categoryID"]);
 					$newcatname = $functions->getNameByID($determinedcat);
+                    $n = "\n";
 
 					if ($type === "PAR2, ")
 						echo $n;
@@ -174,7 +175,12 @@ class Namefixer
 				{
 					$db = new DB();
 					if ($namestatus == 1)
-						$db->queryDirect(sprintf("UPDATE releases set searchname = %s, relnamestatus = 2, categoryID = %d where ID = %d", $db->escapeString($newname), $determinedcat, $release["releaseID"]));
+					{
+						$status = 2;
+						if ($type == "PAR2, ")
+							$status = 7;
+						$db->queryDirect(sprintf("UPDATE releases set searchname = %s, relnamestatus = %d, categoryID = %d where ID = %d", $db->escapeString($newname), $status, $determinedcat, $release["releaseID"]));
+					}
 					else
 						$db->queryDirect(sprintf("UPDATE releases set searchname = %s, categoryID = %d where ID = %d", $db->escapeString($newname), $determinedcat, $release["releaseID"]));
 				}
@@ -225,26 +231,30 @@ class Namefixer
 	//
 	//  Check the array using regex for a clean name.
 	//
-	public function checkName($release, $echo, $type, $namestatus)
+   	public function checkName($release, $echo, $type, $namestatus)
 	{
-		// Just for filenames.
-		if ($type == "Filenames, ")
+		if ($type == "PAR2, ")
 			$this->fileCheck($release, $echo, $type, $namestatus);
-		$this->tvCheck($release, $echo, $type, $namestatus);
-		$this->movieCheck($release, $echo, $type, $namestatus);
-		$this->gameCheck($release, $echo, $type, $namestatus);
-		$this->appCheck($release, $echo, $type, $namestatus);
-		// Just for NFOs.
-		if ($type == "NFO, ")
+		else
 		{
-			$this->nfoCheckTV($release, $echo, $type, $namestatus);
-			$this->nfoCheckMov($release, $echo, $type, $namestatus);
-			$this->nfoCheckMus($release, $echo, $type, $namestatus);
-			$this->nfoCheckTY($release, $echo, $type, $namestatus);
-			$this->nfoCheckG($release, $echo, $type, $namestatus);
+			// Just for filenames.
+			if ($type == "Filenames, ")
+				$this->fileCheck($release, $echo, $type, $namestatus);
+			$this->tvCheck($release, $echo, $type, $namestatus);
+			$this->movieCheck($release, $echo, $type, $namestatus);
+			$this->gameCheck($release, $echo, $type, $namestatus);
+			$this->appCheck($release, $echo, $type, $namestatus);
+			// Just for NFOs.
+			if ($type == "NFO, ")
+			{
+				$this->nfoCheckTV($release, $echo, $type, $namestatus);
+				$this->nfoCheckMov($release, $echo, $type, $namestatus);
+				$this->nfoCheckMus($release, $echo, $type, $namestatus);
+				$this->nfoCheckTY($release, $echo, $type, $namestatus);
+				$this->nfoCheckG($release, $echo, $type, $namestatus);
 		}
 	}
-
+    }
 	//
 	//  Look for a TV name.
 	//
