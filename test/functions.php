@@ -139,6 +139,84 @@ class Functions
 			}
 		}
 	}
+
+    //
+	// Attempt to get a better name from a par2 file and categorize the release.
+	//
+	public function parsePAR2($messageID, $relID, $groupID)
+	{
+		$db = new DB();
+		$category = new Category();
+        $functions = new Functions();
+
+		$quer = $db->queryOneRow("SELECT groupID, categoryID, relnamestatus, searchname, UNIX_TIMESTAMP(postdate) as postdate, ID as releaseID  FROM releases WHERE ID = {$relID}");
+		if ($quer["relnamestatus"] !== 1 && $quer["categoryID"] != Category::CAT_MISC)
+			return false;
+
+		$nntp = new NNTP();
+		$nntp->doConnect();
+		$groups = new Groups();
+        $functions = new Functions();
+		$par2 = $nntp->getMessage($functions->getByNameByID($groupID), $messageID);
+		if ($par2 === false || PEAR::isError($par2))
+		{
+			$nntp->doQuit();
+			$nntp->doConnect();
+			$par2 = $nntp->getMessage($functions->getByNameByID($groupID), $messageID);
+			if ($par2 === false || PEAR::isError($par2))
+			{
+				$nntp->doQuit();
+				return false;
+			}
+		}
+		$nntp->doQuit();
+
+		$par2info = new Par2Info();
+		$par2info->setData($par2);
+		if ($par2info->error)
+			return false;
+
+		$files = $par2info->getFileList();
+		if (count($files) > 0)
+		{
+			$namefixer = new Namefixer($this->echooutput);
+			$rf = new ReleaseFiles();
+			$relfiles = 0;
+			$foundname = false;
+			foreach ($files as $fileID => $file)
+			{
+				// Add to releasefiles.
+				if ($db->queryOneRow(sprintf("SELECT ID FROM releasefiles WHERE releaseID = %d AND name = %s", $relID, $this->db->escapeString($file["name"]))) === false)
+				{
+					if ($rf->add($relID, $file["name"], $file["size"], $quer["postdate"], 0))
+						$relfiles++;
+				}
+				$quer["textstring"] = $file["name"];
+				$namefixer->checkName($quer, 1, "PAR2, ", 1);
+				$stat = $db->queryOneRow("SELECT relnamestatus AS a FROM releases WHERE ID = {$relID}");
+				if ($stat["a"] != 1)
+				{
+					$foundname = true;
+					break;
+				}
+			}
+			if ($relfiles > 0)
+			{
+
+				$cnt = $db->queryOneRow("SELECT COUNT(releaseID) AS count FROM releasefiles WHERE releaseID = {$relID}");
+				$count = $relfiles;
+				if ($cnt !== false && $cnt["count"] > 0)
+					$count = $relfiles + $cnt["count"];
+				$db->query(sprintf("UPDATE releases SET rarinnerfilecount = %d where ID = %d", $count, $relID));
+			}
+			if ($foundname === true)
+				return true;
+			else
+				return false;
+		}
+		else
+			return false;
+	}
     //end of testing
 
    }
