@@ -1072,8 +1072,8 @@ class nameCleaning
 		}
         	else if ($groupName === "alt.binaries.tun")
 		{
-			* Leaving here to show that you can get the names from these.
-			* Useless since all these are passworded and if there is a backlog in post proc, sickbeard will pull these and they will fail since they are passworded.
+			// Leaving here to show that you can get the names from these.
+			// Useless since all these are passworded and if there is a backlog in post proc, sickbeard will pull these and they will fail since they are passworded.
 			//[ nEwZ[NZB].iNFO - [ QmlnTW91dGhmdWxzLjEzLjA3LjA4LkNocmlzc3kuR3JlZW5lLlhYWC43MjBwLk1QNC1LVFI= ] - File [06/48]: "b582519da4d849df003559fc4ae45219.nfo" yEnc
 			if (preg_match('/^\[ nEwZ\[NZB\]\.iNFO - \[ ([a-z0-9A-Z]{3,}=) \] - File \[\d+\/\d+\]: ".+?" yEnc$/', $subject, $match))
 				return base64_decode($match[1]);
