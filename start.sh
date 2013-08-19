@@ -58,23 +58,13 @@ else
 	$TMUXCMD selectp -t 0
 	$TMUXCMD splitw -v -p 75 'printf "\033]2;sphinx\033\\"' 
 	$TMUXCMD splitw -v -p 67 'printf "\033]2;update_missing_movie_info\033\\"' 
-	#$TMUXCMD splitw -v -p 80 'printf "\033]2;fix_android_releases\033\\"' 
-	#$TMUXCMD splitw -v -p 75 'printf "\033]2;fix_prodji_releases\033\\"' 
 	$TMUXCMD selectp -t 0
     $TMUXCMD splitw -h -p 50 'printf "\033]2;update_tv\033\\"' 
 	$TMUXCMD selectp -t 2
     $TMUXCMD splitw -h -p 50 'printf "\033]2;delete_parts\033\\"' 
 	$TMUXCMD selectp -t 4
     $TMUXCMD splitw -h -p 50 'printf "\033]2;optimize\033\\"' 
-	#$TMUXCMD selectp -t 6
-	#$TMUXCMD splitw -h -p 50 'printf "\033]2;fix_core_releases\033\\"' 
-	#$TMUXCMD selectp -t 8
-	#$TMUXCMD splitw -h -p 50 'printf "\033]2;remove_blacklist_releases\033\\"' 
-	#$TMUXCMD selectp -t 10
-	#$TMUXCMD splitw -h -p 50 'printf "\033]2;hash_decrypt\033\\"' 
 	
-	
-
     $TMUXCMD new-window -n post1a 'printf "\033]2;postprocessing[01]\033\\"'
     $TMUXCMD selectp -t 0
     $TMUXCMD splitw -v -p 88 'printf "\033]2;postprocessing[03]\033\\"'
