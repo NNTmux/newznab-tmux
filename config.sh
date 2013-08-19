@@ -313,9 +313,9 @@ export FIXRELEASES_TIMER="600"
 #choose to use afly predbhashcompare.php. Use this only if you have access to 
 #nzpre/predb, otherwise it will not work
 #Before you use this, import db.sql from test/db_updates/ folder
-export AFLY_PREDB="false"
+export AFLY="false"
 #How often to run this script in seconds, default is 10 minutes
-export AFLY_PREDB_TIMER="600"
+export AFLY_TIMER="600"
 
 ############################################################
 
