@@ -304,8 +304,10 @@ export REMOVECRAP_TIMER="40"
 
 ############################################################
 
-#choose to run fixReleaseNames script. This requires you to copy files from "files to copy" folder
-#and is modifying existing core files of newznab. Script may stop working after svn update.
+#choose to run fixReleaseNames script.Before you can use this scripts you need
+#to import db.sql from test/db_updates/ and prehash.sql from test/initial_setup/ folder
+#to your newznab database.
+#Script may stop working after svn update.
 #This is a modified script used by nZEDb and is work in progress
 export FIXRELEASES="false"
 #How often to run this script in seconds, default is 10 minutes
@@ -318,7 +320,6 @@ export AFLY="false"
 export AFLY_TIMER="600"
 
 ############################################################
-
 
 #Choose to run update_predb.php
 export PREDB="false"
