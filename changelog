@@ -1,3 +1,5 @@
+26.08.2013	-->	Fixed typo in monitor.php and updated removeCrapreleases.php.
+23.08.2013	-->	Updated namecleaner
 19.08.2013	-->	Updated namecleaner and namefixer. 
 13.08.2013	-->	Added predb dump with more than 5 million releases for prehash table. Run commands from clean_duplicates_predb.txt first and then from import_predb.txt. PreDB data can be downloaded 	
 			--> from https://mega.co.nz/#!xggDlBSC!ZDMDPVzbFY_MrzkWqX2EIFgIX8dV0vBkyQ_RF4SAb1A
