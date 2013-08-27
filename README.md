@@ -1,6 +1,12 @@
 I have forked jonnyboys newznab-tmux as he and the dev team have moved to another project (https://github.com/nZEDb/nZEDb). I will try as much as i can to maintain and improve these tmux scripts, where possible and needed, as they are a valuable addendum to newznab+.
 Support is given on irc.synirc.net #newznab-tmuxd channel and also on original newznab-tmux channel.
-I started adapting some of more interesting scripts from nZEDb, but they require tempering with newznab database and core newznab files, so use them at your own risk. Any update to nn+ db or core files could render them useless.
+
+I started adapting some of more interesting scripts from nZEDb, but they require tempering with newznab database, so use them at your own risk. Any update to nn+ db could render them useless.
+There is a test folder in main tmux folder. In that folder you will find three different folders, /db_update/, /initial_setup/ and /predb_dump/. When you are done with initial setup and before you run start.sh for the first time, do the following:
+1. Import db.sql from db_update folder into newznab database,
+2. Import create_prehash_table.sql from initial_setup folder, be aware that this WILL delete your existing prehash table.
+3. OPTIONAL: If you want to populate your prehash table with more than 5 million rows of pre data, run commands from import_predb.txt in mysql. Predb dump can be downloaded from  https://mega.co.nz/#!xggDlBSC!ZDMDPVzbFY_MrzkWqX2EIFgIX8dV0vBkyQ_RF4SAb1A. If you already have prehash table created by aflys init.php, you will need to run commands from clean_duplicates_predb.txt before you run import_predb.txt
+
 
 
 Below is the original readme of newznab-tmux, with changes related to my git and removal of donation links:
