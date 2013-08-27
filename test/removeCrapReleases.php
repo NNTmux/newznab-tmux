@@ -144,7 +144,7 @@ if (isset($argv[1]) && $argv[1] == "true")
 	{
 		$type = "Passworded";
 		$db = new DB();
-		$sql = $db->query("select ID, guid, searchname from releases where searchname REGEXP '/passworded|password protect|password/i' and nzbstatus in (1, 2)".$and);
+		$sql = $db->query("select ID, guid, searchname from releases where ( searchname like '%passworded%' or searchname like '%password protect%' or searchname like '%password%' or searchname like '%passwort%' ) and searchname NOT like '%no password%' and searchname NOT like '%not passworded%' and searchname NOT like '%unlocker%' and searchname NOT like '%reset%' and searchname NOT like '%recovery%' and searchname NOT like '%keygen%' and searchname NOT like '%advanced%' and nzbstatus in (1, 2) and categoryID not in (4000, 4010, 4020, 4030, 4040, 4050, 4060, 4070, 8000, 8010)".$and); 
 		$delcount = deleteReleases($sql, $type);
 		return $delcount;
 	}
