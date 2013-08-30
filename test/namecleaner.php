@@ -1076,7 +1076,7 @@ class nameCleaning
 			else
 				return $this->releaseCleanerHelper($subject);
 		}
-        else if ($groupname === "alt.binaries.all-your-base-are-belong-to-us")
+        else if ($groupName === "alt.binaries.all-your-base-are-belong-to-us")
         {
              	//[www.allyourbasearebelongtous.pw]-[The Place Beyond the Pines 2012 1080p US Blu-ray AVC DTS-HD MA 5.1-HDWinG]-[03/97] "tt1817273-us-hdwing-bd.r00" - 46.51 GB - yEnc
 			 if (preg_match('/^\[www\..+?\]-\[(.+?)\]-\[\d+\/\d+\] ".+?" - \d+[,.]\d+ [mMkKgG][bB] - yEnc$/', $subject, $match))
