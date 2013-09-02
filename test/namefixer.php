@@ -35,7 +35,7 @@ class Namefixer
 		$this->timeall = " and rel.adddate > (now() - interval 6 hour) group by rel.ID order by postdate desc";
 		$this->fullother = " and rel.categoryID in (2020, 5050, 6070, 8010) group by rel.ID order by postdate desc";
 		$this->fullall = " order by postdate desc";
-        $this->done = false;
+        $this->done = $this->matched = false;
 	}
 
 	//
@@ -73,7 +73,7 @@ class Namefixer
 		{
 			while ($relrow = $functions->fetchArray($relres))
 			{
-				$this->done = false;
+				$this->done = $this->matched = false;
 				$this->checkName($relrow, $echo, $type, $namestatus);
 				$this->checked++;
 				if ($this->checked % 500 == 0)
@@ -121,7 +121,7 @@ class Namefixer
 		{
 			while ($relrow = $functions->fetchArray($relres))
 			{
-				$this->done = false;
+				$this->done = $this->matched = false;
 				$this->checkName($relrow, $echo, $type, $namestatus);
 				$this->checked++;
 				if ($this->checked % 500 == 0)
