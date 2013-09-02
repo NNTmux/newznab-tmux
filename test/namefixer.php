@@ -8,14 +8,20 @@ require_once("functions.php");
 
 //This script is adapted from nZEDb
 /* Values of relnamestatus:
- * 0 : New release, just inserted into the table.
- * 1 : Categorized release.
- * 2 : Fixed with namefixer.
- * 3 : Fixed with post proc (from mp3 tags or music.php) or predb.
- * 4 : Fixed with misc_sorter.
- * 5 : Fixed with decrypt hashes.
- * 6 : Matched properly in namecleaning.php's releaseCleaner function.
- * 7 : Fixed with PAR2.
+ * 0  : New release, just inserted into the table.
+ * 1  : Categorized release.
+ * 								Previously (see 8,9,10): 2 : Fixed with namefixer.
+ * 3  : Fixed with post proc (from mp3 tags or music.php).
+ * 4  : Fixed with misc_sorter.
+ * 5  : Fixed with decrypt hashes.
+ * 6  : Matched properly in namecleaning.php's releaseCleaner function.
+ * 7  : Fixed with PAR2.
+ * 8  : Fixed with namefixer NFO.
+ * 9  : Fixed with namefixer Files.
+ * 10 : Fixed with namefixer preDB.
+ * 11 : Fixed with prehash.php
+ * 12 : Fixed with requestID.
+ * 20 : The release was checked by namefixer but no name was found.
  */
 
 class Namefixer
@@ -163,12 +169,13 @@ class Namefixer
 
 					if ($type === "PAR2, ")
 						echo $n;
-					echo	"New name: ".$newname.$n.
-							"Old name: ".$release["searchname"].$n.
-							"New cat:  ".$newcatname.$n.
-							"Old cat:  ".$oldcatname.$n.
-							"Group:    ".$groupname.$n.
-							"Method:   ".$type.$method.$n;
+					echo	$n."New name:  ".$newname.$n.
+							"Old name:  ".$release["searchname"].$n.
+							"New cat:   ".$newcatname.$n.
+							"Old cat:   ".$oldcatname.$n.
+							"Group:     ".$groupname.$n.
+							"Method:    ".$type.$method.$n.
+							"ReleaseID: ". $release["releaseid"].$n;
 					if ($type !== "PAR2, ")
 						echo $n;
 				}
@@ -178,10 +185,13 @@ class Namefixer
 					$db = new DB();
 					if ($namestatus == 1)
 					{
-						$status = 2;
-						if ($type == "PAR2, ")
+					   if ($type == "NFO, ")
+							$status = 8;
+						else if ($type == "PAR2, ")
 							$status = 7;
-						$db->queryDirect(sprintf("UPDATE releases set searchname = %s, relnamestatus = %d, categoryID = %d where ID = %d", $db->escapeString($newname), $status, $determinedcat, $release["releaseID"]));
+						else if ($type == "Filenames, ")
+							$status = 9;
+						$db->queryDirect(sprintf("UPDATE releases set searchname = %s, relnamestatus = %d, categoryID = %d where ID = %d", $db->escapeString(substr($newname, 0, 255)), $status, $determinedcat, $release["releaseID"]));
 					}
 					else
 						$db->queryDirect(sprintf("UPDATE releases set searchname = %s, categoryID = %d where ID = %d", $db->escapeString($newname), $determinedcat, $release["releaseID"]));
@@ -223,6 +233,7 @@ class Namefixer
 							"Old cat:  ".$functions->getNameByID($release["categoryID"])."\n".
 							"Group:    ".$functions->getByNameByID($release["groupID"])."\n".
 							"Method:   "."predb md5 release name: ".$row["source"]."\n"."\n";
+                            "ReleaseID: ". $release["id"].$n.$n;
 					}
 					$matched++;
 				}
@@ -257,7 +268,13 @@ class Namefixer
 				$this->nfoCheckG($release, $echo, $type, $namestatus);
 		}
 	}
-    }
+    // The release didn't match so set relnamestatus to 20 so it doesn't get rechecked. Also allows removeCrapReleases to run extra things on the release.
+		if ($namestatus == 1 && $this->matched === false)
+		{
+			$db = new Db;
+			$db->queryExec(sprintf("UPDATE releases SET relnamestatus = 20 WHERE id = %d", $release['releaseid']));
+		}
+	}
 	//
 	//  Look for a TV name.
 	//
