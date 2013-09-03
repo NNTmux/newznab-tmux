@@ -72,14 +72,7 @@ class Namefixer
 		if ($rowcount > 0)
 		{
 			while ($relrow = $functions->fetchArray($relres))
-            	//ignore encrypted nfos
-				if (preg_match('/^=newz\[NZB\]=\w+/', $relrow['nfo']))
-				{
-					$fail = $db->query(sprintf("UPDATE releases SET relnamestatus = 20 WHERE ID = %d", $relrow['ID']));
-					$fail->execute();
-					$this->checked++;
-				}
-				else
+            	
             {
 				$this->done = $this->matched = false;
 				$this->checkName($relrow, $echo, $type, $namestatus);
