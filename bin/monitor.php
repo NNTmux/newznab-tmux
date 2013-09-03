@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.1r827";
+$version="0.1r828";
 
 $db = new DB();
 $DIR = dirname (__FILE__);
@@ -822,7 +822,7 @@ if ($array ['FIXRELEASES'] = "true") {
 			$dead5 = str_replace( " ", '', `tmux list-panes -t {$array['TMUX_SESSION']}:4 | grep dead | wc -l` );
 			$dead6 = str_replace( " ", '', `tmux list-panes -t {$array['TMUX_SESSION']}:5 | grep dead | wc -l` );
 			$dead7 = str_replace( " ", '', `tmux list-panes -t {$array['TMUX_SESSION']}:6 | grep dead | wc -l` );
-			if (( $dead1 >= 4 ) && ( $dead2 == 11 ) && ( $dead3 == 16 ) && ( $dead4 == 16 ) && ( $dead5 == 8 ) && ( $dead6 == 8 ) && ( $dead7 == 3 )) {
+			if (( $dead1 >= 4 ) && ( $dead2 == 6 ) && ( $dead3 == 16 ) && ( $dead4 == 16 ) && ( $dead5 == 8 ) && ( $dead6 == 8 ) && ( $dead7 == 3 )) {
 				$optimize_run="true";
 			} else {
 				$optimize_run="false";
@@ -872,7 +872,7 @@ if ($array ['FIXRELEASES'] = "true") {
 			$dead5 = str_replace( " ", '', `tmux list-panes -t {$array['TMUX_SESSION']}:4 | grep dead | wc -l` );
 			$dead6 = str_replace( " ", '', `tmux list-panes -t {$array['TMUX_SESSION']}:5 | grep dead | wc -l` );
 			$dead7 = str_replace( " ", '', `tmux list-panes -t {$array['TMUX_SESSION']}:6 | grep dead | wc -l` );
-			if (( $dead1 >= 4 ) && ( $dead2 == 11 ) && ( $dead3 == 16 ) && ( $dead4 == 16 ) && ( $dead5 == 8 ) && ( $dead6 == 8 ) && ($dead7 == 3)) {
+			if (( $dead1 >= 4 ) && ( $dead2 == 6 ) && ( $dead3 == 16 ) && ( $dead4 == 16 ) && ( $dead5 == 8 ) && ( $dead6 == 8 ) && ($dead7 == 3)) {
 				$optimize_run="true";
 			} else {
 				$optimize_run="false";
