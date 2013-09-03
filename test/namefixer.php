@@ -72,7 +72,7 @@ class Namefixer
 		if ($rowcount > 0)
 		{
 			while ($relrow = $functions->fetchArray($relres))
-            	
+
             {
 				$this->done = $this->matched = false;
 				$this->checkName($relrow, $echo, $type, $namestatus);
@@ -176,7 +176,7 @@ class Namefixer
 							"Old cat:   ".$oldcatname.$n.
 							"Group:     ".$groupname.$n.
 							"Method:    ".$type.$method.$n.
-							"ReleaseID: ". $release["releaseid"].$n;
+							"ReleaseID: ". $release["releaseID"].$n;
 					if ($type !== "PAR2, ")
 						echo $n;
 				}
@@ -238,7 +238,7 @@ class Namefixer
 							"Old cat:   ".$functions->getNameByID($release["categoryID"]).$n.
 							"Group:     ".$functions->getByNameByID($release["groupID"]).$n.
 							"Method:    "."predb md5 release name: ".$row["source"].$n.
-							"ReleaseID: ". $release["id"].$n.$n;
+							"ReleaseID: ". $release["ID"].$n.$n;
 					}
 					$matching++;
 				}
