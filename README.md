@@ -1,7 +1,7 @@
 I have forked jonnyboys newznab-tmux as he and the dev team have moved to another project (https://github.com/nZEDb/nZEDb). I will try as much as i can to maintain and improve these tmux scripts, where possible and needed, as they are a valuable addendum to newznab+.
 Support is given on irc.synirc.net #newznab-tmuxd channel and also on original newznab-tmux channel.
 
-I started adapting some of more interesting scripts from nZEDb, but they require tempering with newznab database, so use them at your own risk. Any update to nn+ db could render them useless.
+I started adapting some of more interesting scripts from nZEDb, but they require tempering with newznab database, so use them at your own risk. Any update to nn+ db could render them useless. Scripts require PHP version > 5.3.10
 There is a test folder in main tmux folder. In that folder you will find three different folders, /db_update/, /initial_setup/ and /predb_dump/. When you are done with initial setup and before you run start.sh for the first time, do the following:
 
 1. Import db.sql from db_update folder into newznab database,
