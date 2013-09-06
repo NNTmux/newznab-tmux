@@ -833,6 +833,12 @@ class nameCleaning
 			//<ghost-of-usenet.org>XCOM.Enemy.Unknown.Deutsch.Patch.TokZic [0/9] - "XCOM Deutsch.nzb" ein CrazyUpp yEnc
 			else if (preg_match('/^<ghost-of-usenet\.org>(.+?) \[\d+\/\d+\] - ".+?" .+? yEnc$/', $subject, $match))
 				return $match[1];
+            //brothers-of-usenet.info/.net <<<Partner von SSL-News.info>>> - [21/22] - "e4e4ztb54238ibftu.vol127+128.par2" yEnc
+			else if (preg_match('/^brothers-of-usenet.info\/\.net <<<Partner von SSL-News.info>>> - \[\d+\/\d+\] - "(.+?)(\.vol|\.par).+?" yEnc$/', $subject, $match))
+				return $match[1];
+			//58600-0[51/51] - "58600-0.vol0+1.par2" yEnc
+			else if (preg_match('/^(\d+)\-\d+\[\d+\/\d+\] - ".+?" yEnc$/', $subject, $match))
+				return $match[1];    
 			else
 				return $this->releaseCleanerHelper($subject);
 		}
@@ -950,6 +956,17 @@ class nameCleaning
 			//[4197] [036/103] - "ant-mgstlcd2.r34" yEnc
 			if (preg_match('/^(\[\d+\] )\[\d+\/\d+\] - "(.+?)'.$this->e1, $subject, $match))
 				return $match[1].$match[2];
+			else
+				return $this->releaseCleanerHelper($subject);
+		}
+        else if ($groupName === "alt.binaries.sounds.flac")
+		{
+			//[32974]-[FULL]-[#a.b.flac]-[ Tenniscoats-Tokinouta-JP-CD-FLAC-2011-BCC ]-[04/28] - "00-tenniscoats-tokinouta-jp-cd-flac-2011.nfo" yEnc
+			if (preg_match('/^\[\d+\]-\[[a-zA-Z]+\]-\[\#.+?\]-\[(.+?)\]-\[\d.?\/\d.?] - ".+?" yEnc$/', $subject, $match))
+				return $match[1];
+			//[33008]-[FULL]-[a b flac]-[ Moby-Destroyed-Deluxe_Edition-2CD-FLAC-2011-WRE ]-[02/37] - "000-moby-destroyed-deluxe_edition-2cd-2011 nfo" yEnc
+			else if (preg_match('/^\[\d+\]-\[[a-zA-Z]+\]-\[.+?\]-\[(.+?)\]-\[\d.?\/\d.?] - ".+?" yEnc$/', $subject, $match))
+				return $match[1];
 			else
 				return $this->releaseCleanerHelper($subject);
 		}
