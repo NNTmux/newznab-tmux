@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.1r829";
+$version="0.1r830";
 
 $db = new DB();
 $DIR = dirname (__FILE__);
@@ -883,11 +883,14 @@ if ($array ['FIXRELEASES'] = "true") {
 				$color = get_color();
 				shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.$g 'echo \"\033[38;5;\"$color\"m\n$panes0[$g]\nKilled in prep for \nOptimization\" && date +\"%D %T\" && echo \"This is color #$color\" && $ds1 $panes0[$g] $ds4'");
 			}
-			for ($g=0; $g<=10; $g++)
+			for ($g=0; $g<=6; $g++)
 			{
 				$color = get_color();
 				shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:1.$g 'echo \"\033[38;5;\"$color\"m\n$panes1[$g]\nKilled in prep for \nOptimization\" && date +\"%D %T\" && echo \"This is color #$color\" && $ds1 $panes1[$g] $ds4'");
 				$color = get_color();
+            }
+            for ($g=0; $g<=8; $g++)
+            {
 				shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:4.$g 'echo \"\033[38;5;\"$color\"m\n$panes4[$g]\nKilled in prep for \nOptimization\" && date +\"%D %T\" && echo \"This is color #$color\" && $ds1 $panes4[$g] $ds4'");
 				$color = get_color();
 				shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:5.$g 'echo \"\033[38;5;\"$color\"m\n$panes5[$g]\nKilled in prep for \nOptimization\" && date +\"%D %T\" && echo \"This is color #$color\" && $ds1 $panes5[$g] $ds4'");
@@ -899,7 +902,7 @@ if ($array ['FIXRELEASES'] = "true") {
 				$color = get_color();
 				shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:3.$g 'echo \"\033[38;5;\"$color\"m\n$panes3[$g]\nKilled in prep for \nOptimization\" && date +\"%D %T\" && echo \"This is color #$color\" && $ds1 $panes3[$g] $ds4'");
 			}
-			for ($g=0; $g<=2; $g++)
+			for ($g=0; $g<=3; $g++)
 			{
 				$color = get_color();
 				shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:6.$g 'echo \"\033[38;5;\"$color\"m\n$panes6[$g]\nKilled in prep for \nOptimization\" && date +\"%D %T\" && echo \"This is color #$color\" && $ds1 $panes6[$g] $ds4'");
