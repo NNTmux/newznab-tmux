@@ -169,7 +169,7 @@ class Namefixer
 			foreach ($relres as $relrow)
 			{
 				$nzbcontents = new NZBcontents();
-				$nzbcontents->checkPAR2($relrow['guid'], $relrow['releaseid'], $relrow['groupid'], true);
+				$nzbcontents->checkPAR2($relrow['guid'], $relrow['releaseID'], $relrow['groupID'], true);
 				$this->checked++;
 				echo ".";
 				if ($this->checked % 500 == 0)

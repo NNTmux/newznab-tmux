@@ -31,8 +31,9 @@ Class NZBcontents
 	public function LoadNZB($guid)
 	{
 		$nzb = new NZB();
+        $functions = new Functions();
 		// Fetch the NZB location using the GUID.
-		if (!file_exists($nzbpath = $nzb->NZBPath($guid)))
+		if (!file_exists($nzbpath = $functions->NZBPath($guid)))
 		{
 			echo "\n".$guid." appears to be missing the nzb file, skipping.\n";
 			return false;

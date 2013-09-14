@@ -218,6 +218,13 @@ class Functions
 		else
 			return false;
 	}
+
+    // Check if the NZB is there, returns path, else false.
+	function NZBPath($releaseGuid, $sitenzbpath = "")
+	{
+		$nzbfile = $this->getNZBPath($releaseGuid, $sitenzbpath, false);
+		return !file_exists($nzbfile) ? false : $nzbfile;
+	}
     //end of testing
 
    }
