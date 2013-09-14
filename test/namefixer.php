@@ -5,6 +5,7 @@ require_once(WWW_DIR. "lib/category.php");
 require_once(WWW_DIR. "lib/groups.php");
 require_once("namecleaner.php");
 require_once("functions.php");
+require_once("nzbcontents.php");
 
 //This script is adapted from nZEDb
 /* Values of relnamestatus:
@@ -21,7 +22,9 @@ require_once("functions.php");
  * 10 : Fixed with namefixer preDB.
  * 11 : Fixed with prehash.php
  * 12 : Fixed with requestID.
- * 20 : The release was checked by namefixer but no name was found.
+ * 20 : The release was checked by namefixer nfo but no name was found
+ * 21 : The release was checked by namefixer filename but no name was found
+ * 22 : The release was checked by namefixer par2 but no name was found
  */
 
 class Namefixer
@@ -125,6 +128,50 @@ class Namefixer
 				$this->done = $this->matched = false;
 				$this->checkName($relrow, $echo, $type, $namestatus);
 				$this->checked++;
+				if ($this->checked % 500 == 0)
+					echo $this->checked." files processed.\n\n";
+			}
+			if($echo == 1)
+				echo $this->fixed." releases have had their names changed out of: ".$this->checked." files.\n";
+			else
+				echo $this->fixed." releases could have their names changed. ".$this->checked." files were checked.\n";
+		}
+		else
+			echo "Nothing to fix.\n";
+	}
+    //  Attempts to fix release names using the Par2 File.
+	public function fixNamesWithPar2($time, $echo, $cats, $namestatus)
+	{
+		if ($time == 1)
+			echo "Fixing search names in the past 6 hours using the par2 files.\n";
+		else
+			echo "Fixing search names since the beginning using the par2 files.\n";
+
+		$db = new DB();
+		$type = "Filenames, ";
+		$query = "SELECT DISTINCT rel.ID AS releaseID, rel.guid, rel.groupID FROM releases rel INNER JOIN releasefiles relfiles ON (relfiles.releaseID = rel.ID) WHERE relnamestatus IN (0, 1, 6, 20, 21)";
+
+		//24 hours, other cats
+		if ($time == 1 && $cats == 1)
+			$relres = $db->queryDirect($query.$this->timeother);
+		//24 hours, other cats
+		if ($time == 1 && $cats == 2)
+			$relres = $db->queryDirect($query.$this->timeother);
+		//other cats
+		if ($time == 2 && $cats == 1)
+			$relres = $db->queryDirect($query.$this->fullother);
+		//other cats
+		if ($time == 2 && $cats == 2)
+			$relres = $db->queryDirect($query.$this->fullother);
+
+		if (count($relres) > 0)
+		{
+			foreach ($relres as $relrow)
+			{
+				$nzbcontents = new NZBcontents();
+				$nzbcontents->checkPAR2($relrow['guid'], $relrow['releaseid'], $relrow['groupid'], true);
+				$this->checked++;
+				echo ".";
 				if ($this->checked % 500 == 0)
 					echo $this->checked." files processed.\n\n";
 			}
