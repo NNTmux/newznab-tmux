@@ -149,6 +149,7 @@ class Functions
 		$db = new DB();
 		$category = new Category();
         $functions = new Functions();
+        $this->echooutput = $echooutput;
 
 		$quer = $db->queryOneRow("SELECT groupID, categoryID, relnamestatus, searchname, UNIX_TIMESTAMP(postdate) as postdate, ID as releaseID  FROM releases WHERE ID = {$relID}");
 		if ($quer["relnamestatus"] !== 1 && $quer["categoryID"] != Category::CAT_MISC_OTHER)
@@ -180,14 +181,15 @@ class Functions
 		$files = $par2info->getFileList();
 		if (count($files) > 0)
 		{
-			$namefixer = new Namefixer($this->echooutput);
+            $db = new DB();
+            $namefixer = new Namefixer
 			$rf = new ReleaseFiles();
 			$relfiles = 0;
 			$foundname = false;
 			foreach ($files as $fileID => $file)
 			{
 				// Add to releasefiles.
-				if ($db->queryOneRow(sprintf("SELECT ID FROM releasefiles WHERE releaseID = %d AND name = %s", $relID, $this->db->escapeString($file["name"]))) === false)
+				if ($db->queryOneRow(sprintf("SELECT ID FROM releasefiles WHERE releaseID = %d AND name = %s", $relID, $db->escapeString($file["name"]))) === false)
 				{
 					if ($rf->add($relID, $file["name"], $file["size"], $quer["postdate"], 0))
 						$relfiles++;
