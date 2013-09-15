@@ -189,7 +189,8 @@ class Namefixer
 	//
 	public function updateRelease($release, $name, $method, $echo, $type, $namestatus)
 	{
-		if ($this->relid !== $release["releaseID"])
+        $echooutput = true;
+        if ($this->relid !== $release["releaseID"])
 		{
 			$namecleaning = new nameCleaning();
 			$newname = $namecleaning->fixerCleaner($name);
@@ -333,10 +334,15 @@ class Namefixer
 			$db->query(sprintf("UPDATE releases SET relnamestatus = 20 WHERE ID = %d", $release['releaseID']));
 		}
         // The release didn't match so set relnamestatus to 21 so it doesn't get rechecked. Also allows removeCrapReleases to run extra things on the release.
-		if ($namestatus == 1 && $this->matched === false && $type == "Filenames, ")
+		elseif ($namestatus == 1 && $this->matched === false && $type == "Filenames, ")
 		{
 			$db = new DB();
 			$db->query(sprintf("UPDATE releases SET relnamestatus = 21 WHERE ID = %d", $release["releaseID"]));
+		}
+        elseif ($namestatus == 1 && $this->matched === false && $type == "PAR2, ")
+		{
+			$db = new DB();
+			$db->query(sprintf("UPDATE releases SET relnamestatus = 22 WHERE ID = %d", $release["releaseID"]));
 		}
 	}
 	//
