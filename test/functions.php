@@ -151,7 +151,7 @@ class Functions
         $functions = new Functions();
 
 		$quer = $db->queryOneRow("SELECT groupID, categoryID, relnamestatus, searchname, UNIX_TIMESTAMP(postdate) as postdate, ID as releaseID  FROM releases WHERE ID = {$relID}");
-		if ($quer["relnamestatus"] !== 1 && $quer["categoryID"] != Category::CAT_MISC)
+		if ($quer["relnamestatus"] !== 1 && $quer["categoryID"] != Category::CAT_MISC_OTHER)
 			return false;
 
 		$nntp = new NNTP();
