@@ -149,7 +149,6 @@ class Functions
 		$db = new DB();
 		$category = new Category();
         $functions = new Functions();
-        $this->echooutput = $echooutput;
 
 		$quer = $db->queryOneRow("SELECT groupID, categoryID, relnamestatus, searchname, UNIX_TIMESTAMP(postdate) as postdate, ID as releaseID  FROM releases WHERE ID = {$relID}");
 		if ($quer["relnamestatus"] !== 1 && $quer["categoryID"] != Category::CAT_MISC_OTHER)
