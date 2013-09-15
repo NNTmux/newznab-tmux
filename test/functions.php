@@ -182,7 +182,7 @@ class Functions
 		if (count($files) > 0)
 		{
             $db = new DB();
-            $namefixer = new Namefixer
+            $namefixer = new Namefixer;
 			$rf = new ReleaseFiles();
 			$relfiles = 0;
 			$foundname = false;
