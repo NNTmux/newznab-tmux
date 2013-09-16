@@ -24,7 +24,7 @@ function preName($argv)
         $n = "\n";
         echo "Resetting blank searchnames\n";
         $bad = $db->query("UPDATE releases SET searchname = name WHERE searchname = ''");
-        $tot = $bad->num_rows();
+        $tot = $bad->mysqli_fetch_array();
         if ($tot > 0)
                 echo $tot." Releases had no searchname\n";
         echo "Getting work\n";
