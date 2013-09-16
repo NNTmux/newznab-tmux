@@ -387,7 +387,7 @@ Class Predb
 			echo "\nQuerying DB for matches in prehash titles with release searchnames.\n";
 
 		$res = $db->queryDirect("SELECT p.ID, p.category, r.ID AS releaseID FROM prehash p inner join releases r ON p.title = r.searchname WHERE p.releaseID IS NULL");
-        $row = mysqli_fetch_assoc($res);
+        $row = mysqli_fetch_array($res);
         $total = $row [0];
         if($total > 0)
         {
