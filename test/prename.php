@@ -55,7 +55,7 @@ function preName($argv)
                                                 "Old cat:   ".$oldcatname.$n.
                                                 "Group:     ".$groupname.$n.
                                                 "Method:    "."jonnyboy's regexes".$n.
-                                                "ReleaseID: ". $row["ID"].$n;*/
+                                                "ReleaseID: ". $row["ID"].$n;
                                         $updated++;
                                 }
                         }
