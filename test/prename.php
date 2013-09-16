@@ -24,7 +24,7 @@ function preName($argv)
         $n = "\n";
         echo "Resetting blank searchnames\n";
         $bad = $db->query("UPDATE releases SET searchname = name WHERE searchname = ''");
-        $tmp = mysqli_fetch_assoc($bad);
+        $tmp = mysqli_fetch_array($bad);
         $tot = $tmp [0];
         if ($tot > 0)
                 echo $tot." Releases had no searchname\n";
@@ -49,7 +49,7 @@ function preName($argv)
                                         $groupname = $functions->getByNameByID($row["groupID"]);
                                         $oldcatname = $functions->getNameByID($row["categoryID"]);
                                         $newcatname = $functions->getNameByID($determinedcat);
-                                        /*echo  $n."New name:  ".$cleanerName.$n.
+                                        echo  $n."New name:  ".$cleanerName.$n.
                                                 "Old name:  ".$row["searchname"].$n.
                                                 "New cat:   ".$newcatname.$n.
                                                 "Old cat:   ".$oldcatname.$n.
