@@ -20,6 +20,8 @@ function preName($argv)
         $functions = new Functions();
         $updated = 0;
         $cleaned = 0;
+        $tot = 0;
+        $total = 0;
         $counter=1;
         $n = "\n";
         echo "Resetting blank searchnames\n";
@@ -30,9 +32,9 @@ function preName($argv)
                 echo $tot." Releases had no searchname\n";
         echo "Getting work\n";
         if (isset($argv[1]) && $argv[1]=="full")
-                $res = $db->queryDirect("SELECT ID, name, searchname, groupID, categoryID from releases WHERE relnamestatus IN (0, 1, 7, 20, 21, 22) and categoryID BETWEEN 8000 and 8999");
+                $res = $db->query("SELECT ID, name, searchname, groupID, categoryID from releases WHERE relnamestatus IN (0, 1, 7, 20, 21, 22) and categoryID BETWEEN 8000 and 8999");
         else
-                $res = $db->queryDirect("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE relnamestatus IN (0, 1, 7, 20, 21, 22) and categoryID between 8000 and 8999 and adddate > NOW() - INTERVAL 4 HOUR");
+                $res = $db->query("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE relnamestatus IN (0, 1, 7, 20, 21, 22) and categoryID between 8000 and 8999 and adddate > NOW() - INTERVAL 4 HOUR");
         $row = mysqli_fetch_array($res);
         $total = $row [0];
         if ($total > 0)
