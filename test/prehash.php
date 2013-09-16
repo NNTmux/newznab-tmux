@@ -6,6 +6,7 @@ require_once(WWW_DIR."lib/groups.php");
 require_once(WWW_DIR."lib/nfo.php");
 require_once(WWW_DIR."lib/site.php");
 require_once("functions.php");
+require_once("consoletools.php");
 
 /*
  * Class for inserting names/categories/md5 etc from predb sources into the DB, also for matching names on files / subjects.
@@ -33,25 +34,25 @@ Class Predb
 				echo "Retrieving titles from preDB sources.\n";
 			$newwomble = $this->retrieveWomble();
 			if ($this->echooutput)
-				echo $newwomble." Retrieved.\n";
+				echo $newwomble." Retrieved from Womble.\n";
 			$newomgwtf = $this->retrieveOmgwtfnzbs();
 			if ($this->echooutput)
-				echo $newomgwtf." Retrieved.\n";
+				echo $newomgwtf." Retrieved from Omgwtfnzbs.\n";
 			$newzenet = $this->retrieveZenet();
 			if ($this->echooutput)
-				echo $newzenet." Retrieved.\n";
+				echo $newzenet." Retrieved from Zenet.\n";
 			$newprelist = $this->retrievePrelist();
 			if ($this->echooutput)
-				echo $newprelist." Retrieved.\n";
+				echo $newprelist." Retrieved from Prelist.\n";
 			$neworly = $this->retrieveOrlydb();
 			if ($this->echooutput)
-				echo $neworly." Retrieved.\n";
+				echo $neworly." Retrieved from Orlydb.\n";
 			$newsrr = $this->retrieveSrr();
 			if ($this->echooutput)
-				echo $newsrr." Retrieved.\n";
+				echo $newsrr." Retrieved from Srrdb.\n";
 			$newpdme = $this->retrievePredbme();
 			if ($this->echooutput)
-				echo $newpdme." Retrieved.\n";
+				echo $newpdme." Retrieved from Predb.me.\n";
 			$newnames = $newwomble+$newomgwtf+$newzenet+$newprelist+$neworly+$newsrr+$newpdme;
 			if(count($newnames) > 0)
 				$db->query(sprintf("UPDATE prehash SET adddate = now() where ID = %d", $newestrel["ID"]));
@@ -122,6 +123,7 @@ Class Predb
 				}
 			}
 		}
+        echo $updated." Updated from Womble.\n";
 		return $newnames;
 	}
 
@@ -168,6 +170,7 @@ Class Predb
 				}
 			}
 		}
+        echo $updated." Updated from Omgwtfnzbs.\n";
 		return $newnames;
 	}
 
@@ -213,6 +216,7 @@ Class Predb
 				}
 			}
 		}
+        echo $updated." Updated from Zenet.\n";
 		return $newnames;
 	}
 
@@ -265,6 +269,7 @@ Class Predb
 				}
 			}
 		}
+        echo $updated." Updated from Prelist.\n";
 		return $newnames;
 	}
 
@@ -306,6 +311,7 @@ Class Predb
 				}
 			}
 		}
+        echo $updated." Updated from Orlydb.\n";
 		return $newnames;
 	}
 
@@ -329,6 +335,7 @@ Class Predb
 				}
 			}
 		}
+        echo $updated." Updated from Srrdb.\n";
 		return $newnames;
 	}
 
@@ -356,6 +363,7 @@ Class Predb
 				}
 			}
 		}
+        echo $updated." Updated from Predbme.\n";
 		return $newnames;
 	}
 
@@ -373,9 +381,10 @@ Class Predb
 	public function matchPredb()
 	{
 		$db = new DB();
+        $consoletools = new ConsoleTools();
 		$updated = 0;
 		if($this->echooutput)
-			echo "Matching up prehash titles with release search names.\n";
+			echo "\nQuerying DB for matches in prehash titles with release searchnames.\n";
 
 		if($res = $db->queryDirect("SELECT p.ID, p.category, r.ID AS releaseID FROM prehash p inner join releases r ON p.title = r.searchname WHERE p.releaseID IS NULL"))
 		{
@@ -387,8 +396,7 @@ Class Predb
 					$db->query(sprintf("UPDATE releases SET categoryID = %d WHERE ID = %d", $db->escapeString($catID["ID"]), $db->escapeString($row["releaseID"])));
 				$db->query(sprintf("UPDATE releases SET relnamestatus = 11 WHERE ID = %d", $row["releaseID"]));
 				if($this->echooutput)
-					echo ".";
-				$updated++;
+					$consoletools->overWrite("Matching up prehash titles with release search names: ".$consoletools->percentString($updated++,$total));
 			}
 		}
 		return $updated;
@@ -399,7 +407,7 @@ Class Predb
 		$db = new DB();
 		$nfos = 0;
 		if($this->echooutput)
-			echo "Matching up prehash NFOs with releases missing an NFO.\n";
+			echo "\nMatching up prehash NFOs with releases missing an NFO.\n";
 
 			if($res = $db->queryDirect("SELECT r.ID, p.nfo FROM releases r inner join predb p ON r.ID = p.releaseID WHERE p.nfo IS NOT NULL AND r.nfostatus != 1 LIMIT 100"))
 		{
