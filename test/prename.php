@@ -24,7 +24,8 @@ function preName($argv)
         $n = "\n";
         echo "Resetting blank searchnames\n";
         $bad = $db->query("UPDATE releases SET searchname = name WHERE searchname = ''");
-        $tot = mysqli_fetch_array($bad);
+        $tmp = mysqli_fetch_array($bad);
+        $tot = $tmp [0];
         if ($tot > 0)
                 echo $tot." Releases had no searchname\n";
         echo "Getting work\n";
@@ -32,7 +33,8 @@ function preName($argv)
                 $res = $db->query("SELECT ID, name, searchname, groupID, categoryID from releases WHERE relnamestatus IN (0, 1, 7, 20, 21, 22) or categoryID BETWEEN 8000 and 8999");
         else
                 $res = $db->query("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE relnamestatus IN (0, 1, 7, 20, 21, 22) or categoryID between 8000 and 8999 and adddate > NOW() - INTERVAL 4 HOUR");
-        $total = mysqli_fetch_array($res);
+        $tmp = mysqli_fetch_array($res);
+        $total = $tmp [0];
         if ($total > 0)
         {
                 $consoletools = new ConsoleTools();
