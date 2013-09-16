@@ -271,9 +271,9 @@ class Namefixer
 					{
 						$this->matched = true;
 						if ($namestatus == 1)
-							$db->query(sprintf("UPDATE releases SET searchname = %s, categoryID = %d, relnamestatus = 10, dehashstatus = 1 WHERE ID = %d", $db->escapeString($row["title"]), $determinedcat, $release["id"]));
+							$db->query(sprintf("UPDATE releases SET searchname = %s, categoryID = %d, relnamestatus = 10, dehashstatus = 1 WHERE ID = %d", $db->escapeString($row["title"]), $determinedcat, $release["ID"]));
 						else
-							$db->query(sprintf("UPDATE releases SET searchname = %s, categoryID = %d, dehashstatus = 1 WHERE ID = %d", $db->escapeString($row["title"]), $determinedcat, $release["id"]));
+							$db->query(sprintf("UPDATE releases SET searchname = %s, categoryID = %d, dehashstatus = 1 WHERE ID = %d", $db->escapeString($row["title"]), $determinedcat, $release["ID"]));
 					}
 
 					if ($echooutput)
@@ -292,8 +292,7 @@ class Namefixer
 				}
 			if ($namestatus == 1 && $this->matched === false)
 			{
-				$fail = $db->prepare(sprintf("UPDATE releases SET dehashstatus = dehashstatus - 1 WHERE id = %d", $row['id']));
-				$fail->execute();
+				$db->query(sprintf("UPDATE releases SET dehashstatus = dehashstatus - 1 WHERE ID = %d", $row['ID']));
 			}
 
 			}
