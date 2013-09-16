@@ -8,6 +8,9 @@ require_once("consoletools.php");
 require_once("namecleaner.php");
 require_once("functions.php");
 
+//This script tries to fix releasenames using usenet subject and searchname. Without argument it will try to fix names in last 4 hours, with argument full //it will do a whole database.
+//usage php jb_fix_names.php or php jb_fix_names.php full
+
 preName($argv);
 
 function preName($argv)
@@ -29,7 +32,7 @@ function preName($argv)
 	if (isset($argv[1]) && $argv[1]=="full")
 		$res = $db->query("select ID, name, searchname, groupID, categoryID from releases where reqID != 1 and ( relnamestatus in (0, 1, 7, 20, 21, 22) or categoryID between 8000 and 8999)");
 	else
-		$res = $db->query("select ID, name, searchname, groupID, categoryID from releases where reqID != 1 and ( relnamestatus in (0, 1, 7, 20, 21, 22) or categoryID between8 000 and 8999) and adddate > NOW() - INTERVAL 4 HOUR");
+		$res = $db->query("select ID, name, searchname, groupID, categoryID from releases where reqID != 1 and ( relnamestatus in (0, 1, 7, 20, 21, 22) or categoryID between 8000 and 8999) and adddate > NOW() - INTERVAL 4 HOUR");
 	$total = count($res);
 	if ($total > 0)
 	{
