@@ -21,7 +21,6 @@ function preName($argv)
         $updated = 0;
         $cleaned = 0;
         $tot = 0;
-        $total = 0;
         $counter=1;
         $n = "\n";
         echo "Resetting blank searchnames\n";
