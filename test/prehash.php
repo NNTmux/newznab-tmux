@@ -69,7 +69,7 @@ Class Predb
 	public function retrieveWomble()
 	{
 		$db = new DB();
-		$newnames = 0;
+		$newnames = $updated = 0;
 
 		$buffer = getUrl("http://www.newshost.co.za");
 		if ($buffer !== false && strlen($buffer))
@@ -130,7 +130,7 @@ Class Predb
 	public function retrieveOmgwtfnzbs()
 	{
 		$db = new DB();
-		$newnames = 0;
+		$newnames = $updated = 0;
 
 		$buffer = getUrl("http://rss.omgwtfnzbs.org/rss-info.php");
 		if ($buffer !== false && strlen($buffer))
@@ -177,7 +177,7 @@ Class Predb
 	public function retrieveZenet()
 	{
 		$db = new DB();
-		$newnames = 0;
+		$newnames = $updated = 0;
 
 		$buffer = getUrl("http://pre.zenet.org/live.php");
 		if ($buffer !== false && strlen($buffer))
@@ -223,7 +223,7 @@ Class Predb
 	public function retrievePrelist()
 	{
 		$db = new DB();
-		$newnames = 0;
+		$newnames = $updated = 0;
 
 		$buffer = getUrl("http://www.prelist.ws/");
 		if ($buffer !== false && strlen($buffer))
@@ -276,7 +276,7 @@ Class Predb
 	public function retrieveOrlydb()
 	{
 		$db = new DB();
-		$newnames = 0;
+		$newnames = $updated = 0;
 
 		$buffer = getUrl("http://www.orlydb.com/");
 		if ($buffer !== false && strlen($buffer))
@@ -318,7 +318,7 @@ Class Predb
 	public function retrieveSrr()
 	{
 		$db = new DB();
-		$newnames = 0;
+		$newnames = $updated = 0;
 		$releases = @simplexml_load_file('http://www.srrdb.com/feed/srrs');
 		if ($releases !== false)
 		{
@@ -342,7 +342,7 @@ Class Predb
 	public function retrievePredbme()
 	{
 		$db = new DB();
-		$newnames = 0;
+		$newnames = $updated = 0;
 		$arr = array("http://predb.me/?cats=movies-sd&rss=1", "http://predb.me/?cats=movies-hd&rss=1", "http://predb.me/?cats=movies-discs&rss=1", "http://predb.me/?cats=tv-sd&rss=1", "http://predb.me/?cats=tv-hd&rss=1", "http://predb.me/?cats=tv-discs&rss=1", "http://predb.me/?cats=music-audio&rss=1", "http://predb.me/?cats=music-video&rss=1", "http://predb.me/?cats=music-discs&rss=1", "http://predb.me/?cats=games-pc&rss=1", "http://predb.me/?cats=games-xbox&rss=1", "http://predb.me/?cats=games-playstation&rss=1", "http://predb.me/?cats=games-nintendo&rss=1", "http://predb.me/?cats=apps-windows&rss=1", "http://predb.me/?cats=apps-linux&rss=1", "http://predb.me/?cats=apps-mac&rss=1", "http://predb.me/?cats=apps-mobile&rss=1", "http://predb.me/?cats=books-ebooks&rss=1", "http://predb.me/?cats=books-audio-books&rss=1", "http://predb.me/?cats=xxx-videos&rss=1", "http://predb.me/?cats=xxx-images&rss=1", "http://predb.me/?cats=dox&rss=1", "http://predb.me/?cats=unknown&rss=1");
 		foreach ($arr as &$value)
 		{
@@ -386,9 +386,14 @@ Class Predb
 		if($this->echooutput)
 			echo "\nQuerying DB for matches in prehash titles with release searchnames.\n";
 
-		if($res = $db->queryDirect("SELECT p.ID, p.category, r.ID AS releaseID FROM prehash p inner join releases r ON p.title = r.searchname WHERE p.releaseID IS NULL"))
-		{
-			while ($row = mysqli_fetch_assoc($res))
+		$res = $db->queryDirect("SELECT p.ID, p.category, r.ID AS releaseID FROM prehash p inner join releases r ON p.title = r.searchname WHERE p.releaseID IS NULL");
+        $total = $res->rowCount();
+        if($total > 0)
+        {
+            $updated = 1;
+			foreach ($res as $row)
+			{
+			  while ($row = mysqli_fetch_assoc($res))
 			{
 				$db->query(sprintf("UPDATE prehash SET releaseID = %d WHERE ID = %d", $row["releaseID"], $row["ID"]));
 				$catName=str_replace(array("TV-", "TV: "), '', $row["category"]);
@@ -398,7 +403,9 @@ Class Predb
 				if($this->echooutput)
 					$consoletools->overWrite("Matching up prehash titles with release search names: ".$consoletools->percentString($updated++,$total));
 			}
-		}
+            }
+            }
+
 		return $updated;
 	}
 	// Look if the release is missing an nfo.
