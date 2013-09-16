@@ -387,27 +387,23 @@ Class Predb
 			echo "\nQuerying DB for matches in prehash titles with release searchnames.\n";
 
 		$res = $db->queryDirect("SELECT p.ID, p.category, r.ID AS releaseID FROM prehash p inner join releases r ON p.title = r.searchname WHERE p.releaseID IS NULL");
-        $total = $res->rowCount();
+        $row = mysqli_fetch_assoc($res);
+        $total = $row [0];
         if($total > 0)
         {
             $updated = 1;
 			foreach ($res as $row)
 			{
-			  while ($row = mysqli_fetch_assoc($res))
-			{
 				$db->query(sprintf("UPDATE prehash SET releaseID = %d WHERE ID = %d", $row["releaseID"], $row["ID"]));
-				$catName=str_replace(array("TV-", "TV: "), '', $row["category"]);
-				if($catID = $db->queryOneRow(sprintf("SELECT ID FROM category WHERE title = %s", $db->escapeString($catName))))
-					$db->query(sprintf("UPDATE releases SET categoryID = %d WHERE ID = %d", $db->escapeString($catID["ID"]), $db->escapeString($row["releaseID"])));
+				$db->query(sprintf("UPDATE releases SET categoryID = %d WHERE ID = %d", $db->escapeString($catID["ID"]), $db->escapeString($row["releaseID"])));
 				$db->query(sprintf("UPDATE releases SET relnamestatus = 11 WHERE ID = %d", $row["releaseID"]));
 				if($this->echooutput)
 					$consoletools->overWrite("Matching up prehash titles with release search names: ".$consoletools->percentString($updated++,$total));
 			}
-            }
-            }
+        }
 
 		return $updated;
-	}
+    }
 	// Look if the release is missing an nfo.
 	public function matchNfo()
 	{
