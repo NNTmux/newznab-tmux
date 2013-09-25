@@ -11,6 +11,8 @@ require_once(WWW_DIR."/lib/nfo.php");
 require_once(WWW_DIR."/lib/site.php");
 require_once(WWW_DIR."/lib/util.php");
 require_once(WWW_DIR."/lib/groups.php");
+require_once("consoletools.php");
+
 
 
  //*addedd from nZEDb for testing
@@ -226,6 +228,31 @@ class Functions
 	    $nzb = new NZB();
 		$nzbfile = $nzb->getNZBPath($releaseGuid, $sitenzbpath, false);
 		return !file_exists($nzbfile) ? false : $nzbfile;
+	}
+
+    //Categorize releases
+    public function categorizeRelease($type, $where="", $echooutput=false)
+	{
+		$db = new DB();
+		$cat = new Category();
+		$consoletools = new consoleTools();
+		$relcount = 0;
+		$resrel = $db->query("SELECT ID, ".$type.", groupID FROM releases ".$where);
+		$total = count($resrel);
+		if (count($resrel) > 0)
+		{
+			foreach ($resrel as $rowrel)
+			{
+				$catId = $cat->determineCategory($rowrel[$type], $rowrel['groupID']);
+				$db->queryDirect(sprintf("UPDATE releases SET categoryID = %d, relnamestatus = 1 WHERE ID = %d", $catId, $rowrel['ID']));
+				$relcount ++;
+				if ($echooutput)
+					$consoletools->overWrite("Categorizing:".$consoletools->percentString($relcount,$total));
+			}
+		}
+		if ($echooutput !== false && $relcount > 0)
+			echo "\n";
+		return $relcount;
 	}
     //end of testing
 
