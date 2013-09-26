@@ -53,21 +53,25 @@ Class NZBcontents
 	}
 
 	// Attempts to get the releasename from a par2 file
-	public function checkPAR2($guid, $relID, $groupID, $echooutput)
+	public function checkPAR2($guid, $relID, $groupID, $db, $pp)
 	{
 		$nzbfile = $this->LoadNZB($guid);
 		if ($nzbfile !== false)
 		{
 			foreach ($nzbfile->file as $nzbcontents)
 			{
-				if (preg_match('/\.(par2?|\d{2,3}").+(yEnc \(1\/1\)|\(1\/1\))$/i', $nzbcontents->attributes()->subject))
+				if (preg_match('/\.(par[2" ]|\d{2,3}").+\(1\/1\)$/i', $nzbcontents->attributes()->subject))
 				{
 					$pp = new Functions($echooutput);
 					if ($pp->parsePAR2($nzbcontents->segments->segment, $relID, $groupID, null) === true)
-						break;
+					{
+						$db->queryDirect(sprintf('UPDATE releases SET relnamestatus = 22 WHERE (relnamestatus != 7 AND relnamestatus != 22) AND ID = %d', $relID));
+						return true;
+					}
 				}
 			}
 		}
+		return false;
 	}
 
 	// Gets the completion from the NZB, optionally looks if there is an NFO/PAR2 file.

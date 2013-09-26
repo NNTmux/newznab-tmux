@@ -149,7 +149,7 @@ class Namefixer
 
 		$db = new DB();
 		$type = "Filenames, ";
-		$query = "SELECT DISTINCT rel.ID AS releaseID, rel.guid, rel.groupID FROM releases rel INNER JOIN releasefiles relfiles ON (relfiles.releaseID = rel.ID) WHERE (rel.relnamestatus IN (0, 1, 20, 21) OR rel.categoryID = 8010)";
+		$query = "SELECT rel.id AS releaseid, rel.guid, rel.groupid FROM releases rel WHERE rel.categoryid = 7010 AND rel.relnamestatus IN (0, 1, 20, 21)";
 
 		//24 hours, other cats
 		if ($time == 1 && $cats == 1)
@@ -166,12 +166,17 @@ class Namefixer
 
 		if (count($relres) > 0)
 		{
+			$db = new DB();
+			$nzbcontents = new NZBcontents($this->echooutput);
+			$pp = new Functions($this->echooutput);
 			foreach ($relres as $relrow)
 			{
-				$nzbcontents = new NZBcontents();
-				$nzbcontents->checkPAR2($relrow['guid'], $relrow['releaseID'], $relrow['groupID'], true);
+				if ($nzbcontents->checkPAR2($relrow['guid'], $relrow['releaseID'], $relrow['groupID'], $db, $pp) === true)
+				{
+					echo ".";
+					$this->fixed++;
+				}
 				$this->checked++;
-				echo ".";
 				if ($this->checked % 500 == 0)
 					echo $this->checked." files processed.\n\n";
 			}
