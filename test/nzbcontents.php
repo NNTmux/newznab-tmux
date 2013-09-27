@@ -80,7 +80,9 @@ Class NZBcontents
 		$nzbfile = $this->LoadNZB($guid);
 		if ($nzbfile !== false)
 		{
-			$messageid = '';
+            $db = new DB();
+            $pp = new Functions ($this->echooutput);
+            $messageid = '';
 			$actualParts = $artificialParts = 0;
 			$foundnfo = $foundpar2 = false;
 
