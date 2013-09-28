@@ -64,14 +64,10 @@ Class NZBcontents
 				{
 					$pp = new Functions($echooutput);
 					if ($pp->parsePAR2($nzbcontents->segments->segment, $relID, $groupID, null) === true)
-					{
-						$db->queryDirect(sprintf('UPDATE releases SET relnamestatus = 22 WHERE (relnamestatus != 7 AND relnamestatus != 22) AND ID = %d', $relID));
-						return true;
-					}
+				    break;
 				}
 			}
 		}
-		return false;
 	}
 
 	// Gets the completion from the NZB, optionally looks if there is an NFO/PAR2 file.
