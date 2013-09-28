@@ -166,17 +166,12 @@ class Namefixer
 
 		if (count($relres) > 0)
 		{
-			$db = new DB();
-			$nzbcontents = new NZBcontents($this->echooutput);
-			$pp = new Functions($this->echooutput);
 			foreach ($relres as $relrow)
 			{
-				if ($nzbcontents->checkPAR2($relrow['guid'], $relrow['releaseID'], $relrow['groupID'], $db, $pp) === true)
-				{
-					echo ".";
-					$this->fixed++;
-				}
+				$nzbcontents = new NZBcontents();
+				$nzbcontents->checkPAR2($relrow['guid'], $relrow['releaseID'], $relrow['groupID'], true);
 				$this->checked++;
+				echo ".";
 				if ($this->checked % 500 == 0)
 					echo $this->checked." files processed.\n\n";
 			}
@@ -188,6 +183,7 @@ class Namefixer
 		else
 			echo "Nothing to fix.\n";
 	}
+
 
 	//
 	//  Update the release with the new information.
