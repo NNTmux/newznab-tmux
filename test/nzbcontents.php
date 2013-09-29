@@ -60,34 +60,32 @@ Class NZBcontents
 		{
 			foreach ($nzbfile->file as $nzbcontents)
 			{
-				if (preg_match('/\.(par2?|\d{2,3}").+(yEnc \(1\/1\)|\(1\/1\))$/i', $nzbcontents->attributes()->subject))
+				if (preg_match('/\.(par[2" ]|\d{2,3}").+\(1\/1\)$/i', $nzbcontents->attributes()->subject))
 				{
 					$pp = new Functions($echooutput);
 					if ($pp->parsePAR2($nzbcontents->segments->segment, $relID, $groupID, null) === true)
-						break;
+				    break;
 				}
 			}
 		}
 	}
 
 	// Gets the completion from the NZB, optionally looks if there is an NFO/PAR2 file.
-	public function NZBcompletion($guid, $relID, $groupID, $nntp, $nfocheck=false)
+	public function NZBcompletion($guid, $relID, $groupID, $nntp, $db, $nfocheck=false)
 	{
 		$nzbfile = $this->LoadNZB($guid);
 		if ($nzbfile !== false)
 		{
-			$db = new DB();
-			$messageid = '';
+            $db = new DB();
+            $pp = new Functions ($this->echooutput);
+            $messageid = '';
 			$actualParts = $artificialParts = 0;
 			$foundnfo = $foundpar2 = false;
-			$pp = new Functions($this->echooutput);
 
 			foreach ($nzbfile->file as $nzbcontents)
 			{
 				foreach($nzbcontents->segments->segment as $segment)
-				{
 					$actualParts++;
-				}
 
 				$subject = $nzbcontents->attributes()->subject;
 				if(preg_match('/(\d+)\)$/', $subject, $parts))
@@ -103,8 +101,9 @@ Class NZBcontents
 				}
 				if ($foundpar2 === false)
 				{
-					if (preg_match('/\.(par2?|\d{2,3}").+(yEnc \(1\/1\)|\(1\/1\))$/i', $subject))
+					if (preg_match('/\.(par[2" ]|\d{2,3}").+\(1\/1\)$/i', $subject))
 					{
+						$pp = new Functions($this->echooutput);
 						if ($pp->parsePAR2($nzbcontents->segments->segment, $relID, $groupID, $nntp) === true)
 							$foundpar2 = true;
 					}
@@ -120,12 +119,18 @@ Class NZBcontents
 			if ($completion > 100)
 				$completion = 100;
 
-			$this->updateCompletion($completion, $relID);
+			$db->query(sprintf('UPDATE releases SET completion = %d WHERE ID = %d', $completion, $relID));
 			if ($nfocheck !== false)
-				return $messageid;
+			{
+				if ($foundnfo === true)
+					return $messageid;
+				else
+					return false;
+			}
 			else
 				return true;
 		}
+		return false;
 	}
 
 	// Look for an .nfo file in the NZB, return the NFO. Also gets the NZB completion.

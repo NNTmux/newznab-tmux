@@ -149,7 +149,7 @@ class Namefixer
 
 		$db = new DB();
 		$type = "Filenames, ";
-		$query = "SELECT DISTINCT rel.ID AS releaseID, rel.guid, rel.groupID FROM releases rel INNER JOIN releasefiles relfiles ON (relfiles.releaseID = rel.ID) WHERE (rel.relnamestatus IN (0, 1, 20, 21) OR rel.categoryID = 8010)";
+		$query = "SELECT rel.ID AS releaseID, rel.guid, rel.groupID FROM releases rel WHERE rel.categoryID = 8010 AND rel.relnamestatus IN (0, 1, 20, 21)";
 
 		//24 hours, other cats
 		if ($time == 1 && $cats == 1)
@@ -183,6 +183,7 @@ class Namefixer
 		else
 			echo "Nothing to fix.\n";
 	}
+
 
 	//
 	//  Update the release with the new information.
