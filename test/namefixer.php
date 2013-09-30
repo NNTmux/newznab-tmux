@@ -206,7 +206,7 @@ class Namefixer
 				if ($type === "PAR2, ")
 					$newname = ucwords($newname);
 
-				$this->fixed ++;
+				$this->fixed++;
 
 				if ($this->echooutput === true)
 				{
