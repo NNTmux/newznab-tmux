@@ -201,6 +201,7 @@ class Namefixer
 
 				$category = new Category();
                 $functions = new Functions ();
+                $groupname = $functions->getByNameByID($release["groupID"]);
 				$determinedcat = $category->determineCategory($groupname, $newname);
 
 				if ($type === "PAR2, ")
