@@ -270,7 +270,7 @@ class Namefixer
 			{
 				if ($row["title"] !== $release["searchname"])
 				{
-					$determinedcat = $category->determineCategory($row["title"], $release["groupID"]);
+					$determinedcat = $category->determineCategory($release["groupID"],$row["title"]);
 
 					if ($echo == 1)
 					{
