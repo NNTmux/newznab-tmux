@@ -201,7 +201,8 @@ class Namefixer
 
 				$category = new Category();
                 $functions = new Functions ();
-				$determinedcat = $category->determineCategory($newname, $release["groupID"]);
+                $groupname = $functions->getByNameByID($release["groupID"]);
+				$determinedcat = $category->determineCategory($groupname, $newname);
 
 				if ($type === "PAR2, ")
 					$newname = ucwords($newname);
@@ -236,15 +237,15 @@ class Namefixer
 					if ($namestatus == 1)
 					{
 					   if ($type == "NFO, ")
-							$status = 8;
-						else if ($type == "PAR2, ")
-							$status = 7;
-						else if ($type == "Filenames, ")
-							$status = 9;
-						$db->queryDirect(sprintf("UPDATE releases set searchname = %s, relnamestatus = %d, categoryID = %d where ID = %d", $db->escapeString(substr($newname, 0, 255)), $status, $determinedcat, $release["releaseID"]));
+                            $status = 8;
+					   else if ($type == "PAR2, ")
+                            $status = 7;
+					   else if ($type == "Filenames, ")
+                            $status = 9;
+						$db->queryDirect(sprintf("UPDATE releases set searchname = %s, relnamestatus = %d, categoryID = %d where ID = %d", $db->escapeString($newname), $status, $determinedcat, $release["releaseID"]));
 					}
 					else
-						$db->queryDirect(sprintf("UPDATE releases set searchname = %s, categoryID = %d where ID = %d", $db->escapeString($newname), $determinedcat, $release["releaseID"]));
+						$db->query(sprintf("UPDATE releases set searchname = %s, categoryID = %d where ID = %d", $db->escapeString($newname), $determinedcat, $release["releaseID"]));
 				}
 			}
 		}
@@ -266,7 +267,7 @@ class Namefixer
 			{
 				if ($row["title"] !== $release["searchname"])
 				{
-					$determinedcat = $category->determineCategory($row["title"], $release["groupID"]);
+					$determinedcat = $category->determineCategory($release["groupID"],$row["title"]);
 
 					if ($echo == 1)
 					{
