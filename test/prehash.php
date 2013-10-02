@@ -371,9 +371,9 @@ Class Predb
 	public function matchPre($cleanerName, $releaseID)
 	{
 		$db = new DB();
-		if($x = $db->queryOneRow(sprintf("SELECT id FROM prehash WHERE title = %s", $db->escapeString($cleanerName))) !== false)
+		if($x = $db->queryOneRow(sprintf("SELECT ID FROM prehash WHERE title = %s", $db->escapeString($cleanerName))) !== false)
 		{
-			$db->query(sprintf("UPDATE releases SET relnamestatus = 11 WHERE id = %d", $x["id"], $releaseID));
+			$db->query(sprintf("UPDATE releases SET relnamestatus = 11 WHERE ID = %d", $x["ID"], $releaseID));
 		}
 	}
 

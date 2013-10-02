@@ -237,12 +237,20 @@ class Namefixer
 					if ($namestatus == 1)
 					{
 					   if ($type == "NFO, ")
-                            $status = 8;
+                            //$status = 8;
+                            {
+                              $db->query(sprintf("UPDATE releases set searchname = %s, relnamestatus = 8, categoryID = %d where ID = %d", $db->escapeString(substr($newname, 0, 255)), $determinedcat, $release["releaseID"]));
+                            }
 					   else if ($type == "PAR2, ")
-                            $status = 7;
+                            //$status = 7;
+                            {
+                              $db->query(sprintf("UPDATE releases set searchname = %s, relnamestatus = 7, categoryID = %d where ID = %d", $db->escapeString(substr($newname, 0, 255)), $determinedcat, $release["releaseID"]));
+                            }
 					   else if ($type == "Filenames, ")
-                            $status = 9;
-						$db->query(sprintf("UPDATE releases set searchname = %s, relnamestatus = %d, categoryID = %d where ID = %d", $db->escapeString(substr($newname, 0, 255)), $status, $determinedcat, $release["releaseID"]));
+                            //$status = 9;
+						    {
+						      $db->query(sprintf("UPDATE releases set searchname = %s, relnamestatus = 9, categoryID = %d where ID = %d", $db->escapeString(substr($newname, 0, 255)), $determinedcat, $release["releaseID"]));
+                            }
 					}
 					else
 						$db->query(sprintf("UPDATE releases set searchname = %s, categoryID = %d where ID = %d", $db->escapeString($newname), $determinedcat, $release["releaseID"]));
