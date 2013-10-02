@@ -148,7 +148,7 @@ class Namefixer
 			echo "Fixing search names since the beginning using the par2 files.\n";
 
 		$db = new DB();
-		$type = "Filenames, ";
+		$type = "PAR2, ";
 		$query = "SELECT rel.ID AS releaseID, rel.guid, rel.groupID FROM releases rel WHERE rel.categoryID = 8010 AND rel.relnamestatus IN (0, 1, 20, 21)";
 
 		//24 hours, other cats
@@ -164,11 +164,15 @@ class Namefixer
 		if ($time == 2 && $cats == 2)
 			$relres = $db->queryDirect($query.$this->fullother);
 
-		if (count($relres) > 0)
+		$rowcount = $db->getAffectedRows();
+        if ($rowcount > 0)
 		{
-			foreach ($relres as $relrow)
+			while ($relrow = $functions->fetchArray($relres))
+		        //{
+			//foreach ($relres as $relrow)
 			{
 				$nzbcontents = new NZBcontents();
+                $this->done = $this->matched = false;
 				$nzbcontents->checkPAR2($relrow['guid'], $relrow['releaseID'], $relrow['groupID'], true);
 				$this->checked++;
 				echo ".";
@@ -179,7 +183,8 @@ class Namefixer
 				echo $this->fixed." releases have had their names changed out of: ".$this->checked." files.\n";
 			else
 				echo $this->fixed." releases could have their names changed. ".$this->checked." files were checked.\n";
-		}
+		//}
+        }
 		else
 			echo "Nothing to fix.\n";
 	}
