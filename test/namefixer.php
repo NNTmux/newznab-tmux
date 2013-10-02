@@ -148,6 +148,7 @@ class Namefixer
 			echo "Fixing search names since the beginning using the par2 files.\n";
 
 		$db = new DB();
+        $functions = new Functions();
 		$type = "PAR2, ";
 		$query = "SELECT rel.ID AS releaseID, rel.guid, rel.groupID FROM releases rel WHERE rel.categoryID = 8010 AND rel.relnamestatus IN (0, 1, 20, 21)";
 
