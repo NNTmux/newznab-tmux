@@ -244,6 +244,7 @@ class Namefixer
                             $status = 7;
 					   else if ($type == "Filenames, ")
                             $status = 9;
+                       $db->query(sprintf("UPDATE releases SET searchname = %s, relnamestatus = %d, categoryID = %d WHERE ID = %d", $db->escapeString(substr($newname, 0, 255)), $status, $determinedcat, $release["releaseID"]));     
 					}
 					else
 						$db->query(sprintf("UPDATE releases set searchname = %s, categoryID = %d where ID = %d", $db->escapeString($newname), $determinedcat, $release["releaseID"]));
