@@ -123,7 +123,6 @@ Class Predb
 				}
 			}
 		}
-        echo $updated." Updated from Womble.\n";
 		return $newnames;
 	}
 
@@ -170,7 +169,6 @@ Class Predb
 				}
 			}
 		}
-        echo $updated." Updated from Omgwtfnzbs.\n";
 		return $newnames;
 	}
 
@@ -216,7 +214,6 @@ Class Predb
 				}
 			}
 		}
-        echo $updated." Updated from Zenet.\n";
 		return $newnames;
 	}
 
@@ -269,7 +266,6 @@ Class Predb
 				}
 			}
 		}
-        echo $updated." Updated from Prelist.\n";
 		return $newnames;
 	}
 
@@ -311,7 +307,6 @@ Class Predb
 				}
 			}
 		}
-        echo $updated." Updated from Orlydb.\n";
 		return $newnames;
 	}
 
@@ -335,7 +330,6 @@ Class Predb
 				}
 			}
 		}
-        echo $updated." Updated from Srrdb.\n";
 		return $newnames;
 	}
 
@@ -363,7 +357,6 @@ Class Predb
 				}
 			}
 		}
-        echo $updated." Updated from Predbme.\n";
 		return $newnames;
 	}
 
@@ -371,9 +364,9 @@ Class Predb
 	public function matchPre($cleanerName, $releaseID)
 	{
 		$db = new DB();
-		if($x = $db->queryOneRow(sprintf("SELECT id FROM prehash WHERE title = %s", $db->escapeString($cleanerName))) !== false)
+		if($x = $db->queryOneRow(sprintf("SELECT ID FROM prehash WHERE title = %s", $db->escapeString($cleanerName))) !== false)
 		{
-			$db->query(sprintf("UPDATE releases SET relnamestatus = 11 WHERE id = %d", $x["id"], $releaseID));
+			$db->query(sprintf("UPDATE releases SET relnamestatus = 11 WHERE ID = %d", $x["ID"], $releaseID));
 		}
 	}
 
