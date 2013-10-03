@@ -234,25 +234,35 @@ class Namefixer
 				}
 
 				if ($echo == 1)
-				{
-					$db = new DB();
-					if ($namestatus == 1)
-					{
-					   if ($type == "NFO, ")
-                            $status = 8;
-					   else if ($type == "PAR2, ")
-                            $status = 7;
-					   else if ($type == "Filenames, ")
-                            $status = 9;
-                       $db->query(sprintf("UPDATE releases SET searchname = %s, relnamestatus = %d, categoryID = %d WHERE ID = %d", $db->escapeString(substr($newname, 0, 255)), $status, $determinedcat, $release["releaseID"]));     
-					}
-					else
-						$db->query(sprintf("UPDATE releases set searchname = %s, categoryID = %d where ID = %d", $db->escapeString($newname), $determinedcat, $release["releaseID"]));
-				}
+                    {
+                    $db = new DB();
+                    if ($namestatus == 1)
+                        {
+                            if ($type == "NFO, ")
+                                {
+                                $status = 8;
+                                }
+                            if ($type == "PAR2, ")
+                                {
+                                $status = 7;
+                                }
+                            if ($type == "Filenames, ")
+                                {
+                                $status = 9;
+                                $db->query(sprintf("UPDATE releases SET searchname = %s, relnamestatus = %d, categoryID = %d WHERE ID = %d", $db->escapeString(substr($newname, 0, 255)), $status, $determinedcat, $release["releaseID"]));
+                                }
+                        }
+                else
+                    {
+                        $db->query(sprintf("UPDATE releases set searchname = %s, categoryID = %d where ID = %d", $db->escapeString($newname), $determinedcat, $release["releaseID"]));
+                    }
+                }
 			}
 		}
         $this->done = true;
+        sleep(300);
 	}
+
 
 	// Match a MD5 from the prehash table to a release.
 	public function matchPredbMD5($md5, $release, $echo, $namestatus, $echooutput)
