@@ -148,12 +148,8 @@ class Namefixer
 			echo "Fixing search names since the beginning using the par2 files.\n";
 
 		$db = new DB();
-<<<<<<< HEAD
         $functions = new Functions();
 		$type = "PAR2, ";
-=======
-		$type = "Filenames, ";
->>>>>>> parent of 84f6793... Try to fix PAR2 behaviour
 		$query = "SELECT rel.ID AS releaseID, rel.guid, rel.groupID FROM releases rel WHERE rel.categoryID = 8010 AND rel.relnamestatus IN (0, 1, 20, 21)";
 
 		//24 hours, other cats
@@ -173,7 +169,9 @@ class Namefixer
 		{
 			foreach ($relres as $relrow)
 			{
-				$nzbcontents = new NZBcontents();
+                $nzbcontents = new NZBcontents();
+                $this->done = $this->matched = false;
+                $this->checkName($relrow, $echo, $type, $namestatus);
 				$nzbcontents->checkPAR2($relrow['guid'], $relrow['releaseID'], $relrow['groupID'], true);
 				$this->checked++;
 				echo ".";
@@ -242,20 +240,11 @@ class Namefixer
 					if ($namestatus == 1)
 					{
 					   if ($type == "NFO, ")
-                            //$status = 8;
-                            {
-                              $db->query(sprintf("UPDATE releases set searchname = %s, relnamestatus = 8, categoryID = %d where ID = %d", $db->escapeString(substr($newname, 0, 255)), $determinedcat, $release["releaseID"]));
-                            }
+                            $status = 8;
 					   else if ($type == "PAR2, ")
-                            //$status = 7;
-                            {
-                              $db->query(sprintf("UPDATE releases set searchname = %s, relnamestatus = 7, categoryID = %d where ID = %d", $db->escapeString(substr($newname, 0, 255)), $determinedcat, $release["releaseID"]));
-                            }
+                            $status = 7;
 					   else if ($type == "Filenames, ")
-                            //$status = 9;
-						    {
-						      $db->query(sprintf("UPDATE releases set searchname = %s, relnamestatus = 9, categoryID = %d where ID = %d", $db->escapeString(substr($newname, 0, 255)), $determinedcat, $release["releaseID"]));
-                            }
+                            $status = 9;
 					}
 					else
 						$db->query(sprintf("UPDATE releases set searchname = %s, categoryID = %d where ID = %d", $db->escapeString($newname), $determinedcat, $release["releaseID"]));
