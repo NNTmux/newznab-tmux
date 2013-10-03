@@ -148,8 +148,12 @@ class Namefixer
 			echo "Fixing search names since the beginning using the par2 files.\n";
 
 		$db = new DB();
+<<<<<<< HEAD
         $functions = new Functions();
 		$type = "PAR2, ";
+=======
+		$type = "Filenames, ";
+>>>>>>> parent of 84f6793... Try to fix PAR2 behaviour
 		$query = "SELECT rel.ID AS releaseID, rel.guid, rel.groupID FROM releases rel WHERE rel.categoryID = 8010 AND rel.relnamestatus IN (0, 1, 20, 21)";
 
 		//24 hours, other cats
@@ -165,15 +169,11 @@ class Namefixer
 		if ($time == 2 && $cats == 2)
 			$relres = $db->queryDirect($query.$this->fullother);
 
-		$rowcount = $db->getAffectedRows();
-        if ($rowcount > 0)
+		if (count($relres) > 0)
 		{
-			while ($relrow = $functions->fetchArray($relres))
-		        //{
-			//foreach ($relres as $relrow)
+			foreach ($relres as $relrow)
 			{
 				$nzbcontents = new NZBcontents();
-                $this->done = $this->matched = false;
 				$nzbcontents->checkPAR2($relrow['guid'], $relrow['releaseID'], $relrow['groupID'], true);
 				$this->checked++;
 				echo ".";
@@ -184,8 +184,7 @@ class Namefixer
 				echo $this->fixed." releases have had their names changed out of: ".$this->checked." files.\n";
 			else
 				echo $this->fixed." releases could have their names changed. ".$this->checked." files were checked.\n";
-		//}
-        }
+		}
 		else
 			echo "Nothing to fix.\n";
 	}
