@@ -22,6 +22,7 @@
 //----------------------------------------------------------------------
 // Load the application
 require_once(dirname(__FILE__)."/../bin/config.php");
+require_once(WWW_DIR. "lib/framework/db.php");
 
 // nnscripts includes
 require_once("lib/nnscripts.php");
