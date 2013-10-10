@@ -312,12 +312,12 @@ export REMOVECRAP_TIMER="40"
 export FIXRELEASES="false"
 #How often to run this script in seconds, default is 10 minutes
 export FIXRELEASES_TIMER="600"
-#choose to use afly predbhashcompare.php. Use this only if you have access to 
+#choose to use predb_hash_decrypt. Use this only if you have access to 
 #nzpre/predb, otherwise it will not work
-#Before you use this, import db.sql from test/db_updates/ folder
-export AFLY="false"
+#Before you use this, import db.sql and/or updates from test/db_updates/ folder
+export PREDBHASH="false"
 #How often to run this script in seconds, default is 10 minutes
-export AFLY_TIMER="600"
+export PREDBHASH_TIMER="600"
 
 ############################################################
 

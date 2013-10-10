@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.1r843";
+$version="0.1r844";
 
 $db = new DB();
 $DIR = dirname (__FILE__);
@@ -1661,18 +1661,18 @@ if ($array ['FIXRELEASES'] = "true") {
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:5.7 'echo \"\033[38;5;\"$color\"m\n$panes5[7] Disabled by OPTIMIZE\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
 	}
 
-	//run predbHashCompare.php in pane 6.1
-	if (( $array['MAX_LOAD'] >= get_load()) && (( TIME() - $time28 ) >= $array['AFLY_TIMER'] ) &&( $array['AFLY'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
+	//run predb_hash_decrypt.php in pane 6.1
+	if (( $array['MAX_LOAD'] >= get_load()) && (( TIME() - $time28 ) >= $array['PREDBHASH_TIMER'] ) &&( $array['PREDBHASH'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		$log = writelog($panes6[1]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:6.1 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes6[1] $ds2 && cd $_hash && $_php predbHashCompare.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes6[1] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:6.1 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes6[1] $ds2 && cd $_test && $_php predb_hash_decrypt.php true 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes6[1] $ds3' 2>&1 1> /dev/null");
 		$time28 = TIME();
-	} elseif (( $array['AFLY'] != "true" ) && ( $optimize_safe_to_run != "true" )) {
+	} elseif (( $array['PREDBHASH'] != "true" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:6.1 'echo \"\033[38;5;\"$color\"m\n$panes6[1] Disabled by AFLY\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
-	} elseif (( $array['AFLY'] == "true" ) && ( $optimize_safe_to_run != "true" ) && ( $array['MAX_LOAD'] >= get_load())) {
+		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:6.1 'echo \"\033[38;5;\"$color\"m\n$panes6[1] Disabled by PREDBHASH\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
+	} elseif (( $array['PREDBHASH'] == "true" ) && ( $optimize_safe_to_run != "true" ) && ( $array['MAX_LOAD'] >= get_load())) {
 		$color = get_color();
-		$run_time = relativeTime( $array['AFLY_TIMER'] + $time28 );
+		$run_time = relativeTime( $array['PREDBHASH_TIMER'] + $time28 );
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:6.1 'echo \"\033[38;5;\"$color\"m\n$panes6[1] will run in T[ $run_time]\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
 	} elseif (( $optimize_safe_to_run != "true" ) && ( $array['MAX_LOAD'] <= get_load())) {
                 $color = get_color();
