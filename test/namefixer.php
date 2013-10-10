@@ -22,6 +22,7 @@ require_once("nzbcontents.php");
  * 10 : Fixed with namefixer preDB.
  * 11 : Fixed with prehash.php
  * 12 : Fixed with requestID.
+ * 16 : Fixed with jb_fix_names.php
  * 20 : The release was checked by namefixer nfo but no name was found
  * 21 : The release was checked by namefixer filename but no name was found
  * 22 : The release was checked by namefixer par2 but no name was found

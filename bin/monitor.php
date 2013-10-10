@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.1r844";
+$version="0.1r845";
 
 $db = new DB();
 $DIR = dirname (__FILE__);
@@ -1682,11 +1682,11 @@ if ($array ['FIXRELEASES'] = "true") {
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:6.1 'echo \"\033[38;5;\"$color\"m\n$panes6[1] Disabled by OPTIMIZE\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
 	}
 
-	//run fixReleaseNames in pane 6.2
+	//run fixReleaseNames and jonnyboys jb_fix_names.php in pane 6.2
 	if (( $array['MAX_LOAD'] >= get_load()) && (( TIME() - $time27 ) >= $array['FIXRELEASES_TIMER'] ) && ( $array['FIXRELEASES'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		$log = writelog($panes6[2]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:6.2 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes6[2] $ds2 && cd $_test && $_php postprocess_pre.php 2>&1 $log && $_php fixReleaseNames.php 1 true all yes 2>&1 $log && $_php fixReleaseNames.php 3 true other yes 2>&1 $log && $_php fixReleaseNames.php 5 true other yes 2>&1 $log && $_php fixReleaseNames.php 7 true other yes 2>&1 $log && $_php hash_decrypt.php true 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes6[2] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:6.2 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes6[2] $ds2 && cd $_test && $_php postprocess_pre.php 2>&1 $log && $_php fixReleaseNames.php 3 true other yes 2>&1 $log && $_php fixReleaseNames.php 5 true other yes 2>&1 $log && $_php fixReleaseNames.php 7 true other yes 2>&1 $log && $_php hash_decrypt.php true 2>&1 $log && $_php jb_fix_names.php 6 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes6[2] $ds3' 2>&1 1> /dev/null");
 		$time27 = TIME();}
 	  elseif (( $array['FIXRELEASES'] != "true" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
