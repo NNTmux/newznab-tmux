@@ -11,9 +11,9 @@ require_once ("functions.php");
 //this script is adapted from nZEDb decrypt_hashes.php
 
 if (!isset($argv[1]))
-	exit ("This script tries to match an MD5 of the releases.name or releases.searchname to preDB.md5.\nphp predb_decrypt_hashes.php true to limit 1000.\nphp predb_decrypt_hashes.php full to run on full database.\n");
+	exit ("This script tries to match an MD5 of the releases.name or releases.searchname to preDB.md5.\nphp predb_hash_decrypt.php true to limit 1000.\nphp predb_hash_decrypt.php full to run on full database.\n");
 
-echo "\nDecrypt Hashes Started at ".date("g:i:s")."\nMatching preDB MD5 to md5(releases.name or releases.searchname)\n";
+echo "\nHash Decryption Started at ".date("H:i:s")."\nMatching preDB MD5 to md5(releases.name or releases.searchname)\n";
 preName($argv);
 
 function preName($argv)
@@ -22,7 +22,7 @@ function preName($argv)
 	$timestart = TIME();
 	$limit = ($argv[1] == "full") ? "" : " LIMIT 1000";
 
-	$res = $db->queryDirect("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE dehashstatus BETWEEN -5 AND 0 AND hashed = true".$limit);
+	$res = $db->queryDirect("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE hashed = true AND dehashstatus BETWEEN -6 AND 0".$limit);
 	$total = count($res);
 	$counter = 0;
 	$show = '';

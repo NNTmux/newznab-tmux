@@ -11,9 +11,9 @@ require_once ("functions.php");
 //this script is adapted from nZEDb decrypt_hashes.php
 
 if (!isset($argv[1]))
-	exit ("This script tries to match an MD5 of the releases.name or releases.searchname to prehash.md5.\nphp decrypt_hashes.php true to limit 1000.\nphp decrypt_hashes.php full to run on full database.\n");
+	exit ("This script tries to match an MD5 of the releases.name or releases.searchname to prehash.md5.\nphp hash_decrypt.php true to limit 1000.\nphp hash_decrypt.php full to run on full database.\n");
 
-echo "\nDecrypt Hashes Started at ".date("g:i:s")."\nMatching prehash MD5 to md5(releases.name or releases.searchname)\n";
+echo "\nHash Decryption Started at ".date("H:i:s")."\nMatching prehash MD5 to md5(releases.name or releases.searchname)\n";
 preName($argv);
 
 function preName($argv)
