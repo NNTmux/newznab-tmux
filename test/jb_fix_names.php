@@ -108,7 +108,7 @@ function resetSearchnames()
         $relcount = 0;
         $resrel = $db->query("SELECT ID, ".$type.", groupID FROM releases ".$where);
         $total = count($resrel);
-        if (count($resrel) > 0)
+        if ($total > 0)
         {
             foreach ($resrel as $rowrel)
             {
