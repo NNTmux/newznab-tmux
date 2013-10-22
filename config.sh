@@ -296,11 +296,11 @@ export INNODB="false"
 
 ############################################################
 
-#run removeCrapRelesases.php every 40 seconds. Removes crap in last 2 hours by default.
+#run del_crossposted.php every hours. Removes crossposted releases in last 6 hours by default.
 #If you want to remove more, run it manually from test folder.
-export REMOVECRAP="false"
+export CROSSPOSTED="false"
 #How often to run this script in seconds, default is 40 seconds
-export REMOVECRAP_TIMER="40"
+export CROSSPOSTED_TIMER="3600"
 
 ############################################################
 
