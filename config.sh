@@ -298,9 +298,9 @@ export INNODB="false"
 
 #run del_crossposted.php every hours. Removes crossposted releases in last 6 hours by default.
 #If you want to remove more, run it manually from test folder.
-export CROSSPOSTED="false"
+export REMOVECRAP="false"
 #How often to run this script in seconds, default is 40 seconds
-export CROSSPOSTED_TIMER="3600"
+export REMOVECRAP_TIMER="3600"
 
 ############################################################
 
@@ -312,6 +312,9 @@ export CROSSPOSTED_TIMER="3600"
 export FIXRELEASES="false"
 #How often to run this script in seconds, default is 10 minutes
 export FIXRELEASES_TIMER="600"
+
+############################################################
+
 #choose to use predb_hash_decrypt. Use this only if you have access to 
 #nzpre/predb, otherwise it will not work
 #Before you use this, import db.sql and/or updates from test/db_updates/ folder
