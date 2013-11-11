@@ -84,7 +84,7 @@ if (isset($argv[1]) && $argv[1] == "true")
 	{
 		$type = "Gibberish";
 		$db = new DB();
-		$sql = $db->query("SELECT ID, guid, searchname FROM releases WHERE searchname REGEXP '^[a-zA-Z0-9]{15,}$' AND nfostatus = 0 AND relnamestatus IN (20, 21, 22) AND rarinnerfilecount = 0".$and);
+		$sql = $db->query("SELECT ID, guid, searchname FROM releases WHERE searchname REGEXP '^[a-zA-Z0-9]{15,}$' AND nfostatus = 0 AND relnamestatus > 1 AND rarinnerfilecount = 0".$and);
 		$delcount = deleteReleases($sql, $type);
 		return $delcount;
 	}
@@ -94,7 +94,7 @@ if (isset($argv[1]) && $argv[1] == "true")
 	{
 		$type = "Hashed";
 		$db = new DB();
-		$sql = $db->query("SELECT ID, guid, searchname FROM releases WHERE searchname REGEXP '[a-zA-Z0-9]{25,}' AND nfostatus = 0 AND relnamestatus IN (20, 21, 22) AND rarinnerfilecount = 0".$and);
+		$sql = $db->query("SELECT ID, guid, searchname FROM releases WHERE searchname REGEXP '[a-zA-Z0-9]{25,}' AND nfostatus = 0 AND relnamestatus > 1 AND rarinnerfilecount = 0".$and);
 		$delcount = deleteReleases($sql, $type);
 		return $delcount;
 	}
@@ -104,7 +104,7 @@ if (isset($argv[1]) && $argv[1] == "true")
 	{
 		$type = "Short";
 		$db = new DB();
-		$sql = $db->query("SELECT ID, guid, searchname FROM releases WHERE searchname REGEXP '^[a-zA-Z0-9]{0,5}$' AND nfostatus = 0 AND relnamestatus IN (20, 21, 22) AND rarinnerfilecount = 0".$and);
+		$sql = $db->query("SELECT ID, guid, searchname FROM releases WHERE searchname REGEXP '^[a-zA-Z0-9]{0,5}$' AND nfostatus = 0 AND relnamestatus > 1 AND rarinnerfilecount = 0".$and);
 		$delcount = deleteReleases($sql, $type);
 		return $delcount;
 	}
@@ -114,7 +114,7 @@ if (isset($argv[1]) && $argv[1] == "true")
 	{
 		$type = "Executable";
 		$db = new DB();
-		$sql = $db->query('SELECT r.ID, r.guid, r.searchname FROM releases r LEFT JOIN releasefiles rf ON rf.releaseID = r.ID WHERE rf.name LIKE "%.exe" AND r.categoryID NOT IN (4000, 4010, 4020, 4050)'.$and);
+		$sql = $db->query('SELECT r.ID, r.guid, r.searchname FROM releases r INNER JOIN releasefiles rf ON rf.releaseID = r.ID WHERE rf.name LIKE "%.exe" AND r.categoryID NOT IN (4000, 4010, 4020, 4050, 8010)'.$and);
 		$delcount = deleteReleases($sql, $type);
 		return $delcount;
 	}
@@ -124,7 +124,7 @@ if (isset($argv[1]) && $argv[1] == "true")
 	{
 		$type = "install.bin";
 		$db = new DB();
-		$sql = $db->query('SELECT r.ID, r.guid, r.searchname FROM releases r LEFT JOIN releasefiles rf ON rf.releaseID = r.ID WHERE rf.name LIKE "%install.bin%"'.$and);
+		$sql = $db->query('SELECT r.ID, r.guid, r.searchname FROM releases r INNER JOIN releasefiles rf ON rf.releaseID = r.ID WHERE rf.name LIKE "%install.bin%"'.$and);
 		$delcount = deleteReleases($sql, $type);
 		return $delcount;
 	}
@@ -134,7 +134,7 @@ if (isset($argv[1]) && $argv[1] == "true")
 	{
 		$type = "PasswordURL";
 		$db = new DB();
-		$sql = $db->query('SELECT r.ID, r.guid, r.searchname FROM releases r LEFT JOIN releasefiles rf ON rf.releaseID = r.ID WHERE rf.name LIKE "%password.url%"'.$and);
+		$sql = $db->query('SELECT r.ID, r.guid, r.searchname FROM releases r INNER JOIN releasefiles rf ON rf.releaseID = r.ID WHERE rf.name LIKE "%password.url%"'.$and);
 		$delcount = deleteReleases($sql, $type);
 		return $delcount;
 	}
