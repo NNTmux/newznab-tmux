@@ -135,11 +135,9 @@ else
     $TMUXCMD splitw -v -p 67 'printf "\033]2;processBooks2\033\\"'
     $TMUXCMD splitw -v -p 50 'printf "\033]2;processUnwanted\033\\"'
 	
-	$TMUXCMD new-window -n other2 'printf "\033]2;Remove_Crap_Releases\033\\"'
+	$TMUXCMD new-window -n FixNames 'printf "\033]2;Fix_Release_Names\033\\"'
 	$TMUXCMD selectp -t 0
-    $TMUXCMD splitw -h -p 66 'printf "\033]2;PreDB_Hash_Decrypt\033\\"'
-    $TMUXCMD selectp -t 1
-    $TMUXCMD splitw -h -p 50 'printf "\033]2;Fix_Release_Names\033\\"'
+    $TMUXCMD splitw -v -p 50 'printf "\033]2;PreDB_Hash_Decrypt\033\\"'
 	
    
 

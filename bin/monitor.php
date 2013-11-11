@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.2r900";
+$version="0.2r901";
 
 $db = new DB();
 $DIR = dirname (__FILE__);
@@ -1661,7 +1661,27 @@ if ($array ['FIXRELEASES'] = "true") {
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:5.7 'echo \"\033[38;5;\"$color\"m\n$panes5[7] Disabled by OPTIMIZE\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
 	}
 
-	//run predb_hash_decrypt.php in pane 6.1
+    //run fixReleaseNames and jonnyboys jb_fix_names.php and removeCrapReleases in pane 6.0
+	if (( $array['MAX_LOAD'] >= get_load()) && (( TIME() - $time27 ) >= $array['FIXRELEASES_TIMER'] ) && ( $array['FIXRELEASES'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
+		$color = get_color();
+		$log = writelog($panes6[0]);
+		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:6.0 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes6[0] $ds2 && cd $_test && $_php postprocess_pre.php 2>&1 $log && $_php fixReleaseNames.php 3 true other yes 2>&1 $log && $_php fixReleaseNames.php 5 true other yes 2>&1 $log && $_php fixReleaseNames.php 7 true other yes 2>&1 $log && $_php hash_decrypt.php true 2>&1 $log && $_php jb_fix_names.php 6 2>&1 $log && $_php removeCrapReleases.php true 6 2>&1 $log echo \" \033[1;0;33m\" && $ds1 $panes6[0] $ds3' 2>&1 1> /dev/null");
+		$time27 = TIME();}
+	  elseif (( $array['FIXRELEASES'] != "true" ) && ( $optimize_safe_to_run != "true" )) {
+		$color = get_color();
+		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:6.0 'echo \"\033[38;5;\"$color\"m\n$panes6[0] Disabled by fixReleaseNames\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
+	} elseif (( $array['FIXRELEASES'] == "true" ) && ( $optimize_safe_to_run != "true" ) && ( $array['MAX_LOAD'] >= get_load())) {
+		$color = get_color();
+		$run_time = relativeTime( $array['FIXRELEASES_TIMER'] + $time27 );
+		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:6.0 'echo \"\033[38;5;\"$color\"m\n$panes6[0] will run in T[ $run_time]\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
+	} elseif (( $optimize_safe_to_run != "true" ) && ( $array['MAX_LOAD'] <= get_load())) {
+                $color = get_color();
+                shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:6.0 'echo \"\033[38;5;\"$color\"m\n$panes6[0] Disabled by MAX_LOAD\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
+        } elseif ( $optimize_safe_to_run == "true" ) {
+		$color = get_color();
+		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:6.0 'echo \"\033[38;5;\"$color\"m\n$panes6[0] Disabled by OPTIMIZE\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
+	}
+    //run predb_hash_decrypt.php in pane 6.1
 	if (( $array['MAX_LOAD'] >= get_load()) && (( TIME() - $time28 ) >= $array['PREDBHASH_TIMER'] ) &&( $array['PREDBHASH'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		$log = writelog($panes6[1]);
@@ -1682,27 +1702,7 @@ if ($array ['FIXRELEASES'] = "true") {
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:6.1 'echo \"\033[38;5;\"$color\"m\n$panes6[1] Disabled by OPTIMIZE\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
 	}
 
-	//run fixReleaseNames and jonnyboys jb_fix_names.php in pane 6.2
-	if (( $array['MAX_LOAD'] >= get_load()) && (( TIME() - $time27 ) >= $array['FIXRELEASES_TIMER'] ) && ( $array['FIXRELEASES'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
-		$color = get_color();
-		$log = writelog($panes6[2]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:6.2 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes6[2] $ds2 && cd $_test && $_php postprocess_pre.php 2>&1 $log && $_php fixReleaseNames.php 3 true other yes 2>&1 $log && $_php fixReleaseNames.php 5 true other yes 2>&1 $log && $_php fixReleaseNames.php 7 true other yes 2>&1 $log && $_php hash_decrypt.php true 2>&1 $log && $_php jb_fix_names.php 6 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes6[2] $ds3' 2>&1 1> /dev/null");
-		$time27 = TIME();}
-	  elseif (( $array['FIXRELEASES'] != "true" ) && ( $optimize_safe_to_run != "true" )) {
-		$color = get_color();
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:6.2 'echo \"\033[38;5;\"$color\"m\n$panes6[2] Disabled by fixReleaseNames\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
-	} elseif (( $array['FIXRELEASES'] == "true" ) && ( $optimize_safe_to_run != "true" ) && ( $array['MAX_LOAD'] >= get_load())) {
-		$color = get_color();
-		$run_time = relativeTime( $array['FIXRELEASES_TIMER'] + $time27 );
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:6.2 'echo \"\033[38;5;\"$color\"m\n$panes6[2] will run in T[ $run_time]\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
-	} elseif (( $optimize_safe_to_run != "true" ) && ( $array['MAX_LOAD'] <= get_load())) {
-                $color = get_color();
-                shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:6.2 'echo \"\033[38;5;\"$color\"m\n$panes6[2] Disabled by MAX_LOAD\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
-        } elseif ( $optimize_safe_to_run == "true" ) {
-		$color = get_color();
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:6.2 'echo \"\033[38;5;\"$color\"m\n$panes6[2] Disabled by OPTIMIZE\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
-	}
-    //run removeCrapReleases.php in pane 6.0
+    /* //run removeCrapReleases.php in pane 6.0
 	if (( $array['MAX_LOAD'] >= get_load()) && (( TIME() - $time29 ) >= $array['REMOVECRAP_TIMER'] ) && ( $array['REMOVECRAP'] == "true" ) && ( $optimize_safe_to_run != "true" )) {
 		$color = get_color();
 		$log = writelog($panes6[0]);
@@ -1722,7 +1722,7 @@ if ($array ['FIXRELEASES'] = "true") {
 		$color = get_color();
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:6.0 'echo \"\033[38;5;\"$color\"m\n$panes6[0] Disabled by OPTIMIZE\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
 }
-
+    */
 
 	//check ffmpeg and mediainfo, kill if necessary
 	if (( $array['KILL_PROCESS'] != "0" ) && ( $array['KILL_QUIET'] == "true" ) && ( $optimize_safe_to_run != "true" )) {

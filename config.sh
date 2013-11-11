@@ -296,14 +296,6 @@ export INNODB="false"
 
 ############################################################
 
-#run removeCrapReleases.php every hour. Removes creap releases in last 6 hours by default.
-#If you want to remove more, run it manually from test folder.
-export REMOVECRAP="false"
-#How often to run this script in seconds, default is 40 seconds
-export REMOVECRAP_TIMER="3600"
-
-############################################################
-
 #choose to run fixReleaseNames script.Before you can use this scripts you need
 #to import db.sql from test/db_updates/ and prehash.sql from test/initial_setup/ folder
 #to your newznab database.
