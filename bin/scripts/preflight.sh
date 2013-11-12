@@ -85,14 +85,6 @@ if [[ $FIX_POSIX  == "true" ]]; then
 	$SED -i -e 's/return 'SIGPWR';/\/\/return 'SIGPWR';/' $NEWZPATH/www/lib/powerprocess.php
 fi
 
-#attempt to get english only from IMDB
-if [[ $EN_IMDB == "true" ]]; then
-	$SED -i -e 's/akas.imdb/www.imdb/g' $NEWZPATH/www/lib/movie.php
-	$SED -i -e 's/curl_setopt($ch, CURLOPT_URL, $url);/curl_setopt($ch, CURLOPT_URL, $url);\
-	$header[] = "Accept-Language: en-us";\
-	curl_setopt($ch, CURLOPT_HTTPHEADER, $header);/' $NEWZPATH/www/lib/util.php
-fi
-
 #import kevin123's category.php and backfill.php
 if [[ $KEVIN_SAFER == "true" || $KEVIN_BACKFILL_PARTS == "true"  || $KEVIN_THREADED == "true" ]]; then
         cd $DIR"/kevin123"
@@ -150,7 +142,7 @@ rm -f $DIR/bin/temp/*
 #create postprocessing scripts
 for (( c=1; c<=16; c++ ))
 do
-	d=$((($c - 1) * 100))
+    d=$((($c - 1) * 100))
 	cp $NEWZPATH/www/lib/postprocess.php $DIR/bin/temp/postprocess$c.php
 	$SED -i -e "s/PostProcess/PostProcess$c/g" $DIR/bin/temp/postprocess$c.php
 	$SED -i -e "s/echo \$iteration.*$/echo \$iteration --.\"    \".\$rel['ID'].\" : \".\$rel['name'].\"\\\n\";/" $DIR/bin/temp/postprocess$c.php
@@ -164,37 +156,37 @@ do
 	fi
 	$SED -i -e "s/PostPrc : Performing additional post processing.*\$/PostPrc : Performing additional post processing by guid on \".\$rescount.\" releases, starting at $d ...\\n\";/g" $DIR/bin/temp/postprocess$c.php
 	$SED -i -e "s/\/\/echo \"PostPrc : Fetching/echo \"PostPrc : Fetching/g" $DIR/bin/temp/postprocess$c.php
-	if [[ $USE_TWO_NNTP == "true" ]] && [[ $USE_TWO_PP != "true" ]]; then
-		$SED -i -e "s/require_once(WWW_DIR.\"\/lib\/nntp.php\");/require(dirname(__FILE__).\"\/nntp2.php\");/g" $DIR/bin/temp/postprocess$c.php
-		$SED -i -e "s/new Nntp;/new GetConnected;/g" $DIR/bin/temp/postprocess$c.php
-		$SED -i -e "s/doConnect/doConnect2/g" $DIR/bin/temp/postprocess$c.php
-	fi
+	#if [[ $USE_TWO_NNTP == "true" ]] && [[ $USE_TWO_PP != "true" ]]; then
+	#	$SED -i -e "s/require_once(WWW_DIR.\"\/lib\/nntp.php\");/require(dirname(__FILE__).\"\/nntp2.php\");/g" $DIR/bin/temp/postprocess$c.php
+	#	$SED -i -e "s/new Nntp;/new GetConnected;/g" $DIR/bin/temp/postprocess$c.php
+	#	$SED -i -e "s/doConnect/doConnect2/g" $DIR/bin/temp/postprocess$c.php
+	#fi
 	cp $DIR/bin/lib/additional $DIR/bin/temp/processAdditional$c.php
 	$SED -i -e "s/1/$c/g" $DIR/bin/temp/processAdditional$c.php
 	$SED -i -e "s/$numtoProcess = 100;/$numtoProcess = 20;/g" $DIR/bin/temp/postprocess$c.php
 done
 
-for (( c=17; c<=32; c++ ))
-do
-	d=$((($c - 1) * 100))
-	cp $NEWZPATH/www/lib/postprocess.php $DIR/bin/temp/postprocess$c.php
-	$SED -i -e "s/PostProcess/PostProcess$c/g" $DIR/bin/temp/postprocess$c.php 
-	$SED -i -e "s/echo \$iteration.*$/echo \$iteration --.\"    \".\$rel['ID'].\" : \".\$rel['name'].\"\\\n\";/" $DIR/bin/temp/postprocess$c.php
-	$SED -i -e "s/processAdditional/processAdditional$c/g" $DIR/bin/temp/postprocess$c.php
-	$SED -i -e "s/\$tmpPath = \$this->site->tmpunrarpath;/\$tmpPath = \$this->site->tmpunrarpath; \\
-		\$tmpPath .= '1\/tmp$c';/g" $DIR/bin/temp/postprocess$c.php
-	$SED -i -e "s/order by r.postdate desc limit %d.*\$/order by r.guid asc limit %d, %d \", (\$maxattemptstocheckpassworded + 1) * -1, ($c + 16) * 100, \$numtoProcess);/g" $DIR/bin/temp/postprocess$c.php
-	$SED -i -e "s/PostPrc : Performing additional post processing.*\$/PostPrc : Performing additional post processing by guid on \".\$rescount.\" releases, starting at $d ...\\n\";/g" $DIR/bin/temp/postprocess$c.php
-	$SED -i -e "s/\/\/echo \"PostPrc : Fetching/echo \"PostPrc : Fetching/g" $DIR/bin/temp/postprocess$c.php
-	if [[ $USE_TWO_NNTP == "true" ]] && [[ $USE_TWO_PP == "true" ]]; then
-		$SED -i -e "s/require_once(WWW_DIR.\"\/lib\/nntp.php\");/require(dirname(__FILE__).\"\/nntp2.php\");/g" $DIR/bin/temp/postprocess$c.php
-		$SED -i -e "s/new Nntp;/new GetConnected;/g" $DIR/bin/temp/postprocess$c.php
-		$SED -i -e "s/doConnect/doConnect2/g" $DIR/bin/temp/postprocess$c.php
-	fi
-	cp $DIR/bin/lib/additional $DIR/bin/temp/processAdditional$c.php
-	$SED -i -e "s/1/$c/g" $DIR/bin/temp/processAdditional$c.php
-	$SED -i -e "s/$numtoProcess = 100;/$numtoProcess = 20;/g" $DIR/bin/temp/postprocess$c.php
-done
+#for (( c=17; c<=32; c++ ))
+#do
+#	d=$((($c - 1) * 100))
+#	cp $NEWZPATH/www/lib/postprocess.php $DIR/bin/temp/postprocess$c.php
+#	$SED -i -e "s/PostProcess/PostProcess$c/g" $DIR/bin/temp/postprocess$c.php
+#	$SED -i -e "s/echo \$iteration.*$/echo \$iteration --.\"    \".\$rel['ID'].\" : \".\$rel['name'].\"\\\n\";/" $DIR/bin/temp/postprocess$c.php
+#	$SED -i -e "s/processAdditional/processAdditional$c/g" $DIR/bin/temp/postprocess$c.php
+#	$SED -i -e "s/\$tmpPath = \$this->site->tmpunrarpath;/\$tmpPath = \$this->site->tmpunrarpath; \\
+#		\$tmpPath .= '1\/tmp$c';/g" $DIR/bin/temp/postprocess$c.php
+#	$SED -i -e "s/order by r.postdate desc limit %d.*\$/order by r.guid asc limit %d, %d \", (\$maxattemptstocheckpassworded + 1) * -1, ($c + 16) * 100, \$numtoProcess);/##g" $DIR/bin/temp/postprocess$c.php
+#	$SED -i -e "s/PostPrc : Performing additional post processing.*\$/PostPrc : Performing additional post processing by guid on \".\$rescount.\" releases, starting at $d #...\\n\";/g" $DIR/bin/temp/postprocess$c.php
+#	$SED -i -e "s/\/\/echo \"PostPrc : Fetching/echo \"PostPrc : Fetching/g" $DIR/bin/temp/postprocess$c.php
+#	if [[ $USE_TWO_NNTP == "true" ]] && [[ $USE_TWO_PP == "true" ]]; then
+#		$SED -i -e "s/require_once(WWW_DIR.\"\/lib\/nntp.php\");/require(dirname(__FILE__).\"\/nntp2.php\");/g" $DIR/bin/temp/postprocess$c.php
+#		$SED -i -e "s/new Nntp;/new GetConnected;/g" $DIR/bin/temp/postprocess$c.php
+#		$SED -i -e "s/doConnect/doConnect2/g" $DIR/bin/temp/postprocess$c.php
+#	fi
+#	cp $DIR/bin/lib/additional $DIR/bin/temp/processAdditional$c.php
+#	$SED -i -e "s/1/$c/g" $DIR/bin/temp/processAdditional$c.php
+#	$SED -i -e "s/$numtoProcess = 100;/$numtoProcess = 20;/g" $DIR/bin/temp/postprocess$c.php
+#done
 
 cp -f $NEWZPATH/www/lib/nfo.php $DIR/bin/temp/nfo.php
 cp -f $NEWZPATH/www/lib/tvrage.php $DIR/bin/temp/tvrage.php

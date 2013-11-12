@@ -34,25 +34,12 @@ if [[ $FIX_POSIX  == "true" ]]; then
     $SED -i -e 's/return 'SIGPWR';/\/\/return 'SIGPWR';/' $NEWZPATH/www/lib/powerprocess.php
 fi
 
-#attempt to get english only from IMDB
-if [[ $EN_IMDB == "true" ]]; then
-    echo "edit movie language"
-    $SED -i -e 's/akas.imdb/www.imdb/g' $NEWZPATH/www/lib/movie.php
-    $SED -i -e 's/curl_setopt($ch, CURLOPT_URL, $url);/curl_setopt($ch, CURLOPT_URL, $url);\
-    $header[] = "Accept-Language: en-us";\
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $header);/' $NEWZPATH/www/lib/util.php
-fi
 
 #import kevin123's compression mod
 if [[ $KEVIN_SAFER == "true" ]] || [[ $PARSING_MOD == "true" ]]; then
     cd $DIR"/kevin123"
     cp -frv * $NEWZPATH/www/lib/
 fi
-#copy needed files for hash_decrypt and fixReleaseNames scripts
-#if [[ $HASH == "true" ]] || [[ $FIXRELEASES == "true" ]]; then
-#	cd $DIR"/test/files to copy/www/lib"
-#	cp -frv * $NEWZPATH/www/lib/
-#fi	
 
 #set user/group to www
 echo "Fixing permisions, this can take some time if you have a large set of releases"
