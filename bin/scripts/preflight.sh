@@ -140,8 +140,8 @@ rm -f $DIR/bin/lib/nntp2.php
 rm -f $DIR/bin/temp/*
 
 #create postprocessing scripts
-for (c=1)
-do
+
+    c=1
     d=$((($c - 1) * 100))
 	cp $NEWZPATH/www/lib/postprocess.php $DIR/bin/temp/postprocess$c.php
 	$SED -i -e "s/PostProcess/PostProcess$c/g" $DIR/bin/temp/postprocess$c.php
