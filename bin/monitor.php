@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.3r002";
+$version="0.3r003";
 
 $db = new DB();
 $DIR = dirname (__FILE__);
@@ -991,7 +991,7 @@ if ($array ['FIXRELEASES'] = "true") {
 
 	//start postprocessing in pane 1.5
 
-		$f=200;
+		$f=100;
 		$color = get_color();
 		$log = writelog($panes1[5]);
 		if (( $array['MAX_LOAD'] >= get_load()) && ( $work_remaining_now > $f )) {
