@@ -38,38 +38,9 @@ export ADMIN_PATH=$NEWZPATH"/www/admin"
 
 ############################################################
 
-#Post Processing Additional is the post processing that downloads rar files and attempts to get info for your site
-#you are able to set the number of processes to be run from 1-32, remember that each process uses 1 of your nntp connections
-#so, if you have 20, and you set this to 32, you will have errors, lots of errors, nfo lookup uses 1-3 connections each
-#binaries and backfill threaded default up to 10 connections each and predb uses 1, so understand how many connections you are using when setting
-#trial and error for this, set to 1 will run > 0, set to 2 will run > 100, 3 will run > 200 and so on.
-#At some point, increasing this begins to slow things down. It will need to be adjusted for your system
-#to get the desired performance, 0 will disable all post processing, but not category processing
-#the first window has up to 16 postprocess and can use primary or alternate NNTP provider
-export POST_TO_RUN_A="0"
 
-#The second window also has 16 processes and can use promary or alternate NNTP provider
-export POST_TO_RUN_B="0"
-
-#by modifying www/config.php like http://pastebin.com/VgH9DCZw, you can use 1 provider to run update_binaries
-#and backup and another provider to run post processing with. Or, 1 provider to run up to 16 postprocesses and another to run
-#up to 16 more postprocesses, or the same provider for everything
-#you can not switch providers without resetting all groups and truncating, I have included a script in scripts folders to reset and truncate
-#sudo scripts/reset_truncate.php
-#it is not necessary to run reset_truncate.php in order to second nntp provider for postprocessing only
-
-#this one sets 1 provider for everything(false), or first provider for update_binaries and backfill and another for postprocessing(true)
-#this can not be changed after starting scripts
-export USE_TWO_NNTP="false"
-
-#this allows you split the 32 postprocessing into 2 separate providers
-#this can not be changed after starting scripts
-export USE_TWO_PP="false"
-
-############################################################
-
-#post processing per category, setting the above to 0 does not disable these
-#this now takes 0 for none, 1 for the first processor or 2 for both processors
+#post processing per category
+#this now takes 0 for none, 1 for normal processing
 #run processNfos
 export NFOS="0"
 
@@ -267,29 +238,6 @@ export RELEASES_SLEEP="40"
 
 ############################################################
 
-#Choose to run optimize_innodb.php or optimize_mysiam.php script true/false
-#set to false by default, you should test the optimize scripts in bin first
-#optimize_myisam on small tables runs after every 5th loop of update_releases
-export OPTIMIZE="false"
-
-#optimize can wait, patiently while all other panes stop and then run
-#or, forcefully terminate all panes while it runs, to kill all panes and run optimize, enable
-export OPTIMIZE_KILL="false"
-
-#How often to run optimize_myisam on small tables seconds, default is 10 min
-export MYISAM_SMALL="600"
-
-#How often to run optimize_myisam on large tables seconds, default is 1 hr
-export MYISAM_LARGE="3600"
-
-#How often to run optimize_innodb on small tables in seconds, default is 2 hr
-export INNODB_SMALL="7200"
-
-#How often to run optimize_innodb on large tables in seconds, default is 48 hrs
-export INNODB_LARGE="172800"
-
-############################################################
-
 #Choose your database engine, comment the one true/false
 #you should have already converted your database to InnoDB engine, if you select true here
 export INNODB="false"
@@ -426,8 +374,6 @@ export POWERLINE="false"
 #set your LANG to which ever you like, only effects these scripts
 export LANG="en_US.UTF-8"
 
-#to help IMDB return only English titles, enable this, you will need to run update_svn.php or fix_files.sh
-export EN_IMDB="false"
 
 ############################################################
 
