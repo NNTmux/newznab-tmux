@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.3r004";
+$version="0.3r005";
 
 $db = new DB();
 $DIR = dirname (__FILE__);
@@ -991,11 +991,14 @@ if ($array ['FIXRELEASES'] = "true") {
 
 	//start postprocessing in pane 1.5
 
-		$f=100;
+        $g=1
+        $h=$g-1;
+        $f=$h*200;
+        $j=$g*1;
 		$color = get_color();
 		$log = writelog($panes1[5]);
 		if (( $array['MAX_LOAD'] >= get_load()) && ( $work_remaining_now > $f )) {
-			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes1[5] $ds2 && cd $_temp && $_php processAdditional1.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes1[5] $ds3' 2>&1 1> /dev/null");
+			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes1[5] $ds2 && cd $_temp && $_php processAdditional$g.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes1[5] $ds3' 2>&1 1> /dev/null");
 		} elseif ( $work_remaining_now <= $f ) {
 			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.5 'echo \"\033[38;5;\"$color\"m\n$panes1[5] $work_remaining_now < $f\nHas no work to process \" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
 		} elseif ( $array['MAX_LOAD'] <= get_load()) {

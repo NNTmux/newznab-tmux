@@ -140,7 +140,7 @@ rm -f $DIR/bin/lib/nntp2.php
 rm -f $DIR/bin/temp/*
 
 #create postprocessing scripts
-for (( c=1; c<=16; c++ ))
+for (( c=1 ))
 do
     d=$((($c - 1) * 100))
 	cp $NEWZPATH/www/lib/postprocess.php $DIR/bin/temp/postprocess$c.php
