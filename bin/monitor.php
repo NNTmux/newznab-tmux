@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.3r006";
+$version="0.3r007";
 
 $db = new DB();
 $DIR = dirname (__FILE__);
@@ -991,7 +991,7 @@ if ($array ['FIXRELEASES'] = "true") {
 
 	//start postprocessing in pane 1.5
 
-        $g=1
+        $g=1;
         $h=$g-1;
         $f=$h*200;
         $j=$g*1;
@@ -1003,7 +1003,7 @@ if ($array ['FIXRELEASES'] = "true") {
 			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.5 'echo \"\033[38;5;\"$color\"m\n$panes1[5] $work_remaining_now < $f\nHas no work to process \" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
 		} elseif ( $array['MAX_LOAD'] <= get_load()) {
                         shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.5 'echo \"\033[38;5;\"$color\"m\n$panes1[5] Disabled by MAX_LOAD\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
-                }
+                }F
 
 	//runs update_release and in 0.5 once if needed and exits
 	if (( $array['MAX_LOAD_RELEASES'] >= get_load()) && ( $array['RELEASES'] == "true" )) {
