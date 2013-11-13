@@ -206,7 +206,7 @@ $SED -i -e "s/NNTPException/NNTPException2/g" $DIR/bin/temp/nntp2.php
 $SED -i -e "s/class Nntp/class GetConnected/g" $DIR/bin/temp/nntp2.php
 
 $SED -i -e "s/500/250/" $DIR/bin/temp/postprocess1.php
-$SED -i -e "s/500/250/" $DIR/bin/temp/postprocess2.php
+#$SED -i -e "s/500/250/" $DIR/bin/temp/postprocess2.php
 
 $SED -i -e "s/class Nfo/class Nfo1/" $DIR/bin/temp/nfo.php
 $SED -i -e "s/class TvRage/class TvRage1/" $DIR/bin/temp/tvrage.php
@@ -234,35 +234,35 @@ $SED -i -e "s/processConsoleReleases/processConsoleReleases1/" $DIR/bin/temp/con
 $SED -i -e "s/nfoHandleError/nfoHandleError1/" $DIR/bin/temp/nfo.php
 $SED -i -e "s/ORDER BY postdate DESC/ORDER BY postdate ASC/" $DIR/bin/temp/nfo.php
 
-$SED -i -e 's/WWW_DIR."\/lib\/nfo.php"/"nfo.php"/g' $DIR/bin/temp/postprocess2.php
-$SED -i -e 's/WWW_DIR."\/lib\/movie.php"/"movie.php"/g' $DIR/bin/temp/postprocess2.php
+$SED -i -e 's/WWW_DIR."\/lib\/nfo.php"/"nfo.php"/g' $DIR/bin/temp/postprocess1.php
+$SED -i -e 's/WWW_DIR."\/lib\/movie.php"/"movie.php"/g' $DIR/bin/temp/postprocess1.php
 $SED -i -e 's/WWW_DIR."\/lib\/music.php"/"music.php"/g' $DIR/bin/temp/postprocess1.php
-$SED -i -e 's/WWW_DIR."\/lib\/music.php"/"music1.php"/g' $DIR/bin/temp/postprocess2.php
-$SED -i -e 's/WWW_DIR."\/lib\/console.php"/"console.php"/g' $DIR/bin/temp/postprocess2.php
-$SED -i -e 's/WWW_DIR."\/lib\/book.php"/"book.php"/g' $DIR/bin/temp/postprocess2.php
-$SED -i -e 's/WWW_DIR."\/lib\/tvrage.php"/"tvrage.php"/g' $DIR/bin/temp/postprocess2.php
+$SED -i -e 's/WWW_DIR."\/lib\/music.php"/"music1.php"/g' $DIR/bin/temp/postprocess1.php
+$SED -i -e 's/WWW_DIR."\/lib\/console.php"/"console.php"/g' $DIR/bin/temp/postprocess1.php
+$SED -i -e 's/WWW_DIR."\/lib\/book.php"/"book.php"/g' $DIR/bin/temp/postprocess1.php
+$SED -i -e 's/WWW_DIR."\/lib\/tvrage.php"/"tvrage.php"/g' $DIR/bin/temp/postprocess1.php
 
-$SED -i -e "s/processNfos()/processNfos1()/g" $DIR/bin/temp/postprocess2.php
-$SED -i -e "s/processMovies()/processMovies1()/g" $DIR/bin/temp/postprocess2.php
+$SED -i -e "s/processNfos()/processNfos1()/g" $DIR/bin/temp/postprocess1.php
+$SED -i -e "s/processMovies()/processMovies1()/g" $DIR/bin/temp/postprocess1.php
 $SED -i -e "s/processMusic()/processMusic1()/g" $DIR/bin/temp/postprocess1.php
-$SED -i -e "s/processMusic()/processMusic2()/g" $DIR/bin/temp/postprocess2.php
-$SED -i -e "s/processBooks()/processBooks1()/g" $DIR/bin/temp/postprocess2.php
-$SED -i -e "s/processGames()/processGames1()/g" $DIR/bin/temp/postprocess2.php
-$SED -i -e "s/processTv()/processTv1()/g" $DIR/bin/temp/postprocess2.php
+$SED -i -e "s/processMusic()/processMusic2()/g" $DIR/bin/temp/postprocess1.php
+$SED -i -e "s/processBooks()/processBooks1()/g" $DIR/bin/temp/postprocess1.php
+$SED -i -e "s/processGames()/processGames1()/g" $DIR/bin/temp/postprocess1.php
+$SED -i -e "s/processTv()/processTv1()/g" $DIR/bin/temp/postprocess1.php
 
-$SED -i -e "s/new Nfo(/new Nfo1(/" $DIR/bin/temp/postprocess2.php
-$SED -i -e "s/new Movie/new Movie1/" $DIR/bin/temp/postprocess2.php
+$SED -i -e "s/new Nfo(/new Nfo1(/" $DIR/bin/temp/postprocess1.php
+$SED -i -e "s/new Movie/new Movie1/" $DIR/bin/temp/postprocess1.php
 $SED -i -e "s/new Music/new Music1/" $DIR/bin/temp/postprocess1.php
-$SED -i -e "s/new Music/new Music2/" $DIR/bin/temp/postprocess2.php
-$SED -i -e "s/new Book/new Book1/" $DIR/bin/temp/postprocess2.php
-$SED -i -e "s/new Console/new Console1/" $DIR/bin/temp/postprocess2.php
+$SED -i -e "s/new Music/new Music2/" $DIR/bin/temp/postprocess1.php
+$SED -i -e "s/new Book/new Book1/" $DIR/bin/temp/postprocess1.php
+$SED -i -e "s/new Console/new Console1/" $DIR/bin/temp/postprocess1.php
 
-$SED -i -e "s/processNfoFiles/processNfoFiles1/" $DIR/bin/temp/postprocess2.php
-$SED -i -e "s/processMovieReleases()/processMovieReleases1()/" $DIR/bin/temp/postprocess2.php
+$SED -i -e "s/processNfoFiles/processNfoFiles1/" $DIR/bin/temp/postprocess1.php
+$SED -i -e "s/processMovieReleases()/processMovieReleases1()/" $DIR/bin/temp/postprocess1.php
 $SED -i -e "s/processMusicReleases()/processMusicReleases1()/" $DIR/bin/temp/postprocess1.php
-$SED -i -e "s/processMusicReleases()/processMusicReleases2()/" $DIR/bin/temp/postprocess2.php
-$SED -i -e "s/processBookReleases()/processBookReleases1()/" $DIR/bin/temp/postprocess2.php
-$SED -i -e "s/processConsoleReleases()/processConsoleReleases1()/" $DIR/bin/temp/postprocess2.php
+$SED -i -e "s/processMusicReleases()/processMusicReleases2()/" $DIR/bin/temp/postprocess1.php
+$SED -i -e "s/processBookReleases()/processBookReleases1()/" $DIR/bin/temp/postprocess1.php
+$SED -i -e "s/processConsoleReleases()/processConsoleReleases1()/" $DIR/bin/temp/postprocess1.php
 
 $SED -i -e "s/ORDER BY postdate DESC/ORDER BY postdate ASC/" $DIR/bin/temp/nfo.php
 $SED -i -e "s/ORDER BY postdate DESC/ORDER BY postdate ASC/" $DIR/bin/temp/movie.php
