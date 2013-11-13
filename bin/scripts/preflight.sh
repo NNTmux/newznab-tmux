@@ -212,7 +212,7 @@ $SED -i -e "s/class Nfo/class Nfo1/" $DIR/bin/temp/nfo.php
 $SED -i -e "s/class TvRage/class TvRage1/" $DIR/bin/temp/tvrage.php
 $SED -i -e "s/class Movie/class Movie1/" $DIR/bin/temp/movie.php
 $SED -i -e "s/class Music/class Music1/" $DIR/bin/temp/music.php
-$SED -i -e "s/class Music/class Music2/" $DIR/bin/temp/music1.php
+#$SED -i -e "s/class Music/class Music2/" $DIR/bin/temp/music1.php
 $SED -i -e "s/class Console/class Console1/" $DIR/bin/temp/console.php
 $SED -i -e "s/class Book/class Book1/" $DIR/bin/temp/book.php
 
@@ -220,14 +220,14 @@ $SED -i -e "s/function Nfo/function Nfo1/" $DIR/bin/temp/nfo.php
 $SED -i -e "s/function TvRage/function TvRage1/" $DIR/bin/temp/tvrage.php
 $SED -i -e "s/function Movie/function Movie1/" $DIR/bin/temp/movie.php
 $SED -i -e "s/function Music/function Music1/" $DIR/bin/temp/music.php
-$SED -i -e "s/function Music/function Music2/" $DIR/bin/temp/music1.php
+#$SED -i -e "s/function Music/function Music2/" $DIR/bin/temp/music1.php
 $SED -i -e "s/function Console/function Console1/" $DIR/bin/temp/console.php
 $SED -i -e "s/function Book/function Book1/" $DIR/bin/temp/book.php
 
 $SED -i -e "s/processNfoFiles/processNfoFiles1/" $DIR/bin/temp/nfo.php
 $SED -i -e "s/processMovieReleases/processMovieReleases1/" $DIR/bin/temp/movie.php
 $SED -i -e "s/processMusicReleases/processMusicReleases1/" $DIR/bin/temp/music.php
-$SED -i -e "s/processMusicReleases/processMusicReleases2/" $DIR/bin/temp/music1.php
+#$SED -i -e "s/processMusicReleases/processMusicReleases2/" $DIR/bin/temp/music1.php
 $SED -i -e "s/processBookReleases/processBookReleases1/" $DIR/bin/temp/book.php
 $SED -i -e "s/processConsoleReleases/processConsoleReleases1/" $DIR/bin/temp/console.php
 
@@ -237,7 +237,7 @@ $SED -i -e "s/ORDER BY postdate DESC/ORDER BY postdate ASC/" $DIR/bin/temp/nfo.p
 $SED -i -e 's/WWW_DIR."\/lib\/nfo.php"/"nfo.php"/g' $DIR/bin/temp/postprocess1.php
 $SED -i -e 's/WWW_DIR."\/lib\/movie.php"/"movie.php"/g' $DIR/bin/temp/postprocess1.php
 $SED -i -e 's/WWW_DIR."\/lib\/music.php"/"music.php"/g' $DIR/bin/temp/postprocess1.php
-$SED -i -e 's/WWW_DIR."\/lib\/music.php"/"music1.php"/g' $DIR/bin/temp/postprocess1.php
+#$SED -i -e 's/WWW_DIR."\/lib\/music.php"/"music1.php"/g' $DIR/bin/temp/postprocess1.php
 $SED -i -e 's/WWW_DIR."\/lib\/console.php"/"console.php"/g' $DIR/bin/temp/postprocess1.php
 $SED -i -e 's/WWW_DIR."\/lib\/book.php"/"book.php"/g' $DIR/bin/temp/postprocess1.php
 $SED -i -e 's/WWW_DIR."\/lib\/tvrage.php"/"tvrage.php"/g' $DIR/bin/temp/postprocess1.php
@@ -245,7 +245,7 @@ $SED -i -e 's/WWW_DIR."\/lib\/tvrage.php"/"tvrage.php"/g' $DIR/bin/temp/postproc
 $SED -i -e "s/processNfos()/processNfos1()/g" $DIR/bin/temp/postprocess1.php
 $SED -i -e "s/processMovies()/processMovies1()/g" $DIR/bin/temp/postprocess1.php
 $SED -i -e "s/processMusic()/processMusic1()/g" $DIR/bin/temp/postprocess1.php
-$SED -i -e "s/processMusic()/processMusic2()/g" $DIR/bin/temp/postprocess1.php
+#$SED -i -e "s/processMusic()/processMusic2()/g" $DIR/bin/temp/postprocess1.php
 $SED -i -e "s/processBooks()/processBooks1()/g" $DIR/bin/temp/postprocess1.php
 $SED -i -e "s/processGames()/processGames1()/g" $DIR/bin/temp/postprocess1.php
 $SED -i -e "s/processTv()/processTv1()/g" $DIR/bin/temp/postprocess1.php
@@ -253,14 +253,14 @@ $SED -i -e "s/processTv()/processTv1()/g" $DIR/bin/temp/postprocess1.php
 $SED -i -e "s/new Nfo(/new Nfo1(/" $DIR/bin/temp/postprocess1.php
 $SED -i -e "s/new Movie/new Movie1/" $DIR/bin/temp/postprocess1.php
 $SED -i -e "s/new Music/new Music1/" $DIR/bin/temp/postprocess1.php
-$SED -i -e "s/new Music/new Music2/" $DIR/bin/temp/postprocess1.php
+#$SED -i -e "s/new Music/new Music2/" $DIR/bin/temp/postprocess1.php
 $SED -i -e "s/new Book/new Book1/" $DIR/bin/temp/postprocess1.php
 $SED -i -e "s/new Console/new Console1/" $DIR/bin/temp/postprocess1.php
 
 $SED -i -e "s/processNfoFiles/processNfoFiles1/" $DIR/bin/temp/postprocess1.php
 $SED -i -e "s/processMovieReleases()/processMovieReleases1()/" $DIR/bin/temp/postprocess1.php
 $SED -i -e "s/processMusicReleases()/processMusicReleases1()/" $DIR/bin/temp/postprocess1.php
-$SED -i -e "s/processMusicReleases()/processMusicReleases2()/" $DIR/bin/temp/postprocess1.php
+#$SED -i -e "s/processMusicReleases()/processMusicReleases2()/" $DIR/bin/temp/postprocess1.php
 $SED -i -e "s/processBookReleases()/processBookReleases1()/" $DIR/bin/temp/postprocess1.php
 $SED -i -e "s/processConsoleReleases()/processConsoleReleases1()/" $DIR/bin/temp/postprocess1.php
 
@@ -268,9 +268,9 @@ $SED -i -e "s/ORDER BY postdate DESC/ORDER BY postdate ASC/" $DIR/bin/temp/nfo.p
 $SED -i -e "s/ORDER BY postdate DESC/ORDER BY postdate ASC/" $DIR/bin/temp/movie.php
 $SED -i -e "s/ORDER BY createddate DESC/ORDER BY createddate ASC/" $DIR/bin/temp/movie.php
 $SED -i -e "s/ORDER BY postdate DESC LIMIT 1000/ORDER BY postdate DESC LIMIT 100/" $DIR/bin/temp/music.php
-$SED -i -e "s/ORDER BY postdate DESC LIMIT 1000/ORDER BY postdate ASC LIMIT 100/" $DIR/bin/temp/music1.php
+#$SED -i -e "s/ORDER BY postdate DESC LIMIT 1000/ORDER BY postdate ASC LIMIT 100/" $DIR/bin/temp/music1.php
 $SED -i -e "s/ORDER BY createddate DESC/ORDER BY createddate DESC/" $DIR/bin/temp/music.php
-$SED -i -e "s/ORDER BY createddate DESC/ORDER BY createddate ASC/" $DIR/bin/temp/music1.php
+#$SED -i -e "s/ORDER BY createddate DESC/ORDER BY createddate ASC/" $DIR/bin/temp/music1.php
 $SED -i -e "s/ORDER BY postdate DESC/ORDER BY postdate ASC/" $DIR/bin/temp/book.php
 $SED -i -e "s/ORDER BY postdate DESC/ORDER BY postdate ASC/" $DIR/bin/temp/console.php
 $SED -i -e "s/ORDER BY createddate DESC/ORDER BY createddate ASC/" $DIR/bin/temp/console.php

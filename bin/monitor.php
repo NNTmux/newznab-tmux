@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.3r008";
+$version="0.3r009";
 
 $db = new DB();
 $DIR = dirname (__FILE__);
@@ -1129,7 +1129,7 @@ if ($array ['FIXRELEASES'] = "true") {
         }
 
 	//runs postprocess_nfo1.php in pane 2.4 once if needed then exits
-	if (( $array['MAX_LOAD'] >= get_load()) && ( $nfo_remaining_now >= 500 ) && ( $array['NFOS'] == "2" )) {
+	if (( $array['MAX_LOAD'] >= get_load()) && ( $nfo_remaining_now >= 500 ) && ( $array['NFOS'] == "1" )) {
 		$color = get_color();
 		$log = writelog($panes2[4]);
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.4 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes2[4] $ds2 && cd $_bin && $_php postprocess_nfo1.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes2[4] $ds3' 2>&1 1> /dev/null");
@@ -1144,7 +1144,7 @@ if ($array ['FIXRELEASES'] = "true") {
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.4 'echo \"\033[38;5;\"$color\"m\n$panes2[4] Has no work to process \" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
         }
 
-	//runs processGames.php in pane 4.1 once if needed then exits
+	//runs processGames.php in pane 2.1 once if needed then exits
 	if (( $array['MAX_LOAD'] >= get_load()) && ( $console_releases_proc > 0 ) && ( $array['GAMES'] != "0" )) {
 		$color = get_color();
 		$log = writelog($panes2[1]);
@@ -1160,8 +1160,8 @@ if ($array ['FIXRELEASES'] = "true") {
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.1 'echo \"\033[38;5;\"$color\"m\n$panes2[1] Has no work to process \" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
         }
 
-	//runs processGames.php in pane 4.5 once if needed then exits
-	if (( $array['MAX_LOAD'] >= get_load()) && ( $console_releases_proc >= 200 ) && ( $array['GAMES'] == "2" )) {
+	//runs processGames.php in pane 2.5 once if needed then exits
+	if (( $array['MAX_LOAD'] >= get_load()) && ( $console_releases_proc >= 200 ) && ( $array['GAMES'] == "1" )) {
 		$color = get_color();
 		$log = writelog($panes2[5]);
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes2[5] $ds2 && cd $_bin && $_php processGames1.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes2[5] $ds3' 2>&1 1> /dev/null");
@@ -1176,7 +1176,7 @@ if ($array ['FIXRELEASES'] = "true") {
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.5 'echo \"\033[38;5;\"$color\"m\n$panes2[5] Has no work to process \" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
         }
 
-	//runs processMovies.php in pane 4.2 once if needed then exits
+	//runs processMovies.php in pane 2.2 once if needed then exits
 	if (( $array['MAX_LOAD'] >= get_load()) && ( $movie_releases_proc > 0 ) && ( $array['MOVIES'] != "0" )) {
 		$color = get_color();
 		$log = writelog($panes2[2]);
@@ -1192,7 +1192,7 @@ if ($array ['FIXRELEASES'] = "true") {
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.2 'echo \"\033[38;5;\"$color\"m\n$panes2[2] Has no work to process \" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
         }
 
-	//runs processMovies.php in pane 4.6 once if needed then exits
+	//runs processMovies.php in pane 2.6 once if needed then exits
 	if (( $array['MAX_LOAD'] >= get_load()) && ( $movie_releases_proc >= 200 ) && ( $array['MOVIES'] == "2" )) {
 		$color = get_color();
 		$log = writelog($panes2[6]);
@@ -1208,7 +1208,7 @@ if ($array ['FIXRELEASES'] = "true") {
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.6 'echo \"\033[38;5;\"$color\"m\n$panes2[6] Has no work to process \" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
         }
 
-	//runs processMusic.php in pane 4.3 once if needed then exits
+	//runs processMusic.php in pane 2.3 once if needed then exits
 	if (( $array['MAX_LOAD'] >= get_load()) && ( $music_releases_proc > 0 ) && ( $array['MUSIC'] != "0" )) {
 		$color = get_color();
 		$log = writelog($panes2[3]);
@@ -1224,11 +1224,11 @@ if ($array ['FIXRELEASES'] = "true") {
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.3 'echo \"\033[38;5;\"$color\"m\n$panes2[3] Has no work to process \" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
         }
 
-	//runs processMusic.php in pane 4.7 once if needed then exits
-	if (( $array['MAX_LOAD'] >= get_load()) && ( $music_releases_proc >= 200 ) && ( $array['MUSIC'] == "2" )) {
+	//runs processMusic.php in pane 2.7 once if needed then exits
+	if (( $array['MAX_LOAD'] >= get_load()) && ( $music_releases_proc >= 200 ) && ( $array['MUSIC'] == "1" )) {
 		$color = get_color();
 		$log = writelog($panes2[7]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.7 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes2[7] $ds2 && cd $_bin && $_php processMusic1.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes2[7] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.7 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes2[7] $ds2 && cd $_bin && $_php processMusic.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes2[7] $ds3' 2>&1 1> /dev/null");
 	} elseif ( $array['MUSIC'] == "0" ) {
 		$color = get_color();
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.7 'echo \"\033[38;5;\"$color\"m\n$panes2[7] Disabled by MUSIC\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
