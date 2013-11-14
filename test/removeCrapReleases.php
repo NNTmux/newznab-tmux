@@ -112,7 +112,7 @@ if (isset($argv[1]) && $argv[1] == "true")
 	{
 		$type = "Executable";
 		$db = new DB();
-		$sql = $db->query('SELECT r.ID, r.guid, r.searchname FROM releases r INNER JOIN releasefiles rf ON rf.releaseID = r.ID WHERE rf.name LIKE "%.exe" AND r.categoryID NOT IN (4000, 4010, 4020, 4050, 8010)'.$and);
+		$sql = $db->query('SELECT r.ID, r.guid, r.searchname FROM releases r INNER JOIN releasefiles rf ON rf.releaseID = r.ID WHERE rf.name LIKE "%.exe%" AND r.categoryID NOT IN (4000, 4010, 4020, 4050, 8010)'.$and);
 		$delcount = deleteReleases($sql, $type);
 		return $delcount;
 	}
