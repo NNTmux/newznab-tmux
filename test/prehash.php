@@ -23,12 +23,12 @@ Class Predb
 
 	// Retrieve pre info from predb sources and store them in the DB.
 	// Returns the quantity of new titles retrieved.
-	public function combinePre()
+	public function combinePre($nntp)
 	{
 		$db = new DB();
 		$newnames = 0;
 		$newestrel = $db->queryOneRow("SELECT adddate, ID FROM prehash ORDER BY adddate DESC LIMIT 1");
-		if (strtotime($newestrel["adddate"]) < time()-900 || is_null($newestrel['adddate']))
+		if (strtotime($newestrel["adddate"]) < time()-600 || is_null($newestrel['adddate']))
 		{
 			if ($this->echooutput)
 				echo "Retrieving titles from preDB sources.\n";
@@ -449,7 +449,8 @@ Class Predb
 				$te = " in the past 3 hours";
 			echo "Fixing search names".$te." using the prehash md5.\n";
 		}
-		if ($res = $db->queryDirect("select r.ID, r.name, r.searchname, r.categoryID, r.groupID, rf.name as filename from releases r left join releasefiles rf on r.ID = rf.releaseID  where (r.name REGEXP'[a-fA-F0-9]{32}' or rf.name REGEXP'[a-fA-F0-9]{32}') and r.relnamestatus = 1 and r.categoryID = 8010 and passwordstatus >= -1 ORDER BY rf.releaseID, rf.size DESC ".$tq))
+        $regex = "AND (r.hashed = true OR rf.name REGEXP'[a-fA-F0-9]{32}')";
+		if ($res = $db->query(sprintf('SELECT DISTINCT r.id, r.name, r.searchname, r.categoryid, r.groupid, rf.name AS filename, rf.releaseid, rf.size FROM releases r LEFT JOIN releasefiles rf ON r.id = rf.releaseid WHERE r.relnamestatus IN (0, 1, 20, 21, 22) AND dehashstatus BETWEEN -5 AND 0 AND passwordstatus >= -1 %s %s %s ORDER BY rf.releaseid, rf.size DESC', $regex, $tq, $ct)));
 		{
 			while($row = mysqli_fetch_assoc($res))
 			{

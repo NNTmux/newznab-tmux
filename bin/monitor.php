@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.3r014";
+$version="0.3r017";
 
 $db = new DB();
 $DIR = dirname (__FILE__);
