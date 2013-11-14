@@ -30,6 +30,7 @@ if (isset($argv[1]) && isset($argv[2]) && isset($argv[3]) && isset($argv[4]))
     	{
 		require_once(WWW_DIR."/lib/nntp.php");
 		$nntp = new Nntp();
+        $nntp->doConnect();
 		if (($nntp->doConnect()) === false)
 		{
 			echo $c->error("Unable to connect to usenet.\n");
