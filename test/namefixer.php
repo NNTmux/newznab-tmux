@@ -141,8 +141,10 @@ class Namefixer
 			echo "Nothing to fix.\n";
 	}
     //  Attempts to fix release names using the Par2 File.
-	public function fixNamesWithPar2($time, $echo, $cats, $namestatus)
+	public function fixNamesWithPar2($time, $echo, $cats, $namestatus, $nntp)
 	{
+	    if (!isset($nntp))
+			exit($c->error("Unable to connect to usenet.\n"));
 		if ($time == 1)
 			echo "Fixing search names in the past 6 hours using the par2 files.\n";
 		else
@@ -170,9 +172,10 @@ class Namefixer
 		    {
 		    $db = new DB();
 			$nzbcontents = new NZBcontents($this->echooutput);
+            $pp = new Functions ($this->echooutput);
 			foreach ($relres as $relrow)
 			{
-				if ($nzbcontents->checkPAR2($relrow['guid'], $relrow['releaseID'], $relrow['groupID'], true));
+				if ($nzbcontents->checkPAR2($relrow['guid'], $relrow['releaseID'], $relrow['groupID'], $db, $pp, $nntp) === true);
 				{
 				echo ".";
                 $this->fixed++;

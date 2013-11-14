@@ -4,6 +4,7 @@ require_once(WWW_DIR."/lib/framework/db.php");
 require_once(WWW_DIR."/lib/nzb.php");
 require_once(WWW_DIR."/lib/nfo.php");
 require_once("functions.php");
+require_once("ColorCLI.php");
 
 /*
  * Gets information contained within the NZB.
@@ -19,6 +20,10 @@ Class NZBcontents
 
 	public function getNfoFromNZB($guid, $relID, $groupID, $nntp)
 	{
+	    $c = new ColorCLI;
+	    if (!isset($nntp))
+			exit($c->error("Unable to connect to usenet.\n"));
+
 		if($fetchedBinary = $this->NFOfromNZB($guid, $relID, $groupID, $nntp))
 			return $fetchedBinary;
 		else if ($fetchedBinary = $this->hiddenNFOfromNZB($guid, $relID, $groupID, $nntp))
@@ -53,8 +58,12 @@ Class NZBcontents
 	}
 
 	// Attempts to get the releasename from a par2 file
-	public function checkPAR2($guid, $relID, $groupID, $echooutput)
+	public function checkPAR2($guid, $relID, $groupID, $db, $pp, $nntp)
 	{
+	    $c = new ColorCLI;
+	    if (!isset($nntp))
+			exit($c->error("Unable to connect to usenet.\n"));
+
 		$nzbfile = $this->LoadNZB($guid);
 		if ($nzbfile !== false)
 		{
@@ -63,16 +72,24 @@ Class NZBcontents
 				if (preg_match('/\.(par[2" ]|\d{2,3}").+\(1\/1\)$/i', $nzbcontents->attributes()->subject))
 				{
 					$pp = new Functions($echooutput);
-					if ($pp->parsePAR2($nzbcontents->segments->segment, $relID, $groupID, null) === true)
-				    break;
+					if ($pp->parsePAR2($nzbcontents->segments->segment, $relID, $groupID, $nntp) === true)
+                    {
+						$db->query(sprintf('UPDATE releases SET relnamestatus = 22 WHERE (relnamestatus != 7 AND relnamestatus != 22) AND id = %d', $relID));
+						return true;
+					}
 				}
 			}
 		}
-	}
+		return false;
+        }
 
 	// Gets the completion from the NZB, optionally looks if there is an NFO/PAR2 file.
 	public function NZBcompletion($guid, $relID, $groupID, $nntp, $db, $nfocheck=false)
 	{
+	     $c = new ColorCLI;
+	    if (!isset($nntp))
+			exit($c->error("Unable to connect to usenet.\n"));
+
 		$nzbfile = $this->LoadNZB($guid);
 		if ($nzbfile !== false)
 		{
@@ -171,6 +188,10 @@ Class NZBcontents
 	// Look for an NFO in the nzb which does not end in .nfo, return the nfo.
 	public function hiddenNFOfromNZB($guid, $relID, $groupID, $nntp)
 	{
+	    $c = new ColorCLI;
+	    if (!isset($nntp))
+			exit($c->error("Unable to connect to usenet.\n"));
+
 		$nzbfile = $this->LoadNZB($guid);
 		if ($nzbfile !== false)
 		{
