@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-$version="0.3r025";
+$version="0.3r026";
 
 $db = new DB();
 $DIR = dirname (__FILE__);
@@ -1433,6 +1433,6 @@ if ($array ['FIXRELEASES'] = "true") {
 	{
 		sleep(1);
 	}
-    }
+
 
 ?>
