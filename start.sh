@@ -47,7 +47,7 @@ else
     $TMUXCMD splitw -h -p 67 'printf "\033]2;update_binaries\033\\"'
 
     $TMUXCMD selectp -t 0
-    $TMUXCMD splitw -v -p 30 'printf "\033]2;nzbcount\033\\"'
+    $TMUXCMD splitw -v -p 30 'printf "\033]2;postprocessing\033\\"'
 
     $TMUXCMD selectp -t 2
     $TMUXCMD splitw -v -p 75 'printf "\033]2;backfill\033\\"'
@@ -63,7 +63,7 @@ else
 	$TMUXCMD selectp -t 2
     $TMUXCMD splitw -h -p 50 'printf "\033]2;delete_parts\033\\"' 
 	$TMUXCMD selectp -t 4
-    $TMUXCMD splitw -h -p 50 'printf "\033]2;postprocessing\033\\"'
+    $TMUXCMD splitw -h -p 50 'printf "\033]2;nzbcount\033\\"'
 
     $TMUXCMD new-window -n Postproc1 'printf "\033]2;processNfos1\033\\"'
     $TMUXCMD splitw -h -p 50 'printf "\033]2;processNfos2\033\\"'

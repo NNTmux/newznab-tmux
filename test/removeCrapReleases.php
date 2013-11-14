@@ -71,9 +71,7 @@ if (isset($argv[1]) && $argv[1] == "true")
 			        $functions->fastDelete($rel['ID'], $rel['guid'], $site);
 			}
 			else
-			{
 			        echo "Would be deleting: ".$type.": ".$rel['searchname']."\n";
-			}
 			$delcount++;
 		}
 		return $delcount;
