@@ -29,7 +29,7 @@ function preName($argv)
 	if($total > 0)
 	{
         $precount = $db->queryOneRow('SELECT COUNT(*) AS count FROM prehash');
-		echo 'Comparing '.number_format($total).' releases against '.number_format($precount['count'])." preDB's\n";
+		echo 'Comparing '.number_format($total).' releases against '.number_format($precount['count'])." prehash records \n";
         $consoletools = new ConsoleTools();
 		$category = new Category();
         $functions = new Functions();

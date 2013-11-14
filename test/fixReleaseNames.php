@@ -58,10 +58,10 @@ if (isset($argv[1]) && isset($argv[2]) && isset($argv[3]) && isset($argv[4]))
 			$namefixer->fixNamesWithFiles(2,$update,$other,$setStatus);
 			break;
         case 7:
-			$namefixer->fixNamesWithPar2(1,$update,$other,$setStatus, $nntp);
+			$namefixer->fixNamesWithPar2(1,$update,$other,$setStatus,$nntp);
 			break;
 		case 8:
-			$namefixer->fixNamesWithPar2(2,$update,$other,$setStatus, $nntp);
+			$namefixer->fixNamesWithPar2(2,$update,$other,$setStatus,$nntp);
 			break;
 		default :
 			exit("ERROR: Wrong argument, type php fixReleaseNames.php to see a list of valid arguments.".$n);
