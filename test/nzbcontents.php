@@ -72,10 +72,10 @@ Class NZBcontents
 			{
 				if (preg_match('/\.(par[2" ]|\d{2,3}").+\(1\/1\)$/i', $nzbcontents->attributes()->subject))
 				{
-					$pp = new Functions($echooutput);
+					$pp = new Functions();
 					if ($pp->parsePAR2($nzbcontents->segments->segment, $relID, $groupID, $nntp) === true)
                     {
-						$db->query(sprintf('UPDATE releases SET relnamestatus = 22 WHERE (relnamestatus != 7 AND relnamestatus != 22) AND id = %d', $relID));
+						$db->query(sprintf('UPDATE releases SET relnamestatus = 22 WHERE (relnamestatus != 7 AND relnamestatus != 22) AND ID = %d', $relID));
 						return true;
 					}
 				}
