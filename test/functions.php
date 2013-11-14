@@ -164,7 +164,8 @@ class Functions
 		$quer = $db->queryOneRow('SELECT groupID, categoryID, relnamestatus, searchname, '.$t.' as postdate, ID as releaseID FROM releases WHERE ID = '.$relID);
 		if (!in_array($quer['relnamestatus'], array(0, 1, 6, 20, 21)) || $quer['relnamestatus'] === 7 || $quer['categoryID'] != Category::CAT_MISC_OTHER)
 			return false;
-
+        $nntp = new Nntp();
+        $nntp = doConnect();
 		$groups = new Groups();
         $functions = new Functions();
 		$par2 = $nntp->getMessage($functions->getByNameByID($groupID), $messageID);
