@@ -3,6 +3,7 @@
 require_once(WWW_DIR."/lib/framework/db.php");
 require_once(WWW_DIR."/lib/nzb.php");
 require_once(WWW_DIR."/lib/nfo.php");
+require_once(WWW_DIR."/lib/nntp.php");
 require_once("functions.php");
 require_once("ColorCLI.php");
 

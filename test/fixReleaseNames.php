@@ -28,7 +28,7 @@ if (isset($argv[1]) && isset($argv[2]) && isset($argv[3]) && isset($argv[4]))
 
     if ($argv[1] == 7 || $argv[1] == 8)
     	{
-		require_once(FS_ROOT.'/../../../www/lib/nntp.php');
+		require_once(WWW_DIR."/lib/nntp.php");
 		$nntp = new Nntp();
 		if (($nntp->doConnect()) === false)
 		{
