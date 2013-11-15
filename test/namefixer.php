@@ -6,6 +6,8 @@ require_once(WWW_DIR. "lib/groups.php");
 require_once("namecleaner.php");
 require_once("functions.php");
 require_once("nzbcontents.php");
+require_once("ColorCLI.php");
+
 
 //This script is adapted from nZEDb
 /* Values of relnamestatus:
@@ -35,11 +37,14 @@ class Namefixer
 	{
 		$this->echooutput = $echooutput;
 		$this->relid = $this->fixed = $this->checked = 0;
-		$this->timeother = " and rel.adddate > (now() - interval 6 hour) and rel.categoryID in (2020, 5050, 6070, 8010) group by rel.ID order by postdate desc";
-		$this->timeall = " and rel.adddate > (now() - interval 6 hour) group by rel.ID order by postdate desc";
-		$this->fullother = " and rel.categoryID in (2020, 5050, 6070, 8010) group by rel.ID order by postdate desc";
-		$this->fullall = " order by postdate desc";
+        $this->db = new DB();
+		$db = $this->db;
+		$this->timeother = " AND rel.adddate > (now() - interval 6 hour) AND rel.categoryID in (2020, 5050, 6070, 8010) GROUP BY rel.ID ORDER BY postdate DESC";
+		$this->timeall = " AND rel.adddate > (now() - interval 6 hour) GROUP BY rel.ID ORDER BY postdate DESC";
+		$this->fullother = " AND rel.categoryID IN (2020, 5050, 6070, 8010) GROUP BY rel.ID order by postdate DESC";
+		$this->fullall = " ORDER BY postdate DESC";
         $this->done = $this->matched = false;
+        $this->c = new ColorCLI;
 	}
 
 	//
@@ -141,14 +146,16 @@ class Namefixer
 			echo "Nothing to fix.\n";
 	}
     //  Attempts to fix release names using the Par2 File.
-	public function fixNamesWithPar2($time, $echo, $cats, $namestatus)
+	public function fixNamesWithPar2($time, $echo, $cats, $namestatus, $nntp)
 	{
+	    if (!isset($nntp))
+			exit($c->error("Not connected to usenet(namefixer->fixNamesWithPar2.\n"));
 		if ($time == 1)
 			echo "Fixing search names in the past 6 hours using the par2 files.\n";
 		else
 			echo "Fixing search names since the beginning using the par2 files.\n";
 
-		$db = new DB();
+		$db = $this->db;
         $functions = new Functions();
 		$type = "PAR2, ";
 		$query = "SELECT rel.ID AS releaseID, rel.guid, rel.groupID FROM releases rel WHERE rel.categoryID = 8010 AND rel.relnamestatus IN (0, 1, 20, 21)";
@@ -168,14 +175,15 @@ class Namefixer
 
 		if (count($relres) > 0)
 		    {
-		    $db = new DB();
+		    $db = $this->db;
 			$nzbcontents = new NZBcontents($this->echooutput);
+            $pp = new Functions ($this->echooutput);
 			foreach ($relres as $relrow)
 			{
-				if ($nzbcontents->checkPAR2($relrow['guid'], $relrow['releaseID'], $relrow['groupID'], true));
+				if ($nzbcontents->checkPAR2($relrow['guid'], $relrow['releaseID'], $relrow['groupID'], $db, $pp, $nntp) === true)
 				{
-				echo ".";
-                $this->fixed++;
+				    echo ".";
+                    $this->fixed++;
                 }
                 $this->checked++;
 				if ($this->checked % 500 == 0)

@@ -11,7 +11,9 @@ require_once(WWW_DIR."/lib/nfo.php");
 require_once(WWW_DIR."/lib/site.php");
 require_once(WWW_DIR."/lib/util.php");
 require_once(WWW_DIR."/lib/groups.php");
+require_once(WWW_DIR."/lib/nntp.php");
 require_once("consoletools.php");
+require_once("ColorCLI.php");
 
 
 
@@ -146,18 +148,24 @@ class Functions
     //
 	// Attempt to get a better name from a par2 file and categorize the release.
 	//
-	public function parsePAR2($messageID, $relID, $groupID)
+	public function parsePAR2($messageID, $relID, $groupID, $nntp)
 	{
 		$db = new DB();
 		$category = new Category();
         $functions = new Functions();
+        $c = new ColorCLI;
 
-		$quer = $db->queryOneRow("SELECT groupID, categoryID, relnamestatus, searchname, UNIX_TIMESTAMP(postdate) as postdate, ID as releaseID  FROM releases WHERE ID = {$relID}");
-		if ($quer["relnamestatus"] !== 1 && $quer["categoryID"] != Category::CAT_MISC_OTHER)
+        if (!isset($nntp))
+			exit($c->error("Not connected to usenet(functions->parsePAR2).\n"));
+
+        if ($messageID == '')
 			return false;
-
-		$nntp = new NNTP();
-		$nntp->doConnect();
+        $t = 'UNIX_TIMESTAMP(postdate)';
+		$quer = $db->queryOneRow('SELECT groupID, categoryID, relnamestatus, searchname, '.$t.' as postdate, ID as releaseID FROM releases WHERE ID = '.$relID);
+		if (!in_array($quer['relnamestatus'], array(0, 1, 6, 20, 21)) || $quer['relnamestatus'] === 7 || $quer['categoryID'] != Category::CAT_MISC_OTHER)
+			return false;
+        $nntp = new Nntp();
+        $nntp->doConnect();
 		$groups = new Groups();
         $functions = new Functions();
 		$par2 = $nntp->getMessage($functions->getByNameByID($groupID), $messageID);
@@ -172,7 +180,6 @@ class Functions
 				return false;
 			}
 		}
-		$nntp->doQuit();
 
 		$par2info = new Par2Info();
 		$par2info->setData($par2);
@@ -180,7 +187,7 @@ class Functions
 			return false;
 
 		$files = $par2info->getFileList();
-		if (count($files) > 0)
+		if ($files !== false && count($files) > 0)
 		{
             $db = new DB();
             $namefixer = new Namefixer;
@@ -189,8 +196,9 @@ class Functions
 			$foundname = false;
 			foreach ($files as $fileID => $file)
 			{
-				// Add to releasefiles.
-				if ($db->queryOneRow(sprintf("SELECT ID FROM releasefiles WHERE releaseID = %d AND name = %s", $relID, $db->escapeString($file["name"]))) === false)
+			   if (!array_key_exists('name', $file))
+					return false;// Add to releasefiles.
+				if ($relfiles < 11 && $db->queryOneRow(sprintf("SELECT ID FROM releasefiles WHERE releaseID = %d AND name = %s", $relID, $db->escapeString($file["name"]))) === false)
 				{
 					if ($rf->add($relID, $file["name"], $file["size"], $quer["postdate"], 0))
 						$relfiles++;
@@ -198,7 +206,7 @@ class Functions
 				$quer["textstring"] = $file["name"];
 				$namefixer->checkName($quer, 1, "PAR2, ", 1);
 				$stat = $db->queryOneRow("SELECT relnamestatus AS a FROM releases WHERE ID = {$relID}");
-				if ($stat["a"] != 1)
+				if ($stat["a"] === 7)
 				{
 					$foundname = true;
 					break;
@@ -207,7 +215,7 @@ class Functions
 			if ($relfiles > 0)
 			{
 
-				$cnt = $db->queryOneRow("SELECT COUNT(releaseID) AS count FROM releasefiles WHERE releaseID = {$relID}");
+				$cnt = $db->queryOneRow('SELECT COUNT(releaseID) AS count FROM releasefiles WHERE releaseID = '.$relID);
 				$count = $relfiles;
 				if ($cnt !== false && $cnt["count"] > 0)
 					$count = $relfiles + $cnt["count"];

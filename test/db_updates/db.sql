@@ -9,6 +9,7 @@ ALTER TABLE	 `releases` ADD  `nzbstatus` TINYINT NOT NULL DEFAULT 0 after `hashe
 CREATE INDEX ix_releases_hashed on releases(hashed);
 CREATE INDEX ix_releases_mergedreleases on releases(dehashstatus, relnamestatus, passwordstatus);
 CREATE INDEX ix_releases_nzbstatus ON releases(nzbstatus);
+CREATE INDEX ix_releases_nfostatus ON releases (nfostatus ASC) USING HASH;
 UPDATE releases SET hashed = true WHERE searchname REGEXP '[a-fA-F0-9]{32}' OR name REGEXP '[a-fA-F0-9]{32}'; 
 UPDATE releases SET nzbstatus = 1;
 delimiter //
