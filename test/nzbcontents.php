@@ -23,7 +23,7 @@ Class NZBcontents
 	{
 	    $c = new ColorCLI;
 	    if (!isset($nntp))
-			exit($c->error("Unable to connect to usenet.\n"));
+			exit($c->error("Not connected to usenet(nzbcontents->getNfoFromNZB.\n"));
 
 		if($fetchedBinary = $this->NFOfromNZB($guid, $relID, $groupID, $nntp))
 			return $fetchedBinary;
@@ -63,7 +63,7 @@ Class NZBcontents
 	{
 	    $c = new ColorCLI;
 	    if (!isset($nntp))
-			exit($c->error("Unable to connect to usenet.\n"));
+			exit($c->error("Not connected to usenet(nzbcontents->nzbcontents->checkPAR2.\n"));
 
 		$nzbfile = $this->LoadNZB($guid);
 		if ($nzbfile !== false)
@@ -89,7 +89,7 @@ Class NZBcontents
 	{
 	     $c = new ColorCLI;
 	    if (!isset($nntp))
-			exit($c->error("Unable to connect to usenet.\n"));
+			exit($c->error("Not connected to usenet(nzbcontents->NZBcompletiont.\n"));
 
 		$nzbfile = $this->LoadNZB($guid);
 		if ($nzbfile !== false)
@@ -152,8 +152,11 @@ Class NZBcontents
 	}
 
 	// Look for an .nfo file in the NZB, return the NFO. Also gets the NZB completion.
-	public function NFOfromNZB($guid, $relID, $groupID, $nntp)
+	public function NFOfromNZB($guid, $relID, $groupID, $nntp, $groupName, $db, $nfo)
 	{
+	    if (!isset($nntp))
+			exit($c->error("Not connected to usenet(nzbcontents->NFOfromNZB).\n"));
+
 		$messageid = $this->NZBcompletion($guid, $relID, $groupID, $nntp, true);
 		if ($messageid !== "")
 		{
@@ -191,7 +194,7 @@ Class NZBcontents
 	{
 	    $c = new ColorCLI;
 	    if (!isset($nntp))
-			exit($c->error("Unable to connect to usenet.\n"));
+			exit($c->error("Not connected to usenet(nzbcontents->hiddenNFOfromNZB.\n"));
 
 		$nzbfile = $this->LoadNZB($guid);
 		if ($nzbfile !== false)
