@@ -87,7 +87,7 @@ Class NZBcontents
 	// Gets the completion from the NZB, optionally looks if there is an NFO/PAR2 file.
 	public function NZBcompletion($guid, $relID, $groupID, $nntp, $db, $nfocheck=false)
 	{
-	     $c = new ColorCLI;
+	    $c = new ColorCLI;
 	    if (!isset($nntp))
 			exit($c->error("Not connected to usenet(nzbcontents->NZBcompletiont.\n"));
 
@@ -154,7 +154,8 @@ Class NZBcontents
 	// Look for an .nfo file in the NZB, return the NFO. Also gets the NZB completion.
 	public function NFOfromNZB($guid, $relID, $groupID, $nntp, $groupName, $db, $nfo)
 	{
-	    if (!isset($nntp))
+        $c = new ColorCLI;
+        if (!isset($nntp))
 			exit($c->error("Not connected to usenet(nzbcontents->NFOfromNZB).\n"));
 
 		$messageid = $this->NZBcompletion($guid, $relID, $groupID, $nntp, true);
