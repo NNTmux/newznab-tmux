@@ -95,7 +95,7 @@ class Namefixer
 				echo $this->fixed." releases could have their names changed. ".$this->checked." NFO's were checked.\n";
 		}
 		else
-			echo "Nothing to fix.\n";
+			echo $this->c->info ("Nothing to fix.");
 	}
 
 	//
@@ -143,7 +143,7 @@ class Namefixer
 				echo $this->fixed." releases could have their names changed. ".$this->checked." files were checked.\n";
 		}
 		else
-			echo "Nothing to fix.\n";
+			echo $this->c->info ("Nothing to fix.");
 	}
     //  Attempts to fix release names using the Par2 File.
 	public function fixNamesWithPar2($time, $echo, $cats, $namestatus, $nntp)
@@ -195,7 +195,7 @@ class Namefixer
 				echo $this->fixed." releases could have their names changed. ".$this->checked." files were checked.\n";
 		}
 		else
-			echo "Nothing to fix.\n";
+			echo $this->c->info ("Nothing to fix.");
 	}
 
 
@@ -236,13 +236,13 @@ class Namefixer
 
 					if ($type === "PAR2, ")
 						echo $n;
-					echo	$n."New name:  ".$newname.$n.
+					echo $this->c->primary ($n."New name:  ".$newname.$n.
 							"Old name:  ".$release["searchname"].$n.
 							"New cat:   ".$newcatname.$n.
 							"Old cat:   ".$oldcatname.$n.
 							"Group:     ".$groupname.$n.
 							"Method:    ".$type.$method.$n.
-							"ReleaseID: ". $release["releaseID"].$n;
+							"ReleaseID: ". $release["releaseID"].$n);
 					if ($type !== "PAR2, ")
 						echo $n;
 				}
@@ -301,13 +301,13 @@ class Namefixer
 					{
 						$groups = new Groups();
                         $functions = new Functions();
-						echo $n."New name:  ".$row["title"].$n.
+						echo $this->c->primary ( $n."New name:  ".$row["title"].$n.
 							"Old name:  ".$release["searchname"].$n.
 							"New cat:   ".$functions->getNameByID($determinedcat).$n.
 							"Old cat:   ".$functions->getNameByID($release["categoryID"]).$n.
 							"Group:     ".$functions->getByNameByID($release["groupID"]).$n.
 							"Method:    "."predb md5 release name: ".$row["source"].$n.
-							"ReleaseID: ". $release["ID"].$n.$n;
+							"ReleaseID: ". $release["ID"].$n.$n);
 					}
 					$matching++;
 				}

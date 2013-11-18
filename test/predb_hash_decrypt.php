@@ -7,13 +7,14 @@ require_once(WWW_DIR."lib/site.php");
 require_once ("consoletools.php");
 require_once ("namecleaner.php");
 require_once ("functions.php");
+require_once ("ColorCLI.php");
 
 //this script is adapted from nZEDb decrypt_hashes.php
-
+$c = new ColorCLI;
 if (!isset($argv[1]))
-	exit ("This script tries to match an MD5 of the releases.name or releases.searchname to preDB.md5.\nphp predb_hash_decrypt.php true to limit 1000.\nphp predb_hash_decrypt.php full to run on full database.\n");
+		exit ($c->error("This script tries to match an MD5 of the releases.name or releases.searchname to preDB.md5.\nphp predb_hash_decrypt.php true to limit 1000.\nphp predb_hash_decrypt.php full to run on full database.\n"));
 
-echo "\nHash Decryption Started at ".date("H:i:s")."\nMatching preDB MD5 to md5(releases.name or releases.searchname)\n";
+echo $c->header ("\nHash Decryption Started at ".date("H:i:s")."\nMatching preDB MD5 to md5(releases.name or releases.searchname)");
 preName($argv);
 
 function preName($argv)
@@ -29,7 +30,7 @@ function preName($argv)
 	if($total > 0)
 	{
 	    $precount = $db->queryOneRow('SELECT COUNT(*) AS count FROM predb');
-		echo 'Comparing '.number_format($total).' releases against '.number_format($precount['count'])." preDB records \n";
+		echo $c->primary ('Comparing '.number_format($total).' releases against '.number_format($precount['count'])." preDB records");
 		$consoletools = new ConsoleTools();
 		$category = new Category();
         $functions = new Functions();
@@ -54,13 +55,13 @@ function preName($argv)
 						$oldcatname = $functions->getNameByID($row["categoryID"]);
 						$newcatname = $functions->getNameByID($determinedcat);
 
-						echo	$n."New name:  ".$pre['dirname'].$n.
+						echo $c->primary ($n."New name:  ".$pre['dirname'].$n.
 							"Old name:  ".$row["searchname"].$n.
 							"New cat:   ".$newcatname.$n.
 							"Old cat:   ".$oldcatname.$n.
 							"Group:     ".$groupname.$n.
 							"Method:    "."preDB md5".$n.
-							"ReleaseID: ". $row["ID"].$n;
+							"ReleaseID: ". $row["ID"].$n);
 
 						$success = true;
 						$counter++;
@@ -74,7 +75,7 @@ function preName($argv)
 		}
 	}
 	if ($total > 0)
-		echo "\nRenamed ".$counter." releases in ".$consoletools->convertTime(TIME() - $timestart)."\n";
+		echo $c->header ("\nRenamed ".$counter." releases in ".$consoletools->convertTime(TIME() - $timestart).".");
 	else
-		echo "\nNothing to do.\n";
+		echo $c->info ("\nNothing to do.");
 }

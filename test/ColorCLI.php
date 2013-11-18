@@ -213,6 +213,23 @@ class ColorCLI {
         $errorstring = "\033[".self::$foreground_colors['Red']."mError: $str\033[0m\n";
         return $errorstring;
     }
+    public static function primary ($str)
+    {
+		$primarystring = "\033[38;5;".self::$colors256['Green']."m$str\033[0m\n";
+        return $primarystring;
+    }
+
+    public static function header ($str)
+    {
+		$headerstring = "\033[38;5;".self::$colors256['Yellow']."m$str\033[0m\n";
+        return $headerstring;
+    }
+
+	public static function primaryOver ($str)
+	{
+		$primarystring = "\033[38;5;".self::$colors256['Green']."m$str";
+		return $primarystring;
+	}
 
 	public static function rsetColor ()
 	{
