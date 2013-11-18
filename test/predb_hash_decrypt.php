@@ -10,7 +10,7 @@ require_once ("functions.php");
 require_once ("ColorCLI.php");
 
 //this script is adapted from nZEDb decrypt_hashes.php
-$c = new ColorCLI;
+$c = new ColorCLI();
 if (!isset($argv[1]))
 		exit ($c->error("This script tries to match an MD5 of the releases.name or releases.searchname to preDB.md5.\nphp predb_hash_decrypt.php true to limit 1000.\nphp predb_hash_decrypt.php full to run on full database.\n"));
 
@@ -20,6 +20,7 @@ preName($argv);
 function preName($argv)
 {
 	$db = new DB();
+    $c = new ColorCLI();
 	$timestart = TIME();
 	$limit = ($argv[1] == "full") ? "" : " LIMIT 1000";
 

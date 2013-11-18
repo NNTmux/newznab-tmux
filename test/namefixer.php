@@ -44,7 +44,7 @@ class Namefixer
 		$this->fullother = " AND rel.categoryID IN (2020, 5050, 6070, 8010) GROUP BY rel.ID order by postdate DESC";
 		$this->fullall = " ORDER BY postdate DESC";
         $this->done = $this->matched = false;
-        $this->c = new ColorCLI;
+        $this->c = new ColorCLI();
 	}
 
 	//
