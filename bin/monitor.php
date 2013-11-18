@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
-require(WWW_DIR.'/lib/site.php');
+require_once (WWW_DIR.'/lib/site.php');
 
 $version="0.3r042";
 
