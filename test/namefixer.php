@@ -173,7 +173,7 @@ class Namefixer
 		if ($time == 2 && $cats == 2)
 			$relres = $db->queryDirect($query.$this->fullother);
 
-        $row = mysql_fetch_array($relres);
+        $row = mysqli_fetch_array($relres);
         $total = $row(0);
         if ($total > 0)
 		    {
