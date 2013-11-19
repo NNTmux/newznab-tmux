@@ -173,9 +173,11 @@ class Namefixer
 		if ($time == 2 && $cats == 2)
 			$relres = $db->queryDirect($query.$this->fullother);
 
-		if (count($relres) > 0)
+        $row = mysql_fetch_array($relres);
+        $total = $row(0);
+        if ($total > 0)
 		    {
-            echo count($relres)." releases to process.\n"; 
+            echo $total." release(s) to process.\n";
 		    $db = $this->db;
 			$nzbcontents = new NZBcontents($this->echooutput);
             $pp = new Functions ($this->echooutput);
