@@ -175,12 +175,13 @@ class Namefixer
 
 		if (count($relres) > 0)
 		    {
+            echo count($relres)." releases to process.\n"; 
 		    $db = $this->db;
 			$nzbcontents = new NZBcontents($this->echooutput);
             $pp = new Functions ($this->echooutput);
 			foreach ($relres as $relrow)
 			{
-				if ($nzbcontents->checkPAR2($relrow['guid'], $relrow['releaseID'], $relrow['groupID'], $db, $pp, $nntp) === true)
+				if (($nzbcontents->checkPAR2($relrow['guid'], $relrow['releaseID'], $relrow['groupID'], $db, $pp, $nntp)) === true)
 				{
 				    echo ".";
                     $this->fixed++;
