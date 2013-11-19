@@ -175,7 +175,7 @@ class Namefixer
 
         $rowcount = $db->getAffectedRows();
 
-        if (count ($relres) > 0)
+        if ($rowcount > 0)
 		    {
             echo $rowcount." release(s) to process.\n";
 		    $db = $this->db;
