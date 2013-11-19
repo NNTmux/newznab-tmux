@@ -174,7 +174,7 @@ class Namefixer
 			$relres = $db->queryDirect($query.$this->fullother);
 
         $row = mysqli_fetch_array($relres);
-        $total = $row(0);
+        $total = $row[0];
         if ($total > 0)
 		    {
             echo $total." release(s) to process.\n";
