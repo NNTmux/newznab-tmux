@@ -187,7 +187,7 @@ class Namefixer
 				if (($nzbcontents->checkPAR2($relrow['guid'], $relrow['releaseID'], $relrow['groupID'], $db, $pp, $nntp)) !== false);
                     {
                      echo ".";
-                     $this->fixed++;
+                     //$this->fixed++;
                     }
                 $this->checked++;
 				if ($this->checked % 500 == 0)
