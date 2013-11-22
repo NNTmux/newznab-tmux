@@ -169,12 +169,12 @@ class Functions
 		$groups = new Groups();
         $functions = new Functions();
 		$par2 = $nntp->getMessage($functions->getByNameByID($groupID), $messageID);
-		if ($par2 === false || PEAR::isError($par2))
+		if (PEAR::isError($par2))
 		{
 			$nntp->doQuit();
 			$nntp->doConnect();
 			$par2 = $nntp->getMessage($functions->getByNameByID($groupID), $messageID);
-			if ($par2 === false || PEAR::isError($par2))
+			if (PEAR::isError($par2))
 			{
 				$nntp->doQuit();
 				return false;
@@ -226,8 +226,6 @@ class Functions
 			else
 				return false;
 		}
-		else
-			return false;
 	}
 
     // Check if the NZB is there, returns path, else false.
