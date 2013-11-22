@@ -162,7 +162,7 @@ class Functions
 			return false;
         $t = 'UNIX_TIMESTAMP(postdate)';
 		$quer = $db->queryOneRow('SELECT groupID, categoryID, relnamestatus, searchname, '.$t.' as postdate, ID as releaseID FROM releases WHERE ID = '.$relID);
-		if (!in_array($quer['relnamestatus'], array(0, 1, 6, 20, 21)) || $quer['relnamestatus'] === 7 || $quer['categoryID'] != Category::CAT_MISC_OTHER)
+		if ((!in_array($quer['relnamestatus'], array(0, 1, 6, 20, 21)) || $quer['relnamestatus'] === 7 || $quer['categoryID']) != Category::CAT_MISC_OTHER)
 			return false;
         $nntp = new Nntp();
         $nntp->doConnect();
@@ -198,7 +198,7 @@ class Functions
 			{
 			   if (!array_key_exists('name', $file))
 					return false;// Add to releasefiles.
-				if ($relfiles < 11 && $db->queryOneRow(sprintf("SELECT ID FROM releasefiles WHERE releaseID = %d AND name = %s", $relID, $db->escapeString($file["name"]))) === false)
+				if (($relfiles < 11 && $db->queryOneRow(sprintf("SELECT ID FROM releasefiles WHERE releaseID = %d AND name = %s", $relID, $db->escapeString($file["name"])))) === false)
 				{
 					if ($rf->add($relID, $file["name"], $file["size"], $quer["postdate"], 0))
 						$relfiles++;
