@@ -7,6 +7,7 @@ require_once(WWW_DIR."lib/nfo.php");
 require_once(WWW_DIR."lib/site.php");
 require_once("functions.php");
 require_once("consoletools.php");
+require_once("ColorCLI.php");
 
 /*
  * Class for inserting names/categories/md5 etc from predb sources into the DB, also for matching names on files / subjects.
@@ -19,6 +20,8 @@ Class Predb
 		$s = new Sites();
 		$this->site = $s->get();
 		$this->echooutput = $echooutput;
+        $this->db = new DB();
+        $this->c = new ColorCLI;
 	}
 
 	// Retrieve pre info from predb sources and store them in the DB.
@@ -377,7 +380,7 @@ Class Predb
         $consoletools = new ConsoleTools();
 		$updated = 0;
 		if($this->echooutput)
-			echo "\nQuerying DB for matches in prehash titles with release searchnames.\n";
+			echo $this->c->header('Querying DB for matches in prehash titles with release searchnames.');
 
 		$res = $db->queryDirect("SELECT p.ID, p.category, r.ID AS releaseID FROM prehash p inner join releases r ON p.title = r.searchname WHERE p.releaseID IS NULL");
         $row = mysqli_fetch_array($res);

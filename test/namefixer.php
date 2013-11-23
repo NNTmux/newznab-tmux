@@ -44,7 +44,7 @@ class Namefixer
 		$this->fullother = " AND rel.categoryID IN (2020, 5050, 6070, 8010) GROUP BY rel.ID order by postdate DESC";
 		$this->fullall = " ORDER BY postdate DESC";
         $this->done = $this->matched = false;
-        $this->c = new ColorCLI;
+        $this->c = new ColorCLI();
 	}
 
 	//
@@ -95,7 +95,7 @@ class Namefixer
 				echo $this->fixed." releases could have their names changed. ".$this->checked." NFO's were checked.\n";
 		}
 		else
-			echo "Nothing to fix.\n";
+			echo $this->c->info ("Nothing to fix.");
 	}
 
 	//
@@ -143,7 +143,7 @@ class Namefixer
 				echo $this->fixed." releases could have their names changed. ".$this->checked." files were checked.\n";
 		}
 		else
-			echo "Nothing to fix.\n";
+			echo $this->c->info ("Nothing to fix.");
 	}
     //  Attempts to fix release names using the Par2 File.
 	public function fixNamesWithPar2($time, $echo, $cats, $namestatus, $nntp)
@@ -173,18 +173,23 @@ class Namefixer
 		if ($time == 2 && $cats == 2)
 			$relres = $db->queryDirect($query.$this->fullother);
 
-		if (count($relres) > 0)
+        $rowcount = $db->getAffectedRows();
+
+        if ($rowcount > 0)
 		    {
+            echo $rowcount." release(s) to process.\n";
 		    $db = $this->db;
 			$nzbcontents = new NZBcontents($this->echooutput);
             $pp = new Functions ($this->echooutput);
+
 			foreach ($relres as $relrow)
 			{
-				if ($nzbcontents->checkPAR2($relrow['guid'], $relrow['releaseID'], $relrow['groupID'], $db, $pp, $nntp) === true)
-				{
-				    echo ".";
-                    $this->fixed++;
-                }
+                $this->done = $this->matched = false;
+				if (($nzbcontents->checkPAR2($relrow['guid'], $relrow['releaseID'], $relrow['groupID'], $db, $pp, $nntp)) === true)
+                    {
+                     echo ".";
+                     $this->fixed++;
+                    }
                 $this->checked++;
 				if ($this->checked % 500 == 0)
 					echo $this->checked." files processed.\n\n";
@@ -195,7 +200,7 @@ class Namefixer
 				echo $this->fixed." releases could have their names changed. ".$this->checked." files were checked.\n";
 		}
 		else
-			echo "Nothing to fix.\n";
+			echo $this->c->info ("Nothing to fix.");
 	}
 
 
@@ -236,13 +241,13 @@ class Namefixer
 
 					if ($type === "PAR2, ")
 						echo $n;
-					echo	$n."New name:  ".$newname.$n.
+					echo $this->c->primary ($n."New name:  ".$newname.$n.
 							"Old name:  ".$release["searchname"].$n.
 							"New cat:   ".$newcatname.$n.
 							"Old cat:   ".$oldcatname.$n.
 							"Group:     ".$groupname.$n.
 							"Method:    ".$type.$method.$n.
-							"ReleaseID: ". $release["releaseID"].$n;
+							"ReleaseID: ". $release["releaseID"].$n);
 					if ($type !== "PAR2, ")
 						echo $n;
 				}
@@ -301,13 +306,13 @@ class Namefixer
 					{
 						$groups = new Groups();
                         $functions = new Functions();
-						echo $n."New name:  ".$row["title"].$n.
+						echo $this->c->primary ( $n."New name:  ".$row["title"].$n.
 							"Old name:  ".$release["searchname"].$n.
 							"New cat:   ".$functions->getNameByID($determinedcat).$n.
 							"Old cat:   ".$functions->getNameByID($release["categoryID"]).$n.
 							"Group:     ".$functions->getByNameByID($release["groupID"]).$n.
 							"Method:    "."predb md5 release name: ".$row["source"].$n.
-							"ReleaseID: ". $release["ID"].$n.$n;
+							"ReleaseID: ". $release["ID"].$n.$n);
 					}
 					$matching++;
 				}

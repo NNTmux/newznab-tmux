@@ -162,19 +162,19 @@ class Functions
 			return false;
         $t = 'UNIX_TIMESTAMP(postdate)';
 		$quer = $db->queryOneRow('SELECT groupID, categoryID, relnamestatus, searchname, '.$t.' as postdate, ID as releaseID FROM releases WHERE ID = '.$relID);
-		if (!in_array($quer['relnamestatus'], array(0, 1, 6, 20, 21)) || $quer['relnamestatus'] === 7 || $quer['categoryID'] != Category::CAT_MISC_OTHER)
+		if ((!in_array($quer['relnamestatus'], array(0, 1, 6, 20, 21)) || $quer['relnamestatus'] === 7 || $quer['categoryID']) != Category::CAT_MISC_OTHER)
 			return false;
         $nntp = new Nntp();
         $nntp->doConnect();
 		$groups = new Groups();
         $functions = new Functions();
 		$par2 = $nntp->getMessage($functions->getByNameByID($groupID), $messageID);
-		if ($par2 === false || PEAR::isError($par2))
+		if (PEAR::isError($par2))
 		{
 			$nntp->doQuit();
 			$nntp->doConnect();
 			$par2 = $nntp->getMessage($functions->getByNameByID($groupID), $messageID);
-			if ($par2 === false || PEAR::isError($par2))
+			if (PEAR::isError($par2))
 			{
 				$nntp->doQuit();
 				return false;
@@ -198,7 +198,7 @@ class Functions
 			{
 			   if (!array_key_exists('name', $file))
 					return false;// Add to releasefiles.
-				if ($relfiles < 11 && $db->queryOneRow(sprintf("SELECT ID FROM releasefiles WHERE releaseID = %d AND name = %s", $relID, $db->escapeString($file["name"]))) === false)
+				if (($relfiles < 11 && $db->queryOneRow(sprintf("SELECT ID FROM releasefiles WHERE releaseID = %d AND name = %s", $relID, $db->escapeString($file["name"])))) === false)
 				{
 					if ($rf->add($relID, $file["name"], $file["size"], $quer["postdate"], 0))
 						$relfiles++;
@@ -226,8 +226,6 @@ class Functions
 			else
 				return false;
 		}
-		else
-			return false;
 	}
 
     // Check if the NZB is there, returns path, else false.

@@ -19,5 +19,5 @@ CREATE INDEX ix_prehash_nfo ON prehash(`nfo`);
 CREATE INDEX ix_prehash_predate ON prehash(`predate`);
 CREATE INDEX ix_prehash_adddate ON prehash(`adddate`);
 CREATE INDEX ix_prehash_source ON prehash(`source`);
-CREATE INDEX ix_prehash_md5 ON prehash(`hash`);
+CREATE UNIQUE INDEX ix_prehash_md5 ON prehash(`hash`);
 CREATE INDEX ix_prehash_releaseID ON prehash(`releaseID`);
