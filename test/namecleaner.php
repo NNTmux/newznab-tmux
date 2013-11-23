@@ -30,11 +30,7 @@ class nameCleaning
 	*/
 	public function releaseCleaner($subject, $groupName)
 	{
-		/*$groups = new Groups();
-        $functions = new Functions();
-		$groupName = $functions->getByNameByID($groupID);*/
-
-			if ($groupName === "alt.binaries.0day.stuffz")
+	   if ($groupName === "alt.binaries.0day.stuffz")
 		{
 			//ArcSoft.TotalMedia.Theatre.v5.0.1.87-Lz0 - [08/35] - "ArcSoft.TotalMedia.Theatre.v5.0.1.87-Lz0.vol43+09.par2" yEnc
 			if (preg_match('/^([a-zA-Z0-9].+?) - \[\d+\/\d+\] - ".+?" yEnc$/', $subject, $match))
@@ -857,6 +853,9 @@ class nameCleaning
 			//[8370]-[#alt.binaries.hdtv.x264@EFNet]-[Mr.Brooks.2007.720p.BluRay.DTS.x264-ESiR]-[00/86] "Mr.Brooks.2007.720p.BluRay.DTS.x264-ESiR.nzb" yEnc
 			else if (preg_match('/^\[\d+\][ -]\[#.+\][ -]\[(.+)\][ -]\[\d+\/\d+\][ -]{0,3}("|#34;).+("|#34;) yEnc$/', $subject, $match))
 				return $match[1];
+			//(The.Ghost.Writer.2010.hd.for.ipad.NLSUB) [01/21] - "The.Ghost.Writer.2010.hd.for.ipad.NLSUB.part01.rar" yEnc
+			else if (preg_match('/^\((.+)\) \[\d+\/\d+\] - ".+" yEnc$/', $subject, $match))
+				return $match[1];
 			else
 				return array("cleansubject" => $this->releaseCleanerHelper($subject), "properlynamed" => false);
 		}
@@ -989,6 +988,12 @@ class nameCleaning
 			//(Classic Surf) Morning.Of.The.Earth.1971 [03/29] - "Morning.Of.The.Earth.1971.part02.rar" yEnc
 			else if (preg_match('/^\([a-zA-Z0-9].+?\) ([a-zA-Z0-9.-]+) \[\d+\/\d+\] - ".+?" yEnc$/', $subject, $match))
 				return $match[1];
+			//[51/62] Morrissey.25.Live.Concert.2013.BDRip.x264-N0TSC3N3 - "n0tsc3n3-morrissey.25.live.2013.bdrip.x264.rar" yEnc
+			else if (preg_match('/^\[\d+\/\d+\] (.+) - ".+" yEnc$/', $subject, $match))
+				return $match[1];
+			//[AD120512-00006]-[UnOFFSc3n4iT]-[0131105] Chloe.Tra.Seduzione.E.Inganno.2009.iTALiAN.DVDRip.XviD-TRL [19/41] - "trl-chltsdzn.part18.rar" yEnc
+			else if (preg_match('/^\[\w+-\w+\]-\[\w+\]-\[\d+\] (.+) \[\d+\/\d+\] - ".+" yEnc$/', $subject, $match))
+				return $match[1];
 			else
 				return array("cleansubject" => $this->releaseCleanerHelper($subject), "properlynamed" => false);
 		}
@@ -1036,7 +1041,7 @@ class nameCleaning
 			else if (preg_match('/^\(.+usenet\.info\)[ -]{0,3}\[\d+\/\d+\][ -]{0,3}"(.+)(\.part\d*|\.rar)?(\.vol.+?"|\.[A-Za-z0-9]{2,4}").+?yEnc$/', $subject, $match))
 				return $match[1];
 			//[33657]-[#altbin@EFNet]-[FULL]-[ Billy.Jack.1971.REMASTERED.iNTERNAL.DVDRip.XviD-UBiK ]-[000/131]-Billy.Jack.1971.REMASTERED.iNTERNAL.DVDRip.XviD-UBiK.nzb (1/2) yEnc
-			else if (preg_match('/^\[\d+\][ _-]{0,3}\[.+\][ _-]{0,3}(\[(reup|full|repost.+?|part|re-repost|xtr|sample)\])[ _-]{0,3}\[(.+)\][ _-]{0,3}\[\d+[\/-]\d+\][ _-]{0,3}.+yEnc/i', $subject, $match))
+			else if (preg_match('/^\[\d+\][ _-]{0,3}\[.+\][ _-]{0,3}(\[(reup|full|repost.+?|part|re-repost|xtr|sample)\])[ _-]{0,3}\[(.+)\][ _-]{0,3}\[\d+[\/-]\d+\][ _-]{0,3}.+yEnc$/i', $subject, $match))
 				return $match[3];
 			//[01641]-[FULL]-[#hdtv@LinkNet]-[Sesame.Street.S41E03.1080i.HDTV.DD5.1.MPEG2-TrollHD]-[00/51] - "Sesame Street S41E03 Chicken When It Comes to Thunderstorms 1080i HDTV DD5.1 MPEG2-TrollHD.nzb" yEnc
 			else if (preg_match('/\[[\d#]+\]-\[.+\]-\[.+\]-\[(.+)\][- ]\[\d+\/\d+\][ -]{0,3}".+" yEnc$/', $subject, $match))
@@ -1190,7 +1195,7 @@ class nameCleaning
 			else
 				return array("cleansubject" => $this->releaseCleanerHelper($subject), "properlynamed" => false);
 		}
-		if ($groupName === "alt.binaries.teevee")
+		else if ($groupName === "alt.binaries.teevee")
 		{
 			//[278997]-[FULL]-[#a.b.erotica]-[ chi-the.walking.dead.xxx ]-[06/51] - "chi-the.walking.dead.xxx-s.mp4" yEnc
 			//[######]-[FULL]-[#a.b.teevee@EFNet]-[ Misfits.S01.SUBPACK.DVDRip.XviD-P0W4DVD ] [1/5] - "Misfits.S01.SUBPACK.DVDRip.XviD-P0W4DVD.nfo" yEnc
@@ -1325,6 +1330,21 @@ class nameCleaning
 				return $match[1];
 			//[Mercy.S01.720p.WEB-DL.DD5.1.h.264-LP-MMI]-[ Mercy.S01E18.Of Course I'm Not.720p.WEB-DL.DD5.1.H.264-LP ]-[01/24] - "Mercy.S01E18.Of Course I'm Not.720p.WEB-DL.DD5.1.H.264-LP.par2" yEnc
 			else if (preg_match('/^\[.+\][ -]{0,3}\[ (.+) \][ -]{0,3}\[\d+\/\d+\][ -]{0,3}("|#34;).+("|#34;) yEnc$/', $subject, $match))
+				return $match[1];
+			//REPOST: [ Th3.V@mpir3.Di@ri35.S05E02.HDTV.X264-DIMENSION ] - [31/33] - "Th3.V@mpir3.Di@ri35.S05E02.HDTV.X264-DIMENSION.vol050+051.par2" yEnc
+			else if (preg_match('/^(REPOST: )?\[ (.+) \] - \[\d+\/\d+\] - ".+" yEnc$/', $subject, $match))
+				return $match[2];
+			//[#a.b.teevee] Covert.Affairs.S04E11.720p.WEB-DL.DD5.1.H.264-XEON - [11/40] - "Covert.Affairs.S04E11.720p.WEB-DL.DD5.1.H.264-XEON.part09.rar" yEnc
+			else if (preg_match('/^\[#a\.b\.teevee\] (.+) - \[\d+\/\d+\] - ".+" yEnc$/', $subject, $match))
+				return $match[1];
+			//Breaking Bad S6E03 Confessions enjoy! [7 of 46] "03 Confessions (1080p HD).mov.007" yEnc
+			else if (preg_match('/^(.+) Confessions.+\[\d+ of \d+\] ".+\(((1080|720).+[HS]D)\).+" yEnc$/', $subject, $match))
+				return $match[1]."-".$match[2];
+			//[51/62] Morrissey.25.Live.Concert.2013.BDRip.x264-N0TSC3N3 - "n0tsc3n3-morrissey.25.live.2013.bdrip.x264.rar" yEnc
+			else if (preg_match('/^\[\d+\/\d+\] (.+) - ".+" yEnc$/', $subject, $match))
+				return $match[1];
+			//(23/23) -The.Mindy.Project.S02E09.720p.WEB-DL.DD5.1.H.264 - "The.Mindy.Project.S02E09.720p.WEB-DL.DD5.1.H.264.vol31+29.PAR2" - 768.86 MB - yEnc
+			else if (preg_match('/^\(\d+\/\d+\) -(.+) - ".+" - \d+[.,]\d+ [MGK]B - yEnc$/', $subject, $match))
 				return $match[1];
 			else
 				return array("cleansubject" => $this->releaseCleanerHelper($subject), "properlynamed" => false);
