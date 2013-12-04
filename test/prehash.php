@@ -192,7 +192,7 @@ Class Predb
 						if (preg_match('/<tr bgcolor=".+?<td.+?">(?P<date>.+?)<\/td.+?<td.+?(<font.+?">(?P<category>.+?)<\/a.+?|">(?P<category1>NUKE)+?)?<\/td.+?<td.+?">(?P<title>.+?-)<a.+?<b>(?P<title2>.+?)<\/b>.+?<\/td.+?<td.+<td.+?(">(?P<size1>[\d.]+)<b>(?P<size2>.+?)<\/b>.+)?<\/tr>/s', $m, $matches2))
 						{
                             $md5 = md5($matches2["title"].$matches2["title2"]);
-                            $oldname = $db->queryOneRow(sprintf("SELECT title FROM prehash WHERE title = %s", $db->escapeString($md5)));
+                            $oldname = $db->queryOneRow(sprintf("SELECT hash FROM prehash WHERE hash = %s", $db->escapeString($md5)));
 							if ($oldname !== false && $oldname["md5"] == $md5)
 								continue;
 							else
