@@ -1,4 +1,4 @@
-ALTER TABLE	 `releases` ADD  `hashed` BOOL DEFAULT FALSE after `relstatus`; 
+ALTER TABLE	 `releases` ADD  `hashed` BOOL DEFAULT FALSE after `relnamestatus`; 
 CREATE INDEX ix_releases_hashed on releases(hashed);
 CREATE INDEX ix_releases_mergedreleases on releases(dehashstatus, relnamestatus, passwordstatus);
 UPDATE releases SET hashed = true WHERE searchname REGEXP '[a-fA-F0-9]{32}' OR name REGEXP '[a-fA-F0-9]{32}'; 
