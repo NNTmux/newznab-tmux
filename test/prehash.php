@@ -183,13 +183,13 @@ Class Predb
 		$buffer = getUrl("http://pre.zenet.org/live.php");
 		if ($buffer !== false && strlen($buffer))
 		{
-			if (preg_match_all('/<tr bgcolor=".+?<\/tr>/s', $buffer, $matches))
+			if (preg_match_all('/<div background-color=".+?<\/div>/s', $buffer, $matches))
 			{
 				foreach ($matches as $match)
 				{
 					foreach ($match as $m)
 					{
-						if (preg_match('/<tr bgcolor=".+?<td.+?">(?P<date>.+?)<\/td.+?<td.+?(<font.+?">(?P<category>.+?)<\/a.+?|">(?P<category1>NUKE)+?)?<\/td.+?<td.+?">(?P<title>.+?-)<a.+?<b>(?P<title2>.+?)<\/b>.+?<\/td.+?<td.+<td.+?(">(?P<size1>[\d.]+)<b>(?P<size2>.+?)<\/b>.+)?<\/tr>/s', $m, $matches2))
+						if (preg_match('/<div background-color=".+?<div.+?">(?P<date>.+?)<\/div.+?<div.+?(<font.+?">(?P<category>.+?)<\/a.+?|">(?P<category1>NUKE)+?)?<\/div.+?<div.+?">(?P<title>.+?-)<a.+?<b>(?P<title2>.+?)<\/b>.+?<\/div.+?<div.+<div.+?(">(?P<size1>[\d.]+)<b>(?P<size2>.+?)<\/b>.+)?<\/div>/s', $m, $matches2))
 						{
                             $md5 = md5($matches2["title"].$matches2["title2"]);
                             $oldname = $db->queryOneRow(sprintf("SELECT hash FROM prehash WHERE hash = %s", $db->escapeString($md5)));
