@@ -33,7 +33,7 @@ require_once("ColorCLI.php");
 class Namefixer
 {
 
-	function Namefixer($echooutput=true)
+	function __construct($echooutput=true)
 	{
 		$this->echooutput = $echooutput;
 		$this->relid = $this->fixed = $this->checked = 0;
@@ -284,8 +284,10 @@ class Namefixer
 		$category = new Category();
 		$this->matched = false;
 		$n = "\n";
-		$res = $db->query(sprintf("SELECT title, source FROM prehash WHERE hash = %s", $db->escapeString($md5)));
-		if (count($res) > 0)
+		$res = $db->prepare(sprintf("SELECT title, source FROM prehash WHERE hash = %s", $db->escapeString($md5)));
+        $res->execute();
+        $total = $res->rowCount();
+		if ($total > 0)
 		{
 			foreach ($res as $row)
 			{
@@ -297,9 +299,15 @@ class Namefixer
 					{
 						$this->matched = true;
 						if ($namestatus == 1)
-							$db->query(sprintf("UPDATE releases SET searchname = %s, categoryID = %d, relnamestatus = 10, dehashstatus = 1 WHERE ID = %d", $db->escapeString($row["title"]), $determinedcat, $release["ID"]));
+                        {
+							$md = $db->prepare(sprintf("UPDATE releases SET searchname = %s, categoryID = %d, relnamestatus = 10, dehashstatus = 1 WHERE ID = %d", $db->escapeString($row["title"]), $determinedcat, $release["ID"]));
+                            $md->execute();
+                        }
 						else
-							$db->query(sprintf("UPDATE releases SET searchname = %s, categoryID = %d, dehashstatus = 1 WHERE ID = %d", $db->escapeString($row["title"]), $determinedcat, $release["ID"]));
+                        {
+							$md = $db->prepare(sprintf("UPDATE releases SET searchname = %s, categoryID = %d, dehashstatus = 1 WHERE ID = %d", $db->escapeString($row["title"]), $determinedcat, $release["ID"]));
+                            $md->execute();
+                        }
 					}
 
 					if ($echooutput)
@@ -318,7 +326,8 @@ class Namefixer
 				}
 			if ($namestatus == 1 && $this->matched === false)
 			{
-				$db->query(sprintf("UPDATE releases SET dehashstatus = dehashstatus - 1 WHERE ID = %d", $row['ID']));
+				$rel = $db->prepare(sprintf("UPDATE releases SET dehashstatus = dehashstatus - 1 WHERE ID = %d", $row['ID']));
+                $rel->execute();
 			}
 
 			}
@@ -356,18 +365,18 @@ class Namefixer
 	   if ($namestatus == 1 && $this->matched === false && $type == "NFO, ")
 		{
 			$db = new Db;
-			$db->query(sprintf("UPDATE releases SET relnamestatus = 20 WHERE ID = %d", $release['releaseID']));
+			$db->exec(sprintf("UPDATE releases SET relnamestatus = 20 WHERE ID = %d", $release['releaseID']));
 		}
         // The release didn't match so set relnamestatus to 21 so it doesn't get rechecked. Also allows removeCrapReleases to run extra things on the release.
 		elseif ($namestatus == 1 && $this->matched === false && $type == "Filenames, ")
 		{
 			$db = new DB();
-			$db->query(sprintf("UPDATE releases SET relnamestatus = 21 WHERE ID = %d", $release["releaseID"]));
+			$db->exec(sprintf("UPDATE releases SET relnamestatus = 21 WHERE ID = %d", $release["releaseID"]));
 		}
         elseif ($namestatus == 1 && $this->matched === false && $type == "PAR2, ")
 		{
 			$db = new DB();
-			$db->query(sprintf("UPDATE releases SET relnamestatus = 22 WHERE ID = %d", $release["releaseID"]));
+			$db->exec(sprintf("UPDATE releases SET relnamestatus = 22 WHERE ID = %d", $release["releaseID"]));
 		}
 	}
 	//

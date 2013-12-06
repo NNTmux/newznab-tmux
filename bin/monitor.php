@@ -4,7 +4,7 @@ require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
 require_once (WWW_DIR.'/lib/site.php');
 
-$version="0.3r077";
+$version="0.3r300";
 
 $db = new DB();
 $s = new Sites();
@@ -432,14 +432,14 @@ while( $i > 0 )
 			printf("$a..");
 			sleep(1);
 		}
-		//$rel = $db->query("UPDATE `binaries` SET `procstat`=0,`procattempts`=0,`regexID`=NULL, `relpart`=0,`reltotalpart`=0,`relname`=NULL WHERE procstat not in (4, 6)");
-		$rel = $db->query("UPDATE binaries SET procstat=0, procattempts=0, regexID=NULL, relpart=0, reltotalpart=0, relname=NULL");
+		//$rel = $db->exec("UPDATE `binaries` SET `procstat`=0,`procattempts`=0,`regexID`=NULL, `relpart`=0,`reltotalpart`=0,`relname`=NULL WHERE procstat not in (4, 6)");
+		$rel = $db->exec("UPDATE binaries SET procstat=0, procattempts=0, regexID=NULL, relpart=0, reltotalpart=0, relname=NULL");
 	}
 
 	//defrag the query cache every 15 minutes
 	if (( TIME() - $time18 >= 900 ) || ( $i == 1 ))
 	{
-		$result = @$db->query($qcache);
+		$result = @$db->exec($qcache);
 	}
 
 	//rename the session
@@ -469,13 +469,13 @@ while( $i > 0 )
 	if ((( TIME() - $time19 ) >= $array['MONITOR_UPDATE'] ) || ( $i == 1 )) {
 		//get microtime to at start of queries
 		$query_timer_start=microtime_float();
-		$result = @$db->query($qry);
+		$result = @$db->exec($qry);
 		$initquery = array();
 		foreach ($result as $cat=>$sub)
 		{
 			$initquery[$sub['parentID']] = $sub['cnt'];
 		}
-		$proc_result = @$db->query($proc);
+		$proc_result = @$db->exec($proc);
 		$time19 = TIME();
 		$runloop = "true";
 	} else {
