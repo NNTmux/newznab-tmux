@@ -62,7 +62,7 @@ class Namefixer
         $functions = new Functions ();
 		$type = "NFO, ";
 		// Only select releases we haven't checked here before
-		$query = "SELECT nfo.releaseID as nfoID, rel.groupID, rel.categoryID, rel.searchname, uncompress(nfo) as textstring, rel.ID as releaseID from releases rel inner join releasenfo nfo on (nfo.releaseID = rel.ID) where relnamestatus = 1 and relstatus & " . Functions::NFO_PROCESSED_NAMEFIXER . " = 0";
+		$query = "SELECT nfo.releaseID as nfoID, rel.groupID, rel.categoryID, rel.searchname, uncompress(nfo) as textstring, rel.ID as releaseID from releases rel inner join releasenfo nfo on (nfo.releaseID = rel.ID) where relnamestatus = 1";
 
 		//24 hours, other cats
 		if ($time == 1 && $cats == 1)
@@ -445,6 +445,22 @@ class Namefixer
 			$newresult = str_replace("-ALiAS"," PC GAME ALiAS",$result['0']);
 			$this->updateRelease($release, $newresult, $method="gameCheck: PC Games -ALiAS", $echo, $type, $namestatus);
 		}
+        elseif ($this->done === false && $this->relid !== $release["releaseID"] && preg_match('/\w[\w.\',;-].+\-RELOADED/i', $release["textstring"], $result))
+		{
+			$newresult = str_replace("-RELOADED"," PC GAME RELOADED",$result['0']);
+			$this->updateRelease($release, $newresult, $method="gameCheck: PC Games -RELOADED", $echo, $type, $namestatus);
+		}
+        elseif ($this->done === false && $this->relid !== $release["releaseID"] && preg_match('/\w[\w.\',;-].+\-SKIDROW/i', $release["textstring"], $result))
+		{
+			$newresult = str_replace("-SKIDROW"," PC GAME SKIDROW",$result['0']);
+			$this->updateRelease($release, $newresult, $method="gameCheck: PC Games -SKIDROW", $echo, $type, $namestatus);
+		}
+         elseif ($this->done === false && $this->relid !== $release["releaseID"] && preg_match('/\w[\w.\',;-].+\-FLT/i', $release["textstring"], $result))
+		{
+			$newresult = str_replace("-FLT"," PC GAME FLT",$result['0']);
+			$this->updateRelease($release, $newresult, $method="gameCheck: PC Games -FAIRLIGHT", $echo, $type, $namestatus);
+		}
+
 	}
 
 	//
