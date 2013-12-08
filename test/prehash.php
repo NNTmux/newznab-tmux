@@ -29,6 +29,7 @@ Class Predb
 	public function combinePre($nntp)
 	{
 		$db = new DB();
+        $f = new Functions();
 		$newnames = 0;
 		$newestrel = $db->queryOneRow("SELECT adddate, ID FROM prehash ORDER BY adddate DESC LIMIT 1");
 		if (strtotime($newestrel["adddate"]) < time()-600 || is_null($newestrel['adddate']))
@@ -58,7 +59,7 @@ Class Predb
 				echo $newpdme." Retrieved from Predb.me.\n";
 			$newnames = $newwomble+$newomgwtf+$newzenet+$newprelist+$neworly+$newsrr+$newpdme;
 			if(count($newnames) > 0)
-				$db->query(sprintf("UPDATE prehash SET adddate = now() where ID = %d", $newestrel["ID"]));
+				$f->queryExec(sprintf("UPDATE prehash SET adddate = now() where ID = %d", $newestrel["ID"]));
 		}
 		$matched = $this->matchPredb();
 		if ($matched > 0 && $this->echooutput)
@@ -72,6 +73,7 @@ Class Predb
 	public function retrieveWomble()
 	{
 		$db = new DB();
+        $f = new Functions();
 		$newnames = $updated = 0;
 
 		$buffer = getUrl("http://www.newshost.co.za");
@@ -103,7 +105,7 @@ Class Predb
 									else
 										$nfo = $db->escapeString("http://nzb.isasecret.com/".$matches2["nfo"]);
 
-									$qry = $db->prepare(sprintf("UPDATE prehash SET nfo = %s, size = %s, category = %s, predate = %s, adddate = now(), source = %s where ID = %d", $nfo, $size, $db->escapeString($matches2["category"]), $db->from_unixtime(strtotime($matches2["date"])), $db->escapeString("womble"), $oldname["ID"]));
+									    $f->queryExec(sprintf("UPDATE prehash SET nfo = %s, size = %s, category = %s, predate = %s, adddate = now(), source = %s where ID = %d", $nfo, $size, $db->escapeString($matches2["category"]), $db->from_unixtime(strtotime($matches2["date"])), $db->escapeString("womble"), $oldname["ID"]));
 								}
 							}
 							else
@@ -118,8 +120,7 @@ Class Predb
 								else
 									$nfo = $db->escapeString("http://nzb.isasecret.com/".$matches2["nfo"]);
 
-								$qry = $db->prepare(sprintf("INSERT INTO prehash (title, nfo, size, category, predate, adddate, source, hash) VALUES (%s, %s, %s, %s, FROM_UNIXTIME(".strtotime($matches2["date"])."), now(), %s, %s)", $db->escapeString($matches2["title"]), $nfo, $size, $db->escapeString($matches2["category"]), $db->escapeString("womble"), $db->escapeString(md5($matches2["title"]))));
-                                $qry->execute();
+								    $f->queryExec(sprintf("INSERT INTO prehash (title, nfo, size, category, predate, adddate, source, hash) VALUES (%s, %s, %s, %s, FROM_UNIXTIME(".strtotime($matches2["date"])."), now(), %s, %s)", $db->escapeString($matches2["title"]), $nfo, $size, $db->escapeString($matches2["category"]), $db->escapeString("womble"), $db->escapeString(md5($matches2["title"]))));
                                 $newnames++;
 							}
 						}
@@ -133,6 +134,7 @@ Class Predb
 	public function retrieveOmgwtfnzbs()
 	{
 		$db = new DB();
+        $f = new Functions();
 		$newnames = $updated = 0;
 
 		$buffer = getUrl("http://rss.omgwtfnzbs.org/rss-info.php");
@@ -157,7 +159,7 @@ Class Predb
 								else
 								{
 									$size = $db->escapeString(round($matches2["size1"]).$matches2["size2"]);
-									$db->query(sprintf("UPDATE prehash SET size = %s, category = %s, predate = FROM_UNIXTIME(".strtotime($matches2["date"])."), adddate = now(), source = %s where ID = %d", $size, $db->escapeString($matches2["category"]), $db->escapeString("omgwtfnzbs"), $oldname["ID"]));
+									$f->queryExec(sprintf("UPDATE prehash SET size = %s, category = %s, predate = FROM_UNIXTIME(".strtotime($matches2["date"])."), adddate = now(), source = %s where ID = %d", $size, $db->escapeString($matches2["category"]), $db->escapeString("omgwtfnzbs"), $oldname["ID"]));
                                     $newnames++;
 								}
 							}
@@ -165,7 +167,7 @@ Class Predb
 							{
 								$size = $db->escapeString(round($matches2["size1"]).$matches2["size2"]);
 								$title = preg_replace("/  - omgwtfnzbs.org/", "", $matches2["title"]);
-								$db->query(sprintf("INSERT INTO prehash (title, size, category, predate, adddate, source, hash) VALUES (%s, %s, %s, FROM_UNIXTIME(".strtotime($matches2["date"])."), now(), %s, %s)", $db->escapeString($title), $size, $db->escapeString($matches2["category"]), $db->escapeString("omgwtfnzbs"), $db->escapeString($md5)));
+								$f->queryExec(sprintf("INSERT INTO prehash (title, size, category, predate, adddate, source, hash) VALUES (%s, %s, %s, FROM_UNIXTIME(".strtotime($matches2["date"])."), now(), %s, %s)", $db->escapeString($title), $size, $db->escapeString($matches2["category"]), $db->escapeString("omgwtfnzbs"), $db->escapeString($md5)));
                                 $newnames++;
 							}
 						}
@@ -179,6 +181,7 @@ Class Predb
 	public function retrieveZenet()
         {
                 $db = new DB();
+                $f = new Functions();
                 $newnames = $updated = 0;
 
                 $buffer = getUrl("http://pre.zenet.org/live.php");
@@ -210,7 +213,7 @@ Class Predb
                                                                 else
                                                                         $category = "NULL";
 
-                                                                $db->query(sprintf("INSERT INTO prehash (title, size, category, predate, adddate, source, hash) VALUES (%s, %s, %s, FROM_UNIXTIME(".strtotime($matches2["date"])."), now(), %s, %s)", $db->escapeString($matches2["title"].$matches2["title2"]), $size, $category, $db->escapeString("zenet"), $db->escapeString($md5)));
+                                                                $f->queryExec(sprintf("INSERT INTO prehash (title, size, category, predate, adddate, source, hash) VALUES (%s, %s, %s, FROM_UNIXTIME(".strtotime($matches2["date"])."), now(), %s, %s)", $db->escapeString($matches2["title"].$matches2["title2"]), $size, $category, $db->escapeString("zenet"), $db->escapeString($md5)));
                                                                 $newnames++;
                                                         }
                                                 }
@@ -224,6 +227,7 @@ Class Predb
 	public function retrievePrelist()
 	{
 		$db = new DB();
+        $f = new Functions();
 		$newnames = $updated = 0;
 
 		$buffer = getUrl("http://www.prelist.ws/");
@@ -248,7 +252,7 @@ Class Predb
 								else
 									$size = $db->escapeString(round($matches2["size"]));
 
-								$db->query(sprintf("INSERT INTO prehash (title, size, category, predate, adddate, source, hash) VALUES (%s, %s, %s, FROM_UNIXTIME(".strtotime($matches2["date"])."), now(), %s, %s)", $db->escapeString($matches2["title"]), $size, $db->escapeString($matches2["category"]), $db->escapeString("prelist"), $db->escapeString($md5)));
+								$f->queryExec(sprintf("INSERT INTO prehash (title, size, category, predate, adddate, source, hash) VALUES (%s, %s, %s, FROM_UNIXTIME(".strtotime($matches2["date"])."), now(), %s, %s)", $db->escapeString($matches2["title"]), $size, $db->escapeString($matches2["category"]), $db->escapeString("prelist"), $db->escapeString($md5)));
 								$newnames++;
 							}
 						}
@@ -262,7 +266,7 @@ Class Predb
 							{
 								$category = $db->escapeString($matches2["category"].", ".$matches2["category1"]);
 
-								$db->query(sprintf("INSERT INTO prehash (title, category, predate, adddate, source, hash) VALUES (%s, %s, FROM_UNIXTIME(".strtotime($matches2["date"])."), now(), %s, %s)", $db->escapeString($matches2["title"]), $category, $db->escapeString("prelist"), $db->escapeString($md5)));
+								$f->queryExec(sprintf("INSERT INTO prehash (title, category, predate, adddate, source, hash) VALUES (%s, %s, FROM_UNIXTIME(".strtotime($matches2["date"])."), now(), %s, %s)", $db->escapeString($matches2["title"]), $category, $db->escapeString("prelist"), $db->escapeString($md5)));
 								$newnames++;
 							}
 						}
@@ -276,6 +280,7 @@ Class Predb
 	public function retrieveOrlydb()
 	{
 		$db = new DB();
+        $f = new Functions();
 		$newnames = $updated = 0;
 
 		$buffer = getUrl("http://www.orlydb.com/");
@@ -302,7 +307,7 @@ Class Predb
 									else
 										$size = $db->escapeString($matches2["size"]);
 
-									$db->query(sprintf("INSERT INTO prehash (title, size, category, predate, adddate, source, hash) VALUES (%s, %s, %s, FROM_UNIXTIME(".strtotime($matches2["date"])."), now(), %s, %s)", $db->escapeString($matches2["title"]), $size, $db->escapeString($matches2["category"]), $db->escapeString("orlydb"), $db->escapeString($md5)));
+									$f->queryExec(sprintf("INSERT INTO prehash (title, size, category, predate, adddate, source, hash) VALUES (%s, %s, %s, FROM_UNIXTIME(".strtotime($matches2["date"])."), now(), %s, %s)", $db->escapeString($matches2["title"]), $size, $db->escapeString($matches2["category"]), $db->escapeString("orlydb"), $db->escapeString($md5)));
 									$newnames++;
 								}
 							}
@@ -317,6 +322,7 @@ Class Predb
 	public function retrieveSrr()
 	{
 		$db = new DB();
+        $f = new Functions();
 		$newnames = $updated = 0;
 		$releases = @simplexml_load_file('http://www.srrdb.com/feed/srrs');
 		if ($releases !== false)
@@ -329,7 +335,7 @@ Class Predb
 					continue;
 				else
 				{
-					$db->query(sprintf("INSERT INTO prehash (title, predate, adddate, source, hash) VALUES (%s, FROM_UNIXTIME(".strtotime($release->pubDate)."), now(), %s, %s)", $db->escapeString($release->title), $db->escapeString("srrdb"), $db->escapeString($md5)));
+					$f->queryExec(sprintf("INSERT INTO prehash (title, predate, adddate, source, hash) VALUES (%s, FROM_UNIXTIME(".strtotime($release->pubDate)."), now(), %s, %s)", $db->escapeString($release->title), $db->escapeString("srrdb"), $db->escapeString($md5)));
 					$newnames++;
 				}
 			}
@@ -340,6 +346,7 @@ Class Predb
 	public function retrievePredbme()
 	{
 		$db = new DB();
+        $f = new Functions();
 		$newnames = $updated = 0;
 		$arr = array("http://predb.me/?cats=movies-sd&rss=1", "http://predb.me/?cats=movies-hd&rss=1", "http://predb.me/?cats=movies-discs&rss=1", "http://predb.me/?cats=tv-sd&rss=1", "http://predb.me/?cats=tv-hd&rss=1", "http://predb.me/?cats=tv-discs&rss=1", "http://predb.me/?cats=music-audio&rss=1", "http://predb.me/?cats=music-video&rss=1", "http://predb.me/?cats=music-discs&rss=1", "http://predb.me/?cats=games-pc&rss=1", "http://predb.me/?cats=games-xbox&rss=1", "http://predb.me/?cats=games-playstation&rss=1", "http://predb.me/?cats=games-nintendo&rss=1", "http://predb.me/?cats=apps-windows&rss=1", "http://predb.me/?cats=apps-linux&rss=1", "http://predb.me/?cats=apps-mac&rss=1", "http://predb.me/?cats=apps-mobile&rss=1", "http://predb.me/?cats=books-ebooks&rss=1", "http://predb.me/?cats=books-audio-books&rss=1", "http://predb.me/?cats=xxx-videos&rss=1", "http://predb.me/?cats=xxx-images&rss=1", "http://predb.me/?cats=dox&rss=1", "http://predb.me/?cats=unknown&rss=1");
 		foreach ($arr as &$value)
@@ -355,7 +362,7 @@ Class Predb
 						continue;
 					else
 					{
-						$db->query(sprintf("INSERT INTO prehash (title, predate, adddate, source, hash) VALUES (%s, now(), now(), %s, %s)", $db->escapeString($release->title), $db->escapeString("predbme"), $db->escapeString($md5)));
+						$f->queryExec(sprintf("INSERT INTO prehash (title, predate, adddate, source, hash) VALUES (%s, now(), now(), %s, %s)", $db->escapeString($release->title), $db->escapeString("predbme"), $db->escapeString($md5)));
 						$newnames++;
 					}
 				}
@@ -368,9 +375,10 @@ Class Predb
 	public function matchPre($cleanerName, $releaseID)
 	{
 		$db = new DB();
+        $f = new Functions();
 		if($x = $db->queryOneRow(sprintf("SELECT ID FROM prehash WHERE title = %s", $db->escapeString($cleanerName))) !== false)
 		{
-			$db->query(sprintf("UPDATE releases SET relnamestatus = 11 WHERE ID = %d", $x["ID"], $releaseID));
+			$f->queryExec(sprintf("UPDATE releases SET relnamestatus = 11 WHERE ID = %d", $x["ID"], $releaseID));
 		}
 	}
 
@@ -378,14 +386,17 @@ Class Predb
 	public function matchPredb()
 	{
 		$db = new DB();
+        $f = new Functions();
         $consoletools = new ConsoleTools();
 		$updated = 0;
 		if($this->echooutput)
 			echo $this->c->header('Querying DB for matches in prehash titles with release searchnames.');
 
-		$res = $db->queryDirect("SELECT p.ID, p.category, r.ID AS releaseID FROM prehash p inner join releases r ON p.title = r.searchname WHERE p.releaseID IS NULL");
-        $row = mysqli_fetch_array($res);
-        $total = $row [0];
+		$res = $db->prepare("SELECT p.ID, p.category, r.ID AS releaseID FROM prehash p inner join releases r ON p.title = r.searchname WHERE p.releaseID IS NULL");
+        $res->execute();
+        //$row = mysqli_fetch_array($res);
+        //$total = $row [0];
+        $total = $res->rowCount();
         if($total > 0)
         {
             $updated = 1;
@@ -394,8 +405,8 @@ Class Predb
 				$db->query(sprintf("UPDATE prehash SET releaseID = %d WHERE ID = %d", $row["releaseID"], $row["ID"]));
                 $catName=str_replace(array("TV-", "TV: "), '', $row["category"]);
 				if($catID = $db->queryOneRow(sprintf("SELECT ID FROM category WHERE title = %s", $db->escapeString($catName))))
-					$db->query(sprintf("UPDATE releases SET categoryID = %d WHERE ID = %d", $db->escapeString($catID["ID"]), $db->escapeString($row["releaseID"])));
-				$db->query(sprintf("UPDATE releases SET relnamestatus = 11 WHERE ID = %d", $row["releaseID"]));
+					$f->queryExec(sprintf("UPDATE releases SET categoryID = %d WHERE ID = %d", $db->escapeString($catID["ID"]), $db->escapeString($row["releaseID"])));
+				$f->queryExec(sprintf("UPDATE releases SET relnamestatus = 11 WHERE ID = %d", $row["releaseID"]));
 				if($this->echooutput)
 					$consoletools->overWrite("Matching up prehash titles with release search names: ".$consoletools->percentString($updated++,$total));
 			}
@@ -407,12 +418,16 @@ Class Predb
 	public function matchNfo()
 	{
 		$db = new DB();
+        $f = new Functions();
 		$nfos = 0;
 		if($this->echooutput)
 			echo "\nMatching up prehash NFOs with releases missing an NFO.\n";
 
-			if($res = $db->queryDirect("SELECT r.ID, p.nfo FROM releases r inner join predb p ON r.ID = p.releaseID WHERE p.nfo IS NOT NULL AND r.nfostatus != 1 LIMIT 100"))
-		{
+			$res = $db->prepare("SELECT r.ID, p.nfo FROM releases r inner join prehash p ON r.ID = p.releaseID WHERE p.nfo IS NOT NULL AND r.nfostatus != 1 LIMIT 100");
+            $res->execute();
+		    $total = $res->rowCount();
+		    if($total > 0)
+            {
 			$nfo = new Nfo($this->echooutput);
             $functions = new Functions($this->echooutput);
 			while ($row = mysqli_fetch_assoc($res))
@@ -421,10 +436,10 @@ Class Predb
 				if ($buffer !== false && strlen($buffer))
 				{
 					$functions->addReleaseNfo($row["ID"]);
-					$db->query(sprintf("UPDATE releasenfo SET nfo = compress(%s) WHERE releaseID = %d", $db->escapeString($buffer), $row["ID"]));
-					$db->query(sprintf("UPDATE releases SET nfostatus = 1 WHERE ID = %d", $row["ID"]));
+					$f->queryExec(sprintf("UPDATE releasenfo SET nfo = compress(%s) WHERE releaseID = %d", $db->escapeString($buffer), $row["ID"]));
+					$f->queryExec(sprintf("UPDATE releases SET nfostatus = 1 WHERE ID = %d", $row["ID"]));
 					if($this->echooutput)
-						echo ".";
+						echo "+";
 					$nfos++;
 				}
 			}

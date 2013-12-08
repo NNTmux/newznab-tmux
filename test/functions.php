@@ -27,6 +27,49 @@ class Functions
 	{
 		return (is_null($result) ? null : $result->fetch_array());
 	}
+
+    	// Used for deleting, updating (and inserting without needing the last insert id).
+	public function queryExec($query)
+	{
+		if ($query == '')
+			return false;
+
+		try {
+			$run = self::$pdo->prepare($query);
+			$run->execute();
+			return $run;
+		} catch (PDOException $e) {
+			// Deadlock or lock wait timeout, try 10 times.
+			$i = 1;
+			while (($e->errorInfo[1] == 1213 || $e->errorInfo[0] == 40001 || $e->errorInfo[1] == 1205 || $e->getMessage()=='SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction') && $i <= 10)
+			{
+				echo $this->c->error("A Deadlock or lock wait timeout has occurred, sleeping.\n");
+				$this->consoletools->showsleep($i * $i);
+				$run = self::$pdo->prepare($query);
+				$run->execute();
+				return $run;
+				$i++;
+			}
+			if ($e->errorInfo[1] == 1213 || $e->errorInfo[0] == 40001 || $e->errorInfo[1] == 1205)
+			{
+				//echo "Error: Deadlock or lock wait timeout.";
+				return false;
+			}
+			else if ($e->errorInfo[1]==1062 || $e->errorInfo[0]==23000)
+			{
+				//echo "\nError: Update would create duplicate row, skipping\n";
+				return false;
+			}
+			else if ($e->errorInfo[1]==1406 || $e->errorInfo[0]==22001)
+			{
+				//echo "\nError: Too large to fit column length\n";
+				return false;
+			}
+			else
+				echo $this->c->error($e->getMessage());
+			return false;
+		}
+	}
  //  gets name of category from category.php
     public function getNameByID($ID)
 	{
