@@ -33,10 +33,9 @@ function preName($argv)
 	echo "Getting work\n";
 	if (isset($argv[1]) && $argv[1]=="full")
 		$res = $db->prepare("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE ( relnamestatus in (1, 20, 21, 22) AND categoryID BETWEEN 8000 AND 8999)");
-        $res->execute();
     elseif (isset($argv[1]) && is_numeric($argv[1]))
 		$res = $db->prepare("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE ( relnamestatus in (1, 20, 21, 22) AND categoryID BETWEEN 8000 AND 8999) AND adddate > NOW() - INTERVAL %d HOUR",$argv[1]);
-        $res->execute();
+    $res->execute();
     $total = $res->rowCount();
 	if ($total > 0)
 	{
