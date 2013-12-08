@@ -129,7 +129,7 @@ class Namefixer
 		$rowcount = $relres->rowCount();
 		if ($rowcount > 0)
 		{
-			while ($relrow = $functions->fetchArray($relres))
+			foreach ($relres as $relrow)
 			{
 				$this->done = $this->matched = false;
 				$this->checkName($relrow, $echo, $type, $namestatus);
