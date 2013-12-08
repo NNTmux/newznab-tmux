@@ -32,10 +32,12 @@ function preName($argv)
 		echo $tot." Releases had no searchname\n";
 	echo "Getting work\n";
 	if (isset($argv[1]) && $argv[1]=="full")
-		$res = $db->query("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE ( relnamestatus in (1, 20, 21, 22) AND categoryID BETWEEN 8000 AND 8999)");
-	elseif (isset($argv[1]) && is_numeric($argv[1]))
-		$res = $db->query("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE ( relnamestatus in (1, 20, 21, 22) AND categoryID BETWEEN 8000 AND 8999) AND adddate > NOW() - INTERVAL %d HOUR",$argv[1]);
-	$total = $res->rowCount();
+		$res = $db->prepare("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE ( relnamestatus in (1, 20, 21, 22) AND categoryID BETWEEN 8000 AND 8999)");
+        $res->execute();
+    elseif (isset($argv[1]) && is_numeric($argv[1]))
+		$res = $db->prepare("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE ( relnamestatus in (1, 20, 21, 22) AND categoryID BETWEEN 8000 AND 8999) AND adddate > NOW() - INTERVAL %d HOUR",$argv[1]);
+        $res->execute();
+    $total = $res->rowCount();
 	if ($total > 0)
 	{
 		$consoletools = new ConsoleTools();
@@ -92,7 +94,8 @@ function resetSearchnames()
 {
 	$db = new DB();
 	echo "\nResetting blank searchnames\n";
-	$bad = $db->query("UPDATE releases SET searchname = name WHERE searchname = ''");
+	$bad = $db->prepare("UPDATE releases SET searchname = name WHERE searchname = ''");
+    $bad->execute();
 	$tot = count($bad);
 	if ($tot > 0)
 		echo $tot." Releases had no searchname\n";

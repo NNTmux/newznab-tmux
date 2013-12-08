@@ -77,7 +77,7 @@ class Namefixer
 		if ($time == 2 && $cats == 2)
 			$relres = $db->queryDirect($query.$this->fullall);
 
-		$rowcount = $db->getAffectedRows();
+		$rowcount = $relres->rowCount();
 		if ($rowcount > 0)
 		{
 			while ($relrow = $functions->fetchArray($relres))
@@ -126,7 +126,7 @@ class Namefixer
 		if ($time == 2 && $cats == 2)
 			$relres = $db->queryDirect($query.$this->fullall);
 
-		$rowcount = $db->getAffectedRows();
+		$rowcount = $relres->rowCount();
 		if ($rowcount > 0)
 		{
 			while ($relrow = $functions->fetchArray($relres))
@@ -173,7 +173,7 @@ class Namefixer
 		if ($time == 2 && $cats == 2)
 			$relres = $db->queryDirect($query.$this->fullother);
 
-        $rowcount = $db->getAffectedRows();
+        $rowcount = $relres->rowCount();
 
         if ($rowcount > 0)
 		    {
