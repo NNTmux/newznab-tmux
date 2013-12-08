@@ -12,7 +12,7 @@ require_once("ColorCLI.php");
  */
 Class NZBcontents
 {
-	function NZBcontents($echooutput=false)
+	function __construct($echooutput=false)
 	{
 		$this->echooutput = $echooutput;
 		$s = new Sites();
@@ -75,7 +75,7 @@ Class NZBcontents
 					$pp = new Functions();
 					if (($pp->parsePAR2($nzbcontents->segments->segment, $relID, $groupID, $nntp)) === true)
                     {
-						$db->query(sprintf('UPDATE releases SET relnamestatus = 22 WHERE (relnamestatus != 7 AND relnamestatus != 22) AND ID = %d', $relID));
+						$db->exec(sprintf('UPDATE releases SET relnamestatus = 22 WHERE (relnamestatus != 7 AND relnamestatus != 22) AND ID = %d', $relID));
 						return true;
 					}
 				}
@@ -137,7 +137,7 @@ Class NZBcontents
 			if ($completion > 100)
 				$completion = 100;
 
-			$db->query(sprintf('UPDATE releases SET completion = %d WHERE ID = %d', $completion, $relID));
+			$db->exec(sprintf('UPDATE releases SET completion = %d WHERE ID = %d', $completion, $relID));
 			if ($nfocheck !== false)
 			{
 				if ($foundnfo === true)
@@ -238,7 +238,7 @@ Class NZBcontents
 						else
 						{
 							// NFO download failed, increment attempts.
-							$db->query(sprintf("UPDATE releases SET nfostatus = nfostatus-1 WHERE ID = %d", $relID));
+							$db->exec(sprintf("UPDATE releases SET nfostatus = nfostatus-1 WHERE ID = %d", $relID));
 							$failed = true;
 						}
 					}
@@ -256,7 +256,7 @@ Class NZBcontents
 				// No NFO file in the NZB.
 				if ($this->echooutput)
 					echo "-";
-				$db->query(sprintf("UPDATE releases SET nfostatus = 0 WHERE ID = %d", $relID));
+				$db->exec(sprintf("UPDATE releases SET nfostatus = 0 WHERE ID = %d", $relID));
 				return false;
 			}
 			if ($failed == true)
@@ -309,6 +309,6 @@ Class NZBcontents
 	function updateCompletion($completion, $relID)
 	{
 		$db = new DB();
-		$db->query(sprintf("UPDATE releases SET completion = %d WHERE ID = %d", $completion, $relID));
+		$db->exec(sprintf("UPDATE releases SET completion = %d WHERE ID = %d", $completion, $relID));
 	}
 }

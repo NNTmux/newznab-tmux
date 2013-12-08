@@ -212,7 +212,7 @@ class Functions
 				$count = $relfiles;
 				if ($cnt !== false && $cnt["count"] > 0)
 					$count = $relfiles + $cnt["count"];
-				$db->query(sprintf("UPDATE releases SET rarinnerfilecount = %d where ID = %d", $count, $relID));
+				$db->exec(sprintf("UPDATE releases SET rarinnerfilecount = %d where ID = %d", $count, $relID));
 			}
 			if ($foundname === true)
 				return true;
@@ -236,9 +236,10 @@ class Functions
 		$cat = new Category();
 		$consoletools = new consoleTools();
 		$relcount = 0;
-		$resrel = $db->query("SELECT ID, ".$type.", groupID FROM releases ".$where);
-		$total = count($resrel);
-		if (count($resrel) > 0)
+		$resrel = $db->prepare("SELECT ID, ".$type.", groupID FROM releases ".$where);
+        $resrel->execute();
+		$total = $resrel->rowCount();
+		if ($total > 0)
 		{
 			foreach ($resrel as $rowrel)
 			{

@@ -4,7 +4,7 @@ require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
 require_once (WWW_DIR.'/lib/site.php');
 
-$version="0.3r077";
+$version="0.3r302";
 
 $db = new DB();
 $s = new Sites();
@@ -47,7 +47,7 @@ $proc = "SELECT
 //$posted_date = "SELECT(SELECT UNIX_TIMESTAMP(adddate) from releases order by adddate asc limit 1) AS adddate;";
 
 //flush query cache
-$qcache = "FLUSH QUERY CACHE";
+//$qcache = "FLUSH QUERY CACHE";
 
 //get variables from defaults.sh
 $path = dirname(__FILE__);
@@ -433,14 +433,15 @@ while( $i > 0 )
 			sleep(1);
 		}
 		//$rel = $db->query("UPDATE `binaries` SET `procstat`=0,`procattempts`=0,`regexID`=NULL, `relpart`=0,`reltotalpart`=0,`relname`=NULL WHERE procstat not in (4, 6)");
-		$rel = $db->query("UPDATE binaries SET procstat=0, procattempts=0, regexID=NULL, relpart=0, reltotalpart=0, relname=NULL");
+		$rel = $db->prepare("UPDATE binaries SET procstat=0, procattempts=0, regexID=NULL, relpart=0, reltotalpart=0, relname=NULL");
+        $rel->execute();
 	}
 
 	//defrag the query cache every 15 minutes
-	if (( TIME() - $time18 >= 900 ) || ( $i == 1 ))
+	/*if (( TIME() - $time18 >= 900 ) || ( $i == 1 ))
 	{
 		$result = @$db->query($qcache);
-	}
+	} */
 
 	//rename the session
 	if ( $old_session != $array['TMUX_SESSION'] ) {

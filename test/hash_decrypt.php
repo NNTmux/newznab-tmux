@@ -25,7 +25,7 @@ function preName($argv)
 	$limit = ($argv[1] == "full") ? "" : " LIMIT 1000";
 
 	$res = $db->queryDirect("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE hashed = true AND dehashstatus BETWEEN -6 AND 0".$limit);
-	$total = count($res);
+	$total = $res->rowCount();
 	$counter = 0;
 	$show = '';
 	if($total > 0)
@@ -47,8 +47,10 @@ function preName($argv)
 				if ($pre !== false)
 				{
 					$determinedcat = $category->determineCategory($row["groupID"], $pre['title']);
-					$result = $db->query(sprintf("UPDATE releases SET dehashstatus = 1, relnamestatus = 5, searchname = %s, categoryID = %d WHERE ID = %d", $db->escapeString($pre['title']), $determinedcat, $row['ID']));
-					if (count($result) > 0)
+					$result = $db->prepare(sprintf("UPDATE releases SET dehashstatus = 1, relnamestatus = 5, searchname = %s, categoryID = %d WHERE ID = %d", $db->escapeString($pre['title']), $determinedcat, $row['ID']));
+                    $result->execute();
+                    $total = $result->rowCount();
+					if ($total > 0)
 					{
 						$groups = new Groups();
                         $functions = new Functions();
@@ -71,7 +73,8 @@ function preName($argv)
 			}
 			if ($success == false)
 			{
-				$fail = $db->query(sprintf("UPDATE releases SET dehashstatus = dehashstatus - 1 WHERE ID = %d", $row['ID']));
+				$fail = $db->prepare(sprintf("UPDATE releases SET dehashstatus = dehashstatus - 1 WHERE ID = %d", $row['ID']));
+                $fail->execute();
 			}
 		}
 	}

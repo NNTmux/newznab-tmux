@@ -26,16 +26,16 @@ function preName($argv)
 	$counter=1;
 	$n = "\n";
 	resetSearchnames();
-	$bad = $db->query("UPDATE releases SET searchname = name WHERE searchname = ''");
-	$tot = count($bad);
+	$bad = $db->exec("UPDATE releases SET searchname = name WHERE searchname = ''");
+	$tot = $bad->rowCount();
 	if ($tot > 0)
 		echo $tot." Releases had no searchname\n";
 	echo "Getting work\n";
 	if (isset($argv[1]) && $argv[1]=="full")
-		$res = $db->query("select ID, name, searchname, groupID, categoryID from releases where ( relnamestatus in (1, 20, 21, 22) AND categoryID between 8000 and 8999)");
+		$res = $db->query("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE ( relnamestatus in (1, 20, 21, 22) AND categoryID BETWEEN 8000 AND 8999)");
 	elseif (isset($argv[1]) && is_numeric($argv[1]))
-		$res = $db->query("select ID, name, searchname, groupID, categoryID from releases where ( relnamestatus in (1, 20, 21, 22) AND categoryID between 8000 and 8999) and adddate > NOW() - INTERVAL %d HOUR",$argv[1]);
-	$total = count($res);
+		$res = $db->query("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE ( relnamestatus in (1, 20, 21, 22) AND categoryID BETWEEN 8000 AND 8999) AND adddate > NOW() - INTERVAL %d HOUR",$argv[1]);
+	$total = $res->rowCount();
 	if ($total > 0)
 	{
 		$consoletools = new ConsoleTools();
@@ -46,7 +46,8 @@ function preName($argv)
 				if ( $cleanerName != $row['name'] )
 				{
 					$determinedcat = $category->determineCategory($row["groupID"], $cleanerName);
-					$run = $db->query(sprintf("UPDATE releases set relnamestatus = 16, searchname = %s, categoryID = %d where ID = %d", $db->escapeString($cleanerName), $db->escapeString($determinedcat), $db->escapeString($row['ID'])));
+					$run = $db->prepare(sprintf("UPDATE releases set relnamestatus = 16, searchname = %s, categoryID = %d where ID = %d", $db->escapeString($cleanerName), $db->escapeString($determinedcat), $db->escapeString($row['ID'])));
+                    $run->execute();
 					$groupname = $functions->getByNameByID($row["groupID"]);
 					$oldcatname = $functions->getNameByID($row["categoryID"]);
 					$newcatname = $functions->getNameByID($determinedcat);
@@ -106,8 +107,9 @@ function resetSearchnames()
         $cat = new Category();
         $consoletools = new consoleTools();
         $relcount = 0;
-        $resrel = $db->query("SELECT ID, ".$type.", groupID FROM releases ".$where);
-        $total = count($resrel);
+        $resrel = $db->prepare("SELECT ID, ".$type.", groupID FROM releases ".$where);
+        $resrel->execute();
+        $total = $resrel->rowCount();
         if ($total > 0)
         {
             foreach ($resrel as $rowrel)

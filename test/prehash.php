@@ -15,7 +15,7 @@ require_once("ColorCLI.php");
  // This script is adapted from nZEDb
 Class Predb
 {
-	function Predb($echooutput=false)
+	function __construct($echooutput=false)
 	{
 		$s = new Sites();
 		$this->site = $s->get();
@@ -58,7 +58,7 @@ Class Predb
 				echo $newpdme." Retrieved from Predb.me.\n";
 			$newnames = $newwomble+$newomgwtf+$newzenet+$newprelist+$neworly+$newsrr+$newpdme;
 			if(count($newnames) > 0)
-				$db->query(sprintf("UPDATE prehash SET adddate = now() where ID = %d", $newestrel["ID"]));
+				$db->exec(sprintf("UPDATE prehash SET adddate = now() where ID = %d", $newestrel["ID"]));
 		}
 		$matched = $this->matchPredb();
 		if ($matched > 0 && $this->echooutput)
@@ -103,7 +103,7 @@ Class Predb
 									else
 										$nfo = $db->escapeString("http://nzb.isasecret.com/".$matches2["nfo"]);
 
-									$db->query(sprintf("UPDATE prehash SET nfo = %s, size = %s, category = %s, predate = %s, adddate = now(), source = %s where ID = %d", $nfo, $size, $db->escapeString($matches2["category"]), $db->from_unixtime(strtotime($matches2["date"])), $db->escapeString("womble"), $oldname["ID"]));
+									$db->exec(sprintf("UPDATE prehash SET nfo = %s, size = %s, category = %s, predate = %s, adddate = now(), source = %s where ID = %d", $nfo, $size, $db->escapeString($matches2["category"]), $db->from_unixtime(strtotime($matches2["date"])), $db->escapeString("womble"), $oldname["ID"]));
 								}
 							}
 							else
@@ -156,7 +156,7 @@ Class Predb
 								else
 								{
 									$size = $db->escapeString(round($matches2["size1"]).$matches2["size2"]);
-									$db->query(sprintf("UPDATE prehash SET size = %s, category = %s, predate = FROM_UNIXTIME(".strtotime($matches2["date"])."), adddate = now(), source = %s where ID = %d", $size, $db->escapeString($matches2["category"]), $db->escapeString("omgwtfnzbs"), $oldname["ID"]));
+									$db->exec(sprintf("UPDATE prehash SET size = %s, category = %s, predate = FROM_UNIXTIME(".strtotime($matches2["date"])."), adddate = now(), source = %s where ID = %d", $size, $db->escapeString($matches2["category"]), $db->escapeString("omgwtfnzbs"), $oldname["ID"]));
 									$newnames++;
 								}
 							}
@@ -369,7 +369,7 @@ Class Predb
 		$db = new DB();
 		if($x = $db->queryOneRow(sprintf("SELECT ID FROM prehash WHERE title = %s", $db->escapeString($cleanerName))) !== false)
 		{
-			$db->query(sprintf("UPDATE releases SET relnamestatus = 11 WHERE ID = %d", $x["ID"], $releaseID));
+			$db->exec(sprintf("UPDATE releases SET relnamestatus = 11 WHERE ID = %d", $x["ID"], $releaseID));
 		}
 	}
 
@@ -390,11 +390,11 @@ Class Predb
             $updated = 1;
 			foreach ($res as $row)
 			{
-				$db->query(sprintf("UPDATE prehash SET releaseID = %d WHERE ID = %d", $row["releaseID"], $row["ID"]));
+				$db->exec(sprintf("UPDATE prehash SET releaseID = %d WHERE ID = %d", $row["releaseID"], $row["ID"]));
                 $catName=str_replace(array("TV-", "TV: "), '', $row["category"]);
 				if($catID = $db->queryOneRow(sprintf("SELECT ID FROM category WHERE title = %s", $db->escapeString($catName))))
-					$db->query(sprintf("UPDATE releases SET categoryID = %d WHERE ID = %d", $db->escapeString($catID["ID"]), $db->escapeString($row["releaseID"])));
-				$db->query(sprintf("UPDATE releases SET relnamestatus = 11 WHERE ID = %d", $row["releaseID"]));
+					$db->exec(sprintf("UPDATE releases SET categoryID = %d WHERE ID = %d", $db->escapeString($catID["ID"]), $db->escapeString($row["releaseID"])));
+				$db->exec(sprintf("UPDATE releases SET relnamestatus = 11 WHERE ID = %d", $row["releaseID"]));
 				if($this->echooutput)
 					$consoletools->overWrite("Matching up prehash titles with release search names: ".$consoletools->percentString($updated++,$total));
 			}
@@ -420,8 +420,8 @@ Class Predb
 				if ($buffer !== false && strlen($buffer))
 				{
 					$functions->addReleaseNfo($row["ID"]);
-					$db->query(sprintf("UPDATE releasenfo SET nfo = compress(%s) WHERE releaseID = %d", $db->escapeString($buffer), $row["ID"]));
-					$db->query(sprintf("UPDATE releases SET nfostatus = 1 WHERE ID = %d", $row["ID"]));
+					$db->exec(sprintf("UPDATE releasenfo SET nfo = compress(%s) WHERE releaseID = %d", $db->escapeString($buffer), $row["ID"]));
+					$db->exec(sprintf("UPDATE releases SET nfostatus = 1 WHERE ID = %d", $row["ID"]));
 					if($this->echooutput)
 						echo ".";
 					$nfos++;

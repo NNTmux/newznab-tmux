@@ -29,11 +29,12 @@ function crossPost($argv)
         $timer = TIME();
 
 			if (isset($argv[1]) && $argv[1]=="full")
-			    $resrel = $db->query(sprintf("SELECT ID, guid FROM releases GROUP BY GID HAVING COUNT(GID) > 1"));
+			    $resrel = $db->exec(sprintf("SELECT ID, guid FROM releases GROUP BY GID HAVING COUNT(GID) > 1"));
 		    elseif (isset($argv[1]) && is_numeric($argv[1]))
-			    $resrel = $db->query(sprintf("SELECT ID, guid FROM releases WHERE adddate > (NOW() - INTERVAL %d HOUR) GROUP BY GID HAVING COUNT(GID) > 1", $argv[1]));
-			    $total = count($resrel);
-				if(count($resrel) > 0)
+			    $resrel = $db->prepare(sprintf("SELECT ID, guid FROM releases WHERE adddate > (NOW() - INTERVAL %d HOUR) GROUP BY GID HAVING COUNT(GID) > 1", $argv[1]));
+                $resrel->execute();
+			    $total = $resrel->rowCount();
+				if($total > 0)
 				{
 					foreach ($resrel as $rowrel)
 					{
