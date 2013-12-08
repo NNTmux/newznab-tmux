@@ -4,7 +4,7 @@ require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
 require_once (WWW_DIR.'/lib/site.php');
 
-$version="0.3r301";
+$version="0.3r302";
 
 $db = new DB();
 $s = new Sites();
@@ -47,7 +47,7 @@ $proc = "SELECT
 //$posted_date = "SELECT(SELECT UNIX_TIMESTAMP(adddate) from releases order by adddate asc limit 1) AS adddate;";
 
 //flush query cache
-$qcache = "FLUSH QUERY CACHE";
+//$qcache = "FLUSH QUERY CACHE";
 
 //get variables from defaults.sh
 $path = dirname(__FILE__);
@@ -438,10 +438,10 @@ while( $i > 0 )
 	}
 
 	//defrag the query cache every 15 minutes
-	if (( TIME() - $time18 >= 900 ) || ( $i == 1 ))
+	/*if (( TIME() - $time18 >= 900 ) || ( $i == 1 ))
 	{
 		$result = @$db->query($qcache);
-	}
+	} */
 
 	//rename the session
 	if ( $old_session != $array['TMUX_SESSION'] ) {
