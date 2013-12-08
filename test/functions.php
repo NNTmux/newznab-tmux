@@ -19,15 +19,21 @@ require_once("ColorCLI.php");
 
  //*addedd from nZEDb for testing
 
-class Functions
+class Functions extends PDO
 
 {
+    /**
+	 * @var object Instance of PDO class.
+	 */
+	private static $pdo = null;
   // database function
     public function queryArray($query)
+
 	{
+	    $db = new DB();
 		if ($query == '') return false;
 
-		$result = $this->queryDirect($query);
+		$result = $db->queryDirect($query);
 		$rows = array();
 		foreach ($result as $row)
 		{

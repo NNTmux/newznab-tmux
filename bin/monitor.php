@@ -4,7 +4,7 @@ require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
 require_once (WWW_DIR.'/lib/site.php');
 
-$version="0.3r316";
+$version="0.3r318";
 
 $db = new DB();
 $s = new Sites();
