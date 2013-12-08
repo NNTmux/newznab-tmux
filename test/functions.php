@@ -53,7 +53,7 @@ class Functions
 		if (file_exists($nzbpath))
 			unlink($nzbpath);
 
-		$db->query(sprintf("delete releases, releasenfo, releasecomment, usercart, releasefiles, releaseaudio, releasesubs, releasevideo, releaseextrafull
+		$db->exec(sprintf("delete releases, releasenfo, releasecomment, usercart, releasefiles, releaseaudio, releasesubs, releasevideo, releaseextrafull
 							from releases
 								LEFT OUTER JOIN releasenfo on releasenfo.releaseID = releases.ID
 								LEFT OUTER JOIN releasecomment on releasecomment.releaseID = releases.ID
