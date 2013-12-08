@@ -23,9 +23,18 @@ class Functions
 
 {
   // database function
-    public function fetchArray($result)
+    public function queryArray($query)
 	{
-		return (is_null($result) ? null : $result->fetch_array());
+		if ($query == '') return false;
+
+		$result = $this->queryDirect($query);
+		$rows = array();
+		foreach ($result as $row)
+		{
+			$rows[] = $row;
+		}
+
+		return (!isset($rows)) ? false : $rows;
 	}
 
     	// Used for deleting, updating (and inserting without needing the last insert id).

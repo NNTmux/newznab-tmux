@@ -80,7 +80,7 @@ class Namefixer
 		$rowcount = $relres->rowCount();
 		if ($rowcount > 0)
 		{
-			while ($relrow = $functions->fetchArray($relres))
+			while ($relrow = $functions->queryArray($relres))
 
             {
 				$this->done = $this->matched = false;

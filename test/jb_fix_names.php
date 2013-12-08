@@ -20,22 +20,18 @@ function preName($argv)
 	$db = new DB();
 	$groups = new Groups();
 	$category = new Category();
-    $functions = new Functions ();
+    $functions = new Functions();
 	$updated = 0;
 	$cleaned = 0;
 	$counter=1;
 	$n = "\n";
 	resetSearchnames();
-	$bad = $db->exec("UPDATE releases SET searchname = name WHERE searchname = ''");
-	$tot = $bad->rowCount();
-	if ($tot > 0)
-		echo $tot." Releases had no searchname\n";
 	echo "Getting work\n";
 	if (isset($argv[1]) && $argv[1]=="full")
-		$res = $db->query("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE ( relnamestatus in (1, 20, 21, 22) AND categoryID BETWEEN 8000 AND 8999)");
+		$res = $db->prepare("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE ( relnamestatus in (1, 20, 21, 22) AND categoryID BETWEEN 8000 AND 8999)");
     elseif (isset($argv[1]) && is_numeric($argv[1]))
-		$res = $db->query("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE ( relnamestatus in (1, 20, 21, 22) AND categoryID BETWEEN 8000 AND 8999) AND adddate > NOW() - INTERVAL %d HOUR",$argv[1]);
-
+		$res = $db->prepare("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE ( relnamestatus in (1, 20, 21, 22) AND categoryID BETWEEN 8000 AND 8999) AND adddate > NOW() - INTERVAL %d HOUR",$argv[1]);
+    $res->execute();
     $total = count($res);
 	if ($total > 0)
 	{
