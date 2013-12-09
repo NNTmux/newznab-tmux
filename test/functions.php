@@ -22,10 +22,11 @@ require_once("ColorCLI.php");
 class Functions
 
 {
-  function __construct()
+  function __construct($echooutput=true)
   {
-    $this->c = new ColorCLI();
     $this->echooutput = $echooutput;
+    $this->c = new ColorCLI();
+
   }
     /**
 	 * @var object Instance of PDO class.
