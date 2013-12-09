@@ -85,6 +85,17 @@ class Functions
 			return false;
 		}
 	}
+
+    public function Prepare($query, $options = array())
+	{
+		try {
+			$PDOstatement = self::$pdo->prepare($query, $options);
+		} catch (PDOException $e) {
+			//echo $this->c->error($e->getMessage());
+			$PDOstatement = false;
+		}
+		return $PDOstatement;
+	}
  //  gets name of category from category.php
     public function getNameByID($ID)
 	{
