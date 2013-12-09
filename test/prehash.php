@@ -556,7 +556,7 @@ Class Predb
 		return $updated;
     }
 	// Look if the release is missing an nfo.
-	public function matchNfo()
+	public function matchNfo($nntp)
 	{
 		$db = new DB();
         $f = new Functions();
