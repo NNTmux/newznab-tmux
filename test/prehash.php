@@ -382,7 +382,7 @@ Class Predb
         $functions = new Functions();
 		$newnames = 0;
 		$groups = new Groups();
-		$groupid = $functions->getIDByName('alt.binaries.moovee');
+		$groupID = $functions->getIDByName('alt.binaries.moovee');
 		$buffer = @file_get_contents('http://abmoovee.allfilled.com/reqs.php?fetch=posted&page=1');
 		if ($buffer !== false && strlen($buffer))
 		{
@@ -392,16 +392,16 @@ Class Predb
 				{
 					foreach ($match as $m)
 					{
-						if (preg_match('/<td class="cell_reqid">(?P<requestid>\d+)<\/td>.+<td class="cell_request">(?P<title>.+)<\/td>.+<td class="cell_statuschange">(?P<predate>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})<\/td>/s', $m, $matches2))
+						if (preg_match('/<td class="cell_reqid">(?P<requestID>\d+)<\/td>.+<td class="cell_request">(?P<title>.+)<\/td>.+<td class="cell_statuschange">(?P<predate>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})<\/td>/s', $m, $matches2))
 						{
-							if (isset($matches2["requestid"]) && isset($matches2["title"]))
+							if (isset($matches2["requestID"]) && isset($matches2["title"]))
 							{
-								$requestid = $matches2["requestid"];
+								$requestID = $matches2["requestID"];
 								$title = $db->escapeString($matches2["title"]);
 								$md5 = $db->escapeString(md5($matches2["title"]));
 								$predate = $db->escapeString($matches2["predate"]);
 								$source = $db->escapeString('allfilled');
-								$run = $db->queryDirect(sprintf("INSERT IGNORE INTO prehash (title, predate, adddate, source, hash, requestid, groupid) VALUES (%s, %s, now(), %s, %s, %s, %d) ON DUPLICATE KEY UPDATE predate = %s, requestid = %d, groupid = %d", $title, $predate, $source, $md5, $requestid, $groupid, $predate, $requestid, $groupid));
+								$run = $db->queryDirect(sprintf("INSERT IGNORE INTO prehash (title, predate, adddate, source, hash, requestID, groupID) VALUES (%s, %s, now(), %s, %s, %s, %d) ON DUPLICATE KEY UPDATE predate = %s, requestID = %d, groupID = %d", $title, $predate, $source, $md5, $requestID, $groupID, $predate, $requestID, $groupID));
 							}
 						}
 					}
@@ -416,7 +416,7 @@ Class Predb
         $functions = new Functions();
 		$newnames = 0;
 		$groups = new Groups();
-		$groupid = $functions->getIDByName('alt.binaries.teevee');
+		$groupID = $functions->getIDByName('alt.binaries.teevee');
 		$buffer = @file_get_contents('http://abteevee.allfilled.com/reqs.php?fetch=posted&page=1');
 		if ($buffer !== false && strlen($buffer))
 		{
@@ -426,16 +426,16 @@ Class Predb
 				{
 					foreach ($match as $m)
 					{
-						if (preg_match('/<td class="cell_reqid">(?P<requestid>\d+)<\/td>.+<td class="cell_request">(?P<title>.+)<\/td>.+<td class="cell_statuschange">(?P<predate>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})<\/td>/s', $m, $matches2))
+						if (preg_match('/<td class="cell_reqid">(?P<requestID>\d+)<\/td>.+<td class="cell_request">(?P<title>.+)<\/td>.+<td class="cell_statuschange">(?P<predate>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})<\/td>/s', $m, $matches2))
 						{
-							if (isset($matches2["requestid"]) && isset($matches2["title"]))
+							if (isset($matches2["requestID"]) && isset($matches2["title"]))
 							{
-								$requestid = $matches2["requestid"];
+								$requestID = $matches2["requestID"];
 								$title = $db->escapeString($matches2["title"]);
 								$md5 = $db->escapeString(md5($matches2["title"]));
 								$predate = $db->escapeString($matches2["predate"]);
 								$source = $db->escapeString('allfilled');
-								$run = $db->queryDirect(sprintf("INSERT IGNORE INTO prehash (title, predate, adddate, source, hash, requestid, groupid) VALUES (%s, %s, now(), %s, %s, %s, %d) ON DUPLICATE KEY UPDATE predate = %s, requestid = %d, groupid = %d", $title, $predate, $source, $md5, $requestid, $groupid, $predate, $requestid, $groupid));
+								$run = $db->queryDirect(sprintf("INSERT IGNORE INTO prehash (title, predate, adddate, source, hash, requestID, groupID) VALUES (%s, %s, now(), %s, %s, %s, %d) ON DUPLICATE KEY UPDATE predate = %s, requestID = %d, groupID = %d", $title, $predate, $source, $md5, $requestID, $groupID, $predate, $requestID, $groupID));
 							}
 						}
 					}
@@ -450,7 +450,7 @@ Class Predb
         $functions = new Functions();
 		$newnames = 0;
 		$groups = new Groups();
-		$groupid = $functions->getIDByName('alt.binaries.erotica');
+		$groupID = $functions->getIDByName('alt.binaries.erotica');
 		$buffer = @file_get_contents('http://aberotica.allfilled.com/reqs.php?fetch=posted&page=1');
 		if ($buffer !== false && strlen($buffer))
 		{
@@ -460,16 +460,16 @@ Class Predb
 				{
 					foreach ($match as $m)
 					{
-						if (preg_match('/<td class="cell_reqid">(?P<requestid>\d+)<\/td>.+<td class="cell_request">(?P<title>.+)<\/td>.+<td class="cell_statuschange">(?P<predate>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})<\/td>/s', $m, $matches2))
+						if (preg_match('/<td class="cell_reqid">(?P<requestID>\d+)<\/td>.+<td class="cell_request">(?P<title>.+)<\/td>.+<td class="cell_statuschange">(?P<predate>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})<\/td>/s', $m, $matches2))
 						{
-							if (isset($matches2["requestid"]) && isset($matches2["title"]))
+							if (isset($matches2["requestID"]) && isset($matches2["title"]))
 							{
-								$requestid = $matches2["requestid"];
+								$requestID = $matches2["requestID"];
 								$title = $db->escapeString($matches2["title"]);
 								$md5 = $db->escapeString(md5($matches2["title"]));
 								$predate = $db->escapeString($matches2["predate"]);
 								$source = $db->escapeString('allfilled');
-								$run = $db->queryDirect(sprintf("INSERT IGNORE INTO prehash (title, predate, adddate, source, md5, requestid, groupid) VALUES (%s, %s, now(), %s, %s, %s, %d) ON DUPLICATE KEY UPDATE predate = %s, requestid = %d, groupid = %d", $title, $predate, $source, $md5, $requestid, $groupid, $predate, $requestid, $groupid));
+								$run = $db->queryDirect(sprintf("INSERT IGNORE INTO prehash (title, predate, adddate, source, md5, requestID, groupID) VALUES (%s, %s, now(), %s, %s, %s, %d) ON DUPLICATE KEY UPDATE predate = %s, requestID = %d, groupID = %d", $title, $predate, $source, $md5, $requestID, $groupID, $predate, $requestID, $groupID));
 							}
 						}
 					}
@@ -484,7 +484,7 @@ Class Predb
         $functions = new Functions();
 		$newnames = 0;
 		$groups = new Groups();
-		$groupid = $functions->getIDByName('alt.binaries.mom');
+		$groupID = $functions->getIDByName('alt.binaries.mom');
 		$buffer = @file_get_contents('http://abforeign.allfilled.com/reqs.php?fetch=posted&page=1');
 		if ($buffer !== false && strlen($buffer))
 		{
@@ -494,16 +494,16 @@ Class Predb
 				{
 					foreach ($match as $m)
 					{
-						if (preg_match('/<td class="cell_reqid">(?P<requestid>\d+)<\/td>.+<td class="cell_request">(?P<title>.+)<\/td>.+<td class="cell_statuschange">(?P<predate>\d{4}-\d{2}-\d{2}( \d{2}:\d{2}:\d{2})?)<\/td>/s', $m, $matches2))
+						if (preg_match('/<td class="cell_reqid">(?P<requestID>\d+)<\/td>.+<td class="cell_request">(?P<title>.+)<\/td>.+<td class="cell_statuschange">(?P<predate>\d{4}-\d{2}-\d{2}( \d{2}:\d{2}:\d{2})?)<\/td>/s', $m, $matches2))
 						{
-							if (isset($matches2["requestid"]) && isset($matches2["title"]))
+							if (isset($matches2["requestID"]) && isset($matches2["title"]))
 							{
-								$requestid = $matches2["requestid"];
+								$requestID = $matches2["requestID"];
 								$title = $db->escapeString($matches2["title"]);
 								$md5 = $db->escapeString(md5($matches2["title"]));
 								$predate = $db->escapeString($matches2["predate"]);
 								$source = $db->escapeString('allfilled');
-								$run = $db->queryDirect(sprintf("INSERT IGNORE INTO prehash (title, predate, adddate, source, hash, requestid, groupid) VALUES (%s, %s, now(), %s, %s, %s, %d) ON DUPLICATE KEY UPDATE predate = %s, requestid = %d, groupid = %d", $title, $predate, $source, $md5, $requestid, $groupid, $predate, $requestid, $groupid));
+								$run = $db->queryDirect(sprintf("INSERT IGNORE INTO prehash (title, predate, adddate, source, hash, requestID, groupID) VALUES (%s, %s, now(), %s, %s, %s, %d) ON DUPLICATE KEY UPDATE predate = %s, requestID = %d, groupID = %d", $title, $predate, $source, $md5, $requestID, $groupID, $predate, $requestID, $groupID));
 							}
 						}
 					}
@@ -616,7 +616,7 @@ Class Predb
 			echo "Fixing search names".$te." using the prehash md5.\n";
 		}
         $regex = "AND (r.hashed = true OR rf.name REGEXP'[a-fA-F0-9]{32}')";
-		$res = $db->prepare(sprintf('SELECT DISTINCT r.id, r.name, r.searchname, r.categoryid, r.groupid, rf.name AS filename, rf.releaseid, rf.size FROM releases r LEFT JOIN releasefiles rf ON r.id = rf.releaseid WHERE r.relnamestatus IN (0, 1, 20, 21, 22) AND dehashstatus BETWEEN -5 AND 0 AND passwordstatus >= -1 %s %s %s ORDER BY rf.releaseid, rf.size DESC', $regex, $tq, $ct));
+		$res = $db->prepare(sprintf('SELECT DISTINCT r.id, r.name, r.searchname, r.categoryid, r.groupID, rf.name AS filename, rf.releaseid, rf.size FROM releases r LEFT JOIN releasefiles rf ON r.id = rf.releaseid WHERE r.relnamestatus IN (0, 1, 20, 21, 22) AND dehashstatus BETWEEN -5 AND 0 AND passwordstatus >= -1 %s %s %s ORDER BY rf.releaseid, rf.size DESC', $regex, $tq, $ct));
         $res->execute();
         if ($res->rowCount() > 0)
 		{
