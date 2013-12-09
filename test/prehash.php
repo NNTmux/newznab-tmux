@@ -540,7 +540,7 @@ Class Predb
         $total = $res->rowCount();
         if($total > 0)
         {
-            $updated = 1;
+            $updated = 0;
 			foreach ($res as $row)
 			{
 				$db->exec(sprintf("UPDATE prehash SET releaseID = %d WHERE ID = %d", $row["releaseID"], $row["ID"]));
