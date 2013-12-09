@@ -25,6 +25,7 @@ class Functions
   function __construct()
   {
     $this->c = new ColorCLI();
+    $this->echooutput = $echooutput;
   }
     /**
 	 * @var object Instance of PDO class.
