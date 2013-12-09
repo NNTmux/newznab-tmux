@@ -22,10 +22,86 @@ require_once("ColorCLI.php");
 class Functions
 
 {
+  function __construct($echooutput=true)
+  {
+    $this->echooutput = $echooutput;
+    $this->c = new ColorCLI();
+    $this->db = new DB();
+
+  }
+    /**
+	 * @var object Instance of PDO class.
+	 */
+	private static $pdo = null;
   // database function
-    public function fetchArray($result)
+    public function queryArray($query)
+
 	{
-		return (is_null($result) ? null : $result->fetch_array());
+	    $db = new DB();
+		if ($query == '') return false;
+
+		$result = $db->queryDirect($query);
+		$rows = array();
+		foreach ($result as $row)
+		{
+			$rows[] = $row;
+		}
+
+		return (!isset($rows)) ? false : $rows;
+	}
+
+    	// Used for deleting, updating (and inserting without needing the last insert id).
+	public function queryExec($query)
+	{
+		if ($query == '')
+			return false;
+
+		try {
+			$run = self::$pdo->prepare($query);
+			$run->execute();
+			return $run;
+		} catch (PDOException $e) {
+			// Deadlock or lock wait timeout, try 10 times.
+			$i = 1;
+			while (($e->errorInfo[1] == 1213 || $e->errorInfo[0] == 40001 || $e->errorInfo[1] == 1205 || $e->getMessage()=='SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction') && $i <= 10)
+			{
+				echo $this->c->error("A Deadlock or lock wait timeout has occurred, sleeping.\n");
+				$this->consoletools->showsleep($i * $i);
+				$run = self::$pdo->prepare($query);
+				$run->execute();
+				return $run;
+				$i++;
+			}
+			if ($e->errorInfo[1] == 1213 || $e->errorInfo[0] == 40001 || $e->errorInfo[1] == 1205)
+			{
+				//echo "Error: Deadlock or lock wait timeout.";
+				return false;
+			}
+			else if ($e->errorInfo[1]==1062 || $e->errorInfo[0]==23000)
+			{
+				//echo "\nError: Update would create duplicate row, skipping\n";
+				return false;
+			}
+			else if ($e->errorInfo[1]==1406 || $e->errorInfo[0]==22001)
+			{
+				//echo "\nError: Too large to fit column length\n";
+				return false;
+			}
+			else
+				echo $this->c->error($e->getMessage());
+			return false;
+		}
+	}
+
+    public function Prepare($query, $options = array())
+	{
+		try {
+			$PDOstatement = self::$pdo->prepare($query, $options);
+		} catch (PDOException $e) {
+			//echo $this->c->error($e->getMessage());
+			$PDOstatement = false;
+		}
+		return $PDOstatement;
 	}
  //  gets name of category from category.php
     public function getNameByID($ID)
@@ -37,6 +113,14 @@ class Functions
 		$cat = array_shift($arr2);
 		return $parent." ".$cat;
 	}
+
+    public function getIDByName($name)
+	{
+		$db = new DB();
+		$res = $db->queryOneRow(sprintf("SELECT ID FROM groups WHERE name = %s", $db->escapeString($name)));
+		return $res["ID"];
+	}
+
     //deletes from releases
     public function fastDelete($id, $guid, $site)
 	{
@@ -53,7 +137,7 @@ class Functions
 		if (file_exists($nzbpath))
 			unlink($nzbpath);
 
-		$db->query(sprintf("delete releases, releasenfo, releasecomment, usercart, releasefiles, releaseaudio, releasesubs, releasevideo, releaseextrafull
+		$db->exec(sprintf("delete releases, releasenfo, releasecomment, usercart, releasefiles, releaseaudio, releasesubs, releasevideo, releaseextrafull
 							from releases
 								LEFT OUTER JOIN releasenfo on releasenfo.releaseID = releases.ID
 								LEFT OUTER JOIN releasecomment on releasecomment.releaseID = releases.ID
@@ -80,7 +164,33 @@ class Functions
 		$db = new DB();
 		return $db->queryInsert(sprintf("INSERT IGNORE INTO releasenfo (releaseID) VALUE (%d)", $relid));
 	}
+     // Adds an NFO found from predb, rar, zip etc...
+	public function addAlternateNfo($db, $nfo, $release, $nntp)
+	{
+		if (!isset($nntp))
+			exit($this->c->error("Unable to connect to usenet.\n"));
 
+		if ($release['ID'] > 0)
+		{
+				$compress = 'compress(%s)';
+				$nc = $db->escapeString($nfo);
+
+			$ckreleaseid = $db->queryOneRow(sprintf('SELECT ID FROM releasenfo WHERE releaseID = %d', $release['ID']));
+			if (!isset($ckreleaseid['ID']))
+				$db->queryInsert(sprintf('INSERT INTO releasenfo (nfo, releaseID) VALUES ('.$compress.', %d)', $nc, $release['ID']));
+			$db->exec(sprintf('UPDATE releases SET nfostatus = 1 WHERE ID = %d', $release['ID']));
+			/*if (!isset($release['completion']))
+				$release['completion'] = 0;
+			if ($release['completion'] == 0)
+			{
+				$nzbcontents = new NZBcontents($this->echooutput);
+				$nzbcontents->NZBcompletion($release['guid'], $release['ID'], $release['groupID'], $nntp, $db);
+			} */
+			return true;
+		}
+		else
+			return false;
+	}
     // Confirm that the .nfo file is not something else.
 	public function isNFO($possibleNFO)
 	{
@@ -212,7 +322,7 @@ class Functions
 				$count = $relfiles;
 				if ($cnt !== false && $cnt["count"] > 0)
 					$count = $relfiles + $cnt["count"];
-				$db->query(sprintf("UPDATE releases SET rarinnerfilecount = %d where ID = %d", $count, $relID));
+				$db->exec(sprintf("UPDATE releases SET rarinnerfilecount = %d where ID = %d", $count, $relID));
 			}
 			if ($foundname === true)
 				return true;
@@ -236,9 +346,10 @@ class Functions
 		$cat = new Category();
 		$consoletools = new consoleTools();
 		$relcount = 0;
-		$resrel = $db->query("SELECT ID, ".$type.", groupID FROM releases ".$where);
-		$total = count($resrel);
-		if (count($resrel) > 0)
+		$resrel = $db->prepare("SELECT ID, ".$type.", groupID FROM releases ".$where);
+        $resrel->execute();
+		$total = $resrel->rowCount();
+		if ($total > 0)
 		{
 			foreach ($resrel as $rowrel)
 			{
