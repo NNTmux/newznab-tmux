@@ -28,7 +28,7 @@ function preName($argv)
 	resetSearchnames();
 	echo "Getting work\n";
     if (!isset($argv[2]))
-		$res = $db->prepare("SELECT id, name, searchname, groupid, categoryid FROM releases WHERE ( relnamestatus in (1, 20, 21, 22) AND categoryID BETWEEN 8000 AND 8999)");
+		$res = $db->prepare("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE ( relnamestatus in (1, 20, 21, 22) AND categoryID BETWEEN 8000 AND 8999)");
 	elseif (isset($argv[1]) && $argv[1]=="full")
 		$res = $db->prepare("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE ( relnamestatus in (1, 20, 21, 22) AND categoryID BETWEEN 8000 AND 8999)");
     elseif (isset($argv[1]) && is_numeric($argv[1]))
