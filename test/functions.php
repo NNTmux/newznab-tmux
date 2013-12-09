@@ -26,6 +26,7 @@ class Functions
   {
     $this->echooutput = $echooutput;
     $this->c = new ColorCLI();
+    $this->db = new DB();
 
   }
     /**
@@ -178,13 +179,13 @@ class Functions
 			if (!isset($ckreleaseid['ID']))
 				$db->queryInsert(sprintf('INSERT INTO releasenfo (nfo, releaseID) VALUES ('.$compress.', %d)', $nc, $release['ID']));
 			$db->exec(sprintf('UPDATE releases SET nfostatus = 1 WHERE ID = %d', $release['ID']));
-			if (!isset($release['completion']))
+			/*if (!isset($release['completion']))
 				$release['completion'] = 0;
 			if ($release['completion'] == 0)
 			{
 				$nzbcontents = new NZBcontents($this->echooutput);
 				$nzbcontents->NZBcompletion($release['guid'], $release['ID'], $release['groupID'], $nntp, $db);
-			}
+			} */
 			return true;
 		}
 		else
