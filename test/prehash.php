@@ -203,7 +203,7 @@ Class Predb
                                                     $predate = $db->escapeString($matches2['predate']);
 							                        $md5 = $db->escapeString(md5($matches2['title']));
 						        	                $title = $db->escapeString($matches2['title']);
-							                        $oldname = $db->queryOneRow(sprintf('SELECT md5 FROM prehash WHERE md5 = %s', $db->escapeString($md5)));
+							                        $oldname = $db->queryOneRow(sprintf('SELECT hash FROM prehash WHERE md5 = %s', $db->escapeString($md5)));
                                                         if ($oldname !== false && $oldname["md5"] == $md5)
                                                                 continue;
                                                         else
