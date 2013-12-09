@@ -69,7 +69,7 @@ Class Predb
 		$matched = $this->matchPredb();
 		if ($matched > 0 && $this->echooutput)
 			echo "\nMatched ".$matched." prehash titles to release search names.\n";
-		$nfos = $this->matchNfo();
+		$nfos = $this->matchNfo($nntp);
 		if ($nfos > 0 && $this->echooutput)
 			echo "\nAdded ".$nfos." missing NFOs from prehash sources.\n";
 		return $newnames;
