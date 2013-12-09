@@ -106,6 +106,14 @@ class Functions
 		$cat = array_shift($arr2);
 		return $parent." ".$cat;
 	}
+
+    public function getIDByName($name)
+	{
+		$db = new DB();
+		$res = $db->queryOneRow(sprintf("SELECT ID FROM groups WHERE name = %s", $db->escapeString($name)));
+		return $res["ID"];
+	}
+
     //deletes from releases
     public function fastDelete($id, $guid, $site)
 	{
@@ -149,7 +157,33 @@ class Functions
 		$db = new DB();
 		return $db->queryInsert(sprintf("INSERT IGNORE INTO releasenfo (releaseID) VALUE (%d)", $relid));
 	}
+     // Adds an NFO found from predb, rar, zip etc...
+	public function addAlternateNfo($db, $nfo, $release, $nntp)
+	{
+		if (!isset($nntp))
+			exit($this->c->error("Unable to connect to usenet.\n"));
 
+		if ($release['ID'] > 0)
+		{
+				$compress = 'compress(%s)';
+				$nc = $db->escapeString($nfo);
+
+			$ckreleaseid = $db->queryOneRow(sprintf('SELECT ID FROM releasenfo WHERE releaseID = %d', $release['ID']));
+			if (!isset($ckreleaseid['ID']))
+				$db->queryInsert(sprintf('INSERT INTO releasenfo (nfo, releaseID) VALUES ('.$compress.', %d)', $nc, $release['ID']));
+			$db->queryExec(sprintf('UPDATE releases SET nfostatus = 1 WHERE ID = %d', $release['ID']));
+			if (!isset($release['completion']))
+				$release['completion'] = 0;
+			if ($release['completion'] == 0)
+			{
+				$nzbcontents = new NZBcontents($this->echooutput);
+				$nzbcontents->NZBcompletion($release['guid'], $release['ID'], $release['groupiID'], $nntp, $db);
+			}
+			return true;
+		}
+		else
+			return false;
+	}
     // Confirm that the .nfo file is not something else.
 	public function isNFO($possibleNFO)
 	{

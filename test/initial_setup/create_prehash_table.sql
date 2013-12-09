@@ -11,6 +11,8 @@ CREATE TABLE `prehash`
 `source` VARCHAR(50) NOT NULL DEFAULT '',
 `hash` VARCHAR(255) NOT NULL DEFAULT '0',
 `releaseID` INT NULL,
+`requestid` INT NOT NULL DEFAULT '0';
+`groupid` INT NOT NULL DEFAULT '0';
 PRIMARY KEY  (`ID`)
 ) ENGINE=MYISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci AUTO_INCREMENT=1 ;
 
@@ -21,3 +23,4 @@ CREATE INDEX ix_prehash_adddate ON prehash(`adddate`);
 CREATE INDEX ix_prehash_source ON prehash(`source`);
 CREATE UNIQUE INDEX ix_prehash_md5 ON prehash(`hash`);
 CREATE INDEX ix_prehash_releaseID ON prehash(`releaseID`);
+CREATE INDEX ix_prehash_requestid on prehash(requestid, groupid);
