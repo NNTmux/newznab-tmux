@@ -22,7 +22,7 @@ require_once("ColorCLI.php");
 class Functions
 
 {
-  function __construct();
+  function __construct()
   {
     $this->c = new ColorCLI();
   }
