@@ -19,7 +19,7 @@ require_once("ColorCLI.php");
 
  //*addedd from nZEDb for testing
 
-class Functions extends PDO
+class Functions
 
 {
     /**
