@@ -177,7 +177,7 @@ class Functions
 
 			$ckreleaseid = $db->queryOneRow(sprintf('SELECT ID FROM releasenfo WHERE releaseID = %d', $release['ID']));
 			if (!isset($ckreleaseid['ID']))
-				$db->queryInsert(sprintf('INSERT INTO releasenfo (nfo, releaseID) VALUES ('.$compress.', %d)', $nc, $release['ID']));
+				$db->exec(sprintf('INSERT INTO releasenfo (nfo, releaseID) VALUES ('.$compress.', %d)', $nc, $release['ID']));
 			$db->exec(sprintf('UPDATE releases SET nfostatus = 1 WHERE ID = %d', $release['ID']));
 			/*if (!isset($release['completion']))
 				$release['completion'] = 0;
