@@ -32,13 +32,14 @@ function preName($argv)
 	resetSearchnames();
 	echo "Getting work\n";
     if (!isset($argv[2]))
-		$res = $db->exec("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE ( relnamestatus in (1, 20, 21, 22) AND categoryID BETWEEN 8000 AND 8999)".$what);
-   else if (isset($argv[2]) && is_numeric($argv[2]))
-		$res = $db->exec("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE ( relnamestatus in (1, 20, 21, 22) AND categoryID BETWEEN 8000 AND 8999)".$what.$where);
-   else if (isset($argv[1]) && $argv[1]=="full" && isset($argv[2]) && $argv[2] == "all")
-		$res = $db->exec("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE ( relnamestatus in (1, 20, 21, 22) AND categoryID BETWEEN 8000 AND 8999)" .$where);
+		$res = $db->prepare("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE ( relnamestatus in (1, 20, 21, 22) AND categoryID BETWEEN 8000 AND 8999)".$what);
+   elseif (isset($argv[2]) && is_numeric($argv[2]))
+		$res = $db->prepare("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE ( relnamestatus in (1, 20, 21, 22) AND categoryID BETWEEN 8000 AND 8999)".$what.$where);
+   elseif (isset($argv[1]) && $argv[1]=="full" && isset($argv[2]) && $argv[2] == "all")
+		$res = $db->prepare("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE ( relnamestatus in (1, 20, 21, 22) AND categoryID BETWEEN 8000 AND 8999)" .$where);
 
-   $total = $res->rowCount();
+    $res->execute();
+    $total = $res->rowCount();
 	if ($total > 0)
 	{
 		$consoletools = new ConsoleTools();
