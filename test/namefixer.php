@@ -77,18 +77,34 @@ class Namefixer
 		if ($time == 2 && $cats == 2)
 			$relres = $db->queryDirect($query.$this->fullall);
 
-		$rowcount = $relres->rowCount();
-		if ($rowcount > 0)
+		if ($relres->rowCount() > 0)
 		{
-			while ($relrow = $functions->queryArray($relres))
+			foreach ($relres as $relrow)
 
             {
-				$this->done = $this->matched = false;
-				$this->checkName($relrow, $echo, $type, $namestatus);
-				$this->checked++;
-				if ($this->checked % 500 == 0)
-					echo $this->checked." NFOs processed.\n\n";
-			}
+                if (preg_match('/^=newz\[NZB\]=\w+/', $relrow['textstring']))
+ 				{
+-					$fail = $db->prepare(sprintf("UPDATE releases SET relnamestatus = 20 WHERE id = %d", $relrow['rel.id']));
+-					$fail->execute();
+                }
+
+                elseif (preg_match('/[^._-]?([A-Z0-9][-.\w]{5,}-[A-Za-z0-9]{2,})(\.[A-Za-z0-9]{2,3})?/', $relrow['textstring']))
+				{
+					$this->done = $this->matched = false;
+					$this->checkName($relrow, $echo, $type, $namestatus);
+					$this->checked++;
+					if ($this->checked % 500 == 0)
+						echo $this->checked." NFOs processed.\n\n";
+				}
+				else
+				{
+					$this->done = $this->matched = false;
+					$this->checkName($relrow, $echo, $type, $namestatus);
+					$this->checked++;
+					if ($this->checked % 500 == 0)
+						echo $this->checked." NFOs processed.\n\n";
+				}
+            }
 			if($echo == 1)
 				echo $this->fixed." releases have had their names changed out of: ".$this->checked." NFO's.\n";
 			else
@@ -319,7 +335,7 @@ class Namefixer
 							"New cat:   ".$functions->getNameByID($determinedcat).$n.
 							"Old cat:   ".$functions->getNameByID($release["categoryID"]).$n.
 							"Group:     ".$functions->getByNameByID($release["groupID"]).$n.
-							"Method:    "."predb md5 release name: ".$row["source"].$n.
+							"Method:    "."prehash md5 release name: ".$row["source"].$n.
 							"ReleaseID: ". $release["ID"].$n.$n);
 					}
 					$matching++;
