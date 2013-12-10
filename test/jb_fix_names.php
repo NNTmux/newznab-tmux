@@ -88,13 +88,13 @@ function preName($argv)
 					$groupname = $functions->getByNameByID($row["groupID"]);
 					$oldcatname = $functions->getNameByID($row["categoryID"]);
 					$newcatname = $functions->getNameByID($determinedcat);
-					echo	$n."New name:  ".$cleanName.$n.
+					echo $this->c->primary ($n."New name:  ".$cleanName.$n.
 						"Old name:  ".$row["searchname"].$n.
 						"New cat:   ".$newcatname.$n.
 						"Old cat:   ".$oldcatname.$n.
 						"Group:     ".$groupname.$n.
 						"Method:    "."jonnyboy's regexes".$n.
-						"ReleaseID: ". $row["ID"].$n;
+						"ReleaseID: ". $row["ID"].$n; );
                     if ($increment == true)
 					    $updated++;
 				}
