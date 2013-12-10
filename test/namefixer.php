@@ -84,7 +84,7 @@ class Namefixer
             {
                 if (preg_match('/^=newz\[NZB\]=\w+/', $relrow['textstring']))
  				{
--					$fail = $db->prepare(sprintf("UPDATE releases SET relnamestatus = 20 WHERE id = %d", $relrow['rel.id']));
+-					$fail = $db->prepare(sprintf("UPDATE releases SET relnamestatus = 20 WHERE ID = %d", $relrow['rel.ID']));
 -					$fail->execute();
                 }
 
