@@ -83,7 +83,7 @@ function preName($argv)
 				}
 				if ( $cleanerName != $row['name'] )
 				{
-					$determinedcat = $category->determineCategory($row["groupID"], $cleanerName);
+					$determinedcat = $category->determineCategory($row["groupID"], $cleanName);
 					$run = $db->exec(sprintf("UPDATE releases set relnamestatus = 16, searchname = %s, categoryID = %d where ID = %d", $db->escapeString($cleanerName), $db->escapeString($determinedcat), $db->escapeString($row['ID'])));
 					$groupname = $functions->getByNameByID($row["groupID"]);
 					$oldcatname = $functions->getNameByID($row["categoryID"]);
