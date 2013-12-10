@@ -45,7 +45,7 @@ function preName($argv)
 		$consoletools = new ConsoleTools();
 		foreach ($res as $row)
 		{
-            $groupname = $functions->getByNameByID($release["groupID"]);
+            $groupname = $functions->getByNameByID($row["groupID"]);
             $cleanerName = releaseCleaner($row['name'], $row['groupID'], $row['ID'], $groupname);
 			if (!is_array($cleanerName))
 				$cleanName = trim($cleanerName);
