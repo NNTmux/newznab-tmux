@@ -170,7 +170,7 @@ function releaseCleaner($subject, $groupID, $ID, $groupname)
 {
 	$groups = new Groups();
     $functions = new Functions();
-	$groupName = $functions->getByNameByID($groupID);
+	$groupname = $functions->getByNameByID($groupID);
     $db = new DB();
 	$namecleaning = new nameCleaning();
 	$propername = true;
