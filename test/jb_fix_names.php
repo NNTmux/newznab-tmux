@@ -87,7 +87,7 @@ function preName($argv)
 					$groupname = $functions->getByNameByID($row["groupID"]);
 					$oldcatname = $functions->getNameByID($row["categoryID"]);
 					$newcatname = $functions->getNameByID($determinedcat);
-					echo	$n."New name:  ".$cleanerName.$n.
+					echo	$n."New name:  ".$cleanName.$n.
 						"Old name:  ".$row["searchname"].$n.
 						"New cat:   ".$newcatname.$n.
 						"Old cat:   ".$oldcatname.$n.
