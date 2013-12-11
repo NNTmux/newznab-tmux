@@ -251,7 +251,7 @@ class Namefixer
 					$groups = new Groups();
                     $functions = new Functions ();
 					$groupname = $functions->getByNameByID($release["groupID"]);
-					$oldcatname = $functions->getNameByID($release["categoryID"]);
+					$oldcatname = $functions->getNameByID($release["categoryid"]);
 					$newcatname = $functions->getNameByID($determinedcat);
                     $n = "\n";
 
@@ -263,7 +263,7 @@ class Namefixer
 							"Old cat:   ".$oldcatname.$n.
 							"Group:     ".$groupname.$n.
 							"Method:    ".$type.$method.$n.
-							"ReleaseID: ". $release["releaseID"].$n);
+							"ReleaseID: ". $release["id"].$n);
 					if ($type !== "PAR2, ")
 						echo $n;
 				}
@@ -316,12 +316,12 @@ class Namefixer
 						$this->matched = true;
 						if ($namestatus == 1)
                         {
-							$md = $db->prepare(sprintf("UPDATE releases SET searchname = %s, categoryID = %d, relnamestatus = 10, dehashstatus = 1 WHERE ID = %d", $db->escapeString($row["title"]), $determinedcat, $release["ID"]));
+							$md = $db->prepare(sprintf("UPDATE releases SET searchname = %s, categoryID = %d, relnamestatus = 10, dehashstatus = 1 WHERE ID = %d", $db->escapeString($row["title"]), $determinedcat, $release["id"]));
                             $md->execute();
                         }
 						else
                         {
-							$md = $db->prepare(sprintf("UPDATE releases SET searchname = %s, categoryID = %d, dehashstatus = 1 WHERE ID = %d", $db->escapeString($row["title"]), $determinedcat, $release["ID"]));
+							$md = $db->prepare(sprintf("UPDATE releases SET searchname = %s, categoryID = %d, dehashstatus = 1 WHERE ID = %d", $db->escapeString($row["title"]), $determinedcat, $release["id"]));
                             $md->execute();
                         }
 					}
@@ -333,7 +333,7 @@ class Namefixer
 						echo $this->c->primary ( $n."New name:  ".$row["title"].$n.
 							"Old name:  ".$release["searchname"].$n.
 							"New cat:   ".$functions->getNameByID($determinedcat).$n.
-							"Old cat:   ".$functions->getNameByID($release["categoryID"]).$n.
+							"Old cat:   ".$functions->getNameByID($release["categoryid"]).$n.
 							"Group:     ".$functions->getByNameByID($release["groupID"]).$n.
 							"Method:    "."prehash md5 release name: ".$row["source"].$n.
 							"ReleaseID: ". $release["ID"].$n.$n);
