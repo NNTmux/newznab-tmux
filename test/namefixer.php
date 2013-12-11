@@ -316,12 +316,12 @@ class Namefixer
 						$this->matched = true;
 						if ($namestatus == 1)
                         {
-							$md = $db->prepare(sprintf("UPDATE releases SET searchname = %s, categoryID = %d, relnamestatus = 10, dehashstatus = 1 WHERE ID = %d", $db->escapeString($row["title"]), $determinedcat, $release["id"]));
+							$md = $db->prepare(sprintf("UPDATE releases SET searchname = %s, categoryID = %d, relnamestatus = 10, dehashstatus = 1 WHERE ID = %d", $db->escapeString($row["title"]), $determinedcat, $release["ID"]));
                             $md->execute();
                         }
 						else
                         {
-							$md = $db->prepare(sprintf("UPDATE releases SET searchname = %s, categoryID = %d, dehashstatus = 1 WHERE ID = %d", $db->escapeString($row["title"]), $determinedcat, $release["id"]));
+							$md = $db->prepare(sprintf("UPDATE releases SET searchname = %s, categoryID = %d, dehashstatus = 1 WHERE ID = %d", $db->escapeString($row["title"]), $determinedcat, $release["ID"]));
                             $md->execute();
                         }
 					}
@@ -336,7 +336,7 @@ class Namefixer
 							"Old cat:   ".$functions->getNameByID($release["categoryid"]).$n.
 							"Group:     ".$functions->getByNameByID($release["groupID"]).$n.
 							"Method:    "."prehash md5 release name: ".$row["source"].$n.
-							"ReleaseID: ". $release["id"].$n.$n);
+							"ReleaseID: ". $release["ID"].$n.$n);
 					}
 					$matching++;
 				}
