@@ -251,7 +251,7 @@ class Namefixer
 					$groups = new Groups();
                     $functions = new Functions ();
 					$groupname = $functions->getByNameByID($release["groupID"]);
-					$oldcatname = $functions->getNameByID($release["categoryid"]);
+					$oldcatname = $functions->getNameByID($release["categoryID"]);
 					$newcatname = $functions->getNameByID($determinedcat);
                     $n = "\n";
 
@@ -263,7 +263,7 @@ class Namefixer
 							"Old cat:   ".$oldcatname.$n.
 							"Group:     ".$groupname.$n.
 							"Method:    ".$type.$method.$n.
-							"ReleaseID: ". $release["id"].$n);
+							"ReleaseID: ". $release["ID"].$n);
 					if ($type !== "PAR2, ")
 						echo $n;
 				}
