@@ -336,7 +336,7 @@ class Namefixer
 							"Old cat:   ".$functions->getNameByID($release["categoryid"]).$n.
 							"Group:     ".$functions->getByNameByID($release["groupID"]).$n.
 							"Method:    "."prehash md5 release name: ".$row["source"].$n.
-							"ReleaseID: ". $release["ID"].$n.$n);
+							"ReleaseID: ". $release["id"].$n.$n);
 					}
 					$matching++;
 				}
