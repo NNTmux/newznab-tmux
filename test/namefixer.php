@@ -263,7 +263,7 @@ class Namefixer
 							"Old cat:   ".$oldcatname.$n.
 							"Group:     ".$groupname.$n.
 							"Method:    ".$type.$method.$n.
-							"ReleaseID: ". $release["ID"].$n);
+							"ReleaseID: ". $release["releaseID"].$n);
 					if ($type !== "PAR2, ")
 						echo $n;
 				}
