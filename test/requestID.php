@@ -100,10 +100,31 @@ class reqID
 		    $groupID = $functions->getIDByName('alt.binaries.erotica');
 	    else if (preg_match('/\[#?a\.b\.foreign\]/', $oldname))
 		    $groupID = $functions->getIDByName('alt.binaries.mom');
-	    else if ($groupName == 'alt.binaries.etc')
+        else if ($groupName == 'alt.binaries.etc')
 		    $groupID = $functions->getIDByName('alt.binaries.teevee');
+            //groups below are added for testing purposes
         else if (preg_match('/\[#?a\.b\.mom\]/', $oldname))
 		    $groupID = $functions->getIDByName('alt.binaries.mom');
+        else if ($groupName == 'alt.binaries.mom')
+		    $groupID = $functions->getIDByName('alt.binaries.mom');
+        else if ($groupName == 'alt.binaries.town.xxx')
+		    $groupID = $functions->getIDByName('alt.binaries.erotica');
+        else if (preg_match('/\[#?a\.b\.town\.xxx\]/', $oldname))
+		    $groupID = $functions->getIDByName('alt.binaries.erotica');
+        else if ($groupName == 'alt.binaries.tvseries')
+		    $groupID = $functions->getIDByName('alt.binaries.teevee');
+        else if (preg_match('/\[#?a\.b\.tvseries\]/', $oldname))
+		    $groupID = $functions->getIDByName('alt.binaries.teevee');
+        else if ($groupName == 'alt.binaries.x264')
+		    $groupID = $functions->getIDByName('alt.binaries.teevee');
+        else if (preg_match('/\[#?a\.b\.x264\]/', $oldname))
+		    $groupID = $functions->getIDByName('alt.binaries.teevee');
+        else if ($groupName == 'alt.binaries.town')
+		    $groupID = $functions->getIDByName('alt.binaries.teevee');
+        else if (preg_match('/\[#?a\.b\.town\]/', $oldname))
+		    $groupID = $functions->getIDByName('alt.binaries.teevee');
+
+
 
 	    $run = $db->queryOneRow(sprintf("SELECT title FROM prehash WHERE requestID = %d AND groupID = %d", $requestID, $groupID));
 	    if (isset($run['title']))
