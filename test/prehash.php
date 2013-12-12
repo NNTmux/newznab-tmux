@@ -197,13 +197,13 @@ Class Predb
                 $buffer = getUrl("http://pre.zenet.org/live.php");
                 if ($buffer !== false && strlen($buffer))
                 {
-                        if (preg_match_all('/<div class="mini-layout fluid">(\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+<\/div>)/s', $buffer, $matches))
+                       if (preg_match_all('/<div class="mini-layout fluid">((\s+\S+)?\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+(\S+\s+)?(\S+\s+)?(\S+\s+)?(\S+\s+)?(\S+\s+)?(\S+\s+)?(\S+\s+)?<\/div>\s+<\/div>)/s', $buffer, $matches))
                         {
                                 foreach ($matches as $match)
                                 {
                                         foreach ($match as $m)
                                         {
-                                                if (preg_match('/<span class="bold">(?P<predate>\d{4}-\d{2}-\d{2} \d{2}:\d{2})<\/span>.+<a href="\?post=\d+"><b><font color="#\d+">(?P<title>.+)<\/font><\/b><\/a>.+<p><a href="\?cats=.+"><font color="#FF9900">(?P<category>.+)<\/font><\/a> \| (?P<size1>[\d\.,]+)(?P<size2>[MGK]B) \/.+<\/div>/s', $m, $matches2))
+                                                if (preg_match('/<span class="bold">(?P<predate>\d{4}-\d{2}-\d{2} \d{2}:\d{2})<\/span>.+<a href="\?post=\d+"><b><font color="#\d+">(?P<title>.+)<\/font><\/b><\/a>.+<p><a href="\?cats=.+"><font color="#FF9900">(?P<category>.+)<\/font><\/a> \| (?P<size1>[\d\.,]+)?(?P<size2>[MGK]B)? \/.+<\/div>/s', $m, $matches2))
                                                 {
                                                     $predate = $db->escapeString($matches2['predate']);
 							                        $md5 = $db->escapeString(md5($matches2['title']));
@@ -223,7 +223,8 @@ Class Predb
 								                                else
 									                                $category = 'NULL';
 
-                                                                $db->exec(sprintf('INSERT IGNORE INTO prehash (title, size, category, predate, adddate, source, hash) VALUES (%s, %s, %s, %s, now(), %s, %s)', $title, $size, $category, $predate, $db->escapeString('zenet'), $md5));
+                                                                $run = $db->queryInsert(sprintf('INSERT IGNORE INTO prehash (title, size, category, predate, adddate, source, hash) VALUES (%s, %s, %s, %s, now(), %s, %s)', $title, $size, $category, $predate, $db->escapeString('zenet'), $md5));
+                                                                if ($run)
                                                                 $newnames++;
                                                         }
                                                 }
@@ -406,7 +407,7 @@ Class Predb
 								$md5 = $db->escapeString(md5($matches2["title"]));
 								$predate = $db->escapeString($matches2["predate"]);
 								$source = $db->escapeString('allfilled');
-								$run = $db->exec(sprintf("INSERT IGNORE INTO prehash (title, predate, adddate, source, hash, requestID, groupID) VALUES (%s, %s, now(), %s, %s, %s, %d) ON DUPLICATE KEY UPDATE predate = %s, requestID = %d, groupID = %d", $title, $predate, $source, $md5, $requestID, $groupID, $predate, $requestID, $groupID));
+								$run = $db->exec(sprintf("INSERT IGNORE INTO prehash (title, predate, adddate, source, hash, requestID, groupID) VALUES (%s, %s, now(), %s, %s, %s, %d) ON DUPLICATE KEY UPDATE requestID = %d, groupID = %d", $title, $predate, $source, $md5, $requestID, $groupID, $predate, $requestID, $groupID));
 							}
 						}
 					}
@@ -440,7 +441,7 @@ Class Predb
 								$md5 = $db->escapeString(md5($matches2["title"]));
 								$predate = $db->escapeString($matches2["predate"]);
 								$source = $db->escapeString('allfilled');
-								$run = $db->exec(sprintf("INSERT IGNORE INTO prehash (title, predate, adddate, source, hash, requestID, groupID) VALUES (%s, %s, now(), %s, %s, %s, %d) ON DUPLICATE KEY UPDATE predate = %s, requestID = %d, groupID = %d", $title, $predate, $source, $md5, $requestID, $groupID, $predate, $requestID, $groupID));
+								$run = $db->exec(sprintf("INSERT IGNORE INTO prehash (title, predate, adddate, source, hash, requestID, groupID) VALUES (%s, %s, now(), %s, %s, %s, %d) ON DUPLICATE KEY UPDATE requestID = %d, groupID = %d", $title, $predate, $source, $md5, $requestID, $groupID, $predate, $requestID, $groupID));
 							}
 						}
 					}
@@ -474,7 +475,7 @@ Class Predb
 								$md5 = $db->escapeString(md5($matches2["title"]));
 								$predate = $db->escapeString($matches2["predate"]);
 								$source = $db->escapeString('allfilled');
-								$run = $db->exec(sprintf("INSERT IGNORE INTO prehash (title, predate, adddate, source, hash, requestID, groupID) VALUES (%s, %s, now(), %s, %s, %s, %d) ON DUPLICATE KEY UPDATE predate = %s, requestID = %d, groupID = %d", $title, $predate, $source, $md5, $requestID, $groupID, $predate, $requestID, $groupID));
+								$run = $db->exec(sprintf("INSERT IGNORE INTO prehash (title, predate, adddate, source, hash, requestID, groupID) VALUES (%s, %s, now(), %s, %s, %s, %d) ON DUPLICATE KEY UPDATE requestID = %d, groupID = %d", $title, $predate, $source, $md5, $requestID, $groupID, $predate, $requestID, $groupID));
 							}
 						}
 					}
@@ -508,7 +509,7 @@ Class Predb
 								$md5 = $db->escapeString(md5($matches2["title"]));
 								$predate = $db->escapeString($matches2["predate"]);
 								$source = $db->escapeString('allfilled');
-								$run = $db->exec(sprintf("INSERT IGNORE INTO prehash (title, predate, adddate, source, hash, requestID, groupID) VALUES (%s, %s, now(), %s, %s, %s, %d) ON DUPLICATE KEY UPDATE predate = %s, requestID = %d, groupID = %d", $title, $predate, $source, $md5, $requestID, $groupID, $predate, $requestID, $groupID));
+								$run = $db->exec(sprintf("INSERT IGNORE INTO prehash (title, predate, adddate, source, hash, requestID, groupID) VALUES (%s, %s, now(), %s, %s, %s, %d) ON DUPLICATE KEY UPDATE requestID = %d, groupID = %d", $title, $predate, $source, $md5, $requestID, $groupID, $predate, $requestID, $groupID));
 							}
 						}
 					}

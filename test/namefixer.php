@@ -333,7 +333,7 @@ class Namefixer
 						echo $this->c->primary ( $n."New name:  ".$row["title"].$n.
 							"Old name:  ".$release["searchname"].$n.
 							"New cat:   ".$functions->getNameByID($determinedcat).$n.
-							"Old cat:   ".$functions->getNameByID($release["categoryID"]).$n.
+							"Old cat:   ".$functions->getNameByID($release["categoryid"]).$n.
 							"Group:     ".$functions->getByNameByID($release["groupID"]).$n.
 							"Method:    "."prehash md5 release name: ".$row["source"].$n.
 							"ReleaseID: ". $release["ID"].$n.$n);

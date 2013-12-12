@@ -107,11 +107,9 @@ class Functions
     public function getNameByID($ID)
 	{
 		$db = new DB();
-		$arr1 = $db->queryOneRow(sprintf("SELECT title from category where ID = %d", substr($ID, 0, 1)."000"));
-		$parent = array_shift($arr1);
-		$arr2 = $db->queryOneRow(sprintf("SELECT title from category where ID = %d", $ID));
-		$cat = array_shift($arr2);
-		return $parent." ".$cat;
+		$parent = $db->queryOneRow(sprintf("SELECT title FROM category WHERE ID = %d", substr($ID, 0, 1)."000"));
+		$cat = $db->queryOneRow(sprintf("SELECT title FROM category WHERE ID = %d", $ID));
+		return $parent["title"]." ".$cat["title"];
 	}
 
     public function getIDByName($name)
@@ -122,7 +120,7 @@ class Functions
 	}
 
     //deletes from releases
-    public function fastDelete($id, $guid, $site)
+    public function fastDelete($ID, $guid, $site)
 	{
 		$db = new DB();
 		$nzb = new NZB();
@@ -147,15 +145,15 @@ class Functions
 								LEFT OUTER JOIN releasesubs on releasesubs.releaseID = releases.ID
 								LEFT OUTER JOIN releasevideo on releasevideo.releaseID = releases.ID
 								LEFT OUTER JOIN releaseextrafull on releaseextrafull.releaseID = releases.ID
-							where releases.ID = %d", $id));
+							where releases.ID = %d", $ID));
 
 		$ri->delete($guid); // This deletes a file so not in the query
 	}
     //reads name of group
-     public function getByNameByID($id)
+     public function getByNameByID($ID)
 	{
 		$db = new DB();
-		$res = $db->queryOneRow(sprintf("select name from groups where ID = %d ", $id));
+		$res = $db->queryOneRow(sprintf("select name from groups where ID = %d ", $ID));
 		return $res["name"];
 	}
      //Add release nfo, imported from nZEDb
