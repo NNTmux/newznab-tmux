@@ -341,12 +341,12 @@ Class Predb
 			foreach ($releases->channel->item as $release)
 			{
                 $md5 = md5($release->title);
-                $oldname = $db->queryOneRow(sprintf("SELECT title FROM prehash WHERE title = %s", $db->escapeString($md5)));
+                $oldname = $db->queryOneRow(sprintf("SELECT hash FROM prehash WHERE hash = %s", $db->escapeString($md5)));
 				if ($oldname !== false && $oldname["md5"] == $md5)
 					continue;
 				else
 				{
-					$db->exec(sprintf("INSERT IGNORE INTO prehash (title, predate, adddate, source, hash) VALUES (%s, FROM_UNIXTIME(".strtotime($release->pubDate)."), now(), %s, %s)", $db->escapeString($release->title), $db->escapeString("srrdb"), $db->escapeString($md5)));
+					$db->exec(sprintf('INSERT IGNORE INTO prehash (title, predate, adddate, source, hash) VALUES (%s, %s, now(), %s, %s)', $db->escapeString($release->title), $db->from_unixtime($release->pubDate), $db->escapeString('srrdb'), $db->escapeString($md5)))
 					$newnames++;
 				}
 			}
