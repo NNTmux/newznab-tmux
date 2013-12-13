@@ -333,6 +333,7 @@ Class Predb
    public function retrieveSrr()
 	{
 		$db = new DB();
+        $f = new Functions();
 		$newnames = 0;
 		$url = "http://www.srrdb.com/feed/srrs";
 
@@ -354,11 +355,11 @@ Class Predb
 			{
 				$md5 = md5($release->title);
 				$oldname = $db->queryOneRow(sprintf('SELECT hash FROM prehash WHERE hash = %s', $db->escapeString($md5)));
-				if ($oldname !== false && $oldname['md5'] == $md5)
+				if ($oldname !== false && $oldname['hash'] == $md5)
 					continue;
 				else
 				{
-					$db->exec(sprintf('INSERT IGNORE INTO prehash (title, predate, adddate, source, hash) VALUES (%s, %s, now(), %s, %s)', $db->escapeString($release->title), $db->from_unixtime(strtotime($release->pubDate)), $db->escapeString('srrdb'), $db->escapeString($md5)));$newnames++;
+					$db->exec(sprintf('INSERT IGNORE INTO prehash (title, predate, adddate, source, hash) VALUES (%s, %s, now(), %s, %s)', $db->escapeString($release->title), $f->from_unixtime(strtotime($release->pubDate)), $db->escapeString('srrdb'), $db->escapeString($md5)));$newnames++;
 				}
 			}
 		}

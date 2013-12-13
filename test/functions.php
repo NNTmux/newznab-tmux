@@ -103,6 +103,22 @@ class Functions
 		}
 		return $PDOstatement;
 	}
+    public function from_unixtime($utime, $escape=true)
+	{
+		if ($escape === true)
+		{
+		    return 'FROM_UNIXTIME('.$utime.')';
+		}
+		else
+			return date('Y-m-d h:i:s', $utime);
+	}
+
+	// Date to unix time.
+	// (substitute for mysql's UNIX_TIMESTAMP() function)
+	public function unix_timestamp($date)
+	{
+		return strtotime($date);
+	}
  //  gets name of category from category.php
     public function getNameByID($ID)
 	{
