@@ -28,7 +28,7 @@ class nameCleaning
 
 		Return: Trance.2013.DVDRiP.XViD-SML
 	*/
-   public function releaseCleaner($subject, $groupName)
+  	public function releaseCleaner($subject, $groupName)
 	{
 		if ($groupName === "alt.binaries.0day.stuffz")
 		{
