@@ -59,16 +59,16 @@ Class Predb
 			if ($this->echooutput)
 				echo $newpdme." Retrieved from Predb.me.\n";
             $newallm = $this->retrieveAllfilledMoovee();
-            if ($this->ecchooutput)
+            if ($this->echooutput)
                 echo $newallm."Retrieved from AllfilledMoovee.\n";
 			$newallt = $this->retrieveAllfilledTeevee();
-            if ($this->ecchooutput)
+            if ($this->echooutput)
                 echo $newallt."Retrieved from AllfilledTeevee.\n";
 			$newalle = $this->retrieveAllfilledErotica();
-            if ($this->ecchooutput)
+            if ($this->echooutput)
                 echo $newallt."Retrieved from AllfilledErotica.\n";
 			$newallf = $this->retrieveAllfilledForeign();
-            if ($this->ecchooutput)
+            if ($this->echooutput)
                 echo $newallm."Retrieved from AllfilledForeign.\n";
 			$newnames = $newwomble+$newomgwtf+$newzenet+$newprelist+$neworly+$newsrr+$newpdme+$newallm+$newallt+$newalle+$newallf;
 			if(count($newnames) > 0)
