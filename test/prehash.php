@@ -58,11 +58,19 @@ Class Predb
 			$newpdme = $this->retrievePredbme();
 			if ($this->echooutput)
 				echo $newpdme." Retrieved from Predb.me.\n";
-            $this->retrieveAllfilledMoovee();
-			$this->retrieveAllfilledTeevee();
-			$this->retrieveAllfilledErotica();
-			$this->retrieveAllfilledForeign();
-			$newnames = $newwomble+$newomgwtf+$newzenet+$newprelist+$neworly+$newsrr+$newpdme;
+            $newallm = $this->retrieveAllfilledMoovee();
+            if ($this->ecchooutput)
+                echo $newallm."Retrieved from AllfilledMoovee.\n";
+			$newallt = $this->retrieveAllfilledTeevee();
+            if ($this->ecchooutput)
+                echo $newallt."Retrieved from AllfilledTeevee.\n";
+			$newalle = $this->retrieveAllfilledErotica();
+            if ($this->ecchooutput)
+                echo $newallt."Retrieved from AllfilledErotica.\n";
+			$newallf = $this->retrieveAllfilledForeign();
+            if ($this->ecchooutput)
+                echo $newallm."Retrieved from AllfilledForeign.\n";
+			$newnames = $newwomble+$newomgwtf+$newzenet+$newprelist+$neworly+$newsrr+$newpdme+$newallm+$newallt+$newalle+$newallf;
 			if(count($newnames) > 0)
 				$db->exec(sprintf("UPDATE prehash SET adddate = now() where ID = %d", $newestrel["ID"]));
 		}
@@ -398,7 +406,7 @@ Class Predb
 	{
 		$db = new DB();
         $functions = new Functions();
-		$newnames = 0;
+		$newnames = $updated = 0;
 		$groups = new Groups();
 		$groupID = $functions->getIDByName('alt.binaries.moovee');
 		$buffer = @file_get_contents('http://abmoovee.allfilled.com/reqs.php?fetch=posted&page=1');
@@ -420,19 +428,21 @@ Class Predb
 								$predate = $db->escapeString($matches2["predate"]);
 								$source = $db->escapeString('allfilled');
 								$run = $db->exec(sprintf("INSERT IGNORE INTO prehash (title, predate, adddate, source, hash, requestID, groupID) VALUES (%s, %s, now(), %s, %s, %s, %d) ON DUPLICATE KEY UPDATE requestID = %d, groupID = %d", $title, $predate, $source, $md5, $requestID, $groupID, $predate, $requestID, $groupID));
+                                $newnames++;
 							}
 						}
 					}
 				}
 			}
 		}
+        return $newnames;
 	}
 
 	public function retrieveAllfilledTeevee()
 	{
 		$db = new DB();
         $functions = new Functions();
-		$newnames = 0;
+		$newnames = $updated = 0;
 		$groups = new Groups();
 		$groupID = $functions->getIDByName('alt.binaries.teevee');
 		$buffer = @file_get_contents('http://abteevee.allfilled.com/reqs.php?fetch=posted&page=1');
@@ -454,19 +464,21 @@ Class Predb
 								$predate = $db->escapeString($matches2["predate"]);
 								$source = $db->escapeString('allfilled');
 								$run = $db->exec(sprintf("INSERT IGNORE INTO prehash (title, predate, adddate, source, hash, requestID, groupID) VALUES (%s, %s, now(), %s, %s, %s, %d) ON DUPLICATE KEY UPDATE requestID = %d, groupID = %d", $title, $predate, $source, $md5, $requestID, $groupID, $predate, $requestID, $groupID));
+                            $newnames++;
 							}
 						}
 					}
 				}
 			}
 		}
+        return $newnames;
 	}
 
 	public function retrieveAllfilledErotica()
 	{
 		$db = new DB();
         $functions = new Functions();
-		$newnames = 0;
+		$newnames = $updated = 0;
 		$groups = new Groups();
 		$groupID = $functions->getIDByName('alt.binaries.erotica');
 		$buffer = @file_get_contents('http://aberotica.allfilled.com/reqs.php?fetch=posted&page=1');
@@ -488,19 +500,21 @@ Class Predb
 								$predate = $db->escapeString($matches2["predate"]);
 								$source = $db->escapeString('allfilled');
 								$run = $db->exec(sprintf("INSERT IGNORE INTO prehash (title, predate, adddate, source, hash, requestID, groupID) VALUES (%s, %s, now(), %s, %s, %s, %d) ON DUPLICATE KEY UPDATE requestID = %d, groupID = %d", $title, $predate, $source, $md5, $requestID, $groupID, $predate, $requestID, $groupID));
+                            $newnames++;
 							}
 						}
 					}
 				}
 			}
 		}
+        return $newnames;
 	}
 
 	public function retrieveAllfilledForeign()
 	{
 		$db = new DB();
         $functions = new Functions();
-		$newnames = 0;
+		$newnames = $updated = 0;
 		$groups = new Groups();
 		$groupID = $functions->getIDByName('alt.binaries.mom');
 		$buffer = @file_get_contents('http://abforeign.allfilled.com/reqs.php?fetch=posted&page=1');
@@ -522,12 +536,14 @@ Class Predb
 								$predate = $db->escapeString($matches2["predate"]);
 								$source = $db->escapeString('allfilled');
 								$run = $db->exec(sprintf("INSERT IGNORE INTO prehash (title, predate, adddate, source, hash, requestID, groupID) VALUES (%s, %s, now(), %s, %s, %s, %d) ON DUPLICATE KEY UPDATE requestID = %d, groupID = %d", $title, $predate, $source, $md5, $requestID, $groupID, $predate, $requestID, $groupID));
+                            $newnames++;
 							}
 						}
 					}
 				}
 			}
 		}
+        return $newnames;
 	}
 
 	// Update a single release as it's created.
