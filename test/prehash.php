@@ -346,7 +346,7 @@ Class Predb
 					continue;
 				else
 				{
-					$db->exec(sprintf('INSERT IGNORE INTO prehash (title, predate, adddate, source, hash) VALUES (%s, %s, now(), %s, %s)', $db->escapeString($release->title), $db->from_unixtime($release->pubDate), $db->escapeString('srrdb'), $db->escapeString($md5)))
+					$db->exec(sprintf('INSERT IGNORE INTO prehash (title, predate, adddate, source, hash) VALUES (%s, %s, now(), %s, %s)', $db->escapeString($release->title), $db->from_unixtime($release->pubDate), $db->escapeString('srrdb'), $db->escapeString($md5)));
 					$newnames++;
 				}
 			}
