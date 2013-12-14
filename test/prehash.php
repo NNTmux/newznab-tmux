@@ -60,16 +60,16 @@ Class Predb
 				echo $newpdme." Retrieved from Predb.me.\n";
             $newallm = $this->retrieveAllfilledMoovee();
             if ($this->echooutput)
-                echo $newallm."Retrieved from AllfilledMoovee.\n";
+                echo $newallm." Retrieved from AllfilledMoovee.\n";
 			$newallt = $this->retrieveAllfilledTeevee();
             if ($this->echooutput)
-                echo $newallt."Retrieved from AllfilledTeevee.\n";
+                echo $newallt." Retrieved from AllfilledTeevee.\n";
 			$newalle = $this->retrieveAllfilledErotica();
             if ($this->echooutput)
-                echo $newallt."Retrieved from AllfilledErotica.\n";
+                echo $newallt." Retrieved from AllfilledErotica.\n";
 			$newallf = $this->retrieveAllfilledForeign();
             if ($this->echooutput)
-                echo $newallm."Retrieved from AllfilledForeign.\n";
+                echo $newallm." Retrieved from AllfilledForeign.\n";
 			$newnames = $newwomble+$newomgwtf+$newzenet+$newprelist+$neworly+$newsrr+$newpdme+$newallm+$newallt+$newalle+$newallf;
 			if(count($newnames) > 0)
 				$db->exec(sprintf("UPDATE prehash SET adddate = now() where ID = %d", $newestrel["ID"]));
