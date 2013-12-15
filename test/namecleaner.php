@@ -28,7 +28,7 @@ class nameCleaning
 
 		Return: Trance.2013.DVDRiP.XViD-SML
 	*/
-  	public function releaseCleaner($subject, $groupName)
+public function releaseCleaner($subject, $groupName)
 	{
 		if ($groupName === "alt.binaries.0day.stuffz")
 		{
@@ -436,6 +436,12 @@ class nameCleaning
 			//Place2home.net - Diablo_III_USA_RF_XBOX360-PROTOCOL - "d3-ptc.r34" yEnc
 			else if (preg_match('/^place2home\.net - (.*?) - (\[\d+\/\d+\] - )?".+?" yEnc$/i', $subject, $match))
 				return $match[1];
+			//[scnzbefnet][500934] Super.Fun.Night.S01E09.720p.HDTV.X264-DIMENSION [1/19] - "bieber.109.720p-dimension.sfv" yEnc
+			else if (preg_match('/^\[scnzbefnet\]\[(\d+)\] (.+?) \[\d+\/(\d+\]) - ".+?" yEnc$/', $subject, $match))
+				return $match[2];
+			//(Ancient.Aliens.S03E05.Aliens.and.Mysterious.Rituals.720p.HDTV.x264.AC3.2Ch.REPOST) [41/42] - "Ancient.Aliens.S03E05.Aliens.and.Mysterious.Rituals.720p.HDTV.x264.AC3.2Ch.REPOST.vol071+66.PAR2" yEnc
+			else if (preg_match('/^(\((.+?)\) \[)\d+(\/\d+] - ").+?" yEnc$/', $subject, $match))
+				return $match[2];
 			else
 				return array("cleansubject" => $this->releaseCleanerHelper($subject), "properlynamed" => false);
 		}
@@ -737,6 +743,9 @@ class nameCleaning
 			//#sterntuary - Alex Jones Radio Show - "05-03-2009_INFO_BAK_ALJ.nfo" yEnc
 			if (preg_match('/^#sterntuary - (.+? - ".+?)' . $this->e1, $subject, $match))
 				return $match[1];
+			//(24/24) "BBC Great British Garden Revival 03 of 10 Cottage Gardens And House Plants 2013.vol27+22.PAR2" - 48.39 MB - 808.88 MB - yEnc
+			else if (preg_match('/^\(\d+\/(\d+\) "BBC )(.+?)(\.part\d+)?(\.(par2|(vol.+?))"|\.[a-z0-9]{3}"|") - \d.+? - (\d.+? -)? yEnc$/', $subject, $match))
+				return $match[2];
 			else
 				return array("cleansubject" => $this->releaseCleanerHelper($subject), "properlynamed" => false);
 		}
@@ -1832,7 +1841,6 @@ class nameCleaning
 		else
 			return array("cleansubject" => $this->releaseCleanerHelper($subject), "properlynamed" => false);
 	}
-
    public function releaseCleanerHelper($subject)
 	{
 		$cleanerName = preg_replace('/(- )?yEnc$/', '', $subject);
