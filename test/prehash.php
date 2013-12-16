@@ -355,8 +355,7 @@ Class Predb
 		);
 
 		$context = stream_context_create($options);
-		$releases = file_get_contents($url, false, $context);
-		$releases = @simplexml_load_string($releases);
+		$releases = @simplexml_load_string(@file_get_contents($url, false, $context));
 		if ($releases !== false)
 		{
 			foreach ($releases->channel->item as $release)
