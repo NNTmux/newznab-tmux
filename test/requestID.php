@@ -7,48 +7,60 @@ require_once("functions.php");
 require_once("ColorCLI.php");
 require_once("consoletools.php");
 
-class reqID
-{
+//This script is adapted from nZEDB requestID.php
 
+$c = new ColorCLI;
+if (!isset($argv[1]) || ( $argv[1] != "all" && $argv[1] != "full" && !is_numeric($argv[1])))
+	exit($c->error("\nThis script tries to match an MD5 of the releases.name or releases.searchname to predb.md5 doing local lookup only.\n"
+		."php requestid.php 1000		...: to limit to 1000 sorted by newest postdate.\n"
+		."php requestid.php full 		...: to run on full database.\n"
+		."php requestid.php all 		...: to run on all hashed releases(including previously renamed).\n"));
 
-    public function reqID()
-    {
-        $c = new ColorCLI();
-        echo $c->header ("\nRequestID matching Started at ".date("H:i:s")."\nMatching prehash requestID to release name");
-        $db = new DB();
-        $functions = new Functions();
-        $timestart = TIME();
-        $n = "\n";
-        $category = new Category();
-        $groups = new Groups();
-        $res = $db->queryDirect("SELECT r.ID, r.name, g.name AS groupname FROM releases r LEFT JOIN groups g ON r.groupID = g.ID WHERE relnamestatus IN (1, 20, 21, 22) AND reqidstatus in (0, -1)");
+$db = new DB();
+$functions = new Functions();
+$n = "\n";
+$category = new Category();
+$groups = new Groups();
+$consoletools = new ConsoleTools();
+$timestart = TIME();
+$counter = 0;
+
+if (isset($argv[1]) && $argv[1] === "all")
+	$res = $db->queryDirect("SELECT r.ID, r.name, r.categoryID, g.name AS groupname FROM releases r LEFT JOIN groups g ON r.groupID = g.ID WHERE relnamestatus IN (1, 20, 21, 22)");
+else if (isset($argv[1]) && $argv[1] === "full")
+	$res = $db->queryDirect("SELECT r.ID, r.name, r.categoryID, g.name AS groupname FROM releases r LEFT JOIN groups g ON r.groupID = g.ID WHERE relnamestatus IN (1, 20, 21, 22) AND reqidstatus in (0, -1)");
+else if (isset($argv[1]) && is_numeric($argv[1]))
+	$res = $db->queryDirect("SELECT r.ID, r.name, r.categoryID, g.name AS groupname FROM releases r LEFT JOIN groups g ON r.groupID = g.ID WHERE relnamestatus IN (1, 20, 21, 22) AND reqidstatus in (0, -1) ORDER BY postdate DESC LIMIT " . $argv[1]);
+
         $total = $res->rowCount();
         if ($total > 0)
         {
+          	$precount = $db->queryOneRow('SELECT COUNT(*) AS count FROM prehash WHERE requestID > 0');
+	echo $c->header("\nComparing ".number_format($total).' releases against '.number_format($precount['count'])." Local requestID's.");
+	sleep(2);
+
             foreach ($res as $row)
             {
-                if (!preg_match('/^\[\d+\]/', $row['name']))
-                {
-	                $db->exec('UPDATE releases SET reqidstatus = -2 WHERE ID = ' . $row["ID"]);
-	                exit ($c->info ("\nNothing to do."));
-                }
+               if (!preg_match('/^\[\d+\]/', $row['name']) && !preg_match('/^\[ \d+ \]/', $row['name']))
+		            {
+			        $db->exec('UPDATE releases SET reqidstatus = -2 WHERE ID = ' . $row['ID']);
+			        exit('-');
+		            }
 
-                $requestIDtmp = explode(']', substr($row["ID"], 1));
+                $requestIDtmp = explode(']', substr($row["name"], 1));
                 $bFound = false;
                 $newTitle = '';
-                $updated = 0;
 
                 if (count($requestIDtmp) >= 1)
                 {
-	                $requestID = (int) $requestIDtmp;
-	                if ($requestID != 0 and $requestID != '')
+	                $requestID = (int) trim($requestIDtmp[0]);
+			        if ($requestID != 0 and $requestID != '')
                     {
 		                // Do a local lookup
-		                $newTitle = $this->localLookup($requestID, $row["groupname"], $row["name"]);
+		                $newTitle = localLookup($requestID, $row["groupname"], $row["name"]);
 		                if ($newTitle != false && $newTitle != '')
-		                {
-			                $bFound = true;
-		                }
+			            $bFound = true;
+
 	                }
                 }
 
@@ -59,31 +71,31 @@ class reqID
 	                $run = $db->prepare(sprintf('UPDATE releases SET reqidstatus = 1, relnamestatus = 12, searchname = %s, categoryID = %d where ID = %d', $db->escapeString($newTitle), $determinedcat, $row["ID"]));
 	                $run->execute();
 	                $newcatname = $functions->getNameByID($determinedcat);
-	                $method = "requestID :";
+                    $oldcatname = $functions->getNameByID($row['categoryID']);
 
 	                echo 	$c->headerOver($n.$n.'New name:  ').$c->primary($newTitle).
-			                $c->headerOver('Old name:  ').$c->primary($oldname).
-			                $c->headerOver('New cat:   ').$c->primary($newcatname).
-			                $c->headerOver('Group:     ').$c->primary($groupname).
-			                $c->headerOver('Method:    ').$c->primary($method).
-			                $c->headerOver('ReleaseID: ').$c->primary($row["ID"]);
-	                $updated++;
+					$c->headerOver('Old name:  ').$c->primary($row['name']).
+					$c->headerOver('New cat:   ').$c->primary($newcatname).
+					$c->headerOver('Old cat:   ').$c->primary($oldcatname).
+					$c->headerOver('Group:     ').$c->primary($row['groupname']).
+					$c->headerOver('Method:    ').$c->primary('requestID local').
+					$c->headerOver('ReleaseID: ').$c->primary($row['ID']);
+			$counter++;
                 }
                 else
                 {
-	            $db->exec('UPDATE releases SET reqidstatus = -2 WHERE ID = ' . $row["ID"]);
+	            $db->exec('UPDATE releases SET reqidstatus = -3 WHERE ID = ' . $row["ID"]);
 	            echo '.';
                 }
-
+                }
             if ($total > 0)
-		        echo $c->header ( "\nRenamed ".$updated." releases.");
+		        echo $c->header("\nRenamed ".$counter." releases in ".$consoletools->convertTime(TIME() - $timestart).".");
 	        else
-		        echo $c->info ("\nNothing to do.");
-            }
-    }
+		        echo $c->info("\nNothing to do.");
     }
 
-    public function localLookup($requestID, $groupName, $oldname)
+
+    function localLookup($requestID, $groupName, $oldname)
     {
 	    $db = new DB();
 	    $groups = new Groups();
@@ -130,7 +142,7 @@ class reqID
 	    if (isset($run['title']))
 		    return $run['title'];
         }
-}
+
 
 
 
