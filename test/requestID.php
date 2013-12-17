@@ -12,9 +12,9 @@ require_once("consoletools.php");
 $c = new ColorCLI;
 if (!isset($argv[1]) || ( $argv[1] != "all" && $argv[1] != "full" && !is_numeric($argv[1])))
 	exit($c->error("\nThis script tries to match an MD5 of the releases.name or releases.searchname to predb.md5 doing local lookup only.\n"
-		."php requestid.php 1000		...: to limit to 1000 sorted by newest postdate.\n"
-		."php requestid.php full 		...: to run on full database.\n"
-		."php requestid.php all 		...: to run on all hashed releases(including previously renamed).\n"));
+		."php requestid.php 1000 true		...: to limit to 1000 sorted by newest postdate and show renaming.\n"
+		."php requestid.php full true		...: to run on full database and show renaming.\n"
+		."php requestid.php all true		...: to run on all hashed releases(including previously renamed) and show renaming.\n"));
 
 $db = new DB();
 $functions = new Functions();
@@ -70,22 +70,32 @@ else if (isset($argv[1]) && is_numeric($argv[1]))
 	                $determinedcat = $category->determineCategory($groupname, $newTitle);
 	                $run = $db->prepare(sprintf('UPDATE releases SET reqidstatus = 1, relnamestatus = 12, searchname = %s, categoryID = %d where ID = %d', $db->escapeString($newTitle), $determinedcat, $row["ID"]));
 	                $run->execute();
-	                $newcatname = $functions->getNameByID($determinedcat);
-                    $oldcatname = $functions->getNameByID($row['categoryID']);
+                    $counter++;
+	                if (isset($argv[2]) && $argv[2] === 'true')
+			            {
+				            $newcatname = $functions->getNameByID($determinedcat);
+				            $oldcatname = $functions->getNameByID($row['categoryID']);
 
-	                echo 	$c->headerOver($n.$n.'New name:  ').$c->primary($newTitle).
-					$c->headerOver('Old name:  ').$c->primary($row['name']).
-					$c->headerOver('New cat:   ').$c->primary($newcatname).
-					$c->headerOver('Old cat:   ').$c->primary($oldcatname).
-					$c->headerOver('Group:     ').$c->primary($row['groupname']).
-					$c->headerOver('Method:    ').$c->primary('requestID local').
-					$c->headerOver('ReleaseID: ').$c->primary($row['ID']);
-			$counter++;
-                }
+				            echo 	$c->headerOver($n.$n.'New name:  ').$c->primary($newTitle).
+						            $c->headerOver('Old name:  ').$c->primary($row['name']).
+						            $c->headerOver('New cat:   ').$c->primary($newcatname).
+						            $c->headerOver('Old cat:   ').$c->primary($oldcatname).
+						            $c->headerOver('Group:     ').$c->primary($row['groupname']).
+						            $c->headerOver('Method:    ').$c->primary('requestID local').
+						            $c->headerOver('ReleaseID: ').$c->primary($row['ID']);
+			            }
+			        else
+			        {
+				        if ($counter % 100 == 0)
+				    {
+					    echo ".";
+				    }
+			        }
+		        }
                 else
                 {
-	            $db->exec('UPDATE releases SET reqidstatus = -3 WHERE ID = ' . $row["ID"]);
-	            echo '.';
+	                $db->exec('UPDATE releases SET reqidstatus = -3 WHERE ID = ' . $row["ID"]);
+	                echo '.';
                 }
                 }
             if ($total > 0)
