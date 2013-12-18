@@ -158,7 +158,7 @@ class remove_parts_without_releases extends NNScripts
                     ),
                     $this->settings['querylimit']
                 );
-                $result = $this->db->query( $sql );
+                $result = $this->db->queryDirect( $sql );
                 if( is_array( $result ) && 0 < count( $result ) )
                 {
                     // Build the total ID list
