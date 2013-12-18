@@ -15,7 +15,7 @@ CREATE UNIQUE INDEX ix_prehash_md5 ON prehash(`hash`);
 CREATE UNIQUE INDEX ix_prehash_title ON prehash(`title`);
 
 #Import the predb dump file, from mysql
-LOAD DATA INFILE 'predb_temp.csv' IGNORE into table `prehash` (title, nfo, size, category, predate, adddate, source, hash, releaseID);
+LOAD DATA INFILE 'predb_temp.csv' IGNORE into table `prehash` (title, nfo, size, category, predate, adddate, source, hash, releaseID, requestID, groupID);
 
 #Remove the UNIQUE index, OPTIONAL
 drop index ix_prehash_md5 on prehash;
