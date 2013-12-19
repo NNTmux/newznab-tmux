@@ -67,7 +67,7 @@ function preName($argv)
 					if (preg_match('/^[0-9]{1,6}-[0-9]{1,6}-[0-9]{1,6}$/', $cleanName, $match))
 					{
 						$rf = new ReleaseFiles();
-						$files = $rf->get($row['id']);
+						$files = $rf->get($row['ID']);
 						if (count($files) == 1)
 						{
 							foreach ($files as $f)

@@ -67,7 +67,7 @@ class Backfill
 
 		$db = new DB();
 
-        $db->disableAutoCommit();
+        $db->beginTransaction();
 
 		$binaries = new Binaries();
 		$n = $this->n;
@@ -355,7 +355,7 @@ class Backfill
 
 		$db = new DB();
 
-        $db->disableAutoCommit();
+        $db->beginTransaction();
 
 		$binaries = new Binaries();
 		$n = $this->n;

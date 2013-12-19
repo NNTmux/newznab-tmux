@@ -61,7 +61,7 @@ Class Predb
             $this->retrieveAllfilledMoovee();
 			$this->retrieveAllfilledTeevee();
 			$this->retrieveAllfilledErotica();
-			$this->retrieveAllfilledForeign();
+		    $this->retrieveAllfilledForeign();
 			$newnames = $newwomble+$newomgwtf+$newzenet+$newprelist+$neworly+$newsrr+$newpdme;
 			if(count($newnames) > 0)
 				$db->exec(sprintf("UPDATE prehash SET adddate = now() where ID = %d", $newestrel["ID"]));
@@ -330,24 +330,35 @@ Class Predb
 		return $newnames;
 	}
 
-	public function retrieveSrr()
+   public function retrieveSrr()
 	{
 		$db = new DB();
         $f = new Functions();
-		$newnames = $updated = 0;
-		$releases = @simplexml_load_file('http://www.srrdb.com/feed/srrs');
+		$newnames = 0;
+		$url = "http://www.srrdb.com/feed/srrs";
+
+		$options = array(
+		  'http'=>array(
+			'method'=>"GET",
+			'header'=>"Accept-language: en\r\n" .
+					  "Cookie: foo=bar\r\n" .  // check function.stream-context-create on php.net
+					  "User-Agent: Mozilla/5.0 (iPad; U; CPU OS 3_2 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) Version/4.0.4 Mobile/7B334b Safari/531.21.102011-10-16 20:23:10\r\n" // i.e. An iPad
+		  )
+		);
+
+		$context = stream_context_create($options);
+		$releases = @simplexml_load_string(@file_get_contents($url, false, $context));
 		if ($releases !== false)
 		{
 			foreach ($releases->channel->item as $release)
 			{
-                $md5 = md5($release->title);
-                $oldname = $db->queryOneRow(sprintf("SELECT title FROM prehash WHERE title = %s", $db->escapeString($md5)));
-				if ($oldname !== false && $oldname["md5"] == $md5)
+				$md5 = md5($release->title);
+				$oldname = $db->queryOneRow(sprintf('SELECT hash FROM prehash WHERE hash = %s', $db->escapeString($md5)));
+				if ($oldname !== false && $oldname['hash'] == $md5)
 					continue;
 				else
 				{
-					$db->exec(sprintf("INSERT IGNORE INTO prehash (title, predate, adddate, source, hash) VALUES (%s, FROM_UNIXTIME(".strtotime($release->pubDate)."), now(), %s, %s)", $db->escapeString($release->title), $db->escapeString("srrdb"), $db->escapeString($md5)));
-					$newnames++;
+					$db->exec(sprintf('INSERT IGNORE INTO prehash (title, predate, adddate, source, hash) VALUES (%s, %s, now(), %s, %s)', $db->escapeString($release->title), $f->from_unixtime(strtotime($release->pubDate)), $db->escapeString('srrdb'), $db->escapeString($md5)));$newnames++;
 				}
 			}
 		}
@@ -386,7 +397,7 @@ Class Predb
 	{
 		$db = new DB();
         $functions = new Functions();
-		$newnames = 0;
+		$newnames = $updated = 0;
 		$groups = new Groups();
 		$groupID = $functions->getIDByName('alt.binaries.moovee');
 		$buffer = @file_get_contents('http://abmoovee.allfilled.com/reqs.php?fetch=posted&page=1');
@@ -408,19 +419,21 @@ Class Predb
 								$predate = $db->escapeString($matches2["predate"]);
 								$source = $db->escapeString('allfilled');
 								$run = $db->exec(sprintf("INSERT IGNORE INTO prehash (title, predate, adddate, source, hash, requestID, groupID) VALUES (%s, %s, now(), %s, %s, %s, %d) ON DUPLICATE KEY UPDATE requestID = %d, groupID = %d", $title, $predate, $source, $md5, $requestID, $groupID, $predate, $requestID, $groupID));
+                                $newnames++;
 							}
 						}
 					}
 				}
 			}
 		}
+        return $newnames;
 	}
 
 	public function retrieveAllfilledTeevee()
 	{
 		$db = new DB();
         $functions = new Functions();
-		$newnames = 0;
+		$newnames = $updated = 0;
 		$groups = new Groups();
 		$groupID = $functions->getIDByName('alt.binaries.teevee');
 		$buffer = @file_get_contents('http://abteevee.allfilled.com/reqs.php?fetch=posted&page=1');
@@ -442,19 +455,21 @@ Class Predb
 								$predate = $db->escapeString($matches2["predate"]);
 								$source = $db->escapeString('allfilled');
 								$run = $db->exec(sprintf("INSERT IGNORE INTO prehash (title, predate, adddate, source, hash, requestID, groupID) VALUES (%s, %s, now(), %s, %s, %s, %d) ON DUPLICATE KEY UPDATE requestID = %d, groupID = %d", $title, $predate, $source, $md5, $requestID, $groupID, $predate, $requestID, $groupID));
+                            $newnames++;
 							}
 						}
 					}
 				}
 			}
 		}
+        return $newnames;
 	}
 
 	public function retrieveAllfilledErotica()
 	{
 		$db = new DB();
         $functions = new Functions();
-		$newnames = 0;
+		$newnames = $updated = 0;
 		$groups = new Groups();
 		$groupID = $functions->getIDByName('alt.binaries.erotica');
 		$buffer = @file_get_contents('http://aberotica.allfilled.com/reqs.php?fetch=posted&page=1');
@@ -476,19 +491,21 @@ Class Predb
 								$predate = $db->escapeString($matches2["predate"]);
 								$source = $db->escapeString('allfilled');
 								$run = $db->exec(sprintf("INSERT IGNORE INTO prehash (title, predate, adddate, source, hash, requestID, groupID) VALUES (%s, %s, now(), %s, %s, %s, %d) ON DUPLICATE KEY UPDATE requestID = %d, groupID = %d", $title, $predate, $source, $md5, $requestID, $groupID, $predate, $requestID, $groupID));
+                            $newnames++;
 							}
 						}
 					}
 				}
 			}
 		}
+        return $newnames;
 	}
 
 	public function retrieveAllfilledForeign()
 	{
 		$db = new DB();
         $functions = new Functions();
-		$newnames = 0;
+		$newnames = $updated = 0;
 		$groups = new Groups();
 		$groupID = $functions->getIDByName('alt.binaries.mom');
 		$buffer = @file_get_contents('http://abforeign.allfilled.com/reqs.php?fetch=posted&page=1');
@@ -510,12 +527,14 @@ Class Predb
 								$predate = $db->escapeString($matches2["predate"]);
 								$source = $db->escapeString('allfilled');
 								$run = $db->exec(sprintf("INSERT IGNORE INTO prehash (title, predate, adddate, source, hash, requestID, groupID) VALUES (%s, %s, now(), %s, %s, %s, %d) ON DUPLICATE KEY UPDATE requestID = %d, groupID = %d", $title, $predate, $source, $md5, $requestID, $groupID, $predate, $requestID, $groupID));
+                            $newnames++;
 							}
 						}
 					}
 				}
 			}
 		}
+        return $newnames;
 	}
 
 	// Update a single release as it's created.

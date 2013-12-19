@@ -13,7 +13,7 @@ gunzip predb_clean.csv.gz
 sudo chown mysql:mysql predb_clean.csv
 
 #Import the predb dump file, from mysql
-LOAD DATA INFILE 'predb_clean.csv' IGNORE into table `prehash` (title, nfo, size, category, predate, adddate, source, hash);
+LOAD DATA INFILE 'predb_clean.csv' IGNORE into table `prehash` (title, nfo, size, category, predate, adddate, source, hash, releaseID, requestID, groupID);
 
 #Recreate the original indexes, although this will allow duplicates
 drop index ix_prehash_md5 on prehash;
