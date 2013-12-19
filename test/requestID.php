@@ -103,6 +103,8 @@ else if (isset($argv[1]) && is_numeric($argv[1]))
 	        else
 		        echo $c->info("\nNothing to do.");
     }
+    else
+	    echo $c->info("No work to process\n");
 
 
     function localLookup($requestID, $groupName, $oldname)
