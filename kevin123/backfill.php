@@ -447,7 +447,7 @@ class Backfill
 			}
 
 			$db->query(sprintf("UPDATE groups SET first_record = %s, last_updated = now() WHERE ID = %d", $db->escapeString($first), $groupArr['ID']));
-            $db->commit();
+            $db->commit(false);
 
 			if($first==$targetpost)
 				$done = true;
