@@ -498,6 +498,14 @@ class nameCleaning
 			else
 				return array("cleansubject" => $this->releaseCleanerHelper($subject), "properlynamed" => false);
 		}
+		else if ($groupName === "alt.binaries.cbts")
+		{
+			//"softWoRx.Suite.2.0.0.25.x32-TFT.rar" yEnc
+			if (preg_match('/.*"(.+?)(\.part\d*|\.rar)?(\.vol.+?"|\.[A-Za-z0-9]{2,4}")(.+?)yEnc$/', $subject, $match))
+				return $match[1];
+			else
+				return array("cleansubject" => $this->releaseCleanerHelper($subject), "properlynamed" => false);
+		}
 		else if ($groupName === "alt.binaries.cd.image")
 		{
 			//[27930]-[FULL]-[altbinEFNet]-[ Ubersoldier.UNCUT.PATCH-RELOADED ]-[3/5] "rld-usuc.par2" yEnc
@@ -765,10 +773,10 @@ class nameCleaning
 			if (preg_match('/^Skata - (.+) \(\d+ \/ \d+\) - ".+" yEnc$/', $subject, $match))
 				return $match[1];
 			//(????) [02361/43619] - "18j  Amy-superlange Beine.exe" yEnc
-			if (preg_match('/\(\?+\) \[\d+\/\d+\] - "(.+)(\.part\d*|\.rar)?(\.vol.+ \(\d+\/\d+\) "|\.[A-Za-z0-9]{2,4}").+?yEnc$/', $subject, $match))
+			else if (preg_match('/\(\?+\) \[\d+\/\d+\] - "(.+)(\.part\d*|\.rar)?(\.vol.+ \(\d+\/\d+\) "|\.[A-Za-z0-9]{2,4}").+?yEnc$/', $subject, $match))
 				return $match[1];
 			//Mutant.Chronicles.German.2008.AC3.DVDRip.XviD.(01/40) "Mutant.Chronicles.German.2008.AC3.DVDRip.XviD.nfo" yEnc
-			if (preg_match('/.*"(.+)(\.part\d*|\.rar)?(\.vol.+ \(\d+\/\d+\) "|\.[A-Za-z0-9]{2,4}").+?yEnc$/', $subject, $match))
+			else if (preg_match('/.*"(.+)(\.part\d*|\.rar)?(\.vol.+ \(\d+\/\d+\) "|\.[A-Za-z0-9]{2,4}").+?yEnc$/', $subject, $match))
 				return $match[1];
 			else
 				return array("cleansubject" => $this->releaseCleanerHelper($subject), "properlynamed" => false);
@@ -828,6 +836,31 @@ class nameCleaning
 			//[2/4] Graham Masterton - Descendant.mobi
 			else if (preg_match('/^\[\d+\/(\d+\]) (.+?)\.(txt|pdf|mobi|epub|azw)/', $subject, $match))
 				return $match[2];
+			//(NordicAlbino) [01/10] - "SWHQ_NA_675qe0033102suSmzSE.sfv" yEnc
+			//365 Sex Positions A New Way Every Day for a Steamy Erotic Year [eBook] - (1/5) "365.Sex.Positions.A.New.Way.Every.Day.for.a.Steamy.Erotic.Year.eBook.nfo" - yenc yEnc
+			else if (preg_match('/(.+)[-_ ]{0,3}[\(\[]\d+\/\d+[\)\]][-_ ]{0,3}"(.+)(\.part\d*|\.rar)?(\.vol.+ \(\d+\/\d+\) "|\.[A-Za-z0-9]{2,4}").+?yEnc$/', $subject, $match))
+				return $match[2];
+			//[001/125] (NL Epub Wierook Set 49) - "Abulhawa, Susan - Litteken van David_Ochtend in Jenin.epub" yEnc
+			else if (preg_match('/^\[\d+\/\d+\] .+? - "(.+)(\.part\d*|\.rar)?(\.vol.+ \(\d+\/\d+\) "|\.[A-Za-z0-9]{2,4}") yEnc$/', $subject, $match))
+				return $match[1];
+			//(1/1) "Radiological Imaging of the Kidney - E. Quaia (Springer, 2011) WW.pdf" - 162,82 MB - (Radiological Imaging of the Kidney - E. Quaia (Springer, 2011) WW) yEnc
+			else if (preg_match('/^\(\d+\/\d+\) "(.+)(\.part\d*|\.rar)?(\.vol.+ \(\d+\/\d+\) "|\.[A-Za-z0-9]{2,4}").+?yEnc$/', $subject, $match))
+				return $match[1];
+			//(1/7) "0865779767.epub" - 88,93 MB - "Anatomic Basis of Neurologic Diagnosis - epub" yEnc
+			else if (preg_match('/^\(\d+\/\d+\) ".+(\.part\d*|\.rar)?(\.vol.+ \(\d+\/\d+\) "|\.[A-Za-z0-9]{2,4}")([-_ ]{0,3}\d+[.,]\d+ [kKmMgG][bB])?[-_ ]{0,3}"(.+?)" yEnc$/', $subject, $match))
+				return $match[4];
+			//Re: REQ: Jay Lake's Mainspring series/trilogy (see titles inside) - "Lake, Jay - Clockwork Earth 03 - Pinion [epub].rar"  405.6 kBytes yEnc
+			//Attn: Brownian - "del Rey, Maria - Paradise Bay (FBS).rar" yEnc
+			//New Scan "Herbert, James - Sepulchre (html).rar" yEnc
+			else if (preg_match('/^(Attn:|Re: REQ:|New Scan).+?[-_ ]{0,3}"(.+)(\.part\d*|\.rar)?(\.vol.+ \(\d+\/\d+\) "|\.[A-Za-z0-9]{2,4}")[-_ ]{0,3}(\d+[.,]\d+ [kKmMgG][bB](ytes)?)? yEnc$/i', $subject, $match))
+				return $match[2];
+			//"Gabaldon, Diana - Outlander [5] The Fiery Cross.epub" yEnc
+			//Kiny Friedman "Friedman, Kinky - Prisoner of Vandam Street_ A Novel, The.epub" yEnc
+			else if (preg_match('/.*"(.+?)(\.part\d*|\.rar)?(\.vol.+?"|\.[A-Za-z0-9]{2,4}").+?yEnc$/', $subject, $match))
+				return $match[1];
+			//Patterson flood - Mobi -  15/45  "James Patterson - AC 13 - Double Cross.mobi"
+			else if (preg_match('/(.+?)[-_ ]{0,3}\d+\/(\d+[-_ ]{0,3}".+?)\.(txt|pdf|mobi|epub|azw)"( \(\d+\/\d+\))?( )?$/', $subject, $match))
+				return $match[2];
 			else
 				return array("cleansubject" => $this->releaseCleanerHelper($subject), "properlynamed" => false);
 		}
@@ -843,6 +876,53 @@ class nameCleaning
 				return $match[1];
 			//Doctor Who - Target Books [128/175] - "DW125_ Terror of the Vervoids - Pip Baker.mobi" yEnc
 			else if (preg_match('/^Doctor Who - Target Books \[\d+\/(\d+\]) - "DW[0-9]{0,3}[-_ ]{0,3}(.+?)\.(txt|pdf|mobi|epub|azw)" yEnc$/', $subject, $match))
+				return $match[2];
+			//(NordicAlbino) [01/10] - "SWHQ_NA_675qe0033102suSmzSE.sfv" yEnc
+			//365 Sex Positions A New Way Every Day for a Steamy Erotic Year [eBook] - (1/5) "365.Sex.Positions.A.New.Way.Every.Day.for.a.Steamy.Erotic.Year.eBook.nfo" - yenc yEnc
+			else if (preg_match('/(.+)[-_ ]{0,3}[\(\[]\d+\/\d+[\)\]][-_ ]{0,3}"(.+)(\.part\d*|\.rar)?(\.vol.+ \(\d+\/\d+\) "|\.[A-Za-z0-9]{2,4}").+?yEnc$/', $subject, $match))
+				return $match[2];
+			//[1/8] - "Robin Lane Fox - Travelling heroes.epub" yEnc
+			//(1/1) "Unintended Consequences - John Ross.nzb" - 8.67 kB - yEnc
+			else if (preg_match('/^[\(\[]\d+\/\d+[\)\]][-_ ]{0,3}"(.+)(\.part\d*|\.rar)?(\.vol.+ \(\d+\/\d+\) "|\.[A-Za-z0-9]{2,4}")([-_ ]{0,3}\d+[.,]\d+ [kKmMgG][bB])?[-_ ]{0,3}yEnc$/', $subject, $match))
+				return $match[1];
+			//[ Mega Dating and Sex Advice Ebooks - Tips and Tricks for Men PDF ] - "Vatsyayana - The Kama Sutra.pdf.rar" - (54/58) yEnc
+			else if (preg_match('/^[\(\[] .+? [\)\][-_ ]{0,3}"(.+)(\.part\d*|\.rar)?(\.vol.+ \(\d+\/\d+\) "|\.[A-Za-z0-9]{2,4}")[-_ ]{0,3}[\(\[]\d+\/(\d+[\)\]])[-_ ]{0,3}yEnc$/', $subject, $match))
+				return $match[1];
+			//WWII in Photos - "WWII in Photos_05_Conflict Spreads Around the Globe - The Atlantic.epub" yEnc
+			else if (preg_match('/^(WWII in Photos)[-_ ]{0,3}"(.+)(\.part\d*|\.rar)?(\.vol.+ \(\d+\/\d+\) "|\.[A-Za-z0-9]{2,4}")[-_ ]{0,3}yEnc$/', $subject, $match))
+				return $match[2];
+			//Various ebooks on History pdf format  "Chelsea House Publishing Discovering U.S. History Vol. 8, World War I and the Roaring Twenties - 1914-1928 (2010).pdf"  [1 of 1] yEnc
+			else if (preg_match('/^.+?"(.+)(\.part\d*|\.rar)?(\.vol.+ \(\d+\/\d+\) "|\.[A-Za-z0-9]{2,4}")[-_ ]{0,3}\[\d+ of (\d+\])[-_ ]{0,3}yEnc$/', $subject, $match))
+				return $match[1];
+			//A few things -  [4 of 13] "Man From U.N.C.L.E. 08 - The Monster Wheel Affair - David McDaniel.epub" yEnc
+			else if (preg_match('/.+[\(\[]\d+ of \d+[\)\]] "(.+)(\.part\d*|\.rar)?(\.vol.+ \(\d+\/\d+\) "|\.[A-Za-z0-9]{2,4}").+?yEnc$/', $subject, $match))
+				return $match[1];
+			//DDR Kochbuch 1968-wir kochen gut [1/1] - "DDR Kochbuch 1968-wir kochen gut.pdf" toby042002
+			else if (preg_match('/.+[\(\[]\d+\/\d+[\)\]] - "(.+)(\.part\d*|\.rar)?(\.vol.+ \(\d+\/\d+\) "|\.[A-Za-z0-9]{2,4}") toby\d+$/', $subject, $match))
+				return $match[1];
+			//Pottermore UK retail - "Harry Potter and the Goblet of Fire - J.K. Rowling.epub" (05/14) - 907.57 kB - yEnc
+			else if (preg_match('/^.+?[-_ ]{0,3}"(.+)(\.part\d*|\.rar)?(\.vol.+ \(\d+\/\d+\) "|\.[A-Za-z0-9]{2,4}") [\(\[]\d+\/\d+[\)\]] ([-_ ]{0,3}\d+[.,]\d+ [kKmMgG][bB])?[-_ ]{0,3}yEnc$/', $subject, $match))
+				return $match[1];
+			//[001/125] (NL Epub Wierook Set 49) - "Abulhawa, Susan - Litteken van David_Ochtend in Jenin.epub" yEnc
+			else if (preg_match('/^\[\d+\/\d+\] .+? - "(.+)(\.part\d*|\.rar)?(\.vol.+ \(\d+\/\d+\) "|\.[A-Za-z0-9]{2,4}") yEnc$/', $subject, $match))
+				return $match[1];
+			//(1/1) "Radiological Imaging of the Kidney - E. Quaia (Springer, 2011) WW.pdf" - 162,82 MB - (Radiological Imaging of the Kidney - E. Quaia (Springer, 2011) WW) yEnc
+			else if (preg_match('/^\(\d+\/\d+\) "(.+)(\.part\d*|\.rar)?(\.vol.+ \(\d+\/\d+\) "|\.[A-Za-z0-9]{2,4}").+?yEnc$/', $subject, $match))
+				return $match[1];
+			//(1/7) "0865779767.epub" - 88,93 MB - "Anatomic Basis of Neurologic Diagnosis - epub" yEnc
+			else if (preg_match('/^\(\d+\/\d+\) ".+(\.part\d*|\.rar)?(\.vol.+ \(\d+\/\d+\) "|\.[A-Za-z0-9]{2,4}")([-_ ]{0,3}\d+[.,]\d+ [kKmMgG][bB])?[-_ ]{0,3}"(.+?)" yEnc$/', $subject, $match))
+				return $match[4];
+			//Re: REQ: Jay Lake's Mainspring series/trilogy (see titles inside) - "Lake, Jay - Clockwork Earth 03 - Pinion [epub].rar"  405.6 kBytes yEnc
+			//Attn: Brownian - "del Rey, Maria - Paradise Bay (FBS).rar" yEnc
+			//New Scan "Herbert, James - Sepulchre (html).rar" yEnc
+			else if (preg_match('/^(Attn:|Re: REQ:|New Scan).+?[-_ ]{0,3}"(.+)(\.part\d*|\.rar)?(\.vol.+ \(\d+\/\d+\) "|\.[A-Za-z0-9]{2,4}")[-_ ]{0,3}(\d+[.,]\d+ [kKmMgG][bB](ytes)?)? yEnc$/i', $subject, $match))
+				return $match[2];
+			//"Gabaldon, Diana - Outlander [5] The Fiery Cross.epub" yEnc
+			//Kiny Friedman "Friedman, Kinky - Prisoner of Vandam Street_ A Novel, The.epub" yEnc
+			else if (preg_match('/.*"(.+?)(\.part\d*|\.rar)?(\.vol.+?"|\.[A-Za-z0-9]{2,4}").+?yEnc$/', $subject, $match))
+				return $match[1];
+			//Patterson flood - Mobi -  15/45  "James Patterson - AC 13 - Double Cross.mobi"
+			else if (preg_match('/(.+?)[-_ ]{0,3}\d+\/(\d+[-_ ]{0,3}".+?)\.(txt|pdf|mobi|epub|azw)"( \(\d+\/\d+\))?( )?$/', $subject, $match))
 				return $match[2];
 			else
 				return array("cleansubject" => $this->releaseCleanerHelper($subject), "properlynamed" => false);
@@ -862,6 +942,36 @@ class nameCleaning
 				return $match[1];
 			//SFF Dump - "Thomas M. Disch - Camp Concentration.epub" (1033/1217) - 226.47 kB - yEnc
 			else if (preg_match('/^SFF Dump - "(.+?)\.(txt|pdf|mobi|epub|azw)" \(\d+\/\d+\) - \d+[.,]\d+ [kKmMgG][bB] - yEnc$/', $subject, $match))
+				return $match[1];
+			//Patterson flood - Mobi -  15/45  "James Patterson - AC 13 - Double Cross.mobi"
+			else if (preg_match('/(.+?)[-_ ]{0,3}\d+\/(\d+[-_ ]{0,3}".+?)\.(txt|pdf|mobi|epub|azw)"( \(\d+\/\d+\))?( )?$/', $subject, $match))
+				return $match[2];
+			//Re: REQ: Jay Lake's Mainspring series/trilogy (see titles inside) - "Lake, Jay - Clockwork Earth 03 - Pinion [epub].rar"  405.6 kBytes yEnc
+			//Attn: Brownian - "del Rey, Maria - Paradise Bay (FBS).rar" yEnc
+			//New Scan "Herbert, James - Sepulchre (html).rar" yEnc
+			else if (preg_match('/^(Attn:|Re: REQ:|New Scan).+?[-_ ]{0,3}"(.+)(\.part\d*|\.rar)?(\.vol.+ \(\d+\/\d+\) "|\.[A-Za-z0-9]{2,4}")[-_ ]{0,3}(\d+[.,]\d+ [kKmMgG][bB](ytes)?)? yEnc$/i', $subject, $match))
+				return $match[2];
+			//"Gabaldon, Diana - Outlander [5] The Fiery Cross.epub" yEnc
+			//Kiny Friedman "Friedman, Kinky - Prisoner of Vandam Street_ A Novel, The.epub" yEnc
+			else if (preg_match('/.*"(.+?)(\.part\d*|\.rar)?(\.vol.+?"|\.[A-Za-z0-9]{2,4}").+?yEnc$/', $subject, $match))
+				return $match[1];
+			//[001/125] (NL Epub Wierook Set 49) - "Abulhawa, Susan - Litteken van David_Ochtend in Jenin.epub" yEnc
+			else if (preg_match('/^\[\d+\/\d+\] .+? - "(.+)(\.part\d*|\.rar)?(\.vol.+ \(\d+\/\d+\) "|\.[A-Za-z0-9]{2,4}") yEnc$/', $subject, $match))
+				return $match[1];
+			//(1/1) "Radiological Imaging of the Kidney - E. Quaia (Springer, 2011) WW.pdf" - 162,82 MB - (Radiological Imaging of the Kidney - E. Quaia (Springer, 2011) WW) yEnc
+			else if (preg_match('/^\(\d+\/\d+\) "(.+)(\.part\d*|\.rar)?(\.vol.+ \(\d+\/\d+\) "|\.[A-Za-z0-9]{2,4}").+?yEnc$/', $subject, $match))
+				return $match[1];
+			//(1/7) "0865779767.epub" - 88,93 MB - "Anatomic Basis of Neurologic Diagnosis - epub" yEnc
+			else if (preg_match('/^\(\d+\/\d+\) ".+(\.part\d*|\.rar)?(\.vol.+ \(\d+\/\d+\) "|\.[A-Za-z0-9]{2,4}")([-_ ]{0,3}\d+[.,]\d+ [kKmMgG][bB])?[-_ ]{0,3}"(.+?)" yEnc$/', $subject, $match))
+				return $match[4];
+			//Re: REQ: Jay Lake's Mainspring series/trilogy (see titles inside) - "Lake, Jay - Clockwork Earth 03 - Pinion [epub].rar"  405.6 kBytes yEnc
+			//Attn: Brownian - "del Rey, Maria - Paradise Bay (FBS).rar" yEnc
+			//New Scan "Herbert, James - Sepulchre (html).rar" yEnc
+			else if (preg_match('/^(Attn:|Re: REQ:|New Scan).+?[-_ ]{0,3}"(.+)(\.part\d*|\.rar)?(\.vol.+ \(\d+\/\d+\) "|\.[A-Za-z0-9]{2,4}")[-_ ]{0,3}(\d+[.,]\d+ [kKmMgG][bB](ytes)?)? yEnc$/i', $subject, $match))
+				return $match[2];
+			//"Gabaldon, Diana - Outlander [5] The Fiery Cross.epub" yEnc
+			//Kiny Friedman "Friedman, Kinky - Prisoner of Vandam Street_ A Novel, The.epub" yEnc
+			else if (preg_match('/.*"(.+?)(\.part\d*|\.rar)?(\.vol.+?"|\.[A-Za-z0-9]{2,4}").+?yEnc$/', $subject, $match))
 				return $match[1];
 			else
 				return array("cleansubject" => $this->releaseCleanerHelper($subject), "properlynamed" => false);
@@ -922,6 +1032,16 @@ class nameCleaning
 				return $match[2];
 			//[158023]-[FULL]-[#a.b.erotica@EFNet]-[UHQ]-[www.usenet4all.eu]-[ Glamour.Girls.2.XXX.DVDRip.XviD-Pr0nStarS ]-[1/7] - #34;ps-gg2-sample-sample.par2#34; yEnc
 			else if (preg_match('/^\[\d+\]-\[FULL\]-\[.+\]-\[UHQ\]-\[.+\]-\[ (.+) \][- ]\[\d+\/\d+\][ -]{0,3}("|#34;).+("|#34;) yEnc$/', $subject, $match))
+				return $match[1];
+			//..::kleverig.eu::.. [001/141] - "ZYGBUTD5TPgMdjjxnvrl.par2" - 13,28 GB yEnc
+			else if (preg_match('/.+[-_ ]{0,3}[\(\[]\d+\/(\d+[\)\]][-_ ]{0,3}".+)(\.part\d*|\.rar)?(\.vol.+ \(\d+\/\d+\) "|\.[A-Za-z0-9]{2,4}").+?yEnc$/', $subject, $match))
+				return $match[1];
+			//"Babysitters_a_Slut_4_Scene_4.part01.rar"_SpotBots yEnc
+			//- "JH2U0H5FIK8TO7YK3Q.part12.rar" yEnc
+			else if (preg_match('/.*"(.+?)(\.part\d*|\.rar)?(\.vol.+?"|\.[A-Za-z0-9]{2,4}")(.+?)yEnc$/', $subject, $match))
+				return $match[1];
+			//<<<>>CowboyUp2012 XXX><<<Is.Not.Force.It.My.Younger.SOE-806.Jav.Censored.DVDRip.XviD-MotTto>>>usenet-space-cowboys.info<<<Powered by https://secretusenet.com>< "Is.Not.Force.It.My.Younger.SOE-806.Jav.Censored.DVDRip.XviD-MotTto.part01.rar" >< 01/15 (1,39
+			else if (preg_match('/^.+?usenet-space.+?Powered by.+? "(.+?)' . $this->e0 . '.+? \d+\/(\d+.+?)$/', $subject, $match))
 				return $match[1];
 			else
 				return array("cleansubject" => $this->releaseCleanerHelper($subject), "properlynamed" => false);
@@ -1008,7 +1128,7 @@ class nameCleaning
 			if (preg_match('/^<ghost-of-usenet\.org>(.+?) \[\d+\/\d+\] - ".+?" .+? yEnc$/', $subject, $match))
 				return $match[1];
 			//(116/175) "Embrace.of.the.Vampire.1995.1080p.BluRay.x264.YIFY.part115.rar" - 1,60 GB - yEnc
-			if (preg_match('/^\(\d+\/(\d+\)) ("|#34;)(.+)(\.[vol|part].+)?\.(par2|nfo|rar|nzb)("|#34;) - \d+[.,]\d+ [kKmMgG][bB] - yEnc$/i', $subject, $match))
+			else if (preg_match('/^\(\d+\/(\d+\)) ("|#34;)(.+)(\.[vol|part].+)?\.(par2|nfo|rar|nzb)("|#34;) - \d+[.,]\d+ [kKmMgG][bB] - yEnc$/i', $subject, $match))
 				return $match[3];
 			else
 				return array("cleansubject" => $this->releaseCleanerHelper($subject), "properlynamed" => false);
@@ -1318,7 +1438,7 @@ class nameCleaning
 			else if (preg_match('/^([a-zA-Z0-9._-]+ - ?\[)\d+\/(\d+\]) - "(.+?)\.(nzb|rar|par2)" yEnc$/', $subject, $match))
 				return $match[3];
 			//The Beaver 2011 720p BluRay DD5.1 x264-CtrlHD - [00/65] - "The Beaver 2011 720p BluRay DD5.1 x264-CtrlHD.nzb" yEnc
-			if (preg_match('/^([a-zA-Z0-9].+?)( - )\[\d+(\/\d+\] - ").+?" yEnc$/', $subject, $match))
+			else if (preg_match('/^([a-zA-Z0-9].+?)( - )\[\d+(\/\d+\] - ").+?" yEnc$/', $subject, $match))
 				return $match[1];
 			else
 				return array("cleansubject" => $this->releaseCleanerHelper($subject), "properlynamed" => false);
@@ -1914,6 +2034,37 @@ class nameCleaning
 			//ATKExotics.13.01.06.Janea.Toys.XXX.1080p.x264-SEXORS - [1/7] - #34;ATKExotics.13.01.06.Janea.Toys.XXX.1080p.x264-SEXORS.rar#34; yEnc
 			else if (preg_match('/^([a-z].+) - \[\d+\/\d+\][ _-]{0,3}("|#34;).+("|#34;) yEnc$/i', $subject, $match))
 				return $match[1];
+			//-Panzer.Command.Kharkov-SKIDROW - [1/7] - "-Panzer.Command.Kharkov-SKIDROW.rar" yEnc
+			//-AssMasterpiece.12.07.09.Alexis.Monroe.XXX.1080p.x264-SEXORS - [1/7] - #34;-AssMasterpiece.12.07.09.Alexis.Monroe.XXX.1080p.x264-SEXORS.rar#34; yEnc
+			else if (preg_match('/.*[\(\[]\d+\/\d+[\)\]][-_ ]{0,3}("|#34;)(.+?)(\.part\d*|\.rar)?(\.vol.+?"|\.[A-Za-z0-9]{2,4})("|#34;)(.+?)yEnc$/', $subject, $match))
+				return $match[2];
+			//- "JH2U0H5FIK8TO7YK3Q.part12.rar" yEnc
+			else if (preg_match('/.*"(.+?)(\.part\d*|\.rar)?(\.vol.+?"|\.[A-Za-z0-9]{2,4}")(.+?)yEnc$/', $subject, $match))
+				return $match[1];
+			//( XS Video Converter Ultimate 7.7.0 Build 20121226 ) - yEnc
+			else if (preg_match('/^\( (.+?) \) - yEnc$/', $subject, $match))
+				return $match[1];
+			else
+				return array("cleansubject" => $this->releaseCleanerHelper($subject), "properlynamed" => false);
+		}
+		else if ($groupName === "alt.binaries.warez.0-day")
+		{
+			//BabysitterMovies.13.03.11.Babysitter.Jocelyn.Pink.XXX.HR.WMV-VSEX - [7/7] - "BabysitterMovies.13.03.11.Babysitter.Jocelyn.Pink.XXX.HR.WMV-VSEX.rar.vol15+5.par2" yEnc
+			if (preg_match('/^([a-zA-Z].+) - \[\d+\/\d+\] - ".+?" yEnc$/', $subject, $match))
+				return $match[1];
+			//ATKExotics.13.01.06.Janea.Toys.XXX.1080p.x264-SEXORS - [1/7] - #34;ATKExotics.13.01.06.Janea.Toys.XXX.1080p.x264-SEXORS.rar#34; yEnc
+			else if (preg_match('/^([a-z].+) - \[\d+\/\d+\][ _-]{0,3}("|#34;).+("|#34;) yEnc$/i', $subject, $match))
+				return $match[1];
+			//-Panzer.Command.Kharkov-SKIDROW - [1/7] - "-Panzer.Command.Kharkov-SKIDROW.rar" yEnc
+			//-AssMasterpiece.12.07.09.Alexis.Monroe.XXX.1080p.x264-SEXORS - [1/7] - #34;-AssMasterpiece.12.07.09.Alexis.Monroe.XXX.1080p.x264-SEXORS.rar#34; yEnc
+			else if (preg_match('/.*[\(\[]\d+\/\d+[\)\]][-_ ]{0,3}("|#34;)(.+?)(\.part\d*|\.rar)?(\.vol.+?"|\.[A-Za-z0-9]{2,4})("|#34;)(.+?)yEnc$/', $subject, $match))
+				return $match[2];
+			//- "JH2U0H5FIK8TO7YK3Q.part12.rar" yEnc
+			else if (preg_match('/.*"(.+?)(\.part\d*|\.rar)?(\.vol.+?"|\.[A-Za-z0-9]{2,4}")(.+?)yEnc$/', $subject, $match))
+				return $match[1];
+			//( XS Video Converter Ultimate 7.7.0 Build 20121226 ) - yEnc
+			else if (preg_match('/^\( (.+?) \) - yEnc$/', $subject, $match))
+				return $match[1];
 			else
 				return array("cleansubject" => $this->releaseCleanerHelper($subject), "properlynamed" => false);
 		}
@@ -1944,7 +2095,7 @@ class nameCleaning
 				return $match[2];
 			//(38/57) "Fright.Night.2.New.Blood.2013.UNRATED.BluRay.810p.DTS.x264-PRoDJi.part26.rar" - 4,81 GB - yEnc
 			//(14/20) "Jack.the.Giant.Slayer.2013.AC3.192Kbps.23fps.2ch.TR.Audio.BluRay-Demuxed.by.par2" - 173,15 MB - yEnc
-			if (preg_match('/^\(\d+\/(\d+\)) ("|#34;)(.+)(\.[vol|part].+)?\.(par2|nfo|rar|nzb)("|#34;) - \d+[.,]\d+ [kKmMgG][bB] - yEnc$/i', $subject, $match))
+			else if (preg_match('/^\(\d+\/(\d+\)) ("|#34;)(.+)(\.[vol|part].+)?\.(par2|nfo|rar|nzb)("|#34;) - \d+[.,]\d+ [kKmMgG][bB] - yEnc$/i', $subject, $match))
 				return $match[3];
 			else
 				return array("cleansubject" => $this->releaseCleanerHelper($subject), "properlynamed" => false);
