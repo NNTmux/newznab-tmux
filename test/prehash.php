@@ -762,4 +762,24 @@ Class Predb
 		$count = $db->queryOneRow("SELECT count(*) as cnt from prehash");
 		return $count["cnt"];
 	}
+
+    function fileContents($path, $use=false, $context='')
+	{
+		if ($context === '')
+		{
+			$str = @file_get_contents($path);
+		}
+		else
+		{
+			$str = @file_get_contents($path, $use, $context);
+		}
+		if ($str === FALSE)
+		{
+			return false;
+		}
+		else
+		{
+			return $str;
+		}
+	}
 }
