@@ -12,7 +12,7 @@ if ($nntp->doConnect() === false)
 	return;
 }
 
-$predb = new Predb (true);
+$predb = new Predb ($echooutput = true);
 $predb->updatePre();
 $predb->checkPre($nntp);
 if ($titles > 0) {
