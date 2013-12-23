@@ -27,7 +27,7 @@ Class Predb
 
 	// Retrieve pre info from predb sources and store them in the DB.
 	// Returns the quantity of new titles retrieved.
-	public function combinePre($nntp)
+	public function updatePre()
 	{
 		$db = new DB();
         $f = new Functions();
@@ -36,51 +36,77 @@ Class Predb
 		if (strtotime($newestrel["adddate"]) < time()-600 || is_null($newestrel['adddate']))
 		{
 			if ($this->echooutput)
-				echo "Retrieving titles from preDB sources.\n";
+			{
+				echo $this->c->header("Retrieving titles from preDB sources.");
+			}
 			$newwomble = $this->retrieveWomble();
 			if ($this->echooutput)
-				echo $newwomble." Retrieved from Womble.\n";
+			{
+				echo $this->c->primary($newwomble . " \tRetrieved from Womble.");
+			}
 			$newomgwtf = $this->retrieveOmgwtfnzbs();
 			if ($this->echooutput)
-				echo $newomgwtf." Retrieved from Omgwtfnzbs.\n";
+			{
+				echo $this->c->primary($newomgwtf . " \tRetrieved from Omgwtfnzbs.");
+			}
 			$newzenet = $this->retrieveZenet();
 			if ($this->echooutput)
-				echo $newzenet." Retrieved from Zenet.\n";
+			{
+				echo $this->c->primary($newzenet . " \tRetrieved from Zenet.");
+			}
 			$newprelist = $this->retrievePrelist();
 			if ($this->echooutput)
-				echo $newprelist." Retrieved from Prelist.\n";
+			{
+				echo $this->c->primary($newprelist . " \tRetrieved from Prelist.");
+			}
 			$neworly = $this->retrieveOrlydb();
 			if ($this->echooutput)
-				echo $neworly." Retrieved from Orlydb.\n";
+			{
+				echo $this->c->primary($neworly . " \tRetrieved from Orlydb.");
+			}
 			$newsrr = $this->retrieveSrr();
 			if ($this->echooutput)
-				echo $newsrr." Retrieved from Srrdb.\n";
+			{
+				echo $this->c->primary($newsrr . " \tRetrieved from Srrdb.");
+			}
 			$newpdme = $this->retrievePredbme();
 			if ($this->echooutput)
-				echo $newpdme." Retrieved from Predb.me.\n";
-            $this->retrieveAllfilledMoovee();
+			{
+				echo $this->c->primary($newpdme . " \tRetrieved from Predbme.");
+			}
+			$this->retrieveAllfilledMoovee();
 			$this->retrieveAllfilledTeevee();
 			$this->retrieveAllfilledErotica();
-		    $this->retrieveAllfilledForeign();
-            $abgx = $this->retrieveAbgx();
+			$this->retrieveAllfilledForeign();
+			$abgx = $this->retrieveAbgx();
 			if ($this->echooutput)
-				echo $abgx." \tRetrieved from abgx.\n";
-			$newnames = $newwomble+$newomgwtf+$newzenet+$newprelist+$neworly+$newsrr+$newpdme+$abgx;
-			if(count($newnames) > 0)
+			{
+				echo $this->c->primary($abgx . " \tRetrieved from abgx.");
+			}
+			$newnames = $newwomble + $newomgwtf + $newzenet + $newprelist + $neworly + $newsrr + $newpdme + $abgx;
+			if (count($newnames) > 0)
+                {
 				$db->exec(sprintf("UPDATE prehash SET adddate = NOW() WHERE ID = %d", $newestrel["ID"]));
-		}
-		$matched = $this->matchPredb();
-		if ($matched > 0 && $this->echooutput)
-			echo "\nMatched ".$matched." prehash titles to release search names.\n";
-        else
-            echo "\nNo matches found.\n";
-		$nfos = $this->matchNfo($nntp);
-		if ($nfos > 0 && $this->echooutput)
-			echo "\nAdded ".$nfos." missing NFOs from prehash sources.\n";
-        else
-            echo "\nNo missing nfo matches found.Nothing added.\n";
+		        }
+			return $newnames;
+	    }
+    }
 
-		return $newnames;
+    // Attempts to match predb to releases.
+	public function checkPre($nntp)
+	{
+		$matched = $this->matchPredb();
+		if ($this->echooutput)
+		{
+			$count = ($matched > 0) ? $matched : 0;
+			echo $this->c->header('Matched ' . $count . ' predhash titles to release search names.');
+		}
+		$nfos = $this->matchNfo($nntp);
+		if ($this->echooutput)
+		{
+			$count = ($nfos > 0) ? $nfos : 0;
+			echo $this->c->header('Added ' . $count . ' missing NFOs from prehash sources.');
+		}
 	}
 
 	public function retrieveWomble()
@@ -88,8 +114,9 @@ Class Predb
 		$db = new DB();
         $f = new Functions();
 		$newnames = $updated = 0;
+        $matches2 = $matches = $match = $m = '';
 
-		$buffer = getUrl("http://www.newshost.co.za");
+		$buffer = $this->fileContents('http://www.newshost.co.za');
 		if ($buffer !== false && strlen($buffer))
 		{
 			if (preg_match_all('/<tr bgcolor=#[df]{6}>.+?<\/tr>/s', $buffer, $matches))
@@ -149,8 +176,9 @@ Class Predb
 		$db = new DB();
         $f = new Functions();
 		$newnames = $updated = 0;
+        $matches2 = $matches = $match = $m = '';
 
-		$buffer = getUrl("http://rss.omgwtfnzbs.org/rss-info.php");
+		$buffer = $this->fileContents('http://rss.omgwtfnzbs.org/rss-info.php');
 		if ($buffer !== false && strlen($buffer))
 		{
 			if (preg_match_all('/<item>.+?<\/item>/s', $buffer, $matches))
@@ -196,8 +224,9 @@ Class Predb
                 $db = new DB();
                 $f = new Functions();
                 $newnames = $updated = 0;
+                $matches2 = $matches = $match = $m = '';
 
-                $buffer = getUrl("http://pre.zenet.org/live.php");
+		        $buffer = $this->fileContents('http://pre.zenet.org/live.php');
                 if ($buffer !== false && strlen($buffer))
                 {
                        if (preg_match_all('/<div class="mini-layout fluid">((\s+\S+)?\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+(\S+\s+)?(\S+\s+)?(\S+\s+)?(\S+\s+)?(\S+\s+)?(\S+\s+)?(\S+\s+)?<\/div>\s+<\/div>)/s', $buffer, $matches))
@@ -243,8 +272,9 @@ Class Predb
 		$db = new DB();
         $f = new Functions();
 		$newnames = $updated = 0;
+        $matches2 = $matches = $match = $m = '';
 
-		$buffer = getUrl("http://www.prelist.ws/");
+		$buffer = $this->fileContents('http://www.prelist.ws/');
 		if ($buffer !== false && strlen($buffer))
 		{
 			if (preg_match_all('/<small><span.+?<\/span><\/small>/s', $buffer, $matches))
@@ -296,8 +326,9 @@ Class Predb
 		$db = new DB();
         $f = new Functions();
 		$newnames = $updated = 0;
+        $matches2 = $matches = $match = $m = '';
 
-		$buffer = getUrl("http://www.orlydb.com/");
+		$buffer = $this->fileContents('http://www.orlydb.com/');
 		if ($buffer !== false && strlen($buffer))
 		{
 			if (preg_match('/<div id="releases">(.+)<div id="pager">/s', $buffer, $match))
@@ -350,7 +381,7 @@ Class Predb
 		);
 
 		$context = stream_context_create($options);
-		$releases = @simplexml_load_string(@file_get_contents($url, false, $context));
+		$releases = simplexml_load_string($this->fileContents($url, false, $context));
 		if ($releases !== false)
 		{
 			foreach ($releases->channel->item as $release)
@@ -403,7 +434,7 @@ Class Predb
 		$newnames = $updated = 0;
 		$groups = new Groups();
 		$groupID = $functions->getIDByName('alt.binaries.moovee');
-		$buffer = @file_get_contents('http://abmoovee.allfilled.com/reqs.php?fetch=posted&page=1');
+		$buffer = $this->fileContents('http://abmoovee.allfilled.com/reqs.php?fetch=posted&page=1');
 		if ($buffer !== false && strlen($buffer))
 		{
 			if (preg_match_all('/<tr class="(even|odd)".+?<\/tr>/s', $buffer, $matches))
@@ -440,7 +471,7 @@ Class Predb
 		$newnames = $updated = 0;
 		$groups = new Groups();
 		$groupID = $functions->getIDByName('alt.binaries.teevee');
-		$buffer = @file_get_contents('http://abteevee.allfilled.com/reqs.php?fetch=posted&page=1');
+		$buffer = $this->fileContents('http://abteevee.allfilled.com/reqs.php?fetch=posted&page=1');
 		if ($buffer !== false && strlen($buffer))
 		{
 			if (preg_match_all('/<tr class="(even|odd)".+?<\/tr>/s', $buffer, $matches))
@@ -477,7 +508,7 @@ Class Predb
 		$newnames = $updated = 0;
 		$groups = new Groups();
 		$groupID = $functions->getIDByName('alt.binaries.erotica');
-		$buffer = @file_get_contents('http://aberotica.allfilled.com/reqs.php?fetch=posted&page=1');
+		$buffer = $this->fileContents('http://aberotica.allfilled.com/reqs.php?fetch=posted&page=1');
 		if ($buffer !== false && strlen($buffer))
 		{
 			if (preg_match_all('/<tr class="(even|odd)".+?<\/tr>/s', $buffer, $matches))
@@ -514,7 +545,7 @@ Class Predb
 		$newnames = $updated = 0;
 		$groups = new Groups();
 		$groupID = $functions->getIDByName('alt.binaries.mom');
-		$buffer = @file_get_contents('http://abforeign.allfilled.com/reqs.php?fetch=posted&page=1');
+		$buffer = $this->fileContents('http://abforeign.allfilled.com/reqs.php?fetch=posted&page=1');
 		if ($buffer !== false && strlen($buffer))
 		{
 			if (preg_match_all('/<tr class="(even|odd)".+?<\/tr>/s', $buffer, $matches))
@@ -564,7 +595,7 @@ Class Predb
 		$arr = array('x360', 'abcp', 'abgw', 'abgwu', 'absp', 'abgn', 'spsv', 'n3ds', 'abgx', 'abg', 'x360');
 		foreach ($arr as &$value)
 		{
-			$releases = @simplexml_load_string(@file_get_contents('http://www.abgx.net/rss/' . $value . '/posted.rss', false, $context));
+			$releases = simplexml_load_string($this->fileContents('http://www.abgx.net/rss/' . $value . '/posted.rss', false, $context));
 			if ($releases !== false)
 			{
 				preg_match('/^Filled requests in #(\S+)/', $releases->channel->description, $groupname);
