@@ -13,7 +13,7 @@ if ($nntp->doConnect() === false)
 }
 
 $predb = new Predb ($echooutput = true);
-$predb->updatePre();
+$titles = $predb->updatePre(); 
 $predb->checkPre($nntp);
 if ($titles > 0) {
 	echo $c->header('Fetched ' . $titles . ' new title(s) from predb sources.');
