@@ -146,6 +146,7 @@ Class Predb
 										$nfo = $db->escapeString("http://nzb.isasecret.com/".$matches2["nfo"]);
 
 									    $db->exec(sprintf("UPDATE prehash SET nfo = %s, size = %s, category = %s, predate = %s, adddate = now(), source = %s where ID = %d", $nfo, $size, $db->escapeString($matches2["category"]), $db->from_unixtime(strtotime($matches2["date"])), $db->escapeString("womble"), $oldname["ID"]));
+                                $updated++;
 								}
 							}
 							else
@@ -167,6 +168,11 @@ Class Predb
 					}
 				}
 			}
+            echo $this->c->primary($updated . " \tUpdated from Womble.");
+		}
+		else
+		{
+			echo $this->c->error("Update from Womble failed.");
 		}
 		return $newnames;
 	}
@@ -201,7 +207,7 @@ Class Predb
 								{
 									$size = $db->escapeString(round($matches2["size1"]).$matches2["size2"]);
 									$db->exec(sprintf("UPDATE prehash SET size = %s, category = %s, predate = FROM_UNIXTIME(".strtotime($matches2["date"])."), adddate = now(), source = %s where ID = %d", $size, $db->escapeString($matches2["category"]), $db->escapeString("omgwtfnzbs"), $oldname["ID"]));
-                                    $newnames++;
+                                    $updated++;
 								}
 							}
 							else
@@ -215,6 +221,11 @@ Class Predb
 					}
 				}
 			}
+            echo $this->c->primary($updated . " \tUpdated from Omgwtfnzbs.");
+		}
+		else
+		{
+			echo $this->c->error("Update from Omgwtfnzbs failed.");
 		}
 		return $newnames;
 	}
@@ -264,6 +275,10 @@ Class Predb
                                 }
                         }
                 }
+                else
+		        {
+			        echo $this->c->error("Update from Zenet failed.");
+		        }
                 return $newnames;
         }
 
@@ -318,6 +333,10 @@ Class Predb
 				}
 			}
 		}
+        else
+		{
+			echo $this->c->error("Update from Prelist failed.");
+		}
 		return $newnames;
 	}
 
@@ -361,6 +380,10 @@ Class Predb
 				}
 			}
 		}
+        else
+		{
+			echo $this->c->error("Update from Orly failed.");
+		}
 		return $newnames;
 	}
 
@@ -381,9 +404,13 @@ Class Predb
 		);
 
 		$context = stream_context_create($options);
-		$releases = simplexml_load_string($this->fileContents($url, false, $context));
-		if ($releases !== false)
+		$web = $this->fileContents($url, false, $context);
+		if ($web !== false)
 		{
+			$releases = simplexml_load_string($this->fileContents($url, false, $context));
+			if ($releases !== false)
+			{
+
 			foreach ($releases->channel->item as $release)
 			{
 				$md5 = md5($release->title);
@@ -395,6 +422,15 @@ Class Predb
 					$db->exec(sprintf('INSERT IGNORE INTO prehash (title, predate, adddate, source, hash) VALUES (%s, %s, now(), %s, %s)', $db->escapeString($release->title), $f->from_unixtime(strtotime($release->pubDate)), $db->escapeString('srrdb'), $db->escapeString($md5)));$newnames++;
 				}
 			}
+		}
+            else
+			{
+				echo $this->c->error("Update from Srr failed.");
+			}
+		}
+		else
+		{
+			echo $this->c->error("Update from Srr failed.");
 		}
 		return $newnames;
 	}
@@ -422,6 +458,10 @@ Class Predb
 						$newnames++;
 					}
 				}
+			}
+            else
+			{
+				echo $this->c->error("Update from Predbme failed.");
 			}
 		}
 		return $newnames;
