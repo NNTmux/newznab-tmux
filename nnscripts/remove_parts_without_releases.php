@@ -109,7 +109,7 @@ class remove_parts_without_releases extends NNScripts
         {
             $sql .= sprintf( ' AND dateadded < "%s" - INTERVAL %s HOUR', $this->settings['now'], $this->settings['limit'] );
         }
-        $result = $this->db->queryDirect( $sql );
+        $result = $this->db->exec( $sql );
         
         $this->display( ( $result ? "Done" : "Error" ) . PHP_EOL );
     }
@@ -172,7 +172,7 @@ class remove_parts_without_releases extends NNScripts
                         {
                             $this->display( "." );
                             $sql = sprintf( "DELETE FROM parts WHERE ID IN (%s)", implode(',', $ids) );
-                            $this->db->queryDirect( $sql );
+                            $this->db->exec( $sql );
                             $ids = array();
                             $counter = 0;
                         }

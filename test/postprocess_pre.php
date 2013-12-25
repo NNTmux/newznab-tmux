@@ -7,11 +7,15 @@ require_once("ColorCLI.php");
 $nntp = new Nntp();
 if ($nntp->doConnect() === false)
 {
-	$c = new ColorCLI;
+	$c = new ColorCLI();
 	echo $c->error("Unable to connect to usenet.\n");
 	return;
 }
-
-$predb = new Predb (true);
-$predb->combinePre($nntp);
+$c = new ColorCLI();
+$predb = new Predb ($echooutput = true);
+$titles = $predb->updatePre();
+$predb->checkPre($nntp);
+if ($titles > 0) {
+	echo $c->header('Fetched ' . $titles . ' new title(s) from predb sources.');
+}
 $nntp->doQuit();
