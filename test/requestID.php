@@ -98,13 +98,14 @@ else if (isset($argv[1]) && is_numeric($argv[1]))
 	                echo '.';
                 }
                 }
-            if ($total > 0)
-		        echo $c->header("\nRenamed ".$counter." releases in ".$consoletools->convertTime(TIME() - $timestart).".");
-	        else
-		        echo $c->info("\nNothing to do.");
+            if ($total > 0) {
+        echo $c->header("\nRenamed " . number_format($counter) . " releases in " . $consoletools->convertTime(TIME() - $timestart) . ".");
+    } else {
+        echo $c->info("\nNothing to do.");
     }
-    else
-	    echo $c->info("No work to process\n");
+} else {
+    echo $c->info("No work to process\n");
+}
 
 
     function localLookup($requestID, $groupName, $oldname)
@@ -114,6 +115,9 @@ else if (isset($argv[1]) && is_numeric($argv[1]))
         $functions = new Functions();
 	    $groupID = $functions->getIDByName($groupName);
 	    $run = $db->queryOneRow(sprintf("SELECT title FROM prehash WHERE requestID = %d AND groupID = %d", $requestID, $groupID));
+        if (isset($run['title']) && preg_match('/s\d+/i', $run['title']) && !preg_match('/s\d+e\d+/i', $run['title'])) {
+        return false;
+    }
 	    if (isset($run['title']))
 		    return $run['title'];
 	    if (preg_match('/\[#?a\.b\.teevee\]/', $oldname))
