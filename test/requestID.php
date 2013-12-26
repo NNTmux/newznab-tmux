@@ -35,16 +35,16 @@ else if (isset($argv[1]) && is_numeric($argv[1]))
         $total = $res->rowCount();
         if ($total > 0)
         {
-          	$precount = $db->queryOneRow('SELECT COUNT(*) AS count FROM prehash WHERE requestID > 0');
+          	$precount = $db->queryOneRow("SELECT COUNT(*) AS count FROM prehash WHERE requestID > 0");
 	echo $c->header("\nComparing ".number_format($total).' releases against '.number_format($precount['count'])." Local requestID's.");
 	sleep(2);
 
             foreach ($res as $row)
             {
-               if (!preg_match('/^\[\d+\]/', $row['name']) && !preg_match('/^\[ \d+ \]/', $row['name']))
+               if (!preg_match('/^\[\d+\]/', $row["name"]) && !preg_match('/^\[ \d+ \]/', $row["name"]))
 		            {
-			        $db->exec('UPDATE releases SET reqidstatus = -2 WHERE ID = ' . $row['ID']);
-			        exit('-');
+			        $db->exec("UPDATE releases SET reqidstatus = -2 WHERE ID = " . $row["ID"]);
+			        continue;
 		            }
 
                 $requestIDtmp = explode(']', substr($row["name"], 1));
@@ -68,7 +68,7 @@ else if (isset($argv[1]) && is_numeric($argv[1]))
                 {
 	                $groupname = $functions->getByNameByID($row["groupname"]);
 	                $determinedcat = $category->determineCategory($groupname, $newTitle);
-	                $run = $db->prepare(sprintf('UPDATE releases SET reqidstatus = 1, relnamestatus = 12, searchname = %s, categoryID = %d where ID = %d', $db->escapeString($newTitle), $determinedcat, $row["ID"]));
+	                $run = $db->prepare(sprintf("UPDATE releases SET reqidstatus = 1, relnamestatus = 12, searchname = %s, categoryID = %d where ID = %d", $db->escapeString($newTitle), $determinedcat, $row["ID"]));
 	                $run->execute();
                     $counter++;
 	                if (isset($argv[2]) && $argv[2] === 'true')
@@ -77,12 +77,12 @@ else if (isset($argv[1]) && is_numeric($argv[1]))
 				            $oldcatname = $functions->getNameByID($row['categoryID']);
 
 				            echo 	$c->headerOver($n.$n.'New name:  ').$c->primary($newTitle).
-						            $c->headerOver('Old name:  ').$c->primary($row['name']).
+						            $c->headerOver('Old name:  ').$c->primary($row["name"]).
 						            $c->headerOver('New cat:   ').$c->primary($newcatname).
 						            $c->headerOver('Old cat:   ').$c->primary($oldcatname).
-						            $c->headerOver('Group:     ').$c->primary($row['groupname']).
+						            $c->headerOver('Group:     ').$c->primary($row["groupname"]).
 						            $c->headerOver('Method:    ').$c->primary('requestID local').
-						            $c->headerOver('ReleaseID: ').$c->primary($row['ID']);
+						            $c->headerOver('ReleaseID: ').$c->primary($row["ID"]);
 			            }
 			        else
 			        {
@@ -94,7 +94,7 @@ else if (isset($argv[1]) && is_numeric($argv[1]))
 		        }
                 else
                 {
-	                $db->exec('UPDATE releases SET reqidstatus = -3 WHERE ID = ' . $row["ID"]);
+	                $db->exec("UPDATE releases SET reqidstatus = -3 WHERE ID = " . $row["ID"]);
 	                echo '.';
                 }
                 }
@@ -115,11 +115,11 @@ else if (isset($argv[1]) && is_numeric($argv[1]))
         $functions = new Functions();
 	    $groupID = $functions->getIDByName($groupName);
 	    $run = $db->queryOneRow(sprintf("SELECT title FROM prehash WHERE requestID = %d AND groupID = %d", $requestID, $groupID));
-        if (isset($run['title']) && preg_match('/s\d+/i', $run['title']) && !preg_match('/s\d+e\d+/i', $run['title'])) {
+        if (isset($run["title"]) && preg_match('/s\d+/i', $run["title"]) && !preg_match('/s\d+e\d+/i', $run["title"])) {
         return false;
     }
-	    if (isset($run['title']))
-		    return $run['title'];
+	    if (isset($run["title"]))
+		    return $run["title"];
 	    if (preg_match('/\[#?a\.b\.teevee\]/', $oldname))
 		    $groupID = $functions->getIDByName('alt.binaries.teevee');
 	    else if (preg_match('/\[#?a\.b\.moovee\]/', $oldname))
