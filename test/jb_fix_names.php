@@ -183,7 +183,7 @@ function releaseCleaner($subject, $groupID, $ID, $groupname)
 	else if (!empty($cleanerName) && !is_array($cleanerName))
 		return array("cleansubject" => $cleanerName, "properlynamed" => true, "increment" => false);
 
-	if ($groupName == "alt.binaries.classic.tv.shows")
+	if ($groupname == "alt.binaries.classic.tv.shows")
 	{
 		if (preg_match('/^(?P<title>.+\d+x\d+.+)[ _-]{0,3}\[\d+\/\d+\][ _-]{0,3}("|#34;).+("|#34;)[ _-]{0,3}(yEnc|rar|par2)$/i', $subject, $match))
 		{
