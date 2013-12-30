@@ -43,7 +43,7 @@ else if (isset($argv[1]) && is_numeric($argv[1]))
             {
                if (!preg_match('/^\[\d+\]/', $row["name"]) && !preg_match('/^\[ \d+ \]/', $row["name"]))
 		            {
-			        $db->exec("UPDATE releases SET reqidstatus = -2 WHERE ID = " . $row["ID"]);
+			        $db->query(sprintf("UPDATE releases SET reqidstatus = -2 WHERE ID = %d", $row["ID"]));
 			        continue;
 		            }
 

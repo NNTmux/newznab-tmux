@@ -4,7 +4,7 @@ require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
 require_once (WWW_DIR.'/lib/site.php');
 
-$version="0.3r404";
+$version="0.3r407";
 
 $db = new DB();
 $s = new Sites();
@@ -432,9 +432,7 @@ while( $i > 0 )
 			printf("$a..");
 			sleep(1);
 		}
-		//$rel = $db->query("UPDATE `binaries` SET `procstat`=0,`procattempts`=0,`regexID`=NULL, `relpart`=0,`reltotalpart`=0,`relname`=NULL WHERE procstat not in (4, 6)");
-		$rel = $db->prepare("UPDATE binaries SET procstat=0, procattempts=0, regexID=NULL, relpart=0, reltotalpart=0, relname=NULL");
-        $rel->execute();
+		$rel = $db->query("UPDATE `binaries` SET `procstat`=0,`procattempts`=0,`regexID`=NULL, `relpart`=0,`reltotalpart`=0,`relname`=NULL WHERE procstat not in (4, 6)");
 	}
 
 	//defrag the query cache every 15 minutes
