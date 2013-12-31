@@ -3,13 +3,15 @@
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
 require_once (WWW_DIR.'/lib/site.php');
+require_once("../test/ColorCLI.php");
 
-$version="0.3r409";
+$version="0.3r411";
 
 $db = new DB();
 $s = new Sites();
 $site = $s->get();
 $patch = $site->dbversion;
+$c = new ColorCLI();
 $DIR = dirname (__FILE__);
 //totals per category in db, results by parentID
 $qry = "SELECT COUNT( releases.categoryID ) AS cnt, parentID FROM releases INNER JOIN category ON releases.categoryID = category.ID WHERE parentID IS NOT NULL GROUP BY parentID";
@@ -338,13 +340,17 @@ $xxx_releases_now_formatted = number_format ( $xxx_releases_now );
 $book_releases_now_formatted = number_format( $book_releases_now );
 $misc_releases_now_formatted = number_format( $misc_releases_now );
 
+$mask1 = $c->headerOver("%-18s")." ".$c->tmuxOrange("%-48.48s");
+$mask2 = $c->headerOver("%-20s")." ".$c->tmuxOrange("%-33.33s");
+$mask3 = $c->header("%-16.16s %25.25s %25.25s");
+$mask4 = $c->primaryOver("%-16.16s") . " " . $c->tmuxOrange("%25.25s %25.25s");
+$mask5 = $c->tmuxOrange("%-16.16s %25.25s %25.25s");
+
 
 
 //create initial display, USP connection count, prehash count and groups count adapted from nZEDb
 passthru('clear');
 //printf("\033[1;31m  First insert:\033[0m ".relativeTime("$firstdate")."\n");
-$mask1 = "\033[1;33m%-16s \033[38;5;214m%-49.49s \n";
-$mask2 = "\033[1;33m%-16s \033[38;5;214m%-39.39s \n";
 printf($mask2, "Monitor Running v$version [".$patch."]: ", relativeTime("$time"));
 printf($mask1, "USP Connections:" ,$uspactiveconnections." active (".$usptotalconnections." total used) - ".NNTP_SERVER);
 printf($mask1, "Newest Release:", "$newestname");
@@ -355,50 +361,40 @@ if ($array['PREDB'] = "true"){
 if  ($array ['FIXRELEASES'] = "true") {
     printf($mask1, "Prehash Updated:", relativeTime("$newestprehash")."ago");
 }
-$mask = "%-15.15s %22.22s %22.22s\n";
-printf("\033[1;33m\n");
-printf($mask, "Category", "State", "Reason");
-printf($mask, "====================", "====================", "====================");
-printf("\033[38;5;214m");
-printf($mask, "Binaries", "$binaries_state", "$binaries_reason");
-printf($mask, "Backfill", "$backfill_state", "$backfill_reason");
-printf($mask, "Import", "$import_state", "$import_reason");
-printf($mask, "Releases", "$releases_state", "$releases_reason");
-printf($mask, "Parts", "$parts_size_gb", "$parts_rows rows");
-printf($mask, "Binaries", "$binaries_size_gb", $binaries_rows."/".$binaries_total." bins");
+printf($mask3, "Category", "State", "Reason");
+printf($mask3, "====================", "====================", "====================");
+printf($mask4, "Binaries", "$binaries_state", "$binaries_reason");
+printf($mask4, "Backfill", "$backfill_state", "$backfill_reason");
+printf($mask4, "Import", "$import_state", "$import_reason");
+printf($mask4, "Releases", "$releases_state", "$releases_reason");
+printf($mask4, "Parts", "$parts_size_gb", "$parts_rows rows");
+printf($mask4, "Binaries", "$binaries_size_gb", $binaries_rows."/".$binaries_total." bins");
 if ( $array['RAMDISK_PATH'] != "" ) {
-	printf($mask, "Ramdisk", "$disk_use", "$disk_free");
+	printf($mask4, "Ramdisk", "$disk_use", "$disk_free");
 }
-
-printf("\033[1;33m\n");
-printf($mask, "Category", "In Process", "In Database");
-printf($mask, "====================", "====================", "====================");
-printf("\033[38;5;214m");
+printf($mask3, "Category", "In Process", "In Database");
+printf($mask3, "====================", "====================", "====================");
 if ($array ['FIXRELEASES'] = "true"){
-printf($mask, "prehash",number_format($prehash - $prehash_matched)."(".$pre_diff.")",number_format($prehash_matched)."(".$pre_percent."%)");
+printf($mask4, "prehash",number_format($prehash - $prehash_matched)."(".$pre_diff.")",number_format($prehash_matched)."(".$pre_percent."%)");
 }
-printf($mask, "NFO's","$nfo_remaining_now_formatted($nfo_diff)","$nfo_now_formatted($nfo_percent%)");
-printf($mask, "Console(1000)","$console_releases_proc_formatted($console_diff)","$console_releases_now_formatted($console_percent%)");
-printf($mask, "Movie(2000)","$movie_releases_proc_formatted($movie_diff)","$movie_releases_now_formatted($movie_percent%)");
-printf($mask, "Audio(3000)","$music_releases_proc_formatted($music_diff)","$music_releases_now_formatted($music_percent%)");
-printf($mask, "PC(4000)","$pc_releases_proc_formatted($pc_diff)","$pc_releases_now_formatted($pc_percent%)");
-printf($mask, "TVShows(5000)","$tvrage_releases_proc_formatted($tvrage_diff)","$tvrage_releases_now_formatted($tvrage_percent%)");
-printf($mask, "XXX(6000)","$xxx_releases_proc_formatted($xxx_diff)","$xxx_releases_now_formatted($xxx_percent%)");
-printf($mask, "Books(7000)","$book_releases_proc_formatted($book_diff)","$book_releases_now_formatted($book_percent%)");
-printf($mask, "Misc(8000)","$misc_remaining_now_formatted($misc_diff)","$misc_releases_now_formatted($misc_percent%)");
-printf($mask, "Total", "$total_work_now_formatted($work_diff)", "$releases_now_formatted($releases_since_start)");
+printf($mask4, "NFO's","$nfo_remaining_now_formatted($nfo_diff)","$nfo_now_formatted($nfo_percent%)");
+printf($mask4, "Console(1000)","$console_releases_proc_formatted($console_diff)","$console_releases_now_formatted($console_percent%)");
+printf($mask4, "Movie(2000)","$movie_releases_proc_formatted($movie_diff)","$movie_releases_now_formatted($movie_percent%)");
+printf($mask4, "Audio(3000)","$music_releases_proc_formatted($music_diff)","$music_releases_now_formatted($music_percent%)");
+printf($mask4, "PC(4000)","$pc_releases_proc_formatted($pc_diff)","$pc_releases_now_formatted($pc_percent%)");
+printf($mask4, "TVShows(5000)","$tvrage_releases_proc_formatted($tvrage_diff)","$tvrage_releases_now_formatted($tvrage_percent%)");
+printf($mask4, "XXX(6000)","$xxx_releases_proc_formatted($xxx_diff)","$xxx_releases_now_formatted($xxx_percent%)");
+printf($mask4, "Books(7000)","$book_releases_proc_formatted($book_diff)","$book_releases_now_formatted($book_percent%)");
+printf($mask4, "Misc(8000)","$misc_remaining_now_formatted($misc_diff)","$misc_releases_now_formatted($misc_percent%)");
+printf($mask4, "Total", "$total_work_now_formatted($work_diff)", "$releases_now_formatted($releases_since_start)");
 
-printf("\n\033[1;33m");
-printf($mask, "Category", "Time", "Status");
-printf($mask, "====================", "====================", "====================");
-printf("\033[38;5;214m");
-printf($mask, "DB Lagg","$query_timer","0 qps");
+printf($mask3, "Category", "Time", "Status");
+printf($mask3, "====================", "====================", "====================");
+printf($mask4, "DB Lagg","$query_timer","0 qps");
 
-printf("\n\033[1;33m\n");
-printf($mask, "Groups", "Active", "Backfill");
-printf($mask, "====================", "=========================", "=========================");
-printf("\033[38;5;214m");
-printf($mask, "Activated", $active_groups."(".$all_groups.")", $backfill_groups. "(".$all_groups.")");
+printf($mask3, "Groups", "Active", "Backfill");
+printf($mask3, "====================", "=========================", "=========================");
+printf($mask4, "Activated", $active_groups."(".$all_groups.")", $backfill_groups. "(".$all_groups.")");
 
 $i = 1;
 while( $i > 0 )
@@ -756,50 +752,44 @@ if ($array ['FIXRELEASES'] = "true") {
     printf($mask1, "Prehash Updated:", relativeTime("$newestprehash")."ago");
     }
 
-	printf("\033[1;33m\n");
-	printf($mask, "Category", "State", "Reason");
-	printf($mask, "====================", "====================", "====================");
+	printf($mask3, "Category", "State", "Reason");
+	printf($mask3, "====================", "====================", "====================");
 	printf("\033[38;5;214m");
-	printf($mask, "Binaries", "$binaries_state", "$binaries_reason");
-	printf($mask, "Backfill", "$backfill_state", "$backfill_reason");
-	printf($mask, "Import", "$import_state", "$import_reason");
-    printf($mask, "Releases", "$releases_state", "$releases_reason");
-	printf($mask, "Parts", "$parts_size_gb", "$parts_rows rows");
-	printf($mask, "Binaries", "$binaries_size_gb", $binaries_rows."/".$binaries_total." bins");
+	printf($mask4, "Binaries", "$binaries_state", "$binaries_reason");
+	printf($mask4, "Backfill", "$backfill_state", "$backfill_reason");
+	printf($mask4, "Import", "$import_state", "$import_reason");
+    printf($mask4, "Releases", "$releases_state", "$releases_reason");
+	printf($mask4, "Parts", "$parts_size_gb", "$parts_rows rows");
+	printf($mask4, "Binaries", "$binaries_size_gb", $binaries_rows."/".$binaries_total." bins");
 	if ( $array['RAMDISK_PATH'] != "" ) {
-		printf($mask, "Ramdisk", "$disk_use used", "$disk_free free");
+		printf($mask4, "Ramdisk", "$disk_use used", "$disk_free free");
 	}
 
-	printf("\033[1;33m\n");
-	printf($mask, "Category", "In Process", "In Database");
-	printf($mask, "====================", "====================", "====================");
-	printf("\033[38;5;214m");
+	printf($mask3, "Category", "In Process", "In Database");
+	printf($mask3, "====================", "====================", "====================");
     if ($array ['FIXRELEASES'] = "true"){
-    printf($mask, "prehash","~".number_format($prehash - $prehash_matched)."(".$pre_diff.")",number_format($prehash_matched)."(".$pre_percent."%)");
+    printf($mask4, "prehash","~".number_format($prehash - $prehash_matched)."(".$pre_diff.")",number_format($prehash_matched)."(".$pre_percent."%)");
 }
-	printf($mask, "NFO's","$nfo_remaining_now_formatted($nfo_diff)","$nfo_now_formatted($nfo_percent%)");
-	printf($mask, "Console(1000)","$console_releases_proc_formatted($console_diff)","$console_releases_now_formatted($console_percent%)");
-	printf($mask, "Movie(2000)","$movie_releases_proc_formatted($movie_diff)","$movie_releases_now_formatted($movie_percent%)");
-	printf($mask, "Audio(3000)","$music_releases_proc_formatted($music_diff)","$music_releases_now_formatted($music_percent%)");
-	printf($mask, "PC(4000)","$pc_releases_proc_formatted($pc_diff)","$pc_releases_now_formatted($pc_percent%)");
-	printf($mask, "TVShows(5000)","$tvrage_releases_proc_formatted($tvrage_diff)","$tvrage_releases_now_formatted($tvrage_percent%)");
-    printf($mask, "XXX(6000)","$xxx_releases_proc_formatted($xxx_diff)","$xxx_releases_now_formatted($xxx_percent%)");
-	printf($mask, "Books(7000)","$book_releases_proc_formatted($book_diff)","$book_releases_now_formatted($book_percent%)");
-	printf($mask, "Misc(8000)","$misc_remaining_now_formatted($misc_diff)","$misc_releases_now_formatted($misc_percent%)");
-	printf($mask, "Total", "$total_work_now_formatted($work_diff)", "$releases_now_formatted($releases_since_start)");
+	printf($mask4, "NFO's","$nfo_remaining_now_formatted($nfo_diff)","$nfo_now_formatted($nfo_percent%)");
+	printf($mask4, "Console(1000)","$console_releases_proc_formatted($console_diff)","$console_releases_now_formatted($console_percent%)");
+	printf($mask4, "Movie(2000)","$movie_releases_proc_formatted($movie_diff)","$movie_releases_now_formatted($movie_percent%)");
+	printf($mask4, "Audio(3000)","$music_releases_proc_formatted($music_diff)","$music_releases_now_formatted($music_percent%)");
+	printf($mask4, "PC(4000)","$pc_releases_proc_formatted($pc_diff)","$pc_releases_now_formatted($pc_percent%)");
+	printf($mask4, "TVShows(5000)","$tvrage_releases_proc_formatted($tvrage_diff)","$tvrage_releases_now_formatted($tvrage_percent%)");
+    printf($mask4, "XXX(6000)","$xxx_releases_proc_formatted($xxx_diff)","$xxx_releases_now_formatted($xxx_percent%)");
+	printf($mask4, "Books(7000)","$book_releases_proc_formatted($book_diff)","$book_releases_now_formatted($book_percent%)");
+	printf($mask4, "Misc(8000)","$misc_remaining_now_formatted($misc_diff)","$misc_releases_now_formatted($misc_percent%)");
+	printf($mask4, "Total", "$total_work_now_formatted($work_diff)", "$releases_now_formatted($releases_since_start)");
 
-	printf("\n\033[1;33m");
-	printf($mask, "Category", "Time", "Status");
-	printf($mask, "====================", "====================", "====================");
+	printf($mask3, "Category", "Time", "Status");
+	printf($mask3, "====================", "====================", "====================");
 	printf("\033[38;5;214m");
         $get_current_number = str_replace("\n", '', shell_exec($mysqladmin)." qps");
-        printf($mask, "DB Lagg","$query_timer","$get_current_number");
+        printf($mask4, "DB Lagg","$query_timer","$get_current_number");
 
-    printf("\n\033[1;33m\n");
-    printf($mask, "Groups", "Active", "Backfill");
-    printf($mask, "====================", "=========================", "=========================");
-    printf("\033[38;5;214m");
-    printf($mask, "Activated", $active_groups."(".$all_groups.")", $backfill_groups. "(".$all_groups.")");
+    printf($mask3, "Groups", "Active", "Backfill");
+    printf($mask3, "====================", "=========================", "=========================");
+    printf($mask4, "Activated", $active_groups."(".$all_groups.")", $backfill_groups. "(".$all_groups.")");
 
 	/*$optimize_safe_to_run = "false";
 	$optimize_run = "false";
