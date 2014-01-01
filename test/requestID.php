@@ -11,7 +11,7 @@ require_once("consoletools.php");
 
 $c = new ColorCLI;
 if (!isset($argv[1]) || ( $argv[1] != "all" && $argv[1] != "full" && !is_numeric($argv[1])))
-	exit($c->error("\nThis script tries to match an MD5 of the releases.name or releases.searchname to predb.md5 doing local lookup only.\n"
+	exit($c->error("\nThis script tries to match the releases.name or releases.searchname to prehash.requestID doing local lookup only.\n"
 		."php requestid.php 1000 true		...: to limit to 1000 sorted by newest postdate and show renaming.\n"
 		."php requestid.php full true		...: to run on full database and show renaming.\n"
 		."php requestid.php all true		...: to run on all hashed releases(including previously renamed) and show renaming.\n"));
