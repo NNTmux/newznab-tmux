@@ -5,7 +5,7 @@ require(WWW_DIR.'/lib/postprocess.php');
 require_once (WWW_DIR.'/lib/site.php');
 require_once("../test/ColorCLI.php");
 
-$version="0.3r523";
+$version="0.3r524";
 
 $db = new DB();
 $s = new Sites();
@@ -42,9 +42,7 @@ $proc = "SELECT
 ( SELECT UNIX_TIMESTAMP(updatedate) from predb order by updatedate DESC limit 1 ) AS newestpredb,
 ( SELECT COUNT( * ) FROM prehash where releaseID IS NOT NULL ) AS prehash_matched,
 ( SELECT TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES where table_name = 'prehash' AND TABLE_SCHEMA = '".DB_NAME."' ) AS prehash,
-( SELECT name from releases order by adddate desc limit 1 ) AS newestaddname,
-(SELECT COUNT(*) FROM releases WHERE (bitwise & 1284) = 1280 AND reqidstatus IN (0, -1, -3)) AS requestid_inprogress,
-(SELECT COUNT(*) FROM releases WHERE (bitwise & 256) = 256 AND reqidstatus = 1) AS requestid_matched";
+( SELECT name from releases order by adddate desc limit 1 ) AS newestaddname";
 //$proc = "SELECT * FROM procCnt;";
 
 //get first release inserted datetime and oldest posted datetime
@@ -235,7 +233,6 @@ $book_releases_proc = 0;
 $releases_loop = 0;
 $nfo_remaining_now = 0;
 $nfo_now = 0;
-$request_percent = $requestid_inprogress_start = $requestid_inprogress = $requestid_diff = $requestid_matched = 0;
 $parts_rows = 0;
 $parts_size_gb = 0;
 $binaries_rows = 0;
@@ -380,7 +377,6 @@ printf($mask3, "====================", "====================", "================
 if ($array ['FIXRELEASES'] = "true"){
 printf($mask4, "prehash",number_format($prehash - $prehash_matched)."(".$pre_diff.")",number_format($prehash_matched)."(".$pre_percent."%)");
 }
-printf($mask4, "requestID", $requestid_inprogress . "(" . $requestid_diff . ")", number_format($requestid_matched) . "(" . $request_percent . "%)");
 printf($mask4, "NFO's","$nfo_remaining_now_formatted($nfo_diff)","$nfo_now_formatted($nfo_percent%)");
 printf($mask4, "Console(1000)","$console_releases_proc_formatted($console_diff)","$console_releases_now_formatted($console_percent%)");
 printf($mask4, "Movie(2000)","$movie_releases_proc_formatted($movie_diff)","$movie_releases_now_formatted($movie_percent%)");
@@ -488,7 +484,6 @@ while( $i > 0 )
 	//get start values from $qry
 	if ( $i == "1" )
 	{
-        if ( @$proc_result[0]['requestid_inprogress'] != NULL) {$requestid_inprogress_start = $proc_result[0]['requestid_inprogress'];
         if ( @$proc_result[0]['nforemains'] != NULL ) { $nfo_remaining_start = $proc_result[0]['nforemains']; }
         if ( @$proc_result[0]['prehash_matched'] != NULL ) { $prehash_start = $proc_result[0]['prehash_matched']; }
 		if ( @$proc_result[0]['console'] != NULL ) { $console_releases_proc_start = $proc_result[0]['console']; }
@@ -545,14 +540,11 @@ while( $i > 0 )
     if ( @$proc_result[0]['newestpredb'] ) { $newestpredb = $proc_result[0]['newestpredb']; }
     if ( @$proc_result[0]['prehash'] != NULL ) { $prehash = $proc_result[0]['prehash']; }
     if ( @$proc_result[0]['prehash_matched'] != NULL ) { $prehash_matched = $proc_result[0]['prehash_matched']; }
-    if ( @$proc_result[0]['requestid_inprogress'] != NULL) {$requestid_inprogress = $proc_result[0]['requestid_inprogress']; }
-    if ( @$proc_result[0]['requestid_matched'] != NULL) {$requestid_matched = $proc_result[0]['requestid_matched']; }
 
 	//calculate releases difference
 	$releases_misc_diff = number_format( $releases_now - $releases_start );
 	$releases_since_start = number_format( $releases_now - $releases_start );
 	$work_misc_diff = $work_remaining_now - $work_remaining_start;
-    $requestid_diff = number_format($requestid_inprogress - $requestid_inprogress_start);
 
 	$total_work_now = $work_remaining_now + $tvrage_releases_proc + $music_releases_proc + $movie_releases_proc + $console_releases_proc + $book_releases_proc + $xxx_releases_proc + $nfo_remaining_now;
 	if ( $i == 1 ) { $total_work_start = $total_work_now; }
@@ -613,7 +605,6 @@ while( $i > 0 )
         $xxx_percent = sprintf( "%02s", floor(( $xxx_releases_now / $releases_now) * 100 ));
 		$book_percent = sprintf( "%02s", floor(( $book_releases_now / $releases_now) * 100 ));
 		$misc_percent = sprintf( "%02s", floor(( $misc_releases_now / $releases_now) * 100 ));
-        $request_percent = sprintf("%02s", floor(($requestid_matched / $releases_now) * 100));
 	} else {
 		$nfo_percent = 0;
         $pre_percent = 0;
@@ -779,7 +770,6 @@ if ($array ['FIXRELEASES'] = "true") {
     if ($array ['FIXRELEASES'] = "true"){
     printf($mask4, "prehash","~".number_format($prehash - $prehash_matched)."(".$pre_diff.")",number_format($prehash_matched)."(".$pre_percent."%)");
 }
-    printf($mask4, "requestID", number_format($requestid_inprogress) . "(" . $requestid_diff . ")", number_format($requestid_matched) . "(" . $request_percent . "%)");
 	printf($mask4, "NFO's","$nfo_remaining_now_formatted($nfo_diff)","$nfo_now_formatted($nfo_percent%)");
 	printf($mask4, "Console(1000)","$console_releases_proc_formatted($console_diff)","$console_releases_now_formatted($console_percent%)");
 	printf($mask4, "Movie(2000)","$movie_releases_proc_formatted($movie_diff)","$movie_releases_now_formatted($movie_percent%)");
