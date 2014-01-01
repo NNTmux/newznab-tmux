@@ -278,9 +278,10 @@ class Functions
         if ($messageID == '')
 			return false;
         $t = 'UNIX_TIMESTAMP(postdate)';
-		$quer = $db->queryOneRow('SELECT groupID, categoryID, relnamestatus, searchname, '.$t.' as postdate, ID as releaseID FROM releases WHERE ID = '.$relID);
-		if ((!in_array($quer['relnamestatus'], array(0, 1, 6, 20, 21)) || $quer['relnamestatus'] === 7 || $quer['categoryID']) != Category::CAT_MISC_OTHER)
-			return false;
+		$quer = $db->queryOneRow('SELECT groupID, categoryID, searchname, '.$t.' as postdate, ID as releaseID FROM releases WHERE (bitwise & 4) = 0 AND ID = '.$relID);
+  		if ($quer['categoryID'] != Category::CAT_MISC_OTHER)
+            return false;
+            
         $nntp = new Nntp();
         $nntp->doConnect();
 		$groups = new Groups();

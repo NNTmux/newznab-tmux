@@ -82,7 +82,7 @@ if (isset($argv[1]) && $argv[1] == "true")
 	{
 		$type = "Gibberish";
 		$db = new DB();
-		$sql = $db->prepare("SELECT ID, guid, searchname FROM releases WHERE searchname REGEXP '^[a-zA-Z0-9]{15,}$' AND nfostatus = 0 AND relnamestatus >= 20 AND rarinnerfilecount >= 0".$and);
+		$sql = $db->prepare("SELECT ID, guid, searchname FROM releases WHERE searchname REGEXP '^[a-zA-Z0-9]{15,}$' AND nfostatus = 0 AND (bitwise & 1) = 1 AND rarinnerfilecount >= 0".$and);
         $sql->execute();
 		$delcount = deleteReleases($sql, $type);
 		return $delcount;
@@ -93,7 +93,7 @@ if (isset($argv[1]) && $argv[1] == "true")
 	{
 		$type = "Hashed";
 		$db = new DB();
-		$sql = $db->prepare("SELECT ID, guid, searchname FROM releases WHERE searchname REGEXP '[a-zA-Z0-9]{25,}' AND nfostatus = 0 AND relnamestatus >= 20 AND rarinnerfilecount >= 0".$and);
+		$sql = $db->prepare("SELECT ID, guid, searchname FROM releases WHERE searchname REGEXP '[a-zA-Z0-9]{25,}' AND nfostatus = 0 AND (bitwise & 1) = 1 AND rarinnerfilecount >= 0".$and);
         $sql->execute();
 		$delcount = deleteReleases($sql, $type);
 		return $delcount;
@@ -104,7 +104,7 @@ if (isset($argv[1]) && $argv[1] == "true")
 	{
 		$type = "Short";
 		$db = new DB();
-		$sql = $db->prepare("SELECT ID, guid, searchname FROM releases WHERE searchname REGEXP '^[a-zA-Z0-9]{0,5}$' AND nfostatus = 0 AND relnamestatus >= 20 AND rarinnerfilecount >= 0".$and);
+		$sql = $db->prepare("SELECT ID, guid, searchname FROM releases WHERE searchname REGEXP '^[a-zA-Z0-9]{0,5}$' AND nfostatus = 0 AND (bitwise & 1) = 1 AND rarinnerfilecount >= 0".$and);
         $sql->execute();
 		$delcount = deleteReleases($sql, $type);
 		return $delcount;
@@ -148,7 +148,7 @@ if (isset($argv[1]) && $argv[1] == "true")
 	{
 		$type = "Passworded";
 		$db = new DB();
-		$sql = $db->prepare("SELECT ID, guid, searchname FROM releases WHERE ( searchname LIKE '%passworded%' OR searchname LIKE '%password protect%' OR searchname LIKE '%password%' OR searchname LIKE '%passwort%' OR searchname LIKE '%[pw]%' ) AND searchname NOT LIKE '%no password%' AND searchname NOT LIKE '%not passworded%' AND searchname NOT LIKE '%unlocker%' AND searchname NOT LIKE '%reset%' AND searchname NOT LIKE '%recovery%' AND searchname NOT LIKE '%keygen%' AND searchname NOT LIKE '%advanced%' AND nzbstatus in (1, 2) AND categoryID not in (4000, 4010, 4020, 4030, 4040, 4050, 4060, 4070)".$and);
+		$sql = $db->prepare("SELECT ID, guid, searchname FROM releases WHERE ( searchname LIKE '%passworded%' OR searchname LIKE '%password protect%' OR searchname LIKE '%password%' OR searchname LIKE '%passwort%' OR searchname LIKE '%[pw]%' ) AND searchname NOT LIKE '%no password%' AND searchname NOT LIKE '%not passworded%' AND searchname NOT LIKE '%unlocker%' AND searchname NOT LIKE '%reset%' AND searchname NOT LIKE '%recovery%' AND searchname NOT LIKE '%keygen%' AND searchname NOT LIKE '%advanced%' AND (bitwise & 256) = 256 AND categoryID not in (4000, 4010, 4020, 4030, 4040, 4050, 4060, 4070)".$and);
         $sql->execute();
 		$delcount = deleteReleases($sql, $type);
 		return $delcount;

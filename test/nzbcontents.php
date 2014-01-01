@@ -73,14 +73,16 @@ Class NZBcontents
 				if (preg_match('/\.(par[2" ]|\d{2,3}").+\(1\/1\)$/i', $nzbcontents->attributes()->subject))
 				{
 					$pp = new Functions();
-					if (($pp->parsePAR2($nzbcontents->segments->segment, $relID, $groupID, $nntp)) === true)
+					if (($pp->parsePAR2($nzbcontents->segments->segment, $relID, $groupID, $nntp)) === true && $namestatus === 1)
                     {
-						$db->exec(sprintf('UPDATE releases SET relnamestatus = 22 WHERE (relnamestatus != 7 AND relnamestatus != 22) AND ID = %d', $relID));
+						$db->exec(sprintf('UPDATE releases SET bitwise = ((bitwise & ~32)|32) WHERE ID = %d', $relID));
 						return true;
 					}
 				}
 			}
 		}
+        if ($namestatus === 1)
+			$db->exec(sprintf('UPDATE releases SET bitwise = ((bitwise & ~32)|32) WHERE ID = %d', $relID));
 		return false;
         }
 

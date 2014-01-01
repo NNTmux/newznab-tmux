@@ -62,7 +62,7 @@ class Namefixer
         $functions = new Functions ();
 		$type = "NFO, ";
 		// Only select releases we haven't checked here before
-		$query = "SELECT nfo.releaseID as nfoID, rel.groupID, rel.categoryID, rel.searchname, uncompress(nfo) as textstring, rel.ID as releaseID from releases rel inner join releasenfo nfo on (nfo.releaseID = rel.ID) where relnamestatus = 1";
+		$query = "SELECT nfo.releaseID as nfoID, rel.groupID, rel.categoryID, rel.searchname, uncompress(nfo) as textstring, rel.ID as releaseID from releases rel inner join releasenfo nfo on (nfo.releaseID = rel.ID) where categoryID != 5070 AND ((bitwise & 4) = 0 OR rel.categoryID = 8010) AND (bitwise & 64) = 0";
 
 		//24 hours, other cats
 		if ($time == 1 && $cats == 1)
@@ -84,7 +84,7 @@ class Namefixer
             {
                 if (preg_match('/^=newz\[NZB\]=\w+/', $relrow['textstring']))
  				{
--					$fail = $db->prepare(sprintf("UPDATE releases SET relnamestatus = 20 WHERE ID = %d", $relrow['rel.ID']));
+-					$fail = $db->prepare(sprintf("UPDATE releases SET bitwise = ((bitwise & ~64)|64) WHERE ID = %d", $relrow['rel.ID']));
 -					$fail->execute();
                 }
 
@@ -127,7 +127,7 @@ class Namefixer
 		$db = new DB();
         $functions = new Functions();
 		$type = "Filenames, ";
-		$query = "SELECT relfiles.name as textstring, rel.categoryID, rel.searchname, rel.groupID, relfiles.releaseID as fileID, rel.ID as releaseID from releases rel inner join releasefiles relfiles on (relfiles.releaseID = rel.ID) where relnamestatus = 1";
+		$query = "SELECT relfiles.name as textstring, rel.categoryID, rel.searchname, rel.groupID, relfiles.releaseID as fileID, rel.ID as releaseID from releases rel inner join releasefiles relfiles on (relfiles.releaseID = rel.ID) where categoryID != 5070 AND ((bitwise & 4) = 0 OR rel.categoryID = 8010) AND (bitwise & 128) = 0";
 
 		//24 hours, other cats
 		if ($time == 1 && $cats == 1)
@@ -174,7 +174,7 @@ class Namefixer
 		$db = $this->db;
         $functions = new Functions();
 		$type = "PAR2, ";
-		$query = "SELECT rel.ID AS releaseID, rel.guid, rel.groupID FROM releases rel WHERE rel.categoryID = 8010 AND rel.relnamestatus IN (0, 1, 20, 21)";
+		$query = "SELECT rel.ID AS releaseID, rel.guid, rel.groupID FROM releases rel WHERE ((bitwise & 4) = 0 OR rel.categoryID = 8010) AND (bitwise & 32) = 0";
 
 		//24 hours, other cats
 		if ($time == 1 && $cats == 1)
@@ -279,11 +279,11 @@ class Namefixer
                                 $status = 7;
                             elseif ($type == "Filenames, ")
                                 $status = 9;
-                                $db->queryDirect(sprintf("UPDATE releases SET searchname = %s, relnamestatus = %d, categoryID = %d WHERE ID = %d", $db->escapeString(substr($newname, 0, 255)), $status, $determinedcat, $release["releaseID"]));
+                                $db->queryDirect(sprintf("UPDATE releases SET searchname = %s, bitwise = ((bitwise & ~4)|4), bitwise = ((bitwise & ~%d)|%d), categoryID = %d WHERE ID = %d", $db->escapeString(substr($newname, 0, 255)), $status, $status, $determinedcat, $release["releaseID"]));
                         }
                     else
                                 {
-                                $db->queryDirect(sprintf("UPDATE releases set searchname = %s, categoryID = %d where ID = %d", $db->escapeString($newname), $determinedcat, $release["releaseID"]));
+                                $db->queryDirect(sprintf("UPDATE releases set searchname = %s, bitwise = ((bitwise & ~1)|1), categoryID = %d where ID = %d", $db->escapeString($newname), $determinedcat, $release["releaseID"]));
                                 }
                 }
 			}
@@ -316,7 +316,7 @@ class Namefixer
 						$this->matched = true;
 						if ($namestatus == 1)
                         {
-							$md = $db->prepare(sprintf("UPDATE releases SET searchname = %s, categoryID = %d, relnamestatus = 10, dehashstatus = 1 WHERE ID = %d", $db->escapeString($row["title"]), $determinedcat, $release["ID"]));
+							$md = $db->prepare(sprintf("UPDATE releases SET searchname = %s, categoryID = %d, bitwise = ((bitwise & ~5)|5), dehashstatus = 1 WHERE ID = %d", $db->escapeString($row["title"]), $determinedcat, $release["ID"]));
                             $md->execute();
                         }
 						else
@@ -381,18 +381,18 @@ class Namefixer
 	   if ($namestatus == 1 && $this->matched === false && $type == "NFO, ")
 		{
 			$db = new Db;
-			$db->exec(sprintf("UPDATE releases SET relnamestatus = 20 WHERE ID = %d", $release['releaseID']));
+			$db->exec(sprintf("UPDATE releases SET bitwise = ((bitwise & ~64)|64) WHERE ID = %d", $release['releaseID']));
 		}
         // The release didn't match so set relnamestatus to 21 so it doesn't get rechecked. Also allows removeCrapReleases to run extra things on the release.
 		elseif ($namestatus == 1 && $this->matched === false && $type == "Filenames, ")
 		{
 			$db = new DB();
-			$db->exec(sprintf("UPDATE releases SET relnamestatus = 21 WHERE ID = %d", $release["releaseID"]));
+			$db->exec(sprintf("UPDATE releases SET bitwise = ((bitwise & ~128)|128) WHERE ID = %d", $release["releaseID"]));
 		}
         elseif ($namestatus == 1 && $this->matched === false && $type == "PAR2, ")
 		{
 			$db = new DB();
-			$db->exec(sprintf("UPDATE releases SET relnamestatus = 22 WHERE ID = %d", $release["releaseID"]));
+			$db->exec(sprintf("UPDATE releases SET bitwise = ((bitwise & ~32)|32) WHERE ID = %d", $release["releaseID"]));
 		}
 	}
 	//

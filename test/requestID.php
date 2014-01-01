@@ -26,11 +26,11 @@ $timestart = TIME();
 $counter = 0;
 
 if (isset($argv[1]) && $argv[1] === "all")
-	$res = $db->queryDirect("SELECT r.ID, r.name, r.categoryID, g.name AS groupname FROM releases r LEFT JOIN groups g ON r.groupID = g.ID WHERE relnamestatus IN (1, 20, 21, 22)");
+	$res = $db->queryDirect("SELECT r.ID, r.name, r.categoryID, g.name AS groupname FROM releases r LEFT JOIN groups g ON r.groupID = g.ID WHERE (bitwise & 1280) = 1280");
 else if (isset($argv[1]) && $argv[1] === "full")
-	$res = $db->queryDirect("SELECT r.ID, r.name, r.categoryID, g.name AS groupname FROM releases r LEFT JOIN groups g ON r.groupID = g.ID WHERE relnamestatus IN (1, 20, 21, 22) AND reqidstatus in (0, -1)");
+	$res = $db->queryDirect("SELECT r.ID, r.name, r.categoryID, g.name AS groupname FROM releases r LEFT JOIN groups g ON r.groupID = g.ID WHERE (bitwise & 1284) = 1280 AND reqidstatus in (0, -1)");
 else if (isset($argv[1]) && is_numeric($argv[1]))
-	$res = $db->queryDirect("SELECT r.ID, r.name, r.categoryID, g.name AS groupname FROM releases r LEFT JOIN groups g ON r.groupID = g.ID WHERE relnamestatus IN (1, 20, 21, 22) AND reqidstatus in (0, -1) ORDER BY postdate DESC LIMIT " . $argv[1]);
+	$res = $db->queryDirect("SELECT r.ID, r.name, r.categoryID, g.name AS groupname FROM releases r LEFT JOIN groups g ON r.groupID = g.ID WHERE (bitwise & 1280) = 1280 AND reqidstatus in (0, -1) ORDER BY postdate DESC LIMIT " . $argv[1]);
 
         $total = $res->rowCount();
         if ($total > 0)
@@ -68,7 +68,7 @@ else if (isset($argv[1]) && is_numeric($argv[1]))
                 {
 	                $groupname = $functions->getByNameByID($row["groupname"]);
 	                $determinedcat = $category->determineCategory($groupname, $newTitle);
-	                $run = $db->prepare(sprintf("UPDATE releases SET reqidstatus = 1, relnamestatus = 12, searchname = %s, categoryID = %d where ID = %d", $db->escapeString($newTitle), $determinedcat, $row["ID"]));
+	                $run = $db->prepare(sprintf("UPDATE releases SET reqidstatus = 1, bitwise = ((bitwise & ~4)|4), searchname = %s, categoryID = %d where ID = %d", $db->escapeString($newTitle), $determinedcat, $row["ID"]));
 	                $run->execute();
                     $counter++;
 	                if (isset($argv[2]) && $argv[2] === 'true')
