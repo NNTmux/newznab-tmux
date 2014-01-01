@@ -5,7 +5,7 @@ require(WWW_DIR.'/lib/postprocess.php');
 require_once (WWW_DIR.'/lib/site.php');
 require_once("../test/ColorCLI.php");
 
-$version="0.3r521";
+$version="0.3r522";
 
 $db = new DB();
 $s = new Sites();
@@ -547,7 +547,7 @@ while( $i > 0 )
     if ( @$proc_result[0]['prehash'] != NULL ) { $prehash = $proc_result[0]['prehash']; }
     if ( @$proc_result[0]['prehash_matched'] != NULL ) { $prehash_matched = $proc_result[0]['prehash_matched']; }
     if ( @$proc_result[0]['requestid_inprogress'] != NULL) {$requestid_inprogress = $proc_result[0]['requestid_inprogress']; }
-    if ( @$proc_result[0]['requestid_matched'] != NULL) {$requestid_matched = $proc_work_result3[0]['requestid_matched']; }
+    if ( @$proc_result[0]['requestid_matched'] != NULL) {$requestid_matched = $proc_result[0]['requestid_matched']; }
 
 	//calculate releases difference
 	$releases_misc_diff = number_format( $releases_now - $releases_start );
