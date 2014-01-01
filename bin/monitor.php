@@ -1428,5 +1428,4 @@ if ($array ['FIXRELEASES'] = "true") {
 		sleep(1);
 	}
 }
-}
 ?>
