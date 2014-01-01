@@ -59,7 +59,7 @@ Class NZBcontents
 	}
 
 	// Attempts to get the releasename from a par2 file
-	public function checkPAR2($guid, $relID, $groupID, $db, $pp, $nntp)
+	public function checkPAR2($guid, $relID, $groupID, $db, $pp, $namestatus, $nntp)
 	{
 	    $c = new ColorCLI;
 	    if (!isset($nntp))
