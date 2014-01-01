@@ -201,7 +201,7 @@ class Namefixer
 			foreach ($relres as $relrow)
 			{
                 $this->done = $this->matched = false;
-				if (($nzbcontents->checkPAR2($relrow['guid'], $relrow['releaseID'], $relrow['groupID'], $db, $pp, $nntp)) === true)
+				if (($nzbcontents->checkPAR2($relrow['guid'], $relrow['releaseID'], $relrow['groupID'], $db, $pp, $namestatus, $nntp)) === true)
                     {
                      echo ".";
                      $this->fixed++;

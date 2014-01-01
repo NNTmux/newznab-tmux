@@ -694,7 +694,7 @@ Class Predb
 			echo $this->c->primary('Querying DB for matches in prehash titles with release searchnames.');
 		}
 
-		$res = $db->queryDirect('SELECT p.id AS preID, r.ID AS releaseID FROM prehash p INNER JOIN releases r ON p.title = r.searchname WHERE r.preID IS NULL'); 
+		$res = $db->queryDirect('SELECT p.id AS preID, r.ID AS releaseID FROM prehash p INNER JOIN releases r ON p.title = r.searchname WHERE r.preID IS NULL');
         //$row = mysqli_fetch_array($res);
         //$total = $row [0];
         $total = $res->rowCount();
@@ -703,7 +703,7 @@ Class Predb
            echo "\n";
 			foreach ($res as $row)
 			{
-				$db->queryExec(sprintf('UPDATE releases SET preID = %d WHERE ID = %d', $row['preID'], $row['releaseID']));
+				$db->exec(sprintf('UPDATE releases SET preID = %d WHERE ID = %d', $row['preID'], $row['releaseID']));
 				if ($this->echooutput)
 				{
 					$consoletools->overWritePrimary('Matching up prehash titles with release search names: ' . $consoletools->percentString(++$updated, $total));
