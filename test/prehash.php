@@ -675,9 +675,10 @@ Class Predb
 	{
 		$db = new DB();
         $f = new Functions();
-		if($x = $db->queryOneRow(sprintf("SELECT ID FROM prehash WHERE title = %s", $db->escapeString($cleanerName))) !== false)
+		$x = '';
+		if ($db->queryOneRow(sprintf('SELECT ID FROM prehash WHERE title = %s', $db->escapeString($cleanerName))) !== false)
 		{
-			$db->exec(sprintf("UPDATE releases SET relnamestatus = 11 WHERE ID = %d", $x["ID"], $releaseID));
+			$db->exec(sprintf('UPDATE releases SET preID = %d WHERE ID = %d', $x['id'], $releaseID));
 		}
 	}
 
@@ -689,28 +690,27 @@ Class Predb
         $consoletools = new ConsoleTools();
 		$updated = 0;
 		if($this->echooutput)
-			echo $this->c->header('Querying DB for matches in prehash titles with release searchnames.');
+			{
+			echo $this->c->primary('Querying DB for matches in prehash titles with release searchnames.');
+		}
 
-		$res = $db->prepare("SELECT p.ID, p.category, r.ID AS releaseID FROM prehash p inner join releases r ON p.title = r.searchname WHERE p.releaseID IS NULL");
-        $res->execute();
+		$res = $db->queryDirect('SELECT p.id AS preID, r.ID AS releaseID FROM prehash p INNER JOIN releases r ON p.title = r.searchname WHERE r.preID IS NULL'); 
         //$row = mysqli_fetch_array($res);
         //$total = $row [0];
         $total = $res->rowCount();
         if($total > 0)
         {
-            $updated = 0;
+           echo "\n";
 			foreach ($res as $row)
 			{
-				$db->exec(sprintf("UPDATE prehash SET releaseID = %d WHERE ID = %d", $row["releaseID"], $row["ID"]));
-                $catName=str_replace(array("TV-", "TV: "), '', $row["category"]);
-				if($catID = $db->queryOneRow(sprintf("SELECT ID FROM category WHERE title = %s", $db->escapeString($catName))))
-					$db->exec(sprintf("UPDATE releases SET categoryID = %d WHERE ID = %d", $db->escapeString($catID["ID"]), $db->escapeString($row["releaseID"])));
-				$db->exec(sprintf("UPDATE releases SET relnamestatus = 11 WHERE ID = %d", $row["releaseID"]));
-				if($this->echooutput)
-					$consoletools->overWrite("Matching up prehash titles with release search names: ".$consoletools->percentString($updated++,$total));
+				$db->queryExec(sprintf('UPDATE releases SET preID = %d WHERE ID = %d', $row['preID'], $row['releaseID']));
+				if ($this->echooutput)
+				{
+					$consoletools->overWritePrimary('Matching up prehash titles with release search names: ' . $consoletools->percentString(++$updated, $total));
+				}
 			}
-        }
-
+			echo "\n";
+		}
 		return $updated;
     }
 	// Look if the release is missing an nfo.

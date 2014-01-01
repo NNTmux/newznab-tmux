@@ -322,29 +322,26 @@ class Functions
 						$relfiles++;
 				}
 				$quer["textstring"] = $file["name"];
-				$namefixer->checkName($quer, 1, "PAR2, ", 1);
-				$stat = $db->queryOneRow("SELECT relnamestatus AS a FROM releases WHERE ID = {$relID}");
-				if ($stat["a"] === 7)
-				{
-					$foundname = true;
-					break;
-				}
-			}
-			if ($relfiles > 0)
-			{
-
-				$cnt = $db->queryOneRow('SELECT COUNT(releaseID) AS count FROM releasefiles WHERE releaseID = '.$relID);
-				$count = $relfiles;
-				if ($cnt !== false && $cnt["count"] > 0)
-					$count = $relfiles + $cnt["count"];
-				$db->exec(sprintf("UPDATE releases SET rarinnerfilecount = %d where ID = %d", $count, $relID));
-			}
-			if ($foundname === true)
-				return true;
-			else
-				return false;
-		}
-	}
+				if ($namefixer->checkName($quer, 1, 'PAR2, ', 1) === true) {
+                    $foundname = true;
+                    break;
+                }
+            }
+            if ($relfiles > 0) {
+                $this->debug('Added ' . $relfiles . ' releasefiles from PAR2 for ' . $quer['searchname']);
+                $cnt = $db->queryOneRow('SELECT COUNT(releaseID) AS count FROM releasefiles WHERE releaseID = ' . $relID);
+                $count = $relfiles;
+                if ($cnt !== false && $cnt['count'] > 0)
+                    $count = $relfiles + $cnt['count'];
+                $db->exec(sprintf('UPDATE releases SET rarinnerfilecount = %d where ID = %d', $count, $relID));
+            }
+            if ($foundname === true)
+                return true;
+            else
+                return false;
+        } else
+            return false;
+    }
 
     // Check if the NZB is there, returns path, else false.
 	function NZBPath($releaseGuid, $sitenzbpath = "")
