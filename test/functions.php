@@ -328,7 +328,7 @@ class Functions
                 }
             }
             if ($relfiles > 0) {
-                $this->debug('Added ' . $relfiles . ' releasefiles from PAR2 for ' . $quer['searchname']);
+                echo $this->c->debug("Added " . $relfiles . " releasefiles from PAR2 for " . $quer["searchname"]);
                 $cnt = $db->queryOneRow('SELECT COUNT(releaseID) AS count FROM releasefiles WHERE releaseID = ' . $relID);
                 $count = $relfiles;
                 if ($cnt !== false && $cnt['count'] > 0)
