@@ -5,7 +5,7 @@ require(WWW_DIR.'/lib/postprocess.php');
 require_once (WWW_DIR.'/lib/site.php');
 require_once("../test/ColorCLI.php");
 
-$version="0.3r522";
+$version="0.3r523";
 
 $db = new DB();
 $s = new Sites();
@@ -44,8 +44,7 @@ $proc = "SELECT
 ( SELECT TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES where table_name = 'prehash' AND TABLE_SCHEMA = '".DB_NAME."' ) AS prehash,
 ( SELECT name from releases order by adddate desc limit 1 ) AS newestaddname,
 (SELECT COUNT(*) FROM releases WHERE (bitwise & 1284) = 1280 AND reqidstatus IN (0, -1, -3)) AS requestid_inprogress,
-(SELECT COUNT(*) FROM releases WHERE (bitwise & 256) = 256 AND reqidstatus = 1) AS requestid_matched,
-(SELECT COUNT(*) FROM releases WHERE (bitwise & 256) = 256 AND preid IS NOT NULL) AS predb_matched";
+(SELECT COUNT(*) FROM releases WHERE (bitwise & 256) = 256 AND reqidstatus = 1) AS requestid_matched";
 //$proc = "SELECT * FROM procCnt;";
 
 //get first release inserted datetime and oldest posted datetime
