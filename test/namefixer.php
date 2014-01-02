@@ -225,7 +225,6 @@ class Namefixer
 	//
 	public function updateRelease($release, $name, $method, $echo, $type, $namestatus)
 	{
-        $echooutput = true;
         if ($this->relid !== $release["releaseID"])
 		{
 			$namecleaning = new nameCleaning();
@@ -238,8 +237,7 @@ class Namefixer
 
 				$category = new Category();
                 $functions = new Functions ();
-                $groupname = $functions->getByNameByID($release["groupID"]);
-				$determinedcat = $category->determineCategory($groupname, $newname);
+				$determinedcat = $category->determineCategory($release["groupID"], $newname);
 
 				if ($type === "PAR2, ")
                     {
@@ -278,7 +276,7 @@ class Namefixer
                     }
 				}
 
-                   if ($echo == 1) {
+                if ($echo == 1) {
                     $db = $this->db;
                     if ($namestatus == 1) {
                         if ($type == "NFO, ") {
@@ -288,11 +286,11 @@ class Namefixer
                         } else if ($type == "Filenames, ") {
                             $status = 133;
                         }
-                                $run = $db->exec(sprintf("UPDATE releases SET searchname = %s, bitwise = ((bitwise & ~4)|4), bitwise = ((bitwise & ~%d)|%d), categoryID = %d WHERE ID = %d", $db->escapeString(substr($newname, 0, 255)), $status, $status, $determinedcat, $release["releaseID"]));
+                                $run = $db->queryDirect(sprintf("UPDATE releases SET searchname = %s, bitwise = ((bitwise & ~4)|4), bitwise = ((bitwise & ~%d)|%d), categoryID = %d WHERE ID = %d", $db->escapeString(substr($newname, 0, 255)), $status, $status, $determinedcat, $release["releaseID"]));
                         }
                     else
                                 {
-                                $run = $db->exec(sprintf("UPDATE releases set searchname = %s, bitwise = ((bitwise & ~1)|1), categoryID = %d where ID = %d", $db->escapeString($newname), $determinedcat, $release["releaseID"]));
+                                $run = $db->queryDirect(sprintf("UPDATE releases set searchname = %s, bitwise = ((bitwise & ~1)|1), categoryID = %d where ID = %d", $db->escapeString($newname), $determinedcat, $release["releaseID"]));
                                 }
                 }
 			}
