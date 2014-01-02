@@ -8,9 +8,7 @@ ALTER TABLE `releases`
   ADD `relnamestatus` TINYINT NOT NULL DEFAULT 1 after `nfostatus`,
   ADD `hashed` BOOL DEFAULT false after `relnamestatus`,
   ADD `nzbstatus` TINYINT NOT NULL DEFAULT 0 after `hashed`,
-  ADD `reqidstatus` TINYINT(1) NOT NULL DEFAULT '0' after `relnamestatus`;
-
-ALTER TABLE `releases`
+  ADD `reqidstatus` TINYINT(1) NOT NULL DEFAULT '0' after `relnamestatus`,
   ADD INDEX `ix_releases_hashed` (`hashed`),
   ADD INDEX `ix_releases_mergedreleases` (`dehashstatus`, `relnamestatus`, `passwordstatus`),
   ADD INDEX `ix_releases_nzbstatus` (`nzbstatus`),
