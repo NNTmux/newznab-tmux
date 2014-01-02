@@ -242,7 +242,9 @@ class Namefixer
 				$determinedcat = $category->determineCategory($groupname, $newname);
 
 				if ($type === "PAR2, ")
+                    {
 					$newname = ucwords($newname);
+                    }
 
 				$this->fixed++;
 
@@ -260,7 +262,9 @@ class Namefixer
                     $n = "\n";
 
 					if ($type === "PAR2, ")
+                        {
 						echo $n;
+                        }
 					 echo $n . $this->c->headerOver("New name:  ") . $this->c->primary($newname) .
                     $this->c->headerOver("Old name:  ") . $this->c->primary($release["searchname"]) .
                     $this->c->headerOver("New cat:   ") . $this->c->primary($newcatname) .
@@ -269,25 +273,26 @@ class Namefixer
                     $this->c->headerOver("Method:    ") . $this->c->primary($type . $method) .
                     $this->c->headerOver("ReleaseID: ") . $this->c->primary($release["releaseID"]);
 					if ($type !== "PAR2, ")
+                    {
 						echo $n;
+                    }
 				}
 
-				if ($echo == 1)
-                    {
-                    $db = new DB();
-                    if ($namestatus == 1)
-                        {
-                            if ($type == "NFO, ")
-                                $status = 69;
-                            elseif ($type == "PAR2, ")
-                                $status = 37;
-                            elseif ($type == "Filenames, ")
-                                $status = 133;
-                                $db->queryDirect(sprintf("UPDATE releases SET searchname = %s, bitwise = ((bitwise & ~4)|4), bitwise = ((bitwise & ~%d)|%d), categoryID = %d WHERE ID = %d", $db->escapeString(substr($newname, 0, 255)), $status, $status, $determinedcat, $release["releaseID"]));
+                   if ($echo == 1) {
+                    $db = $this->db;
+                    if ($namestatus == 1) {
+                        if ($type == "NFO, ") {
+                            $status = 69;
+                        } else if ($type == "PAR2, ") {
+                            $status = 37;
+                        } else if ($type == "Filenames, ") {
+                            $status = 133;
+                        }
+                                $run = $db->exec(sprintf("UPDATE releases SET searchname = %s, bitwise = ((bitwise & ~4)|4), bitwise = ((bitwise & ~%d)|%d), categoryID = %d WHERE ID = %d", $db->escapeString(substr($newname, 0, 255)), $status, $status, $determinedcat, $release["releaseID"]));
                         }
                     else
                                 {
-                                $db->queryDirect(sprintf("UPDATE releases set searchname = %s, bitwise = ((bitwise & ~1)|1), categoryID = %d where ID = %d", $db->escapeString($newname), $determinedcat, $release["releaseID"]));
+                                $run = $db->exec(sprintf("UPDATE releases set searchname = %s, bitwise = ((bitwise & ~1)|1), categoryID = %d where ID = %d", $db->escapeString($newname), $determinedcat, $release["releaseID"]));
                                 }
                 }
 			}
