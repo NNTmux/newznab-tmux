@@ -277,7 +277,7 @@ class Namefixer
 				}
 
                 if ($echo == 1) {
-                    $db = $this->db;
+                    $db = new DB();
                     if ($namestatus == 1) {
                         if ($type == "NFO, ") {
                             $status = 69;
