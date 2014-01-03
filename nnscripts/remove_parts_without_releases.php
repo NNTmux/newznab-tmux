@@ -109,7 +109,7 @@ class remove_parts_without_releases extends NNScripts
         {
             $sql .= sprintf( ' AND dateadded < "%s" - INTERVAL %s HOUR', $this->settings['now'], $this->settings['limit'] );
         }
-        $result = $this->db->exec( $sql );
+        $result = $this->db->queryDirect( $sql );
         
         $this->display( ( $result ? "Done" : "Error" ) . PHP_EOL );
     }
