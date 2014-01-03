@@ -163,7 +163,6 @@ if (isset($argv[1]) && $argv[1] == "true")
 		$type = "Sample";
 		$db = new DB();
 		$sql = $db->query('SELECT ID, guid, searchname FROM releases WHERE totalPart > 1 AND name LIKE "%sample%" AND size < 40000000 AND categoryID IN (5020, 5030, 5040, 5050, 5060, 5070, 5080, 2020, 2030, 2040, 2050, 2060)'.$and);
-        $sql->execute();
 		$delcount = deleteReleases($sql, $type);
 		return $delcount;
 	}
@@ -185,7 +184,7 @@ if (isset($argv[1]) && $argv[1] == "true")
 		$db = new DB();
 		$regexes = $db->query('SELECT regex FROM binaryblacklist WHERE status = 1 AND optype =1');
 		$delcount = 0;
-        $count = $regexes->rowCount();
+        $count = count($regexes);
 		if($count > 0)
 		{
 			foreach ($regexes as $regex)

@@ -32,14 +32,12 @@ function preName($argv)
 	resetSearchnames();
 	echo "Getting work\n";
     if (!isset($argv[2]))
-		$res = $db->prepare("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE reqidstatus != 1 AND ((bitwise & 260) = 256 OR categoryID BETWEEN 8000 AND 8999)".$what);
+		$res = $db->query("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE reqidstatus != 1 AND ((bitwise & 260) = 256 OR categoryID BETWEEN 8000 AND 8999)".$what);
    elseif (isset($argv[2]) && is_numeric($argv[2]))
-		$res = $db->prepare("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE reqidstatus != 1 AND ((bitwise & 260) = 256 OR categoryID BETWEEN 8000 AND 8999)".$what.$where);
+		$res = $db->query("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE reqidstatus != 1 AND ((bitwise & 260) = 256 OR categoryID BETWEEN 8000 AND 8999)".$what.$where);
    elseif (isset($argv[1]) && $argv[1]=="full" && isset($argv[2]) && $argv[2] == "all")
-		$res = $db->prepare("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE (bitwise & 256) = 256" .$where);
-
-    $res->execute();
-    $total = $res->rowCount();
+		$res = $db->query("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE (bitwise & 256) = 256" .$where);
+    $total = count($res);
 	if ($total > 0)
 	{
 		$consoletools = new ConsoleTools();
