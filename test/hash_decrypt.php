@@ -79,8 +79,7 @@ function preName($argv)
 			}
 			if ($success == false)
 			{
-				$fail = $db->prepare(sprintf("UPDATE releases SET dehashstatus = dehashstatus - 1 WHERE ID = %d", $row['ID']));
-                $fail->execute();
+				$fail = $db->query(sprintf("UPDATE releases SET dehashstatus = dehashstatus - 1 WHERE ID = %d", $row['ID']));
 			}
 		}
 	}

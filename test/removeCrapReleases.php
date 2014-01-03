@@ -93,7 +93,6 @@ if (isset($argv[1]) && $argv[1] == "true")
 		$type = "Hashed";
 		$db = new DB();
 		$sql = $db->query("SELECT ID, guid, searchname FROM releases WHERE searchname REGEXP '[a-zA-Z0-9]{25,}' AND nfostatus = 0 AND (bitwise & 1) = 1 AND rarinnerfilecount >= 0".$and);
-        $sql->execute();
 		$delcount = deleteReleases($sql, $type);
 		return $delcount;
 	}
@@ -192,8 +191,7 @@ if (isset($argv[1]) && $argv[1] == "true")
 		{
 			foreach ($regexes as $regex)
 			{
-				$sql = $db->prepare("SELECT r.ID, r.guid, r.searchname FROM releases r LEFT JOIN releasefiles rf on rf.releaseID = r.ID WHERE (rf.name REGEXP".$db->escapeString($regex["regex"])." or r.name REGEXP".$db->escapeString($regex["regex"]).")".$and);
-                $sql->execute();
+				$sql = $db->query("SELECT r.ID, r.guid, r.searchname FROM releases r LEFT JOIN releasefiles rf on rf.releaseID = r.ID WHERE (rf.name REGEXP".$db->escapeString($regex["regex"])." or r.name REGEXP".$db->escapeString($regex["regex"]).")".$and);
 				$delcount += deleteReleases($sql, $type);
 			}
 		}
