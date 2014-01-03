@@ -17,7 +17,8 @@ preName($argv);
 
 function preName($argv)
 {
-	$db = new DB();
+	$this->db = new DB();
+    $db = $this->db;
 	$groups = new Groups();
 	$category = new Category();
     $functions = new Functions();
@@ -131,7 +132,8 @@ function preName($argv)
 }
 function resetSearchnames()
 {
-		$db = new DB();
+    $this->db = new DB();
+    $db = $this->db;
 	echo "\nResetting blank searchnames\n";
 	$bad = $db->prepare("UPDATE releases SET searchname = name WHERE searchname = ''");
 	$bad->execute();
@@ -145,7 +147,8 @@ function resetSearchnames()
     // Returns the quantity of categorized releases.
     function categorizeRelease($type, $where="", $echooutput=false)
     {
-        $db = new DB();
+        $this->db = new DB();
+        $db = $this->db;
         $cat = new Category();
         $consoletools = new consoleTools();
         $relcount = 0;
@@ -174,7 +177,8 @@ function releaseCleaner($subject, $groupID, $ID, $groupname)
 	$groups = new Groups();
     $functions = new Functions();
 	$groupname = $functions->getByNameByID($groupID);
-    $db = new DB();
+    $this->db = new DB();
+    $db = $this->db;
 	$namecleaning = new nameCleaning();
 	$propername = true;
 	$cleanName = '';

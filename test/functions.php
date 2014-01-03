@@ -27,6 +27,7 @@ class Functions
     $this->echooutput = $echooutput;
     $this->c = new ColorCLI();
     $this->db = new DB();
+    $db = $this->db;
 
   }
     /**
@@ -37,7 +38,6 @@ class Functions
     public function queryArray($query)
 
 	{
-	    $db = new DB();
 		if ($query == '') return false;
 
 		$result = $db->queryDirect($query);
@@ -122,7 +122,6 @@ class Functions
  //  gets name of category from category.php
     public function getNameByID($ID)
 	{
-		$db = new DB();
 		$parent = $db->queryOneRow(sprintf("SELECT title FROM category WHERE ID = %d", substr($ID, 0, 1)."000"));
 		$cat = $db->queryOneRow(sprintf("SELECT title FROM category WHERE ID = %d", $ID));
 		return $parent["title"]." ".$cat["title"];
@@ -130,7 +129,6 @@ class Functions
 
     public function getIDByName($name)
 	{
-		$db = new DB();
 		$res = $db->queryOneRow(sprintf("SELECT ID FROM groups WHERE name = %s", $db->escapeString($name)));
 		return $res["ID"];
 	}
@@ -138,7 +136,6 @@ class Functions
     //deletes from releases
     public function fastDelete($ID, $guid, $site)
 	{
-		$db = new DB();
 		$nzb = new NZB();
 		$ri = new ReleaseImage();
 
@@ -168,14 +165,12 @@ class Functions
     //reads name of group
      public function getByNameByID($ID)
 	{
-		$db = new DB();
 		$res = $db->queryOneRow(sprintf("select name from groups where ID = %d ", $ID));
 		return $res["name"];
 	}
      //Add release nfo, imported from nZEDb
     	public function addReleaseNfo($relid)
 	{
-		$db = new DB();
 		return $db->queryInsert(sprintf("INSERT IGNORE INTO releasenfo (releaseID) VALUE (%d)", $relid));
 	}
      // Adds an NFO found from predb, rar, zip etc...
@@ -267,7 +262,6 @@ class Functions
 	//
 	public function parsePAR2($messageID, $relID, $groupID, $nntp)
 	{
-		$db = new DB();
 		$category = new Category();
         $functions = new Functions();
         $c = new ColorCLI;
@@ -307,7 +301,6 @@ class Functions
 		$files = $par2info->getFileList();
 		if ($files !== false && count($files) > 0)
 		{
-            $db = new DB();
             $namefixer = new Namefixer;
 			$rf = new ReleaseFiles();
 			$relfiles = 0;
@@ -354,7 +347,6 @@ class Functions
     //Categorize releases
     public function categorizeRelease($type, $where="", $echooutput=false)
 	{
-		$db = new DB();
 		$cat = new Category();
 		$consoletools = new consoleTools();
 		$relcount = 0;

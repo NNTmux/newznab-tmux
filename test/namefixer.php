@@ -58,7 +58,6 @@ class Namefixer
 		else
 			echo "Fixing search names since the beginning using .nfo files.\n";
 
-		$db = new DB();
         $functions = new Functions ();
 		$type = "NFO, ";
 		// Only select releases we haven't checked here before
@@ -124,7 +123,6 @@ class Namefixer
 		else
 			echo "Fixing search names since the beginning using the filename.\n";
 
-		$db = new DB();
         $functions = new Functions();
 		$type = "Filenames, ";
 		$query = "SELECT relfiles.name as textstring, rel.categoryID, rel.searchname, rel.groupID, relfiles.releaseID as fileID, rel.ID as releaseID from releases rel inner join releasefiles relfiles on (relfiles.releaseID = rel.ID) where categoryID != 5070 AND ((bitwise & 4) = 0 OR rel.categoryID = 8010) AND (bitwise & 128) = 0";
@@ -303,7 +301,6 @@ class Namefixer
 	// Match a MD5 from the prehash table to a release.
 	public function matchPredbMD5($md5, $release, $echo, $namestatus, $echooutput)
 	{
-		$db = new DB();
 		$matching = 0;
 		$category = new Category();
 		$this->matched = false;
@@ -388,18 +385,15 @@ class Namefixer
     // The release didn't match so set relnamestatus to 20 so it doesn't get rechecked. Also allows removeCrapReleases to run extra things on the release.
 	   if ($namestatus == 1 && $this->matched === false && $type == "NFO, ")
 		{
-			$db = new Db;
 			$db->exec(sprintf("UPDATE releases SET bitwise = ((bitwise & ~64)|64) WHERE ID = %d", $release['releaseID']));
 		}
         // The release didn't match so set relnamestatus to 21 so it doesn't get rechecked. Also allows removeCrapReleases to run extra things on the release.
 		elseif ($namestatus == 1 && $this->matched === false && $type == "Filenames, ")
 		{
-			$db = new DB();
 			$db->exec(sprintf("UPDATE releases SET bitwise = ((bitwise & ~128)|128) WHERE ID = %d", $release["releaseID"]));
 		}
         elseif ($namestatus == 1 && $this->matched === false && $type == "PAR2, ")
 		{
-			$db = new DB();
 			$db->exec(sprintf("UPDATE releases SET bitwise = ((bitwise & ~32)|32) WHERE ID = %d", $release["releaseID"]));
 		}
 	}

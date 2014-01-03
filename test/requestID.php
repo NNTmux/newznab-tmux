@@ -16,7 +16,8 @@ if (!isset($argv[1]) || ( $argv[1] != "all" && $argv[1] != "full" && !is_numeric
 		."php requestid.php full true		...: to run on full database and show renaming.\n"
 		."php requestid.php all true		...: to run on all hashed releases(including previously renamed) and show renaming.\n"));
 
-$db = new DB();
+$this->db = new DB();
+$db = $this->db;
 $functions = new Functions();
 $n = "\n";
 $category = new Category();
@@ -110,7 +111,8 @@ else if (isset($argv[1]) && is_numeric($argv[1]))
 
     function localLookup($requestID, $groupName, $oldname)
     {
-	    $db = new DB();
+	    $this->db = new DB();
+        $db = $this->db;
 	    $groups = new Groups();
         $functions = new Functions();
 	    $groupID = $functions->getIDByName($groupName);
