@@ -146,9 +146,8 @@ function resetSearchnames()
         $cat = new Category();
         $consoletools = new consoleTools();
         $relcount = 0;
-        $resrel = $db->prepare("SELECT ID, ".$type.", groupID FROM releases ".$where);
-        $resrel->execute();
-        $total = $resrel->rowCount();
+        $resrel = $db->query("SELECT ID, ".$type.", groupID FROM releases ".$where);
+        $total = count($resrel);
         if ($total > 0)
         {
             foreach ($resrel as $rowrel)

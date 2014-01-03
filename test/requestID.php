@@ -68,8 +68,7 @@ else if (isset($argv[1]) && is_numeric($argv[1]))
                 {
 	                $groupname = $functions->getByNameByID($row["groupname"]);
 	                $determinedcat = $category->determineCategory($groupname, $newTitle);
-	                $run = $db->prepare(sprintf("UPDATE releases SET reqidstatus = 1, bitwise = ((bitwise & ~4)|4), searchname = %s, categoryID = %d where ID = %d", $db->escapeString($newTitle), $determinedcat, $row["ID"]));
-	                $run->execute();
+	                $run = $db->query(sprintf("UPDATE releases SET reqidstatus = 1, bitwise = ((bitwise & ~4)|4), searchname = %s, categoryID = %d where ID = %d", $db->escapeString($newTitle), $determinedcat, $row["ID"]));
                     $counter++;
 	                if (isset($argv[2]) && $argv[2] === 'true')
 			            {
