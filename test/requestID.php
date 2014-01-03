@@ -16,8 +16,7 @@ if (!isset($argv[1]) || ( $argv[1] != "all" && $argv[1] != "full" && !is_numeric
 		."php requestid.php full true		...: to run on full database and show renaming.\n"
 		."php requestid.php all true		...: to run on all hashed releases(including previously renamed) and show renaming.\n"));
 
-$this->db = new DB();
-$db = $this->db;
+$db = new DB();
 $functions = new Functions();
 $n = "\n";
 $category = new Category();
@@ -69,8 +68,7 @@ else if (isset($argv[1]) && is_numeric($argv[1]))
                 {
 	                $groupname = $functions->getByNameByID($row["groupname"]);
 	                $determinedcat = $category->determineCategory($groupname, $newTitle);
-	                $run = $db->prepare(sprintf("UPDATE releases SET reqidstatus = 1, bitwise = ((bitwise & ~4)|4), searchname = %s, categoryID = %d where ID = %d", $db->escapeString($newTitle), $determinedcat, $row["ID"]));
-	                $run->execute();
+	                $run = $db->query(sprintf("UPDATE releases SET reqidstatus = 1, bitwise = ((bitwise & ~4)|4), searchname = %s, categoryID = %d where ID = %d", $db->escapeString($newTitle), $determinedcat, $row["ID"]));
                     $counter++;
 	                if (isset($argv[2]) && $argv[2] === 'true')
 			            {
@@ -111,8 +109,7 @@ else if (isset($argv[1]) && is_numeric($argv[1]))
 
     function localLookup($requestID, $groupName, $oldname)
     {
-	    $this->db = new DB();
-        $db = $this->db;
+	    $db = new DB();
 	    $groups = new Groups();
         $functions = new Functions();
 	    $groupID = $functions->getIDByName($groupName);

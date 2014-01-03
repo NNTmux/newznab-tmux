@@ -22,8 +22,7 @@ preName($argv);
 
 function preName($argv)
 {
-	$this->db = new DB();
-    $db = $this->db;
+	$db = new DB();
     $c = new ColorCLI();
 	$timestart = TIME();
 	if (isset($argv[1]) && $argv[1] === "all")
@@ -80,7 +79,7 @@ function preName($argv)
 			}
 			if ($success == false)
 			{
-				$db->exec(sprintf("UPDATE releases SET dehashstatus = dehashstatus - 1 WHERE ID = %d", $row['ID']));
+				$db->query(sprintf("UPDATE releases SET dehashstatus = dehashstatus - 1 WHERE ID = %d", $row['ID']));
 			}
 		}
 	}

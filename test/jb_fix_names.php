@@ -17,8 +17,7 @@ preName($argv);
 
 function preName($argv)
 {
-	$this->db = new DB();
-    $db = $this->db;
+	$db = new DB();
 	$groups = new Groups();
 	$category = new Category();
     $functions = new Functions();
@@ -33,14 +32,12 @@ function preName($argv)
 	resetSearchnames();
 	echo "Getting work\n";
     if (!isset($argv[2]))
-		$res = $db->prepare("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE reqidstatus != 1 AND ((bitwise & 260) = 256 OR categoryID BETWEEN 8000 AND 8999)".$what);
+		$res = $db->query("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE reqidstatus != 1 AND ((bitwise & 260) = 256 OR categoryID BETWEEN 8000 AND 8999)".$what);
    elseif (isset($argv[2]) && is_numeric($argv[2]))
-		$res = $db->prepare("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE reqidstatus != 1 AND ((bitwise & 260) = 256 OR categoryID BETWEEN 8000 AND 8999)".$what.$where);
+		$res = $db->query("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE reqidstatus != 1 AND ((bitwise & 260) = 256 OR categoryID BETWEEN 8000 AND 8999)".$what.$where);
    elseif (isset($argv[1]) && $argv[1]=="full" && isset($argv[2]) && $argv[2] == "all")
-		$res = $db->prepare("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE (bitwise & 256) = 256" .$where);
-
-    $res->execute();
-    $total = $res->rowCount();
+		$res = $db->query("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE (bitwise & 256) = 256" .$where);
+    $total = count($res);
 	if ($total > 0)
 	{
 		$consoletools = new ConsoleTools();
@@ -132,12 +129,10 @@ function preName($argv)
 }
 function resetSearchnames()
 {
-    $this->db = new DB();
-    $db = $this->db;
+    $db = new DB();
 	echo "\nResetting blank searchnames\n";
-	$bad = $db->prepare("UPDATE releases SET searchname = name WHERE searchname = ''");
-	$bad->execute();
-	$tot = $bad->rowCount();
+	$bad = $db->query("UPDATE releases SET searchname = name WHERE searchname = ''");
+	$tot = count($bad);
 	if ($tot > 0)
 		echo $tot." Releases had no searchname\n";
 }
@@ -147,14 +142,12 @@ function resetSearchnames()
     // Returns the quantity of categorized releases.
     function categorizeRelease($type, $where="", $echooutput=false)
     {
-        $this->db = new DB();
-        $db = $this->db;
+        $db = new DB();
         $cat = new Category();
         $consoletools = new consoleTools();
         $relcount = 0;
-        $resrel = $db->prepare("SELECT ID, ".$type.", groupID FROM releases ".$where);
-        $resrel->execute();
-        $total = $resrel->rowCount();
+        $resrel = $db->query("SELECT ID, ".$type.", groupID FROM releases ".$where);
+        $total = count($resrel);
         if ($total > 0)
         {
             foreach ($resrel as $rowrel)
@@ -177,8 +170,7 @@ function releaseCleaner($subject, $groupID, $ID, $groupname)
 	$groups = new Groups();
     $functions = new Functions();
 	$groupname = $functions->getByNameByID($groupID);
-    $this->db = new DB();
-    $db = $this->db;
+    $db = new DB();
 	$namecleaning = new nameCleaning();
 	$propername = true;
 	$cleanName = '';
