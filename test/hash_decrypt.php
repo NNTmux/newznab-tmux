@@ -53,9 +53,8 @@ function preName($argv)
 				if ($pre !== false)
 				{
 					$determinedcat = $category->determineCategory($row["groupID"], $pre['title']);
-					$result = $db->prepare(sprintf("UPDATE releases SET dehashstatus = 1,  bitwise = ((bitwise & ~37)|37), searchname = %s, categoryID = %d WHERE ID = %d", $db->escapeString($pre['title']), $determinedcat, $row['ID']));
-                    $result->execute();
-                    $total = $result->rowCount();
+					$result = $db->query(sprintf("UPDATE releases SET dehashstatus = 1,  bitwise = ((bitwise & ~37)|37), searchname = %s, categoryID = %d WHERE ID = %d", $db->escapeString($pre['title']), $determinedcat, $row['ID']));
+                    $total = count($result);
 					if ($total > 0)
 					{
 						$groups = new Groups();
