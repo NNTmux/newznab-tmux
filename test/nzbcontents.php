@@ -17,8 +17,6 @@ Class NZBcontents
 		$this->echooutput = $echooutput;
 		$s = new Sites();
 		$this->site = $s->get();
-        $this->db = new DB();
-        $db = $this->db;
 	}
 
 	public function getNfoFromNZB($guid, $relID, $groupID, $nntp)
@@ -98,6 +96,7 @@ Class NZBcontents
 		$nzbfile = $this->LoadNZB($guid);
 		if ($nzbfile !== false)
 		{
+            $db = new DB();
             $pp = new Functions ($this->echooutput);
             $messageid = '';
 			$actualParts = $artificialParts = 0;
@@ -203,6 +202,7 @@ Class NZBcontents
 		$nzbfile = $this->LoadNZB($guid);
 		if ($nzbfile !== false)
 		{
+			$db = new DB();
 			$groups = new Groups();
             $functions = new Functions ();
 			$groupName = $functions->getByNameByID($groupID);
@@ -310,6 +310,7 @@ Class NZBcontents
 	//	Update the releases completion.
 	function updateCompletion($completion, $relID)
 	{
-		$this->db->exec(sprintf("UPDATE releases SET completion = %d WHERE ID = %d", $completion, $relID));
+		$db = new DB();
+		$db->exec(sprintf("UPDATE releases SET completion = %d WHERE ID = %d", $completion, $relID));
 	}
 }

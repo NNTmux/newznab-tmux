@@ -22,8 +22,7 @@ preName($argv);
 
 function preName($argv)
 {
-	$this->db = new DB();
-    $db = $this->db;
+	$db = new DB();
     $c = new ColorCLI();
 	$timestart = TIME();
 	if (isset($argv[1]) && $argv[1] === "all")

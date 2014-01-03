@@ -22,7 +22,6 @@ Class Predb
 		$this->site = $s->get();
 		$this->echooutput = $echooutput;
         $this->db = new DB();
-        $db = $this->db;
         $this->c = new ColorCLI;
 	}
 
@@ -30,6 +29,7 @@ Class Predb
 	// Returns the quantity of new titles retrieved.
 	public function updatePre()
 	{
+		$db = new DB();
         $f = new Functions();
 		$newnames = 0;
 		$newestrel = $db->queryOneRow("SELECT adddate, ID FROM prehash ORDER BY adddate DESC LIMIT 1");
@@ -111,6 +111,7 @@ Class Predb
 
 	public function retrieveWomble()
 	{
+		$db = new DB();
         $f = new Functions();
 		$newnames = $updated = 0;
         $matches2 = $matches = $match = $m = '';
@@ -178,6 +179,7 @@ Class Predb
 
 	public function retrieveOmgwtfnzbs()
 	{
+		$db = new DB();
         $f = new Functions();
 		$newnames = $updated = 0;
         $matches2 = $matches = $match = $m = '';
@@ -230,6 +232,7 @@ Class Predb
 
 	public function retrieveZenet()
         {
+                $db = new DB();
                 $f = new Functions();
                 $newnames = $updated = 0;
                 $matches2 = $matches = $match = $m = '';
@@ -281,6 +284,7 @@ Class Predb
 
 	public function retrievePrelist()
 	{
+		$db = new DB();
         $f = new Functions();
 		$newnames = $updated = 0;
         $matches2 = $matches = $match = $m = '';
@@ -338,6 +342,7 @@ Class Predb
 
 	public function retrieveOrlydb()
 	{
+		$db = new DB();
         $f = new Functions();
 		$newnames = $updated = 0;
         $matches2 = $matches = $match = $m = '';
@@ -384,6 +389,7 @@ Class Predb
 
    public function retrieveSrr()
 	{
+		$db = new DB();
         $f = new Functions();
 		$newnames = 0;
 		$url = "http://www.srrdb.com/feed/srrs";
@@ -431,6 +437,7 @@ Class Predb
 
 	public function retrievePredbme()
 	{
+		$db = new DB();
         $f = new Functions();
 		$newnames = $updated = 0;
 		$arr = array("http://predb.me/?cats=movies-sd&rss=1", "http://predb.me/?cats=movies-hd&rss=1", "http://predb.me/?cats=movies-discs&rss=1", "http://predb.me/?cats=tv-sd&rss=1", "http://predb.me/?cats=tv-hd&rss=1", "http://predb.me/?cats=tv-discs&rss=1", "http://predb.me/?cats=music-audio&rss=1", "http://predb.me/?cats=music-video&rss=1", "http://predb.me/?cats=music-discs&rss=1", "http://predb.me/?cats=games-pc&rss=1", "http://predb.me/?cats=games-xbox&rss=1", "http://predb.me/?cats=games-playstation&rss=1", "http://predb.me/?cats=games-nintendo&rss=1", "http://predb.me/?cats=apps-windows&rss=1", "http://predb.me/?cats=apps-linux&rss=1", "http://predb.me/?cats=apps-mac&rss=1", "http://predb.me/?cats=apps-mobile&rss=1", "http://predb.me/?cats=books-ebooks&rss=1", "http://predb.me/?cats=books-audio-books&rss=1", "http://predb.me/?cats=xxx-videos&rss=1", "http://predb.me/?cats=xxx-images&rss=1", "http://predb.me/?cats=dox&rss=1", "http://predb.me/?cats=unknown&rss=1");
@@ -462,6 +469,7 @@ Class Predb
 
     public function retrieveAllfilledMoovee()
 	{
+		$db = new DB();
         $functions = new Functions();
 		$newnames = $updated = 0;
 		$groups = new Groups();
@@ -498,6 +506,7 @@ Class Predb
 
 	public function retrieveAllfilledTeevee()
 	{
+		$db = new DB();
         $functions = new Functions();
 		$newnames = $updated = 0;
 		$groups = new Groups();
@@ -534,6 +543,7 @@ Class Predb
 
 	public function retrieveAllfilledErotica()
 	{
+		$db = new DB();
         $functions = new Functions();
 		$newnames = $updated = 0;
 		$groups = new Groups();
@@ -570,6 +580,7 @@ Class Predb
 
 	public function retrieveAllfilledForeign()
 	{
+		$db = new DB();
         $functions = new Functions();
 		$newnames = $updated = 0;
 		$groups = new Groups();
@@ -606,7 +617,9 @@ Class Predb
 
     public function retrieveAbgx()
 	{
+		$db = new DB();
 		$newnames = 0;
+		$db = new DB();
         $functions = new Functions();
 		$groups = new Groups();
 
@@ -660,6 +673,7 @@ Class Predb
 	// Update a single release as it's created.
 	public function matchPre($cleanerName, $releaseID)
 	{
+		$db = new DB();
         $f = new Functions();
 		$x = '';
 		if ($db->queryOneRow(sprintf('SELECT ID FROM prehash WHERE title = %s', $db->escapeString($cleanerName))) !== false)
@@ -671,6 +685,7 @@ Class Predb
 	// When a searchname is the same as the title, tie it to the predb. Try to update the categoryID at the same time.
 	public function matchPredb()
 	{
+		$db = new DB();
         $f = new Functions();
         $consoletools = new ConsoleTools();
 		$updated = 0;
@@ -701,6 +716,7 @@ Class Predb
 	// Look if the release is missing an nfo.
 	public function matchNfo($nntp)
 	{
+		$db = new DB();
         $f = new Functions();
 		$nfos = 0;
 		if($this->echooutput)
@@ -739,6 +755,7 @@ Class Predb
 	// Matches the MD5 within the prehash table to release files and subjects (names) which are hashed.
 	public function parseTitles($time, $echo, $cats, $namestatus, $md5="")
 	{
+		$db = new DB();
 		$namefixer = new Namefixer();
 		$updated = 0;
 
@@ -776,11 +793,13 @@ Class Predb
 
 	public function getAll($offset, $offset2)
 	{
+		$db = new DB();
 		return $db->exec(sprintf("SELECT p.*, r.guid FROM prehash p left join releases r on p.releaseID = r.ID ORDER BY p.adddate DESC limit %d,%d", $offset, $offset2));
 	}
 
 	public function getCount()
 	{
+		$db = new DB();
 		$count = $db->queryOneRow("SELECT count(*) as cnt from prehash");
 		return $count["cnt"];
 	}
