@@ -723,7 +723,7 @@ Class Predb
 			echo "\nMatching up prehash NFOs with releases missing an NFO.\n";
 
 			$res = $db->query("SELECT r.ID, p.nfo FROM releases r inner join prehash p ON r.ID = p.releaseID WHERE p.nfo IS NOT NULL AND r.nfostatus != 1 LIMIT 100");
-		    $total = $res->rowCount();
+		    $total = count($res);
 		    if($total > 0)
             {
 			$nfo = new Nfo($this->echooutput);

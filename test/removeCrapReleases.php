@@ -154,7 +154,6 @@ if (isset($argv[1]) && $argv[1] == "true")
 		$db = new DB();
 		$sql = $db->query("SELECT ID, guid, searchname FROM releases WHERE totalPart = 1 AND size < 1000000 AND categoryID not in (7000, 7010, 7020, 7030, 3010)".$and);
 		$delcount = deleteReleases($sql, $type);
-        $sql->execute();
 		return $delcount;
 	}
 
