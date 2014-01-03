@@ -131,10 +131,9 @@ function preName($argv)
 }
 function resetSearchnames()
 {
-		$db = new DB();
+    $db = new DB();
 	echo "\nResetting blank searchnames\n";
-	$bad = $db->prepare("UPDATE releases SET searchname = name WHERE searchname = ''");
-	$bad->execute();
+	$bad = $db->exec("UPDATE releases SET searchname = name WHERE searchname = ''");
 	$tot = $bad->rowCount();
 	if ($tot > 0)
 		echo $tot." Releases had no searchname\n";
