@@ -84,8 +84,7 @@ class Namefixer
             {
                 if (preg_match('/^=newz\[NZB\]=\w+/', $relrow['textstring']))
  				{
--					$fail = $db->prepare(sprintf("UPDATE releases SET bitwise = ((bitwise & ~64)|64) WHERE ID = %d", $relrow['rel.ID']));
--					$fail->execute();
+    				$fail = $db->query(sprintf("UPDATE releases SET bitwise = ((bitwise & ~64)|64) WHERE ID = %d", $relrow['rel.ID']));
                 }
 
                 elseif (preg_match('/[^._-]?([A-Z0-9][-.\w]{5,}-[A-Za-z0-9]{2,})(\.[A-Za-z0-9]{2,3})?/', $relrow['textstring']))
@@ -308,9 +307,8 @@ class Namefixer
 		$category = new Category();
 		$this->matched = false;
 		$n = "\n";
-		$res = $db->prepare(sprintf("SELECT title, source FROM prehash WHERE hash = %s", $db->escapeString($md5)));
-        $res->execute();
-        $total = $res->rowCount();
+		$res = $db->query(sprintf("SELECT title, source FROM prehash WHERE hash = %s", $db->escapeString($md5)));
+        $total = count($res);
 		if ($total > 0)
 		{
 			foreach ($res as $row)
@@ -324,13 +322,11 @@ class Namefixer
 						$this->matched = true;
 						if ($namestatus == 1)
                         {
-							$md = $db->prepare(sprintf("UPDATE releases SET searchname = %s, categoryID = %d, bitwise = ((bitwise & ~5)|5), dehashstatus = 1 WHERE ID = %d", $db->escapeString($row["title"]), $determinedcat, $release["ID"]));
-                            $md->execute();
+							$md = $db->query(sprintf("UPDATE releases SET searchname = %s, categoryID = %d, bitwise = ((bitwise & ~5)|5), dehashstatus = 1 WHERE ID = %d", $db->escapeString($row["title"]), $determinedcat, $release["ID"]));
                         }
 						else
                         {
-							$md = $db->prepare(sprintf("UPDATE releases SET searchname = %s, categoryID = %d, dehashstatus = 1 WHERE ID = %d", $db->escapeString($row["title"]), $determinedcat, $release["ID"]));
-                            $md->execute();
+							$md = $db->query(sprintf("UPDATE releases SET searchname = %s, categoryID = %d, dehashstatus = 1 WHERE ID = %d", $db->escapeString($row["title"]), $determinedcat, $release["ID"]));
                         }
 					}
 
@@ -350,8 +346,7 @@ class Namefixer
 				}
 			if ($namestatus == 1 && $this->matched === false)
 			{
-				$rel = $db->prepare(sprintf("UPDATE releases SET dehashstatus = dehashstatus - 1 WHERE ID = %d", $row['ID']));
-                $rel->execute();
+				$rel = $db->query(sprintf("UPDATE releases SET dehashstatus = dehashstatus - 1 WHERE ID = %d", $row['ID']));
 			}
 
 			}
