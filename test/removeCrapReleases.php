@@ -9,51 +9,47 @@ require_once(WWW_DIR."lib/framework/db.php");
 require_once(WWW_DIR."lib/releases.php");
 require_once(WWW_DIR."lib/site.php");
 require_once("functions.php");
+require_once ("ColorCLI.php");
 
-if (!isset($argv[1]) && !isset($argv[2]))
-{
-	exit("Run fixReleaseNames.php first to attempt to fix release names.\n"
-		."To see an explanation of what this script does, type php removeCrapReleases.php false\n"
-		."If you are sure you want to run this script, type php removeCrapReleases.php true full\n"
-		."The second mandatory argument is the time in hours(ex: 12) to go back, or you can type full.\n"
-		."You can pass 1 optional third argument:\n"
-		."blacklist | executable | gibberish | hashed | installbin | passworded | passwordurl | sample | scr | short | size\n");
-}
-else if (isset($argv[1]) && $argv[1] == "false" && !isset($argv[2]))
-{
-	exit("blacklist deletes releases after applying the configured blacklist regexes.\n"
-		."executable deletes releases not in other misc or the apps sections and contain an .exe file\n"
-		."gibberish deletes releases WHERE the name is only letters or numbers and is 15 characters or more.\n"
-		."hashed deletes releases WHERE the name contains a string of 25 or more numbers or letters.\n"
-		."installbin deletes releases which contain an install.bin file\n"
-		."passworded deletes releases which contain password or passworded in the search name\n"
-		."passwordurl deletes releases which contain a password.url file\n"
-		."sample deletes releases smaller than 40MB and has more than 1 file and has sample in the name\n"
-		."scr deletes releases WHERE .scr extension is found in the files or subject\n"
-		."short deletes releases WHERE the name is only numbers or letters and is 5 characters or less\n"
-		."size deletes releases smaller than 1MB and has only 1 file not in mp3/books\n"
-		."php removeCrapReleases.php true full runs all the above\n"
-		."php removeCrapReleases.php true full gibberish runs only this type\n");
+$c = new ColorCLI();
+
+if (!isset($argv[1]) && !isset($argv[2])) {
+	exit($c->error("Run fixReleaseNames.php first to attempt to fix release names. This will miss some releases if you have not set fixReleaseNames to set the release as checked.\n"
+					. "php $argv[0] false               ...:To see an explanation of what this script does.\n"
+					. "php $argv[0] true full           ...:If you are sure you want to run this script.\n"
+					. "\nThe second mandatory argument is the time in hours(ex: 12) to go back, or you can type full.\n"
+					. "You can pass 1 optional third argument:\n"
+					. "blacklist | executable | gibberish | hashed | installbin | passworded | passwordurl | sample | scr | short | size\n"));
+} else if (isset($argv[1]) && $argv[1] == 'false' && !isset($argv[2])) {
+	exit($c->primary("blacklist:   deletes releases after applying the configured blacklist regexes.\n"
+					. "executable:  deletes releases not in other misc or the apps sections and contain an .exe file\n"
+					. "gibberish:   deletes releases where the name is only letters or numbers and is 15 characters or more.\n"
+					. "hashed:      deletes releases where the name contains a string of 25 or more numbers or letters.\n"
+					. "installbin:  deletes releases which contain an install.bin file\n"
+					. "passworded:  deletes releases which contain password or passworded in the search name\n"
+					. "passwordurl: deletes releases which contain a password.url file\n"
+					. "sample:      deletes releases smaller than 40MB and has more than 1 file and has sample in the name\n"
+					. "scr:         deletes releases where .scr extension is found in the files or subject\n"
+					. "short:       deletes releases where the name is only numbers or letters and is 5 characters or less\n"
+					. "size:        deletes releases smaller than 1MB and has only 1 file not in mp3/books\n\n"
+					. "php $argv[0] true full             ...: To run all the above\n"
+					. "php $argv[0] true full gibberish   ...: To run only this type\n"));
 }
 
-if (isset($argv[1]) && !is_numeric($argv[1]) && isset($argv[2]) && $argv[2] == "full")
-{
-	echo "Removing crap releases - no time limit.\n";
-	$and = "";
+if (isset($argv[1]) && !is_numeric($argv[1]) && isset($argv[2]) && $argv[2] == 'full') {
+	echo $c->header("Removing crap releases - no time limit.");
+	$and = '';
+} else if (isset($argv[1]) && isset($argv[2]) && is_numeric($argv[2])) {
+	echo $c->header('Removing crap releases from the past ' . $argv[2] . " hour(s).");
+	$db = new DB();
+		$and = ' AND adddate > (NOW() - INTERVAL ' . $argv[2] . ' HOUR) ORDER BY ID ASC';
+} else if (!isset($argv[2]) || $argv[2] !== 'full' || !is_numeric($argv[2])) {
+	exit($c->error("\nERROR: Wrong second argument.\n"));
 }
-else if (isset($argv[1]) && isset($argv[2]) && is_numeric($argv[2]))
-{
-	echo "Removing crap releases FROM the past ".$argv[2]." hour(s).\n";
-	$and = " and adddate > (now() - interval ".$argv[2]." hour) order by ID asc";
-}
-else if (!isset($argv[2]) || $argv[2] !== "full" || !is_numeric($argv[2]))
-	exit("ERROR: Wrong second argument.\n");
-
 $delete = 0;
-if (isset($argv[1]) && $argv[1] == "true")
-        $delete = 1;
+if (isset($argv[1]) && $argv[1] == 'true') {
+	$delete = 1;
 
-{
 	function deleteReleases($sql, $type)
 	{
 	        global $delete;
@@ -61,17 +57,17 @@ if (isset($argv[1]) && $argv[1] == "true")
         $functions = new Functions ();
 		$s = new Sites();
 		$site = $s->get();
-		
+        $c = new ColorCLI();
 		$delcount = 0;
 		foreach ($sql as $rel)
 		{
 		  if ($delete == 1)
 		        {
-        			echo "Deleting: ".$type.": ".$rel['searchname']."\n";
+        			echo $c->primary('Deleting: ' . $type . ': ' . $rel['searchname']);
 			        $functions->fastDelete($rel['ID'], $rel['guid'], $site);
 			}
 			else
-			        echo "Would be deleting: ".$type.": ".$rel['searchname']."\n";
+			        echo $c->primary('Would be deleting: ' . $type . ': ' . $rel['searchname']);
 			$delcount++;
 		}
 		return $delcount;
@@ -242,31 +238,41 @@ if (isset($argv[1]) && $argv[1] == "true")
 	
 	if ($totalDeleted > 0)
 	{
-		echo "Total Removed: ".$totalDeleted."\n";
-		if($gibberishDeleted > 0)
-			echo "Gibberish    : ".$gibberishDeleted."\n";
-		if($hashedDeleted > 0)
-			echo "Hashed       : ".$hashedDeleted."\n";
-		if($shortDeleted > 0)
-			echo "Short        : ".$shortDeleted."\n";
-		if($executableDeleted > 0)
-			echo "Executable   : ".$executableDeleted."\n";
-		if($installBinDeleted > 0)
-			echo "install.bin  : ".$installBinDeleted."\n";
-		if($PURLDeleted > 0)
-			echo "PURL         : ".$PURLDeleted."\n";
-		if($PassDeleted > 0)
-			echo "Passworded : ".$PassDeleted."\n";
-		if($sizeDeleted > 0)
-			echo "Size         : ".$sizeDeleted."\n";
-		if($sampleDeleted > 0)
-			echo "Sample       : ".$sampleDeleted."\n";
-		if($scrDeleted > 0)
-			echo ".scr         : ".$scrDeleted."\n";
-		if($blacklistDeleted > 0)
-			echo "Blacklist    : ".$blacklistDeleted."\n";
+	   echo $c->header("Total Removed: " . $totalDeleted);
+		if ($gibberishDeleted > 0) {
+			echo $c->primary("Gibberish    : " . $gibberishDeleted);
+		}
+		if ($hashedDeleted > 0) {
+			echo $c->primary("Hashed       : " . $hashedDeleted);
+		}
+		if ($shortDeleted > 0) {
+			echo $c->primary("Short        : " . $shortDeleted);
+		}
+		if ($executableDeleted > 0) {
+			echo $c->primary("Executable   : " . $executableDeleted);
+		}
+		if ($installBinDeleted > 0) {
+			echo $c->primary("install.bin  : " . $installBinDeleted);
+		}
+		if ($PURLDeleted > 0) {
+			echo $c->primary("PURL         : " . $PURLDeleted);
+		}
+		if ($PassDeleted > 0) {
+			echo $c->primary("Passworded : " . $PassDeleted);
+		}
+		if ($sizeDeleted > 0) {
+			echo $c->primary("Size         : " . $sizeDeleted);
+		}
+		if ($sampleDeleted > 0) {
+			echo $c->primary("Sample       : " . $sampleDeleted);
+		}
+		if ($scrDeleted > 0) {
+			echo $c->primary(".scr         : " . $scrDeleted);
+		}
+		if ($blacklistDeleted > 0) {
+			echo $c->primary("Blacklist    : " . $blacklistDeleted);
+		}
+	} else {
+		exit($c->info("Nothing was found to delete."));
 	}
-	else
-		exit("Nothing was found to delete.\n");
 }
-?>
