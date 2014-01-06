@@ -773,7 +773,7 @@ Class Predb
 			echo "Fixing search names".$te." using the prehash md5.\n";
 		}
         $regex = "AND ((r.bitwise & 512) = 512 OR rf.name REGEXP'[a-fA-F0-9]{32}')";
-		$res = $db->queryDirect(sprintf('SELECT DISTINCT r.id, r.name, r.searchname, r.categoryid, r.groupID, rf.name AS filename, rf.releaseid, rf.size FROM releases r LEFT JOIN releasefiles rf ON r.id = rf.releaseid WHERE (bitwise & 260) = 256 AND dehashstatus BETWEEN -5 AND 0 AND passwordstatus >= -1 %s %s %s ORDER BY rf.releaseid, rf.size DESC', $regex, $tq, $ct));
+		$res = $db->queryDirect(sprintf('SELECT DISTINCT r.ID, r.name, r.searchname, r.categoryID, r.groupID, rf.name AS filename, rf.releaseID, rf.size FROM releases r LEFT JOIN releasefiles rf ON r.ID = rf.releaseID WHERE (bitwise & 260) = 256 AND dehashstatus BETWEEN -5 AND 0 AND passwordstatus >= -1 %s %s %s ORDER BY rf.releaseID, rf.size DESC', $regex, $tq, $ct));
         echo "Checking " . $res->rowCount() . " releases\n";
         if ($res->rowCount() > 0)
 		{

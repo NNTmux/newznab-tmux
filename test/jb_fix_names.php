@@ -42,14 +42,16 @@ function preName($argv)
 		$where = '';
 	}
 	resetSearchnames();
-	echo "Getting work\n";
-    if (!isset($argv[2]))
-		$res = $db->query("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE reqidstatus != 1 AND ((bitwise & 260) = 256 OR categoryID BETWEEN 8000 AND 8999)".$what);
-   elseif (isset($argv[2]) && is_numeric($argv[2]))
-		$res = $db->query("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE reqidstatus != 1 AND ((bitwise & 260) = 256 OR categoryID BETWEEN 8000 AND 8999)".$what.$where);
-   elseif (isset($argv[1]) && $argv[1]=="full" && isset($argv[2]) && $argv[2] == "all")
-		$res = $db->query("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE (bitwise & 256) = 256" .$where);
-    $total = count($res);
+    if (!isset($argv[2])){
+		$res = $db->queryDirect("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE reqidstatus != 1 AND ((bitwise & 260) = 256 OR categoryID BETWEEN 8000 AND 8999)".$what);
+ }
+   elseif (isset($argv[2]) && is_numeric($argv[2])){
+		$res = $db->queryDirect("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE reqidstatus != 1 AND ((bitwise & 260) = 256 OR categoryID BETWEEN 8000 AND 8999)".$what.$where);
+ }
+   elseif (isset($argv[1]) && $argv[1]=="full" && isset($argv[2]) && $argv[2] == "all"){
+		$res = $db->queryDirect("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE (bitwise & 256) = 256" .$where);
+        }
+    $total = $res->rowCount();
 	if ($total > 0)
 	{
 		$consoletools = new ConsoleTools();
@@ -76,7 +78,7 @@ function preName($argv)
 				if ($groupname == 'alt.binaries.e-book' || $groupname == 'alt.binaries.e-book.flood') {
 					if (preg_match('/^[0-9]{1,6}-[0-9]{1,6}-[0-9]{1,6}$/', $cleanName, $match)) {
 						$rf = new ReleaseFiles();
-						$files = $rf->get($row['id']);
+						$files = $rf->get($row['ID']);
 						if (count($files) == 1) {
 							foreach ($files as $f) {
 								if (preg_match('/^(?P<title>.+)\.(pdf|html|epub|mobi|azw)/', $f["name"], $match)) {
@@ -135,7 +137,7 @@ function preName($argv)
 			$consoletools->overWritePrimary("Renamed NZBs:  [${updated}][${counted}]        " . $consoletools->percentString( ++$counter, $total));
 		}
 	}
-	echo $c->header(number_format($updated) . " renamed using namecleaning.php\n" . $counted . " using renametopre\nout of " . number_format($total) . " releases.");
+	echo $c->header(number_format($updated) . " renamed using namecleaner.php\n" . $counted . " using jb_fix_names\nout of " . number_format($total) . " releases.");
 	echo $c->header("Categorizing all non-categorized releases in other->misc using usenet subject. This can take a while, be patient.");
 	$timestart = TIME();
 	if (isset($argv[1]) && $argv[1] == "full") {
@@ -153,7 +155,7 @@ function preName($argv)
         $relcount = categorizeRelease("searchname", "WHERE categoryID = 8010", true);
     }else {
         $relcount = categorizeRelease("searchname", "WHERE categoryID = 8010 AND adddate > NOW() - INTERVAL ".$argv[1]." HOUR", true);
-    $consoletools = new ConsoleTools();
+    $consoletools1 = new ConsoleTools();
     $time1 = $consoletools1->convertTime(TIME() - $timestart1);
     echo $c->header("Finished categorizing " . $relcount . " releases in " . $time1 . " seconds, using the searchname.");
     resetSearchnames();
@@ -166,7 +168,7 @@ function resetSearchnames()
 	echo $c->header("Resetting blank searchnames.");
 	$bad = $db->query("UPDATE releases SET searchname = name WHERE searchname = ''");
 	$tot = count($bad);
-	if ($tot > 0)
+	if ($tot > 0) {
 		echo $c->primary($tot . " Releases had no searchname.");
 }
 	echo $c->header("Resetting searchnames that are a single letter.");
@@ -190,6 +192,7 @@ function resetSearchnames()
 	if ($count0 > 0) {
 		echo $c->primary($count0 . " Releases had single digit searchnames.");
 	}
+}
 
     // Categorizes releases.
     // $type = name or searchname
