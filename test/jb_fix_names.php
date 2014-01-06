@@ -91,11 +91,11 @@ function preName($argv)
 				}
 			   	if ($cleanName != $row['name']) {
 					if (strlen(utf8_decode($cleanName)) <= 3) {
-						$counter++;
+						//echo $row["name"] . "\n";
 					} else {
 					$determinedcat = $category->determineCategory($row["groupID"], $cleanName);
-					 if ($argv[2] === 'all') {
-							$preid = ' AND preID = NULL ';
+					 if (isset($argv[2]) && $argv[2] === 'all') {
+							$preid = ', preID = NULL ';
 						} else {
 							$preid = ' ';
 						}
@@ -137,7 +137,7 @@ function preName($argv)
 			$consoletools->overWritePrimary("Renamed NZBs:  [${updated}][${counted}]        " . $consoletools->percentString( ++$counter, $total));
 		}
 	}
-	echo $c->header(number_format($updated) . " renamed using namecleaner.php\n" . $counted . " using jb_fix_names\nout of " . number_format($total) . " releases.");
+	echo $c->header("\n" . number_format($updated) . " renamed using namecleaning.php\n" . number_format($counted) . " using renametopre.php\nout of " . number_format($total) . " releases.\n");
 	echo $c->header("Categorizing all non-categorized releases in other->misc using usenet subject. This can take a while, be patient.");
 	$timestart = TIME();
 	if (isset($argv[1]) && $argv[1] == "full") {
@@ -147,7 +147,7 @@ function preName($argv)
     }
 	$consoletools = new ConsoleTools();
 	$time = $consoletools->convertTime(TIME() - $timestart);
-   echo $c->header("Finished categorizing " . $relcount . " releases in " . $time . " seconds, using the usenet subject.");
+   echo $c->header("Finished categorizing " . number_format($relcount) . " releases in " . $time . " seconds, using the usenet subject.\n");
 
 	echo $c->header("Categorizing all non-categorized releases in other->misc using searchname. This can take a while, be patient.");
 	$timestart1 = TIME();
@@ -157,7 +157,7 @@ function preName($argv)
         $relcount = categorizeRelease("searchname", "WHERE categoryID = 8010 AND adddate > NOW() - INTERVAL ".$argv[1]." HOUR", true);
     $consoletools1 = new ConsoleTools();
     $time1 = $consoletools1->convertTime(TIME() - $timestart1);
-    echo $c->header("Finished categorizing " . $relcount . " releases in " . $time1 . " seconds, using the searchname.");
+    echo $c->header("Finished categorizing " . number_format($relcount) . " releases in " . $time1 . " seconds, using the searchname.\n");
     resetSearchnames();
 }
 }
@@ -166,31 +166,31 @@ function resetSearchnames()
     $db = new DB();
     $c = new ColorCLI();
 	echo $c->header("Resetting blank searchnames.");
-	$bad = $db->query("UPDATE releases SET searchname = name WHERE searchname = ''");
+	$bad = $db->query("UPDATE releases SET searchname = name, bitwise = ((bitwise & ~5)|0) WHERE searchname = ''");
 	$tot = count($bad);
 	if ($tot > 0) {
-		echo $c->primary($tot . " Releases had no searchname.");
+		echo $c->primary(number_format($tot) . " Releases had no searchname.");
 }
 	echo $c->header("Resetting searchnames that are a single letter.");
 	$count0 = $count = 0;
 	foreach (range('a', 'z') as $i) {
-		$run = $db->queryDirect("UPDATE releases SET searchname = name WHERE searchname = '" . $i . "'");
+		$run = $db->queryDirect("UPDATE releases SET searchname = name, bitwise = ((bitwise & ~5)|0) WHERE searchname = '" . $i . "'");
 		if ($run->rowCount() > 0) {
 			$count++;
 		}
 	}
 	if ($count > 0) {
-		echo $c->primary($count . " Releases had single letter searchnames.");
+		echo $c->primary(number_format($count) . " Releases had single letter searchnames.");
 	}
 	echo $c->header("Resetting searchnames that are a single digit.");
 	foreach (range(0, 9) as $i) {
-		$run0 = $db->queryDirect("UPDATE releases SET searchname = name WHERE searchname = '" . $i . "'");
+		$run0 = $db->queryDirect("UPDATE releases SET searchname = name, bitwise = ((bitwise & ~5)|0) WHERE searchname = '" . $i . "'");
 		if ($run0->rowCount() > 0) {
 			$count0++;
 		}
 	}
 	if ($count0 > 0) {
-		echo $c->primary($count0 . " Releases had single digit searchnames.");
+		echo $c->primary(number_format($count0) . " Releases had single digit searchnames.");
 	}
 }
 
