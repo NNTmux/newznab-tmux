@@ -158,6 +158,7 @@ function preName($argv)
     echo $c->header("Finished categorizing " . $relcount . " releases in " . $time1 . " seconds, using the searchname.");
     resetSearchnames();
 }
+}
 function resetSearchnames()
 {
     $db = new DB();
@@ -189,7 +190,6 @@ function resetSearchnames()
 	if ($count0 > 0) {
 		echo $c->primary($count0 . " Releases had single digit searchnames.");
 	}
-}
 
     // Categorizes releases.
     // $type = name or searchname
