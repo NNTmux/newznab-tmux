@@ -29,7 +29,7 @@ function preName($argv)
 	$groups = new Groups();
 	$category = new Category();
     $functions = new Functions();
-    $updated = $counted = $none = 0;
+    $internal = $external = $pre = $none = 0;
 	$counter = 0;
 	$c = new ColorCLI();
 	$n = "\n";
@@ -69,6 +69,11 @@ function preName($argv)
 					$increment = $cleanerName["increment"];
 				} else {
 					$increment = false;
+				}
+                if (isset($cleanerName["predb"])) {
+					$predb = $cleanerName["predb"];
+				} else {
+					$predb = false;
 				}
 			}
 
@@ -120,9 +125,11 @@ function preName($argv)
 						  $c->headerOver("Method:    ") . $c->primary("renametopre regexes").
 						  $c->headerOver("ReleaseID: ") . $c->primary($row["id"]); */
 						if ($increment === true) {
-							$updated++;
+							$internal++;
+						} else if ($predb === true) {
+							$pre++;
 						} else if ($propername === true) {
-							$counted++;
+							$external++;
 						}
 					}
 				}
@@ -134,10 +141,10 @@ function preName($argv)
 				echo $c->header("         [internal][external] processed/total");
 			}
 
-			$consoletools->overWritePrimary("Renamed NZBs:  [${updated}][${counted}]        " . $consoletools->percentString( ++$counter, $total));
+			$consoletools->overWritePrimary("Renamed Releases:  [Internal=" . number_format($internal) . "][External=" . number_format($external) . "][Predb=" . number_format($pre) . "]        " . $consoletools->percentString( ++$counter, $total));
 		}
 	}
-	echo $c->header("\n" . number_format($updated) . " renamed using namecleaning.php\n" . number_format($counted) . " using renametopre.php\nout of " . number_format($total) . " releases.\n");
+	echo $c->header("\n" . number_format($internal) . " renamed using namecleaning.php\n" . number_format($external) . " using renametopre.php\nout of " . number_format($total) . " releases.\n");
 	echo $c->header("Categorizing all non-categorized releases in other->misc using usenet subject. This can take a while, be patient.");
 	$timestart = TIME();
 	if (isset($argv[1]) && $argv[1] == "full") {
@@ -225,9 +232,20 @@ function resetSearchnames()
 function releaseCleaner($subject, $groupID, $groupname)
 {
 	$groups = new Groups();
+    $db = new DB();
+    $match = '';
+    // Get pre style name from releases.name
+	if (preg_match('/(\w+\.(\w+\.)+\w+-\w+)/', $subject, $match)) {
+		$title = $db->queryOneRow("SELECT title, ID from prehash WHERE title = " . $db->escapeString(trim($match[1])) . " OR title = " . $db->escapeString(trim($match[2])));
+		if (isset($title['title'])) {
+			$cleanerName = $title['title'];
+			if (!empty($cleanerName)) {
+				return array("cleansubject" => $cleanerName, "properlynamed" => true, "increment" => false, "predb" => true);
+			}
+		}
+	}
     $functions = new Functions();
 	$groupName = $functions->getByNameByID($groupID);
-    $db = new DB();
 	$namecleaning = new nameCleaning();
 	$propername = true;
 	$cleanName = '';
