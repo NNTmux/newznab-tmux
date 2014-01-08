@@ -95,7 +95,7 @@ else
     $TMUXCMD selectp -t 1
     $TMUXCMD splitw -v -p 50 'printf "\033]2;RequestID\033\\"'
     $TMUXCMD selectp -t 3
-    $TMUXCMD splitw -v -p 50 'printf "\033]2;PrehashUpdate\033\\"'
+    $TMUXCMD splitw -h -p 50 'printf "\033]2;PrehashUpdate\033\\"'
 
 	
    
