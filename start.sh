@@ -89,11 +89,11 @@ else
 	
 	$TMUXCMD new-window -n FixNames 'printf "\033]2;Fix_Release_Names\033\\"'
 	$TMUXCMD selectp -t 0
-    $TMUXCMD splitw -v -p 50 'printf "\033]2;RequestID\033\\"'
+    $TMUXCMD splitw -v -p 50 'printf "\033]2;RemoveCrap\033\\"'
     $TMUXCMD selectp -t 0
     $TMUXCMD splitw -h -p 50 'printf "\033]2;PreDB_Hash_Decrypt\033\\"'
     $TMUXCMD selectp -t 1
-    $TMUXCMD splitw -v -p 50 'printf "\033]2;RemoveCrap\033\\"'
+    $TMUXCMD splitw -v -p 50 'printf "\033]2;RequestID\033\\"'
 
 	
    
