@@ -8,7 +8,7 @@ There is a test folder in main tmux folder. In that folder you will find three d
 
 2. Import create_prehash_table.sql from initial_setup folder, be aware that this WILL delete your existing prehash table.
 
-3. OPTIONAL: If you want to populate your prehash table with more than 5 million rows of pre data, run commands from import_predb.txt in mysql. Predb dump can be downloaded from  https://mega.co.nz/#!xggDlBSC!ZDMDPVzbFY_MrzkWqX2EIFgIX8dV0vBkyQ_RF4SAb1A. If you already have prehash table created by aflys init.php, you will need to run commands from clean_duplicates_predb.txt before you run import_predb.txt
+3. OPTIONAL: If you want to populate your prehash table with more than 6 million rows of pre data (This dump includes 6,166,783 unique predb releases.), run dump_prehash.php to import the predb dump. Predb dump can be downloaded from  (will add the link later) .
 
 
 
