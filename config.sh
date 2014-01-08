@@ -255,12 +255,35 @@ export FIXRELEASES_TIMER="600"
 
 ############################################################
 
-#choose to use predb_hash_decrypt. Use this only if you have access to 
+#choose to use predb_hash_decrypt. Use this only if you have access to
 #nzpre/predb, otherwise it will not work
 #Before you use this, import db.sql and/or updates from test/db_updates/ folder
 export PREDBHASH="false"
 #How often to run this script in seconds, default is 10 minutes
 export PREDBHASH_TIMER="600"
+
+############################################################
+
+#choose to run requestID.php to fix release names. 
+#Before you use this, import db.sql and/or updates from test/db_updates/
+# and run initial_setup of prehash table
+
+export REQID="false"
+
+#How often to run this script in seconds, default is 20 minutes
+# don't go below this value as you can get banned from allfilled servers
+
+export REQID_TIMER="1200"
+
+############################################################
+
+#choose to run removecrap.php
+
+export REMOVECRAP="false"
+
+#How often to run this script in seconds, default is 10 minutes
+
+export REMOVECRAP_TIMER="600"
 
 ############################################################
 

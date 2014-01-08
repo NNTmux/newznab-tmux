@@ -141,7 +141,7 @@ function preName($argv)
 				echo $c->header("         [internal][external] processed/total");
 			}
 
-			$consoletools->overWritePrimary("Renamed Releases:  [Internal=" . number_format($internal) . "][External=" . number_format($external) . "][Predb=" . number_format($pre) . "]        " . $consoletools->percentString( ++$counter, $total));
+			$consoletools->overWritePrimary("Renamed Releases:  [Internal=" . number_format($internal) . "][External=" . number_format($external) . "][Predb=" . number_format($pre) . "] " . $consoletools->percentString( ++$counter, $total));
 		}
 	}
 	echo $c->header("\n" . number_format($internal) . " renamed using namecleaning.php\n" . number_format($external) . " using renametopre.php\nout of " . number_format($total) . " releases.\n");
@@ -235,8 +235,8 @@ function releaseCleaner($subject, $groupID, $groupname)
     $db = new DB();
     $match = '';
     // Get pre style name from releases.name
-	if (preg_match('/(\w+\.(\w+\.)+\w+-\w+)/', $subject, $match)) {
-		$title = $db->queryOneRow("SELECT title, ID from prehash WHERE title = " . $db->escapeString(trim($match[1])) . " OR title = " . $db->escapeString(trim($match[2])));
+	if (preg_match('/(\w+[\._](\w+[\._-])+\w+-\w+)/', $subject, $match)) {
+		$title = $db->queryOneRow("SELECT title from prehash WHERE title = " . $db->escapeString(trim($match[1])));
 		if (isset($title['title'])) {
 			$cleanerName = $title['title'];
 			if (!empty($cleanerName)) {
