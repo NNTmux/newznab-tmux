@@ -287,6 +287,17 @@ export REMOVECRAP_TIMER="600"
 
 ############################################################
 
+#choose to disable postprocess_pre.php.This is true by default,
+#it is not recommended to disable it if you have the prehash table.
+
+export UPPRE="true"
+
+#How often to run this script in seconds, default is 20 minutes
+
+export UPPRE_TIMER="1200"
+
+############################################################
+
 #Choose to run update_predb.php
 export PREDB="false"
 

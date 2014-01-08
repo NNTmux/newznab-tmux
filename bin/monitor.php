@@ -5,7 +5,7 @@ require(WWW_DIR.'/lib/postprocess.php');
 require_once (WWW_DIR.'/lib/site.php');
 require_once("../test/ColorCLI.php");
 
-$version="0.3r581";
+$version="0.3r590";
 
 $db = new DB();
 $s = new Sites();
@@ -207,6 +207,7 @@ $time28 = TIME();
 $time29 = TIME();
 $time30 = TIME();
 $time31 = TIME();
+$time32 = TIME();
 
 if ( $array['INNODB'] == "true" ) {
 	$time5 = TIME();
@@ -1370,7 +1371,7 @@ if ($array ['FIXRELEASES'] = "true") {
 	if (( $array['MAX_LOAD'] >= get_load()) && (( TIME() - $time27 ) >= $array['FIXRELEASES_TIMER'] ) && ( $array['FIXRELEASES'] == "true" )) {
 		$color = get_color();
 		$log = writelog($panes4[0]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:4.0 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes4[0] $ds2 && cd $_test && $_php postprocess_pre.php 2>&1 $log && $_php fixReleaseNames.php 3 true other yes 2>&1 $log && $_php fixReleaseNames.php 5 true other yes 2>&1 $log && $_php fixReleaseNames.php 7 true other yes 2>&1 $log && $_php hash_decrypt.php 1000 2>&1 $log && $_php jb_fix_names.php 2 2>&1 $log echo \" \033[1;0;33m\" && $ds1 $panes4[0] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:4.0 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes4[0] $ds2 && cd $_test && $_php fixReleaseNames.php 1 true other yes 2>&1 $log && $_php fixReleaseNames.php 3 true other yes 2>&1 $log && $_php fixReleaseNames.php 5 true other yes 2>&1 $log && $_php fixReleaseNames.php 7 true other yes 2>&1 $log && $_php hash_decrypt.php 1000 2>&1 $log && $_php jb_fix_names.php 2 2>&1 $log echo \" \033[1;0;33m\" && $ds1 $panes4[0] $ds3' 2>&1 1> /dev/null");
 		$time27 = TIME();}
 	  elseif ( $array['FIXRELEASES'] != "true" ) {
 		$color = get_color();
@@ -1433,6 +1434,24 @@ if ($array ['FIXRELEASES'] = "true") {
 	} elseif ( $array['MAX_LOAD'] <= get_load()) {
                 $color = get_color();
                 shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:4.3 'echo \"\033[38;5;\"$color\"m\n$panes4[3] Disabled by MAX_LOAD\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
+        }
+
+    //run postprocess_pre.php in pane 4.4
+	if (( $array['MAX_LOAD'] >= get_load()) && (( TIME() - $time32 ) >= $array['UPPRE_TIMER'] ) && ( $array['UPPRE'] == "true" )) {
+		$color = get_color();
+		$log = writelog($panes4[4]);
+		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:4.4 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes4[4] $ds2 && cd $_test && $_php postprocess_pre.php 2>&1 $log  echo \" \033[1;0;33m\" && $ds1 $panes4[4] $ds3' 2>&1 1> /dev/null");
+		$time32 = TIME();}
+	  elseif ( $array['UPPRE'] != "true" ) {
+		$color = get_color();
+		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:4.4 'echo \"\033[38;5;\"$color\"m\n$panes4[4] Disabled by Update_Prehash\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
+	} elseif (( $array['UPPRE'] == "true" ) && ( $array['MAX_LOAD'] >= get_load())) {
+		$color = get_color();
+		$run_time = relativeTime( $array['UPPRE_TIMER'] + $time32 );
+		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:4.4 'echo \"\033[38;5;\"$color\"m\n$panes4[4] will run in T[ $run_time]\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
+	} elseif ( $array['MAX_LOAD'] <= get_load()) {
+                $color = get_color();
+                shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:4.4 'echo \"\033[38;5;\"$color\"m\n$panes4[4] Disabled by MAX_LOAD\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
         }
 
 	//check ffmpeg and mediainfo, kill if necessary
