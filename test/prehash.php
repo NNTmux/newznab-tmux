@@ -501,7 +501,7 @@ Class Predb
 			}
 		}
         else
-			echo "Error: \tUpdate from Moovee failed.\n";
+			echo $this->c->error ("Error: Update from Moovee failed.");
 	}
 
 	public function retrieveAllfilledTeevee()
@@ -538,7 +538,7 @@ Class Predb
 			}
 		}
         else
-			echo "Error: \tUpdate from Teevee failed.\n";
+			echo $this->c->error ("Error: Update from Teevee failed.");
 	}
 
 	public function retrieveAllfilledErotica()
@@ -575,7 +575,7 @@ Class Predb
 			}
 		}
         else
-			echo "Error: \tUpdate from Erotica failed.\n";
+			echo $this->c->error ("Error: \tUpdate from Erotica failed.");
 	}
 
 	public function retrieveAllfilledForeign()
@@ -612,7 +612,7 @@ Class Predb
 			}
 		}
         else
-			echo "Error: \tUpdate from Foreign failed.\n";
+			echo $this->c->error ("Error: Update from Foreign failed.");
 	}
 
     public function retrieveAbgx()
@@ -665,7 +665,7 @@ Class Predb
 				}
 			}
 			else
-				echo "Error: \tUpdate from ABGX failed.\n";
+				echo $this->c->error ("Error: Update from ABGX failed.");
 		}
 		return $newnames;
 	}
@@ -678,7 +678,7 @@ Class Predb
 		$x = '';
 		if ($db->queryOneRow(sprintf('SELECT ID FROM prehash WHERE title = %s', $db->escapeString($cleanerName))) !== false)
 		{
-			$db->exec(sprintf('UPDATE releases SET preID = %d WHERE ID = %d', $x['id'], $releaseID));
+			$db->exec(sprintf('UPDATE releases SET preID = %d WHERE ID = %d', $x['ID'], $releaseID));
 		}
 	}
 
@@ -694,7 +694,7 @@ Class Predb
 			echo $this->c->primary('Querying DB for matches in prehash titles with release searchnames.');
 		}
 
-		$res = $db->queryDirect('SELECT p.id AS preID, r.ID AS releaseID FROM prehash p INNER JOIN releases r ON p.title = r.searchname WHERE r.preID IS NULL');
+		$res = $db->queryDirect('SELECT p.ID AS preID, r.ID AS releaseID FROM prehash p INNER JOIN releases r ON p.title = r.searchname WHERE r.preID IS NULL');
         //$row = mysqli_fetch_array($res);
         //$total = $row [0];
         $total = $res->rowCount();
@@ -720,7 +720,7 @@ Class Predb
         $f = new Functions();
 		$nfos = 0;
 		if($this->echooutput)
-			echo "\nMatching up prehash NFOs with releases missing an NFO.\n";
+			echo $this->c->header ("Matching up prehash NFOs with releases missing an NFO.");
 
 			$res = $db->query("SELECT r.ID, p.nfo FROM releases r inner join prehash p ON r.ID = p.releaseID WHERE p.nfo IS NOT NULL AND r.nfostatus != 1 LIMIT 100");
 		    $total = count($res);
@@ -770,7 +770,7 @@ Class Predb
 			$te = "";
 			if ($time == 1)
 				$te = " in the past 3 hours";
-			echo "Fixing search names".$te." using the prehash md5.\n";
+			echo $this->c->header ("Fixing search names".$te." using the prehash md5.");
 		}
         $regex = "AND ((r.bitwise & 512) = 512 OR rf.name REGEXP'[a-fA-F0-9]{32}')";
 		$res = $db->queryDirect(sprintf('SELECT DISTINCT r.ID, r.name, r.searchname, r.categoryID, r.groupID, rf.name AS filename, rf.releaseID, rf.size FROM releases r LEFT JOIN releasefiles rf ON r.ID = rf.releaseID WHERE (bitwise & 260) = 256 AND dehashstatus BETWEEN -5 AND 0 AND passwordstatus >= -1 %s %s %s ORDER BY rf.releaseID, rf.size DESC', $regex, $tq, $ct));
