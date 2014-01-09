@@ -8,7 +8,7 @@ There is a test folder in main tmux folder. In that folder you will find three d
 
 2. Import create_prehash_table.sql from initial_setup folder, be aware that this WILL delete your existing prehash table.
 
-3. OPTIONAL: If you want to populate your prehash table with more than 6 million rows of pre data (This dump includes 6,166,783 unique predb releases.), run dump_prehash.php to import the predb dump. Predb dump can be downloaded from  (will add the link later) .
+3. OPTIONAL: If you want to populate your prehash table with more than 6 million rows of pre data (This dump includes 6,166,783 unique predb releases.), run dump_prehash.php to import the predb dump. Predb dump can be downloaded from https://mega.co.nz/#!fdVzyQrQ!K_rUgWP86HHoaLyLYYZGHmkU7HR_QWmp_jgnpgnW3MQ.
 
 
 
