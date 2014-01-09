@@ -91,7 +91,7 @@ Class NZBcontents
 	{
 	    $c = new ColorCLI;
 	    if (!isset($nntp))
-			exit($c->error("Not connected to usenet(nzbcontents->NZBcompletiont.\n"));
+			exit($c->error("Not connected to usenet(nzbcontents->NZBcompletion.\n"));
 
 		$nzbfile = $this->LoadNZB($guid);
 		if ($nzbfile !== false)
