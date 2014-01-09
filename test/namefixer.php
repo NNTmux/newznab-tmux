@@ -84,7 +84,7 @@ class Namefixer
             {
                 if (preg_match('/^=newz\[NZB\]=\w+/', $relrow['textstring']))
  				{
-    				$fail = $db->query(sprintf("UPDATE releases SET bitwise = ((bitwise & ~64)|64) WHERE ID = %d", $relrow['rel.ID']));
+    				$db->query(sprintf("UPDATE releases SET bitwise = ((bitwise & ~64)|64) WHERE ID = %d", $relrow['rel.ID']));
                 }
 
                 elseif (preg_match('/[^._-]?([A-Z0-9][-.\w]{5,}-[A-Za-z0-9]{2,})(\.[A-Za-z0-9]{2,3})?/', $relrow['textstring']))
@@ -119,9 +119,9 @@ class Namefixer
 	public function fixNamesWithFiles($time, $echo, $cats, $namestatus)
 	{
 		if ($time == 1)
-			echo "Fixing search names in the past 6 hours using the filename.\n";
+			echo $this->c->header ("Fixing search names in the past 6 hours using the filename.");
 		else
-			echo "Fixing search names since the beginning using the filename.\n";
+			echo $this->c->header ("Fixing search names since the beginning using the filename.");
 
 		$db = new DB();
         $functions = new Functions();
@@ -141,9 +141,10 @@ class Namefixer
 		if ($time == 2 && $cats == 2)
 			$relres = $db->queryDirect($query.$this->fullall);
 
-		$rowcount = $relres->rowCount();
-		if ($rowcount > 0)
+		if ($relres->rowCount() > 0)
 		{
+		   echo $this->c->header ("Fixing " . number_format($relres->rowCount()) . " search names using the filename.");
+			sleep(2);
 			foreach ($relres as $relrow)
 			{
 				$this->done = $this->matched = false;
@@ -153,9 +154,9 @@ class Namefixer
 					echo $this->checked." files processed.\n\n";
 			}
 			if($echo == 1)
-				echo $this->fixed." releases have had their names changed out of: ".$this->checked." files.\n";
+				echo $this->c->header ($this->fixed." releases have had their names changed out of: ".$this->checked." files.");
 			else
-				echo $this->fixed." releases could have their names changed. ".$this->checked." files were checked.\n";
+				echo $this->c->header ($this->fixed." releases could have their names changed. ".$this->checked." files were checked.");
 		}
 		else
 			echo $this->c->info ("Nothing to fix.");
@@ -166,9 +167,9 @@ class Namefixer
 	    if (!isset($nntp))
 			exit($c->error("Not connected to usenet(namefixer->fixNamesWithPar2.\n"));
 		if ($time == 1)
-			echo "Fixing search names in the past 6 hours using the par2 files.\n";
+			echo $this->c->header ("Fixing search names in the past 6 hours using the par2 files.");
 		else
-			echo "Fixing search names since the beginning using the par2 files.\n";
+			echo $this->c->header ("Fixing search names since the beginning using the par2 files.");
 
 		$db = $this->db;
         $functions = new Functions();
@@ -192,7 +193,7 @@ class Namefixer
 
         if ($rowcount > 0)
 		    {
-            echo $rowcount." release(s) to process.\n";
+            echo $this->c->header ($rowcount." release(s) to process.");
 		    $db = $this->db;
 			$nzbcontents = new NZBcontents($this->echooutput);
             $pp = new Functions ($this->echooutput);
@@ -207,12 +208,12 @@ class Namefixer
                     }
                 $this->checked++;
 				if ($this->checked % 500 == 0)
-					echo $this->checked." files processed.\n\n";
+					echo $this->c->header ($this->checked." files processed.");
 			}
 			if($echo == 1)
-				echo $this->fixed." releases have had their names changed out of: ".$this->checked." files.\n";
+				echo $this->c->header ($this->fixed." releases have had their names changed out of: ".$this->checked." files.");
 			else
-				echo $this->fixed." releases could have their names changed. ".$this->checked." files were checked.\n";
+				echo $this->c->header ($this->fixed." releases could have their names changed. ".$this->checked." files were checked.");
 		}
 		else
 			echo $this->c->info ("Nothing to fix.");
