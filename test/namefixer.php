@@ -211,7 +211,7 @@ class Namefixer
 			foreach ($relres as $relrow)
 			{
                 $this->done = $this->matched = false;
-				if (($nzbcontents->checkPAR2($relrow['guid'], $relrow['releaseID'], $relrow['groupID'], $db, $pp, $namestatus, $nntp)) === true)
+				if (($nzbcontents->checkPAR2($relrow['guid'], $relrow['releaseID'], $relrow['groupID'], $db, $pp, $namestatus, $nntp, $show)) === true)
                     {
                      echo ".";
                      $this->fixed++;
@@ -361,6 +361,7 @@ class Namefixer
    	public function checkName($release, $echo, $type, $namestatus, $show)
 	{
 	  // Get pre style name from releases.name
+        $matches = '';
 		preg_match_all('/(\w+[\._](\w+[\._-])+\w+-\w+)/', $release['textstring'], $matches);
 		foreach ($matches as $match) {
 			foreach ($match as $val) {

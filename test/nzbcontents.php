@@ -59,7 +59,7 @@ Class NZBcontents
 	}
 
 	// Attempts to get the releasename from a par2 file
-	public function checkPAR2($guid, $relID, $groupID, $db, $pp, $namestatus, $nntp)
+	public function checkPAR2($guid, $relID, $groupID, $db, $pp, $namestatus, $nntp, $show)
 	{
 	    $c = new ColorCLI;
 	    if (!isset($nntp))
@@ -73,7 +73,7 @@ Class NZBcontents
 				if (preg_match('/\.(par[2" ]|\d{2,3}").+\(1\/1\)$/i', $nzbcontents->attributes()->subject))
 				{
 					$pp = new Functions();
-					if (($pp->parsePAR2($nzbcontents->segments->segment, $relID, $groupID, $nntp)) === true && $namestatus === 1)
+					if (($pp->parsePAR2($nzbcontents->segments->segment, $relID, $groupID, $nntp, $show)) === true && $namestatus === 1)
                     {
 						$db->exec(sprintf('UPDATE releases SET bitwise = ((bitwise & ~32)|32) WHERE ID = %d', $relID));
 						return true;
