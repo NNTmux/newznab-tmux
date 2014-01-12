@@ -7,6 +7,7 @@ require_once("namecleaner.php");
 require_once("functions.php");
 require_once("nzbcontents.php");
 require_once("ColorCLI.php");
+require_once("consoletools.php");
 
 
 //This script is adapted from nZEDb
@@ -45,24 +46,28 @@ class Namefixer
 		$this->fullall = " ORDER BY postdate DESC";
         $this->done = $this->matched = false;
         $this->c = new ColorCLI();
+        $this->consoletools = new ConsoleTools();
 	}
 
 	//
 	//  Attempts to fix release names using the NFO.
 	//
-	public function fixNamesWithNfo($time, $echo, $cats, $namestatus)
+	public function fixNamesWithNfo($time, $echo, $cats, $namestatus, $show)
 	{
 
-		if ($time == 1)
-			echo "Fixing search names in the past 6 hours using .nfo files.\n";
-		else
-			echo "Fixing search names since the beginning using .nfo files.\n";
+	   if ($time == 1) {
+			echo $this->c->header("Fixing search names in the past 6 hours using .nfo files.");
+		} else {
+			echo $this->c->header("Fixing search names since the beginning using .nfo files.");
+		}
 
 		$db = new DB();
         $functions = new Functions ();
 		$type = "NFO, ";
 		// Only select releases we haven't checked here before
-		$query = "SELECT nfo.releaseID as nfoID, rel.groupID, rel.categoryID, rel.searchname, uncompress(nfo) as textstring, rel.ID as releaseID from releases rel inner join releasenfo nfo on (nfo.releaseID = rel.ID) where categoryID != 5070 AND ((bitwise & 4) = 0 OR rel.categoryID = 8010) AND (bitwise & 64) = 0";
+		$query = "SELECT rel.ID AS releaseID FROM releases rel "
+			. "INNER JOIN releasenfo nfo ON (nfo.releaseID = rel.ID) "
+			. "WHERE ((bitwise & 4) = 0 OR rel.categoryID = 8010) AND (bitwise & 64) = 0";
 
 		//24 hours, other cats
 		if ($time == 1 && $cats == 1)
@@ -77,46 +82,47 @@ class Namefixer
 		if ($time == 2 && $cats == 2)
 			$relres = $db->queryDirect($query.$this->fullall);
 
-		if ($relres->rowCount() > 0)
-		{
-			foreach ($relres as $relrow)
+		$total = $relres->rowCount();
+		if ($total > 0) {
+			echo $this->c->primary(number_format($total) . " releases to process.");
+			sleep(2);
+			foreach ($relres as $rel){
+			  $relrow = $db->queryOneRow("SELECT nfo.releaseID AS nfoID, rel.groupID, rel.categoryID, rel.searchname, UNCOMPRESS(nfo) AS textstring, "
+					. "rel.ID AS releaseID FROM releases rel "
+					. "INNER JOIN releasenfo nfo ON (nfo.releaseID = rel.ID) "
+					. "WHERE rel.ID = " . $rel['releaseID']);
 
-            {
-                if (preg_match('/^=newz\[NZB\]=\w+/', $relrow['textstring']))
- 				{
-    				$db->query(sprintf("UPDATE releases SET bitwise = ((bitwise & ~64)|64) WHERE ID = %d", $relrow['rel.ID']));
-                }
-
-                elseif (preg_match('/[^._-]?([A-Z0-9][-.\w]{5,}-[A-Za-z0-9]{2,})(\.[A-Za-z0-9]{2,3})?/', $relrow['textstring']))
-				{
-					$this->done = $this->matched = false;
-					$this->checkName($relrow, $echo, $type, $namestatus);
+				//ignore encrypted nfos
+				if (preg_match('/^=newz\[NZB\]=\w+/', $relrow['textstring'])) {
+					$db->queryExec(sprintf("UPDATE releases SET bitwise = ((bitwise & ~64)|64) WHERE ID = %d", $relrow['rel.ID']));
 					$this->checked++;
-					if ($this->checked % 500 == 0)
-						echo $this->checked." NFOs processed.\n\n";
-				}
-				else
-				{
+				} else {
 					$this->done = $this->matched = false;
-					$this->checkName($relrow, $echo, $type, $namestatus);
+					$this->checkName($relrow, $echo, $type, $namestatus, $show);
 					$this->checked++;
-					if ($this->checked % 500 == 0)
-						echo $this->checked." NFOs processed.\n\n";
+					if ($this->checked % 500 === 0 && $show === 1) {
+						echo $this->c->alternate($this->checked . " NFOs processed.\n");
+						sleep(1);
+					}
 				}
-            }
-			if($echo == 1)
-				echo $this->fixed." releases have had their names changed out of: ".$this->checked." NFO's.\n";
-			else
-				echo $this->fixed." releases could have their names changed. ".$this->checked." NFO's were checked.\n";
+				if ($show === 2) {
+					$this->consoletools->overWritePrimary("Renamed Releases: [" . number_format($this->fixed) . "] " . $this->consoletools->percentString($this->checked, $total));
+				}
+			}
+			if ($echo == 1) {
+				echo $this->c->header("\n" . $this->fixed . " releases have had their names changed out of: " . $this->checked . " NFO's.");
+			} else {
+				echo $this->c->header("\n" . $this->fixed . " releases could have their names changed. " . $this->checked . " NFO's were checked.");
+			}
+		} else {
+			echo $this->c->info("Nothing to fix.");
 		}
-		else
-			echo $this->c->info ("Nothing to fix.");
 	}
 
 	//
 	//  Attempts to fix release names using the File name.
 	//
-	public function fixNamesWithFiles($time, $echo, $cats, $namestatus)
+	public function fixNamesWithFiles($time, $echo, $cats, $namestatus, $show)
 	{
 		if ($time == 1)
 			echo $this->c->header ("Fixing search names in the past 6 hours using the filename.");
@@ -141,28 +147,33 @@ class Namefixer
 		if ($time == 2 && $cats == 2)
 			$relres = $db->queryDirect($query.$this->fullall);
 
-		if ($relres->rowCount() > 0)
-		{
-		   echo $this->c->header ("Fixing " . number_format($relres->rowCount()) . " search names using the filename.");
+		$total = $relres->rowCount();
+		if ($total > 0) {
+			echo $this->c->primary(number_format($total) . " releases to process.");
 			sleep(2);
-			foreach ($relres as $relrow)
-			{
+			foreach ($relres as $relrow) {
 				$this->done = $this->matched = false;
-				$this->checkName($relrow, $echo, $type, $namestatus);
+				$this->checkName($relrow, $echo, $type, $namestatus, $show);
 				$this->checked++;
-				if ($this->checked % 500 == 0)
-					echo $this->checked." files processed.\n\n";
+				if ($this->checked % 500 == 0 && $show === 1) {
+					echo $this->c->alternate($this->checked . " files processed.");
+					sleep(1);
+				}
+				if ($show === 2) {
+					$this->consoletools->overWritePrimary("Renamed Releases: [" . number_format($this->fixed) . "] " . $this->consoletools->percentString($this->checked, $total));
+				}
 			}
-			if($echo == 1)
-				echo $this->c->header ($this->fixed." releases have had their names changed out of: ".$this->checked." files.");
-			else
-				echo $this->c->header ($this->fixed." releases could have their names changed. ".$this->checked." files were checked.");
+			if ($echo == 1) {
+				echo $this->c->header("\n" . $this->fixed . " releases have had their names changed out of: " . $this->checked . " files.");
+			} else {
+				echo $this->c->header("\n" . $this->fixed . " releases could have their names changed. " . $this->checked . " files were checked.");
+			}
+		} else {
+			echo $this->c->info("Nothing to fix.");
 		}
-		else
-			echo $this->c->info ("Nothing to fix.");
 	}
     //  Attempts to fix release names using the Par2 File.
-	public function fixNamesWithPar2($time, $echo, $cats, $namestatus, $nntp)
+	public function fixNamesWithPar2($time, $echo, $cats, $namestatus, $show, $nntp)
 	{
 	    if (!isset($nntp))
 			exit($c->error("Not connected to usenet(namefixer->fixNamesWithPar2.\n"));
@@ -189,11 +200,10 @@ class Namefixer
 		if ($time == 2 && $cats == 2)
 			$relres = $db->queryDirect($query.$this->fullother);
 
-        $rowcount = $relres->rowCount();
-
-        if ($rowcount > 0)
-		    {
-            echo $this->c->header ($rowcount." release(s) to process.");
+        	$total = $relres->rowCount();
+		if ($total > 0) {
+			echo $this->c->primary(number_format($total) . " releases to process.");
+			sleep(2);
 		    $db = $this->db;
 			$nzbcontents = new NZBcontents($this->echooutput);
             $pp = new Functions ($this->echooutput);
@@ -207,19 +217,22 @@ class Namefixer
                      $this->fixed++;
                     }
                 $this->checked++;
-				if ($this->checked % 500 == 0)
-					echo $this->c->header ($this->checked." files processed.");
+			   if ($this->checked % 500 == 0 && $show === 1) {
+					echo $this->c->alternate("\n" . $this->checked . " files processed.\n");
+				}
+				if ($show === 2) {
+					$this->consoletools->overWritePrimary("Renamed Releases: [" . number_format($this->fixed) . "] " . $this->consoletools->percentString($this->checked, $total));
+				}
 			}
-			if($echo == 1)
-				echo $this->c->header ($this->fixed." releases have had their names changed out of: ".$this->checked." files.");
-			else
-				echo $this->c->header ($this->fixed." releases could have their names changed. ".$this->checked." files were checked.");
+			if ($echo == 1) {
+				echo $this->c->header("\n" . $this->fixed . " releases have had their names changed out of: " . $this->checked . " files.");
+			} else {
+				echo $this->c->header("\n" . $this->fixed . " releases could have their names changed. " . $this->checked . " files were checked.");
+			}
+		} else {
+			echo $this->c->alternate("Nothing to fix.");
 		}
-		else
-			echo $this->c->info ("Nothing to fix.");
 	}
-
-
 	//
 	//  Update the release with the new information.
 	//
@@ -301,17 +314,16 @@ class Namefixer
 
 
 	// Match a MD5 from the prehash table to a release.
-	public function matchPredbMD5($md5, $release, $echo, $namestatus, $echooutput)
+	public function matchPredbMD5($md5, $release, $echo, $namestatus, $echooutput, $show)
 	{
 		$db = new DB();
 		$matching = 0;
 		$category = new Category();
 		$this->matched = false;
 		$n = "\n";
-		$res = $db->query(sprintf("SELECT title, source FROM prehash WHERE hash = %s", $db->escapeString($md5)));
-        $total = count($res);
-		if ($total > 0)
-		{
+		$res = $db->queryDirect(sprintf("SELECT title, source FROM prehash WHERE hash = %s", $db->escapeString($md5)));
+        $total = $res->rowCount();
+		if ($total > 0) {
 			foreach ($res as $row)
 			{
 				if ($row["title"] !== $release["searchname"])
@@ -323,34 +335,22 @@ class Namefixer
 						$this->matched = true;
 						if ($namestatus == 1)
                         {
-							$md = $db->query(sprintf("UPDATE releases SET searchname = %s, categoryID = %d, bitwise = ((bitwise & ~5)|5), dehashstatus = 1 WHERE ID = %d", $db->escapeString($row["title"]), $determinedcat, $release["ID"]));
+							$db->query(sprintf("UPDATE releases SET searchname = %s, categoryID = %d, bitwise = ((bitwise & ~5)|5), dehashstatus = 1 WHERE ID = %d", $db->escapeString($row["title"]), $determinedcat, $release["ID"]));
                         }
 						else
                         {
-							$md = $db->query(sprintf("UPDATE releases SET searchname = %s, categoryID = %d, dehashstatus = 1 WHERE ID = %d", $db->escapeString($row["title"]), $determinedcat, $release["ID"]));
+							$db->query(sprintf("UPDATE releases SET searchname = %s, categoryID = %d, dehashstatus = 1 WHERE ID = %d", $db->escapeString($row["title"]), $determinedcat, $release["ID"]));
                         }
 					}
 
-					if ($echooutput)
-					{
-						$groups = new Groups();
-                        $functions = new Functions();
-						echo $this->c->primary ( $n."New name:  ".$row["title"].$n.
-							"Old name:  ".$release["searchname"].$n.
-							"New cat:   ".$functions->getNameByID($determinedcat).$n.
-							"Old cat:   ".$functions->getNameByID($release["categoryid"]).$n.
-							"Group:     ".$functions->getByNameByID($release["groupID"]).$n.
-							"Method:    "."prehash md5 release name: ".$row["source"].$n.
-							"ReleaseID: ". $release["ID"].$n.$n);
+						if ($echooutput && $show === 1) {
+						$this->updateRelease($release, $row["title"], $method = "prehash md5 release name: " . $row["source"], $echo, "MD5, ", $namestatus, $show);
 					}
 					$matching++;
 				}
-			if ($namestatus == 1 && $this->matched === false)
-			{
-				$rel = $db->query(sprintf("UPDATE releases SET dehashstatus = dehashstatus - 1 WHERE ID = %d", $row['ID']));
 			}
-
-			}
+		} else {
+			$db->query(sprintf("UPDATE releases SET dehashstatus = %d - 1 WHERE ID = %d", $release['dehashstatus'], $release['releaseID']));
 		}
 		return $matching;
 	}
@@ -358,29 +358,42 @@ class Namefixer
 	//
 	//  Check the array using regex for a clean name.
 	//
-   	public function checkName($release, $echo, $type, $namestatus)
+   	public function checkName($release, $echo, $type, $namestatus, $show)
 	{
-		if ($type == "PAR2, ")
-			$this->fileCheck($release, $echo, $type, $namestatus);
-		else
-		{
-			// Just for filenames.
-			if ($type == "Filenames, ")
-				$this->fileCheck($release, $echo, $type, $namestatus);
-			$this->tvCheck($release, $echo, $type, $namestatus);
-			$this->movieCheck($release, $echo, $type, $namestatus);
-			$this->gameCheck($release, $echo, $type, $namestatus);
-			$this->appCheck($release, $echo, $type, $namestatus);
-			// Just for NFOs.
-			if ($type == "NFO, ")
-			{
-				$this->nfoCheckTV($release, $echo, $type, $namestatus);
-				$this->nfoCheckMov($release, $echo, $type, $namestatus);
-				$this->nfoCheckMus($release, $echo, $type, $namestatus);
-				$this->nfoCheckTY($release, $echo, $type, $namestatus);
-				$this->nfoCheckG($release, $echo, $type, $namestatus);
+	  // Get pre style name from releases.name
+		preg_match_all('/(\w+[\._](\w+[\._-])+\w+-\w+)/', $release['textstring'], $matches);
+		foreach ($matches as $match) {
+			foreach ($match as $val) {
+				$title = $this->db->queryOneRow("SELECT title from prehash WHERE title = " . $this->db->escapeString(trim($val)));
+				if (isset($title['title'])) {
+					$this->cleanerName = $title['title'];
+					if (!empty($this->cleanerName)) {
+						$this->updateRelease($release, $title['title'], $method = "prehash: Match", $echo, $type, $namestatus, $show);
+						continue;
+					}
+				}
+			}
 		}
-	}
+		if ($type == "PAR2, ") {
+			$this->fileCheck($release, $echo, $type, $namestatus, $show);
+		} else {
+			// Just for NFOs.
+			if ($type == "NFO, ") {
+				$this->nfoCheckTV($release, $echo, $type, $namestatus, $show);
+				$this->nfoCheckMov($release, $echo, $type, $namestatus, $show);
+				$this->nfoCheckMus($release, $echo, $type, $namestatus, $show);
+				$this->nfoCheckTY($release, $echo, $type, $namestatus, $show);
+				$this->nfoCheckG($release, $echo, $type, $namestatus, $show);
+			}
+			// Just for filenames.
+			if ($type == "Filenames, ") {
+				$this->fileCheck($release, $echo, $type, $namestatus, $show);
+			}
+			$this->tvCheck($release, $echo, $type, $namestatus, $show);
+			$this->movieCheck($release, $echo, $type, $namestatus, $show);
+			$this->gameCheck($release, $echo, $type, $namestatus, $show);
+			$this->appCheck($release, $echo, $type, $namestatus, $show);
+		}
     // The release didn't match so set relnamestatus to 20 so it doesn't get rechecked. Also allows removeCrapReleases to run extra things on the release.
 	   if ($namestatus == 1 && $this->matched === false && $type == "NFO, ")
 		{
@@ -402,7 +415,7 @@ class Namefixer
 	//
 	//  Look for a TV name.
 	//
-	public function tvCheck($release, $echo, $type, $namestatus)
+	public function tvCheck($release, $echo, $type, $namestatus, $show)
 	{
 		if ($this->done === false && $this->relid !== $release["releaseID"] && preg_match('/\w[-\w.\',;& ]+((s\d{1,2}[._ -]?[bde]\d{1,2})|\d{1,2}x\d{2}|ep[._ -]?\d{2})[-\w.\',;.()]+(BD(-?(25|50|RIP))?|Blu-?Ray ?(3D)?|BRRIP|CAM(RIP)?|DBrip|DTV|DVD\-?(5|9|(R(IP)?|scr(eener)?))?|[HPS]D?(RIP|TV(RIP)?)?|NTSC|PAL|R5|Ripped |S?VCD|scr(eener)?|SAT(RIP)?|TS|VHS(RIP)?|VOD|WEB-DL)[._ -][-\w.\',;& ]+\w/i', $release["textstring"], $result))
 			$this->updateRelease($release, $result["0"], $method="tvCheck: Title.SxxExx.Text.source.group", $echo, $type, $namestatus);
@@ -425,7 +438,7 @@ class Namefixer
 	//
 	//  Look for a movie name.
 	//
-	public function movieCheck($release, $echo, $type, $namestatus)
+		public function movieCheck($release, $echo, $type, $namestatus, $show)
 	{
 		if ($this->done === false && $this->relid !== $release["releaseID"] && preg_match('/\w[-\w.\',;& ]+((19|20)\d\d)[-\w.\',;& ]+(480|720|1080)[ip][._ -](DivX|[HX][._ -]?264|MPEG2|XviD(HD)?|WMV)[-\w.\',;& ]+\w/i', $release["textstring"], $result))
 			$this->updateRelease($release, $result["0"], $method="movieCheck: Title.year.Text.res.vcod.group", $echo, $type, $namestatus);
@@ -458,7 +471,7 @@ class Namefixer
 	//
 	//  Look for a game name.
 	//
-	public function gameCheck($release, $echo, $type, $namestatus)
+	public function gameCheck($release, $echo, $type, $namestatus, $show)
 	{
 		if ($this->done === false && $this->relid !== $release["releaseID"] && preg_match('/\w[-\w.\',;& ]+(ASIA|DLC|EUR|GOTY|JPN|KOR|MULTI\d{1}|NTSCU?|PAL|RF|Region[._ -]?Free|USA|XBLA)[._ -](DLC[._ -]Complete|FRENCH|GERMAN|MULTI\d{1}|PROPER|PSN|READ[._ -]?NFO|UMD)?[._ -]?(GC|NDS|NGC|PS3|PSP|WII|XBOX(360)?)[-\w.\',;& ]+\w/i', $release["textstring"], $result))
 			$this->updateRelease($release, $result["0"], $method="gameCheck: Videogames 1", $echo, $type, $namestatus);
@@ -495,7 +508,7 @@ class Namefixer
 	//
 	//  Look for a app name.
 	//
-	public function appCheck($release, $echo, $type, $namestatus)
+	public function appCheck($release, $echo, $type, $namestatus, $show)
 	{
 		if ($this->done === false && $this->relid !== $release["releaseID"] && preg_match('/\w[-\w.\',;& ]+(\d{1,10}|Linux|UNIX)[._ -](RPM)?[._ -]?(X64)?[._ -]?(Incl)[._ -](Keygen)[-\w.\',;& ]+\w/i', $release["textstring"], $result))
 			$this->updateRelease($release, $result["0"], $method="appCheck: Apps 1", $echo, $type, $namestatus);
@@ -510,7 +523,7 @@ class Namefixer
 	//
 	//  TV.
 	//
-	public function nfoCheckTV($release, $echo, $type, $namestatus)
+	public function nfoCheckTV($release, $echo, $type, $namestatus, $show)
 	{
 		if ($this->done === false && $this->relid !== $release["releaseID"] && preg_match('/:\s*.*[\\\\\/]([A-Z0-9].+?S\d+[.-_ ]?[ED]\d+.+?)\.\w{2,}\s+/i', $release["textstring"], $result))
 			$this->updateRelease($release, $result["1"], $method="nfoCheck: Generic TV 1", $echo, $type, $namestatus);
@@ -521,7 +534,7 @@ class Namefixer
 	//
 	//  Movies.
 	//
-	public function nfoCheckMov($release, $echo, $type, $namestatus)
+	public function nfoCheckMov($release, $echo, $type, $namestatus, $show)
 	{
 		if ($this->done === false && $this->relid !== $release["releaseID"] && preg_match('/(?:(\:\s{1,}))(.+?(19|20)\d\d.+?(BDRip|bluray|DVD(R|Rip)?|XVID).+?)(\s{2,}|\r|\n)/i', $release["textstring"], $result))
 			$this->updateRelease($release, $result["2"], $method="nfoCheck: Generic Movies 1", $echo, $type, $namestatus);
@@ -534,7 +547,7 @@ class Namefixer
 	//
 	//  Music.
 	//
-	public function nfoCheckMus($release, $echo, $type, $namestatus)
+	public function nfoCheckMus($release, $echo, $type, $namestatus, $show)
 	{
 		if ($this->done === false && $this->relid !== $release["releaseID"] && preg_match('/(?:\s{2,})(.+?-FM-\d{2}-\d{2})/i', $release["textstring"], $result))
 		{
@@ -546,7 +559,7 @@ class Namefixer
 	//
 	//  Title (year)
 	//
-	public function nfoCheckTY($release, $echo, $type, $namestatus)
+	public function nfoCheckTY($release, $echo, $type, $namestatus, $show)
 	{
 		//Title(year)
 		if ($this->done === false && $this->relid !== $release["releaseID"] && preg_match('/(\w[-\w`~!@#$%^&*()_+={}|"<>?\[\]\\;\',.\/ ]+\s?\((19|20)\d\d\))/i', $release["textstring"], $result) && !preg_match('/\.pdf|Audio ?Book/i', $release["textstring"]))
@@ -641,7 +654,7 @@ class Namefixer
 	//
 	//  Games.
 	//
-	public function nfoCheckG($release, $echo, $type, $namestatus)
+	public function nfoCheckG($release, $echo, $type, $namestatus, $show)
 	{
 		if ($this->done === false && $this->relid !== $release["releaseID"] && preg_match('/ALiAS|BAT-TEAM|\FAiRLiGHT|Game Type|Glamoury|HI2U|iTWINS|JAGUAR|LARGEISO|MAZE|MEDIUMISO|nERv|PROPHET|PROFiT|PROCYON|RELOADED|REVOLVER|ROGUE|ViTALiTY/i', $release["textstring"]))
 		{
@@ -661,7 +674,7 @@ class Namefixer
 	//
 	//  Misc.
 	//
-	public function nfoCheckMisc($release, $echo, $type, $namestatus)
+	public function nfoCheckMisc($release, $echo, $type, $namestatus, $show)
 	{
 		if ($this->done === false && $this->relid !== $release["releaseID"] && preg_match('/Supplier.+?IGUANA/i', $release["textstring"]))
 		{
@@ -691,7 +704,7 @@ class Namefixer
 	 *
 	 */
 
-	public function fileCheck($release, $echo, $type, $namestatus)
+	public function fileCheck($release, $echo, $type, $namestatus, $show)
 	{
 		if ($this->done === false && $this->relid !== $release["releaseID"] && preg_match('/^(.+?(x264|XviD)\-TVP)\\\\/i', $release["textstring"], $result))
 			$this->updateRelease($release, $result["1"], $method="fileCheck: TVP", $echo, $type, $namestatus);

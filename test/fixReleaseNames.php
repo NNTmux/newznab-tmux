@@ -26,6 +26,12 @@ if (isset($argv[1]) && isset($argv[2]) && isset($argv[3]) && isset($argv[4]))
 	$other = ($argv[3] == "other") ? 1 : 2;
 	$setStatus = ($argv[4] == "yes") ? 1 : 2;
 
+    if (isset($argv[5]) && $argv[5] === 'show') {
+		$show = 1;
+	} else {
+		$show = 2;
+	}
+
     if ($argv[1] == 7 || $argv[1] == 8)
     	{
 		require_once(WWW_DIR."/lib/nntp.php");
@@ -38,51 +44,47 @@ if (isset($argv[1]) && isset($argv[2]) && isset($argv[3]) && isset($argv[4]))
 		}
 	}
 
-	switch ($argv[1])
-	{
+	switch ($argv[1]) {
 		case 1:
-			$predb->parseTitles(1,$update,$other,$setStatus);
+			$predb->parseTitles(1, $update, $other, $setStatus, $show);
 			break;
 		case 2:
-			$predb->parseTitles(2,$update,$other,$setStatus);
+			$predb->parseTitles(2, $update, $other, $setStatus, $show);
 			break;
 		case 3:
-			$namefixer->fixNamesWithNfo(1,$update,$other,$setStatus);
+			$namefixer->fixNamesWithNfo(1, $update, $other, $setStatus, $show);
 			break;
 		case 4:
-			$namefixer->fixNamesWithNfo(2,$update,$other,$setStatus);
+			$namefixer->fixNamesWithNfo(2, $update, $other, $setStatus, $show);
 			break;
 		case 5:
-			$namefixer->fixNamesWithFiles(1,$update,$other,$setStatus);
+			$namefixer->fixNamesWithFiles(1, $update, $other, $setStatus, $show);
 			break;
 		case 6:
-			$namefixer->fixNamesWithFiles(2,$update,$other,$setStatus);
+			$namefixer->fixNamesWithFiles(2, $update, $other, $setStatus, $show);
 			break;
-        case 7:
-			$namefixer->fixNamesWithPar2(1,$update,$other,$setStatus,$nntp);
+		case 7:
+			$namefixer->fixNamesWithPar2(1, $update, $other, $setStatus, $show, $nntp);
 			break;
 		case 8:
-			$namefixer->fixNamesWithPar2(2,$update,$other,$setStatus,$nntp);
+			$namefixer->fixNamesWithPar2(2, $update, $other, $setStatus, $show, $nntp);
 			break;
 		default :
-			exit("ERROR: Wrong argument, type php fixReleaseNames.php to see a list of valid arguments.".$n);
+			exit($c->error("\nERROR: Wrong argument, type php $argv[0] to see a list of valid arguments." . $n));
 			break;
 	}
+} else {
+	exit($c->error("\nYou must supply 4 arguments.\n"
+			. "The 2nd argument, false, will display the results, but not change the name, type true to have the names changed.\n"
+			. "The 3rd argument, other, will only do against other categories, to do against all categories use all.\n"
+			. "The 4th argument, yes, will set the release as checked, so the next time you run it will not be processed, to not set as checked type no.\n"
+			. "The 5th argument (optional), show, wiil display the release changes or only show a counter.\n\n"
+			. "php $argv[0] 1 false other no ...: Fix release names, using the usenet subject in the past 3 hours with predb information.\n"
+			. "php $argv[0] 2 false other no ...: Fix release names, using the usenet subject with predb information.\n"
+			. "php $argv[0] 3 false other no ...: Fix release names using NFO in the past 6 hours.\n"
+			. "php $argv[0] 4 false other no ...: Fix release names using NFO.\n"
+			. "php $argv[0] 5 false other no ...: Fix release names in misc categories using File Name in the past 6 hours.\n"
+			. "php $argv[0] 6 false other no ...: Fix release names in misc categories using File Name.\n"
+			. "php $argv[0] 7 false other no ...: Fix release names in misc categories using Par2 Files in the past 6 hours.\n"
+			. "php $argv[0] 8 false other no ...: Fix release names in misc categories using Par2 Files.\n\n"));
 }
-else
-{
-	exit("ERROR: You must supply 4 arguments.".$n.
-			"php fixReleaseNames.php 1 false other no ...: Fix release names, using the usenet subject in the past 3 hours with predb information.".$n.
-			"php fixReleaseNames.php 2 false other no ...: Fix release names, using the usenet subject with predb information.".$n.
-			"php fixReleaseNames.php 3 false other no ...: Fix release names using NFO in the past 6 hours.".$n.
-			"php fixReleaseNames.php 4 false other no ...: Fix release names using NFO.".$n.
-			"php fixReleaseNames.php 5 false other no ...: Fix release names in misc categories using File Name in the past 6 hours.".$n.
-			"php fixReleaseNames.php 6 false other no ...: Fix release names in misc categories using File Name.".$n.
-            "php fixReleaseNames.php 7 false other no ...: Fix release names in misc categories using Par2 Files in the past 6 hours.".$n.
-			"php fixReleaseNames.php 8 false other no ...: Fix release names in misc categories using Par2 Files.".$n.
-            "The 2nd argument false will display the results, but not change the name, type true to have the names changed.".$n.
-			"The 3rd argument other will only do against other categories, to do against all categories use all.".$n.
-			"The 4th argument yes will set the release as checked, so the next time you run it will not be processed, to not set as checked type no.".$n.$n);
-}
-
-?>

@@ -752,11 +752,13 @@ Class Predb
 	}
 
 	// Matches the MD5 within the prehash table to release files and subjects (names) which are hashed.
-	public function parseTitles($time, $echo, $cats, $namestatus, $md5="")
+		public function parseTitles($time, $echo, $cats, $namestatus, $show)
 	{
 		$db = new DB();
 		$namefixer = new Namefixer();
-		$updated = 0;
+        $consoletools = new ConsoleTools();
+		$updated = $checked = 0;
+		$matches = '';
 
 		$tq = "";
 		if ($time == 1)
@@ -773,21 +775,32 @@ Class Predb
 			echo $this->c->header ("Fixing search names".$te." using the prehash md5.");
 		}
         $regex = "AND ((r.bitwise & 512) = 512 OR rf.name REGEXP'[a-fA-F0-9]{32}')";
-		$res = $db->queryDirect(sprintf('SELECT DISTINCT r.ID, r.name, r.searchname, r.categoryID, r.groupID, rf.name AS filename, rf.releaseID, rf.size FROM releases r LEFT JOIN releasefiles rf ON r.ID = rf.releaseID WHERE (bitwise & 260) = 256 AND dehashstatus BETWEEN -5 AND 0 AND passwordstatus >= -1 %s %s %s ORDER BY rf.releaseID, rf.size DESC', $regex, $tq, $ct));
-        echo "Checking " . $res->rowCount() . " releases\n";
-        if ($res->rowCount() > 0)
-		{
-		  foreach ($res as $row)
-			{
-			   if (preg_match("/[a-f0-9]{32}/i", $row["name"], $matches))
-					$updated = $updated + $namefixer->matchPredbMD5($matches[0], $row, $echo, $namestatus, $this->echooutput);
-				else if (preg_match("/[a-f0-9]{32}/i", $row["filename"], $matches))
-					$updated = $updated + $namefixer->matchPredbMD5($matches[0], $row, $echo, $namestatus, $this->echooutput);
+		$res = $db->queryDirect(sprintf('SELECT r.ID AS releaseID, r.name, r.searchname, r.categoryID, r.groupID, '
+				. 'dehashstatus, rf.name AS filename FROM releases r '
+				. 'LEFT OUTER JOIN releasefiles rf ON r.ID = rf.releaseID '
+				. 'WHERE (bitwise & 260) = 256 AND dehashstatus BETWEEN -6 AND 0 %s %s %s', $regex, $ct, $tq));
+        $total = $res->rowCount();
+		echo $this->c->primary(number_format($total) . " releases to process.");
+		if ($total > 0) {
+			foreach ($res as $row) {
+				if (preg_match('/[a-f0-9]{32}/i', $row['name'], $matches)) {
+					$updated = $updated + $namefixer->matchPredbMD5($matches[0], $row, $echo, $namestatus, $this->echooutput, $show);
+				} else if (preg_match('/[a-f0-9]{32}/i', $row['filename'], $matches)) {
+					$updated = $updated + $namefixer->matchPredbMD5($matches[0], $row, $echo, $namestatus, $this->echooutput, $show);
+				}
+				if ($show === 2) {
+					$consoletools->overWritePrimary("Renamed Releases: [" . number_format($updated) . "] " . $consoletools->percentString( ++$checked, $total));
+				}
 			}
 		}
+		if ($echo == 1) {
+			echo $this->c->header("\n" . $updated . " releases have had their names changed out of: " . number_format($checked) . " files.");
+		} else {
+			echo $this->c->header("\n" . $updated . " releases could have their names changed. " . number_format($checked) . " files were checked.");
+		}
+
 		return $updated;
 	}
-
 
 	public function getAll($offset, $offset2)
 	{
