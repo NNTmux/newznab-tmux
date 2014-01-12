@@ -265,7 +265,7 @@ class Functions
     //
 	// Attempt to get a better name from a par2 file and categorize the release.
 	//
-	public function parsePAR2($messageID, $relID, $groupID, $nntp)
+    public function parsePAR2($messageID, $relID, $groupID, $nntp, $show)
 	{
 		$db = new DB();
 		$category = new Category();
@@ -322,7 +322,7 @@ class Functions
 						$relfiles++;
 				}
 				$quer["textstring"] = $file["name"];
-				if ($namefixer->checkName($quer, 1, 'PAR2, ', 1) === true) {
+				if ($namefixer->checkName($quer, 1, 'PAR2, ', 1, $show) === true) {
                     $foundname = true;
                     break;
                 }
