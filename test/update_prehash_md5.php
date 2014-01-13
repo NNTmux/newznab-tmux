@@ -12,7 +12,7 @@ $c = new ColorCLI();
 
 if (!isset($argv[1]) || $argv[1] != 'true') {
 	exit($c->error("\nThis script will recalculate and update the MD5 column for each pre.\n\n"
-					. "php $argv[0] true      ...: To reset every predb MD5.\n"));
+					. "php $argv[0] true      ...: To reset every prehash MD5.\n"));
 }
 
 // Drop the unique index
@@ -25,17 +25,17 @@ if ($has_index->rowCount() > 0) {
 $res = $db->queryDirect("SELECT ID, title FROM prehash");
 $total = $res->rowCount();
 $deleted = $count = 0;
-echo $c->header("Updating MD5's on $total preDB's.");
+echo $c->header("Updating MD5's on $total prehash's.");
 foreach ($res as $row) {
 	$name = trim($row['title']);
 	$md5 = $db->escapeString(md5($name));
 	$title = $db->escapeString($name);
 
-	$db->queryDirect(sprintf("UPDATE prehash SET title = %s, hash = %s WHERE ID = %d", $title, $md5, $row['ID']));
+	$db->queryDirect(sprintf("UPDATE prehash SET title = %s, md5 = %s WHERE ID = %d", $title, $md5, $row['ID']));
 	$consoletools->overWriteHeader("Reset MD5s: " . $consoletools->percentString(++$count, $total));
 }
 
 //Re-create the unique index, dropping dupes
 echo $c->info("\nCreating index ix_prehash_md5.");
-$db->queryDirect("ALTER IGNORE TABLE prehash ADD CONSTRAINT ix_prehash_md5 UNIQUE (hash)");
+$db->queryDirect("ALTER IGNORE TABLE prehash ADD CONSTRAINT ix_prehash_md5 UNIQUE (md5)");
 echo $c->header("\nDone.");

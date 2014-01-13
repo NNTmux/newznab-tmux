@@ -12,12 +12,12 @@ require_once ("ColorCLI.php");
 //this script is adapted from nZEDb decrypt_hashes.php
 $c = new ColorCLI();
 if (!isset($argv[1]) || ( $argv[1] != "all" && $argv[1] != "full" && !is_numeric($argv[1])))
-	exit($c->error("\nThis script tries to match an MD5 of the releases.name or releases.searchname to predb.md5.\n"
-		."php predb_hash_decrypt.php 1000		...: to limit to 1000 sorted by newest postdate.\n"
-		."php predb_hash_decrypt.php full 		...: to run on full database.\n"
-		."php predb_hash_decrypt.php all 		...: to run on all hashed releases(including previously renamed).\n"));
+	exit($c->error("\nThis script tries to match an MD5 of the releases.name or releases.searchname to prehash.md5.\n"
+		."php predb_md5_decrypt.php 1000		...: to limit to 1000 sorted by newest postdate.\n"
+		."php predb_md5_decrypt.php full 		...: to run on full database.\n"
+		."php predb_md5_decrypt.php all 		...: to run on all hashed releases(including previously renamed).\n"));
 
-echo $c->header ("\nHash Decryption Started at ".date("H:i:s")."\nMatching preDB MD5 to md5(releases.name or releases.searchname)");
+echo $c->header ("\nHash Decryption Started at ".date("H:i:s")."\nMatching prehash MD5 to md5(releases.name or releases.searchname)");
 preName($argv);
 
 function preName($argv)
@@ -49,7 +49,7 @@ function preName($argv)
 			$success = false;
 			if (preg_match('/([0-9a-fA-F]{32})/', $row['searchname'], $match) || preg_match('/([0-9a-fA-F]{32})/', $row['name'], $match))
 			{
-				$pre = $db->queryOneRow(sprintf("SELECT dirname FROM predb WHERE hash = %s", $db->escapeString($match[1])));
+				$pre = $db->queryOneRow(sprintf("SELECT dirname FROM predb WHERE md5 = %s", $db->escapeString($match[1])));
 				if ($pre !== false)
 				{
 					$determinedcat = $category->determineCategory($row["groupID"], $pre['dirname']);

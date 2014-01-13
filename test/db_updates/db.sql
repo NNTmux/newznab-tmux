@@ -1,13 +1,13 @@
 ALTER TABLE  `predb`
-  ADD `hash` VARCHAR( 32 ) NULL,
-  ADD INDEX (`hash`);
+  ADD `md5` VARCHAR( 32 ) NULL,
+  ADD INDEX (`md5`);
 ALTER TABLE  `releases`
   ADD `dehashstatus` TINYINT( 1 ) NOT NULL DEFAULT  '0' AFTER  `haspreview`,
   ADD `nfostatus` TINYINT NOT NULL DEFAULT 0 after `dehashstatus`,
   ADD `reqidstatus` TINYINT(1) NOT NULL DEFAULT '0' AFTER `dehashstatus`,
   ADD `bitwise` SMALLINT UNSIGNED NOT NULL DEFAULT 0 AFTER `reqidstatus`,
-  ADD INDEX `ix_releases_nfostatus` (`nfostatus` ASC) USING HASH,
-  ADD INDEX `ix_releases_reqidstatus` (`reqidstatus` ASC) USING HASH,
+  ADD INDEX `ix_releases_nfostatus` (`nfostatus` ASC) USING md5,
+  ADD INDEX `ix_releases_reqidstatus` (`reqidstatus` ASC) USING md5,
   ADD INDEX `ix_releases_status` (`ID`, `nfostatus`, `bitwise`, `passwordstatus`, `dehashstatus`, `reqidstatus`, `musicinfoID`, `consoleinfoID`, `bookinfoID`, `haspreview`, `categoryID`);
 
 DELIMITER $$

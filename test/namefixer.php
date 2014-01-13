@@ -321,7 +321,7 @@ class Namefixer
 		$category = new Category();
 		$this->matched = false;
 		$n = "\n";
-		$res = $db->queryDirect(sprintf("SELECT title, source FROM prehash WHERE hash = %s", $db->escapeString($md5)));
+		$res = $db->queryDirect(sprintf("SELECT title, source FROM prehash WHERE md5 = %s", $db->escapeString($md5)));
         $total = $res->rowCount();
 		if ($total > 0) {
 			foreach ($res as $row)
