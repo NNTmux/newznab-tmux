@@ -230,7 +230,7 @@ class Namefixer
 				echo $this->c->header("\n" . $this->fixed . " releases could have their names changed. " . $this->checked . " files were checked.");
 			}
 		} else {
-			echo $this->c->alternate("Nothing to fix.");
+			echo $this->c->info("Nothing to fix.");
 		}
 	}
 	//
