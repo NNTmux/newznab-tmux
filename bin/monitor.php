@@ -5,7 +5,7 @@ require(WWW_DIR.'/lib/postprocess.php');
 require_once (WWW_DIR.'/lib/site.php');
 require_once("../test/ColorCLI.php");
 
-$version="0.3r604";
+$version="0.3r605";
 
 $db = new DB();
 $s = new Sites();
@@ -40,7 +40,7 @@ $proc = "SELECT
 ( SELECT COUNT( ID ) FROM groups WHERE first_record IS NOT NULL and `backfill_target` > 0 and first_record_postdate != '2000-00-00 00:00:00'  < first_record_postdate) AS backfill_groups,
 ( SELECT UNIX_TIMESTAMP(adddate) from prehash order by adddate DESC limit 1 ) AS newestprehash,
 ( SELECT UNIX_TIMESTAMP(updatedate) from predb order by updatedate DESC limit 1 ) AS newestpredb,
-(SELECT COUNT(*) FROM releases WHERE (bitwise & 256) = 256 AND preid IS NOT NULL) AS prehash_matched,
+(SELECT COUNT(*) FROM releases WHERE (bitwise & 256) = 256 AND preID IS NOT NULL) AS prehash_matched,
 ( SELECT TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES where table_name = 'prehash' AND TABLE_SCHEMA = '".DB_NAME."' ) AS prehash,
 ( SELECT name from releases order by adddate desc limit 1 ) AS newestaddname";
 //$proc = "SELECT * FROM procCnt;";
