@@ -51,7 +51,7 @@ function preName($argv)
    elseif (isset($argv[1]) && $argv[1]=="full" && isset($argv[2]) && $argv[2] == "all"){
 		$res = $db->queryDirect("SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE (bitwise & 256) = 256" .$where);
         }
-    $total = $res->rowCount();
+    $total = count($res);
 	if ($total > 0)
 	{
 		$consoletools = new ConsoleTools();
