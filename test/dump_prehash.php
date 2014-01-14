@@ -63,7 +63,7 @@ if (isset($argv[1]) && $argv[1] == 'export' && isset($argv[2])) {
 	$db->queryDirect('INSERT INTO ' . $table . ' (title, nfo, size, category, predate, adddate, source, md5, requestID, groupID) SELECT t.title, t.nfo, t.size, t.category, t.predate, t.adddate, t.source, t.md5, t.requestID, IF(g.ID IS NOT NULL, g.ID, 0) FROM tmp_pre t LEFT OUTER JOIN groups g ON t.groupname = g.name ON DUPLICATE KEY UPDATE prehash.nfo = IF(prehash.nfo is null, t.nfo, prehash.nfo), prehash.size = IF(prehash.size is null, t.size, prehash.size), prehash.category = IF(prehash.category is null, t.category, prehash.category), prehash.requestID = IF(prehash.requestID = 0, t.requestID, prehash.requestID), prehash.groupID = IF(g.ID IS NOT NULL, g.ID, 0)');
 
 	// Drop tmp_pre table
-	$db->queryExec('DROP TABLE IF EXISTS tmp_pre');
+	$db->query('DROP TABLE IF EXISTS tmp_pre');
 } else {
 	exit($c->error("\nThis script can export or import a prehash dump file. You may use the full path, or a relative path.\n"
 					. "For importing, the script insert new rows and update existing matched rows. For databases not on the local system, use remote, else use local.\n"
