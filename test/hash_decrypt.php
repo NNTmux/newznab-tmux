@@ -13,9 +13,9 @@ require_once ("ColorCLI.php");
 $c = new ColorCLI();
 if (!isset($argv[1]) || ( $argv[1] != "all" && $argv[1] != "full" && !is_numeric($argv[1])))
 	exit($c->error("\nThis script tries to match an MD5 of the releases.name or releases.searchname to predb.md5.\n"
-		."php md5_decrypt.php 1000		...: to limit to 1000 sorted by newest postdate.\n"
-		."php md5_decrypt.php full 		...: to run on full database.\n"
-		."php md5_decrypt.php all 		...: to run on all hashed releases(including previously renamed).\n"));
+		."php hash_decrypt.php 1000		...: to limit to 1000 sorted by newest postdate.\n"
+		."php hash_decrypt.php full 		...: to run on full database.\n"
+		."php hash_decrypt.php all 		...: to run on all hashed releases(including previously renamed).\n"));
 
 echo $c->header ("\nHash Decryption Started at ".date("H:i:s")."\nMatching prehash MD5 to md5(releases.name or releases.searchname)");
 preName($argv);

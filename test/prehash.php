@@ -99,7 +99,7 @@ Class Predb
 		if ($this->echooutput)
 		{
 			$count = ($matched > 0) ? $matched : 0;
-			echo $this->c->header('Matched ' . $count . ' prehash titles to release search names.');
+			echo $this->c->header('Matched ' . number_format($count) . ' prehash titles to release search names.');
 		}
 		$nfos = $this->matchNfo($nntp);
 		if ($this->echooutput)
@@ -691,7 +691,7 @@ Class Predb
 		$updated = 0;
 		if($this->echooutput)
 			{
-			echo $this->c->primary('Querying DB for matches in prehash titles with release searchnames.');
+			echo $this->c->header('Querying DB for release searchnames not matched with prehash titles.');
 		}
 
 		$res = $db->queryDirect('SELECT p.ID AS preID, r.ID AS releaseID FROM prehash p INNER JOIN releases r ON p.title = r.searchname WHERE r.preID IS NULL');
