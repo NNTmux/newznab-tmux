@@ -144,7 +144,7 @@ function preName($argv)
 			$consoletools->overWritePrimary("Renamed Releases:  [Internal=" . number_format($internal) . "][External=" . number_format($external) . "][Predb=" . number_format($pre) . "] " . $consoletools->percentString( ++$counter, $total));
 		}
 	}
-	echo $c->header("\n" . number_format($internal) . " renamed using namecleaning.php\n" . number_format($external) . " using renametopre.php\nout of " . number_format($total) . " releases.\n");
+	echo $c->header("\n" . number_format($pre) . " renamed using preDB Match\n" . number_format($external) . " renamed using NameCleaning.php\n" . number_format($internal) . " using renametopre.php\nout of " . number_format($total) . " releases.\n");
 	echo $c->header("Categorizing all non-categorized releases in other->misc using usenet subject. This can take a while, be patient.");
 	$timestart = TIME();
 	if (isset($argv[1]) && $argv[1] == "full") {
