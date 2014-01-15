@@ -68,7 +68,7 @@ function preName($argv, $argc)
 		$where = ' AND groupid = ' . $argv[2];
 		$why = ' WHERE (bitwise & 260) = 256';
 	} else if ($full === true) {
-		$why = ' WHERE ((bitwise & 260) = 256 OR categoryid between 7000 AND 7999)';
+		$why = ' WHERE ((bitwise & 260) = 256 OR categoryid between 8000 AND 8999)';
 	} else if ($all === true) {
 		$why = ' WHERE (bitwise & 256) = 256';
 	} else {
