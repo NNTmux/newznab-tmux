@@ -5,7 +5,7 @@ require(WWW_DIR.'/lib/postprocess.php');
 require_once (WWW_DIR.'/lib/site.php');
 require_once("../test/ColorCLI.php");
 
-$version="0.3r612";
+$version="0.3r613";
 
 $db = new DB();
 $s = new Sites();
@@ -504,9 +504,9 @@ while( $i > 0 )
 	{
         if ( @$proc_result[0]['nforemains'] != NULL ) { $nfo_remaining_start = $proc_result[0]['nforemains']; }
         if ( @$proc_result2[0]['prehash_matched'] != NULL ) { $prehash_start = $proc_result2[0]['prehash_matched']; }
-        if ( @$proc_result2[0]['distinct_prehash_matched'] != NULL) {$distinct_prehash_matched = $proc_result2[0]['distinct_prehash_matched'];}
-        if ( @$proc_result2[0]['requestid_inprogress'] != NULL) {$requestid_inprogress_start = $proc_result2[0]['requestid_inprogress'];}
-        if ( @$proc_result2[0]['requestid_matched'] != NULL) {$requestid_matched = $proc_result2[0]['requestid_matched'];
+        if ( @$proc_result2[0]['distinct_prehash_matched'] != NULL) {$distinct_prehash_matched = $proc_result2[0]['distinct_prehash_matched']; }
+        if ( @$proc_result2[0]['requestid_inprogress'] != NULL) {$requestid_inprogress_start = $proc_result2[0]['requestid_inprogress']; }
+        if ( @$proc_result2[0]['requestid_matched'] != NULL) {$requestid_matched = $proc_result2[0]['requestid_matched']; }
 		if ( @$proc_result[0]['console'] != NULL ) { $console_releases_proc_start = $proc_result[0]['console']; }
 		if ( @$proc_result[0]['movies'] != NULL ) { $movie_releases_proc_start = $proc_result[0]['movies']; }
 		if ( @$proc_result[0]['audio'] != NULL ) { $music_releases_proc_start = $proc_result[0]['audio']; }
@@ -1510,5 +1510,3 @@ if ($array ['FIXRELEASES'] = "true") {
 		sleep(1);
 	}
 }
-}
-?>
