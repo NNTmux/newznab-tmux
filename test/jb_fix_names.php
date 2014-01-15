@@ -151,8 +151,8 @@ function preName($argv, $argc)
 							$external++;
 						}
 						if ($show === 1) {
-							$oldcatname = $category->getNameByID($row["categoryID"]);
-							$newcatname = $category->getNameByID($determinedcat);
+							$oldcatname = $functions->getNameByID($row["categoryID"]);
+							$newcatname = $functions->getNameByID($determinedcat);
 							echo $c->headerOver("\n\nNew name:  ") . $c->primary($cleanName) .
 							$c->headerOver("Old name:  ") . $c->primary($row["searchname"]) .
 							$c->headerOver("New cat:   ") . $c->primary($newcatname) .
