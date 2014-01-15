@@ -141,13 +141,13 @@ function preName($argv, $argc)
 						}
 
 					   if ($increment === true) {
-							$status = "renametopre Match";
+							$status = "jb_fix_names Match";
 							$internal++;
 						} else if ($predb === true) {
-							$status = "PreDB: Match";
+							$status = "Prehash: Match";
 							$pre++;
 						} else if ($propername === true) {
-							$status = "ReleaseCleaner Match";
+							$status = "releaseCleaner Match";
 							$external++;
 						}
 						if ($show === 1) {
