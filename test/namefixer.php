@@ -31,6 +31,9 @@ require_once("consoletools.php");
  * 22 : The release was checked by namefixer par2 but no name was found
  */
 
+
+CONST PREDB_REGEX = "/([\w\(\)]+[\._]([\w\(\)]+[\._-])+[\w\(\)]+-\w+)/";
+
 class Namefixer
 {
 
@@ -68,6 +71,7 @@ class Namefixer
 		$query = "SELECT rel.ID AS releaseID FROM releases rel "
 			. "INNER JOIN releasenfo nfo ON (nfo.releaseID = rel.ID) "
 			. "WHERE ((bitwise & 4) = 0 OR rel.categoryID = 8010) AND (bitwise & 64) = 0";
+            	//. "WHERE preid IS NULL";
 
 		//24 hours, other cats
 		if ($time == 1 && $cats == 1)
@@ -132,7 +136,8 @@ class Namefixer
 		$db = new DB();
         $functions = new Functions();
 		$type = "Filenames, ";
-		$query = "SELECT relfiles.name as textstring, rel.categoryID, rel.searchname, rel.groupID, relfiles.releaseID as fileID, rel.ID as releaseID from releases rel inner join releasefiles relfiles on (relfiles.releaseID = rel.ID) where categoryID != 5070 AND ((bitwise & 4) = 0 OR rel.categoryID = 8010) AND (bitwise & 128) = 0";
+		$query = "SELECT relfiles.name as textstring, rel.categoryID, rel.searchname, rel.groupID, relfiles.releaseID as fileID, rel.ID as releaseID from releases rel inner join releasefiles relfiles on (relfiles.releaseID = rel.ID) where ((bitwise & 4) = 0 OR rel.categoryID = 8010) AND (bitwise & 128) = 0";
+    //. "WHERE preid IS NULL";
 
 		//24 hours, other cats
 		if ($time == 1 && $cats == 1)
@@ -186,6 +191,7 @@ class Namefixer
         $functions = new Functions();
 		$type = "PAR2, ";
 		$query = "SELECT rel.ID AS releaseID, rel.guid, rel.groupID FROM releases rel WHERE ((bitwise & 4) = 0 OR rel.categoryID = 8010) AND (bitwise & 32) = 0";
+    //. "WHERE preid IS NULL";
 
 		//24 hours, other cats
 		if ($time == 1 && $cats == 1)
@@ -362,7 +368,7 @@ class Namefixer
 	{
 	  // Get pre style name from releases.name
         $matches = '';
-		preg_match_all('/(\w+[\._](\w+[\._-])+\w+-\w+)/', $release['textstring'], $matches);
+		preg_match_all('/([\w\(\)]+[\._]([\w\(\)]+[\._-])+[\w\(\)]+-\w+)/', $release['textstring'], $matches);
 		foreach ($matches as $match) {
 			foreach ($match as $val) {
 				$title = $this->db->queryOneRow("SELECT title from prehash WHERE title = " . $this->db->escapeString(trim($val)));
@@ -747,9 +753,9 @@ class Namefixer
 		}
 		elseif ($this->done === false && $this->relid !== $release["releaseID"] && preg_match('/\w[-\w.\',;& ]+\d{3,4}\.hdtv-lol\.(avi|mp4|mkv|ts|nfo|nzb)/i', $release["textstring"], $result))
 			$this->updateRelease($release, $result["0"], $method="fileCheck: Title.211.hdtv-lol.extension", $echo, $type, $namestatus, $show);
-		elseif ($this->done === false && $this->relid !== $release["releaseID"] && preg_match('/\w[-\w.\',;& ]+-S\d{1,2}E\d{1,2}-XVID-DL.avi/i', $release["textstring"], $result))
+		else if ($this->done === false && $this->relid !== $release["releaseid"] && preg_match('/\w[-\w.\',;& ]+-S\d{1,2}[EX]\d{1,2}-XVID-DL.avi/i', $release["textstring"], $result))
 			$this->updateRelease($release, $result["0"], $method="fileCheck: Title-SxxExx-XVID-DL.avi", $echo, $type, $namestatus, $show);
-		elseif ($this->done === false && $this->relid !== $release["releaseID"] && preg_match('/\S.*[\w.\-\',;]+\s\-\ss\d{2}e\d{2}\s\-\s[\w.\-\',;].+\./i', $release["textstring"], $result))
+		else if ($this->done === false && $this->relid !== $release["releaseid"] && preg_match('/\S.*[\w.\-\',;]+\s\-\ss\d{2}[ex]\d{2}\s\-\s[\w.\-\',;].+\./i', $release["textstring"], $result))
 			$this->updateRelease($release, $result["0"], $method="fileCheck: Title - SxxExx - Eptitle", $echo, $type, $namestatus, $show);
 		elseif ($this->done === false && $this->relid !== $release["releaseID"] && preg_match('/\w.+?\)\.nds/i', $release["textstring"], $result))
 			$this->updateRelease($release, $result["0"], $method="fileCheck: ).nds Nintendo DS", $echo, $type, $namestatus, $show);
