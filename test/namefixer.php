@@ -753,9 +753,9 @@ class Namefixer
 		}
 		elseif ($this->done === false && $this->relid !== $release["releaseID"] && preg_match('/\w[-\w.\',;& ]+\d{3,4}\.hdtv-lol\.(avi|mp4|mkv|ts|nfo|nzb)/i', $release["textstring"], $result))
 			$this->updateRelease($release, $result["0"], $method="fileCheck: Title.211.hdtv-lol.extension", $echo, $type, $namestatus, $show);
-		else if ($this->done === false && $this->relid !== $release["releaseid"] && preg_match('/\w[-\w.\',;& ]+-S\d{1,2}[EX]\d{1,2}-XVID-DL.avi/i', $release["textstring"], $result))
+		else if ($this->done === false && $this->relid !== $release["releaseID"] && preg_match('/\w[-\w.\',;& ]+-S\d{1,2}[EX]\d{1,2}-XVID-DL.avi/i', $release["textstring"], $result))
 			$this->updateRelease($release, $result["0"], $method="fileCheck: Title-SxxExx-XVID-DL.avi", $echo, $type, $namestatus, $show);
-		else if ($this->done === false && $this->relid !== $release["releaseid"] && preg_match('/\S.*[\w.\-\',;]+\s\-\ss\d{2}[ex]\d{2}\s\-\s[\w.\-\',;].+\./i', $release["textstring"], $result))
+		else if ($this->done === false && $this->relid !== $release["releaseID"] && preg_match('/\S.*[\w.\-\',;]+\s\-\ss\d{2}[ex]\d{2}\s\-\s[\w.\-\',;].+\./i', $release["textstring"], $result))
 			$this->updateRelease($release, $result["0"], $method="fileCheck: Title - SxxExx - Eptitle", $echo, $type, $namestatus, $show);
 		elseif ($this->done === false && $this->relid !== $release["releaseID"] && preg_match('/\w.+?\)\.nds/i', $release["textstring"], $result))
 			$this->updateRelease($release, $result["0"], $method="fileCheck: ).nds Nintendo DS", $echo, $type, $namestatus, $show);
