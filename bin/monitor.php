@@ -5,7 +5,7 @@ require(WWW_DIR.'/lib/postprocess.php');
 require_once (WWW_DIR.'/lib/site.php');
 require_once("../test/ColorCLI.php");
 
-$version="0.3r623";
+$version="0.3r624";
 
 $db = new DB();
 $s = new Sites();

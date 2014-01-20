@@ -722,7 +722,7 @@ Class Predb
 		if($this->echooutput)
 			echo $this->c->header ("Matching up prehash NFOs with releases missing an NFO.");
 
-			$res = $db->query("SELECT r.ID, p.nfo FROM releases r inner join prehash p ON r.ID = p.releaseID WHERE p.nfo IS NOT NULL AND r.nfostatus != 1 LIMIT 100");
+			$res = $db->query("SELECT r.ID, p.nfo, r.completion, r.guid, r.groupID FROM releases r INNER JOIN prehash p ON r.preID = p.ID WHERE p.nfo IS NOT NULL AND r.nfostatus != 1 LIMIT 100");
 		    $total = count($res);
 		    if($total > 0)
             {
