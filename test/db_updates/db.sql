@@ -4,7 +4,7 @@ ALTER TABLE  `predb`
 ALTER TABLE  `releases`
   ADD `dehashstatus` TINYINT( 1 ) NOT NULL DEFAULT  '0' AFTER  `haspreview`,
   ADD `nfostatus` TINYINT NOT NULL DEFAULT 0 after `dehashstatus`,
-  ADD `reqidstatus` TINYINT(1) NOT NULL DEFAULT '0' AFTER `dehashstatus`,
+  ADD `reqidstatus` TINYINT(1) NOT NULL DEFAULT '0' AFTER `nfostatus`,
   ADD `bitwise` SMALLINT UNSIGNED NOT NULL DEFAULT 0 AFTER `reqidstatus`,
   ADD INDEX `ix_releases_nfostatus` (`nfostatus` ASC) USING HASH,
   ADD INDEX `ix_releases_reqidstatus` (`reqidstatus` ASC) USING HASH,
