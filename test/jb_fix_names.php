@@ -215,7 +215,7 @@ function resetSearchnames()
     $db = new DB();
     $c = new ColorCLI();
 	echo $c->header("Resetting blank searchnames.");
-	$bad = $db->queryDirect("UPDATE releases SET searchname = name, bitwise = ((bitwise & ~5)|0) WHERE searchname = ''");
+	$bad = $db->queryDirect("UPDATE releases SET preID = NULL, searchname = name, bitwise = ((bitwise & ~5)|0) WHERE searchname = ''");
 	$tot = $bad->rowCount();
 	if ($tot > 0) {
 		echo $c->primary(number_format($tot) . " Releases had no searchname.");
@@ -223,7 +223,7 @@ function resetSearchnames()
 	echo $c->header("Resetting searchnames that are a single letter.");
 	$count0 = $count = 0;
 	foreach (range('a', 'z') as $i) {
-		$run = $db->queryDirect("UPDATE releases SET searchname = name, bitwise = ((bitwise & ~5)|0) WHERE searchname = '" . $i . "'");
+		$run = $db->queryDirect("UPDATE releases SET preID = NULL, searchname = name, bitwise = ((bitwise & ~5)|0) WHERE searchname = '" . $i . "'");
 		if ($run->rowCount() > 0) {
 			$count++;
 		}
