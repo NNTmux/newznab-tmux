@@ -68,10 +68,16 @@ class Namefixer
         $functions = new Functions ();
 		$type = "NFO, ";
 		// Only select releases we haven't checked here before
-		$query = "SELECT rel.ID AS releaseID FROM releases rel "
-			. "INNER JOIN releasenfo nfo ON (nfo.releaseID = rel.ID) "
-			. "WHERE ((bitwise & 4) = 0 OR rel.categoryID = 8010) AND (bitwise & 64) = 0";
-            	//. "WHERE preid IS NULL";
+			if ($cats === 3) {
+			$query = "SELECT rel.ID AS releaseID FROM releases rel "
+				. "INNER JOIN releasenfo nfo ON (nfo.releaseID = rel.ID) "
+				. "WHERE (bitwise & 256) = 256 AND preID IS NULL";
+			$cats = 2;
+		} else {
+			$query = "SELECT rel.ID AS releaseID FROM releases rel "
+				. "INNER JOIN releasenfo nfo ON (nfo.releaseID = rel.ID) "
+				. "WHERE ((bitwise & 4) = 0 OR rel.categoryID = 8010) AND (bitwise & 64) = 0";
+		}
 
 		//24 hours, other cats
 		if ($time == 1 && $cats == 1)
@@ -136,8 +142,18 @@ class Namefixer
 		$db = new DB();
         $functions = new Functions();
 		$type = "Filenames, ";
-		$query = "SELECT relfiles.name as textstring, rel.categoryID, rel.searchname, rel.groupID, relfiles.releaseID as fileID, rel.ID as releaseID from releases rel inner join releasefiles relfiles on (relfiles.releaseID = rel.ID) where ((bitwise & 4) = 0 OR rel.categoryID = 8010) AND (bitwise & 128) = 0";
-    //. "WHERE preid IS NULL";
+	   	if ($cats === 3) {
+			$query = "SELECT relfiles.name AS textstring, rel.categoryID, rel.searchname, rel.groupID, relfiles.releaseID AS fileID, "
+				. "rel.ID AS releaseID FROM releases rel "
+				. "INNER JOIN releasefiles relfiles ON (relfiles.releaseID = rel.ID) "
+				. "WHERE (bitwise & 256) = 256 AND preID IS NULL";
+			$cats = 2;
+		} else {
+			$query = "SELECT relfiles.name AS textstring, rel.categoryID, rel.searchname, rel.groupID, relfiles.releaseID AS fileID, "
+				. "rel.ID AS releaseID FROM releases rel "
+				. "INNER JOIN releasefiles relfiles ON (relfiles.releaseID = rel.ID) "
+				. "WHERE ((bitwise & 4) = 0 OR rel.categoryID = 8010) AND (bitwise & 128) = 0";
+		}
 
 		//24 hours, other cats
 		if ($time == 1 && $cats == 1)
@@ -190,22 +206,29 @@ class Namefixer
 		$db = $this->db;
         $functions = new Functions();
 		$type = "PAR2, ";
-		$query = "SELECT rel.ID AS releaseID, rel.guid, rel.groupID FROM releases rel WHERE ((bitwise & 4) = 0 OR rel.categoryID = 8010) AND (bitwise & 32) = 0";
-    //. "WHERE preid IS NULL";
+		if ($cats === 3) {
+			$query = "SELECT rel.ID AS releaseID, rel.guid, rel.groupID FROM releases rel WHERE (bitwise & 256) = 256 AND preID IS NULL";
+			$cats = 2;
+		} else {
+			$query = "SELECT rel.ID AS releaseID, rel.guid, rel.groupID FROM releases rel WHERE ((bitwise & 4) = 0 OR rel.categoryID = 8010) AND (bitwise & 32) = 0";
+		}
 
 		//24 hours, other cats
-		if ($time == 1 && $cats == 1)
-			$relres = $db->queryDirect($query.$this->timeother);
-		//24 hours, other cats
-		if ($time == 1 && $cats == 2)
-			$relres = $db->queryDirect($query.$this->timeother);
+		if ($time == 1 && $cats == 1) {
+			$relres = $db->queryDirect($query . $this->timeother);
+		}
+		//24 hours, all cats
+		if ($time == 1 && $cats == 2) {
+			$relres = $db->queryDirect($query . $this->timeall);
+		}
 		//other cats
-		if ($time == 2 && $cats == 1)
-			$relres = $db->queryDirect($query.$this->fullother);
-		//other cats
-		if ($time == 2 && $cats == 2)
-			$relres = $db->queryDirect($query.$this->fullother);
-
+		if ($time == 2 && $cats == 1) {
+			$relres = $db->queryDirect($query . $this->fullother);
+		}
+		//all cats
+		if ($time == 2 && $cats == 2) {
+			$relres = $db->queryDirect($query . $this->fullall);
+		}
         	$total = $relres->rowCount();
 		if ($total > 0) {
 			echo $this->c->primary(number_format($total) . " releases to process.");
@@ -242,7 +265,7 @@ class Namefixer
 	//
 	//  Update the release with the new information.
 	//
-	public function updateRelease($release, $name, $method, $echo, $type, $namestatus, $show)
+	public function updateRelease($release, $name, $method, $echo, $type, $namestatus, $show, $preid = 'NULL')
 	{
         if ($this->relid !== $release["releaseID"])
 		{
@@ -306,11 +329,11 @@ class Namefixer
                         } else if ($type == "Filenames, ") {
                             $status = 133;
                         }
-                                $run = $db->queryDirect(sprintf("UPDATE releases SET searchname = %s, bitwise = ((bitwise & ~4)|4), bitwise = ((bitwise & ~%d)|%d), categoryID = %d WHERE ID = %d", $db->escapeString(substr($newname, 0, 255)), $status, $status, $determinedcat, $release["releaseID"]));
-                        }
-                    else
-                                {
-                                $run = $db->queryDirect(sprintf("UPDATE releases set searchname = %s, bitwise = ((bitwise & ~1)|1), categoryID = %d where ID = %d", $db->escapeString($newname), $determinedcat, $release["releaseID"]));
+                                $run = $db->queryDirect(sprintf("UPDATE releases SET preID = %s, searchname = %s, bitwise = ((bitwise & ~4)|4),"
+								. " %s categoryID = %d WHERE ID = %d", $preid, $db->escapeString(substr($newname, 0, 255)), $status, $determinedcat, $release["releaseID"]));
+					} else {
+						$run = $db->queryDirect(sprintf("UPDATE releases SET preID = %s, searchname = %s, bitwise = ((bitwise & ~1)|1), "
+								. "categoryID = %d WHERE ID = %d", $preid, $db->escapeString(substr($newname, 0, 255)), $determinedcat, $release["releaseID"]));
                                 }
                 }
 			}
@@ -371,7 +394,7 @@ class Namefixer
 		preg_match_all('/([\w\(\)]+[\._]([\w\(\)]+[\._-])+[\w\(\)]+-\w+)/', $release['textstring'], $matches);
 		foreach ($matches as $match) {
 			foreach ($match as $val) {
-				$title = $this->db->queryOneRow("SELECT title from prehash WHERE title = " . $this->db->escapeString(trim($val)));
+				$title = $this->db->queryOneRow("SELECT title, ID from prehash WHERE title = " . $this->db->escapeString(trim($val)));
 				if (isset($title['title'])) {
 					$this->cleanerName = $title['title'];
 					if (!empty($this->cleanerName)) {

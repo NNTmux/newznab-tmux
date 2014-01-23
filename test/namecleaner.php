@@ -110,16 +110,29 @@ class nameCleaning
 	*/
  	public function releaseCleaner($subject, $groupName) {
 
-        $match = '';
+        $match = $matches = '';
 		$db = new DB();
 
-		// Get pre style name from releases.name
+		/*// Get pre style name from releases.name
 		if (preg_match('/([\w\(\)]+[\._]([\w\(\)]+[\._-])+[\w\(\)]+-\w+)/', $subject, $match)) {
 			$title = $db->queryOneRow("SELECT title from prehash WHERE title = " . $db->escapeString(trim($match[1])));
 			if (isset($title['title'])) {
 				$cleanerName = $title['title'];
 				if (!empty($cleanerName)) {
 					return array("cleansubject" => $cleanerName, "properlynamed" => true, "increment" => false, "predb" => true);
+				}
+			}
+		}
+        */
+        preg_match_all('/([\w\(\)]+[\s\._-]([\w\(\)]+[\s\._-])+[\w\(\)]+-\w+)/', $subject, $matches);
+		foreach ($matches as $match) {
+			foreach ($match as $val) {
+				$title = $db->queryOneRow("SELECT title, ID from prehash WHERE title = " . $db->escapeString(trim($val)));
+				if (isset($title['title'])) {
+					$cleanerName = $title['title'];
+					if (!empty($cleanerName)) {
+						return array("cleansubject" => $cleanerName, "properlynamed" => true, "increment" => false, "predb" => $title['ID']);
+					}
 				}
 			}
 		}
@@ -998,12 +1011,23 @@ class nameCleaning
 			else
 				return array("cleansubject" => $this->releaseCleanerHelper($subject), "properlynamed" => false);
 		}
-		else if ($groupName === "alt.binaries.e-book.rpg") {
-			//ATTN: falsifies RE: REQ:-Pathfinder RPG anything at all TIA [362/408] - "Pathfinder_-_PZO1110B_-_Pathfinder_RPG_-_Beta_Playtest_-_Prestige_Enhancement.pdf" yEnc
-			if (preg_match('/^.+?\[\d+\/(\d+\]) - "(.+?)\.(txt|pdf|mobi|epub|azw)" yEnc$/', $subject, $match))
-				return $match[2];
+        else if ($groupName === "alt.binaries.e-book.rpg") {
+            //ATTN: falsifies RE: REQ:-Pathfinder RPG anything at all TIA [362/408] - "Pathfinder_-_PZO1110B_-_Pathfinder_RPG_-_Beta_Playtest_-_Prestige_Enhancement.pdf" yEnc
+            if (preg_match('/^.+?\[\d+\/(\d+\]) - "(.+?)\.(txt|pdf|mobi|epub|azw)" yEnc$/', $subject, $match))
+                return $match[2];
+            else
+                return array("cleansubject" => $this->releaseCleanerHelper($subject), "properlynamed" => false);
+        }
+		else if ($groupName === "alt.binaries.e-book.magazines") {
+            // [Top.Gear.South.Africa-February.2014] - "Top.Gear.South.Africa-February.2014.pdf.vol00+1.par2" yEnc  - 809.32 KB
+            if (preg_match('/(\[.*\])/', $this->subject, $match))
+            {
+                return $match[1];
+            }
 			else
+            {
 				return array("cleansubject" => $this->releaseCleanerHelper($subject), "properlynamed" => false);
+            }
 		}
 		else if ($groupName === "alt.binaries.e-book.technical") {
 			//ASST NEW MTLS 13 MAR 2012 A  -  [106/116] - "The Elements of Style, Illus. - W. Strunk Jr., E. White, M. Kalman (Penguin, 2005) WW.pdf" yEnc
@@ -2232,6 +2256,7 @@ class nameCleaning
 		else
 			return array("cleansubject" => $this->releaseCleanerHelper($subject), "properlynamed" => false);
 	}
+
 
    public function releaseCleanerHelper($subject)
 	{

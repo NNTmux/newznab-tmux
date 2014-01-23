@@ -12,7 +12,7 @@ require_once("ColorCLI.php");
 //This is jonnyboys renametopre.php script adapted for newznab.
 
 $c = new ColorCLI();
-if (!(isset($argv[1]) && ($argv[1] == "all" || $argv[1] == "full" || is_numeric($argv[1])))) {
+if (!(isset($argv[1]) && ($argv[1] == "all" || $argv[1] == "full" || $argv[1] == "preid" || is_numeric($argv[1])))) {
 	exit($c->error("\nThis script will attempt to rename releases using regexes first from NameCleaning.php and then from this file.\n"
 			. "An optional last argument, show, will display the release name changes.\n\n"
 			. "php $argv[0] full                    ...: To process all releases not previously renamed.\n"
@@ -20,7 +20,8 @@ if (!(isset($argv[1]) && ($argv[1] == "all" || $argv[1] == "full" || is_numeric(
 			. "php $argv[0] all                     ...: To process all releases.\n"
 			. "php $argv[0] full 155                ...: To process all releases in groupid 155 not previously renamed.\n"
 			. "php $argv[0] all 155                 ...: To process all releases in groupid 155.\n"
-			. "php $argv[0] all '(155, 140)'        ...: To process all releases in groupids 155 and 140.\n"));
+			. "php $argv[0] all '(155, 140)'        ...: To process all releases in groupids 155 and 140.\n"
+            . "php $argv[0] preid                   ...: To process all releases where not matched to prehash.\n"));
 }
 preName($argv, $argc);
 
@@ -39,17 +40,21 @@ function preName($argv, $argc)
 	}
 	$counter = 0;
 	$c = new ColorCLI();
-    $full = $all = false;
+    $full = $all = $preid = false;
 	$what = $where = $why = '';
 	if ($argv[1] === 'full') {
 		$full = true;
 	} else if ($argv[1] === 'all') {
 		$all = true;
+	} else if ($argv[1] === 'preid') {
+		$preid = true;
 	} else if (is_numeric($argv[1])) {
 		$what = ' AND adddate > NOW() - INTERVAL ' . $argv[1] . ' HOUR';
 	}
-
-	if (isset($argv[1]) && is_numeric($argv[1])) {
+    if ($preid === true) {
+		$where = '';
+		$why = ' WHERE preID IS NULL AND (bitwise & 256) = 256';
+    } else if (isset($argv[1]) && is_numeric($argv[1])) {
 		$where = '';
 		$why = ' WHERE (bitwise & 260) = 256';
 	} else if (isset($argv[2]) && is_numeric($argv[2]) && $full === true) {
@@ -85,10 +90,17 @@ function preName($argv, $argc)
 		{
             $groupname = $functions->getByNameByID($row["groupID"]);
             $cleanerName = releaseCleaner($row['name'], $row['groupID'], $groupname);
+            $preid = "NULL";
+			$predb = $increment = false;
 			if (!is_array($cleanerName)){
 				$cleanName = trim($cleanerName);
-                $propername = $increment = true; }
-			else {
+                $propername = $increment = true;
+                $run = $db->queryOneRow("SELECT ID FROM prehash WHERE title = " . $db->escapeString($row['groupID']));
+				if (isset($run['ID'])) {
+					$preid = $run["ID"];
+					$predb = true;
+                    }
+			}   else {
 				$cleanName = trim($cleanerName["cleansubject"]);
 				$propername = $cleanerName["properlynamed"];
 				if (isset($cleanerName["increment"])) {
@@ -98,8 +110,7 @@ function preName($argv, $argc)
 				}
                 if (isset($cleanerName["predb"])) {
 					$predb = $cleanerName["predb"];
-				} else {
-					$predb = false;
+                    $predb = true;
 				}
 			}
 
@@ -131,13 +142,13 @@ function preName($argv, $argc)
 							$preid = ' ';
 						}
 						if ($cleanedBook == true && $propername == true) { // reset bookinfoid so it gets re-processed
-							$run = $db->query(sprintf("UPDATE releases SET bitwise = ((bitwise & ~5)|5), searchname = %s, categoryID = %d, bookinfoID = NULL" . $preid . "WHERE ID = %d", $db->escapeString($cleanName), $determinedcat, $row['ID']));
-						} else if ($cleanedBook == true && $propername == false) { // reset bookinfoid so it gets re-processed
-							$run = $db->query(sprintf("UPDATE releases SET bitwise = ((bitwise & ~1)|1), searchname = %s, categoryID = %d, bookinfoID = NULL" . $preid . "WHERE ID = %d", $db->escapeString($cleanName), $determinedcat, $row['ID']));
+							$run = $db->query(sprintf("UPDATE releases SET bitwise = ((bitwise & ~5)|5), searchname = %s, categoryID = %d, bookinfoID = NULL, preID = " . $preid . " WHERE ID = %d", $db->escapeString($cleanName), $determinedcat, $row['ID']));
+						}  else if ($cleanedBook == true && $propername == false) { // reset bookinfoid so it gets re-processed
+							$run = $db->query(sprintf("UPDATE releases SET bitwise = ((bitwise & ~1)|1), searchname = %s, categoryID = %d, bookinfoID = NULL, preID = " . $preid . " WHERE ID = %d", $db->escapeString($cleanName), $determinedcat, $row['ID']));
 						} else if ($propername == true) {
-							$run = $db->query(sprintf("UPDATE releases SET bitwise = ((bitwise & ~5)|5), searchname = %s, categoryID = %d" . $preid . "WHERE ID = %d", $db->escapeString($cleanName), $determinedcat, $row['ID']));
+							$run = $db->query(sprintf("UPDATE releases SET bitwise = ((bitwise & ~5)|5), searchname = %s, categoryID = %d, preID = " . $preid . " WHERE ID = %d", $db->escapeString($cleanName), $determinedcat, $row['ID']));
 						} else if ($propername == false) {
-							$run = $db->query(sprintf("UPDATE releases SET bitwise = ((bitwise & ~1)|1), searchname = %s, categoryID = %d" . $preid . "WHERE ID = %d", $db->escapeString($cleanName), $determinedcat, $row['ID']));
+							$run = $db->query(sprintf("UPDATE releases SET bitwise = ((bitwise & ~1)|1), searchname = %s, categoryID = %d, preID = " . $preid . " WHERE ID = %d", $db->escapeString($cleanName), $determinedcat, $row['ID']));
 						}
 
 					   if ($increment === true) {
@@ -201,6 +212,8 @@ function preName($argv, $argc)
 		$relcount = categorizeRelease("searchname", "WHERE categoryID = 8010 OR (bitwise & 1) = 0", true);
 	} else if (isset($argv[1]) && $argv[1] == "all") {
 		$relcount = categorizeRelease("searchname", "", true);
+	} else if (isset($argv[1]) && $argv[1] == "preid") {
+		$relcount = categorizeRelease("searchname", "WHERE preID IS NULL AND (bitwise & 256) = 256", true);
 	} else {
 		$relcount = categorizeRelease("searchname", "WHERE ((bitwise & 1) = 0 OR categoryID = 8010) AND adddate > NOW() - INTERVAL " . $argv[1] . " HOUR", true);
 	}

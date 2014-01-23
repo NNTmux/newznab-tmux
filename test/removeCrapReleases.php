@@ -178,7 +178,7 @@ if (isset($argv[1]) && $argv[1] == 'true') {
 	{
 		$type = "Blacklist";
 		$db = new DB();
-		$regexes = $db->query('SELECT regex FROM binaryblacklist WHERE status = 1 AND optype =1');
+		$regexes = $db->queryDirect('SELECT regex FROM binaryblacklist WHERE status = 1 AND optype = 1');
 		$delcount = 0;
         $count = count($regexes);
 		if($count > 0)

@@ -9,6 +9,7 @@ require_once("functions.php");
 require_once("consoletools.php");
 require_once("ColorCLI.php");
 require_once ("nzbcontents.php");
+require_once("simple_html_dom.php");
 
 /*
  * Class for inserting names/categories/md5 etc from predb sources into the DB, also for matching names on files / subjects.
@@ -33,7 +34,7 @@ Class Predb
         $f = new Functions();
 		$newnames = 0;
 		$newestrel = $db->queryOneRow("SELECT adddate, ID FROM prehash ORDER BY adddate DESC LIMIT 1");
-		if (strtotime($newestrel["adddate"]) < time()-600 || is_null($newestrel['adddate']))
+		if (strtotime($newestrel["adddate"]) < time()-1200 || is_null($newestrel['adddate']))
 		{
 			if ($this->echooutput)
 			{
@@ -83,11 +84,15 @@ Class Predb
 			{
 				echo $this->c->primary($abgx . " \tRetrieved from abgx.");
 			}
-			$newnames = $newwomble + $newomgwtf + $newzenet + $newprelist + $neworly + $newsrr + $newpdme + $abgx;
-			if (count($newnames) > 0)
-                {
-				$db->exec(sprintf("UPDATE prehash SET adddate = NOW() WHERE ID = %d", $newestrel["ID"]));
-		        }
+            $newUsenetCrawler = $this->retrieveUsenetCrawler();
+			if ($this->echooutput) {
+				echo $this->c->primary($newUsenetCrawler . " \tRetrieved from Usenet-Crawler.");
+			}
+			exit;
+			$newnames = $newwomble + $newomgwtf + $newzenet + $newprelist + $neworly + $newsrr + $newpdme + $abgx + $newUsenetCrawler;
+			if (count($newnames) > 0) {
+				$db->exec(sprintf('UPDATE prehash SET adddate = NOW() WHERE ID = %d', $newestrel['ID']));
+			}
 			return $newnames;
 	    }
     }
@@ -670,6 +675,50 @@ Class Predb
 		return $newnames;
 	}
 
+    public function retrieveUsenetCrawler()
+	{
+		$db = new DB();
+		$newnames = 0;
+		$html = str_get_html($this->getWebPage("http://www.usenet-crawler.com/predb?q=&c=&offset=0#results"));
+		$releases = @$html->find('table[id="browsetable"]');
+		if (!isset($releases[0])) {
+			return $newnames;
+		}
+		$rows = $releases[0]->find('tr');
+		$count = 0;
+		foreach ($rows as $post) {
+			if ($count == 0) {
+				//Skip the table header row
+				$count++;
+				continue;
+			}
+			$data = $post->find('td');
+			$predate = strtotime($data[0]->innertext);
+
+			$e = $data[1]->find('a');
+			if (isset($e[0])) {
+				$title = trim($e[0]->innertext);
+				$title = str_ireplace(array('<u>', '</u>'), '', $title);
+			} elseif (preg_match('/(.+)<\/br><sub>/', $data[1])) {
+				// title is nuked, so skip
+				continue;
+			} else {
+				$title = trim($data[1]->innertext);
+			}
+			$e = $data[2]->find('a');
+			$category = $e[0]->innertext;
+			preg_match('/([\d\.]+MB)/', $data[3]->innertext, $match);
+			$size = isset($match[1]) ? $match[1] : 'NULL';
+			$md5 = md5($title);
+			if ($category != 'NUKED') {
+				if ($db->exec(sprintf('INSERT INTO prehash (title, predate, adddate, source, md5, category, size) VALUES (%s, %s, now(), %s, %s, %s, %s)', $db->escapeString($title), $db->from_unixtime($predate), $db->escapeString('usenet-crawler'), $db->escapeString($md5), $db->escapeString($category), $db->escapeString($size)))) {
+					$newnames++;
+				}
+			}
+		}
+		return $newnames;
+	}
+
 	// Update a single release as it's created.
 	public function matchPre($cleanerName, $releaseID)
 	{
@@ -815,22 +864,32 @@ Class Predb
 		return $count["cnt"];
 	}
 
-    function fileContents($path, $use=false, $context='')
+    public function getOne($preID)
 	{
-		if ($context === '')
-		{
+		$db = new DB();
+		return $db->queryOneRow(sprintf('SELECT * FROM predb WHERE id = %d', $preID));
+	}
+
+	public function getWebPage($url)
+	{
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		$output = curl_exec($ch);
+		curl_close($ch);
+		return $output;
+	}
+
+	function fileContents($path, $use = false, $context = '')
+	{
+		if ($context === '') {
 			$str = @file_get_contents($path);
-		}
-		else
-		{
+		} else {
 			$str = @file_get_contents($path, $use, $context);
 		}
-		if ($str === FALSE)
-		{
+		if ($str === FALSE) {
 			return false;
-		}
-		else
-		{
+		} else {
 			return $str;
 		}
 	}
