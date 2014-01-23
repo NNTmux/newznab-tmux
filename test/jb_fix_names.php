@@ -142,13 +142,13 @@ function preName($argv, $argc)
 							$preid = ' ';
 						}
 						if ($cleanedBook == true && $propername == true) { // reset bookinfoid so it gets re-processed
-							$run = $db->query(sprintf("UPDATE releases SET bitwise = ((bitwise & ~5)|5), searchname = %s, categoryID = %d, bookinfoID = NULL, preID = " . $preid . " WHERE ID = %d", $db->escapeString($cleanName), $determinedcat, $row['ID']));
+							$run = $db->exec(sprintf("UPDATE releases SET bitwise = ((bitwise & ~5)|5), searchname = %s, categoryID = %d, bookinfoID = NULL, preID = " . $preid . " WHERE ID = %d", $db->escapeString($cleanName), $determinedcat, $row['ID']));
 						}  else if ($cleanedBook == true && $propername == false) { // reset bookinfoid so it gets re-processed
-							$run = $db->query(sprintf("UPDATE releases SET bitwise = ((bitwise & ~1)|1), searchname = %s, categoryID = %d, bookinfoID = NULL, preID = " . $preid . " WHERE ID = %d", $db->escapeString($cleanName), $determinedcat, $row['ID']));
+							$run = $db->exec(sprintf("UPDATE releases SET bitwise = ((bitwise & ~1)|1), searchname = %s, categoryID = %d, bookinfoID = NULL, preID = " . $preid . " WHERE ID = %d", $db->escapeString($cleanName), $determinedcat, $row['ID']));
 						} else if ($propername == true) {
-							$run = $db->query(sprintf("UPDATE releases SET bitwise = ((bitwise & ~5)|5), searchname = %s, categoryID = %d, preID = " . $preid . " WHERE ID = %d", $db->escapeString($cleanName), $determinedcat, $row['ID']));
+							$run = $db->exec(sprintf("UPDATE releases SET bitwise = ((bitwise & ~5)|5), searchname = %s, categoryID = %d, preID = " . $preid . " WHERE ID = %d", $db->escapeString($cleanName), $determinedcat, $row['ID']));
 						} else if ($propername == false) {
-							$run = $db->query(sprintf("UPDATE releases SET bitwise = ((bitwise & ~1)|1), searchname = %s, categoryID = %d, preID = " . $preid . " WHERE ID = %d", $db->escapeString($cleanName), $determinedcat, $row['ID']));
+							$run = $db->exec(sprintf("UPDATE releases SET bitwise = ((bitwise & ~1)|1), searchname = %s, categoryID = %d, preID = " . $preid . " WHERE ID = %d", $db->escapeString($cleanName), $determinedcat, $row['ID']));
 						}
 
 					   if ($increment === true) {
