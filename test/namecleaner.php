@@ -17,6 +17,7 @@ class nameCleaning
 		// Extensions.
 		$this->e0 = '([-_](proof|sample|thumbs?))*(\.part(\d+)?(\.rar)?|\.rar)?(\d{1,3}\.rev"|\.vol.+?"|\.[A-Za-z0-9]{2,4}"|")';
 		$this->e1 = $this->e0.' yEnc$/';
+        $this->e2 = $this->e0 . ' - \d+[.,]\d+ [kKmMgG][bB] yEnc$/';
         $this->subject = $this->groupName = '';
 		$this->nofiles = false;
 	}
