@@ -43,10 +43,10 @@ class Namefixer
 		$this->relid = $this->fixed = $this->checked = 0;
         $this->db = new DB();
 		$db = $this->db;
-		$this->timeother = " AND rel.adddate > (now() - interval 6 hour) AND rel.categoryID in (2020, 5050, 6070, 8010) GROUP BY rel.ID ORDER BY postdate DESC";
-		$this->timeall = " AND rel.adddate > (now() - interval 6 hour) GROUP BY rel.ID ORDER BY postdate DESC";
-		$this->fullother = " AND rel.categoryID IN (2020, 5050, 6070, 8010) GROUP BY rel.ID order by postdate DESC";
-		$this->fullall = " ORDER BY postdate DESC";
+		$this->timeother = " AND rel.adddate > (now() - interval 6 hour) AND rel.categoryID in (2020, 5050, 6070, 8010) GROUP BY rel.ID ORDER BY postdate";
+		$this->timeall = " AND rel.adddate > (now() - interval 6 hour) GROUP BY rel.ID ORDER BY postdate";
+		$this->fullother = " AND rel.categoryID IN (2020, 5050, 6070, 8010) GROUP BY rel.ID";
+		$this->fullall = "";
         $this->done = $this->matched = false;
         $this->c = new ColorCLI();
         $this->consoletools = new ConsoleTools();
@@ -142,12 +142,14 @@ class Namefixer
 		$db = new DB();
         $functions = new Functions();
 		$type = "Filenames, ";
+        $preid = false;
 	   	if ($cats === 3) {
 			$query = "SELECT relfiles.name AS textstring, rel.categoryID, rel.searchname, rel.groupID, relfiles.releaseID AS fileID, "
 				. "rel.ID AS releaseID FROM releases rel "
 				. "INNER JOIN releasefiles relfiles ON (relfiles.releaseID = rel.ID) "
 				. "WHERE (bitwise & 256) = 256 AND preID IS NULL";
 			$cats = 2;
+            $preid = true;
 		} else {
 			$query = "SELECT relfiles.name AS textstring, rel.categoryID, rel.searchname, rel.groupID, relfiles.releaseID AS fileID, "
 				. "rel.ID AS releaseID FROM releases rel "
@@ -174,7 +176,7 @@ class Namefixer
 			sleep(2);
 			foreach ($relres as $relrow) {
 				$this->done = $this->matched = false;
-				$this->checkName($relrow, $echo, $type, $namestatus, $show);
+				$this->checkName($relrow, $echo, $type, $namestatus, $show, $preid);
 				$this->checked++;
 				if ($this->checked % 500 == 0 && $show === 1) {
 					echo $this->c->alternate($this->checked . " files processed.");
@@ -385,22 +387,27 @@ class Namefixer
 	//
 	//  Check the array using regex for a clean name.
 	//
-   	public function checkName($release, $echo, $type, $namestatus, $show)
+   	public function checkName($release, $echo, $type, $namestatus, $show, $preid = false)
 	{
 	  // Get pre style name from releases.name
         $matches = '';
-		preg_match_all('/([\w\(\)]+[\._]([\w\(\)]+[\._-])+[\w\(\)]+-\w+)/', $release['textstring'], $matches);
-		foreach ($matches as $match) {
-			foreach ($match as $val) {
-				$title = $this->db->queryOneRow("SELECT title, ID from prehash WHERE title = " . $this->db->escapeString(trim($val)));
-				if (isset($title['title'])) {
-					$this->cleanerName = $title['title'];
-					if (!empty($this->cleanerName)) {
-						$this->updateRelease($release, $title['title'], $method = "prehash: Match", $echo, $type, $namestatus, $show);
-						continue;
+		if (preg_match_all('/([\w\(\)]+[\s\._-]([\w\(\)]+[\s\._-])+[\w\(\)]+-\w+)/', $release['textstring'], $matches)) {
+			foreach ($matches as $match) {
+				foreach ($match as $val) {
+					$title = $this->db->queryOneRow("SELECT title, ID from prehash WHERE title = " . $this->db->escapeString(trim($val)));
+					if (isset($title['title'])) {
+						$this->cleanerName = $title['title'];
+						if (!empty($this->cleanerName)) {
+							$this->updateRelease($release, $title['title'], $method = "prehash: Match", $echo, $type, $namestatus, $show, $title['ID']);
+							continue;
 					}
 				}
 			}
+		}
+    }
+        	// if processing preid on filename, do not continue
+		if ($preid === true) {
+			return false;
 		}
 		if ($type == "PAR2, ") {
 			$this->fileCheck($release, $echo, $type, $namestatus, $show);

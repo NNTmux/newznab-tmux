@@ -72,17 +72,19 @@ if (isset($argv[1]) && $argv[1] === "all") {
                     {
 		                // Do a local lookup
 		                $newTitle = localLookup($requestID, $row["groupname"], $row["name"]);
-		                if ($newTitle != false && $newTitle != '')
-			            $bFound = true;
-
+		                if (is_array($newTitle) && $newTitle['title'] != ''){
+			                $bFound = true;
+                        }
 	                }
                 }
 
                 if ($bFound === true)
                 {
+                    $title = $newTitle['title'];
+			        $preid = $newTitle['ID'];
 	                $groupname = $functions->getByNameByID($row["groupname"]);
-	                $determinedcat = $category->determineCategory($groupname, $newTitle);
-	                $run = $db->query(sprintf("UPDATE releases SET reqidstatus = 1, bitwise = ((bitwise & ~4)|4), searchname = %s, categoryID = %d where ID = %d", $db->escapeString($newTitle), $determinedcat, $row["ID"]));
+	                $determinedcat = $category->determineCategory($groupname, $title );
+			        $run = $db->queryDirect(sprintf('UPDATE releases SET preID = %d, reqidstatus = 1, bitwise = ((bitwise & ~5)|5), searchname = %s, categoryID = %d WHERE ID = %d', $preid, $db->escapeString($title), $determinedcat, $row['ID']));
                     if ($row['name'] !== $newTitle)
                     {
                     $counter++;
@@ -91,7 +93,7 @@ if (isset($argv[1]) && $argv[1] === "all") {
 				            $newcatname = $functions->getNameByID($determinedcat);
 				            $oldcatname = $functions->getNameByID($row['categoryID']);
 
-				            echo 	$c->headerOver($n.$n.'New name:  ').$c->primary($newTitle).
+				            echo 	$c->headerOver($n.$n.'New name:  ').$c->primary($title).
 						            $c->headerOver('Old name:  ').$c->primary($row["name"]).
 						            $c->headerOver('New cat:   ').$c->primary($newcatname).
 						            $c->headerOver('Old cat:   ').$c->primary($oldcatname).
@@ -130,12 +132,12 @@ if (isset($argv[1]) && $argv[1] === "all") {
 	    $groups = new Groups();
         $functions = new Functions();
 	    $groupID = $functions->getIDByName($groupName);
-	    $run = $db->queryOneRow(sprintf("SELECT title FROM prehash WHERE requestID = %d AND groupID = %d", $requestID, $groupID));
+	    $run = $db->queryOneRow(sprintf("SELECT ID, title FROM prehash WHERE requestID = %d AND groupID = %d", $requestID, $groupID));
         if (isset($run["title"]) && preg_match('/s\d+/i', $run["title"]) && !preg_match('/s\d+e\d+/i', $run["title"])) {
         return false;
     }
 	    if (isset($run["title"]))
-		    return $run["title"];
+		   return array('title' => $run['title'], 'ID' => $run['ID']);
 	    if (preg_match('/\[#?a\.b\.teevee\]/', $oldname))
 		    $groupID = $functions->getIDByName('alt.binaries.teevee');
 	    else if (preg_match('/\[#?a\.b\.moovee\]/', $oldname))
@@ -170,9 +172,9 @@ if (isset($argv[1]) && $argv[1] === "all") {
 
 
 
-	    $run = $db->queryOneRow(sprintf("SELECT title FROM prehash WHERE requestID = %d AND groupID = %d", $requestID, $groupID));
+	    $run = $db->queryOneRow(sprintf("SELECT ID, title FROM prehash WHERE requestID = %d AND groupID = %d", $requestID, $groupID));
 	    if (isset($run['title']))
-		    return $run['title'];
+		    return array('title' => $run['title'], 'ID' => $run['ID']);
         }
 
 

@@ -49,11 +49,11 @@ function preName($argv)
 			$success = false;
 			if (preg_match('/([0-9a-fA-F]{32})/', $row['searchname'], $match) || preg_match('/([0-9a-fA-F]{32})/', $row['name'], $match))
 			{
-				$pre = $db->queryOneRow(sprintf("SELECT dirname FROM predb WHERE md5 = %s", $db->escapeString($match[1])));
+				$pre = $db->queryOneRow(sprintf("SELECT ID, dirname FROM predb WHERE md5 = %s", $db->escapeString($match[1])));
 				if ($pre !== false)
 				{
 					$determinedcat = $category->determineCategory($row["groupID"], $pre['dirname']);
-					$result = $db->query(sprintf("UPDATE releases SET dehashstatus = 1, bitwise = ((bitwise & ~37)|37), searchname = %s, categoryID = %d WHERE ID = %d", $db->escapeString($pre['dirname']), $determinedcat, $row['ID']));
+					$result = $db->query(sprintf("UPDATE releases SET preID = %d, dehashstatus = 1, bitwise = ((bitwise & ~37)|37), searchname = %s, categoryID = %d WHERE ID = %d", $pre['ID'], $db->escapeString($pre['dirname']), $determinedcat, $row['ID']));
                     $total = count($result);
 					if ( $total > 0)
 					{

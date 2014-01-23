@@ -88,7 +88,10 @@ Class Predb
 			if ($this->echooutput) {
 				echo $this->c->primary($newUsenetCrawler . " \tRetrieved from Usenet-Crawler.");
 			}
-			exit;
+            $this->retrieveAllfilledMoovee();
+			$this->retrieveAllfilledTeevee();
+			$this->retrieveAllfilledErotica();
+			$this->retrieveAllfilledForeign();
 			$newnames = $newwomble + $newomgwtf + $newzenet + $newprelist + $neworly + $newsrr + $newpdme + $abgx + $newUsenetCrawler;
 			if (count($newnames) > 0) {
 				$db->exec(sprintf('UPDATE prehash SET adddate = NOW() WHERE ID = %d', $newestrel['ID']));
