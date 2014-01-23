@@ -109,7 +109,7 @@ function preName($argv, $argc)
 					$increment = false;
 				}
                 if (isset($cleanerName["predb"])) {
-					$predb = $cleanerName["predb"];
+					$preid = $cleanerName["predb"];
                     $predb = true;
 				}
 			}
@@ -233,26 +233,11 @@ function resetSearchnames()
 	if ($tot > 0) {
 		echo $c->primary(number_format($tot) . " Releases had no searchname.");
 }
-	echo $c->header("Resetting searchnames that are a single letter.");
-	$count0 = $count = 0;
-	foreach (range('a', 'z') as $i) {
-		$run = $db->queryDirect("UPDATE releases SET preID = NULL, searchname = name, bitwise = ((bitwise & ~5)|0) WHERE searchname = '" . $i . "'");
-		if ($run->rowCount() > 0) {
-			$count++;
-		}
-	}
-	if ($count > 0) {
-		echo $c->primary(number_format($count) . " Releases had single letter searchnames.");
-	}
-	echo $c->header("Resetting searchnames that are a single digit.");
-	foreach (range(0, 9) as $i) {
-		$run0 = $db->queryDirect("UPDATE releases SET searchname = name, bitwise = ((bitwise & ~5)|0) WHERE searchname = '" . $i . "'");
-		if ($run0->rowCount() > 0) {
-			$count0++;
-		}
-	}
-	if ($count0 > 0) {
-		echo $c->primary(number_format($count0) . " Releases had single digit searchnames.");
+	  	echo $c->header("Resetting searchnames that are 5 characters or less.");
+	$run = $db->queryDirect("UPDATE releases SET preID = NULL, searchname = name, bitwise = ((bitwise & ~5)|0) WHERE LENGTH(searchname) <= 5");
+	$total = $run->rowCount();
+	if ($total > 0) {
+		echo $c->primary(number_format($total) . " Releases had searchnames that were 5 characters or less.");
 	}
 }
 
