@@ -679,6 +679,7 @@ Class Predb
 	{
 		$db = new DB();
 		$newnames = 0;
+        $functions = new Functions();
 		$html = str_get_html($this->getWebPage("http://www.usenet-crawler.com/predb?q=&c=&offset=0#results"));
 		$releases = @$html->find('table[id="browsetable"]');
 		if (!isset($releases[0])) {
@@ -711,7 +712,7 @@ Class Predb
 			$size = isset($match[1]) ? $match[1] : 'NULL';
 			$md5 = md5($title);
 			if ($category != 'NUKED') {
-				if ($db->exec(sprintf('INSERT INTO prehash (title, predate, adddate, source, md5, category, size) VALUES (%s, %s, now(), %s, %s, %s, %s)', $db->escapeString($title), $db->from_unixtime($predate), $db->escapeString('usenet-crawler'), $db->escapeString($md5), $db->escapeString($category), $db->escapeString($size)))) {
+				if ($db->exec(sprintf('INSERT INTO prehash (title, predate, adddate, source, md5, category, size) VALUES (%s, %s, now(), %s, %s, %s, %s)', $db->escapeString($title), $functions->from_unixtime($predate), $db->escapeString('usenet-crawler'), $db->escapeString($md5), $db->escapeString($category), $db->escapeString($size)))) {
 					$newnames++;
 				}
 			}
