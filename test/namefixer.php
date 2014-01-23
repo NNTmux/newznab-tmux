@@ -104,7 +104,7 @@ class Namefixer
 
 				//ignore encrypted nfos
 				if (preg_match('/^=newz\[NZB\]=\w+/', $relrow['textstring'])) {
-					$db->queryExec(sprintf("UPDATE releases SET bitwise = ((bitwise & ~64)|64) WHERE ID = %d", $relrow['rel.ID']));
+					$db->query(sprintf("UPDATE releases SET bitwise = ((bitwise & ~64)|64) WHERE ID = %d", $relrow['rel.ID']));
 					$this->checked++;
 				} else {
 					$this->done = $this->matched = false;
@@ -323,11 +323,11 @@ class Namefixer
                     $db = new DB();
                     if ($namestatus == 1) {
                         if ($type == "NFO, ") {
-                            $status = 69;
+                            $status = "bitwise = ((bitwise & ~69)|69),";
                         } else if ($type == "PAR2, ") {
-                            $status = 37;
+                            $status = "bitwise = ((bitwise & ~37)|37),";
                         } else if ($type == "Filenames, ") {
-                            $status = 133;
+                            $status = "bitwise = ((bitwise & ~133)|133),";
                         }
                                 $run = $db->queryDirect(sprintf("UPDATE releases SET preID = %s, searchname = %s, bitwise = ((bitwise & ~4)|4),"
 								. " %s categoryID = %d WHERE ID = %d", $preid, $db->escapeString(substr($newname, 0, 255)), $status, $determinedcat, $release["releaseID"]));
