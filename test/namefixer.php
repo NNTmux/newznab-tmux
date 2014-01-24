@@ -68,11 +68,13 @@ class Namefixer
         $functions = new Functions ();
 		$type = "NFO, ";
 		// Only select releases we haven't checked here before
+            $preid = false;
 			if ($cats === 3) {
 			$query = "SELECT rel.ID AS releaseID FROM releases rel "
 				. "INNER JOIN releasenfo nfo ON (nfo.releaseID = rel.ID) "
 				. "WHERE (bitwise & 256) = 256 AND preID IS NULL";
 			$cats = 2;
+            $preid = true;
 		} else {
 			$query = "SELECT rel.ID AS releaseID FROM releases rel "
 				. "INNER JOIN releasenfo nfo ON (nfo.releaseID = rel.ID) "
@@ -108,7 +110,7 @@ class Namefixer
 					$this->checked++;
 				} else {
 					$this->done = $this->matched = false;
-					$this->checkName($relrow, $echo, $type, $namestatus, $show);
+					$this->checkName($relrow, $echo, $type, $namestatus, $show, $preid);
 					$this->checked++;
 					if ($this->checked % 500 === 0 && $show === 1) {
 						echo $this->c->alternate($this->checked . " NFOs processed.\n");
