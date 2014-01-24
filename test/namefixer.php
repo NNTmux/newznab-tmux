@@ -785,7 +785,10 @@ class Namefixer
 			$this->updateRelease($release, $result["0"], $method="fileCheck: Title-SxxExx-XVID-DL.avi", $echo, $type, $namestatus, $show);
 		else if ($this->done === false && $this->relid !== $release["releaseID"] && preg_match('/\S.*[\w.\-\',;]+\s\-\ss\d{2}[ex]\d{2}\s\-\s[\w.\-\',;].+\./i', $release["textstring"], $result))
 			$this->updateRelease($release, $result["0"], $method="fileCheck: Title - SxxExx - Eptitle", $echo, $type, $namestatus, $show);
-		elseif ($this->done === false && $this->relid !== $release["releaseID"] && preg_match('/\w.+?\)\.nds/i', $release["textstring"], $result))
+		else if ($this->done === false && $this->relid !== $release["releaseID"] && preg_match('/\w.+?\)\.nds/i', $release["textstring"], $result))
 			$this->updateRelease($release, $result["0"], $method="fileCheck: ).nds Nintendo DS", $echo, $type, $namestatus, $show);
-	}
+        else if ($this->done === false && $this->relid !== $release["releaseID"] && preg_match('/\w.+?\.(pdf|html|epub|mobi|azw)/i', $release["textstring"], $result)) {
+			$this->updateRelease($release, $result["0"], $method = "fileCheck: EBook", $echo, $type, $namestatus, $show);
+		}
+        }
 }
