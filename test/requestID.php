@@ -37,13 +37,13 @@ if (isset($argv[2]) && is_numeric($argv[2])) {
 
 //runs on every release
 if (isset($argv[1]) && $argv[1] === "all") {
-	$res = $db->queryDirect("SELECT r.ID, r.name, r.categoryID, g.name AS groupname FROM releases r LEFT JOIN groups g ON r.groupID = g.ID WHERE (bitwise & 1280) = 1280");
+	$res = $db->queryDirect("SELECT r.ID, r.searchname, r.categoryID, g.name AS groupname FROM releases r LEFT JOIN groups g ON r.groupID = g.ID WHERE (bitwise & 1280) = 1280");
 //runs on all releases not already renamed
 } else if (isset($argv[1]) && $argv[1] === "full") {
-	$res = $db->queryDirect("SELECT r.ID, r.name, r.categoryID, g.name AS groupname FROM releases r LEFT JOIN groups g ON r.groupID = g.ID WHERE ((bitwise & 1284) = 1280 " . $time . " AND reqidstatus in (0, -1)");
+	$res = $db->queryDirect("SELECT r.ID, r.searchname, r.categoryID, g.name AS groupname FROM releases r LEFT JOIN groups g ON r.groupID = g.ID WHERE ((bitwise & 1284) = 1280 " . $time . " AND reqidstatus in (0, -1)");
 //runs on all releases not already renamed limited by user
 } else if (isset($argv[1]) && is_numeric($argv[1])) {
-	$res = $db->queryDirect("SELECT r.ID, r.name, r.categoryID, g.name AS groupname FROM releases r LEFT JOIN groups g ON r.groupID = g.ID WHERE ((bitwise & 1284) = 1280 " . $time . " AND reqidstatus in (0, -1) ORDER BY postdate DESC LIMIT " . $argv[1]);
+	$res = $db->queryDirect("SELECT r.ID, r.searchname, r.categoryID, g.name AS groupname FROM releases r LEFT JOIN groups g ON r.groupID = g.ID WHERE ((bitwise & 1284) = 1280 " . $time . " AND reqidstatus in (0, -1) ORDER BY postdate DESC LIMIT " . $argv[1]);
 }
 
         $total = $res->rowCount();
@@ -55,13 +55,13 @@ if (isset($argv[1]) && $argv[1] === "all") {
 
             foreach ($res as $row)
             {
-               if (!preg_match('/^\[\d+\]/', $row["name"]) && !preg_match('/^\[ \d+ \]/', $row["name"]))
+               if (!preg_match('/^\[\d+\]/', $row["searchname"]) && !preg_match('/^\[ \d+ \]/', $row["searchname"]))
 		            {
 			        $db->query(sprintf("UPDATE releases SET reqidstatus = -2 WHERE ID = %d", $row["ID"]));
 			        continue;
 		            }
 
-                $requestIDtmp = explode(']', substr($row["name"], 1));
+                $requestIDtmp = explode(']', substr($row["searchname"], 1));
                 $bFound = false;
                 $newTitle = '';
 
@@ -71,7 +71,7 @@ if (isset($argv[1]) && $argv[1] === "all") {
 			        if ($requestID != 0 and $requestID != '')
                     {
 		                // Do a local lookup
-		                $newTitle = localLookup($requestID, $row["groupname"], $row["name"]);
+		                $newTitle = localLookup($requestID, $row["groupname"], $row["searchname"]);
 		                if (is_array($newTitle) && $newTitle['title'] != ''){
 			                $bFound = true;
                         }
@@ -85,7 +85,7 @@ if (isset($argv[1]) && $argv[1] === "all") {
 	                $groupname = $functions->getByNameByID($row["groupname"]);
 	                $determinedcat = $category->determineCategory($groupname, $title );
 			        $run = $db->queryDirect(sprintf('UPDATE releases SET preID = %d, reqidstatus = 1, bitwise = ((bitwise & ~5)|5), searchname = %s, categoryID = %d WHERE ID = %d', $preid, $db->escapeString($title), $determinedcat, $row['ID']));
-                    if ($row['name'] !== $newTitle)
+                    if ($row['searchname'] !== $newTitle)
                     {
                     $counter++;
 	                if (isset($argv[2]) && $argv[2] === 'true')
@@ -94,7 +94,7 @@ if (isset($argv[1]) && $argv[1] === "all") {
 				            $oldcatname = $functions->getNameByID($row['categoryID']);
 
 				            echo 	$c->headerOver($n.$n.'New name:  ').$c->primary($title).
-						            $c->headerOver('Old name:  ').$c->primary($row["name"]).
+						            $c->headerOver('Old name:  ').$c->primary($row["searchname"]).
 						            $c->headerOver('New cat:   ').$c->primary($newcatname).
 						            $c->headerOver('Old cat:   ').$c->primary($oldcatname).
 						            $c->headerOver('Group:     ').$c->primary($row["groupname"]).
