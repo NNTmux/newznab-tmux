@@ -57,7 +57,7 @@ if (isset($argv[1]) && $argv[1] === "all") {
             {
                if (!preg_match('/^\[\d+\]/', $row["searchname"]) && !preg_match('/^\[ \d+ \]/', $row["searchname"]))
 		            {
-			        $db->query(sprintf("UPDATE releases SET reqidstatus = -2 WHERE ID = %d", $row["ID"]));
+			        $db->query(sprintf("UPDATE releases SET reqidstatus = -2 WHERE reqidstatus != 1 AND ID = %d", $row["ID"]));
 			        continue;
 		            }
 
@@ -112,7 +112,7 @@ if (isset($argv[1]) && $argv[1] === "all") {
                 }
                 else
                 {
-	                $db->exec("UPDATE releases SET reqidstatus = -3 WHERE ID = " . $row["ID"]);
+	                $db->exec("UPDATE releases SET reqidstatus = -3 WHERE reqidstatus != 1 AND ID = " . $row["ID"]);
 	                echo '.';
                 }
                 }
