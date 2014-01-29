@@ -5,9 +5,11 @@ require_once(WWW_DIR. "lib/framework/db.php");
 require_once(WWW_DIR."lib/category.php");
 require_once("ColorCLI.php");
 require_once("consoletools.php");
+require_once("prehash.php");
 
 $db = new DB();
 $consoletools = new ConsoleTools();
+$predb = new PreDb();
 $c = new ColorCLI();
 
 if (!isset($argv[1]) || $argv[1] != 'true') {
@@ -38,4 +40,18 @@ foreach ($res as $row) {
 //Re-create the unique index, dropping dupes
 echo $c->info("\nCreating index ix_prehash_md5.");
 $db->queryDirect("ALTER IGNORE TABLE prehash ADD CONSTRAINT ix_prehash_md5 UNIQUE (md5)");
+echo $c->header("\nDone.");
+
+$releases = $db->queryDirect("SELECT ID, searchname FROM releases WHERE preID IS NOT NULL");
+$newtotal = $releases->rowCount();
+$matched = $counter = 0;
+foreach ($releases as $release) {
+	$run = $predb->matchPre($release['searchname'], $release['ID']);
+	if ($run === false) {
+		$db->exec(sprintf('UPDATE releases SET preID = NULL WHERE ID = %d', $release['ID']));
+	} else {
+		$matched++;
+	}
+	$consoletools->overWritePrimary("Matching Releases:  [" . number_format($matched) . "] " . $consoletools->percentString( ++$counter, $newtotal));
+}
 echo $c->header("\nDone.");
