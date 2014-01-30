@@ -5,7 +5,7 @@ require(WWW_DIR.'/lib/postprocess.php');
 require_once (WWW_DIR.'/lib/site.php');
 require_once("../test/ColorCLI.php");
 
-$version="0.3r650";
+$version="0.3r651";
 
 $db = new DB();
 $s = new Sites();
@@ -13,6 +13,9 @@ $site = $s->get();
 $patch = $site->dbversion;
 $c = new ColorCLI();
 $DIR = dirname (__FILE__);
+$port = NNTP_PORT;
+$host = NNTP_SERVER;
+$ip = gethostbyname($host);
 //totals per category in db, results by parentID
 $qry = "SELECT COUNT( releases.categoryID ) AS cnt, parentID FROM releases INNER JOIN category ON releases.categoryID = category.ID WHERE parentID IS NOT NULL GROUP BY parentID";
 
@@ -366,7 +369,7 @@ $mask5 = $c->tmuxOrange("%-16.16s %25.25s %25.25s");
 passthru('clear');
 //printf("\033[1;31m  First insert:\033[0m ".relativeTime("$firstdate")."\n");
 printf($mask2, "Monitor Running v$version [".$patch."]: ", relativeTime("$time"));
-printf($mask1, "USP Connections:" ,$uspactiveconnections." active (".$usptotalconnections." total used) - ".NNTP_SERVER);
+printf($mask1, "USP Connections:", $uspactiveconnections . " active (" . $usptotalconnections . " total) - " . $host . ":" . $port);;
 printf($mask1, "Newest Release:", "$newestname");
 printf($mask1, "Release Added:", relativeTime("$newestdate")."ago");
 if ($array['PREDB'] = "true"){
@@ -762,14 +765,26 @@ while( $i > 0 )
 	}
 
     //get usenet connections, borrowed from nZEDb
-$uspactiveconnections = str_replace("\n", '', shell_exec ("ss -n | grep :".NNTP_PORT." | grep -c ESTAB"));
-$usptotalconnections  = str_replace("\n", '', shell_exec ("ss -n | grep -c :".NNTP_PORT.""));
+$uspactiveconnections = str_replace("\n", '', shell_exec("ss -n | grep " . $ip . ":" . $port . " | grep -c ESTAB"));
+$usptotalconnections  = str_replace("\n", '', shell_exec("ss -n | grep -c " . $ip . ":" . $port));
+        if ($uspactiveconnections == 0 && $usptotalconnections == 0) {
+            $uspactiveconnections = str_replace("\n", '', shell_exec("ss -n | grep " . $ip . ":https | grep -c ESTAB"));
+            $usptotalconnections = str_replace("\n", '', shell_exec("ss -n | grep -c " . $ip . ":https"));
+        }
+        if ($uspactiveconnections == 0 && $usptotalconnections == 0) {
+            $uspactiveconnections = str_replace("\n", '', shell_exec("ss -n | grep " . $port . " | grep -c ESTAB"));
+            $usptotalconnections = str_replace("\n", '', shell_exec("ss -n | grep -c " . $port));
+        }
+		if ($uspactiveconnections == 0 && $usptotalconnections == 0 ) {
+			$uspactiveconnections = str_replace("\n", '', shell_exec("ss -n | grep " . $ip . " | grep -c ESTAB"));
+			$usptotalconnections = str_replace("\n", '', shell_exec("ss -n | grep -c " . $ip));
+		}
 
 	//update display
 	passthru('clear');
 	//printf("\033[1;31m  First insert:\033[0m ".relativeTime("$firstdate")."\n");
 	printf($mask2, "Monitor Running v$version [".$patch."]: ", relativeTime("$time"));
-    printf($mask1, "USP Connections:" ,$uspactiveconnections." active (".$usptotalconnections." total used) - ".NNTP_SERVER);
+    printf($mask1, "USP Connections:", $uspactiveconnections . " active (" . $usptotalconnections . " total) - " . $host . ":" . $port);
 	printf($mask1, "Newest Release:", "$newestname");
 	printf($mask1, "Release Added:", relativeTime("$newestdate")."ago");
     if ($array['PREDB'] = "true"){
