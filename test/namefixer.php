@@ -10,7 +10,7 @@ require_once("ColorCLI.php");
 require_once("consoletools.php");
 
 
-//This script is adapted from nZEDb
+//This script is ported from nZEDb and adapted for newznab
 /* Values of relnamestatus:
  * 0  : New release, just inserted into the table.
  * 1  : Categorized release.
@@ -331,10 +331,10 @@ class Namefixer
                         } else if ($type == "Filenames, ") {
                             $status = "bitwise = ((bitwise & ~133)|133),";
                         }
-                                $run = $db->queryDirect(sprintf("UPDATE releases SET preID = %s, searchname = %s, bitwise = ((bitwise & ~4)|4),"
+                                $run = $db->queryDirect(sprintf("UPDATE releases SET imdbID = NULL, rageID = NULL, tvdbID = NULL, preID = %s, searchname = %s, bitwise = ((bitwise & ~4)|4),"
 								. " %s categoryID = %d WHERE ID = %d", $preid, $db->escapeString(substr($newname, 0, 255)), $status, $determinedcat, $release["releaseID"]));
 					} else {
-						$run = $db->queryDirect(sprintf("UPDATE releases SET preID = %s, searchname = %s, bitwise = ((bitwise & ~1)|1), "
+						$run = $db->queryDirect(sprintf("UPDATE releases SET imdbID = NULL, rageID = NULL, tvdbID = NULL, preID = %s, searchname = %s, bitwise = ((bitwise & ~1)|1), "
 								. "categoryID = %d WHERE ID = %d", $preid, $db->escapeString(substr($newname, 0, 255)), $determinedcat, $release["releaseID"]));
                                 }
                 }
