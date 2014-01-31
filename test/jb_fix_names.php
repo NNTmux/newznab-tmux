@@ -235,11 +235,11 @@ function resetSearchnames()
 	if ($tot > 0) {
 		echo $c->primary(number_format($tot) . " Releases had no searchname.");
 }
-	  	echo $c->header("Resetting searchnames that are 5 characters or less.");
-	$run = $db->queryDirect("UPDATE releases SET preID = NULL, searchname = name, bitwise = ((bitwise & ~5)|0) WHERE LENGTH(searchname) <= 5");
+	  	echo $c->header("Resetting searchnames that are 15 characters or less.");
+	$run = $db->queryDirect("UPDATE releases SET preID = NULL, searchname = name, bitwise = ((bitwise & ~5)|0) WHERE LENGTH(searchname) <= 15");
 	$total = $run->rowCount();
 	if ($total > 0) {
-		echo $c->primary(number_format($total) . " Releases had searchnames that were 5 characters or less.");
+		echo $c->primary(number_format($total) . " Releases had searchnames that were 15 characters or less.");
 	}
 }
 
