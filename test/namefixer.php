@@ -331,11 +331,11 @@ class Namefixer
                         } else if ($type == "Filenames, ") {
                             $status = "bitwise = ((bitwise & ~133)|133),";
                         }
-                                $run = $db->queryDirect(sprintf("UPDATE releases SET rageID = NULL, seriesfull = NULL, season = NULL, episode = NULL, tvtitle = NULL, tvairdate = NULL, imdbID = NULL, musicinfoID = NULL, consoleinfoID = NULL, bookinfoID = NULL, "
+                                $run = $db->exec(sprintf("UPDATE releases SET rageID = NULL, seriesfull = NULL, season = NULL, episode = NULL, tvtitle = NULL, tvairdate = NULL, imdbID = NULL, musicinfoID = NULL, consoleinfoID = NULL, bookinfoID = NULL, "
 								. "anidbID = NULL, haspreview = 0, preID = %s, searchname = %s, bitwise = ((bitwise & ~4)|4),"
 								. " %s categoryID = %d WHERE ID = %d", $preid, $db->escapeString(substr($newname, 0, 255)), $status, $determinedcat, $release["releaseID"]));
 					} else {
-						$run = $db->queryDirect(sprintf("UPDATE releases SET rageID = NULL, seriesfull = NULL, season = NULL, episode = NULL, tvtitle = NULL, tvairdate = NULL, imdbID = NULL, musicinfoID = NULL, consoleinfoID = NULL, bookinfoID = NULL, "
+						$run = $db->exec(sprintf("UPDATE releases SET rageID = NULL, seriesfull = NULL, season = NULL, episode = NULL, tvtitle = NULL, tvairdate = NULL, imdbID = NULL, musicinfoID = NULL, consoleinfoID = NULL, bookinfoID = NULL, "
 								. "anidbID = NULL, haspreview = 0, preID = %s, searchname = %s, bitwise = ((bitwise & ~1)|1), "
 								. "categoryID = %d WHERE ID = %d", $preid, $db->escapeString(substr($newname, 0, 255)), $determinedcat, $release["releaseID"]));
                                 }
