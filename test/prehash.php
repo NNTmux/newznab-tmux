@@ -380,7 +380,7 @@ Class Predb
 							if (preg_match('/timestamp">(?P<date>.+?)<\/span>.+?section">.+?">(?P<category>.+?)<\/a>.+?release">(?P<title>.+?)<\/span>(.+info">(?P<size>.+?) )?/s', $m, $matches2))
 							{
                                 $md5 = md5($matches2["title"]);
-                                $oldname = $db->queryOneRow(sprintf("SELECT title FROM prehash WHERE title = %s", $db->escapeString($md5)));
+                                $oldname = $db->queryOneRow(sprintf("SELECT md5 FROM prehash WHERE md5 = %s", $db->escapeString($md5)));
 								if ($oldname !== false && $oldname["md5"] == $md5)
 									continue;
 								else
