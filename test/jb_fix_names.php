@@ -141,14 +141,13 @@ function preName($argv, $argc)
 						} else {
 							$preid = ' ';
 						}
-						if ($cleanedBook == true && $propername == true) { // reset bookinfoid so it gets re-processed
-							$run = $db->exec(sprintf("UPDATE releases SET bitwise = ((bitwise & ~5)|5), searchname = %s, categoryID = %d, bookinfoID = NULL, preID = " . $preid . " WHERE ID = %d", $db->escapeString($cleanName), $determinedcat, $row['ID']));
-						}  else if ($cleanedBook == true && $propername == false) { // reset bookinfoid so it gets re-processed
-							$run = $db->exec(sprintf("UPDATE releases SET bitwise = ((bitwise & ~1)|1), searchname = %s, categoryID = %d, bookinfoID = NULL, preID = " . $preid . " WHERE ID = %d", $db->escapeString($cleanName), $determinedcat, $row['ID']));
-						} else if ($propername == true) {
-							$run = $db->exec(sprintf("UPDATE releases SET bitwise = ((bitwise & ~5)|5), searchname = %s, categoryID = %d, preID = " . $preid . " WHERE ID = %d", $db->escapeString($cleanName), $determinedcat, $row['ID']));
-						} else if ($propername == false) {
-							$run = $db->exec(sprintf("UPDATE releases SET bitwise = ((bitwise & ~1)|1), searchname = %s, categoryID = %d, preID = " . $preid . " WHERE ID = %d", $db->escapeString($cleanName), $determinedcat, $row['ID']));
+
+						if ($propername == true) {
+							$run = $db->exec(sprintf("UPDATE releases SET rageID = NULL, seriesfull = NULL, season = NULL, episode = NULL, tvtitle = NULL, tvairdate = NULL, imdbID = NULL, musicinfoID = NULL, consoleinfoID = NULL, bookinfoID = NULL, "
+								. "anidbID = NULL, haspreview = 0, bitwise = ((bitwise & ~5)|5), searchname = %s, categoryID = %d, preID = " . $preid . " WHERE ID = %d", $db->escapeString($cleanName), $determinedcat, $row['ID']));
+						} else {
+							$run = $db->exec(sprintf("UPDATE releases SET rageID = NULL, seriesfull = NULL, season = NULL, episode = NULL, tvtitle = NULL, tvairdate = NULL, imdbID = NULL, musicinfoID = NULL, consoleinfoID = NULL, bookinfoID = NULL, "
+								. "anidbID = NULL, haspreview = 0, bitwise = ((bitwise & ~1)|1), searchname = %s, categoryID = %d, preID = " . $preid . " WHERE ID = %d", $db->escapeString($cleanName), $determinedcat, $row['ID']));
 						}
 
 					   if ($increment === true) {
@@ -230,7 +229,8 @@ function resetSearchnames()
     $db = new DB();
     $c = new ColorCLI();
 	echo $c->header("Resetting blank searchnames.");
-	$bad = $db->queryDirect("UPDATE releases SET preID = NULL, searchname = name, bitwise = ((bitwise & ~5)|0) WHERE searchname = ''");
+	$bad = $db->queryDirect("UPDATE releases SET rageID = NULL, seriesfull = NULL, season = NULL, episode = NULL, tvtitle = NULL, tvairdate = NULL, imdbID = NULL, musicinfoID = NULL, consoleinfoID = NULL, bookinfoID = NULL, "
+								. "anidbID = NULL, haspreview = 0, preID = NULL, searchname = name, bitwise = ((bitwise & ~5)|0) WHERE searchname = ''");
 	$tot = $bad->rowCount();
 	if ($tot > 0) {
 		echo $c->primary(number_format($tot) . " Releases had no searchname.");

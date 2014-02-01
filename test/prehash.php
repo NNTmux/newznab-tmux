@@ -343,9 +343,11 @@ Class Predb
 							else
 							{
 								$category = $db->escapeString($matches2["category"].", ".$matches2["category1"]);
-
-								$db->exec(sprintf("INSERT IGNORE INTO prehash (title, category, predate, adddate, source, md5) VALUES (%s, %s, FROM_UNIXTIME(".strtotime($matches2["date"])."), now(), %s, %s)", $db->escapeString($matches2["title"]), $category, $db->escapeString("prelist"), $db->escapeString($md5)));
+                                if (strlen($matches2['title']) > 15) {
+								if($db->exec(sprintf("INSERT IGNORE INTO prehash (title, category, predate, adddate, source, md5) VALUES (%s, %s, FROM_UNIXTIME(".strtotime($matches2["date"])."), now(), %s, %s)", $db->escapeString($matches2["title"]), $category, $db->escapeString("prelist"), $db->escapeString($md5))));   {
 								$newnames++;
+                                    }
+                                }
 							}
 						}
 					}
@@ -390,7 +392,7 @@ Class Predb
 									else
 										$size = $db->escapeString($matches2["size"]);
 
-                                    if (strlen($matches['title']) > 15) {
+                                    if (strlen($matches2['title']) > 15) {
                                         if($db->exec(sprintf("INSERT IGNORE INTO prehash (title, size, category, predate, adddate, source, md5) VALUES (%s, %s, %s, FROM_UNIXTIME(".strtotime($matches2["date"])."), now(), %s, %s)", $db->escapeString($matches2["title"]), $size, $db->escapeString($matches2["category"]), $db->escapeString("orlydb"), $db->escapeString($md5))));{
 									$newnames++;
                                     }

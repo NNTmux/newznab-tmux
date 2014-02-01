@@ -53,7 +53,8 @@ function preName($argv)
 				if ($pre !== false)
 				{
 					$determinedcat = $category->determineCategory($row["groupID"], $pre['title']);
-					$result = $db->query(sprintf("UPDATE releases SET preID = %d, dehashstatus = 1,  bitwise = ((bitwise & ~37)|37), searchname = %s, categoryID = %d WHERE ID = %d", $pre['ID'], $db->escapeString($pre['title']), $determinedcat, $row['ID']));
+					$result = $db->query(sprintf("UPDATE releases SET rageID = NULL, seriesfull = NULL, season = NULL, episode = NULL, tvtitle = NULL, tvairdate = NULL, imdbID = NULL, musicinfoID = NULL, consoleinfoID = NULL, bookinfoID = NULL, "
+								. "anidbID = NULL, haspreview = 0, preID = %d, dehashstatus = 1,  bitwise = ((bitwise & ~37)|37), searchname = %s, categoryID = %d WHERE ID = %d", $pre['ID'], $db->escapeString($pre['title']), $determinedcat, $row['ID']));
                     $total = count($result);
 					if ($total > 0)
 					{

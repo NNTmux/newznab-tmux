@@ -6,6 +6,7 @@ require_once(WWW_DIR. "lib/groups.php");
 require_once("functions.php");
 require_once("ColorCLI.php");
 require_once("consoletools.php");
+require_once("namefixer.php");
 
 //This script is adapted from nZEDB requestID.php
 
@@ -24,6 +25,7 @@ $n = "\n";
 $category = new Category();
 $groups = new Groups();
 $consoletools = new ConsoleTools();
+$namefixer = new Namefixer();
 $timestart = TIME();
 $counter = 0;
 
@@ -84,7 +86,8 @@ if (isset($argv[1]) && $argv[1] === "all") {
 			        $preid = $newTitle['ID'];
 	                $groupname = $functions->getByNameByID($row["groupname"]);
 	                $determinedcat = $category->determineCategory($groupname, $title );
-			        $run = $db->queryDirect(sprintf('UPDATE releases SET preID = %d, reqidstatus = 1, bitwise = ((bitwise & ~5)|5), searchname = %s, categoryID = %d WHERE ID = %d', $preid, $db->escapeString($title), $determinedcat, $row['ID']));
+			        $run = $db->queryDirect(sprintf('UPDATE releases SET rageID = NULL, seriesfull = NULL, season = NULL, episode = NULL, tvtitle = NULL, tvairdate = NULL, imdbID = NULL, musicinfoID = NULL, consoleinfoID = NULL, bookinfoID = NULL, "
+								. "anidbID = NULL, haspreview = 0, preID = %d, reqidstatus = 1, bitwise = ((bitwise & ~5)|5), searchname = %s, categoryID = %d WHERE ID = %d', $preid, $db->escapeString($title), $determinedcat, $row['ID']));
                     if ($row['searchname'] !== $newTitle)
                     {
                     $counter++;
