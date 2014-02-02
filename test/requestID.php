@@ -87,7 +87,7 @@ if (isset($argv[1]) && $argv[1] === "all") {
 	                $groupname = $functions->getByNameByID($row["groupname"]);
 	                $determinedcat = $category->determineCategory($groupname, $title );
 			        $run = $db->queryDirect(sprintf('UPDATE releases SET rageID = NULL, seriesfull = NULL, season = NULL, episode = NULL, tvtitle = NULL, tvairdate = NULL, imdbID = NULL, musicinfoID = NULL, consoleinfoID = NULL, bookinfoID = NULL, "
-								. "anidbID = NULL, haspreview = 0, preID = %d, reqidstatus = 1, bitwise = ((bitwise & ~5)|5), searchname = %s, categoryID = %d WHERE ID = %d', $preid, $db->escapeString($title), $determinedcat, $row['ID']));
+								. "anidbID = NULL, preID = %d, reqidstatus = 1, bitwise = ((bitwise & ~5)|5), searchname = %s, categoryID = %d WHERE ID = %d', $preid, $db->escapeString($title), $determinedcat, $row['ID']));
                     if ($row['searchname'] !== $newTitle)
                     {
                     $counter++;
