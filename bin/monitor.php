@@ -5,7 +5,7 @@ require(WWW_DIR.'/lib/postprocess.php');
 require_once (WWW_DIR.'/lib/site.php');
 require_once("../test/ColorCLI.php");
 
-$version="0.3r664";
+$version="0.3r665";
 
 $db = new DB();
 $s = new Sites();
@@ -419,7 +419,10 @@ printf($mask4, "Activated", $active_groups."(".$all_groups.")", $backfill_groups
 $i = 1;
 while( $i > 0 )
 {
-
+     //kill mediainfo and ffmpeg if exceeds 60 sec
+	shell_exec("killall -o 60s -9 mediainfo 2>&1 1> /dev/null");
+	shell_exec("killall -o 60s -9 ffmpeg 2>&1 1> /dev/null");
+    
 	//get microtime at start of loop
 	$time_loop_start = microtime_float();
 
@@ -1495,7 +1498,7 @@ if ($array ['FIXRELEASES'] = "true") {
                 $color = get_color();
                 shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:4.4 'echo \"\033[38;5;\"$color\"m\n$panes4[4] Disabled by MAX_LOAD\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
         }
-
+    /*
 	//check ffmpeg and mediainfo, kill if necessary
 	if (( $array['KILL_PROCESS'] != "0" ) && ( $array['KILL_QUIET'] == "true" )) {
 		shell_exec("killall -qo {$array['KILL_PROCESS']}s -9 mediainfo");
@@ -1512,6 +1515,7 @@ if ($array ['FIXRELEASES'] = "true") {
 		shell_exec("killall mediainfo 2>&1 1> /dev/null");
 		shell_exec("killall ffmpeg 2>&1 1> /dev/null");
 	}
+    */
 
 	$i++;
 	//turn of monitor if set to false

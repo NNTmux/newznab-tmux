@@ -331,15 +331,6 @@ export SPHINX_TIMER="3600"
 
 ############################################################
 
-#mediainfo and ffmpeg can hang occasionally, set timer, in seconds, to anything other than 0 to enable
-#it should not need to run longer that 120 seconds
-export KILL_PROCESS="0"
-
-#look at man killall - if you have the -q option, enable this, otherwise leave it disabled
-export KILL_QUIET="false"
-
-############################################################
-
 #Delete parts and binaries older than retention days, which is set in edit - site
 #this uses a script posted by cj https://github.com/NNScripts/nn-custom-scripts
 export DELETE_PARTS="false"
