@@ -114,8 +114,6 @@ class nameCleaning
 				return $this->cores();
 			case 'alt.binaries.console.ps3':
 				return $this->console_ps3();
-			case 'alt.binaries.country.mp3':
-				return $this->generic();
 			case 'alt.binaries.dc':
 				return $this->dc();
 			case 'alt.binaries.divx.french':
@@ -768,17 +766,8 @@ class nameCleaning
 
 	public function cd_image()
 	{
-		//[27930]-[FULL]-[altbinEFNet]-[ Ubersoldier.UNCUT.PATCH-RELOADED ]-[3/5] "rld-usuc.par2" yEnc
-		//[27607]-[#altbin@EFNet]-[Full]-[ Cars.Radiator.Springs.Adventure.READNFO-CRIME ] - [02/49] - "crm-crsa.par2" yEnc
-		//[27774]-[FULL]-[altbinEFNet]-[ DVD4 ]-[01/61] "unl-totwar.sfv" yEnc
-		if (preg_match('/^\[\d+\]-\[.+?\]-\[.+?\]-\[ (.+?) \] ?- ?\[\d+\/\d+\] (- )?"(.+?)' . $this->e1, $this->subject, $match)) {
-			if (strlen($match[1]) > 7) {
-				return $match[1];
-			} else {
-				return $match[3];
-			}
-		} //[www.drlecter.tk]-[The_Night_of_the_Rabbit-FLT]-[01/67] "Dr.Lecter.nfo" - 5.61 GB - yEnc
-		else if (preg_match('/^\[www\..+?\]-\[(.+?)\]-\[\d+\/\d+\] ".+?" - \d+[,.]\d+ [mMkKgG][bB] - yEnc$/', $this->subject, $match))
+		//[www.drlecter.tk]-[The_Night_of_the_Rabbit-FLT]-[01/67] "Dr.Lecter.nfo" - 5.61 GB - yEnc
+		if (preg_match('/^\[www\..+?\]-\[(.+?)\]-\[\d+\/\d+\] ".+?" - \d+[,.]\d+ [mMkKgG][bB] - yEnc$/', $this->subject, $match))
 			return $match[1];
 		//Slender.The.Arrival-WaLMaRT.PC - [01/26] - "wmt-stal.nfo" - yEnc
 		//The.Night.of.the.Rabbit-FLT - [03/66] - "flt-notr.r00" - FAiRLIGHT - 5,10 GB - yEnc
@@ -800,6 +789,9 @@ class nameCleaning
 		//Trine.2.Complete.Story-SKIDROW - "sr-trine2completestory.nfo" - [01/78] - yEnc
 		else if (preg_match('/^(\[[A-Z ]+\] - )?([a-zA-Z0-9.-]{10,}) - ".+?" - \[\d+\/\d+\] - yEnc$/', $this->subject, $match))
 			return $match[2];
+		//Uploader.Presents-Metal.Gear.Rising.Revengeance-RELOADED(51/65]"rld-megerire.r48" yEnc
+		else if (preg_match('/^Uploader\.Presents-(.+)[\(\[]\d+\/\d+\]".+" yEnc$/', $this->subject, $match))
+			return $match[1];
 		else
 			return array("cleansubject" => $this->releaseCleanerHelper($this->subject), "properlynamed" => false);
 	}
@@ -1531,6 +1523,12 @@ class nameCleaning
 		//[16/62]  (CastleStorm.XBLA.XBOX360-MoNGoLS) - "mgl-cast.part15.rar" yEnc
 		else if (preg_match('/^\[\d+\/(\d+\])  \(([a-zA-Z0-9 -_\.]+)\) - ".+?' . $this->e1, $this->subject, $match))
 			return $match[2];
+		//GOGDump Wing Commander - Privateer (1993) [GOG] [03/14] - "Wing Commander - Privateer (1993) [GOG].part2.rar" yEnc
+		else if (preg_match('/^GOGDump (.+) \[\d+\/(\d+\]) - ".+?' . $this->e1, $this->subject, $match))
+			return $match[1];
+		//Uploader.Presents-Metal.Gear.Rising.Revengeance-RELOADED(51/65]"rld-megerire.r48" yEnc
+		else if (preg_match('/^Uploader\.Presents-(.+)[\(\[]\d+\/\d+\]".+" yEnc$/', $this->subject, $match))
+			return $match[1];
 		else
 			return array("cleansubject" => $this->releaseCleanerHelper($this->subject), "properlynamed" => false);
 	}
@@ -2073,7 +2071,7 @@ class nameCleaning
 		else if (preg_match('/\( (.+?) \)[-_ ]{0,3}( |\().+\)[-_ ]{0,3}[\(\[]\d+\/(\d+[\)\]])[-_ ]{0,3}".+(\.part\d*|\.rar)?(\.vol.+ \(\d+\/\d+\) "|\.[A-Za-z0-9]{2,4}").+?yEnc$/', $this->subject, $match))
 			return $match[1];
 		//Metallica - Ride The Lightning    "01 - Fight Fire With Fire.mp3" yEnc
-		else if (preg_match('/^(.+?)[-_ ]{0,3}("|#34;)(.+?)(\.part\d*|\.rar)?(\.vol.+ \(\d+\/\d+\) "|\.[A-Za-z0-9]{2,4}("|#34;))[-_ ]{0,3}yEnc$/', $this->subject, $match))
+		else if (preg_match('/^(.+?)[-_ ]{0,3}("|#34;)(.+?)' . $this->e1, $this->subject, $match))
 			return $match[3];
 		else
 			return array("cleansubject" => $this->releaseCleanerHelper($this->subject), "properlynamed" => false);
@@ -2622,6 +2620,9 @@ class nameCleaning
 			return $match[1] . "-" . $match[2];
 		//[51/62] Morrissey.25.Live.Concert.2013.BDRip.x264-N0TSC3N3 - "n0tsc3n3-morrissey.25.live.2013.bdrip.x264.rar" yEnc
 		else if (preg_match('/^\[\d+\/\d+\] (.+) - ".+" yEnc$/', $this->subject, $match))
+			return $match[1];
+		//(01/19) - Description - "How I Met Your Mother S05E24 - Doppelgangers.part01.rar" - 175,05 MB - yEnc
+		else if (preg_match('/^\(\d+\/\d+\)[ -]+Description[ -]+"(.+)\.part\d+\.rar"[ -]+\d+[.,]\d+ [kKmMgG][bB][ -]+yEnc$/', $this->subject, $match))
 			return $match[1];
 		//(23/23) -The.Mindy.Project.S02E09.720p.WEB-DL.DD5.1.H.264 - "The.Mindy.Project.S02E09.720p.WEB-DL.DD5.1.H.264.vol31+29.PAR2" - 768.86 MB - yEnc
 		else if (preg_match('/^\(\d+\/\d+\) -(.+) - ".+" - \d+[.,]\d+ [MGK]B - yEnc$/', $this->subject, $match))
