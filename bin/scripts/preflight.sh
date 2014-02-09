@@ -136,7 +136,6 @@ rm -f $DIR/bin/lib/nfo.php
 rm -f $DIR/bin/lib/tvrage.php
 rm -f $DIR/bin/processAdditional*
 rm -f $DIR/bin/processAlternate*
-rm -f $DIR/bin/lib/nntp2.php
 rm -f $DIR/bin/temp/*
 
 #create postprocessing scripts
@@ -155,36 +154,10 @@ rm -f $DIR/bin/temp/*
 	fi
 	$SED -i -e "s/PostPrc : Performing additional post processing.*\$/PostPrc : Performing additional post processing by guid on \".\$rescount.\" releases, starting at $d ...\\n\";/g" $DIR/bin/temp/postprocess$c.php
 	$SED -i -e "s/\/\/echo \"PostPrc : Fetching/echo \"PostPrc : Fetching/g" $DIR/bin/temp/postprocess$c.php
-	#if [[ $USE_TWO_NNTP == "true" ]] && [[ $USE_TWO_PP != "true" ]]; then
-	#	$SED -i -e "s/require_once(WWW_DIR.\"\/lib\/nntp.php\");/require(dirname(__FILE__).\"\/nntp2.php\");/g" $DIR/bin/temp/postprocess$c.php
-	#	$SED -i -e "s/new Nntp;/new GetConnected;/g" $DIR/bin/temp/postprocess$c.php
-	#	$SED -i -e "s/doConnect/doConnect2/g" $DIR/bin/temp/postprocess$c.php
-	#fi
 	cp $DIR/bin/lib/additional $DIR/bin/temp/processAdditional$c.php
 	$SED -i -e "s/1/$c/g" $DIR/bin/temp/processAdditional$c.php
 	$SED -i -e "s/$numtoProcess = 100;/$numtoProcess = 20;/g" $DIR/bin/temp/postprocess$c.php
 
-#for (( c=17; c<=32; c++ ))
-#do
-#	d=$((($c - 1) * 100))
-#	cp $NEWZPATH/www/lib/postprocess.php $DIR/bin/temp/postprocess$c.php
-#	$SED -i -e "s/PostProcess/PostProcess$c/g" $DIR/bin/temp/postprocess$c.php
-#	$SED -i -e "s/echo \$iteration.*$/echo \$iteration --.\"    \".\$rel['ID'].\" : \".\$rel['name'].\"\\\n\";/" $DIR/bin/temp/postprocess$c.php
-#	$SED -i -e "s/processAdditional/processAdditional$c/g" $DIR/bin/temp/postprocess$c.php
-#	$SED -i -e "s/\$tmpPath = \$this->site->tmpunrarpath;/\$tmpPath = \$this->site->tmpunrarpath; \\
-#		\$tmpPath .= '1\/tmp$c';/g" $DIR/bin/temp/postprocess$c.php
-#	$SED -i -e "s/order by r.postdate desc limit %d.*\$/order by r.guid asc limit %d, %d \", (\$maxattemptstocheckpassworded + 1) * -1, ($c + 16) * 100, \$numtoProcess);/##g" $DIR/bin/temp/postprocess$c.php
-#	$SED -i -e "s/PostPrc : Performing additional post processing.*\$/PostPrc : Performing additional post processing by guid on \".\$rescount.\" releases, starting at $d #...\\n\";/g" $DIR/bin/temp/postprocess$c.php
-#	$SED -i -e "s/\/\/echo \"PostPrc : Fetching/echo \"PostPrc : Fetching/g" $DIR/bin/temp/postprocess$c.php
-#	if [[ $USE_TWO_NNTP == "true" ]] && [[ $USE_TWO_PP == "true" ]]; then
-#		$SED -i -e "s/require_once(WWW_DIR.\"\/lib\/nntp.php\");/require(dirname(__FILE__).\"\/nntp2.php\");/g" $DIR/bin/temp/postprocess$c.php
-#		$SED -i -e "s/new Nntp;/new GetConnected;/g" $DIR/bin/temp/postprocess$c.php
-#		$SED -i -e "s/doConnect/doConnect2/g" $DIR/bin/temp/postprocess$c.php
-#	fi
-#	cp $DIR/bin/lib/additional $DIR/bin/temp/processAdditional$c.php
-#	$SED -i -e "s/1/$c/g" $DIR/bin/temp/processAdditional$c.php
-#	$SED -i -e "s/$numtoProcess = 100;/$numtoProcess = 20;/g" $DIR/bin/temp/postprocess$c.php
-#done
 
 cp -f $NEWZPATH/www/lib/nfo.php $DIR/bin/temp/nfo.php
 cp -f $NEWZPATH/www/lib/tvrage.php $DIR/bin/temp/tvrage.php
@@ -193,26 +166,14 @@ cp -f $NEWZPATH/www/lib/music.php $DIR/bin/temp/music.php
 cp -f $NEWZPATH/www/lib/music.php $DIR/bin/temp/music1.php
 cp -f $NEWZPATH/www/lib/console.php $DIR/bin/temp/console.php
 cp -f $NEWZPATH/www/lib/book.php $DIR/bin/temp/book.php
-cp -f $NEWZPATH/www/lib/nntp.php $DIR/bin/temp/nntp2.php
 
-
-$SED -i -e "s/function doConnect/function doConnect2/" $DIR/bin/temp/nntp2.php
-$SED -i -e "s/NNTP_USERNAME/NNTP_USERNAME2/g" $DIR/bin/temp/nntp2.php
-$SED -i -e "s/NNTP_PASSWORD/NNTP_PASSWORD2/g" $DIR/bin/temp/nntp2.php
-$SED -i -e "s/NNTP_SERVER/NNTP_SERVER2/g" $DIR/bin/temp/nntp2.php
-$SED -i -e "s/NNTP_PORT/NNTP_PORT2/g" $DIR/bin/temp/nntp2.php
-$SED -i -e "s/NNTP_SSLENABLED/NNTP_SSLENABLED2/g" $DIR/bin/temp/nntp2.php
-$SED -i -e "s/NNTPException/NNTPException2/g" $DIR/bin/temp/nntp2.php
-$SED -i -e "s/class Nntp/class GetConnected/g" $DIR/bin/temp/nntp2.php
 
 $SED -i -e "s/500/250/" $DIR/bin/temp/postprocess1.php
-#$SED -i -e "s/500/250/" $DIR/bin/temp/postprocess2.php
 
 $SED -i -e "s/class Nfo/class Nfo1/" $DIR/bin/temp/nfo.php
 $SED -i -e "s/class TvRage/class TvRage1/" $DIR/bin/temp/tvrage.php
 $SED -i -e "s/class Movie/class Movie1/" $DIR/bin/temp/movie.php
 $SED -i -e "s/class Music/class Music1/" $DIR/bin/temp/music.php
-#$SED -i -e "s/class Music/class Music2/" $DIR/bin/temp/music1.php
 $SED -i -e "s/class Console/class Console1/" $DIR/bin/temp/console.php
 $SED -i -e "s/class Book/class Book1/" $DIR/bin/temp/book.php
 
@@ -220,14 +181,12 @@ $SED -i -e "s/function Nfo/function Nfo1/" $DIR/bin/temp/nfo.php
 $SED -i -e "s/function TvRage/function TvRage1/" $DIR/bin/temp/tvrage.php
 $SED -i -e "s/function Movie/function Movie1/" $DIR/bin/temp/movie.php
 $SED -i -e "s/function Music/function Music1/" $DIR/bin/temp/music.php
-#$SED -i -e "s/function Music/function Music2/" $DIR/bin/temp/music1.php
 $SED -i -e "s/function Console/function Console1/" $DIR/bin/temp/console.php
 $SED -i -e "s/function Book/function Book1/" $DIR/bin/temp/book.php
 
 $SED -i -e "s/processNfoFiles/processNfoFiles1/" $DIR/bin/temp/nfo.php
 $SED -i -e "s/processMovieReleases/processMovieReleases1/" $DIR/bin/temp/movie.php
 $SED -i -e "s/processMusicReleases/processMusicReleases1/" $DIR/bin/temp/music.php
-#$SED -i -e "s/processMusicReleases/processMusicReleases2/" $DIR/bin/temp/music1.php
 $SED -i -e "s/processBookReleases/processBookReleases1/" $DIR/bin/temp/book.php
 $SED -i -e "s/processConsoleReleases/processConsoleReleases1/" $DIR/bin/temp/console.php
 
@@ -237,7 +196,6 @@ $SED -i -e "s/ORDER BY postdate DESC/ORDER BY postdate ASC/" $DIR/bin/temp/nfo.p
 $SED -i -e 's/WWW_DIR."\/lib\/nfo.php"/"nfo.php"/g' $DIR/bin/temp/postprocess1.php
 $SED -i -e 's/WWW_DIR."\/lib\/movie.php"/"movie.php"/g' $DIR/bin/temp/postprocess1.php
 $SED -i -e 's/WWW_DIR."\/lib\/music.php"/"music.php"/g' $DIR/bin/temp/postprocess1.php
-#$SED -i -e 's/WWW_DIR."\/lib\/music.php"/"music1.php"/g' $DIR/bin/temp/postprocess1.php
 $SED -i -e 's/WWW_DIR."\/lib\/console.php"/"console.php"/g' $DIR/bin/temp/postprocess1.php
 $SED -i -e 's/WWW_DIR."\/lib\/book.php"/"book.php"/g' $DIR/bin/temp/postprocess1.php
 $SED -i -e 's/WWW_DIR."\/lib\/tvrage.php"/"tvrage.php"/g' $DIR/bin/temp/postprocess1.php
@@ -245,7 +203,6 @@ $SED -i -e 's/WWW_DIR."\/lib\/tvrage.php"/"tvrage.php"/g' $DIR/bin/temp/postproc
 $SED -i -e "s/processNfos()/processNfos1()/g" $DIR/bin/temp/postprocess1.php
 $SED -i -e "s/processMovies()/processMovies1()/g" $DIR/bin/temp/postprocess1.php
 $SED -i -e "s/processMusic()/processMusic1()/g" $DIR/bin/temp/postprocess1.php
-#$SED -i -e "s/processMusic()/processMusic2()/g" $DIR/bin/temp/postprocess1.php
 $SED -i -e "s/processBooks()/processBooks1()/g" $DIR/bin/temp/postprocess1.php
 $SED -i -e "s/processGames()/processGames1()/g" $DIR/bin/temp/postprocess1.php
 $SED -i -e "s/processTv()/processTv1()/g" $DIR/bin/temp/postprocess1.php
@@ -253,14 +210,12 @@ $SED -i -e "s/processTv()/processTv1()/g" $DIR/bin/temp/postprocess1.php
 $SED -i -e "s/new Nfo(/new Nfo1(/" $DIR/bin/temp/postprocess1.php
 $SED -i -e "s/new Movie/new Movie1/" $DIR/bin/temp/postprocess1.php
 $SED -i -e "s/new Music/new Music1/" $DIR/bin/temp/postprocess1.php
-#$SED -i -e "s/new Music/new Music2/" $DIR/bin/temp/postprocess1.php
 $SED -i -e "s/new Book/new Book1/" $DIR/bin/temp/postprocess1.php
 $SED -i -e "s/new Console/new Console1/" $DIR/bin/temp/postprocess1.php
 
 $SED -i -e "s/processNfoFiles/processNfoFiles1/" $DIR/bin/temp/postprocess1.php
 $SED -i -e "s/processMovieReleases()/processMovieReleases1()/" $DIR/bin/temp/postprocess1.php
 $SED -i -e "s/processMusicReleases()/processMusicReleases1()/" $DIR/bin/temp/postprocess1.php
-#$SED -i -e "s/processMusicReleases()/processMusicReleases2()/" $DIR/bin/temp/postprocess1.php
 $SED -i -e "s/processBookReleases()/processBookReleases1()/" $DIR/bin/temp/postprocess1.php
 $SED -i -e "s/processConsoleReleases()/processConsoleReleases1()/" $DIR/bin/temp/postprocess1.php
 
@@ -268,17 +223,12 @@ $SED -i -e "s/ORDER BY postdate DESC/ORDER BY postdate ASC/" $DIR/bin/temp/nfo.p
 $SED -i -e "s/ORDER BY postdate DESC/ORDER BY postdate ASC/" $DIR/bin/temp/movie.php
 $SED -i -e "s/ORDER BY createddate DESC/ORDER BY createddate ASC/" $DIR/bin/temp/movie.php
 $SED -i -e "s/ORDER BY postdate DESC LIMIT 1000/ORDER BY postdate DESC LIMIT 100/" $DIR/bin/temp/music.php
-#$SED -i -e "s/ORDER BY postdate DESC LIMIT 1000/ORDER BY postdate ASC LIMIT 100/" $DIR/bin/temp/music1.php
 $SED -i -e "s/ORDER BY createddate DESC/ORDER BY createddate DESC/" $DIR/bin/temp/music.php
-#$SED -i -e "s/ORDER BY createddate DESC/ORDER BY createddate ASC/" $DIR/bin/temp/music1.php
 $SED -i -e "s/ORDER BY postdate DESC/ORDER BY postdate ASC/" $DIR/bin/temp/book.php
 $SED -i -e "s/ORDER BY postdate DESC/ORDER BY postdate ASC/" $DIR/bin/temp/console.php
 $SED -i -e "s/ORDER BY createddate DESC/ORDER BY createddate ASC/" $DIR/bin/temp/console.php
 
-#$SED -i -e "s/order by postdate desc/ORDER BY postdate ASC/" $DIR/bin/temp/tvrage.php
-#$SED -i -e "s/order by rageID asc/order by rageID DESC/" $DIR/bin/temp/tvrage.php
-#$SED -i -e "s/order by airdate asc/order by airdate DESC/" $DIR/bin/temp/tvrage.php
-#$SED -i -e "s/order by tvrage.releasetitle asc/order by tvrage.releasetitle DESC/" $DIR/bin/temp/tvrage.php
+
 
 
 LINE=`grep -Hnm 1 '$this->rarfileregex = ' ../../../../www/lib/nzbinfo.php | cut -d: -f2`

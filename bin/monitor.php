@@ -4,8 +4,10 @@ require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
 require_once (WWW_DIR.'/lib/site.php');
 require_once("../test/ColorCLI.php");
+require_once("../test/showsleep.php");
 
-$version="0.3r667";
+
+$version="0.3r668";
 
 $db = new DB();
 $s = new Sites();
@@ -1498,27 +1500,9 @@ if ($array ['FIXRELEASES'] = "true") {
                 $color = get_color();
                 shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:4.4 'echo \"\033[38;5;\"$color\"m\n$panes4[4] Disabled by MAX_LOAD\" && date +\"%D %T\" && echo \"This is color #$color\"' 2>&1 1> /dev/null");
         }
-    /*
-	//check ffmpeg and mediainfo, kill if necessary
-	if (( $array['KILL_PROCESS'] != "0" ) && ( $array['KILL_QUIET'] == "true" )) {
-		shell_exec("killall -qo {$array['KILL_PROCESS']}s -9 mediainfo");
-		shell_exec("killall -qo {$array['KILL_PROCESS']}s -9 ffmpeg");
-	} else {
-		shell_exec("killall -o {$array['KILL_PROCESS']}s -9 mediainfo 2>&1 1> /dev/null");
-		shell_exec("killall -o {$array['KILL_PROCESS']}s -9 ffmpeg 2>&1 1> /dev/null");
-	}
-
-	if ( $array['KILL_QUIET'] == "true" )  {
-		shell_exec("killall -q mediainfo");
-		shell_exec("killall -q ffmpeg");
-	} else {
-		shell_exec("killall mediainfo 2>&1 1> /dev/null");
-		shell_exec("killall ffmpeg 2>&1 1> /dev/null");
-	}
-    */
 
 	$i++;
-	//turn of monitor if set to false
+	//turn off monitor if set to false
 	if ( $array['RUNNING'] != "true" ) {
 		$i=0;
 	}

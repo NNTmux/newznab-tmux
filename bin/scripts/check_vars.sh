@@ -11,20 +11,12 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 source defaults.sh
 
-for vars in RUNNING TVRAGE OTHERS UNWANTED KEEP_KILLED SEQUENTIAL BINARIES BINARIES_THREADS BACKFILL BACKFILL_THREADS KEVIN_SAFER KEVIN_BACKFILL_PARTS KEVIN_THREADED IMPORT NZB_THREADS IMPORT_TRUE MISC_ONLY RELEASES INNODB FIXRELEASES PREDBHASH REQID REMOVECRAP UPPRE PREDB SPOTNAB TV_SCHEDULE SPHINX DELETE_PARTS FIX_POSIX USE_HTOP USE_BWMNG USE_MYTOP USE_ATOP USE_NMON USE_IOTOP USE_VNSTAT USE_TCPTRACK USE_TOP USE_IFTOP USE_CONSOLE POWERLINE RAMDISK CHOWN_TRUE WRITE_LOGS
+for vars in RUNNING NFOS GAMES MOVIES MUSIC EBOOK TVRAGE OTHERS UNWANTED KEEP_KILLED SEQUENTIAL BINARIES BINARIES_THREADS BACKFILL BACKFILL_THREADS KEVIN_SAFER KEVIN_BACKFILL_PARTS KEVIN_THREADED IMPORT NZB_THREADS IMPORT_TRUE MISC_ONLY RELEASES INNODB FIXRELEASES PREDBHASH REQID REMOVECRAP UPPRE PREDB SPOTNAB TV_SCHEDULE SPHINX DELETE_PARTS FIX_POSIX USE_HTOP USE_BWMNG USE_MYTOP USE_ATOP USE_NMON USE_IOTOP USE_VNSTAT USE_TCPTRACK USE_TOP USE_IFTOP USE_CONSOLE POWERLINE RAMDISK CHOWN_TRUE WRITE_LOGS
 do
 	#echo $vars=\"${!vars}\"
 	if [[ ${!vars} != "true" && ${!vars} != "false" ]]; then
 		clear
 		echo -e "\033[38;5;160m $vars=\"${!vars}\" is not valid. Please edit defaults.sh and correct it. Aborting\033[0m.\n"; exit 1
-	fi
-done
-
-for vars in NFOS GAMES MOVIES MUSIC EBOOK
-do
-        if [[ ${!vars} != 0 && ${!vars} != 1 && ${!vars} != 2 ]]; then
-      	        clear
-               	echo -e "\033[38;5;160m$vars=\"${!vars}\" is note valid number. Please edit defaults.sh and correct it. Aborting\033[0m.\n"; exit 1
 	fi
 done
 
@@ -41,13 +33,6 @@ do
 	fi
 done
 
-for vars in POST_TO_RUN_A POST_TO_RUN_B
-do
-	if ! [[ ${!vars} -le 16 && ${!vars} -ge 0 ]]; then
-                clear
-        	echo -e "\033[38;5;160m$vars=\"${!vars}\" is not valid. Please edit defaults.sh and correct it. Aborting\033[0m.\n"; exit 1
-	fi
-done
 
 for vars in NEWZPATH NEWZNAB_PATH TESTING_PATH ADMIN_PATH RAMDISK_PATH
 do
