@@ -113,7 +113,7 @@ Class Predb
 		if ($this->echooutput)
 		{
 			$count = ($nfos > 0) ? $nfos : 0;
-			echo $this->c->header('Added ' . $count . ' missing NFOs from prehash sources.');
+			echo $this->c->header("\nAdded " . number_format($count) . ' missing NFOs from preDB sources.');
 		}
 	}
 
@@ -800,7 +800,7 @@ Class Predb
 		if($this->echooutput)
 			echo $this->c->header ("Matching up prehash NFOs with releases missing an NFO.");
 
-			$res = $db->query("SELECT r.ID, p.nfo, r.completion, r.guid, r.groupID FROM releases r INNER JOIN prehash p ON r.preID = p.ID WHERE p.nfo IS NOT NULL AND r.nfostatus != 1 LIMIT 100");
+			$res = $db->query("SELECT r.ID, p.nfo, r.completion, r.guid, r.groupID FROM releases r INNER JOIN prehash p ON r.preID = p.ID WHERE r.nfostatus != 1 AND p.nfo IS NOT NULL LIMIT 100");
 		    $total = count($res);
 		    if($total > 0)
             {
