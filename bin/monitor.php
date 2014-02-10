@@ -7,7 +7,7 @@ require_once("../test/ColorCLI.php");
 require_once("../test/showsleep.php");
 
 
-$version="0.3r672";
+$version="0.3r673";
 
 $db = new DB();
 $s = new Sites();
