@@ -392,7 +392,7 @@ class Functions
 			if ($type === 'all' || $type === 'full') {
 				$tbls = '';
 				foreach ($alltables as $table) {
-					$tbls .= $table['name'] . ', ';
+					$tbls .= $table['Name'] . ', ';
 				}
 				$tbls = rtrim(trim($tbls),',');
 				if ($admin === false) {
@@ -403,17 +403,17 @@ class Functions
 				foreach ($alltables as $table) {
 					if ($type === 'analyze') {
 						if ($admin === false) {
-							echo $this->c->primary('Analyzing table: ' . $table['name']);
+							echo $this->c->primary('Analyzing table: ' . $table['Name']);
 						}
-						$db->queryDirect('ANALYZE LOCAL TABLE `' . $table['name'] . '`');
+						$db->queryDirect('ANALYZE LOCAL TABLE `' . $table['Name'] . '`');
 					} else {
 						if ($admin === false) {
-							echo $this->c->primary('Optimizing table: ' . $table['name']);
+							echo $this->c->primary('Optimizing table: ' . $table['Name']);
 						}
 						if (strtolower($table['engine']) == 'myisam') {
-							$db->queryDirect('REPAIR TABLE `' . $table['name'] . '`');
+							$db->queryDirect('REPAIR TABLE `' . $table['Name'] . '`');
 						}
-						$db->queryDirect('OPTIMIZE LOCAL TABLE `' . $table['name'] . '`');
+						$db->queryDirect('OPTIMIZE LOCAL TABLE `' . $table['Name'] . '`');
 					}
 				}
 			}
