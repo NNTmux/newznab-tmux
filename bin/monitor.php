@@ -7,7 +7,7 @@ require_once("../test/ColorCLI.php");
 require_once("../test/showsleep.php");
 
 
-$version="0.3r677";
+$version="0.3r678";
 
 $db = new DB();
 $s = new Sites();
@@ -1415,7 +1415,7 @@ if ($array ['FIXRELEASES'] = "true") {
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.7 'echo \"\033[38;5;\"$color\"m\n$panes3[7] Has no work to process \" && date +\"%D %T\"' 2>&1 1> /dev/null");
         }
 
-    //run fixReleaseNames and jonnyboys jb_fix_names.php and removeCrapReleases in pane 4.0
+    //run fixReleaseNames and jonnyboys jb_fix_names.php in pane 4.0
 	if (( $array['MAX_LOAD'] >= get_load()) && (( TIME() - $time27 ) >= $array['FIXRELEASES_TIMER'] ) && ( $array['FIXRELEASES'] == "true" )) {
 		$color = get_color();
 		$log = writelog($panes4[0]);
@@ -1467,19 +1467,19 @@ if ($array ['FIXRELEASES'] = "true") {
                 shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:4.2 'echo \"\033[38;5;\"$color\"m\n$panes4[2] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
         }
         //run removeCrap.php in pane 4.3
-	if (( $array['MAX_LOAD'] >= get_load()) && (( TIME() - $time31 ) >= $array['REMOVECRAP_TIMER'] ) && ( $array['REMOVECRAP'] == "true" )) {
+	if (( $array['MAX_LOAD'] >= get_load()) && ( $array['REMOVECRAP'] == "true" )) {
 		$color = get_color();
 		$log = writelog($panes4[3]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:4.3 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes4[3] $ds2 && cd $_test && $_php removeCrapReleases.php true 2 2>&1 $log echo \" \033[1;0;33m\" && $ds1 $panes4[3] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:4.3 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes4[3] $ds2 && cd $_test && $_sleep {$array['REMOVECRAP_TIMER']} && $_php removeCrapReleases.php true 2 2>&1 $log echo \" \033[1;0;33m\" && $ds1 $panes4[3] $ds3' 2>&1 1> /dev/null");
 		$time31 = TIME();}
 	  elseif ( $array['REMOVECRAP'] != "true" ) {
 		$color = get_color();
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:4.3 'echo \"\033[38;5;\"$color\"m\n$panes4[3] Disabled by RemoveCrap\" && date +\"%D %T\"' 2>&1 1> /dev/null");
-	} elseif (( $array['REMOVECRAP'] == "true" ) && ( $array['MAX_LOAD'] >= get_load())) {
+	} /*elseif (( $array['REMOVECRAP'] == "true" ) && ( $array['MAX_LOAD'] >= get_load())) {
 		$color = get_color();
 		$run_time = relativeTime( $array['REMOVECRAP_TIMER'] + $time31 );
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:4.3 'echo \"\033[38;5;\"$color\"m\n$panes4[3] will run in T[ $run_time]\" && date +\"%D %T\"' 2>&1 1> /dev/null");
-	} elseif ( $array['MAX_LOAD'] <= get_load()) {
+	} */elseif ( $array['MAX_LOAD'] <= get_load()) {
                 $color = get_color();
                 shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:4.3 'echo \"\033[38;5;\"$color\"m\n$panes4[3] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
         }
