@@ -7,7 +7,7 @@ require_once("../test/ColorCLI.php");
 require_once("../test/showsleep.php");
 
 
-$version="0.3r674";
+$version="0.3r675";
 
 $db = new DB();
 $s = new Sites();
@@ -1433,7 +1433,7 @@ if ($array ['FIXRELEASES'] = "true") {
                 shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:4.0 'echo \"\033[38;5;\"$color\"m\n$panes4[0] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
         }
     //run predb_hash_decrypt.php in pane 4.1
-	if (( $array['MAX_LOAD'] >= get_load()) && (( TIME() - $time28 ) >= $array['PREDBHASH_TIMER'] ) &&( $array['PREDBHASH'] == "true" )) {
+	if (( $array['MAX_LOAD'] >= get_load()) &&( $array['PREDBHASH'] == "true" )) {
 		$color = get_color();
 		$log = writelog($panes4[1]);
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:4.1 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes4[1] $ds2 && cd $_test && $_php predb_hash_decrypt.php 1000 2>&1 $log && $_sleep {$array ['PREDBHASH_TIMER']} && echo \" \033[1;0;33m\" && $ds1 $panes4[1] $ds3' 2>&1 1> /dev/null");
