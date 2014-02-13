@@ -8,7 +8,7 @@ require_once("../test/showsleep.php");
 require_once("../test/functions.php");
 
 
-$version="0.3r691";
+$version="0.3r692";
 
 $db = new DB();
 $functions = new Functions();
@@ -429,11 +429,11 @@ while( $i > 0 )
 	shell_exec("killall -o 60s -9 ffmpeg 2>&1 1> /dev/null");
 
     // Ananlyze tables every 60 min
-	$time08 = TIME();
+	$time33 = TIME();
 	printf("Analyzing your tables to refresh your indexes.");
-	if ($i == 1 || (TIME() - $time08 >= 3600)) {
+	if ($i == 1 || (TIME() - $time33 >= 3600)) {
 		$functions->optimise(true, 'analyze');
-		$time08 = TIME();
+		$time33 = TIME();
 	}
     
 	//get microtime at start of loop
