@@ -5,11 +5,13 @@ require(WWW_DIR.'/lib/postprocess.php');
 require_once (WWW_DIR.'/lib/site.php');
 require_once("../test/ColorCLI.php");
 require_once("../test/showsleep.php");
+require_once("../test/functions.php");
 
 
 $version="0.3r691";
 
 $db = new DB();
+$functions = new Functions();
 $s = new Sites();
 $site = $s->get();
 $patch = $site->dbversion;
