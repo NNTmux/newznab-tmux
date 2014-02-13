@@ -8,7 +8,7 @@ require_once("../test/showsleep.php");
 require_once("../test/functions.php");
 
 
-$version="0.3r692";
+$version="0.3r693";
 
 $db = new DB();
 $functions = new Functions();
@@ -25,12 +25,12 @@ $qry = "SELECT COUNT( releases.categoryID ) AS cnt, parentID FROM releases INNER
 
 //needs to be processed query
 $proc = "SELECT
-( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE (bitwise & 256) = 256 AND categoryID BETWEEN 1000 AND 1999 ) AS console,
-( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE (bitwise & 256) = 256 AND categoryID BETWEEN 2000 AND 2999 ) AS movies,
-( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE (bitwise & 257) = 257 AND categoryID BETWEEN 3000 AND 3999 ) AS audio,
+( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE (bitwise & 256) = 256 AND categoryID BETWEEN 1000 AND 1999 AND consoleinfoID IS NULL ) AS console,
+( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE (bitwise & 256) = 256 AND categoryID BETWEEN 2000 AND 2999 AND imdbID IS NULL ) AS movies,
+( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE (bitwise & 257) = 257 AND categoryID BETWEEN 3000 AND 3999 AND musicinfoID IS NULL) AS audio,
 ( SELECT COUNT(*) FROM releases r USE INDEX(ix_releases_status), category c WHERE (r.bitwise & 256) = 256 AND c.ID = r.categoryID AND c.parentID = 6000 AND r.passwordstatus BETWEEN -6 AND -1 AND r.haspreview = -1 AND c.disablepreview = 0) AS xxx,
 ( SELECT COUNT(*) FROM releases r USE INDEX(ix_releases_status), category c WHERE (r.bitwise & 256) = 256 AND c.ID = r.categoryID AND c.parentID = 4000 AND r.passwordstatus BETWEEN -6 AND -1 AND r.haspreview = -1 AND c.disablepreview = 0) AS pc,
-( SELECT COUNT(*) FROM releases r USE INDEX(ix_releases_status), category c WHERE (r.bitwise & 256) = 256 AND categoryID BETWEEN 5000 AND 5999 ) AS tv,
+( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE (bitwise & 256) = 256 AND categoryID BETWEEN 5000 AND 5999 AND rageID = -1) AS tv,
 ( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE (bitwise & 256) = 256 AND categoryID = 7020 AND bookinfoID IS NULL ) AS book,
 ( SELECT COUNT(*) FROM releases r USE INDEX(ix_releases_status), category c WHERE (r.bitwise & 256) = 256 AND c.ID = r.categoryID AND r.passwordstatus BETWEEN -6 AND -1 AND r.haspreview = -1 AND c.disablepreview = 0) AS work,
 ( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE (bitwise & 256) = 256) AS releases,
