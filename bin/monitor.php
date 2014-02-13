@@ -7,7 +7,7 @@ require_once("../test/ColorCLI.php");
 require_once("../test/showsleep.php");
 
 
-$version="0.3r690";
+$version="0.3r691";
 
 $db = new DB();
 $s = new Sites();
@@ -425,6 +425,14 @@ while( $i > 0 )
      //kill mediainfo and ffmpeg if exceeds 60 sec
 	shell_exec("killall -o 60s -9 mediainfo 2>&1 1> /dev/null");
 	shell_exec("killall -o 60s -9 ffmpeg 2>&1 1> /dev/null");
+
+    // Ananlyze tables every 60 min
+	$time08 = TIME();
+	printf("Analyzing your tables to refresh your indexes.");
+	if ($i == 1 || (TIME() - $time08 >= 3600)) {
+		$functions->optimise(true, 'analyze');
+		$time08 = TIME();
+	}
     
 	//get microtime at start of loop
 	$time_loop_start = microtime_float();

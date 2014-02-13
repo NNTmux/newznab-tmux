@@ -376,6 +376,50 @@ class Functions
 			echo "\n";
 		return $relcount;
 	}
+
+    // Optimises/repairs tables on mysql.
+	public function optimise($admin = false, $type = '')
+	{
+		$tablecnt = 0;
+			if ($type === 'true' || $type === 'full' || $type === 'analyze') {
+				$alltables = $this->query('SHOW TABLE STATUS');
+			} else {
+				$alltables = $this->query('SHOW TABLE STATUS WHERE Data_free / Data_length > 0.005');
+			}
+			$tablecnt = count($alltables);
+			if ($type === 'all' || $type === 'full') {
+				$tbls = '';
+				foreach ($alltables as $table) {
+					$tbls .= $table['name'] . ', ';
+				}
+				$tbls = rtrim(trim($tbls),',');
+				if ($admin === false) {
+					echo $this->c->primary('Optimizing tables: ' . $tbls);
+				}
+				$this->exec("OPTIMIZE LOCAL TABLE ${tbls}");
+			} else {
+				foreach ($alltables as $table) {
+					if ($type === 'analyze') {
+						if ($admin === false) {
+							echo $this->c->primary('Analyzing table: ' . $table['name']);
+						}
+						$this->exec('ANALYZE LOCAL TABLE `' . $table['name'] . '`');
+					} else {
+						if ($admin === false) {
+							echo $this->c->primary('Optimizing table: ' . $table['name']);
+						}
+						if (strtolower($table['engine']) == 'myisam') {
+							$this->exec('REPAIR TABLE `' . $table['name'] . '`');
+						}
+						$this->exec('OPTIMIZE LOCAL TABLE `' . $table['name'] . '`');
+					}
+				}
+			}
+			if ($type !== 'analyze') {
+				$this->exec('FLUSH TABLES');
+			}
+		return $tablecnt;
+	}
     //end of testing
 
    }
