@@ -398,27 +398,27 @@ class Functions
 				if ($admin === false) {
 					echo $this->c->primary('Optimizing tables: ' . $tbls);
 				}
-				$db->exec("OPTIMIZE LOCAL TABLE ${tbls}");
+				$db->queryDirect("OPTIMIZE LOCAL TABLE ${tbls}");
 			} else {
 				foreach ($alltables as $table) {
 					if ($type === 'analyze') {
 						if ($admin === false) {
 							echo $this->c->primary('Analyzing table: ' . $table['name']);
 						}
-						$db->exec('ANALYZE LOCAL TABLE `' . $table['name'] . '`');
+						$db->queryDirect('ANALYZE LOCAL TABLE `' . $table['name'] . '`');
 					} else {
 						if ($admin === false) {
 							echo $this->c->primary('Optimizing table: ' . $table['name']);
 						}
 						if (strtolower($table['engine']) == 'myisam') {
-							$db->exec('REPAIR TABLE `' . $table['name'] . '`');
+							$db->queryDirect('REPAIR TABLE `' . $table['name'] . '`');
 						}
-						$db->exec('OPTIMIZE LOCAL TABLE `' . $table['name'] . '`');
+						$db->queryDirect('OPTIMIZE LOCAL TABLE `' . $table['name'] . '`');
 					}
 				}
 			}
 			if ($type !== 'analyze') {
-				$db->exec('FLUSH TABLES');
+				$db->queryDirect('FLUSH TABLES');
 			}
 		return $tablecnt;
 	}
