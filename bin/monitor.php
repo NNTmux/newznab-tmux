@@ -7,7 +7,7 @@ require_once("../test/ColorCLI.php");
 require_once("../test/showsleep.php");
 
 
-$version="0.3r680";
+$version="0.3r690";
 
 $db = new DB();
 $s = new Sites();
@@ -23,17 +23,17 @@ $qry = "SELECT COUNT( releases.categoryID ) AS cnt, parentID FROM releases INNER
 
 //needs to be processed query
 $proc = "SELECT
-( SELECT COUNT( groupID ) AS cnt from releases where consoleinfoID IS NULL and categoryID BETWEEN 1000 AND 1999 ) AS console,
-( SELECT COUNT( groupID ) AS cnt from releases where imdbID IS NULL and categoryID BETWEEN 2000 AND 2999 ) AS movies,
-( SELECT COUNT( groupID ) AS cnt from releases where musicinfoID IS NULL and categoryID BETWEEN 3000 AND 3999 ) AS audio,
-( SELECT COUNT( groupID ) AS cnt from releases where reqID IS NULL and haspreview = -1 and categoryID BETWEEN 6000 AND 6999 ) AS xxx,
-(SELECT COUNT( groupID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (categoryID BETWEEN 4000 AND 4999 and ((r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)))) AS pc,
-( SELECT COUNT( groupID ) AS cnt from releases where rageID = -1 and categoryID BETWEEN 5000 AND 5999 ) AS tv,
-( SELECT COUNT( groupID ) AS cnt from releases where bookinfoID IS NULL and categoryID = 7020 ) AS book,
-( SELECT COUNT( groupID ) AS cnt from releases r left join category c on c.ID = r.categoryID where (r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)) AS work,
-( SELECT COUNT( groupID ) AS cnt from releases) AS releases,
-( SELECT COUNT( groupID ) AS cnt FROM releases r WHERE r.releasenfoID = 0) AS nforemains,
-( SELECT COUNT( groupID ) AS cnt FROM releases WHERE releasenfoID not in (0, -1)) AS nfo,
+( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE (bitwise & 256) = 256 AND categoryID BETWEEN 1000 AND 1999 ) AS console,
+( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE (bitwise & 256) = 256 AND categoryID BETWEEN 2000 AND 2999 ) AS movies,
+( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE (bitwise & 257) = 257 AND categoryID BETWEEN 3000 AND 3999 ) AS audio,
+( SELECT COUNT(*) FROM releases r USE INDEX(ix_releases_status), category c WHERE (r.bitwise & 256) = 256 AND c.ID = r.categoryID AND c.parentID = 6000 AND r.passwordstatus BETWEEN -6 AND -1 AND r.haspreview = -1 AND c.disablepreview = 0) AS xxx,
+( SELECT COUNT(*) FROM releases r USE INDEX(ix_releases_status), category c WHERE (r.bitwise & 256) = 256 AND c.ID = r.categoryID AND c.parentID = 4000 AND r.passwordstatus BETWEEN -6 AND -1 AND r.haspreview = -1 AND c.disablepreview = 0) AS pc,
+( SELECT COUNT(*) FROM releases r USE INDEX(ix_releases_status), category c WHERE (r.bitwise & 256) = 256 AND categoryID BETWEEN 5000 AND 5999 ) AS tv,
+( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE (bitwise & 256) = 256 AND categoryID = 7020 AND bookinfoID IS NULL ) AS book,
+( SELECT COUNT(*) FROM releases r USE INDEX(ix_releases_status), category c WHERE (r.bitwise & 256) = 256 AND c.ID = r.categoryID AND r.passwordstatus BETWEEN -6 AND -1 AND r.haspreview = -1 AND c.disablepreview = 0) AS work,
+( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE (bitwise & 256) = 256) AS releases,
+( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE (bitwise & 256) = 256 AND nfostatus BETWEEN -6 AND -1) AS nforemains,
+( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE (bitwise & 256) = 256 AND nfostatus = 1) AS nfo,
 ( SELECT table_rows AS cnt FROM information_schema.TABLES where table_name = 'parts' AND TABLE_SCHEMA = '".DB_NAME."' ) AS parts,
 ( SELECT COUNT(ID) FROM binaries WHERE procstat = 0 ) AS binaries,
 ( SELECT table_rows AS cnt FROM information_schema.TABLES where table_name = 'binaries' AND TABLE_SCHEMA = '".DB_NAME."' ) AS binaries_total,
@@ -49,9 +49,9 @@ $proc = "SELECT
 ( SELECT name from releases order by adddate desc limit 1 ) AS newestaddname";
 //$proc = "SELECT * FROM procCnt;";
 $proc2 = "SELECT
-	(SELECT COUNT(*) FROM releases WHERE (bitwise & 1284) = 1280 AND reqidstatus in (0, -1) OR (reqidstatus = -3 AND adddate > NOW() - INTERVAL 2 HOUR)) AS requestid_inprogress,
-	(SELECT COUNT(*) FROM releases WHERE (bitwise & 256) = 256 AND reqidstatus = 1 OR reqID IS NOT NULL) AS requestid_matched,
-	(SELECT COUNT(*) FROM releases WHERE (bitwise & 256) = 256 AND preID IS NOT NULL) AS prehash_matched,
+	(SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE (bitwise & 1284) = 1280 AND reqidstatus in (0, -1) OR (reqidstatus = -3 AND adddate > NOW() - INTERVAL 2 HOUR)) AS requestid_inprogress,
+	(SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE (bitwise & 256) = 256 AND reqidstatus = 1 OR reqID IS NOT NULL) AS requestid_matched,
+	(SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE (bitwise & 256) = 256 AND preID IS NOT NULL) AS prehash_matched,
 	(SELECT COUNT(DISTINCT(preID)) FROM releases) AS distinct_prehash_matched";
 
 //get first release inserted datetime and oldest posted datetime
