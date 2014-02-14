@@ -514,12 +514,12 @@ while( $i > 0 )
 		$init1_time = (TIME() - $time01);
 
         $time04 = TIME();
-		$proc_result = @$db->query($proc, rand_bool($i));
+		$proc_result = @$db->query($proc);
         $proc1_time = (TIME() - $time04);
 		$proc11_time = (TIME() - $time01);
 
         $time05 = TIME();
-        $proc_result2 = @$db->query($proc2, rand_bool($i));
+        $proc_result2 = @$db->query($proc2);
         $proc2_time = (TIME() - $time05);
 		$proc21_time = (TIME() - $time01);
 
