@@ -8,7 +8,7 @@ require_once("../test/showsleep.php");
 require_once("../test/functions.php");
 
 
-$version="0.3r699";
+$version="0.3r700";
 
 $db = new DB();
 $functions = new Functions();
@@ -55,6 +55,9 @@ $proc2 = "SELECT
 	(SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE (bitwise & 256) = 256 AND reqidstatus = 1 OR reqID IS NOT NULL) AS requestid_matched,
 	(SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE (bitwise & 256) = 256 AND preID IS NOT NULL) AS prehash_matched,
 	(SELECT COUNT(DISTINCT(preID)) FROM releases) AS distinct_prehash_matched";
+
+$split_query = "SELECT
+    ( SELECT UNIX_TIMESTAMP(adddate) FROM releases USE INDEX(ix_releases_status) WHERE (bitwise & 256) = 256 ORDER BY adddate DESC LIMIT 1 ) AS newestadd";
 
 //get first release inserted datetime and oldest posted datetime
 //$posted_date = "SELECT(SELECT UNIX_TIMESTAMP(adddate) from releases order by adddate asc limit 1) AS adddate;";
@@ -494,12 +497,32 @@ while( $i > 0 )
 	}
 
 	//run queries
+    $time01 = TIME();
 	if ((( TIME() - $time19 ) >= $array['MONITOR_UPDATE'] ) || ( $i == 1 )) {
+	    echo $c->info("\nThe numbers(queries) above are currently being refreshed. \nNo pane(script) can be (re)started until these have completed.\n");
 		//get microtime to at start of queries
 		$query_timer_start=microtime_float();
+
+        $time02 = TIME();
+		$split_result = $db->query($split_query, false);
+		$split_time = (TIME() - $time02);
+		$split1_time = (TIME() - $time01);
+
+        $time03 = TIME();
 		$initquery = @$db->query($qry, false);
-		$proc_result = @$db->query($proc);
-        $proc_result2 = @$db->query($proc2);
+        $init_time = (TIME() - $time03);
+		$init1_time = (TIME() - $time01);
+
+        $time04 = TIME();
+		$proc_result = @$db->query($proc, rand_bool($i));
+        $proc1_time = (TIME() - $time04);
+		$proc11_time = (TIME() - $time01);
+
+        $time05 = TIME();
+        $proc_result2 = @$db->query($proc2, rand_bool($i));
+        $proc2_time = (TIME() - $time05);
+		$proc21_time = (TIME() - $time01);
+
 		$time19 = TIME();
 		$runloop = "true";
 	} else {
