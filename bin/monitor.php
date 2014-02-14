@@ -8,7 +8,7 @@ require_once("../test/showsleep.php");
 require_once("../test/functions.php");
 
 
-$version="0.3r695";
+$version="0.3r696";
 
 $db = new DB();
 $functions = new Functions();
@@ -496,12 +496,7 @@ while( $i > 0 )
 	if ((( TIME() - $time19 ) >= $array['MONITOR_UPDATE'] ) || ( $i == 1 )) {
 		//get microtime to at start of queries
 		$query_timer_start=microtime_float();
-		$result = @$db->query($qry);
-		$initquery = array();
-		foreach ($result as $cat=>$sub)
-		{
-			$initquery[$sub['parentID']] = $sub['cnt'];
-		}
+		$initquery = @$db->query($qry, false);
 		$proc_result = @$db->query($proc);
         $proc_result2 = @$db->query($proc2);
 		$time19 = TIME();
@@ -533,14 +528,32 @@ while( $i > 0 )
 	}
 
 	//get values from $qry
-	if ( @$initquery['1000'] != NULL ) { $console_releases_now = $initquery['1000']; }
-	if ( @$initquery['2000'] != NULL ) { $movie_releases_now = $initquery['2000']; }
-	if ( @$initquery['3000'] != NULL ) { $music_releases_now = $initquery['3000']; }
-	if ( @$initquery['4000'] != NULL ) { $pc_releases_now = $initquery['4000']; }
-	if ( @$initquery['5000'] != NULL ) { $tvrage_releases_now = $initquery['5000']; }
-    if ( @$initquery['6000'] != NULL ) { $xxx_releases_now = $initquery['6000']; }
-	if ( @$initquery['7000'] != NULL ) { $book_releases_now = $initquery['7000']; }
-	if ( @$initquery['8000'] != NULL ) { $misc_releases_now = $initquery['8000']; }
+	foreach ($initquery as $cat) {
+		if ($cat['parentID'] == 1000) {
+			$console_releases_now = $cat['count'];
+		}
+		if ($cat['parentID'] == 2000) {
+			$movie_releases_now = $cat['count'];
+		}
+		if ($cat['parentID'] == 3000) {
+			$music_releases_now = $cat['count'];
+		}
+		if ($cat['parentID'] == 4000) {
+			$pc_releases_now = $cat['count'];
+		}
+		if ($cat['parentID'] == 5000) {
+			$tvrage_releases_now = $cat['count'];
+		}
+		if ($cat['parentID'] == 6000) {
+			$xxx_releases_now = $cat['count'];
+		}
+		if ($cat['parentID'] == 7000) {
+			$misc_releases_now = $cat['count'];
+		}
+		if ($cat['parentID'] == 8000) {
+			$book_releases_now = $cat['count'];
+		}
+	}
 
 	//get values from $proc
 	if ( @$proc_result[0]['console'] != NULL ) { $console_releases_proc = $proc_result[0]['console']; }
