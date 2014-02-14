@@ -376,6 +376,52 @@ class Functions
 			echo "\n";
 		return $relcount;
 	}
+
+    // Optimises/repairs tables on mysql.
+	public function optimise($admin = false, $type = '')
+	{
+        $db = new DB();
+        $c = new ColorCLI();
+        $tablecnt = 0;
+			if ($type === 'true' || $type === 'full' || $type === 'analyze') {
+				$alltables = $db->query('SHOW TABLE STATUS');
+			} else {
+				$alltables = $db->query('SHOW TABLE STATUS WHERE Data_free / Data_length > 0.005');
+			}
+			$tablecnt = count($alltables);
+			if ($type === 'all' || $type === 'full') {
+				$tbls = '';
+				foreach ($alltables as $table) {
+					$tbls .= $table['Name'] . ', ';
+				}
+				$tbls = rtrim(trim($tbls),',');
+				if ($admin === false) {
+					echo $this->c->primary('Optimizing tables: ' . $tbls);
+				}
+				$db->queryDirect("OPTIMIZE LOCAL TABLE ${tbls}");
+			} else {
+				foreach ($alltables as $table) {
+					if ($type === 'analyze') {
+						if ($admin === false) {
+							echo $this->c->primary('Analyzing table: ' . $table['Name']);
+						}
+						$db->queryDirect('ANALYZE LOCAL TABLE `' . $table['Name'] . '`');
+					} else {
+						if ($admin === false) {
+							echo $this->c->primary('Optimizing table: ' . $table['Name']);
+						}
+						if (strtolower($table['engine']) == 'myisam') {
+							$db->queryDirect('REPAIR TABLE `' . $table['Name'] . '`');
+						}
+						$db->queryDirect('OPTIMIZE LOCAL TABLE `' . $table['Name'] . '`');
+					}
+				}
+			}
+			if ($type !== 'analyze') {
+				$db->queryDirect('FLUSH TABLES');
+			}
+		return $tablecnt;
+	}
     //end of testing
 
    }

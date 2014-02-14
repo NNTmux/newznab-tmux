@@ -238,12 +238,6 @@ export RELEASES_SLEEP="40"
 
 ############################################################
 
-#Choose your database engine, comment the one true/false
-#you should have already converted your database to InnoDB engine, if you select true here
-export INNODB="false"
-
-############################################################
-
 #choose to run fixReleaseNames script.Before you can use this scripts you need
 #to import db.sql from test/db_updates/ and prehash.sql from test/initial_setup/ folder
 #to your newznab database.
