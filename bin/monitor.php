@@ -8,7 +8,7 @@ require_once("../test/showsleep.php");
 require_once("../test/functions.php");
 
 
-$version="0.3r696";
+$version="0.3r698";
 
 $db = new DB();
 $functions = new Functions();
@@ -25,17 +25,17 @@ $qry = "SELECT c.parentID AS parentID, COUNT(r.ID) AS count FROM category c, rel
 
 //needs to be processed query
 $proc = "SELECT
-( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE (bitwise & 256) = 256 AND categoryID BETWEEN 1000 AND 1999 AND consoleinfoID IS NULL ) AS console,
-( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE (bitwise & 256) = 256 AND categoryID BETWEEN 2000 AND 2999 AND imdbID IS NULL ) AS movies,
-( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE (bitwise & 257) = 257 AND categoryID BETWEEN 3000 AND 3999 AND musicinfoID IS NULL) AS audio,
-( SELECT COUNT(*) FROM releases r USE INDEX(ix_releases_status), category c WHERE (r.bitwise & 256) = 256 AND c.ID = r.categoryID AND c.parentID = 6000 AND r.passwordstatus BETWEEN -6 AND -1 AND r.haspreview = -1 AND c.disablepreview = 0) AS xxx,
-( SELECT COUNT(*) FROM releases r USE INDEX(ix_releases_status), category c WHERE (r.bitwise & 256) = 256 AND c.ID = r.categoryID AND c.parentID = 4000 AND r.passwordstatus BETWEEN -6 AND -1 AND r.haspreview = -1 AND c.disablepreview = 0) AS pc,
-( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE (bitwise & 256) = 256 AND categoryID BETWEEN 5000 AND 5999 AND rageID = -1) AS tv,
-( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE (bitwise & 256) = 256 AND categoryID = 7020 AND bookinfoID IS NULL ) AS book,
-( SELECT COUNT(*) FROM releases r USE INDEX(ix_releases_status), category c WHERE (r.bitwise & 256) = 256 AND c.ID = r.categoryID AND r.passwordstatus BETWEEN -6 AND -1 AND r.haspreview = -1 AND c.disablepreview = 0) AS work,
+( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE categoryID BETWEEN 1000 AND 1999 AND consoleinfoID IS NULL ) AS console,
+( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE categoryID BETWEEN 2000 AND 2999 AND imdbID IS NULL ) AS movies,
+( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE categoryID BETWEEN 3000 AND 3999 AND musicinfoID IS NULL) AS audio,
+( SELECT COUNT(*) FROM releases r USE INDEX(ix_releases_status), category c WHERE c.ID = r.categoryID AND c.parentID = 6000 AND r.passwordstatus BETWEEN -6 AND -1 AND r.haspreview = -1 AND c.disablepreview = 0) AS xxx,
+( SELECT COUNT(*) FROM releases r USE INDEX(ix_releases_status), category c WHERE c.ID = r.categoryID AND c.parentID = 4000 AND r.passwordstatus BETWEEN -6 AND -1 AND r.haspreview = -1 AND c.disablepreview = 0) AS pc,
+( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE categoryID BETWEEN 5000 AND 5999 AND rageID = -1) AS tv,
+( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE categoryID = 7020 AND bookinfoID IS NULL ) AS book,
+( SELECT COUNT(*) FROM releases r USE INDEX(ix_releases_status), category c WHERE c.ID = r.categoryID AND r.passwordstatus BETWEEN -6 AND -1 AND r.haspreview = -1 AND c.disablepreview = 0) AS work,
 ( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE (bitwise & 256) = 256) AS releases,
-( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE (bitwise & 256) = 256 AND nfostatus BETWEEN -6 AND -1) AS nforemains,
-( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE (bitwise & 256) = 256 AND nfostatus = 1) AS nfo,
+( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE nfostatus BETWEEN -6 AND -1) AS nforemains,
+( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE nfostatus = 1) AS nfo,
 ( SELECT table_rows AS cnt FROM information_schema.TABLES where table_name = 'parts' AND TABLE_SCHEMA = '".DB_NAME."' ) AS parts,
 ( SELECT COUNT(ID) FROM binaries WHERE procstat = 0 ) AS binaries,
 ( SELECT table_rows AS cnt FROM information_schema.TABLES where table_name = 'binaries' AND TABLE_SCHEMA = '".DB_NAME."' ) AS binaries_total,
@@ -253,6 +253,7 @@ $releases_now = 0;
 //$firstdate = TIME();
 $newestname = "Unknown";
 $newestdate = TIME();
+$newestadd = TIME();
 $newestpredb = TIME();
 $newestprehash = TIME();
 $parts_rows_unformatted = 0;
@@ -372,7 +373,7 @@ passthru('clear');
 printf($mask2, "Monitor Running v$version [".$patch."]: ", relativeTime("$time"));
 printf($mask1, "USP Connections:", $uspactiveconnections . " active (" . $usptotalconnections . " total) - " . $host . ":" . $port);;
 printf($mask1, "Newest Release:", "$newestname");
-printf($mask1, "Release Added:", relativeTime("$newestdate")."ago");
+printf($mask1, "Release Added:", relativeTime("$newestadd")."ago");
 if ($array['PREDB'] = "true"){
     printf($mask1, "Predb Updated:", relativeTime("$newestpredb")."ago");
 }
@@ -811,7 +812,7 @@ $usptotalconnections  = str_replace("\n", '', shell_exec("ss -n | grep -c " . $i
 	printf($mask2, "Monitor Running v$version [".$patch."]: ", relativeTime("$time"));
     printf($mask1, "USP Connections:", $uspactiveconnections . " active (" . $usptotalconnections . " total) - " . $host . ":" . $port);
 	printf($mask1, "Newest Release:", "$newestname");
-	printf($mask1, "Release Added:", relativeTime("$newestdate")."ago");
+	printf($mask1, "Release Added:", relativeTime("$newestadd")."ago");
     if ($array['PREDB'] = "true"){
     printf($mask1, "Predb Updated:", relativeTime("$newestpredb")."ago");
     }
