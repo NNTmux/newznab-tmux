@@ -8,7 +8,7 @@ require_once("../test/showsleep.php");
 require_once("../test/functions.php");
 
 
-$version="0.3r694";
+$version="0.3r695";
 
 $db = new DB();
 $functions = new Functions();
@@ -21,7 +21,7 @@ $port = NNTP_PORT;
 $host = NNTP_SERVER;
 $ip = gethostbyname($host);
 //totals per category in db, results by parentID
-$qry = "SELECT COUNT( releases.categoryID ) AS cnt, parentID FROM releases INNER JOIN category ON releases.categoryID = category.ID WHERE parentID IS NOT NULL GROUP BY parentID";
+$qry = "SELECT c.parentID AS parentID, COUNT(r.ID) AS count FROM category c, releases r WHERE r.categoryID = c.ID GROUP BY c.parentID";
 
 //needs to be processed query
 $proc = "SELECT
@@ -221,10 +221,6 @@ $time30 = TIME();
 $time31 = TIME();
 $time32 = TIME();
 
-if ( $array['INNODB'] == "true" ) {
-	$time5 = TIME();
-	$time8 = TIME();
-}
 
 //init start values
 $work_start = 0;
@@ -430,7 +426,7 @@ while( $i > 0 )
 
     // Ananlyze tables every 60 min
 	$time33 = TIME();
-	printf("Analyzing your tables to refresh your indexes.");
+	printf($c->info("\nAnalyzing your tables to refresh your indexes."));
 	if ($i == 1 || (TIME() - $time33 >= 3600)) {
 		$functions->optimise(true, 'analyze');
 		$time33 = TIME();
