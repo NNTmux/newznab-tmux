@@ -8,7 +8,7 @@ require_once("../test/showsleep.php");
 require_once("../test/functions.php");
 
 
-$version="0.3r698";
+$version="0.3r699";
 
 $db = new DB();
 $functions = new Functions();
@@ -549,10 +549,10 @@ while( $i > 0 )
 			$xxx_releases_now = $cat['count'];
 		}
 		if ($cat['parentID'] == 7000) {
-			$misc_releases_now = $cat['count'];
+			$book_releases_now = $cat['count'];
 		}
 		if ($cat['parentID'] == 8000) {
-			$book_releases_now = $cat['count'];
+			$misc_releases_now = $cat['count'];
 		}
 	}
 
