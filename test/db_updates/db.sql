@@ -8,12 +8,12 @@ ALTER TABLE  `releases`
   ADD `bitwise` SMALLINT UNSIGNED NOT NULL DEFAULT 0 AFTER `reqidstatus`,
   ADD INDEX `ix_releases_nfostatus` (`nfostatus` ASC) USING HASH,
   ADD INDEX `ix_releases_reqidstatus` (`reqidstatus` ASC) USING HASH,
-  CREATE INDEX ix_releases_bitwise on releases(bitwise),
-  CREATE INDEX ix_releases_passwordstatus on releases(passwordstatus),
-  CREATE INDEX ix_releases_dehashstatus ON releases(dehashstatus),
-  CREATE INDEX ix_releases_haspreview ON releases (haspreview ASC) USING HASH,
-  CREATE INDEX ix_releases_postdate_name ON releases (postdate, name),
-  CREATE INDEX ix_releases_status ON releases (ID, nfostatus, bitwise, passwordstatus, dehashstatus, reqidstatus, musicinfoID, consoleinfoID, bookinfoID, haspreview, categoryID, imdbID, rageID, groupID);
+  ADD INDEX `ix_releases_bitwise` (`bitwise`),
+  ADD INDEX `ix_releases_passwordstatus` (`passwordstatus`),
+  ADD INDEX `ix_releases_dehashstatus` (`dehashstatus`),
+  ADD INDEX `ix_releases_haspreview` (`haspreview` ASC) USING HASH,
+  ADD INDEX `ix_releases_postdate_name` (`postdate`, `name`),
+  ADD INDEX `ix_releases_status` (`ID`, `nfostatus`, `bitwise`, `passwordstatus`, `dehashstatus`, `reqidstatus`, `musicinfoID`, `consoleinfoID`, `bookinfoID`, `haspreview`, `categoryID`, `imdbID`, `rageID`, `groupID`);
 
 DELIMITER $$
 CREATE TRIGGER check_insert BEFORE INSERT ON releases FOR EACH ROW BEGIN IF NEW.searchname REGEXP '[a-fA-F0-9]{32}' OR NEW.name REGEXP '[a-fA-F0-9]{32}' THEN SET NEW.bitwise = ((NEW.bitwise & ~512)|512);ELSEIF NEW.name REGEXP '^\\[[[:digit:]]+\\]' THEN SET NEW.bitwise = ((NEW.bitwise & ~1024)|1024); END IF; END; $$
