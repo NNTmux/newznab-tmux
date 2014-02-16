@@ -40,21 +40,21 @@ export ADMIN_PATH=$NEWZPATH"/www/admin"
 
 
 #post processing per category
-#this now takes 0 for none, 1 for normal processing
+#this now takes true or false.
 #run processNfos
-export NFOS="0"
+export NFOS="false"
 
 #run processGames
-export GAMES="0"
+export GAMES="false"
 
 #run processMovies
-export MOVIES="0"
+export MOVIES="false"
 
 #run processMusic
-export MUSIC="0"
+export MUSIC="false"
 
 #run processEbook
-export EBOOK="0"
+export EBOOK="false"
 
 #these are true/false
 #run processTV
