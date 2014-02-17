@@ -8,7 +8,7 @@ require_once("../test/showsleep.php");
 require_once("../test/functions.php");
 
 
-$version="0.3r702";
+$version="0.3r703";
 
 $db = new DB();
 $functions = new Functions();
@@ -422,6 +422,7 @@ printf($mask3, "====================", "=========================", "===========
 printf($mask4, "Activated", $active_groups."(".$all_groups.")", $backfill_groups. "(".$all_groups.")");
 
 $i = 1;
+$time33 = TIME();
 while( $i > 0 )
 {
      //kill mediainfo and ffmpeg if exceeds 60 sec
@@ -429,9 +430,9 @@ while( $i > 0 )
 	shell_exec("killall -o 60s -9 ffmpeg 2>&1 1> /dev/null");
 
     // Ananlyze tables every 60 min
-	$time33 = TIME();
-	printf($c->info("\nAnalyzing your tables to refresh your indexes."));
+
 	if ($i == 1 || (TIME() - $time33 >= 3600)) {
+	    printf($c->info("\nAnalyzing your tables to refresh your indexes."));
 		$functions->optimise(true, 'analyze');
 		$time33 = TIME();
 	}
