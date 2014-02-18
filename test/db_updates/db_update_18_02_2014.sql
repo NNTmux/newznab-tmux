@@ -5,13 +5,12 @@ ALTER TABLE `releases`
     ADD COLUMN `isrenamed` BOOL NOT NULL DEFAULT 0,
     ADD COLUMN `ishashed` BOOL NOT NULL DEFAULT 0,
     ADD COLUMN `isrequestid` BOOL NOT NULL DEFAULT 0,
-    CREATE INDEX ix_releases_status (nzbstatus, iscategorized, isrenamed, nfostatus, ishashed, isrequestid, passwordstatus, dehashstatus, reqidstatus, musicinfoID, consoleinfoID, bookinfoID, haspreview, categoryID, imdbID, rageID);
-UPDATE releases
-    SET nzbstatus = 1 WHERE (bitwise & 256) = 256,
-    SET iscategorized = 1 WHERE (bitwise & 1) = 1,
-    SET isrenamed = 1 WHERE (bitwise & 4) = 4,
-    SET ishashed = 1 WHERE (bitwise & 512) = 512,
-    SET isrequestid = 1 WHERE (bitwise & 1024) = 1024;
+    CREATE INDEX ix_releases_status ON releases (nzbstatus, iscategorized, isrenamed, nfostatus, ishashed, isrequestid, passwordstatus, dehashstatus, reqidstatus, musicinfoID, consoleinfoID, bookinfoID, haspreview, categoryID, imdbID, rageID);
+UPDATE releases SET nzbstatus = 1 WHERE (bitwise & 256) = 256;
+UPDATE releases SET iscategorized = 1 WHERE (bitwise & 1) = 1;
+UPDATE releases SET isrenamed = 1 WHERE (bitwise & 4) = 4;
+UPDATE releases SET ishashed = 1 WHERE (bitwise & 512) = 512;
+UPDATE releases SET isrequestid = 1 WHERE (bitwise & 1024) = 1024;
 
 DROP TRIGGER IF EXISTS check_insert;
 DROP TRIGGER IF EXISTS check_update;
