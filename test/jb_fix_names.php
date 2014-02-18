@@ -53,29 +53,29 @@ function preName($argv, $argc)
 	}
     if ($usepre === true) {
 		$where = '';
-		$why = ' WHERE preID IS NULL AND (bitwise & 256) = 256';
+		$why = ' WHERE preID IS NULL AND nzbstatus = 1';
     } else if (isset($argv[1]) && is_numeric($argv[1])) {
 		$where = '';
-		$why = ' WHERE (bitwise & 260) = 256';
+		$why = ' WHERE nzbstatus = 1 AND isrenamed = 1';
 	} else if (isset($argv[2]) && is_numeric($argv[2]) && $full === true) {
 		$where = ' AND groupid = ' . $argv[2];
-		$why = ' WHERE (bitwise & 260) = 256';
+		$why = ' WHERE nzbstatus = 1 AND isrenamed = 1';
     } else if (isset($argv[2]) && preg_match('/\([\d, ]+\)/', $argv[2]) && $full === true) {
         $where = ' AND groupid IN ' . $argv[2];
-        $why = ' WHERE (bitwise & 260) = 256';
+        $why = ' WHERE nzbstatus = 1 AND isrenamed = 1';
 	} else if (isset($argv[2]) && preg_match('/\([\d, ]+\)/', $argv[2]) && $all === true) {
 		$where = ' AND groupid IN ' . $argv[2];
-		$why = ' WHERE (bitwise & 256) = 256';
+		$why = ' WHERE nzbstatus = 1';
 	} else if (isset($argv[2]) && is_numeric($argv[2]) && $all === true) {
 		$where = ' AND groupid = ' . $argv[2];
-		$why = ' WHERE (bitwise & 256) = 256';
+		$why = ' WHERE nzbstatus = 1';
 	} else if (isset($argv[2]) && is_numeric($argv[2])) {
 		$where = ' AND groupid = ' . $argv[2];
-		$why = ' WHERE (bitwise & 260) = 256';
+		$why = ' WHERE nzbstatus = 1 AND isrenamed = 1';
 	} else if ($full === true) {
-		$why = ' WHERE ((bitwise & 260) = 256 OR categoryid between 8000 AND 8999)';
+		$why = ' WHERE (nzbstatus = 1 AND isrenamed = 1 OR categoryid between 8000 AND 8999)';
 	} else if ($all === true) {
-		$why = ' WHERE (bitwise & 256) = 256';
+		$why = ' WHERE nzbstatus = 1';
 	} else {
 		$why = ' WHERE 1=1';
 	}
@@ -144,10 +144,10 @@ function preName($argv, $argc)
 
 						if ($propername == true) {
 							$run = $db->exec(sprintf("UPDATE releases SET rageID = NULL, seriesfull = NULL, season = NULL, episode = NULL, tvtitle = NULL, tvairdate = NULL, imdbID = NULL, musicinfoID = NULL, consoleinfoID = NULL, bookinfoID = NULL, "
-								. "anidbID = NULL, bitwise = ((bitwise & ~5)|5), searchname = %s, categoryID = %d, preID = " . $preid . " WHERE ID = %d", $db->escapeString($cleanName), $determinedcat, $row['ID']));
+								. "anidbID = NULL, iscategorized = 1, isrenamed = 1, searchname = %s, categoryID = %d, preID = " . $preid . " WHERE ID = %d", $db->escapeString($cleanName), $determinedcat, $row['ID']));
 						} else {
 							$run = $db->exec(sprintf("UPDATE releases SET rageID = NULL, seriesfull = NULL, season = NULL, episode = NULL, tvtitle = NULL, tvairdate = NULL, imdbID = NULL, musicinfoID = NULL, consoleinfoID = NULL, bookinfoID = NULL, "
-								. "anidbID = NULL, bitwise = ((bitwise & ~1)|1), searchname = %s, categoryID = %d, preID = " . $preid . " WHERE ID = %d", $db->escapeString($cleanName), $determinedcat, $row['ID']));
+								. "anidbID = NULL, iscategorized = 1, searchname = %s, categoryID = %d, preID = " . $preid . " WHERE ID = %d", $db->escapeString($cleanName), $determinedcat, $row['ID']));
 						}
 
 					   if ($increment === true) {
@@ -177,7 +177,7 @@ function preName($argv, $argc)
 				}
 			}
 				if ($cleanName == $row['name']) {
-				$db->query(sprintf("UPDATE releases SET bitwise = ((bitwise & ~5)|5) WHERE ID = %d", $row['ID']));
+				$db->query(sprintf("UPDATE releases SET iscategorized = 1, isrenamed = 1 WHERE ID = %d", $row['ID']));
 			}
 			if ($show === 2 && $usepre === false) {
 				$consoletools->overWritePrimary("Renamed Releases:  [Internal=" . number_format($internal) . "][External=" . number_format($external) . "][Prehash=" . number_format($pre) . "] " . $consoletools->percentString( ++$counter, $total));
@@ -200,7 +200,7 @@ function preName($argv, $argc)
 	$timestart = TIME();
 
 	if (isset($argv[1]) && is_numeric($argv[1])) {
-		$relcount = categorizeRelease("searchname","WHERE ((bitwise & 1) = 0 OR categoryID = 8010) AND adddate > NOW() - INTERVAL " . $argv[1] . " HOUR", true);
+		$relcount = categorizeRelease("searchname","WHERE iscategorized  = 0 OR categoryID = 8010) AND adddate > NOW() - INTERVAL " . $argv[1] . " HOUR", true);
 	} else if (isset($argv[2]) && preg_match('/\([\d, ]+\)/', $argv[2]) && $full === true) {
 		$relcount = categorizeRelease("searchname", str_replace(" AND", "WHERE", $where) . " AND (bitwise & 1) = 0 ", true);
     } else if (isset($argv[2]) && preg_match('/\([\d, ]+\)/', $argv[2]) && $all === true) {
@@ -214,9 +214,9 @@ function preName($argv, $argc)
 	} else if (isset($argv[1]) && $argv[1] == "all") {
 		$relcount = categorizeRelease("searchname", "", true);
 	} else if (isset($argv[1]) && $argv[1] == "preid") {
-		$relcount = categorizeRelease("searchname", "WHERE preID IS NULL AND (bitwise & 256) = 256", true);
+		$relcount = categorizeRelease("searchname", "WHERE preID IS NULL AND nzbstatus = 1", true);
 	} else {
-		$relcount = categorizeRelease("searchname", "WHERE ((bitwise & 1) = 0 OR categoryID = 8010) AND adddate > NOW() - INTERVAL " . $argv[1] . " HOUR", true);
+		$relcount = categorizeRelease("searchname", "WHERE iscategorized  = 0 OR categoryID = 8010) AND adddate > NOW() - INTERVAL " . $argv[1] . " HOUR", true);
 	}
 	$consoletools = new ConsoleTools();
 	$time = $consoletools->convertTime(TIME() - $timestart);
@@ -230,13 +230,13 @@ function resetSearchnames()
     $c = new ColorCLI();
 	echo $c->header("Resetting blank searchnames.");
 	$bad = $db->queryDirect("UPDATE releases SET rageID = NULL, seriesfull = NULL, season = NULL, episode = NULL, tvtitle = NULL, tvairdate = NULL, imdbID = NULL, musicinfoID = NULL, consoleinfoID = NULL, bookinfoID = NULL, "
-								. "anidbID = NULL, preID = NULL, searchname = name, bitwise = ((bitwise & ~5)|0) WHERE searchname = ''");
+								. "anidbID = NULL, preID = NULL, searchname = name, isrenamed = 0, iscategorized = 0 WHERE searchname = ''");
 	$tot = $bad->rowCount();
 	if ($tot > 0) {
 		echo $c->primary(number_format($tot) . " Releases had no searchname.");
 }
 	  	echo $c->header("Resetting searchnames that are 15 characters or less.");
-	$run = $db->queryDirect("UPDATE releases SET preID = NULL, searchname = name, bitwise = ((bitwise & ~5)|0) WHERE LENGTH(searchname) <= 15 AND LENGTH(name) > 15");
+	$run = $db->queryDirect("UPDATE releases SET preID = NULL, searchname = name, isrenamed = 0, iscategorized = 0 WHERE LENGTH(searchname) <= 15 AND LENGTH(name) > 15");
 	$total = $run->rowCount();
 	if ($total > 0) {
 		echo $c->primary(number_format($total) . " Releases had searchnames that were 15 characters or less.");
@@ -259,7 +259,7 @@ function resetSearchnames()
             foreach ($resrel as $rowrel)
             {
                 $catID = $cat->determineCategory($rowrel['groupID'], $rowrel[$type]);
-                $db->exec(sprintf("UPDATE releases SET bitwise = ((bitwise & ~1)|1), categoryID = %d WHERE ID = %d", $catID, $rowrel['ID']));
+                $db->exec(sprintf("UPDATE releases SET iscategorized = 1, categoryID = %d WHERE ID = %d", $catID, $rowrel['ID']));
                 $relcount ++;
                 if ($echooutput)
                     $consoletools->overWritePrimary("Categorizing: " . $consoletools->percentString($relcount, $total));

@@ -26,11 +26,11 @@ function preName($argv)
     $c = new ColorCLI();
 	$timestart = TIME();
 	if (isset($argv[1]) && $argv[1] === "all")
-		$res = $db->queryDirect('SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE (bitwise & 512) = 512');
+		$res = $db->queryDirect('SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE ishashed = 1');
 	else if (isset($argv[1]) && $argv[1] === "full")
-		$res = $db->queryDirect('SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE (bitwise & 512) = 512 AND dehashstatus BETWEEN -6 AND 0');
+		$res = $db->queryDirect('SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE ishashed = 1 AND dehashstatus BETWEEN -6 AND 0');
 	else if (isset($argv[1]) && is_numeric($argv[1]))
-		$res = $db->queryDirect('SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE (bitwise & 512) = 512 AND dehashstatus BETWEEN -6 AND 0 ORDER BY postdate DESC LIMIT '.$argv[1]);
+		$res = $db->queryDirect('SELECT ID, name, searchname, groupID, categoryID FROM releases WHERE ishashed = 1 AND dehashstatus BETWEEN -6 AND 0 ORDER BY postdate DESC LIMIT '.$argv[1]);
 	$total = $res->rowCount();
 	$counter = 0;
 	$show = '';
@@ -54,7 +54,7 @@ function preName($argv)
 				{
 					$determinedcat = $category->determineCategory($row["groupID"], $pre['dirname']);
 					$result = $db->query(sprintf("UPDATE releases SET rageID = NULL, seriesfull = NULL, season = NULL, episode = NULL, tvtitle = NULL, tvairdate = NULL, imdbID = NULL, musicinfoID = NULL, consoleinfoID = NULL, bookinfoID = NULL, "
-								. "anidbID = NULL, preID = %d, dehashstatus = 1, bitwise = ((bitwise & ~37)|37), searchname = %s, categoryID = %d WHERE ID = %d", $pre['ID'], $db->escapeString($pre['dirname']), $determinedcat, $row['ID']));
+								. "anidbID = NULL, preID = %d, dehashstatus = 1, isrenamed = 1, iscategorized = 1, bitwise = ((bitwise & ~32)|32), searchname = %s, categoryID = %d WHERE ID = %d", $pre['ID'], $db->escapeString($pre['dirname']), $determinedcat, $row['ID']));
                     $total = count($result);
 					if ( $total > 0)
 					{

@@ -840,7 +840,7 @@ Class Predb
 
 		$tq = "";
 		if ($time == 1)
-			$tq = " and r.adddate > (now() - interval 3 hour)";
+			$tq = $tq = 'AND r.adddate > (NOW() - INTERVAL 3 HOUR) ORDER BY rf.releaseID, rf.size DESC';
 		$ct = "";
 		if ($cats == 1)
 			$ct = " and r.categoryID in (2020, 5050, 6070, 8010)";
@@ -852,11 +852,19 @@ Class Predb
 				$te = " in the past 3 hours";
 			echo $this->c->header ("Fixing search names".$te." using the prehash md5.");
 		}
-        $regex = "AND ((r.bitwise & 512) = 512 OR rf.name REGEXP'[a-fA-F0-9]{32}')";
-		$res = $db->queryDirect(sprintf('SELECT r.ID AS releaseID, r.name, r.searchname, r.categoryID, r.groupID, '
+        $regex = "AND ((r.ishashed = 1 OR rf.name REGEXP'[a-fA-F0-9]{32}')";
+		if ($cats === 3) {
+			$query = sprintf('SELECT r.ID AS releaseID, r.name, r.searchname, r.categoryID, r.groupID, '
 				. 'dehashstatus, rf.name AS filename FROM releases r '
 				. 'LEFT OUTER JOIN releasefiles rf ON r.ID = rf.releaseID '
-				. 'WHERE (bitwise & 260) = 256 AND dehashstatus BETWEEN -6 AND 0 %s %s %s', $regex, $ct, $tq));
+				. 'WHERE nzbstatus = 1 AND preID IS NULL %s', $regex);
+		} else {
+			$query = sprintf('SELECT r.ID AS releaseID, r.name, r.searchname, r.categoryID, r.groupID, '
+				. 'dehashstatus, rf.name AS filename FROM releases r '
+				. 'LEFT OUTER JOIN releasefiles rf ON r.ID = rf.releaseID '
+				. 'WHERE nzbstatus = 1 AND isrenamed = 0 AND dehashstatus BETWEEN -6 AND 0 %s %s %s', $regex, $ct, $tq);
+		}
+        $res = $db->queryDirect($query);
         $total = $res->rowCount();
 		echo $this->c->primary(number_format($total) . " releases to process.");
 		if ($total > 0) {
