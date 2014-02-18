@@ -202,15 +202,15 @@ function preName($argv, $argc)
 	if (isset($argv[1]) && is_numeric($argv[1])) {
 		$relcount = categorizeRelease("searchname","WHERE iscategorized  = 0 OR categoryID = 8010) AND adddate > NOW() - INTERVAL " . $argv[1] . " HOUR", true);
 	} else if (isset($argv[2]) && preg_match('/\([\d, ]+\)/', $argv[2]) && $full === true) {
-		$relcount = categorizeRelease("searchname", str_replace(" AND", "WHERE", $where) . " AND (bitwise & 1) = 0 ", true);
+		$relcount = categorizeRelease("searchname", str_replace(" AND", "WHERE", $where) . " AND iscategorized  = 0 ", true);
     } else if (isset($argv[2]) && preg_match('/\([\d, ]+\)/', $argv[2]) && $all === true) {
         $relcount = categorizeRelease("searchname", str_replace(" AND", "WHERE", $where), true);
 	} else 	if (isset($argv[2]) && is_numeric($argv[2]) && $argv[1] == "full") {
-		$relcount = categorizeRelease("searchname", str_replace(" AND", "WHERE", $where) . " AND (bitwise & 1) = 0 ", true);
+		$relcount = categorizeRelease("searchname", str_replace(" AND", "WHERE", $where) . " AND iscategorized  = 0 ", true);
     } else  if (isset($argv[2]) && is_numeric($argv[2]) && $argv[1] == "all") {
         $relcount = categorizeRelease("searchname", str_replace(" AND", "WHERE", $where), true);
 	} else if (isset($argv[1]) && $argv[1] == "full") {
-		$relcount = categorizeRelease("searchname", "WHERE categoryID = 8010 OR (bitwise & 1) = 0", true);
+		$relcount = categorizeRelease("searchname", "WHERE categoryID = 8010 OR iscategorized  = 0", true);
 	} else if (isset($argv[1]) && $argv[1] == "all") {
 		$relcount = categorizeRelease("searchname", "", true);
 	} else if (isset($argv[1]) && $argv[1] == "preid") {
