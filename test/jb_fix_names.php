@@ -246,7 +246,7 @@ function resetSearchnames()
     // Categorizes releases.
     // $type = name or searchname
     // Returns the quantity of categorized releases.
-    function categorizeRelease($type, $where="", $echooutput=false)
+    function categorizeRelease($type, $where, $echooutput = false)
     {
         $db = new DB();
         $cat = new Category();
