@@ -11,25 +11,57 @@ require_once("consoletools.php");
 
 
 //This script is ported from nZEDb and adapted for newznab
-/* Values of relnamestatus:
- * 0  : New release, just inserted into the table.
- * 1  : Categorized release.
- * 								Previously (see 8,9,10): 2 : Fixed with namefixer.
- * 3  : Fixed with post proc (from mp3 tags or music.php).
- * 4  : Fixed with misc_sorter.
- * 5  : Fixed with decrypt hashes.
- * 6  : Matched properly in namecleaning.php's releaseCleaner function.
- * 7  : Fixed with PAR2.
- * 8  : Fixed with namefixer NFO.
- * 9  : Fixed with namefixer Files.
- * 10 : Fixed with namefixer preDB.
- * 11 : Fixed with prehash.php
- * 12 : Fixed with requestID.
- * 16 : Fixed with jb_fix_names.php
- * 20 : The release was checked by namefixer nfo but no name was found
- * 21 : The release was checked by namefixer filename but no name was found
- * 22 : The release was checked by namefixer par2 but no name was found
- */
+/* These constants can not be used as they are
+	 * To select where false            - 'SELECT * FROM releases WHERE isrenamed = 0;' - selects all that have not been renamed
+	 * To select where true             - 'SELECT * FROM releases WHERE iscategorized = 1;' - selects all that have been categorized
+	 * To select multiple true or false - 'SELECT * FROM releases WHERE isrenamed = 0 AND iscategorized = 0;' - selects all that have not been renamed and have not been categorized
+	 *
+	 * To set false                     - 'UPDATE releases SET isrenamed = 0);' - sets all releases to not renamed
+	 * To set true                      - 'UPDATE releases SET iscategorized = 1;' - sets all releases to categorized
+	 * To set multiple true or false    - 'UPDATE releases SET iscategorized = 1 AND isrenamed = 0;' - sets all releases to categorized true and renamed false
+
+	  // One bit each, max 32, limited by 32 bit OS's
+	  //const NF_NEW			=	   0;	0000 0000 0000 0000 0000 	New release, just inserted into the table.
+	  //const NF_CATEGORIZED	=	   1;	0000 0000 0000 0000 0001 	Categorized release.
+	  //0000 0000 0000 0000 0010 	Spare - Previously 2 (now split into 8,9,10) : Fixed with namefixer.
+	  //const NF_RENAMED		=	   4;	0000 0000 0000 0000 0100 	Renamed using any script.
+	  const NF_POST_PROC	=	   8;	0000 0000 0000 0000 1000 	Processed by post proc (from mp3 tags or music.php).
+	  const NF_MISC_SORTER	=	  16;	0000 0000 0000 0001 0000 	Processed by misc_sorter.
+	  const NF_PAR2			=	  32;	0000 0000 0000 0010 0000 	Processed by namefixer PAR2.
+	  const NF_NF_NFO		=	  64;	0000 0000 0000 0100 0000 	Processed by namefixer NFO.
+	  const NF_NF_FILES		=	 128;	0000 0000 0000 1000 0000 	Processed by namefixer Files.
+
+	  //const NZB_STATUS		=	 256;	0000 0000 0001 0000 0000 	NZBStatus 0 = no nzb, 256 = is an nzb
+	  //const HASHED			=	 512;	0000 0000 0010 0000 0000 	ishashed 0 = not hashed, 512 = is hashed
+	  //const REQUEST			=   1024;	0000 0000 0100 0000 0000 	isrequestid 0 = not a requestid, 1024 = is a requestid
+
+	  // To display counts for false
+	  SELECT
+	  (SELECT COUNT(*) FROM releases WHERE iscategorized = 0) as not_categorized,
+	  (SELECT COUNT(*) FROM releases WHERE isrenamed = 0) as not_renamed,
+	  (SELECT COUNT(*) FROM releases WHERE (bitwise & 8) = 0) as not_proc_by_pp,
+	  (SELECT COUNT(*) FROM releases WHERE (bitwise & 16) = 0) as not_proc_by_sorter,
+	  (SELECT COUNT(*) FROM releases WHERE (bitwise & 32) = 0) as not_proc_by_par2,
+	  (SELECT COUNT(*) FROM releases WHERE (bitwise & 64) = 0) as not_proc_by_nfo,
+	  (SELECT COUNT(*) FROM releases WHERE (bitwise & 128) = 0) as not_proc_by_files,
+	  (SELECT COUNT(*) FROM releases WHERE nzbstatus = 0) as no_nzb,
+	  (SELECT COUNT(*) FROM releases WHERE ishashed = 0) as not_hashed,
+	  (SELECT COUNT(*) FROM releases WHERE isrequestid = 0) as not_requestid;
+
+	  // To display counts for true
+	  SELECT
+	  (SELECT COUNT(*) FROM releases WHERE iscategorized = 1) as categorized,
+	  (SELECT COUNT(*) FROM releases WHERE isrenamed = 1) as renamed,
+	  (SELECT COUNT(*) FROM releases WHERE (bitwise & 8) = 8) as proc_by_pp,
+	  (SELECT COUNT(*) FROM releases WHERE (bitwise & 16) = 16) as proc_by_sorter,
+	  (SELECT COUNT(*) FROM releases WHERE (bitwise & 32) = 32) as proc_by_par2,
+	  (SELECT COUNT(*) FROM releases WHERE (bitwise & 64) = 64) as proc_by_nfo,
+	  (SELECT COUNT(*) FROM releases WHERE (bitwise & 128) = 128) as proc_by_files,
+	  (SELECT COUNT(*) FROM releases WHERE nzbstatus = 1) as has_nzb,
+	  (SELECT COUNT(*) FROM releases WHERE ishashed = 1) as is_hashed,
+	  (SELECT COUNT(*) FROM releases WHERE isrequestid =1) as is_requestid;
+
+	 */
 
 
 CONST PREDB_REGEX = "/([\w\(\)]+[\._]([\w\(\)]+[\._-])+[\w\(\)]+-\w+)/";
@@ -72,13 +104,13 @@ class Namefixer
 			if ($cats === 3) {
 			$query = "SELECT rel.ID AS releaseID FROM releases rel "
 				. "INNER JOIN releasenfo nfo ON (nfo.releaseID = rel.ID) "
-				. "WHERE (bitwise & 256) = 256 AND preID IS NULL";
+				. "WHERE nzbstatus = 1 AND preID IS NULL";
 			$cats = 2;
             $preid = true;
 		} else {
 			$query = "SELECT rel.ID AS releaseID FROM releases rel "
 				. "INNER JOIN releasenfo nfo ON (nfo.releaseID = rel.ID) "
-				. "WHERE ((bitwise & 4) = 0 OR rel.categoryID = 8010) AND (bitwise & 64) = 0";
+				. "WHERE (isrenamed = 0 OR rel.categoryID = 8010) AND (bitwise & 64) = 0";
 		}
 
 		//24 hours, other cats
@@ -149,14 +181,14 @@ class Namefixer
 			$query = "SELECT relfiles.name AS textstring, rel.categoryID, rel.searchname, rel.groupID, relfiles.releaseID AS fileID, "
 				. "rel.ID AS releaseID FROM releases rel "
 				. "INNER JOIN releasefiles relfiles ON (relfiles.releaseID = rel.ID) "
-				. "WHERE (bitwise & 256) = 256 AND preID IS NULL";
+				. "WHERE nzbstatus = 1 AND preID IS NULL";
 			$cats = 2;
             $preid = true;
 		} else {
 			$query = "SELECT relfiles.name AS textstring, rel.categoryID, rel.searchname, rel.groupID, relfiles.releaseID AS fileID, "
 				. "rel.ID AS releaseID FROM releases rel "
 				. "INNER JOIN releasefiles relfiles ON (relfiles.releaseID = rel.ID) "
-				. "WHERE ((bitwise & 4) = 0 OR rel.categoryID = 8010) AND (bitwise & 128) = 0";
+				. "WHERE (isrenamed = 0 OR rel.categoryID = 8010) AND (bitwise & 128) = 0";
 		}
 
 		//24 hours, other cats
@@ -211,10 +243,10 @@ class Namefixer
         $functions = new Functions();
 		$type = "PAR2, ";
 		if ($cats === 3) {
-			$query = "SELECT rel.ID AS releaseID, rel.guid, rel.groupID FROM releases rel WHERE (bitwise & 256) = 256 AND preID IS NULL";
+			$query = "SELECT rel.ID AS releaseID, rel.guid, rel.groupID FROM releases rel WHERE nzbstatus = 1 AND preID IS NULL";
 			$cats = 2;
 		} else {
-			$query = "SELECT rel.ID AS releaseID, rel.guid, rel.groupID FROM releases rel WHERE ((bitwise & 4) = 0 OR rel.categoryID = 8010) AND (bitwise & 32) = 0";
+			$query = "SELECT rel.ID AS releaseID, rel.guid, rel.groupID FROM releases rel WHERE (isrenamed = 0 OR rel.categoryID = 8010) AND (bitwise & 32) = 0";
 		}
 
 		//24 hours, other cats
@@ -325,18 +357,18 @@ class Namefixer
                     $db = new DB();
                     if ($namestatus == 1) {
                         if ($type == "NFO, ") {
-                            $status = "bitwise = ((bitwise & ~69)|69),";
+                            $status = "isrenamed = 1, iscategorized = 1, bitwise = ((bitwise & ~64)|64),";
                         } else if ($type == "PAR2, ") {
-                            $status = "bitwise = ((bitwise & ~37)|37),";
+                            $status = "isrenamed = 1, iscategorized = 1, bitwise = ((bitwise & ~32)|32),";
                         } else if ($type == "Filenames, ") {
-                            $status = "bitwise = ((bitwise & ~133)|133),";
+                            $status = "isrenamed = 1, iscategorized = 1, bitwise = ((bitwise & ~128)|128),";
                         }
                                 $run = $db->exec(sprintf("UPDATE releases SET rageID = NULL, seriesfull = NULL, season = NULL, episode = NULL, tvtitle = NULL, tvairdate = NULL, imdbID = NULL, musicinfoID = NULL, consoleinfoID = NULL, bookinfoID = NULL, "
-								. "anidbID = NULL, preID = %s, searchname = %s, bitwise = ((bitwise & ~4)|4),"
+								. "anidbID = NULL, preID = %s, searchname = %s, isrenamed = 1,"
 								. " %s categoryID = %d WHERE ID = %d", $preid, $db->escapeString(substr($newname, 0, 255)), $status, $determinedcat, $release["releaseID"]));
 					} else {
 						$run = $db->exec(sprintf("UPDATE releases SET rageID = NULL, seriesfull = NULL, season = NULL, episode = NULL, tvtitle = NULL, tvairdate = NULL, imdbID = NULL, musicinfoID = NULL, consoleinfoID = NULL, bookinfoID = NULL, "
-								. "anidbID = NULL, preID = %s, searchname = %s, bitwise = ((bitwise & ~1)|1), "
+								. "anidbID = NULL, preID = %s, searchname = %s, iscategorized = 1, "
 								. "categoryID = %d WHERE ID = %d", $preid, $db->escapeString(substr($newname, 0, 255)), $determinedcat, $release["releaseID"]));
                                 }
                 }
@@ -369,7 +401,7 @@ class Namefixer
 						if ($namestatus == 1)
                         {
 							$db->query(sprintf("UPDATE releases SET rageID = NULL, seriesfull = NULL, season = NULL, episode = NULL, tvtitle = NULL, tvairdate = NULL, imdbID = NULL, musicinfoID = NULL, consoleinfoID = NULL, bookinfoID = NULL, "
-								. "anidbID = NULL, searchname = %s, categoryID = %d, bitwise = ((bitwise & ~5)|5), dehashstatus = 1 WHERE ID = %d", $db->escapeString($row["title"]), $determinedcat, $release["ID"]));
+								. "anidbID = NULL, searchname = %s, categoryID = %d, isrenamed = 1, iscategorized = 1, dehashstatus = 1 WHERE ID = %d", $db->escapeString($row["title"]), $determinedcat, $release["ID"]));
                         }
 						else
                         {
