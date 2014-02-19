@@ -8,11 +8,7 @@ require_once("../test/showsleep.php");
 require_once("../test/functions.php");
 
 
-<<<<<<< HEAD
-$version="0.3r709";
-=======
 $version="0.3r706";
->>>>>>> parent of 40723e3... Updates to monitor
 
 $db = new DB();
 $functions = new Functions();
