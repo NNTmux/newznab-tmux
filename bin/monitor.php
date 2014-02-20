@@ -8,7 +8,7 @@ require_once("../test/showsleep.php");
 require_once("../test/functions.php");
 
 
-$version="0.3r707";
+$version="0.3r709";
 
 $db = new DB();
 $functions = new Functions();
@@ -63,7 +63,7 @@ $split_query = "SELECT
 //$posted_date = "SELECT(SELECT UNIX_TIMESTAMP(adddate) from releases order by adddate asc limit 1) AS adddate;";
 
 //flush query cache
-//$qcache = "FLUSH QUERY CACHE";
+$qcache = "FLUSH QUERY CACHE";
 
 //get variables from defaults.sh
 $path = dirname(__FILE__);
@@ -458,21 +458,21 @@ while( $i > 0 )
 	unset($array['']);
 
 	//allow tmux to create panes before running queries
-	if ( $i == 1 ) {
+   /*	if ( $i == 1 ) {
 		printf("\n\033[1;31mTmux panes safely created in ");
 		for($a=10;$a>-1;$a--)
 		{
 			printf("$a..");
 			sleep(1);
-		}
+		}*/
 		$rel = $db->query("UPDATE `binaries` SET `procstat`=0,`procattempts`=0,`regexID`=NULL, `relpart`=0,`reltotalpart`=0,`relname`=NULL WHERE procstat not in (4, 6)");
 	}
 
 	//defrag the query cache every 15 minutes
-	/*if (( TIME() - $time18 >= 900 ) || ( $i == 1 ))
+	if (( TIME() - $time18 >= 900 ) || ( $i == 1 ))
 	{
 		$result = @$db->query($qcache);
-	} */
+	}
 
 	//rename the session
 	if ( $old_session != $array['TMUX_SESSION'] ) {
