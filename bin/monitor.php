@@ -458,16 +458,15 @@ while( $i > 0 )
 	unset($array['']);
 
 	//allow tmux to create panes before running queries
-   /*	if ( $i == 1 ) {
+   /*if ( $i == 1 ) {
 		printf("\n\033[1;31mTmux panes safely created in ");
 		for($a=10;$a>-1;$a--)
 		{
 			printf("$a..");
 			sleep(1);
-		}*/
-		$rel = $db->query("UPDATE `binaries` SET `procstat`=0,`procattempts`=0,`regexID`=NULL, `relpart`=0,`reltotalpart`=0,`relname`=NULL WHERE procstat not in (4, 6)");
-	}
-
+		}
+	}*/
+    $rel = $db->query("UPDATE `binaries` SET `procstat`=0,`procattempts`=0,`regexID`=NULL, `relpart`=0,`reltotalpart`=0,`relname`=NULL WHERE procstat not in (4, 6)");
 	//defrag the query cache every 15 minutes
 	if (( TIME() - $time18 >= 900 ) || ( $i == 1 ))
 	{
