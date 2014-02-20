@@ -8,7 +8,7 @@ require_once("../test/showsleep.php");
 require_once("../test/functions.php");
 
 
-$version="0.3r709";
+$version="0.3r710";
 
 $db = new DB();
 $functions = new Functions();
@@ -457,15 +457,6 @@ while( $i > 0 )
 	$array = array_combine($varnames, $vardata);
 	unset($array['']);
 
-	//allow tmux to create panes before running queries
-   /*if ( $i == 1 ) {
-		printf("\n\033[1;31mTmux panes safely created in ");
-		for($a=10;$a>-1;$a--)
-		{
-			printf("$a..");
-			sleep(1);
-		}
-	}*/
     $rel = $db->query("UPDATE `binaries` SET `procstat`=0,`procattempts`=0,`regexID`=NULL, `relpart`=0,`reltotalpart`=0,`relname`=NULL WHERE procstat not in (4, 6)");
 	//defrag the query cache every 15 minutes
 	if (( TIME() - $time18 >= 900 ) || ( $i == 1 ))
@@ -716,7 +707,7 @@ while( $i > 0 )
 	$panes4 = str_replace("\n", '', explode(" ", $panes_win_5));
 
 	//kill update_binaries.php backfill.php and import-nzb if timer exceeded
-	$killit=explode(" ", relativeTime("$newestdate"));
+	$killit=explode(" ", relativeTime("$newestadd"));
 	$killed="false";
 	if ( $array['KILL_UPDATES'] != "0" ) {
 		if ((( $killit[1] != "secs" ) && ( $killit[1] != "sec" )) && (( $killit[1] == "hrs" ) || ( $killit[1] == "hr" ) || ( $killit[0] >= $array['KILL_UPDATES'] )) && ( $i % 5 == 0 )) {
