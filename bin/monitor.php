@@ -8,7 +8,7 @@ require_once("../test/showsleep.php");
 require_once("../test/functions.php");
 
 
-$version="0.3r711";
+$version="0.3r712";
 
 $db = new DB();
 $functions = new Functions();
@@ -41,7 +41,6 @@ $proc = "SELECT
 ( SELECT table_rows AS cnt FROM information_schema.TABLES where table_name = 'binaries' AND TABLE_SCHEMA = '".DB_NAME."' ) AS binaries_total,
 ( SELECT concat(round((data_length+index_length)/(1024*1024*1024),2),'GB') AS cnt FROM information_schema.tables where table_name = 'parts' AND TABLE_SCHEMA = '".DB_NAME."' ) AS partsize,
 ( SELECT concat(round((data_length+index_length)/(1024*1024*1024),2),'GB') AS cnt FROM information_schema.tables where table_name = 'binaries' AND TABLE_SCHEMA = '".DB_NAME."' ) AS binariessize,
-( SELECT UNIX_TIMESTAMP(adddate) FROM releases USE INDEX(ix_releases_status) WHERE (bitwise & 256) = 256 ORDER BY adddate DESC LIMIT 1 ) AS newestadd,
 ( SELECT COUNT( ID ) FROM groups WHERE active = 1 ) AS active_groups,
 ( SELECT COUNT( ID ) FROM groups WHERE name IS NOT NULL ) AS all_groups,
 ( SELECT COUNT( ID ) FROM groups WHERE first_record IS NOT NULL and `backfill_target` > 0 and first_record_postdate != '2000-00-00 00:00:00'  < first_record_postdate) AS backfill_groups,
