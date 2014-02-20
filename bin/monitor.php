@@ -8,7 +8,7 @@ require_once("../test/showsleep.php");
 require_once("../test/functions.php");
 
 
-$version="0.3r710";
+$version="0.3r711";
 
 $db = new DB();
 $functions = new Functions();
@@ -373,7 +373,11 @@ $mask5 = $c->tmuxOrange("%-16.16s %25.25s %25.25s");
 //create initial display, USP connection count, prehash count and groups count adapted from nZEDb
 passthru('clear');
 //printf("\033[1;31m  First insert:\033[0m ".relativeTime("$firstdate")."\n");
-printf($mask2, "Monitor Running v$version [".$patch."]: ", relativeTime("$time"));
+if ($array['RUNNING'] = "true" ) {
+	printf($mask2, "Monitor Running v$version [" . $patch . "]: ", relativeTime("$time"));
+} else {
+	printf($mask2, "Monitor Off v$version [" . $patch . "]: ", relativeTime("$time"));
+}
 printf($mask1, "USP Connections:", $uspactiveconnections . " active (" . $usptotalconnections . " total) - " . $host . ":" . $port);;
 printf($mask1, "Newest Release:", "$newestname");
 printf($mask1, "Release Added:", relativeTime("$newestadd")."ago");
@@ -823,14 +827,18 @@ $usptotalconnections  = str_replace("\n", '', shell_exec("ss -n | grep -c " . $i
 	//update display
 	passthru('clear');
 	//printf("\033[1;31m  First insert:\033[0m ".relativeTime("$firstdate")."\n");
-	printf($mask2, "Monitor Running v$version [".$patch."]: ", relativeTime("$time"));
+	if ($array['RUNNING'] = "true" ) {
+	printf($mask2, "Monitor Running v$version [" . $patch . "]: ", relativeTime("$time"));
+}   else {
+	printf($mask2, "Monitor Off v$version [" . $patch . "]: ", relativeTime("$time"));
+}
     printf($mask1, "USP Connections:", $uspactiveconnections . " active (" . $usptotalconnections . " total) - " . $host . ":" . $port);
 	printf($mask1, "Newest Release:", "$newestname");
 	printf($mask1, "Release Added:", relativeTime("$newestadd")."ago");
     if ($array['PREDB'] = "true"){
     printf($mask1, "Predb Updated:", relativeTime("$newestpredb")."ago");
     }
-if ($array ['FIXRELEASES'] = "true") {
+    if ($array ['FIXRELEASES'] = "true") {
     printf($mask1, "Prehash Updated:", relativeTime("$newestprehash")."ago");
     }
 
