@@ -8,7 +8,7 @@ require_once("../test/showsleep.php");
 require_once("../test/functions.php");
 
 
-$version="0.3r716";
+$version="0.3r717";
 
 $db = new DB();
 $functions = new Functions();
@@ -29,11 +29,11 @@ $proc = "SELECT
 ( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE categoryID BETWEEN 2000 AND 2999 AND imdbID IS NULL ) AS movies,
 ( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE categoryID BETWEEN 3000 AND 3999 AND musicinfoID IS NULL) AS audio,
 ( SELECT COUNT(*) FROM releases r USE INDEX(ix_releases_status), category c WHERE c.ID = r.categoryID AND c.parentID = 6000 AND r.passwordstatus BETWEEN -6 AND -1 AND r.haspreview = -1 AND c.disablepreview = 0) AS xxx,
-( SELECT COUNT(*) FROM releases r USE INDEX(ix_releases_status), category c WHERE c.ID = r.categoryID AND c.parentID = 4000 AND r.passwordstatus BETWEEN -6 AND -1 AND r.haspreview = -1 AND c.disablepreview = 0) AS pc,
+( SELECT COUNT(*) FROM releases r USE INDEX(ix_releases_status) left join category c on c.ID = r.categoryID where (r.passwordstatus between -6 and -1) or (r.haspreview = -1 and c.disablepreview = 0)) AS pc,
 ( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE categoryID BETWEEN 5000 AND 5999 AND rageID = -1) AS tv,
 ( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE categoryID = 7020 AND bookinfoID IS NULL ) AS book,
 ( SELECT COUNT(*) FROM releases r USE INDEX(ix_releases_status), category c WHERE c.ID = r.categoryID AND r.passwordstatus BETWEEN -6 AND -1 AND r.haspreview = -1 AND c.disablepreview = 0) AS work,
-( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE (bitwise & 256) = 256) AS releases,
+( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status)) AS releases,
 ( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE releasenfoID = 0) AS nforemains,
 ( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE releasenfoID not in (0, -1)) AS nfo,
 ( SELECT table_rows AS cnt FROM information_schema.TABLES where table_name = 'parts' AND TABLE_SCHEMA = '".DB_NAME."' ) AS parts,
