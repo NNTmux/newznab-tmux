@@ -8,7 +8,7 @@ require_once("../test/showsleep.php");
 require_once("../test/functions.php");
 
 
-$version="0.3r721";
+$version="0.3r723";
 
 $db = new DB();
 $functions = new Functions();
@@ -62,7 +62,7 @@ $split_query = "SELECT
 //$posted_date = "SELECT(SELECT UNIX_TIMESTAMP(adddate) from releases order by adddate asc limit 1) AS adddate;";
 
 //flush query cache
-$qcache = "FLUSH QUERY CACHE";
+//$qcache = "FLUSH QUERY CACHE";
 
 //get variables from defaults.sh
 $path = dirname(__FILE__);
@@ -372,11 +372,7 @@ $mask5 = $c->tmuxOrange("%-16.16s %25.25s %25.25s");
 //create initial display, USP connection count, prehash count and groups count adapted from nZEDb
 passthru('clear');
 //printf("\033[1;31m  First insert:\033[0m ".relativeTime("$firstdate")."\n");
-if ($array['RUNNING'] = "true" ) {
-	printf($mask2, "Monitor Running v$version [" . $patch . "]: ", relativeTime("$time"));
-} else {
-	printf($mask2, "Monitor Off v$version [" . $patch . "]: ", relativeTime("$time"));
-}
+printf($mask2, "Monitor Running v$version [" . $patch . "]: ", relativeTime("$time"));
 printf($mask1, "USP Connections:", $uspactiveconnections . " active (" . $usptotalconnections . " total) - " . $host . ":" . $port);;
 printf($mask1, "Newest Release:", "$newestname");
 printf($mask1, "Release Added:", relativeTime("$newestadd")."ago");
@@ -462,10 +458,10 @@ while( $i > 0 )
 
 
 	//defrag the query cache every 15 minutes
-	if (( TIME() - $time18 >= 900 ) || ( $i == 1 ))
+	/*if (( TIME() - $time18 >= 900 ) || ( $i == 1 ))
 	{
 		$result = @$db->query($qcache);
-	}
+	} */
 
 	//rename the session
 	if ( $old_session != $array['TMUX_SESSION'] ) {
@@ -826,11 +822,7 @@ $usptotalconnections  = str_replace("\n", '', shell_exec("ss -n | grep -c " . $i
 	//update display
 	passthru('clear');
 	//printf("\033[1;31m  First insert:\033[0m ".relativeTime("$firstdate")."\n");
-	if ($array['RUNNING'] = "true" ) {
 	printf($mask2, "Monitor Running v$version [" . $patch . "]: ", relativeTime("$time"));
-}   else {
-	printf($mask2, "Monitor Off v$version [" . $patch . "]: ", relativeTime("$time"));
-}
     printf($mask1, "USP Connections:", $uspactiveconnections . " active (" . $usptotalconnections . " total) - " . $host . ":" . $port);
 	printf($mask1, "Newest Release:", "$newestname");
 	printf($mask1, "Release Added:", relativeTime("$newestadd")."ago");
