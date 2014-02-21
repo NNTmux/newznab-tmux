@@ -8,7 +8,7 @@ require_once("../test/showsleep.php");
 require_once("../test/functions.php");
 
 
-$version="0.3r720";
+$version="0.3r721";
 
 $db = new DB();
 $functions = new Functions();
@@ -460,10 +460,6 @@ while( $i > 0 )
 	$array = array_combine($varnames, $vardata);
 	unset($array['']);
 
-    //run initial query on tmux start
-   if ( $i == 1 ) {
-       $rel = $db->query("UPDATE `binaries` SET `procstat`=0,`procattempts`=0,`regexID`=NULL, `relpart`=0,`reltotalpart`=0,`relname`=NULL WHERE procstat not in (4, 6)");
-	}
 
 	//defrag the query cache every 15 minutes
 	if (( TIME() - $time18 >= 900 ) || ( $i == 1 ))
