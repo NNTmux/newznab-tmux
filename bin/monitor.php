@@ -8,7 +8,7 @@ require_once("../test/showsleep.php");
 require_once("../test/functions.php");
 
 
-$version="0.3r723";
+$version="0.3r724";
 
 $db = new DB();
 $functions = new Functions();
@@ -50,9 +50,9 @@ $proc = "SELECT
 ( SELECT name from releases order by adddate desc limit 1 ) AS newestaddname";
 //$proc = "SELECT * FROM procCnt;";
 $proc2 = "SELECT
-	(SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE (bitwise & 1284) = 1280 AND reqidstatus in (0, -1) OR (reqidstatus = -3 AND adddate > NOW() - INTERVAL 2 HOUR)) AS requestid_inprogress,
-	(SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE (bitwise & 256) = 256 AND reqidstatus = 1 OR reqID IS NOT NULL) AS requestid_matched,
-	(SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE (bitwise & 256) = 256 AND preID IS NOT NULL) AS prehash_matched,
+	(SELECT COUNT(*) FROM releases WHERE nzbstatus = 1 AND isrenamed = 0 AND isrequestid = 1 AND reqidstatus in (0, -1) OR (reqidstatus = -3 AND adddate > NOW() - INTERVAL 2 HOUR)) AS requestid_inprogress,
+	(SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE nzbstatus = 1 AND reqidstatus = 1 OR reqID IS NOT NULL) AS requestid_matched,
+	(SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE nzbstatus = 1 AND preID IS NOT NULL) AS prehash_matched,
 	(SELECT COUNT(DISTINCT(preID)) FROM releases) AS distinct_prehash_matched";
 
 $split_query = "SELECT
