@@ -75,14 +75,14 @@ Class NZBcontents
 					$pp = new Functions();
 					if (($pp->parsePAR2($nzbcontents->segments->segment, $relID, $groupID, $nntp, $show)) === true && $namestatus === 1)
                     {
-						$db->exec(sprintf('UPDATE releases SET bitwise = ((bitwise & ~32)|32) WHERE ID = %d', $relID));
+						$db->exec(sprintf('UPDATE releases SET proc_par2 = 1 WHERE ID = %d', $relID));
 						return true;
 					}
 				}
 			}
 		}
         if ($namestatus === 1)
-			$db->exec(sprintf('UPDATE releases SET bitwise = ((bitwise & ~32)|32) WHERE ID = %d', $relID));
+			$db->exec(sprintf('UPDATE releases SET proc_par2 = 1 WHERE ID = %d', $relID));
 		return false;
         }
 

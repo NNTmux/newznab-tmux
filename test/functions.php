@@ -278,7 +278,7 @@ class Functions
         if ($messageID == '')
 			return false;
         $t = 'UNIX_TIMESTAMP(postdate)';
-		$quer = $db->queryOneRow('SELECT groupID, categoryID, searchname, '.$t.' as postdate, ID as releaseID FROM releases WHERE (bitwise & 4) = 0 AND ID = '.$relID);
+		$quer = $db->queryOneRow('SELECT groupID, categoryID, searchname, '.$t.' as postdate, ID as releaseID FROM releases WHERE isrenamed = 0 AND ID = '.$relID);
   		if ($quer['categoryID'] != Category::CAT_MISC_OTHER)
             return false;
             

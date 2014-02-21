@@ -39,13 +39,13 @@ if (isset($argv[2]) && is_numeric($argv[2])) {
 
 //runs on every release
 if (isset($argv[1]) && $argv[1] === "all") {
-	$res = $db->queryDirect("SELECT r.ID, r.searchname, r.categoryID, g.name AS groupname FROM releases r LEFT JOIN groups g ON r.groupID = g.ID WHERE (bitwise & 1280) = 1280");
+	$res = $db->queryDirect("SELECT r.ID, r.searchname, r.categoryID, g.name AS groupname FROM releases r LEFT JOIN groups g ON r.groupID = g.ID WHERE nzbstatus = 1 AND isrequestid = 1");
 //runs on all releases not already renamed
 } else if (isset($argv[1]) && $argv[1] === "full") {
-	$res = $db->queryDirect("SELECT r.ID, r.searchname, r.categoryID, g.name AS groupname FROM releases r LEFT JOIN groups g ON r.groupID = g.ID WHERE ((bitwise & 1284) = 1280 " . $time . " AND reqidstatus in (0, -1)");
+	$res = $db->queryDirect("SELECT r.ID, r.searchname, r.categoryID, g.name AS groupname FROM releases r LEFT JOIN groups g ON r.groupID = g.ID WHERE nzbstatus = 1 AND (isrenamed = 0 AND isrequestid = 1 " . $time . " AND reqidstatus in (0, -1)");
 //runs on all releases not already renamed limited by user
 } else if (isset($argv[1]) && is_numeric($argv[1])) {
-	$res = $db->queryDirect("SELECT r.ID, r.searchname, r.categoryID, g.name AS groupname FROM releases r LEFT JOIN groups g ON r.groupID = g.ID WHERE ((bitwise & 1284) = 1280 " . $time . " AND reqidstatus in (0, -1) ORDER BY postdate DESC LIMIT " . $argv[1]);
+	$res = $db->queryDirect("SELECT r.ID, r.searchname, r.categoryID, g.name AS groupname FROM releases r LEFT JOIN groups g ON r.groupID = g.ID WHERE nzbstatus = 1 AND (isrenamed = 0 AND isrequestid = 1 " . $time . " AND reqidstatus in (0, -1) ORDER BY postdate DESC LIMIT " . $argv[1]);
 }
 
         $total = $res->rowCount();
@@ -87,7 +87,7 @@ if (isset($argv[1]) && $argv[1] === "all") {
 	                $groupname = $functions->getByNameByID($row["groupname"]);
 	                $determinedcat = $category->determineCategory($groupname, $title );
 			        $run = $db->queryDirect(sprintf('UPDATE releases SET rageID = NULL, seriesfull = NULL, season = NULL, episode = NULL, tvtitle = NULL, tvairdate = NULL, imdbID = NULL, musicinfoID = NULL, consoleinfoID = NULL, bookinfoID = NULL, "
-								. "anidbID = NULL, preID = %d, reqidstatus = 1, bitwise = ((bitwise & ~5)|5), searchname = %s, categoryID = %d WHERE ID = %d', $preid, $db->escapeString($title), $determinedcat, $row['ID']));
+								. "anidbID = NULL, preID = %d, reqidstatus = 1, isrenamed = 1, iscategorized = 1, searchname = %s, categoryID = %d WHERE ID = %d', $preid, $db->escapeString($title), $determinedcat, $row['ID']));
                     if ($row['searchname'] !== $newTitle)
                     {
                     $counter++;
