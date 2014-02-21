@@ -1,9 +1,9 @@
 <?php
 
 require(dirname(__FILE__)."/config.php");
-require(dirname(__FILE__)."/temp/postprocess1.php");
+require(dirname(__FILE__)."/temp/postprocess2.php");
 
-$postprocess = new PostProcess1(true);
+$postprocess = new PostProcess2(true);
 $postprocess->processNfos1();
 
 ?>
