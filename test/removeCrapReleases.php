@@ -78,7 +78,7 @@ if (isset($argv[1]) && $argv[1] == 'true') {
 	{
 		$type = "Gibberish";
 		$db = new DB();
-		$sql = $db->query("SELECT ID, guid, searchname FROM releases WHERE searchname REGEXP '^[a-zA-Z0-9]{15,}$' AND releasenfoID = 0 AND iscategorized = 1 AND rarinnerfilecount >= 0".$and);
+		$sql = $db->query("SELECT ID, guid, searchname FROM releases WHERE searchname REGEXP '^[a-zA-Z0-9]{15,}$' AND releasenfoID IN (0,-1) AND (proc_files = 1 OR proc_par2 = 1 OR proc_nfo = 1) AND rarinnerfilecount >= 0".$and);
 		$delcount = deleteReleases($sql, $type);
 		return $delcount;
 	}
@@ -88,7 +88,7 @@ if (isset($argv[1]) && $argv[1] == 'true') {
 	{
 		$type = "Hashed";
 		$db = new DB();
-		$sql = $db->query("SELECT ID, guid, searchname FROM releases WHERE searchname REGEXP '[a-zA-Z0-9]{25,}' AND releasenfoID = 0 AND iscategorized = 1 AND rarinnerfilecount >= 0".$and);
+		$sql = $db->query("SELECT ID, guid, searchname FROM releases WHERE searchname REGEXP '[a-zA-Z0-9]{25,}' AND releasenfoID IN (0,-1) AND ishashed = 1 AND (proc_files = 1 OR proc_par2 = 1 OR proc_nfo = 1) AND rarinnerfilecount >= 0".$and);
 		$delcount = deleteReleases($sql, $type);
 		return $delcount;
 	}
