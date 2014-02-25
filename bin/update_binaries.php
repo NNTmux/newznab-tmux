@@ -5,6 +5,7 @@ require_once(WWW_DIR."/lib/groups.php");
 require_once(WWW_DIR."/lib/binaries.php");
 require_once("../test/ColorCLI.php");
 $time = TIME();
+$c = new ColorCLI();
 
 if (isset($argv[1]))
 {
