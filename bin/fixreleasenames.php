@@ -6,6 +6,7 @@ require_once(WWW_DIR."/lib/groups.php");
 require_once(WWW_DIR.'/lib/nntp.php');
 require_once("../test/ColorCLI.php");
 require_once("../test/namefixer.php");
+require_once("../test/functions.php"); 
 
 $c = new ColorCLI();
 if (!isset($argv[1])) {
