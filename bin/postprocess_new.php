@@ -57,22 +57,22 @@ if (isset($argv[1]) && $argv[1] === "additional") {
 } else if (isset($argv[1]) && $argv[1] === "tv"){
 	    if ($site->lookuptvrage == 1)
 		{
-			$tvrage = new TVRage($this->echooutput);
-			$tvrage->processTvReleases(($this->site->lookuptvrage==1));
+			$tvrage = new TVRage(true);
+			$tvrage->processTvReleases(($site->lookuptvrage==1));
 		}
         else {
             echo $c->info("TVRage lookup disabled in site settings.\n");
         }
 		if ($site->lookupthetvdb == 1)
 		{
-			$thetvdb = new TheTVDB($this->echooutput);
+			$thetvdb = new TheTVDB(true);
 			$thetvdb->processReleases();
 		}
         else {
             echo $c->info("TheTVDB lookup disabled in site settings.\n");
         }
 } else if (isset($argv[1]) && $argv[1] === "games") {
-    if ($site->lookuptvrage == 1){
+    if ($site->lookupgames == 1){
     $postprocess -> processGames();
 }   else{
         echo $c->info("Games lookup disabled in site settings.\n");
@@ -85,7 +85,7 @@ if (isset($argv[1]) && $argv[1] === "additional") {
         echo $c->info("Books lookup disabled in site settings.\n");
     }
 } else if (isset($argv[1]) && $argv[1] === "music") {
-        if ($site->lookuptvrage == 1){
+        if ($site->lookupmusic == 1){
                 $postprocess -> processMusic();
             }
         else {
