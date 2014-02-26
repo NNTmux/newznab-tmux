@@ -38,11 +38,11 @@ if len(sys.argv) == 3 and sys.argv[1] == "nfo" and sys.argv[2] == "clean":
 elif len(sys.argv) == 3 and sys.argv[1] == "par2" and sys.argv[2] == "clean":
 	clean = " isrenamed = 0 AND proc_files = 1 AND proc_nfo = 1 "
 elif len(sys.argv) == 3 and sys.argv[1] == "nfo" and sys.argv[2] == "preid":
-	clean = " preid = IS NULL "
+	clean = " preID = IS NULL "
 elif len(sys.argv) == 3 and sys.argv[1] == "par2" and sys.argv[2] == "preid":
-	clean = " preid = IS NULL "
+	clean = " preID = IS NULL "
 elif len(sys.argv) == 3 and sys.argv[1] == "filename" and sys.argv[2] == "preid":
-	clean = " preid = IS NULL "
+	clean = " preID = IS NULL "
 else:
 	clean = " isrenamed = 0 "
 
@@ -56,22 +56,22 @@ datas = []
 maxtries = 0
 
 if len(sys.argv) > 1 and sys.argv[1] == "nfo":
-    run = "SELECT DISTINCT rel.ID AS releaseID FROM releases rel INNER JOIN releasenfo nfo ON (nfo.releaseID = rel.ID) WHERE nzbstatus = 1 AND proc_nfo = 0 AND" + clean + "ORDER BY postdate DESC LIMIT %s"
+    run = "SELECT DISTINCT rel.ID AS releaseID FROM releases rel INNER JOIN releasenfo nfo ON (nfo.releaseID = rel.ID) WHERE proc_nfo = 0 AND" + clean + "ORDER BY postdate DESC LIMIT %s"
     cur[0].execute(run, process_all)
     datas = cur[0].fetchall()
 elif len(sys.argv) > 1 and (sys.argv[1] == "filename"):
-    run = "SELECT DISTINCT rel.ID AS releaseID FROM releases rel INNER JOIN releasefiles relfiles ON (relfiles.releaseID = rel.ID) WHERE nzbstatus = 1 AND proc_files = 0 AND" + clean + "ORDER BY postdate ASC LIMIT %s"
+    run = "SELECT DISTINCT rel.ID AS releaseID FROM releases rel INNER JOIN releasefiles relfiles ON (relfiles.releaseID = rel.ID) WHERE proc_files = 0 AND" + clean + "ORDER BY postdate ASC LIMIT %s"
     cur[0].execute(run, process_all)
     datas = cur[0].fetchall()
 elif len(sys.argv) > 1 and (sys.argv[1] == "md5"):
     while len(datas) == 0 and maxtries >= -5:
-        run = "SELECT DISTINCT rel.ID FROM releases rel INNER JOIN releasefiles rf ON rel.ID = rf.releaseID WHERE nzbstatus = 1 AND isrenamed = 0 AND rel.dehashstatus BETWEEN %s AND 0 AND rel.passwordstatus >= -1 AND (ishashed = 1 OR rf.name REGEXP'[a-fA-F0-9]{32}') ORDER BY postdate ASC LIMIT %s"
+        run = "SELECT DISTINCT rel.ID FROM releases rel INNER JOIN releasefiles rf ON rel.ID = rf.releaseID WHERE isrenamed = 0 AND rel.dehashstatus BETWEEN %s AND 0 AND rel.passwordstatus >= -1 AND (ishashed = 1 OR rf.name REGEXP'[a-fA-F0-9]{32}') ORDER BY postdate ASC LIMIT %s"
         cur[0].execute(run, (maxtries,process_all))
         datas = cur[0].fetchall()
         maxtries = maxtries - 1
 elif len(sys.argv) > 1 and (sys.argv[1] == "par2"):
 	#This one does from oldest posts to newest posts, since nfo pp does same thing but newest to oldest
-    run = "SELECT ID AS releaseID, guid, groupID FROM releases WHERE nzbstatus = 1 AND proc_par2 = 0 AND" + clean + "ORDER BY postdate ASC LIMIT %s"
+    run = "SELECT ID AS releaseID, guid, groupID FROM releases WHERE proc_par2 = 0 AND" + clean + "ORDER BY postdate ASC LIMIT %s"
     cur[0].execute(run, process_all)
     datas = cur[0].fetchall()
 
