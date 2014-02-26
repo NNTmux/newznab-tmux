@@ -8,7 +8,7 @@ require_once("../test/showsleep.php");
 require_once("../test/functions.php");
 
 
-$version="0.3r820";
+$version="0.3r831";
 
 $db = new DB();
 $functions = new Functions();
@@ -1349,11 +1349,17 @@ $usptotalconnections  = str_replace("\n", '', shell_exec("ss -n | grep -c " . $i
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.9 'echo \"\033[38;5;\"$color\"m\n$panes2[9] Has no work to process \" && date +\"%D %T\"' 2>&1 1> /dev/null");
         }
 
-    //run fixReleaseNames in pane 3.0
+    //run fixreleasenames threaded in pane 3.0
 	if (( $array['MAX_LOAD'] >= get_load()) && ( $array['FIXRELEASES'] == "true" )) {
 		$color = get_color();
 		$log = writelog($panes3[0]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.0 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes3[0] $ds2 && cd $_test && $_php fixReleaseNames.php 3 true other yes show 2>&1 $log && $_php fixReleaseNames.php 5 true other yes show 2>&1 $log && $_php fixReleaseNames.php 7 true other yes show 2>&1 $log && $_php hash_decrypt.php 1000 2>&1 $log && echo \" \033[1;0;33m\" && $_sleep {$array ['FIXRELEASES_TIMER']} && $ds1 $panes3[0] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.0 ' \
+                    $ds1 $panes3[0] $ds2; \
+                    cd $_test && $_python ${DIR}/../test/fixreleasenames_threaded.py md5 2>&1 $log; \
+                    $_python ${DIR}/../test/fixreleasenames_threaded.py nfo 2>&1 $log; \
+                    $_python ${DIR}/../test/fixreleasenames_threaded.py filename 2>&1 $log; \
+                    $_python ${DIR}/../test/fixreleasenames_threaded.py par2 2>&1 $log; \
+                    $_sleep {$array ['FIXRELEASES_TIMER']} && $ds1 $panes3[0] $ds3' 2>&1 1> /dev/null");
 		$time27 = TIME();}
 	  elseif ( $array['FIXRELEASES'] != "true" ) {
 		$color = get_color();
