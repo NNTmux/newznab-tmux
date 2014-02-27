@@ -244,6 +244,12 @@ export RELEASES_SLEEP="40"
 #Script may stop working after svn update.
 #This is a modified script used by nZEDb and is work in progress
 export FIXRELEASES="false"
+
+#Run fixreleasenames theraded (requires python and cymysql, read threaded_scripts_readme.txt 
+#for instructions
+
+export FIXRELEASES_THREADED="false"
+
 #How often to run this script in seconds, default is 10 minutes
 export FIXRELEASES_TIMER="600"
 
