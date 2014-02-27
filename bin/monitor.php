@@ -8,7 +8,7 @@ require_once("../test/showsleep.php");
 require_once("../test/functions.php");
 
 
-$version="0.3r834";
+$version="0.3r835";
 
 $db = new DB();
 $functions = new Functions();
@@ -1386,13 +1386,18 @@ $usptotalconnections  = str_replace("\n", '', shell_exec("ss -n | grep -c " . $i
                 $color = get_color();
                 shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.1 'echo \"\033[38;5;\"$color\"m\n$panes3[1] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
         }
-        //run requestID in pane 3.2
-	if (( $array['MAX_LOAD'] >= get_load()) && ( $array['REQID'] == "true" )) {
+        //run requestID or requestid threaded in pane 3.2
+	if (( $array['MAX_LOAD'] >= get_load()) && ( $array['REQID'] == "true" ) && ( $array['REQID_THREADED'] == "true" )) {
+		$color = get_color();
+		$log = writelog($panes3[2]);
+		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.2 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes3[2] $ds2 && cd $_test && $_python ${DIR}/../test/requestid_threaded.py 2>&1 $log && echo \" \033[1;0;33m\" && $_sleep {$array['REQID_TIMER']} && $ds1 $panes3[2] $ds3' 2>&1 1> /dev/null");
+		$time30 = TIME();
+    } elseif (( $array['MAX_LOAD'] >= get_load()) && ( $array['REQID'] == "true" ) && ( $array['REQID_THREADED'] == "false" )) {
 		$color = get_color();
 		$log = writelog($panes3[2]);
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.2 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes3[2] $ds2 && cd $_test && $_php requestID.php 1000 true 2>&1 $log && echo \" \033[1;0;33m\" && $_sleep {$array['REQID_TIMER']} && $ds1 $panes3[2] $ds3' 2>&1 1> /dev/null");
-		$time30 = TIME();}
-	  elseif ( $array['REQID'] != "true" ) {
+		$time30 = TIME();
+    } elseif ( $array['REQID'] != "true" ) {
 		$color = get_color();
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.2 'echo \"\033[38;5;\"$color\"m\n$panes3[2] Disabled by RequestID\" && date +\"%D %T\"' 2>&1 1> /dev/null");
 	} elseif ( $array['MAX_LOAD'] <= get_load()) {

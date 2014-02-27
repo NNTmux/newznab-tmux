@@ -245,7 +245,7 @@ export RELEASES_SLEEP="40"
 #This is a modified script used by nZEDb and is work in progress
 export FIXRELEASES="false"
 
-#Run fixreleasenames theraded (requires python and cymysql, read threaded_scripts_readme.txt 
+#Run fixreleasenames threaded.Requires python and cymysql, read threaded_scripts_readme.txt 
 #for instructions
 
 export FIXRELEASES_THREADED="false"
@@ -260,7 +260,7 @@ export FIXRELEASES_TIMER="600"
 #Before you use this, import db.sql and/or updates from test/db_updates/ folder
 export PREDBHASH="false"
 #How often to run this script in seconds, default is 10 minutes
-export PREDBHASH_TIMER="600"
+export PREDBHASH_TIMER="40"
 
 ############################################################
 
@@ -270,10 +270,13 @@ export PREDBHASH_TIMER="600"
 
 export REQID="false"
 
-#How often to run this script in seconds, default is 20 minutes
-# don't go below this value as you can get banned from allfilled servers
+#Run threaded requestid. Requires python and cymysql, read threaded_scripts_readme.txt 
+#for instructions
+export REQID_THREADED="false" 
 
-export REQID_TIMER="1200"
+#How often to run this script in seconds, default is 40 seconds
+
+export REQID_TIMER="40"
 
 ############################################################
 
@@ -281,9 +284,9 @@ export REQID_TIMER="1200"
 
 export REMOVECRAP="false"
 
-#How often to run this script in seconds, default is 10 minutes
+#How often to run this script in seconds, default is 2 minutes
 
-export REMOVECRAP_TIMER="600"
+export REMOVECRAP_TIMER="120"
 
 ############################################################
 
@@ -292,9 +295,9 @@ export REMOVECRAP_TIMER="600"
 
 export UPPRE="true"
 
-#How often to run this script in seconds, default is 20 minutes
+#How often to run this script in seconds, default is 40 seconds
 
-export UPPRE_TIMER="1200"
+export UPPRE_TIMER="40"
 
 ############################################################
 
