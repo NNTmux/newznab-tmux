@@ -8,7 +8,7 @@ require_once("../test/showsleep.php");
 require_once("../test/functions.php");
 
 
-$version="0.3r840";
+$version="0.3r841";
 
 $db = new DB();
 $functions = new Functions();
@@ -1102,15 +1102,23 @@ $usptotalconnections  = str_replace("\n", '', shell_exec("ss -n | grep -c " . $i
                 }
 
 	//runs update_release and in 0.5 once if needed and exits
-	if (( $array['MAX_LOAD_RELEASES'] >= get_load()) && ( $array['RELEASES'] == "true" )) {
+	if (( $array['MAX_LOAD_RELEASES'] >= get_load()) && ( $array['RELEASES'] == "true" ) && ($array['RELEASES_THREADED'] == "true")) {
 		$color = get_color();
 		$log = writelog($panes0[5]);
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[5] $ds2 && cd $_test && $_python ${DIR}/../test/releases_threaded.py && 2>&1 $log && echo \" \033[1;0;33m\" && $_sleep {$array['RELEASES_SLEEP']} && $ds1 $panes0[5] $ds3' 2>&1 1> /dev/null");
-	} elseif (( $array['MAX_LOAD_RELEASES'] >= get_load()) && ( $array['RELEASES'] == "true" )) {
+	} elseif (( $array['MAX_LOAD_RELEASES'] >= get_load()) && ( $array['RELEASES'] == "true" ) && ($array['RELEASES_THREADED'] == "false")) {
+		$color = get_color();
+		$log = writelog($panes0[5]);
+		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[5] $ds2 && cd $_bin && $_php update_releases.php && 2>&1 $log && echo \" \033[1;0;33m\" && $_sleep {$array['RELEASES_SLEEP']} && $ds1 $panes0[5] $ds3' 2>&1 1> /dev/null");
+    } elseif (( $array['MAX_LOAD_RELEASES'] >= get_load()) && ( $array['RELEASES'] == "true" ) && ($array['RELEASES_THREADED'] == "true")) {
 		$color = get_color();
 		$log = writelog($panes0[5]);
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[5] $ds2 && cd $_test && $_python ${DIR}/../test/releases_threaded.py 2>&1 $log && echo \" \033[1;0;33m\" && $_sleep {$array['RELEASES_SLEEP']}  && $ds1 $panes0[5] $ds3' 2>&1 1> /dev/null");
-	} elseif (( $array['RELEASES'] == "true" ) && ( $array['MAX_LOAD_RELEASES'] <= get_load())) {
+	} elseif (( $array['MAX_LOAD_RELEASES'] >= get_load()) && ( $array['RELEASES'] == "true" ) && ($array['RELEASES_THREADED'] == "false")) {
+		$color = get_color();
+		$log = writelog($panes0[5]);
+		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[5] $ds2 && cd $_bin && $_php update_releases.php && 2>&1 $log && echo \" \033[1;0;33m\" && $_sleep {$array['RELEASES_SLEEP']} && $ds1 $panes0[5] $ds3' 2>&1 1> /dev/null");
+    } elseif (( $array['RELEASES'] == "true" ) && ( $array['MAX_LOAD_RELEASES'] <= get_load())) {
                 $color = get_color();
                 shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.5 'echo \"\033[38;5;\"$color\"m\n$panes0[5] Disabled by MAX_LOAD_RELEASES\" && date +\"%D %T\"' 2>&1 1> /dev/null");
     } elseif ( $array['RELEASES'] != "true" ) {

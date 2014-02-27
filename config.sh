@@ -232,6 +232,9 @@ export MISC_ONLY="false"
 #Create releases, this is really only necessary to turn off when you only want to post process
 export RELEASES="false"
 
+#Use the threaded script. This is atm realy not threaded, but python script is ready for threading
+export RELEASES_THREADED="false"
+
 #Set, in seconds - how long the update_release should sleep between runs
 #bottom right
 export RELEASES_SLEEP="40"
