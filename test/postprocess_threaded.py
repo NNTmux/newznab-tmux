@@ -91,7 +91,7 @@ if len(sys.argv) > 1 and sys.argv[1] == "additional":
 	ps5 = format(int(dbgrab[0][13]))
 	ps6 = format(int(dbgrab[0][14]))
 elif len(sys.argv) > 1 and sys.argv[1] == "nfo":
-	cur[0].execute("SELECT (SELECT value FROM tmux WHERE setting = 'postthreads') AS a, (SELECT value FROM tmux WHERE setting = 'maxaddprocessed') AS b, (SELECT value FROM tmux WHERE setting = 'maxnfoprocessed') AS c, (SELECT value FROM tmux WHERE setting = 'maximdbprocessed') AS d, (SELECT value FROM tmux WHERE setting = 'maxrageprocessed') AS e, (SELECT value FROM tmux WHERE setting = 'maxsizetopostprocess') AS f, (SELECT value FROM site WHERE setting = 'tmpunrarpath') AS g, (SELECT value FROM tmux WHERE setting = 'post') AS h, (SELECT value FROM tmux WHERE setting = 'post_non') AS i, (SELECT count(*) FROM releases WHERE nfostatus = -1 "+groupID+") as j, (SELECT count(*) FROM releases WHERE nfostatus = -2 "+groupID+") as k, (SELECT count(*) FROM releases WHERE nfostatus = -3 "+groupID+") as l, (SELECT count(*) FROM releases WHERE nfostatus = -4 "+groupID+") as m, (SELECT count(*) FROM releases WHERE nfostatus = -5 "+groupID+") as n, (SELECT count(*) FROM releases WHERE nfostatus = -6 "+groupID+") as o")
+	cur[0].execute("SELECT (SELECT value FROM tmux WHERE setting = 'postthreads') AS a, (SELECT value FROM tmux WHERE setting = 'maxaddprocessed') AS b, (SELECT value FROM tmux WHERE setting = 'maxnfoprocessed') AS c, (SELECT value FROM tmux WHERE setting = 'maximdbprocessed') AS d, (SELECT value FROM tmux WHERE setting = 'maxrageprocessed') AS e, (SELECT value FROM tmux WHERE setting = 'maxsizetopostprocess') AS f, (SELECT value FROM site WHERE setting = 'tmpunrarpath') AS g, (SELECT value FROM tmux WHERE setting = 'post') AS h, (SELECT value FROM tmux WHERE setting = 'post_non') AS i, (SELECT count(*) FROM releases WHERE releasenfoID = 0 AND nfostatus = -1 "+groupID+") as j, (SELECT count(*) FROM releases WHERE releasenfoID = 0 AND nfostatus = -2 "+groupID+") as k, (SELECT count(*) FROM releases WHERE releasenfoID = 0 AND nfostatus = -3 "+groupID+") as l, (SELECT count(*) FROM releases WHERE releasenfoID = 0 AND nfostatus = -4 "+groupID+") as m, (SELECT count(*) FROM releases WHERE releasenfoID = 0 AND nfostatus = -5 "+groupID+") as n, (SELECT count(*) FROM releases WHERE releasenfoID = 0 AND nfostatus = -6 "+groupID+") as o")
 	dbgrab = cur[0].fetchall()
 	ps1 = format(int(dbgrab[0][9]))
 	ps2 = format(int(dbgrab[0][10]))
@@ -163,27 +163,27 @@ if sys.argv[1] == "additional":
 						maxtries = -6
 
 elif sys.argv[1] == "nfo":
-	cur[0].execute("SELECT ID, guid, groupID, name from releases WHERE nfostatus = -1 "+groupID+" ORDER BY postdate DESC LIMIT "+str(process_nfo))
+	cur[0].execute("SELECT ID, guid, groupID, name from releases WHERE releasenfoID = 0 AND nfostatus = -1 "+groupID+" ORDER BY postdate DESC LIMIT "+str(process_nfo))
 	datas = cur[0].fetchall()
 	maxtries = -1
 	if len(datas) < process_nfo:
-		cur[0].execute("SELECT ID, guid, groupID, name from releases WHERE nfostatus = -2 "+groupID+" ORDER BY postdate DESC LIMIT "+str(process_nfo - len(datas)))
+		cur[0].execute("SELECT ID, guid, groupID, name from releases WHERE releasenfoID = 0 AND nfostatus = -2 "+groupID+" ORDER BY postdate DESC LIMIT "+str(process_nfo - len(datas)))
 		datas += cur[0].fetchall()
 		maxtries = -2
 		if len(datas) < process_nfo:
-			cur[0].execute("SELECT ID, guid, groupID, name from releases WHERE nfostatus = -3 "+groupID+" ORDER BY postdate DESC LIMIT "+str(process_nfo - len(datas)))
+			cur[0].execute("SELECT ID, guid, groupID, name from releases WHERE releasenfoID = 0 AND nfostatus = -3 "+groupID+" ORDER BY postdate DESC LIMIT "+str(process_nfo - len(datas)))
 			datas += cur[0].fetchall()
 			maxtries = -3
 			if len(datas) < process_nfo:
-				cur[0].execute("SELECT ID, guid, groupID, name from releases WHERE nfostatus = -4 "+groupID+" ORDER BY postdate DESC LIMIT "+str(process_nfo - len(datas)))
+				cur[0].execute("SELECT ID, guid, groupID, name from releases WHERE releasenfoID = 0 AND nfostatus = -4 "+groupID+" ORDER BY postdate DESC LIMIT "+str(process_nfo - len(datas)))
 				datas += cur[0].fetchall()
 				maxtries = -4
 				if len(datas) < process_nfo:
-					cur[0].execute("SELECT ID, guid, groupID, name from releases WHERE nfostatus = -5 "+groupID+" ORDER BY postdate DESC LIMIT "+str(process_nfo - len(datas)))
+					cur[0].execute("SELECT ID, guid, groupID, name from releases WHERE releasenfoID = 0 AND nfostatus = -5 "+groupID+" ORDER BY postdate DESC LIMIT "+str(process_nfo - len(datas)))
 					datas += cur[0].fetchall()
 					maxtries = -5
 					if len(datas) < process_nfo:
-						cur[0].execute("SELECT ID, guid, groupID, name from releases WHERE nfostatus = -6 "+groupID+" ORDER BY postdate DESC LIMIT "+str(process_nfo - len(datas)))
+						cur[0].execute("SELECT ID, guid, groupID, name from releases WHERE releasenfoID = 0 AND nfostatus = -6 "+groupID+" ORDER BY postdate DESC LIMIT "+str(process_nfo - len(datas)))
 						datas += cur[0].fetchall()
 						maxtries = -6
 

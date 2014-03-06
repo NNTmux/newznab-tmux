@@ -8,7 +8,7 @@ require_once("../test/showsleep.php");
 require_once("../test/functions.php");
 
 
-$version="0.3r842";
+$version="0.3r850";
 
 $db = new DB();
 $functions = new Functions();
@@ -47,8 +47,8 @@ $proc = "SELECT
 ( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE categoryID = 7020 AND bookinfoID IS NULL ) AS book,
 ( SELECT COUNT(*) FROM releases r USE INDEX(ix_releases_status), category c WHERE c.ID = r.categoryID AND r.passwordstatus = -1 AND r.haspreview = -1 AND c.disablepreview = 0) AS work,
 ( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status)) AS releases,
-( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE releasenfoID = 0) AS nforemains,
-( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE releasenfoID not in (0, -1)) AS nfo,
+( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE releasenfoID = 0 AND nfostatus BETWEEN -6 AND -1) AS nforemains,
+( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE releasenfoID not in (0, -1) AND nfostatus = 1) AS nfo,
 ( SELECT table_rows AS cnt FROM information_schema.TABLES WHERE table_name = 'parts' AND TABLE_SCHEMA = '".DB_NAME."' ) AS parts,
 ( SELECT COUNT(ID) FROM binaries WHERE procstat = 0 ) AS binaries,
 ( SELECT table_rows AS cnt FROM information_schema.TABLES WHERE table_name = 'binaries' AND TABLE_SCHEMA = '".DB_NAME."' ) AS binaries_total,
@@ -63,9 +63,9 @@ $proc = "SELECT
 ( SELECT name from releases order by adddate desc limit 1 ) AS newestaddname";
 //$proc = "SELECT * FROM procCnt;";
 $proc2 = "SELECT
-	(SELECT COUNT(*) FROM releases WHERE nzbstatus = 1 AND isrenamed = 0 AND isrequestid = 1 AND reqidstatus in (0, -1) OR (reqidstatus = -3 AND adddate > NOW() - INTERVAL 2 HOUR)) AS requestid_inprogress,
-	(SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE nzbstatus = 1 AND reqidstatus = 1 OR reqID IS NOT NULL) AS requestid_matched,
-	(SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE nzbstatus = 1 AND preID IS NOT NULL) AS prehash_matched,
+	(SELECT COUNT(*) FROM releases WHERE isrenamed = 0 AND isrequestid = 1 AND reqidstatus in (0, -1) OR (reqidstatus = -3 AND adddate > NOW() - INTERVAL 2 HOUR)) AS requestid_inprogress,
+	(SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE reqidstatus = 1 OR reqID IS NOT NULL) AS requestid_matched,
+	(SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE preID IS NOT NULL) AS prehash_matched,
 	(SELECT COUNT(DISTINCT(preID)) FROM releases) AS distinct_prehash_matched";
 
 $split_query = "SELECT
@@ -1094,7 +1094,7 @@ $usptotalconnections  = str_replace("\n", '', shell_exec("ss -n | grep -c " . $i
 		$color = get_color();
 		$log = writelog($panes0[1]);
 		if (( $array['MAX_LOAD'] >= get_load()) && ( $work_remaining_now > $f )) {
-			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.1 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[1] $ds2 && cd $_bin && $_php postprocess_new.php additional 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes0[1] $ds3' 2>&1 1> /dev/null");
+			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.1 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[1] $ds2 && $_python ${DIR}/../test/postprocess_threaded.py additional 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes0[1] $ds3' 2>&1 1> /dev/null");
 		} elseif ( $work_remaining_now <= $f ) {
 			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.1 'echo \"\033[38;5;\"$color\"m\n$panes0[1] $work_remaining_now < $f\nHas no work to process \" && date +\"%D %T\"' 2>&1 1> /dev/null");
 		} elseif ( $array['MAX_LOAD'] <= get_load()) {
@@ -1105,7 +1105,7 @@ $usptotalconnections  = str_replace("\n", '', shell_exec("ss -n | grep -c " . $i
 	if (( $array['MAX_LOAD_RELEASES'] >= get_load()) && ( $array['RELEASES'] == "true" ) && ($array['RELEASES_THREADED'] == "true")) {
 		$color = get_color();
 		$log = writelog($panes0[5]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[5] $ds2 && cd $_test && $_python ${DIR}/../test/releases_threaded.py && 2>&1 $log && echo \" \033[1;0;33m\" && $_sleep {$array['RELEASES_SLEEP']} && $ds1 $panes0[5] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[5] $ds2 && $_python ${DIR}/../test/releases_threaded.py && 2>&1 $log && echo \" \033[1;0;33m\" && $_sleep {$array['RELEASES_SLEEP']} && $ds1 $panes0[5] $ds3' 2>&1 1> /dev/null");
 	} elseif (( $array['MAX_LOAD_RELEASES'] >= get_load()) && ( $array['RELEASES'] == "true" ) && ($array['RELEASES_THREADED'] == "false")) {
 		$color = get_color();
 		$log = writelog($panes0[5]);
@@ -1113,7 +1113,7 @@ $usptotalconnections  = str_replace("\n", '', shell_exec("ss -n | grep -c " . $i
     } elseif (( $array['MAX_LOAD_RELEASES'] >= get_load()) && ( $array['RELEASES'] == "true" ) && ($array['RELEASES_THREADED'] == "true")) {
 		$color = get_color();
 		$log = writelog($panes0[5]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[5] $ds2 && cd $_test && $_python ${DIR}/../test/releases_threaded.py 2>&1 $log && echo \" \033[1;0;33m\" && $_sleep {$array['RELEASES_SLEEP']}  && $ds1 $panes0[5] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[5] $ds2 && $_python ${DIR}/../test/releases_threaded.py 2>&1 $log && echo \" \033[1;0;33m\" && $_sleep {$array['RELEASES_SLEEP']}  && $ds1 $panes0[5] $ds3' 2>&1 1> /dev/null");
 	} elseif (( $array['MAX_LOAD_RELEASES'] >= get_load()) && ( $array['RELEASES'] == "true" ) && ($array['RELEASES_THREADED'] == "false")) {
 		$color = get_color();
 		$log = writelog($panes0[5]);
@@ -1220,7 +1220,7 @@ $usptotalconnections  = str_replace("\n", '', shell_exec("ss -n | grep -c " . $i
 	if (( $array['MAX_LOAD'] >= get_load()) && ( $nfo_remaining_now > 0 )) {
 		$color = get_color();
 		$log = writelog($panes2[0]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.0 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes2[0] $ds2 && cd $_bin && $_php postprocess_new.php nfo 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes2[0] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.0 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes2[0] $ds2 && $_python ${DIR}/../test/postprocess_threaded.py nfo 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes2[0] $ds3' 2>&1 1> /dev/null");
 	}  elseif ( $array['MAX_LOAD'] <= get_load()) {
                 $color = get_color();
                 shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.0 'echo \"\033[38;5;\"$color\"m\n$panes2[0] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
@@ -1233,7 +1233,7 @@ $usptotalconnections  = str_replace("\n", '', shell_exec("ss -n | grep -c " . $i
 	if (( $array['MAX_LOAD'] >= get_load()) && ( $tvrage_releases_proc > 0 )) {
 		$color = get_color();
 		$log = writelog($panes2[1]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.1 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes2[1] $ds2 && cd $_bin && $_php postprocess_new.php tv 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes2[1] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.1 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes2[1] $ds2 && $_python ${DIR}/../test/postprocess_threaded.py tv 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes2[1] $ds3' 2>&1 1> /dev/null");
 	} elseif ( $array['MAX_LOAD'] <= get_load()) {
                 $color = get_color();
                 shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.1 'echo \"\033[38;5;\"$color\"m\n$panes2[1] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
@@ -1246,7 +1246,7 @@ $usptotalconnections  = str_replace("\n", '', shell_exec("ss -n | grep -c " . $i
 	if (( $array['MAX_LOAD'] >= get_load()) && ( $movie_releases_proc > 0 )) {
 		$color = get_color();
 		$log = writelog($panes2[2]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.2 'echo \"\033[38;5;\"$color\"\" && $ds1 $panes2[2] $ds2 && cd $_bin && $_php postprocess_new.php movie 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes2[2] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.2 'echo \"\033[38;5;\"$color\"\" && $ds1 $panes2[2] $ds2 && cd $_bin && $_python ${DIR}/../test/postprocess_threaded.py movie 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes2[2] $ds3' 2>&1 1> /dev/null");
 	} elseif  ( $array['MAX_LOAD'] <= get_load()) {
                 $color = get_color();
                 shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.2 'echo \"\033[38;5;\"$color\"m\n$panes2[2] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
@@ -1363,7 +1363,7 @@ $usptotalconnections  = str_replace("\n", '', shell_exec("ss -n | grep -c " . $i
 		$log = writelog($panes3[0]);
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.0 ' \
                     $ds1 $panes3[0] $ds2; \
-                    cd $_test && $_python ${DIR}/../test/fixreleasenames_threaded.py md5 2>&1 $log; \
+                    $_python ${DIR}/../test/fixreleasenames_threaded.py md5 2>&1 $log; \
                     $_python ${DIR}/../test/fixreleasenames_threaded.py nfo 2>&1 $log; \
                     $_python ${DIR}/../test/fixreleasenames_threaded.py filename 2>&1 $log; \
                     $_python ${DIR}/../test/fixreleasenames_threaded.py par2 2>&1 $log; \
@@ -1398,7 +1398,7 @@ $usptotalconnections  = str_replace("\n", '', shell_exec("ss -n | grep -c " . $i
 	if (( $array['MAX_LOAD'] >= get_load()) && ( $array['REQID'] == "true" ) && ( $array['REQID_THREADED'] == "true" )) {
 		$color = get_color();
 		$log = writelog($panes3[2]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.2 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes3[2] $ds2 && cd $_test && $_python ${DIR}/../test/requestid_threaded.py 2>&1 $log && echo \" \033[1;0;33m\" && $_sleep {$array['REQID_TIMER']} && $ds1 $panes3[2] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.2 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes3[2] $ds2 && $_python ${DIR}/../test/requestid_threaded.py 2>&1 $log && echo \" \033[1;0;33m\" && $_sleep {$array['REQID_TIMER']} && $ds1 $panes3[2] $ds3' 2>&1 1> /dev/null");
 		$time30 = TIME();
     } elseif (( $array['MAX_LOAD'] >= get_load()) && ( $array['REQID'] == "true" ) && ( $array['REQID_THREADED'] == "false" )) {
 		$color = get_color();

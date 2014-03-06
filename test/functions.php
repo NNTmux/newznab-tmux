@@ -23,6 +23,7 @@ require_once("consoletools.php");
 require_once("ColorCLI.php");
 require_once("nzbcontents.php");
 require_once("namefixer.php");
+require_once("TraktTv.php");
 
 
 
@@ -41,6 +42,7 @@ class Functions
     $this->echooutput = $echooutput;
     $this->c = new ColorCLI();
     $this->db = new DB();
+    $this->m = new Movie();
     $this->tmpPath = $this->site->tmpunrarpath;
     $this->audiofileregex = '\.(AAC|AIFF|APE|AC3|ASF|DTS|FLAC|MKA|MKS|MP2|MP3|RA|OGG|OGM|W64|WAV|WMA)';
 	$this->ignorebookregex = '/\b(epub|lit|mobi|pdf|sipdf|html)\b.*\.rar(?!.{20,})/i';
@@ -49,10 +51,15 @@ class Functions
     $this->segmentstodownload = (!empty($this->tmux->segmentstodownload)) ? $this->tmux->segmentstodownload : 2;
     $this->passchkattempts = (!empty($this->tmux->passchkattempts)) ? $this->tmux->passchkattempts : 1;
     $this->partsqty = (!empty($this->tmux->maxpartsprocessed)) ? $this->tmux->maxpartsprocessed : 3;
+    $this->movieqty = (!empty($this->tmux->maximdbprocessed)) ? $this->tmux->maximdbprocessed : 100;
+    $this->rageqty = (!empty($his->tmux->maxrageprocessed)) ? $this->tmux->maxrageprocessed : 75;
     $this->DEBUG_ECHO = ($this->tmux->debuginfo == '0') ? false : true;
 		if (defined('DEBUG_ECHO') && DEBUG_ECHO == true) {
 			$this->DEBUG_ECHO = true;
 		}
+    $this->nzbs = (!empty($this->tmux->maxnfoprocessed)) ? $this->tmux->maxnfoprocessed : 100;
+    $this->service = '';
+    $this->debug = ($this->tmux->debuginfo == "0") ? false : true;
 
   }
     /**
@@ -77,7 +84,7 @@ class Functions
 	}
 
     	// Used for deleting, updating (and inserting without needing the last insert ID).
-	public function queryExec($query)
+	public function exec($query)
 	{
 		if ($query == '')
 			return false;
@@ -218,7 +225,7 @@ class Functions
 			$ckreleaseid = $db->queryOneRow(sprintf('SELECT ID FROM releasenfo WHERE releaseID = %d', $release['ID']));
 			if (!isset($ckreleaseid['ID']))
 				$db->exec(sprintf('INSERT INTO releasenfo (nfo, releaseID) VALUES ('.$compress.', %d)', $nc, $release['ID']));
-			$db->exec(sprintf('UPDATE releases SET nfostatus = 1 WHERE ID = %d', $release['ID']));
+			$db->exec(sprintf('UPDATE releases SET releasenfoID = %d, nfostatus = 1 WHERE ID = %d', $ckreleaseid['ID'], $release['ID']));
 			if (!isset($release['completion']))
 				$release['completion'] = 0;
 			if ($release['completion'] == 0)
@@ -232,38 +239,63 @@ class Functions
 			return false;
 	}
     // Confirm that the .nfo file is not something else.
-	public function isNFO($possibleNFO)
-	{
-		$ok = false;
-		if ($possibleNFO !== false)
-		{
-			if (!preg_match('/(<?xml|;\s*Generated\sby.+SF\w|^\s*PAR|\.[a-z0-9]{2,7}\s[a-z0-9]{8}|^\s*RAR|\A.{0,10}(JFIF|matroska|ftyp|ID3))/i', $possibleNFO))
-			{
-				if (strlen($possibleNFO) < 45 * 1024)
-				{
-					// exif_imagetype needs a minimum size or else it doesn't work.
-					if (strlen($possibleNFO) > 15)
-					{
-						// Check if it's a picture - EXIF.
-						if (@exif_imagetype($possibleNFO) == false)
-						{
-							// Check if it's a picture - JFIF.
-							if ($this->check_JFIF($possibleNFO) == false)
-							{
-								// Check if it's a par2.
-								$par2info = new Par2Info();
-								$par2info->setData($possibleNFO);
-								if ($par2info->error)
-								{
-									$ok = true;
-								}
-							}
-						}
+	public function isNFO($possibleNFO, $guid) {
+		$r = false;
+		if ($possibleNFO === false) {
+			return $r;
+		}
+			// Make sure it's not too big or small, size needs to be at least 12 bytes for header checking.
+		$size = strlen($possibleNFO);
+		if ($size < 100 * 1024 && $size > 12) {
+			// Ignore common file types.
+			if (preg_match(
+				'/(^RIFF|)<\?xml|;\s*Generated\s*by.*SF\w|\A\s*PAR|\.[a-z0-9]{2,7}\s*[a-z0-9]{8}|\A\s*RAR|\A.{0,10}(JFIF|matroska|ftyp|ID3)|\A=newz\[NZB\]=/i'
+				, $possibleNFO)) {
+				return $r;
+			}// file workswith files, so save to disk
+			$tmpPath = $this->tmpPath.$guid.'.nfo';
+			file_put_contents($tmpPath, $possibleNFO);
+
+			// Linux boxes have 'file' (so should Macs)
+			if (strtolower(substr(PHP_OS, 0, 3)) != 'win') {
+				exec("file -b $tmpPath", $result);
+				if (is_array($result)) {
+					if (count($result) > 1) {
+						$result = implode(',', $result[0]);
+					} else {
+						$result = $result[0];
+					}
+				}
+				$test = preg_match('#^.*(ISO-8859|UTF-(?:8|16|32) Unicode(?: \(with BOM\)|)|ASCII)(?: English| C++ Program|) text.*$#i', $result);
+				// if the result is false, something went wrong, continue with getID3 tests.
+				if ($test !== false) {
+					if ($test == 1) {
+						@unlink($tmpPath);
+						return true;
+					}
+
+					// non-printable characters should never appear in text, so rule them out.
+					$test = preg_match('#\x00|\x01|\x02|\x03|\x04|\x05|\x06|\x07|\x08|\x0B|\x0E|\x0F|\x12|\x13|\x14|\x15|\x16|\x17|\x18|\x19|\x1A|\x1B|\x1C|\x1D|\x1E|\x1F#', $possibleNFO);
+					if ($test) {
+						@unlink($tmpPath);
+						return false;
 					}
 				}
 			}
-		}
-		return $ok;
+			    require_once(WWW_DIR."/lib/rarinfo/par2info.php");
+				$par2info = new Par2Info();
+				$par2info->setData($possibleNFO);
+				if ($par2info->error) {
+					// Check if it's an SFV.
+					require_once(WWW_DIR."/lib/rarinfo/sfvinfo.php");
+					$sfv = new SfvInfo;
+					$sfv->setData($possibleNFO);
+					if ($sfv->error) {
+						return true;
+					}
+				}
+				   	}
+		return $r;
 	}
 
 	//	Check if the possible NFO is a JFIF.
@@ -829,7 +861,7 @@ class Functions
 										}
 										$blnTookJPG = $ri->saveImage($rel['guid'] . '_thumb', $this->tmpPath . $file, $ri->jpgSavePath, 650, 650);
 										if ($blnTookJPG !== false) {
-											$this->db->queryExec(sprintf('UPDATE releases SET jpgstatus = %d WHERE ID = %d', 1, $rel['ID']));
+											$this->db->exec(sprintf('UPDATE releases SET jpgstatus = %d WHERE ID = %d', 1, $rel['ID']));
 										}
 									}*/
 									if ($processSample === true || $processVideo === true || $processMediainfo === true) {
@@ -959,7 +991,7 @@ class Functions
 							if (filesize($this->tmpPath . 'samplepicture.jpg') > 15 && exif_imagetype($this->tmpPath . 'samplepicture.jpg') !== false && $blnTookJPG === false) {
 								$blnTookJPG = $ri->saveImage($rel['guid'] . '_thumb', $this->tmpPath . 'samplepicture.jpg', $ri->jpgSavePath, 650, 650);
 								if ($blnTookJPG !== false)
-									$this->db->queryExec(sprintf('UPDATE releases SET jpgstatus = %d WHERE ID = %d', 1, $rel['ID']));
+									$this->db->exec(sprintf('UPDATE releases SET jpgstatus = %d WHERE ID = %d', 1, $rel['ID']));
 							}
 
 							foreach (glob($this->tmpPath . 'samplepicture.jpg') as $v) {
@@ -1019,6 +1051,19 @@ class Functions
 		unset($this->consoleTools, $rar, $nzbcontents, $groups, $ri);
 	}
 
+    // Process nfo files.
+	public function processNfos($releaseToWork = '', $nntp)
+	{
+		if (!isset($nntp))
+			exit($this->c->error("Not connected to usenet(functions->processNfos).\n"));
+
+		if ($this->site->lookupnfo == 1) {
+			$nfo = new Nfo($this->echooutput);
+			$this->processNfoFiles($releaseToWork, $this->site->lookupimdb, $this->site->lookuptvrage, $groupID = '', $nntp);
+		}
+	}
+
+    //Process nfo files
     public function processNfoFiles($releaseToWork = '', $processImdb = 1, $processTvrage = 1, $groupID = '', $nntp) {
 		if (!isset($nntp)) {
 			exit($this->c->error("Unable to connect to usenet.\n"));
@@ -1031,7 +1076,7 @@ class Functions
 		if ($releaseToWork == '') {
 			$i = -1;
 			while (($nfocount != $this->nzbs) && ($i >= -6)) {
-				$res = $db->query(sprintf('SELECT ID, guid, groupID, name FROM releases WHERE nfostatus between %d AND -1 AND size < %s ' . $groupID . ' LIMIT %d', $i, $this->maxsize * 1073741824, $this->nzbs));
+				$res = $db->query(sprintf('SELECT ID, guid, groupID, name FROM releases WHERE releasenfoID = 0 AND nfostatus between %d AND -1 AND size < %s ' . $groupID . ' LIMIT %d', $i, $this->maxsize * 1073741824, $this->nzbs));
 				$nfocount = count($res);
 				$i--;
 			}
@@ -1045,12 +1090,12 @@ class Functions
 			if ($this->echooutput && $releaseToWork == '') {
 				echo $this->c->primary('Processing ' . $nfocount . ' NFO(s), starting at ' . $this->nzbs . " * = hidden NFO, + = NFO, - = no NFO, f = download failed.");
 				// Get count of releases per passwordstatus
-				$pw1 = $this->db->query('SELECT count(*) as count FROM releases WHERE nfostatus = -1');
-				$pw2 = $this->db->query('SELECT count(*) as count FROM releases WHERE nfostatus = -2');
-				$pw3 = $this->db->query('SELECT count(*) as count FROM releases WHERE nfostatus = -3');
-				$pw4 = $this->db->query('SELECT count(*) as count FROM releases WHERE nfostatus = -4');
-				$pw5 = $this->db->query('SELECT count(*) as count FROM releases WHERE nfostatus = -5');
-				$pw6 = $this->db->query('SELECT count(*) as count FROM releases WHERE nfostatus = -6');
+				$pw1 = $this->db->query('SELECT count(*) as count FROM releases WHERE releasenfoID = 0 AND nfostatus = -1');
+				$pw2 = $this->db->query('SELECT count(*) as count FROM releases WHERE releasenfoID = 0 AND nfostatus = -2');
+				$pw3 = $this->db->query('SELECT count(*) as count FROM releases WHERE releasenfoID = 0 AND nfostatus = -3');
+				$pw4 = $this->db->query('SELECT count(*) as count FROM releases WHERE releasenfoID = 0 AND nfostatus = -4');
+				$pw5 = $this->db->query('SELECT count(*) as count FROM releases WHERE releasenfoID = 0 AND nfostatus = -5');
+				$pw6 = $this->db->query('SELECT count(*) as count FROM releases WHERE releasenfoID = 0 AND nfostatus = -6');
 				echo $this->c->header('Available to process: -6 = ' . number_format($pw6[0]['count']) . ', -5 = ' . number_format($pw5[0]['count']) . ', -4 = ' . number_format($pw4[0]['count']) . ', -3 = ' . number_format($pw3[0]['count']) . ', -2 = ' . number_format($pw2[0]['count']) . ', -1 = ' . number_format($pw1[0]['count']));
 			}
 			$groups = new Groups();
@@ -1068,9 +1113,9 @@ class Functions
 					if (!isset($ckreleaseid['ID'])) {
 						$db->queryInsert(sprintf('INSERT INTO releasenfo (nfo, releaseID) VALUES (' . $cp . ', %d)', $nc, $arr['ID']));
 					}
-					$db->exec(sprintf('UPDATE releases SET nfostatus = 1 WHERE ID = %d', $arr['ID']));
+					$db->exec(sprintf('UPDATE releases SET releasenfoID = %d, nfostatus = 1 WHERE ID = %d', $ckreleaseid['ID'], $arr['ID']));
 					$ret++;
-					$movie->processMovieReleases();
+					$this->domovieupdate($fetchedBinary, 'nfo', $arr['ID'], $processImdb);
 
 					// If set scan for tvrage info.
 					if ($processTvrage == 1) {
@@ -1090,12 +1135,22 @@ class Functions
 						}
 					}
 				}
+                else {
+                  $db->exec(sprintf('UPDATE releases SET releasenfoID = -1, nfostatus = -7 WHERE ID = %d', $arr['ID']));
+                }
+			}
+		}
+        //set releasenfoID in releases table to -1 where releasenfo nfo IS NULL
+        if ($releaseToWork == '') {
+			$relres = $db->query('SELECT ID FROM releasenfo WHERE nfo IS NULL');
+			foreach ($relres as $relrow) {
+				$db->exec(sprintf('UPDATE releases SET releasenfoID = -1 WHERE releasenfoID = %d', $relrow['ID']));
 			}
 		}
 
 		// Remove nfo that we cant fetch after 5 attempts.
 		if ($releaseToWork == '') {
-			$relres = $db->query('SELECT ID FROM releases WHERE nzbstatus = 1 AND nfostatus < -6');
+			$relres = $db->query('SELECT ID FROM releases WHERE releasenfoID = -1');
 			foreach ($relres as $relrow) {
 				$db->exec(sprintf('DELETE FROM releasenfo WHERE nfo IS NULL and releaseID = %d', $relrow['ID']));
 			}
@@ -1155,6 +1210,206 @@ class Functions
 			$pos = 1;
 
 		return $pos;
+	}
+
+    // Process all TV related releases which will assign their series/episode/rage data.
+	public function processTv($releaseToWork = '')
+	{
+		if ($this->site->lookuptvrage == 1) {
+			$tvrage = new TvRage($this->echooutput);
+			$this->processTvReleases($releaseToWork, $this->site->lookuptvrage == 1);
+		}
+	}
+
+    public function processTvReleases($releaseToWork = '', $lookupTvRage = true, $local = false)
+	{
+		$ret = 0;
+		$trakt = new TraktTv();
+        $tvrage = new TvRage();
+
+		// Get all releases without a rageID which are in a tv category.
+		if ($releaseToWork == '') {
+			$res = $this->db->query(sprintf("SELECT r.searchname, r.ID FROM releases r INNER JOIN category c ON r.categoryID = c.ID WHERE r.rageID = -1 AND c.parentID = %d ORDER BY postdate DESC LIMIT %d", Category::CAT_PARENT_TV, $this->rageqty));
+			$tvcount = count($res);
+		} else {
+			$pieces = explode("           =+=            ", $releaseToWork);
+			$res = array(array('searchname' => $pieces[0], 'ID' => $pieces[1]));
+			$tvcount = 1;
+		}
+
+		if ($this->echooutput && $tvcount > 1) {
+			echo $this->c->header("Processing TV for " . $tvcount . " release(s).");
+		}
+
+		foreach ($res as $arr) {
+			$show = $tvrage->parseNameEpSeason($arr['searchname']);
+			if (is_array($show) && $show['name'] != '') {
+				// Update release with season, ep, and airdate info (if available) from releasetitle.
+				$tvrage->updateEpInfo($show, $arr['ID']);
+
+				// Find the rageID.
+				$ID = $tvrage->getByTitle($show['cleanname']);
+
+				// Force local lookup only
+				if ($local == true) {
+					$lookupTvRage = false;
+				}
+
+				if ($ID === false && $lookupTvRage) {
+					// If it doesnt exist locally and lookups are allowed lets try to get it.
+					if ($this->echooutput) {
+						echo $this->c->primaryOver("TVRage ID for ") . $this->c->headerOver($show['cleanname']) . $this->c->primary(" not found in local db, checking web.");
+					}
+
+					$tvrShow = $tvrage->getRageMatch($show);
+					if ($tvrShow !== false && is_array($tvrShow)) {
+						// Get all tv info and add show.
+						$tvrage->updateRageInfo($tvrShow['showid'], $show, $tvrShow, $arr['ID']);
+					} else if ($tvrShow === false) {
+						// If tvrage fails, try trakt.
+						$traktArray = $trakt->traktTVSEsummary($show['name'], $show['season'], $show['episode']);
+						if ($traktArray !== false) {
+							if (isset($traktArray['show']['tvrage_id']) && $traktArray['show']['tvrage_id'] !== 0) {
+								if ($this->echooutput) {
+									echo $this->c->primary('Found TVRage ID on trakt:' . $traktArray['show']['tvrage_id']);
+								}
+								$this->updateRageInfoTrakt($traktArray['show']['tvrage_id'], $show, $traktArray, $arr['ID']);
+							}
+							// No match, add to tvrage with rageID = -2 and $show['cleanname'] title only.
+							else {
+								$this->add(-2, $show['cleanname'], '', '', '', '');
+							}
+						}
+						// No match, add to tvrage with rageID = -2 and $show['cleanname'] title only.
+						else {
+							$this->add(-2, $show['cleanname'], '', '', '', '');
+						}
+					} else {
+						// $tvrShow probably equals -1 but we'll do this as a catchall instead of a specific else if.
+						// Skip because we couldnt connect to tvrage.com.
+					}
+				} else if ($ID > 0) {
+					//if ($this->echooutput) {
+					//    echo $this->c->AlternateOver("TV series: ") . $this->c->header($show['cleanname'] . " " . $show['seriesfull'] . (($show['year'] != '') ? ' ' . $show['year'] : '') . (($show['country'] != '') ? ' [' . $show['country'] . ']' : ''));
+					// }
+					$tvairdate = (isset($show['airdate']) && !empty($show['airdate'])) ? $this->db->escapeString($this->checkDate($show['airdate'])) : "NULL";
+					$tvtitle = "NULL";
+
+					if ($lookupTvRage) {
+						$epinfo = $tvrage->getEpisodeInfo($ID, $show['season'], $show['episode']);
+						if ($epinfo !== false) {
+							if (isset($epinfo['airdate'])) {
+								$tvairdate = $this->db->escapeString($this->checkDate($epinfo['airdate']));
+							}
+
+							if (!empty($epinfo['title'])) {
+								$tvtitle = $this->db->escapeString(trim($epinfo['title']));
+							}
+						}
+					}
+					if ($tvairdate == "NULL") {
+						$this->db->exec(sprintf('UPDATE releases SET tvtitle = %s, rageID = %d WHERE ID = %d', $tvtitle, $ID, $arr['ID']));
+					} else {
+						$this->db->exec(sprintf('UPDATE releases SET tvtitle = %s, tvairdate = %s, rageID = %d WHERE ID = %d', $tvtitle, $tvairdate, $ID, $arr['ID']));
+					}
+					// Cant find rageID, so set rageID to n/a.
+				} else {
+					$this->db->exec(sprintf('UPDATE releases SET rageID = -2 WHERE ID = %d', $arr['ID']));
+				}
+				// Not a tv episode, so set rageID to n/a.
+			} else {
+				$this->db->exec(sprintf('UPDATE releases SET rageID = -2 WHERE ID = %d', $arr['ID']));
+			}
+			$ret++;
+		}
+		return $ret;
+	}
+
+    public function updateRageInfoTrakt($rageid, $show, $traktArray, $relid)
+	{
+
+        $tvrage = new TvRage();
+		// Try and get the episode specific info from tvrage.
+		$epinfo = $tvrage->getEpisodeInfo($rageid, $show['season'], $show['episode']);
+		if ($epinfo !== false) {
+			$tvairdate = (!empty($epinfo['airdate'])) ? $this->db->escapeString($epinfo['airdate']) : "NULL";
+			$tvtitle = (!empty($epinfo['title'])) ? $this->db->escapeString($epinfo['title']) : "NULL";
+			$this->db->exec(sprintf("UPDATE releases SET tvtitle = %s, tvairdate = %s, rageID = %d WHERE ID = %d", $this->db->escapeString(trim($tvtitle)), $tvairdate, $traktArray['show']['tvrage_id'], $relid));
+		} else {
+			$this->db->exec(sprintf("UPDATE releases SET rageID = %d WHERE ID = %d", $traktArray['show']['tvrage_id'], $relid));
+		}
+
+		$genre = '';
+		if (isset($traktArray['show']['genres']) && is_array($traktArray['show']['genres']) && !empty($traktArray['show']['genres'])) {
+			$genre = $traktArray['show']['genres']['0'];
+		}
+
+		$country = '';
+		if (isset($traktArray['show']['country']) && !empty($traktArray['show']['country'])) {
+			$country = $this->countryCode($traktArray['show']['country']);
+		}
+
+		$rInfo = $tvrage->getRageInfoFromPage($rageid);
+		$desc = '';
+		if (isset($rInfo['desc']) && !empty($rInfo['desc'])) {
+			$desc = $rInfo['desc'];
+		}
+
+		$imgbytes = '';
+		if (isset($rInfo['imgurl']) && !empty($rInfo['imgurl'])) {
+			$img = getUrl($rInfo['imgurl']);
+			if ($img !== false) {
+				$im = @imagecreatefromstring($img);
+				if ($im !== false) {
+					$imgbytes = $img;
+				}
+			}
+		}
+
+		$this->add($rageid, $show['cleanname'], $desc, $genre, $country, $imgbytes);
+	}
+
+    // Convert 2012-24-07 to 2012-07-24, there is probably a better way
+	public function checkDate($date)
+	{
+		if (!empty($date) && $date != NULL) {
+			$chk = explode(" ", $date);
+			$chkd = explode("-", $chk[0]);
+			if ($chkd[1] > 12) {
+				$date = date('Y-m-d H:i:s', strtotime($chkd[1] . " " . $chkd[2] . " " . $chkd[0]));
+			}
+			return $date;
+		}
+		return NULL;
+	}
+
+    public function countryCode($country)
+	{
+		if (!is_array($country) && strlen($country) > 2) {
+			$code = $this->db->queryOneRow('SELECT code FROM country WHERE LOWER(name) = LOWER(' . $this->db->escapeString($country) . ')');
+			if (isset($code['code'])) {
+				return $code['code'];
+			}
+		}
+		return $country;
+	}
+
+    public function add($rageid, $releasename, $desc, $genre, $country, $imgbytes)
+	{
+		$releasename = str_replace(array('.', '_'), array(' ', ' '), $releasename);
+		$country = $this->countryCode($country);
+
+		if ($rageid != -2) {
+			$ckid = $this->db->queryOneRow('SELECT ID FROM tvrage WHERE rageID = ' . $rageid);
+		} else {
+			$ckid = $this->db->queryOneRow('SELECT ID FROM tvrage WHERE releasetitle = ' . $this->db->escapeString($releasename));
+		}
+
+		if (!isset($ckid['ID']) || $rageid == -2) {
+				$this->db->exec(sprintf('INSERT INTO tvrage (rageID, releasetitle, description, genre, country, createddate, imgdata) VALUES (%s, %s, %s, %s, %s, NOW(), %s)', $rageid, $this->db->escapeString($releasename), $this->db->escapeString(substr($desc, 0, 10000)), $this->db->escapeString(substr($genre, 0, 64)), $this->db->escapeString($country), $this->db->escapeString($imgbytes)));
+		} else {
+				$this->db->exec(sprintf('UPDATE tvrage SET releasetitle = %s, description = %s, genre = %s, country = %s, createddate = NOW(), imgdata = %s WHERE rage = %d', $this->db->escapeString($releasename), $this->db->escapeString(substr($desc, 0, 10000)), $this->db->escapeString(substr($genre, 0, 64)), $this->db->escapeString($country), $this->db->escapeString($imgbytes), $rageid));
+		}
 	}
 
     // Open the rar, see if it has a password, attempt to get a file.
@@ -1217,7 +1472,7 @@ class Functions
 						if (preg_match($this->supportfiles . ')(?!.{20,})/i', $file['name']))
 							continue;
 
-						if (preg_match('/\.zip$/i', $file['name'])) {
+						/*if (preg_match('/\.zip$/i', $file['name'])) {
 							$zipdata = $rar->getFileData($file['name'], $file['source']);
 							$data = $this->processReleaseZips($zipdata, false, true, $release, $nntp);
 
@@ -1227,7 +1482,7 @@ class Functions
 										$tmpfiles = $this->getRar($d['data']);
 								}
 							}
-						}
+						}*/
 
 						if (!isset($file['next_offset']))
 							$file['next_offset'] = 0;
@@ -1259,7 +1514,7 @@ class Functions
 				// File is compressed, use unrar to get the content
 				$rarfile = $this->tmpPath . 'rarfile' . mt_rand(0, 99999) . '.rar';
 				if (@file_put_contents($rarfile, $fetchedBinary)) {
-					$execstring = '"' . $this->site->unrarpath . '" e -ai -ep -c- -id -inul -kb -or -p- -r -y "' . $rarfile . '" "' . $this->tmpPath . '"';
+					$execstring = '"' . $this->site->unrarpath . '" e -ai -ep -c- -ID -inul -kb -or -p- -r -y "' . $rarfile . '" "' . $this->tmpPath . '"';
 					$output = @runCmd($execstring, false, true);
 					if (isset($files[0]['name'])) {
 						if ($this->echooutput)
@@ -1351,13 +1606,13 @@ class Functions
 	}
 
     public function parseRageId($str) {
-		if (preg_match('/tvrage\.com\/shows\/id-(\d{1,6})/i', $str, $matches)) {
+		if (preg_match('/tvrage\.com\/shows\/ID-(\d{1,6})/i', $str, $matches)) {
 			return trim($matches[1]);
 		}
 		return false;
 	}
 
-    function debug($str)
+    public function debug($str)
 	{
 		if ($this->echooutput && $this->DEBUG_ECHO) {
 			echo $this->c->debug($str);
@@ -1456,6 +1711,396 @@ class Functions
 			}
 		}
 	}
+
+    public function parseImdb($str)
+	{
+		if (preg_match('/(?:imdb.*?)?(?:tt|Title\?)(\d{5,7})/i', $str, $matches)) {
+			return trim($matches[1]);
+		}
+
+		return false;
+	}
+
+	public function getMovieInfo($imdbId)
+	{
+		return $this->db->queryOneRow(sprintf("SELECT * FROM movieinfo WHERE imdbID = %d", $imdbId));
+	}
+
+	public function getMovieInfoMultiImdb($imdbIds)
+	{
+		$allids = str_replace(',,', ',', str_replace(array('(,', ' ,', ', )', ',)'), '', implode(',', $imdbIds)));
+		$sql = sprintf("SELECT DISTINCT movieinfo.*, releases.imdbID AS relimdb FROM movieinfo "
+			. "LEFT OUTER JOIN releases ON releases.imdbID = movieinfo.imdbID WHERE movieinfo.imdbID IN (%s)", $allids);
+		return $this->db->query($sql);
+	}
+    public function domovieupdate($buffer, $service, $id, $processImdb = 1)
+	{
+		$imdbId = $this->parseImdb($buffer);
+		if ($imdbId !== false) {
+			if ($service == 'nfo') {
+				$this->service = 'nfo';
+			}
+			if ($this->echooutput && $this->service != '') {
+				echo $this->c->headerOver("\n" . $service . ' found IMDBid: ') . $this->c->primary('tt' . $imdbId);
+			}
+
+			$this->db->exec(sprintf('UPDATE releases SET imdbID = %s WHERE ID = %d', $this->db->escapeString($imdbId), $id));
+
+			// If set, scan for imdb info.
+			if ($processImdb == 1) {
+				$movCheck = $this->getMovieInfo($imdbId);
+				if ($movCheck === false || (isset($movCheck['updateddate']) && (time() - strtotime($movCheck['updateddate'])) > 2592000)) {
+					$this->m->updateMovieInfo($imdbId);
+				}
+			}
+		}
+		return $imdbId;
+	}
+
+    public function parseMovieSearchName($releasename)
+	{
+		$matches = '';
+		if (preg_match('/\b[Ss]\d+[-._Ee]|\bE\d+\b/', $releasename)) {
+			return false;
+		}
+		$cat = new Category();
+		if (!$cat->isMovieForeign($releasename)) {
+			preg_match('/(?P<name>[\w. -]+)[-._( ](?P<year>(19|20)\d\d)/i', $releasename, $matches);
+			if (!isset($matches['year'])) {
+				preg_match('/^(?P<name>[\w. -]+[-._ ]((bd|br|dvd)rip|bluray|hdtv|divx|xvid|proper|repack|real\.proper|sub\.?(fix|pack)|ac3d|unrated|1080[ip]|720p))/i', $releasename, $matches);
+			}
+
+			if (isset($matches['name'])) {
+				$name = preg_replace('/\(.*?\)|[._]/i', ' ', $matches['name']);
+				$year = (isset($matches['year'])) ? $matches['year'] : '';
+				if (strlen($name) > 4 && !preg_match('/^\d+$/', $name)) {
+					if ($this->debug && $this->echooutput) {
+						echo "DB name: {$releasename}\n";
+					}
+					return array('title' => trim($name), 'year' => $year);
+				}
+			}
+		}
+		return false;
+	}
+
+    public function processMovies($releaseToWork = '')
+	{
+		if ($this->site->lookupimdb == 1) {
+			$movie = new Movie($this->echooutput);
+			$this->processMovieReleases($releaseToWork);
+		}
+	}
+
+    public function processMovieReleases($releaseToWork = '')
+	{
+		$trakt = new TraktTv();
+		$googleban = false;
+		$googlelimit = 0;
+		$result = '';
+
+		if ($releaseToWork == '') {
+			$res = $this->db->query(sprintf("SELECT r.searchname AS name, r.ID FROM releases r "
+					. "INNER JOIN category c ON r.categoryID = c.ID "
+					. "WHERE r.imdbID IS NULL AND c.parentID = %d LIMIT %d", Category::CAT_PARENT_MOVIE, $this->movieqty));
+			$moviecount = count($res);
+		} else {
+			$pieces = explode("           =+=            ", $releaseToWork);
+			$res = array(array('name' => $pieces[0], 'ID' => $pieces[1]));
+			$moviecount = 1;
+		}
+
+		if ($moviecount > 0) {
+			if ($this->echooutput && $moviecount > 1) {
+				echo $this->c->header("Processing " . $moviecount . " movie release(s).");
+			}
+
+				$like = 'LIKE';
+				$inyear = 'year';
+
+			foreach ($res as $arr) {
+				$parsed = $this->parseMovieSearchName($arr['name']);
+				if ($parsed !== false) {
+					$year = false;
+					$moviename = $parsed['title'];
+					$movienameonly = $moviename;
+					if ($parsed['year'] != '') {
+						$year = true;
+						$moviename .= ' (' . $parsed['year'] . ')';
+					}
+
+					// Check locally first.
+					if ($year === true) {
+						$start = (int) $parsed['year'] - 2;
+						$end = (int) $parsed['year'] + 2;
+						$ystr = '(';
+						while ($start < $end) {
+							$ystr .= $start . ',';
+							$start ++;
+						}
+						$ystr .= $end . ')';
+						$ckimdbid = $this->db->queryOneRow(sprintf('SELECT imdbID FROM movieinfo '
+								. 'WHERE title %s %s AND %s IN %s', $like, "'%" . $parsed['title'] . "%'", $inyear, $ystr));
+					} else {
+						$ckimdbid = $this->db->queryOneRow(sprintf('SELECT imdbID FROM movieinfo '
+								. 'WHERE title %s %s', $like, "'%" . $parsed['title'] . "%'"));
+					}
+
+					// Try lookup by %name%
+					if (!isset($ckimdbid['imdbID'])) {
+						$title = str_replace('er', 're', $parsed['title']);
+						if ($title != $parsed['title']) {
+							$ckimdbid = $this->db->queryOneRow(sprintf('SELECT imdbID FROM movieinfo WHERE title %s %s', $like, "'%" . $title . "%'"));
+						}
+						if (!isset($ckimdbid['imdbID'])) {
+							$pieces = explode(' ', $parsed['title']);
+							$title1 = '%';
+							foreach ($pieces as $piece) {
+								$title1 .= str_replace(array("'", "!", '"'), "", $piece) . '%';
+							}
+							$ckimdbid = $this->db->queryOneRow(sprintf("SELECT imdbID FROM movieinfo WHERE replace(replace(title, \"'\", ''), '!', '') %s %s", $like, $this->db->escapeString($title1)));
+						}
+						if (!isset($ckimdbid['imdbID'])) {
+							$pieces = explode(' ', $title);
+							$title2 = '%';
+							foreach ($pieces as $piece) {
+								$title2 .= str_replace(array("'", "!", '"'), "", $piece) . '%';
+							}
+							$ckimdbid = $this->db->queryOneRow(sprintf("SELECT imdbID FROM movieinfo WHERE replace(replace(replace(title, \"'\", ''), '!', ''), '\"', '') %s %s", $like, $this->db->escapeString($title2)));
+						}
+					}
+
+
+					if (isset($ckimdbid['imdbID'])) {
+						$imdbID = $this->domovieupdate('tt' . $ckimdbid['imdbID'], 'Local DB', $arr['ID']);
+						if ($imdbID === false) {
+							$this->db->exec(sprintf("UPDATE releases SET imdbID = 0000000 WHERE ID = %d", $arr["ID"]));
+						}
+						echo $this->c->alternateOver("\nFound Local: ") . $this->c->headerOver($moviename);
+						continue;
+					}
+
+					if ($this->echooutput) {
+						echo $this->c->primaryOver("\nLooking up: ") . $this->c->headerOver($moviename);
+					}
+
+					// Check OMDbapi first
+					if ($year === true && preg_match('/\d{4}/', $year)) {
+						$url = 'http://www.omdbapi.com/?t=' . str_replace(' ', '%20', $movienameonly) . '&y=' . $year . '&r=json';
+					} else {
+						$url = 'http://www.omdbapi.com/?t=' . str_replace(' ', '%20', $movienameonly) . '&r=json';
+					}
+					$omdbid = json_decode(file_get_contents($url));
+					if (isset($omdbid->imdbID)) {
+						$imdbID = $this->domovieupdate($omdbid->imdbID, 'OMDbAPI', $arr['ID']);
+						if ($imdbID !== false) {
+							continue;
+						}
+					}
+
+					// Check on trakt.
+					$traktimdbid = $trakt->traktMoviesummary($moviename, 'imdbID');
+					if ($traktimdbid !== false) {
+						$imdbID = $this->domovieupdate($traktimdbid, 'Trakt', $arr['ID']);
+						if ($imdbID === false) {
+							// No imdb ID found, set to all zeros so we don't process again.
+							$this->db->exec(sprintf("UPDATE releases SET imdbID = 0000000 WHERE ID = %d", $arr["ID"]));
+						} else {
+							continue;
+						}
+					}
+					// Check on search engines.
+					else if ($googleban == false && $googlelimit <= 40) {
+						$moviename1 = str_replace(' ', '+', $moviename);
+						$buffer = getUrl("https://www.google.com/search?hl=en&as_q=" . urlencode($moviename1) . "&as_epq=&as_oq=&as_eq=&as_nlo=&as_nhi=&lr=&cr=&as_qdr=all&as_sitesearch=imdb.com&as_occt=any&safe=images&tbs=&as_filetype=&as_rights=");
+
+						// Make sure we got some data.
+						if ($buffer !== false && strlen($buffer)) {
+							$googlelimit++;
+							if (!preg_match('/To continue, please type the characters below/i', $buffer)) {
+								$imdbID = $this->domovieupdate($buffer, 'Google1', $arr['ID']);
+								if ($imdbID === false) {
+									if (preg_match('/(?P<name>[\w+].+)(\+\(\d{4}\))/i', $moviename1, $result)) {
+										$buffer = getUrl("https://www.google.com/search?hl=en&as_q=" . urlencode($result["name"]) . "&as_epq=&as_oq=&as_eq=&as_nlo=&as_nhi=&lr=&cr=&as_qdr=all&as_sitesearch=imdb.com&as_occt=any&safe=images&tbs=&as_filetype=&as_rights=");
+
+										if ($buffer !== false && strlen($buffer)) {
+											$googlelimit++;
+											$imdbID = $this->domovieupdate($buffer, 'Google2', $arr["ID"]);
+											if ($imdbID === false) {
+												//no imdb ID found, set to all zeros so we don't process again
+												$this->db->exec(sprintf("UPDATE releases SET imdbID = 0000000 WHERE ID = %d", $arr["ID"]));
+											} else {
+												continue;
+											}
+										} else {
+											$googleban = true;
+											if ($this->bingSearch($moviename, $arr["ID"]) === true) {
+												continue;
+											} else if ($this->yahooSearch($moviename, $arr["ID"]) === true) {
+												continue;
+											}
+										}
+									} else {
+										$googleban = true;
+										if ($this->bingSearch($moviename, $arr["ID"]) === true) {
+											continue;
+										} else if ($this->yahooSearch($moviename, $arr["ID"]) === true) {
+											continue;
+										}
+									}
+								} else {
+									continue;
+								}
+							} else {
+								$googleban = true;
+								if ($this->bingSearch($moviename, $arr["ID"]) === true) {
+									continue;
+								} else if ($this->yahooSearch($moviename, $arr["ID"]) === true) {
+									continue;
+								}
+							}
+						} else {
+							if ($this->bingSearch($moviename, $arr["ID"]) === true) {
+								continue;
+							} else if ($this->yahooSearch($moviename, $arr["ID"]) === true) {
+								continue;
+							}
+						}
+					} else if ($this->bingSearch($moviename, $arr["ID"]) === true) {
+						continue;
+					} else if ($this->yahooSearch($moviename, $arr["ID"]) === true) {
+						continue;
+					} else if (!isset($ckimdbid['imdbID']) && $year === true) {
+						$ckimdbid = $this->db->queryOneRow(sprintf('SELECT imdbID FROM movieinfo WHERE title %s %s', $like, "'%" . $parsed['title'] . "%'"));
+						if (isset($ckimdbid['imdbID'])) {
+							$imdbID = $this->domovieupdate('tt' . $ckimdbid['imdbID'], 'Local DB', $arr['ID']);
+							if ($imdbID === false) {
+								$this->db->exec(sprintf("UPDATE releases SET imdbID = 0000000 WHERE ID = %d", $arr["ID"]));
+							}
+
+							continue;
+						}
+					} else {
+						echo $this->c->error("Exceeded request limits on google.com bing.com and yahoo.com.");
+						break;
+					}
+				} else {
+					$this->db->exec(sprintf("UPDATE releases SET imdbID = 0000000 WHERE ID = %d", $arr["ID"]));
+					continue;
+				}
+			}
+		}
+	}
+
+    public function bingSearch($moviename, $relID)
+	{
+		$result = '';
+		if ($this->binglimit <= 40) {
+			$moviename = str_replace(' ', '+', $moviename);
+			if (preg_match('/(?P<name>[\w+].+)(\+(?P<year>\(\d{4}\)))?/i', $moviename, $result)) {
+				if (isset($result["year"]) && !empty($result["year"])) {
+					$buffer = getUrl("http://www.bing.com/search?q=" . $result["name"] . urlencode($result["year"]) . "+" . urlencode("site:imdb.com") . "&qs=n&form=QBRE&pq=" . $result["name"] . urlencode($result["year"]) . "+" . urlencode("site:imdb.com") . "&sc=4-38&sp=-1&sk=");
+					if ($buffer !== false && strlen($buffer)) {
+						$this->binglimit++;
+						$imdbId = $this->domovieupdate($buffer, 'Bing1', $relID);
+						if ($imdbId === false) {
+							$buffer = getUrl("http://www.bing.com/search?q=" . $result["name"] . "+" . urlencode("site:imdb.com") . "&qs=n&form=QBRE&pq=" . $result["name"] . "+" . urlencode("site:imdb.com") . "&sc=4-38&sp=-1&sk=");
+							if ($buffer !== false && strlen($buffer)) {
+								$this->binglimit++;
+								$imdbId = $this->domovieupdate($buffer, 'Bing2', $relID);
+								if ($imdbId === false) {
+									$this->db->exec(sprintf("UPDATE releases SET imdbID = 0000000 WHERE ID = %d", $relID));
+									return true;
+								} else {
+									return true;
+								}
+							} else {
+								return false;
+							}
+						} else {
+							return true;
+						}
+					} else {
+						return false;
+					}
+				} else {
+					$buffer = getUrl("http://www.bing.com/search?q=" . $result["name"] . "+" . urlencode("site:imdb.com") . "&qs=n&form=QBRE&pq=" . $result["name"] . "+" . urlencode("site:imdb.com") . "&sc=4-38&sp=-1&sk=");
+					if ($buffer !== false && strlen($buffer)) {
+						$this->binglimit++;
+						$imdbId = $this->domovieupdate($buffer, 'Bing2', $relID);
+						if ($imdbId === false) {
+							$this->db->exec(sprintf("UPDATE releases SET imdbID = 0000000 WHERE ID = %d", $relID));
+							return true;
+						} else {
+							return true;
+						}
+					} else {
+						return false;
+					}
+				}
+			} else {
+				$this->db->exec(sprintf("UPDATE releases SET imdbID = 0000000 WHERE ID = %d", $relID));
+				return true;
+			}
+		} else {
+			return false;
+		}
+	}
+
+	public function yahooSearch($moviename, $relID)
+	{
+		$result = '';
+		if ($this->yahoolimit <= 40) {
+			$moviename = str_replace(' ', '+', $moviename);
+			if (preg_match('/(?P<name>[\w+].+)(\+(?P<year>\(\d{4}\)))?/i', $moviename, $result)) {
+				if (isset($result["year"]) && !empty($result["year"])) {
+					$buffer = getUrl("http://search.yahoo.com/search?n=15&ei=UTF-8&va_vt=any&vo_vt=any&ve_vt=any&vp_vt=any&vf=all&vm=p&fl=0&fr=yfp-t-900&p=" . $result["name"] . "+" . urlencode($result["year"]) . "&vs=imdb.com");
+					if ($buffer !== false && strlen($buffer)) {
+						$this->yahoolimit++;
+						$imdbId = $this->domovieupdate($buffer, 'Yahoo1', $relID);
+						if ($imdbId === false) {
+							$buffer = getUrl("http://search.yahoo.com/search?n=15&ei=UTF-8&va_vt=any&vo_vt=any&ve_vt=any&vp_vt=any&vf=all&vm=p&fl=0&fr=yfp-t-900&p=" . $result["name"] . "&vs=imdb.com");
+							if ($buffer !== false && strlen($buffer)) {
+								$this->yahoolimit++;
+								$imdbId = $this->domovieupdate($buffer, 'Yahoo2', $relID);
+								if ($imdbId === false) {
+									$this->db->exec(sprintf("UPDATE releases SET imdbID = 0000000 WHERE ID = %d", $relID));
+									return true;
+								} else {
+									return true;
+								}
+							} else {
+								return false;
+							}
+						} else {
+							return true;
+						}
+					}
+					return false;
+				} else {
+					$buffer = getUrl("http://search.yahoo.com/search?n=15&ei=UTF-8&va_vt=any&vo_vt=any&ve_vt=any&vp_vt=any&vf=all&vm=p&fl=0&fr=yfp-t-900&p=" . $result["name"] . "&vs=imdb.com");
+					if ($buffer !== false && strlen($buffer)) {
+						$this->yahoolimit++;
+						$imdbId = $this->domovieupdate($buffer, 'Yahoo2', $relID);
+						if ($imdbId === false) {
+							$this->db->exec(sprintf("UPDATE releases SET imdbID = 0000000 WHERE ID = %d", $relID));
+							return true;
+						} else {
+							return true;
+						}
+					} else {
+						return false;
+					}
+				}
+			} else {
+				$this->db->exec(sprintf("UPDATE releases SET imdbID = 0000000 WHERE ID = %d", $relID));
+				return true;
+			}
+		} else {
+			return false;
+		}
+	}
+
     //end of testing
 
    }

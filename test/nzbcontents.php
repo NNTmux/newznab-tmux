@@ -17,20 +17,22 @@ Class NZBcontents
 		$this->echooutput = $echooutput;
 		$s = new Sites();
 		$this->site = $s->get();
+        $this->c = new ColorCLI();
 	}
 
-	public function getNfoFromNZB($guid, $relID, $groupID, $nntp)
+	public function getNfoFromNZB($guid, $relID, $groupID, $nntp, $groupName, $db, $nfo)
 	{
-	    $c = new ColorCLI;
-	    if (!isset($nntp))
-			exit($c->error("Not connected to usenet(nzbcontents->getNfoFromNZB.\n"));
+		if (!isset($nntp)) {
+			exit($this->c->error("Not connected to usenet(nzbcontents->getNfoFromNZB).\n"));
+		}
 
-		if($fetchedBinary = $this->NFOfromNZB($guid, $relID, $groupID, $nntp))
+		if ($fetchedBinary = $this->NFOfromNZB($guid, $relID, $groupID, $nntp, $groupName, $db, $nfo)) {
 			return $fetchedBinary;
-		else if ($fetchedBinary = $this->hiddenNFOfromNZB($guid, $relID, $groupID, $nntp))
+		} else if ($fetchedBinary = $this->hiddenNFOfromNZB($guid, $relID, $groupID, $nntp, $groupName, $db, $nfo)) {
 			return $fetchedBinary;
-		else
+		} else {
 			return false;
+		}
 	}
 
 	// Returns a XML of the NZB file.
@@ -160,116 +162,102 @@ Class NZBcontents
         if (!isset($nntp))
 			exit($c->error("Not connected to usenet(nzbcontents->NFOfromNZB).\n"));
 
-		$messageid = $this->NZBcompletion($guid, $relID, $groupID, $nntp, true);
-		if ($messageid !== "")
-		{
+		$messageid = $this->NZBcompletion($guid, $relID, $groupID, $nntp, $db, true);
+		if ($messageid !== false) {
 			$nfo = new NFO();
             $functions = new Functions ();
 			$functions->addReleaseNfo($relID);
 			$groups = new Groups();
-			$fetchedBinary = $nntp->getMessage($functions->getByNameByID($groupID), $messageid);
-			if ($fetchedBinary === false || PEAR::isError($fetchedBinary))
-			{
+			$fetchedBinary = $nntp->getMessage($groupName, $messageid);
+			if ($nntp->isError($fetchedBinary)) {
 				$nntp->doQuit();
 				$nntp->doConnect();
-				$fetchedBinary = $nntp->getMessage($functions->getByNameByID($groupID), $messageid);
-				if ($fetchedBinary === false || PEAR::isError($fetchedBinary))
-				{
-					$nntp->doQuit();
+				$fetchedBinary = $nntp->getMessage($groupName, $messageid);
+				if ($nntp->isError($fetchedBinary)) {
 					$fetchedBinary = false;
 				}
 			}
-			if ($functions->isNFO($fetchedBinary) === true)
-			{
-				if ($this->echooutput)
-					echo "+";
+			if ($functions->isNFO($fetchedBinary, $guid) === true){
+		            if ($this->echooutput) {
+					echo '+';
+				}
 				return $fetchedBinary;
 			}
-			else
-				return false;
 		}
-		else
-			return false;
-	}
+		return false;
+    }
 
 	// Look for an NFO in the nzb which does not end in .nfo, return the nfo.
-	public function hiddenNFOfromNZB($guid, $relID, $groupID, $nntp)
+	public function hiddenNFOfromNZB($guid, $relID, $groupID, $nntp, $groupName, $db, $nfo)
 	{
-	    $c = new ColorCLI;
-	    if (!isset($nntp))
-			exit($c->error("Not connected to usenet(nzbcontents->hiddenNFOfromNZB.\n"));
-
+		if (!isset($nntp)) {
+			exit($this->c->error("Not connected to usenet(nzbcontents->hiddenNFOfromNZB).\n"));
+		}
+        $functions = new Functions();
 		$nzbfile = $this->LoadNZB($guid);
-		if ($nzbfile !== false)
-		{
-			$db = new DB();
-			$groups = new Groups();
-            $functions = new Functions ();
-			$groupName = $functions->getByNameByID($groupID);
+		if ($nzbfile !== false) {
 			$foundnfo = $failed = false;
-			$nfo = new NFO($this->echooutput);
-			foreach ($nzbfile->file as $nzbcontents)
-			{
+			foreach ($nzbfile->file as $nzbcontents) {
 				$subject = $nzbcontents->attributes()->subject;
 				// Look for a subject with 1 part, ignore common file extensions.
-				if (preg_match('/(yEnc\s\(1\/1\)|\(1\/1\)$)/i', $subject) && !preg_match('/\.(apk|bat|bmp|cbr|cbz|cfg|css|csv|cue|db|dll|doc|epub|exe|gif|htm|ico|idx|ini|jpg|lit|log|m3u|mid|mobi|mp3|nib|nzb|odt|opf|otf|par|par2|pdf|psd|pps|png|ppt|r\d{2,4}|rar|sfv|srr|sub|srt|sql|rom|rtf|tif|torrent|ttf|txt|vb|vol\d+\+\d+|wps|xml|zip)/i', $subject))
-				{
+				if (preg_match('/\(1\/1\)$/i', $subject) && !preg_match('/\.(apk|bat|bmp|cbr|cbz|cfg|css|csv|cue|db|dll|doc|epub|exe|gif|htm|ico|idx|ini|jpg|lit|log|m3u|mid|mobi|mp3|nib|nzb|odt|opf|otf|par|par2|pdf|psd|pps|png|ppt|r\d{2,4}|rar|sfv|srr|sub|srt|sql|rom|rtf|tif|torrent|ttf|txt|vb|vol\d+\+\d+|wps|xml|zip)/i', $subject)) {
 					$messageid = $nzbcontents->segments->segment;
-					if ($messageid !== false)
-					{
+					if ($messageid !== false) {
 						$possibleNFO = $nntp->getMessage($groupName, $messageid);
-						if ($possibleNFO === false || PEAR::isError($possibleNFO))
-						{
+						if ($nntp->isError($possibleNFO)) {
 							$nntp->doQuit();
 							$nntp->doConnect();
 							$possibleNFO = $nntp->getMessage($groupName, $messageid);
-							if ($possibleNFO === false || PEAR::isError($possibleNFO))
-							{
+							if ($nntp->isError($possibleNFO)) {
 								$nntp->doQuit();
 								$possibleNFO = false;
 							}
 						}
-						if ($possibleNFO !== false)
-						{
-							if ($functions->isNFO($possibleNFO) == true)
-							{
+						if ($possibleNFO !== false) {
+							if ($functions->isNFO($possibleNFO, $guid) == true) {
+								// If a previous attempt failed, set this to false because we got an nfo anyways.
+								if ($failed === true) {
+									$failed = false;
+								}
 								$fetchedBinary = $possibleNFO;
 								$foundnfo = true;
+								break;
 							}
-						}
-						else
-						{
-							// NFO download failed, increment attempts.
-							$db->exec(sprintf("UPDATE releases SET nfostatus = nfostatus-1 WHERE ID = %d", $relID));
+							// Set it back to false so we can possibly get another nfo.
+							else {
+								$possibleNFO = false;
+							}
+						} else {
 							$failed = true;
 						}
 					}
 				}
 			}
-			if ($foundnfo !== false && $failed == false)
-			{
-				$functions->addReleaseNfo($relID);
-				if ($this->echooutput)
-					echo "*";
+			if ($foundnfo !== false && $failed === false) {
+				if ($this->echooutput) {
+					echo '*';
+				}
 				return $fetchedBinary;
 			}
-			if ($foundnfo == false && $failed == false)
-			{
+			if ($foundnfo === false && $failed === false) {
 				// No NFO file in the NZB.
-				if ($this->echooutput)
-					echo "-";
-				$db->exec(sprintf("UPDATE releases SET nfostatus = 0 WHERE ID = %d", $relID));
+				if ($this->echooutput) {
+					echo '-';
+				}
+				$db->exec(sprintf('UPDATE releases SET nfostatus = 0 WHERE ID = %d', $relID));
 				return false;
 			}
-			if ($failed == true)
-			{
-				if ($this->echooutput)
-					echo "f";
+			if ($failed === true) {
+				// NFO download failed, increment attempts.
+				$db->exec(sprintf('UPDATE releases SET nfostatus = nfostatus-1 WHERE ID = %d', $relID));
+				if ($this->echooutput) {
+					echo 'f';
+				}
 				return false;
 			}
-		}
-		else
+		} else {
 			return false;
+		}
 	}
 
 	public function nzblist($guid='')

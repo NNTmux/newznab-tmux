@@ -33,9 +33,16 @@ if (count($requestIDtmp) >= 1) {
 		if (is_array($newTitle) && $newTitle['title'] != '') {
 			$bFound = true;
 			$local = true;
-		}
+		} else {
+			$newTitle = getReleaseNameFromRequestID($tmux, $requestID, $pieces[2]);
+			if (is_array($newTitle) && $newTitle['title'] != '') {
+				$bFound = true;
+				$local = false;
+			}
 		}
 	}
+}
+
 if ($bFound === true) {
 	$title = $newTitle['title'];
 	$preid = $newTitle['ID'];
@@ -62,6 +69,26 @@ if ($bFound === true) {
 } else {
 	$db->queryExec('UPDATE releases SET reqidstatus = -3 WHERE ID = ' . $pieces[0]);
 	echo '.';
+}
+
+function getReleaseNameFromRequestID($tmux, $requestID, $groupName)
+{
+	$t = new Tmux();
+	$tmux = $t->get();
+	if ($tmux->request_url == '') {
+		return false;
+	}
+	// Build Request URL
+	$req_url1 = str_ireplace('[GROUP_NM]', urlencode($groupName), $tmux->request_url);
+	$req_url = str_ireplace('[REQUEST_ID]', urlencode($requestID), $req_url1);
+	$xml = @simplexml_load_file($req_url);
+	if (($xml == false) || (count($xml) == 0)) {
+		return false;
+	}
+	$request = $xml->request[0];
+	if (isset($request)) {
+		return array('title' => $request['name'], 'ID' => 'NULL');
+	}
 }
 
 function localLookup($requestID, $groupName, $oldname)
