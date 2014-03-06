@@ -391,13 +391,6 @@ $mask3 = $c->header("%-16.16s %25.25s %25.25s");
 $mask4 = $c->primaryOver("%-16.16s") . " " . $c->tmuxOrange("%25.25s %25.25s");
 $mask5 = $c->tmuxOrange("%-16.16s %25.25s %25.25s");
 
-// Ananlyze tables
-printf($c->info("\nAnalyzing your tables to refresh your indexes."));
-$functions->optimise(true, 'analyze');
-
-sleep (5);
-
-
 
 //create initial display, USP connection count, prehash count and groups count adapted from nZEDb
 passthru('clear');
@@ -452,6 +445,10 @@ printf($mask4, "Activated", $active_groups."(".$all_groups.")", $backfill_groups
 
 $i = 1;
 $time33 = TIME();
+
+// Ananlyze tables
+printf($c->info("\nAnalyzing your tables to refresh your indexes."));
+$functions->optimise(true, 'analyze');
 
 while( $i > 0 )
 {
