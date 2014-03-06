@@ -21,7 +21,7 @@ $DIR = dirname (__FILE__);
 $port = NNTP_PORT;
 $host = NNTP_SERVER;
 $ip = gethostbyname($host);
-$t = new Tmux(),
+$t = new Tmux();
 $tmux = $t->get();
 
 
