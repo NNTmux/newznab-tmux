@@ -3,12 +3,13 @@
 require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
 require_once (WWW_DIR.'/lib/site.php');
+require_once(WWW_DIR.'/lib/Tmux.php');
 require_once("../test/ColorCLI.php");
 require_once("../test/showsleep.php");
 require_once("../test/functions.php");
 
 
-$version="0.3r850";
+$version="0.3r851";
 
 $db = new DB();
 $functions = new Functions();
@@ -20,6 +21,8 @@ $DIR = dirname (__FILE__);
 $port = NNTP_PORT;
 $host = NNTP_SERVER;
 $ip = gethostbyname($host);
+$t = new Tmux(),
+$tmux = $t->get();
 
 
 if (command_exist("python3")) {
