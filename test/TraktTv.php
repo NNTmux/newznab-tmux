@@ -1,5 +1,6 @@
 <?php
-
+require(dirname(__FILE__)."/config.php");
+require_once(WWW_DIR.'/lib/Tmux.php');
 /*
  * 	Lookup information from trakt.tv using their API.
  */
