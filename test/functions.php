@@ -1159,7 +1159,7 @@ class Functions
     //set releasenfoID in releases table to -1 where releasenfo nfo IS NULL
     function freeNfo()
     {
-			$relres = $db->query('SELECT ID FROM releasenfo WHERE nfo IS NULL');
+			$relres = $this->db->query('SELECT ID FROM releasenfo WHERE nfo IS NULL');
 			foreach ($relres as $relrow) {
 				$db->exec(sprintf('UPDATE releases SET releasenfoID = -1 WHERE releasenfoID = %d', $relrow['ID']));
 			}
@@ -1168,7 +1168,7 @@ class Functions
 
     function removeNfo()
     {
-      $relres = $db->query('SELECT ID FROM releases WHERE releasenfoID = -1');
+      $relres = $this->db->query('SELECT ID FROM releases WHERE releasenfoID = -1');
 			foreach ($relres as $relrow) {
 				$db->exec(sprintf('DELETE FROM releasenfo WHERE nfo IS NULL and releaseID = %d', $relrow['ID']));
 			}
