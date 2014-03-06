@@ -9,7 +9,7 @@ require_once("../test/showsleep.php");
 require_once("../test/functions.php");
 
 
-$version="0.3r851";
+$version="0.3r852";
 
 $db = new DB();
 $functions = new Functions();
@@ -394,6 +394,8 @@ $mask5 = $c->tmuxOrange("%-16.16s %25.25s %25.25s");
 // Ananlyze tables
 printf($c->info("\nAnalyzing your tables to refresh your indexes."));
 $functions->optimise(true, 'analyze');
+
+sleep (5);
 
 
 
