@@ -9,7 +9,7 @@ require_once("../test/showsleep.php");
 require_once("../test/functions.php");
 
 
-$version="0.3r855";
+$version="0.3r856";
 
 $db = new DB();
 $functions = new Functions();
@@ -1287,11 +1287,11 @@ $usptotalconnections  = str_replace("\n", '', shell_exec("ss -n | grep -c " . $i
         }
 
 	//Process Console releases in pane 2.5 once if needed then exits
-	if (( $array['MAX_LOAD'] >= get_load()) && ( $console_releases_proc >= 200 )) {
+	if (( $array['MAX_LOAD'] >= get_load()) && ( $console_releases_proc > 0 )) {
 		$color = get_color();
 		$log = writelog($panes2[5]);
 		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes2[5] $ds2 && cd $_bin && $_php postprocess_new.php games 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes2[5] $ds3' 2>&1 1> /dev/null");
-	} elseif  ( $array['MAX_LOAD'] <= get_load()) {
+	} elseif ( $array['MAX_LOAD'] <= get_load()) {
                 $color = get_color();
                 shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.5 'echo \"\033[38;5;\"$color\"m\n$panes2[5] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
     } elseif ( $console_releases_proc == 0 )  {
