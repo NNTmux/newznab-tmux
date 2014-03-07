@@ -24,7 +24,7 @@ $pieces = explode('           =+=            ', $argv[1]);
 
 $functions = new Functions(true);
 if (isset($pieces[6])) {
-	// Create the connection here and pass, this is for post processing, so check for alternate
+	// Create the connection here and pass
 	$nntp = new NNTP();
 	if  ($nntp->doConnect() === false) {
 		exit($c->error("Unable to connect to usenet."));
@@ -33,7 +33,7 @@ if (isset($pieces[6])) {
 	$functions->processAdditionalThreaded($argv[1], $nntp);
 		$nntp->doQuit();
 } else if (isset($pieces[3])) {
-	// Create the connection here and pass, this is for post processing, so check for alternate
+	// Create the connection here and pass
 	$nntp = new NNTP();
 	if ($nntp->doConnect() === false) {
 		exit($c->error("Unable to connect to usenet."));

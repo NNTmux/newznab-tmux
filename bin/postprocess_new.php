@@ -104,6 +104,9 @@ if (isset($argv[1]) && $argv[1] === "additional") {
             {
                echo $c->info("AniDB lookup disabled in site settings.\n");
             }
-}
+} else if (isset($argv[1]) && $argv[1] === "spotnab") {
+                $postprocess -> processSpotnab();
+            }
+
 
 
