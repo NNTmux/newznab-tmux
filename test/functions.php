@@ -67,6 +67,7 @@ class Functions
     $this->nzbs = (!empty($this->tmux->maxnfoprocessed)) ? $this->tmux->maxnfoprocessed : 100;
     $this->service = '';
     $this->debug = ($this->tmux->debuginfo == "0") ? false : true;
+    $this->imgSavePath = WWW_DIR.'covers/console/'; 
   }
     /**
 	 * @var object Instance of PDO class.
@@ -2532,7 +2533,7 @@ class Functions
 	{
 		$db = $this->db;
 		$like = 'LIKE';
-		
+
 		return $db->queryOneRow(sprintf("SELECT * FROM consoleinfo WHERE title LIKE %s AND platform %s %s", $db->escapeString("%" . $title . "%"), $like, $db->escapeString("%" . $platform . "%")));
 	}
 
