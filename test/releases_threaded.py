@@ -21,7 +21,7 @@ pathname = os.path.abspath(os.path.dirname(sys.argv[0]))
 
 print(bcolors.HEADER + "\nUpdate Releases Threaded Started at {}".format(datetime.datetime.now().strftime("%H:%M:%S")) + bcolors.ENDC)
 
-cur[0].execute("SELECT value FROM tmux WHERE setting = 'releasesthreads'")
+cur[0].execute("SELECT value FROM tmux WHERE setting = 'releasethreads'")
 dbgrab = cur[0].fetchone()
 threads = int(dbgrab[0][0])
 
