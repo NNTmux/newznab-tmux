@@ -9,7 +9,7 @@ require_once("../test/showsleep.php");
 require_once("../test/functions.php");
 
 
-$version="0.3r856";
+$version="0.3r857";
 
 $db = new DB();
 $functions = new Functions();
@@ -1421,7 +1421,7 @@ $usptotalconnections  = str_replace("\n", '', shell_exec("ss -n | grep -c " . $i
 	if (( $array['MAX_LOAD'] >= get_load()) && ( $array['REMOVECRAP'] == "true" )) {
 		$color = get_color();
 		$log = writelog($panes3[3]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.3 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes3[3] $ds2 && cd $_test && $_php removeCrapReleases.php true 2 2>&1 $log echo \" \033[1;0;33m\" && $_sleep {$array['REMOVECRAP_TIMER']} && $ds1 $panes3[3] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.3 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes3[3] $ds2 && cd $_test && $_php removeCrapReleases.php true 2 2>&1 $log && echo \" \033[1;0;33m\" && $_sleep {$array['REMOVECRAP_TIMER']} && $ds1 $panes3[3] $ds3' 2>&1 1> /dev/null");
 		$time31 = TIME();}
 	  elseif ( $array['REMOVECRAP'] != "true" ) {
 		$color = get_color();
