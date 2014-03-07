@@ -2528,6 +2528,14 @@ class Functions
 		return $result;
 	}
 
+    public function getConsoleInfoByName($title, $platform)
+	{
+		$db = $this->db;
+		$like = 'LIKE';
+		
+		return $db->queryOneRow(sprintf("SELECT * FROM consoleinfo WHERE title LIKE %s AND platform %s %s", $db->escapeString("%" . $title . "%"), $like, $db->escapeString("%" . $platform . "%")));
+	}
+
 
 
 
