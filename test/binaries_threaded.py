@@ -17,7 +17,6 @@ import lib.info as info
 from lib.info import bcolors
 conf = info.readConfig()
 cur = info.connect()
-threads = 5
 start_time = time.time()
 pathname = os.path.abspath(os.path.dirname(sys.argv[0]))
 
@@ -56,8 +55,13 @@ if len(datas) == 0:
     info.disconnect(cur[0], cur[1])
     sys.exit
 
+cur[0].execute("SELECT value FROM tmux WHERE setting = 'binarythreads'")
+dbgrab = cur[0].fetchone()
+run_threads = int(dbgrab[0][0])
+
 #close connection to mysql
 info.disconnect(cur[0], cur[1])
+
 
 my_queue = queue.Queue()
 time_of_last_run = time.time()
@@ -86,7 +90,7 @@ def main():
 	global time_of_last_run
 	time_of_last_run = time.time()
 
-	print(bcolors.HEADER + "We will be using a max of {} threads, a queue of {} groups".format(threads, "{:,}".format(len(datas))) + bcolors.ENDC)
+	print(bcolors.HEADER + "We will be using a max of {} threads, a queue of {} groups".format(run_threads, "{:,}".format(len(datas))) + bcolors.ENDC)
 	time.sleep(2)
 
 	def signal_handler(signal, frame):
@@ -96,7 +100,7 @@ def main():
 
 	if True:
 		#spawn a pool of worker threads
-		for i in range(threads):
+		for i in range(run_threads):
 			p = queue_runner(my_queue)
 			#p.setDaemon(False)
 			p.start()

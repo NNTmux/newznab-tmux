@@ -48,31 +48,32 @@ else:
 
 print(bcolors.HEADER + "\nfixReleasesNames {} Threaded Started at {}".format(sys.argv[1],datetime.datetime.now().strftime("%H:%M:%S")) + bcolors.ENDC)
 
-run_threads = 5
-perrun = 20
-process_all = run_threads * perrun
+cur[0].execute("SELECT value FROM tmux WHERE setting = 'fixnamethreads'")
+run_threads = cur[0].fetchone()
+cur[0].execute("SELECT value FROM tmux WHERE setting = 'fixnamesperrun'")
+perrun = cur[0].fetchone()
 
 datas = []
 maxtries = 0
 
 if len(sys.argv) > 1 and sys.argv[1] == "nfo":
     run = "SELECT DISTINCT rel.ID AS releaseID FROM releases rel INNER JOIN releasenfo nfo ON (nfo.releaseID = rel.ID) WHERE categoryID = 8010 AND proc_nfo = 0 AND" + clean + "ORDER BY postdate DESC LIMIT %s"
-    cur[0].execute(run, process_all)
+    cur[0].execute(run, (int(perrun[0]) * int(run_threads[0])))
     datas = cur[0].fetchall()
 elif len(sys.argv) > 1 and (sys.argv[1] == "filename"):
     run = "SELECT DISTINCT rel.ID AS releaseID FROM releases rel INNER JOIN releasefiles relfiles ON (relfiles.releaseID = rel.ID) WHERE categoryID = 8010 AND proc_files = 0 AND" + clean + "ORDER BY postdate ASC LIMIT %s"
-    cur[0].execute(run, process_all)
+    cur[0].execute(run, (int(perrun[0]) * int(run_threads[0])))
     datas = cur[0].fetchall()
 elif len(sys.argv) > 1 and (sys.argv[1] == "md5"):
     while len(datas) == 0 and maxtries >= -5:
         run = "SELECT DISTINCT rel.ID FROM releases rel INNER JOIN releasefiles rf ON rel.ID = rf.releaseID WHERE isrenamed = 0 AND rel.dehashstatus BETWEEN %s AND 0 AND rel.passwordstatus >= -1 AND (ishashed = 1 OR rf.name REGEXP'[a-fA-F0-9]{32}') ORDER BY postdate ASC LIMIT %s"
-        cur[0].execute(run, (maxtries,process_all))
+        cur[0].execute(run, (maxtries, int(perrun[0])*int(run_threads[0])))
         datas = cur[0].fetchall()
         maxtries = maxtries - 1
 elif len(sys.argv) > 1 and (sys.argv[1] == "par2"):
 	#This one does from oldest posts to newest posts, since nfo pp does same thing but newest to oldest
     run = "SELECT ID AS releaseID, guid, groupID FROM releases WHERE categoryID = 8010 AND proc_par2 = 0 AND" + clean + "ORDER BY postdate ASC LIMIT %s"
-    cur[0].execute(run, process_all)
+    cur[0].execute(run, (int(perrun[0]) * int(run_threads[0])))
     datas = cur[0].fetchall()
 
 #close connection to mysql
@@ -123,7 +124,7 @@ def main():
 
 	if True:
 		#spawn a pool of place worker threads
-		for i in range(run_threads):
+		for i in range(int(run_threads[0])): 
 			p = queue_runner(my_queue)
 			p.setDaemon(False)
 			p.start()

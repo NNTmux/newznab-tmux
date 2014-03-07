@@ -779,7 +779,7 @@
 			<tr>
 				<td style="width:180px;"><label for="releasesthreads">Update Releases Threads:</label></td>
 				<td>
-					<input class="short" id="releasesthreads" name="releasesthreads" type="text" value="{$ftmux->releasesthreads}" />
+					<input class="short" id="releasethreads" name="releasethreads" type="text" value="{$ftmux->releasethreads}" />
 					<div class="hint">The number of threads for update_releases. This actualy makes no difference, newznab update_releases is not threaded.</div>
 				</td>
 			</tr>

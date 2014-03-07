@@ -21,7 +21,9 @@ pathname = os.path.abspath(os.path.dirname(sys.argv[0]))
 
 print(bcolors.HEADER + "\nUpdate Releases Threaded Started at {}".format(datetime.datetime.now().strftime("%H:%M:%S")) + bcolors.ENDC)
 
-threads = 5
+cur[0].execute("SELECT value FROM tmux WHERE setting = 'releasesthreads'")
+dbgrab = cur[0].fetchone()
+threads = int(dbgrab[0][0])
 
 cur[0].execute("SELECT table_name FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '"+conf['DB_NAME']+"' AND table_rows > 0 AND table_name LIKE 'binaries'")
 datas = cur[0].fetchall()
