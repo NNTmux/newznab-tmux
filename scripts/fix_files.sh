@@ -48,7 +48,7 @@ if [[ $CHOWN_TRUE == "true" ]]; then
     chown -R $WWW_USER $NEWZPATH/www/
     chown -R $WWW_USER $NEWZPATH/db/
     chown -R $WWW_USER $NEWZPATH/misc/
-	chown -R $NEWZPATH/nzbfiles/
+	chown -R $WWW_USER $NEWZPATH/nzbfiles/
     chmod 775 $NEWZPATH/www/lib/smarty/templates_c
     chmod -R 775 $NEWZPATH/www/covers
     chmod 775 $NEWZPATH/www
@@ -58,7 +58,7 @@ else
     chmod 777 $NEWZPATH/www/lib/smarty/templates_c
     chmod -R 777 $NEWZPATH/www/covers
     chmod 777 $NEWZPATH/www
-	chmod -R 777 $NEWZPATH/nzbfiles
+	chmod -R 777 $NEWZPATH/nzbfiles/
     #chmod 777 $NEWZPATH/www/install
 fi
 
