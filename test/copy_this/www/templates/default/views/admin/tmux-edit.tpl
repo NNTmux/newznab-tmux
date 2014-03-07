@@ -57,7 +57,7 @@
                     <input id="monitor_path" name="monitor_path" class="long" type="text" value="{$ftmux->monitor_path}" /><br />
                     <input id="monitor_path_a" name="monitor_path_a" class="long" type="text" value="{$ftmux->monitor_path_a}" /><br />
                     <input id="monitor_path_b" name="monitor_path_b" class="long" type="text" value="{$ftmux->monitor_path_b}" />
-                    <div class="hint">Enter a path here to have Monitor monitor its usage and free space. Must be a valid path.<br />To use this example, add to fstab and edit path, gid and uid, then mount as user not root:<br />tmpfs /var/www/nZEDb/nzbfiles/tmpunrar tmpfs user,uid=1000,gid=33,nodev,nodiratime,nosuid,size=1G,mode=777 0 0<br />
+                    <div class="hint">Enter a path here to have Monitor monitor its usage and free space. Must be a valid path.<br />To use this example, add to fstab and edit path, gid and uid, then mount as user not root:<br />tmpfs /var/www/newznab/nzbfiles/tmpunrar tmpfs user,uid=1000,gid=33,nodev,nodiratime,nosuid,size=1G,mode=777 0 0<br />
                         gid == group id == /etc/groups, uid == user id == /etc/passwd</div>
                 </td>
             </tr>
@@ -66,7 +66,7 @@
                 <td style="width:180px;"><label for="explain">Information:</label></td>
                 <td>
                     <div class="explanation">
-                        Monitor is the name of the script that monitors all of the tmux panes and windows. It stops/stops scripts based on user settings. It queries the database to provide stats from your nZEDb database.<br /><br />
+                        Monitor is the name of the script that monitors all of the tmux panes and windows. It stops/stops scripts based on user settings. It queries the database to provide stats from your newznab database.<br /><br />
                         There are 2 columns of numbers, 'In Process' and 'In Database'. The 'In Process' is all releases that need to be postprocessed. The 'In Database' is the number of releases matching that category.<br /><br />
                         The 'In Process' column has 2 sets of numbers, the total for each category that needs to be postprocessed and inside the parenthesis is the difference from when the script started to what it is now.<br /><br />
                         The 'In Database' column also has 2 sets of numbers, the total releases for each category and inside the parenthesis is the percentage that category is to the total number of releases.<br /><br />
@@ -751,6 +751,68 @@
 				<td>
 					<input class="short" id="amazonsleep" name="amazonsleep" type="text" value="{$ftmux->amazonsleep}" />
 					<div class="hint">Sleep time in milliseconds to wait in between amazon requests. If you thread post-proc, multiply by the number of threads. ie Postprocessing Threads = 12, Amazon sleep time = 12000<br /><a href="https://affiliate-program.amazon.com/gp/advertising/api/detail/faq.html">https://affiliate-program.amazon.com/gp/advertising/api/detail/faq.html</a></div>
+				</td>
+			</tr>
+
+		</table>
+	</fieldset>
+
+    <fieldset>
+		<legend>Advanced - Threaded Settings</legend>
+		<table class="input">
+			<tr>
+				<td style="width:180px;"><label for="binarythreads">Update Binaries Threads:</label></td>
+				<td>
+					<input class="short" id="binarythreads" name="binarythreads" type="text" value="{$ftmux->binarythreads}" />
+					<div class="hint">The number of threads for update_binaries. If you notice that you are getting a lot of parts into the partrepair table, it is possible that you USP is not keeping up with the requests. Try to reduce the threads. At least until the cause can be determined.</div>
+				</td>
+			</tr>
+
+			<tr>
+				<td style="width:180px;"><label for="backfillthreads">Backfill Threads:</label></td>
+				<td>
+					<input class="short" id="backfillthreads" name="backfillthreads" type="text" value="{$ftmux->backfillthreads}" />
+					<div class="hint">The number of threads for backfill.</div>
+				</td>
+			</tr>
+
+			<tr>
+				<td style="width:180px;"><label for="releasesthreads">Update Releases Threads:</label></td>
+				<td>
+					<input class="short" id="releasesthreads" name="releasesthreads" type="text" value="{$ftmux->releasesthreads}" />
+					<div class="hint">The number of threads for update_releases. This actualy makes no difference, newznab update_releases is not threaded.</div>
+				</td>
+			</tr>
+
+			<tr>
+				<td style="width:180px;"><label for="nzbthreads">Import-nzb Threads:</label></td>
+				<td>
+					<input class="short" id="nzbthreads" name="nzbthreads" type="text" value="{$ftmux->nzbthreads}" />
+					<div class="hint">The number of threads for import-nzb(bulk). This will thread each subfolder.</div>
+				</td>
+			</tr>
+
+			<tr>
+				<td style="width:180px;"><label for="postthreads">Postprocessing Additional Threads:</label></td>
+				<td>
+					<input class="short" id="postthreads" name="postthreads" type="text" value="{$ftmux->postthreads}" />
+					<div class="hint">The number of threads for additional postprocessing. This includes deep rar inspection, preview and sample creation and nfo processing.</div>
+				</td>
+			</tr>
+
+			<tr>
+				<td style="width:180px;"><label for="postthreadsnon">Postprocessing Non-Amazon Threads:</label></td>
+				<td>
+					<input class="short" id="postthreadsnon" name="postthreadsnon" type="text" value="{$ftmux->postthreadsnon}" />
+					<div class="hint">The number of threads for non-amazon postprocessing. This includes movies, anime and tv lookups.</div>
+				</td>
+			</tr>
+
+			<tr>
+				<td style="width:180px;"><label for="fixnamethreads">fixReleaseNames Threads:</label></td>
+				<td>
+					<input class="short" id="fixnamethreads"  name="fixnamethreads" type="text" value="{$ftmux->fixnamethreads}" />
+					<div class="hint">The number of threads for fixReleasesNames. This includes md5, nfos, par2 and filenames.</div>
 				</td>
 			</tr>
 
