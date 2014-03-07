@@ -67,8 +67,6 @@ class Functions
     $this->nzbs = (!empty($this->tmux->maxnfoprocessed)) ? $this->tmux->maxnfoprocessed : 100;
     $this->service = '';
     $this->debug = ($this->tmux->debuginfo == "0") ? false : true;
-    $this->renamed = '';
-
   }
     /**
 	 * @var object Instance of PDO class.
@@ -2134,7 +2132,7 @@ class Functions
     public function processConsoleReleases()
 	{
 		$db = $this->db;
-		$res = $db->queryDirect(sprintf('SELECT r.searchname, r.ID FROM releases r INNER JOIN category c ON r.categoryID = c.ID WHERE %s AND r.consoleinfoID IS NULL AND c.parentID = %d ORDER BY r.postdate DESC LIMIT %d', $this->renamed, Category::CAT_PARENT_GAME, $this->gameqty));
+		$res = $db->queryDirect(sprintf('SELECT r.searchname, r.ID FROM releases r INNER JOIN category c ON r.categoryID = c.ID WHERE r.consoleinfoID IS NULL AND c.parentID = %d ORDER BY r.postdate DESC LIMIT %d', Category::CAT_PARENT_GAME, $this->gameqty));
 
 		if ($res->rowCount() > 0) {
 			if ($this->echooutput) {
