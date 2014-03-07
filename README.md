@@ -4,9 +4,11 @@ Support is given on irc.synirc.net #newznab-tmuxd channel and also on original n
 I started adapting some of more interesting scripts from nZEDb, but they require tempering with newznab database, so use them at your own risk. Any update to nn+ db could render them useless. Scripts require PHP version > 5.3.10
 There is a test folder in main tmux folder. In that folder you will find three different folders, /db_update/, /initial_setup/ and /predb_dump/. When you are done with initial setup and before you run start.sh for the first time, do the following:
 
-1. Import db.sql from db_update folder into newznab database,
+1. Import db.sql from db_update folder into newznab database (prehash table creation has been incorporated into db.sql),
 
-2. Import create_prehash_table.sql from initial_setup folder, be aware that this WILL delete your existing prehash table.
+2. Copy files from /test/copy_this/ folder into your newznab installation to have some of the things in tmux changed in admin area (many things are work in progress and produce no change). This is available in default template for now. 
+
+3. Some of the scripts are now threaded, they need python. Install instructions are in threaded_scripts_readme.txt
 
 3. OPTIONAL: If you want to populate your prehash table with more than 6 million rows of pre data (This dump includes 6,166,783 unique predb releases.), run dump_prehash.php to import the predb dump. Predb dump can be downloaded from https://mega.co.nz/#!LUsRACZA!Iz4u-0EIKTuIjySp00ESi2a1XcxFPxhppd15Hakb_YE.
 
@@ -110,7 +112,7 @@ Below is the original readme of newznab-tmux, with changes related to my git and
 
  * A couple of autoinstallers are available to completely install everything needed for Ubuntu 12.10 Newznab+ installation. [zombu2](https://github.com/zombu2/nninstall) and [convict](https://github.com/rcconvict/nninstaller) each have simlar installers and can be found in the gits. If you prefor to do things yourself there is an excellent guide [here](http://oizopower.tweakblogs.net/blog/8524/newznab%2B-installatie-%28ubuntu-nginx-percona%29.html).
   
- * Join in the conversation at irc://irc.synirc.net/newznab-tmux.
+ * Join in the conversation at irc://irc.synirc.net/tmux
 
 
 
@@ -129,10 +131,5 @@ If you want to donate please click on donate button
 
 
 <hr>
-![Newznab-tmux](https://raw.github.com/jonnyboy/newznab-tmux/master/image/newznab-tmux-1.png)
-![Newznab-tmux](https://raw.github.com/jonnyboy/newznab-tmux/master/image/newznab-tmux-2.png)
-![Newznab-tmux](https://raw.github.com/jonnyboy/newznab-tmux/master/image/newznab-tmux-3.png)
-![Newznab-tmux](https://raw.github.com/jonnyboy/newznab-tmux/master/image/newznab-tmux-4.png)
-![Newznab-tmux](https://raw.github.com/jonnyboy/newznab-tmux/master/image/newznab-tmux-5.png)
-![Newznab-tmux](https://raw.github.com/jonnyboy/newznab-tmux/master/image/newznab-tmux-6.png)
+
 

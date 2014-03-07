@@ -66,16 +66,16 @@ else
     $TMUXCMD splitw -h -p 50 'printf "\033]2;nzbcount\033\\"'
 
     $TMUXCMD new-window -n PostProcessing 'printf "\033]2;processNfos1\033\\"'
-    $TMUXCMD splitw -h -p 50 'printf "\033]2;processAnime\033\\"'
+    $TMUXCMD splitw -h -p 50 'printf "\033]2;processGames\033\\"'
     $TMUXCMD selectp -t 0
     $TMUXCMD splitw -v -p 80 'printf "\033]2;processTV\033\\"'
     $TMUXCMD splitw -v -p 75 'printf "\033]2;processMovies\033\\"'
     $TMUXCMD splitw -v -p 67 'printf "\033]2;processMusic\033\\"'
-    $TMUXCMD splitw -v -p 50 'printf "\033]2;processOther\033\\"'
+    $TMUXCMD splitw -v -p 50 'printf "\033]2;processAnime\033\\"'
     $TMUXCMD selectp -t 5
-    $TMUXCMD splitw -v -p 80 'printf "\033]2;processGames\033\\"'
-    $TMUXCMD splitw -v -p 75 'printf "\033]2;processSpotnab\033\\"'
-    $TMUXCMD splitw -v -p 67 'printf "\033]2;processBooks\033\\"'
+    $TMUXCMD splitw -v -p 80 'printf "\033]2;processSpotnab\033\\"'
+    $TMUXCMD splitw -v -p 75 'printf "\033]2;processBooks\033\\"'
+    $TMUXCMD splitw -v -p 67 'printf "\033]2;processOther\033\\"'
     $TMUXCMD splitw -v -p 50 'printf "\033]2;processUnwanted\033\\"'
 	
 	$TMUXCMD new-window -n FixNames 'printf "\033]2;Fix_Release_Names\033\\"'
