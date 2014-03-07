@@ -19,6 +19,7 @@ require_once(WWW_DIR."/lib/movie.php");
 require_once(WWW_DIR."/lib/nntp.php");
 require_once(WWW_DIR."/lib/postprocess.php");
 require_once(WWW_DIR."/lib/Tmux.php");
+require_once(WWW_DIR."/lib/amazon.php");
 require_once("consoletools.php");
 require_once("ColorCLI.php");
 require_once("nzbcontents.php");
@@ -53,6 +54,11 @@ class Functions
     $this->partsqty = (!empty($this->tmux->maxpartsprocessed)) ? $this->tmux->maxpartsprocessed : 3;
     $this->movieqty = (!empty($this->tmux->maximdbprocessed)) ? $this->tmux->maximdbprocessed : 100;
     $this->rageqty = (!empty($his->tmux->maxrageprocessed)) ? $this->tmux->maxrageprocessed : 75;
+    $this->pubkey = $this->site->amazonpubkey;
+	$this->privkey = $this->site->amazonprivkey;
+	$this->asstag = $this->site->amazonassociatetag;
+	$this->gameqty = (!empty($this->tmux->maxgamesprocessed)) ? $this->tmux->maxgamesprocessed : 150;
+	$this->sleeptime = (!empty($this->tmux->amazonsleep)) ? $this->tmux->amazonsleep : 1000;
     $this->DEBUG_ECHO = ($this->tmux->debuginfo == '0') ? false : true;
 		if (defined('DEBUG_ECHO') && DEBUG_ECHO == true) {
 			$this->DEBUG_ECHO = true;
@@ -60,6 +66,7 @@ class Functions
     $this->nzbs = (!empty($this->tmux->maxnfoprocessed)) ? $this->tmux->maxnfoprocessed : 100;
     $this->service = '';
     $this->debug = ($this->tmux->debuginfo == "0") ? false : true;
+    $this->renamed = '';
 
   }
     /**
@@ -2109,6 +2116,421 @@ class Functions
 			return false;
 		}
 	}
+
+    /**
+	 * Lookup games if enabled.
+	 *
+	 * @return void
+	 */
+	public function processGames()
+	{
+		if ($this->site->lookupgames == 1) {
+			$console = new Console($this->echooutput);
+			$this->processConsoleReleases();
+		}
+	}
+
+    public function processConsoleReleases()
+	{
+		$db = $this->db;
+		$res = $db->queryDirect(sprintf('SELECT r.searchname, r.ID FROM releases r INNER JOIN category c ON r.categoryID = c.ID WHERE %s AND r.consoleinfoID IS NULL AND c.parentID = %d ORDER BY r.postdate DESC LIMIT %d', $this->renamed, Category::CAT_PARENT_GAME, $this->gameqty));
+
+		if ($res->rowCount() > 0) {
+			if ($this->echooutput) {
+				echo $this->c->header("\nProcessing " . $res->rowCount() . ' console release(s).');
+			}
+
+			foreach ($res as $arr) {
+				$startTime = microtime(true);
+				$usedAmazon = false;
+				$gameInfo = $this->parseTitle($arr['searchname']);
+				if ($gameInfo !== false) {
+
+					if ($this->echooutput) {
+						echo $this->c->headerOver('Looking up: ') . $this->c->primary($gameInfo['title'] . ' (' . $gameInfo['platform'] . ')');
+					}
+
+					// Check for existing console entry.
+					$gameCheck = $this->getConsoleInfoByName($gameInfo['title'], $gameInfo['platform']);
+
+					if ($gameCheck === false) {
+						$gameId = $this->updateConsoleInfo($gameInfo);
+						$usedAmazon = true;
+						if ($gameId === false) {
+							$gameId = -2;
+						}
+					} else {
+						$gameId = $gameCheck['ID'];
+					}
+
+					// Update release.
+					$db->exec(sprintf('UPDATE releases SET consoleinfoID = %d WHERE ID = %d', $gameId, $arr['ID']));
+				} else {
+					// Could not parse release title.
+					$db->exec(sprintf('UPDATE releases SET consoleinfoID = %d WHERE ID = %d', -2, $arr['ID']));
+					echo '.';
+				}
+
+				// Sleep to not flood amazon.
+				$diff = floor((microtime(true) - $startTime) * 1000000);
+				if ($this->sleeptime * 1000 - $diff > 0 && $usedAmazon === true) {
+					usleep($this->sleeptime * 1000 - $diff);
+				}
+			}
+		} else
+		if ($this->echooutput) {
+			echo $this->c->header('No console releases to process.');
+		}
+	}
+
+	function parseTitle($releasename)
+	{
+		$matches = '';
+		$releasename = preg_replace('/\sMulti\d?\s/i', '', $releasename);
+		$result = array();
+
+		// Get name of the game from name of release.
+		preg_match('/^(.+((abgx360EFNet|EFNet\sFULL|FULL\sabgxEFNet|abgx\sFULL|abgxbox360EFNet)\s|illuminatenboard\sorg))?(?P<title>.*?)[\.\-_ ](v\.?\d\.\d|PAL|NTSC|EUR|USA|JP|ASIA|JAP|JPN|AUS|MULTI\.?5|MULTI\.?4|MULTI\.?3|PATCHED|FULLDVD|DVD5|DVD9|DVDRIP|PROPER|REPACK|RETAIL|DEMO|DISTRIBUTION|REGIONFREE|READ\.?NFO|NFOFIX|PS2|PS3|PSP|WII|X\-?BOX|XBLA|X360|NDS|N64|NGC)/i', $releasename, $matches);
+		if (isset($matches['title'])) {
+			$title = $matches['title'];
+			// Replace dots or underscores with spaces.
+			$result['title'] = preg_replace('/(\.|_|\%20)/', ' ', $title);
+			// Needed to add code to handle DLC Properly.
+			if (preg_match('/dlc/i', $result['title'])) {
+				$result['dlc'] = '1';
+				if (preg_match('/Rock Band Network/i', $result['title'])) {
+					$result['title'] = 'Rock Band';
+				} else if (preg_match('/\-/i', $result['title'])) {
+					$dlc = explode("-", $result['title']);
+					$result['title'] = $dlc[0];
+				} else if (preg_match('/(.*? .*?) /i', $result['title'], $dlc)) {
+					$result['title'] = $dlc[0];
+				}
+			}
+		}
+
+		//get the platform of the release
+		preg_match('/[\.\-_ ](?P<platform>XBLA|WiiWARE|N64|SNES|NES|PS2|PS3|PS 3|PSP|WII|XBOX360|X\-?BOX|X360|NDS|NGC)/i', $releasename, $matches);
+		if (isset($matches['platform'])) {
+			$platform = $matches['platform'];
+			if (preg_match('/^(XBLA)$/i', $platform)) {
+				if (preg_match('/DLC/i', $title)) {
+					$platform = str_replace('XBLA', 'XBOX360', $platform); // baseline single quote
+				}
+			}
+			$browseNode = $this->getBrowseNode($platform);
+			$result['platform'] = $platform;
+			$result['node'] = $browseNode;
+		}
+		$result['release'] = $releasename;
+		array_map("trim", $result);
+		// Make sure we got a title and platform otherwise the resulting lookup will probably be shit. Other option is to pass the $release->categoryID here if we don't find a platform but that would require an extra lookup to determine the name. In either case we should have a title at the minimum.
+		return (isset($result['title']) && !empty($result['title']) && isset($result['platform'])) ? $result : false;
+	}
+
+	function getBrowseNode($platform)
+	{
+		switch ($platform) {
+			case 'PS2':
+				$nodeId = '301712';
+				break;
+			case 'PS3':
+				$nodeId = '14210751';
+				break;
+			case 'PSP':
+				$nodeId = '11075221';
+				break;
+			case 'WII':
+			case 'Wii':
+				$nodeId = '14218901';
+				break;
+			case 'XBOX360':
+			case 'X360':
+				$nodeId = '14220161';
+				break;
+			case 'XBOX':
+			case 'X-BOX':
+				$nodeId = '537504';
+				break;
+			case 'NDS':
+				$nodeId = '11075831';
+				break;
+			case 'N64':
+				$nodeId = '229763';
+				break;
+			case 'SNES':
+				$nodeId = '294945';
+				break;
+			case 'NES':
+				$nodeId = '566458';
+				break;
+			case 'NGC':
+				$nodeId = '541022';
+				break;
+			default:
+				$nodeId = '468642';
+				break;
+		}
+
+		return $nodeId;
+	}
+
+	public function matchBrowseNode($nodeName)
+	{
+		$str = '';
+
+		//music nodes above mp3 download nodes
+		switch ($nodeName) {
+			case 'Action':
+			case 'Adventure':
+			case 'Arcade':
+			case 'Board Games':
+			case 'Cards':
+			case 'Casino':
+			case 'Flying':
+			case 'Puzzle':
+			case 'Racing':
+			case 'Rhythm':
+			case 'Role-Playing':
+			case 'Simulation':
+			case 'Sports':
+			case 'Strategy':
+			case 'Trivia':
+				$str = $nodeName;
+				break;
+		}
+		return ($str != '') ? $str : false;
+	}
+
+    public function updateConsoleInfo($gameInfo)
+	{
+		$db = $this->db;
+		$gen = new Genres();
+		$ri = new ReleaseImage();
+
+		$con = array();
+		$amaz = $this->fetchAmazonProperties($gameInfo['title'], $gameInfo['node']);
+		if (!$amaz) {
+			return false;
+		}
+
+		// Load genres.
+		$defaultGenres = $gen->getGenres(Genres::CONSOLE_TYPE);
+		$genreassoc = array();
+		foreach ($defaultGenres as $dg) {
+			$genreassoc[$dg['id']] = strtolower($dg['title']);
+		}
+
+		// Get game properties.
+		$con['coverurl'] = (string) $amaz->Items->Item->LargeImage->URL;
+		if ($con['coverurl'] != "") {
+			$con['cover'] = 1;
+		} else {
+			$con['cover'] = 0;
+		}
+
+		$con['title'] = (string) $amaz->Items->Item->ItemAttributes->Title;
+		if (empty($con['title'])) {
+			$con['title'] = $gameInfo['title'];
+		}
+
+		$con['platform'] = (string) $amaz->Items->Item->ItemAttributes->Platform;
+		if (empty($con['platform'])) {
+			$con['platform'] = $gameInfo['platform'];
+		}
+
+		// Beginning of Recheck Code.
+		// This is to verify the result back from amazon was at least somewhat related to what was intended.
+		// Some of the platforms don't match Amazon's exactly. This code is needed to facilitate rechecking.
+		if (preg_match('/^X360$/i', $gameInfo['platform'])) {
+			$gameInfo['platform'] = str_replace('X360', 'Xbox 360', $gameInfo['platform']);
+		} // baseline single quote
+		if (preg_match('/^XBOX360$/i', $gameInfo['platform'])) {
+			$gameInfo['platform'] = str_replace('XBOX360', 'Xbox 360', $gameInfo['platform']);
+		} // baseline single quote
+		if (preg_match('/^NDS$/i', $gameInfo['platform'])) {
+			$gameInfo['platform'] = str_replace('NDS', 'Nintendo DS', $gameInfo['platform']);
+		} // baseline single quote
+		if (preg_match('/^PS3$/i', $gameInfo['platform'])) {
+			$gameInfo['platform'] = str_replace('PS3', 'PlayStation 3', $gameInfo['platform']);
+		} // baseline single quote
+		if (preg_match('/^PSP$/i', $gameInfo['platform'])) {
+			$gameInfo['platform'] = str_replace('PSP', 'Sony PSP', $gameInfo['platform']);
+		} // baseline single quote
+		if (preg_match('/^Wii$/i', $gameInfo['platform'])) {
+			$gameInfo['platform'] = str_replace('Wii', 'Nintendo Wii', $gameInfo['platform']); // baseline single quote
+			$gameInfo['platform'] = str_replace('WII', 'Nintendo Wii', $gameInfo['platform']); // baseline single quote
+		}
+		if (preg_match('/^N64$/i', $gameInfo['platform'])) {
+			$gameInfo['platform'] = str_replace('N64', 'Nintendo 64', $gameInfo['platform']);
+		} // baseline single quote
+		if (preg_match('/^NES$/i', $gameInfo['platform'])) {
+			$gameInfo['platform'] = str_replace('NES', 'Nintendo NES', $gameInfo['platform']);
+		} // baseline single quote
+		if (preg_match('/Super/i', $con['platform'])) {
+			$con['platform'] = str_replace('Super Nintendo', 'SNES', $con['platform']); // baseline single quote
+			$con['platform'] = str_replace('Nintendo Super NES', 'SNES', $con['platform']); // baseline single quote
+		}
+		// Remove Online Game Code So Titles Match Properly.
+		if (preg_match('/\[Online Game Code\]/i', $con['title'])) {
+			$con['title'] = str_replace(' [Online Game Code]', '', $con['title']);
+		} // baseline single quote
+// Basically the XBLA names contain crap, this is to reduce the title down far enough to be usable.
+		if (preg_match('/xbla/i', $gameInfo['platform'])) {
+			$gameInfo['title'] = substr($gameInfo['title'], 0, 10);
+			$con['substr'] = $gameInfo['title'];
+		}
+
+		// This actual compares the two strings and outputs a percentage value.
+		$titlepercent = $platformpercent = '';
+		similar_text(strtolower($gameInfo['title']), strtolower($con['title']), $titlepercent);
+		similar_text(strtolower($gameInfo['platform']), strtolower($con['platform']), $platformpercent);
+
+		// Since Wii Ware games and XBLA have inconsistent original platforms, as long as title is 50% its ok.
+		if (preg_match('/(wiiware|xbla)/i', $gameInfo['platform'])) {
+			if ($titlepercent >= 50) {
+				$platformpercent = 100;
+			}
+		}
+
+		// If the release is DLC matching sucks, so assume anything over 50% is legit.
+		if (isset($gameInfo['dlc']) && $gameInfo['dlc'] == 1) {
+			if ($titlepercent >= 50) {
+				$titlepercent = 100;
+				$platformpercent = 100;
+			}
+		}
+
+		/* Show the percentages.
+		  echo("Matched: Title Percentage: $titlepercent%");
+		  echo("Matched: Platform Percentage: $platformpercent%"); */
+
+		// If the Title is less than 80% Platform must be 100% unless it is XBLA.
+		if ($titlepercent < 70) {
+			if ($platformpercent != 100) {
+				return false;
+			}
+		}
+
+		// If title is less than 80% then its most likely not a match.
+		if ($titlepercent < 70) {
+			return false;
+		}
+
+		// Platform must equal 100%.
+		if ($platformpercent != 100) {
+			return false;
+		}
+
+		$con['asin'] = (string) $amaz->Items->Item->ASIN;
+
+		$con['url'] = (string) $amaz->Items->Item->DetailPageURL;
+		$con['url'] = str_replace("%26tag%3Dws", "%26tag%3Dopensourceins%2D21", $con['url']);
+
+		$con['salesrank'] = (string) $amaz->Items->Item->SalesRank;
+		if ($con['salesrank'] == "") {
+			$con['salesrank'] = 'null';
+		}
+
+		$con['publisher'] = (string) $amaz->Items->Item->ItemAttributes->Publisher;
+
+		$con['esrb'] = (string) $amaz->Items->Item->ItemAttributes->ESRBAgeRating;
+
+		$con['releasedate'] = $db->escapeString((string) $amaz->Items->Item->ItemAttributes->ReleaseDate);
+		if ($con['releasedate'] == "''") {
+			$con['releasedate'] = 'null';
+		}
+
+		$con['review'] = "";
+		if (isset($amaz->Items->Item->EditorialReviews)) {
+			$con['review'] = trim(strip_tags((string) $amaz->Items->Item->EditorialReviews->EditorialReview->Content));
+		}
+
+		$genreKey = -1;
+		$genreName = '';
+		if (isset($amaz->Items->Item->BrowseNodes) || isset($amaz->Items->Item->ItemAttributes->Genre)) {
+			if (isset($amaz->Items->Item->BrowseNodes)) {
+				//had issues getting this out of the browsenodes obj
+				//workaround is to get the xml and load that into its own obj
+				$amazGenresXml = $amaz->Items->Item->BrowseNodes->asXml();
+				$amazGenresObj = simplexml_load_string($amazGenresXml);
+				$amazGenres = $amazGenresObj->xpath("//Name");
+				foreach ($amazGenres as $amazGenre) {
+					$currName = trim($amazGenre[0]);
+					if (empty($genreName)) {
+						$genreMatch = $this->matchBrowseNode($currName);
+						if ($genreMatch !== false) {
+							$genreName = $genreMatch;
+							break;
+						}
+					}
+				}
+			}
+
+			if (empty($genreName) && isset($amaz->Items->Item->ItemAttributes->Genre)) {
+				$a = (string) $amaz->Items->Item->ItemAttributes->Genre;
+				$b = str_replace('-', ' ', $a);
+				$tmpGenre = explode(' ', $b);
+				foreach ($tmpGenre as $tg) {
+					$genreMatch = $this->matchBrowseNode(ucwords($tg));
+					if ($genreMatch !== false) {
+						$genreName = $genreMatch;
+						break;
+					}
+				}
+			}
+		}
+
+		if (empty($genreName)) {
+			$genreName = 'Unknown';
+		}
+
+		if (in_array(strtolower($genreName), $genreassoc)) {
+			$genreKey = array_search(strtolower($genreName), $genreassoc);
+		} else {
+			$genreKey = $db->queryInsert(sprintf("INSERT INTO genres (`title`, `type`) VALUES (%s, %d)", $db->escapeString($genreName), Genres::CONSOLE_TYPE));
+		}
+
+		$con['consolegenre'] = $genreName;
+		$con['consolegenreID'] = $genreKey;
+
+		$check = $db->queryOneRow(sprintf('SELECT id FROM consoleinfo WHERE title = %s AND asin = %s', $db->escapeString($con['title']), $db->escapeString($con['asin'])));
+		if ($check === false) {
+			$consoleId = $db->queryInsert(sprintf("INSERT INTO consoleinfo (title, asin, url, salesrank, platform, publisher, genreid, esrb, releasedate, review, cover, createddate, updateddate) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, NOW(), NOW())", $db->escapeString($con['title']), $db->escapeString($con['asin']), $db->escapeString($con['url']), $con['salesrank'], $db->escapeString($con['platform']), $db->escapeString($con['publisher']), ($con['consolegenreID'] == -1 ? "null" : $con['consolegenreID']), $db->escapeString($con['esrb']), $con['releasedate'], $db->escapeString($con['review']), $con['cover']));
+		} else {
+			$consoleId = $check['id'];
+			$db->queryExec(sprintf('UPDATE consoleinfo SET title = %s, asin = %s, url = %s, salesrank = %s, platform = %s, publisher = %s, genreid = %s, esrb = %s, releasedate = %s, review = %s, cover = %s, updateddate = NOW() WHERE id = %d', $db->escapeString($con['title']), $db->escapeString($con['asin']), $db->escapeString($con['url']), $con['salesrank'], $db->escapeString($con['platform']), $db->escapeString($con['publisher']), ($con['consolegenreID'] == -1 ? "null" : $con['consolegenreID']), $db->escapeString($con['esrb']), $con['releasedate'], $db->escapeString($con['review']), $con['cover'], $consoleId));
+		}
+
+		if ($consoleId) {
+			if ($this->echooutput) {
+				echo $this->c->header("Added/updated game: ") .
+				$this->c->alternateOver("   Title:    ") . $this->c->primary($con['title']) .
+				$this->c->alternateOver("   Platform: ") . $this->c->primary($con['platform']);
+			}
+
+			$con['cover'] = $ri->saveImage($consoleId, $con['coverurl'], $this->imgSavePath, 250, 250);
+		} else {
+			if ($this->echooutput) {
+				echo $this->c->headerOver("Nothing to update: ") . $this->c->primary($con['title'] . " (" . $con['platform']);
+			}
+		}
+		return $consoleId;
+	}
+
+	public function fetchAmazonProperties($title, $node)
+	{
+		$obj = new AmazonProductAPI($this->pubkey, $this->privkey, $this->asstag);
+		try {
+			$result = $obj->searchProducts($title, AmazonProductAPI::GAMES, "NODE", $node);
+		} catch (Exception $e) {
+			$result = false;
+		}
+		return $result;
+	}
+
+
+
 
     //end of testing
 
