@@ -8,6 +8,7 @@ require_once(WWW_DIR.'/lib/anidb.php');
 require_once(WWW_DIR.'/lib/tvrage.php');
 require_once(WWW_DIR.'/lib/thetvdb.php');
 require_once(dirname(__FILE__).'/../test/ColorCLI.php');
+require_once(dirname(__FILE__).'/../test/functions.php');
 
 $c = new ColorCLI();
 $s = new Sites();
