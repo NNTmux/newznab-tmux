@@ -20,6 +20,7 @@ require_once(WWW_DIR."/lib/nntp.php");
 require_once(WWW_DIR."/lib/postprocess.php");
 require_once(WWW_DIR."/lib/Tmux.php");
 require_once(WWW_DIR."/lib/amazon.php");
+require_once(WWW_DIR."/lib/genres.php");
 require_once("consoletools.php");
 require_once("ColorCLI.php");
 require_once("nzbcontents.php");
@@ -1285,11 +1286,11 @@ class Functions
 						// If tvrage fails, try trakt.
 						$traktArray = $trakt->traktTVSEsummary($show['name'], $show['season'], $show['episode']);
 						if ($traktArray !== false) {
-							if (isset($traktArray['show']['tvrage_id']) && $traktArray['show']['tvrage_id'] !== 0) {
+							if (isset($traktArray['show']['tvrage_ID']) && $traktArray['show']['tvrage_ID'] !== 0) {
 								if ($this->echooutput) {
-									echo $this->c->primary('Found TVRage ID on trakt:' . $traktArray['show']['tvrage_id']);
+									echo $this->c->primary('Found TVRage ID on trakt:' . $traktArray['show']['tvrage_ID']);
 								}
-								$this->updateRageInfoTrakt($traktArray['show']['tvrage_id'], $show, $traktArray, $arr['ID']);
+								$this->updateRageInfoTrakt($traktArray['show']['tvrage_ID'], $show, $traktArray, $arr['ID']);
 							}
 							// No match, add to tvrage with rageID = -2 and $show['cleanname'] title only.
 							else {
@@ -1350,9 +1351,9 @@ class Functions
 		if ($epinfo !== false) {
 			$tvairdate = (!empty($epinfo['airdate'])) ? $this->db->escapeString($epinfo['airdate']) : "NULL";
 			$tvtitle = (!empty($epinfo['title'])) ? $this->db->escapeString($epinfo['title']) : "NULL";
-			$this->db->exec(sprintf("UPDATE releases SET tvtitle = %s, tvairdate = %s, rageID = %d WHERE ID = %d", $this->db->escapeString(trim($tvtitle)), $tvairdate, $traktArray['show']['tvrage_id'], $relid));
+			$this->db->exec(sprintf("UPDATE releases SET tvtitle = %s, tvairdate = %s, rageID = %d WHERE ID = %d", $this->db->escapeString(trim($tvtitle)), $tvairdate, $traktArray['show']['tvrage_ID'], $relid));
 		} else {
-			$this->db->exec(sprintf("UPDATE releases SET rageID = %d WHERE ID = %d", $traktArray['show']['tvrage_id'], $relid));
+			$this->db->exec(sprintf("UPDATE releases SET rageID = %d WHERE ID = %d", $traktArray['show']['tvrage_ID'], $relid));
 		}
 
 		$genre = '';
@@ -1749,7 +1750,7 @@ class Functions
 			. "LEFT OUTER JOIN releases ON releases.imdbID = movieinfo.imdbID WHERE movieinfo.imdbID IN (%s)", $allids);
 		return $this->db->query($sql);
 	}
-    public function domovieupdate($buffer, $service, $id, $processImdb = 1)
+    public function domovieupdate($buffer, $service, $ID, $processImdb = 1)
 	{
 		$imdbId = $this->parseImdb($buffer);
 		if ($imdbId !== false) {
@@ -1760,7 +1761,7 @@ class Functions
 				echo $this->c->headerOver("\n" . $service . ' found IMDBid: ') . $this->c->primary('tt' . $imdbId);
 			}
 
-			$this->db->exec(sprintf('UPDATE releases SET imdbID = %s WHERE ID = %d', $this->db->escapeString($imdbId), $id));
+			$this->db->exec(sprintf('UPDATE releases SET imdbID = %s WHERE ID = %d', $this->db->escapeString($imdbId), $ID));
 
 			// If set, scan for imdb info.
 			if ($processImdb == 1) {
@@ -2318,7 +2319,7 @@ class Functions
 		$defaultGenres = $gen->getGenres(Genres::CONSOLE_TYPE);
 		$genreassoc = array();
 		foreach ($defaultGenres as $dg) {
-			$genreassoc[$dg['id']] = strtolower($dg['title']);
+			$genreassoc[$dg['ID']] = strtolower($dg['title']);
 		}
 
 		// Get game properties.
@@ -2494,12 +2495,12 @@ class Functions
 		$con['consolegenre'] = $genreName;
 		$con['consolegenreID'] = $genreKey;
 
-		$check = $db->queryOneRow(sprintf('SELECT id FROM consoleinfo WHERE title = %s AND asin = %s', $db->escapeString($con['title']), $db->escapeString($con['asin'])));
+		$check = $db->queryOneRow(sprintf('SELECT ID FROM consoleinfo WHERE title = %s AND asin = %s', $db->escapeString($con['title']), $db->escapeString($con['asin'])));
 		if ($check === false) {
 			$consoleId = $db->queryInsert(sprintf("INSERT INTO consoleinfo (title, asin, url, salesrank, platform, publisher, genreid, esrb, releasedate, review, cover, createddate, updateddate) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, NOW(), NOW())", $db->escapeString($con['title']), $db->escapeString($con['asin']), $db->escapeString($con['url']), $con['salesrank'], $db->escapeString($con['platform']), $db->escapeString($con['publisher']), ($con['consolegenreID'] == -1 ? "null" : $con['consolegenreID']), $db->escapeString($con['esrb']), $con['releasedate'], $db->escapeString($con['review']), $con['cover']));
 		} else {
-			$consoleId = $check['id'];
-			$db->queryExec(sprintf('UPDATE consoleinfo SET title = %s, asin = %s, url = %s, salesrank = %s, platform = %s, publisher = %s, genreid = %s, esrb = %s, releasedate = %s, review = %s, cover = %s, updateddate = NOW() WHERE id = %d', $db->escapeString($con['title']), $db->escapeString($con['asin']), $db->escapeString($con['url']), $con['salesrank'], $db->escapeString($con['platform']), $db->escapeString($con['publisher']), ($con['consolegenreID'] == -1 ? "null" : $con['consolegenreID']), $db->escapeString($con['esrb']), $con['releasedate'], $db->escapeString($con['review']), $con['cover'], $consoleId));
+			$consoleId = $check['ID'];
+			$db->exec(sprintf('UPDATE consoleinfo SET title = %s, asin = %s, url = %s, salesrank = %s, platform = %s, publisher = %s, genreid = %s, esrb = %s, releasedate = %s, review = %s, cover = %s, updateddate = NOW() WHERE ID = %d', $db->escapeString($con['title']), $db->escapeString($con['asin']), $db->escapeString($con['url']), $con['salesrank'], $db->escapeString($con['platform']), $db->escapeString($con['publisher']), ($con['consolegenreID'] == -1 ? "null" : $con['consolegenreID']), $db->escapeString($con['esrb']), $con['releasedate'], $db->escapeString($con['review']), $con['cover'], $consoleId));
 		}
 
 		if ($consoleId) {

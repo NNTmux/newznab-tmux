@@ -73,7 +73,8 @@ if (isset($argv[1]) && $argv[1] === "additional") {
         }
 } else if (isset($argv[1]) && $argv[1] === "games") {
     if ($site->lookupgames == 1){
-    $postprocess -> processGames();
+        $functions = new Functions();
+        $functions -> processGames();
 }   else{
         echo $c->info("Games lookup disabled in site settings.\n");
     }
