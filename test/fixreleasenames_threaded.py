@@ -112,9 +112,9 @@ def main():
 	time_of_last_run = time.time()
 
 	if sys.argv[1] == 'md5':
-		print(bcolors.HEADER + "We will be using a max of {} threads, a queue of {} {} releases. dehashstatus range {} to 0".format(run_threads, "{:,}".format(len(datas)), sys.argv[1], maxtries + 1) + bcolors.ENDC)
+		print(bcolors.HEADER + "We will be using a max of {} threads, a queue of {} {} releases. dehashstatus range {} to 0".format(run_threads[0], "{:,}".format(len(datas)), sys.argv[1], maxtries + 1) + bcolors.ENDC)
 	else:
-		print(bcolors.HEADER + "We will be using a max of {} threads, a queue of {} releases using {}".format(run_threads, "{:,}".format(len(datas)), sys.argv[1]) + bcolors.ENDC)
+		print(bcolors.HEADER + "We will be using a max of {} threads, a queue of {} releases using {}".format(run_threads[0], "{:,}".format(len(datas)), sys.argv[1]) + bcolors.ENDC)
 	time.sleep(2)
 
 	def signal_handler(signal, frame):
@@ -124,7 +124,7 @@ def main():
 
 	if True:
 		#spawn a pool of place worker threads
-		for i in range(int(run_threads[0])): 
+		for i in range(int(run_threads[0])):
 			p = queue_runner(my_queue)
 			p.setDaemon(False)
 			p.start()
