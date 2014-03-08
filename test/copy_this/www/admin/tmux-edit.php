@@ -51,8 +51,8 @@ $page->smarty->assign('fix_crap_check_ids', array('blacklist', 'executable', 'gi
 $page->smarty->assign('fix_crap_check_names', array('blacklist', 'executable', 'gibberish', 'hashed', 'installbin', 'passworded', 'passwordurl', 'sample', 'scr', 'short', 'size'));
 $page->smarty->assign('sequential_ids', array(0,1));
 $page->smarty->assign('sequential_names', array('Disabled', 'Sequential'));
-$page->smarty->assign('binaries_ids', array(0,1));
-$page->smarty->assign('binaries_names', array('Disabled', 'Threaded Update'));
+$page->smarty->assign('binaries_ids', array(0,1,2));
+$page->smarty->assign('binaries_names', array('Disabled', 'Normal', 'Threaded Update'));
 $page->smarty->assign('post_non_ids', array(0,1,2));
 $page->smarty->assign('post_non_names', array('Disabled', 'All Available Releases', 'Properly Renamed Releases'));
 $page->smarty->assign('lookup_reqids_ids', array(0,1,2));
