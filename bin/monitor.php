@@ -9,7 +9,7 @@ require_once("../test/showsleep.php");
 require_once("../test/functions.php");
 
 
-$version="0.3r861";
+$version="0.3r866";
 
 $db = new DB();
 $functions = new Functions();
@@ -21,8 +21,12 @@ $DIR = dirname (__FILE__);
 $port = NNTP_PORT;
 $host = NNTP_SERVER;
 $ip = gethostbyname($host);
+
 $t = new Tmux();
 $tmux = $t->get();
+$seq = (isset($tmux->sequential)) ? $tmux->sequential : 0;
+$powerline = (isset($tmux->powerline)) ? $tmux->powerline : 0;
+$colors = (isset($tmux->colors)) ? $tmux->colors : 0;
 
 
 if (command_exist("python3")) {
@@ -76,12 +80,37 @@ $proc_tmux = "SELECT "
     . "(SELECT VALUE FROM tmux WHERE SETTING = 'tmux_session') AS tmux_session, "
 	. "(SELECT VALUE FROM tmux WHERE SETTING = 'niceness') AS niceness, "
 	. "(SELECT VALUE FROM tmux WHERE SETTING = 'binaries') AS binaries_run, "
+    . "(SELECT VALUE FROM tmux WHERE SETTING = 'backfill') AS backfill, "
+    . "(SELECT VALUE FROM tmux WHERE SETTING = 'seq_timer') as seq_timer, "
+    . "(SELECT VALUE FROM tmux WHERE SETTING = 'import') AS import, "
     . "(SELECT VALUE FROM tmux WHERE SETTING = 'releases') AS releases_run, "
 	. "(SELECT VALUE FROM tmux WHERE SETTING = 'releases_threaded') AS releases_threaded, "
+    . "(SELECT VALUE FROM tmux WHERE SETTING = 'post') AS post, "
+    . "(SELECT VALUE FROM tmux WHERE SETTING = 'post_timer') as post_timer, "
 	. "(SELECT VALUE FROM tmux WHERE SETTING = 'fix_names') as fix_names, "
+    . "(SELECT VALUE FROM tmux WHERE SETTING = 'fix_timer') as fix_timer, "
     . "(SELECT VALUE FROM tmux WHERE SETTING = 'bins_timer') as bins_timer, "
     . "(SELECT VALUE FROM tmux WHERE SETTING = 'rel_timer') as rel_timer, "
+    . "(SELECT VALUE FROM tmux WHERE SETTING = 'back_timer') as back_timer, "
+	. "(SELECT VALUE FROM tmux WHERE SETTING = 'import_timer') as import_timer, "
+    . "(SELECT VALUE FROM tmux WHERE SETTING = 'postprocess_kill') as postprocess_kill, "
+    . "(SELECT VALUE FROM tmux WHERE SETTING = 'crap_timer') as crap_timer, "
+	. "(SELECT VALUE FROM tmux WHERE SETTING = 'fix_crap') as fix_crap, "
+	. "(SELECT VALUE FROM tmux WHERE SETTING = 'fix_crap_opt') as fix_crap_opt, "
+	. "(SELECT VALUE FROM tmux WHERE SETTING = 'tv_timer') as tv_timer, "
+	. "(SELECT VALUE FROM tmux WHERE SETTING = 'update_tv') as update_tv, "
     . "(SELECT VALUE FROM tmux WHERE SETTING = 'post_kill_timer') as post_kill_timer, "
+    . "(SELECT VALUE FROM tmux WHERE SETTING = 'monitor_path') as monitor_path, "
+	. "(SELECT VALUE FROM tmux WHERE SETTING = 'monitor_path_a') as monitor_path_a, "
+	. "(SELECT VALUE FROM tmux WHERE SETTING = 'monitor_path_b') as monitor_path_b, "
+    . "(SELECT VALUE FROM site WHERE SETTING = 'debuginfo') as debug, "
+    . "(SELECT VALUE FROM tmux WHERE SETTING = 'dehash') as dehash, "
+	. "(SELECT VALUE FROM tmux WHERE SETTING = 'dehash_timer') as dehash_timer, "
+	. "(SELECT VALUE FROM tmux WHERE SETTING = 'backfill_days') as backfilldays, "
+    . "(SELECT VALUE FROM tmux WHERE SETTING = 'post_amazon') as post_amazon, "
+	. "(SELECT VALUE FROM tmux WHERE SETTING = 'post_timer_amazon') as post_timer_amazon, "
+	. "(SELECT VALUE FROM tmux WHERE SETTING = 'post_non') as post_non, "
+	. "(SELECT VALUE FROM tmux WHERE SETTING = 'post_timer_non') as post_timer_non, "
     . "(SELECT VALUE FROM tmux WHERE SETTING = 'colors_start') AS colors_start, "
 	. "(SELECT VALUE FROM tmux WHERE SETTING = 'colors_end') AS colors_end, "
 	. "(SELECT VALUE FROM tmux WHERE SETTING = 'colors_exc') AS colors_exc, "
@@ -142,11 +171,11 @@ $_pythonn = "nice -n${array['NICENESS']} $PYTHON";
 $NNPATH="{$array['NEWZPATH']}{$array['NEWZNAB_PATH']}";
 $TESTING="{$array['NEWZPATH']}{$array['TESTING_PATH']}";
 $killed="false";
-$old_session="{$array['TMUX_SESSION']}";
+$old_session = $tmux_session;
 $getdate = gmDate("Ymd");
 
 //build queries for shell
-$_backfill_increment = "UPDATE groups set backfill_target=backfill_target+1 WHERE active=1 and backfill_target<{$array['MAXDAYS']};";
+$_backfill_increment = "UPDATE groups set backfill_target=backfill_target+1 WHERE active=1 and backfill_target<$backfilldays;";
 $mysql_command_1 = "$_mysql --defaults-file=$_conf/my.cnf -u$_DB_USER -h $_DB_HOST $_DB_NAME -e \"$_backfill_increment\"";
 $reset_bin = "UPDATE binaries SET procstat=0, procattempts=0, regexID=NULL, relpart=0, reltotalpart=0, relname=NULL;";
 $mysql_command_2 = "$_mysql --defaults-file=$_conf/my.cnf -u$_DB_USER -h $_DB_HOST $_DB_NAME -e \"$reset_bin\"";
@@ -473,6 +502,7 @@ printf($mask4, "Activated", $active_groups."(".$all_groups.")", $backfill_groups
 
 $i = 1;
 $time33 = TIME();
+$fcfirstrun = true;
 
 while( $i > 0 )
 {
@@ -508,10 +538,10 @@ while( $i > 0 )
 	} */
 
 	//rename the session
-	if ( $old_session != $array['TMUX_SESSION'] ) {
-		shell_exec("$_tmux rename-session -t $old_session {$array['TMUX_SESSION']}");
+	if ( $old_session != $tmux_session ) {
+		shell_exec("$_tmux rename-session -t $old_session $tmux_session");
 	}
-	$old_session="{$array['TMUX_SESSION']}";
+	$old_session="$tmux_session";
 
 	//reload tmux.conf
 	if ( $array['POWERLINE'] == "true" ) {
@@ -521,12 +551,12 @@ while( $i > 0 )
 	}
 
 	//reset title, might rename in some terminals
-	printf("\033]0;{$array['TMUX_SESSION']}\007\003\n");
+	printf("\033]0;$tmux_session\007\003\n");
 
 	//kill panes if user changed to/from nzb import threaded
 	if ( $_imports != $array['NZB_THREADS'] ) {
-		shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.4 'sleep 5' && $ds1 $panes0[4] $ds4");
-		shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:1.5 'sleep 5' && $ds1 $panes1[5] $ds4");
+		shell_exec("$_tmux respawnp -k -t${tmux_session}:0.4 'sleep 5' && $ds1 $panes0[4] $ds4");
+		shell_exec("$_tmux respawnp -k -t${tmux_session}:1.5 'sleep 5' && $ds1 $panes1[5] $ds4");
 		$_imports = $array['NZB_THREADS'];
 	}
 
@@ -653,6 +683,13 @@ while( $i > 0 )
     if ( @$split_result[0]['newestadd'] != NULL) {$newestadd = $split_result[0]['newestadd'];}
     if ($proc_tmux_result[0]['tmpunrar'] != NULL) {
 		$tmpunrar = $proc_tmux_result[0]['tmpunrar'];
+    }
+    if ($proc_tmux_result[0]['postprocess_kill'] != NULL) {
+		$postprocess_kill = $proc_tmux_result[0]['postprocess_kill'];
+	}
+	if ($proc_tmux_result[0]['backfilldays'] != NULL) {
+		$backfilldays = $proc_tmux_result[0]['backfilldays'];
+	}
     if ($proc_tmux_result[0]['colors_start'] != NULL) {
 		$colors_start = $proc_tmux_result[0]['colors_start'];
 	}
@@ -667,6 +704,9 @@ while( $i > 0 )
 	}
 	if ($proc_tmux_result[0]['monitor'] != NULL) {
 		$monitor = $proc_tmux_result[0]['monitor'];
+	}
+    if ($proc_tmux_result[0]['backfill'] != NULL) {
+		$backfill = $proc_tmux_result[0]['backfill'];
 	}
     if ($proc_tmux_result[0]['niceness'] != NULL) {
 		$niceness = $proc_tmux_result[0]['niceness'];
@@ -689,7 +729,82 @@ while( $i > 0 )
     if ($proc_tmux_result[0]['rel_timer'] != NULL) {
 		$rel_timer = $proc_tmux_result[0]['rel_timer'];
 	}
+    if ($proc_tmux_result[0]['import'] != NULL) {
+		$import = $proc_tmux_result[0]['import'];
+	}
+    if ($proc_tmux_result[0]['fix_names'] != NULL) {
+		$fix_names = $proc_tmux_result[0]['fix_names'];
+	}
+	if ($proc_tmux_result[0]['fix_crap'] != NULL) {
+		$fix_crap = explode(', ', ($proc_tmux_result[0]['fix_crap']));
+	}
+	if ($proc_tmux_result[0]['fix_crap_opt'] != NULL) {
+		$fix_crap_opt = $proc_tmux_result[0]['fix_crap_opt'];
+	}
+	if ($proc_tmux_result[0]['update_tv'] != NULL) {
+		$update_tv = $proc_tmux_result[0]['update_tv'];
+	}
+	if ($proc_tmux_result[0]['post'] != NULL) {
+		$post = $proc_tmux_result[0]['post'];
+    }
+    if ($proc_tmux_result[0]['dehash'] != NULL) {
+		$dehash = $proc_tmux_result[0]['dehash'];
+	}
 
+    //reset monitor paths before query
+	$monitor_path = "";
+	$monitor_path_a = "";
+	$monitor_path_b = "";
+
+	if ($proc_tmux_result[0]['monitor_path'] != NULL) {
+		$monitor_path = $proc_tmux_result[0]['monitor_path'];
+	}
+	if ($proc_tmux_result[0]['monitor_path_a'] != NULL) {
+		$monitor_path_a = $proc_tmux_result[0]['monitor_path_a'];
+	}
+	if ($proc_tmux_result[0]['monitor_path_b'] != NULL) {
+		$monitor_path_b = $proc_tmux_result[0]['monitor_path_b'];
+	}
+
+	if ($proc_tmux_result[0]['debug'] != NULL) {
+		$debug = $proc_tmux_result[0]['debug'];
+    }
+    if ($proc_tmux_result[0]['post_amazon'] != NULL) {
+		$post_amazon = $proc_tmux_result[0]['post_amazon'];
+	}
+	if ($proc_tmux_result[0]['post_timer_amazon'] != NULL) {
+		$post_timer_amazon = $proc_tmux_result[0]['post_timer_amazon'];
+	}
+	if ($proc_tmux_result[0]['post_non'] != NULL) {
+		$post_non = $proc_tmux_result[0]['post_non'];
+	}
+	if ($proc_tmux_result[0]['post_timer_non'] != NULL) {
+		$post_timer_non = $proc_tmux_result[0]['post_timer_non'];
+	}
+    if ($proc_tmux_result[0]['back_timer'] != NULL) {
+		$back_timer = $proc_tmux_result[0]['back_timer'];
+	}
+	if ($proc_tmux_result[0]['import_timer'] != NULL) {
+		$import_timer = $proc_tmux_result[0]['import_timer'];
+	}
+    if ($proc_tmux_result[0]['fix_timer'] != NULL) {
+		$fix_timer = $proc_tmux_result[0]['fix_timer'];
+	}
+	if ($proc_tmux_result[0]['crap_timer'] != NULL) {
+		$crap_timer = $proc_tmux_result[0]['crap_timer'];
+	}
+	if ($proc_tmux_result[0]['post_timer'] != NULL) {
+		$post_timer = $proc_tmux_result[0]['post_timer'];
+	}
+	if ($proc_tmux_result[0]['post_kill_timer'] != NULL) {
+		$post_kill_timer = $proc_tmux_result[0]['post_kill_timer'];
+	}
+	if ($proc_tmux_result[0]['tv_timer'] != NULL) {
+		$tv_timer = $proc_tmux_result[0]['tv_timer'];
+	}
+	if ($proc_tmux_result[0]['dehash_timer'] != NULL) {
+		$dehash_timer = $proc_tmux_result[0]['dehash_timer'];
+	}
 
 
 	//calculate releases difference
@@ -778,11 +893,11 @@ while( $i > 0 )
 		$total_work_used = $total_work_now;
 	}
 
-	$panes_win_1 = shell_exec("echo `tmux list-panes -t  {$array['TMUX_SESSION']}:0 -F '#{pane_title}'`");
-	$panes_win_2 = shell_exec("echo `tmux list-panes -t  {$array['TMUX_SESSION']}:1 -F '#{pane_title}'`");
-	$panes_win_3 = shell_exec("echo `tmux list-panes -t  {$array['TMUX_SESSION']}:2 -F '#{pane_title}'`");
-	$panes_win_4 = shell_exec("echo `tmux list-panes -t  {$array['TMUX_SESSION']}:3 -F '#{pane_title}'`");
-	$panes_win_5 = shell_exec("echo `tmux list-panes -t  {$array['TMUX_SESSION']}:4 -F '#{pane_title}'`");
+	$panes_win_1 = shell_exec("echo `tmux list-panes -t  $tmux_session:0 -F '#{pane_title}'`");
+	$panes_win_2 = shell_exec("echo `tmux list-panes -t  $tmux_session:1 -F '#{pane_title}'`");
+	$panes_win_3 = shell_exec("echo `tmux list-panes -t  $tmux_session:2 -F '#{pane_title}'`");
+	$panes_win_4 = shell_exec("echo `tmux list-panes -t  $tmux_session:3 -F '#{pane_title}'`");
+	$panes_win_5 = shell_exec("echo `tmux list-panes -t  $tmux_session:4 -F '#{pane_title}'`");
 
 	$panes0 = str_replace("\n", '', explode(" ", $panes_win_1));
 	$panes1 = str_replace("\n", '', explode(" ", $panes_win_2));
@@ -795,12 +910,12 @@ while( $i > 0 )
 	$killed="false";
 	if ( $array['KILL_UPDATES'] != "0" ) {
 		if ((( $killit[1] != "secs" ) && ( $killit[1] != "sec" )) && (( $killit[1] == "hrs" ) || ( $killit[1] == "hr" ) || ( $killit[0] >= $array['KILL_UPDATES'] )) && ( $i % 5 == 0 )) {
-			$color = get_color();
-			shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.2 'echo \"\033[38;5;\"$color\"m\n$panes0[2] Killed by KILL_UPDATES\" && $ds1 $panes0[2] $ds4'");
-			$color = get_color();
-			shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.3 'echo \"\033[38;5;\"$color\"m\n$panes0[3] Killed by KILL_UPDATES\" && $ds1 $panes0[3] $ds4'");
-			$color = get_color();
-			shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.4 'echo \"\033[38;5;\"$color\"m\n$panes0[4] Killed by KILL_UPDATES\" && $ds1 $panes0[4] $ds4'");
+			$color = get_color($colors_start, $colors_end, $colors_exc);
+			shell_exec("$_tmux respawnp -k -t${tmux_session}:0.2 'echo \"\033[38;5;\"$color\"m\n$panes0[2] Killed by KILL_UPDATES\" && $ds1 $panes0[2] $ds4'");
+			$color = get_color($colors_start, $colors_end, $colors_exc);
+			shell_exec("$_tmux respawnp -k -t${tmux_session}:0.3 'echo \"\033[38;5;\"$color\"m\n$panes0[3] Killed by KILL_UPDATES\" && $ds1 $panes0[3] $ds4'");
+			$color = get_color($colors_start, $colors_end, $colors_exc);
+			shell_exec("$_tmux respawnp -k -t${tmux_session}:0.4 'echo \"\033[38;5;\"$color\"m\n$panes0[4] Killed by KILL_UPDATES\" && $ds1 $panes0[4] $ds4'");
 			if ( $array['KEEP_KILLED'] == "true" ) {
 				$killed="true";
 			}
@@ -844,7 +959,7 @@ while( $i > 0 )
         }
 
 	//get state for backfill
-	if ( $array['BACKFILL'] != "true" ) {
+	if ( $backfill == 0 ) {
 		$backfill_state="disabled";
 		$backfill_reason="disabled";
         } elseif ( $array['MAX_LOAD'] <= get_load()) {
@@ -868,7 +983,7 @@ while( $i > 0 )
 	}
 
 	//get state for import
-	if ( $array['IMPORT'] != "true" ) {
+	if ( $import == 0 ) {
 		$import_state="disabled";
 		$import_reason="disabled";
         } elseif ( $array['MAX_LOAD'] <= get_load()) {
@@ -1009,147 +1124,147 @@ $usptotalconnections  = str_replace("\n", '', shell_exec("ss -n | grep -c " . $i
 	if ( $array['SEQUENTIAL'] != "true" ) {
 		//runs update_binaries in 0.2 once if needed and exits
 		if (( $array['MAX_LOAD'] >= get_load()) && ( $killed != "true" ) && ( $binaries != 0  ) && (( $binaries_rows_unformatted < $array['BINARIES_MAX_BINS'] ) || ( $array['BINARIES_MAX_BINS'] == 0 )) && (( $total_work_used < $array['BINARIES_MAX_RELEASES'] ) || ( $array['BINARIES_MAX_RELEASES'] == 0 )) && (( $parts_rows_unformatted < $array['BINARIES_MAX_ROWS'] ) || ( $array['BINARIES_MAX_ROWS'] == 0 ))) {
-			$color = get_color();
+			$color = get_color($colors_start, $colors_end, $colors_exc);
 			$log = writelog($panes0[2]);
-			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.2 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[2] $ds2 && $_update_cmd 2>&1 $log && echo \" \033[1;0;33m\" &&  $_sleep {$array['BINARIES_SLEEP']} && $ds1 $panes0[2] $ds3' 2>&1 1> /dev/null");
+			shell_exec("$_tmux respawnp -t${tmux_session}:0.2 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[2] $ds2 && $_update_cmd 2>&1 $log && echo \" \033[1;0;33m\" &&  $_sleep {$array['BINARIES_SLEEP']} && $ds1 $panes0[2] $ds3' 2>&1 1> /dev/null");
 		} elseif (( $parts_rows_unformatted > $array['BINARIES_MAX_ROWS'] ) && ( $binaries != 0  ) && ( $array['BINARIES_MAX_ROWS'] != 0 ))  {
-			$color = get_color();
-			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.2 'echo \"\033[38;5;\"$color\"m\nBINARIES_MAX_ROWS exceeded\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+			$color = get_color($colors_start, $colors_end, $colors_exc);
+			shell_exec("$_tmux respawnp -t${tmux_session}:0.2 'echo \"\033[38;5;\"$color\"m\nBINARIES_MAX_ROWS exceeded\" && date +\"%D %T\"' 2>&1 1> /dev/null");
 		} elseif (( $total_work_used > $array['BINARIES_MAX_RELEASES'] ) && ( $binaries != 0  ) && ( $array['BINARIES_MAX_RELEASES'] != 0 ))  {
-			$color = get_color();
-			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.2 'echo \"\033[38;5;\"$color\"m\nBINARIES_MAX_RELEASES exceeded\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+			$color = get_color($colors_start, $colors_end, $colors_exc);
+			shell_exec("$_tmux respawnp -t${tmux_session}:0.2 'echo \"\033[38;5;\"$color\"m\nBINARIES_MAX_RELEASES exceeded\" && date +\"%D %T\"' 2>&1 1> /dev/null");
 		} elseif (( $binaries != 0  ) && ( $array['MAX_LOAD'] <= get_load())) {
-                        $color = get_color();
-                        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.2 'echo \"\033[38;5;\"$color\"m\n$panes0[2] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
-                } elseif ( $array['BINARIES'] != "true" )  {
-			$color = get_color();
-			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.2 'echo \"\033[38;5;\"$color\"m\n$panes0[2] Disabled by BINARIES\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+                        $color = get_color($colors_start, $colors_end, $colors_exc);
+                        shell_exec("$_tmux respawnp -t${tmux_session}:0.2 'echo \"\033[38;5;\"$color\"m\n$panes0[2] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+                } elseif ( $binaries != 0  )  {
+			$color = get_color($colors_start, $colors_end, $colors_exc);
+			shell_exec("$_tmux respawnp -t${tmux_session}:0.2 'echo \"\033[38;5;\"$color\"m\n$panes0[2] Disabled by BINARIES\" && date +\"%D %T\"' 2>&1 1> /dev/null");
 		}
 
 		//runs backfill in 0.3 once if needed and exits
-		if (( $array['MAX_LOAD'] >= get_load()) && ( $killed != "true" ) && ( $array['BACKFILL'] == "true" ) && (( $binaries_rows_unformatted < $array['BACKFILL_MAX_BINS'] ) || ( $array['BACKFILL_MAX_BINS'] == 0 )) && (( $total_work_used < $array['BACKFILL_MAX_RELEASES'] ) || ( $array['BACKFILL_MAX_RELEASES'] == 0 )) && (( $parts_rows_unformatted < $array['BACKFILL_MAX_ROWS'] ) || ( $array['BACKFILL_MAX_ROWS'] == 0 ))) {
-			$color = get_color();
+		if (( $array['MAX_LOAD'] >= get_load()) && ( $killed != "true" ) && ( $backfill == 1 ) && (( $binaries_rows_unformatted < $array['BACKFILL_MAX_BINS'] ) || ( $array['BACKFILL_MAX_BINS'] == 0 )) && (( $total_work_used < $array['BACKFILL_MAX_RELEASES'] ) || ( $array['BACKFILL_MAX_RELEASES'] == 0 )) && (( $parts_rows_unformatted < $array['BACKFILL_MAX_ROWS'] ) || ( $array['BACKFILL_MAX_ROWS'] == 0 ))) {
+			$color = get_color($colors_start, $colors_end, $colors_exc);
 			$log = writelog($panes0[3]);
-			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.3 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[3] $ds2 && $_backfill_cmd && echo \" \033[1;0;33m\" && $_sleep {$array['BACKFILL_SLEEP']} && $ds1 $panes0[3] $ds3' 2>&1 1> /dev/null");
-		} elseif (( $parts_rows_unformatted > $array['BACKFILL_MAX_ROWS'] ) && ( $array['BACKFILL'] == "true" ) && ( $array['BACKFILL_MAX_ROWS'] != 0 ))  {
-			$color = get_color();
-			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.3 'echo \"\033[38;5;\"$color\"m\nBACKFILL_MAX_ROWS exceeded\" && date +\"%D %T\"' 2>&1 1> /dev/null");
-		} elseif (( $total_work_used > $array['BACKFILL_MAX_RELEASES'] ) && ( $array['BACKFILL'] == "true" ) && ( $array['BACKFILL_MAX_RELEASES'] != 0 ))  {
-			$color = get_color();
-			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.3 'echo \"\033[38;5;\"$color\"m\nBACKFILL_MAX_RELEASES exceeded\" && date +\"%D %T\"' 2>&1 1> /dev/null");
-		} elseif (( $array['BACKFILL'] == "true" ) && ( $array['MAX_LOAD'] <= get_load())) {
-                        $color = get_color();
-                        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.3 'echo \"\033[38;5;\"$color\"m\n$panes0[3] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
-        } elseif ( $array['BACKFILL'] != "true" ) {
-			$color = get_color();
-			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.3 'echo \"\033[38;5;\"$color\"m\n$panes0[3] Disabled by BACKFILL\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+			shell_exec("$_tmux respawnp -t${tmux_session}:0.3 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[3] $ds2 && $_backfill_cmd && echo \" \033[1;0;33m\" && $_sleep $back_timer && $ds1 $panes0[3] $ds3' 2>&1 1> /dev/null");
+		} elseif (( $parts_rows_unformatted > $array['BACKFILL_MAX_ROWS'] ) && ( $backfill == 1 ) && ( $array['BACKFILL_MAX_ROWS'] != 0 ))  {
+			$color = get_color($colors_start, $colors_end, $colors_exc);
+			shell_exec("$_tmux respawnp -t${tmux_session}:0.3 'echo \"\033[38;5;\"$color\"m\nBACKFILL_MAX_ROWS exceeded\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+		} elseif (( $total_work_used > $array['BACKFILL_MAX_RELEASES'] ) && ( $backfill == 1 ) && ( $array['BACKFILL_MAX_RELEASES'] != 0 ))  {
+			$color = get_color($colors_start, $colors_end, $colors_exc);
+			shell_exec("$_tmux respawnp -t${tmux_session}:0.3 'echo \"\033[38;5;\"$color\"m\nBACKFILL_MAX_RELEASES exceeded\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+		} elseif (( $backfill == 1 ) && ( $array['MAX_LOAD'] <= get_load())) {
+                        $color = get_color($colors_start, $colors_end, $colors_exc);
+                        shell_exec("$_tmux respawnp -t${tmux_session}:0.3 'echo \"\033[38;5;\"$color\"m\n$panes0[3] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+        } elseif ( $backfill == 0 ) {
+			$color = get_color($colors_start, $colors_end, $colors_exc);
+			shell_exec("$_tmux respawnp -t${tmux_session}:0.3 'echo \"\033[38;5;\"$color\"m\n$panes0[3] Disabled by BACKFILL\" && date +\"%D %T\"' 2>&1 1> /dev/null");
 		}
 	}
 
 	//run update_binaries and backfill using seq in pane 0.2
-	$dead = `$_tmux list-panes -t {$array['TMUX_SESSION']}:0 | grep 2: | grep dead`;
+	$dead = `$_tmux list-panes -t${tmux_session}:0 | grep 2: | grep dead`;
 	if (( $array['SEQUENTIAL'] == "true" ) && ( strlen( $dead ) > "4" )) {
 		if (( $array['MAX_LOAD'] >= get_load()) && (( $i == 1 ) || ( TIME() - $time13 >= $array['BINARIES_SEQ_TIMER'] )) && (( $binaries_rows_unformatted < $array['BINARIES_MAX_BINS'] ) || ( $array['BINARIES_MAX_BINS'] == 0 )) && ( $binaries != 0  ) && (( $total_work_used < $array['BINARIES_MAX_RELEASES'] ) || ( $array['BINARIES_MAX_RELEASES'] == 0 )) && (( $parts_rows_unformatted < $array['BINARIES_MAX_ROWS'] ) || ( $array['BINARIES_MAX_ROWS'] == 0 ))) {
-			$color = get_color();
-			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.2 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[2] $ds2 && $_update_cmd && echo \" \033[1;0;33m\" && $ds1 $panes0[2] $ds3' 2>&1 1> /dev/null");
+			$color = get_color($colors_start, $colors_end, $colors_exc);
+			shell_exec("$_tmux respawnp -t${tmux_session}:0.2 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[2] $ds2 && $_update_cmd && echo \" \033[1;0;33m\" && $ds1 $panes0[2] $ds3' 2>&1 1> /dev/null");
 			$time13 = TIME();
-		} elseif (( $array['MAX_LOAD'] >= get_load()) && ( TIME() - $time14 >= $array['BACKFILL_SEQ_TIMER'] ) && (( $binaries_rows_unformatted < $array['BACKFILL_MAX_BINS'] ) || ( $array['BACKFILL_MAX_BINS'] == 0 )) && ( $array['BACKFILL'] == "true" ) && (( $total_work_used < $array['BACKFILL_MAX_RELEASES'] ) || ( $array['BACKFILL_MAX_RELEASES'] == 0 )) && (( $parts_rows_unformatted < $array['BACKFILL_MAX_ROWS'] ) || ( $array['BACKFILL_MAX_ROWS'] == 0 )))  {
-			$color = get_color();
-			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.2 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[3] $ds2 && $_backfill_cmd && echo \" \033[1;0;33m\" && $ds1 $panes0[3] $ds3' 2>&1 1> /dev/null");
+		} elseif (( $array['MAX_LOAD'] >= get_load()) && ( TIME() - $time14 >= $array['BACKFILL_SEQ_TIMER'] ) && (( $binaries_rows_unformatted < $array['BACKFILL_MAX_BINS'] ) || ( $array['BACKFILL_MAX_BINS'] == 0 )) && ( $backfill == 1 ) && (( $total_work_used < $array['BACKFILL_MAX_RELEASES'] ) || ( $array['BACKFILL_MAX_RELEASES'] == 0 )) && (( $parts_rows_unformatted < $array['BACKFILL_MAX_ROWS'] ) || ( $array['BACKFILL_MAX_ROWS'] == 0 )))  {
+			$color = get_color($colors_start, $colors_end, $colors_exc);
+			shell_exec("$_tmux respawnp -t${tmux_session}:0.2 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[3] $ds2 && $_backfill_cmd && echo \" \033[1;0;33m\" && $ds1 $panes0[3] $ds3' 2>&1 1> /dev/null");
 			$time14 = TIME();
-		} elseif (( $array['BINARIES'] != "true" ) && ( $array['BACKFILL'] != "true" )) {
-			$color = get_color();
-			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.2 'echo \"\033[38;5;\"$color\"m\n$panes0[2] and $panes0[3] Disabled by BINARIES and BACKFILL\" && date +\"%D %T\"' 2>&1 1> /dev/null");
-		} elseif (( $array['BACKFILL'] == "true" ) && ( $binaries != 0  ) && ( $array['MAX_LOAD'] >= get_load())) {
-			$color = get_color();
+		} elseif (( $binaries != 0  ) && ( $backfill == 0 )) {
+			$color = get_color($colors_start, $colors_end, $colors_exc);
+			shell_exec("$_tmux respawnp -t${tmux_session}:0.2 'echo \"\033[38;5;\"$color\"m\n$panes0[2] and $panes0[3] Disabled by BINARIES and BACKFILL\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+		} elseif (( $backfill == 1 ) && ( $binaries != 0  ) && ( $array['MAX_LOAD'] >= get_load())) {
+			$color = get_color($colors_start, $colors_end, $colors_exc);
 			$run_time1 = relativeTime( $array['BACKFILL_SEQ_TIMER'] + $time14 );
 			$run_time2 = relativeTime( $array['BINARIES_SEQ_TIMER'] + $time13 );
-			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.2 'echo \"\033[38;5;\"$color\"m\n$panes0[2] will run in T[ $run_time2]\n$panes0[3] will run in T[ $run_time1] \" && date +\"%D %T\"' 2>&1 1> /dev/null");
-		} elseif (( $array['BACKFILL'] == "true" ) && ( $array['MAX_LOAD'] >= get_load())) {
-			$color = get_color();
+			shell_exec("$_tmux respawnp -t${tmux_session}:0.2 'echo \"\033[38;5;\"$color\"m\n$panes0[2] will run in T[ $run_time2]\n$panes0[3] will run in T[ $run_time1] \" && date +\"%D %T\"' 2>&1 1> /dev/null");
+		} elseif (( $backfill == 1 ) && ( $array['MAX_LOAD'] >= get_load())) {
+			$color = get_color($colors_start, $colors_end, $colors_exc);
 			$run_time = relativeTime( $array['BACKFILL_SEQ_TIMER'] + $time14 );
-			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.2 'echo \"\033[38;5;\"$color\"m\n$panes03] will run in T[ $run_time1]\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+			shell_exec("$_tmux respawnp -t${tmux_session}:0.2 'echo \"\033[38;5;\"$color\"m\n$panes03] will run in T[ $run_time1]\" && date +\"%D %T\"' 2>&1 1> /dev/null");
 		} elseif (( $binaries != 0  ) && ( $array['MAX_LOAD'] >= get_load())) {
-			$color = get_color();
+			$color = get_color($colors_start, $colors_end, $colors_exc);
 			$run_time = relativeTime( $array['BINARIES_SEQ_TIMER'] + $time13 );
-			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.2 'echo \"\033[38;5;\"$color\"m\n$panes0[2] will run in T[ $run_time2]\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+			shell_exec("$_tmux respawnp -t${tmux_session}:0.2 'echo \"\033[38;5;\"$color\"m\n$panes0[2] will run in T[ $run_time2]\" && date +\"%D %T\"' 2>&1 1> /dev/null");
 		} elseif  ( $array['MAX_LOAD'] <= get_load()) {
-                        $color = get_color();
-                        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.2 'echo \"\033[38;5;\"$color\"m\n$panes0[2] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+                        $color = get_color($colors_start, $colors_end, $colors_exc);
+                        shell_exec("$_tmux respawnp -t${tmux_session}:0.2 'echo \"\033[38;5;\"$color\"m\n$panes0[2] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
                 }
 	}
 
 	//notify pane 0.3 of the status of pane 0.2
 	if ( $array['SEQUENTIAL'] == "true" ) {
-		if (( $array['MAX_LOAD'] >= get_load()) && ( $array['BINARIES'] != "true" ) && ( $array['BACKFILL'] != "true" )) {
-			$color = get_color();
-			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.3 'echo \"\033[38;5;\"$color\"m\n$panes0[2] and $panes0[3] Disabled by BINARIES and BACKFILL\" && date +\"%D %T\"' 2>&1 1> /dev/null");
-		} elseif (( $array['BACKFILL'] == "true" ) && ( $binaries != 0  ) && ( $array['MAX_LOAD'] >= get_load())) {
+		if (( $array['MAX_LOAD'] >= get_load()) && ( $binaries != 0  ) && ( $backfill == 0 )) {
+			$color = get_color($colors_start, $colors_end, $colors_exc);
+			shell_exec("$_tmux respawnp -t${tmux_session}:0.3 'echo \"\033[38;5;\"$color\"m\n$panes0[2] and $panes0[3] Disabled by BINARIES and BACKFILL\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+		} elseif (( $backfill == 1 ) && ( $binaries != 0  ) && ( $array['MAX_LOAD'] >= get_load())) {
 			$run_time1 = relativeTime( $array['BACKFILL_SEQ_TIMER'] + $time14 );
 			$run_time2 = relativeTime( $array['BINARIES_SEQ_TIMER'] + $time13 );
-			$color = get_color();
-			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.3 'echo \"\033[38;5;\"$color\"m\n$panes0[2] will run in T[ $run_time2]\n$panes0[3] will run in T[ $run_time1] \" && date +\"%D %T\"' 2>&1 1> /dev/null");
-		} elseif (( $array['BACKFILL'] == "true" ) && ( $array['MAX_LOAD'] >= get_load())) {
+			$color = get_color($colors_start, $colors_end, $colors_exc);
+			shell_exec("$_tmux respawnp -t${tmux_session}:0.3 'echo \"\033[38;5;\"$color\"m\n$panes0[2] will run in T[ $run_time2]\n$panes0[3] will run in T[ $run_time1] \" && date +\"%D %T\"' 2>&1 1> /dev/null");
+		} elseif (( $backfill == 1 ) && ( $array['MAX_LOAD'] >= get_load())) {
 			$run_time = relativeTime( $array['BACKFILL_SEQ_TIMER'] + $time14 );
-			$color = get_color();
-			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.3 'echo \"\033[38;5;\"$color\"m\n$panes0[3] will run in T[ $run_time1]\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+			$color = get_color($colors_start, $colors_end, $colors_exc);
+			shell_exec("$_tmux respawnp -t${tmux_session}:0.3 'echo \"\033[38;5;\"$color\"m\n$panes0[3] will run in T[ $run_time1]\" && date +\"%D %T\"' 2>&1 1> /dev/null");
 		} elseif (( $binaries != 0  ) && ( $array['MAX_LOAD'] >= get_load())) {
 			$run_time = relativeTime( $array['BINARIES_SEQ_TIMER'] + $time13 );
-			$color = get_color();
-			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.3 'echo \"\033[38;5;\"$color\"m\n$panes0[2] will run in T[ $run_time2]\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+			$color = get_color($colors_start, $colors_end, $colors_exc);
+			shell_exec("$_tmux respawnp -t${tmux_session}:0.3 'echo \"\033[38;5;\"$color\"m\n$panes0[2] will run in T[ $run_time2]\" && date +\"%D %T\"' 2>&1 1> /dev/null");
 		} elseif ( $array['MAX_LOAD'] <= get_load()) {
-                        $color = get_color();
-                        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.3 'echo \"\033[38;5;\"$color\"m\n$panes0[3] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+                        $color = get_color($colors_start, $colors_end, $colors_exc);
+                        shell_exec("$_tmux respawnp -t${tmux_session}:0.3 'echo \"\033[38;5;\"$color\"m\n$panes0[3] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
                 }
 	}
 
 	//kill panes for sequential
 	if ( $array['SEQUENTIAL'] == "true" ) {
-		if (( $parts_rows_unformatted > $array['BINARIES_MAX_ROWS'] ) && ( $binaries != 0  ) && ( $array['BINARIES_MAX_ROWS'] != 0 ) && ( $array['BACKFILL'] == "true" ) && ( $total_work_used > $array['BACKFILL_MAX_RELEASES'] ) && ( $array['BACKFILL_MAX_ROWS'] != 0 )) {
-			$color = get_color();
-			shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.2 'echo \"\033[38;5;\"$color\"m\nBINARIES_MAX_ROWS and BACKFILL_MAX_ROWS exceeded\" && $ds1 $panes0[2] $ds4'");
-			shell_exec("$_tmux respawnp -k -t {$array['TMUX_SESSION']}:0.3 'echo \"\033[38;5;\"$color\"m\nBINARIES_MAX_ROWS and BACKFILL_MAX_ROWS exceeded\" && $ds1 $panes0[3] $ds4'");
+		if (( $parts_rows_unformatted > $array['BINARIES_MAX_ROWS'] ) && ( $binaries != 0  ) && ( $array['BINARIES_MAX_ROWS'] != 0 ) && ( $backfill == 1 ) && ( $total_work_used > $array['BACKFILL_MAX_RELEASES'] ) && ( $array['BACKFILL_MAX_ROWS'] != 0 )) {
+			$color = get_color($colors_start, $colors_end, $colors_exc);
+			shell_exec("$_tmux respawnp -k -t${tmux_session}:0.2 'echo \"\033[38;5;\"$color\"m\nBINARIES_MAX_ROWS and BACKFILL_MAX_ROWS exceeded\" && $ds1 $panes0[2] $ds4'");
+			shell_exec("$_tmux respawnp -k -t${tmux_session}:0.3 'echo \"\033[38;5;\"$color\"m\nBINARIES_MAX_ROWS and BACKFILL_MAX_ROWS exceeded\" && $ds1 $panes0[3] $ds4'");
 		}
 	}
 
 	//runs nzb-import in 0.4 once if needed and exits
-	if (( $array['MAX_LOAD'] >= get_load()) && ( $killed != "true" ) && ( $array['IMPORT'] == "true" ) && (( $total_work_used < $array['IMPORT_MAX_RELEASES'] ) || ( $array['IMPORT_MAX_RELEASES'] == 0 )) && (( $parts_rows_unformatted < $array['IMPORT_MAX_ROWS'] ) || ( $array['IMPORT_MAX_ROWS'] == 0 ))) {
-		$color = get_color();
+	if (( $array['MAX_LOAD'] >= get_load()) && ( $killed != "true" ) && ( $import == 1 ) && (( $total_work_used < $array['IMPORT_MAX_RELEASES'] ) || ( $array['IMPORT_MAX_RELEASES'] == 0 )) && (( $parts_rows_unformatted < $array['IMPORT_MAX_ROWS'] ) || ( $array['IMPORT_MAX_ROWS'] == 0 ))) {
+		$color = get_color($colors_start, $colors_end, $colors_exc);
 		$log = writelog($panes0[4]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.4 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[4] $ds2 && cd $_bin && $nzb_cmd && echo \" \" && echo \" \033[1;0;33m\" && $_sleep {$array['IMPORT_SLEEP']} && $ds1 $panes0[4] $ds3' 2>&1 1> /dev/null");
-		$color = get_color();
+		shell_exec("$_tmux respawnp -t${tmux_session}:0.4 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[4] $ds2 && cd $_bin && $nzb_cmd && echo \" \" && echo \" \033[1;0;33m\" && $_sleep {$array['IMPORT_SLEEP']} && $ds1 $panes0[4] $ds3' 2>&1 1> /dev/null");
+		$color = get_color($colors_start, $colors_end, $colors_exc);
 		$log = writelog($panes1[5]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes1[5] $ds2 && cd $_bin && $_php nzbcount.php 2>&1 $log' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t${tmux_session}:1.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes1[5] $ds2 && cd $_bin && $_php nzbcount.php 2>&1 $log' 2>&1 1> /dev/null");
 
-	} elseif (( $parts_rows_unformatted > $array['IMPORT_MAX_ROWS'] ) && ( $array['IMPORT'] == "true" ) && ( $array['IMPORT_MAX_ROWS'] != 0 )) {
-		$color = get_color();
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.4 'echo \"\033[38;5;\"$color\"m\nIMPORT_MAX_ROWS exceeded\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+	} elseif (( $parts_rows_unformatted > $array['IMPORT_MAX_ROWS'] ) && ( $import == 1 ) && ( $array['IMPORT_MAX_ROWS'] != 0 )) {
+		$color = get_color($colors_start, $colors_end, $colors_exc);
+		shell_exec("$_tmux respawnp -t${tmux_session}:0.4 'echo \"\033[38;5;\"$color\"m\nIMPORT_MAX_ROWS exceeded\" && date +\"%D %T\"' 2>&1 1> /dev/null");
 
-	} elseif (( $total_work_used > $array['IMPORT_MAX_RELEASES'] ) && ( $array['IMPORT'] == "true" ) && ( $array['IMPORT_MAX_RELEASES'] != 0 )) {
-		$color = get_color();
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.4 'echo \"\033[38;5;\"$color\"m\nIMPORT_MAX_RELEASES exceeded\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+	} elseif (( $total_work_used > $array['IMPORT_MAX_RELEASES'] ) && ( $import == 1 ) && ( $array['IMPORT_MAX_RELEASES'] != 0 )) {
+		$color = get_color($colors_start, $colors_end, $colors_exc);
+		shell_exec("$_tmux respawnp -t${tmux_session}:0.4 'echo \"\033[38;5;\"$color\"m\nIMPORT_MAX_RELEASES exceeded\" && date +\"%D %T\"' 2>&1 1> /dev/null");
 
-	} elseif (( $array['IMPORT'] == "true" ) && ( $array['MAX_LOAD'] <= get_load())) {
-                $color = get_color();
-                shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.4 'echo \"\033[38;5;\"$color\"m\n$panes0[4] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+	} elseif (( $import == 1 ) && ( $array['MAX_LOAD'] <= get_load())) {
+                $color = get_color($colors_start, $colors_end, $colors_exc);
+                shell_exec("$_tmux respawnp -t${tmux_session}:0.4 'echo \"\033[38;5;\"$color\"m\n$panes0[4] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
 
-    } elseif ( $array['IMPORT'] != "true" ) {
-		$color = get_color();
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.4 'echo \"\033[38;5;\"$color\"m\n$panes0[4] Disabled by IMPORT\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+    } elseif ( $import == 0 ) {
+		$color = get_color($colors_start, $colors_end, $colors_exc);
+		shell_exec("$_tmux respawnp -t${tmux_session}:0.4 'echo \"\033[38;5;\"$color\"m\n$panes0[4] Disabled by IMPORT\" && date +\"%D %T\"' 2>&1 1> /dev/null");
 
 	}
 
 	//runs nzbcount in 1.5 loops
-	if (( $array['MAX_LOAD'] >= get_load()) && ( $array['IMPORT'] == "true" )) {
-		$color = get_color();
+	if (( $array['MAX_LOAD'] >= get_load()) && ( $import == 1 )) {
+		$color = get_color($colors_start, $colors_end, $colors_exc);
 		$log = writelog($panes1[5]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes1[5] $ds2 && cd $_bin && $_php nzbcount.php 2>&1 $log' 2>&1 1> /dev/null");
-	} elseif ( $array['IMPORT'] != "true" ) {
-		$color = get_color();
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.5 'echo \"\033[38;5;\"$color\"m\n$panes1[5] Disabled by IMPORT\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t${tmux_session}:1.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes1[5] $ds2 && cd $_bin && $_php nzbcount.php 2>&1 $log' 2>&1 1> /dev/null");
+	} elseif ( $import == 0 ) {
+		$color = get_color($colors_start, $colors_end, $colors_exc);
+		shell_exec("$_tmux respawnp -t${tmux_session}:1.5 'echo \"\033[38;5;\"$color\"m\n$panes1[5] Disabled by IMPORT\" && date +\"%D %T\"' 2>&1 1> /dev/null");
 	} elseif ( $array['MAX_LOAD'] <= get_load()) {
-                $color = get_color();
-                shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.5 'echo \"\033[38;5;\"$color\"m\n$panes1[5] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+                $color = get_color($colors_start, $colors_end, $colors_exc);
+                shell_exec("$_tmux respawnp -t${tmux_session}:1.5 'echo \"\033[38;5;\"$color\"m\n$panes1[5] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
         }
 
 	//start postprocessing in pane 0.1
@@ -1158,277 +1273,277 @@ $usptotalconnections  = str_replace("\n", '', shell_exec("ss -n | grep -c " . $i
         $h=$g-1;
         $f=$h*200;
         $j=$g*1;
-		$color = get_color();
+		$color = get_color($colors_start, $colors_end, $colors_exc);
 		$log = writelog($panes0[1]);
 		if (( $array['MAX_LOAD'] >= get_load()) && ( $work_remaining_now > $f )) {
-			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.1 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[1] $ds2 && cd $_test && $_python ${DIR}/../test/postprocess_threaded.py additional 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes0[1] $ds3' 2>&1 1> /dev/null");
+			shell_exec("$_tmux respawnp -t${tmux_session}:0.1 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[1] $ds2 && cd $_test && $_python ${DIR}/../test/postprocess_threaded.py additional 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes0[1] $ds3' 2>&1 1> /dev/null");
 		} elseif ( $work_remaining_now <= $f ) {
-			shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.1 'echo \"\033[38;5;\"$color\"m\n$panes0[1] $work_remaining_now < $f\nHas no work to process \" && date +\"%D %T\"' 2>&1 1> /dev/null");
+			shell_exec("$_tmux respawnp -t${tmux_session}:0.1 'echo \"\033[38;5;\"$color\"m\n$panes0[1] $work_remaining_now < $f\nHas no work to process \" && date +\"%D %T\"' 2>&1 1> /dev/null");
 		} elseif ( $array['MAX_LOAD'] <= get_load()) {
-                        shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.1 'echo \"\033[38;5;\"$color\"m\n$panes0[1] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+                        shell_exec("$_tmux respawnp -t${tmux_session}:0.1 'echo \"\033[38;5;\"$color\"m\n$panes0[1] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
                 }
 
 	//runs update_release and in 0.5 once if needed and exits
 	if (( $array['MAX_LOAD_RELEASES'] >= get_load()) && ( $releases_run == 2 )) {
-		$color = get_color();
+		$color = get_color($colors_start, $colors_end, $colors_exc);
 		$log = writelog($panes0[5]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[5] $ds2 && cd $_test && $_python ${DIR}/../test/releases_threaded.py && 2>&1 $log && echo \" \033[1;0;33m\" && $_sleep {$array['RELEASES_SLEEP']} && $ds1 $panes0[5] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t${tmux_session}:0.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[5] $ds2 && cd $_test && $_python ${DIR}/../test/releases_threaded.py && 2>&1 $log && echo \" \033[1;0;33m\" && $_sleep $rel_timer && $ds1 $panes0[5] $ds3' 2>&1 1> /dev/null");
 	} elseif (( $array['MAX_LOAD_RELEASES'] >= get_load()) && ( $releases_run == 1 )) {
-		$color = get_color();
+		$color = get_color($colors_start, $colors_end, $colors_exc);
 		$log = writelog($panes0[5]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[5] $ds2 && cd $_bin && $_php update_releases.php && 2>&1 $log && echo \" \033[1;0;33m\" && $_sleep {$array['RELEASES_SLEEP']} && $ds1 $panes0[5] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t${tmux_session}:0.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[5] $ds2 && cd $_bin && $_php update_releases.php && 2>&1 $log && echo \" \033[1;0;33m\" && $_sleep $rel_timer && $ds1 $panes0[5] $ds3' 2>&1 1> /dev/null");
     } elseif (( $array['MAX_LOAD_RELEASES'] >= get_load()) && ( $releases_run == 2 )) {
-		$color = get_color();
+		$color = get_color($colors_start, $colors_end, $colors_exc);
 		$log = writelog($panes0[5]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[5] $ds2 && cd $_test && $_python ${DIR}/../test/releases_threaded.py 2>&1 $log && echo \" \033[1;0;33m\" && $_sleep {$array['RELEASES_SLEEP']}  && $ds1 $panes0[5] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t${tmux_session}:0.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[5] $ds2 && cd $_test && $_python ${DIR}/../test/releases_threaded.py 2>&1 $log && echo \" \033[1;0;33m\" && $_sleep $rel_timer && $ds1 $panes0[5] $ds3' 2>&1 1> /dev/null");
 	} elseif (( $array['MAX_LOAD_RELEASES'] >= get_load()) && ( $releases_run == 1 )) {
-		$color = get_color();
+		$color = get_color($colors_start, $colors_end, $colors_exc);
 		$log = writelog($panes0[5]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[5] $ds2 && cd $_bin && $_php update_releases.php && 2>&1 $log && echo \" \033[1;0;33m\" && $_sleep {$array['RELEASES_SLEEP']} && $ds1 $panes0[5] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t${tmux_session}:0.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[5] $ds2 && cd $_bin && $_php update_releases.php && 2>&1 $log && echo \" \033[1;0;33m\" && $_sleep $rel_timer && $ds1 $panes0[5] $ds3' 2>&1 1> /dev/null");
     } elseif (( $releases_run !== 0  ) && ( $array['MAX_LOAD_RELEASES'] <= get_load())) {
-                $color = get_color();
-                shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.5 'echo \"\033[38;5;\"$color\"m\n$panes0[5] Disabled by MAX_LOAD_RELEASES\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+                $color = get_color($colors_start, $colors_end, $colors_exc);
+                shell_exec("$_tmux respawnp -t${tmux_session}:0.5 'echo \"\033[38;5;\"$color\"m\n$panes0[5] Disabled by MAX_LOAD_RELEASES\" && date +\"%D %T\"' 2>&1 1> /dev/null");
     } elseif ( $releases_run == 0  ) {
-		$color = get_color();
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:0.5 'echo \"\033[38;5;\"$color\"m\n$panes0[5] Disabled by RELEASES\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+		$color = get_color($colors_start, $colors_end, $colors_exc);
+		shell_exec("$_tmux respawnp -t${tmux_session}:0.5 'echo \"\033[38;5;\"$color\"m\n$panes0[5] Disabled by RELEASES\" && date +\"%D %T\"' 2>&1 1> /dev/null");
 	}
 
 	//run update_predb.php in 1.0 ever 15 minutes and on fifth loop
 	if (( $array['MAX_LOAD'] >= get_load()) && ((( TIME() - $time2 ) >= $array['PREDB_TIMER'] ) || ( $i == 5 )) && ( $array['PREDB'] == "true" )) {
-		$color = get_color();
+		$color = get_color($colors_start, $colors_end, $colors_exc);
 		$log = writelog($panes1[0]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.0 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes1[0] $ds2 && cd $NNPATH && $_php update_predb.php true 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes1[0] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t${tmux_session}:1.0 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes1[0] $ds2 && cd $NNPATH && $_php update_predb.php true 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes1[0] $ds3' 2>&1 1> /dev/null");
 		$time2 = TIME();
 	} elseif (( $array['PREDB'] == "true" ) && ( $array['MAX_LOAD'] >= get_load())) {
-		$color = get_color();
+		$color = get_color($colors_start, $colors_end, $colors_exc);
 		$run_time = relativeTime( $array['PREDB_TIMER'] + $time2 );
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.0 'echo \"\033[38;5;\"$color\"m\n$panes1[0] will run in T[ $run_time]\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t${tmux_session}:1.0 'echo \"\033[38;5;\"$color\"m\n$panes1[0] will run in T[ $run_time]\" && date +\"%D %T\"' 2>&1 1> /dev/null");
 	} elseif (( $array['MAX_LOAD'] >= get_load()) && ( $array['PREDB'] != "true" )) {
-		$color = get_color();
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.0 'echo \"\033[38;5;\"$color\"m\n$panes1[0] Disabled by PREDB\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+		$color = get_color($colors_start, $colors_end, $colors_exc);
+		shell_exec("$_tmux respawnp -t${tmux_session}:1.0 'echo \"\033[38;5;\"$color\"m\n$panes1[0] Disabled by PREDB\" && date +\"%D %T\"' 2>&1 1> /dev/null");
     } elseif ( $array['MAX_LOAD'] <= get_load()) {
-                $color = get_color();
-                shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.0 'echo \"\033[38;5;\"$color\"m\n$panes1[0] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+                $color = get_color($colors_start, $colors_end, $colors_exc);
+                shell_exec("$_tmux respawnp -t${tmux_session}:1.0 'echo \"\033[38;5;\"$color\"m\n$panes1[0] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
 	}
 
 	//run update_tvschedule.php and $_php update_theaters.php in 1.1 every 12 hours and tenth loop
 	if (( $array['MAX_LOAD'] >= get_load()) && ((( TIME() - $time4 ) >= $array['TVRAGE_TIMER'] ) || ( $i == 10 )) && ( $array['TV_SCHEDULE'] == "true")) {
-		$color = get_color();
+		$color = get_color($colors_start, $colors_end, $colors_exc);
 		$log = writelog($panes1[1]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.1 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes1[1] $ds2 && cd $NNPATH && $_php update_tvschedule.php 2>&1 $log && $_php update_theaters.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes1[1] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t${tmux_session}:1.1 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes1[1] $ds2 && cd $NNPATH && $_php update_tvschedule.php 2>&1 $log && $_php update_theaters.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes1[1] $ds3' 2>&1 1> /dev/null");
 		$time4 = TIME();
 	} elseif (( $array['TV_SCHEDULE'] == "true") && ( $array['MAX_LOAD'] >= get_load())) {
-		$color = get_color();
+		$color = get_color($colors_start, $colors_end, $colors_exc);
 		$run_time = relativeTime( $array['TVRAGE_TIMER'] + $time4 );
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.1 'echo \"\033[38;5;\"$color\"m\n$panes1[1] and update_theaters will run in T[ $run_time]\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t${tmux_session}:1.1 'echo \"\033[38;5;\"$color\"m\n$panes1[1] and update_theaters will run in T[ $run_time]\" && date +\"%D %T\"' 2>&1 1> /dev/null");
 	} elseif ( $array['TV_SCHEDULE'] != "true") {
-		$color = get_color();
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.1 'echo \"\033[38;5;\"$color\"m\n$panes1[1] Disabled by TV_SCHEDULE\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+		$color = get_color($colors_start, $colors_end, $colors_exc);
+		shell_exec("$_tmux respawnp -t${tmux_session}:1.1 'echo \"\033[38;5;\"$color\"m\n$panes1[1] Disabled by TV_SCHEDULE\" && date +\"%D %T\"' 2>&1 1> /dev/null");
 	} elseif ( $array['MAX_LOAD'] <= get_load()) {
-                $color = get_color();
-                shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.1 'echo \"\033[38;5;\"$color\"m\n$panes1[1] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+                $color = get_color($colors_start, $colors_end, $colors_exc);
+                shell_exec("$_tmux respawnp -t${tmux_session}:1.1 'echo \"\033[38;5;\"$color\"m\n$panes1[1] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
         }
 
 	//run sphinx in pane 1.2
 	if (( $array['MAX_LOAD'] >= get_load()) && ( TIME() - $time9 >= $array['SPHINX_TIMER'] ) && ( $array['SPHINX'] == "true")) {
 		$color=get_color();
 		$log = writelog($panes1[2]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.2 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes1[2] $ds2 && cd $_bin && $_php sphinx.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes1[2] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t${tmux_session}:1.2 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes1[2] $ds2 && cd $_bin && $_php sphinx.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes1[2] $ds3' 2>&1 1> /dev/null");
 		$time9 = TIME();
 	} elseif ( $array['SPHINX'] != "true" ) {
-		$color = get_color();
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.2 'echo \"\033[38;5;\"$color\"m\n$panes1[2] Disabled by SPHINX\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+		$color = get_color($colors_start, $colors_end, $colors_exc);
+		shell_exec("$_tmux respawnp -t${tmux_session}:1.2 'echo \"\033[38;5;\"$color\"m\n$panes1[2] Disabled by SPHINX\" && date +\"%D %T\"' 2>&1 1> /dev/null");
 	} elseif ( $array['MAX_LOAD'] >= get_load()) {
-		$color = get_color();
+		$color = get_color($colors_start, $colors_end, $colors_exc);
 		$run_time = relativeTime( $array['SPHINX_TIMER'] + $time9 );
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.2 'echo \"\033[38;5;\"$color\"m\n$panes1[2] will run in T[ $run_time]\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t${tmux_session}:1.2 'echo \"\033[38;5;\"$color\"m\n$panes1[2] will run in T[ $run_time]\" && date +\"%D %T\"' 2>&1 1> /dev/null");
 	} elseif ( $array['MAX_LOAD'] <= get_load()) {
-                $color = get_color();
-                shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.2 'echo \"\033[38;5;\"$color\"m\n$panes1[2] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+                $color = get_color($colors_start, $colors_end, $colors_exc);
+                shell_exec("$_tmux respawnp -t${tmux_session}:1.2 'echo \"\033[38;5;\"$color\"m\n$panes1[2] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
         }
 
 	//run delete parts in pane 1.3
 	if (( $array['MAX_LOAD'] >= get_load()) && (( TIME() - $time16 ) >= $array['DELETE_TIMER'] ) && ( $array['DELETE_PARTS'] == "true" )) {
-		$color = get_color();
+		$color = get_color($colors_start, $colors_end, $colors_exc);
 		$log = writelog($panes1[3]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.3 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes1[3] $ds2 && cd $_cj && $_php remove_parts_without_releases.php 2>&1 $log && $ds1 $panes1[3] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t${tmux_session}:1.3 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes1[3] $ds2 && cd $_cj && $_php remove_parts_without_releases.php 2>&1 $log && $ds1 $panes1[3] $ds3' 2>&1 1> /dev/null");
 		$time16 = TIME();
 	} elseif (( $array['DELETE_PARTS'] != "true" )) {
-		$color = get_color();
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.3 'echo \"\033[38;5;\"$color\"m\n$panes1[3] Disabled by DELETE_PARTS\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+		$color = get_color($colors_start, $colors_end, $colors_exc);
+		shell_exec("$_tmux respawnp -t${tmux_session}:1.3 'echo \"\033[38;5;\"$color\"m\n$panes1[3] Disabled by DELETE_PARTS\" && date +\"%D %T\"' 2>&1 1> /dev/null");
 	} elseif ( $array['MAX_LOAD'] >= get_load()) {
-		$color = get_color();
+		$color = get_color($colors_start, $colors_end, $colors_exc);
 		$run_time = relativeTime( $array['DELETE_TIMER'] + $time16 );
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.3 'echo \"\033[38;5;\"$color\"m\n$panes1[3] will run in T[ $run_time]\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t${tmux_session}:1.3 'echo \"\033[38;5;\"$color\"m\n$panes1[3] will run in T[ $run_time]\" && date +\"%D %T\"' 2>&1 1> /dev/null");
 	} elseif ( $array['MAX_LOAD'] <= get_load()) {
-                $color = get_color();
-                shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.3 'echo \"\033[38;5;\"$color\"m\n$panes1[3] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+                $color = get_color($colors_start, $colors_end, $colors_exc);
+                shell_exec("$_tmux respawnp -t${tmux_session}:1.3 'echo \"\033[38;5;\"$color\"m\n$panes1[3] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
         }
 
 	//run update_missing_movie_info parts in pane 1.4 on 15th loop
 	if (( $array['MAX_LOAD'] >= get_load()) && ((( TIME() - $time17 ) >= $array['MOVIE_TIMER'] ) || ( $i == 15 )) && ( $array['FETCH_MOVIE'] == "true" )) {
-		$color = get_color();
+		$color = get_color($colors_start, $colors_end, $colors_exc);
 		$log = writelog($panes1[4]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.4 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes1[4] $ds2 && cd $_cj && $_php update_missing_movie_info.php 2>&1 $log && $ds1 $panes1[4] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t${tmux_session}:1.4 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes1[4] $ds2 && cd $_cj && $_php update_missing_movie_info.php 2>&1 $log && $ds1 $panes1[4] $ds3' 2>&1 1> /dev/null");
 		$time17 = TIME();
 	} elseif ( $array['FETCH_MOVIE'] != "true" ) {
-		$color = get_color();
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.4 'echo \"\033[38;5;\"$color\"m\n$panes1[4] Disabled by FETCH_MOVIE\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+		$color = get_color($colors_start, $colors_end, $colors_exc);
+		shell_exec("$_tmux respawnp -t${tmux_session}:1.4 'echo \"\033[38;5;\"$color\"m\n$panes1[4] Disabled by FETCH_MOVIE\" && date +\"%D %T\"' 2>&1 1> /dev/null");
 	} elseif ( $array['MAX_LOAD'] >= get_load()) {
-		$color = get_color();
+		$color = get_color($colors_start, $colors_end, $colors_exc);
 		$run_time = relativeTime( $array['MOVIE_TIMER'] + $time17 );
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.4 'echo \"\033[38;5;\"$color\"m\n$panes1[4] will run in T[ $run_time]\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t${tmux_session}:1.4 'echo \"\033[38;5;\"$color\"m\n$panes1[4] will run in T[ $run_time]\" && date +\"%D %T\"' 2>&1 1> /dev/null");
 	} elseif ( $array['MAX_LOAD'] <= get_load()) {
-                $color = get_color();
-                shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:1.4 'echo \"\033[38;5;\"$color\"m\n$panes1[4] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+                $color = get_color($colors_start, $colors_end, $colors_exc);
+                shell_exec("$_tmux respawnp -t${tmux_session}:1.4 'echo \"\033[38;5;\"$color\"m\n$panes1[4] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
         }
 
 	//runs postprocess_nfo.php in pane 2.0 once if needed then exits
 	if (( $array['MAX_LOAD'] >= get_load()) && ( $nfo_remaining_now > 0 )) {
-		$color = get_color();
+		$color = get_color($colors_start, $colors_end, $colors_exc);
 		$log = writelog($panes2[0]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.0 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes2[0] $ds2 && cd $_test && $_python ${DIR}/../test/postprocess_threaded.py nfo 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes2[0] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t${tmux_session}:2.0 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes2[0] $ds2 && cd $_test && $_python ${DIR}/../test/postprocess_threaded.py nfo 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes2[0] $ds3' 2>&1 1> /dev/null");
 	}  elseif ( $array['MAX_LOAD'] <= get_load()) {
-                $color = get_color();
-                shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.0 'echo \"\033[38;5;\"$color\"m\n$panes2[0] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+                $color = get_color($colors_start, $colors_end, $colors_exc);
+                shell_exec("$_tmux respawnp -t${tmux_session}:2.0 'echo \"\033[38;5;\"$color\"m\n$panes2[0] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
     } elseif ( $nfo_remaining_now == 0 ) {
-		$color = get_color();
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.0 'echo \"\033[38;5;\"$color\"m\n$panes2[0] Has no work to process \" && date +\"%D %T\"' 2>&1 1> /dev/null");
+		$color = get_color($colors_start, $colors_end, $colors_exc);
+		shell_exec("$_tmux respawnp -t${tmux_session}:2.0 'echo \"\033[38;5;\"$color\"m\n$panes2[0] Has no work to process \" && date +\"%D %T\"' 2>&1 1> /dev/null");
         }
 
     //Postprocess TV Releases in pane 2.1 once if needed then exits
 	if (( $array['MAX_LOAD'] >= get_load()) && ( $tvrage_releases_proc > 0 )) {
-		$color = get_color();
+		$color = get_color($colors_start, $colors_end, $colors_exc);
 		$log = writelog($panes2[1]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.1 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes2[1] $ds2 && cd $_test && $_python ${DIR}/../test/postprocess_threaded.py tv 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes2[1] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t${tmux_session}:2.1 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes2[1] $ds2 && cd $_test && $_python ${DIR}/../test/postprocess_threaded.py tv 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes2[1] $ds3' 2>&1 1> /dev/null");
 	} elseif ( $array['MAX_LOAD'] <= get_load()) {
-                $color = get_color();
-                shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.1 'echo \"\033[38;5;\"$color\"m\n$panes2[1] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+                $color = get_color($colors_start, $colors_end, $colors_exc);
+                shell_exec("$_tmux respawnp -t${tmux_session}:2.1 'echo \"\033[38;5;\"$color\"m\n$panes2[1] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
     } elseif ( $tvrage_releases_proc == 0 ) {
-		$color = get_color();
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.1 'echo \"\033[38;5;\"$color\"m\n$panes2[1] Has no work to process \" && date +\"%D %T\"' 2>&1 1> /dev/null");
+		$color = get_color($colors_start, $colors_end, $colors_exc);
+		shell_exec("$_tmux respawnp -t${tmux_session}:2.1 'echo \"\033[38;5;\"$color\"m\n$panes2[1] Has no work to process \" && date +\"%D %T\"' 2>&1 1> /dev/null");
         }
 
     //runs processMovies.php in pane 2.2 once if needed then exits
 	if (( $array['MAX_LOAD'] >= get_load()) && ( $movie_releases_proc > 0 )) {
-		$color = get_color();
+		$color = get_color($colors_start, $colors_end, $colors_exc);
 		$log = writelog($panes2[2]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.2 'echo \"\033[38;5;\"$color\"\" && $ds1 $panes2[2] $ds2 && cd $_test && $_python ${DIR}/../test/postprocess_threaded.py movie 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes2[2] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t${tmux_session}:2.2 'echo \"\033[38;5;\"$color\"\" && $ds1 $panes2[2] $ds2 && cd $_test && $_python ${DIR}/../test/postprocess_threaded.py movie 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes2[2] $ds3' 2>&1 1> /dev/null");
 	} elseif  ( $array['MAX_LOAD'] <= get_load()) {
-                $color = get_color();
-                shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.2 'echo \"\033[38;5;\"$color\"m\n$panes2[2] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+                $color = get_color($colors_start, $colors_end, $colors_exc);
+                shell_exec("$_tmux respawnp -t${tmux_session}:2.2 'echo \"\033[38;5;\"$color\"m\n$panes2[2] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
     } elseif ( $movie_releases_proc == 0 ) {
-		$color = get_color();
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.2 'echo \"\033[38;5;\"$color\"m\n$panes2[2] Has no work to process \" && date +\"%D %T\"' 2>&1 1> /dev/null");
+		$color = get_color($colors_start, $colors_end, $colors_exc);
+		shell_exec("$_tmux respawnp -t${tmux_session}:2.2 'echo \"\033[38;5;\"$color\"m\n$panes2[2] Has no work to process \" && date +\"%D %T\"' 2>&1 1> /dev/null");
         }
 
     //runs processMusic.php in pane 2.3 once if needed then exits
 	if (( $array['MAX_LOAD'] >= get_load()) && ( $music_releases_proc > 0 )) {
-		$color = get_color();
+		$color = get_color($colors_start, $colors_end, $colors_exc);
 		$log = writelog($panes2[3]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.3 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes2[3] $ds2 && cd $_bin && $_php postprocess_new.php music 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes2[3] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t${tmux_session}:2.3 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes2[3] $ds2 && cd $_bin && $_php postprocess_new.php music 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes2[3] $ds3' 2>&1 1> /dev/null");
 	} elseif ( $array['MAX_LOAD'] <= get_load()) {
-                $color = get_color();
-                shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.3 'echo \"\033[38;5;\"$color\"m\n$panes2[3] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+                $color = get_color($colors_start, $colors_end, $colors_exc);
+                shell_exec("$_tmux respawnp -t${tmux_session}:2.3 'echo \"\033[38;5;\"$color\"m\n$panes2[3] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
     } elseif ( $music_releases_proc == 0 ) {
-		$color = get_color();
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.3 'echo \"\033[38;5;\"$color\"m\n$panes2[3] Has no work to process \" && date +\"%D %T\"' 2>&1 1> /dev/null");
+		$color = get_color($colors_start, $colors_end, $colors_exc);
+		shell_exec("$_tmux respawnp -t${tmux_session}:2.3 'echo \"\033[38;5;\"$color\"m\n$panes2[3] Has no work to process \" && date +\"%D %T\"' 2>&1 1> /dev/null");
         }
 
 	//Process Anime releases in pane 2.4 once if needed then exits
 	if (( $array['MAX_LOAD'] >= get_load()) && ( $tvrage_releases_proc > 0 )) {
-		$color = get_color();
+		$color = get_color($colors_start, $colors_end, $colors_exc);
 		$log = writelog($panes2[4]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.4 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes2[4] $ds2 && cd $_bin && $_php postprocess_new.php anime 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes2[4] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t${tmux_session}:2.4 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes2[4] $ds2 && cd $_bin && $_php postprocess_new.php anime 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes2[4] $ds3' 2>&1 1> /dev/null");
 	} elseif ( $array['MAX_LOAD'] <= get_load()) {
-                $color = get_color();
-                shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.4 'echo \"\033[38;5;\"$color\"m\n$panes2[4] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+                $color = get_color($colors_start, $colors_end, $colors_exc);
+                shell_exec("$_tmux respawnp -t${tmux_session}:2.4 'echo \"\033[38;5;\"$color\"m\n$panes2[4] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
     } else  {
-		$color = get_color();
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.4 'echo \"\033[38;5;\"$color\"m\n$panes2[4] Has no work to process \" && date +\"%D %T\"' 2>&1 1> /dev/null");
+		$color = get_color($colors_start, $colors_end, $colors_exc);
+		shell_exec("$_tmux respawnp -t${tmux_session}:2.4 'echo \"\033[38;5;\"$color\"m\n$panes2[4] Has no work to process \" && date +\"%D %T\"' 2>&1 1> /dev/null");
         }
 
 	//Process Console releases in pane 2.5 once if needed then exits
 	if (( $array['MAX_LOAD'] >= get_load()) && ( $console_releases_proc > 0 )) {
-		$color = get_color();
+		$color = get_color($colors_start, $colors_end, $colors_exc);
 		$log = writelog($panes2[5]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes2[5] $ds2 && cd $_bin && $_php postprocess_new.php games 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes2[5] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t${tmux_session}:2.5 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes2[5] $ds2 && cd $_bin && $_php postprocess_new.php games 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes2[5] $ds3' 2>&1 1> /dev/null");
 	} elseif ( $array['MAX_LOAD'] <= get_load()) {
-                $color = get_color();
-                shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.5 'echo \"\033[38;5;\"$color\"m\n$panes2[5] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+                $color = get_color($colors_start, $colors_end, $colors_exc);
+                shell_exec("$_tmux respawnp -t${tmux_session}:2.5 'echo \"\033[38;5;\"$color\"m\n$panes2[5] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
     } elseif ( $console_releases_proc == 0 )  {
-		$color = get_color();
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.5 'echo \"\033[38;5;\"$color\"m\n$panes2[5] Has no work to process \" && date +\"%D %T\"' 2>&1 1> /dev/null");
+		$color = get_color($colors_start, $colors_end, $colors_exc);
+		shell_exec("$_tmux respawnp -t${tmux_session}:2.5 'echo \"\033[38;5;\"$color\"m\n$panes2[5] Has no work to process \" && date +\"%D %T\"' 2>&1 1> /dev/null");
         }
 
 	//run processSpotnab.php in 2.6 every 15 minutes
 	if (( $array['MAX_LOAD'] >= get_load()) && (( TIME() - $time20 ) >= $array['SPOTNAB_TIMER'] ) && ( $array['SPOTNAB'] == "true" )) {
-		$color = get_color();
+		$color = get_color($colors_start, $colors_end, $colors_exc);
 		$log = writelog($panes2[6]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.6 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes2[6] $ds2 && cd $_bin && $_php postprocess_new.php spotnab true 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes2[6] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t${tmux_session}:2.6 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes2[6] $ds2 && cd $_bin && $_php postprocess_new.php spotnab true 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes2[6] $ds3' 2>&1 1> /dev/null");
 		$time20 = TIME();
 	} elseif ( $array['SPOTNAB'] != "true" ) {
-		$color = get_color();
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.6 'echo \"\033[38;5;\"$color\"m\n$panes2[6] Disabled by SPOTNAB\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+		$color = get_color($colors_start, $colors_end, $colors_exc);
+		shell_exec("$_tmux respawnp -t${tmux_session}:2.6 'echo \"\033[38;5;\"$color\"m\n$panes2[6] Disabled by SPOTNAB\" && date +\"%D %T\"' 2>&1 1> /dev/null");
 	} elseif (( $array['SPOTNAB'] == "true" ) && ( $array['MAX_LOAD'] >= get_load())) {
-		$color = get_color();
+		$color = get_color($colors_start, $colors_end, $colors_exc);
 		$run_time = relativeTime( $array['SPOTNAB_TIMER'] + $time20 );
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.6 'echo \"\033[38;5;\"$color\"m\n$panes2[6] will run in T[ $run_time]\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t${tmux_session}:2.6 'echo \"\033[38;5;\"$color\"m\n$panes2[6] will run in T[ $run_time]\" && date +\"%D %T\"' 2>&1 1> /dev/null");
 	} elseif ( $array['MAX_LOAD'] <= get_load()) {
-                $color = get_color();
-                shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.6 'echo \"\033[38;5;\"$color\"m\n$panes2[6] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+                $color = get_color($colors_start, $colors_end, $colors_exc);
+                shell_exec("$_tmux respawnp -t${tmux_session}:2.6 'echo \"\033[38;5;\"$color\"m\n$panes2[6] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
         }
 
 	//Process Books in pane 2.7 once if needed then exits
 	if (( $array['MAX_LOAD'] >= get_load()) && ( $book_releases_proc > 0 )) {
-		$color = get_color();
+		$color = get_color($colors_start, $colors_end, $colors_exc);
 		$log = writelog($panes2[7]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.7 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes2[7] $ds2 && cd $_bin && $_php postprocess_new.php ebook 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes2[7] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t${tmux_session}:2.7 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes2[7] $ds2 && cd $_bin && $_php postprocess_new.php ebook 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes2[7] $ds3' 2>&1 1> /dev/null");
 	} elseif ( $array['MAX_LOAD'] <= get_load()) {
-                $color = get_color();
-                shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.7 'echo \"\033[38;5;\"$color\"m\n$panes2[7] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+                $color = get_color($colors_start, $colors_end, $colors_exc);
+                shell_exec("$_tmux respawnp -t${tmux_session}:2.7 'echo \"\033[38;5;\"$color\"m\n$panes2[7] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
     } elseif ( $book_releases_proc == 0 ) {
-		$color = get_color();
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.7 'echo \"\033[38;5;\"$color\"m\n$panes2[7] Has no work to process \" && date +\"%D %T\"' 2>&1 1> /dev/null");
+		$color = get_color($colors_start, $colors_end, $colors_exc);
+		shell_exec("$_tmux respawnp -t${tmux_session}:2.7 'echo \"\033[38;5;\"$color\"m\n$panes2[7] Has no work to process \" && date +\"%D %T\"' 2>&1 1> /dev/null");
         }
 
 	//Process Other releases in pane 2.8 once if needed then exits
 	if  (( $array['MAX_LOAD'] >= get_load()) && ( $array['OTHERS'] == "true" )) {
-		$color = get_color();
+		$color = get_color($colors_start, $colors_end, $colors_exc);
 		$log = writelog($panes2[8]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.8 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes2[8] $ds2 && cd $_bin && $_php postprocess_new.php other 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes2[8] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t${tmux_session}:2.8 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes2[8] $ds2 && cd $_bin && $_php postprocess_new.php other 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes2[8] $ds3' 2>&1 1> /dev/null");
 	} elseif ( $array['OTHERS'] != "true" ) {
-		$color = get_color();
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.8 'echo \"\033[38;5;\"$color\"m\n$panes2[8] Disabled by OTHERS\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+		$color = get_color($colors_start, $colors_end, $colors_exc);
+		shell_exec("$_tmux respawnp -t${tmux_session}:2.8 'echo \"\033[38;5;\"$color\"m\n$panes2[8] Disabled by OTHERS\" && date +\"%D %T\"' 2>&1 1> /dev/null");
 	} elseif ( $array['MAX_LOAD'] <= get_load()) {
-                $color = get_color();
-                shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.8 'echo \"\033[38;5;\"$color\"m\n$panes2[8] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+                $color = get_color($colors_start, $colors_end, $colors_exc);
+                shell_exec("$_tmux respawnp -t${tmux_session}:2.8 'echo \"\033[38;5;\"$color\"m\n$panes2[8] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
     } else  {
-		$color = get_color();
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.8 'echo \"\033[38;5;\"$color\"m\n$panes2[8] Has no work to process \" && date +\"%D %T\"' 2>&1 1> /dev/null");
+		$color = get_color($colors_start, $colors_end, $colors_exc);
+		shell_exec("$_tmux respawnp -t${tmux_session}:2.8 'echo \"\033[38;5;\"$color\"m\n$panes2[8] Has no work to process \" && date +\"%D %T\"' 2>&1 1> /dev/null");
         }
 
 	//Process Unwanted releases in pane 2.9 in continuous loop, will restart if exits
 	if  (( $array['MAX_LOAD'] >= get_load()) && ( $array['UNWANTED'] == "true" )) {
-		$color = get_color();
+		$color = get_color($colors_start, $colors_end, $colors_exc);
 		$log = writelog($panes2[9]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.9 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes2[9] $ds2 && cd $_bin && $_php postprocess_new.php unwanted 2>&1 $log && echo \" \033[1;0;33;33m\" && $ds1 $panes2[9] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t${tmux_session}:2.9 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes2[9] $ds2 && cd $_bin && $_php postprocess_new.php unwanted 2>&1 $log && echo \" \033[1;0;33;33m\" && $ds1 $panes2[9] $ds3' 2>&1 1> /dev/null");
 	} elseif ( $array['UNWANTED'] != "true" ) {
-		$color = get_color();
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.9 'echo \"\033[38;5;\"$color\"m\n$panes2[9] Disabled by UNWANTED\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+		$color = get_color($colors_start, $colors_end, $colors_exc);
+		shell_exec("$_tmux respawnp -t${tmux_session}:2.9 'echo \"\033[38;5;\"$color\"m\n$panes2[9] Disabled by UNWANTED\" && date +\"%D %T\"' 2>&1 1> /dev/null");
 	} elseif ( $array['MAX_LOAD'] <= get_load()) {
-                $color = get_color();
-                shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.9 'echo \"\033[38;5;\"$color\"m\n$panes2[9] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+                $color = get_color($colors_start, $colors_end, $colors_exc);
+                shell_exec("$_tmux respawnp -t${tmux_session}:2.9 'echo \"\033[38;5;\"$color\"m\n$panes2[9] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
     } else  {
-		$color = get_color();
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:2.9 'echo \"\033[38;5;\"$color\"m\n$panes2[9] Has no work to process \" && date +\"%D %T\"' 2>&1 1> /dev/null");
+		$color = get_color($colors_start, $colors_end, $colors_exc);
+		shell_exec("$_tmux respawnp -t${tmux_session}:2.9 'echo \"\033[38;5;\"$color\"m\n$panes2[9] Has no work to process \" && date +\"%D %T\"' 2>&1 1> /dev/null");
         }
 
     //run fixreleasenames threaded in pane 3.0
 	if (( $array['MAX_LOAD'] >= get_load()) && ( $array['FIXRELEASES'] == "true" ) && ( $array['FIXRELEASES_THREADED'] == "true" )) {
-		$color = get_color();
+		$color = get_color($colors_start, $colors_end, $colors_exc);
 		$log = writelog($panes3[0]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.0 ' \
+		shell_exec("$_tmux respawnp -t${tmux_session}:3.0 ' \
                     $ds1 $panes3[0] $ds2; \
                     cd $_test && $_python ${DIR}/../test/fixreleasenames_threaded.py md5 2>&1 $log; \
                     $_python ${DIR}/../test/fixreleasenames_threaded.py nfo 2>&1 $log; \
@@ -1437,74 +1552,109 @@ $usptotalconnections  = str_replace("\n", '', shell_exec("ss -n | grep -c " . $i
                     $_sleep {$array ['FIXRELEASES_TIMER']} && $ds1 $panes3[0] $ds3' 2>&1 1> /dev/null");
 		$time27 = TIME();
     } elseif (( $array['MAX_LOAD'] >= get_load()) && ( $array['FIXRELEASES'] == "true" ) && ( $array['FIXRELEASES_THREADED'] == "false" )) {
-		$color = get_color();
+		$color = get_color($colors_start, $colors_end, $colors_exc);
 		$log = writelog($panes3[0]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.0 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes3[0] $ds2 && cd $_test && $_php fixReleaseNames.php 3 true other yes show 2>&1 $log && $_php fixReleaseNames.php 5 true other yes show 2>&1 $log && $_php fixReleaseNames.php 7 true other yes show 2>&1 $log && echo \" \033[1;0;33m\" && $_sleep {$array ['FIXRELEASES_TIMER']} && $ds1 $panes3[0] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t${tmux_session}:3.0 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes3[0] $ds2 && cd $_test && $_php fixReleaseNames.php 3 true other yes show 2>&1 $log && $_php fixReleaseNames.php 5 true other yes show 2>&1 $log && $_php fixReleaseNames.php 7 true other yes show 2>&1 $log && echo \" \033[1;0;33m\" && $_sleep {$array ['FIXRELEASES_TIMER']} && $ds1 $panes3[0] $ds3' 2>&1 1> /dev/null");
         $time27 = TIME();
 	} elseif ( $array['FIXRELEASES'] == "false" ) {
-		$color = get_color();
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.0 'echo \"\033[38;5;\"$color\"m\n$panes3[0] Disabled by fixReleaseNames\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+		$color = get_color($colors_start, $colors_end, $colors_exc);
+		shell_exec("$_tmux respawnp -t${tmux_session}:3.0 'echo \"\033[38;5;\"$color\"m\n$panes3[0] Disabled by fixReleaseNames\" && date +\"%D %T\"' 2>&1 1> /dev/null");
 	} elseif ( $array['MAX_LOAD'] <= get_load()) {
-                $color = get_color();
-                shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.0 'echo \"\033[38;5;\"$color\"m\n$panes3[0] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+                $color = get_color($colors_start, $colors_end, $colors_exc);
+                shell_exec("$_tmux respawnp -t${tmux_session}:3.0 'echo \"\033[38;5;\"$color\"m\n$panes3[0] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
         }
     //run predb_hash_decrypt.php in pane 3.1
 	if (( $array['MAX_LOAD'] >= get_load()) &&( $array['PREDBHASH'] == "true" )) {
-		$color = get_color();
+		$color = get_color($colors_start, $colors_end, $colors_exc);
 		$log = writelog($panes3[1]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.1 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes3[1] $ds2 && cd $_test && $_php predb_hash_decrypt.php 1000 2>&1 $log && echo \" \033[1;0;33m\" && $_sleep {$array ['PREDBHASH_TIMER']} && $ds1 $panes3[1] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t${tmux_session}:3.1 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes3[1] $ds2 && cd $_test && $_php predb_hash_decrypt.php 1000 2>&1 $log && echo \" \033[1;0;33m\" && $_sleep {$array ['PREDBHASH_TIMER']} && $ds1 $panes3[1] $ds3' 2>&1 1> /dev/null");
 		$time28 = TIME();
 	} elseif ( $array['PREDBHASH'] != "true" ) {
-		$color = get_color();
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.1 'echo \"\033[38;5;\"$color\"m\n$panes3[1] Disabled by PREDBHASH\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+		$color = get_color($colors_start, $colors_end, $colors_exc);
+		shell_exec("$_tmux respawnp -t${tmux_session}:3.1 'echo \"\033[38;5;\"$color\"m\n$panes3[1] Disabled by PREDBHASH\" && date +\"%D %T\"' 2>&1 1> /dev/null");
 	} elseif ( $array['MAX_LOAD'] <= get_load()) {
-                $color = get_color();
-                shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.1 'echo \"\033[38;5;\"$color\"m\n$panes3[1] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+                $color = get_color($colors_start, $colors_end, $colors_exc);
+                shell_exec("$_tmux respawnp -t${tmux_session}:3.1 'echo \"\033[38;5;\"$color\"m\n$panes3[1] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
         }
         //run requestID or requestid threaded in pane 3.2
 	if (( $array['MAX_LOAD'] >= get_load()) && ( $array['REQID'] == "true" ) && ( $array['REQID_THREADED'] == "true" )) {
-		$color = get_color();
+		$color = get_color($colors_start, $colors_end, $colors_exc);
 		$log = writelog($panes3[2]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.2 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes3[2] $ds2 && cd $_test && $_python ${DIR}/../test/requestid_threaded.py 2>&1 $log && echo \" \033[1;0;33m\" && $_sleep {$array['REQID_TIMER']} && $ds1 $panes3[2] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t${tmux_session}:3.2 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes3[2] $ds2 && cd $_test && $_python ${DIR}/../test/requestid_threaded.py 2>&1 $log && echo \" \033[1;0;33m\" && $_sleep {$array['REQID_TIMER']} && $ds1 $panes3[2] $ds3' 2>&1 1> /dev/null");
 		$time30 = TIME();
     } elseif (( $array['MAX_LOAD'] >= get_load()) && ( $array['REQID'] == "true" ) && ( $array['REQID_THREADED'] == "false" )) {
-		$color = get_color();
+		$color = get_color($colors_start, $colors_end, $colors_exc);
 		$log = writelog($panes3[2]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.2 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes3[2] $ds2 && cd $_test && $_php requestID.php 1000 true 2>&1 $log && echo \" \033[1;0;33m\" && $_sleep {$array['REQID_TIMER']} && $ds1 $panes3[2] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t${tmux_session}:3.2 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes3[2] $ds2 && cd $_test && $_php requestID.php 1000 true 2>&1 $log && echo \" \033[1;0;33m\" && $_sleep {$array['REQID_TIMER']} && $ds1 $panes3[2] $ds3' 2>&1 1> /dev/null");
 		$time30 = TIME();
     } elseif ( $array['REQID'] != "true" ) {
-		$color = get_color();
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.2 'echo \"\033[38;5;\"$color\"m\n$panes3[2] Disabled by RequestID\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+		$color = get_color($colors_start, $colors_end, $colors_exc);
+		shell_exec("$_tmux respawnp -t${tmux_session}:3.2 'echo \"\033[38;5;\"$color\"m\n$panes3[2] Disabled by RequestID\" && date +\"%D %T\"' 2>&1 1> /dev/null");
 	} elseif ( $array['MAX_LOAD'] <= get_load()) {
-                $color = get_color();
-                shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.2 'echo \"\033[38;5;\"$color\"m\n$panes3[2] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+                $color = get_color($colors_start, $colors_end, $colors_exc);
+                shell_exec("$_tmux respawnp -t${tmux_session}:3.2 'echo \"\033[38;5;\"$color\"m\n$panes3[2] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
         }
         //run removeCrap.php in pane 3.3
-	if (( $array['MAX_LOAD'] >= get_load()) && ( $array['REMOVECRAP'] == "true" )) {
-		$color = get_color();
-		$log = writelog($panes3[3]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.3 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes3[3] $ds2 && cd $_test && $_php removeCrapReleases.php true 2 2>&1 $log && echo \" \033[1;0;33m\" && $_sleep {$array['REMOVECRAP_TIMER']} && $ds1 $panes3[3] $ds3' 2>&1 1> /dev/null");
-		$time31 = TIME();}
-	  elseif ( $array['REMOVECRAP'] != "true" ) {
-		$color = get_color();
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.3 'echo \"\033[38;5;\"$color\"m\n$panes3[3] Disabled by RemoveCrap\" && date +\"%D %T\"' 2>&1 1> /dev/null");
-	} elseif ( $array['MAX_LOAD'] <= get_load()) {
-                $color = get_color();
-                shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.3 'echo \"\033[38;5;\"$color\"m\n$panes3[3] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
-        }
+	if (($fix_crap_opt != "Disabled") && (($i == 1) || $fcfirstrun)) {
+				$log = writelog($panes3[3]);
+				if ($fix_crap_opt == 'All') {
+					shell_exec("tmux respawnp -t${tmux_session}:3.3 ' \
+						$_php ${DIR}/../test/removeCrapReleases.php true 2 $log; date +\"%D %T\"; $_sleep $crap_timer' 2>&1 1> /dev/null");
+				} else {
+					$fcmax = count($fix_crap);
+					if (is_null($fcnum)) {
+						$fcnum = 0;
+					}
+					//Check to see if the pane is dead, if so resawn it.
+					if (shell_exec("tmux list-panes -t${tmux_session}:3 | grep ^1 | grep -c dead") == 1) {
+						shell_exec("tmux respawnp -t${tmux_session}:3.3 ' \
+							echo \"Running removeCrapReleases for $fix_crap[$fcnum]\"; \
+							$_php ${DIR}/../test/removeCrapReleases.php true full $fix_crap[$fcnum] $log; date +\"%D %T\"; $_sleep $crap_timer' 2>&1 1> /dev/null");
+						$fcnum++;
+					}
+					if ($fcnum == $fcmax) {
+						$fcnum = 0;
+						$fcfirstrun = false;
+					}
+				}
+			} else if ($fix_crap_opt != 'Disabled') {
+				$log = writelog($panes3[3]);
+				if ($fix_crap_opt == 'All') {
+					shell_exec("tmux respawnp -t${tmux_session}:3.3 ' \
+						$_php ${DIR}/../test/removeCrapReleases.php true 2 $log; date +\"%D %T\"; $_sleep $crap_timer' 2>&1 1> /dev/null");
+				} else {
+					$fcmax = count($fix_crap);
+					if (is_null($fcnum)) {
+						$fcnum = 0;
+					}
+					//Check to see if the pane is dead, if so respawn it.
+					if (shell_exec("tmux list-panes -t${tmux_session}:3 | grep ^1 | grep -c dead") == 1) {
+						shell_exec("tmux respawnp -t${tmux_session}:3.3 ' \
+							echo \"Running removeCrapReleases for $fix_crap[$fcnum]\"; \
+							$_php ${DIR}/../test/removeCrapReleases.php true 2 $fix_crap[$fcnum] $log; date +\"%D %T\"; $_sleep $crap_timer' 2>&1 1> /dev/null");
+						$fcnum++;
+					}
+					if ($fcnum == $fcmax) {
+						$fcnum = 0;
+					}
+				}
+			} else {
+				$color = get_color($colors_start, $colors_end, $colors_exc);
+				shell_exec("tmux respawnp -k -t${tmux_session}:3.3 'echo \"\033[38;5;${color}m\n${panes3[3]} has been disabled/terminated by Remove Crap Releases\"'");
+			}
 
     //run postprocess_pre.php in pane 3.4
 	if (( $array['MAX_LOAD'] >= get_load()) && ( $array['UPPRE'] == "true" )) {
-		$color = get_color();
+		$color = get_color($colors_start, $colors_end, $colors_exc);
 		$log = writelog($panes3[4]);
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.4 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes3[4] $ds2 && cd $_test && $_php postprocess_pre.php 2>&1 $log && echo \" \033[1;0;33m\" && $_sleep {$array['UPPRE_TIMER']} && $ds1 $panes3[4] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t${tmux_session}:3.4 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes3[4] $ds2 && cd $_test && $_php postprocess_pre.php 2>&1 $log && echo \" \033[1;0;33m\" && $_sleep {$array['UPPRE_TIMER']} && $ds1 $panes3[4] $ds3' 2>&1 1> /dev/null");
 		$time32 = TIME();}
 	  elseif ( $array['UPPRE'] != "true" ) {
-		$color = get_color();
-		shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.4 'echo \"\033[38;5;\"$color\"m\n$panes3[4] Disabled by Update_Prehash\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+		$color = get_color($colors_start, $colors_end, $colors_exc);
+		shell_exec("$_tmux respawnp -t${tmux_session}:3.4 'echo \"\033[38;5;\"$color\"m\n$panes3[4] Disabled by Update_Prehash\" && date +\"%D %T\"' 2>&1 1> /dev/null");
 	} elseif ( $array['MAX_LOAD'] <= get_load()) {
-                $color = get_color();
-                shell_exec("$_tmux respawnp -t {$array['TMUX_SESSION']}:3.4 'echo \"\033[38;5;\"$color\"m\n$panes3[4] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+                $color = get_color($colors_start, $colors_end, $colors_exc);
+                shell_exec("$_tmux respawnp -t${tmux_session}:3.4 'echo \"\033[38;5;\"$color\"m\n$panes3[4] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
         }
 
 	$i++;
@@ -1514,9 +1664,8 @@ $usptotalconnections  = str_replace("\n", '', shell_exec("ss -n | grep -c " . $i
 	}
 	sleep(5);
 
-	while (( ! shell_exec("$_tmux list-panes -t {$array['TMUX_SESSION']}:1 | grep 4: | grep dead" )))
+	while (( ! shell_exec("$_tmux list-panes -t${tmux_session}:1 | grep 4: | grep dead" )))
 	{
 		sleep(1);
 	}
-}
 }
