@@ -9,7 +9,7 @@ require_once("../test/showsleep.php");
 require_once("../test/functions.php");
 
 
-$version="0.3r881";
+$version="0.3r882";
 
 $db = new DB();
 $functions = new Functions();
@@ -1122,6 +1122,13 @@ $usptotalconnections  = str_replace("\n", '', shell_exec("ss -n | grep -c " . $i
 	} else {
 		$nzb_cmd = "$_php nzb-import.php \"{$array['NZBS']}\" \"{$array['IMPORT_TRUE']}\" 2>&1 $log";
 	}
+
+if ($post_non == 2) {
+		$clean = ' clean ';
+	} else {
+		$clean = ' ';
+	}
+
 if ($running == 1){
 	//check if sequential is set
 	if ( $array['SEQUENTIAL'] != "true" ) {
@@ -1477,31 +1484,33 @@ if ($running == 1){
                 shell_exec("$_tmux respawnp -t${tmux_session}:2.0 'echo \"\033[38;5;\"$color\"m\n$panes2[0] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
     }*/
 
-    //Postprocess TV Releases in pane 2.1 once if needed then exits
-	if (( $array['MAX_LOAD'] >= get_load()) && ( $tvrage_releases_proc > 0 )) {
-		$color = get_color($colors_start, $colors_end, $colors_exc);
-		$log = writelog($panes2[1]);
-		shell_exec("$_tmux respawnp -t${tmux_session}:2.1 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes2[1] $ds2 && cd $_test && $_python ${DIR}/../test/postprocess_threaded.py tv 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes2[1] $ds3' 2>&1 1> /dev/null");
-	} elseif ( $array['MAX_LOAD'] <= get_load()) {
-                $color = get_color($colors_start, $colors_end, $colors_exc);
-                shell_exec("$_tmux respawnp -t${tmux_session}:2.1 'echo \"\033[38;5;\"$color\"m\n$panes2[1] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
-    } elseif ( $tvrage_releases_proc == 0 ) {
-		$color = get_color($colors_start, $colors_end, $colors_exc);
-		shell_exec("$_tmux respawnp -t${tmux_session}:2.1 'echo \"\033[38;5;\"$color\"m\n$panes2[1] Has no work to process \" && date +\"%D %T\"' 2>&1 1> /dev/null");
-        }
+    //Postprocess TV Releases in pane 2.1
+	if (($post_non != 0) && ($tvrage_releases_proc > 0)) {
+				//run postprocess_releases non amazon
+				$log = writelog($panes2[1]);
+				shell_exec("tmux respawnp -t${tmux_session}:2.1 ' \
+						$_python ${DIR}/../test/postprocess_threaded.py tv $clean $log; date +\"%D %T\"; $_sleep $post_timer_non' 2>&1 1> /dev/null");
+			} else if (($post_non != 0) && ($tvrage_releases_proc == 0)) {
+				$color = get_color($colors_start, $colors_end, $colors_exc);
+				shell_exec("tmux respawnp -k -t${tmux_session}:2.1 'echo \"\033[38;5;${color}m\n${panes2[1]} has been disabled/terminated by No TV to process\"'");
+			} else {
+				$color = get_color($colors_start, $colors_end, $colors_exc);
+				shell_exec("tmux respawnp -k -t${tmux_session}:2.1 'echo \"\033[38;5;${color}m\n${panes2[1]} has been disabled/terminated by Postprocess Non-Amazon\"'");
+			}
 
-    //runs processMovies.php in pane 2.2 once if needed then exits
-	if (( $array['MAX_LOAD'] >= get_load()) && ( $movie_releases_proc > 0 )) {
-		$color = get_color($colors_start, $colors_end, $colors_exc);
-		$log = writelog($panes2[2]);
-		shell_exec("$_tmux respawnp -t${tmux_session}:2.2 'echo \"\033[38;5;\"$color\"\" && $ds1 $panes2[2] $ds2 && cd $_test && $_python ${DIR}/../test/postprocess_threaded.py movie 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes2[2] $ds3' 2>&1 1> /dev/null");
-	} elseif  ( $array['MAX_LOAD'] <= get_load()) {
-                $color = get_color($colors_start, $colors_end, $colors_exc);
-                shell_exec("$_tmux respawnp -t${tmux_session}:2.2 'echo \"\033[38;5;\"$color\"m\n$panes2[2] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
-    } elseif ( $movie_releases_proc == 0 ) {
-		$color = get_color($colors_start, $colors_end, $colors_exc);
-		shell_exec("$_tmux respawnp -t${tmux_session}:2.2 'echo \"\033[38;5;\"$color\"m\n$panes2[2] Has no work to process \" && date +\"%D %T\"' 2>&1 1> /dev/null");
-        }
+    //Process movies in pane 2.2
+	if (($post_non != 0) && ($movie_releases_proc > 0)) {
+				//run postprocess_releases non amazon
+				$log = writelog($panes2[2]);
+				shell_exec("tmux respawnp -t${tmux_session}:2.2 ' \
+						$_python ${DIR}/../test/postprocess_threaded.py movie $clean $log; date +\"%D %T\"; $_sleep $post_timer_non' 2>&1 1> /dev/null");
+			} else if (($post_non != 0) && ($movie_releases_proc == 0)) {
+				$color = get_color($colors_start, $colors_end, $colors_exc);
+				shell_exec("tmux respawnp -k -t${tmux_session}:2.2 'echo \"\033[38;5;${color}m\n${panes2[2]} has been disabled/terminated by No Movies to process\"'");
+			} else {
+				$color = get_color($colors_start, $colors_end, $colors_exc);
+				shell_exec("tmux respawnp -k -t${tmux_session}:2.2 'echo \"\033[38;5;${color}m\n${panes2[2]} has been disabled/terminated by Postprocess Non-Amazon\"'");
+			}
 
     //runs processMusic.php in pane 2.3 once if needed then exits
 	if (( $array['MAX_LOAD'] >= get_load()) && ( $music_releases_proc > 0 )) {
