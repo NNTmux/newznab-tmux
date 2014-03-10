@@ -9,7 +9,7 @@ require_once("../test/showsleep.php");
 require_once("../test/functions.php");
 
 
-$version="0.3r866";
+$version="0.3r877";
 
 $db = new DB();
 $functions = new Functions();
@@ -173,13 +173,6 @@ $TESTING="{$array['NEWZPATH']}{$array['TESTING_PATH']}";
 $killed="false";
 $old_session = $tmux_session;
 $getdate = gmDate("Ymd");
-
-//build queries for shell
-$_backfill_increment = "UPDATE groups set backfill_target=backfill_target+1 WHERE active=1 and backfill_target<$backfilldays;";
-$mysql_command_1 = "$_mysql --defaults-file=$_conf/my.cnf -u$_DB_USER -h $_DB_HOST $_DB_NAME -e \"$_backfill_increment\"";
-$reset_bin = "UPDATE binaries SET procstat=0, procattempts=0, regexID=NULL, relpart=0, reltotalpart=0, relname=NULL;";
-$mysql_command_2 = "$_mysql --defaults-file=$_conf/my.cnf -u$_DB_USER -h $_DB_HOST $_DB_NAME -e \"$reset_bin\"";
-$mysqladmin = "$_mysqladmin --defaults-file=$_conf/my.cnf -u$_DB_USER -h $_DB_HOST status | awk '{print $22;}'";
 
 //got microtime
 function microtime_float()
@@ -404,6 +397,7 @@ $prehash = 0;
 $pre_diff = 0;
 $pre_percent = 0;
 $distinct_prehash_matched = 0;
+$last_history = "";
 
 //formatted  output
 $pre_diff = number_format( $prehash_matched - $prehash_start );
@@ -434,6 +428,13 @@ $tvrage_releases_now_formatted = number_format( $tvrage_releases_now );
 $xxx_releases_now_formatted = number_format ( $xxx_releases_now );
 $book_releases_now_formatted = number_format( $book_releases_now );
 $misc_releases_now_formatted = number_format( $misc_releases_now );
+
+//build queries for shell
+$_backfill_increment = "UPDATE groups set backfill_target=backfill_target+1 WHERE active=1 and backfill_target<$backfilldays;";
+$mysql_command_1 = "$_mysql --defaults-file=$_conf/my.cnf -u$_DB_USER -h $_DB_HOST $_DB_NAME -e \"$_backfill_increment\"";
+$reset_bin = "UPDATE binaries SET procstat=0, procattempts=0, regexID=NULL, relpart=0, reltotalpart=0, relname=NULL;";
+$mysql_command_2 = "$_mysql --defaults-file=$_conf/my.cnf -u$_DB_USER -h $_DB_HOST $_DB_NAME -e \"$reset_bin\"";
+$mysqladmin = "$_mysqladmin --defaults-file=$_conf/my.cnf -u$_DB_USER -h $_DB_HOST status | awk '{print $22;}'";
 
 $mask1 = $c->headerOver("%-18s")." ".$c->tmuxOrange("%-48.48s");
 $mask2 = $c->headerOver("%-20s")." ".$c->tmuxOrange("%-33.33s");
@@ -501,6 +502,7 @@ printf($mask3, "====================", "=========================", "===========
 printf($mask4, "Activated", $active_groups."(".$all_groups.")", $backfill_groups. "(".$all_groups.")");
 
 $i = 1;
+$monitor = 30;
 $time33 = TIME();
 $fcfirstrun = true;
 
@@ -1269,20 +1271,59 @@ $usptotalconnections  = str_replace("\n", '', shell_exec("ss -n | grep -c " . $i
 
 	//start postprocessing in pane 0.1
 
-        $g=1;
-        $h=$g-1;
-        $f=$h*200;
-        $j=$g*1;
-		$color = get_color($colors_start, $colors_end, $colors_exc);
-		$log = writelog($panes0[1]);
-		if (( $array['MAX_LOAD'] >= get_load()) && ( $work_remaining_now > $f )) {
-			shell_exec("$_tmux respawnp -t${tmux_session}:0.1 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes0[1] $ds2 && cd $_test && $_python ${DIR}/../test/postprocess_threaded.py additional 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes0[1] $ds3' 2>&1 1> /dev/null");
-		} elseif ( $work_remaining_now <= $f ) {
-			shell_exec("$_tmux respawnp -t${tmux_session}:0.1 'echo \"\033[38;5;\"$color\"m\n$panes0[1] $work_remaining_now < $f\nHas no work to process \" && date +\"%D %T\"' 2>&1 1> /dev/null");
-		} elseif ( $array['MAX_LOAD'] <= get_load()) {
-                        shell_exec("$_tmux respawnp -t${tmux_session}:0.1 'echo \"\033[38;5;\"$color\"m\n$panes0[1] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
-                }
+        //start postprocessing in pane 0.1
 
+        if (($post == 1 && ($work_remaining_now + $pc_releases_proc + $xxx_releases_proc) > 0)) {
+				//run postprocess_releases additional
+				$history = str_replace(" ", '', `tmux list-panes -t${tmux_session}:0 | grep 1: | awk '{print $4;}'`);
+				if ($last_history != $history) {
+					$last_history = $history;
+					$time29 = TIME();
+				} else {
+					if (TIME() - $time29 >= $post_kill_timer) {
+						$color = get_color($colors_start, $colors_end, $colors_exc);
+						passthru("tmux respawnp -k -t${tmux_session}:0.1 'echo \"\033[38;5;${color}m\n${panes0[1]} has been terminated by Possible Hung thread\"'");
+						$wipe = `tmux clearhist -t${tmux_session}:0.1`;
+						$time29 = TIME();
+					}
+				}
+				$dead1 = str_replace(" ", '', `tmux list-panes -t${tmux_session}:0 | grep dead | grep 1: | wc -l`);
+				if ($dead1 == 1) {
+					$time29 = TIME();
+				}
+				$log = writelog($panes0[1]);
+				shell_exec("tmux respawnp -t${tmux_session}:0.1 'echo \"\033[38;5;${color}m\"; \
+						$_python ${DIR}/../test/postprocess_threaded.py additional $log; date +\"%D %T\"; $_sleep $post_timer' 2>&1 1> /dev/null");
+		} else if (($post == 3) && ($work_remaining_now + $pc_releases_proc + $xxx_releases_proc > 0)) {
+				//run postprocess_releases additional
+				$history = str_replace(" ", '', `tmux list-panes -t${tmux_session}:0 | grep 1: | awk '{print $4;}'`);
+				if ($last_history != $history) {
+					$last_history = $history;
+					$time29 = TIME();
+				} else {
+					if (TIME() - $time29 >= $post_kill_timer) {
+						$color = get_color($colors_start, $colors_end, $colors_exc);
+						shell_exec("tmux respawnp -k -t${tmux_session}:0.1 'echo \"\033[38;5;${color}m\n${panes0[1]} has been terminated by Possible Hung thread\"'");
+						$wipe = `tmux clearhist -t${tmux_session}:0.1`;
+						$time29 = TIME();
+					}
+				}
+				$dead1 = str_replace(" ", '', `tmux list-panes -t${tmux_session}:0 | grep dead | grep 1: | wc -l`);
+				if ($dead1 == 1) {
+					$time29 = TIME();
+				}
+				$log = writelog($panes0[1]);
+				shell_exec("tmux respawnp -t${tmux_session}:0.1 ' \
+						$_python ${DIR}/../test/postprocess_threaded.py additional $log; date +\"%D %T\"; $_sleep $post_timer' 2>&1 1> /dev/null");
+			} else if (($post != 0) && ($work_remaining_now + $pc_releases_proc + $xxx_releases_proc == 0)) {
+				$color = get_color($colors_start, $colors_end, $colors_exc);
+				shell_exec("tmux respawnp -k -t${tmux_session}:0.1 'echo \"\033[38;5;${color}m\n${panes0[1]} has been disabled/terminated by No Misc to process\"'");
+			} else {
+				$color = get_color($colors_start, $colors_end, $colors_exc);
+				shell_exec("tmux respawnp -k -t${tmux_session}:0.1 'echo \"\033[38;5;${color}m\n${panes0[1]} has been disabled/terminated by Postprocess Additional\"'");
+			}/*elseif ( $array['MAX_LOAD'] <= get_load()) {
+                        shell_exec("$_tmux respawnp -t${tmux_session}:0.1 'echo \"\033[38;5;\"$color\"m\n$panes0[1] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+                }*/
 	//runs update_release and in 0.5 once if needed and exits
 	if (( $array['MAX_LOAD_RELEASES'] >= get_load()) && ( $releases_run == 2 )) {
 		$color = get_color($colors_start, $colors_end, $colors_exc);
@@ -1399,17 +1440,41 @@ $usptotalconnections  = str_replace("\n", '', shell_exec("ss -n | grep -c " . $i
         }
 
 	//runs postprocess_nfo.php in pane 2.0 once if needed then exits
-	if (( $array['MAX_LOAD'] >= get_load()) && ( $nfo_remaining_now > 0 )) {
-		$color = get_color($colors_start, $colors_end, $colors_exc);
-		$log = writelog($panes2[0]);
-		shell_exec("$_tmux respawnp -t${tmux_session}:2.0 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes2[0] $ds2 && cd $_test && $_python ${DIR}/../test/postprocess_threaded.py nfo 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes2[0] $ds3' 2>&1 1> /dev/null");
-	}  elseif ( $array['MAX_LOAD'] <= get_load()) {
+	if ($post == 2 && $nfo_remaining_now > 0) {
+				$log = writelog($panes2[0]);
+				shell_exec("tmux respawnp -t${tmux_session}:2.0 ' \
+						$_python ${DIR}/../test/postprocess_threaded.py nfo $log; date +\"%D %T\"; $_sleep $post_timer' 2>&1 1> /dev/null");
+    } else if ($post == 3 && $nfo_remaining_now > 0) {
+				//run postprocess_releases nfo
+				$history = str_replace(" ", '', `tmux list-panes -t${tmux_session}:2 | grep 0: | awk '{print $4;}'`);
+				if ($last_history != $history) {
+					$last_history = $history;
+					$time2 = TIME();
+				} else {
+					if (TIME() - $time31 >= $post_kill_timer) {
+						$color = get_color($colors_start, $colors_end, $colors_exc);
+						shell_exec("tmux respawnp -k -t${tmux_session}:2.0 'echo \"\033[38;5;${color}m\n${panes2[0]} has been terminated by Possible Hung thread\"'");
+						$wipe = `tmux clearhist -t${tmux_session}:2.0`;
+						$time31 = TIME();
+					}
+				}
+				$dead2 = str_replace(" ", '', `tmux list-panes -t${tmux_session}:2 | grep dead | grep 0: | wc -l`);
+				if ($dead2 == 1) {
+					$time31 = TIME();
+				}
+				$log = writelog($panes2[0]);
+				shell_exec("tmux respawnp -t${tmux_session}:2.0 ' \
+						$_python ${DIR}/../test/postprocess_threaded.py nfo $log; date +\"%D %T\"; $_sleep $post_timer' 2>&1 1> /dev/null");
+			} else if ($post != 0 && $nfo_remaining_now == 0) {
+				$color = get_color($colors_start, $colors_end, $colors_exc);
+				shell_exec("tmux respawnp -k -t${tmux_session}:2.0 'echo \"\033[38;5;${color}m\n${panes2[0]} has been disabled/terminated by No Nfo to process\"'");
+			} else {
+				$color = get_color($colors_start, $colors_end, $colors_exc);
+				shell_exec("tmux respawnp -k -t${tmux_session}:2.0 'echo \"\033[38;5;${color}m\n${panes2[0]} has been disabled/terminated by Postprocess NFO\"'");
+			} /*elseif ( $array['MAX_LOAD'] <= get_load()) {
                 $color = get_color($colors_start, $colors_end, $colors_exc);
                 shell_exec("$_tmux respawnp -t${tmux_session}:2.0 'echo \"\033[38;5;\"$color\"m\n$panes2[0] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
-    } elseif ( $nfo_remaining_now == 0 ) {
-		$color = get_color($colors_start, $colors_end, $colors_exc);
-		shell_exec("$_tmux respawnp -t${tmux_session}:2.0 'echo \"\033[38;5;\"$color\"m\n$panes2[0] Has no work to process \" && date +\"%D %T\"' 2>&1 1> /dev/null");
-        }
+    }*/
 
     //Postprocess TV Releases in pane 2.1 once if needed then exits
 	if (( $array['MAX_LOAD'] >= get_load()) && ( $tvrage_releases_proc > 0 )) {
