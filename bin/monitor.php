@@ -9,7 +9,7 @@ require_once("../test/showsleep.php");
 require_once("../test/functions.php");
 
 
-$version="0.3r880";
+$version="0.3r881";
 
 $db = new DB();
 $functions = new Functions();
@@ -558,7 +558,7 @@ while( $i > 0 )
 	//run queries
     $time01 = TIME();
     $proc_tmux_result = $db->query($proc_tmux, false);
-	if ((( TIME() - $time19 ) >= $monitor ) || ( $i == 1 )) {
+	if ((( TIME() - $time19 ) >= $monitor  && $running == 1) || ( $i == 1 )) {
 	    echo $c->info("\nThe numbers(queries) above are currently being refreshed. \nNo pane(script) can be (re)started until these have completed.\n");
 		//get microtime to at start of queries
 		$query_timer_start=microtime_float();
