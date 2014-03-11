@@ -9,7 +9,7 @@ require_once("../test/showsleep.php");
 require_once("../test/functions.php");
 
 
-$version="0.3r888";
+$version="0.3r889";
 
 $db = new DB();
 $functions = new Functions();
@@ -1385,19 +1385,19 @@ if ($running == 1){
 	}
 
 	//run update_tvschedule.php and $_php update_theaters.php in 1.1 every 12 hours and tenth loop
-	if (( $maxload >= get_load()) && ((( TIME() - $time4 ) >= $array['TVRAGE_TIMER'] ) || ( $i == 10 )) && ( $array['TV_SCHEDULE'] == "true")) {
+	if (( $maxload >= get_load()) && (( TIME() - $time4 ) >= $tv_timer ) && ( $update_tv == 1)) {
 		$color = get_color($colors_start, $colors_end, $colors_exc);
 		$log = writelog($panes1[1]);
 		shell_exec("$_tmux respawnp -t${tmux_session}:1.1 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes1[1] $ds2 && cd $NNPATH && $_php update_tvschedule.php 2>&1 $log && $_php update_theaters.php 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes1[1] $ds3' 2>&1 1> /dev/null");
 		$time4 = TIME();
-	} elseif (( $array['TV_SCHEDULE'] == "true") && ( $maxload >= get_load())) {
+	} else if (( $update_tv == 1) && ( $maxload >= get_load())) {
 		$color = get_color($colors_start, $colors_end, $colors_exc);
-		$run_time = relativeTime( $array['TVRAGE_TIMER'] + $time4 );
+		$run_time = relativeTime( $tv_timer + $time4 );
 		shell_exec("$_tmux respawnp -t${tmux_session}:1.1 'echo \"\033[38;5;\"$color\"m\n$panes1[1] and update_theaters will run in T[ $run_time]\" && date +\"%D %T\"' 2>&1 1> /dev/null");
-	} elseif ( $array['TV_SCHEDULE'] != "true") {
+	} else if ( $update_tv == 0) {
 		$color = get_color($colors_start, $colors_end, $colors_exc);
-		shell_exec("$_tmux respawnp -t${tmux_session}:1.1 'echo \"\033[38;5;\"$color\"m\n$panes1[1] Disabled by TV_SCHEDULE\" && date +\"%D %T\"' 2>&1 1> /dev/null");
-	} elseif ( $maxload <= get_load()) {
+		shell_exec("$_tmux respawnp -t${tmux_session}:1.1 'echo \"\033[38;5;\"$color\"m\n$panes1[1] has been disabled/terminated by Update TV/Theater\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+	} else if ( $maxload <= get_load()) {
                 $color = get_color($colors_start, $colors_end, $colors_exc);
                 shell_exec("$_tmux respawnp -t${tmux_session}:1.1 'echo \"\033[38;5;\"$color\"m\n$panes1[1] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
         }
