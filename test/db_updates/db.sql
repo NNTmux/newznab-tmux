@@ -173,6 +173,8 @@ INSERT INTO tmux (setting, value) values ('defrag_cache','900'),
     ('addpar2', '0'),
 	('fixnamethreads', '1'),
 	('fixnamesperrun', '10'),
+    ('max_load', 2.0),
+    ('max_load_releases', 2.0),
     ('sqlpatch','0');
 
 DROP TABLE IF EXISTS country;
