@@ -8,7 +8,7 @@
 	<tr>
 		<th>title</th>
 			{if $isadmin || $ismod}
-			<th>requestid</th>
+			<th>requestID</th>
 			{/if}
 		<th>added</th>
 		<th>pre-date</th>
@@ -34,9 +34,9 @@
 			</td>
 			{if $isadmin || $ismod}
 			<td class="prehash">
-				{if {$result.requestid} == 0}
-				{elseif is_numeric({$result.requestid})}
-					{$result.requestid}
+				{if {$result.requestID} == 0}
+				{elseif is_numeric({$result.requestID})}
+					{$result.requestID}
 				{/if}
 			</td>
 			{/if}
