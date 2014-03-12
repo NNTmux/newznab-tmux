@@ -211,12 +211,9 @@ Class Predb
 							$oldname = $db->queryOneRow(sprintf('SELECT md5, source, ID FROM prehash WHERE md5 = %s', $db->escapeString($md5)));
 							if ($oldname !== false && $oldname["md5"] == $md5)
 							{
-								if ($oldname["source"] == "womble")
-								{
+								if ($oldname['source'] == 'womble' || $oldname['source'] == 'omgwtfnzbs') {
 									continue;
-								}
-								else
-								{
+								} else {
 									$size = $db->escapeString(round($matches2["size1"]).$matches2["size2"]);
 									$db->exec(sprintf("UPDATE prehash SET size = %s, category = %s, predate = FROM_UNIXTIME(".strtotime($matches2["date"])."), adddate = now(), source = %s where ID = %d", $size, $db->escapeString($matches2["category"]), $db->escapeString("omgwtfnzbs"), $oldname["ID"]));
                                     $updated++;
