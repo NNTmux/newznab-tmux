@@ -57,6 +57,17 @@ $page->smarty->assign('post_non_ids', array(0,1,2));
 $page->smarty->assign('post_non_names', array('Disabled', 'All Available Releases', 'Properly Renamed Releases'));
 $page->smarty->assign('lookup_reqids_ids', array(0,1,2));
 $page->smarty->assign('lookup_reqids_names', array('Disabled', 'Lookup Request IDs', 'Lookup Request IDs Threaded'));
+$page->smarty->assign('spotnab_ids', array(0,1));
+$page->smarty->assign('spotnab_names', array('Disabled', 'Enabled'));
+$page->smarty->assign('others_ids', array(0,1));
+$page->smarty->assign('others_names', array('Disabled', 'Enabled'));
+$page->smarty->assign('unwanted_ids', array(0,1));
+$page->smarty->assign('unwanted_names', array('Disabled', 'Enabled'));
+$page->smarty->assign('fetch_movie_ids', array(0,1));
+$page->smarty->assign('fetch_movie_names', array('Disabled', 'Enabled'));
+$page->smarty->assign('predb_ids', array(0,1));
+$page->smarty->assign('predb_names', array('Disabled', 'Enabled'));
+
 
 $page->content = $page->smarty->fetch('tmux-edit.tpl');
 $page->render();
