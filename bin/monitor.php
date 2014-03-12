@@ -9,7 +9,7 @@ require_once("../test/showsleep.php");
 require_once("../test/functions.php");
 
 
-$version="0.3r896";
+$version="0.3r897";
 
 $db = new DB();
 $functions = new Functions();
@@ -1497,7 +1497,7 @@ if ($running == 1){
 				$history = str_replace(" ", '', `tmux list-panes -t${tmux_session}:2 | grep 0: | awk '{print $4;}'`);
 				if ($last_history != $history) {
 					$last_history = $history;
-					$time2 = TIME();
+					$time31 = TIME();
 				} else {
 					if (TIME() - $time31 >= $post_kill_timer) {
 						$color = get_color($colors_start, $colors_end, $colors_exc);
