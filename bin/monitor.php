@@ -9,7 +9,7 @@ require_once("../test/showsleep.php");
 require_once("../test/functions.php");
 
 
-$version="0.3r893";
+$version="0.3r894";
 
 $db = new DB();
 $functions = new Functions();
@@ -255,14 +255,15 @@ function get_load() {
 	return $load[0];
 }
 
-function writelog( $pane )
+function writelog($pane)
 {
-	global $path;
-	global $getdate;
-	global $array;
-	global $_tee;
-	if ( $array['WRITE_LOGS'] == "true" ) {
-		return " | $_tee -a $path/../logs/$pane-$getdate.log";
+	$path = dirname(__FILE__) . "/../logs";
+	$getdate = gmDate("Ymd");
+	$t = new Tmux();
+	$tmux = $t->get();
+	$logs = (isset($tmux->write_logs)) ? $tmux->write_logs : 0;
+	if ($logs == 1) {
+		return "2>&1 | tee -a $path/$pane-$getdate.log";
 	} else {
 		return "";
 	}
