@@ -9,7 +9,7 @@ require_once("../test/showsleep.php");
 require_once("../test/functions.php");
 
 
-$version="0.3r894";
+$version="0.3r895";
 
 $db = new DB();
 $functions = new Functions();
@@ -1401,7 +1401,7 @@ if ($running == 1){
 	}
 
 	//run update_predb.php in 1.0 ever 15 minutes and on fifth loop
-	if (((( TIME() - $time2 ) >= $predb_timer ) || ( $i == 5 )) && ( $predb == 1 )) {
+	if ((( TIME() - $time2 ) >= $predb_timer ) && ( $predb == 1 )) {
 		$color = get_color($colors_start, $colors_end, $colors_exc);
 		$log = writelog($panes1[0]);
 		shell_exec("$_tmux respawnp -t${tmux_session}:1.0 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes1[0] $ds2 && cd $NNPATH && $_php update_predb.php true 2>&1 $log && echo \" \033[1;0;33m\" && $ds1 $panes1[0] $ds3' 2>&1 1> /dev/null");
