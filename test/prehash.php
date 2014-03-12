@@ -153,7 +153,7 @@ Class Predb
 									else
 										$nfo = $db->escapeString("http://newshost.co.za/".$matches2["nfo"]);
 
-                                            $db->exec(sprintf("UPDATE prehash SET nfo = %s, size = %s, category = %s, predate = %s, adddate = now(), source = %s where ID = %d", $nfo, $size, $db->escapeString($matches2["category"]), $db->from_unixtime(strtotime($matches2["date"])), $db->escapeString("womble"), $oldname["ID"]));
+                                            $db->exec(sprintf("UPDATE prehash SET nfo = %s, size = %s, category = %s, predate = %s, adddate = now(), source = %s where ID = %d", $nfo, $size, $db->escapeString($matches2["category"]), $f->from_unixtime(strtotime($matches2["date"])), $db->escapeString("womble"), $oldname["ID"]));
                                 $updated++;
                                 }
 							}

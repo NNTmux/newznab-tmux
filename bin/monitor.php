@@ -9,7 +9,7 @@ require_once("../test/showsleep.php");
 require_once("../test/functions.php");
 
 
-$version="0.3r897";
+$version="0.3r898";
 
 $db = new DB();
 $functions = new Functions();
