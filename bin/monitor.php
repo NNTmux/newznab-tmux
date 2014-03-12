@@ -9,7 +9,7 @@ require_once("../test/showsleep.php");
 require_once("../test/functions.php");
 
 
-$version="0.3r898";
+$version="0.3r899";
 
 $db = new DB();
 $functions = new Functions();
@@ -515,6 +515,7 @@ $i = 1;
 $monitor = 30;
 $time33 = TIME();
 $fcfirstrun = true;
+$fcnum = 0;
 
 while( $i > 0 )
 {
@@ -1732,7 +1733,7 @@ if ($running == 1){
 						$_php ${DIR}/../test/removeCrapReleases.php true 2 $log; date +\"%D %T\"; $_sleep $crap_timer' 2>&1 1> /dev/null");
 				} else {
 					$fcmax = count($fix_crap);
-					if (is_null($fcnum)) {
+					if (!isset($fcnum)) {
 						$fcnum = 0;
 					}
 					//Check to see if the pane is dead, if so resawn it.
@@ -1754,7 +1755,7 @@ if ($running == 1){
 						$_php ${DIR}/../test/removeCrapReleases.php true 2 $log; date +\"%D %T\"; $_sleep $crap_timer' 2>&1 1> /dev/null");
 				} else {
 					$fcmax = count($fix_crap);
-					if (is_null($fcnum)) {
+					if (!isset($fcnum)) {
 						$fcnum = 0;
 					}
 					//Check to see if the pane is dead, if so respawn it.
