@@ -136,7 +136,7 @@ Class Predb
 						if (preg_match('/<tr bgcolor=#[df]{6}>.+?<td>(?P<date>.+?)<\/td>(.+?right>(?P<size1>.+?)&nbsp;(?P<size2>.+?)<\/td.+?)?<td>(?P<category>.+?)<\/td.+?<a href=.+?(<a href="(?P<nfo>.+?)">nfo<\/a>.+)?<td>(?P<title>.+?)<\/td.+tr>/s', $m, $matches2))
 						{
 						    $md5 = md5($matches2["title"]);
-							$oldname = $db->queryOneRow(sprintf("SELECT title, source, ID, nfo FROM prehash WHERE title = %s", $db->escapeString($md5)));
+							$oldname = $db->queryOneRow(sprintf("SELECT md5, source, ID, nfo FROM prehash WHERE md5 = %s", $db->escapeString($md5)));
 							if ($oldname !== false && $oldname["md5"] == $md5)
 							{
 								if ($oldname["nfo"] != NULL)
@@ -263,20 +263,19 @@ Class Predb
 							                        $md5 = $db->escapeString(md5($matches2['title']));
 						        	                $title = $db->escapeString($matches2['title']);
 							                        $oldname = $db->queryOneRow(sprintf('SELECT md5 FROM prehash WHERE md5 = %s', $db->escapeString($md5)));
-                                                        if ($oldname !== false && $oldname["md5"] == $md5)
+                                                        if ($oldname !== false && "'" . $oldname['md5'] . "'" === $md5){
                                                                 continue;
-                                                        else
-                                                        {
-                                                               	if (!isset($matches2['size1']) && empty($matches2['size1']))
+                                                                } else {
+                                                               	if (!isset($matches2['size1']) && empty($matches2['size1'])) {
 									                                $size = 'NULL';
-								                                else
+								                                } else {
 									                                $size = $db->escapeString(round($matches2['size1']).$matches2['size2']);
-
-								                                if (isset($matches2['category']) && !empty($matches2['category']))
+                                                                    }
+								                                if (isset($matches2['category']) && !empty($matches2['category'])) {
 									                                $category = $db->escapeString($matches2['category']);
-								                                else
+								                                } else {
 									                                $category = 'NULL';
-
+                                                                    }
                                                                 if (strlen($title) > 15) {
                                                                     if ($db->queryInsert(sprintf('INSERT IGNORE INTO prehash (title, size, category, predate, adddate, source, md5) VALUES (%s, %s, %s, %s, now(), %s, %s)', $title, $size, $category, $predate, $db->escapeString('zenet'), $md5)));{
                                                                 $newnames++;
@@ -314,7 +313,7 @@ Class Predb
 						if (!preg_match('/NUKED/', $m) && preg_match('/">\[ (?P<date>.+?) U.+?">(?P<category>.+?)<\/a>.+?">(?P<title>.+?)<\/a>.+?(b>\[ (?P<size>.+?) \]<\/b)?/si', $m, $matches2))
 						{
                             $md5 = md5($matches2["title"]);
-                            $oldname = $db->queryOneRow(sprintf("SELECT title FROM prehash WHERE title = %s", $db->escapeString($md5)));
+                            $oldname = $db->queryOneRow(sprintf("SELECT md5 FROM prehash WHERE md5 = %s", $db->escapeString($md5)));
 							if ($oldname !== false && $oldname["md5"] == $md5)
 								continue;
 							else
@@ -654,8 +653,8 @@ Class Predb
 		  'http'=>array(
 			'method'=>"GET",
 			'header'=>"Accept-language: en\r\n" .
-					  "Cookie: foo=bar\r\n" .  // check function.stream-context-create on php.net
-					  "User-Agent: Mozilla/5.0 (iPad; U; CPU OS 3_2 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) Version/4.0.4 Mobile/7B334b Safari/531.21.102011-10-16 20:23:10\r\n" // i.e. An iPad
+			"Cookie: foo=bar\r\n" .  // check function.stream-context-create on php.net
+			"User-Agent: Mozilla/5.0 (iPad; U; CPU OS 3_2 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) Version/4.0.4 Mobile/7B334b Safari/531.21.102011-10-16 20:23:10\r\n" // i.e. An iPad
 		  )
 		);
 		$context = stream_context_create($options);
