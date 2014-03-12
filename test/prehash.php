@@ -891,7 +891,9 @@ Class Predb
 	public function getAll($offset, $offset2)
 	{
 		$db = new DB();
-		return $db->exec(sprintf("SELECT p.*, r.guid FROM prehash p left join releases r on p.releaseID = r.ID ORDER BY p.adddate DESC limit %d,%d", $offset, $offset2));
+		$parr = $db->query(sprintf('SELECT p.*, r.guid FROM prehash p LEFT OUTER JOIN releases r ON p.ID = r.preID ORDER BY p.adddate DESC LIMIT %d OFFSET %d', $offset2, $offset));
+		$count = $db->queryOneRow("SELECT COUNT(*) AS cnt FROM prehash");
+		return array('arr' => $parr, 'count' => $count['cnt']);
 	}
 
 	public function getCount()
