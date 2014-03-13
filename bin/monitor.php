@@ -9,7 +9,7 @@ require_once("../test/showsleep.php");
 require_once("../test/functions.php");
 
 
-$version="0.3r900";
+$version="0.3r901";
 
 $db = new DB();
 $functions = new Functions();
@@ -1725,53 +1725,56 @@ if ($running == 1){
                 $color = get_color($colors_start, $colors_end, $colors_exc);
                 shell_exec("$_tmux respawnp -t${tmux_session}:3.2 'echo \"\033[38;5;\"$color\"m\n$panes3[2] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
         }
-        //run removeCrap.php in pane 3.3
-	if (($fix_crap_opt != "Disabled") && (($i == 1) || $fcfirstrun)) {
-				$log = writelog($panes3[3]);
-				if ($fix_crap_opt == 'All') {
+        // Run Remove crap releases in pane 3.3
+			switch ($fix_crap_opt) {
+				// Do all types up to 2 hours.
+				case 'All':
+					$log = writelog($panes3[3]);
 					shell_exec("tmux respawnp -t${tmux_session}:3.3 ' \
-						$_php ${DIR}/../test/removeCrapReleases.php true 2 $log; date +\"%D %T\"; $_sleep $crap_timer' 2>&1 1> /dev/null");
-				} else {
+							$_php ${DIR}/../test/removeCrapReleases.php true 2 $log; date +\"%D %T\"; $_sleep $crap_timer' 2>&1 1> /dev/null");
+					break;
+				// The user has specified custom types.
+				case 'Custom':
+					$log = writelog($panes3[3]);
+
+					// Check how many types the user picked.
 					$fcmax = count($fix_crap);
-					if (!isset($fcnum)) {
-						$fcnum = 0;
+
+					// Make sure he actually selected some.
+					if ($fcmax > 0) {
+
+						// If this is the first run, do a full run, else run on last 2 hours of releases.
+						$fctime = '2';
+						if ((($i == 1) || $fcfirstrun)) {
+							$fctime = 'full';
+						}
+
+						//Check to see if the pane is dead, if so resawn it.
+						if (shell_exec("tmux list-panes -t${tmux_session}:3 | grep ^3 | grep -c dead") == 1) {
+
+							// Run remove crap releases.
+							shell_exec("tmux respawnp -t${tmux_session}:3.3 ' \
+								echo \"Running removeCrapReleases for $fix_crap[$fcnum]\"; \
+								php ${DIR}/../test/removeCrapReleases.php true $fctime $fix_crap[$fcnum] $log; date +\"%D %T\"; $_sleep $crap_timer' 2>&1 1> /dev/null");
+
+							// Increment so we know which type to run next.
+							$fcnum++;
+						}
+
+						// If we reached the end, reset the type.
+						if ($fcnum == $fcmax) {
+							$fcnum = 0;
+
+							// And say we are not on the first run, so we run 2 hours the next times.
+							$fcfirstrun = false;
+						}
 					}
-					//Check to see if the pane is dead, if so resawn it.
-					if (shell_exec("tmux list-panes -t${tmux_session}:3 | grep ^1 | grep -c dead") == 1) {
-						shell_exec("tmux respawnp -t${tmux_session}:3.3 ' \
-							echo \"Running removeCrapReleases for $fix_crap[$fcnum]\"; \
-							$_php ${DIR}/../test/removeCrapReleases.php true full $fix_crap[$fcnum] $log; date +\"%D %T\"; $_sleep $crap_timer' 2>&1 1> /dev/null");
-						$fcnum++;
-					}
-					if ($fcnum == $fcmax) {
-						$fcnum = 0;
-						$fcfirstrun = false;
-					}
-				}
-			} else if ($fix_crap_opt != 'Disabled') {
-				$log = writelog($panes3[3]);
-				if ($fix_crap_opt == 'All') {
-					shell_exec("tmux respawnp -t${tmux_session}:3.3 ' \
-						$_php ${DIR}/../test/removeCrapReleases.php true 2 $log; date +\"%D %T\"; $_sleep $crap_timer' 2>&1 1> /dev/null");
-				} else {
-					$fcmax = count($fix_crap);
-					if (!isset($fcnum)) {
-						$fcnum = 0;
-					}
-					//Check to see if the pane is dead, if so respawn it.
-					if (shell_exec("tmux list-panes -t${tmux_session}:3 | grep ^1 | grep -c dead") == 1) {
-						shell_exec("tmux respawnp -t${tmux_session}:3.3 ' \
-							echo \"Running removeCrapReleases for $fix_crap[$fcnum]\"; \
-							$_php ${DIR}/../test/removeCrapReleases.php true 2 $fix_crap[$fcnum] $log; date +\"%D %T\"; $_sleep $crap_timer' 2>&1 1> /dev/null");
-						$fcnum++;
-					}
-					if ($fcnum == $fcmax) {
-						$fcnum = 0;
-					}
-				}
-			} else {
-				$color = get_color($colors_start, $colors_end, $colors_exc);
-				shell_exec("tmux respawnp -k -t${tmux_session}:3.3 'echo \"\033[38;5;${color}m\n${panes3[3]} has been disabled/terminated by Remove Crap Releases\"'");
+					break;
+				case 'Disabled':
+				default:
+					$color = get_color($colors_start, $colors_end, $colors_exc);
+					shell_exec("tmux respawnp -k -t${tmux_session}:3.3 'echo \"\033[38;5;${color}m\n${panes3[3]} has been disabled/terminated by Remove Crap Releases\"'");
+					break;
 			}
 
     //run postprocess_pre.php in pane 3.4
