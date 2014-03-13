@@ -299,3 +299,4 @@ if (isset($argv[1]) && $argv[1] == 'true') {
 	}  else {
 	exit($c->info("Nothing was found to delete."));
 }
+}
