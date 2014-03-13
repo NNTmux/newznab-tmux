@@ -188,7 +188,7 @@ if (isset($argv[1]) && $argv[1] == 'true') {
 			foreach ($regexes as $regex)
 			{
 				$regexsql = "(rf.name REGEXP " . $db->escapeString($regex['regex']) . " OR r.name REGEXP " . $db->escapeString($regex['regex']) . ")";
-            }
+
 			// Get the group ID if the regex is set to work against a group.
 			$groupID = '';
 			if (strtolower($regex['groupname']) !== 'alt.binaries.*') {
