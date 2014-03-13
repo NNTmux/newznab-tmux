@@ -177,65 +177,89 @@ if (isset($argv[1]) && $argv[1] == 'true') {
 	function deleteBlacklist($and)
 	{
 		$type = "Blacklist";
+        $groups = new Groups();
+        $functions = new Functions();
 		$db = new DB();
-		$regexes = $db->queryDirect('SELECT regex FROM binaryblacklist WHERE status = 1 AND optype = 1');
+		$regexes = $db->queryDirect('SELECT regex, ID, groupname FROM binaryblacklist WHERE status = 1 AND optype = 1');
 		$delcount = 0;
         $count = count($regexes);
 		if($count > 0)
 		{
 			foreach ($regexes as $regex)
 			{
-				$sql = $db->query("SELECT r.ID, r.guid, r.searchname FROM releases r LEFT JOIN releasefiles rf on rf.releaseID = r.ID WHERE (rf.name REGEXP".$db->escapeString($regex["regex"])." or r.name REGEXP".$db->escapeString($regex["regex"]).")".$and);
-				$delcount += deleteReleases($sql, $type);
+				$regexsql = "(rf.name REGEXP " . $db->escapeString($regex['regex']) . " OR r.name REGEXP " . $db->escapeString($regex['regex']) . ")";
+            }
+			// Get the group ID if the regex is set to work against a group.
+			$groupID = '';
+			if (strtolower($regex['groupname']) !== 'alt.binaries.*') {
+				$groupID = $functions->getIDByName($regex['groupname']);
+				$groupID = ($groupID === '' ? '' : ' AND r.groupID = ' . $groupID . ' ');
 			}
+
+			$sql = $db->prepare("SELECT r.ID, r.guid, r.searchname FROM releases r LEFT JOIN releasefiles rf ON rf.releaseID = r.ID WHERE {$regexsql} " . $groupID . $and);
+			$sql->execute();
+			$delcount += deleteReleases($sql, 'Blacklist ' . $regex['ID']);
 		}
-		return $delcount;
 	}
+	return $delcount;
+}
 
 	$totalDeleted = $gibberishDeleted = $hashedDeleted = $shortDeleted = $executableDeleted = $installBinDeleted = $PURLDeleted = $PassDeleted = $sizeDeleted = $sampleDeleted = $scrDeleted = $blacklistDeleted = 0;
 	
-	if (isset($argv[3]))
-	{
-		if (isset($argv[3]) && $argv[3] == "gibberish")
+   if (isset($argv[3])) {
+	switch ($argv[3]) {
+		case 'gibberish':
 			$gibberishDeleted = deleteGibberish($and);
-		if (isset($argv[3]) && $argv[3] == "hashed")
+			break;
+		case 'hashed':
 			$hashedDeleted = deleteHashed($and);
-		if (isset($argv[3]) && $argv[3] == "short")
+			break;
+		case 'short':
 			$shortDeleted = deleteShort($and);
-		if (isset($argv[3]) && $argv[3] == "executable")
+			break;
+		case 'executable':
 			$executableDeleted = deleteExecutable($and);
-		if (isset($argv[3]) && $argv[3] == "installbin")
+			break;
+		case 'installbin':
 			$installBinDeleted = deleteInstallBin($and);
-		if (isset($argv[3]) && $argv[3] == "passwordurl")
+			break;
+		case 'passwordurl':
 			$PURLDeleted = deletePasswordURL($and);
-		if (isset($argv[3]) && $argv[3] == "passworded")
+			break;
+		case 'passworded':
 			$PURLDeleted = deletePassworded($and);
-		if (isset($argv[3]) && $argv[3] == "size")
+			break;
+		case 'size':
 			$sizeDeleted = deleteSize($and);
-		if (isset($argv[3]) && $argv[3] == "sample")
+			break;
+		case 'sample':
 			$sampleDeleted = deleteSample($and);
-		if (isset($argv[3]) && $argv[3] == "scr")
+			break;
+		case 'scr':
 			$scrDeleted = deleteScr($and);
-		if (isset($argv[3]) && $argv[3] == "blacklist")
+			break;
+		case 'blacklist':
 			$blacklistDeleted = deleteBlacklist($and);
+			break;
+		default:
+			exit("Wrong third argument.\n");
 	}
-	else
-	{
-		$gibberishDeleted = deleteGibberish($and);
-		$hashedDeleted = deleteHashed($and);
-		$shortDeleted = deleteShort($and);
-		$executableDeleted = deleteExecutable($and);
-		$installBinDeleted = deleteInstallBin($and);
-		$PURLDeleted = deletePasswordURL($and);
-		$PassDeleted = deletePassworded($and);
-		$sizeDeleted = deleteSize($and);
-		$sampleDeleted = deleteSample($and);
-		$scrDeleted = deleteScr($and);
-		$blacklistDeleted = deleteBlacklist($and);
-	}
+} else {
+	$gibberishDeleted = deleteGibberish($and);
+	$hashedDeleted = deleteHashed($and);
+	$shortDeleted = deleteShort($and);
+	$executableDeleted = deleteExecutable($and);
+	$installBinDeleted = deleteInstallBin($and);
+	$PURLDeleted = deletePasswordURL($and);
+	$PassDeleted = deletePassworded($and);
+	$sizeDeleted = deleteSize($and);
+	$sampleDeleted = deleteSample($and);
+	$scrDeleted = deleteScr($and);
+	$blacklistDeleted = deleteBlacklist($and);
+}
 
 	$totalDeleted = $totalDeleted+$gibberishDeleted+$hashedDeleted+$shortDeleted+$executableDeleted+$installBinDeleted+$PURLDeleted+$PassDeleted+$sizeDeleted+$sampleDeleted+$scrDeleted+$blacklistDeleted;
-	
+
 	if ($totalDeleted > 0)
 	{
 	   echo $c->header("Total Removed: " . $totalDeleted);
@@ -272,7 +296,6 @@ if (isset($argv[1]) && $argv[1] == 'true') {
 		if ($blacklistDeleted > 0) {
 			echo $c->primary("Blacklist    : " . $blacklistDeleted);
 		}
-	} else {
-		exit($c->info("Nothing was found to delete."));
-	}
+	}  else {
+	exit($c->info("Nothing was found to delete."));
 }

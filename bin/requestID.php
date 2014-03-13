@@ -12,6 +12,7 @@ if (!isset($argv[1])) {
 	exit($c->error("This script is not intended to be run manually, it is called from requestid_threaded.py."));
 }
 $pieces = explode('                       ', $argv[1]);
+$web = $pieces[3];
 $db = new DB();
 $n = "\n";
 $category = new Category();
@@ -33,7 +34,7 @@ if (count($requestIDtmp) >= 1) {
 		if (is_array($newTitle) && $newTitle['title'] != '') {
 			$bFound = true;
 			$local = true;
-		} else {
+		} else if ($web == "True"){
 			$newTitle = getReleaseNameFromRequestID($tmux, $requestID, $pieces[2]);
 			if (is_array($newTitle) && $newTitle['title'] != '') {
 				$bFound = true;
