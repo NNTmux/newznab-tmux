@@ -9,7 +9,7 @@ require_once("../test/showsleep.php");
 require_once("../test/functions.php");
 
 
-$version="0.3r902";
+$version="0.3r903";
 
 $db = new DB();
 $functions = new Functions();
@@ -125,8 +125,8 @@ $proc_tmux = "SELECT "
     . "(SELECT VALUE FROM tmux WHERE SETTING = 'unwanted') AS unwanted, "
     . "(SELECT VALUE FROM tmux WHERE SETTING = 'fetch_movie') AS fetch_movie, "
     . "(SELECT VALUE FROM tmux WHERE SETTING = 'movie_timer') AS movie_timer, "
-    . "(SELECT VALUE FROM site WHERE SETTING = 'lookup_reqids') as lookup_reqids, "
-    . "(SELECT VALUE FROM site WHERE SETTING = 'lookup_reqids_timer') as lookup_reqids_timer, "
+    . "(SELECT VALUE FROM tmux WHERE SETTING = 'lookup_reqids') as lookup_reqids, "
+    . "(SELECT VALUE FROM tmux WHERE SETTING = 'lookup_reqids_timer') as lookup_reqids_timer, "
     . "(SELECT VALUE FROM site WHERE SETTING = 'lookupbooks') as processbooks, "
 	. "(SELECT VALUE FROM site WHERE SETTING = 'lookupmusic') as processmusic, "
 	. "(SELECT VALUE FROM site WHERE SETTING = 'lookupgames') as processgames, "
