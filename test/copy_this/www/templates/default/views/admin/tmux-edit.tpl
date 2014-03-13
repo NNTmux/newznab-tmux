@@ -447,7 +447,7 @@
             <tr>
                 <td style="width:180px;"><label for="predb">Update PreDB:</label></td>
                 <td>
-                    {html_options style="width:180px;" class="siteeditstyle" id="dehash" name='predb' values=$predb_ids output=$predb_names selected=$ftmux->predb}
+                    {html_options style="width:180px;" class="siteeditstyle" id="predb" name='predb' values=$predb_ids output=$predb_names selected=$ftmux->predb}
                     <div class="hint">Choose to update PreDb from nzpre true/false</div>
                 </td>
             </tr>

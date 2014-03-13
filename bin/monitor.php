@@ -9,7 +9,7 @@ require_once("../test/showsleep.php");
 require_once("../test/functions.php");
 
 
-$version="0.3r901";
+$version="0.3r902";
 
 $db = new DB();
 $functions = new Functions();
@@ -125,6 +125,8 @@ $proc_tmux = "SELECT "
     . "(SELECT VALUE FROM tmux WHERE SETTING = 'unwanted') AS unwanted, "
     . "(SELECT VALUE FROM tmux WHERE SETTING = 'fetch_movie') AS fetch_movie, "
     . "(SELECT VALUE FROM tmux WHERE SETTING = 'movie_timer') AS movie_timer, "
+    . "(SELECT VALUE FROM site WHERE SETTING = 'lookup_reqids') as lookup_reqids, "
+    . "(SELECT VALUE FROM site WHERE SETTING = 'lookup_reqids_timer') as lookup_reqids_timer, "
     . "(SELECT VALUE FROM site WHERE SETTING = 'lookupbooks') as processbooks, "
 	. "(SELECT VALUE FROM site WHERE SETTING = 'lookupmusic') as processmusic, "
 	. "(SELECT VALUE FROM site WHERE SETTING = 'lookupgames') as processgames, "
@@ -489,7 +491,7 @@ printf($mask3, "====================", "====================", "================
 if ($fix_names == 1){
 printf($mask4, "prehash", number_format($prehash - $distinct_prehash_matched) . "(" . $pre_diff . ")", number_format($prehash_matched) . "(" . $pre_percent . "%)");
 }
-if ($array ['REQID'] = "true"){
+if (($lookreqids == 1) || ($lookreqids == 2)){
 printf($mask4, "requestID", $requestid_inprogress . "(" . $requestid_diff . ")", number_format($requestid_matched) . "(" . $request_percent . "%)");
 }
 printf($mask4, "NFO's","$nfo_remaining_now_formatted($nfo_diff)","$nfo_now_formatted($nfo_percent%)");
@@ -786,6 +788,12 @@ while( $i > 0 )
 	}
     if ($proc_tmux_result[0]['movie_timer'] != NULL) {
 		$movie_timer = $proc_tmux_result[0]['movie_timer'];
+	}
+    if ($proc_tmux_result[0]['lookup_reqids'] != NULL) {
+		$lookreqids = $proc_tmux_result[0]['lookup_reqids'];
+	}
+    if ($proc_tmux_result[0]['lookup_reqids_timer'] != NULL) {
+		$lookreqids_timer = $proc_tmux_result[0]['lookup_reqids_timer'];
 	}
 
 
@@ -1097,7 +1105,7 @@ $usptotalconnections  = str_replace("\n", '', shell_exec("ss -n | grep -c " . $i
     if ($fix_names == 1){
     printf($mask4, "prehash", number_format($prehash - $distinct_prehash_matched) . "(" . $pre_diff . ")", number_format($prehash_matched) . "(" . $pre_percent . "%)");
     }
-    if ($array ['REQID'] = "true"){
+    if (($lookreqids == 1) || ($lookreqids == 2)){
     printf($mask4, "requestID", number_format($requestid_inprogress) . "(" . $requestid_diff . ")", number_format($requestid_matched) . "(" . $request_percent . "%)");
     }
 	printf($mask4, "NFO's","$nfo_remaining_now_formatted($nfo_diff)","$nfo_now_formatted($nfo_percent%)");
@@ -1708,23 +1716,23 @@ if ($running == 1){
 		shell_exec("$_tmux respawnp -t${tmux_session}:3.1 'echo \"\033[38;5;\"$color\"m\n$panes3[1] has been disabled/terminated by Decrypt Hashes\"'");
 	}
         //run requestID or requestid threaded in pane 3.2
-	if (( $maxload >= get_load()) && ( $array['REQID'] == "true" ) && ( $array['REQID_THREADED'] == "true" )) {
+	if (( $maxload >= get_load()) && ( $lookreqids == 2 )) {
 		$color = get_color($colors_start, $colors_end, $colors_exc);
 		$log = writelog($panes3[2]);
-		shell_exec("$_tmux respawnp -t${tmux_session}:3.2 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes3[2] $ds2 && cd $_test && $_python ${DIR}/../test/requestid_threaded.py 2>&1 $log && echo \" \033[1;0;33m\" && $_sleep {$array['REQID_TIMER']} && $ds1 $panes3[2] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t${tmux_session}:3.2 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes3[2] $ds2 && cd $_test && $_python ${DIR}/../test/requestid_threaded.py 2>&1 $log && echo \" \033[1;0;33m\" && $_sleep $lookreqids_timer && $ds1 $panes3[2] $ds3' 2>&1 1> /dev/null");
 		$time30 = TIME();
-    } elseif (( $maxload >= get_load()) && ( $array['REQID'] == "true" ) && ( $array['REQID_THREADED'] == "false" )) {
+    } elseif (( $maxload >= get_load()) && ( $lookreqids == 1 )) {
 		$color = get_color($colors_start, $colors_end, $colors_exc);
 		$log = writelog($panes3[2]);
-		shell_exec("$_tmux respawnp -t${tmux_session}:3.2 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes3[2] $ds2 && cd $_test && $_php requestID.php 1000 true 2>&1 $log && echo \" \033[1;0;33m\" && $_sleep {$array['REQID_TIMER']} && $ds1 $panes3[2] $ds3' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t${tmux_session}:3.2 'echo \"\033[38;5;\"$color\"m\" && $ds1 $panes3[2] $ds2 && cd $_test && $_php requestID.php 1000 true 2>&1 $log && echo \" \033[1;0;33m\" && $_sleep $lookreqids_timer && $ds1 $panes3[2] $ds3' 2>&1 1> /dev/null");
 		$time30 = TIME();
-    } elseif ( $array['REQID'] != "true" ) {
-		$color = get_color($colors_start, $colors_end, $colors_exc);
-		shell_exec("$_tmux respawnp -t${tmux_session}:3.2 'echo \"\033[38;5;\"$color\"m\n$panes3[2] Disabled by RequestID\" && date +\"%D %T\"' 2>&1 1> /dev/null");
-	} elseif ( $maxload <= get_load()) {
+    } else if ( $maxload <= get_load()) {
                 $color = get_color($colors_start, $colors_end, $colors_exc);
                 shell_exec("$_tmux respawnp -t${tmux_session}:3.2 'echo \"\033[38;5;\"$color\"m\n$panes3[2] Disabled by MAX_LOAD\" && date +\"%D %T\"' 2>&1 1> /dev/null");
-        }
+    } else {
+		$color = get_color($colors_start, $colors_end, $colors_exc);
+		shell_exec("$_tmux respawnp -t${tmux_session}:3.2 'echo \"\033[38;5;\"$color\"m\n$panes3[2] has been disabled/terminated by RequestID Lookup\" && date +\"%D %T\"' 2>&1 1> /dev/null");
+	}
         // Run Remove crap releases in pane 3.3
 			switch ($fix_crap_opt) {
 				// Do all types up to 2 hours.
