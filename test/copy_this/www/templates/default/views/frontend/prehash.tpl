@@ -1,4 +1,17 @@
+{if $site->adbrowse != ''}
+	{$site->adbrowse}
+{/if}
 <h1>{$page->title}</h1>
+<form name="presearch" method="get" action="{$smarty.const.WWW_TOP}/../misc/update_scripts/nix_scripts/tmux/test/prehash" id="custom-search-form" class="form-search form-horizontal col-4 col-lg-4 pull-right">
+	<div id="search" class="input-group col-12 col-lg-12">
+		<input type="text" class="form-control" placeholder="Search PreDB" id="presearch" name="presearch" value="{$lastSearch|escape:'html'}">
+		<span class="input-group-btn">
+			<button type="submit" value="Go" class="btn btn-default">
+				<i class="icon-search"></i>
+			</button>
+		</span>
+	</div>
+</form>
 {$pager}
 <table style="width:100%;margin-bottom:10px; margin-top:5px;" class="data Sortable highlight">
 	<tr>
@@ -9,6 +22,8 @@
 		<th>source</th>
 		<th>category</th>
 		<th>size</th>
+		<th></th>
+		<th></th>
 	</tr>
 	{foreach from=$results item=result}
 		<tr class="{cycle values=",alt"}">
