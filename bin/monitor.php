@@ -9,7 +9,7 @@ require_once("../test/showsleep.php");
 require_once("../test/functions.php");
 
 
-$version="0.3r920";
+$version="0.3r921";
 
 $db = new DB();
 $functions = new Functions();
@@ -27,7 +27,7 @@ $tmux = $t->get();
 $seq = (isset($tmux->sequential)) ? $tmux->sequential : 0;
 $powerline = (isset($tmux->powerline)) ? $tmux->powerline : 0;
 $colors = (isset($tmux->colors)) ? $tmux->colors : 0;
-$tpatch = $tmux->sqlpatch();
+$tpatch = $tmux->sqlpatch;
 
 
 if (command_exist("python3")) {
