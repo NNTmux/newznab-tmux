@@ -3,8 +3,9 @@
 
 require_once(dirname(__FILE__)."/../../bin/config.php");
 require_once (WWW_DIR.'/lib/site.php');
-require_once("/../ColorCLI.php");
+require_once("../ColorCLI.php");
 require_once(WWW_DIR.'/lib/Tmux.php');
+require_once(WWW_DIR.'/lib/smarty/Smarty.class.php'); 
 
 // Function inspired by : http://stackoverflow.com/questions/1883079/best-practice-import-mysql-file-in-php-split-queries/2011454#2011454
 function SplitSQL($file, $delimiter = ';')
@@ -17,7 +18,7 @@ function SplitSQL($file, $delimiter = ';')
 		if (is_resource($file) === true) {
 			$query = array();
 			$db = new DB();
-			$dbsys = $db->DB_TYPE;
+			$dbsys = DB_TYPE;
 			$c = new ColorCLI();
 
 			while (feof($file) === false) {
@@ -111,7 +112,7 @@ if (isset($os) && $os == "unix") {
 	$db = new DB();
 	$backedup = false;
 	$c = new ColorCLI();
-
+    $DIR = dirname (__FILE__);
     $path = $DIR.'/patches/';
 
 
