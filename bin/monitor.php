@@ -9,7 +9,7 @@ require_once("../test/showsleep.php");
 require_once("../test/functions.php");
 
 
-$version="0.3r918";
+$version="0.3r919";
 
 $db = new DB();
 $functions = new Functions();
@@ -27,6 +27,7 @@ $tmux = $t->get();
 $seq = (isset($tmux->sequential)) ? $tmux->sequential : 0;
 $powerline = (isset($tmux->powerline)) ? $tmux->powerline : 0;
 $colors = (isset($tmux->colors)) ? $tmux->colors : 0;
+$tpatch = $tmux->sqlpatch();
 
 
 if (command_exist("python3")) {
@@ -452,7 +453,7 @@ sleep (5);
 //create initial display, USP connection count, prehash count and groups count adapted from nZEDb
 passthru('clear');
 //printf("\033[1;31m  First insert:\033[0m ".relativeTime("$firstdate")."\n");
-printf($mask2, "Monitor Running v$version [" . $patch . "]: ", relativeTime("$time"));
+printf($mask2, "Monitor Running v$version [". $tpatch ."][" . $patch . "]: ", relativeTime("$time"));
 printf($mask1, "USP Connections:", $uspactiveconnections . " active (" . $usptotalconnections . " total) - " . $host . ":" . $port);;
 printf($mask1, "Newest Release:", "$newestname");
 printf($mask1, "Release Added:", relativeTime("$newestadd")."ago");
@@ -1047,7 +1048,7 @@ $usptotalconnections  = str_replace("\n", '', shell_exec("ss -n | grep -c " . $i
 	//update display
 	passthru('clear');
 	//printf("\033[1;31m  First insert:\033[0m ".relativeTime("$firstdate")."\n");
-	printf($mask2, "Monitor Running v$version [" . $patch . "]: ", relativeTime("$time"));
+	printf($mask2, "Monitor Running v$version [". $tpatch ."][" . $patch . "]: ", relativeTime("$time"));
     printf($mask1, "USP Connections:", $uspactiveconnections . " active (" . $usptotalconnections . " total) - " . $host . ":" . $port);
 	printf($mask1, "Newest Release:", "$newestname");
 	printf($mask1, "Release Added:", relativeTime("$newestadd")."ago");
