@@ -268,7 +268,7 @@
                 <td style="width:180px;"><label for="post_kill_timer">Postprocess Kill Timer:</label></td>
                 <td>
                     <input id="post_kill_timer" name="post_kill_timer" class="short" type="text" value="{$ftmux->post_kill_timer}" />
-                    <div class="hint">The time postprocess is allowed to run with no updates to the screen. Activity is detected when the history for the pane changes. The clock is restarted every time activity is detected.</div>
+                    <div class="hint">The time postprocess is allowed to run with no updates to the screen.Time is in minutes. Activity is detected when the history for the pane changes. The clock is restarted every time activity is detected.</div>
                 </td>
             </tr>
 
@@ -538,14 +538,6 @@
                 <td>
                     <input id="niceness" name="niceness" class="short" type="text" value="{$ftmux->niceness}" />
                     <div class="hint">This sets the 'nice'ness of each script, default is 19, the lowest, the highest is -20 anything between -1 and -20 require root/sudo to run</div>
-                </td>
-            </tr>
-
-            <tr>
-                <td style="width:180px;"><label for="collections_kill">Maximum Collections:</label></td>
-                <td>
-                    <input id="collections_kill" name="collections_kill" class="short" type="text" value="{$ftmux->collections_kill}" />
-                    <div class="hint">Set this to any number above 0 and when it is exceeded, backfill and update binaries will be terminated. 0 disables.</div>
                 </td>
             </tr>
 
