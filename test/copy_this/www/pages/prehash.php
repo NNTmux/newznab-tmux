@@ -9,7 +9,13 @@ $predb = new PreDb();
 
 $offset = (isset($_REQUEST["offset"]) && ctype_digit($_REQUEST['offset'])) ? $_REQUEST["offset"] : 0;
 
-$parr = $predb->getAll($offset, ITEMS_PER_PAGE);
+if (isset($_REQUEST['presearch'])) {
+	$lastSearch = $_REQUEST['presearch'];
+	$parr = $predb->getAll($offset, ITEMS_PER_PAGE, $_REQUEST['presearch']);
+} else {
+	$lastSearch = '';
+	$parr = $predb->getAll($offset, ITEMS_PER_PAGE);
+}
 
 $page->smarty->assign('pagertotalitems', $parr['count']);
 $page->smarty->assign('pageroffset', $offset);

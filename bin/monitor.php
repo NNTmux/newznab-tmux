@@ -9,7 +9,7 @@ require_once("../test/showsleep.php");
 require_once("../test/functions.php");
 
 
-$version="0.3r921";
+$version="0.3r923";
 
 $db = new DB();
 $functions = new Functions();
@@ -123,6 +123,10 @@ $proc_tmux = "SELECT "
     . "(SELECT VALUE FROM tmux WHERE SETTING = 'spotnab') AS spotnab, "
     . "(SELECT VALUE FROM tmux WHERE SETTING = 'spotnab_timer') AS spotnab_timer, "
     . "(SELECT VALUE FROM tmux WHERE SETTING = 'others') AS others, "
+    . "(SELECT VALUE FROM tmux WHERE SETTING = 'delete_parts') AS delete_parts, "
+    . "(SELECT VALUE FROM tmux WHERE SETTING = 'delete_timer') AS delete_timer, "
+    . "(SELECT VALUE FROM tmux WHERE SETTING = 'sphinx') AS sphinx, "
+    . "(SELECT VALUE FROM tmux WHERE SETTING = 'sphinx_timer') AS sphinx_timer, "
     . "(SELECT VALUE FROM tmux WHERE SETTING = 'unwanted') AS unwanted, "
     . "(SELECT VALUE FROM tmux WHERE SETTING = 'fetch_movie') AS fetch_movie, "
     . "(SELECT VALUE FROM tmux WHERE SETTING = 'movie_timer') AS movie_timer, "
@@ -772,6 +776,18 @@ while( $i > 0 )
     if ($proc_tmux_result[0]['seq_timer'] != NULL) {
 		$seq_timer = $proc_tmux_result[0]['seq_timer'];
 	}
+     if ($proc_tmux_result[0]['sphinx'] != NULL) {
+		$sphinx = $proc_tmux_result[0]['sphinx'];
+	}
+     if ($proc_tmux_result[0]['sphinx_timer'] != NULL) {
+		$sphinx_timer = $proc_tmux_result[0]['sphinx_timer'];
+	}
+     if ($proc_tmux_result[0]['delete_parts'] != NULL) {
+		$delete_parts = $proc_tmux_result[0]['delete_parts'];
+	}
+     if ($proc_tmux_result[0]['delete_timer'] != NULL) {
+		$delete_timer = $proc_tmux_result[0]['delete_timer'];
+	}
 
 
     //reset monitor paths before query
@@ -1405,17 +1421,17 @@ if ($running == 1){
         }
 
 	//run sphinx in pane 1.2
-	if (( $maxload >= get_load()) && ( TIME() - $time9 >= $array['SPHINX_TIMER'] ) && ( $array['SPHINX'] == "true")) {
+	if (( $maxload >= get_load()) && ( TIME() - $time9 >= $sphinx_timer ) && ( $sphinx == 1)) {
 		$color=get_color();
 		$log = writelog($panes1[2]);
 		shell_exec("$_tmux respawnp -t${tmux_session}:1.2 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php sphinx.php 2>&1 $log && echo \" \033[1;0;33m\"' 2>&1 1> /dev/null");
 		$time9 = TIME();
-	} elseif ( $array['SPHINX'] != "true" ) {
+	} else if ($sphinx == 0) {
 		$color = get_color($colors_start, $colors_end, $colors_exc);
-		shell_exec("$_tmux respawnp -t${tmux_session}:1.2 'echo \"\033[38;5;\"$color\"m\n$panes1[2] Disabled by SPHINX\"' 2>&1 1> /dev/null");
-	} elseif ( $maxload >= get_load()) {
+		shell_exec("$_tmux respawnp -t${tmux_session}:1.2 'echo \"\033[38;5;\"$color\"m\n$panes1[2]  has been disabled/terminated by Sphinx\"' 2>&1 1> /dev/null");
+	} else if ( $maxload >= get_load()) {
 		$color = get_color($colors_start, $colors_end, $colors_exc);
-		$run_time = relativeTime( $array['SPHINX_TIMER'] + $time9 );
+		$run_time = relativeTime( $sphinx_timer + $time9 );
 		shell_exec("$_tmux respawnp -t${tmux_session}:1.2 'echo \"\033[38;5;\"$color\"m\n$panes1[2] will run in T[ $run_time]\"' 2>&1 1> /dev/null");
 	} elseif ( $maxload <= get_load()) {
                 $color = get_color($colors_start, $colors_end, $colors_exc);
@@ -1423,17 +1439,17 @@ if ($running == 1){
         }
 
 	//run delete parts in pane 1.3
-	if (( $maxload >= get_load()) && (( TIME() - $time16 ) >= $array['DELETE_TIMER'] ) && ( $array['DELETE_PARTS'] == "true" )) {
+	if (( $maxload >= get_load()) && (( TIME() - $time16 ) >= $delete_timer ) && ( $delete_parts == 1 )) {
 		$color = get_color($colors_start, $colors_end, $colors_exc);
 		$log = writelog($panes1[3]);
 		shell_exec("$_tmux respawnp -t${tmux_session}:1.3 'echo \"\033[38;5;\"$color\"m\" && cd $_cj && $_php remove_parts_without_releases.php 2>&1 $log' 2>&1 1> /dev/null");
 		$time16 = TIME();
-	} elseif (( $array['DELETE_PARTS'] != "true" )) {
+	} elseif (( $delete_parts == 0 )) {
 		$color = get_color($colors_start, $colors_end, $colors_exc);
-		shell_exec("$_tmux respawnp -t${tmux_session}:1.3 'echo \"\033[38;5;\"$color\"m\n$panes1[3] Disabled by DELETE_PARTS\"' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t${tmux_session}:1.3 'echo \"\033[38;5;\"$color\"m\n$panes1[3]  has been disabled/terminated by Delete Parts\"' 2>&1 1> /dev/null");
 	} elseif ( $maxload >= get_load()) {
 		$color = get_color($colors_start, $colors_end, $colors_exc);
-		$run_time = relativeTime( $array['DELETE_TIMER'] + $time16 );
+		$run_time = relativeTime( $delete_timer + $time16 );
 		shell_exec("$_tmux respawnp -t${tmux_session}:1.3 'echo \"\033[38;5;\"$color\"m\n$panes1[3] will run in T[ $run_time]\"' 2>&1 1> /dev/null");
 	} elseif ( $maxload <= get_load()) {
                 $color = get_color($colors_start, $colors_end, $colors_exc);
