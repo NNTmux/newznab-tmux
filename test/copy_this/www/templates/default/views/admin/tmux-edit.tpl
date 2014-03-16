@@ -622,6 +622,22 @@
                     <div class="hint">Set this to limit the load on your system to value entered. Default value is 2.0.</div>
                 </td>
             </tr>
+
+            <tr>
+				<td style="width:180px;"><label for="safebackfilldate">Safe Backfill Date:</label></td>
+				<td>
+					<input class="small" id="safebackfilldate" name="safebackfilldate" type="text" value="{$ftmux->safebackfilldate}" />
+					<div class="hint">The target date for safe backfill. Format: YYYY-MM-DD</div>
+				</td>
+			</tr>
+
+            <tr>
+				<td style="width:180px;"><label for="safepartrepair">Part Repair for Backfill Scripts:</label></td>
+				<td>
+					{html_radios id="safepartrepair" name='safepartrepair' values=$yesno_ids output=$yesno_names selected=$ftmux->safepartrepair separator='<br />'}
+					<div class="hint">Whether to put unreceived parts into partrepair table when running binaries(safe) or backfill scripts.</div>
+				</td>
+			</tr>
         </table>
     </fieldset>
 

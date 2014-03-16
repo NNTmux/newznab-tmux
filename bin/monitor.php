@@ -9,7 +9,7 @@ require_once("../test/showsleep.php");
 require_once("../test/functions.php");
 
 
-$version="0.3r923";
+$version="0.3r926";
 
 $db = new DB();
 $functions = new Functions();
@@ -140,6 +140,11 @@ $proc_tmux = "SELECT "
 
 $split_query = "SELECT
     ( SELECT UNIX_TIMESTAMP(adddate) FROM releases USE INDEX(ix_releases_status) ORDER BY adddate DESC LIMIT 1 ) AS newestadd";
+$split_query = "SELECT "
+		. "(SELECT COUNT(*) FROM groups WHERE first_record IS NOT NULL AND (now() - interval backfill_target day) < first_record_postdate) AS backfill_groups_days, "
+		. "(SELECT COUNT(*) FROM groups WHERE first_record IS NOT NULL AND (now() - interval datediff(curdate(), "
+		. "(SELECT VALUE FROM tmux WHERE SETTING = 'safebackfilldate')) day) < first_record_postdate) AS backfill_groups_date, "
+        . "(SELECT UNIX_TIMESTAMP(adddate) FROM releases USE INDEX(ix_releases_status) ORDER BY adddate DESC LIMIT 1 ) AS newestadd";
 
 //get first release inserted datetime and oldest posted datetime
 //$posted_date = "SELECT(SELECT UNIX_TIMESTAMP(adddate) from releases order by adddate asc limit 1) AS adddate;";
@@ -411,6 +416,9 @@ $predb = 0;
 $fix_names = 0;
 $lookreqids = 0;
 $monitor_path = "";
+$backfilldays = 0;
+$backfill_groups_date = 0;
+$colors_exc = 0;
 
 //formatted  output
 $pre_diff = number_format( $prehash_matched - $prehash_start );
@@ -503,7 +511,11 @@ printf($mask4, "DB Lagg","$query_timer","0 qps");
 
 printf($mask3, "Groups", "Active", "Backfill");
 printf($mask3, "====================", "=========================", "=========================");
-printf($mask4, "Activated", $active_groups."(".$all_groups.")", $backfill_groups. "(".$all_groups.")");
+if ($backfilldays == "1") {
+	printf($mask4, "Activated", $active_groups . "(" . $all_groups . ")", $backfill_groups_days . "(" . $all_groups . ")");
+} else {
+	printf($mask4, "Activated", $active_groups . "(" . $all_groups . ")", $backfill_groups_date . "(" . $all_groups . ")");
+}
 
 $i = 1;
 $monitor = 30;
@@ -844,9 +856,15 @@ while( $i > 0 )
 	if ($proc_tmux_result[0]['dehash_timer'] != NULL) {
 		$dehash_timer = $proc_tmux_result[0]['dehash_timer'];
 	}
+    if ($split_result[0]['backfill_groups_days'] != NULL) {
+		$backfill_groups_days = $split_result[0]['backfill_groups_days'];
+	}
+	if ($split_result[0]['backfill_groups_date'] != NULL) {
+		$backfill_groups_date = $split_result[0]['backfill_groups_date'];
+	}
 
 //build queries for shell
-$_backfill_increment = "UPDATE groups set backfill_target=backfill_target+1 WHERE active=1 and backfill_target<$backfilldays;";
+$_backfill_increment = "UPDATE groups set backfill_target=backfill_target+1 WHERE active=1 and backfill_target<$backfill_groups_days;";
 $mysql_command_1 = "$_mysql --defaults-file=$_conf/my.cnf -u$_DB_USER -h $_DB_HOST $_DB_NAME -e \"$_backfill_increment\"";
 $reset_bin = "UPDATE binaries SET procstat=0, procattempts=0, regexID=NULL, relpart=0, reltotalpart=0, relname=NULL;";
 $mysql_command_2 = "$_mysql --defaults-file=$_conf/my.cnf -u$_DB_USER -h $_DB_HOST $_DB_NAME -e \"$reset_bin\"";
@@ -1113,7 +1131,11 @@ $usptotalconnections  = str_replace("\n", '', shell_exec("ss -n | grep -c " . $i
 
     printf($mask3, "Groups", "Active", "Backfill");
     printf($mask3, "====================", "=========================", "=========================");
-    printf($mask4, "Activated", $active_groups."(".$all_groups.")", $backfill_groups. "(".$all_groups.")");
+    if ($backfilldays == "1") {
+		printf($mask4, "Activated", $active_groups . "(" . $all_groups . ")", $backfill_groups_days . "(" . $all_groups . ")");
+	} else {
+		printf($mask4, "Activated", $active_groups . "(" . $all_groups . ")", $backfill_groups_date . "(" . $all_groups . ")");
+	}
 
 if ($post_non == 2) {
 		$clean = ' clean ';
@@ -1138,16 +1160,7 @@ $_sleep = "$_phpn ${DIR}/../test/showsleep.php";
 	}
 
 	//set command for running backfill
-	if ( $array['KEVIN_SAFER'] == "true" ) {
-		$log = writelog($panes0[3]);
-		$_backfill_cmd = "cd $_bin && $_php safer_backfill_parts.php 2>&1 $log";
-	} else if ( $array['KEVIN_BACKFILL_PARTS'] == "true" ) {
-		$log = writelog($panes0[3]);
-		$_backfill_cmd = "cd $_bin && $_php backfill_parts.php 2>&1 $log";
-	} else if ( $array['KEVIN_THREADED'] == "true" ) {
-		$log = writelog($panes0[3]);
-		$_backfill_cmd = "cd $_bin && $_php backfill_parts_threaded.php 2>&1 $log";
-	} else if ( $array['BACKFILL_THREADS'] == "true" ) {
+    if ( $array['BACKFILL_THREADS'] == "true" ) {
 		$log = writelog($panes0[3]);
 		$_backfill_cmd = "cd $_bin && $_php backfill_threaded.php 2>&1 $log && $mysql_command_1 2>&1 $log";
 	} else {
@@ -1185,25 +1198,29 @@ if ($running == 1){
 					$_update_cmd $log; date +\"%D %T\"; echo \"\nbinaries have been disabled/terminated by Exceeding Limits\"; $_sleep $bins_timer' 2>&1 1> /dev/null");
     }
 
-    if ($kill_pp != "true") {
-		//runs backfill in 0.3 once if needed and exits
-		if (( $maxload >= get_load()) && ($killed != "true") && ( $backfill == 1)) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			$log = writelog($panes0[3]);
-			shell_exec("$_tmux respawnp -t${tmux_session}:0.3 'echo \"\033[38;5;\"$color\"m\" && $_backfill_cmd && echo \" \033[1;0;33m\" && $_sleep $back_timer' 2>&1 1> /dev/null");
-		} else if (( $backfill == 1 ) && ( $maxload <= get_load())) {
-                        $color = get_color($colors_start, $colors_end, $colors_exc);
-                        shell_exec("$_tmux respawnp -t${tmux_session}:0.3 'echo \"\033[38;5;\"$color\"m\n$panes0[3] Disabled by Max Load\"' 2>&1 1> /dev/null");
-        } else if ($backfill == 0) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("$_tmux respawnp -t${tmux_session}:0.3 'echo \"\033[38;5;\"$color\"m\n$panes0[3] has been disabled/terminated by Backfill\"'");
-		    }
-    } else if ($kill_pp == "true") {
-                $color = get_color($colors_start, $colors_end, $colors_exc);
-				shell_exec("tmux respawnp -t${tmux_session}:0.3 'echo \"\033[38;5;${color}m\"; \
-					echo \"\nbackfill has been disabled/terminated by Exceeding Limits\"; \
-					$_backfill_cmd $log; date +\"%D %T\"; echo \"\nbackfill has been disabled/terminated by Exceeding Limits\"; $_sleep $back_timer' 2>&1 1> /dev/null");
-	            }
+		//runs backfill in 0.3
+        $backsleep = $back_timer;
+		if (($backfill == 4) && ($kill_pp == "false") && (TIME() - $time6 <= 4800)) {
+				$log = writelog($panes0[3]);
+				shell_exec("tmux respawnp -t${tmux_session}:0.3 ' \
+						$_python ${DIR}/../test/backfill_safe_threaded.py $log; date +\"%D %T\"; $_sleep $backsleep' 2>&1 1> /dev/null");
+			} else if (($backfill != 0) && ($kill_pp == "false") && (TIME() - $time6 <= 4800)) {
+				$log = writelog($panes0[3]);
+				shell_exec("tmux respawnp -t${tmux_session}:0.3 ' \
+						$_python ${DIR}/../test/backfill_threaded.py group $log; date +\"%D %T\"; $_sleep $backsleep' 2>&1 1> /dev/null");
+			} else if (($backfill != 0) && ($kill_pp == "false") && (TIME() - $time6 >= 4800)) {
+				$log = writelog($panes0[3]);
+				shell_exec("tmux respawnp -k -t${tmux_session}:0.3 ' \
+						$_python ${DIR}/../test/backfill_threaded.py all $log; date +\"%D %T\"; $_sleep $backsleep' 2>&1 1> /dev/null");
+				$time6 = TIME();
+			} else if ($kill_pp == "false") {
+				$color = get_color($colors_start, $colors_end, $colors_exc);
+				shell_exec("tmux respawnp -k -t${tmux_session}:0.3 'echo \"\033[38;5;${color}m\n${panes0[3]} has been disabled/terminated by Exceeding Limits\"'");
+			} else {
+				$color = get_color($colors_start, $colors_end, $colors_exc);
+				shell_exec("tmux respawnp -k -t${tmux_session}:0.3 'echo \"\033[38;5;${color}m\n${panes0[3]} has been disabled/terminated by Backfill\"'");
+			}
+
     }
 
 	//run update_binaries and backfill using seq in pane 0.2
@@ -1305,8 +1322,6 @@ if ($running == 1){
                 $color = get_color($colors_start, $colors_end, $colors_exc);
                 shell_exec("$_tmux respawnp -t${tmux_session}:1.5 'echo \"\033[38;5;\"$color\"m\n$panes1[5] Disabled by Max Load\"' 2>&1 1> /dev/null");
         }
-
-	//start postprocessing in pane 0.1
 
         //start postprocessing in pane 0.1
 

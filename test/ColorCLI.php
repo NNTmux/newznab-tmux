@@ -1,11 +1,9 @@
 <?php
-
 // Original taken from https://gist.github.com/donatj/1315354 by Jesse Donat.
 // Modified by ThePeePs.
 
 class ColorCLI
 {
-
 	static $foreground_colors = array(
 		'Black' => '30',
 		'Blue' => '34',
@@ -189,7 +187,7 @@ class ColorCLI
 
 	public static function debug($str)
 	{
-		$debugstring = "\033[" . self::$foreground_colors['Purple'] . "mDebug: $str\033[0m\n";
+		$debugstring = "\033[" . self::$foreground_colors['Gray'] . "mDebug: $str\033[0m\n";
 		return $debugstring;
 	}
 
@@ -231,7 +229,7 @@ class ColorCLI
 
 	public static function alternate($str)
 	{
-		$str = "\033[38;5;" . self::$colors256['DeepPink1'] . "m$str\033[0m";
+		$str = "\033[38;5;" . self::$colors256['DeepPink1'] . "m$str\033[0m\n";
 		return $str;
 	}
 
@@ -270,4 +268,15 @@ class ColorCLI
 		return "\033[0m";
 	}
 
+	/**
+	 * Echo message to CLI.
+	 *
+	 * @param string $message The message.
+	 * @param bool $nl Add a new line?
+	 * @void
+	 */
+	public static function doEcho($message, $nl = false)
+	{
+		echo $message . ($nl ? PHP_EOL : '');
+	}
 }
