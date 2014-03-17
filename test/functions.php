@@ -2581,7 +2581,7 @@ class Functions
 		}
 
 			$this->doecho(
-			    . $type .
+                $type .
 				' Safe Threaded for ' .
 				$group .
 				" completed." .
@@ -2832,7 +2832,7 @@ class Functions
 		$process = $this->safepartrepair ? 'update' : 'backfill';
 
 		if ($this->echo) {
-					$this->c->header( .
+					$this->c->header (
 					'Processing ' .
 					str_replace('alt.binaries', 'a.b', $groupArr['name']) .
 					(($this->compressedHeaders) ? ' Using Compression' : ' Not Using Compression') .
@@ -2843,7 +2843,7 @@ class Functions
 					' to ' .
 					number_format($last) .
 					$this->c->rsetColor()
-				);
+			   );
 		}
 		$this->startLoop = microtime(true);
 
@@ -3056,7 +3056,7 @@ class Functions
 		$timeGroup = number_format(microtime(true) - $this->startGroup, 2);
 
 		if ($this->echo) {
-				$this->c->primary( .
+				$this->c->primary( 
 				'Group processed in ' .
 				$timeGroup .
 				" seconds." .
