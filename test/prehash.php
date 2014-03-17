@@ -103,7 +103,7 @@ Class Predb
 				echo $this->c->primary($newnames . " \tRetrieved from all the above sources..");
 			}
 			if (count($newnames) > 0) {
-				$db->queryExec(sprintf('UPDATE prehash SET adddate = NOW() WHERE ID = %d', $newestrel['ID']));
+				$db->exec(sprintf('UPDATE prehash SET adddate = NOW() WHERE ID = %d', $newestrel['ID']));
 			}
 			return $newnames;
 		}
