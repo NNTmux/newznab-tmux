@@ -2639,9 +2639,8 @@ class Functions
 								str_replace('alt.binaries', 'a.b', $group) .
 								". Retrying with newest article, from parts table, [$post] from ${groupa['pname']}";
 
-							if ($this->echo) {
 								$this->c->info($dmessage);
-							}
+
 						}
 					} else {
 						$res = $db->queryOneRow('SELECT p.number FROM ' . $groupa['bname'] . ' b, ' . $groupa['pname'] . ' p WHERE b.ID = p.binaryID AND b.groupID = ' . $groupID . ' ORDER BY p.number ASC LIMIT 1');
@@ -2652,9 +2651,8 @@ class Functions
 								str_replace('alt.binaries', 'a.b', $group) .
 								". Retrying with oldest article, from parts table, [$post] from ${groupa['pname']}.";
 
-							if ($this->echo) {
 								$this->c->info($dmessage);
-							}
+
 						}
 					}
 					$success = false;
@@ -2669,9 +2667,8 @@ class Functions
 								str_replace('alt.binaries', 'a.b', $group) .
 								". Using newest date from ${groupa['bname']}.";
 
-							if ($this->echo) {
 							   $this->c->info($dmessage);
-							}
+
 							if (strlen($date) > 0) {
 								$success = true;
 							}
@@ -2685,9 +2682,8 @@ class Functions
 								str_replace('alt.binaries', 'a.b', $group) .
 								". Using oldest date from ${groupa['cname']}.";
 
-							if ($this->echo) {
 								$this->c->info($dmessage);
-							}
+
 							if (strlen($date) > 0) {
 								$success = true;
 							}
@@ -2702,7 +2698,7 @@ class Functions
 					}
 				}
 
-				if ($debug && $this->echo && $attempts > 0) {
+				if ($attempts > 0) {
 					$this->c->debug('Retried ' . $attempts . " time(s).");
 				}
 			}
@@ -2720,9 +2716,8 @@ class Functions
 						$res['first_record_postdate'] .
 						"], instead.";
 
-					if ($this->echo) {
 						$this->c->info($dmessage);
-					}
+
 					return strtotime($res['first_record_postdate']);
 				} else {
 					return false;
@@ -2738,9 +2733,8 @@ class Functions
 						$res['last_record_postdate'] .
 						"], instead.";
 
-					if ($this->echo) {
 						$this->c->info($dmessage);
-					}
+
 					return strtotime($res['last_record_postdate']);
 				} else {
 					return false;
@@ -2795,9 +2789,7 @@ class Functions
 				if ($groupName === '') {
 					$dmessage =  "\nStarting group " . $counter . ' of ' . sizeof($res);
 
-					if ($this->echo) {
 						$this->c->header . $dmessage . $this->c->rsetColor();
-					}
 				}
 				$this->backfillPostGroup($nntp, $this->db, $binaries, $groupArr, sizeof($res) - $counter, $articles);
 				$counter++;
@@ -2805,9 +2797,7 @@ class Functions
 		} else {
 			$dmessage = "No groups specified. Ensure groups are added to nZEDb's database for updating.";
 
-			if ($this->echo) {
 				$this->c->warning($dmessage);
-			}
 		}
 	}
     	/**
@@ -2831,7 +2821,6 @@ class Functions
 		$groupArr = $groups->getByName($group);
 		$process = $this->safepartrepair ? 'update' : 'backfill';
 
-		if ($this->echo) {
 					$this->c->header (
 					'Processing ' .
 					str_replace('alt.binaries', 'a.b', $groupArr['name']) .
@@ -2844,7 +2833,6 @@ class Functions
 					number_format($last) .
 					$this->c->rsetColor()
 			   );
-		}
 		$this->startLoop = microtime(true);
 
 		// Select group, here, only once
@@ -2903,9 +2891,7 @@ class Functions
 			$dmessage = "No groups specified. Ensure groups are added to nZEDb's database for updating.";
 			$this->debugging->start("backfillAllGroups", $dmessage, 1);
 
-			if ($this->echo) {
 				$this->c->primary . $dmessage . $this->c->rsetColor();
-			}
 		}
 	}
 
@@ -2936,9 +2922,8 @@ class Functions
 		if ($groupArr['first_record'] == 0 || $groupArr['backfill_target'] == 0) {
 			$dmessage = "Group ${groupArr['name']} has invalid numbers. Have you run update on it? Have you set the backfill days amount?";
 
-			if ($this->echo) {
-				$this->c->warning($dmessage);
-			}
+			$this->c->warning($dmessage);
+
 			return;
 		}
 
@@ -2946,9 +2931,8 @@ class Functions
 		if ($groupArr['first_record'] <= ($data['first'] + 50000)) {
 			$dmessage = "We have hit the maximum we can backfill for " . str_replace('alt.binaries', 'a.b', $groupArr['name']) . ", skipping it.";
 
-			if ($this->echo) {
+
 				$this->c->notice($dmessage);
-			}
 			//$groups = new Groups();
 			//$groups->disableForPost($groupArr['name']);
 			return;
@@ -2958,13 +2942,10 @@ class Functions
 		if ($targetpost >= $groupArr['first_record']) {
 			$dmessage = "Nothing to do, we already have the target post.";
 
-			if ($this->echo) {
 				$this->c->notice($dmessage);
-			}
 			return;
 		}
 
-		if ($this->echo) {
 			$this->c->doEcho(
 				'Group ' .
 				$data['group'] .
@@ -2993,7 +2974,6 @@ class Functions
 				' days is post ' .
 				$targetpost, true
 			);
-		}
 
 		$done = false;
 		// Set first and last, moving the window by maxxMssgs.
@@ -3054,14 +3034,13 @@ class Functions
 
 		$timeGroup = number_format(microtime(true) - $this->startGroup, 2);
 
-		if ($this->echo) {
 				$this->c->primary(
 				'Group processed in ' .
 				$timeGroup .
 				" seconds." .
 				$this->c->rsetColor()
 			);
-		}
+
 	}
 
     	/**
@@ -3081,7 +3060,7 @@ class Functions
 			$dmessage = "Not connected to usenet(backfill->daytopost).\n";
 			exit($this->c->error($dmessage));
 		}
-
+        $pddebug = false;
 		// Goal timestamp.
 		$goaldate = date('U') - (86400 * $days);
 		$totalnumberofarticles = $data['last'] - $data['first'];
@@ -3102,9 +3081,8 @@ class Functions
 				date('r', $firstDate) . ' or ' .
 				$this->daysOld($firstDate) . " days).";
 
-			if ($this->echo) {
 				$this->c->warning($dmessage);
-			}
+
 			return $data['first'];
 		} else if ($goaldate > $lastDate) {
 			$dmessage =
@@ -3116,9 +3094,8 @@ class Functions
 				date('r', $lastDate - 86400) .
 				").";
 
-			if ($this->echo) {
 				$this->c->error($dmessage);
-			}
+
 			return '';
 		}
 
