@@ -3056,7 +3056,7 @@ class Functions
 		$timeGroup = number_format(microtime(true) - $this->startGroup, 2);
 
 		if ($this->echo) {
-				$this->c->primary( 
+				$this->c->primary(
 				'Group processed in ' .
 				$timeGroup .
 				" seconds." .
@@ -3216,12 +3216,10 @@ class Functions
 
 		$this->startGroup = microtime(true);
 
-			$this->c->doEcho(
-				$this->c->header .
+				$this->c->header (
 				'Processing ' .
 				$groupArr['name'] .
 				$this->c->rsetColor()
-				, true
 			);
 
 		// Select group, here, only once
@@ -3331,8 +3329,7 @@ class Functions
 		while ($done === false) {
 			$binaries->startLoop = microtime(true);
 
-				$this->c->doEcho(
-					$this->c->header .
+					$this->c->header(
 					"\nGetting " .
 					($last - $first + 1) .
 					" articles from " .
@@ -3342,7 +3339,7 @@ class Functions
 					" group(s) left. (" .
 					(number_format($first - $targetpost)) .
 					" articles in queue)" .
-					$this->c->rsetColor(), true
+					$this->c->rsetColor()
 				);
 
 			flush();
@@ -3371,13 +3368,12 @@ class Functions
 		$timeGroup = number_format(microtime(true) - $this->startGroup, 2);
 
 
-			$this->c->doEcho(
-				$this->c->header .
+				$this->c->header(
 				$data['group'] .
 				' processed in ' .
 				$timeGroup .
 				" seconds." .
-				$this->c->rsetColor(), true
+				$this->c->rsetColor()
 			);
 	}
 
