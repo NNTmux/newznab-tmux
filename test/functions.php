@@ -2581,13 +2581,11 @@ class Functions
 		}
 
 			$this->doecho(
-				$this->c->primary .
-				$type .
+                $type .
 				' Safe Threaded for ' .
 				$group .
 				" completed." .
 				$this->c->rsetColor()
-				, true
 			);
 		}
 
@@ -2610,7 +2608,7 @@ class Functions
 			$dmessage = "Not connected to usenet(backfill->postdate).";
 
 
-				$this->c->doEcho($this->c->error($dmessage), true);
+				$this->c->error($dmessage);
 
 			return false;
 		}
@@ -2642,7 +2640,7 @@ class Functions
 								". Retrying with newest article, from parts table, [$post] from ${groupa['pname']}";
 
 							if ($this->echo) {
-								$this->c->doEcho($this->c->info($dmessage), true);
+								$this->c->info($dmessage);
 							}
 						}
 					} else {
@@ -2655,7 +2653,7 @@ class Functions
 								". Retrying with oldest article, from parts table, [$post] from ${groupa['pname']}.";
 
 							if ($this->echo) {
-								$this->c->doEcho($this->c->info($dmessage), true);
+								$this->c->info($dmessage);
 							}
 						}
 					}
@@ -2672,7 +2670,7 @@ class Functions
 								". Using newest date from ${groupa['bname']}.";
 
 							if ($this->echo) {
-								$this->c->doEcho($this->c->info($dmessage), true);
+							   $this->c->info($dmessage);
 							}
 							if (strlen($date) > 0) {
 								$success = true;
@@ -2688,7 +2686,7 @@ class Functions
 								". Using oldest date from ${groupa['cname']}.";
 
 							if ($this->echo) {
-								$this->c->doEcho($this->c->info($dmessage), true);
+								$this->c->info($dmessage);
 							}
 							if (strlen($date) > 0) {
 								$success = true;
@@ -2705,7 +2703,7 @@ class Functions
 				}
 
 				if ($debug && $this->echo && $attempts > 0) {
-					$this->c->doEcho($this->c->debug('Retried ' . $attempts . " time(s)."), true);
+					$this->c->debug('Retried ' . $attempts . " time(s).");
 				}
 			}
 		} while ($attempts <= 20 && $success === false);
@@ -2723,7 +2721,7 @@ class Functions
 						"], instead.";
 
 					if ($this->echo) {
-						$this->c->doEcho($this->c->info($dmessage), true);
+						$this->c->info($dmessage);
 					}
 					return strtotime($res['first_record_postdate']);
 				} else {
@@ -2741,7 +2739,7 @@ class Functions
 						"], instead.";
 
 					if ($this->echo) {
-						$this->c->doEcho($this->c->info($dmessage), true);
+						$this->c->info($dmessage);
 					}
 					return strtotime($res['last_record_postdate']);
 				} else {
@@ -2798,7 +2796,7 @@ class Functions
 					$dmessage =  "\nStarting group " . $counter . ' of ' . sizeof($res);
 
 					if ($this->echo) {
-						$this->c->doEcho($this->c->header . $dmessage . $this->c->rsetColor(), true);
+						$this->c->header . $dmessage . $this->c->rsetColor();
 					}
 				}
 				$this->backfillPostGroup($nntp, $this->db, $binaries, $groupArr, sizeof($res) - $counter, $articles);
@@ -2808,7 +2806,7 @@ class Functions
 			$dmessage = "No groups specified. Ensure groups are added to nZEDb's database for updating.";
 
 			if ($this->echo) {
-				$this->c->doEcho($this->c->warning($dmessage), true);
+				$this->c->warning($dmessage);
 			}
 		}
 	}
@@ -2834,8 +2832,7 @@ class Functions
 		$process = $this->safepartrepair ? 'update' : 'backfill';
 
 		if ($this->echo) {
-				$this->c->doEcho(
-					$this->c->header .
+					$this->c->header (
 					'Processing ' .
 					str_replace('alt.binaries', 'a.b', $groupArr['name']) .
 					(($this->compressedHeaders) ? ' Using Compression' : ' Not Using Compression') .
@@ -2846,8 +2843,7 @@ class Functions
 					' to ' .
 					number_format($last) .
 					$this->c->rsetColor()
-					, true
-				);
+			   );
 		}
 		$this->startLoop = microtime(true);
 
@@ -2898,7 +2894,7 @@ class Functions
 				if ($groupName === '') {
 					$dmessage = "Starting group " . $counter . ' of ' . sizeof($res);
 
-						$this->c->doEcho($this->c->header .$dmessage . $this->c->rsetColor(), true);
+					   $this->c->header .$dmessage . $this->c->rsetColor();
 				}
 				$this->backfillGroup($nntp, $db, $binaries, $groupArr, sizeof($res) - $counter);
 				$counter++;
@@ -2908,7 +2904,7 @@ class Functions
 			$this->debugging->start("backfillAllGroups", $dmessage, 1);
 
 			if ($this->echo) {
-				$this->c->doEcho($this->c->primary . $dmessage . $this->c->rsetColor(), true);
+				$this->c->primary . $dmessage . $this->c->rsetColor();
 			}
 		}
 	}
@@ -2941,7 +2937,7 @@ class Functions
 			$dmessage = "Group ${groupArr['name']} has invalid numbers. Have you run update on it? Have you set the backfill days amount?";
 
 			if ($this->echo) {
-				$this->c->doEcho($this->c->warning($dmessage), true);
+				$this->c->warning($dmessage);
 			}
 			return;
 		}
@@ -2951,7 +2947,7 @@ class Functions
 			$dmessage = "We have hit the maximum we can backfill for " . str_replace('alt.binaries', 'a.b', $groupArr['name']) . ", skipping it.";
 
 			if ($this->echo) {
-				$this->c->doEcho($this->c->notice($dmessage), true);
+				$this->c->notice($dmessage);
 			}
 			//$groups = new Groups();
 			//$groups->disableForPost($groupArr['name']);
@@ -2963,7 +2959,7 @@ class Functions
 			$dmessage = "Nothing to do, we already have the target post.";
 
 			if ($this->echo) {
-				$this->c->doEcho($this->c->notice($dmessage), true);
+				$this->c->notice($dmessage);
 			}
 			return;
 		}
@@ -3020,8 +3016,7 @@ class Functions
 		while ($done === false) {
 			$binaries->startLoop = microtime(true);
 
-				$this->c->doEcho(
-					$this->c->header .
+					$this->c->header(
 					'Getting ' .
 					(number_format($last - $first + 1)) .
 					" articles from " .
@@ -3030,7 +3025,7 @@ class Functions
 					" group(s) left. (" .
 					(number_format($first - $targetpost)) .
 					" articles in queue)." .
-					$this->c->rsetColor(), true
+					$this->c->rsetColor()
 				);
 
 			flush();
@@ -3060,12 +3055,11 @@ class Functions
 		$timeGroup = number_format(microtime(true) - $this->startGroup, 2);
 
 		if ($this->echo) {
-			$this->c->doEcho(
-				$this->c->primary .
+				$this->c->primary(
 				'Group processed in ' .
 				$timeGroup .
 				" seconds." .
-				$this->c->rsetColor(), true
+				$this->c->rsetColor()
 			);
 		}
 	}
@@ -3109,7 +3103,7 @@ class Functions
 				$this->daysOld($firstDate) . " days).";
 
 			if ($this->echo) {
-				$this->c->doEcho($this->c->warning($dmessage), true);
+				$this->c->warning($dmessage);
 			}
 			return $data['first'];
 		} else if ($goaldate > $lastDate) {
@@ -3123,7 +3117,7 @@ class Functions
 				").";
 
 			if ($this->echo) {
-				$this->c->doEcho($this->c->error($dmessage), true);
+				$this->c->error($dmessage);
 			}
 			return '';
 		}
@@ -3221,12 +3215,10 @@ class Functions
 
 		$this->startGroup = microtime(true);
 
-			$this->c->doEcho(
-				$this->c->header .
+				$this->c->header (
 				'Processing ' .
 				$groupArr['name'] .
 				$this->c->rsetColor()
-				, true
 			);
 
 		// Select group, here, only once
@@ -3250,7 +3242,7 @@ class Functions
 				str_replace('alt.binaries', 'a.b', $data['group']) .
 				". Otherwise the group is dead, you must disable it.";
 
-				$this->c->doEcho($this->c->error($dmessage), true);
+				$this->c->error($dmessage);
 
 			return;
 		}
@@ -3262,7 +3254,7 @@ class Functions
 				str_replace('alt.binaries', 'a.b', $groupArr['name']) .
 				", skipping it.";
 
-				$this->c->doEcho($this->c->notice($dmessage), true);
+				$this->c->notice($dmessage);
 
 			//$groups = new Groups();
 			//$groups->disableForPost($groupArr['name']);
@@ -3273,13 +3265,12 @@ class Functions
 		if ($targetpost >= $groupArr['first_record']) {
 			$dmessage = "Nothing to do, we already have the target post.";
 
-				$this->c->doEcho($this->c->notice($dmessage), true);
+				$this->c->notice($dmessage);
 
 			return;
 		}
 
-			$this->c->doEcho(
-				$this->c->primary .
+				$this->c->primary(
 				'Group ' . $data['group'] .
 				"'s oldest article is " .
 				number_format($data['first']) .
@@ -3336,8 +3327,7 @@ class Functions
 		while ($done === false) {
 			$binaries->startLoop = microtime(true);
 
-				$this->c->doEcho(
-					$this->c->header .
+					$this->c->header(
 					"\nGetting " .
 					($last - $first + 1) .
 					" articles from " .
@@ -3347,7 +3337,7 @@ class Functions
 					" group(s) left. (" .
 					(number_format($first - $targetpost)) .
 					" articles in queue)" .
-					$this->c->rsetColor(), true
+					$this->c->rsetColor()
 				);
 
 			flush();
@@ -3376,13 +3366,12 @@ class Functions
 		$timeGroup = number_format(microtime(true) - $this->startGroup, 2);
 
 
-			$this->c->doEcho(
-				$this->c->header .
+				$this->c->header(
 				$data['group'] .
 				' processed in ' .
 				$timeGroup .
 				" seconds." .
-				$this->c->rsetColor(), true
+				$this->c->rsetColor()
 			);
 	}
 

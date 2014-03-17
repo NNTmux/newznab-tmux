@@ -165,6 +165,8 @@ INSERT INTO tmux (setting, value) values ('defrag_cache','900'),
     ('sphinx_timer', '600'),
     ('delete_parts', '0'),
     ('delete_timer', '43200');
+    ('safebackfilldate', '2012-06-24'),
+    ('safepartrepair', '0'); 
 	('request_hours', '1'),
     ('trakttvkey',''), 
     ('lookuppar2','0'),
@@ -423,6 +425,19 @@ INSERT INTO country (code, name) VALUES ( 'AF', 'Afghanistan' ),
 	( 'YE', 'Yemen' ),
 	( 'ZM', 'Zambia' ),
 	( 'ZW', 'Zimbabwe' );
+
+DROP TABLE IF EXISTS shortgroups;
+CREATE TABLE shortgroups (
+	ID INT(11) NOT NULL AUTO_INCREMENT,
+	name VARCHAR(255) NOT NULL DEFAULT "",
+	first_record BIGINT UNSIGNED NOT NULL DEFAULT "0",
+	last_record BIGINT UNSIGNED NOT NULL DEFAULT "0",
+	updated DATETIME DEFAULT NULL,
+	PRIMARY KEY (ID)
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci AUTO_INCREMENT=1;
+
+CREATE INDEX ix_shortgroups_id ON shortgroups(ID);
+CREATE INDEX ix_shortgroups_name ON shortgroups(name);
 
 DROP TRIGGER IF EXISTS check_insert;
 DROP TRIGGER IF EXISTS check_update;
