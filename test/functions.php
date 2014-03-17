@@ -2608,7 +2608,7 @@ class Functions
 			$dmessage = "Not connected to usenet(backfill->postdate).";
 
 
-				$this->c->doEcho($this->c->error($dmessage), true);
+				$this->c->error($dmessage);
 
 			return false;
 		}
@@ -2894,7 +2894,7 @@ class Functions
 				if ($groupName === '') {
 					$dmessage = "Starting group " . $counter . ' of ' . sizeof($res);
 
-						$this->c->doEcho($this->c->header .$dmessage . $this->c->rsetColor(), true);
+					   $this->c->header .$dmessage . $this->c->rsetColor();
 				}
 				$this->backfillGroup($nntp, $db, $binaries, $groupArr, sizeof($res) - $counter);
 				$counter++;
@@ -3016,8 +3016,7 @@ class Functions
 		while ($done === false) {
 			$binaries->startLoop = microtime(true);
 
-				$this->c->doEcho(
-					$this->c->header .
+					$this->c->header(
 					'Getting ' .
 					(number_format($last - $first + 1)) .
 					" articles from " .
@@ -3026,7 +3025,7 @@ class Functions
 					" group(s) left. (" .
 					(number_format($first - $targetpost)) .
 					" articles in queue)." .
-					$this->c->rsetColor(), true
+					$this->c->rsetColor()
 				);
 
 			flush();
@@ -3243,7 +3242,7 @@ class Functions
 				str_replace('alt.binaries', 'a.b', $data['group']) .
 				". Otherwise the group is dead, you must disable it.";
 
-				$this->c->doEcho($this->c->error($dmessage), true);
+				$this->c->error($dmessage);
 
 			return;
 		}
@@ -3255,7 +3254,7 @@ class Functions
 				str_replace('alt.binaries', 'a.b', $groupArr['name']) .
 				", skipping it.";
 
-				$this->c->doEcho($this->c->notice($dmessage), true);
+				$this->c->notice($dmessage);
 
 			//$groups = new Groups();
 			//$groups->disableForPost($groupArr['name']);
@@ -3266,13 +3265,12 @@ class Functions
 		if ($targetpost >= $groupArr['first_record']) {
 			$dmessage = "Nothing to do, we already have the target post.";
 
-				$this->c->doEcho($this->c->notice($dmessage), true);
+				$this->c->notice($dmessage);
 
 			return;
 		}
 
-			$this->c->doEcho(
-				$this->c->primary .
+				$this->c->primary(
 				'Group ' . $data['group'] .
 				"'s oldest article is " .
 				number_format($data['first']) .
