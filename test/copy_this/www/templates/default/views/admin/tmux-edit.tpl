@@ -145,14 +145,14 @@
                         example: you have Backfill Threads = 10, Backfill Quantity = 20k, Max Messages = 5k: you will run 10 threads, queue of 40 and download 200k headers.<br />
                         Interval - Backfills the number of groups (set in tmux), by backfill days (set in admin-view groups), completely.<br />
                         All - Backfills the number of groups (set in tmux), by Backfill Quantity (set in tmux), up to backfill days (set in admin-view groups)<br />
-                        These settings are all per loop and does not use backfill date. Approximately every 80 minutes, every activated backfill group will be backfilled (5k headers). This is to allow incomplete collections to be completed and/or the 2 hour delay reset if the collection is still active. This extra step is not necessary and is not used when using Sequential.<br />
+                        These settings are all per loop and does not use backfill date. Approximately every 80 minutes, every activated backfill group will be backfilled (5k headers).This extra step is not necessary and is not used when using Sequential.<br />
                         Newest - Sorts the group selection with the least backfill days backfilled, first.<br />
                         Oldest - Sorts the group selection with the most backfill days backfilled, first.<br />
                         Alphabetical - Sorts the group selection from a to z.<br />
                         Alphabetical Reverse - Sorts the group selection from z to a.<br /a>
                             Most Posts - Sorts the group selection by the highest number of posts, first.<br /a>
                             Fewest Posts - Sorts the group selection by the lowest number of posts, first.<br />
-                        Backfill days - Days per Group from admin->view group or the Safe Backfill Date from admin->edit site.</div>
+                        Backfill days - Days per Group from admin->view group or the Safe Backfill Date from admin->tmux.</div>
                 </td>
             </tr>
             <tr>
@@ -204,7 +204,7 @@
                 <td style="width:180px;"><label for="nzbs">Nzbs:</label></td>
                 <td>
                     <input id="nzbs" class="long" name="nzbs" type="text" value="{$ftmux->nzbs}" />
-                    <div class="hint">Set the path to the nzb dump you downloaded from torrents, this is the path to bulk files folder of nzbs. This is by default, recursive and threaded. You set the threads in edit site, Advanced Settings.</div>
+                    <div class="hint">Set the path to the nzb dump you downloaded from torrents, this is the path to bulk files folder of nzbs. This is by default, recursive and threaded. You set the threads in Advanced Settings.</div>
                 </td>
             </tr>
 
