@@ -45,7 +45,7 @@ except:
 print(bcolors.HEADER + "\n\nRequestID Threaded Started at {}".format(datetime.datetime.now().strftime("%H:%M:%S")) + bcolors.ENDC)
 
 request_hours = 6
-cur[0].execute("SELECT r.ID, r.name, g.name AS groupname FROM releases r LEFT JOIN groups g ON r.groupID = g.ID WHERE nzbstatus = 1 AND isrenamed = 0 AND isrequestid = 1 AND reqidstatus in (0, -1) OR (reqidstatus = -3 AND adddate > NOW() - INTERVAL 6 HOUR) LIMIT 100000")
+cur[0].execute("SELECT r.ID, r.name, g.name AS groupname FROM releases r LEFT JOIN groups g ON r.groupID = g.ID WHERE isrenamed = 0 AND isrequestid = 1 AND reqidstatus in (0, -1) OR (reqidstatus = -3 AND adddate > NOW() - INTERVAL 6 HOUR) LIMIT 100000")
 datas = cur[0].fetchall()
 
 #close connection to mysql

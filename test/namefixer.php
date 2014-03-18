@@ -52,7 +52,7 @@ class Namefixer
 			if ($cats === 3) {
 			$query = "SELECT rel.ID AS releaseID FROM releases rel "
 				. "INNER JOIN releasenfo nfo ON (nfo.releaseID = rel.ID) "
-				. "WHERE nzbstatus = 1 AND preID IS NULL";
+				. "WHERE preID IS NULL";
 			$cats = 2;
             $preid = true;
 		} else {
@@ -129,7 +129,7 @@ class Namefixer
 			$query = "SELECT relfiles.name AS textstring, rel.categoryID, rel.searchname, rel.groupID, relfiles.releaseID AS fileID, "
 				. "rel.ID AS releaseID FROM releases rel "
 				. "INNER JOIN releasefiles relfiles ON (relfiles.releaseID = rel.ID) "
-				. "WHERE nzbstatus = 1 AND preID IS NULL";
+				. "WHERE preID IS NULL";
 			$cats = 2;
             $preid = true;
 		} else {
@@ -191,7 +191,7 @@ class Namefixer
         $functions = new Functions();
 		$type = "PAR2, ";
 		if ($cats === 3) {
-			$query = "SELECT rel.ID AS releaseID, rel.guid, rel.groupID FROM releases rel WHERE nzbstatus = 1 AND preID IS NULL";
+			$query = "SELECT rel.ID AS releaseID, rel.guid, rel.groupID FROM releases rel WHERE preID IS NULL";
 			$cats = 2;
 		} else {
 			$query = "SELECT rel.ID AS releaseID, rel.guid, rel.groupID FROM releases rel WHERE (isrenamed = 0 OR rel.categoryID = 8010) AND proc_par2 = 0";
