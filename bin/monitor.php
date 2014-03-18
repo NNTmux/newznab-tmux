@@ -9,7 +9,7 @@ require_once("../test/showsleep.php");
 require_once("../test/functions.php");
 
 
-$version="0.3r1001";
+$version="0.3r1002";
 
 $db = new DB();
 $functions = new Functions();
@@ -953,7 +953,7 @@ $old_session = "$tmux_session";
 
 
 	$total_work_used = $total_work_now;
-     if (($postprocess_kill < $total_work_now) && ($postprocess_kill != 0)) {
+     if (($postprocess_kill != 0) && ($postprocess_kill < $total_work_now)  ) {
 		$kill_pp = "true";
 	} else {
 		$kill_pp = "false";
@@ -1160,7 +1160,7 @@ $_sleep = "$_phpn ${DIR}/../test/showsleep.php";
 if ($running == 1){
 	//check if sequential is set
 	if ($seq == 0) {
-	    if ($kill_pp != "true") {
+	    if ($kill_pp == "false") {
 		//runs update_binaries in 0.2 once if needed and exits
 		if (( $maxload >= get_load()) && ($killed != "true") && ($binaries != 0)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
@@ -1313,13 +1313,13 @@ if ($running == 1){
 				$log = writelog($panes0[1]);
 				shell_exec("tmux respawnp -t${tmux_session}:0.1 ' \
 						$_python ${DIR}/../test/import_threaded.py $log; date +\"%D %T\"; $_sleep $import_timer' 2>&1 1> /dev/null");
-			} else if ($kill_pp == "true") {
-				$color = get_color($colors_start, $colors_end, $colors_exc);
-				shell_exec("tmux respawnp -k -t${tmux_session}:0.1 'echo \"\033[38;5;${color}m\n${panes0[1]} has been disabled/terminated by Exceeding Limits\"'");
 			} else if (( $import == 1 ) && ( $maxload <= get_load())) {
                 $color = get_color($colors_start, $colors_end, $colors_exc);
                 shell_exec("$_tmux respawnp -t${tmux_session}:0.4 'echo \"\033[38;5;\"$color\"m\n$panes0[4] Disabled by Max Load\"' 2>&1 1> /dev/null");
-            } else {
+            } else if ($kill_pp == "true") {
+				$color = get_color($colors_start, $colors_end, $colors_exc);
+				shell_exec("tmux respawnp -k -t${tmux_session}:0.1 'echo \"\033[38;5;${color}m\n${panes0[1]} has been disabled/terminated by Exceeding Limits\"'");
+			}  else {
 				$color = get_color($colors_start, $colors_end, $colors_exc);
 				shell_exec("tmux respawnp -k -t${tmux_session}:0.1 'echo \"\033[38;5;${color}m\n${panes0[1]} has been disabled/terminated by Import\"'");
 			}
@@ -1331,7 +1331,7 @@ if ($running == 1){
 		shell_exec("$_tmux respawnp -t${tmux_session}:1.5 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php nzbcount.php 2>&1 $log' 2>&1 1> /dev/null");
 	} else if ( $import == 0 ) {
 		$color = get_color($colors_start, $colors_end, $colors_exc);
-		shell_exec("$_tmux respawnp -t${tmux_session}:1.5 'echo \"\033[38;5;\"$color\"m\n$panes1[5] Disabled by IMPORT\"' 2>&1 1> /dev/null");
+		shell_exec("$_tmux respawnp -t${tmux_session}:1.5 'echo \"\033[38;5;\"$color\"m\n$panes1[5] has been disabled/terminated by Import\"'");
 	} else if ( $maxload <= get_load()) {
                 $color = get_color($colors_start, $colors_end, $colors_exc);
                 shell_exec("$_tmux respawnp -t${tmux_session}:1.5 'echo \"\033[38;5;\"$color\"m\n$panes1[5] Disabled by Max Load\"' 2>&1 1> /dev/null");
