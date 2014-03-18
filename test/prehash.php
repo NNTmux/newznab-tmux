@@ -871,12 +871,12 @@ Class Predb
 			$query = sprintf('SELECT r.ID AS releaseID, r.name, r.searchname, r.categoryID, r.groupID, '
 				. 'dehashstatus, rf.name AS filename FROM releases r '
 				. 'LEFT OUTER JOIN releasefiles rf ON r.ID = rf.releaseID '
-				. 'WHERE nzbstatus = 1 AND preID IS NULL %s', $regex);
+				. 'WHERE preID IS NULL %s', $regex);
 		} else {
 			$query = sprintf('SELECT r.ID AS releaseID, r.name, r.searchname, r.categoryID, r.groupID, '
 				. 'dehashstatus, rf.name AS filename FROM releases r '
 				. 'LEFT OUTER JOIN releasefiles rf ON r.ID = rf.releaseID '
-				. 'WHERE nzbstatus = 1 AND isrenamed = 0 AND dehashstatus BETWEEN -6 AND 0 %s %s %s', $regex, $ct, $tq);
+				. 'WHERE isrenamed = 0 AND dehashstatus BETWEEN -6 AND 0 %s %s %s', $regex, $ct, $tq);
 		}
         $res = $db->queryDirect($query);
         $total = $res->rowCount();

@@ -34,7 +34,7 @@ if (!isset($argv[1])) {
 		$binaries->partRepair($nntp, $groupArr);
 	} else if (isset($pieces[1]) && $pieces[0] == 'binupdate') {
 		$binaries = new Binaries();
-        $functions = new Functions(); 
+        $functions = new Functions();
 		$groupName = $pieces[1];
 		$grp = new Groups();
 		$groupArr = $grp->getByName($groupName);

@@ -23,7 +23,7 @@ $binaries = new Binaries();
 $s = new Sites();
 $site = $s->get();
 $crosspostt = (!empty($site->crossposttime)) ? $site->crossposttime : 2;
-$releasecleaning = new NameCleaner();
+$releasecleaning = new NameCleaning();
 $categorize = new Category();
 $nzbsperhour = $nzbSkipped = $maxtoprocess = 0;
 $consoleTools = new ConsoleTools();
