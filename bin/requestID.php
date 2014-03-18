@@ -4,20 +4,19 @@ require(dirname(__FILE__)."/config.php");
 require_once(WWW_DIR."/lib/framework/db.php");
 require_once(WWW_DIR."/lib/groups.php");
 require_once(WWW_DIR."/lib/category.php");
-require_once("../test/functions.php");
-require_once("../test/ColorCLI.php");
+require_once(dirname(__FILE__).'/../test/functions.php');
+require_once(dirname(__FILE__).'/../test/ColorCLI.php');
 
 $c = new ColorCLI();
 if (!isset($argv[1])) {
 	exit($c->error("This script is not intended to be run manually, it is called from requestid_threaded.py."));
 }
 $pieces = explode('                       ', $argv[1]);
-$web = $pieces[3];
 $db = new DB();
 $n = "\n";
 $category = new Category();
 $groups = new Groups();
-$f = new Funtions();
+$f = new Functions();
 if (!preg_match('/^\[\d+\]/', $pieces[1])) {
 	$db->query('UPDATE releases SET reqidstatus = -2 WHERE ID = ' . $pieces[0]);
 	exit('.');
@@ -34,7 +33,7 @@ if (count($requestIDtmp) >= 1) {
 		if (is_array($newTitle) && $newTitle['title'] != '') {
 			$bFound = true;
 			$local = true;
-		} else if ($web == "True"){
+		} else {
 			$newTitle = getReleaseNameFromRequestID($tmux, $requestID, $pieces[2]);
 			if (is_array($newTitle) && $newTitle['title'] != '') {
 				$bFound = true;
@@ -68,7 +67,7 @@ if ($bFound === true) {
 	$c->headerOver('ReleaseID: ') . $c->primary($pieces[0]);
 	$updated++;
 } else {
-	$db->queryExec('UPDATE releases SET reqidstatus = -3 WHERE ID = ' . $pieces[0]);
+	$db->exec('UPDATE releases SET reqidstatus = -3 WHERE ID = ' . $pieces[0]);
 	echo '.';
 }
 
@@ -97,7 +96,7 @@ function localLookup($requestID, $groupName, $oldname)
 	$db = new DB();
 	$groups = new Groups();
     $f = new Functions();
-	$groupid = $f->getIDByName($groupName);
+	$groupID = $f->getIDByName($groupName);
 	$run = $db->queryOneRow(sprintf("SELECT ID, title FROM prehash WHERE requestID = %d AND groupID = %d", $requestID, $groupID));
 	if (isset($run['title']) && preg_match('/s\d+/i', $run['title']) && !preg_match('/s\d+e\d+/i', $run['title'])) {
 		return false;
