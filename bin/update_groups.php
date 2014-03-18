@@ -5,6 +5,7 @@ require_once(WWW_DIR.'/lib/nntp.php');
 require_once(dirname(__FILE__).'/../test/ColorCLI.php');
 require_once(dirname(__FILE__).'/../test/consoletools.php');
 
+
 $start = TIME();
 $c = new ColorCLI();
 $consoleTools = new ConsoleTools();
@@ -26,7 +27,7 @@ $db = new DB();
 $db->exec('TRUNCATE TABLE shortgroups');
 
 // Put into an array all active groups
-$res = $db->query('SELECT name FROM groups WHERE active = 1 OR backfill = 1');
+$res = $db->query('SELECT name FROM groups WHERE active = 1');
 
 foreach ($data as $newgroup) {
 	if (myInArray($res, $newgroup['group'], 'name')) {

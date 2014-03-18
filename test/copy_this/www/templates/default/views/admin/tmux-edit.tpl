@@ -835,6 +835,14 @@
 				</td>
 			</tr>
 
+            <tr>
+				<td style="width:180px;"><label for="partrepair">Part Repair:</label></td>
+				<td>
+					{html_radios id="partrepair" name='partrepair' values=$yesno_ids output=$yesno_names selected=$ftmux->partrepair separator='<br />'}
+					<div class="hint">Whether to attempt to repair parts or not, increases backfill/binaries updating time.</div>
+				</td>
+			</tr>
+
 			<tr>
 				<td style="width:180px;"><label for="debuginfo">Debug information:</label></td>
 				<td>

@@ -71,11 +71,37 @@ class Functions
     $this->compressedHeaders = ($this->site->compressedheaders == '1') ? true : false;
     $this->safepartrepair = (!empty($this->tmux->safepartrepair)) ? $this->tmux->safepartrepair : 0;
     $this->safebdate = (!empty($this->tmux->safebackfilldate)) ? $this->tmux->safebackfilldate : '2012 - 06 - 24';
+    $this->DoPartRepair = ($this->tmux->partrepair == '0') ? false : true;
+    $this->messagebuffer = (!empty($this->site->maxmssgs)) ? $this->site->maxmssgs : 20000;
+	$this->NewGroupScanByDays = ($this->site->newgroupscanmethod == '1') ? true : false;
+	$this->NewGroupMsgsToScan = (!empty($this->site->newgroupmsgstoscan)) ? $this->site->newgroupmsgstoscan : 50000;
+	$this->NewGroupDaysToScan = (!empty($this->site->newgroupdaystoscan)) ? $this->site->newgroupdaystoscan : 3;
+	$this->partrepairlimit = (!empty($this->tmux->maxpartrepair)) ? $this->tmux->maxpartrepair : 15000;
   }
     /**
 	 * @var object Instance of PDO class.
 	 */
 	private static $pdo = null;
+
+    	/**
+	 * Should we use part repair?
+	 * @var bool
+	 */
+	private $DoPartRepair;
+
+    /**
+	 * How many headers do we download per loop?
+	 * @var int
+	 */
+	public $messagebuffer;
+
+    /**
+	 * How many days to go back on a new group?
+	 * @var bool
+	 */
+	private $NewGroupScanByDays;
+
+
   // database function
     public function queryArray($query)
 
@@ -2680,7 +2706,7 @@ class Functions
 							$dmessage =
 								"Unable to fetch article $post from " .
 								str_replace('alt.binaries', 'a.b', $group) .
-								". Using oldest date from ${groupa['cname']}.";
+								". Using oldest date from ${groupa['bname']}.";
 
 								$this->c->info($dmessage);
 
@@ -2979,7 +3005,7 @@ class Functions
 		// Set first and last, moving the window by maxxMssgs.
 		$last = $groupArr['first_record'] - 1;
 		// Set the initial "chunk".
-		$first = $last - $binaries->messagebuffer + 1;
+		$first = $last - $this->messagebuffer + 1;
 
 		// Just in case this is the last chunk we needed.
 		if ($targetpost > $first) {
@@ -3023,7 +3049,7 @@ class Functions
 			} else {
 				// Keep going: set new last, new first, check for last chunk.
 				$last = $first - 1;
-				$first = $last - $binaries->messagebuffer + 1;
+				$first = $last - $this->messagebuffer + 1;
 				if ($targetpost > $first) {
 					$first = $targetpost;
 				}
@@ -3288,7 +3314,7 @@ class Functions
 		// Set first and last, moving the window by maxxMssgs.
 		$last = $groupArr['first_record'] - 1;
 		// Set the initial "chunk".
-		$first = $last - $binaries->messagebuffer + 1;
+		$first = $last - $this->messagebuffer + 1;
 		// Just in case this is the last chunk we needed.
 		if ($targetpost > $first) {
 			$first = $targetpost;
@@ -3331,7 +3357,7 @@ class Functions
 			} else {
 				// Keep going: set new last, new first, check for last chunk.
 				$last = $first - 1;
-				$first = $last - $binaries->messagebuffer + 1;
+				$first = $last - $this->messagebuffer + 1;
 				if ($targetpost > $first) {
 					$first = $targetpost;
 				}
@@ -3352,10 +3378,335 @@ class Functions
 			);
 	}
 
+    	/**
+	 * Download new headers for a single group.
+	 *
+	 * @param array $groupArr Array of MySQL results for a single group.
+	 * @param object $nntp Instance of class NNTP
+	 *
+	 * @return void
+	 */
+	public function updateGroup($groupArr, $nntp)
+	{
+		if (!isset($nntp)) {
+			$message = "Not connected to usenet(binaries->updateGroup).";
+			exit($this->c->error($message));
+		}
+
+		$this->startGroup = microtime(true);
+		$this->c->primary('Processing ' . str_replace('alt.binaries', 'a.b', $groupArr['name']));
+
+
+		// Select the group, here, needed for processing the group
+		$data = $nntp->selectGroup($groupArr['name']);
+		if ($nntp->isError($data)) {
+			$data = $nntp->dataError($nntp, $groupArr['name']);
+			if ($nntp->isError($data)) {
+				return;
+			}
+		}
+
+		// Attempt to repair any missing parts before grabbing new ones.
+		if ($groupArr['last_record'] != 0) {
+			if ($this->DoPartRepair) {
+					$this->c->primary("Part repair enabled. Checking for missing parts.");
+				$this->partRepair($nntp, $groupArr);
+			} else {
+					$this->c->primary("Part repair disabled by user.");
+				    }
+			    }
+
+		// Get first and last part numbers from newsgroup.
+		$db = $this->db;
+
+		if ($groupArr['last_record'] == 0) {
+			// For new newsgroups - determine here how far you want to go back.
+			if ($this->NewGroupScanByDays) {
+				$first = $this->daytopost($nntp, $groupArr['name'], $this->NewGroupDaysToScan, $data, true);
+				if ($first == '') {
+				$this->c->warning("Skipping group: {$groupArr['name']}");
+					return;
+				}
+			} else {
+				if ($data['first'] > ($data['last'] - ($this->NewGroupMsgsToScan + $this->messagebuffer))) {
+					$first = $data['first'];
+				} else {
+					$first = $data['last'] - ($this->NewGroupMsgsToScan + $this->messagebuffer);
+				}
+			}
+
+			$left = $this->messagebuffer;
+			$last = $grouplast = $data['last'] - $left;
+		} else {
+			$first = $groupArr['last_record'];
+
+			// Leave 50%+ of the new articles on the server for next run (allow server enough time to actually make parts available).
+			$newcount = $data['last'] - $first;
+			$left = 0;
+			if ($newcount > $this->messagebuffer) {
+				// Drop the remaining plus $this->messagebuffer, pick them up on next run
+				if ($newcount < (2 * $this->messagebuffer)) {
+					$left = ((int) ($newcount / 2));
+					$last = $grouplast = ($data['last'] - $left);
+				} else {
+					$remainingcount = $newcount % $this->messagebuffer;
+					$left = $remainingcount + $this->messagebuffer;
+					$last = $grouplast = ($data['last'] - $left);
+				}
+			} else {
+				$left = ((int) ($newcount / 2));
+				$last = $grouplast = ($data['last'] - $left);
+			}
+		}
+
+		// Generate postdate for first record, for those that upgraded.
+		if (is_null($groupArr['first_record_postdate']) && $groupArr['first_record'] != '0') {
+			$newdate = $this->postdate($nntp, $groupArr['first_record'], false, $groupArr['name'], true, 'oldest');
+			if ($newdate !== false) {
+				$first_record_postdate = $newdate;
+			} else {
+				$first_record_postdate = time();
+			}
+
+			$groupArr['first_record_postdate'] = $first_record_postdate;
+
+			$db->exec(sprintf('UPDATE groups SET first_record_postdate = %s WHERE ID = %d', $this->from_unixtime($first_record_postdate), $groupArr['ID']));
+		}
+
+		// Defaults for post record first/last postdate
+		if (is_null($groupArr['first_record_postdate'])) {
+			$first_record_postdate = time();
+		} else {
+			$first_record_postdate = strtotime($groupArr['first_record_postdate']);
+		}
+
+		if (is_null($groupArr['last_record_postdate'])) {
+			$last_record_postdate = time();
+		} else {
+			$last_record_postdate = strtotime($groupArr['last_record_postdate']);
+		}
+
+
+		// Calculate total number of parts.
+		$total = $grouplast - $first;
+		$realtotal = $data['last'] - $first;
+
+		// If total is bigger than 0 it means we have new parts in the newsgroup.
+		if ($total > 0) {
+				if ($groupArr['last_record'] == 0) {
+						$this->c->primary(
+							'New group ' .
+							$data['group'] .
+							' starting with ' .
+							(($this->NewGroupScanByDays) ? $this->NewGroupDaysToScan
+								. ' days' : number_format($this->NewGroupMsgsToScan) .
+								' messages'
+							) .
+							" worth. Leaving " .
+							number_format($left) .
+							" for next pass.\nServer oldest: " .
+							number_format($data['first']) .
+							' Server newest: ' .
+							number_format($data['last']) .
+							' Local newest: ' .
+							number_format($groupArr['last_record'])
+					);
+				} else {
+						$this->c->primary(
+							'Group ' .
+							$data['group'] .
+							' has ' .
+							number_format($realtotal) .
+							" new articles. Leaving " .
+							number_format($left) .
+							" for next pass.\nServer oldest: " .
+							number_format($data['first']) . ' Server newest: ' .
+							number_format($data['last']) .
+							' Local newest: ' .
+							number_format($groupArr['last_record'])
+					);
+				}
+
+			$done = false;
+			// Get all the parts (in portions of $this->messagebuffer to not use too much memory).
+			while ($done === false) {
+				$this->startLoop = microtime(true);
+
+				if ($total > $this->messagebuffer) {
+					if ($first + $this->messagebuffer > $grouplast) {
+						$last = $grouplast;
+					} else {
+						$last = $first + $this->messagebuffer;
+					}
+				}
+				$first++;
+						$this->c->header(
+							"Getting " .
+							number_format($last - $first + 1) .
+							' articles (' . number_format($first) .
+							' to ' .
+							number_format($last) .
+							') from ' .
+							str_replace('alt.binaries', 'a.b', $data['group']) .
+							" - (" .
+							number_format($grouplast - $last) .
+							" articles in queue)."
+					);
+				flush();
+
+				// Get article headers from newsgroup. Let scan deal with nntp connection, else compression fails after first grab
+				$scanSummary = $binaries->scan($nntp, $groupArr, $first, $last);
+
+				// Scan failed - skip group.
+				if ($scanSummary == false) {
+					return;
+				}
+
+				// If new group, update first record & postdate
+				if (is_null($groupArr['first_record_postdate']) && $groupArr['first_record'] == '0') {
+					$groupArr['first_record'] = $scanSummary['firstArticleNumber'];
+
+					if (isset($scanSummary['firstArticleDate'])) {
+						$first_record_postdate = strtotime($scanSummary['firstArticleDate']);
+					}
+
+					$groupArr['first_record_postdate'] = $first_record_postdate;
+
+					$db->exec(sprintf('UPDATE groups SET first_record = %s, first_record_postdate = %s WHERE ID = %d', $scanSummary['firstArticleNumber'], $this->from_unixtime($db->escapeString($first_record_postdate)), $groupArr['ID']));
+				}
+
+				if (isset($scanSummary['lastArticleDate'])) {
+					$last_record_postdate = strtotime($scanSummary['lastArticleDate']);
+				}
+
+				$db->exec(sprintf('UPDATE groups SET last_record = %s, last_record_postdate = %s, last_updated = NOW() WHERE ID = %d', $db->escapeString($scanSummary['lastArticleNumber']), $this->from_unixtime($last_record_postdate), $groupArr['ID']));
+
+				if ($last == $grouplast) {
+					$done = true;
+				} else {
+					$first = $last;
+				}
+            }
+			$timeGroup = number_format(microtime(true) - $this->startGroup, 2);
+				$this->c->primary($data['group'] . ' processed in ' . $timeGroup . " seconds.");
+		    } else {
+					$this->c->primary(
+						'No new articles for ' .
+						$data['group'] .
+						' (first ' .
+						number_format($first) .
+						' last ' .
+						number_format($last) .
+						' grouplast ' .
+						number_format($groupArr['last_record']) .
+						' total ' . number_format($total) .
+						")\n" .
+						"Server oldest: " .
+						number_format($data['first']) .
+						' Server newest: ' .
+						number_format($data['last']) .
+						' Local newest: ' .
+						number_format($groupArr['last_record'])
+				);
+			}
+        }
+
+        /**
+	 * Attempt to get missing headers.
+	 *
+	 * @param $nntp     Instance of class NNTP.
+	 * @param $groupArr The info for this group from mysql.
+	 *
+	 * @return void
+	 */
+	public function partRepair($nntp, $groupArr)
+	{
+		if (!isset($nntp)) {
+			$dmessage = "Not connected to usenet(binaries->partRepair).";
+			exit($this->c->error("Not connected to usenet(binaries->partRepair)."));
+		}
+
+		// Get all parts in partrepair table.
+		$db = $this->db;
+
+		// Check that tables exist, create if they do not
+			$group['prname'] = 'partrepair';
+
+		$missingParts = $db->query(sprintf('SELECT * FROM ' . $group['prname'] . ' WHERE groupID = %d AND attempts < 5 ORDER BY numberID ASC LIMIT %d', $groupArr['ID'], $this->partrepairlimit));
+		$partsRepaired = $partsFailed = 0;
+
+		if (sizeof($missingParts) > 0) {
+				$this->consoleTools->overWritePrimary(
+					'Attempting to repair ' .
+					number_format(sizeof($missingParts)) .
+					" parts."
+				);
+
+			// Loop through each part to group into continuous ranges with a maximum range of messagebuffer/4.
+			$ranges = array();
+			$partlist = array();
+			$firstpart = $lastnum = $missingParts[0]['numberID'];
+			foreach ($missingParts as $part) {
+				if (($part['numberID'] - $firstpart) > ($this->messagebuffer / 4)) {
+					$ranges[] = array('partfrom' => $firstpart, 'partto' => $lastnum, 'partlist' => $partlist);
+					$firstpart = $part['numberID'];
+					$partlist = array();
+				}
+				$partlist[] = $part['numberID'];
+				$lastnum = $part['numberID'];
+			}
+			$ranges[] = array('partfrom' => $firstpart, 'partto' => $lastnum, 'partlist' => $partlist);
+
+			$num_attempted = 0;
+
+			// Download missing parts in ranges.
+			foreach ($ranges as $range) {
+				$this->startLoop = microtime(true);
+
+				$partfrom = $range['partfrom'];
+				$partto = $range['partto'];
+				$partlist = $range['partlist'];
+				$count = sizeof($range['partlist']);
+
+				$num_attempted += $count;
+				$this->consoleTools->overWritePrimary("Attempting repair: " . $this->consoleTools->percentString2($num_attempted - $count + 1, $num_attempted, sizeof($missingParts)) . ': ' . $partfrom . ' to ' . $partto);
+
+				// Get article from newsgroup.
+				$binaries->scan($nntp, $groupArr, $partfrom, $partto, 'update');
+			}
+
+			// Calculate parts repaired
+			$sql = sprintf('SELECT COUNT(ID) AS num FROM ' . $group['prname'] . ' WHERE groupID=%d AND numberID <= %d', $groupArr['ID'], $missingParts[sizeof($missingParts) - 1]['numberID']);
+			$result = $db->queryOneRow($sql);
+			if (isset($result['num'])) {
+				$partsRepaired = (sizeof($missingParts)) - $result['num'];
+			}
+
+			// Update attempts on remaining parts for active group
+			if (isset($missingParts[sizeof($missingParts) - 1]['ID'])) {
+				$sql = sprintf("UPDATE ${group['prname']} SET attempts=attempts+1 WHERE groupID=%d AND numberID <= %d", $groupArr['ID'], $missingParts[sizeof($missingParts) - 1]['numberID']);
+				$result = $db->exec($sql);
+				if ($result) {
+					$partsFailed = $result->rowCount();
+				}
+			}
+
+					$this->c->primary(
+						"\n" .
+						number_format($partsRepaired) .
+						" parts repaired."
+					);
+		}
+
+		// Remove articles that we cant fetch after 5 attempts.
+		$db->exec(sprintf('DELETE FROM ' . $group['prname'] . ' WHERE attempts >= 5 AND groupID = %d', $groupArr['ID']));
+	}
+
 
 
     //end of testing
 
    }
+
 
 ?>

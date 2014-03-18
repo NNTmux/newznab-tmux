@@ -131,6 +131,7 @@ INSERT INTO tmux (setting, value) values ('defrag_cache','900'),
 	('maxbooksprocessed', 300),
 	('maxnzbsprocessed', 1000),
 	('maxpartrepair', 15000),
+    ('partrepair', 1),
 	('binarythreads', 1),
 	('backfillthreads', 1),
 	('postthreads', 1),
@@ -166,7 +167,7 @@ INSERT INTO tmux (setting, value) values ('defrag_cache','900'),
     ('delete_parts', '0'),
     ('delete_timer', '43200');
     ('safebackfilldate', '2012-06-24'),
-    ('safepartrepair', '0'); 
+    ('safepartrepair', '0');
 	('request_hours', '1'),
     ('trakttvkey',''), 
     ('lookuppar2','0'),
@@ -175,7 +176,7 @@ INSERT INTO tmux (setting, value) values ('defrag_cache','900'),
 	('fixnamesperrun', '10'),
     ('max_load', 2.0),
     ('max_load_releases', 2.0),
-    ('sqlpatch','0');
+    ('sqlpatch','4');
 
 DROP TABLE IF EXISTS country;
 CREATE TABLE country (
