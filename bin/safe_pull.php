@@ -4,7 +4,7 @@ require_once(dirname(__FILE__).'/config.php');
 require_once(WWW_DIR.'/lib/nntp.php');
 require_once(dirname(__FILE__).'/../test/ColorCLI.php');
 require_once(dirname(__FILE__).'/../test/consoletools.php');
-require_once(dirname(__FILE__).'/../test/functions.php'); 
+require_once(dirname(__FILE__).'/../test/functions.php');
 
 $c = new ColorCLI();
 
@@ -34,10 +34,11 @@ if (!isset($argv[1])) {
 		$binaries->partRepair($nntp, $groupArr);
 	} else if (isset($pieces[1]) && $pieces[0] == 'binupdate') {
 		$binaries = new Binaries();
+        $functions = new Functions(); 
 		$groupName = $pieces[1];
 		$grp = new Groups();
 		$groupArr = $grp->getByName($groupName);
-		$binaries->updateGroup($nntp, $groupArr);
+		$functions->updateGroup($nntp, $groupArr);
 	} else if (isset($pieces[2]) && ($pieces[2] == 'Binary' || $pieces[2] == 'Backfill')) {
 		$functions = new Functions();
 		$functions->getFinal($pieces[0], $pieces[1], $pieces[2], $nntp);

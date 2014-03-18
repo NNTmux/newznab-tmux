@@ -2921,7 +2921,7 @@ class Functions
 		}
 	}
 
-    	public function backfillGroup($nntp, $db, $binaries, $groupArr, $left)
+    public function backfillGroup($nntp, $db, $binaries, $groupArr, $left)
 	{
 		if (!isset($nntp)) {
 			$dmessage = "Not connected to usenet(backfill->backfillGroup).";
@@ -3020,7 +3020,7 @@ class Functions
 		}
 
 		while ($done === false) {
-			$binaries->startLoop = microtime(true);
+			$this->startLoop = microtime(true);
 
 					$this->c->header(
 					'Getting ' .
@@ -3328,7 +3328,7 @@ class Functions
 		}
 
 		while ($done === false) {
-			$binaries->startLoop = microtime(true);
+			$this->startLoop = microtime(true);
 
 					$this->c->header(
 					"\nGetting " .
