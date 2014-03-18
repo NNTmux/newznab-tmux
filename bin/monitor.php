@@ -4,9 +4,9 @@ require(dirname(__FILE__)."/config.php");
 require(WWW_DIR.'/lib/postprocess.php');
 require_once (WWW_DIR.'/lib/site.php');
 require_once(WWW_DIR.'/lib/Tmux.php');
-require_once("../test/ColorCLI.php");
-require_once("../test/showsleep.php");
-require_once("../test/functions.php");
+require_once(dirname(__FILE__)."/../test/ColorCLI.php");
+require_once(dirname(__FILE__)."/../test/showsleep.php");
+require_once(dirname(__FILE__)."/../test/functions.php");
 
 
 $version="0.3r1006";
@@ -855,12 +855,12 @@ while( $i > 0 )
 		$backfill_groups_date = $split_result[0]['backfill_groups_date'];
 	}
 
-//build queries for shell
+/*//build queries for shell
 $_backfill_increment = "UPDATE groups set backfill_target=backfill_target+1 WHERE active=1 and backfill_target<$backfill_groups_days;";
 $mysql_command_1 = "$_mysql --defaults-file=$_conf/my.cnf -u$_DB_USER -h $_DB_HOST $_DB_NAME -e \"$_backfill_increment\"";
 $reset_bin = "UPDATE binaries SET procstat=0, procattempts=0, regexID=NULL, relpart=0, reltotalpart=0, relname=NULL;";
 $mysql_command_2 = "$_mysql --defaults-file=$_conf/my.cnf -u$_DB_USER -h $_DB_HOST $_DB_NAME -e \"$reset_bin\"";
-$mysqladmin = "$_mysqladmin --defaults-file=$_conf/my.cnf -u$_DB_USER -h $_DB_HOST status | awk '{print $22;}'";
+$mysqladmin = "$_mysqladmin --defaults-file=$_conf/my.cnf -u$_DB_USER -h $_DB_HOST status | awk '{print $22;}'";*/
 
 $old_session = "$tmux_session";
 
