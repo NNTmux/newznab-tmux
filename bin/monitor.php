@@ -9,7 +9,7 @@ require_once(dirname(__FILE__)."/../test/showsleep.php");
 require_once(dirname(__FILE__)."/../test/functions.php");
 
 
-$version="0.3r1012";
+$version="0.3r1013";
 
 $db = new DB();
 $functions = new Functions();
@@ -1112,7 +1112,7 @@ $usptotalconnections  = str_replace("\n", '', shell_exec("ss -n | grep -c " . $i
 		echo "\n";
 		printf($mask3, "Query Block", "Time", "Cumulative");
 		printf($mask3, "======================================", "=========================", "======================================");
-		printf($mask4, "Combined", $tmux_time . " " . $split_time . " " . $init_time . " " . $proc1_time . " " . $proc2_time . " ". $tmux_time . " " . $split1_time . " " . $init1_time . " " . $proc11_time . " " . $proc21_time . " ");
+		printf($mask4, "Combined", $tmux_time . " " . $split_time . " " . $init_time . " " . $proc1_time . " " . $proc2_time . " " . $split1_time . " " . $init1_time . " " . $proc11_time . " " . $proc21_time . " ");
 
 		$pieces = explode(" ", $db->getAttribute(PDO::ATTR_SERVER_INFO));
 		echo $c->primaryOver("\nThreads = ") . $c->headerOver($pieces[4]) . $c->primaryOver(', Opens ') . $c->headerOver($pieces[14]) . $c->primaryOver(', Tables = ') . $c->headerOver($pieces[22]) . $c->primaryOver(', Slow = ') . $c->headerOver($pieces[11]) . $c->primaryOver(', QPS = ') . $c->header($pieces[28]);
