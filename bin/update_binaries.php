@@ -3,12 +3,14 @@
 require(dirname(__FILE__)."/config.php");
 require_once(WWW_DIR."/lib/groups.php");
 require_once(WWW_DIR."/lib/binaries.php");
+require_once(dirname(__FILE__)."/../test/ColorCLI.php");
 $time = TIME();
+$c = new ColorCLI();
 
 if (isset($argv[1]))
 {
         $group = $argv[1];
-        echo "Updating group {$group}\n";
+        echo $c->header("Updating group {$group}");
 
         $g = new Groups;
         $group = $g->getByName($group);
@@ -51,7 +53,7 @@ function relativeTime($_time) {
     return $return;
 }
 
-echo "\n\033[1;33mStock binaries update process completed in: " .relativeTime($time). "\n";
+echo $c->header("Group update process completed in: " .relativeTime($time). "\n");
 
 ?>
 
