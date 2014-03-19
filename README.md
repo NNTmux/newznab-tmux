@@ -1,16 +1,18 @@
 I have forked jonnyboys newznab-tmux as he and the dev team have moved to another project (https://github.com/nZEDb/nZEDb). I will try as much as i can to maintain and improve these tmux scripts, where possible and needed, as they are a valuable addendum to newznab+.
-Support is given on irc.synirc.net #newznab-tmuxd channel and also on original newznab-tmux channel.
+Support is given on irc.synirc.net #tmux channel.
 
 I started adapting some of more interesting scripts from nZEDb, but they require tempering with newznab database, so use them at your own risk. Any update to nn+ db could render them useless. Scripts require PHP version > 5.3.10
-There is a test folder in main tmux folder. In that folder you will find three different folders, /db_update/, /initial_setup/ and /predb_dump/. When you are done with initial setup and before you run start.sh for the first time, do the following:
+There is a test folder in main tmux folder. In that folder you will find two folders, /DB/ and /copy_this/. if you are setting up tmux for the first time, import db.sql using cli (mysql -u {┤your username} -p newznab < db.sql).
 
-1. Import db.sql from db_update folder into newznab database (prehash table creation has been incorporated into db.sql),
+1. Copy files from /test/copy_this/ folder into your newznab installation /www folder. You can now edit tmux settings in newznab admin area. This is available in default template for now.
 
-2. Copy files from /test/copy_this/ folder into your newznab installation to have some of the things in tmux changed in admin area (many things are work in progress and produce no change). This is available in default template for now. 
-
-3. Some of the scripts are now threaded, they need python. Install instructions are in threaded_scripts_readme.txt
+3. Most of the scripts are now threaded, they need python installed. Install instructions are in threaded_scripts_readme.txt
 
 3. OPTIONAL: If you want to populate your prehash table with more than 6 million rows of pre data (This dump includes 6,166,783 unique predb releases.), run dump_prehash.php to import the predb dump. Predb dump can be downloaded from https://mega.co.nz/#!LUsRACZA!Iz4u-0EIKTuIjySp00ESi2a1XcxFPxhppd15Hakb_YE.
+
+Config and defaults.sh have been deprecated and removed from tmux, as did kevin123 scripts too. Newzdash reporting has also been removed from tmux, as newzdash is no longer maintained.
+The /test/DB/patchDB.php script is now used to deal with database changes in tmux.
+Tmus is started with start.php (php start.php command). Scripts not used anymore are still available for your use, but you need to run them manualy.
 
 
 
@@ -26,7 +28,7 @@ Below is the original readme of newznab-tmux, with changes related to my git and
 
  * tmux 1.6 or newer is needed to runs these scripts. These scripts relies on tmux reporting that the "Pane is dead". That is how the script knows that is nothing running in that pane and to restart it for another loop. Seeing "Pane is dead" is normal and expected. If, you are using \*bsd or MacOS, you may need to install [gnu sed(gsed)](http://www.gnu.org/software/software.html) and set the path to it in defaults.sh.
 
- * I have included a deb package to install tmux 1.8. It is located in the packages folder and it can be installed after cloning my git.
+ * I have included a deb package to install tmux 1.8 (there is also a tmux 1.9 package in there). It is located in the packages folder and it can be installed after cloning my git.
 
  * To exit the scripts without any worry of causing problems. Click into the Monitor pane, top left and Ctrl-c, or edit defaults.sh and set running="false". This will stop the monitor script. When all of the other panes show dead, then it is ok to run Ctrl-a c and in new window run killall tmux. The only unsafe time to kill these scripts is when optimize is running. Monitor  will display a warning whenever an optimize is in progress.
 
