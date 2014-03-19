@@ -9,7 +9,7 @@ require_once(dirname(__FILE__)."/../test/showsleep.php");
 require_once(dirname(__FILE__)."/../test/functions.php");
 
 
-$version="0.3r1010";
+$version="0.3r1011";
 
 $db = new DB();
 $functions = new Functions();
