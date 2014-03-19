@@ -151,8 +151,6 @@ INSERT INTO tmux (setting, value) values ('defrag_cache','900'),
     ('lookup_reqids_timer', '40'),
     ('sphinx', '0'),
     ('sphinx_timer', '600'),
-    ('delete_parts', '0'),
-    ('delete_timer', '600'),
     ('movie_timer', '43200'),
     ('fetch_movie', '0'),
     ('unwanted', '0'),
@@ -161,8 +159,6 @@ INSERT INTO tmux (setting, value) values ('defrag_cache','900'),
     ('spotnab_timer', '600'),
     ('predb', '0'),
     ('predb_timer', '600'),
-    ('sphinx', '0'),
-    ('sphinx_timer', '600'),
     ('delete_parts', '0'),
     ('delete_timer', '43200');
     ('safebackfilldate', '2012-06-24'),
@@ -175,7 +171,7 @@ INSERT INTO tmux (setting, value) values ('defrag_cache','900'),
 	('fixnamesperrun', '10'),
     ('max_load', 2.0),
     ('max_load_releases', 2.0),
-    ('sqlpatch','4');
+    ('sqlpatch','5');
 
 DROP TABLE IF EXISTS country;
 CREATE TABLE country (
