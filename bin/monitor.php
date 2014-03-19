@@ -9,7 +9,7 @@ require_once(dirname(__FILE__)."/../test/showsleep.php");
 require_once(dirname(__FILE__)."/../test/functions.php");
 
 
-$version="0.3r1011";
+$version="0.3r1012";
 
 $db = new DB();
 $functions = new Functions();
@@ -130,6 +130,7 @@ $proc_tmux = "SELECT "
     . "(SELECT VALUE FROM tmux WHERE SETTING = 'unwanted') AS unwanted, "
     . "(SELECT VALUE FROM tmux WHERE SETTING = 'fetch_movie') AS fetch_movie, "
     . "(SELECT VALUE FROM tmux WHERE SETTING = 'movie_timer') AS movie_timer, "
+    . "(SELECT VALUE FROM tmux WHERE SETTING = 'showquery') AS show_query, "
     . "(SELECT VALUE FROM tmux WHERE SETTING = 'lookup_reqids') as lookup_reqids, "
     . "(SELECT VALUE FROM tmux WHERE SETTING = 'lookup_reqids_timer') as lookup_reqids_timer, "
     . "(SELECT VALUE FROM site WHERE SETTING = 'lookupbooks') as processbooks, "
@@ -412,6 +413,8 @@ $backfill_groups_date = 0;
 $colors_exc = 0;
 $show_query = 0;
 $run_releases = 0;
+$tmux_time = $split_time = $init_time = $proc1_time = $proc2_time = $proc3_time = $split1_time = 0;
+$init1_time = $proc11_time = $proc21_time = $proc31_time = $tpg_count_time = $tpg_count_1_time = 0;
 
 //formatted  output
 $pre_diff = number_format( $prehash_matched - $prehash_start );
@@ -505,6 +508,12 @@ if ($backfilldays == "1") {
 } else {
 	printf($mask4, "Activated", $active_groups . "(" . $all_groups . ")", $backfill_groups_date . "(" . $all_groups . ")");
 }
+echo "\n";
+if ($show_query == 1) {
+	printf($mask3, "Query Block", "Time", "Cumulative");
+	printf($mask3, "======================================", "=========================", "======================================");
+	printf($mask4, "Combined", "0", "0");
+}
 
 $i = 1;
 $monitor = 30;
@@ -534,6 +543,7 @@ while( $i > 0 )
 	//run queries
     $time01 = TIME();
     $proc_tmux_result = $db->query($proc_tmux, false);
+    $tmux_time = (TIME() - $time01);
 	if ((( TIME() - $time19 ) >= $monitor  && $running == 1) || ( $i == 1 )) {
 	    echo $c->info("\nThe numbers(queries) above are currently being refreshed. \nNo pane(script) can be (re)started until these have completed.\n");
 		//get microtime to at start of queries
@@ -771,6 +781,9 @@ while( $i > 0 )
 	}
      if ($proc_tmux_result[0]['delete_timer'] != NULL) {
 		$delete_timer = $proc_tmux_result[0]['delete_timer'];
+	}
+    if ($proc_tmux_result[0]['show_query'] != NULL) {
+		$show_query = $proc_tmux_result[0]['show_query'];
 	}
 
 
@@ -1094,6 +1107,15 @@ $usptotalconnections  = str_replace("\n", '', shell_exec("ss -n | grep -c " . $i
 		printf($mask4, "Activated", $active_groups . "(" . $all_groups . ")", $backfill_groups_days . "(" . $all_groups . ")");
 	} else {
 		printf($mask4, "Activated", $active_groups . "(" . $all_groups . ")", $backfill_groups_date . "(" . $all_groups . ")");
+	}
+    if ($show_query == 1) {
+		echo "\n";
+		printf($mask3, "Query Block", "Time", "Cumulative");
+		printf($mask3, "======================================", "=========================", "======================================");
+		printf($mask4, "Combined", $tmux_time . " " . $split_time . " " . $init_time . " " . $proc1_time . " " . $proc2_time . " ". $tmux_time . " " . $split1_time . " " . $init1_time . " " . $proc11_time . " " . $proc21_time . " ");
+
+		$pieces = explode(" ", $db->getAttribute(PDO::ATTR_SERVER_INFO));
+		echo $c->primaryOver("\nThreads = ") . $c->headerOver($pieces[4]) . $c->primaryOver(', Opens ') . $c->headerOver($pieces[14]) . $c->primaryOver(', Tables = ') . $c->headerOver($pieces[22]) . $c->primaryOver(', Slow = ') . $c->headerOver($pieces[11]) . $c->primaryOver(', QPS = ') . $c->header($pieces[28]);
 	}
 
 if ($post_non == 2) {

@@ -145,7 +145,7 @@ Class Predb
 						if (preg_match('/<tr bgcolor=#[df]{6}>.+?<td>(?P<date>.+?)<\/td>(.+?right>(?P<size1>.+?)&nbsp;(?P<size2>.+?)<\/td.+?)?<td>(?P<category>.+?)<\/td.+?<a href=.+?(<a href="(?P<nfo>.+?)">nfo<\/a>.+)?<td>(?P<title>.+?)<\/td.+tr>/s', $m, $matches2))
 						{
 						    $md5 = $db->escapeString(md5($matches2['title']));
-							$oldname = $db->queryOneRow(sprintf('SELECT md5, source, id, nfo FROM predb WHERE md5 = %s', $md5));
+							$oldname = $db->queryOneRow(sprintf('SELECT md5, source, ID, nfo FROM prehash WHERE md5 = %s', $md5));
 							if ($oldname !== false) {
 								if ($oldname["nfo"] != NULL)
 									continue;
@@ -216,7 +216,7 @@ Class Predb
 						{
 						    $title = preg_replace('/\s+- omgwtfnzbs\.org/', '', $matches2['title']);
 							$md5 = $db->escapeString(md5($title));
-							$oldname = $db->queryOneRow(sprintf('SELECT md5, source, id FROM predb WHERE md5 = %s', $md5));
+							$oldname = $db->queryOneRow(sprintf('SELECT md5, source, ID FROM prehash WHERE md5 = %s', $md5));
 							if ($oldname !== false) {
 								if ($oldname['source'] == 'womble' || $oldname['source'] == 'omgwtfnzbs') {
 									continue;
@@ -283,7 +283,7 @@ Class Predb
 									                                $category = 'NULL';
                                                                     }
                                                                 if (strlen($title) > 15) {
-                                                                    if ($db->queryInsert(sprintf('INSERT IGNORE INTO prehash (title, size, category, predate, adddate, source, md5) VALUES (%s, %s, %s, %s, now(), %s, %s)', $title, $size, $category, $db->escapeString($matches2['predate']), $db->escapeString('zenet'), $md5)));{
+                                                                    if ($db->queryInsert(sprintf('INSERT INTO prehash (title, size, category, predate, adddate, source, md5) VALUES (%s, %s, %s, %s, now(), %s, %s)', $title, $size, $category, $db->escapeString($matches2['predate']), $db->escapeString('zenet'), $md5)));{
                                                                 $newnames++;
                                                                 }
                                                         }
@@ -795,8 +795,6 @@ Class Predb
 		}
 
 		$res = $db->queryDirect('SELECT p.ID AS preID, r.ID AS releaseID FROM prehash p INNER JOIN releases r ON p.title = r.searchname WHERE r.preID IS NULL');
-        //$row = mysqli_fetch_array($res);
-        //$total = $row [0];
         $total = $res->rowCount();
         if($total > 0)
         {
@@ -949,7 +947,7 @@ Class Predb
     public function getOne($preID)
 	{
 		$db = new DB();
-		return $db->queryOneRow(sprintf('SELECT * FROM predb WHERE id = %d', $preID));
+		return $db->queryOneRow(sprintf('SELECT * FROM prehash WHERE ID = %d', $preID));
 	}
 
 	public function getWebPage($url)
