@@ -843,6 +843,23 @@
 				</td>
 			</tr>
 
+            <tr>
+				<td style="width:180px;"><label for="zippath">7za Path:</label></td>
+				<td>
+					<input id="zippath" class="long" name="zippath" type="text" value="{$ftmux->zippath}" />
+					<div class="hint">The path to the 7za/p7zip in Ubuntu 13.10 (7zip command line in windows) binary, used for grabbing nfos from compressed zip files.
+						<br/>Use forward slashes in windows <span style="font-family:courier;">c:/path/to/7z.exe</span></div>
+				</td>
+			</tr>
+
+            <tr>
+				<td style="width:180px;"><label for="processjpg">Process JPG:</label></td>
+				<td>
+					{html_radios id="processjpg" name='processjpg' values=$yesno_ids output=$yesno_names selected=$ftmux->processjpg separator='<br />'}
+					<div class="hint">Whether to attempt to retrieve a JPG file while additional post processing, these are usually on XXX releases.<br/></div>
+				</td>
+			</tr>
+
 			<tr>
 				<td style="width:180px;"><label for="debuginfo">Debug information:</label></td>
 				<td>

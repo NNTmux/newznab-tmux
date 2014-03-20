@@ -611,6 +611,7 @@ class Functions
 			$processMediainfo = ($this->site->mediainfopath != '') ? true : false;
 			$processAudioinfo = ($this->site->mediainfopath != '') ? true : false;
 			$processPasswords = ($this->site->unrarpath != '') ? true : false;
+            $processJPGSample = ($this->tmux->processjpg === '0') ? false : true;
 			$tmpPath = $this->tmpPath;
 
 			// Loop through the releases.
@@ -731,14 +732,14 @@ class Functions
 					}
 
 					// Look for a JPG picture.
-					/*if ($processJPGSample === true && !preg_match('/flac|lossless|mp3|music|inner-sanctum|sound/i', $groupName) && preg_match('/\.(jpg|jpeg)[. ")\]]/i', $nzbcontents['title'])) {
+					if ($processJPGSample === true && !preg_match('/flac|lossless|mp3|music|inner-sanctum|sound/i', $groupName) && preg_match('/\.(jpg|jpeg)[. ")\]]/i', $nzbcontents['title'])) {
 						if (isset($nzbcontents['segments']) && empty($jpgmsgid)) {
 							$jpggroup = $groupName;
 							$jpgmsgid[] = $nzbcontents['segments'][0];
 							if (count($nzbcontents['segments']) > 1)
 								$jpgmsgid[] = $nzbcontents['segments'][1];
 						}
-					} */
+					}
 					if (preg_match($this->ignorebookregex, $nzbcontents['title']))
 						$ignoredbooks++;
 				}
@@ -888,18 +889,18 @@ class Functions
 										$blnTookAudioinfo = $this->p->getAudioSample($this->tmpPath, $rel['guid']);
 										@unlink($this->tmpPath . 'sample.' . $name[2]);
 									}
-									/*if ($processJPGSample === true && $blnTookJPG === false && preg_match('/\.(jpg|jpeg)$/', $file)) {
+									if ($processJPGSample === true && $blnTookJPG === false && preg_match('/\.(jpg|jpeg)$/', $file)) {
 										if (filesize($this->tmpPath . $file) < 15) {
 											continue;
 										}
 										if (exif_imagetype($this->tmpPath . $file) === false) {
 											continue;
 										}
-										$blnTookJPG = $ri->saveImage($rel['guid'] . '_thumb', $this->tmpPath . $file, $ri->jpgSavePath, 650, 650);
+										$blnTookJPG = $ri->saveImage($rel['guid'] . '_thumb', $this->tmpPath . $file, $ri->imgSavePath, 650, 650);
 										if ($blnTookJPG !== false) {
 											$this->db->exec(sprintf('UPDATE releases SET jpgstatus = %d WHERE ID = %d', 1, $rel['ID']));
 										}
-									}*/
+									}
 									if ($processSample === true || $processVideo === true || $processMediainfo === true) {
 										if (preg_match('/(.*)' . $this->videofileregex . '$/i', $file, $name)) {
 											rename($this->tmpPath . $name[0], $this->tmpPath . 'sample.avi');
@@ -1010,7 +1011,7 @@ class Functions
 				}
 
 				// Download JPG file.
-				/*if ($processJPGSample === true && !empty($jpgmsgid) && $blnTookJPG === false) {
+				if ($processJPGSample === true && !empty($jpgmsgid) && $blnTookJPG === false) {
 					$jpgBinary = $nntp->getMessages($jpggroup, $jpgmsgid);
 					if ($nntp->isError($jpgBinary)) {
 						$nntp->doQuit();
@@ -1025,7 +1026,7 @@ class Functions
 						$this->addmediafile($this->tmpPath . 'samplepicture.jpg', $jpgBinary);
 						if (is_dir($this->tmpPath) && is_file($this->tmpPath . 'samplepicture.jpg')) {
 							if (filesize($this->tmpPath . 'samplepicture.jpg') > 15 && exif_imagetype($this->tmpPath . 'samplepicture.jpg') !== false && $blnTookJPG === false) {
-								$blnTookJPG = $ri->saveImage($rel['guid'] . '_thumb', $this->tmpPath . 'samplepicture.jpg', $ri->jpgSavePath, 650, 650);
+								$blnTookJPG = $ri->saveImage($rel['guid'] . '_thumb', $this->tmpPath . 'samplepicture.jpg', $ri->imgSavePath, 650, 650);
 								if ($blnTookJPG !== false)
 									$this->db->exec(sprintf('UPDATE releases SET jpgstatus = %d WHERE ID = %d', 1, $rel['ID']));
 							}
@@ -1039,7 +1040,7 @@ class Functions
 						if ($this->echooutput)
 							echo 'f';
 					}
-				} */
+				}
 
 				// Set up release values.
 				$hpsql = $isql = $vsql = $jsql = '';
@@ -1517,7 +1518,7 @@ class Functions
 						if (preg_match($this->supportfiles . ')(?!.{20,})/i', $file['name']))
 							continue;
 
-						/*if (preg_match('/\.zip$/i', $file['name'])) {
+						if (preg_match('/\.zip$/i', $file['name'])) {
 							$zipdata = $rar->getFileData($file['name'], $file['source']);
 							$data = $this->processReleaseZips($zipdata, false, true, $release, $nntp);
 
@@ -1527,7 +1528,7 @@ class Functions
 										$tmpfiles = $this->getRar($d['data']);
 								}
 							}
-						}*/
+						}
 
 						if (!isset($file['next_offset']))
 							$file['next_offset'] = 0;
@@ -1593,6 +1594,181 @@ class Functions
 			$retval = false;
 		unset($fetchedBinary, $rar, $rf, $nfo);
 		return $retval;
+	}
+
+    /**
+	 * Open the zip, see if it has a password, attempt to get a file.
+	 *
+	 * @note Called by processReleaseFiles
+	 *
+	 * @param $fetchedBinary
+	 * @param bool $open
+	 * @param bool $data
+	 * @param $release
+	 * @param $nntp
+	 *
+	 * @return array|bool
+	 */
+	protected function processReleaseZips($fetchedBinary, $open = false, $data = false, $release, $nntp)
+	{
+		if (!isset($nntp)) {
+			exit($this->c->error("Not connected to usenet(Functions->processReleaseZips).\n"));
+		}
+
+		// Load the ZIP file or data.
+		$zip = new ZipInfo();
+		if ($open)
+			$zip->open($fetchedBinary, true);
+		else
+			$zip->setData($fetchedBinary, true);
+
+		if ($zip->error) {
+			$this->c->error('processReleaseZips', 'ZIP Error: ' . $zip->error);
+			return false;
+		}
+
+		if (!empty($zip->isEncrypted)) {
+			$this->c->error('processReleaseZips', 'ZIP archive is password encrypted for release ' . $release['ID']);
+			$this->password = true;
+			return false;
+		}
+
+		$files = $zip->getFileList();
+		$dataArray = array();
+		if ($files !== false) {
+
+			if ($this->echooutput) {
+				echo 'z';
+			}
+			foreach ($files as $file) {
+				$thisData = $zip->getFileData($file['name']);
+				$dataArray[] = array('zip' => $file, 'data' => $thisData);
+
+				// Process RARs inside the ZIP.
+				if (preg_match('/\.(r\d+|part\d+|rar)$/i', $file['name']) || preg_match('/\bRAR\b/i', $thisData)) {
+
+					$tmpFiles = $this->getRar($thisData);
+					if ($tmpFiles !== false) {
+
+						$limit = 0;
+						foreach ($tmpFiles as $f) {
+
+							if ($limit++ > 11) {
+								break;
+							}
+							$this->addFile($f, $release, $rar = false, $nntp);
+							$files[] = $f;
+						}
+					}
+				}
+				//Extract a NFO from the zip.
+				else if ($this->nonfo === true && $file['size'] < 100000 && preg_match('/\.(nfo|inf|ofn)$/i', $file['name'])) {
+					if ($file['compressed'] !== 1) {
+						if ($this->addAlternateNfo($this->db, $thisData, $release, $nntp)) {
+							$this->c->error('processReleaseZips', 'Added NFO from ZIP file for releaseID ' . $release['ID']);
+							if ($this->echooutput) {
+								echo 'n';
+							}
+							$this->nonfo = false;
+						}
+					} else if ($this->tmux->zippath !== '' && $file['compressed'] === 1) {
+
+						$zip->setExternalClient($this->tmux->zippath);
+						$zipData = $zip->extractFile($file['name']);
+						if ($zipData !== false && strlen($zipData) > 5) {
+							if ($this->addAlternateNfo($this->db, $zipData, $release, $nntp)) {
+
+								$this->c->error('processReleaseZips', 'Added compressed NFO from ZIP file for releaseID ' . $release['ID']);
+								if ($this->echooutput) {
+									echo 'n';
+								}
+
+								$this->nonfo = false;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		if ($data) {
+			$files = $dataArray;
+			unset($dataArray);
+		}
+
+		unset($fetchedBinary, $zip);
+		return $files;
+	}
+
+	/**
+	 * Get contents of rar file.
+	 *
+	 * @note Called by processReleaseFiles and processReleaseZips
+	 *
+	 * @param $fetchedBinary
+	 *
+	 * @return array|bool
+	 */
+	protected function getRar($fetchedBinary)
+	{
+		$rar = new ArchiveInfo();
+		$files = $retVal = false;
+		if ($rar->setData($fetchedBinary, true)) {
+			// Useless?
+			$files = $rar->getArchiveFileList();
+		}
+		if ($rar->error) {
+			$this->c->error('getRar', 'RAR Error: ' . $rar->error);
+			return $retVal;
+		}
+		if (!empty($rar->isEncrypted)) {
+			$this->c->error('getRar', 'Archive is password encrypted.');
+			$this->password = true;
+			return $retVal;
+		}
+		$tmp = $rar->getSummary(true, false);
+
+		if (isset($tmp['is_encrypted']) && $tmp['is_encrypted'] != 0) {
+			$this->c->error('getRar', 'Archive is password encrypted.');
+			$this->password = true;
+			return $retVal;
+		}
+		$files = $rar->getArchiveFileList();
+		if ($files !== false) {
+			$retVal = array();
+			if ($this->echooutput !== false) {
+				echo 'r';
+			}
+			foreach ($files as $file) {
+				if (isset($file['name'])) {
+					if (isset($file['error'])) {
+						$this->c->error('getRar', "Error: {$file['error']} (in: {$file['source']})");
+						continue;
+					}
+					if (isset($file['pass']) && $file['pass'] == true) {
+						$this->password = true;
+						break;
+					}
+					if (preg_match($this->supportFiles . ')(?!.{20,})/i', $file['name'])) {
+						continue;
+					}
+					if (preg_match('/([^\/\\\\]+)(\.[a-z][a-z0-9]{2,3})$/i', $file['name'], $name)) {
+						$rarFile = $this->tmpPath . $name[1] . mt_rand(0, 99999) . $name[2];
+						$fetchedBinary = $rar->getFileData($file['name'], $file['source']);
+						if ($this->site->mediainfopath !== '') {
+							$this->addMediaFile($rarFile, $fetchedBinary);
+						}
+					}
+					if (!preg_match('/\.(r\d+|part\d+)$/i', $file['name'])) {
+						$retVal[] = $file;
+					}
+				}
+			}
+		}
+
+		if (count($retVal) === 0)
+			return false;
+		return $retVal;
 	}
 
     public function updateReleaseHasPreview($guid)
@@ -2789,7 +2965,6 @@ class Functions
 	{
 		if (!isset($nntp)) {
 			$dmessage = "Not connected to usenet(backfill->backfillPostAllGroups).\n";
-			$this->debugging->start("backfillPostAllGroups", $dmessage, 1);
 			exit($this->c->error($dmessage));
 		}
 
@@ -2821,7 +2996,7 @@ class Functions
 				$counter++;
 			}
 		} else {
-			$dmessage = "No groups specified. Ensure groups are added to nZEDb's database for updating.";
+			$dmessage = "No groups specified. Ensure groups are added to newznab's database for updating.";
 
 				$this->c->warning($dmessage);
 		}
@@ -2914,9 +3089,7 @@ class Functions
 				$counter++;
 			}
 		} else {
-			$dmessage = "No groups specified. Ensure groups are added to nZEDb's database for updating.";
-			$this->debugging->start("backfillAllGroups", $dmessage, 1);
-
+			$dmessage = "No groups specified. Ensure groups are added to newznab's database for updating.";
 				$this->c->primary . $dmessage . $this->c->rsetColor();
 		}
 	}
