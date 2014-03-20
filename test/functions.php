@@ -68,6 +68,7 @@ class Functions
     $this->service = '';
     $this->debug = ($this->tmux->debuginfo == "0") ? false : true;
     $this->imgSavePath = WWW_DIR.'covers/console/';
+    $this->jpgSavePath = WWW_DIR.'covers/sample/';
     $this->compressedHeaders = ($this->site->compressedheaders == '1') ? true : false;
     $this->safepartrepair = (!empty($this->tmux->safepartrepair)) ? $this->tmux->safepartrepair : 0;
     $this->safebdate = (!empty($this->tmux->safebackfilldate)) ? $this->tmux->safebackfilldate : '2012 - 06 - 24';
@@ -100,6 +101,13 @@ class Functions
 	 * @var bool
 	 */
 	private $NewGroupScanByDays;
+
+    /**
+	 * Path to save large jpg pictures(xxx).
+	 *
+	 * @var string
+	 */
+	public $jpgSavePath;
 
 
   // database function
@@ -896,7 +904,7 @@ class Functions
 										if (exif_imagetype($this->tmpPath . $file) === false) {
 											continue;
 										}
-										$blnTookJPG = $ri->saveImage($rel['guid'] . '_thumb', $this->tmpPath . $file, $ri->imgSavePath, 650, 650);
+										$blnTookJPG = $ri->saveImage($rel['guid'] . '_thumb', $this->tmpPath . $file, $this->jpgSavePath, 650, 650);
 										if ($blnTookJPG !== false) {
 											$this->db->exec(sprintf('UPDATE releases SET jpgstatus = %d WHERE ID = %d', 1, $rel['ID']));
 										}
@@ -1026,7 +1034,7 @@ class Functions
 						$this->addmediafile($this->tmpPath . 'samplepicture.jpg', $jpgBinary);
 						if (is_dir($this->tmpPath) && is_file($this->tmpPath . 'samplepicture.jpg')) {
 							if (filesize($this->tmpPath . 'samplepicture.jpg') > 15 && exif_imagetype($this->tmpPath . 'samplepicture.jpg') !== false && $blnTookJPG === false) {
-								$blnTookJPG = $ri->saveImage($rel['guid'] . '_thumb', $this->tmpPath . 'samplepicture.jpg', $ri->imgSavePath, 650, 650);
+								$blnTookJPG = $ri->saveImage($rel['guid'] . '_thumb', $this->tmpPath . 'samplepicture.jpg', $this->jpgSavePath, 650, 650);
 								if ($blnTookJPG !== false)
 									$this->db->exec(sprintf('UPDATE releases SET jpgstatus = %d WHERE ID = %d', 1, $rel['ID']));
 							}

@@ -9,7 +9,7 @@ require_once(dirname(__FILE__)."/../test/showsleep.php");
 require_once(dirname(__FILE__)."/../test/functions.php");
 
 
-$version="0.3r1017";
+$version="0.3r1018";
 
 $db = new DB();
 $functions = new Functions();
@@ -150,14 +150,6 @@ $split_query = "SELECT "
 //get first release inserted datetime and oldest posted datetime
 //$posted_date = "SELECT(SELECT UNIX_TIMESTAMP(adddate) from releases order by adddate asc limit 1) AS adddate;";
 
-//get variables from defaults.sh
-/*$path = dirname(__FILE__);
-$varnames = shell_exec("cat ".$path."/../defaults.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
-$vardata = shell_exec("cat ".$path."/../defaults.sh | grep ^export | cut -d \\\" -f2 | awk '{print $1;}'");
-$varnames = explode("\n", $varnames);
-$vardata = explode("\n", $vardata);
-$array = array_combine($varnames, $vardata);
-unset($array['']);*/
 
 //environment
 $_nice = getenv('NICE');
@@ -522,9 +514,9 @@ $fcnum = 0;
 
 while( $i > 0 )
 {
-     //kill mediainfo and ffmpeg if exceeds 60 sec
-	shell_exec("killall -o 60s -9 mediainfo 2>&1 1> /dev/null");
-	shell_exec("killall -o 60s -9 ffmpeg 2>&1 1> /dev/null");
+     //kill mediainfo and ffmpeg if exceeds 120 sec
+	shell_exec("killall -o 120s -9 mediainfo 2>&1 1> /dev/null");
+	shell_exec("killall -o 120s -9 ffmpeg 2>&1 1> /dev/null");
 
 	//get microtime at start of loop
 	$time_loop_start = microtime_float();
