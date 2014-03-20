@@ -9,7 +9,7 @@ require_once(dirname(__FILE__)."/../test/showsleep.php");
 require_once(dirname(__FILE__)."/../test/functions.php");
 
 
-$version="0.3r1018";
+$version="0.3r1019";
 
 $db = new DB();
 $functions = new Functions();
@@ -514,9 +514,9 @@ $fcnum = 0;
 
 while( $i > 0 )
 {
-     //kill mediainfo and ffmpeg if exceeds 120 sec
-	shell_exec("killall -o 120s -9 mediainfo 2>&1 1> /dev/null");
-	shell_exec("killall -o 120s -9 ffmpeg 2>&1 1> /dev/null");
+     //kill mediainfo and ffmpeg if exceeds 60 sec
+	shell_exec("killall -o 60s -9 mediainfo 2>&1 1> /dev/null");
+	shell_exec("killall -o 60s -9 ffmpeg 2>&1 1> /dev/null");
 
 	//get microtime at start of loop
 	$time_loop_start = microtime_float();
@@ -1482,7 +1482,7 @@ if ($running == 1){
 		shell_exec("tmux respawnp -t${tmux_session}:1.4 'echo \"\033[38;5;\"$color\"m\n$panes1[4] Disabled by Fetch Movie\"' 2>&1 1> /dev/null");
 	}
 
-	//runs postprocess_nfo.php in pane 2.0 once if needed then exits
+	//runs postprocess_nfo.php in pane 2.0
 	if (($maxload >= get_load()) && ($post == 2) && ($nfo_remaining_now > 0)) {
 				$log = writelog($panes2[0]);
 				shell_exec("tmux respawnp -t${tmux_session}:2.0 ' \
