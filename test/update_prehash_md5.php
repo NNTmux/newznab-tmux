@@ -9,7 +9,7 @@ require_once("prehash.php");
 
 $db = new DB();
 $consoletools = new ConsoleTools();
-$predb = new PreDb();
+$predb = new PreHash();
 $c = new ColorCLI();
 
 if (!isset($argv[1]) || $argv[1] != 'true') {

@@ -15,7 +15,7 @@ require_once("simple_html_dom.php");
  * Class for inserting names/categories/md5 etc from predb sources into the DB, also for matching names on files / subjects.
  */
  // This script is adapted from nZEDb
-Class Predb
+Class PreHash
 {
 	function __construct($echooutput=false)
 	{
@@ -935,6 +935,13 @@ Class Predb
 
 		$parr = $db->query(sprintf('SELECT p.*, r.guid FROM prehash p LEFT OUTER JOIN releases r ON p.ID = r.preID %s ORDER BY p.adddate DESC LIMIT %d OFFSET %d', $search, $offset2, $offset));
 		return array('arr' => $parr, 'count' => $count);
+	}
+
+    // Returns a single row for a release.
+	public function getForRelease($preID)
+	{
+		$db = new DB();
+		return $db->query(sprintf('SELECT * FROM prehash WHERE ID = %d', $preID));
 	}
 
 	public function getCount()
