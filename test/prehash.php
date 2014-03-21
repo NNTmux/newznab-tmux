@@ -531,7 +531,7 @@ Class PreHash
                                     $db->exec(sprintf("INSERT INTO prehash (title, predate, adddate, source, md5, requestID, groupID, category) VALUES (%s, %s, now(), %s, %s, %s, %d, 'Movies')", $title, $db->escapeString($matches2["predate"]), $db->escapeString('abMooVee'), $md5, $matches2["requestID"], $groupID));
                                         $newnames++;
 									} else {
-										$db->exec(sprintf('UPDATE prehash SET requestID = %s WHERE md5 = %s', $matches2["requestID"], $md5));
+										$db->exec(sprintf('UPDATE prehash SET requestID = %s, groupID = %s WHERE md5 = %s', $matches2["requestID"], $groupID, $md5));
 									}
                                 }
 							}
@@ -574,7 +574,7 @@ Class PreHash
                                     $db->exec(sprintf("INSERT INTO prehash (title, predate, adddate, source, md5, requestID, groupID, category) VALUES (%s, %s, now(), %s, %s, %s, %d, 'TV')", $title, $db->escapeString($matches2["predate"]), $db->escapeString('abTeeVee'), $md5, $matches2["requestID"], $groupID));
                                         $newnames++;
 									} else {
-										$db->exec(sprintf('UPDATE prehash SET requestID = %s WHERE md5 = %s', $matches2["requestID"], $md5));
+										$db->exec(sprintf('UPDATE prehash SET requestID = %s, groupID = %s WHERE md5 = %s', $matches2["requestID"], $groupID, $md5));
 									}
                                 }
 							}
@@ -615,7 +615,7 @@ Class PreHash
                                     $db->exec(sprintf("INSERT INTO prehash (title, predate, adddate, source, md5, requestid, groupid, category) VALUES (%s, %s, now(), %s, %s, %s, %d, 'XXX')", $title, $db->escapeString($matches2["predate"]), $db->escapeString('abErotica'), $md5, $matches2["requestID"], $groupID));
                                 $newnames++;
 									} else {
-										$db->exec(sprintf('UPDATE prehash SET requestID = %s WHERE md5 = %s', $matches2["requestID"], $md5));
+										$db->exec(sprintf('UPDATE prehash SET requestID = %s, groupID = %s WHERE md5 = %s', $matches2["requestID"], $groupID, $md5));
 									}
                                 }
 							}
@@ -656,7 +656,7 @@ Class PreHash
                                     if($db->exec(sprintf("INSERT INTO prehash (title, predate, adddate, source, md5, requestid, groupid) VALUES (%s, %s, now(), %s, %s, %s, %d)", $title, $db->escapeString($matches2["predate"]), $db->escapeString('abForeign'), $md5, $matches2["requestID"], $groupID)));
 						   $newnames++;
 									} else {
-										$db->exec(sprintf('UPDATE prehash SET requestID = %s WHERE md5 = %s', $matches2["requestID"], $md5));
+										$db->exec(sprintf('UPDATE prehash SET requestID = %s, groupID = %s WHERE md5 = %s', $matches2["requestID"], $groupID, $md5));
 									}
                                 }
 							}
