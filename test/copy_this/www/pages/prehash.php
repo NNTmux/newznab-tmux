@@ -5,7 +5,7 @@ if (!$users->isLoggedIn()) {
 	$page->show403();
 }
 
-$predb = new PreDb();
+$predb = new PreHash();
 
 $offset = (isset($_REQUEST["offset"]) && ctype_digit($_REQUEST['offset'])) ? $_REQUEST["offset"] : 0;
 

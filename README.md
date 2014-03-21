@@ -1,7 +1,7 @@
 I have forked jonnyboys newznab-tmux as he and the dev team have moved to another project (https://github.com/nZEDb/nZEDb). I will try as much as i can to maintain and improve these tmux scripts, where possible and needed, as they are a valuable addendum to newznab+.
 Support is given on irc.synirc.net #tmux channel.
 
-I started adapting some of more interesting scripts from nZEDb, but they require tempering with newznab database, so use them at your own risk. Any update to nn+ db could render them useless. Scripts require PHP version > 5.3.10
+I started adapting some of more interesting scripts from nZEDb, but they require tempering with newznab database, so use them at your own risk. Any update to nn+ db could render them useless. Scripts require PHP version > 5.3.10 and Python 2.7x or newer.
 There is a test folder in main tmux folder. In that folder you will find two folders, /DB/ and /copy_this/. if you are setting up tmux for the first time, import db.sql using cli (mysql -u {┤your username} -p newznab < db.sql).
 
 1. Copy files from /test/copy_this/ folder into your newznab installation /www folder. You can now edit tmux settings in newznab admin area. This is available in default template for now.

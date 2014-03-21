@@ -125,12 +125,9 @@ if (isset($_GET["id"]))
 		$predbQuery = $PreDB->getByID($data["preID"]);
 	}
 
-    $prehashQuery = '';
-    if ($data["preID"] > 0)
-    {
+
     $prehash = new PreHash();
-	$pre = $prehash->getForRelease($data['preID']);
-    }
+	$pre = $prehash->getForRelease($data["preID"]);
 
 	$rf = new ReleaseFiles;
 	$releasefiles = $rf->get($data["ID"]);
