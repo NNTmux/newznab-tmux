@@ -141,7 +141,7 @@ function window_colors($tmux_session)
 
 function window_post($tmux_session)
 {
-	exec("tmux new-window -t $tmux_session -n PostProcessing 'printf \"\033]2;processNfosOld\033\"'");
+	exec("tmux new-window -t $tmux_session -n PostProcessing 'printf \"\033]2;processNfos\033\"'");
 	exec("tmux splitw -t $tmux_session:2 -h -p 50 'printf \"\033]2;processGames\033\"'");
 	exec("tmux selectp -t 0; tmux splitw -t $tmux_session:2 -v -p 80 'printf \"\033]2;processTV\033\"'");
     exec("tmux splitw -t $tmux_session:2 -v -p 75 'printf \"\033]2;processMovies\033\"'");
