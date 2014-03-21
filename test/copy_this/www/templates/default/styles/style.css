@@ -137,17 +137,6 @@ table.innerdata td { padding:2px; border-left-width:0; border-bottom-width:0; bo
 table.innerdata th { padding:2px; border-style: none; background-color:#EEE;}
 
 table.input th, table.input td { text-align: left; vertical-align:top; }
-/*
-predb
-*/
-
-.prehash {
-	color:#000;
-	text-align: center;
-}
-.prehash-left {
-	text-align: left;
-}
 
 /*
 form inputs and helpers

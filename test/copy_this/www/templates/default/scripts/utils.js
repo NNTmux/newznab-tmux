@@ -683,7 +683,7 @@ jQuery(function($){
 			  },
 			  text: 'loading...',
 			  ajax: {
-			     url: SERVERROOT + 'ajax_preinfo', 
+			     url: SERVERROOT + 'ajax_preinfo',
 			     type: 'GET',
 			     data: { searchname: searchname }, 
 			     success: function(data, status) {
@@ -711,7 +711,7 @@ jQuery(function($){
 			  ajax: {
 			     url: SERVERROOT + 'ajax_prehashinfo', // URL to the local file
 			     type: 'GET', // POST or GET
-			     data: { ID: preID }, // Data to pass along with your request
+			     data: { id: preid }, // Data to pass along with your request
 			     success: function(data, status) {
 			        this.set('content.text', data);
 			     }
