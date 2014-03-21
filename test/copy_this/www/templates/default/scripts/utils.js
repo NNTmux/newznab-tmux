@@ -709,7 +709,7 @@ jQuery(function($){
 			  ajax: {
 			     url: SERVERROOT + 'ajax_prehashinfo', // URL to the local file
 			     type: 'GET', // POST or GET
-			     data: { id: preid }, // Data to pass along with your request
+			     data: { ID: preID }, // Data to pass along with your request
 			     success: function(data, status) {
 			        this.set('content.text', data);
 			     }
