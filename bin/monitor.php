@@ -9,7 +9,7 @@ require_once(dirname(__FILE__)."/../test/showsleep.php");
 require_once(dirname(__FILE__)."/../test/functions.php");
 
 
-$version="0.3r1019";
+$version="0.3r1020";
 
 $db = new DB();
 $functions = new Functions();
@@ -74,7 +74,7 @@ $proc2 = "SELECT
 	(SELECT COUNT(*) FROM releases WHERE isrenamed = 0 AND isrequestid = 1 AND reqidstatus in (0, -1) OR (reqidstatus = -3 AND adddate > NOW() - INTERVAL 2 HOUR)) AS requestid_inprogress,
 	(SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE reqidstatus = 1 OR reqID IS NOT NULL) AS requestid_matched,
 	(SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE preID IS NOT NULL) AS prehash_matched,
-	(SELECT COUNT(DISTINCT(preID)) FROM releases) AS distinct_prehash_matched";
+	(SELECT COUNT(DISTINCT(preID)) FROM releases WHERE preID > 0) AS distinct_prehash_matched";
 
 $proc_tmux = "SELECT "
     . "(SELECT VALUE FROM tmux WHERE SETTING = 'monitor_delay') AS monitor, "
