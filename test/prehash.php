@@ -919,12 +919,11 @@ Class PreHash
 	{
 		$db = new DB();
 		if ($search !== '') {
-			$like = ($db->dbSystem() === 'mysql' ? 'LIKE' : 'ILIKE');
 			$search = explode(' ', trim($search));
 			if (count($search > 1)) {
-				$search = "$like '%" . implode("%' AND title $like '%", $search) . "%'";
+				$search = "LIKE '%" . implode("%' AND title LIKE '%", $search) . "%'";
 			} else {
-				$search = "$like '%" . $search . "%'";
+				$search = "LIKE '%" . $search . "%'";
 			}
 			$search = 'WHERE title ' . $search;
 			$count = $db->queryOneRow(sprintf('SELECT COUNT(*) AS cnt FROM prehash %s', $search));
