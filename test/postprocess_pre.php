@@ -12,7 +12,7 @@ if ($nntp->doConnect() === false)
 	return;
 }
 $c = new ColorCLI();
-$predb = new Predb ($echooutput = true);
+$predb = new PreHash ($echooutput = true);
 $titles = $predb->updatePre();
 $predb->checkPre($nntp);
 if ($titles > 0) {

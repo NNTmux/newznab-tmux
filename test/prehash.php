@@ -8,14 +8,14 @@ require_once(WWW_DIR."lib/site.php");
 require_once("functions.php");
 require_once("consoletools.php");
 require_once("ColorCLI.php");
-require_once ("nzbcontents.php");
+require_once("nzbcontents.php");
 require_once("simple_html_dom.php");
 
 /*
  * Class for inserting names/categories/md5 etc from predb sources into the DB, also for matching names on files / subjects.
  */
  // This script is adapted from nZEDb
-Class Predb
+Class PreHash
 {
 	function __construct($echooutput=false)
 	{
@@ -531,7 +531,7 @@ Class Predb
                                     $db->exec(sprintf("INSERT INTO prehash (title, predate, adddate, source, md5, requestID, groupID, category) VALUES (%s, %s, now(), %s, %s, %s, %d, 'Movies')", $title, $db->escapeString($matches2["predate"]), $db->escapeString('abMooVee'), $md5, $matches2["requestID"], $groupID));
                                         $newnames++;
 									} else {
-										$db->exec(sprintf('UPDATE prehash SET requestID = %s WHERE md5 = %s', $matches2["requestID"], $md5));
+										$db->exec(sprintf('UPDATE prehash SET requestID = %s, groupID = %s WHERE md5 = %s', $matches2["requestID"], $groupID, $md5));
 									}
                                 }
 							}
@@ -574,7 +574,7 @@ Class Predb
                                     $db->exec(sprintf("INSERT INTO prehash (title, predate, adddate, source, md5, requestID, groupID, category) VALUES (%s, %s, now(), %s, %s, %s, %d, 'TV')", $title, $db->escapeString($matches2["predate"]), $db->escapeString('abTeeVee'), $md5, $matches2["requestID"], $groupID));
                                         $newnames++;
 									} else {
-										$db->exec(sprintf('UPDATE prehash SET requestID = %s WHERE md5 = %s', $matches2["requestID"], $md5));
+										$db->exec(sprintf('UPDATE prehash SET requestID = %s, groupID = %s WHERE md5 = %s', $matches2["requestID"], $groupID, $md5));
 									}
                                 }
 							}
@@ -615,7 +615,7 @@ Class Predb
                                     $db->exec(sprintf("INSERT INTO prehash (title, predate, adddate, source, md5, requestid, groupid, category) VALUES (%s, %s, now(), %s, %s, %s, %d, 'XXX')", $title, $db->escapeString($matches2["predate"]), $db->escapeString('abErotica'), $md5, $matches2["requestID"], $groupID));
                                 $newnames++;
 									} else {
-										$db->exec(sprintf('UPDATE prehash SET requestID = %s WHERE md5 = %s', $matches2["requestID"], $md5));
+										$db->exec(sprintf('UPDATE prehash SET requestID = %s, groupID = %s WHERE md5 = %s', $matches2["requestID"], $groupID, $md5));
 									}
                                 }
 							}
@@ -656,7 +656,7 @@ Class Predb
                                     if($db->exec(sprintf("INSERT INTO prehash (title, predate, adddate, source, md5, requestid, groupid) VALUES (%s, %s, now(), %s, %s, %s, %d)", $title, $db->escapeString($matches2["predate"]), $db->escapeString('abForeign'), $md5, $matches2["requestID"], $groupID)));
 						   $newnames++;
 									} else {
-										$db->exec(sprintf('UPDATE prehash SET requestID = %s WHERE md5 = %s', $matches2["requestID"], $md5));
+										$db->exec(sprintf('UPDATE prehash SET requestID = %s, groupID = %s WHERE md5 = %s', $matches2["requestID"], $groupID, $md5));
 									}
                                 }
 							}
@@ -919,12 +919,11 @@ Class Predb
 	{
 		$db = new DB();
 		if ($search !== '') {
-			$like = ($db->dbSystem() === 'mysql' ? 'LIKE' : 'ILIKE');
 			$search = explode(' ', trim($search));
 			if (count($search > 1)) {
-				$search = "$like '%" . implode("%' AND title $like '%", $search) . "%'";
+				$search = "LIKE '%" . implode("%' AND title LIKE '%", $search) . "%'";
 			} else {
-				$search = "$like '%" . $search . "%'";
+				$search = "LIKE '%" . $search . "%'";
 			}
 			$search = 'WHERE title ' . $search;
 			$count = $db->queryOneRow(sprintf('SELECT COUNT(*) AS cnt FROM prehash %s', $search));
@@ -935,6 +934,13 @@ Class Predb
 
 		$parr = $db->query(sprintf('SELECT p.*, r.guid FROM prehash p LEFT OUTER JOIN releases r ON p.ID = r.preID %s ORDER BY p.adddate DESC LIMIT %d OFFSET %d', $search, $offset2, $offset));
 		return array('arr' => $parr, 'count' => $count);
+	}
+
+    // Returns a single row for a release.
+	public function getForRelease($preID)
+	{
+		$db = new DB();
+		return $db->query(sprintf('SELECT * FROM prehash WHERE ID = %d', $preID));
 	}
 
 	public function getCount()

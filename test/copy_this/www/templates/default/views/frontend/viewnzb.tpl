@@ -149,6 +149,29 @@
 		{if $predb.nuketype != '' && $predb.nukereason != ''}<tr><th>{$predb.nuketype|lower|capitalize}:</th><td>{$predb.nukereason}</td></tr>{/if}
 	{/if}
 
+    	{if $pre|@count > 0}
+		<tr>
+			<th>Prehash:</th>
+			<td style="padding:0;">
+				<table style="width:100%;" class="innerdata highlight">
+					<tr>
+						<th>Title</th>
+						<th class="mid">Date</th>
+						<th class="mid">Source</th>
+						<th class="mid">Size</th>
+					</tr>
+					{foreach from=$pre item=pd}
+						<tr>
+							<td>{$pd.title}</td>
+							<td class="mid">{$pd.predate|date_format}</td>
+							<td class="mid">{$pd.source}</td>
+							{if isset($pd.size)}{if $pd.size > 0}<td class="right">{$pd.size}</td>{/if}{/if}
+						</tr>
+					{/foreach}
+				</table>
+			</td>
+		</tr>
+	{/if}
 	{if $release.haspreview == 2 && $userdata.canpreview == 1}
 		<tr>	
 			<th>Preview:</th>

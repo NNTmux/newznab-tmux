@@ -2,9 +2,9 @@
 	{$site->adbrowse}
 {/if}
 <h1>{$page->title}</h1>
-<form name="presearch" method="get" action="{$smarty.const.WWW_TOP}/prehash" id="custom-search-form" class="form-search form-horizontal col-4 col-lg-4 pull-right">
+<form name="prehashsearch" method="get" action="{$smarty.const.WWW_TOP}/prehash" id="custom-search-form" class="form-search form-horizontal col-4 col-lg-4 pull-right">
 	<div id="search" class="input-group col-12 col-lg-12">
-		<input type="text" class="form-control" placeholder="Search PreDB" id="presearch" name="presearch" value="{$lastSearch|escape:'html'}">
+		<input type="text" class="form-control" placeholder="Search Prehash" id="prehashsearch" name="prehashsearch" value="{$lastSearch|escape:'html'}">
 		<span class="input-group-btn">
 			<button type="submit" value="Go" class="btn btn-default">
 				<i class="icon-search"></i>
@@ -79,6 +79,10 @@
 				{if {$result.source} == abgx}
 					<a title="Visit abgx" href="{$site->dereferrer_link}http://www.abgx.net/rss/x360/posted.rss">
 						abgx.net
+					</a>
+                {elseif in_array({$result.source}, array('abErotica', 'abMooVee', 'abTeeVee', 'abForeign'))}
+					<a title="Visit allfilled {$result.source}" href="{$site->dereferrer_link}http://{$result.source}.allfilled.com/search.php?q={$result.title}&Search=Search">
+						{$result.source}
 					</a>
 				{elseif {$result.source} == omgwtfnzbs}
 					<a title="Visit omgwtfnzbs" href="{$site->dereferrer_link}http://rss.omgwtfnzbs.org/rss-info.php">
