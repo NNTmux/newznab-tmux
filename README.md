@@ -6,9 +6,11 @@ There is a test folder in main tmux folder. In that folder you will find two fol
 
 1. Copy files from /test/copy_this/ folder into your newznab installation /www folder. You can now edit tmux settings in newznab admin area. This is available in default template for now.
 
-3. Most of the scripts are now threaded, they need python installed. Install instructions are in threaded_scripts_readme.txt
+2. Most of the scripts are now threaded, they need python installed. Install instructions are in threaded_scripts_readme.txt
 
-3. OPTIONAL: If you want to populate your prehash table with more than 6 million rows of pre data (This dump includes 6,166,783 unique predb releases.), run dump_prehash.php to import the predb dump. Predb dump can be downloaded from https://mega.co.nz/#!LUsRACZA!Iz4u-0EIKTuIjySp00ESi2a1XcxFPxhppd15Hakb_YE.
+3. You need to create sample folder in you covers folder (aka. /www/covers/sample) so you can have samples taken from releases, mostly XXX, and can be viewed in releases.
+
+4. OPTIONAL: If you want to populate your prehash table with more than 6 million rows of pre data (This dump includes 6,166,783 unique predb releases.), run dump_prehash.php to import the predb dump. Predb dump can be downloaded from https://mega.co.nz/#!LUsRACZA!Iz4u-0EIKTuIjySp00ESi2a1XcxFPxhppd15Hakb_YE.
 
 Config and defaults.sh have been deprecated and removed from tmux, as did kevin123 scripts too. Newzdash reporting has also been removed from tmux, as newzdash is no longer maintained.
 The /test/DB/patchDB.php script is now used to deal with database changes in tmux.

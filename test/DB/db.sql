@@ -4,6 +4,7 @@ ALTER TABLE  `predb`
 ALTER TABLE  `releases`
   ADD `dehashstatus` TINYINT( 1 ) NOT NULL DEFAULT 0,
   ADD `nfostatus` TINYINT NOT NULL DEFAULT 0,
+  ADD `jpgstatus` TINYINT(1) NOT NULL DEFAULT 0,
   ADD `reqidstatus` TINYINT(1) NOT NULL DEFAULT 0 ,
   ADD COLUMN `iscategorized` BIT NOT NULL DEFAULT 0,
   ADD COLUMN `isrenamed` BIT NOT NULL DEFAULT 0,
@@ -151,8 +152,6 @@ INSERT INTO tmux (setting, value) values ('defrag_cache','900'),
     ('lookup_reqids_timer', '40'),
     ('sphinx', '0'),
     ('sphinx_timer', '600'),
-    ('delete_parts', '0'),
-    ('delete_timer', '600'),
     ('movie_timer', '43200'),
     ('fetch_movie', '0'),
     ('unwanted', '0'),
@@ -161,8 +160,6 @@ INSERT INTO tmux (setting, value) values ('defrag_cache','900'),
     ('spotnab_timer', '600'),
     ('predb', '0'),
     ('predb_timer', '600'),
-    ('sphinx', '0'),
-    ('sphinx_timer', '600'),
     ('delete_parts', '0'),
     ('delete_timer', '43200');
     ('safebackfilldate', '2012-06-24'),
@@ -175,7 +172,9 @@ INSERT INTO tmux (setting, value) values ('defrag_cache','900'),
 	('fixnamesperrun', '10'),
     ('max_load', 2.0),
     ('max_load_releases', 2.0),
-    ('sqlpatch','4');
+    ('zippath', ''),
+    ('processjpg', 0),
+    ('sqlpatch','6');
 
 DROP TABLE IF EXISTS country;
 CREATE TABLE country (
@@ -438,6 +437,10 @@ CREATE TABLE shortgroups (
 
 CREATE INDEX ix_shortgroups_id ON shortgroups(ID);
 CREATE INDEX ix_shortgroups_name ON shortgroups(name);
+
+INSERT INTO menu (href, title, tooltip, role, ordinal )
+VALUES ('prehash', 'Prehash',
+	'Prehash', 1, 120);
 
 DROP TRIGGER IF EXISTS check_insert;
 DROP TRIGGER IF EXISTS check_update;

@@ -15,7 +15,7 @@ $tmux = $t->get();
 $patch = (isset($tmux->sqlpatch)) ? $tmux->sqlpatch : 0;
 
 // Check database patch version
-if ($patch < 5) {
+if ($patch < 7) {
 	exit($c->error("\nYour database is not up to date. Please update.\nphp ${DIR}/test/DB/patchDB.php\n"));
 }
 $tmux_session = (isset($tmux->tmux_session)) ? $tmux->tmux_session : 0;
@@ -43,6 +43,13 @@ function writelog($pane)
 	} else {
 		return "";
 	}
+}
+
+//remove folders from tmpunrar
+$tmpunrar = $site->tmpunrarpath;
+if ((count(glob("$tmpunrar/*", GLOB_ONLYDIR))) > 0) {
+	echo $c->info("Removing dead folders from " . $tmpunrar);
+	exec("rm -r " . $tmpunrar . "/*");
 }
 
 function command_exist($cmd)
@@ -134,7 +141,7 @@ function window_colors($tmux_session)
 
 function window_post($tmux_session)
 {
-	exec("tmux new-window -t $tmux_session -n PostProcessing 'printf \"\033]2;processNfos\033\"'");
+	exec("tmux new-window -t $tmux_session -n PostProcessing 'printf \"\033]2;processNfosOld\033\"'");
 	exec("tmux splitw -t $tmux_session:2 -h -p 50 'printf \"\033]2;processGames\033\"'");
 	exec("tmux selectp -t 0; tmux splitw -t $tmux_session:2 -v -p 80 'printf \"\033]2;processTV\033\"'");
     exec("tmux splitw -t $tmux_session:2 -v -p 75 'printf \"\033]2;processMovies\033\"'");

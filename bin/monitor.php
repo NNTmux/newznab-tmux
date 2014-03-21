@@ -9,7 +9,7 @@ require_once(dirname(__FILE__)."/../test/showsleep.php");
 require_once(dirname(__FILE__)."/../test/functions.php");
 
 
-$version="0.3r1015";
+$version="0.3r1021";
 
 $db = new DB();
 $functions = new Functions();
@@ -74,7 +74,7 @@ $proc2 = "SELECT
 	(SELECT COUNT(*) FROM releases WHERE isrenamed = 0 AND isrequestid = 1 AND reqidstatus in (0, -1) OR (reqidstatus = -3 AND adddate > NOW() - INTERVAL 2 HOUR)) AS requestid_inprogress,
 	(SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE reqidstatus = 1 OR reqID IS NOT NULL) AS requestid_matched,
 	(SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE preID IS NOT NULL) AS prehash_matched,
-	(SELECT COUNT(DISTINCT(preID)) FROM releases) AS distinct_prehash_matched";
+	(SELECT COUNT(DISTINCT(preID)) FROM releases WHERE preID > 0) AS distinct_prehash_matched";
 
 $proc_tmux = "SELECT "
     . "(SELECT VALUE FROM tmux WHERE SETTING = 'monitor_delay') AS monitor, "
@@ -150,14 +150,6 @@ $split_query = "SELECT "
 //get first release inserted datetime and oldest posted datetime
 //$posted_date = "SELECT(SELECT UNIX_TIMESTAMP(adddate) from releases order by adddate asc limit 1) AS adddate;";
 
-//get variables from defaults.sh
-/*$path = dirname(__FILE__);
-$varnames = shell_exec("cat ".$path."/../defaults.sh | grep ^export | cut -d \= -f1 | awk '{print $2;}'");
-$vardata = shell_exec("cat ".$path."/../defaults.sh | grep ^export | cut -d \\\" -f2 | awk '{print $1;}'");
-$varnames = explode("\n", $varnames);
-$vardata = explode("\n", $vardata);
-$array = array_combine($varnames, $vardata);
-unset($array['']);*/
 
 //environment
 $_nice = getenv('NICE');
@@ -1346,8 +1338,14 @@ if ($running == 1){
 				}
 				$log = writelog($panes0[1]);
 				shell_exec("tmux respawnp -t${tmux_session}:0.1 'echo \"\033[38;5;${color}m\"; \
+                        rm -rf $tmpunrar/*; \
 						$_python ${DIR}/../test/postprocess_threaded.py additional $log; date +\"%D %T\"; $_sleep $post_timer' 2>&1 1> /dev/null");
-		} else if (($post == 3) && ($work_remaining_now + $pc_releases_proc + $xxx_releases_proc > 0)) {
+		} else if (($post == 2) && ($nfo_remaining_now > 0)) {
+				$log = writelog($panes0[1]);
+				shell_exec("tmux respawnp -t${tmux_session}:0.1 ' \
+                        rm -rf $tmpunrar/*; \
+						$_python ${DIR}/../test/postprocess_threaded.py nfo $log; date +\"%D %T\"; $_sleep $post_timer' 2>&1 1> /dev/null");
+        } else if (($post == 3) && (($nfo_remaining_now > 0) || ($work_remaining_now + $pc_releases_proc + $xxx_releases_proc > 0))) {
 				//run postprocess_releases additional
 				$history = str_replace(" ", '', `tmux list-panes -t${tmux_session}:0 | grep 1: | awk '{print $4;}'`);
 				if ($last_history != $history) {
@@ -1367,13 +1365,13 @@ if ($running == 1){
 				}
 				$log = writelog($panes0[1]);
 				shell_exec("tmux respawnp -t${tmux_session}:0.1 ' \
-						$_python ${DIR}/../test/postprocess_threaded.py additional $log; date +\"%D %T\"; $_sleep $post_timer' 2>&1 1> /dev/null");
-			} else if (($post != 0) && ($work_remaining_now + $pc_releases_proc + $xxx_releases_proc == 0)) {
+                        rm -rf $tmpunrar/*; \
+						$_python ${DIR}/../test/postprocess_threaded.py additional $log;\
+                        $_python ${DIR}/../test/postprocess_threaded.py nfo $log; date +\"%D %T\"; $_sleep $post_timer' 2>&1 1> /dev/null");
+			} else if (($post != 0) && ($nfo_remaining_now == 0) && ($work_remaining_now + $pc_releases_proc + $xxx_releases_proc == 0)) {
 				$color = get_color($colors_start, $colors_end, $colors_exc);
-				shell_exec("tmux respawnp -k -t${tmux_session}:0.1 'echo \"\033[38;5;${color}m\n${panes0[1]} has been disabled/terminated by No Misc to process\"'");
-			} else if ( $maxload <= get_load()) {
-                        shell_exec("tmux respawnp -t${tmux_session}:0.1 'echo \"\033[38;5;\"$color\"m\n$panes0[1] Disabled by Max Load\"' 2>&1 1> /dev/null");
-            } else  {
+				shell_exec("tmux respawnp -k -t${tmux_session}:0.1 'echo \"\033[38;5;${color}m\n${panes0[1]} has been disabled/terminated by No Misc/Nfo to process\"'");
+			} else  {
 				$color = get_color($colors_start, $colors_end, $colors_exc);
 				shell_exec("tmux respawnp -k -t${tmux_session}:0.1 'echo \"\033[38;5;${color}m\n${panes0[1]} has been disabled/terminated by Postprocess Additional\"'");
 			}
@@ -1490,33 +1488,12 @@ if ($running == 1){
 		shell_exec("tmux respawnp -t${tmux_session}:1.4 'echo \"\033[38;5;\"$color\"m\n$panes1[4] Disabled by Fetch Movie\"' 2>&1 1> /dev/null");
 	}
 
-	//runs postprocess_nfo.php in pane 2.0 once if needed then exits
-	if (($maxload >= get_load()) && ($post == 2) && ($nfo_remaining_now > 0)) {
+	//runs postprocess_new.php nfo in pane 2.0
+	if (($maxload >= get_load()) && (($post == 0) || ($post == 1)) && ($nfo_remaining_now > 0)) {
 				$log = writelog($panes2[0]);
 				shell_exec("tmux respawnp -t${tmux_session}:2.0 ' \
-						$_python ${DIR}/../test/postprocess_threaded.py nfo $log; date +\"%D %T\"; $_sleep $post_timer' 2>&1 1> /dev/null");
-    } else if (($maxload >= get_load()) && ($post == 3) && ($nfo_remaining_now > 0)) {
-				//run postprocess_releases nfo
-				$history = str_replace(" ", '', `tmux list-panes -t${tmux_session}:2 | grep 0: | awk '{print $4;}'`);
-				if ($last_history != $history) {
-					$last_history = $history;
-					$time31 = TIME();
-				} else {
-					if (TIME() - $time31 >= $post_kill_timer) {
-						$color = get_color($colors_start, $colors_end, $colors_exc);
-						shell_exec("tmux respawnp -k -t${tmux_session}:2.0 'echo \"\033[38;5;${color}m\n${panes2[0]} has been terminated by Possible Hung thread\"'");
-						$wipe = `tmux clearhist -t${tmux_session}:2.0`;
-						$time31 = TIME();
-					}
-				}
-				$dead2 = str_replace(" ", '', `tmux list-panes -t${tmux_session}:2 | grep dead | grep 0: | wc -l`);
-				if ($dead2 == 1) {
-					$time31 = TIME();
-				}
-				$log = writelog($panes2[0]);
-				shell_exec("tmux respawnp -t${tmux_session}:2.0 ' \
-						$_python ${DIR}/../test/postprocess_threaded.py nfo $log; date +\"%D %T\"; $_sleep $post_timer' 2>&1 1> /dev/null");
-	} else if (($maxload >= get_load()) && ($post != 0) && ($nfo_remaining_now == 0)) {
+						cd $_bin && $_php postprocess_new.php nfo $log; date +\"%D %T\"; $_sleep $post_timer' 2>&1 1> /dev/null");
+    } else if (($maxload >= get_load()) && ($post == 0) && ($nfo_remaining_now == 0)) {
 				$color = get_color($colors_start, $colors_end, $colors_exc);
 				shell_exec("tmux respawnp -k -t${tmux_session}:2.0 'echo \"\033[38;5;${color}m\n${panes2[0]} has been disabled/terminated by No Nfo to process\"'");
 	} else if ( $maxload <= get_load()) {
@@ -1524,7 +1501,7 @@ if ($running == 1){
                 shell_exec("tmux respawnp -t${tmux_session}:2.0 'echo \"\033[38;5;\"$color\"m\n$panes2[0] Disabled by Max Load\"' 2>&1 1> /dev/null");
     } else {
 				$color = get_color($colors_start, $colors_end, $colors_exc);
-				shell_exec("tmux respawnp -k -t${tmux_session}:2.0 'echo \"\033[38;5;${color}m\n${panes2[0]} has been disabled/terminated by Postprocess NFO\"'");
+				shell_exec("tmux respawnp -k -t${tmux_session}:2.0 'echo \"\033[38;5;${color}m\n${panes2[0]} threaded Nfo processing is running in pane 0.1\"'");
     }
 
     //Postprocess TV Releases in pane 2.1
