@@ -173,30 +173,63 @@ if (isset($argv[1]) && $argv[1] == 'true') {
 		return $delcount;
 	}
 
-	// Use the site blacklists to delete releases.
-	function deleteBlacklist($and)
-	{
-		$type = "Blacklist";
-        $groups = new Groups();
-        $functions = new Functions();
-		$db = new DB();
-		$regexes = $db->queryDirect('SELECT regex, ID, groupname FROM binaryblacklist WHERE status = 1 AND optype = 1');
-		$delcount = 0;
-        $count = count($regexes);
-		if($count > 0)
-		{
-			foreach ($regexes as $regex)
-			{
-				$regexsql = "(rf.name REGEXP " . $db->escapeString($regex['regex']) . " OR r.name REGEXP " . $db->escapeString($regex['regex']) . ")";
+ // Use the site blacklists to delete releases.
+function deleteBlacklist($and)
+{
+	$db = new DB();
+	//$binaries = new Binaries();
+
+	$regexes = $db->query('SELECT regex, ID, groupname, msgcol FROM binaryblacklist WHERE status = 1 AND optype = 1');
+	$delcount = 0;
+	$count = count($regexes);
+	if ($count > 0) {
+		foreach ($regexes as $regex) {
+
+			$rMethod = 'REGEXP';
+
+			$regexsql = '';
+			switch ((int) $regex['msgcol']) {
+				case Binaries::BLACKLIST_FIELD_SUBJECT:
+					$regexsql = "LEFT JOIN releasefiles rf ON rf.releaseID = r.ID WHERE (rf.name {$rMethod} " .
+						$db->escapeString($regex['regex']) .
+						" OR r.name {$rMethod} " .
+						$db->escapeString($regex['regex']) .
+						" OR r.searchname {$rMethod} " .
+						$db->escapeString($regex['regex']) .
+						")";
+					break;
+				case Binaries::BLACKLIST_FIELD_FROM:
+					$regexsql = "WHERE r.fromname {$rMethod} " . $db->escapeString($regex['regex']);
+					break;
+				case Binaries::BLACKLIST_FIELD_MESSAGEID:
+					break;
+			}
+
+			if ($regexsql === '') {
+				continue;
+			}
 
 			// Get the group ID if the regex is set to work against a group.
 			$groupID = '';
 			if (strtolower($regex['groupname']) !== 'alt.binaries.*') {
-				$groupID = $functions->getIDByName($regex['groupname']);
-				$groupID = ($groupID === '' ? '' : ' AND r.groupID = ' . $groupID . ' ');
+				$groupIDs = $db->query('SELECT ID FROM groups WHERE name ' . $rMethod . $db->escapeString($regex['groupname']));
+				$gIDcount = count($groupIDs);
+				if ($gIDcount === 0) {
+					continue;
+				} elseif ($gIDcount === 1) {
+					$groupIDs = $groupIDs[0]['ID'];
+				} else {
+					$string = '';
+					foreach ($groupIDs as $ID) {
+						$string .= $ID['ID'] . ',';
+					}
+					$groupIDs = (substr($string, 0, -1));
+				}
+
+				$groupID = ' AND r.groupID in (' . $groupIDs . ') ';
 			}
 
-			$sql = $db->prepare("SELECT r.ID, r.guid, r.searchname FROM releases r LEFT JOIN releasefiles rf ON rf.releaseID = r.ID WHERE {$regexsql} " . $groupID . $and);
+			$sql = $db->prepare("SELECT r.ID, r.guid, r.searchname FROM releases r " . $regexsql . $groupID . $and);
 			$sql->execute();
 			$delcount += deleteReleases($sql, 'Blacklist ' . $regex['ID']);
 		}
@@ -205,7 +238,7 @@ if (isset($argv[1]) && $argv[1] == 'true') {
 }
 
 	$totalDeleted = $gibberishDeleted = $hashedDeleted = $shortDeleted = $executableDeleted = $installBinDeleted = $PURLDeleted = $PassDeleted = $sizeDeleted = $sampleDeleted = $scrDeleted = $blacklistDeleted = 0;
-	
+
    if (isset($argv[3])) {
 	switch ($argv[3]) {
 		case 'gibberish':
