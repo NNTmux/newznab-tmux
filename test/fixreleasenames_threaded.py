@@ -23,7 +23,7 @@ pathname = os.path.abspath(os.path.dirname(sys.argv[0]))
 if len(sys.argv) == 1:
 	print(bcolors.ERROR + "\nAn argument is required\n\n"
 		+ "python " + sys.argv[0] + " [md5, nfo, filename, par2]     ...: To process all previously unprocessed releases, using [md5, nfo, filename, par2].\n"
-		+ "python " + sys.argv[0] + " [nfo, filename, par2] preID                ...: To process all releases not matched to preID, using [nfo, filename, par2].\n"
+		+ "python " + sys.argv[0] + " [nfo, filename, par2] prehashid                ...: To process all releases not matched to prehashID, using [nfo, filename, par2].\n"
 		+ "python " + sys.argv[0] + " nfo clean                                  ...: To process all releases processed by filename, using nfo.\n"
 		+ "python " + sys.argv[0] + " par2 clean                                 ...: To process all releases processed by filename and nfo, using par2.\n"
 		+ bcolors.ENDC)
@@ -37,12 +37,12 @@ if len(sys.argv) == 3 and sys.argv[1] == "nfo" and sys.argv[2] == "clean":
 	clean = " isrenamed = 0 AND proc_files = 1 "
 elif len(sys.argv) == 3 and sys.argv[1] == "par2" and sys.argv[2] == "clean":
 	clean = " isrenamed = 0 AND proc_files = 1 AND proc_nfo = 1 "
-elif len(sys.argv) == 3 and sys.argv[1] == "nfo" and sys.argv[2] == "preid":
-	clean = " preID = IS NULL "
-elif len(sys.argv) == 3 and sys.argv[1] == "par2" and sys.argv[2] == "preid":
-	clean = " preID = IS NULL "
-elif len(sys.argv) == 3 and sys.argv[1] == "filename" and sys.argv[2] == "preid":
-	clean = " preID = IS NULL "
+elif len(sys.argv) == 3 and sys.argv[1] == "nfo" and sys.argv[2] == "prehashid":
+	clean = " prehashID = IS NULL "
+elif len(sys.argv) == 3 and sys.argv[1] == "par2" and sys.argv[2] == "prehashid":
+	clean = " prehashID = IS NULL "
+elif len(sys.argv) == 3 and sys.argv[1] == "filename" and sys.argv[2] == "prehashid":
+	clean = " prehashID = IS NULL "
 else:
 	clean = " isrenamed = 0 "
 

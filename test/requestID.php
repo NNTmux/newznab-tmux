@@ -83,11 +83,11 @@ if (isset($argv[1]) && $argv[1] === "all") {
                 if ($bFound === true)
                 {
                     $title = $newTitle['title'];
-			        $preid = $newTitle['ID'];
+			        $prehashID = $newTitle['ID'];
 	                $groupname = $functions->getByNameByID($row["groupname"]);
 	                $determinedcat = $category->determineCategory($groupname, $title );
 			        $run = $db->queryDirect(sprintf('UPDATE releases SET rageID = NULL, seriesfull = NULL, season = NULL, episode = NULL, tvtitle = NULL, tvairdate = NULL, imdbID = NULL, musicinfoID = NULL, consoleinfoID = NULL, bookinfoID = NULL, "
-								. "anidbID = NULL, preID = %d, reqidstatus = 1, isrenamed = 1, iscategorized = 1, searchname = %s, categoryID = %d WHERE ID = %d', $preid, $db->escapeString($title), $determinedcat, $row['ID']));
+								. "anidbID = NULL, prehashID = %d, reqidstatus = 1, isrenamed = 1, iscategorized = 1, searchname = %s, categoryID = %d WHERE ID = %d', $prehashID, $db->escapeString($title), $determinedcat, $row['ID']));
                     if ($row['searchname'] !== $newTitle)
                     {
                     $counter++;

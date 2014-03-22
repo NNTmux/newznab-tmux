@@ -48,13 +48,13 @@ class Namefixer
         $functions = new Functions ();
 		$type = "NFO, ";
 		// Only select releases we haven't checked here before
-            $preid = false;
+            $prehashID = false;
 			if ($cats === 3) {
 			$query = "SELECT rel.ID AS releaseID FROM releases rel "
 				. "INNER JOIN releasenfo nfo ON (nfo.releaseID = rel.ID) "
-				. "WHERE preID IS NULL";
+				. "WHERE prehashID IS NULL";
 			$cats = 2;
-            $preid = true;
+            $prehashID = true;
 		} else {
 			$query = "SELECT rel.ID AS releaseID FROM releases rel "
 				. "INNER JOIN releasenfo nfo ON (nfo.releaseID = rel.ID) "
@@ -90,7 +90,7 @@ class Namefixer
 					$this->checked++;
 				} else {
 					$this->done = $this->matched = false;
-					$this->checkName($relrow, $echo, $type, $namestatus, $show, $preid);
+					$this->checkName($relrow, $echo, $type, $namestatus, $show, $prehashID);
 					$this->checked++;
 					if ($this->checked % 500 === 0 && $show === 1) {
 						echo $this->c->alternate($this->checked . " NFOs processed.\n");
@@ -124,14 +124,14 @@ class Namefixer
 		$db = new DB();
         $functions = new Functions();
 		$type = "Filenames, ";
-        $preid = false;
+        $prehashID = false;
 	   	if ($cats === 3) {
 			$query = "SELECT relfiles.name AS textstring, rel.categoryID, rel.searchname, rel.groupID, relfiles.releaseID AS fileID, "
 				. "rel.ID AS releaseID FROM releases rel "
 				. "INNER JOIN releasefiles relfiles ON (relfiles.releaseID = rel.ID) "
-				. "WHERE preID IS NULL";
+				. "WHERE prehashID IS NULL";
 			$cats = 2;
-            $preid = true;
+            $prehashID = true;
 		} else {
 			$query = "SELECT relfiles.name AS textstring, rel.categoryID, rel.searchname, rel.groupID, relfiles.releaseID AS fileID, "
 				. "rel.ID AS releaseID FROM releases rel "
@@ -158,7 +158,7 @@ class Namefixer
 			sleep(2);
 			foreach ($relres as $relrow) {
 				$this->done = $this->matched = false;
-				$this->checkName($relrow, $echo, $type, $namestatus, $show, $preid);
+				$this->checkName($relrow, $echo, $type, $namestatus, $show, $prehashID);
 				$this->checked++;
 				if ($this->checked % 500 == 0 && $show === 1) {
 					echo $this->c->alternate($this->checked . " files processed.");
@@ -191,7 +191,7 @@ class Namefixer
         $functions = new Functions();
 		$type = "PAR2, ";
 		if ($cats === 3) {
-			$query = "SELECT rel.ID AS releaseID, rel.guid, rel.groupID FROM releases rel WHERE preID IS NULL";
+			$query = "SELECT rel.ID AS releaseID, rel.guid, rel.groupID FROM releases rel WHERE prehashID IS NULL";
 			$cats = 2;
 		} else {
 			$query = "SELECT rel.ID AS releaseID, rel.guid, rel.groupID FROM releases rel WHERE (isrenamed = 0 OR rel.categoryID = 8010) AND proc_par2 = 0";
@@ -247,7 +247,7 @@ class Namefixer
 	//
 	//  Update the release with the new information.
 	//
-	public function updateRelease($release, $name, $method, $echo, $type, $namestatus, $show, $preid = 'NULL')
+	public function updateRelease($release, $name, $method, $echo, $type, $namestatus, $show, $prehashID = 'NULL')
 	{
         if ($this->relid !== $release["releaseID"])
 		{
@@ -312,12 +312,12 @@ class Namefixer
                             $status = "isrenamed = 1, iscategorized = 1, proc_files = 1,";
                         }
                                 $run = $db->exec(sprintf("UPDATE releases SET rageID = NULL, seriesfull = NULL, season = NULL, episode = NULL, tvtitle = NULL, tvairdate = NULL, imdbID = NULL, musicinfoID = NULL, consoleinfoID = NULL, bookinfoID = NULL, "
-								. "anidbID = NULL, preID = %s, searchname = %s, isrenamed = 1,"
-								. " %s categoryID = %d WHERE ID = %d", $preid, $db->escapeString(substr($newname, 0, 255)), $status, $determinedcat, $release["releaseID"]));
+								. "anidbID = NULL, prehashID = %s, searchname = %s, isrenamed = 1,"
+								. " %s categoryID = %d WHERE ID = %d", $prehashID, $db->escapeString(substr($newname, 0, 255)), $status, $determinedcat, $release["releaseID"]));
 					} else {
 						$run = $db->exec(sprintf("UPDATE releases SET rageID = NULL, seriesfull = NULL, season = NULL, episode = NULL, tvtitle = NULL, tvairdate = NULL, imdbID = NULL, musicinfoID = NULL, consoleinfoID = NULL, bookinfoID = NULL, "
-								. "anidbID = NULL, preID = %s, searchname = %s, iscategorized = 1, "
-								. "categoryID = %d WHERE ID = %d", $preid, $db->escapeString(substr($newname, 0, 255)), $determinedcat, $release["releaseID"]));
+								. "anidbID = NULL, prehashID = %s, searchname = %s, iscategorized = 1, "
+								. "categoryID = %d WHERE ID = %d", $prehashID, $db->escapeString(substr($newname, 0, 255)), $determinedcat, $release["releaseID"]));
                                 }
                 }
 			}
@@ -373,7 +373,7 @@ class Namefixer
 	//
 	//  Check the array using regex for a clean name.
 	//
-   	public function checkName($release, $echo, $type, $namestatus, $show, $preid = false)
+   	public function checkName($release, $echo, $type, $namestatus, $show, $prehashID = false)
 	{
 	  // Get pre style name from releases.name
         $matches = '';
@@ -391,8 +391,8 @@ class Namefixer
 			}
 		}
     }
-        	// if processing preid on filename, do not continue
-		if ($preid === true) {
+        	// if processing prehashID on filename, do not continue
+		if ($prehashID === true) {
 			return false;
 		}
 		if ($type == "PAR2, ") {

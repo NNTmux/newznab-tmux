@@ -42,13 +42,13 @@ echo $c->info("\nCreating index ix_prehash_md5.");
 $db->queryDirect("ALTER IGNORE TABLE prehash ADD CONSTRAINT ix_prehash_md5 UNIQUE (md5)");
 echo $c->header("\nDone.");
 
-$releases = $db->queryDirect("SELECT ID, searchname FROM releases WHERE preID IS NOT NULL");
+$releases = $db->queryDirect("SELECT ID, searchname FROM releases WHERE prehashID IS NOT NULL");
 $newtotal = $releases->rowCount();
 $matched = $counter = 0;
 foreach ($releases as $release) {
 	$run = $predb->matchPre($release['searchname'], $release['ID']);
 	if ($run === false) {
-		$db->exec(sprintf('UPDATE releases SET preID = NULL WHERE ID = %d', $release['ID']));
+		$db->exec(sprintf('UPDATE releases SET prehashID = NULL WHERE ID = %d', $release['ID']));
 	} else {
 		$matched++;
 	}

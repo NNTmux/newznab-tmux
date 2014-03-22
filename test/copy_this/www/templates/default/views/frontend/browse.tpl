@@ -61,7 +61,7 @@
 					<div class="btns">{strip}
 						{if $result.nfoID > 0}<a href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}" title="View Nfo" class="modal_nfo rndbtn" rel="nfo">Nfo</a>{/if}
 						{if $result.preID > 0 && $userdata.canpre == 1}<span class="preinfo rndbtn" title="{$result.searchname}">Pre'd {$result.ctime|timeago}</span>{/if}
-                        {if $result.preID > 0}<span class="prehashinfo rndbtn" title="{$result.preID}">Prehash</span>{/if}
+                        {if $result.prehashID > 0}<span class="prehashinfo rndbtn" title="{$result.prehashID}">Prehash</span>{/if}
 						{if $result.movieinfoID > 0}<a href="{$smarty.const.WWW_TOP}/movies?imdb={$result.imdbID}" title="View movie info" class="rndbtn" rel="movie" >Movie</a>{/if}
 						{if $result.haspreview == 1 && $userdata.canpreview == 1}<a href="{$smarty.const.WWW_TOP}/covers/preview/{$result.guid}_thumb.jpg" name="name{$result.guid}" title="View Screenshot" class="modal_prev rndbtn" rel="preview">Preview</a>{/if}
                         {if $result.jpgstatus == 1 && $userdata.canpreview == 1}<a href="{$smarty.const.WWW_TOP}/covers/sample/{$result.guid}_thumb.jpg" name="name{$result.guid}" title="Sample of {$result.searchname|escape:"htmlall"}" class="modal_prev rndbtn" rel="preview">Sample</a>{/if}

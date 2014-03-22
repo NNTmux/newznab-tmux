@@ -776,7 +776,7 @@ Class PreHash
         $f = new Functions();
 			$x = $db->queryOneRow(sprintf('SELECT ID FROM prehash WHERE title = %s', $db->escapeString($cleanerName)));
 		if (isset($x['ID'])) {
-			$db->exec(sprintf('UPDATE releases SET preID = %d WHERE ID = %d', $x['ID'], $releaseID));
+			$db->exec(sprintf('UPDATE releases SET prehashID = %d WHERE ID = %d', $x['ID'], $releaseID));
 			return true;
 		}
 		return false;
@@ -794,14 +794,14 @@ Class PreHash
 			echo $this->c->header('Querying DB for release searchnames not matched with prehash titles.');
 		}
 
-		$res = $db->queryDirect('SELECT p.ID AS preID, r.ID AS releaseID FROM prehash p INNER JOIN releases r ON p.title = r.searchname WHERE r.preID IS NULL');
+		$res = $db->queryDirect('SELECT p.ID AS prehashID, r.ID AS releaseID FROM prehash p INNER JOIN releases r ON p.title = r.searchname WHERE r.prehashID IS NULL');
         $total = $res->rowCount();
         if($total > 0)
         {
            echo "\n";
 			foreach ($res as $row)
 			{
-				$db->exec(sprintf('UPDATE releases SET preID = %d WHERE ID = %d', $row['preID'], $row['releaseID']));
+				$db->exec(sprintf('UPDATE releases SET prehashID = %d WHERE ID = %d', $row['prehashID'], $row['releaseID']));
 				if ($this->echooutput)
 				{
 					$consoletools->overWritePrimary('Matching up prehash titles with release search names: ' . $consoletools->percentString(++$updated, $total));
@@ -820,7 +820,7 @@ Class PreHash
 		if($this->echooutput)
 			echo $this->c->header ("Matching up prehash NFOs with releases missing an NFO.");
 
-			$res = $db->query("SELECT r.ID, p.nfo, r.completion, r.guid, r.groupID FROM releases r INNER JOIN prehash p ON r.preID = p.ID WHERE r.nfostatus = 0 AND p.nfo IS NOT NULL LIMIT 100");
+			$res = $db->query("SELECT r.ID, p.nfo, r.completion, r.guid, r.groupID FROM releases r INNER JOIN prehash p ON r.prehashID = p.ID WHERE r.nfostatus = 0 AND p.nfo IS NOT NULL LIMIT 100");
 		    $total = count($res);
 		    if($total > 0)
             {
@@ -877,7 +877,7 @@ Class PreHash
 			$query = sprintf('SELECT r.ID AS releaseID, r.name, r.searchname, r.categoryID, r.groupID, '
 				. 'dehashstatus, rf.name AS filename FROM releases r '
 				. 'LEFT OUTER JOIN releasefiles rf ON r.ID = rf.releaseID '
-				. 'WHERE preID IS NULL %s', $regex);
+				. 'WHERE prehashID IS NULL %s', $regex);
 		} else {
 			$query = sprintf('SELECT r.ID AS releaseID, r.name, r.searchname, r.categoryID, r.groupID, '
 				. 'dehashstatus, rf.name AS filename FROM releases r '
@@ -932,15 +932,15 @@ Class PreHash
 			$count = $this->getCount();
 		}
 
-		$parr = $db->query(sprintf('SELECT p.*, r.guid FROM prehash p LEFT OUTER JOIN releases r ON p.ID = r.preID %s ORDER BY p.adddate DESC LIMIT %d OFFSET %d', $search, $offset2, $offset));
+		$parr = $db->query(sprintf('SELECT p.*, r.guid FROM prehash p LEFT OUTER JOIN releases r ON p.ID = r.prehashID %s ORDER BY p.adddate DESC LIMIT %d OFFSET %d', $search, $offset2, $offset));
 		return array('arr' => $parr, 'count' => $count);
 	}
 
     // Returns a single row for a release.
-	public function getForRelease($preID)
+	public function getForRelease($prehashID)
 	{
 		$db = new DB();
-		return $db->query(sprintf('SELECT * FROM prehash WHERE ID = %d', $preID));
+		return $db->query(sprintf('SELECT * FROM prehash WHERE ID = %d', $prehashID));
 	}
 
 	public function getCount()
@@ -950,10 +950,10 @@ Class PreHash
 		return $count["cnt"];
 	}
 
-    public function getOne($preID)
+    public function getOne($prehashID)
 	{
 		$db = new DB();
-		return $db->queryOneRow(sprintf('SELECT * FROM prehash WHERE ID = %d', $preID));
+		return $db->queryOneRow(sprintf('SELECT * FROM prehash WHERE ID = %d', $prehashID));
 	}
 
 	public function getWebPage($url)

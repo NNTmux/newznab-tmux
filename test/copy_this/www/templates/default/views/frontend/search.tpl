@@ -127,7 +127,7 @@
 					<div class="btns">
 						{if $result.nfoID > 0}<a href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}" title="View Nfo" class="rndbtn modal_nfo" rel="nfo">Nfo</a>{/if}
 						{if $result.preID > 0 && $userdata.canpre == 1}<span class="preinfo rndbtn" title="{$result.searchname}">Pre'd {$result.ctime|timeago}</span>{/if}
-                        {if $result.preID > 0}<span class="prehashinfo rndbtn" title="{$result.preID}">Prehash</span>{/if}
+                        {if $result.prehashID > 0}<span class="prehashinfo rndbtn" title="{$result.prehashID}">Prehash</span>{/if}
 						{if $result.movieinfoID > 0}<a href="{$smarty.const.WWW_TOP}/movies?imdb={$result.imdbID}" title="View movie info" class="rndbtn" rel="movie" >Movie</a>{/if}
 						{if $result.haspreview == 1 && $userdata.canpreview == 1}<a href="{$smarty.const.WWW_TOP}/covers/preview/{$result.guid}_thumb.jpg" name="name{$result.guid}" title="View Screenshot" class="modal_prev rndbtn" rel="preview">Preview</a>{/if}
                         {if $result.haspreview == 2 && $userdata.canpreview == 1}<a href="#" name="audio{$result.guid}" title="Listen to {$result.searchname|escape:"htmlall"}" class="audioprev rndbtn" rel="audio">Listen</a><audio id="audprev{$result.guid}" preload="none"><source src="{$smarty.const.WWW_TOP}/covers/audio/{$result.guid}.mp3" type="audio/mpeg"><source src="{$smarty.const.WWW_TOP}/covers/audio/{$result.guid}.ogg" type="audio/ogg"></audio>{/if}
