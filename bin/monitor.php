@@ -9,7 +9,7 @@ require_once(dirname(__FILE__)."/../test/showsleep.php");
 require_once(dirname(__FILE__)."/../test/functions.php");
 
 
-$version="0.3r1025";
+$version="0.3r1026";
 
 $db = new DB();
 $functions = new Functions();
@@ -1709,7 +1709,7 @@ if ($running == 1){
 				case 'All':
 					$log = writelog($panes3[3]);
 					shell_exec("tmux respawnp -t${tmux_session}:3.3 ' \
-							$_php ${DIR}/../test/removeCrapReleases.php true 2 $log; date +\"%D %T\"; $_sleep $crap_timer' 2>&1 1> /dev/null");
+							$_php ${DIR}/../test/removeCrapReleases_new.php true 2 $log; date +\"%D %T\"; $_sleep $crap_timer' 2>&1 1> /dev/null");
 					break;
 				// The user has specified custom types.
 				case 'Custom':
@@ -1733,7 +1733,7 @@ if ($running == 1){
 							// Run remove crap releases.
 							shell_exec("tmux respawnp -t${tmux_session}:3.3 ' \
 								echo \"Running removeCrapReleases for $fix_crap[$fcnum]\"; \
-								php ${DIR}/../test/removeCrapReleases.php true $fctime $fix_crap[$fcnum] $log; date +\"%D %T\"; $_sleep $crap_timer' 2>&1 1> /dev/null");
+								php ${DIR}/../test/removeCrapReleases_new.php true $fctime $fix_crap[$fcnum] $log; date +\"%D %T\"; $_sleep $crap_timer' 2>&1 1> /dev/null");
 
 							// Increment so we know which type to run next.
 							$fcnum++;

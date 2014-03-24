@@ -2,7 +2,7 @@
 require_once(dirname(__FILE__)."/../bin/config.php");
 require_once(WWW_DIR."/lib/framework/cache.php");
 require_once(WWW_DIR."/lib/framework/db.php");
-require_once(WWW_DIR. "lib/category.php");
+require_once(WWW_DIR."/lib/category.php");
 require_once(WWW_DIR."/lib/releases.php");
 require_once(WWW_DIR."/lib/releaseimage.php");
 require_once(WWW_DIR."/lib/nzb.php");
@@ -213,7 +213,7 @@ class Functions
 	}
 
     //deletes from releases
-    public function fastDelete($ID, $guid, $site)
+    public function fastDelete($ID, $guid)
 	{
 		$db = new DB();
 		$nzb = new NZB();
@@ -223,7 +223,7 @@ class Functions
 		//
 		// delete from disk.
 		//
-		$nzbpath = $nzb->getNZBPath($guid, $site->nzbpath, false);
+		$nzbpath = $nzb->getNZBPath($guid);
 
 		if (file_exists($nzbpath))
 			unlink($nzbpath);
