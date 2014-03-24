@@ -20,6 +20,7 @@ if (!isset($argv[1])) {
 	$pieces = explode(' ', $argv[1]);
 	if (isset($pieces[1]) && $pieces[1] == 'partrepair') {
 		$binaries = new Binaries();
+        $functions = new Functions();
 		$groupName = $pieces[0];
 		$grp = new Groups();
 		$groupArr = $grp->getByName($groupName);
@@ -31,7 +32,7 @@ if (!isset($argv[1])) {
 				return;
 			}
 		}
-		$binaries->partRepair($nntp, $groupArr);
+		$functions->partRepair($nntp, $groupArr);
 	} else if (isset($pieces[1]) && $pieces[0] == 'binupdate') {
 		$binaries = new Binaries();
         $functions = new Functions();
