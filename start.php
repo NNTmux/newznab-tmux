@@ -1,7 +1,7 @@
 <?php
 
 require_once(dirname(__FILE__)."/bin/config.php");
-require_once(dirname(__FILE__)."/test/ColorCLI.php");
+require_once(dirname(__FILE__)."/lib/ColorCLI.php");
 require_once (WWW_DIR.'/lib/site.php');
 require_once(WWW_DIR.'/lib/Tmux.php');
 
