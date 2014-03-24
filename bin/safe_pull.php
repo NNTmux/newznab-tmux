@@ -39,7 +39,7 @@ if (!isset($argv[1])) {
 		$groupName = $pieces[1];
 		$grp = new Groups();
 		$groupArr = $grp->getByName($groupName);
-		$functions->updateGroup($groupArr, $nntp);
+		$binaries->updateGroup($nntp, $groupArr);
 	} else if (isset($pieces[2]) && ($pieces[2] == 'Binary' || $pieces[2] == 'Backfill')) {
 		$functions = new Functions();
 		$functions->getFinal($pieces[0], $pieces[1], $pieces[2], $nntp);
