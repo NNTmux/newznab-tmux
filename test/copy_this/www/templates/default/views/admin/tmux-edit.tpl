@@ -118,7 +118,7 @@
                 <td style="width:180px;"><label for="binaries">Update Binaries:</label></td>
                 <td>
                     {html_options style="width:180px;" class="siteeditstyle" id="binaries" name='binaries' values=$binaries_ids output=$binaries_names selected=$ftmux->binaries}
-                    <div class="hint">Choose to run update_binaries. Update binaries gets from your last_record to now.<br />Threaded Update runs 1 group per thread.<br /></div>
+                    <div class="hint">Choose to run update_binaries. Update binaries gets from your last_record to now.<br />Simple Threaded Update runs 1 group per thread.<br />Complete Threaded Update splits all work across multiple threads(binaries_safe_threaded.py).</div>
                 </td>
             </tr>
 
