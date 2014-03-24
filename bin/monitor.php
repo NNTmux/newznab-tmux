@@ -9,7 +9,7 @@ require_once(dirname(__FILE__)."/../test/showsleep.php");
 require_once(dirname(__FILE__)."/../test/functions.php");
 
 
-$version="0.3r1027";
+$version="0.3r1028";
 
 $db = new DB();
 $functions = new Functions();
@@ -1122,7 +1122,7 @@ $_pythonn = "nice -n$niceness $PYTHON";
 $_sleep = "$_phpn ${DIR}/../test/showsleep.php";
 
 	//set command for running update_binaries
-	if ($binaries != 0) {
+	if ($binaries == 1) {
 		$log = writelog($panes0[2]);
 		$_update_cmd = "cd $_bin && $_php update_binaries.php 2>&1 $log";
 	} else if ($binaries == 2)  {
