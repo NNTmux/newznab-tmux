@@ -3816,8 +3816,8 @@ class Functions
 	public function partRepair($nntp, $groupArr)
 	{
 		if (!isset($nntp)) {
-			$dmessage = "Not connected to usenet(binaries->partRepair).";
-			exit($this->c->error("Not connected to usenet(binaries->partRepair)."));
+			$dmessage = "Not connected to usenet(functions->partRepair).";
+			exit($this->c->error("Not connected to usenet(functions->partRepair)."));
 		}
 
 		// Get all parts in partrepair table.
