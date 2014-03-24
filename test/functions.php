@@ -3576,6 +3576,7 @@ class Functions
 
 		$this->startGroup = microtime(true);
 		$this->c->primary('Processing ' . str_replace('alt.binaries', 'a.b', $groupArr['name']));
+        $binaries = new Binaries();
 
 
 		// Select the group, here, needed for processing the group
