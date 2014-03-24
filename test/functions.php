@@ -78,6 +78,7 @@ class Functions
 	$this->NewGroupMsgsToScan = (!empty($this->site->newgroupmsgstoscan)) ? $this->site->newgroupmsgstoscan : 50000;
 	$this->NewGroupDaysToScan = (!empty($this->site->newgroupdaystoscan)) ? $this->site->newgroupdaystoscan : 3;
 	$this->partrepairlimit = (!empty($this->tmux->maxpartrepair)) ? $this->tmux->maxpartrepair : 15000;
+    $this->onlyProcessRegexBinaries = false;
   }
     /**
 	 * @var object Instance of PDO class.
@@ -3574,6 +3575,7 @@ class Functions
 			exit($this->c->error($message));
 		}
 
+
 		$this->startGroup = microtime(true);
 		$this->c->primary('Processing ' . str_replace('alt.binaries', 'a.b', $groupArr['name']));
         $binaries = new Binaries();
@@ -3587,6 +3589,16 @@ class Functions
 				return;
 			}
 		}
+
+        if ($groupArr['regexmatchonly'] == 1)
+        {
+            $this->onlyProcessRegexBinaries = true;
+            $this->c->info ("\nDiscarding parts that do not match a regex");
+        }
+        else
+        {
+            $this->onlyProcessRegexBinaries = false;
+        }
 
 		// Attempt to repair any missing parts before grabbing new ones.
 		if ($groupArr['last_record'] != 0) {
