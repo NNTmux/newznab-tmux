@@ -47,13 +47,13 @@ def gitCurrentVersion():
 	return current_commit
 
 def latestCommit():
-	url = 'https://api.github.com/repos/jonnyboy/newznab-tmux/commits/master'
+	url = 'https://api.github.com/repos/DariusIII/newznab-tmux/commits/master'
 	result = urllib2.urlopen(url).read()
 	git = json.JSONDecoder().decode(result)
 	return git['sha']
 
 def commitsBehind():
-	url = 'https://api.github.com/repos/jonnyboy/newznab-tmux/compare/%s...%s' % (gitCurrentVersion(), latestCommit())
+	url = 'https://api.github.com/repos/DariusIII/newznab-tmux/compare/%s...%s' % (gitCurrentVersion(), latestCommit())
 	try:
 		result = urllib2.urlopen(url).read()
 	except urllib2.HTTPError:

@@ -4,9 +4,9 @@ require(dirname(__FILE__)."/config.php");
 require_once(WWW_DIR."/lib/framework/db.php");
 require_once(WWW_DIR."/lib/groups.php");
 require_once(WWW_DIR.'/lib/nntp.php');
-require_once("../test/ColorCLI.php");
-require_once("../test/namefixer.php");
-require_once("../test/functions.php"); 
+require_once("../lib/ColorCLI.php");
+require_once("../lib/namefixer.php");
+require_once("../lib/functions.php"); 
 
 $c = new ColorCLI();
 if (!isset($argv[1])) {

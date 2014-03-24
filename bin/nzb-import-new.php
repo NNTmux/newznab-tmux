@@ -6,9 +6,9 @@ require_once(WWW_DIR.'/lib/binaries.php');
 require_once(WWW_DIR.'/lib/category.php');
 require_once(WWW_DIR.'/lib/groups.php');
 require_once(WWW_DIR.'/lib/nzb.php');
-require_once(dirname(__FILE__).'/../test/ColorCLI.php');
-require_once(dirname(__FILE__).'/../test/namecleaner.php');
-require_once(dirname(__FILE__).'/../test/consoletools.php');
+require_once(dirname(__FILE__).'/../lib/ColorCLI.php');
+require_once(dirname(__FILE__).'/../lib/namecleaner.php');
+require_once(dirname(__FILE__).'/../lib/consoletools.php');
 
 $c = new ColorCLI();
 

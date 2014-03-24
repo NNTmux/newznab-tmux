@@ -2,8 +2,8 @@
 
 require_once(dirname(__FILE__).'/config.php');
 require_once(WWW_DIR.'/lib/nntp.php');
-require_once(dirname(__FILE__).'/../test/ColorCLI.php');
-require_once(dirname(__FILE__).'/../test/consoletools.php');
+require_once(dirname(__FILE__).'/../lib/ColorCLI.php');
+require_once(dirname(__FILE__).'/../lib/consoletools.php');
 
 
 $start = TIME();
