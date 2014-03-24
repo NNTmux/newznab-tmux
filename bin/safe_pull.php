@@ -44,13 +44,13 @@ if (!isset($argv[1])) {
 		$functions->getFinal($pieces[0], $pieces[1], $pieces[2], $nntp);
 	} else if (isset($pieces[2]) && $pieces[2] == 'BackfillAll') {
 		$functions = new Functions();
-		$functions->backfillPostAllGroups($nntp, $pieces[0], $pieces[1], $type = '');
+		$functions->backfillAllGroups($nntp, $pieces[0], $pieces[1]);
 	} else if (isset($pieces[3])) {
 		$functions = new Functions();
 		$functions->getRange($pieces[0], $pieces[1], $pieces[2], $pieces[3], $nntp);
 	} else if (isset($pieces[1])) {
 		$functions = new Functions();
-		$functions->backfillPostAllGroups($nntp, $pieces[0], $pieces[1], $type = '');
+		$functions->backfillAllGroups($nntp, $pieces[0], $pieces[1]);
 	}
 		$nntp->doQuit();
 }
