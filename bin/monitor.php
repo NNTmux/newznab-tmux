@@ -1131,6 +1131,7 @@ $_sleep = "$_phpn ${DIR}/../test/showsleep.php";
 	} else if ($binaries == 3)  {
 		$log = writelog($panes0[2]);
 		$_update_cmd = "$_python ${DIR}/../test/binaries_safe_threaded.py 2>&1 $log";
+    }
 
 if ($releases_run != 0) {
 			$run_releases = "$_python ${DIR}/../test/releases_threaded.py";
