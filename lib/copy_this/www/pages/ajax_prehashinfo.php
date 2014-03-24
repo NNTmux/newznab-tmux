@@ -1,5 +1,5 @@
 <?php
-require_once(WWW_DIR.'/../misc/update_scripts/nix_scripts/tmux/test/prehash.php');
+require_once(WWW_DIR.'/../misc/update_scripts/nix_scripts/tmux/lib/prehash.php');
 if (!$users->isLoggedIn()) {
 	$page->show403();
 }

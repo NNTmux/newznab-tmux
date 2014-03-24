@@ -7,7 +7,7 @@ require_once(WWW_DIR."/lib/tvrage.php");
 require_once(WWW_DIR."/lib/anidb.php");
 require_once(WWW_DIR."/lib/predb.php");
 require_once(WWW_DIR."/lib/episode.php");
-require_once(WWW_DIR."/../misc/update_scripts/nix_scripts/tmux/test/prehash.php");
+require_once(WWW_DIR."/../misc/update_scripts/nix_scripts/tmux/lib/prehash.php");
 
 
 
