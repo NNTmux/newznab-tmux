@@ -932,7 +932,7 @@ Class PreHash
 			$count = $this->getCount();
 		}
 
-		$parr = $db->query(sprintf('SELECT p.*, r.guid FROM prehash p LEFT OUTER JOIN releases r ON p.ID = r.prehashID %s ORDER BY p.adddate DESC LIMIT %d OFFSET %d', $search, $offset2, $offset));
+		$parr = $db->query(sprintf('SELECT p.*, r.guid FROM prehash p INNER JOIN releases r ON p.ID = r.prehashID %s ORDER BY p.adddate DESC LIMIT %d OFFSET %d', $search, $offset2, $offset));
 		return array('arr' => $parr, 'count' => $count);
 	}
 
