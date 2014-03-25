@@ -311,7 +311,7 @@ class Functions
 					}
 				}
 				$test = preg_match('#^.*(ISO-8859|UTF-(?:8|16|32) Unicode(?: \(with BOM\)|)|ASCII)(?: English| C++ Program|) text.*$#i', $result);
-				// if the result is false, something went wrong, continue with getID3 tests.
+				// if the result is false, something went wrong
 				if ($test !== false) {
 					if ($test == 1) {
 						@unlink($tmpPath);
