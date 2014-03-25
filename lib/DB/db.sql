@@ -441,7 +441,7 @@ CREATE INDEX ix_shortgroups_name ON shortgroups(name);
 
 INSERT INTO menu (href, title, tooltip, role, ordinal )
 VALUES ('prehash', 'Prehash',
-	'Prehash', 1, 120);
+	'Prehash', 1, 68);
 
 DROP TRIGGER IF EXISTS check_insert;
 DROP TRIGGER IF EXISTS check_update;
