@@ -9,9 +9,9 @@ $predb = new PreHash();
 
 $offset = (isset($_REQUEST["offset"]) && ctype_digit($_REQUEST['offset'])) ? $_REQUEST["offset"] : 0;
 
-if (isset($_REQUEST['presearch'])) {
-	$lastSearch = $_REQUEST['presearch'];
-	$parr = $predb->getAll($offset, ITEMS_PER_PAGE, $_REQUEST['presearch']);
+if (isset($_REQUEST['prehashsearch'])) {
+	$lastSearch = $_REQUEST['prehashsearch'];
+	$parr = $predb->getAll($offset, ITEMS_PER_PAGE, $_REQUEST['prehashsearch']);
 } else {
 	$lastSearch = '';
 	$parr = $predb->getAll($offset, ITEMS_PER_PAGE);

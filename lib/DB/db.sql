@@ -175,7 +175,7 @@ INSERT INTO tmux (setting, value) values ('defrag_cache','900'),
     ('max_load_releases', 2.0),
     ('zippath', ''),
     ('processjpg', 0),
-    ('sqlpatch','6');
+    ('sqlpatch','8');
 
 DROP TABLE IF EXISTS country;
 CREATE TABLE country (
