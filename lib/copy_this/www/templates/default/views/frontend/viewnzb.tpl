@@ -53,6 +53,14 @@
 			<a class="rndbtn" href="{$smarty.const.WWW_TOP}/movies?imdb={$release.imdbID}" title="View all versions">Movie View</a>
 		</div>
 	</td></tr>
+    {if $movie.trailer != ""}
+    <tr><th>Trailer:</th>
+        <td>
+            <object width="445" height="280" data="http://www.youtube.com/v/{$movie.trailer}" type="application/x-shockwave-flash">
+            <param name="src" value="http://www.youtube.com/v/{$movie.trailer}" /></object>
+        </td>
+    </tr>
+    {/if}
 	{/if}
 
 	{if $anidb && $release.anidbID > 0}
@@ -149,7 +157,7 @@
 		{if $predb.nuketype != '' && $predb.nukereason != ''}<tr><th>{$predb.nuketype|lower|capitalize}:</th><td>{$predb.nukereason}</td></tr>{/if}
 	{/if}
 
-    	{if $pre|@count > 0}
+    {if $pre|@count > 0}
 		<tr>
 			<th>Prehash:</th>
 			<td style="padding:0;">
@@ -172,13 +180,13 @@
 			</td>
 		</tr>
 	{/if}
+
 	{if $release.haspreview == 2 && $userdata.canpreview == 1}
-		<tr>	
+		<tr>
 			<th>Preview:</th>
 			<td><a href="#" name="audio{$release.guid}" title="Listen to {$release.searchname|escape:"htmlall"}" class="audioprev rndbtn" rel="audio">Listen</a><audio id="audprev{$release.guid}" preload="none"><source src="{$smarty.const.WWW_TOP}/covers/audio/{$release.guid}.mp3" type="audio/mpeg"><source src="{$smarty.const.WWW_TOP}/covers/audio/{$release.guid}.ogg" type="audio/ogg"></audio></td>
 		</tr>
 	{/if}
-
 
 	{if $reVideo.releaseID|@count > 0 || $reAudio|@count > 0}
 	<tr><th>Media Info:</th>
@@ -330,6 +338,7 @@
 	{if $release.haspreview == 1 && $userdata.canpreview == 1}
 	<tr><th>Preview:</th><td><img class="shadow" width="450" src="{$smarty.const.WWW_TOP}/covers/preview/{$release.guid}_thumb.jpg" alt="{$release.searchname|escape:"htmlall"} screenshot" /></td></tr>
 	{/if}
+
     {if $release.jpgstatus == 1 && $userdata.canpreview == 1}
 	<tr><th>Sample:</th><td><img class="shadow" width="450" src="{$smarty.const.WWW_TOP}/covers/sample/{$release.guid}_thumb.jpg" alt="{$release.searchname|escape:"htmlall"} screenshot" /></td></tr>
 	{/if}
