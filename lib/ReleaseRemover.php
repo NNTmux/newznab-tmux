@@ -411,9 +411,9 @@ class ReleaseRemover
 			AND rf.name %s %s
 			AND r.categoryID NOT IN (%d, %d, %d, %d) %s",
 			$this->like,
-			"'.exes'",
+			"'%.exes%'",
 			$this->like,
-			"'.exe'",
+			"'%.exe%'",
 			Category::CAT_PC_0DAY,
 			Category::CAT_PC_GAMES,
 			Category::CAT_PC_ISO,
@@ -441,7 +441,7 @@ class ReleaseRemover
 			INNER JOIN releasefiles rf ON rf.releaseID = r.ID
 			WHERE rf.name %s %s %s",
 			$this->like,
-			"'install.bin'",
+			"'%install.bin%'",
 			$this->crapTime
 		);
 
@@ -465,7 +465,7 @@ class ReleaseRemover
 			INNER JOIN releasefiles rf ON rf.releaseID = r.ID
 			WHERE rf.name %s %s %s",
 			$this->like,
-			"'password.url'",
+			"'%password.url%'",
 			$this->crapTime
 		);
 
@@ -496,19 +496,19 @@ class ReleaseRemover
 			AND r.categoryID NOT IN (%d, %d, %d, %d, %d, %d, %d, %d) %s",
 			$this->like,
 			// Matches passwort / passworded / etc also.
-			"'passwor'",
+			"'%passwor%'",
 			$this->like,
-			"'advanced'",
+			"'%advanced%'",
 			$this->like,
-			"'no password'",
+			"'%no password%'",
 			$this->like,
-			"'not password'",
+			"'%not password%'",
 			$this->like,
-			"'recovery'",
+			"'%recovery%'",
 			$this->like,
-			"'reset'",
+			"'%reset%'",
 			$this->like,
-			"'unlocker'",
+			"'%unlocker%'",
 			Category::CAT_PC_GAMES,
 			Category::CAT_PC_0DAY,
 			Category::CAT_PC_ISO,
@@ -570,7 +570,7 @@ class ReleaseRemover
 			AND r.name %s %s
 			AND r.categoryID IN (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) %s",
 			$this->like,
-			"'sample'",
+			"'%sample%'",
 			Category::CAT_TV_ANIME,
 			Category::CAT_TV_DOCU,
 			Category::CAT_TV_FOREIGN,

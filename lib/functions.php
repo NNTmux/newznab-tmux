@@ -73,12 +73,11 @@ class Functions
     $this->safepartrepair = (!empty($this->tmux->safepartrepair)) ? $this->tmux->safepartrepair : 0;
     $this->safebdate = (!empty($this->tmux->safebackfilldate)) ? $this->tmux->safebackfilldate : '2012 - 06 - 24';
     $this->DoPartRepair = ($this->tmux->partrepair == '0') ? false : true;
-    $this->messagebuffer = (!empty($this->site->maxmssgs)) ? $this->site->maxmssgs : 20000;
+    $this->messagebuffer = (!empty($this->site->maxmssgs)) ? (int)$this->site->maxmssgs : 20000;
 	$this->NewGroupScanByDays = ($this->site->newgroupscanmethod == '1') ? true : false;
-	$this->NewGroupMsgsToScan = (!empty($this->site->newgroupmsgstoscan)) ? $this->site->newgroupmsgstoscan : 50000;
-	$this->NewGroupDaysToScan = (!empty($this->site->newgroupdaystoscan)) ? $this->site->newgroupdaystoscan : 3;
-	$this->partrepairlimit = (!empty($this->tmux->maxpartrepair)) ? $this->tmux->maxpartrepair : 15000;
-    $this->onlyProcessRegexBinaries = false;
+	$this->NewGroupMsgsToScan = (!empty($this->site->newgroupmsgstoscan)) ? (int)$this->site->newgroupmsgstoscan : 50000;
+	$this->NewGroupDaysToScan = (!empty($this->site->newgroupdaystoscan)) ? (int)$this->site->newgroupdaystoscan : 3;
+	$this->partrepairlimit = (!empty($this->tmux->maxpartrepair)) ? (int)$this->tmux->maxpartrepair : 15000;
   }
     /**
 	 * @var object Instance of PDO class.
@@ -3590,15 +3589,6 @@ class Functions
 			}
 		}
 
-        if ($groupArr['regexmatchonly'] == 1)
-        {
-            $this->onlyProcessRegexBinaries = true;
-            $this->c->info ("\nDiscarding parts that do not match a regex");
-        }
-        else
-        {
-            $this->onlyProcessRegexBinaries = false;
-        }
 
 		// Attempt to repair any missing parts before grabbing new ones.
 		if ($groupArr['last_record'] != 0) {
@@ -3616,7 +3606,7 @@ class Functions
 		if ($groupArr['last_record'] == 0) {
 			// For new newsgroups - determine here how far you want to go back.
 			if ($this->NewGroupScanByDays) {
-				$first = $this->daytopost($nntp, $groupArr['name'], $this->NewGroupDaysToScan, $data, true);
+				$first = $this->daytopost($this->NewGroupDaysToScan, $data);
 				if ($first == '') {
 				$this->c->warning("Skipping group: {$groupArr['name']}");
 					return;
@@ -3655,7 +3645,7 @@ class Functions
 
 		// Generate postdate for first record, for those that upgraded.
 		if (is_null($groupArr['first_record_postdate']) && $groupArr['first_record'] != '0') {
-			$newdate = $this->postdate($nntp, $groupArr['first_record'], false, $groupArr['name'], true, 'oldest');
+			$newdate = $this->postdate($groupArr['first_record'], $data);
 			if ($newdate !== false) {
 				$first_record_postdate = $newdate;
 			} else {
