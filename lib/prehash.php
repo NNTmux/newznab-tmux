@@ -794,7 +794,7 @@ Class PreHash
 			echo $this->c->header('Querying DB for release searchnames not matched with prehash titles.');
 		}
 
-		$res = $db->queryDirect('SELECT p.ID AS prehashID, r.ID AS releaseID FROM prehash p INNER JOIN releases r ON p.title = r.searchname WHERE r.prehashID IS NULL');
+		$res = $db->queryDirect('SELECT p.ID AS prehashID, r.ID AS releaseID FROM prehash p INNER JOIN releases r ON p.title = r.searchname WHERE r.prehashID = 0');
         $total = $res->rowCount();
         if($total > 0)
         {
@@ -877,7 +877,7 @@ Class PreHash
 			$query = sprintf('SELECT r.ID AS releaseID, r.name, r.searchname, r.categoryID, r.groupID, '
 				. 'dehashstatus, rf.name AS filename FROM releases r '
 				. 'LEFT OUTER JOIN releasefiles rf ON r.ID = rf.releaseID '
-				. 'WHERE prehashID IS NULL %s', $regex);
+				. 'WHERE prehashID = 0 %s', $regex);
 		} else {
 			$query = sprintf('SELECT r.ID AS releaseID, r.name, r.searchname, r.categoryID, r.groupID, '
 				. 'dehashstatus, rf.name AS filename FROM releases r '

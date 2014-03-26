@@ -453,29 +453,34 @@ class Functions
 		return !file_exists($nzbfile) ? false : $nzbfile;
 	}
 
-    //Categorize releases
-    public function categorizeRelease($type, $where="", $echooutput=false)
+    // Sends releases back to other->misc.
+	public function resetCategorize($where = '')
 	{
-		$db = new DB();
+		$this->db->exec('UPDATE releases SET categoryID = 8010, iscategorized = 0 ' . $where);
+	}
+
+	// Categorizes releases.
+	// $type = name or searchname
+	// Returns the quantity of categorized releases.
+	public function categorizeRelease($type, $where = '', $echooutput = false)
+	{
 		$cat = new Category();
-		$consoletools = new consoleTools();
 		$relcount = 0;
-		$resrel = $db->prepare("SELECT ID, ".$type.", groupID FROM releases ".$where);
-        $resrel->execute();
+		$resrel = $this->db->queryDirect('SELECT ID, ' . $type . ', groupID FROM releases ' . $where);
 		$total = $resrel->rowCount();
-		if ($total > 0)
-		{
-			foreach ($resrel as $rowrel)
-			{
-				$catId = $cat->determineCategory($rowrel[$type], $rowrel['groupID']);
-				$db->queryDirect(sprintf("UPDATE releases SET categoryID = %d, relnamestatus = 1 WHERE ID = %d", $catId, $rowrel['ID']));
+		if (count($resrel) > 0) {
+			foreach ($resrel as $rowrel) {
+				$catId = $cat->determineCategory($rowrel['groupID'], $rowrel[$type]);
+				$this->db->exec(sprintf('UPDATE releases SET categoryID = %d, iscategorized = 1 WHERE ID = %d', $catId, $rowrel['ID']));
 				$relcount ++;
-				if ($echooutput)
-					$consoletools->overWrite("Categorizing:".$consoletools->percentString($relcount,$total));
+				if ($this->echooutput) {
+					$this->consoleTools->overWritePrimary('Categorizing: ' . $this->consoleTools->percentString($relcount, $total));
+				}
 			}
 		}
-		if ($echooutput !== false && $relcount > 0)
+		if ($this->echooutput !== false && $relcount > 0) {
 			echo "\n";
+		}
 		return $relcount;
 	}
 
