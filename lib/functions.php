@@ -45,6 +45,7 @@ class Functions
     $this->c = new ColorCLI();
     $this->db = new DB();
     $this->m = new Movie();
+    $this->consoleTools = new ConsoleTools();
     $this->tmpPath = $this->site->tmpunrarpath;
     $this->audiofileregex = '\.(AAC|AIFF|APE|AC3|ASF|DTS|FLAC|MKA|MKS|MP2|MP3|RA|OGG|OGM|W64|WAV|WMA)';
 	$this->ignorebookregex = '/\b(epub|lit|mobi|pdf|sipdf|html)\b.*\.rar(?!.{20,})/i';
