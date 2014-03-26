@@ -872,7 +872,7 @@ Class PreHash
 				$te = " in the past 3 hours";
 			echo $this->c->header ("Fixing search names".$te." using the prehash md5.");
 		}
-        $regex = "AND ((r.ishashed = 1 OR rf.name REGEXP'[a-fA-F0-9]{32}')";
+        $regex = "AND (r.ishashed = 1 OR rf.name REGEXP'[a-fA-F0-9]{32}')";
 		if ($cats === 3) {
 			$query = sprintf('SELECT r.ID AS releaseID, r.name, r.searchname, r.categoryID, r.groupID, '
 				. 'dehashstatus, rf.name AS filename FROM releases r '
