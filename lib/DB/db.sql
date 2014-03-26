@@ -6,7 +6,7 @@ ALTER TABLE  `releases`
   ADD `nfostatus` TINYINT NOT NULL DEFAULT 0,
   ADD `jpgstatus` TINYINT(1) NOT NULL DEFAULT 0,
   ADD `reqidstatus` TINYINT(1) NOT NULL DEFAULT 0 ,
-  ADD `prehashID` INT(12) NULL DEFAULT NULL ,
+  ADD `prehashID` INT UNSIGNED NOT NULL DEFAULT '0',
   ADD `iscategorized` BIT NOT NULL DEFAULT 0,
   ADD `isrenamed` BIT NOT NULL DEFAULT 0,
   ADD `ishashed` BIT NOT NULL DEFAULT 0,
