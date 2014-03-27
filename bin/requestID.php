@@ -4,8 +4,8 @@ require(dirname(__FILE__)."/config.php");
 require_once(WWW_DIR."/lib/framework/db.php");
 require_once(WWW_DIR."/lib/groups.php");
 require_once(WWW_DIR."/lib/category.php");
-require_once(dirname(__FILE__).'/../test/functions.php');
-require_once(dirname(__FILE__).'/../test/ColorCLI.php');
+require_once(dirname(__FILE__).'/../lib/functions.php');
+require_once(dirname(__FILE__).'/../lib/ColorCLI.php');
 
 $c = new ColorCLI();
 if (!isset($argv[1])) {
@@ -45,11 +45,11 @@ if (count($requestIDtmp) >= 1) {
 
 if ($bFound === true) {
 	$title = $newTitle['title'];
-	$preid = $newTitle['ID'];
+	$prehashID = $newTitle['ID'];
 	$groupname = $f->getByNameByID($pieces[2]);
 	$determinedcat = $category->determineCategory($groupname, $title);
 	$run = $db->queryDirect(sprintf("UPDATE releases SET rageID = -1, seriesfull = NULL, season = NULL, episode = NULL, tvtitle = NULL, tvairdate = NULL, imdbID = NULL, musicinfoID = NULL, consoleinfoID = NULL, bookinfoID = NULL, anidbID = NULL, "
-			. "preID = %d, reqidstatus = 1, isrenamed = 1, searchname = %s, categoryID = %d where ID = %d", $preid, $db->escapeString($title), $determinedcat, $pieces[0]));
+			. "prehashID = %d, reqidstatus = 1, isrenamed = 1, searchname = %s, categoryID = %d where ID = %d", $prehashID, $db->escapeString($title), $determinedcat, $pieces[0]));
 	$groupid = $f->getIDByName($pieces[2]);
 	if ($groupid !== 0) {
 		$md5 = md5($title);

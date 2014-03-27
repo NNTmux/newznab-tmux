@@ -3,8 +3,8 @@
 require_once(dirname(__FILE__).'/config.php');
 require_once(WWW_DIR.'/lib/nntp.php');
 require_once(WWW_DIR.'/lib/Tmux.php');
-require_once(dirname(__FILE__).'/../test/ColorCLI.php');
-require_once(dirname(__FILE__).'/../test/functions.php');
+require_once(dirname(__FILE__).'/../lib/ColorCLI.php');
+require_once(dirname(__FILE__).'/../lib/functions.php');
 
 $c = new ColorCLI();
 if (!isset($argv[1])) {

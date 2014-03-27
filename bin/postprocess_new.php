@@ -7,14 +7,14 @@ require_once(WWW_DIR.'/lib/site.php');
 require_once(WWW_DIR.'/lib/anidb.php');
 require_once(WWW_DIR.'/lib/tvrage.php');
 require_once(WWW_DIR.'/lib/thetvdb.php');
-require_once(dirname(__FILE__).'/../test/ColorCLI.php');
-require_once(dirname(__FILE__).'/../test/functions.php');
+require_once(dirname(__FILE__).'/../lib/ColorCLI.php');
+require_once(dirname(__FILE__).'/../lib/functions.php');
 
 $c = new ColorCLI();
 $s = new Sites();
 $site = $s->get();
 if (!isset($argv[1])) {
-	exit($c->error("You need to set an argument [additional, nfo, movie, tv, games, ebook, music, anime]."));
+	exit($c->error("You need to set an argument [additional, nfo, movie, tv, games, ebook, music, anime, unwanted, others]."));
 }
 
 $postprocess = new PostProcess(true);
@@ -106,7 +106,12 @@ if (isset($argv[1]) && $argv[1] === "additional") {
             }
 } else if (isset($argv[1]) && $argv[1] === "spotnab") {
                 $postprocess -> processSpotnab();
-            }
+} else if (isset($argv[1]) && $argv[1] === "unwanted") {
+                $postprocess -> processUnwanted();
+} else if (isset($argv[1]) && $argv[1] === "other") {
+                $postprocess -> processOtherMiscCategory();
+}
+
 
 
 
