@@ -9,7 +9,7 @@ require_once(dirname(__FILE__)."/../lib/showsleep.php");
 require_once(dirname(__FILE__)."/../lib/functions.php");
 
 
-$version="0.3r1036";
+$version="0.3r1037";
 
 $db = new DB();
 $functions = new Functions();
@@ -1628,7 +1628,7 @@ if ($running == 1){
 		shell_exec("tmux respawnp -t${tmux_session}:2.8 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php postprocess_new.php other 2>&1 $log && echo \" \033[1;0;33m\"' 2>&1 1> /dev/null");
 	} else if ( $others == 0) {
 		$color = get_color($colors_start, $colors_end, $colors_exc);
-		shell_exec("tmux respawnp -t${tmux_session}:2.8 'echo \"\033[38;5;\"$color\"m\n$panes2[8] Disabled by OTHERS\"' 2>&1 1> /dev/null");
+		shell_exec("tmux respawnp -t${tmux_session}:2.8 'echo \"\033[38;5;\"$color\"m\n$panes2[8] Disabled by OTHER\"' 2>&1 1> /dev/null");
 	} else if ( $maxload <= get_load()) {
                 $color = get_color($colors_start, $colors_end, $colors_exc);
                 shell_exec("tmux respawnp -t${tmux_session}:2.8 'echo \"\033[38;5;\"$color\"m\n$panes2[8] Disabled by Max Load\"' 2>&1 1> /dev/null");

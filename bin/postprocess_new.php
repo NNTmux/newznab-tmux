@@ -14,7 +14,7 @@ $c = new ColorCLI();
 $s = new Sites();
 $site = $s->get();
 if (!isset($argv[1])) {
-	exit($c->error("You need to set an argument [additional, nfo, movie, tv, games, ebook, music, anime]."));
+	exit($c->error("You need to set an argument [additional, nfo, movie, tv, games, ebook, music, anime, unwanted, others]."));
 }
 
 $postprocess = new PostProcess(true);
@@ -106,7 +106,12 @@ if (isset($argv[1]) && $argv[1] === "additional") {
             }
 } else if (isset($argv[1]) && $argv[1] === "spotnab") {
                 $postprocess -> processSpotnab();
-            }
+} else if (isset($argv[1]) && $argv[1] === "unwanted") {
+                $postprocess -> processUnwanted();
+} else if (isset($argv[1]) && $argv[1] === "other") {
+                $postprocess -> processOtherMiscCategory();
+}
+
 
 
 
