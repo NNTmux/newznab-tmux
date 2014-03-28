@@ -2,9 +2,9 @@ I have forked jonnyboys newznab-tmux as he and the dev team have moved to anothe
 Support is given on irc.synirc.net #tmux channel.
 
 I started adapting some of more interesting scripts from nZEDb, but they require tempering with newznab database, so use them at your own risk. Any update to nn+ db could render them useless. Scripts require PHP version > 5.3.10 and Python 2.7x or newer.
-There is a test folder in main tmux folder. In that folder you will find two folders, /DB/ and /copy_this/. if you are setting up tmux for the first time, import db.sql using cli (mysql -u {┤your username} -p newznab < db.sql).
+There is a lib folder in main tmux folder. In that folder you will find two folders, /DB/ and /copy_this/. if you are setting up tmux for the first time, import db.sql using cli (mysql -u {┤your username} -p newznab < db.sql).
 
-1. Copy files from /test/copy_this/ folder into your newznab installation /www folder. You can now edit tmux settings in newznab admin area. This is available in default template for now.
+1. Copy files from /lib/copy_this/ folder into your newznab installation /www folder. You can now edit tmux settings in newznab admin area. This is available in default template for now.
 
 2. Most of the scripts are now threaded, they need python installed. Install instructions are in threaded_scripts_readme.txt
 
@@ -13,7 +13,7 @@ There is a test folder in main tmux folder. In that folder you will find two fol
 4. OPTIONAL: If you want to populate your prehash table with more than 6 million rows of pre data (This dump includes 6,166,783 unique predb releases.), run dump_prehash.php to import the predb dump. Predb dump can be downloaded from https://mega.co.nz/#!LUsRACZA!Iz4u-0EIKTuIjySp00ESi2a1XcxFPxhppd15Hakb_YE.
 
 Config and defaults.sh have been deprecated and removed from tmux, as did kevin123 scripts too. Newzdash reporting has also been removed from tmux, as newzdash is no longer maintained.
-The /test/DB/patchDB.php script is now used to deal with database changes in tmux.
+The /lib/DB/patchDB.php script is now used to deal with database changes in tmux.
 Tmus is started with start.php (php start.php command). Scripts not used anymore are still available for your use, but you need to run them manualy.
 
 
