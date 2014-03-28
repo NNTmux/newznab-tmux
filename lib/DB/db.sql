@@ -21,6 +21,7 @@ ALTER TABLE  `releases`
   ADD INDEX `ix_releases_haspreview` (`haspreview` ASC) USING HASH,
   ADD INDEX `ix_releases_postdate_name` (`postdate`, `name`),
   ADD INDEX `ix_releases_status` (`iscategorized`, `isrenamed`, `nfostatus`, `ishashed`, `passwordstatus`, `dehashstatus`, `releasenfoID`, `musicinfoID`, `consoleinfoID`, `bookinfoID`, `haspreview`, `categoryID`, `imdbID`, `rageID`);
+  ADD INDEX `ix_releases_prehashid_searchname` (`prehashID`, `searchname`); 
 
 DROP TABLE IF EXISTS prehash;
 CREATE TABLE prehash (
@@ -44,6 +45,8 @@ CREATE INDEX ix_prehash_predate ON prehash(predate);
 CREATE INDEX ix_prehash_adddate ON prehash(adddate);
 CREATE INDEX ix_prehash_source ON prehash(source);
 CREATE INDEX ix_prehash_requestid on prehash(requestID, groupID);
+CREATE INDEX ix_prehash_size ON prehash(size);
+CREATE INDEX ix_prehash_category ON prehash(category);
 CREATE UNIQUE INDEX ix_prehash_md5 ON prehash(md5);
 
 DROP TABLE IF EXISTS tmux;
@@ -175,7 +178,7 @@ INSERT INTO tmux (setting, value) values ('defrag_cache','900'),
     ('max_load_releases', 2.0),
     ('zippath', ''),
     ('processjpg', 0),
-    ('sqlpatch','8');
+    ('sqlpatch','11');
 
 DROP TABLE IF EXISTS country;
 CREATE TABLE country (
