@@ -21,7 +21,7 @@ ALTER TABLE  `releases`
   ADD INDEX `ix_releases_haspreview` (`haspreview` ASC) USING HASH,
   ADD INDEX `ix_releases_postdate_name` (`postdate`, `name`),
   ADD INDEX `ix_releases_status` (`iscategorized`, `isrenamed`, `nfostatus`, `ishashed`, `passwordstatus`, `dehashstatus`, `releasenfoID`, `musicinfoID`, `consoleinfoID`, `bookinfoID`, `haspreview`, `categoryID`, `imdbID`, `rageID`);
-  ADD INDEX `ix_releases_prehashid_searchname` (`prehashID`, `searchname`); 
+  ADD INDEX `ix_releases_prehashid_searchname` (`prehashID`, `searchname`);
 
 DROP TABLE IF EXISTS prehash;
 CREATE TABLE prehash (
@@ -36,6 +36,9 @@ CREATE TABLE prehash (
 	md5 VARCHAR(255) NOT NULL DEFAULT '0',
 	requestID INT(10) UNSIGNED NOT NULL DEFAULT '0',
 	groupID INT(10) UNSIGNED NOT NULL DEFAULT '0',
+    nuked TINYINT(1) NOT NULL DEFAULT '0',
+    nukereason VARCHAR(255) NULL,
+    files VARCHAR(50) NULL,
 	PRIMARY KEY (ID)
 ) ENGINE=INNODB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci AUTO_INCREMENT=1;
 

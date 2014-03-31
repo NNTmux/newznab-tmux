@@ -13,9 +13,16 @@ require_once("functions.php");
 class IRCScraper
 {
 	/**
+	 * Array of current pre info.
 	 * @var array
 	 */
 	protected $CurPre;
+
+	/**
+	 * Array of old pre info.
+	 * @var array
+	 */
+	protected $OldPre;
 
 	/**
 	 * List of groups and their ID's
@@ -110,21 +117,42 @@ class IRCScraper
 					'#alt.binaries.moovee'                 => 'moovee',
 					'#alt.binaries.erotica'                => 'erotica',
 					'#alt.binaries.flac'                   => 'flac',
-					//'#alt.binaries.foreign'                => 'foreign'
+					'#alt.binaries.foreign'                => 'foreign',
+					'#alt.binaries.console.ps3'            => null
 				);
+				// Check if the user is ignoring channels.
+				if (defined('SCRAPE_IRC_EFNET_IGNORED_CHANNELS') && SCRAPE_IRC_EFNET_IGNORED_CHANNELS != '') {
+					$ignored = explode(',', SCRAPE_IRC_EFNET_IGNORED_CHANNELS);
+					$newList = array();
+					foreach($channelList as $channel => $password) {
+						if (!in_array($channel, $ignored)) {
+							$newList[$channel] = $password;
+						}
+					}
+					if (empty($newList)) {
+						exit('ERROR: You have ignored every group there is to scrape!' . PHP_EOL);
+					}
+					$channelList = $newList;
+					unset($newList);
+				}
 				$regex =
 					// Simple regex, more advanced regex below when doing the real checks.
 					'/' .
-						'FILLED.*Pred.*ago' .                          // a.b.inner-sanctum
+						'FILLED.*Pred.*ago' .                                  // a.b.inner-sanctum
 						'|' .
-						'Thank.*you.*Req.*Id.*Request' .               // a.b.cd.image, a.b.movies.divx, a.b.sounds.mp3.complete_cd, a.b.warez
+						'Thank.*you.*Req.*Id.*Request' .                       // a.b.cd.image, a.b.movies.divx, a.b.sounds.mp3.complete_cd, a.b.warez
 						'|' .
 						'Thank.*?you.*?You.*?are.*?now.*?Filling.*?ReqId.*?' . // a.b.flac a.b.teevee
 						'|' .
-						'Thank.*?You.*?Request.*?Filled!.*?ReqId' .    // a.b.moovee
+						'Thank.*?You.*?Request.*?Filled!.*?ReqId' .            // a.b.moovee a.b.foreign
 						'|' .
-						'That.*?was.*?awesome.*?Shall.*?ReqId' .       // a.b.erotica
+						'That.*?was.*?awesome.*?Shall.*?ReqId' .               // a.b.erotica
+						'|' .
+						'person.*?filling.*?request.*?for:.*?ReqID:' .         // a.b.console.ps3
 					'/i';
+				// a.b.teevee:
+				// Nuke    : [NUKE] ReqId:[183497] [From.Dusk.Till.Dawn.S01E01.720p.HDTV.x264-BATV] Reason:[bad.ivtc.causing.jerky.playback.due.to.dupe.and.missing.frames.in.segment.from.16m.to.30m]
+				// Un nuke : [UNNUKE] ReqId:[183449] [The.Biggest.Loser.AU.S09E29.PDTV.x264-RTA] Reason:[get.samplefix]
 				break;
 
 			case 'corrupt':
@@ -136,6 +164,9 @@ class IRCScraper
 				$password    = SCRAPE_IRC_CORRUPT_PASSWORD;
 				$channelList = array('#pre' => null);
 				$regex       = '/PRE:.+?\[.+?\]/i'; // #pre
+				// Nuke    : NUKE: Miclini-Sunday_Morning_P1-DIRFIX-DAB-03-30-2014-G4E [dirfix.must.state.name.of.release.being.fixed] [EthNet]
+				// Un nuke : UNNUKE: Youssoupha-Sur_Les_Chemins_De_Retour-FR-CD-FLAC-2009-0MNi [flac.rule.4.12.states.ENGLISH.artist.and.title.must.be.correct.and.this.is.not.ENGLISH] [LocalNet]
+				// Mod nuke: MODNUKE: Miclini-Sunday_Morning_P1-DIRFIX-DAB-03-30-2014-G4E [nfo.must.state.name.of.release.being.fixed] [EthNet]
 				break;
 
 			case 'zenet':
@@ -147,6 +178,8 @@ class IRCScraper
 				$password    = SCRAPE_IRC_ZENET_PASSWORD;
 				$channelList = array('#Pre' => null);
 				$regex       = '/^\(PRE\)\s+\(/'; // #Pre
+				// Nuke   : (NUKE) (German_TOP100_Single_Charts_31_03_2014-MCG) (selfmade.compilations.not.allowed)
+				// Un nuke: (UNNUKE) (The.Biggest.Loser.AU.S09E29.PDTV.x264-RTA) (get.samplefix)
 				break;
 
 			default:
@@ -277,6 +310,18 @@ class IRCScraper
 				}
 				break;
 
+			case 'abqueen':
+				if ($channel === '#alt.binaries.foreign') {
+					$this->ab_foreign($data->message);
+				}
+				break;
+
+			case 'binarybot':
+				if ($channel === '#alt.binaries.console.ps3') {
+					$this->ab_console_ps3($data->message);
+				}
+				break;
+
 			default:
 				break;
 		}
@@ -377,8 +422,24 @@ class IRCScraper
 	{
 		//Thank You [*Anonymous*] Request Filled! ReqId:[140445] [FULL 94x50MB Burning.Daylight.2010.720p.BluRay.x264-SADPANDA] Requested by:[*Anonymous* 3h 29m ago] Comments:[0] Watchers:[0] Points Earned:[314] [Pred 4h 29m ago]
 		if (preg_match('/ReqId:\[(?P<reqid>\d+)\]\s+\[FULL\s+\d+x\d+[MGPTK]?B\s+(?P<title>.+?)\]\s+.+?\[Pred\s+(?P<predago>.+?)\s+ago\]/i', $message, $matches)) {
-			$this->CurPre['source']  = '#a.b.moovee';
-			$this->CurPre['groupid'] = $this->getGroupID('alt.binaries.moovee');
+			$this->CurPre['source']   = '#a.b.moovee';
+			$this->CurPre['groupid']  = $this->getGroupID('alt.binaries.moovee');
+			$this->CurPre['category'] = 'Movies';
+			$this->siftMatches($matches);
+		}
+	}
+
+	/**
+	 * Gets new PRE from #a.b.foreign
+	 *
+	 * @param string $message The IRC message to parse.
+	 */
+	protected function ab_foreign(&$message)
+	{
+		//Thank You [*Anonymous*] Request Filled! ReqId:[61525] [Movie] [FULL 95x50MB Wadjda.2012.PAL.MULTI.DVDR-VIAZAC] Requested by:[*Anonymous* 5m 13s ago] Comments:[0] Watchers:[0] Points Earned:[317] [Pred 8m 27s ago]
+		if (preg_match('/ReqId:\[(?P<reqid>\d+)\]\s+\[(?P<category>.+?)\]\s+\[FULL\s+\d+x\d+[MGPTK]?B\s+(?P<title>.+?)\]\s+.+?\[Pred\s+(?P<predago>.+?)\s+ago\]/i', $message, $matches)) {
+			$this->CurPre['source']  = '#a.b.foreign';
+			$this->CurPre['groupid'] = $this->getGroupID('alt.binaries.mom');
 			$this->siftMatches($matches);
 		}
 	}
@@ -394,6 +455,22 @@ class IRCScraper
 		if (preg_match('/You\s+are\s+now\s+Filling\s+ReqId:\[(?P<reqid>\d+)\]\s+\[FULL\s+(?P<title>.+?)\]\s+\[Pred\s+(?P<predago>.+?)\s+ago\]/', $message, $matches)) {
 			$this->CurPre['source']   = '#a.b.teevee';
 			$this->CurPre['grpoupid'] = $this->getGroupID('alt.binaries.teevee');
+			$this->siftMatches($matches);
+		}
+	}
+
+	/**
+	 * Gets new PRE from #a.b.console.ps3
+	 *
+	 * @param string $message The IRC message to parse.
+	 */
+	protected function ab_console_ps3(&$message)
+	{
+		//<BinaryBot> [Anonymous person filling request for: FULL 56 Ragnarok.Odyssey.ACE.PS3-iMARS NTSC BLURAY imars-ragodyace-ps3 56x100MB by Khaine13 on 2014-03-29 13:14:12][ReqID: 4888][You get a bonus of 6 for a total points earning of: 62 for filling with 10% par2s!][Your score will be adjusted once you have -filled 4888]
+		if (preg_match('/\s+FULL\d+\s+(?P<title>.+?)\s+.+?\]\[ReqID:\s+(?P<reqid>\d+)\]\[/', $message, $matches)) {
+			$this->CurPre['source']   = '#a.b.console.ps3';
+			$this->CurPre['groupid'] = $this->getGroupID('alt.binaries.console.ps3');
+			$this->CurPre['category'] = 'PS3';
 			$this->siftMatches($matches);
 		}
 	}
@@ -465,7 +542,8 @@ class IRCScraper
 	 */
 	protected function checkForDupe()
 	{
-		if ($this->db->queryOneRow(sprintf('SELECT ID FROM prehash WHERE md5 = %s', $this->CurPre['md5'])) === false) {
+		$this->OldPre = $this->db->queryOneRow(sprintf('SELECT ID FROM prehash WHERE md5 = %s', $this->CurPre['md5']));
+		if ($this->OldPre === false) {
 			$this->insertNewPre();
 		} else {
 			$this->updatePre();
@@ -525,7 +603,7 @@ class IRCScraper
 		$query = 'UPDATE prehash SET ';
 
 		$query .= (!empty($this->CurPre['size'])     ? 'size = '      . $this->db->escapeString($this->CurPre['size'])     . ', ' : '');
-		$query .= (!empty($this->CurPre['category']) ? 'category = '  . $this->db->escapeString($this->CurPre['category']) . ', ' : '');
+		$query .= (empty($this->OldPre['category']) && !empty($this->CurPre['category']) ? 'category = '  . $this->db->escapeString($this->CurPre['category']) . ', ' : '');
 		$query .= (!empty($this->CurPre['source'])   ? 'source = '    . $this->db->escapeString($this->CurPre['source'])   . ', ' : '');
 		$query .= (!empty($this->CurPre['reqid'])    ? 'requestID = ' . $this->CurPre['reqid']                             . ', ' : '');
 		$query .= (!empty($this->CurPre['groupid'])  ? 'groupID = '   . $this->CurPre['groupid']                           . ', ' : '');
@@ -545,6 +623,11 @@ class IRCScraper
 		$this->resetPreVariables();
 	}
 
+	/**
+	 * Echo new or update pre to CLI.
+	 *
+	 * @param bool $new
+	 */
 	protected function doEcho($new = true)
 	{
 		if (!$this->silent) {
@@ -581,6 +664,7 @@ class IRCScraper
 	 */
 	protected function resetPreVariables()
 	{
+		$this->OldPre = array();
 		$this->CurPre =
 			array(
 				'title'    => '',
@@ -589,8 +673,8 @@ class IRCScraper
 				'predate'  => '',
 				'category' => '',
 				'source'   => '',
-				'groupID'  => '',
-				'reqID'    => ''
+				'groupid'  => '',
+				'reqid'    => ''
 
 			);
 	}
