@@ -33,7 +33,7 @@ Class PreHash
 		$db = new DB();
         $f = new Functions();
 		$newnames = 0;
-		$newestrel = $db->queryOneRow("SELECT adddate, ID FROM prehash ORDER BY adddate DESC LIMIT 1");
+		$newestrel = $db->queryOneRow('SELECT adddate, ID FROM prehash WHERE source NOT like "#%" ORDER BY adddate DESC LIMIT 1');
 		if (strtotime($newestrel["adddate"]) < time()-1200 || is_null($newestrel['adddate']))
 		{
 			if ($this->echooutput)
