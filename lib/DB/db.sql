@@ -167,9 +167,9 @@ INSERT INTO tmux (setting, value) values ('defrag_cache','900'),
     ('predb', '0'),
     ('predb_timer', '600'),
     ('delete_parts', '0'),
-    ('delete_timer', '43200');
+    ('delete_timer', '43200'),
     ('safebackfilldate', '2012-06-24'),
-    ('safepartrepair', '0');
+    ('safepartrepair', '0'),
 	('request_hours', '1'),
     ('trakttvkey',''), 
     ('lookuppar2','0'),

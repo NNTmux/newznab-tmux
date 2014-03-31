@@ -22,6 +22,9 @@
 		<th>source</th>
 		<th>category</th>
 		<th>size</th>
+        <th>nuke</th>
+        <th>nuke reason</th>
+        <th>files</th>
 		<th></th>
 		<th></th>
 	</tr>
@@ -213,6 +216,29 @@
 			<td class="prehash">
 				{if {$result.size} != 'NULL' && {$result.size} != ''}
 					{$result.size}
+				{else}
+					N/A
+				{/if}
+			</td>
+            	<td class="prehash">
+				{if {$result.nuke} != 'NULL' && {$result.nuke} != ''}
+					{$result.nuke}
+				{else}
+					N/A
+				{/if}
+			</td>
+            </td>
+            	<td class="prehash">
+				{if {$result.nukereason} != 'NULL' && {$result.nukereason} != ''}
+					{$result.nukereason}
+				{else}
+					N/A
+				{/if}
+			</td>
+            </td>
+            	<td class="prehash">
+				{if {$result.files} != 'NULL' && {$result.files} != ''}
+					{$result.files}
 				{else}
 					N/A
 				{/if}
