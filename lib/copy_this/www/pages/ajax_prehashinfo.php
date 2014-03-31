@@ -28,6 +28,15 @@ if (!$predata) {
 			print "<tr><th>Size:</th><td>" . htmlentities($predata["size"], ENT_QUOTES) . "</td></tr>\n";
 		}
 	}
+    if (isset($predata["nuke"]) && $predata["nuke"] != "") {
+		print "<tr><th>Nuke:</th><td>" . htmlentities($predata["nuke"], ENT_QUOTES) . "</td></tr>\n";
+	}
+    if (isset($predata["nukereason"]) && $predata["nukereasom"] != "") {
+		print "<tr><th>Nuke Reason:</th><td>" . htmlentities($predata["nukereason"], ENT_QUOTES) . "</td></tr>\n";
+	}
+    if (isset($predata["files"]) && $predata["files"] != "") {
+		print "<tr><th>Files:</th><td>" . htmlentities($predata["files"], ENT_QUOTES) . "</td></tr>\n";
+	}
 	print "<tr><th>Pred:</th><td>" . htmlentities($predata["predate"], ENT_QUOTES) . "</td></tr>\n";
 	print "</table>";
 }
