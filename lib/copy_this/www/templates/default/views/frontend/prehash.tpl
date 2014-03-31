@@ -22,15 +22,13 @@
 		<th>source</th>
 		<th>category</th>
 		<th>size</th>
-        <th>nuke</th>
-        <th>nuke reason</th>
         <th>files</th>
-		<th></th>
-		<th></th>
 	</tr>
 	{foreach from=$results item=result}
 		<tr class="{cycle values=",alt"}">
 			<td class="prehash">
+                {if $result.nuked > 1}<a title="NUKED:{$result.nukereason}"><img src="{$smarty.const.WWW_TOP}/templates/default/images/icons/nuked.png" /></a>{/if}
+				{if $result.nuked == 1}<a title="UNNUKED:{$result.nukereason}"><img src="{$smarty.const.WWW_TOP}/templates/default/images/icons/unnuked.png" /></a>{/if}
 				{if isset($result.guid)}
 					<a class="title" title="View details" href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.title|escape:"htmlall"}">
 						{$result.title|escape:"htmlall"}
@@ -220,25 +218,13 @@
 					N/A
 				{/if}
 			</td>
-            	<td class="prehash">
-				{if {$result.nuke} != 'NULL' && {$result.nuke} != ''}
-					{$result.nuke}
-				{else}
-					N/A
-				{/if}
-			</td>
-            </td>
-            	<td class="prehash">
-				{if {$result.nukereason} != 'NULL' && {$result.nukereason} != ''}
-					{$result.nukereason}
-				{else}
-					N/A
-				{/if}
-			</td>
-            </td>
-            	<td class="prehash">
-				{if {$result.files} != 'NULL' && {$result.files} != ''}
-					{$result.files}
+            <td class="prehash">
+				{if isset($result.files)}
+					{if strpos($result.files, 'B')}
+						{$result.files}
+					{else}
+						{$result.files}MB
+					{/if}
 				{else}
 					N/A
 				{/if}
