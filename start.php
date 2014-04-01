@@ -172,18 +172,18 @@ function window_ircscraper($tmux_session, $window)
 	if ($scrape_cz == 1 && $scrape_efnet == 1) {
 	    $DIR = dirname (__FILE__);
 		$ircscraper = $DIR . "/lib/IRCScraper/scrape.php";
-		exec("tmux new-window -t $tmux_session -n IRCScraper 'printf \"\033]2;scrape_cz\033\" && php $ircscraper cz'");
-		exec("tmux selectp -t 0; tmux splitw -t $tmux_session:$window -v -p 50 'printf \"\033]2;scrape_Efnet\033\" && php $ircscraper efnet'");
+		exec("tmux new-window -t $tmux_session -n IRCScraper 'printf \"\033]2;scrape_cz\033\" && php $ircscraper cz false false true '");
+		exec("tmux selectp -t 0; tmux splitw -t $tmux_session:$window -v -p 50 'printf \"\033]2;scrape_Efnet\033\" && php $ircscraper efnet false false true'");
 	}
 	else if ($scrape_cz == 1) {
 	    $DIR = dirname (__FILE__);
 		$ircscraper = $DIR . "/lib/IRCScraper/scrape.php";
-		exec("tmux new-window -t $tmux_session -n IRCScraper 'printf \"\033]2;scrape_cz\033\" && php $ircscraper cz'");
+		exec("tmux new-window -t $tmux_session -n IRCScraper 'printf \"\033]2;scrape_cz\033\" && php $ircscraper cz false false true'");
 	}
 	elseif ($scrape_efnet == 1) {
-	    $DIR = dirname (__FILE__);  
+	    $DIR = dirname (__FILE__);
 		$ircscraper = $DIR . "/lib/IRCScraper/scrape.php";
-		exec("tmux new-window -t $tmux_session -n IRCScraper 'printf \"\033]2;scrape_Efnet\033\" && php $ircscraper efnet'");
+		exec("tmux new-window -t $tmux_session -n IRCScraper 'printf \"\033]2;scrape_Efnet\033\" && php $ircscraper efnet false false true'");
 	}
 }
 
