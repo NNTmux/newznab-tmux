@@ -6,14 +6,14 @@
 	<meta name="keywords" content="" />
 	<meta name="description" content="" />	
 	<title>{$site->title|default:'newznab'} - {$page->meta_title|default:$page->title}</title>
-	<link href="{$smarty.const.WWW_TOP}/../templates/default/styles/style.css" rel="stylesheet" type="text/css" media="screen" />
-	<link href="{$smarty.const.WWW_TOP}/../templates/default/styles/admin.css" rel="stylesheet" type="text/css" media="screen" />
-	<link rel="shortcut icon" type="image/ico" href="{$smarty.const.WWW_TOP}/../templates/default/images/favicon.ico"/>
+	<link href="{$smarty.const.WWW_TOP}/../templates/nntmux/styles/style.css" rel="stylesheet" type="text/css" media="screen" />
+	<link href="{$smarty.const.WWW_TOP}/../templates/nntmux/styles/admin.css" rel="stylesheet" type="text/css" media="screen" />
+	<link rel="shortcut icon" type="image/ico" href="{$smarty.const.WWW_TOP}/../templates/nntmux/images/favicon.ico"/>
 	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/../templates/default/scripts/sorttable.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/../templates/default/scripts/utils-admin.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/../templates/default/scripts/jquery.multifile.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/../templates/default/scripts/jquery.autosize-min.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/../templates/nntmux/scripts/sorttable.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/../templates/nntmux/scripts/utils-admin.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/../templates/nntmux/scripts/jquery.multifile.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/../templates/nntmux/scripts/jquery.autosize-min.js"></script>
 	<script type="text/javascript">var WWW_TOP = "{$smarty.const.WWW_TOP}/..";</script>
 	
 	{$page->head}

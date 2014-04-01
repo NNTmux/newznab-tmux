@@ -8,18 +8,18 @@
 	<title>{$page->meta_title}{if $page->meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
 {if $loggedin=="true"}	<link rel="alternate" type="application/rss+xml" title="{$site->title} Full Rss Feed" href="{$smarty.const.WWW_TOP}/rss?t=0&amp;dl=1&amp;i={$userdata.ID}&amp;r={$userdata.rsstoken}" />{/if}
 
-	<link href="{$smarty.const.WWW_TOP}/templates/default/styles/style.css" rel="stylesheet" type="text/css" media="screen" />
-	<link href="{$smarty.const.WWW_TOP}/templates/default/styles/jquery.qtip.css" rel="stylesheet" type="text/css" media="screen" />
+	<link href="{$smarty.const.WWW_TOP}/templates/nntmux/styles/style.css" rel="stylesheet" type="text/css" media="screen" />
+	<link href="{$smarty.const.WWW_TOP}/templates/nntmux/styles/jquery.qtip.css" rel="stylesheet" type="text/css" media="screen" />
 {if $site->google_adsense_acc != ''}	<link href="http://www.google.com/cse/api/branding.css" rel="stylesheet" type="text/css" media="screen" />
 {/if}
-	<link rel="shortcut icon" type="image/ico" href="{$smarty.const.WWW_TOP}/templates/default/images/favicon.ico"/>
+	<link rel="shortcut icon" type="image/ico" href="{$smarty.const.WWW_TOP}/templates/nntmux/images/favicon.ico"/>
 	<link rel="search" type="application/opensearchdescription+xml" href="{$smarty.const.WWW_TOP}/opensearch" title="{$site->title|escape}" />
 	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/default/scripts/jquery.colorbox-min.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/default/scripts/jquery.autosize-min.js"></script>	
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/default/scripts/jquery.qtip2.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/default/scripts/utils.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/default/scripts/sorttable.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/nntmux/scripts/jquery.colorbox-min.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/nntmux/scripts/jquery.autosize-min.js"></script>	
+	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/nntmux/scripts/jquery.qtip2.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/nntmux/scripts/utils.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/nntmux/scripts/sorttable.js"></script>
 
 	<script type="text/javascript">
 	/* <![CDATA[ */	
@@ -44,7 +44,7 @@
 	{/strip}
 
 	<div id="logo">
-		<a class="logolink" title="{$site->title} Logo" href="{$smarty.const.WWW_TOP}{$site->home_link}"><img class="logoimg" alt="{$site->title} Logo" src="{$smarty.const.WWW_TOP}/templates/default/images/clearlogo.png" /></a>
+		<a class="logolink" title="{$site->title} Logo" href="{$smarty.const.WWW_TOP}{$site->home_link}"><img class="logoimg" alt="{$site->title} Logo" src="{$smarty.const.WWW_TOP}/templates/nntmux/images/clearlogo.png" /></a>
 
 		<h1><a href="{$smarty.const.WWW_TOP}{$site->home_link}">{$site->title}</a></h1>
 		<p><em>{$site->strapline}</em></p>
@@ -110,17 +110,17 @@
 			{/if}
 			
 			<li>
-				<a title="Sickbeard - The ultimate usenet PVR" href="http://www.sickbeard.com/"><img class="menupic" alt="Sickbeard - The ultimate usenet PVR" src="{$smarty.const.WWW_TOP}/templates/default/images/sickbeard.png" /></a>
+				<a title="Sickbeard - The ultimate usenet PVR" href="http://www.sickbeard.com/"><img class="menupic" alt="Sickbeard - The ultimate usenet PVR" src="{$smarty.const.WWW_TOP}/templates/nntmux/images/sickbeard.png" /></a>
 			</li>
 			<li>
-				<a title="Sabznbd - A great usenet binary downloader" href="http://www.sabnzbd.org/"><img class="menupic" alt="Sabznbd - A great usenet binary downloader" src="{$smarty.const.WWW_TOP}/templates/default/images/sabnzbd.png" /></a>
+				<a title="Sabznbd - A great usenet binary downloader" href="http://www.sabnzbd.org/"><img class="menupic" alt="Sabznbd - A great usenet binary downloader" src="{$smarty.const.WWW_TOP}/templates/nntmux/images/sabnzbd.png" /></a>
 			</li>
 			</ul>
 		</div>
 	
 		<div style="clear: both;text-align:right;">
 			<a class="w3validator" href="http://validator.w3.org/check?uri=referer">
-			<img src="{$smarty.const.WWW_TOP}/templates/default/images/valid-xhtml10.png" alt="Valid XHTML 1.0 Transitional" height="31" width="88" />
+			<img src="{$smarty.const.WWW_TOP}/templates/nntmux/images/valid-xhtml10.png" alt="Valid XHTML 1.0 Transitional" height="31" width="88" />
 			</a> 
 		</div>
 		

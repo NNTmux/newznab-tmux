@@ -44,9 +44,9 @@
 <table style="width:100%;" class="data highlight icons" id="coverstable">
 	<tr>
 		<th width="130"><input type="checkbox" class="nzb_check_all" /></th>
-		<th>author<br/><a title="Sort Descending" href="{$orderbyauthor_desc}"><img src="{$smarty.const.WWW_TOP}/templates/default/images/sorting/arrow_down.gif" alt="" /></a><a title="Sort Ascending" href="{$orderbyauthor_asc}"><img src="{$smarty.const.WWW_TOP}/templates/default/images/sorting/arrow_up.gif" alt="" /></a></th>
-		<th>genre<br/><a title="Sort Descending" href="{$orderbygenre_desc}"><img src="{$smarty.const.WWW_TOP}/templates/default/images/sorting/arrow_down.gif" alt="" /></a><a title="Sort Ascending" href="{$orderbygenre_asc}"><img src="{$smarty.const.WWW_TOP}/templates/default/images/sorting/arrow_up.gif" alt="" /></a></th>
-		<th>posted<br/><a title="Sort Descending" href="{$orderbyposted_desc}"><img src="{$smarty.const.WWW_TOP}/templates/default/images/sorting/arrow_down.gif" alt="" /></a><a title="Sort Ascending" href="{$orderbyposted_asc}"><img src="{$smarty.const.WWW_TOP}/templates/default/images/sorting/arrow_up.gif" alt="" /></a></th>
+		<th>author<br/><a title="Sort Descending" href="{$orderbyauthor_desc}"><img src="{$smarty.const.WWW_TOP}/templates/nntmux/images/sorting/arrow_down.gif" alt="" /></a><a title="Sort Ascending" href="{$orderbyauthor_asc}"><img src="{$smarty.const.WWW_TOP}/templates/nntmux/images/sorting/arrow_up.gif" alt="" /></a></th>
+		<th>genre<br/><a title="Sort Descending" href="{$orderbygenre_desc}"><img src="{$smarty.const.WWW_TOP}/templates/nntmux/images/sorting/arrow_down.gif" alt="" /></a><a title="Sort Ascending" href="{$orderbygenre_asc}"><img src="{$smarty.const.WWW_TOP}/templates/nntmux/images/sorting/arrow_up.gif" alt="" /></a></th>
+		<th>posted<br/><a title="Sort Descending" href="{$orderbyposted_desc}"><img src="{$smarty.const.WWW_TOP}/templates/nntmux/images/sorting/arrow_down.gif" alt="" /></a><a title="Sort Ascending" href="{$orderbyposted_asc}"><img src="{$smarty.const.WWW_TOP}/templates/nntmux/images/sorting/arrow_up.gif" alt="" /></a></th>
 	</tr>
 
 	{foreach from=$results item=result}
