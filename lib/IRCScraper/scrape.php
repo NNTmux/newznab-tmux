@@ -4,7 +4,7 @@ require_once(dirname(__FILE__).'/../Net_SmartIRC/Net/SmartIRC.php');
 require_once(dirname(__FILE__)."/../IRCScraper.php");
 require_once 'settings.php';
 
-if (!is_file('settings.php')) {
+if (!is_file('/var/www/newznab/misc/update_scripts/nix_scripts/tmux/lib/IRCScraper/settings.php')) {
 	exit('Copy settings_example.php to settings.php and change the settings.' . PHP_EOL);
 }
 
