@@ -1,4 +1,8 @@
 <?php
+require_once(dirname(__FILE__)."/../../bin/config.php");
+require_once(dirname(__FILE__).'/../Net_SmartIRC/Net/SmartIRC.php');
+require_once(dirname(__FILE__)."/../IRCScraper.php");
+require_once 'settings.php';
 
 if (!is_file('settings.php')) {
 	exit('Copy settings_example.php to settings.php and change the settings.' . PHP_EOL);
@@ -23,11 +27,6 @@ if (!isset($argv[1])) {
 if (!in_array($argv[1], array('efnet', 'cz'))) {
 	exit('Error, must be efnet or cz, you typed: ' . $argv[1] . PHP_EOL);
 }
-
-require_once(dirname(__FILE__)."/../../bin/config.php");
-require_once(dirname(__FILE__).'/../Net_SmartIRC/Net/SmartIRC.php');
-require_once(dirname(__FILE__)."/../IRCScraper.php");
-require_once 'settings.php';
 
 if (!defined('SCRAPE_IRC_EFNET_NICKNAME') ||
 	!defined('SCRAPE_IRC_CORRUPT_NICKNAME') ||
