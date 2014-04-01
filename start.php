@@ -15,7 +15,7 @@ $tmux = $t->get();
 $patch = (isset($tmux->sqlpatch)) ? $tmux->sqlpatch : 0;
 
 // Check database patch version
-if ($patch < 12) {
+if ($patch < 13) {
 	exit($c->error("\nYour database is not up to date. Please update.\nphp ${DIR}/lib/DB/patchDB.php\n"));
 }
 $tmux_session = (isset($tmux->tmux_session)) ? $tmux->tmux_session : 0;
@@ -162,6 +162,31 @@ function window_fixnames($tmux_session)
     exec("tmux selectp -t 3;tmux splitw -t $tmux_session:3 -h -p 50 'printf \"\033]2;PrehashUpdate\033\"'");
 }
 
+function window_ircscraper($tmux_session, $window)
+{
+	$t = new Tmux();
+	$tmux = $t->get();
+	$scrape_cz = $tmux->scrape_cz;
+	$scrape_efnet = $tmux->scrape_efnet;
+
+	if ($scrape_cz == 1 && $scrape_efnet == 1) {
+		$ircscraper = $DIR . "/lib/IRCScraper/scrape.php";
+
+		exec("tmux new-window -t $tmux_session -n IRCScraper 'printf \"\033]2;scrape_cz\033\" && php $ircscraper cz'");
+		exec("tmux selectp -t 0; tmux splitw -t $tmux_session:$window -v -p 50 'printf \"\033]2;scrape_Efnet\033\" && php $ircscraper efnet'");
+	}
+	else if ($scrape_cz == 1) {
+		$ircscraper = $DIR . "/lib/IRCScraper/scrape.php";
+
+		exec("tmux new-window -t $tmux_session -n IRCScraper 'printf \"\033]2;scrape_cz\033\" && php $ircscraper cz'");
+	}
+	elseif ($scrape_efnet == 1) {
+		$ircscraper = $DIR . "/lib/IRCScraper/scrape.php";
+
+		exec("tmux new-window -t $tmux_session -n IRCScraper 'printf \"\033]2;scrape_Efnet\033\" && php $ircscraper efnet'");
+	}
+}
+
 
 function attach($DIR, $tmux_session)
 {
@@ -197,6 +222,8 @@ if ($seq == 1) {
 	window_utilities($tmux_session);
 	window_post($tmux_session);
     window_fixnames($tmux_session);
+    window_ircscraper($tmux_session, 4);
+
 	if ($colors == 1) {
 		window_colors($tmux_session);
 	}
@@ -213,6 +240,7 @@ if ($seq == 1) {
 	window_utilities($tmux_session);
 	window_post($tmux_session);
     window_fixnames($tmux_session);
+    window_ircscraper($tmux_session, 4);
 
 	if ($colors == 1) {
 		window_colors($tmux_session);

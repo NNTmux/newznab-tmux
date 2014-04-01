@@ -29,9 +29,13 @@
 	{foreach from=$results item=result}
 		<tr class="{cycle values=",alt"}">
 			<td class="prehash">
-                {if $result.nuked > 1}<a title="NUKED:{$result.nukereason}"><img src="{$smarty.const.WWW_TOP}/templates/default/images/icons/nuked.png" /></a>{/if}
-				{if $result.nuked == 1}<a title="UNNUKED:{$result.nukereason}"><img src="{$smarty.const.WWW_TOP}/templates/default/images/icons/unnuked.png" /></a>{/if}
 				{if isset($result.guid)}
+                    <a style="font-style:italic;text-decoration:underline;color:#{if $result.nuked == 1}009933{elseif $result.nuked > 1}990000{/if};" class="title" title="View details" href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.title|escape:"htmlall"}">
+						<span title="{if $result.nuked == 1}UNNUKED: {$result.nukereason|escape:"htmlall"}{elseif $result.nuked > 1}NUKED: {$result.nukereason|escape:"htmlall"}{else}{$result.title|escape:"htmlall"}{/if}">{$result.title|escape:"htmlall"|truncate:55}</span>
+					</a>
+				{else}
+					<span style="color:#{if $result.nuked == 1}009933{elseif $result.nuked > 1}990000{/if};" title="{if $result.nuked == 1}UNNUKED: {$result.nukereason|escape:"htmlall"}{elseif $result.nuked > 1}NUKED: {$result.nukereason|escape:"htmlall"}{else}{$result.title|escape:"htmlall"}{/if}">{$result.title|escape:"htmlall"|truncate:55}</span>
+				{/if}
 					<a class="title" title="View details" href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.title|escape:"htmlall"}">
 						{$result.title|escape:"htmlall"}
 					</a>
@@ -44,7 +48,7 @@
 					<a
 						class="requestID"
 						title="{$result.requestID}"
-						href="{$smarty.const.WWW_TOP}/search?searchadvr=&searchadvsubject=[{$result.requestID}]
+						href="{$smarty.const.WWW_TOP}/search?searchadvr=&searchadvsubject={$result.requestID}
 						&searchadvposter=&searchadvdaysnew=&searchadvdaysold=&searchadvgroups=-1&searchadvcat=-1
 						&searchadvsizefrom=-1&searchadvsizeto=-1&searchadvhasnfo=0&searchadvhascomments=0&search_type=adv"
 					>
@@ -69,6 +73,10 @@
 					<a title="Visit allfilled {$result.source}" href="{$site->dereferrer_link}http://{$result.source}.allfilled.com/search.php?q={$result.title}&Search=Search">
 						{$result.source}
 					</a>
+                {elseif $result.source|strpos:'#a.b.' !== false}
+					<a title="Visit {$result.source} on IRC" href="irc://irc.Prison.NET:6667/{str_replace('#a.b.', 'alt.binaries.', {$result.source})}">
+						{$result.source}
+					</a>
 				{elseif {$result.source} == omgwtfnzbs}
 					<a title="Visit omgwtfnzbs" href="{$site->dereferrer_link}http://rss.omgwtfnzbs.org/rss-info.php">
 						omgwtfnzbs.org
@@ -84,6 +92,14 @@
 				{elseif {$result.source} == prelist}
 					<a title="Visit Prelist" href="{$site->dereferrer_link}http://www.prelist.ws/?search={$result.title}" target="_blank">
 						Prelist.ws
+					</a>
+                {elseif {$result.source} == "#Pre@zenet"}
+					<a title="Visit zenet on IRC" href="irc://irc.zenet.org:6667/Pre" target="_blank">
+						Zenet IRC
+					</a>
+				{elseif {$result.source} == "#pre@corrupt"}
+					<a title="Visit corrupt on IRC" href="irc://irc.corrupt-net.org:6667/pre" target="_blank">
+						Corrupt-Net
 					</a>
 				{elseif {$result.source} == srrdb}
 					<a title="Visit srrDB" href="{$site->dereferrer_link}http://www.srrdb.com/browse/{$result.title}" target="_blank">
