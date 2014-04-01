@@ -3,7 +3,6 @@
 require_once(dirname(__FILE__)."/../bin/config.php");
 require_once(dirname(__FILE__)."/Net_SmartIRC/Net/SmartIRC.php");
 require_once(WWW_DIR."/lib/framework/db.php");
-require_once(WWW_DIR."/lib/groups.php");
 require_once("functions.php");
 
 
@@ -76,6 +75,11 @@ class IRCScraper
 	 */
 	protected $IRC = null;
 
+    /**
+	 * @var DB
+	 */
+	protected $db;
+
 	/**
 	 * Current server.
 	 * efnet | corrupt | zenet
@@ -107,7 +111,6 @@ class IRCScraper
 	public function __construct(&$irc, $serverType, &$silent = false, &$debug = false, &$socket = true)
 	{
 		$this->db = new DB();
-		$this->groups = new Groups();
         $this->functions = new Functions();
 		$this->groupList = array();
 		$this->IRC = $irc;
@@ -491,6 +494,13 @@ class IRCScraper
 		}
 		if (isset($matches['files'])) {
 			$this->CurPre['files'] = substr($matches['files'], 0, 50);
+            // If the pre has no size, try to get one from files.
+			if (empty($this->OldPre['size']) && empty($this->CurPre['size'])) {
+				if (preg_match('/(?P<files>\d+)x(?P<size>\d+)\s*(?P<ext>[KMGTP]?B)\s*$/i', $matches['files'], $match)) {
+					$this->CurPre['size'] = ((int)$match['files'] * (int)$match['size']) . $match['ext'];
+					unset($match);
+				}
+			}
 		}
 		$this->checkForDupe();
 	}
@@ -808,7 +818,7 @@ class IRCScraper
 	 */
 	protected function checkForDupe()
 	{
-		$this->OldPre = $this->db->queryOneRow(sprintf('SELECT ID, category FROM prehash WHERE md5 = %s', $this->CurPre['md5']));
+		$this->OldPre = $this->db->queryOneRow(sprintf('SELECT category, size FROM prehash WHERE md5 = %s', $this->CurPre['md5']));
 		if ($this->OldPre === false) {
 			$this->insertNewPre();
 		} else {
@@ -882,7 +892,11 @@ class IRCScraper
 		$query .= (!empty($this->CurPre['groupid'])  ? 'groupID = '    . $this->CurPre['groupid']                         . ', ' : '');
 		$query .= (!empty($this->CurPre['predate'])  ? 'predate = '    . $this->CurPre['predate']                         . ', ' : '');
 		$query .= (!empty($this->CurPre['nuked'])    ? 'nuked = '      . $this->CurPre['nuked']                           . ', ' : '');
-		$query .= (empty($this->OldPre['category']) && !empty($this->CurPre['category']) ? 'category = '  . $this->db->escapeString($this->CurPre['category']) . ', ' : '');
+		$query .= (
+			(empty($this->OldPre['category']) && !empty($this->CurPre['category']))
+				? 'category = ' . $this->db->escapeString($this->CurPre['category']) . ', '
+				: ''
+		);
 
 		if ($query === 'UPDATE prehash SET '){
 			return;
@@ -963,7 +977,8 @@ class IRCScraper
 	protected function getGroupID($groupName)
 	{
 		if (!isset($this->groupList[$groupName])) {
-			$this->groupList[$groupName] = $this->functions->getIDByName($groupName);
+			$group = $this->db->queryOneRow(sprintf('SELECT ID FROM groups WHERE name = %s', $this->db->escapeString($groupName)));
+			$this->groupList[$groupName] = $group['ID'];
 		}
 		return $this->groupList[$groupName];
 	}
