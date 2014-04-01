@@ -180,6 +180,8 @@ INSERT INTO tmux (setting, value) values ('defrag_cache','900'),
     ('max_load_releases', 2.0),
     ('zippath', ''),
     ('processjpg', 0),
+    ('scrape_cz', 0),
+    ('scrape_efnet', 0),
     ('sqlpatch','11');
 
 DROP TABLE IF EXISTS country;
