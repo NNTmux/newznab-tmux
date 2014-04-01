@@ -36,12 +36,6 @@
 				{else}
 					<span style="color:#{if $result.nuked == 1}009933{elseif $result.nuked > 1}990000{/if};" title="{if $result.nuked == 1}UNNUKED: {$result.nukereason|escape:"htmlall"}{elseif $result.nuked > 1}NUKED: {$result.nukereason|escape:"htmlall"}{else}{$result.title|escape:"htmlall"}{/if}">{$result.title|escape:"htmlall"|truncate:55}</span>
 				{/if}
-					<a class="title" title="View details" href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.title|escape:"htmlall"}">
-						{$result.title|escape:"htmlall"}
-					</a>
-				{else}
-					{$result.title|escape:"htmlall"}
-				{/if}
 			</td>
 			<td class="prehash">
 				{if is_numeric({$result.requestID}) && {$result.requestID} != 0}
