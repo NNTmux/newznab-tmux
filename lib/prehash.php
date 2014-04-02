@@ -637,7 +637,7 @@ Class PreHash
 											INSERT INTO prehash (title, predate, source, md5, requestID, groupID, files, category)
 											VALUES (%s, %s, %s, %s, %s, %d, %s, 'Movies')",
 											$this->db->escapeString($matches2["title"]),
-											$this->db->from_unixtime(strtotime($matches2["predate"])),
+											$this->functions->from_unixtime(strtotime($matches2["predate"])),
 											$this->db->escapeString('abMooVee'),
 											$md5,
 											$matches2["requestID"],
@@ -707,7 +707,7 @@ Class PreHash
 											INSERT INTO prehash (title, predate, source, md5, requestID, groupID, files, category)
 											VALUES (%s, %s, %s, %s, %s, %d, %s, 'TV')",
 											$this->db->escapeString($matches2["title"]),
-											$this->db->from_unixtime(strtotime($matches2["predate"])),
+											$this->functions->from_unixtime(strtotime($matches2["predate"])),
 											$this->db->escapeString('abTeeVee'),
 											$md5,
 											$matches2["requestID"],
@@ -778,7 +778,7 @@ Class PreHash
 											INSERT INTO prehash (title, predate, source, md5, requestID, groupID, files, category)
 											VALUES (%s, %s, %s, %s, %s, %d, %s, %s)",
 											$this->db->escapeString($matches2["title"]),
-											$this->db->from_unixtime(strtotime($matches2["predate"])),
+											$this->functions->from_unixtime(strtotime($matches2["predate"])),
 											$this->db->escapeString('abErotica'),
 											$md5,
 											$matches2["requestID"],
@@ -850,7 +850,7 @@ Class PreHash
 											INSERT INTO prehash (title, predate, source, md5, requestID, groupID, files, category)
 											VALUES (%s, %s, %s, %s, %s, %d, %s, %s)",
 											$this->db->escapeString($matches2["title"]),
-											$this->db->from_unixtime(strtotime($matches2["predate"])),
+											$this->functions->from_unixtime(strtotime($matches2["predate"])),
 											$this->db->escapeString('abForeign'),
 											$md5,
 											$matches2["requestID"],
@@ -892,7 +892,7 @@ Class PreHash
 	 */
 	protected function retrieveAbgx()
 	{
-		$newnames = 0;
+		$newNames = 0;
 		$groups = new Groups();
 		$groupname = $request = $title = '';
 
@@ -936,12 +936,12 @@ Class PreHash
 									INSERT INTO prehash (title, predate, source, md5, requestID, groupID)
 									VALUES (%s, %s, %s, %s, %d, %d)',
 									$this->db->escapeString($title[1]),
-									$this->db->from_unixtime(strtotime($predate)),
+									$this->functions->from_unixtime(strtotime($predate)),
 									$this->db->escapeString('abgx'),
 									$this->db->escapeString($md5),
 									$requestid,
 									$groupid))) {
-								$newnames++;
+								$newNames++;
 							}
 						}
 					}
@@ -949,16 +949,16 @@ Class PreHash
 					if ($this->echooutput) {
 						echo $this->c->error("Update from ABGX failed.");
 					}
-					return $newnames;
+					return $newNames;
 				}
 			} else {
 				if ($this->echooutput) {
 					echo $this->c->error("Update from ABGX failed.");
 				}
-				return $newnames;
+				return $newNames;
 			}
 		}
-		return $newnames;
+		return $newNames;
 	}
 
 	/**
@@ -969,7 +969,7 @@ Class PreHash
 	protected  function retrieveUsenetCrawler()
 	{
 		$db = new DB();
-		$newnames = 0;
+		$newNames = 0;
 
 		$data = $this->getUrl("http://www.usenet-crawler.com/predb?q=&c=&offset=0#results");
 		if ($data === false) {
@@ -979,7 +979,7 @@ Class PreHash
 		$html = str_get_html($data);
 		$releases = @$html->find('table[id="browsetable"]');
 		if (!isset($releases[0])) {
-			return $newnames;
+			return $newNames;
 		}
 		$rows = $releases[0]->find('tr');
 		$count = 0;
@@ -1016,11 +1016,11 @@ Class PreHash
 			$size = isset($match[1]) ? $match[1] : 'NULL';
 			if (strlen($title) > 15 && $category != 'NUKED') {
 				if ($db->exec(sprintf('INSERT INTO prehash (title, predate, source, md5, category, size) VALUES (%s, %s, %s, %s, %s, %s)', $db->escapeString($title), $this->functions->from_unixtime($predate), $db->escapeString('usenet-crawler'), $db->escapeString($md5), $db->escapeString($category), $db->escapeString($size)))) {
-					$newnames++;
+					$newNames++;
 				}
 			}
 		}
-		return $newnames;
+		return $newNames;
 	}
 
 	// Update a single release as it's created.
