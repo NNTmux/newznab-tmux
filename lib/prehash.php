@@ -904,7 +904,7 @@ Class PreHash
 				$releases = @simplexml_load_string($data);
 				if ($releases !== false) {
 					preg_match('/^Filled requests in #(\S+)/', $releases->channel->description, $groupname);
-					$groupid = ($groups->getIDByName($groupname[1])) ? $groups->getIDByName($groupname[1]) : 0;
+					$groupid = ($this->functions->getIDByName($groupname[1])) ? $this->functions->getIDByName($groupname[1]) : 0;
 					foreach ($releases->channel->item as $release) {
 
 						preg_match('/\(\d+\) (\S+) .+(\d{4}-\d{1,2}-\d{1,2} \d{1,2}:\d{1,2}:\d{1,2})/', $release->description, $title);
