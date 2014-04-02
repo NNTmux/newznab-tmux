@@ -157,7 +157,7 @@
 		{if $predb.nuketype != '' && $predb.nukereason != ''}<tr><th>{$predb.nuketype|lower|capitalize}:</th><td>{$predb.nukereason}</td></tr>{/if}
 	{/if}
 
-    {if $pre|@count > 0}
+    {if $prehash|@count > 0}
 		<tr>
 			<th>Prehash:</th>
 			<td style="padding:0;">
@@ -167,13 +167,17 @@
 						<th class="mid">Date</th>
 						<th class="mid">Source</th>
 						<th class="mid">Size</th>
+                        <th class="mid">Files</th>
+                        <th class="mid">Nukereason</th>
 					</tr>
-					{foreach from=$pre item=pd}
+					{foreach from=$prehash item=pd}
 						<tr>
 							<td>{$pd.title}</td>
 							<td class="mid">{$pd.predate|date_format}</td>
 							<td class="mid">{$pd.source}</td>
 							{if isset($pd.size)}{if $pd.size > 0}<td class="right">{$pd.size}</td>{/if}{/if}
+                            {if isset($pd.files)}{if $pd.files != ''}<td class="right">{$pd.files}</td>{/if}{/if}
+                            {if isset($pd.nuked) && $pd.nuked > 0 && $pd.nukereason !=''}<td class="right">{$pd.nukereason}</td>{/if}
 						</tr>
 					{/foreach}
 				</table>
