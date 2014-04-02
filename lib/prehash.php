@@ -153,7 +153,7 @@ Class PreHash
 			// If we found nothing, update the last added to now to reset the timer.
 			$this->db->exec(sprintf("UPDATE tmux SET value = %s WHERE setting = 'lastpretime'", $this->db->escapeString(time())));
 			}
-			return $newnames;
+			return $newNames;
 	}
 
     // Attempts to match predb to releases.
