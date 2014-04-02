@@ -53,8 +53,19 @@ if ($bFound === true) {
 	$groupid = $f->getIDByName($pieces[2]);
 	if ($groupid !== 0) {
 		$md5 = md5($title);
-		$db->queryDirect(sprintf("INSERT IGNORE INTO prehash (title, adddate, source, md5, requestID, groupID) VALUES "
-				. "(%s, now(), %s, %s, %s, %d) ON DUPLICATE KEY UPDATE requestID = %d", $db->escapeString($title), $db->escapeString('requestWEB'), $db->escapeString($md5), $requestID, $groupID, $requestID));
+		$dupe = $db->queryOneRow(sprintf('SELECT requestID FROM prehash WHERE md5 = %s', $db->escapeString($md5)));
+		if ($dupe === false || ($dupe !== false && $dupe['requestID'] !== $requestID)) {
+			$db->queryDirect(
+				sprintf("
+				INSERT INTO prehash (title, source, md5, requestID, groupID)
+				VALUES (%s, %s, %s, %s, %d)",
+					$db->escapeString($title),
+					$db->escapeString('requestWEB'),
+					$db->escapeString($md5),
+					$requestID, $groupid
+				)
+			);
+        }
 	} else if ($groupid === 0) {
 		echo $requestID . "\n";
 	}

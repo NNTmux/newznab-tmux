@@ -31,7 +31,6 @@ CREATE TABLE prehash (
 	size VARCHAR(50) NULL,
 	category VARCHAR(255) NULL,
 	predate DATETIME DEFAULT NULL,
-	adddate DATETIME DEFAULT NULL,
 	source VARCHAR(50) NOT NULL DEFAULT '',
 	md5 VARCHAR(255) NOT NULL DEFAULT '0',
 	requestID INT(10) UNSIGNED NOT NULL DEFAULT '0',
@@ -45,7 +44,6 @@ CREATE TABLE prehash (
 CREATE INDEX ix_prehash_title ON prehash(title);
 CREATE INDEX ix_prehash_nfo ON prehash(nfo);
 CREATE INDEX ix_prehash_predate ON prehash(predate);
-CREATE INDEX ix_prehash_adddate ON prehash(adddate);
 CREATE INDEX ix_prehash_source ON prehash(source);
 CREATE INDEX ix_prehash_requestid on prehash(requestID, groupID);
 CREATE INDEX ix_prehash_size ON prehash(size);
@@ -182,6 +180,7 @@ INSERT INTO tmux (setting, value) values ('defrag_cache','900'),
     ('processjpg', 0),
     ('scrape_cz', 0),
     ('scrape_efnet', 0),
+    ('lastpretime', '0'),
     ('sqlpatch','11');
 
 DROP TABLE IF EXISTS country;

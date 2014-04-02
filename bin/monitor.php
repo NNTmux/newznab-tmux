@@ -9,7 +9,7 @@ require_once(dirname(__FILE__)."/../lib/showsleep.php");
 require_once(dirname(__FILE__)."/../lib/functions.php");
 
 
-$version="0.3r1051";
+$version="0.3r1052";
 
 $db = new DB();
 $functions = new Functions();
@@ -67,7 +67,7 @@ $proc = "SELECT
 ( SELECT COUNT( ID ) FROM groups WHERE active = 1 ) AS active_groups,
 ( SELECT COUNT( ID ) FROM groups WHERE name IS NOT NULL ) AS all_groups,
 ( SELECT COUNT( ID ) FROM groups WHERE first_record IS NOT NULL and `backfill_target` > 0 and first_record_postdate != '2000-00-00 00:00:00'  < first_record_postdate) AS backfill_groups,
-( SELECT UNIX_TIMESTAMP(adddate) from prehash order by adddate DESC limit 1 ) AS newestprehash,
+( SELECT UNIX_TIMESTAMP(predate) from prehash order by predate DESC limit 1 ) AS newestprehash,
 ( SELECT UNIX_TIMESTAMP(updatedate) from predb order by updatedate DESC limit 1 ) AS newestpredb,
 ( SELECT TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES WHERE table_name = 'prehash' AND TABLE_SCHEMA = '".DB_NAME."' ) AS prehash,
 ( SELECT name from releases order by adddate desc limit 1 ) AS newestaddname";
@@ -650,7 +650,12 @@ while( $i > 0 )
     if ( @$proc_result[0]['all_groups'] != NULL ) { $all_groups = $proc_result[0]['all_groups']; }
     if ( @$proc_result[0]['newestprehash'] ) { $newestprehash = $proc_result[0]['newestprehash']; }
     if ( @$proc_result[0]['newestpredb'] ) { $newestpredb = $proc_result[0]['newestpredb']; }
-    if ( @$proc_result[0]['prehash'] != NULL ) { $prehash = $proc_result[0]['prehash']; }
+    if ( @$proc_result[0]['prehash'] != NULL ) { $prehash = $proc_result[0]['prehash'];
+         		$nowTime = time();
+		    if ($prehash > $nowTime) {
+			    $prehash = $nowTime;
+		        }
+        }
     if ( @$proc_result2[0]['prehash_matched'] != NULL ) { $prehash_matched = $proc_result2[0]['prehash_matched']; }
     if ( @$proc_result2[0]['distinct_prehash_matched'] != NULL) {$distinct_prehash_matched = $proc_result2[0]['distinct_prehash_matched'];}
 	if ( @$proc_result2[0]['requestid_inprogress'] != NULL) {$requestid_inprogress = $proc_result2[0]['requestid_inprogress'];}
