@@ -514,7 +514,7 @@ Class PreHash
 					}
 
 					if (preg_match('/Filesize.*<td>(?P<size>\d*)<\/td>\s*<td>.*?<\/td>\s*<td>.*?<\/td>\s*<\/tr>\s*<\/table>\s*/is', $release->description, $description)) {
-						$size = ((isset($description['size']) && !empty($description['size'])) ? $this->db->escapeString(bytesToSizeString($description['size'])) : 'NULL');
+						$size = ((isset($description['size']) && !empty($description['size'])) ? $this->db->escapeString($this->bytesToSizeString($description['size'])) : 'NULL');
 					}
 
 					if ($oldName !== false) {
@@ -1263,4 +1263,17 @@ Class PreHash
 			'Version/4.0.4 Mobile/7B334b Safari/531.21.102011-10-16 20:23:10', 'foo=bar'
 		);
 	}
+   /**
+ * Get human readable size string from bytes.
+ *
+ * @param int $bytes     Bytes number to convert.
+ * @param int $precision How many floating point units to add.
+ *
+ * @return string
+ */
+function bytesToSizeString($bytes, $precision = 0)
+{
+	$unit = array('B','KB','MB','GB','TB','PB','EB');
+	return round($bytes / pow(1024, ($i = floor(log($bytes, 1024)))), $precision) . $unit[(int)$i];
+}
 }
