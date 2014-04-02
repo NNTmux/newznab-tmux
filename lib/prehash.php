@@ -47,9 +47,9 @@ Class PreHash
 	{
 		$db = new DB();
         $f = new Functions();
-		$newnames = 0;
+		$newNames = 0;
 		$newestRel = $this->db->queryOneRow("SELECT value AS adddate FROM tmux WHERE setting = 'lastpretime'");
-		if ((int)($newestrel["adddate"] < time()-1200))
+		if ((int)($newestRel["adddate"] < time()-1200))
 		{
 			if ($this->echooutput)
 			{

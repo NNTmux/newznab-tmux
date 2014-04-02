@@ -4,6 +4,7 @@ require(dirname(__FILE__)."/config.php");
 require_once(WWW_DIR."/lib/framework/db.php");
 require_once(WWW_DIR."/lib/groups.php");
 require_once(WWW_DIR."/lib/category.php");
+require_once(WWW_DIR."/lib/Tmux.php");
 require_once(dirname(__FILE__).'/../lib/functions.php');
 require_once(dirname(__FILE__).'/../lib/ColorCLI.php');
 
@@ -16,6 +17,8 @@ $db = new DB();
 $n = "\n";
 $category = new Category();
 $groups = new Groups();
+$t = new Tmux ();
+$tmux = $t->get();
 $f = new Functions();
 if (!preg_match('/^\[\d+\]/', $pieces[1])) {
 	$db->query('UPDATE releases SET reqidstatus = -2 WHERE ID = ' . $pieces[0]);
