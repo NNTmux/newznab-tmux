@@ -20,7 +20,7 @@ ALTER TABLE  `releases`
   ADD INDEX `ix_releases_dehashstatus` (`dehashstatus`),
   ADD INDEX `ix_releases_haspreview` (`haspreview` ASC) USING HASH,
   ADD INDEX `ix_releases_postdate_name` (`postdate`, `name`),
-  ADD INDEX `ix_releases_status` (`iscategorized`, `isrenamed`, `nfostatus`, `ishashed`, `passwordstatus`, `dehashstatus`, `releasenfoID`, `musicinfoID`, `consoleinfoID`, `bookinfoID`, `haspreview`, `categoryID`, `imdbID`, `rageID`);
+  ADD INDEX `ix_releases_status` (`iscategorized`, `isrenamed`, `nfostatus`, `ishashed`, `passwordstatus`, `dehashstatus`, `releasenfoID`, `musicinfoID`, `consoleinfoID`, `bookinfoID`, `haspreview`, `categoryID`, `imdbID`, `rageID`),
   ADD INDEX `ix_releases_prehashid_searchname` (`prehashID`, `searchname`);
 
 DROP TABLE IF EXISTS prehash;
