@@ -48,13 +48,12 @@ Class PreHash
 	// Returns the quantity of new titles retrieved.
 	public function updatePre()
 	{
-		$db = new DB();
         $f = new Functions();
 		$newNames = 0;
 		$newestRel = $this->db->queryOneRow("SELECT value AS adddate FROM tmux WHERE setting = 'lastpretime'");
-		if ((int)($newestRel["adddate"] < time()-1200))
-		{
-			if ($this->echooutput)
+		if ((int)$newestRel['adddate'] < (time() - 600)) {
+
+            if ($this->echooutput)
 			{
 				echo $this->c->header("Retrieving titles from preDB sources.");
 			}
@@ -156,7 +155,7 @@ Class PreHash
 			// If we found nothing, update the last added to now to reset the timer.
 			$this->db->exec(sprintf("UPDATE tmux SET value = %s WHERE setting = 'lastpretime'", $this->db->escapeString(time())));
 			}
-			return $newNames;
+		return $newNames;
 	}
 
     // Attempts to match predb to releases.
