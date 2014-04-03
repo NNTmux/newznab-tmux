@@ -20,8 +20,8 @@ ALTER TABLE  `releases`
   ADD INDEX `ix_releases_dehashstatus` (`dehashstatus`),
   ADD INDEX `ix_releases_haspreview` (`haspreview` ASC) USING HASH,
   ADD INDEX `ix_releases_postdate_name` (`postdate`, `name`),
-  ADD INDEX `ix_releases_status` (`iscategorized`, `isrenamed`, `nfostatus`, `ishashed`, `passwordstatus`, `dehashstatus`, `releasenfoID`, `musicinfoID`, `consoleinfoID`, `bookinfoID`, `haspreview`, `categoryID`, `imdbID`, `rageID`);
-  ADD INDEX `ix_releases_prehashid_searchname` (`prehashID`, `searchname`); 
+  ADD INDEX `ix_releases_status` (`iscategorized`, `isrenamed`, `nfostatus`, `ishashed`, `passwordstatus`, `dehashstatus`, `releasenfoID`, `musicinfoID`, `consoleinfoID`, `bookinfoID`, `haspreview`, `categoryID`, `imdbID`, `rageID`),
+  ADD INDEX `ix_releases_prehashid_searchname` (`prehashID`, `searchname`);
 
 DROP TABLE IF EXISTS prehash;
 CREATE TABLE prehash (
@@ -31,18 +31,19 @@ CREATE TABLE prehash (
 	size VARCHAR(50) NULL,
 	category VARCHAR(255) NULL,
 	predate DATETIME DEFAULT NULL,
-	adddate DATETIME DEFAULT NULL,
 	source VARCHAR(50) NOT NULL DEFAULT '',
 	md5 VARCHAR(255) NOT NULL DEFAULT '0',
 	requestID INT(10) UNSIGNED NOT NULL DEFAULT '0',
 	groupID INT(10) UNSIGNED NOT NULL DEFAULT '0',
+    nuked TINYINT(1) NOT NULL DEFAULT '0',
+    nukereason VARCHAR(255) NULL,
+    files VARCHAR(50) NULL,
 	PRIMARY KEY (ID)
 ) ENGINE=INNODB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci AUTO_INCREMENT=1;
 
 CREATE INDEX ix_prehash_title ON prehash(title);
 CREATE INDEX ix_prehash_nfo ON prehash(nfo);
 CREATE INDEX ix_prehash_predate ON prehash(predate);
-CREATE INDEX ix_prehash_adddate ON prehash(adddate);
 CREATE INDEX ix_prehash_source ON prehash(source);
 CREATE INDEX ix_prehash_requestid on prehash(requestID, groupID);
 CREATE INDEX ix_prehash_size ON prehash(size);
@@ -109,7 +110,6 @@ INSERT INTO tmux (setting, value) values ('defrag_cache','900'),
 	('dehash_timer','30'),
 	('backfill_order','2'),
 	('backfill_days', '1'),
-    ('safebackfilldate', '2012-06-24'),
 	('post_amazon', '0'),
     ('amazonsleep', 1000),
 	('post_non', '0'),
@@ -165,9 +165,9 @@ INSERT INTO tmux (setting, value) values ('defrag_cache','900'),
     ('predb', '0'),
     ('predb_timer', '600'),
     ('delete_parts', '0'),
-    ('delete_timer', '43200');
+    ('delete_timer', '43200'),
     ('safebackfilldate', '2012-06-24'),
-    ('safepartrepair', '0');
+    ('safepartrepair', '0'),
 	('request_hours', '1'),
     ('trakttvkey',''), 
     ('lookuppar2','0'),
@@ -178,7 +178,10 @@ INSERT INTO tmux (setting, value) values ('defrag_cache','900'),
     ('max_load_releases', 2.0),
     ('zippath', ''),
     ('processjpg', 0),
-    ('sqlpatch','11');
+    ('scrape_cz', 0),
+    ('scrape_efnet', 0),
+    ('lastpretime', '0'),
+    ('sqlpatch','14');
 
 DROP TABLE IF EXISTS country;
 CREATE TABLE country (

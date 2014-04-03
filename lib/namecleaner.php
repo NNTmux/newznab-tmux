@@ -119,7 +119,7 @@ class nameCleaning
 				return $this->classic_tv_shows();
 			case 'alt.binaries.comics':
 				return $this->comics();
-			case 'alt.binaries.classic.comics.dcp':
+			case 'alt.binaries.comics.dcp':
 				return $this->comics_dcp();
 			case 'alt.binaries.comp':
 				return $this->comp();
@@ -1075,10 +1075,37 @@ class nameCleaning
 
 	public function comics_dcp()
 	{
+		//New Releases 2014.3.20 - "The Silver Surfer 012 (1970-01) (digital) (milton19-Empire).cbr" yEnc
+		if (preg_match('/\d{4}\.(\d{2}\.){2} - "(.+?)\.cb[rz]" yEnc$/i', $this->subject, $match)) {
+			return array('cleansubject' => $match[2], 'properlynamed' => false);
+		}
+		//Re: Req: Dark Tower - The Battle of Jericho Hill 05 (of 05) TIA - File 1 of 1 - yEnc
+		else if (preg_match('/(Req?: )+(.+?) - File \d+ of \d+ - yEnc$/i', $this->subject, $match)) {
+			return array('cleansubject' => $match[2], 'properlynamed' => false);
+		}
+		//Amazing Spider-man 306 || FB-DCP scan || 1988 || - "Amazing Spider-man 306 (1988)(FB-DCP)(C2C).CBR" [3/7] yEnc
+		else if (preg_match('/\|\| \d{4} \|\| - "(.+?)\.cb[rz]" \[\d+\/\d+\] yEnc$/i', $this->subject, $match)) {
+			return array('cleansubject' => $match[1], 'properlynamed' => false);
+		}
+		//All-Star Squadron Preview 00 (1981) [HQ rescan] [1/5] - All-Star Squadron Preview 00 (Aug 1981) [HQ rescan] [RexTyler].cbr yEnc
+		//Mad Color Classics (1st time as true CBR) - [1/1] Mad Color Classics 04 {FIXED} (c2c) [True CBR by RexTyler].cbr yEnc
+		//Comico Christmas Special (1988) - [1/5] Comico Christmas Special (1988) [starv].cbr.par2 yEnc
+		else if (preg_match('/\s+\[\d+\/\d+\]\s+(-\s+)?([A-Z0-9].+?)(\[.*?(starv|RexTyler).*?\])?\.cb[rz](\.par2)?\s+yEnc$/i', $this->subject, $match)) {
+			return array('cleansubject' => $match[2], 'properlynamed' => false);
+		}
+		//0-Day 2013.8.28 - "Ultimate Comics Spider-Man 026 (2013) complete/unbroken - File 1 of 1 - Ultimate Comics Spider-Man 026 (2013) (Digital) (Zone-Empire).cbr yEnc
+		//Ultimate Comics Spider-Man 026 - File 1 of 1 - Ultimate Comics Spider-Man 026 (2013) (Digital) (Zone-Empire).rar yEnc
+		else if (preg_match('/\s+-\s+File \d+ of \d+\s+-\s+([A-Z0-9].+?)\.(cb[rz]|rar)\s+yEnc$/i', $this->subject, $match)) {
+			return array('cleansubject' => $match[1], 'properlynamed' => false);
+		}
+		//Grimm Fairy Tales Myths & Legends 12 - File 1 of 1 - yEnc
+		else if (preg_match('/^([a-z0-9].+?)\s+-\s+File \d+ of \d+\s+-\s+yEnc$/i', $this->subject, $match)) {
+			return array('cleansubject' => $match[1], 'properlynamed' => false);
+		}
 		// Return anything between the quotes.
-		if (preg_match('/.*"(.+?)(\.part\d*|\.rar)?(\.vol.+?"|\.[A-Za-z0-9]{2,4}").+?yEnc$/', $this->subject, $match)) {
+		else if (preg_match('/.*"(.+?)(\.part\d*|\.rar)?(\.vol.+?"|\.[A-Za-z0-9]{2,4}").+?yEnc$/', $this->subject, $match)) {
 			if (strlen($match[1]) > 7 && !preg_match('/\.vol.+/', $match[1])) {
-				return $match[1];
+				return array('cleansubject' => $match[1], 'properlynamed' => false);
 			} else {
 				return array("cleansubject" => $this->releaseCleanerHelper($this->subject), "properlynamed" => false);
 			}
@@ -2282,6 +2309,10 @@ class nameCleaning
 		} //Big.Brother.IL.S05E01.WS.PDTV.XviD-Silver007 [1/1] - "Big.Brother.IL.S05E01.WS.PDTV.XviD-Silver007.avi" yEnc
 		else if (preg_match('/^[a-zA-Z0-9._-]+ \[\d+\/\d+\] - "(.+?)' . $this->e1, $this->subject, $match) && !preg_match('/[a-fA-F0-9]{32}/', $this->subject)) {
 			return $match[1];
+		}
+		//[ f680631754c469e49d3447bf0beadb8e ] [1/8] - "00-chris_carreiro-dirty-web-2014.m3u" yEnc
+		else if (preg_match('/^\[ [a-f0-9]{32} \] \[\d+\/\d+\] - "\d+[-_](.+?)\.[a-z0-9]{3,4}" yEnc$/i', $this->subject, $match)) {
+			return $match[1];
 		} else {
 			return array("cleansubject" => $this->releaseCleanerHelper($this->subject), "properlynamed" => false);
 		}
@@ -2336,6 +2367,12 @@ class nameCleaning
 			return $match[2];
 		} //[002/161] - "Rayman_Legends_USA_PS3-CLANDESTiNE.nfo" yEnc
 		else if (preg_match('/^\[\d+\/\d+\][ _-]{0,3}"(.+?)' . $this->e1, $this->subject, $match)) {
+			return $match[1];
+		}
+		//NetVideoGirls.13.08.05.Julia.XXX.MP4-KTR - [1/1] - "NetVideoGirls.13.08.05.Julia.XXX.MP4-KTR.rar" yEnc
+		//FemaleAgent.E136.Rollie.XXX.1080p.MOV-KTR - [1/1] - "FemaleAgent.E136.Rollie.XXX.1080p.MOV-KTR.rar" yEnc
+		//Penthouse.13.07.13.Natalia.Starr.Pet.Of.Month.July.2013.XXX.3D.WMV-TBP - [1/1] - "Penthouse.13.07.13.Natalia.Starr.Pet.Of.Month.July.2013.XXX.3D.WMV-TBP.rar" yEnc
+		else if (preg_match('/^([a-z0-9].+?\.XXX.*?\.[a-z0-9]{3,4}-[a-z0-9]+) - \[\d+\/\d+\] - ".+?" yEnc$/i', $this->subject, $match)) {
 			return $match[1];
 		} else {
 			return array("cleansubject" => $this->releaseCleanerHelper($this->subject), "properlynamed" => false);

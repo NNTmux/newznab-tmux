@@ -163,7 +163,7 @@ class ReleaseRemover
 		$this->timeStart = TIME();
 
 		// Start forming the query.
-		$this->query = 'SELECT ID, guid FROM releases WHERE 1=1';
+		$this->query = 'SELECT ID, guid, searchname FROM releases WHERE 1=1';
 
 		// Keep forming the query based on the user's criteria, return if any errors.
 		foreach($arguments as $arg) {

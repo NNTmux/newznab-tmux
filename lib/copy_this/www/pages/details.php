@@ -127,7 +127,7 @@ if (isset($_GET["id"]))
 
 
     $prehash = new PreHash();
-	$pre = $prehash->getForRelease($data["preID"]);
+	$pre = $prehash->getForRelease($data["prehashID"]);
 
 	$rf = new ReleaseFiles;
 	$releasefiles = $rf->get($data["ID"]);

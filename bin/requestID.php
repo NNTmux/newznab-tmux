@@ -4,6 +4,7 @@ require(dirname(__FILE__)."/config.php");
 require_once(WWW_DIR."/lib/framework/db.php");
 require_once(WWW_DIR."/lib/groups.php");
 require_once(WWW_DIR."/lib/category.php");
+require_once(WWW_DIR."/lib/Tmux.php");
 require_once(dirname(__FILE__).'/../lib/functions.php');
 require_once(dirname(__FILE__).'/../lib/ColorCLI.php');
 
@@ -16,6 +17,8 @@ $db = new DB();
 $n = "\n";
 $category = new Category();
 $groups = new Groups();
+$t = new Tmux ();
+$tmux = $t->get();
 $f = new Functions();
 if (!preg_match('/^\[\d+\]/', $pieces[1])) {
 	$db->query('UPDATE releases SET reqidstatus = -2 WHERE ID = ' . $pieces[0]);
@@ -53,8 +56,19 @@ if ($bFound === true) {
 	$groupid = $f->getIDByName($pieces[2]);
 	if ($groupid !== 0) {
 		$md5 = md5($title);
-		$db->queryDirect(sprintf("INSERT IGNORE INTO prehash (title, adddate, source, md5, requestID, groupID) VALUES "
-				. "(%s, now(), %s, %s, %s, %d) ON DUPLICATE KEY UPDATE requestID = %d", $db->escapeString($title), $db->escapeString('requestWEB'), $db->escapeString($md5), $requestID, $groupID, $requestID));
+		$dupe = $db->queryOneRow(sprintf('SELECT requestID FROM prehash WHERE md5 = %s', $db->escapeString($md5)));
+		if ($dupe === false || ($dupe !== false && $dupe['requestID'] !== $requestID)) {
+			$db->queryDirect(
+				sprintf("
+				INSERT INTO prehash (title, source, md5, requestID, groupID)
+				VALUES (%s, %s, %s, %s, %d)",
+					$db->escapeString($title),
+					$db->escapeString('requestWEB'),
+					$db->escapeString($md5),
+					$requestID, $groupid
+				)
+			);
+        }
 	} else if ($groupid === 0) {
 		echo $requestID . "\n";
 	}
