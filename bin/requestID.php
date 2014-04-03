@@ -119,15 +119,15 @@ function localLookup($requestID, $groupName, $oldname)
 		return array('title' => $run['title'], 'id' => $run['id']);
 	}
 	if (preg_match('/\[#?a\.b\.teevee\]/', $oldname)) {
-		$groupid = $groups->getIDByName('alt.binaries.teevee');
+		$groupID = $f->getIDByName('alt.binaries.teevee');
 	} else if (preg_match('/\[#?a\.b\.moovee\]/', $oldname)) {
-		$groupid = $groups->getIDByName('alt.binaries.moovee');
+		$groupID = $f->getIDByName('alt.binaries.moovee');
 	} else if (preg_match('/\[#?a\.b\.erotica\]/', $oldname)) {
-		$groupid = $groups->getIDByName('alt.binaries.erotica');
+		$groupID = $f->getIDByName('alt.binaries.erotica');
 	} else if (preg_match('/\[#?a\.b\.foreign\]/', $oldname)) {
-		$groupid = $groups->getIDByName('alt.binaries.mom');
+		$groupID = $f->getIDByName('alt.binaries.mom');
 	} else if ($groupName == 'alt.binaries.etc') {
-		$groupid = $groups->getIDByName('alt.binaries.teevee');
+		$groupID = $f->getIDByName('alt.binaries.teevee');
 	}
 	$run1 = $db->queryOneRow(sprintf("SELECT ID, title FROM prehash WHERE requestID = %d AND groupID = %d", $requestID, $groupID));
 	if (isset($run1['title'])) {
