@@ -176,105 +176,113 @@ Class PreHash
 		}
 	}
 
-	public function retrieveWomble()
+		/**
+	 * Retrieve new pre info from womble.
+	 *
+	 * @return int
+	 */
+	protected function retrieveWomble()
 	{
-		$db = new DB();
-        $f = new Functions();
 		$newNames = $updated = 0;
-        $matches2 = $matches = $match = $m = '';
+		$buffer = $this->getUrl('http://www.newshost.co.za');
+		if ($buffer !== false) {
+			$matches = $match = $matches2 = array();
+			if (preg_match_all('/<tr bgcolor=#[df]{6}>.+?<\/tr>/s', $buffer, $matches)) {
+				foreach ($matches as $match) {
+					foreach ($match as $m) {
+						if (preg_match('/<tr bgcolor=#[df]{6}>.+?<td>(?P<date>.+?)<\/td>(.+?right>(?P<size1>.+?)&nbsp;(?P<size2>.+?)<\/td.+?)?<td>(?P<category>.+?)<\/td.+?<a href=.+?(<a href="(?P<nfo>.+?)">nfo<\/a>.+)?<td>(?P<title>.+?)<\/td.+tr>/s', $m, $matches2)) {
 
-		$buffer = $this->fileContents('http://www.newshost.co.za');
-		if ($buffer !== false && strlen($buffer))
-		{
-			if (preg_match_all('/<tr bgcolor=#[df]{6}>.+?<\/tr>/s', $buffer, $matches))
-			{
-				foreach ($matches as $match)
-				{
-					foreach ($match as $m)
-					{
-						if (preg_match('/<tr bgcolor=#[df]{6}>.+?<td>(?P<date>.+?)<\/td>(.+?right>(?P<size1>.+?)&nbsp;(?P<size2>.+?)<\/td.+?)?<td>(?P<category>.+?)<\/td.+?<a href=.+?(<a href="(?P<nfo>.+?)">nfo<\/a>.+)?<td>(?P<title>.+?)<\/td.+tr>/s', $m, $matches2))
-						{
-						    $md5 = $db->escapeString(md5($matches2['title']));
-							$oldname = $db->queryOneRow(sprintf('SELECT md5, source, ID, nfo FROM prehash WHERE md5 = %s', $md5));
-							if ($oldname !== false) {
-								if ($oldname["nfo"] != NULL)
-									continue;
-								else
-								{
-									if (!isset($matches2["size1"]) && empty($matches2["size1"]))
-										$size = "NULL";
-									else
-										$size = $db->escapeString($matches2["size1"].$matches2["size2"]);
-
-									if ($matches2["nfo"] == "")
-										$nfo = "NULL";
-									else
-										$nfo = $db->escapeString("http://newshost.co.za/".$matches2["nfo"]);
-
-                                            $db->exec(sprintf("UPDATE prehash SET nfo = %s, size = %s, category = %s, predate = %s, source = %s where ID = %d", $nfo, $size, $db->escapeString($matches2["category"]), $f->from_unixtime(strtotime($matches2["date"])), $db->escapeString("womble"), $oldname["ID"]));
-                                $updated++;
-                                }
+							// If the title is too short, don't bother.
+							if (strlen($matches2['title']) < 15) {
+								continue;
 							}
-							else
-							{
-								if (!isset($matches2["size1"]) && empty($matches2["size1"]))
-									$size = "NULL";
-								else
-									$size = $db->escapeString($matches2["size1"].$matches2["size2"]);
 
-								if ($matches2["nfo"] == "")
-									$nfo = "NULL";
-								else
-									$nfo = $db->escapeString("http://newshost.co.za/".$matches2["nfo"]);
+							$md5 = $this->db->escapeString(md5($matches2['title']));
+							$oldName = $this->db->queryOneRow(sprintf('SELECT md5, source, ID, nfo FROM prehash WHERE md5 = %s', $md5));
+							// If we have it already and have the NFO, continue.
+							if ($oldName !== false && $oldName['nfo'] != NULL) {
+								continue;
+							}
 
-                                    if (strlen($matches2['title']) > 15) {
-                                        if($db->exec(sprintf("INSERT INTO prehash (title, nfo, size, category, predate, source, md5) VALUES (%s, %s, %s, %s, FROM_UNIXTIME(".strtotime($matches2["date"])."), %s, %s)", $db->escapeString($matches2["title"]), $nfo, $size, $db->escapeString($matches2["category"]), $db->escapeString("womble"), $md5)));{
-                                $newNames++;
-                                }
+							// Start forming data for the query.
+							$nfo =
+								($matches2['nfo'] == ''
+									? 'NULL'
+									: $this->db->escapeString('http://www.newshost.co.za/' . $matches2['nfo'])
+								);
+							$size =
+								((!isset($matches['size1']) && empty($matches2['size1']))
+									? 'NULL'
+									: $this->db->escapeString($matches2['size1'] . $matches2['size2'])
+								);
+							$category = $this->db->escapeString($matches2['category']);
+							$time = $this->functions->from_unixtime(strtotime($matches2['date']));
+							$source = $this->db->escapeString('womble');
+
+							// If we already have it, update.
+							if ($oldName !== false) {
+								$this->db->exec(
+									sprintf('
+										UPDATE prehash SET
+											nfo = %s, size = %s, category = %s, predate = %s,
+											source = %s
+										WHERE ID = %d',
+										$nfo, $size, $category, $time, $source, $oldName['ID']
+									)
+								);
+								$updated++;
+							} elseif ($this->db->exec(
+								sprintf('
+									INSERT INTO prehash (title, nfo, size, category, predate, source, md5)
+									VALUES (%s, %s, %s, %s, %s, %s, %s)',
+									$this->db->escapeString($matches2['title']),
+									$nfo, $size, $category, $time, $source, $md5))) {
+								$newNames++;
 							}
 						}
 					}
 				}
 			}
-        }
-            echo $this->c->primary($updated . " \tUpdated from Womble.");
-	}
-		else
-		{
+			if ($this->echooutput) {
+				echo $this->c->primary($updated . " \tUpdated from Womble.");
+			}
+		} elseif ($this->echooutput) {
 			echo $this->c->error("Update from Womble failed.");
 		}
 		return $newNames;
 	}
 
-	public function retrieveOmgwtfnzbs()
+	/**
+	 * Retrieve pre info from omg.
+	 *
+	 * @return int
+	 */
+	protected function retrieveOmgwtfnzbs()
 	{
-		$db = new DB();
-        $f = new Functions();
 		$newNames = $updated = 0;
-        $matches2 = $matches = $match = $m = '';
-
-		$buffer = $this->fileContents('http://rss.omgwtfnzbs.org/rss-info.php');
-		if ($buffer !== false && strlen($buffer))
-		{
-			if (preg_match_all('/<item>.+?<\/item>/s', $buffer, $matches))
-			{
-				foreach ($matches as $match)
-				{
-					foreach ($match as $m)
-					{
+		$buffer = $this->getUrl('http://rss.omgwtfnzbs.org/rss-info.php');
+		if ($buffer !== false) {
+			$matches = $matches2 = $match = array();
+			if (preg_match_all('/<item>.+?<\/item>/s', $buffer, $matches)) {
+				foreach ($matches as $match) {
+					foreach ($match as $m) {
 						if (preg_match('/<title>(?P<title>.+?)\s+-\s+omgwtfnzbs\.org.*?<\/title.+?pubDate>(?P<date>.+?)<\/pubDate.+?gory:<\/b> (?P<category>.+?)<br \/.+?<\/b> (?P<size1>.+?) (?P<size2>[a-zA-Z]+)<b/s', $m, $matches2)) {
-						  // If the title is too short, don't bother.
+
+							// If the title is too short, don't bother.
 							if (strlen($matches2['title']) < 15) {
 								continue;
 							}
-						    $title = $matches2['title'];
+
+							$title = $matches2['title'];
 							$md5 = $this->db->escapeString(md5($title));
 							$oldName = $this->db->queryOneRow(sprintf('SELECT md5, source, ID FROM prehash WHERE md5 = %s', $md5));
-						   // If we have it already and the source is womble or omg, continue.
+
+							// If we have it already and the source is womble or omg, continue.
 							if ($oldName !== false && ($oldName['source'] === 'womble' || $oldName['source'] === 'omgwtfnzbs')) {
 								continue;
 							}
-                            $size = $this->db->escapeString(round($matches2['size1']) . $matches2['size2']);
+
+							$size = $this->db->escapeString(round($matches2['size1']) . $matches2['size2']);
 							$category = $this->db->escapeString($matches2['category']);
 							$time = $this->functions->from_unixtime(strtotime($matches2['date']));
 							$source = $this->db->escapeString('omgwtfnzbs');
@@ -310,33 +318,36 @@ Class PreHash
 		return $newNames;
 	}
 
-	public function retrieveZenet()
-        {
-                $db = new DB();
-                $f = new Functions();
-                $newNames = $updated = 0;
-                $matches2 = $matches = $match = $m = '';
+	/**
+	 * Get new pre data from zenet.
+	 *
+	 * @return int
+	 */
+	protected function retrieveZenet()
+	{
+		$newNames = 0;
 
-		        $buffer = $this->fileContents('http://pre.zenet.org/live.php');
-                if ($buffer !== false && strlen($buffer))
-                {
-                       if (preg_match_all('/<div class="mini-layout fluid">((\s+\S+)?\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+(\S+\s+)?(\S+\s+)?(\S+\s+)?(\S+\s+)?(\S+\s+)?(\S+\s+)?(\S+\s+)?<\/div>\s+<\/div>)/s', $buffer, $matches))
-                        {
-                                foreach ($matches as $match)
-                                {
-                                        foreach ($match as $m)
-                                        {
-                                                	if (preg_match('/<span class="bold">(?P<predate>\d{4}-\d{2}-\d{2} \d{2}:\d{2})<\/span>.+<a href="\?post=\d+"><b><font color="#\d+">(?P<title>.+)<\/font><\/b><\/a>.+<p><a href="\?cats=.+"><font color="#FF9900">(?P<category>.+)<\/font><\/a> \| (?P<size1>[\d\.,]+)?(?P<size2>[MGK]B)? \/\s+(?P<files>\d+).+<\/div>/s', $m, $matches2)) {
+		$buffer = $this->getUrl('http://pre.zenet.org/live.php');
+		if ($buffer !== false) {
+			$matches = $matches2 = $match = array();
+			if (preg_match_all('/<div class="mini-layout fluid">((\s+\S+)?\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+(\S+\s+)?(\S+\s+)?(\S+\s+)?(\S+\s+)?(\S+\s+)?(\S+\s+)?(\S+\s+)?<\/div>\s+<\/div>)/s', $buffer, $matches)) {
+				foreach ($matches as $match) {
+					foreach ($match as $m) {
+						if (preg_match('/<span class="bold">(?P<predate>\d{4}-\d{2}-\d{2} \d{2}:\d{2})<\/span>.+<a href="\?post=\d+"><b><font color="#\d+">(?P<title>.+)<\/font><\/b><\/a>.+<p><a href="\?cats=.+"><font color="#FF9900">(?P<category>.+)<\/font><\/a> \| (?P<size1>[\d\.,]+)?(?P<size2>[MGK]B)? \/\s+(?P<files>\d+).+<\/div>/s', $m, $matches2)) {
 
-                            // If it's too short, don't bother.
+							// If it's too short, don't bother.
 							if (strlen($matches2['title']) < 15) {
 								continue;
 							}
-                            $md5 = $this->db->escapeString(md5($matches2['title']));
+
+							$md5 = $this->db->escapeString(md5($matches2['title']));
 							$dupeCheck = $this->db->queryOneRow(sprintf('SELECT md5 FROM prehash WHERE md5 = %s', $md5));
+
+							// If we already have it, skip.
 							if ($dupeCheck !== false) {
-							continue;
-                            } elseif ($this->db->exec(
+
+								continue;
+							} elseif ($this->db->exec(
 								sprintf('
 									INSERT INTO prehash (title, size, category, predate, source, md5, files)
 									VALUES (%s, %s, %s, %s, %s, %s, %s)',
@@ -555,45 +566,79 @@ Class PreHash
 		return $newNames;
 	}
 
-	public function retrievePredbme()
+	/**
+	 * Get pre from this source.
+	 *
+	 * @return int
+	 */
+	protected function retrievePredbme()
 	{
-		$db = new DB();
-        $f = new Functions();
-		$newNames = $updated = 0;
+		$newNames = 0;
 
-        $options = array(
-			'http' => array(
-				'method' => "GET",
-				'header' => "Accept-language: en\r\n" .
-					"Cookie: foo=bar\r\n" . // check function.stream-context-create on php.net
-					"User-Agent: Mozilla/5.0 (iPad; U; CPU OS 3_2 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) Version/4.0.4 Mobile/7B334b Safari/531.21.102011-10-16 20:23:10\r\n" // i.e. An iPad
-			)
+		$URLs = array(
+			'http://predb.me/?cats=movies-sd&rss=1',
+			'http://predb.me/?cats=movies-hd&rss=1',
+			'http://predb.me/?cats=movies-discs&rss=1',
+			'http://predb.me/?cats=tv-sd&rss=1',
+			'http://predb.me/?cats=tv-hd&rss=1',
+			'http://predb.me/?cats=tv-discs&rss=1',
+			'http://predb.me/?cats=music-audio&rss=1',
+			'http://predb.me/?cats=music-video&rss=1',
+			'http://predb.me/?cats=music-discs&rss=1',
+			'http://predb.me/?cats=games-pc&rss=1',
+			'http://predb.me/?cats=games-xbox&rss=1',
+			'http://predb.me/?cats=games-playstation&rss=1',
+			'http://predb.me/?cats=games-nintendo&rss=1',
+			'http://predb.me/?cats=apps-windows&rss=1',
+			'http://predb.me/?cats=apps-linux&rss=1',
+			'http://predb.me/?cats=apps-mac&rss=1',
+			'http://predb.me/?cats=apps-mobile&rss=1',
+			'http://predb.me/?cats=books-ebooks&rss=1',
+			'http://predb.me/?cats=books-audio-books&rss=1',
+			'http://predb.me/?cats=xxx-videos&rss=1',
+			'http://predb.me/?cats=xxx-images&rss=1',
+			'http://predb.me/?cats=dox&rss=1',
+			'http://predb.me/?cats=unknown&rss=1'
 		);
-		$context = stream_context_create($options);
-		$arr = array("http://predb.me/?cats=movies-sd&rss=1", "http://predb.me/?cats=movies-hd&rss=1", "http://predb.me/?cats=movies-discs&rss=1", "http://predb.me/?cats=tv-sd&rss=1", "http://predb.me/?cats=tv-hd&rss=1", "http://predb.me/?cats=tv-discs&rss=1", "http://predb.me/?cats=music-audio&rss=1", "http://predb.me/?cats=music-video&rss=1", "http://predb.me/?cats=music-discs&rss=1", "http://predb.me/?cats=games-pc&rss=1", "http://predb.me/?cats=games-xbox&rss=1", "http://predb.me/?cats=games-playstation&rss=1", "http://predb.me/?cats=games-nintendo&rss=1", "http://predb.me/?cats=apps-windows&rss=1", "http://predb.me/?cats=apps-linux&rss=1", "http://predb.me/?cats=apps-mac&rss=1", "http://predb.me/?cats=apps-mobile&rss=1", "http://predb.me/?cats=books-ebooks&rss=1", "http://predb.me/?cats=books-audio-books&rss=1", "http://predb.me/?cats=xxx-videos&rss=1", "http://predb.me/?cats=xxx-images&rss=1", "http://predb.me/?cats=dox&rss=1", "http://predb.me/?cats=unknown&rss=1");
-		foreach ($arr as &$value)
-		{
-			$releases = @simplexml_load_string($this->fileContents($value, false, $context));
-			if ($releases !== false)
-			{
-				foreach ($releases->channel->item as $release)
-				{
-                    $md5 = $db->escapeString(md5($release->title));
-					$oldname = $db->queryOneRow(sprintf('SELECT md5 FROM prehash WHERE md5 = %s', $md5));
-					if ($oldname !== false) {
-						continue;
-					} else
-					{
-                    if (strlen($release->title) > 15) {
-                        if($db->exec(sprintf("INSERT INTO prehash (title, predate, source, md5) VALUES (%s, now(), %s, %s)", $db->escapeString($release->title), $db->escapeString("predbme"), $md5)));{
-						$newNames++;
-                        }
+
+		foreach ($URLs as &$url) {
+			$data = $this->getUrl($url);
+			if ($data !== false) {
+				$releases = @simplexml_load_string($data);
+				if ($releases !== false) {
+					foreach ($releases->channel->item as $release) {
+
+						// Skip if too short.
+						if (strlen($release->title) < 15) {
+							continue;
+						}
+						$md5 = $this->db->escapeString(md5($release->title));
+						$oldname = $this->db->queryOneRow(sprintf('SELECT md5 FROM prehash WHERE md5 = %s', $md5));
+						if ($oldname !== false) {
+							continue;
+						} elseif ($this->db->exec(
+							sprintf('
+								INSERT INTO prehash (title, predate, source, md5)
+								VALUES (%s, NOW(), %s, %s)',
+								$this->db->escapeString($release->title),
+								$this->db->escapeString('predbme'),
+								$md5))) {
+							$newNames++;
+						}
 					}
+				} else {
+					if ($this->echooutput) {
+						echo $this->c->error("Update from Predbme failed.");
+					}
+					// If the site is down, don't try the other URLs.
+					break;
 				}
-			}
-        }else
-			{
-				echo $this->c->error("Update from Predbme failed.");
+			} else {
+				if ($this->echooutput) {
+					echo $this->c->error("Update from Predbme failed.");
+				}
+				// If the site is down, don't try the other URLs.
+				break;
 			}
 		}
 		return $newNames;
@@ -1142,7 +1187,7 @@ Class PreHash
 			$query = sprintf('SELECT r.ID AS releaseID, r.name, r.searchname, r.categoryID, r.groupID, '
 				. 'dehashstatus, rf.name AS filename FROM releases r '
 				. 'LEFT OUTER JOIN releasefiles rf ON r.ID = rf.releaseID '
-				. 'WHERE prehashID = 0 %s', $regex);
+				. 'WHERE dehashstatus BETWEEN -6 AND 0 AND prehashID = 0 %s', $regex);
 		} else {
 			$query = sprintf('SELECT r.ID AS releaseID, r.name, r.searchname, r.categoryID, r.groupID, '
 				. 'dehashstatus, rf.name AS filename FROM releases r '
