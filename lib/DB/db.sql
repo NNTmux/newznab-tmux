@@ -26,7 +26,7 @@ ALTER TABLE  `releases`
 ALTER TABLE `users`
   ADD `nzbgeturl` VARCHAR(255) NULL DEFAULT NULL,
   ADD `nzbgetusername` VARCHAR(255) NULL DEFAULT NULL,
-  ADD `nzbgetpassword` VARCHAR(255) NULL DEFAULT NULL;    
+  ADD `nzbgetpassword` VARCHAR(255) NULL DEFAULT NULL;
 
 DROP TABLE IF EXISTS prehash;
 CREATE TABLE prehash (
@@ -186,7 +186,7 @@ INSERT INTO tmux (setting, value) values ('defrag_cache','900'),
     ('scrape_cz', 0),
     ('scrape_efnet', 0),
     ('lastpretime', '0'),
-    ('sqlpatch','14');
+    ('sqlpatch','15');
 
 DROP TABLE IF EXISTS country;
 CREATE TABLE country (
