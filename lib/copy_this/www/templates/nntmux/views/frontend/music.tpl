@@ -1,4 +1,4 @@
-
+ 
 <h1>Browse Music</h1>
 
 <form name="browseby" action="music">
@@ -113,8 +113,7 @@
 					<div class="icon icon_nzb"><a title="Download Nzb" href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}/{$result.searchname|escape:"url"}">&nbsp;</a></div>
 					<div class="icon icon_cart" title="Add to Cart"></div>
 					{if $sabintegrated}<div class="icon icon_sab" title="Send to my Sabnzbd"></div>{/if}
-                    {if $weHas/templates/nntmux/}<div class="icon icon_nzbvortex" title="Send to NZBVortex"></div>{/if}
-                    {if $weHasNZBget}<div class="icon icon_nzbget" title="Send to NZBGet"></div>{/if}
+                    {if $weHasVortex}<div class="icon icon_nzbvortex" title="Send to NZBVortex"></div>{/if}
 				</div>
 			</td>
 		</tr>

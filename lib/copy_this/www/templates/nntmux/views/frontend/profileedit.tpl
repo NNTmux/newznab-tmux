@@ -1,4 +1,4 @@
-
+ 
 <h1>Edit your profile</h1>
 
 {if $error != ''}
@@ -125,33 +125,6 @@
 			<div class="hint">Remote API key for NZBVortex found in <strong>Preferences -> Remote</strong>.
 			<br />
 			Example: 52FE-5ABD</div>
-		</td>
-	</tr>
-</table>
-</fieldset>
-
-<fieldset>
-<legend>NZBGet Integration</legend>
-<table class="input">
-	<tr>
-		<th width="100"><label for="nzbgeturl">NZBGet Server URL</label>:</th>
-		<td>
-			<input id="nzbgeturl" class="long" name="nzbgeturl" type="text" value="{$user.nzbgeturl}" />
-			<div class="hint">The url of the NZBGet installation, for example: http://127.0.0.1:6789/.</div>
-		</td>
-	</tr>
-	<tr>
-		<th width="100"><label for="nzbgetusername">NZBGet Username:</label>:</th>
-		<td>
-			<input id="nzbgetusernamey" class="medium" name="nzbgetusername" type="text" value="{$user.nzbgetusername}" />
-			<div class="hint">The user name for the NZBGet installation.</div>
-		</td>
-	</tr>
-    <tr>
-		<th width="100"><label for="nzbgetpassword">NZBGet Password:</label>:</th>
-		<td>
-			<input id="nzbgetpassword" class="medium" name="nzbgetpassword" type="text" value="{$user.nzbgetpassword}" />
-			<div class="hint">The password for the NZBGet installation.</div>
 		</td>
 	</tr>
 </table>

@@ -23,11 +23,6 @@ ALTER TABLE  `releases`
   ADD INDEX `ix_releases_status` (`iscategorized`, `isrenamed`, `nfostatus`, `ishashed`, `passwordstatus`, `dehashstatus`, `releasenfoID`, `musicinfoID`, `consoleinfoID`, `bookinfoID`, `haspreview`, `categoryID`, `imdbID`, `rageID`),
   ADD INDEX `ix_releases_prehashid_searchname` (`prehashID`, `searchname`);
 
-ALTER TABLE `users`
-  ADD `nzbgeturl` VARCHAR(255) NULL DEFAULT NULL,
-  ADD `nzbgetusername` VARCHAR(255) NULL DEFAULT NULL,
-  ADD `nzbgetpassword` VARCHAR(255) NULL DEFAULT NULL;    
-
 DROP TABLE IF EXISTS prehash;
 CREATE TABLE prehash (
 	ID INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,

@@ -1,4 +1,4 @@
-
+ 
 <h1>Browse Books</h1>
 
 <form name="browseby" action="books">
@@ -108,7 +108,6 @@
 								<div class="icon icon_cart" title="Add to Cart"></div>
 								{if $sabintegrated}<div class="icon icon_sab" title="Send to my Sabnzbd"></div>{/if}
                                 {if $weHasVortex}<div class="icon icon_nzbvortex" title="Send to NZBVortex"></div>{/if}
-                                {if $weHasNZBget}<div class="icon icon_nzbget" title="Send to NZBGet"></div>{/if}
 							</td>
 						</tr>
 						{if $m@index == 1 && $m@total > 2}
