@@ -9,7 +9,7 @@ require_once(dirname(__FILE__)."/../lib/showsleep.php");
 require_once(dirname(__FILE__)."/../lib/functions.php");
 
 
-$version="0.3r1060";
+$version="0.3r1061";
 
 $db = new DB();
 $functions = new Functions();
@@ -1355,7 +1355,8 @@ if ($running == 1){
 				$log = writelog($panes0[1]);
 				shell_exec("tmux respawnp -t${tmux_session}:0.1 ' \
                         rm -rf $tmpunrar/*; \
-						$_python ${DIR}/../python/postprocess_threaded.py nfo $log; date +\"%D %T\"; $_sleep $post_timer' 2>&1 1> /dev/null");
+						$_python ${DIR}/../python/postprocess_threaded.py nfo $log;\
+                        $_php ${DIR}/../bin/postprocess_new.php nfo $log; date +\"%D %T\"; $_sleep $post_timer' 2>&1 1> /dev/null");
         } else if (($post == 3) && (($nfo_remaining_now > 0) || ($work_remaining_now + $pc_releases_proc + $xxx_releases_proc > 0))) {
 				//run postprocess_releases additional
 				$history = str_replace(" ", '', `tmux list-panes -t${tmux_session}:0 | grep 1: | awk '{print $4;}'`);
@@ -1378,7 +1379,8 @@ if ($running == 1){
 				shell_exec("tmux respawnp -t${tmux_session}:0.1 ' \
                         rm -rf $tmpunrar/*; \
 						$_python ${DIR}/../python/postprocess_threaded.py additional $log;\
-                        $_python ${DIR}/../python/postprocess_threaded.py nfo $log; date +\"%D %T\"; $_sleep $post_timer' 2>&1 1> /dev/null");
+                        $_python ${DIR}/../python/postprocess_threaded.py nfo $log;\
+                        $_php ${DIR}/../bin/postprocess_new.php nfo $log; date +\"%D %T\"; $_sleep $post_timer' 2>&1 1> /dev/null");
 			} else if (($post != 0) && ($nfo_remaining_now == 0) && ($work_remaining_now + $pc_releases_proc + $xxx_releases_proc == 0)) {
 				$color = get_color($colors_start, $colors_end, $colors_exc);
 				shell_exec("tmux respawnp -k -t${tmux_session}:0.1 'echo \"\033[38;5;${color}m\n${panes0[1]} has been disabled/terminated by No Misc/Nfo to process\"'");
@@ -1669,6 +1671,7 @@ if ($running == 1){
                     $_python ${DIR}/../python/fixreleasenames_threaded.py nfo 2>&1 $log; \
                     $_python ${DIR}/../python/fixreleasenames_threaded.py filename 2>&1 $log; \
                     $_python ${DIR}/../python/fixreleasenames_threaded.py par2 2>&1 $log; \
+                    $_php ${DIR}/../lib/fixReleaseNames.php 4 true other yes show $log;
                     $_sleep $fix_timer' 2>&1 1> /dev/null");
 		$time27 = TIME();
     } elseif (( $maxload >= get_load()) && ( $fix_names == 1 )) {
