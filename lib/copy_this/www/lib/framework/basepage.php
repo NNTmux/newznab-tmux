@@ -88,7 +88,7 @@ class BasePage
 			$this->smarty->assign('loggedin',"true");
 			
             if (!empty($this->userdata['nzbgetusername']) && (!empty($this->userdata['nzbgetpassword']) && (!empty($this->userdata['nzbgeturl']))))
-                $this->smarty->assign('weHasNZBget', true);
+                $this->smarty->asign('weHasNZBget', true);
 
             if (!empty($this->userdata['nzbvortex_api_key']) && (!empty($this->userdata['nzbvortex_server_url'])))
                 $this->smarty->assign('weHasVortex', true);
