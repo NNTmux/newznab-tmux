@@ -1,5 +1,5 @@
 <?php
-require_once(WWW_DIR."/lib/util.php");  
+require_once(WWW_DIR."/lib/util.php");
 require_once(WWW_DIR."/lib/page.php");
 require_once(WWW_DIR."/lib/releases.php");
 require_once(WWW_DIR."/lib/mzb.php");
