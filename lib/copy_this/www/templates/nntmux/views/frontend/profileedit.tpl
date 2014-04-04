@@ -136,21 +136,21 @@
 	<tr>
 		<th width="100"><label for="nzbgeturl">NZBGet Server URL</label>:</th>
 		<td>
-			<input id="nzbgeturl" class="form-control" name="nzbgeturl" type="text" value="{$user.nzbgeturl}" />
+			<input id="nzbgeturl" class="long" name="nzbgeturl" type="text" value="{$user.nzbgeturl}" />
 			<div class="hint">The url of the NZBGet installation, for example: http://127.0.0.1:6789/.</div>
 		</td>
 	</tr>
 	<tr>
 		<th width="100"><label for="nzbgetusername">NZBGet Username:</label>:</th>
 		<td>
-			<input id="nzbgetusername" class="form-control" name="nzbgetusername" type="text" value="{$user.nzbgetusername}" />
+			<input id="nzbgetusernamey" class="medium" name="nzbgetusername" type="text" value="{$user.nzbgetusername}" />
 			<div class="hint">The user name for the NZBGet installation.</div>
 		</td>
 	</tr>
     <tr>
 		<th width="100"><label for="nzbgetpassword">NZBGet Password:</label>:</th>
 		<td>
-			<input id="nzbgetpassword" class="form-control" name="nzbgetpassword" type="text" value="{$user.nzbgetpassword}" />
+			<input id="nzbgetpassword" class="medium" name="nzbgetpassword" type="text" value="{$user.nzbgetpassword}" />
 			<div class="hint">The password for the NZBGet installation.</div>
 		</td>
 	</tr>

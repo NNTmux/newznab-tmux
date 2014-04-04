@@ -1,4 +1,4 @@
-
+ 
 <h1>Profile for {$user.username|escape:"htmlall"}</h1>
 
 <table class="data">
@@ -66,19 +66,6 @@
             API key: {$user.nzbvortex_api_key}
             <br />
             Server URL: <a href="{$user.nzbvortex_server_url}" target="_blank">{$user.nzbvortex_server_url}</a>
-        </td>
-    </tr>
-	{/if}
-
-    {if ($user.ID==$userdata.ID)}
-	<tr>
-	   <th>NZBGet</th>
-        <td>
-            NZBGet Username: {$user.nzbgetusername}
-            <br />
-            NZBGet Password: {$user.nzbgetpassword}
-            <br />
-            NZBGet Server URL: <a href="{$user.nzbgeturl}" target="_blank">{$user.nzbgeturl}</a>
         </td>
     </tr>
 	{/if}
