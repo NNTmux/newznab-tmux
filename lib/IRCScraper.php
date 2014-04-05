@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__)."/../bin/config.php");
 require_once(dirname(__FILE__)."/Net_SmartIRC/Net/SmartIRC.php");
-require_once(dirname(__FILE__)."/Net_SmartIRC/modules/pingfix.php");
+require_once(dirname(__FILE__)."/Net_SmartIRC/modules/PingFix.php");
 require_once(WWW_DIR."/lib/framework/db.php");
 require_once("functions.php");
 
