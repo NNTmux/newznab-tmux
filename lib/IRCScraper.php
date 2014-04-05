@@ -2,6 +2,7 @@
 
 require_once(dirname(__FILE__)."/../bin/config.php");
 require_once(dirname(__FILE__)."/Net_SmartIRC/Net/SmartIRC.php");
+require_once(dirname(__FILE__)."/Net_SmartIRC/modules/pingfix.php");
 require_once(WWW_DIR."/lib/framework/db.php");
 require_once("functions.php");
 
@@ -114,6 +115,8 @@ class IRCScraper
         $this->functions = new Functions();
 		$this->groupList = array();
 		$this->IRC = $irc;
+        // Use the PingFix module.
+		new Net_SmartIRC_module_PingFix($irc);
 		if ($debug) {
 			$this->IRC->setDebug(SMARTIRC_DEBUG_ALL);
 		}
@@ -245,6 +248,18 @@ class IRCScraper
 			default:
 				return;
 		}
+
+        $versions = array(
+			'HexChat 2.9.6',
+			'mIRC 7.32',
+			'HydraIRC v0.3.165',
+			'X-Chat 2.8.9',
+			'KVIrc 4.2.0'
+		);
+
+		// Change the CTCP string.
+		$this->IRC->setCtcpVersion($versions[mt_rand(0, 4)]);
+		unset($versions);
 
 		// Use real sockets instead of fsock.
 		$this->IRC->setUseSockets($socket);
