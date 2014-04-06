@@ -33,7 +33,7 @@ if (!empty($_POST)) {
 	} else {
 		$max_pull = $ourSite['max_pull'];
 	}
-	$db->queryExec(sprintf('UPDATE sharing SET site_name = %s, max_push = %d, max_pull = %d', $db->escapeString($site_name), $max_push, $max_pull));
+	$db->exec(sprintf('UPDATE sharing SET site_name = %s, max_push = %d, max_pull = %d', $db->escapeString($site_name), $max_push, $max_pull));
 	$ourSite = $db->queryOneRow('SELECT * FROM sharing');
 }
 
