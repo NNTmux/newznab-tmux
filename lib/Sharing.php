@@ -249,7 +249,7 @@ Class Sharing
 		$res = $this->db->query('
 			SELECT r.ID, r.gid as nzb_guid
 			FROM releases r
-			INNER JOIN releasecomment rc ON rc.nzb_guid = nzb_guid
+			INNER JOIN releasecomment rc ON rc.nzb_guid = r.gid
 			WHERE rc.releaseID = 0'
 		);
 
