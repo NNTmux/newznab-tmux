@@ -3,10 +3,10 @@
 /**
  * Attempt to include PEAR's nntp class if it has not already been included.
  */
-require_once ("/Net_NNTP/NNTP/Client.php");
+require_once(WWW_DIR."/lib/Net_NNTP/NNTP/Client.php");
 require_once(WWW_DIR."/lib/Tmux.php");
-require_once("ColorCLI.php");
-require_once("Yenc.php");
+require_once(WWW_DIR."/../../misc/update_scripts/nix_scripts/tmux/lib/ColorCLI.php");
+require_once(WWW_DIR."/../../misc/update_scripts/nix_scripts/tmux/lib/Yenc.php");
 
 /**
  * Class for connecting to the usenet, retrieving articles and article headers,

@@ -2,7 +2,7 @@
 
 require_once(dirname(__FILE__).'/config.php');
 require_once(WWW_DIR.'/lib/postprocess.php');
-require_once(dirname(__FILE__).'/../lib/NNTP.php');
+require_once(WWW_DIR.'/lib/nntp.php')
 require_once(WWW_DIR.'/lib/site.php');
 require_once(WWW_DIR.'/lib/anidb.php');
 require_once(WWW_DIR.'/lib/tvrage.php');
