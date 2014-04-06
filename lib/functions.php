@@ -26,6 +26,7 @@ require_once("ColorCLI.php");
 require_once("nzbcontents.php");
 require_once("namefixer.php");
 require_once("TraktTv.php");
+require_once("Sharing.php");
 
 
 
@@ -197,6 +198,45 @@ class Functions
 	{
 		return strtotime($date);
 	}
+
+    public function unix_timestamp_column($column, $outputName = 'unix_time')
+	{
+		return 'UNIX_TIMESTAMP(' . $column . ') AS ' . $outputName;
+
+	}
+
+	/**
+	 * Interpretation of mysql's UUID method.
+	 * Return uuid v4 string. http://www.php.net/manual/en/function.uniqid.php#94959
+	 *
+	 * @return string
+	 */
+	public function uuid()
+	{
+		return sprintf(
+			'%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+			mt_rand(0, 0xffff),
+			mt_rand(0, 0xffff),
+			mt_rand(0, 0xffff),
+			mt_rand(0, 0x0fff) | 0x4000,
+			mt_rand(0, 0x3fff) | 0x8000,
+			mt_rand(0, 0xffff),
+			mt_rand(0, 0xffff),
+			mt_rand(0, 0xffff)
+		);
+	}
+
+  /**
+	 * Process comments.
+	 *
+	 * @param NNTP $nntp
+	 */
+	public function processSharing(&$nntp)
+	{
+		$sharing = new Sharing($this->db, $nntp);
+		$sharing->start();
+	}
+
  //  gets name of category from category.php
     public function getNameByID($ID)
 	{
