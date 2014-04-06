@@ -183,7 +183,7 @@ INSERT INTO tmux (setting, value) values ('defrag_cache','900'),
     ('lastpretime', '0'),
     ('nntpretries', '10'),
     ('alternate_nntp', '0'),
-    ('sqlpatch','15');
+    ('sqlpatch','16');
 
 DROP TABLE IF EXISTS country;
 CREATE TABLE country (
