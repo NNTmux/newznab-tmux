@@ -1,7 +1,7 @@
 <?php
 require_once(dirname(__FILE__)."/../bin/config.php");
 require_once(WWW_DIR."lib/framework/db.php");
-require_once(WWW_DIR."nntp.php");
+require_once(WWW_DIR."lib/nntp.php");
 require_once("Yenc.php");
 require_once("functions.php");
 
