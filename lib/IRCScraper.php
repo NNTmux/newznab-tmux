@@ -112,6 +112,7 @@ class IRCScraper
 	public function __construct(&$irc, $serverType, &$silent = false, &$debug = false, &$socket = true)
 	{
 		$this->db = new DB();
+        $this->functions = new Functions(); 
 		$this->groupList = array();
 		$this->IRC = $irc;
 		// Use the PingFix module.
