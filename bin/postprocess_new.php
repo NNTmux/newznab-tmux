@@ -20,7 +20,7 @@ if (!isset($argv[1])) {
 $postprocess = new PostProcess(true);
 if (isset($argv[1]) && $argv[1] === "additional") {
 	// Create the connection here and pass, this is for post processing
-	$nntp = new Nntp();
+	$nntp = new NNTP();
     if ($nntp->doConnect() === false)
     {
 	$c = new ColorCLI();
@@ -34,7 +34,7 @@ if (isset($argv[1]) && $argv[1] === "additional") {
 } else if (isset($argv[1]) && $argv[1] === "nfo"){
     if ( $site->lookupnfo == 1){
     // Create the connection here and pass, this is for post processing
-	$nntp = new Nntp();
+	$nntp = new NNTP();
     if ($nntp->doConnect() === false)
     {
 	$c = new ColorCLI();
