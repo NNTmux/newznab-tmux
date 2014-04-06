@@ -112,6 +112,9 @@ Class Sharing
 		$this->siteSettings['fetching'] = ($this->siteSettings['fetching'] == 1 ? true : false);
 		$this->siteSettings['enabled'] = ($this->siteSettings['enabled'] == 1 ? true : false);
 		$this->siteSettings['start_position'] = ($this->siteSettings['start_position'] == 1 ? true : false);
+
+        //read functions from functions.php
+        $this->functions = new Functions();
 	}
 
 	/**
