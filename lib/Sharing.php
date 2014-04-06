@@ -1,7 +1,7 @@
 <?php
 require_once(dirname(__FILE__)."/../bin/config.php");
 require_once(WWW_DIR."lib/framework/db.php");
-require_once(WWW_DIR."lib/nntp.php");
+require_once("NNTP.php");
 require_once("Yenc.php");
 require_once("functions.php");
 
@@ -155,7 +155,7 @@ Class Sharing
 		$siteName = uniqid('newznab_', true);
 		$this->db->exec(
 			sprintf('
-				INSERT INTO sharing (site_name, site_guid, max_push, max_pull, hide_users, start_position) VALUES (%s, %s, 40 , 2500, 1, 1)',
+				INSERT INTO sharing (site_name, site_guid, max_push, max_pull, hide_users, start_position) VALUES (%s, %s, 40 , 1000, 1, 1)',
 				$this->db->escapeString($siteName),
 				$this->db->escapeString(($siteGuid === '' ? sha1($siteName) : $siteGuid))
 			)
@@ -287,12 +287,7 @@ Class Sharing
 			// If the user picked to start from the oldest, get the oldest.
 			if ($this->siteSettings['start_position'] === true) {
 					echo '(Sharing) This is the first time running sharing so we will get the first article which will take a few seconds.' . PHP_EOL;
-				// Get first article based on time.
-				$day = ((time() - 1396137600) / 86400);
-				$backfill = new Backfill($this->nntp);
-				$article = $backfill->daytopost($day, $group);
-				unset($backfill);
-				$this->siteSettings['last_article'] = $ourOldest = (string)$article;
+            $this->siteSettings['last_article'] = $ourOldest = (string)($group['first']);
 
 			// Else get the newest.
 			} else {
