@@ -479,7 +479,7 @@ Class Sharing
 			sprintf('
 				INSERT INTO releasecomment
 				(text, createddate, shareID, gid, nzb_guid, siteID, username, userID, releaseID, shared, host)
- 				VALUES (%s, %s, %s, %s, %s, %s, %s, 0, 0, 2, "")',
+ 				VALUES (%s, %s, %s, %s, %s, %s, 0, 0, 2, "")',
 				$this->db->escapeString($body['BODY']),
 				$this->functions->from_unixtime(($body['TIME'] > time() ? time() : $body['TIME'])),
 				$this->db->escapeString($body['SID']),
