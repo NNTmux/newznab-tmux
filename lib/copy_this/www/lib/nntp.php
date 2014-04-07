@@ -5,8 +5,8 @@
  */
 require_once(WWW_DIR."/lib/Net_NNTP/NNTP/Client.php");
 require_once(WWW_DIR."/lib/Tmux.php");
-require_once(WWW_DIR."/../misc/update_scripts/nix_scripts/tmux/lib/ColorCLI.php");
-require_once(WWW_DIR."/../misc/update_scripts/nix_scripts/tmux/lib/Yenc.php");
+require_once(WWW_DIR."../misc/update_scripts/nix_scripts/tmux/lib/ColorCLI.php");
+require_once(WWW_DIR."../misc/update_scripts/nix_scripts/tmux/lib/Yenc.php");
 
 /**
  * Class for connecting to the usenet, retrieving articles and article headers,

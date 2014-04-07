@@ -1,6 +1,7 @@
 <?php
 require_once(dirname(__FILE__)."/../bin/config.php");
 require_once(WWW_DIR."/lib/framework/db.php");
+require_once(WWW_DIR."/lib/site.php");
 require_once("functions.php");
 
 class ReleaseComments
@@ -15,7 +16,7 @@ class ReleaseComments
 	public function getComments($id)
 	{
 		$db = new DB();
-		return $db->query(sprintf("SELECT releasecomment.*, users.username FROM releasecomment LEFT OUTER JOIN users ON users.ID = releasecomment.userID WHERE releaseID = %d", $id));
+		return $db->query(sprintf("SELECT releasecomment.* FROM releasecomment WHERE releaseID = %d", $id));
 	}
 
 	public function getCommentCount()
@@ -33,7 +34,7 @@ class ReleaseComments
 		if ($res)
 		{
 			$db->exec(sprintf("DELETE FROM releasecomment WHERE ID = %d", $id));
-			$this->updateReleaseCommentCount($res["releaseid"]);
+			$this->updateReleaseCommentCount($res["releaseID"]);
 		}
 	}
 
@@ -46,7 +47,6 @@ class ReleaseComments
 
 	public function deleteCommentsForUser($id)
 	{
-		$db = new DB();
 
 		$numcomments = $this->getCommentCountForUser($id);
 		if ($numcomments > 0)
@@ -69,7 +69,20 @@ class ReleaseComments
 		if ($s->storeuserips != "1")
 			$host = "";
 
-		$comid = $db->queryInsert(sprintf("INSERT INTO releasecomment (releaseID, text, userID, createddate, host) VALUES (%d, %s, %d, NOW(), %s)", $id, $db->escapeString($text), $userid, $db->escapeString($host)));
+		$username = $db->queryOneRow(sprintf('SELECT username FROM users WHERE ID = %d', $userid));
+		$username = ($username === false ? 'ANON' : $username['username']);
+
+		$comid = $db->queryInsert(
+			sprintf("
+				INSERT INTO releasecomment (releaseID, text, userID, createddate, host, username)
+				VALUES (%d, %s, %d, NOW(), %s, %s)",
+				$id,
+				$db->escapeString($text),
+				$userid,
+				$db->escapeString($host),
+				$db->escapeString($username)
+			)
+		);
 		$this->updateReleaseCommentCount($id);
 		return $comid;
 	}
@@ -77,28 +90,43 @@ class ReleaseComments
 	public function getCommentsRange($start, $num)
 	{
 		$db = new DB();
-
 		return $db->query(
 			sprintf("
-				SELECT releasecomment.*, users.username, releases.guid
+				SELECT releasecomment.*, releases.guid
 				FROM releasecomment
-				LEFT OUTER JOIN users ON users.ID = releasecomment.userID
 				LEFT JOIN releases on releases.ID = releasecomment.releaseID
 				ORDER BY releasecomment.createddate DESC %s",
-				($start === false ? '' : " LIMIT " . $num . " OFFSET " . $start)));
+				($start === false ? '' : " LIMIT " . $num . " OFFSET " . $start)
+			)
+		);
 	}
 
 	// Updates the amount of comments for the rlease.
 	public function updateReleaseCommentCount($relid)
 	{
 		$db = new DB();
-		$db->exec(sprintf("UPDATE releases SET comments = (SELECT COUNT(ID) from releasecomment WHERE releasecomment.releaseID = %d) WHERE releases.ID = %d", $relid, $relid));
+		$db->exec(
+			sprintf("
+				UPDATE releases
+				SET comments = (SELECT COUNT(ID) from releasecomment WHERE releasecomment.releaseID = %d)
+				WHERE releases.ID = %d",
+				$relid,
+				$relid
+			)
+		);
 	}
 
 	public function getCommentCountForUser($uid)
 	{
 		$db = new DB();
-		$res = $db->queryOneRow(sprintf("SELECT COUNT(ID) AS num FROM releasecomment WHERE userID = %d", $uid));
+		$res = $db->queryOneRow(
+			sprintf("
+				SELECT COUNT(ID) AS num
+				FROM releasecomment
+				WHERE userID = %d",
+				$uid
+			)
+		);
 		return $res["num"];
 	}
 
@@ -111,6 +139,15 @@ class ReleaseComments
 		else
 			$limit = " LIMIT ".$num." OFFSET ".$start;
 
-		return $db->query(sprintf("SELECT releasecomment.*, users.username FROM releasecomment LEFT OUTER JOIN users ON users.ID = releasecomment.userID WHERE userID = %d ORDER BY releasecomment.createddate DESC".$limit, $uid));
+		return $db->query(
+			sprintf("
+				SELECT releasecomment.*
+				FROM releasecomment
+				WHERE userID = %d
+				ORDER BY releasecomment.createddate DESC %s",
+				$uid,
+				$limit
+			)
+		);
 	}
 }
