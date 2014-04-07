@@ -155,7 +155,8 @@ Class Sharing
 		$siteName = uniqid('newznab_', true);
 		$this->db->exec(
 			sprintf('
-				INSERT INTO sharing (site_name, site_guid, max_push, max_pull, hide_users, start_position) VALUES (%s, %s, 40 , 1000, 1, 1)',
+				INSERT INTO sharing (site_name, site_guid, max_push, max_pull, hide_users, start_position, auto_enable, fetching)
+				VALUES (%s, %s, 40 , 200, 1, 1, 1, 1)',
 				$this->db->escapeString($siteName),
 				$this->db->escapeString(($siteGuid === '' ? sha1($siteName) : $siteGuid))
 			)
@@ -295,7 +296,7 @@ Class Sharing
 				$this->siteSettings['last_article'] = $ourOldest = (string)($group['last'] - 1000);
 			}
 		} else {
-			$ourOldest = $this->siteSettings['last_article'] + 1;
+			$ourOldest = (string)($this->siteSettings['last_article'] + 1);
 		}
 
 		// Set our newest to our oldest wanted + max pull setting.
@@ -391,7 +392,11 @@ Class Sharing
 								$this->db->escapeString($matches['guid'])
 							)
 						);
-						$found++;
+						// Update once in a while in case the user cancels the script.
+						if ($found++ % 10 == 0) {
+							$this->siteSettings['lastarticle'] = $header['Number'];
+							$this->db->exec(sprintf('UPDATE sharing SET last_article = %d',$header['Number']));
+						}
 							echo '.';
 					}
 				}
@@ -399,12 +404,7 @@ Class Sharing
 		}
 		// Update sharing's last article number.
 		$this->siteSettings['lastarticle'] = $newest;
-		$this->db->exec(
-			sprintf('
-				UPDATE sharing SET last_article = %d',
-				$newest
-			)
-		);
+		$this->db->exec(sprintf('UPDATE sharing SET last_article = %d',$newest));
 			if ($found > 0) {
 				echo PHP_EOL . '(Sharing) Fetched ' . $found . ' new comments.' . PHP_EOL;
 			} else {
@@ -445,6 +445,11 @@ Class Sharing
 		// Just in case.
 		if (!isset($body['USER'])) {
 			return false;
+		}
+
+        // Set sn names to anon.
+		if (substr($body['USER'], 0, 3) === 'sn-') {
+			$body['USER'] = 'ANON';
 		}
 
 		// Check if we have the user.

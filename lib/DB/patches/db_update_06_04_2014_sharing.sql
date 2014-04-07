@@ -7,7 +7,7 @@ CREATE TABLE sharing_sites (
 	first_time     DATETIME           DEFAULT NULL,
 	enabled        TINYINT(1)         NOT NULL DEFAULT '0',
 	comments       MEDIUMINT UNSIGNED NOT NULL DEFAULT '0',
-	PRIMARY KEY    (id)
+	PRIMARY KEY    (ID)
 ) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS sharing;
@@ -17,12 +17,12 @@ CREATE TABLE sharing (
 	enabled        TINYINT(1)         NOT NULL DEFAULT '0',
 	posting        TINYINT(1)         NOT NULL DEFAULT '0',
     start_position TINYINT(1)         NOT NULL DEFAULT '0',
-	fetching       TINYINT(1)         NOT NULL DEFAULT '0',
-	auto_enable    TINYINT(1)         NOT NULL DEFAULT '0',
+	fetching       TINYINT(1)         NOT NULL DEFAULT '1',
+	auto_enable    TINYINT(1)         NOT NULL DEFAULT '1',
 	hide_users     TINYINT(1)         NOT NULL DEFAULT '1',
 	last_article   BIGINT UNSIGNED    NOT NULL DEFAULT '0',
 	max_push       MEDIUMINT UNSIGNED NOT NULL DEFAULT '40',
-	max_pull       INT UNSIGNED       NOT NULL DEFAULT '1000',
+	max_pull       INT UNSIGNED       NOT NULL DEFAULT '200',
 	PRIMARY KEY    (site_guid)
 ) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ;
 

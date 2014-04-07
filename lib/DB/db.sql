@@ -183,7 +183,8 @@ INSERT INTO tmux (setting, value) values ('defrag_cache','900'),
     ('lastpretime', '0'),
     ('nntpretries', '10'),
     ('alternate_nntp', '0'),
-    ('sqlpatch','16');
+    ('sharing_timer', '60'),
+    ('sqlpatch','17');
 
 DROP TABLE IF EXISTS country;
 CREATE TABLE country (
@@ -466,12 +467,12 @@ CREATE TABLE sharing (
 	enabled        TINYINT(1)         NOT NULL DEFAULT '0',
 	posting        TINYINT(1)         NOT NULL DEFAULT '0',
     start_position TINYINT(1)         NOT NULL DEFAULT '0',
-	fetching       TINYINT(1)         NOT NULL DEFAULT '0',
-	auto_enable    TINYINT(1)         NOT NULL DEFAULT '0',
+	fetching       TINYINT(1)         NOT NULL DEFAULT '1',
+	auto_enable    TINYINT(1)         NOT NULL DEFAULT '1',
 	hide_users     TINYINT(1)         NOT NULL DEFAULT '1',
 	last_article   BIGINT UNSIGNED    NOT NULL DEFAULT '0',
 	max_push       MEDIUMINT UNSIGNED NOT NULL DEFAULT '40',
-	max_pull       INT UNSIGNED       NOT NULL DEFAULT '1000',
+	max_pull       INT UNSIGNED       NOT NULL DEFAULT '200',
 	PRIMARY KEY    (site_guid)
 ) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ;
 

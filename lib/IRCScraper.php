@@ -214,7 +214,7 @@ class IRCScraper
 						'A\s+NZB\s+is\s+available.*?To\s+Download' .   // a.b.sony.psp
 						'|' .
 						'\s+NZB:\s+http:\/\/scnzb\.eu\/' .             // scnzb
-						'|' .
+						//'|' .
 						//'^\[SBINDEX\]' .                               // tvnzb
 						'|' .
 						'^\[(MOD|OLD|RE|UN)?NUKE\]' .                  // Nukes. various channels
@@ -763,7 +763,7 @@ class IRCScraper
 	protected function scnzb(&$message)
 	{
 		//[Complete][512754] Formula1.2014.Malaysian.Grand.Prix.Team.Principals.Press.Conference.720p.HDTV.x264-W4F  NZB: http://scnzb.eu/1pgOmwj
-		if (preg_match('/\[Complete\]\[(?P<reqid>\d+)\]\s+(?P<title>.+?)\s+NZB:/i', $message, $matches)) {
+		if (preg_match('/\[Complete\]\[(?P<reqid>\d+)\]\s*(?P<title>.+?)\s+NZB:/i', $message, $matches)) {
 			$this->CurPre['source']  = '#scnzb';
 			$this->CurPre['groupid'] = $this->getGroupID('alt.binaries.boneless');
 			$this->siftMatches($matches);
