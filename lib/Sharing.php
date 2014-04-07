@@ -478,8 +478,8 @@ Class Sharing
 		// Insert the comment.
 		if ($this->db->exec(
 			sprintf('
-				INSERT INTO releasecomment (text, userID, createddate, shareID, shared, nzb_guid, releaseID, host, siteID)
-				VALUES (%s, %d, %s, %s, 2, %s, 0, "", %s)',
+				INSERT INTO releasecomment (text, userID, createddate, issynced, shareID, shared, nzb_guid, releaseID, host, siteID)
+				VALUES (%s, %d, %s, 1, %s, 2, %s, 0, "", %s)',
 				$this->db->escapeString($body['BODY']),
 				$userid,
 				$this->functions->from_unixtime(($body['TIME'] > time() ? time() : $body['TIME'])),
