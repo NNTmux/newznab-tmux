@@ -33,18 +33,7 @@ if (!empty($_POST)) {
 	} else {
 		$max_pull = $ourSite['max_pull'];
 	}
-	if (!empty($_POST['sharing_maxdownload']) && is_numeric($_POST['sharing_maxdownload'])) {
-		$max_download = trim($_POST['sharing_maxdownload']);
-	} else {
-		$max_download = $ourSite['max_download'];
-	}
-	$db->exec(
-		sprintf('
-			UPDATE sharing
-			SET site_name = %s, max_push = %d, max_pull = %d, max_download = %d',
-			$db->escapeString($site_name), $max_push, $max_pull, $max_download
-		)
-	);
+	$db->exec(sprintf('UPDATE sharing SET site_name = %s, max_push = %d, max_pull = %d', $db->escapeString($site_name), $max_push, $max_pull));
 	$ourSite = $db->queryOneRow('SELECT * FROM sharing');
 }
 
