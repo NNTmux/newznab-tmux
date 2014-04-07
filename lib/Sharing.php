@@ -133,14 +133,13 @@ Class Sharing
 			$this->nntp->doConnect();
 		}
 
-
+		if ($this->siteSettings['posting']) {
+			$this->postAll();
+		}
 		if ($this->siteSettings['fetching']) {
 			$this->fetchAll();
 		}
 		$this->matchComments();
-        if ($this->siteSettings['posting']) {
-			$this->postAll();
-		}
 	}
 
 	/**
@@ -208,9 +207,6 @@ Class Sharing
 		// Create a unique identifier for this comment.
 		$sid = sha1($row['unix_time'] . $row['text'] . $row['nzb_guid']);
 
-        // Check if the comment is already shared.
-		$check = $this->db->queryOneRow(sprintf('SELECT ID FROM releasecomment WHERE shareID = %s', $this->db->escapeString($sid)));
-		if ($check === false) {
 		// Example of a subject.
 		//(_nZEDb_)nZEDb_533f16e46a5091.73152965_3d12d7c1169d468aaf50d5541ef02cc88f3ede10 - [1/1] "92ba694cebc4fbbd0d9ccabc8604c71b23af1131" (1/1) yEnc
 
@@ -229,25 +225,22 @@ Class Sharing
 			),
 			'<anon@anon.com>'
 		);
- 			// Check if we succesfully uploaded it.
-			if ($this->nntp->isError($success) === false && $success === true) {
 
-				// Update DB to say we posted the article.
-				$this->db->exec(
-					sprintf('
-						UPDATE releasecomment
-						SET shared = 1, shareID = %s
-						WHERE ID = %d',
-						$this->db->escapeString($sid),
-						$row['ID']
-					)
-				);
-					echo '.';
-			}
-		} else {
-			// Update the DB to say it's shared.
-			$this->db->exec(sprintf('UPDATE releasecomment SET shared = 1 WHERE ID = %d', $row['ID']));
-       }
+		// Check if we succesfully uploaded it.
+		if ($this->nntp->isError($success) === false && $success === true) {
+
+			// Update DB to say we posted the article.
+			$this->db->exec(
+				sprintf('
+					UPDATE releasecomment
+					SET shared = 1, shareID = %s
+					WHERE ID = %d',
+					$this->db->escapeString($sid),
+					$row['ID']
+				)
+			);
+				echo '.';
+		}
 	}
 
 	/**
@@ -412,11 +405,8 @@ Class Sharing
 								$this->db->escapeString($matches['guid'])
 							)
 						);
-							$found++;
 							echo '.';
-							if ($found % 40 == 0) {
-								echo '[' . $found . ']' . PHP_EOL;
-					}
+							$found++;
 				}
 			}
 		}
@@ -443,11 +433,11 @@ Class Sharing
 	 * Fetch a comment and insert it.
 	 *
 	 * @param string $messageID Message-ID for the article.
-	 * @param string $siteID    ID of the site.
+	 * @param string $siteid    ID of the site.
 	 *
 	 * @return bool
 	 */
-	protected function insertNewComment(&$messageID, &$siteID)
+	protected function insertNewComment(&$messageID, &$siteid)
 	{
 		// Get the article body.
 		$body = $this->nntp->getMessage(self::group, $messageID);
@@ -478,15 +468,15 @@ Class Sharing
 		if ($this->db->exec(
 			sprintf('
 				INSERT INTO releasecomment
-				(text, createddate, shareID, gid, nzb_guid, siteID, username, userID, releaseID, shared, host)
- 				VALUES (%s, %s, %s, %s, %s, %s, 0, 0, 2, "")',
+ +				(text, createddate, shareID, nzb_guid, siteID, username, userID, releaseID, shared, host)
+ +				VALUES (%s, %s, %s, %s, %s, %s, 0, 0, 2, "")',
 				$this->db->escapeString($body['BODY']),
+				$userid,
 				$this->functions->from_unixtime(($body['TIME'] > time() ? time() : $body['TIME'])),
 				$this->db->escapeString($body['SID']),
 				$this->db->escapeString($body['RID']),
-				$this->db->escapeString($body['RID']),
-				$this->db->escapeString($siteID),
-				$this->db->escapeString((substr($body['USER'], 0, 3) === 'sn-' ? 'SH_ANON' : 'SH_' . $body['USER']))
+				$this->db->escapeString($siteid),
+				$this->db->escapeString((substr($body['USER'], 0, 3) === 'sn-' ? 'ANON' : $body['USER']))
 			)
 		)) {
 			return true;

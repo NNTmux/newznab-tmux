@@ -183,9 +183,9 @@ class IRCScraper
 				if (defined('SCRAPE_IRC_EFNET_IGNORED_CHANNELS') && SCRAPE_IRC_EFNET_IGNORED_CHANNELS != '') {
 					$ignored = explode(',', SCRAPE_IRC_EFNET_IGNORED_CHANNELS);
 					$newList = array();
-					foreach($channelList as $channel => $chanpass) {
+					foreach($channelList as $channel => $password) {
 						if (!in_array($channel, $ignored)) {
-							$newList[$channel] = $chanpass;
+							$newList[$channel] = $password;
 						}
 					}
 					if (empty($newList)) {
