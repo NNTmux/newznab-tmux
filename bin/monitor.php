@@ -9,7 +9,7 @@ require_once(dirname(__FILE__)."/../lib/showsleep.php");
 require_once(dirname(__FILE__)."/../lib/functions.php");
 
 
-$version="0.3r1069";
+$version="0.3r1070";
 
 $db = new DB();
 $functions = new Functions();
@@ -1465,22 +1465,15 @@ if ($running == 1){
                 shell_exec("tmux respawnp -t${tmux_session}:1.2 'echo \"\033[38;5;\"$color\"m\n$panes1[2] Disabled by Max Load\"' 2>&1 1> /dev/null");
         }
 
-	//run delete parts in pane 1.3
-	if (( $maxload >= get_load()) && (( TIME() - $time16 ) >= $delete_timer ) && ( $delete_parts == 1 )) {
+	//run comment sharing in in pane 1.3
+	if (( $maxload >= get_load()) && (( TIME() - $time16 ) >= 600 )) {
 		$color = get_color($colors_start, $colors_end, $colors_exc);
 		$log = writelog($panes1[3]);
-		shell_exec("tmux respawnp -t${tmux_session}:1.3 'echo \"\033[38;5;\"$color\"m\" && cd $_cj && $_php remove_parts_without_releases.php 2>&1 $log' 2>&1 1> /dev/null");
+		shell_exec("tmux respawnp -t${tmux_session}:1.3 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php postprocess_new.php sharing 2>&1 $log' 2>&1 1> /dev/null");
 		$time16 = TIME();
-	} elseif (( $delete_parts == 0 )) {
-		$color = get_color($colors_start, $colors_end, $colors_exc);
-		shell_exec("tmux respawnp -t${tmux_session}:1.3 'echo \"\033[38;5;\"$color\"m\n$panes1[3]  has been disabled/terminated by Delete Parts\"' 2>&1 1> /dev/null");
-	} elseif ( $maxload >= get_load()) {
-		$color = get_color($colors_start, $colors_end, $colors_exc);
-		$run_time = relativeTime( $delete_timer + $time16 );
-		shell_exec("tmux respawnp -t${tmux_session}:1.3 'echo \"\033[38;5;\"$color\"m\n$panes1[3] will run in T[ $run_time]\"' 2>&1 1> /dev/null");
-	} elseif ( $maxload <= get_load()) {
+	}  else if ( $maxload <= get_load()) {
                 $color = get_color($colors_start, $colors_end, $colors_exc);
-                shell_exec("tmux respawnp -t${tmux_session}:1.3 'echo \"\033[38;5;\"$color\"m\n$panes1[3] Disabled by Max Load\"' 2>&1 1> /dev/null");
+                shell_exec("tmux respawnp -t${tmux_session}:1.3 'echo \"\033[38;5;\"$color\"m\n$panes1[3] Sharing Comments Disabled by Max Load\"' 2>&1 1> /dev/null");
         }
 
 	//run update_missing_movie_info parts in pane 1.4 on 15th loop
