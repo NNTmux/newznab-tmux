@@ -168,7 +168,7 @@ Class Sharing
 	 */
 	protected function postAll()
 	{
-		// Get all comments that we have no posted yet.
+		// Get all comments that we have not posted yet.
 		$newComments = $this->db->query(
 			sprintf(
 				'SELECT rc.text, rc.ID, %s, u.username, r.gid as nzb_guid
@@ -258,8 +258,9 @@ Class Sharing
 			foreach ($res as $row) {
 				$this->db->exec(
 					sprintf(
-						"UPDATE releasecomment SET releaseID = %d WHERE nzb_guid = %s",
+						"UPDATE releasecomment SET releaseID = %d, gid = %s WHERE nzb_guid = %s",
 						$row['ID'],
+                        $this->db->escapeString($row['nzb_guid']),
 						$this->db->escapeString($row['nzb_guid'])
 					)
 				);
