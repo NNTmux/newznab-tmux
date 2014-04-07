@@ -9,7 +9,7 @@ require_once(dirname(__FILE__)."/../lib/showsleep.php");
 require_once(dirname(__FILE__)."/../lib/functions.php");
 
 
-$version="0.3r1072";
+$version="0.3r1073";
 
 $db = new DB();
 $functions = new Functions();
@@ -1470,11 +1470,12 @@ if ($running == 1){
         }
 
 	//run comment sharing in in pane 1.3
-	if (( $maxload >= get_load()) && (( TIME() - $time16 ) >= $sharing_timer )) {
+	if ($maxload >= get_load()) {
 		$color = get_color($colors_start, $colors_end, $colors_exc);
 		$log = writelog($panes1[3]);
-		shell_exec("tmux respawnp -t${tmux_session}:1.3 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php postprocess_new.php sharing 2>&1 $log; $_sleep $sharing_timer' 2>&1 1> /dev/null");
-		$time16 = TIME();
+		shell_exec("tmux respawnp -t${tmux_session}:1.3 'echo \"\033[38;5;\"$color\"m\";\
+                    cd $_bin && $_php postprocess_new.php sharing 2>&1 $log;\
+                     $_sleep $sharing_timer' 2>&1 1> /dev/null");
 	}  else if ( $maxload <= get_load()) {
                 $color = get_color($colors_start, $colors_end, $colors_exc);
                 shell_exec("tmux respawnp -t${tmux_session}:1.3 'echo \"\033[38;5;\"$color\"m\n$panes1[3] Sharing Comments Disabled by Max Load\"' 2>&1 1> /dev/null");
