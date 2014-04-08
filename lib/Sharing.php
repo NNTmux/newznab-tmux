@@ -486,7 +486,7 @@ Class Sharing
 		}
 
 		// Just in case.
-		if (!isset($body['USER'])) {
+			if (!isset($body['USER']) || !isset($body['SID']) || !isset($body['RID']) || !isset($body['TIME']) | !isset($body['BODY'])) {
 			return false;
 		}
 
@@ -494,8 +494,8 @@ Class Sharing
 		if ($this->db->exec(
 			sprintf('
 				INSERT INTO releasecomment
-				(text, createddate, shareID, gid, nzb_guid, siteID, username, userID, releaseID, shared, host)
-				VALUES (%s, %s, %s, %s, %s, %s, %s, 0, 0, 2, "")',
+				(text, createddate, issynced, shareID, gid, nzb_guid, siteID, username, userID, releaseID, shared, host)
+				VALUES (%s, %s, 1, %s, %s, %s, %s, %s, 0, 0, 2, "")',
 				$this->db->escapeString($body['BODY']),
 				$this->functions->from_unixtime(($body['TIME'] > time() ? time() : $body['TIME'])),
 				$this->db->escapeString($body['SID']),

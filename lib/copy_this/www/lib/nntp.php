@@ -142,22 +142,20 @@ class NNTP extends Net_NNTP_Client
 	 *
 	 * @param boolean $compression Should we attempt to enable XFeature Gzip
 	 *     compression on this connection?
-	 * @param boolean $alternate   Use the alternate NNTP connection.
+	 *
 	 *
 	 * @return boolean On success = Did we successfully connect to the usenet?
 	 * @return object  On failure = Pear error.
 	 *
 	 * @access public
 	 */
-	public function doConnect($compression = true, $alternate = false)
+	public function doConnect($compression = true)
 	{
 		if (// Don't reconnect to usenet if:
 			// We are already connected to usenet. AND
 			$this->_isConnected() &&
 			// (If compression is wanted and on,                    OR    Compression is not wanted and off.) AND
-			(($compression && $this->compression)                   || (!$compression && !$this->compression)) &&
-			// (Alternate is wanted, AND current server is alt,     OR    Alternate is not wanted AND current is main.)
-			(($alternate && $this->currentServer === NNTP_SERVER_A) || (!$alternate && $this->currentServer === NNTP_SERVER))
+			(($compression && $this->compression)                   || (!$compression && !$this->compression))
 		) {
 			return true;
 		} else {
@@ -167,19 +165,11 @@ class NNTP extends Net_NNTP_Client
 		$ret = $ret2 = $connected = $sslEnabled = $cError = $aError = false;
 
 		// If we switched servers, reset objects.
-		if (!$alternate) {
 			$sslEnabled = NNTP_SSLENABLED ? true : false;
 			$this->currentServer = NNTP_SERVER;
 			$this->currentPort = NNTP_PORT;
 			$userName = NNTP_USERNAME;
 			$password = NNTP_PASSWORD;
-		} else {
-			$sslEnabled = NNTP_SSLENABLED_A ? true : false;
-			$this->currentServer = NNTP_SERVER_A;
-			$this->currentPort = NNTP_PORT_A;
-			$userName = NNTP_USERNAME_A;
-			$password = NNTP_PASSWORD_A;
-		}
 
 		$enc = ($sslEnabled ? ' (ssl)' : ' (non-ssl)');
 		$sslEnabled = ($sslEnabled ? 'tls' : false);
@@ -414,14 +404,14 @@ class NNTP extends Net_NNTP_Client
 	 *
 	 * @param string $groupName The name of the group the articles are in.
 	 * @param array|string|int $identifiers Message-ID(string) or article number(int), or array containing M-ID's or A-Numbers.
-	 * @param bool $alternate Use the alternate NNTP provider?
+	 * 
 	 *
 	 * @return string On success : The article bodies.
 	 * @return object On failure : Pear error.
 	 *
 	 * @access public
 	 */
-	public function getMessages($groupName, $identifiers, $alternate=false)
+	public function getMessages($groupName, $identifiers)
 	{
 		$connected = $this->checkConnection();
 		if ($connected !== true) {
@@ -430,13 +420,6 @@ class NNTP extends Net_NNTP_Client
 
 		// String to hold all the bodies.
 		$body = '';
-
-		$aConnected = false;
-		if ($alternate === true) {
-			$nntp = new NNTP($this->echo);
-		} else {
-			$nntp = null;
-		}
 
 		// Check if the msgIds are in an array.
 		if (is_array($identifiers)) {
@@ -448,7 +431,7 @@ class NNTP extends Net_NNTP_Client
 			foreach ($identifiers as $m) {
 				$iDents++;
 				// Download the body.
-				$message = $this->getMessage($groupName, $m, $alternate);
+				$message = $this->getMessage($groupName, $m);
 
 				// Append the body to $body.
 				if (!$this->isError($message)) {
@@ -456,34 +439,6 @@ class NNTP extends Net_NNTP_Client
 
 					// If there is an error return the PEAR error object.
 				} else {
-					if ($alternate === true) {
-						if ($aConnected === false) {
-							// Check if the current connected server is the alternate or not.
-							if ($this->currentServer === NNTP_SERVER) {
-								// It's the main so connect to the alternate.
-								$nntp->doConnect(true, true);
-							} else {
-								// It's the alternate so connect to the main.
-								$nntp->doConnect();
-							}
-							$aConnected = true;
-						}
-						$newBody = $nntp->getMessage($groupName, $m);
-						if ($nntp->isError($newBody)) {
-							if ($aConnected) {
-								$nntp->doQuit();
-							}
-							// If we got some data, return it.
-							if ($body !== '') {
-								return $body;
-							// Try until we possibly find data.
-							} elseif ($iCount > $iDents) {
-								continue;
-							}
-							return $newBody;
-						}
-						$body .= $newBody;
-					} else {
 						// If we got some data, return it.
 						if ($body !== '') {
 							return $body;
@@ -492,28 +447,17 @@ class NNTP extends Net_NNTP_Client
 							continue;
 						}
 						return $message;
-					}
 				}
 			}
 
 			// If it's a string check if it's a valid message-ID.
 		} else if (is_string($identifiers) || is_numeric($identifiers)) {
-			$body = $this->getMessage($groupName, $identifiers, $alternate);
-			if ($alternate === true && $this->isError($body)) {
-				$nntp->doConnect(true, true);
-				$body = $nntp->getMessage($groupName, $identifiers);
-				$aConnected = true;
-			}
-
+			$body = $this->getMessage($groupName, $identifiers);
 			// Else return an error.
 		} else {
 			$message = 'Wrong Identifier type, array, int or string accepted. This type of var was passed: ' . gettype($identifiers);
 			return $this->throwError($this->c->error($message));
-		}
-
-		if ($aConnected === true) {
-			$nntp->doQuit();
-		}
+        }
 
 		return $body;
 	}
