@@ -5,6 +5,8 @@
  */
 require_once(WWW_DIR."/lib/Net_NNTP/NNTP/Client.php");
 require_once(WWW_DIR."/lib/Tmux.php");
+require_once(WWW_DIR."/lib/site.php");
+require_once(WWW_DIR."/lib/binaries.php");
 require_once(WWW_DIR."../misc/update_scripts/nix_scripts/tmux/lib/ColorCLI.php");
 require_once(WWW_DIR."../misc/update_scripts/nix_scripts/tmux/lib/Yenc.php");
 
@@ -99,6 +101,11 @@ class NNTP extends Net_NNTP_Client
 	 * @var string
 	 */
 	protected $currentGroup = '';
+
+	/**
+	 * Start an NNTP connection.
+	 */
+	public $XFCompression = false;
 
 	/**
 	 * Default constructor.
@@ -1072,6 +1079,427 @@ class NNTP extends Net_NNTP_Client
 		$this->compression = true;
 		return true;
 	}
+
+	/**
+    *
+	* Added from original nntp for compatibility reasons
+    *
+	*/
+
+	/**
+     * Retrieve blob
+     * Get data and assume we do not hit any blindspots
+     * @return mixed (array) text response on success or (object) pear_error on failure
+     * @access private
+     */
+    function _getCompressedResponse()
+    {
+        $data = array();
+
+		// We can have two kinds of compressed support:
+		// - yEnc encoding
+		// - Just a gzip drop
+		// We try to autodetect which one this uses
+
+		$line = @fread($this->_socket, 1024);
+		if (substr($line, 0, 7) == '=ybegin') {
+			$data = $this->_getTextResponse();
+			$data = $line . "\r\n" . implode("", $data);
+   	    	$data = $this->yencDecode($data);
+			$data = explode("\r\n", gzinflate($data));
+			return $data;
+		}
+		// We cannot use blocked I/O on this one
+		$streamMetadata = stream_get_meta_data($this->_socket);
+		stream_set_blocking($this->_socket, false);
+
+        // Continue until connection is lost or we don't receive any data anymore
+		$tries = 0;
+		$uncompressed = '';
+        while (!feof($this->_socket)) {
+
+            # Retrieve and append up to 32k characters from the server
+            $received = @fread($this->_socket, 32768);
+			if (strlen($received) == 0) {
+				$tries++;
+				# Try decompression
+				$uncompressed = @gzuncompress($line);
+				if (($uncompressed !== false) || ($tries > 500)) {
+					break;
+				}
+				if ($tries % 50 == 0) {
+				}
+			}
+			# an error occured
+			if ($received === false) {
+				@fclose($this->_socket);
+				$this->_socket = false;
+			}
+            $line .= $received;
+        }
+		# and set the stream to its original blocked(?) value
+		stream_set_blocking($this->_socket, $streamMetadata['blocked']);
+		$data = explode("\r\n", $uncompressed);
+		$dataCount = count($data);
+
+		# Gzipped compress includes the "." and linefeed in the compressed stream, skip those.
+		if ($dataCount >= 2) {
+			if (($data[($dataCount - 2)] == ".") && (empty($data[($dataCount - 1)]))) {
+				array_pop($data);
+				array_pop($data);
+			}
+			$data = array_filter($data);
+		}
+		return $data;
+    }
+
+
+	/**
+	 * Enable XFeature compression support for the current connection.
+	 */
+	function enableXFCompression()
+	{
+		$response = $this->_sendCommand('XFEATURE COMPRESS GZIP');
+
+		if (PEAR::isError($response) || $response != 290) {
+			//echo "Xfeature compression not supported!\n";
+			return false;
+		}
+
+		$this->XFCompression = true;
+		//echo "XFeature compression enabled\n";
+		return true;
+	}
+
+	function _getXFCompressedTextResponse()
+	{
+		$tries 				= 0;
+		$bytesreceived 		= 0;
+		$totalbytesreceived = 0;
+		$completed			= false;
+		$data 				= null;
+		//build binary array that represents zero results basically a compressed empty string terminated with .(period) char(13) char(10)
+		 $emptyreturnend 	= chr(0x03).chr(0x00).chr(0x00).chr(0x00).chr(0x00).chr(0x01).chr(0x2e).chr(0x0d).chr(0x0a);
+		 $emptyreturn  		= chr(0x78).chr(0x9C).$emptyreturnend;
+		 $emptyreturn2 		= chr(0x78).chr(0x01).$emptyreturnend;
+		 $emptyreturn3 		= chr(0x78).chr(0x5e).$emptyreturnend;
+		 $emptyreturn4 		= chr(0x78).chr(0xda).$emptyreturnend;
+
+		while (!feof($this->_socket))
+		{
+			$completed = false;
+			//get data from the stream
+			 $buffer = fgets($this->_socket);
+			 //get byte count and update total bytes
+			 $bytesreceived = strlen($buffer);
+			 //if we got no bytes at all try one more time to pull data.
+			 if ($bytesreceived == 0)
+			 {
+				$buffer = fgets($this->_socket);
+			 }
+			//get any socket error codes
+			$errorcode = 0;
+			if (function_exists("socket_last_error"))
+				$errorcode = socket_last_error();
+
+			//if the buffer is zero its zero...
+			if ($bytesreceived === 0)
+				return $this->throwError('No data returned.', 1000);
+			//did we have any socket errors?
+			 if ($errorcode === 0)
+			 {
+				//append buffer to final data object
+				 $data .= $buffer;
+				 $totalbytesreceived = $totalbytesreceived+$bytesreceived;
+
+				 //output byte count in real time once we have 1MB of data
+				if ($totalbytesreceived > 10240)
+				if ($totalbytesreceived%128 == 0)
+				{
+					//echo "bytes received: ";
+					//echo $totalbytesreceived;
+					//echo "\r";
+				}
+
+				//check to see if we have the magic terminator on the byte stream
+				$b1 = null;
+				if ($bytesreceived > 2)
+				if (ord($buffer[$bytesreceived-3]) == 0x2e && ord($buffer[$bytesreceived-2]) == 0x0d && ord($buffer[$bytesreceived-1]) == 0x0a)//substr($buffer,-3) == ".\r\n"
+				{
+					//check to see if the returned binary string is 11 bytes long generally and indcator
+					//of an compressed empty string probably don't need this check
+					if ($totalbytesreceived==11)
+					{
+						//compare the data to the empty string if the data is a compressed empty string
+						//throw an error else return the data
+						if (($data === $emptyreturn)||($data === $emptyreturn2)||($data === $emptyreturn3)||($data === $emptyreturn4))
+						{
+							echo "empty gzip stream\n";
+							return $this->throwError('No data returned.', 1000);
+						}
+					}
+					else
+					{
+						//echo "\n";
+						$completed = true;
+					}
+				}
+			 }
+			 else
+			 {
+				 echo "failed to read from socket\n";
+				 return $this->throwError('Failed to read line from socket.', 1000);
+			 }
+
+			if ($completed)
+			{
+				//check to see if the header is valid for a gzip stream
+				if(ord($data[0]) == 0x78 && in_array(ord($data[1]),array(0x01,0x5e,0x9c,0xda)))
+				{
+					$decomp = @gzuncompress(mb_substr ( $data , 0 ,-3, '8bit' ));
+				}
+				else
+				{
+					echo "Invalid header on gzip stream.\n";
+					return $this->throwError('Invalid gzip stream.', 1000);
+				}
+
+				if ($decomp != false)
+				{
+					$decomp = explode("\r\n", trim($decomp));
+					return $decomp;
+				}
+				else
+				{
+					$tries++;
+					echo "Decompression Failed Retry Number: $tries \n";
+				}
+			}
+		}
+		//throw an error if we get out of the loop
+		if (!feof($this->_socket))
+		{
+			return "Error: unexpected fgets() fail\n";
+		}
+		return $this->throwError('Decompression Failed, connection closed.', 1000);
+	}
+
+	/**
+     * Fetch message header from message number $first until $last
+     * The format of the returned array is:
+     * $messages[message_id][header_name]
+     * @param optional string $range articles to fetch
+     * @return mixed (array) nested array of message and there headers on success or (object) pear_error on failure
+     * @access protected
+     */
+    function cmdXZver($range = null)
+    {
+        if (is_null($range))
+			$command = 'XZVER';
+    	else
+    	    $command = 'XZVER ' . $range;
+        $response = $this->_sendCommand($command);
+
+    	switch ($response) {
+    	    case 224: // RFC2980: 'Overview information follows'
+				$data = $this->_getCompressedResponse();
+    	        foreach ($data as $key => $value)
+    	            $data[$key] = explode("\t", trim($value));
+
+    	    	return $data;
+    	    	break;
+    	    case 412: // RFC2980: 'No news group current selected'
+    	    	return $this->throwError('No news group current selected', $response, $this->_currentStatusResponse());
+    	    	break;
+    	    case 420: // RFC2980: 'No article(s) selected'
+    	    	return $this->throwError('No article(s) selected', $response, $this->_currentStatusResponse());
+    	    	break;
+    	    case 502: // RFC2980: 'no permission'
+    	    	return $this->throwError('No permission', $response, $this->_currentStatusResponse());
+    	    	break;
+	    	case 500: // RFC2980: 'unknown command'
+	        	$this->throwError("XZver not supported ({$this->_currentStatusResponse()})", $response);
+	       		break;
+    	    default:
+    	    	return $this->_handleUnexpectedResponse($response);
+    	}
+    }
+
+	/**
+	 * Decode a yenc encoded string.
+	 */
+	function decodeYenc($yencodedvar)
+	{
+		$input = array();
+		preg_match("/^(=ybegin.*=yend[^$]*)$/ims", $yencodedvar, $input);
+		if (isset($input[1]))
+		{
+			$ret = "";
+			$input = trim(preg_replace("/\r\n/im", "",  preg_replace("/(^=yend.*)/im", "", preg_replace("/(^=ypart.*\\r\\n)/im", "", preg_replace("/(^=ybegin.*\\r\\n)/im", "", $input[1], 1), 1), 1)));
+
+			for( $chr = 0; $chr < strlen($input) ; $chr++)
+				$ret .= ($input[$chr] != "=" ? chr(ord($input[$chr]) - 42) : chr((ord($input[++$chr]) - 64) - 42));
+
+			return $ret;
+		}
+		return false;
+	}
+	
+	/**
+	 * Encode a yenc encoded string.
+	 */
+	function encodeYenc($message, $filename, $linelen = 128, $crc32 = true)
+	{
+		/*
+		* This code was found http://everything2.com/title/yEnc+PHP+Class
+		*/
+
+		// yEnc 1.3 draft doesn't allow line lengths of more than 254 bytes.
+		if ($linelen > 254)
+			$linelen = 254;
+
+		if ($linelen < 1)
+			return false;
+
+		$encoded = "";
+
+		// Encode each character of the message one at a time.
+		for( $i = 0; $i < strlen($message); $i++)
+		{
+			$value = (ord($message{$i}) + 42) % 256;
+
+		// Escape NULL, TAB, LF, CR, space, . and = characters.
+		if ($value == 0 || $value == 9 || $value == 10 ||
+			$value == 13 || $value == 32 || $value == 46 ||
+			$value == 61)
+			$encoded .= "=".chr(($value + 64) % 256);
+		else
+			$encoded .= chr($value);
+	}
+
+		// Wrap the lines to $linelen characters
+		$encoded = trim(chunk_split($encoded, $linelen));
+
+		// Tack a yEnc header onto the encoded message.
+		$encoded = "=ybegin line=$linelen size=".strlen($message)
+				." name=".trim($filename)."\r\n".$encoded;
+		$encoded .= "\r\n=yend size=".strlen($message);
+
+		// Add a CRC32 checksum if desired.
+		if ($crc32 === true)
+			$encoded .= " crc32=".strtolower(sprintf("%04X", crc32($message)));
+
+		return $encoded."\r\n";
+	}
+
+	// }}}
+    // {{{ cmdXZver()
+	/*
+	 * Based on code from http://wonko.com/software/yenc/, but
+	 * simplified because XZVER and the likes don't implement
+	 * yenc properly
+	 */
+	private function yencDecode($string, $destination = "") {
+		$encoded = array();
+		$header = array();
+		$decoded = '';
+
+		# Extract the yEnc string itself
+		preg_match("/^(=ybegin.*=yend[^$]*)$/ims", $string, $encoded);
+		$encoded = $encoded[1];
+
+		# Extract the filesize and filename from the yEnc header
+		preg_match("/^=ybegin.*size=([^ $]+).*name=([^\\r\\n]+)/im", $encoded, $header);
+		$filesize = $header[1];
+		$filename = $header[2];
+
+		# Remove the header and footer from the string before parsing it.
+		$encoded = preg_replace("/(^=ybegin.*\\r\\n)/im", "", $encoded, 1);
+		$encoded = preg_replace("/(^=yend.*)/im", "", $encoded, 1);
+
+		# Remove linebreaks and whitespace from the string
+		$encoded = trim(str_replace("\r\n", "", $encoded));
+
+		// Decode
+		$strLength = strlen($encoded);
+		for($i = 0; $i < $strLength; $i++) {
+			$c = $encoded[$i];
+
+			if ($c == '=') {
+				$i++;
+				$decoded .= chr((ord($encoded[$i]) - 64) - 42);
+			} else {
+				$decoded .= chr(ord($c) - 42);
+			}
+		}
+		// Make sure the decoded filesize is the same as the size specified in the header.
+		if (strlen($decoded) != $filesize) {
+			throw new Exception("Filesize in yEnc header en filesize found do not match up");
+		}
+		return $decoded;
+	}
+
+		/**
+	 * Retrieve all NNTP messages associated with a binaries.ID
+	 */
+	function getBinary($binaryId, $isNfo=false)
+	{
+		$db = new DB();
+		$bin = new Binaries();
+
+		$binary = $bin->getById($binaryId);
+		if (!$binary)
+		{
+            printf("NntpPrc: Unable to locate binary: %s\n", $binaryId);
+			return false;
+        }
+
+		$summary = $this->selectGroup($binary['groupname']);
+		$message = $dec = '';
+
+		if (PEAR::isError($summary))
+		{
+			echo "NntpPrc : ".substr($summary->getMessage(), 0, 100)."\n";
+			return false;
+		}
+
+		$resparts = $db->query(sprintf("SELECT size, partnumber, messageID FROM parts WHERE binaryID = %d ORDER BY partnumber", $binaryId));
+
+		//
+		// Dont attempt to download nfos which are larger than one part.
+		//
+		if (sizeof($resparts) > 1 && $isNfo === true)
+		{
+			//echo 'NntpPrc : Error Nfo is too large... skipping.\n';
+			return false;
+		}
+
+		foreach($resparts as $part)
+		{
+			$messageID = '<'.$part['messageID'].'>';
+			$body = $this->getBody($messageID, true);
+			if (PEAR::isError($body))
+			{
+				//echo 'NntpPrc : Error fetching part number '.$part['messageID'].' in '.$binary['groupname'].' (Server response: '. $body->getMessage().')';
+				return false;
+			}
+
+			$dec = $this->decodeYenc($body);
+			if (!$dec)
+			{
+                printf("NntpPrc: Unable to decode body of binary: %s\n", $binaryId);
+
+				//
+				// Yenc decode failed
+				//
+				return false;
+			}
+			$message .= $dec;
+		}
+		return $message;
+	}
+
+
 
 	/**
 	 * Extend to not get weak warnings.

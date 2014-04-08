@@ -457,7 +457,7 @@ CREATE TABLE sharing_sites (
 	first_time     DATETIME           DEFAULT NULL,
 	enabled        TINYINT(1)         NOT NULL DEFAULT '0',
 	comments       MEDIUMINT UNSIGNED NOT NULL DEFAULT '0',
-	PRIMARY KEY    (id)
+	PRIMARY KEY    (ID)
 ) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS sharing;
