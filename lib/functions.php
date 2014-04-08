@@ -16,7 +16,6 @@ require_once(WWW_DIR."/lib/groups.php");
 require_once(WWW_DIR.'/lib/nntp.php');
 require_once(WWW_DIR."/lib/tvrage.php");
 require_once(WWW_DIR."/lib/movie.php");
-require_once(WWW_DIR."/lib/nntp.php");
 require_once(WWW_DIR."/lib/postprocess.php");
 require_once(WWW_DIR."/lib/Tmux.php");
 require_once(WWW_DIR."/lib/amazon.php");
