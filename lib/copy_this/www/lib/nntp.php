@@ -1344,7 +1344,7 @@ class NNTP extends Net_NNTP_Client
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Encode a yenc encoded string.
 	 */
