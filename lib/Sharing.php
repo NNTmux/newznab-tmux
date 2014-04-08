@@ -5,17 +5,19 @@ require_once(WWW_DIR.'/lib/nntp.php');
 require_once("Yenc.php");
 require_once("functions.php");
 
-
 /**
+ *
+ *
  * Class Sharing
  */
+
 Class Sharing
 {
 	/**
 	 *      --------------------------------------------
 	 *      sharing_sites table (contains remote sites):
 	 *      --------------------------------------------
-	 *      ID            ID of the site.
+	 *      id            ID of the site.
 	 *      site_name     Name of the site.
 	 *      site_guid     Unique hash identifier for the site.
 	 *      last_time     Newest comment time for this site.
@@ -41,7 +43,7 @@ Class Sharing
 	 *      releasecomments table (modifications)
 	 *      -------------------------------------------
 	 *      shared        Has this comment been shared or have we received it from another site. (0 not shared, 1 shared, 2 received)
-	 *      shareID       Unique identifier to know if we already have the comment or not.
+	 *      shareid       Unique identifier to know if we already have the comment or not.
 	 *      nzb_guid      Guid of the NZB's first message-id.
 	 */
 
@@ -112,9 +114,8 @@ Class Sharing
 		$this->siteSettings['fetching'] = ($this->siteSettings['fetching'] == 1 ? true : false);
 		$this->siteSettings['enabled'] = ($this->siteSettings['enabled'] == 1 ? true : false);
 		$this->siteSettings['start_position'] = ($this->siteSettings['start_position'] == 1 ? true : false);
-
-        //read functions from functions.php
-        $this->functions = new Functions();
+		//add functions.php
+		$this->functions = new Functions();
 	}
 
 	/**
@@ -133,12 +134,11 @@ Class Sharing
 			$this->nntp->doConnect();
 		}
 
-
 		if ($this->siteSettings['fetching']) {
 			$this->fetchAll();
 		}
 		$this->matchComments();
-        if ($this->siteSettings['posting']) {
+		if ($this->siteSettings['posting']) {
 			$this->postAll();
 		}
 	}
@@ -171,7 +171,7 @@ Class Sharing
 	 */
 	protected function postAll()
 	{
-		// Get all comments that we have not posted yet.
+		// Get all comments that we have no posted yet.
 		$newComments = $this->db->query(
 			sprintf(
 				'SELECT rc.text, rc.ID, %s, u.username, r.gid as nzb_guid
@@ -179,7 +179,7 @@ Class Sharing
 				INNER JOIN users u ON rc.userID = u.ID
 				INNER JOIN releases r on rc.releaseID = r.ID
 				WHERE rc.shared = 0 LIMIT %d',
-				$this->functions->unix_timestamp_column('rc.createddate'),
+			   $this->functions->unix_timestamp_column('rc.createddate'),
 				$this->siteSettings['max_push']
 			)
 		);
@@ -188,6 +188,8 @@ Class Sharing
 		if (count($newComments) === 0) {
 			return;
 		}
+
+
 			echo '(Sharing) Starting to upload comments.' . PHP_EOL;
 
 
@@ -195,7 +197,10 @@ Class Sharing
 		foreach($newComments as $comment) {
 			$this->postComment($comment);
 		}
+
+
 			echo PHP_EOL . '(Sharing) Finished uploading comments.' . PHP_EOL;
+
 	}
 
 	/**
@@ -208,7 +213,7 @@ Class Sharing
 		// Create a unique identifier for this comment.
 		$sid = sha1($row['unix_time'] . $row['text'] . $row['nzb_guid']);
 
-        // Check if the comment is already shared.
+		// Check if the comment is already shared.
 		$check = $this->db->queryOneRow(sprintf('SELECT ID FROM releasecomment WHERE shareID = %s', $this->db->escapeString($sid)));
 		if ($check === false) {
 
@@ -216,7 +221,7 @@ Class Sharing
 			//(_nZEDb_)nZEDb_533f16e46a5091.73152965_3d12d7c1169d468aaf50d5541ef02cc88f3ede10 - [1/1] "92ba694cebc4fbbd0d9ccabc8604c71b23af1131" (1/1) yEnc
 
 			// Attempt to upload the comment to usenet.
-	   		$success = $this->nntp->postArticle(
+			$success = $this->nntp->postArticle(
 				self::group,
 				('(_nZEDb_)' . $this->siteSettings['site_name'] . '_' . $this->siteSettings['site_guid'] . ' - [1/1] "' . $sid . '" yEnc (1/1)'),
 				json_encode(
@@ -231,7 +236,7 @@ Class Sharing
 				'<anon@anon.com>'
 			);
 
- 			// Check if we succesfully uploaded it.
+			// Check if we succesfully uploaded it.
 			if ($this->nntp->isError($success) === false && $success === true) {
 
 				// Update DB to say we posted the article.
@@ -244,12 +249,14 @@ Class Sharing
 						$row['ID']
 					)
 				);
+
 					echo '.';
+
 			}
 		} else {
 			// Update the DB to say it's shared.
 			$this->db->exec(sprintf('UPDATE releasecomment SET shared = 1 WHERE ID = %d', $row['ID']));
-       }
+		}
 	}
 
 	/**
@@ -258,7 +265,7 @@ Class Sharing
 	protected function matchComments()
 	{
 		$res = $this->db->query('
-			SELECT r.ID, r.gid as nzb_guid
+			SELECT r.ID, r.gid AS nzb_guid
 			FROM releases r
 			INNER JOIN releasecomment rc ON rc.nzb_guid = r.gid
 			WHERE rc.releaseID = 0'
@@ -269,15 +276,16 @@ Class Sharing
 			foreach ($res as $row) {
 				$this->db->exec(
 					sprintf(
-						"UPDATE releasecomment SET releaseID = %d, gid = %s WHERE nzb_guid = %s",
+						"UPDATE releasecomment SET releaseID = %d WHERE nzb_guid = %s",
 						$row['ID'],
-                        $this->db->escapeString($row['nzb_guid']),
 						$this->db->escapeString($row['nzb_guid'])
 					)
 				);
 				$this->db->exec(sprintf('UPDATE releases SET comments = comments + 1 WHERE ID = %d', $row['ID']));
 			}
+
 				echo '(Sharing) Matched ' . $found . ' comments.' . PHP_EOL;
+
 		}
 	}
 
@@ -298,7 +306,7 @@ Class Sharing
 		if ($this->siteSettings['last_article'] == 0) {
 			// If the user picked to start from the oldest, get the oldest.
 			if ($this->siteSettings['start_position'] === true) {
-            	$this->siteSettings['last_article'] = $ourOldest = (string)($group['first']);
+				$this->siteSettings['last_article'] = $ourOldest = (string)($group['first']);
 			// Else get the newest.
 			} else {
 				$this->siteSettings['last_article'] = $ourOldest = (string)($group['last'] - 1000);
@@ -319,7 +327,10 @@ Class Sharing
 		if ($ourOldest > $newest) {
 			return;
 		}
+
+
 			echo '(Sharing) Starting to fetch new comments.' . PHP_EOL;
+
 
 		// Get the wanted aritcles
 		$headers = $this->nntp->getOverview($ourOldest . '-' . $newest, true, false);
@@ -332,6 +343,7 @@ Class Sharing
 		$found = $total = $currentArticle = 0;
 		// Loop over NNTP headers until we find comments.
 		foreach ($headers as $header) {
+
 			// Check if the article is missing.
 			if (!isset($header['Number'])) {
 				continue;
@@ -344,6 +356,7 @@ Class Sharing
 			if ($found > $this->siteSettings['max_download']) {
 				break;
 			}
+
 			//(_nZEDb_)nZEDb_533f16e46a5091.73152965_3d12d7c1169d468aaf50d5541ef02cc88f3ede10 - [1/1] "92ba694cebc4fbbd0d9ccabc8604c71b23af1131" (1/1) yEnc
 			if ($header['From'] === '<anon@anon.com>' &&
 				preg_match('/^\(_nZEDb_\)(?P<site>.+?)_(?P<guid>[a-f0-9]{40}) - \[1\/1\] "(?P<sid>[a-f0-9]{40})" yEnc \(1\/1\)$/i', $header['Subject'], $matches)) {
@@ -412,33 +425,35 @@ Class Sharing
 								$this->db->escapeString($matches['guid'])
 							)
 						);
-							$found++;
+						$found++;
+
 							echo '.';
 							if ($found % 40 == 0) {
 								echo '[' . $found . ']' . PHP_EOL;
+							}
+						}
 					}
 				}
+			// Update once in a while in case the user cancels the script.
+			if ($total++ % 10 == 0) {
+				$this->siteSettings['lastarticle'] = $currentArticle;
+				$this->db->exec(sprintf('UPDATE sharing SET last_article = %d', $currentArticle));
 			}
 		}
-
-		// Update once in a while in case the user cancels the script.
-		if ($total++ % 10 == 0) {
-		$this->siteSettings['lastarticle'] = $currentArticle;
-		$this->db->exec(sprintf('UPDATE sharing SET last_article = %d', $currentArticle));
-		}
-	}
 
 		if ($currentArticle > 0) {
 			// Update sharing's last article number.
 			$this->siteSettings['lastarticle'] = $currentArticle;
 			$this->db->exec(sprintf('UPDATE sharing SET last_article = %d', $currentArticle));
 		}
-		if ($found > 0) {
-			echo PHP_EOL . '(Sharing) Fetched ' . $found . ' new comments.' . PHP_EOL;
+
+
+			if ($found > 0) {
+				echo PHP_EOL . '(Sharing) Fetched ' . $found . ' new comments.' . PHP_EOL;
 			} else {
 				echo '(Sharing) Finish looking for new comments, but did not find any.' . PHP_EOL;
 			}
-	}
+		}
 
 	/**
 	 * Fetch a comment and insert it.
@@ -480,7 +495,7 @@ Class Sharing
 			sprintf('
 				INSERT INTO releasecomment
 				(text, createddate, shareID, gid, nzb_guid, siteID, username, userID, releaseID, shared, host)
- 				VALUES (%s, %s, %s, %s, %s, %s, %s, 0, 0, 2, "")',
+				VALUES (%s, %s, %s, %s, %s, %s, %s, 0, 0, 2, "")',
 				$this->db->escapeString($body['BODY']),
 				$this->functions->from_unixtime(($body['TIME'] > time() ? time() : $body['TIME'])),
 				$this->db->escapeString($body['SID']),
