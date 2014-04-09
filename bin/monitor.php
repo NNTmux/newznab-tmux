@@ -9,7 +9,7 @@ require_once(dirname(__FILE__)."/../lib/showsleep.php");
 require_once(dirname(__FILE__)."/../lib/functions.php");
 
 
-$version="0.3r1079";
+$version="0.3r1080";
 
 $db = new DB();
 $functions = new Functions();
@@ -125,8 +125,6 @@ $proc_tmux = "SELECT "
     . "(SELECT VALUE FROM tmux WHERE SETTING = 'spotnab') AS spotnab, "
     . "(SELECT VALUE FROM tmux WHERE SETTING = 'spotnab_timer') AS spotnab_timer, "
     . "(SELECT VALUE FROM tmux WHERE SETTING = 'others') AS others, "
-    . "(SELECT VALUE FROM tmux WHERE SETTING = 'delete_parts') AS delete_parts, "
-    . "(SELECT VALUE FROM tmux WHERE SETTING = 'delete_timer') AS delete_timer, "
     . "(SELECT VALUE FROM tmux WHERE SETTING = 'sharing_timer') AS sharing_timer, "
     . "(SELECT VALUE FROM tmux WHERE SETTING = 'sphinx') AS sphinx, "
     . "(SELECT VALUE FROM tmux WHERE SETTING = 'sphinx_timer') AS sphinx_timer, "
@@ -770,17 +768,11 @@ while( $i > 0 )
     if ($proc_tmux_result[0]['seq_timer'] != NULL) {
 		$seq_timer = $proc_tmux_result[0]['seq_timer'];
 	}
-     if ($proc_tmux_result[0]['sphinx'] != NULL) {
+    if ($proc_tmux_result[0]['sphinx'] != NULL) {
 		$sphinx = $proc_tmux_result[0]['sphinx'];
 	}
-     if ($proc_tmux_result[0]['sphinx_timer'] != NULL) {
+    if ($proc_tmux_result[0]['sphinx_timer'] != NULL) {
 		$sphinx_timer = $proc_tmux_result[0]['sphinx_timer'];
-	}
-     if ($proc_tmux_result[0]['delete_parts'] != NULL) {
-		$delete_parts = $proc_tmux_result[0]['delete_parts'];
-	}
-     if ($proc_tmux_result[0]['delete_timer'] != NULL) {
-		$delete_timer = $proc_tmux_result[0]['delete_timer'];
 	}
     if ($proc_tmux_result[0]['show_query'] != NULL) {
 		$show_query = $proc_tmux_result[0]['show_query'];

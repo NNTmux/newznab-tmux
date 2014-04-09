@@ -164,8 +164,6 @@ INSERT INTO tmux (setting, value) values ('defrag_cache','900'),
     ('spotnab_timer', '600'),
     ('predb', '0'),
     ('predb_timer', '600'),
-    ('delete_parts', '0'),
-    ('delete_timer', '43200'),
     ('safebackfilldate', '2012-06-24'),
     ('safepartrepair', '0'),
 	('request_hours', '1'),
@@ -184,7 +182,7 @@ INSERT INTO tmux (setting, value) values ('defrag_cache','900'),
     ('nntpretries', '10'),
     ('alternate_nntp', '0'),
     ('sharing_timer', '60'),
-    ('sqlpatch','19');
+    ('sqlpatch','20');
 
 DROP TABLE IF EXISTS country;
 CREATE TABLE country (
