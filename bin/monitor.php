@@ -9,7 +9,7 @@ require_once(dirname(__FILE__)."/../lib/showsleep.php");
 require_once(dirname(__FILE__)."/../lib/functions.php");
 
 
-$version="0.3r1081";
+$version="0.3r1082";
 
 $db = new DB();
 $functions = new Functions();
@@ -1496,7 +1496,7 @@ if ($running == 1){
 				$log = writelog($panes2[0]);
 				shell_exec("tmux respawnp -t${tmux_session}:2.0 ' \
 						cd $_bin && $_php postprocess_new.php nfo $log; date +\"%D %T\"; $_sleep $post_timer' 2>&1 1> /dev/null");
-    } else if (($maxload >= get_load()) && ($post == 0) && ($nfo_remaining_now == 0)) {
+    } else if (($maxload >= get_load()) && (($post == 0) || ($post == 1)) && ($nfo_remaining_now == 0)) {
 				$color = get_color($colors_start, $colors_end, $colors_exc);
 				shell_exec("tmux respawnp -k -t${tmux_session}:2.0 'echo \"\033[38;5;${color}m\n${panes2[0]} has been disabled/terminated by No Nfo to process\"'");
 	} else if ( $maxload <= get_load()) {
