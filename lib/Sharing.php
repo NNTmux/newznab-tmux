@@ -494,8 +494,8 @@ Class Sharing
 		if ($this->db->exec(
 			sprintf('
 				INSERT INTO releasecomment
-				(text, createddate, issynced, shareID, gid, nzb_guid, siteID, username, userID, releaseID, shared, host, sourceID)
-				VALUES (%s, %s, 1, %s, %s, %s, %s, %s, 0, 0, 2, "", 999)',
+				(sourceID, text, createddate, issynced, shareID, gid, nzb_guid, siteID, username, userID, releaseID, shared, host)
+				VALUES (666, %s, %s, 1, %s, %s, %s, %s, %s, 0, 0, 2, "")',
 				$this->db->escapeString($body['BODY']),
 				$this->functions->from_unixtime(($body['TIME'] > time() ? time() : $body['TIME'])),
 				$this->db->escapeString($body['SID']),
