@@ -4,7 +4,7 @@ Support is given on irc.synirc.net #tmux channel.
 I started adapting some of more interesting scripts from nZEDb, but they require tempering with newznab database, so use them at your own risk. Any update to nn+ db could render them useless. Scripts require PHP version > 5.3.10 and Python 2.7x or newer.
 There is a lib folder in main tmux folder. In that folder you will find two folders, /DB/ and /copy_this/. if you are setting up tmux for the first time, import db.sql using cli (mysql -u {┤your username} -p newznab < db.sql).
 
-1. Copy files from /lib/copy_this/ folder into your newznab installation /www folder. You can now edit tmux settings in newznab admin area. This is available in default template for now.
+1. Copy files from /lib/copy_this/ folder into your newznab installation /www folder. I have created the nntmux theme where all the settings are available. 
 
 2. Most of the scripts are now threaded, they need python installed. Install instructions are in threaded_scripts_readme.txt
 

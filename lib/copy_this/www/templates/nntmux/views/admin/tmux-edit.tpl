@@ -531,27 +531,6 @@
     </fieldset>
 
     <fieldset>
-        <legend>Delete Parts</legend>
-        <table class="input">
-            <tr>
-                <td style="width:180px;"><label for="delete_parts">Delete Parts:</label></td>
-                <td>
-                    {html_radios id="delete_parts" name='delete_parts' values=$yesno_ids output=$yesno_names selected=$ftmux->deleta_parts separator='<br />'}
-                    <div class="hint">Choose to delete parts without releases</div>
-                </td>
-            </tr>
-
-            <tr>
-                <td style="width:180px;"><label for="delete_timer">Delete Parts Sleep Timer:</label></td>
-                <td>
-                    <input id="delete_timer" name="delete_timer" class="short" type="text" value="{$ftmux->delete_timer}" />
-                    <div class="hint">The time to sleep from the time the loop ends until it is restarted, in seconds.</div>
-                </td>
-            </tr>
-        </table>
-    </fieldset>
-
-    <fieldset>
         <legend>Update TV/Theater</legend>
         <table class="input">
             <tr>
@@ -888,6 +867,14 @@
 				</td>
 			</tr>
 
+            <tr>
+				<td style="width:180px;"><label for="sharing_timer">Comments Sharing Timer:</label></td>
+				<td>
+					<input class="short" id="sharing_timer" name="sharing_timer" type="text" value="{$ftmux->sharing_timer}" />
+					<div class="hint">Set the timer for updating comments shared between newznab and nZEDb servers</div>
+				</td>
+			</tr>
+
 			<tr>
 				<td style="width:180px;"><label for="debuginfo">Debug information:</label></td>
 				<td>
@@ -997,6 +984,20 @@
 				</td>
 			</tr>
 
+		</table>
+	</fieldset>
+
+    <fieldset>
+		<legend>Connection Settings</legend>
+		<table class="input">
+
+			<tr>
+				<td style="width:180px;"><label for="nntpretries">NNTP Retry Attempts:</label></td>
+				<td>
+					<input class="short" id="nntpretries" name="nntpretries" type="text" value="{$ftmux->nntpretries}" />
+					<div class="hint">The maximum number of retry attmpts to connect to nntp provider. On error, each retry takes approximately 5 seconds nntp returns reply. (Default 10)</div>
+				</td>
+			</tr>
 		</table>
 	</fieldset>
 

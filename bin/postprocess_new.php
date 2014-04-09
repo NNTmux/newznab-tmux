@@ -14,13 +14,13 @@ $c = new ColorCLI();
 $s = new Sites();
 $site = $s->get();
 if (!isset($argv[1])) {
-	exit($c->error("You need to set an argument [additional, nfo, movie, tv, games, ebook, music, anime, unwanted, others]."));
+	exit($c->error("You need to set an argument [additional, nfo, movie, tv, games, ebook, music, anime, unwanted, others, spotnab, sharing]."));
 }
 
 $postprocess = new PostProcess(true);
 if (isset($argv[1]) && $argv[1] === "additional") {
 	// Create the connection here and pass, this is for post processing
-	$nntp = new Nntp();
+	$nntp = new NNTP();
     if ($nntp->doConnect() === false)
     {
 	$c = new ColorCLI();
@@ -34,7 +34,7 @@ if (isset($argv[1]) && $argv[1] === "additional") {
 } else if (isset($argv[1]) && $argv[1] === "nfo"){
     if ( $site->lookupnfo == 1){
     // Create the connection here and pass, this is for post processing
-	$nntp = new Nntp();
+	$nntp = new NNTP();
     if ($nntp->doConnect() === false)
     {
 	$c = new ColorCLI();
@@ -110,6 +110,9 @@ if (isset($argv[1]) && $argv[1] === "additional") {
                 $postprocess -> processUnwanted();
 } else if (isset($argv[1]) && $argv[1] === "other") {
                 $postprocess -> processOtherMiscCategory();
+} else if (isset($argv[1]) && $argv[1] === "sharing") {
+                $functions = new Functions();
+                $functions -> processSharing($nntp);
 }
 
 
