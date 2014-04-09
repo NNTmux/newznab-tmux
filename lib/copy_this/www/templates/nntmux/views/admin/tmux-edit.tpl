@@ -998,14 +998,6 @@
 					<div class="hint">The maximum number of retry attmpts to connect to nntp provider. On error, each retry takes approximately 5 seconds nntp returns reply. (Default 10)</div>
 				</td>
 			</tr>
-
-			<tr>
-				<td style="width:180px;"><label for="alternate_nntp">Alternate NNTP Provider:</label></td>
-				<td>
-					{html_radios id="alternate_nntp" name='alternate_nntp' values=$yesno_ids output=$yesno_names selected=$ftmux->alternate_nntp separator='<br />'}
-					<div class="hint">This sets Postproccessing Additional/Nfo to use the alternate NNTP provider as set in config.php.This setting is not yet used, it is here as a placeholder</div>
-				</td>
-			</tr>
 		</table>
 	</fieldset>
 

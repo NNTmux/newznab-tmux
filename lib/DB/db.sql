@@ -180,7 +180,6 @@ INSERT INTO tmux (setting, value) values ('defrag_cache','900'),
     ('scrape_efnet', 0),
     ('lastpretime', '0'),
     ('nntpretries', '10'),
-    ('alternate_nntp', '0'),
     ('sharing_timer', '60'),
     ('sqlpatch','20');
 
