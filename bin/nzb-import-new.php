@@ -22,7 +22,6 @@ $db = new DB();
 $binaries = new Binaries();
 $s = new Sites();
 $site = $s->get();
-$crosspostt = (!empty($site->crossposttime)) ? $site->crossposttime : 2;
 $releasecleaning = new NameCleaning();
 $categorize = new Category();
 $nzbsperhour = $nzbSkipped = $maxtoprocess = 0;
@@ -89,6 +88,7 @@ function relativeTime($_time)
 	{
 	    $s = new Sites();
         $site = $s->get();
+		$nzb = new NZB();
 	    $sitenzbpath = $site->nzbpath;
 		$path =
 			$nzb->getNZBPath($relguid, $sitenzbpath, true);
