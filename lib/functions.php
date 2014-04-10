@@ -2173,7 +2173,7 @@ class Functions
 					}
 
 					// Check on trakt.
-					$traktimdbid = $trakt->traktMoviesummary($moviename, 'imdbID');
+					$traktimdbid = $trakt->traktMoviesummary($moviename);
 					if ($traktimdbid !== false) {
 						$imdbID = $this->domovieupdate($traktimdbid, 'Trakt', $arr['ID']);
 						if ($imdbID === false) {
@@ -3929,6 +3929,90 @@ class Functions
 
 		// Remove articles that we cant fetch after 5 attempts.
 		$db->exec(sprintf('DELETE FROM ' . $group['prname'] . ' WHERE attempts >= 5 AND groupID = %d', $groupArr['ID']));
+	}
+
+	/**
+	 * Use cURL To download a web page into a string.
+	 *
+	 * @param string $url       The URL to download.
+	 * @param string $method    get/post
+	 * @param string $postdata  If using POST, post your POST data here.
+	 * @param string $language  Use alternate langauge in header.
+	 * @param bool   $debug     Show debug info.
+	 * @param string $userAgent User agent.
+	 * @param string $cookie    Cookie.
+	 *
+	 * @return bool|mixed
+	 */
+	function getUrl($url, $method = 'get', $postdata = '', $language = "", $debug = false, $userAgent = '', $cookie = '')
+	{
+		switch($language) {
+			case 'fr':
+			case 'fr-fr':
+				$language = "fr-fr";
+				break;
+			case 'de':
+			case 'de-de':
+				$language = "de-de";
+				break;
+			case 'en':
+				$language = 'en';
+				break;
+			case '':
+			case 'en-us':
+			default:
+				$language = "en-us";
+		}
+		$header[] = "Accept-Language: " . $language;
+
+		$ch = curl_init();
+		$options = array(
+			CURLOPT_URL            => $url,
+			CURLOPT_HTTPHEADER     => $header,
+			CURLOPT_RETURNTRANSFER => 1,
+			CURLOPT_FOLLOWLOCATION => 1,
+			CURLOPT_TIMEOUT        => 15,
+			CURLOPT_SSL_VERIFYPEER => false,
+			CURLOPT_SSL_VERIFYHOST => false,
+		);
+		curl_setopt_array($ch, $options);
+
+		if ($userAgent !== '') {
+			curl_setopt($ch, CURLOPT_USERAGENT, $userAgent);
+		}
+
+		if ($cookie !== '') {
+			curl_setopt($ch, CURLOPT_COOKIE, $cookie);
+		}
+
+		if ($method === 'post') {
+			$options = array(
+				CURLOPT_POST       => 1,
+				CURLOPT_POSTFIELDS => $postdata
+			);
+			curl_setopt_array($ch, $options);
+		}
+
+		if ($debug) {
+			$options =
+				array(
+					CURLOPT_HEADER      => true,
+					CURLINFO_HEADER_OUT => true,
+					CURLOPT_NOPROGRESS  => false,
+					CURLOPT_VERBOSE     => true
+				);
+			curl_setopt_array($ch, $options);
+		}
+
+		$buffer = curl_exec($ch);
+		$err = curl_errno($ch);
+		curl_close($ch);
+
+		if ($err !== 0) {
+			return false;
+		} else {
+			return $buffer;
+		}
 	}
 
 
