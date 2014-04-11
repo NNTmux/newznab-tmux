@@ -17,6 +17,7 @@ ALTER TABLE  `releases`
   ADD INDEX `ix_releases_nfostatus` (`nfostatus` ASC) USING HASH,
   ADD INDEX `ix_releases_reqidstatus` (`reqidstatus` ASC) USING HASH,
   ADD INDEX `ix_releases_passwordstatus` (`passwordstatus`),
+  ADD INDEX `ix_releases_releasenfoID` (`releasenfoID`),
   ADD INDEX `ix_releases_dehashstatus` (`dehashstatus`),
   ADD INDEX `ix_releases_haspreview` (`haspreview` ASC) USING HASH,
   ADD INDEX `ix_releases_postdate_name` (`postdate`, `name`),
@@ -181,7 +182,7 @@ INSERT INTO tmux (setting, value) values ('defrag_cache','900'),
     ('lastpretime', '0'),
     ('nntpretries', '10'),
     ('sharing_timer', '60'),
-    ('sqlpatch','20');
+    ('sqlpatch','22');
 
 DROP TABLE IF EXISTS country;
 CREATE TABLE country (
