@@ -9,7 +9,7 @@ require_once(dirname(__FILE__)."/../lib/showsleep.php");
 require_once(dirname(__FILE__)."/../lib/functions.php");
 
 
-$version="0.3r1089";
+$version="0.3r1090";
 
 $db = new DB();
 $functions = new Functions();
@@ -953,9 +953,9 @@ $old_session = "$tmux_session";
 	$panes3 = str_replace("\n", '', explode(" ", $panes_win_4));
 	$panes4 = str_replace("\n", '', explode(" ", $panes_win_5));
 
+    $killed = "false";
 	//kill update_binaries.php backfill.php and import-nzb if timer exceeded
-	$killit=explode(" ", relativeTime("$newestadd"));
-	$killed = "false";
+	/*$killit=explode(" ", relativeTime("$newestadd"));
 	if ( $post_kill_timer != 0 ) {
 		if ((( $killit[1] != "secs" ) && ( $killit[1] != "sec" )) && (( $killit[1] == "hrs" ) || ( $killit[1] == "hr" ) || ( $killit[0] >= $post_kill_timer) && ( $i % 5 == 0 ))) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
@@ -965,7 +965,7 @@ $old_session = "$tmux_session";
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			shell_exec("tmux respawnp -k -t${tmux_session}:0.4 'echo \"\033[38;5;\"$color\"m\n$panes0[4] Killed by Postprocess Kill Timer\"'");
 		}
-	}
+	}*/
 
 	//get state for binaries
 	if ( $binaries == 0 ) {
