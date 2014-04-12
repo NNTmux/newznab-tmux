@@ -1227,8 +1227,8 @@ class Functions
 				}
                 else {
                   $db->exec(sprintf('UPDATE releases SET releasenfoID = -1, nfostatus = -7 WHERE ID = %d', $arr['ID']));
-                  $this->freeNfo();
-                  $this->removeNfo();
+                  $this->freeNfo($arr['ID']);
+                  $this->removeNfo($arr['ID']);
                 }
 			}
 		}
@@ -1247,24 +1247,31 @@ class Functions
 	}
 
     //set releasenfoID in releases table to -1 where releasenfo nfo IS NULL
-    function freeNfo()
+    function freeNfo($id = '')
     {
             $db = $this->db;
+		if ($id == '') {
 			$relres = $db->query('SELECT ID FROM releasenfo WHERE nfo IS NULL');
 			foreach ($relres as $relrow) {
 				$db->exec(sprintf('UPDATE releases SET releasenfoID = -1 WHERE releasenfoID = %d', $relrow['ID']));
 			}
+		} else {
+                               $db->exec(sprintf('UPDATE releases SET releasenfoID = -1 WHERE releasenfoID = %d', $id));
+				}
+	}
 
-    }
-
-    function removeNfo()
+    function removeNfo($id = '')
     {
         $db = $this->db;
-        $relres = $db->query('SELECT ID FROM releases WHERE releasenfoID = -1');
-			foreach ($relres as $relrow) {
-				$db->exec(sprintf('DELETE FROM releasenfo WHERE nfo IS NULL and releaseID = %d', $relrow['ID']));
-			}
-    }
+		if($id == '') {
+        	$relres = $db->query('SELECT ID FROM releases WHERE releasenfoID = -1');
+				foreach ($relres as $relrow) {
+					$db->exec(sprintf('DELETE FROM releasenfo WHERE nfo IS NULL and releaseID = %d', $relrow['ID']));
+					}
+    	} else {
+        $db->exec(sprintf('DELETE FROM releasenfo WHERE nfo IS NULL and releaseID = %d', $id));
+       	}
+	}
 
     function doecho($str)
 	{
