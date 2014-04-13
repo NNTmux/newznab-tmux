@@ -1206,7 +1206,7 @@ class Functions
 					}
 					$db->exec(sprintf('UPDATE releases SET releasenfoID = %d, nfostatus = 1 WHERE ID = %d', $ckreleaseid['ID'], $arr['ID']));
 					$ret++;
-					$this->domovieupdate($fetchedBinary, 'nfo', $arr['ID'], $processImdb);
+					$movie->domovieupdate($fetchedBinary, 'nfo', $arr['ID'], $processImdb);
 
 					// If set scan for tvrage info.
 					if ($processTvrage == 1) {
