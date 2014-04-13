@@ -168,7 +168,8 @@ INSERT INTO tmux (setting, value) values ('defrag_cache','900'),
     ('safebackfilldate', '2012-06-24'),
     ('safepartrepair', '0'),
 	('request_hours', '1'),
-    ('trakttvkey',''), 
+    ('trakttvkey',''),
+	('fanarttvkey', ''),
     ('lookuppar2','0'),
     ('addpar2', '0'),
 	('fixnamethreads', '1'),
@@ -182,7 +183,7 @@ INSERT INTO tmux (setting, value) values ('defrag_cache','900'),
     ('lastpretime', '0'),
     ('nntpretries', '10'),
     ('sharing_timer', '60'),
-    ('sqlpatch','22');
+    ('sqlpatch','23');
 
 DROP TABLE IF EXISTS country;
 CREATE TABLE country (

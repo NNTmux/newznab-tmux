@@ -760,6 +760,18 @@
         	</table>
 	</fieldset>
 
+	<fieldset>
+		<legend>Fanart.tv API Key</legend>
+		<table class="input">
+            <tr>
+				<td>
+					<input id="fanarttvkey" class="long" name="fanarttvkey" type="text" value="{$ftmux->fanarttvkey}" />
+					<div class="hint">The Fanart.tv api key. Used for Fanart.tv lookups. Fanart.tv would appreciate it if you use this service to help them out by adding high quality images not already available on TMDB.</div>
+				</td>
+			</tr>
+        	</table>
+	</fieldset>
+
     <fieldset>
 		<legend>Usenet Settings</legend>
 		<table class="input">
