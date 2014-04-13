@@ -3664,7 +3664,7 @@ class Functions
 	{
 		return (
 			(DB_TYPE === 'mysql' ? 'LIKE ' : 'ILIKE ') .
-			$this->escapeString(
+			$this->db->escapeString(
 				($left  ? '%' : '') .
 				$str .
 				($right ? '%' : '')
