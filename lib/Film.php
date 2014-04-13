@@ -7,6 +7,7 @@ require_once(WWW_DIR."/lib/util.php");
 require_once(WWW_DIR."/lib/category.php");
 require_once(WWW_DIR."/lib/releaseimage.php");
 require_once(WWW_DIR."/lib/rottentomato.php");
+require_once(WWW_DIR."/lib/Tmux.php");
 require_once("ColorCLI.php");
 require_once("TraktTv.php");
 require_once("functions.php");
@@ -118,6 +119,8 @@ class Film
 		$this->c = new ColorCLI();
 		$this->db = new DB();
 		$this->functions = new Functions();
+		$t = new Tmux();
+		$this->tmux = $t->get();
 		$this->releaseImage = new ReleaseImage();
 		$s = new Sites();
 		$this->site = $s->get();
