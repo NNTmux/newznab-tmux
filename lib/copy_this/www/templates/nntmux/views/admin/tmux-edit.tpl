@@ -764,8 +764,9 @@
 		<legend>Fanart.tv API Key</legend>
 		<table class="input">
             <tr>
+				<td style="width:180px;"><label for="fanarttvkey">Fanart.tv API key:</label></td>
 				<td>
-					<input id="fanarttvkey" class="long" name="fanarttvkey" type="text" value="{$ftmux->fanarttvkey}" />
+					<input id="fanarttvkey" class="long" name="fanarttvkey" type="text" value="{$fsite->fanarttvkey}" />
 					<div class="hint">The Fanart.tv api key. Used for Fanart.tv lookups. Fanart.tv would appreciate it if you use this service to help them out by adding high quality images not already available on TMDB.</div>
 				</td>
 			</tr>
