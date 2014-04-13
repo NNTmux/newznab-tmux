@@ -183,7 +183,8 @@ INSERT INTO tmux (setting, value) values ('defrag_cache','900'),
     ('lastpretime', '0'),
     ('nntpretries', '10'),
     ('sharing_timer', '60'),
-    ('sqlpatch','23');
+	('imdburl', '0'),
+    ('sqlpatch','24');
 
 DROP TABLE IF EXISTS country;
 CREATE TABLE country (
