@@ -68,6 +68,9 @@ $page->smarty->assign('fetch_movie_names', array('Disabled', 'Enabled'));
 $page->smarty->assign('predb_ids', array(0,1));
 $page->smarty->assign('predb_names', array('Disabled', 'Enabled'));
 
+$page->smarty->assign('imdb_urls', array(0,1));
+$page->smarty->assign('imdburl_names', array('imdb.com', 'akas.imdb.com'));
+
 
 $page->content = $page->smarty->fetch('tmux-edit.tpl');
 $page->render();

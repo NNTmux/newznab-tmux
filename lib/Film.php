@@ -130,7 +130,7 @@ class Film
 		$this->tmdb = new TMDb($this->site->tmdbkey, $this->imdbLanguage);
 
 		$this->fanartapikey = $this->tmux->fanarttvkey;
-		$this->imdburl = ($this->site->imdburl == 0 ? false : true);
+		$this->imdburl = ($this->tmux->imdburl == 0 ? false : true);
 		$this->movieqty = (!empty($this->tmux->maximdbprocessed) ? $this->tmux->maximdbprocessed : 100);
 		$this->searchEngines = true;
 		$this->showPasswords = (!empty($this->site->showpasswordedrelease) ? $this->site->showpasswordedrelease : 0);

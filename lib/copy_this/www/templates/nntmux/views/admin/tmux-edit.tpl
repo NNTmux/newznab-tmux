@@ -773,6 +773,19 @@
         	</table>
 	</fieldset>
 
+	<fieldset>
+		<legend>IMDB.com URL</legend>
+		<table class="input">
+		<tr>
+				<td style="width:180px;"><label for="imdburl">IMDB.com:</label></td>
+				<td>
+					{html_options style="width:180px;" class="imdburl" id="imdburl" name='imdburl' values=$imdb_urls output=$imdburl_names selected=$ftmux->imdburl}
+					<div class="hint">Akas.imdb.com returns titles in their original title, imdb.com returns titles based on your IP address (if you are in france, you will get french titles).</div>
+				</td>
+			</tr>
+			</table>
+	</fieldset>
+
     <fieldset>
 		<legend>Usenet Settings</legend>
 		<table class="input">
