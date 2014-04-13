@@ -1127,7 +1127,7 @@ class Film
 			$andYearIn .= $end . ')';
 		}
 		$IMDBCheck = $this->db->queryOneRow(
-			sprintf('%s WHERE title %s %s', $query, $this->db->likeString($this->currentTitle), $andYearIn));
+			sprintf('%s WHERE title %s %s', $query, $this->functions->likeString($this->currentTitle), $andYearIn));
 
 		// Look by %word%word%word% etc..
 		if ($IMDBCheck === false) {
@@ -1138,7 +1138,7 @@ class Film
 			}
 			$IMDBCheck = $this->db->queryOneRow(
 				sprintf("%s WHERE replace(replace(title, \"'\", ''), '!', '') %s %s",
-					$query, $this->db->likeString($tempTitle), $andYearIn
+					$query, $this->functions->likeString($tempTitle), $andYearIn
 				)
 			);
 		}
@@ -1149,7 +1149,7 @@ class Film
 			if ($tempTitle !== $this->currentTitle) {
 				$IMDBCheck = $this->db->queryOneRow(
 					sprintf('%s WHERE title %s %s',
-						$query, $this->db->likeString($tempTitle), $andYearIn
+						$query, $this->functions->likeString($tempTitle), $andYearIn
 					)
 				);
 
@@ -1162,7 +1162,7 @@ class Film
 					}
 					$IMDBCheck = $this->db->queryOneRow(
 						sprintf("%s WHERE replace(replace(replace(title, \"'\", ''), '!', ''), '\"', '') %s %s",
-							$query, $this->db->likeString($tempTitle), $andYearIn
+							$query, $this->functions->likeString($tempTitle), $andYearIn
 						)
 					);
 				}

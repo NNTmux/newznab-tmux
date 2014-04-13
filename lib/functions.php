@@ -3651,6 +3651,27 @@ class Functions
 		}
 	}
 
+	/**
+	 * Formats a 'like' string. ex.(LIKE '%chocolate%')
+	 *
+	 * @param string $str    The string.
+	 * @param bool   $left   Add a % to the left.
+	 * @param bool   $right  Add a % to the right.
+	 *
+	 * @return string
+	 */
+	public function likeString($str, $left=true, $right=true)
+	{
+		return (
+			(DB_TYPE === 'mysql' ? 'LIKE ' : 'ILIKE ') .
+			$this->escapeString(
+				($left  ? '%' : '') .
+				$str .
+				($right ? '%' : '')
+			)
+		);
+	}
+
 
 
     //end of testing
