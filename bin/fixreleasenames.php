@@ -6,7 +6,8 @@ require_once(WWW_DIR."/lib/groups.php");
 require_once(WWW_DIR.'/lib/nntp.php');
 require_once("../lib/ColorCLI.php");
 require_once("../lib/namefixer.php");
-require_once("../lib/functions.php"); 
+require_once("../lib/functions.php");
+require_once("../lib/Info.php"); 
 
 $c = new ColorCLI();
 if (!isset($argv[1])) {
@@ -64,9 +65,8 @@ if (!isset($argv[1])) {
 		$relID = $pieces[1];
 		$guid = $pieces[2];
 		$groupID = $pieces[3];
-		$nzbcontents = new NZBContents(true);
-		$pp = new Functions($echooutput = true);
-		$res = $nzbcontents->checkPAR2($guid, $relID, $groupID, $db, $pp, 1, $nntp, 1);
+		$nzbcontents = new NZBContents(array('echo' => true, 'nntp' => $nntp, 'nfo' => new Info(), 'db' => $db, 'pp' => new Functions(true)));
+		$res = $nzbcontents->checkPAR2($guid, $relID, $groupID, 1, 1);
 		if ($res === false) {
 			echo '.';
 		}
