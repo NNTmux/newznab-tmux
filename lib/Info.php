@@ -247,7 +247,7 @@ class Info
 				$release['completion'] = 0;
 			}
 			if ($release['completion'] == 0) {
-				$nzbContents = new NZBContents(array('echo' => $this->echo, 'nntp' => $nntp, 'nfo' => $this, 'db' => $db, 'pp' => new Functions($this->echooutput)));
+				$nzbContents = new NZBContents(array('echo' => $this->echo, 'nntp' => $nntp, 'nfo' => $this, 'db' => $db, 'pp' => new Functions(true)));
 				$nzbContents->parseNZB($release['guid'], $release['ID'], $release['groupID']);
 			}
 			return true;
@@ -309,7 +309,7 @@ class Info
 			}
 			$groups = new Groups();
 			$functions = new Functions();
-			$nzbContents = new NZBContents(array('echo' => $this->echo, 'nntp' => $nntp, 'nfo' => $this, 'db' => $this->db, 'pp' => new Functions($this->echooutput)));
+			$nzbContents = new NZBContents(array('echo' => $this->echo, 'nntp' => $nntp, 'nfo' => $this, 'db' => $this->db, 'pp' => new Functions(true)));
 			$movie = new Film($this->echo);
 			$tvRage = new TvRage($this->echo);
 
