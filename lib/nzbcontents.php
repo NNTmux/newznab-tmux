@@ -76,10 +76,10 @@ Class NZBcontents
 		$this->tmux = $t->get();
 		$this->functions = new Functions();
 		$this->lookuppar2 = (isset($this->tmux->lookuppar2)) ? $this->tmux->lookuppar2 : 0;
-		$this->db   = $options['db'];
-		$this->nntp = $options['nntp'];
-		$this->nfo  = $options['nfo'];
-		$this->pp   = $options['pp'];
+		$this->db   = $options['db'] = new DB();
+		$this->nntp = $options['nntp'] = new NNTP();
+		$this->nfo  = $options['nfo'] = new Info();
+		$this->pp   = $options['pp'] = $this->functions;
 		$this->nzb  = new NZB();
 	}
 

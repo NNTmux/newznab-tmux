@@ -309,7 +309,7 @@ class Info
 			}
 			$groups = new Groups();
 			$functions = new Functions();
-			$nzbContents = new NZBContents(array('echo' => $this->echo, 'nntp' => $nntp, 'nfo' => $nfo, 'db' => $this->db, 'pp' => new Functions($this->echooutput)));
+			$nzbContents = new NZBContents(array('echo' => $this->echo, 'nntp' => $nntp, 'nfo' => $this, 'db' => $this->db, 'pp' => new Functions($this->echooutput)));
 			$movie = new Film($this->echo);
 			$tvRage = new TvRage($this->echo);
 
