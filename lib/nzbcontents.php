@@ -13,7 +13,7 @@ require_once("Info.php");
  *
  * Class NZBContents
  */
-Class NZBContents
+Class NZBcontents
 {
 	/**
 	 * @var nzedb\db\DB
@@ -74,6 +74,7 @@ Class NZBContents
 		$this->site = $s->get();
 		$t = new Tmux();
 		$this->tmux = $t->get();
+		$this->functions = new Functions();
 		$this->lookuppar2 = (isset($this->tmux->lookuppar2)) ? $this->tmux->lookuppar2 : 0;
 		$this->db   = $options['db'];
 		$this->nntp = $options['nntp'];
