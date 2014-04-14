@@ -297,7 +297,6 @@ class Functions
 	{
 		$db = new DB();
 		$category = new Category();
-        $functions = new Functions();
         $c = new ColorCLI;
 
         if (!isset($nntp))
@@ -314,12 +313,12 @@ class Functions
         $nntp->doConnect();
 		$groups = new Groups();
         $functions = new Functions();
-		$par2 = $nntp->getMessage($functions->getByNameByID($groupID), $messageID);
+		$par2 = $nntp->getMessage($this->getByNameByID($groupID), $messageID);
 		if (PEAR::isError($par2))
 		{
 			$nntp->doQuit();
 			$nntp->doConnect();
-			$par2 = $nntp->getMessage($functions->getByNameByID($groupID), $messageID);
+			$par2 = $nntp->getMessage($this->getByNameByID($groupID), $messageID);
 			if (PEAR::isError($par2))
 			{
 				$nntp->doQuit();

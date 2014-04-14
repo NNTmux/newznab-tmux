@@ -147,7 +147,7 @@ Class NZBcontents
 		if ($nzbfile !== false) {
 			foreach ($nzbfile->file as $nzbcontents) {
 				if (preg_match('/\.(par[2" ]|\d{2,3}").+\(1\/1\)$/i', $nzbcontents->attributes()->subject)) {
-					if ($this->pp->parsePAR2($nzbcontents->segments->segment, $relID, $groupID, $this->nntp, $show) === true && $namestatus === 1) {
+					if ($this->functions->parsePAR2($nzbcontents->segments->segment, $relID, $groupID, $this->nntp, $show) === true && $namestatus === 1) {
 						$this->db->exec(sprintf('UPDATE releases SET proc_par2 = 1 WHERE ID = %d', $relID));
 						return true;
 					}
@@ -210,7 +210,7 @@ Class NZBcontents
 
 				if ($this->lookuppar2 == 1 && $foundPAR2 === false) {
 					if (preg_match('/\.(par[2" ]|\d{2,3}").+\(1\/1\)$/i', $subject)) {
-						if ($this->pp->parsePAR2((string)$nzbcontents->segments->segment, $relID, $groupID, $this->nntp, 1) === true) {
+						if ($this->functions->parsePAR2((string)$nzbcontents->segments->segment, $relID, $groupID, $this->nntp, 1) === true) {
 							$this->db->exec(sprintf('UPDATE releases SET proc_par2 = 1 WHERE ID = %d', $relID));
 							$foundPAR2 = true;
 						}
