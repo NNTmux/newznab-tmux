@@ -103,6 +103,31 @@ class NNTP extends Net_NNTP_Client
 	protected $currentGroup = '';
 
 	/**
+	 * Path to yydecoder.
+	 * @var bool|string
+	 */
+	protected $yyDecoderPath;
+
+	/**
+	 * Path to temp yEnc input storage file.
+	 * @var string
+	 */
+	protected $yEncTempInput;
+
+	/**
+	 * Path to temp yEnc output storage file.
+	 * @var string
+	 */
+	protected $yEncTempOutput;
+
+	/**
+	 * If on unix, hide yydecode CLI output.
+	 * @var string
+	 */
+	protected $yEncSilence;
+
+
+	/**
 	 * Start an NNTP connection.
 	 */
 	public $XFCompression = false;
@@ -122,9 +147,32 @@ class NNTP extends Net_NNTP_Client
         $this->s = new Sites();
         $this->site = $this->s->get();
 		$this->tmux = $this->t->get();
+		$this->functions = new Functions();
+		$this->tmpPath = $this->site->tmpunrarpath;
 		$this->nntpRetries = ((!empty($this->tmux->nntpretries)) ? (int)$this->tmux->nntpretries : 0) + 1;
+		$this->yyDecoderPath = ((!empty($this->tmux->yydecoderpath)) ? $this->tmux->yydecoderpath : false);
+		$this->yEncTempInput = WWW_DIR.'nzbfiles/yenc/input';
+		$this->yEncTempOutput = WWW_DIR.'nzbfiles/yenc/output';
+		$this->yEncSilence = ($this->functions->isWindows() ? '' : ' > /dev/null 2>&1');
 		$this->currentServer = NNTP_SERVER;
 		$this->currentPort = NNTP_PORT;
+
+		// Test if the user can read/write to the yEnc path.
+		if (!is_file($this->yEncTempInput)) {
+			@file_put_contents($this->yEncTempInput, 'x');
+		}
+		if (!is_file($this->yEncTempOutput)) {
+			@file_put_contents($this->yEncTempOutput, 'x');
+		}
+		if (!is_file($this->yEncTempInput) ||
+			!is_file($this->yEncTempOutput) ||
+			!is_readable($this->yEncTempInput) ||
+			!is_readable($this->yEncTempOutput) ||
+			!is_writable($this->yEncTempInput) ||
+			!is_writable($this->yEncTempOutput)
+		) {
+			$this->yyDecoderPath = false;
+		}
 	}
 
 	/**
@@ -916,33 +964,54 @@ class NNTP extends Net_NNTP_Client
 	 *
 	 * @TODO: ? Maybe this function should be merged into the YEnc class?
 	 */
-	protected function _decodeYEnc($string)
+   protected function _decodeYEnc($data)
 	{
-		$ret = $string;
-		if (preg_match('/^(=yBegin.*=yEnd[^$]*)$/ims', $string, $input)) {
-			$ret = '';
-			$input =
-				trim(
-					preg_replace(
-						'/\r\n/im', '',
+		if (preg_match('/^(=yBegin.*=yEnd[^$]*)$/ims', $data, $input)) {
+			// If there user has no yyDecode path set, use PHP to decode yEnc.
+			if ($this->yyDecoderPath === false) {
+				$data = '';
+				$input =
+					trim(
 						preg_replace(
-							'/(^=yEnd.*)/im', '',
+							'/\r\n/im', '',
 							preg_replace(
-								'/(^=yPart.*\\r\\n)/im', '',
+								'/(^=yEnd.*)/im', '',
 								preg_replace(
-									'/(^=yBegin.*\\r\\n)/im', '',
-									$input[1],
+									'/(^=yPart.*\\r\\n)/im', '',
+									preg_replace(
+										'/(^=yBegin.*\\r\\n)/im', '',
+										$input[1],
+									1),
 								1),
-							1),
-						1)
-					)
-				);
+							1)
+						)
+					);
 
-			for ($chr = 0; $chr < strlen($input); $chr++) {
-				$ret .= ($input[$chr] != '=' ? chr(ord($input[$chr]) - 42) : chr((ord($input[++$chr]) - 64) - 42));
+				$length = strlen($input);
+				for ($chr = 0; $chr < $length; $chr++) {
+					$data .= ($input[$chr] !== '=' ? chr(ord($input[$chr]) - 42) : chr((ord($input[++$chr]) - 64) - 42));
+				}
+			} else {
+				$inFile = $this->yEncTempInput . mt_rand(0, 999999);
+				$ouFile = $this->yEncTempOutput . mt_rand(0, 999999);
+				file_put_contents($inFile, $input[1]);
+				file_put_contents($ouFile, '');
+				$this->functions->runCmd(
+					"'" .
+					$this->yyDecoderPath .
+					"' '" .
+					$inFile .
+					"' -o '" .
+					$ouFile .
+					"' -f -b" .
+					$this->yEncSilence
+				);
+				$data = file_get_contents($ouFile);
+				unlink($inFile);
+				unlink($ouFile);
 			}
 		}
-		return $ret;
+		return $data;
 	}
 
 	/**

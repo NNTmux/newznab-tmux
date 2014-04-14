@@ -184,7 +184,8 @@ INSERT INTO tmux (setting, value) values ('defrag_cache','900'),
     ('nntpretries', '10'),
     ('sharing_timer', '60'),
 	('imdburl', '0'),
-    ('sqlpatch','24');
+	('yydecoderpath', ''),
+    ('sqlpatch','25');
 
 DROP TABLE IF EXISTS country;
 CREATE TABLE country (

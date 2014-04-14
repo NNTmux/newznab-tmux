@@ -885,6 +885,14 @@
 				</td>
 			</tr>
 
+				<tr>
+				<td style="width:180px;"><label for="yydecoderpath">yyDecode Path:</label></td>
+				<td>
+					<input id="yydecoderpath" class="long" name="yydecoderpath" type="text" value="{$ftmux->yydecoderpath}" />
+					<div class="hint">Path to yydecode, this will decode yEnc articles. On ubuntu/debian you can get yydecode in the getdeb repository. Compiling yydecode from source is easy/fast also.</div>
+				</td>
+			</tr>
+
             <tr>
 				<td style="width:180px;"><label for="processjpg">Process JPG:</label></td>
 				<td>

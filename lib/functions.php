@@ -27,6 +27,7 @@ require_once("namefixer.php");
 require_once("TraktTv.php");
 require_once("Sharing.php");
 require_once("Film.php");
+require_once("Info.php");
 
 
 
@@ -55,7 +56,6 @@ class Functions
     $this->segmentstodownload = (!empty($this->tmux->segmentstodownload)) ? $this->tmux->segmentstodownload : 2;
     $this->passchkattempts = (!empty($this->tmux->passchkattempts)) ? $this->tmux->passchkattempts : 1;
     $this->partsqty = (!empty($this->tmux->maxpartsprocessed)) ? $this->tmux->maxpartsprocessed : 3;
-    $this->movieqty = (!empty($this->tmux->maximdbprocessed)) ? $this->tmux->maximdbprocessed : 100;
     $this->rageqty = (!empty($his->tmux->maxrageprocessed)) ? $this->tmux->maxrageprocessed : 75;
     $this->pubkey = $this->site->amazonpubkey;
 	$this->privkey = $this->site->amazonprivkey;
@@ -66,8 +66,6 @@ class Functions
 		if (defined('DEBUG_ECHO') && DEBUG_ECHO == true) {
 			$this->DEBUG_ECHO = true;
 		}
-    $this->nzbs = (!empty($this->tmux->maxnfoprocessed)) ? $this->tmux->maxnfoprocessed : 100;
-    $this->service = '';
     $this->debug = ($this->tmux->debuginfo == "0") ? false : true;
     $this->imgSavePath = WWW_DIR.'covers/console/';
     $this->jpgSavePath = WWW_DIR.'covers/sample/';
@@ -290,120 +288,7 @@ class Functions
 		$res = $db->queryOneRow(sprintf("select name from groups where ID = %d ", $ID));
 		return $res["name"];
 	}
-     //Add release nfo, imported from nZEDb
-    	public function addReleaseNfo($relid)
-	{
-		$db = new DB();
-		return $db->queryInsert(sprintf("INSERT IGNORE INTO releasenfo (releaseID) VALUE (%d)", $relid));
-	}
-     // Adds an NFO found from predb, rar, zip etc...
-	public function addAlternateNfo($db, $nfo, $release, $nntp)
-	{
-		if (!isset($nntp))
-			exit($this->c->error("Unable to connect to usenet.\n"));
 
-		if ($release['ID'] > 0)
-		{
-				$compress = 'compress(%s)';
-				$nc = $db->escapeString($nfo);
-
-			$ckreleaseid = $db->queryOneRow(sprintf('SELECT ID FROM releasenfo WHERE releaseID = %d', $release['ID']));
-			if (!isset($ckreleaseid['ID']))
-				$db->exec(sprintf('INSERT INTO releasenfo (nfo, releaseID) VALUES ('.$compress.', %d)', $nc, $release['ID']));
-			$db->exec(sprintf('UPDATE releases SET releasenfoID = %d, nfostatus = 1 WHERE ID = %d', $ckreleaseid['ID'], $release['ID']));
-			if (!isset($release['completion']))
-				$release['completion'] = 0;
-			if ($release['completion'] == 0)
-			{
-				$nzbcontents = new NZBcontents($this->echooutput);
-				$nzbcontents->NZBcompletion($release['guid'], $release['ID'], $release['groupID'], $nntp, $db);
-			}
-			return true;
-		}
-		else
-			return false;
-	}
-    // Confirm that the .nfo file is not something else.
-	public function isNFO($possibleNFO, $guid) {
-		$r = false;
-		if ($possibleNFO === false) {
-			return $r;
-		}
-			// Make sure it's not too big or small, size needs to be at least 12 bytes for header checking.
-		$size = strlen($possibleNFO);
-		if ($size < 100 * 1024 && $size > 12) {
-			// Ignore common file types.
-			if (preg_match(
-				'/(^RIFF|)<\?xml|;\s*Generated\s*by.*SF\w|\A\s*PAR|\.[a-z0-9]{2,7}\s*[a-z0-9]{8}|\A\s*RAR|\A.{0,10}(JFIF|matroska|ftyp|ID3)|\A=newz\[NZB\]=/i'
-				, $possibleNFO)) {
-				return $r;
-			}// file workswith files, so save to disk
-			$tmpPath = $this->tmpPath.$guid.'.nfo';
-			file_put_contents($tmpPath, $possibleNFO);
-
-			// Linux boxes have 'file' (so should Macs)
-			if (strtolower(substr(PHP_OS, 0, 3)) != 'win') {
-				exec("file -b $tmpPath", $result);
-				if (is_array($result)) {
-					if (count($result) > 1) {
-						$result = implode(',', $result[0]);
-					} else {
-						$result = $result[0];
-					}
-				}
-				$test = preg_match('#^.*(ISO-8859|UTF-(?:8|16|32) Unicode(?: \(with BOM\)|)|ASCII)(?: English| C++ Program|) text.*$#i', $result);
-				// if the result is false, something went wrong
-				if ($test !== false) {
-					if ($test == 1) {
-						@unlink($tmpPath);
-						return true;
-					}
-
-					// non-printable characters should never appear in text, so rule them out.
-					$test = preg_match('#\x00|\x01|\x02|\x03|\x04|\x05|\x06|\x07|\x08|\x0B|\x0E|\x0F|\x12|\x13|\x14|\x15|\x16|\x17|\x18|\x19|\x1A|\x1B|\x1C|\x1D|\x1E|\x1F#', $possibleNFO);
-					if ($test) {
-						@unlink($tmpPath);
-						return false;
-					}
-				}
-			}
-			    require_once(WWW_DIR."/lib/rarinfo/par2info.php");
-				$par2info = new Par2Info();
-				$par2info->setData($possibleNFO);
-				if ($par2info->error) {
-					// Check if it's an SFV.
-					require_once(WWW_DIR."/lib/rarinfo/sfvinfo.php");
-					$sfv = new SfvInfo;
-					$sfv->setData($possibleNFO);
-					if ($sfv->error) {
-						return true;
-					}
-				}
-				   	}
-		return $r;
-	}
-
-	//	Check if the possible NFO is a JFIF.
-	function check_JFIF($filename)
-	{
-		$fp = @fopen($filename, 'r');
-		if ($fp)
-		{
-			// JFIF often (but not always) starts at offset 6.
-			if (fseek($fp, 6) == 0)
-			{
-				// JFIF header is 16 bytes.
-				if (($bytes = fread($fp, 16)) !== false)
-				{
-					// Make sure it is JFIF header.
-					if (substr($bytes, 0, 4) == "JFIF")
-						return true;
-					else
-						return false;
-				}
-			}
-		}
-	}
 
     //
 	// Attempt to get a better name from a par2 file and categorize the release.
@@ -1149,130 +1034,12 @@ class Functions
 			exit($this->c->error("Not connected to usenet(functions->processNfos).\n"));
 
 		if ($this->site->lookupnfo == 1) {
-			$nfo = new Nfo($this->echooutput);
-			$this->processNfoFiles($releaseToWork, $this->site->lookupimdb, $this->site->lookuptvrage, $groupID = '', $nntp);
+			$nfo = new Info($this->echooutput);
+			$nfo->processNfoFiles($releaseToWork, $this->site->lookupimdb, $this->site->lookuptvrage, $groupID = '', $nntp);
 		}
 	}
 
-    //Process nfo files
-    public function processNfoFiles($releaseToWork = '', $processImdb = 1, $processTvrage = 1, $groupID = '', $nntp) {
-		if (!isset($nntp)) {
-			exit($this->c->error("Unable to connect to usenet.\n"));
-		}
 
-		$db = $this->db;
-		$nfocount = $ret = 0;
-		$groupID = $groupID == '' ? '' : 'AND groupID = ' . $groupID;
-
-		if ($releaseToWork == '') {
-			$i = -1;
-			while (($nfocount != $this->nzbs) && ($i >= -6)) {
-				$res = $db->query(sprintf('SELECT ID, guid, groupID, name FROM releases WHERE releasenfoID = 0 AND nfostatus between %d AND -1 AND size < %s ' . $groupID . ' LIMIT %d', $i, $this->maxsize * 1073741824, $this->nzbs));
-				$nfocount = count($res);
-				$i--;
-			}
-		} else {
-			$pieces = explode('           =+=            ', $releaseToWork);
-			$res = array(array('ID' => $pieces[0], 'guid' => $pieces[1], 'groupID' => $pieces[2], 'name' => $pieces[3]));
-			$nfocount = 1;
-		}
-
-		if ($nfocount > 0) {
-			if ($this->echooutput && $releaseToWork == '') {
-				echo $this->c->primary('Processing ' . $nfocount . ' NFO(s), starting at ' . $this->nzbs . " * = hidden NFO, + = NFO, - = no NFO, f = download failed.");
-				// Get count of releases per passwordstatus
-				$pw1 = $this->db->query('SELECT count(*) as count FROM releases WHERE releasenfoID = 0 AND nfostatus = -1');
-				$pw2 = $this->db->query('SELECT count(*) as count FROM releases WHERE releasenfoID = 0 AND nfostatus = -2');
-				$pw3 = $this->db->query('SELECT count(*) as count FROM releases WHERE releasenfoID = 0 AND nfostatus = -3');
-				$pw4 = $this->db->query('SELECT count(*) as count FROM releases WHERE releasenfoID = 0 AND nfostatus = -4');
-				$pw5 = $this->db->query('SELECT count(*) as count FROM releases WHERE releasenfoID = 0 AND nfostatus = -5');
-				$pw6 = $this->db->query('SELECT count(*) as count FROM releases WHERE releasenfoID = 0 AND nfostatus = -6');
-				echo $this->c->header('Available to process: -6 = ' . number_format($pw6[0]['count']) . ', -5 = ' . number_format($pw5[0]['count']) . ', -4 = ' . number_format($pw4[0]['count']) . ', -3 = ' . number_format($pw3[0]['count']) . ', -2 = ' . number_format($pw2[0]['count']) . ', -1 = ' . number_format($pw1[0]['count']));
-			}
-			$groups = new Groups();
-			$nzbcontents = new NZBContents($this->echooutput);
-			$movie = new Film($this->echooutput);
-			$tvrage = new TvRage();
-
-			foreach ($res as $arr) {
-				$fetchedBinary = $nzbcontents->getNFOfromNZB($arr['guid'], $arr['ID'], $arr['groupID'], $nntp, $this->getByNameByID($arr['groupID']), $db, $this);
-				if ($fetchedBinary !== false) {
-					// Insert nfo into database.
-					$cp = 'COMPRESS(%s)';
-					$nc = $db->escapeString($fetchedBinary);
-					$ckreleaseid = $db->queryOneRow(sprintf('SELECT ID FROM releasenfo WHERE releaseID = %d', $arr['ID']));
-					if (!isset($ckreleaseid['ID'])) {
-						$db->queryInsert(sprintf('INSERT INTO releasenfo (nfo, releaseID) VALUES (' . $cp . ', %d)', $nc, $arr['ID']));
-					}
-					$db->exec(sprintf('UPDATE releases SET releasenfoID = %d, nfostatus = 1 WHERE ID = %d', $ckreleaseid['ID'], $arr['ID']));
-					$ret++;
-					$movie->domovieupdate($fetchedBinary, 'nfo', $arr['ID'], $processImdb);
-
-					// If set scan for tvrage info.
-					if ($processTvrage == 1) {
-						$rageId = $this->parseRageId($fetchedBinary);
-						if ($rageId !== false) {
-							$show = $tvrage->parseNameEpSeason($arr['name']);
-							if (is_array($show) && $show['name'] != '') {
-								// Update release with season, ep, and airdate info (if available) from releasetitle.
-								$tvrage->updateEpInfo($show, $arr['ID']);
-
-								$rid = $tvrage->getByRageID($rageId);
-								if (!$rid) {
-									$tvrShow = $tvrage->getRageInfoFromService($rageId);
-									$tvrage->updateRageInfo($rageId, $show, $tvrShow, $arr['ID']);
-								}
-							}
-						}
-					}
-				}
-                else {
-                  $db->exec(sprintf('UPDATE releases SET releasenfoID = -1, nfostatus = -7 WHERE ID = %d', $arr['ID']));
-                  $this->freeNfo($arr['ID']);
-                  $this->removeNfo($arr['ID']);
-                }
-			}
-		}
-		// Remove nfo that we cant fetch after 5 attempts.
-		if ($releaseToWork == '') {
-			if ($this->echooutput) {
-				if ($this->echooutput && $nfocount > 0 && $releaseToWork == '') {
-					echo "\n";
-				}
-				if ($this->echooutput && $ret > 0 && $releaseToWork == '') {
-					echo $ret . " NFO file(s) found/processed.\n";
-				}
-			}
-			return $ret;
-		}
-	}
-
-    //set releasenfoID in releases table to -1 where releasenfo nfo IS NULL
-    function freeNfo($id = '')
-    {
-            $db = $this->db;
-		if ($id == '') {
-			$relres = $db->query('SELECT ID FROM releasenfo WHERE nfo IS NULL');
-			foreach ($relres as $relrow) {
-				$db->exec(sprintf('UPDATE releases SET releasenfoID = -1 WHERE releasenfoID = %d', $relrow['ID']));
-			}
-		} else {
-                               $db->exec(sprintf('UPDATE releases SET releasenfoID = -1 WHERE releasenfoID = %d', $id));
-				}
-	}
-
-    function removeNfo($id = '')
-    {
-        $db = $this->db;
-		if($id == '') {
-        	$relres = $db->query('SELECT ID FROM releases WHERE releasenfoID = -1');
-				foreach ($relres as $relrow) {
-					$db->exec(sprintf('DELETE FROM releasenfo WHERE nfo IS NULL and releaseID = %d', $relrow['ID']));
-					}
-    	} else {
-        $db->exec(sprintf('DELETE FROM releasenfo WHERE nfo IS NULL and releaseID = %d', $id));
-       	}
-	}
 
     function doecho($str)
 	{
@@ -1725,7 +1492,8 @@ class Functions
 				//Extract a NFO from the zip.
 				else if ($this->nonfo === true && $file['size'] < 100000 && preg_match('/\.(nfo|inf|ofn)$/i', $file['name'])) {
 					if ($file['compressed'] !== 1) {
-						if ($this->addAlternateNfo($this->db, $thisData, $release, $nntp)) {
+						$nfo = new Info($this->echooutput);
+						if ($nfo->addAlternateNfo($this->db, $thisData, $release, $nntp)) {
 							$this->c->error('processReleaseZips', 'Added NFO from ZIP file for releaseID ' . $release['ID']);
 							if ($this->echooutput) {
 								echo 'n';
@@ -1737,7 +1505,8 @@ class Functions
 						$zip->setExternalClient($this->tmux->zippath);
 						$zipData = $zip->extractFile($file['name']);
 						if ($zipData !== false && strlen($zipData) > 5) {
-							if ($this->addAlternateNfo($this->db, $zipData, $release, $nntp)) {
+							$nfo = new Info($this->echooutput);
+							if ($nfo->addAlternateNfo($this->db, $zipData, $release, $nntp)) {
 
 								$this->c->error('processReleaseZips', 'Added compressed NFO from ZIP file for releaseID ' . $release['ID']);
 								if ($this->echooutput) {
@@ -1866,8 +1635,8 @@ class Functions
 			if ($tmpdata !== false) {
 				// Extract a NFO from the rar.
 				if ($this->nonfo === true && $v['size'] > 100 && $v['size'] < 100000 && preg_match('/(\.(nfo|inf|ofn)|info.txt)$/i', $v['name'])) {
-					$nfo = new Nfo($this->echooutput);
-					if ($this->addAlternateNfo($this->db, $tmpdata, $release, $nntp)) {
+					$nfo = new Info($this->echooutput);
+					if ($nfo->addAlternateNfo($this->db, $tmpdata, $release, $nntp)) {
 						$this->debug('added rar nfo');
 						if ($this->echooutput)
 							echo 'n';
@@ -1887,12 +1656,6 @@ class Functions
 		}
 	}
 
-    public function parseRageId($str) {
-		if (preg_match('/tvrage\.com\/shows\/ID-(\d{1,6})/i', $str, $matches)) {
-			return trim($matches[1]);
-		}
-		return false;
-	}
 
     public function debug($str)
 	{
@@ -3672,7 +3435,41 @@ class Functions
 		);
 	}
 
+   // Check if O/S is windows.
+	function isWindows()
+	{
+	return (strtolower(substr(php_uname('s'), 0, 3)) === 'win');
+	}
 
+	/**
+ 	* Run CLI command.
+ 	*
+ 	* @param string $command
+ 	* @param bool   $debug
+ 	*
+ 	* @return array
+ 	*/
+	function runCmd($command, $debug = false)
+	{
+		$nl = PHP_EOL;
+		if (isWindows() && strpos(phpversion(), "5.2") !== false) {
+			$command = "\"" . $command . "\"";
+		}
+
+		if ($debug) {
+			echo '-Running Command: ' . $nl . '   ' . $command . $nl;
+		}
+
+		$output = array();
+		$status = 1;
+		@exec($command, $output, $status);
+
+		if ($debug) {
+			echo '-Command Output: ' . $nl . '   ' . implode($nl . '  ', $output) . $nl;
+		}
+
+		return $output;
+	}
 
     //end of testing
 

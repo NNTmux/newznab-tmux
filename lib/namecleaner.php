@@ -3452,6 +3452,9 @@ class nameCleaning
 		} //"Marvels.Agents.of.S.H.I.E.L.D.S01E07.HDTV.XviD-FUM.avi.nfo" [09/16] yEnc
 		else if (preg_match('/^"(.+?)' . $this->e0 . '[ _-]{0,3}\[\d+\/(\d+\])[ _-]{0,3}yEnc$/', $this->subject, $match)) {
 			return $match[1];
+		}  //[185891]-[ Suits.S01E01.720p.BluRay.X264-REWARD ]- "Suits.S01E01.720p.BluRay.par2" yEnc
+		else if (preg_match('/^\[\d+\]-\[ (.+?) \]- ".+?" yEnc$/i', $this->subject, $match)) {
+			return $match[1];
 		} //[140022]-[04] - [01/40] - "140022-04.nfo" yEnc
 		else if (preg_match('/\[\d+\]-\[.+\] - \[\d+\/\d+\] - "\d+-.+" yEnc/', $this->subject)) {
 			return array("cleansubject" => $this->subject, "properlynamed" => false, "ignore" => true);

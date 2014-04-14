@@ -11,6 +11,7 @@ require_once("ColorCLI.php");
 require_once("nzbcontents.php");
 require_once("simple_html_dom.php");
 require_once("IRCScraper.php");
+require_once("Info.php");
 
 
 /*
@@ -1112,19 +1113,20 @@ Class PreHash
 	// Look if the release is missing an nfo.
 	public function matchNfo($nntp)
 	{
+        if (!isset($nntp)) {
+			exit($this->c->error("Not connected to usenet(prehash->matchNFO).\n"));
+		}
+
 		$db = new DB();
-        $f = new Functions();
 		$nfos = 0;
 		if($this->echooutput)
 			echo $this->c->header ("Matching up prehash NFOs with releases missing an NFO.");
 
-			$res = $db->query("SELECT r.ID, p.nfo, p.title, r.completion, r.guid, r.groupID FROM releases r INNER JOIN prehash p ON r.prehashID = p.ID WHERE r.nfostatus != 1 AND p.nfo IS NOT NULL LIMIT 100");
-		    $total = count($res);
+			$res = $db->queryDirect("SELECT r.ID, p.nfo, p.title, r.completion, r.guid, r.groupID FROM releases r INNER JOIN prehash p ON r.prehashID = p.ID WHERE r.nfostatus != 1 AND p.nfo IS NOT NULL LIMIT 100");
+		    $total = $res->rowCount();
 		    if($total > 0)
             {
-			$nfo = new Nfo($this->echooutput);
-            $nzbcontents = new Nzbcontents($this->echooutput);
-            $functions = new Functions($this->echooutput);
+			$nfo = new Info($this->echooutput);
 		    foreach ($res as $row)
 			{
 			   $URL = $row['nfo'];
@@ -1144,7 +1146,7 @@ Class PreHash
                     if ($row['nfo'] === 'srrdb' && preg_match('/You\'ve reached the daily limit/i', $buffer)) {
 						continue;
 					}
-					if ($this->functions->addAlternateNfo($db, $buffer, $row, $nntp))
+					if ($nfo->addAlternateNfo($db, $buffer, $row, $nntp))
 					{
 					 if($this->echooutput)
 							echo '+';

@@ -7,6 +7,7 @@ require_once("namecleaner.php");
 require_once("functions.php");
 require_once("nzbcontents.php");
 require_once("ColorCLI.php");
+require_once("Info.php");
 require_once("consoletools.php");
 
 
@@ -218,13 +219,11 @@ class Namefixer
 			echo $this->c->primary(number_format($total) . " releases to process.");
 			sleep(2);
 		    $db = $this->db;
-			$nzbcontents = new NZBcontents($this->echooutput);
-            $pp = new Functions ($this->echooutput);
-
+			$nzbcontents = new NZBcontents(array('echo' => $this->echooutput, 'nntp' => $nntp, 'nfo' => new Info(), 'db' => $this->db, 'pp' => new Functions($this->echooutput)));
 			foreach ($relres as $relrow)
 			{
                 $this->done = $this->matched = false;
-				if (($nzbcontents->checkPAR2($relrow['guid'], $relrow['releaseID'], $relrow['groupID'], $db, $pp, $namestatus, $nntp, $show)) === true) {
+				if (($nzbcontents->checkPAR2($relrow['guid'], $relrow['releaseID'], $relrow['groupID'], $namestatus, $show)) === true) {
 				    $this->fixed++;
                     }
                 $this->checked++;
