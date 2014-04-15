@@ -104,7 +104,7 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 	 *
 	 * @var array
 	 * @access private
-	 * @since 1.3.0
+	 * @since  1.3.0
 	 */
 	var $_overviewFormatCache = null;
 
@@ -135,17 +135,17 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 	 * <b>Usage example:</b>
 	 * {@example docs/examples/phpdoc/connect.php}
 	 *
-	 * @param string	$host	(optional) The hostname og IP-address of the NNTP-server to connect to, defaults to localhost.
-	 * @param mixed	$encryption	(optional) false|'tls'|'ssl', defaults to false.
-	 * @param int	$port	(optional) The port number to connect to, defaults to 119 or 563 dependng on $encryption.
-	 * @param int	$timeout	(optional)
+	 * @param string $host       (optional) The hostname og IP-address of the NNTP-server to connect to, defaults to localhost.
+	 * @param mixed  $encryption (optional) false|'tls'|'ssl', defaults to false.
+	 * @param int    $port       (optional) The port number to connect to, defaults to 119 or 563 dependng on $encryption.
+	 * @param int    $timeout    (optional)
 	 *
 	 * @return mixed <br>
-	 *  - (bool)	True when posting allowed, otherwise false
-	 *  - (object)	Pear_Error on failure
+	 *  - (bool)    True when posting allowed, otherwise false
+	 *  - (object)    Pear_Error on failure
 	 * @access public
-	 * @see Net_NNTP_Client::disconnect()
-	 * @see Net_NNTP_Client::authenticate()
+	 * @see    Net_NNTP_Client::disconnect()
+	 * @see    Net_NNTP_Client::authenticate()
 	 */
 	function connect($host = null, $encryption = null, $port = null, $timeout = 15)
 	{
@@ -176,13 +176,14 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 	 *
 	 * @return mixed <br>
 	 *  - (bool)
-	 *  - (object)	Pear_Error on failure
+	 *  - (object)    Pear_Error on failure
 	 * @access public
-	 * @see Net_NNTP_Client::connect()
+	 * @see    Net_NNTP_Client::connect()
 	 */
 	function disconnect()
 	{
 		$this->resetProperties();
+
 		return parent::disconnect();
 	}
 
@@ -201,14 +202,14 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 	 * <b>Usage example:</b>
 	 * {@example docs/examples/phpdoc/authenticate.php}
 	 *
-	 * @param string	$user	The username
-	 * @param string	$pass	The password
+	 * @param string $user The username
+	 * @param string $pass The password
 	 *
 	 * @return mixed <br>
-	 *  - (bool)	True on successful authentification, otherwise false
-	 *  - (object)	Pear_Error on failure
+	 *  - (bool)    True on successful authentification, otherwise false
+	 *  - (object)    Pear_Error on failure
 	 * @access public
-	 * @see Net_NNTP_Client::connect()
+	 * @see    Net_NNTP_Client::connect()
 	 */
 	function authenticate($user, $pass)
 	{
@@ -237,18 +238,18 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 	 * <b>Usage example:</b>
 	 * {@example docs/examples/phpdoc/selectGroup.php}
 	 *
-	 * @param string	$group	Name of the group to select
-	 * @param mixed	$articles	(optional) experimental! When true the article numbers is returned in 'articles'
+	 * @param string $group    Name of the group to select
+	 * @param mixed  $articles (optional) experimental! When true the article numbers is returned in 'articles'
 	 *
 	 * @return mixed <br>
-	 *  - (array)	Summary about the selected group
-	 *  - (object)	Pear_Error on failure
+	 *  - (array)    Summary about the selected group
+	 *  - (object)    Pear_Error on failure
 	 * @access public
-	 * @see Net_NNTP_Client::getGroups()
-	 * @see Net_NNTP_Client::group()
-	 * @see Net_NNTP_Client::first()
-	 * @see Net_NNTP_Client::last()
-	 * @see Net_NNTP_Client::count()
+	 * @see    Net_NNTP_Client::getGroups()
+	 * @see    Net_NNTP_Client::group()
+	 * @see    Net_NNTP_Client::first()
+	 * @see    Net_NNTP_Client::last()
+	 * @see    Net_NNTP_Client::count()
 	 */
 	function selectGroup($group, $articles = false)
 	{
@@ -292,17 +293,17 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 	 * <b>Usage example:</b>
 	 * {@example docs/examples/phpdoc/selectPreviousArticle.php}
 	 *
-	 * @param int	$_ret	(optional) Experimental
+	 * @param int $_ret (optional) Experimental
 	 *
 	 * @return mixed <br>
-	 *  - (integer)	Article number, if $ret=0 (default)
-	 *  - (string)	Message-id, if $ret=1
-	 *  - (array)	Both article number and message-id, if $ret=-1
-	 *  - (bool)	False if no prevoius article exists
-	 *  - (object)	Pear_Error on failure
+	 *  - (integer)    Article number, if $ret=0 (default)
+	 *  - (string)    Message-id, if $ret=1
+	 *  - (array)    Both article number and message-id, if $ret=-1
+	 *  - (bool)    False if no prevoius article exists
+	 *  - (object)    Pear_Error on failure
 	 * @access public
-	 * @see Net_NNTP_Client::selectArticle()
-	 * @see Net_NNTP_Client::selectNextArticle()
+	 * @see    Net_NNTP_Client::selectArticle()
+	 * @see    Net_NNTP_Client::selectNextArticle()
 	 */
 	function selectPreviousArticle($_ret = 0)
 	{
@@ -314,13 +315,13 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 
 		switch ($_ret) {
 			case -1:
-				return array('Number' => (int) $response[0], 'Message-ID' => (string) $response[1]);
+				return array('Number' => (int)$response[0], 'Message-ID' => (string)$response[1]);
 				break;
 			case 0:
-				return (int) $response[0];
+				return (int)$response[0];
 				break;
 			case 1:
-				return (string) $response[1];
+				return (string)$response[1];
 				break;
 			default:
 				error(); // ...
@@ -338,17 +339,17 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 	 * <b>Usage example:</b>
 	 * {@example docs/examples/phpdoc/selectNextArticle.php}
 	 *
-	 * @param int	$_ret	(optional) Experimental
+	 * @param int $_ret (optional) Experimental
 	 *
 	 * @return mixed <br>
-	 *  - (integer)	Article number, if $ret=0 (default)
-	 *  - (string)	Message-id, if $ret=1
-	 *  - (array)	Both article number and message-id, if $ret=-1
-	 *  - (bool)	False if no further articles exist
-	 *  - (object)	Pear_Error on unexpected failure
+	 *  - (integer)    Article number, if $ret=0 (default)
+	 *  - (string)    Message-id, if $ret=1
+	 *  - (array)    Both article number and message-id, if $ret=-1
+	 *  - (bool)    False if no further articles exist
+	 *  - (object)    Pear_Error on unexpected failure
 	 * @access public
-	 * @see Net_NNTP_Client::selectArticle()
-	 * @see Net_NNTP_Client::selectPreviousArticle()
+	 * @see    Net_NNTP_Client::selectArticle()
+	 * @see    Net_NNTP_Client::selectPreviousArticle()
 	 */
 	function selectNextArticle($_ret = 0)
 	{
@@ -360,13 +361,13 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 
 		switch ($_ret) {
 			case -1:
-				return array('Number' => (int) $response[0], 'Message-ID' => (string) $response[1]);
+				return array('Number' => (int)$response[0], 'Message-ID' => (string)$response[1]);
 				break;
 			case 0:
-				return (int) $response[0];
+				return (int)$response[0];
 				break;
 			case 1:
-				return (string) $response[1];
+				return (string)$response[1];
 				break;
 			default:
 				error(); // ...
@@ -384,17 +385,17 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 	 * <b>Usage example:</b>
 	 * {@example docs/examples/phpdoc/selectArticle.php}
 	 *
-	 * @param mixed	$article	The message-number (on the server) of
+	 * @param mixed $article            The message-number (on the server) of
 	 *                                  the article to select as current article.
-	 * @param int	$_ret	(optional) Experimental
+	 * @param int   $_ret               (optional) Experimental
 	 *
 	 * @return mixed <br>
-	 *  - (integer)	Article number
-	 *  - (bool)	False if article doesn't exists
-	 *  - (object)	Pear_Error on failure
+	 *  - (integer)    Article number
+	 *  - (bool)    False if article doesn't exists
+	 *  - (object)    Pear_Error on failure
 	 * @access public
-	 * @see Net_NNTP_Client::selectNextArticle()
-	 * @see Net_NNTP_Client::selectPreviousArticle()
+	 * @see    Net_NNTP_Client::selectNextArticle()
+	 * @see    Net_NNTP_Client::selectPreviousArticle()
 	 */
 	function selectArticle($article = null, $_ret = 0)
 	{
@@ -406,13 +407,13 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 
 		switch ($_ret) {
 			case -1:
-				return array('Number' => (int) $response[0], 'Message-ID' => (string) $response[1]);
+				return array('Number' => (int)$response[0], 'Message-ID' => (string)$response[1]);
 				break;
 			case 0:
-				return (int) $response[0];
+				return (int)$response[0];
 				break;
 			case 1:
-				return (string) $response[1];
+				return (string)$response[1];
 				break;
 			default:
 				error(); // ...
@@ -431,20 +432,20 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 	 * <b>Usage example:</b>
 	 * {@example docs/examples/phpdoc/getArticle.php}
 	 *
-	 * @param mixed	$article	(optional) Either the message-id or the
+	 * @param mixed $article            (optional) Either the message-id or the
 	 *                                  message-number on the server of the
 	 *                                  article to fetch.
-	 * @param bool	$implode	(optional) When true the result array
+	 * @param bool  $implode            (optional) When true the result array
 	 *                                  is imploded to a string, defaults to
 	 *                                  false.
 	 *
 	 * @return mixed <br>
-	 *  - (array)	Complete article (when $implode is false)
-	 *  - (string)	Complete article (when $implode is true)
-	 *  - (object)	Pear_Error on failure
+	 *  - (array)    Complete article (when $implode is false)
+	 *  - (string)    Complete article (when $implode is true)
+	 *  - (object)    Pear_Error on failure
 	 * @access public
-	 * @see Net_NNTP_Client::getHeader()
-	 * @see Net_NNTP_Client::getBody()
+	 * @see    Net_NNTP_Client::getHeader()
+	 * @see    Net_NNTP_Client::getBody()
 	 */
 	function getArticle($article = null, $implode = false)
 	{
@@ -490,20 +491,20 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 	 * <b>Usage example:</b>
 	 * {@example docs/examples/phpdoc/getHeader.php}
 	 *
-	 * @param mixed	$article	(optional) Either message-id or message
+	 * @param mixed $article            (optional) Either message-id or message
 	 *                                  number of the article to fetch.
-	 * @param bool	$implode	(optional) When true the result array
+	 * @param bool  $implode            (optional) When true the result array
 	 *                                  is imploded to a string, defaults to
 	 *                                  false.
 	 *
 	 * @return mixed <br>
-	 *  - (bool)	False if article does not exist
-	 *  - (array)	Header fields (when $implode is false)
-	 *  - (string)	Header fields (when $implode is true)
-	 *  - (object)	Pear_Error on failure
+	 *  - (bool)    False if article does not exist
+	 *  - (array)    Header fields (when $implode is false)
+	 *  - (string)    Header fields (when $implode is true)
+	 *  - (object)    Pear_Error on failure
 	 * @access public
-	 * @see Net_NNTP_Client::getArticle()
-	 * @see Net_NNTP_Client::getBody()
+	 * @see    Net_NNTP_Client::getArticle()
+	 * @see    Net_NNTP_Client::getBody()
 	 */
 	function getHeader($article = null, $implode = false)
 	{
@@ -549,20 +550,20 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 	 * <b>Usage example:</b>
 	 * {@example docs/examples/phpdoc/getBody.php}
 	 *
-	 * @param mixed	$article	(optional) Either the message-id or the
+	 * @param mixed $article            (optional) Either the message-id or the
 	 *                                  message-number on the server of the
 	 *                                  article to fetch.
-	 * @param bool	$implode	(optional) When true the result array
+	 * @param bool  $implode            (optional) When true the result array
 	 *                                  is imploded to a string, defaults to
 	 *                                  false.
 	 *
 	 * @return mixed <br>
-	 *  - (array)	Message body (when $implode is false)
-	 *  - (string)	Message body (when $implode is true)
-	 *  - (object)	Pear_Error on failure
+	 *  - (array)    Message body (when $implode is false)
+	 *  - (string)    Message body (when $implode is true)
+	 *  - (object)    Pear_Error on failure
 	 * @access public
-	 * @see Net_NNTP_Client::getHeader()
-	 * @see Net_NNTP_Client::getArticle()
+	 * @see    Net_NNTP_Client::getHeader()
+	 * @see    Net_NNTP_Client::getArticle()
 	 */
 	function getBody($article = null, $implode = false)
 	{
@@ -605,14 +606,14 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 	 * <b>Usage example:</b>
 	 * {@example docs/examples/phpdoc/post.php}
 	 *
-	 * @param mixed	$article	<br>
-	 *  - (string) Complete article in a ready to send format (lines terminated by LFCR etc.)
-	 *  - (array) First key is the article header, second key is article body - any further keys are ignored !!!
-	 *  - (mixed) Something 'callable' (which must return otherwise acceptable data as replacement)
+	 * @param mixed $article <br>
+	 *                       - (string) Complete article in a ready to send format (lines terminated by LFCR etc.)
+	 *                       - (array) First key is the article header, second key is article body - any further keys are ignored !!!
+	 *                       - (mixed) Something 'callable' (which must return otherwise acceptable data as replacement)
 	 *
 	 * @return mixed <br>
-	 *  - (string)	Server response
-	 *  - (object)	Pear_Error on failure
+	 *  - (string)    Server response
+	 *  - (object)    Pear_Error on failure
 	 * @access public
 	 * @ignore
 	 */
@@ -671,14 +672,14 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 	 * <b>Usage example:</b>
 	 * {@example docs/examples/phpdoc/mail.php}
 	 *
-	 * @param string	$groups	The groups to post to.
-	 * @param string	$subject	The subject of the article.
-	 * @param string	$body	The body of the article.
-	 * @param string	$additional	(optional) Additional header fields to send.
+	 * @param string $groups     The groups to post to.
+	 * @param string $subject    The subject of the article.
+	 * @param string $body       The body of the article.
+	 * @param string $additional (optional) Additional header fields to send.
 	 *
 	 * @return mixed <br>
-	 *  - (string)	Server response
-	 *  - (object)	Pear_Error on failure
+	 *  - (string)    Server response
+	 *  - (object)    Pear_Error on failure
 	 * @access public
 	 */
 	function mail($groups, $subject, $body, $additional = null)
@@ -715,14 +716,14 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 	 * <b>Usage example:</b>
 	 * {@example docs/examples/phpdoc/getDate.php}
 	 *
-	 * @param int	$format	(optional) Determines the format of returned date:
+	 * @param int $format        (optional) Determines the format of returned date:
 	 *                           - 0: return string
 	 *                           - 1: return integer/timestamp
 	 *                           - 2: return an array('y'=>year, 'm'=>month,'d'=>day)
 	 *
 	 * @return mixed <br>
 	 *  - (mixed)
-	 *  - (object)	Pear_Error on failure
+	 *  - (object)    Pear_Error on failure
 	 * @access public
 	 */
 	function getDate($format = 1)
@@ -741,8 +742,9 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 				break;
 			case 2:
 				return array('y' => substr($date, 0, 4),
-					'm' => substr($date, 4, 2),
-					'd' => substr($date, 6, 2));
+							 'm' => substr($date, 4, 2),
+							 'd' => substr($date, 6, 2)
+				);
 				break;
 			default:
 				error();
@@ -761,14 +763,14 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 	 * <b>Usage example:</b>
 	 * {@example docs/examples/phpdoc/getNewGroups.php}
 	 *
-	 * @param mixed	$time	<br>
-	 *  - (integer)	A timestamp
-	 *  - (string)	Somthing parseable by strtotime() like '-1 week'
-	 * @param string	$distributions	(optional)
+	 * @param mixed  $time          <br>
+	 *                              - (integer)    A timestamp
+	 *                              - (string)    Somthing parseable by strtotime() like '-1 week'
+	 * @param string $distributions (optional)
 	 *
 	 * @return mixed <br>
 	 *  - (array)
-	 *  - (object)	Pear_Error on failure
+	 *  - (object)    Pear_Error on failure
 	 * @access public
 	 */
 	function getNewGroups($time, $distributions = null)
@@ -801,17 +803,17 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 	 * <b>Usage example:</b>
 	 * {@example docs/examples/phpdoc/getNewArticles.php}
 	 *
-	 * @param mixed	$time	<br>
-	 *  - (integer)	A timestamp
-	 *  - (string)	Somthing parseable by strtotime() like '-1 week'
-	 * @param string	$groups	(optional)
-	 * @param string	$distributions	(optional)
+	 * @param mixed  $time          <br>
+	 *                              - (integer)    A timestamp
+	 *                              - (string)    Somthing parseable by strtotime() like '-1 week'
+	 * @param string $groups        (optional)
+	 * @param string $distributions (optional)
 	 *
 	 * @return mixed <br>
 	 *  - (array)
-	 *  - (object)	Pear_Error on failure
+	 *  - (object)    Pear_Error on failure
 	 * @access public
-	 * @since 1.3.0
+	 * @since  1.3.0
 	 */
 	function getNewArticles($time, $groups = '*', $distribution = null)
 	{
@@ -844,11 +846,11 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 	 * {@example docs/examples/phpdoc/getGroups.php}
 	 *
 	 * @return mixed <br>
-	 *  - (array)	Nested array with information about every valid group
-	 *  - (object)	Pear_Error on failure
+	 *  - (array)    Nested array with information about every valid group
+	 *  - (object)    Pear_Error on failure
 	 * @access public
-	 * @see Net_NNTP_Client::getDescriptions()
-	 * @see Net_NNTP_Client::selectGroup()
+	 * @see    Net_NNTP_Client::getDescriptions()
+	 * @see    Net_NNTP_Client::selectGroup()
 	 */
 	function getGroups($wildmat = null)
 	{
@@ -907,13 +909,13 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 	 * <b>Usage example:</b>
 	 * {@example docs/examples/phpdoc/getDescriptions.php}
 	 *
-	 * @param mixed	$wildmat	(optional)
+	 * @param mixed $wildmat (optional)
 	 *
 	 * @return mixed <br>
-	 *  - (array)	Associated array with descriptions of known groups
-	 *  - (object)	Pear_Error on failure
+	 *  - (array)    Associated array with descriptions of known groups
+	 *  - (object)    Pear_Error on failure
 	 * @access public
-	 * @see Net_NNTP_Client::getGroups()
+	 * @see    Net_NNTP_Client::getGroups()
 	 */
 	function getDescriptions($wildmat = null)
 	{
@@ -961,20 +963,20 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 	 * <b>Usage example:</b>
 	 * {@example docs/examples/phpdoc/getOverview.php}
 	 *
-	 * @param mixed	$range	(optional)
-	 *                          - '<message number>'
-	 *                          - '<message number>-<message number>'
-	 *                          - '<message number>-'
-	 *                          - '<message-id>'
-	 * @param boolean	$_names	(optional) experimental parameter! Use field names as array kays
-	 * @param boolean	$_forceNames	(optional) experimental parameter!
+	 * @param mixed   $range       (optional)
+	 *                             - '<message number>'
+	 *                             - '<message number>-<message number>'
+	 *                             - '<message number>-'
+	 *                             - '<message-id>'
+	 * @param boolean $_names      (optional) experimental parameter! Use field names as array kays
+	 * @param boolean $_forceNames (optional) experimental parameter!
 	 *
 	 * @return mixed <br>
-	 *  - (array)	Nested array of article overview data
-	 *  - (object)	Pear_Error on failure
+	 *  - (array)    Nested array of article overview data
+	 *  - (object)    Pear_Error on failure
 	 * @access public
-	 * @see Net_NNTP_Client::getHeaderField()
-	 * @see Net_NNTP_Client::getOverviewFormat()
+	 * @see    Net_NNTP_Client::getHeaderField()
+	 * @see    Net_NNTP_Client::getOverviewFormat()
 	 */
 	function getOverview($range = null, $_names = true, $_forceNames = true)
 	{
@@ -1010,6 +1012,7 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 					// Use 'Message-ID' field as key
 					$articles[$article['Message-ID']] = $article;
 				}
+
 				return $articles;
 		}
 
@@ -1107,10 +1110,10 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 	 * {@example docs/examples/phpdoc/getOveriewFormat.php}
 	 *
 	 * @return mixed <br>
-	 *  - (array)	Overview field names
-	 *  - (object)	Pear_Error on failure
+	 *  - (array)    Overview field names
+	 *  - (object)    Pear_Error on failure
 	 * @access public
-	 * @see Net_NNTP_Client::getOverview()
+	 * @see    Net_NNTP_Client::getOverview()
 	 */
 	function getOverviewFormat($_forceNames = true, $_full = false)
 	{
@@ -1122,13 +1125,15 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 		// Force name of first seven fields
 		if ($_forceNames) {
 			array_splice($format, 0, 7);
-			$format = array_merge(array('Subject' => false,
-				'From' => false,
-				'Date' => false,
-				'Message-ID' => false,
-				'References' => false,
-				':bytes' => false,
-				':lines' => false), $format);
+			$format = array_merge(array('Subject'    => false,
+										'From'       => false,
+										'Date'       => false,
+										'Message-ID' => false,
+										'References' => false,
+										':bytes'     => false,
+										':lines'     => false
+				), $format
+			);
 		}
 
 		if ($_full) {
@@ -1153,19 +1158,19 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 	 * <b>Usage example:</b>
 	 * {@example docs/examples/phpdoc/getHeaderField.php}
 	 *
-	 * @param string	$field	The name of the header field to retreive
-	 * @param mixed	$range	(optional)
+	 * @param string $field       The name of the header field to retreive
+	 * @param mixed  $range       (optional)
 	 *                            '<message number>'
 	 *                            '<message number>-<message number>'
 	 *                            '<message number>-'
 	 *                            '<message-id>'
 	 *
 	 * @return mixed <br>
-	 *  - (array)	Nested array of
-	 *  - (object)	Pear_Error on failure
+	 *  - (array)    Nested array of
+	 *  - (object)    Pear_Error on failure
 	 * @access public
-	 * @see Net_NNTP_Client::getOverview()
-	 * @see Net_NNTP_Client::getReferences()
+	 * @see    Net_NNTP_Client::getOverview()
+	 * @see    Net_NNTP_Client::getReferences()
 	 */
 	function getHeaderField($field, $range = null)
 	{
@@ -1211,13 +1216,13 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 	 * <b>Usage example:</b>
 	 * {@example docs/examples/phpdoc/getGroupArticles.php}
 	 *
-	 * @param mixed	$range	(optional) Experimental!
+	 * @param mixed $range (optional) Experimental!
 	 *
 	 * @return mixed <br>
 	 *  - (array)
-	 *  - (object)	Pear_Error on failure
+	 *  - (object)    Pear_Error on failure
 	 * @access public
-	 * @since 1.3.0
+	 * @since  1.3.0
 	 */
 	function getGroupArticles($range = null)
 	{
@@ -1253,17 +1258,17 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 	 * <b>Usage example:</b>
 	 * {@example docs/examples/phpdoc/getReferences.php}
 	 *
-	 * @param mixed	$range	(optional)
+	 * @param mixed $range        (optional)
 	 *                            '<message number>'
 	 *                            '<message number>-<message number>'
 	 *                            '<message number>-'
 	 *                            '<message-id>'
 	 *
 	 * @return mixed <br>
-	 *  - (array)	Nested array of references
-	 *  - (object)	Pear_Error on failure
+	 *  - (array)    Nested array of references
+	 *  - (object)    Pear_Error on failure
 	 * @access public
-	 * @see Net_NNTP_Client::getHeaderField()
+	 * @see    Net_NNTP_Client::getHeaderField()
 	 */
 	function getReferences($range = null)
 	{
@@ -1340,13 +1345,13 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 	 * {@example docs/examples/phpdoc/count.php}
 	 *
 	 * @return mixed <br>
-	 *  - (string)	the number of article in group
-	 *  - (object)	Pear_Error on failure
+	 *  - (string)    the number of article in group
+	 *  - (object)    Pear_Error on failure
 	 * @access public
-	 * @see Net_NNTP_Client::group()
-	 * @see Net_NNTP_Client::first()
-	 * @see Net_NNTP_Client::last()
-	 * @see Net_NNTP_Client::selectGroup()
+	 * @see    Net_NNTP_Client::group()
+	 * @see    Net_NNTP_Client::first()
+	 * @see    Net_NNTP_Client::last()
+	 * @see    Net_NNTP_Client::selectGroup()
 	 * @ignore
 	 */
 	function count()
@@ -1364,13 +1369,13 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 	 * {@example docs/examples/phpdoc/last.php}
 	 *
 	 * @return mixed <br>
-	 *  - (string)	the last article's number
-	 *  - (object)	Pear_Error on failure
+	 *  - (string)    the last article's number
+	 *  - (object)    Pear_Error on failure
 	 * @access public
-	 * @see Net_NNTP_Client::first()
-	 * @see Net_NNTP_Client::group()
-	 * @see Net_NNTP_Client::count()
-	 * @see Net_NNTP_Client::selectGroup()
+	 * @see    Net_NNTP_Client::first()
+	 * @see    Net_NNTP_Client::group()
+	 * @see    Net_NNTP_Client::count()
+	 * @see    Net_NNTP_Client::selectGroup()
 	 * @ignore
 	 */
 	function last()
@@ -1388,13 +1393,13 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 	 * {@example docs/examples/phpdoc/first.php}
 	 *
 	 * @return mixed <br>
-	 *  - (string)	the first article's number
-	 *  - (object)	Pear_Error on failure
+	 *  - (string)    the first article's number
+	 *  - (object)    Pear_Error on failure
 	 * @access public
-	 * @see Net_NNTP_Client::last()
-	 * @see Net_NNTP_Client::group()
-	 * @see Net_NNTP_Client::count()
-	 * @see Net_NNTP_Client::selectGroup()
+	 * @see    Net_NNTP_Client::last()
+	 * @see    Net_NNTP_Client::group()
+	 * @see    Net_NNTP_Client::count()
+	 * @see    Net_NNTP_Client::selectGroup()
 	 * @ignore
 	 */
 	function first()
@@ -1412,13 +1417,13 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 	 * {@example docs/examples/phpdoc/group.php}
 	 *
 	 * @return mixed <br>
-	 *  - (string)	group name
-	 *  - (object)	Pear_Error on failure
+	 *  - (string)    group name
+	 *  - (object)    Pear_Error on failure
 	 * @access public
-	 * @see Net_NNTP_Client::first()
-	 * @see Net_NNTP_Client::last()
-	 * @see Net_NNTP_Client::count()
-	 * @see Net_NNTP_Client::selectGroup()
+	 * @see    Net_NNTP_Client::first()
+	 * @see    Net_NNTP_Client::last()
+	 * @see    Net_NNTP_Client::count()
+	 * @see    Net_NNTP_Client::selectGroup()
 	 * @ignore
 	 */
 	function group()
@@ -1432,16 +1437,17 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 	/**
 	 * Test whether a connection is currently open or closed.
 	 *
-	 * @return bool	True if connected, otherwise false
-	 * @access public
-	 * @see Net_NNTP_Client::connect()
-	 * @see Net_NNTP_Client::quit()
-	 * @deprecated	since v1.3.0 due to use of protected method: Net_NNTP_Protocol_Client::isConnected()
+	 * @return bool    True if connected, otherwise false
+	 * @access        public
+	 * @see           Net_NNTP_Client::connect()
+	 * @see           Net_NNTP_Client::quit()
+	 * @deprecated    since v1.3.0 due to use of protected method: Net_NNTP_Protocol_Client::isConnected()
 	 * @ignore
 	 */
 	function isConnected()
 	{
 		trigger_error('You are using deprecated API v1.0 in Net_NNTP_Client: isConnected() !', E_USER_NOTICE);
+
 		return parent::_isConnected();
 	}
 
@@ -1457,6 +1463,7 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 	function getArticleRaw($article, $implode = false)
 	{
 		trigger_error('You are using deprecated API v1.0 in Net_NNTP_Client: getArticleRaw() !', E_USER_NOTICE);
+
 		return $this->getArticle($article, $implode);
 	}
 
@@ -1472,6 +1479,7 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 	function getHeaderRaw($article = null, $implode = false)
 	{
 		trigger_error('You are using deprecated API v1.0 in Net_NNTP_Client: getHeaderRaw() !', E_USER_NOTICE);
+
 		return $this->getHeader($article, $implode);
 	}
 
@@ -1487,6 +1495,7 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 	function getBodyRaw($article = null, $implode = false)
 	{
 		trigger_error('You are using deprecated API v1.0 in Net_NNTP_Client: getBodyRaw() !', E_USER_NOTICE);
+
 		return $this->getBody($article, $implode);
 	}
 
@@ -1502,6 +1511,7 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 	function getNewNews($time, $groups = '*', $distribution = null)
 	{
 		trigger_error('You are using deprecated API v1.1 in Net_NNTP_Client: getNewNews() !', E_USER_NOTICE);
+
 		return $this->getNewArticles($time, $groups, $distribution);
 	}
 
@@ -1517,6 +1527,7 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 	function getReferencesOverview($first, $last)
 	{
 		trigger_error('You are using deprecated API v1.0 in Net_NNTP_Client: getReferencesOverview() !', E_USER_NOTICE);
+
 		return $this->getReferences($first . '-' . $last);
 	}
 
@@ -1524,4 +1535,3 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 }
 
 // }}}
-?>

@@ -26,20 +26,24 @@
 
 class Net_SmartIRC_irccommands extends Net_SmartIRC_base
 {
-    /**
-     * sends a new message
-     *
-     * Sends a message to a channel or user.
-     *
-     * @see DOCUMENTATION
-     * @param integer $type specifies the type, like QUERY/ACTION or CTCP see 'Message Types'
-     * @param string $destination can be a user or channel
-     * @param mixed $message the message
-     * @return boolean
-     * @access public
-     */
-    function message($type, $destination, $messagearray, $priority = SMARTIRC_MEDIUM)
-    {
+	/**
+	 * sends a new message
+	 *
+	 * Sends a message to a channel or user.
+	 *
+	 * @see      DOCUMENTATION
+	 *
+	 * @param integer $type        specifies the type, like QUERY/ACTION or CTCP see 'Message Types'
+	 * @param string  $destination can be a user or channel
+	 * @param         $messagearray
+	 * @param int     $priority
+	 *
+	 * @internal param mixed $message the message
+	 * @return boolean
+	 * @access   public
+	 */
+	function message($type, $destination, $messagearray, $priority = SMARTIRC_MEDIUM)
+	{
         if (!is_array($messagearray)) {
             $messagearray = array($messagearray);
         }

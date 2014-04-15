@@ -103,6 +103,8 @@ function getReleaseNameFromRequestID($tmux, $requestID, $groupName)
 	if (isset($request)) {
 		return array('title' => $request['name'], 'ID' => 'NULL');
 	}
+
+	return true;
 }
 
 function localLookup($requestID, $groupName, $oldname)
@@ -133,4 +135,6 @@ function localLookup($requestID, $groupName, $oldname)
 	if (isset($run1['title'])) {
 		return array('title' => $run['title'], 'ID' => $run['ID']);
 	}
+
+	return true;
 }

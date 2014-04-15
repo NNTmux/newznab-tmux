@@ -1,6 +1,6 @@
 <?php
-require_once(WWW_DIR."/lib/framework/db.php");
-require_once(WWW_DIR."/lib/site.php");
+require_once(WWW_DIR . "/lib/framework/db.php");
+require_once(WWW_DIR . "/lib/site.php");
 
 class Tmux
 {
@@ -13,6 +13,7 @@ class Tmux
 	{
 		$s = new Sites();
 		$site = $s->get();
+
 		return $site->version;
 	}
 
@@ -55,6 +56,7 @@ class Tmux
 		}
 
 		$obj->{'version'} = $this->version();
+
 		return $obj;
 	}
 
@@ -73,7 +75,7 @@ class Tmux
 	{
 		$db = $this->db;
 		$sql = sprintf("UPDATE tmux SET value = %s WHERE setting = %s", $db->escapeString($value), $db->escapeString($setting));
+
 		return $db->exec($sql);
 	}
 }
-?>
