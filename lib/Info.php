@@ -355,7 +355,7 @@ class Info
 					if (!isset($ckreleaseid['id'])) {
 						$this->db->queryInsert(sprintf('INSERT INTO releasenfo (nfo, releaseID) VALUES (' . $cp . ', %d)', $nc, $arr['ID']));
 					}
-					$this->db->exec(sprintf('UPDATE releases SET nfostatus = %d WHERE ID = %d', self::NFO_FOUND, $arr['ID']));
+					$this->db->exec(sprintf('UPDATE releases SET releasenfoID = 1, nfostatus = %d WHERE ID = %d', self::NFO_FOUND, $arr['ID']));
 					$ret++;
 					$movie->doMovieUpdate($fetchedBinary, 'nfo', $arr['ID'], $processImdb);
 

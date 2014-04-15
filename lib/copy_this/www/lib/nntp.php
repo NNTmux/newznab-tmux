@@ -1365,7 +1365,7 @@ class NNTP extends Net_NNTP_Client
     	}
     }
 
-		/**
+	/**
 	 * yDecodes an encoded string and either writes the result to a file or returns it as a string.
 	 *
 	 * @param string $string yEncoded string to decode.
