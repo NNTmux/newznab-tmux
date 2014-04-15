@@ -3989,4 +3989,3 @@ class nameCleaning
 		return $cleanerName;
 	}
 }
-    ?>

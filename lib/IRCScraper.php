@@ -1,5 +1,4 @@
 <?php
-
 require_once(dirname(__FILE__)."/../bin/config.php");
 require_once(dirname(__FILE__)."/Net_SmartIRC/Net/SmartIRC.php");
 require_once(dirname(__FILE__)."/Net_SmartIRC/modules/PingFix.php");
