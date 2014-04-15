@@ -164,68 +164,68 @@
 
 
 		{foreach from=$release.category_ids|parray:"," item=cat}
-	<newznab:attr name="category" value="{$cat}"/>
+	<attr name="category" value="{$cat}"/>
 		{/foreach}
-		<newznab:attr name="size" value="{$release.size}"/>
-		<newznab:attr name="files" value="{$release.totalpart}"/>
-		<newznab:attr name="poster" value="{$release.fromname|escape:html}"/>
+		<attr name="size" value="{$release.size}"/>
+		<attr name="files" value="{$release.totalpart}"/>
+		<attr name="poster" value="{$release.fromname|escape:html}"/>
 		{if $release.season != ""}
-			<newznab:attr name="season" value="{$release.season}"/>
+			<attr name="season" value="{$release.season}"/>
 		{/if}
 		{if $release.episode != ""}
-			<newznab:attr name="episode" value="{$release.episode}"/>
+			<attr name="episode" value="{$release.episode}"/>
 		{/if}
 		{if $release.fullep != ""}
-			<newznab:attr name="fullep">{$release.fullep}</newznab:attr>
+			<attr name="fullep">{$release.fullep}</attr>
 		{/if}
 		{if $release.showtitle != ""}
-			<newznab:attr name="showtitle">{$release.showtitle|escape:html}</newznab:attr>
+			<attr name="showtitle">{$release.showtitle|escape:html}</attr>
 		{/if}
 		{if $release.rageID != "-1" && $release.rageID != "-2"}
-			<newznab:attr name="rageid" value="{$release.rageID}"/>
+			<attr name="rageid" value="{$release.rageID}"/>
 		{/if}
 		{if $release.tvtitle != ""}
-			<newznab:attr name="tvtitle" value="{$release.tvtitle|escape:html}"/>
+			<attr name="tvtitle" value="{$release.tvtitle|escape:html}"/>
 		{/if}
 		{if $release.tvairdate != ""}
-			<newznab:attr name="tvairdate" value="{$release.tvairdate|phpdate_format:"DATE_RSS"}"/>
+			<attr name="tvairdate" value="{$release.tvairdate|phpdate_format:"DATE_RSS"}"/>
 		{/if}
 		{if $release.imdbID != ""}
-			<newznab:attr name="imdb" value="{$release.imdbID}"/>
+			<attr name="imdb" value="{$release.imdbID}"/>
 		{/if}
 		{if $release.tvdbID != ""}
-			<newznab:attr name="tvdb-show" value="{$release.tvdbID}"/>
+			<attr name="tvdb-show" value="{$release.tvdbID}"/>
 		{/if}
 		{if $release.ep_tvdbID != ""}
-			<newznab:attr name="tvdb-ep" value="{$release.ep_tvdbID}"/>
+			<attr name="tvdb-ep" value="{$release.ep_tvdbID}"/>
 		{/if}
 		{if $release.rating != ""}
-			<newznab:attr name="rating" value="{$release.rating}"/>
+			<attr name="rating" value="{$release.rating}"/>
 		{/if}
 		{if $release.overview != ""}
-			<newznab:attr name="overview">{$release.overview|escape:html}</newznab:attr>
+			<attr name="overview">{$release.overview|escape:html}</attr>
 		{/if}
 		{if $release.writer != ""}
 			{foreach from=$release.writer|parray:"," item=writer}
-				<newznab:attr name="writer" value="{$writer|trim|escape:html}"/>
+				<attr name="writer" value="{$writer|trim|escape:html}"/>
 			{/foreach}
 		{/if}
 		{if $release.gueststars != ""}
 			{foreach from=$release.gueststars|parray:"," item=gueststar}
-				<newznab:attr name="gueststar" value="{$gueststar|trim|escape:html}"/>
+				<attr name="gueststar" value="{$gueststar|trim|escape:html}"/>
 			{/foreach}
 		{/if}
 		{if $release.director != ""}
 			{foreach from=$release.director|parray:"," item=director}
-				<newznab:attr name="director" value="{$director|trim|escape:html}"/>
+				<attr name="director" value="{$director|trim|escape:html}"/>
 			{/foreach}
 		{/if}
-		<newznab:attr name="grabs" value="{$release.grabs}"/>
-		<newznab:attr name="comments" value="{$release.comments|escape:"htmlall"}"/>
+		<attr name="grabs" value="{$release.grabs}"/>
+		<attr name="comments" value="{$release.comments|escape:"htmlall"}"/>
 		<!--suppress XmlUnboundNsPrefix -->
-		<newznab:attr name="password" value="{$release.passwordstatus}"/>
-		<newznab:attr name="usenetdate" value="{$release.postdate|phpdate_format:"DATE_RSS"}"/>
-		<newznab:attr name="group" value="{$release.group_name|escape:html}"/>
+		<attr name="password" value="{$release.passwordstatus}"/>
+		<attr name="usenetdate" value="{$release.postdate|phpdate_format:"DATE_RSS"}"/>
+		<attr name="group" value="{$release.group_name|escape:html}"/>
 
 	</item>
 {/foreach}
