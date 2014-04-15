@@ -1,4 +1,7 @@
 {$rsshead}
+<!--suppress ALL -->
+
+
 <newznab:response offset="{$offset}" total="{if $releases|@count > 0}{$releases[0]._totalrows}{else}0{/if}"/>
 {foreach from=$releases item=release}
 	<item>
