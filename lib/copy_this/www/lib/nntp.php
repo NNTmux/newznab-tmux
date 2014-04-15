@@ -433,7 +433,7 @@ class NNTP extends Net_NNTP_Client
 	 *
 	 * @param string $groupName The name of the group the articles are in.
 	 * @param array|string|int $identifiers Message-ID(string) or article number(int), or array containing M-ID's or A-Numbers.
-	 * 
+	 *
 	 *
 	 * @return string On success : The article bodies.
 	 * @return object On failure : Pear error.
@@ -981,15 +981,17 @@ class NNTP extends Net_NNTP_Client
 	/**
 	 * Decode a string of text encoded with yEnc.
 	 *
-	 * @note For usage outside of this class, please use the YEnc library.
+	 * @note     For usage outside of this class, please use the YEnc library.
 	 *
-	 * @param string $string The encoded text to decode.
+	 * @param $data
+	 *
+	 * @internal param string $string The encoded text to decode.
 	 *
 	 * @return string  The decoded yEnc string, or the input, if it's not yEnc.
 	 *
-	 * @access protected
+	 * @access   protected
 	 *
-	 * @TODO: ? Maybe this function should be merged into the YEnc class?
+	 * @TODO     : ? Maybe this function should be merged into the YEnc class?
 	 */
    protected function _decodeYEnc($data)
 	{
@@ -1325,15 +1327,18 @@ class NNTP extends Net_NNTP_Client
 	}
 
 	/**
-     * Fetch message header from message number $first until $last
-     * The format of the returned array is:
-     * $messages[message_id][header_name]
-     * @param optional string $range articles to fetch
-     * @return mixed (array) nested array of message and there headers on success or (object) pear_error on failure
-     * @access protected
-     */
-    function cmdXZver($range = null)
-    {
+	 * Fetch message header from message number $first until $last
+	 * The format of the returned array is:
+	 * $messages[message_id][header_name]
+	 *
+	 * @param null $range
+	 *
+	 * @internal param string $optional $range articles to fetch
+	 * @return mixed (array) nested array of message and there headers on success or (object) pear_error on failure
+	 * @access   protected
+	 */
+	function cmdXZver($range = null)
+	{
         if (is_null($range))
 			$command = 'XZVER';
     	else
