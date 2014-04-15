@@ -1146,7 +1146,7 @@ Class PreHash
                     if ($row['nfo'] === 'srrdb' && preg_match('/You\'ve reached the daily limit/i', $buffer)) {
 						continue;
 					}
-					if ($nfo->addAlternateNfo($db, $buffer, $row, $nntp))
+					if ($nfo->addAlternateNfo($buffer, $row, $nntp))
 					{
 					 if($this->echooutput)
 							echo '+';

@@ -2,7 +2,6 @@
 require_once(dirname(__FILE__)."/../bin/config.php");
 require_once(WWW_DIR."lib/framework/db.php");
 require_once(WWW_DIR.'/lib/nntp.php');
-require_once("Yenc.php");
 require_once("functions.php");
 
 /**
@@ -56,11 +55,6 @@ Class Sharing
 	 * @var NNTP
 	 */
 	protected $nntp;
-
-	/**
-	 * @var Yenc
-	 */
-	protected $yEnc;
 
 	/**
 	 * Array containing site settings.
@@ -128,7 +122,6 @@ Class Sharing
 			return;
 		}
 
-		$this->yEnc = new Yenc();
 		if (is_null($this->nntp)) {
 			$this->nntp = new NNTP();
 			$this->nntp->doConnect();
@@ -466,7 +459,7 @@ Class Sharing
 	protected function insertNewComment(&$messageID, &$siteID)
 	{
 		// Get the article body.
-		$body = $this->nntp->getMessage(self::group, $messageID);
+		$body = $this->nntp->getMessages(self::group, $messageID);
 
 		// Check if there's an error.
 		if ($this->nntp->isError($body)) {

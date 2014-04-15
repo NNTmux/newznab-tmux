@@ -78,6 +78,7 @@ class Functions
 	$this->NewGroupMsgsToScan = (!empty($this->site->newgroupmsgstoscan)) ? (int)$this->site->newgroupmsgstoscan : 50000;
 	$this->NewGroupDaysToScan = (!empty($this->site->newgroupdaystoscan)) ? (int)$this->site->newgroupdaystoscan : 3;
 	$this->partrepairlimit = (!empty($this->tmux->maxpartrepair)) ? (int)$this->tmux->maxpartrepair : 15000;
+	$this->nfo = new Info();
   }
     /**
 	 * @var object Instance of PDO class.
@@ -254,9 +255,9 @@ class Functions
     //deletes from releases
     public function fastDelete($ID, $guid)
 	{
-		$db = new DB();
 		$nzb = new NZB();
 		$ri = new ReleaseImage();
+		$ri->delete($guid);
 
 
 		//
@@ -267,7 +268,7 @@ class Functions
 		if (file_exists($nzbpath))
 			unlink($nzbpath);
 
-		$db->exec(sprintf("delete releases, releasenfo, releasecomment, usercart, releasefiles, releaseaudio, releasesubs, releasevideo, releaseextrafull
+		$this->db->exec(sprintf("delete releases, releasenfo, releasecomment, usercart, releasefiles, releaseaudio, releasesubs, releasevideo, releaseextrafull
 							from releases
 								LEFT OUTER JOIN releasenfo on releasenfo.releaseID = releases.ID
 								LEFT OUTER JOIN releasecomment on releasecomment.releaseID = releases.ID
@@ -278,8 +279,6 @@ class Functions
 								LEFT OUTER JOIN releasevideo on releasevideo.releaseID = releases.ID
 								LEFT OUTER JOIN releaseextrafull on releaseextrafull.releaseID = releases.ID
 							where releases.ID = %d", $ID));
-
-		$ri->delete($guid); // This deletes a file so not in the query
 	}
     //reads name of group
      public function getByNameByID($ID)
@@ -1492,7 +1491,7 @@ class Functions
 				else if ($this->nonfo === true && $file['size'] < 100000 && preg_match('/\.(nfo|inf|ofn)$/i', $file['name'])) {
 					if ($file['compressed'] !== 1) {
 						$nfo = new Info($this->echooutput);
-						if ($nfo->addAlternateNfo($this->db, $thisData, $release, $nntp)) {
+						if ($this->nfo->addAlternateNfo($thisData, $release, $nntp)) {
 							$this->c->error('processReleaseZips', 'Added NFO from ZIP file for releaseID ' . $release['ID']);
 							if ($this->echooutput) {
 								echo 'n';
@@ -1505,7 +1504,7 @@ class Functions
 						$zipData = $zip->extractFile($file['name']);
 						if ($zipData !== false && strlen($zipData) > 5) {
 							$nfo = new Info($this->echooutput);
-							if ($nfo->addAlternateNfo($this->db, $zipData, $release, $nntp)) {
+							if ($this->nfo->addAlternateNfo($zipData, $release, $nntp)) {
 
 								$this->c->error('processReleaseZips', 'Added compressed NFO from ZIP file for releaseID ' . $release['ID']);
 								if ($this->echooutput) {
@@ -1635,7 +1634,7 @@ class Functions
 				// Extract a NFO from the rar.
 				if ($this->nonfo === true && $v['size'] > 100 && $v['size'] < 100000 && preg_match('/(\.(nfo|inf|ofn)|info.txt)$/i', $v['name'])) {
 					$nfo = new Info($this->echooutput);
-					if ($nfo->addAlternateNfo($this->db, $tmpdata, $release, $nntp)) {
+					if ($this->nfo->addAlternateNfo($tmpData, $release, $nntp)) {
 						$this->debug('added rar nfo');
 						if ($this->echooutput)
 							echo 'n';

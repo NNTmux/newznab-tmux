@@ -9,7 +9,7 @@ require_once(dirname(__FILE__)."/../lib/showsleep.php");
 require_once(dirname(__FILE__)."/../lib/functions.php");
 
 
-$version="0.3r1095";
+$version="0.3r1096";
 
 $db = new DB();
 $functions = new Functions();
@@ -1709,11 +1709,11 @@ if ($running == 1){
 	}
         // Run Remove crap releases in pane 3.3
 			switch ($fix_crap_opt) {
-				// Do all types up to 2 hours.
+				// Do all types up to 4 hours.
 				case 'All':
 					$log = writelog($panes3[3]);
 					shell_exec("tmux respawnp -t${tmux_session}:3.3 ' \
-							$_php ${DIR}/../lib/removeCrapReleases_new.php true 2 $log; date +\"%D %T\"; $_sleep $crap_timer' 2>&1 1> /dev/null");
+							$_php ${DIR}/../lib/removeCrapReleases_new.php true 4 $log; date +\"%D %T\"; $_sleep $crap_timer' 2>&1 1> /dev/null");
 					break;
 				// The user has specified custom types.
 				case 'Custom':

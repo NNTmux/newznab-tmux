@@ -94,6 +94,10 @@ class Info
 	 */
 	protected $echo;
 
+	const NFO_UNPROC = -1; // Release has not been processed yet.
+	const NFO_NONFO  =  0; // Release has no NFO.
+	const NFO_FOUND  =  1; // Release has an NFO.
+
 	/**
 	 * Default constructor.
 	 *
@@ -147,7 +151,7 @@ class Info
 
 		// Make sure it's not too big or small, size needs to be at least 12 bytes for header checking.
 		$size = strlen($possibleNFO);
-		if ($size < 100 * 1024 && $size > 12) {
+		if ($size < 65535 && $size > 11) {
 			// Ignore common file types.
 			if (preg_match(
 				'/(^RIFF|)<\?xml|;\s*Generated\s*by.*SF\w|\A\s*[RP]AR|\A.{0,10}(JFIF|matroska|ftyp|ID3)|\A=newz\[NZB\]=/i'
@@ -216,7 +220,6 @@ class Info
 	/**
 	 * Add an NFO from alternate sources. ex.: PreDB, rar, zip, etc...
 	 *
-	 * @param object $db      Instance of class DB.
 	 * @param string $nfo     The nfo.
 	 * @param array  $release The SQL row for this release.
 	 * @param object $nntp    Instance of class NNTP.
@@ -225,35 +228,42 @@ class Info
 	 *
 	 * @access public
 	 */
-	public function addAlternateNfo($db, $nfo, $release, $nntp) {
-		if (!isset($nntp)) {
-			exit($this->c->error("NFO->addAlternateNfo() Not connected to usenet.\n"));
-		}
+	public function addAlternateNfo($nfo, $release, $nntp)
+	{
+		if ($release['ID'] > 0 && $this->isNFO($nfo, $release['guid'])) {
 
-		if ($release['ID'] > 0) {
-			if (DB_TYPE === 'mysql') {
-				$compress = 'compress(%s)';
-				$nc = $db->escapeString($nfo);
-			} else {
-				$compress = '%s';
-				$nc = $db->escapeString(utf8_encode($nfo));
+			$check = $this->db->queryOneRow(sprintf('SELECT ID FROM releasenfo WHERE releaseID = %d', $release['ID']));
+
+			if ($check === false) {
+				$this->db->queryInsert(
+					sprintf('INSERT INTO releasenfo (nfo, releaseid) VALUES (compress(%s), %d)',
+						$this->db->escapeString($nfo),
+						$release['ID']
+					)
+				);
 			}
-			$ckreleaseid = $db->queryOneRow(sprintf('SELECT ID FROM releasenfo WHERE releaseID = %d', $release['ID']));
-			if (!isset($ckreleaseid['ID'])) {
-				$db->queryInsert(sprintf('INSERT INTO releasenfo (nfo, releaseID) VALUES (' . $compress . ', %d)', $nc, $release['ID']));
-			}
-			$db->exec(sprintf('UPDATE releases SET releasenfoID = 1, nfostatus = 1 WHERE ID = %d', $release['ID']));
+
+			$this->db->exec(sprintf('UPDATE releases SET nfostatus = %d WHERE ID = %d', self::NFO_FOUND, $release['ID']));
+
 			if (!isset($release['completion'])) {
 				$release['completion'] = 0;
 			}
+
 			if ($release['completion'] == 0) {
-				$nzbContents = new NZBContents(array('echo' => $this->echo, 'nntp' => $nntp, 'nfo' => $this, 'db' => $db, 'pp' => new Functions(true)));
+				$nzbContents = new NZBContents(
+					array(
+						'echo' => $this->echo,
+						'nntp' => $nntp,
+						'nfo'  => $this,
+						'db'   => $this->db,
+						'pp'   => new Functions(true)
+					)
+				);
 				$nzbContents->parseNZB($release['guid'], $release['ID'], $release['groupID']);
 			}
 			return true;
-		} else {
-			return false;
 		}
+		return false;
 	}
 
 	/**
@@ -275,14 +285,28 @@ class Info
 		}
 
 		$nfoCount = $ret = 0;
-		$groupID = $groupID === '' ? '' : 'AND groupID = ' . $groupID;
+		$groupID = ($groupID === '' ? '' : 'AND groupID = ' . $groupID);
 		$res = array();
 
 		if ($releaseToWork === '') {
 			$i = -1;
 			while (($nfoCount != $this->nzbs) && ($i >= -6)) {
-				$res = $this->db->query(sprintf('SELECT ID, guid, groupID, name FROM releases WHERE nfostatus between %d AND -1 AND size < %s ' . $groupID . ' LIMIT %d', $i, $this->maxsize * 1073741824, $this->nzbs));
-				$nfoCount = count($res);
+				$res += $this->db->query(
+					sprintf('
+						SELECT ID, guid, groupID, name
+						FROM releases
+						WHERE nfostatus BETWEEN %d AND %d
+						AND size < %s
+						%s
+						LIMIT %d',
+						$i,
+						self::NFO_UNPROC,
+						$this->maxsize * 1073741824,
+						$groupID,
+						$this->nzbs
+					)
+				);
+				$nfoCount += count($res);
 				$i--;
 			}
 		} else {
@@ -293,11 +317,13 @@ class Info
 
 		if ($nfoCount > 0) {
 			if ($releaseToWork === '') {
-				$this->c->doEcho($this->c->primary(
-					'Processing ' . $nfoCount .
-					' NFO(s), starting at ' . $this->nzbs .
-					' * = hidden NFO, + = NFO, - = no NFO, f = download failed.'
-				));
+				$this->c->doEcho(
+					$this->c->primary(
+						'Processing ' . $nfoCount .
+						' NFO(s), starting at ' . $this->nzbs .
+						' * = hidden NFO, + = NFO, - = no NFO, f = download failed.'
+					)
+				);
 
 				// Get count of releases per nfo status
 				$outString = 'Available to process';
@@ -329,7 +355,7 @@ class Info
 					if (!isset($ckreleaseid['id'])) {
 						$this->db->queryInsert(sprintf('INSERT INTO releasenfo (nfo, releaseID) VALUES (' . $cp . ', %d)', $nc, $arr['ID']));
 					}
-					$this->db->exec(sprintf('UPDATE releases SET releasenfoID = 1, nfostatus = 1 WHERE ID = %d', $arr['ID']));
+					$this->db->exec(sprintf('UPDATE releases SET nfostatus = %d WHERE ID = %d', self::NFO_FOUND, $arr['ID']));
 					$ret++;
 					$movie->doMovieUpdate($fetchedBinary, 'nfo', $arr['ID'], $processImdb);
 
@@ -358,7 +384,7 @@ class Info
 		if ($releaseToWork === '') {
 			$relres = $this->db->query('SELECT ID FROM releases WHERE nfostatus < -6 OR releasenfoID = -1');
 			foreach ($relres as $relrow) {
-				$this->db->exec(sprintf('DELETE FROM releasenfo WHERE nfo IS NULL and releaseID = %d', $relrow['ID']));
+				$this->db->exec(sprintf('DELETE FROM releasenfo WHERE nfo IS NULL AND releaseID = %d', $relrow['ID']));
 			}
 
 			if ($this->echo) {
