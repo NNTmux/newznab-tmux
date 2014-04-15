@@ -3472,6 +3472,4 @@ class Functions
     //end of testing
 
    }
-
-
 ?>
