@@ -9,6 +9,7 @@ require_once(WWW_DIR."/lib/site.php");
 require_once(WWW_DIR."/lib/binaries.php");
 require_once(WWW_DIR."../misc/update_scripts/nix_scripts/tmux/lib/ColorCLI.php");
 require_once(WWW_DIR."../misc/update_scripts/nix_scripts/tmux/lib/Yenc.php");
+require_once(WWW_DIR."../misc/update_scripts/nix_scripts/tmux/lib/functions.php");
 
 /**
  * Class for connecting to the usenet, retrieving articles and article headers,
