@@ -9,7 +9,7 @@ require_once(dirname(__FILE__)."/../lib/showsleep.php");
 require_once(dirname(__FILE__)."/../lib/functions.php");
 
 
-$version="0.3r1090";
+$version="0.3r1097";
 
 $db = new DB();
 $functions = new Functions();
@@ -1564,7 +1564,7 @@ if ($running == 1){
 		shell_exec("tmux respawnp -t${tmux_session}:2.4 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php postprocess_new.php anime 2>&1 $log && $_sleep $post_timer_non && echo \" \033[1;0;33m\"' 2>&1 1> /dev/null");
 	} else if (($maxload >= get_load()) && ($post_non != 0) && ($tvrage_releases_proc == 0)) {
 		$color = get_color($colors_start, $colors_end, $colors_exc);
-		shell_exec("tmux respawnp -t${tmux_session}:2.4 'echo \"\033[38;5;${color}m\n${panes2[3]} has been disabled/terminated by No Anime to process\"'");
+		shell_exec("tmux respawnp -t${tmux_session}:2.4 'echo \"\033[38;5;${color}m\n${panes2[4]} has been disabled/terminated by No Anime to process\"'");
     } else if ( $maxload <= get_load()) {
                 $color = get_color($colors_start, $colors_end, $colors_exc);
                 shell_exec("tmux respawnp -t${tmux_session}:2.4 'echo \"\033[38;5;\"$color\"m\n$panes2[4] Disabled by Max Load\"' 2>&1 1> /dev/null");
@@ -1709,11 +1709,11 @@ if ($running == 1){
 	}
         // Run Remove crap releases in pane 3.3
 			switch ($fix_crap_opt) {
-				// Do all types up to 2 hours.
+				// Do all types up to 4 hours.
 				case 'All':
 					$log = writelog($panes3[3]);
 					shell_exec("tmux respawnp -t${tmux_session}:3.3 ' \
-							$_php ${DIR}/../lib/removeCrapReleases_new.php true 2 $log; date +\"%D %T\"; $_sleep $crap_timer' 2>&1 1> /dev/null");
+							$_php ${DIR}/../lib/removeCrapReleases_new.php true 4 $log; date +\"%D %T\"; $_sleep $crap_timer' 2>&1 1> /dev/null");
 					break;
 				// The user has specified custom types.
 				case 'Custom':

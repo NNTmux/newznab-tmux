@@ -1,5 +1,4 @@
 {$rsshead}
-
 {foreach from=$releases item=release}
 <item>
 	<title>{$release.searchname|escape:html}</title>

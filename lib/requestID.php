@@ -179,8 +179,4 @@ if (isset($argv[1]) && $argv[1] === "all") {
 	    if (isset($run['title']))
 		    return array('title' => $run['title'], 'ID' => $run['ID']);
         }
-
-
-
-
 ?>

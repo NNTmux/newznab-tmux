@@ -9,6 +9,7 @@ require_once(WWW_DIR."/lib/site.php");
 require_once(WWW_DIR."/lib/binaries.php");
 require_once(WWW_DIR."../misc/update_scripts/nix_scripts/tmux/lib/ColorCLI.php");
 require_once(WWW_DIR."../misc/update_scripts/nix_scripts/tmux/lib/Yenc.php");
+require_once(WWW_DIR."../misc/update_scripts/nix_scripts/tmux/lib/functions.php");
 
 /**
  * Class for connecting to the usenet, retrieving articles and article headers,
@@ -17,77 +18,22 @@ require_once(WWW_DIR."../misc/update_scripts/nix_scripts/tmux/lib/Yenc.php");
  */
 class NNTP extends Net_NNTP_Client
 {
+     /**
+	 * @var ColorCLI
+	 */
+	protected $c;
 
 	/**
-	 * Instance of class ColorCLI.
-	 *
-	 * @var object
-	 * @access private
+	 * @var Debugging
 	 */
-	private $c;
-
-	/**
-	 * Instance of class Site.
-	 * @var object
-	 * @access private
-	 */
-	private $s;
+	protected $debugging;
 
 	/**
 	 * Object containing site settings.
 	 *
-	 * @var object
-	 * @access private
+	 * @var bool|stdClass
 	 */
-	private $site;
-
-	/**
-	 * Class instance of debugging.
-	 *
-	 * @var object
-	 */
-	private $debugging;
-
-	/**
-	 * Port of the current NNTP server.
-	 * @var int
-	 */
-	private $currentPort;
-
-	/**
-	 * Address of the current NNTP server.
-	 * @var string
-	 */
-	private $currentServer;
-
-	/**
-	 * How many times should we try to reconnect to the NNTP server?
-	 *
-	 * @var int
-	 * @access private
-	 */
-	private $nntpRetries;
-
-	/**
-	 * Does the server support XFeature GZip header compression?
-	 *
-	 * @var boolean
-	 * @access private
-	 */
-	private $compression = false;
-
-	/**
-	 * Are we allowed to post to usenet?
-	 *
-	 * @var bool
-	 */
-	protected $postingAllowed = false;
-
-	/**
-	 * Echo to cli?
-	 * @var bool
-	 */
-	protected $echo;
+	protected $site;
 
 	/**
 	 * Log/echo debug?
@@ -96,11 +42,77 @@ class NNTP extends Net_NNTP_Client
 	protected $debug;
 
 	/**
+	 * Echo to cli?
+	 * @var bool
+	 */
+	protected $echo;
+
+	/**
+	 * Does the server support XFeature GZip header compression?
+	 * @var boolean
+	 */
+	protected $compression = false;
+
+	/**
 	 * Currently selected group.
-	 *
 	 * @var string
 	 */
 	protected $currentGroup = '';
+
+	/**
+	 * Port of the current NNTP server.
+	 * @var int
+	 */
+	protected $currentPort = NNTP_PORT;
+
+	/**
+	 * Address of the current NNTP server.
+	 * @var string
+	 */
+	protected $currentServer = NNTP_SERVER;
+
+	/**
+	 * Are we allowed to post to usenet?
+	 * @var bool
+	 */
+	protected $postingAllowed = false;
+
+	/**
+	 * How many times should we try to reconnect to the NNTP server?
+	 * @var int
+	 */
+	protected $nntpRetries;
+
+	/**
+	 * Path to yyDecoder binary.
+	 * @var bool|string
+	 */
+	protected $yyDecoderPath;
+
+	/**
+	 * If on unix, hide yydecode CLI output.
+	 * @var string
+	 */
+	protected $yEncSilence;
+
+	/**
+	 * Path to temp yEnc input storage file.
+	 * @var string
+	 */
+	protected $yEncTempInput;
+
+	/**
+	 * Path to temp yEnc output storage file.
+	 * @var string
+	 */
+	protected $yEncTempOutput;
+
+	/**
+	 * Instance of class Site.
+	 * @var object
+	 * @access private
+	 */
+	private $s;
 
 	/**
 	 * Start an NNTP connection.
@@ -122,9 +134,26 @@ class NNTP extends Net_NNTP_Client
         $this->s = new Sites();
         $this->site = $this->s->get();
 		$this->tmux = $this->t->get();
+		$this->functions = new Functions();
+		$this->tmpPath = $this->site->tmpunrarpath;
 		$this->nntpRetries = ((!empty($this->tmux->nntpretries)) ? (int)$this->tmux->nntpretries : 0) + 1;
+		$this->yyDecoderPath = ((!empty($this->tmux->yydecoderpath)) ? $this->tmux->yydecoderpath : false);
+		$this->yEncTempInput = WWW_DIR."nzbfiles/yenc/input";
+		$this->yEncTempOutput = WWW_DIR."nzbfiles/yenc/output";
+		$this->yEncSilence = ($this->functions->isWindows() ? '' : ' > /dev/null 2>&1');
 		$this->currentServer = NNTP_SERVER;
 		$this->currentPort = NNTP_PORT;
+
+	   	// Test if the user can read/write to the yEnc path.
+		if (!is_file($this->yEncTempInput)) {
+			@file_put_contents($this->yEncTempInput, 'x');
+		}
+		if (!is_file($this->yEncTempInput) || !is_readable($this->yEncTempInput) || !is_writable($this->yEncTempInput)) {
+			$this->yyDecoderPath = false;
+		}
+		if (is_file($this->yEncTempInput)) {
+			@unlink($this->yEncTempInput);
+		}
 	}
 
 	/**
@@ -647,12 +676,10 @@ class NNTP extends Net_NNTP_Client
 			$groups = implode(', ', $groups);
 		}
 
-		// Check if we should encode to yEnc.
+			// Check if we should encode to yEnc.
 		if ($yEnc) {
-			$y = new Yenc();
-			$body = $y->encode(($compress ? gzdeflate($body, 4) : $body), $subject);
-
-			// If not yEnc, then check if the body is 510+ chars, split it at 510 chars and separate with \r\n
+			$body = $this->encodeYEnc(($compress ? gzdeflate($body, 4) : $body), $subject);
+		// If not yEnc, then check if the body is 510+ chars, split it at 510 chars and separate with \r\n
 		} else {
 			$body = $this->splitLines($body, $compress);
 		}
@@ -726,6 +753,63 @@ class NNTP extends Net_NNTP_Client
 		} else {
 			return parent::_getTextResponse();
 		}
+	}
+
+	/**
+	 * Decode a string of text encoded with yEnc. Ignores all errors.
+	 *
+	 * @param  string $data The encoded text to decode.
+	 *
+	 * @return string The decoded yEnc string, or the input string, if it's not yEnc.
+	 */
+	protected function _decodeIgnoreYEnc($data)
+	{
+		if (preg_match('/^(=yBegin.*=yEnd[^$]*)$/ims', $data, $input)) {
+			// If there user has no yyDecode path set, use PHP to decode yEnc.
+			if ($this->yyDecoderPath === false) {
+				$data = '';
+				$input =
+					trim(
+						preg_replace(
+							'/\r\n/im', '',
+							preg_replace(
+								'/(^=yEnd.*)/im', '',
+								preg_replace(
+									'/(^=yPart.*\\r\\n)/im', '',
+									preg_replace(
+										'/(^=yBegin.*\\r\\n)/im', '',
+										$input[1],
+										1),
+									1),
+								1)
+						)
+					);
+
+				$length = strlen($input);
+				for ($chr = 0; $chr < $length; $chr++) {
+					$data .= ($input[$chr] !== '=' ? chr(ord($input[$chr]) - 42) : chr((ord($input[++$chr]) - 64) - 42));
+				}
+			} else {
+				$inFile = $this->yEncTempInput . mt_rand(0, 999999);
+				$ouFile = $this->yEncTempOutput . mt_rand(0, 999999);
+				file_put_contents($inFile, $input[1]);
+				file_put_contents($ouFile, '');
+				$this->functions->runCmd(
+					"'" .
+					$this->yyDecoderPath .
+					"' '" .
+					$inFile .
+					"' -o '" .
+					$ouFile .
+					"' -f -b" .
+					$this->yEncSilence
+				);
+				$data = file_get_contents($ouFile);
+				unlink($inFile);
+				unlink($ouFile);
+			}
+		}
+		return $data;
 	}
 
 	/**
@@ -859,48 +943,39 @@ class NNTP extends Net_NNTP_Client
 		return $this->throwError($this->c->error($message), 1000);
 	}
 
-	/**
+   /**
 	 * Check if we are still connected. Reconnect if not.
 	 *
-	 * @var bool $reSelectGroup Select back the group after connecting?
+	 * @param  bool $reSelectGroup Select back the group after connecting?
 	 *
-	 * @return bool
+	 * @return mixed On success: (bool)   True;
+	 *               On failure: (object) PEAR_Error>
 	 */
-	protected function checkConnection($reSelectGroup=true)
+	protected function checkConnection($reSelectGroup = true)
 	{
 		$currentGroup = $this->currentGroup;
 		// Check if we are connected.
 		if (parent::_isConnected()) {
-			return true;
+			$retVal = true;
 		} else {
 			switch($this->currentServer) {
 				case NNTP_SERVER:
 					if (is_resource($this->_socket)) {
 						$this->doQuit(true);
 					}
-					$connected =  $this->doConnect();
-					break;
-				case NNTP_SERVER_A:
-					if (is_resource($this->_socket)) {
-						$this->doQuit(true);
-					}
-					$connected = $this->doConnect(true, true);
+					$retVal = $this->doConnect();
 					break;
 				default:
-					$connected = $this->throwError('Wrong server constant used in NNTP checkConnection()!');
+					$retVal = $this->throwError('Wrong server constant used in NNTP checkConnection()!');
 			}
-			if ($connected !== true){
-				return $connected;
-			} else {
-				if ($reSelectGroup) {
-					$group = $this->selectGroup($currentGroup);
-					if ($this->isError($group)) {
-						return $group;
-					}
+			if ($retVal === true && $reSelectGroup){
+				$group = $this->selectGroup($currentGroup);
+				if ($this->isError($group)) {
+					$retVal = $group;
 				}
-				return $connected;
 			}
 		}
+		return $retVal;
 	}
 
 	/**
@@ -916,33 +991,54 @@ class NNTP extends Net_NNTP_Client
 	 *
 	 * @TODO: ? Maybe this function should be merged into the YEnc class?
 	 */
-	protected function _decodeYEnc($string)
+   protected function _decodeYEnc($data)
 	{
-		$ret = $string;
-		if (preg_match('/^(=yBegin.*=yEnd[^$]*)$/ims', $string, $input)) {
-			$ret = '';
-			$input =
-				trim(
-					preg_replace(
-						'/\r\n/im', '',
+		if (preg_match('/^(=yBegin.*=yEnd[^$]*)$/ims', $data, $input)) {
+			// If there user has no yyDecode path set, use PHP to decode yEnc.
+			if ($this->yyDecoderPath === false) {
+				$data = '';
+				$input =
+					trim(
 						preg_replace(
-							'/(^=yEnd.*)/im', '',
+							'/\r\n/im', '',
 							preg_replace(
-								'/(^=yPart.*\\r\\n)/im', '',
+								'/(^=yEnd.*)/im', '',
 								preg_replace(
-									'/(^=yBegin.*\\r\\n)/im', '',
-									$input[1],
+									'/(^=yPart.*\\r\\n)/im', '',
+									preg_replace(
+										'/(^=yBegin.*\\r\\n)/im', '',
+										$input[1],
+									1),
 								1),
-							1),
-						1)
-					)
-				);
+							1)
+						)
+					);
 
-			for ($chr = 0; $chr < strlen($input); $chr++) {
-				$ret .= ($input[$chr] != '=' ? chr(ord($input[$chr]) - 42) : chr((ord($input[++$chr]) - 64) - 42));
+				$length = strlen($input);
+				for ($chr = 0; $chr < $length; $chr++) {
+					$data .= ($input[$chr] !== '=' ? chr(ord($input[$chr]) - 42) : chr((ord($input[++$chr]) - 64) - 42));
+				}
+			} else {
+				$inFile = $this->yEncTempInput . mt_rand(0, 999999);
+				$ouFile = $this->yEncTempOutput . mt_rand(0, 999999);
+				file_put_contents($inFile, $input[1]);
+				file_put_contents($ouFile, '');
+				$this->functions->runCmd(
+					"'" .
+					$this->yyDecoderPath .
+					"' '" .
+					$inFile .
+					"' -o '" .
+					$ouFile .
+					"' -f -b" .
+					$this->yEncSilence
+				);
+				$data = file_get_contents($ouFile);
+				unlink($inFile);
+				unlink($ouFile);
 			}
 		}
-		return $ret;
+		return $data;
 	}
 
 	/**
@@ -1270,70 +1366,122 @@ class NNTP extends Net_NNTP_Client
     }
 
 	/**
-	 * Decode a yenc encoded string.
+	 * yDecodes an encoded string and either writes the result to a file or returns it as a string.
+	 *
+	 * @param string $string yEncoded string to decode.
+	 *
+	 * @return mixed On success: (string) The decoded string.
+	 *               On failure: (object) PEAR_Error.
 	 */
-	function decodeYenc($yencodedvar)
+	public function decodeYEnc($string)
 	{
-		$input = array();
-		preg_match("/^(=ybegin.*=yend[^$]*)$/ims", $yencodedvar, $input);
-		if (isset($input[1]))
-		{
-			$ret = "";
-			$input = trim(preg_replace("/\r\n/im", "",  preg_replace("/(^=yend.*)/im", "", preg_replace("/(^=ypart.*\\r\\n)/im", "", preg_replace("/(^=ybegin.*\\r\\n)/im", "", $input[1], 1), 1), 1)));
+		$encoded = $crc = '';
+		// Extract the yEnc string itself.
+		if (preg_match("/=ybegin.*size=([^ $]+).*\\r\\n(.*)\\r\\n=yend.*size=([^ $\\r\\n]+)(.*)/ims", $string, $encoded)) {
+			if (preg_match('/crc32=([^ $\\r\\n]+)/ims', $encoded[4], $trailer)) {
+				$crc = trim($trailer[1]);
+			}
+			$headerSize  = $encoded[1];
+			$trailerSize = $encoded[3];
+			$encoded     = $encoded[2];
 
-			for( $chr = 0; $chr < strlen($input) ; $chr++)
-				$ret .= ($input[$chr] != "=" ? chr(ord($input[$chr]) - 42) : chr((ord($input[++$chr]) - 64) - 42));
-
-			return $ret;
-		}
-		return false;
-	}
-
-	/**
-	 * Encode a yenc encoded string.
-	 */
-	function encodeYenc($message, $filename, $linelen = 128, $crc32 = true)
-	{
-		/*
-		* This code was found http://everything2.com/title/yEnc+PHP+Class
-		*/
-
-		// yEnc 1.3 draft doesn't allow line lengths of more than 254 bytes.
-		if ($linelen > 254)
-			$linelen = 254;
-
-		if ($linelen < 1)
+		} else {
 			return false;
+		}
 
-		$encoded = "";
+		// Remove line breaks from the string.
+		$encoded = trim(str_replace("\r\n", '', $encoded));
 
-		// Encode each character of the message one at a time.
-		for( $i = 0; $i < strlen($message); $i++)
-		{
-			$value = (ord($message{$i}) + 42) % 256;
+		// Make sure the header and trailer file sizes match up.
+		if ($headerSize != $trailerSize) {
+			$message = 'Header and trailer file sizes do not match. This is a violation of the yEnc specification.';
+			return $this->throwError($message);
+		}
 
-		// Escape NULL, TAB, LF, CR, space, . and = characters.
-		if ($value == 0 || $value == 9 || $value == 10 ||
-			$value == 13 || $value == 32 || $value == 46 ||
-			$value == 61)
-			$encoded .= "=".chr(($value + 64) % 256);
-		else
-			$encoded .= chr($value);
+		// Decode.
+		$decoded = '';
+		$encodedLength = strlen($encoded);
+		for ($chr = 0; $chr < $encodedLength; $chr++) {
+			$decoded .= ($encoded[$chr] !== '=' ? chr(ord($encoded[$chr]) - 42) : chr((ord($encoded[++$chr]) - 64) - 42));
+		}
+
+		// Make sure the decoded file size is the same as the size specified in the header.
+		if (strlen($decoded) != $headerSize) {
+			$message = 'Header file size and actual file size do not match. The file is probably corrupt.';
+			return $this->throwError($message);
+		}
+
+		// Check the CRC value
+		if ($crc !== '' && (strtolower($crc) !== strtolower(sprintf("%04X", crc32($decoded))))) {
+			$message = 'CRC32 checksums do not match. The file is probably corrupt.';
+			return $this->throwError($message);
+		}
+
+		return $decoded;
 	}
 
-		// Wrap the lines to $linelen characters
-		$encoded = trim(chunk_split($encoded, $linelen));
+   	/**
+	 * yEncodes a string and returns it.
+	 *
+	 * @param string $string     String to encode.
+	 * @param string $filename   Name to use as the filename in the yEnc header (this does not have to be an actual file).
+	 * @param int    $lineLength Line length to use (can be up to 254 characters).
+	 * @param bool   $crc32      Pass True to include a CRC checksum in the trailer to allow decoders to verify data integrity.
+	 *
+	 * @return mixed On success: (string) yEnc encoded string.
+	 *               On failure: (bool)   False.
+	 */
+	public function encodeYEnc($string, $filename, $lineLength = 128, $crc32 = true)
+	{
+		// yEnc 1.3 draft doesn't allow line lengths of more than 254 bytes.
+		if ($lineLength > 254) {
+			$lineLength = 254;
+		}
 
-		// Tack a yEnc header onto the encoded message.
-		$encoded = "=ybegin line=$linelen size=".strlen($message)
-				." name=".trim($filename)."\r\n".$encoded;
-		$encoded .= "\r\n=yend size=".strlen($message);
+		if ($lineLength < 1) {
+			$message = $lineLength . ' is not a valid line length.';
+			return $this->throwError($message);
+		}
+
+		$encoded = '';
+		$stringLength = strlen($string);
+		// Encode each character of the string one at a time.
+		for( $i = 0; $i < $stringLength; $i++) {
+			$value = (ord($string{$i}) + 42) % 256;
+
+			// Escape NULL, TAB, LF, CR, space, . and = characters.
+			if ($value == 0 || $value == 9 || $value == 10 || $value == 13 || $value == 32 || $value == 46 || $value == 61) {
+				$encoded .= '=' . chr(($value + 64) % 256);
+			}
+			else {
+				$encoded .= chr($value);
+			}
+		}
+
+		$encoded =
+			// Wrap the lines to $lineLength characters
+			trim(
+				chunk_split(
+					// Tack a yEnc header onto the encoded string.
+					'=ybegin line=' .
+					$lineLength .
+					' size=' .
+					$stringLength .
+					' name=' .
+					trim($filename) .
+					"\r\n" .
+					$encoded .
+					"\r\n=yend size=" .
+					$stringLength, $lineLength
+				)
+			);
 
 		// Add a CRC32 checksum if desired.
-		if ($crc32 === true)
-			$encoded .= " crc32=".strtolower(sprintf("%04X", crc32($message)));
+		if ($crc32 === true) {
+			$encoded .= ' crc32=' . strtolower(sprintf("%04X", crc32($string)));
+		}
 
-		return $encoded."\r\n";
+		return $encoded . "\r\n";
 	}
 
 	// }}}
