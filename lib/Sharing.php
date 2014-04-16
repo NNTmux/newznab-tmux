@@ -486,7 +486,7 @@ Class Sharing
 			return false;
 		}
 		// Hash a unique Comment ID to associate with this message
-		$cid = md5($body['ID'] . $body['USER'] . $body['TIME'] . $body['host']);
+		$cid = md5($body['SID'] . $body['USER'] . $body['TIME'] . $body['BODY']);
 
 		// Insert the comment.
 		if ($this->db->exec(
