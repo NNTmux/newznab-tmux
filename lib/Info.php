@@ -14,7 +14,7 @@ require_once("getid3/getid3/getid3.php");
  * Class Nfo
  * Class for handling fetching/storing of NFO files.
  */
-class Nfo
+class Info
 {
 	/**
 	 * Site settings.
