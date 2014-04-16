@@ -1,6 +1,6 @@
 {$rsshead}
+
 {foreach from=$releases item=release}
-	<!--suppress ALL -->
 	<item>
 		<title>{$release.searchname|escape:html}</title>
 		<guid isPermaLink="true">{$serverroot}details/{$release.guid}</guid>
@@ -164,68 +164,67 @@
 
 
 		{foreach from=$release.category_ids|parray:"," item=cat}
-	<attr name="category" value="{$cat}"/>
+	<newznab:attr name="category" value="{$cat}"/>
 		{/foreach}
-		<attr name="size" value="{$release.size}"/>
-		<attr name="files" value="{$release.totalpart}"/>
-		<attr name="poster" value="{$release.fromname|escape:html}"/>
+		<newznab:attr name="size" value="{$release.size}"/>
+		<newznab:attr name="files" value="{$release.totalpart}"/>
+		<newznab:attr name="poster" value="{$release.fromname|escape:html}"/>
 		{if $release.season != ""}
-			<attr name="season" value="{$release.season}"/>
+			<newznab:attr name="season" value="{$release.season}"/>
 		{/if}
 		{if $release.episode != ""}
-			<attr name="episode" value="{$release.episode}"/>
+			<newznab:attr name="episode" value="{$release.episode}"/>
 		{/if}
 		{if $release.fullep != ""}
-			<attr name="fullep">{$release.fullep}</attr>
+			<newznab:attr name="fullep">{$release.fullep}</newznab:attr>
 		{/if}
 		{if $release.showtitle != ""}
-			<attr name="showtitle">{$release.showtitle|escape:html}</attr>
+			<newznab:attr name="showtitle">{$release.showtitle|escape:html}</newznab:attr>
 		{/if}
 		{if $release.rageID != "-1" && $release.rageID != "-2"}
-			<attr name="rageid" value="{$release.rageID}"/>
+			<newznab:attr name="rageid" value="{$release.rageID}"/>
 		{/if}
 		{if $release.tvtitle != ""}
-			<attr name="tvtitle" value="{$release.tvtitle|escape:html}"/>
+			<newznab:attr name="tvtitle" value="{$release.tvtitle|escape:html}"/>
 		{/if}
 		{if $release.tvairdate != ""}
-			<attr name="tvairdate" value="{$release.tvairdate|phpdate_format:"DATE_RSS"}"/>
+			<newznab:attr name="tvairdate" value="{$release.tvairdate|phpdate_format:"DATE_RSS"}"/>
 		{/if}
 		{if $release.imdbID != ""}
-			<attr name="imdb" value="{$release.imdbID}"/>
+			<newznab:attr name="imdb" value="{$release.imdbID}"/>
 		{/if}
 		{if $release.tvdbID != ""}
-			<attr name="tvdb-show" value="{$release.tvdbID}"/>
+			<newznab:attr name="tvdb-show" value="{$release.tvdbID}"/>
 		{/if}
 		{if $release.ep_tvdbID != ""}
-			<attr name="tvdb-ep" value="{$release.ep_tvdbID}"/>
+			<newznab:attr name="tvdb-ep" value="{$release.ep_tvdbID}"/>
 		{/if}
 		{if $release.rating != ""}
-			<attr name="rating" value="{$release.rating}"/>
+			<newznab:attr name="rating" value="{$release.rating}"/>
 		{/if}
 		{if $release.overview != ""}
-			<attr name="overview">{$release.overview|escape:html}</attr>
+			<newznab:attr name="overview">{$release.overview|escape:html}</newznab:attr>
 		{/if}
 		{if $release.writer != ""}
 			{foreach from=$release.writer|parray:"," item=writer}
-				<attr name="writer" value="{$writer|trim|escape:html}"/>
+				<newznab:attr name="writer" value="{$writer|trim|escape:html}"/>
 			{/foreach}
 		{/if}
 		{if $release.gueststars != ""}
 			{foreach from=$release.gueststars|parray:"," item=gueststar}
-				<attr name="gueststar" value="{$gueststar|trim|escape:html}"/>
+				<newznab:attr name="gueststar" value="{$gueststar|trim|escape:html}"/>
 			{/foreach}
 		{/if}
 		{if $release.director != ""}
 			{foreach from=$release.director|parray:"," item=director}
-				<attr name="director" value="{$director|trim|escape:html}"/>
+				<newznab:attr name="director" value="{$director|trim|escape:html}"/>
 			{/foreach}
 		{/if}
-		<attr name="grabs" value="{$release.grabs}"/>
-		<attr name="comments" value="{$release.comments|escape:"htmlall"}"/>
-		<!--suppress XmlUnboundNsPrefix -->
-		<attr name="password" value="{$release.passwordstatus}"/>
-		<attr name="usenetdate" value="{$release.postdate|phpdate_format:"DATE_RSS"}"/>
-		<attr name="group" value="{$release.group_name|escape:html}"/>
+		<newznab:attr name="grabs" value="{$release.grabs}"/>
+		<newznab:attr name="comments" value="{$release.comments|escape:"htmlall"}"/>
+		<newznab:attr name="password" value="{$release.passwordstatus}"/>
+		<newznab:attr name="usenetdate" value="{$release.postdate|phpdate_format:"DATE_RSS"}"/>
+		<newznab:attr name="group" value="{$release.group_name|escape:html}"/>
 
 	</item>
 {/foreach}
