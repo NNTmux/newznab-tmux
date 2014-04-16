@@ -37,9 +37,9 @@ Class TraktTv
 			$TVjson = $this->functions->getUrl(
 				'http://api.trakt.tv/show/episode/summary.json/' .
 				$this->APIKEY . '/' .
-				str_replace([' ', '_', '.'], '-', $title) . '/' .
-				str_replace(['S', 's'], '', $season) . '/' .
-				str_replace(['E', 'e'], '', $ep)
+				str_replace(array(' ', '_', '.'), '-', $title) . '/' .
+				str_replace(array('S', 's'), '', $season) . '/' .
+				str_replace(array('E', 'e'), '', $ep)
 			);
 
 			if ($TVjson !== false) {
@@ -66,7 +66,7 @@ Class TraktTv
 				'http://api.trakt.tv/movie/summary.json/' .
 				$this->APIKEY .
 				'/' .
-				str_replace([' ', '_', '.'], '-', str_replace(['(', ')'], '', $movie))
+				str_replace(array(' ', '_', '.'), '-', str_replace(array('(', ')'), '', $movie))
 			);
 
 			if ($MovieJson !== false) {
