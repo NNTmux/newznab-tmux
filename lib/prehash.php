@@ -14,10 +14,12 @@ require_once("IRCScraper.php");
 require_once("Info.php");
 
 
-/*
- * Class for inserting names/categories/md5 etc from predb sources into the DB, also for matching names on files / subjects.
+/**
+ * Class for inserting names/categories/md5 etc from PreDB sources into the DB,
+ * also for matching names on files / subjects.
+ *
+ * Class PreHash
  */
- // This script is adapted from nZEDb
 Class PreHash
 {
   // If you wish to not get PRE from one of these sources, set it to false.
@@ -35,13 +37,49 @@ Class PreHash
 	const PRE_EROTICA  = true;
 	const PRE_FOREIGN  = true;
 
-	function __construct($echooutput=false)
+	// Nuke status.
+	const PRE_NONUKE = 0; // Pre is not nuked.
+	const PRE_UNNUKED = 1; // Pre was un nuked.
+	const PRE_NUKED = 2; // Pre is nuked.
+	const PRE_MODNUKE = 3; // Nuke reason was modified.
+	const PRE_RENUKED = 4; // Pre was re nuked.
+	const PRE_OLDNUKE = 5; // Pre is nuked for being old.
+
+	/**
+	 * @var bool|stdClass
+	 */
+	protected $site;
+
+	/**
+	 * @var bool
+	 */
+	protected $echooutput;
+
+	/**
+	 * @var DB
+	 */
+	protected $db;
+
+	/**
+	 * @var ColorCLI
+	 */
+	protected $c;
+	/**
+	 * @var bool
+	 */
+	private $echo;
+
+	/**
+	 * @param bool $echo
+	 *
+	 */
+	function __construct($echo = false)
 	{
 		$s = new Sites();
 		$this->site = $s->get();
-		$this->echooutput = $echooutput;
-        $this->db = new DB();
-        $this->c = new ColorCLI;
+		$this->echooutput = $echo;
+		$this->db = new DB();
+		$this->c = new ColorCLI;
         $this->functions = new Functions();
 	}
 
@@ -408,7 +446,7 @@ Class PreHash
 
 							$nuked = $nukereason = '';
 							if (!empty($matches4['reason'])) {
-								$nuked = IRCScraper::NUKE;
+								$nuked = self::PRE_NUKED;
 								$nukereason = $matches4['reason'];
 							}
 
@@ -426,7 +464,7 @@ Class PreHash
 									$this->db->escapeString('prelist'),
 									$md5,
 									$this->db->escapeString($matches4['files']),
-									($nuked === '' ? IRCScraper::NO_NUKE : $nuked),
+									($nuked === '' ? self::PRE_NONUKE : $nuked),
 									($nukereason === '' ? 'NULL' : $this->db->escapeString($nukereason))))) {
 								$newNames++;
 							}

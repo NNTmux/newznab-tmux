@@ -1,7 +1,7 @@
 <?php
-require_once(dirname(__FILE__)."/../bin/config.php");
-require_once(WWW_DIR."lib/framework/db.php");
-require_once(WWW_DIR.'/lib/nntp.php');
+require_once(dirname(__FILE__) . "/../bin/config.php");
+require_once(WWW_DIR . "lib/framework/db.php");
+require_once(WWW_DIR . '/lib/nntp.php');
 require_once("functions.php");
 
 /**
@@ -9,7 +9,6 @@ require_once("functions.php");
  *
  * Class Sharing
  */
-
 Class Sharing
 {
 	/**
@@ -58,12 +57,14 @@ Class Sharing
 
 	/**
 	 * Array containing site settings.
+	 *
 	 * @var array
 	 */
 	protected $siteSettings = array();
 
 	/**
 	 * Group to work in.
+	 *
 	 * @const
 	 */
 	const group = 'alt.binaries.zines';
@@ -71,7 +72,7 @@ Class Sharing
 	/**
 	 * Construct.
 	 *
-	 * @param DB $db
+	 * @param DB   $db
 	 * @param NNTP $nntp
 	 */
 	public function __construct(&$db = null, &$nntp = null)
@@ -156,6 +157,7 @@ Class Sharing
 				$this->db->escapeString(($siteGuid === '' ? sha1($siteName) : $siteGuid))
 			)
 		);
+
 		return $this->db->queryOneRow('SELECT * FROM sharing');
 	}
 
@@ -172,7 +174,7 @@ Class Sharing
 				INNER JOIN users u ON rc.userID = u.ID
 				INNER JOIN releases r on rc.releaseID = r.ID
 				WHERE rc.shared = 0 LIMIT %d',
-			   $this->functions->unix_timestamp_column('rc.createddate'),
+				$this->functions->unix_timestamp_column('rc.createddate'),
 				$this->siteSettings['max_push']
 			)
 		);
@@ -183,16 +185,16 @@ Class Sharing
 		}
 
 
-			echo '(Sharing) Starting to upload comments.' . PHP_EOL;
+		echo '(Sharing) Starting to upload comments.' . PHP_EOL;
 
 
 		// Loop over the comments.
-		foreach($newComments as $comment) {
+		foreach ($newComments as $comment) {
 			$this->postComment($comment);
 		}
 
 
-			echo PHP_EOL . '(Sharing) Finished uploading comments.' . PHP_EOL;
+		echo PHP_EOL . '(Sharing) Finished uploading comments.' . PHP_EOL;
 
 	}
 
@@ -219,11 +221,11 @@ Class Sharing
 				('(_nZEDb_)' . $this->siteSettings['site_name'] . '_' . $this->siteSettings['site_guid'] . ' - [1/1] "' . $sid . '" yEnc (1/1)'),
 				json_encode(
 					array(
-						'USER'  => ($this->siteSettings['hide_users'] ? 'ANON' : $row['username']),
-						'TIME'  => $row['unix_time'],
-						'SID'   => $sid,
-						'RID'   => $row['nzb_guid'],
-						'BODY'  => $row['text']
+						'USER' => ($this->siteSettings['hide_users'] ? 'ANON' : $row['username']),
+						'TIME' => $row['unix_time'],
+						'SID'  => $sid,
+						'RID'  => $row['nzb_guid'],
+						'BODY' => $row['text']
 					)
 				),
 				'<anon@anon.com>'
@@ -243,7 +245,7 @@ Class Sharing
 					)
 				);
 
-					echo '.';
+				echo '.';
 
 			}
 		} else {
@@ -277,7 +279,7 @@ Class Sharing
 				$this->db->exec(sprintf('UPDATE releases SET comments = comments + 1 WHERE ID = %d', $row['ID']));
 			}
 
-				echo '(Sharing) Matched ' . $found . ' comments.' . PHP_EOL;
+			echo '(Sharing) Matched ' . $found . ' comments.' . PHP_EOL;
 
 		}
 	}
@@ -300,7 +302,7 @@ Class Sharing
 			// If the user picked to start from the oldest, get the oldest.
 			if ($this->siteSettings['start_position'] === true) {
 				$this->siteSettings['last_article'] = $ourOldest = (string)($group['first']);
-			// Else get the newest.
+				// Else get the newest.
 			} else {
 				$this->siteSettings['last_article'] = $ourOldest = (string)($group['last'] - 1000);
 			}
@@ -322,7 +324,7 @@ Class Sharing
 		}
 
 
-			echo '(Sharing) Starting to fetch new comments.' . PHP_EOL;
+		echo '(Sharing) Starting to fetch new comments.' . PHP_EOL;
 
 
 		// Get the wanted aritcles
@@ -352,7 +354,8 @@ Class Sharing
 
 			//(_nZEDb_)nZEDb_533f16e46a5091.73152965_3d12d7c1169d468aaf50d5541ef02cc88f3ede10 - [1/1] "92ba694cebc4fbbd0d9ccabc8604c71b23af1131" (1/1) yEnc
 			if ($header['From'] === '<anon@anon.com>' &&
-				preg_match('/^\(_nZEDb_\)(?P<site>.+?)_(?P<guid>[a-f0-9]{40}) - \[1\/1\] "(?P<sid>[a-f0-9]{40})" yEnc \(1\/1\)$/i', $header['Subject'], $matches)) {
+				preg_match('/^\(_nZEDb_\)(?P<site>.+?)_(?P<guid>[a-f0-9]{40}) - \[1\/1\] "(?P<sid>[a-f0-9]{40})" yEnc \(1\/1\)$/i', $header['Subject'], $matches)
+			) {
 
 				// Check if this is from our own site.
 				if ($matches['guid'] === $this->siteSettings['site_guid']) {
@@ -420,13 +423,13 @@ Class Sharing
 						);
 						$found++;
 
-							echo '.';
-							if ($found % 40 == 0) {
-								echo '[' . $found . ']' . PHP_EOL;
-							}
+						echo '.';
+						if ($found % 40 == 0) {
+							echo '[' . $found . ']' . PHP_EOL;
 						}
 					}
 				}
+			}
 			// Update once in a while in case the user cancels the script.
 			if ($total++ % 10 == 0) {
 				$this->siteSettings['lastarticle'] = $currentArticle;
@@ -441,12 +444,12 @@ Class Sharing
 		}
 
 
-			if ($found > 0) {
-				echo PHP_EOL . '(Sharing) Fetched ' . $found . ' new comments.' . PHP_EOL;
-			} else {
-				echo '(Sharing) Finish looking for new comments, but did not find any.' . PHP_EOL;
-			}
+		if ($found > 0) {
+			echo PHP_EOL . '(Sharing) Fetched ' . $found . ' new comments.' . PHP_EOL;
+		} else {
+			echo '(Sharing) Finish looking for new comments, but did not find any.' . PHP_EOL;
 		}
+	}
 
 	/**
 	 * Fetch a comment and insert it.
@@ -467,7 +470,7 @@ Class Sharing
 		}
 
 		// Decompress the body.
-		$body = gzinflate($body);
+		$body = @gzinflate($body);
 		if ($body === false) {
 			return false;
 		}
@@ -479,11 +482,11 @@ Class Sharing
 		}
 
 		// Just in case.
-			if (!isset($body['USER']) || !isset($body['SID']) || !isset($body['RID']) || !isset($body['TIME']) | !isset($body['BODY'])) {
+		if (!isset($body['USER']) || !isset($body['SID']) || !isset($body['RID']) || !isset($body['TIME']) | !isset($body['BODY'])) {
 			return false;
 		}
 		// Hash a unique Comment ID to associate with this message
-			$cid = md5($body['ID'].$body['USER'].$body['TIME'].$body['host']);
+		$cid = md5($body['ID'] . $body['USER'] . $body['TIME'] . $body['host']);
 
 		// Insert the comment.
 		if ($this->db->exec(
@@ -500,9 +503,11 @@ Class Sharing
 				$this->db->escapeString($siteID),
 				$this->db->escapeString((substr($body['USER'], 0, 3) === 'sn-' ? 'SH_ANON' : 'SH_' . $body['USER']))
 			)
-		)) {
+		)
+		) {
 			return true;
 		}
+
 		return false;
 	}
 

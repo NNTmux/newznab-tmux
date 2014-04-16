@@ -4,6 +4,7 @@ require_once(dirname(__FILE__)."/Net_SmartIRC/Net/SmartIRC.php");
 require_once(dirname(__FILE__)."/Net_SmartIRC/modules/PingFix.php");
 require_once(WWW_DIR."/lib/framework/db.php");
 require_once("functions.php");
+require_once("prehash.php");
 
 
 //
@@ -16,42 +17,6 @@ require_once("functions.php");
  */
 class IRCScraper
 {
-	/**
-	 * Pre is not nuked.
-	 * @const
-	 */
-	const NO_NUKE  = 0;
-
-	/**
-	 * Pre was un nuked.
-	 * @const
-	 */
-	const UN_NUKE  = 1;
-
-	/**
-	 * Pre is nuked.
-	 * @const
-	 */
-	const NUKE     = 2;
-
-	/**
-	 * Nuke reason was modified.
-	 * @const
-	 */
-	const MOD_NUKE = 3;
-
-	/**
-	 * Pre was re nuked.
-	 * @const
-	 */
-	const RE_NUKE  = 4;
-
-	/**
-	 * Pre is nuked for being old.
-	 * @const
-	 */
-	const OLD_NUKE = 5;
-
 	/**
 	 * Array of current pre info.
 	 * @var array
@@ -519,19 +484,19 @@ class IRCScraper
 			$this->nuked = true;
 			switch ($matches['nuke']) {
 				case 'NUKE':
-					$this->CurPre['nuked'] = self::NUKE;
+					$this->CurPre['nuked'] = PreHash::PRE_NUKED;
 					break;
 				case 'UNNUKE':
-					$this->CurPre['nuked'] = self::UN_NUKE;
+					$this->CurPre['nuked'] = PreHash::PRE_UNNUKED;
 					break;
 				case 'MODNUKE':
-					$this->CurPre['nuked'] = self::MOD_NUKE;
+					$this->CurPre['nuked'] = PreHash::PRE_MODNUKE;
 					break;
 				case 'RENUKE':
-					$this->CurPre['nuked'] = self::RE_NUKE;
+					$this->CurPre['nuked'] = PreHash::PRE_RENUKED;
 					break;
 				case 'OLDNUKE':
-					$this->CurPre['nuked'] = self::OLD_NUKE;
+					$this->CurPre['nuked'] = PreHash::PRE_OLDNUKE;
 					break;
 			}
 		}
@@ -971,19 +936,19 @@ class IRCScraper
 			$nukeString = '';
 			if ($this->nuked !== false) {
 				switch((int)$this->CurPre['nuked']) {
-					case self::NUKE:
+					case PreHash::PRE_NUKED:
 						$nukeString = '[ NUKED ] ';
 						break;
-					case self::UN_NUKE:
+					case PreHash::PRE_UNNUKED:
 						$nukeString = '[UNNUKED] ';
 						break;
-					case self::MOD_NUKE:
+					case PreHash::PRE_MODNUKE:
 						$nukeString = '[MODNUKE] ';
 						break;
-					case self::OLD_NUKE:
+					case PreHash::PRE_OLDNUKE:
 						$nukeString = '[OLDNUKE] ';
 						break;
-					case self::RE_NUKE:
+					case PreHash::PRE_RENUKED:
 						$nukeString = '[RENUKED] ';
 						break;
 					default:

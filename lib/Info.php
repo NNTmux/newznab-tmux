@@ -142,14 +142,15 @@ class Info
 	 *
 	 * @access public
 	 */
-	public function isNFO($possibleNFO, $guid) {
+	public function isNFO(&$possibleNFO, $guid)
+	{
 		$r = false;
 		if ($possibleNFO === false) {
 			return $r;
 		}
 
 		// Make sure it's not too big or small, size needs to be at least 12 bytes for header checking.
-		$size = strlen($possibleNFO);
+		$size = mb_strlen($possibleNFO, '8bit');
 		if ($size < 65535 && $size > 11) {
 			// Ignore common file types.
 			if (preg_match(
@@ -227,7 +228,7 @@ class Info
 	 *
 	 * @access public
 	 */
-	public function addAlternateNfo($nfo, $release, $nntp)
+	public function addAlternateNfo(&$nfo, $release, $nntp)
 	{
 		if ($release['ID'] > 0 && $this->isNFO($nfo, $release['guid'])) {
 

@@ -75,7 +75,7 @@ Class NZBcontents
 		$t = new Tmux();
 		$this->tmux = $t->get();
 		$this->functions = new Functions();
-		$this->lookuppar2 = (isset($this->tmux->lookuppar2)) ? $this->tmux->lookuppar2 : 0;
+		$this->lookuppar2 = ($this->tmux->lookuppar2 == 1 ? true : false);
 		$this->db   = $options['db'];
 		$this->nntp = $options['nntp'];
 		$this->nfo  = $options['nfo'];
@@ -114,6 +114,7 @@ Class NZBcontents
 				if ($this->echooutput) {
 					echo ($messageID['hidden'] === false ? '+' : '*');
 				}
+				$fetchedBinary = true;
 			} else {
 				if ($this->echooutput) {
 					echo '-';
@@ -136,25 +137,25 @@ Class NZBcontents
 	 * @param string $guid
 	 * @param int    $relID
 	 * @param int    $groupID
-	 * @param int    $namestatus
+	 * @param int    $nameStatus
 	 * @param int    $show
 	 *
 	 * @return bool
 	 */
-	public function checkPAR2($guid, $relID, $groupID, $namestatus, $show)
+	public function checkPAR2($guid, $relID, $groupID, $namseStatus, $show)
 	{
 		$nzbfile = $this->LoadNZB($guid);
 		if ($nzbfile !== false) {
 			foreach ($nzbfile->file as $nzbcontents) {
 				if (preg_match('/\.(par[2" ]|\d{2,3}").+\(1\/1\)$/i', $nzbcontents->attributes()->subject)) {
-					if ($this->functions->parsePAR2($nzbcontents->segments->segment, $relID, $groupID, $this->nntp, $show) === true && $namestatus === 1) {
+					if ($this->functions->parsePAR2($nzbcontents->segments->segment, $relID, $groupID, $this->nntp, $show) === true && $namseStatus === 1) {
 						$this->db->exec(sprintf('UPDATE releases SET proc_par2 = 1 WHERE ID = %d', $relID));
 						return true;
 					}
 				}
 			}
 		}
-		if ($namestatus === 1) {
+		if ($namseStatus === 1) {
 			$this->db->exec(sprintf('UPDATE releases SET proc_par2 = 1 WHERE ID = %d', $relID));
 		}
 		return false;
@@ -208,7 +209,7 @@ Class NZBcontents
 					}
 				}
 
-				if ($this->lookuppar2 == 1 && $foundPAR2 === false) {
+				if ($this->lookuppar2 && $foundPAR2 === false) {
 					if (preg_match('/\.(par[2" ]|\d{2,3}").+\(1\/1\)$/i', $subject)) {
 						if ($this->functions->parsePAR2((string)$nzbcontents->segments->segment, $relID, $groupID, $this->nntp, 1) === true) {
 							$this->db->exec(sprintf('UPDATE releases SET proc_par2 = 1 WHERE ID = %d', $relID));
@@ -244,7 +245,7 @@ Class NZBcontents
 	 *
 	 * @return bool|SimpleXMLElement
 	 */
-	protected function LoadNZB($guid)
+	protected function LoadNZB(&$guid)
 	{
 		// Fetch the NZB location using the GUID.
 		$nzbpath = $this->functions->NZBPath($guid);
@@ -273,7 +274,7 @@ Class NZBcontents
 		$nzbfile = @simplexml_load_file($nzbpath);
 		if (!$nzbfile) {
 			if ($this->echooutput) {
-				echo PHP_EOL ."Unable to load NZB: " . $guid . " appears to be an invalid NZB, skipping." . PHP_EOL;
+				echo PHP_EOL . "Unable to load NZB: $guid appears to be an invalid NZB, skipping." . PHP_EOL;
 			}
 			return false;
 		}

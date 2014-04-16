@@ -1,7 +1,8 @@
 <?php
-require_once(dirname(__FILE__)."/../bin/config.php");
-require_once(WWW_DIR.'/lib/Tmux.php');
+require_once(dirname(__FILE__) . "/../bin/config.php");
+require_once(WWW_DIR . '/lib/Tmux.php');
 require_once('functions.php');
+
 /**
  * Class TraktTv
  * Lookup information from trakt.tv using their API.
@@ -36,15 +37,16 @@ Class TraktTv
 			$TVjson = $this->functions->getUrl(
 				'http://api.trakt.tv/show/episode/summary.json/' .
 				$this->APIKEY . '/' .
-				str_replace(array(' ', '_', '.'), '-', $title) . '/' .
-				str_replace(array('S', 's'), '', $season) . '/' .
-				str_replace(array('E', 'e'), '', $ep)
+				str_replace([' ', '_', '.'], '-', $title) . '/' .
+				str_replace(['S', 's'], '', $season) . '/' .
+				str_replace(['E', 'e'], '', $ep)
 			);
 
 			if ($TVjson !== false) {
 				return json_decode($TVjson, true);
 			}
 		}
+
 		return false;
 	}
 
@@ -53,18 +55,18 @@ Class TraktTv
 	 * Accept a title (the-big-lebowski-1998), a IMDB id, or a TMDB id.
 	 *
 	 * @param string $movie Title or IMDB id.
-	 * @param bool $array   Return the full array or just the IMDB id.
+	 * @param bool   $array Return the full array or just the IMDB id.
 	 *
 	 * @return bool|mixed
 	 */
-	public function traktMoviesummary($movie = '', $array=false)
+	public function traktMoviesummary($movie = '', $array = false)
 	{
 		if (!empty($this->APIKEY)) {
 			$MovieJson = $this->functions->getUrl(
 				'http://api.trakt.tv/movie/summary.json/' .
 				$this->APIKEY .
 				'/' .
-				str_replace(array(' ', '_', '.'), '-',  str_replace(array('(', ')'), '', $movie))
+				str_replace([' ', '_', '.'], '-', str_replace(['(', ')'], '', $movie))
 			);
 
 			if ($MovieJson !== false) {
@@ -81,6 +83,7 @@ Class TraktTv
 				}
 			}
 		}
+
 		return false;
 	}
 }
