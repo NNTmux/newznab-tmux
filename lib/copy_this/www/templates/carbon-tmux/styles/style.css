@@ -526,7 +526,7 @@ div.movextra tr.mlextra {display:none;}
 div.movcover { width:140px; }
 div.movcover img { margin-bottom:5px;}
 
-.mediainfo, .seriesinfo, .preinfo {cursor:pointer;}
+.mediainfo, .seriesinfo, .preinfo .prehashinfo {cursor:pointer;}
 
 a.external { background: url('../images/newwindow.png') center right no-repeat !important; padding-right:13px !important;}
 
