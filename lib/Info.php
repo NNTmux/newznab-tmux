@@ -4,19 +4,20 @@ require_once(WWW_DIR."/lib/framework/db.php");
 require_once(WWW_DIR."/lib/site.php");
 require_once(WWW_DIR."/lib/Tmux.php");
 require_once(WWW_DIR."/lib/tvrage.php");
+require_once(WWW_DIR . "/lib/rarinfo/par2info.php");
+require_once(WWW_DIR . "/lib/rarinfo/sfvinfo.php");
 require_once("ColorCLI.php");
 require_once("Film.php");
+require_once("/getid3/getid3/getid3.php");
 
 /**
- * Class Info
+ * Class Nfo
  * Class for handling fetching/storing of NFO files.
- * @public
  */
-class Info
+class Nfo
 {
 	/**
 	 * Site settings.
-	 *
 	 * @var bool|stdClass
 	 * @access private
 	 */
@@ -24,71 +25,54 @@ class Info
 
 	/**
 	 * How many nfo's to process per run.
-	 *
 	 * @var int
-	 * @access private
 	 */
 	private $nzbs;
 
 	/**
 	 * Max NFO size to process.
-	 *
 	 * @var int
-	 * @access private
 	 */
 	private $maxsize;
 
 	/**
 	 * Path to temporarily store files.
-	 *
 	 * @var string
-	 * @access private
 	 */
 	private $tmpPath;
 
 	/**
 	 * Instance of class ColorCLI
-	 *
 	 * @var ColorCLI
-	 * @access private
 	 */
 	private $c;
 
 	/**
 	 * Instance of class DB
-	 *
 	 * @var DB
-	 * @access private
 	 */
 	private $db;
 
 	/**
 	 * Primary color for console text output.
-	 *
 	 * @var string
-	 * @access private
 	 */
 	private $primary = 'Green';
 
 	/**
 	 * Color for warnings on console text output.
-	 *
 	 * @var string
-	 * @access private
 	 */
 	private $warning = 'Red';
 
 	/**
 	 * Color for headers(?) on console text output.
-	 *
 	 * @var string
-	 * @access private
 	 */
 	private $header = 'Yellow';
 
 	/**
 	 * Echo to cli?
-	 *
 	 * @var bool
 	 */
 	protected $echo;
@@ -144,23 +128,21 @@ class Info
 	 */
 	public function isNFO(&$possibleNFO, $guid)
 	{
-		$r = false;
 		if ($possibleNFO === false) {
-			return $r;
+			return false;
 		}
 
-		// Make sure it's not too big or small, size needs to be at least 12 bytes for header checking.
-		$size = mb_strlen($possibleNFO, '8bit');
-		if ($size < 65535 && $size > 11) {
-			// Ignore common file types.
-			if (preg_match(
-				'/(^RIFF|)<\?xml|;\s*Generated\s*by.*SF\w|\A\s*[RP]AR|\A.{0,10}(JFIF|matroska|ftyp|ID3)|\A=newz\[NZB\]=/i'
-				, $possibleNFO)) {
-				return $r;
-			}
-
-			// file/getid3 work with files, so save to disk
-			$tmpPath = $this->tmpPath.$guid.'.nfo';
+		// Make sure it's not too big or small, size needs to be at least 12 bytes for header checking. Ignore common file types.
+		$size = strlen($possibleNFO);
+		if ($size < 65535 &&
+			$size > 11 &&
+			!preg_match(
+				'/\A(\s*<\?xml|=newz\[NZB\]=|RIFF|\s*[RP]AR|.{0,10}(JFIF|matroska|ftyp|ID3))|;\s*Generated\s*by.*SF\w/i'
+				, $possibleNFO
+			)
+		) {
+			// File/GetId3 work with files, so save to disk.
+			$tmpPath = $this->tmpPath . $guid . '.nfo';
 			file_put_contents($tmpPath, $possibleNFO);
 
 			// Linux boxes have 'file' (so should Macs)
@@ -173,39 +155,33 @@ class Info
 						$result = $result[0];
 					}
 				}
-				$test = preg_match('#^.*(ISO-8859|UTF-(?:8|16|32) Unicode(?: \(with BOM\)|)|ASCII)(?: English| C++ Program|) text.*$#i', $result);
-				// if the result is false, something went wrong, continue with getID3 tests.
-				if ($test !== false) {
-					if ($test == 1) {
-						@unlink($tmpPath);
-						return true;
-					}
+				// Check if it's text.
+				if (preg_match('/(ASCII|ISO-8859|UTF-(8|16|32).*?)\s*text/', $result)) {
+					@unlink($tmpPath);
 
-					// non-printable characters should never appear in text, so rule them out.
-					$test = preg_match('#\x00|\x01|\x02|\x03|\x04|\x05|\x06|\x07|\x08|\x0B|\x0E|\x0F|\x12|\x13|\x14|\x15|\x16|\x17|\x18|\x19|\x1A|\x1B|\x1C|\x1D|\x1E|\x1F#', $possibleNFO);
-					if ($test) {
-						@unlink($tmpPath);
-						return false;
-					}
+					return true;
+
+					// Or binary.
+				} else if (preg_match('/^(JPE?G|Parity|PNG|RAR|XML|(7-)?[Zz]ip)/', $result) ||
+					preg_match('/[\x00-\x08\x12-\x1F\x0B\x0E\x0F]/', $possibleNFO)
+				) {
+					@unlink($tmpPath);
+
+					return false;
 				}
 			}
 
-			// If on Windows, or above checks couldn't  make a categorical identification,
-			// Use getid3 to check if it's an image/video/rar/zip etc..
+			// If above checks couldn't  make a categorical identification, Use GetId3 to check if it's an image/video/rar/zip etc..
 			require_once ("getid3/getid3/getid3.php");
 			$getid3 = new getid3();
 			$check = $getid3->analyze($tmpPath);
-			unset($getid3);
 			@unlink($tmpPath);
-			unset($tmpPath);
 			if (isset($check['error'])) {
 				// Check if it's a par2.
-				require_once(WWW_DIR."/lib/rarinfo/par2info.php");
 				$par2info = new Par2Info();
 				$par2info->setData($possibleNFO);
 				if ($par2info->error) {
 					// Check if it's an SFV.
-					require_once(WWW_DIR."/lib/rarinfo/sfvinfo.php");
 					$sfv = new SfvInfo();
 					$sfv->setData($possibleNFO);
 					if ($sfv->error) {
@@ -214,7 +190,8 @@ class Info
 				}
 			}
 		}
-		return $r;
+
+		return false;
 	}
 
 	/**
@@ -226,7 +203,6 @@ class Info
 	 *
 	 * @return bool           True on success, False on failure.
 	 *
-	 * @access public
 	 */
 	public function addAlternateNfo(&$nfo, $release, $nntp)
 	{
@@ -277,7 +253,6 @@ class Info
 	 *
 	 * @return int                   How many NFO's were processed?
 	 *
-	 * @access public
 	 */
 	public function processNfoFiles($releaseToWork = '', $processImdb = 1, $processTvrage = 1, $groupID = '', $nntp) {
 		if (!isset($nntp)) {

@@ -108,7 +108,8 @@ Class NZBcontents
 				if ($this->echooutput) {
 					echo 'f';
 				}
-				$fetchedBinary = false;
+
+				return false;
 			}
 			if ($this->nfo->isNFO($fetchedBinary, $guid) === true) {
 				if ($this->echooutput) {
@@ -121,6 +122,7 @@ Class NZBcontents
 				}
 				$this->db->exec(sprintf('UPDATE releases SET nfostatus = 0 WHERE ID = %d', $relID));
 			}
+			$fetchedBinary = false;
 		} else {
 			if ($this->echooutput) {
 				echo '-';
