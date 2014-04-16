@@ -33,13 +33,12 @@ class nameCleaning
 		$match = $matches = array();
 		$this->groupName = $groupName;
 		$this->subject = $subject;
-		$functions = new Functions();
 
 		// Get pre style name from releases.name
 		if (preg_match_all('/([\w\(\)]+[\s\._-]([\w\(\)]+[\s\._-])+[\w\(\)]+-\w+)/', $this->subject, $matches)) {
 			foreach ($matches as $match) {
 				foreach ($match as $val) {
-					$title = $this->db->queryOneRow("SELECT title, ID from prehash WHERE title = " . $db->escapeString(trim($val)));
+					$title = $this->db->queryOneRow("SELECT title, ID from prehash WHERE title = " . $this->db->escapeString(trim($val)));
 					if ($title !== false) {
 						return array(
 							"cleansubject"  => $title['title'],
@@ -51,25 +50,23 @@ class nameCleaning
 				}
 			}
 		}
-
-        // Get pre style name from requestid
-		if (preg_match('/^\[(\d+)\]/', $this->subject, $match){
+		// Get pre style name from requestID
+		if (preg_match('/^\[ ?(\d+) ?\]/', $this->subject, $match)) {
 			$title = $this->db->queryOneRow(
 				sprintf(
 					'SELECT p.title , p.ID from prehash p INNER JOIN groups g on g.ID = p.groupID
 								WHERE p.requestID = %d and g.name = %d ', $match[1], $this->groupName
 				)
 			);
-		if ($title !== false) {
-			return array(
-				"cleansubject"  => $title['title'],
-				"properlynamed" => true,
-				"increment"     => false,
-				"predb"         => $title['ID']
-			);
+			if ($title !== false) {
+				return array(
+					"cleansubject"  => $title['title'],
+					"properlynamed" => true,
+					"increment"     => false,
+					"predb"         => $title['ID']
+				);
+			}
 		}
-	}
-
 		if ($usepre === true) {
 			return false;
 		}
