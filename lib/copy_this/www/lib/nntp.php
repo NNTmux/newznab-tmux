@@ -1371,23 +1371,61 @@ class NNTP extends Net_NNTP_Client
     }
 
 	/**
-	 * Decode a yenc encoded string.
+	 * yDecodes an encoded string and either writes the result to a file or returns it as a string.
+	 *
+	 * @param string $string yEncoded string to decode.
+	 *
+	 * @return mixed On success: (string) The decoded string.
+	 *               On failure: (object) PEAR_Error.
 	 */
-	function decodeYenc($yencodedvar)
+	public function decodeYEnc($string)
 	{
-		$input = array();
-		preg_match("/^(=ybegin.*=yend[^$]*)$/ims", $yencodedvar, $input);
-		if (isset($input[1])) {
-			$ret = "";
-			$input = trim(preg_replace("/\r\n/im", "", preg_replace("/(^=yend.*)/im", "", preg_replace("/(^=ypart.*\\r\\n)/im", "", preg_replace("/(^=ybegin.*\\r\\n)/im", "", $input[1], 1), 1), 1)));
+		$encoded = $crc = '';
+		// Extract the yEnc string itself.
+		if (preg_match("/=ybegin.*size=([^ $]+).*\\r\\n(.*)\\r\\n=yend.*size=([^ $\\r\\n]+)(.*)/ims", $string, $encoded)) {
+			if (preg_match('/crc32=([^ $\\r\\n]+)/ims', $encoded[4], $trailer)) {
+				$crc = trim($trailer[1]);
+			}
+			$headerSize = $encoded[1];
+			$trailerSize = $encoded[3];
+			$encoded = $encoded[2];
 
-			for ($chr = 0; $chr < strlen($input); $chr++)
-				$ret .= ($input[$chr] != "=" ? chr(ord($input[$chr]) - 42) : chr((ord($input[++$chr]) - 64) - 42));
-
-			return $ret;
+		} else {
+			return false;
 		}
 
-		return false;
+		// Remove line breaks from the string.
+		$encoded = trim(str_replace("\r\n", '', $encoded));
+
+		// Make sure the header and trailer file sizes match up.
+		if ($headerSize != $trailerSize) {
+			$message = 'Header and trailer file sizes do not match. This is a violation of the yEnc specification.';
+
+			return $this->throwError($message);
+		}
+
+		// Decode.
+		$decoded = '';
+		$encodedLength = strlen($encoded);
+		for ($chr = 0; $chr < $encodedLength; $chr++) {
+			$decoded .= ($encoded[$chr] !== '=' ? chr(ord($encoded[$chr]) - 42) : chr((ord($encoded[++$chr]) - 64) - 42));
+		}
+
+		// Make sure the decoded file size is the same as the size specified in the header.
+		if (strlen($decoded) != $headerSize) {
+			$message = 'Header file size and actual file size do not match. The file is probably corrupt.';
+
+			return $this->throwError($message);
+		}
+
+		// Check the CRC value
+		if ($crc !== '' && (strtolower($crc) !== strtolower(sprintf("%04X", crc32($decoded))))) {
+			$message = 'CRC32 checksums do not match. The file is probably corrupt.';
+
+			return $this->throwError($message);
+		}
+
+		return $decoded;
 	}
 
    	/**
@@ -1460,6 +1498,13 @@ class NNTP extends Net_NNTP_Client
 	 * Based on code from http://wonko.com/software/yenc/, but
 	 * simplified because XZVER and the likes don't implement
 	 * yenc properly
+	 */
+	/**
+	 * @param        $string
+	 * @param string $destination
+	 *
+	 * @return string
+	 * @throws Exception
 	 */
 	private function yencDecode($string, $destination = "") {
 		$encoded = array();
