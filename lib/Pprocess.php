@@ -657,7 +657,7 @@ class PProcess
 		$this->processSample = empty($this->site->ffmpegpath) ? false : true;
 		$this->processVideo = ($this->tmux->processvideos === '0') ? false : true;
 		$this->processMediaInfo = $this->processAudioInfo = empty($this->site->mediainfopath) ? false : true;
-		$this->processAudioSample = ($this->site->processaudiosample == '0') ? false : true;
+		$this->processAudioSample = ($this->site->saveaudiopreview == '0') ? false : true;
 		$this->processJPGSample = ($this->tmux->processjpg === '0') ? false : true;
 		$this->processPasswords = ((($this->site->checkpasswordedrar === '0') ? false : true) && (empty($this->site->unrarpath) ? false : true));
 		//\\
@@ -736,7 +736,8 @@ class PProcess
 							r.nfostatus, r.completion, r.categoryID, r.searchname
 						FROM releases r
 						LEFT JOIN category c ON c.ID = r.categoryID
-						WHERE r.size < %d
+						WHERE nzbstatus = 1
+						AND r.size < %d
 						%s
 						AND r.passwordstatus = %d
 						AND (r.haspreview = -1 AND c.disablepreview = 0)
