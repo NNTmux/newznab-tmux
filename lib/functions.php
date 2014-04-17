@@ -35,34 +35,6 @@ require_once("Info.php");
 class Functions
 
 {
-	/**
-	 * Initiate objects used in processAdditional.
-	 *
-	 * @return void
-	 */
-	protected function initAdditional()
-	{
-		// Check if the objects are already initiated.
-		if ($this->additionalInitiated) {
-			return;
-		}
-
-		/**
-		 * How many additional to process per run.
-		 *
-		 * @var int
-		 */
-		private
-		$addqty;
-
-		/**
-		 * Have we initiated the objects used for processAdditional?
-		 *
-		 * @var bool
-		 */
-		private
-		$additionalInitiated;
-
 		function __construct($echooutput = true)
 		{
 			$s = new Sites();
