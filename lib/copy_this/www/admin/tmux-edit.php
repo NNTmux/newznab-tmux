@@ -47,7 +47,7 @@ $page->smarty->assign('post_ids', array(0,1,2,3));
 $page->smarty->assign('post_names', array('Disabled', 'PostProcess Additional', 'PostProcess NFOs', 'All'));
 $page->smarty->assign('fix_crap_radio_ids', array('Disabled', 'All', 'Custom'));
 $page->smarty->assign('fix_crap_radio_names', array('Disabled', 'All', 'Custom'));
-$page->smarty->assign('fix_crap_check_ids', array('blacklist', 'executable', 'gibberish', 'hashed', 'installbin', 'passworded', 'passwordurl', 'sample', 'scr', 'short', 'size', 'codec'));
+$page->smarty->assign('fix_crap_check_ids', array('blacklist', 'executable', 'gibberish', 'hashed', 'installbin', 'passworded', 'passwordurl', 'sample', 'scr', 'short', 'size', 'wmv'));
 $page->smarty->assign('fix_crap_check_names', array('blacklist', 'executable', 'gibberish', 'hashed', 'installbin', 'passworded', 'passwordurl', 'sample', 'scr', 'short', 'size', 'wmv'));
 $page->smarty->assign('sequential_ids', array(0,1));
 $page->smarty->assign('sequential_names', array('Disabled', 'Sequential'));
