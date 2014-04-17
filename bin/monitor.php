@@ -9,7 +9,7 @@ require_once(dirname(__FILE__)."/../lib/showsleep.php");
 require_once(dirname(__FILE__)."/../lib/functions.php");
 
 
-$version = "0.3r1101";
+$version = "0.3r1102";
 
 $db = new DB();
 $functions = new Functions();
@@ -1726,7 +1726,7 @@ if ($running == 1){
 					if ($fcmax > 0) {
 
 						// If this is the first run, do a full run, else run on last 2 hours of releases.
-						$fctime = '2';
+						$fctime = '4';
 						if ((($i == 1) || $fcfirstrun)) {
 							$fctime = 'full';
 						}
