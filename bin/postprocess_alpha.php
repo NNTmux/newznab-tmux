@@ -38,12 +38,12 @@ if (isset($pieces[6])) {
 		exit($c->error("Unable to connect to usenet."));
 	}
 
-	$$postprocess->processNfos($argv[1], $nntp);
+	$postprocess->processNfos($argv[1], $nntp);
 	$nntp->doQuit();
 
 } else if (isset($pieces[2])) {
-	$$postprocess->processMovies($argv[1]);
+	$postprocess->processMovies($argv[1]);
 	echo '.';
 } else if (isset($pieces[1])) {
-	$$postprocess->processTv($argv[1]);
+	$postprocess->processTv($argv[1]);
 }

@@ -666,8 +666,7 @@ class PProcess
 		$this->jpgSavePath = WWW_DIR . 'covers/sample/';
 		$this->imgSavePath = WWW_DIR . 'covers/console/';
 		$this->vidSavePath = WWW_DIR . 'covers/video/';
-		$this->
-			$this->mainTmpPath = $this->site->tmpunrarpath;
+		$this->mainTmpPath = $this->site->tmpunrarpath;
 		$this->tmpPath = $this->mainTmpPath;
 		//\\
 
