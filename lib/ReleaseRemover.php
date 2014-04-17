@@ -710,12 +710,23 @@ class ReleaseRemover
 	protected function removeWMV()
 	{
 		$this->method = 'WMV';
+		/** @var $categories TYPE_NAME */
+		$categories = sprintf("r.categoryID IN (%d, %d, %d, %d, %d, %d) AND",
+			Category::CAT_MOVIE_3D,
+			Category::CAT_MOVIE_BLURAY,
+			Category::CAT_MOVIE_FOREIGN,
+			Category::CAT_MOVIE_HD,
+			Category::CAT_MOVIE_OTHER,
+			Category::CAT_MOVIE_SD
+		);
+		/** @var $regex TYPE_NAME */
 		$regex = sprintf("rf.name %s 'x264.*\.wmv$'", $this->regexp);
+		/** @var $this TYPE_NAME */
 		$this->query = sprintf(
-			"SELECT DISTINCT r.ID, r.searchname FROM releasefiles
+			'SELECT DISTINCT r.ID, r.guid, r.searchname FROM releasefiles
 			rf INNER JOIN releases r ON (rf.releaseID = r.ID)
-			WHERE %s",
-			$regex
+			WHERE %s %s',
+			$categories, $regex
 		);
 
 		if ($this->checkSelectQuery() === false) {
