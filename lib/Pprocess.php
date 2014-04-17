@@ -855,7 +855,7 @@ class PProcess
 				ob_end_clean();
 
 				// Get a list of files in the nzb.
-				$nzbFiles = $nzb->nzbFileList($nzbFile);
+				$nzbFiles = $this->functions->nzbFileList($nzbFile);
 				if (count($nzbFiles) === 0) {
 					// There does not appear to be any files in the nzb, decrement password status.
 					$this->c->debug('processAdditional', 'NZB file is empty: ' . $rel['guid']);
