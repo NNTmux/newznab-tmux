@@ -132,7 +132,7 @@ class ReleaseRemover
 		$this->color = new ColorCLI();
 		$this->consoleTools = new ConsoleTools();
 		$this->releases = new Releases();
-        $this->functions = new Functions();
+		$this->functions = new Functions();
 
 		$this->mysql = (DB_TYPE === 'mysql' ? true : false);
 		$this->like = ($this->mysql ? 'LIKE' : 'ILIKE');
@@ -199,13 +199,13 @@ class ReleaseRemover
 
 		return ($this->browser
 			?
-				'Success! ' .
-				($this->delete ? "Deleted " : "Would have deleted ") .
-				$this->deletedCount .
-				' release(s) in ' .
-				$this->consoleTools->convertTime(TIME() - $this->timeStart)
+			'Success! ' .
+			($this->delete ? "Deleted " : "Would have deleted ") .
+			$this->deletedCount .
+			' release(s) in ' .
+			$this->consoleTools->convertTime(TIME() - $this->timeStart)
 			:
-				true
+			true
 		);
 	}
 
@@ -237,7 +237,7 @@ class ReleaseRemover
 					$this->error = 'Error, time must be a number or full.';
 					return $this->returnError();
 				}
-                if ($this->echoCLI) {
+				if ($this->echoCLI) {
 					echo $this->color->header('Removing crap releases from the past ' . $time . " hour(s).");
 				}
 				$this->crapTime =
@@ -283,9 +283,9 @@ class ReleaseRemover
 			case 'size':
 				$this->removeSize();
 				break;
-            case 'codec':
-                $this->removeCodecPoster();
-                break;
+			case 'wmv':
+				$this->removeWMV();
+				break;
 			case '':
 				$this->removeBlacklist();
 				$this->removeExecutable();
@@ -297,7 +297,7 @@ class ReleaseRemover
 				$this->removeSCR();
 				$this->removeShort();
 				$this->removeSize();
-                $this->removeCodecPoster();
+				$this->removeWMV();
 				break;
 			default:
 				$this->error = 'Wrong type: ' .$type;
@@ -702,33 +702,20 @@ class ReleaseRemover
 		return true;
 	}
 
-    /**
-	 * Remove releases that contain .wmv files and Codec\Setup.exe files, aka that spam poster.
-	 * Thanks to dizant from nZEDb forums for parts of the sql query
+	/**
+	 * Remove releases that contain .wmv file, aka that spam poster.
+	 * Thanks to dizant from nZEDb forums for the sql query
 	 * @return bool
 	 */
-	protected function removeCodecPoster()
+	protected function removeWMV()
 	{
-		$this->method = 'Codec Poster';
+		$this->method = 'WMV';
 		$regex = sprintf("rf.name %s 'x264.*\.wmv$'", $this->regexp);
-		$codec = '%\\Codec%Setup.exe%';
-		$iferror = '%If_you_get_error.txt%';
-		$categories = sprintf("r.categoryID IN (%d, %d, %d, %d, %d, %d) AND",
-			Category::CAT_MOVIE_3D,
-			Category::CAT_MOVIE_BLURAY,
-			Category::CAT_MOVIE_FOREIGN,
-			Category::CAT_MOVIE_HD,
-			Category::CAT_MOVIE_OTHER,
-			Category::CAT_MOVIE_SD
-			);
-		$codeclike = sprintf("UNION SELECT r.ID, r.guid, r.searchname FROM releases r
-			LEFT JOIN releasefiles rf ON r.ID = rf.releaseID
-			WHERE %s rf.name %s '%s' OR rf.name %s '%s'", $categories, $this->like, $codec, $this->like, $iferror
-			);
 		$this->query = sprintf(
-			"SELECT r.ID, r.guid, r.searchname FROM releases
-			r INNER JOIN releasefiles rf ON (rf.releaseID = r.ID)
-			WHERE %s %s %s %s %s", $categories, $regex, $this->crapTime, $codeclike, $this->crapTime
+			"SELECT DISTINCT r.ID, r.searchname FROM releasefiles
+			rf INNER JOIN releases r ON (rf.releaseID = r.ID)
+			WHERE %s",
+			$regex
 		);
 
 		if ($this->checkSelectQuery() === false) {
