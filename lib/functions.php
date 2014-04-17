@@ -59,7 +59,6 @@ class Functions
 			$this->pubkey = $this->site->amazonpubkey;
 			$this->privkey = $this->site->amazonprivkey;
 			$this->asstag = $this->site->amazonassociatetag;
-			$this->addqty = (!empty($this->tmux->maxaddprocessed)) ? (int)$this->site->maxaddprocessed : 25;
 			$this->gameqty = (!empty($this->tmux->maxgamesprocessed)) ? $this->tmux->maxgamesprocessed : 150;
 			$this->sleeptime = (!empty($this->tmux->amazonsleep)) ? $this->tmux->amazonsleep : 1000;
 			$this->DEBUG_ECHO = ($this->tmux->debuginfo == '0') ? false : true;
@@ -80,7 +79,7 @@ class Functions
 			$this->nfo = new Info();
 
 			//\\ Paths.
-			$this->audSavePath = www . DIR . 'covers/audiosample/';
+			$this->audSavePath = WWW_DIR . 'covers/audiosample/';
 			$this->imgSavePath = WWW_DIR . 'covers/console/';
 			$this->jpgSavePath = WWW_DIR . 'covers/sample/';
 			$this->mainTmpPath = $this->site->tmpunrarpath;
