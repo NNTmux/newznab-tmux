@@ -813,7 +813,7 @@ class PProcess
 				$this->c->debug('processAdditional', 'Processing ' . $rel['searchname']);
 
 				// Per release defaults.
-				$this->tmpPath = $this->mainTmpPath . $rel['guid'] .;
+				$this->tmpPath = $this->mainTmpPath . $rel['guid'];
 				if (!is_dir($this->tmpPath)) {
 					$old = umask(0777);
 					@mkdir($this->tmpPath, 0777, true);
@@ -1828,7 +1828,6 @@ class PProcess
 
 			if ($rar->error) {
 				$this->c->debug('processReleaseFiles', "Error: {$rar->error}.");
-
 				return false;
 			}
 
@@ -1839,7 +1838,6 @@ class PProcess
 			if (isset($tmp['is_encrypted']) && $tmp['is_encrypted'] != 0) {
 				$this->c->debug('processReleaseFiles', 'Archive is password encrypted.');
 				$this->password = true;
-
 				return false;
 			}
 
@@ -1894,10 +1892,12 @@ class PProcess
 
 						if (!isset($file['next_offset'])) {
 							$file['next_offset'] = 0;
+						}
 						$range = mt_rand(0, 99999);
 							if (isset($file['range'])) {
 								$range = $file['range'];
-								$retVal[] = array('name' => $file['name'], 'source' => $file['source'], 'range' => $range, 'size' => $file['size'], 'date' => $file['date'], 'pass' => $file['pass'], 'next_offset' => $file['next_offset']);
+						}
+						$retVal[] = array('name' => $file['name'], 'source' => $file['source'], 'range' => $range, 'size' => $file['size'], 'date' => $file['date'], 'pass' => $file['pass'], 'next_offset' => $file['next_offset']);
 						$this->adj = $file['next_offset'] + $this->adj;
 					}
 				}
@@ -1944,7 +1944,8 @@ class PProcess
 					}
 				}
 			}
-		} else {
+		}
+		 else {
 			// Not a rar file, try it as a ZIP file.
 			$files = $this->processReleaseZips($fetchedBinary, false, false, $release, $nntp);
 			if ($files !== false && isset($files[0]['name'])) {
@@ -2000,7 +2001,6 @@ class PProcess
 			$retVal = false;
 		}
 		unset($fetchedBinary, $rar, $nfo);
-
 		return $retVal;
 	}
 
@@ -2011,6 +2011,7 @@ class PProcess
 	 * @param array  $release Row from DB with release info.
 	 *
 	 * @return bool
+	 * @access protected
 	 */
 	protected function siftPAR2($PAR2, $release)
 	{
@@ -2032,6 +2033,7 @@ class PProcess
 	 * @param $releaseID
 	 *
 	 * @return bool
+	 * @access protected
 	 */
 	protected function getMediaInfo($releaseID)
 	{
@@ -2147,7 +2149,7 @@ class PProcess
 					if ($retVal === false) {
 
 						//  Get the media info for the file.
-						$xmlArray = $this - functions->runCmd('"' . $this->site->mediainfopath . '" --Output=XML "' . $audioFile . '"');
+						$xmlArray = $this -> functions->runCmd('"' . $this->site->mediainfopath . '" --Output=XML "' . $audioFile . '"');
 						if (is_array($xmlArray)) {
 
 							// Convert to array.
