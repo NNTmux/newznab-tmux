@@ -3784,6 +3784,32 @@ class Functions
 			return $output;
 		}
 
+		// Convert obj to array.
+		function objectsIntoArray($arrObjData, $arrSkipIndices = array())
+		{
+			$arrData = array();
+
+			// If input is object, convert into array.
+			if (is_object($arrObjData)) {
+				$arrObjData = get_object_vars($arrObjData);
+			}
+
+			if (is_array($arrObjData)) {
+				foreach ($arrObjData as $index => $value) {
+					// Recursive call.
+					if (is_object($value) || is_array($value)) {
+						$value = objectsIntoArray($value, $arrSkipIndices);
+					}
+					if (in_array($index, $arrSkipIndices)) {
+						continue;
+					}
+					$arrData[$index] = $value;
+				}
+			}
+
+			return $arrData;
+		}
+
 		/**
 		 * Convert bytes to kb/mb/gb/tb and return in human readable format.
 		 *

@@ -37,6 +37,7 @@ class PProcess
 	 * @TODO: Remove ffmpeg_image_time from DB..
 	 */
 
+	const BAD_FILE = 10; // Possibly broken RAR/ZIP.
 	/**
 	 * @var ColorCLI
 	 */
@@ -617,6 +618,20 @@ class PProcess
 	protected $processPasswords;
 
 	/**
+	 * @var ReleaseExtra
+	 * @access protected
+	 */
+	protected $releaseExtra;
+
+	/**
+	 * @var bool
+	 * @access protected
+	 */
+	protected $newfiles;
+
+	/**
+
+	/**
 	 * Initiate objects used in processAdditional.
 	 *
 	 * @return void
@@ -864,7 +879,7 @@ class PProcess
 				$passStatus = array(Releases::PASSWD_NONE);
 				$sampleMsgID = $jpgMsgID = $audioType = $mID = array();
 				$mediaMsgID = $audioMsgID = '';
-				$hasRar = $ignoredBooks = $failed = $this->filesAdded = 0;
+				$hasRar = $ignoredBooks = $failed = $this->filesAdded = $notInfinite = 0;
 				$this->password = $this->noNFO = $bookFlood = false;
 				$groupName = $this->functions->getByNameByID($rel['groupID']);
 
@@ -899,19 +914,16 @@ class PProcess
 					) {
 
 						if (isset($nzbContents['segments'])) {
-							$sampleMsgID[] = (string)$nzbContents['segments'][0];
+
 
 							// Get the amount of segments for this file.
 							$segCount = count($nzbContents['segments']);
-							if ($segCount > 1) {
-
-								// If it's more than 1 try to get up to the site specified value of segments.
-								for ($i = 1; $i < $this->segmentsToDownload; $i++) {
-									if ($segCount > $i) {
-										$sampleMsgID[] = (string)$nzbContents['segments'][$i];
-									} else {
-										break;
-									}
+							// If it's more than 1 try to get up to the site specified value of segments.
+							for ($i = 0; $i < $this->segmentsToDownload; $i++) {
+								if ($segCount > $i) {
+									$sampleMsgID[] = (string)$nzbContents['segments'][$i];
+								} else {
+									break;
 								}
 							}
 						}
@@ -1026,7 +1038,7 @@ class PProcess
 							if ($this->sum > $this->size || $this->adj === 0) {
 
 								// Get message-id's for the rar file.
-								$mID = array_slice((array)$rarFile['segments'], 0, $this->segmentsToDownload);
+								$mID = array_slice((array)$rarFile['segments'], 0, $this->partsQTY);
 
 								// Download the article(s) from usenet.
 								$fetchedBinary = $nntp->getMessages($groupName, $mID);
@@ -1395,7 +1407,7 @@ class PProcess
 
 				if ($failed > 0) {
 					if ($failed / count($nzbFiles) > 0.7 || $notInfinite > $this->passChkAttempts || $notInfinite > $this->partsQTY) {
-						$passStatus[] = Releases::BAD_FILE;
+						$passStatus[] = self::BAD_FILE;
 					}
 				}
 
@@ -1549,7 +1561,7 @@ class PProcess
 	 *
 	 * @param      $v
 	 * @param      $release
-	 * @param bool $rar
+	 * @param bool |ArchiveInfo $rar
 	 * @param      $nntp
 	 *
 	 * @return void
@@ -1650,6 +1662,7 @@ class PProcess
 			if ($this->echooutput) {
 				echo 'z';
 			}
+			$limit = 0;
 			foreach ($files as $file) {
 				$thisData = $zip->getFileData($file['name']);
 				$dataArray[] = array('zip' => $file, 'data' => $thisData);
@@ -1660,13 +1673,12 @@ class PProcess
 					$tmpFiles = $this->getRar($thisData);
 					if ($tmpFiles !== false) {
 
-						$limit = 0;
 						foreach ($tmpFiles as $f) {
 
 							if ($limit++ > 11) {
 								break;
 							}
-							$this->addFile($f, $release, $rar = false, $nntp);
+							$this->addFile($f, $release, false, $nntp);
 							$files[] = $f;
 						}
 					}
@@ -1877,38 +1889,30 @@ class PProcess
 						}
 
 						if (preg_match('/\.zip$/i', $file['name'])) {
-							$zipData = $rar->getFileData($file['name'], $file['source']);
-							$data = $this->processReleaseZips($zipData, false, true, $release, $nntp);
-
-							if ($data != false) {
-								foreach ($data as $d) {
-									if (preg_match('/\.(part\d+|r\d+|rar)(\.rar)?$/i', $d['zip']['name'])) {
-										$tmpFiles = $this->getRar($d['data']);
-									}
-								}
-							}
+							$this->processReleaseZips($rar->getFileData($file['name'], $file['source']), false, true, $release, $nntp);
 						}
 
-						if (!isset($file['next_offset']))
+						if (!isset($file['next_offset'])) {
 							$file['next_offset'] = 0;
 						$range = mt_rand(0, 99999);
-						if (isset($file['range']))
-							$range = $file['range'];
-						$retVal[] = array('name' => $file['name'], 'source' => $file['source'], 'range' => $range, 'size' => $file['size'], 'date' => $file['date'], 'pass' => $file['pass'], 'next_offset' => $file['next_offset']);
+							if (isset($file['range'])) {
+								$range = $file['range'];
+								$retVal[] = array('name' => $file['name'], 'source' => $file['source'], 'range' => $range, 'size' => $file['size'], 'date' => $file['date'], 'pass' => $file['pass'], 'next_offset' => $file['next_offset']);
 						$this->adj = $file['next_offset'] + $this->adj;
 					}
 				}
 
 				$this->sum = $this->adj;
-				if ($this->segsize !== 0)
-					$this->adj = $this->adj / $this->segsize;
-				else
-					$this->adj = 0;
-
-				if ($this->adj < .7)
-					$this->adj = 1;
-			} else {
-				$this->size = $files[0]['size'] * 0.95;
+						if ($this->segsize !== 0) {
+							$this->adj = $this->adj / $this->segsize;
+						} else {
+							$this->adj = 0;
+						}
+						if ($this->adj < .7) {
+							$this->adj = 1;
+						}
+					} else {
+						$this->size = $files[0]['size'] * 0.95;
 				if ($this->name != $files[0]['name']) {
 					$this->name = $files[0]['name'];
 					$this->sum = $this->segsize;
@@ -2286,7 +2290,7 @@ class PProcess
 	 *
 	 * @note Only called by processAdditional
 	 *
-	 * @param $releaseGUID
+	 * @param string $releaseGUID
 	 *
 	 * @return bool
 	 */

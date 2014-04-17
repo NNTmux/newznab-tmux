@@ -16,7 +16,7 @@ require_once("Info.php");
 Class NZBcontents
 {
 	/**
-	 * @var nzedb\db\DB
+	 * @var db
 	 */
 	protected $db;
 
@@ -149,7 +149,7 @@ Class NZBcontents
 		$nzbfile = $this->LoadNZB($guid);
 		if ($nzbfile !== false) {
 			foreach ($nzbfile->file as $nzbcontents) {
-				if (preg_match('/\.(par[2" ]|\d{2,3}").+\(1\/1\)$/i', $nzbcontents->attributes()->subject)) {
+				if (preg_match('/\.(par[2" ]|\d{2,3}").+\(1\/1\)$/i', (string)$nzbcontents->attributes()->subject)) {
 					if ($this->functions->parsePAR2($nzbcontents->segments->segment, $relID, $groupID, $this->nntp, $show) === true && $namseStatus === 1) {
 						$this->db->exec(sprintf('UPDATE releases SET proc_par2 = 1 WHERE ID = %d', $relID));
 						return true;
@@ -179,7 +179,7 @@ Class NZBcontents
 		if ($nzbFile !== false) {
 			$messageID = $hiddenID = '';
 			$actualParts = $artificialParts = 0;
-			$foundPAR2 = false;
+			$foundPAR2 = ($this->lookuppar2 === false ? true : false);
 			$foundNFO = $hiddenNFO = ($nfoCheck === false ? true : false);
 
 			foreach ($nzbFile->file as $nzbcontents) {
@@ -189,7 +189,7 @@ Class NZBcontents
 
 				$subject = $nzbcontents->attributes()->subject;
 				if (preg_match('/(\d+)\)$/', $subject, $parts)) {
-					$artificialParts = $artificialParts + $parts[1];
+					$artificialParts += $parts[1];
 				}
 
 				if ($foundNFO === false) {
