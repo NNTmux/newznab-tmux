@@ -130,6 +130,7 @@ class PProcess
 		$this->nameFixer = new Namefixer($this->echooutput);
 		$this->Nfo = new Info($this->echooutput);
 		$this->releaseFiles = new ReleaseFiles();
+		$this->functions = new Functions(true);
 		$s = new sites();
 		$t = new Tmux();
 		//\\
