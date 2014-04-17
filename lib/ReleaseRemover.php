@@ -242,7 +242,7 @@ class ReleaseRemover
 				}
 				$this->crapTime =
 					' AND r.adddate > (NOW() - INTERVAL ' .
-					($this->mysql ? $this->db->escapeString($time . ' HOURS') : $time . ' HOUR)') .
+					($this->mysql ? $time . ' HOUR)' : $this->db->escapeString($time . ' HOURS')) .
 					' ORDER BY r.ID ASC';
 				break;
 		}
