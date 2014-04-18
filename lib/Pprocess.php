@@ -784,12 +784,12 @@ class PProcess
 			$totResults = 1;
 		}
 
-		$resCount = $startCount = $totResults;
-		if ($resCount > 0) {
+		$startCount = $totResults;
+		if ($totResults > 0) {
 			// Start up the required objects.
 			$this->initAdditional();
 
-			if ($this->echooutput && $resCount > 1) {
+			if ($this->echooutput && $totResults > 1) {
 				$this->doEcho('Additional post-processing, started at: ' . date('D M d, Y G:i a'));
 				$this->doEcho('Downloaded: (xB) = yEnc article, f= failed ;Processing: z = zip file, r = rar file');
 				$this->doEcho('Added: s = sample image, j = jpeg image, A = audio sample, a = audio mediainfo, v = video sample');
@@ -892,13 +892,13 @@ class PProcess
 				foreach ($nzbFiles as $nzbContents) {
 
 					// Check if it's not a nfo, nzb, par2 etc...
-					if (preg_match($this->supportFiles . "|nfo\b|inf\b|ofn\b)($|[ \")\]-])(?!.{20,})/i", $nzbContents['title'])) {
+				   if (preg_match($this->supportFiles . '|nfo\b|inf\b|ofn\b)($|[ ")\]-])(?!.{20,})/i', $nzbContents['title'])) {
 						continue;
 					}
 
 					// Check if it's a rar/zip.
-					if (preg_match("
-						/\.(part0*1|part0+|r0+|r0*1|rar|0+|0*10?|zip)(\.rar)*($|[ \")\]-])|\"[a-f0-9]{32}\.[1-9]\d{1,2}\".*\(\d+\/\d{2,}\)$/i",
+										if (preg_match('
+						/\.(part0*1|part0+|r0+|r0*1|rar|0+|0*10?|zip)(\.rar)*($|[ ")\]-])|"[a-f0-9]{32}\.[1-9]\d{1,2}".*\(\d+\/\d{2,}\)$/i',
 						$nzbContents['title']
 					)
 					) {
@@ -909,10 +909,8 @@ class PProcess
 					// Look for a video sample, make sure it's not an image.
 					if ($this->processSample === true &&
 						empty($sampleMsgID) &&
-						!preg_match('/\.jpe?g/i', $nzbContents['title']) &&
-						preg_match('/sample/i', $nzbContents['title'])
-					) {
-
+						preg_match('/sample/i', $nzbContents['title']) &&
+						!preg_match('/\.jpe?g/i', $nzbContents['title'])) {
 						if (isset($nzbContents['segments'])) {
 
 
@@ -925,6 +923,22 @@ class PProcess
 								} else {
 									break;
 								}
+							}
+						}
+					}
+					// Look for a JPG picture, make sure it's not a CD cover.
+					if ($this->processJPGSample === true &&
+						empty($jpgMsgID) &&
+						!preg_match('/flac|lossless|mp3|music|inner-sanctum|sound/i', $groupName) &&
+						preg_match('/\.jpe?g[. ")\]]/i', $nzbContents['title'])
+					) {
+
+						if (isset($nzbContents['segments'])) {
+
+							$jpgMsgID[] = (string)$nzbContents['segments'][0];
+							// If there's more than 1 part, get 2.
+							if (count($nzbContents['segments']) > 1) {
+								$jpgMsgID[] = (string)$nzbContents['segments'][1];
 							}
 						}
 					}
@@ -951,23 +965,6 @@ class PProcess
 							// Get the extension.
 							$audioType = $type[1];
 							$audioMsgID = (string)$nzbContents['segments'][0];
-						}
-					}
-
-					// Look for a JPG picture, make sure it's not a CD cover.
-					if ($this->processJPGSample === true &&
-						empty($jpgMsgID) &&
-						!preg_match('/flac|lossless|mp3|music|inner-sanctum|sound/i', $groupName) &&
-						preg_match('/\.jpe?g[. ")\]]/i', $nzbContents['title'])
-					) {
-
-						if (isset($nzbContents['segments'])) {
-
-							$jpgMsgID[] = (string)$nzbContents['segments'][0];
-							// If there's more than 1 part, get 2.
-							if (count($nzbContents['segments']) > 1) {
-								$jpgMsgID[] = (string)$nzbContents['segments'][1];
-							}
 						}
 					}
 
@@ -1002,16 +999,14 @@ class PProcess
 						// Loop through the files, attempt to find if password-ed and files. Starting with what not to process.
 						foreach ($nzbFiles as $rarFile) {
 							if ($this->passChkAttempts > 1) {
-								if ($notInfinite > $this->passChkAttempts) {
-									break;
+															if ($this->passChkAttempts > 1 && $notInfinite > $this->passChkAttempts) {
+								break;
+							} else if ($notInfinite > $this->partsQTY) {
+								if ($this->echooutput) {
+									echo PHP_EOL . $this->c->info("Ran out of tries to download yEnc articles for the RAR files.");
 								}
-							} else {
-								if ($notInfinite > $this->partsQTY) {
-									if ($this->echooutput) {
-										echo "\n";
-										echo $this->c->info("Ran out of tries to download yEnc articles for the RAR files.");
-									}
-									break;
+								break;
+
 								}
 							}
 
@@ -1023,18 +1018,22 @@ class PProcess
 							}
 
 							// Probably not a rar/zip.
-							if (!preg_match("/\.\b(part\d+|part00\.rar|part01\.rar|rar|r00|r01|zipr\d{2,3}|zip|zipx)($|[ \")\]-])|\"[a-f0-9]{32}\.[1-9]\d{1,2}\".*\(\d+\/\d{2,}\)$/i", $rarFile['title'])) {
+							if (!preg_match(
+								'/\.\b(part\d+|part00\.rar|part01\.rar|rar|r00|r01|zipr\d{2,3}|zip|zipx)($|[ ")\]-])|"[a-f0-9]{32}\.[1-9]\d{1,2}".*\(\d+\/\d{2,}\)$/i',
+								$rarFile['title'])) {
+
+
 								continue;
 							}
 
 							// Process rar contents until 1G or 85% of file size is found (smaller of the two).
 							if ($rarFile['size'] === 0 && $rarFile['partsactual'] !== 0 && $rarFile['partstotal'] !== 0) {
-								$this->segsize = $rarFile['size'] / ($rarFile['partsactual'] / $rarFile['partstotal']);
+								$this->segsize = ($rarFile['size'] / ($rarFile['partsactual'] / $rarFile['partstotal']));
 							} else {
 								$this->segsize = 0;
 							}
 
-							$this->sum = $this->sum + $this->adj * $this->segsize;
+							$this->sum = ($this->sum + ($this->adj * $this->segsize));
 							if ($this->sum > $this->size || $this->adj === 0) {
 
 								// Get message-id's for the rar file.
@@ -1103,10 +1102,8 @@ class PProcess
 									$tmpFiles = $archInfo->getArchiveFileList();
 									if (isset($tmpFiles[0]['name'])) {
 										foreach ($tmpFiles as $r) {
-											if (isset($r['range'])) {
-												$range = $r['range'];
-											} else {
-												$range = mt_rand(0, 99999);
+										if (!isset($r['range'])) {
+												$r['range'] = mt_rand(0, 99999);
 											}
 
 											$r['range'] = $range;
@@ -1275,12 +1272,12 @@ class PProcess
 								}
 
 							}
-							unset($sampleBinary);
 						} else {
 							if ($this->echooutput) {
 								echo 'f';
 							}
 						}
+						unset($sampleBinary);
 					}
 				}
 
@@ -1455,12 +1452,14 @@ class PProcess
 		unset($rar, $nzbContents);
 	}
 
-	/**
+   /**
 	 * Convert bytes to kb/mb/gb/tb and return in human readable format.
 	 *
 	 * @param int $bytes
 	 *
 	 * @return string
+	 *
+	 * @access protected
 	 */
 	protected function readableBytesString($bytes)
 	{
@@ -1470,7 +1469,7 @@ class PProcess
 		$tb = $kb * $gb;
 		if ($bytes < $kb) {
 			return $bytes . 'B';
-		} else if ($bytes < ($mb)) {
+		} else if ($bytes < $mb) {
 			return round($bytes / $kb, 1) . 'KB';
 		} else if ($bytes < $gb) {
 			return round($bytes / $mb, 1) . 'MB';
@@ -1565,12 +1564,12 @@ class PProcess
 	 * @param      $nntp
 	 *
 	 * @return void
+	 *
+	 * @access protected
+
 	 */
 	protected function addFile($v, $release, $rar = false, $nntp)
 	{
-		if (!isset($nntp)) {
-			exit($this->c->error("Not connected to usenet(PProcess->addFile).\n"));
-		}
 
 		if (!isset($v['error']) && isset($v['source'])) {
 			if ($rar !== false && preg_match('/\.zip$/', $v['source'])) {

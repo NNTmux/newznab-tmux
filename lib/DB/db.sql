@@ -191,7 +191,7 @@ INSERT INTO tmux (setting, value) values ('defrag_cache','900'),
   ('ffmpeg_duration', '5'),
   ('ffmpeg_image_time', '5'),
   ('processvideos', '0'),
-  ('sqlpatch', '25');
+  ('sqlpatch', '26');
 
 DROP TABLE IF EXISTS country;
 CREATE TABLE country (

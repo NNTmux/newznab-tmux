@@ -807,6 +807,9 @@ class NNTP extends Net_NNTP_Client
 					$this->yEncSilence
 				);
 				$data = file_get_contents($ouFile);
+				if ($data === false) {
+					return $this->throwError('Error getting data from yydecode.');
+				}
 				unlink($inFile);
 				unlink($ouFile);
 			}
