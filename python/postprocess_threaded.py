@@ -132,32 +132,32 @@ process_additional = run_threads * ppperrun
 process_nfo = run_threads * nfoperrun
 
 if sys.argv[1] == "additional":
-	run = "SELECT r.ID, r.guid, r.name, c.disablepreview, r.size, r.groupID, r.nfostatus, r.categoryID from releases r LEFT JOIN category c ON c.ID = r.categoryID WHERE "+maxsize+" AND r.passwordstatus = -1 AND r.haspreview = -1 AND c.disablepreview = 0 "+groupID+" ORDER BY postdate DESC LIMIT %s"
+	run = "SELECT r.ID, r.guid, r.name, c.disablepreview, r.size, r.groupID, r.nfostatus, r.categoryID, r.searchname from releases r LEFT JOIN category c ON c.ID = r.categoryID WHERE "+maxsize+" AND r.passwordstatus = -1 AND r.haspreview = -1 AND c.disablepreview = 0 "+groupID+" ORDER BY postdate DESC LIMIT %s"
 	cur[0].execute(run, process_additional)
 	datas = cur[0].fetchall()
 	maxtries = -1
 	if len(datas) < process_additional:
-		run = "SELECT r.ID, r.guid, r.name, c.disablepreview, r.size, r.groupID, r.nfostatus, r.categoryID from releases r LEFT JOIN category c ON c.ID = r.categoryID WHERE "+maxsize+" AND r.passwordstatus = -2 AND r.haspreview = -1 AND c.disablepreview = 0 "+groupID+" ORDER BY postdate DESC LIMIT %s"
+		run = "SELECT r.ID, r.guid, r.name, c.disablepreview, r.size, r.groupID, r.nfostatus, r.categoryID, r.searchname from releases r LEFT JOIN category c ON c.ID = r.categoryID WHERE "+maxsize+" AND r.passwordstatus = -2 AND r.haspreview = -1 AND c.disablepreview = 0 "+groupID+" ORDER BY postdate DESC LIMIT %s"
 		cur[0].execute(run, (process_additional - len(datas)))
 		datas += cur[0].fetchall()
 		maxtries = -2
 		if len(datas) < process_additional:
-			run = "SELECT r.ID, r.guid, r.name, c.disablepreview, r.size, r.groupID, r.nfostatus, r.categoryID from releases r LEFT JOIN category c ON c.ID = r.categoryID WHERE "+maxsize+" AND r.passwordstatus = -3 AND r.haspreview = -1 AND c.disablepreview = 0 "+groupID+" ORDER BY postdate DESC LIMIT %s"
+			run = "SELECT r.ID, r.guid, r.name, c.disablepreview, r.size, r.groupID, r.nfostatus, r.categoryID, r.searchname from releases r LEFT JOIN category c ON c.ID = r.categoryID WHERE "+maxsize+" AND r.passwordstatus = -3 AND r.haspreview = -1 AND c.disablepreview = 0 "+groupID+" ORDER BY postdate DESC LIMIT %s"
 			cur[0].execute(run, (process_additional - len(datas)))
 			datas += cur[0].fetchall()
 			maxtries = -3
 			if len(datas) < process_additional:
-				run = "SELECT r.ID, r.guid, r.name, c.disablepreview, r.size, r.groupID, r.nfostatus, r.categoryID from releases r LEFT JOIN category c ON c.ID = r.categoryID WHERE "+maxsize+" AND r.passwordstatus = -4 AND r.haspreview = -1 AND c.disablepreview = 0 "+groupID+" ORDER BY postdate DESC LIMIT %s"
+				run = "SELECT r.ID, r.guid, r.name, c.disablepreview, r.size, r.groupID, r.nfostatus, r.categoryID, r.searchname from releases r LEFT JOIN category c ON c.ID = r.categoryID WHERE "+maxsize+" AND r.passwordstatus = -4 AND r.haspreview = -1 AND c.disablepreview = 0 "+groupID+" ORDER BY postdate DESC LIMIT %s"
 				cur[0].execute(run, (process_additional - len(datas)))
 				datas += cur[0].fetchall()
 				maxtries = -4
 				if len(datas) < process_additional:
-					run = "SELECT r.ID, r.guid, r.name, c.disablepreview, r.size, r.groupID, r.nfostatus, r.categoryID from releases r LEFT JOIN category c ON c.ID = r.categoryID WHERE "+maxsize+" AND r.passwordstatus = -5 AND r.haspreview = -1 AND c.disablepreview = 0 "+groupID+" ORDER BY postdate DESC LIMIT %s"
+					run = "SELECT r.ID, r.guid, r.name, c.disablepreview, r.size, r.groupID, r.nfostatus, r.categoryID, r.searchname from releases r LEFT JOIN category c ON c.ID = r.categoryID WHERE "+maxsize+" AND r.passwordstatus = -5 AND r.haspreview = -1 AND c.disablepreview = 0 "+groupID+" ORDER BY postdate DESC LIMIT %s"
 					cur[0].execute(run, (process_additional - len(datas)))
 					datas += cur[0].fetchall()
 					maxtries = -5
 					if len(datas) < process_additional:
-						run = "SELECT r.ID, r.guid, r.name, c.disablepreview, r.size, r.groupID, r.nfostatus, r.categoryID from releases r LEFT JOIN category c ON c.ID = r.categoryID WHERE "+maxsize+" AND r.passwordstatus = -6 AND r.haspreview = -1 AND c.disablepreview = 0 "+groupID+" ORDER BY postdate DESC LIMIT %s"
+						run = "SELECT r.ID, r.guid, r.name, c.disablepreview, r.size, r.groupID, r.nfostatus, r.categoryID, r.searchname from releases r LEFT JOIN category c ON c.ID = r.categoryID WHERE "+maxsize+" AND r.passwordstatus = -6 AND r.haspreview = -1 AND c.disablepreview = 0 "+groupID+" ORDER BY postdate DESC LIMIT %s"
 						cur[0].execute(run, (process_additional - len(datas)))
 						datas += cur[0].fetchall()
 						maxtries = -6
@@ -267,11 +267,11 @@ def main(args):
 			p.setDaemon(False)
 			p.start()
 
-	#now load some arbitrary jobs into the queue
+		#now load some arbitrary jobs into the queue
 	if sys.argv[1] == "additional":
 		for release in datas:
 			time.sleep(.02)
-			my_queue.put(u("%s           =+=            %s           =+=            %s           =+=            %s           =+=            %s           =+=            %s           =+=            %s           =+=            %s") % (release[0], release[1], release[2], release[3], release[4], release[5], release[6], release[7]))
+			my_queue.put(u("%s           =+=            %s           =+=            %s           =+=            %s           =+=            %s           =+=            %s           =+=            %s           =+=            %s           =+=            %s") % (release[0], release[1], release[2], release[3], release[4], release[5], release[6], release[7], release[8]))
 	elif sys.argv[1] == "nfo":
 		for release in datas:
 			time.sleep(.02)
@@ -284,7 +284,7 @@ def main(args):
 		for release in datas:
 			time.sleep(.02)
 			my_queue.put(u("%s           =+=            %s") % (release[0], release[1]))
-
+			
 	my_queue.join()
 
 	if sys.argv[1] == "nfo":

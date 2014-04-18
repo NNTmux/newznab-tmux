@@ -736,8 +736,7 @@ class PProcess
 							r.nfostatus, r.completion, r.categoryID, r.searchname
 						FROM releases r
 						LEFT JOIN category c ON c.ID = r.categoryID
-						WHERE nzbstatus = 1
-						AND r.size < %d
+						WHERE r.size < %d
 						%s
 						AND r.passwordstatus = %d
 						AND (r.haspreview = -1 AND c.disablepreview = 0)
