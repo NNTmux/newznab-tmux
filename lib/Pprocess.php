@@ -15,7 +15,6 @@ require_once(WWW_DIR . "/lib/site.php");
 require_once(WWW_DIR . "/lib/Tmux.php");
 require_once(WWW_DIR . "/lib/amazon.php");
 require_once(WWW_DIR . "/lib/genres.php");
-require_once(WWW_DIR . "/lib/tvrage.php");
 require_once(WWW_DIR . "/lib/anidb.php");
 require_once("consoletools.php");
 require_once("ColorCLI.php");
@@ -26,6 +25,7 @@ require_once("prehash.php");
 require_once("Sharing.php");
 require_once("TraktTv.php");
 require_once("Film.php");
+require_once("TvAnger.php");
 
 /**
  * Class PProcess
@@ -302,7 +302,7 @@ class PProcess
 	public function processTv($releaseToWork = '')
 	{
 		if ($this->site->lookuptvrage === '1') {
-			$tvRage = new TvRage($this->echooutput);
+			$tvRage = new TvAnger($this->echooutput);
 			$tvRage->processTvReleases($releaseToWork, $this->site->lookuptvrage === '1');
 		}
 	}
