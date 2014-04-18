@@ -8,6 +8,7 @@ require_once("functions.php");
 require_once("nzbcontents.php");
 require_once("ColorCLI.php");
 require_once("Info.php");
+require_once("Pprocess.php");
 require_once("consoletools.php");
 
 
@@ -219,7 +220,7 @@ class Namefixer
 			echo $this->c->primary(number_format($total) . " releases to process.");
 			sleep(2);
 		    $db = $this->db;
-			$nzbcontents = new NZBcontents(array('echo' => $this->echooutput, 'nntp' => $nntp, 'nfo' => new Info(), 'db' => $this->db, 'pp' => new Functions(true)));
+			$nzbcontents = new NZBcontents(array('echo' => $this->echooutput, 'nntp' => $nntp, 'nfo' => new Info(), 'db' => $this->db, 'pp' => new PProcess(true)));
 			foreach ($relres as $relrow)
 			{
                 $this->done = $this->matched = false;
