@@ -813,7 +813,7 @@ class PProcess
 				$this->c->debug('processAdditional', 'Processing ' . $rel['searchname']);
 
 				// Per release defaults.
-				$this->tmpPath = $this->mainTmpPath . $rel['guid'];
+				$this->tmpPath = $this->mainTmpPath . $rel['guid'] . '/';
 				if (!is_dir($this->tmpPath)) {
 					$old = umask(0777);
 					@mkdir($this->tmpPath, 0777, true);
