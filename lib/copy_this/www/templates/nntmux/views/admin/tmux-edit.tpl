@@ -104,7 +104,7 @@
             <tr>
                 <td style="width:180px;"><label for="explain">Information:</label></td>
                 <td>
-                    <div class="explanation">I recommend using Sequential, if you are also grabbing nzbs.</div>
+                    <div class="explanation">I do not recommend using sequential, as it is not tested enough.</div>
                 </td>
             </tr>
 
