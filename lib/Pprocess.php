@@ -1105,8 +1105,7 @@ class PProcess
 										if (!isset($r['range'])) {
 												$r['range'] = mt_rand(0, 99999);
 											}
-
-											$r['range'] = $range;
+											
 											if (!isset($r['error'])) {
 
 												if ($rel['categoryID'] !== Category::CAT_MISC_OTHER) {
