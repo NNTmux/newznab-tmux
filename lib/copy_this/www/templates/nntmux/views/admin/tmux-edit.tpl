@@ -799,14 +799,6 @@
 			</tr>
 
 			<tr>
-				<td style="width:180px;"><label for="segmentstodownload">Number of Segments to download for video samples:</label></td>
-				<td>
-					<input class="short" id="segmentstodownload" name="segmentstodownload" type="text" value="{$ftmux->segmentstodownload}" />
-					<div class="hint">The maximum number of segments to download to generate the sample video file. (Default 2)</div>
-				</td>
-			</tr>
-
-			<tr>
 				<td style="width:180px;"><label for="lookuppar2">Lookup PAR2:</label></td>
 				<td>
 					{html_radios id="lookuppar2" name='lookuppar2' values=$yesno_ids output=$yesno_names selected=$ftmux->lookuppar2 separator='<br />'}
@@ -898,6 +890,30 @@
 				<td>
 					{html_radios id="processjpg" name='processjpg' values=$yesno_ids output=$yesno_names selected=$ftmux->processjpg separator='<br />'}
 					<div class="hint">Whether to attempt to retrieve a JPG file while additional post processing, these are usually on XXX releases.<br/></div>
+				</td>
+			</tr>
+
+				<tr>
+				<td style="width:180px;"><label for="processvideos">Process Video Samples:</label></td>
+				<td>
+					{html_radios id="processvideos" name='processvideos' values=$yesno_ids output=$yesno_names selected=$ftmux->processvideos separator='<br />'}
+					<div class="hint">Whether to attempt to process a video sample, these videos are very short 1-3 seconds, 100KB on average, in ogv format. You must have ffmpeg for this.<br/></div>
+				</td>
+			</tr>
+
+			<tr>
+				<td style="width:180px;"><label for="segmentstodownload">Number of Segments to download for video/jpg samples:</label></td>
+				<td>
+					<input class="short" id="segmentstodownload" name="segmentstodownload" type="text" value="{$ftmux->segmentstodownload}" />
+					<div class="hint">The maximum number of segments to download to generate the sample video file or jpg sample image. (Default 2)</div>
+				</td>
+			</tr>
+
+			<tr>
+				<td style="width:180px;"><label for="ffmpeg_duration">Video sample file duration for ffmpeg:</label></td>
+				<td>
+					<input class="short" id="ffmpeg_duration" name="ffmpeg_duration" type="text" value="{$ftmux->ffmpeg_duration}" />
+					<div class="hint">The maximum duration (In Seconds) for ffmpeg to generate the sample for. (Default 5)</div>
 				</td>
 			</tr>
 

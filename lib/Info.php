@@ -3,11 +3,12 @@ require_once(dirname(__FILE__)."/../bin/config.php");
 require_once(WWW_DIR."/lib/framework/db.php");
 require_once(WWW_DIR."/lib/site.php");
 require_once(WWW_DIR."/lib/Tmux.php");
-require_once(WWW_DIR."/lib/tvrage.php");
 require_once(WWW_DIR . "/lib/rarinfo/par2info.php");
 require_once(WWW_DIR . "/lib/rarinfo/sfvinfo.php");
 require_once("ColorCLI.php");
+require_once("Pprocess.php");
 require_once("Film.php");
+require_once("TvAnger.php");
 require_once("getid3/getid3/getid3.php");
 
 /**
@@ -232,7 +233,7 @@ class Info
 						'nntp' => $nntp,
 						'nfo'  => $this,
 						'db'   => $this->db,
-						'pp'   => new Functions(true)
+						'pp'   => new PProcess(true)
 					)
 				);
 				$nzbContents->parseNZB($release['guid'], $release['ID'], $release['groupID']);
@@ -310,9 +311,9 @@ class Info
 			}
 			$groups = new Groups();
 			$functions = new Functions();
-			$nzbContents = new NZBContents(array('echo' => $this->echo, 'nntp' => $nntp, 'nfo' => $this, 'db' => $this->db, 'pp' => new Functions(true)));
+			$nzbContents = new NZBContents(array('echo' => $this->echo, 'nntp' => $nntp, 'nfo' => $this, 'db' => $this->db, 'pp' => new PProcess(true)));
 			$movie = new Film($this->echo);
-			$tvRage = new TvRage($this->echo);
+			$tvRage = new TvAnger($this->echo);
 
 			foreach ($res as $arr) {
 				$fetchedBinary = $nzbContents->getNFOfromNZB($arr['guid'], $arr['ID'], $arr['groupID'], $functions->getByNameByID($arr['groupID']));

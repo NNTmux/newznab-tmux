@@ -7,6 +7,7 @@ require_once(WWW_DIR."/lib/Tmux.php");
 require_once("functions.php");
 require_once("ColorCLI.php");
 require_once("Info.php");
+require_once("Pprocess.php");
 
 /**
  * Gets information contained within the NZB.
@@ -16,7 +17,7 @@ require_once("Info.php");
 Class NZBcontents
 {
 	/**
-	 * @var nzedb\db\DB
+	 * @var db
 	 */
 	protected $db;
 
@@ -31,7 +32,7 @@ Class NZBcontents
 	protected $nfo;
 
 	/**
-	 * @var PostProcess
+	 * @var PProcess
 	 */
 	protected $pp;
 
@@ -64,7 +65,7 @@ Class NZBcontents
 	 *         'nntp'  => NNTP        ; Class NNTP.
 	 *         'nfo'   => Info         ; Class Info.
 	 *         'db'    => DB          ; Class db.
-	 *         'pp'    => PostProcess ; Class PostProcess.
+	 *         'pp'    => PProcess ; Class PProcess.
 	 *     )
 	 */
 	public function __construct($options)
@@ -75,6 +76,7 @@ Class NZBcontents
 		$t = new Tmux();
 		$this->tmux = $t->get();
 		$this->functions = new Functions();
+		$this->pprocess = new PProcess();
 		$this->lookuppar2 = ($this->tmux->lookuppar2 == 1 ? true : false);
 		$this->db   = $options['db'];
 		$this->nntp = $options['nntp'];
@@ -115,7 +117,6 @@ Class NZBcontents
 				if ($this->echooutput) {
 					echo ($messageID['hidden'] === false ? '+' : '*');
 				}
-				$fetchedBinary = true;
 			} else {
 				if ($this->echooutput) {
 					echo '-';
@@ -149,8 +150,8 @@ Class NZBcontents
 		$nzbfile = $this->LoadNZB($guid);
 		if ($nzbfile !== false) {
 			foreach ($nzbfile->file as $nzbcontents) {
-				if (preg_match('/\.(par[2" ]|\d{2,3}").+\(1\/1\)$/i', $nzbcontents->attributes()->subject)) {
-					if ($this->functions->parsePAR2($nzbcontents->segments->segment, $relID, $groupID, $this->nntp, $show) === true && $namseStatus === 1) {
+				if (preg_match('/\.(par[2" ]|\d{2,3}").+\(1\/1\)$/i', (string)$nzbcontents->attributes()->subject)) {
+					if ($this->pprocess->parsePAR2($nzbcontents->segments->segment, $relID, $groupID, $this->nntp, $show) === true && $namseStatus === 1) {
 						$this->db->exec(sprintf('UPDATE releases SET proc_par2 = 1 WHERE ID = %d', $relID));
 						return true;
 					}
@@ -179,7 +180,7 @@ Class NZBcontents
 		if ($nzbFile !== false) {
 			$messageID = $hiddenID = '';
 			$actualParts = $artificialParts = 0;
-			$foundPAR2 = false;
+			$foundPAR2 = ($this->lookuppar2 === false ? true : false);
 			$foundNFO = $hiddenNFO = ($nfoCheck === false ? true : false);
 
 			foreach ($nzbFile->file as $nzbcontents) {
@@ -189,7 +190,7 @@ Class NZBcontents
 
 				$subject = $nzbcontents->attributes()->subject;
 				if (preg_match('/(\d+)\)$/', $subject, $parts)) {
-					$artificialParts = $artificialParts + $parts[1];
+					$artificialParts += $parts[1];
 				}
 
 				if ($foundNFO === false) {
