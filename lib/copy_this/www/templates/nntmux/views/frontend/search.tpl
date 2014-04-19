@@ -125,12 +125,19 @@
 				
 				<div class="resextra">
 					<div class="btns">
+						{if $result.videostatus == 1}
+									<a href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"htmlall"}" title="This release has a video preview." class="model_prev rndbtn" rel="preview">
+										<img src="{$smarty.const.WWW_TOP}/templates/nntmux/images/multimedia/video.png">
+									</a>
+								{/if}
 						{if $result.nfoID > 0}<a href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}" title="View Nfo" class="rndbtn modal_nfo" rel="nfo">Nfo</a>{/if}
 						{if $result.preID > 0 && $userdata.canpre == 1}<span class="preinfo rndbtn" title="{$result.searchname}">Pre'd {$result.ctime|timeago}</span>{/if}
                         {if $result.prehashID > 0}<span class="prehashinfo rndbtn" title="{$result.prehashID}">Prehash</span>{/if}
 						{if $result.movieinfoID > 0}<a href="{$smarty.const.WWW_TOP}/movies?imdb={$result.imdbID}" title="View movie info" class="rndbtn" rel="movie" >Movie</a>{/if}
 						{if $result.haspreview == 1 && $userdata.canpreview == 1}<a href="{$smarty.const.WWW_TOP}/covers/preview/{$result.guid}_thumb.jpg" name="name{$result.guid}" title="View Screenshot" class="modal_prev rndbtn" rel="preview">Preview</a>{/if}
                         {if $result.haspreview == 2 && $userdata.canpreview == 1}<a href="#" name="audio{$result.guid}" title="Listen to {$result.searchname|escape:"htmlall"}" class="audioprev rndbtn" rel="audio">Listen</a><audio id="audprev{$result.guid}" preload="none"><source src="{$smarty.const.WWW_TOP}/covers/audio/{$result.guid}.mp3" type="audio/mpeg"><source src="{$smarty.const.WWW_TOP}/covers/audio/{$result.guid}.ogg" type="audio/ogg"></audio>{/if}
+						{if $result.jpgstatus == 1 && $userdata.canpreview == 1}
+									<a href="{$smarty.const.WWW_TOP}/covers/sample/{$result.guid}_thumb.jpg" name="name{$result.guid}" title="Sample of {$result.searchname|escape:"htmlall"}" class="modal_prev rndbtn" rel="preview">Sample</a>{/if}
 						{if $result.rageID > 0}<a class="rndbtn" href="{$smarty.const.WWW_TOP}/series/{$result.rageID}" title="View all episodes">View Series</a>{/if}
 						{if $result.anidbID > 0}<a class="rndbtn" href="{$smarty.const.WWW_TOP}/anime/{$result.anidbID}" title="View all episodes">View Anime</a>{/if}
 						{if $result.consoleinfoID > 0}<a href="#" name="name{$result.consoleinfoID}" title="View console info" class="modal_console rndbtn" rel="console" >Cover</a>{/if}

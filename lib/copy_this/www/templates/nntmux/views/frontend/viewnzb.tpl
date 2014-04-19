@@ -346,7 +346,12 @@
     {if $release.jpgstatus == 1 && $userdata.canpreview == 1}
 	<tr><th>Sample:</th><td><img class="shadow" width="450" src="{$smarty.const.WWW_TOP}/covers/sample/{$release.guid}_thumb.jpg" alt="{$release.searchname|escape:"htmlall"} screenshot" /></td></tr>
 	{/if}
-
+    {if $release.videostatus == 1 && $userdata.canpreview == 1}
+	<tr><th>Video:</th><td><video width="450" controls><source src="{$smarty.const.WWW_TOP}/covers/video/{$release.guid}.ogv" type="video/ogg">Your browser does not support the video tag.</video></td></tr>
+	{/if}
+	{if $release.audiostatus == 1 && $userdata.canpreview == 1}
+	<tr><th>Audio:</th><td><audio controls><source src="{$smarty.const.WWW_TOP}/covers/audio/{$release.guid}.ogg" type="audio/ogg">Your browser does not support the audio element.</audio></td></tr>
+	{/if}
 	<tr><th>Size:</th><td>{$release.size|fsize_format:"MB"}{if $release.completion > 0}&nbsp;({if $release.completion < 100}<span class="warning">{$release.completion}%</span>{else}{$release.completion}%{/if}){/if}</td></tr>
 	<tr><th>Grabs:</th><td>{$release.grabs} time{if $release.grabs==1}{else}s{/if}</td></tr>
 	<tr><th>Files:</th><td><a title="View file list" href="{$smarty.const.WWW_TOP}/filelist/{$release.guid}">{$release.totalpart} file{if $release.totalpart==1}{else}s{/if}</a></td></tr>

@@ -65,6 +65,10 @@
 						{if $result.movieinfoID > 0}<a href="{$smarty.const.WWW_TOP}/movies?imdb={$result.imdbID}" title="View movie info" class="rndbtn" rel="movie" >Movie</a>{/if}
 						{if $result.haspreview == 1 && $userdata.canpreview == 1}<a href="{$smarty.const.WWW_TOP}/covers/preview/{$result.guid}_thumb.jpg" name="name{$result.guid}" title="View Screenshot" class="modal_prev rndbtn" rel="preview">Preview</a>{/if}
                         {if $result.jpgstatus == 1 && $userdata.canpreview == 1}<a href="{$smarty.const.WWW_TOP}/covers/sample/{$result.guid}_thumb.jpg" name="name{$result.guid}" title="Sample of {$result.searchname|escape:"htmlall"}" class="modal_prev rndbtn" rel="preview">Sample</a>{/if}
+						{if $result.videostatus == 1}
+									<a href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"htmlall"}" title="This release has a video preview." class="model_prev rndbtn" rel="preview">
+										<img src="{$smarty.const.WWW_TOP}/templates/nntmux/images/multimedia/video.png" />
+									</a>{/if}
 						{if $result.haspreview == 2 && $userdata.canpreview == 1}<a href="#" name="audio{$result.guid}" title="Listen to {$result.searchname|escape:"htmlall"}" class="audioprev rndbtn" rel="audio">Listen</a><audio id="audprev{$result.guid}" preload="none"><source src="{$smarty.const.WWW_TOP}/covers/audio/{$result.guid}.mp3" type="audio/mpeg"><source src="{$smarty.const.WWW_TOP}/covers/audio/{$result.guid}.ogg" type="audio/ogg"></audio>{/if}
 						{if $result.musicinfoID > 0}<a href="#" name="name{$result.musicinfoID}" title="View music info" class="modal_music rndbtn" rel="music" >Cover</a>{/if}
 						{if $result.consoleinfoID > 0}<a href="#" name="name{$result.consoleinfoID}" title="View console info" class="modal_console rndbtn" rel="console" >Cover</a>{/if}
@@ -83,7 +87,7 @@
 				<a title="View file list" href="{$smarty.const.WWW_TOP}/filelist/{$result.guid}">{$result.totalpart}</a>
 				{if $result.rarinnerfilecount > 0}
 					<div class="rarfilelist">
-						<img src="{$smarty.const.WWW_TOP}/templates/nntmux/images/icons/magnifier.png" alt="{$result.guid}" class="tooltip" />				
+						<img src="{$smarty.const.WWW_TOP}/templates/nntmux/images/icons/magnifier.png" alt="{$result.guid}" class="tooltip" />
 					</div>
 				{/if}
 			</td>
