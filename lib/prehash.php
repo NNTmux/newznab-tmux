@@ -258,7 +258,7 @@ Class PreHash
 									: $this->db->escapeString($matches2['size1'] . $matches2['size2'])
 								);
 							$category = $this->db->escapeString($matches2['category']);
-							$time = $this->db->from_unixtime(strtotime($matches2['date']));
+							$time = $this->functions->from_unixtime(strtotime($matches2['date']));
 							$source = $this->db->escapeString('womble');
 
 							// If we already have it, update.
@@ -327,7 +327,7 @@ Class PreHash
 
 							$size = $this->db->escapeString(round($matches2['size1']) . $matches2['size2']);
 							$category = $this->db->escapeString($matches2['category']);
-							$time = $this->db->from_unixtime(strtotime($matches2['date']));
+							$time = $this->functions->from_unixtime(strtotime($matches2['date']));
 							$source = $this->db->escapeString('omgwtfnzbs');
 
 							// If we have it already, update it.
@@ -807,7 +807,7 @@ Class PreHash
 											INSERT INTO prehash (title, predate, source, md5, sha1, requestID, groupID, files, category)
 											VALUES (%s, %s, %s, %s, %s, %s, %d, %s, 'TV')",
 											$this->db->escapeString($matches2["title"]),
-											$this->db->from_unixtime(strtotime($matches2["predate"])),
+											$this->functions->from_unixtime(strtotime($matches2["predate"])),
 											$this->db->escapeString('abTeeVee'),
 											$md5,
 											$sha1,
