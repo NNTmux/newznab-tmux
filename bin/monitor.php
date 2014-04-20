@@ -9,7 +9,7 @@ require_once(dirname(__FILE__) . "/../lib/showsleep.php");
 require_once(dirname(__FILE__) . "/../lib/functions.php");
 
 
-$version = "0.3r1107";
+$version = "0.3r1108";
 
 $db = new DB();
 $functions = new Functions();
@@ -1500,19 +1500,19 @@ while ($i > 0) {
 		if (($maxloadr >= get_load()) && ($releases_run == 2)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			$log = writelog($panes0[5]);
-			shell_exec("tmux respawnp -t${tmux_session}:0.5 'echo \"\033[38;5;\"$color\"m\" && cd $_py && $_python ${DIR}/../python/releases_threaded.py && 2>&1 $log; $_sleep $rel_timer' 2>&1 1> /dev/null");
+			shell_exec("tmux respawnp -t${tmux_session}:0.5 'echo \"\033[38;5;\"$color\"m\" && cd $_py && $_python ${DIR}/../python/releases_threaded.py $log; $_sleep $rel_timer' 2>&1 1> /dev/null");
 		} elseif (($maxloadr >= get_load()) && ($releases_run == 1)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			$log = writelog($panes0[5]);
-			shell_exec("tmux respawnp -t${tmux_session}:0.5 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php update_releases.php && 2>&1 $log; $_sleep $rel_timer' 2>&1 1> /dev/null");
+			shell_exec("tmux respawnp -t${tmux_session}:0.5 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php update_releases.php $log; $_sleep $rel_timer' 2>&1 1> /dev/null");
 		} elseif (($maxloadr >= get_load()) && ($releases_run == 2)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			$log = writelog($panes0[5]);
-			shell_exec("tmux respawnp -t${tmux_session}:0.5 'echo \"\033[38;5;\"$color\"m\" && cd $_py && $_python ${DIR}/../python/releases_threaded.py 2>&1 $log; $_sleep $rel_timer' 2>&1 1> /dev/null");
+			shell_exec("tmux respawnp -t${tmux_session}:0.5 'echo \"\033[38;5;\"$color\"m\" && cd $_py && $_python ${DIR}/../python/releases_threaded.py $log; $_sleep $rel_timer' 2>&1 1> /dev/null");
 		} elseif (($maxloadr >= get_load()) && ($releases_run == 1)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			$log = writelog($panes0[5]);
-			shell_exec("tmux respawnp -t${tmux_session}:0.5 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php update_releases.php && 2>&1 $log; $_sleep $rel_timer' 2>&1 1> /dev/null");
+			shell_exec("tmux respawnp -t${tmux_session}:0.5 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php update_releases.php $log; $_sleep $rel_timer' 2>&1 1> /dev/null");
 		} elseif (($releases_run !== 0) && ($maxloadr <= get_load())) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			shell_exec("tmux respawnp -t${tmux_session}:0.5 'echo \"\033[38;5;\"$color\"m\n$panes0[5] Disabled by Max Load Releases\"' 2>&1 1> /dev/null");

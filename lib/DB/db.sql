@@ -36,7 +36,8 @@ CREATE TABLE prehash (
 	category VARCHAR(255) NULL,
 	predate DATETIME DEFAULT NULL,
 	source VARCHAR(50) NOT NULL DEFAULT '',
-	md5 VARCHAR(255) NOT NULL DEFAULT '0',
+	md5 varchar(32) NOT NULL DEFAULT '0',
+	sha1 varchar(40) NOT NULL DEFAULT '0',
 	requestID INT(10) UNSIGNED NOT NULL DEFAULT '0',
 	groupID INT(10) UNSIGNED NOT NULL DEFAULT '0',
     nuked TINYINT(1) NOT NULL DEFAULT '0',
@@ -53,6 +54,7 @@ CREATE INDEX ix_prehash_requestid on prehash(requestID, groupID);
 CREATE INDEX ix_prehash_size ON prehash(size);
 CREATE INDEX ix_prehash_category ON prehash(category);
 CREATE UNIQUE INDEX ix_prehash_md5 ON prehash(md5);
+CREATE UNIQUE INDEX ix_prehash_sha1 ON prehash(sha1);
 
 DROP TABLE IF EXISTS tmux;
 CREATE TABLE tmux (
@@ -191,7 +193,7 @@ INSERT INTO tmux (setting, value) values ('defrag_cache','900'),
   ('ffmpeg_duration', '5'),
   ('ffmpeg_image_time', '5'),
   ('processvideos', '0'),
-  ('sqlpatch', '26');
+  ('sqlpatch', '27');
 
 DROP TABLE IF EXISTS country;
 CREATE TABLE country (

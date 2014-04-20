@@ -18,11 +18,11 @@ require_once("Info.php");
  * Class for inserting names/categories/md5 etc from PreDB sources into the DB,
  * also for matching names on files / subjects.
  *
- * Class PreHash
+ * Class PreDb
  */
 Class PreHash
 {
-  // If you wish to not get PRE from one of these sources, set it to false.
+	// If you wish to not get PRE from one of these sources, set it to false.
 	const PRE_WOMBLE   = true;
 	const PRE_OMGWTF   = true;
 	const PRE_ZENET    = true;
@@ -38,9 +38,9 @@ Class PreHash
 	const PRE_FOREIGN  = true;
 
 	// Nuke status.
-	const PRE_NONUKE = 0; // Pre is not nuked.
+	const PRE_NONUKE  = 0; // Pre is not nuked.
 	const PRE_UNNUKED = 1; // Pre was un nuked.
-	const PRE_NUKED = 2; // Pre is nuked.
+	const PRE_NUKED   = 2; // Pre is nuked.
 	const PRE_MODNUKE = 3; // Nuke reason was modified.
 	const PRE_RENUKED = 4; // Pre was re nuked.
 	const PRE_OLDNUKE = 5; // Pre is nuked for being old.
@@ -64,38 +64,35 @@ Class PreHash
 	 * @var ColorCLI
 	 */
 	protected $c;
-	/**
-	 * @var bool
-	 */
-	private $echo;
 
 	/**
 	 * @param bool $echo
-	 *
 	 */
-	function __construct($echo = false)
+	public function __construct($echo = false)
 	{
-		$s = new Sites();
-		$this->site = $s->get();
 		$this->echooutput = $echo;
 		$this->db = new DB();
-		$this->c = new ColorCLI;
-        $this->functions = new Functions();
+		$this->c = new ColorCLI();
+		$this->functions = new Functions();
 	}
 
-	// Retrieve pre info from predb sources and store them in the DB.
-	// Returns the quantity of new titles retrieved.
+	/**
+	 * Retrieve pre info from PreDB sources and store them in the DB.
+	 *
+	 * @return int The quantity of new titles retrieved.
+	 */
 	public function updatePre()
 	{
-        $f = new Functions();
 		$newNames = 0;
 		$newestRel = $this->db->queryOneRow("SELECT value AS adddate FROM tmux WHERE setting = 'lastpretime'");
+
+		// Wait 10 minutes in between pulls.
 		if ((int)$newestRel['adddate'] < (time() - 600)) {
 
-            if ($this->echooutput)
-			{
+			if ($this->echooutput) {
 				echo $this->c->header("Retrieving titles from preDB sources.");
 			}
+
 			if (self::PRE_WOMBLE) {
 				$newNames += $newWomble = $this->retrieveWomble();
 				if ($this->echooutput) {
@@ -193,28 +190,34 @@ Class PreHash
 
 			// If we found nothing, update the last added to now to reset the timer.
 			$this->db->exec(sprintf("UPDATE tmux SET value = %s WHERE setting = 'lastpretime'", $this->db->escapeString(time())));
-			}
+		}
+
 		return $newNames;
 	}
 
-    // Attempts to match predb to releases.
+	/**
+	 * Attempts to match PreDB titles / NFOs to releases.
+	 *
+	 * @param $nntp
+	 */
 	public function checkPre($nntp)
 	{
 		$matched = $this->matchPredb();
-		if ($this->echooutput)
-		{
-			$count = ($matched > 0) ? $matched : 0;
-			echo $this->c->header('Matched ' . number_format($count) . ' prehash titles to release search names.');
+		if ($this->echooutput) {
+			echo $this->c->header(
+				'Matched ' . number_format(($matched > 0) ? $matched : 0) . ' predDB titles to release search names.'
+			);
 		}
+
 		$nfos = $this->matchNfo($nntp);
-		if ($this->echooutput)
-		{
-			$count = ($nfos > 0) ? $nfos : 0;
-			echo $this->c->header("\nAdded " . number_format($count) . ' missing NFOs from preDB sources.');
+		if ($this->echooutput) {
+			echo $this->c->header(
+				"\nAdded " . number_format(($nfos > 0) ? $nfos : 0) . ' missing NFOs from preDB sources.'
+			);
 		}
 	}
 
-		/**
+	/**
 	 * Retrieve new pre info from womble.
 	 *
 	 * @return int
@@ -236,7 +239,8 @@ Class PreHash
 							}
 
 							$md5 = $this->db->escapeString(md5($matches2['title']));
-							$oldName = $this->db->queryOneRow(sprintf('SELECT md5, source, ID, nfo FROM prehash WHERE md5 = %s', $md5));
+							$sha1 = $this->db->escapeString(sha1($matches2['title']));
+							$oldName = $this->db->queryOneRow(sprintf('SELECT md5, source, id, nfo FROM prehash WHERE md5 = %s', $md5));
 							// If we have it already and have the NFO, continue.
 							if ($oldName !== false && $oldName['nfo'] != NULL) {
 								continue;
@@ -254,7 +258,7 @@ Class PreHash
 									: $this->db->escapeString($matches2['size1'] . $matches2['size2'])
 								);
 							$category = $this->db->escapeString($matches2['category']);
-							$time = $this->functions->from_unixtime(strtotime($matches2['date']));
+							$time = $this->db->from_unixtime(strtotime($matches2['date']));
 							$source = $this->db->escapeString('womble');
 
 							// If we already have it, update.
@@ -271,10 +275,10 @@ Class PreHash
 								$updated++;
 							} elseif ($this->db->exec(
 								sprintf('
-									INSERT INTO prehash (title, nfo, size, category, predate, source, md5)
-									VALUES (%s, %s, %s, %s, %s, %s, %s)',
+									INSERT INTO prehash (title, nfo, size, category, predate, source, md5, sha1)
+									VALUES (%s, %s, %s, %s, %s, %s, %s, %s)',
 									$this->db->escapeString($matches2['title']),
-									$nfo, $size, $category, $time, $source, $md5))) {
+									$nfo, $size, $category, $time, $source, $md5, $sha1))) {
 								$newNames++;
 							}
 						}
@@ -313,6 +317,7 @@ Class PreHash
 
 							$title = $matches2['title'];
 							$md5 = $this->db->escapeString(md5($title));
+							$sha1 = $this->db->escapeString(sha1($title));
 							$oldName = $this->db->queryOneRow(sprintf('SELECT md5, source, ID FROM prehash WHERE md5 = %s', $md5));
 
 							// If we have it already and the source is womble or omg, continue.
@@ -322,7 +327,7 @@ Class PreHash
 
 							$size = $this->db->escapeString(round($matches2['size1']) . $matches2['size2']);
 							$category = $this->db->escapeString($matches2['category']);
-							$time = $this->functions->from_unixtime(strtotime($matches2['date']));
+							$time = $this->db->from_unixtime(strtotime($matches2['date']));
 							$source = $this->db->escapeString('omgwtfnzbs');
 
 							// If we have it already, update it.
@@ -332,15 +337,15 @@ Class PreHash
 										UPDATE prehash
 										SET size = %s, category = %s, predate = %s, source = %s
 										WHERE ID = %d',
-										$size, $category, $time, $source, $oldName['ID']
+										$size, $category, $time, $source, $oldName['id']
 									)
 								);
 								$updated++;
 							} elseif ($this->db->exec(
 									sprintf('
-										INSERT INTO prehash (title, size, category, predate, source, md5)
-										VALUES (%s, %s, %s, %s, %s, %s)',
-										$this->db->escapeString($title), $size, $category, $time, $source, $md5))) {
+										INSERT INTO prehash (title, size, category, predate, source, md5, sha1)
+										VALUES (%s, %s, %s, %s, %s, %s, %s)',
+										$this->db->escapeString($title), $size, $category, $time, $source, $md5, $sha1))) {
 								$newNames++;
 							}
 						}
@@ -379,6 +384,7 @@ Class PreHash
 							}
 
 							$md5 = $this->db->escapeString(md5($matches2['title']));
+							$sha1 = $this->db->escapeString(sha1($matches2['title']));
 							$dupeCheck = $this->db->queryOneRow(sprintf('SELECT md5 FROM prehash WHERE md5 = %s', $md5));
 
 							// If we already have it, skip.
@@ -387,8 +393,8 @@ Class PreHash
 								continue;
 							} elseif ($this->db->exec(
 								sprintf('
-									INSERT INTO prehash (title, size, category, predate, source, md5, files)
-									VALUES (%s, %s, %s, %s, %s, %s, %s)',
+									INSERT INTO prehash (title, size, category, predate, source, md5, sha1, files)
+									VALUES (%s, %s, %s, %s, %s, %s, %s, %s)',
 									$this->db->escapeString($matches2['title']),
 									((!isset($matches2['size1']) && empty($matches2['size1']))
 										? 'NULL'
@@ -401,6 +407,7 @@ Class PreHash
 									$this->functions->from_unixtime(strtotime($matches2['predate'])),
 									$this->db->escapeString('zenet'),
 									$md5,
+									$sha1,
 									$this->db->escapeString($matches2['files'])))) {
 								$newNames++;
 							}
@@ -414,7 +421,7 @@ Class PreHash
 		return $newNames;
 	}
 
-		/**
+	/**
 	 * Get new pre from pre list.
 	 *
 	 * @note - Probably has to be remade.
@@ -437,6 +444,7 @@ Class PreHash
 								continue;
 							}
 							$md5 =  $this->db->escapeString(md5($matches4['title']));
+							$sha1 = $this->db->escapeString(sha1($matches4['title']));
 							$oldName = $this->db->queryOneRow(sprintf('SELECT md5 FROM prehash WHERE md5 = %s', $md5));
 
 							// If we have it already, skip.
@@ -452,8 +460,8 @@ Class PreHash
 
 							if ($this->db->exec(
 								sprintf('
-										INSERT INTO prehash (title, size, category, predate, source, md5, files, nuked, nukreason)
-										VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)',
+										INSERT INTO prehash (title, size, category, predate, source, md5, sha1, files, nuked, nukereason)
+										VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)',
 									$this->db->escapeString($matches4['title']),
 									((!isset($matches4['size']) && empty($matches4['size']))
 										? 'NULL'
@@ -463,6 +471,7 @@ Class PreHash
 									$this->functions->from_unixtime(strtotime($matches4['date'])),
 									$this->db->escapeString('prelist'),
 									$md5,
+									$sha1,
 									$this->db->escapeString($matches4['files']),
 									($nuked === '' ? self::PRE_NONUKE : $nuked),
 									($nukereason === '' ? 'NULL' : $this->db->escapeString($nukereason))))) {
@@ -478,7 +487,7 @@ Class PreHash
 		return $newNames;
 	}
 
-		/**
+	/**
 	 * Get new pre from this source.
 	 * @return int
 	 */
@@ -499,13 +508,14 @@ Class PreHash
 									continue;
 								}
 								$md5 = $this->db->escapeString(md5($matches2['title']));
+								$sha1 = $this->db->escapeString(sha1($matches2['title']));
 								$oldName = $this->db->queryOneRow(sprintf('SELECT md5 FROM prehash WHERE md5 = %s', $md5));
 								if ($oldName !== false) {
 									continue;
 								} elseif ($this->db->exec(
 									sprintf('
-										INSERT INTO prehash (title, size, category, predate, source, md5, files)
-										VALUES (%s, %s, %s, %s, %s, %s, %s)',
+										INSERT INTO prehash (title, size, category, predate, source, md5, sha1, files)
+										VALUES (%s, %s, %s, %s, %s, %s, %s, %s)',
 										$this->db->escapeString($matches2['title']),
 										((!isset($matches2['size']) && empty($matches2['size']))
 											? 'NULL'
@@ -515,6 +525,7 @@ Class PreHash
 										$this->functions->from_unixtime(strtotime($matches2['date'])),
 										$this->db->escapeString('orlydb'),
 										$md5,
+										$sha1,
 										((!isset($matches2['files']) && empty($matches2['files']))
 											? 'NULL'
 											: $this->db->escapeString($matches2['files']))
@@ -535,7 +546,7 @@ Class PreHash
 		return $newNames;
 	}
 
-   /**
+	/**
 	 * Get pre from this source.
 	 * @return int
 	 */
@@ -555,6 +566,7 @@ Class PreHash
 						continue;
 					}
 					$md5 = $this->db->escapeString(md5($release->title));
+					$sha1 = $this->db->escapeString(sha1($release->title));
 					$oldName = $this->db->queryOneRow(sprintf('SELECT ID, nfo FROM prehash WHERE md5 = %s', $md5));
 
 					$nfo = $size = '';
@@ -563,7 +575,7 @@ Class PreHash
 					}
 
 					if (preg_match('/Filesize.*<td>(?P<size>\d*)<\/td>\s*<td>.*?<\/td>\s*<td>.*?<\/td>\s*<\/tr>\s*<\/table>\s*/is', $release->description, $description)) {
-						$size = ((isset($description['size']) && !empty($description['size'])) ? $this->db->escapeString($this->bytesToSizeString($description['size'])) : 'NULL');
+						$size = ((isset($description['size']) && !empty($description['size'])) ? $this->db->escapeString(nzedb\utility\bytesToSizeString($description['size'])) : 'NULL');
 					}
 
 					if ($oldName !== false) {
@@ -584,12 +596,13 @@ Class PreHash
 						continue;
 					} else if ($this->db->exec(
 						sprintf('
-							INSERT INTO prehash (title, predate, source, md5, nfo, size)
-							VALUES (%s, %s, %s, %s, %s, %s)',
+							INSERT INTO prehash (title, predate, source, md5, sha1, nfo, size)
+							VALUES (%s, %s, %s, %s, %s, %s, %s)',
 							$this->db->escapeString($release->title),
 							$this->functions->from_unixtime(strtotime($release->pubDate)),
 							$this->db->escapeString('srrdb'),
 							$md5,
+							$sha1,
 							$nfo,
 							$size))) {
 						$newNames++;
@@ -651,16 +664,18 @@ Class PreHash
 							continue;
 						}
 						$md5 = $this->db->escapeString(md5($release->title));
+						$sha1 = $this->db->escapeString(sha1($release->title));
 						$oldname = $this->db->queryOneRow(sprintf('SELECT md5 FROM prehash WHERE md5 = %s', $md5));
 						if ($oldname !== false) {
 							continue;
 						} elseif ($this->db->exec(
 							sprintf('
-								INSERT INTO prehash (title, predate, source, md5)
-								VALUES (%s, NOW(), %s, %s)',
+								INSERT INTO prehash (title, predate, source, md5, sha1)
+								VALUES (%s, NOW(), %s, %s, %s)',
 								$this->db->escapeString($release->title),
 								$this->db->escapeString('predbme'),
-								$md5))) {
+								$md5,
+								$sha1))) {
 							$newNames++;
 						}
 					}
@@ -682,7 +697,7 @@ Class PreHash
 		return $newNames;
 	}
 
-    /**
+	/**
 	 * Get pre from this source.
 	 *
 	 * @return int
@@ -705,25 +720,26 @@ Class PreHash
 				foreach ($matches as $match) {
 					foreach ($match as $m) {
 						if (preg_match('/<td class="cell_reqid">(?P<requestid>\d+)<\/td>.+?<td class="cell_filecount">(?P<files>\d+x\d+)<\/td>.+?<td class="cell_request">(?P<title>.+)<\/td>.+<td class="cell_statuschange">(?P<predate>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})<\/td>/s', $m, $matches2)) {
-							if (isset($matches2["requestID"]) && isset($matches2["title"])) {
+							if (isset($matches2["requestid"]) && isset($matches2["title"])) {
 
 								// If too short, skip.
 								if (strlen($matches2["title"]) < 15) {
 									continue;
 								}
 								$md5 = $this->db->escapeString(md5($matches2["title"]));
-
+								$sha1 = $this->db->escapeString(sha1($matches2["title"]));
 								$dupeCheck = $this->db->queryOneRow(sprintf('SELECT ID, requestID FROM prehash WHERE md5 = %s', $md5));
 								if ($dupeCheck === false) {
 									$this->db->exec(
 										sprintf("
-											INSERT INTO prehash (title, predate, source, md5, requestID, groupID, files, category)
-											VALUES (%s, %s, %s, %s, %s, %d, %s, 'Movies')",
+											INSERT INTO prehash (title, predate, source, md5, sha1, requestID, groupID, files, category)
+											VALUES (%s, %s, %s, %s, %s, %s, %d, %s, 'Movies')",
 											$this->db->escapeString($matches2["title"]),
 											$this->functions->from_unixtime(strtotime($matches2["predate"])),
 											$this->db->escapeString('abMooVee'),
 											$md5,
-											$matches2["requestID"],
+											$sha1,
+											$matches2["requestid"],
 											$groupid,
 											$this->db->escapeString($matches2['files'])
 										)
@@ -735,7 +751,7 @@ Class PreHash
 											UPDATE prehash
 											SET requestID = %s, groupID = %d, files = %s
 											WHERE md5 = %s',
-											$matches2["requestID"],
+											$matches2["requestid"],
 											$groupid,
 											$this->db->escapeString($matches2['files']),
 											$md5
@@ -775,37 +791,39 @@ Class PreHash
 			if (preg_match_all('/<tr class="(even|odd)".+?<\/tr>/s', $buffer, $matches)) {
 				foreach ($matches as $match) {
 					foreach ($match as $m) {
-						if (preg_match('/<td class="cell_reqid">(?P<requestID>\d+)<\/td>.+?<td class="cell_filecount">(?P<files>\d+x\d+)<\/td>.+?<td class="cell_request">(?P<title>.+)<\/td>.+<td class="cell_statuschange">(?P<predate>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})<\/td>/s', $m, $matches2)) {
-							if (isset($matches2["requestID"]) && isset($matches2["title"])) {
+						if (preg_match('/<td class="cell_reqid">(?P<requestid>\d+)<\/td>.+?<td class="cell_filecount">(?P<files>\d+x\d+)<\/td>.+?<td class="cell_request">(?P<title>.+)<\/td>.+<td class="cell_statuschange">(?P<predate>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})<\/td>/s', $m, $matches2)) {
+							if (isset($matches2["requestid"]) && isset($matches2["title"])) {
 
 								// Skip if too short.
 								if (strlen($matches2["title"]) < 15) {
 									continue;
 								}
 								$md5 = $this->db->escapeString(md5($matches2["title"]));
+								$sha1 = $this->db->escapeString(sha1($matches2["title"]));
 								$dupeCheck = $this->db->queryOneRow(sprintf('SELECT ID, requestID FROM prehash WHERE md5 = %s', $md5));
 								if ($dupeCheck === false) {
 									$this->db->exec(
 										sprintf("
-											INSERT INTO prehash (title, predate, source, md5, requestID, groupID, files, category)
-											VALUES (%s, %s, %s, %s, %s, %d, %s, 'TV')",
+											INSERT INTO prehash (title, predate, source, md5, sha1, requestID, groupID, files, category)
+											VALUES (%s, %s, %s, %s, %s, %s, %d, %s, 'TV')",
 											$this->db->escapeString($matches2["title"]),
-											$this->functions->from_unixtime(strtotime($matches2["predate"])),
+											$this->db->from_unixtime(strtotime($matches2["predate"])),
 											$this->db->escapeString('abTeeVee'),
 											$md5,
-											$matches2["requestID"],
+											$sha1,
+											$matches2["requestid"],
 											$groupid,
 											$this->db->escapeString($matches2['files'])
 										)
 									);
 									$newNames++;
-								} else if (empty($dupeCheck['requestID'])) {
+								} else if (empty($dupeCheck['requestid'])) {
 									$this->db->exec(
 										sprintf('
 											UPDATE prehash
 											SET requestID = %s, groupID = %d, files = %s
 											WHERE md5 = %s',
-											$matches2["requestID"],
+											$matches2["requestid"],
 											$groupid,
 											$this->db->escapeString($matches2['files']),
 											$md5
@@ -846,38 +864,39 @@ Class PreHash
 				foreach ($matches as $match) {
 					foreach ($match as $m) {
 						if (preg_match('/<td class="cell_reqid">(?P<requestid>\d+)<\/td>.+?<td class="cell_type">(?P<category>.+?)<\/td>.+?<td class="cell_filecount">(?P<files>\d+x\d+)<\/td>.+?<td class="cell_request">(?P<title>.+)<\/td>.+<td class="cell_statuschange">(?P<predate>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})<\/td>/s', $m, $matches2)) {
-							if (isset($matches2["requestID"]) && isset($matches2["title"])) {
+							if (isset($matches2["requestid"]) && isset($matches2["title"])) {
 
 								// If too short, skip.
 								if (strlen($matches2["title"]) < 15) {
 									continue;
 								}
 								$md5 = $this->db->escapeString(md5($matches2["title"]));
-
+								$sha1 = $this->db->escapeString(sha1($matches2["title"]));
 								$dupeCheck = $this->db->queryOneRow(sprintf('SELECT ID, requestID FROM prehash WHERE md5 = %s', $md5));
 								if ($dupeCheck === false) {
 									$this->db->exec(
 										sprintf("
-											INSERT INTO prehash (title, predate, source, md5, requestID, groupID, files, category)
-											VALUES (%s, %s, %s, %s, %s, %d, %s, %s)",
+											INSERT INTO prehash (title, predate, source, md5, sha1, requestID, groupID, files, category)
+											VALUES (%s, %s, %s, %s, %s, %s, %d, %s, %s)",
 											$this->db->escapeString($matches2["title"]),
 											$this->functions->from_unixtime(strtotime($matches2["predate"])),
 											$this->db->escapeString('abErotica'),
 											$md5,
-											$matches2["requestID"],
+											$sha1,
+											$matches2["requestid"],
 											$groupid,
 											$this->db->escapeString($matches2['files']),
 											$this->db->escapeString('XXX-' . $matches2['category'])
 										)
 									);
 									$newNames++;
-								} else if (empty($dupeCheck['requestID'])) {
+								} else if (empty($dupeCheck['requestid'])) {
 									$this->db->exec(
 										sprintf('
 											UPDATE prehash
 											SET requestID = %s, groupID = %d, files = %s
 											WHERE md5 = %s',
-											$matches2["requestID"],
+											$matches2["requestid"],
 											$groupid,
 											$this->db->escapeString($matches2['files']),
 											$md5
@@ -918,38 +937,39 @@ Class PreHash
 				foreach ($matches as $match) {
 					foreach ($match as $m) {
 						if (preg_match('/<td class="cell_reqid">(?P<requestid>\d+)<\/td>.+<td class="cell_type">(?P<category>.+?)<\/td>.+?<td class="cell_filecount">(?P<files>\d+x\d+)<\/td>.+?<td class="cell_request">(?P<title>.+)<\/td>.+<td class="cell_statuschange">(?P<predate>\d{4}-\d{2}-\d{2}( \d{2}:\d{2}:\d{2})?)<\/td>/s', $m, $matches2)) {
-							if (isset($matches2["requestID"]) && isset($matches2["title"])) {
+							if (isset($matches2["requestid"]) && isset($matches2["title"])) {
 
 							// If too short, skip.
 							if (strlen($matches2["title"]) < 15) {
 								continue;
 							}
 							$md5 = $this->db->escapeString(md5($matches2["title"]));
-
+							$sha1 = $this->db->escapeString(sha1($matches2["title"]));
 								$dupeCheck = $this->db->queryOneRow(sprintf('SELECT ID, requestID FROM prehash WHERE md5 = %s', $md5));
 								if ($dupeCheck === false) {
 									$this->db->exec(
 										sprintf("
-											INSERT INTO prehash (title, predate, source, md5, requestID, groupID, files, category)
-											VALUES (%s, %s, %s, %s, %s, %d, %s, %s)",
+											INSERT INTO prehash (title, predate, source, md5, sha1, requestID, groupID, files, category)
+											VALUES (%s, %s, %s, %s, %s, %s, %d, %s, %s)",
 											$this->db->escapeString($matches2["title"]),
 											$this->functions->from_unixtime(strtotime($matches2["predate"])),
 											$this->db->escapeString('abForeign'),
 											$md5,
-											$matches2["requestID"],
+											$sha1,
+											$matches2["requestid"],
 											$groupid,
 											$this->db->escapeString($matches2["files"]),
 											$this->db->escapeString($matches2["category"])
 										)
 									);
 									$newNames++;
-								} else if (empty($dupeCheck['requestID'])) {
+								} else if (empty($dupeCheck['requestid'])) {
 									$this->db->exec(
 										sprintf('
 											UPDATE prehash
 											SET requestID = %s, groupID = %d, files = %s, category = %s
 											WHERE md5 = %s',
-											$matches2["requestID"],
+											$matches2["requestid"],
 											$groupid,
 											$this->db->escapeString($matches2["files"]),
 											$this->db->escapeString($matches2["category"]),
@@ -975,7 +995,7 @@ Class PreHash
 	 */
 	protected function retrieveAbgx()
 	{
-		$newNames = 0;
+		$newnames = 0;
 		$groups = new Groups();
 		$groupname = $request = $title = '';
 
@@ -998,10 +1018,11 @@ Class PreHash
 						preg_match('/^Req (\d+) - (\S+) .+/', $release->title, $request);
 						$requestid = $request[1];
 						$md5 = md5($title[1]);
+						$sha1 = sha1($title[1]);
 						$predate = $title[2];
 
-						$oldname = $this->db->queryOneRow(sprintf('SELECT md5, requestID, groupID FROM prehash WHERE md5 = %s', $this->db->escapeString($md5)));
-						if ($oldname !== false && empty($oldname['requestID'])) {
+						$oldname = $this->db->queryOneRow(sprintf('SELECT md5, requestiID, groupID FROM prehash WHERE md5 = %s', $this->db->escapeString($md5)));
+						if ($oldname !== false && empty($oldname['requestid'])) {
 							$this->db->exec(
 								sprintf('
 									UPDATE prehash
@@ -1016,15 +1037,16 @@ Class PreHash
 						else if ($oldname === false) {
 							if ($this->db->exec(
 								sprintf('
-									INSERT INTO prehash (title, predate, source, md5, requestID, groupID)
-									VALUES (%s, %s, %s, %s, %d, %d)',
+									INSERT INTO prehash (title, predate, source, md5, sha1, requestID, groupID)
+									VALUES (%s, %s, %s, %s, %s, %d, %d)',
 									$this->db->escapeString($title[1]),
 									$this->functions->from_unixtime(strtotime($predate)),
 									$this->db->escapeString('abgx'),
 									$this->db->escapeString($md5),
+									$this->db->escapeString($sha1),
 									$requestid,
 									$groupid))) {
-								$newNames++;
+								$newnames++;
 							}
 						}
 					}
@@ -1032,16 +1054,16 @@ Class PreHash
 					if ($this->echooutput) {
 						echo $this->c->error("Update from ABGX failed.");
 					}
-					return $newNames;
+					return $newnames;
 				}
 			} else {
 				if ($this->echooutput) {
 					echo $this->c->error("Update from ABGX failed.");
 				}
-				return $newNames;
+				return $newnames;
 			}
 		}
-		return $newNames;
+		return $newnames;
 	}
 
 	/**
@@ -1052,7 +1074,7 @@ Class PreHash
 	protected  function retrieveUsenetCrawler()
 	{
 		$db = new DB();
-		$newNames = 0;
+		$newnames = 0;
 
 		$data = $this->getUrl("http://www.usenet-crawler.com/predb?q=&c=&offset=0#results");
 		if ($data === false) {
@@ -1062,7 +1084,7 @@ Class PreHash
 		$html = str_get_html($data);
 		$releases = @$html->find('table[id="browsetable"]');
 		if (!isset($releases[0])) {
-			return $newNames;
+			return $newnames;
 		}
 		$rows = $releases[0]->find('tr');
 		$count = 0;
@@ -1087,6 +1109,7 @@ Class PreHash
 			}
 
 			$md5 = md5($title);
+			$sha1 = sha1($title);
 			// Check DB if we already have it.
 			$check = $db->queryOneRow(sprintf('SELECT ID FROM prehash WHERE md5 = %s', $db->escapeString($md5)));
 			if ($check !== false) {
@@ -1098,76 +1121,83 @@ Class PreHash
 			preg_match('/([\d\.]+MB)/', $data[3]->innertext, $match);
 			$size = isset($match[1]) ? $match[1] : 'NULL';
 			if (strlen($title) > 15 && $category != 'NUKED') {
-				if ($db->exec(sprintf('INSERT INTO prehash (title, predate, source, md5, category, size) VALUES (%s, %s, %s, %s, %s, %s)', $db->escapeString($title), $this->functions->from_unixtime($predate), $db->escapeString('usenet-crawler'), $db->escapeString($md5), $db->escapeString($category), $db->escapeString($size)))) {
-					$newNames++;
+				if ($db->exec(sprintf('INSERT INTO prehash (title, predate, source, md5, sha1, category, size) VALUES (%s, %s, %s, %s, %s, %s, %s)',
+					$db->escapeString($title), $this->functions->from_unixtime($predate), $db->escapeString('usenet-crawler'), $db->escapeString($md5), $db->escapeString($sha1),
+					$db->escapeString($category), $db->escapeString($size)))) {
+					$newnames++;
 				}
 			}
 		}
-		return $newNames;
+		return $newnames;
 	}
 
 	// Update a single release as it's created.
 	public function matchPre($cleanerName, $releaseID)
 	{
 		$db = new DB();
-        $f = new Functions();
-			$x = $db->queryOneRow(sprintf('SELECT ID FROM prehash WHERE title = %s', $db->escapeString($cleanerName)));
-		if (isset($x['ID'])) {
+		$x = $db->queryOneRow(sprintf('SELECT ID FROM prehash WHERE title = %s', $db->escapeString($cleanerName)));
+		if (isset($x['id'])) {
 			$db->exec(sprintf('UPDATE releases SET prehashID = %d WHERE ID = %d', $x['ID'], $releaseID));
 			return true;
 		}
 		return false;
 	}
 
-	// When a searchname is the same as the title, tie it to the predb. Try to update the categoryID at the same time.
+	// When a searchname is the same as the title, tie it to the prehash. Try to update the categoryID at the same time.
 	public function matchPredb()
 	{
+		/*
+		 * For future reference, mysql 5.6 innodb has fulltext searching support.
+		 * INSERT INTO releases (name) VALUES ('[149787]-[FULL]-[#a.b.teevee]-[ The.Amazing.World.of.Gumball.S01E28.The.Club.720p.HDTV.x264-W4F ]-[1/1] - "The.Amazing.World.of.Gumball.S01E28.The.Club.720p.HDTV.x264-W4F.nzb" yEnc');
+		 * ALTER TABLE releases ADD FULLTEXT(name);
+		 * SELECT * FROM releases WHERE MATCH (name) AGAINST ('"The.Amazing.World.of.Gumball.S01E28.The.Club.720p.HDTV.x264-W4F"' IN BOOLEAN MODE);
+		 *
+		 * In myisam this is much faster than SELECT * FROM releases WHERE name LIKE '%The.Amazing.World.of.Gumball.S01E28.The.Club.720p.HDTV.x264-W4F%';
+		 * So I'm guessing in innodb it will be the same.
+		 */
 		$db = new DB();
-        $f = new Functions();
-        $consoletools = new ConsoleTools();
+		$consoletools = new ConsoleTools();
 		$updated = 0;
-		if($this->echooutput)
-			{
-			echo $this->c->header('Querying DB for release searchnames not matched with prehash titles.');
+		if ($this->echooutput) {
+			echo $this->c->header('Querying DB for release searchnames not matched with preDB titles.');
 		}
 
 		$res = $db->queryDirect('SELECT p.ID AS prehashID, r.ID AS releaseID FROM prehash p INNER JOIN releases r ON p.title = r.searchname WHERE r.prehashID = 0');
-        $total = $res->rowCount();
-        if($total > 0)
-        {
-           echo "\n";
-			foreach ($res as $row)
-			{
+		$total = $res->rowCount();
+		echo $this->c->primary(number_format($total) . ' releases to match.');
+		if ($total > 0) {
+			foreach ($res as $row) {
 				$db->exec(sprintf('UPDATE releases SET prehashID = %d WHERE ID = %d', $row['prehashID'], $row['releaseID']));
-				if ($this->echooutput)
-				{
-					$consoletools->overWritePrimary('Matching up prehash titles with release search names: ' . $consoletools->percentString(++$updated, $total));
+				if ($this->echooutput) {
+					$consoletools->overWritePrimary('Matching up preDB titles with release searchnames: ' . $consoletools->percentString( ++$updated, $total));
 				}
 			}
-			echo "\n";
+			if ($this->echooutput) {
+				echo "\n";
+			}
 		}
 		return $updated;
-    }
+	}
+
 	// Look if the release is missing an nfo.
 	public function matchNfo($nntp)
 	{
-        if (!isset($nntp)) {
-			exit($this->c->error("Not connected to usenet(prehash->matchNFO).\n"));
+		if (!isset($nntp)) {
+			exit($this->c->error("Not connected to usenet(binaries->updateAllGroups).\n"));
 		}
 
 		$db = new DB();
 		$nfos = 0;
-		if($this->echooutput)
-			echo $this->c->header ("Matching up prehash NFOs with releases missing an NFO.");
+		if ($this->echooutput) {
+			echo $this->c->primary('Matching up prehash NFOs with releases missing an NFO.');
+		}
 
-			$res = $db->queryDirect("SELECT r.ID, p.nfo, p.title, r.completion, r.guid, r.groupID FROM releases r INNER JOIN prehash p ON r.prehashID = p.ID WHERE r.nfostatus != 1 AND p.nfo IS NOT NULL LIMIT 100");
-		    $total = $res->rowCount();
-		    if($total > 0)
-            {
+		$res = $db->queryDirect('SELECT r.ID, p.nfo, p.title, r.completion, r.guid, r.groupID FROM releases r INNER JOIN prehash p ON r.prehashID = p.ID WHERE r.nfostatus != 1 AND p.nfo IS NOT NULL LIMIT 100');
+		$total = $res->rowCount();
+		if ($total > 0) {
 			$nfo = new Info($this->echooutput);
-		    foreach ($res as $row)
-			{
-			   $URL = $row['nfo'];
+			foreach ($res as $row) {
+				$URL = $row['nfo'];
 
 				// To save space in the DB we do this instead of storing the full URL.
 				if ($URL === 'srrdb') {
@@ -1177,54 +1207,65 @@ Class PreHash
 				$buffer = $this->getUrl($URL);
 
 				if ($buffer !== false) {
-				    if (strlen($buffer) < 5) {
+					if (strlen($buffer) < 5) {
 						continue;
 					}
 
-                    if ($row['nfo'] === 'srrdb' && preg_match('/You\'ve reached the daily limit/i', $buffer)) {
+					if ($row['nfo'] === 'srrdb' && preg_match('/You\'ve reached the daily limit/i', $buffer)) {
 						continue;
 					}
-					if ($nfo->addAlternateNfo($buffer, $row, $nntp))
-					{
-					 if($this->echooutput)
+
+					if ($nfo->addAlternateNfo($buffer, $row, $nntp)) {
+						if ($this->echooutput) {
 							echo '+';
+						}
 						$nfos++;
-					}
-					else
-					{
-						if($this->echooutput)
+					} else {
+						if ($this->echooutput) {
 							echo '-';
-				    }
+						}
+					}
+				}
 			}
-            }
-			return $nfos;
 		}
+		return $nfos;
 	}
 
 	// Matches the MD5 within the prehash table to release files and subjects (names) which are hashed.
-		public function parseTitles($time, $echo, $cats, $namestatus, $show)
+	public function parseTitles($time, $echo, $cats, $namestatus, $show)
 	{
 		$db = new DB();
-		$namefixer = new Namefixer();
-        $consoletools = new ConsoleTools();
+		$namefixer = new Namefixer($this->echooutput);
+		$consoletools = new ConsoleTools();
 		$updated = $checked = 0;
 		$matches = '';
 
-		$tq = "";
-		if ($time == 1)
-			$tq = $tq = 'AND r.adddate > (NOW() - INTERVAL 3 HOUR) ORDER BY rf.releaseID, rf.size DESC';
-		$ct = "";
-		if ($cats == 1)
-			$ct = " and r.categoryID in (2020, 5050, 6070, 8010)";
-
-		if($this->echooutput)
-		{
-			$te = "";
-			if ($time == 1)
-				$te = " in the past 3 hours";
-			echo $this->c->header ("Fixing search names".$te." using the prehash md5.");
+		$tq = '';
+		if ($time == 1) {
+			if (DB_TYPE === 'mysql') {
+				$tq = 'AND r.adddate > (NOW() - INTERVAL 3 HOUR) ORDER BY rf.releaseID, rf.size DESC';
+			} else if (DB_TYPE === 'pgsql') {
+				$tq = "AND r.adddate > (NOW() - INTERVAL '3 HOURS') ORDER BY rf.releaseID, rf.size DESC";
+			}
 		}
-        $regex = "AND (r.ishashed = 1 OR rf.name REGEXP'[a-fA-F0-9]{32}')";
+		$ct = '';
+		if ($cats == 1) {
+			$ct = 'AND r.categoryID IN (2020, 5050, 6070, 8010)';
+		}
+
+		if ($this->echooutput) {
+			$te = '';
+			if ($time == 1) {
+				$te = ' in the past 3 hours';
+			}
+			echo $this->c->header('Fixing search names' . $te . " using the prehash md5.");
+		}
+		if (DB_TYPE === 'mysql') {
+			$regex = "AND (r.ishashed = 1 OR rf.name REGEXP'[a-fA-F0-9]{32}')";
+		} else if (DB_TYPE === 'pgsql') {
+			$regex = "AND (r.ishashed = 1 OR rf.name ~ '[a-fA-F0-9]{32}')";
+		}
+
 		if ($cats === 3) {
 			$query = sprintf('SELECT r.ID AS releaseID, r.name, r.searchname, r.categoryID, r.groupID, '
 				. 'dehashstatus, rf.name AS filename FROM releases r '
@@ -1236,8 +1277,9 @@ Class PreHash
 				. 'LEFT OUTER JOIN releasefiles rf ON r.ID = rf.releaseID '
 				. 'WHERE isrenamed = 0 AND dehashstatus BETWEEN -6 AND 0 %s %s %s', $regex, $ct, $tq);
 		}
-        $res = $db->queryDirect($query);
-        $total = $res->rowCount();
+
+		$res = $db->queryDirect($query);
+		$total = $res->rowCount();
 		echo $this->c->primary(number_format($total) . " releases to process.");
 		if ($total > 0) {
 			foreach ($res as $row) {
@@ -1247,7 +1289,7 @@ Class PreHash
 					$updated = $updated + $namefixer->matchPredbMD5($matches[0], $row, $echo, $namestatus, $this->echooutput, $show);
 				}
 				if ($show === 2) {
-					$consoletools->overWritePrimary("Renamed Releases: [" . number_format($updated) . "] " . $consoletools->percentString( ++$checked, $total));
+					$consoletools->overWritePrimary("Renamed Releases: [" . number_format($updated) . "] " . $consoletools->percentString(++$checked, $total));
 				}
 			}
 		}
@@ -1271,11 +1313,12 @@ Class PreHash
 	{
 		$db = new DB();
 		if ($search !== '') {
+			$like = (DB_TYPE === 'mysql' ? 'LIKE' : 'ILIKE');
 			$search = explode(' ', trim($search));
 			if (count($search > 1)) {
-				$search = "LIKE '%" . implode("%' AND title LIKE '%", $search) . "%'";
+				$search = "$like '%" . implode("%' AND title $like '%", $search) . "%'";
 			} else {
-				$search = "LIKE '%" . $search . "%'";
+				$search = "$like '%" . $search . "%'";
 			}
 			$search = 'WHERE title ' . $search;
 			$count = $db->queryOneRow(sprintf('SELECT COUNT(*) AS cnt FROM prehash %s', $search));
@@ -1288,50 +1331,27 @@ Class PreHash
 		return array('arr' => $parr, 'count' => $count);
 	}
 
-    // Returns a single row for a release.
-	public function getForRelease($prehashID)
-	{
-		$db = new DB();
-		return $db->query(sprintf('SELECT * FROM prehash WHERE ID = %d', $prehashID));
-	}
-
 	public function getCount()
 	{
 		$db = new DB();
-		$count = $db->queryOneRow("SELECT count(*) as cnt from prehash");
-		return $count["cnt"];
+		$count = $db->queryOneRow('SELECT COUNT(*) AS cnt FROM prehash');
+		return $count['cnt'];
 	}
 
-    public function getOne($prehashID)
+	// Returns a single row for a release.
+	public function getForRelease($preID)
 	{
 		$db = new DB();
-		return $db->queryOneRow(sprintf('SELECT * FROM prehash WHERE ID = %d', $prehashID));
+		return $db->query(sprintf('SELECT * FROM prehash WHERE ID = %d', $preID));
 	}
 
-	public function getWebPage($url)
+	public function getOne($preID)
 	{
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		$output = curl_exec($ch);
-		curl_close($ch);
-		return $output;
+		$db = new DB();
+		return $db->queryOneRow(sprintf('SELECT * FROM prehash WHERE ID = %d', $preID));
 	}
 
-	function fileContents($path, $use = false, $context = '')
-	{
-		if ($context === '') {
-			$str = @file_get_contents($path);
-		} else {
-			$str = @file_get_contents($path, $use, $context);
-		}
-		if ($str === FALSE) {
-			return false;
-		} else {
-			return $str;
-		}
-	}
-    	/**
+	/**
 	 * Get data from URL.
 	 *
 	 * @param string $url
@@ -1340,7 +1360,7 @@ Class PreHash
 	 */
 	protected function getUrl($url)
 	{
-		return getUrl(
+		return $this->functions->getUrl(
 			$url,
 			'get',
 			'',
@@ -1350,21 +1370,5 @@ Class PreHash
 			'Version/4.0.4 Mobile/7B334b Safari/531.21.102011-10-16 20:23:10', 'foo=bar'
 		);
 	}
-   /**
- * Get human readable size string from bytes.
- *
- * @param int $bytes     Bytes number to convert.
- * @param int $precision How many floating point units to add.
- *
- * @return string
- */
-function bytesToSizeString($bytes, $precision = 0)
-{
-    if ($bytes == 0) {
-		return '0B';
-	}
 
-	$unit = array('B','KB','MB','GB','TB','PB','EB');
-	return round($bytes / pow(1024, ($i = floor(log($bytes, 1024)))), $precision) . $unit[(int)$i];
-}
 }
