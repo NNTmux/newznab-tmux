@@ -78,6 +78,7 @@ class IRCScraper extends IRCClient
 	public function __construct($serverType, &$silent = false, &$debug = false)
 	{
 		$this->db = new DB();
+		$this->functions = new Functions();
 		$this->groupList = array();
 		$this->serverType = $serverType;
 		$this->silent = $silent;
@@ -359,7 +360,7 @@ class IRCScraper extends IRCClient
 				$predate = (time() - $predate);
 			}
 		}
-		$this->CurPre['predate'] = ($predate === 0 ? '' : $this->db->from_unixtime($predate));
+		$this->CurPre['predate'] = ($predate === 0 ? '' : $this->functions->from_unixtime($predate));
 	}
 
 	/**
