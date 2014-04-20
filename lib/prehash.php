@@ -575,7 +575,7 @@ Class PreHash
 					}
 
 					if (preg_match('/Filesize.*<td>(?P<size>\d*)<\/td>\s*<td>.*?<\/td>\s*<td>.*?<\/td>\s*<\/tr>\s*<\/table>\s*/is', $release->description, $description)) {
-						$size = ((isset($description['size']) && !empty($description['size'])) ? $this->db->escapeString(nzedb\utility\bytesToSizeString($description['size'])) : 'NULL');
+						$size = ((isset($description['size']) && !empty($description['size'])) ? $this->db->escapeString($this->functions->bytesToSizeString($description['size'])) : 'NULL');
 					}
 
 					if ($oldName !== false) {
