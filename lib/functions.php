@@ -2388,6 +2388,26 @@ class Functions
 		}
 	}
 
+	/**
+ 	* Get human readable size string from bytes.
+ 	*
+ 	* @param int $bytes     Bytes number to convert.
+ 	* @param int $precision How many floating point units to add.
+ 	*
+ 	* @return string
+ 	*/
+	function bytesToSizeString($bytes, $precision = 0)
+	{
+    if ($bytes == 0) {
+		return '0B';
+	}
+
+	$unit = array('B','KB','MB','GB','TB','PB','EB');
+	return round($bytes / pow(1024, ($i = floor(log($bytes, 1024)))), $precision) . $unit[(int)$i];
+}
+
+
+
 	//end of testing
 
 }
