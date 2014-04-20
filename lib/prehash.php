@@ -240,7 +240,7 @@ Class PreHash
 
 							$md5 = $this->db->escapeString(md5($matches2['title']));
 							$sha1 = $this->db->escapeString(sha1($matches2['title']));
-							$oldName = $this->db->queryOneRow(sprintf('SELECT md5, source, id, nfo FROM prehash WHERE md5 = %s', $md5));
+							$oldName = $this->db->queryOneRow(sprintf('SELECT md5, source, ID, nfo FROM prehash WHERE md5 = %s', $md5));
 							// If we have it already and have the NFO, continue.
 							if ($oldName !== false && $oldName['nfo'] != NULL) {
 								continue;
@@ -337,7 +337,7 @@ Class PreHash
 										UPDATE prehash
 										SET size = %s, category = %s, predate = %s, source = %s
 										WHERE ID = %d',
-										$size, $category, $time, $source, $oldName['id']
+										$size, $category, $time, $source, $oldName['ID']
 									)
 								);
 								$updated++;
@@ -1136,7 +1136,7 @@ Class PreHash
 	{
 		$db = new DB();
 		$x = $db->queryOneRow(sprintf('SELECT ID FROM prehash WHERE title = %s', $db->escapeString($cleanerName)));
-		if (isset($x['id'])) {
+		if (isset($x['ID'])) {
 			$db->exec(sprintf('UPDATE releases SET prehashID = %d WHERE ID = %d', $x['ID'], $releaseID));
 			return true;
 		}
