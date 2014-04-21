@@ -397,19 +397,19 @@ class IRCScraper extends IRCClient
 			$this->nuked = true;
 			switch ($matches['nuke']) {
 				case 'NUKE':
-					$this->CurPre['nuked'] = PreDb::PRE_NUKED;
+					$this->CurPre['nuked'] = PreHash::PRE_NUKED;
 					break;
 				case 'UNNUKE':
-					$this->CurPre['nuked'] = PreDb::PRE_UNNUKED;
+					$this->CurPre['nuked'] = PreHash::PRE_UNNUKED;
 					break;
 				case 'MODNUKE':
-					$this->CurPre['nuked'] = PreDb::PRE_MODNUKE;
+					$this->CurPre['nuked'] = PreHash::PRE_MODNUKE;
 					break;
 				case 'RENUKE':
-					$this->CurPre['nuked'] = PreDb::PRE_RENUKED;
+					$this->CurPre['nuked'] = PreHash::PRE_RENUKED;
 					break;
 				case 'OLDNUKE':
-					$this->CurPre['nuked'] = PreDb::PRE_OLDNUKE;
+					$this->CurPre['nuked'] = PreHash::PRE_OLDNUKE;
 					break;
 			}
 		}
@@ -748,7 +748,7 @@ class IRCScraper extends IRCClient
 	 */
 	protected function checkForDupe()
 	{
-		$this->OldPre = $this->db->queryOneRow(sprintf('SELECT category, size FROM predb WHERE md5 = %s', $this->CurPre['md5']));
+		$this->OldPre = $this->db->queryOneRow(sprintf('SELECT category, size FROM prehash WHERE md5 = %s', $this->CurPre['md5']));
 		if ($this->OldPre === false) {
 			$this->insertNewPre();
 		} else {
@@ -767,15 +767,15 @@ class IRCScraper extends IRCClient
 			return;
 		}
 
-		$query = 'INSERT INTO predb (';
+		$query = 'INSERT INTO prehash (';
 
 		$query .= (!empty($this->CurPre['size'])     ? 'size, '       : '');
 		$query .= (!empty($this->CurPre['category']) ? 'category, '   : '');
 		$query .= (!empty($this->CurPre['source'])   ? 'source, '     : '');
 		$query .= (!empty($this->CurPre['reason'])   ? 'nukereason, ' : '');
 		$query .= (!empty($this->CurPre['files'])    ? 'files, ' : '');
-		$query .= (!empty($this->CurPre['reqid']) ? 'requestid, ' : '');
-		$query .= (!empty($this->CurPre['groupid']) ? 'groupid, '    : '');
+		$query .= (!empty($this->CurPre['reqid']) ? 'requestID, ' : '');
+		$query .= (!empty($this->CurPre['groupid']) ? 'groupID, ' : '');
 		$query .= (!empty($this->CurPre['nuked'])    ? 'nuked, ' : '');
 
 		$query .= 'predate, md5, sha1, title) VALUES (';
@@ -819,14 +819,14 @@ class IRCScraper extends IRCClient
 			return;
 		}
 
-		$query = 'UPDATE predb SET ';
+		$query = 'UPDATE prehash SET ';
 
 		$query .= (!empty($this->CurPre['size'])     ? 'size = '       . $this->db->escapeString($this->CurPre['size'])   . ', ' : '');
 		$query .= (!empty($this->CurPre['source'])   ? 'source = '     . $this->db->escapeString($this->CurPre['source']) . ', ' : '');
 		$query .= (!empty($this->CurPre['files'])    ? 'files = '      . $this->db->escapeString($this->CurPre['files'])  . ', ' : '');
 		$query .= (!empty($this->CurPre['reason'])   ? 'nukereason = ' . $this->db->escapeString($this->CurPre['reason']) . ', ' : '');
-		$query .= (!empty($this->CurPre['reqid']) ? 'requestid = ' . $this->CurPre['reqid'] . ', ' : '');
-		$query .= (!empty($this->CurPre['groupid']) ? 'groupid = ' . $this->CurPre['groupid'] . ', ' : '');
+		$query .= (!empty($this->CurPre['reqid']) ? 'requestID = ' . $this->CurPre['reqid'] . ', ' : '');
+		$query .= (!empty($this->CurPre['groupid']) ? 'groupID = ' . $this->CurPre['groupid'] . ', ' : '');
 		$query .= (!empty($this->CurPre['predate'])  ? 'predate = '    . $this->CurPre['predate']                         . ', ' : '');
 		$query .= (!empty($this->CurPre['nuked'])    ? 'nuked = '      . $this->CurPre['nuked']                           . ', ' : '');
 		$query .= (
@@ -835,7 +835,7 @@ class IRCScraper extends IRCClient
 			: ''
 		);
 
-		if ($query === 'UPDATE predb SET '){
+		if ($query === 'UPDATE prehash SET ') {
 			return;
 		}
 
@@ -865,20 +865,20 @@ class IRCScraper extends IRCClient
 			$nukeString = '';
 			if ($this->nuked !== false) {
 				switch((int)$this->CurPre['nuked']) {
-					case PreDb::PRE_NUKED:
-						$nukeString = '[ NUKED ] ';
+					case PreHash::PRE_NUKED:
+					$nukeString = '[ NUKED ] ';
 						break;
-					case PreDb::PRE_UNNUKED:
-						$nukeString = '[UNNUKED] ';
+					case PreHash::PRE_UNNUKED:
+					$nukeString = '[UNNUKED] ';
 						break;
-					case PreDb::PRE_MODNUKE:
-						$nukeString = '[MODNUKE] ';
+					case PreHash::PRE_MODNUKE:
+					$nukeString = '[MODNUKE] ';
 						break;
-					case PreDb::PRE_OLDNUKE:
-						$nukeString = '[OLDNUKE] ';
+					case PreHash::PRE_OLDNUKE:
+					$nukeString = '[OLDNUKE] ';
 						break;
-					case PreDb::PRE_RENUKED:
-						$nukeString = '[RENUKED] ';
+					case PreHash::PRE_RENUKED:
+					$nukeString = '[RENUKED] ';
 						break;
 					default:
 						break;
