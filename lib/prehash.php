@@ -12,6 +12,7 @@ require_once("nzbcontents.php");
 require_once("simple_html_dom.php");
 require_once("IRCScraper.php");
 require_once("Info.php");
+require_once("namefixer.php");
 
 
 /**
