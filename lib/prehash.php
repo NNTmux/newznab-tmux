@@ -1382,7 +1382,7 @@ Class PreHash
 	 */
 	protected function getUrl($url)
 	{
-		return this->functions->getUrl(
+		return $this->functions->getUrl(
 		$url,
 			'get',
 			'',
