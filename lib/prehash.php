@@ -1277,12 +1277,12 @@ Class PreHash
 			if ($time == 1) {
 				$te = ' in the past 3 hours';
 			}
-			echo $this->c->header('Fixing search names' . $te . " using the prehash md5.");
+			echo $this->c->header('Fixing search names' . $te . " using the prehash md5/sha1.");
 		}
 		if (DB_TYPE === 'mysql') {
-			$regex = "AND (r.ishashed = 1 OR rf.name REGEXP'[a-fA-F0-9]{32}')";
+			$regex = "AND (r.ishashed = 1 OR rf.name REGEXP'[a-fA-F0-9]{32}' OR rf.name REGEXP'[a-fA-F0-9]{40}')";
 		} else if (DB_TYPE === 'pgsql') {
-			$regex = "AND (r.ishashed = 1 OR rf.name ~ '[a-fA-F0-9]{32}')";
+			$regex = "AND (r.ishashed = 1 OR rf.name ~ '[a-fA-F0-9]{32}' OR rf.name ~ '[a-fA-F0-9]{40}')";
 		}
 
 		if ($cats === 3) {
@@ -1303,14 +1303,20 @@ Class PreHash
 		if ($total > 0) {
 			foreach ($res as $row) {
 				if (preg_match('/[a-f0-9]{32}/i', $row['name'], $matches)) {
-					$updated = $updated + $namefixer->matchPredbMD5($matches[0], $row, $echo, $namestatus, $this->echooutput, $show);
-				} else if (preg_match('/[a-f0-9]{32}/i', $row['filename'], $matches)) {
-					$updated = $updated + $namefixer->matchPredbMD5($matches[0], $row, $echo, $namestatus, $this->echooutput, $show);
-				} else if (preg_match('/[a-f0-9]{40}/i', $row['name'], $matches)) {
-					$updated = $updated + $namefixer->matchPredbSHA1($matches[0], $row, $echo, $namestatus, $this->echooutput, $show);
-				} else if (preg_match('/[a-f0-9]{40}/i', $row['filename'], $matches)) {
-					$updated = $updated + $namefixer->matchPredbSHA1($matches[0], $row, $echo, $namestatus, $this->echooutput, $show);
-				}
+                                        if (strlen($matches[0]) === 32) {
+                                                $updated = $updated + $namefixer->matchPredbMD5($matches[0], $row, $echo, $namestatus, $this->echooutput, $show);
+                                        }
+                                        else if (strlen($matches[0]) === 40) {
+                                                $updated = $updated + $namefixer->matchPredbSHA1($matches[0], $row, $echo, $namestatus, $this->echooutput, $show);
+                                        }
+                                } else if (preg_match('/[a-f0-9]{32}/i', $row['filename'], $matches)) {
+                                        if (strlen($matches[0]) === 32) {
+                                                $updated = $updated + $namefixer->matchPredbMD5($matches[0], $row, $echo, $namestatus, $this->echooutput, $show);
+                                        }
+                                        else if (strlen($matches[0]) === 40) {
+                                                $updated = $updated + $namefixer->matchPredbSHA1($matches[0], $row, $echo, $namestatus, $this->echooutput, $show);
+                                        }
+                                }
 				if ($show === 2) {
 					$consoletools->overWritePrimary("Renamed Releases: [" . number_format($updated) . "] " . $consoletools->percentString(++$checked, $total));
 				}
