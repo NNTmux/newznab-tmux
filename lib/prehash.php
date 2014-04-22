@@ -1250,7 +1250,7 @@ Class PreHash
 		return $nfos;
 	}
 
-	// Matches the MD5 within the prehash table to release files and subjects (names) which are hashed.
+	// Matches the MD5/SHA1 within the prehash table to release files and subjects (names) which are hashed.
 	public function parseTitles($time, $echo, $cats, $namestatus, $show)
 	{
 		$db = new DB();
@@ -1306,6 +1306,10 @@ Class PreHash
 					$updated = $updated + $namefixer->matchPredbMD5($matches[0], $row, $echo, $namestatus, $this->echooutput, $show);
 				} else if (preg_match('/[a-f0-9]{32}/i', $row['filename'], $matches)) {
 					$updated = $updated + $namefixer->matchPredbMD5($matches[0], $row, $echo, $namestatus, $this->echooutput, $show);
+				} else if (preg_match('/[a-f0-9]{40}/i', $row['name'], $matches)) {
+					$updated = $updated + $namefixer->matchPredbSHA1($matches[0], $row, $echo, $namestatus, $this->echooutput, $show);
+				} else if (preg_match('/[a-f0-9]{40}/i', $row['filename'], $matches)) {
+					$updated = $updated + $namefixer->matchPredbSHA1($matches[0], $row, $echo, $namestatus, $this->echooutput, $show);
 				}
 				if ($show === 2) {
 					$consoletools->overWritePrimary("Renamed Releases: [" . number_format($updated) . "] " . $consoletools->percentString(++$checked, $total));

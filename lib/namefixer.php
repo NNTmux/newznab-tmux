@@ -183,7 +183,7 @@ class Namefixer
 	public function fixNamesWithPar2($time, $echo, $cats, $namestatus, $show, $nntp)
 	{
 	    if (!isset($nntp))
-			exit($c->error("Not connected to usenet(namefixer->fixNamesWithPar2.\n"));
+			exit($this->c->error("Not connected to usenet(namefixer->fixNamesWithPar2.\n"));
 		if ($time == 1)
 			echo $this->c->header ("Fixing search names in the past 6 hours using the par2 files.");
 		else
@@ -370,6 +370,51 @@ class Namefixer
 		return $matching;
 	}
 
+	/**
+	 *    Match a SHA1 from the prehash table to a release.
+	 */
+	public function matchPredbSHA1($sha1, $release, $echo, $namestatus, $echooutput, $show)
+	{
+		$db = new DB();
+		$matching = 0;
+		$category = new Category();
+		$this->matched = false;
+		$n = "\n";
+		$res = $db->queryDirect(sprintf("SELECT title, source FROM prehash WHERE sha1 = %s", $db->escapeString($sha1)));
+		$total = $res->rowCount();
+		if ($total > 0) {
+			foreach ($res as $row) {
+				if ($row["title"] !== $release["searchname"]) {
+					$determinedcat = $category->determineCategory($release["groupID"], $row["title"]);
+
+					if ($echo == 1) {
+						$this->matched = true;
+						if ($namestatus == 1) {
+							$db->query(sprintf("UPDATE releases SET rageID = NULL, seriesfull = NULL, season = NULL, episode = NULL, tvtitle = NULL, tvairdate = NULL, imdbID = NULL, musicinfoID = NULL, consoleinfoID = NULL, bookinfoID = NULL, "
+									. "anidbID = NULL, searchname = %s, categoryID = %d, isrenamed = 1, iscategorized = 1, dehashstatus = 1 WHERE ID = %d", $db->escapeString($row["title"]), $determinedcat, $release["ID"]
+								)
+							);
+						} else {
+							$db->query(sprintf("UPDATE releases SET rageID = NULL, seriesfull = NULL, season = NULL, episode = NULL, tvtitle = NULL, tvairdate = NULL, imdbID = NULL, musicinfoID = NULL, consoleinfoID = NULL, bookinfoID = NULL, "
+									. "anidbID = NULL, searchname = %s, categoryID = %d, dehashstatus = 1 WHERE ID = %d", $db->escapeString($row["title"]), $determinedcat, $release["ID"]
+								)
+							);
+						}
+					}
+
+					if ($echooutput && $show === 1) {
+						$this->updateRelease($release, $row["title"], $method = "prehash sha1 release name: " . $row["source"], $echo, "SHA1, ", $namestatus, $show);
+					}
+					$matching++;
+				}
+			}
+		} else {
+			$db->query(sprintf("UPDATE releases SET dehashstatus = %d - 1 WHERE ID = %d", $release['dehashstatus'], $release['releaseID']));
+		}
+
+		return $matching;
+	}
+
 	//
 	//  Check the array using regex for a clean name.
 	//
@@ -498,7 +543,7 @@ class Namefixer
 		if ($this->done === false && $this->relid !== $release["releaseID"] && preg_match('/\w[-\w.\',;& ]+(ASIA|DLC|EUR|GOTY|JPN|KOR|MULTI\d{1}|NTSCU?|PAL|RF|Region[._ -]?Free|USA|XBLA)[._ -](DLC[._ -]Complete|FRENCH|GERMAN|MULTI\d{1}|PROPER|PSN|READ[._ -]?NFO|UMD)?[._ -]?(GC|NDS|NGC|PS3|PSP|WII|XBOX(360)?)[-\w.\',;& ]+\w/i', $release["textstring"], $result))
 			$this->updateRelease($release, $result["0"], $method="gameCheck: Videogames 1", $echo, $type, $namestatus, $show);
 		elseif ($this->done === false && $this->relid !== $release["releaseID"] && preg_match('/\w[-\w.\',;& ]+(GC|NDS|NGC|PS3|WII|XBOX(360)?)[._ -](DUPLEX|iNSOMNi|OneUp|STRANGE|SWAG|SKY)[-\w.\',;& ]+\w/i', $release["textstring"], $result))
-			$this->updateRelease($release, $result["0"], $method="gameCheck: Videogames 2", $echo, $type, $namestatus);
+			$this->updateRelease($release, $result["0"], $method = "gameCheck: Videogames 2", $echo, $type, $namestatus, $show);
 		elseif ($this->done === false && $this->relid !== $release["releaseID"] && preg_match('/\w[\w.\',;-].+-OUTLAWS/i', $release["textstring"], $result))
 		{
 			$result = str_replace("OUTLAWS","PC GAME OUTLAWS",$result['0']);
