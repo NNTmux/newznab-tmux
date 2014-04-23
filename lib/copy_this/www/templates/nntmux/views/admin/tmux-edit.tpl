@@ -129,6 +129,14 @@
                     <div class="hint">The time to sleep from the time the loop ends until it is restarted, in seconds.</div>
                 </td>
             </tr>
+
+			<tr>
+                <td style="width:180px;"><label for="bins_kill_timer">Binaries Kill Timer:</label></td>
+                <td>
+                    <input id="bins_kill_timer" name="bins_kill_timer" class="short" type="text" value="{$ftmux->bins_kill_timer}" />
+                    <div class="hint">The time update_binaries is allowed to run with no updates.Time is in minutes.</div>
+                </td>
+            </tr>
         </table>
     </fieldset>
 
