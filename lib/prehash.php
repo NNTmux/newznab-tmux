@@ -19,7 +19,7 @@ require_once("namefixer.php");
  * Class for inserting names/categories/md5 etc from PreDB sources into the DB,
  * also for matching names on files / subjects.
  *
- * Class PreDb
+ * Class PreHash
  */
 Class PreHash
 {
@@ -452,7 +452,7 @@ Class PreHash
 							}
 							$md5 =  $this->db->escapeString(md5($matches4['title']));
 							$sha1 = $this->db->escapeString(sha1($matches4['title']));
-							$oldName = $this->db->queryOneRow(sprintf('SELECT md5 FROM prehash WHERE md5 = %s', $md5));
+							$oldName = $this->db->queryOneRow(sprintf('SELECT md5, sha1 FROM prehash WHERE md5 = %s AND sha1 = %s', $md5, $sha1));
 
 							// If we have it already, skip.
 							if ($oldName !== false) {
@@ -516,7 +516,7 @@ Class PreHash
 								}
 								$md5 = $this->db->escapeString(md5($matches2['title']));
 								$sha1 = $this->db->escapeString(sha1($matches2['title']));
-								$oldName = $this->db->queryOneRow(sprintf('SELECT md5 FROM prehash WHERE md5 = %s', $md5));
+								$oldName = $this->db->queryOneRow(sprintf('SELECT md5, sha1 FROM prehash WHERE md5 = %s AND sha1 = %s', $md5, $sha1));
 								if ($oldName !== false) {
 									continue;
 								} elseif ($this->db->exec(
@@ -575,7 +575,7 @@ Class PreHash
 					}
 					$md5 = $this->db->escapeString(md5($release->title));
 					$sha1 = $this->db->escapeString(sha1($release->title));
-					$oldName = $this->db->queryOneRow(sprintf('SELECT ID, nfo FROM prehash WHERE md5 = %s', $md5));
+					$oldName = $this->db->queryOneRow(sprintf('SELECT ID, nfo FROM prehash WHERE md5 = %s AND sha1 = %s', $md5, $sha1));
 
 					$nfo = $size = '';
 					if (preg_match('/<dt>NFO availability<\/dt>\s*<dd>(?P<nfo>(yes|no))<\/dd>/is', $release->description, $description)) {
@@ -673,7 +673,7 @@ Class PreHash
 						}
 						$md5 = $this->db->escapeString(md5($release->title));
 						$sha1 = $this->db->escapeString(sha1($release->title));
-						$oldname = $this->db->queryOneRow(sprintf('SELECT md5 FROM prehash WHERE md5 = %s', $md5));
+						$oldname = $this->db->queryOneRow(sprintf('SELECT md5, sha1 FROM prehash WHERE md5 = %s AND sha1 = %s', $md5, $sha1));
 						if ($oldname !== false) {
 							continue;
 						} elseif ($this->db->exec(
@@ -730,7 +730,7 @@ Class PreHash
 			if (preg_match_all('/<tr class="(even|odd)".+?<\/tr>/s', $buffer, $matches)) {
 				foreach ($matches as $match) {
 					foreach ($match as $m) {
-						if (preg_match('/<td class="cell_reqid">(?P<requestID>\d+)<\/td>.+?<td class="cell_filecount">(?P<files>\d+x\d+)<\/td>.+?<td class="cell_request">(?P<title>.+)<\/td>.+<td class="cell_statuschange">(?P<predate>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})<\/td>/s', $m, $matches2)) {
+						if (preg_match('/<td class="cell_reqid">(?P<requestid>\d+)<\/td>.+?<td class="cell_filecount">(?P<files>\d+x\d+)<\/td>.+?<td class="cell_request">(?P<title>.+)<\/td>.+<td class="cell_statuschange">(?P<predate>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})<\/td>/s', $m, $matches2)) {
 							if (isset($matches2["requestID"]) && isset($matches2["title"])) {
 
 								// If too short, skip.
@@ -739,14 +739,14 @@ Class PreHash
 								}
 								$md5 = $this->db->escapeString(md5($matches2["title"]));
 								$sha1 = $this->db->escapeString(sha1($matches2["title"]));
-								$dupeCheck = $this->db->queryOneRow(sprintf('SELECT ID, requestID FROM prehash WHERE md5 = %s', $md5));
+								$dupeCheck = $this->db->queryOneRow(sprintf('SELECT ID, requestID FROM prehash WHERE md5 = %s AND sha1 = %s', $md5, $sha1));
 								if ($dupeCheck === false) {
 									$this->db->exec(
 										sprintf("
 											INSERT INTO prehash (title, predate, source, md5, sha1, requestID, groupID, files, category)
 											VALUES (%s, %s, %s, %s, %s, %s, %d, %s, 'Movies')",
-											$this->db->escapeString($matches2["title"]),
-											$this->functions->from_unixtime(strtotime($matches2["predate"])),
+											$this->db->escapeString($matches2['title']),
+											$this->functions->from_unixtime(strtotime($matches2['predate'])),
 											$this->db->escapeString('abMooVee'),
 											$md5,
 											$sha1,
@@ -762,7 +762,7 @@ Class PreHash
 											UPDATE prehash
 											SET requestID = %s, groupID = %d, files = %s
 											WHERE md5 = %s',
-											$matches2["requestID"],
+											$matches2['requestID'],
 											$groupid,
 											$this->db->escapeString($matches2['files']),
 											$md5
@@ -802,7 +802,7 @@ Class PreHash
 			if (preg_match_all('/<tr class="(even|odd)".+?<\/tr>/s', $buffer, $matches)) {
 				foreach ($matches as $match) {
 					foreach ($match as $m) {
-						if (preg_match('/<td class="cell_reqid">(?P<requestID>\d+)<\/td>.+?<td class="cell_filecount">(?P<files>\d+x\d+)<\/td>.+?<td class="cell_request">(?P<title>.+)<\/td>.+<td class="cell_statuschange">(?P<predate>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})<\/td>/s', $m, $matches2)) {
+						if (preg_match('/<td class="cell_reqid">(?P<requestid>\d+)<\/td>.+?<td class="cell_filecount">(?P<files>\d+x\d+)<\/td>.+?<td class="cell_request">(?P<title>.+)<\/td>.+<td class="cell_statuschange">(?P<predate>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})<\/td>/s', $m, $matches2)) {
 							if (isset($matches2["requestID"]) && isset($matches2["title"])) {
 
 								// Skip if too short.
@@ -811,7 +811,7 @@ Class PreHash
 								}
 								$md5 = $this->db->escapeString(md5($matches2["title"]));
 								$sha1 = $this->db->escapeString(sha1($matches2["title"]));
-								$dupeCheck = $this->db->queryOneRow(sprintf('SELECT ID, requestID FROM prehash WHERE md5 = %s', $md5));
+								$dupeCheck = $this->db->queryOneRow(sprintf('SELECT ID, requestID FROM prehash WHERE md5 = %s AND sha1 = %s', $md5, $sha1));
 								if ($dupeCheck === false) {
 									$this->db->exec(
 										sprintf("
@@ -874,7 +874,7 @@ Class PreHash
 			if (preg_match_all('/<tr class="(even|odd)".+?<\/tr>/s', $buffer, $matches)) {
 				foreach ($matches as $match) {
 					foreach ($match as $m) {
-						if (preg_match('/<td class="cell_reqid">(?P<requestID>\d+)<\/td>.+?<td class="cell_type">(?P<category>.+?)<\/td>.+?<td class="cell_filecount">(?P<files>\d+x\d+)<\/td>.+?<td class="cell_request">(?P<title>.+)<\/td>.+<td class="cell_statuschange">(?P<predate>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})<\/td>/s', $m, $matches2)) {
+						if (preg_match('/<td class="cell_reqid">(?P<requestid>\d+)<\/td>.+?<td class="cell_type">(?P<category>.+?)<\/td>.+?<td class="cell_filecount">(?P<files>\d+x\d+)<\/td>.+?<td class="cell_request">(?P<title>.+)<\/td>.+<td class="cell_statuschange">(?P<predate>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})<\/td>/s', $m, $matches2)) {
 							if (isset($matches2["requestID"]) && isset($matches2["title"])) {
 
 								// If too short, skip.
@@ -947,7 +947,7 @@ Class PreHash
 				$matches = $matches2 = $match = array();
 				foreach ($matches as $match) {
 					foreach ($match as $m) {
-						if (preg_match('/<td class="cell_reqid">(?P<requestID>\d+)<\/td>.+<td class="cell_type">(?P<category>.+?)<\/td>.+?<td class="cell_filecount">(?P<files>\d+x\d+)<\/td>.+?<td class="cell_request">(?P<title>.+)<\/td>.+<td class="cell_statuschange">(?P<predate>\d{4}-\d{2}-\d{2}( \d{2}:\d{2}:\d{2})?)<\/td>/s', $m, $matches2)) {
+						if (preg_match('/<td class="cell_reqid">(?P<requestid>\d+)<\/td>.+<td class="cell_type">(?P<category>.+?)<\/td>.+?<td class="cell_filecount">(?P<files>\d+x\d+)<\/td>.+?<td class="cell_request">(?P<title>.+)<\/td>.+<td class="cell_statuschange">(?P<predate>\d{4}-\d{2}-\d{2}( \d{2}:\d{2}:\d{2})?)<\/td>/s', $m, $matches2)) {
 							if (isset($matches2["requestID"]) && isset($matches2["title"])) {
 
 								// If too short, skip.
@@ -1032,7 +1032,7 @@ Class PreHash
 						$sha1 = sha1($title[1]);
 						$predate = $title[2];
 
-						$oldname = $this->db->queryOneRow(sprintf('SELECT md5, sha1, requestiID, groupID FROM prehash WHERE md5 = %s AND sha1 = %s', $this->db->escapeString($md5), $this->db->escapeString($sha1)));
+						$oldname = $this->db->queryOneRow(sprintf('SELECT md5, sha1, requestID, groupID FROM prehash WHERE md5 = %s AND sha1 = %s', $this->db->escapeString($md5), $this->db->escapeString($sha1)));
 						if ($oldname !== false && empty($oldname['requestID'])) {
 							$this->db->exec(
 								sprintf('
@@ -1250,7 +1250,7 @@ Class PreHash
 		return $nfos;
 	}
 
-	// Matches the MD5 within the prehash table to release files and subjects (names) which are hashed.
+	// Matches the MD5/SHA1 within the prehash table to release files and subjects (names) which are hashed.
 	public function parseTitles($time, $echo, $cats, $namestatus, $show)
 	{
 		$db = new DB();
@@ -1277,12 +1277,12 @@ Class PreHash
 			if ($time == 1) {
 				$te = ' in the past 3 hours';
 			}
-			echo $this->c->header('Fixing search names' . $te . " using the prehash md5.");
+			echo $this->c->header('Fixing search names' . $te . " using the prehash md5/sha1.");
 		}
 		if (DB_TYPE === 'mysql') {
-			$regex = "AND (r.ishashed = 1 OR rf.name REGEXP'[a-fA-F0-9]{32}')";
+			$regex = "AND (r.ishashed = 1 OR rf.name REGEXP'[a-fA-F0-9]{32}' OR rf.name REGEXP'[a-fA-F0-9]{40}')";
 		} else if (DB_TYPE === 'pgsql') {
-			$regex = "AND (r.ishashed = 1 OR rf.name ~ '[a-fA-F0-9]{32}')";
+			$regex = "AND (r.ishashed = 1 OR rf.name ~ '[a-fA-F0-9]{32}' OR rf.name ~ '[a-fA-F0-9]{40}')";
 		}
 
 		if ($cats === 3) {
@@ -1303,10 +1303,20 @@ Class PreHash
 		if ($total > 0) {
 			foreach ($res as $row) {
 				if (preg_match('/[a-f0-9]{32}/i', $row['name'], $matches)) {
-					$updated = $updated + $namefixer->matchPredbMD5($matches[0], $row, $echo, $namestatus, $this->echooutput, $show);
-				} else if (preg_match('/[a-f0-9]{32}/i', $row['filename'], $matches)) {
-					$updated = $updated + $namefixer->matchPredbMD5($matches[0], $row, $echo, $namestatus, $this->echooutput, $show);
-				}
+                                        if (strlen($matches[0]) === 32) {
+                                                $updated = $updated + $namefixer->matchPredbMD5($matches[0], $row, $echo, $namestatus, $this->echooutput, $show);
+                                        }
+                                        else if (strlen($matches[0]) === 40) {
+                                                $updated = $updated + $namefixer->matchPredbSHA1($matches[0], $row, $echo, $namestatus, $this->echooutput, $show);
+                                        }
+                                } else if (preg_match('/[a-f0-9]{32}/i', $row['filename'], $matches)) {
+                                        if (strlen($matches[0]) === 32) {
+                                                $updated = $updated + $namefixer->matchPredbMD5($matches[0], $row, $echo, $namestatus, $this->echooutput, $show);
+                                        }
+                                        else if (strlen($matches[0]) === 40) {
+                                                $updated = $updated + $namefixer->matchPredbSHA1($matches[0], $row, $echo, $namestatus, $this->echooutput, $show);
+                                        }
+                                }
 				if ($show === 2) {
 					$consoletools->overWritePrimary("Renamed Releases: [" . number_format($updated) . "] " . $consoletools->percentString(++$checked, $total));
 				}
@@ -1383,7 +1393,7 @@ Class PreHash
 	protected function getUrl($url)
 	{
 		return $this->functions->getUrl(
-			$url,
+		$url,
 			'get',
 			'',
 			'en',

@@ -435,56 +435,6 @@ class Functions
 		$this->db->exec(sprintf('UPDATE releases SET haspreview = 1 WHERE guid = %s', $this->db->escapeString($guid)));
 	}
 
-	function addfile($v, $release, $rar = false, $nntp)
-	{
-		if (!isset($nntp))
-			exit($this->c->error("Not connected to usenet(postprocess->addfile).\n"));
-
-		if (!isset($v['error']) && isset($v['source'])) {
-			if ($rar !== false && preg_match('/\.zip$/', $v['source'])) {
-				$zip = new ZipInfo();
-				$tmpdata = $zip->getFileData($v['name'], $v['source']);
-			} else if ($rar !== false)
-				$tmpdata = $rar->getFileData($v['name'], $v['source']);
-			else
-				$tmpdata = false;
-
-			// Check if we already have the file or not.
-			// Also make sure we don't add too many files, some releases have 100's of files, like PS3 releases.
-			if ($this->filesadded < 11 && $this->db->queryOneRow(sprintf('SELECT ID FROM releasefiles WHERE releaseID = %d AND name = %s AND size = %d', $release['ID'], $this->db->escapeString($v['name']), $v['size'])) === false) {
-				$rf = new ReleaseFiles();
-				if ($rf->add($release['ID'], $v['name'], $v['size'], $v['date'], $v['pass'])) {
-					$this->filesadded++;
-					$this->newfiles = true;
-					if ($this->echooutput)
-						echo '^';
-				}
-			}
-
-			if ($tmpdata !== false) {
-				// Extract a NFO from the rar.
-				if ($this->nonfo === true && $v['size'] > 100 && $v['size'] < 100000 && preg_match('/(\.(nfo|inf|ofn)|info.txt)$/i', $v['name'])) {
-					$nfo = new Info($this->echooutput);
-					if ($this->nfo->addAlternateNfo($tmpData, $release, $nntp)) {
-						$this->debug('added rar nfo');
-						if ($this->echooutput)
-							echo 'n';
-						$this->nonfo = false;
-					}
-				} // Extract a video file from the compressed file.
-				else if ($this->site->mediainfopath != '' && preg_match('/' . $this->videofileregex . '$/i', $v['name']))
-					$this->addmediafile($this->tmpPath . 'sample_' . mt_rand(0, 99999) . '.avi', $tmpdata);
-				// Extract an audio file from the compressed file.
-				else if ($this->site->mediainfopath != '' && preg_match('/' . $this->audiofileregex . '$/i', $v['name'], $ext))
-					$this->addmediafile($this->tmpPath . 'audio_' . mt_rand(0, 99999) . $ext[0], $tmpdata);
-				else if ($this->site->mediainfopath != '' && preg_match('/([^\/\\\r]+)(\.[a-z][a-z0-9]{2,3})$/i', $v['name'], $name))
-					$this->addmediafile($this->tmpPath . $name[1] . mt_rand(0, 99999) . $name[2], $tmpdata);
-			}
-			unset($tmpdata, $rf);
-		}
-	}
-
-
 	public
 	function debug($str)
 	{
@@ -574,20 +524,6 @@ class Functions
 		}
 
 		return $result;
-	}
-
-	function addmediafile($file, $data)
-	{
-		if (@file_put_contents($file, $data) !== false) {
-			$xmlarray = @runCmd('"' . $this->site->mediainfopath . '" --Output=XML "' . $file . '"');
-			if (is_array($xmlarray)) {
-				$xmlarray = implode("\n", $xmlarray);
-				$xmlObj = @simplexml_load_string($xmlarray);
-				$arrXml = objectsIntoArray($xmlObj);
-				if (!isset($arrXml['File']['track'][0]))
-					@unlink($file);
-			}
-		}
 	}
 
 	public

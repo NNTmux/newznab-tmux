@@ -83,6 +83,7 @@ INSERT INTO tmux (setting, value) values ('defrag_cache','900'),
 	('fix_names','0'),
 	('seq_timer','30'),
 	('bins_timer','30'),
+	('bins_kill_timer', '0'),
 	('back_timer','30'),
 	('import_timer','30'),
 	('rel_timer','30'),
@@ -190,10 +191,10 @@ INSERT INTO tmux (setting, value) values ('defrag_cache','900'),
     ('sharing_timer', '60'),
 	('imdburl', '0'),
 	('yydecoderpath', ''),
-  ('ffmpeg_duration', '5'),
-  ('ffmpeg_image_time', '5'),
-  ('processvideos', '0'),
-  ('sqlpatch', '27');
+  	('ffmpeg_duration', '5'),
+  	('ffmpeg_image_time', '5'),
+  	('processvideos', '0'),
+  	('sqlpatch', '28');
 
 DROP TABLE IF EXISTS country;
 CREATE TABLE country (

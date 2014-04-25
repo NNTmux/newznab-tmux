@@ -9,7 +9,7 @@ require_once(dirname(__FILE__) . "/../lib/showsleep.php");
 require_once(dirname(__FILE__) . "/../lib/functions.php");
 
 
-$version = "0.3r1109";
+$version = "0.3r1115";
 
 $db = new DB();
 $functions = new Functions();
@@ -99,6 +99,7 @@ $proc_tmux = "SELECT "
 	. "(SELECT VALUE FROM tmux WHERE SETTING = 'back_timer') as back_timer, "
 	. "(SELECT VALUE FROM tmux WHERE SETTING = 'import_timer') as import_timer, "
 	. "(SELECT VALUE FROM tmux WHERE SETTING = 'postprocess_kill') as postprocess_kill, "
+	. "(SELECT VALUE FROM tmux WHERE SETTING = 'bins_kill_timer') as bins_kill_timer, "
 	. "(SELECT VALUE FROM tmux WHERE SETTING = 'crap_timer') as crap_timer, "
 	. "(SELECT VALUE FROM tmux WHERE SETTING = 'fix_crap') as fix_crap, "
 	. "(SELECT VALUE FROM tmux WHERE SETTING = 'fix_crap_opt') as fix_crap_opt, "
@@ -763,6 +764,9 @@ while ($i > 0) {
 	if ($proc_tmux_result[0]['postprocess_kill'] != null) {
 		$postprocess_kill = $proc_tmux_result[0]['postprocess_kill'];
 	}
+	if ($proc_tmux_result[0]['bins_kill_timer'] != null) {
+		$bins_kill_timer = $proc_tmux_result[0]['bins_kill_timer'];
+	}
 	if ($proc_tmux_result[0]['backfilldays'] != null) {
 		$backfilldays = $proc_tmux_result[0]['backfilldays'];
 	}
@@ -1052,19 +1056,20 @@ while ($i > 0) {
 	$panes3 = str_replace("\n", '', explode(" ", $panes_win_4));
 	$panes4 = str_replace("\n", '', explode(" ", $panes_win_5));
 
-	$killed = "false";
+
 	//kill update_binaries.php backfill.php and import-nzb if timer exceeded
-	/*$killit=explode(" ", relativeTime("$newestadd"));
-	if ( $post_kill_timer != 0 ) {
-		if ((( $killit[1] != "secs" ) && ( $killit[1] != "sec" )) && (( $killit[1] == "hrs" ) || ( $killit[1] == "hr" ) || ( $killit[0] >= $post_kill_timer) && ( $i % 5 == 0 ))) {
+	$killit=explode(" ", relativeTime("$newestadd"));
+	$killed = "false";
+	if ( $bins_kill_timer != 0 ) {
+		if ((( $killit[1] != "secs" ) && ( $killit[1] != "sec" )) && (( $killit[1] == "hrs" ) || ( $killit[1] == "hr" ) || ( $killit[0] >= $bins_kill_timer) && ( $i % 5 == 0 ))) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -k -t${tmux_session}:0.2 'echo \"\033[38;5;\"$color\"m\n$panes0[2] Killed by Postprocess Kill Timer\"'");
+			shell_exec("tmux respawnp -k -t${tmux_session}:0.2 'echo \"\033[38;5;\"$color\"m\n$panes0[2] Killed by Binaries Kill Timer\"'");
 			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -k -t${tmux_session}:0.3 'echo \"\033[38;5;\"$color\"m\n$panes0[3] Killed by Postprocess Kill Timer\"'");
+			shell_exec("tmux respawnp -k -t${tmux_session}:0.3 'echo \"\033[38;5;\"$color\"m\n$panes0[3] Killed by Binaries Kill Timer\"'");
 			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -k -t${tmux_session}:0.4 'echo \"\033[38;5;\"$color\"m\n$panes0[4] Killed by Postprocess Kill Timer\"'");
+			shell_exec("tmux respawnp -k -t${tmux_session}:0.4 'echo \"\033[38;5;\"$color\"m\n$panes0[4] Killed by Binaries Kill Timer\"'");
 		}
-	}*/
+	}
 
 	//get state for binaries
 	if ($binaries == 0) {
@@ -1078,7 +1083,7 @@ while ($i > 0) {
 		$binaries_reason = "pp-exceeded";
 	} else if ($killed == "true") {
 		$binaries_state = "time-exceeded";
-		$binaries_reason = $post_kill_timer . " minutes";
+		$binaries_reason = $bins_kill_timer . " minutes";
 	} else {
 		$binaries_state = "enabled";
 		$binaries_reason = "enabled";
