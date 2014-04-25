@@ -26,6 +26,8 @@ if (!in_array($argv[1], array('efnet', 'cz'))) {
 	exit('Error, must be efnet or cz, you typed: ' . $argv[1] . PHP_EOL);
 }
 
+require_once('/var/www/newznab/misc/update_scripts/nix_scripts/tmux/lib/IRCScraper/settings.php');
+
 if (SCRAPE_IRC_EFNET_NICKNAME == '' || SCRAPE_IRC_CORRUPT_NICKNAME == '' || SCRAPE_IRC_ZENET_NICKNAME == '') {
 	exit("ERROR! You must put a username in settings.php" . PHP_EOL);
 }
