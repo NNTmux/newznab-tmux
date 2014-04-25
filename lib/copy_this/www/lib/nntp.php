@@ -183,8 +183,7 @@ class NNTP extends Net_NNTP_Client
 			// We are already connected to usenet. AND
 			$this->_isConnected() &&
 			// (If compression is wanted and on,                    OR    Compression is not wanted and off.) AND
-			(($compression && $this->compression) || (!$compression && !$this->compression)) &&
-			($this->currentServer === NNTP_SERVER)
+			(($compression && $this->compression)                   || (!$compression && !$this->compression))
 		) {
 			return true;
 		} else {
@@ -457,9 +456,10 @@ class NNTP extends Net_NNTP_Client
 			$iDents = 0;
 
 			// Loop over the message-ID's or article numbers.
-			foreach ($identifiers as $wanted) {
+			foreach ($identifiers as $m) {
+				$iDents++;
 				// Download the body.
-				$message = $this->getMessage($groupName, $wanted);
+				$message = $this->getMessage($groupName, $m);
 
 				// Append the body to $body.
 				if (!$this->isError($message)) {
