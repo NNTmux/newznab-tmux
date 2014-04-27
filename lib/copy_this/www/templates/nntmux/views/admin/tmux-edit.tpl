@@ -276,7 +276,7 @@
                 <td style="width:180px;"><label for="post_kill_timer">Postprocess Kill Timer:</label></td>
                 <td>
                     <input id="post_kill_timer" name="post_kill_timer" class="short" type="text" value="{$ftmux->post_kill_timer}" />
-                    <div class="hint">The time postprocess is allowed to run with no updates to the screen.Time is in minutes. Activity is detected when the history for the pane changes. The clock is restarted every time activity is detected.</div>
+                    <div class="hint">The time postprocess is allowed to run with no updates to the screen.Time is in seconds. Activity is detected when the history for the pane changes. The clock is restarted every time activity is detected.</div>
                 </td>
             </tr>
 
