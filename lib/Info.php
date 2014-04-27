@@ -220,7 +220,7 @@ class Info
 				);
 			}
 
-			$this->db->exec(sprintf('UPDATE releases SET nfostatus = %d WHERE ID = %d', self::NFO_FOUND, $release['ID']));
+			$this->db->exec(sprintf('UPDATE releases SET releasenfoID = 1, nfostatus = %d WHERE ID = %d', self::NFO_FOUND, $release['ID']));
 
 			if (!isset($release['completion'])) {
 				$release['completion'] = 0;
@@ -328,7 +328,7 @@ class Info
 						$nc = $this->db->escapeString(utf8_encode($fetchedBinary));
 					}
 					$ckreleaseid = $this->db->queryOneRow(sprintf('SELECT ID FROM releasenfo WHERE releaseID = %d', $arr['ID']));
-					if (!isset($ckreleaseid['id'])) {
+					if (!isset($ckreleaseid['ID'])) {
 						$this->db->queryInsert(sprintf('INSERT INTO releasenfo (nfo, releaseID) VALUES (' . $cp . ', %d)', $nc, $arr['ID']));
 					}
 					$this->db->exec(sprintf('UPDATE releases SET releasenfoID = 1, nfostatus = %d WHERE ID = %d', self::NFO_FOUND, $arr['ID']));
