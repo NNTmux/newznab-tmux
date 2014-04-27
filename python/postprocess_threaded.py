@@ -163,27 +163,27 @@ if sys.argv[1] == "additional":
 						maxtries = -6
 
 elif sys.argv[1] == "nfo":
-	cur[0].execute("SELECT ID, guid, groupID, name from releases WHERE releasenfoID = 0 AND nfostatus = -1 "+groupID+" ORDER BY postdate DESC LIMIT "+str(process_nfo))
+	cur[0].execute("SELECT ID, guid, groupID, name from releases WHERE nfostatus = -1 "+groupID+" ORDER BY postdate DESC LIMIT "+str(process_nfo))
 	datas = cur[0].fetchall()
 	maxtries = -1
 	if len(datas) < process_nfo:
-		cur[0].execute("SELECT ID, guid, groupID, name from releases WHERE releasenfoID = 0 AND nfostatus = -2 "+groupID+" ORDER BY postdate DESC LIMIT "+str(process_nfo - len(datas)))
+		cur[0].execute("SELECT ID, guid, groupID, name from releases WHERE nfostatus = -2 "+groupID+" ORDER BY postdate DESC LIMIT "+str(process_nfo - len(datas)))
 		datas += cur[0].fetchall()
 		maxtries = -2
 		if len(datas) < process_nfo:
-			cur[0].execute("SELECT ID, guid, groupID, name from releases WHERE releasenfoID = 0 AND nfostatus = -3 "+groupID+" ORDER BY postdate DESC LIMIT "+str(process_nfo - len(datas)))
+			cur[0].execute("SELECT ID, guid, groupID, name from releases WHERE nfostatus = -3 "+groupID+" ORDER BY postdate DESC LIMIT "+str(process_nfo - len(datas)))
 			datas += cur[0].fetchall()
 			maxtries = -3
 			if len(datas) < process_nfo:
-				cur[0].execute("SELECT ID, guid, groupID, name from releases WHERE releasenfoID = 0 AND nfostatus = -4 "+groupID+" ORDER BY postdate DESC LIMIT "+str(process_nfo - len(datas)))
+				cur[0].execute("SELECT ID, guid, groupID, name from releases WHERE nfostatus = -4 "+groupID+" ORDER BY postdate DESC LIMIT "+str(process_nfo - len(datas)))
 				datas += cur[0].fetchall()
 				maxtries = -4
 				if len(datas) < process_nfo:
-					cur[0].execute("SELECT ID, guid, groupID, name from releases WHERE releasenfoID = 0 AND nfostatus = -5 "+groupID+" ORDER BY postdate DESC LIMIT "+str(process_nfo - len(datas)))
+					cur[0].execute("SELECT ID, guid, groupID, name from releases WHERE nfostatus = -5 "+groupID+" ORDER BY postdate DESC LIMIT "+str(process_nfo - len(datas)))
 					datas += cur[0].fetchall()
 					maxtries = -5
 					if len(datas) < process_nfo:
-						cur[0].execute("SELECT ID, guid, groupID, name from releases WHERE releasenfoID = 0 AND nfostatus = -6 "+groupID+" ORDER BY postdate DESC LIMIT "+str(process_nfo - len(datas)))
+						cur[0].execute("SELECT ID, guid, groupID, name from releases WHERE nfostatus = -6 "+groupID+" ORDER BY postdate DESC LIMIT "+str(process_nfo - len(datas)))
 						datas += cur[0].fetchall()
 						maxtries = -6
 
@@ -284,7 +284,7 @@ def main(args):
 		for release in datas:
 			time.sleep(.02)
 			my_queue.put(u("%s           =+=            %s") % (release[0], release[1]))
-			
+
 	my_queue.join()
 
 	if sys.argv[1] == "nfo":

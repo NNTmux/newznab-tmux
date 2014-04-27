@@ -141,7 +141,7 @@ class PProcess
 
 		//\\
 
-		//\\ Site settings.
+		//\\ Tmux settings.
 		$this->addqty = (!empty($this->tmux->maxaddprocessed)) ? (int)$this->tmux->maxaddprocessed : 25;
 		$this->addpar2 = ($this->tmux->addpar2 === '0') ? false : true;
 		$this->maxsize = (!empty($this->tmux->maxsizetopostprocess)) ? (int)$this->tmux->maxsizetopostprocess : 100;
@@ -1105,7 +1105,7 @@ class PProcess
 										if (!isset($r['range'])) {
 												$r['range'] = mt_rand(0, 99999);
 											}
-											
+
 											if (!isset($r['error'])) {
 
 												if ($rel['categoryID'] !== Category::CAT_MISC_OTHER) {
