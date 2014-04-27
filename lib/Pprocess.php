@@ -1407,9 +1407,11 @@ class PProcess
 					}
 				}
 
-				// If samples exist from previous runs, set flags.
+			   // If samples exist from previous runs, set flags.
 				if (file_exists($this->imgSavePath . $rel['guid'] . '_thumb.jpg')) {
 					$iSQL = ', haspreview = 1';
+				} else {
+					$iSQL = ', haspreview = 0';
 				}
 				if (file_exists($this->vidSavePath . $rel['guid'] . '.ogv')) {
 					$vSQL = ', videostatus = 1';
@@ -1418,18 +1420,45 @@ class PProcess
 					$jSQL = ', jpgstatus = 1';
 				}
 
-				$size = $this->db->queryOneRow('SELECT COUNT(releasefiles.releaseID) AS count, SUM(releasefiles.size) AS size FROM releasefiles WHERE releaseID = ' . $rel['ID']);
+				$size = $this->db->queryOneRow(
+					sprintf('
+						SELECT COUNT(releasefiles.releaseID) AS count,
+						SUM(releasefiles.size) AS size
+						FROM releasefiles
+						WHERE releaseID = %d',
+						$rel['ID']
+					)
+				);
+
+				if ($size === false) {
+					$size['count'] = $size['size'] = 0;
+				}
 
 				$pStatus = max($passStatus);
 				if ($this->processPasswords === true && $pStatus > 0) {
-					$sql = sprintf('UPDATE releases SET passwordstatus = %d, rarinnerfilecount = %d %s %s %s %s WHERE ID = %d', $pStatus, $size['count'], $iSQL, $vSQL, $jSQL, $hpSQL, $rel['ID']);
-				} else if ($hasRar && ((isset($size['size']) && (is_null($size['size']) || $size['size'] === '0')) || !isset($size['size']))) {
-					if (!$this->blnTookSample) {
-						$hpSQL = '';
-					}
-					$sql = sprintf('UPDATE releases SET passwordstatus = passwordstatus - 1, rarinnerfilecount = %d %s %s %s %s WHERE ID = %d', $size['count'], $iSQL, $vSQL, $jSQL, $hpSQL, $rel['ID']);
+					$sql =
+						sprintf('
+							UPDATE releases
+							SET passwordstatus = %d, rarinnerfilecount = %d %s %s %s
+							WHERE ID = %d',
+							$pStatus, $size['count'], $iSQL, $vSQL, $jSQL, $rel['ID']
+						);
+				} else if ($hasRar && $size['size'] === 0) {
+					$sql =
+						sprintf('
+							UPDATE releases
+							SET passwordstatus = passwordstatus - 1, rarinnerfilecount = %d %s %s %s
+							WHERE ID = %d',
+							$size['count'], $iSQL, $vSQL, $jSQL, $rel['ID']
+						);
 				} else {
-					$sql = sprintf('UPDATE releases SET passwordstatus = %s, rarinnerfilecount = %d %s %s %s %s WHERE ID = %d', Releases::PASSWD_NONE, $size['count'], $iSQL, $vSQL, $jSQL, $hpSQL, $rel['ID']);
+					$sql =
+						sprintf('
+							UPDATE releases
+							SET passwordstatus = %s, rarinnerfilecount = %d %s %s %s
+							WHERE ID = %d',
+							Releases::PASSWD_NONE, $size['count'], $iSQL, $vSQL, $jSQL, $rel['ID']
+						);
 				}
 
 				$this->db->exec($sql);
