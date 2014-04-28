@@ -24,12 +24,6 @@ class Enzebe
 	 */
 	private $site;
 
-	/**
-	 * Determines if the site setting table per group is enabled.
-	 * @var int
-	 * @access private
-	 */
-	private $tablePerGroup;
 
 	/**
 	 * Group ID when writing NZBs.
@@ -40,7 +34,8 @@ class Enzebe
 
 	/**
 	 * Instance of class db.
-	 * @var nzedb\db\DB
+	 *
+	 * @var $db
 	 * @access protected
 	 */
 	protected $db;
@@ -68,15 +63,16 @@ class Enzebe
 	 */
 	public function __construct()
 	{
-		$this->s = new Sites();
-		$this->site = $this->s->get();
+		$s = new Sites();
+		$this->site = $s->get();
 	}
 
 	/**
 	 * Initiate class vars when writing NZB's.
 	 *
+	 * @param        $db
 	 * @param string $date
-	 * @param int $groupID
+	 * @param int    $groupID
 	 *
 	 * @access public
 	 */
@@ -192,10 +188,10 @@ class Enzebe
 			gzclose($fp);
 
 			if (is_file($path)) {
-				$this->db->queryExec(
+				$this->db->exec(
 					sprintf('
 						UPDATE releases SET nzbstatus = %d %s WHERE ID = %d',
-						NZB::NZB_ADDED,
+						SELF::NZB_ADDED,
 						($nzb_guid === '' ? '' : ', nzb_guid = ' . $this->db->escapestring(md5($nzb_guid))),
 						$relID
 					)
