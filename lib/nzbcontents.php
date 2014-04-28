@@ -3,7 +3,6 @@ require_once(dirname(__FILE__)."/../bin/config.php");
 require_once(WWW_DIR."/lib/framework/db.php");
 require_once(WWW_DIR."/lib/nntp.php");
 require_once(WWW_DIR."/lib/Tmux.php");
-require_once("functions.php");
 require_once("ColorCLI.php");
 require_once("Info.php");
 require_once("Pprocess.php");
@@ -75,7 +74,6 @@ Class NZBcontents
 		$this->site = $s->get();
 		$t = new Tmux();
 		$this->tmux = $t->get();
-		$this->functions = new Functions();
 		$this->pprocess = new PProcess();
 		$this->lookuppar2 = ($this->tmux->lookuppar2 == 1 ? true : false);
 		$this->db   = $options['db'];
@@ -251,7 +249,7 @@ Class NZBcontents
 	protected function LoadNZB(&$guid)
 	{
 		// Fetch the NZB location using the GUID.
-		$nzbpath = $this->functions->NZBPath($guid);
+		$nzbpath = $this->nzb->NZBPath($guid);
 		if ($nzbpath === false) {
 			if ($this->echooutput) {
 				echo PHP_EOL . $guid . " appears to be missing the nzb file, skipping." . PHP_EOL;
