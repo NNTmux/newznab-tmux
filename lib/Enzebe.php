@@ -224,7 +224,9 @@ class Enzebe
 	private function buildNZBPath($releaseGuid, $createIfNotExist)
 	{
 		$siteNzbPath = $this->site->nzbpath;
-		$nzbPath .= substr($releaseGuid, 0, 1) ."/";
+		$nzbPath = '';
+		$i = 0;
+		$nzbPath .= substr($releaseGuid, $i, 1) . '/';
 		$nzbPath = $siteNzbPath . $nzbPath;
 
 		if ($createIfNotExist && !is_dir($nzbPath)) {
