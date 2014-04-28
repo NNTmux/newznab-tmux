@@ -197,7 +197,7 @@ class Enzebe
 				$this->db->exec(
 					sprintf('
 						UPDATE releases SET nzbstatus = %d %s WHERE ID = %d',
-						SELF::NZB_ADDED,
+						Enzebe::NZB_ADDED,
 						($nzb_guid === '' ? '' : ', nzb_guid = ' . $this->db->escapestring(md5($nzb_guid))),
 						$relID
 					)
