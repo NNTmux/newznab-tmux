@@ -650,7 +650,7 @@ class PProcess
 		$this->releaseImage = new ReleaseImage();
 		//\\
 
-		//\\ Site settings.
+		//\\ Tmux and Site settings.
 		$this->ffMPEGDuration = (!empty($this->tmux->ffmpeg_duration)) ? (int)$this->tmux->ffmpeg_duration : 5;
 		$this->partsQTY = (!empty($this->tmux->maxpartsprocessed)) ? (int)$this->tmux->maxpartsprocessed : 3;
 		$this->passChkAttempts = (!empty($this->tmux->passchkattempts)) ? (int)$this->tmux->passchkattempts : 1;
