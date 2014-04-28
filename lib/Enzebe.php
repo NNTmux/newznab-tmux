@@ -112,6 +112,7 @@ class Enzebe
 	{
 		$path = $this->getNZBPath($relGuid, true);
 		$this->site = new Sites();
+		$this->db = new DB();
 		$fp = gzopen($path, 'w5');
 		if ($fp) {
 			$nzb_guid = '';
