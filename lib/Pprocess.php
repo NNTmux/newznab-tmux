@@ -26,6 +26,7 @@ require_once("Sharing.php");
 require_once("TraktTv.php");
 require_once("Film.php");
 require_once("TvAnger.php");
+require_once("Konsole.php");
 
 /**
  * Class PProcess
@@ -208,7 +209,7 @@ class PProcess
 	public function processGames()
 	{
 		if ($this->site->lookupgames !== '0') {
-			$console = new Console($this->echooutput);
+			$console = new Konsole($this->echooutput);
 			$console->processConsoleReleases();
 		}
 	}
