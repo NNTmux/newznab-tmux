@@ -40,13 +40,13 @@ if (isset($argv[2]) && is_numeric($argv[2])) {
 
 //runs on every release
 if (isset($argv[1]) && $argv[1] === "all") {
-	$res = $db->queryDirect("SELECT r.ID, r.searchname, r.categoryID, g.name AS groupname FROM releases r LEFT JOIN groups g ON r.groupID = g.ID WHERE isrequestid = 1");
+	$res = $db->queryDirect("SELECT r.ID, r.searchname, r.categoryID, g.name AS groupname FROM releases r LEFT JOIN groups g ON r.groupID = g.ID WHERE (isrequestid = 1 OR searchname REGEXP '^[0-9]{6}$')");
 //runs on all releases not already renamed
 } else if (isset($argv[1]) && $argv[1] === "full") {
-	$res = $db->queryDirect("SELECT r.ID, r.searchname, r.categoryID, g.name AS groupname FROM releases r LEFT JOIN groups g ON r.groupID = g.ID WHERE (isrenamed = 0 AND isrequestid = 1 " . $time . " AND reqidstatus in (0, -1)");
+	$res = $db->queryDirect("SELECT r.ID, r.searchname, r.categoryID, g.name AS groupname FROM releases r LEFT JOIN groups g ON r.groupID = g.ID WHERE (isrenamed = 0 AND isrequestid = 1 OR searchname REGEXP '^[0-9]{6}$' " . $time . " AND reqidstatus in (0, -1)");
 //runs on all releases not already renamed limited by user
 } else if (isset($argv[1]) && is_numeric($argv[1])) {
-	$res = $db->queryDirect("SELECT r.ID, r.searchname, r.categoryID, g.name AS groupname FROM releases r LEFT JOIN groups g ON r.groupID = g.ID WHERE (isrenamed = 0 AND isrequestid = 1 " . $time . " AND reqidstatus in (0, -1) ORDER BY postdate DESC LIMIT " . $argv[1]);
+	$res = $db->queryDirect("SELECT r.ID, r.searchname, r.categoryID, g.name AS groupname FROM releases r LEFT JOIN groups g ON r.groupID = g.ID WHERE (isrenamed = 0 AND isrequestid = 1 OR searchname REGEXP '^[0-9]{6}$' " . $time . " AND reqidstatus in (0, -1) ORDER BY postdate DESC LIMIT " . $argv[1]);
 }
 
 $total = $res->rowCount();
@@ -56,7 +56,7 @@ if ($total > 0) {
 	sleep(2);
 
 	foreach ($res as $row) {
-		if (!preg_match('/^\[\d+\]/', $row["searchname"]) && !preg_match('/^\[ \d+ \]/', $row["searchname"])) {
+		if (!preg_match('/^\[\d+\]/', $row["searchname"]) && !preg_match('/^\[ \d+ \]/', $row["searchname"]) && !preg_match('^[0-9]{6}$^', $row["searchname"])) {
 			$db->query(sprintf("UPDATE releases SET reqidstatus = -2 WHERE reqidstatus != 1 AND ID = %d", $row["ID"]));
 			continue;
 		}
