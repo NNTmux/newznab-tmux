@@ -14,20 +14,13 @@ require_once(WWW_DIR . "/lib/site.php");
 require_once(WWW_DIR . "/lib/util.php");
 require_once(WWW_DIR . "/lib/groups.php");
 require_once(WWW_DIR . '/lib/nntp.php');
-require_once(WWW_DIR . "/lib/tvrage.php");
-require_once(WWW_DIR . "/lib/movie.php");
 require_once(WWW_DIR . "/lib/postprocess.php");
 require_once(WWW_DIR . "/lib/Tmux.php");
-require_once(WWW_DIR . "/lib/amazon.php");
-require_once(WWW_DIR . "/lib/genres.php");
 require_once("consoletools.php");
 require_once("ColorCLI.php");
 require_once("nzbcontents.php");
 require_once("namefixer.php");
 require_once("TraktTv.php");
-require_once("Sharing.php");
-require_once("Film.php");
-require_once("Info.php");
 
 
 //*addedd from nZEDb for testing
@@ -48,18 +41,6 @@ class Functions
 		$this->m = new Movie();
 		$this->consoleTools = new ConsoleTools();
 		$this->tmpPath = $this->site->tmpunrarpath;
-		$this->audiofileregex = '\.(AAC|AIFF|APE|AC3|ASF|DTS|FLAC|MKA|MKS|MP2|MP3|RA|OGG|OGM|W64|WAV|WMA)';
-		$this->ignorebookregex = '/\b(epub|lit|mobi|pdf|sipdf|html)\b.*\.rar(?!.{20,})/i';
-		$this->supportfiles = '/\.(vol\d{1,3}\+\d{1,3}|par2|srs|sfv|nzb';
-		$this->videofileregex = '\.(AVI|F4V|IFO|M1V|M2V|M4V|MKV|MOV|MP4|MPEG|MPG|MPGV|MPV|OGV|QT|RM|RMVB|TS|VOB|WMV)';
-		$this->segmentstodownload = (!empty($this->tmux->segmentstodownload)) ? $this->tmux->segmentstodownload : 2;
-		$this->passchkattempts = (!empty($this->tmux->passchkattempts)) ? $this->tmux->passchkattempts : 1;
-		$this->partsqty = (!empty($this->tmux->maxpartsprocessed)) ? $this->tmux->maxpartsprocessed : 3;
-		$this->rageqty = (!empty($this->tmux->maxrageprocessed)) ? $this->tmux->maxrageprocessed : 75;
-		$this->pubkey = $this->site->amazonpubkey;
-		$this->privkey = $this->site->amazonprivkey;
-		$this->asstag = $this->site->amazonassociatetag;
-		$this->gameqty = (!empty($this->tmux->maxgamesprocessed)) ? $this->tmux->maxgamesprocessed : 150;
 		$this->sleeptime = (!empty($this->tmux->amazonsleep)) ? $this->tmux->amazonsleep : 1000;
 		$this->DEBUG_ECHO = ($this->tmux->debuginfo == '0') ? false : true;
 		if (defined('DEBUG_ECHO') && DEBUG_ECHO == true) {
@@ -76,14 +57,6 @@ class Functions
 		$this->NewGroupMsgsToScan = (!empty($this->site->newgroupmsgstoscan)) ? (int)$this->site->newgroupmsgstoscan : 50000;
 		$this->NewGroupDaysToScan = (!empty($this->site->newgroupdaystoscan)) ? (int)$this->site->newgroupdaystoscan : 3;
 		$this->partrepairlimit = (!empty($this->tmux->maxpartrepair)) ? (int)$this->tmux->maxpartrepair : 15000;
-		$this->nfo = new Info();
-
-		//\\ Paths.
-		$this->audSavePath = WWW_DIR . 'covers/audiosample/';
-		$this->imgSavePath = WWW_DIR . 'covers/console/';
-		$this->jpgSavePath = WWW_DIR . 'covers/sample/';
-		$this->mainTmpPath = $this->site->tmpunrarpath;
-		//\\
 	}
 
 	/**
