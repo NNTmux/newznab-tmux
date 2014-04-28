@@ -56,7 +56,7 @@ $proc = "SELECT
 ( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE nzbstatus = 1 AND categoryID BETWEEN 5000 AND 5999 AND rageID = -1) AS tv,
 ( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE nzbstatus = 1 AND categoryID = 7020 AND bookinfoID IS NULL ) AS book,
 ( SELECT COUNT(*) FROM releases r USE INDEX(ix_releases_status), category c WHERE nzbstatus = 1 AND c.ID = r.categoryID AND r.passwordstatus = -1 AND r.haspreview = -1 AND c.disablepreview = 0) AS work,
-( SELECT COUNT(*) FROM releases nzbstatus = 1) AS releases,
+( SELECT COUNT(*) FROM releases WHERE nzbstatus = 1) AS releases,
 ( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE nzbstatus = 1 AND nfostatus BETWEEN -6 AND -1) AS nforemains,
 ( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE nzbstatus = 1 AND nfostatus = 1) AS nfo,
 ( SELECT table_rows AS cnt FROM information_schema.TABLES WHERE table_name = 'parts' AND TABLE_SCHEMA = '" . DB_NAME . "' ) AS parts,
