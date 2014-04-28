@@ -1,13 +1,13 @@
 <?php
 require_once(dirname(__FILE__)."/../bin/config.php");
 require_once(WWW_DIR."/lib/framework/db.php");
-require_once(WWW_DIR."/lib/nzb.php");
 require_once(WWW_DIR."/lib/nntp.php");
 require_once(WWW_DIR."/lib/Tmux.php");
 require_once("functions.php");
 require_once("ColorCLI.php");
 require_once("Info.php");
 require_once("Pprocess.php");
+require_once("Enzebe.php");
 
 /**
  * Gets information contained within the NZB.
@@ -37,7 +37,7 @@ Class NZBcontents
 	protected $pp;
 
 	/**
-	 * @var NZB
+	 * @var Enzebe
 	 */
 	protected $nzb;
 
@@ -82,7 +82,7 @@ Class NZBcontents
 		$this->nntp = $options['nntp'];
 		$this->nfo  = $options['nfo'];
 		$this->pp   = $options['pp'];
-		$this->nzb  = new NZB();
+		$this->nzb  = new Enzebe();
 	}
 
 	/**

@@ -10,7 +10,6 @@ require_once(WWW_DIR . "/lib/releaseimage.php");
 require_once(WWW_DIR . "/lib/releaseextra.php");
 require_once(WWW_DIR . "/lib/groups.php");
 require_once(WWW_DIR . '/lib/nntp.php');
-require_once(WWW_DIR . "/lib/nzb.php");
 require_once(WWW_DIR . "/lib/site.php");
 require_once(WWW_DIR . "/lib/Tmux.php");
 require_once(WWW_DIR . "/lib/amazon.php");
@@ -27,6 +26,7 @@ require_once("TraktTv.php");
 require_once("Film.php");
 require_once("TvAnger.php");
 require_once("Konsole.php");
+require_once("Enzebe.php");
 
 /**
  * Class PProcess
@@ -132,6 +132,7 @@ class PProcess
 		$this->Nfo = new Info($this->echooutput);
 		$this->releaseFiles = new ReleaseFiles();
 		$this->functions = new Functions(true);
+		$this->nzb = new Enzebe();
 		$s = new sites();
 		$t = new Tmux();
 		//\\
@@ -797,7 +798,7 @@ class PProcess
 				$this->doEcho('Added: m = video mediainfo, n = nfo, ^ = file details from inside the rar/zip');
 			}
 
-			$nzb = new NZB($this->echooutput);
+			$nzb = new Enzebe($this->echooutput);
 
 			// Loop through the releases.
 			foreach ($result as $rel) {
@@ -856,7 +857,7 @@ class PProcess
 				ob_end_clean();
 
 				// Get a list of files in the nzb.
-				$nzbFiles = $this->functions->nzbFileList($nzbFile);
+				$nzbFiles = $this->nzb->nzbFileList($nzbFile);
 				if (count($nzbFiles) === 0) {
 					// There does not appear to be any files in the nzb, decrement password status.
 					$this->c->debug('processAdditional', 'NZB file is empty: ' . $rel['guid']);

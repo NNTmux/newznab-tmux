@@ -132,76 +132,76 @@ process_additional = run_threads * ppperrun
 process_nfo = run_threads * nfoperrun
 
 if sys.argv[1] == "additional":
-	run = "SELECT r.ID, r.guid, r.name, c.disablepreview, r.size, r.groupID, r.nfostatus, r.categoryID, r.searchname from releases r LEFT JOIN category c ON c.ID = r.categoryID WHERE "+maxsize+" AND r.passwordstatus = -1 AND r.haspreview = -1 AND c.disablepreview = 0 "+groupID+" ORDER BY postdate DESC LIMIT %s"
+	run = "SELECT r.ID, r.guid, r.name, c.disablepreview, r.size, r.groupID, r.nfostatus, r.categoryID, r.searchname from releases r LEFT JOIN category c ON c.ID = r.categoryID WHERE nzbstatus = 1 "+maxsize+" AND r.passwordstatus = -1 AND r.haspreview = -1 AND c.disablepreview = 0 "+groupID+" ORDER BY postdate DESC LIMIT %s"
 	cur[0].execute(run, process_additional)
 	datas = cur[0].fetchall()
 	maxtries = -1
 	if len(datas) < process_additional:
-		run = "SELECT r.ID, r.guid, r.name, c.disablepreview, r.size, r.groupID, r.nfostatus, r.categoryID, r.searchname from releases r LEFT JOIN category c ON c.ID = r.categoryID WHERE "+maxsize+" AND r.passwordstatus = -2 AND r.haspreview = -1 AND c.disablepreview = 0 "+groupID+" ORDER BY postdate DESC LIMIT %s"
+		run = "SELECT r.ID, r.guid, r.name, c.disablepreview, r.size, r.groupID, r.nfostatus, r.categoryID, r.searchname from releases r LEFT JOIN category c ON c.ID = r.categoryID WHERE nzbstatus = 1 "+maxsize+" AND r.passwordstatus = -2 AND r.haspreview = -1 AND c.disablepreview = 0 "+groupID+" ORDER BY postdate DESC LIMIT %s"
 		cur[0].execute(run, (process_additional - len(datas)))
 		datas += cur[0].fetchall()
 		maxtries = -2
 		if len(datas) < process_additional:
-			run = "SELECT r.ID, r.guid, r.name, c.disablepreview, r.size, r.groupID, r.nfostatus, r.categoryID, r.searchname from releases r LEFT JOIN category c ON c.ID = r.categoryID WHERE "+maxsize+" AND r.passwordstatus = -3 AND r.haspreview = -1 AND c.disablepreview = 0 "+groupID+" ORDER BY postdate DESC LIMIT %s"
+			run = "SELECT r.ID, r.guid, r.name, c.disablepreview, r.size, r.groupID, r.nfostatus, r.categoryID, r.searchname from releases r LEFT JOIN category c ON c.ID = r.categoryID WHERE nzbstatus = 1 "+maxsize+" AND r.passwordstatus = -3 AND r.haspreview = -1 AND c.disablepreview = 0 "+groupID+" ORDER BY postdate DESC LIMIT %s"
 			cur[0].execute(run, (process_additional - len(datas)))
 			datas += cur[0].fetchall()
 			maxtries = -3
 			if len(datas) < process_additional:
-				run = "SELECT r.ID, r.guid, r.name, c.disablepreview, r.size, r.groupID, r.nfostatus, r.categoryID, r.searchname from releases r LEFT JOIN category c ON c.ID = r.categoryID WHERE "+maxsize+" AND r.passwordstatus = -4 AND r.haspreview = -1 AND c.disablepreview = 0 "+groupID+" ORDER BY postdate DESC LIMIT %s"
+				run = "SELECT r.ID, r.guid, r.name, c.disablepreview, r.size, r.groupID, r.nfostatus, r.categoryID, r.searchname from releases r LEFT JOIN category c ON c.ID = r.categoryID WHERE nzbstatus = 1 "+maxsize+" AND r.passwordstatus = -4 AND r.haspreview = -1 AND c.disablepreview = 0 "+groupID+" ORDER BY postdate DESC LIMIT %s"
 				cur[0].execute(run, (process_additional - len(datas)))
 				datas += cur[0].fetchall()
 				maxtries = -4
 				if len(datas) < process_additional:
-					run = "SELECT r.ID, r.guid, r.name, c.disablepreview, r.size, r.groupID, r.nfostatus, r.categoryID, r.searchname from releases r LEFT JOIN category c ON c.ID = r.categoryID WHERE "+maxsize+" AND r.passwordstatus = -5 AND r.haspreview = -1 AND c.disablepreview = 0 "+groupID+" ORDER BY postdate DESC LIMIT %s"
+					run = "SELECT r.ID, r.guid, r.name, c.disablepreview, r.size, r.groupID, r.nfostatus, r.categoryID, r.searchname from releases r LEFT JOIN category c ON c.ID = r.categoryID WHERE nzbstatus = 1 "+maxsize+" AND r.passwordstatus = -5 AND r.haspreview = -1 AND c.disablepreview = 0 "+groupID+" ORDER BY postdate DESC LIMIT %s"
 					cur[0].execute(run, (process_additional - len(datas)))
 					datas += cur[0].fetchall()
 					maxtries = -5
 					if len(datas) < process_additional:
-						run = "SELECT r.ID, r.guid, r.name, c.disablepreview, r.size, r.groupID, r.nfostatus, r.categoryID, r.searchname from releases r LEFT JOIN category c ON c.ID = r.categoryID WHERE "+maxsize+" AND r.passwordstatus = -6 AND r.haspreview = -1 AND c.disablepreview = 0 "+groupID+" ORDER BY postdate DESC LIMIT %s"
+						run = "SELECT r.ID, r.guid, r.name, c.disablepreview, r.size, r.groupID, r.nfostatus, r.categoryID, r.searchname from releases r LEFT JOIN category c ON c.ID = r.categoryID WHERE nzbstatus = 1 "+maxsize+" AND r.passwordstatus = -6 AND r.haspreview = -1 AND c.disablepreview = 0 "+groupID+" ORDER BY postdate DESC LIMIT %s"
 						cur[0].execute(run, (process_additional - len(datas)))
 						datas += cur[0].fetchall()
 						maxtries = -6
 
 elif sys.argv[1] == "nfo":
-	cur[0].execute("SELECT ID, guid, groupID, name from releases WHERE nfostatus = -1 "+groupID+" ORDER BY postdate DESC LIMIT "+str(process_nfo))
+	cur[0].execute("SELECT ID, guid, groupID, name from releases WHERE nzbstatus = 1 AND nfostatus = -1 "+groupID+" ORDER BY postdate DESC LIMIT "+str(process_nfo))
 	datas = cur[0].fetchall()
 	maxtries = -1
 	if len(datas) < process_nfo:
-		cur[0].execute("SELECT ID, guid, groupID, name from releases WHERE nfostatus = -2 "+groupID+" ORDER BY postdate DESC LIMIT "+str(process_nfo - len(datas)))
+		cur[0].execute("SELECT ID, guid, groupID, name from releases WHERE nzbstatus = 1 AND nfostatus = -2 "+groupID+" ORDER BY postdate DESC LIMIT "+str(process_nfo - len(datas)))
 		datas += cur[0].fetchall()
 		maxtries = -2
 		if len(datas) < process_nfo:
-			cur[0].execute("SELECT ID, guid, groupID, name from releases WHERE nfostatus = -3 "+groupID+" ORDER BY postdate DESC LIMIT "+str(process_nfo - len(datas)))
+			cur[0].execute("SELECT ID, guid, groupID, name from releases WHERE nzbstatus = 1 AND nfostatus = -3 "+groupID+" ORDER BY postdate DESC LIMIT "+str(process_nfo - len(datas)))
 			datas += cur[0].fetchall()
 			maxtries = -3
 			if len(datas) < process_nfo:
-				cur[0].execute("SELECT ID, guid, groupID, name from releases WHERE nfostatus = -4 "+groupID+" ORDER BY postdate DESC LIMIT "+str(process_nfo - len(datas)))
+				cur[0].execute("SELECT ID, guid, groupID, name from releases WHERE nzbstatus = 1 AND nfostatus = -4 "+groupID+" ORDER BY postdate DESC LIMIT "+str(process_nfo - len(datas)))
 				datas += cur[0].fetchall()
 				maxtries = -4
 				if len(datas) < process_nfo:
-					cur[0].execute("SELECT ID, guid, groupID, name from releases WHERE nfostatus = -5 "+groupID+" ORDER BY postdate DESC LIMIT "+str(process_nfo - len(datas)))
+					cur[0].execute("SELECT ID, guid, groupID, name from releases WHERE nzbstatus = 1 AND nfostatus = -5 "+groupID+" ORDER BY postdate DESC LIMIT "+str(process_nfo - len(datas)))
 					datas += cur[0].fetchall()
 					maxtries = -5
 					if len(datas) < process_nfo:
-						cur[0].execute("SELECT ID, guid, groupID, name from releases WHERE nfostatus = -6 "+groupID+" ORDER BY postdate DESC LIMIT "+str(process_nfo - len(datas)))
+						cur[0].execute("SELECT ID, guid, groupID, name from releases WHERE nzbstatus = 1 AND nfostatus = -6 "+groupID+" ORDER BY postdate DESC LIMIT "+str(process_nfo - len(datas)))
 						datas += cur[0].fetchall()
 						maxtries = -6
 
 
 elif sys.argv[1] == "movie" and len(sys.argv) == 3 and sys.argv[2] == "clean":
-		run = "SELECT DISTINCT searchname AS name, ID, categoryID from releases WHERE isrenamed = 1 AND searchname IS NOT NULL AND imdbID IS NULL AND categoryID IN (SELECT ID FROM category WHERE parentID = 2000) ORDER BY postdate DESC LIMIT %s"
+		run = "SELECT DISTINCT searchname AS name, ID, categoryID from releases WHERE nzbstatus = 1 AND isrenamed = 1 AND searchname IS NOT NULL AND imdbID IS NULL AND categoryID IN (SELECT ID FROM category WHERE parentID = 2000) ORDER BY postdate DESC LIMIT %s"
 		cur[0].execute(run, (run_threads * movieperrun))
 		datas = cur[0].fetchall()
 elif sys.argv[1] == "movie":
-		run = "SELECT searchname AS name, ID, categoryID from releases WHERE searchname IS NOT NULL AND imdbID IS NULL AND categoryID IN (SELECT ID FROM category WHERE parentID = 2000) ORDER BY postdate DESC LIMIT %s"
+		run = "SELECT searchname AS name, ID, categoryID from releases WHERE nzbstatus = 1 AND searchname IS NOT NULL AND imdbID IS NULL AND categoryID IN (SELECT ID FROM category WHERE parentID = 2000) ORDER BY postdate DESC LIMIT %s"
 		cur[0].execute(run, (run_threads * movieperrun))
 		datas = cur[0].fetchall()
 elif sys.argv[1] == "tv" and len(sys.argv) == 3 and sys.argv[2] == "clean":
-		run = "SELECT searchname, ID from releases WHERE isrenamed = 1 AND searchname IS NOT NULL AND rageID = -1 AND categoryID IN (SELECT ID FROM category WHERE parentID = 5000 ) "+orderBY+" LIMIT %s"
+		run = "SELECT searchname, ID from releases WHERE nzbstatus = 1 AND isrenamed = 1 AND searchname IS NOT NULL AND rageID = -1 AND categoryID IN (SELECT ID FROM category WHERE parentID = 5000 ) "+orderBY+" LIMIT %s"
 		cur[0].execute(run, (run_threads * tvrageperrun))
 		datas = cur[0].fetchall()
 elif sys.argv[1] == "tv":
-		run = "SELECT searchname, ID from releases WHERE searchname IS NOT NULL AND rageID = -1 AND categoryID IN (SELECT ID FROM category WHERE parentID = 5000 ) "+orderBY+" LIMIT %s"
+		run = "SELECT searchname, ID from releases WHERE nzbstatus = 1 AND searchname IS NOT NULL AND rageID = -1 AND categoryID IN (SELECT ID FROM category WHERE parentID = 5000 ) "+orderBY+" LIMIT %s"
 		cur[0].execute(run, (run_threads * tvrageperrun))
 		datas = cur[0].fetchall()
 
