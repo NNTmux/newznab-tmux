@@ -123,7 +123,7 @@ if sys.argv[1] == "additional" or sys.argv[1] == "nfo":
 if maxsize == 0:
 	maxsize = ''
 else:
-	maxsize = 'r.size < '+str(maxsizeck * 1073741824)
+	maxsize = 'AND r.size < '+str(maxsizeck * 1073741824)
 
 datas = []
 maxtries = -1
