@@ -111,6 +111,7 @@ class Enzebe
 	public function writeNZBforReleaseId($relID, $relGuid, $name, $cTitle)
 	{
 		$path = $this->getNZBPath($relGuid, true);
+		$this->site = new Sites();
 		$fp = gzopen($path, 'w5');
 		if ($fp) {
 			$nzb_guid = '';
