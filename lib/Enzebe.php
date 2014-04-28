@@ -132,12 +132,16 @@ class Enzebe
 			$result =
 				$this->db->query(
 					sprintf('
-						SELECT binaries.*,
-						UNIX_TIMESTAMP(date) AS udate, groups.name
-						FROM binaries
-						INNER JOIN groups on binaries.groupID = groups.ID
-						WHERE binaries.releaseID = %d
-						ORDER BY binaries.name', $relID
+						SELECT %s.*, %s.date AS udate, groups.name AS groupname
+						FROM %s
+						INNER JOIN groups ON %s.groupID = groups.ID
+						WHERE %s.releaseID = %d',
+						$this->bname,
+						$this->bname,
+						$this->bname,
+						$this->bname,
+						$this->bname,
+						$relID
 					)
 				);
 
