@@ -1,4 +1,4 @@
-ALTER TABLE `releases` ADD COLUMN `nzbstatus` TINYINT(1) NOT NULL DEFAULT 0;
+ALTER TABLE `releases` ADD COLUMN `nzbstatus` TINYINT(1) NOT NULL DEFAULT 1;
 ALTER TABLE `releases` ADD COLUMN `nzb_guid` VARCHAR(50) NULL;
 ALTER TABLE `releases` DROP INDEX `ix_releases_status`;
 ALTER TABLE `releases` ADD INDEX `ix_releases_status` (`nzbstatus`, `iscategorized`, `isrenamed`, `nfostatus`, `ishashed`, `passwordstatus`, `dehashstatus`, `releasenfoID`, `musicinfoID`, `consoleinfoID`, `bookinfoID`, `haspreview`, `categoryID`, `imdbID`, `rageID`);
