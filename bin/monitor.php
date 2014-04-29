@@ -9,7 +9,7 @@ require_once(dirname(__FILE__) . "/../lib/showsleep.php");
 require_once(dirname(__FILE__) . "/../lib/functions.php");
 
 
-$version = "0.3r1125";
+$version = "0.3r1130";
 
 $db = new DB();
 $functions = new Functions();
@@ -48,17 +48,17 @@ $qry = "SELECT c.parentID AS parentID, COUNT(r.ID) AS count FROM category c, rel
 
 //needs to be processed query
 $proc = "SELECT
-( SELECT COUNT(*) FROM releases WHERE nzbstatus = 1 AND categoryID BETWEEN 1000 AND 1999 AND consoleinfoID IS NULL ) AS console,
-( SELECT COUNT(*) FROM releases WHERE nzbstatus = 1 AND categoryID BETWEEN 2000 AND 2999 AND imdbID IS NULL ) AS movies,
-( SELECT COUNT(*) FROM releases WHERE nzbstatus = 1 AND categoryID BETWEEN 3000 AND 3999 AND musicinfoID IS NULL) AS audio,
-( SELECT COUNT(*) FROM releases r, category c WHERE nzbstatus = 1 AND c.ID = r.categoryID AND c.parentID = 6000 AND r.passwordstatus = -1 AND r.haspreview = -1 AND c.disablepreview = 0) AS xxx,
-( SELECT COUNT(*) FROM releases r INNER JOIN category c on c.ID = r.categoryID WHERE nzbstatus = 1 AND (r.passwordstatus = -1) OR (r.haspreview = -1 and c.disablepreview = 0)) AS pc,
-( SELECT COUNT(*) FROM releases WHERE nzbstatus = 1 AND categoryID BETWEEN 5000 AND 5999 AND rageID = -1) AS tv,
-( SELECT COUNT(*) FROM releases WHERE nzbstatus = 1 AND categoryID = 7020 AND bookinfoID IS NULL ) AS book,
-( SELECT COUNT(*) FROM releases r, category c WHERE nzbstatus = 1 AND c.ID = r.categoryID AND r.passwordstatus = -1 AND r.haspreview = -1 AND c.disablepreview = 0) AS work,
-( SELECT COUNT(*) FROM releases WHERE nzbstatus = 1) AS releases,
-( SELECT COUNT(*) FROM releases WHERE nzbstatus = 1 AND nfostatus BETWEEN -6 AND -1) AS nforemains,
-( SELECT COUNT(*) FROM releases WHERE nzbstatus = 1 AND nfostatus = 1) AS nfo,
+( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE categoryID BETWEEN 1000 AND 1999 AND consoleinfoID IS NULL ) AS console,
+( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE categoryID BETWEEN 2000 AND 2999 AND imdbID IS NULL ) AS movies,
+( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE categoryID BETWEEN 3000 AND 3999 AND musicinfoID IS NULL) AS audio,
+( SELECT COUNT(*) FROM releases r USE INDEX(ix_releases_status), category c WHERE c.ID = r.categoryID AND c.parentID = 6000 AND r.passwordstatus = -1 AND r.haspreview = -1 AND c.disablepreview = 0) AS xxx,
+( SELECT COUNT(*) FROM releases r USE INDEX(ix_releases_status) INNER JOIN category c on c.ID = r.categoryID WHERE (r.passwordstatus = -1) OR (r.haspreview = -1 and c.disablepreview = 0)) AS pc,
+( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE categoryID BETWEEN 5000 AND 5999 AND rageID = -1) AS tv,
+( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE categoryID = 7020 AND bookinfoID IS NULL ) AS book,
+( SELECT COUNT(*) FROM releases r USE INDEX(ix_releases_status), category c WHERE c.ID = r.categoryID AND r.passwordstatus = -1 AND r.haspreview = -1 AND c.disablepreview = 0) AS work,
+( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status)) AS releases,
+( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE nfostatus BETWEEN -6 AND -1) AS nforemains,
+( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE nfostatus = 1) AS nfo,
 ( SELECT table_rows AS cnt FROM information_schema.TABLES WHERE table_name = 'parts' AND TABLE_SCHEMA = '" . DB_NAME . "' ) AS parts,
 ( SELECT COUNT(ID) FROM binaries WHERE procstat = 0 ) AS binaries,
 ( SELECT table_rows AS cnt FROM information_schema.TABLES WHERE table_name = 'binaries' AND TABLE_SCHEMA = '" . DB_NAME . "' ) AS binaries_total,
@@ -74,8 +74,8 @@ $proc = "SELECT
 //$proc = "SELECT * FROM procCnt;";
 $proc2 = "SELECT
 	(SELECT COUNT(*) FROM releases WHERE isrenamed = 0 AND isrequestid = 1 AND reqidstatus in (0, -1) OR (reqidstatus = -3 AND adddate > NOW() - INTERVAL 2 HOUR)) AS requestid_inprogress,
-	(SELECT COUNT(*) FROM releases WHERE reqidstatus = 1 OR reqID IS NOT NULL) AS requestid_matched,
-	(SELECT COUNT(*) FROM releases WHERE prehashID IS NOT NULL) AS prehash_matched,
+	(SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE reqidstatus = 1 OR reqID IS NOT NULL) AS requestid_matched,
+	(SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE prehashID IS NOT NULL) AS prehash_matched,
 	(SELECT COUNT(DISTINCT(prehashID)) FROM releases WHERE prehashID > 0) AS distinct_prehash_matched";
 
 $proc_tmux = "SELECT "
@@ -147,7 +147,7 @@ $split_query = "SELECT "
 	. "(SELECT COUNT(*) FROM groups WHERE first_record IS NOT NULL AND (now() - interval backfill_target day) < first_record_postdate) AS backfill_groups_days, "
 	. "(SELECT COUNT(*) FROM groups WHERE first_record IS NOT NULL AND (now() - interval datediff(curdate(), "
 	. "(SELECT VALUE FROM tmux WHERE SETTING = 'safebackfilldate')) day) < first_record_postdate) AS backfill_groups_date, "
-	. "(SELECT UNIX_TIMESTAMP(adddate) FROM releases ORDER BY adddate DESC LIMIT 1 ) AS newestadd";
+	. "(SELECT UNIX_TIMESTAMP(adddate) FROM releases USE INDEX(ix_releases_status) ORDER BY adddate DESC LIMIT 1 ) AS newestadd";
 
 //get first release inserted datetime and oldest posted datetime
 //$posted_date = "SELECT(SELECT UNIX_TIMESTAMP(adddate) from releases order by adddate asc limit 1) AS adddate;";
