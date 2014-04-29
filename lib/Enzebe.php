@@ -22,7 +22,7 @@ class Enzebe
 	 * @var object
 	 * @access private
 	 */
-	private $site;
+	public $site;
 
 
 	/**
@@ -227,7 +227,8 @@ class Enzebe
 	 */
 	private function buildNZBPath($releaseGuid, $createIfNotExist)
 	{
-		$this->site = new Sites();
+		$s = new Sites();
+		$this->site = $s->get();
 		$siteNzbPath = $this->site->nzbpath;
 		$nzbPath = '';
 		$i = 0;
