@@ -112,6 +112,8 @@ class Enzebe
 	{
 		$path = $this->getNZBPath($relGuid, true);
 		$this->site = new Sites();
+		$this->bname = 'binaries';
+		$this->pname = 'parts';
 		$this->db = new DB();
 		$fp = gzopen($path, 'w5');
 		if ($fp) {
