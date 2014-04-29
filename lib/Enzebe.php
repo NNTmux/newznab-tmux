@@ -227,6 +227,7 @@ class Enzebe
 	 */
 	private function buildNZBPath($releaseGuid, $createIfNotExist)
 	{
+		$this->site = new Sites();
 		$siteNzbPath = $this->site->nzbpath;
 		$nzbPath = '';
 		$i = 0;
