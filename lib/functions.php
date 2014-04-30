@@ -21,6 +21,7 @@ require_once("ColorCLI.php");
 require_once("nzbcontents.php");
 require_once("namefixer.php");
 require_once("TraktTv.php");
+require_once("Enzebe.php");
 
 
 //*addedd from nZEDb for testing
@@ -238,7 +239,7 @@ class Functions
 	public
 	function fastDelete($ID, $guid)
 	{
-		$nzb = new NZB();
+		$nzb = new Enzebe();
 		$ri = new ReleaseImage();
 		$ri->delete($guid);
 
@@ -274,15 +275,6 @@ class Functions
 		$res = $db->queryOneRow(sprintf("select name from groups where ID = %d ", $ID));
 
 		return $res["name"];
-	}
-
-	// Check if the NZB is there, returns path, else false.
-	function NZBPath($releaseGuid, $sitenzbpath = "")
-	{
-		$nzb = new NZB();
-		$nzbfile = $nzb->getNZBPath($releaseGuid, $sitenzbpath, false);
-
-		return !file_exists($nzbfile) ? false : $nzbfile;
 	}
 
 	// Sends releases back to other->misc.
@@ -402,89 +394,6 @@ class Functions
 		if ($this->echooutput && $this->DEBUG_ECHO) {
 			echo $this->c->debug($str);
 		}
-	}
-
-	public
-	function nzbFileList($nzb)
-	{
-		$num_pars = $i = 0;
-		$result = array();
-
-		$nzb = str_replace("\x0F", '', $nzb);
-		$xml = @simplexml_load_string($nzb);
-		if (!$xml || strtolower($xml->getName()) != 'nzb') {
-			return $result;
-		}
-
-		foreach ($xml->file as $file) {
-			// Subject.
-			$title = $file->attributes()->subject;
-
-			// Amoune of pars.
-			if (preg_match('/\.par2/i', $title)) {
-				$num_pars++;
-			}
-
-			$result[$i]['title'] = $title;
-
-			// Extensions.
-			if (preg_match(
-				'/\.(\d{2,3}|7z|ace|ai7|srr|srt|sub|aiff|asc|avi|audio|bin|bz2|'
-				. 'c|cfc|cfm|chm|class|conf|cpp|cs|css|csv|cue|deb|divx|doc|dot|'
-				. 'eml|enc|exe|file|gif|gz|hlp|htm|html|image|iso|jar|java|jpeg|'
-				. 'jpg|js|lua|m|m3u|mm|mov|mp3|mpg|nfo|nzb|odc|odf|odg|odi|odp|'
-				. 'ods|odt|ogg|par2|parity|pdf|pgp|php|pl|png|ppt|ps|py|r\d{2,3}|'
-				. 'ram|rar|rb|rm|rpm|rtf|sfv|sig|sql|srs|swf|sxc|sxd|sxi|sxw|tar|'
-				. 'tex|tgz|txt|vcf|video|vsd|wav|wma|wmv|xls|xml|xpi|xvid|zip7|zip)'
-				. '[" ](?!(\)|\-))/i', $file->attributes()->subject, $ext
-			)
-			) {
-
-				if (preg_match('/\.r\d{2,3}/i', $ext[0])) {
-					$ext[1] = 'rar';
-				}
-
-				$result[$i]['ext'] = strtolower($ext[1]);
-			} else {
-				$result[$i]['ext'] = '';
-			}
-
-			$filesize = $numsegs = 0;
-
-			// File size.
-			foreach ($file->segments->segment as $segment) {
-				$filesize += $segment->attributes()->bytes;
-				$numsegs++;
-			}
-			$result[$i]['size'] = $filesize;
-
-			// File completion.
-			if (preg_match('/(\d+)\)$/', $title, $parts)) {
-				$result[$i]['partstotal'] = $parts[1];
-			}
-			$result[$i]['partsactual'] = $numsegs;
-
-			// Groups.
-			if (!isset($result[$i]['groups'])) {
-				$result[$i]['groups'] = array();
-			}
-			foreach ($file->groups->group as $g) {
-				array_push($result[$i]['groups'], (string)$g);
-			}
-
-			// Parts.
-			if (!isset($result[$i]['segments'])) {
-				$result[$i]['segments'] = array();
-			}
-			foreach ($file->segments->segment as $s) {
-				array_push($result[$i]['segments'], (string)$s);
-			}
-
-			unset($result[$i]['segments']['@attributes']);
-			$i++;
-		}
-
-		return $result;
 	}
 
 	/**
@@ -1611,6 +1520,7 @@ class Functions
 				$this->consoleTools->overWritePrimary("Attempting repair: " . $this->consoleTools->percentString2($num_attempted - $count + 1, $num_attempted, sizeof($missingParts)) . ': ' . $partfrom . ' to ' . $partto);
 
 				// Get article from newsgroup.
+				$binaries = new Binaries();
 				$binaries->scan($nntp, $groupArr, $partfrom, $partto, 'update');
 			}
 
