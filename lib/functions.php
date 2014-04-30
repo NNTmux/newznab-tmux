@@ -1520,6 +1520,7 @@ class Functions
 				$this->consoleTools->overWritePrimary("Attempting repair: " . $this->consoleTools->percentString2($num_attempted - $count + 1, $num_attempted, sizeof($missingParts)) . ': ' . $partfrom . ' to ' . $partto);
 
 				// Get article from newsgroup.
+				$binaries = new Binaries();
 				$binaries->scan($nntp, $groupArr, $partfrom, $partto, 'update');
 			}
 
