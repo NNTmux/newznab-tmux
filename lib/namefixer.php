@@ -395,7 +395,7 @@ class Namefixer
 		if ($total > 0) {
 			foreach ($res as $row) {
 				if ($row["title"] !== $release["searchname"]) {
-					$determinedcat = $this->category->determineCategory($release["groupid"], $row["title"]);
+					$determinedcat = $this->category->determineCategory($release["groupID"], $row["title"]);
 
 					if ($echo == 1) {
 						$this->matched = true;
