@@ -9,7 +9,7 @@ require_once(dirname(__FILE__) . "/../lib/showsleep.php");
 require_once(dirname(__FILE__) . "/../lib/functions.php");
 
 
-$version = "0.3r1132";
+$version = "0.3r1133";
 
 $db = new DB();
 $functions = new Functions();
@@ -266,33 +266,16 @@ function writelog($pane)
 
 $time = TIME();
 $time2 = TIME();
-$time3 = TIME();
 $time4 = TIME();
 $time6 = TIME();
-$time7 = TIME();
 $time9 = TIME();
-$time10 = TIME();
-$time11 = TIME();
-$time12 = TIME();
-$time13 = TIME();
-$time14 = TIME();
-$time15 = TIME();
-$time16 = TIME();
 $time17 = TIME();
-$time18 = TIME();
 $time19 = TIME();
 $time20 = TIME();
-$time21 = TIME();
-$time22 = TIME();
-$time23 = TIME();
-$time24 = TIME();
-$time25 = TIME();
-$time26 = TIME();
 $time27 = TIME();
 $time28 = TIME();
 $time29 = TIME();
 $time30 = TIME();
-$time31 = TIME();
 $time32 = TIME();
 
 
@@ -324,7 +307,6 @@ $binaries_rows = 0;
 $binaries_total = 0;
 $binaries_size_gb = 0;
 $releases_now = 0;
-//$firstdate = TIME();
 $newestname = "Unknown";
 $newestdate = TIME();
 $newestadd = TIME();
@@ -458,7 +440,6 @@ sleep(5);
 
 //create initial display, USP connection count, prehash count and groups count adapted from nZEDb
 passthru('clear');
-//printf("\033[1;31m  First insert:\033[0m ".relativeTime("$firstdate")."\n");
 printf($mask2, "Monitor Running v$version [" . $tpatch . "][" . $patch . "]: ", relativeTime("$time"));
 printf($mask1, "USP Connections:", $uspactiveconnections . " active (" . $usptotalconnections . " total) - " . $host . ":" . $port);;
 printf($mask1, "Newest Release:", "$newestname");
@@ -1144,7 +1125,6 @@ while ($i > 0) {
 
 	//update display
 	passthru('clear');
-	//printf("\033[1;31m  First insert:\033[0m ".relativeTime("$firstdate")."\n");
 	printf($mask2, "Monitor Running v$version [" . $tpatch . "][" . $patch . "]: ", relativeTime("$time"));
 	printf($mask1, "USP Connections:", $uspactiveconnections . " active (" . $usptotalconnections . " total) - " . $host . ":" . $port);
 	printf($mask1, "Newest Release:", "$newestname");
