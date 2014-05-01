@@ -9,7 +9,7 @@ require_once(dirname(__FILE__) . "/../lib/showsleep.php");
 require_once(dirname(__FILE__) . "/../lib/functions.php");
 
 
-$version = "0.3r1131";
+$version = "0.3r1132";
 
 $db = new DB();
 $functions = new Functions();
@@ -173,7 +173,7 @@ $TESTING = "/var/www/newznab/misc/testing/";
 $killed = "false";
 $getdate = gmDate("Ymd");
 
-//got microtime
+//get microtime
 function microtime_float()
 {
 	list($usec, $sec) = explode(" ", microtime());
@@ -522,9 +522,6 @@ while ($i > 0) {
 	//kill mediainfo and ffmpeg if exceeds 60 sec
 	shell_exec("killall -o 60s -9 mediainfo 2>&1 1> /dev/null");
 	shell_exec("killall -o 60s -9 ffmpeg 2>&1 1> /dev/null");
-
-	//get microtime at start of loop
-	$time_loop_start = microtime_float();
 
 	$getdate = gmDate("Ymd");
 
