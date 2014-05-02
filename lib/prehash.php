@@ -1280,9 +1280,9 @@ Class PreHash
 			echo $this->c->header('Fixing search names' . $te . " using the prehash md5/sha1.");
 		}
 		if (DB_TYPE === 'mysql') {
-			$regex = "AND (r.ishashed = 1 OR rf.name REGEXP'[a-fA-F0-9]{32}')";
+			$regex = "AND (r.ishashed = 1 OR rf.name REGEXP'[a-fA-F0-9]{32,40}')";
 		} else if (DB_TYPE === 'pgsql') {
-			$regex = "AND (r.ishashed = 1 OR rf.name ~ '[a-fA-F0-9]{32}')";
+			$regex = "AND (r.ishashed = 1 OR rf.name ~ '[a-fA-F0-9]{32,40}')";
 		}
 
 		if ($cats === 3) {

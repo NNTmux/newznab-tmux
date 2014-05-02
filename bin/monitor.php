@@ -9,7 +9,7 @@ require_once(dirname(__FILE__) . "/../lib/showsleep.php");
 require_once(dirname(__FILE__) . "/../lib/functions.php");
 
 
-$version = "0.3r1133";
+$version = "0.3r1134";
 
 $db = new DB();
 $functions = new Functions();
@@ -1743,8 +1743,8 @@ while ($i > 0) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			$log = writelog($panes3[0]);
 			shell_exec("tmux respawnp -t${tmux_session}:3.0 ' \
-                    cd $_py && $_python ${DIR}/../python/fixreleasenames_threaded.py md5 2>&1 $log; \
-                    $_python ${DIR}/../python/fixreleasenames_threaded.py nfo 2>&1 $log; \
+                    cd $_lib && $_php fixReleaseNames.php 1 true other yes show 2>&1 $log; \
+                    cd $_py && $_python ${DIR}/../python/fixreleasenames_threaded.py nfo 2>&1 $log; \
                     $_python ${DIR}/../python/fixreleasenames_threaded.py filename 2>&1 $log; \
                     $_python ${DIR}/../python/fixreleasenames_threaded.py par2 2>&1 $log; \
                     $_php ${DIR}/../lib/fixReleaseNames.php 4 true other yes show $log;
