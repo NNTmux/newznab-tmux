@@ -9,7 +9,7 @@ require_once(dirname(__FILE__) . "/../lib/showsleep.php");
 require_once(dirname(__FILE__) . "/../lib/functions.php");
 
 
-$version = "0.3r1118";
+$version = "0.3r1134";
 
 $db = new DB();
 $functions = new Functions();
@@ -173,7 +173,7 @@ $TESTING = "/var/www/newznab/misc/testing/";
 $killed = "false";
 $getdate = gmDate("Ymd");
 
-//got microtime
+//get microtime
 function microtime_float()
 {
 	list($usec, $sec) = explode(" ", microtime());
@@ -266,33 +266,16 @@ function writelog($pane)
 
 $time = TIME();
 $time2 = TIME();
-$time3 = TIME();
 $time4 = TIME();
 $time6 = TIME();
-$time7 = TIME();
 $time9 = TIME();
-$time10 = TIME();
-$time11 = TIME();
-$time12 = TIME();
-$time13 = TIME();
-$time14 = TIME();
-$time15 = TIME();
-$time16 = TIME();
 $time17 = TIME();
-$time18 = TIME();
 $time19 = TIME();
 $time20 = TIME();
-$time21 = TIME();
-$time22 = TIME();
-$time23 = TIME();
-$time24 = TIME();
-$time25 = TIME();
-$time26 = TIME();
 $time27 = TIME();
 $time28 = TIME();
 $time29 = TIME();
 $time30 = TIME();
-$time31 = TIME();
 $time32 = TIME();
 
 
@@ -324,7 +307,6 @@ $binaries_rows = 0;
 $binaries_total = 0;
 $binaries_size_gb = 0;
 $releases_now = 0;
-//$firstdate = TIME();
 $newestname = "Unknown";
 $newestdate = TIME();
 $newestadd = TIME();
@@ -358,7 +340,6 @@ $import_state = "disabled";
 $import_reason = "disabled";
 $releases_state = "disabled";
 $releases_reason = "disabled";
-$query_timer_start = 0;
 $query_timer = 0;
 $console_releases_start = 0;
 $movie_releases_start = 0;
@@ -459,7 +440,6 @@ sleep(5);
 
 //create initial display, USP connection count, prehash count and groups count adapted from nZEDb
 passthru('clear');
-//printf("\033[1;31m  First insert:\033[0m ".relativeTime("$firstdate")."\n");
 printf($mask2, "Monitor Running v$version [" . $tpatch . "][" . $patch . "]: ", relativeTime("$time"));
 printf($mask1, "USP Connections:", $uspactiveconnections . " active (" . $usptotalconnections . " total) - " . $host . ":" . $port);;
 printf($mask1, "Newest Release:", "$newestname");
@@ -524,9 +504,6 @@ while ($i > 0) {
 	shell_exec("killall -o 60s -9 mediainfo 2>&1 1> /dev/null");
 	shell_exec("killall -o 60s -9 ffmpeg 2>&1 1> /dev/null");
 
-	//get microtime at start of loop
-	$time_loop_start = microtime_float();
-
 	$getdate = gmDate("Ymd");
 
 
@@ -543,8 +520,6 @@ while ($i > 0) {
 	$tmux_time = (TIME() - $time01);
 	if (((TIME() - $time19) >= $monitor && $running == 1) || ($i == 1)) {
 		echo $c->info("\nThe numbers(queries) above are currently being refreshed. \nNo pane(script) can be (re)started until these have completed.\n");
-		//get microtime to at start of queries
-		$query_timer_start = microtime_float();
 
 		$time02 = TIME();
 		$split_result = $db->query($split_query, false);
@@ -552,24 +527,21 @@ while ($i > 0) {
 		$split1_time = (TIME() - $time01);
 
 		$time03 = TIME();
-		$initquery = @$db->query($qry, false);
+		$initquery = $db->query($qry, false);
 		$init_time = (TIME() - $time03);
 		$init1_time = (TIME() - $time01);
 
 		$time04 = TIME();
-		$proc_result = @$db->query($proc);
+		$proc_result = $db->query($proc);
 		$proc1_time = (TIME() - $time04);
 		$proc11_time = (TIME() - $time01);
 
 		$time05 = TIME();
-		$proc_result2 = @$db->query($proc2);
+		$proc_result2 = $db->query($proc2);
 		$proc2_time = (TIME() - $time05);
 		$proc21_time = (TIME() - $time01);
 
 		$time19 = TIME();
-		$runloop = "true";
-	} else {
-		$runloop = "false";
 	}
 
 	//initial query for total releases
@@ -999,11 +971,6 @@ while ($i > 0) {
 	$work_since_start = ($total_work_now - $total_work_start);
 	$work_diff = number_format($work_since_start);
 
-	//get microtime at end of queries
-	if ($runloop == "true") {
-		$query_timer = microtime_float() - $query_timer_start;
-	}
-
 	if ($monitor_path != "") {
 		$disk_use = decodeSize(disk_total_space($monitor_path) - disk_free_space($monitor_path));
 		$disk_free = decodeSize(disk_free_space($monitor_path));
@@ -1158,7 +1125,6 @@ while ($i > 0) {
 
 	//update display
 	passthru('clear');
-	//printf("\033[1;31m  First insert:\033[0m ".relativeTime("$firstdate")."\n");
 	printf($mask2, "Monitor Running v$version [" . $tpatch . "][" . $patch . "]: ", relativeTime("$time"));
 	printf($mask1, "USP Connections:", $uspactiveconnections . " active (" . $usptotalconnections . " total) - " . $host . ":" . $port);
 	printf($mask1, "Newest Release:", "$newestname");
@@ -1777,8 +1743,8 @@ while ($i > 0) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			$log = writelog($panes3[0]);
 			shell_exec("tmux respawnp -t${tmux_session}:3.0 ' \
-                    cd $_py && $_python ${DIR}/../python/fixreleasenames_threaded.py md5 2>&1 $log; \
-                    $_python ${DIR}/../python/fixreleasenames_threaded.py nfo 2>&1 $log; \
+                    cd $_lib && $_php fixReleaseNames.php 1 true other yes show 2>&1 $log; \
+                    cd $_py && $_python ${DIR}/../python/fixreleasenames_threaded.py nfo 2>&1 $log; \
                     $_python ${DIR}/../python/fixreleasenames_threaded.py filename 2>&1 $log; \
                     $_python ${DIR}/../python/fixreleasenames_threaded.py par2 2>&1 $log; \
                     $_php ${DIR}/../lib/fixReleaseNames.php 4 true other yes show $log;

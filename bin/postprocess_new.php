@@ -7,7 +7,6 @@ require_once(WWW_DIR.'/lib/site.php');
 require_once(WWW_DIR.'/lib/anidb.php');
 require_once(WWW_DIR.'/lib/thetvdb.php');
 require_once(dirname(__FILE__).'/../lib/ColorCLI.php');
-require_once(dirname(__FILE__).'/../lib/functions.php');
 require_once(dirname(__FILE__).'/../lib/TvAnger.php');
 require_once(dirname(__FILE__).'/../lib/Pprocess.php');
 require_once(dirname(__FILE__).'/../lib/Info.php'); 
@@ -76,8 +75,7 @@ if (isset($argv[1]) && $argv[1] === "additional") {
         }
 } else if (isset($argv[1]) && $argv[1] === "games") {
     if ($site->lookupgames == 1){
-        $functions = new Functions();
-        $functions -> processGames();
+        $pprocess -> processGames();
 }   else{
         echo $c->info("Games lookup disabled in site settings.\n");
     }
@@ -113,8 +111,7 @@ if (isset($argv[1]) && $argv[1] === "additional") {
 } else if (isset($argv[1]) && $argv[1] === "other") {
                 $postprocess -> processOtherMiscCategory();
 } else if (isset($argv[1]) && $argv[1] === "sharing") {
-                $functions = new Functions();
-                $functions -> processSharing($nntp);
+                $pprocess -> processSharing($nntp);
 }
 
 
