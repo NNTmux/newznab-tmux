@@ -161,7 +161,7 @@ INSERT INTO tmux (setting, value) values ('defrag_cache','900'),
     ('passchkattempts', 1),
     ('maxpartsprocessed', 3),
     ('debuginfo', 0),
-    ('request_url', 'http://predb_irc.nzedb.com/predb_irc.php?reqid=[REQUEST_ID]&group=[GROUP_NM]'),
+    ('request_url', 'http://reqid.nzedb.com/index.php?reqid=[REQUEST_ID]&group=[GROUP_NM]'),
 	('lookup_reqids', '1'),
     ('lookup_reqids_timer', '40'),
     ('sphinx', '0'),
@@ -197,7 +197,7 @@ INSERT INTO tmux (setting, value) values ('defrag_cache','900'),
   	('ffmpeg_duration', '5'),
   	('ffmpeg_image_time', '5'),
   	('processvideos', '0'),
-  	('sqlpatch', '29');
+  	('sqlpatch', '30');
 
 DROP TABLE IF EXISTS country;
 CREATE TABLE country (
