@@ -1,10 +1,10 @@
 <?php
-
 require_once(dirname(__FILE__)."/../bin/config.php");
-require_once(dirname(__FILE__)."/Net_SmartIRC/Net/SmartIRC.php");
-require_once(dirname(__FILE__)."/Net_SmartIRC/modules/PingFix.php");
+require_once(dirname(__FILE__) . "/Net_SmartIRC/Net/SmartIRC.php");
+require_once(dirname(__FILE__) . "/Net_SmartIRC/modules/PingFix.php");
 require_once(WWW_DIR."/lib/framework/db.php");
 require_once("functions.php");
+require_once("prehash.php");
 
 
 //
@@ -17,42 +17,6 @@ require_once("functions.php");
  */
 class IRCScraper
 {
-	/**
-	 * Pre is not nuked.
-	 * @const
-	 */
-	const NO_NUKE  = 0;
-
-	/**
-	 * Pre was un nuked.
-	 * @const
-	 */
-	const UN_NUKE  = 1;
-
-	/**
-	 * Pre is nuked.
-	 * @const
-	 */
-	const NUKE     = 2;
-
-	/**
-	 * Nuke reason was modified.
-	 * @const
-	 */
-	const MOD_NUKE = 3;
-
-	/**
-	 * Pre was re nuked.
-	 * @const
-	 */
-	const RE_NUKE  = 4;
-
-	/**
-	 * Pre is nuked for being old.
-	 * @const
-	 */
-	const OLD_NUKE = 5;
-
 	/**
 	 * Array of current pre info.
 	 * @var array
@@ -103,16 +67,16 @@ class IRCScraper
 	/**
 	 * Construct
 	 *
-	 * @param Net_SmartIRC $irc          Instance of class Net_SmartIRC
+	 * @param Net_SmartIRC $irc    Instance of class Net_SmartIRC
 	 * @param string       $serverType   efnet | corrupt | zenet
 	 * @param bool         $silent       Run this in silent mode (no text output).
 	 * @param bool         $debug        Turn on Net_SmartIRC debug?
-	 * @param bool         $socket       Use real sockets or fsock?
+	 * @param bool         $socket Use real sockets or fsock?
 	 */
 	public function __construct(&$irc, $serverType, &$silent = false, &$debug = false, &$socket = true)
 	{
 		$this->db = new DB();
-        $this->functions = new Functions();
+		$this->functions = new Functions();
 		$this->groupList = array();
 		$this->IRC = $irc;
 		// Use the PingFix module.
@@ -147,7 +111,7 @@ class IRCScraper
 	/**
 	 * Main method for scraping.
 	 *
-	 * @param bool $socket  Use real sockets or fsock?
+	 * @param bool $socket Use real sockets or fsock?
 	 */
 	protected function startScraping(&$socket)
 	{
@@ -197,29 +161,29 @@ class IRCScraper
 				$regex =
 					// Simple regex, more advanced regex below when doing the real checks.
 					'/' .
-						'FILLED.*Pred.*ago' .                          // a.b.inner-sanctum
-						'|' .
-						'Thank.*you.*Req.*Id.*Request' .               // a.b.cd.image, a.b.movies.divx, a.b.sounds.mp3.complete_cd, a.b.warez
-						'|' .
-						'Thank.*?You.*?Request.*?Filled!.*?ReqId' .    // a.b.moovee a.b.foreign a.b.flac a.b.teevee
-						'|' .
-						'That.*?was.*?awesome.*?Shall.*?ReqId' .       // a.b.erotica
-						'|' .
-						'person.*?filling.*?request.*?for:.*?ReqID:' . // a.b.console.ps3
-						'|' .
-						'NEW.*?\[NDS\].*?PRE:' .                       // a.b.games.nintendods
-						'|' .
-						'A\s+new\s+NZB\s+has\s+been\s+added:' .        // a.b.games.wii a.b.games.xbox360
-						'|' .
-						'A\s+NZB\s+is\s+available.*?To\s+Download' .   // a.b.sony.psp
-						'|' .
-						'\s+NZB:\s+http:\/\/scnzb\.eu\/' .             // scnzb
-						//'|' .
-						//'^\[SBINDEX\]' .                               // tvnzb
-						'|' .
-						'^\[(MOD|OLD|RE|UN)?NUKE\]' .                  // Nukes. various channels
-						'|' .
-						'added\s+(nuke|reason)\s+info\s+for:' .        // Nukes. a.b.games.xbox360 a.b.games.wii
+					'FILLED.*Pred.*ago' . // a.b.inner-sanctum
+					'|' .
+					'Thank.*you.*Req.*Id.*Request' . // a.b.cd.image, a.b.movies.divx, a.b.sounds.mp3.complete_cd, a.b.warez
+					'|' .
+					'Thank.*?You.*?Request.*?Filled!.*?ReqId' . // a.b.moovee a.b.foreign a.b.flac a.b.teevee
+					'|' .
+					'That.*?was.*?awesome.*?Shall.*?ReqId' . // a.b.erotica
+					'|' .
+					'person.*?filling.*?request.*?for:.*?ReqID:' . // a.b.console.ps3
+					'|' .
+					'NEW.*?\[NDS\].*?PRE:' . // a.b.games.nintendods
+					'|' .
+					'A\s+new\s+NZB\s+has\s+been\s+added:' . // a.b.games.wii a.b.games.xbox360
+					'|' .
+					'A\s+NZB\s+is\s+available.*?To\s+Download' . // a.b.sony.psp
+					'|' .
+					'\s+NZB:\s+http:\/\/scnzb\.eu\/' . // scnzb
+					//'|' .
+					//'^\[SBINDEX\]' .                               // tvnzb
+					'|' .
+					'^\[(MOD|OLD|RE|UN)?NUKE\]' . // Nukes. various channels
+					'|' .
+					'added\s+(nuke|reason)\s+info\s+for:' . // Nukes. a.b.games.xbox360 a.b.games.wii
 					'/i';
 				break;
 
@@ -231,7 +195,7 @@ class IRCScraper
 				$realname    = SCRAPE_IRC_CORRUPT_REALNAME;
 				$password    = SCRAPE_IRC_CORRUPT_PASSWORD;
 				$channelList = array('#pre' => null);
-				$regex       = '/PRE:.+?\[.+?\]|^(MOD|OLD|RE|UN)?NUKE:\s+/i'; // #pre
+				$regex = '/PRE:.+?\[.+?\]|^(MOD|OLD|RE|UN)?NUKE:\s+/i'; // #pre
 				break;
 
 			case 'zenet':
@@ -242,7 +206,7 @@ class IRCScraper
 				$realname    = SCRAPE_IRC_ZENET_REALNAME;
 				$password    = SCRAPE_IRC_ZENET_PASSWORD;
 				$channelList = array('#Pre' => null);
-				$regex       = '/^\(PRE\)\s+\(|^\((MOD|OLD|RE|UN)?NUKE\)\s+/i'; // #Pre
+				$regex = '/^\(PRE\)\s+\(|^\((MOD|OLD|RE|UN)?NUKE\)\s+/i'; // #Pre
 				break;
 
 			default:
@@ -250,14 +214,14 @@ class IRCScraper
 		}
 
 		$versions = array(
-			'HexChat 2.9.6 [x64] / Windows ' . rand(7,8) . ' [' . rand(2,3) . '.' . rand(0,99) .'GHz]',
+			'HexChat 2.9.6 [x64] / Windows ' . rand(7, 8) . ' [' . rand(2, 3) . '.' . rand(0, 99) . 'GHz]',
 			'irssi v0.8.' . rand(10, 16) . ' - running on Linux i686',
 			'KVIrc 4.2.0',
 			'mIRC 7.32 Khaled Mardam-Bey',
 			'mIRC v6.31 Khaled Mardam-Bey',
 			'HydraIRC v0.3.165',
-			'xchat 2.8. ' . rand(6,9) . ' Ubuntu',
-			'ZNC 1.' . rand(0,2) . ' - http://znc.in',
+			'xchat 2.8. ' . rand(6, 9) . ' Ubuntu',
+			'ZNC 1.' . rand(0, 2) . ' - http://znc.in',
 		);
 
 		// Change the CTCP string.
@@ -297,7 +261,7 @@ class IRCScraper
 
 		// Login to IRC.
 		if (!$this->IRC->login(
-			// Nick name.
+		// Nick name.
 			$nickname,
 			// Real name.
 			$realname,
@@ -307,7 +271,8 @@ class IRCScraper
 			$username,
 			// Password.
 			(empty($password) ? null : $password)
-		)) {
+		)
+		) {
 			exit('Error logging in to: (' .
 				$server . ':' . $port . ') nickname: (' . $nickname .
 				'). Verify your connection information, you might also be banned from this server or there might have been a connection issue.' .
@@ -368,7 +333,7 @@ class IRCScraper
 	public function check_type($irc, $data)
 	{
 		$channel = strtolower($data->channel);
-		$poster  = strtolower($data->nick);
+		$poster = strtolower($data->nick);
 
 		switch($channel) {
 
@@ -502,6 +467,7 @@ class IRCScraper
 	protected function siftMatches(&$matches)
 	{
 		$this->CurPre['md5'] = $this->db->escapeString(md5($matches['title']));
+		$this->CurPre['sha1'] = $this->db->escapeString(sha1($matches['title']));
 		$this->CurPre['title'] = $matches['title'];
 
 		if (isset($matches['reqid'])) {
@@ -520,19 +486,19 @@ class IRCScraper
 			$this->nuked = true;
 			switch ($matches['nuke']) {
 				case 'NUKE':
-					$this->CurPre['nuked'] = self::NUKE;
+					$this->CurPre['nuked'] = PreHash::PRE_NUKED;
 					break;
 				case 'UNNUKE':
-					$this->CurPre['nuked'] = self::UN_NUKE;
+					$this->CurPre['nuked'] = PreHash::PRE_UNNUKED;
 					break;
 				case 'MODNUKE':
-					$this->CurPre['nuked'] = self::MOD_NUKE;
+					$this->CurPre['nuked'] = PreHash::PRE_MODNUKE;
 					break;
 				case 'RENUKE':
-					$this->CurPre['nuked'] = self::RE_NUKE;
+					$this->CurPre['nuked'] = PreHash::PRE_RENUKED;
 					break;
 				case 'OLDNUKE':
-					$this->CurPre['nuked'] = self::OLD_NUKE;
+					$this->CurPre['nuked'] = PreHash::PRE_OLDNUKE;
 					break;
 			}
 		}
@@ -775,17 +741,17 @@ class IRCScraper
 	 *
 	 * @param string $message The IRC message to parse.
 	 */
-/*	protected function tvnzb(&$message)
-	{
-		//[SBINDEX] Rev.S03E02.HDTV.x264-TLA :: TV > HD :: 210.13 MB :: Aired: 31/Mar/2014 :: http://lolo.sickbeard.com/getnzb/aa10bcef235c604612dd61b0627ae25f.nzb
-		if (preg_match('/\[SBINDEX\]\s+(?P<title>.+?)\s+::\s+(?P<sbcat>.+?)\s+::\s+(?P<size>.+?)\s+::\s+Aired/i', $message, $matches)) {
-			if (preg_match('/^(?P<first>.+?)\s+>\s+(?P<last>.+?)$/', $matches['sbcat'], $match)) {
-				$matches['category'] = $match['first'] . '-' . $match['last'];
+	/*	protected function tvnzb(&$message)
+		{
+			//[SBINDEX] Rev.S03E02.HDTV.x264-TLA :: TV > HD :: 210.13 MB :: Aired: 31/Mar/2014 :: http://lolo.sickbeard.com/getnzb/aa10bcef235c604612dd61b0627ae25f.nzb
+			if (preg_match('/\[SBINDEX\]\s+(?P<title>.+?)\s+::\s+(?P<sbcat>.+?)\s+::\s+(?P<size>.+?)\s+::\s+Aired/i', $message, $matches)) {
+				if (preg_match('/^(?P<first>.+?)\s+>\s+(?P<last>.+?)$/', $matches['sbcat'], $match)) {
+					$matches['category'] = $match['first'] . '-' . $match['last'];
+				}
+				$this->CurPre['source'] = '#tvnzb';
+				$this->siftMatches($matches);
 			}
-			$this->CurPre['source'] = '#tvnzb';
-			$this->siftMatches($matches);
-		}
-	}*/
+		}*/
 
 	/**
 	 * Gets new PRE from #Pre on zenet
@@ -890,11 +856,11 @@ class IRCScraper
 		$query .= (!empty($this->CurPre['source'])   ? 'source, '     : '');
 		$query .= (!empty($this->CurPre['reason'])   ? 'nukereason, ' : '');
 		$query .= (!empty($this->CurPre['files'])    ? 'files, '      : '');
-		$query .= (!empty($this->CurPre['reqid'])    ? 'requestID, '  : '');
-		$query .= (!empty($this->CurPre['groupid'])  ? 'groupID, '    : '');
+		$query .= (!empty($this->CurPre['reqid']) ? 'requestID, ' : '');
+		$query .= (!empty($this->CurPre['groupid']) ? 'groupID, ' : '');
 		$query .= (!empty($this->CurPre['nuked'])    ? 'nuked, '      : '');
 
-		$query .= 'predate, md5, title) VALUES (';
+		$query .= 'predate, md5, sha1, title) VALUES (';
 
 		$query .= (!empty($this->CurPre['size'])     ? $this->db->escapeString($this->CurPre['size'])     . ', '   : '');
 		$query .= (!empty($this->CurPre['category']) ? $this->db->escapeString($this->CurPre['category']) . ', '   : '');
@@ -906,12 +872,13 @@ class IRCScraper
 		$query .= (!empty($this->CurPre['nuked'])    ? $this->CurPre['nuked']                             . ', '   : '');
 		$query .= (!empty($this->CurPre['predate'])  ? $this->CurPre['predate']                           . ', '   : 'NOW(), ');
 
-		$query .= '%s, %s)';
+		$query .= '%s, %s, %s)';
 
 		$this->db->exec(
 			sprintf(
-				$query,
+			$query,
 				$this->CurPre['md5'],
+				$this->CurPre['sha1'],
 				$this->db->escapeString($this->CurPre['title'])
 			)
 		);
@@ -932,21 +899,21 @@ class IRCScraper
 
 		$query = 'UPDATE prehash SET ';
 
-		$query .= (!empty($this->CurPre['size'])     ? 'size = '       . $this->db->escapeString($this->CurPre['size'])   . ', ' : '');
-		$query .= (!empty($this->CurPre['source'])   ? 'source = '     . $this->db->escapeString($this->CurPre['source']) . ', ' : '');
-		$query .= (!empty($this->CurPre['files'])    ? 'files = '      . $this->db->escapeString($this->CurPre['files'])  . ', ' : '');
-		$query .= (!empty($this->CurPre['reason'])   ? 'nukereason = ' . $this->db->escapeString($this->CurPre['reason']) . ', ' : '');
-		$query .= (!empty($this->CurPre['reqid'])    ? 'requestID = '  . $this->CurPre['reqid']                           . ', ' : '');
-		$query .= (!empty($this->CurPre['groupid'])  ? 'groupID = '    . $this->CurPre['groupid']                         . ', ' : '');
-		$query .= (!empty($this->CurPre['predate'])  ? 'predate = '    . $this->CurPre['predate']                         . ', ' : '');
-		$query .= (!empty($this->CurPre['nuked'])    ? 'nuked = '      . $this->CurPre['nuked']                           . ', ' : '');
+		$query .= (!empty($this->CurPre['size'])     ? 'size = '       	. $this->db->escapeString($this->CurPre['size'])   	. ', ' : '');
+		$query .= (!empty($this->CurPre['source'])   ? 'source = '     	. $this->db->escapeString($this->CurPre['source']) 	. ', ' : '');
+		$query .= (!empty($this->CurPre['files'])    ? 'files = '      	. $this->db->escapeString($this->CurPre['files'])  	. ', ' : '');
+		$query .= (!empty($this->CurPre['reason'])   ? 'nukereason = ' 	. $this->db->escapeString($this->CurPre['reason']) 	. ', ' : '');
+		$query .= (!empty($this->CurPre['reqid']) 	 ? 'requestID = ' 	. $this->CurPre['reqid'] 							. ', ' : '');
+		$query .= (!empty($this->CurPre['groupid'])  ? 'groupID = ' 	. $this->CurPre['groupid'] 							. ', ' : '');
+		$query .= (!empty($this->CurPre['predate'])  ? 'predate = '    	. $this->CurPre['predate']                         	. ', ' : '');
+		$query .= (!empty($this->CurPre['nuked'])    ? 'nuked = '      	. $this->CurPre['nuked']                           	. ', ' : '');
 		$query .= (
 			(empty($this->OldPre['category']) && !empty($this->CurPre['category']))
 				? 'category = ' . $this->db->escapeString($this->CurPre['category']) . ', '
 				: ''
 		);
 
-		if ($query === 'UPDATE prehash SET '){
+		if ($query === 'UPDATE prehash SET ') {
 			return;
 		}
 
@@ -972,19 +939,19 @@ class IRCScraper
 			$nukeString = '';
 			if ($this->nuked !== false) {
 				switch((int)$this->CurPre['nuked']) {
-					case self::NUKE:
+					case PreHash::PRE_NUKED:
 						$nukeString = '[ NUKED ] ';
 						break;
-					case self::UN_NUKE:
+					case PreHash::PRE_UNNUKED:
 						$nukeString = '[UNNUKED] ';
 						break;
-					case self::MOD_NUKE:
+					case PreHash::PRE_MODNUKE:
 						$nukeString = '[MODNUKE] ';
 						break;
-					case self::OLD_NUKE:
+					case PreHash::PRE_OLDNUKE:
 						$nukeString = '[OLDNUKE] ';
 						break;
-					case self::RE_NUKE:
+					case PreHash::PRE_RENUKED:
 						$nukeString = '[RENUKED] ';
 						break;
 					default:
@@ -1042,6 +1009,7 @@ class IRCScraper
 			array(
 				'title'    => '',
 				'md5'      => '',
+				'sha1'     => '',
 				'size'     => '',
 				'predate'  => '',
 				'category' => '',

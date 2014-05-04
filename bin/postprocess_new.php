@@ -5,10 +5,11 @@ require_once(WWW_DIR.'/lib/postprocess.php');
 require_once(WWW_DIR.'/lib/nntp.php');
 require_once(WWW_DIR.'/lib/site.php');
 require_once(WWW_DIR.'/lib/anidb.php');
-require_once(WWW_DIR.'/lib/tvrage.php');
 require_once(WWW_DIR.'/lib/thetvdb.php');
 require_once(dirname(__FILE__).'/../lib/ColorCLI.php');
-require_once(dirname(__FILE__).'/../lib/functions.php');
+require_once(dirname(__FILE__).'/../lib/TvAnger.php');
+require_once(dirname(__FILE__).'/../lib/Pprocess.php');
+require_once(dirname(__FILE__).'/../lib/Info.php'); 
 
 $c = new ColorCLI();
 $s = new Sites();
@@ -16,8 +17,8 @@ $site = $s->get();
 if (!isset($argv[1])) {
 	exit($c->error("You need to set an argument [additional, nfo, movie, tv, games, ebook, music, anime, unwanted, others, spotnab, sharing]."));
 }
-
 $postprocess = new PostProcess(true);
+$pprocess = new PProcess(true);
 if (isset($argv[1]) && $argv[1] === "additional") {
 	// Create the connection here and pass, this is for post processing
 	$nntp = new NNTP();
@@ -27,7 +28,7 @@ if (isset($argv[1]) && $argv[1] === "additional") {
 	echo $c->error("Unable to connect to usenet.\n");
 	return;
     }
-	$postprocess->processAdditional();
+	$pprocess->processAdditional();
 
     $nntp->doQuit();
 
@@ -49,7 +50,7 @@ if (isset($argv[1]) && $argv[1] === "additional") {
         }
 } else if (isset($argv[1]) && $argv[1] === "movie"){
     if ( $site->lookupimdb == 1){
-	    $postprocess->processMovies();
+	    $pprocess->processMovies();
 	echo '.';
     }
     else  {
@@ -58,7 +59,7 @@ if (isset($argv[1]) && $argv[1] === "additional") {
 } else if (isset($argv[1]) && $argv[1] === "tv"){
 	    if ($site->lookuptvrage == 1)
 		{
-			$tvrage = new TVRage(true);
+			$tvrage = new TvAnger(true);
 			$tvrage->processTvReleases(($site->lookuptvrage==1));
 		}
         else {
@@ -74,8 +75,7 @@ if (isset($argv[1]) && $argv[1] === "additional") {
         }
 } else if (isset($argv[1]) && $argv[1] === "games") {
     if ($site->lookupgames == 1){
-        $functions = new Functions();
-        $functions -> processGames();
+        $pprocess -> processGames();
 }   else{
         echo $c->info("Games lookup disabled in site settings.\n");
     }
@@ -111,8 +111,7 @@ if (isset($argv[1]) && $argv[1] === "additional") {
 } else if (isset($argv[1]) && $argv[1] === "other") {
                 $postprocess -> processOtherMiscCategory();
 } else if (isset($argv[1]) && $argv[1] === "sharing") {
-                $functions = new Functions();
-                $functions -> processSharing($nntp);
+                $pprocess -> processSharing($nntp);
 }
 
 

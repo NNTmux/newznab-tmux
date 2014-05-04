@@ -20,7 +20,7 @@ $groups = new Groups();
 $t = new Tmux ();
 $tmux = $t->get();
 $f = new Functions();
-if (!preg_match('/^\[\d+\]/', $pieces[1])) {
+if (!preg_match('/^\[\d+\]/', $pieces[1] || !preg_match('^[0-9]{6}$^', $pieces[1]))) {
 	$db->query('UPDATE releases SET reqidstatus = -2 WHERE ID = ' . $pieces[0]);
 	exit('.');
 }
@@ -56,15 +56,17 @@ if ($bFound === true) {
 	$groupid = $f->getIDByName($pieces[2]);
 	if ($groupid !== 0) {
 		$md5 = md5($title);
-		$dupe = $db->queryOneRow(sprintf('SELECT requestID FROM prehash WHERE md5 = %s', $db->escapeString($md5)));
+		$sha1 = sha1($title);
+		$dupe = $db->queryOneRow(sprintf('SELECT requestID FROM prehash WHERE md5 = %s OR sha1 = %s', $db->escapeString($md5), $db->escapeString($sha1)));
 		if ($dupe === false || ($dupe !== false && $dupe['requestID'] !== $requestID)) {
 			$db->queryDirect(
 				sprintf("
-				INSERT INTO prehash (title, source, md5, requestID, groupID)
+				INSERT INTO prehash (title, source, md5, sha1, requestID, groupID)
 				VALUES (%s, %s, %s, %s, %d)",
 					$db->escapeString($title),
 					$db->escapeString('requestWEB'),
 					$db->escapeString($md5),
+					$db->escapeString($sha1),
 					$requestID, $groupid
 				)
 			);
@@ -103,6 +105,8 @@ function getReleaseNameFromRequestID($tmux, $requestID, $groupName)
 	if (isset($request)) {
 		return array('title' => $request['name'], 'ID' => 'NULL');
 	}
+
+	return true;
 }
 
 function localLookup($requestID, $groupName, $oldname)
@@ -116,7 +120,7 @@ function localLookup($requestID, $groupName, $oldname)
 		return false;
 	}
 	if (isset($run['title'])) {
-		return array('title' => $run['title'], 'id' => $run['id']);
+		return array('title' => $run['title'], 'ID' => $run['ID']);
 	}
 	if (preg_match('/\[#?a\.b\.teevee\]/', $oldname)) {
 		$groupID = $f->getIDByName('alt.binaries.teevee');
@@ -133,4 +137,6 @@ function localLookup($requestID, $groupName, $oldname)
 	if (isset($run1['title'])) {
 		return array('title' => $run['title'], 'ID' => $run['ID']);
 	}
+
+	return true;
 }

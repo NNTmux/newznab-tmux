@@ -9,7 +9,7 @@
 <webMaster>{$site->email} ({$site->title|escape})</webMaster>
 <category>{$site->meta_keywords}</category>
 <image>
-	<url>{$serverroot}templates/nntmux/images/banner.jpg</url>
+	<url>{$serverroot}templates/default/images/banner.jpg</url>
 	<title>{$site->title|escape}</title>
 	<link>{$serverroot}</link>
 	<description>Visit {$site->title|escape} - {$site->strapline|escape}</description>

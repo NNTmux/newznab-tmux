@@ -6,14 +6,16 @@ require_once(WWW_DIR."/lib/groups.php");
 require_once(WWW_DIR.'/lib/nntp.php');
 require_once("../lib/ColorCLI.php");
 require_once("../lib/namefixer.php");
-require_once("../lib/functions.php"); 
+require_once("../lib/functions.php");
+require_once("../lib/Info.php");
+require_once("../lib/Pprocess.php");
 
 $c = new ColorCLI();
 if (!isset($argv[1])) {
 	exit($c->error("This script is not intended to be run manually, it is called from fixreleasenames_threaded.py."));
 } else if (isset($argv[1])) {
 	$db = new DB();
-	$namefixer = new NameFixer(true);
+	$namefixer = new Namefixer(true);
 	$pieces = explode(' ', $argv[1]);
 	if (isset($pieces[1]) && $pieces[0] == 'nfo') {
 		$release = $pieces[1];
@@ -47,10 +49,10 @@ if (!isset($argv[1])) {
 	} else if (isset($pieces[1]) && $pieces[0] == 'md5') {
 		$release = $pieces[1];
 		if ($res = $db->queryOneRow(sprintf('SELECT r.ID AS releaseID, r.name, r.searchname, r.categoryID, r.groupID, dehashstatus, rf.name AS filename FROM releases r LEFT JOIN releasefiles rf ON r.ID = rf.releaseID WHERE r.ID = %d', $release))) {
-			if (preg_match('/[a-f0-9]{32}/i', $res['name'], $matches)) {
-				$namefixer->matchPredbMD5($matches[0], $res, 1, 1, true, 1);
-			} else if (preg_match('/[a-f0-9]{32}/i', $res['filename'], $matches)) {
-				$namefixer->matchPredbMD5($matches[0], $res, 1, 1, true, 1);
+			if (preg_match('/[a-f0-9]{32,40}/i', $res['name'], $matches)) {
+				$namefixer->matchPredbHash($matches[0], $res, 1, 1, true, 1);
+			} else if (preg_match('/[a-f0-9]{32,40}/i', $res['filename'], $matches)) {
+				$namefixer->matchPredbHash($matches[0], $res, 1, 1, true, 1);
 			} else {
 				echo '.';
 			}
@@ -64,9 +66,8 @@ if (!isset($argv[1])) {
 		$relID = $pieces[1];
 		$guid = $pieces[2];
 		$groupID = $pieces[3];
-		$nzbcontents = new NZBContents(true);
-		$pp = new Functions($echooutput = true);
-		$res = $nzbcontents->checkPAR2($guid, $relID, $groupID, $db, $pp, 1, $nntp, 1);
+		$nzbcontents = new NZBContents(array('echo' => true, 'nntp' => $nntp, 'nfo' => new Info(), 'db' => $db, 'pp' => new PProcess(true)));
+		$res = $nzbcontents->checkPAR2($guid, $relID, $groupID, 1, 1);
 		if ($res === false) {
 			echo '.';
 		}

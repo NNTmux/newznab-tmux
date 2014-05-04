@@ -104,7 +104,7 @@
             <tr>
                 <td style="width:180px;"><label for="explain">Information:</label></td>
                 <td>
-                    <div class="explanation">I recommend using Sequential, if you are also grabbing nzbs.</div>
+                    <div class="explanation">I do not recommend using sequential, as it is not tested enough.</div>
                 </td>
             </tr>
 
@@ -127,6 +127,14 @@
                 <td>
                     <input id="bins_timer" name="bins_timer" class="short" type="text" value="{$ftmux->bins_timer}" />
                     <div class="hint">The time to sleep from the time the loop ends until it is restarted, in seconds.</div>
+                </td>
+            </tr>
+
+			<tr>
+                <td style="width:180px;"><label for="bins_kill_timer">Binaries Kill Timer:</label></td>
+                <td>
+                    <input id="bins_kill_timer" name="bins_kill_timer" class="short" type="text" value="{$ftmux->bins_kill_timer}" />
+                    <div class="hint">The time update_binaries is allowed to run with no updates.Time is in minutes.</div>
                 </td>
             </tr>
         </table>
@@ -268,7 +276,7 @@
                 <td style="width:180px;"><label for="post_kill_timer">Postprocess Kill Timer:</label></td>
                 <td>
                     <input id="post_kill_timer" name="post_kill_timer" class="short" type="text" value="{$ftmux->post_kill_timer}" />
-                    <div class="hint">The time postprocess is allowed to run with no updates to the screen.Time is in minutes. Activity is detected when the history for the pane changes. The clock is restarted every time activity is detected.</div>
+                    <div class="hint">The time postprocess is allowed to run with no updates to the screen.Time is in seconds. Activity is detected when the history for the pane changes. The clock is restarted every time activity is detected.</div>
                 </td>
             </tr>
 
@@ -313,8 +321,10 @@
                 <td style="width:180px;"><label for="fix_names">Fix Release Names:</label></td>
                 <td>
                     {html_radios id="fix_names" name='fix_names' values=$yesno_ids output=$yesno_names selected=$ftmux->fix_names separator='<br />'}
-                    <div class="hint">Choose to try to fix Releases Names using NFOs, par2 files, filenames, md5 and misc sorter. true/false</div>
-                </td>
+					<div class="hint">Choose to try to fix Releases Names using NFOs, par2 files, filenames, md5 and
+						sha1. true/false
+					</div>
+				</td>
             </tr>
 
             <tr>
@@ -760,6 +770,32 @@
         	</table>
 	</fieldset>
 
+	<fieldset>
+		<legend>Fanart.tv API Key</legend>
+		<table class="input">
+            <tr>
+				<td style="width:180px;"><label for="fanarttvkey">Fanart.tv API key:</label></td>
+				<td>
+					<input id="fanarttvkey" class="long" name="fanarttvkey" type="text" value="{$ftmux->fanarttvkey}" />
+					<div class="hint">The Fanart.tv api key. Used for Fanart.tv lookups. Fanart.tv would appreciate it if you use this service to help them out by adding high quality images not already available on TMDB.</div>
+				</td>
+			</tr>
+        	</table>
+	</fieldset>
+
+	<fieldset>
+		<legend>IMDB.com URL</legend>
+		<table class="input">
+		<tr>
+				<td style="width:180px;"><label for="imdburl">IMDB.com:</label></td>
+				<td>
+					{html_options style="width:180px;" class="imdburl" id="imdburl" name='imdburl' values=$imdb_urls output=$imdburl_names selected=$ftmux->imdburl}
+					<div class="hint">Akas.imdb.com returns titles in their original title, imdb.com returns titles based on your IP address (if you are in france, you will get french titles).</div>
+				</td>
+			</tr>
+			</table>
+	</fieldset>
+
     <fieldset>
 		<legend>Usenet Settings</legend>
 		<table class="input">
@@ -769,14 +805,6 @@
 				<td>
 					<input class="short" id="maxsizetopostprocess" name="maxsizetopostprocess" type="text" value="{$ftmux->maxsizetopostprocess}" />
 					<div class="hint">The maximum size in gigabytes to postprocess a release. If set to 0, then ignored.</div>
-				</td>
-			</tr>
-
-			<tr>
-				<td style="width:180px;"><label for="segmentstodownload">Number of Segments to download for video samples:</label></td>
-				<td>
-					<input class="short" id="segmentstodownload" name="segmentstodownload" type="text" value="{$ftmux->segmentstodownload}" />
-					<div class="hint">The maximum number of segments to download to generate the sample video file. (Default 2)</div>
 				</td>
 			</tr>
 
@@ -859,11 +887,43 @@
 				</td>
 			</tr>
 
+				<tr>
+				<td style="width:180px;"><label for="yydecoderpath">yyDecode Path:</label></td>
+				<td>
+					<input id="yydecoderpath" class="long" name="yydecoderpath" type="text" value="{$ftmux->yydecoderpath}" />
+					<div class="hint">Path to yydecode, this will decode yEnc articles. On ubuntu/debian you can get yydecode in the getdeb repository. Compiling yydecode from source is easy/fast also.</div>
+				</td>
+			</tr>
+
             <tr>
 				<td style="width:180px;"><label for="processjpg">Process JPG:</label></td>
 				<td>
 					{html_radios id="processjpg" name='processjpg' values=$yesno_ids output=$yesno_names selected=$ftmux->processjpg separator='<br />'}
 					<div class="hint">Whether to attempt to retrieve a JPG file while additional post processing, these are usually on XXX releases.<br/></div>
+				</td>
+			</tr>
+
+				<tr>
+				<td style="width:180px;"><label for="processvideos">Process Video Samples:</label></td>
+				<td>
+					{html_radios id="processvideos" name='processvideos' values=$yesno_ids output=$yesno_names selected=$ftmux->processvideos separator='<br />'}
+					<div class="hint">Whether to attempt to process a video sample, these videos are very short 1-3 seconds, 100KB on average, in ogv format. You must have ffmpeg for this.<br/></div>
+				</td>
+			</tr>
+
+			<tr>
+				<td style="width:180px;"><label for="segmentstodownload">Number of Segments to download for video/jpg samples:</label></td>
+				<td>
+					<input class="short" id="segmentstodownload" name="segmentstodownload" type="text" value="{$ftmux->segmentstodownload}" />
+					<div class="hint">The maximum number of segments to download to generate the sample video file or jpg sample image. (Default 2)</div>
+				</td>
+			</tr>
+
+			<tr>
+				<td style="width:180px;"><label for="ffmpeg_duration">Video sample file duration for ffmpeg:</label></td>
+				<td>
+					<input class="short" id="ffmpeg_duration" name="ffmpeg_duration" type="text" value="{$ftmux->ffmpeg_duration}" />
+					<div class="hint">The maximum duration (In Seconds) for ffmpeg to generate the sample for. (Default 5)</div>
 				</td>
 			</tr>
 

@@ -10,7 +10,7 @@ require_once(WWW_DIR."lib/releases.php");
 require_once(WWW_DIR."lib/site.php");
 require_once("functions.php");
 require_once ("ColorCLI.php");
-require_once ("ReleaseRemover.php"); 
+require_once("ReleaseRemover.php");
 
 $c = new ColorCLI();
 $n = PHP_EOL;
@@ -18,13 +18,13 @@ $n = PHP_EOL;
 $argCnt = count($argv);
 if ($argCnt === 1) {
 	exit(
-		$c->error(
-			$n .
-			'Run fixReleaseNames.php first to attempt to fix release names.'. $n .
-			'This will miss some releases if you have not set fixReleaseNames to set the release as checked.' . $n . $n .
-			"php $argv[0] false Display full usage of this script." . $n .
-			"php $argv[0] true full Run this script with all options."
-		)
+	$c->error(
+		$n .
+		'Run fixReleaseNames.php first to attempt to fix release names.' . $n .
+		'This will miss some releases if you have not set fixReleaseNames to set the release as checked.' . $n . $n .
+		"php $argv[0] false Display full usage of this script." . $n .
+		"php $argv[0] true full Run this script with all options."
+	)
 	);
 }
 if ($argCnt === 2) {
@@ -48,7 +48,7 @@ if ($argCnt === 2) {
 			'                  sample      = Remove releases that are smaller than 40MB more than 1 file and have sample in the title' . $n .
 			'                  scr         = Remove releases where .scr extension is found in the files or subject.' . $n .
 			'                  short       = Remove releases where the name is only numbers or letters and is 5 characters or less.' . $n .
-            '                  wmv         = Remove releases where the release contains WMV file and is in x264 category (the spamer).' . $n .
+			'                  wmv         = Remove releases where the release contains WMV file and is in x264 category (the spamer).' . $n .
 			'                  size        = Remove releases smaller than 1MB and have only 1 file and not in books or mp3 section.' . $n . $n .
 			'examples:' . $n .
 			"php $argv[0] true 12 blacklist     = Remove releases up to 12 hours old using site blacklists." . $n .

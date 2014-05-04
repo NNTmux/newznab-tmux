@@ -43,4 +43,3 @@ if (isset($argv[1]) && isset($argv[2])) {
 			. "php update_releases.php 2 true			...: Categorizes releases in all sections using the search name\n"
             . "\nYou must pass a second argument whether to post process or not, true or false\n"));
 }
-

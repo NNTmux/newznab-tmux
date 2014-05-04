@@ -1,7 +1,7 @@
 <?php
-require_once(dirname(__FILE__)."/../../bin/config.php");
-require_once(dirname(__FILE__).'/../Net_SmartIRC/Net/SmartIRC.php');
-require_once(dirname(__FILE__)."/../IRCScraper.php");
+require_once(dirname(__FILE__) . "/../../bin/config.php");
+require_once(dirname(__FILE__) . '/../Net_SmartIRC/Net/SmartIRC.php');
+require_once(dirname(__FILE__) . "/../IRCScraper.php");
 require_once 'settings.php';
 
 if (!is_file('/var/www/newznab/misc/update_scripts/nix_scripts/tmux/lib/IRCScraper/settings.php')) {
@@ -30,7 +30,8 @@ if (!in_array($argv[1], array('efnet', 'cz'))) {
 
 if (!defined('SCRAPE_IRC_EFNET_NICKNAME') ||
 	!defined('SCRAPE_IRC_CORRUPT_NICKNAME') ||
-	!defined('SCRAPE_IRC_ZENET_NICKNAME')) {
+	!defined('SCRAPE_IRC_ZENET_NICKNAME')
+) {
 	exit ('ERROR! You must update your settings.php using settings_example.php' . PHP_EOL);
 }
 
@@ -46,8 +47,8 @@ if ($argv[1] === 'cz') {
 	}
 }
 
-$silent = ((isset($argv[2]) && $argv[2] === 'true')  ? true : false);
-$debug  = ((isset($argv[3]) && $argv[3] === 'true')  ? true : false);
+$silent = ((isset($argv[2]) && $argv[2] === 'true') ? true : false);
+$debug = ((isset($argv[3]) && $argv[3] === 'true') ? true : false);
 $socket = ((isset($argv[4]) && $argv[4] === 'false') ? false : true);
 
 // Net_SmartIRC started here, or else globals are not properly set.
