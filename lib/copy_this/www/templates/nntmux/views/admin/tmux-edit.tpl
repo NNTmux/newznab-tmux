@@ -321,8 +321,10 @@
                 <td style="width:180px;"><label for="fix_names">Fix Release Names:</label></td>
                 <td>
                     {html_radios id="fix_names" name='fix_names' values=$yesno_ids output=$yesno_names selected=$ftmux->fix_names separator='<br />'}
-                    <div class="hint">Choose to try to fix Releases Names using NFOs, par2 files, filenames, md5 and misc sorter. true/false</div>
-                </td>
+					<div class="hint">Choose to try to fix Releases Names using NFOs, par2 files, filenames, md5 and
+						sha1. true/false
+					</div>
+				</td>
             </tr>
 
             <tr>
