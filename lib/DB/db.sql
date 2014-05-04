@@ -17,7 +17,6 @@ ALTER TABLE  `releases`
 	ADD `proc_par2` BIT NOT NULL DEFAULT 0,
 	ADD `proc_nfo` BIT NOT NULL DEFAULT 0,
   	ADD `proc_files` BIT NOT NULL DEFAULT 0,
-	ADD `nzb_guid` VARCHAR(50) NULL,
 	ADD `nzbstatus` TINYINT(1) NOT NULL DEFAULT 0,
   	ADD INDEX `ix_releases_nfostatus` (`nfostatus` ASC) USING HASH,
   	ADD INDEX `ix_releases_reqidstatus` (`reqidstatus` ASC) USING HASH,
@@ -27,7 +26,6 @@ ALTER TABLE  `releases`
   	ADD INDEX `ix_releases_haspreview` (`haspreview` ASC) USING HASH,
   	ADD INDEX `ix_releases_postdate_name` (`postdate`, `name`),
   	ADD INDEX `ix_releases_status` (`nzbstatus`, `iscategorized`, `isrenamed`, `nfostatus`, `ishashed`, `passwordstatus`, `dehashstatus`, `releasenfoID`, `musicinfoID`, `consoleinfoID`, `bookinfoID`, `haspreview`, `categoryID`, `imdbID`, `rageID`),
-	ADD INDEX `ix_releases_nzb_guid` (`nzb_guid`),
   	ADD INDEX `ix_releases_prehashid_searchname` (`prehashID`, `searchname`);
 
 DROP TABLE IF EXISTS prehash;
@@ -197,7 +195,7 @@ INSERT INTO tmux (setting, value) values ('defrag_cache','900'),
   	('ffmpeg_duration', '5'),
   	('ffmpeg_image_time', '5'),
   	('processvideos', '0'),
-  	('sqlpatch', '30');
+  	('sqlpatch', '31');
 
 DROP TABLE IF EXISTS country;
 CREATE TABLE country (
