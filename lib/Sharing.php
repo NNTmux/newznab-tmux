@@ -169,7 +169,7 @@ Class Sharing
 		// Get all comments that we have no posted yet.
 		$newComments = $this->db->query(
 			sprintf(
-				'SELECT rc.text, rc.ID, %s, u.username, r.nzb_guid
+				'SELECT rc.text, rc.ID, %s, u.username, r.gid AS nzb_guid
 				FROM releasecomment rc
 				INNER JOIN users u ON rc.userID = u.ID
 				INNER JOIN releases r on rc.releaseID = r.ID
@@ -260,9 +260,9 @@ Class Sharing
 	protected function matchComments()
 	{
 		$res = $this->db->query('
-			SELECT r.ID, r.nzb_guid
+			SELECT r.ID, r.gid AS nzb_guid
 			FROM releases r
-			INNER JOIN releasecomment rc ON rc.nzb_guid = r.nzb_guid
+			INNER JOIN releasecomment rc ON rc.nzb_guid = r.gid
 			WHERE rc.releaseID = 0'
 		);
 
