@@ -55,7 +55,7 @@ class nameCleaning
 			}
 		}
 		// Get pre style name from requestID
-		if (preg_match('/^\[ ?(\d+) ?\]/', $this->subject, $match)) {
+		if (preg_match('/^\[ ?(\d{4,6}) ?\]/', $this->subject, $match) || preg_match('/^REQ\s*(\d{4,6})/i', $this->subject, $match) || preg_match('/^(\d{4,6})-\d\[/', $this->subject, $match)) {
 			$title = $this->db->queryOneRow(
 				sprintf(
 					'SELECT p.title , p.ID from prehash p INNER JOIN groups g on g.ID = p.groupID
