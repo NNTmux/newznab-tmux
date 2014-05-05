@@ -195,7 +195,7 @@ INSERT INTO tmux (setting, value) values ('defrag_cache','900'),
   	('ffmpeg_duration', '5'),
   	('ffmpeg_image_time', '5'),
   	('processvideos', '0'),
-  	('sqlpatch', '31');
+  	('sqlpatch', '32');
 
 DROP TABLE IF EXISTS country;
 CREATE TABLE country (
@@ -501,8 +501,8 @@ DROP TRIGGER IF EXISTS check_insert;
 DROP TRIGGER IF EXISTS check_update;
 
 DELIMITER $$
-CREATE TRIGGER check_insert BEFORE INSERT ON releases FOR EACH ROW BEGIN IF NEW.searchname REGEXP '[a-fA-F0-9]{32}' OR NEW.name REGEXP '[a-fA-F0-9]{32}' THEN SET NEW.ishashed = 1;ELSEIF NEW.name REGEXP '^\\[[[:digit:]]+\\]' THEN SET NEW.isrequestid = 1;ELSEIF NEW.releasenfoID = 0 THEN SET NEW.nfostatus = -1; END IF; END;$$
-CREATE TRIGGER check_update BEFORE UPDATE ON releases FOR EACH ROW BEGIN IF NEW.searchname REGEXP '[a-fA-F0-9]{32}' OR NEW.name REGEXP '[a-fA-F0-9]{32}' THEN SET NEW.ishashed = 1;ELSEIF NEW.name REGEXP '^\\[[[:digit:]]+\\]' THEN SET NEW.isrequestid = 1;ELSEIF NEW.releasenfoID = 0 THEN SET NEW.nfostatus = -1; END IF; END;$$
+CREATE TRIGGER check_insert BEFORE INSERT ON releases FOR EACH ROW BEGIN IF NEW.searchname REGEXP '[a-fA-F0-9]{32}' OR NEW.name REGEXP '[a-fA-F0-9]{32}' THEN SET NEW.ishashed = 1;ELSEIF NEW.name REGEXP '^\[ ?([[:digit:]]{4,6}) ?\]|^REQ\s*([[:digit:]]{4,6})|^([[:digit:]]{4,6})-[[:digit:]]{1}\\[' THEN SET NEW.isrequestid = 1;ELSEIF NEW.releasenfoID = 0 THEN SET NEW.nfostatus = -1; END IF; END;$$
+CREATE TRIGGER check_update BEFORE UPDATE ON releases FOR EACH ROW BEGIN IF NEW.searchname REGEXP '[a-fA-F0-9]{32}' OR NEW.name REGEXP '[a-fA-F0-9]{32}' THEN SET NEW.ishashed = 1;ELSEIF NEW.name REGEXP '^\[ ?([[:digit:]]{4,6}) ?\]|^REQ\s*([[:digit:]]{4,6})|^([[:digit:]]{4,6})-[[:digit:]]{1}\\[' THEN SET NEW.isrequestid = 1;ELSEIF NEW.releasenfoID = 0 THEN SET NEW.nfostatus = -1; END IF; END;$$
 DELIMITER ;
 
 
