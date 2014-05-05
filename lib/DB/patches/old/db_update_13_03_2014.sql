@@ -1,1 +1,0 @@
-DELETE FROM `tmux` WHERE `setting` = 'lookup_reqids_threaded';

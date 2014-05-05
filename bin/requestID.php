@@ -20,7 +20,7 @@ $groups = new Groups();
 $t = new Tmux ();
 $tmux = $t->get();
 $f = new Functions();
-if (!preg_match('/^\[\d+\]/', $pieces[1] || !preg_match('^[0-9]{6}$^', $pieces[1]))) {
+if (!preg_match('/^\[ ?(\d{4,6}) ?\]/', $pieces[1]) && !preg_match('/^REQ\s*(\d{4,6})/i', $pieces[1]) && !preg_match('/^(\d{4,6})-\d{1}\[/', $pieces[1])) {
 	$db->query('UPDATE releases SET reqidstatus = -2 WHERE ID = ' . $pieces[0]);
 	exit('.');
 }
