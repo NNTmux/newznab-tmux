@@ -450,7 +450,7 @@ Class PreHash
 						{
 							$dupe = $this->db->queryOneRow(sprintf('SELECT ID FROM prehash WHERE title = %s', $this->db->escapeString($result["title"])));
 							if ($dupe === false) {
-								$this->db->queryExec(
+								$this->db->exec(
 									sprintf("
 									INSERT INTO prehash (title, predate, source, md5, files, category, sha1, size)
 									VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
@@ -466,7 +466,7 @@ Class PreHash
 								);
 								$newNames++;
 							} else {
-								$this->db->queryExec(
+								$this->db->exec(
 									sprintf("UPDATE prehash SET category = %s, size = %s, files = %s WHERE title = %s",
 										$this->db->escapeString($result['category']),
 										$this->db->escapeString($result["size"]),
@@ -481,7 +481,7 @@ Class PreHash
 						{
 							$dupe = $this->db->queryOneRow(sprintf('SELECT ID FROM prehash WHERE title = %s', $this->db->escapeString($result["title"])));
 							if ($dupe === false) {
-								$this->db->queryExec(
+								$this->db->exec(
 									sprintf("
 									INSERT INTO prehash (title, predate, source, md5, nuked, sha1, nukereason)
 									VALUES (%s, %s, %s, %s, %d, %s, %s)",
