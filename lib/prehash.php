@@ -620,7 +620,7 @@ Class PreHash
 					} else if ($this->db->exec(
 						sprintf('
 							INSERT INTO prehash (title, predate, source, md5, sha1, nfo)
-							VALUES (%s, %s, %s, %s, %s, %s, %s)',
+							VALUES (%s, %s, %s, %s, %s, %s)',
 							$this->db->escapeString($release->title),
 							$this->functions->from_unixtime(strtotime($release->pubDate)),
 							$this->db->escapeString('srrdb'),
