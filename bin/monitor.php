@@ -9,7 +9,7 @@ require_once(dirname(__FILE__) . "/../lib/showsleep.php");
 require_once(dirname(__FILE__) . "/../lib/functions.php");
 
 
-$version = "0.3r1144";
+$version = "0.3r1145";
 
 $db = new DB();
 $functions = new Functions();
@@ -28,8 +28,7 @@ $seq = (isset($tmux->sequential)) ? $tmux->sequential : 0;
 $powerline = (isset($tmux->powerline)) ? $tmux->powerline : 0;
 $colors = (isset($tmux->colors)) ? $tmux->colors : 0;
 $tpatch = $tmux->sqlpatch;
-$scrape_cz = $tmux->scrape_cz;
-$scrape_efnet = $tmux->scrape_efnet;
+$scrape = $tmux->scrape;
 
 
 if (command_exist("python3")) {
