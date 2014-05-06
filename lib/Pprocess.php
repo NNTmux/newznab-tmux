@@ -710,7 +710,7 @@ class PProcess
 	/**
 	 * Check for passworded releases, RAR contents and Sample/Media info.
 	 *
-	 * @note Called externally by tmux/bin/update_per_group and update/postprocess.php
+	 * @note Called externally by postprocess_alpha.php
 	 *
 	 * @param NNTP   $nntp          Class NNTP
 	 * @param string $releaseToWork String containing SQL results. Optional.

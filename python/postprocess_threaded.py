@@ -271,7 +271,7 @@ def main(args):
 	if sys.argv[1] == "additional":
 		for release in datas:
 			time.sleep(.02)
-			my_queue.put(u("%s           =+=            %s           =+=            %s           =+=            %s           =+=            %s           =+=            %s           =+=            %s           =+=            %s           =+=            %s           =+=           %s") % (release[0], release[1], release[2], release[3], release[4], release[5], release[6], release[7], release[8], release[9]))
+			my_queue.put(u("%s           =+=            %s           =+=            %s           =+=            %s           =+=            %s           =+=            %s           =+=            %s           =+=            %s           =+=            %s           =+=            %s") % (release[0], release[1], release[2], release[3], release[4], release[5], release[6], release[7], release[8], release[9]))
 	elif sys.argv[1] == "nfo":
 		for release in datas:
 			time.sleep(.02)
