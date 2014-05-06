@@ -735,7 +735,7 @@ class PProcess
 				$qResult = $this->db->query(
 					sprintf('
 						SELECT r.ID, r.guid, r.name, c.disablepreview, r.size, r.groupID,
-							r.nfostatus, r.completion, r.categoryID, r.searchname
+							r.nfostatus, r.releasenfoID, r.completion, r.categoryID, r.searchname
 						FROM releases r
 						LEFT JOIN category c ON c.ID = r.categoryID
 						WHERE r.size < %d
@@ -779,8 +779,9 @@ class PProcess
 					'size'           => $pieces[4],
 					'groupID'        => $pieces[5],
 					'nfostatus'      => $pieces[6],
-					'categoryID'     => $pieces[7],
-					'searchname'     => $pieces[8]
+					'releasenfoID' => $pieces[7],
+					'categoryID'   => $pieces[8],
+					'searchname'   => $pieces[9]
 				)
 			);
 			$totResults = 1;
@@ -886,7 +887,7 @@ class PProcess
 				$groupName = $this->functions->getByNameByID($rel['groupID']);
 
 				// Make sure we don't already have an nfo.
-				if ($rel['nfostatus'] !== '1') {
+				if (($rel['nfostatus'] !== '1' OR $rel['releasenfoID'] !== '1')) {
 					$this->noNFO = true;
 				}
 
