@@ -1,6 +1,6 @@
 <?php
-require_once(dirname(__FILE__)."/../bin/config.php");
-require_once(WWW_DIR."/lib/framework/db.php");
+require_once(dirname(__FILE__) . "/../bin/config.php");
+require_once(WWW_DIR . "/lib/framework/db.php");
 require_once("prehash.php");
 require_once("IRCClient.php");
 require_once("functions.php");
@@ -66,6 +66,7 @@ class IRCScraper extends IRCClient
 
 	/**
 	 * Regex to ignore categories.
+	 *
 	 * @var string
 	 */
 	protected $categoryIgnoreRegex;
@@ -263,30 +264,28 @@ class IRCScraper extends IRCClient
 
 		$query = 'INSERT INTO prehash (';
 
-		$query .= (!empty($this->CurPre['size'])     ? 'size, '       : '');
-		$query .= (!empty($this->CurPre['category']) ? 'category, '   : '');
-		$query .= (!empty($this->CurPre['source'])   ? 'source, '     : '');
-		$query .= (!empty($this->CurPre['reason'])   ? 'nukereason, ' : '');
-		$query .= (!empty($this->CurPre['files'])    ? 'files, '      : '');
+		$query .= (!empty($this->CurPre['size']) ? 'size, ' : '');
+		$query .= (!empty($this->CurPre['category']) ? 'category, ' : '');
+		$query .= (!empty($this->CurPre['source']) ? 'source, ' : '');
+		$query .= (!empty($this->CurPre['reason']) ? 'nukereason, ' : '');
+		$query .= (!empty($this->CurPre['files']) ? 'files, ' : '');
 		$query .= (!empty($this->CurPre['reqid']) ? 'requestID, ' : '');
 		$query .= (!empty($this->CurPre['groupid']) ? 'groupID, ' : '');
-		$query .= (!empty($this->CurPre['nuked'])    ? 'nuked, '      : '');
+		$query .= (!empty($this->CurPre['nuked']) ? 'nuked, ' : '');
 
 		$query .= 'predate, md5, sha1, title) VALUES (';
 
-		$query .= (!empty($this->CurPre['size'])     ? $this->db->escapeString($this->CurPre['size'])     . ', '   : '');
-		$query .= (!empty($this->CurPre['category']) ? $this->db->escapeString($this->CurPre['category']) . ', '   : '');
-		$query .= (!empty($this->CurPre['source'])   ? $this->db->escapeString($this->CurPre['source'])   . ', '   : '');
-		$query .= (!empty($this->CurPre['reason'])   ? $this->db->escapeString($this->CurPre['reason'])   . ', '   : '');
-		$query .= (!empty($this->CurPre['files'])    ? $this->db->escapeString($this->CurPre['files'])    . ', '   : '');
-		$query .= (!empty($this->CurPre['reqid'])    ? $this->CurPre['reqid']                             . ', '   : '');
-		$query .= (!empty($this->CurPre['groupid'])  ? $this->CurPre['groupid']                           . ', '   : '');
-		$query .= (!empty($this->CurPre['nuked'])    ? $this->CurPre['nuked']                             . ', '   : '');
-		$query .= (!empty($this->CurPre['predate'])  ? $this->CurPre['predate']                           . ', '   : 'NOW(), ');
+		$query .= (!empty($this->CurPre['size']) ? $this->db->escapeString($this->CurPre['size']) . ', ' : '');
+		$query .= (!empty($this->CurPre['category']) ? $this->db->escapeString($this->CurPre['category']) . ', ' : '');
+		$query .= (!empty($this->CurPre['source']) ? $this->db->escapeString($this->CurPre['source']) . ', ' : '');
+		$query .= (!empty($this->CurPre['reason']) ? $this->db->escapeString($this->CurPre['reason']) . ', ' : '');
+		$query .= (!empty($this->CurPre['files']) ? $this->db->escapeString($this->CurPre['files']) . ', ' : '');
+		$query .= (!empty($this->CurPre['reqid']) ? $this->CurPre['reqid'] . ', ' : '');
+		$query .= (!empty($this->CurPre['groupid']) ? $this->CurPre['groupid'] . ', ' : '');
+		$query .= (!empty($this->CurPre['nuked']) ? $this->CurPre['nuked'] . ', ' : '');
+		$query .= (!empty($this->CurPre['predate']) ? $this->CurPre['predate'] . ', ' : 'NOW(), ');
 
 		$query .= '%s, %s, %s)';
-
-		//$this->db->ping(true);
 
 		$this->db->exec(
 			sprintf(
@@ -324,19 +323,17 @@ class IRCScraper extends IRCClient
 		$query .= (!empty($this->CurPre['predate']) ? 'predate = ' . $this->CurPre['predate'] . ', ' : '');
 		$query .= (!empty($this->CurPre['nuked']) ? 'nuked = ' . $this->CurPre['nuked'] . ', ' : '');
 		$query .= (
-			(empty($this->OldPre['category']) && !empty($this->CurPre['category']))
-				? 'category = ' . $this->db->escapeString($this->CurPre['category']) . ', '
-				: ''
+		(empty($this->OldPre['category']) && !empty($this->CurPre['category']))
+			? 'category = ' . $this->db->escapeString($this->CurPre['category']) . ', '
+			: ''
 		);
 
-		if ($query === 'UPDATE prehash SET '){
+		if ($query === 'UPDATE prehash SET ') {
 			return;
 		}
 
-		$query .= 'title = '      . $this->db->escapeString($this->CurPre['title']);
+		$query .= 'title = ' . $this->db->escapeString($this->CurPre['title']);
 		$query .= ' WHERE md5 = ' . $this->CurPre['md5'];
-
-		//$this->db->ping(true);
 
 		$this->db->exec($query);
 
@@ -358,7 +355,7 @@ class IRCScraper extends IRCClient
 
 			$nukeString = '';
 			if ($this->nuked !== false) {
-				switch((int)$this->CurPre['nuked']) {
+				switch ((int)$this->CurPre['nuked']) {
 					case PreHash::PRE_NUKED:
 						$nukeString = '[ NUKED ] ';
 						break;
@@ -386,7 +383,7 @@ class IRCScraper extends IRCClient
 				($new ? '] [ Added Pre ] [' : '] [Updated Pre] [') .
 				$this->CurPre['source'] .
 				'] ' .
-				 $nukeString .
+				$nukeString .
 				'[' .
 				$this->CurPre['title'] .
 				']' .
@@ -417,6 +414,7 @@ class IRCScraper extends IRCClient
 			$group = $this->db->queryOneRow(sprintf('SELECT ID FROM groups WHERE name = %s', $this->db->escapeString($groupName)));
 			$this->groupList[$groupName] = $group['ID'];
 		}
+
 		return $this->groupList[$groupName];
 	}
 
