@@ -383,14 +383,13 @@ class Namefixer
 		// Determine MD5 or SHA1
 		if (strlen($hash) === 40) {
 			$hashtype = "SHA1, ";
+			$hashcheck = "sha1";
 		} else {
 			$hashtype = "MD5, ";
+			$hashcheck = "md5";
 		}
 
-		$res = $db->queryDirect(sprintf("SELECT title, source FROM prehash WHERE md5 = %s OR sha1 = %s",
-				$db->escapeString($hash), $db->escapeString($hash)
-			)
-		);
+		$res = $db->queryDirect(sprintf("SELECT title, source FROM prehash WHERE %s = %s", $hashcheck, $db->escapeString(strtolower($hash))));
 		$total = $res->rowCount();
 		if ($total > 0) {
 			foreach ($res as $row) {
@@ -420,6 +419,7 @@ class Namefixer
 			}
 		} else {
 			$db->exec(sprintf("UPDATE releases SET dehashstatus = %d - 1 WHERE ID = %d", $release['dehashstatus'], $release['releaseID']));
+			echo ".";
 		}
 		return $matching;
 	}
