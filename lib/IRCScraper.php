@@ -3,6 +3,8 @@ require_once(dirname(__FILE__)."/../bin/config.php");
 require_once(WWW_DIR."/lib/framework/db.php");
 require_once("prehash.php");
 require_once("IRCClient.php");
+require_once("functions.php");
+
 
 /**
  * Class IRCScraper
@@ -110,6 +112,7 @@ class IRCScraper extends IRCClient
 		}
 
 		$this->db = new DB();
+		$this->functions = new Functions();
 		$this->groupList = array();
 		$this->silent = $silent;
 		$this->_debug = $debug;
@@ -191,7 +194,7 @@ class IRCScraper extends IRCClient
 
 			$this->CurPre['md5'] = $this->db->escapeString(md5($matches['title']));
 			$this->CurPre['sha1'] = $this->db->escapeString(sha1($matches['title']));
-			$this->CurPre['predate'] = $this->db->from_unixtime(strtotime($matches['time'] . ' UTC'));
+			$this->CurPre['predate'] = $this->functions->from_unixtime(strtotime($matches['time'] . ' UTC'));
 			$this->CurPre['title'] = $matches['title'];
 			$this->CurPre['source'] = $matches['source'];
 			if ($matches['category'] !== 'N/A') {
