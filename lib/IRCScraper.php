@@ -286,7 +286,7 @@ class IRCScraper extends IRCClient
 
 		$query .= '%s, %s, %s)';
 
-		$this->db->ping(true);
+		//$this->db->ping(true);
 
 		$this->db->exec(
 			sprintf(
@@ -336,7 +336,7 @@ class IRCScraper extends IRCClient
 		$query .= 'title = '      . $this->db->escapeString($this->CurPre['title']);
 		$query .= ' WHERE md5 = ' . $this->CurPre['md5'];
 
-		$this->db->ping(true);
+		//$this->db->ping(true);
 
 		$this->db->exec($query);
 

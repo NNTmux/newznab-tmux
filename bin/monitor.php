@@ -1959,9 +1959,10 @@ while ($i > 0) {
 			shell_exec("tmux respawnp -t${tmux_session}:4.1 'echo \"\033[38;5;\"$color\"m\n$panes4[0] has been disabled/terminated by IRCSCraping\"'");
 		}
 
-	} else if ($seq == 0) {
-		for ($g = 1; $g <= 5; $g++) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
+	} else
+		if ($seq == 0) {
+			for ($g = 1; $g <= 5; $g++) {
+				$color = get_color($colors_start, $colors_end, $colors_exc);
 			shell_exec("tmux respawnp -k -t${tmux_session}:0.$g 'echo \"\033[38;5;${color}m\n${panes0[$g]} has been disabled/terminated by Running\"'");
 		}
 		for ($g = 0; $g <= 5; $g++) {
