@@ -9,7 +9,7 @@ require_once(dirname(__FILE__) . "/../lib/showsleep.php");
 require_once(dirname(__FILE__) . "/../lib/functions.php");
 
 
-$version = "0.3r1141";
+$version = "0.3r1142";
 
 $db = new DB();
 $functions = new Functions();
@@ -174,6 +174,9 @@ $killed = "false";
 $getdate = gmDate("Ymd");
 
 //get microtime
+/**
+ * @return float
+ */
 function microtime_float()
 {
 	list($usec, $sec) = explode(" ", microtime());
@@ -181,6 +184,11 @@ function microtime_float()
 	return ((float)$usec + (float)$sec);
 }
 
+/**
+ * @param $_time
+ *
+ * @return string
+ */
 function relativeTime($_time)
 {
 	$d[0] = array(1, "sec");
@@ -209,6 +217,11 @@ function relativeTime($_time)
 	return $return;
 }
 
+/**
+ * @param $cmd
+ *
+ * @return bool
+ */
 function command_exist($cmd)
 {
 	$returnVal = shell_exec("which $cmd 2>/dev/null");
@@ -216,6 +229,9 @@ function command_exist($cmd)
 	return (empty($returnVal) ? false : true);
 }
 
+/**
+ * @return int
+ */
 function get_color()
 {
 	$from = 1;
@@ -234,6 +250,11 @@ function get_color()
 	return $number;
 }
 
+/**
+ * @param $bytes
+ *
+ * @return string
+ */
 function decodeSize($bytes)
 {
 	$types = array('B', 'KB', 'MB', 'GB', 'TB');
@@ -243,6 +264,9 @@ function decodeSize($bytes)
 }
 
 //get system load
+/**
+ * @return mixed
+ */
 function get_load()
 {
 	$load = sys_getloadavg();
@@ -250,6 +274,11 @@ function get_load()
 	return $load[0];
 }
 
+/**
+ * @param $pane
+ *
+ * @return string
+ */
 function writelog($pane)
 {
 	$path = dirname(__FILE__) . "/../logs";
