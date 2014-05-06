@@ -9,7 +9,7 @@ require_once(dirname(__FILE__) . "/../lib/showsleep.php");
 require_once(dirname(__FILE__) . "/../lib/functions.php");
 
 
-$version = "0.3r1143";
+$version = "0.3r1144";
 
 $db = new DB();
 $functions = new Functions();
@@ -1891,26 +1891,12 @@ while ($i > 0) {
 			shell_exec("tmux respawnp -t${tmux_session}:3.4 'echo \"\033[38;5;\"$color\"m\n$panes3[4] has been disabled/terminated by Decrypt Hashes\"'");
 		}
 
-		//run IRCScraper for corrupt/zenet in pane 4.0
-		if ($scrape_cz == 1 && $scrape_efnet == 1) {
+		//run IRCScraper in pane 4.0
+		if ($scrape == 1) {
 			$DIR = dirname(__FILE__);
 			$ircscraper = $DIR . "/../lib/IRCScraper/scrape.php";
 			shell_exec("tmux respawnp -t${tmux_session}:4.0 ' \
-	    $_php $ircscraper true'"
-			);
-			//Check to see if the pane is dead, if so respawn it.
-			if (shell_exec("tmux list-panes -t${tmux_session}:4 | grep ^0 | grep -c dead") == 1) {
-				$DIR = dirname(__FILE__);
-				$ircscraper = $DIR . "/../lib/IRCScraper/scrape.php";
-				shell_exec("tmux respawnp -t${tmux_session}:4.0 ' \
-		        $_php $ircscraper true'"
-				);
-			}
-		} else if ($scrape_cz == 1) {
-			$DIR = dirname(__FILE__);
-			$ircscraper = $DIR . "/../lib/IRCScraper/scrape.php";
-			shell_exec("tmux respawnp -t${tmux_session}:4.0 ' \
-	    $_php $ircscraper true'"
+	    	$_php $ircscraper true'"
 			);
 			//Check to see if the pane is dead, if so respawn it.
 			if (shell_exec("tmux list-panes -t${tmux_session}:4 | grep ^0 | grep -c dead") == 1) {
@@ -1924,41 +1910,6 @@ while ($i > 0) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			shell_exec("tmux respawnp -t${tmux_session}:4.0 'echo \"\033[38;5;\"$color\"m\n$panes4[0] has been disabled/terminated by IRCSCraping\"'");
 		}
-
-		//run IRCScraper for efnet in pane 4.1
-		if ($scrape_cz == 1 && $scrape_efnet == 1) {
-			$DIR = dirname(__FILE__);
-			$ircscraper = $DIR . "/../lib/IRCScraper/scrape.php";
-			shell_exec("tmux respawnp -t${tmux_session}:4.1 ' \
-	    $_php $ircscraper true'"
-			);
-			//Check to see if the pane is dead, if so respawn it.
-			if (shell_exec("tmux list-panes -t${tmux_session}:4 | grep ^1 | grep -c dead") == 1) {
-				$DIR = dirname(__FILE__);
-				$ircscraper = $DIR . "/../lib/IRCScraper/scrape.php";
-				shell_exec("tmux respawnp -t${tmux_session}:4.1 ' \
-      		    $_php $ircscraper true'"
-				);
-			}
-		} else if ($scrape_efnet == 1) {
-			$DIR = dirname(__FILE__);
-			$ircscraper = $DIR . "/../lib/IRCScraper/scrape.php";
-			shell_exec("tmux respawnp -t${tmux_session}:4.1 ' \
-	    $_php $ircscraper true'"
-			);
-			//Check to see if the pane is dead, if so respawn it.
-			if (shell_exec("tmux list-panes -t${tmux_session}:4 | grep ^1 | grep -c dead") == 1) {
-				$DIR = dirname(__FILE__);
-				$ircscraper = $DIR . "/../lib/IRCScraper/scrape.php";
-				shell_exec("tmux respawnp -t${tmux_session}:4.1 ' \
-		        $_php $ircscraper true'"
-				);
-			}
-		} else {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:4.1 'echo \"\033[38;5;\"$color\"m\n$panes4[0] has been disabled/terminated by IRCSCraping\"'");
-		}
-
 	} else
 		if ($seq == 0) {
 			for ($g = 1; $g <= 5; $g++) {
