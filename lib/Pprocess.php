@@ -667,7 +667,6 @@ class PProcess
 		//\\ Paths.
 		$this->audSavePath = WWW_DIR . 'covers/audio/';
 		$this->jpgSavePath = WWW_DIR . 'covers/sample/';
-		$this->imgSavePath = WWW_DIR . 'covers/console/';
 		$this->vidSavePath = WWW_DIR . 'covers/video/';
 		$this->mainTmpPath = $this->site->tmpunrarpath;
 		$this->tmpPath = $this->mainTmpPath;
@@ -1411,7 +1410,7 @@ class PProcess
 				}
 
 			   // If samples exist from previous runs, set flags.
-				if (file_exists($this->imgSavePath . $rel['guid'] . '_thumb.jpg')) {
+				if (file_exists($this->releaseImage->imgSavePath . $rel['guid'] . '_thumb.jpg')) {
 					$iSQL = ', haspreview = 1';
 				} else {
 					$iSQL = ', haspreview = 0';
