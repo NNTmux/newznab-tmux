@@ -211,6 +211,10 @@ class IRCScraper extends IRCClient
 			if ($matches['files'] !== 'N/A') {
 				$this->CurPre['files'] = substr($matches['files'], 0, 50);
 			}
+			if (isset($matches['filename']) && $matches['filename'] !== 'N/A') {
+				$this->CurPre['filename'] = $matches['filename'];
+			}
+
 			if (isset($matches['nuked'])) {
 				switch ($matches['nuked']) {
 					case 'NUKED':
@@ -271,6 +275,7 @@ class IRCScraper extends IRCClient
 		$query .= (!empty($this->CurPre['reqid']) ? 'requestID, ' : '');
 		$query .= (!empty($this->CurPre['groupid']) ? 'groupID, ' : '');
 		$query .= (!empty($this->CurPre['nuked']) ? 'nuked, ' : '');
+		$query .= (!empty($this->CurPre['filename']) ? 'filename, ' : '');
 
 		$query .= 'predate, md5, sha1, title) VALUES (';
 
@@ -282,6 +287,7 @@ class IRCScraper extends IRCClient
 		$query .= (!empty($this->CurPre['reqid']) ? $this->CurPre['reqid'] . ', ' : '');
 		$query .= (!empty($this->CurPre['groupid']) ? $this->CurPre['groupid'] . ', ' : '');
 		$query .= (!empty($this->CurPre['nuked']) ? $this->CurPre['nuked'] . ', ' : '');
+		$query .= (!empty($this->CurPre['filename']) ? $this->db->escapeString($this->CurPre['filename']) . ', ' : '');
 		$query .= (!empty($this->CurPre['predate']) ? $this->CurPre['predate'] . ', ' : 'NOW(), ');
 
 		$query .= '%s, %s, %s)';
@@ -321,6 +327,8 @@ class IRCScraper extends IRCClient
 		$query .= (!empty($this->CurPre['groupid']) ? 'groupID = ' . $this->CurPre['groupid'] . ', ' : '');
 		$query .= (!empty($this->CurPre['predate']) ? 'predate = ' . $this->CurPre['predate'] . ', ' : '');
 		$query .= (!empty($this->CurPre['nuked']) ? 'nuked = ' . $this->CurPre['nuked'] . ', ' : '');
+		$query .= (!empty($this->CurPre['filename']) ? 'filename = ' . $this->db->escapeString($this->CurPre['filename']) . ', ' : '');
+
 		$query .= (
 		(empty($this->OldPre['category']) && !empty($this->CurPre['category']))
 			? 'category = ' . $this->db->escapeString($this->CurPre['category']) . ', '
@@ -439,7 +447,8 @@ class IRCScraper extends IRCClient
 				'reqid'    => '',
 				'nuked'    => '',
 				'reason'   => '',
-				'files'    => ''
+				'files'    => '',
+				'filename' => ''
 			);
 	}
 }
