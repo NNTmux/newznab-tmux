@@ -22,6 +22,7 @@
 		<th style="width:70px;text-align:center;">ReqID</th>
 		<th style="width:70px;text-align:center;">Size</th>
 		<th style="width:70px;text-align:center;">Files</th>
+		<th style="width:70px;text-align:center;">Filename</th>
 		<th style="width:25px"></th>
 		<th style="width:25px"></th>
 	</tr>
@@ -232,7 +233,14 @@
 				{/if}
 			</td>
 			<td class="prehash" style="text-align:center;">
-				<a
+				{if isset($result.filename)}
+					{$result.filename}
+				{else}
+					N/A
+				{/if}
+			</td>
+			<td class="prehash" style="text-align:center;">
+			<a
 					style="float: right;"
 					title="NzbIndex"
 					href="{$site->dereferrer_link}http://nzbindex.com/search/?q={$result.title}"
