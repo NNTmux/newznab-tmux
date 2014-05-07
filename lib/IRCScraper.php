@@ -211,7 +211,9 @@ class IRCScraper extends IRCClient
 			if ($matches['files'] !== 'N/A') {
 				$this->CurPre['files'] = substr($matches['files'], 0, 50);
 			}
-
+			if (($matches['filename'] !== 'N/A') || ($matches['filename'] !== '')) {
+				$this->CurPre['filename'] = $matches['filename'];
+			}
 			if (isset($matches['nuked'])) {
 				switch ($matches['nuked']) {
 					case 'NUKED':
@@ -269,6 +271,7 @@ class IRCScraper extends IRCClient
 		$query .= (!empty($this->CurPre['source']) ? 'source, ' : '');
 		$query .= (!empty($this->CurPre['reason']) ? 'nukereason, ' : '');
 		$query .= (!empty($this->CurPre['files']) ? 'files, ' : '');
+		$query .= (!empty($this->CurPre['filename']) ? 'filename, ' : '');
 		$query .= (!empty($this->CurPre['reqid']) ? 'requestID, ' : '');
 		$query .= (!empty($this->CurPre['groupid']) ? 'groupID, ' : '');
 		$query .= (!empty($this->CurPre['nuked']) ? 'nuked, ' : '');
@@ -280,6 +283,7 @@ class IRCScraper extends IRCClient
 		$query .= (!empty($this->CurPre['source']) ? $this->db->escapeString($this->CurPre['source']) . ', ' : '');
 		$query .= (!empty($this->CurPre['reason']) ? $this->db->escapeString($this->CurPre['reason']) . ', ' : '');
 		$query .= (!empty($this->CurPre['files']) ? $this->db->escapeString($this->CurPre['files']) . ', ' : '');
+		$query .= (!empty($this->CurPre['filename']) ? $this->db->escapeString($this->CurPre['filename']) . ', ' : '');
 		$query .= (!empty($this->CurPre['reqid']) ? $this->CurPre['reqid'] . ', ' : '');
 		$query .= (!empty($this->CurPre['groupid']) ? $this->CurPre['groupid'] . ', ' : '');
 		$query .= (!empty($this->CurPre['nuked']) ? $this->CurPre['nuked'] . ', ' : '');
@@ -317,6 +321,7 @@ class IRCScraper extends IRCClient
 		$query .= (!empty($this->CurPre['size']) ? 'size = ' . $this->db->escapeString($this->CurPre['size']) . ', ' : '');
 		$query .= (!empty($this->CurPre['source']) ? 'source = ' . $this->db->escapeString($this->CurPre['source']) . ', ' : '');
 		$query .= (!empty($this->CurPre['files']) ? 'files = ' . $this->db->escapeString($this->CurPre['files']) . ', ' : '');
+		$query .= (!empty($this->CurPre['filename']) ? 'filename = ' . $this->db->escapeString($this->CurPre['filename']) . ', ' : '');
 		$query .= (!empty($this->CurPre['reason']) ? 'nukereason = ' . $this->db->escapeString($this->CurPre['reason']) . ', ' : '');
 		$query .= (!empty($this->CurPre['reqid']) ? 'requestID = ' . $this->CurPre['reqid'] . ', ' : '');
 		$query .= (!empty($this->CurPre['groupid']) ? 'groupID = ' . $this->CurPre['groupid'] . ', ' : '');
@@ -440,7 +445,8 @@ class IRCScraper extends IRCClient
 				'reqid'    => '',
 				'nuked'    => '',
 				'reason'   => '',
-				'files'    => ''
+				'files'    => '',
+				'filename'    => ''
 			);
 	}
 }

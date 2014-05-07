@@ -31,22 +31,24 @@ ALTER TABLE  `releases`
 DROP TABLE IF EXISTS prehash;
 CREATE TABLE prehash (
 	ID INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  filename varchar(255) NOT NULL DEFAULT '',
 	title VARCHAR(255) NOT NULL DEFAULT '',
 	nfo VARCHAR(255) NULL,
 	size VARCHAR(50) NULL,
 	category VARCHAR(255) NULL,
 	predate DATETIME DEFAULT NULL,
 	source VARCHAR(50) NOT NULL DEFAULT '',
-  	md5  VARCHAR(32) NOT NULL DEFAULT '',
-  	sha1 VARCHAR(40) NOT NULL DEFAULT '',
-  	requestID INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  md5  VARCHAR(32) NOT NULL DEFAULT '',
+  sha1 VARCHAR(40) NOT NULL DEFAULT '',
+  requestID INT(10) UNSIGNED NOT NULL DEFAULT '0',
 	groupID INT(10) UNSIGNED NOT NULL DEFAULT '0',
-    nuked TINYINT(1) NOT NULL DEFAULT '0',
-    nukereason VARCHAR(255) NULL,
-    files VARCHAR(50) NULL,
+   nuked TINYINT(1) NOT NULL DEFAULT '0',
+   nukereason VARCHAR(255) NULL,
+   files VARCHAR(50) NULL,
 	PRIMARY KEY (ID)
 ) ENGINE=INNODB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci AUTO_INCREMENT=1;
 
+CREATE INDEX ix_prehash_filename ON prehash (filename);
 CREATE INDEX ix_prehash_title ON prehash(title);
 CREATE INDEX ix_prehash_nfo ON prehash(nfo);
 CREATE INDEX ix_prehash_predate ON prehash(predate);
@@ -194,7 +196,7 @@ INSERT INTO tmux (setting, value) values ('defrag_cache','900'),
   ('ffmpeg_duration', '5'),
   ('ffmpeg_image_time', '5'),
   	('processvideos', '0'),
-  ('sqlpatch', '34');
+  ('sqlpatch', '35');
 
 DROP TABLE IF EXISTS country;
 CREATE TABLE country (
@@ -491,6 +493,17 @@ ALTER TABLE releasecomment ADD COLUMN shared   TINYINT(1)  NOT NULL DEFAULT '1';
 ALTER TABLE releasecomment ADD COLUMN shareID  VARCHAR(40) NOT NULL DEFAULT '';
 ALTER TABLE releasecomment ADD COLUMN siteID   VARCHAR(40) NOT NULL DEFAULT '';
 ALTER TABLE releasecomment ADD COLUMN nzb_guid VARCHAR(32) NOT NULL DEFAULT '';
+
+ALTER TABLE `releasefiles` ADD COLUMN `ishashed` tinyint(1) NOT NULL DEFAULT '0' AFTER `size`;
+ALTER TABLE `releasefiles` ADD INDEX `ix_releasefiles_ishashed` (`ishashed`);
+
+DROP TRIGGER IF EXISTS check_rfinsert;
+DROP TRIGGER IF EXISTS check_rfupdate;
+
+DELIMITER $$
+CREATE TRIGGER check_rfinsert BEFORE INSERT ON releasefiles FOR EACH ROW BEGIN IF NEW.name REGEXP '[a-fA-F0-9]{32}' THEN SET NEW.ishashed = 1; END IF; END;$$
+CREATE TRIGGER check_rfupdate BEFORE UPDATE ON releasefiles FOR EACH ROW BEGIN IF NEW.name REGEXP '[a-fA-F0-9]{32}' THEN SET NEW.ishashed = 1; END IF; END;$$
+DELIMITER ;
 
 INSERT INTO menu (href, title, tooltip, role, ordinal )
 VALUES ('prehash', 'Prehash',
