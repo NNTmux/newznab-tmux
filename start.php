@@ -14,7 +14,7 @@ $tmux = $t->get();
 $patch = (isset($tmux->sqlpatch)) ? $tmux->sqlpatch : 0;
 
 // Check database patch version
-if ($patch < 32) {
+if ($patch < 35) {
 	exit($c->error("\nYour database is not up to date. Please update.\nphp ${DIR}/lib/DB/patchDB.php\n"));
 }
 $tmux_session = (isset($tmux->tmux_session)) ? $tmux->tmux_session : 0;
@@ -165,18 +165,10 @@ function window_ircscraper($tmux_session, $window)
 {
     $t = new Tmux();
 	$tmux = $t->get();
-	$scrape_cz = $tmux->scrape_cz;
-	$scrape_efnet = $tmux->scrape_efnet;
+	$scrape = $tmux->scrape;
 
-	if ($scrape_cz == 1 && $scrape_efnet == 1) {
-	    exec("tmux new-window -t $tmux_session -n IRCScraper 'printf \"\033]2;scrape_cz\033\"'");
-		exec("tmux selectp -t 0; tmux splitw -t $tmux_session:$window -v -p 50 'printf \"\033]2;scrape_Efnet\033\"'");
-	}
-	else if ($scrape_cz == 1) {
-		exec("tmux new-window -t $tmux_session -n IRCScraper 'printf \"\033]2;scrape_cz\033\"'");
-	}
-	elseif ($scrape_efnet == 1) {
-		exec("tmux new-window -t $tmux_session -n IRCScraper 'printf \"\033]2;scrape_Efnet\033\"'");
+	if ($scrape == 1) {
+		exec("tmux new-window -t $tmux_session -n IRCScraper 'printf \"\033]2;IRCScraper\033\"'");
 	}
 }
 

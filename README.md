@@ -8,7 +8,7 @@ There is a lib folder in main tmux folder. In that folder you will find two fold
 
 2. Most of the scripts are now threaded, they need python installed. Install instructions are in threaded_scripts_readme.txt
 
-3. You need to create sample folder in you covers folder (aka. /www/covers/sample) so you can have samples taken from releases, mostly XXX, and can be viewed in releases.
+3. You need to create sample folder in you covers folder (aka. /www/covers/sample) so you can have samples taken from releases, mostly XXX, and can be viewed in releases. For video previews you need video folder /www/covers/video/.
 
 4. OPTIONAL: If you want to populate your prehash table with more than 6 million rows of pre data (This dump includes 6,166,783 unique predb releases.), run dump_prehash.php to import the predb dump. Predb dump can be downloaded from https://mega.co.nz/#!LUsRACZA!Iz4u-0EIKTuIjySp00ESi2a1XcxFPxhppd15Hakb_YE.
 
@@ -47,21 +47,6 @@ Below is the original readme of newznab-tmux, with changes related to my git
   cd /var/www/newznab/misc/update_scripts/nix_scripts/
   git clone https://github.com/DariusIII/newznab-tmux.git tmux
   cd tmux
-
-
- * Now, you need to update your Newznab+ installation, copy some files and edit others. This is destructive and will overwrite any changes you have made to you Newznab+ files. If you do not want to update or overwrite you Newznab+ installation, skip this step, but not the next step.
-
-  ```bash
-  cd scripts && sudo ./update_svn.sh
-  ```
-
-
- * Updating these scripts is very simple.
-
-  ```bash
-  git pull
-  sudo scripts/update_svn.sh
-  ```
 
  * If you have grsec compiled into your kernel, you may need root privileges for nmon, bwm-ng and any other app that accesses the /proc folder.
 
