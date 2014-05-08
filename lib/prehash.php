@@ -16,6 +16,7 @@ require_once("namefixer.php");
 
 
 /**
+ * This script is adapted from nZEDb for usage in newznab-tmux
  * Class for inserting names/categories/md5 etc from prehash sources into the DB,
  * also for matching names on files / subjects.
  *
