@@ -939,9 +939,9 @@ Class PreHash
 			echo $this->c->header('Fixing search names' . $te . " using the prehash md5/sha1.");
 		}
 		if (DB_TYPE === 'mysql') {
-			$regex = "AND (r.ishashed = 1 OR rf.name REGEXP'[a-fA-F0-9]{32,40}')";
+			$regex = "AND (r.ishashed = 1 OR rf.ishashed = 1)";
 		} else if (DB_TYPE === 'pgsql') {
-			$regex = "AND (r.ishashed = 1 OR rf.name ~ '[a-fA-F0-9]{32,40}')";
+			$regex = "AND (r.ishashed = 1 OR rf.ishashed = 1))";
 		}
 
 		if ($cats === 3) {
@@ -961,9 +961,9 @@ Class PreHash
 		echo $this->c->primary(number_format($total) . " releases to process.");
 		if ($total > 0) {
 			foreach ($res as $row) {
-				if (preg_match('/[a-f0-9]{32,40}/i', $row['name'], $matches)) {
+				if (preg_match('/[a-fA-f0-9]{32,40}/i', $row['name'], $matches)) {
 					$updated = $updated + $namefixer->matchPredbHash($matches[0], $row, $echo, $namestatus, $this->echooutput, $show);
-				} else if (preg_match('/[a-f0-9]{32,40}/i', $row['filename'], $matches)) {
+				} else if (preg_match('/[a-fA-f0-9]{32,40}/i', $row['filename'], $matches)) {
 					$updated = $updated + $namefixer->matchPredbHash($matches[0], $row, $echo, $namestatus, $this->echooutput, $show);
 				}
 				if ($show === 2) {
