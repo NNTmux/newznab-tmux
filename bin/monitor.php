@@ -9,7 +9,7 @@ require_once(dirname(__FILE__) . "/../lib/showsleep.php");
 require_once(dirname(__FILE__) . "/../lib/functions.php");
 
 
-$version = "0.3r1150";
+$version = "0.3r1152";
 
 $db = new DB();
 $functions = new Functions();
@@ -28,6 +28,7 @@ $seq = (isset($tmux->sequential)) ? $tmux->sequential : 0;
 $powerline = (isset($tmux->powerline)) ? $tmux->powerline : 0;
 $tpatch = $tmux->sqlpatch;
 $scrape = $tmux->scrape;
+$sharing = $tmux->run_sharing;
 
 
 if (command_exist("python3")) {
@@ -1416,19 +1417,6 @@ while ($i > 0) {
 			shell_exec("tmux respawnp -k -t${tmux_session}:0.4 'echo \"\033[38;5;${color}m\n${panes0[4]} has been disabled/terminated by Import\"'");
 		}
 
-		//runs nzbcount in 1.5 loops
-		if (($maxload >= get_load()) && ($import == 1)) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			$log = writelog($panes1[5]);
-			shell_exec("tmux respawnp -t${tmux_session}:1.5 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php nzbcount.php 2>&1 $log' 2>&1 1> /dev/null");
-		} else if ($import == 0) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:1.5 'echo \"\033[38;5;\"$color\"m\n$panes1[5] has been disabled/terminated by Import\"'");
-		} else if ($maxload <= get_load()) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:1.5 'echo \"\033[38;5;\"$color\"m\n$panes1[5] Disabled by Max Load\"' 2>&1 1> /dev/null");
-		}
-
 		//start postprocessing in pane 0.1
 
 		if (($post == 1 && ($work_remaining_now + $pc_releases_proc + $xxx_releases_proc) > 0)) {
@@ -1569,20 +1557,6 @@ while ($i > 0) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			shell_exec("tmux respawnp -t${tmux_session}:1.2 'echo \"\033[38;5;\"$color\"m\n$panes1[2] Disabled by Max Load\"' 2>&1 1> /dev/null");
 		}
-
-		//run comment sharing in in pane 1.3
-		if ($maxload >= get_load()) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			$log = writelog($panes1[3]);
-			shell_exec("tmux respawnp -t${tmux_session}:1.3 'echo \"\033[38;5;\"$color\"m\";\
-                    cd $_bin && $_php postprocess_new.php sharing 2>&1 $log;\
-                     $_sleep $sharing_timer' 2>&1 1> /dev/null"
-			);
-		} else if ($maxload <= get_load()) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:1.3 'echo \"\033[38;5;\"$color\"m\n$panes1[3] Sharing Comments Disabled by Max Load\"' 2>&1 1> /dev/null");
-		}
-
 		//run update_missing_movie_info parts in pane 1.4 on 15th loop
 		if (($maxload >= get_load()) && (((TIME() - $time17) >= $movie_timer) || ($i == 15)) && ($fetch_movie == 1)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
@@ -1904,9 +1878,17 @@ while ($i > 0) {
 		        $_php $ircscraper true'"
 				);
 			}
-		} else {
+		}
+		//run Sharing in pane 5.0
+		if ($sharing == 1) {
+		$DIR = dirname(__FILE__);
+		$csharing = $DIR . "/postprocess_new.php";
+		shell_exec("tmux respawnp -t${tmux_session}:5.0 ' \
+	    	$_php $csharing sharing'"
+		);
+	} else {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:4.0 'echo \"\033[38;5;\"$color\"m\n$panes4[0] has been disabled/terminated by IRCSCraping\"'");
+			shell_exec("tmux respawnp -t${tmux_session}:4.0 'echo \"\033[38;5;\"$color\"m\n$panes4[0] has been disabled/terminated by Comment Sharing\"'");
 		}
 	} else
 		if ($seq == 0) {

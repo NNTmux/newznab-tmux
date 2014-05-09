@@ -14,7 +14,7 @@ $tmux = $t->get();
 $patch = (isset($tmux->sqlpatch)) ? $tmux->sqlpatch : 0;
 
 // Check database patch version
-if ($patch < 36) {
+if ($patch < 37) {
 	exit($c->error("\nYour database is not up to date. Please update.\nphp ${DIR}/lib/DB/patchDB.php\n"));
 }
 $tmux_session = (isset($tmux->tmux_session)) ? $tmux->tmux_session : 0;
@@ -125,12 +125,9 @@ function start_apps($tmux_session)
 function window_utilities($tmux_session)
 {
 	exec("tmux new-window -t $tmux_session -n Utils 'printf \"\033]2;update_predb\033\"'");
-	exec("tmux selectp -t 0;tmux splitw -t $tmux_session:1 -v -p 75 'printf \"\033]2;sphinx\033\"'");
-    exec("tmux splitw -t $tmux_session:1 -v -p 67 'printf \"\033]2;update_missing_movie_info\033\"'");
-	exec("tmux selectp -t 0; tmux splitw -t $tmux_session:1 -h -p 50 'printf \"\033]2;update_tv\033\"'");
-	exec("tmux selectp -t 2; tmux splitw -t $tmux_session:1 -h -p 50 'printf \"\033]2;comment_sharing\033\"'");
-    exec("tmux selectp -t 4; tmux splitw -t $tmux_session:1 -h -p 50 'printf \"\033]2;nzbcount\033\"'");
-
+	exec("tmux selectp -t 0;tmux splitw -t $tmux_session:1 -v -p 75 'printf \"\033]2;Sphinx\033\"'");
+    exec("tmux splitw -t $tmux_session:1 -v -p 67 'printf \"\033]2;Update_Missing_Movie_Info\033\"'");
+	exec("tmux selectp -t 2; tmux splitw -t $tmux_session:1 -h -p 50 'printf \"\033]2;UpdateTV\033\"'");
 }
 
 
@@ -157,7 +154,7 @@ function window_fixnames($tmux_session)
     exec("tmux selectp -t 3;tmux splitw -t $tmux_session:3 -h -p 50 'printf \"\033]2;PrehashUpdate\033\"'");
 }
 
-function window_ircscraper($tmux_session, $window)
+function window_ircscraper($tmux_session)
 {
     $t = new Tmux();
 	$tmux = $t->get();
@@ -165,6 +162,19 @@ function window_ircscraper($tmux_session, $window)
 
 	if ($scrape == 1) {
 		exec("tmux new-window -t $tmux_session -n IRCScraper 'printf \"\033]2;IRCScraper\033\"'");
+	}
+}
+
+function window_sharing($tmux_session)
+{
+	$db = new DB();
+	$sharing = $db->queryOneRow('SELECT enabled, posting, fetching FROM sharing');
+	$t = new Tmux();
+	$tmux = $t->get();
+	$tmux_share = (isset($tmux->run_sharing)) ? $tmux->run_sharing : 0;
+
+	if ($tmux_share && $sharing['enabled'] == 1 && ($sharing['posting'] == 1 || $sharing['fetching'] == 1)) {
+		exec("tmux new-window -t $tmux_session -n Sharing 'printf \"\033]2;comment_sharing\033\"'");
 	}
 }
 

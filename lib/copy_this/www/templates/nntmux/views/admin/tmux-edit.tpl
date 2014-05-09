@@ -314,6 +314,30 @@
         </table>
     </fieldset>
 
+	<fieldset>
+		<legend>Comment Sharing</legend>
+		<table class="input">
+			<tr>
+				<td style="width:180px;"><label for="run_sharing">Comment Sharing :</label></td>
+				<td>
+					{html_radios id="run_sharing" name='run_sharing' values=$yesno_ids output=$yesno_names
+					selected=$ftmux->run_sharing separator='<br />'}
+
+					<div class="hint">Run Comment Sharing from within tmux if you have it enabled in Admin->Comment Sharing Settings.</div>
+				</td>
+			</tr>
+			<tr>
+				<td style="width:180px;"><label for="sharing_timer">Comments Sharing Timer:</label></td>
+				<td>
+					<input class="short" id="sharing_timer" name="sharing_timer" type="text"
+						   value="{$ftmux->sharing_timer}"/>
+
+					<div class="hint">Set the sleep time between updates</div>
+				</td>
+			</tr>
+		</table>
+	</fieldset>
+
     <fieldset>
         <legend>Fix Release Names</legend>
         <table class="input">
@@ -902,14 +926,6 @@
 				<td>
 					<input class="short" id="ffmpeg_duration" name="ffmpeg_duration" type="text" value="{$ftmux->ffmpeg_duration}" />
 					<div class="hint">The maximum duration (In Seconds) for ffmpeg to generate the sample for. (Default 5)</div>
-				</td>
-			</tr>
-
-            <tr>
-				<td style="width:180px;"><label for="sharing_timer">Comments Sharing Timer:</label></td>
-				<td>
-					<input class="short" id="sharing_timer" name="sharing_timer" type="text" value="{$ftmux->sharing_timer}" />
-					<div class="hint">Set the timer for updating comments shared between newznab and nZEDb servers</div>
 				</td>
 			</tr>
 
