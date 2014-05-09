@@ -736,25 +736,6 @@
     </fieldset>
 
     <fieldset>
-        <legend>Tmux Colors</legend>
-        <table class="input">
-            <tr>
-                <td style="width:180px;"><label for="colors">256 Colors:</label></td>
-                <td>
-                    {html_radios id="colors" name='colors' values=$yesno_ids output=$yesno_names selected=$ftmux->colors separator='<br />'}
-                    <div class="hint">Show a color display of all available colors based on the settings below. true/fasle</div>
-                    <input id="colors_start" name="colors_start" class="short" type="text" value="{$ftmux->colors_start}" />
-                    <input id="colors_end" name="colors_end" class="short" type="text" value="{$ftmux->colors_end}" /><br />
-                    <input id="colors_exc" name="colors_exc" class="longer" type="text" value="{$ftmux->colors_exc}" />
-                    <div class="hint">The color displayed is tmux scripts is randomized from this list.<br />
-                        The first box is the start number, the second box is the end number and the last box are the exceptions. An array is created from these numbers.<br \>The exceptions do not need to be in numerical order.<br />The start number must be smaller than the end number.<br />
-                        If you connect using putty, then under Window/Translation set Remote character set to UTF-8 and check "Copy and paste line drawing characters". To use 256 colors, you must set Connection/Data Terminal-type string to "xterm-256color" and in Window/Colours check the top three boxes, otherwise only 16 colors are displayed. If you are using FreeBSD, you will need to add export TERM=xterm-256color to your .bashrc file to show 256 colors.</div>
-                </td>
-            </tr>
-        </table>
-    </fieldset>
-
-    <fieldset>
 		<legend>TraktTV API Key</legend>
 		<table class="input">
             <tr>

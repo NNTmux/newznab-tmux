@@ -14,7 +14,7 @@ $tmux = $t->get();
 $patch = (isset($tmux->sqlpatch)) ? $tmux->sqlpatch : 0;
 
 // Check database patch version
-if ($patch < 35) {
+if ($patch < 36) {
 	exit($c->error("\nYour database is not up to date. Please update.\nphp ${DIR}/lib/DB/patchDB.php\n"));
 }
 $tmux_session = (isset($tmux->tmux_session)) ? $tmux->tmux_session : 0;
@@ -133,10 +133,6 @@ function window_utilities($tmux_session)
 
 }
 
-function window_colors($tmux_session)
-{
-	exec("tmux new-window -t $tmux_session -n colors 'printf \"\033]2;tmux_colors\033\"'");
-}
 
 function window_post($tmux_session)
 {
@@ -209,9 +205,6 @@ if ($seq == 1) {
     window_fixnames($tmux_session);
     window_ircscraper($tmux_session, 4);
 
-	if ($colors == 1) {
-		window_colors($tmux_session);
-	}
 	start_apps($tmux_session);
 	attach($DIR, $tmux_session);
 } else {
@@ -227,9 +220,6 @@ if ($seq == 1) {
     window_fixnames($tmux_session);
     window_ircscraper($tmux_session, 4);
 
-	if ($colors == 1) {
-		window_colors($tmux_session);
-	}
 	start_apps($tmux_session);
 	attach($DIR, $tmux_session);
 }

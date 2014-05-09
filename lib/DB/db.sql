@@ -130,7 +130,6 @@ INSERT INTO tmux (setting, value) values ('defrag_cache','900'),
 	('colors_exc', '4, 8, 9, 11, 15, 16, 17, 18, 19, 46, 47, 48, 49, 50, 51, 52, 53, 59, 60'),
 	('monitor_path_a', NULL),
 	('monitor_path_b', NULL),
-	('colors', '0'),
 	('showquery', '0'),
 	('fix_crap_opt', 'Disabled'),
 	('showprocesslist', '0'),
@@ -196,7 +195,7 @@ INSERT INTO tmux (setting, value) values ('defrag_cache','900'),
   ('ffmpeg_duration', '5'),
   ('ffmpeg_image_time', '5'),
   	('processvideos', '0'),
-  ('sqlpatch', '35');
+  ('sqlpatch', '36');
 
 DROP TABLE IF EXISTS country;
 CREATE TABLE country (
