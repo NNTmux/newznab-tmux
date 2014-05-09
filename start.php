@@ -214,7 +214,8 @@ if ($seq == 1) {
 	window_utilities($tmux_session);
 	window_post($tmux_session);
     window_fixnames($tmux_session);
-    window_ircscraper($tmux_session, 4);
+	window_ircscraper($tmux_session);
+	window_sharing($tmux_session);
 
 	start_apps($tmux_session);
 	attach($DIR, $tmux_session);
@@ -229,7 +230,8 @@ if ($seq == 1) {
 	window_utilities($tmux_session);
 	window_post($tmux_session);
     window_fixnames($tmux_session);
-    window_ircscraper($tmux_session, 4);
+	window_ircscraper($tmux_session);
+	window_sharing($tmux_session);
 
 	start_apps($tmux_session);
 	attach($DIR, $tmux_session);
