@@ -9,7 +9,7 @@ require_once(dirname(__FILE__) . "/../lib/showsleep.php");
 require_once(dirname(__FILE__) . "/../lib/functions.php");
 
 
-$version = "0.3r1152";
+$version = "0.3r1153";
 
 $db = new DB();
 $functions = new Functions();
@@ -1522,58 +1522,61 @@ while ($i > 0) {
 			shell_exec("tmux respawnp -t${tmux_session}:1.0 'echo \"\033[38;5;\"$color\"m\n$panes1[0] Disabled by PREDB\"' 2>&1 1> /dev/null");
 		}
 
-		//run update_tvschedule.php and $_php update_theaters.php in 1.1 every 12 hours and tenth loop
-		if (($maxload >= get_load()) && ((TIME() - $time4) >= $tv_timer) && ($update_tv == 1)) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
+		//run sphinx in pane 1.1
+		if (($maxload >= get_load()) && (TIME() - $time9 >= $sphinx_timer) && ($sphinx == 1)) {
+			$color = get_color();
 			$log = writelog($panes1[1]);
-			shell_exec("tmux respawnp -t${tmux_session}:1.1 'echo \"\033[38;5;\"$color\"m\" && cd $NNPATH && $_php update_tvschedule.php 2>&1 $log && $_php update_theaters.php 2>&1 $log && echo \" \033[1;0;33m\"' 2>&1 1> /dev/null");
-			$time4 = TIME();
-		} else if (($update_tv == 1) && ($maxload >= get_load())) {
+			shell_exec("tmux respawnp -t${tmux_session}:1.1 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php sphinx.php 2>&1 $log' 2>&1 1> /dev/null");
+			$time9 = TIME();
+		} else if ($sphinx == 0) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
-			$run_time = relativeTime($tv_timer + $time4);
-			shell_exec("tmux respawnp -t${tmux_session}:1.1 'echo \"\033[38;5;\"$color\"m\n$panes1[1] and update_theaters will run in T[ $run_time]\"' 2>&1 1> /dev/null");
-		} else if ($update_tv == 0) {
+			shell_exec("tmux respawnp -t${tmux_session}:1.1 'echo \"\033[38;5;\"$color\"m\n$panes1[1]  has been disabled/terminated by Sphinx\"' 2>&1 1> /dev/null");
+		} else if ($maxload >= get_load()) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:1.1 'echo \"\033[38;5;\"$color\"m\n$panes1[1] has been disabled/terminated by Update TV/Theater\"' 2>&1 1> /dev/null");
-		} else if ($maxload <= get_load()) {
+			$run_time = relativeTime($sphinx_timer + $time9);
+			shell_exec("tmux respawnp -t${tmux_session}:1.1 'echo \"\033[38;5;\"$color\"m\n$panes1[1] will run in T[ $run_time]\"' 2>&1 1> /dev/null");
+		} elseif ($maxload <= get_load()) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			shell_exec("tmux respawnp -t${tmux_session}:1.1 'echo \"\033[38;5;\"$color\"m\n$panes1[1] Disabled by Max Load\"' 2>&1 1> /dev/null");
 		}
 
-		//run sphinx in pane 1.2
-		if (($maxload >= get_load()) && (TIME() - $time9 >= $sphinx_timer) && ($sphinx == 1)) {
-			$color = get_color();
-			$log = writelog($panes1[2]);
-			shell_exec("tmux respawnp -t${tmux_session}:1.2 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php sphinx.php 2>&1 $log' 2>&1 1> /dev/null");
-			$time9 = TIME();
-		} else if ($sphinx == 0) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:1.2 'echo \"\033[38;5;\"$color\"m\n$panes1[2]  has been disabled/terminated by Sphinx\"' 2>&1 1> /dev/null");
-		} else if ($maxload >= get_load()) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			$run_time = relativeTime($sphinx_timer + $time9);
-			shell_exec("tmux respawnp -t${tmux_session}:1.2 'echo \"\033[38;5;\"$color\"m\n$panes1[2] will run in T[ $run_time]\"' 2>&1 1> /dev/null");
-		} elseif ($maxload <= get_load()) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:1.2 'echo \"\033[38;5;\"$color\"m\n$panes1[2] Disabled by Max Load\"' 2>&1 1> /dev/null");
-		}
-		//run update_missing_movie_info parts in pane 1.3 on 15th loop
+		//run update_missing_movie_info parts in pane 1.2 on 15th loop
 		if (($maxload >= get_load()) && (((TIME() - $time17) >= $movie_timer) || ($i == 15)) && ($fetch_movie == 1)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
-			$log = writelog($panes1[3]);
-			shell_exec("tmux respawnp -t${tmux_session}:1.3 'echo \"\033[38;5;\"$color\"m\" && cd $_cj && $_php update_missing_movie_info.php 2>&1 $log' 2>&1 1> /dev/null");
+			$log = writelog($panes1[2]);
+			shell_exec("tmux respawnp -t${tmux_session}:1.2 'echo \"\033[38;5;\"$color\"m\" && cd $_cj && $_php update_missing_movie_info.php 2>&1 $log' 2>&1 1> /dev/null");
 			$time17 = TIME();
 		} else if (($maxload >= get_load()) && ($fetch_movie == 1)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			$run_time = relativeTime($movie_timer + $time17);
-			shell_exec("tmux respawnp -t${tmux_session}:1.3 'echo \"\033[38;5;\"$color\"m\n$panes1[3] will run in T[ $run_time]\"' 2>&1 1> /dev/null");
+			shell_exec("tmux respawnp -t${tmux_session}:1.2 'echo \"\033[38;5;\"$color\"m\n$panes1[2] will run in T[ $run_time]\"' 2>&1 1> /dev/null");
 		} else if ($maxload <= get_load()) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:1.3 'echo \"\033[38;5;\"$color\"m\n$panes1[3] Disabled by MAX LOAD\"' 2>&1 1> /dev/null");
+			shell_exec("tmux respawnp -t${tmux_session}:1.2 'echo \"\033[38;5;\"$color\"m\n$panes1[2] Disabled by MAX LOAD\"' 2>&1 1> /dev/null");
 		} else {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:1.3 'echo \"\033[38;5;\"$color\"m\n$panes1[3] Disabled by Fetch Movie\"' 2>&1 1> /dev/null");
+			shell_exec("tmux respawnp -t${tmux_session}:1.2 'echo \"\033[38;5;\"$color\"m\n$panes1[2] Disabled by Fetch Movie\"' 2>&1 1> /dev/null");
 		}
+
+		//run update_tvschedule.php and $_php update_theaters.php in 1.3 every 12 hours and tenth loop
+		if (($maxload >= get_load()) && ((TIME() - $time4) >= $tv_timer) && ($update_tv == 1)) {
+			$color = get_color($colors_start, $colors_end, $colors_exc);
+			$log = writelog($panes1[3]);
+			shell_exec("tmux respawnp -t${tmux_session}:1.3 'echo \"\033[38;5;\"$color\"m\" && cd $NNPATH && $_php update_tvschedule.php 2>&1 $log && $_php update_theaters.php 2>&1 $log && echo \" \033[1;0;33m\"' 2>&1 1> /dev/null");
+			$time4 = TIME();
+		} else if (($update_tv == 1) && ($maxload >= get_load())) {
+			$color = get_color($colors_start, $colors_end, $colors_exc);
+			$run_time = relativeTime($tv_timer + $time4);
+			shell_exec("tmux respawnp -t${tmux_session}:1.3 'echo \"\033[38;5;\"$color\"m\n$panes1[3] and update_theaters will run in T[ $run_time]\"' 2>&1 1> /dev/null");
+		} else if ($update_tv == 0) {
+			$color = get_color($colors_start, $colors_end, $colors_exc);
+			shell_exec("tmux respawnp -t${tmux_session}:1.3 'echo \"\033[38;5;\"$color\"m\n$panes1[3] has been disabled/terminated by Update TV/Theater\"' 2>&1 1> /dev/null");
+		} else if ($maxload <= get_load()) {
+			$color = get_color($colors_start, $colors_end, $colors_exc);
+			shell_exec("tmux respawnp -t${tmux_session}:1.3 'echo \"\033[38;5;\"$color\"m\n$panes1[3] Disabled by Max Load\"' 2>&1 1> /dev/null");
+		}
+
+
 
 		//runs postprocess_new.php nfo in pane 2.0
 		if (($maxload >= get_load()) && (($post == 0) || ($post == 1)) && ($nfo_remaining_now > 0)) {
