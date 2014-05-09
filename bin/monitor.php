@@ -9,7 +9,7 @@ require_once(dirname(__FILE__) . "/../lib/showsleep.php");
 require_once(dirname(__FILE__) . "/../lib/functions.php");
 
 
-$version = "0.3r1153";
+$version = "0.3r1154";
 
 $db = new DB();
 $functions = new Functions();
@@ -27,8 +27,7 @@ $tmux = $t->get();
 $seq = (isset($tmux->sequential)) ? $tmux->sequential : 0;
 $powerline = (isset($tmux->powerline)) ? $tmux->powerline : 0;
 $tpatch = $tmux->sqlpatch;
-$scrape = $tmux->scrape;
-$sharing = $tmux->run_sharing;
+$run_ircscraper = $tmux->scrape;
 
 
 if (command_exist("python3")) {
@@ -1866,33 +1865,15 @@ while ($i > 0) {
 			shell_exec("tmux respawnp -t${tmux_session}:3.4 'echo \"\033[38;5;\"$color\"m\n$panes3[4] has been disabled/terminated by Decrypt Hashes\"'");
 		}
 
-		//run IRCScraper in pane 4.0
-		if ($scrape == 1) {
-			$DIR = dirname(__FILE__);
-			$ircscraper = $DIR . "/../lib/IRCScraper/scrape.php";
-			shell_exec("tmux respawnp -t${tmux_session}:4.0 ' \
-	    	$_php $ircscraper true'"
-			);
-			//Check to see if the pane is dead, if so respawn it.
-			if (shell_exec("tmux list-panes -t${tmux_session}:4 | grep ^0 | grep -c dead") == 1) {
-				$DIR = dirname(__FILE__);
-				$ircscraper = $DIR . "/../lib/IRCScraper/scrape.php";
-				shell_exec("tmux respawnp -t${tmux_session}:4.0 ' \
-		        $_php $ircscraper true'"
-				);
-			}
-		}
-		//run Sharing in pane 5.0
-		if ($sharing == 1) {
-		$DIR = dirname(__FILE__);
-		$csharing = $DIR . "/postprocess_new.php";
-		shell_exec("tmux respawnp -t${tmux_session}:5.0 ' \
-	    	$_php $csharing sharing'"
-		);
-	} else {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:4.0 'echo \"\033[38;5;\"$color\"m\n$panes4[0] has been disabled/terminated by Comment Sharing\"'");
-		}
+		//pane setup for IrcScraper / Sharing
+		$ipane = 4;
+		$spane = 5;
+
+		//run IRCScraper
+		run_ircscraper($tmux_session, $_php, $ipane, $run_ircscraper);
+
+		//run Sharing
+		run_sharing($tmux_session, $_php, $spane, $_sleep, $sharing_timer);
 	} else
 		if ($seq == 0) {
 			for ($g = 1; $g <= 5; $g++) {
@@ -1953,4 +1934,41 @@ while ($i > 0) {
 
 	$i++;
 	sleep(10);
+}
+
+function run_ircscraper($tmux_session, $_php, $pane, $run_ircscraper)
+{
+	if ($run_ircscraper == 1) {
+		//Check to see if the pane is dead, if so respawn it.
+		if (shell_exec("tmux list-panes -t${tmux_session}:${pane} | grep ^0 | grep -c dead") == 1) {
+			$DIR = dirname(__FILE__);
+			$ircscraper = $DIR . "/../lib/IRCScraper/scrape.php";
+			shell_exec(
+				"tmux respawnp -t${tmux_session}:${pane}.0 ' \
+						$_php $ircscraper true'"
+			);
+		}
+	} else {
+		shell_exec("tmux respawnp -t${tmux_session}:${pane}.0 'echo \"\nIRCScraper has been disabled/terminated by IRCSCraper\"'");
+	}
+}
+
+function run_sharing($tmux_session, $_php, $pane, $_sleep, $sharing_timer)
+{
+	$db = new DB();
+	$sharing = $db->queryOneRow('SELECT enabled, posting, fetching FROM sharing');
+	$t = new Tmux();
+	$tmux = $t->get();
+	$tmux_share = (isset($tmux->run_sharing)) ? $tmux->run_sharing : 0;
+
+	if ($tmux_share && $sharing['enabled'] == 1 && ($sharing['posting'] == 1 || $sharing['fetching'] == 1)) {
+		if (shell_exec("tmux list-panes -t${tmux_session}:${pane} | grep ^0 | grep -c dead") == 1) {
+			$DIR = dirname(__FILE__);
+			$sharing2 = $DIR . "/postprocess_new.php true";
+			shell_exec(
+				"tmux respawnp -t${tmux_session}:${pane}.0 ' \
+					$_php $sharing2; $_sleep $sharing_timer' 2>&1 1> /dev/null"
+			);
+		}
+	}
 }
