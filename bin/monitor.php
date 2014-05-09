@@ -1964,7 +1964,7 @@ function run_sharing($tmux_session, $_php, $pane, $_sleep, $sharing_timer)
 	if ($tmux_share && $sharing['enabled'] == 1 && ($sharing['posting'] == 1 || $sharing['fetching'] == 1)) {
 		if (shell_exec("tmux list-panes -t${tmux_session}:${pane} | grep ^0 | grep -c dead") == 1) {
 			$DIR = dirname(__FILE__);
-			$sharing2 = $DIR . "/postprocess_new.php true";
+			$sharing2 = $DIR . "/postprocess_new.php sharing";
 			shell_exec(
 				"tmux respawnp -t${tmux_session}:${pane}.0 ' \
 					$_php $sharing2; $_sleep $sharing_timer' 2>&1 1> /dev/null"
