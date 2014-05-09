@@ -1,6 +1,6 @@
 <?php
-
 require_once(dirname(__FILE__) . "/config.php");
+require_once(WWW_DIR . "lib/framework/db.php");
 require(WWW_DIR . '/lib/postprocess.php');
 require_once(WWW_DIR . '/lib/site.php');
 require_once(WWW_DIR . '/lib/Tmux.php');
@@ -9,7 +9,7 @@ require_once(dirname(__FILE__) . "/../lib/showsleep.php");
 require_once(dirname(__FILE__) . "/../lib/functions.php");
 
 
-$version = "0.3r1150";
+$version = "0.3r1154";
 
 $db = new DB();
 $functions = new Functions();
@@ -27,7 +27,7 @@ $tmux = $t->get();
 $seq = (isset($tmux->sequential)) ? $tmux->sequential : 0;
 $powerline = (isset($tmux->powerline)) ? $tmux->powerline : 0;
 $tpatch = $tmux->sqlpatch;
-$scrape = $tmux->scrape;
+$run_ircscraper = $tmux->scrape;
 
 
 if (command_exist("python3")) {
@@ -1416,19 +1416,6 @@ while ($i > 0) {
 			shell_exec("tmux respawnp -k -t${tmux_session}:0.4 'echo \"\033[38;5;${color}m\n${panes0[4]} has been disabled/terminated by Import\"'");
 		}
 
-		//runs nzbcount in 1.5 loops
-		if (($maxload >= get_load()) && ($import == 1)) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			$log = writelog($panes1[5]);
-			shell_exec("tmux respawnp -t${tmux_session}:1.5 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php nzbcount.php 2>&1 $log' 2>&1 1> /dev/null");
-		} else if ($import == 0) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:1.5 'echo \"\033[38;5;\"$color\"m\n$panes1[5] has been disabled/terminated by Import\"'");
-		} else if ($maxload <= get_load()) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:1.5 'echo \"\033[38;5;\"$color\"m\n$panes1[5] Disabled by Max Load\"' 2>&1 1> /dev/null");
-		}
-
 		//start postprocessing in pane 0.1
 
 		if (($post == 1 && ($work_remaining_now + $pc_releases_proc + $xxx_releases_proc) > 0)) {
@@ -1534,72 +1521,61 @@ while ($i > 0) {
 			shell_exec("tmux respawnp -t${tmux_session}:1.0 'echo \"\033[38;5;\"$color\"m\n$panes1[0] Disabled by PREDB\"' 2>&1 1> /dev/null");
 		}
 
-		//run update_tvschedule.php and $_php update_theaters.php in 1.1 every 12 hours and tenth loop
-		if (($maxload >= get_load()) && ((TIME() - $time4) >= $tv_timer) && ($update_tv == 1)) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
+		//run sphinx in pane 1.1
+		if (($maxload >= get_load()) && (TIME() - $time9 >= $sphinx_timer) && ($sphinx == 1)) {
+			$color = get_color();
 			$log = writelog($panes1[1]);
-			shell_exec("tmux respawnp -t${tmux_session}:1.1 'echo \"\033[38;5;\"$color\"m\" && cd $NNPATH && $_php update_tvschedule.php 2>&1 $log && $_php update_theaters.php 2>&1 $log && echo \" \033[1;0;33m\"' 2>&1 1> /dev/null");
-			$time4 = TIME();
-		} else if (($update_tv == 1) && ($maxload >= get_load())) {
+			shell_exec("tmux respawnp -t${tmux_session}:1.1 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php sphinx.php 2>&1 $log' 2>&1 1> /dev/null");
+			$time9 = TIME();
+		} else if ($sphinx == 0) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
-			$run_time = relativeTime($tv_timer + $time4);
-			shell_exec("tmux respawnp -t${tmux_session}:1.1 'echo \"\033[38;5;\"$color\"m\n$panes1[1] and update_theaters will run in T[ $run_time]\"' 2>&1 1> /dev/null");
-		} else if ($update_tv == 0) {
+			shell_exec("tmux respawnp -t${tmux_session}:1.1 'echo \"\033[38;5;\"$color\"m\n$panes1[1]  has been disabled/terminated by Sphinx\"' 2>&1 1> /dev/null");
+		} else if ($maxload >= get_load()) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:1.1 'echo \"\033[38;5;\"$color\"m\n$panes1[1] has been disabled/terminated by Update TV/Theater\"' 2>&1 1> /dev/null");
-		} else if ($maxload <= get_load()) {
+			$run_time = relativeTime($sphinx_timer + $time9);
+			shell_exec("tmux respawnp -t${tmux_session}:1.1 'echo \"\033[38;5;\"$color\"m\n$panes1[1] will run in T[ $run_time]\"' 2>&1 1> /dev/null");
+		} elseif ($maxload <= get_load()) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			shell_exec("tmux respawnp -t${tmux_session}:1.1 'echo \"\033[38;5;\"$color\"m\n$panes1[1] Disabled by Max Load\"' 2>&1 1> /dev/null");
 		}
 
-		//run sphinx in pane 1.2
-		if (($maxload >= get_load()) && (TIME() - $time9 >= $sphinx_timer) && ($sphinx == 1)) {
-			$color = get_color();
-			$log = writelog($panes1[2]);
-			shell_exec("tmux respawnp -t${tmux_session}:1.2 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php sphinx.php 2>&1 $log' 2>&1 1> /dev/null");
-			$time9 = TIME();
-		} else if ($sphinx == 0) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:1.2 'echo \"\033[38;5;\"$color\"m\n$panes1[2]  has been disabled/terminated by Sphinx\"' 2>&1 1> /dev/null");
-		} else if ($maxload >= get_load()) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			$run_time = relativeTime($sphinx_timer + $time9);
-			shell_exec("tmux respawnp -t${tmux_session}:1.2 'echo \"\033[38;5;\"$color\"m\n$panes1[2] will run in T[ $run_time]\"' 2>&1 1> /dev/null");
-		} elseif ($maxload <= get_load()) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:1.2 'echo \"\033[38;5;\"$color\"m\n$panes1[2] Disabled by Max Load\"' 2>&1 1> /dev/null");
-		}
-
-		//run comment sharing in in pane 1.3
-		if ($maxload >= get_load()) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			$log = writelog($panes1[3]);
-			shell_exec("tmux respawnp -t${tmux_session}:1.3 'echo \"\033[38;5;\"$color\"m\";\
-                    cd $_bin && $_php postprocess_new.php sharing 2>&1 $log;\
-                     $_sleep $sharing_timer' 2>&1 1> /dev/null"
-			);
-		} else if ($maxload <= get_load()) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:1.3 'echo \"\033[38;5;\"$color\"m\n$panes1[3] Sharing Comments Disabled by Max Load\"' 2>&1 1> /dev/null");
-		}
-
-		//run update_missing_movie_info parts in pane 1.4 on 15th loop
+		//run update_missing_movie_info parts in pane 1.2 on 15th loop
 		if (($maxload >= get_load()) && (((TIME() - $time17) >= $movie_timer) || ($i == 15)) && ($fetch_movie == 1)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
-			$log = writelog($panes1[4]);
-			shell_exec("tmux respawnp -t${tmux_session}:1.4 'echo \"\033[38;5;\"$color\"m\" && cd $_cj && $_php update_missing_movie_info.php 2>&1 $log' 2>&1 1> /dev/null");
+			$log = writelog($panes1[2]);
+			shell_exec("tmux respawnp -t${tmux_session}:1.2 'echo \"\033[38;5;\"$color\"m\" && cd $_cj && $_php update_missing_movie_info.php 2>&1 $log' 2>&1 1> /dev/null");
 			$time17 = TIME();
 		} else if (($maxload >= get_load()) && ($fetch_movie == 1)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			$run_time = relativeTime($movie_timer + $time17);
-			shell_exec("tmux respawnp -t${tmux_session}:1.4 'echo \"\033[38;5;\"$color\"m\n$panes1[4] will run in T[ $run_time]\"' 2>&1 1> /dev/null");
+			shell_exec("tmux respawnp -t${tmux_session}:1.2 'echo \"\033[38;5;\"$color\"m\n$panes1[2] will run in T[ $run_time]\"' 2>&1 1> /dev/null");
 		} else if ($maxload <= get_load()) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:1.4 'echo \"\033[38;5;\"$color\"m\n$panes1[4] Disabled by MAX LOAD\"' 2>&1 1> /dev/null");
+			shell_exec("tmux respawnp -t${tmux_session}:1.2 'echo \"\033[38;5;\"$color\"m\n$panes1[2] Disabled by MAX LOAD\"' 2>&1 1> /dev/null");
 		} else {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:1.4 'echo \"\033[38;5;\"$color\"m\n$panes1[4] Disabled by Fetch Movie\"' 2>&1 1> /dev/null");
+			shell_exec("tmux respawnp -t${tmux_session}:1.2 'echo \"\033[38;5;\"$color\"m\n$panes1[2] Disabled by Fetch Movie\"' 2>&1 1> /dev/null");
 		}
+
+		//run update_tvschedule.php and $_php update_theaters.php in 1.3 every 12 hours and tenth loop
+		if (($maxload >= get_load()) && ((TIME() - $time4) >= $tv_timer) && ($update_tv == 1)) {
+			$color = get_color($colors_start, $colors_end, $colors_exc);
+			$log = writelog($panes1[3]);
+			shell_exec("tmux respawnp -t${tmux_session}:1.3 'echo \"\033[38;5;\"$color\"m\" && cd $NNPATH && $_php update_tvschedule.php 2>&1 $log && $_php update_theaters.php 2>&1 $log && echo \" \033[1;0;33m\"' 2>&1 1> /dev/null");
+			$time4 = TIME();
+		} else if (($update_tv == 1) && ($maxload >= get_load())) {
+			$color = get_color($colors_start, $colors_end, $colors_exc);
+			$run_time = relativeTime($tv_timer + $time4);
+			shell_exec("tmux respawnp -t${tmux_session}:1.3 'echo \"\033[38;5;\"$color\"m\n$panes1[3] and update_theaters will run in T[ $run_time]\"' 2>&1 1> /dev/null");
+		} else if ($update_tv == 0) {
+			$color = get_color($colors_start, $colors_end, $colors_exc);
+			shell_exec("tmux respawnp -t${tmux_session}:1.3 'echo \"\033[38;5;\"$color\"m\n$panes1[3] has been disabled/terminated by Update TV/Theater\"' 2>&1 1> /dev/null");
+		} else if ($maxload <= get_load()) {
+			$color = get_color($colors_start, $colors_end, $colors_exc);
+			shell_exec("tmux respawnp -t${tmux_session}:1.3 'echo \"\033[38;5;\"$color\"m\n$panes1[3] Disabled by Max Load\"' 2>&1 1> /dev/null");
+		}
+
+
 
 		//runs postprocess_new.php nfo in pane 2.0
 		if (($maxload >= get_load()) && (($post == 0) || ($post == 1)) && ($nfo_remaining_now > 0)) {
@@ -1889,25 +1865,15 @@ while ($i > 0) {
 			shell_exec("tmux respawnp -t${tmux_session}:3.4 'echo \"\033[38;5;\"$color\"m\n$panes3[4] has been disabled/terminated by Decrypt Hashes\"'");
 		}
 
-		//run IRCScraper in pane 4.0
-		if ($scrape == 1) {
-			$DIR = dirname(__FILE__);
-			$ircscraper = $DIR . "/../lib/IRCScraper/scrape.php";
-			shell_exec("tmux respawnp -t${tmux_session}:4.0 ' \
-	    	$_php $ircscraper true'"
-			);
-			//Check to see if the pane is dead, if so respawn it.
-			if (shell_exec("tmux list-panes -t${tmux_session}:4 | grep ^0 | grep -c dead") == 1) {
-				$DIR = dirname(__FILE__);
-				$ircscraper = $DIR . "/../lib/IRCScraper/scrape.php";
-				shell_exec("tmux respawnp -t${tmux_session}:4.0 ' \
-		        $_php $ircscraper true'"
-				);
-			}
-		} else {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:4.0 'echo \"\033[38;5;\"$color\"m\n$panes4[0] has been disabled/terminated by IRCSCraping\"'");
-		}
+		//pane setup for IrcScraper / Sharing
+		$ipane = 4;
+		$spane = 5;
+
+		//run IRCScraper
+		run_ircscraper($tmux_session, $_php, $ipane, $run_ircscraper);
+
+		//run Sharing
+		run_sharing($tmux_session, $_php, $spane, $_sleep, $sharing_timer);
 	} else
 		if ($seq == 0) {
 			for ($g = 1; $g <= 5; $g++) {
@@ -1968,4 +1934,41 @@ while ($i > 0) {
 
 	$i++;
 	sleep(10);
+}
+
+function run_ircscraper($tmux_session, $_php, $pane, $run_ircscraper)
+{
+	if ($run_ircscraper == 1) {
+		//Check to see if the pane is dead, if so respawn it.
+		if (shell_exec("tmux list-panes -t${tmux_session}:${pane} | grep ^0 | grep -c dead") == 1) {
+			$DIR = dirname(__FILE__);
+			$ircscraper = $DIR . "/../lib/IRCScraper/scrape.php";
+			shell_exec(
+				"tmux respawnp -t${tmux_session}:${pane}.0 ' \
+						$_php $ircscraper true'"
+			);
+		}
+	} else {
+		shell_exec("tmux respawnp -t${tmux_session}:${pane}.0 'echo \"\nIRCScraper has been disabled/terminated by IRCSCraper\"'");
+	}
+}
+
+function run_sharing($tmux_session, $_php, $pane, $_sleep, $sharing_timer)
+{
+	$db = new DB();
+	$sharing = $db->queryOneRow('SELECT enabled, posting, fetching FROM sharing');
+	$t = new Tmux();
+	$tmux = $t->get();
+	$tmux_share = (isset($tmux->run_sharing)) ? $tmux->run_sharing : 0;
+
+	if ($tmux_share && $sharing['enabled'] == 1 && ($sharing['posting'] == 1 || $sharing['fetching'] == 1)) {
+		if (shell_exec("tmux list-panes -t${tmux_session}:${pane} | grep ^0 | grep -c dead") == 1) {
+			$DIR = dirname(__FILE__);
+			$sharing2 = $DIR . "/postprocess_new.php true";
+			shell_exec(
+				"tmux respawnp -t${tmux_session}:${pane}.0 ' \
+					$_php $sharing2; $_sleep $sharing_timer' 2>&1 1> /dev/null"
+			);
+		}
+	}
 }
