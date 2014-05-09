@@ -1,8 +1,9 @@
 <?php
 require_once(dirname(__FILE__)."/bin/config.php");
-require_once(dirname(__FILE__)."/lib/ColorCLI.php");
+require_once(WWW_DIR . "lib/framework/db.php");
 require_once (WWW_DIR.'/lib/site.php');
 require_once(WWW_DIR.'/lib/Tmux.php');
+require_once(dirname(__FILE__) . "/lib/ColorCLI.php");
 
 $db = new DB();
 $DIR = dirname (__FILE__);
@@ -174,7 +175,7 @@ function window_sharing($tmux_session)
 	$tmux_share = (isset($tmux->run_sharing)) ? $tmux->run_sharing : 0;
 
 	if ($tmux_share && $sharing['enabled'] == 1 && ($sharing['posting'] == 1 || $sharing['fetching'] == 1)) {
-		exec("tmux new-window -t $tmux_session -n Sharing 'printf \"\033]2;comment_sharing\033\"'");
+		exec("tmux new-window -t $tmux_session -n Sharing 'printf \"\033]2;CommentSharing\033\"'");
 	}
 }
 
