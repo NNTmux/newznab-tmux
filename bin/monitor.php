@@ -1557,22 +1557,22 @@ while ($i > 0) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			shell_exec("tmux respawnp -t${tmux_session}:1.2 'echo \"\033[38;5;\"$color\"m\n$panes1[2] Disabled by Max Load\"' 2>&1 1> /dev/null");
 		}
-		//run update_missing_movie_info parts in pane 1.4 on 15th loop
+		//run update_missing_movie_info parts in pane 1.3 on 15th loop
 		if (($maxload >= get_load()) && (((TIME() - $time17) >= $movie_timer) || ($i == 15)) && ($fetch_movie == 1)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
-			$log = writelog($panes1[4]);
-			shell_exec("tmux respawnp -t${tmux_session}:1.4 'echo \"\033[38;5;\"$color\"m\" && cd $_cj && $_php update_missing_movie_info.php 2>&1 $log' 2>&1 1> /dev/null");
+			$log = writelog($panes1[3]);
+			shell_exec("tmux respawnp -t${tmux_session}:1.3 'echo \"\033[38;5;\"$color\"m\" && cd $_cj && $_php update_missing_movie_info.php 2>&1 $log' 2>&1 1> /dev/null");
 			$time17 = TIME();
 		} else if (($maxload >= get_load()) && ($fetch_movie == 1)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			$run_time = relativeTime($movie_timer + $time17);
-			shell_exec("tmux respawnp -t${tmux_session}:1.4 'echo \"\033[38;5;\"$color\"m\n$panes1[4] will run in T[ $run_time]\"' 2>&1 1> /dev/null");
+			shell_exec("tmux respawnp -t${tmux_session}:1.3 'echo \"\033[38;5;\"$color\"m\n$panes1[3] will run in T[ $run_time]\"' 2>&1 1> /dev/null");
 		} else if ($maxload <= get_load()) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:1.4 'echo \"\033[38;5;\"$color\"m\n$panes1[4] Disabled by MAX LOAD\"' 2>&1 1> /dev/null");
+			shell_exec("tmux respawnp -t${tmux_session}:1.3 'echo \"\033[38;5;\"$color\"m\n$panes1[3] Disabled by MAX LOAD\"' 2>&1 1> /dev/null");
 		} else {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:1.4 'echo \"\033[38;5;\"$color\"m\n$panes1[4] Disabled by Fetch Movie\"' 2>&1 1> /dev/null");
+			shell_exec("tmux respawnp -t${tmux_session}:1.3 'echo \"\033[38;5;\"$color\"m\n$panes1[3] Disabled by Fetch Movie\"' 2>&1 1> /dev/null");
 		}
 
 		//runs postprocess_new.php nfo in pane 2.0
