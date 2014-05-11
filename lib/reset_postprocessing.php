@@ -28,7 +28,7 @@ if (isset($argv[1]) && $argv[1] === "all") {
 		$total = $qry->rowCount();
 		$affected = 0;
 		foreach ($qry as $releases) {
-			$db->exec("UPDATE releases SET consoleinfoID = NULL, imdbID = NULL, musicinfoID = NULL, bookinfoID = NULL, rageID = -1, passwordstatus = -1, haspreview = -1, jpgstatus = 0, nfostatus = -1 WHERE ID = " . $releases['ID']);
+			$db->exec("UPDATE releases SET consoleinfoID = NULL, imdbID = NULL, musicinfoID = NULL, bookinfoID = NULL, rageID = -1, passwordstatus = -1, haspreview = -1, jpgstatus = 0, videostatus = 0, audiostatus = 0, nfostatus = -1 WHERE ID = " . $releases['ID']);
 			$consoletools->overWritePrimary("Resetting Releases:  " . $consoletools->percentString( ++$affected, $total));
 		}
 	}
@@ -103,10 +103,10 @@ if (isset($argv[1]) && ($argv[1] === "misc" || $argv[1] === "all")) {
 	$ran = true;
 	if (isset($argv[2]) && $argv[2] === "true") {
 		echo $c->header("Resetting all Additional postprocessing");
-		$where = ' WHERE (haspreview != -1 AND haspreview != 0) OR (passwordstatus != -1 AND passwordstatus != 0) OR jpgstatus != 0';
+		$where = ' WHERE (haspreview != -1 AND haspreview != 0) OR (passwordstatus != -1 AND passwordstatus != 0) OR jpgstatus != 0 OR videostatus != 0 OR audiostatus != 0';
 	} else {
 		echo $c->header("Resetting all failed Additional postprocessing");
-		$where = " WHERE haspreview < -1 OR haspreview = 0 OR passwordstatus < -1 OR passwordstatus = 0 OR jpgstatus < 0";
+		$where = " WHERE haspreview < -1 OR haspreview = 0 OR passwordstatus < -1 OR passwordstatus = 0 OR jpgstatus < 0 OR videostatus < 0 OR audiostatus < 0";
 	}
 
 	echo $c->primary("SELECT ID FROM releases" . $where);
@@ -114,7 +114,7 @@ if (isset($argv[1]) && ($argv[1] === "misc" || $argv[1] === "all")) {
 	$total = $qry->rowCount();
 	$concount = 0;
 	foreach ($qry as $releases) {
-		$db->exec("UPDATE releases SET passwordstatus = -1, haspreview = -1, jpgstatus = 0, WHERE ID = " . $releases['ID']);
+		$db->exec("UPDATE releases SET passwordstatus = -1, haspreview = -1, jpgstatus = 0, videostatus = 0, audiostatus = 0 WHERE ID = " . $releases['ID']);
 		$consoletools->overWritePrimary("Resetting Releases:  " . $consoletools->percentString( ++$concount, $total));
 	}
 	echo $c->header("\n" . number_format($concount) . " Release's reset.");
@@ -151,7 +151,7 @@ if (isset($argv[1]) && ($argv[1] === "books" || $argv[1] === "all")) {
 		$where = ' WHERE bookinfoID IS NOT NULL';
 	} else {
 		echo $c->header("Resetting all failed Book postprocessing");
-		$where = " WHERE bookinfoID IN (-2, 0) AND categoryID BETWEEN 8000 AND 8999";
+		$where = " WHERE bookinfoID IN (-2, 0) AND categoryID BETWEEN 7000 AND 7999";
 	}
 
 	$qry = $db->queryDirect("SELECT ID FROM releases" . $where);
