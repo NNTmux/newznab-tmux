@@ -370,7 +370,7 @@ class Namefixer
 		$this->category = new Category();
 		$this->matched = false;
 
-		$res = $db->queryDirect(sprintf("SELECT r.ID AS releaseid, r.searchname, r.groupID, r.categoryID
+		$res = $db->queryDirect(sprintf("SELECT r.ID AS releaseID, r.searchname, r.groupID, r.categoryID
 						     FROM releasesearch rs INNER JOIN releases r ON r.ID = rs.releaseID
 						     WHERE nzbstatus = 1 AND r.prehashID = 0 AND ishashed = 0
 						     AND categoryID NOT BETWEEN 4000 AND 4999
@@ -432,13 +432,13 @@ class Namefixer
 			foreach ($res as $pre) {
 				$db->exec(sprintf("UPDATE releases SET prehashID = %d WHERE ID = %d", $pre['preid'], $release['releaseID']));
 				if ($pre['title'] !== $release['searchname']) {
-					$determinedcat = $this->category->determineCategory($release['groupid'], $pre['title']);
+					$determinedcat = $this->category->determineCategory($release['groupID'], $pre['title']);
 
 					if ($echo == 1) {
 						$this->matched = true;
 						if ($namestatus == 1) {
 							$db->exec(sprintf("UPDATE releases SET rageID = -1, seriesfull = NULL, season = NULL, episode = NULL, tvtitle = NULL, tvairdate = NULL, imdbID = NULL, musicinfoID = NULL, consoleinfoID = NULL, bookinfoID = NULL, anidbID = NULL, "
-									. "searchname = %s, categoryID = %d, isrenamed = 1, iscategorized = 1 WHERE id = %d", $db->escapeString($pre['title']), $determinedcat, $release['releaseid']
+									. "searchname = %s, categoryID = %d, isrenamed = 1, iscategorized = 1 WHERE id = %d", $db->escapeString($pre['title']), $determinedcat, $release['releaseID']
 								)
 							);
 						} else {
