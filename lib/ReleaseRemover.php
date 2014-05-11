@@ -283,6 +283,9 @@ class ReleaseRemover
 			case 'size':
 				$this->removeSize();
 				break;
+			case 'huge':
+				$this->removeHuge();
+				break;
 			case 'wmv':
 				$this->removeWMV();
 				break;
@@ -297,6 +300,7 @@ class ReleaseRemover
 				$this->removeSCR();
 				$this->removeShort();
 				$this->removeSize();
+				$this->removeHuge();
 				$this->removeWMV();
 				break;
 			default:
@@ -531,7 +535,7 @@ class ReleaseRemover
 	}
 
 	/**
-	 * Remove releases smaller than 1MB with 1 part not in MP3/books/misc section.
+	 * Remove releases smaller than 2MB with 1 part not in MP3/books/misc section.
 	 *
 	 * @return bool
 	 */
@@ -542,13 +546,36 @@ class ReleaseRemover
 			"SELECT r.ID, r.guid, r.searchname
 			FROM releases r
 			WHERE r.totalpart = 1
-			AND r.size < 1000000
+			AND r.size < 2097152
 			AND r.categoryID NOT IN (%d, %d, %d, %d, %d) %s",
 			Category::CAT_MUSIC_MP3,
 			Category::CAT_BOOK_COMICS,
 			Category::CAT_BOOK_EBOOK,
 			Category::CAT_BOOK_MAGS,
 			Category::CAT_MISC_OTHER,
+			$this->crapTime
+		);
+
+		if ($this->checkSelectQuery() === false) {
+			return $this->returnError();
+		}
+
+		return $this->deleteReleases();
+	}
+
+	/**
+	 * Remove releases bigger than 200MB with just a single file.
+	 *
+	 * @return bool
+	 */
+	protected function removeHuge()
+	{
+		$this->method = 'Huge';
+		$this->query = sprintf(
+			"SELECT r.ID, r.guid, r.searchname
+			FROM releases r
+			WHERE r.totalpart = 1
+			AND r.size > 209715200 %s",
 			$this->crapTime
 		);
 

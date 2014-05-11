@@ -362,6 +362,104 @@ class Namefixer
 		$this->done = true;
 	}
 
+	// Match a PreDB title to a release name or searchname using an exact full-text match
+	public function matchPredbFT($pre, $echo, $namestatus, $echooutput, $show)
+	{
+		$db = $this->db;
+		$matching = 0;
+		$this->category = new Category();
+		$this->matched = false;
+
+		$res = $db->queryDirect(sprintf("SELECT r.ID AS releaseid, r.searchname, r.groupID, r.categoryID
+						     FROM releasesearch rs INNER JOIN releases r ON r.ID = rs.releaseID
+						     WHERE nzbstatus = 1 AND r.prehashID = 0 AND ishashed = 0
+						     AND categoryID NOT BETWEEN 4000 AND 4999
+						     AND MATCH (rs.name, rs.searchname) AGAINST ('\"%s\"' IN BOOLEAN MODE)",
+				$pre['title']
+			)
+		);
+
+		if ($res !== false) {
+			$total = $res->rowCount();
+		} else {
+			return $matching;
+		}
+
+		if ($total > 0) {
+			foreach ($res as $row) {
+				$db->exec(sprintf("UPDATE releases SET prehashID = %d WHERE ID = %d", $pre['preid'], $row['releaseID']));
+				if ($pre['title'] !== $row['searchname']) {
+					$determinedcat = $this->category->determineCategory($row['groupID'], $pre['title']);
+
+					if ($echo == 1) {
+						$this->matched = true;
+						if ($namestatus == 1) {
+							$db->exec(sprintf("UPDATE releases SET rageID = -1, seriesfull = NULL, season = NULL, episode = NULL, tvtitle = NULL, tvairdate = NULL, imdbID = NULL, musicinfoID = NULL, consoleinfoID = NULL, bookinfoID = NULL, anidbID = NULL, "
+									. "searchname = %s, categoryID = %d, isrenamed = 1, iscategorized = 1 WHERE ID = %d", $db->escapeString($pre['title']), $determinedcat, $row['releaseID']
+								)
+							);
+						} else {
+							$db->exec(sprintf("UPDATE releases SET rageID = -1, seriesfull = NULL, season = NULL, episode = NULL, tvtitle = NULL, tvairdate = NULL, imdbID = NULL, musicinfoID = NULL, consoleinfoID = NULL, bookinfoID = NULL, anidbID = NULL, "
+									. "searchname = %s, categoryID = %d WHERE ID = %d", $db->escapeString($pre['title']), $determinedcat, $row['releaseID']
+								)
+							);
+						}
+					}
+
+					if ($echooutput && $show === 1) {
+						$this->updateRelease($row, $pre['title'], $method = "Title Match source: " . $pre['source'], $echo, "Prehash FT Exact, ", $namestatus, $show);
+					}
+					$matching++;
+				}
+			}
+		}
+
+		return $matching;
+	}
+
+
+	// Match a filename from prehash to a release.
+	public function matchPredbFiles($release, $echo, $namestatus, $echooutput, $show)
+	{
+		$db = $this->db;
+		$matching = 0;
+		$this->category = new Category();
+		$this->matched = false;
+
+		$res = $db->queryDirect(sprintf("SELECT ID AS preid, title, source FROM prehash WHERE filename = %s ORDER BY predate DESC LIMIT 1", $db->escapeString($release['filename'])));
+		$total = $res->rowCount();
+		if ($total > 0) {
+			foreach ($res as $pre) {
+				$db->exec(sprintf("UPDATE releases SET prehashID = %d WHERE ID = %d", $pre['preid'], $release['releaseID']));
+				if ($pre['title'] !== $release['searchname']) {
+					$determinedcat = $this->category->determineCategory($release['groupid'], $pre['title']);
+
+					if ($echo == 1) {
+						$this->matched = true;
+						if ($namestatus == 1) {
+							$db->exec(sprintf("UPDATE releases SET rageID = -1, seriesfull = NULL, season = NULL, episode = NULL, tvtitle = NULL, tvairdate = NULL, imdbID = NULL, musicinfoID = NULL, consoleinfoID = NULL, bookinfoID = NULL, anidbID = NULL, "
+									. "searchname = %s, categoryID = %d, isrenamed = 1, iscategorized = 1 WHERE id = %d", $db->escapeString($pre['title']), $determinedcat, $release['releaseid']
+								)
+							);
+						} else {
+							$db->exec(sprintf("UPDATE releases SET rageID = -1, seriesfull = NULL, season = NULL, episode = NULL, tvtitle = NULL, tvairdate = NULL, imdbID = NULL, musicinfoID = NULL, consoleinfoID = NULL, bookinfoID = NULL, anidbID = NULL, "
+									. "searchname = %s, categoryID = %d WHERE ID = %d", $db->escapeString($pre['title']), $determinedcat, $release['releaseID']
+								)
+							);
+						}
+					}
+
+					if ($echooutput && $show === 1) {
+						$this->updateRelease($release, $pre['title'], $method = "filename match source: " . $pre['source'], $echo, "Prehash file match, ", $namestatus, $show);
+					}
+					$matching++;
+				}
+			}
+		}
+
+		return $matching;
+	}
+
 
 	/**
 	 * @param $hash
