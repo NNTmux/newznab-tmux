@@ -344,9 +344,12 @@ class Namefixer
 							$status = "isrenamed = 1, iscategorized = 1, proc_par2 = 1,";
 						} else if ($type == "Filenames, ") {
 							$status = "isrenamed = 1, iscategorized = 1, proc_files = 1,";
-						}  else if ($type == "Prehash file match, ") {
+						} else if ($type == "Prehash file match, ") {
+							$status = "isrenamed = 1, iscategorized = 1, proc_filenames = 1,";
+						} else if ($type == "Prehash FT Exact, ") {
 							$status = "isrenamed = 1, iscategorized = 1, proc_filenames = 1,";
 						}
+
 						$run = $db->exec(sprintf("UPDATE releases SET rageID = NULL, seriesfull = NULL, season = NULL, episode = NULL, tvtitle = NULL, tvairdate = NULL, imdbID = NULL, musicinfoID = NULL, consoleinfoID = NULL, bookinfoID = NULL, "
 								. "anidbID = NULL, prehashID = %s, searchname = %s, isrenamed = 1,"
 								. " %s categoryID = %d WHERE ID = %d", $prehashID, $db->escapeString(substr($newname, 0, 255)), $status, $determinedcat, $release["releaseID"]
