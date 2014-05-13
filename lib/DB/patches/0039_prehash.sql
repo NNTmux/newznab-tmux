@@ -1,0 +1,4 @@
+ALTER TABLE prehash ADD COLUMN searched tinyint(1) NOT NULL DEFAULT 0;
+ALTER TABLE prehash ADD INDEX ix_prehash_searched (searched);
+
+UPDATE `tmux` SET value = '39' WHERE `setting` = 'sqlpatch';

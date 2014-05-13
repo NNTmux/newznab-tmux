@@ -46,6 +46,7 @@ CREATE TABLE prehash (
   nuked      TINYINT(1)       NOT NULL DEFAULT '0',
   nukereason VARCHAR(255)     NULL,
   files      VARCHAR(50)      NULL,
+  searched   tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (ID)
 )
   ENGINE =INNODB
@@ -61,6 +62,7 @@ CREATE INDEX ix_prehash_source ON prehash (source);
 CREATE INDEX ix_prehash_requestid ON prehash (requestID, groupID);
 CREATE INDEX ix_prehash_size ON prehash (size);
 CREATE INDEX ix_prehash_category ON prehash (category);
+CREATE INDEX ix_prehash_searched ON prehash(searched);
 CREATE UNIQUE INDEX ix_prehash_md5 ON prehash (md5);
 CREATE UNIQUE INDEX ix_prehash_sha1 ON prehash (sha1);
 
@@ -206,7 +208,7 @@ INSERT INTO tmux (setting, value) VALUES ('defrag_cache', '900'),
   ('ffmpeg_duration', '5'),
   ('ffmpeg_image_time', '5'),
   ('processvideos', '0'),
-  ('sqlpatch', '38');
+  ('sqlpatch', '39');
 
 DROP TABLE IF EXISTS releasesearch;
 CREATE TABLE releasesearch (

@@ -371,25 +371,30 @@ class Namefixer
 		$db = $this->db;
 		$matching = 0;
 		$this->category = new Category();
+		$this->functions = new Functions();
 		$this->matched = false;
-		$titlelike = "%" . $pre['title'] . "%";
 
+		//Remove all non-printable chars, preg match all interesting words
+		$titlelike = "%" . $this->functions->stripNonPrintingChars($pre['title']) . "%";
+		preg_match_all('#\w+#', $pre['title'], $matches, PREG_PATTERN_ORDER);
+		$titlematch = '+"' . implode('" +"', $matches[0]) . '"';
+
+		//Find release matches with fulltext and then identify exact matches with cleaned LIKE string
 		$res = $db->queryDirect(sprintf("SELECT rs.releaseID AS releaseID FROM releasesearch rs
-						     WHERE MATCH (rs.name, rs.searchname) AGAINST ('\"%s\"' IN BOOLEAN MODE)
+						     WHERE MATCH (rs.name, rs.searchname) AGAINST ('%s' IN BOOLEAN MODE)
 						     AND (rs.name LIKE %s OR rs.searchname LIKE %s)
-						     LIMIT 15",
-				$pre['title'], $db->escapeString($titlelike), $db->escapeString($titlelike)
-			)
-		);
+						     LIMIT 16", $titlematch, $db->escapeString($titlelike), $db->escapeString($titlelike)));
+
 		if ($res !== false) {
-			$total = $res->rowCount();
+			$total = count($res);
 		} else {
 			return $matching;
 		}
-		// Run if row count is positive, but do not run if row count exceeds 10 (as this is likely a failed title match)
-		if ($total > 0 && $total <= 10) {
+
+		// Run if row count is positive, but do not run if row count exceeds 15 (as this is likely a failed title match)
+		if ($total > 0 && $total <= 15) {
 			foreach ($res as $row) {
-				$release = $db->queryOneRow(sprintf("SELECT ID AS releaseID, name, searchname, groupID, categoryID FROM releases WHERE nzbstatus = 1 AND prehashID = 0 AND ishashed = 0 AND ID = %d", $row['releaseID']));
+				$release = $db->queryOneRow(sprintf("SELECT ID AS releaseID, name, searchname, groupID, categoryID FROM releases WHERE nzbstatus = 1 AND prehashID = 0 AND ID = %d", $row['releaseID']));
 				if ($release !== false) {
 					$db->exec(sprintf("UPDATE releases SET prehashID = %d WHERE ID = %d", $pre['preid'], $release['releaseID']));
 					if ($pre['title'] !== $release['searchname']) {
