@@ -345,9 +345,9 @@ class Namefixer
 						} else if ($type == "Filenames, ") {
 							$status = "isrenamed = 1, iscategorized = 1, proc_files = 1,";
 						} else if ($type == "Prehash file match, ") {
-							$status = "isrenamed = 1, iscategorized = 1, proc_filenames = 1,";
+							$status = "isrenamed = 1, iscategorized = 1, proc_files = 1,";
 						} else if ($type == "Prehash FT Exact, ") {
-							$status = "isrenamed = 1, iscategorized = 1, proc_filenames = 1,";
+							$status = "isrenamed = 1, iscategorized = 1, proc_files = 1,";
 						}
 
 						$run = $db->exec(sprintf("UPDATE releases SET rageID = NULL, seriesfull = NULL, season = NULL, episode = NULL, tvtitle = NULL, tvairdate = NULL, imdbID = NULL, musicinfoID = NULL, consoleinfoID = NULL, bookinfoID = NULL, "
