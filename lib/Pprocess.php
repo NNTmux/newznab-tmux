@@ -333,7 +333,7 @@ class PProcess
 		}
 
 		$query = $this->db->queryOneRow(
-			'SELECT ID, groupID, categoryID, searchname, ' .
+			'SELECT ID, groupID, categoryID, name, searchname, ' .
 			(DB_TYPE === 'mysql' ? 'UNIX_TIMESTAMP(postdate)' : 'extract(epoch FROM postdate)') .
 			' as postdate, ID as releaseID  FROM releases WHERE isrenamed = 0 AND ID = ' .
 			$relID
