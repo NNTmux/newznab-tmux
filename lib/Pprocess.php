@@ -1721,9 +1721,9 @@ class PProcess
 							}
 							$this->noNFO = false;
 						}
-					} else if ($this->site->zippath !== '' && $file['compressed'] === 1) {
+					} else if ($this->tmux->zippath !== '' && $file['compressed'] === 1) {
 
-						$zip->setExternalClient($this->site->zippath);
+						$zip->setExternalClient($this->tmux->zippath);
 						$zipData = $zip->extractFile($file['name']);
 						if ($zipData !== false && strlen($zipData) > 5) {
 							if ($this->Nfo->addAlternateNfo($zipData, $release, $nntp)) {
