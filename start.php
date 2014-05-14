@@ -15,7 +15,7 @@ $tmux = $t->get();
 $patch = (isset($tmux->sqlpatch)) ? $tmux->sqlpatch : 0;
 
 // Check database patch version
-if ($patch < 37) {
+if ($patch < 39) {
 	exit($c->error("\nYour database is not up to date. Please update.\nphp ${DIR}/lib/DB/patchDB.php\n"));
 }
 $tmux_session = (isset($tmux->tmux_session)) ? $tmux->tmux_session : 0;
@@ -46,10 +46,12 @@ function writelog($pane)
 }
 
 //remove folders from tmpunrar
-$tmpunrar = $site->tmpunrarpath;
-if ((count(glob("$tmpunrar/*", GLOB_ONLYDIR))) > 0) {
-	echo $c->info("Removing dead folders from " . $tmpunrar);
-	exec("rm -r " . $tmpunrar . "/*");
+if (isset($site->tmpunrarpath)) {
+	$tmpunrar = $site->tmpunrarpath;
+	if ((count(glob("$tmpunrar/*", GLOB_ONLYDIR))) > 0) {
+		echo $c->info("Removing dead folders from " . $tmpunrar);
+		exec("rm -r " . $tmpunrar . "/*");
+	}
 }
 
 function command_exist($cmd)

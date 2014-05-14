@@ -21,7 +21,7 @@ $t = new Tmux ();
 $tmux = $t->get();
 $f = new Functions();
 if (!preg_match('/^\[ ?(\d{4,6}) ?\]/', $pieces[1]) && !preg_match('/^REQ\s*(\d{4,6})/i', $pieces[1]) && !preg_match('/^(\d{4,6})-\d{1}\[/', $pieces[1])) {
-	$db->query('UPDATE releases SET reqidstatus = -2 WHERE ID = ' . $pieces[0]);
+	$db->exec('UPDATE releases SET reqidstatus = -2 WHERE ID = ' . $pieces[0]);
 	exit('.');
 }
 $requestIDtmp = explode(']', substr($pieces[1], 1));
@@ -56,17 +56,15 @@ if ($bFound === true) {
 	$groupid = $f->getIDByName($pieces[2]);
 	if ($groupid !== 0) {
 		$md5 = md5($title);
-		$sha1 = sha1($title);
-		$dupe = $db->queryOneRow(sprintf('SELECT requestID FROM prehash WHERE md5 = %s OR sha1 = %s', $db->escapeString($md5), $db->escapeString($sha1)));
+		$dupe = $db->queryOneRow(sprintf('SELECT requestID FROM prehash WHERE md5 = %s', $db->escapeString($md5)));
 		if ($dupe === false || ($dupe !== false && $dupe['requestID'] !== $requestID)) {
 			$db->queryDirect(
 				sprintf("
-				INSERT INTO prehash (title, source, md5, sha1, requestID, groupID)
+				INSERT INTO prehash (title, source, md5, requestID, groupID)
 				VALUES (%s, %s, %s, %s, %d)",
 					$db->escapeString($title),
 					$db->escapeString('requestWEB'),
 					$db->escapeString($md5),
-					$db->escapeString($sha1),
 					$requestID, $groupid
 				)
 			);

@@ -49,7 +49,8 @@ if ($argCnt === 2) {
 			'                  scr         = Remove releases where .scr extension is found in the files or subject.' . $n .
 			'                  short       = Remove releases where the name is only numbers or letters and is 5 characters or less.' . $n .
 			'                  wmv         = Remove releases where the release contains WMV file and is in x264 category (the spamer).' . $n .
-			'                  size        = Remove releases smaller than 1MB and have only 1 file and not in books or mp3 section.' . $n . $n .
+			'					huge		= Remove releases bigger than 200MB with just a single file.' . $n .
+			'                  size        = Remove releases smaller than 2MB and have only 1 file and not in books or mp3 section.' . $n . $n .
 			'examples:' . $n .
 			"php $argv[0] true 12 blacklist     = Remove releases up to 12 hours old using site blacklists." . $n .
 			"php $argv[0] false full            = Show what releases could have been removed." . $n .

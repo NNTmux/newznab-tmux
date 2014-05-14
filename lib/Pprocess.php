@@ -333,7 +333,7 @@ class PProcess
 		}
 
 		$query = $this->db->queryOneRow(
-			'SELECT ID, groupID, categoryID, searchname, ' .
+			'SELECT ID, groupID, categoryID, name, searchname, ' .
 			(DB_TYPE === 'mysql' ? 'UNIX_TIMESTAMP(postdate)' : 'extract(epoch FROM postdate)') .
 			' as postdate, ID as releaseID  FROM releases WHERE isrenamed = 0 AND ID = ' .
 			$relID
@@ -1721,9 +1721,9 @@ class PProcess
 							}
 							$this->noNFO = false;
 						}
-					} else if ($this->site->zippath !== '' && $file['compressed'] === 1) {
+					} else if ($this->tmux->zippath !== '' && $file['compressed'] === 1) {
 
-						$zip->setExternalClient($this->site->zippath);
+						$zip->setExternalClient($this->tmux->zippath);
 						$zipData = $zip->extractFile($file['name']);
 						if ($zipData !== false && strlen($zipData) > 5) {
 							if ($this->Nfo->addAlternateNfo($zipData, $release, $nntp)) {

@@ -9,7 +9,7 @@ require_once(dirname(__FILE__) . "/../lib/showsleep.php");
 require_once(dirname(__FILE__) . "/../lib/functions.php");
 
 
-$version = "0.3r1154";
+$version = "0.3r1159";
 
 $db = new DB();
 $functions = new Functions();
@@ -1750,7 +1750,8 @@ while ($i > 0) {
                     cd $_py && $_python ${DIR}/../python/fixreleasenames_threaded.py nfo 2>&1 $log; \
                     $_python ${DIR}/../python/fixreleasenames_threaded.py filename 2>&1 $log; \
                     $_python ${DIR}/../python/fixreleasenames_threaded.py par2 2>&1 $log; \
-                    $_php ${DIR}/../lib/fixReleaseNames.php 4 true other yes show $log;
+                    $_php ${DIR}/../lib/fixReleaseNames.php 4 true other yes show $log; \
+                    $_php ${DIR}/../lib/prehashftmatch.php 100 show $log;
                     $_sleep $fix_timer' 2>&1 1> /dev/null"
 			);
 			$time27 = TIME();
