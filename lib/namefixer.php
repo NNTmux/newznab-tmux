@@ -469,7 +469,7 @@ class Namefixer
 					}
 
 					if ($echooutput && $show === 1) {
-						$this->updateRelease($release, $pre['title'], $method = "filename match source: " . $pre['source'], $echo, "Prehash file match, ", $namestatus, $show);
+						$this->updateRelease($release, $pre['title'], $method = "file " . $release['filename'] . " matched source: " . $pre['source'], $echo, "PreHash file match, ", $namestatus, $show);
 					}
 					$matching++;
 				}
