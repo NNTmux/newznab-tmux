@@ -440,7 +440,7 @@ class NNTP extends Net_NNTP_Client
 	 *
 	 * @access public
 	 */
-	public function &getMessages($groupName, $identifiers)
+	public function getMessages($groupName, $identifiers)
 	{
 		$connected = $this->checkConnection();
 		if ($connected !== true) {
@@ -465,8 +465,6 @@ class NNTP extends Net_NNTP_Client
 				if (!$this->isError($message)) {
 					$body .= $message;
 					unset($message);
-
-
 					// If there is an error return the PEAR error object.
 				} else {
 						// If we got some data, return it.
@@ -684,7 +682,6 @@ class NNTP extends Net_NNTP_Client
 		} else {
 			$body = $this->splitLines($body, $compress);
 		}
-
 
 		// From is required by NNTP servers, but parent function mail does not require it, so format it.
 		$from = 'From: ' . $from;
@@ -1458,35 +1455,29 @@ class NNTP extends Net_NNTP_Client
 		$encoded = '';
 		$stringLength = strlen($string);
 		// Encode each character of the string one at a time.
-		for( $i = 0; $i < $stringLength; $i++) {
-			$value = (ord($string{$i}) + 42) % 256;
+		for ($i = 0; $i < $stringLength; $i++) {
+			$value = ((ord($string{$i}) + 42) % 256);
+
 
 			// Escape NULL, TAB, LF, CR, space, . and = characters.
 			if ($value == 0 || $value == 9 || $value == 10 || $value == 13 || $value == 32 || $value == 46 || $value == 61) {
-				$encoded .= '=' . chr(($value + 64) % 256);
-			}
-			else {
+				$encoded .= ('=' . chr(($value + 64) % 256));
+			} else {
 				$encoded .= chr($value);
 			}
 		}
 
 		$encoded =
-			// Wrap the lines to $lineLength characters
-			trim(
-				chunk_split(
-					// Tack a yEnc header onto the encoded string.
-					'=ybegin line=' .
-					$lineLength .
-					' size=' .
-					$stringLength .
-					' name=' .
-					trim($filename) .
-					"\r\n" .
-					$encoded .
-					"\r\n=yend size=" .
-					$stringLength, $lineLength
-				)
-			);
+			'=ybegin line=' .
+			$lineLength .
+			' size=' .
+			$stringLength .
+			' name=' .
+			trim($filename) .
+			"\r\n" .
+			trim(chunk_split($encoded, $lineLength)) .
+			"\r\n=yend size=" .
+			$stringLength;
 
 		// Add a CRC32 checksum if desired.
 		if ($crc32 === true) {
@@ -1644,7 +1635,7 @@ class NNTP extends Net_NNTP_Client
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Encode a yenc encoded string.
 	 */
