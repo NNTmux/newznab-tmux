@@ -330,6 +330,12 @@ class Namefixer
 						$this->c->headerOver("Group:     ") . $this->c->primary($groupname) .
 						$this->c->headerOver("Method:    ") . $this->c->primary($type . $method) .
 						$this->c->headerOver("ReleaseID: ") . $this->c->primary($release["releaseID"]);
+					if (isset($release['filename']) && $release['filename'] != "") {
+						echo
+							$this->c->headerOver("Filename:  ") .
+							$this->c->primary($release["filename"]);
+					}
+
 					if ($type !== "PAR2, ") {
 						echo $n;
 					}
@@ -344,7 +350,7 @@ class Namefixer
 							$status = "isrenamed = 1, iscategorized = 1, proc_par2 = 1,";
 						} else if ($type == "Filenames, ") {
 							$status = "isrenamed = 1, iscategorized = 1, proc_files = 1,";
-						} else if ($type == "PreHash file match, ") {
+						} else if ($type == "SHA1, " || $type == "MD5, ") {
 							$status = "isrenamed = 1, iscategorized = 1, proc_files = 1,";
 						} else if ($type == "Prehash FT Exact, ") {
 							$status = "isrenamed = 1, iscategorized = 1, proc_files = 1,";
@@ -432,15 +438,22 @@ class Namefixer
 	}
 
 
-	// Match a filename from prehash to a release.
-	public function matchPredbFiles($release, $echo, $namestatus, $echooutput, $show)
+	// Match a release filename to a PreDB filename or title.
+	public function matchPredbFiles($release, $echo, $namestatus, $echooutput, $show, $type)
 	{
 		$db = $this->db;
 		$matching = 0;
 		$this->category = new Category();
 		$this->matched = false;
 
-		$res = $db->queryDirect(sprintf("SELECT ID AS preid, title, source FROM prehash WHERE filename = %s ORDER BY predate DESC LIMIT 1", $db->escapeString($release['filename'])));
+		if ($type = 'full') {
+			$column = sprintf("filename = %s OR title = %s", $db->escapeString($release['filename']), $db->escapeString($release['filename']));
+		} else {
+			$column = sprintf("filename = %s", $db->escapeString($release['filename']));
+		}
+
+		$res = $db->queryDirect(sprintf("SELECT ID AS preid, title, source FROM predhash WHERE %s ORDER BY predate DESC LIMIT 1", $column));
+
 		if ($res !== false) {
 			$total = $res->rowCount();
 		} else {
@@ -469,7 +482,7 @@ class Namefixer
 					}
 
 					if ($echooutput && $show === 1) {
-						$this->updateRelease($release, $pre['title'], $method = "file " . $release['filename'] . " matched source: " . $pre['source'], $echo, "PreHash file match, ", $namestatus, $show);
+						$this->updateRelease($release, $pre['title'], $method = "file matched source: " . $pre['source'], $echo, "Prehash file match, ", $namestatus, $show);
 					}
 					$matching++;
 				}
