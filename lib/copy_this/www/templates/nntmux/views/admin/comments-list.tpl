@@ -1,4 +1,4 @@
-<h1>{$page->title}</h1> 
+<h1>{$page->title}</h1>
 
 {if $commentslist}
 {$pager}
@@ -13,13 +13,15 @@
 		<th class="mid">options</th>
 	</tr>
 
-	
+
 	{foreach from=$commentslist item=comment}
 	<tr class="{cycle values=",alt"}">
 		<td>
 			{if $comment.sourceid == 0}<a title="View {$comment.username}'s profile" href="{$smarty.const.WWW_TOP}/user-edit.php?id={$comment.userID}">{$comment.username}</a>{else}{$comment.username}<br/><span style="color: #ce0000;">(syndicated)</span>{/if}
 		</td>
-		<td width="70" title="{$comment.createddate}">{$comment.createddate|date_format}</td>
+		<td width="70" title="{$comment.createddate}">{$comment.createddate|date_format} ({$comment.createddate|timeago}
+			ago)
+		</td>
 		<td>{$comment.text|escape:"htmlall"|nl2br}</td>
 		<td>{$comment.host}</td>
 		<td class="mid" width="70">
