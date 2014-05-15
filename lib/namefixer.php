@@ -344,7 +344,7 @@ class Namefixer
 							$status = "isrenamed = 1, iscategorized = 1, proc_par2 = 1,";
 						} else if ($type == "Filenames, ") {
 							$status = "isrenamed = 1, iscategorized = 1, proc_files = 1,";
-						} else if ($type == "Prehash file match, ") {
+						} else if ($type == "PreHash file match, ") {
 							$status = "isrenamed = 1, iscategorized = 1, proc_files = 1,";
 						} else if ($type == "Prehash FT Exact, ") {
 							$status = "isrenamed = 1, iscategorized = 1, proc_files = 1,";
