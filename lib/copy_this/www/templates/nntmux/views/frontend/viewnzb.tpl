@@ -1,6 +1,6 @@
 <h1>{$release.searchname|escape:"htmlall"}</h1>
 
-{$site->addetail}	
+{$site->addetail}
 
 {if $rage && $release.rageID > 0 && $rage.imgdata != ""}<img class="shadow" src="{$smarty.const.WWW_TOP}/getimage?type=tvrage&amp;id={$rage.ID}" width="180" alt="{$rage.releasetitle|escape:"htmlall"}" style="float:right;" />{/if}
 {if $movie && $release.rageID < 0 && $movie.cover == 1}<img class="shadow" src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbID}-cover.jpg" width="180" alt="{$movie.title|escape:"htmlall"}" style="float:right;" />{/if}
@@ -30,7 +30,8 @@
 				{if $episode.gueststars != ""}<strong>Guest Stars:</strong> {$episode.gueststars|escape:"htmlall"|replace:"|":", "}</br>{/if}
 			{/if}
 			<div style="margin-top:10px;">
-				<a class="rndbtn" title="View all episodes from this series" href="{$smarty.const.WWW_TOP}/series/{$release.rageID}">All Episodes</a> 
+				<a class="rndbtn" title="View all episodes from this series"
+				   href="{$smarty.const.WWW_TOP}/series/{$release.rageID}">All Episodes</a>
 				<a class="rndbtn" target="_blank" href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$release.rageID}" title="View at TV Rage">TV Rage</a>
 				{if $release.tvdbID > 0}<a class="rndbtn" target="_blank" href="{$site->dereferrer_link}http://thetvdb.com/?tab=series&id={$release.tvdbID}&lid=7" title="View at TheTVDB">TheTVDB</a>{/if}
 				<a class="rndbtn" href="{$smarty.const.WWW_TOP}/rss?rage={$release.rageID}&amp;dl=1&amp;i={$userdata.ID}&amp;r={$userdata.rsstoken}" title="Rss feed for this series">Series Rss Feed</a>
@@ -79,7 +80,8 @@
 				{if $episode.writer != ""}<strong>Writer:</strong> {$episode.writer|escape:"htmlall"|replace:"|":", "}</br>{/if}
 			{/if}
 			<div style="margin-top:10px;">
-				<a class="rndbtn" title="View all episodes from this anime" href="{$smarty.const.WWW_TOP}/anime/{$release.anidbID}">All Episodes</a> 
+				<a class="rndbtn" title="View all episodes from this anime"
+				   href="{$smarty.const.WWW_TOP}/anime/{$release.anidbID}">All Episodes</a>
 				<a class="rndbtn" target="_blank" href="{$site->dereferrer_link}http://anidb.net/perl-bin/animedb.pl?show=anime&aid={$anidb.anidbID}" title="View at AniDB">AniDB</a>
 				{if $release.tvdbID > 0}<a class="rndbtn" target="_blank" href="{$site->dereferrer_link}http://thetvdb.com/?tab=series&id={$release.tvdbID}&lid=7" title="View at TheTVDB">TheTVDB</a>{/if}
 				<a class="rndbtn" href="{$smarty.const.WWW_TOP}/rss?anidb={$release.anidbID}&amp;dl=1&amp;i={$userdata.ID}&amp;r={$userdata.rsstoken}" title="RSS feed for this anime">Anime RSS Feed</a>
@@ -121,7 +123,7 @@
 		</div>
 		{/if}
 	</td></tr>
-	{/if}	
+	{/if}
 
 	{if $music}
 	<tr><th>Music Info:</th><td>
@@ -142,7 +144,7 @@
 			{assign var="tracksplits" value="|"|explode:$music.tracks}
 			{foreach from=$tracksplits item=tracksplit}
 			<li>{$tracksplit|trim|escape:"htmlall"}</li>
-			{/foreach}		
+			{/foreach}
 		</ol>
 	</td></tr>
 	{/if}
@@ -222,7 +224,7 @@
 					<td><strong>Video</strong></td>
 					<td>Duration</td>
 					<td class="right">{$reVideo.videoduration}</td>
-				</tr>				
+				</tr>
 				{/if}
 				{if $reVideo.videoformat != ""}
 				<tr>
@@ -250,14 +252,14 @@
 					<td></td>
 					<td>Aspect</td>
 					<td class="right">{$reVideo.videoaspect}</td>
-				</tr>				
+				</tr>
 				{/if}
 				{if $reVideo.videoframerate != ""}
 				<tr>
 					<td></td>
 					<td>Framerate</td>
 					<td class="right">{$reVideo.videoframerate} fps</td>
-				</tr>	
+				</tr>
 				{/if}
 				{if $reVideo.videolibrary != ""}
 				<tr>
@@ -277,64 +279,64 @@
 					<td></td>
 					<td>Language</td>
 					<td class="right">{$audio.audiolanguage}</td>
-				</tr>					
+				</tr>
 				{/if}
 				{if $audio.audiotitle != ""}
 				<tr>
 					<td></td>
 					<td>Title</td>
 					<td class="right">{$audio.audiotitle}</td>
-				</tr>					
-				{/if}						
-				{if $audio.audiomode != ""}
+				</tr>
+				{/if}
+					{if $audio.audiomode != ""}
 				<tr>
 					<td></td>
 					<td>Mode</td>
 					<td class="right">{$audio.audiomode}</td>
-				</tr>		
-				{/if}
+				</tr>
+					{/if}
 				{if $audio.audiobitratemode != ""}
 				<tr>
 					<td></td>
 					<td>Bitrate Mode</td>
 					<td class="right">{$audio.audiobitratemode}</td>
-				</tr>					
+				</tr>
 				{/if}
 				{if $audio.audiobitrate != ""}
 				<tr>
 					<td></td>
 					<td>Bitrate</td>
 					<td class="right">{$audio.audiobitrate}</td>
-				</tr>	
+				</tr>
 				{/if}
 				{if $audio.audiochannels != ""}
 				<tr>
 					<td></td>
 					<td>Channels</td>
 					<td class="right">{$audio.audiochannels}</td>
-				</tr>	
+				</tr>
 				{/if}
 				{if $audio.audiosamplerate != ""}
 				<tr>
 					<td></td>
 					<td>Sample Rate</td>
 					<td class="right">{$audio.audiosamplerate}</td>
-				</tr>	
+				</tr>
 				{/if}
 				{if $audio.audiolibrary != ""}
 				<tr>
 					<td></td>
 					<td>Library</td>
 					<td class="right">{$audio.audiolibrary}</td>
-				</tr>					
-				{/if}		
+				</tr>
+				{/if}
 				{/foreach}
 				{if $reSubs.subs != ""}
 				<tr>
 					<td><strong>Subtitles</strong></td>
 					<td>Languages</td>
 					<td class="right">{$reSubs.subs|escape:"htmlall"}</td>
-				</tr>					
+				</tr>
 				{/if}
 			</table>
 		</td>
@@ -430,7 +432,12 @@
 			</tr>
 		{foreach from=$comments item=comment}
 			<tr>
-				<td class="less" title="{$comment.createddate}">{if $comment.sourceid == 0}<a title="View {$comment.username}'s profile" href="{$smarty.const.WWW_TOP}/profile?name={$comment.username}">{$comment.username}</a>{else}{$comment.username}<br/><span style="color: #ce0000;">(syndicated)</span>{/if}<br/>{$comment.createddate|date_format}</td>
+				<td class="less" title="{$comment.createddate}">{if $comment.sourceid == 0}<a
+					title="View {$comment.username}'s profile"
+					href="{$smarty.const.WWW_TOP}/profile?name={$comment.username}">{$comment.username}</a>{else}{$comment.username}
+				<br/><span style="color: #ce0000;">(syndicated)</span>{/if}<br/>{$comment.createddate|date_format}
+					({$comment.createddate|timeago} ago)
+				</td>
 				<td>{$comment.text|escape:"htmlall"|nl2br}</td>
 			</tr>
 		{/foreach}
