@@ -208,7 +208,8 @@ INSERT INTO tmux (setting, value) VALUES ('defrag_cache', '900'),
   ('ffmpeg_duration', '5'),
   ('ffmpeg_image_time', '5'),
   ('processvideos', '0'),
-  ('sqlpatch', '39');
+  ('lastpretime', '0'),
+  ('sqlpatch', '40');
 
 DROP TABLE IF EXISTS releasesearch;
 CREATE TABLE releasesearch (
@@ -219,7 +220,7 @@ CREATE TABLE releasesearch (
   searchname VARCHAR(255)     NOT NULL DEFAULT '',
   PRIMARY KEY (ID)
 )
-  ENGINE =INNODB
+  ENGINE =MYISAM
   DEFAULT CHARSET =utf8
   COLLATE =utf8_unicode_ci
   AUTO_INCREMENT =1;
