@@ -45,6 +45,4 @@ END;
 $$
 DELIMITER ;
 
-UPDATE `tmux`
-SET value = '41'
-WHERE `setting` = 'sqlpatch';
+UPDATE `tmux` SET value = '41' WHERE `setting` = 'sqlpatch';
