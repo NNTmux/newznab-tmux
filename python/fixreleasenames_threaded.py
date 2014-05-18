@@ -77,7 +77,7 @@ elif len(sys.argv) > 1 and (sys.argv[1] == "par2"):
     cur[0].execute(run, (int(perrun[0]) * int(run_threads[0])))
     datas = cur[0].fetchall()
 elif len(sys.argv) > 1 and (sys.argv[1] == "predbft"):
- 	#This one does from oldest posts to newest posts since there are many other more efficient PreDB matching schemes
+	#This one does from oldest posts to newest posts since there are many other more efficient PreDB matching schemes
 	run = "SELECT ID AS preid FROM prehash WHERE LENGTH(title) >= 15 AND searched = 0 AND title NOT REGEXP '[\"\<\> ]' ORDER BY predate ASC LIMIT %s"
 	cur[0].execute(run, (int(perrun[0])/10 * int(run_threads[0])))
 	datas = cur[0].fetchall()
@@ -153,9 +153,9 @@ def main():
 			time.sleep(.03)
 			my_queue.put("%s %s %s %s" % ("par2", release[0], release[1], release[2]))
 	elif sys.argv[1] == "predbft":
-     	for release in datas:
-     		time.sleep(.03)
-     		my_queue.put("%s %s" % ("predbft", release[0]))
+		for release in datas:
+		time.sleep(.03)
+	 		my_queue.put("%s %s" % ("predbft", release[0]))
 
 	my_queue.join()
 
