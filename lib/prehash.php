@@ -920,8 +920,9 @@ Class PreHash
 	}
 
 	/**
-	 * @note Matches the MD5/SHA1 within the prehash table to release files and subjects (names) which are hashed.
-	 * @param $time
+	 * @note Matches the hashes within the prehash table to release files and subjects (names) which are hashed.
+	 *
+*@param $time
 	 * @param $echo
 	 * @param $cats
 	 * @param $namestatus
@@ -955,7 +956,7 @@ Class PreHash
 			if ($time == 1) {
 				$te = ' in the past 3 hours';
 			}
-			echo $this->c->header('Fixing search names' . $te . " using the prehash md5/sha1.");
+			echo $this->c->header('Fixing search names' . $te . " using the prehash hash.");
 		}
 		if (DB_TYPE === 'mysql') {
 			$regex = "AND (r.ishashed = 1 OR rf.ishashed = 1)";

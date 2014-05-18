@@ -247,7 +247,7 @@ class IRCScraper extends IRCClient
 	 */
 	protected function checkForDupe()
 	{
-		$this->OldPre = $this->db->queryOneRow(sprintf('SELECT category, size FROM prehash WHERE md5 = %s', $this->CurPre['md5']));
+		$this->OldPre = $this->db->queryOneRow(sprintf('SELECT category, size FROM prehash INNER JOIN predbhash ON predbhash.pre_id = prehash.ID WHERE MATCH (predbhash.hashes) AGAINST (%s)', $this->CurPre['md5']));
 		if ($this->OldPre === false) {
 			$this->insertNewPre();
 		} else {
@@ -318,7 +318,7 @@ class IRCScraper extends IRCClient
 			return;
 		}
 
-		$query = 'UPDATE prehash SET ';
+		$query = 'UPDATE prehash INNER JOIN predbhash ON predbhash.pre_id = prehash.ID SET ';
 
 		$query .= (!empty($this->CurPre['size']) ? 'size = ' . $this->db->escapeString($this->CurPre['size']) . ', ' : '');
 		$query .= (!empty($this->CurPre['source']) ? 'source = ' . $this->db->escapeString($this->CurPre['source']) . ', ' : '');
@@ -336,12 +336,12 @@ class IRCScraper extends IRCClient
 			: ''
 		);
 
-		if ($query === 'UPDATE prehash SET ') {
+		if ($query === 'UPDATE prehash INNER JOIN predbhash ON predbhash.pre_id = prehash.ID SET ') {
 			return;
 		}
 
 		$query .= 'title = ' . $this->db->escapeString($this->CurPre['title']);
-		$query .= ' WHERE md5 = ' . $this->CurPre['md5'];
+		$query .= ' WHERE MATCH (hashes) AGAINST (' . $this->CurPre['md5'] . ')';
 
 		$this->db->exec($query);
 

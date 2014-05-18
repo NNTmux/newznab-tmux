@@ -514,13 +514,11 @@ class Namefixer
 		// Determine MD5 or SHA1
 		if (strlen($hash) === 40) {
 			$hashtype = "SHA1, ";
-			$hashcheck = "sha1";
 		} else {
 			$hashtype = "MD5, ";
-			$hashcheck = "md5";
 		}
 
-		$res = $db->queryDirect(sprintf("SELECT title, source FROM prehash WHERE %s = %s", $hashcheck, $db->escapeString(strtolower($hash))));
+		$res = $db->queryDirect(sprintf("SELECT title, source FROM prehash INNER JOIN predbhash ON predbhash.pre_id = prehash.ID WHERE MATCH (predbhash.hashes) AGAINST (%s)", $db->escapeString(strtolower($hash))));
 		if ($res !== false) {
 			$total = $res->rowCount();
 		} else {
