@@ -155,7 +155,7 @@ def main():
 	elif sys.argv[1] == "predbft":
 		for release in datas:
 			time.sleep(.03)
-	 		my_queue.put("%s %s" % ("predbft", release[0]))
+			my_queue.put("%s %s" % ("predbft", release[0]))
 
 	my_queue.join()
 
