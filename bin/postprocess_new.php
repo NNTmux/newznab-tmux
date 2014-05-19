@@ -9,7 +9,7 @@ require_once(WWW_DIR.'/lib/thetvdb.php');
 require_once(dirname(__FILE__).'/../lib/ColorCLI.php');
 require_once(dirname(__FILE__).'/../lib/TvAnger.php');
 require_once(dirname(__FILE__).'/../lib/Pprocess.php');
-require_once(dirname(__FILE__).'/../lib/Info.php'); 
+require_once(dirname(__FILE__) . '/../lib/Info.php');
 
 $c = new ColorCLI();
 $s = new Sites();
@@ -28,12 +28,9 @@ if (isset($argv[1]) && $argv[1] === "additional") {
 	echo $c->error("Unable to connect to usenet.\n");
 	return;
     }
-	$pprocess->processAdditional();
-
+	$pprocess->processAdditional($nntp);
     $nntp->doQuit();
-
 } else if (isset($argv[1]) && $argv[1] === "nfo"){
-    if ( $site->lookupnfo == 1){
     // Create the connection here and pass, this is for post processing
 	$nntp = new NNTP();
     if ($nntp->doConnect() === false)
@@ -44,66 +41,24 @@ if (isset($argv[1]) && $argv[1] === "additional") {
     }
 	$postprocess->processNfos();
     $nntp->doQuit();
-    }
-    else {
-      echo $c->info("Nfo lookup disabled in site settings.\n");
-        }
 } else if (isset($argv[1]) && $argv[1] === "movie"){
-    if ( $site->lookupimdb == 1){
 	    $pprocess->processMovies();
 	echo '.';
-    }
-    else  {
-        echo $c->info("Movie lookup disabled in site settings.\n");
-    }
 } else if (isset($argv[1]) && $argv[1] === "tv"){
-	    if ($site->lookuptvrage == 1)
-		{
 			$tvrage = new TvAnger(true);
-			$tvrage->processTvReleases(($site->lookuptvrage==1));
-		}
-        else {
-            echo $c->info("TVRage lookup disabled in site settings.\n");
-        }
-		if ($site->lookupthetvdb == 1)
-		{
 			$thetvdb = new TheTVDB(true);
-			$thetvdb->processReleases();
-		}
-        else {
-            echo $c->info("TheTVDB lookup disabled in site settings.\n");
-        }
+	$tvrage->processTvReleases(($site->lookuptvrage == 1));
+	$thetvdb->processReleases();
 } else if (isset($argv[1]) && $argv[1] === "games") {
-    if ($site->lookupgames == 1){
-        $pprocess -> processGames();
-}   else{
-        echo $c->info("Games lookup disabled in site settings.\n");
-    }
+	$pprocess->processGames();
 } else if (isset($argv[1]) && $argv[1] === "ebook") {
-    if ($site->lookupbooks == 1){
-    $postprocess -> processBooks();
-    }
-    else {
-        echo $c->info("Books lookup disabled in site settings.\n");
-    }
+	$postprocess->processBooks();
 } else if (isset($argv[1]) && $argv[1] === "music") {
-        if ($site->lookupmusic == 1){
                 $postprocess -> processMusic();
-            }
-        else {
-            echo $c->info("Music lookup disabled in site settings.\n");
-    }
 } else if (isset($argv[1]) && $argv[1] === "anime") {
-        if ( $site->lookupanidb == 1)
-        {
-            $anidb = new AniDB(true);
-            $anidb->animetitlesUpdate();
-            $anidb->processAnimeReleases();
-        }
-        else
-            {
-               echo $c->info("AniDB lookup disabled in site settings.\n");
-            }
+	$anidb = new AniDB(true);
+	$anidb->animetitlesUpdate();
+	$anidb->processAnimeReleases();
 } else if (isset($argv[1]) && $argv[1] === "spotnab") {
                 $postprocess -> processSpotnab();
 } else if (isset($argv[1]) && $argv[1] === "unwanted") {

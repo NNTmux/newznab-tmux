@@ -314,6 +314,30 @@
         </table>
     </fieldset>
 
+	<fieldset>
+		<legend>Comment Sharing</legend>
+		<table class="input">
+			<tr>
+				<td style="width:180px;"><label for="run_sharing">Comment Sharing :</label></td>
+				<td>
+					{html_radios id="run_sharing" name='run_sharing' values=$yesno_ids output=$yesno_names
+					selected=$ftmux->run_sharing separator='<br />'}
+
+					<div class="hint">Run Comment Sharing from within tmux if you have it enabled in Admin->Comment Sharing Settings.</div>
+				</td>
+			</tr>
+			<tr>
+				<td style="width:180px;"><label for="sharing_timer">Comments Sharing Timer:</label></td>
+				<td>
+					<input class="short" id="sharing_timer" name="sharing_timer" type="text"
+						   value="{$ftmux->sharing_timer}"/>
+
+					<div class="hint">Set the sleep time between updates</div>
+				</td>
+			</tr>
+		</table>
+	</fieldset>
+
     <fieldset>
         <legend>Fix Release Names</legend>
         <table class="input">
@@ -565,19 +589,16 @@
         <legend>PreDb IRC Scraper</legend>
         <table class="input">
             <tr>
-                <td style="width:180px;"><label for="scrape_cz">Scrape Corrupt/Zenet Irc Channels:</label></td>
-                <td>
-                    {html_radios id="scrape_cz" name='scrape_cz' values=$yesno_ids output=$yesno_names
-                    selected=$ftmux->scrape_cz separator='<br />'} <div class="hint">Choose to run IRCScraper on corrupt/zenet irc channels. Setting SCRAPE_IRC_C_Z_BOOL parameter to true or false in settings.php will toggle between the servers. The pane for this can not be created after tmux starts.</div>
-                </td>
-            </tr>
-
-            <tr>
-                <td style="width:180px;"><label for="scrape_efnet">Scrape Efnet Irc Channels:</label></td>
-                <td>
-                    {html_radios id="scrape_efnet" name='scrape_efnet' values=$yesno_ids output=$yesno_names selected=$ftmux->scrape_efnet separator='<br />'} <div class="hint">Choose to run IRCScraper on Efnet irc channels. The pane for this can not be created after tmux starts.</div>
-                </td>
-            </tr>
+				<td style="width:180px;"><label for="scrape_cz">Scrape Irc Channels:</label></td>
+				<td>
+					{html_radios id="scrape" name='scrape' values=$yesno_ids output=$yesno_names
+					selected=$ftmux->scrape separator='<br />'}
+					<div class="hint">Choose to run IRCScraper on irc channels. Setting SCRAPE_IRC_C_Z_BOOL parameter to
+						true or false in settings.php will toggle between the servers. The pane for this can not be
+						created after tmux starts.
+					</div>
+				</td>
+			</tr>
             <tr>
                 <td style="width:180px;"><label for="explain">Information:</label></td>
                 <td>
@@ -733,25 +754,6 @@
                 <td>
                     {html_radios id="console" name='console' values=$yesno_ids output=$yesno_names selected=$ftmux->console separator='<br />'}
                     <div class="hint">Open an empty bash shell. The pane for this can not be created after tmux starts.</div>
-                </td>
-            </tr>
-        </table>
-    </fieldset>
-
-    <fieldset>
-        <legend>Tmux Colors</legend>
-        <table class="input">
-            <tr>
-                <td style="width:180px;"><label for="colors">256 Colors:</label></td>
-                <td>
-                    {html_radios id="colors" name='colors' values=$yesno_ids output=$yesno_names selected=$ftmux->colors separator='<br />'}
-                    <div class="hint">Show a color display of all available colors based on the settings below. true/fasle</div>
-                    <input id="colors_start" name="colors_start" class="short" type="text" value="{$ftmux->colors_start}" />
-                    <input id="colors_end" name="colors_end" class="short" type="text" value="{$ftmux->colors_end}" /><br />
-                    <input id="colors_exc" name="colors_exc" class="longer" type="text" value="{$ftmux->colors_exc}" />
-                    <div class="hint">The color displayed is tmux scripts is randomized from this list.<br />
-                        The first box is the start number, the second box is the end number and the last box are the exceptions. An array is created from these numbers.<br \>The exceptions do not need to be in numerical order.<br />The start number must be smaller than the end number.<br />
-                        If you connect using putty, then under Window/Translation set Remote character set to UTF-8 and check "Copy and paste line drawing characters". To use 256 colors, you must set Connection/Data Terminal-type string to "xterm-256color" and in Window/Colours check the top three boxes, otherwise only 16 colors are displayed. If you are using FreeBSD, you will need to add export TERM=xterm-256color to your .bashrc file to show 256 colors.</div>
                 </td>
             </tr>
         </table>
@@ -924,14 +926,6 @@
 				<td>
 					<input class="short" id="ffmpeg_duration" name="ffmpeg_duration" type="text" value="{$ftmux->ffmpeg_duration}" />
 					<div class="hint">The maximum duration (In Seconds) for ffmpeg to generate the sample for. (Default 5)</div>
-				</td>
-			</tr>
-
-            <tr>
-				<td style="width:180px;"><label for="sharing_timer">Comments Sharing Timer:</label></td>
-				<td>
-					<input class="short" id="sharing_timer" name="sharing_timer" type="text" value="{$ftmux->sharing_timer}" />
-					<div class="hint">Set the timer for updating comments shared between newznab and nZEDb servers</div>
 				</td>
 			</tr>
 

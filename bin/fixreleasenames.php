@@ -19,7 +19,7 @@ if (!isset($argv[1])) {
 	$pieces = explode(' ', $argv[1]);
 	if (isset($pieces[1]) && $pieces[0] == 'nfo') {
 		$release = $pieces[1];
-		if ($res = $db->queryOneRow(sprintf('SELECT rel.guid AS guid, nfo.releaseID AS nfoid, rel.groupID, rel.categoryID, rel.searchname, uncompress(nfo) AS textstring, rel.ID AS releaseID FROM releases rel INNER JOIN releasenfo nfo ON (nfo.releaseID = rel.ID) WHERE rel.ID = %d', $release))) {
+		if ($res = $db->queryOneRow(sprintf('SELECT rel.guid AS guid, nfo.releaseID AS nfoid, rel.groupID, rel.categoryID, rel.name, rel.searchname, uncompress(nfo) AS textstring, rel.ID AS releaseID FROM releases rel INNER JOIN releasenfo nfo ON (nfo.releaseID = rel.ID) WHERE rel.ID = %d', $release))) {
 			//ignore encrypted nfos
 			if (preg_match('/^=newz\[NZB\]=\w+/', $res['textstring'])) {
 				$namefixer->done = $namefixer->matched = false;
@@ -38,7 +38,7 @@ if (!isset($argv[1])) {
 	} else if (isset($pieces[1]) && $pieces[0] == 'filename') {
 		$release = $pieces[1];
 		if ($res = $db->queryOneRow(sprintf('SELECT relfiles.name AS textstring, rel.categoryID, rel.searchname, '
-				. 'rel.groupID, relfiles.releaseID AS fileid, rel.ID AS releaseID FROM releases rel '
+				. 'rel.groupID, relfiles.releaseID AS fileid, rel.ID AS releaseID, rel.name FROM releases rel '
 				. 'INNER JOIN releasefiles relfiles ON (relfiles.releaseID = rel.ID) WHERE rel.ID = %d', $release))) {
 			$namefixer->done = $namefixer->matched = false;
 			if ($namefixer->checkName($res, true, 'Filenames, ', 1, 1) !== true) {
@@ -49,11 +49,12 @@ if (!isset($argv[1])) {
 	} else if (isset($pieces[1]) && $pieces[0] == 'md5') {
 		$release = $pieces[1];
 		if ($res = $db->queryOneRow(sprintf('SELECT r.ID AS releaseID, r.name, r.searchname, r.categoryID, r.groupID, dehashstatus, rf.name AS filename FROM releases r LEFT JOIN releasefiles rf ON r.ID = rf.releaseID WHERE r.ID = %d', $release))) {
-			if (preg_match('/[a-f0-9]{32,40}/i', $res['name'], $matches)) {
+			if (preg_match('/[a-fA-F0-9]{32,40}/i', $res['name'], $matches)) {
 				$namefixer->matchPredbHash($matches[0], $res, 1, 1, true, 1);
-			} else if (preg_match('/[a-f0-9]{32,40}/i', $res['filename'], $matches)) {
+			} else if (preg_match('/[a-fA-F0-9]{32,40}/i', $res['filename'], $matches)) {
 				$namefixer->matchPredbHash($matches[0], $res, 1, 1, true, 1);
 			} else {
+				$db->exec(sprintf("UPDATE releases SET dehashstatus = %d - 1 WHERE ID = %d", $res['dehashstatus'], $res['releaseID']));
 				echo '.';
 			}
 		}
@@ -74,5 +75,18 @@ if (!isset($argv[1])) {
 
         $nntp->doQuit();
 
+	} else if (isset($pieces[1]) && $pieces[0] == 'predbft') {
+		$pre = $pieces[1];
+		if ($res = $db->queryOneRow(sprintf('SELECT ID AS preid, title, source, searched FROM prehash '
+				. 'WHERE ID = %d', $pre
+			)
+		)
+		) {
+			$namefixer->done = $namefixer->matched = false;
+			if ($namefixer->matchPredbFT($res, 1, 1, true, 1) !== true) {
+				echo '.';
+			}
+			$namefixer->checked++;
+		}
 	}
 }

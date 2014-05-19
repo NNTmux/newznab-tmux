@@ -1,6 +1,5 @@
 <?php
 require_once(dirname(__FILE__) . "/../bin/config.php");
-require_once(WWW_DIR . "/lib/framework/cache.php");
 require_once(WWW_DIR . "/lib/framework/db.php");
 require_once(WWW_DIR . "/lib/category.php");
 require_once(WWW_DIR . "/lib/releases.php");
@@ -72,7 +71,7 @@ class Functions
 	 * @var bool
 	 */
 	private
-	$DoPartRepair;
+		$DoPartRepair;
 
 	/**
 	 * How many headers do we download per loop?
@@ -80,7 +79,7 @@ class Functions
 	 * @var int
 	 */
 	public
-	$messagebuffer;
+		$messagebuffer;
 
 	/**
 	 * How many days to go back on a new group?
@@ -88,7 +87,7 @@ class Functions
 	 * @var bool
 	 */
 	private
-	$NewGroupScanByDays;
+		$NewGroupScanByDays;
 
 	/**
 	 * Path to save large jpg pictures(xxx).
@@ -96,7 +95,7 @@ class Functions
 	 * @var string
 	 */
 	public
-	$jpgSavePath;
+		$jpgSavePath;
 
 
 	// database function
@@ -1747,23 +1746,80 @@ class Functions
 	}
 
 	/**
- 	* Get human readable size string from bytes.
- 	*
- 	* @param int $bytes     Bytes number to convert.
- 	* @param int $precision How many floating point units to add.
- 	*
- 	* @return string
- 	*/
-	function bytesToSizeString($bytes, $precision = 0)
+	 * Strips non-printing characters from a string.
+	 *
+	 * Operates directly on the text string, but also returns the result for situations requiring a
+	 * return value (use in ternary, etc.)/
+	 *
+	 * @param $text		String variable to strip.
+	 *
+	 * @return string	The stripped variable.
+	 */
+	static public function stripNonPrintingChars(&$text)
 	{
-    if ($bytes == 0) {
-		return '0B';
+		$lowChars = [
+			"\x00", "\x01", "\x02", "\x03", "\x04", "\x05", "\x06", "\x07",
+			"\x08", "\x09", "\x0A", "\x0B", "\x0C", "\x0D", "\x0E", "\x0F",
+			"\x10", "\x11", "\x12", "\x13", "\x14", "\x15", "\x16", "\x17",
+			"\x18", "\x19", "\x1A", "\x1B", "\x1C", "\x1D", "\x1E", "\x1F",
+		];
+		$text = str_replace($lowChars, '', $text);
+		return $text;
 	}
 
-	$unit = array('B','KB','MB','GB','TB','PB','EB');
-	return round($bytes / pow(1024, ($i = floor(log($bytes, 1024)))), $precision) . $unit[(int)$i];
-}
+	/**
+	 * Get human readable size string from bytes.
+	 *
+	 * @param int $bytes     Bytes number to convert.
+	 * @param int $precision How many floating point units to add.
+	 *
+	 * @return string
+	 */
+	function bytesToSizeString($bytes, $precision = 0)
+	{
+		if ($bytes == 0) {
+			return '0B';
+		}
 
+		$unit = array('B','KB','MB','GB','TB','PB','EB');
+		return round($bytes / pow(1024, ($i = floor(log($bytes, 1024)))), $precision) . $unit[(int)$i];
+	}
+
+	/**
+	 * Removes the preceeding or proceeding portion of a string
+	 * relative to the last occurrence of the specified character.
+	 * The character selected may be retained or discarded.
+	 *
+	 * @param string $character      the character to search for.
+	 * @param string $string         the string to search through.
+	 * @param string $side           determines whether text to the left or the right of the character is returned.
+	 *                               Options are: left, or right.
+	 * @param bool   $keep_character determines whether or not to keep the character.
+	 *                               Options are: true, or false.
+	 *
+	 * @return string
+	 */
+	static public function cutStringUsingLast($character, $string, $side, $keep_character = true)
+	{
+		$offset = ($keep_character ? 1 : 0);
+		$whole_length = strlen($string);
+		$right_length = (strlen(strrchr($string, $character)) - 1);
+		$left_length = ($whole_length - $right_length - 1);
+		switch ($side) {
+			case 'left':
+				$piece = substr($string, 0, ($left_length + $offset));
+				break;
+			case 'right':
+				$start = (0 - ($right_length + $offset));
+				$piece = substr($string, $start);
+				break;
+			default:
+				$piece = false;
+				break;
+		}
+
+		return ($piece);
+	}
 
 
 	//end of testing

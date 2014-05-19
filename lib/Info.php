@@ -358,7 +358,7 @@ class Info
 
 		// Remove nfo that we cant fetch after 5 attempts.
 		if ($releaseToWork === '') {
-			$relres = $this->db->query('SELECT ID FROM releases WHERE nfostatus < -6');
+			$relres = $this->db->query('SELECT ID FROM releases WHERE nfostatus < -6 AND releasenfoID = -1');
 			foreach ($relres as $relrow) {
 				$this->db->exec(sprintf('DELETE FROM releasenfo WHERE nfo IS NULL AND releaseID = %d', $relrow['ID']));
 			}

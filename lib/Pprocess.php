@@ -333,7 +333,7 @@ class PProcess
 		}
 
 		$query = $this->db->queryOneRow(
-			'SELECT ID, groupID, categoryID, searchname, ' .
+			'SELECT ID, groupID, categoryID, name, searchname, ' .
 			(DB_TYPE === 'mysql' ? 'UNIX_TIMESTAMP(postdate)' : 'extract(epoch FROM postdate)') .
 			' as postdate, ID as releaseID  FROM releases WHERE isrenamed = 0 AND ID = ' .
 			$relID
@@ -667,7 +667,6 @@ class PProcess
 		//\\ Paths.
 		$this->audSavePath = WWW_DIR . 'covers/audio/';
 		$this->jpgSavePath = WWW_DIR . 'covers/sample/';
-		$this->imgSavePath = WWW_DIR . 'covers/console/';
 		$this->vidSavePath = WWW_DIR . 'covers/video/';
 		$this->mainTmpPath = $this->site->tmpunrarpath;
 		$this->tmpPath = $this->mainTmpPath;
@@ -710,7 +709,7 @@ class PProcess
 	/**
 	 * Check for passworded releases, RAR contents and Sample/Media info.
 	 *
-	 * @note Called externally by tmux/bin/update_per_group and update/postprocess.php
+	 * @note Called externally by postprocess_alpha.php
 	 *
 	 * @param NNTP   $nntp          Class NNTP
 	 * @param string $releaseToWork String containing SQL results. Optional.
@@ -735,7 +734,7 @@ class PProcess
 				$qResult = $this->db->query(
 					sprintf('
 						SELECT r.ID, r.guid, r.name, c.disablepreview, r.size, r.groupID,
-							r.nfostatus, r.completion, r.categoryID, r.searchname
+							r.nfostatus, r.releasenfoID, r.completion, r.categoryID, r.searchname
 						FROM releases r
 						LEFT JOIN category c ON c.ID = r.categoryID
 						WHERE r.size < %d
@@ -779,8 +778,9 @@ class PProcess
 					'size'           => $pieces[4],
 					'groupID'        => $pieces[5],
 					'nfostatus'      => $pieces[6],
-					'categoryID'     => $pieces[7],
-					'searchname'     => $pieces[8]
+					'releasenfoID' => $pieces[7],
+					'categoryID'   => $pieces[8],
+					'searchname'   => $pieces[9]
 				)
 			);
 			$totResults = 1;
@@ -886,7 +886,7 @@ class PProcess
 				$groupName = $this->functions->getByNameByID($rel['groupID']);
 
 				// Make sure we don't already have an nfo.
-				if ($rel['nfostatus'] !== '1') {
+				if (($rel['nfostatus'] !== '1' OR $rel['releasenfoID'] !== '1')) {
 					$this->noNFO = true;
 				}
 
@@ -1410,7 +1410,7 @@ class PProcess
 				}
 
 			   // If samples exist from previous runs, set flags.
-				if (file_exists($this->imgSavePath . $rel['guid'] . '_thumb.jpg')) {
+				if (file_exists($this->releaseImage->imgSavePath . $rel['guid'] . '_thumb.jpg')) {
 					$iSQL = ', haspreview = 1';
 				} else {
 					$iSQL = ', haspreview = 0';
@@ -1721,9 +1721,9 @@ class PProcess
 							}
 							$this->noNFO = false;
 						}
-					} else if ($this->site->zippath !== '' && $file['compressed'] === 1) {
+					} else if ($this->tmux->zippath !== '' && $file['compressed'] === 1) {
 
-						$zip->setExternalClient($this->site->zippath);
+						$zip->setExternalClient($this->tmux->zippath);
 						$zipData = $zip->extractFile($file['name']);
 						if ($zipData !== false && strlen($zipData) > 5) {
 							if ($this->Nfo->addAlternateNfo($zipData, $release, $nntp)) {
