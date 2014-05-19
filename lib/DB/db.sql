@@ -17,17 +17,15 @@ ADD `proc_pp` TINYINT(1) NOT NULL DEFAULT 0,
 ADD `proc_par2` BIT NOT NULL DEFAULT 0,
 ADD `proc_nfo` BIT NOT NULL DEFAULT 0,
 ADD `proc_files` BIT NOT NULL DEFAULT 0,
-ADD `proc_filenames` BIT NOT NULL DEFAULT 0,
-ADD `nzbstatus` TINYINT(1) NOT NULL DEFAULT 1,
-ADD INDEX `ix_releases_nfostatus` (`nfostatus` ASC) USING HASH,
-ADD INDEX `ix_releases_reqidstatus` (`reqidstatus` ASC) USING HASH,
-ADD INDEX `ix_releases_passwordstatus` (`passwordstatus`),
-ADD INDEX `ix_releases_releasenfoID` (`releasenfoID`),
-ADD INDEX `ix_releases_dehashstatus` (`dehashstatus`),
-ADD INDEX `ix_releases_haspreview` (`haspreview` ASC) USING HASH,
-ADD INDEX `ix_releases_postdate_name` (`postdate`, `name`),
-ADD INDEX `ix_releases_status` (`nzbstatus`, `iscategorized`, `isrenamed`, `nfostatus`, `ishashed`, `passwordstatus`, `dehashstatus`, `releasenfoID`, `musicinfoID`, `consoleinfoID`, `bookinfoID`, `haspreview`, `categoryID`, `imdbID`, `rageID`),
-ADD INDEX `ix_releases_prehashid_searchname` (`prehashID`, `searchname`);
+ADD `nzbstatus` TINYINT(1) NOT NULL DEFAULT 1;
+CREATE INDEX `ix_releases_nfostatus` ON `releases` (`nfostatus` ASC) USING HASH;
+CREATE INDEX `ix_releases_reqidstatus` ON `releases` (`reqidstatus` ASC) USING HASH;
+CREATE INDEX `ix_releases_passwordstatus` ON `releases` (`passwordstatus`);
+CREATE INDEX `ix_releases_releasenfoID` ON `releases` (`releasenfoID`);
+CREATE INDEX `ix_releases_dehashstatus` ON `releases` (`dehashstatus`);
+CREATE INDEX `ix_releases_haspreview` ON `releases` (`haspreview` ASC) USING HASH;
+CREATE INDEX `ix_releases_postdate_name` ON `releases` (`postdate`, `name`);
+CREATE INDEX `ix_releases_prehashid_searchname` ON `releases` (`prehashID`, `searchname`);
 
 DROP TABLE IF EXISTS prehash;
 CREATE TABLE prehash (
@@ -54,17 +52,17 @@ CREATE TABLE prehash (
   COLLATE utf8_unicode_ci
   AUTO_INCREMENT =1;
 
-CREATE INDEX ix_prehash_filename ON prehash (filename);
-CREATE INDEX ix_prehash_title ON prehash (title);
-CREATE INDEX ix_prehash_nfo ON prehash (nfo);
-CREATE INDEX ix_prehash_predate ON prehash (predate);
-CREATE INDEX ix_prehash_source ON prehash (source);
-CREATE INDEX ix_prehash_requestid ON prehash (requestID, groupID);
-CREATE INDEX ix_prehash_size ON prehash (size);
-CREATE INDEX ix_prehash_category ON prehash (category);
-CREATE INDEX ix_prehash_searched ON prehash (searched);
-CREATE UNIQUE INDEX ix_prehash_md5 ON prehash (md5);
-CREATE UNIQUE INDEX ix_prehash_sha1 ON prehash (sha1);
+CREATE INDEX `ix_prehash_filename` ON `prehash` (`filename`);
+CREATE INDEX `ix_prehash_title` ON `prehash` (`title`);
+CREATE INDEX `ix_prehash_nfo` ON `prehash` (`nfo`);
+CREATE INDEX `ix_prehash_predate` ON `prehash` (`predate`);
+CREATE INDEX `ix_prehash_source` ON `prehash` (`source`);
+CREATE INDEX `ix_prehash_requestid` ON `prehash` (`requestID`, `groupID`);
+CREATE INDEX `ix_prehash_size` ON `prehash` (`size`);
+CREATE INDEX `ix_prehash_category` ON `prehash` (`category`);
+CREATE INDEX `ix_prehash_searched` ON `prehash` (`searched`);
+CREATE UNIQUE INDEX `ix_prehash_md5` ON `prehash` (`md5`);
+CREATE UNIQUE INDEX `ix_prehash_sha1` ON `prehash` (`sha1`);
 
 DROP TABLE IF EXISTS tmux;
 CREATE TABLE tmux (
@@ -541,7 +539,7 @@ ALTER TABLE releasecomment ADD COLUMN nzb_guid VARCHAR(32) NOT NULL DEFAULT '';
 
 ALTER TABLE `releasefiles` ADD COLUMN `ishashed` TINYINT(1) NOT NULL DEFAULT '0'
 AFTER `size`;
-ALTER TABLE `releasefiles` ADD INDEX `ix_releasefiles_ishashed` (`ishashed`);
+CREATE INDEX `ix_releasefiles_ishashed` ON `releasefiles` (`ishashed`);
 
 DROP TABLE IF EXISTS predbhash;
 CREATE TABLE predbhash (
