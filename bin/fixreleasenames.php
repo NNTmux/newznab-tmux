@@ -75,5 +75,18 @@ if (!isset($argv[1])) {
 
         $nntp->doQuit();
 
+	} else if (isset($pieces[1]) && $pieces[0] == 'predbft') {
+		$pre = $pieces[1];
+		if ($res = $db->queryOneRow(sprintf('SELECT ID AS preid, title, source, searched FROM prehash '
+				. 'WHERE ID = %d', $pre
+			)
+		)
+		) {
+			$namefixer->done = $namefixer->matched = false;
+			if ($namefixer->matchPredbFT($res, 1, 1, true, 1) !== true) {
+				echo '.';
+			}
+			$namefixer->checked++;
+		}
 	}
 }

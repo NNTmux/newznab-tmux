@@ -38,7 +38,7 @@ if (isset($argv[1]) && $argv[1] === "all") {
 //Selects all Prehash Titles that don't have a current match in releases (slower intial query but less loop time)
 } else if (isset($argv[1]) && $argv[1] === "full") {
 	$titles = $db->queryDirect("SELECT ID AS preid, title, source, searched FROM prehash
-					WHERE LENGTH(title) >= 15 AND searched BETWEEN -5 AND 0
+					WHERE LENGTH(title) >= 15 AND searched = 0
 					AND title NOT REGEXP '[\"\<\> ]' ORDER BY predate ASC");
 //Selects Prehash Titles where predate is greater than the past user selected number of hours
 } else if (isset($argv[1]) && is_numeric($argv[1])) {
