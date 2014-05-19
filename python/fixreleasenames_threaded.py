@@ -58,7 +58,7 @@ datas = []
 maxtries = 0
 
 if len(sys.argv) > 1 and sys.argv[1] == "nfo":
-    run = "SELECT DISTINCT rel.ID AS releaseID FROM releases rel INNER JOIN releasenfo nfo ON (nfo.releaseID = rel.ID) WHERE categoryID = 8010 AND proc_nfo = 0 AND" + clean + "ORDER BY postdate DESC LIMIT %s"
+    run = "SELECT DISTINCT ID AS releaseID FROM releases WHERE nzbstatus = 1 AND nfostatus = 1 AND proc_nfo = 0 AND" + clean + "ORDER BY postdate DESC LIMIT %s"
     cur[0].execute(run, (int(perrun[0]) * int(run_threads[0])))
     datas = cur[0].fetchall()
 elif len(sys.argv) > 1 and (sys.argv[1] == "filename"):
