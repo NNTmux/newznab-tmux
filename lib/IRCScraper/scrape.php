@@ -19,8 +19,6 @@ if (!isset($argv[1]) || $argv[1] !== 'true') {
 	);
 }
 
-//require_once 'settings.php';
-
 if (!defined('SCRAPE_IRC_NICKNAME')) {
 	exit('ERROR! You must update settings.php using settings_example.php.');
 }
