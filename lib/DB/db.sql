@@ -26,6 +26,7 @@ CREATE INDEX `ix_releases_dehashstatus` ON `releases` (`dehashstatus`);
 CREATE INDEX `ix_releases_haspreview` ON `releases` (`haspreview` ASC) USING HASH;
 CREATE INDEX `ix_releases_postdate_name` ON `releases` (`postdate`, `name`);
 CREATE INDEX `ix_releases_prehashid_searchname` ON `releases` (`prehashID`, `searchname`);
+CREATE INDEX `ix_releases_status` ON `releases` (`nzbstatus`, `iscategorized`, `isrenamed`, `nfostatus`, `ishashed`, `passwordstatus`, `dehashstatus`, `releasenfoID`, `musicinfoID`, `consoleinfoID`, `bookinfoID`, `haspreview`, `categoryID`, `imdbID`, `rageID`);
 
 DROP TABLE IF EXISTS prehash;
 CREATE TABLE prehash (
