@@ -19,7 +19,7 @@ if (!isset($argv[1]) || $argv[1] !== 'true') {
 	);
 }
 
-require_once '/var/www/newznab/misc/update_scripts/nix_scripts/tmux/lib/IRCScraper/settings.php';
+//require_once 'settings.php';
 
 if (!defined('SCRAPE_IRC_NICKNAME')) {
 	exit('ERROR! You must update settings.php using settings_example.php.');
