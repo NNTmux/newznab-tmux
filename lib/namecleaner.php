@@ -48,7 +48,8 @@ class nameCleaning
 							"cleansubject"  => $title['title'],
 							"properlynamed" => true,
 							"increment"     => false,
-							"predb"         => $title['ID']
+							"predb"     => $title['ID'],
+							"requestid" => false
 						);
 					}
 				}
@@ -85,7 +86,7 @@ class nameCleaning
 			if ($title === false && !empty($reqGname)) {
 				$title = $this->db->queryOneRow(
 					sprintf(
-						"SELECT p.title , p.ID from prehash p INNER JOIN groups g on g.ID = p.groupID
+						"SELECT p.title as title, p.ID as ID from prehash p INNER JOIN groups g on g.ID = p.groupID
 									WHERE p.requestID = %d and g.name = %s", $match[1], $this->db->escapeString($reqGname)
 					)
 				);
@@ -95,7 +96,8 @@ class nameCleaning
 					"cleansubject"  => $title['title'],
 					"properlynamed" => true,
 					"increment"     => false,
-					"predb"         => $title['ID']
+					"predb"     => $title['ID'],
+					"requestid" => true
 				);
 			}
 		}
