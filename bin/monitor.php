@@ -9,7 +9,7 @@ require_once(dirname(__FILE__) . "/../lib/showsleep.php");
 require_once(dirname(__FILE__) . "/../lib/functions.php");
 
 
-$version = "0.3r1168";
+$version = "0.3r1171";
 
 $db = new DB();
 $functions = new Functions();
@@ -1052,10 +1052,10 @@ while ($i > 0) {
 
 
 	//kill update_binaries.php backfill.php and import-nzb if timer exceeded
-	$killit=explode(" ", relativeTime("$newestadd"));
+	$killit = explode(" ", relativeTime("$newestadd"));
 	$killed = "false";
-	if ( $bins_kill_timer != 0 ) {
-		if ((( $killit[1] != "secs" ) && ( $killit[1] != "sec" )) && (( $killit[1] == "hrs" ) || ( $killit[1] == "hr" ) || ( $killit[0] >= $bins_kill_timer) && ( $i % 5 == 0 ))) {
+	if ($bins_kill_timer != 0) {
+		if ((($killit[1] != "secs") && ($killit[1] != "sec")) && (($killit[1] == "hrs") || ($killit[1] == "hr") || ($killit[0] >= $bins_kill_timer) && ($i % 5 == 0))) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			shell_exec("tmux respawnp -k -t${tmux_session}:0.2 'echo \"\033[38;5;\"$color\"m\n$panes0[2] Killed by Binaries Kill Timer\"'");
 			$color = get_color($colors_start, $colors_end, $colors_exc);
@@ -1576,7 +1576,6 @@ while ($i > 0) {
 		}
 
 
-
 		//runs postprocess_new.php nfo in pane 2.0
 		if (($maxload >= get_load()) && (($post == 0) || ($post == 1)) && ($nfo_remaining_now > 0)) {
 			$log = writelog($panes2[0]);
@@ -1878,59 +1877,59 @@ while ($i > 0) {
 		if ($seq == 0) {
 			for ($g = 1; $g <= 5; $g++) {
 				$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -k -t${tmux_session}:0.$g 'echo \"\033[38;5;${color}m\n${panes0[$g]} has been disabled/terminated by Running\"'");
+				shell_exec("tmux respawnp -k -t${tmux_session}:0.$g 'echo \"\033[38;5;${color}m\n${panes0[$g]} has been disabled/terminated by Running\"'");
+			}
+			for ($g = 0; $g <= 5; $g++) {
+				$color = get_color($colors_start, $colors_end, $colors_exc);
+				shell_exec("tmux respawnp -k -t${tmux_session}:1.$g 'echo \"\033[38;5;${color}m\n${panes1[$g]} has been disabled/terminated by Running\"'");
+			}
+			for ($g = 0; $g <= 9; $g++) {
+				$color = get_color($colors_start, $colors_end, $colors_exc);
+				shell_exec("tmux respawnp -k -t${tmux_session}:2.$g 'echo \"\033[38;5;${color}m\n${panes2[$g]} has been disabled/terminated by Running\"'");
+			}
+			for ($g = 0; $g <= 4; $g++) {
+				$color = get_color($colors_start, $colors_end, $colors_exc);
+				shell_exec("tmux respawnp -k -t${tmux_session}:3.$g 'echo \"\033[38;5;${color}m\n${panes3[$g]} has been disabled/terminated by Running\"'");
+			}
+			for ($g = 0; $g <= 1; $g++) {
+				$color = get_color($colors_start, $colors_end, $colors_exc);
+				shell_exec("tmux respawnp -k -t${tmux_session}:4.$g 'echo \"\033[38;5;${color}m\n${panes4[$g]} has been disabled/terminated by Running\"'");
+			}
+		} else if ($seq == 1) {
+			for ($g = 1; $g <= 5; $g++) {
+				$color = get_color($colors_start, $colors_end, $colors_exc);
+				shell_exec("tmux respawnp -k -t${tmux_session}:0.$g 'echo \"\033[38;5;${color}m\n${panes0[$g]} has been disabled/terminated by Running\"'");
+			}
+			for ($g = 0; $g <= 5; $g++) {
+				$color = get_color($colors_start, $colors_end, $colors_exc);
+				shell_exec("tmux respawnp -k -t${tmux_session}:1.$g 'echo \"\033[38;5;${color}m\n${panes1[$g]} has been disabled/terminated by Running\"'");
+			}
+			for ($g = 0; $g <= 9; $g++) {
+				$color = get_color($colors_start, $colors_end, $colors_exc);
+				shell_exec("tmux respawnp -k -t${tmux_session}:2.$g 'echo \"\033[38;5;${color}m\n${panes2[$g]} has been disabled/terminated by Running\"'");
+			}
+			for ($g = 0; $g <= 4; $g++) {
+				$color = get_color($colors_start, $colors_end, $colors_exc);
+				shell_exec("tmux respawnp -k -t${tmux_session}:3.$g 'echo \"\033[38;5;${color}m\n${panes3[$g]} has been disabled/terminated by Running\"'");
+			}
+		} else if ($seq == 2) {
+			for ($g = 1; $g <= 5; $g++) {
+				$color = get_color($colors_start, $colors_end, $colors_exc);
+				shell_exec("tmux respawnp -k -t${tmux_session}:0.$g 'echo \"\033[38;5;${color}m\n${panes0[$g]} has been disabled/terminated by Running\"'");
+			}
+			for ($g = 0; $g <= 5; $g++) {
+				$color = get_color($colors_start, $colors_end, $colors_exc);
+				shell_exec("tmux respawnp -k -t${tmux_session}:1.$g 'echo \"\033[38;5;${color}m\n${panes1[$g]} has been disabled/terminated by Running\"'");
+			}
+			for ($g = 0; $g <= 9; $g++) {
+				$color = get_color($colors_start, $colors_end, $colors_exc);
+				shell_exec("tmux respawnp -k -t${tmux_session}:2.$g 'echo \"\033[38;5;${color}m\n${panes2[$g]} has been disabled/terminated by Running\"'");
+			}
+			for ($g = 0; $g <= 4; $g++) {
+				$color = get_color($colors_start, $colors_end, $colors_exc);
+				shell_exec("tmux respawnp -k -t${tmux_session}:3.$g 'echo \"\033[38;5;${color}m\n${panes3[$g]} has been disabled/terminated by Running\"'");
+			}
 		}
-		for ($g = 0; $g <= 5; $g++) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -k -t${tmux_session}:1.$g 'echo \"\033[38;5;${color}m\n${panes1[$g]} has been disabled/terminated by Running\"'");
-		}
-		for ($g = 0; $g <= 9; $g++) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -k -t${tmux_session}:2.$g 'echo \"\033[38;5;${color}m\n${panes2[$g]} has been disabled/terminated by Running\"'");
-		}
-		for ($g = 0; $g <= 4; $g++) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -k -t${tmux_session}:3.$g 'echo \"\033[38;5;${color}m\n${panes3[$g]} has been disabled/terminated by Running\"'");
-		}
-		for ($g = 0; $g <= 1; $g++) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -k -t${tmux_session}:4.$g 'echo \"\033[38;5;${color}m\n${panes4[$g]} has been disabled/terminated by Running\"'");
-		}
-	} else if ($seq == 1) {
-		for ($g = 1; $g <= 5; $g++) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -k -t${tmux_session}:0.$g 'echo \"\033[38;5;${color}m\n${panes0[$g]} has been disabled/terminated by Running\"'");
-		}
-		for ($g = 0; $g <= 5; $g++) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -k -t${tmux_session}:1.$g 'echo \"\033[38;5;${color}m\n${panes1[$g]} has been disabled/terminated by Running\"'");
-		}
-		for ($g = 0; $g <= 9; $g++) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -k -t${tmux_session}:2.$g 'echo \"\033[38;5;${color}m\n${panes2[$g]} has been disabled/terminated by Running\"'");
-		}
-		for ($g = 0; $g <= 4; $g++) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -k -t${tmux_session}:3.$g 'echo \"\033[38;5;${color}m\n${panes3[$g]} has been disabled/terminated by Running\"'");
-		}
-	} else if ($seq == 2) {
-		for ($g = 1; $g <= 5; $g++) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -k -t${tmux_session}:0.$g 'echo \"\033[38;5;${color}m\n${panes0[$g]} has been disabled/terminated by Running\"'");
-		}
-		for ($g = 0; $g <= 5; $g++) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -k -t${tmux_session}:1.$g 'echo \"\033[38;5;${color}m\n${panes1[$g]} has been disabled/terminated by Running\"'");
-		}
-		for ($g = 0; $g <= 9; $g++) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -k -t${tmux_session}:2.$g 'echo \"\033[38;5;${color}m\n${panes2[$g]} has been disabled/terminated by Running\"'");
-		}
-		for ($g = 0; $g <= 4; $g++) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -k -t${tmux_session}:3.$g 'echo \"\033[38;5;${color}m\n${panes3[$g]} has been disabled/terminated by Running\"'");
-		}
-	}
 
 	$i++;
 	sleep(10);
