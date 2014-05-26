@@ -19,5 +19,41 @@ There is a lib folder in main tmux folder. In that folder you will find two fold
 
 4. Disable all the lookups in site settings (nfo, movie, books, anidb, tvrage, thetvdb etc.), they are enabled in tmux, otherwise it will interfere with tmux scripts.
 
+# yEnc:
+
+  Note: You have 3 choices,
+        you can install simple_php_yenc_decode which offers the best performance,
+        installing yydecode, which offers good performance,
+        or using PHP (no install required) which is very slow.
+        You can change these at any time if you have issues with any of the 3.
+
+  simple_php_yenc_decode:
+
+       sudo apt-get install git
+       cd ~/
+       git clone https://github.com/kevinlekiller/simple_php_yenc_decode
+       cd simple_php_yenc_decode/
+       sh ubuntu.sh
+       cd ~/
+       rm -rf simple_php_yenc_decode/
+
+  yydecode
+
+       cd ~/
+       mkdir -p yydecode
+       cd yydecode/
+       wget http://colocrossing.dl.sourceforge.net/project/yydecode/yydecode/0.2.10/yydecode-0.2.10.tar.gz
+       tar -xzf yydecode-0.2.10.tar.gz
+       cd yydecode-0.2.10/
+       ./configure
+       make
+       sudo make install
+       make clean
+       cd ~/
+       rm -rf yydecode/
+
+  Note: After installing you can change the yEnc setting in tmux edit accordingly.
+
 Tmux is started with start.php (php start.php command). Scripts not used anymore are still available for your use, but you need to run them manualy.
+
 

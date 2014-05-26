@@ -136,22 +136,29 @@ class NNTP extends Net_NNTP_Client
 		$this->functions = new Functions();
 		$this->tmpPath = $this->site->tmpunrarpath;
 		$this->nntpRetries = ((!empty($this->tmux->nntpretries)) ? (int)$this->tmux->nntpretries : 0) + 1;
+		// Check if the user wants to use yydecode or the simple_php_yenc_decode extension.
 		$this->yyDecoderPath = ((!empty($this->tmux->yydecoderpath)) ? $this->tmux->yydecoderpath : false);
-		$this->yEncTempInput = WWW_DIR."nzbfiles/yenc/input";
-		$this->yEncTempOutput = WWW_DIR."nzbfiles/yenc/output";
-		$this->yEncSilence = ($this->functions->isWindows() ? '' : ' > /dev/null 2>&1');
-		$this->currentServer = NNTP_SERVER;
-		$this->currentPort = NNTP_PORT;
+		if ($this->yyDecoderPath === 'simple_php_yenc_decode') {
+			if (extension_loaded('simple_php_yenc_decode')) {
+				$this->yEncExtension = true;
+			} else {
+				$this->yyDecoderPath = false;
+			}
+		} else if ($this->yyDecoderPath !== false) {
+			$this->yEncTempInput = WWW_DIR . "nzbfiles/yenc/input";
+			$this->yEncTempOutput = WWW_DIR . "nzbfiles/yenc/output";
+			$this->yEncSilence = ($this->functions->isWindows() ? '' : ' > /dev/null 2>&1');
 
-	   	// Test if the user can read/write to the yEnc path.
-		if (!is_file($this->yEncTempInput)) {
-			@file_put_contents($this->yEncTempInput, 'x');
-		}
-		if (!is_file($this->yEncTempInput) || !is_readable($this->yEncTempInput) || !is_writable($this->yEncTempInput)) {
-			$this->yyDecoderPath = false;
-		}
-		if (is_file($this->yEncTempInput)) {
-			@unlink($this->yEncTempInput);
+			// Test if the user can read/write to the yEnc path.
+			if (!is_file($this->yEncTempInput)) {
+				@file_put_contents($this->yEncTempInput, 'x');
+			}
+			if (!is_file($this->yEncTempInput) || !is_readable($this->yEncTempInput) || !is_writable($this->yEncTempInput)) {
+				$this->yyDecoderPath = false;
+			}
+			if (is_file($this->yEncTempInput)) {
+				@unlink($this->yEncTempInput);
+			}
 		}
 	}
 
@@ -787,6 +794,8 @@ class NNTP extends Net_NNTP_Client
 				for ($chr = 0; $chr < $length; $chr++) {
 					$data .= ($input[$chr] !== '=' ? chr(ord($input[$chr]) - 42) : chr((ord($input[++$chr]) - 64) - 42));
 				}
+			} elseif ($this->yEncExtension) {
+				$data = simple_yenc_decode($input[1]);
 			} else {
 				$inFile = $this->yEncTempInput . mt_rand(0, 999999);
 				$ouFile = $this->yEncTempOutput . mt_rand(0, 999999);
