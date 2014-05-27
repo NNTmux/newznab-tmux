@@ -38,8 +38,6 @@ CREATE TABLE prehash (
   category   VARCHAR(255)     NULL,
   predate    DATETIME DEFAULT NULL,
   source     VARCHAR(50)      NOT NULL DEFAULT '',
-  md5        VARCHAR(32)      NOT NULL DEFAULT '',
-  sha1       VARCHAR(40)      NOT NULL DEFAULT '',
   requestID  INT(10) UNSIGNED NOT NULL DEFAULT '0',
   groupID    INT(10) UNSIGNED NOT NULL DEFAULT '0',
   nuked      TINYINT(1)       NOT NULL DEFAULT '0',
@@ -207,7 +205,7 @@ INSERT INTO tmux (setting, value) VALUES ('defrag_cache', '900'),
   ('ffmpeg_duration', '5'),
   ('ffmpeg_image_time', '5'),
   ('processvideos', '0'),
-  ('sqlpatch', '40');
+  ('sqlpatch', '43');
 
 DROP TABLE IF EXISTS releasesearch;
 CREATE TABLE releasesearch (
@@ -573,9 +571,10 @@ DELIMITER ;
 DROP TRIGGER IF EXISTS update_hashes;
 
 DELIMITER $$
-CREATE TRIGGER update_hashes AFTER UPDATE ON prehash FOR EACH ROW BEGIN IF NEW.title != OLD.title
+CREATE TRIGGER update_hashes AFTER UPDATE ON predhash FOR EACH ROW BEGIN IF NEW.title != OLD.title
 THEN UPDATE predbhash
-SET hashes = CONCAT_WS(',', MD5(NEW.title), MD5(MD5(NEW.title)), SHA1(NEW.title)); END IF;
+SET hashes = CONCAT_WS(',', MD5(NEW.title), MD5(MD5(NEW.title)), SHA1(NEW.title))
+WHERE pre_id = OLD.ID; END IF;
 END;
 $$
 DELIMITER ;
