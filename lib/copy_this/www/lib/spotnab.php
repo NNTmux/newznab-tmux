@@ -1318,7 +1318,7 @@ class SpotNab {
 		$rc = new ReleaseComments();
 
 		// Comments
-		$sql_new_cmt = "INSERT INTO releasecomment (".
+		$sql_new_cmt = "INSERT IGNORE INTO releasecomment (" .
 			"ID, sourceID, username, userID, gid, cid, isvisible, ".
 			"releaseID, `text`, createddate, issynced) VALUES (".
 			"NULL, %d, %s, 0, %s, %s, %d, 0, %s, %s, 1)";
@@ -2468,7 +2468,7 @@ class SpotNab {
 					."(SELECT count(ID) from releasecomment where sourceid = s.ID)"
 					." AS comments FROM spotnabsources s");
 	}
-	
+
 	public function getSourceById($id)
 	{
 		$db = new DB();
@@ -2488,7 +2488,7 @@ class SpotNab {
 				$db->escapeString($publickey));
 		return $db->queryInsert($sql);
 	}
-	
+
 	public function updateSource($id, $description,$username,$usermail,$usenetgroup,$publickey)
 	{
 		$db = new DB();
@@ -2512,10 +2512,11 @@ class SpotNab {
 		$db = new DB();
 		return $db->exec(sprintf("update spotnabsources SET active = %d WHERE id = %d", $active, $id));
 	}
-	
+
 	public function getDefaultValue($table,$field)
 	{
 		$db = new DB();
-		return $db->query(sprintf("SHOW COLUMNS FROM %s WHERE field = %s", $table, $db->escapeString($field)));				
+
+		return $db->query(sprintf("SHOW COLUMNS FROM %s WHERE field = %s", $table, $db->escapeString($field)));
 	}
 }
