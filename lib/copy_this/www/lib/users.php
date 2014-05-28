@@ -157,7 +157,7 @@ class Users
         return $db->queryInsert($sql);
 	}
 
-	public function update($id, $uname, $email, $grabs, $role, $notes, $invites, $movieview, $musicview, $consoleview, $bookview, $nzbvortexServerUrl = false, $nzbvortexApiKey = false, $queueType = '', $nzbgetURL = '', $nzbgetUsername = '', $nzbgetPassword = '', $saburl = '', $sabapikey = '', $sabpriority = '', $sabapikeytype = '')
+	public function update($id, $uname, $email, $grabs, $role, $notes, $invites, $movieview, $musicview, $consoleview, $bookview, $queueType = '', $nzbgetURL = '', $nzbgetUsername = '', $nzbgetPassword = '', $saburl = '', $sabapikey = '', $sabpriority = '', $sabapikeytype = '', $nzbvortexServerUrl = false, $nzbvortexApiKey = false)
 	{
 		$db = new DB();
 
