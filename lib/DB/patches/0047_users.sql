@@ -1,4 +1,4 @@
-ALTER TABLE users ADD COLUMN queuetype TINYINT(1) NOT NULL DEFAULT 0;
+ALTER TABLE users ADD COLUMN queuetype TINYINT(1) NOT NULL DEFAULT 1;
 /* Add a column to pick between Sab and NZBGet. */
 
 ALTER TABLE users ADD COLUMN nzbgeturl VARCHAR(255) NULL DEFAULT NULL;
