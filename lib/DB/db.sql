@@ -203,7 +203,7 @@ INSERT INTO tmux (setting, value) VALUES ('defrag_cache', '900'),
   ('ffmpeg_duration', '5'),
   ('ffmpeg_image_time', '5'),
   ('processvideos', '0'),
-  ('sqlpatch', '45');
+  ('sqlpatch', '46');
 
 DROP TABLE IF EXISTS releasesearch;
 CREATE TABLE releasesearch (
@@ -533,6 +533,12 @@ ALTER TABLE releasecomment ADD COLUMN shared TINYINT(1) NOT NULL DEFAULT '1';
 ALTER TABLE releasecomment ADD COLUMN shareID VARCHAR(40) NOT NULL DEFAULT '';
 ALTER TABLE releasecomment ADD COLUMN siteID VARCHAR(40) NOT NULL DEFAULT '';
 ALTER TABLE releasecomment ADD COLUMN nzb_guid VARCHAR(32) NOT NULL DEFAULT '';
+ALTER TABLE releasecomment ADD COLUMN text_hash VARCHAR(32) NOT NULL DEFAULT '';
+DROP TRIGGER IF EXISTS insert_MD5;
+CREATE TRIGGER insert_MD5 BEFORE INSERT ON releasecomment FOR EACH ROW SET NEW.text_hash = MD5(NEW.text);
+UPDATE releasecomment
+SET text_hash = MD5(text);
+ALTER IGNORE TABLE releasecomment ADD UNIQUE INDEX ix_releasecomment_hash_releaseID (text_hash, releaseID);
 
 ALTER TABLE `releasefiles` ADD COLUMN `ishashed` TINYINT(1) NOT NULL DEFAULT '0'
 AFTER `size`;
