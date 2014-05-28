@@ -106,8 +106,12 @@
 							<td class="icons">
 								<div class="icon icon_nzb"><a title="Download Nzb" href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}/{$mname[$m@index]|escape:"url"}">&nbsp;</a></div>
 								<div class="icon icon_cart" title="Add to Cart"></div>
-								{if $sabintegrated}<div class="icon icon_sab" title="Send to my Sabnzbd"></div>{/if}
-                                {if $weHasVortex}<div class="icon icon_nzbvortex" title="Send to NZBVortex"></div>{/if}
+								{if $sabintegrated}
+									<div class="icon icon_sab" title="Send to my Queue"></div>
+								{/if}
+								{if $weHasVortex}
+									<div class="icon icon_nzbvortex" title="Send to NZBVortex"></div>
+								{/if}
 							</td>
 						</tr>
 						{if $m@index == 1 && $m@total > 2}
