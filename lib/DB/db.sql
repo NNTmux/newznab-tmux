@@ -52,7 +52,7 @@ CREATE TABLE prehash (
   AUTO_INCREMENT =1;
 
 CREATE INDEX `ix_prehash_filename` ON `prehash` (`filename`);
-CREATE INDEX `ix_prehash_title` ON `prehash` (`title`);
+CREATE UNIQUE INDEX `ix_prehash_title` ON `prehash` (`title`);
 CREATE INDEX `ix_prehash_nfo` ON `prehash` (`nfo`);
 CREATE INDEX `ix_prehash_predate` ON `prehash` (`predate`);
 CREATE INDEX `ix_prehash_source` ON `prehash` (`source`);
@@ -60,8 +60,6 @@ CREATE INDEX `ix_prehash_requestid` ON `prehash` (`requestID`, `groupID`);
 CREATE INDEX `ix_prehash_size` ON `prehash` (`size`);
 CREATE INDEX `ix_prehash_category` ON `prehash` (`category`);
 CREATE INDEX `ix_prehash_searched` ON `prehash` (`searched`);
-CREATE UNIQUE INDEX `ix_prehash_md5` ON `prehash` (`md5`);
-CREATE UNIQUE INDEX `ix_prehash_sha1` ON `prehash` (`sha1`);
 
 DROP TABLE IF EXISTS tmux;
 CREATE TABLE tmux (
@@ -205,7 +203,7 @@ INSERT INTO tmux (setting, value) VALUES ('defrag_cache', '900'),
   ('ffmpeg_duration', '5'),
   ('ffmpeg_image_time', '5'),
   ('processvideos', '0'),
-  ('sqlpatch', '43');
+  ('sqlpatch', '45');
 
 DROP TABLE IF EXISTS releasesearch;
 CREATE TABLE releasesearch (
