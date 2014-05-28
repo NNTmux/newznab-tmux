@@ -2,11 +2,13 @@
 require_once(WWW_DIR."/lib/category.php");
 require_once(WWW_DIR."/lib/sabnzbd.php");
 require_once(WWW_DIR."/lib/util.php");
+require_once(WWW_DIR . "/lib/users.php");
 require_once(WWW_DIR.'/../misc/update_scripts/nix_scripts/tmux/lib/NZBGet.php');
 
 $category = new Category;
 $sab = new SABnzbd($page);
 $nzbGet = new NZBGet($page);
+$users = new Users();
 
 if (!$users->isLoggedIn())
 	$page->show403();
