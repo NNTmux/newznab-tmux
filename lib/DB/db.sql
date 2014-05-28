@@ -38,8 +38,6 @@ CREATE TABLE prehash (
   category   VARCHAR(255)     NULL,
   predate    DATETIME DEFAULT NULL,
   source     VARCHAR(50)      NOT NULL DEFAULT '',
-  md5        VARCHAR(32)      NOT NULL DEFAULT '',
-  sha1       VARCHAR(40)      NOT NULL DEFAULT '',
   requestID  INT(10) UNSIGNED NOT NULL DEFAULT '0',
   groupID    INT(10) UNSIGNED NOT NULL DEFAULT '0',
   nuked      TINYINT(1)       NOT NULL DEFAULT '0',
@@ -54,7 +52,7 @@ CREATE TABLE prehash (
   AUTO_INCREMENT =1;
 
 CREATE INDEX `ix_prehash_filename` ON `prehash` (`filename`);
-CREATE INDEX `ix_prehash_title` ON `prehash` (`title`);
+CREATE UNIQUE INDEX `ix_prehash_title` ON `prehash` (`title`);
 CREATE INDEX `ix_prehash_nfo` ON `prehash` (`nfo`);
 CREATE INDEX `ix_prehash_predate` ON `prehash` (`predate`);
 CREATE INDEX `ix_prehash_source` ON `prehash` (`source`);
@@ -62,8 +60,6 @@ CREATE INDEX `ix_prehash_requestid` ON `prehash` (`requestID`, `groupID`);
 CREATE INDEX `ix_prehash_size` ON `prehash` (`size`);
 CREATE INDEX `ix_prehash_category` ON `prehash` (`category`);
 CREATE INDEX `ix_prehash_searched` ON `prehash` (`searched`);
-CREATE UNIQUE INDEX `ix_prehash_md5` ON `prehash` (`md5`);
-CREATE UNIQUE INDEX `ix_prehash_sha1` ON `prehash` (`sha1`);
 
 DROP TABLE IF EXISTS tmux;
 CREATE TABLE tmux (
@@ -207,7 +203,7 @@ INSERT INTO tmux (setting, value) VALUES ('defrag_cache', '900'),
   ('ffmpeg_duration', '5'),
   ('ffmpeg_image_time', '5'),
   ('processvideos', '0'),
-  ('sqlpatch', '40');
+  ('sqlpatch', '46');
 
 DROP TABLE IF EXISTS releasesearch;
 CREATE TABLE releasesearch (
@@ -537,6 +533,12 @@ ALTER TABLE releasecomment ADD COLUMN shared TINYINT(1) NOT NULL DEFAULT '1';
 ALTER TABLE releasecomment ADD COLUMN shareID VARCHAR(40) NOT NULL DEFAULT '';
 ALTER TABLE releasecomment ADD COLUMN siteID VARCHAR(40) NOT NULL DEFAULT '';
 ALTER TABLE releasecomment ADD COLUMN nzb_guid VARCHAR(32) NOT NULL DEFAULT '';
+ALTER TABLE releasecomment ADD COLUMN text_hash VARCHAR(32) NOT NULL DEFAULT '';
+DROP TRIGGER IF EXISTS insert_MD5;
+CREATE TRIGGER insert_MD5 BEFORE INSERT ON releasecomment FOR EACH ROW SET NEW.text_hash = MD5(NEW.text);
+UPDATE releasecomment
+SET text_hash = MD5(text);
+ALTER IGNORE TABLE releasecomment ADD UNIQUE INDEX ix_releasecomment_hash_releaseID (text_hash, releaseID);
 
 ALTER TABLE `releasefiles` ADD COLUMN `ishashed` TINYINT(1) NOT NULL DEFAULT '0'
 AFTER `size`;
@@ -575,7 +577,8 @@ DROP TRIGGER IF EXISTS update_hashes;
 DELIMITER $$
 CREATE TRIGGER update_hashes AFTER UPDATE ON prehash FOR EACH ROW BEGIN IF NEW.title != OLD.title
 THEN UPDATE predbhash
-SET hashes = CONCAT_WS(',', MD5(NEW.title), MD5(MD5(NEW.title)), SHA1(NEW.title)); END IF;
+SET hashes = CONCAT_WS(',', MD5(NEW.title), MD5(MD5(NEW.title)), SHA1(NEW.title))
+WHERE pre_id = OLD.ID; END IF;
 END;
 $$
 DELIMITER ;

@@ -17,7 +17,7 @@ if (!isset($argv[1]) || ( $argv[1] != "all" && $argv[1] != "full" && !is_numeric
 		."php predb_hash_decrypt.php full 		...: to run on full database.\n"
 		."php predb_hash_decrypt.php all 		...: to run on all hashed releases(including previously renamed).\n"));
 
-echo $c->header ("\nHash Decryption Started at ".date("H:i:s")."\nMatching prehash MD5 to md5(releases.name or releases.searchname)");
+echo $c->header("\nHash Decryption Started at " . date("H:i:s") . "\nMatching preDB MD5 to md5(releases.name or releases.searchname)");
 preName($argv);
 
 function preName($argv)
