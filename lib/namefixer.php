@@ -382,7 +382,6 @@ class Namefixer
 		$this->category = new Category();
 		$this->functions = new Functions();
 		$this->matched = false;
-
 		//Remove all non-printable chars, preg match all interesting words
 		$titlelike = "%" . $this->functions->stripNonPrintingChars($pre['title']) . "%";
 		preg_match_all('#\w+#', $pre['title'], $matches, PREG_PATTERN_ORDER);
@@ -392,7 +391,9 @@ class Namefixer
 		$res = $db->queryDirect(sprintf("SELECT rs.releaseID AS releaseID FROM releasesearch rs
 						     WHERE MATCH (rs.name, rs.searchname) AGAINST ('%s' IN BOOLEAN MODE)
 						     AND (rs.name LIKE %s OR rs.searchname LIKE %s)
-						     LIMIT 16", $titlematch, $db->escapeString($titlelike), $db->escapeString($titlelike)));
+						     LIMIT 16", $titlematch, $db->escapeString($titlelike), $db->escapeString($titlelike)
+			)
+		);
 
 		if ($res !== false) {
 			$total = count($res);
@@ -434,6 +435,7 @@ class Namefixer
 		} elseif ($total >= 10) {
 			$matching = -1;
 		}
+
 		return $matching;
 	}
 

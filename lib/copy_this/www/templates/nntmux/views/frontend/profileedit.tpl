@@ -88,60 +88,97 @@
 		</table>
 	</fieldset>
 
-	{if $page->site->sabintegrationtype == 2}
+	{if $page->site->sabintegrationtype != 1}
+		<fieldset>
+			<legend>Queue Type</legend>
+			<table class="table table-condensed input">
+				<colgroup>
+					<col style="width: 150px;">
+				</colgroup>
+				<tr>
+					<th>Queue type:</th>
+					<td>
+						{html_options id="queuetypeids" name='queuetypeids' values=$queuetypeids output=$queuetypes selected=$user.queuetype}
+						<span class="help-block">Pick the type of queue you wish to use, once you save your profile, the page will reload, the box will appear and you can fill out the details.</span>
+					</td>
+				</tr>
+			</table>
+		</fieldset>
+	{/if}
+	{if $user.queuetype == 2 && ($page->site->sabintegrationtype == 0 || $page->site->sabintegrationtype == 2)}
+		<fieldset>
+			<legend>NZBGet Integration</legend>
+			<table class="table table-condensed input">
+				<colgroup>
+					<col style="width: 150px;">
+				</colgroup>
+				<tr>
+					<th><label for="nzbgeturl">NZBGet Url:</label></th>
+					<td>
+						<input id="nzbgeturl" class="form-control" name="nzbgeturl" type="text" value="{$user.nzbgeturl}" />
+						<span class="help-block">The url of the NZBGet installation, for example: http://127.0.0.1:6789/</span>
+					</td>
+				</tr>
+
+				<tr>
+					<th><label for="nzbgetusername">NZBGet Username:</label></th>
+					<td>
+						<input id="nzbgetusername" class="form-control" name="nzbgetusername" type="text" value="{$user.nzbgetusername}" />
+						<span class="help-block">The user name for the NZBGet installation.</span>
+					</td>
+				</tr>
+
+				<tr>
+					<th><label for="nzbgetpassword">NZBGet Password:</label></th>
+					<td>
+						<input id="nzbgetpassword" class="form-control" name="nzbgetpassword" type="text" value="{$user.nzbgetpassword}" />
+						<span class="help-block">The password for the NZBGet installation.</span>
+					</td>
+				</tr>
+
+			</table>
+		</fieldset>
+	{/if}
+	{if $user.queuetype == 1 && $page->site->sabintegrationtype == 2}
 		<fieldset>
 			<legend>SABnzbd Integration</legend>
 			<table class="input">
 				<tr>
-					<th width="100"><label for="saburl">SABnzbd Url</label>:</th>
+					<th width="100"><label for="saburl">SABnzbd Url:</label></th>
 					<td>
-						<input id="saburl" class="long" name="saburl" type="text" value="{$saburl_selected}"/>
-
-						<div class="hint">The url of the SAB installation, for example: http://localhost:8080/sabnzbd/
-						</div>
+						<input id="saburl" class="long" name="saburl" type="text" value="{$saburl_selected}" />
+						<div class="hint">The url of the SAB installation, for example: http://localhost:8080/sabnzbd/</div>
 					</td>
 				</tr>
 
 				<tr>
-					<th><label for="sabapikey">SABnzbd Api Key</label>:</th>
+					<th><label for="sabapikey">SABnzbd Api Key:</label></th>
 					<td>
-						<input id="sabapikey" class="long" name="sabapikey" type="text" value="{$sabapikey_selected}"/>
-
-						<div class="hint">The api key of the SAB installation. Can be the full api key or the nzb api
-							key (as of SAB 0.6)
-						</div>
+						<input id="sabapikey" class="long" name="sabapikey" type="text" value="{$sabapikey_selected}" />
+						<div class="hint">The api key of the SAB installation. Can be the full api key or the nzb api key (as of SAB 0.6)</div>
 					</td>
 				</tr>
 
 				<tr>
-					<th><label for="sabapikeytype">Api Key Type</label>:</th>
+					<th><label for="sabapikeytype">Api Key Type:</label></th>
 					<td>
 						{html_radios id="sabapikeytype" name='sabapikeytype' values=$sabapikeytype_ids output=$sabapikeytype_names selected=$sabapikeytype_selected separator='<br />'}
-						<div class="hint">Select the type of api key you entered in the above setting. Using your full
-							SAB api key will allow you access to the SAB queue from within this site.
-						</div>
+						<div class="hint">Select the type of api key you entered in the above setting. Using your full SAB api key will allow you access to the SAB queue from within this site.</div>
 					</td>
 				</tr>
 
 				<tr>
-					<th><label for="sabpriority">Priority Level</label>:</th>
+					<th><label for="sabpriority">Priority Level:</label></th>
 					<td>
 						{html_options id="sabpriority" name='sabpriority' values=$sabpriority_ids output=$sabpriority_names selected=$sabpriority_selected}
 						<div class="hint">Set the priority level for NZBs that are added to your queue</div>
 					</td>
 				</tr>
 				<tr>
-					<th><label for="sabsetting">Setting Storage</label>:</th>
+					<th><label for="sabsetting">Setting Storage:</label></th>
 					<td>
-						{html_radios id="sabsetting" name='sabsetting' values=$sabsetting_ids output=$sabsetting_names selected=$sabsetting_selected separator='&nbsp;&nbsp;'}{if $sabsetting_selected == 2}&nbsp;&nbsp;[
-							<a class="confirm_action" href="?action=clearcookies">Clear Cookies</a>
-							]{/if}
-						<div class="hint">Where to store the SAB setting.<br/>&bull; <b>Cookie</b> will store the
-							setting in your browsers coookies and will only work when using your current browser.<br/>&bull;
-							<b>Site</b> will store the setting in your user account enabling it to work no matter where
-							you are logged in from.<br/><span class="warning"><b>Please Note:</b></span> You should only
-							store your full SAB api key with sites you trust.
-						</div>
+						{html_radios id="sabsetting" name='sabsetting' values=$sabsetting_ids output=$sabsetting_names selected=$sabsetting_selected separator='&nbsp;&nbsp;'}{if $sabsetting_selected == 2}&nbsp;&nbsp;[<a class="confirm_action" href="?action=clearcookies">Clear Cookies</a>]{/if}
+						<div class="hint">Where to store the SAB setting.<br />&bull; <b>Cookie</b> will store the setting in your browsers coookies and will only work when using your current browser.<br/>&bull; <b>Site</b> will store the setting in your user account enabling it to work no matter where you are logged in from.<br /><span class="warning"><b>Please Note:</b></span> You should only store your full SAB api key with sites you trust.</div>
 					</td>
 				</tr>
 			</table>

@@ -1,12 +1,12 @@
 <?php
 
-require(dirname(__FILE__)."/config.php");
-require_once(WWW_DIR."/lib/framework/db.php");
-require_once(WWW_DIR."/lib/groups.php");
-require_once(WWW_DIR."/lib/category.php");
-require_once(WWW_DIR."/lib/Tmux.php");
-require_once(dirname(__FILE__).'/../lib/functions.php');
-require_once(dirname(__FILE__).'/../lib/ColorCLI.php');
+require(dirname(__FILE__) . "/config.php");
+require_once(WWW_DIR . "/lib/framework/db.php");
+require_once(WWW_DIR . "/lib/groups.php");
+require_once(WWW_DIR . "/lib/category.php");
+require_once(WWW_DIR . "/lib/Tmux.php");
+require_once(dirname(__FILE__) . '/../lib/functions.php');
+require_once(dirname(__FILE__) . '/../lib/ColorCLI.php');
 
 $c = new ColorCLI();
 if (!isset($argv[1])) {
@@ -56,33 +56,33 @@ if ($bFound === true) {
 	$groupname = $f->getByNameByID($pieces[2]);
 	$determinedcat = $category->determineCategory($groupname, $title);
 	$run = $db->queryDirect(sprintf("UPDATE releases SET rageID = -1, seriesfull = NULL, season = NULL, episode = NULL, tvtitle = NULL, tvairdate = NULL, imdbID = NULL, musicinfoID = NULL, consoleinfoID = NULL, bookinfoID = NULL, anidbID = NULL, "
-			. "prehashID = %d, reqidstatus = 1, isrenamed = 1, searchname = %s, categoryID = %d where ID = %d", $prehashID, $db->escapeString($title), $determinedcat, $pieces[0]));
+			. "prehashID = %d, reqidstatus = 1, isrenamed = 1, searchname = %s, categoryID = %d where ID = %d", $prehashID, $db->escapeString($title), $determinedcat, $pieces[0]
+		)
+	);
 	$groupid = $f->getIDByName($pieces[2]);
 	if ($groupid !== 0) {
-		$md5 = md5($title);
-		$dupe = $db->queryOneRow(sprintf('SELECT requestID FROM prehash INNER JOIN predbhash ON predbhash.pre_id = prehash.ID WHERE MATCH (predbhash.hashes) AGAINST (%s)', $db->escapeString($md5)));
+		$dupe = $db->queryOneRow(sprintf('SELECT requestID FROM prehash WHERE title = %s', $db->escapeString($title)));
 		if ($dupe === false || ($dupe !== false && $dupe['requestID'] !== $requestID)) {
 			$db->queryDirect(
 				sprintf("
-				INSERT INTO prehash (title, source, md5, requestID, groupID)
-				VALUES (%s, %s, %s, %s, %d)",
+					INSERT INTO prehash (title, source, requestID, groupID)
+					VALUES (%s, %s, %d, %d)",
 					$db->escapeString($title),
 					$db->escapeString('requestWEB'),
-					$db->escapeString($md5),
 					$requestID, $groupid
 				)
 			);
-        }
+		}
 	} else if ($groupid === 0) {
 		echo $requestID . "\n";
 	}
 	$newcatname = $f->getNameByID($determinedcat);
 	echo $c->headerOver($n . $n . 'New name:  ') . $c->primary($title) .
-	$c->headerOver('Old name:  ') . $c->primary($pieces[1]) .
-	$c->headerOver('New cat:   ') . $c->primary($newcatname) .
-	$c->headerOver('Group:     ') . $c->primary(trim($pieces[2])) .
-	$c->headerOver('Method:    ') . $c->primary("requestID local") .
-	$c->headerOver('ReleaseID: ') . $c->primary($pieces[0]);
+		$c->headerOver('Old name:  ') . $c->primary($pieces[1]) .
+		$c->headerOver('New cat:   ') . $c->primary($newcatname) .
+		$c->headerOver('Group:     ') . $c->primary(trim($pieces[2])) .
+		$c->headerOver('Method:    ') . $c->primary("requestID local") .
+		$c->headerOver('ReleaseID: ') . $c->primary($pieces[0]);
 	$updated++;
 } else {
 	$db->exec('UPDATE releases SET reqidstatus = -3 WHERE ID = ' . $pieces[0]);
@@ -115,7 +115,7 @@ function localLookup($requestID, $groupName, $oldname)
 {
 	$db = new DB();
 	$groups = new Groups();
-    $f = new Functions();
+	$f = new Functions();
 	$groupID = $f->getIDByName($groupName);
 	$run = $db->queryOneRow(sprintf("SELECT ID, title FROM prehash WHERE requestID = %d AND groupID = %d", $requestID, $groupID));
 	if (isset($run['title']) && preg_match('/s\d+/i', $run['title']) && !preg_match('/s\d+e\d+/i', $run['title'])) {

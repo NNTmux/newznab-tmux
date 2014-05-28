@@ -289,65 +289,61 @@
 
 
 <fieldset>
-<legend>SABnzbd Integration Settings</legend>
-<table class="input">
-<tr>
-	<td style="width:160px;"><label for="sabintegrationtype">Integration Type</label>:</td>
-	<td>
-		{html_radios id="sabintegrationtype" name='sabintegrationtype' values=$sabintegrationtype_ids output=$sabintegrationtype_names selected=$fsite->sabintegrationtype separator='<br />'}
-		<div class="hint">Whether to allow integration with a SAB install and if so what type of integration<br/></div>
-	</td>
-</tr>
-
-<tr>
-	<td><label for="saburl">SABnzbd Url</label>:</td>
-	<td>
-		<input id="saburl" class="long" name="saburl" type="text" value="{$fsite->saburl}" />
-		<div class="hint">The url of the SAB installation, for example: http://localhost:8080/sabnzbd/</div>
-	</td>
-</tr>
-
-<tr>
-	<td><label for="sabapikey">SABnzbd Api Key</label>:</td>
-	<td>
-		<input id="sabapikey" class="long" name="sabapikey" type="text" value="{$fsite->sabapikey}" />
-		<div class="hint">The Api key of the SAB installation. Can be the full api key or the nzb api key (as of SAB 0.6)</div>
-	</td>
-</tr>
-
-<tr>
-	<td><label for="sabapikeytype">Api Key Type</label>:</td>
-	<td>
-		{html_radios id="sabapikeytype" name='sabapikeytype' values=$sabapikeytype_ids output=$sabapikeytype_names selected=$fsite->sabapikeytype separator='<br />'}
-		<div class="hint">Select the type of api key you entered in the above setting</div>
-	</td>
-</tr>
-
-<tr>
-	<td><label for="sabpriority">Priority Level</label>:</td>
-	<td>
-		{html_options id="sabpriority" name='sabpriority' values=$sabpriority_ids output=$sabpriority_names selected=$fsite->sabpriority}
-		<div class="hint">Set the priority level for NZBs that are added to your queue</div>
-	</td>
-</tr>
-
-<tr>
-	<td><label for="sabcompletedir">SABnzbd Complete Path</label>:</td>
-	<td>
-		<input id="sabcompletedir" class="long" name="sabcompletedir" type="text" value="{$fsite->sabcompletedir}" />
-		<div class="hint">The downloads/complete folder for a local sab install, for example: /var/www/sab/downloads/complete</div>
-	</td>
-</tr>
-
-<tr>
-	<td><label for="sabvdir">SABnzbd Complete Vdir URL</label>:</td>
-	<td>
-		<input id="sabvdir" class="long" name="sabvdir" type="text" value="{$fsite->sabvdir}" />
-		<div class="hint">A url to a hosted virtual directory pointing to the sab downloads/complete folder, e.g. http://server/complete</div>
-	</td>
-</tr>
-
-</table>
+	<legend>SABnzbd Integration Settings</legend>
+	<table class="input">
+		<tr>
+			<td style="width:180px;"><label for="sabintegrationtype">Integration Type:</label></td>
+			<td>
+				{html_radios id="sabintegrationtype" name='sabintegrationtype' values=$sabintegrationtype_ids output=$sabintegrationtype_names selected=$fsite->sabintegrationtype separator='<br />'}
+				<div class="hint">
+					Whether to allow integration with a SAB install and if so what type of integration.<br/>
+					<strong>Setting this to integrated also disables NZBGet from being selectable to the user.</strong><br />
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td style="width:180px;"><label for="saburl">SABnzbd Url:</label></td>
+			<td>
+				<input id="saburl" class="long" name="saburl" type="text" value="{$fsite->saburl}" />
+				<div class="hint">The url of the SAB installation, for example: http://localhost:8080/sabnzbd/</div>
+			</td>
+		</tr>
+		<tr>
+			<td style="width:180px;"><label for="sabapikey">SABnzbd Api Key:</label></td>
+			<td>
+				<input id="sabapikey" class="long" name="sabapikey" type="text" value="{$fsite->sabapikey}" />
+				<div class="hint">The Api key of the SAB installation. Can be the full api key or the nzb api key (as of SAB 0.6)</div>
+			</td>
+		</tr>
+		<tr>
+			<td style="width:180px;"><label for="sabapikeytype">Api Key Type:</label></td>
+			<td>
+				{html_radios id="sabapikeytype" name='sabapikeytype' values=$sabapikeytype_ids output=$sabapikeytype_names selected=$fsite->sabapikeytype separator='<br />'}
+				<div class="hint">Select the type of api key you entered in the above setting</div>
+			</td>
+		</tr>
+		<tr>
+			<td style="width:180px;"><label for="sabpriority">Priority Level:</label></td>
+			<td>
+				{html_options style="width:180px;" id="sabpriority" name='sabpriority' values=$sabpriority_ids output=$sabpriority_names selected=$fsite->sabpriority}
+				<div class="hint">Set the priority level for NZBs that are added to your queue</div>
+			</td>
+		</tr>
+		<tr>
+			<td><label for="sabcompletedir">SABnzbd Complete Path</label>:</td>
+			<td>
+				<input id="sabcompletedir" class="long" name="sabcompletedir" type="text" value="{$fsite->sabcompletedir}" />
+				<div class="hint">The downloads/complete folder for a local sab install, for example: /var/www/sab/downloads/complete</div>
+			</td>
+		</tr>
+		<tr>
+			<td><label for="sabvdir">SABnzbd Complete Vdir URL</label>:</td>
+			<td>
+				<input id="sabvdir" class="long" name="sabvdir" type="text" value="{$fsite->sabvdir}" />
+				<div class="hint">A url to a hosted virtual directory pointing to the sab downloads/complete folder, e.g. http://server/complete</div>
+			</td>
+		</tr>
+	</table>
 </fieldset>
 
 
@@ -731,21 +727,21 @@
 	<td><label for="spotnabuser">Username</label>:</td>
 	<td>
 		<input name="spotnabuser" type="text" value="{$fsite->spotnabuser}" />
-		<div class="hint">The username part used for posting. eg nntp</div>		
+		<div class="hint">The username part used for posting. eg nntp</div>
 	</td>
 </tr>
 <tr>
 	<td><label for="spotnabemail">E-mail</label>:</td>
 	<td>
 		<input name="spotnabemail" type="text" value="{$fsite->spotnabemail}" />
-		<div class="hint">The email part used for posting. eg spot@nntp.com</div>		
+		<div class="hint">The email part used for posting. eg spot@nntp.com</div>
 	</td>
 </tr>
 <tr>
 	<td><label for="spotnabgroup">Usenet Group</label>:</td>
 	<td>
 		<input name="spotnabgroup" type="text" value="{$fsite->spotnabgroup}" />
-		<div class="hint">The group where posts are uploaded. eg alt.binaries.backup</div>		
+		<div class="hint">The group where posts are uploaded. eg alt.binaries.backup</div>
 	</td>
 </tr>
 
@@ -753,7 +749,7 @@
   <td style="width:130px;"><label for="spotnabsitepubkey">Public Key</label>:</td>
   <td>
 	<textarea class="autosize"  name="spotnabsitepubkey">{$fsite->spotnabsitepubkey|escape:html}</textarea>
-	<div class="hint">Public key other sites will use to decrypt comments.</div>		
+	<div class="hint">Public key other sites will use to decrypt comments.</div>
   </td>
 </tr>
 
@@ -761,7 +757,7 @@
   <td style="width:130px;"><label for="spotnabsiteprvkey">Private Key:<br><u>Do Not Share This</u></label></td>
   <td>
 	<textarea class="autosize"  name="spotnabsiteprvkey">{$fsite->spotnabsiteprvkey|escape:html}</textarea>
-	<div class="hint">Private key used to encrypt comments before uploading.</div>		
+	<div class="hint">Private key used to encrypt comments before uploading.</div>
   </td>
 </tr>
 
@@ -841,7 +837,7 @@
     <tr>
     	<td><label for="sphinxmergefreq">Merge Frequency</label>:</td>
     	<td>
-    		Every day at <input class="tiny" id="sphinxmergefreq" name="sphinxmergefreq" type="text" value="{$fsite->sphinxmergefreq}" /> or 
+    		Every day at <input class="tiny" id="sphinxmergefreq" name="sphinxmergefreq" type="text" value="{$fsite->sphinxmergefreq}" /> or
     		<input style="width: 40px" id="sphinxmergefreq_count" name="sphinxmergefreq_count" type="text" value="{$fsite->sphinxmergefreq_count}" /> records.<br/>
     		<div class="hint">Merge the delta indexes into the main indexes every day at at this time (24-hour format) or once the delta index grows above the given size.</div>
     	</td>

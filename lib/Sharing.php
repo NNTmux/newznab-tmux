@@ -489,7 +489,7 @@ Class Sharing
 		// Insert the comment.
 		if ($this->db->exec(
 			sprintf('
-				INSERT INTO releasecomment
+				INSERT IGNORE INTO releasecomment
 				(text, createddate, issynced, shareID, gid, nzb_guid, siteID, username, userID, releaseID, shared, host, sourceID)
 				VALUES (%s, %s, 1, %s, %s, %s, %s, %s, 0, 0, 2, "", 999)',
 				$this->db->escapeString($body['BODY']),

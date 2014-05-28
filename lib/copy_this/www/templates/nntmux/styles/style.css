@@ -297,9 +297,7 @@ movie, console and music modals with backdrop images.
 #moviepreviews img {max-width:600px;}
 #moviepreviews .previewtitle {margin-bottom: 20px;}
 
-
-
-/* 
+/*
 icons and multioperation buttons
 */
 input.nzb_check_all { margin-left:5px; }
@@ -315,8 +313,15 @@ div.icon_cart_clicked	{ background-image:url('../images/icons/cartdown.png'); }
 div.icon_nzb			{ background-image:url('../images/icons/nzbup.png'); }
 div.icon_nzb_clicked	{ background-image:url('../images/icons/nzbdown.png'); }
 div.icon_nzb a			{ text-decoration:none; padding-bottom:2px; padding-right:12px; }
-div.icon_sab			{ background-image:url('../images/icons/sabup.png'); }
-div.icon_sab_clicked	{ background-image:url('../images/icons/sabdown.png'); }
+
+div.icon_sab {
+    background-image: url('../images/icons/queueup.png');
+}
+
+div.icon_sab_clicked {
+    background-image: url('../images/icons/queuedown.png');
+}
+
 div.icon_tvrage			{ background-image:url('../images/icons/tvrage.png'); }
 div.icon_check			{ background-image:url('../images/icons/check.png'); }
 div.icon_nzbvortex		{ background-image: url('../images/icons/vortex/bigsmile.png'); }
@@ -372,7 +377,7 @@ div.icon_nzbvortex_clicked		{ background-image: url('../images/icons/vortex/bigs
         .cboxSlideshow_off #cboxSlideshow.hover{background-position:-75px -25px;}
 
 /*
-    The following fixes png-transparency for IE6.  
+    The following fixes png-transparency for IE6.
 */
 .cboxIE #cboxTopLeft{background:transparent; filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=images/colorbox/internet_explorer/borderTopLeft.png, sizingMethod='scale');}
 .cboxIE #cboxTopCenter{background:transparent; filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=images/colorbox/internet_explorer/borderTopCenter.png, sizingMethod='scale');}
