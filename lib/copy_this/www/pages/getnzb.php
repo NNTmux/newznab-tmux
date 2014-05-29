@@ -1,8 +1,8 @@
 <?php
 require_once(WWW_DIR . "/lib/releases.php");
-require_once(WWW_DIR . '/../misc/update_scripts/nix_scripts/tmux/lib/Enzebe.php');
+require_once(WWW_DIR . "/lib/nzb.php");
 
-$nzb = new Enzebe();
+$nzb = new NZB();
 $rel = new Releases();
 $uid = 0;
 
