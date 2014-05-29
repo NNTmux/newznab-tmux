@@ -1,9 +1,9 @@
 <?php
-require_once(WWW_DIR."/lib/category.php");
-require_once(WWW_DIR."/lib/sabnzbd.php");
-require_once(WWW_DIR."/lib/util.php");
+require_once(WWW_DIR . "/lib/category.php");
+require_once(WWW_DIR . "/lib/sabnzbd.php");
+require_once(WWW_DIR . "/lib/util.php");
 require_once(WWW_DIR . "/lib/users.php");
-require_once(WWW_DIR.'/../misc/update_scripts/nix_scripts/tmux/lib/NZBGet.php');
+require_once(WWW_DIR . '/../misc/update_scripts/nix_scripts/tmux/lib/NZBGet.php');
 
 $category = new Category;
 $sab = new SABnzbd($page);
@@ -22,36 +22,27 @@ if (!$data)
 
 $errorStr = '';
 
-switch($action)
-{
+switch ($action) {
 	case 'newapikey':
 		$users->updateRssKey($userid);
-		header("Location: profileedit" );
+		header("Location: profileedit");
 		break;
 	case 'clearcookies':
 		$sab->unsetCookie();
-		header("Location: profileedit" );
+		header("Location: profileedit");
 		break;
 	case 'submit':
 
 		$data["email"] = $_POST['email'];
 		if (isset($_POST['saburl']) && strlen(trim($_POST['saburl'])) > 0 && !endsWith($_POST['saburl'], "/"))
-			$_POST['saburl'] = $_POST['saburl']."/";
+			$_POST['saburl'] = $_POST['saburl'] . "/";
 
-		if ($_POST['password']!= "" && $_POST['password'] != $_POST['confirmpassword'])
-		{
+		if ($_POST['password'] != "" && $_POST['password'] != $_POST['confirmpassword']) {
 			$errorStr = "Password Mismatch";
-		}
-		else if ($_POST['password']!= "" && !$users->isValidPassword($_POST['password']))
-		{
+		} else if ($_POST['password'] != "" && !$users->isValidPassword($_POST['password'])) {
 			$errorStr = "Your password must be longer than five characters.";
-		}
-		else if (isset($_POST['nzbgeturl']) && $nzbGet->verifyURL($_POST['nzbgeturl']) === false) {
+		} else if (isset($_POST['nzbgeturl']) && $nzbGet->verifyURL($_POST['nzbgeturl']) === false) {
 			$errorStr = "The NZBGet URL you entered is invalid!";
-		} else if (isset($_POST['nzbgetpassword']) && empty($_POST['nzbgetpassword'])) {
-			$errorStr = 'You must enter a NZBGet password!';
-		} else if (isset($_POST['nzbgetusername']) && empty($_POST['nzbgetusername'])) {
-			$errorStr = 'You must enter a NZBGet username!';
 		} else if (!$users->isValidEmail($_POST['email'])) {
 			$errorStr = "Your email is not a valid format.";
 		} else {
@@ -60,11 +51,8 @@ switch($action)
 				$errorStr = "Sorry, the email is already in use.";
 			} elseif ((empty($_POST['saburl']) && !empty($_POST['sabapikey'])) || (!empty($_POST['saburl']) && empty($_POST['sabapikey']))) {
 				$errorStr = "Insert a SABnzdb URL and API key.";
-			}
-			else
-			{
-				if (isset($_POST['sabsetting']) && $_POST['sabsetting'] == 2)
-				{
+			} else {
+				if (isset($_POST['sabsetting']) && $_POST['sabsetting'] == 2) {
 					$sab->setCookie($_POST['saburl'], $_POST['sabapikey'], $_POST['sabpriority'], $_POST['sabapikeytype']);
 					$_POST['saburl'] = $_POST['sabapikey'] = $_POST['sabpriority'] = $_POST['sabapikeytype'] = false;
 				}
@@ -90,7 +78,8 @@ switch($action)
 					(isset($_POST['sabpriority']) ? $_POST['sabpriority'] : ''),
 					(isset($_POST['sabapikeytype']) ? $_POST['sabapikeytype'] : ''),
 					(isset($_POST['nzbvortex_server_url']) ? $_POST['nzbvortex_server_url'] : false),
-					(isset($_POST['nzbvortex_api_key']) ? $_POST['nzbvortex_api_key'] : false));
+					(isset($_POST['nzbvortex_api_key']) ? $_POST['nzbvortex_api_key'] : false)
+				);
 
 				$_POST['exccat'] = (!isset($_POST['exccat']) || !is_array($_POST['exccat'])) ? array() : $_POST['exccat'];
 				$users->addCategoryExclusions($userid, $_POST['exccat']);
@@ -98,7 +87,7 @@ switch($action)
 				if ($_POST['password'] != "")
 					$users->updatePassword($userid, $_POST['password']);
 
-				header("Location:".WWW_TOP."/profile");
+				header("Location:" . WWW_TOP . "/profile");
 				die();
 			}
 		}
@@ -117,17 +106,17 @@ $page->smarty->assign('userexccat', $users->getCategoryExclusion($userid));
 $page->smarty->assign('saburl_selected', $sab->url);
 $page->smarty->assign('sabapikey_selected', $sab->apikey);
 
-$page->smarty->assign('sabapikeytype_ids', array(SABnzbd::API_TYPE_NZB,SABnzbd::API_TYPE_FULL));
-$page->smarty->assign('sabapikeytype_names', array( 'Nzb Api Key', 'Full Api Key'));
-$page->smarty->assign('sabapikeytype_selected', ($sab->apikeytype == '')?SABnzbd::API_TYPE_NZB:$sab->apikeytype);
+$page->smarty->assign('sabapikeytype_ids', array(SABnzbd::API_TYPE_NZB, SABnzbd::API_TYPE_FULL));
+$page->smarty->assign('sabapikeytype_names', array('Nzb Api Key', 'Full Api Key'));
+$page->smarty->assign('sabapikeytype_selected', ($sab->apikeytype == '') ? SABnzbd::API_TYPE_NZB : $sab->apikeytype);
 
 $page->smarty->assign('sabpriority_ids', array(SABnzbd::PRIORITY_FORCE, SABnzbd::PRIORITY_HIGH, SABnzbd::PRIORITY_NORMAL, SABnzbd::PRIORITY_LOW, SABnzbd::PRIORITY_PAUSED));
-$page->smarty->assign('sabpriority_names', array( 'Force', 'High', 'Normal', 'Low', 'Paused'));
-$page->smarty->assign('sabpriority_selected', ($sab->priority == '')?SABnzbd::PRIORITY_NORMAL:$sab->priority);
+$page->smarty->assign('sabpriority_names', array('Force', 'High', 'Normal', 'Low', 'Paused'));
+$page->smarty->assign('sabpriority_selected', ($sab->priority == '') ? SABnzbd::PRIORITY_NORMAL : $sab->priority);
 
-$page->smarty->assign('sabsetting_ids', array(1,2));
-$page->smarty->assign('sabsetting_names', array( 'Site', 'Cookie'));
-$page->smarty->assign('sabsetting_selected', ($sab->checkCookie()===true?2:1));
+$page->smarty->assign('sabsetting_ids', array(1, 2));
+$page->smarty->assign('sabsetting_names', array('Site', 'Cookie'));
+$page->smarty->assign('sabsetting_selected', ($sab->checkCookie() === true ? 2 : 1));
 
 switch ($sab->integrated) {
 	case SABnzbd::INTEGRATION_TYPE_USER:
@@ -142,17 +131,17 @@ switch ($sab->integrated) {
 }
 
 $page->smarty->assign(array(
-		'queuetypes' => $queueTypes,
+		'queuetypes'   => $queueTypes,
 		'queuetypeids' => $queueTypeIDs
 	)
 );
 
 $page->meta_title = "Edit User Profile";
 $page->meta_keywords = "edit,profile,user,details";
-$page->meta_description = "Edit User Profile for ".$data["username"] ;
+$page->meta_description = "Edit User Profile for " . $data["username"];
 
 
-$page->smarty->assign('catlist',$category->getForSelect(false));
+$page->smarty->assign('catlist', $category->getForSelect(false));
 
 $page->content = $page->smarty->fetch('profileedit.tpl');
 $page->render();
