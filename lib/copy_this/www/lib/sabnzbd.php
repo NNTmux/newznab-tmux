@@ -89,7 +89,7 @@ class SABnzbd
 	 */
 	public function __construct(&$page)
 	{
-		$this->uid = $page->userdata['id'];
+		$this->uid = $page->userdata['ID'];
 		$this->rsstoken = $page->userdata['rsstoken'];
 		$this->serverurl = $page->serverurl;
 		$this->functions = new Functions();
