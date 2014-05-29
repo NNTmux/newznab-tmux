@@ -104,7 +104,7 @@ if (isset($_GET["id"])) {
 	readgzfile($nzbpath);
 
 	// Set the NZB file name.
-	header("Content-Disposition: attachment; filename=\"" . str_replace(" ", "_", $reldata["searchname"]) . ".nzb\"");
+	header("Content-Disposition: attachment; filename=" . str_replace(array(',', ' '), '_', $reldata["searchname"]) . ".nzb");
 	// Get the size of the NZB file.
 	header("Content-Length: " . ob_get_length());
 	header("Content-Type: application/x-nzb");
