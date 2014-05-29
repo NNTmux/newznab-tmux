@@ -52,11 +52,9 @@ switch($action)
 			$errorStr = 'You must enter a NZBGet password!';
 		} else if (isset($_POST['nzbgetusername']) && empty($_POST['nzbgetusername'])) {
 			$errorStr = 'You must enter a NZBGet username!';
-		}
-		else if (!$users->isValidEmail($_POST['email']))
+		} else if (!$users->isValidEmail($_POST['email'])) {
 			$errorStr = "Your email is not a valid format.";
-		else
-		{
+		} else {
 			$res = $users->getByEmail($_POST['email']);
 			if ($res && $res["ID"] != $userid) {
 				$errorStr = "Sorry, the email is already in use.";
