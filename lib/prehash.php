@@ -121,7 +121,7 @@ Class PreHash
 				}
 			}
 
-			if (self::PRE_OMGWTF) {
+			/*if (self::PRE_OMGWTF) {
 				$this->updatedPre = $this->insertedPre = 0;
 				$this->retrieveOmgwtfnzbs();
 				$newPre += $this->insertedPre;
@@ -130,9 +130,9 @@ Class PreHash
 					echo $this->c->primary($this->insertedPre . " \tRetrieved from Omgwtfnzbs.");
 					echo $this->c->primary($this->updatedPre . " \tUpdated from Omgwtfnzbs.");
 				}
-			}
+			}*/
 
-			if (self::PRE_ZENET) {
+			/*if (self::PRE_ZENET) {
 				$this->updatedPre = $this->insertedPre = 0;
 				$this->retrieveZenet();
 				$newPre += $this->insertedPre;
@@ -141,9 +141,9 @@ Class PreHash
 					echo $this->c->primary($this->insertedPre . " \tRetrieved from Zenet.");
 					echo $this->c->primary($this->updatedPre . " \tUpdated from Zenet.");
 				}
-			}
+			}*/
 
-			if (self::PRE_PRELIST) {
+			/*if (self::PRE_PRELIST) {
 				$this->updatedPre = $this->insertedPre = 0;
 				$this->retrievePrelist();
 				$newPre += $this->insertedPre;
@@ -152,9 +152,9 @@ Class PreHash
 					echo $this->c->primary($this->insertedPre . " \tRetrieved from Prelist.");
 					echo $this->c->primary($this->updatedPre . " \tUpdated from Prelist.");
 				}
-			}
+			}*/
 
-			if (self::PRE_ORLYDB) {
+			/*if (self::PRE_ORLYDB) {
 				$this->updatedPre = $this->insertedPre = 0;
 				$this->retrieveOrlydb();
 				$newPre += $this->insertedPre;
@@ -163,9 +163,9 @@ Class PreHash
 					echo $this->c->primary($this->insertedPre . " \tRetrieved from Orlydb.");
 					echo $this->c->primary($this->updatedPre . " \tUpdated from Orlydb.");
 				}
-			}
+			}*/
 
-			if (self::PRE_SRRDB) {
+			/*if (self::PRE_SRRDB) {
 				$this->updatedPre = $this->insertedPre = 0;
 				$this->retrieveSrr();
 				$newPre += $this->insertedPre;
@@ -174,7 +174,7 @@ Class PreHash
 					echo $this->c->primary($this->insertedPre . " \tRetrieved from Srrdb.");
 					echo $this->c->primary($this->updatedPre . " \tUpdated from Srrdb.");
 				}
-			}
+			}*/
 
 			if (self::PRE_PREDBME) {
 				$this->updatedPre = $this->insertedPre = 0;
@@ -889,7 +889,8 @@ Class PreHash
 
 				// To save space in the DB we do this instead of storing the full URL.
 				if ($URL === 'srrdb') {
-					$URL = 'http://www.srrdb.com/download/file/' . $row['title'] . '/' . strtolower(urlencode($row['title'])) . '.nfo';
+					continue;
+					//$URL = 'http://www.srrdb.com/download/file/' . $row['title'] . '/' . strtolower(urlencode($row['title'])) . '.nfo';
 				}
 
 				$buffer = $this->getUrl($URL);
@@ -899,9 +900,9 @@ Class PreHash
 						continue;
 					}
 
-					if ($row['nfo'] === 'srrdb' && preg_match('/You\'ve reached the daily limit/i', $buffer)) {
+					/*if ($row['nfo'] === 'srrdb' && preg_match('/You\'ve reached the daily limit/i', $buffer)) {
 						continue;
-					}
+					}*/
 
 					if ($nfo->addAlternateNfo($buffer, $row, $nntp)) {
 						if ($this->echooutput) {
