@@ -63,7 +63,7 @@ if ($total > 0) {
 			$requestID = (int)$match[1];
 		} else {
 			echo "requestID = " . $requestID . " name =" . $row['name'] . PHP_EOL;
-			$db->queryExec('UPDATE releases SET reqidstatus = -2 WHERE ID = ' . $row['id']);
+			$db->exec('UPDATE releases SET reqidstatus = -2 WHERE ID = ' . $row['ID']);
 			$counter++;
 			continue;
 		}

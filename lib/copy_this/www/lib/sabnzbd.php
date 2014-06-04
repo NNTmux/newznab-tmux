@@ -47,14 +47,14 @@ class SABnzbd
 	protected $uid = '';
 
 	/**
-	 * User's nZEDb API key to send to SAB when downloading a NZB.
+	 * User's newznab API key to send to SAB when downloading a NZB.
 	 *
 	 * @var string
 	 */
 	protected $rsstoken = '';
 
 	/**
-	 * nZEDb Site URL to send to SAB to download the NZB.
+	 * newznab Site URL to send to SAB to download the NZB.
 	 *
 	 * @var string
 	 */
