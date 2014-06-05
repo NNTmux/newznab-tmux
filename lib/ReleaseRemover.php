@@ -730,28 +730,37 @@ class ReleaseRemover
 	}
 
 	/**
-	 * Remove releases that contain .wmv file, aka that spam poster.
-	 * Thanks to dizant from nZEDb forums for the sql query
-	 * @return bool
+	 * Remove releases that contain .wmv files and Codec\Setup.exe files, aka that spam poster.
+	 * Thanks to dizant from nZEDb forums for parts of the sql query
+	 *
+*@return bool
 	 */
-	protected function removeWMV()
+	protected function removeCodecPoster()
 	{
-		$this->method = 'WMV';
-		/** @var $categories TYPE_NAME */
-		$categories = sprintf("r.categoryID IN (%d, %d, %d, %d, %d, %d) AND",
+		$this->method = 'Codec Poster';
+		$regex = sprintf("rf.name %s 'x264.*\.(wmv|avi)$'", $this->regexp);
+		$codec = '%\\Codec%Setup.exe%';
+		$iferror = '%If_you_get_error.txt%';
+		$categories = sprintf("r.categoryID IN (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d) AND",
 			Category::CAT_MOVIE_3D,
 			Category::CAT_MOVIE_BLURAY,
 			Category::CAT_MOVIE_FOREIGN,
 			Category::CAT_MOVIE_HD,
 			Category::CAT_MOVIE_OTHER,
-			Category::CAT_MOVIE_SD
+			Category::CAT_MOVIE_SD,
+			Category::CAT_XXX_WMV,
+			Category::CAT_XXX_X264,
+			Category::CAT_XXX_XVID,
+			Category::CAT_XXX_OTHER
 		);
-		$regex = sprintf("rf.name %s 'x264.*\.wmv$'", $this->regexp);
+		$codeclike = sprintf("UNION SELECT r.ID, r.guid, r.searchname FROM releases r
+			LEFT JOIN releasefiles rf ON r.ID = rf.releaseID
+			WHERE %s rf.name %s '%s' OR rf.name %s '%s'", $categories, $this->like, $codec, $this->like, $iferror
+		);
 		$this->query = sprintf(
-			'SELECT DISTINCT r.ID, r.guid, r.searchname FROM releasefiles
-			rf INNER JOIN releases r ON (rf.releaseID = r.ID)
-			WHERE %s %s %s',
-			$categories, $regex, $this->crapTime
+			"SELECT r.ID, r.guid, r.searchname FROM releases
+			r INNER JOIN releasefiles rf ON (rf.releaseID = r.ID)
+			WHERE %s %s %s %s %s", $categories, $regex, $this->crapTime, $codeclike, $this->crapTime
 		);
 
 		if ($this->checkSelectQuery() === false) {
