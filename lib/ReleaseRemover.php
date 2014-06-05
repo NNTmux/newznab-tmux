@@ -286,8 +286,8 @@ class ReleaseRemover
 			case 'huge':
 				$this->removeHuge();
 				break;
-			case 'wmv':
-				$this->removeWMV();
+			case 'codec':
+				$this->removeCodecPoster();
 				break;
 			case '':
 				$this->removeBlacklist();
@@ -301,7 +301,7 @@ class ReleaseRemover
 				$this->removeShort();
 				$this->removeSize();
 				$this->removeHuge();
-				$this->removeWMV();
+				$this->removeCodecPoster();
 				break;
 			default:
 				$this->error = 'Wrong type: ' .$type;
