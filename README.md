@@ -17,8 +17,6 @@ There is a lib folder in main tmux folder. In that folder you will find two fold
 
 3. You need to create sample folder in you covers folder (aka. /www/covers/sample) so you can have samples taken from releases, mostly XXX, and can be viewed in releases. For video previews you need video folder /www/covers/video/.
 
-4. Disable all the lookups in site settings (nfo, movie, books, anidb, tvrage, thetvdb etc.), they are enabled in tmux, otherwise it will interfere with tmux scripts.
-
 # yEnc:
 
   Note: You have 3 choices,
