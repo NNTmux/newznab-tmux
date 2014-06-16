@@ -183,7 +183,7 @@ class PProcess
 	 */
 	public function processMovies($releaseToWork = '')
 	{
-		if ($this->site->lookupImdb == 1) {
+		if ($this->site->lookupimdb == 1) {
 			$movie = new Film($this->echooutput);
 			$movie->processMovieReleases($releaseToWork);
 		}
@@ -213,7 +213,7 @@ class PProcess
 	public function processNfos($releaseToWork = '', $nntp)
 	{
 		if ($this->site->lookupnfo == 1) {
-			$this->Nfo->processNfoFiles($releaseToWork, $this->site->lookupImdb, $this->site->lookupTvrage, $groupID = '', $nntp);
+			$this->Nfo->processNfoFiles($releaseToWork, $this->site->lookupimdb, $this->site->lookuptvrage, $groupID = '', $nntp);
 		}
 	}
 
@@ -249,7 +249,7 @@ class PProcess
 	 */
 	public function processTv($releaseToWork = '')
 	{
-		if ($this->site->lookupTvrage == 1) {
+		if ($this->site->lookuptvrage == 1) {
 			$tvRage = new TvAnger($this->echooutput);
 			$tvRage->processTvReleases($releaseToWork, true);
 		}
