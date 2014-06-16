@@ -1053,7 +1053,7 @@ Class ProcessAdditional
 
 			if (!empty($this->_AudioInfoMessageIDs)) {
 				// Try to download it from usenet.
-				$audioBinary = $this->_nntp->getMessages($this->_releaseGroupName, $this->_AudioInfoMessageIDs, $this->_alternateNNTP);
+				$audioBinary = $this->_nntp->getMessages($this->_releaseGroupName, $this->_AudioInfoMessageIDs);
 				if ($this->_nntp->isError($audioBinary)) {
 					$audioBinary = false;
 				}
