@@ -27,7 +27,6 @@ require_once("TraktTv.php");
 require_once("Film.php");
 require_once("TvAnger.php");
 require_once("Konsole.php");
-require_once("Enzebe.php");
 require_once("functions.php");
 require_once("ProcessAdditional.php");
 
@@ -58,18 +57,21 @@ class PProcess
 
 	/**
 	 * Object containing site settings.
+	 *
 	 * @var bool|stdClass
 	 */
 	private $site;
 
 	/**
 	 * Add par2 info to rar list?
+	 *
 	 * @var bool
 	 */
 	private $addpar2;
 
 	/**
 	 * Should we echo to CLI?
+	 *
 	 * @var bool
 	 */
 	private $echooutput;
@@ -77,6 +79,7 @@ class PProcess
 
 	/**
 	 * Instance of NameFixer.
+	 *
 	 * @var NameFixer
 	 */
 	protected $nameFixer;
@@ -364,30 +367,31 @@ class PProcess
 						}
 					} else {
 						$filesAdded++;
-				}
+					}
 
-				// Try to get a new name.
-				if ($foundName === false) {
-					$query['textstring'] = $file['name'];
-					if ($this->nameFixer->checkName($query, 1, 'PAR2, ', 1, $show) === true) {
-						$foundName = true;
+					// Try to get a new name.
+					if ($foundName === false) {
+						$query['textstring'] = $file['name'];
+						if ($this->nameFixer->checkName($query, 1, 'PAR2, ', 1, $show) === true) {
+							$foundName = true;
+						}
 					}
 				}
-			}
 				// Update the file count with the new file count + old file count.
-			$this->db->exec(
-				sprintf('
+				$this->db->exec(
+					sprintf('
 						UPDATE releases SET rarinnerfilecount = rarinnerfilecount + %d
 						WHERE ID = %d',
-					$filesAdded,
-					$relID
-				)
-			);
-		}
-		if ($foundName === true) {
-			return true;
+						$filesAdded,
+						$relID
+					)
+				);
+			}
+			if ($foundName === true) {
+				return true;
 			}
 		}
+
 		return false;
 	}
 }

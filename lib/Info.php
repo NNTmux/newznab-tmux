@@ -9,6 +9,7 @@ require_once("ColorCLI.php");
 require_once("Pprocess.php");
 require_once("Film.php");
 require_once("TvAnger.php");
+require_once("functions.php");
 require_once("getid3/getid3/getid3.php");
 
 /**
@@ -100,6 +101,10 @@ class Info
 		$this->nzbs = (!empty($this->tmux->maxnfoprocessed)) ? $this->tmux->maxnfoprocessed : 100;
 		$this->maxsize = (!empty($this->tmux->maxsizetopostprocess)) ? $this->tmux->maxsizetopostprocess : 100;
 		$this->tmpPath = $this->site->tmpunrarpath;
+		if (!preg_match('/[\/\\\\]$/', $this->tmpPath)) {
+			$this->tmpPath .= '/';
+		}
+		$this->functions = new Functions();
 	}
 
 	/**
@@ -147,8 +152,8 @@ class Info
 			file_put_contents($tmpPath, $possibleNFO);
 
 			// Linux boxes have 'file' (so should Macs)
-			if (strtolower(substr(PHP_OS, 0, 3)) !== 'win') {
-				exec("file -b $tmpPath", $result);
+			if ($this->functions->hasCommand('file')) {
+				exec('file -b "' . $tmpPath . '"', $result);
 				if (is_array($result)) {
 					if (count($result) > 1) {
 						$result = implode(',', $result[0]);
