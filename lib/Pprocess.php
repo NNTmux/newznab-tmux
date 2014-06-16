@@ -213,7 +213,7 @@ class PProcess
 	public function processNfos($releaseToWork = '', $nntp)
 	{
 		if ($this->site->lookupnfo == 1) {
-			$this->Nfo->processNfoFiles($releaseToWork, $this->site->lookupimdb, $this->site->lookuptvrage, $groupID = '', $nntp);
+			$this->Nfo->processNfoFiles($releaseToWork, $this->site->lookupImdb, $this->site->lookupTvrage, $groupID = '', $nntp);
 		}
 	}
 
