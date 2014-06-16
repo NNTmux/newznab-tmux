@@ -120,7 +120,7 @@ Class ProcessAdditional
 		}
 		$this->_archiveInfo->setExternalClients($clients);
 
-		$this->_hasGNUFile = $this->_functions->hasCommand('file') === true ? true : false);
+		$this->_hasGNUFile = $this->_functions->hasCommand(('file') === true ? true : false);
 
 		// Maximum amount of releases to fetch per run.
 		$this->_queryLimit =
