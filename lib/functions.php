@@ -1751,9 +1751,9 @@ class Functions
 	 * Operates directly on the text string, but also returns the result for situations requiring a
 	 * return value (use in ternary, etc.)/
 	 *
-	 * @param $text		String variable to strip.
+	 * @param $text        String variable to strip.
 	 *
-	 * @return string	The stripped variable.
+	 * @return string    The stripped variable.
 	 */
 	static public function stripNonPrintingChars(&$text)
 	{
@@ -1764,6 +1764,7 @@ class Functions
 			"\x18", "\x19", "\x1A", "\x1B", "\x1C", "\x1D", "\x1E", "\x1F",
 		];
 		$text = str_replace($lowChars, '', $text);
+
 		return $text;
 	}
 
@@ -1781,7 +1782,8 @@ class Functions
 			return '0B';
 		}
 
-		$unit = array('B','KB','MB','GB','TB','PB','EB');
+		$unit = array('B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB');
+
 		return round($bytes / pow(1024, ($i = floor(log($bytes, 1024)))), $precision) . $unit[(int)$i];
 	}
 
@@ -1837,42 +1839,6 @@ class Functions
 		} else {
 			return null;
 		}
-	}
-
-	/**
-	 * Removes the preceeding or proceeding portion of a string
-	 * relative to the last occurrence of the specified character.
-	 * The character selected may be retained or discarded.
-	 *
-	 * @param string $character      the character to search for.
-	 * @param string $string         the string to search through.
-	 * @param string $side           determines whether text to the left or the right of the character is returned.
-	 *                               Options are: left, or right.
-	 * @param bool   $keep_character determines whether or not to keep the character.
-	 *                               Options are: true, or false.
-	 *
-	 * @return string
-	 */
-	static public function cutStringUsingLast($character, $string, $side, $keep_character = true)
-	{
-		$offset = ($keep_character ? 1 : 0);
-		$whole_length = strlen($string);
-		$right_length = (strlen(strrchr($string, $character)) - 1);
-		$left_length = ($whole_length - $right_length - 1);
-		switch ($side) {
-			case 'left':
-				$piece = substr($string, 0, ($left_length + $offset));
-				break;
-			case 'right':
-				$start = (0 - ($right_length + $offset));
-				$piece = substr($string, $start);
-				break;
-			default:
-				$piece = false;
-				break;
-		}
-
-		return ($piece);
 	}
 	//end of testing
 }
