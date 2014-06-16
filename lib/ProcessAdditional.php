@@ -1152,7 +1152,7 @@ Class ProcessAdditional
 				SELECT COUNT(releasefiles.releaseID) AS count,
 				SUM(releasefiles.size) AS size
 				FROM releasefiles
-				WHERE releaseid = %d',
+				WHERE releaseID = %d',
 				$this->_release['ID']
 			)
 		);
