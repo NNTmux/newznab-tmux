@@ -109,6 +109,7 @@ Class ProcessAdditional
 		$this->_par2Info = new Par2Info();
 		$this->_nfo = new Info($this->_echoCLI);
 		$this->_functions = new Functions();
+		$this->c = new ColorCLI();
 
 		// Pass the binary extractors to ArchiveInfo.
 		$clients = array();
@@ -658,14 +659,14 @@ Class ProcessAdditional
 	{
 		// Give the data to archive info so it can check if it's a rar.
 		if ($this->_archiveInfo->setData($compressedData, true) === false) {
-			$this->_debug('Data is probably not RAR or ZIP.' . PHP_EOL);
+			$this->c->debug('Data is probably not RAR or ZIP.' . PHP_EOL);
 
 			return false;
 		}
 
 		// Check if there's an error.
 		if ($this->_archiveInfo->error !== '') {
-			$this->_debug('ArchiveInfo Error: ' . $this->_archiveInfo->error);
+			$this->c->debug('ArchiveInfo Error: ' . $this->_archiveInfo->error);
 
 			return false;
 		}
@@ -675,7 +676,7 @@ Class ProcessAdditional
 
 		// Check if the compressed file is encrypted.
 		if (!empty($this->_archiveInfo->isEncrypted) || (isset($dataSummary['is_encrypted']) && $dataSummary['is_encrypted'] != 0)) {
-			$this->_debug('ArchiveInfo: Compressed file has a password.');
+			$this->c->debug('ArchiveInfo: Compressed file has a password.');
 			$this->_releaseHasPassword = true;
 
 			return false;
@@ -726,7 +727,7 @@ Class ProcessAdditional
 				}
 
 				if (isset($file['error'])) {
-					$this->_debug("Error: {$file['error']} (in: {$file['source']})");
+					$this->c->debug("Error: {$file['error']} (in: {$file['source']})");
 					continue;
 				}
 
@@ -797,7 +798,7 @@ Class ProcessAdditional
 					if (preg_match('/alt\.binaries\.movies($|\.divx$)/', $this->_releaseGroupName) &&
 						preg_match('/[\/\\\\]Codec[\/\\\\]Setup\.exe/i', $file['name'])
 					) {
-						$this->_debug('Codec spam found, setting release to potentially passworded.' . PHP_EOL);
+						$this->c->debug('Codec spam found, setting release to potentially passworded.' . PHP_EOL);
 						$this->_passwordStatus = array(Releases::PASSWD_POTENTIAL);
 					} //Run a PreDB filename check on insert to try and match the release
 					else if (strpos($file['name'], '.') !== false) {
@@ -1217,7 +1218,7 @@ Class ProcessAdditional
 				);
 			}
 		} catch (exception $e) {
-			$this->_debug('ERROR: Could not open temp dir: ' . $e->getMessage() . PHP_EOL);
+			$this->c->debug('ERROR: Could not open temp dir: ' . $e->getMessage() . PHP_EOL);
 
 			return false;
 		}
@@ -1318,8 +1319,8 @@ Class ProcessAdditional
 									)
 								);
 
-								$this->_debug(
-									'getAudioInfo: ' .
+								$this->c->debug(
+								'getAudioInfo: ' .
 									'New name:(' . $newName .
 									') Old name:(' . $rQuery['searchname'] .
 									') New cat:(' . $newCat .
