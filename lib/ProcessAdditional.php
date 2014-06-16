@@ -150,7 +150,7 @@ Class ProcessAdditional
 		$this->_processSample = empty($this->_siteSettings->ffmpegpath) ? false : true;
 		$this->_processVideo = ($this->_tmuxSettings->processvideos == 0) ? false : true;
 		$this->_processJPGSample = ($this->_tmuxSettings->processjpg == 0) ? false : true;
-		$this->_processAudioSample = ($this->_siteSettings->processaudiosample == 0) ? false : true;
+		$this->_processAudioSample = ($this->_siteSettings->processaudio == 0) ? false : true;
 		$this->_processMediaInfo = empty($this->_siteSettings->mediainfopath) ? false : true;
 		$this->_processAudioInfo = $this->_processMediaInfo;
 		$this->_processPasswords = (
