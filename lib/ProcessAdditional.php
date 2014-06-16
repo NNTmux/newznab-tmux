@@ -110,6 +110,8 @@ Class ProcessAdditional
 		$this->_nfo = new Info($this->_echoCLI);
 		$this->_functions = new Functions();
 		$this->c = new ColorCLI();
+		$this->jpgSavePath = WWW_DIR . 'covers/sample/';
+		$this->vidSavePath = WWW_DIR . 'covers/video/';
 
 		// Pass the binary extractors to ArchiveInfo.
 		$clients = array();
@@ -1098,7 +1100,7 @@ Class ProcessAdditional
 				// Try to resize and move it.
 				$this->_foundJPGSample =
 					$this->_releaseImage->saveImage(
-						$this->_release['guid'] . '_thumb', $this->tmpPath . 'samplepicture.jpg', $this->_tmuxSettings->jpgSavePath, 650, 650
+						$this->_release['guid'] . '_thumb', $this->tmpPath . 'samplepicture.jpg', $this->jpgSavePath, 650, 650
 					);
 
 				if ($this->_foundJPGSample !== false) {
@@ -1138,11 +1140,11 @@ Class ProcessAdditional
 			$iSQL = ', haspreview = 1';
 		}
 
-		if (is_file($this->_tmuxSettings->vidSavePath . $this->_release['guid'] . '.ogv')) {
+		if (is_file($this->vidSavePath . $this->_release['guid'] . '.ogv')) {
 			$vSQL = ', videostatus = 1';
 		}
 
-		if (is_file($this->_tmuxSettings->jpgSavePath . $this->_release['guid'] . '_thumb.jpg')) {
+		if (is_file($this->jpgSavePath . $this->_release['guid'] . '_thumb.jpg')) {
 			$jSQL = ', jpgstatus = 1';
 		}
 
@@ -1433,7 +1435,7 @@ Class ProcessAdditional
 		$this->_foundJPGSample =
 			$this->_releaseImage->saveImage(
 				$this->_release['guid'] . '_thumb',
-				$fileLocation, $this->_tmuxSettings->jpgSavePath, 650, 650
+				$fileLocation, $this->jpgSavePath, 650, 650
 			);
 
 		// If it's successful, tell the DB.
@@ -1650,7 +1652,7 @@ Class ProcessAdditional
 				if ($file === $fileName) {
 
 					// Create a path to where the file should be moved.
-					$newFile = $this->_tmuxSettings->vidSavePath . $this->_release['guid'] . '.ogv';
+					$newFile = $this->vidSavePath . $this->_release['guid'] . '.ogv';
 
 					// Try to move the file to the new path.
 					$renamed = @rename($this->tmpPath . $fileName, $newFile);
