@@ -358,14 +358,12 @@ class PProcess
 							)
 						) === false
 					) {
-
 						// Try to add the files to the DB.
 						if ($this->releaseFiles->add($relID, $file['name'], $file['size'], $query['post_date'], 0)) {
 							$filesAdded++;
 						}
-					}
-				} else {
-					$filesAdded++;
+					} else {
+						$filesAdded++;
 				}
 
 				// Try to get a new name.
