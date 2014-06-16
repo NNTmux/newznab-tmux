@@ -29,7 +29,7 @@ if (isset($pieces[6])) {
 		exit($c->error("Unable to connect to usenet."));
 	}
 
-	$postprocess->processAdditional($argv[1], $nntp);
+	$postprocess->processAdditional($nntp, $argv[1]);
 	$nntp->doQuit();
 } else if (isset($pieces[3])) {
 	// Create the connection here and pass
