@@ -27,8 +27,8 @@ require_once("TraktTv.php");
 require_once("Film.php");
 require_once("TvAnger.php");
 require_once("Konsole.php");
-require_once("Enzebe.php");
 require_once("functions.php");
+require_once("Enzebe.php");
 
 
 /**
