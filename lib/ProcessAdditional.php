@@ -16,6 +16,7 @@ require_once(WWW_DIR . "/lib/amazon.php");
 require_once(WWW_DIR . "/lib/genres.php");
 require_once(WWW_DIR . "/lib/anidb.php");
 require_once(WWW_DIR . "/lib/book.php");
+require_once(WWW_DIR . "/lib/nzb.php");
 require_once("consoletools.php");
 require_once("ColorCLI.php");
 require_once("nzbcontents.php");
@@ -28,8 +29,6 @@ require_once("Film.php");
 require_once("TvAnger.php");
 require_once("Konsole.php");
 require_once("functions.php");
-require_once("Enzebe.php");
-
 
 /**
  * Class ProcessAdditional
@@ -98,7 +97,7 @@ Class ProcessAdditional
 		$this->_siteSettings = $siteSettings;
 		$this->_tmuxSettings = $tmuxSettings;
 
-		$this->_nzb = new Enzebe($this->_echoCLI);
+		$this->_nzb = new Nzb($this->_echoCLI);
 		$this->_groups = new Groups($this->_db);
 		$this->_archiveInfo = new ArchiveInfo();
 		$this->_releaseFiles = new ReleaseFiles();
@@ -419,7 +418,7 @@ Class ProcessAdditional
 	 */
 	protected function _getNZBContents()
 	{
-		$nzbPath = $this->_nzb->NZBPath($this->_release['guid']);
+		$nzbPath = $this->_nzb->getNZBPath($this->_release['guid']);
 		if ($nzbPath === false) {
 
 			$this->_echo('NZB not found for GUID: ' . $this->_release['guid']);
