@@ -108,10 +108,11 @@ class Info
 	}
 
 	/**
-	 * Look for a TvRage ID in a string.
+	 * Look for a TvRage id in a string.
 	 *
-	 * @param string  $str   The string with a TvRage ID.
-	 * @return string The TVRage ID on success.
+	 * @param string $str The string with a TvRage id.
+	 *
+	 * @return string The TVRage id on success.
 	 * @return bool   False on failure.
 	 *
 	 * @access public
@@ -143,7 +144,7 @@ class Info
 		if ($size < 65535 &&
 			$size > 11 &&
 			!preg_match(
-				'/\A(\s*<\?xml|=newz\[NZB\]=|RIFF|\s*[RP]AR|.{0,10}(JFIF|matroska|ftyp|ID3))|;\s*Generated\s*by.*SF\w/i'
+				'/\A(\s*<\?xml|=newz\[NZB\]=|RIFF|\s*[RP]AR|.{0,10}(JFIF|matroska|ftyp|id3))|;\s*Generated\s*by.*SF\w/i'
 				, $possibleNFO
 			)
 		) {
@@ -212,20 +213,20 @@ class Info
 	 */
 	public function addAlternateNfo(&$nfo, $release, $nntp)
 	{
-		if ($release['ID'] > 0 && $this->isNFO($nfo, $release['guid'])) {
+		if ($release['id'] > 0 && $this->isNFO($nfo, $release['guid'])) {
 
-			$check = $this->db->queryOneRow(sprintf('SELECT ID FROM releasenfo WHERE releaseID = %d', $release['ID']));
+			$check = $this->db->queryOneRow(sprintf('SELECT id FROM releasenfo WHERE releaseid = %d', $release['id']));
 
 			if ($check === false) {
 				$this->db->queryInsert(
-					sprintf('INSERT INTO releasenfo (nfo, releaseID) VALUES (compress(%s), %d)',
+					sprintf('INSERT INTO releasenfo (nfo, releaseid) VALUES (compress(%s), %d)',
 						$this->db->escapeString($nfo),
-						$release['ID']
+						$release['id']
 					)
 				);
 			}
 
-			$this->db->exec(sprintf('UPDATE releases SET releasenfoID = 1, nfostatus = %d WHERE ID = %d', self::NFO_FOUND, $release['ID']));
+			$this->db->exec(sprintf('UPDATE releases SET releasenfoid = 1, nfostatus = %d WHERE id = %d', self::NFO_FOUND, $release['id']));
 
 			if (!isset($release['completion'])) {
 				$release['completion'] = 0;
@@ -241,7 +242,7 @@ class Info
 						'pp'   => new PProcess(true)
 					)
 				);
-				$nzbContents->parseNZB($release['guid'], $release['ID'], $release['groupID']);
+				$nzbContents->parseNZB($release['guid'], $release['id'], $release['groupid']);
 			}
 			return true;
 		}
@@ -254,19 +255,20 @@ class Info
 	 * @param string $releaseToWork
 	 * @param int $processImdb       Attempt to find IMDB id's in the NZB?
 	 * @param int $processTvrage     Attempt to find TvRage id's in the NZB?
-	 * @param string $groupID        (optional) The group ID to work on.
+	 * @param string $groupid        (optional) The group id to work on.
 	 * @param object $nntp           Instance of class NNTP.
 	 *
 	 * @return int                   How many NFO's were processed?
 	 *
 	 */
-	public function processNfoFiles($releaseToWork = '', $processImdb = 1, $processTvrage = 1, $groupID = '', $nntp) {
+	public function processNfoFiles($releaseToWork = '', $processImdb = 1, $processTvrage = 1, $groupid = '', $nntp)
+	{
 		if (!isset($nntp)) {
 			exit($this->c->error("Unable to connect to usenet.\n"));
 		}
 
 		$nfoCount = $ret = 0;
-		$groupID = ($groupID === '' ? '' : 'AND groupID = ' . $groupID);
+		$groupid = ($groupid === '' ? '' : 'AND groupid = ' . $groupid);
 		$res = array();
 
 		if ($releaseToWork === '') {
@@ -274,7 +276,7 @@ class Info
 			while (($nfoCount != $this->nzbs) && ($i >= -6)) {
 				$res += $this->db->query(
 					sprintf('
-						SELECT ID, guid, groupID, name
+						SELECT id, guid, groupid, name
 						FROM releases
 						WHERE nfostatus BETWEEN %d AND %d
 						AND size < %s
@@ -283,7 +285,7 @@ class Info
 						$i,
 						self::NFO_UNPROC,
 						$this->maxsize * 1073741824,
-						$groupID,
+						$groupid,
 						$this->nzbs
 					)
 				);
@@ -292,7 +294,7 @@ class Info
 			}
 		} else {
 			$pieces = explode('           =+=            ', $releaseToWork);
-			$res = array(array('ID' => $pieces[0], 'guid' => $pieces[1], 'groupID' => $pieces[2], 'name' => $pieces[3]));
+			$res = array(array('id' => $pieces[0], 'guid' => $pieces[1], 'groupid' => $pieces[2], 'name' => $pieces[3]));
 			$nfoCount = 1;
 		}
 
@@ -321,7 +323,7 @@ class Info
 			$tvRage = new TvAnger($this->echo);
 
 			foreach ($res as $arr) {
-				$fetchedBinary = $nzbContents->getNFOfromNZB($arr['guid'], $arr['ID'], $arr['groupID'], $functions->getByNameByID($arr['groupID']));
+				$fetchedBinary = $nzbContents->getNFOfromNZB($arr['guid'], $arr['id'], $arr['groupid'], $functions->getByNameByid($arr['groupid']));
 				if ($fetchedBinary !== false) {
 					// Insert nfo into database.
 					$cp = $nc = null;
@@ -332,13 +334,13 @@ class Info
 						$cp = '%s';
 						$nc = $this->db->escapeString(utf8_encode($fetchedBinary));
 					}
-					$ckreleaseid = $this->db->queryOneRow(sprintf('SELECT ID FROM releasenfo WHERE releaseID = %d', $arr['ID']));
-					if (!isset($ckreleaseid['ID'])) {
-						$this->db->queryInsert(sprintf('INSERT INTO releasenfo (nfo, releaseID) VALUES (' . $cp . ', %d)', $nc, $arr['ID']));
+					$ckreleaseid = $this->db->queryOneRow(sprintf('SELECT id FROM releasenfo WHERE releaseid = %d', $arr['id']));
+					if (!isset($ckreleaseid['id'])) {
+						$this->db->queryInsert(sprintf('INSERT INTO releasenfo (nfo, releaseid) VALUES (' . $cp . ', %d)', $nc, $arr['id']));
 					}
-					$this->db->exec(sprintf('UPDATE releases SET releasenfoID = 1, nfostatus = %d WHERE ID = %d', self::NFO_FOUND, $arr['ID']));
+					$this->db->exec(sprintf('UPDATE releases SET releasenfoid = 1, nfostatus = %d WHERE id = %d', self::NFO_FOUND, $arr['id']));
 					$ret++;
-					$movie->doMovieUpdate($fetchedBinary, 'nfo', $arr['ID'], $processImdb);
+					$movie->doMovieUpdate($fetchedBinary, 'nfo', $arr['id'], $processImdb);
 
 					// If set scan for tvrage info.
 					if ($processTvrage == 1) {
@@ -347,12 +349,12 @@ class Info
 							$show = $tvRage->parseNameEpSeason($arr['name']);
 							if (is_array($show) && $show['name'] != '') {
 								// Update release with season, ep, and air date info (if available) from release title.
-								$tvRage->updateEpInfo($show, $arr['ID']);
+								$tvRage->updateEpInfo($show, $arr['id']);
 
-								$rid = $tvRage->getByRageID($rageId);
+								$rid = $tvRage->getByRageid($rageId);
 								if (!$rid) {
 									$tvrShow = $tvRage->getRageInfoFromService($rageId);
-									$tvRage->updateRageInfo($rageId, $show, $tvrShow, $arr['ID']);
+									$tvRage->updateRageInfo($rageId, $show, $tvrShow, $arr['id']);
 								}
 							}
 						}
@@ -363,9 +365,9 @@ class Info
 
 		// Remove nfo that we cant fetch after 5 attempts.
 		if ($releaseToWork === '') {
-			$relres = $this->db->query('SELECT ID FROM releases WHERE nfostatus < -6 AND releasenfoID = -1');
+			$relres = $this->db->query('SELECT id FROM releases WHERE nfostatus < -6 AND releasenfoid = -1');
 			foreach ($relres as $relrow) {
-				$this->db->exec(sprintf('DELETE FROM releasenfo WHERE nfo IS NULL AND releaseID = %d', $relrow['ID']));
+				$this->db->exec(sprintf('DELETE FROM releasenfo WHERE nfo IS NULL AND releaseid = %d', $relrow['id']));
 			}
 
 			if ($this->echo) {
