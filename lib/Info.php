@@ -218,7 +218,7 @@ class Info
 
 			if ($check === false) {
 				$this->db->queryInsert(
-					sprintf('INSERT INTO releasenfo (nfo, releaseid) VALUES (compress(%s), %d)',
+					sprintf('INSERT INTO releasenfo (nfo, releaseID) VALUES (compress(%s), %d)',
 						$this->db->escapeString($nfo),
 						$release['ID']
 					)
