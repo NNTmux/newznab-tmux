@@ -98,6 +98,11 @@ class ReleaseRemover
 	/**
 	 * @var string
 	 */
+	protected $crapTimeOrder = '';
+
+	/**
+	 * @var string
+	 */
 	protected $method = '';
 
 	/**
@@ -226,6 +231,7 @@ class ReleaseRemover
 
 		$time = trim($time);
 		$this->crapTime = '';
+		$this->crapTimeOrder = '';
 		switch ($time) {
 			case 'full':
 				if ($this->echoCLI) {
@@ -242,8 +248,9 @@ class ReleaseRemover
 				}
 				$this->crapTime =
 					' AND r.adddate > (NOW() - INTERVAL ' .
-					($this->mysql ? $time . ' HOUR)' : $this->db->escapeString($time . ' HOURS')) .
-					' ORDER BY r.ID ASC';
+					($this->mysql ? $time . ' HOUR)' : $this->db->escapeString($time . ' HOURS'));
+
+				$this->crapTimeOrder = ' ORDER BY r.ID ASC';
 				break;
 		}
 
@@ -341,8 +348,8 @@ class ReleaseRemover
 			AND r.nfostatus = 0
 			AND r.iscategorized = 1
 			AND r.rarinnerfilecount = 0
-			AND r.categoryID NOT IN (%d) %s",
-			$regex, Category::CAT_MISC_OTHER, $this->crapTime
+			AND r.categoryID NOT IN (%d) %s %s",
+			$regex, Category::CAT_MISC_OTHER, $this->crapTime, $this->crapTimeOrder
 		);
 
 		if ($this->checkSelectQuery() === false) {
@@ -367,8 +374,8 @@ class ReleaseRemover
 			AND r.nfostatus = 0
 			AND r.iscategorized = 1
 			AND r.rarinnerfilecount = 0
-			AND r.categoryID NOT IN (%d) %s",
-			$regex, Category::CAT_MISC_OTHER, $this->crapTime
+			AND r.categoryID NOT IN (%d) %s %s",
+			$regex, Category::CAT_MISC_OTHER, $this->crapTime, $this->crapTimeOrder
 		);
 
 		if ($this->checkSelectQuery() === false) {
@@ -393,8 +400,8 @@ class ReleaseRemover
 			AND r.nfostatus = 0
 			AND r.iscategorized = 1
 			AND r.rarinnerfilecount = 0
-			AND r.categoryID NOT IN (%d) %s",
-			$regex, Category::CAT_MISC_OTHER, $this->crapTime
+			AND r.categoryID NOT IN (%d) %s %s",
+			$regex, Category::CAT_MISC_OTHER, $this->crapTime, $this->crapTimeOrder
 		);
 
 		if ($this->checkSelectQuery() === false) {
@@ -417,7 +424,7 @@ class ReleaseRemover
 			INNER JOIN releasefiles rf ON rf.releaseID = r.ID
 			WHERE r.searchname NOT %s %s
 			AND rf.name %s %s
-			AND r.categoryID NOT IN (%d, %d, %d, %d) %s",
+			AND r.categoryID NOT IN (%d, %d, %d, %d) %s %s",
 			$this->like,
 			"'%.exes%'",
 			$this->like,
@@ -426,7 +433,8 @@ class ReleaseRemover
 			Category::CAT_PC_GAMES,
 			Category::CAT_PC_ISO,
 			Category::CAT_MISC_OTHER,
-			$this->crapTime
+			$this->crapTime,
+			$this->crapTimeOrder
 		);
 
 		if ($this->checkSelectQuery() === false) {
@@ -447,10 +455,11 @@ class ReleaseRemover
 			"SELECT r.ID, r.guid, r.searchname
 			FROM releases r
 			INNER JOIN releasefiles rf ON rf.releaseID = r.ID
-			WHERE rf.name %s %s %s",
+			WHERE rf.name %s %s %s %s",
 			$this->like,
 			"'%install.bin%'",
-			$this->crapTime
+			$this->crapTime,
+			$this->crapTimeOrder
 		);
 
 		if ($this->checkSelectQuery() === false) {
@@ -471,10 +480,11 @@ class ReleaseRemover
 			"SELECT r.ID, r.guid, r.searchname
 			FROM releases r
 			INNER JOIN releasefiles rf ON rf.releaseID = r.ID
-			WHERE rf.name %s %s %s",
+			WHERE rf.name %s %s %s %s",
 			$this->like,
 			"'%password.url%'",
-			$this->crapTime
+			$this->crapTime,
+			$this->crapTimeOrder
 		);
 
 		if ($this->checkSelectQuery() === false) {
@@ -501,7 +511,7 @@ class ReleaseRemover
 			AND r.searchname NOT %s %s
 			AND r.searchname NOT %s %s
 			AND r.searchname NOT %s %s
-			AND r.categoryID NOT IN (%d, %d, %d, %d, %d, %d, %d, %d) %s",
+			AND r.categoryID NOT IN (%d, %d, %d, %d, %d, %d, %d, %d) %s %s",
 			$this->like,
 			// Matches passwort / passworded / etc also.
 			"'%passwor%'",
@@ -525,7 +535,8 @@ class ReleaseRemover
 			Category::CAT_PC_MOBILEIOS,
 			Category::CAT_PC_MOBILEOTHER,
 			Category::CAT_MISC_OTHER,
-			$this->crapTime
+			$this->crapTime,
+			$this->crapTimeOrder
 		);
 
 		if ($this->checkSelectQuery() === false) {
@@ -547,13 +558,14 @@ class ReleaseRemover
 			FROM releases r
 			WHERE r.totalpart = 1
 			AND r.size < 2097152
-			AND r.categoryID NOT IN (%d, %d, %d, %d, %d) %s",
+			AND r.categoryID NOT IN (%d, %d, %d, %d, %d) %s %s",
 			Category::CAT_MUSIC_MP3,
 			Category::CAT_BOOK_COMICS,
 			Category::CAT_BOOK_EBOOK,
 			Category::CAT_BOOK_MAGS,
 			Category::CAT_MISC_OTHER,
-			$this->crapTime
+			$this->crapTime,
+			$this->crapTimeOrder
 		);
 
 		if ($this->checkSelectQuery() === false) {
@@ -576,7 +588,8 @@ class ReleaseRemover
 			FROM releases r
 			WHERE r.totalpart = 1
 			AND r.size > 209715200 %s",
-			$this->crapTime
+			$this->crapTime,
+			$this->crapTimeOrder
 		);
 
 		if ($this->checkSelectQuery() === false) {
@@ -599,7 +612,7 @@ class ReleaseRemover
 			WHERE r.totalpart > 1
 			AND r.size < 40000000
 			AND r.name %s %s
-			AND r.categoryID IN (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) %s",
+			AND r.categoryID IN (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) %s %s",
 			$this->like,
 			"'%sample%'",
 			Category::CAT_TV_ANIME,
@@ -615,7 +628,8 @@ class ReleaseRemover
 			Category::CAT_MOVIE_HD,
 			Category::CAT_MOVIE_OTHER,
 			Category::CAT_MOVIE_SD,
-			$this->crapTime
+			$this->crapTime,
+			$this->crapTimeOrder
 		);
 
 		if ($this->checkSelectQuery() === false) {
@@ -638,8 +652,8 @@ class ReleaseRemover
 			"SELECT r.ID, r.guid, r.searchname
 			FROM releases r
 			LEFT JOIN releasefiles rf on rf.releaseID = r.ID
-			WHERE %s %s",
-			$regex, $this->crapTime
+			WHERE %s %s %s",
+			$regex, $this->crapTime, $this->crapTimeOrder
 		);
 
 		if ($this->checkSelectQuery() === false) {
@@ -717,7 +731,7 @@ class ReleaseRemover
 				$this->method = 'Blacklist ' . $regex['ID'];
 				$this->query = sprintf(
 					"SELECT r.ID, r.guid, r.searchname
-					FROM releases r %s %s %s", $regexsql, $groupID, $this->crapTime
+					FROM releases r %s %s %s %s", $regexsql, $groupID, $this->crapTime, $this->crapTimeOrder
 				);
 
 				if ($this->checkSelectQuery() === false) {
@@ -733,7 +747,7 @@ class ReleaseRemover
 	 * Remove releases that contain .wmv files and Codec\Setup.exe files, aka that spam poster.
 	 * Thanks to dizant from nZEDb forums for parts of the sql query
 	 *
-*@return bool
+	 * @return bool
 	 */
 	protected function removeCodecPoster()
 	{
@@ -760,7 +774,7 @@ class ReleaseRemover
 		$this->query = sprintf(
 			"SELECT r.ID, r.guid, r.searchname FROM releases
 			r INNER JOIN releasefiles rf ON (rf.releaseID = r.ID)
-			WHERE %s %s %s %s %s", $categories, $regex, $this->crapTime, $codeclike, $this->crapTime
+			WHERE %s %s %s %s %s %s", $categories, $regex, $this->crapTime, $codeclike, $this->crapTime, " ORDER BY 1 ASC"
 		);
 
 		if ($this->checkSelectQuery() === false) {
