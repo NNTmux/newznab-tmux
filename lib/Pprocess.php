@@ -104,7 +104,7 @@ class PProcess
 		$this->nameFixer = new NameFixer($this->echooutput);
 		$this->Nfo = new Info($this->echooutput);
 		$this->releaseFiles = new ReleaseFiles();
-		$this->functions = new Functions();
+		$this->functions = new Functions(true);
 
 		//\\ Site object.
 		$this->tmux = $t->get();
@@ -125,7 +125,7 @@ class PProcess
 	 */
 	public function processAll($nntp)
 	{
-		$this->processPredb($nntp);
+		$this->processPrehash($nntp);
 		$this->processAdditional($nntp);
 		$this->processNfos('', $nntp);
 		$this->processSharing($nntp);
@@ -144,7 +144,7 @@ class PProcess
 	 */
 	public function processAnime()
 	{
-		if ($this->site->lookupanidb == 1) {
+		if ($this->site->lookupanidb === '1') {
 			$anidb = new AniDB($this->echooutput);
 			$anidb->animetitlesUpdate();
 			$anidb->processAnimeReleases();
@@ -158,7 +158,7 @@ class PProcess
 	 */
 	public function processBooks()
 	{
-		if ($this->site->lookupbooks != 0) {
+		if ($this->site->lookupbooks !== '0') {
 			$books = new Books($this->echooutput);
 			$books->processBookReleases();
 		}
@@ -171,7 +171,7 @@ class PProcess
 	 */
 	public function processGames()
 	{
-		if ($this->site->lookupgames != 0) {
+		if ($this->site->lookupgames !== '0') {
 			$console = new Konsole($this->echooutput);
 			$console->processConsoleReleases();
 		}
@@ -186,7 +186,7 @@ class PProcess
 	 */
 	public function processMovies($releaseToWork = '')
 	{
-		if ($this->site->lookupimdb == 1) {
+		if ($this->site->lookupimdb === '1') {
 			$movie = new Film($this->echooutput);
 			$movie->processMovieReleases($releaseToWork);
 		}
@@ -199,7 +199,7 @@ class PProcess
 	 */
 	public function processMusic()
 	{
-		if ($this->site->lookupmusic != 0) {
+		if ($this->site->lookupmusic !== '0') {
 			$music = new Music($this->echooutput);
 			$music->processMusicReleases();
 		}
@@ -215,7 +215,7 @@ class PProcess
 	 */
 	public function processNfos($releaseToWork = '', $nntp)
 	{
-		if ($this->site->lookupnfo == 1) {
+		if ($this->site->lookupnfo === '1') {
 			$this->Nfo->processNfoFiles($releaseToWork, $this->site->lookupimdb, $this->site->lookuptvrage, $groupID = '', $nntp);
 		}
 	}
@@ -227,7 +227,7 @@ class PProcess
 	 *
 	 * @return void
 	 */
-	public function processPredb($nntp)
+	public function processPrehash($nntp)
 	{
 		// 2014-05-31 : Web PreDB fetching is removed. Using IRC is now recommended.
 	}
@@ -252,7 +252,7 @@ class PProcess
 	 */
 	public function processTv($releaseToWork = '')
 	{
-		if ($this->site->lookuptvrage == 1) {
+		if ($this->site->lookuptvrage === '1') {
 			$tvRage = new TvAnger($this->echooutput);
 			$tvRage->processTvReleases($releaseToWork, true);
 		}
