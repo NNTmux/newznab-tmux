@@ -805,7 +805,7 @@ Class ProcessAdditional
 					} //Run a PreDB filename check on insert to try and match the release
 					else if (strpos($file['name'], '.') !== false) {
 						$this->_release['filename'] = $this->_functions->cutStringUsingLast('.', $file['name'], 'left', false);
-						$this->_release['releaseid'] = $this->_release['ID'];
+						$this->_release['releaseID'] = $this->_release['ID'];
 						$this->_nameFixer->matchPredbFiles($this->_release, 1, 1, true, 1, 'full');
 					}
 				}
