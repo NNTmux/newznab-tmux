@@ -893,7 +893,7 @@ Class ProcessAdditional
 					} // Check if it's alt.binaries.u4e file.
 					else if (in_array($this->_releaseGroupName, array('alt.binaries.u4e', 'alt.binaries.mom')) &&
 						preg_match('/Linux_2rename\.sh/i', $file) &&
-						$this->_release['categoryid'] == Category::CAT_MISC_OTHER
+						$this->_release['categoryID'] == Category::CAT_MISC_OTHER
 					) {
 						$this->_processU4ETitle($file);
 					} // If we have GNU file, check the type of file and process it.
@@ -2129,7 +2129,7 @@ Class ProcessAdditional
 		$this->_NZBHasCompressedFile = false;
 
 		$this->_sampleMessageIDs = $this->_JPGMessageIDs = $this->_MediaInfoMessageIDs = array();
-		$this->_AudioInfoMessageIDs = $this->_RARFileMessageIDs = array();
+		$this->_AudioInfoMessageIDs = $this->_RARFileMessageIDu4es = array();
 		$this->_AudioInfoExtension = '';
 
 		$this->_addedFileInfo = 0;
