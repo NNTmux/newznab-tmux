@@ -216,7 +216,7 @@ class PProcess
 	public function processNfos($releaseToWork = '', $nntp)
 	{
 		if ($this->site->lookupnfo === '1') {
-			$this->Nfo->processNfoFiles($releaseToWork, $this->site->lookupimdb, $this->site->lookuptvrage, $groupid = '', $nntp);
+			$this->Nfo->processNfoFiles($releaseToWork, $this->site->lookupimdb, $this->site->lookuptvrage, $groupID = '', $nntp);
 		}
 	}
 
@@ -265,14 +265,14 @@ class PProcess
 	 *
 	 * @param NNTP   $nntp          Class NNTP
 	 * @param string $releaseToWork String containing SQL results. Optional.
-	 * @param string $groupid Group id. Optional
+	 * @param string $groupID       Group ID. Optional
 	 *
 	 * @return void
 	 */
-	public function processAdditional($nntp, $releaseToWork = '', $groupid = '')
+	public function processAdditional($nntp, $releaseToWork = '', $groupID = '')
 	{
 		$processAdditional = new ProcessAdditional($this->echooutput, $nntp, $this->db, $this->site, $this->tmux);
-		$processAdditional->start($releaseToWork, $groupid);
+		$processAdditional->start($releaseToWork, $groupID);
 	}
 
 	/**
@@ -280,25 +280,25 @@ class PProcess
 	 *
 	 * @note Called from NZBContents.php
 	 *
-	 * @param string $messageid Messageid from NZB file.
-	 * @param int    $relid     id of the release.
-	 * @param int    $groupid   Group id of the release.
+	 * @param string $messageID MessageID from NZB file.
+	 * @param int    $relID     ID of the release.
+	 * @param int    $groupID   Group ID of the release.
 	 * @param NNTP   $nntp      Class NNTP
 	 * @param int    $show      Only show result or apply iy.
 	 *
 	 * @return bool
 	 */
-	public function parsePAR2($messageid, $relid, $groupid, $nntp, $show)
+	public function parsePAR2($messageID, $relID, $groupID, $nntp, $show)
 	{
-		if ($messageid === '') {
+		if ($messageID === '') {
 			return false;
 		}
 
 		$query = $this->db->queryOneRow(
 			sprintf('
-				SELECT id, groupid, categoryid, name, searchname, UNIX_TIMESTAMP(postdate) AS post_date, IS AS releaseid
-				FROM releases WHERE isrenamed = 0 AND id = %d',
-				$relid
+				SELECT ID, groupID, categoryID, name, searchname, UNIX_TIMESTAMP(postdate) AS post_date, IS AS releaseID
+				FROM releases WHERE isrenamed = 0 AND ID = %d',
+				$relID
 			)
 		);
 
@@ -309,7 +309,7 @@ class PProcess
 		// Only get a new name if the category is OTHER.
 		$foundName = true;
 		if (!in_array(
-			(int)$query['categoryid'],
+			(int)$query['categoryID'],
 			array(
 				Category::CAT_MOVIE_OTHER,
 				Category::CAT_PC_MOBILEOTHER,
@@ -323,7 +323,7 @@ class PProcess
 		}
 
 		// Get the PAR2 file.
-		$par2 = $nntp->getMessages($this->functions->getByNameByid($groupid), $messageid);
+		$par2 = $nntp->getMessages($this->functions->getByNameByID($groupID), $messageID);
 		if ($nntp->isError($par2)) {
 			return false;
 		}
@@ -356,13 +356,13 @@ class PProcess
 					// Add to release files.
 					if ($filesAdded < 11 &&
 						$this->db->queryOneRow(
-							sprintf('SELECT id FROM releasefiles WHERE releaseid = %d AND name = %s',
-								$relid, $this->db->escapeString($file['name'])
+							sprintf('SELECT ID FROM releasefiles WHERE releaseID = %d AND name = %s',
+								$relID, $this->db->escapeString($file['name'])
 							)
 						) === false
 					) {
 						// Try to add the files to the DB.
-						if ($this->releaseFiles->add($relid, $file['name'], $file['size'], $query['post_date'], 0)) {
+						if ($this->releaseFiles->add($relID, $file['name'], $file['size'], $query['post_date'], 0)) {
 							$filesAdded++;
 						}
 					} else {
@@ -381,9 +381,9 @@ class PProcess
 				$this->db->exec(
 					sprintf('
 						UPDATE releases SET rarinnerfilecount = rarinnerfilecount + %d
-						WHERE id = %d',
+						WHERE ID = %d',
 						$filesAdded,
-						$relid
+						$relID
 					)
 				);
 			}

@@ -129,11 +129,11 @@ Class ProcessAdditional
 		$this->_queryLimit =
 			(!empty($this->_tmuxSettings->maxaddprocessed)) ? (int)$this->_tmuxSettings->maxaddprocessed : 25;
 
-		// Maximum message id's to download per file type in the NZB (video, jpg, etc).
+		// Maximum message ID's to download per file type in the NZB (video, jpg, etc).
 		$this->_segmentsToDownload =
 			(!empty($this->_tmuxSettings->segmentstodownload)) ? (int)$this->_tmuxSettings->segmentstodownload : 2;
 
-		// Maximum message id's to download for a RAR file.
+		// Maximum message ID's to download for a RAR file.
 		$this->_maximumRarSegments =
 			(!empty($this->_tmuxSettings->maxpartsprocessed)) ? (int)$this->_tmuxSettings->maxpartsprocessed : 3;
 
@@ -180,27 +180,27 @@ Class ProcessAdditional
 	 * Main method.
 	 *
 	 * @param string     $release Optional single release to work on.
-	 * @param int|string $groupid Optional id of a group to work on.
+	 * @param int|string $groupID Optional ID of a group to work on.
 	 *
 	 * @void
 	 */
-	public function start($release = '', $groupid = '')
+	public function start($release = '', $groupID = '')
 	{
 		// Fetch all the releases to work on.
 		if ($release === '') {
-			$this->_fetchReleases($groupid);
+			$this->_fetchReleases($groupID);
 		} else {
 			$release = explode('           =+=            ', $release);
 			$this->_releases = array(
 				array(
-					'id'         => $release[0],
+					'ID'             => $release[0],
 					'guid'           => $release[1],
 					'name'           => $release[2],
 					'disablepreview' => $release[3],
 					'size'           => $release[4],
-					'groupid'    => $release[5],
+					'groupID'        => $release[5],
 					'nfostatus'      => $release[6],
-					'categoryid' => $release[7],
+					'categoryID'     => $release[7],
 					'searchname'     => $release[8]
 				)
 			);
@@ -219,15 +219,15 @@ Class ProcessAdditional
 	/**
 	 * Get all releases that need to be processed.
 	 *
-	 * @param int|string $groupid
+	 * @param int|string $groupID
 	 *
 	 * @void
 	 */
-	protected function _fetchReleases($groupid)
+	protected function _fetchReleases($groupID)
 	{
 		$this->_releases = array();
 		$this->_totalReleases = 0;
-		$groupid = ($groupid === '' ? '' : 'AND r.groupid = ' . $groupid);
+		$groupID = ($groupID === '' ? '' : 'AND r.groupID = ' . $groupID);
 
 		$i = -6;
 		$limit = $this->_queryLimit;
@@ -236,10 +236,10 @@ Class ProcessAdditional
 
 			$releases = $this->_db->query(
 				sprintf('
-						SELECT r.id, r.guid, r.name, c.disablepreview, r.size, r.groupid,
-							r.nfostatus, r.completion, r.categoryid, r.searchname
+						SELECT r.ID, r.guid, r.name, c.disablepreview, r.size, r.groupID,
+							r.nfostatus, r.completion, r.categoryID, r.searchname
 						FROM releases r
-						LEFT JOIN category c ON c.id = r.categoryid
+						LEFT JOIN category c ON c.ID = r.categoryID
 						WHERE nzbstatus = 1
 						AND r.size < %d
 						%s
@@ -247,7 +247,7 @@ Class ProcessAdditional
 						AND (r.haspreview = -1 AND c.disablepreview = 0)
 						ORDER BY postdate
 						DESC LIMIT %d',
-					$this->_maxSize, $groupid, $i, $limit
+					$this->_maxSize, $groupID, $i, $limit
 				)
 			);
 
@@ -304,7 +304,7 @@ Class ProcessAdditional
 	{
 		foreach ($this->_releases as $this->_release) {
 			$this->_echo(
-				'[' . $this->_release['id'] . '][' .
+				'[' . $this->_release['ID'] . '][' .
 				$this->_readableBytesString($this->_release['size']) . ']',
 				false
 			);
@@ -351,14 +351,14 @@ Class ProcessAdditional
 				}
 			}
 
-			// Process usenet Message-id downloads.
+			// Process usenet Message-ID downloads.
 			if ($this->_processPasswords === true ||
 				$this->_processSample === true ||
 				$this->_processMediaInfo === true ||
 				$this->_processAudioInfo === true ||
 				$this->_processVideo === true
 			) {
-				$this->_processMessageidDownloads();
+				$this->_processMessageIDDownloads();
 			}
 
 			// Update the release to say we processed it.
@@ -400,8 +400,8 @@ Class ProcessAdditional
 				// Decrement password status.
 				$this->_db->exec(
 					sprintf(
-						'UPDATE releases SET passwordstatus = passwordstatus - 1 WHERE id = %d',
-						$this->_release['id']
+						'UPDATE releases SET passwordstatus = passwordstatus - 1 WHERE ID = %d',
+						$this->_release['ID']
 					)
 				);
 
@@ -422,13 +422,13 @@ Class ProcessAdditional
 		$nzbPath = $this->_nzb->NZBPath($this->_release['guid']);
 		if ($nzbPath === false) {
 
-			$this->_echo('NZB not found for GUid: ' . $this->_release['guid']);
+			$this->_echo('NZB not found for GUID: ' . $this->_release['guid']);
 
 			// The nzb was not located. decrement the password status.
 			$this->_db->exec(
 				sprintf(
-					'UPDATE releases SET passwordstatus = passwordstatus - 1 WHERE id = %d',
-					$this->_release['id']
+					'UPDATE releases SET passwordstatus = passwordstatus - 1 WHERE ID = %d',
+					$this->_release['ID']
 				)
 			);
 
@@ -448,13 +448,13 @@ Class ProcessAdditional
 		$this->_nzbContents = $this->_nzb->nzbFileList($nzbContents);
 		if (count($this->_nzbContents) === 0) {
 
-			$this->_echo('NZB is empty or broken for GUid: ' . $this->_release['guid']);
+			$this->_echo('NZB is empty or broken for GUID: ' . $this->_release['guid']);
 
 			// There does not appear to be any files in the nzb, decrement password status.
 			$this->_db->exec(
 				sprintf(
-					'UPDATE releases SET passwordstatus = passwordstatus - 1 WHERE id = %d',
-					$this->_release['id']
+					'UPDATE releases SET passwordstatus = passwordstatus - 1 WHERE ID = %d',
+					$this->_release['ID']
 				)
 			);
 
@@ -482,7 +482,7 @@ Class ProcessAdditional
 	protected $_NZBHasCompressedFile;
 
 	/**
-	 * Process the files inside the NZB, find Message-id's to download.
+	 * Process the files inside the NZB, find Message-ID's to download.
 	 * If we find files with book extensions, return the amount.
 	 *
 	 * @return int
@@ -508,7 +508,7 @@ Class ProcessAdditional
 
 			// Look for a video sample, make sure it's not an image.
 			if ($this->_processSample === true &&
-				empty($this->_sampleMessageids) &&
+				empty($this->_sampleMessageIDs) &&
 				preg_match('/sample/i', $this->_currentNZBFile['title']) &&
 				!preg_match('/\.jpe?g/i', $this->_currentNZBFile['title'])
 			) {
@@ -519,7 +519,7 @@ Class ProcessAdditional
 					// If it's more than 1 try to get up to the site specified value of segments.
 					for ($i = 0; $i < $this->_segmentsToDownload; $i++) {
 						if ($segCount > $i) {
-							$this->_sampleMessageids[] = (string)$this->_currentNZBFile['segments'][$i];
+							$this->_sampleMessageIDs[] = (string)$this->_currentNZBFile['segments'][$i];
 						} else {
 							break;
 						}
@@ -529,7 +529,7 @@ Class ProcessAdditional
 
 			// Look for a JPG picture, make sure it's not a CD cover.
 			if ($this->_processJPGSample === true &&
-				empty($this->_JPGMessageids) &&
+				empty($this->_JPGMessageIDs) &&
 				!preg_match('/flac|lossless|mp3|music|inner-sanctum|sound/i', $this->_releaseGroupName) &&
 				preg_match('/\.jpe?g[. ")\]]/i', $this->_currentNZBFile['title'])
 			) {
@@ -540,7 +540,7 @@ Class ProcessAdditional
 					// If it's more than 1 try to get up to the site specified value of segments.
 					for ($i = 0; $i < $this->_segmentsToDownload; $i++) {
 						if ($segCount > $i) {
-							$this->_JPGMessageids[] = (string)$this->_currentNZBFile['segments'][$i];
+							$this->_JPGMessageIDs[] = (string)$this->_currentNZBFile['segments'][$i];
 						} else {
 							break;
 						}
@@ -550,26 +550,26 @@ Class ProcessAdditional
 
 			// Look for a video file, make sure it's not a sample, for MediaInfo.
 			if ($this->_processMediaInfo === true &&
-				empty($this->_MediaInfoMessageids) &&
+				empty($this->_MediaInfoMessageIDs) &&
 				!preg_match('/sample/i', $this->_currentNZBFile['title']) &&
 				preg_match('/' . $this->_videoFileRegex . '[. ")\]]/i', $this->_currentNZBFile['title'])
 			) {
 
 				if (isset($this->_currentNZBFile['segments'])) {
-					$this->_MediaInfoMessageids = (string)$this->_currentNZBFile['segments'][0];
+					$this->_MediaInfoMessageIDs = (string)$this->_currentNZBFile['segments'][0];
 				}
 			}
 
 			// Look for a audio file.
 			if ($this->_processAudioInfo === true &&
-				empty($this->_AudioInfoMessageids) &&
+				empty($this->_AudioInfoMessageIDs) &&
 				preg_match('/' . $this->_audioFileRegex . '[. ")\]]/i', $this->_currentNZBFile['title'], $type)
 			) {
 
 				if (isset($this->_currentNZBFile['segments'])) {
 					// Get the extension.
 					$this->_AudioInfoExtension = $type[1];
-					$this->_AudioInfoMessageids = (string)$this->_currentNZBFile['segments'][0];
+					$this->_AudioInfoMessageIDs = (string)$this->_currentNZBFile['segments'][0];
 				}
 			}
 
@@ -611,10 +611,10 @@ Class ProcessAdditional
 			}
 
 			// Get message-id's for the rar file.
-			$mid = array_slice((array)$nzbFile['segments'], 0, $this->_maximumRarSegments);
+			$mID = array_slice((array)$nzbFile['segments'], 0, $this->_maximumRarSegments);
 
 			// Download the article(s) from usenet.
-			$fetchedBinary = $this->_nntp->getMessages($this->_releaseGroupName, $mid);
+			$fetchedBinary = $this->_nntp->getMessages($this->_releaseGroupName, $mID);
 			if ($this->_nntp->isError($fetchedBinary)) {
 				$fetchedBinary = false;
 			}
@@ -780,16 +780,16 @@ Class ProcessAdditional
 			if ($this->_addedFileInfo < 11 &&
 				$this->_db->queryOneRow(
 					sprintf('
-						SELECT id FROM releasefiles
-						WHERE releaseid = %d
+						SELECT ID FROM releasefiles
+						WHERE releaseID = %d
 						AND name = %s
 						AND size = %d',
-						$this->_release['id'], $this->_db->escapeString($file['name']), $file['size']
+						$this->_release['ID'], $this->_db->escapeString($file['name']), $file['size']
 					)
 				) === false
 			) {
 
-				if ($this->_releaseFiles->add($this->_release['id'], $file['name'], $file['size'], $file['date'], $file['pass'])) {
+				if ($this->_releaseFiles->add($this->_release['ID'], $file['name'], $file['size'], $file['date'], $file['pass'])) {
 					$this->_addedFileInfo++;
 
 					if ($this->_echoCLI) {
@@ -805,7 +805,7 @@ Class ProcessAdditional
 					} //Run a PreDB filename check on insert to try and match the release
 					else if (strpos($file['name'], '.') !== false) {
 						$this->_release['filename'] = $this->_functions->cutStringUsingLast('.', $file['name'], 'left', false);
-						$this->_release['releaseid'] = $this->_release['id'];
+						$this->_release['releaseid'] = $this->_release['ID'];
 						$this->_nameFixer->matchPredbFiles($this->_release, 1, 1, true, 1, 'full');
 					}
 				}
@@ -958,15 +958,15 @@ Class ProcessAdditional
 	 *
 	 * @void
 	 */
-	protected function _processMessageidDownloads()
+	protected function _processMessageIDDownloads()
 	{
 		// Download and process sample image.
 		if ($this->_foundSample === false || $this->_foundVideo === false) {
 
-			if (!empty($this->_sampleMessageids)) {
+			if (!empty($this->_sampleMessageIDs)) {
 
 				// Download it from usenet.
-				$sampleBinary = $this->_nntp->getMessages($this->_releaseGroupName, $this->_sampleMessageids);
+				$sampleBinary = $this->_nntp->getMessages($this->_releaseGroupName, $this->_sampleMessageIDs);
 				if ($this->_nntp->isError($sampleBinary)) {
 					$sampleBinary = false;
 				}
@@ -993,8 +993,8 @@ Class ProcessAdditional
 							$this->_foundVideo = $this->_getVideo($fileLocation);
 						}
 
-						// Try to get media info. Don't get it here if $mediaMsgid is not empty.
-						if ($this->_foundMediaInfo === false && empty($mediaMsgid)) {
+						// Try to get media info. Don't get it here if $mediaMsgID is not empty.
+						if ($this->_foundMediaInfo === false && empty($mediaMsgID)) {
 							$this->_foundMediaInfo = $this->_getMediaInfo($fileLocation);
 						}
 
@@ -1008,10 +1008,10 @@ Class ProcessAdditional
 		// Download and process mediainfo. Also try to get a sample if we didn't get one yet.
 		if ($this->_foundMediaInfo === false || $this->_foundSample === false || $this->_foundVideo === false) {
 
-			if (!empty($this->_MediaInfoMessageids)) {
+			if (!empty($this->_MediaInfoMessageIDs)) {
 
 				// Try to download it from usenet.
-				$mediaBinary = $this->_nntp->getMessages($this->_releaseGroupName, $this->_MediaInfoMessageids);
+				$mediaBinary = $this->_nntp->getMessages($this->_releaseGroupName, $this->_MediaInfoMessageIDs);
 				if ($this->_nntp->isError($mediaBinary)) {
 					// If error set it to false.
 					$mediaBinary = false;
@@ -1054,9 +1054,9 @@ Class ProcessAdditional
 		// Download audio file, use media info to try to get the artist / album.
 		if (($this->_foundAudioInfo === false || $this->_foundAudioSample === false)) {
 
-			if (!empty($this->_AudioInfoMessageids)) {
+			if (!empty($this->_AudioInfoMessageIDs)) {
 				// Try to download it from usenet.
-				$audioBinary = $this->_nntp->getMessages($this->_releaseGroupName, $this->_AudioInfoMessageids);
+				$audioBinary = $this->_nntp->getMessages($this->_releaseGroupName, $this->_AudioInfoMessageIDs);
 				if ($this->_nntp->isError($audioBinary)) {
 					$audioBinary = false;
 				}
@@ -1080,10 +1080,10 @@ Class ProcessAdditional
 		}
 
 		// Download JPG file.
-		if ($this->_foundJPGSample === false && !empty($this->_JPGMessageids)) {
+		if ($this->_foundJPGSample === false && !empty($this->_JPGMessageIDs)) {
 
 			// Try to download it.
-			$jpgBinary = $this->_nntp->getMessages($this->_releaseGroupName, $this->_JPGMessageids);
+			$jpgBinary = $this->_nntp->getMessages($this->_releaseGroupName, $this->_JPGMessageIDs);
 			if ($this->_nntp->isError($jpgBinary)) {
 				$jpgBinary = false;
 			}
@@ -1109,8 +1109,8 @@ Class ProcessAdditional
 						sprintf('
 							UPDATE releases
 							SET jpgstatus = %d
-							WHERE id = %d', 1,
-							$this->_release['id']
+							WHERE ID = %d', 1,
+							$this->_release['ID']
 						)
 					);
 
@@ -1151,11 +1151,11 @@ Class ProcessAdditional
 		// Get the amount of files we found inside the RAR/ZIP files.
 		$releaseFiles = $this->_db->queryOneRow(
 			sprintf('
-				SELECT COUNT(releasefiles.releaseid) AS count,
+				SELECT COUNT(releasefiles.releaseID) AS count,
 				SUM(releasefiles.size) AS size
 				FROM releasefiles
-				WHERE releaseid = %d',
-				$this->_release['id']
+				WHERE releaseID = %d',
+				$this->_release['ID']
 			)
 		);
 
@@ -1170,25 +1170,25 @@ Class ProcessAdditional
 			$query = sprintf('
 				UPDATE releases
 				SET passwordstatus = passwordstatus - 1, rarinnerfilecount = %d %s %s %s
-				WHERE id = %d',
+				WHERE ID = %d',
 				$releaseFiles['count'],
 				$iSQL,
 				$vSQL,
 				$jSQL,
-				$this->_release['id']
+				$this->_release['ID']
 			);
 		} // Else update the release with the password status (if the admin enabled the setting).
 		else {
 			$query = sprintf('
 				UPDATE releases
 				SET passwordstatus = %d, rarinnerfilecount = %d %s %s %s
-				WHERE id = %d',
+				WHERE ID = %d',
 				($this->_processPasswords === true ? $this->_passwordStatus : Releases::PASSWD_NONE),
 				$releaseFiles['count'],
 				$iSQL,
 				$vSQL,
 				$jSQL,
-				$this->_release['id']
+				$this->_release['ID']
 			);
 		}
 
@@ -1252,8 +1252,8 @@ Class ProcessAdditional
 		// Make sure the category is music or other.
 		$rQuery = $this->_db->queryOneRow(
 			sprintf(
-				'SELECT searchname, categoryid as id, groupid FROM releases WHERE proc_pp = 0 AND id = %d',
-				$this->_release['id']
+				'SELECT searchname, categoryID as ID, groupID FROM releases WHERE proc_pp = 0 AND ID = %d',
+				$this->_release['ID']
 			)
 		);
 
@@ -1266,7 +1266,7 @@ Class ProcessAdditional
 					Category::CAT_MOVIE_OTHER,
 					Category::CAT_TV_OTHER
 				),
-				$rQuery['id']
+				$rQuery['ID']
 			)
 		) {
 			return false;
@@ -1306,18 +1306,18 @@ Class ProcessAdditional
 								} else if ($ext === 'FLAC') {
 									$newCat = Category::CAT_MUSIC_LOSSLESS;
 								} else {
-									$newCat = $this->_categorize->determineCategory($rQuery['groupid'], $newName);
+									$newCat = $this->_categorize->determineCategory($rQuery['groupID'], $newName);
 								}
 
 								// Update the search name.
 								$this->_db->exec(
 									sprintf('
 										UPDATE releases
-										SET searchname = %s, categoryid = %d, iscategorized = 1, isrenamed = 1, proc_pp = 1
-										WHERE id = %d',
+										SET searchname = %s, categoryID = %d, iscategorized = 1, isrenamed = 1, proc_pp = 1
+										WHERE ID = %d',
 										$this->_db->escapeString(substr($newName, 0, 255)),
 										$newCat,
-										$this->_release['id']
+										$this->_release['ID']
 									)
 								);
 
@@ -1326,14 +1326,14 @@ Class ProcessAdditional
 									'New name:(' . $newName .
 									') Old name:(' . $rQuery['searchname'] .
 									') New cat:(' . $newCat .
-								') Old cat:(' . $rQuery['id'] .
-								') Group:(' . $rQuery['groupid'] .
-								') Method:(' . 'PostProccess getAudioInfo' .
-								') Releaseid:(' . $this->_release['id'] . ')'
+									') Old cat:(' . $rQuery['ID'] .
+									') Group:(' . $rQuery['groupID'] .
+									') Method:(' . 'PostProccess getAudioInfo' .
+									') ReleaseID:(' . $this->_release['ID'] . ')'
 								);
 
 								// Add the media info.
-								$this->_releaseExtra->addFromXml($this->_release['id'], $xmlArray);
+								$this->_releaseExtra->addFromXml($this->_release['ID'], $xmlArray);
 
 								$retVal = true;
 								$this->_foundAudioInfo = true;
@@ -1403,8 +1403,8 @@ Class ProcessAdditional
 							sprintf('
 								UPDATE releases
 								SET audiostatus = 1
-								WHERE id = %d',
-								$this->_release['id']
+								WHERE ID = %d',
+								$this->_release['ID']
 							)
 						);
 
@@ -1444,9 +1444,9 @@ Class ProcessAdditional
 				sprintf('
 					UPDATE releases
 					SET jpgstatus = %d
-					WHERE id = %d',
+					WHERE ID = %d',
 					1,
-					$this->_release['id']
+					$this->_release['ID']
 				)
 			);
 		}
@@ -1721,8 +1721,8 @@ Class ProcessAdditional
 				$xmlArray = implode("\n", $xmlArray);
 
 				// Insert it into the DB.
-				$this->_releaseExtra->addFull($this->_release['id'], $xmlArray);
-				$this->_releaseExtra->addFromXml($this->_release['id'], $xmlArray);
+				$this->_releaseExtra->addFull($this->_release['ID'], $xmlArray);
+				$this->_releaseExtra->addFromXml($this->_release['ID'], $xmlArray);
 
 				if ($this->_echoCLI) {
 					echo 'm';
@@ -1752,8 +1752,8 @@ Class ProcessAdditional
 			sprintf('
 				SELECT UNIX_TIMESTAMP(postdate) AS postdate
 				FROM releases
-				WHERE id = %d',
-				$this->_release['id']
+				WHERE ID = %d',
+				$this->_release['ID']
 			)
 		);
 
@@ -1763,7 +1763,7 @@ Class ProcessAdditional
 
 		// Only get a new name if the category is OTHER.
 		$foundName = true;
-		if (in_array(((int)$this->_release['categoryid']),
+		if (in_array(((int)$this->_release['categoryID']),
 			array(
 				Category::CAT_MOVIE_OTHER,
 				Category::CAT_MUSIC_OTHER,
@@ -1795,14 +1795,14 @@ Class ProcessAdditional
 			if ($this->_addPAR2Files) {
 				if ($filesAdded < 11 &&
 					$this->_db->queryOneRow(
-						sprintf('SELECT id FROM releasefiles WHERE releaseid = %d AND name = %s',
-							$this->_release['id'], $this->_db->escapeString($file['name'])
+						sprintf('SELECT ID FROM releasefiles WHERE releaseID = %d AND name = %s',
+							$this->_release['ID'], $this->_db->escapeString($file['name'])
 						)
 					) === false
 				) {
 
 					// Try to add the files to the DB.
-					if ($this->_releaseFiles->add($this->_release['id'], $file['name'], $file['size'], $releaseInfo['postdate'], 0)) {
+					if ($this->_releaseFiles->add($this->_release['ID'], $file['name'], $file['size'], $releaseInfo['postdate'], 0)) {
 						$filesAdded++;
 					}
 				}
@@ -1813,7 +1813,7 @@ Class ProcessAdditional
 			// Try to get a new name.
 			if ($foundName === false) {
 				$this->_release['textstring'] = $file['name'];
-				$this->_release['releaseid'] = $this->_release['id'];
+				$this->_release['releaseID'] = $this->_release['ID'];
 				if ($this->_nameFixer->checkName($this->_release, ($this->_echoCLI ? 1 : 0), 'PAR2, ', 1, 1) === true) {
 					$foundName = true;
 				}
@@ -1822,9 +1822,9 @@ Class ProcessAdditional
 		// Update the file count with the new file count + old file count.
 		$this->_db->exec(
 			sprintf(
-				'UPDATE releases SET rarinnerfilecount = rarinnerfilecount + %d WHERE id = %d',
+				'UPDATE releases SET rarinnerfilecount = rarinnerfilecount + %d WHERE ID = %d',
 				$filesAdded,
-				$this->_release['id']
+				$this->_release['ID']
 			)
 		);
 		$this->_foundPAR2Info = true;
@@ -1863,10 +1863,10 @@ Class ProcessAdditional
 		}
 
 		/* Try to get a video with it.
-		 * Don't get it here if _sampleMessageids is empty
+		 * Don't get it here if _sampleMessageIDs is empty
 		 * or has 1 message-id (Saves downloading another part).
 		 */
-		if ($this->_foundVideo === false && count($this->_sampleMessageids) < 2) {
+		if ($this->_foundVideo === false && count($this->_sampleMessageIDs) < 2) {
 			$this->_foundVideo = $this->_getVideo($this->tmpPath . 'sample.avi');
 		}
 
@@ -1894,14 +1894,14 @@ Class ProcessAdditional
 					$this->_db->exec(
 						sprintf('
 							UPDATE releases
-							SET rageid = -1, seriesfull = NULL, season = NULL, episode = NULL,
-								tvtitle = NULL, tvairdate = NULL, imdbid = NULL, musicinfoid = NULL,
-								consoleinfoid = NULL, bookinfoid = NULL, anidbid = NULL, prehashid = 0, preid = NULL,
-								searchname = %s, isrenamed = 1, iscategorized = 1, proc_files = 1, categoryid = %d
-							WHERE id = %d',
+							SET rageID = -1, seriesfull = NULL, season = NULL, episode = NULL,
+								tvtitle = NULL, tvairdate = NULL, imdbID = NULL, musicinfoID = NULL,
+								consoleinfoID = NULL, bookinfoID = NULL, anidbID = NULL, prehashID = 0, preID = NULL,
+								searchname = %s, isrenamed = 1, iscategorized = 1, proc_files = 1, categoryID = %d
+							WHERE ID = %d',
 							$this->_db->escapeString(substr($newName, 0, 255)),
-							$this->_categorize->determineCategory($this->_release['groupid'], $newName),
-							$this->_release['id']
+							$this->_categorize->determineCategory($this->_release['groupID'], $newName),
+							$this->_release['ID']
 						)
 					);
 					break;
@@ -2047,15 +2047,15 @@ Class ProcessAdditional
 	protected $_foundPAR2Info;
 
 	/**
-	 * Message id's for found content to download.
+	 * Message ID's for found content to download.
 	 *
 	 * @var array
 	 */
-	protected $_sampleMessageids;
-	protected $_JPGMessageids;
-	protected $_MediaInfoMessageids;
-	protected $_AudioInfoMessageids;
-	protected $_RARFileMessageids;
+	protected $_sampleMessageIDs;
+	protected $_JPGMessageIDs;
+	protected $_MediaInfoMessageIDs;
+	protected $_AudioInfoMessageIDs;
+	protected $_RARFileMessageIDs;
 
 	/**
 	 * Password status of the current release.
@@ -2118,7 +2118,7 @@ Class ProcessAdditional
 		$this->_passwordStatus = array(Releases::PASSWD_NONE);
 		$this->_releaseHasPassword = false;
 
-		$this->_releaseGroupName = $this->_functions->getByNameByid($this->_release['groupid']);
+		$this->_releaseGroupName = $this->_functions->getByNameByID($this->_release['groupID']);
 
 		$this->_releaseHasNoNFO = false;
 		// Make sure we don't already have an nfo.
@@ -2128,8 +2128,8 @@ Class ProcessAdditional
 
 		$this->_NZBHasCompressedFile = false;
 
-		$this->_sampleMessageids = $this->_JPGMessageids = $this->_MediaInfoMessageids = array();
-		$this->_AudioInfoMessageids = $this->_RARFileMessageids = array();
+		$this->_sampleMessageIDs = $this->_JPGMessageIDs = $this->_MediaInfoMessageIDs = array();
+		$this->_AudioInfoMessageIDs = $this->_RARFileMessageIDs = array();
 		$this->_AudioInfoExtension = '';
 
 		$this->_addedFileInfo = 0;
