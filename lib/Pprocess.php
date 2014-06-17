@@ -296,7 +296,7 @@ class PProcess
 
 		$query = $this->db->queryOneRow(
 			sprintf('
-				SELECT ID, groupID, categoryID, name, searchname, UNIX_TIMESTAMP(postdate) AS post_date, IS AS releaseID
+				SELECT ID, groupID, categoryID, name, searchname, UNIX_TIMESTAMP(postdate) AS post_date, ID AS releaseID
 				FROM releases WHERE isrenamed = 0 AND ID = %d',
 				$relID
 			)
