@@ -174,7 +174,7 @@ Class PreHash
 		}
 		$ct = '';
 		if ($cats == 1) {
-			$ct = 'AND r.categoryID IN (1090, 2020, 3050, 6050, 5050, 7010, 8050)';
+			$ct = 'AND r.categoryID IN (2020, 5050, 6070, 8010)';
 		}
 
 		if ($this->echooutput) {
