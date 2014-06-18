@@ -116,12 +116,12 @@ Class ProcessAdditional
 		$this->vidSavePath = WWW_DIR . 'covers/video/';
 
 		// Pass the binary extractors to ArchiveInfo.
-		$clients = array();
+		$clients = [];
 		if (!empty($this->_siteSettings->unrarpath)) {
-			$clients += array(ArchiveInfo::TYPE_RAR => $this->_siteSettings->unrarpath);
+			$clients += [ArchiveInfo::TYPE_RAR => $this->_siteSettings->unrarpath];
 		}
 		if (!empty($this->_tmuxsettings->zippath)) {
-			$clients += array(ArchiveInfo::TYPE_ZIP => $this->_tmuxSettings->zippath);
+			$clients += [ArchiveInfo::TYPE_ZIP => $this->_tmuxSettings->zippath];
 		}
 		$this->_archiveInfo->setExternalClients($clients);
 
@@ -193,8 +193,8 @@ Class ProcessAdditional
 			$this->_fetchReleases($groupID);
 		} else {
 			$release = explode('           =+=            ', $release);
-			$this->_releases = array(
-				array(
+			$this->_releases = [
+				[
 					'ID'             => $release[0],
 					'guid'           => $release[1],
 					'name'           => $release[2],
@@ -204,8 +204,8 @@ Class ProcessAdditional
 					'nfostatus'      => $release[6],
 					'categoryID'     => $release[7],
 					'searchname'     => $release[8]
-				)
-			);
+				]
+			];
 			$this->_totalReleases = 1;
 		}
 
@@ -227,7 +227,7 @@ Class ProcessAdditional
 	 */
 	protected function _fetchReleases($groupID)
 	{
-		$this->_releases = array();
+		$this->_releases = [];
 		$this->_totalReleases = 0;
 		$groupID = ($groupID === '' ? '' : 'AND r.groupID = ' . $groupID);
 
@@ -803,7 +803,7 @@ Class ProcessAdditional
 						preg_match('/[\/\\\\]Codec[\/\\\\]Setup\.exe/i', $file['name'])
 					) {
 						$this->c->debug('Codec spam found, setting release to potentially passworded.' . PHP_EOL);
-						$this->_passwordStatus = array(Releases::PASSWD_POTENTIAL);
+						$this->_passwordStatus = [Releases::PASSWD_POTENTIAL];
 					} //Run a PreDB filename check on insert to try and match the release
 					else if (strpos($file['name'], '.') !== false) {
 						$this->_release['filename'] = $this->_functions->cutStringUsingLast('.', $file['name'], 'left', false);
@@ -851,7 +851,7 @@ Class ProcessAdditional
 			$nestedLevels++;
 		}
 
-		$fileType = array();
+		$fileType = [];
 
 		// Get all the remaining files in the temp dir.
 		$files = $this->_getTempDirectoryContents();
@@ -893,7 +893,7 @@ Class ProcessAdditional
 					) {
 						$this->_processVideoFile($file);
 					} // Check if it's alt.binaries.u4e file.
-					else if (in_array($this->_releaseGroupName, array('alt.binaries.u4e', 'alt.binaries.mom')) &&
+					else if (in_array($this->_releaseGroupName, ['alt.binaries.u4e', 'alt.binaries.mom']) &&
 						preg_match('/Linux_2rename\.sh/i', $file) &&
 						$this->_release['categoryID'] == Category::CAT_MISC_OTHER
 					) {
@@ -1567,7 +1567,7 @@ Class ProcessAdditional
 				);
 
 				// If we don't get the time create the sample the old way (gets the start of the video).
-				$numbers = array();
+				$numbers = [];
 				if (!preg_match('/^\d{2}:\d{2}:(\d{2}).(\d{2})$/', $time, $numbers)) {
 					$this->_functions->runCmd(
 						'"' .
@@ -1766,14 +1766,14 @@ Class ProcessAdditional
 		// Only get a new name if the category is OTHER.
 		$foundName = true;
 		if (in_array(((int)$this->_release['categoryID']),
-			array(
+			[
 				Category::CAT_MOVIE_OTHER,
 				Category::CAT_MUSIC_OTHER,
 				Category::CAT_PC_MOBILEOTHER,
 				Category::CAT_TV_OTHER,
 				Category::CAT_MISC_OTHER,
 				Category::CAT_XXX_OTHER
-			)
+			]
 		)
 		) {
 			$foundName = false;
@@ -2117,7 +2117,7 @@ Class ProcessAdditional
 		$this->_foundSample = (($this->_release['disablepreview'] == 1) ? true : false);
 		$this->_foundPAR2Info = false;
 
-		$this->_passwordStatus = array(Releases::PASSWD_NONE);
+		$this->_passwordStatus = [Releases::PASSWD_NONE];
 		$this->_releaseHasPassword = false;
 
 		$this->_releaseGroupName = $this->_functions->getByNameByID($this->_release['groupID']);
@@ -2130,8 +2130,8 @@ Class ProcessAdditional
 
 		$this->_NZBHasCompressedFile = false;
 
-		$this->_sampleMessageIDs = $this->_JPGMessageIDs = $this->_MediaInfoMessageIDs = array();
-		$this->_AudioInfoMessageIDs = $this->_RARFileMessageIDu4es = array();
+		$this->_sampleMessageIDs = $this->_JPGMessageIDs = $this->_MediaInfoMessageIDs = [];
+		$this->_AudioInfoMessageIDs = $this->_RARFileMessageIDu4es = [];
 		$this->_AudioInfoExtension = '';
 
 		$this->_addedFileInfo = 0;
