@@ -1771,7 +1771,6 @@ Class ProcessAdditional
 		if (in_array(((int)$this->_release['categoryID']),
 			[
 				Category::CAT_MOVIE_OTHER,
-				Category::CAT_MUSIC_OTHER,
 				Category::CAT_PC_MOBILEOTHER,
 				Category::CAT_TV_OTHER,
 				Category::CAT_MISC_OTHER,
