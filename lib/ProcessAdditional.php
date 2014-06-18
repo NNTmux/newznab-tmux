@@ -8,6 +8,7 @@ require_once(WWW_DIR . "/lib/category.php");
 require_once(WWW_DIR . "/lib/releases.php");
 require_once(WWW_DIR . "/lib/releaseimage.php");
 require_once(WWW_DIR . "/lib/releaseextra.php");
+require_once(WWW_DIR . "/lib/releasefiles.php");
 require_once(WWW_DIR . "/lib/groups.php");
 require_once(WWW_DIR . '/lib/nntp.php');
 require_once(WWW_DIR . "/lib/site.php");
