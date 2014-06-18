@@ -1010,7 +1010,7 @@ Class ProcessAdditional
 		// Download and process mediainfo. Also try to get a sample if we didn't get one yet.
 		if ($this->_foundMediaInfo === false || $this->_foundSample === false || $this->_foundVideo === false) {
 
-			if (!empty($this->_MediaInfoMessageIDs)) {
+			if ($this->_foundMediaInfo === false && !empty($this->_MediaInfoMessageIDs)) {
 
 				// Try to download it from usenet.
 				$mediaBinary = $this->_nntp->getMessages($this->_releaseGroupName, $this->_MediaInfoMessageIDs);
@@ -1323,16 +1323,19 @@ Class ProcessAdditional
 									)
 								);
 
-								$this->c->debug(
-								'getAudioInfo: ' .
-									'New name:(' . $newName .
-									') Old name:(' . $rQuery['searchname'] .
-									') New cat:(' . $newCat .
-									') Old cat:(' . $rQuery['ID'] .
-									') Group:(' . $rQuery['groupID'] .
-									') Method:(' . 'PostProccess getAudioInfo' .
-									') ReleaseID:(' . $this->_release['ID'] . ')'
-								);
+								// Echo the changed name.
+								if ($this->_echoCLI) {
+									NameFixer::echoChangedReleaseName(array(
+											'new_name'     => $newName,
+											'old_name'     => $rQuery['searchname'],
+											'new_category' => $newCat,
+											'old_category' => $rQuery['ID'],
+											'group'        => $rQuery['groupID'],
+											'release_id'   => $this->_release['ID'],
+											'method'       => 'ProcessAdditional->_getAudioInfo'
+										)
+									);
+								}
 
 								// Add the media info.
 								$this->_releaseExtra->addFromXml($this->_release['ID'], $xmlArray);
@@ -1888,11 +1891,27 @@ Class ProcessAdditional
 	 */
 	protected function _processU4ETitle($fileLocation)
 	{
+		// Open the file for reading.
 		$handle = @fopen($fileLocation, 'r');
+		// Check if it failed.
 		if ($handle) {
+			// Loop over the file line by line.
 			while (($buffer = fgets($handle, 16384)) !== false) {
+				// Check if we find the word
 				if (stripos($buffer, 'mkdir') !== false) {
-					$newName = trim(str_replace('mkdir', '', $buffer));
+
+					// Get a new name.
+					$newName = trim(str_replace('mkdir ', '', $buffer));
+
+					// Check if it's a empty string or not.
+					if (empty($newName)) {
+						continue;
+					}
+
+					// Get a new category ID.
+					$newCategory = $this->_categorize->determineCategory($this->_release['groupID'], $newName);
+
+					// Update the release with the data.
 					$this->_db->exec(
 						sprintf('
 							UPDATE releases
@@ -1902,15 +1921,33 @@ Class ProcessAdditional
 								searchname = %s, isrenamed = 1, iscategorized = 1, proc_files = 1, categoryID = %d
 							WHERE ID = %d',
 							$this->_db->escapeString(substr($newName, 0, 255)),
-							$this->_categorize->determineCategory($this->_release['groupID'], $newName),
+							$newCategory,
 							$this->_release['ID']
 						)
 					);
+
+					// Echo the changed name to CLI.
+					if ($this->_echoCLI) {
+						NameFixer::echoChangedReleaseName(array(
+								'new_name'     => $newName,
+								'old_name'     => $this->_release['searchname'],
+								'new_category' => $newCategory,
+								'old_category' => $this->_release['categoryID'],
+								'group'        => $this->_release['groupID'],
+								'release_id'   => $this->_release['ID'],
+								'method'       => 'ProcessAdditional->_processU4ETitle'
+							)
+						);
+					}
+
+					// Break out of the loop.
 					break;
 				}
 			}
+			// Close the file.
 			fclose($handle);
 		}
+		// Delete the file.
 		@unlink($fileLocation);
 	}
 
