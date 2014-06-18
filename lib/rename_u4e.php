@@ -43,13 +43,13 @@ $db = new DB();
 $functions = new Functions();
 $nntp = new NNTP;
 $nzbContents = new NZBContents(
-	array(
+	[
 		'db'   => $db,
 		'echo' => true,
 		'nfo'  => new Info(true),
 		'pp'   => new PProcess(true),
 		'nntp' => $nntp
-	)
+	]
 );
 $categorize = new Category();
 
