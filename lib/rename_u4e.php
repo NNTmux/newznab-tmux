@@ -11,6 +11,7 @@ require_once('ColorCLI.php');
 require_once('nzbcontents.php');
 require_once('Pprocess.php');
 require_once('Info.php');
+require_once('namefixer.php');
 
 $c = new ColorCLI();
 
@@ -179,16 +180,16 @@ if ($releases !== false) {
 
 		$determinedCat = $categorize->determineCategory($release['groupID'], $newName);
 
-		echo
-			PHP_EOL .
-			$c->headerOver("New name:  ") . $c->primary($newName) .
-			$c->headerOver("Old name:  ") . $c->primary($release['oldname']) .
-			$c->headerOver("Use name:  ") . $c->primary($release['name']) .
-			$c->headerOver("New cat:   ") . $c->primary($functions->getNameByid($determinedCat)) .
-			$c->headerOver("Old cat:   ") . $c->primary($functions->getNameByid($release['categoryID'])) .
-			$c->headerOver("Group:     ") . $c->primary($release['groupname']) .
-			$c->headerOver("Method:    ") . $c->primary('Files, u4e') .
-			$c->headerOver("ReleaseID: ") . $c->primary($release['ID']);
+		NameFixer::echoChangedReleaseName(array(
+				'new_name'     => $newName,
+				'old_name'     => $release['oldname'],
+				'new_category' => $functions->getNameByid($determinedCat),
+				'old_category' => $functions->getNameByid($release['categoryID']),
+				'group'        => $release['groupname'],
+				'release_id'   => $release['ID'],
+				'method'       => 'lib/rename_u4e.php'
+			)
+		);
 
 		$db->exec(
 			sprintf('

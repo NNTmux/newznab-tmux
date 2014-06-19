@@ -20,91 +20,97 @@ class NNTP extends Net_NNTP_Client
      /**
 	 * @var ColorCLI
 	 */
-	protected $c;
+	protected $_c;
 
 	/**
 	 * @var Debugging
 	 */
-	protected $debugging;
+	protected $_debugging;
 
 	/**
 	 * Object containing site settings.
 	 *
 	 * @var bool|stdClass
 	 */
-	protected $site;
+	protected $_site;
 
 	/**
 	 * Log/echo debug?
 	 * @var bool
 	 */
-	protected $debug;
+	protected $_debugBool;
 
 	/**
 	 * Echo to cli?
 	 * @var bool
 	 */
-	protected $echo;
+	protected $_echo;
 
 	/**
 	 * Does the server support XFeature GZip header compression?
 	 * @var boolean
 	 */
-	protected $compression = false;
+	protected $_compression = false;
 
 	/**
 	 * Currently selected group.
 	 * @var string
 	 */
-	protected $currentGroup = '';
+	protected $_currentGroup = '';
 
 	/**
 	 * Port of the current NNTP server.
 	 * @var int
 	 */
-	protected $currentPort = NNTP_PORT;
+	protected $_currentPort = NNTP_PORT;
 
 	/**
 	 * Address of the current NNTP server.
 	 * @var string
 	 */
-	protected $currentServer = NNTP_SERVER;
+	protected $_currentServer = NNTP_SERVER;
 
 	/**
 	 * Are we allowed to post to usenet?
 	 * @var bool
 	 */
-	protected $postingAllowed = false;
+	protected $_postingAllowed = false;
 
 	/**
 	 * How many times should we try to reconnect to the NNTP server?
 	 * @var int
 	 */
-	protected $nntpRetries;
+	protected $_nntpRetries;
 
 	/**
 	 * Path to yyDecoder binary.
 	 * @var bool|string
 	 */
-	protected $yyDecoderPath;
+	protected $_yyDecoderPath;
 
 	/**
 	 * If on unix, hide yydecode CLI output.
 	 * @var string
 	 */
-	protected $yEncSilence;
+	protected $_yEncSilence;
 
 	/**
 	 * Path to temp yEnc input storage file.
 	 * @var string
 	 */
-	protected $yEncTempInput;
+	protected $_yEncTempInput;
 
 	/**
 	 * Path to temp yEnc output storage file.
 	 * @var string
 	 */
-	protected $yEncTempOutput;
+	protected $_yEncTempOutput;
+
+	/**
+	 * Use the simple_php_yenc_decode extension for decoding yEnc articles?
+	 * @var bool
+	 */
+	protected $_yEncExtension = false;
 
 	/**
 	 * Instance of class Site.
@@ -127,37 +133,38 @@ class NNTP extends Net_NNTP_Client
 	 */
 	public function __construct($echo = true)
 	{
-		$this->echo = $echo;
-		$this->c = new ColorCLI();
+		$this->_echo = $echo;
+		$this->_c = new ColorCLI();
 		$this->t = new Tmux();
         $this->s = new Sites();
-        $this->site = $this->s->get();
+		$this->_site = $this->s->get();
 		$this->tmux = $this->t->get();
 		$this->functions = new Functions();
-		$this->tmpPath = $this->site->tmpunrarpath;
-		$this->nntpRetries = ((!empty($this->tmux->nntpretries)) ? (int)$this->tmux->nntpretries : 0) + 1;
+		$nntp = new NNTP();
+		$this->tmpPath = $this->_site->tmpunrarpath;
+		$this->_nntpRetries = ((!empty($this->tmux->nntpretries)) ? (int)$this->tmux->nntpretries : 0) + 1;
 		// Check if the user wants to use yydecode or the simple_php_yenc_decode extension.
-		$this->yyDecoderPath = ((!empty($this->tmux->yydecoderpath)) ? $this->tmux->yydecoderpath : false);
-		if (strpos($this->yyDecoderPath, 'simple_php_yenc_decode') !== false) {
+		$this->_yyDecoderPath = ((!empty($this->tmux->yydecoderpath)) ? $this->tmux->yydecoderpath : false);
+		if (strpos($this->_yyDecoderPath, 'simple_php_yenc_decode') !== false) {
 			if (extension_loaded('simple_php_yenc_decode')) {
 				$this->yEncExtension = true;
 			} else {
-				$this->yyDecoderPath = false;
+				$this->_yyDecoderPath = false;
 			}
-		} else if ($this->yyDecoderPath !== false) {
-			$this->yEncTempInput = WWW_DIR . "nzbfiles/yenc/input";
-			$this->yEncTempOutput = WWW_DIR . "nzbfiles/yenc/output";
-			$this->yEncSilence = ($this->functions->isWindows() ? '' : ' > /dev/null 2>&1');
+		} else if ($this->_yyDecoderPath !== false) {
+			$this->_yEncTempInput = WWW_DIR . "../nzbfiles/yenc/input";
+			$this->_yEncTempOutput = WWW_DIR . "../nzbfiles/yenc/output";
+			$this->_yEncSilence = ($this->functions->isWindows() ? '' : ' > /dev/null 2>&1');
 
 			// Test if the user can read/write to the yEnc path.
-			if (!is_file($this->yEncTempInput)) {
-				@file_put_contents($this->yEncTempInput, 'x');
+			if (!is_file($this->_yEncTempInput)) {
+				@file_put_contents($this->_yEncTempInput, 'x');
 			}
-			if (!is_file($this->yEncTempInput) || !is_readable($this->yEncTempInput) || !is_writable($this->yEncTempInput)) {
-				$this->yyDecoderPath = false;
+			if (!is_file($this->_yEncTempInput) || !is_readable($this->_yEncTempInput) || !is_writable($this->_yEncTempInput)) {
+				$this->_yyDecoderPath = false;
 			}
-			if (is_file($this->yEncTempInput)) {
-				@unlink($this->yEncTempInput);
+			if (is_file($this->_yEncTempInput)) {
+				@unlink($this->_yEncTempInput);
 			}
 		}
 	}
@@ -190,8 +197,8 @@ class NNTP extends Net_NNTP_Client
 			// We are already connected to usenet. AND
 			$this->_isConnected() &&
 			// (If compression is wanted and on,                    OR    Compression is not wanted and off.) AND
-			(($compression && $this->compression) || (!$compression && !$this->compression)) &&
-			($this->currentServer === NNTP_SERVER)
+			(($compression && $this->_compression) || (!$compression && !$this->_compression)) &&
+			($this->_currentServer === NNTP_SERVER)
 		) {
 			return true;
 		} else {
@@ -202,8 +209,8 @@ class NNTP extends Net_NNTP_Client
 
 		// If we switched servers, reset objects.
 		$sslEnabled = (NNTP_SSLENABLED ? true : false);
-		$this->currentServer = NNTP_SERVER;
-		$this->currentPort = NNTP_PORT;
+		$this->_currentServer = NNTP_SERVER;
+		$this->_currentPort = NNTP_PORT;
 		$userName = NNTP_USERNAME;
 		$password = NNTP_PASSWORD;
 		$socketTimeout = (defined('NNTP_SOCKET_TIMEOUT') ? NNTP_SOCKET_TIMEOUT : $this->_socketTimeout);
@@ -212,15 +219,14 @@ class NNTP extends Net_NNTP_Client
 		$sslEnabled = ($sslEnabled ? 'tls' : false);
 
 		// Try to connect until we run of out tries.
-		$retries = $this->nntpRetries;
-
+		$retries = $this->_nntpRetries;
 		while (true) {
 			$retries--;
 			$authenticated = false;
 
 			// If we are not connected, try to connect.
 			if (!$connected) {
-				$ret = $this->connect($this->currentServer, $sslEnabled, $this->currentPort, 5, $socketTimeout);
+				$ret = $this->connect($this->_currentServer, $sslEnabled, $this->_currentPort, 5, $socketTimeout);
 			}
 
 			// Check if we got an error while connecting.
@@ -231,7 +237,7 @@ class NNTP extends Net_NNTP_Client
 				// Say that we are connected so we don't retry.
 				$connected = true;
 				// When there is no error it returns bool if we are allowed to post or not.
-				$this->postingAllowed = $ret;
+				$this->_postingAllowed = $ret;
 			} else {
 				// Only fetch the message once.
 				if (!$cError) {
@@ -248,11 +254,12 @@ class NNTP extends Net_NNTP_Client
 			if ($retries === 0 && !$connected) {
 				$message =
 					"Cannot connect to server " .
-					$this->currentServer .
+					$this->_currentServer .
 					$enc .
 					': ' .
 					$cError;
-				return $this->throwError($this->c->error($message));
+
+				return $this->throwError($this->_c->error($message));
 			}
 
 			// If we are connected, try to authenticate.
@@ -287,14 +294,15 @@ class NNTP extends Net_NNTP_Client
 					if ($retries === 0 && $authenticated === false) {
 						$message =
 							"Cannot authenticate to server " .
-							$this->currentServer .
+							$this->_currentServer .
 							$enc .
 							' - ' .
 							$userName .
 							' (' .
 							$aError .
 							')';
-						return $this->throwError($this->c->error($message));
+
+						return $this->throwError($this->_c->error($message));
 					}
 				}
 			}
@@ -302,7 +310,7 @@ class NNTP extends Net_NNTP_Client
 			// If we are connected and authenticated, try enabling compression if we have it enabled.
 			if ($connected === true && $authenticated === true) {
 				// Try to enable compression.
-				if ($compression === true && $this->site->compressedheaders === '1') {
+				if ($compression === true && $this->_site->compressedheaders === '1') {
 					$this->_enableCompression();
 				}
 				return true;
@@ -316,8 +324,9 @@ class NNTP extends Net_NNTP_Client
 			usleep(400000);
 		}
 		// If we somehow got out of the loop, return an error.
-		$message = 'Unable to connect to ' . $this->currentServer . $enc;
-		return $this->throwError($this->c->error($message));
+		$message = 'Unable to connect to ' . $this->_currentServer . $enc;
+
+		return $this->throwError($this->_c->error($message));
 	}
 
 	/**
@@ -347,9 +356,9 @@ class NNTP extends Net_NNTP_Client
 	 */
 	protected function _resetProperties()
 	{
-		$this->compression = false;
+		$this->_compression = false;
 		$this->currentGroup = '';
-		$this->postingAllowed = false;
+		$this->_postingAllowed = false;
 		parent::_resetProperties();
 	}
 
@@ -362,7 +371,7 @@ class NNTP extends Net_NNTP_Client
 	 */
 	public function selectGroup($group, $articles = false, $force = false)
 	{
-		$connected = $this->checkConnection(false);
+		$connected = $this->_checkConnection(false);
 		if ($connected !== true) {
 			return $connected;
 		}
@@ -388,7 +397,7 @@ class NNTP extends Net_NNTP_Client
 	 */
 	public function getOverview($range = null, $names = true, $forceNames = true)
 	{
-		$connected = $this->checkConnection();
+		$connected = $this->_checkConnection();
 		if ($connected !== true) {
 			return $connected;
 		}
@@ -405,9 +414,9 @@ class NNTP extends Net_NNTP_Client
 	 * @return string On success : The article's body.
 	 * @return object On failure : Pear error.
 	 *
-	 * @access public
+	 * @access protected
 	 */
-	public function getMessage($groupName, $identifier)
+	protected function &_getMessage($groupName, $identifier)
 	{
 		// Make sure the requested group is already selected, if not select it.
 		if (parent::group() !== $groupName) {
@@ -422,7 +431,7 @@ class NNTP extends Net_NNTP_Client
 		// Check if this is an article number or message-id.
 		if (!is_numeric($identifier)) {
 			// It's a message-id so check if it has the triangular brackets.
-			$identifier = $this->formatMessageID($identifier);
+			$identifier = $this->_formatMessageID($identifier);
 		}
 
 		// Download the article body from usenet.
@@ -433,7 +442,9 @@ class NNTP extends Net_NNTP_Client
 		}
 
 		// Attempt to yEnc decode and return the body.
-		return $this->_decodeIgnoreYEnc($body);
+		$body = $this->_decodeIgnoreYEnc($body);
+
+		return $body;
 	}
 
 	/**
@@ -450,13 +461,14 @@ class NNTP extends Net_NNTP_Client
 	 */
 	public function getMessages($groupName, $identifiers)
 	{
-		$connected = $this->checkConnection();
+		$connected = $this->_checkConnection();
 		if ($connected !== true) {
 			return $connected;
 		}
 
 		// String to hold all the bodies.
 		$body = '';
+		$nntp = new NNTP();
 
 		// Check if the msgIds are in an array.
 		if (is_array($identifiers)) {
@@ -467,7 +479,7 @@ class NNTP extends Net_NNTP_Client
 			// Loop over the message-ID's or article numbers.
 			foreach ($identifiers as $wanted) {
 				// Download the body.
-				$message = $this->getMessage($groupName, $wanted);
+				$message = $this->_getMessage($groupName, $wanted);
 
 				// Append the body to $body.
 				if (!$this->isError($message)) {
@@ -488,12 +500,13 @@ class NNTP extends Net_NNTP_Client
 
 			// If it's a string check if it's a valid message-ID.
 		} else if (is_string($identifiers) || is_numeric($identifiers)) {
-			$body = $this->getMessage($groupName, $identifiers);
+			$body = $this->_getMessage($groupName, $identifiers);
 			// Else return an error.
 		} else {
 			$message = 'Wrong Identifier type, array, int or string accepted. This type of var was passed: ' . gettype($identifiers);
-			return $this->throwError($this->c->error($message));
-        }
+
+			return $this->throwError($this->_c->error($message));
+		}
 
 		return $body;
 	}
@@ -513,7 +526,7 @@ class NNTP extends Net_NNTP_Client
 	 */
 	public function get_Article($groupName, $identifier, $yEnc = false)
 	{
-		$connected = $this->checkConnection();
+		$connected = $nntp->_checkConnection();
 		if ($connected !== true) {
 			return $connected;
 		}
@@ -531,7 +544,7 @@ class NNTP extends Net_NNTP_Client
 		// Check if it's an article number or message-ID.
 		if (!is_numeric($identifier)) {
 			// If it's a message-ID, check if it has the required triangular brackets.
-			$identifier = $this->formatMessageID($identifier);
+			$identifier = $nntp->_formatMessageID($identifier);
 		}
 
 		// Download the article.
@@ -588,7 +601,7 @@ class NNTP extends Net_NNTP_Client
 	 */
 	public function get_Header($groupName, $identifier)
 	{
-		$connected = $this->checkConnection();
+		$connected = $nntp->_checkConnection();
 		if ($connected !== true) {
 			return $connected;
 		}
@@ -606,7 +619,7 @@ class NNTP extends Net_NNTP_Client
 		// Check if it's an article number or message-id.
 		if (!is_numeric($identifier)) {
 			// Verify we have the required triangular brackets if it is a message-id.
-			$identifier = $this->formatMessageID($identifier);
+			$identifier = $nntp->_formatMessageID($identifier);
 		}
 
 		// Download the header.
@@ -657,12 +670,13 @@ class NNTP extends Net_NNTP_Client
 	 */
 	public function postArticle($groups, $subject, $body, $from, $yEnc = true, $compress = true, $extra = '')
 	{
-		if (!$this->postingAllowed) {
-			$message = 'You do not have the right to post articles on server ' . $this->currentServer;
-			return $this->throwError($this->c->error($message));
+		if (!$this->_postingAllowed) {
+			$message = 'You do not have the right to post articles on server ' . $this->_currentServer;
+
+			return $this->throwError($this->_c->error($message));
 		}
 
-		$connected = $this->checkConnection();
+		$connected = $nntp->_checkConnection();
 		if ($connected !== true) {
 			return $connected;
 		}
@@ -670,12 +684,14 @@ class NNTP extends Net_NNTP_Client
 		// Throw errors if subject or from are more than 510 chars.
 		if (strlen($subject) > 510) {
 			$message = 'Max length of subject is 510 chars.';
-			return $this->throwError($this->c->error($message));
+
+			return $this->throwError($this->_c->error($message));
 		}
 
 		if (strlen($from) > 510) {
 			$message = 'Max length of from is 510 chars.';
-			return $this->throwError($this->c->error($message));
+
+			return $this->throwError($this->_c->error($message));
 		}
 
 		// Check if the group is string or array.
@@ -728,8 +744,8 @@ class NNTP extends Net_NNTP_Client
 		if ($this->isError($data)) {
 			$message = "Code {$data->code}: {$data->message}\nSkipping group: {$group}";
 
-			if ($this->echo) {
-				$this->c->doEcho($this->c->error($message), true);
+			if ($this->_echo) {
+				$this->_c->doEcho($this->_c->error($message), true);
 			}
 			$nntp->doQuit();
 		}
@@ -747,11 +763,11 @@ class NNTP extends Net_NNTP_Client
 	 * @return self    Our overridden function when compression is enabled.
 	 * @return parent  Parent function when no compression.
 	 *
-	 * @access public
+	 * @access protected
 	 */
-	public function _getTextResponse()
+	protected function _getTextResponse()
 	{
-		if ($this->compression === true &&
+		if ($this->_compression === true &&
 			isset($this->_currentStatusResponse[1]) &&
 			stripos($this->_currentStatusResponse[1], 'COMPRESS=GZIP') !== false) {
 
@@ -768,11 +784,11 @@ class NNTP extends Net_NNTP_Client
 	 *
 	 * @return string The decoded yEnc string, or the input string, if it's not yEnc.
 	 */
-	protected function _decodeIgnoreYEnc($data)
+	protected function &_decodeIgnoreYEnc($data)
 	{
 		if (preg_match('/^(=yBegin.*=yEnd[^$]*)$/ims', $data, $input)) {
 			// If there user has no yyDecode path set, use PHP to decode yEnc.
-			if ($this->yyDecoderPath === false) {
+			if ($this->_yyDecoderPath === false) {
 				$data = '';
 				$input =
 					trim(
@@ -798,23 +814,23 @@ class NNTP extends Net_NNTP_Client
 			} elseif ($this->yEncExtension) {
 				$data = simple_yenc_decode($input[1]);
 			} else {
-				$inFile = $this->yEncTempInput . mt_rand(0, 999999);
-				$ouFile = $this->yEncTempOutput . mt_rand(0, 999999);
+				$inFile = $this->_yEncTempInput . mt_rand(0, 999999);
+				$ouFile = $this->_yEncTempOutput . mt_rand(0, 999999);
 				file_put_contents($inFile, $input[1]);
 				file_put_contents($ouFile, '');
 				$this->functions->runCmd(
 					"'" .
-					$this->yyDecoderPath .
+					$this->_yyDecoderPath .
 					"' '" .
 					$inFile .
 					"' -o '" .
 					$ouFile .
 					"' -f -b" .
-					$this->yEncSilence
+					$this->_yEncSilence
 				);
 				$data = file_get_contents($ouFile);
 				if ($data === false) {
-					return $this->throwError('Error getting data from yydecode.');
+					$data = $this->throwError('Error getting data from yydecode.');
 				}
 				unlink($inFile);
 				unlink($ouFile);
@@ -838,7 +854,7 @@ class NNTP extends Net_NNTP_Client
 	 *
 	 * @access protected
 	 */
-	protected function _getXFeatureTextResponse()
+	protected function &_getXFeatureTextResponse()
 	{
 		$tries = $bytesReceived = $totalBytesReceived = 0;
 		$completed = $possibleTerm = false;
@@ -887,10 +903,10 @@ class NNTP extends Net_NNTP_Client
 				// Split the string of headers into an array of individual headers, then return it.
 				if (!empty($deComp)) {
 
-					if ($this->echo && $totalBytesReceived > 10240) {
-						$this->c->doEcho(
-							$this->c->primaryOver(
-								'Received ' .
+					if ($this->_echo && $totalBytesReceived > 10240) {
+						$this->_c->doEcho(
+							$this->_c->primaryOver(
+							'Received ' .
 								round($totalBytesReceived / 1024) .
 								'KB from group (' .
 								$this->group() .
@@ -900,12 +916,15 @@ class NNTP extends Net_NNTP_Client
 					}
 
 					// Return array of headers.
-					return explode("\r\n", trim($deComp));
+					$deComp = explode("\r\n", trim($deComp));
+
+					return $deComp;
 				} else {
 					// Try 5 times to decompress.
 					if ($tries++ > 5) {
 						$message = 'Decompression Failed after 5 tries.';
-						return $this->throwError($this->c->error($message), 1000);
+
+						return $this->throwError($this->_c->error($message), 1000);
 					}
 					// Skip the loop to try decompressing again.
 					continue;
@@ -924,7 +943,9 @@ class NNTP extends Net_NNTP_Client
 			// If the buffer is zero it's zero, return error.
 			if ($bytesReceived === 0) {
 				$message = 'The NNTP server has returned no data.';
-				return $this->throwError($this->c->error($message), 1000);
+				$message = $this->throwError($this->_c->error($message), 1000);
+
+				return $message;
 			}
 
 			// Append buffer to final data object.
@@ -947,11 +968,15 @@ class NNTP extends Net_NNTP_Client
 		// Throw an error if we get out of the loop.
 		if (!feof($this->_socket)) {
 			$message = "Error: Could not find the end-of-file pointer on the gzip stream.";
-			return $this->throwError($this->c->error($message), 1000);
+			$message = $this->throwError($this->_c->error($message), 1000);
+
+			return $message;
 		}
 
 		$message = 'Decompression Failed, connection closed.';
-		return $this->throwError($this->c->error($message), 1000);
+		$message = $this->throwError($this->_c->error($message), 1000);
+
+		return $message;
 	}
 
    /**
@@ -962,14 +987,14 @@ class NNTP extends Net_NNTP_Client
 	 * @return mixed On success: (bool)   True;
 	 *               On failure: (object) PEAR_Error>
 	 */
-	protected function checkConnection($reSelectGroup = true)
+	protected function &_checkConnection($reSelectGroup = true)
 	{
 		$currentGroup = $this->currentGroup;
 		// Check if we are connected.
 		if (parent::_isConnected()) {
 			$retVal = true;
 		} else {
-			switch($this->currentServer) {
+			switch ($this->_currentServer) {
 				case NNTP_SERVER:
 					if (is_resource($this->_socket)) {
 						$this->doQuit(true);
@@ -1008,7 +1033,7 @@ class NNTP extends Net_NNTP_Client
 	{
 		if (preg_match('/^(=yBegin.*=yEnd[^$]*)$/ims', $data, $input)) {
 			// If there user has no yyDecode path set, use PHP to decode yEnc.
-			if ($this->yyDecoderPath === false) {
+			if ($this->_yyDecoderPath === false) {
 				$data = '';
 				$input =
 					trim(
@@ -1032,19 +1057,19 @@ class NNTP extends Net_NNTP_Client
 					$data .= ($input[$chr] !== '=' ? chr(ord($input[$chr]) - 42) : chr((ord($input[++$chr]) - 64) - 42));
 				}
 			} else {
-				$inFile = $this->yEncTempInput . mt_rand(0, 999999);
-				$ouFile = $this->yEncTempOutput . mt_rand(0, 999999);
+				$inFile = $this->_yEncTempInput . mt_rand(0, 999999);
+				$ouFile = $this->_yEncTempOutput . mt_rand(0, 999999);
 				file_put_contents($inFile, $input[1]);
 				file_put_contents($ouFile, '');
 				$this->functions->runCmd(
 					"'" .
-					$this->yyDecoderPath .
+					$this->_yyDecoderPath .
 					"' '" .
 					$inFile .
 					"' -o '" .
 					$ouFile .
 					"' -f -b" .
-					$this->yEncSilence
+					$this->_yEncSilence
 				);
 				$data = file_get_contents($ouFile);
 				unlink($inFile);
@@ -1063,8 +1088,12 @@ class NNTP extends Net_NNTP_Client
 	 *
 	 * @access protected
 	 */
-	protected function formatMessageID($messageID)
+	protected function _formatMessageID($messageID)
 	{
+		$messageID = (string)$messageID;
+		if (strlen($messageID) < 1) {
+			return false;
+		}
 		// Check if the first char is <, if not add it.
 		if ($messageID[0] !== '<') {
 			$messageID = '<' . $messageID;
@@ -1088,7 +1117,7 @@ class NNTP extends Net_NNTP_Client
 	 *
 	 * @access protected
 	 */
-	protected function splitLines($string, $compress = false)
+	protected function _splitLines($string, $compress = false)
 	{
 		// Check if the length is longer than 510 chars.
 		if (strlen($string) > 510) {
@@ -1123,13 +1152,14 @@ class NNTP extends Net_NNTP_Client
 		} else if ($response !== 290) {
 			$msg = "XFeature GZip Compression not supported. Consider disabling compression in site settings.";
 
-			if ($this->echo) {
-				$this->c->doEcho($this->c->error($msg), true);
+			if ($this->_echo) {
+				$this->_c->doEcho($this->_c->error($msg), true);
 			}
 			return $response;
 		}
 
-		$this->compression = true;
+		$this->_compression = true;
+
 		return true;
 	}
 
@@ -1727,7 +1757,6 @@ class NNTP extends Net_NNTP_Client
 
 					if ($line === false) {
 						$error = $this->throwError('Failed to read line from socket.', null);
-
 						return $error;
 					}
 
@@ -1745,9 +1774,9 @@ class NNTP extends Net_NNTP_Client
 				return $error;
 
 			default:
-				$error = $this->_handleErrorResponse($response);
+				$response = $this->_handleErrorResponse($response);
 
-				return $error;
+				return $response;
 		}
 	}
 
