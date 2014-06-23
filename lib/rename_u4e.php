@@ -60,7 +60,7 @@ $releases = $db->queryDirect(
 		FROM releasefiles rf
 		INNER JOIN releases r ON rf.releaseID = r.ID
 		INNER JOIN groups g ON r.groupID = g.ID
-		WHERE (r.isrenamed = 0 OR r.categoryID = 8010)
+		WHERE (r.isrenamed = 0 AND r.categoryID = 8010)
 		AND r.passwordstatus = 0
 		AND rf.name %s
 		ORDER BY r.postdate DESC',
@@ -143,7 +143,7 @@ if ($releases !== false) {
 
 		$fileName = '';
 		foreach ($files as $file) {
-			if (preg_match('/linux.*\.sh/i', $file)) {
+			if (preg_match('/Linux.*\.sh/i', $file)) {
 				$fileName = $file;
 				break;
 			}
