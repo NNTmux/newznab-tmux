@@ -89,6 +89,4 @@ INSERT INTO category (ID, title, parentID) VALUES (7060, 'Foreign', 7000);
 INSERT INTO category (ID, title, parentID) VALUES (8010, 'Misc', 8000);
 INSERT INTO category (ID, title, parentID) VALUES (8020, 'Hashed', 8000);
 
-UPDATE `tmux`
-SET `value` = '48'
-WHERE `setting` = 'sqlpatch';
+UPDATE `tmux` SET `value` = '48' WHERE `setting` = 'sqlpatch';
