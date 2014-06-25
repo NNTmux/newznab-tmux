@@ -183,7 +183,7 @@ class Categorize extends Category
 					if ($this->categorizeForeign && $this->isBookForeign()) {
 						break;
 					}
-					$this->tmpCat = Category::CAT_BOOK_MAGAZINES;
+					$this->tmpCat = Category::CAT_BOOK_MAGS;
 					break;
 				case $group === 'alt.binaries.e-book.rpg':
 					switch (true) {
@@ -336,7 +336,7 @@ class Categorize extends Category
 					$this->tmpCat = Category::CAT_MUSIC_VIDEO;
 					break;
 				case $group === 'alt.binaries.multimedia.documentaries':
-					$this->tmpCat = Category::CAT_TV_DOCUMENTARY;
+					$this->tmpCat = Category::CAT_TV_DOCU;
 					break;
 				case preg_match('/alt\.binaries\.multimedia\.sports(\.boxing)?/', $group):
 					$this->tmpCat = Category::CAT_TV_SPORT;
@@ -521,7 +521,8 @@ class Categorize extends Category
 	public function isDocumentaryTV()
 	{
 		if (preg_match('/[-._ ](Docu|Documentary)[-._ ]/i', $this->releaseName)) {
-			$this->tmpCat = Category::CAT_TV_DOCUMENTARY;
+			$this->tmpCat = Category::CAT_TV_DOCU;
+
 			return true;
 		}
 		return false;
@@ -1167,8 +1168,8 @@ class Categorize extends Category
 			case $this->isTechnicalBook():
 			case $this->isMagazine():
 			case $this->isBookOther():
-			case $this->isEBook():
-				return true;
+			case $this->isBookEBook():
+			return true;
 			default:
 				return false;
 		}
@@ -1224,7 +1225,7 @@ class Categorize extends Category
 			case $this->isBookForeign():
 				break;
 			default:
-				$this->tmpCat = Category::CAT_BOOK_MAGAZINES;
+				$this->tmpCat = Category::CAT_BOOK_MAGS;
 				break;
 		}
 		return true;
@@ -1240,7 +1241,7 @@ class Categorize extends Category
 		return false;
 	}
 
-	public function isEBook()
+	public function isBookEBook()
 	{
 		switch (true) {
 			case !preg_match('/^ePub|[-._ ](Ebook|E?\-book|\) WW|Publishing)|[\.\-_\(\[ ](azw|epub|html|mobi|pdf|rtf|tif|txt)[\.\-_\)\] ]|[\. ](azw|doc|epub|mobi|pdf)(?![\w .])|\.ebook-\w$/i', $this->releaseName):
