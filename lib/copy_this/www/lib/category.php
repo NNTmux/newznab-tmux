@@ -186,10 +186,10 @@ class Category
 	{
 		return $this->db->queryOneRow(
 			sprintf(
-				"SELECT c.disablepreview, c.ID,
+				"SELECT c.disablepreview, c.ID, c.description, c.minsizetoformrelease, c.maxsizetoformrelease,
 					CONCAT(COALESCE(cp.title,'') ,
 					CASE WHEN cp.title IS NULL THEN '' ELSE ' > ' END , c.title) AS title,
-					c.status, c.parentID, c.minsizetoformelease
+					c.status, c.parentID,
 				FROM category c
 				LEFT OUTER JOIN category cp ON cp.ID = c.parentID
 				WHERE c.ID = %d", $id
@@ -235,7 +235,7 @@ class Category
 	{
 		return $this->db->query(
 			sprintf(
-				"UPDATE category SET disablepreview = %d, status = %d, description = %s, minsize = %d
+				"UPDATE category SET disablepreview = %d, status = %d, description = %s, minsizetoformrelease = %d
 				WHERE ID = %d",
 				$disablepreview, $status, $this->db->escapeString($desc), $minsize, $id
 			)
@@ -253,7 +253,7 @@ class Category
 
 		$exccatlist = '';
 		if (count($excludedcats) > 0) {
-			$exccatlist = ' AND id NOT IN (' . implode(',', $excludedcats) . ')';
+			$exccatlist = ' AND ID NOT IN (' . implode(',', $excludedcats) . ')';
 		}
 
 		$arr = $this->db->query(sprintf('SELECT * FROM category WHERE status = %d %s', Category::STATUS_ACTIVE, $exccatlist));
