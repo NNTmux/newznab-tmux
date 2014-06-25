@@ -105,7 +105,7 @@ Class ProcessAdditional
 		$this->_archiveInfo = new ArchiveInfo();
 		$this->_releaseFiles = new ReleaseFiles();
 		$this->_nameFixer = new NameFixer($this->_echoCLI);
-		$this->_categorize = new Category();
+		$this->_categorize = new Categorize();
 		$this->_releaseExtra = new ReleaseExtra();
 		$this->_releaseImage = new ReleaseImage();
 		$this->_par2Info = new Par2Info();

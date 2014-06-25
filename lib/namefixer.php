@@ -64,7 +64,7 @@ class NameFixer
 		$this->done = $this->matched = false;
 		$this->c = new ColorCLI();
 		$this->consoletools = new ConsoleTools();
-		$this->category = new Category();
+		$this->category = new Categorize();
 		$this->functions = new Functions();
 		$this->_groups = new Groups($this->db);
 	}
