@@ -1071,9 +1071,9 @@ class Net_NNTP_Protocol_Client extends PEAR
 	 *
 	 * @return mixed (bool) true on success
 	 *               (object) pear_error on failure
-	 * @access protected
+	 * @access public
 	 */
-	protected function cmdPost()
+	public function cmdPost()
 	{
 		$response = $this->_sendCommand('POST');
 		if ($this->isError($response)) {
