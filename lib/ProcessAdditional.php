@@ -1517,7 +1517,7 @@ Class ProcessAdditional
 					$saved = $this->_releaseImage->saveImage(
 						$this->_release['guid'] . '_thumb',
 						$this->tmpPath . $file,
-						$this->_releaseImage->imgSavePath, 800, 600
+						$this->_releaseImage->imgSavePath, 650, 650
 					);
 
 					// Delete the temp file we created.
