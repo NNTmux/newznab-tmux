@@ -89,7 +89,7 @@ class Categorize extends Category
 	 */
 	public function byGroup()
 	{
-		$group = $this->db->queryOneRow(sprintf('SELECT LOWER(name) AS name FROM groups WHERE id = %d', $this->groupID));
+		$group = $this->db->queryOneRow(sprintf('SELECT LOWER(name) AS name FROM groups WHERE ID = %d', $this->groupID));
 		if ($group !== false) {
 			$group = $group['name'];
 			switch (true) {
@@ -168,7 +168,7 @@ class Categorize extends Category
 					$this->tmpCat = Category::CAT_MOVIE_FOREIGN;
 					break;
 				case $group === 'alt.binaries.documentaries':
-					$this->tmpCat = Category::CAT_TV_DOCUMENTARY;
+					$this->tmpCat = Category::CAT_TV_DOCU;
 					break;
 				case $group === 'alt.binaries.dreamcast':
 					$this->tmpCat = Category::CAT_GAME_OTHER;
@@ -422,7 +422,7 @@ class Categorize extends Category
 					if ($this->isPhone()) {
 						break;
 					}
-					$this->tmpCat = Category::CAT_PC_PHONE_OTHER;
+					$this->tmpCat = Category::CAT_PC_MOBILEOTHER;
 					break;
 				case $this->categorizeForeign && $group === 'db.binaer.tv':
 					$this->tmpCat = Category::CAT_TV_FOREIGN;
@@ -692,13 +692,13 @@ class Categorize extends Category
 	{
 		switch (true) {
 			case preg_match('/[^a-z0-9](IPHONE|ITOUCH|IPAD)[-._ ]/i', $this->releaseName):
-				$this->tmpCat = Category::CAT_PC_PHONE_IOS;
+				$this->tmpCat = Category::CAT_PC_MOBILEIOS;
 				break;
 			case preg_match('/[-._ ]?(ANDROID)[-._ ]/i', $this->releaseName):
-				$this->tmpCat = Category::CAT_PC_PHONE_ANDROID;
+				$this->tmpCat = Category::CAT_PC_MOBILEANDROID;
 				break;
 			case preg_match('/[^a-z0-9](symbian|xscale|wm5|wm6)[-._ ]/i', $this->releaseName):
-				$this->tmpCat = Category::CAT_PC_PHONE_OTHER;
+				$this->tmpCat = Category::CAT_PC_MOBILEOTHER;
 				break;
 			default:
 				return false;
