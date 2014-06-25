@@ -46,7 +46,7 @@ class Categorize extends Category
 		$site = $s->get();
 		$this->categorizeForeign = ($site->categorizeforeign == "0") ? false : true;
 		$this->catWebDL = ($site->catwebdl == "0") ? false : true;
-		parent::__construct();
+		//parent::__construct();
 	}
 
 	/**
