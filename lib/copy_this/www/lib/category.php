@@ -97,17 +97,17 @@ class Category
 	public function get($activeonly = false, $excludedcats = array())
 	{
 		return $this->db->query(
-			"SELECT c.id, CONCAT(cp.title, ' > ',c.title) AS title, cp.id AS parentid, c.status, c.minsize
+			"SELECT c.ID, CONCAT(cp.title, ' > ',c.title) AS title, cp.ID AS parentID, c.status, c.minsizetoformrelease
 			FROM category c
-			INNER JOIN category cp ON cp.id = c.parentid " .
+			INNER JOIN category cp ON cp.ID = c.parentID " .
 			($activeonly ?
 				sprintf(
 					" WHERE c.status = %d %s ",
 					Category::STATUS_ACTIVE,
-					(count($excludedcats) > 0 ? " AND c.id NOT IN (" . implode(",", $excludedcats) . ")" : '')
+					(count($excludedcats) > 0 ? " AND c.ID NOT IN (" . implode(",", $excludedcats) . ")" : '')
 				) : ''
 			) .
-			" ORDER BY c.id"
+			" ORDER BY c.ID"
 		);
 	}
 
@@ -120,7 +120,7 @@ class Category
 	 */
 	public function isParent($cid)
 	{
-		$ret = $this->db->queryOneRow(sprintf("SELECT * FROM category WHERE id = %d AND parentid IS NULL", $cid));
+		$ret = $this->db->queryOneRow(sprintf("SELECT * FROM category WHERE ID = %d AND parentID IS NULL", $cid));
 		if ($ret) {
 			return true;
 		} else {
@@ -140,7 +140,7 @@ class Category
 			$act = sprintf(" WHERE c.status = %d ", Category::STATUS_ACTIVE);
 		}
 
-		return $this->db->query("SELECT c.*, (SELECT title FROM category WHERE id=c.parentid) AS parentName FROM category c " . $act . " ORDER BY c.id");
+		return $this->db->query("SELECT c.*, (SELECT title FROM category WHERE ID = c.parentID) AS parentName FROM category c " . $act . " ORDER BY c.ID");
 	}
 
 	/**
@@ -152,7 +152,7 @@ class Category
 	 */
 	public function getChildren($cid)
 	{
-		return $this->db->query(sprintf("SELECT c.* FROM category c WHERE parentid = %d", $cid));
+		return $this->db->query(sprintf("SELECT c.* FROM category c WHERE parentID = %d", $cid));
 	}
 
 	/**
@@ -162,7 +162,7 @@ class Category
 	 */
 	public function getEnabledParentNames()
 	{
-		return $this->db->query("SELECT title FROM category WHERE parentid IS NULL AND status = 1");
+		return $this->db->query("SELECT title FROM category WHERE parentID IS NULL AND status = 1");
 	}
 
 	/**
@@ -172,7 +172,7 @@ class Category
 	 */
 	public function getDisabledIDs()
 	{
-		return $this->db->query("SELECT id FROM category WHERE status = 2 OR parentid IN (SELECT id FROM category WHERE status = 2 AND parentid IS NULL)");
+		return $this->db->query("SELECT ID FROM category WHERE status = 2 OR parentID IN (SELECT ID FROM category WHERE status = 2 AND parentID IS NULL)");
 	}
 
 	/**
@@ -186,13 +186,13 @@ class Category
 	{
 		return $this->db->queryOneRow(
 			sprintf(
-				"SELECT c.disablepreview, c.id,
+				"SELECT c.disablepreview, c.ID,
 					CONCAT(COALESCE(cp.title,'') ,
 					CASE WHEN cp.title IS NULL THEN '' ELSE ' > ' END , c.title) AS title,
-					c.status, c.parentID, c.minsize
+					c.status, c.parentID, c.minsizetoformelease
 				FROM category c
-				LEFT OUTER JOIN category cp ON cp.id = c.parentid
-				WHERE c.id = %d", $id
+				LEFT OUTER JOIN category cp ON cp.ID = c.parentID
+				WHERE c.ID = %d", $id
 			)
 		);
 	}
@@ -211,8 +211,8 @@ class Category
 				sprintf(
 					"SELECT CONCAT(cp.title, ' > ',c.title) AS title
 					FROM category c
-					INNER JOIN category cp ON cp.id = c.parentid
-					WHERE c.id IN (%s)", implode(',', $ids)
+					INNER JOIN category cp ON cp.ID = c.parentID
+					WHERE c.ID IN (%s)", implode(',', $ids)
 				)
 			);
 		} else {
@@ -236,7 +236,7 @@ class Category
 		return $this->db->query(
 			sprintf(
 				"UPDATE category SET disablepreview = %d, status = %d, description = %s, minsize = %d
-				WHERE id = %d",
+				WHERE ID = %d",
 				$disablepreview, $status, $this->db->escapeString($desc), $minsize, $id
 			)
 		);
@@ -258,7 +258,7 @@ class Category
 
 		$arr = $this->db->query(sprintf('SELECT * FROM category WHERE status = %d %s', Category::STATUS_ACTIVE, $exccatlist));
 		foreach ($arr as $a) {
-			if ($a['parentid'] == '') {
+			if ($a['parentID'] == '') {
 				$ret[] = $a;
 			}
 		}
@@ -267,7 +267,7 @@ class Category
 			$subcatlist = array();
 			$subcatnames = array();
 			foreach ($arr as $a) {
-				if ($a['parentid'] == $parent['id']) {
+				if ($a['parentID'] == $parent['ID']) {
 					$subcatlist[] = $a;
 					$subcatnames[] = $a['title'];
 				}
@@ -299,7 +299,7 @@ class Category
 		}
 
 		foreach ($categories as $category) {
-			$temp_array[$category["id"]] = $category["title"];
+			$temp_array[$category["ID"]] = $category["title"];
 		}
 
 		return $temp_array;
@@ -314,8 +314,8 @@ class Category
 	 */
 	public function getNameByID($ID)
 	{
-		$parent = $this->db->queryOneRow(sprintf("SELECT title FROM category WHERE id = %d", substr($ID, 0, 1) . "000"));
-		$cat = $this->db->queryOneRow(sprintf("SELECT title FROM category WHERE id = %d", $ID));
+		$parent = $this->db->queryOneRow(sprintf("SELECT title FROM category WHERE ID = %d", substr($ID, 0, 1) . "000"));
+		$cat = $this->db->queryOneRow(sprintf("SELECT title FROM category WHERE ID = %d", $ID));
 
 		return $parent["title"] . " " . $cat["title"];
 	}
