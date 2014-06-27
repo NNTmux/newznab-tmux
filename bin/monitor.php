@@ -1,7 +1,6 @@
 <?php
 require_once(dirname(__FILE__) . "/config.php");
 require_once(WWW_DIR . "lib/framework/db.php");
-require(WWW_DIR . '/lib/postprocess.php');
 require_once(WWW_DIR . '/lib/site.php');
 require_once(WWW_DIR . '/lib/Tmux.php');
 require_once(dirname(__FILE__) . "/../lib/ColorCLI.php");
@@ -9,7 +8,7 @@ require_once(dirname(__FILE__) . "/../lib/showsleep.php");
 require_once(dirname(__FILE__) . "/../lib/functions.php");
 
 
-$version = "0.3r1194";
+$version = "0.4r2000";
 
 $db = new DB();
 $functions = new Functions();
