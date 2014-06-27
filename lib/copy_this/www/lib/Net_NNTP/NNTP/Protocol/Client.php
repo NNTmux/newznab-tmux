@@ -452,8 +452,8 @@ class Net_NNTP_Protocol_Client extends PEAR
 	 * @return string The response message.
 	 * @access protected
 	 */
-potected function _currentStatusResponse()
-{
+	protected function _currentStatusResponse()
+	{
 	return $this->_currentStatusResponse[1];
 	}
 
