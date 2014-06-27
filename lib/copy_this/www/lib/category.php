@@ -1,5 +1,6 @@
 <?php
 require_once(WWW_DIR . "/lib/framework/db.php");
+require_once(WWW_DIR . "lib/Categorize.php");
 
 /**
  * This class manages the site wide categories.
