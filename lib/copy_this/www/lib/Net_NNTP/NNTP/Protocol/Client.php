@@ -450,11 +450,11 @@ class Net_NNTP_Protocol_Client extends PEAR
 	 * Return the last received response message.
 	 *
 	 * @return string The response message.
-	 * @access private
+	 * @access protected
 	 */
-	private function _currentStatusResponse()
-	{
-		return $this->_currentStatusResponse[1];
+potected function _currentStatusResponse()
+{
+	return $this->_currentStatusResponse[1];
 	}
 
 	/* Session administration commands */
