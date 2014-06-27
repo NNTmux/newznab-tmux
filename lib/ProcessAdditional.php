@@ -190,6 +190,17 @@ Class ProcessAdditional
 	{
 		// Fetch all the releases to work on.
 		if ($release === '') {
+			// Clear out old folders/files from the temp folder.
+			$this->_recursivePathDelete(
+				$this->_mainTmpPath,
+				// These are folders we don't want to delete.
+				array(
+					// This is the actual unrar folder.
+					$this->_mainTmpPath,
+					// This folder is used by misc/testing/Dev/rename_u4e.php
+					$this->_mainTmpPath . 'u4e'
+				)
+			);
 			$this->_fetchReleases($groupID);
 		} else {
 			$release = explode('           =+=            ', $release);
@@ -377,6 +388,36 @@ Class ProcessAdditional
 		}
 		if ($this->_echoCLI) {
 			echo PHP_EOL;
+		}
+	}
+
+	/**
+	 * Deletes files and folders recursively.
+	 *
+	 * @param string $path           Path to a folder or file.
+	 * @param array  $ignoredFolders Array with paths to folders to ignore.
+	 *
+	 * @void
+	 * @access protected
+	 */
+	protected function _recursivePathDelete($path, $ignoredFolders = array())
+	{
+		if (is_dir($path)) {
+
+			$files = glob(rtrim($path, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . '*');
+
+			foreach ($files as $file) {
+				$this->_recursivePathDelete($file, $ignoredFolders);
+			}
+
+			if (in_array($path, $ignoredFolders)) {
+				return;
+			}
+
+			@rmdir($path);
+
+		} else if (is_file($path)) {
+			@unlink($path);
 		}
 	}
 
@@ -895,7 +936,7 @@ Class ProcessAdditional
 					} // Check if it's alt.binaries.u4e file.
 					else if (in_array($this->_releaseGroupName, ['alt.binaries.u4e', 'alt.binaries.mom']) &&
 						preg_match('/Linux_2rename\.sh/i', $file) &&
-						$this->_release['categoryID'] == Category::CAT_MISC_OTHER
+						$this->_release['categoryID'] == Category::CAT_MISC_HASHED
 					) {
 						$this->_processU4ETitle($file);
 					} // If we have GNU file, check the type of file and process it.
@@ -1167,6 +1208,11 @@ Class ProcessAdditional
 
 		$this->_passwordStatus = max($this->_passwordStatus);
 
+		// Set the release to no password if password processing is off.
+		if ($this->_processPasswords === false) {
+			$this->_releaseHasPassword = false;
+		}
+
 		// If we failed to get anything from the RAR/ZIPs, decrement the passwordstatus.
 		if ($this->_NZBHasCompressedFile && $releaseFiles['count'] == 0) {
 			$query = sprintf('
@@ -1202,23 +1248,27 @@ Class ProcessAdditional
 	 * Optional, pass a regex to filter the files.
 	 *
 	 * @param string $pattern Regex, optional
+	 * @param string $path Path to the folder (if empty, uses $this->tmpPath)
 	 *
 	 * @return Iterator Object|bool
 	 */
-	protected function _getTempDirectoryContents($pattern = '')
+	protected function _getTempDirectoryContents($pattern = '', $path = '')
 	{
+		if ($path === '') {
+			$path = $this->tmpPath;
+		}
 		try {
 			if ($pattern !== '') {
 				return new RegexIterator(
 					new RecursiveIteratorIterator(
-						new RecursiveDirectoryIterator($this->tmpPath)
+						new RecursiveDirectoryIterator($path)
 					),
 					$pattern,
 					RecursiveRegexIterator::GET_MATCH
 				);
 			} else {
 				return new RecursiveIteratorIterator(
-					new RecursiveDirectoryIterator($this->tmpPath)
+					new RecursiveDirectoryIterator($path)
 				);
 			}
 		} catch (exception $e) {
@@ -1773,8 +1823,14 @@ Class ProcessAdditional
 				Category::CAT_MOVIE_OTHER,
 				Category::CAT_PC_MOBILEOTHER,
 				Category::CAT_TV_OTHER,
-				Category::CAT_MISC_OTHER,
-				Category::CAT_XXX_OTHER
+				Category::CAT_XXX_OTHER,
+				Category::CAT_BOOK_OTHER,
+				Category::CAT_GAME_OTHER,
+				Category::CAT_MUSIC_OTHER,
+				Category::CAT_TV_OTHER,
+				Category::CAT_MISC_HASHED,
+				Category::CAT_XXX_OTHER,
+				Category::CAT_MISC_OTHER
 			]
 		)
 		) {

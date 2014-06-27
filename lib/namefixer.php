@@ -58,9 +58,9 @@ class NameFixer
 		$this->echooutput = $echooutput;
 		$this->relid = $this->fixed = $this->checked = 0;
 		$this->db = new DB();
-		$this->timeother = ' AND rel.adddate > (NOW() - INTERVAL 0 HOUR) AND rel.categoryID IN (2020, 6070, 5050, 8010) GROUP BY rel.ID ORDER BY postdate DESC';
+		$this->timeother = ' AND rel.adddate > (NOW() - INTERVAL 0 HOUR) AND rel.categoryID IN (1090, 2020, 3050, 6050, 5050, 7050, 8010) GROUP BY rel.ID ORDER BY postdate DESC';
 		$this->timeall = ' AND rel.adddate > (NOW() - INTERVAL 6 HOUR) GROUP BY rel.ID ORDER BY postdate DESC';
-		$this->fullother = ' AND rel.categoryID IN (2020, 6070, 5050, 8010) GROUP BY rel.ID';
+		$this->fullother = ' AND rel.categoryID IN (1090, 2020, 3050, 6050, 5050, 7050, 8010) GROUP BY rel.ID';
 		$this->fullall = '';
 		$this->done = $this->matched = false;
 		$this->c = new ColorCLI();
