@@ -1,6 +1,9 @@
 <?php
 require_once(WWW_DIR . "/lib/framework/db.php");
 
+/**
+ * This class manages the site wide categories.
+ */
 class Category
 {
 	const CAT_GAME_NDS = 1010;
@@ -73,221 +76,176 @@ class Category
 	const STATUS_ACTIVE = 1;
 	const STATUS_DISABLED = 2;
 
-	/**
-	 * @var DB
-	 */
-	protected $db;
+	private $tmpCat = 0;
 
 	/**
-	 * Construct.
-	 */
-	public function __construct()
-	{
-		$this->db = new DB();
-	}
-
-	/**
-	 * Get array of categories in DB.
-	 *
-	 * @param bool  $activeonly
-	 * @param array $excludedcats
-	 *
-	 * @return array
+	 * Get a list of categories.
 	 */
 	public function get($activeonly = false, $excludedcats = array())
 	{
-		return $this->db->query(
-			"SELECT c.ID, CONCAT(cp.title, ' > ',c.title) AS title, cp.ID AS parentID, c.status, c.minsizetoformrelease
-			FROM category c
-			INNER JOIN category cp ON cp.ID = c.parentID " .
-			($activeonly ?
-				sprintf(
-					" WHERE c.status = %d %s ",
-					Category::STATUS_ACTIVE,
-					(count($excludedcats) > 0 ? " AND c.ID NOT IN (" . implode(",", $excludedcats) . ")" : '')
-				) : ''
-			) .
-			" ORDER BY c.ID"
-		);
+		$db = new DB();
+
+		$exccatlist = "";
+		if (count($excludedcats) > 0)
+			$exccatlist = " and c.ID not in (" . implode(",", $excludedcats) . ")";
+
+		$act = "";
+		if ($activeonly)
+			$act = sprintf(" where c.status = %d ", Category::STATUS_ACTIVE);
+
+		if ($exccatlist != "")
+			$act .= $exccatlist;
+
+		return $db->query("select c.ID, concat(cp.title, ' > ',c.title) as title, cp.ID as parentID, c.status from category c inner join category cp on cp.ID = c.parentID " . $act . " ORDER BY c.ID", true);
 	}
 
 	/**
-	 * Check if category is parent.
-	 *
-	 * @param $cid
-	 *
-	 * @return bool
+	 * Determine if a category is a parent.
 	 */
 	public function isParent($cid)
 	{
-		$ret = $this->db->queryOneRow(sprintf("SELECT * FROM category WHERE ID = %d AND parentID IS NULL", $cid));
-		if ($ret) {
+		$db = new DB();
+		$ret = $db->queryOneRow(sprintf("select count(*) as count from category where ID = %d and parentID is null", $cid), true);
+		if ($ret['count'])
 			return true;
-		} else {
+		else
 			return false;
-		}
 	}
 
 	/**
-	 * @param bool $activeonly
-	 *
-	 * @return array
+	 * Get a list of categories and their parents.
 	 */
 	public function getFlat($activeonly = false)
 	{
+		$db = new DB();
 		$act = "";
-		if ($activeonly) {
-			$act = sprintf(" WHERE c.status = %d ", Category::STATUS_ACTIVE);
-		}
+		if ($activeonly)
+			$act = sprintf(" where c.status = %d ", Category::STATUS_ACTIVE);
 
-		return $this->db->query("SELECT c.*, (SELECT title FROM category WHERE ID = c.parentID) AS parentName FROM category c " . $act . " ORDER BY c.ID");
+		return $db->query("select c.*, (SELECT title FROM category WHERE ID=c.parentID) AS parentName from category c " . $act . " ORDER BY c.ID");
 	}
 
 	/**
-	 * Get children of a parent category.
-	 *
-	 * @param $cid
-	 *
-	 * @return array
+	 * Get a list of all child categories for a parent.
 	 */
 	public function getChildren($cid)
 	{
-		return $this->db->query(sprintf("SELECT c.* FROM category c WHERE parentID = %d", $cid));
+		$db = new DB();
+
+		return $db->query(sprintf("select c.* from category c where parentID = %d", $cid), true);
 	}
 
 	/**
-	 * Get names of enabled parent categories.
-	 *
-	 * @return array
-	 */
-	public function getEnabledParentNames()
-	{
-		return $this->db->query("SELECT title FROM category WHERE parentID IS NULL AND status = 1");
-	}
-
-	/**
-	 * Returns category ID's for site disabled categories.
-	 *
-	 * @return array
-	 */
-	public function getDisabledIDs()
-	{
-		return $this->db->query("SELECT ID FROM category WHERE status = 2 OR parentID IN (SELECT ID FROM category WHERE status = 2 AND parentID IS NULL)");
-	}
-
-	/**
-	 * Get a single category by id.
-	 *
-	 * @param string|int $id
-	 *
-	 * @return array|bool
+	 * Get a category row by its ID.
 	 */
 	public function getById($id)
 	{
-		return $this->db->queryOneRow(
-			sprintf(
-				"SELECT c.disablepreview, c.ID, c.description, c.minsizetoformrelease, c.maxsizetoformrelease,
-					CONCAT(COALESCE(cp.title,'') ,
-					CASE WHEN cp.title IS NULL THEN '' ELSE ' > ' END , c.title) AS title,
-					c.status, c.parentID,
-				FROM category c
-				LEFT OUTER JOIN category cp ON cp.ID = c.parentID
-				WHERE c.ID = %d", $id
+		$db = new DB();
+
+		return $db->queryOneRow(sprintf("SELECT c.disablepreview, c.ID, c.description, c.minsizetoformrelease, c.maxsizetoformrelease, CONCAT(COALESCE(cp.title,'') , CASE WHEN cp.title IS NULL THEN '' ELSE ' > ' END , c.title) as title, c.status, c.parentID from category c left outer join category cp on cp.ID = c.parentID where c.ID = %d", $id));
+	}
+
+	/*
+	* Return min/max size range (in array(min, max)) otherwise, none is returned
+	* if no size restrictions are set
+	*/
+	public function getSizeRangeById($id)
+	{
+		$db = new DB();
+		$res = $db->queryOneRow(sprintf("SELECT c.minsizetoformrelease, c.maxsizetoformrelease, cp.minsizetoformrelease as p_minsizetoformrelease, cp.maxsizetoformrelease as p_maxsizetoformrelease" .
+				" from category c left outer join category cp on cp.ID = c.parentID where c.ID = %d", $id
 			)
 		);
+		if (!$res)
+			return null;
+
+		$min = intval($res['minsizetoformrelease']);
+		$max = intval($res['maxsizetoformrelease']);
+		if ($min == 0 && $max == 0) {
+			# Size restriction disabled; now check parent
+			$min = intval($res['p_minsizetoformrelease']);
+			$max = intval($res['p_maxsizetoformrelease']);
+			if ($min == 0 && $max == 0) {
+				# no size restriction
+				return null;
+			} else if ($max > 0) {
+				$min = 0;
+				$max = intval($res['p_maxsizetoformrelease']);
+			} else {
+				$min = intval($res['p_minsizetoformrelease']);
+				$max = PHP_INT_MAX;
+			}
+		} else if ($max > 0) {
+			$min = 0;
+			$max = intval($res['maxsizetoformrelease']);
+		} else {
+			$min = intval($res['minsizetoformrelease']);
+			$max = PHP_INT_MAX;
+		}
+
+		# If code reaches here, then content is enabled
+		return array('min' => $min, 'max' => $max);
 	}
 
 	/**
-	 * Get multiple categories.
-	 *
-	 * @param array $ids
-	 *
-	 * @return array|bool
+	 * Get a list of categories by an array of IDs.
 	 */
 	public function getByIds($ids)
 	{
-		if (count($ids) > 0) {
-			return $this->db->query(
-				sprintf(
-					"SELECT CONCAT(cp.title, ' > ',c.title) AS title
-					FROM category c
-					INNER JOIN category cp ON cp.ID = c.parentID
-					WHERE c.ID IN (%s)", implode(',', $ids)
-				)
-			);
-		} else {
-			return false;
-		}
+		$db = new DB();
+
+		return $db->query(sprintf("SELECT concat(cp.title, ' > ',c.title) as title from category c inner join category cp on cp.ID = c.parentID where c.ID in (%s)", implode(',', $ids)));
 	}
 
 	/**
 	 * Update a category.
-	 *
-	 * @param $id
-	 * @param $status
-	 * @param $desc
-	 * @param $disablepreview
-	 * @param $minsize
-	 *
-	 * @return bool
 	 */
-	public function update($id, $status, $desc, $disablepreview, $minsize)
+	public function update($id, $status, $desc, $disablepreview, $minsize, $maxsize)
 	{
-		return $this->db->query(
-			sprintf(
-				"UPDATE category SET disablepreview = %d, status = %d, description = %s, minsizetoformrelease = %d
-				WHERE ID = %d",
-				$disablepreview, $status, $this->db->escapeString($desc), $minsize, $id
-			)
-		);
+		$db = new DB();
+
+		return $db->exec(sprintf("update category set disablepreview = %d, status = %d, minsizetoformrelease = %d, maxsizetoformrelease = %d, description = %s where ID = %d", $disablepreview, $status, $minsize, $maxsize, $db->escapeString($desc), $id));
 	}
 
 	/**
-	 * @param array $excludedcats
-	 *
-	 * @return array
+	 * Get the categories in a format for use by the headermenu.tpl.
 	 */
 	public function getForMenu($excludedcats = array())
 	{
+		$db = new DB();
 		$ret = array();
 
-		$exccatlist = '';
-		if (count($excludedcats) > 0) {
-			$exccatlist = ' AND ID NOT IN (' . implode(',', $excludedcats) . ')';
-		}
+		$exccatlist = "";
+		if (count($excludedcats) > 0)
+			$exccatlist = " and ID not in (" . implode(",", $excludedcats) . ")";
 
-		$arr = $this->db->query(sprintf('SELECT * FROM category WHERE status = %d %s', Category::STATUS_ACTIVE, $exccatlist));
-		foreach ($arr as $a) {
-			if ($a['parentID'] == '') {
+		$arr = $db->query(sprintf("select * from category where status = %d %s", Category::STATUS_ACTIVE, $exccatlist), true);
+		foreach ($arr as $a)
+			if ($a["parentID"] == "")
 				$ret[] = $a;
-			}
-		}
 
 		foreach ($ret as $key => $parent) {
 			$subcatlist = array();
 			$subcatnames = array();
 			foreach ($arr as $a) {
-				if ($a['parentID'] == $parent['ID']) {
+				if ($a["parentID"] == $parent["ID"]) {
 					$subcatlist[] = $a;
-					$subcatnames[] = $a['title'];
+					$subcatnames[] = $a["title"];
 				}
 			}
 
 			if (count($subcatlist) > 0) {
 				array_multisort($subcatnames, SORT_ASC, $subcatlist);
-				$ret[$key]['subcatlist'] = $subcatlist;
+				$ret[$key]["subcatlist"] = $subcatlist;
 			} else {
 				unset($ret[$key]);
 			}
 		}
-
 		return $ret;
 	}
 
 	/**
-	 * @param bool $blnIncludeNoneSelected
-	 *
-	 * @return array
+	 * Return a list of categories for use in a dropdown.
 	 */
 	public function getForSelect($blnIncludeNoneSelected = true)
 	{
@@ -298,25 +256,10 @@ class Category
 			$temp_array[-1] = "--Please Select--";
 		}
 
-		foreach ($categories as $category) {
+		foreach ($categories as $category)
 			$temp_array[$category["ID"]] = $category["title"];
-		}
 
 		return $temp_array;
 	}
 
-	/**
-	 * Return the parent and category name from the supplied categoryID.
-	 *
-	 * @param $ID
-	 *
-	 * @return string
-	 */
-	public function getNameByID($ID)
-	{
-		$parent = $this->db->queryOneRow(sprintf("SELECT title FROM category WHERE ID = %d", substr($ID, 0, 1) . "000"));
-		$cat = $this->db->queryOneRow(sprintf("SELECT title FROM category WHERE ID = %d", $ID));
-
-		return $parent["title"] . " " . $cat["title"];
-	}
 }

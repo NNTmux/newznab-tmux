@@ -1001,71 +1001,6 @@ class NNTP extends Net_NNTP_Client
 	}
 
 	/**
-	 * Decode a string of text encoded with yEnc.
-	 *
-	 * @note     For usage outside of this class, please use the YEnc library.
-	 *
-	 * @param $data
-	 *
-	 * @internal param string $string The encoded text to decode.
-	 *
-	 * @return string  The decoded yEnc string, or the input, if it's not yEnc.
-	 *
-	 * @access   protected
-	 *
-	 * @TODO     : ? Maybe this function should be merged into the YEnc class?
-	 */
-   protected function _decodeYEnc($data)
-	{
-		if (preg_match('/^(=yBegin.*=yEnd[^$]*)$/ims', $data, $input)) {
-			// If there user has no yyDecode path set, use PHP to decode yEnc.
-			if ($this->yyDecoderPath === false) {
-				$data = '';
-				$input =
-					trim(
-						preg_replace(
-							'/\r\n/im', '',
-							preg_replace(
-								'/(^=yEnd.*)/im', '',
-								preg_replace(
-									'/(^=yPart.*\\r\\n)/im', '',
-									preg_replace(
-										'/(^=yBegin.*\\r\\n)/im', '',
-										$input[1],
-									1),
-								1),
-							1)
-						)
-					);
-
-				$length = strlen($input);
-				for ($chr = 0; $chr < $length; $chr++) {
-					$data .= ($input[$chr] !== '=' ? chr(ord($input[$chr]) - 42) : chr((ord($input[++$chr]) - 64) - 42));
-				}
-			} else {
-				$inFile = $this->yEncTempInput . mt_rand(0, 999999);
-				$ouFile = $this->yEncTempOutput . mt_rand(0, 999999);
-				file_put_contents($inFile, $input[1]);
-				file_put_contents($ouFile, '');
-				$this->functions->runCmd(
-					"'" .
-					$this->yyDecoderPath .
-					"' '" .
-					$inFile .
-					"' -o '" .
-					$ouFile .
-					"' -f -b" .
-					$this->yEncSilence
-				);
-				$data = file_get_contents($ouFile);
-				unlink($inFile);
-				unlink($ouFile);
-			}
-		}
-		return $data;
-	}
-
-	/**
 	 * Check if the Message-ID has the required opening and closing brackets.
 	 *
 	 * @param  string $messageID The Message-ID with or without brackets.
@@ -1236,6 +1171,9 @@ class NNTP extends Net_NNTP_Client
 		return true;
 	}
 
+	/**
+	 * @return array|string
+	 */
 	function _getXFCompressedTextResponse()
 	{
 		$tries 				= 0;

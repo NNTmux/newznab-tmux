@@ -46,6 +46,7 @@ class Categorize extends Category
 		$site = $s->get();
 		$this->categorizeForeign = ($site->categorizeforeign == "0") ? false : true;
 		$this->catWebDL = ($site->catwebdl == "0") ? false : true;
+		$this->db = new DB();
 		//parent::__construct();
 	}
 
@@ -815,7 +816,8 @@ class Categorize extends Category
 	public function isXxxPack()
 	{
 		if (preg_match('/[ .]PACK[ .]/i', $this->releaseName)) {
-			$this->tmpCat = Category::CAT_XXX_PACKS;
+			$this->tmpCat = Category::CAT_XXX_PACK;
+
 			return true;
 		}
 		return false;
