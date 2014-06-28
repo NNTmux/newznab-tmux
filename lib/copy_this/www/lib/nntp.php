@@ -437,7 +437,7 @@ class NNTP extends Net_NNTP_Client
 		}
 
 		// Send XOVER command to NNTP with wanted articles.
-		$response = $this->sendCommand('XOVER ' . $range);
+		$response = $this->_sendCommand('XOVER ' . $range);
 		if ($this->isError($response)) {
 			return $response;
 		}
