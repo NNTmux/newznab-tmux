@@ -431,13 +431,13 @@ class NNTP extends Net_NNTP_Client
 	public function getXOVER($range)
 	{
 		// Check if we are still connected.
-		$connected = $this->_checkConnection();
+		$connected = $this->checkConnection();
 		if ($connected !== true) {
 			return $connected;
 		}
 
 		// Send XOVER command to NNTP with wanted articles.
-		$response = $this->_sendCommand('XOVER ' . $range);
+		$response = $this->sendCommand('XOVER ' . $range);
 		if ($this->isError($response)) {
 			return $response;
 		}
