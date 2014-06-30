@@ -1,7 +1,6 @@
 <?php
 require_once(dirname(__FILE__)."/../bin/config.php");
 require_once(WWW_DIR."lib/framework/db.php");
-require_once(WWW_DIR."lib/category.php");
 require_once(WWW_DIR."lib/groups.php");
 require_once(WWW_DIR."lib/nfo.php");
 require_once(WWW_DIR."lib/site.php");
@@ -174,7 +173,7 @@ Class PreHash
 		}
 		$ct = '';
 		if ($cats == 1) {
-			$ct = 'AND r.categoryID IN (2020, 5050, 6070, 8010)';
+			$ct = 'AND r.categoryID IN (1090, 2020, 3050, 6050, 5050, 7050, 8010)';
 		}
 
 		if ($this->echooutput) {
