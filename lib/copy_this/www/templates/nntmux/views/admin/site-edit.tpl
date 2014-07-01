@@ -594,6 +594,30 @@
 
 </table>
 </fieldset>
+<fieldset>
+	<legend>Language/Categorization options</legend>
+	<table class="input">
+		<tr>
+			<td style="width:180px;"><label for="categorizeforeign">Categorize Foreign:</label></td>
+			<td>
+				{html_radios id="categorizeforeign" name='categorizeforeign' values=$yesno_ids output=$yesno_names selected=$fsite->categorizeforeign separator='<br />'}
+				<div class="hint">Whether to send foreign movies/tv to
+					foreign sections or not. If set to true they will go in foreign categories.
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td style="width:180px;"><label for="catwebdl">Categorize WEB-DL:</label></td>
+			<td>
+				{html_radios id="catwebdl" name='catwebdl' values=$yesno_ids output=$yesno_names selected=$fsite->catwebdl separator='<br />'}
+				<div class="hint">Whether to send WEB-DL to the WEB-DL section or not. If set to true they will go in
+					WEB-DL category, false will send them in HD TV.<br/>This will also make them inaccessible to
+					Sickbeard and possibly Couchpotato.
+				</div>
+			</td>
+		</tr>
+	</table>
+</fieldset>
 
 <fieldset>
 <legend>Password Settings</legend>
