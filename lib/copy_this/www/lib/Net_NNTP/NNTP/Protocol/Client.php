@@ -450,11 +450,11 @@ class Net_NNTP_Protocol_Client extends PEAR
 	 * Return the last received response message.
 	 *
 	 * @return string The response message.
-	 * @access private
+	 * @access protected
 	 */
-	private function _currentStatusResponse()
+	protected function _currentStatusResponse()
 	{
-		return $this->_currentStatusResponse[1];
+	return $this->_currentStatusResponse[1];
 	}
 
 	/* Session administration commands */
@@ -1100,9 +1100,9 @@ class Net_NNTP_Protocol_Client extends PEAR
 	 *
 	 * @return mixed (bool) true on success
 	 *               (object) pear_error on failure
-	 * @access protected
+	 * @access public
 	 */
-	protected function cmdPost2($article)
+	public function cmdPost2($article)
 	{
 		$this->_sendArticle($article);
 

@@ -15,7 +15,7 @@ if (!isset($argv[1])) {
 $pieces = explode('                       ', $argv[1]);
 $db = new DB();
 $n = "\n";
-$category = new Category();
+$category = new Categorize();
 $groups = new Groups();
 $t = new Tmux ();
 $tmux = $t->get();

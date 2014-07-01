@@ -52,7 +52,7 @@ $nzbContents = new NZBContents(
 		'nntp' => $nntp
 	]
 );
-$categorize = new Category();
+$categorize = new Categorize();
 
 $releases = $db->queryDirect(
 	sprintf('
