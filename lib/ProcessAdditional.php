@@ -2201,7 +2201,7 @@ Class ProcessAdditional
 		$this->_passwordStatus = array(Releases::PASSWD_NONE);
 		$this->_releaseHasPassword = false;
 
-		$this->_releaseGroupName = $this->_functions->getByNameByID_debug($this->_release['groupID']);
+		$this->_releaseGroupName = $this->_functions->getByNameByID($this->_release['groupID']);
 
 		$this->_releaseHasNoNFO = false;
 		// Make sure we don't already have an nfo.
