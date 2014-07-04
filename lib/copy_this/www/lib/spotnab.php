@@ -501,7 +501,7 @@ class SpotNab {
 
 			}catch(Exception $e){
 				// Reset Connection
-				$fetch_okay = $this->_nntpReset($group);
+				$fetch_okay = $this->_nntpReset(SpotNab::AUTODISCOVER_POST_GROUP);
 
 				// Track retry attempts
 				$retries--;
