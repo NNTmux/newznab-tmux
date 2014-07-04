@@ -289,7 +289,7 @@ class Functions
 	public
 	function categorizeRelease($type, $where = '', $echooutput = false)
 	{
-		$cat = new Category();
+		$cat = new Categorize();
 		$relcount = 0;
 		$resrel = $this->db->queryDirect('SELECT ID, ' . $type . ', groupID FROM releases ' . $where);
 		$total = $resrel->rowCount();
@@ -1751,9 +1751,9 @@ class Functions
 	 * Operates directly on the text string, but also returns the result for situations requiring a
 	 * return value (use in ternary, etc.)/
 	 *
-	 * @param $text		String variable to strip.
+	 * @param $text        String variable to strip.
 	 *
-	 * @return string	The stripped variable.
+	 * @return string    The stripped variable.
 	 */
 	static public function stripNonPrintingChars(&$text)
 	{
@@ -1764,6 +1764,7 @@ class Functions
 			"\x18", "\x19", "\x1A", "\x1B", "\x1C", "\x1D", "\x1E", "\x1F",
 		];
 		$text = str_replace($lowChars, '', $text);
+
 		return $text;
 	}
 
@@ -1781,7 +1782,8 @@ class Functions
 			return '0B';
 		}
 
-		$unit = array('B','KB','MB','GB','TB','PB','EB');
+		$unit = array('B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB');
+
 		return round($bytes / pow(1024, ($i = floor(log($bytes, 1024)))), $precision) . $unit[(int)$i];
 	}
 
@@ -1821,7 +1823,22 @@ class Functions
 		return ($piece);
 	}
 
+	/**
+	 * Detect if the command is accessible on the system.
+	 *
+	 * @param $cmd
+	 *
+	 * @return bool|null Returns true if found, false if not found, and null if which is not detected.
+	 */
+	static public function hasCommand($cmd)
+	{
+		if ('HAS_WHICH') {
+			$returnVal = shell_exec("which $cmd");
 
+			return (empty($returnVal) ? false : true);
+		} else {
+			return null;
+		}
+	}
 	//end of testing
-
 }

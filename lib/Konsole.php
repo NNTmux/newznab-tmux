@@ -329,18 +329,43 @@ class Konsole
 		if (preg_match('/^XBOX360$/i', $gameInfo['platform'])) {
 			$gameInfo['platform'] = str_replace('XBOX360', 'Xbox 360', $gameInfo['platform']);
 		} // baseline single quote
+		if (preg_match('/^XBOXONE$/i', $gameInfo['platform'])) {
+			$gameInfo['platform'] = str_replace('XBOXONE', 'Xbox One', $gameInfo['platform']);
+		} // baseline single quote
 		if (preg_match('/^NDS$/i', $gameInfo['platform'])) {
 			$gameInfo['platform'] = str_replace('NDS', 'Nintendo DS', $gameInfo['platform']);
 		} // baseline single quote
+		if (preg_match('/^3DS$/i', $gameInfo['platform'])) {
+			$gameInfo['platform'] = str_replace('3DS', 'Nintendo 3DS', $gameInfo['platform']);
+		} // baseline single quote
+		if (preg_match('/^PS2$/i', $gameInfo['platform'])) {
+			$gameInfo['platform'] = str_replace('PS2', 'PlayStation2', $gameInfo['platform']);
+		}
 		if (preg_match('/^PS3$/i', $gameInfo['platform'])) {
 			$gameInfo['platform'] = str_replace('PS3', 'PlayStation 3', $gameInfo['platform']);
+		} // baseline single quote
+		if (preg_match('/^PS4$/i', $gameInfo['platform'])) {
+			$gameInfo['platform'] = str_replace('PS4', 'PlayStation 4', $gameInfo['platform']);
 		} // baseline single quote
 		if (preg_match('/^PSP$/i', $gameInfo['platform'])) {
 			$gameInfo['platform'] = str_replace('PSP', 'Sony PSP', $gameInfo['platform']);
 		} // baseline single quote
+		if (preg_match('/^PSVITA$/i', $gameInfo['platform'])) {
+			$gameInfo['platform'] = str_replace('PSVITA', 'PlayStation Vita', $gameInfo['platform']);
+		} // baseline single quote
+		if (preg_match('/^PSX$/i', $gameInfo['platform'])) {
+			$gameInfo['platform'] = str_replace('PSX', 'PlayStation', $gameInfo['platform']);
+		} // baseline single quote
+		if (preg_match('/^WiiU$/i', $gameInfo['platform'])) {
+			$gameInfo['platform'] = str_replace('WiiU', 'Nintendo Wii U', $gameInfo['platform']); // baseline single quote
+			$gameInfo['platform'] = str_replace('WIIU', 'Nintendo Wii U', $gameInfo['platform']); // baseline single quote
+		}
 		if (preg_match('/^Wii$/i', $gameInfo['platform'])) {
 			$gameInfo['platform'] = str_replace('Wii', 'Nintendo Wii', $gameInfo['platform']); // baseline single quote
 			$gameInfo['platform'] = str_replace('WII', 'Nintendo Wii', $gameInfo['platform']); // baseline single quote
+		}
+		if (preg_match('/^NGC$/i', $gameInfo['platform'])) {
+			$gameInfo['platform'] = str_replace('NGC', 'GameCube', $gameInfo['platform']); // baseline single quote
 		}
 		if (preg_match('/^N64$/i', $gameInfo['platform'])) {
 			$gameInfo['platform'] = str_replace('N64', 'Nintendo 64', $gameInfo['platform']);
@@ -382,11 +407,10 @@ class Konsole
 			}
 		}
 
-		/* Show the percentages. **
-		  echo("Matched: Title Percentage: $titlepercent%");
-		  echo("Matched: Platform Percentage: $platformpercent%");
-		**/
-
+		/**
+		echo("Matched: Title Percentage: $titlepercent% between " . strtolower($gameInfo['title']) . " and " . strtolower($con['title']) . ".\n");
+		echo("Matched: Platform Percentage: $platformpercent% \n");
+		 **/
 		// If the Title is less than 80% Platform must be 100% unless it is XBLA.
 		if ($titlepercent < 70) {
 			if ($platformpercent != 100) {
@@ -592,7 +616,7 @@ class Konsole
 		$result = array();
 
 		// Get name of the game from name of release.
-		preg_match('/^(.+((abgx360EFNet|EFNet\sFULL|FULL\sabgxEFNet|abgx\sFULL|abgxbox360EFNet)\s|illuminatenboard\sorg|\(\d+\)))?(?P<title>.*?)[\.\-_ \:](v\.?\d\.\d|PAL|NTSC|EUR|USA|JP|ASIA|JAP|JPN|AUS|MULTI(\.?\d{1,2})?|PATCHED|FULLDVD|DVD5|DVD9|DVDRIP|PROPER|REPACK|RETAIL|DEMO|DISTRIBUTION|REGIONFREE|[\. ]RF[\. ]?|READ\.?NFO|NFOFIX|PS2|PS3|PSP|WII|X\-?BOX|XBLA|X360|3DS|NDS|N64|NGC)/i', $releasename, $matches);
+		preg_match('/^(.+((abgx360EFNet|EFNet\sFULL|FULL\sabgxEFNet|abgx\sFULL|abgxbox360EFNet)\s|illuminatenboard\sorg|Place2(hom|us)e.net|united-forums? co uk|\(\d+\)))?(?P<title>.*?)[\.\-_ \:](v\.?\d\.\d|PAL|NTSC|EUR|USA|JP|ASIA|JAP|JPN|AUS|MULTI(\.?\d{1,2})?|PATCHED|FULLDVD|DVD5|DVD9|DVDRIP|PROPER|REPACK|RETAIL|DEMO|DISTRIBUTION|REGIONFREE|[\. ]RF[\. ]?|READ\.?NFO|NFOFIX|PSX(2PSP)?|PS[2-4]|PSP|PSVITA|WIIU|WII|X\-?BOX|XBLA|X360|3DS|NDS|N64|NGC)/i', $releasename, $matches);
 		if (isset($matches['title'])) {
 			$title = $matches['title'];
 			// Replace dots or underscores with spaces.
@@ -613,7 +637,7 @@ class Konsole
 		}
 
 		//get the platform of the release
-		preg_match('/[\.\-_ ](?P<platform>XBLA|WiiWARE|N64|SNES|NES|PS2|PS3|PS 3|PSP|WII|XBOX360|X\-?BOX|X360|NDS|NGC)/i', $releasename, $matches);
+		preg_match('/[\.\-_ ](?P<platform>XBLA|WiiWARE|N64|SNES|NES|PS[2-4]|PS 3|PSX(2PSP)?|PSP|WIIU|WII|XBOX360|XBOXONE|X\-?BOX|X360|3DS|NDS|N?GC)/i', $releasename, $matches);
 		if (isset($matches['platform'])) {
 			$platform = $matches['platform'];
 			if (preg_match('/^(XBLA)$/i', $platform)) {
@@ -640,16 +664,32 @@ class Konsole
 			case 'PS3':
 				$nodeId = '14210751';
 				break;
+			case 'PS4':
+				$nodeId = '6427814011';
+				break;
 			case 'PSP':
 				$nodeId = '11075221';
+				break;
+			case 'PSVITA':
+				$nodeId = '3010556011';
+				break;
+			case 'PSX':
+				$nodeId = '294940';
 				break;
 			case 'WII':
 			case 'Wii':
 				$nodeId = '14218901';
 				break;
+			case 'WIIU':
+			case 'WiiU':
+				$nodeId = '3075112011';
+				break;
 			case 'XBOX360':
 			case 'X360':
 				$nodeId = '14220161';
+				break;
+			case 'XBOXONE':
+				$nodeId = '6469269011';
 				break;
 			case 'XBOX':
 			case 'X-BOX':
@@ -657,6 +697,13 @@ class Konsole
 				break;
 			case 'NDS':
 				$nodeId = '11075831';
+				break;
+			case '3DS':
+				$nodeId = '2622269011';
+				break;
+			case 'GC':
+			case 'NGC':
+				$nodeId = '541022';
 				break;
 			case 'N64':
 				$nodeId = '229763';
@@ -666,9 +713,6 @@ class Konsole
 				break;
 			case 'NES':
 				$nodeId = '566458';
-				break;
-			case 'NGC':
-				$nodeId = '541022';
 				break;
 			default:
 				$nodeId = '468642';

@@ -501,7 +501,7 @@ class SpotNab {
 
 			}catch(Exception $e){
 				// Reset Connection
-				$fetch_okay = $this->_nntpReset($group);
+				$fetch_okay = $this->_nntpReset(SpotNab::AUTODISCOVER_POST_GROUP);
 
 				// Track retry attempts
 				$retries--;
@@ -833,8 +833,7 @@ class SpotNab {
 						$batch = $first + SpotNab::FETCH_USENET_BATCH;
 
 					// Batch Processing
-					while ($processed < $total)
-					{
+					while ($processed >= 0 && $processed < $total) {
 						$headers = $this->_get_headers($group,
 							"$first-$batch", $retries);
 

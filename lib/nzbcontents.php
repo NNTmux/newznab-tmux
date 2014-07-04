@@ -2,6 +2,7 @@
 require_once(dirname(__FILE__)."/../bin/config.php");
 require_once(WWW_DIR."/lib/framework/db.php");
 require_once(WWW_DIR."/lib/nntp.php");
+require_once(WWW_DIR . "/lib/nzb.php");
 require_once(WWW_DIR."/lib/Tmux.php");
 require_once("ColorCLI.php");
 require_once("Info.php");
@@ -80,7 +81,8 @@ Class NZBcontents
 		$this->nntp = $options['nntp'];
 		$this->nfo  = $options['nfo'];
 		$this->pp   = $options['pp'];
-		$this->nzb  = new Enzebe();
+		$this->nzb = new NZB();
+		$this->enzebe = new Enzebe();
 	}
 
 	/**
@@ -246,10 +248,10 @@ Class NZBcontents
 	 *
 	 * @return bool|SimpleXMLElement
 	 */
-	protected function LoadNZB(&$guid)
+	public function LoadNZB(&$guid)
 	{
 		// Fetch the NZB location using the GUID.
-		$nzbpath = $this->nzb->NZBPath($guid);
+		$nzbpath = $this->nzb->getNZBPath($guid);
 		if ($nzbpath === false) {
 			if ($this->echooutput) {
 				echo PHP_EOL . $guid . " appears to be missing the nzb file, skipping." . PHP_EOL;

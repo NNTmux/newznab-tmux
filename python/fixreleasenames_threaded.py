@@ -62,7 +62,7 @@ if len(sys.argv) > 1 and sys.argv[1] == "nfo":
     cur[0].execute(run, (int(perrun[0]) * int(run_threads[0])))
     datas = cur[0].fetchall()
 elif len(sys.argv) > 1 and (sys.argv[1] == "filename"):
-    run = "SELECT DISTINCT rel.ID AS releaseID FROM releases rel INNER JOIN releasefiles relfiles ON (relfiles.releaseID = rel.ID) WHERE categoryID = 8010 AND proc_files = 0 AND" + clean + "ORDER BY postdate ASC LIMIT %s"
+    run = "SELECT DISTINCT rel.ID AS releaseID FROM releases rel INNER JOIN releasefiles relfiles ON (relfiles.releaseID = rel.ID) WHERE categoryID IN (8010, 8020) AND proc_files = 0 AND" + clean + "ORDER BY postdate ASC LIMIT %s"
     cur[0].execute(run, (int(perrun[0]) * int(run_threads[0])))
     datas = cur[0].fetchall()
 elif len(sys.argv) > 1 and (sys.argv[1] == "md5"):
@@ -73,7 +73,7 @@ elif len(sys.argv) > 1 and (sys.argv[1] == "md5"):
         maxtries = maxtries - 1
 elif len(sys.argv) > 1 and (sys.argv[1] == "par2"):
 	#This one does from oldest posts to newest posts, since nfo pp does same thing but newest to oldest
-    run = "SELECT ID AS releaseID, guid, groupID FROM releases WHERE categoryID = 8010 AND proc_par2 = 0 AND" + clean + "ORDER BY postdate ASC LIMIT %s"
+    run = "SELECT ID AS releaseID, guid, groupID FROM releases WHERE categoryID IN (8010, 8020) AND proc_par2 = 0 AND" + clean + "ORDER BY postdate ASC LIMIT %s"
     cur[0].execute(run, (int(perrun[0]) * int(run_threads[0])))
     datas = cur[0].fetchall()
 elif len(sys.argv) > 1 and (sys.argv[1] == "predbft"):

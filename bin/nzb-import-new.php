@@ -4,6 +4,7 @@ require_once(dirname(__FILE__) . '/config.php');
 require_once(WWW_DIR . '/lib/nntp.php');
 require_once(WWW_DIR . '/lib/binaries.php');
 require_once(WWW_DIR . '/lib/category.php');
+require_once(WWW_DIR . '/lib/Categorize.php');
 require_once(WWW_DIR . '/lib/groups.php');
 require_once(dirname(__FILE__) . '/../lib/ColorCLI.php');
 require_once(dirname(__FILE__) . '/../lib/namecleaner.php');
@@ -24,7 +25,7 @@ $binaries = new Binaries();
 $s = new Sites();
 $site = $s->get();
 $releasecleaning = new NameCleaning();
-$categorize = new Category();
+$categorize = new Categorize();
 $nzbsperhour = $nzbSkipped = $maxtoprocess = 0;
 $consoleTools = new ConsoleTools();
 

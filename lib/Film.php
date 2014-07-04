@@ -1324,7 +1324,7 @@ class Film
 	protected function parseMovieSearchName($releaseName)
 	{
 		// Check if it's foreign ?
-		$cat = new Category();
+		$cat = new Categorize();
 		if (!$cat->isMovieForeign($releaseName)) {
 			$name = $year = '';
 			$followingList = '[^\w]((1080|480|720)p|AC3D|Directors([^\w]CUT)?|DD5\.1|(DVD|BD|BR)(Rip)?|BluRay|divx|HDTV|iNTERNAL|LiMiTED|(Real\.)?Proper|RE(pack|Rip)|Sub\.?(fix|pack)|Unrated|WEB-DL|(x|H)[-._ ]?264|xvid)[^\w]';

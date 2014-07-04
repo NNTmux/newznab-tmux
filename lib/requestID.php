@@ -3,6 +3,7 @@ require_once(dirname(__FILE__) . "/../bin/config.php");
 require_once(WWW_DIR . "lib/framework/db.php");
 require_once(WWW_DIR . "lib/category.php");
 require_once(WWW_DIR . "lib/groups.php");
+require_once(WWW_DIR . "lib/site.php");
 require_once("functions.php");
 require_once("ColorCLI.php");
 require_once("consoletools.php");
@@ -10,138 +11,376 @@ require_once("namefixer.php");
 
 //This script is adapted from nZEDB requestID.php
 
-$c = new ColorCLI();
-if (!isset($argv[1]) || ( $argv[1] != "all" && $argv[1] != "full" && !is_numeric($argv[1]))) {
-	exit($c->error("\nThis script tries to match a release request ID by group to a PreDB request ID by group doing local lookup only.\n"
-			. "In addition an optional final argument is time, in minutes, to check releases that have previously been checked.\n\n"
-			. "php requestID.php 1000 show		...: to limit to 1000 sorted by newest postdate and show renaming.\n"
-			. "php requestID.php full show		...: to run on full database and show renaming.\n"
-			. "php requestID.php all show		...: to run on all hashed releases (including previously renamed) and show renaming.\n"));
-}
+/**
+ * Attempts to find a PRE name for a release using a request ID from our local pre database,
+ * or internet request id database.
+ *
+ * Class RequestID
+ */
+class RequestID
+{
+	// Request ID.
+	const REQID_NONE = -3; // The Request ID was not found locally or via web lookup.
+	const REQID_ZERO = -2; // The Request ID was 0.
+	const REQID_NOLL = -1; // Request ID was not found via local lookup.
+	const REQID_UPROC = 0; // Release has not been processed.
+	const REQID_FOUND = 1; // Request ID found and release was updated.
 
-$db = new DB();
-$functions = new Functions();
-$category = new Category();
-$groups = new Groups();
-$consoletools = new ConsoleTools();
-$namefixer = new Namefixer();
-$timestart = TIME();
-$counter = $counted = 0;
+	/**
+	 * @var bool Echo to CLI?
+	 */
+	protected $echoOutput;
 
-if (isset($argv[2]) && is_numeric($argv[2])) {
-	$time = ' OR r.postdate > NOW() - INTERVAL ' . $argv[2] . ' MINUTE)';
-} else if (isset($argv[3]) && is_numeric($argv[3])) {
-	$time = ' OR r.postdate > NOW() - INTERVAL ' . $argv[3] . ' MINUTE)';
-} else {
-	$time = ')';
-}
+	/**
+	 * @var Category
+	 */
+	protected $category;
 
-//runs on every release not already PreDB Matched
-if (isset($argv[1]) && $argv[1] === "all") {
-	$qry = $db->queryDirect("SELECT r.ID, r.name, r.categoryID, g.name AS groupname, g.ID as gid FROM releases r LEFT JOIN groups g ON r.groupID = g.ID WHERE nzbstatus = 1 AND prehashID = 0 AND isrequestid = 1");
-//runs on all releases not already renamed not already PreDB matched
-} else if (isset($argv[1]) && $argv[1] === "full") {
-	$qry = $db->queryDirect("SELECT r.ID, r.name, r.categoryID, g.name AS groupname, g.ID as gid FROM releases r LEFT JOIN groups g ON r.groupID = g.ID WHERE nzbstatus = 1 AND prehashID = 0 AND (isrenamed = 0 AND isrequestid = 1 " . $time . " AND reqidstatus in (0, -1, -3)");
-//runs on all releases not already renamed limited by user not already PreDB matched
-} else if (isset($argv[1]) && is_numeric($argv[1])) {
-	$qry = $db->queryDirect("SELECT r.ID, r.name, r.categoryID, g.name AS groupname, g.ID as gid FROM releases r LEFT JOIN groups g ON r.groupID = g.ID WHERE nzbstatus = 1 AND prehashID = 0 AND (isrenamed = 0 AND isrequestid = 1 " . $time . " AND reqidstatus in (0, -1, -3) ORDER BY postdate DESC LIMIT " . $argv[1]);
-}
+	/**
+	 * @var DB
+	 */
+	protected $db;
 
-$total = $qry->rowCount();
-if ($total > 0) {
-	$precount = $db->queryOneRow('SELECT COUNT(*) AS count FROM prehash WHERE requestID > 0');
-	echo $c->header("\nComparing " . number_format($total) . ' releases against ' . number_format($precount['count']) . " Local requestID's.");
-	sleep(2);
+	/**
+	 * @var ConsoleTools
+	 */
+	protected $consoleTools;
 
-	foreach ($qry as $row) {
-		$requestID = 0;
-		if (preg_match('/^\[ ?(\d{4,6}) ?\]/', $row['name'], $match) ||
-			preg_match('/^REQ\s*(\d{4,6})/i', $row['name'], $match) ||
-			preg_match('/^(\d{4,6})-\d{1}\[/', $row['name'], $match) ||
-			preg_match('/(\d{4,6}) -/', $row['name'], $match)
-		) {
-			$requestID = (int)$match[1];
-		} else {
-			echo "requestID = " . $requestID . " name =" . $row['name'] . PHP_EOL;
-			$db->exec('UPDATE releases SET reqidstatus = -2 WHERE ID = ' . $row['ID']);
-			$counter++;
-			continue;
+	/**
+	 * @var ColorCLI
+	 */
+	protected $colorCLI;
+
+	/**
+	 * @var int How many request id's did we find?
+	 */
+	protected $reqIDsFound = 0;
+
+	/**
+	 * @var bool Is this a local or web lookup ?
+	 */
+	protected $local = true;
+
+	/**
+	 * @var int What group are we working on ?
+	 */
+	protected $groupID = 0;
+
+	/**
+	 * @var array MySQL results for releases with RequestID's.
+	 */
+	protected $results = array();
+
+	/**
+	 * @var array Single MySQL result.
+	 */
+	protected $result = array();
+
+	/**
+	 * @var int How many releases max to do a web lookup.
+	 */
+	protected $limit = 100;
+
+	/**
+	 * @var bool The title found from a request ID lookup.
+	 */
+	protected $newTitle = false;
+
+	/**
+	 * @var int The found request ID for the release.
+	 */
+	protected $requestID = self::REQID_ZERO;
+
+	/**
+	 * The ID of the PRE entry the found request ID belongs to.
+	 *
+	 * @var bool|int
+	 */
+	protected $preDbID = false;
+
+	/**
+	 * @var bool|stdClass
+	 */
+	protected $site;
+
+	/**
+	 * Construct.
+	 *
+	 * @param bool $echoOutput
+	 */
+	public function __construct($echoOutput = false)
+	{
+		$this->echoOutput = $echoOutput;
+		$this->category = new Categorize();
+		$this->db = new DB();
+		$this->consoleTools = new ConsoleTools();
+		$this->colorCLI = new ColorCLI();
+		$this->site = (new Sites)->get();
+		$this->functions = new Functions();
+	}
+
+	/**
+	 * Process RequestID's via Web or Local lookup.
+	 *
+	 * @param int  $groupID The ID of the group.
+	 * @param int  $limit   How many requests to do.
+	 * @param bool $local   Do a local or web lookup?
+	 *
+	 * @return int How many request ID's were found.
+	 */
+	public function lookupReqIDs($groupID, $limit, $local)
+	{
+		$this->groupID = $groupID;
+		$this->limit = $limit;
+		$this->local = $local;
+		$this->reqIDsFound = 0;
+		$this->getResults();
+
+		if ($this->results !== false && $this->results->rowCount() > 0) {
+			$this->findReqIdMatches();
 		}
 
-		$bFound = false;
-		$newTitle = '';
+		return $this->reqIDsFound;
+	}
 
-		if ($requestID != 0 and $requestID != '') {
-			// Do a local lookup first
-			$newTitle = localLookup($requestID, $row['groupname'], $row['name']);
-			if (is_array($newTitle) && $newTitle['title'] != '') {
-				$bFound = true;
+	/**
+	 * Get all results from the releases table that have request ID's to be processed.
+	 */
+	protected function getResults()
+	{
+		// Look for records that potentially have requestID titles and have not been matched to a PreDB title
+		$this->results = $this->db->queryDirect(
+			sprintf(
+				'SELECT r.ID, r.name, r.searchname, g.name AS groupname, r.groupID
+				FROM releases r
+				LEFT JOIN groups g ON r.groupID = g.ID
+				WHERE nzbstatus = 1
+				AND prehashID = 0
+				AND (isrequestid = 1 AND reqidstatus = %d
+					OR (reqidstatus = %d AND adddate > NOW() - INTERVAL %d HOUR)
+				)
+				%s %s LIMIT %d',
+				($this->local === true ? self::REQID_UPROC : self::REQID_NOLL),
+				self::REQID_NONE,
+				(isset($this->site->request_hours) ? (int)$this->site->request_hours : 1),
+				(empty($this->groupID) ? '' : ('AND groupID = ' . $this->groupID)),
+				($this->local === true ? '' : 'ORDER BY postdate DESC'),
+				$this->limit
+			)
+		);
+	}
+
+	/**
+	 * See if the release has a valid request ID, try to a PRE name locally or from the internet.
+	 */
+	protected function findReqIdMatches()
+	{
+		$this->newTitle = false;
+
+		foreach ($this->results as $result) {
+			$this->result = $result;
+
+			$this->newTitle = false;
+
+			// Try to get request id.
+			if (preg_match('/\[\s*(\d+)\s*\]/', $this->result['name'], $requestID) ||
+				preg_match('/^REQ\s*(\d{4,6})/i', $this->result['name'], $requestID) ||
+				preg_match('/^(\d{4,6})-\d{1}\[/', $this->result['name'], $requestID) ||
+				preg_match('/(\d{4,6}) -/', $this->result['name'], $requestID)
+			) {
+				$this->requestID = (int)$requestID[1];
+			} else {
+				$this->requestID = self::REQID_ZERO;
 			}
-		}
 
-		if ($bFound === true) {
-			$title = $newTitle['title'];
-			$preid = $newTitle['ID'];
-			$determinedcat = $category->determineCategory($row['gid'], $title);
-			$run = $db->queryDirect(sprintf('UPDATE releases set rageID = -1, seriesfull = NULL, season = NULL, episode = NULL, tvtitle = NULL, tvairdate = NULL, imdbID = NULL, musicinfoID = NULL, consoleinfoID = NULL, bookinfoID = NULL, anidbID = NULL, '
-					. 'prehashID = %d, reqidstatus = 1, isrenamed = 1, iscategorized = 1, searchname = %s, categoryID = %d WHERE ID = %d', $preid, $db->escapeString($title), $determinedcat, $row['ID']));
-			if ($row['name'] !== $newTitle) {
-				$counted++;
-				if (isset($argv[2]) && $argv[2] === 'show') {
-					$newcatname = $category->getNameByID($determinedcat);
-					$oldcatname = $category->getNameByID($row['categoryID']);
+			if ($this->requestID === self::REQID_ZERO) {
+				$this->db->exec(
+					sprintf('
+						UPDATE releases
+						SET reqidstatus = %d
+						WHERE ID = %d',
+						self::REQID_ZERO,
+						$this->result['ID']
+					)
+				);
+				if ($this->local === false && $this->echoOutput) {
+					echo '-';
+				}
+			} else {
 
-					echo $c->headerOver("\nNew name:  ") . $c->primary($title) .
-					$c->headerOver('Old name:  ') . $c->primary($row['name']) .
-					$c->headerOver('New cat:   ') . $c->primary($newcatname) .
-					$c->headerOver('Old cat:   ') . $c->primary($oldcatname) .
-					$c->headerOver('Group:     ') . $c->primary($row['groupname']) .
-					$c->headerOver('Method:    ') . $c->primary('requestID local') .
-					$c->headerOver('ReleaseID: ') . $c->primary($row['ID']);
+				if ($this->local === true) {
+					$this->localCheck();
+				} else {
+					$this->remoteCheck();
+				}
+
+				if ($this->newTitle !== false) {
+					if ($this->preDbID === false) {
+						$this->insertIntoPreDB();
+					}
+
+					$this->updateRelease();
+				} else {
+					$this->db->exec(
+						sprintf(
+							'UPDATE releases SET reqidstatus = %d WHERE ID = %d',
+							self::REQID_NONE,
+							$this->result['ID']
+						)
+					);
+					if ($this->local === false && $this->echoOutput) {
+						echo '-';
+					}
 				}
 			}
+		}
+	}
+
+	/**
+	 * Try to find a PRE name using the request ID in our local PRE database.
+	 */
+	protected function localCheck()
+	{
+		$localCheck = $this->db->queryOneRow(
+			sprintf("
+				SELECT ID, title
+				FROM prehash
+				WHERE requestID = %d
+				AND groupID = %d",
+				$this->requestID,
+				$this->result['groupID']
+			)
+		);
+
+		if ($localCheck !== false) {
+			$this->newTitle = $localCheck['title'];
+			$this->preDbID = $localCheck['ID'];
+			$this->reqIDsFound++;
+		}
+	}
+
+	/**
+	 * Try to find a PRE name on the internet using the found request ID.
+	 */
+	protected function remoteCheck()
+	{
+		// Do a web lookup.
+		$xml = $this->functions->getUrl(
+			str_ireplace(
+				'[REQUEST_ID]',
+				$this->requestID,
+				str_ireplace(
+					'[GROUP_NM]',
+					urlencode($this->result['groupname']),
+					$this->site->request_url
+				)
+			)
+		);
+
+		if ($xml === false && preg_match('/alt\.binaries\.(etc|mom|\.hdtv.x264)/', $this->result['groupname'])) {
+			$reqGname = 'alt.binaries.moovee';
+			if ($this->result['groupname'] === 'alt.binaries.etc') {
+				$reqGname = 'alt.binaries.teevee';
+			}
+			$xml = $this->functions->getUrl(
+				str_ireplace(
+					'[REQUEST_ID]',
+					$this->requestID,
+					str_ireplace(
+						'[GROUP_NM]',
+						urlencode($reqGname),
+						$this->site->request_url
+					)
+				)
+			);
+		}
+
+		if ($xml !== false) {
+			$xml = simplexml_load_string($xml);
+			if ($xml !== false &&
+				isset($xml->request[0]['name']) && !empty($xml->request[0]['name']) &&
+				strtolower($xml->request[0]['name']) !== strtolower($this->result['searchname'])
+			) {
+
+				$this->newTitle = $xml->request[0]['name'];
+				$this->reqIDsFound++;
+			}
+		}
+	}
+
+	/**
+	 * If we found a PRE name, update the releases name and reset post processing.
+	 */
+	protected function updateRelease()
+	{
+		$determinedCategory = $this->category->determineCategory($this->result['groupID'], $this->newTitle);
+		$this->db->exec(
+			sprintf('
+				UPDATE releases
+				SET rageid = -1, seriesfull = NULL, season = NULL, episode = NULL, tvtitle = NULL,
+				tvairdate = NULL, imdbID = NULL, musicinfoID = NULL, consoleinfoID = NULL, bookinfoID = NULL, anidbID = NULL,
+				reqidstatus = %d, isrenamed = 1, proc_files = 1, searchname = %s, categoryiID = %d,
+				prehashID = %d
+				WHERE ID = %d',
+				self::REQID_FOUND,
+				$this->db->escapeString($this->newTitle),
+				$determinedCategory,
+				$this->preDbID,
+				$this->result['ID']
+			)
+		);
+
+		if ($this->echoOutput) {
+			NameFixer::echoChangedReleaseName(array(
+					'new_name'     => $this->newTitle,
+					'old_name'     => $this->result['searchname'],
+					'new_category' => $this->functions->getNameByID($determinedCategory),
+					'old_category' => '',
+					'group'        => $this->result['groupname'],
+					'release_id'   => $this->result['ID'],
+					'method'       => 'RequestID->updateRelease<' . ($this->local ? 'local' : 'web') . '>'
+				)
+			);
+		}
+	}
+
+	/**
+	 * If we found a request ID on the internet, check if our PRE database has it, insert it if not.
+	 */
+	protected function insertIntoPreDB()
+	{
+		$dupeCheck = $this->db->queryOneRow(
+			sprintf('
+				SELECT ID AS prehashID, requestID, groupID
+				FROM prehash
+				WHERE title = %s',
+				$this->db->escapeString($this->newTitle)
+			)
+		);
+
+		if ($dupeCheck === false) {
+			$this->preDbID = $this->db->queryInsert(
+				sprintf("
+					INSERT INTO prehash (title, source, requestID, groupID, predate)
+					VALUES (%s, %s, %d, %d, NOW())",
+					$this->db->escapeString($this->newTitle),
+					$this->db->escapeString('requestWEB'),
+					$this->requestID,
+					$this->result['groupID']
+				)
+			);
 		} else {
-			$db->exec('UPDATE releases SET reqidstatus = -3 WHERE ID = ' . $row['ID']);
+			$this->preDbID = $dupeCheck['prehashID'];
+			$this->db->exec(
+				sprintf('
+					UPDATE prehash
+					SET requestID = %d, groupID = %d
+					WHERE ID = %d',
+					$this->requestID,
+					$this->result['groupID'],
+					$this->preDbID
+				)
+			);
 		}
-		if (!isset($argv[2]) || $argv[2] !== 'show') {
-			$consoletools->overWritePrimary("Renamed Releases: [" . number_format($counted) . "] " . $consoletools->percentString(++$counter, $total));
-		}
 	}
-	if ($total > 0) {
-		echo $c->header("\nRenamed " . number_format($counted) . " releases in " . $consoletools->convertTime(TIME() - $timestart) . ".");
-	} else {
-		echo $c->info("\nNothing to do.");
-	}
-} else {
-	echo $c->info("No work to process\n");
-}
-
-
-function localLookup($requestID, $groupName, $oldname)
-{
-	$db = new DB();
-	$groups = new Groups();
-	$functions = new Functions();
-	$groupID = $functions->getIDByName($groupName);
-	$run = $db->queryOneRow(sprintf("SELECT ID, title FROM prehash WHERE requestID = %d AND groupID = %d", $requestID, $groupID));
-	if (isset($run["title"]) && preg_match('/s\d+/i', $run["title"]) && !preg_match('/s\d+e\d+/i', $run["title"])) {
-		return false;
-	}
-	if (isset($run["title"]))
-		return array('title' => $run['title'], 'ID' => $run['ID']);
-	if (preg_match('/\[#?a\.b\.teevee\]/', $oldname))
-		$groupID = $functions->getIDByName('alt.binaries.teevee');
-	else if (preg_match('/\[#?a\.b\.moovee\]/', $oldname))
-		$groupID = $functions->getIDByName('alt.binaries.moovee');
-	else if (preg_match('/\[#?a\.b\.erotica\]/', $oldname))
-		$groupID = $functions->getIDByName('alt.binaries.erotica');
-	else if (preg_match('/\[#?a\.b\.foreign\]/', $oldname))
-		$groupID = $functions->getIDByName('alt.binaries.mom');
-	else if ($groupName == 'alt.binaries.etc')
-		$groupID = $functions->getIDByName('alt.binaries.teevee');
-
-
-	$run = $db->queryOneRow(sprintf("SELECT ID, title FROM prehash WHERE requestID = %d AND groupID = %d", $requestID, $groupID));
-	if (isset($run['title']))
-		return array('title' => $run['title'], 'ID' => $run['ID']);
 }
