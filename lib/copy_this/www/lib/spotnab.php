@@ -2152,7 +2152,7 @@ class SpotNab {
 		$message = @gzcompress($message, 9);
 
 		// Yenc Binary Content
-		$message = $this->_nntp->encodeYenc2($message, md5($message));
+		$message = $this->_nntp->encodeYEnc($message, md5($message));
 
 		//
 		// Prepare Header
