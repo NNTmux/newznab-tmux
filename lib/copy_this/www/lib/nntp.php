@@ -1091,9 +1091,9 @@ class NNTP extends Net_NNTP_Client
 	 * @return self    Our overridden function when compression is enabled.
 	 *         parent  Parent function when no compression.
 	 *
-	 * @access protected
+	 * @access public
 	 */
-	protected function _getTextResponse()
+	public function _getTextResponse()
 	{
 		if ($this->_compression === true &&
 			isset($this->_currentStatusResponse[1]) &&
