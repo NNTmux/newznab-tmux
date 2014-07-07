@@ -108,6 +108,7 @@ class NNTP extends Net_NNTP_Client
 		$this->_nntpRetries = ((!empty($this->_tmux->nntpretries) ? (int)$this->_tmux->nntpretries : 0) + 1);
 
 		$this->_initiateYEncSettings();
+		define('NNTP_SOCKET_TIMEOUT', '120');
 	}
 
 	/**
