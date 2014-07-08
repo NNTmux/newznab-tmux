@@ -1,4 +1,4 @@
-<div id="menucontainer"> 
+<div id="menucontainer">
 	<div id="menulink">
 		<ul>
 		{foreach from=$parentcatlist item=parentcat}
@@ -30,6 +30,20 @@
 				{/foreach}
 				</ul>
 			</li>
+			{elseif ($parentcat.ID == 4000 && $userdata.gameview=="1")}
+				<li><a title="Browse {$parentcat.title}" href="{$smarty.const.WWW_TOP}/games">{$parentcat.title}</a>
+					<ul>
+						{foreach from=$parentcat.subcatlist item=subcat}
+							{if $subcat.ID == 4050}
+								<li><a title="Browse {$subcat.title}"
+									   href="{$smarty.const.WWW_TOP}/games">{$subcat.title}</a></li>
+							{else}
+								<li><a title="Browse {$subcat.title}"
+									   href="{$smarty.const.WWW_TOP}/browse?t={$subcat.ID}">{$subcat.title}</a></li>
+							{/if}
+						{/foreach}
+					</ul>
+				</li>
 			{else}
 			<li><a title="Browse {$parentcat.title}" href="{$smarty.const.WWW_TOP}/browse?t={$parentcat.ID}">{$parentcat.title}</a>
 				<ul>
@@ -51,7 +65,7 @@
 			</li>
 		</ul>
 	</div>
-	
+
 	<div id="menusearchlink">
 		<form id="headsearch_form" action="{$smarty.const.WWW_TOP}/search/" method="get">
 
@@ -69,7 +83,9 @@
 			</select>
 
 			<label style="display:none;" for="headsearch">Search Text</label>
-			<input id="headsearch" name="search" value="{if $header_menu_search == ""}Enter keywords{else}{$header_menu_search|escape:"htmlall"}{/if}" style="width:85px;" type="text" tabindex="1" /> 
+			<input id="headsearch" name="search"
+				   value="{if $header_menu_search == ""}Enter keywords{else}{$header_menu_search|escape:"htmlall"}{/if}"
+				   style="width:85px;" type="text" tabindex="1"/>
 
 		</form>
 	</div>

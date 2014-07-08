@@ -17,6 +17,7 @@ ADD `proc_pp` TINYINT(1) NOT NULL DEFAULT 0,
 ADD `proc_par2` BIT NOT NULL DEFAULT 0,
 ADD `proc_nfo` BIT NOT NULL DEFAULT 0,
 ADD `proc_files` BIT NOT NULL DEFAULT 0,
+ADD `gamesinfo_id` INT AFTER consoleinfoID,
 ADD `nzbstatus` TINYINT(1) NOT NULL DEFAULT 1;
 CREATE INDEX `ix_releases_nfostatus` ON `releases` (`nfostatus` ASC) USING HASH;
 CREATE INDEX `ix_releases_reqidstatus` ON `releases` (`reqidstatus` ASC) USING HASH;
@@ -26,7 +27,10 @@ CREATE INDEX `ix_releases_dehashstatus` ON `releases` (`dehashstatus`);
 CREATE INDEX `ix_releases_haspreview` ON `releases` (`haspreview` ASC) USING HASH;
 CREATE INDEX `ix_releases_postdate_name` ON `releases` (`postdate`, `name`);
 CREATE INDEX `ix_releases_prehashid_searchname` ON `releases` (`prehashID`, `searchname`);
+CREATE INDEX `ix_releases_gamesinfo_id` ON `releases` (`gamesinfo_id`);
 CREATE INDEX `ix_releases_status` ON `releases` (`nzbstatus`, `iscategorized`, `isrenamed`, `nfostatus`, `ishashed`, `passwordstatus`, `dehashstatus`, `releasenfoID`, `musicinfoID`, `consoleinfoID`, `bookinfoID`, `haspreview`, `categoryID`, `imdbID`, `rageID`);
+
+ALTER TABLE users ADD COLUMN gameview INT AFTER consoleview;
 
 DROP TABLE IF EXISTS prehash;
 CREATE TABLE prehash (
@@ -203,7 +207,7 @@ INSERT INTO tmux (setting, value) VALUES ('defrag_cache', '900'),
   ('ffmpeg_duration', '5'),
   ('ffmpeg_image_time', '5'),
   ('processvideos', '0'),
-  ('sqlpatch', '50');
+  ('sqlpatch', '55');
 
 DROP TABLE IF EXISTS releasesearch;
 CREATE TABLE releasesearch (
@@ -476,6 +480,29 @@ INSERT INTO country (code, name) VALUES ('AF', 'Afghanistan'),
   ('ZM', 'Zambia'),
   ('ZW', 'Zimbabwe');
 
+DROP TABLE IF EXISTS gamesinfo;
+CREATE TABLE         gamesinfo (
+  id          INT(10) UNSIGNED    NOT NULL AUTO_INCREMENT,
+  title       VARCHAR(255)        NOT NULL,
+  asin        VARCHAR(128)        DEFAULT NULL,
+  url         VARCHAR(1000)       DEFAULT NULL,
+  platform    VARCHAR(255)        DEFAULT NULL,
+  publisher   VARCHAR(255)        DEFAULT NULL,
+  genreid     INT(10)             NULL DEFAULT NULL,
+  esrb        VARCHAR(255)        NULL DEFAULT NULL,
+  releasedate DATETIME            DEFAULT NULL,
+  review      VARCHAR(3000)       DEFAULT NULL,
+  cover       TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
+  createddate DATETIME            NOT NULL,
+  updateddate DATETIME            NOT NULL,
+  PRIMARY KEY                    (id),
+  UNIQUE INDEX ix_gamesinfo_asin (asin)
+)
+  ENGINE          = InnoDB
+  DEFAULT CHARSET = utf8
+  COLLATE         = utf8_unicode_ci
+  AUTO_INCREMENT  = 1;
+
 DROP TABLE IF EXISTS shortgroups;
 CREATE TABLE shortgroups (
   ID           INT(11)         NOT NULL AUTO_INCREMENT,
@@ -701,6 +728,11 @@ INSERT INTO menu (href, title, tooltip, role, ordinal)
 VALUES ('prehash', 'Prehash',
         'Prehash', 1, 68);
 
+INSERT INTO `site` (`setting`, `value`) VALUES
+  ('categorizeforeign',	'1'),
+  ('catwebdl',	'0'),
+  ('giantbombkey', '');
+
 DROP TRIGGER IF EXISTS check_insert;
 DROP TRIGGER IF EXISTS check_update;
 
@@ -746,9 +778,3 @@ WHERE releaseID = OLD.ID;
 END;
 $$
 DELIMITER ;
-
-
-
-
-
-
