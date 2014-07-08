@@ -554,12 +554,12 @@ class Net_NNTP_Protocol_Client extends PEAR
 
 		switch ($response) {
 			// 200, Posting allowed
-			case NET_NNTP_PROTOCOL_RESPONSECODE_READY_POSTING_ALLOWED:
+			case 'NET_NNTP_PROTOCOL_RESPONSECODE_READY_POSTING_ALLOWED':
 				// TODO: Set some variable before return
 				return true;
 
 			// 201, Posting NOT allowed
-			case NET_NNTP_PROTOCOL_RESPONSECODE_READY_POSTING_PROHIBITED:
+			case 'NET_NNTP_PROTOCOL_RESPONSECODE_READY_POSTING_PROHIBITED':
 				if ($this->_logger) {
 					$this->_logger->info('Posting not allowed!');
 				}
@@ -588,7 +588,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 
 		switch ($response) {
 			// 101, Draft: 'Capability list follows'
-			case NET_NNTP_PROTOCOL_RESPONSECODE_CAPABILITIES_FOLLOW:
+			case 'NET_NNTP_PROTOCOL_RESPONSECODE_CAPABILITIES_FOLLOW':
 				$data = $this->_getTextResponse();
 				if ($this->isError($data)) {
 					return $data;
@@ -616,12 +616,12 @@ class Net_NNTP_Protocol_Client extends PEAR
 
 		switch ($response) {
 			// 200, RFC2980: 'Hello, you can post'
-			case NET_NNTP_PROTOCOL_RESPONSECODE_READY_POSTING_ALLOWED:
+			case 'NET_NNTP_PROTOCOL_RESPONSECODE_READY_POSTING_ALLOWED':
 				// TODO: Set some variable before return
 				return true;
 
 			// 201, RFC2980: 'Hello, you can't post'
-			case NET_NNTP_PROTOCOL_RESPONSECODE_READY_POSTING_PROHIBITED:
+			case 'NET_NNTP_PROTOCOL_RESPONSECODE_READY_POSTING_PROHIBITED':
 				if ($this->_logger) {
 					$this->_logger->info('Posting not allowed!');
 				}
@@ -659,7 +659,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 
 		switch ($response) {
 			// RFC977: 'closing connection - goodbye!'
-			case NET_NNTP_PROTOCOL_RESPONSECODE_DISCONNECTING_REQUESTED:
+			case 'NET_NNTP_PROTOCOL_RESPONSECODE_DISCONNECTING_REQUESTED':
 				// If socket is still open, close it.
 				$disconnected = true;
 				if ($this->_isConnected(false)) {
@@ -693,7 +693,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 
 		switch ($response) {
 			// RFC4642: 'continue with TLS negotiation'
-			case NET_NNTP_PROTOCOL_RESPONSECODE_TLS_AUTHENTICATION_CONTINUE:
+			case 'NET_NNTP_PROTOCOL_RESPONSECODE_TLS_AUTHENTICATION_CONTINUE':
 				$encrypted = stream_socket_enable_crypto($this->_socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
 				switch (true) {
 					case $encrypted === true:
@@ -744,7 +744,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 
 		switch ($response) {
 			// 211, RFC977: 'n f l s group selected'
-			case NET_NNTP_PROTOCOL_RESPONSECODE_GROUP_SELECTED:
+			case 'NET_NNTP_PROTOCOL_RESPONSECODE_GROUP_SELECTED':
 				$response_arr = explode(' ', trim($this->_currentStatusResponse()));
 
 				if ($this->_logger) {
@@ -792,7 +792,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 
 		switch ($response) {
 			// 211, RFC2980: 'list of article numbers follow'
-			case NET_NNTP_PROTOCOL_RESPONSECODE_GROUP_SELECTED:
+			case 'NET_NNTP_PROTOCOL_RESPONSECODE_GROUP_SELECTED':
 
 				$articles = $this->_getTextResponse();
 				if ($this->isError($articles)) {
@@ -845,7 +845,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 
 		switch ($response) {
 			// 223, RFC977: 'n a article retrieved - request text separately (n = article number, a = unique article id)'
-			case NET_NNTP_PROTOCOL_RESPONSECODE_ARTICLE_SELECTED:
+			case 'NET_NNTP_PROTOCOL_RESPONSECODE_ARTICLE_SELECTED':
 				$response_arr = explode(' ', trim($this->_currentStatusResponse()));
 
 				if ($this->_logger) {
@@ -875,7 +875,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 
 		switch ($response) {
 			// 223, RFC977: 'n a article retrieved - request text separately (n = article number, a = unique article id)'
-			case NET_NNTP_PROTOCOL_RESPONSECODE_ARTICLE_SELECTED:
+			case 'NET_NNTP_PROTOCOL_RESPONSECODE_ARTICLE_SELECTED':
 				$response_arr = explode(' ',
 					trim($this->_currentStatusResponse()));
 
@@ -917,7 +917,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 
 		switch ($response) {
 			// 220, RFC977: 'n <a> article retrieved - head and body follow (n = article number, <a> = message-id)'
-			case NET_NNTP_PROTOCOL_RESPONSECODE_ARTICLE_FOLLOWS:
+			case 'NET_NNTP_PROTOCOL_RESPONSECODE_ARTICLE_FOLLOWS':
 				$data = $this->_getTextResponse();
 				if ($this->isError($data)) {
 					return $data;
@@ -958,7 +958,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 
 		switch ($response) {
 			// 221, RFC977: 'n <a> article retrieved - head follows'
-			case NET_NNTP_PROTOCOL_RESPONSECODE_HEAD_FOLLOWS:
+			case 'NET_NNTP_PROTOCOL_RESPONSECODE_HEAD_FOLLOWS':
 				$data = $this->_getTextResponse();
 				if ($this->isError($data)) {
 					return $data;
@@ -1000,7 +1000,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 
 		switch ($response) {
 			// 222, RFC977: 'n <a> article retrieved - body follows'
-			case NET_NNTP_PROTOCOL_RESPONSECODE_BODY_FOLLOWS:
+			case 'NET_NNTP_PROTOCOL_RESPONSECODE_BODY_FOLLOWS':
 				$data = $this->_getTextResponse();
 				if ($this->isError($data)) {
 					return $data;
@@ -1044,7 +1044,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 			 * separately' (actually not documented, but copied
 			 * from the ARTICLE command)
 			 */
-			case NET_NNTP_PROTOCOL_RESPONSECODE_ARTICLE_SELECTED:
+			case 'NET_NNTP_PROTOCOL_RESPONSECODE_ARTICLE_SELECTED':
 				$response_arr = explode(' ',
 					trim($this->_currentStatusResponse()));
 
@@ -1077,7 +1077,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 
 		switch ($response) {
 			// 340, RFC977: 'send article to be posted. End with <CR-LF>.<CR-LF>'
-			case NET_NNTP_PROTOCOL_RESPONSECODE_POSTING_SEND:
+			case 'NET_NNTP_PROTOCOL_RESPONSECODE_POSTING_SEND':
 				return true;
 
 			default:
@@ -1109,7 +1109,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 
 		switch ($response) {
 			// 240, RFC977: 'article posted ok'
-			case NET_NNTP_PROTOCOL_RESPONSECODE_POSTING_SUCCESS:
+			case 'NET_NNTP_PROTOCOL_RESPONSECODE_POSTING_SUCCESS':
 				return true;
 
 			default:
@@ -1135,7 +1135,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 
 		switch ($response) {
 			// 335, RFC997: 'Send article to be transferred'
-			case NET_NNTP_PROTOCOL_RESPONSECODE_TRANSFER_SEND:
+			case 'NET_NNTP_PROTOCOL_RESPONSECODE_TRANSFER_SEND':
 				return true;
 
 			default:
@@ -1166,7 +1166,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 
 		switch ($response) {
 			// 235, RFC977: 'Article transferred OK'
-			case NET_NNTP_PROTOCOL_RESPONSECODE_TRANSFER_SUCCESS:
+			case 'NET_NNTP_PROTOCOL_RESPONSECODE_TRANSFER_SUCCESS':
 				return true;
 
 			default:
@@ -1192,7 +1192,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 
 		switch ($response) {
 			// 111, RFC2980: '(string of numbers representing the date and time)'
-			case NET_NNTP_PROTOCOL_RESPONSECODE_SERVER_DATE:
+			case 'NET_NNTP_PROTOCOL_RESPONSECODE_SERVER_DATE':
 				return $this->_currentStatusResponse();
 
 			default:
@@ -1216,7 +1216,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 
 		switch ($response) {
 			// 100, RFC977: 'Help text follows'
-			case NET_NNTP_PROTOCOL_RESPONSECODE_HELP_FOLLOWS:
+			case 'NET_NNTP_PROTOCOL_RESPONSECODE_HELP_FOLLOWS':
 				$data = $this->_getTextResponse();
 				if ($this->isError($data)) {
 					return $data;
@@ -1255,7 +1255,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 
 		switch ($response) {
 			// 231, REF977: 'list of new newsgroups follows'
-			case NET_NNTP_PROTOCOL_RESPONSECODE_NEW_GROUPS_FOLLOW:
+			case 'NET_NNTP_PROTOCOL_RESPONSECODE_NEW_GROUPS_FOLLOW':
 				$data = $this->_getTextResponse();
 				if ($this->isError($data)) {
 					return $data;
@@ -1319,7 +1319,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 
 		switch ($response) {
 			// 230, RFC977: 'list of new articles by message-id follows'
-			case NET_NNTP_PROTOCOL_RESPONSECODE_NEW_ARTICLES_FOLLOW:
+			case 'NET_NNTP_PROTOCOL_RESPONSECODE_NEW_ARTICLES_FOLLOW':
 				$messages = array();
 				foreach($this->_getTextResponse() as $line) {
 					$messages[] = $line;
@@ -1349,7 +1349,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 
 		switch ($response) {
 			// 215, RFC977: 'list of newsgroups follows'
-			case NET_NNTP_PROTOCOL_RESPONSECODE_GROUPS_FOLLOW:
+			case 'NET_NNTP_PROTOCOL_RESPONSECODE_GROUPS_FOLLOW':
 				$data = $this->_getTextResponse();
 				if ($this->isError($data)) {
 					return $data;
@@ -1399,7 +1399,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 
 		switch ($response) {
 			// 215, RFC977: 'list of newsgroups follows'
-			case NET_NNTP_PROTOCOL_RESPONSECODE_GROUPS_FOLLOW:
+			case 'NET_NNTP_PROTOCOL_RESPONSECODE_GROUPS_FOLLOW':
 				$data = $this->_getTextResponse();
 				if ($this->isError($data)) {
 					return $data;
@@ -1454,7 +1454,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 
 		switch ($response) {
 			// 215, RFC2980: 'information follows'
-			case NET_NNTP_PROTOCOL_RESPONSECODE_GROUPS_FOLLOW:
+			case 'NET_NNTP_PROTOCOL_RESPONSECODE_GROUPS_FOLLOW':
 				$data = $this->_getTextResponse();
 				if ($this->isError($data)) {
 					return $data;
@@ -1509,7 +1509,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 
 		switch ($response) {
 			// 224, RFC2980: 'Overview information follows'
-			case NET_NNTP_PROTOCOL_RESPONSECODE_OVERVIEW_FOLLOWS:
+			case 'NET_NNTP_PROTOCOL_RESPONSECODE_OVERVIEW_FOLLOWS':
 				$data = $this->_getTextResponse();
 				if ($this->isError($data)) {
 					return $data;
@@ -1561,7 +1561,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 
 		switch ($response) {
 			// 224, RFC2980: 'Overview information follows'
-			case NET_NNTP_PROTOCOL_RESPONSECODE_OVERVIEW_FOLLOWS:
+			case 'NET_NNTP_PROTOCOL_RESPONSECODE_OVERVIEW_FOLLOWS':
 				$data = $this->_getTextResponse();
 				if ($this->isError($data)) {
 					return $data;
@@ -1598,7 +1598,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 
 		switch ($response) {
 			// 215, RFC2980: 'information follows'
-			case NET_NNTP_PROTOCOL_RESPONSECODE_GROUPS_FOLLOW:
+			case 'NET_NNTP_PROTOCOL_RESPONSECODE_GROUPS_FOLLOW':
 				$data = $this->_getTextResponse();
 				if ($this->isError($data)) {
 					return $data;
@@ -1656,7 +1656,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 
 		switch ($response) {
 			// 221, RFC2980: 'Header follows'
-			case NET_NNTP_PROTOCOL_RESPONSECODE_HEAD_FOLLOWS:
+			case 'NET_NNTP_PROTOCOL_RESPONSECODE_HEAD_FOLLOWS':
 				$data = $this->_getTextResponse();
 				if ($this->isError($data)) {
 					return $data;
@@ -1694,7 +1694,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 
 		switch ($response) {
 			// RFC2980: 'list of groups and descriptions follows'
-			case NET_NNTP_PROTOCOL_RESPONSECODE_XGTITLE_GROUPS_FOLLOW:
+			case 'NET_NNTP_PROTOCOL_RESPONSECODE_XGTITLE_GROUPS_FOLLOW':
 				$data = $this->_getTextResponse();
 				if ($this->isError($data)) {
 					return $data;
@@ -1743,7 +1743,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 
 		switch ($response) {
 			// 224, RFC2980: 'Overview information follows'
-			case NET_NNTP_PROTOCOL_RESPONSECODE_OVERVIEW_FOLLOWS:
+			case 'NET_NNTP_PROTOCOL_RESPONSECODE_OVERVIEW_FOLLOWS':
 				$data = $this->_getTextResponse();
 				if ($this->isError($data)) {
 					return $data;
