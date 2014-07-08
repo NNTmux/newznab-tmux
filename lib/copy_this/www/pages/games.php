@@ -65,7 +65,7 @@ $browseby_link = '&amp;title=' . $title . '&amp;platform=' . $platform;
 
 $page->smarty->assign('pagertotalitems', $browsecount);
 $page->smarty->assign('pageroffset', $offset);
-$page->smarty->assign('pageritemsperpage', 'ITEMS_PER_PAGE_SMALL');
+$page->smarty->assign('pageritemsperpage', ITEMS_PER_PAGE_SMALL);
 $page->smarty->assign('pagerquerybase', WWW_TOP . "/games?t=" . $category . $browseby_link . "&amp;ob=" . $orderby . "&amp;offset=");
 $page->smarty->assign('pagerquerysuffix', "#results");
 
