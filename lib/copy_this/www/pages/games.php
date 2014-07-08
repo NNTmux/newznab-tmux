@@ -55,7 +55,7 @@ $page->smarty->assign('title', $title);
 $genres = $gen->getGenres(Genres::GAME_TYPE, true);
 $tmpgnr = array();
 foreach ($genres as $gn) {
-	$tmpgnr[$gn['id']] = $gn['title'];
+	$tmpgnr[$gn['ID']] = $gn['title'];
 }
 $genre = (isset($_REQUEST['genre']) && array_key_exists($_REQUEST['genre'], $tmpgnr)) ? $_REQUEST['genre'] : '';
 $page->smarty->assign('genres', $genres);
@@ -65,7 +65,7 @@ $browseby_link = '&amp;title=' . $title . '&amp;platform=' . $platform;
 
 $page->smarty->assign('pagertotalitems', $browsecount);
 $page->smarty->assign('pageroffset', $offset);
-$page->smarty->assign('pageritemsperpage', ITEMS_PER_COVER_PAGE);
+$page->smarty->assign('pageritemsperpage', 'ITEMS_PER_PAGE_SMALL');
 $page->smarty->assign('pagerquerybase', WWW_TOP . "/games?t=" . $category . $browseby_link . "&amp;ob=" . $orderby . "&amp;offset=");
 $page->smarty->assign('pagerquerysuffix', "#results");
 
