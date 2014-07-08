@@ -242,6 +242,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 		 *    function with user input, by appending a new line        *
 		 *    character followed by the injection.                     *
 		 ***************************************************************
+
 		 * Prevent new line (and possible future) characters in the NNTP
 		 * commands Net_NNTP does not support pipelined commands.
 		 * Inserting a new line character allows sending multiple
@@ -450,11 +451,11 @@ class Net_NNTP_Protocol_Client extends PEAR
 	 * Return the last received response message.
 	 *
 	 * @return string The response message.
-	 * @access protected
+	 * @access private
 	 */
-	protected function _currentStatusResponse()
+	private function _currentStatusResponse()
 	{
-	return $this->_currentStatusResponse[1];
+		return $this->_currentStatusResponse[1];
 	}
 
 	/* Session administration commands */
@@ -477,7 +478,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 	 */
 	protected function connect($host = null, $encryption = null, $port = null, $timeout = 15, $socketTimeout = 120)
 	{
-		if ($this->_isConnected()) {
+		if ($this->_isConnected() ) {
 			return $this->throwError('Already connected, disconnect first!', null);
 		}
 
@@ -740,7 +741,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 	 */
 	protected function cmdGroup($newsgroup)
 	{
-		$response = $this->_sendCommand('GROUP ' . $newsgroup);
+		$response = $this->_sendCommand('GROUP '.$newsgroup);
 		if ($this->isError($response)) {
 			return $response;
 		}
@@ -789,7 +790,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 		}
 
 		$response = $this->_sendCommand($command);
-		if ($this->isError($response)) {
+		if ($this->isError($response)){
 			return $response;
 		}
 
@@ -855,7 +856,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 					$this->_logger->info('Selected previous article: ' . $response_arr[0] . ' - ' . $response_arr[1]);
 				}
 
-				return array($response_arr[0], (string)$response_arr[1]);
+				return array($response_arr[0], (string) $response_arr[1]);
 
 			default:
 				return $this->_handleErrorResponse($response);
@@ -880,14 +881,13 @@ class Net_NNTP_Protocol_Client extends PEAR
 			// 223, RFC977: 'n a article retrieved - request text separately (n = article number, a = unique article id)'
 			case NET_NNTP_PROTOCOL_RESPONSECODE_ARTICLE_SELECTED:
 				$response_arr = explode(' ',
-					trim($this->_currentStatusResponse())
-				);
+					trim($this->_currentStatusResponse()));
 
 				if ($this->_logger) {
 					$this->_logger->info('Selected previous article: ' . $response_arr[0] . ' - ' . $response_arr[1]);
 				}
 
-				return array($response_arr[0], (string)$response_arr[1]);
+				return array($response_arr[0], (string) $response_arr[1]);
 
 			default:
 				return $this->_handleErrorResponse($response);
@@ -1050,14 +1050,13 @@ class Net_NNTP_Protocol_Client extends PEAR
 			 */
 			case NET_NNTP_PROTOCOL_RESPONSECODE_ARTICLE_SELECTED:
 				$response_arr = explode(' ',
-					trim($this->_currentStatusResponse())
-				);
+					trim($this->_currentStatusResponse()));
 
 				if ($this->_logger) {
 					$this->_logger->info('Selected article: ' . $response_arr[0] . ' - ' . $response_arr[1]);
 				}
 
-				return array($response_arr[0], (string)$response_arr[1]);
+				return array($response_arr[0], (string) $response_arr[1]);
 
 			default:
 				return $this->_handleErrorResponse($response);
@@ -1071,9 +1070,9 @@ class Net_NNTP_Protocol_Client extends PEAR
 	 *
 	 * @return mixed (bool) true on success
 	 *               (object) pear_error on failure
-	 * @access public
+	 * @access protected
 	 */
-	public function cmdPost()
+	protected function cmdPost()
 	{
 		$response = $this->_sendCommand('POST');
 		if ($this->isError($response)) {
@@ -1100,9 +1099,9 @@ class Net_NNTP_Protocol_Client extends PEAR
 	 *
 	 * @return mixed (bool) true on success
 	 *               (object) pear_error on failure
-	 * @access public
+	 * @access protected
 	 */
-	public function cmdPost2($article)
+	protected function cmdPost2($article)
 	{
 		$this->_sendArticle($article);
 
@@ -1141,7 +1140,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 		switch ($response) {
 			// 335, RFC997: 'Send article to be transferred'
 			case NET_NNTP_PROTOCOL_RESPONSECODE_TRANSFER_SEND:
-				return true;
+			return true;
 
 			default:
 				return $this->_handleErrorResponse($response);
@@ -1172,7 +1171,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 		switch ($response) {
 			// 235, RFC977: 'Article transferred OK'
 			case NET_NNTP_PROTOCOL_RESPONSECODE_TRANSFER_SUCCESS:
-				return true;
+			return true;
 
 			default:
 				return $this->_handleErrorResponse($response);
@@ -1191,7 +1190,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 	protected function cmdDate()
 	{
 		$response = $this->_sendCommand('DATE');
-		if ($this->isError($response)) {
+		if ($this->isError($response)){
 			return $response;
 		}
 
@@ -1222,7 +1221,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 		switch ($response) {
 			// 100, RFC977: 'Help text follows'
 			case NET_NNTP_PROTOCOL_RESPONSECODE_HELP_FOLLOWS:
-				$data = $this->_getTextResponse();
+			$data = $this->_getTextResponse();
 				if ($this->isError($data)) {
 					return $data;
 				}
@@ -1254,7 +1253,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 		}
 
 		$response = $this->_sendCommand($command);
-		if ($this->isError($response)) {
+		if ($this->isError($response)){
 			return $response;
 		}
 
@@ -1267,7 +1266,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 				}
 
 				$groups = array();
-				foreach ($data as $line) {
+				foreach($data as $line) {
 					$arr = explode(' ', trim($line));
 
 					$group = array(
@@ -1289,8 +1288,8 @@ class Net_NNTP_Protocol_Client extends PEAR
 	/**
 	 *
 	 *
-	 * @param int   $time         Unix timestamp.
-	 * @param mixed $newsgroups   (string or array of strings)
+	 * @param int   $time       Unix timestamp.
+	 * @param mixed $newsgroups (string or array of strings)
 	 * @param mixed $distribution (string or array of strings)
 	 *
 	 * @return mixed
@@ -1318,7 +1317,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 		// TODO: the length of the request string may not exceed 510 chars.
 
 		$response = $this->_sendCommand($command);
-		if ($this->isError($response)) {
+		if ($this->isError($response)){
 			return $response;
 		}
 
@@ -1326,7 +1325,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 			// 230, RFC977: 'list of new articles by message-id follows'
 			case NET_NNTP_PROTOCOL_RESPONSECODE_NEW_ARTICLES_FOLLOW:
 				$messages = array();
-				foreach ($this->_getTextResponse() as $line) {
+				foreach($this->_getTextResponse() as $line) {
 					$messages[] = $line;
 				}
 				return $messages;
@@ -1348,7 +1347,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 	protected function cmdList()
 	{
 		$response = $this->_sendCommand('LIST');
-		if ($this->isError($response)) {
+		if ($this->isError($response)){
 			return $response;
 		}
 
@@ -1361,7 +1360,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 				}
 
 				$groups = array();
-				foreach ($data as $line) {
+				foreach($data as $line) {
 					$arr = explode(' ', trim($line));
 
 					$group = array(
@@ -1398,7 +1397,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 		}
 
 		$response = $this->_sendCommand($command);
-		if ($this->isError($response)) {
+		if ($this->isError($response)){
 			return $response;
 		}
 
@@ -1411,7 +1410,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 				}
 
 				$groups = array();
-				foreach ($data as $line) {
+				foreach($data as $line) {
 					$arr = explode(' ', trim($line));
 
 					$group = array(
@@ -1453,7 +1452,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 		}
 
 		$response = $this->_sendCommand($command);
-		if ($this->isError($response)) {
+		if ($this->isError($response)){
 			return $response;
 		}
 
@@ -1467,9 +1466,9 @@ class Net_NNTP_Protocol_Client extends PEAR
 
 				$groups = array();
 
-				foreach ($data as $line) {
+				foreach($data as $line) {
 					if (preg_match('/^(\S+)\s+(.*)$/', ltrim($line), $matches)) {
-						$groups[$matches[1]] = (string)$matches[2];
+						$groups[$matches[1]] = (string) $matches[2];
 					} else if ($this->_logger) {
 						$this->_logger->warning("Recieved non-standard line: '$line'");
 					}
@@ -1508,7 +1507,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 		}
 
 		$response = $this->_sendCommand($command);
-		if ($this->isError($response)) {
+		if ($this->isError($response)){
 			return $response;
 		}
 
@@ -1560,7 +1559,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 		}
 
 		$response = $this->_sendCommand($command);
-		if ($this->isError($response)) {
+		if ($this->isError($response)){
 			return $response;
 		}
 
@@ -1597,7 +1596,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 	protected function cmdListOverviewFmt()
 	{
 		$response = $this->_sendCommand('LIST OVERVIEW.FMT');
-		if ($this->isError($response)) {
+		if ($this->isError($response)){
 			return $response;
 		}
 
@@ -1655,7 +1654,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 		}
 
 		$response = $this->_sendCommand($command);
-		if ($this->isError($response)) {
+		if ($this->isError($response)){
 			return $response;
 		}
 
@@ -1668,7 +1667,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 				}
 
 				$return = array();
-				foreach ($data as $line) {
+				foreach($data as $line) {
 					$line = explode(' ', trim($line), 2);
 					$return[$line[0]] = $line[1];
 				}
@@ -1693,7 +1692,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 	protected function cmdXGTitle($wildMat = '*')
 	{
 		$response = $this->_sendCommand('XGTITLE ' . $wildMat);
-		if ($this->isError($response)) {
+		if ($this->isError($response)){
 			return $response;
 		}
 
@@ -1707,9 +1706,9 @@ class Net_NNTP_Protocol_Client extends PEAR
 
 				$groups = array();
 
-				foreach ($data as $line) {
+				foreach($data as $line) {
 					preg_match('/^(.*?)\s(.*?$)/', trim($line), $matches);
-					$groups[$matches[1]] = (string)$matches[2];
+					$groups[$matches[1]] = (string) $matches[2];
 				}
 
 				return $groups;
@@ -1731,7 +1730,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 	protected function cmdXROver($range = null)
 	{
 		// Warn about deprecated API (the code _is_ still in alpha state)
-		if (func_num_args() > 1) {
+		if (func_num_args() > 1 ) {
 			exit('The second parameter in cmdXROver() has been deprecated! Use x-y instead...');
 		}
 
@@ -1742,7 +1741,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 		}
 
 		$response = $this->_sendCommand($command);
-		if ($this->isError($response)) {
+		if ($this->isError($response)){
 			return $response;
 		}
 
@@ -1755,7 +1754,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 				}
 
 				$return = array();
-				foreach ($data as $line) {
+				foreach($data as $line) {
 					$line = explode(' ', trim($line), 2);
 					$return[$line[0]] = $line[1];
 				}
@@ -1784,7 +1783,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 		}
 
 		$response = $this->_sendCommand('XPAT ' . $field . ' ' . $range . ' ' . $wildMat);
-		if ($this->isError($response)) {
+		if ($this->isError($response)){
 			return $response;
 		}
 
@@ -1796,7 +1795,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 				}
 
 				$return = array();
-				foreach ($data as $line) {
+				foreach($data as $line) {
 					$line = explode(' ', trim($line), 2);
 					$return[$line[0]] = $line[1];
 				}
@@ -1822,7 +1821,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 	protected function cmdAuthinfo($user, $pass)
 	{
 		// Send the username
-		$response = $this->_sendCommand('AUTHINFO user ' . $user);
+		$response = $this->_sendCommand('AUTHINFO user '.$user);
 		if ($this->isError($response)) {
 			return $response;
 		}
@@ -1830,7 +1829,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 		// Send the password, if the server asks
 		if (($response == 381) && ($pass !== null)) {
 			// Send the password
-			$response = $this->_sendCommand('AUTHINFO pass ' . $pass);
+			$response = $this->_sendCommand('AUTHINFO pass '.$pass);
 			if ($this->isError($response)) {
 				return $response;
 			}
@@ -1991,7 +1990,6 @@ class Net_NNTP_Protocol_Client extends PEAR
 
 			default:
 				$text = $this->_currentStatusResponse();
-
 				return $this->throwError("Unexpected response: '$text'", $response, $text);
 		}
 	}

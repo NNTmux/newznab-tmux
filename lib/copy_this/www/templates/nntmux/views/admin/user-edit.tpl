@@ -1,4 +1,4 @@
- 
+
 <h1>{$page->title}</h1>
 
 {if $error != ''}
@@ -31,7 +31,7 @@
 		{if $user.ID}
 			<div class="hint">Only enter a password if you want to change it.</div>
 		{/if}
-	</td>	
+	</td>
 </tr>
 {if $user.ID}
 <tr>
@@ -60,6 +60,13 @@
 	<td>Music View:</td>
 	<td>
 		<input name="musicview" type="checkbox" value="1" {if $user.musicview=="1"}checked="checked"{/if} />
+	</td>
+</tr>
+
+<tr>
+	<td>Game View:</td>
+	<td>
+		<input name="gameview" type="checkbox" value="1" {if $user.gameview=="1"}checked="checked"{/if}" />
 	</td>
 </tr>
 
@@ -95,16 +102,16 @@
 	<td></td>
 	<td>
 		<input type="submit" value="Save" />
-		
+
 		{if $user.ID != ""}
-			<input onclick="return doDelete();" type="button" value="Delete" />	
-			
+			<input onclick="return doDelete();" type="button" value="Delete" />
+
 			<script type="text/javascript">
 			function doDelete()
 			{
-				if (confirm('Are you sure?'))  
-					window.location='user-delete.php?id={$user.ID}&redir=user-list.php'; 
-				else 
+				if (confirm('Are you sure?'))
+					window.location='user-delete.php?id={$user.ID}&redir=user-list.php';
+				else
 					return false;
 			}
 			</script>

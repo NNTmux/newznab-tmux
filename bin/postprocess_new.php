@@ -51,6 +51,8 @@ if (isset($argv[1]) && $argv[1] === "additional") {
 	$thetvdb->processReleases();
 } else if (isset($argv[1]) && $argv[1] === "games") {
 	$pprocess->processGames();
+} else if (isset($argv[1]) && $argv[1] === "console") {
+	$pprocess->processConsoleGames();
 } else if (isset($argv[1]) && $argv[1] === "ebook") {
 	$postprocess->processBooks();
 } else if (isset($argv[1]) && $argv[1] === "music") {

@@ -1,4 +1,4 @@
- 
+
 <h1>Profile for {$user.username|escape:"htmlall"}</h1>
 
 <table class="data">
@@ -14,11 +14,11 @@
 	<tr><th>Grabs Today:</th><td><span id="ugrtd">{$grabstoday.num}</span> {if $grabstoday.num >= $user.downloadrequests}&nbsp;&nbsp;<small>(Next DL in {($grabstoday.nextdl/3600)|intval}h {($grabstoday.nextdl/60) % 60}m)</small>{/if}{if $userdata.role==2 && $grabstoday.num > 0}<a onclick="resetapireq({$user.ID}, 'grabs'); document.getElementById('ugrtd').innerHTML='0'; return false;" href="#">Reset</a>{/if}</td></tr>
 	{/if}
 	<tr><th>Grabs Total:</th><td>{$user.grabs}</td></tr>
-	
+
 	{if ($user.ID==$userdata.ID || $userdata.role==2) && $site->registerstatus==1}
 	<tr>
 		<th title="Not public">Invites:</th>
-		<td>{$user.invites} 
+		<td>{$user.invites}
 		{if $user.invites > 0}
 			[<a id="lnkSendInvite" onclick="return false;" href="#">Send Invite</a>]
 			<span title="Your invites will be reduced when the invitation is claimed." class="invitesuccess" id="divInviteSuccess">Invite Sent</span>
@@ -34,15 +34,16 @@
 		</td>
 	</tr>
 	{/if}
-	
+
 	{if $userinvitedby && $userinvitedby.username != ""}
 	<tr><th>Invited By:</th><td><a title="View {$userinvitedby.username}'s profile" href="{$smarty.const.WWW_TOP}/profile?name={$userinvitedby.username}">{$userinvitedby.username}</a></td>
 	{/if}
-	
+
 	<tr><th>UI Preferences:</th>
 		<td>
 			{if $user.movieview == "1"}View movie covers{else}View standard movie category{/if}<br/>
 			{if $user.musicview == "1"}View music covers{else}View standard music category{/if}<br/>
+			{if $user.gameview == "1"}View game covers{else}View standard game category{/if}<br/>
 			{if $user.consoleview == "1"}View console covers{else}View standard console category{/if}<br/>
 			{if $user.bookview == "1"}View book covers{else}View standard book category{/if}
 		</td>
@@ -58,7 +59,7 @@
 			Storage: {if $sabsetting == ''}N/A{else}{$sabsetting}{/if}
 		</td>
 	{/if}
-	
+
 	{if ($user.ID==$userdata.ID)}
 	<tr>
 	   <th>NZBVortex</th>
@@ -74,8 +75,8 @@
 			<tr><th>My TV Shows:</th><td><a href="{$smarty.const.WWW_TOP}/myshows">Manage my shows</a></td></tr>
 			<tr><th>My Movies:</th><td><a href="{$smarty.const.WWW_TOP}/mymovies">Manage my movies</a></td></tr>
 	{/if}
-	
-	
+
+
 	{if $user.ID==$userdata.ID}<tr><th></th><td><a href="{$smarty.const.WWW_TOP}/profileedit">Edit</a></td></tr>{/if}
 </table>
 
@@ -91,7 +92,7 @@
 			<th>hosthash</th>
 			<th>release</th>
 		</tr>
-		
+
 		{foreach from=$downloadlist item=download}
 		{if $download@iteration == 10}
 			<tr class="more"><td colspan="3"><a onclick="$('tr.extra').toggle();$('tr.more').toggle();return false;" href="#">show all...</a></td></tr>
@@ -121,7 +122,7 @@
 			<th>comment</th>
 		</tr>
 
-		
+
 		{foreach from=$commentslist item=comment}
 		<tr>
 			<td width="80" title="{$comment.createddate}">{$comment.createddate|date_format}</td>

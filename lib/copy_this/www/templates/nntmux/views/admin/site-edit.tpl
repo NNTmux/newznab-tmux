@@ -232,6 +232,14 @@
 		<div class="hint">The amazon associate tag. Used for cover lookups.</div>
 	</td>
 </tr>
+<tr>
+	<td style="width:180px;"><label for="giantbombkey">Giant Bomb API Key:</label></td>
+	<td>
+		<input id="giantbombkey" class="long" name="giantbombkey" type="text" value="{$fsite->giantbombkey}"/>
+
+		<div class="hint">The giantbomb key. Used for game lookups.</div>
+	</td>
+</tr>
 
 </table>
 </fieldset>
@@ -982,4 +990,3 @@
 <input type="submit" value="Save Site Settings" />
 
 </form>
-
