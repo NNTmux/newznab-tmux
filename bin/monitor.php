@@ -8,7 +8,7 @@ require_once(dirname(__FILE__) . "/../lib/showsleep.php");
 require_once(dirname(__FILE__) . "/../lib/functions.php");
 
 
-$version = "0.4r2004";
+$version = "0.4r2010";
 
 $db = new DB();
 $functions = new Functions();
@@ -1657,11 +1657,12 @@ while ($i > 0) {
 			shell_exec("tmux respawnp -t${tmux_session}:2.4 'echo \"\033[38;5;${color}m\n${panes2[4]} has been disabled/terminated by Postprocess Anime\"'");
 		}
 
-		//Process Console releases in pane 2.5 once if needed then exits
+		//Process Games in pane 2.5 once if needed then exits
 		if (($maxload >= get_load()) && ($post_amazon == 1) && ($console_releases_proc > 0)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			$log = writelog($panes2[5]);
-			shell_exec("tmux respawnp -t${tmux_session}:2.5 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php postprocess_new.php games 2>&1 $log && $_sleep $post_timer_amazon && echo \" \033[1;0;33m\"' 2>&1 1> /dev/null");
+			shell_exec("tmux respawnp -t${tmux_session}:2.5 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php postprocess_new.php console 2>&1 $log; \
+			$_php postprocess_new.php games 2>&1 $log; $_sleep $post_timer_amazon && echo \" \033[1;0;33m\"' 2>&1 1> /dev/null");
 		} else if (($maxload >= get_load()) && ($post_amazon == 1) && ($console_releases_proc == 0)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			shell_exec("tmux respawnp -t${tmux_session}:2.5 'echo \"\033[38;5;\"$color\"m\n$panes2[5] has been disabled/terminated by No Games to process\"'");

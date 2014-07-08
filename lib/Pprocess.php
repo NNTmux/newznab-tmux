@@ -16,6 +16,7 @@ require_once(WWW_DIR . "/lib/amazon.php");
 require_once(WWW_DIR . "/lib/genres.php");
 require_once(WWW_DIR . "/lib/anidb.php");
 require_once(WWW_DIR . "/lib/book.php");
+require_once(WWW_DIR . "/lib/Games.php");
 require_once("consoletools.php");
 require_once("ColorCLI.php");
 require_once("nzbcontents.php");
@@ -131,6 +132,7 @@ class PProcess
 		$this->processSharing($nntp);
 		$this->processMovies();
 		$this->processMusic();
+		$this->processConsoleGames();
 		$this->processGames();
 		$this->processAnime();
 		$this->processTv();
@@ -165,15 +167,28 @@ class PProcess
 	}
 
 	/**
+	 * Lookup console games if enabled.
+	 *
+	 * @return void
+	 */
+	public function processConsoleGames()
+	{
+		if ($this->site->lookupgames !== '0') {
+			$console = new Konsole($this->echooutput);
+			$console->processConsoleReleases();
+		}
+	}
+
+	/**
 	 * Lookup games if enabled.
 	 *
 	 * @return void
 	 */
 	public function processGames()
 	{
-		if ($this->site->lookupgames !== '0') {
-			$console = new Konsole($this->echooutput);
-			$console->processConsoleReleases();
+		if ($this->site->lookupgames !== 0) {
+			$games = new Games($this->echooutput);
+			$games->processGamesReleases();
 		}
 	}
 
