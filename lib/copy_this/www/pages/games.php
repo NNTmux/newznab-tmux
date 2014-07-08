@@ -34,7 +34,7 @@ $ordering = $games->getgamesOrdering();
 $orderby = isset($_REQUEST["ob"]) && in_array($_REQUEST['ob'], $ordering) ? $_REQUEST["ob"] : '';
 
 $results = $games2 = array();
-$results = $games->getgamesRange($catarray, $offset, ITEMS_PER_COVER_PAGE, $orderby, -1, $page->userdata["categoryexclusions"]);
+$results = $games->getgamesRange($catarray, $offset, 'ITEMS_PER_PAGE_SMALL', $orderby, -1, $page->userdata["categoryexclusions"]);
 $maxwords = 50;
 foreach ($results as $result) {
 	if (!empty($result['review'])) {
