@@ -10,7 +10,7 @@ $pdo = new DB();
 $c = new ColorCLI();
 
 $res = $pdo->query(
-	sprintf("SELECT searchname FROM releases WHERE gamesinfo_id IS NULL AND categoryID = 4050 ORDER BY id DESC LIMIT 100")
+	sprintf("SELECT searchname FROM releases WHERE gamesinfo_id IS NULL AND categoryID = 4050 ORDER BY ID DESC LIMIT 100")
 );
 $total = count($res);
 if ($total > 0) {
