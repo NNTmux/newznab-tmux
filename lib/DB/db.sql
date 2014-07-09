@@ -207,7 +207,7 @@ INSERT INTO tmux (setting, value) VALUES ('defrag_cache', '900'),
   ('ffmpeg_duration', '5'),
   ('ffmpeg_image_time', '5'),
   ('processvideos', '0'),
-  ('sqlpatch', '55');
+  ('sqlpatch', '56');
 
 DROP TABLE IF EXISTS releasesearch;
 CREATE TABLE releasesearch (
@@ -727,6 +727,7 @@ DELIMITER ;
 INSERT INTO menu (href, title, tooltip, role, ordinal)
 VALUES ('prehash', 'Prehash',
         'Prehash', 1, 68);
+INSERT INTO menu (href, title, tooltip, role, ordinal ) VALUES ('newposterwall', 'New Releases', "Newest Releases Poster Wall", 1, 11);
 
 INSERT INTO `site` (`setting`, `value`) VALUES
   ('categorizeforeign',	'1'),

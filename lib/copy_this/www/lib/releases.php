@@ -1208,7 +1208,7 @@ class Releases
 	}
 
 	/**
-	 * Search for releases by imdbid/movieinfo. Used by API/Couchpotato.
+	 * Search for releases by imdbID/movieinfo. Used by API/Couchpotato.
 	 */
 	public function searchbyImdbId($imdbId, $offset = 0, $limit = 100, $name = "", $cat = array(-1), $genre = "", $maxage = -1)
 	{
@@ -1942,6 +1942,135 @@ class Releases
                             WHERE releases.adddate > NOW() - INTERVAL 1 WEEK
                             GROUP BY concat(cp.title, ' > ', category.title)
                             ORDER BY COUNT(*) DESC"
+		);
+	}
+
+	/**
+	 * Get all newest movies with coves for poster wall.
+	 *
+	 * @return array
+	 */
+	public function getNewestMovies()
+	{
+		$db = new DB();
+
+		return $db->query(
+			"SELECT DISTINCT (a.imdbID),
+				guid, name, b.title, searchname, size, completion,
+				postdate, categoryID, comments, grabs, c.cover
+			FROM releases a, category b, movieinfo c
+			WHERE a.categoryID BETWEEN 2000 AND 2999
+			AND b.title = 'Movies'
+			AND a.imdbID = c.imdbID
+			AND a.imdbID !='NULL'
+			AND a.imdbID != 0
+			AND c.cover = 1
+			GROUP BY a.imdbID
+			ORDER BY a.postdate
+			DESC LIMIT 24"
+		);
+	}
+
+	/**
+	 * Get all newest console games with covers for poster wall.
+	 *
+	 * @return array
+	 */
+	public function getNewestConsole()
+	{
+		$db = new DB();
+
+		return $db->query(
+			"SELECT DISTINCT (a.consoleinfoID),
+				guid, name, b.title, searchname, size, completion,
+				postdate, categoryID, comments, grabs, c.cover
+			FROM releases a, category b, consoleinfo c
+			WHERE c.cover > 0
+			AND a.categoryID BETWEEN 1000 AND 1999
+			AND b.title = 'Console'
+			AND a.consoleinfoID = c.ID
+			AND a.consoleinfoID != -2
+			AND a.consoleinfoID != 0
+			GROUP BY a.consoleinfoID
+			ORDER BY a.postdate
+			DESC LIMIT 35"
+		);
+	}
+
+	/**
+	 * Get all newest PC games with covers for poster wall.
+	 *
+	 * @return array
+	 */
+	public function getNewestGames()
+	{
+		$db = new DB();
+
+		return $db->query(
+			"SELECT DISTINCT (a.gamesinfo_id),
+				guid, name, b.title, searchname, size, completion,
+				postdate, categoryID, comments, grabs, c.cover
+			FROM releases a, category b, gamesinfo c
+			WHERE c.cover > 0
+			AND a.categoryID = 4050
+			AND b.title = 'Games'
+			AND a.gamesinfo_id = c.ID
+			AND a.gamesinfo_id != -2
+			AND a.gamesinfo_id != 0
+			GROUP BY a.gamesinfo_id
+			ORDER BY a.postdate
+			DESC LIMIT 35"
+		);
+	}
+
+	/**
+	 * Get all newest music with covers for poster wall.
+	 *
+	 * @return array
+	 */
+	public function getNewestMP3s()
+	{
+		$db = new DB();
+
+		return $db->query(
+			"SELECT DISTINCT (a.musicinfoID),
+				guid, name, b.title, searchname, size, completion,
+				 postdate, categoryID, comments, grabs, c.cover
+			FROM releases a, category b, musicinfo c
+			WHERE c.cover > 0
+			AND a.categoryID BETWEEN 3000 AND 3999
+			AND a.categoryID != 3030
+			AND b.title = 'Audio'
+			AND a.musicinfoID = c.ID
+			AND a.musicinfoID != -2
+			GROUP BY a.musicinfoID
+			ORDER BY a.postdate
+			DESC LIMIT 24"
+		);
+	}
+
+	/**
+	 * Get all newest books with covers for poster wall.
+	 *
+	 * @return array
+	 */
+	public function getNewestBooks()
+	{
+		$db = new DB();
+
+		return $db->query(
+			"SELECT DISTINCT (a.bookinfoID),
+				guid, name, b.title, searchname, size, completion,
+				postdate, categoryID, comments, grabs, url, c.cover, c.title as booktitle, c.author
+			FROM releases a, category b, bookinfo c
+			WHERE c.cover > 0
+			AND (a.categoryID BETWEEN 7000 AND 7999 OR a.categoryID = 3030)
+			AND (b.title = 'Books' OR b.title = 'Audiobook')
+			AND a.bookinfoID = c.ID
+			AND a.bookinfoID != -2
+			GROUP BY a.bookinfoID
+			ORDER BY a.postdate
+			DESC LIMIT 24"
 		);
 	}
 }

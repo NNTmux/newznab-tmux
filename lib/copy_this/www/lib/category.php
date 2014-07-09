@@ -137,6 +137,18 @@ class Category
 	}
 
 	/**
+	 * Get names of enabled parent categories.
+	 *
+	 * @return array
+	 */
+	public function getEnabledParentNames()
+	{
+		$db = new DB();
+
+		return $db->query("SELECT title FROM category WHERE parentID IS NULL AND status = 1");
+	}
+
+	/**
 	 * Get a category row by its ID.
 	 */
 	public function getById($id)
@@ -242,6 +254,7 @@ class Category
 				unset($ret[$key]);
 			}
 		}
+
 		return $ret;
 	}
 
