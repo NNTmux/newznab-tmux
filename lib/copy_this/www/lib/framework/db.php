@@ -2,8 +2,8 @@
 require_once(WWW_DIR . "/lib/framework/cache.php");
 require_once(WWW_DIR."/lib/site.php");
 require_once(WWW_DIR."/lib/util.php");
-require_once(WWW_DIR."../../misc/update_scripts/nix_scripts/tmux/lib/ConsoleTools.php");
-require_once(WWW_DIR."../../misc/update_scripts/nix_scripts/tmux/lib/ColorCLI.php");
+require_once(WWW_DIR."../misc/update_scripts/nix_scripts/tmux/lib/ConsoleTools.php");
+require_once(WWW_DIR."../misc/update_scripts/nix_scripts/tmux/lib/ColorCLI.php");
 
 
 /**
