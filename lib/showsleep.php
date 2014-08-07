@@ -1,7 +1,7 @@
 <?php
 //This script is ported from nZEDb and adapted for newznab
 require_once(dirname(__FILE__)."/../bin/config.php");
-require_once("ConsoleTools.php");
+require_once("consoletools.php");
 
 // This script is simply so I can show sleep progress in bash script
 $consoletools = new ConsoleTools();

@@ -4,7 +4,7 @@
 
 class ColorCLI
 {
-	static $foreground_colors = [
+	static $foreground_colors = array(
 		'Black' => '30',
 		'Blue' => '34',
 		'Green' => '32',
@@ -13,9 +13,9 @@ class ColorCLI
 		'Purple' => '35',
 		'Yellow' => '33',
 		'Gray' => '37',
-	];
+	);
 	// Feel free to add any other colors that you like here.
-	static $colors256 = [
+	static $colors256 = array(
 		'Gray' => '008', 'Red' => '009',
 		'Green' => '010', 'Yellow' => '011',
 		'Blue' => '012', 'Purple' => '013',
@@ -140,19 +140,19 @@ class ColorCLI
 		'Grey26' => '250', 'Grey27' => '251',
 		'Grey28' => '252', 'Grey29' => '253',
 		'Grey30' => '254', 'Grey31' => '255',
-	];
-	static $background_colors = [
+	);
+	static $background_colors = array(
 		'Black' => '40', 'Red' => '41',
 		'Green' => '42', 'Yellow' => '43',
 		'Blue' => '44', 'Purple' => '45',
 		'Cyan' => '46', 'White' => '47',
-	];
-	static $options = [
+	);
+	static $options = array(
 		'Norm' => '0', 'Bold' => '1',
 		'Dim' => '2', 'Uline' => '4',
 		'Blink' => '5', 'Rev' => '7',
 		'Hidden' => '8', 'Crossout' => '9',
-	];
+	);
 
 	public static function bell($count = 1)
 	{
@@ -259,7 +259,7 @@ class ColorCLI
 
 	public static function warningOver($str)
 	{
-		$str = "\033[38;5;" . self::$colors256['Red'] . "m$str\033[0m";
+		$str = "\033[38;5;" . self::$colors256['Red'] . "m";
 		return $str;
 	}
 

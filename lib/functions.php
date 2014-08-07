@@ -15,7 +15,7 @@ require_once(WWW_DIR . "/lib/groups.php");
 require_once(WWW_DIR . '/lib/nntp.php');
 require_once(WWW_DIR . "/lib/postprocess.php");
 require_once(WWW_DIR . "/lib/Tmux.php");
-require_once("ConsoleTools.php");
+require_once("consoletools.php");
 require_once("ColorCLI.php");
 require_once("nzbcontents.php");
 require_once("namefixer.php");

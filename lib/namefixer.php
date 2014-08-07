@@ -11,7 +11,7 @@ require_once("nzbcontents.php");
 require_once("ColorCLI.php");
 require_once("Info.php");
 require_once("Pprocess.php");
-require_once("ConsoleTools.php");
+require_once("consoletools.php");
 
 
 //This script is ported from nZEDb and adapted for newznab
