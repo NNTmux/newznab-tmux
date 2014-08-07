@@ -18,7 +18,7 @@ require_once(WWW_DIR . "/lib/genres.php");
 require_once(WWW_DIR . "/lib/anidb.php");
 require_once(WWW_DIR . "/lib/book.php");
 require_once(WWW_DIR . "/lib/nzb.php");
-require_once("consoletools.php");
+require_once("ConsoleTools.php");
 require_once("ColorCLI.php");
 require_once("nzbcontents.php");
 require_once("namefixer.php");

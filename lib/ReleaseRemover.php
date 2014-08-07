@@ -4,7 +4,7 @@ require_once(WWW_DIR."/lib/framework/cache.php");
 require_once(WWW_DIR."/lib/framework/db.php");
 require_once(WWW_DIR."/lib/releases.php");
 require_once(WWW_DIR."/lib/category.php");
-require_once("consoletools.php");
+require_once("ConsoleTools.php");
 require_once("ColorCLI.php");
 require_once("functions.php");
 

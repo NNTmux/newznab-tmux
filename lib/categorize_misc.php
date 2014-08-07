@@ -5,7 +5,7 @@ require_once(WWW_DIR."/lib/groups.php");
 require_once(WWW_DIR."/lib/nntp.php");
 require_once("ColorCLI.php");
 require_once("functions.php");
-require_once("consoletools.php");
+require_once("ConsoleTools.php");
 
 $c = new ColorCLI();
 
