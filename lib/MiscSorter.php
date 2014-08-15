@@ -1,12 +1,15 @@
 <?php
-require_once(WWW_DIR. "config.php");
-require_once(WWW_DIR. "lib/framework/db.php");
-require_once(WWW_DIR. 'lib/amazon.php');
-require_once(WWW_DIR. 'lib/Categorize.php');
-require_once(WWW_DIR. 'lib/groups.php');
-require_once('Film.php');
-require_once('Info.php');
-require_once('ReleaseCleaner.php');
+require_once(WWW_DIR . "/lib/framework/db.php");
+require_once(WWW_DIR . "/lib/amazon.php");
+require_once(WWW_DIR . "/lib/Categorize.php");
+require_once(WWW_DIR . "/lib/groups.php");
+require_once(WWW_DIR . "/lib/music.php");
+require_once(WWW_DIR . "/lib/site.php");
+require_once("Info.php");
+require_once("Film.php");
+require_once("ColorCLI.php");
+require_once("ReleaseCleaner.php");
+
 
 /**
  * Class MiscSorter
@@ -20,22 +23,27 @@ class MiscSorter
 	 */
 	function __construct($echooutput = false)
 	{
-		$this->qualities = ['(:?..)?tv', '480[ip]?', '640[ip]?', '720[ip]?', '1080[ip]?', 'ac3', 'audio_ts', 'avi', 'bd[\- ]?rip', 'bd25', 'bd50',
+		$this->qualities = array('(:?..)?tv', '480[ip]?', '640[ip]?', '720[ip]?', '1080[ip]?', 'ac3', 'audio_ts', 'avi', 'bd[\- ]?rip', 'bd25', 'bd50',
 			'bdmv', 'blu ?ray', 'br[\- ]?disk', 'br[\- ]?rip', 'cam', 'cam[\- ]?rip', 'dc', 'directors.?cut', 'divx\d?', 'dts', 'dvd', 'dvd[\- ]?r',
 			'dvd[\- ]?rip', 'dvd[\- ]?scr', 'extended', 'hd', 'hd[\- ]?tv', 'h264', 'hd[\- ]?cam', 'hd[\- ]?ts', 'iso', 'm2ts', 'mkv', 'mpeg(:?\-\d)?',
 			'mpg', 'ntsc', 'pal', 'proper', 'ppv', 'ppv[\- ]?rip', 'r\d{1}', 'repack', 'repacked', 'scr', 'screener', 'tc', 'telecine', 'telesync', 'ts',
-			'tv[\- ]?rip', 'unrated', 'vhs( ?rip)', 'video_ts', 'video ts', 'x264', 'xvid', 'web[\- ]?rip'];
+			'tv[\- ]?rip', 'unrated', 'vhs( ?rip)', 'video_ts', 'video ts', 'x264', 'xvid', 'web[\- ]?rip');
 
 		$this->echooutput = $echooutput;
 		$this->qty = 100;
 
 		$this->pdo = new DB();
-		$this->category = new Categorize();
-		$this->movie = new Film();
-		$this->nfolib = new Info();
+		$s = new Sites();
+		$this->site = $s->get();
+		$this->category = new Categorize($this->echooutput);
+		$this->movie = new Film($this->echooutput);
+		$this->nfolib = new Info($this->echooutput);
 		$this->nc = new ReleaseCleaning();
-		$this->groups = new Groups();
+		$this->groups = new Groups($this->pdo);
+		$this->c = new ColorCLI();
 
+		//$res = $this->pdo->exec("SET NAMES 'utf8'");
+		//$res = $this->pdo->exec("SET CHARACTER SET 'utf8'");
 
 		mb_internal_encoding("UTF-8");
 		mb_regex_encoding("UTF-8");
@@ -51,6 +59,9 @@ class MiscSorter
 	function doecho($str = '', $type = '')
 	{
 		if ($this->echooutput && $str != '') {
+			if ($type == 'debug')
+				echo "$str\n";
+			else if ($type != 'debug')
 				echo "$str\n";
 		}
 	}
@@ -80,18 +91,18 @@ class MiscSorter
 			$cats = $this->category->get(true, array());
 		$thecategory = array();
 		foreach ($cats as $c)
-			$thecategory[] = $c['id'];
+			$thecategory[] = $c['ID'];
 
 		$thecategory = implode(", ", $thecategory);
-		$res = $this->pdo->query(sprintf("SELECT id FROM releases WHERE nfostatus = 1 AND passwordstatus >= 0 AND releases.categoryid IN (%s) LIMIT %d", $thecategory, $this->qty));
+		$res = $this->pdo->query(sprintf("SELECT ID FROM releases WHERE nfostatus = 1 AND passwordstatus >= 0 AND releases.categoryID IN (%s) LIMIT %d", $thecategory, $this->qty));
 
 		if (count($res) == 0)
 			return false;
 
-		$this->idarr = $res[0]['id'];
+		$this->idarr = $res[0]['ID'];
 		unset($res[0]);
 		foreach ($res as $r)
-			$this->idarr = $this->idarr . ", " . $r['id'];
+			$this->idarr = $this->idarr . ", " . $r['ID'];
 
 		if ($this->idarr == '')
 			return false;
@@ -184,57 +195,55 @@ class MiscSorter
 
 	function dodbupdate($id, $cat, $name = '', $typeid = 0, $type = '', $debug = '')
 	{
-		if ($debug == '')
-			$debug = $this->DEBUGGING;
 		$n = "\n";
 		$groups = $this->groups;
 
-		$release = $this->pdo->query("SELECT r.searchname as searchname, categoryid as cat, g.name as name FROM releases r INNER JOIN groups g ON r.group_id = g.id WHERE r.id = {$id}");
+		$release = $this->pdo->query("SELECT r.searchname as searchname, categoryID as cat, g.name as name FROM releases r INNER JOIN groups g ON r.groupID = g.ID WHERE r.ID = {$id}");
 		$oldcatname = $this->category->getNameByID($release[0]['cat']);
 		$newcatname = $this->category->getNameByID($cat);
 
-		$query = "UPDATE releases SET categoryid = {$cat}, proc_sorter = 1";
+		$query = "UPDATE releases SET categoryID = {$cat}, proc_sorter = 1";
 		if ($name != '') {
 			$query .= ", isrenamed = 1, iscategorized = 1, searchname = " . $this->pdo->escapeString($name);
 			$name = preg_replace(array('/^[-=_\.:\s]+/', '/[-=_\.:\s]+$/'), '', $name);
-			echo $n . $n . $this->pdo->log->headerOver("New name:  ") . $this->pdo->log->primary($name) .
-			$this->pdo->log->headerOver("Old name:  ") . $this->pdo->log->primaryOver($release[0]["searchname"]);
+			echo $n . $n . $this->c->headerOver("New name:  ") . $this->c->primary($name) .
+			$this->c->headerOver("Old name:  ") . $this->c->primaryOver($release[0]["searchname"]);
 		}
 
 		switch ($type) {
 			case 'imdb':
 				if ($typeid != 0)
-					$query .= ", imdbid = {$typeid}";
+					$query .= ", imdbID = {$typeid}";
 				break;
 			case 'book':
 				if ($typeid != 0)
-					$query .= ", bookinfoid = {$typeid}";
+					$query .= ", bookinfoID = {$typeid}";
 				break;
 			case 'music':
 				if ($typeid != 0)
-					$query .= ", musicinfoid = {$typeid}";
+					$query .= ", musicinfoID = {$typeid}";
 				break;
 			case 'anime':
 				if ($typeid != 0)
-					$query .= ", anidbid = {$typeid}";
+					$query .= ", anidbID = {$typeid}";
 				break;
 			case 'tv':
 				if ($typeid != 0)
-					$query .= ", rageid = {$typeid}";
+					$query .= ", rageID = {$typeid}";
 				break;
 			default:
 				break;
 		}
-		echo $n . $this->pdo->log->headerOver("New cat:   ") . $this->pdo->log->primary($newcatname) .
-		$this->pdo->log->headerOver("Old cat:   ") . $this->pdo->log->primary($oldcatname) .
-		$this->pdo->log->headerOver("Group:     ") . $this->pdo->log->primary($release[0]['name']) .
-		$this->pdo->log->headerOver("Method:    ") . $this->pdo->log->primary('sorter ' . $type) .
-		$this->pdo->log->headerOver("ReleaseID: ") . $this->pdo->log->primary($id);
+		echo $n . $this->c->headerOver("New cat:   ") . $this->c->primary($newcatname) .
+		$this->c->headerOver("Old cat:   ") . $this->c->primary($oldcatname) .
+		$this->c->headerOver("Group:     ") . $this->c->primary($release[0]['name']) .
+		$this->c->headerOver("Method:    ") . $this->c->primary('sorter ' . $type) .
+		$this->c->headerOver("ReleaseID: ") . $this->c->primary($id);
 
-		$query .= " WHERE id = {$id}";
+		$query .= " WHERE ID = {$id}";
 		//$this->doecho($query);
 		if (!$debug) {
-			if ($this->pdo->queryExec($query) !== false)
+			if ($this->pdo->exec($query) !== false)
 				return true;
 		} else
 			return true;
@@ -346,7 +355,7 @@ class MiscSorter
 
 	function doAmazon($name, $id, $nfo = "", $q, $region = 'com', $case = false, $nfo = '', $row = '')
 	{
-		$amazon = new AmazonProductAPI($this->pdo->getSetting('amazonpubkey'), $this->pdo->getSetting('amazonprivkey'), $this->pdo->getSetting('amazonassociatetag'));
+		$amazon = new AmazonProductAPI($this->site->amazonpubkey, $this->site->amazonprivkey, $this->site->amazonassociatetag);
 		$ok = false;
 
 		try {
@@ -384,22 +393,22 @@ class MiscSorter
 				$new = $new . " - " . (string) $amaz->Items->Item->ItemAttributes->Title;
 				$name = $this->nc->fixerCleaner($new);
 
-				$query = "SELECT id FROM bookinfo WHERE asin = '" . (string) $amaz->Items->Item->ASIN . "'";
+				$query = "SELECT ID FROM bookinfo WHERE asin = '" . (string) $amaz->Items->Item->ASIN . "'";
 				$rel = $this->pdo->query($query);
 				if (count($rel) == 0) {
-					$book = new Books(['Echo' => $this->echooutput, 'Settings' => $this->pdo]);
+					$book = new Books($this->echooutput);
 					$bookId = $book->updateBookInfo('', $amaz);
 					unset($book);
 				} else {
-					$bookId = $rel[0]['id'];
+					$bookId = $rel[0]['ID'];
 				}
 
-				$query = "SELECT * FROM releases INNER JOIN releaseaudio ON releases.id = releaseaudio.releaseid WHERE releases.id = {$id}";
+				$query = "SELECT * FROM releases INNER JOIN releaseaudio ON releases.ID = releaseaudio.releaseID WHERE releases.ID = {$id}";
 				$rel = $this->pdo->query($query);
 				if (count($rel) > 0 || $audiobook)
 					$ok = $this->dodbupdate($id, Category::CAT_MUSIC_AUDIOBOOK, $name, $bookId, 'book');
 				else
-					$ok = $this->dodbupdate($id, Category::CAT_BOOKS_EBOOK, $name, $bookId, 'book');
+					$ok = $this->dodbupdate($id, Category::CAT_BOOK_EBOOK, $name, $bookId, 'book');
 				unset($rel);
 				break;
 
@@ -415,11 +424,11 @@ class MiscSorter
 				$query = "SELECT * FROM musicinfo WHERE asin = '" . (string) $amaz->Items->Item->ASIN . "'";
 				$rel = $this->pdo->query($query);
 				if (count($rel) == 0) {
-					//$music = new Music();
+					$music = new Music();
 					//$musicId = $music->updateMusicInfo('', '', $amaz)
-					//unset($music);
+					unset($music);
 				} else
-					$musicId = $rel[0]['id'];
+					$musicId = $rel[0]['ID'];
 
 				//$ok = $this->dodbupdate($id, 3010, $name, $musicId, 'music');
 				break;
@@ -451,12 +460,12 @@ class MiscSorter
 			return false;
 		}
 
-		$nzb1 = new NZB($this->pdo);
+		$nzb1 = new NZB();
 		$nzbpath = $nzb1->NZBPath($guid);
 		$nzb = array();
 
 		if ($nzbpath !== false) {
-			$xmlObj = @simplexml_load_file(Utility::unzipGzipFile($nzbpath));
+			$xmlObj = @simplexml_load_file('compress.zlib://' . $nzbpath);
 			if ($xmlObj && strtolower($xmlObj->getName()) == 'nzb') {
 				foreach ($xmlObj->file as $file) {
 					$nzbfile = array();
@@ -579,7 +588,7 @@ class MiscSorter
 							$artist[1] = $artist[3];
 
 						if (isset($title[1]) && isset($artist[1]))
-							$ok = $this->dodbupdate($row['id'], Category::CAT_MUSIC_MP3, $this->cleanname($artist[1]) . " - " . $this->cleanname($title[1]));
+							$ok = $this->dodbupdate($row['ID'], Category::CAT_MUSIC_MP3, $this->cleanname($artist[1]) . " - " . $this->cleanname($title[1]));
 					}
 				}
 				break;
@@ -589,7 +598,7 @@ class MiscSorter
 			case 'macos':
 			case 'macosx':
 			case 'osx':
-				$ok = $this->doOS($nfo, $row['id'], Category::CAT_PC_MAC);
+				$ok = $this->doOS($nfo, $row['ID'], Category::CAT_PC_MAC);
 				break;
 
 			case 'windows':
@@ -601,31 +610,31 @@ class MiscSorter
 			case 'linux':
 			case 'install':
 			case 'application':
-				$ok = $this->doOS($nfo, $row['id'], Category::CAT_PC_0DAY);
+				$ok = $this->doOS($nfo, $row['ID'], Category::CAT_PC_0DAY);
 				break;
 
 			case 'android':
-				$ok = $this->doOS($nfo, $row['id'], Category::CAT_PC_PHONE_ANDROID);
+				$ok = $this->doOS($nfo, $row['ID'], Category::CAT_PC_MOBILEANDROID);
 				break;
 
 			case 'ios':
 			case 'iphone':
 			case 'ipad':
 			case 'ipod':
-				$ok = $this->doOS($nfo, $row['id'], Category::CAT_PC_PHONE_IOS);
+				$ok = $this->doOS($nfo, $row['ID'], Category::CAT_PC_MOBILEIOS);
 				break;
 
 			case 'game':
 				$set = preg_split('/\>(.*)\</Ui', $nfo, 0, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
 
 				if (isset($set[1]))
-					$ok = $this->dodbupdate($row['id'], Category::CAT_PC_GAMES, $this->cleanname($set[1]));
+					$ok = $this->dodbupdate($row['ID'], Category::CAT_PC_GAMES, $this->cleanname($set[1]));
 				else
-					$ok = $this->doOS($nfo, $row['id'], Category::CAT_PC_GAMES);
+					$ok = $this->doOS($nfo, $row['ID'], Category::CAT_PC_GAMES);
 				break;
 
 			case 'imdb':
-				$imdb = $this->movie->doMovieUpdate($nfo, "sorter", $row['id']);
+				$imdb = $this->movie->doMovieUpdate($nfo, "sorter", $row['ID']);
 				if ($imdb !== false) {
 					$movie = $this->movie->getMovieInfo($imdb);
 					$name = $this->moviename($nfo, $imdb, $row['searchname']);
@@ -634,23 +643,23 @@ class MiscSorter
 						if (preg_match('/sport/iU', $movie['genre']))
 							$cat = Category::CAT_TV_SPORT;
 						else if (preg_match('/docu/iU', $movie['genre']))
-							$cat = Category::CAT_TV_DOCUMENTARY;
+							$cat = Category::CAT_TV_DOCU;
 						else if (preg_match('/talk\-show/iU', $movie['genre']))
 							$cat = Category::CAT_TV_OTHER;
-						else if (preg_match('/tv/iU', $movie['type']) || preg_match('/episode/iU', $movie['type']) || preg_match('/reality/iU', $movie['type']))
+						else if (preg_match('/tv/iU', $movie['genre']) || preg_match('/episode/iU', $movie['genre']) || preg_match('/reality/iU', $movie['genre']))
 							$cat = Category::CAT_TV_OTHER;
 						else {
-							$cat = $this->category->determineCategory($name, $row['group_id']);
-							if ($cat == Category::CAT_MISC)
+							$cat = $this->category->determineCategory($name, $row['groupID']);
+							if ($cat == Category::CAT_MISC_OTHER)
 								$cat = Category::CAT_MOVIE_OTHER;
 						}
 					} else
-						$cat = $this->category->determineCategory($name, $row['group_id']);
+						$cat = $this->category->determineCategory($name, $row['groupID']);
 
-					if ($cat < Category::CAT_PARENT_GAME || $cat > Category::CAT_PARENT_BOOKS + 1000)
+					if ($cat < Category::CAT_PARENT_GAME || $cat > Category::CAT_PARENT_BOOK + 1000)
 						$cat = Category::CAT_MOVIE_OTHER;
 
-					$ok = $this->dodbupdate($row['id'], $cat, $name, $imdb, 'imdb');
+					$ok = $this->dodbupdate($row['ID'], $cat, $name, $imdb, 'imdb');
 				}
 				break;
 			case 'audiobook':
@@ -664,19 +673,19 @@ class MiscSorter
 				$author = preg_split('/(?:a\s?u\s?t\s?h\s?o\s?r\b)+? *?(?!(?:[^\s\.\:\}\]\*\xb0-\x{3000}\?] ?){2,}?\b)(?:[\*\?\-\=\|\;\:\.\[\}\]\(\s\xb0-\x{3000}\?]+?)[\s\.\>\:\(\)]((?!\:) ?[a-z0-9\&].+)(?:\s\s\s|$|\.\.\.)/Uuim', $nfo, 0, PREG_SPLIT_DELIM_CAPTURE);
 				$title = preg_split('/(?:t\s?i\s?t\s?l\s?e\b|b\s?o\s?o\s?k\b)+? *?(?!(?:[^\s\.\:\}\]\*\xb0-\x{3000}\?] ?){2,}?\b)(?:[\*\?\-\=\|\;\:\.\[\}\]\(\s\xb0-\x{3000}\?]+?)[\s\.\>\:\(\)]((?!\:) ?[a-z0-9\&].+)(?:\s\s\s|$|\.\.\.)/Uuim', $nfo, 0, PREG_SPLIT_DELIM_CAPTURE);
 				if (isset($author[1]) && isset($title[1]))
-					$ok = $this->dodbupdate($row['id'], Category::CAT_MUSIC_AUDIOBOOK, $this->cleanname($author[1] . " - " . $title[1]));
+					$ok = $this->dodbupdate($row['ID'], Category::CAT_MUSIC_AUDIOBOOK, $this->cleanname($author[1] . " - " . $title[1]));
 				else if (preg_match('/[\h\_\.\:\xb0-\x{3000}]{2,}?([a-z].+) \- (.+)(?:[\s\_\.\:\xb0-\x{3000}]{2,}|$)/iu', $nfo, $matches)) {
 					$pos = $this->nfopos($nfo, $matches[1] . " - " . $matches[2]);
 					if ($pos !== false && $pos < 0.4 && !preg_match('/\:\d\d$/', $matches[2]) && strlen($matches[1]) < 48 && strlen($matches[2]) < 48)
 						if (!preg_match('/title/i', $matches[1]) && !preg_match('/title/i', $matches[2]))
-							$ok = $this->dodbupdate($row['id'], Category::CAT_MUSIC_AUDIOBOOK, $this->cleanname($matches[1] . " - " . $matches[2]));
+							$ok = $this->dodbupdate($row['ID'], Category::CAT_MUSIC_AUDIOBOOK, $this->cleanname($matches[1] . " - " . $matches[2]));
 				}
 
 				break;
 
 			case 'comicbook':
 			case 'comix':
-				$ok = $this->dodbupdate($row['id'], Category::CAT_BOOKS_COMICS, '');
+				$ok = $this->dodbupdate($row['ID'], Category::CAT_BOOK_COMICS, '');
 				break;
 
 			case 'avi':
@@ -728,7 +737,7 @@ class MiscSorter
 
 				if (count($set) > 1) {
 					//var_dump($set);
-					$ok = $this->doAmazon($row['name'], $row['id'], $nfo, $set[2], $set[1], $case, $nfo, $row);
+					$ok = $this->doAmazon($row['name'], $row['ID'], $nfo, $set[2], $set[1], $case, $nfo, $row);
 				}
 				break;
 		}
@@ -738,7 +747,7 @@ class MiscSorter
 	function nfosorter($category = Category::CAT_PARENT_MISC, $id = 0, $nntp)
 	{
 		if (!isset($nntp))
-			exit($this->pdo->log->error("Not connected to usenet(miscsorter->nfosorter).\n"));
+			exit($this->c->error("Not connected to usenet(miscsorter->nfosorter).\n"));
 
 		$this->idarr = $this->getIDs($category);
 		if ($id != 0)
@@ -746,7 +755,7 @@ class MiscSorter
 
 
 		$uc = "UNCOMPRESS(releasenfo.nfo)";
-		$res = $this->pdo->query(sprintf("SELECT {$uc} AS nfo, releases.id, releases.guid, releases.fromname, releases.name, releases.searchname, groups.name AS gname, releases.group_id FROM releasenfo INNER JOIN releases ON releasenfo.releaseid = releases.id INNER JOIN groups ON releases.group_id = groups.id WHERE releases.id IN (%s)", $this->idarr));
+		$res = $this->pdo->query(sprintf("SELECT {$uc} AS nfo, releases.ID, releases.guid, releases.fromname, releases.name, releases.searchname, groups.name AS gname, releases.groupID FROM releasenfo INNER JOIN releases ON releasenfo.releaseID = releases.ID INNER JOIN groups ON releases.groupID = groups.id WHERE releases.ID IN (%s)", $this->idarr));
 		if (strlen($this->idarr) > 0 && count($res) > 0) {
 			foreach ($res as $row) {
 				$hash = $this->getHash($row['name']);
@@ -784,13 +793,13 @@ class MiscSorter
 						$pos = $this->nfopos($nfo, $m);
 
 						if ($pos !== false && $pos > 0.55 && $case != 'imdb') {
-							$this->pdo->queryExec(sprintf('UPDATE releases SET proc_sorter = 1 WHERE id = %d', $res[0]['id']));
+							$this->pdo->exec(sprintf('UPDATE releases SET proc_sorter = 1 WHERE ID = %d', $res[0]['ID']));
 							return false;
 						}
 
 						if ($ret = $this->matchnfo($case, $nfo, $row))
 							return $ret;
-						$this->pdo->queryExec(sprintf('UPDATE releases SET proc_sorter = 1 WHERE id = %d', $res[0]['id']));
+						$this->pdo->exec(sprintf('UPDATE releases SET proc_sorter = 1 WHERE ID = %d', $res[0]['ID']));
 						return false;
 					}
 				}
@@ -801,15 +810,15 @@ class MiscSorter
 	function musicnzb($category = Category::CAT_PARENT_MISC, $id = 0)
 	{
 		if ($id != 0)
-			$query = "SELECT releases.*, g.name AS gname FROM releases INNER JOIN groups g ON releases.group_id = g.id WHERE releases.id = ($id)"; // AND NOT (`imdbID` > 1 OR `rageID` > 1 OR `musicinfoID` is not null OR `consoleinfoID` is not null OR `bookinfoID` is not null )";
+			$query = "SELECT releases.*, g.name AS gname FROM releases INNER JOIN groups g ON releases.groupID = g.ID WHERE releases.ID = ($id)"; // AND NOT (`imdbID` > 1 OR `rageID` > 1 OR `musicinfoID` is not null OR `consoleinfoID` is not null OR `bookinfoID` is not null )";
 		else {
 			if ($this->category->isParent($category)) {
 				$thecategory = array();
 				foreach ($this->category->getChildren($category) as $c)
-					$thecategory[] = $c['id'];
+					$thecategory[] = $c['ID'];
 				$category = implode(", ", $thecategory);
 			}
-			$query = "SELECT releases.*, g.name AS gname FROM releases INNER JOIN groups g ON releases.group_id = g.id WHERE categoryid IN (" . $category . ") AND nfostatus >= 0 AND passwordstatus >= 0 AND NOT (imdbid IS NOT NULL OR rageid > 0 OR consoleinfoid IS NOT NULL OR bookinfoid IS NOT NULL)";
+			$query = "SELECT releases.*, g.name AS gname FROM releases INNER JOIN groups g ON releases.groupID = g.ID WHERE categoryID IN (" . $category . ") AND nfostatus >= 0 AND passwordstatus >= 0 AND NOT (imdbID IS NOT NULL OR rageID > 0 OR consoleinfoID IS NOT NULL OR bookinfoID IS NOT NULL)";
 		}
 
 		$res = $this->pdo->query($query);
@@ -822,26 +831,25 @@ class MiscSorter
 
 				$frommail = $row['fromname'];
 
-				//trigger_error("doing part 2".$row['id']);
-				$query = "SELECT releasevideo.releaseid FROM releasevideo WHERE releasevideo.releaseid = " . $row['id'];
+				//trigger_error("doing part 2".$row['ID']);
+				$query = "SELECT releasevideo.releaseID FROM releasevideo WHERE releasevideo.releaseID = " . $row['ID'];
 				$rel = $this->pdo->queryOneRow($query);
 
 				if ($rel !== false)
 					continue;
 
-
 				$uc = "UNCOMPRESS(releasenfo.nfo)";
-				$query = "SELECT releasenfo.releaseid, {$uc} AS nfo FROM releasenfo WHERE releasenfo.releaseid = " . $row['id'];
+				$query = "SELECT releasenfo.releaseID, {$uc} AS nfo FROM releasenfo WHERE releasenfo.releaseID = " . $row['ID'];
 				$rel = $this->pdo->queryOneRow($query);
 
 				$nfo = '';
 				if ($rel !== false)
-					if ($rel['releaseid'] == $row['id'])
+					if ($rel['releaseID'] == $row['ID'])
 						$nfo = $rel['nfo'];
 
 				$name = $this->domusicfiles($row);
 				if ($name != ' ' && $name != '') {
-					$ok = $this->dodbupdate($row['id'], Category::CAT_MUSIC_MP3, $name);
+					$ok = $this->dodbupdate($row['ID'], Category::CAT_MUSIC_MP3, $name);
 					return $ok;
 				}
 			}

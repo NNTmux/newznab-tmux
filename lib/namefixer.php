@@ -5,13 +5,13 @@ require_once(WWW_DIR . "lib/category.php");
 require_once(WWW_DIR . "lib/Categorize.php");
 require_once(WWW_DIR . "lib/groups.php");
 require_once(WWW_DIR . "lib/nntp.php");
-require_once("namecleaner.php");
+require_once("ReleaseCleaner.php");
 require_once("functions.php");
 require_once("nzbcontents.php");
 require_once("ColorCLI.php");
 require_once("Info.php");
 require_once("Pprocess.php");
-require_once("ConsoleTools.php");
+require_once("consoletools.php");
 
 
 //This script is ported from nZEDb and adapted for newznab
@@ -365,7 +365,7 @@ class NameFixer
 	public function updateRelease($release, $name, $method, $echo, $type, $nameStatus, $show, $preId = 0)
 	{
 		if ($this->relid !== $release['releaseID']) {
-			$releaseCleaning = new nameCleaning();
+			$releaseCleaning = new ReleaseCleaning();
 			$newName = $releaseCleaning->fixerCleaner($name);
 			if (strtolower($newName) != strtolower($release["searchname"])) {
 				$this->matched = true;

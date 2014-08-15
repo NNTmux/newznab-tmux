@@ -11,7 +11,7 @@ require_once("functions.php");
 //
 //	Cleans names for releases/imports/namefixer
 //
-class nameCleaning
+class ReleaseCleaning
 {
 	public $subject = '';
 	public $groupName = '';

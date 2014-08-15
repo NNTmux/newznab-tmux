@@ -8,7 +8,7 @@ require_once(dirname(__FILE__) . "/../lib/showsleep.php");
 require_once(dirname(__FILE__) . "/../lib/functions.php");
 
 
-$version = "0.4r2011";
+$version = "0.4r2015";
 
 $db = new DB();
 $functions = new Functions();
@@ -55,7 +55,7 @@ $proc = "SELECT
 ( SELECT COUNT(*) FROM releases r INNER JOIN category c ON c.ID = r.categoryID WHERE r.nzbstatus = 1 AND ((r.passwordstatus BETWEEN -6 AND -1 AND r.haspreview = -1 AND c.disablepreview = 0) OR (r.categoryID = 4050 AND r.gamesinfo_id IS NULL))) AS work,
 ( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status)) AS releases,
 ( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE releasenfoID = 0 AND nfostatus BETWEEN -6 AND -1) AS nforemains,
-( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE nfostatus = 1 AND releasenfoID = 1) AS nfo,
+( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE nfostatus = 1 OR releasenfoID > 0) AS nfo,
 ( SELECT table_rows AS cnt FROM information_schema.TABLES WHERE table_name = 'parts' AND TABLE_SCHEMA = '" . DB_NAME . "' ) AS parts,
 ( SELECT COUNT(ID) FROM binaries WHERE procstat = 0 ) AS binaries,
 ( SELECT table_rows AS cnt FROM information_schema.TABLES WHERE table_name = 'binaries' AND TABLE_SCHEMA = '" . DB_NAME . "' ) AS binaries_total,
@@ -529,6 +529,7 @@ while ($i > 0) {
 	//kill mediainfo and ffmpeg if exceeds 60 sec
 	shell_exec("killall -o 60s -9 mediainfo 2>&1 1> /dev/null");
 	shell_exec("killall -o 60s -9 ffmpeg 2>&1 1> /dev/null");
+	shell_exec("killall -o 60s -9 avconv 2>&1 1> /dev/null");
 
 	$getdate = gmDate("Ymd");
 
@@ -1742,11 +1743,12 @@ while ($i > 0) {
 			$log = writelog($panes3[0]);
 			shell_exec("tmux respawnp -t${tmux_session}:3.0 ' \
                     cd $_lib && $_php fixReleaseNames.php 1 true other yes show 2>&1 $log; \
-                    cd $_py && $_python ${DIR}/../python/fixreleasenames_threaded.py nfo 2>&1 $log; \
-                    $_python ${DIR}/../python/fixreleasenames_threaded.py filename 2>&1 $log; \
-                    $_python ${DIR}/../python/fixreleasenames_threaded.py par2 2>&1 $log; \
-                    $_python ${DIR}/../python/fixreleasenames_threaded.py predbft 2>&1 $log; \
-                    $_php ${DIR}/../lib/fixReleaseNames.php 4 true other yes show $log; $_sleep $fix_timer' 2>&1 1> /dev/null"
+                    cd $_py && $_python ${DIR}/../python/groupfixrelnames_threaded.py nfo 2>&1 $log; \
+                    $_python ${DIR}/../python/groupfixrelnames_threaded.py md5 2>&1 $log; \
+                    $_python ${DIR}/../python/groupfixrelnames_threaded.py filename 2>&1 $log; \
+                    $_python ${DIR}/../python/groupfixrelnames_threaded.py par2 2>&1 $log; \
+                    $_python ${DIR}/../python/groupfixrelnames_threaded.py miscsorter 2>&1 $log; \
+                    $_python ${DIR}/../python/groupfixrelnames_threaded.py predbft 2>&1 $log; $_sleep $fix_timer' 2>&1 1> /dev/null"
 			);
 			$time27 = TIME();
 		} elseif (($maxload >= get_load()) && ($fix_names == 1)) {
