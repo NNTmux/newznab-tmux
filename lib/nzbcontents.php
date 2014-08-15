@@ -140,25 +140,27 @@ Class NZBcontents
 	 * @param string $guid
 	 * @param int    $relID
 	 * @param int    $groupID
-	 * @param int    $nameStatus
+	 * @param        $nameStatus
 	 * @param int    $show
 	 *
+	 * @internal param $nameStatus
+	 * @internal param int $nameStatus
 	 * @return bool
 	 */
-	public function checkPAR2($guid, $relID, $groupID, $namseStatus, $show)
+	public function checkPAR2($guid, $relID, $groupID, $nameStatus, $show)
 	{
 		$nzbfile = $this->LoadNZB($guid);
 		if ($nzbfile !== false) {
 			foreach ($nzbfile->file as $nzbcontents) {
 				if (preg_match('/\.(par[2" ]|\d{2,3}").+\(1\/1\)$/i', (string)$nzbcontents->attributes()->subject)) {
-					if ($this->pprocess->parsePAR2($nzbcontents->segments->segment, $relID, $groupID, $this->nntp, $show) === true && $namseStatus === 1) {
+					if ($this->pprocess->parsePAR2($nzbcontents->segments->segment, $relID, $groupID, $this->nntp, $show) === true && $nameStatus === 1) {
 						$this->db->exec(sprintf('UPDATE releases SET proc_par2 = 1 WHERE ID = %d', $relID));
 						return true;
 					}
 				}
 			}
 		}
-		if ($namseStatus === 1) {
+		if ($nameStatus === 1) {
 			$this->db->exec(sprintf('UPDATE releases SET proc_par2 = 1 WHERE ID = %d', $relID));
 		}
 		return false;
