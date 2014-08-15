@@ -293,7 +293,7 @@ class PProcess
 	/**
 	 * Attempt to get a better name from a par2 file and categorize the release.
 	 *
-	 * @note Called from NZBContents.php
+	 * @note Called from nzbcontents.php
 	 *
 	 * @param string $messageID MessageID from NZB file.
 	 * @param int    $relID     ID of the release.
