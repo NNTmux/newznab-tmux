@@ -2,10 +2,10 @@
 require_once(dirname(__FILE__) . "/config.php");
 require_once(WWW_DIR . "/lib/framework/db.php");
 require_once(dirname(__FILE__) . '/../lib/ColorCLI.php');
-require_once(dirname(__FILE__) . '/../lib/NameFixer.php');
-require_once(dirname(__FILE__) . '/../lib/Functions.php');
+require_once(dirname(__FILE__) . '/../lib/namefixer.php');
+require_once(dirname(__FILE__) . '/../lib/functions.php');
 require_once(dirname(__FILE__) . '/../lib/Info.php');
-require_once(dirname(__FILE__) . '/../lib/NZBContents.php');
+require_once(dirname(__FILE__) . '/../lib/nzbcontents.php');
 require_once(dirname(__FILE__) . '/../lib/MiscSorter.php');
 
 $c = new ColorCLI();

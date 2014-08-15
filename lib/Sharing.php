@@ -2,7 +2,7 @@
 require_once(dirname(__FILE__) . "/../bin/config.php");
 require_once(WWW_DIR . "lib/framework/db.php");
 require_once(WWW_DIR . '/lib/nntp.php');
-require_once("Functions.php");
+require_once("functions.php");
 
 /**
  *
@@ -109,7 +109,7 @@ Class Sharing
 		$this->siteSettings['fetching'] = ($this->siteSettings['fetching'] == 1 ? true : false);
 		$this->siteSettings['enabled'] = ($this->siteSettings['enabled'] == 1 ? true : false);
 		$this->siteSettings['start_position'] = ($this->siteSettings['start_position'] == 1 ? true : false);
-		//add Functions.php
+		//add functions.php
 		$this->functions = new Functions();
 	}
 

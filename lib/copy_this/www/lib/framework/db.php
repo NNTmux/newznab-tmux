@@ -1,7 +1,7 @@
 <?php
 require_once(WWW_DIR . "/lib/framework/cache.php");
 require_once(WWW_DIR . "/lib/util.php");
-require_once(WWW_DIR . "../misc/update_scripts/nix_scripts/tmux/lib/ConsoleTools.php");
+require_once(WWW_DIR . "../misc/update_scripts/nix_scripts/tmux/lib/consoletools.php");
 require_once(WWW_DIR . "../misc/update_scripts/nix_scripts/tmux/lib/ColorCLI.php");
 
 class DB

@@ -5,7 +5,7 @@ require_once(WWW_DIR . '/lib/site.php');
 require_once(WWW_DIR . '/lib/Tmux.php');
 require_once(dirname(__FILE__) . "/../lib/ColorCLI.php");
 require_once(dirname(__FILE__) . "/../lib/showsleep.php");
-require_once(dirname(__FILE__) . "/../lib/Functions.php");
+require_once(dirname(__FILE__) . "/../lib/functions.php");
 
 
 $version = "0.4r2015";

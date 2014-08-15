@@ -1,5 +1,5 @@
 <?php
-require_once(WWW_DIR . '/../misc/update_scripts/nix_scripts/tmux/lib/Functions.php');
+require_once(WWW_DIR . '/../misc/update_scripts/nix_scripts/tmux/lib/functions.php');
 
 /**
  * Class SABnzbd

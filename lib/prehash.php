@@ -4,14 +4,14 @@ require_once(WWW_DIR."lib/framework/db.php");
 require_once(WWW_DIR."lib/groups.php");
 require_once(WWW_DIR."lib/nfo.php");
 require_once(WWW_DIR."lib/site.php");
-require_once("Functions.php");
-require_once("ConsoleTools.php");
+require_once("functions.php");
+require_once("consoletools.php");
 require_once("ColorCLI.php");
-require_once("NZBContents.php");
+require_once("nzbcontents.php");
 require_once("simple_html_dom.php");
 require_once("IRCScraper.php");
 require_once("Info.php");
-require_once("NameFixer.php");
+require_once("namefixer.php");
 
 
 /**

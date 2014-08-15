@@ -10,7 +10,7 @@ require_once(WWW_DIR."/lib/rottentomato.php");
 require_once(WWW_DIR."/lib/Tmux.php");
 require_once("ColorCLI.php");
 require_once("TraktTv.php");
-require_once("Functions.php");
+require_once("functions.php");
 
 /**
  * Class Film

@@ -2,9 +2,9 @@
 require_once(dirname(__FILE__) . "/../bin/config.php");
 require_once(WWW_DIR . "/lib/framework/db.php");
 require_once(WWW_DIR . "/lib/category.php");
-require_once("ConsoleTools.php");
+require_once("consoletools.php");
 require_once("ColorCLI.php");
-require_once("NameFixer.php");
+require_once("namefixer.php");
 
 $c = new ColorCLI();
 if (!isset($argv[1]) || ( $argv[1] != "all" && $argv[1] != "full" && !is_numeric($argv[1]))) {

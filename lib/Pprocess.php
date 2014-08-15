@@ -17,10 +17,10 @@ require_once(WWW_DIR . "/lib/genres.php");
 require_once(WWW_DIR . "/lib/anidb.php");
 require_once(WWW_DIR . "/lib/book.php");
 require_once(WWW_DIR . "/lib/Games.php");
-require_once("ConsoleTools.php");
+require_once("consoletools.php");
 require_once("ColorCLI.php");
-require_once("NZBContents.php");
-require_once("NameFixer.php");
+require_once("nzbcontents.php");
+require_once("namefixer.php");
 require_once("Info.php");
 require_once("prehash.php");
 require_once("Sharing.php");
@@ -28,7 +28,7 @@ require_once("TraktTv.php");
 require_once("Film.php");
 require_once("TvAnger.php");
 require_once("Konsole.php");
-require_once("Functions.php");
+require_once("functions.php");
 require_once("ProcessAdditional.php");
 
 /**
@@ -293,7 +293,7 @@ class PProcess
 	/**
 	 * Attempt to get a better name from a par2 file and categorize the release.
 	 *
-	 * @note Called from NZBContents.php
+	 * @note Called from nzbcontents.php
 	 *
 	 * @param string $messageID MessageID from NZB file.
 	 * @param int    $relID     ID of the release.

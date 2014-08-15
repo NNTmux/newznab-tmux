@@ -3,7 +3,7 @@ require_once(dirname(__FILE__) . "/../bin/config.php");
 require_once(WWW_DIR . "/lib/framework/db.php");
 require_once(WWW_DIR . "/lib/releases.php");
 require_once("Enzebe.php");
-require_once("Functions.php");
+require_once("functions.php");
 /**
  * Class NZBGet
  *

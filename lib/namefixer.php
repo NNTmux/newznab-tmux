@@ -6,12 +6,12 @@ require_once(WWW_DIR . "lib/Categorize.php");
 require_once(WWW_DIR . "lib/groups.php");
 require_once(WWW_DIR . "lib/nntp.php");
 require_once("ReleaseCleaner.php");
-require_once("Functions.php");
-require_once("NZBContents.php");
+require_once("functions.php");
+require_once("nzbcontents.php");
 require_once("ColorCLI.php");
 require_once("Info.php");
 require_once("Pprocess.php");
-require_once("ConsoleTools.php");
+require_once("consoletools.php");
 
 
 //This script is ported from nZEDb and adapted for newznab

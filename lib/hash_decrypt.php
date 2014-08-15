@@ -4,10 +4,10 @@ require_once(WWW_DIR."lib/category.php");
 require_once(WWW_DIR."lib/groups.php");
 require_once(WWW_DIR."lib/nfo.php");
 require_once(WWW_DIR."lib/site.php");
-require_once("ConsoleTools.php");
+require_once("consoletools.php");
 require_once("ReleaseCleaner.php");
-require_once("NameFixer.php");
-require_once("Functions.php");
+require_once("namefixer.php");
+require_once("functions.php");
 require_once ("ColorCLI.php");
 
 //this script is adapted from nZEDb decrypt_hashes.php
