@@ -453,6 +453,35 @@ class DB
 	}
 
 	/**
+	 * Returns all results as an associative array.
+	 *
+	 * Do not use this function for large dat-asets, as it can cripple the Db server and use huge
+	 * amounts of RAM. Instead iterate through the data.
+	 *
+	 * @param string $query The query to execute.
+	 *
+	 * @return array|boolean Array of results on success, false otherwise.
+	 */
+	public function queryAssoc($query)
+	{
+		if ($query == '') {
+			return false;
+		}
+		$mode = self::$instance->getAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE);
+		if ($mode != \PDO::FETCH_ASSOC) {
+			self::$instance->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
+		}
+
+		$result = $this->queryArray($query);
+
+		if ($mode != \PDO::FETCH_ASSOC) {
+			self::$instance->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
+		}
+
+		return $result;
+	}
+
+	/**
 	 * Optimize the database
 	 *
 	 * @param bool $force
