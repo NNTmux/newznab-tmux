@@ -8,7 +8,7 @@ require_once(WWW_DIR . "/lib/site.php");
 require_once("Info.php");
 require_once("Film.php");
 require_once("ColorCLI.php");
-require_once("ReleaseCleaning.php");
+require_once("ReleaseCleaner.php");
 
 
 /**
