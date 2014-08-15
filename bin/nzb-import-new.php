@@ -24,7 +24,7 @@ $db = new DB();
 $binaries = new Binaries();
 $s = new Sites();
 $site = $s->get();
-$releasecleaning = new NameCleaning();
+$releasecleaning = new ReleaseCleaning();
 $categorize = new Categorize();
 $nzbsperhour = $nzbSkipped = $maxtoprocess = 0;
 $consoleTools = new ConsoleTools();
