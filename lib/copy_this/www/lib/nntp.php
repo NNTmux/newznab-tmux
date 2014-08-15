@@ -2,12 +2,12 @@
 /**
  * Attempt to include PEAR's nntp class if it has not already been included.
  */
-require_once(WWW_DIR."/lib/Net_NNTP/NNTP/Client.php");
-require_once(WWW_DIR."/lib/Tmux.php");
-require_once(WWW_DIR."/lib/site.php");
-require_once(WWW_DIR."/lib/binaries.php");
-require_once(WWW_DIR."../misc/update_scripts/nix_scripts/tmux/lib/ColorCLI.php");
-require_once(WWW_DIR."../misc/update_scripts/nix_scripts/tmux/lib/functions.php");
+require_once(WWW_DIR . "/lib/Net_NNTP/NNTP/Client.php");
+require_once(WWW_DIR . "/lib/Tmux.php");
+require_once(WWW_DIR . "/lib/site.php");
+require_once(WWW_DIR . "/lib/binaries.php");
+require_once(WWW_DIR . "../misc/update_scripts/nix_scripts/tmux/lib/ColorCLI.php");
+require_once(WWW_DIR . "../misc/update_scripts/nix_scripts/tmux/lib/Functions.php");
 
 /**
  * Class for connecting to the usenet, retrieving articles and article headers,
@@ -133,7 +133,7 @@ class NNTP extends Net_NNTP_Client
 	 */
 	public function doConnect($compression = true)
 	{
-		if (// Don't reconnect to usenet if:
+		if ( // Don't reconnect to usenet if:
 			// We are already connected to usenet. AND
 			parent::_isConnected() &&
 			// (If compression is wanted and on,                    OR    Compression is not wanted and off.) AND
@@ -146,7 +146,7 @@ class NNTP extends Net_NNTP_Client
 
 		$ret = $ret2 = $connected = $sslEnabled = $cError = $aError = false;
 
-		// Set variables to connect based on if we are using the alternate provider or not.
+		// Set variables to connect.
 		$sslEnabled = (NNTP_SSLENABLED ? true : false);
 		$this->_currentServer = NNTP_SERVER;
 		$this->_currentPort = NNTP_PORT;
@@ -248,6 +248,7 @@ class NNTP extends Net_NNTP_Client
 				if ($compression === true && $this->_site->compressedheaders == 1) {
 					$this->_enableCompression();
 				}
+
 				return true;
 			}
 			// If we reached this point and have not connected after all retries, break out of the loop.
@@ -283,6 +284,7 @@ class NNTP extends Net_NNTP_Client
 			// Disconnect from usenet.
 			return parent::disconnect();
 		}
+
 		return true;
 	}
 
@@ -462,6 +464,7 @@ class NNTP extends Net_NNTP_Client
 			$data[$key] = $headerArray;
 			$iterator = 0;
 		}
+
 		// Return the array of headers.
 		return $data;
 	}
@@ -473,14 +476,13 @@ class NNTP extends Net_NNTP_Client
 	 * @param mixed  $identifiers (string) Message-ID.
 	 *                            (int)    Article number.
 	 *                            (array)  Article numbers or Message-ID's (can contain both in the same array)
-	 * @param bool   $alternate   Use the alternate NNTP provider?
 	 *
 	 * @return mixed On success : (string) The article bodies.
 	 *               On failure : (object) PEAR_Error.
 	 *
 	 * @access public
 	 */
-	public function getMessages($groupName, $identifiers, $alternate = false)
+	public function getMessages($groupName, $identifiers)
 	{
 		$connected = $this->_checkConnection();
 		if ($connected !== true) {
@@ -490,8 +492,6 @@ class NNTP extends Net_NNTP_Client
 		// String to hold all the bodies.
 		$body = '';
 
-		$aConnected = false;
-		$nntp = ($alternate === true ? new NNTP($this->_echo) : null);
 
 		// Check if the msgIds are in an array.
 		if (is_array($identifiers)) {
@@ -522,6 +522,7 @@ class NNTP extends Net_NNTP_Client
 
 			return $this->throwError($this->_c->error($message));
 		}
+
 		return $body;
 	}
 
@@ -579,7 +580,7 @@ class NNTP extends Net_NNTP_Client
 				// If we found the empty line it means we are done reading the header and we will start reading the body.
 				if (!$emptyLine) {
 					if ($line === '') {
-						$emptyLine = True;
+						$emptyLine = true;
 						continue;
 					}
 
@@ -601,6 +602,7 @@ class NNTP extends Net_NNTP_Client
 			// Finally we decode the message using yEnc.
 			$ret['Message'] = ($yEnc ? $this->_decodeIgnoreYEnc($body) : $body);
 		}
+
 		return $ret;
 	}
 
@@ -661,6 +663,7 @@ class NNTP extends Net_NNTP_Client
 				}
 			}
 		}
+
 		return $ret;
 	}
 
@@ -763,6 +766,7 @@ class NNTP extends Net_NNTP_Client
 			}
 			$nntp->doQuit();
 		}
+
 		return $data;
 	}
 
@@ -912,9 +916,12 @@ class NNTP extends Net_NNTP_Client
 									preg_replace(
 										'/(^=yBegin.*\\r\\n)/im', '',
 										$input[1],
-										1),
-									1),
-								1)
+										1
+									),
+									1
+								),
+								1
+							)
 						)
 					);
 
@@ -948,6 +955,7 @@ class NNTP extends Net_NNTP_Client
 				unlink($ouFile);
 			}
 		}
+
 		return $data;
 	}
 
@@ -1191,12 +1199,14 @@ class NNTP extends Net_NNTP_Client
 
 					// Return array of headers.
 					$deComp = explode("\r\n", trim($deComp));
+
 					return $deComp;
 				} else {
 					// Try 5 times to decompress.
 					if ($tries++ > 5) {
 						$message = 'Decompression Failed after 5 tries.';
 						$message = $this->throwError($this->_c->error($message), 1000);
+
 						return $message;
 					}
 					// Skip the loop to try decompressing again.
@@ -1216,6 +1226,7 @@ class NNTP extends Net_NNTP_Client
 				if ($bytesReceived === 0) {
 					$message = 'The NNTP server has returned no data.';
 					$message = $this->throwError($this->_c->error($message), 1000);
+
 					return $message;
 				}
 			}
@@ -1242,11 +1253,13 @@ class NNTP extends Net_NNTP_Client
 		if (!feof($this->_socket)) {
 			$message = "Error: Could not find the end-of-file pointer on the gzip stream.";
 			$message = $this->throwError($this->_c->error($message), 1000);
+
 			return $message;
 		}
 
 		$message = 'Decompression Failed, connection closed.';
 		$message = $this->throwError($this->_c->error($message), 1000);;
+
 		return $message;
 	}
 
@@ -1275,6 +1288,7 @@ class NNTP extends Net_NNTP_Client
 		if (substr($messageID, -1) !== '>') {
 			$messageID .= '>';
 		}
+
 		return $messageID;
 	}
 
