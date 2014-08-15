@@ -83,7 +83,7 @@ class PProcess
 	 *
 	 * @var NameFixer
 	 */
-	protected $nameFixer;
+	protected $NameFixer;
 
 	/**
 	 * Constructor.
@@ -102,7 +102,7 @@ class PProcess
 		$this->db = new DB();
 		$this->groups = new Groups();
 		$this->_par2Info = new Par2Info();
-		$this->nameFixer = new NameFixer($this->echooutput);
+		$this->namefixer = new NameFixer($this->echooutput);
 		$this->Nfo = new Info($this->echooutput);
 		$this->releaseFiles = new ReleaseFiles();
 		$this->functions = new Functions(true);
@@ -293,7 +293,7 @@ class PProcess
 	/**
 	 * Attempt to get a better name from a par2 file and categorize the release.
 	 *
-	 * @note Called from nzbcontents.php
+	 * @note Called from NZBContents.php
 	 *
 	 * @param string $messageID MessageID from NZB file.
 	 * @param int    $relID     ID of the release.
@@ -338,7 +338,7 @@ class PProcess
 		}
 
 		// Get the PAR2 file.
-		$par2 = $nntp->getMessages($this->functions->getByNameByID($groupID), $messageID);
+		$par2 = $nntp->getMessages($this->groups->getByNameByID($groupID), $messageID);
 		if ($nntp->isError($par2)) {
 			return false;
 		}
@@ -387,7 +387,7 @@ class PProcess
 					// Try to get a new name.
 					if ($foundName === false) {
 						$query['textstring'] = $file['name'];
-						if ($this->nameFixer->checkName($query, 1, 'PAR2, ', 1, $show) === true) {
+						if ($this->namefixer->checkName($query, 1, 'PAR2, ', 1, $show) === true) {
 							$foundName = true;
 						}
 					}
