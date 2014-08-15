@@ -5,7 +5,7 @@ require_once(WWW_DIR . "/lib/category.php");
 require_once(WWW_DIR . "/lib/Tmux.php");
 require_once("ColorCLI.php");
 require_once("TraktTv.php");
-require_once("functions.php");
+require_once("Functions.php");
 
 class TvAnger
 {

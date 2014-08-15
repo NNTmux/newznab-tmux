@@ -1,7 +1,7 @@
 <?php
 require_once(WWW_DIR . "/config.php");
 require_once(WWW_DIR . "/lib/framework/db.php");
-require_once(WWW_DIR . '/../misc/update_scripts/nix_scripts/tmux/lib/functions.php');
+require_once(WWW_DIR . '/../misc/update_scripts/nix_scripts/tmux/lib/Functions.php');
 
 /**
  * This page prints an XML (or JSON, see extras) on the browser with predb data based on criteria.

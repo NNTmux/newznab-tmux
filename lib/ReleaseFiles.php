@@ -1,7 +1,7 @@
 <?php
 require_once(dirname(__FILE__) . "/../bin/config.php");
 require_once(WWW_DIR . "lib/framework/db.php");
-require_once("functions.php");
+require_once("Functions.php");
 
 /**
  * Adds/fetches rar/zip/etc files for a release.

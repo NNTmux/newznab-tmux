@@ -6,12 +6,12 @@ require_once(WWW_DIR . '/lib/nzbinfo.php');
 require_once(WWW_DIR . '/lib/nzb.php');
 require_once(WWW_DIR . '/lib/site.php');
 require_once(WWW_DIR . '/lib/category.php');
-require_once('functions.php');
+require_once('Functions.php');
 require_once('ColorCLI.php');
-require_once('nzbcontents.php');
+require_once('NZBContents.php');
 require_once('Pprocess.php');
 require_once('Info.php');
-require_once('namefixer.php');
+require_once('NameFixer.php');
 
 $c = new ColorCLI();
 

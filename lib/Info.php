@@ -9,7 +9,7 @@ require_once("ColorCLI.php");
 require_once("Pprocess.php");
 require_once("Film.php");
 require_once("TvAnger.php");
-require_once("functions.php");
+require_once("Functions.php");
 require_once("getid3/getid3/getid3.php");
 
 /**

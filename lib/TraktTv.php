@@ -1,7 +1,7 @@
 <?php
 require_once(dirname(__FILE__) . "/../bin/config.php");
 require_once(WWW_DIR . '/lib/Tmux.php');
-require_once('functions.php');
+require_once('Functions.php');
 
 /**
  * Class TraktTv
