@@ -36,6 +36,7 @@ Class ProcessAdditional
 {
 	/**
 	 * How many compressed (rar/zip) files to check.
+	 *
 	 * @int
 	 * @default 20
 	 */
@@ -48,6 +49,7 @@ Class ProcessAdditional
 
 	/**
 	 * How many levels deep to go inside of RAR/ZIP files.
+	 *
 	 * @TODO DB setting.
 	 * @var int
 	 */
@@ -55,18 +57,21 @@ Class ProcessAdditional
 
 	/**
 	 * Releases to work on.
+	 *
 	 * @var Array
 	 */
 	protected $_releases;
 
 	/**
 	 * Count of releases to work on.
+	 *
 	 * @var int
 	 */
 	protected $_totalReleases;
 
 	/**
 	 * Current release we are working on.
+	 *
 	 * @var Array
 	 */
 	protected $_release;
@@ -78,6 +83,7 @@ Class ProcessAdditional
 
 	/**
 	 * List of files with sizes/etc contained in the NZB.
+	 *
 	 * @var array
 	 */
 	protected $_nzbContents;
@@ -119,6 +125,7 @@ Class ProcessAdditional
 		$this->c = new ColorCLI();
 		$this->jpgSavePath = WWW_DIR . 'covers/sample/';
 		$this->vidSavePath = WWW_DIR . 'covers/video/';
+		$this->imgSavePath = WWW_DIR . 'covers/preview/';
 
 		// Pass the binary extractors to ArchiveInfo.
 		$clients = [];
@@ -444,9 +451,11 @@ Class ProcessAdditional
 						$this->_release['ID']
 					)
 				);
+
 				return false;
 			}
 		}
+
 		return true;
 	}
 
@@ -469,6 +478,7 @@ Class ProcessAdditional
 					$this->_release['ID']
 				)
 			);
+
 			return false;
 		}
 
@@ -477,12 +487,12 @@ Class ProcessAdditional
 		// Decompress the NZB.
 		@readgzfile($nzbPath);
 		// Read the nzb into memory.
-		$nzbContents = ob_get_contents();
+		$NZBContents = ob_get_contents();
 		// Clean (erase) the output buffer and turn off output buffering.
 		ob_end_clean();
 
 		// Get a list of files in the nzb.
-		$this->_nzbContents = $this->_enzebe->nzbFileList($nzbContents);
+		$this->_nzbContents = $this->_enzebe->nzbFileList($NZBContents);
 		if (count($this->_nzbContents) === 0) {
 
 			$this->_echo('NZB is empty or broken for GUID: ' . $this->_release['guid']);
@@ -494,6 +504,7 @@ Class ProcessAdditional
 					$this->_release['ID']
 				)
 			);
+
 			return false;
 		}
 
@@ -505,12 +516,14 @@ Class ProcessAdditional
 
 	/**
 	 * Current file we are working on inside a NZB.
+	 *
 	 * @var array
 	 */
 	protected $_currentNZBFile;
 
 	/**
 	 * Does the current NZB contain a compressed (RAR/ZIP) file?
+	 *
 	 * @var bool
 	 */
 	protected $_NZBHasCompressedFile;
@@ -613,6 +626,7 @@ Class ProcessAdditional
 				$totalBookFiles++;
 			}
 		}
+
 		return $totalBookFiles;
 	}
 
@@ -715,6 +729,7 @@ Class ProcessAdditional
 		if (!empty($this->_archiveInfo->isEncrypted) || (isset($dataSummary['is_encrypted']) && $dataSummary['is_encrypted'] != 0)) {
 			$this->_debug('ArchiveInfo: Compressed file has a password.');
 			$this->_releaseHasPassword = true;
+
 			return false;
 		}
 
@@ -786,6 +801,7 @@ Class ProcessAdditional
 
 			$this->_addFileInfo($file);
 		}
+
 		return ($this->_totalFileInfo > 0 ? true : false);
 	}
 
@@ -1219,7 +1235,7 @@ Class ProcessAdditional
 		$iSQL = ', haspreview = 0';
 
 		// If samples exist from previous runs, set flags.
-		if (is_file($this->_releaseImage->imgSavePath . $this->_release['guid'] . '_thumb.jpg')) {
+		if (is_file($this->imgSavePath . $this->_release['guid'] . '_thumb.jpg')) {
 			$iSQL = ', haspreview = 1';
 		}
 
@@ -1411,7 +1427,7 @@ Class ProcessAdditional
 										$newCat,
 										$this->_release['ID']
 									)
-									);
+								);
 
 								// Echo the changed name.
 								if ($this->_echoCLI) {
@@ -1500,6 +1516,7 @@ Class ProcessAdditional
 				}
 			}
 		}
+
 		return ($retVal && $audVal);
 	}
 
@@ -1586,7 +1603,7 @@ Class ProcessAdditional
 				$saved = $this->_releaseImage->saveImage(
 					$this->_release['guid'] . '_thumb',
 					$fileName,
-					$this->_releaseImage->imgSavePath, 800, 600
+					$this->imgSavePath, 800, 600
 				);
 
 				// Delete the temp file we created.
@@ -1603,6 +1620,7 @@ Class ProcessAdditional
 				}
 			}
 		}
+
 		return false;
 	}
 
@@ -1750,6 +1768,7 @@ Class ProcessAdditional
 				return true;
 			}
 		}
+
 		return false;
 	}
 
@@ -1789,9 +1808,11 @@ Class ProcessAdditional
 				if ($this->_echoCLI) {
 					echo 'm';
 				}
+
 				return true;
 			}
 		}
+
 		return false;
 	}
 
@@ -2084,54 +2105,63 @@ Class ProcessAdditional
 
 	/**
 	 * Have we created a video file for the current release?
+	 *
 	 * @var bool
 	 */
 	protected $_foundVideo;
 
 	/**
 	 * Have we found MediaInfo data for a Video for the current release?
+	 *
 	 * @var bool
 	 */
 	protected $_foundMediaInfo;
 
 	/**
 	 * Have we found MediaInfo data for a Audio file for the current release?
+	 *
 	 * @var bool
 	 */
 	protected $_foundAudioInfo;
 
 	/**
 	 * Have we created a short Audio file sample for the current release?
+	 *
 	 * @var bool
 	 */
 	protected $_foundAudioSample;
 
 	/**
 	 * Extension of the found audio file (MP3/FLAC/etc).
+	 *
 	 * @var string
 	 */
 	protected $_AudioInfoExtension;
 
 	/**
 	 * Have we downloaded a JPG file for the current release?
+	 *
 	 * @var bool
 	 */
 	protected $_foundJPGSample;
 
 	/**
 	 * Have we created a Video JPG image sample for the current release?
+	 *
 	 * @var bool
 	 */
 	protected $_foundSample;
 
 	/**
 	 * Have we found PAR2 info on this release?
+	 *
 	 * @var bool
 	 */
 	protected $_foundPAR2Info;
 
 	/**
 	 * Message ID's for found content to download.
+	 *
 	 * @var array
 	 */
 	protected $_sampleMessageIDs;
@@ -2142,30 +2172,35 @@ Class ProcessAdditional
 
 	/**
 	 * Password status of the current release.
+	 *
 	 * @var array
 	 */
 	protected $_passwordStatus;
 
 	/**
 	 * Does the current release have a password?
+	 *
 	 * @var bool
 	 */
 	protected $_releaseHasPassword;
 
 	/**
 	 * Does the current release have an NFO file?
+	 *
 	 * @var bool
 	 */
 	protected $_releaseHasNoNFO;
 
 	/**
 	 * Name of the current release's usenet group.
+	 *
 	 * @var string
 	 */
 	protected $_releaseGroupName;
 
 	/**
 	 * Number of file information added to DB (from rar/zip/par2 contents).
+	 *
 	 * @var int
 	 */
 	protected $_addedFileInfo;
@@ -2173,12 +2208,14 @@ Class ProcessAdditional
 	/**
 	 * Number of file information we found from RAR/ZIP.
 	 * (if some of it was already in DB, this count goes up, while the count above does not)
+	 *
 	 * @var int
 	 */
 	protected $_totalFileInfo;
 
 	/**
 	 * How many compressed (rar/zip) files have we checked.
+	 *
 	 * @var int
 	 */
 	protected $_compressedFilesChecked;
@@ -2201,7 +2238,7 @@ Class ProcessAdditional
 		$this->_passwordStatus = array(Releases::PASSWD_NONE);
 		$this->_releaseHasPassword = false;
 
-		$this->_releaseGroupName = $this->_functions->getByNameByID($this->_release['groupID']);
+		$this->_releaseGroupName = $this->_groups->getByNameByID($this->_release['groupID']);
 
 		$this->_releaseHasNoNFO = false;
 		// Make sure we don't already have an nfo.
