@@ -70,7 +70,7 @@ class Category
 	const CAT_PARENT_PC = 4000;
 	const CAT_PARENT_TV = 5000;
 	const CAT_PARENT_XXX = 6000;
-	const CAT_PARENT_BOOKS = 7000;
+	const CAT_PARENT_BOOK = 7000;
 	const CAT_PARENT_MISC = 8000;
 	const CAT_NOT_DETERMINED = 7900;
 	const STATUS_INACTIVE = 0;
@@ -208,6 +208,15 @@ class Category
 		$db = new DB();
 
 		return $db->query(sprintf("SELECT concat(cp.title, ' > ',c.title) as title from category c inner join category cp on cp.ID = c.parentID where c.ID in (%s)", implode(',', $ids)));
+	}
+
+	public function getNameByID($ID)
+	{
+		$db = new DB();
+		$parent = $db->queryOneRow(sprintf("SELECT title FROM category WHERE ID = %d", substr($ID, 0, 1) . "000"));
+		$cat = $db->queryOneRow(sprintf("SELECT title FROM category WHERE ID = %d", $ID));
+
+		return $parent["title"] . " " . $cat["title"];
 	}
 
 	/**
