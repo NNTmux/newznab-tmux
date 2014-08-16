@@ -251,6 +251,8 @@ class DB
 		if ($query == "")
 			return false;
 
+		$query = Utility::collapseWhiteSpace($query);
+
 		if ($useCache) {
 			$cache = new Cache();
 			if ($cache->enabled && $cache->exists($query)) {
@@ -260,7 +262,7 @@ class DB
 			}
 		}
 
-		$result = self::$instance->query($query)->fetchAll();
+		$result = $this->queryArray($query);
 
 		if ($result === false || $result === true)
 			return array();
