@@ -721,6 +721,45 @@ class Releases
 	}
 
 	/**
+	 * Deletes a single release by GUID, and all the corresponding files.
+	 *
+	 * @param array        $identifiers ['g' => Release GUID(mandatory), 'id => releaseID(optional, pass false)]
+	 * @param NZB          $nzb
+	 * @param ReleaseImage $releaseImage
+	 */
+	public function deleteSingle($identifiers, $nzb, $releaseImage)
+	{
+		$db = new DB();
+		$releaseImage = new ReleaseImage();
+		// Delete NZB from disk.
+		$nzbPath = $nzb->getNZBPath($identifiers['g']);
+		if ($nzbPath) {
+			@unlink($nzbPath);
+		}
+
+		// Delete images.
+		$releaseImage->delete($identifiers['g']);
+
+		// Delete from DB.
+		$db->queryExec(
+			sprintf('
+				DELETE r, rn, rc, uc, rf, ra, rs, rv, re
+				FROM releases r
+				LEFT OUTER JOIN releasenfo rn ON rn.releaseID = r.ID
+				LEFT OUTER JOIN releasecomment rc ON rc.releaseID = r.ID
+				LEFT OUTER JOIN usercart uc ON uc.releaseID = r.ID
+				LEFT OUTER JOIN releasefiles rf ON rf.releaseID = r.ID
+				LEFT OUTER JOIN releaseaudio ra ON ra.releaseID = r.ID
+				LEFT OUTER JOIN releasesubs rs ON rs.releaseID = r.ID
+				LEFT OUTER JOIN releasevideo rv ON rv.releaseID = r.ID
+				LEFT OUTER JOIN releaseextrafull re ON re.releaseID = r.ID
+				WHERE r.guid = %s',
+				$db->escapeString($identifiers['g'])
+			)
+		);
+	}
+
+	/**
 	 * Delete a preview associated with a release and update the release to indicate it doesnt have one.
 	 */
 	public function deletePreview($guid)
@@ -1664,7 +1703,7 @@ class Releases
 			// Write the nzb to disk
 			//
 			$nzbfile = $nzb->getNZBPath($relguid, $page->site->nzbpath, true);
-			$nzb->writeNZBforReleaseId($relid, $cleanRelName, $catId, $nzbfile);
+			$nzb->writeNZBforreleaseID($relid, $cleanRelName, $catId, $nzbfile);
 
 			//
 			// Remove used binaries
