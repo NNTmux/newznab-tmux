@@ -566,14 +566,14 @@ class MiscSorter
 				break;
 
 			case 'android':
-				$ok = $this->doOS($nfo, $row['ID'], Category::CAT_PC_PHONE_ANDROID);
+				$ok = $this->doOS($nfo, $row['ID'], Category::CAT_PC_MOBILEANDROID);
 				break;
 
 			case 'ios':
 			case 'iphone':
 			case 'ipad':
 			case 'ipod':
-			$ok = $this->doOS($nfo, $row['ID'], Category::CAT_PC_PHONE_IOS);
+			$ok = $this->doOS($nfo, $row['ID'], Category::CAT_PC_MOBILEIOS);
 			break;
 
 			case 'game':
