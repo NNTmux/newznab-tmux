@@ -43,10 +43,10 @@ class XXX
 
 	/**
 	 * @param $echo
-	 * @param $releaseImage
-	 * @param $db
+	 * @internal param $releaseImage
+	 * @internal param $db
 	 */
-	public function __construct($echo, $releaseImage, $db)
+	public function __construct($echo)
 	{
 		$this->db = new DB();
 		$this->releaseImage = new ReleaseImage();

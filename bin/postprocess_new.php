@@ -15,7 +15,7 @@ $c = new ColorCLI();
 $s = new Sites();
 $site = $s->get();
 if (!isset($argv[1])) {
-	exit($c->error("You need to set an argument [additional, nfo, movie, tv, games, ebook, music, anime, unwanted, others, spotnab, sharing]."));
+	exit($c->error("You need to set an argument [additional, nfo, movie, tv, games, xxx, ebook, music, anime, unwanted, others, spotnab, sharing]."));
 }
 $postprocess = new PostProcess(true);
 $pprocess = new PProcess(true);
@@ -51,6 +51,8 @@ if (isset($argv[1]) && $argv[1] === "additional") {
 	$thetvdb->processReleases();
 } else if (isset($argv[1]) && $argv[1] === "games") {
 	$pprocess->processGames();
+} else if (isset($argv[1]) && $argv[1] === "xxx") {
+	$pprocess->processXXX();
 } else if (isset($argv[1]) && $argv[1] === "console") {
 	$pprocess->processConsoleGames();
 } else if (isset($argv[1]) && $argv[1] === "ebook") {

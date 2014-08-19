@@ -17,6 +17,7 @@ require_once(WWW_DIR . "/lib/genres.php");
 require_once(WWW_DIR . "/lib/anidb.php");
 require_once(WWW_DIR . "/lib/book.php");
 require_once(WWW_DIR . "/lib/Games.php");
+require_once(WWW_DIR . "/lib/XXX.php");
 require_once("consoletools.php");
 require_once("ColorCLI.php");
 require_once("nzbcontents.php");
@@ -189,6 +190,17 @@ class PProcess
 		if ($this->site->lookupgames !== 0) {
 			$games = new Games($this->echooutput);
 			$games->processGamesReleases();
+		}
+	}
+
+	/**
+	 * Lookup xxx if enabled.
+	 */
+	public function processXXX()
+	{
+		if ($this->site->lookupxxx == 1) {
+			$xxx = new XXX($this->echooutput);
+			$xxx->processXXXReleases();
 		}
 	}
 
