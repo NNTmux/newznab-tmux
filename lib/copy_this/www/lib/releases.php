@@ -723,14 +723,12 @@ class Releases
 	/**
 	 * Deletes a single release by GUID, and all the corresponding files.
 	 *
-	 * @param              $quid
+	 * @param              $guid
 	 * @param              $id
 	 * @param NZB          $nzb
 	 * @param ReleaseImage $releaseImage
-	 *
-	 * @internal param array $identifiers ['g' => Release GUID(mandatory), 'id => releaseID(optional, pass false)]
 	 */
-	public function deleteSingle($quid, $id, $nzb, $releaseImage)
+	public function deleteSingle($guid, $id, $nzb, $releaseImage)
 	{
 		$db = new DB();
 		$releaseImage = new ReleaseImage();
