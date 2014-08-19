@@ -1764,7 +1764,7 @@ while ($i > 0) {
 			shell_exec("tmux respawnp -t${tmux_session}:3.0 'echo \"\033[38;5;\"$color\"m\n$panes3[0] Disabled by Max Load\"' 2>&1 1> /dev/null");
 		}
 		//run predb_hash_decrypt.php in pane 3.1
-		if (($maxload >= get_load()) && (($dehash == 1) || ($dehash == 3))) {
+		/*if (($maxload >= get_load()) && (($dehash == 1) || ($dehash == 3))) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			$log = writelog($panes3[1]);
 			shell_exec("tmux respawnp -t${tmux_session}:3.1 'echo \"\033[38;5;\"$color\"m\" && cd $_lib && $_php predb_hash_decrypt.php 1000 2>&1 $log; $_sleep $dehash_timer' 2>&1 1> /dev/null");
@@ -1776,8 +1776,9 @@ while ($i > 0) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			shell_exec("tmux respawnp -t${tmux_session}:3.1 'echo \"\033[38;5;\"$color\"m\n$panes3[1] has been disabled/terminated by Decrypt Hashes\"'");
 		}
+		*/
 		//run requestID or requestid threaded in pane 3.2
-		if (($maxload >= get_load()) && ($lookreqids == 2)) {
+		/*if (($maxload >= get_load()) && ($lookreqids == 2)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			$log = writelog($panes3[2]);
 			shell_exec("tmux respawnp -t${tmux_session}:3.2 'echo \"\033[38;5;\"$color\"m\" && cd $_py && $_python ${DIR}/../python/requestid_threaded.py 2>&1 $log; $_sleep $lookreqids_timer' 2>&1 1> /dev/null");
@@ -1794,18 +1795,19 @@ while ($i > 0) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			shell_exec("tmux respawnp -t${tmux_session}:3.2 'echo \"\033[38;5;\"$color\"m\n$panes3[2] has been disabled/terminated by RequestID Lookup\"' 2>&1 1> /dev/null");
 		}
-		// Run Remove crap releases in pane 3.3
+		*/
+		// Run Remove crap releases in pane 3.1
 		switch ($fix_crap_opt) {
 			// Do all types up to 4 hours.
 			case 'All':
-				$log = writelog($panes3[3]);
-				shell_exec("tmux respawnp -t${tmux_session}:3.3 ' \
+				$log = writelog($panes3[1]);
+				shell_exec("tmux respawnp -t${tmux_session}:3.1 ' \
 							$_php ${DIR}/../lib/removeCrapReleases_new.php true 4 $log; date +\"%D %T\"; $_sleep $crap_timer' 2>&1 1> /dev/null"
 				);
 				break;
 			// The user has specified custom types.
 			case 'Custom':
-				$log = writelog($panes3[3]);
+				$log = writelog($panes3[1]);
 
 				// Check how many types the user picked.
 				$fcmax = count($fix_crap);
@@ -1823,7 +1825,7 @@ while ($i > 0) {
 					if (shell_exec("tmux list-panes -t${tmux_session}:3 | grep ^3 | grep -c dead") == 1) {
 
 						// Run remove crap releases.
-						shell_exec("tmux respawnp -t${tmux_session}:3.3 ' \
+						shell_exec("tmux respawnp -t${tmux_session}:3.1 ' \
 								echo \"Running removeCrapReleases for $fix_crap[$fcnum]\"; \
 								php ${DIR}/../lib/removeCrapReleases_new.php true $fctime $fix_crap[$fcnum] $log; date +\"%D %T\"; $_sleep $crap_timer' 2>&1 1> /dev/null"
 						);
@@ -1844,22 +1846,22 @@ while ($i > 0) {
 			case 'Disabled':
 			default:
 				$color = get_color($colors_start, $colors_end, $colors_exc);
-				shell_exec("tmux respawnp -k -t${tmux_session}:3.3 'echo \"\033[38;5;${color}m\n${panes3[3]} has been disabled/terminated by Remove Crap Releases\"'");
+				shell_exec("tmux respawnp -k -t${tmux_session}:3.1 'echo \"\033[38;5;${color}m\n${panes3[1]} has been disabled/terminated by Remove Crap Releases\"'");
 				break;
 		}
 
-		//run postprocess_pre.php in pane 3.4
-		if (($maxload >= get_load()) && (($dehash == 2) || ($dehash == 3))) {
+		//run postprocess_pre.php in pane 3.2
+		if ($maxload >= get_load()) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
-			$log = writelog($panes3[4]);
-			shell_exec("tmux respawnp -t${tmux_session}:3.4 'echo \"\033[38;5;\"$color\"m\" && cd $_lib && $_php postprocess_pre.php 2>&1 $log; $_sleep $dehash_timer' 2>&1 1> /dev/null");
+			$log = writelog($panes3[2]);
+			shell_exec("tmux respawnp -t${tmux_session}:3.2 'echo \"\033[38;5;\"$color\"m\" && cd $_lib && $_php postprocess_pre.php 2>&1 $log; ' 2>&1 1> /dev/null");
 			$time32 = TIME();
 		} else if ($maxload <= get_load()) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:3.4 'echo \"\033[38;5;\"$color\"m\n$panes3[4] Disabled by Max Load\"' 2>&1 1> /dev/null");
+			shell_exec("tmux respawnp -t${tmux_session}:3.2 'echo \"\033[38;5;\"$color\"m\n$panes3[2] Disabled by Max Load\"' 2>&1 1> /dev/null");
 		} else {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:3.4 'echo \"\033[38;5;\"$color\"m\n$panes3[4] has been disabled/terminated by Decrypt Hashes\"'");
+			shell_exec("tmux respawnp -t${tmux_session}:3.2 'echo \"\033[38;5;\"$color\"m\n$panes3[2] has been disabled/terminated by Postprocess Pre\"'");
 		}
 
 		//pane setup for IrcScraper / Sharing

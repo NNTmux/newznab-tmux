@@ -127,8 +127,6 @@ INSERT INTO tmux (setting, value) VALUES ('defrag_cache', '900'),
 ('patchdb', '0'),
 ('patchdb_timer', '21600'),
 ('progressive', '0'),
-('dehash', '0'),
-('dehash_timer', '30'),
 ('backfill_order', '2'),
 ('backfill_days', '1'),
 ('post_amazon', '0'),
@@ -171,9 +169,6 @@ INSERT INTO tmux (setting, value) VALUES ('defrag_cache', '900'),
 ('passchkattempts', 1),
 ('maxpartsprocessed', 3),
 ('debuginfo', 0),
-('request_url', 'http://reqid.nzedb.com/index.php?reqid=[REQUEST_ID]&group=[GROUP_NM]'),
-('lookup_reqids', '1'),
-('lookup_reqids_timer', '40'),
 ('sphinx', '0'),
 ('sphinx_timer', '600'),
 ('movie_timer', '43200'),
@@ -207,7 +202,7 @@ INSERT INTO tmux (setting, value) VALUES ('defrag_cache', '900'),
   ('ffmpeg_duration', '5'),
   ('ffmpeg_image_time', '5'),
   ('processvideos', '0'),
-  ('sqlpatch', '56');
+  ('sqlpatch', '58');
 
 DROP TABLE IF EXISTS releasesearch;
 CREATE TABLE releasesearch (

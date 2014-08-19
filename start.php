@@ -151,10 +151,8 @@ function window_post($tmux_session)
 function window_fixnames($tmux_session)
 {
 	exec("tmux new-window -t $tmux_session -n FixNames 'printf \"\033]2;Fix_Release_Names\033\"'");
-	exec("tmux selectp -t 0; tmux splitw -t $tmux_session:3 -v -p 50 'printf \"\033]2;RemoveCrap\033\"'");
-    exec("tmux selectp -t 0; tmux splitw -t $tmux_session:3 -h -p 50 'printf \"\033]2;PreDB_Hash_Decrypt\033\"'");
-    exec("tmux selectp -t 1; tmux splitw -t $tmux_session:3 -v -p 50 'printf \"\033]2;RequestID\033\"'");
-    exec("tmux selectp -t 3;tmux splitw -t $tmux_session:3 -h -p 50 'printf \"\033]2;PrehashUpdate\033\"'");
+	exec("tmux splitw -t $tmux_session:3 -v -p 67 'printf \"\033]2;RemoveCrap\033\"'");
+	exec("tmux splitw -t $tmux_session:3 -v -p 50 'printf \"\033]2;PrehashUpdate\033\"'");
 }
 
 function window_ircscraper($tmux_session)
