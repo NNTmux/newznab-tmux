@@ -576,7 +576,17 @@
 	</td>
 </tr>
 
-	<tr>
+<tr>
+	<td style="width:180px;"><label for="maxxxxprocessed">Maximum xxx per run:</label></td>
+	<td>
+		<input class="short" id="maxxxxprocessed" name="maxxxxprocessed" type="text" value="{$site->maxxxxprocessed}"/>
+		<div class="hint">The maximum amount of XXX to process per run. This does not use an NNTP
+			connection or query Amazon.
+	</div>
+	</td>
+</tr>
+
+<tr>
 	<td><label for="lookupbooks">Lookup Books</label>:</td>
 	<td>
 		{html_radios id="lookupbooks" name='lookupbooks' values=$yesno_ids output=$yesno_names selected=$fsite->lookupbooks separator='<br />'}
