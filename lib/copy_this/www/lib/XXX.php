@@ -1,7 +1,13 @@
 <?php
 require_once(WWW_DIR . "/lib/framework/db.php");
 require_once(WWW_DIR . "/lib/releaseimage.php");
+require_once(WWW_DIR . "/lib/IAFD.php");
+require_once(WWW_DIR . "/lib/ADE.php");
+require_once(WWW_DIR . "/lib/AEBN.php");
+require_once(WWW_DIR . "/lib/Hotmovies.php");
+require_once(WWW_DIR . "/lib/Popporn.php");
 require_once(WWW_DIR . "../misc/update_scripts/nix_scripts/tmux/lib/ColorCLI.php");
+
 
 
 /**
