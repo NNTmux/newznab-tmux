@@ -65,7 +65,7 @@ class XXX
 		$this->movieqty = ($this->site->maxxxxprocessed != '') ? $this->site->maxxxxprocessed : 100;
 		$this->showPasswords = ($this->site->showpasswordedrelease != '') ? $this->site->showpasswordedrelease : 0;
 		$this->echooutput = $echo;
-		$this->imgSavePath = WWW_DIR . 'covers/xxx' . '/';
+		$this->imgSavePath = WWW_DIR . 'covers/xxx/';
 		$this->cookie = WWW_DIR . 'tmp/xxx.cookie';
 	}
 
