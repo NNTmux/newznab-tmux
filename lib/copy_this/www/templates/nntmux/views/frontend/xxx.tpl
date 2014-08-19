@@ -340,7 +340,7 @@
 			covers.
 			<br>This could also mean there are no movie releases.
 			<br>Please try looking in the
-			<a href="{$smarty.const.WWW_TOP}/browse?t={$category}" style="font-weight:strong;text-decoration:underline;"
+			<a href="{$smarty.const.WWW_TOP}/browse?t={$category}"
 					>list view</a>, which does not require XXX covers.
 		</p>
 	</div>
