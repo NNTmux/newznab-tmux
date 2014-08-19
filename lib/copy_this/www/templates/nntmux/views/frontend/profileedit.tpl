@@ -68,6 +68,13 @@
 				</td>
 			</tr>
 			<tr>
+				<th>View XXX Page:</th>
+				<td>
+					<input id="xxxview" name="xxxview" value="1" type="checkbox" {if $user.xxxview=="1"}checked="checked"{/if}>
+					<div class="hint">Browse XXX covers. Only shows XXX releases with known lookup info.</div>
+				</td>
+			</tr>
+			<tr>
 				<th>View Console Page:</th>
 				<td>
 					<input id="consoleview" name="consoleview" value="1" type="checkbox"
