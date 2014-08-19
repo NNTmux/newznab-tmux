@@ -723,22 +723,25 @@ class Releases
 	/**
 	 * Deletes a single release by GUID, and all the corresponding files.
 	 *
-	 * @param array        $identifiers ['g' => Release GUID(mandatory), 'id => releaseID(optional, pass false)]
+	 * @param              $quid
+	 * @param              $id
 	 * @param NZB          $nzb
 	 * @param ReleaseImage $releaseImage
+	 *
+	 * @internal param array $identifiers ['g' => Release GUID(mandatory), 'id => releaseID(optional, pass false)]
 	 */
-	public function deleteSingle($identifiers, $nzb, $releaseImage)
+	public function deleteSingle($quid, $id, $nzb, $releaseImage)
 	{
 		$db = new DB();
 		$releaseImage = new ReleaseImage();
 		// Delete NZB from disk.
-		$nzbPath = $nzb->getNZBPath($identifiers['g']);
+		$nzbPath = $nzb->getNZBPath($guid);
 		if ($nzbPath) {
 			@unlink($nzbPath);
 		}
 
 		// Delete images.
-		$releaseImage->delete($identifiers['g']);
+		$releaseImage->delete($guid);
 
 		// Delete from DB.
 		$db->queryExec(
@@ -754,7 +757,7 @@ class Releases
 				LEFT OUTER JOIN releasevideo rv ON rv.releaseID = r.ID
 				LEFT OUTER JOIN releaseextrafull re ON re.releaseID = r.ID
 				WHERE r.guid = %s',
-				$db->escapeString($identifiers['g'])
+				$db->escapeString($guid)
 			)
 		);
 	}
