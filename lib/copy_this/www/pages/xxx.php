@@ -1,9 +1,12 @@
 <?php
+require_once(WWW_DIR . "/lib/XXX.php");
+require_once(WWW_DIR . "/lib/category.php");
+
 if (!$page->users->isLoggedIn()) {
 	$page->show403();
 }
 
-$movie = new XXX();
+$movie = new XXX(true);
 $cat = new Category();
 
 $moviecats = $cat->getChildren(Category::CAT_PARENT_XXX);
