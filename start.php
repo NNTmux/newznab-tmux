@@ -15,7 +15,7 @@ $tmux = $t->get();
 $patch = (isset($tmux->sqlpatch)) ? $tmux->sqlpatch : 0;
 
 // Check database patch version
-if ($patch < 56) {
+if ($patch < 63) {
 	exit($c->error("\nYour database is not up to date. Please update.\nphp ${DIR}/lib/DB/patchDB.php\n"));
 }
 $tmux_session = (isset($tmux->tmux_session)) ? $tmux->tmux_session : 0;
@@ -144,7 +144,7 @@ function window_post($tmux_session)
     exec("tmux splitw -t $tmux_session:2 -v -p 50 'printf \"\033]2;processAnime\033\"'");
     exec("tmux selectp -t 5;tmux splitw -t $tmux_session:2 -v -p 80 'printf \"\033]2;processSpotnab\033\"'");
     exec("tmux splitw -t $tmux_session:2 -v -p 75 'printf \"\033]2;processBooks\033\"'");
-    exec("tmux splitw -t $tmux_session:2 -v -p 67 'printf \"\033]2;processOther\033\"'");
+    exec("tmux splitw -t $tmux_session:2 -v -p 67 'printf \"\033]2;processXXX\033\"'");
     exec("tmux splitw -t $tmux_session:2 -v -p 50 'printf \"\033]2;processUnwanted\033\"'");
 }
 

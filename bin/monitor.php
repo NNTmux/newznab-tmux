@@ -8,7 +8,7 @@ require_once(dirname(__FILE__) . "/../lib/showsleep.php");
 require_once(dirname(__FILE__) . "/../lib/functions.php");
 
 
-$version = "0.4r2020";
+$version = "0.4r2025";
 
 $db = new DB();
 $functions = new Functions();
@@ -1705,14 +1705,14 @@ while ($i > 0) {
 			shell_exec("tmux respawnp -t${tmux_session}:2.7 'echo \"\033[38;5;${color}m\n${panes2[7]} has been disabled/terminated by Postprocess Books\"'");
 		}
 
-		//Process Other releases in pane 2.8 once if needed then exits
-		if (($maxload >= get_load()) && ($others == 1)) {
+		//Process XXX releases in pane 2.8 once if needed then exits
+		if (($maxload >= get_load()) && ($xxx_releases_proc > 0)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			$log = writelog($panes2[8]);
-			shell_exec("tmux respawnp -t${tmux_session}:2.8 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php postprocess_new.php other 2>&1 $log && echo \" \033[1;0;33m\"' 2>&1 1> /dev/null");
-		} else if ($others == 0) {
+			shell_exec("tmux respawnp -t${tmux_session}:2.8 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php postprocess_new.php xxx 2>&1 $log && echo \" \033[1;0;33m\"' 2>&1 1> /dev/null");
+		} else if ($xxx_releases_proc == 0) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:2.8 'echo \"\033[38;5;\"$color\"m\n$panes2[8] Disabled by OTHER\"' 2>&1 1> /dev/null");
+			shell_exec("tmux respawnp -t${tmux_session}:2.8 'echo \"\033[38;5;\"$color\"m\n$panes2[8] Disabled by XXX\"' 2>&1 1> /dev/null");
 		} else if ($maxload <= get_load()) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			shell_exec("tmux respawnp -t${tmux_session}:2.8 'echo \"\033[38;5;\"$color\"m\n$panes2[8] Disabled by Max Load\"' 2>&1 1> /dev/null");
@@ -1763,39 +1763,7 @@ while ($i > 0) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			shell_exec("tmux respawnp -t${tmux_session}:3.0 'echo \"\033[38;5;\"$color\"m\n$panes3[0] Disabled by Max Load\"' 2>&1 1> /dev/null");
 		}
-		//run predb_hash_decrypt.php in pane 3.1
-		/*if (($maxload >= get_load()) && (($dehash == 1) || ($dehash == 3))) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			$log = writelog($panes3[1]);
-			shell_exec("tmux respawnp -t${tmux_session}:3.1 'echo \"\033[38;5;\"$color\"m\" && cd $_lib && $_php predb_hash_decrypt.php 1000 2>&1 $log; $_sleep $dehash_timer' 2>&1 1> /dev/null");
-			$time28 = TIME();
-		} else if ($maxload <= get_load()) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:3.1 'echo \"\033[38;5;\"$color\"m\n$panes3[1] Disabled by Max Load\"' 2>&1 1> /dev/null");
-		} else {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:3.1 'echo \"\033[38;5;\"$color\"m\n$panes3[1] has been disabled/terminated by Decrypt Hashes\"'");
-		}
-		*/
-		//run requestID or requestid threaded in pane 3.2
-		/*if (($maxload >= get_load()) && ($lookreqids == 2)) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			$log = writelog($panes3[2]);
-			shell_exec("tmux respawnp -t${tmux_session}:3.2 'echo \"\033[38;5;\"$color\"m\" && cd $_py && $_python ${DIR}/../python/requestid_threaded.py 2>&1 $log; $_sleep $lookreqids_timer' 2>&1 1> /dev/null");
-			$time30 = TIME();
-		} elseif (($maxload >= get_load()) && ($lookreqids == 1)) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			$log = writelog($panes3[2]);
-			shell_exec("tmux respawnp -t${tmux_session}:3.2 'echo \"\033[38;5;\"$color\"m\" && cd $_lib && $_php requestID.php 1000 true 2>&1 $log; $_sleep $lookreqids_timer' 2>&1 1> /dev/null");
-			$time30 = TIME();
-		} else if ($maxload <= get_load()) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:3.2 'echo \"\033[38;5;\"$color\"m\n$panes3[2] Disabled by Max Load\"' 2>&1 1> /dev/null");
-		} else {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:3.2 'echo \"\033[38;5;\"$color\"m\n$panes3[2] has been disabled/terminated by RequestID Lookup\"' 2>&1 1> /dev/null");
-		}
-		*/
+
 		// Run Remove crap releases in pane 3.1
 		switch ($fix_crap_opt) {
 			// Do all types up to 4 hours.
