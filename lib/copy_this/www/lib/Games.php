@@ -26,7 +26,7 @@ class Games
 	 */
 	function __construct($echooutput = false)
 	{
-		$this->echooutput = $echooutput;
+		$this->echoOutput = $echooutput;
 
 		$this->pdo = new DB();
 		$s = new Sites();
@@ -34,7 +34,7 @@ class Games
 		$t = new Tmux();
 		$this->tmux = $t->get();
 		$this->publicKey = $this->site->giantbombkey;
-		$this->gameqty = ($this->tmux->maxgamesprocessed != '') ? $this->tmux->maxgamesprocessed : 150;
+		$this->gameQty = ($this->tmux->maxgamesprocessed != '') ? $this->tmux->maxgamesprocessed : 150;
 		$this->sleeptime = ($this->tmux->amazonsleep != '') ? $this->tmux->amazonsleep : 1000;
 		$this->imgSavePath = WWW_DIR . 'covers/games' . '/';
 		$this->renamed = '';
