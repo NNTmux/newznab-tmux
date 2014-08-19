@@ -2,7 +2,7 @@
 require_once(WWW_DIR . "/lib/XXX.php");
 require_once(WWW_DIR . "/lib/category.php");
 
-if (!$page->users->isLoggedIn()) {
+if (!$users->isLoggedIn()) {
 	$page->show403();
 }
 
