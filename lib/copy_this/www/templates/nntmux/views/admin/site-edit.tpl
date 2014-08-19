@@ -569,6 +569,14 @@
 </tr>
 
 <tr>
+	<td><label for="lookupxxx">Lookup XXX</label>:</td>
+	<td>
+		{html_radios id="lookupxxx" name='lookupxxx' values=$yesno_ids output=$yesno_names selected=$fsite->lookupxxx separator='<br />'}
+		<div class="hint">Whether to attempt to lookup XXX information when processing binaries.</div>
+	</td>
+</tr>
+
+	<tr>
 	<td><label for="lookupbooks">Lookup Books</label>:</td>
 	<td>
 		{html_radios id="lookupbooks" name='lookupbooks' values=$yesno_ids output=$yesno_names selected=$fsite->lookupbooks separator='<br />'}
