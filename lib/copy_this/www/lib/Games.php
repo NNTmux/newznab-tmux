@@ -35,7 +35,7 @@ class Games
 		$this->tmux = $t->get();
 		$this->publicKey = $this->site->giantbombkey;
 		$this->gameQty = ($this->tmux->maxgamesprocessed != '') ? $this->tmux->maxgamesprocessed : 150;
-		$this->sleeptime = ($this->tmux->amazonsleep != '') ? $this->tmux->amazonsleep : 1000;
+		$this->sleepTime = ($this->tmux->amazonsleep != '') ? $this->tmux->amazonsleep : 1000;
 		$this->imgSavePath = WWW_DIR . 'covers/games' . '/';
 		$this->renamed = '';
 		$this->matchPercentage = 60;
@@ -729,10 +729,10 @@ class Games
 						$gameId = $gameCheck['id'];
 					}
 					// Update release.
-					$this->pdo->queryExec(sprintf('UPDATE releases SET gamesinfo_id = %d WHERE id = %d', $gameId, $arr['id']));
+					$this->pdo->queryExec(sprintf('UPDATE releases SET gamesinfo_id = %d WHERE ID = %d', $gameId, $arr['ID']));
 				} else {
 					// Could not parse release title.
-					$this->pdo->queryExec(sprintf('UPDATE releases SET gamesinfo_id = %d WHERE id = %d', -2, $arr['id']));
+					$this->pdo->queryExec(sprintf('UPDATE releases SET gamesinfo_id = %d WHERE ID = %d', -2, $arr['ID']));
 
 					if ($this->echoOutput) {
 						echo '.';
