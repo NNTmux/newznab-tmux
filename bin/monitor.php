@@ -8,7 +8,7 @@ require_once(dirname(__FILE__) . "/../lib/showsleep.php");
 require_once(dirname(__FILE__) . "/../lib/functions.php");
 
 
-$version = "0.4r2015";
+$version = "0.4r2020";
 
 $db = new DB();
 $functions = new Functions();
@@ -1822,7 +1822,7 @@ while ($i > 0) {
 					}
 
 					//Check to see if the pane is dead, if so respawn it.
-					if (shell_exec("tmux list-panes -t${tmux_session}:3 | grep ^3 | grep -c dead") == 1) {
+					if (shell_exec("tmux list-panes -t${tmux_session}:3 | grep ^1 | grep -c dead") == 1) {
 
 						// Run remove crap releases.
 						shell_exec("tmux respawnp -t${tmux_session}:3.1 ' \
