@@ -543,8 +543,8 @@ class XXX
 			}
 		} else {
 			// If xxxinfo title is found, update release with the current xxxinfo id because it was nulled before..
-			$this->db->queryExec(sprintf('UPDATE releases SET xxxinfo_id = %d  WHERE ID = %d', $check['ID'], $this->currentRelID));
-			$xxxID = $check['ID'];
+			$this->db->queryExec(sprintf('UPDATE releases SET xxxinfo_id = %d  WHERE ID = %d', $check['id'], $this->currentRelID));
+			$xxxID = $check['id'];
 		}
 		if ($this->echooutput) {
 			$this->c->doEcho(
