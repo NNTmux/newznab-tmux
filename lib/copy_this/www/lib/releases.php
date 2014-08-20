@@ -1898,7 +1898,7 @@ class Releases
 		else {
 			if ($xml != "") {
 				$xmlObj = @simplexml_load_string($xml);
-				$arrXml = objectsIntoArray($xmlObj);
+				$arrXml = $util->objectsIntoArray($xmlObj);
 
 				if (isset($arrXml["item"]) && is_array($arrXml["item"])) {
 					foreach ($arrXml["item"] as $item) {
