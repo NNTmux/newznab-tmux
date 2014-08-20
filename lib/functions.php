@@ -38,6 +38,7 @@ class Functions
 		$this->echooutput = $echooutput;
 		$this->c = new ColorCLI();
 		$this->db = new DB();
+		$this->groups = new Groups();
 		$this->m = new Movie();
 		$this->consoleTools = new ConsoleTools();
 		$this->tmpPath = $this->site->tmpunrarpath;
@@ -153,7 +154,7 @@ class Functions
 		} else {
 			$postsdate = $this->postdate($nntp, $first, false, $group, true, 'newest');
 		}
-		$postsdate = $this->from_unixtime($postsdate);
+		$postsdate = $this->db->from_unixtime($postsdate);
 
 		if ($type == 'Backfill') {
 			$db->exec(sprintf('UPDATE groups SET first_record_postdate = %s, first_record = %s, last_updated = NOW() WHERE ID = %d', $postsdate, $db->escapeString($first), $groupArr['ID']));
@@ -206,7 +207,7 @@ class Functions
 			if (!$nntp->isError($msgs)) {
 				// Set table names
 				$groups = new Groups();
-				$groupID = $this->getIDByName($group);
+				$groupID = $this->groups->getIDByName($group);
 				$groupa = array();
 				$groupa['bname'] = 'binaries';
 				$groupa['pname'] = 'parts';
@@ -603,7 +604,7 @@ class Functions
 				$firstr_date = $newdate;
 			}
 
-			$db->exec(sprintf('UPDATE groups SET first_record_postdate = %s, first_record = %s, last_updated = NOW() WHERE ID = %d', $this->from_unixtime($firstr_date), $db->escapeString($first), $groupArr['ID']));
+			$db->exec(sprintf('UPDATE groups SET first_record_postdate = %s, first_record = %s, last_updated = NOW() WHERE ID = %d', $this->db->from_unixtime($firstr_date), $db->escapeString($first), $groupArr['ID']));
 			if ($first == $targetpost) {
 				$done = true;
 			} else {
@@ -616,7 +617,7 @@ class Functions
 			}
 		}
 		// Set group's first postdate.
-		$db->exec(sprintf('UPDATE groups SET first_record_postdate = %s, last_updated = NOW() WHERE ID = %d', $this->from_unixtime($firstr_date), $groupArr['ID']));
+		$db->exec(sprintf('UPDATE groups SET first_record_postdate = %s, last_updated = NOW() WHERE ID = %d', $this->db->from_unixtime($firstr_date), $groupArr['ID']));
 
 		$timeGroup = number_format(microtime(true) - $this->startGroup, 2);
 
@@ -918,7 +919,7 @@ class Functions
 				$firstr_date = $newdate;
 			}
 
-			$db->exec(sprintf('UPDATE groups SET first_record_postdate = %s, first_record = %s, last_updated = NOW() WHERE ID = %d', $this->from_unixtime($firstr_date), $db->escapeString($first), $groupArr['ID']));
+			$db->exec(sprintf('UPDATE groups SET first_record_postdate = %s, first_record = %s, last_updated = NOW() WHERE ID = %d', $this->db->from_unixtime($firstr_date), $db->escapeString($first), $groupArr['ID']));
 			if ($first == $targetpost) {
 				$done = true;
 			} else {
@@ -931,7 +932,7 @@ class Functions
 			}
 		}
 		// Set group's first postdate.
-		$db->exec(sprintf('UPDATE groups SET first_record_postdate = %s, last_updated = NOW() WHERE ID = %d', $this->from_unixtime($firstr_date), $groupArr['ID']));
+		$db->exec(sprintf('UPDATE groups SET first_record_postdate = %s, last_updated = NOW() WHERE ID = %d', $this->db->from_unixtime($firstr_date), $groupArr['ID']));
 
 		$timeGroup = number_format(microtime(true) - $this->startGroup, 2);
 
@@ -1042,7 +1043,7 @@ class Functions
 
 			$groupArr['first_record_postdate'] = $first_record_postdate;
 
-			$db->exec(sprintf('UPDATE groups SET first_record_postdate = %s WHERE ID = %d', $this->from_unixtime($first_record_postdate), $groupArr['ID']));
+			$db->exec(sprintf('UPDATE groups SET first_record_postdate = %s WHERE ID = %d', $this->db->from_unixtime($first_record_postdate), $groupArr['ID']));
 		}
 
 		// Defaults for post record first/last postdate
@@ -1144,14 +1145,14 @@ class Functions
 
 					$groupArr['first_record_postdate'] = $first_record_postdate;
 
-					$db->exec(sprintf('UPDATE groups SET first_record = %s, first_record_postdate = %s WHERE ID = %d', $scanSummary['firstArticleNumber'], $this->from_unixtime($db->escapeString($first_record_postdate)), $groupArr['ID']));
+					$db->exec(sprintf('UPDATE groups SET first_record = %s, first_record_postdate = %s WHERE ID = %d', $scanSummary['firstArticleNumber'], $this->db->from_unixtime($db->escapeString($first_record_postdate)), $groupArr['ID']));
 				}
 
 				if (isset($scanSummary['lastArticleDate'])) {
 					$last_record_postdate = strtotime($scanSummary['lastArticleDate']);
 				}
 
-				$db->exec(sprintf('UPDATE groups SET last_record = %s, last_record_postdate = %s, last_updated = NOW() WHERE ID = %d', $db->escapeString($scanSummary['lastArticleNumber']), $this->from_unixtime($last_record_postdate), $groupArr['ID']));
+				$db->exec(sprintf('UPDATE groups SET last_record = %s, last_record_postdate = %s, last_updated = NOW() WHERE ID = %d', $db->escapeString($scanSummary['lastArticleNumber']), $this->db->from_unixtime($last_record_postdate), $groupArr['ID']));
 
 				if ($last == $grouplast) {
 					$done = true;
