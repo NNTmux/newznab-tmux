@@ -9,6 +9,7 @@ require_once(WWW_DIR."/lib/predb.php");
 require_once(WWW_DIR."/lib/episode.php");
 require_once(WWW_DIR . "/lib/XXX.php");
 require_once(WWW_DIR . "/lib/Games.php");
+require_once(WWW_DIR . "/lib/util.php");
 require_once(WWW_DIR . "../misc/update_scripts/nix_scripts/tmux/lib/Film.php");
 require_once(WWW_DIR . "../misc/update_scripts/nix_scripts/tmux/lib/TraktTv.php");
 
