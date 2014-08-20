@@ -71,6 +71,8 @@ switch ($action) {
 					(isset($_POST['xxxview']) ? "1" : "0"),
 					(isset($_POST['consoleview']) ? "1" : "0"),
 					(isset($_POST['bookview']) ? "1" : "0"),
+					$_POST['cp_url'],
+					$_POST['cp_api'],
 					$_POST['queuetypeids'],
 					(isset($_POST['nzbgeturl']) ? $_POST['nzbgeturl'] : ''),
 					(isset($_POST['nzbgetusername']) ? $_POST['nzbgetusername'] : ''),
@@ -141,6 +143,9 @@ $page->smarty->assign(array(
 $page->meta_title = "Edit User Profile";
 $page->meta_keywords = "edit,profile,user,details";
 $page->meta_description = "Edit User Profile for " . $data["username"];
+
+$page->smarty->assign('cp_url_selected', $data['cp_url']);
+$page->smarty->assign('cp_api_selected', $data['cp_api']);
 
 
 $page->smarty->assign('catlist', $category->getForSelect(false));
