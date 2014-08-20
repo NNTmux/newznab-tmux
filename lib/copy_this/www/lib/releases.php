@@ -1890,7 +1890,8 @@ class Releases
 			$url = $url . "&newznabID=" . $nnid;
 		}
 
-		$xml = getUrl($url);
+		$util = new Utility();
+		$xml = $util->getUrl($url);
 
 		if ($xml === false || preg_match('/no feed/i', $xml))
 			return "no feed";
@@ -1918,7 +1919,8 @@ class Releases
 			if ($nnid != "")
 				$nnid = "?newznabID=" . $nnid . "&rev=" . $rev;
 
-			$regfile = getUrl($url . $nnid, "get", "", "gzip");
+			$util = new Utility();
+			$regfile = $util->getUrl($url . $nnid, "get", "", "gzip");
 			if ($regfile !== false && $regfile != "") {
 				/*$Rev: 728 $*/
 				if (preg_match('/\/\*\$Rev: (\d{3,4})/i', $regfile, $matches)) {
