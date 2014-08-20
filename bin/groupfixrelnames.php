@@ -1,4 +1,5 @@
 <?php
+require_once(dirname(__FILE__) . "/config.php");
 require_once(WWW_DIR . "/lib/framework/db.php");
 require_once(WWW_DIR . "/lib/util.php");
 require_once(dirname(__FILE__) . '/../lib/ColorCLI.php');
