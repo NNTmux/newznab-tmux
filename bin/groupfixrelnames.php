@@ -36,7 +36,7 @@ if (!isset($argv[1])) {
 								AND r.prehashID = 0
 								ORDER BY r.postdate DESC
 								LIMIT %s',
-					$util->likeString($guidChar, false, true),
+					$pdo->likeString($guidChar, false, true),
 					$maxperrun
 				)
 			);
@@ -69,7 +69,7 @@ if (!isset($argv[1])) {
 								AND r.prehashID = 0
 								ORDER BY r.postdate ASC
 								LIMIT %s',
-					$util->likeString($guidChar, false, true),
+					$pdo->likeString($guidChar, false, true),
 					$maxperrun
 				)
 			);
@@ -96,7 +96,7 @@ if (!isset($argv[1])) {
 								AND r.prehashID = 0
 								ORDER BY r.dehashstatus DESC, r.postdate ASC
 								LIMIT %s',
-					$util->likeString($guidChar, false, true),
+					$pdo->likeString($guidChar, false, true),
 					$maxperrun
 				)
 			);
@@ -124,7 +124,7 @@ if (!isset($argv[1])) {
 								AND r.prehashID = 0
 								ORDER BY r.postdate ASC
 								LIMIT %s',
-					$util->likeString($guidChar, false, true),
+					$pdo->likeString($guidChar, false, true),
 					$maxperrun
 				)
 			);
