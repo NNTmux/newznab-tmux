@@ -724,7 +724,7 @@ function getUrl ($url, $method = 'get', $postdata = '', $language = "", $debug =
  */
 function imdb_trailers($imdbID)
 {
-	$xml = getUrl('http://api.traileraddict.com/?imdb=' . $imdbID);
+	$xml = self::getUrl('http://api.traileraddict.com/?imdb=' . $imdbID);
 	if ($xml !== false) {
 		if (preg_match('/(<iframe.+?<\/iframe>)/i', $xml, $html)) {
 			return $html[1];
