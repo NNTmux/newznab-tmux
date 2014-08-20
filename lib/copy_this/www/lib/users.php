@@ -162,7 +162,7 @@ class Users
 		return $db->queryInsert($sql);
 	}
 
-	public function update($id, $uname, $email, $grabs, $role, $notes, $invites, $movieview, $musicview, $gameview, $xxxview, $consoleview, $bookview, $queueType = '', $nzbgetURL = '', $nzbgetUsername = '', $nzbgetPassword = '', $saburl = '', $sabapikey = '', $sabpriority = '', $sabapikeytype = '', $nzbvortexServerUrl = false, $nzbvortexApiKey = false)
+	public function update($id, $uname, $email, $grabs, $role, $notes, $invites, $movieview, $musicview, $gameview, $xxxview, $consoleview, $bookview, $queueType = '', $nzbgetURL = '', $nzbgetUsername = '', $nzbgetPassword = '', $saburl = '', $sabapikey = '', $sabpriority = '', $sabapikeytype = '', $cp_url = false, $cp_api = false, $nzbvortexServerUrl = false, $nzbvortexApiKey = false)
 	{
 		$db = new DB();
 
@@ -224,8 +224,15 @@ class Users
 			$sql[] = sprintf('sabapikeytype = %d', $sabapikeytype);
 		}
 
-		if ($nzbvortexApiKey !== false)
+		if ($nzbvortexApiKey !== false) {
 			$sql[] = sprintf("nzbvortex_api_key = '%s'", $nzbvortexApiKey);
+		}
+		if ($cp_url !== false) {
+			$sql[] = sprintf('cp_url = %s', $db->escapeString($cp_url));
+		}
+		if ($cp_api !== false) {
+			$sql[] = sprintf('cp_api = %s', $db->escapeString($cp_api));
+		}
 
 		$sql = sprintf("update users set %s where id = %d", implode(', ', $sql), $id);
 		$db->exec($sql);
