@@ -9,6 +9,8 @@ require_once(WWW_DIR."/lib/predb.php");
 require_once(WWW_DIR."/lib/episode.php");
 require_once(WWW_DIR . "/lib/XXX.php");
 require_once(WWW_DIR . "/lib/Games.php");
+require_once(WWW_DIR . "../misc/update_scripts/nix_scripts/tmux/lib/Film.php");
+require_once(WWW_DIR . "../misc/update_scripts/nix_scripts/tmux/lib/TraktTv.php");
 
 
 if (!$users->isLoggedIn())
@@ -78,15 +80,34 @@ if (isset($_GET["id"]))
 	}
 
 	$mov = '';
-	if ($data['imdbID'] != '') {
-		require_once(WWW_DIR."/lib/movie.php");
-		$movie = new Movie();
+	if ($data['imdbID'] != '' && $data['imdbID'] != 0000000) {
+		$movie = new Film();
 		$mov = $movie->getMovieInfo($data['imdbID']);
 
-		if ($mov) {
+		$trakt = new TraktTv();
+		$traktSummary = $trakt->traktMoviesummary('tt' . $data['imdbID'], true);
+		if ($traktSummary !== false &&
+			isset($traktSummary['trailer']) &&
+			$traktSummary['trailer'] !== '' &&
+			preg_match('/[\/?]v[\/\=](\w+)$/i', $traktSummary['trailer'], $youtubeM)
+		) {
+			$mov['trailer'] =
+				'<embed width="480" height="345" src="' .
+				'https://www.youtube.com/v/' . $youtubeM[1] .
+				'" type="application/x-shockwave-flash"></embed>';
+		} else {
+			$mov['trailer'] = Utility::imdb_trailers($data['imdbID']);
+		}
+
+		if ($mov && isset($mov['title'])) {
+			$mov['title'] = str_replace(array('/', '\\'), '', $mov['title']);
 			$mov['actors'] = $movie->makeFieldLinks($mov, 'actors');
 			$mov['genre'] = $movie->makeFieldLinks($mov, 'genre');
 			$mov['director'] = $movie->makeFieldLinks($mov, 'director');
+		} else if ($traktSummary !== false) {
+			$mov['title'] = str_replace(array('/', '\\'), '', $traktSummary['title']);
+		} else {
+			$mov = false;
 		}
 	}
 
