@@ -775,7 +775,7 @@ function objectsIntoArray ($arrObjData, $arrSkipIndices = [])
 function runCmd ($command, $debug = false)
 {
 	$nl = PHP_EOL;
-	if (isWindows() && strpos(phpversion(), "5.2") !== false) {
+	if (self::isWindows() && strpos(phpversion(), "5.2") !== false) {
 		$command = "\"" . $command . "\"";
 	}
 
@@ -809,7 +809,7 @@ function safeFilename ($filename)
 // Central function for sending site email.
 function sendEmail($to, $subject, $contents, $from)
 {
-	if (isWindows()) {
+	if (self::isWindows()) {
 		$n = "\r\n";
 	} else {
 		$n = "\n";
