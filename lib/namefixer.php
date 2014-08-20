@@ -25,6 +25,7 @@ class NameFixer
 
 	/**
 	 * Has the current release found a new name?
+	 *
 	 * @var bool
 	 */
 	public $matched;
@@ -66,7 +67,6 @@ class NameFixer
 		$this->c = new ColorCLI();
 		$this->consoletools = new ConsoleTools();
 		$this->category = new Categorize();
-		$this->functions = new Functions();
 		$this->_groups = new Groups($this->db);
 		$this->utility = new Utility();
 	}
@@ -78,7 +78,7 @@ class NameFixer
 	 * @param int $echo 1: change the name, anything else: preview of what could have been changed.
 	 * @param int $cats 1: other categories, 2: all categories
 	 * @param     $nameStatus
-	 * @param $show
+	 * @param     $show
 	 */
 	public function fixNamesWithNfo($time, $echo, $cats, $nameStatus, $show)
 	{
@@ -130,7 +130,7 @@ class NameFixer
 					// Ignore encrypted NFOs.
 					if (preg_match('/^=newz\[NZB\]=\w+/', $releaseRow['textstring'])) {
 						$this->db->queryExec(
-						sprintf('UPDATE releases SET proc_nfo = 1 WHERE ID = %d', $releaseRow['releaseID'])
+							sprintf('UPDATE releases SET proc_nfo = 1 WHERE ID = %d', $releaseRow['releaseID'])
 						);
 						continue;
 					}
@@ -153,7 +153,7 @@ class NameFixer
 	 * @param int $echo 1: change the name, anything else: preview of what could have been changed.
 	 * @param int $cats 1: other categories, 2: all categories
 	 * @param     $nameStatus
-	 * @param $show
+	 * @param     $show
 	 */
 	public function fixNamesWithFiles($time, $echo, $cats, $nameStatus, $show)
 	{
@@ -207,11 +207,11 @@ class NameFixer
 	/**
 	 * Attempts to fix release names using the Par2 File.
 	 *
-	 * @param int $time 1: 24 hours, 2: no time limit
-	 * @param int $echo 1: change the name, anything else: preview of what could have been changed.
-	 * @param int $cats 1: other categories, 2: all categories
-	 * @param     $nameStatus
-	 * @param     $show
+	 * @param int  $time 1: 24 hours, 2: no time limit
+	 * @param int  $echo 1: change the name, anything else: preview of what could have been changed.
+	 * @param int  $cats 1: other categories, 2: all categories
+	 * @param      $nameStatus
+	 * @param      $show
 	 * @param NNTP $nntp
 	 */
 	public function fixNamesWithPar2($time, $echo, $cats, $nameStatus, $show, $nntp)
@@ -286,6 +286,7 @@ class NameFixer
 			echo $this->c->header($query . $this->fullall . ";\n");
 			$releases = $this->db->queryDirect($query . $this->fullall);
 		}
+
 		return $releases;
 	}
 
@@ -575,6 +576,7 @@ class NameFixer
 		} elseif ($total >= 16) {
 			$matching = -1;
 		}
+
 		return $matching;
 	}
 
@@ -761,6 +763,7 @@ class NameFixer
 				)
 			);
 		}
+
 		return $matching;
 	}
 

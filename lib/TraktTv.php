@@ -1,7 +1,7 @@
 <?php
 require_once(dirname(__FILE__) . "/../bin/config.php");
 require_once(WWW_DIR . '/lib/Tmux.php');
-require_once('functions.php');
+require_once(WWW_DIR . '/lib/util.php');
 
 /**
  * Class TraktTv
@@ -19,7 +19,7 @@ Class TraktTv
 		$t = new Tmux();
 		$tmux = $t->get();
 		$this->APIKEY = $tmux->trakttvkey;
-		$this->functions = new Functions();
+		$this->util = new Utility();
 	}
 
 	/**
@@ -34,8 +34,8 @@ Class TraktTv
 	public function traktTVSEsummary($title = '', $season = '', $ep = '')
 	{
 		if (!empty($this->APIKEY)) {
-			$TVjson = $this->functions->getUrl(
-				'http://api.trakt.tv/show/episode/summary.json/' .
+			$TVjson = $this->util->getUrl(
+			'http://api.trakt.tv/show/episode/summary.json/' .
 				$this->APIKEY . '/' .
 				str_replace(array(' ', '_', '.'), '-', $title) . '/' .
 				str_replace(array('S', 's'), '', $season) . '/' .
@@ -62,8 +62,8 @@ Class TraktTv
 	public function traktMoviesummary($movie = '', $array = false)
 	{
 		if (!empty($this->APIKEY)) {
-			$MovieJson = $this->functions->getUrl(
-				'http://api.trakt.tv/movie/summary.json/' .
+			$MovieJson = $this->util->getUrl(
+			'http://api.trakt.tv/movie/summary.json/' .
 				$this->APIKEY .
 				'/' .
 				str_replace(array(' ', '_', '.'), '-', str_replace(array('(', ')'), '', $movie))

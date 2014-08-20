@@ -18,6 +18,7 @@ require_once(WWW_DIR . "/lib/genres.php");
 require_once(WWW_DIR . "/lib/anidb.php");
 require_once(WWW_DIR . "/lib/book.php");
 require_once(WWW_DIR . "/lib/nzb.php");
+require_once(WWW_DIR . "/lib/util.php");
 require_once("consoletools.php");
 require_once("ColorCLI.php");
 require_once("nzbcontents.php");
@@ -29,7 +30,6 @@ require_once("TraktTv.php");
 require_once("Film.php");
 require_once("TvAnger.php");
 require_once("Konsole.php");
-require_once("functions.php");
 require_once("Enzebe.php");
 
 Class ProcessAdditional
@@ -121,7 +121,7 @@ Class ProcessAdditional
 		$this->_releaseImage = new ReleaseImage();
 		$this->_par2Info = new Par2Info();
 		$this->_nfo = new Info($this->_echoCLI);
-		$this->_functions = new Functions();
+		$this->_util = new Utility();
 		$this->c = new ColorCLI();
 		$this->jpgSavePath = WWW_DIR . 'covers/sample/';
 		$this->vidSavePath = WWW_DIR . 'covers/video/';
@@ -137,7 +137,7 @@ Class ProcessAdditional
 		}
 		$this->_archiveInfo->setExternalClients($clients);
 
-		$this->_hasGNUFile = $this->_functions->hasCommand(('file') === true ? true : false);
+		$this->_hasGNUFile = $this->_util->hasCommand(('file') === true ? true : false);
 
 		// Maximum amount of releases to fetch per run.
 		$this->_queryLimit =
@@ -228,7 +228,7 @@ Class ProcessAdditional
 					'name'           => $release[2],
 					'disablepreview' => $release[3],
 					'size'           => $release[4],
-					'groupID' => $release[5],
+					'groupID'        => $release[5],
 					'nfostatus'      => $release[6],
 					'categoryID'     => $release[7],
 					'searchname'     => $release[8]
@@ -398,7 +398,7 @@ Class ProcessAdditional
 	/**
 	 * Deletes files and folders recursively.
 	 *
-	 * @param string $path Path to a folder or file.
+	 * @param string $path           Path to a folder or file.
 	 * @param array  $ignoredFolders Array with paths to folders to ignore.
 	 *
 	 * @void
@@ -1304,7 +1304,7 @@ Class ProcessAdditional
 	 * Optional, pass a regex to filter the files.
 	 *
 	 * @param string $pattern Regex, optional
-	 * @param string $path Path to the folder (if empty, uses $this->tmpPath)
+	 * @param string $path    Path to the folder (if empty, uses $this->tmpPath)
 	 *
 	 * @return Iterator Object|bool
 	 */

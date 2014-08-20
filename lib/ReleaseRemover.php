@@ -1,13 +1,12 @@
 <?php
-require_once(dirname(__FILE__)."/../bin/config.php");
-require_once(WWW_DIR."/lib/framework/cache.php");
-require_once(WWW_DIR."/lib/framework/db.php");
-require_once(WWW_DIR."/lib/releases.php");
-require_once(WWW_DIR."/lib/category.php");
+require_once(dirname(__FILE__) . "/../bin/config.php");
+require_once(WWW_DIR . "/lib/framework/cache.php");
+require_once(WWW_DIR . "/lib/framework/db.php");
+require_once(WWW_DIR . "/lib/releases.php");
+require_once(WWW_DIR . "/lib/category.php");
 require_once(WWW_DIR . "/lib/releaseimage.php");
 require_once("consoletools.php");
 require_once("ColorCLI.php");
-require_once("functions.php");
 require_once("Enzebe.php");
 
 // TODO: Move RemoveCrapReleases and possible others into here.
@@ -41,24 +40,28 @@ class ReleaseRemover
 
 	/**
 	 * The query we will use to select unwanted releases.
+	 *
 	 * @var string
 	 */
 	protected $query;
 
 	/**
 	 * LIKE is case sensitive in PgSQL, get the insensitive one for it.
+	 *
 	 * @var string
 	 */
 	protected $like;
 
 	/**
 	 * If an error occurred, store it here.
+	 *
 	 * @var string
 	 */
 	protected $error;
 
 	/**
 	 * Time we started.
+	 *
 	 * @var int
 	 */
 	protected $timeStart;
@@ -72,12 +75,14 @@ class ReleaseRemover
 
 	/**
 	 * Ignore user check?
+	 *
 	 * @var bool
 	 */
 	protected $ignoreUserCheck;
 
 	/**
 	 * Is is run from the browser?
+	 *
 	 * @var bool
 	 */
 	protected $browser;
@@ -139,7 +144,6 @@ class ReleaseRemover
 		$this->color = new ColorCLI();
 		$this->consoleTools = new ConsoleTools();
 		$this->releases = new Releases();
-		$this->functions = new Functions();
 		$this->nzb = new Enzebe();
 		$this->releaseImage = new ReleaseImage();
 

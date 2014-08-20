@@ -160,6 +160,45 @@ class DB
 			)
 		);
 	}
+
+	/**
+	 * PHP interpretation of MySQL's from_unixtime method.
+	 *
+	 * @param int $utime UnixTime
+	 *
+	 * @return bool|string
+	 */
+	public function from_unixtime($utime)
+	{
+		return 'FROM_UNIXTIME(' . $utime . ')';
+	}
+
+	/**
+	 * PHP interpretation of mysql's unix_timestamp method.
+	 *
+	 * @param string $date
+	 *
+	 * @return int
+	 */
+	public function unix_timestamp($date)
+	{
+		return strtotime($date);
+	}
+
+	/**
+	 * Get a string for MySQL with a column name in between
+	 * ie: UNIX_TIMESTAMP(column_name) AS outputName
+	 *
+	 * @param string $column     The datetime column.
+	 * @param string $outputName The name to store the SQL data into. (the word after AS)
+	 *
+	 * @return string
+	 */
+	public function unix_timestamp_column($column, $outputName = 'unix_time')
+	{
+		return ('UNIX_TIMESTAMP(' . $column . ') AS ' . $outputName);
+	}
+
 	/**
 	 * Reconnect to MySQL when the connection has been lost.
 	 *

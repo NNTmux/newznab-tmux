@@ -29,7 +29,6 @@ require_once("TraktTv.php");
 require_once("Film.php");
 require_once("TvAnger.php");
 require_once("Konsole.php");
-require_once("functions.php");
 require_once("ProcessAdditional.php");
 
 /**
@@ -106,7 +105,6 @@ class PProcess
 		$this->namefixer = new NameFixer($this->echooutput);
 		$this->Nfo = new Info($this->echooutput);
 		$this->releaseFiles = new ReleaseFiles();
-		$this->functions = new Functions(true);
 
 		//\\ Site object.
 		$this->tmux = $t->get();
