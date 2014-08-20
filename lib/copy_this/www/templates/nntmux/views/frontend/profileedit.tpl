@@ -228,5 +228,25 @@
 			</tr>
 		</table>
 	</fieldset>
+	<fieldset class="notop">
+		<legend>CouchPotato Integration</legend>
+		<table class="input">
+			<tr>
+				<td style="width:180px;"><label for="cp_api">CouchPotato API key:</label></td>
+				<td>
+					<input id="cp_api" class="long" name="cp_api" type="text" value="{$cp_api_selected}" />
+					<div class="hint">The CouchPotato api key. Used for 'Add To CouchPotato'.</div>
+				</td>
+			</tr>
+
+			<tr>
+				<td style="width:180px;"><label for="cp_url">CouchPotato Url:</label></td>
+				<td>
+					<input id="cp_url" class="long" name="cp_url" type="text" value="{$cp_url_selected}" />
+					<div class="hint">The CouchPotato url. Used for 'Add To CouchPotato', for example: http://192.168.10.10:5050</div>
+				</td>
+			</tr>
+		</table>
+	</fieldset>
 	<input type="submit" value="Save Profile"/>
 </form>
