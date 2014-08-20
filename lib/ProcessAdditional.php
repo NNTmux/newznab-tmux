@@ -853,7 +853,7 @@ Class ProcessAdditional
 						$this->_passwordStatus = array(Releases::PASSWD_POTENTIAL);
 					} //Run a PreDB filename check on insert to try and match the release
 					else if (strpos($file['name'], '.') != 0 && strlen($file['name']) > 0) {
-						$this->_release['filename'] = $this->_functions->cutStringUsingLast('.', $file['name'], 'left', false);
+						$this->_release['filename'] = $this->_util->cutStringUsingLast('.', $file['name'], 'left', false);
 						$this->_release['releaseID'] = $this->_release['ID'];
 						$this->_nameFixer->matchPredbFiles($this->_release, 1, 1, true, 1, 'full');
 					}
@@ -1386,11 +1386,11 @@ Class ProcessAdditional
 			if ($retVal === false) {
 
 				//  Get the media info for the file.
-				$xmlArray = $this->_functions->runCmd('"' . $this->_siteSettings->mediainfopath . '" --Output=XML "' . $fileLocation . '"');
+				$xmlArray = $this->_util > runCmd('"' . $this->_siteSettings->mediainfopath . '" --Output=XML "' . $fileLocation . '"');
 				if (is_array($xmlArray)) {
 
 					// Convert to array.
-					$arrXml = $this->_functions->objectsIntoArray(@simplexml_load_string(implode("\n", $xmlArray)));
+					$arrXml = $this->_util->objectsIntoArray(@simplexml_load_string(implode("\n", $xmlArray)));
 
 					if (isset($arrXml['File']['track'])) {
 
@@ -1465,8 +1465,8 @@ Class ProcessAdditional
 				$audioFileName = ($this->_release['guid'] . '.ogg');
 
 				// Create an audio sample.
-				$this->_functions->runCmd(
-					'"' .
+				$this->_util->runCmd(
+				'"' .
 					$this->_siteSettings->ffmpegpath .
 					'" -t 30 -i "' .
 					$fileLocation .
@@ -1583,8 +1583,8 @@ Class ProcessAdditional
 			$fileName = ($this->tmpPath . 'zzzz' . mt_rand(5, 12) . mt_rand(5, 12) . '.jpg');
 
 			// Create the image.
-			$this->_functions->runCmd(
-				'"' .
+			$this->_util->runCmd(
+			'"' .
 				$this->_siteSettings->ffmpegpath .
 				'" -i "' .
 				$fileLocation .
@@ -1657,8 +1657,8 @@ Class ProcessAdditional
 				// If we don't get the time create the sample the old way (gets the start of the video).
 				$numbers = array();
 				if (!preg_match('/^\d{2}:\d{2}:(\d{2}).(\d{2})$/', $time, $numbers)) {
-					$this->_functions->runCmd(
-						'"' .
+					$this->_util->runCmd(
+					'"' .
 						$this->_siteSettings->ffmpegpath .
 						'" -i "' .
 						$fileLocation .
@@ -1698,8 +1698,8 @@ Class ProcessAdditional
 					}
 
 					// Try to get the sample (from the end instead of the start).
-					$this->_functions->runCmd(
-						'"' .
+					$this->_util->runCmd(
+					'"' .
 						$this->_siteSettings->ffmpegpath .
 						'" -i "' .
 						$fileLocation .
@@ -1713,8 +1713,8 @@ Class ProcessAdditional
 				}
 			} else {
 				// If longer than 60, then run the old way.
-				$this->_functions->runCmd(
-					'"' .
+				$this->_util->runCmd(
+				'"' .
 					$this->_siteSettings->ffmpegpath .
 					'" -i "' .
 					$fileLocation .
@@ -1789,7 +1789,7 @@ Class ProcessAdditional
 		if (is_file($fileLocation)) {
 
 			// Run media info on it.
-			$xmlArray = $this->_functions->runCmd('"' . $this->_siteSettings->mediainfopath . '" --Output=XML "' . $fileLocation . '"');
+			$xmlArray = $this->_util->runCmd('"' . $this->_siteSettings->mediainfopath . '" --Output=XML "' . $fileLocation . '"');
 
 			// Check if we got it.
 			if (is_array($xmlArray)) {
