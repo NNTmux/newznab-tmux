@@ -1386,7 +1386,7 @@ Class ProcessAdditional
 			if ($retVal === false) {
 
 				//  Get the media info for the file.
-				$xmlArray = $this->_util > runCmd('"' . $this->_siteSettings->mediainfopath . '" --Output=XML "' . $fileLocation . '"');
+				$xmlArray = $this->_util->runCmd('"' . $this->_siteSettings->mediainfopath . '" --Output=XML "' . $fileLocation . '"');
 				if (is_array($xmlArray)) {
 
 					// Convert to array.
