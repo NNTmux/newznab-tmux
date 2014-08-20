@@ -1,5 +1,5 @@
 <?php
-require_once(WWW_DIR . '/../misc/update_scripts/nix_scripts/tmux/lib/functions.php');
+require_once(WWW_DIR . "/lib/util.php");
 
 /**
  * Class SABnzbd
@@ -92,7 +92,7 @@ class SABnzbd
 		$this->uid = $page->userdata['ID'];
 		$this->rsstoken = $page->userdata['rsstoken'];
 		$this->serverurl = $page->serverurl;
-		$this->functions = new Functions();
+		$this->util = new Utility();
 
 		// Set up properties.
 		switch ($page->site->sabintegrationtype) {
@@ -150,8 +150,8 @@ class SABnzbd
 	 */
 	public function sendToSab($guid)
 	{
-		return $this->functions->getUrl(
-			$this->url .
+		return $this->util->getUrl(
+		$this->url .
 			'api?mode=addurl&priority=' .
 			$this->priority .
 			'&apikey=' .
@@ -176,8 +176,8 @@ class SABnzbd
 	 */
 	public function getQueue()
 	{
-		return $this->functions->getUrl(
-			$this->url .
+		return $this->util->getUrl(
+		$this->url .
 			"api?mode=qstatus&output=json&apikey=" .
 			$this->apikey
 		);
@@ -190,8 +190,8 @@ class SABnzbd
 	 */
 	public function getAdvQueue()
 	{
-		return $this->functions->getUrl(
-			$this->url .
+		return $this->util->getUrl(
+		$this->url .
 			"api?mode=queue&start=START&limit=LIMIT&output=json&apikey=" .
 			$this->apikey
 		);
@@ -206,8 +206,8 @@ class SABnzbd
 	 */
 	public function delFromQueue($id)
 	{
-		return $this->functions->getUrl(
-			$this->url .
+		return $this->util->getUrl(
+		$this->url .
 			"api?mode=queue&name=delete&value=" .
 			$id .
 			"&apikey=" .
@@ -224,8 +224,8 @@ class SABnzbd
 	 */
 	public function pauseFromQueue($id)
 	{
-		return $this->functions->getUrl(
-			$this->url .
+		return $this->util->getUrl(
+		$this->url .
 			"api?mode=queue&name=pause&value=" .
 			$id .
 			"&apikey=" .
@@ -242,8 +242,8 @@ class SABnzbd
 	 */
 	public function resumeFromQueue($id)
 	{
-		return $this->functions->getUrl(
-			$this->url .
+		return $this->util->getUrl(
+		$this->url .
 			"api?mode=queue&name=resume&value=" .
 			$id .
 			"&apikey=" .
@@ -258,8 +258,8 @@ class SABnzbd
 	 */
 	public function pauseAll()
 	{
-		return $this->functions->getUrl(
-			$this->url .
+		return $this->util->getUrl(
+		$this->url .
 			"api?mode=pause" .
 			"&apikey=" .
 			$this->apikey
@@ -273,8 +273,8 @@ class SABnzbd
 	 */
 	public function resumeAll()
 	{
-		return $this->functions->getUrl(
-			$this->url .
+		return $this->util->getUrl(
+		$this->url .
 			"api?mode=resume" .
 			"&apikey=" .
 			$this->apikey

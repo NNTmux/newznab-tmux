@@ -202,9 +202,9 @@ class Utility
 		// Return the string.
 		return ($string === '' ? false : $string);
 	}
-}
 
-/**
+
+	/**
  * Get human readable size string from bytes.
  *
  * @param int $bytes     Bytes number to convert.
@@ -872,4 +872,6 @@ function responseXmlToObject($input)
 	$input = str_replace('<newznab:', '<', $input);
 	$xml = @simplexml_load_string($input);
 	return $xml;
+}
+
 }
