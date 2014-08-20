@@ -753,7 +753,7 @@ function objectsIntoArray ($arrObjData, $arrSkipIndices = [])
 		foreach ($arrObjData as $index => $value) {
 			// Recursive call.
 			if (is_object($value) || is_array($value)) {
-				$value = objectsIntoArray($value, $arrSkipIndices);
+				$value = self::objectsIntoArray($value, $arrSkipIndices);
 			}
 			if (in_array($index, $arrSkipIndices)) {
 				continue;
