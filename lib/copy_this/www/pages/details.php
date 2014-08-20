@@ -97,8 +97,7 @@ if (isset($_GET["id"]))
 				'https://www.youtube.com/v/' . $youtubeM[1] .
 				'" type="application/x-shockwave-flash"></embed>';
 		} else {
-			$util = new Utility();
-			$mov['trailer'] = $util->imdb_trailers($data['imdbID']);
+			$mov['trailer'] = Utility::imdb_trailers($data['imdbID']);
 		}
 
 		if ($mov && isset($mov['title'])) {

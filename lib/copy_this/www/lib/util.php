@@ -718,13 +718,13 @@ function getUrl ($url, $method = 'get', $postdata = '', $language = "", $debug =
 /**
  * Fetches an embeddable video to a IMDB trailer from http://www.traileraddict.com
  *
- * @param $id
+ * @param $imdbID
  *
  * @return string
  */
-function imdb_trailers ($id)
+function imdb_trailers($imdbID)
 {
-	$xml = getUrl('http://api.traileraddict.com/?imdb=' . $id);
+	$xml = getUrl('http://api.traileraddict.com/?imdb=' . $imdbID);
 	if ($xml !== false) {
 		if (preg_match('/(<iframe.+?<\/iframe>)/i', $xml, $html)) {
 			return $html[1];
