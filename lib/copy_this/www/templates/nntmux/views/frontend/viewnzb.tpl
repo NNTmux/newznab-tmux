@@ -91,38 +91,36 @@
 	<tr>
 		<th>Movie Info:</th>
 		<td>
-			<strong>{$movie.title|escape:"htmlall"} ({$movie.year}) {if $movie.rating == ''}N/A{/if}{$movie.rating}
-				/10</strong>
-			{if $movie.tagline != ''}<br/>{$movie.tagline|escape:"htmlall"}{/if}
-			{if $movie.plot != ''}{if $movie.tagline != ''} - {else}<br/>{/if}{$movie.plot|escape:"htmlall"}{/if}
+			<strong>{$movie.title|stripslashes|escape:"htmlall"} ({$movie.year}
+				) {if $movie.rating !== ''}{$movie.rating}/10{/if}</strong>
+			{if $movie.tagline != ''}<br/>{$movie.tagline|stripslashes|escape:"htmlall"}{/if}
+			{if $movie.plot != ''}{if $movie.tagline != ''} - {else}
+				<br/>
+			{/if}{$movie.plot|stripslashes|escape:"htmlall"}{/if}
 			<br/><br/>{if $movie.director != ""} <strong>Director:</strong> {$movie.director}<br/>{/if}
 			<strong>Genre:</strong> {$movie.genre}
 			<br/><strong>Starring:</strong> {$movie.actors}
+			{if $movie.trailer != ''}
+				<br/>
+				<strong>Trailer:</strong>
+				<div>{$movie.trailer}</div>
+			{/if}
 			<div style="margin-top:10px;">
 				<a class="rndbtn" target="_blank"
 				   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$release.imdbID}/" title="View at IMDB">IMDB</a>
 				{if $movie.tmdbID != ''}<a class="rndbtn" target="_blank"
 										   href="{$site->dereferrer_link}http://www.themoviedb.org/movie/{$movie.tmdbID}"
 										   title="View at TMDb">TMDb</a>{/if}
-				<a class="rndbtn" href="{$smarty.const.WWW_TOP}/movies?imdb={$release.imdbID}"
-				   title="View all versions">Movie View</a>
+				<a
+						class="rndbtn sendtocouch" target="blackhole"
+						href="javascript:;"
+						rel="{$site->dereferrer_link}{$cpurl}/api/{$cpapi}/movie.add/?identifier=tt{$release.imdbID}&title={$movie.title}"
+						name="CP{$release.imdbID}" title="Add to CouchPotato">
+					CouchPotato
+				</a>
 			</div>
 		</td>
 	</tr>
-	{if $movie.trailer != ""}
-		<tr>
-			<th>Trailer:</th>
-			<td>
-				<object style="width:445px; height:280px;"
-						data="http{if $page->secure_connection}s{/if}://www.youtube.com/v/{$movie.trailer}?modestbranding=0&amp;rel=0&amp;showinfo=0&amp;autohide=1&amp;vq=hd720"
-						type="application/x-shockwave-flash">
-					<param name="src"
-						   value="http{if $page->secure_connection}s{/if}://www.youtube.com/v/{$movie.trailer}?modestbranding=0&amp;rel=0&amp;showinfo=0&amp;autohide=1&amp;vq=hd720"/>
-					<param name="allowFullScreen" value="true"/>
-				</object>
-			</td>
-		</tr>
-	{/if}
 {/if}
 
 {if $anidb && $release.anidbID > 0}
