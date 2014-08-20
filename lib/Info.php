@@ -333,13 +333,12 @@ class Info
 				$this->c->doEcho($this->c->header($outString . '.'));
 			}
 			$groups = new Groups();
-			$functions = new Functions();
 			$nzbContents = new NZBContents(array('echo' => $this->echo, 'nntp' => $nntp, 'nfo' => $this, 'db' => $this->db, 'pp' => new PProcess(true)));
 			$movie = new Film($this->echo);
 			$tvRage = new TvAnger($this->echo);
 
 			foreach ($res as $arr) {
-				$fetchedBinary = $nzbContents->getNFOfromNZB($arr['guid'], $arr['ID'], $arr['groupID'], $functions->getByNameByID($arr['groupID']));
+				$fetchedBinary = $nzbContents->getNFOfromNZB($arr['guid'], $arr['ID'], $arr['groupID'], $groups->getByNameByID($arr['groupID']));
 				if ($fetchedBinary !== false) {
 					// Insert nfo into database.
 					$cp = $nc = null;

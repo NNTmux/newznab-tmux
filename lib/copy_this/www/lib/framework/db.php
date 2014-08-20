@@ -523,36 +523,93 @@ class DB
 	}
 
 	/**
-	 * Optimize the database
+	 * Optimises/repairs tables on mysql.
 	 *
-	 * @param bool $force
+	 * @param bool   $admin     If we are on web, don't echo.
+	 * @param string $type      'full' | '' Force optimize of all tables.
+	 *                          'space'     Optimise tables with 5% or more free space.
+	 *                          'analyze'   Analyze tables to rebuild statistics.
+	 * @param bool   $local     Only analyze local tables. Good if running replication.
+	 * @param array  $tableList (optional) Names of tables to analyze.
 	 *
-	 * @return array
+	 * @return int Quantity optimized/analyzed
 	 */
-	public function optimise($force = false)
+	public function optimise($admin = false, $type = '', $local = false, $tableList = [])
 	{
-		$ret = array();
-		if ($force)
-			$alltables = $this->query("show table status");
-		else
-			$alltables = $this->query("show table status where Data_free != 0");
-
-		foreach ($alltables as $tablename) {
-			$ret[] = $tablename['Name'];
-			if (strtolower($tablename['Engine']) == "myisam")
-				$this->queryDirect("REPAIR TABLE `" . $tablename['Name'] . "` USE_FRM");
-
-			$this->queryDirect("OPTIMIZE TABLE `" . $tablename['Name'] . "`");
-			$this->queryDirect("ANALYZE TABLE `" . $tablename['Name'] . "`");
+		$tableAnd = '';
+		if (count($tableList)) {
+			foreach ($tableList as $tableName) {
+				$tableAnd .= ($this->escapeString($tableName) . ',');
+			}
+			$tableAnd = (' AND Name IN (' . rtrim($tableAnd, ',') . ')');
 		}
 
-		$nulltables = $this->query("select table_name from information_schema.TABLES where table_schema = '" . DB_NAME . "' and engine is null");
-		foreach ($nulltables as $tablename) {
-			$ret[] = $tablename['table_name'];
-			$this->queryDirect("REPAIR TABLE `" . $tablename['table_name'] . "` USE_FRM");
+		switch ($type) {
+			case 'space':
+				$tableArray = $this->queryDirect('SHOW TABLE STATUS WHERE Data_free / Data_length > 0.005' . $tableAnd);
+				$myIsamTables = $this->queryDirect("SHOW TABLE STATUS WHERE ENGINE LIKE 'myisam' AND Data_free / Data_length > 0.005" . $tableAnd);
+				break;
+			case 'analyze':
+			case '':
+			case 'full':
+			default:
+				$tableArray = $this->queryDirect('SHOW TABLE STATUS WHERE 1=1' . $tableAnd);
+				$myIsamTables = $this->queryDirect("SHOW TABLE STATUS WHERE ENGINE LIKE 'myisam'" . $tableAnd);
+				break;
 		}
 
-		return $ret;
+		$optimised = 0;
+		if ($tableArray instanceof \Traversable && $tableArray->rowCount()) {
+
+			$tableNames = '';
+			foreach ($tableArray as $table) {
+				$tableNames .= $table['name'] . ',';
+			}
+			$tableNames = rtrim($tableNames, ',');
+
+			$local = ($local ? 'LOCAL' : '');
+			if ($type === 'analyze') {
+				$this->queryExec(sprintf('ANALYZE %s TABLE %s', $local, $tableNames));
+				$this->logOptimize($admin, 'ANALYZE', $tableNames);
+			} else {
+
+				$this->queryExec(sprintf('OPTIMIZE %s TABLE %s', $local, $tableNames));
+				$this->logOptimize($admin, 'OPTIMIZE', $tableNames);
+
+				if ($myIsamTables instanceof \Traversable && $myIsamTables->rowCount()) {
+					$tableNames = '';
+					foreach ($myIsamTables as $table) {
+						$tableNames .= $table['name'] . ',';
+					}
+					$tableNames = rtrim($tableNames, ',');
+					$this->queryExec(sprintf('REPAIR %s TABLE %s', $local, $tableNames));
+					$this->logOptimize($admin, 'REPAIR', $tableNames);
+				}
+				$this->queryExec(sprintf('FLUSH %s TABLES', $local));
+			}
+			$optimised = $tableArray->rowCount();
+		}
+
+		return $optimised;
+	}
+
+	/**
+	 * Log/echo repaired/optimized/analyzed tables.
+	 *
+	 * @param bool   $web    If we are on web, don't echo.
+	 * @param string $type   ANALYZE|OPTIMIZE|REPAIR
+	 * @param string $tables Table names.
+	 *
+	 * @access private
+	 * @void
+	 */
+	private function logOptimize($web, $type, $tables)
+	{
+		$message = $type . ' (' . $tables . ')';
+		if ($web === false) {
+			echo $this->log->primary($message);
+
+		}
 	}
 
 	/**

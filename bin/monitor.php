@@ -8,10 +8,9 @@ require_once(dirname(__FILE__) . "/../lib/showsleep.php");
 require_once(dirname(__FILE__) . "/../lib/functions.php");
 
 
-$version = "0.4r2030";
+$version = "0.4r2035";
 
 $db = new DB();
-$functions = new Functions();
 $s = new Sites();
 $site = $s->get();
 $patch = $site->dbversion;
@@ -460,7 +459,7 @@ $mask5 = $c->tmuxOrange("%-16.16s %25.25s %25.25s");
 
 // Ananlyze tables
 printf($c->info("\nAnalyzing your tables to refresh your indexes."));
-$functions->optimise(true, 'analyze');
+$db->optimise(false, 'analyze', false, ['releases']);
 
 sleep(5);
 

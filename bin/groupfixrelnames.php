@@ -1,6 +1,6 @@
 <?php
-require_once(dirname(__FILE__) . "/config.php");
 require_once(WWW_DIR . "/lib/framework/db.php");
+require_once(WWW_DIR . "/lib/util.php");
 require_once(dirname(__FILE__) . '/../lib/ColorCLI.php');
 require_once(dirname(__FILE__) . '/../lib/namefixer.php');
 require_once(dirname(__FILE__) . '/../lib/functions.php');
@@ -14,7 +14,7 @@ if (!isset($argv[1])) {
 } else if (isset($argv[1])) {
 	$pdo = new DB();
 	$namefixer = new NameFixer(true);
-	$functions = new Functions();
+	$util = new Utility();
 	$pieces = explode(' ', $argv[1]);
 	$guidChar = $pieces[1];
 	$maxperrun = $pieces[2];
@@ -35,7 +35,7 @@ if (!isset($argv[1])) {
 								AND r.prehashID = 0
 								ORDER BY r.postdate DESC
 								LIMIT %s',
-					$functions->likeString($guidChar, false, true),
+					$util->likeString($guidChar, false, true),
 					$maxperrun
 				)
 			);
@@ -68,7 +68,7 @@ if (!isset($argv[1])) {
 								AND r.prehashID = 0
 								ORDER BY r.postdate ASC
 								LIMIT %s',
-					$functions->likeString($guidChar, false, true),
+					$util->likeString($guidChar, false, true),
 					$maxperrun
 				)
 			);
@@ -95,7 +95,7 @@ if (!isset($argv[1])) {
 								AND r.prehashID = 0
 								ORDER BY r.dehashstatus DESC, r.postdate ASC
 								LIMIT %s',
-					$functions->likeString($guidChar, false, true),
+					$util->likeString($guidChar, false, true),
 					$maxperrun
 				)
 			);
@@ -123,7 +123,7 @@ if (!isset($argv[1])) {
 								AND r.prehashID = 0
 								ORDER BY r.postdate ASC
 								LIMIT %s',
-					$functions->likeString($guidChar, false, true),
+					$util->likeString($guidChar, false, true),
 					$maxperrun
 				)
 			);
