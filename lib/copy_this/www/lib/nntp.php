@@ -5,9 +5,9 @@
 require_once(WWW_DIR . "/lib/Net_NNTP/NNTP/Client.php");
 require_once(WWW_DIR . "/lib/Tmux.php");
 require_once(WWW_DIR . "/lib/site.php");
+require_once(WWW_DIR . "/lib/util.php");
 require_once(WWW_DIR . "/lib/binaries.php");
 require_once(WWW_DIR . "../misc/update_scripts/nix_scripts/tmux/lib/ColorCLI.php");
-require_once(WWW_DIR . "../misc/update_scripts/nix_scripts/tmux/lib/functions.php");
 
 /**
  * Class for connecting to the usenet, retrieving articles and article headers,
@@ -100,7 +100,7 @@ class NNTP extends Net_NNTP_Client
 		$this->_site = $sites->get();
 		$tmux = new Tmux();
 		$this->_tmux = $tmux->get();
-		$this->_functions = new Functions();
+		$this->_util = new Utility();
 
 		$this->_echo = $echo;
 
@@ -937,8 +937,8 @@ class NNTP extends Net_NNTP_Client
 				$ouFile = $this->_yEncTempOutput . mt_rand(0, 999999);
 				file_put_contents($inFile, $input[1]);
 				file_put_contents($ouFile, '');
-				$this->_functions->runCmd(
-					"'" .
+				$this->_util->runCmd(
+				"'" .
 					$this->_yyDecoderPath .
 					"' '" .
 					$inFile .
@@ -1017,7 +1017,7 @@ class NNTP extends Net_NNTP_Client
 			}
 		} else if ($this->_yyDecoderPath !== false) {
 
-			$this->_yEncSilence = ($this->_functions->isWindows() ? '' : ' > /dev/null 2>&1');
+			$this->_yEncSilence = ($this->_util->isWindows() ? '' : ' > /dev/null 2>&1');
 			$this->_yEncTempInput = $this->_site->unrarpath . 'yEnc' . '/';
 			$this->_yEncTempOutput = $this->_yEncTempInput . 'output';
 			$this->_yEncTempInput .= 'input';
