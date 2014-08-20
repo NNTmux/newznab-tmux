@@ -8,7 +8,7 @@ require_once(dirname(__FILE__) . "/../lib/showsleep.php");
 require_once(dirname(__FILE__) . "/../lib/functions.php");
 
 
-$version = "0.4r2025";
+$version = "0.4r2030";
 
 $db = new DB();
 $functions = new Functions();
@@ -48,11 +48,11 @@ $proc = "SELECT
 ( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE categoryID BETWEEN 1000 AND 1999 AND consoleinfoID IS NULL ) AS console,
 ( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE categoryID BETWEEN 2000 AND 2999 AND imdbID IS NULL ) AS movies,
 ( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE categoryID BETWEEN 3000 AND 3999 AND musicinfoID IS NULL) AS audio,
-( SELECT COUNT(*) FROM releases r USE INDEX(ix_releases_status), category c WHERE c.ID = r.categoryID AND c.parentID = 6000 AND r.passwordstatus = -1 AND r.haspreview = -1 AND c.disablepreview = 0) AS xxx,
-( SELECT COUNT(*) FROM releases r INNER JOIN category c ON c.ID = r.categoryID WHERE r.nzbstatus = 1 AND ((r.categoryID BETWEEN 4000 AND 4999 AND r.passwordstatus BETWEEN -6 AND -1 AND r.haspreview = -1 AND c.disablepreview = 0) OR (r.categoryID = 4050 AND r.gamesinfo_id IS NULL))) AS pc,
+( SELECT COUNT(*) FROM releases r USE INDEX(ix_releases_status), category c WHERE c.ID = r.categoryID AND c.parentID = 6000 AND ((r.passwordstatus = -1 AND r.haspreview = -1 AND c.disablepreview = 0) OR (categoryID BETWEEN 6000 AND 6040 AND xxxinfo_id = 0))) AS xxx,
+( SELECT COUNT(*) FROM releases r INNER JOIN category c ON c.ID = r.categoryID WHERE r.nzbstatus = 1 AND ((r.categoryID BETWEEN 4000 AND 4999 AND r.passwordstatus BETWEEN -6 AND -1 AND r.haspreview = -1 AND c.disablepreview = 0) OR (r.categoryID = 4050 AND r.gamesinfo_id = 0))) AS pc,
 ( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE categoryID BETWEEN 5000 AND 5999 AND rageID = -1) AS tv,
 ( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE categoryID = 7020 AND bookinfoID IS NULL ) AS book,
-( SELECT COUNT(*) FROM releases r INNER JOIN category c ON c.ID = r.categoryID WHERE r.nzbstatus = 1 AND ((r.passwordstatus BETWEEN -6 AND -1 AND r.haspreview = -1 AND c.disablepreview = 0) OR (r.categoryID = 4050 AND r.gamesinfo_id IS NULL))) AS work,
+( SELECT COUNT(*) FROM releases r INNER JOIN category c ON c.ID = r.categoryID WHERE r.nzbstatus = 1 AND ((r.passwordstatus BETWEEN -6 AND -1 AND r.haspreview = -1 AND c.disablepreview = 0) OR (r.categoryID = 4050 AND r.gamesinfo_id IS NULL) OR (categoryID BETWEEN 6000 AND 6040 AND xxxinfo_id = 0))) AS work,
 ( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status)) AS releases,
 ( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE releasenfoID = 0 AND nfostatus BETWEEN -6 AND -1) AS nforemains,
 ( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE nfostatus = 1 OR releasenfoID > 0) AS nfo,
