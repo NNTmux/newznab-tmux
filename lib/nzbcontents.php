@@ -8,7 +8,6 @@ require_once(WWW_DIR . "/lib/util.php");
 require_once("ColorCLI.php");
 require_once("Info.php");
 require_once("Pprocess.php");
-require_once("Enzebe.php");
 
 /**
  * Gets information contained within the NZB.
@@ -42,7 +41,7 @@ Class NZBContents
 	protected $pp;
 
 	/**
-	 * @var Enzebe
+	 * @var NZB
 	 * @access protected
 	 */
 	protected $nzb;
@@ -98,7 +97,7 @@ Class NZBContents
 		$this->nfo = ($options['Nfo'] instanceof Info ? $options['Nfo'] : new Info());
 		$this->pp = (
 		$options['PostProcess'] instanceof PProcess ? $options['PostProcess'] : new PProcess());
-		$this->nzb = ($options['NZB'] instanceof Enzebe ? $options['NZB'] : new Enzebe());
+		$this->nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB());
 		$t = new Tmux();
 		$this->tmux = $t->get();
 		$this->lookuppar2 = ($this->tmux->lookuppar2 == 1 ? true : false);
@@ -279,7 +278,7 @@ Class NZBContents
 	public function LoadNZB(&$guid)
 	{
 		// Fetch the NZB location using the GUID.
-		$nzbPath = $this->nzb->NZBPath($guid);
+		$nzbPath = $this->nzb->getNZBPath($guid);
 		if ($nzbPath === false) {
 			if ($this->echooutput) {
 				echo PHP_EOL . $guid . ' appears to be missing the nzb file, skipping.' . PHP_EOL;

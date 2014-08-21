@@ -129,12 +129,12 @@ if (!isset($argv[1])) {
 				)
 			);
 			if ($releases !== false) {
-				$nntp = new NNTP(['Settings' => $pdo, 'ColorCLI' => $c]);
+				$nntp = new NNTP();
 				$Nfo = new Info();
 				$nzbcontents = new NZBContents(
 					array(
 						'Echo'        => true, 'NNTP' => $nntp, 'Nfo' => $Nfo, 'Settings' => $pdo,
-						'PostProcess' => new PProcess(['Settings' => $pdo, 'Nfo' => $Nfo, 'NameFixer' => $namefixer])
+						'PostProcess' => new PProcess()
 					)
 				);
 				foreach ($releases as $release) {
