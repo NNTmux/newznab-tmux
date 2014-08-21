@@ -10,6 +10,12 @@
 															src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbID}-cover.jpg"
 															width="180" alt="{$movie.title|escape:"htmlall"}"
 															style="float:right;" />{/if}
+{if $xxx && $xxx.cover == 1}<img class="shadow img-thumbnail" style="vertical-align:top"
+								 src="{$smarty.const.WWW_TOP}/covers/xxx/{$xxx.id}-cover.jpg"
+								 alt="{$xxx.title|escape:"htmlall"}">{/if}
+{if $game && $game.cover == 1}<img class="shadow img-thumbnail" style="vertical-align:top"
+								   src="{$smarty.const.WWW_TOP}/covers/games/{$game.id}.jpg"
+								   alt="{$game.title|escape:"htmlall"}">{/if}
 {if $anidb && $release.anidbID > 0 && $anidb.picture != ""}<img class="shadow"
 																src="{$smarty.const.WWW_TOP}/covers/anime/{$anidb.anidbID}.jpg"
 																width="180" alt="{$anidb.title|escape:"htmlall"}"
