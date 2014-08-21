@@ -71,8 +71,6 @@ switch ($action) {
 					(isset($_POST['xxxview']) ? "1" : "0"),
 					(isset($_POST['consoleview']) ? "1" : "0"),
 					(isset($_POST['bookview']) ? "1" : "0"),
-					$_POST['cp_url'],
-					$_POST['cp_api'],
 					$_POST['queuetypeids'],
 					(isset($_POST['nzbgeturl']) ? $_POST['nzbgeturl'] : ''),
 					(isset($_POST['nzbgetusername']) ? $_POST['nzbgetusername'] : ''),
@@ -82,7 +80,9 @@ switch ($action) {
 					(isset($_POST['sabpriority']) ? $_POST['sabpriority'] : ''),
 					(isset($_POST['sabapikeytype']) ? $_POST['sabapikeytype'] : ''),
 					(isset($_POST['nzbvortex_server_url']) ? $_POST['nzbvortex_server_url'] : false),
-					(isset($_POST['nzbvortex_api_key']) ? $_POST['nzbvortex_api_key'] : false)
+					(isset($_POST['nzbvortex_api_key']) ? $_POST['nzbvortex_api_key'] : false),
+					$_POST['cp_url'],
+					$_POST['cp_api']
 				);
 
 				$_POST['exccat'] = (!isset($_POST['exccat']) || !is_array($_POST['exccat'])) ? array() : $_POST['exccat'];
