@@ -228,7 +228,7 @@
 			</tr>
 		</table>
 	</fieldset>
-	<fieldset class="notop">
+	<fieldset>
 		<legend>CouchPotato Integration</legend>
 		<table class="input">
 			<tr>
