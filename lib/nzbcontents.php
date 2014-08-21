@@ -97,10 +97,7 @@ Class NZBContents
 		$this->nntp = ($options['NNTP'] instanceof NNTP ? $options['NNTP'] : new NNTP());
 		$this->nfo = ($options['Nfo'] instanceof Info ? $options['Nfo'] : new Info());
 		$this->pp = (
-		$options['PostProcess'] instanceof PProcess
-			? $options['PostProcess']
-			: new PProcess()
-		);
+		$options['PostProcess'] instanceof PProcess ? $options['PostProcess'] : new PProcess());
 		$this->nzb = ($options['NZB'] instanceof Enzebe ? $options['NZB'] : new Enzebe());
 		$t = new Tmux();
 		$this->tmux = $t->get();
