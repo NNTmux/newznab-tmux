@@ -79,13 +79,13 @@
 			<div class="movcover">
 				<a
 						target="_blank"
-						href="{$smarty.const.WWW_TOP}/xxx/?id={$result.id}"
+						href="{$smarty.const.WWW_TOP}/xxx/?ID={$result.id}"
 						name="name{$result.id}"
 						title="View XXX info"
 						class="modal_xxx thumbnail" rel="viewxxx"
 						><img
 							class="shadow" style="margin: 3px 0;"
-							src="{$smarty.const.WWW_TOP}/covers/xxx/{if $result.cover == 1}{$result.ID}-cover.jpg{else}no-cover.jpg{/if}"
+							src="{$smarty.const.WWW_TOP}/covers/xxx/{if $result.cover == 1}{$result.id}-cover.jpg{else}no-cover.jpg{/if}"
 							width="160" border="0" alt="{$result.title|escape:"htmlall"}"
 							></a>
 
