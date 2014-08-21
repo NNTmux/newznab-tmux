@@ -162,7 +162,7 @@ class Users
 		return $db->queryInsert($sql);
 	}
 
-	public function update($id, $uname, $email, $grabs, $role, $notes, $invites, $movieview, $musicview, $gameview, $xxxview, $consoleview, $bookview, $queueType = '', $nzbgetURL = '', $nzbgetUsername = '', $nzbgetPassword = '', $saburl = '', $sabapikey = '', $sabpriority = '', $sabapikeytype = '', $nzbvortexApiKey = false, $cp_url = false, $cp_api = false)
+	public function update($id, $uname, $email, $grabs, $role, $notes, $invites, $movieview, $musicview, $gameview, $xxxview, $consoleview, $bookview, $queueType = '', $nzbgetURL = '', $nzbgetUsername = '', $nzbgetPassword = '', $saburl = '', $sabapikey = '', $sabpriority = '', $sabapikeytype = '', $nzbvortexServerUrl, $nzbvortexApiKey = false, $cp_url = false, $cp_api = false)
 	{
 		$db = new DB();
 
@@ -223,7 +223,9 @@ class Users
 		if ($sabapikeytype !== '') {
 			$sql[] = sprintf('sabapikeytype = %d', $sabapikeytype);
 		}
-
+		if ($nzbvortexServerUrl !== false) {
+			$sql[] = sprintf("nzbvortex_server_url = '%s'", $nzbvortexServerUrl);
+		}
 		if ($nzbvortexApiKey !== false) {
 			$sql[] = sprintf("nzbvortex_api_key = '%s'", $nzbvortexApiKey);
 		}
