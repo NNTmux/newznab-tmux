@@ -99,13 +99,21 @@
 			{foreach from=$results item=result}
 				<tr class="{cycle values=",alt"}">
 					<td class="mid">
-						<div class="movcover">
-							<a class="title" title="View details"
-							   href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"htmlall"}">
-								<img class="shadow"
-									 src="{$smarty.const.WWW_TOP}/covers/games/{if $result.cover == 1}{$result.gamesinfo_id}.jpg{else}no-cover.jpg{/if}"
-									 width="120" border="0" alt="{$result.title|escape:"htmlall"}"/>
-							</a>
+						<div class="movcover" style="padding-bottom:5px;">
+							<a
+									class="title thumbnail"
+									title="View giantbomb page"
+									target="_blank"
+									href="{$site->dereferrer_link}{$result.url}"
+									width="130px"
+									height="180px"
+									><img
+										class="shadow"
+										src="{$smarty.const.WWW_TOP}/covers/games/{if $result.cover == 1}{$result.gamesinfo_id}.jpg{else}no-cover.jpg{/if}"
+										width="130px"
+										border="0"
+										alt="{$result.title|escape:"htmlall"}"
+										></a>
 
 							<div class="movextra">
 								{if $result.nfoid > 0}<a href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}"
