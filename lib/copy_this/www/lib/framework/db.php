@@ -541,7 +541,7 @@ class DB
 			foreach ($tableList as $tableName) {
 				$tableAnd .= ($this->escapeString($tableName) . ',');
 			}
-			$tableAnd = (' AND name IN (' . rtrim($tableAnd, ',') . ')');
+			$tableAnd = (' AND Name IN (' . rtrim($tableAnd, ',') . ')');
 		}
 
 		switch ($type) {
