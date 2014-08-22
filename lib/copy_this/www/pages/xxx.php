@@ -12,7 +12,7 @@ $cat = new Category();
 $moviecats = $cat->getChildren(Category::CAT_PARENT_XXX);
 $mtmp = array();
 foreach ($moviecats as $mcat) {
-	$mtmp[$mcat['id']] = $mcat;
+	$mtmp[$mcat['ID']] = $mcat;
 }
 $category = Category::CAT_PARENT_XXX;
 if (isset($_REQUEST['t']) && array_key_exists($_REQUEST['t'], $mtmp)) {
