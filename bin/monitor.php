@@ -8,7 +8,7 @@ require_once(dirname(__FILE__) . "/../lib/showsleep.php");
 require_once(dirname(__FILE__) . "/../lib/functions.php");
 
 
-$version = "0.4r2035";
+$version = "0.4r2036";
 
 $db = new DB();
 $s = new Sites();
@@ -1442,8 +1442,7 @@ while ($i > 0) {
 		} else if (($post == 2) && ($nfo_remaining_now > 0)) {
 			$log = writelog($panes0[1]);
 			shell_exec("tmux respawnp -t${tmux_session}:0.1 ' \
-						$_python ${DIR}/../python/postprocess_threaded.py nfo $log;\
-                        $_php ${DIR}/../bin/postprocess_new.php nfo $log; date +\"%D %T\"; $_sleep $post_timer' 2>&1 1> /dev/null"
+						$_python ${DIR}/../python/postprocess_threaded.py nfo $log; date +\"%D %T\"; $_sleep $post_timer' 2>&1 1> /dev/null"
 			);
 		} else if (($post == 3) && (($nfo_remaining_now > 0) || ($work_remaining_now + $pc_releases_proc + $xxx_releases_proc > 0))) {
 			//run postprocess_releases additional
@@ -1466,8 +1465,7 @@ while ($i > 0) {
 			$log = writelog($panes0[1]);
 			shell_exec("tmux respawnp -t${tmux_session}:0.1 ' \
 						$_python ${DIR}/../python/postprocess_threaded.py additional $log;\
-                        $_python ${DIR}/../python/postprocess_threaded.py nfo $log;\
-                        $_php ${DIR}/../bin/postprocess_new.php nfo $log; date +\"%D %T\"; $_sleep $post_timer' 2>&1 1> /dev/null"
+                        $_python ${DIR}/../python/postprocess_threaded.py nfo $log; date +\"%D %T\"; $_sleep $post_timer' 2>&1 1> /dev/null"
 			);
 		} else if (($post != 0) && ($nfo_remaining_now == 0) && ($work_remaining_now + $pc_releases_proc + $xxx_releases_proc == 0)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
