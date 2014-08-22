@@ -7,69 +7,44 @@
 	</div>
 	<br>
 {/if}
-<h1>Browse {$catname}</h1>
-<form name="browseby" action="xxx">
-	<table class="rndbtn" border="0" cellpadding="2" cellspacing="0">
-		<tr>
-			<th class="left"><label for="xxxtitle">Title</label></th>
-			<th class="left"><label for="xxxactors">Actor</label></th>
-			<th class="left"><label for="xxxdirector">Director</label></th>
-			<th class="left"><label for="genre">Genre</label></th>
-			<th class="left"><label for="category">Category</label></th>
-			<th></th>
-		</tr>
-		<tr>
-			<td><input id="xxxtitle" type="text" name="title" value="{$title}" size="15"/></td>
-			<td><input id="xxxactors" type="text" name="actors" value="{$actors}" size="15"/></td>
-			<td><input id="xxxdirector" type="text" name="director" value="{$director}" size="15"/></td>
-			<td>
-				<select id="genre" name="genre">
-					<option class="grouping" value=""></option>
-					{foreach from=$genres item=gen}
-						<option {if $gen==$genre}selected="selected"{/if} value="{$gen}">{$gen}</option>
-					{/foreach}
-				</select>
-			</td>
-			<td>
-				<select id="category" name="t">
-					<option class="grouping" value="6000"></option>
-					{foreach from=$catlist item=ct}
-						<option {if $ct.id==$category}selected="selected"{/if} value="{$ct.id}">{$ct.title}</option>
-					{/foreach}
-				</select>
-			</td>
-			<td><input type="submit" value="Go"/></td>
-		</tr>
-	</table>
-</form>
-<p></p>
+<div class="panel">
+	<div class="panel-heading">
+		<h4 class="panel-title">
+			<a
+					class="accordion-toggle"
+					data-toggle="collapse"
+					data-parent="#accordion"
+					href="#searchtoggle"
+					><i class="icon-search"></i> Search Filter</a>
+		</h4>
+	</div>
+	<div id="searchtoggle" class="panel-collapse collapse">
+		<div class="panel-body">
+			{include file='search-filter.tpl'}
+		</div>
+	</div>
+</div>
 {if $results|@count > 0}
 	<form id="nzb_multi_operations_form" action="get">
-
-	<div class="nzb_multi_operations">
-		View: <b>Covers</b> | <a href="{$smarty.const.WWW_TOP}/browse?t={$category}">List</a><br/>
-		<small>With Selected:</small>
-		<input type="button" class="nzb_multi_operations_download" value="Download NZBs"/>
-		<input type="button" class="nzb_multi_operations_cart" value="Add to Cart"/>
-		{if $sabintegrated}<input type="button" class="nzb_multi_operations_sab" value="Send to my Queue"/>{/if}
+	<div class="container nzb_multi_operations" style="text-align:right;margin-bottom:5px;">
+		View:
+		<span><i class="icon-th-list"></i></span>
+		&nbsp;&nbsp;
+		<a href="{$smarty.const.WWW_TOP}/browse?t={$category}"><i class="icon-align-justify"></i></a>
+		{if $isadmin || $ismod}
+			&nbsp;&nbsp;
+			Admin:
+			<button type="button" class="btn btn-warning nzb_multi_operations_edit">Edit</button>
+			<button type="button" class="btn btn-danger nzb_multi_operations_delete">Delete</button>
+		{/if}
 	</div>
-	<br/>
-
-	{$pager}
-
+	{include file='multi-operations.tpl'}
 	<table class="table table-striped table-condensed data" id="coverstable">
 	<thead>
 	<tr>
-		<th><input type="checkbox" class="nzb_check_all"></th>
+		<th>Select All:<input type="checkbox" class="nzb_check_all"></th>
 		<th>title<a title="Sort Descending" href="{$orderbytitle_desc}"><i class="icon-chevron-down icon-black"></i></a><a
-					title="Sort Ascending" href="{$orderbytitle_asc}"><i class="icon-chevron-up icon-black"></i></a>
-		</th>
-		<th>year<a title="Sort Descending" href="{$orderbyyear_desc}"><i class="icon-chevron-down icon-black"></i></a><a
-					title="Sort Ascending" href="{$orderbyyear_asc}"><i class="icon-chevron-up icon-black"></i></a></th>
-		<th>rating<a title="Sort Descending" href="{$orderbyrating_desc}"><i
-						class="icon-chevron-down icon-black"></i></a><a
-					title="Sort Ascending" href="{$orderbyrating_asc}"><i class="icon-chevron-up icon-black"></i></a>
-		</th>
+					title="Sort Ascending" href="{$orderbytitle_asc}"><i class="icon-chevron-up icon-black"></i></a></th>
 	</tr>
 	</thead>
 	<tbody>
@@ -79,7 +54,7 @@
 			<div class="movcover">
 				<a
 						target="_blank"
-						href="{$smarty.const.WWW_TOP}/xxx/?ID={$result.id}"
+						href="{$smarty.const.WWW_TOP}/xxx/?id={$result.id}"
 						name="name{$result.id}"
 						title="View XXX info"
 						class="modal_xxx thumbnail" rel="viewxxx"
@@ -88,7 +63,6 @@
 							src="{$smarty.const.WWW_TOP}/covers/xxx/{if $result.cover == 1}{$result.id}-cover.jpg{else}no-cover.jpg{/if}"
 							width="160" border="0" alt="{$result.title|escape:"htmlall"}"
 							></a>
-
 				<div class="relextra" style="margin-top:5px;">
 					{if $result.classused == "ade"}
 						<a
@@ -156,7 +130,7 @@
 			<h2>
 				<a
 						title="{$result.title|stripslashes|escape:"htmlall"}"
-						href="{$smarty.const.WWW_TOP}/xxx?id={$result.id}">{$result.title|stripslashes|escape:"htmlall"}
+						href="{$smarty.const.WWW_TOP}/xxx/?id={$result.id}">{$result.title|stripslashes|escape:"htmlall"}
 				</a>
 			</h2>
 			{if $result.tagline != ''}
@@ -184,7 +158,6 @@
 				<br>
 			{/if}
 			<br>
-
 			<div class="relextra">
 				<table class="table table-condensed table-hover data">
 					{assign var="msplits" value=","|explode:$result.grp_release_id}
@@ -211,7 +184,6 @@
 									<b>{$mname[$m@index]|escape:"htmlall"}</b>
 								</a>
 								<br>
-
 								<div class="resextra">
 									<div class="pull-left">
 										<i class="icon-calendar"></i> Posted {$mpostdate[$m@index]|timeago} |
@@ -228,8 +200,7 @@
 												href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}#comments">{$mcomments[$m@index]}
 											cmt{if $mcomments[$m@index] != 1}s{/if}
 										</a> |
-										<i class="icon-download"></i> {$mgrabs[$m@index]}
-										grab{if $mgrabs[$m@index] != 1}s{/if}
+										<i class="icon-download"></i> {$mgrabs[$m@index]} grab{if $mgrabs[$m@index] != 1}s{/if}
 									</div>
 									<div class="pull-right">
 										{if $mnfo[$m@index] > 0}
@@ -268,17 +239,11 @@
 															><i class="icon-share-alt"></i></a></span
 												>
 										{if $mpass[$m@index] == 1}
-											<span class="icon-stack" title="Potentially Passworded"><i
-														class="icon-check-empty icon-stack-base"></i><i
-														class="icon-unlock-alt"></i></span>
+											<span class="icon-stack" title="Potentially Passworded"><i class="icon-check-empty icon-stack-base"></i><i class="icon-unlock-alt"></i></span>
 										{elseif $mpass[$m@index] == 2}
-											<span class="icon-stack" title="Broken Post"><i
-														class="icon-check-empty icon-stack-base"></i><i
-														class="icon-unlink"></i></span>
+											<span class="icon-stack" title="Broken Post"><i class="icon-check-empty icon-stack-base"></i><i class="icon-unlink"></i></span>
 										{elseif $mpass[$m@index] == 10}
-											<span class="icon-stack" title="Passworded Archive"><i
-														class="icon-check-empty icon-stack-base"></i><i
-														class="icon-lock"></i></span>
+											<span class="icon-stack" title="Passworded Archive"><i class="icon-check-empty icon-stack-base"></i><i class="icon-lock"></i></span>
 										{/if}
 									</div>
 								</div>
@@ -317,17 +282,11 @@
 	{/foreach}
 	</tbody>
 	</table>
-	<br/>
-
-	{$pager}
-
-	<div class="nzb_multi_operations">
-		<small>With Selected:</small>
-		<input type="button" class="nzb_multi_operations_download" value="Download NZBs"/>
-		<input type="button" class="nzb_multi_operations_cart" value="Add to Cart"/>
-		{if $sabintegrated}<input type="button" class="nzb_multi_operations_sab" value="Send to my Queue"/>{/if}
-	</div>
-
+	{if $results|@count > 10}
+		<div class="nzb_multi_operations">
+			{include file='multi-operations.tpl'}
+		</div>
+	{/if}
 	</form>
 {else}
 	<div class="alert alert-link" style="vertical-align:middle;">
@@ -336,14 +295,11 @@
 			<h2 style="margin-top: 7px;"> ಠ_ಠ </h2>
 		</div>
 		<p>No movie releases have XXX covers.
-			<br>This might mean the Administrator's has file permission issues, or he has disabled looking up XXX
-			covers.
+			<br>This might mean the Administrator's has file permission issues, or he has disabled looking up XXX covers.
 			<br>This could also mean there are no movie releases.
 			<br>Please try looking in the
-			<a href="{$smarty.const.WWW_TOP}/browse?t={$category}"
+			<a href="{$smarty.const.WWW_TOP}/browse?t={$category}" style="text-decoration:underline;"
 					>list view</a>, which does not require XXX covers.
 		</p>
 	</div>
 {/if}
-
-<br/><br/><br/>
