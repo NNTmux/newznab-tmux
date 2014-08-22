@@ -56,8 +56,6 @@ class XXX
 	{
 		$this->db = new DB();
 		$this->releaseImage = new ReleaseImage();
-		$t = new Tmux();
-		$this->tmux = $t->get();
 		$s = new Sites();
 		$this->site = $s->get();
 		$this->c = new ColorCLI();
