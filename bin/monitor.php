@@ -1769,7 +1769,7 @@ while ($i > 0) {
 			case 'All':
 				$log = writelog($panes3[1]);
 				shell_exec("tmux respawnp -t${tmux_session}:3.1 ' \
-							$_php ${DIR}/../lib/removeCrapReleases_new.php true 4 $log; date +\"%D %T\"; $_sleep $crap_timer' 2>&1 1> /dev/null"
+							$_php ${DIR}/../lib/removeCrapReleases.php true 4 $log; date +\"%D %T\"; $_sleep $crap_timer' 2>&1 1> /dev/null"
 				);
 				break;
 			// The user has specified custom types.
@@ -1794,7 +1794,7 @@ while ($i > 0) {
 						// Run remove crap releases.
 						shell_exec("tmux respawnp -t${tmux_session}:3.1 ' \
 								echo \"Running removeCrapReleases for $fix_crap[$fcnum]\"; \
-								php ${DIR}/../lib/removeCrapReleases_new.php true $fctime $fix_crap[$fcnum] $log; date +\"%D %T\"; $_sleep $crap_timer' 2>&1 1> /dev/null"
+								php ${DIR}/../lib/removeCrapReleases.php true $fctime $fix_crap[$fcnum] $log; date +\"%D %T\"; $_sleep $crap_timer' 2>&1 1> /dev/null"
 						);
 
 						// Increment so we know which type to run next.

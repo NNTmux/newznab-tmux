@@ -1,9 +1,9 @@
 <?php
-require_once(dirname(__FILE__) . "/../bin/config.php");
+require_once(dirname(__FILE__) . "/../../bin/config.php");
 require_once(WWW_DIR . "/lib/framework/db.php");
 require_once(WWW_DIR . "/lib/category.php");
-require_once("ColorCLI.php");
-require_once("consoletools.php");
+require_once("../ColorCLI.php");
+require_once("../consoletools.php");
 
 
 $c = new ColorCLI();
@@ -92,7 +92,8 @@ function categorizeRelease($update = true, $where, $echooutput = false)
 								imdbID = NULL,
 								musicinfoID = NULL,
 								consoleinfoID = NULL,
-								gamesinfo_id = NULL,
+								gamesinfo_id = 0,
+								xxxinfo_id = 0,
 								bookinfoID = NULL,
 								anidbID = NULL,
 								categoryID = %d

@@ -1,8 +1,8 @@
 <?php
 //This script will update all records in the gamesinfo table
-require_once(dirname(__FILE__) . "/../bin/config.php");
+require_once(dirname(__FILE__) . "/../../bin/config.php");
 require_once(WWW_DIR . "/lib/Games.php");
-require_once("ColorCLI.php");
+require_once("../ColorCLI.php");
 
 
 $game = new Games(true);
@@ -10,7 +10,7 @@ $pdo = new DB();
 $c = new ColorCLI();
 
 $res = $pdo->query(
-	sprintf("SELECT searchname FROM releases WHERE gamesinfo_id IS NULL AND categoryID = 4050 ORDER BY ID DESC LIMIT 100")
+	sprintf("SELECT searchname FROM releases WHERE gamesinfo_id = 0 AND categoryID = 4050 ORDER BY ID DESC LIMIT 100")
 );
 $total = count($res);
 if ($total > 0) {
