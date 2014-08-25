@@ -205,6 +205,7 @@
 	<td style="width:160px;"><label for="rottentomatokey">Rotten Tomatoes Key</label>:</td>
 	<td>
 		<input id="rottentomatokey" class="long" name="rottentomatokey" type="text" value="{$fsite->rottentomatokey}" />
+		{html_options style="width:180px;" id="rottentomatoquality" name='rottentomatoquality' values=$rottentomatoquality_ids output=$rottentomatoquality_names selected=$fsite->rottentomatoquality}
 		<div class="hint">The api key used for access to rotten tomatoes</div>
 	</td>
 </tr>
