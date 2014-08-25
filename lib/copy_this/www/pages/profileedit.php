@@ -9,6 +9,7 @@ $category = new Category;
 $sab = new SABnzbd($page);
 $nzbGet = new NZBGet($page);
 $users = new Users();
+$util = new Utility();
 
 if (!$users->isLoggedIn())
 	$page->show403();
@@ -34,7 +35,7 @@ switch ($action) {
 	case 'submit':
 
 		$data["email"] = $_POST['email'];
-		if (isset($_POST['saburl']) && strlen(trim($_POST['saburl'])) > 0 && !endsWith($_POST['saburl'], "/"))
+		if (isset($_POST['saburl']) && strlen(trim($_POST['saburl'])) > 0 && !$util->endsWith($_POST['saburl'], "/"))
 			$_POST['saburl'] = $_POST['saburl'] . "/";
 
 		if ($_POST['password'] != "" && $_POST['password'] != $_POST['confirmpassword']) {
