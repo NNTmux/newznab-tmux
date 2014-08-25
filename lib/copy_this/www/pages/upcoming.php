@@ -1,6 +1,6 @@
 <?php
 require_once(WWW_DIR.'/../misc/update_scripts/nix_scripts/tmux/lib/Film.php');
-if (!$page->users->isLoggedIn()) {
+if (!$users->isLoggedIn()) {
 	$page->show403();
 }
 
