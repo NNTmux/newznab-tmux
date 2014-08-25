@@ -22,8 +22,7 @@
 			<tr class="{cycle values=",alt"}">
 				<td class="mid">
 					<div class="movcover">
-						<img class="shadow" src="{replace_quality($result->posters->{$site->rottentomatoquality}, $site->rottentomatoquality)}"" width="120"
-						border="0" alt="{$result->title|escape:"htmlall"}"/>
+						<img class="shadow" src="{replace_quality($result->posters->{$site->rottentomatoquality}, $site->rottentomatoquality)}"" width="120" border="0" alt="{$result->title|escape:"htmlall"}"/>
 
 						<div class="movextra">
 							{if $result->ratings->critics_score > 60}
