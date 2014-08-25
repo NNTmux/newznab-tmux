@@ -99,7 +99,7 @@ class PProcess
 		//\\ Class instances.
 		$s = new Sites();
 		$t = new Tmux();
-		$this->db = new DB();
+		$this->pdo = new DB();
 		$this->groups = new Groups();
 		$this->_par2Info = new Par2Info();
 		$this->namefixer = new NameFixer($this->echooutput);
@@ -146,7 +146,7 @@ class PProcess
 	public function processAnime()
 	{
 		if ($this->site->lookupanidb === '1') {
-			$anidb = new AniDB($this->echooutput);
+			$anidb = new AniDB(['Echo' => $this->echooutput, 'Settings' => $this->pdo]);
 			$anidb->animetitlesUpdate();
 			$anidb->processAnimeReleases();
 		}
@@ -264,7 +264,7 @@ class PProcess
 	 */
 	public function processSharing(&$nntp)
 	{
-		$sharing = new Sharing($this->db, $nntp);
+		$sharing = new Sharing($this->pdo, $nntp);
 		$sharing->start();
 	}
 
@@ -296,7 +296,7 @@ class PProcess
 	 */
 	public function processAdditional($nntp, $releaseToWork = '', $groupID = '')
 	{
-		$processAdditional = new ProcessAdditional($this->echooutput, $nntp, $this->db, $this->site, $this->tmux);
+		$processAdditional = new ProcessAdditional($this->echooutput, $nntp, $this->pdo, $this->site, $this->tmux);
 		$processAdditional->start($releaseToWork, $groupID);
 	}
 
@@ -319,7 +319,7 @@ class PProcess
 			return false;
 		}
 
-		$query = $this->db->queryOneRow(
+		$query = $this->pdo->queryOneRow(
 			sprintf('
 				SELECT ID, groupID, categoryID, name, searchname, UNIX_TIMESTAMP(postdate) AS post_date, ID AS releaseID
 				FROM releases WHERE isrenamed = 0 AND ID = %d',
@@ -380,9 +380,9 @@ class PProcess
 				if ($this->addpar2) {
 					// Add to release files.
 					if ($filesAdded < 11 &&
-						$this->db->queryOneRow(
+						$this->pdo->queryOneRow(
 							sprintf('SELECT ID FROM releasefiles WHERE releaseID = %d AND name = %s',
-								$relID, $this->db->escapeString($file['name'])
+								$relID, $this->pdo->escapeString($file['name'])
 							)
 						) === false
 					) {
@@ -403,7 +403,7 @@ class PProcess
 					}
 				}
 				// Update the file count with the new file count + old file count.
-				$this->db->exec(
+				$this->pdo->exec(
 					sprintf('
 						UPDATE releases SET rarinnerfilecount = rarinnerfilecount + %d
 						WHERE ID = %d',

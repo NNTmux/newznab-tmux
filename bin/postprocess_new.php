@@ -60,9 +60,7 @@ if (isset($argv[1]) && $argv[1] === "additional") {
 } else if (isset($argv[1]) && $argv[1] === "music") {
                 $postprocess -> processMusic();
 } else if (isset($argv[1]) && $argv[1] === "anime") {
-	$anidb = new AniDB(true);
-	$anidb->animetitlesUpdate();
-	$anidb->processAnimeReleases();
+	$pprocess->processAnime();
 } else if (isset($argv[1]) && $argv[1] === "spotnab") {
                 $postprocess -> processSpotnab();
 } else if (isset($argv[1]) && $argv[1] === "unwanted") {
@@ -72,7 +70,3 @@ if (isset($argv[1]) && $argv[1] === "additional") {
 } else if (isset($argv[1]) && $argv[1] === "sharing") {
                 $pprocess -> processSharing($nntp);
 }
-
-
-
-

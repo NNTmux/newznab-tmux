@@ -240,6 +240,13 @@
 		<div class="hint">The giantbomb key. Used for game lookups.</div>
 	</td>
 </tr>
+<tr>
+	<td style="width:180px;"><label for="anidbkey">Anidb API key:</label></td>
+	<td>
+		<input id="anidbkey" class="long" name="anidbkey" type="text" value="{$site->anidbkey}"/>
+		<div class="hint">The Anidb api key. Used for Anime lookups.</div>
+	</td>
+</tr>
 
 </table>
 </fieldset>
