@@ -162,6 +162,46 @@ class DB
 	}
 
 	/**
+	 * Looks up info for index on table.
+	 *
+	 * @param $table string Table to look at.
+	 * @param $index string Index to check.
+	 *
+	 * @return bool|array False on failure, associative array of SHOW data.
+	 */
+	public function checkIndex($table, $index)
+	{
+		$result = $this->query(
+			sprintf(
+				"SHOW INDEX FROM %s WHERE key_name = '%s'",
+				trim($table),
+				trim($index)
+			)
+		);
+		if ($result === false) {
+			return false;
+		}
+
+		return $result->fetch(\PDO::FETCH_ASSOC);
+	}
+
+	public function checkColumnIndex($table, $column)
+	{
+		$result = $this->query(
+			sprintf(
+				"SHOW INDEXES IN %s WHERE non_unique = 0 AND column_name = '%s'",
+				trim($table),
+				trim($column)
+			)
+		);
+		if ($result === false) {
+			return false;
+		}
+
+		return $result->fetchAll(\PDO::FETCH_ASSOC);
+	}
+
+	/**
 	 * PHP interpretation of MySQL's from_unixtime method.
 	 *
 	 * @param int $utime UnixTime
