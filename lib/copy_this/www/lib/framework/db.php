@@ -64,12 +64,12 @@ class DB
 		$dsn = $this->dbSystem . ':host=' . DB_HOST;
 		if (!empty(DB_PORT)) {
 			$dsn .= ';port=' . DB_PORT;
-	}
+		}
 		$dsn .= ';charset=utf8';
 
 		$options = [
-			\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-			\PDO::ATTR_TIMEOUT => 180,
+			\PDO::ATTR_ERRMODE            => \PDO::ERRMODE_EXCEPTION,
+			\PDO::ATTR_TIMEOUT            => 180,
 			\PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8",
 			\PDO::MYSQL_ATTR_LOCAL_INFILE => true
 		];
@@ -162,6 +162,46 @@ class DB
 	}
 
 	/**
+	 * Looks up info for index on table.
+	 *
+	 * @param $table string Table to look at.
+	 * @param $index string Index to check.
+	 *
+	 * @return bool|array False on failure, associative array of SHOW data.
+	 */
+	public function checkIndex($table, $index)
+	{
+		$result = $this->query(
+			sprintf(
+				"SHOW INDEX FROM %s WHERE key_name = '%s'",
+				trim($table),
+				trim($index)
+			)
+		);
+		if ($result === false) {
+			return false;
+		}
+
+		return $result->fetch(\PDO::FETCH_ASSOC);
+	}
+
+	public function checkColumnIndex($table, $column)
+	{
+		$result = $this->query(
+			sprintf(
+				"SHOW INDEXES IN %s WHERE non_unique = 0 AND column_name = '%s'",
+				trim($table),
+				trim($column)
+			)
+		);
+		if ($result === false) {
+			return false;
+		}
+
+		return $result->fetchAll(\PDO::FETCH_ASSOC);
+	}
+
+	/**
 	 * PHP interpretation of MySQL's from_unixtime method.
 	 *
 	 * @param int $utime UnixTime
@@ -213,6 +253,7 @@ class DB
 			// If we are not reconnected, return false.
 			return false;
 		}
+
 		return true;
 	}
 
@@ -228,6 +269,7 @@ class DB
 		if (stripos($errorMessage, 'MySQL server has gone away') !== false) {
 			return true;
 		}
+
 		return false;
 	}
 
@@ -355,6 +397,7 @@ class DB
 				$result = false;
 			}
 		}
+
 		return $result;
 	}
 
@@ -377,12 +420,12 @@ class DB
 
 		$i = 2;
 		$error = '';
-		while($i < 11) {
+		while ($i < 11) {
 			$result = $this->queryExecHelper($query);
 			if (is_array($result) && isset($result['deadlock'])) {
 				$error = $result['message'];
 				if ($result['deadlock'] === true) {
-					$this->ct->showsleep($i * ($i/2));
+					$this->ct->showsleep($i * ($i / 2));
 					$i++;
 				} else {
 					break;
@@ -397,6 +440,7 @@ class DB
 		if ($silent === false) {
 			$this->echoError($error, 'queryExec', 4);
 		}
+
 		return false;
 	}
 
@@ -411,13 +455,15 @@ class DB
 	protected function queryExecHelper($query, $insert = false)
 	{
 		try {
-			if ($insert === false ) {
+			if ($insert === false) {
 				$run = self::$instance->prepare($query);
 				$run->execute();
+
 				return $run;
 			} else {
 				$ins = self::$instance->prepare($query);
 				$ins->execute();
+
 				return self::$instance->lastInsertId();
 			}
 
@@ -430,9 +476,7 @@ class DB
 				$e->getMessage() == 'SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction'
 			) {
 				return ['deadlock' => true, 'message' => $e->getMessage()];
-			}
-
-			// Check if we lost connection to MySQL.
+			} // Check if we lost connection to MySQL.
 			else if ($this->_checkGoneAway($e->getMessage()) !== false) {
 
 				// Reconnect to MySQL.
@@ -624,11 +668,12 @@ class DB
 	public function ping($restart = false)
 	{
 		try {
-			return (bool) self::$instance->query('SELECT 1+1');
+			return (bool)self::$instance->query('SELECT 1+1');
 		} catch (\PDOException $e) {
 			if ($restart == true) {
 				$this->initialiseDatabase();
 			}
+
 			return false;
 		}
 	}
@@ -644,9 +689,9 @@ class DB
 	 */
 	protected function echoError($error, $exit = false)
 	{
-			echo(
-			($this->cli ? $this->log->error($error) . PHP_EOL : '<div class="error">' . $error . '</div>')
-			);
+		echo(
+		($this->cli ? $this->log->error($error) . PHP_EOL : '<div class="error">' . $error . '</div>')
+		);
 		if ($exit) {
 			exit();
 		}
