@@ -27,7 +27,7 @@ if ($users->isLoggedIn()) {
 			$page->show403();
 		}
 	}
-	$uid = $res["id"];
+	$uid = $res["ID"];
 	$maxdls = $res["downloadrequests"];
 }
 
@@ -58,7 +58,7 @@ if (isset($_GET["id"]) && isset($_GET["zip"]) && $_GET["zip"] == "1") {
 		$users->incrementGrabs($uid, count($guids));
 		foreach ($guids as $guid) {
 			$rel->updateGrab($guid);
-			$users->addDownloadRequest($uid);
+			$users->addDownloadRequest($uid, $hosthash, $page->site);
 
 			if (isset($_GET["del"]) && $_GET["del"] == 1) {
 				$users->delCartByUserAndRelease($guid, $uid);
@@ -87,7 +87,7 @@ if (isset($_GET["id"])) {
 
 	if ($reldata) {
 		$rel->updateGrab($_GET["id"]);
-		$users->addDownloadRequest($uid);
+		$users->addDownloadRequest($uid, $hosthash, $page->site);
 		$users->incrementGrabs($uid);
 		if (isset($_GET["del"]) && $_GET["del"] == 1) {
 			$users->delCartByUserAndRelease($_GET["id"], $uid);
