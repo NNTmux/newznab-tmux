@@ -186,7 +186,7 @@ class PProcess
 	public function processGames()
 	{
 		if ($this->site->lookupgames !== 0) {
-			$games = new Games($this->echooutput);
+			$games = new Games(['Echo' => $this->echooutput, 'Settings' => $this->pdo]);
 			$games->processGamesReleases();
 		}
 	}
