@@ -12,14 +12,12 @@ class Genres
 	const BOOK_TYPE = Category::CAT_BOOK_EBOOK;
 	const GAME_TYPE = Category::CAT_PARENT_PC;
 
-	public function _construct()
-	{
-		$this->pdo = new DB();
-	}
 
 	public function getGenres($type = '', $activeonly = false)
 	{
-		return $this->pdo->query($this->getListQuery($type, $activeonly));
+		$db = new DB();
+
+		return $db->query($this->getListQuery($type, $activeonly));
 	}
 
 	private function getListQuery($type = '', $activeonly = false)
