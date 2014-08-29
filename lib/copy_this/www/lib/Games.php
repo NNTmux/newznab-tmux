@@ -118,10 +118,10 @@ class Games
 			sprintf("
 				SELECT COUNT(DISTINCT r.gamesinfo_id) AS num
 				FROM releases r
-				INNER JOIN gamesinfo con ON con.id = r.gamesinfo_id
+				INNER JOIN gamesinfo con ON gam.id = r.gamesinfo_id
 				WHERE r.nzbstatus = 1
-				AND con.title != ''
-				AND con.cover = 1
+				AND gam.title != ''
+				AND gam.cover = 1
 				AND r.passwordstatus <= (SELECT value FROM site WHERE setting='showpasswordedrelease')
 				AND %s %s %s %s",
 				$this->getBrowseBy(),
@@ -141,7 +141,7 @@ class Games
 		if ($start === false) {
 			$limit = "";
 		} else {
-			$limit = " LIMIT " . $num . " OFFSET " . $start;
+			$limit = " LIMIT " . $num . "," . $start;
 		}
 		$catsrch = "";
 		if (count($cat) > 0 && $cat[0] != -1) {
@@ -195,14 +195,14 @@ class Games
 				. "GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_totalparts, "
 				. "GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_comments, "
 				. "GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grabs, "
-				. "con.*, YEAR (con.releasedate) as year, r.gamesinfo_id, groups.name AS group_name,
+				. "gam.*, YEAR (gam.releasedate) as year, r.gamesinfo_id, groups.name AS group_name,
 				rn.ID as nfoid FROM releases r "
 				. "LEFT OUTER JOIN groups ON groups.ID = r.groupID "
 				. "LEFT OUTER JOIN releasenfo rn ON rn.releaseID = r.ID "
-				. "INNER JOIN gamesinfo con ON con.id = r.gamesinfo_id "
-				. "WHERE r.nzbstatus = 1 AND con.cover = 1 AND con.title != '' AND "
+				. "INNER JOIN gamesinfo con ON gam.id = r.gamesinfo_id "
+				. "WHERE r.nzbstatus = 1 AND gam.cover = 1 AND gam.title != '' AND "
 				. "r.passwordstatus <= (SELECT value FROM site WHERE setting='showpasswordedrelease') AND %s %s %s %s "
-				. "GROUP BY con.id ORDER BY %s %s" . $limit,
+				. "GROUP BY gam.id ORDER BY %s %s" . $limit,
 				$browseby,
 				$catsrch,
 				$maxage,
@@ -219,13 +219,13 @@ class Games
 		$orderArr = explode("_", $order);
 		switch ($orderArr[0]) {
 			case 'title':
-				$orderfield = 'con.title';
+				$orderfield = 'gam.title';
 				break;
 			case 'releasedate':
-				$orderfield = 'con.releasedate';
+				$orderfield = 'gam.releasedate';
 				break;
 			case 'genre':
-				$orderfield = 'con.genre_id';
+				$orderfield = 'gam.genre_id';
 				break;
 			case 'size':
 				$orderfield = 'r.size';
@@ -270,9 +270,9 @@ class Games
 			if (isset($_REQUEST[$bbk]) && !empty($_REQUEST[$bbk])) {
 				$bbs = stripslashes($_REQUEST[$bbk]);
 				if ($bbk === 'year') {
-					$browseby .= 'YEAR (con.releasedate) ' . $like . ' (' . $this->pdo->escapeString('%' . $bbs . '%') . ') AND ';
+					$browseby .= 'YEAR (gam.releasedate) ' . $like . ' (' . $this->pdo->escapeString('%' . $bbs . '%') . ') AND ';
 				} else {
-					$browseby .= 'con.' . $bbv . ' ' . $like . ' (' . $this->pdo->escapeString('%' . $bbs . '%') . ') AND ';
+					$browseby .= 'gam.' . $bbv . ' ' . $like . ' (' . $this->pdo->escapeString('%' . $bbs . '%') . ') AND ';
 				}
 			}
 		}
