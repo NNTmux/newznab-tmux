@@ -10,31 +10,52 @@ class Genres
 	const CONSOLE_TYPE = Category::CAT_PARENT_GAME;
 	const MUSIC_TYPE = Category::CAT_PARENT_MUSIC;
 	const BOOK_TYPE = Category::CAT_BOOK_EBOOK;
-	const GAME_TYPE    = Category::CAT_PARENT_PC;
+	const GAME_TYPE = Category::CAT_PARENT_PC;
 
-	/**
-	 * Get genre rows, filter by type/active.
-	 */
-	public function getGenres($type='', $activeonly=false, $usecache=false)
+	public function _construct()
 	{
-		$db = new DB();
+		$this->pdo = new DB();
+	}
 
+	public function getGenres($type = '', $activeonly = false)
+	{
+		return $this->pdo->query($this->getListQuery($type, $activeonly));
+	}
+
+	private function getListQuery($type = '', $activeonly = false)
+	{
 		if (!empty($type))
-			$typesql = sprintf(" and genres.type = %d", $type);
+			$typesql = sprintf(" AND g.type = %d", $type);
 		else
 			$typesql = '';
 
-		if ($activeonly)
-		{
-			$sql = sprintf("SELECT genres.*  FROM genres INNER JOIN (SELECT DISTINCT genreID FROM musicinfo) X ON X.genreID = genres.ID %s
-			UNION
-			SELECT genres.*  FROM genres INNER JOIN (SELECT DISTINCT genreID FROM consoleinfo) X ON X.genreID = genres.ID %s
-			ORDER BY title", $typesql, $typesql);
+		if ($activeonly) {
+			$sql = sprintf("
+						SELECT g.*
+						FROM genres g
+						INNER JOIN
+							(SELECT DISTINCT genreID FROM musicinfo) x
+							ON x.genreID = g.ID %1\$s
+						UNION
+						SELECT g.*
+						FROM genres g
+						INNER JOIN
+							(SELECT DISTINCT genreID FROM consoleinfo) x
+							ON x.genreID = g.ID %1\$s
+						UNION
+						SELECT g.*
+						FROM genres g
+						INNER JOIN
+							(SELECT DISTINCT genre_id FROM gamesinfo) x
+							ON x.genre_id = g.ID %1\$s
+							ORDER BY title",
+				$typesql
+			);
+		} else {
+			$sql = sprintf("SELECT g.* FROM genres g WHERE 1 %s ORDER BY g.title", $typesql);
 		}
-		else
-			$sql = sprintf("select genres.* from genres where 1 %s order by title", $typesql);
 
-		return $db->query($sql, $usecache);
+		return $sql;
 	}
 
 	/**
