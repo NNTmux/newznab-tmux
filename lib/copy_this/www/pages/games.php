@@ -33,7 +33,7 @@ $ordering = $games->getgamesOrdering();
 
 $orderby = isset($_REQUEST["ob"]) && in_array($_REQUEST['ob'], $ordering) ? $_REQUEST["ob"] : '';
 
-$results = $games = array();
+$results = $games2 = array();
 $results = $games->getgamesRange($catarray, $offset, ITEMS_PER_PAGE_SMALL, $orderby, -1, $page->userdata["categoryexclusions"]);
 $maxwords = 50;
 foreach ($results as $result) {
@@ -44,7 +44,7 @@ foreach ($results as $result) {
 			$result['review'] = implode(' ', $newwords) . '...';
 		}
 	}
-	$games[] = $result;
+	$games2[] = $result;
 }
 $platform = (isset($_REQUEST['platform']) && !empty($_REQUEST['platform'])) ? stripslashes($_REQUEST['platform']) : '';
 $page->smarty->assign('platform', $platform);
@@ -87,7 +87,7 @@ foreach ($ordering as $ordertype) {
 	$page->smarty->assign('orderby' . $ordertype, WWW_TOP . "/games?t=" . $category . $browseby_link . "&amp;ob=" . $ordertype . "&amp;offset=0");
 }
 
-$page->smarty->assign('results', $games);
+$page->smarty->assign('results', $games2);
 
 $page->meta_title = "Browse Games";
 $page->meta_keywords = "browse,nzb,games,description,details";
