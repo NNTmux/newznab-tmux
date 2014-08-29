@@ -118,7 +118,7 @@ class Games
 			sprintf("
 				SELECT COUNT(DISTINCT r.gamesinfo_id) AS num
 				FROM releases r
-				INNER JOIN gamesinfo con ON gam.id = r.gamesinfo_id
+				INNER JOIN gamesinfo gam ON gam.id = r.gamesinfo_id
 				WHERE r.nzbstatus = 1
 				AND gam.title != ''
 				AND gam.cover = 1
@@ -199,7 +199,7 @@ class Games
 				rn.ID as nfoid FROM releases r "
 				. "LEFT OUTER JOIN groups ON groups.ID = r.groupID "
 				. "LEFT OUTER JOIN releasenfo rn ON rn.releaseID = r.ID "
-				. "INNER JOIN gamesinfo con ON gam.id = r.gamesinfo_id "
+				. "INNER JOIN gamesinfo gam ON gam.id = r.gamesinfo_id "
 				. "WHERE r.nzbstatus = 1 AND gam.cover = 1 AND gam.title != '' AND "
 				. "r.passwordstatus <= (SELECT value FROM site WHERE setting='showpasswordedrelease') AND %s %s %s %s "
 				. "GROUP BY gam.id ORDER BY %s %s" . $limit,
