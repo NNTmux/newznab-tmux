@@ -13,38 +13,120 @@ require_once(WWW_DIR . "../misc/update_scripts/nix_scripts/tmux/lib/functions.ph
 
 class Games
 {
-	const REQID_NONE = -3; // The Request ID was not found locally or via web lookup.
-	const REQID_ZERO = -2; // The Request ID was 0.
-	const REQID_NOLL = -1; // Request ID was not found via local lookup.
-	const CONS_UPROC = 0; // Release has not been processed.
 	const REQID_FOUND = 1; // Request ID found and release was updated.
+	const REQID_NO_LOCAL = -1; // Request ID was not found via local lookup.
+	const REQID_NONE = -3; // The Request ID was not found locally or via web lookup.
+	const REQID_UNPROCESSED = 0; // Release has not been processed.
+	const REQID_ZERO = -2; // The Request ID was 0.
 
+	/**
+	 * @var string
+	 */
+	public $cookie;
+
+	/**
+	 * @var bool
+	 */
+	public $echoOutput;
+
+	/**
+	 * @var array|bool|int|string
+	 */
+	public $gameQty;
+
+	/**
+	 * @var string
+	 */
+	public $imgSavePath;
+
+	/**
+	 * @var int
+	 */
+	public $matchPercentage;
+
+	/**
+	 * @var bool
+	 */
+	public $maxHitRequest;
+
+	/**
+	 * @var DB
+	 */
 	public $pdo;
 
 	/**
-	 * @param bool $echooutput
+	 * @var array|bool|string
 	 */
-	function __construct($echooutput = false)
-	{
-		$this->echoOutput = $echooutput;
+	public $publicKey;
 
-		$this->pdo = new DB();
-		$s = new Sites();
-		$this->site = $s->get();
+	/**
+	 * @var string
+	 */
+	public $renamed;
+
+	/**
+	 * @var array|bool|int|string
+	 */
+	public $sleepTime;
+
+	/**
+	 * @var string
+	 */
+	protected $_classUsed;
+
+	/**
+	 * @var string
+	 */
+	protected $_gameID;
+
+	/**
+	 * @var array
+	 */
+	protected $_gameResults;
+
+	/**
+	 * @var object
+	 */
+	protected $_getGame;
+
+	/**
+	 * @var int
+	 */
+	protected $_resultsFound = 0;
+
+	/**
+	 * @param array $options Class instances / Echo to cli.
+	 */
+	public function __construct(array $options = array())
+	{
+		$defaults = [
+			'Echo'     => false,
+			'ColorCLI' => null,
+			'Settings' => null,
+		];
+		$options += $defaults;
+
+		$this->echoOutput = ($options['Echo']);
+
+		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+
 		$t = new Tmux();
 		$this->tmux = $t->get();
-		$this->publicKey = $this->site->giantbombkey;
+		$s = new Sites();
+		$this->site = $s->get();
+		$this->c = new ColorCLI();
+		$this->publicKey = $this->tmux->giantbombkey;
 		$this->gameQty = ($this->tmux->maxgamesprocessed != '') ? $this->tmux->maxgamesprocessed : 150;
 		$this->sleepTime = ($this->tmux->amazonsleep != '') ? $this->tmux->amazonsleep : 1000;
 		$this->imgSavePath = WWW_DIR . 'covers/games' . '/';
 		$this->renamed = '';
 		$this->matchPercentage = 60;
 		$this->maxHitRequest = false;
-		$this->cookie = WWW_DIR . 'tmp/game.cookie';
+		$this->cookie = WWW_DIR . 'tmp/xxx.cookie';
 		if ($this->site->lookupgames == 2) {
 			$this->renamed = 'AND isrenamed = 1';
 		}
-		$this->c = new ColorCLI();
+		//$this->cleangames = ($this->pdo->getSetting('lookupgames') == 2) ? 'AND isrenamed = 1' : '';
 	}
 
 	public function getGamesInfo($id)
@@ -90,28 +172,9 @@ class Games
 
 	public function getGamesCount($cat, $maxage = -1, $excludedcats = array())
 	{
-		$catsrch = "";
+		$catsrch = '';
 		if (count($cat) > 0 && $cat[0] != -1) {
-			$catsrch = " (";
-			$categ = new Category();
-			foreach ($cat as $category) {
-				if ($category != -1) {
-					if ($categ->isParent($category)) {
-						$children = $categ->getChildren($category);
-						$chlist = "-99";
-						foreach ($children as $child) {
-							$chlist .= ", " . $child["ID"];
-						}
-
-						if ($chlist != "-99") {
-							$catsrch .= " r.categoryID IN (" . $chlist . ") OR ";
-						}
-					} else {
-						$catsrch .= sprintf(" r.categoryID = %d OR ", $category);
-					}
-				}
-			}
-			$catsrch .= "1=2 )";
+			$catsrch = (new Category())->getCategorySearch($cat);
 		}
 
 		$res = $this->pdo->queryOneRow(
@@ -143,28 +206,10 @@ class Games
 		} else {
 			$limit = " LIMIT " . $num . " OFFSET " . $start;
 		}
-		$catsrch = "";
-		if (count($cat) > 0 && $cat[0] != -1) {
-			$catsrch = " (";
-			$categ = new Category();
-			foreach ($cat as $category) {
-				if ($category != -1) {
-					if ($categ->isParent($category)) {
-						$children = $categ->getChildren($category);
-						$chlist = "-99";
-						foreach ($children as $child) {
-							$chlist .= ", " . $child["ID"];
-						}
 
-						if ($chlist != "-99") {
-							$catsrch .= " r.categoryID IN (" . $chlist . ") OR ";
-						}
-					} else {
-						$catsrch .= sprintf(" r.categoryID = %d OR ", $category);
-					}
-				}
-			}
-			$catsrch .= "1=2 )";
+		$catsrch = '';
+		if (count($cat) > 0 && $cat[0] != -1) {
+			$catsrch = (new Category())->getCategorySearch($cat);
 		}
 
 		if ($maxage > 0) {
@@ -196,11 +241,11 @@ class Games
 				. "GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_comments, "
 				. "GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grabs, "
 				. "gam.*, YEAR (gam.releasedate) as year, r.gamesinfo_id, groups.name AS group_name,
-				rn.ID as nfoid FROM releases r "
+				rn.id as nfoid FROM releases r "
 				. "LEFT OUTER JOIN groups ON groups.ID = r.groupID "
 				. "LEFT OUTER JOIN releasenfo rn ON rn.releaseID = r.ID "
 				. "INNER JOIN gamesinfo gam ON gam.id = r.gamesinfo_id "
-				. "WHERE r.nzbstatus = 1 AND gam.cover = 1 AND gam.title != '' AND "
+				. "WHERE r.nzbstatus = 1 AND gam.title != '' AND "
 				. "r.passwordstatus <= (SELECT value FROM site WHERE setting='showpasswordedrelease') AND %s %s %s %s "
 				. "GROUP BY gam.id ORDER BY %s %s" . $limit,
 				$browseby,
@@ -332,7 +377,7 @@ class Games
 	 */
 	public function updateGamesInfo($gameInfo)
 	{
-		$gen = new Genres();
+		$gen = new Genres(['Settings' => $this->pdo]);
 		$ri = new ReleaseImage();
 
 		$gam = array();
@@ -466,7 +511,7 @@ class Games
 		$defaultGenres = $gen->getGenres(Genres::GAME_TYPE);
 		$genreassoc = array();
 		foreach ($defaultGenres as $dg) {
-			$genreassoc[$dg['ID']] = strtolower($dg['title']);
+			$genreassoc[$dg['id']] = strtolower($dg['title']);
 		}
 
 		// Prepare database values.
@@ -487,11 +532,11 @@ class Games
 			$gam['title'] = $gameInfo['title'];
 		}
 		if (!isset($gam['releasedate'])) {
-			$gam['releasedate'] = 'null';
+			$gam['releasedate'] = "";
 		}
 
 		if ($gam['releasedate'] == "''") {
-			$gam['releasedate'] = 'null';
+			$gam['releasedate'] = "";
 		}
 		if (!isset($gam['review'])) {
 			$gam['review'] = 'No Review';
@@ -521,9 +566,7 @@ class Games
 			sprintf('
 				SELECT id
 				FROM gamesinfo
-				WHERE title = %s
-				AND asin = %s',
-				$this->pdo->escapeString($gam['title']),
+				WHERE asin = %s',
 				$this->pdo->escapeString($gam['asin'])
 			)
 		);
@@ -539,7 +582,7 @@ class Games
 					$this->pdo->escapeString($gam['publisher']),
 					($gam['gamesgenreID'] == -1 ? "null" : $gam['gamesgenreID']),
 					$this->pdo->escapeString($gam['esrb']),
-					$gam['releasedate'],
+					($gam['releasedate'] != "" ? $this->pdo->escapeString($gam['releasedate']) : "null"),
 					$this->pdo->escapeString(substr($gam['review'], 0, 3000)),
 					$gam['cover'],
 					$gam['backdrop'],
@@ -562,7 +605,7 @@ class Games
 					$this->pdo->escapeString($gam['publisher']),
 					($gam['gamesgenreID'] == -1 ? "null" : $gam['gamesgenreID']),
 					$this->pdo->escapeString($gam['esrb']),
-					$gam['releasedate'],
+					($gam['releasedate'] != "" ? $this->pdo->escapeString($gam['releasedate']) : "null"),
 					$this->pdo->escapeString(substr($gam['review'], 0, 3000)),
 					$gam['cover'],
 					$gam['backdrop'],
@@ -581,7 +624,9 @@ class Games
 					$this->c->primary($gam['title'])
 				);
 			}
-			$gam['cover'] = $ri->saveImage($gamesId, $gam['coverurl'], $this->imgSavePath, 250, 250);
+			if ($gam['cover'] === 1) {
+				$gam['cover'] = $ri->saveImage($gamesId, $gam['coverurl'], $this->imgSavePath, 250, 250);
+			}
 			if ($gam['backdrop'] === 1) {
 				$gam['backdrop'] = $ri->saveImage($gamesId . '-backdrop', $gam['backdropurl'], $this->imgSavePath, 1920, 1024);
 			}
@@ -616,7 +661,6 @@ class Games
 			// We hit the maximum request.
 			if (empty($result)) {
 				$this->maxHitRequest = true;
-
 				return false;
 			}
 			if (!is_array($result['results']) || (int)$result['number_of_total_results'] === 0) {
@@ -677,7 +721,7 @@ class Games
 	{
 		$res = $this->pdo->queryDirect(
 			sprintf('
-				SELECT searchname, ID
+				SELECT searchname, id
 				FROM releases
 				WHERE nzbstatus = 1 %s
 				AND gamesinfo_id = 0
@@ -729,10 +773,10 @@ class Games
 						$gameId = $gameCheck['id'];
 					}
 					// Update release.
-					$this->pdo->queryExec(sprintf('UPDATE releases SET gamesinfo_id = %d WHERE ID = %d', $gameId, $arr['ID']));
+					$this->pdo->queryExec(sprintf('UPDATE releases SET gamesinfo_id = %d WHERE id = %d', $gameId, $arr['id']));
 				} else {
 					// Could not parse release title.
-					$this->pdo->queryExec(sprintf('UPDATE releases SET gamesinfo_id = %d WHERE ID = %d', -2, $arr['ID']));
+					$this->pdo->queryExec(sprintf('UPDATE releases SET gamesinfo_id = %d WHERE id = %d', -2, $arr['id']));
 
 					if ($this->echoOutput) {
 						echo '.';
