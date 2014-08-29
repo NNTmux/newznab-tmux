@@ -77,7 +77,7 @@ class Games
 		return $this->pdo->query(
 			sprintf(
 				"SELECT * FROM gamesinfo ORDER BY createddate DESC %s",
-				($start === false ? '' : 'LIMIT ' . $start . ',' . $num)
+				($start === false ? '' : 'LIMIT ' . $num . ' OFFSET ' . $start)
 			)
 		);
 	}
@@ -141,7 +141,7 @@ class Games
 		if ($start === false) {
 			$limit = "";
 		} else {
-			$limit = " LIMIT " . $start . "," . $num;
+			$limit = " LIMIT " . $num . " OFFSET " . $start;
 		}
 		$catsrch = "";
 		if (count($cat) > 0 && $cat[0] != -1) {

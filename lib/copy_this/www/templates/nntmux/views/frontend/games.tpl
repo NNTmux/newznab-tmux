@@ -101,8 +101,9 @@
 							</a>
 
 							<div class="movextra">
-								{if $result.nfoid > 0}<a href="{$smarty.const.WWW_TOP}/nfo/{$result.grp_release_guid}"
-														 title="View Nfo" class="rndbtn modal_nfo" rel="nfo">
+								{if $result.grp_release_nfoid > 0}<a
+									href="{$smarty.const.WWW_TOP}/nfo/{$result.grp_release_guid}"
+									title="View Nfo" class="rndbtn modal_nfo" rel="nfo">
 										Nfo</a>{/if}
 								<a class="rndbtn" target="_blank" href="{$site->dereferrer_link}{$result.url}"
 								   name="amazon{$result.gamesinfo_id}" title="View amazon page">Amazon</a>
