@@ -77,7 +77,7 @@ class Games
 		return $this->pdo->query(
 			sprintf(
 				"SELECT * FROM gamesinfo ORDER BY createddate DESC %s",
-				($start === false ? '' : 'LIMIT ' . $num . ' OFFSET ' . $start)
+				($start === false ? '' : 'LIMIT ' . $start . ',' . $num)
 			)
 		);
 	}
@@ -335,7 +335,7 @@ class Games
 		$gen = new Genres();
 		$ri = new ReleaseImage();
 
-		$con = array();
+		$gam = array();
 
 		// Process Steam first before giantbomb
 		// Steam has more details
@@ -363,29 +363,29 @@ class Games
 			switch ($this->_classUsed) {
 
 				case "gb":
-					$con['coverurl'] = (string)$this->_gameResults['image']['super_url'];
-					$con['title'] = (string)$this->_gameResults['name'];
-					$con['asin'] = $this->_gameID;
-					$con['url'] = (string)$this->_gameResults['site_detail_url'];
+					$gam['coverurl'] = (string)$this->_gameResults['image']['super_url'];
+					$gam['title'] = (string)$this->_gameResults['name'];
+					$gam['asin'] = $this->_gameID;
+					$gam['url'] = (string)$this->_gameResults['site_detail_url'];
 					if (is_array($this->_gameResults['publishers'])) {
 						while (list($key) = each($this->_gameResults['publishers'])) {
 							if ($key == 0) {
-								$con['publisher'] = (string)$this->_gameResults['publishers'][$key]['name'];
+								$gam['publisher'] = (string)$this->_gameResults['publishers'][$key]['name'];
 							}
 						}
 					} else {
-						$con['publisher'] = "Unknown";
+						$gam['publisher'] = "Unknown";
 					}
 
 					if (is_array($this->_gameResults['original_game_rating'])) {
-						$con['esrb'] = (string)$this->_gameResults['original_game_rating'][0]['name'];
+						$gam['esrb'] = (string)$this->_gameResults['original_game_rating'][0]['name'];
 					} else {
-						$con['esrb'] = (string)$this->_gameResults['original_game_rating']['name'];
+						$gam['esrb'] = (string)$this->_gameResults['original_game_rating']['name'];
 					}
-					$con['releasedate'] = $this->pdo->escapeString((string)$this->_gameResults['original_release_date']);
+					$gam['releasedate'] = $this->pdo->escapeString((string)$this->_gameResults['original_release_date']);
 
 					if (isset($this->_gameResults['description'])) {
-						$con['review'] = trim(strip_tags((string)$this->_gameResults['description']));
+						$gam['review'] = trim(strip_tags((string)$this->_gameResults['description']));
 					}
 					$genreName = '';
 					if (empty($genreName) && isset($this->_gameResults['genres'][0]['name'])) {
@@ -403,42 +403,42 @@ class Games
 					break;
 				case "steam":
 					if (isset($this->_gameResults['cover'])) {
-						$con['coverurl'] = (string)$this->_gameResults['cover'];
+						$gam['coverurl'] = (string)$this->_gameResults['cover'];
 					}
 
 					if (isset($this->_gameResults['backdrop'])) {
-						$con['backdropurl'] = (string)$this->_gameResults['backdrop'];
+						$gam['backdropurl'] = (string)$this->_gameResults['backdrop'];
 					}
 
-					$con['title'] = (string)$this->_gameResults['title'];
-					$con['asin'] = $this->_gameResults['steamgameid'];
-					$con['url'] = (string)$this->_gameResults['directurl'];
+					$gam['title'] = (string)$this->_gameResults['title'];
+					$gam['asin'] = $this->_gameResults['steamgameid'];
+					$gam['url'] = (string)$this->_gameResults['directurl'];
 
 					if (isset($this->_gameResults['gamedetails']['Publisher'])) {
-						$con['publisher'] = (string)$this->_gameResults['gamedetails']['Publisher'];
+						$gam['publisher'] = (string)$this->_gameResults['gamedetails']['Publisher'];
 					} else {
-						$con['publisher'] = "Unknown";
+						$gam['publisher'] = "Unknown";
 					}
 
 					if (isset($this->_gameResults['rating'])) {
-						$con['esrb'] = (string)$this->_gameResults['rating'];
+						$gam['esrb'] = (string)$this->_gameResults['rating'];
 					} else {
-						$con['esrb'] = "Not Rated";
+						$gam['esrb'] = "Not Rated";
 					}
 
 					if (!empty($this->_gameResults['gamedetails']['Release Date'])) {
 						$date = DateTime::createFromFormat('j M Y',
 							$this->_gameResults['gamedetails']['Release Date']
 						);
-						$con['releasedate'] = $this->pdo->escapeString((string)$date->format('Y-m-d'));
+						$gam['releasedate'] = $this->pdo->escapeString((string)$date->format('Y-m-d'));
 					}
 
 					if (isset($this->_gameResults['description'])) {
-						$con['review'] = trim(strip_tags((string)$this->_gameResults['description']));
+						$gam['review'] = trim(strip_tags((string)$this->_gameResults['description']));
 					}
 
 					if (isset($this->_gameResults['trailer'])) {
-						$con['trailer'] = (string)$this->_gameResults['trailer'];
+						$gam['trailer'] = (string)$this->_gameResults['trailer'];
 					}
 
 					$genreName = '';
@@ -470,33 +470,33 @@ class Games
 		}
 
 		// Prepare database values.
-		if (isset($con['coverurl'])) {
-			$con['cover'] = 1;
+		if (isset($gam['coverurl'])) {
+			$gam['cover'] = 1;
 		} else {
-			$con['cover'] = 0;
+			$gam['cover'] = 0;
 		}
-		if (isset($con['backdropurl'])) {
-			$con['backdrop'] = 1;
+		if (isset($gam['backdropurl'])) {
+			$gam['backdrop'] = 1;
 		} else {
-			$con['backdrop'] = 0;
+			$gam['backdrop'] = 0;
 		}
-		if (!isset($con['trailer'])) {
-			$con['trailer'] = 0;
+		if (!isset($gam['trailer'])) {
+			$gam['trailer'] = 0;
 		}
-		if (empty($con['title'])) {
-			$con['title'] = $gameInfo['title'];
+		if (empty($gam['title'])) {
+			$gam['title'] = $gameInfo['title'];
 		}
-		if (!isset($con['releasedate'])) {
-			$con['releasedate'] = 'null';
+		if (!isset($gam['releasedate'])) {
+			$gam['releasedate'] = 'null';
 		}
 
-		if ($con['releasedate'] == "''") {
-			$con['releasedate'] = 'null';
+		if ($gam['releasedate'] == "''") {
+			$gam['releasedate'] = 'null';
 		}
-		if (!isset($con['review'])) {
-			$con['review'] = 'No Review';
+		if (!isset($gam['review'])) {
+			$gam['review'] = 'No Review';
 		}
-		$con['classused'] = $this->_classUsed;
+		$gam['classused'] = $this->_classUsed;
 
 		if (empty($genreName)) {
 			$genreName = 'Unknown';
@@ -514,8 +514,8 @@ class Games
 			);
 		}
 
-		$con['gamesgenre'] = $genreName;
-		$con['gamesgenreID'] = $genreKey;
+		$gam['gamesgenre'] = $genreName;
+		$gam['gamesgenreID'] = $genreKey;
 
 		$check = $this->pdo->queryOneRow(
 			sprintf('
@@ -523,8 +523,8 @@ class Games
 				FROM gamesinfo
 				WHERE title = %s
 				AND asin = %s',
-				$this->pdo->escapeString($con['title']),
-				$this->pdo->escapeString($con['asin'])
+				$this->pdo->escapeString($gam['title']),
+				$this->pdo->escapeString($gam['asin'])
 			)
 		);
 		if ($check === false) {
@@ -533,18 +533,18 @@ class Games
 					INSERT INTO gamesinfo
 						(title, asin, url, publisher, genre_id, esrb, releasedate, review, cover, backdrop, trailer, classused, createddate, updateddate)
 					VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %d, %d, %s, %s, NOW(), NOW())",
-					$this->pdo->escapeString($con['title']),
-					$this->pdo->escapeString($con['asin']),
-					$this->pdo->escapeString($con['url']),
-					$this->pdo->escapeString($con['publisher']),
-					($con['gamesgenreID'] == -1 ? "null" : $con['gamesgenreID']),
-					$this->pdo->escapeString($con['esrb']),
-					$con['releasedate'],
-					$this->pdo->escapeString(substr($con['review'], 0, 3000)),
-					$con['cover'],
-					$con['backdrop'],
-					$this->pdo->escapeString($con['trailer']),
-					$this->pdo->escapeString($con['classused'])
+					$this->pdo->escapeString($gam['title']),
+					$this->pdo->escapeString($gam['asin']),
+					$this->pdo->escapeString($gam['url']),
+					$this->pdo->escapeString($gam['publisher']),
+					($gam['gamesgenreID'] == -1 ? "null" : $gam['gamesgenreID']),
+					$this->pdo->escapeString($gam['esrb']),
+					$gam['releasedate'],
+					$this->pdo->escapeString(substr($gam['review'], 0, 3000)),
+					$gam['cover'],
+					$gam['backdrop'],
+					$this->pdo->escapeString($gam['trailer']),
+					$this->pdo->escapeString($gam['classused'])
 				)
 			);
 		} else {
@@ -556,18 +556,18 @@ class Games
 						title = %s, asin = %s, url = %s, publisher = %s, genre_id = %s,
 						esrb = %s, releasedate = %s, review = %s, cover = %d, backdrop = %d, trailer = %s, classused = %s, updateddate = NOW()
 					WHERE id = %d',
-					$this->pdo->escapeString($con['title']),
-					$this->pdo->escapeString($con['asin']),
-					$this->pdo->escapeString($con['url']),
-					$this->pdo->escapeString($con['publisher']),
-					($con['gamesgenreID'] == -1 ? "null" : $con['gamesgenreID']),
-					$this->pdo->escapeString($con['esrb']),
-					$con['releasedate'],
-					$this->pdo->escapeString(substr($con['review'], 0, 3000)),
-					$con['cover'],
-					$con['backdrop'],
-					$this->pdo->escapeString($con['trailer']),
-					$this->pdo->escapeString($con['classused']),
+					$this->pdo->escapeString($gam['title']),
+					$this->pdo->escapeString($gam['asin']),
+					$this->pdo->escapeString($gam['url']),
+					$this->pdo->escapeString($gam['publisher']),
+					($gam['gamesgenreID'] == -1 ? "null" : $gam['gamesgenreID']),
+					$this->pdo->escapeString($gam['esrb']),
+					$gam['releasedate'],
+					$this->pdo->escapeString(substr($gam['review'], 0, 3000)),
+					$gam['cover'],
+					$gam['backdrop'],
+					$this->pdo->escapeString($gam['trailer']),
+					$this->pdo->escapeString($gam['classused']),
 					$gamesId
 				)
 			);
@@ -578,18 +578,18 @@ class Games
 				$this->c->doEcho(
 					$this->c->header("Added/updated game: ") .
 					$this->c->alternateOver("   Title:    ") .
-					$this->c->primary($con['title'])
+					$this->c->primary($gam['title'])
 				);
 			}
-			$con['cover'] = $ri->saveImage($gamesId, $con['coverurl'], $this->imgSavePath, 250, 250);
-			if ($con['backdrop'] === 1) {
-				$con['backdrop'] = $ri->saveImage($gamesId . '-backdrop', $con['backdropurl'], $this->imgSavePath, 1920, 1024);
+			$gam['cover'] = $ri->saveImage($gamesId, $gam['coverurl'], $this->imgSavePath, 250, 250);
+			if ($gam['backdrop'] === 1) {
+				$gam['backdrop'] = $ri->saveImage($gamesId . '-backdrop', $gam['backdropurl'], $this->imgSavePath, 1920, 1024);
 			}
 		} else {
 			if ($this->echoOutput) {
 				$this->c->doEcho(
 					$this->c->headerOver("Nothing to update: ") .
-					$this->c->primary($con['title'] . ' (PC)')
+					$this->c->primary($gam['title'] . ' (PC)')
 				);
 			}
 		}
