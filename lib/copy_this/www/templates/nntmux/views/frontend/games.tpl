@@ -17,7 +17,7 @@
 				<select id="genre" name="genre">
 					<option class="grouping" value=""></option>
 					{foreach from=$genres item=gen}
-						<option {if $gen.id == $genre}selected="selected"{/if} value="{$gen.ID}">{$gen.title}</option>
+						<option {if $gen.ID == $genre}selected="selected"{/if} value="{$gen.ID}">{$gen.title}</option>
 					{/foreach}
 				</select>
 			</td>
