@@ -141,7 +141,7 @@ class Games
 		if ($start === false) {
 			$limit = "";
 		} else {
-			$limit = " LIMIT " . $num . "," . $start;
+			$limit = " LIMIT " . $start . "," . $num;
 		}
 		$catsrch = "";
 		if (count($cat) > 0 && $cat[0] != -1) {
