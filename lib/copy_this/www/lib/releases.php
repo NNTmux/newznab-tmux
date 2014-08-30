@@ -1694,7 +1694,7 @@ class Releases
 			$releaseCleaning = new ReleaseCleaning();
 			$cleanRelName = $this->cleanReleaseName($row['relname']);
 			$cleanedName = $releaseCleaning->releaseCleaner(
-				$row['subject'], $row['fromname'], $row['filesize'], $row['group_name']
+				$row['relname'], $row['fromname'], $row['filesize'], $row['group_name']
 			);
 
 			if (is_array($cleanedName)) {
