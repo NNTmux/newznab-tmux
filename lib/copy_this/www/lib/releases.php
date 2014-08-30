@@ -1718,7 +1718,6 @@ class Releases
 				}
 			}
 			$relid = $this->insertRelease($cleanRelName, $db->escapeString(utf8_encode($cleanedName)), $row["parts"], $row["groupID"], $relguid, $catId, $row["regexID"], $row["date"], $row["fromname"], $row["reqID"], $page->site, Enzebe::NZB_NONE, $properName === true ? 1 : 0, $isReqID, $prehashID);
-			var_dump($relid);
 			//
 			// Tag every binary for this release with its parent release id
 			//
@@ -1891,10 +1890,8 @@ class Releases
 			$db->escapeString($date), $db->escapeString($fromname), $reqID, ($site->checkpasswordedrar > 0 ? -1 : 0), -1, -1,
 			$db->escapeString($nzbstatus), $db->escapeString($isrenamed), $db->escapeString($isReqID), $db->escapeString($prehashID)
 		);
-		var_dump($sql);
 
 		$relid = $db->queryInsert($sql);
-		var_dump($relid);
 
 		return $relid;
 	}
