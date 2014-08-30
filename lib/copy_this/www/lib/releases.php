@@ -1893,6 +1893,7 @@ class Releases
 		);
 
 		$relid = $db->queryInsert($sql);
+		var_dump($relid);
 
 		return $relid;
 	}
