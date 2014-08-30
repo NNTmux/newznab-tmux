@@ -1886,9 +1886,9 @@ class Releases
 
 		$sql = sprintf("insert into releases (name, searchname, totalpart, groupID, adddate, guid, categoryID, regexID, rageID, postdate, fromname, size, reqID, passwordstatus, completion, haspreview, nfostatus, nzbstatus,
 					isrenamed, iscategorized, reqidstatus, prehashID)
-                    values (%s,   %s,  %d, %d, now(), %s, %d, %s, -1, %s, %s, 0, %s, %d, 100, %d, %d, %d, %d, 1, %d, %d  )",
+                    values (%s, %s, %d, %d, now(), %s, %d, %s, -1, %s, %s, 0, %s, %d, 100, %d, %d, %d, %d, 1, %d, %d)",
 			$db->escapeString($cleanRelName), $db->escapeString($cleanedName), $parts, $group, $db->escapeString($guid), $catId, $regexID,
-			$db->escapeString($date), $db->escapeString($fromname), $reqID, ($site->checkpasswordedrar > 0 ? -1 : 0), -1,
+			$db->escapeString($date), $db->escapeString($fromname), $reqID, ($site->checkpasswordedrar > 0 ? -1 : 0), -1, -1,
 			$db->escapeString($nzbstatus), $db->escapeString($isrenamed), $db->escapeString($isReqID), $db->escapeString($prehashID)
 		);
 		var_dump($sql);
