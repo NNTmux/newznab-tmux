@@ -1891,6 +1891,7 @@ class Releases
 			$db->escapeString($date), $db->escapeString($fromname), $reqID, ($site->checkpasswordedrar > 0 ? -1 : 0), -1,
 			$db->escapeString($nzbstatus), $db->escapeString($isrenamed), 1, $db->escapeString($isReqID), $db->escapeString($prehashID)
 		);
+		var_dump($sql);
 
 		$relid = $db->queryInsert($sql);
 		var_dump($relid);
