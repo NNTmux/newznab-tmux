@@ -1699,7 +1699,7 @@ class Releases
 
 			if (is_array($cleanedName)) {
 				$properName = $cleanedName['properlynamed'];
-				$prehashID = (isset($cleanerName['prehash']) ? $cleanerName['prehash'] : false);
+				$prehashID = (isset($cleanerName['predb']) ? $cleanerName['predb'] : false);
 				$isReqID = (isset($cleanerName['requestID']) ? $cleanerName['requestID'] : false);
 				$cleanedName = $cleanedName['cleansubject'];
 			} else {
