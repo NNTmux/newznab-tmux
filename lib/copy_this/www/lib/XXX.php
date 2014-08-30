@@ -9,7 +9,6 @@ require_once(WWW_DIR . "/lib/Popporn.php");
 require_once(WWW_DIR . "../misc/update_scripts/nix_scripts/tmux/lib/ColorCLI.php");
 
 
-
 /**
  * Class XXX
  */
@@ -49,10 +48,11 @@ class XXX
 
 	/**
 	 * @param $echo
+	 *
 	 * @internal param $releaseImage
 	 * @internal param $db
 	 */
-	public function __construct($echo=false)
+	public function __construct($echo = false)
 	{
 		$this->db = new DB();
 		$this->releaseImage = new ReleaseImage();
@@ -537,7 +537,7 @@ class XXX
 				if (isset($mov['backdrop'])) {
 					$mov['backdrop'] = $this->releaseImage->saveImage($xxxID . '-backdrop', $mov['backdrop'], $this->imgSavePath, 1920, 1024);
 				}
-				$this->db->queryExec(sprintf('UPDATE xxxinfo SET cover = %d, backdrop = %d  WHERE ID = %d', $mov['cover'], $mov['backdrop'], $xxxID));
+				$this->db->queryExec(sprintf('UPDATE xxxinfo SET cover = %d, backdrop = %d  WHERE id = %d', $mov['cover'], $mov['backdrop'], $xxxID));
 			}
 		} else {
 			// If xxxinfo title is found, update release with the current xxxinfo id because it was nulled before..
