@@ -18,7 +18,8 @@ class DB
 	 */
 	public function __construct()
 	{
-		$this->cli = Utility::isCLI();
+		$this->utility = new Utility();
+		$this->cli = $this->utility->isCLI();
 		$this->log = new ColorCLI();
 
 		if (!(self::$instance instanceof PDO)) {
@@ -332,7 +333,7 @@ class DB
 		if ($query == "")
 			return false;
 
-		$query = Utility::collapseWhiteSpace($query);
+		$query = $this->utility->collapseWhiteSpace($query);
 
 		if ($useCache) {
 			$cache = new Cache();
@@ -369,7 +370,7 @@ class DB
 			return false;
 		}
 
-		$query = Utility::collapseWhiteSpace($query);
+		$query = $this->utility->collapseWhiteSpace($query);
 
 
 		try {
@@ -415,7 +416,7 @@ class DB
 			return false;
 		}
 
-		$query = Utility::collapseWhiteSpace($query);
+		$query = $this->utility->collapseWhiteSpace($query);
 
 
 		$i = 2;

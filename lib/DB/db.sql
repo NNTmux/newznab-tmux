@@ -18,7 +18,8 @@ ADD `proc_par2` BIT NOT NULL DEFAULT 0,
 ADD `proc_nfo` BIT NOT NULL DEFAULT 0,
 ADD `proc_files` BIT NOT NULL DEFAULT 0,
 ADD `gamesinfo_id` INT AFTER consoleinfoID,
-ADD `nzbstatus` TINYINT(1) NOT NULL DEFAULT 1;
+ADD `nzbstatus` TINYINT(1) NOT NULL DEFAULT 1,
+ADD `proc_sorter` TINYINT(1) NOT NULL DEFAULT '0';
 CREATE INDEX `ix_releases_nfostatus` ON `releases` (`nfostatus` ASC) USING HASH;
 CREATE INDEX `ix_releases_reqidstatus` ON `releases` (`reqidstatus` ASC) USING HASH;
 CREATE INDEX `ix_releases_passwordstatus` ON `releases` (`passwordstatus`);
@@ -31,6 +32,9 @@ CREATE INDEX `ix_releases_gamesinfo_id` ON `releases` (`gamesinfo_id`);
 CREATE INDEX `ix_releases_status` ON `releases` (`nzbstatus`, `iscategorized`, `isrenamed`, `nfostatus`, `ishashed`, `passwordstatus`, `dehashstatus`, `releasenfoID`, `musicinfoID`, `consoleinfoID`, `bookinfoID`, `haspreview`, `categoryID`, `imdbID`, `rageID`);
 
 ALTER TABLE users ADD COLUMN gameview INT AFTER consoleview;
+ALTER TABLE users ADD COLUMN xxxview INT AFTER consoleview;
+ALTER TABLE users ADD COLUMN cp_api  VARCHAR(255) NULL DEFAULT NULL;
+ALTER TABLE users ADD COLUMN cp_url  VARCHAR(255) NULL DEFAULT NULL;
 
 DROP TABLE IF EXISTS prehash;
 CREATE TABLE prehash (
@@ -202,7 +206,7 @@ INSERT INTO tmux (setting, value) VALUES ('defrag_cache', '900'),
   ('ffmpeg_duration', '5'),
   ('ffmpeg_image_time', '5'),
   ('processvideos', '0'),
-  ('sqlpatch', '68');
+  ('sqlpatch', '71');
 
 DROP TABLE IF EXISTS releasesearch;
 CREATE TABLE releasesearch (
@@ -494,6 +498,32 @@ CREATE TABLE         gamesinfo (
   updateddate DATETIME            NOT NULL,
   PRIMARY KEY                    (id),
   UNIQUE INDEX ix_gamesinfo_asin (asin)
+)
+  ENGINE          = InnoDB
+  DEFAULT CHARSET = utf8
+  COLLATE         = utf8_unicode_ci
+  AUTO_INCREMENT  = 1;
+
+DROP TABLE IF EXISTS xxxinfo;
+CREATE TABLE         xxxinfo (
+  id          INT(10) UNSIGNED               NOT NULL AUTO_INCREMENT,
+  title       VARCHAR(255)                   NOT NULL,
+  tagline     VARCHAR(1024)                  NOT NULL,
+  plot        BLOB                           NULL DEFAULT NULL,
+  genre       VARCHAR(64)                    NOT NULL,
+  director    VARCHAR(64)                    DEFAULT NULL,
+  actors      VARCHAR(2000)                  NOT NULL,
+  extras      TEXT                           DEFAULT NULL,
+  productinfo TEXT                           DEFAULT NULL,
+  trailers    TEXT                           DEFAULT NULL,
+  directurl   VARCHAR(2000)                  NOT NULL,
+  classused   VARCHAR(3)                     NOT NULL,
+  cover       TINYINT(1) UNSIGNED            NOT NULL DEFAULT '0',
+  backdrop    TINYINT(1) UNSIGNED            NOT NULL DEFAULT '0',
+  createddate DATETIME                       NOT NULL,
+  updateddate DATETIME                       NOT NULL,
+  PRIMARY KEY                      (id),
+  INDEX        ix_xxxinfo_title  (title)
 )
   ENGINE          = InnoDB
   DEFAULT CHARSET = utf8
@@ -1225,7 +1255,13 @@ INSERT INTO menu (href, title, tooltip, role, ordinal ) VALUES ('newposterwall',
 INSERT INTO `site` (`setting`, `value`) VALUES
   ('categorizeforeign',	'1'),
   ('catwebdl',	'0'),
-  ('giantbombkey', '');
+  ('giantbombkey', ''),
+  ('lookupxxx', 1),
+  ('maxxxxprocessed', 100),
+  ('rottentomatoquality', 'profile'),
+  ('anidbkey', '');
+
+ALTER TABLE animetitles CHANGE createddate unixtime INT(12) UNSIGNED NOT NULL;
 
 DROP TRIGGER IF EXISTS check_insert;
 DROP TRIGGER IF EXISTS check_update;
@@ -1235,18 +1271,14 @@ CREATE TRIGGER check_insert BEFORE INSERT ON releases FOR EACH ROW BEGIN IF NEW.
                                                                             NEW.name REGEXP '[a-fA-F0-9]{32}'
 THEN SET NEW.ishashed = 1;
 ELSEIF NEW.name REGEXP '^\\[ ?([[:digit:]]{4,6}) ?\\]|^REQ\s*([[:digit:]]{4,6})|^([[:digit:]]{4,6})-[[:digit:]]{1}\\['
-  THEN SET NEW.isrequestid = 1;
-ELSEIF NEW.releasenfoID = 0
-  THEN SET NEW.nfostatus = -1; END IF;
+  THEN SET NEW.isrequestid = 1; END IF;
 END;
 $$
 CREATE TRIGGER check_update BEFORE UPDATE ON releases FOR EACH ROW BEGIN IF NEW.searchname REGEXP '[a-fA-F0-9]{32}' OR
                                                                             NEW.name REGEXP '[a-fA-F0-9]{32}'
 THEN SET NEW.ishashed = 1;
 ELSEIF NEW.name REGEXP '^\\[ ?([[:digit:]]{4,6}) ?\\]|^REQ\s*([[:digit:]]{4,6})|^([[:digit:]]{4,6})-[[:digit:]]{1}\\['
-  THEN SET NEW.isrequestid = 1;
-ELSEIF NEW.releasenfoID = 0
-  THEN SET NEW.nfostatus = -1; END IF;
+  THEN SET NEW.isrequestid = 1;END IF;
 END;
 $$
 CREATE TRIGGER insert_search AFTER INSERT ON releases FOR EACH ROW BEGIN INSERT INTO releasesearch (releaseID, guid, name, searchname)

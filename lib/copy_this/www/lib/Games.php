@@ -115,7 +115,7 @@ class Games
 		$s = new Sites();
 		$this->site = $s->get();
 		$this->c = new ColorCLI();
-		$this->publicKey = $this->tmux->giantbombkey;
+		$this->publicKey = $this->site->giantbombkey;
 		$this->gameQty = ($this->tmux->maxgamesprocessed != '') ? $this->tmux->maxgamesprocessed : 150;
 		$this->sleepTime = ($this->tmux->amazonsleep != '') ? $this->tmux->amazonsleep : 1000;
 		$this->imgSavePath = WWW_DIR . 'covers/games' . '/';
