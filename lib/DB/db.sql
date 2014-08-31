@@ -17,8 +17,9 @@ ADD `proc_pp` TINYINT(1) NOT NULL DEFAULT 0,
 ADD `proc_par2` BIT NOT NULL DEFAULT 0,
 ADD `proc_nfo` BIT NOT NULL DEFAULT 0,
 ADD `proc_files` BIT NOT NULL DEFAULT 0,
-ADD `gamesinfo_id` INT AFTER consoleinfoID,
-ADD `nzbstatus` TINYINT(1) NOT NULL DEFAULT 1,
+ADD `gamesinfo_id` INT SIGNED NOT NULL DEFAULT '0',
+ADD `xxxinfo_id` INT SIGNED NOT NULL DEFAULT '0',
+ADD `nzbstatus` TINYINT(1) NOT NULL DEFAULT 0,
 ADD `proc_sorter` TINYINT(1) NOT NULL DEFAULT '0';
 CREATE INDEX `ix_releases_nfostatus` ON `releases` (`nfostatus` ASC) USING HASH;
 CREATE INDEX `ix_releases_reqidstatus` ON `releases` (`reqidstatus` ASC) USING HASH;
@@ -29,6 +30,7 @@ CREATE INDEX `ix_releases_haspreview` ON `releases` (`haspreview` ASC) USING HAS
 CREATE INDEX `ix_releases_postdate_name` ON `releases` (`postdate`, `name`);
 CREATE INDEX `ix_releases_prehashid_searchname` ON `releases` (`prehashID`, `searchname`);
 CREATE INDEX `ix_releases_gamesinfo_id` ON `releases` (`gamesinfo_id`);
+CREATE INDEX `ix_releases_xxxinfo_id` ON `releases` (`xxxinfo_id`);
 CREATE INDEX `ix_releases_status` ON `releases` (`nzbstatus`, `iscategorized`, `isrenamed`, `nfostatus`, `ishashed`, `passwordstatus`, `dehashstatus`, `releasenfoID`, `musicinfoID`, `consoleinfoID`, `bookinfoID`, `haspreview`, `categoryID`, `imdbID`, `rageID`);
 
 ALTER TABLE users ADD COLUMN gameview INT AFTER consoleview;
@@ -206,7 +208,7 @@ INSERT INTO tmux (setting, value) VALUES ('defrag_cache', '900'),
   ('ffmpeg_duration', '5'),
   ('ffmpeg_image_time', '5'),
   ('processvideos', '0'),
-  ('sqlpatch', '72');
+  ('sqlpatch', '73');
 
 DROP TABLE IF EXISTS releasesearch;
 CREATE TABLE releasesearch (
