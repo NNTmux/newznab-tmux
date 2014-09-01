@@ -427,7 +427,7 @@ class Games
 					} else {
 						$gam['esrb'] = (string)$this->_gameResults['original_game_rating']['name'];
 					}
-					$gam['releasedate'] = $this->pdo->escapeString((string)$this->_gameResults['original_release_date']);
+					$gam['releasedate'] = (string)$this->_gameResults['original_release_date'];
 
 					if (isset($this->_gameResults['description'])) {
 						$gam['review'] = trim(strip_tags((string)$this->_gameResults['description']));

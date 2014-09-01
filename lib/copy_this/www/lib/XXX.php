@@ -545,7 +545,7 @@ class XXX
 				}
 				if ($this->parseXXXSearchName($arr['searchname']) !== false) {
 
-					$this->currentRelID = $arr['ID'];
+					$this->currentRelID = $arr['id'];
 					$movieName = $this->currentTitle;
 
 					if ($this->echooutput) {
