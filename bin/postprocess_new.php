@@ -69,4 +69,6 @@ if (isset($argv[1]) && $argv[1] === "additional") {
                 $postprocess -> processOtherMiscCategory();
 } else if (isset($argv[1]) && $argv[1] === "sharing") {
                 $pprocess -> processSharing($nntp);
+} else if (isset($argv[1]) && $argv[1] === "additional") {
+	$pprocess->processAdditional($nntp);
 }
