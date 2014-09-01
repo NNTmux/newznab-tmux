@@ -10,12 +10,10 @@
 															src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbID}-cover.jpg"
 															width="180" alt="{$movie.title|escape:"htmlall"}"
 															style="float:right;" />{/if}
-{if $xxx && $xxx.cover == 1}<img class="shadow img-thumbnail" style="vertical-align:top"
-								 src="{$smarty.const.WWW_TOP}/covers/xxx/{$xxx.id}-cover.jpg"
-								 alt="{$xxx.title|escape:"htmlall"}">{/if}
-{if $game && $game.cover == 1}<img class="shadow img-thumbnail" style="vertical-align:top"
-								   src="{$smarty.const.WWW_TOP}/covers/games/{$game.id}.jpg"
-								   alt="{$game.title|escape:"htmlall"}">{/if}
+{if $game && $game.cover == 1}<img class="shadow" src="{$smarty.const.WWW_TOP}/covers/games/{$game.id}.jpg" width="160"
+								   alt="{$con.title|escape:"htmlall"}" style="float:right;" />{/if}
+{if $xxx && $xxx.cover == 1}<img class="shadow" src="{$smarty.const.WWW_TOP}/covers/xxx/{$xxx.id}-cover.jpg" width="160"
+								 alt="{$movie.title|escape:"htmlall"}" style="float:right;" />{/if}
 {if $anidb && $release.anidbID > 0 && $anidb.picture != ""}<img class="shadow"
 																src="{$smarty.const.WWW_TOP}/covers/anime/{$anidb.anidbID}.jpg"
 																width="180" alt="{$anidb.title|escape:"htmlall"}"
@@ -208,15 +206,29 @@
 
 {if $game}
 	<tr>
-		<th style="vertical-align:top">PC Game Info:</th>
-		<td><strong>{$game.title|escape:"htmlall"} ({$game.releasedate|date_format:"%Y"})</strong><br>
-			{if $game.review != ""}<span class="descinitial">{$game.review|escape:"htmlall"|nl2br|magicurl|truncate:"350":" <a class=\"descmore\" href=\"#\">more...</a>"}</span>{if $game.review|strlen > 350}<span class="descfull">{$game.review|escape:"htmlall"|nl2br|magicurl}</span>{/if}<br><br>{/if}
-			{if $game.esrb != ""}<strong>ESRB:</strong> {$game.esrb|escape:"htmlall"}<br>{/if}
-			{if $game.genres != ""}<strong>Genre:</strong> {$game.genres|escape:"htmlall"}<br>{/if}
-			{if $game.publisher != ""}<strong>Publisher:</strong> {$game.publisher|escape:"htmlall"}<br>{/if}
+		<th>Game Info:</th>
+		<td>
+			<strong>{$game.title|escape:"htmlall"} ({$game.releasedate|date_format:"%Y"})</strong><br/>
+			{if $game.review != ""}<span
+					class="descinitial">{$game.review|escape:"htmlall"|nl2br|magicurl|truncate:"350":" <a class=\"descmore\" href=\"#\">more...</a>"}</span>{if $game.review|strlen > 350}
+				<span class="descfull">{$game.review|escape:"htmlall"|nl2br|magicurl}</span>{/if}
+				<br/>
+				<br/>
+			{/if}
+			{if $game.esrb != ""}<strong>ESRB:</strong>{$game.esrb|escape:"htmlall"}<br/>{/if}
+			{if $game.genres != ""}<strong>Genre:</strong>{$game.genres|escape:"htmlall"}<br/>{/if}
+			{if $game.publisher != ""}<strong>Publisher:</strong>{$game.publisher|escape:"htmlall"}<br/>{/if}
+			{if $game.platform != ""}<strong>Platform:</strong>{$game.platform|escape:"htmlall"}<br/>{/if}
 			{if $game.releasedate != ""}<strong>Released:</strong> {$game.releasedate|date_format}{/if}
 			<div style="margin-top:10px;">
-				<span class="label label-default"><a target="_blank" href="{$site->dereferrer_link}{$game.url}/" title="View game at Giantbomb">Giantbomb</a></span>
+				{if $game.classused == "gb"}
+					<a class="rndbtn" target="_blank" href="{$site->dereferrer_link}{$game.url}"
+					   title="View game at Giantbomb">Giantbomb</a>
+				{/if}
+				{if $game.classused == "steam"}
+					<a class="rndbtn" target="_blank" href="{$site->dereferrer_link}{$game.url}"
+					   title="View game at Steam">Steam</a>
+				{/if}
 			</div>
 		</td>
 	</tr>
@@ -224,32 +236,35 @@
 
 {if $xxx}
 	<tr>
-		<th style="vertical-align:top">XXX Info:</th>
-		<td><strong>{$xxx.title|stripslashes|escape:"htmlall"}</strong>
-			{if $xxx.tagline != ''}<br>{$xxx.tagline|stripslashes|escape:"htmlall"}{/if}
-			{if $xxx.plot != ''}{if $xxx.tagline != ''} - {else}<br>{/if}{$xxx.plot|stripslashes|escape:"htmlall"}{/if}
-			<br><br>{if $xxx.director != ""} <strong>Director:</strong> {$xxx.director}<br>{/if}
-			<strong>Genre:</strong> {$xxx.genre}
-			{if $xxx.actors !=''}<br><strong>Starring:</strong>{$xxx.actors}{/if}
-			{if $xxx.trailers != ''}
+		<th>XXX Info:</th>
+		<td>
+			<strong>{$xxx.title|stripslashes|escape:"htmlall"}</strong>
+			{if $xxx.tagline != ''}<br/>{$xxx.tagline|stripslashes|escape:"htmlall"}{/if}
+			{if $xxx.plot != ''}{if $xxx.tagline != ''} - {else}<br/>{/if}{$xxx.plot|stripslashes|escape:"htmlall"}{/if}
+			<br/><br/>{if $xxx.director != ""} <strong>Director:</strong> {$xxx.director}<br/>{/if}
+			<strong>Genre:</strong> {$xxx.genres}
+			<br/><strong>Starring:</strong> {$xxx.actors}
+			{if $xxx.trailer != ''}
 				<br /><strong>Trailer:</strong>
-				<div>{$xxx.trailers}</div>
+				<div>{$xxx.trailer}</div>
 			{/if}
 			<div style="margin-top:10px;">
-							<span class="label label-default">
-								{if $xxx.classused === "ade"}
-									<a target="_blank" href="{$site->dereferrer_link}{$xxx.directurl}/" title="View at Adult DVD Empire">ADE</a>
-								{elseif $xxx.classused === "pop"}
-								<a target="_blank" href="{$site->dereferrer_link}{$xxx.directurl}/" title="View at Popporn">Popporn</a>
-								{else}
-								<a target="_blank" href="{$site->dereferrer_link}{$xxx.directurl}/" title="View at Hot Movies">HM</a>
-								{/if}
-							</span>
-				{if $xxx.classused != ''}
-					<span class="label label-default">
-								<a target="_blank" href="{$site->dereferrer_link}http://www.iafd.com/results.asp?searchtype=title&searchstring={$xxx.title}" title="Search IAFD">IAFD</a>
-								</span>
+				{if $xxx.classused === "ade"}
+					<a class="rndbtn" target="_blank" href="{$site->dereferrer_link}{$xxx.directurl}"
+					   title="View at Adult DVD Empire">ADE</a>
+				{elseif $xxx.classused === "pop"}
+					<a class="rndbtn" target="_blank" href="{$site->dereferrer_link}{$xxx.directurl}/"
+					   title="View at Popporn">Popporn</a>
+				{elseif $xxx.classused === "aebn"}
+					<a class="rndbtn" target="_blank" href="{$site->dereferrer_link}{$xxx.directurl}"
+					   title="View at Adult Entertainment Broadcast Network">AEBN</a>
+				{else}
+					<a class="rndbtn" target="_blank" href="{$site->dereferrer_link}{$xxx.directurl}"
+					   title="View at Hot Movies">HM</a>
 				{/if}
+				<a class="rndbtn" target="_blank"
+				   href="{$site->dereferrer_link}http://www.iafd.com/results.asp?searchtype=title&searchstring={$xxx.title}"
+				   title="Search IAFD">IAFD</a>
 			</div>
 		</td>
 	</tr>
