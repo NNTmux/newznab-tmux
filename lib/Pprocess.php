@@ -1,22 +1,23 @@
 <?php
 require_once(dirname(__FILE__) . "/../bin/config.php");
-require_once(WWW_DIR . "/lib/rarinfo/par2info.php");
-require_once(WWW_DIR . "/lib/rarinfo/archiveinfo.php");
-require_once(WWW_DIR . "/lib/rarinfo/zipinfo.php");
-require_once(WWW_DIR . "/lib/framework/db.php");
-require_once(WWW_DIR . "/lib/category.php");
-require_once(WWW_DIR . "/lib/releases.php");
-require_once(WWW_DIR . "/lib/releaseimage.php");
-require_once(WWW_DIR . "/lib/releaseextra.php");
-require_once(WWW_DIR . "/lib/groups.php");
-require_once(WWW_DIR . '/lib/nntp.php');
-require_once(WWW_DIR . "/lib/site.php");
-require_once(WWW_DIR . "/lib/Tmux.php");
-require_once(WWW_DIR . "/lib/amazon.php");
-require_once(WWW_DIR . "/lib/genres.php");
-require_once(WWW_DIR . "/lib/anidb.php");
-require_once(WWW_DIR . "/lib/book.php");
-require_once(WWW_DIR . "/lib/Games.php");
+require_once(WWW_DIR . "lib/rarinfo/par2info.php");
+require_once(WWW_DIR . "lib/rarinfo/archiveinfo.php");
+require_once(WWW_DIR . "lib/rarinfo/zipinfo.php");
+require_once(WWW_DIR . "lib/framework/db.php");
+require_once(WWW_DIR . "lib/category.php");
+require_once(WWW_DIR . "lib/releases.php");
+require_once(WWW_DIR . "lib/releaseimage.php");
+require_once(WWW_DIR . "lib/releaseextra.php");
+require_once(WWW_DIR . "lib/groups.php");
+require_once(WWW_DIR . 'lib/nntp.php');
+require_once(WWW_DIR . "lib/site.php");
+require_once(WWW_DIR . "lib/Tmux.php");
+require_once(WWW_DIR . "lib/amazon.php");
+require_once(WWW_DIR . "lib/genres.php");
+require_once(WWW_DIR . "lib/anidb.php");
+require_once(WWW_DIR . "lib/book.php");
+require_once(WWW_DIR . "lib/Games.php");
+require_once(WWW_DIR . "lib/XXX.php");
 require_once("consoletools.php");
 require_once("ColorCLI.php");
 require_once("nzbcontents.php");
@@ -28,7 +29,6 @@ require_once("TraktTv.php");
 require_once("Film.php");
 require_once("TvAnger.php");
 require_once("Konsole.php");
-require_once("functions.php");
 require_once("ProcessAdditional.php");
 
 /**
@@ -83,7 +83,7 @@ class PProcess
 	 *
 	 * @var NameFixer
 	 */
-	protected $nameFixer;
+	protected $NameFixer;
 
 	/**
 	 * Constructor.
@@ -99,13 +99,12 @@ class PProcess
 		//\\ Class instances.
 		$s = new Sites();
 		$t = new Tmux();
-		$this->db = new DB();
+		$this->pdo = new DB();
 		$this->groups = new Groups();
 		$this->_par2Info = new Par2Info();
-		$this->nameFixer = new NameFixer($this->echooutput);
+		$this->namefixer = new NameFixer($this->echooutput);
 		$this->Nfo = new Info($this->echooutput);
 		$this->releaseFiles = new ReleaseFiles();
-		$this->functions = new Functions(true);
 
 		//\\ Site object.
 		$this->tmux = $t->get();
@@ -147,7 +146,7 @@ class PProcess
 	public function processAnime()
 	{
 		if ($this->site->lookupanidb === '1') {
-			$anidb = new AniDB($this->echooutput);
+			$anidb = new AniDB(['Echo' => $this->echooutput, 'Settings' => $this->pdo]);
 			$anidb->animetitlesUpdate();
 			$anidb->processAnimeReleases();
 		}
@@ -187,8 +186,19 @@ class PProcess
 	public function processGames()
 	{
 		if ($this->site->lookupgames !== 0) {
-			$games = new Games($this->echooutput);
+			$games = new Games(['Echo' => $this->echooutput, 'Settings' => $this->pdo]);
 			$games->processGamesReleases();
+		}
+	}
+
+	/**
+	 * Lookup xxx if enabled.
+	 */
+	public function processXXX()
+	{
+		if ($this->site->lookupxxx == 1) {
+			$xxx = new XXX($this->echooutput);
+			$xxx->processXXXReleases();
 		}
 	}
 
@@ -254,7 +264,7 @@ class PProcess
 	 */
 	public function processSharing(&$nntp)
 	{
-		$sharing = new Sharing($this->db, $nntp);
+		$sharing = new Sharing($this->pdo, $nntp);
 		$sharing->start();
 	}
 
@@ -286,7 +296,7 @@ class PProcess
 	 */
 	public function processAdditional($nntp, $releaseToWork = '', $groupID = '')
 	{
-		$processAdditional = new ProcessAdditional($this->echooutput, $nntp, $this->db, $this->site, $this->tmux);
+		$processAdditional = new ProcessAdditional($this->echooutput, $nntp, $this->pdo, $this->site, $this->tmux);
 		$processAdditional->start($releaseToWork, $groupID);
 	}
 
@@ -309,7 +319,7 @@ class PProcess
 			return false;
 		}
 
-		$query = $this->db->queryOneRow(
+		$query = $this->pdo->queryOneRow(
 			sprintf('
 				SELECT ID, groupID, categoryID, name, searchname, UNIX_TIMESTAMP(postdate) AS post_date, ID AS releaseID
 				FROM releases WHERE isrenamed = 0 AND ID = %d',
@@ -338,7 +348,7 @@ class PProcess
 		}
 
 		// Get the PAR2 file.
-		$par2 = $nntp->getMessages($this->functions->getByNameByID($groupID), $messageID);
+		$par2 = $nntp->getMessages($this->groups->getByNameByID($groupID), $messageID);
 		if ($nntp->isError($par2)) {
 			return false;
 		}
@@ -370,9 +380,9 @@ class PProcess
 				if ($this->addpar2) {
 					// Add to release files.
 					if ($filesAdded < 11 &&
-						$this->db->queryOneRow(
+						$this->pdo->queryOneRow(
 							sprintf('SELECT ID FROM releasefiles WHERE releaseID = %d AND name = %s',
-								$relID, $this->db->escapeString($file['name'])
+								$relID, $this->pdo->escapeString($file['name'])
 							)
 						) === false
 					) {
@@ -387,13 +397,13 @@ class PProcess
 					// Try to get a new name.
 					if ($foundName === false) {
 						$query['textstring'] = $file['name'];
-						if ($this->nameFixer->checkName($query, 1, 'PAR2, ', 1, $show) === true) {
+						if ($this->namefixer->checkName($query, 1, 'PAR2, ', 1, $show) === true) {
 							$foundName = true;
 						}
 					}
 				}
 				// Update the file count with the new file count + old file count.
-				$this->db->exec(
+				$this->pdo->exec(
 					sprintf('
 						UPDATE releases SET rarinnerfilecount = rarinnerfilecount + %d
 						WHERE ID = %d',

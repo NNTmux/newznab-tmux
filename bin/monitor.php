@@ -8,10 +8,9 @@ require_once(dirname(__FILE__) . "/../lib/showsleep.php");
 require_once(dirname(__FILE__) . "/../lib/functions.php");
 
 
-$version = "0.4r2011";
+$version = "0.4r2037";
 
 $db = new DB();
-$functions = new Functions();
 $s = new Sites();
 $site = $s->get();
 $patch = $site->dbversion;
@@ -48,14 +47,14 @@ $proc = "SELECT
 ( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE categoryID BETWEEN 1000 AND 1999 AND consoleinfoID IS NULL ) AS console,
 ( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE categoryID BETWEEN 2000 AND 2999 AND imdbID IS NULL ) AS movies,
 ( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE categoryID BETWEEN 3000 AND 3999 AND musicinfoID IS NULL) AS audio,
-( SELECT COUNT(*) FROM releases r USE INDEX(ix_releases_status), category c WHERE c.ID = r.categoryID AND c.parentID = 6000 AND r.passwordstatus = -1 AND r.haspreview = -1 AND c.disablepreview = 0) AS xxx,
-( SELECT COUNT(*) FROM releases r INNER JOIN category c ON c.ID = r.categoryID WHERE r.nzbstatus = 1 AND ((r.categoryID BETWEEN 4000 AND 4999 AND r.passwordstatus BETWEEN -6 AND -1 AND r.haspreview = -1 AND c.disablepreview = 0) OR (r.categoryID = 4050 AND r.gamesinfo_id IS NULL))) AS pc,
+( SELECT COUNT(*) FROM releases r USE INDEX(ix_releases_status), category c WHERE c.ID = r.categoryID AND c.parentID = 6000 AND ((r.passwordstatus = -1 AND r.haspreview = -1 AND c.disablepreview = 0) OR (categoryID BETWEEN 6000 AND 6040 AND xxxinfo_id = 0))) AS xxx,
+( SELECT COUNT(*) FROM releases r INNER JOIN category c ON c.ID = r.categoryID WHERE r.nzbstatus = 1 AND ((r.categoryID BETWEEN 4000 AND 4999 AND r.passwordstatus BETWEEN -6 AND -1 AND r.haspreview = -1 AND c.disablepreview = 0) OR (r.categoryID = 4050 AND r.gamesinfo_id = 0))) AS pc,
 ( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE categoryID BETWEEN 5000 AND 5999 AND rageID = -1) AS tv,
 ( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE categoryID = 7020 AND bookinfoID IS NULL ) AS book,
-( SELECT COUNT(*) FROM releases r INNER JOIN category c ON c.ID = r.categoryID WHERE r.nzbstatus = 1 AND ((r.passwordstatus BETWEEN -6 AND -1 AND r.haspreview = -1 AND c.disablepreview = 0) OR (r.categoryID = 4050 AND r.gamesinfo_id IS NULL))) AS work,
+( SELECT COUNT(*) FROM releases r INNER JOIN category c ON c.ID = r.categoryID WHERE r.nzbstatus = 1 AND ((r.passwordstatus BETWEEN -6 AND -1 AND r.haspreview = -1 AND c.disablepreview = 0) OR (r.categoryID = 4050 AND r.gamesinfo_id IS NULL) OR (categoryID BETWEEN 6000 AND 6040 AND xxxinfo_id = 0))) AS work,
 ( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status)) AS releases,
 ( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE releasenfoID = 0 AND nfostatus BETWEEN -6 AND -1) AS nforemains,
-( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE nfostatus = 1 AND releasenfoID = 1) AS nfo,
+( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE nfostatus = 1 OR releasenfoID > 0) AS nfo,
 ( SELECT table_rows AS cnt FROM information_schema.TABLES WHERE table_name = 'parts' AND TABLE_SCHEMA = '" . DB_NAME . "' ) AS parts,
 ( SELECT COUNT(ID) FROM binaries WHERE procstat = 0 ) AS binaries,
 ( SELECT table_rows AS cnt FROM information_schema.TABLES WHERE table_name = 'binaries' AND TABLE_SCHEMA = '" . DB_NAME . "' ) AS binaries_total,
@@ -460,7 +459,7 @@ $mask5 = $c->tmuxOrange("%-16.16s %25.25s %25.25s");
 
 // Ananlyze tables
 printf($c->info("\nAnalyzing your tables to refresh your indexes."));
-$functions->optimise(true, 'analyze');
+$db->optimise(false, 'analyze', false, ['releases']);
 
 sleep(5);
 
@@ -529,6 +528,7 @@ while ($i > 0) {
 	//kill mediainfo and ffmpeg if exceeds 60 sec
 	shell_exec("killall -o 60s -9 mediainfo 2>&1 1> /dev/null");
 	shell_exec("killall -o 60s -9 ffmpeg 2>&1 1> /dev/null");
+	shell_exec("killall -o 60s -9 avconv 2>&1 1> /dev/null");
 
 	$getdate = gmDate("Ymd");
 
@@ -1442,8 +1442,7 @@ while ($i > 0) {
 		} else if (($post == 2) && ($nfo_remaining_now > 0)) {
 			$log = writelog($panes0[1]);
 			shell_exec("tmux respawnp -t${tmux_session}:0.1 ' \
-						$_python ${DIR}/../python/postprocess_threaded.py nfo $log;\
-                        $_php ${DIR}/../bin/postprocess_new.php nfo $log; date +\"%D %T\"; $_sleep $post_timer' 2>&1 1> /dev/null"
+						$_python ${DIR}/../python/postprocess_threaded.py nfo $log; date +\"%D %T\"; $_sleep $post_timer' 2>&1 1> /dev/null"
 			);
 		} else if (($post == 3) && (($nfo_remaining_now > 0) || ($work_remaining_now + $pc_releases_proc + $xxx_releases_proc > 0))) {
 			//run postprocess_releases additional
@@ -1466,8 +1465,7 @@ while ($i > 0) {
 			$log = writelog($panes0[1]);
 			shell_exec("tmux respawnp -t${tmux_session}:0.1 ' \
 						$_python ${DIR}/../python/postprocess_threaded.py additional $log;\
-                        $_python ${DIR}/../python/postprocess_threaded.py nfo $log;\
-                        $_php ${DIR}/../bin/postprocess_new.php nfo $log; date +\"%D %T\"; $_sleep $post_timer' 2>&1 1> /dev/null"
+                        $_python ${DIR}/../python/postprocess_threaded.py nfo $log; date +\"%D %T\"; $_sleep $post_timer' 2>&1 1> /dev/null"
 			);
 		} else if (($post != 0) && ($nfo_remaining_now == 0) && ($work_remaining_now + $pc_releases_proc + $xxx_releases_proc == 0)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
@@ -1704,14 +1702,14 @@ while ($i > 0) {
 			shell_exec("tmux respawnp -t${tmux_session}:2.7 'echo \"\033[38;5;${color}m\n${panes2[7]} has been disabled/terminated by Postprocess Books\"'");
 		}
 
-		//Process Other releases in pane 2.8 once if needed then exits
-		if (($maxload >= get_load()) && ($others == 1)) {
+		//Process XXX releases in pane 2.8 once if needed then exits
+		if (($maxload >= get_load()) && ($xxx_releases_proc > 0)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			$log = writelog($panes2[8]);
-			shell_exec("tmux respawnp -t${tmux_session}:2.8 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php postprocess_new.php other 2>&1 $log && echo \" \033[1;0;33m\"' 2>&1 1> /dev/null");
-		} else if ($others == 0) {
+			shell_exec("tmux respawnp -t${tmux_session}:2.8 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php postprocess_new.php xxx 2>&1 $log && echo \" \033[1;0;33m\"' 2>&1 1> /dev/null");
+		} else if ($xxx_releases_proc == 0) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:2.8 'echo \"\033[38;5;\"$color\"m\n$panes2[8] Disabled by OTHER\"' 2>&1 1> /dev/null");
+			shell_exec("tmux respawnp -t${tmux_session}:2.8 'echo \"\033[38;5;\"$color\"m\n$panes2[8] Disabled by XXX\"' 2>&1 1> /dev/null");
 		} else if ($maxload <= get_load()) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			shell_exec("tmux respawnp -t${tmux_session}:2.8 'echo \"\033[38;5;\"$color\"m\n$panes2[8] Disabled by Max Load\"' 2>&1 1> /dev/null");
@@ -1742,11 +1740,12 @@ while ($i > 0) {
 			$log = writelog($panes3[0]);
 			shell_exec("tmux respawnp -t${tmux_session}:3.0 ' \
                     cd $_lib && $_php fixReleaseNames.php 1 true other yes show 2>&1 $log; \
-                    cd $_py && $_python ${DIR}/../python/fixreleasenames_threaded.py nfo 2>&1 $log; \
-                    $_python ${DIR}/../python/fixreleasenames_threaded.py filename 2>&1 $log; \
-                    $_python ${DIR}/../python/fixreleasenames_threaded.py par2 2>&1 $log; \
-                    $_python ${DIR}/../python/fixreleasenames_threaded.py predbft 2>&1 $log; \
-                    $_php ${DIR}/../lib/fixReleaseNames.php 4 true other yes show $log; $_sleep $fix_timer' 2>&1 1> /dev/null"
+                    cd $_py && $_python ${DIR}/../python/groupfixrelnames_threaded.py nfo 2>&1 $log; \
+                    $_python ${DIR}/../python/groupfixrelnames_threaded.py md5 2>&1 $log; \
+                    $_python ${DIR}/../python/groupfixrelnames_threaded.py filename 2>&1 $log; \
+                    $_python ${DIR}/../python/groupfixrelnames_threaded.py par2 2>&1 $log; \
+                    $_python ${DIR}/../python/groupfixrelnames_threaded.py miscsorter 2>&1 $log; \
+                    $_python ${DIR}/../python/groupfixrelnames_threaded.py predbft 2>&1 $log; $_sleep $fix_timer' 2>&1 1> /dev/null"
 			);
 			$time27 = TIME();
 		} elseif (($maxload >= get_load()) && ($fix_names == 1)) {
@@ -1761,49 +1760,19 @@ while ($i > 0) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			shell_exec("tmux respawnp -t${tmux_session}:3.0 'echo \"\033[38;5;\"$color\"m\n$panes3[0] Disabled by Max Load\"' 2>&1 1> /dev/null");
 		}
-		//run predb_hash_decrypt.php in pane 3.1
-		if (($maxload >= get_load()) && (($dehash == 1) || ($dehash == 3))) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			$log = writelog($panes3[1]);
-			shell_exec("tmux respawnp -t${tmux_session}:3.1 'echo \"\033[38;5;\"$color\"m\" && cd $_lib && $_php predb_hash_decrypt.php 1000 2>&1 $log; $_sleep $dehash_timer' 2>&1 1> /dev/null");
-			$time28 = TIME();
-		} else if ($maxload <= get_load()) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:3.1 'echo \"\033[38;5;\"$color\"m\n$panes3[1] Disabled by Max Load\"' 2>&1 1> /dev/null");
-		} else {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:3.1 'echo \"\033[38;5;\"$color\"m\n$panes3[1] has been disabled/terminated by Decrypt Hashes\"'");
-		}
-		//run requestID or requestid threaded in pane 3.2
-		if (($maxload >= get_load()) && ($lookreqids == 2)) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			$log = writelog($panes3[2]);
-			shell_exec("tmux respawnp -t${tmux_session}:3.2 'echo \"\033[38;5;\"$color\"m\" && cd $_py && $_python ${DIR}/../python/requestid_threaded.py 2>&1 $log; $_sleep $lookreqids_timer' 2>&1 1> /dev/null");
-			$time30 = TIME();
-		} elseif (($maxload >= get_load()) && ($lookreqids == 1)) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			$log = writelog($panes3[2]);
-			shell_exec("tmux respawnp -t${tmux_session}:3.2 'echo \"\033[38;5;\"$color\"m\" && cd $_lib && $_php requestID.php 1000 true 2>&1 $log; $_sleep $lookreqids_timer' 2>&1 1> /dev/null");
-			$time30 = TIME();
-		} else if ($maxload <= get_load()) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:3.2 'echo \"\033[38;5;\"$color\"m\n$panes3[2] Disabled by Max Load\"' 2>&1 1> /dev/null");
-		} else {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:3.2 'echo \"\033[38;5;\"$color\"m\n$panes3[2] has been disabled/terminated by RequestID Lookup\"' 2>&1 1> /dev/null");
-		}
-		// Run Remove crap releases in pane 3.3
+
+		// Run Remove crap releases in pane 3.1
 		switch ($fix_crap_opt) {
 			// Do all types up to 4 hours.
 			case 'All':
-				$log = writelog($panes3[3]);
-				shell_exec("tmux respawnp -t${tmux_session}:3.3 ' \
-							$_php ${DIR}/../lib/removeCrapReleases_new.php true 4 $log; date +\"%D %T\"; $_sleep $crap_timer' 2>&1 1> /dev/null"
+				$log = writelog($panes3[1]);
+				shell_exec("tmux respawnp -t${tmux_session}:3.1 ' \
+							$_php ${DIR}/../lib/removeCrapReleases.php true 4 $log; date +\"%D %T\"; $_sleep $crap_timer' 2>&1 1> /dev/null"
 				);
 				break;
 			// The user has specified custom types.
 			case 'Custom':
-				$log = writelog($panes3[3]);
+				$log = writelog($panes3[1]);
 
 				// Check how many types the user picked.
 				$fcmax = count($fix_crap);
@@ -1818,12 +1787,12 @@ while ($i > 0) {
 					}
 
 					//Check to see if the pane is dead, if so respawn it.
-					if (shell_exec("tmux list-panes -t${tmux_session}:3 | grep ^3 | grep -c dead") == 1) {
+					if (shell_exec("tmux list-panes -t${tmux_session}:3 | grep ^1 | grep -c dead") == 1) {
 
 						// Run remove crap releases.
-						shell_exec("tmux respawnp -t${tmux_session}:3.3 ' \
+						shell_exec("tmux respawnp -t${tmux_session}:3.1 ' \
 								echo \"Running removeCrapReleases for $fix_crap[$fcnum]\"; \
-								php ${DIR}/../lib/removeCrapReleases_new.php true $fctime $fix_crap[$fcnum] $log; date +\"%D %T\"; $_sleep $crap_timer' 2>&1 1> /dev/null"
+								php ${DIR}/../lib/removeCrapReleases.php true $fctime $fix_crap[$fcnum] $log; date +\"%D %T\"; $_sleep $crap_timer' 2>&1 1> /dev/null"
 						);
 
 						// Increment so we know which type to run next.
@@ -1842,22 +1811,22 @@ while ($i > 0) {
 			case 'Disabled':
 			default:
 				$color = get_color($colors_start, $colors_end, $colors_exc);
-				shell_exec("tmux respawnp -k -t${tmux_session}:3.3 'echo \"\033[38;5;${color}m\n${panes3[3]} has been disabled/terminated by Remove Crap Releases\"'");
+				shell_exec("tmux respawnp -k -t${tmux_session}:3.1 'echo \"\033[38;5;${color}m\n${panes3[1]} has been disabled/terminated by Remove Crap Releases\"'");
 				break;
 		}
 
-		//run postprocess_pre.php in pane 3.4
-		if (($maxload >= get_load()) && (($dehash == 2) || ($dehash == 3))) {
+		//run postprocess_pre.php in pane 3.2
+		if ($maxload >= get_load()) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
-			$log = writelog($panes3[4]);
-			shell_exec("tmux respawnp -t${tmux_session}:3.4 'echo \"\033[38;5;\"$color\"m\" && cd $_lib && $_php postprocess_pre.php 2>&1 $log; $_sleep $dehash_timer' 2>&1 1> /dev/null");
+			$log = writelog($panes3[2]);
+			shell_exec("tmux respawnp -t${tmux_session}:3.2 'echo \"\033[38;5;\"$color\"m\" && cd $_lib && $_php postprocess_pre.php 2>&1 $log; ' 2>&1 1> /dev/null");
 			$time32 = TIME();
 		} else if ($maxload <= get_load()) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:3.4 'echo \"\033[38;5;\"$color\"m\n$panes3[4] Disabled by Max Load\"' 2>&1 1> /dev/null");
+			shell_exec("tmux respawnp -t${tmux_session}:3.2 'echo \"\033[38;5;\"$color\"m\n$panes3[2] Disabled by Max Load\"' 2>&1 1> /dev/null");
 		} else {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:3.4 'echo \"\033[38;5;\"$color\"m\n$panes3[4] has been disabled/terminated by Decrypt Hashes\"'");
+			shell_exec("tmux respawnp -t${tmux_session}:3.2 'echo \"\033[38;5;\"$color\"m\n$panes3[2] has been disabled/terminated by Postprocess Pre\"'");
 		}
 
 		//pane setup for IrcScraper / Sharing

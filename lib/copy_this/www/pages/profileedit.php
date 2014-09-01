@@ -9,6 +9,7 @@ $category = new Category;
 $sab = new SABnzbd($page);
 $nzbGet = new NZBGet($page);
 $users = new Users();
+$util = new Utility();
 
 if (!$users->isLoggedIn())
 	$page->show403();
@@ -34,7 +35,7 @@ switch ($action) {
 	case 'submit':
 
 		$data["email"] = $_POST['email'];
-		if (isset($_POST['saburl']) && strlen(trim($_POST['saburl'])) > 0 && !endsWith($_POST['saburl'], "/"))
+		if (isset($_POST['saburl']) && strlen(trim($_POST['saburl'])) > 0 && !$util->endsWith($_POST['saburl'], "/"))
 			$_POST['saburl'] = $_POST['saburl'] . "/";
 
 		if ($_POST['password'] != "" && $_POST['password'] != $_POST['confirmpassword']) {
@@ -68,6 +69,7 @@ switch ($action) {
 					(isset($_POST['movieview']) ? "1" : "0"),
 					(isset($_POST['musicview']) ? "1" : "0"),
 					(isset($_POST['gameview']) ? "1" : "0"),
+					(isset($_POST['xxxview']) ? "1" : "0"),
 					(isset($_POST['consoleview']) ? "1" : "0"),
 					(isset($_POST['bookview']) ? "1" : "0"),
 					$_POST['queuetypeids'],
@@ -79,7 +81,9 @@ switch ($action) {
 					(isset($_POST['sabpriority']) ? $_POST['sabpriority'] : ''),
 					(isset($_POST['sabapikeytype']) ? $_POST['sabapikeytype'] : ''),
 					(isset($_POST['nzbvortex_server_url']) ? $_POST['nzbvortex_server_url'] : false),
-					(isset($_POST['nzbvortex_api_key']) ? $_POST['nzbvortex_api_key'] : false)
+					(isset($_POST['nzbvortex_api_key']) ? $_POST['nzbvortex_api_key'] : false),
+					$_POST['cp_url'],
+					$_POST['cp_api']
 				);
 
 				$_POST['exccat'] = (!isset($_POST['exccat']) || !is_array($_POST['exccat'])) ? array() : $_POST['exccat'];
@@ -141,10 +145,11 @@ $page->meta_title = "Edit User Profile";
 $page->meta_keywords = "edit,profile,user,details";
 $page->meta_description = "Edit User Profile for " . $data["username"];
 
+$page->smarty->assign('cp_url_selected', $data['cp_url']);
+$page->smarty->assign('cp_api_selected', $data['cp_api']);
+
 
 $page->smarty->assign('catlist', $category->getForSelect(false));
 
 $page->content = $page->smarty->fetch('profileedit.tpl');
 $page->render();
-
-

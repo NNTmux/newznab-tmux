@@ -1,15 +1,15 @@
 <?php
-require_once(dirname(__FILE__)."/../bin/config.php");
-require_once(WWW_DIR."/lib/framework/db.php");
-require_once(WWW_DIR."/lib/site.php");
-require_once(WWW_DIR."/lib/Tmux.php");
+require_once(dirname(__FILE__) . "/../bin/config.php");
+require_once(WWW_DIR . "/lib/framework/db.php");
+require_once(WWW_DIR . "/lib/site.php");
+require_once(WWW_DIR . "/lib/Tmux.php");
+require_once(WWW_DIR . "/lib/util.php");
 require_once(WWW_DIR . "/lib/rarinfo/par2info.php");
 require_once(WWW_DIR . "/lib/rarinfo/sfvinfo.php");
 require_once("ColorCLI.php");
 require_once("Pprocess.php");
 require_once("Film.php");
 require_once("TvAnger.php");
-require_once("functions.php");
 require_once("getid3/getid3/getid3.php");
 
 /**
@@ -20,6 +20,7 @@ class Info
 {
 	/**
 	 * Site settings.
+	 *
 	 * @var bool|stdClass
 	 * @access private
 	 */
@@ -27,61 +28,70 @@ class Info
 
 	/**
 	 * How many nfo's to process per run.
+	 *
 	 * @var int
 	 */
 	private $nzbs;
 
 	/**
 	 * Max NFO size to process.
+	 *
 	 * @var int
 	 */
 	private $maxsize;
 
 	/**
 	 * Path to temporarily store files.
+	 *
 	 * @var string
 	 */
 	private $tmpPath;
 
 	/**
 	 * Instance of class ColorCLI
+	 *
 	 * @var ColorCLI
 	 */
 	private $c;
 
 	/**
 	 * Instance of class DB
+	 *
 	 * @var DB
 	 */
 	private $db;
 
 	/**
 	 * Primary color for console text output.
+	 *
 	 * @var string
 	 */
 	private $primary = 'Green';
 
 	/**
 	 * Color for warnings on console text output.
+	 *
 	 * @var string
 	 */
 	private $warning = 'Red';
 
 	/**
 	 * Color for headers(?) on console text output.
+	 *
 	 * @var string
 	 */
 	private $header = 'Yellow';
 
 	/**
 	 * Echo to cli?
+	 *
 	 * @var bool
 	 */
 	protected $echo;
 
 	const NFO_UNPROC = -1; // Release has not been processed yet.
-	const NFO_NONFO  =  0; // Release has no NFO.
-	const NFO_FOUND  =  1; // Release has an NFO.
+	const NFO_NONFO = 0; // Release has no NFO.
+	const NFO_FOUND = 1; // Release has an NFO.
 
 	/**
 	 * Default constructor.
@@ -90,7 +100,8 @@ class Info
 	 *
 	 * @access public
 	 */
-	public function __construct($echo = false) {
+	public function __construct($echo = false)
+	{
 		$this->echo = $echo;
 		$s = new Sites();
 		$this->c = new ColorCLI();
@@ -104,22 +115,25 @@ class Info
 		if (!preg_match('/[\/\\\\]$/', $this->tmpPath)) {
 			$this->tmpPath .= '/';
 		}
-		$this->functions = new Functions();
+		$this->util = new Utility();
 	}
 
 	/**
 	 * Look for a TvRage ID in a string.
 	 *
-	 * @param string  $str   The string with a TvRage ID.
+	 * @param string $str The string with a TvRage ID.
+	 *
 	 * @return string The TVRage ID on success.
 	 * @return bool   False on failure.
 	 *
 	 * @access public
 	 */
-	public function parseRageId($str) {
+	public function parseRageId($str)
+	{
 		if (preg_match('/tvrage\.com\/shows\/id-(\d{1,6})/i', $str, $matches)) {
 			return trim($matches[1]);
 		}
+
 		return false;
 	}
 
@@ -128,6 +142,7 @@ class Info
 	 *
 	 * @param string $possibleNFO The nfo.
 	 * @param string $guid        The guid of the release.
+	 *
 	 * @return bool               True on success, False on failure.
 	 *
 	 * @access public
@@ -152,7 +167,7 @@ class Info
 			file_put_contents($tmpPath, $possibleNFO);
 
 			// Linux boxes have 'file' (so should Macs)
-			if ($this->functions->hasCommand('file')) {
+			if ($this->util->hasCommand('file')) {
 				exec('file -b "' . $tmpPath . '"', $result);
 				if (is_array($result)) {
 					if (count($result) > 1) {
@@ -178,7 +193,7 @@ class Info
 			}
 
 			// If above checks couldn't  make a categorical identification, Use GetId3 to check if it's an image/video/rar/zip etc..
-			require_once ("getid3/getid3/getid3.php");
+			require_once("getid3/getid3/getid3.php");
 			$getid3 = new getid3();
 			$check = $getid3->analyze($tmpPath);
 			@unlink($tmpPath);
@@ -243,8 +258,10 @@ class Info
 				);
 				$nzbContents->parseNZB($release['guid'], $release['ID'], $release['groupID']);
 			}
+
 			return true;
 		}
+
 		return false;
 	}
 
@@ -252,15 +269,16 @@ class Info
 	 * Attempt to find NFO files inside the NZB's of releases.
 	 *
 	 * @param string $releaseToWork
-	 * @param int $processImdb       Attempt to find IMDB id's in the NZB?
-	 * @param int $processTvrage     Attempt to find TvRage id's in the NZB?
-	 * @param string $groupID        (optional) The group ID to work on.
-	 * @param object $nntp           Instance of class NNTP.
+	 * @param int    $processImdb   Attempt to find IMDB id's in the NZB?
+	 * @param int    $processTvrage Attempt to find TvRage id's in the NZB?
+	 * @param string $groupID       (optional) The group ID to work on.
+	 * @param object $nntp          Instance of class NNTP.
 	 *
 	 * @return int                   How many NFO's were processed?
 	 *
 	 */
-	public function processNfoFiles($releaseToWork = '', $processImdb = 1, $processTvrage = 1, $groupID = '', $nntp) {
+	public function processNfoFiles($releaseToWork = '', $processImdb = 1, $processTvrage = 1, $groupID = '', $nntp)
+	{
 		if (!isset($nntp)) {
 			exit($this->c->error("Unable to connect to usenet.\n"));
 		}
@@ -309,19 +327,18 @@ class Info
 				// Get count of releases per nfo status
 				$outString = 'Available to process';
 				for ($i = -1; $i >= -6; $i--) {
-					$ns =  $this->db->query('SELECT COUNT(*) AS count FROM releases WHERE nfostatus = ' . $i);
+					$ns = $this->db->query('SELECT COUNT(*) AS count FROM releases WHERE nfostatus = ' . $i);
 					$outString .= ', ' . $i . ' = ' . number_format($ns[0]['count']);
 				}
 				$this->c->doEcho($this->c->header($outString . '.'));
 			}
 			$groups = new Groups();
-			$functions = new Functions();
 			$nzbContents = new NZBContents(array('echo' => $this->echo, 'nntp' => $nntp, 'nfo' => $this, 'db' => $this->db, 'pp' => new PProcess(true)));
 			$movie = new Film($this->echo);
 			$tvRage = new TvAnger($this->echo);
 
 			foreach ($res as $arr) {
-				$fetchedBinary = $nzbContents->getNFOfromNZB($arr['guid'], $arr['ID'], $arr['groupID'], $functions->getByNameByID($arr['groupID']));
+				$fetchedBinary = $nzbContents->getNFOfromNZB($arr['guid'], $arr['ID'], $arr['groupID'], $groups->getByNameByID($arr['groupID']));
 				if ($fetchedBinary !== false) {
 					// Insert nfo into database.
 					$cp = $nc = null;
@@ -377,6 +394,7 @@ class Info
 				}
 			}
 		}
+
 		return $ret;
 	}
 
