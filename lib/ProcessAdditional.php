@@ -19,6 +19,7 @@ require_once(WWW_DIR . "/lib/anidb.php");
 require_once(WWW_DIR . "/lib/book.php");
 require_once(WWW_DIR . "/lib/nzb.php");
 require_once(WWW_DIR . "/lib/util.php");
+require_once(WWW_DIR . "/lib/SphinxSearch.php");
 require_once("consoletools.php");
 require_once("ColorCLI.php");
 require_once("nzbcontents.php");
@@ -123,6 +124,7 @@ Class ProcessAdditional
 		$this->_nfo = new Info($this->_echoCLI);
 		$this->_util = new Utility();
 		$this->c = new ColorCLI();
+		$this->sphinxsearch = new SphinxSearch();
 		$this->jpgSavePath = WWW_DIR . 'covers/sample/';
 		$this->vidSavePath = WWW_DIR . 'covers/video/';
 		$this->imgSavePath = WWW_DIR . 'covers/preview/';
@@ -1416,6 +1418,7 @@ Class ProcessAdditional
 								} else {
 									$newCat = $this->_categorize->determineCategory($rQuery['groupID'], $newName);
 								}
+								$newTitle = $this->_db->escapeString(substr($newName, 0, 255));
 
 								// Update the search name.
 								$this->_db->exec(
@@ -1428,6 +1431,8 @@ Class ProcessAdditional
 										$this->_release['ID']
 									)
 								);
+
+								$this->sphinxsearch->updateReleaseSearchName($this->_release['ID'], $newTitle);
 
 								// Echo the changed name.
 								if ($this->_echoCLI) {
@@ -1985,6 +1990,8 @@ Class ProcessAdditional
 					// Get a new category ID.
 					$newCategory = $this->_categorize->determineCategory($this->_release['groupID'], $newName);
 
+					$newTitle = $this->_db->escapeString(substr($newName, 0, 255));
+
 					// Update the release with the data.
 					$this->_db->exec(
 						sprintf('
@@ -1999,6 +2006,7 @@ Class ProcessAdditional
 							$this->_release['ID']
 						)
 					);
+					$this->sphinxsearch->updateReleaseSearchName($this->_release['ID'], $newTitle);
 
 					// Echo the changed name to CLI.
 					if ($this->_echoCLI) {
