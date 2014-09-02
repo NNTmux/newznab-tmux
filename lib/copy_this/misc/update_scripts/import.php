@@ -5,6 +5,7 @@ require_once(FS_ROOT . "/../../www/config.php");
 require_once(FS_ROOT . "/../../www/lib/framework/db.php");
 require_once(FS_ROOT . "/../../www/lib/releases.php");
 require_once(FS_ROOT . "/../../www/lib/nzbinfo.php");
+require_once(FS_ROOT . "/../../www/lib/util.php");
 require_once(FS_ROOT . "/../../www/lib/nzb.php");
 require_once(FS_ROOT . "/../../www/lib/category.php");
 
