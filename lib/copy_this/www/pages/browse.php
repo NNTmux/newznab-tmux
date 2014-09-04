@@ -53,8 +53,10 @@ elseif ($category != -1 && count($grp) == 0)
 			$section = 'books';
 		elseif ($cdata['parentID'] == Category::CAT_PARENT_MOVIE || $cdata['ID'] == Category::CAT_PARENT_MOVIE)
 			$section = 'movies';
-		elseif ($cdata['parentid'] == Category::CAT_PARENT_PC || $cdata['ID'] == Category::CAT_PC_GAMES)
+		elseif ($cdata['parentID'] == Category::CAT_PARENT_PC || $cdata['ID'] == Category::CAT_PC_GAMES)
 			$section = 'games';
+		elseif ($cdata['parentID'] == Category::CAT_PARENT_XXX || $cdata['ID'] == Category::CAT_PARENT_XXX)
+			$section = 'xxx';
 		elseif ($cdata['parentID'] == Category::CAT_PARENT_MUSIC || $cdata['ID'] == Category::CAT_PARENT_MUSIC)
 			$section = 'music';
 	} else {

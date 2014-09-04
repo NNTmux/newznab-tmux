@@ -110,7 +110,6 @@ Class Sharing
 		$this->siteSettings['enabled'] = ($this->siteSettings['enabled'] == 1 ? true : false);
 		$this->siteSettings['start_position'] = ($this->siteSettings['start_position'] == 1 ? true : false);
 		//add functions.php
-		$this->functions = new Functions();
 	}
 
 	/**
@@ -174,7 +173,7 @@ Class Sharing
 				INNER JOIN users u ON rc.userID = u.ID
 				INNER JOIN releases r on rc.releaseID = r.ID
 				WHERE rc.shared = 0 LIMIT %d',
-				$this->functions->unix_timestamp_column('rc.createddate'),
+				$this->db->unix_timestamp_column('rc.createddate'),
 				$this->siteSettings['max_push']
 			)
 		);
@@ -493,7 +492,7 @@ Class Sharing
 				(text, createddate, issynced, shareID, gid, nzb_guid, siteID, username, userID, releaseID, shared, host, sourceID)
 				VALUES (%s, %s, 1, %s, %s, %s, %s, %s, 0, 0, 2, "", 999)',
 				$this->db->escapeString($body['BODY']),
-				$this->functions->from_unixtime(($body['TIME'] > time() ? time() : $body['TIME'])),
+				$this->db->from_unixtime(($body['TIME'] > time() ? time() : $body['TIME'])),
 				$this->db->escapeString($body['SID']),
 				$this->db->escapeString($body['RID']),
 				$this->db->escapeString($body['RID']),

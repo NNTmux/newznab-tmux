@@ -17,6 +17,8 @@ require_once(WWW_DIR . "/lib/releasecomments.php");
 require_once(WWW_DIR . "/lib/postprocess.php");
 require_once(WWW_DIR . "/lib/sphinx.php");
 require_once(WWW_DIR . "lib/Categorize.php");
+require_once(WWW_DIR . "../misc/update_scripts/nix_scripts/tmux/lib/ReleaseCleaner.php");
+require_once(WWW_DIR . "../misc/update_scripts/nix_scripts/tmux/lib/Enzebe.php");
 
 /**
  * This class handles storage and retrieval of releases rows and the main processing functions
@@ -718,6 +720,46 @@ class Releases
 				$db->exec(sprintf("DELETE from releases where id = %d", $rel['ID']));
 			}
 		}
+	}
+
+	/**
+	 * Deletes a single release by GUID, and all the corresponding files.
+	 *
+	 * @param              $guid
+	 * @param              $id
+	 * @param NZB          $nzb
+	 * @param ReleaseImage $releaseImage
+	 */
+	public function deleteSingle($guid, $id, $nzb, $releaseImage)
+	{
+		$db = new DB();
+		$releaseImage = new ReleaseImage();
+		// Delete NZB from disk.
+		$nzbPath = $nzb->getNZBPath($guid);
+		if ($nzbPath) {
+			@unlink($nzbPath);
+		}
+
+		// Delete images.
+		$releaseImage->delete($guid);
+
+		// Delete from DB.
+		$db->queryExec(
+			sprintf('
+				DELETE r, rn, rc, uc, rf, ra, rs, rv, re
+				FROM releases r
+				LEFT OUTER JOIN releasenfo rn ON rn.releaseID = r.ID
+				LEFT OUTER JOIN releasecomment rc ON rc.releaseID = r.ID
+				LEFT OUTER JOIN usercart uc ON uc.releaseID = r.ID
+				LEFT OUTER JOIN releasefiles rf ON rf.releaseID = r.ID
+				LEFT OUTER JOIN releaseaudio ra ON ra.releaseID = r.ID
+				LEFT OUTER JOIN releasesubs rs ON rs.releaseID = r.ID
+				LEFT OUTER JOIN releasevideo rv ON rv.releaseID = r.ID
+				LEFT OUTER JOIN releaseextrafull re ON re.releaseID = r.ID
+				WHERE r.guid = %s',
+				$db->escapeString($guid)
+			)
+		);
 	}
 
 	/**
@@ -1649,9 +1691,33 @@ class Releases
 				$catId = $cat->determineCategory($row["group_name"], $row["relname"]);
 
 			// Clean release name
+			$releaseCleaning = new ReleaseCleaning();
 			$cleanRelName = $this->cleanReleaseName($row['relname']);
-			$relid = $this->insertRelease($cleanRelName, $row["parts"], $row["groupID"], $relguid, $catId, $row["regexID"], $row["date"], $row["fromname"], $row["reqID"], $page->site);
+			$cleanedName = $releaseCleaning->releaseCleaner(
+				$row['relname'], $row['fromname'], $row['group_name']
+			);
 
+			if (is_array($cleanedName)) {
+				$properName = $cleanedName['properlynamed'];
+				$prehashID = (isset($cleanerName['predb']) ? $cleanerName['predb'] : false);
+				$isReqID = (isset($cleanerName['requestID']) ? $cleanerName['requestID'] : false);
+				$cleanedName = $cleanedName['cleansubject'];
+			} else {
+				$properName = true;
+				$isReqID = $prehashID = false;
+			}
+
+			if ($prehashID === false && $cleanedName !== '') {
+				// try to match the cleaned searchname to predb title or filename here
+				$preHash = new PreHash();
+				$preMatch = $preHash->matchPre($cleanedName);
+				if ($preMatch !== false) {
+					$cleanedName = $preMatch['title'];
+					$prehashID = $preMatch['prehashID'];
+					$properName = true;
+				}
+			}
+			$relid = $this->insertRelease($cleanRelName, $db->escapeString(utf8_encode($cleanedName)), $row["parts"], $row["groupID"], $relguid, $catId, $row["regexID"], $row["date"], $row["fromname"], $row["reqID"], $page->site, Enzebe::NZB_NONE, $properName === true ? 1 : 0, $isReqID, $prehashID);
 			//
 			// Tag every binary for this release with its parent release id
 			//
@@ -1664,7 +1730,7 @@ class Releases
 			// Write the nzb to disk
 			//
 			$nzbfile = $nzb->getNZBPath($relguid, $page->site->nzbpath, true);
-			$nzb->writeNZBforReleaseId($relid, $cleanRelName, $catId, $nzbfile);
+			$nzb->writeNZBforreleaseID($relid, $cleanRelName, $catId, $nzbfile);
 
 			//
 			// Remove used binaries
@@ -1805,7 +1871,7 @@ class Releases
 		return $retcount;
 	}
 
-	public function insertRelease($cleanRelName, $parts, $group, $guid, $catId, $regexID, $date, $fromname, $reqID, $site)
+	public function insertRelease($cleanRelName, $cleanedName, $parts, $group, $guid, $catId, $regexID, $date, $fromname, $reqID, $site, $nzbstatus, $isrenamed, $isReqID, $prehashID)
 	{
 		$db = new DB();
 
@@ -1817,10 +1883,12 @@ class Releases
 		else
 			$reqID = " null ";
 
-		$sql = sprintf("insert into releases (name, searchname, totalpart, groupID, adddate, guid, categoryID, regexID, rageID, postdate, fromname, size, reqID, passwordstatus, completion, haspreview)
-                    values (%s,   %s,  %d, %d, now(), %s, %d, %s, -1, %s, %s, 0, %s, %d, 100, %d)",
-			$db->escapeString($cleanRelName), $db->escapeString($cleanRelName), $parts, $group, $db->escapeString($guid), $catId, $regexID,
-			$db->escapeString($date), $db->escapeString($fromname), $reqID, ($site->checkpasswordedrar > 0 ? -1 : 0), -1
+		$sql = sprintf("insert into releases (name, searchname, totalpart, groupID, adddate, guid, categoryID, regexID, rageID, postdate, fromname, size, reqID, passwordstatus, completion, haspreview, nfostatus, nzbstatus,
+					isrenamed, iscategorized, reqidstatus, prehashID)
+                    values (%s, %s, %d, %d, now(), %s, %d, %s, -1, %s, %s, 0, %s, %d, 100, %d, %d, %d, %d, 1, %d, %d)",
+			$db->escapeString($cleanRelName), $cleanedName, $parts, $group, $db->escapeString($guid), $catId, $regexID,
+			$db->escapeString($date), $db->escapeString($fromname), $reqID, ($site->checkpasswordedrar > 0 ? -1 : 0), -1, -1,
+			$db->escapeString($nzbstatus), $db->escapeString($isrenamed), $db->escapeString($isReqID), $db->escapeString($prehashID)
 		);
 
 		$relid = $db->queryInsert($sql);
@@ -1850,14 +1918,15 @@ class Releases
 			$url = $url . "&newznabID=" . $nnid;
 		}
 
-		$xml = getUrl($url);
+		$util = new Utility();
+		$xml = $util->getUrl($url);
 
 		if ($xml === false || preg_match('/no feed/i', $xml))
 			return "no feed";
 		else {
 			if ($xml != "") {
 				$xmlObj = @simplexml_load_string($xml);
-				$arrXml = objectsIntoArray($xmlObj);
+				$arrXml = $util->objectsIntoArray($xmlObj);
 
 				if (isset($arrXml["item"]) && is_array($arrXml["item"])) {
 					foreach ($arrXml["item"] as $item) {
@@ -1878,7 +1947,8 @@ class Releases
 			if ($nnid != "")
 				$nnid = "?newznabID=" . $nnid . "&rev=" . $rev;
 
-			$regfile = getUrl($url . $nnid, "get", "", "gzip");
+			$util = new Utility();
+			$regfile = $util->getUrl($url . $nnid, "get", "", "gzip");
 			if ($regfile !== false && $regfile != "") {
 				/*$Rev: 728 $*/
 				if (preg_match('/\/\*\$Rev: (\d{3,4})/i', $regfile, $matches)) {

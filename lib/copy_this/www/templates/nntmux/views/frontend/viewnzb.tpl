@@ -10,6 +10,10 @@
 															src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbID}-cover.jpg"
 															width="180" alt="{$movie.title|escape:"htmlall"}"
 															style="float:right;" />{/if}
+{if $game && $game.cover == 1}<img class="shadow" src="{$smarty.const.WWW_TOP}/covers/games/{$game.id}.jpg" width="160"
+								   alt="{$con.title|escape:"htmlall"}" style="float:right;" />{/if}
+{if $xxx && $xxx.cover == 1}<img class="shadow" src="{$smarty.const.WWW_TOP}/covers/xxx/{$xxx.id}-cover.jpg" width="160"
+								 alt="{$movie.title|escape:"htmlall"}" style="float:right;" />{/if}
 {if $anidb && $release.anidbID > 0 && $anidb.picture != ""}<img class="shadow"
 																src="{$smarty.const.WWW_TOP}/covers/anime/{$anidb.anidbID}.jpg"
 																width="180" alt="{$anidb.title|escape:"htmlall"}"
@@ -91,38 +95,36 @@
 	<tr>
 		<th>Movie Info:</th>
 		<td>
-			<strong>{$movie.title|escape:"htmlall"} ({$movie.year}) {if $movie.rating == ''}N/A{/if}{$movie.rating}
-				/10</strong>
-			{if $movie.tagline != ''}<br/>{$movie.tagline|escape:"htmlall"}{/if}
-			{if $movie.plot != ''}{if $movie.tagline != ''} - {else}<br/>{/if}{$movie.plot|escape:"htmlall"}{/if}
+			<strong>{$movie.title|stripslashes|escape:"htmlall"} ({$movie.year}
+				) {if $movie.rating !== ''}{$movie.rating}/10{/if}</strong>
+			{if $movie.tagline != ''}<br/>{$movie.tagline|stripslashes|escape:"htmlall"}{/if}
+			{if $movie.plot != ''}{if $movie.tagline != ''} - {else}
+				<br/>
+			{/if}{$movie.plot|stripslashes|escape:"htmlall"}{/if}
 			<br/><br/>{if $movie.director != ""} <strong>Director:</strong> {$movie.director}<br/>{/if}
 			<strong>Genre:</strong> {$movie.genre}
 			<br/><strong>Starring:</strong> {$movie.actors}
+			{if $movie.trailer != ''}
+				<br/>
+				<strong>Trailer:</strong>
+				<div>{$movie.trailer}</div>
+			{/if}
 			<div style="margin-top:10px;">
 				<a class="rndbtn" target="_blank"
 				   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$release.imdbID}/" title="View at IMDB">IMDB</a>
 				{if $movie.tmdbID != ''}<a class="rndbtn" target="_blank"
 										   href="{$site->dereferrer_link}http://www.themoviedb.org/movie/{$movie.tmdbID}"
 										   title="View at TMDb">TMDb</a>{/if}
-				<a class="rndbtn" href="{$smarty.const.WWW_TOP}/movies?imdb={$release.imdbID}"
-				   title="View all versions">Movie View</a>
+				<a
+						class="rndbtn sendtocouch" target="blackhole"
+						href="javascript:;"
+						rel="{$site->dereferrer_link}{$cpurl}/api/{$cpapi}/movie.add/?identifier=tt{$release.imdbID}&title={$movie.title}"
+						name="CP{$release.imdbID}" title="Add to CouchPotato">
+					CouchPotato
+				</a>
 			</div>
 		</td>
 	</tr>
-	{if $movie.trailer != ""}
-		<tr>
-			<th>Trailer:</th>
-			<td>
-				<object style="width:445px; height:280px;"
-						data="http{if $page->secure_connection}s{/if}://www.youtube.com/v/{$movie.trailer}?modestbranding=0&amp;rel=0&amp;showinfo=0&amp;autohide=1&amp;vq=hd720"
-						type="application/x-shockwave-flash">
-					<param name="src"
-						   value="http{if $page->secure_connection}s{/if}://www.youtube.com/v/{$movie.trailer}?modestbranding=0&amp;rel=0&amp;showinfo=0&amp;autohide=1&amp;vq=hd720"/>
-					<param name="allowFullScreen" value="true"/>
-				</object>
-			</td>
-		</tr>
-	{/if}
 {/if}
 
 {if $anidb && $release.anidbID > 0}
@@ -198,6 +200,72 @@
 					   title="View game at Amazon">Amazon</a>
 				</div>
 			{/if}
+		</td>
+	</tr>
+{/if}
+
+{if $game}
+	<tr>
+		<th>Game Info:</th>
+		<td>
+			<strong>{$game.title|escape:"htmlall"} ({$game.releasedate|date_format:"%Y"})</strong><br/>
+			{if $game.review != ""}<span
+					class="descinitial">{$game.review|escape:"htmlall"|nl2br|magicurl|truncate:"350":" <a class=\"descmore\" href=\"#\">more...</a>"}</span>{if $game.review|strlen > 350}
+				<span class="descfull">{$game.review|escape:"htmlall"|nl2br|magicurl}</span>{/if}
+				<br/>
+				<br/>
+			{/if}
+			{if $game.esrb != ""}<strong>ESRB:</strong>{$game.esrb|escape:"htmlall"}<br/>{/if}
+			{if $game.genres != ""}<strong>Genre:</strong>{$game.genres|escape:"htmlall"}<br/>{/if}
+			{if $game.publisher != ""}<strong>Publisher:</strong>{$game.publisher|escape:"htmlall"}<br/>{/if}
+			{if $game.platform != ""}<strong>Platform:</strong>{$game.platform|escape:"htmlall"}<br/>{/if}
+			{if $game.releasedate != ""}<strong>Released:</strong> {$game.releasedate|date_format}{/if}
+			<div style="margin-top:10px;">
+				{if $game.classused == "gb"}
+					<a class="rndbtn" target="_blank" href="{$site->dereferrer_link}{$game.url}"
+					   title="View game at Giantbomb">Giantbomb</a>
+				{/if}
+				{if $game.classused == "steam"}
+					<a class="rndbtn" target="_blank" href="{$site->dereferrer_link}{$game.url}"
+					   title="View game at Steam">Steam</a>
+				{/if}
+			</div>
+		</td>
+	</tr>
+{/if}
+
+{if $xxx}
+	<tr>
+		<th>XXX Info:</th>
+		<td>
+			<strong>{$xxx.title|stripslashes|escape:"htmlall"}</strong>
+			{if $xxx.tagline != ''}<br/>{$xxx.tagline|stripslashes|escape:"htmlall"}{/if}
+			{if $xxx.plot != ''}{if $xxx.tagline != ''} - {else}<br/>{/if}{$xxx.plot|stripslashes|escape:"htmlall"}{/if}
+			<br/><br/>{if $xxx.director != ""} <strong>Director:</strong> {$xxx.director}<br/>{/if}
+			<strong>Genre:</strong> {$xxx.genres}
+			<br/><strong>Starring:</strong> {$xxx.actors}
+			{if $xxx.trailer != ''}
+				<br /><strong>Trailer:</strong>
+				<div>{$xxx.trailer}</div>
+			{/if}
+			<div style="margin-top:10px;">
+				{if $xxx.classused === "ade"}
+					<a class="rndbtn" target="_blank" href="{$site->dereferrer_link}{$xxx.directurl}"
+					   title="View at Adult DVD Empire">ADE</a>
+				{elseif $xxx.classused === "pop"}
+					<a class="rndbtn" target="_blank" href="{$site->dereferrer_link}{$xxx.directurl}/"
+					   title="View at Popporn">Popporn</a>
+				{elseif $xxx.classused === "aebn"}
+					<a class="rndbtn" target="_blank" href="{$site->dereferrer_link}{$xxx.directurl}"
+					   title="View at Adult Entertainment Broadcast Network">AEBN</a>
+				{else}
+					<a class="rndbtn" target="_blank" href="{$site->dereferrer_link}{$xxx.directurl}"
+					   title="View at Hot Movies">HM</a>
+				{/if}
+				<a class="rndbtn" target="_blank"
+				   href="{$site->dereferrer_link}http://www.iafd.com/results.asp?searchtype=title&searchstring={$xxx.title}"
+				   title="Search IAFD">IAFD</a>
+			</div>
 		</td>
 	</tr>
 {/if}

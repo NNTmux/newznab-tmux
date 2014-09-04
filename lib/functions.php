@@ -38,6 +38,7 @@ class Functions
 		$this->echooutput = $echooutput;
 		$this->c = new ColorCLI();
 		$this->db = new DB();
+		$this->groups = new Groups();
 		$this->m = new Movie();
 		$this->consoleTools = new ConsoleTools();
 		$this->tmpPath = $this->site->tmpunrarpath;
@@ -58,12 +59,6 @@ class Functions
 		$this->NewGroupDaysToScan = (!empty($this->site->newgroupdaystoscan)) ? (int)$this->site->newgroupdaystoscan : 3;
 		$this->partrepairlimit = (!empty($this->tmux->maxpartrepair)) ? (int)$this->tmux->maxpartrepair : 15000;
 	}
-
-	/**
-	 * @var object Instance of PDO class.
-	 */
-	private
-	static $pdo = null;
 
 	/**
 	 * Should we use part repair?
@@ -89,274 +84,6 @@ class Functions
 	private
 		$NewGroupScanByDays;
 
-	/**
-	 * Path to save large jpg pictures(xxx).
-	 *
-	 * @var string
-	 */
-	public
-		$jpgSavePath;
-
-
-	// database function
-	public
-	function queryArray($query)
-
-	{
-		$db = new DB();
-		if ($query == '') return false;
-
-		$result = $db->queryDirect($query);
-		$rows = array();
-		foreach ($result as $row) {
-			$rows[] = $row;
-		}
-
-		return (!isset($rows)) ? false : $rows;
-	}
-
-	// Used for deleting, updating (and inserting without needing the last insert ID).
-	public
-	function exec($query)
-	{
-		if ($query == '')
-			return false;
-
-		try {
-			$run = self::$pdo->prepare($query);
-			$run->execute();
-
-			return $run;
-		} catch (PDOException $e) {
-			// Deadlock or lock wait timeout, try 10 times.
-			$i = 1;
-			while (($e->errorInfo[1] == 1213 || $e->errorInfo[0] == 40001 || $e->errorInfo[1] == 1205 || $e->getMessage() == 'SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction') && $i <= 10) {
-				echo $this->c->error("A Deadlock or lock wait timeout has occurred, sleeping.\n");
-				$this->consoletools->showsleep($i * $i);
-				$run = self::$pdo->prepare($query);
-				$run->execute();
-
-				return $run;
-				$i++;
-			}
-			if ($e->errorInfo[1] == 1213 || $e->errorInfo[0] == 40001 || $e->errorInfo[1] == 1205) {
-				//echo "Error: Deadlock or lock wait timeout.";
-				return false;
-			} else if ($e->errorInfo[1] == 1062 || $e->errorInfo[0] == 23000) {
-				//echo "\nError: Update would create duplicate row, skipping\n";
-				return false;
-			} else if ($e->errorInfo[1] == 1406 || $e->errorInfo[0] == 22001) {
-				//echo "\nError: Too large to fit column length\n";
-				return false;
-			} else
-				echo $this->c->error($e->getMessage());
-
-			return false;
-		}
-	}
-
-	public
-	function Prepare($query, $options = array())
-	{
-		try {
-			$PDOstatement = self::$pdo->prepare($query, $options);
-		} catch (PDOException $e) {
-			//echo $this->c->error($e->getMessage());
-			$PDOstatement = false;
-		}
-
-		return $PDOstatement;
-	}
-
-	public
-	function from_unixtime($utime, $escape = true)
-	{
-		if ($escape === true) {
-			return 'FROM_UNIXTIME(' . $utime . ')';
-		} else
-			return date('Y-m-d h:i:s', $utime);
-	}
-
-	// Date to unix time.
-	// (substitute for mysql's UNIX_TIMESTAMP() function)
-	public
-	function unix_timestamp($date)
-	{
-		return strtotime($date);
-	}
-
-	public
-	function unix_timestamp_column($column, $outputName = 'unix_time')
-	{
-		return 'UNIX_TIMESTAMP(' . $column . ') AS ' . $outputName;
-
-	}
-
-	/**
-	 * Interpretation of mysql's UUID method.
-	 * Return uuid v4 string. http://www.php.net/manual/en/function.uniqid.php#94959
-	 *
-	 * @return string
-	 */
-	public
-	function uuid()
-	{
-		return sprintf(
-			'%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-			mt_rand(0, 0xffff),
-			mt_rand(0, 0xffff),
-			mt_rand(0, 0xffff),
-			mt_rand(0, 0x0fff) | 0x4000,
-			mt_rand(0, 0x3fff) | 0x8000,
-			mt_rand(0, 0xffff),
-			mt_rand(0, 0xffff),
-			mt_rand(0, 0xffff)
-		);
-	}
-
-	//  gets name of category from category.php
-	public
-	function getNameByID($ID)
-	{
-		$db = new DB();
-		$parent = $db->queryOneRow(sprintf("SELECT title FROM category WHERE ID = %d", substr($ID, 0, 1) . "000"));
-		$cat = $db->queryOneRow(sprintf("SELECT title FROM category WHERE ID = %d", $ID));
-
-		return $parent["title"] . " " . $cat["title"];
-	}
-
-	public
-	function getIDByName($name)
-	{
-		$db = new DB();
-		$res = $db->queryOneRow(sprintf("SELECT ID FROM groups WHERE name = %s", $db->escapeString($name)));
-
-		return $res["ID"];
-	}
-
-	//deletes from releases
-	public
-	function fastDelete($ID, $guid)
-	{
-		$nzb = new Enzebe();
-		$ri = new ReleaseImage();
-		$ri->delete($guid);
-
-
-		//
-		// delete from disk.
-		//
-		$nzbpath = $nzb->getNZBPath($guid);
-
-		if (file_exists($nzbpath))
-			unlink($nzbpath);
-
-		$this->db->exec(sprintf("delete releases, releasenfo, releasecomment, usercart, releasefiles, releaseaudio, releasesubs, releasevideo, releaseextrafull
-							from releases
-								LEFT OUTER JOIN releasenfo on releasenfo.releaseID = releases.ID
-								LEFT OUTER JOIN releasecomment on releasecomment.releaseID = releases.ID
-								LEFT OUTER JOIN usercart on usercart.releaseID = releases.ID
-								LEFT OUTER JOIN releasefiles on releasefiles.releaseID = releases.ID
-								LEFT OUTER JOIN releaseaudio on releaseaudio.releaseID = releases.ID
-								LEFT OUTER JOIN releasesubs on releasesubs.releaseID = releases.ID
-								LEFT OUTER JOIN releasevideo on releasevideo.releaseID = releases.ID
-								LEFT OUTER JOIN releaseextrafull on releaseextrafull.releaseID = releases.ID
-							where releases.ID = %d", $ID
-			)
-		);
-	}
-
-	//reads name of group
-	public
-	function getByNameByID($ID)
-	{
-		$db = new DB();
-		$res = $db->queryOneRow(sprintf("select name from groups where ID = %d ", $ID));
-
-		return $res["name"];
-	}
-
-	// Sends releases back to other->misc.
-	public
-	function resetCategorize($where = '')
-	{
-		$this->db->exec('UPDATE releases SET categoryID = 8010, iscategorized = 0 ' . $where);
-	}
-
-	// Categorizes releases.
-	// $type = name or searchname
-	// Returns the quantity of categorized releases.
-	public
-	function categorizeRelease($type, $where = '', $echooutput = false)
-	{
-		$cat = new Categorize();
-		$relcount = 0;
-		$resrel = $this->db->queryDirect('SELECT ID, ' . $type . ', groupID FROM releases ' . $where);
-		$total = $resrel->rowCount();
-		if (count($resrel) > 0) {
-			foreach ($resrel as $rowrel) {
-				$catId = $cat->determineCategory($rowrel['groupID'], $rowrel[$type]);
-				$this->db->exec(sprintf('UPDATE releases SET categoryID = %d, iscategorized = 1 WHERE ID = %d', $catId, $rowrel['ID']));
-				$relcount++;
-				if ($this->echooutput) {
-					$this->consoleTools->overWritePrimary('Categorizing: ' . $this->consoleTools->percentString($relcount, $total));
-				}
-			}
-		}
-		if ($this->echooutput !== false && $relcount > 0) {
-			echo "\n";
-		}
-
-		return $relcount;
-	}
-
-	// Optimises/repairs tables on mysql.
-	public
-	function optimise($admin = false, $type = '')
-	{
-		$db = new DB();
-		$c = new ColorCLI();
-		$tablecnt = 0;
-		if ($type === 'true' || $type === 'full' || $type === 'analyze') {
-			$alltables = $db->query('SHOW TABLE STATUS');
-		} else {
-			$alltables = $db->query('SHOW TABLE STATUS WHERE Data_free / Data_length > 0.005');
-		}
-		$tablecnt = count($alltables);
-		if ($type === 'all' || $type === 'full') {
-			$tbls = '';
-			foreach ($alltables as $table) {
-				$tbls .= $table['Name'] . ', ';
-			}
-			$tbls = rtrim(trim($tbls), ',');
-			if ($admin === false) {
-				echo $this->c->primary('Optimizing tables: ' . $tbls);
-			}
-			$db->queryDirect("OPTIMIZE LOCAL TABLE ${tbls}");
-		} else {
-			foreach ($alltables as $table) {
-				if ($type === 'analyze') {
-					if ($admin === false) {
-						echo $this->c->primary('Analyzing table: ' . $table['Name']);
-					}
-					$db->queryDirect('ANALYZE LOCAL TABLE `' . $table['Name'] . '`');
-				} else {
-					if ($admin === false) {
-						echo $this->c->primary('Optimizing table: ' . $table['Name']);
-					}
-					if (strtolower($table['engine']) == 'myisam') {
-						$db->queryDirect('REPAIR TABLE `' . $table['Name'] . '`');
-					}
-					$db->queryDirect('OPTIMIZE LOCAL TABLE `' . $table['Name'] . '`');
-				}
-			}
-		}
-		if ($type !== 'analyze') {
-			$db->queryDirect('FLUSH TABLES');
-		}
-
-		return $tablecnt;
-	}
 
 	function doecho($str)
 	{
@@ -427,7 +154,7 @@ class Functions
 		} else {
 			$postsdate = $this->postdate($nntp, $first, false, $group, true, 'newest');
 		}
-		$postsdate = $this->from_unixtime($postsdate);
+		$postsdate = $this->db->from_unixtime($postsdate);
 
 		if ($type == 'Backfill') {
 			$db->exec(sprintf('UPDATE groups SET first_record_postdate = %s, first_record = %s, last_updated = NOW() WHERE ID = %d', $postsdate, $db->escapeString($first), $groupArr['ID']));
@@ -480,7 +207,7 @@ class Functions
 			if (!$nntp->isError($msgs)) {
 				// Set table names
 				$groups = new Groups();
-				$groupID = $this->getIDByName($group);
+				$groupID = $this->groups->getIDByName($group);
 				$groupa = array();
 				$groupa['bname'] = 'binaries';
 				$groupa['pname'] = 'parts';
@@ -877,7 +604,7 @@ class Functions
 				$firstr_date = $newdate;
 			}
 
-			$db->exec(sprintf('UPDATE groups SET first_record_postdate = %s, first_record = %s, last_updated = NOW() WHERE ID = %d', $this->from_unixtime($firstr_date), $db->escapeString($first), $groupArr['ID']));
+			$db->exec(sprintf('UPDATE groups SET first_record_postdate = %s, first_record = %s, last_updated = NOW() WHERE ID = %d', $this->db->from_unixtime($firstr_date), $db->escapeString($first), $groupArr['ID']));
 			if ($first == $targetpost) {
 				$done = true;
 			} else {
@@ -890,7 +617,7 @@ class Functions
 			}
 		}
 		// Set group's first postdate.
-		$db->exec(sprintf('UPDATE groups SET first_record_postdate = %s, last_updated = NOW() WHERE ID = %d', $this->from_unixtime($firstr_date), $groupArr['ID']));
+		$db->exec(sprintf('UPDATE groups SET first_record_postdate = %s, last_updated = NOW() WHERE ID = %d', $this->db->from_unixtime($firstr_date), $groupArr['ID']));
 
 		$timeGroup = number_format(microtime(true) - $this->startGroup, 2);
 
@@ -1192,7 +919,7 @@ class Functions
 				$firstr_date = $newdate;
 			}
 
-			$db->exec(sprintf('UPDATE groups SET first_record_postdate = %s, first_record = %s, last_updated = NOW() WHERE ID = %d', $this->from_unixtime($firstr_date), $db->escapeString($first), $groupArr['ID']));
+			$db->exec(sprintf('UPDATE groups SET first_record_postdate = %s, first_record = %s, last_updated = NOW() WHERE ID = %d', $this->db->from_unixtime($firstr_date), $db->escapeString($first), $groupArr['ID']));
 			if ($first == $targetpost) {
 				$done = true;
 			} else {
@@ -1205,7 +932,7 @@ class Functions
 			}
 		}
 		// Set group's first postdate.
-		$db->exec(sprintf('UPDATE groups SET first_record_postdate = %s, last_updated = NOW() WHERE ID = %d', $this->from_unixtime($firstr_date), $groupArr['ID']));
+		$db->exec(sprintf('UPDATE groups SET first_record_postdate = %s, last_updated = NOW() WHERE ID = %d', $this->db->from_unixtime($firstr_date), $groupArr['ID']));
 
 		$timeGroup = number_format(microtime(true) - $this->startGroup, 2);
 
@@ -1316,7 +1043,7 @@ class Functions
 
 			$groupArr['first_record_postdate'] = $first_record_postdate;
 
-			$db->exec(sprintf('UPDATE groups SET first_record_postdate = %s WHERE ID = %d', $this->from_unixtime($first_record_postdate), $groupArr['ID']));
+			$db->exec(sprintf('UPDATE groups SET first_record_postdate = %s WHERE ID = %d', $this->db->from_unixtime($first_record_postdate), $groupArr['ID']));
 		}
 
 		// Defaults for post record first/last postdate
@@ -1418,14 +1145,14 @@ class Functions
 
 					$groupArr['first_record_postdate'] = $first_record_postdate;
 
-					$db->exec(sprintf('UPDATE groups SET first_record = %s, first_record_postdate = %s WHERE ID = %d', $scanSummary['firstArticleNumber'], $this->from_unixtime($db->escapeString($first_record_postdate)), $groupArr['ID']));
+					$db->exec(sprintf('UPDATE groups SET first_record = %s, first_record_postdate = %s WHERE ID = %d', $scanSummary['firstArticleNumber'], $this->db->from_unixtime($db->escapeString($first_record_postdate)), $groupArr['ID']));
 				}
 
 				if (isset($scanSummary['lastArticleDate'])) {
 					$last_record_postdate = strtotime($scanSummary['lastArticleDate']);
 				}
 
-				$db->exec(sprintf('UPDATE groups SET last_record = %s, last_record_postdate = %s, last_updated = NOW() WHERE ID = %d', $db->escapeString($scanSummary['lastArticleNumber']), $this->from_unixtime($last_record_postdate), $groupArr['ID']));
+				$db->exec(sprintf('UPDATE groups SET last_record = %s, last_record_postdate = %s, last_updated = NOW() WHERE ID = %d', $db->escapeString($scanSummary['lastArticleNumber']), $this->db->from_unixtime($last_record_postdate), $groupArr['ID']));
 
 				if ($last == $grouplast) {
 					$done = true;
@@ -1548,297 +1275,6 @@ class Functions
 
 		// Remove articles that we cant fetch after 5 attempts.
 		$db->exec(sprintf('DELETE FROM ' . $group['prname'] . ' WHERE attempts >= 5 AND groupID = %d', $groupArr['ID']));
-	}
-
-	/**
-	 * Use cURL To download a web page into a string.
-	 *
-	 * @param string $url       The URL to download.
-	 * @param string $method    get/post
-	 * @param string $postdata  If using POST, post your POST data here.
-	 * @param string $language  Use alternate langauge in header.
-	 * @param bool   $debug     Show debug info.
-	 * @param string $userAgent User agent.
-	 * @param string $cookie    Cookie.
-	 *
-	 * @return bool|mixed
-	 */
-	function getUrl($url, $method = 'get', $postdata = '', $language = "", $debug = false, $userAgent = '', $cookie = '')
-	{
-		switch ($language) {
-			case 'fr':
-			case 'fr-fr':
-				$language = "fr-fr";
-				break;
-			case 'de':
-			case 'de-de':
-				$language = "de-de";
-				break;
-			case 'en':
-				$language = 'en';
-				break;
-			case '':
-			case 'en-us':
-			default:
-				$language = "en-us";
-		}
-		$header[] = "Accept-Language: " . $language;
-
-		$ch = curl_init();
-		$options = array(
-			CURLOPT_URL            => $url,
-			CURLOPT_HTTPHEADER     => $header,
-			CURLOPT_RETURNTRANSFER => 1,
-			CURLOPT_FOLLOWLOCATION => 1,
-			CURLOPT_TIMEOUT        => 15,
-			CURLOPT_SSL_VERIFYPEER => false,
-			CURLOPT_SSL_VERIFYHOST => false,
-		);
-		curl_setopt_array($ch, $options);
-
-		if ($userAgent !== '') {
-			curl_setopt($ch, CURLOPT_USERAGENT, $userAgent);
-		}
-
-		if ($cookie !== '') {
-			curl_setopt($ch, CURLOPT_COOKIE, $cookie);
-		}
-
-		if ($method === 'post') {
-			$options = array(
-				CURLOPT_POST       => 1,
-				CURLOPT_POSTFIELDS => $postdata
-			);
-			curl_setopt_array($ch, $options);
-		}
-
-		if ($debug) {
-			$options =
-				array(
-					CURLOPT_HEADER      => true,
-					CURLINFO_HEADER_OUT => true,
-					CURLOPT_NOPROGRESS  => false,
-					CURLOPT_VERBOSE     => true
-				);
-			curl_setopt_array($ch, $options);
-		}
-
-		$buffer = curl_exec($ch);
-		$err = curl_errno($ch);
-		curl_close($ch);
-
-		if ($err !== 0) {
-			return false;
-		} else {
-			return $buffer;
-		}
-	}
-
-	/**
-	 * Formats a 'like' string. ex.(LIKE '%chocolate%')
-	 *
-	 * @param string $str   The string.
-	 * @param bool   $left  Add a % to the left.
-	 * @param bool   $right Add a % to the right.
-	 *
-	 * @return string
-	 */
-	public
-	function likeString($str, $left = true, $right = true)
-	{
-		return (
-			(DB_TYPE === 'mysql' ? 'LIKE ' : 'ILIKE ') .
-			$this->db->escapeString(
-				($left ? '%' : '') .
-				$str .
-				($right ? '%' : '')
-			)
-		);
-	}
-
-	// Check if O/S is windows.
-	function isWindows()
-	{
-		return (strtolower(substr(php_uname('s'), 0, 3)) === 'win');
-	}
-
-	/**
-	 * Run CLI command.
-	 *
-	 * @param string $command
-	 * @param bool   $debug
-	 *
-	 * @return array
-	 */
-	function runCmd($command, $debug = false)
-	{
-		$nl = PHP_EOL;
-		if (isWindows() && strpos(phpversion(), "5.2") !== false) {
-			$command = "\"" . $command . "\"";
-		}
-
-		if ($debug) {
-			echo '-Running Command: ' . $nl . '   ' . $command . $nl;
-		}
-
-		$output = array();
-		$status = 1;
-		@exec($command, $output, $status);
-
-		if ($debug) {
-			echo '-Command Output: ' . $nl . '   ' . implode($nl . '  ', $output) . $nl;
-		}
-
-		return $output;
-	}
-
-	// Convert obj to array.
-	function objectsIntoArray($arrObjData, $arrSkipIndices = array())
-	{
-		$arrData = array();
-
-		// If input is object, convert into array.
-		if (is_object($arrObjData)) {
-			$arrObjData = get_object_vars($arrObjData);
-		}
-
-		if (is_array($arrObjData)) {
-			foreach ($arrObjData as $index => $value) {
-				// Recursive call.
-				if (is_object($value) || is_array($value)) {
-					$value = objectsIntoArray($value, $arrSkipIndices);
-				}
-				if (in_array($index, $arrSkipIndices)) {
-					continue;
-				}
-				$arrData[$index] = $value;
-			}
-		}
-
-		return $arrData;
-	}
-
-	/**
-	 * Convert bytes to kb/mb/gb/tb and return in human readable format.
-	 *
-	 * @param int $bytes
-	 *
-	 * @return string
-	 */
-	protected
-	function readableBytesString($bytes)
-	{
-		$kb = 1024;
-		$mb = $kb * $kb;
-		$gb = $kb * $mb;
-		$tb = $kb * $gb;
-		if ($bytes < $kb) {
-			return $bytes . 'B';
-		} else if ($bytes < ($mb)) {
-			return round($bytes / $kb, 1) . 'KB';
-		} else if ($bytes < $gb) {
-			return round($bytes / $mb, 1) . 'MB';
-		} else if ($bytes < $tb) {
-			return round($bytes / $gb, 1) . 'GB';
-		} else {
-			return round($bytes / $tb, 1) . 'TB';
-		}
-	}
-
-	/**
-	 * Strips non-printing characters from a string.
-	 *
-	 * Operates directly on the text string, but also returns the result for situations requiring a
-	 * return value (use in ternary, etc.)/
-	 *
-	 * @param $text        String variable to strip.
-	 *
-	 * @return string    The stripped variable.
-	 */
-	static public function stripNonPrintingChars(&$text)
-	{
-		$lowChars = [
-			"\x00", "\x01", "\x02", "\x03", "\x04", "\x05", "\x06", "\x07",
-			"\x08", "\x09", "\x0A", "\x0B", "\x0C", "\x0D", "\x0E", "\x0F",
-			"\x10", "\x11", "\x12", "\x13", "\x14", "\x15", "\x16", "\x17",
-			"\x18", "\x19", "\x1A", "\x1B", "\x1C", "\x1D", "\x1E", "\x1F",
-		];
-		$text = str_replace($lowChars, '', $text);
-
-		return $text;
-	}
-
-	/**
-	 * Get human readable size string from bytes.
-	 *
-	 * @param int $bytes     Bytes number to convert.
-	 * @param int $precision How many floating point units to add.
-	 *
-	 * @return string
-	 */
-	function bytesToSizeString($bytes, $precision = 0)
-	{
-		if ($bytes == 0) {
-			return '0B';
-		}
-
-		$unit = array('B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB');
-
-		return round($bytes / pow(1024, ($i = floor(log($bytes, 1024)))), $precision) . $unit[(int)$i];
-	}
-
-	/**
-	 * Removes the preceeding or proceeding portion of a string
-	 * relative to the last occurrence of the specified character.
-	 * The character selected may be retained or discarded.
-	 *
-	 * @param string $character      the character to search for.
-	 * @param string $string         the string to search through.
-	 * @param string $side           determines whether text to the left or the right of the character is returned.
-	 *                               Options are: left, or right.
-	 * @param bool   $keep_character determines whether or not to keep the character.
-	 *                               Options are: true, or false.
-	 *
-	 * @return string
-	 */
-	static public function cutStringUsingLast($character, $string, $side, $keep_character = true)
-	{
-		$offset = ($keep_character ? 1 : 0);
-		$whole_length = strlen($string);
-		$right_length = (strlen(strrchr($string, $character)) - 1);
-		$left_length = ($whole_length - $right_length - 1);
-		switch ($side) {
-			case 'left':
-				$piece = substr($string, 0, ($left_length + $offset));
-				break;
-			case 'right':
-				$start = (0 - ($right_length + $offset));
-				$piece = substr($string, $start);
-				break;
-			default:
-				$piece = false;
-				break;
-		}
-
-		return ($piece);
-	}
-
-	/**
-	 * Detect if the command is accessible on the system.
-	 *
-	 * @param $cmd
-	 *
-	 * @return bool|null Returns true if found, false if not found, and null if which is not detected.
-	 */
-	static public function hasCommand($cmd)
-	{
-		if ('HAS_WHICH') {
-			$returnVal = shell_exec("which $cmd");
-
-			return (empty($returnVal) ? false : true);
-		} else {
-			return null;
-		}
 	}
 	//end of testing
 }

@@ -10,7 +10,6 @@ require_once(WWW_DIR."/lib/rottentomato.php");
 require_once(WWW_DIR."/lib/Tmux.php");
 require_once("ColorCLI.php");
 require_once("TraktTv.php");
-require_once("functions.php");
 
 /**
  * Class Film
@@ -118,7 +117,7 @@ class Film
 	{
 		$this->c = new ColorCLI();
 		$this->db = new DB();
-		$this->functions = new Functions();
+		$this->util = new Utility();
 		$t = new Tmux();
 		$this->tmux = $t->get();
 		$this->releaseImage = new ReleaseImage();
@@ -757,7 +756,7 @@ class Film
 	protected function fetchFanartTVProperties($imdbId)
 	{
 		if ($this->fanartapikey != '') {
-			$buffer = $this->functions->getURL('http://api.fanart.tv/webservice/movie/' . $this->fanartapikey . '/tt' . $imdbId . '/xml/');
+			$buffer = $this->util->getURL('http://api.fanart.tv/webservice/movie/' . $this->fanartapikey . '/tt' . $imdbId . '/xml/');
 			if ($buffer !== false) {
 				$art = @simplexml_load_string($buffer);
 				if ($art !== false) {
@@ -892,8 +891,8 @@ class Film
 
 
 		$buffer =
-			$this->functions->getURL(
-				'http://' . ($this->imdburl === false ? 'www' : 'akas') . '.imdb.com/title/tt' . $imdbId . '/',
+			$this->util->getURL(
+			'http://' . ($this->imdburl === false ? 'www' : 'akas') . '.imdb.com/title/tt' . $imdbId . '/',
 				'get',
 				'',
 				(!empty($this->imdblanguage) ? $this->imdblanguage : 'en'),
@@ -1064,8 +1063,8 @@ class Film
 
 					// Check OMDB api.
 					$buffer =
-						$this->functions->getURL(
-							'http://www.omdbapi.com/?t=' .
+						$this->util->getURL(
+						'http://www.omdbapi.com/?t=' .
 							urlencode($this->currentTitle) .
 							($this->currentYear !== false ? ('&y=' . $this->currentYear) : '') .
 							'&r=json'
@@ -1127,7 +1126,8 @@ class Film
 			$andYearIn .= $end . ')';
 		}
 		$IMDBCheck = $this->db->queryOneRow(
-			sprintf('%s WHERE title %s %s', $query, $this->functions->likeString($this->currentTitle), $andYearIn));
+			sprintf('%s WHERE title %s %s', $query, $this->db->likeString($this->currentTitle), $andYearIn)
+		);
 
 		// Look by %word%word%word% etc..
 		if ($IMDBCheck === false) {
@@ -1138,7 +1138,7 @@ class Film
 			}
 			$IMDBCheck = $this->db->queryOneRow(
 				sprintf("%s WHERE replace(replace(title, \"'\", ''), '!', '') %s %s",
-					$query, $this->functions->likeString($tempTitle), $andYearIn
+					$query, $this->db->likeString($tempTitle), $andYearIn
 				)
 			);
 		}
@@ -1149,7 +1149,7 @@ class Film
 			if ($tempTitle !== $this->currentTitle) {
 				$IMDBCheck = $this->db->queryOneRow(
 					sprintf('%s WHERE title %s %s',
-						$query, $this->functions->likeString($tempTitle), $andYearIn
+						$query, $this->db->likeString($tempTitle), $andYearIn
 					)
 				);
 
@@ -1162,7 +1162,7 @@ class Film
 					}
 					$IMDBCheck = $this->db->queryOneRow(
 						sprintf("%s WHERE replace(replace(replace(title, \"'\", ''), '!', ''), '\"', '') %s %s",
-							$query, $this->functions->likeString($tempTitle), $andYearIn
+							$query, $this->db->likeString($tempTitle), $andYearIn
 						)
 					);
 				}
@@ -1216,8 +1216,8 @@ class Film
 	 */
 	protected function googleSearch()
 	{
-		$buffer = $this->functions->getURL(
-			'https://www.google.com/search?hl=en&as_q=&as_epq=' .
+		$buffer = $this->util->getURL(
+		'https://www.google.com/search?hl=en&as_q=&as_epq=' .
 			urlencode(
 				$this->currentTitle .
 				' ' .
@@ -1250,8 +1250,8 @@ class Film
 	 */
 	protected function bingSearch()
 	{
-		$buffer = $this->functions->getURL(
-			"http://www.bing.com/search?q=" .
+		$buffer = $this->util->getURL(
+		"http://www.bing.com/search?q=" .
 			urlencode(
 				'("' .
 				$this->currentTitle .
@@ -1279,8 +1279,8 @@ class Film
 	 */
 	protected function yahooSearch()
 	{
-		$buffer = $this->functions->getURL(
-			"http://search.yahoo.com/search?n=10&ei=UTF-8&va_vt=title&vo_vt=any&ve_vt=any&vp_vt=any&vf=all&vm=p&fl=0&fr=fp-top&p=intitle:" .
+		$buffer = $this->util->getURL(
+		"http://search.yahoo.com/search?n=10&ei=UTF-8&va_vt=title&vo_vt=any&ve_vt=any&vp_vt=any&vf=all&vm=p&fl=0&fr=fp-top&p=intitle:" .
 			urlencode(
 				'intitle:' .
 				implode(' intitle:',

@@ -1,10 +1,10 @@
 <?php
 
-require_once(dirname(__FILE__).'/config.php');
-require_once(WWW_DIR.'/lib/nntp.php');
-require_once(WWW_DIR.'/lib/Tmux.php');
-require_once(dirname(__FILE__).'/../lib/ColorCLI.php');
-require_once(dirname(__FILE__).'/../lib/functions.php');
+require_once(dirname(__FILE__) . '/config.php');
+require_once(WWW_DIR . '/lib/nntp.php');
+require_once(WWW_DIR . '/lib/Tmux.php');
+require_once(dirname(__FILE__) . '/../lib/ColorCLI.php');
+require_once(dirname(__FILE__) . '/../lib/functions.php');
 
 $c = new ColorCLI();
 if (!isset($argv[1])) {
@@ -26,5 +26,5 @@ if (!isset($argv[1])) {
 		$functions = new Functions();
 		$functions->backfillPostAllGroups($nntp, $pieces[0], $count, $type = '');
 	}
-		$nntp->doQuit();
+	$nntp->doQuit();
 }

@@ -3,8 +3,8 @@
 require_once(dirname(__FILE__).'/config.php');
 require_once(WWW_DIR.'/lib/nntp.php');
 require_once(dirname(__FILE__).'/../lib/ColorCLI.php');
-require_once(dirname(__FILE__).'/../lib/consoletools.php');
-require_once(dirname(__FILE__).'/../lib/functions.php');
+require_once(dirname(__FILE__) . '/../lib/consoletools.php');
+require_once(dirname(__FILE__) . '/../lib/functions.php');
 
 $c = new ColorCLI();
 
