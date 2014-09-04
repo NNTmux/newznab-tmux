@@ -15,7 +15,6 @@ class ReleaseCleaning
 {
 	public $subject = '';
 	public $groupName = '';
-	public $size = '';
 	public $fromName = '';
 
 	/**
@@ -30,13 +29,12 @@ class ReleaseCleaning
 		$this->db = new DB();
 	}
 
- 		public function releaseCleaner($subject, $fromName, $size, $groupName, $usepre = false)
+ 		public function releaseCleaner($subject, $fromName, $groupName, $usepre = false)
 	{
 		$match = $matches = array();
 		$this->groupName = $groupName;
 		$this->subject = $subject;
 		$this->fromName = $fromName;
-		$this->size = $size;
 
 		// Get pre style name from releases.name
 		if (preg_match_all('/([\w\(\)]+[\s\._-]([\w\(\)]+[\s\._-])+[\w\(\)]+-\w+)/', $this->subject, $matches)) {
