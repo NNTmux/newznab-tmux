@@ -39,7 +39,7 @@ where = ""
 datelimit = "AND DATEDIFF(NOW(), r.adddate) <= 7"
 groupby = "GROUP BY LEFT(r.guid, 1)"
 orderby = "ORDER BY LEFT(r.guid, 1) ASC"
-rowlimit = "LIMIT 16"
+rowlimit = "LIMIT 100"
 
 cur[0].execute("SELECT value FROM tmux WHERE setting = 'fixnamethreads'")
 run_threads = cur[0].fetchone()

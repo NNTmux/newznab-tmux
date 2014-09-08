@@ -77,6 +77,7 @@ class NameFixer
 		$this->timeall = ' AND rel.adddate > (NOW() - INTERVAL 6 HOUR) GROUP BY rel.ID ORDER BY postdate DESC';
 		$this->fullother = ' AND rel.categoryID IN (1090, 2020, 3050, 6050, 5050, 7050, 8010) GROUP BY rel.ID';
 		$this->fullall = '';
+		$this->_fileName = '';
 		$this->done = $this->matched = false;
 		$this->c = new ColorCLI();
 		$this->consoletools = new ConsoleTools();
