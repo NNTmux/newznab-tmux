@@ -1,4 +1,5 @@
 <?php
+require_once(dirname(__FILE__) . "/../bin/config.php");
 require_once(WWW_DIR . "/lib/framework/db.php");
 require_once("prehash.php");
 require_once("IRCClient.php");
