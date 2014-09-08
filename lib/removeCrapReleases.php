@@ -3,9 +3,9 @@
 /*
  * This script deletes releases that match certain criteria, type php removeCrapReleases.php false for details.
  */
-require_once(WWW_DIR."lib/framework/db.php");
-require_once(WWW_DIR."lib/releases.php");
-require_once(WWW_DIR."lib/site.php");
+require_once(WWW_DIR."/lib/framework/db.php");
+require_once(WWW_DIR."/lib/releases.php");
+require_once(WWW_DIR."/lib/site.php");
 require_once("functions.php");
 require_once ("ColorCLI.php");
 require_once("ReleaseRemover.php");
