@@ -3,8 +3,6 @@
 /*
  * This script deletes releases that match certain criteria, type php removeCrapReleases.php false for details.
  */
-
-require_once(dirname(__FILE__)."/../bin/config.php");
 require_once(WWW_DIR."lib/framework/db.php");
 require_once(WWW_DIR."lib/releases.php");
 require_once(WWW_DIR."lib/site.php");

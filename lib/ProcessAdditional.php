@@ -1,5 +1,4 @@
 <?php
-require_once(dirname(__FILE__) . "/../bin/config.php");
 require_once(WWW_DIR . "/lib/rarinfo/par2info.php");
 require_once(WWW_DIR . "/lib/rarinfo/archiveinfo.php");
 require_once(WWW_DIR . "/lib/rarinfo/zipinfo.php");
