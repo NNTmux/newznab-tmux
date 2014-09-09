@@ -18,7 +18,7 @@ require_once("namefixer.php");
  *
  * Class PreDb
  */
-Class PreDb
+Class PreHash
 {
 	// Nuke status.
 	const PRE_NONUKE  = 0; // Pre is not nuked.
