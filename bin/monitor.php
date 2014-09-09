@@ -8,9 +8,9 @@ require_once(WWW_DIR . "/lib/showsleep.php");
 require_once(dirname(__FILE__) . "/../lib/functions.php");
 
 
-$version = "0.4r2037";
+$version = "0.4r2100";
 
-$db = new DB();
+$db = new Settings();
 $s = new Sites();
 $site = $s->get();
 $patch = $site->dbversion;
@@ -525,6 +525,12 @@ $fcfirstrun = true;
 $fcnum = 0;
 
 while ($i > 0) {
+
+	//check the db connection
+	if ($db->ping(true) == false) {
+		unset($pdo);
+		$db = new Settings();
+	}
 	//kill mediainfo and ffmpeg if exceeds 60 sec
 	shell_exec("killall -o 60s -9 mediainfo 2>&1 1> /dev/null");
 	shell_exec("killall -o 60s -9 ffmpeg 2>&1 1> /dev/null");
