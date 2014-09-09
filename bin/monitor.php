@@ -1,6 +1,6 @@
 <?php
 require_once(dirname(__FILE__) . "/config.php");
-require_once(WWW_DIR . "lib/framework/db.php");
+require_once(WWW_DIR . "lib/framework/Settings.php");
 require_once(WWW_DIR . '/lib/site.php');
 require_once(WWW_DIR . '/lib/Tmux.php');
 require_once(WWW_DIR . "/lib/ColorCLI.php");
