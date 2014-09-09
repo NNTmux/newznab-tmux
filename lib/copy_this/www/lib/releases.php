@@ -16,7 +16,6 @@ require_once(WWW_DIR . "/lib/releaseimage.php");
 require_once(WWW_DIR . "/lib/releasecomments.php");
 require_once(WWW_DIR . "/lib/postprocess.php");
 require_once(WWW_DIR . "/lib/sphinx.php");
-require_once(WWW_DIR . "/lib/SphinxSearch.php");
 require_once(WWW_DIR . "lib/Categorize.php");
 require_once(WWW_DIR . "../misc/update_scripts/nix_scripts/tmux/lib/ReleaseCleaner.php");
 require_once(WWW_DIR . "../misc/update_scripts/nix_scripts/tmux/lib/Enzebe.php");
@@ -80,16 +79,6 @@ class Releases
 	 * @var release is passworded
 	 */
 	const PASSWD_RAR = 2;
-
-	/**
-	 * @var ReleaseSearch
-	 */
-	public $releaseSearch;
-
-	/**
-	 * @var SphinxSearch
-	 */
-	public $sphinxSearch;
 
 	/**
 	 * Get a list of releases by an array of names
@@ -753,9 +742,6 @@ class Releases
 
 		// Delete images.
 		$releaseImage->delete($guid);
-		// Delete from sphinx.
-		$this->sphinxSearch->deleteRelease($guid, $db);
-
 		// Delete from DB.
 		$db->queryExec(
 			sprintf('
@@ -1905,8 +1891,6 @@ class Releases
 		);
 
 		$relid = $db->queryInsert($sql);
-
-		$this->sphinxSearch->insertRelease($relid);
 
 		return $relid;
 	}
