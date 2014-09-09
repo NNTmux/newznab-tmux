@@ -252,7 +252,6 @@ class DB extends PDO
 			PDO::ATTR_PERSISTENT => $this->opts['persist'],
 			PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8",
 			PDO::MYSQL_ATTR_LOCAL_INFILE => true,
-			PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true
 		];
 
 		$this->dsn = $dsn;

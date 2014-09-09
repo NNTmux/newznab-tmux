@@ -70,6 +70,36 @@ class Utility
 		return ($piece);
 	}
 
+	/**
+	 * Set curl context options for verifying SSL certificates.
+	 *
+	 * @param bool $verify false = Ignore config.php and do not verify the openssl cert.
+	 *                     true  = Check config.php and verify based on those settings.
+	 *                     If you know the certificate will be self-signed, pass false.
+	 *
+	 * @return array
+	 * @static
+	 * @access public
+	 */
+	static public function curlSslContextOptions($verify = true)
+	{
+		$options = [];
+		if ($verify && NN_SSL_VERIFY_HOST) {
+			$options += [
+				CURLOPT_CAINFO         => NN_SSL_CAFILE,
+				CURLOPT_CAPATH         => NN_SSL_CAPATH,
+				CURLOPT_SSL_VERIFYPEER => (bool)NN_SSL_VERIFY_PEER,
+				CURLOPT_SSL_VERIFYHOST => (NN_SSL_VERIFY_HOST ? 2 : 0),
+			];
+		} else {
+			$options += [
+				CURLOPT_SSL_VERIFYPEER => false,
+				CURLOPT_SSL_VERIFYHOST => 0,
+			];
+		}
+		return $options;
+	}
+
 	static public function getDirFiles (array $options = null)
 	{
 		$defaults = [
