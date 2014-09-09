@@ -10,7 +10,7 @@ require_once(dirname(__FILE__) . "/../lib/functions.php");
 
 $version = "0.4r2100";
 
-$db = new DB();
+$db = new Settings();
 $s = new Sites();
 $site = $s->get();
 $patch = $site->dbversion;
