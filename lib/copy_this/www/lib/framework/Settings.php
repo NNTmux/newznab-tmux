@@ -47,7 +47,7 @@ class Settings extends DB
 	{
 		parent::__construct($options);
 		$result         = parent::exec("describe site", true);
-		$this->table = ($result === false) ? 'settings' : 'site';
+		$this->table = ($result === false) ? 'site' : 'tmux';
 
 		return $this->pdo;
 	}
@@ -89,10 +89,10 @@ class Settings extends DB
 		];
 		$options += $defaults;
 
-		if ($this->table == 'settings') {
-			$result = $this->_getFromSettings($options);
-		} else {
+		if ($this->table == 'site') {
 			$result = $this->_getFromSites($options);
+		} else {
+			$result = $this->_getFromTmux($options);
 		}
 		return $result;
 	}
@@ -243,6 +243,19 @@ class Settings extends DB
 	{
 		$setting = empty($options['setting']) ? $options['name'] : $options['setting'];
 		$sql     = 'SELECT value FROM site ';
+		if (!empty($setting)) {
+			$sql .= "WHERE setting = '$setting'";
+		}
+
+		$result = $this->queryOneRow($sql);
+
+		return $result['value'];
+	}
+
+	protected function _getFromTmux($options)
+	{
+		$setting = empty($options['setting']) ? $options['name'] : $options['setting'];
+		$sql     = 'SELECT value FROM tmux ';
 		if (!empty($setting)) {
 			$sql .= "WHERE setting = '$setting'";
 		}
