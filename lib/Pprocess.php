@@ -2,7 +2,7 @@
 require_once(WWW_DIR . "lib/rarinfo/par2info.php");
 require_once(WWW_DIR . "lib/rarinfo/archiveinfo.php");
 require_once(WWW_DIR . "lib/rarinfo/zipinfo.php");
-require_once(WWW_DIR . "lib/framework/db.php");
+require_once(WWW_DIR . "lib/framework/Settings.php");
 require_once(WWW_DIR . "lib/category.php");
 require_once(WWW_DIR . "lib/releases.php");
 require_once(WWW_DIR . "lib/releaseimage.php");
@@ -17,6 +17,7 @@ require_once(WWW_DIR . "lib/anidb.php");
 require_once(WWW_DIR . "lib/book.php");
 require_once(WWW_DIR . "lib/Games.php");
 require_once(WWW_DIR . "lib/XXX.php");
+require_once(WWW_DIR . "lib/Logger.php");
 require_once(WWW_DIR . "/lib/ConsoleTools.php");
 require_once(WWW_DIR . "/lib/ColorCLI.php");
 require_once("nzbcontents.php");
@@ -30,15 +31,48 @@ require_once("TvAnger.php");
 require_once("Konsole.php");
 require_once("ProcessAdditional.php");
 
-/**
- * Class PProcess
- */
 class PProcess
 {
 	/**
-	 * @var DB
+	 * @var Settings
 	 */
-	private $db;
+	public $pdo;
+
+	/**
+	 * Class instance of debugging.
+	 *
+	 * @var Logger
+	 */
+	protected $debugging;
+
+	/**
+	 * Instance of NameFixer.
+	 * @var NameFixer
+	 */
+	protected $nameFixer;
+
+	/**
+	 * @var Par2Info
+	 */
+	protected $_par2Info;
+
+	/**
+	 * Use alternate NNTP provider when download fails?
+	 * @var bool
+	 */
+	private $alternateNNTP;
+
+	/**
+	 * Add par2 info to rar list?
+	 * @var bool
+	 */
+	private $addpar2;
+
+	/**
+	 * Should we echo to CLI?
+	 * @var bool
+	 */
+	private $echooutput;
 
 	/**
 	 * @var Groups
@@ -56,62 +90,40 @@ class PProcess
 	private $releaseFiles;
 
 	/**
-	 * Object containing site settings.
-	 *
-	 * @var bool|stdClass
-	 */
-	private $site;
-
-	/**
-	 * Add par2 info to rar list?
-	 *
-	 * @var bool
-	 */
-	private $addpar2;
-
-	/**
-	 * Should we echo to CLI?
-	 *
-	 * @var bool
-	 */
-	private $echooutput;
-
-
-	/**
-	 * Instance of NameFixer.
-	 *
-	 * @var NameFixer
-	 */
-	protected $NameFixer;
-
-	/**
 	 * Constructor.
 	 *
-	 * @param bool $echoOutput Echo to CLI or not?
+	 * @param array $options Pass in class instances.
 	 */
-	public function __construct($echoOutput = false)
+	public function __construct(array $options = [])
 	{
+		$defaults = [
+			'Echo'         => true,
+			'Logger'       => null,
+			'Groups'       => null,
+			'NameFixer'    => null,
+			'Nfo'          => null,
+			'ReleaseFiles' => null,
+			'Settings'     => null,
+		];
+		$options += $defaults;
+
 		//\\ Various.
-		$this->echooutput = $echoOutput;
+		$this->echooutput = ($options['Echo'] && nZEDb_ECHOCLI);
 		//\\
 
 		//\\ Class instances.
-		$s = new Sites();
-		$t = new Tmux();
-		$this->pdo = new DB();
-		$this->groups = new Groups();
+		$this->pdo = (($options['Settings'] instanceof Settings) ? $options['Settings'] : new Settings());
+		$this->groups = (($options['Groups'] instanceof Groups) ? $options['Groups'] : new Groups(['Settings' => $this->pdo]));
 		$this->_par2Info = new Par2Info();
-		$this->namefixer = new NameFixer($this->echooutput);
-		$this->Nfo = new Info($this->echooutput);
-		$this->releaseFiles = new ReleaseFiles();
-
-		//\\ Site object.
-		$this->tmux = $t->get();
-		$this->site = $s->get();
+		$this->debugging = ($options['Logger'] instanceof Logger ? $options['Logger'] : new Logger(['ColorCLI' => $this->pdo->log]));
+		$this->nameFixer = (($options['NameFixer'] instanceof NameFixer) ? $options['NameFixer'] : new NameFixer(['Echo' => $this->echooutput, 'Settings' => $this->pdo, 'Groups' => $this->groups]));
+		$this->Nfo = (($options['Nfo'] instanceof Info ) ? $options['Nfo'] : new Info(['Echo' => $this->echooutput, 'Settings' => $this->pdo]));
+		$this->releaseFiles = (($options['ReleaseFiles'] instanceof ReleaseFiles) ? $options['ReleaseFiles'] : new ReleaseFiles($this->pdo));
 		//\\
 
 		//\\ Site settings.
-		$this->addpar2 = ($this->tmux->addpar2 == 0) ? false : true;
+		$this->addpar2 = ($this->pdo->getSetting('addpar2') == 0) ? false : true;
+		$this->alternateNNTP = ($this->pdo->getSetting('alternate_nntp') == 1 ? true : false);
 		//\\
 	}
 
@@ -124,16 +136,16 @@ class PProcess
 	 */
 	public function processAll($nntp)
 	{
-		$this->processPrehash($nntp);
 		$this->processAdditional($nntp);
-		$this->processNfos('', $nntp);
+		$this->processNfos($nntp);
 		$this->processSharing($nntp);
 		$this->processMovies();
 		$this->processMusic();
-		$this->processConsoleGames();
+		$this->processConsoles();
 		$this->processGames();
 		$this->processAnime();
 		$this->processTv();
+		$this->processXXX();
 		$this->processBooks();
 	}
 
@@ -144,7 +156,7 @@ class PProcess
 	 */
 	public function processAnime()
 	{
-		if ($this->site->lookupanidb === '1') {
+		if ($this->pdo->getSetting('lookupanidb') == 1) {
 			$anidb = new AniDB(['Echo' => $this->echooutput, 'Settings' => $this->pdo]);
 			$anidb->animetitlesUpdate();
 			$anidb->processAnimeReleases();
@@ -158,9 +170,8 @@ class PProcess
 	 */
 	public function processBooks()
 	{
-		if ($this->site->lookupbooks !== '0') {
-			$books = new Books($this->echooutput);
-			$books->processBookReleases();
+		if ($this->pdo->getSetting('lookupbooks') != 0) {
+			(new Books(['Echo' => $this->echooutput, 'Settings' => $this->pdo, ]))->processBookReleases();
 		}
 	}
 
@@ -169,11 +180,10 @@ class PProcess
 	 *
 	 * @return void
 	 */
-	public function processConsoleGames()
+	public function processConsoles()
 	{
-		if ($this->site->lookupgames !== '0') {
-			$console = new Konsole($this->echooutput);
-			$console->processConsoleReleases();
+		if ($this->pdo->getSetting('lookupgames') != 0) {
+			(new Console(['Settings' => $this->pdo, 'Echo' => $this->echooutput]))->processConsoleReleases();
 		}
 	}
 
@@ -184,35 +194,26 @@ class PProcess
 	 */
 	public function processGames()
 	{
-		if ($this->site->lookupgames !== 0) {
-			$games = new Games(['Echo' => $this->echooutput, 'Settings' => $this->pdo]);
-			$games->processGamesReleases();
-		}
-	}
-
-	/**
-	 * Lookup xxx if enabled.
-	 */
-	public function processXXX()
-	{
-		if ($this->site->lookupxxx == 1) {
-			$xxx = new XXX($this->echooutput);
-			$xxx->processXXXReleases();
+		if ($this->pdo->getSetting('lookupgames') != 0) {
+			(new Games(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processGamesReleases();
 		}
 	}
 
 	/**
 	 * Lookup imdb if enabled.
 	 *
-	 * @param string $releaseToWork
+	 * @param string     $groupID       (Optional) ID of a group to work on.
+	 * @param string     $guidChar      (Optional) First letter of a release GUID to use to get work.
+	 * @param int|string $processMovies (Optional) 0 Don't process, 1 process all releases,
+	 *                                             2 process renamed releases only, '' check site setting
 	 *
 	 * @return void
 	 */
-	public function processMovies($releaseToWork = '')
+	public function processMovies($groupID = '', $guidChar = '', $processMovies = '')
 	{
-		if ($this->site->lookupimdb === '1') {
-			$movie = new Film($this->echooutput);
-			$movie->processMovieReleases($releaseToWork);
+		$processMovies = (is_numeric($processMovies) ? $processMovies : $this->pdo->getSetting('lookupimdb'));
+		if ($processMovies > 0) {
+			(new Movie(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processMovieReleases($groupID, $guidChar, $processMovies);
 		}
 	}
 
@@ -223,37 +224,25 @@ class PProcess
 	 */
 	public function processMusic()
 	{
-		if ($this->site->lookupmusic !== '0') {
-			$music = new Music($this->echooutput);
-			$music->processMusicReleases();
+		if ($this->pdo->getSetting('lookupmusic') != 0) {
+			(new Music(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processMusicReleases();
 		}
 	}
 
 	/**
 	 * Process nfo files.
 	 *
-	 * @param string $releaseToWork
-	 * @param        $nntp
+	 * @param NNTP   $nntp
+	 * @param string $groupID  (Optional) ID of a group to work on.
+	 * @param string $guidChar (Optional) First letter of a release GUID to use to get work.
 	 *
 	 * @return void
 	 */
-	public function processNfos($releaseToWork = '', $nntp)
+	public function processNfos(&$nntp, $groupID = '', $guidChar = '')
 	{
-		if ($this->site->lookupnfo === '1') {
-			$this->Nfo->processNfoFiles($releaseToWork, $this->site->lookupimdb, $this->site->lookuptvrage, $groupID = '', $nntp);
+		if ($this->pdo->getSetting('lookupnfo') == 1) {
+			$this->Nfo->processNfoFiles($nntp, $groupID, $guidChar, (int)$this->pdo->getSetting('lookupimdb'), (int)$this->pdo->getSetting('lookuptvrage'));
 		}
-	}
-
-	/**
-	 * Fetch titles from predb sites.
-	 *
-	 * @param $nntp
-	 *
-	 * @return void
-	 */
-	public function processPrehash($nntp)
-	{
-		// 2014-05-31 : Web PreDB fetching is removed. Using IRC is now recommended.
 	}
 
 	/**
@@ -263,22 +252,34 @@ class PProcess
 	 */
 	public function processSharing(&$nntp)
 	{
-		$sharing = new Sharing($this->pdo, $nntp);
-		$sharing->start();
+		(new Sharing())->start();
 	}
 
 	/**
 	 * Process all TV related releases which will assign their series/episode/rage data.
 	 *
-	 * @param string $releaseToWork
+	 * @param string     $groupID   (Optional) ID of a group to work on.
+	 * @param string     $guidChar  (Optional) First letter of a release GUID to use to get work.
+	 * @param string|int $processTV (Optional) 0 Don't process, 1 process all releases,
+	 *                                         2 process renamed releases only, '' check site setting
 	 *
 	 * @return void
 	 */
-	public function processTv($releaseToWork = '')
+	public function processTv($groupID = '', $guidChar = '', $processTV = '')
 	{
-		if ($this->site->lookuptvrage === '1') {
-			$tvRage = new TvAnger($this->echooutput);
-			$tvRage->processTvReleases($releaseToWork, true);
+		$processTV = (is_numeric($processTV) ? $processTV : $this->pdo->getSetting('lookuptvrage'));
+		if ($processTV > 0) {
+			(new TvAnger(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processTvReleases($groupID, $guidChar, $processTV);
+		}
+	}
+
+	/**
+	 * Lookup xxx if enabled.
+	 */
+	public function processXXX()
+	{
+		if ($this->pdo->getSetting('lookupxxx') == 1) {
+			(new XXX(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processXXXReleases();
 		}
 	}
 
@@ -287,16 +288,15 @@ class PProcess
 	 *
 	 * @note Called externally by tmux/bin/update_per_group and update/postprocess.php
 	 *
-	 * @param NNTP   $nntp          Class NNTP
-	 * @param string $releaseToWork String containing SQL results. Optional.
-	 * @param string $groupID       Group ID. Optional
+	 * @param NNTP       $nntp    Class NNTP
+	 * @param int|string $groupID  (Optional) ID of a group to work on.
+	 * @param string     $guidChar (Optional) First char of release GUID, can be used to select work.
 	 *
 	 * @return void
 	 */
-	public function processAdditional($nntp, $releaseToWork = '', $groupID = '')
+	public function processAdditional(&$nntp, $groupID = '', $guidChar = '')
 	{
-		$processAdditional = new ProcessAdditional($this->echooutput, $nntp, $this->pdo, $this->site, $this->tmux);
-		$processAdditional->start($releaseToWork, $groupID);
+		(new ProcessAdditional(['Echo' => $this->echooutput, 'NNTP' => $nntp, 'Settings' => $this->pdo, 'Groups' => $this->groups, 'NameFixer' => $this->nameFixer, 'Nfo' => $this->Nfo, 'ReleaseFiles' => $this->releaseFiles]))->start($groupID, $guidChar);
 	}
 
 	/**
@@ -312,7 +312,7 @@ class PProcess
 	 *
 	 * @return bool
 	 */
-	public function parsePAR2($messageID, $relID, $groupID, $nntp, $show)
+	public function parsePAR2($messageID, $relID, $groupID, &$nntp, $show)
 	{
 		if ($messageID === '') {
 			return false;
@@ -320,8 +320,10 @@ class PProcess
 
 		$query = $this->pdo->queryOneRow(
 			sprintf('
-				SELECT ID, groupID, categoryID, name, searchname, UNIX_TIMESTAMP(postdate) AS post_date, ID AS releaseID
-				FROM releases WHERE isrenamed = 0 AND ID = %d',
+				SELECT ID, groupID, categoryID, name, searchname, UNIX_TIMESTAMP(postdate) AS post_date, ID AS releaseid
+				FROM releases
+				WHERE isrenamed = 0
+				AND ID = %d',
 				$relID
 			)
 		);
@@ -335,9 +337,13 @@ class PProcess
 		if (!in_array(
 			(int)$query['categoryID'],
 			array(
+				Category::CAT_BOOK_OTHER,
+				Category::CAT_GAME_OTHER,
 				Category::CAT_MOVIE_OTHER,
-				Category::CAT_PC_MOBILEOTHER,
+				Category::CAT_MUSIC_OTHER,
+				Category::CAT_PC_PHONE_OTHER,
 				Category::CAT_TV_OTHER,
+				Category::CAT_OTHER_HASHED,
 				Category::CAT_XXX_OTHER,
 				Category::CAT_MISC_OTHER
 			)
@@ -347,7 +353,7 @@ class PProcess
 		}
 
 		// Get the PAR2 file.
-		$par2 = $nntp->getMessages($this->groups->getByNameByID($groupID), $messageID);
+		$par2 = $nntp->getMessages($this->groups->getByNameByID($groupID), $messageID, $this->alternateNNTP);
 		if ($nntp->isError($par2)) {
 			return false;
 		}
@@ -380,31 +386,44 @@ class PProcess
 					// Add to release files.
 					if ($filesAdded < 11 &&
 						$this->pdo->queryOneRow(
-							sprintf('SELECT ID FROM releasefiles WHERE releaseID = %d AND name = %s',
-								$relID, $this->pdo->escapeString($file['name'])
+							sprintf('
+								SELECT ID
+								FROM releasefiles
+								WHERE releaseID = %d
+								AND name = %s',
+								$relID,
+								$this->pdo->escapeString($file['name'])
 							)
 						) === false
 					) {
+
 						// Try to add the files to the DB.
 						if ($this->releaseFiles->add($relID, $file['name'], $file['size'], $query['post_date'], 0)) {
 							$filesAdded++;
 						}
-					} else {
-						$filesAdded++;
 					}
+				} else {
+					$filesAdded++;
+				}
 
-					// Try to get a new name.
-					if ($foundName === false) {
-						$query['textstring'] = $file['name'];
-						if ($this->namefixer->checkName($query, 1, 'PAR2, ', 1, $show) === true) {
-							$foundName = true;
-						}
+				// Try to get a new name.
+				if ($foundName === false) {
+					$query['textstring'] = $file['name'];
+					if ($this->nameFixer->checkName($query, 1, 'PAR2, ', 1, $show) === true) {
+						$foundName = true;
 					}
 				}
+			}
+
+			// If we found some files.
+			if ($filesAdded > 0) {
+				$this->debugging->log('PostProcess', 'parsePAR2', 'Added ' . $filesAdded . ' releasefiles from PAR2 for ' . $query['searchname'], \Logger::LOG_INFO);
+
 				// Update the file count with the new file count + old file count.
-				$this->pdo->exec(
+				$this->pdo->queryExec(
 					sprintf('
-						UPDATE releases SET rarinnerfilecount = rarinnerfilecount + %d
+						UPDATE releases
+						SET rarinnerfilecount = rarinnerfilecount + %d
 						WHERE ID = %d',
 						$filesAdded,
 						$relID
@@ -415,7 +434,6 @@ class PProcess
 				return true;
 			}
 		}
-
 		return false;
 	}
 }
