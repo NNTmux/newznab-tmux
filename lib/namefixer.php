@@ -6,13 +6,13 @@ require_once(WWW_DIR . "lib/Categorize.php");
 require_once(WWW_DIR . "lib/nzb.php");
 require_once(WWW_DIR . "lib/groups.php");
 require_once(WWW_DIR . "lib/nntp.php");
+require_once(WWW_DIR . "/lib/ColorCLI.php");
+require_once(WWW_DIR . "/lib/ConsoleTools.php");
 require_once("ReleaseCleaner.php");
 require_once("functions.php");
 require_once("nzbcontents.php");
-require_once("ColorCLI.php");
 require_once("Info.php");
 require_once("Pprocess.php");
-require_once("consoletools.php");
 require_once("Enzebe.php");
 
 

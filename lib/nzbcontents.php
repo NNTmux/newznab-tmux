@@ -4,7 +4,7 @@ require_once(WWW_DIR."/lib/nntp.php");
 require_once(WWW_DIR . "/lib/nzb.php");
 require_once(WWW_DIR."/lib/Tmux.php");
 require_once(WWW_DIR . "/lib/util.php");
-require_once("ColorCLI.php");
+require_once(WWW_DIR . "/lib/ColorCLI.php");
 require_once("Info.php");
 require_once("Pprocess.php");
 

@@ -5,7 +5,7 @@ require_once(WWW_DIR . "/lib/Tmux.php");
 require_once(WWW_DIR . "/lib/util.php");
 require_once(WWW_DIR . "/lib/rarinfo/par2info.php");
 require_once(WWW_DIR . "/lib/rarinfo/sfvinfo.php");
-require_once("ColorCLI.php");
+require_once(WWW_DIR . "/lib/ColorCLI.php");
 require_once("Pprocess.php");
 require_once("Film.php");
 require_once("TvAnger.php");

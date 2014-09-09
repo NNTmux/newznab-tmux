@@ -8,7 +8,7 @@ require_once(WWW_DIR . "/lib/framework/db.php");
 require_once(WWW_DIR . "/lib/util.php");
 require_once(WWW_DIR . "/lib/releaseimage.php");
 require_once(WWW_DIR . "/lib/Tmux.php");
-require_once("../ColorCLI.php");
+require_once(WWW_DIR . "/lib/ColorCLI.php");
 
 class AniDBstandAlone {
 

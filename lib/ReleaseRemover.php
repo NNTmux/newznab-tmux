@@ -4,8 +4,8 @@ require_once(WWW_DIR . "/lib/framework/db.php");
 require_once(WWW_DIR . "/lib/releases.php");
 require_once(WWW_DIR . "/lib/category.php");
 require_once(WWW_DIR . "/lib/releaseimage.php");
-require_once("consoletools.php");
-require_once("ColorCLI.php");
+require_once(WWW_DIR . "/lib/ConsoleTools.php");
+require_once(WWW_DIR . "/lib/ColorCLI.php");
 require_once("Enzebe.php");
 
 // TODO: Move RemoveCrapReleases and possible others into here.

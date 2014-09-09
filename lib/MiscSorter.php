@@ -7,12 +7,12 @@ require_once(WWW_DIR . "/lib/groups.php");
 require_once(WWW_DIR . "/lib/music.php");
 require_once(WWW_DIR . "/lib/site.php");
 require_once(WWW_DIR . "/lib/nzb.php");
+require_once(WWW_DIR . "/lib/ColorCLI.php");
 require_once("Info.php");
 require_once("Film.php");
 require_once("Enzebe.php");
 require_once("namefixer.php");
 require_once("Konsole.php");
-require_once("ColorCLI.php");
 require_once("ReleaseCleaner.php");
 
 
