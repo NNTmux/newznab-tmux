@@ -3,13 +3,14 @@
 //=========================
 // Config you must change - updated by installer.
 //=========================
-define('DB_SYSTEM', 'mysql');
+define('DB_TYPE', 'mysql');
 define('DB_HOST', '127.0.0.1');
 define('DB_PORT', '3306');
 define('DB_SOCKET', '');
 define('DB_USER', '');
 define('DB_PASSWORD', '');
 define('DB_NAME', 'newznab');
+define('DB_INNODB', true);
 define('DB_PCONNECT', false);
 
 define('NNTP_USERNAME', '');

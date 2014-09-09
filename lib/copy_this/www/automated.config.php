@@ -16,6 +16,9 @@ define('NN_CORE', NN_LIB);
 // Refers to the web root for the Smarty lib
 define('NN_WWW', NN_ROOT);
 
+// Refers to the covers folder
+define('NN_COVERS', NN_WWW . 'covers' .DS);
+
 // Used to refer to the resources folder
 define('NN_RES', NN_ROOT . 'resources' . DS);
 
