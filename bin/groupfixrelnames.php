@@ -1,6 +1,6 @@
 <?php
 require_once(dirname(__FILE__) . "/config.php");
-require_once(WWW_DIR . "/lib/framework/db.php");
+require_once(WWW_DIR . "/lib/framework/Settings.php");
 require_once(WWW_DIR . "/lib/util.php");
 require_once(WWW_DIR . "/lib/ColorCLI.php");
 require_once(dirname(__FILE__) . '/../lib/namefixer.php');
@@ -9,13 +9,12 @@ require_once(dirname(__FILE__) . '/../lib/Info.php');
 require_once(dirname(__FILE__) . '/../lib/nzbcontents.php');
 require_once(dirname(__FILE__) . '/../lib/MiscSorter.php');
 
-$c = new ColorCLI();
+$pdo = new Settings();
+
 if (!isset($argv[1])) {
-	exit($c->error("This script is not intended to be run manually, it is called from groupfixrelnames_threaded.py."));
+	exit($pdo->log->error("This script is not intended to be run manually, it is called from groupfixrelnames_threaded.py."));
 } else if (isset($argv[1])) {
-	$pdo = new DB();
-	$namefixer = new NameFixer(true);
-	$util = new Utility();
+	$namefixer = new \NameFixer(['Settings' => $pdo]);
 	$pieces = explode(' ', $argv[1]);
 	$guidChar = $pieces[1];
 	$maxperrun = $pieces[2];
@@ -27,7 +26,7 @@ if (!isset($argv[1])) {
 				sprintf('
 								SELECT r.ID AS releaseID, r.guid, r.groupID, r.categoryID, r.name, r.searchname,
 									uncompress(nfo) AS textstring
-								FROM releases r USE INDEX (ix_releases_guid)
+								FROM releases r
 								INNER JOIN releasenfo rn ON r.ID = rn.releaseID
 								WHERE r.guid %s
 								AND r.nzbstatus = 1
@@ -40,7 +39,8 @@ if (!isset($argv[1])) {
 					$maxperrun
 				)
 			);
-			if ($releases !== false) {
+
+			if ($releases instanceof Traversable) {
 				foreach ($releases as $release) {
 					if (preg_match('/^=newz\[NZB\]=\w+/', $release['textstring'])) {
 						$namefixer->done = $namefixer->matched = false;
@@ -62,7 +62,7 @@ if (!isset($argv[1])) {
 				sprintf('
 								SELECT rf.name AS textstring, rf.releaseID AS fileid,
 									r.ID AS releaseID, r.name, r.searchname, r.categoryID, r.groupID
-								FROM releases r USE INDEX (ix_releases_guid)
+								FROM releases r
 								INNER JOIN releasefiles rf ON r.ID = rf.releaseID
 								WHERE r.guid %s
 								AND r.nzbstatus = 1 AND r.proc_files = 0
@@ -73,7 +73,8 @@ if (!isset($argv[1])) {
 					$maxperrun
 				)
 			);
-			if ($releases !== false) {
+
+			if ($releases instanceof Traversable) {
 				foreach ($releases as $release) {
 					$namefixer->done = $namefixer->matched = false;
 					if ($namefixer->checkName($release, true, 'Filenames, ', 1, 1) !== true) {
@@ -88,7 +89,7 @@ if (!isset($argv[1])) {
 				sprintf('
 								SELECT DISTINCT r.ID AS releaseID, r.name, r.searchname, r.categoryID, r.groupID, r.dehashstatus,
 									rf.name AS filename
-								FROM releases r USE INDEX (ix_releases_guid)
+								FROM releases r
 								LEFT OUTER JOIN releasefiles rf ON r.ID = rf.releaseID AND rf.ishashed = 1
 								WHERE r.guid %s
 								AND nzbstatus = 1 AND r.ishashed = 1
@@ -100,14 +101,15 @@ if (!isset($argv[1])) {
 					$maxperrun
 				)
 			);
-			if ($releases !== false) {
+
+			if ($releases instanceof Traversable) {
 				foreach ($releases as $release) {
 					if (preg_match('/[a-fA-F0-9]{32,40}/i', $release['name'], $matches)) {
 						$namefixer->matchPredbHash($matches[0], $release, 1, 1, true, 1);
 					} else if (preg_match('/[a-fA-F0-9]{32,40}/i', $release['filename'], $matches)) {
 						$namefixer->matchPredbHash($matches[0], $release, 1, 1, true, 1);
 					} else {
-						$pdo->exec(sprintf("UPDATE releases SET dehashstatus = %d - 1 WHERE ID = %d", $release['dehashstatus'], $release['releaseID']));
+						$pdo->queryExec(sprintf("UPDATE releases SET dehashstatus = %d - 1 WHERE ID = %d", $release['dehashstatus'], $release['releaseID']));
 						echo '.';
 					}
 				}
@@ -117,7 +119,7 @@ if (!isset($argv[1])) {
 			$releases = $pdo->queryDirect(
 				sprintf('
 								SELECT r.ID AS releaseID, r.guid, r.groupID
-								FROM releases r USE INDEX (ix_releases_guid)
+								FROM releases r
 								WHERE r.guid %s
 								AND r.nzbstatus = 1
 								AND r.proc_par2 = 0
@@ -128,13 +130,18 @@ if (!isset($argv[1])) {
 					$maxperrun
 				)
 			);
-			if ($releases !== false) {
-				$nntp = new NNTP();
-				$Nfo = new Info();
+
+			if ($releases instanceof Traversable) {
+				$nntp = new NNTP(['Settings' => $pdo]);
+				if (($pdo->getSetting('alternate_nntp') == '1' ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
+					exit($pdo->log->error("Unable to connect to usenet."));
+				}
+
+				$Nfo = new Info(['Settings' => $pdo, 'Echo' => true]);
 				$nzbcontents = new NZBContents(
 					array(
-						'Echo'        => true, 'NNTP' => $nntp, 'Nfo' => $Nfo, 'Settings' => $pdo,
-						'PostProcess' => new PProcess()
+						'Echo' => true, 'NNTP' => $nntp, 'Nfo' => $Nfo, 'Settings' => $pdo,
+						'PostProcess' => new PProcess(['Settings' => $pdo, 'Nfo' => $Nfo, 'NameFixer' => $namefixer])
 					)
 				);
 				foreach ($releases as $release) {
@@ -149,7 +156,7 @@ if (!isset($argv[1])) {
 			$releases = $pdo->queryDirect(
 				sprintf('
 								SELECT r.ID AS releaseID
-								FROM releases r USE INDEX (ix_releases_guid)
+								FROM releases r
 								WHERE r.guid %s
 								AND r.nzbstatus = 1 AND r.nfostatus = 1
 								AND r.proc_sorter = 0 AND r.isrenamed = 0
@@ -160,15 +167,11 @@ if (!isset($argv[1])) {
 					$maxperrun
 				)
 			);
-			if ($releases !== false) {
-				$nntp = new NNTP(['Settings' => $pdo, 'ColorCLI' => $c]);
-				$sorter = new MiscSorter(true);
+
+			if ($releases instanceof Traversable) {
+				$sorter = new MiscSorter(true, $pdo);
 				foreach ($releases as $release) {
-					$res = $sorter->nfosorter(null, $release['releaseID'], $nntp);
-					if ($res != true) {
-						$pdo->exec(sprintf('UPDATE releases SET proc_sorter = 1 WHERE ID = %d', $release['releaseID']));
-						echo '.';
-					}
+					$res = $sorter->nfosorter(null, $release['releaseID']);
 				}
 			}
 			break;
@@ -184,10 +187,11 @@ if (!isset($argv[1])) {
 							LIMIT %s
 							OFFSET %s',
 					$maxperrun,
-					$thread * $maxperrun
+					$thread * $maxperrun - $maxperrun
 				)
 			);
-			if ($pres !== false) {
+
+			if ($pres instanceof Traversable) {
 				foreach ($pres as $pre) {
 					$namefixer->done = $namefixer->matched = false;
 					$ftmatched = $searched = 0;
@@ -201,7 +205,7 @@ if (!isset($argv[1])) {
 						$searched = $pre['searched'] - 1;
 						echo ".";
 					}
-					$pdo->exec(sprintf("UPDATE prehash SET searched = %d WHERE ID = %d", $searched, $pre['prehashID']));
+					$pdo->queryExec(sprintf("UPDATE prehash SET searched = %d WHERE ID = %d", $searched, $pre['prehashID']));
 					$namefixer->checked++;
 				}
 			}
