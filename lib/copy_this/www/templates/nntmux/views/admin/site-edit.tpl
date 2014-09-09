@@ -471,6 +471,16 @@
 	</td>
 </tr>
 
+<tr>
+	<td style="width:180px;"><label for="alternate_nntp">Alternate NNTP Provider:</label></td>
+	<td>
+		{html_radios id="alternate_nntp" name='alternate_nntp' values=$yesno_ids output=$yesno_names selected=$site->alternate_nntp separator='<br />'}
+		<div class="hint">This sets Postproccessing Additional/Nfo to use the alternate NNTP provider as set in
+			config.php.You need to edit the included config.php from copy_this folder.
+		</div>
+	</td>
+</tr>
+
 
 <tr>
 	<td><label for="maxmssgs">Max Messages</label>:</td>
