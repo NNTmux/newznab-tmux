@@ -1443,12 +1443,12 @@ while ($i > 0) {
 			}
 			$log = writelog($panes0[1]);
 			shell_exec("tmux respawnp -t${tmux_session}:0.1 'echo \"\033[38;5;${color}m\"; \
-						$_python ${DIR}/../python/postprocess_threaded.py additional $log; date +\"%D %T\"; $_sleep $post_timer' 2>&1 1> /dev/null"
+						cd $_bin && $_php postprocess_new.php additional true $log; date +\"%D %T\"; $_sleep $post_timer' 2>&1 1> /dev/null"
 			);
 		} else if (($post == 2) && ($nfo_remaining_now > 0)) {
 			$log = writelog($panes0[1]);
 			shell_exec("tmux respawnp -t${tmux_session}:0.1 ' \
-						$_python ${DIR}/../python/postprocess_threaded.py nfo $log; date +\"%D %T\"; $_sleep $post_timer' 2>&1 1> /dev/null"
+						cd $_bin && $_php postprocess_new.php nfo true $log; date +\"%D %T\"; $_sleep $post_timer' 2>&1 1> /dev/null"
 			);
 		} else if (($post == 3) && (($nfo_remaining_now > 0) || ($work_remaining_now + $pc_releases_proc + $xxx_releases_proc > 0))) {
 			//run postprocess_releases additional
@@ -1470,8 +1470,8 @@ while ($i > 0) {
 			}
 			$log = writelog($panes0[1]);
 			shell_exec("tmux respawnp -t${tmux_session}:0.1 ' \
-						$_python ${DIR}/../python/postprocess_threaded.py additional $log;\
-                        $_python ${DIR}/../python/postprocess_threaded.py nfo $log; date +\"%D %T\"; $_sleep $post_timer' 2>&1 1> /dev/null"
+						cd $_bin && $_php postprocess_new.php additional true $log;\
+                        cd $_bin && $_php postprocess_new.php nfo true $log; date +\"%D %T\"; $_sleep $post_timer' 2>&1 1> /dev/null"
 			);
 		} else if (($post != 0) && ($nfo_remaining_now == 0) && ($work_remaining_now + $pc_releases_proc + $xxx_releases_proc == 0)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
@@ -1580,7 +1580,7 @@ while ($i > 0) {
 		if (($maxload >= get_load()) && (($post == 0) || ($post == 1)) && ($nfo_remaining_now > 0)) {
 			$log = writelog($panes2[0]);
 			shell_exec("tmux respawnp -t${tmux_session}:2.0 ' \
-						cd $_bin && $_php postprocess_new.php nfo $log; date +\"%D %T\"; $_sleep $post_timer' 2>&1 1> /dev/null"
+						cd $_bin && $_php postprocess_new.php nfo true $log; date +\"%D %T\"; $_sleep $post_timer' 2>&1 1> /dev/null"
 			);
 		} else if (($maxload >= get_load()) && (($post == 0) || ($post == 1)) && ($nfo_remaining_now == 0)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
@@ -1598,7 +1598,7 @@ while ($i > 0) {
 			//run postprocess_releases non amazon
 			$log = writelog($panes2[1]);
 			shell_exec("tmux respawnp -t${tmux_session}:2.1 ' \
-						$_python ${DIR}/../python/postprocess_threaded.py tv $clean $log; date +\"%D %T\"; $_sleep $post_timer_non' 2>&1 1> /dev/null"
+						cd $_bin && $_php postprocess_new.php tv true $clean $log; date +\"%D %T\"; $_sleep $post_timer_non' 2>&1 1> /dev/null"
 			);
 		} else if (($post_non != 0) && ($tvrage_releases_proc == 0)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
@@ -1616,7 +1616,7 @@ while ($i > 0) {
 			//run postprocess_releases non amazon
 			$log = writelog($panes2[2]);
 			shell_exec("tmux respawnp -t${tmux_session}:2.2 ' \
-						$_python ${DIR}/../python/postprocess_threaded.py movie $clean $log; date +\"%D %T\"; $_sleep $post_timer_non' 2>&1 1> /dev/null"
+						cd $_bin && $_php postprocess_new.php movie true $clean $log; date +\"%D %T\"; $_sleep $post_timer_non' 2>&1 1> /dev/null"
 			);
 		} else if (($maxload >= get_load()) && ($post_non != 0) && ($movie_releases_proc == 0)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
@@ -1633,7 +1633,7 @@ while ($i > 0) {
 		if (($maxload >= get_load()) && ($post_amazon == 1) && ($music_releases_proc > 0)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			$log = writelog($panes2[3]);
-			shell_exec("tmux respawnp -t${tmux_session}:2.3 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php postprocess_new.php music 2>&1 $log && $_sleep $post_timer_amazon' 2>&1 1> /dev/null");
+			shell_exec("tmux respawnp -t${tmux_session}:2.3 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php postprocess_new.php music true 2>&1 $log && $_sleep $post_timer_amazon' 2>&1 1> /dev/null");
 		} else if (($maxload >= get_load()) && ($post_amazon == 1) && ($music_releases_proc == 0)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			shell_exec("tmux respawnp -t${tmux_session}:2.3 'echo \"\033[38;5;${color}m\n${panes2[3]} has been disabled/terminated by No Music to process\"'");
@@ -1649,7 +1649,7 @@ while ($i > 0) {
 		if (($maxload >= get_load()) && ($post_non != 0) && ($tvrage_releases_proc > 0)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			$log = writelog($panes2[4]);
-			shell_exec("tmux respawnp -t${tmux_session}:2.4 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php postprocess_new.php anime 2>&1 $log && $_sleep $post_timer_non && echo \" \033[1;0;33m\"' 2>&1 1> /dev/null");
+			shell_exec("tmux respawnp -t${tmux_session}:2.4 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php postprocess_new.php anime true 2>&1 $log && $_sleep $post_timer_non && echo \" \033[1;0;33m\"' 2>&1 1> /dev/null");
 		} else if (($maxload >= get_load()) && ($post_non != 0) && ($tvrage_releases_proc == 0)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			shell_exec("tmux respawnp -t${tmux_session}:2.4 'echo \"\033[38;5;${color}m\n${panes2[4]} has been disabled/terminated by No Anime to process\"'");
@@ -1665,7 +1665,7 @@ while ($i > 0) {
 		if (($maxload >= get_load()) && ($post_amazon == 1) && (($console_releases_proc > 0) || ($pc_releases_proc > 0))) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			$log = writelog($panes2[5]);
-			shell_exec("tmux respawnp -t${tmux_session}:2.5 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php postprocess_new.php console 2>&1 $log && $_php postprocess_new.php games 2>&1 $log && $_sleep $post_timer_amazon && echo \" \033[1;0;33m\"' 2>&1 1> /dev/null");
+			shell_exec("tmux respawnp -t${tmux_session}:2.5 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php postprocess_new.php console true 2>&1 $log && $_php postprocess_new.php games true 2>&1 $log && $_sleep $post_timer_amazon && echo \" \033[1;0;33m\"' 2>&1 1> /dev/null");
 		} else if (($maxload >= get_load()) && ($post_amazon == 1) && (($console_releases_proc == 0) || ($pc_releases_proc > 0))) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			shell_exec("tmux respawnp -t${tmux_session}:2.5 'echo \"\033[38;5;\"$color\"m\n$panes2[5] has been disabled/terminated by No Games to process\"'");
@@ -1696,7 +1696,7 @@ while ($i > 0) {
 		if (($maxload >= get_load()) && ($post_amazon == 1) && ($book_releases_proc > 0)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			$log = writelog($panes2[7]);
-			shell_exec("tmux respawnp -t${tmux_session}:2.7 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php postprocess_new.php ebook 2>&1 $log && $_sleep $post_timer_amazon && echo \" \033[1;0;33m\"' 2>&1 1> /dev/null");
+			shell_exec("tmux respawnp -t${tmux_session}:2.7 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php postprocess_new.php ebook true 2>&1 $log && $_sleep $post_timer_amazon && echo \" \033[1;0;33m\"' 2>&1 1> /dev/null");
 		} else if (($maxload >= get_load()) && ($post_amazon == 1) && ($book_releases_proc == 0)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			shell_exec("tmux respawnp -t${tmux_session}:2.7 'echo \"\033[38;5;\"$color\"m\n$panes2[7] has been disabled/terminated by No Books to process\"' 2>&1 1> /dev/null");
@@ -1712,7 +1712,7 @@ while ($i > 0) {
 		if (($maxload >= get_load()) && ($xxx_releases_proc > 0)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			$log = writelog($panes2[8]);
-			shell_exec("tmux respawnp -t${tmux_session}:2.8 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php postprocess_new.php xxx 2>&1 $log && echo \" \033[1;0;33m\"' 2>&1 1> /dev/null");
+			shell_exec("tmux respawnp -t${tmux_session}:2.8 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php postprocess_new.php xxx true 2>&1 $log && echo \" \033[1;0;33m\"' 2>&1 1> /dev/null");
 		} else if ($xxx_releases_proc == 0) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			shell_exec("tmux respawnp -t${tmux_session}:2.8 'echo \"\033[38;5;\"$color\"m\n$panes2[8] Disabled by XXX\"' 2>&1 1> /dev/null");
@@ -1934,7 +1934,7 @@ function run_sharing($tmux_session, $_php, $pane, $_sleep, $sharing_timer)
 	if ($tmux_share && $sharing['enabled'] == 1 && ($sharing['posting'] == 1 || $sharing['fetching'] == 1)) {
 		if (shell_exec("tmux list-panes -t${tmux_session}:${pane} | grep ^0 | grep -c dead") == 1) {
 			$DIR = dirname(__FILE__);
-			$sharing2 = $DIR . "/postprocess_new.php sharing";
+			$sharing2 = $DIR . "/postprocess_new.php sharing true";
 			shell_exec(
 				"tmux respawnp -t${tmux_session}:${pane}.0 ' \
 					$_php $sharing2; $_sleep $sharing_timer' 2>&1 1> /dev/null"

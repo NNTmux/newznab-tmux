@@ -1,5 +1,5 @@
 <?php
-require_once(WWW_DIR."lib/framework/db.php");
+require_once(WWW_DIR."lib/framework/Settings.php");
 require_once(WWW_DIR."lib/groups.php");
 require_once(WWW_DIR."lib/nfo.php");
 require_once(WWW_DIR."lib/site.php");
@@ -12,20 +12,18 @@ require_once("IRCScraper.php");
 require_once("Info.php");
 require_once("namefixer.php");
 
-
 /**
- * This script is adapted from nZEDb for usage in newznab-tmux
  * Class for inserting names/categories etc from PreDB sources into the DB,
  * also for matching names on files / subjects.
  *
- * Class PreHash
+ * Class PreDb
  */
-Class PreHash
+Class PreDb
 {
 	// Nuke status.
-	const PRE_NONUKE = 0; // Pre is not nuked.
+	const PRE_NONUKE  = 0; // Pre is not nuked.
 	const PRE_UNNUKED = 1; // Pre was un nuked.
-	const PRE_NUKED = 2; // Pre is nuked.
+	const PRE_NUKED   = 2; // Pre is nuked.
 	const PRE_MODNUKE = 3; // Nuke reason was modified.
 	const PRE_RENUKED = 4; // Pre was re nuked.
 	const PRE_OLDNUKE = 5; // Pre is nuked for being old.
@@ -43,56 +41,69 @@ Class PreHash
 	/**
 	 * @var DB
 	 */
-	protected $db;
+	protected $pdo;
+
+	private $dateLimit;
 
 	/**
-	 * @var ColorCLI
+	 * @param array $options
 	 */
-	protected $c;
-	/**
-	 * @param bool $echo
-	 */
-	public function __construct($echo = false)
+	public function __construct(array $options = array())
 	{
-		$this->echooutput = $echo;
-		$this->db = new DB();
-		$this->c = new ColorCLI();
+		$defaults = [
+			'Echo'     => false,
+			'Settings' => null,
+		];
+		$options += $defaults;
+
+		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
+		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
 	}
 
 	/**
 	 * Attempts to match PreDB titles to releases.
 	 *
-	 * @param $nntp
+	 * @param $dateLimit
 	 */
-	public function checkPre($nntp)
+	public function checkPre($dateLimit = false)
 	{
-		$consoleTools = new ConsoleTools();
+		$this->dateLimit = $dateLimit;
+
+		$consoleTools = new ConsoleTools(['ColorCLI' => $this->pdo->log]);
 		$updated = 0;
+		$datesql = '';
+
 		if ($this->echooutput) {
-			echo $this->c->header('Querying DB for release search names not matched with PreDB titles.');
+			echo $this->pdo->log->header('Querying DB for release search names not matched with PreDB titles.');
 		}
 
-		$res = $this->db->queryDirect('
-			SELECT p.ID AS prehashID, r.ID AS releaseID
-			FROM prehash p
-			INNER JOIN releases r ON p.title = r.searchname
-			WHERE r.prehashID = 0'
+		if ($this->dateLimit !== false && is_numeric($this->dateLimit)) {
+			$datesql = sprintf('AND DATEDIFF(NOW(), adddate) <= %d', $this->dateLimit);
+		}
+
+		$res = $this->pdo->queryDirect(
+			sprintf('
+							SELECT p.ID AS prehashID, r.ID AS releaseID
+							FROM prehash p
+							INNER JOIN releases r ON p.title = r.searchname
+							WHERE r.prehashID < 1 %s',
+				$datesql
+			)
 		);
 
 		if ($res !== false) {
-
 			$total = $res->rowCount();
-			echo $this->c->primary(number_format($total) . ' releases to match.');
+			echo $this->pdo->log->primary(number_format($total) . ' releases to match.');
 
-			if ($total > 0) {
+			if ($res instanceof Traversable) {
 				foreach ($res as $row) {
-					$this->db->exec(
+					$this->pdo->queryExec(
 						sprintf('UPDATE releases SET prehashID = %d WHERE ID = %d', $row['prehashID'], $row['releaseID'])
 					);
 
 					if ($this->echooutput) {
 						$consoleTools->overWritePrimary(
-							'Matching up preDB titles with release searchnames: ' . $consoleTools->percentString(++$updated, $total)
+							'Matching up preDB titles with release searchnames: ' . $consoleTools->percentString( ++$updated, $total)
 						);
 					}
 				}
@@ -102,7 +113,7 @@ Class PreHash
 			}
 
 			if ($this->echooutput) {
-				echo $this->c->header(
+				echo $this->pdo->log->header(
 					'Matched ' . number_format(($updated > 0) ? $updated : 0) . ' PreDB titles to release search names.'
 				);
 			}
@@ -122,25 +133,25 @@ Class PreHash
 			return false;
 		}
 
-		$titleCheck = $this->db->queryOneRow(
-			sprintf('SELECT ID FROM prehash WHERE title = %s LIMIT 1', $this->db->escapeString($cleanerName))
+		$titleCheck = $this->pdo->queryOneRow(
+			sprintf('SELECT ID FROM prehash WHERE title = %s LIMIT 1', $this->pdo->escapeString($cleanerName))
 		);
 
 		if ($titleCheck !== false) {
 			return array(
-				'title'     => $cleanerName,
+				'title' => $cleanerName,
 				'prehashID' => $titleCheck['ID']
 			);
 		}
 
 		// Check if clean name matches a PreDB filename.
-		$fileCheck = $this->db->queryOneRow(
-			sprintf('SELECT ID, title FROM prehash WHERE filename = %s LIMIT 1', $this->db->escapeString($cleanerName))
+		$fileCheck = $this->pdo->queryOneRow(
+			sprintf('SELECT ID, title FROM preHASH WHERE filename = %s LIMIT 1', $this->pdo->escapeString($cleanerName))
 		);
 
 		if ($fileCheck !== false) {
 			return array(
-				'title'     => $fileCheck['title'],
+				'title' => $fileCheck['title'],
 				'prehashID' => $fileCheck['ID']
 			);
 		}
@@ -161,10 +172,9 @@ Class PreHash
 	 */
 	public function parseTitles($time, $echo, $cats, $namestatus, $show)
 	{
-		$namefixer = new NameFixer($this->echooutput);
-		$consoletools = new ConsoleTools();
+		$namefixer = new NameFixer(['Echo' => $this->echooutput, 'ConsoleTools' => $this->pdo->log, 'Settings' => $this->pdo]);
+		$consoletools = new ConsoleTools(['ColorCLI' => $this->pdo->log]);
 		$updated = $checked = 0;
-		$matches = '';
 
 		$tq = '';
 		if ($time == 1) {
@@ -172,7 +182,7 @@ Class PreHash
 		}
 		$ct = '';
 		if ($cats == 1) {
-			$ct = 'AND r.categoryID IN (1090, 2020, 3050, 6050, 5050, 7050, 8010)';
+			$ct = 'AND r.categoryID IN (1090, 2020, 3050, 6050, 5050, 7010, 8050)';
 		}
 
 		if ($this->echooutput) {
@@ -180,7 +190,7 @@ Class PreHash
 			if ($time == 1) {
 				$te = ' in the past 3 hours';
 			}
-			echo $this->c->header('Fixing search names' . $te . " using the predb hash.");
+			echo $this->pdo->log->header('Fixing search names' . $te . " using the predb hash.");
 		}
 		$regex = "AND (r.ishashed = 1 OR rf.ishashed = 1)";
 
@@ -188,20 +198,18 @@ Class PreHash
 			$query = sprintf('SELECT r.ID AS releaseID, r.name, r.searchname, r.categoryID, r.groupID, '
 				. 'dehashstatus, rf.name AS filename FROM releases r '
 				. 'LEFT OUTER JOIN releasefiles rf ON r.ID = rf.releaseID '
-				. 'WHERE nzbstatus = 1 AND dehashstatus BETWEEN -6 AND 0 AND prehashID = 0 %s', $regex
-			);
+				. 'WHERE nzbstatus = 1 AND dehashstatus BETWEEN -6 AND 0 AND prehashID = 0 %s', $regex);
 		} else {
 			$query = sprintf('SELECT r.ID AS releaseID, r.name, r.searchname, r.categoryID, r.groupID, '
 				. 'dehashstatus, rf.name AS filename FROM releases r '
 				. 'LEFT OUTER JOIN releasefiles rf ON r.ID = rf.releaseID '
-				. 'WHERE nzbstatus = 1 AND isrenamed = 0 AND dehashstatus BETWEEN -6 AND 0 %s %s %s', $regex, $ct, $tq
-			);
+				. 'WHERE nzbstatus = 1 AND isrenamed = 0 AND dehashstatus BETWEEN -6 AND 0 %s %s %s', $regex, $ct, $tq);
 		}
 
-		$res = $this->db->queryDirect($query);
+		$res = $this->pdo->queryDirect($query);
 		$total = $res->rowCount();
-		echo $this->c->primary(number_format($total) . " releases to process.");
-		if ($total > 0) {
+		echo $this->pdo->log->primary(number_format($total) . " releases to process.");
+		if ($res instanceof Traversable) {
 			foreach ($res as $row) {
 				if (preg_match('/[a-fA-F0-9]{32,40}/i', $row['name'], $matches)) {
 					$updated = $updated + $namefixer->matchPredbHash($matches[0], $row, $echo, $namestatus, $this->echooutput, $show);
@@ -214,9 +222,9 @@ Class PreHash
 			}
 		}
 		if ($echo == 1) {
-			echo $this->c->header("\n" . $updated . " releases have had their names changed out of: " . number_format($checked) . " files.");
+			echo $this->pdo->log->header("\n" . $updated . " releases have had their names changed out of: " . number_format($checked) . " files.");
 		} else {
-			echo $this->c->header("\n" . $updated . " releases could have their names changed. " . number_format($checked) . " files were checked.");
+			echo $this->pdo->log->header("\n" . $updated . " releases could have their names changed. " . number_format($checked) . " files were checked.");
 		}
 
 		return $updated;
@@ -235,19 +243,19 @@ Class PreHash
 	{
 		if ($search !== '') {
 			$search = explode(' ', trim($search));
-			if (count($search > 1)) {
+			if (count($search) > 1) {
 				$search = "LIKE '%" . implode("%' AND title LIKE '%", $search) . "%'";
 			} else {
 				$search = "LIKE '%" . $search . "%'";
 			}
 			$search = 'WHERE title ' . $search;
-			$count = $this->db->queryOneRow(sprintf('SELECT COUNT(*) AS cnt FROM prehash %s', $search));
+			$count = $this->pdo->queryOneRow(sprintf('SELECT COUNT(*) AS cnt FROM prehash %s', $search));
 			$count = $count['cnt'];
 		} else {
 			$count = $this->getCount();
 		}
 
-		$parr = $this->db->query(
+		$parr = $this->pdo->query(
 			sprintf('
 				SELECT p.*, r.guid
 				FROM prehash p
@@ -258,7 +266,6 @@ Class PreHash
 				$offset
 			)
 		);
-
 		return array('arr' => $parr, 'count' => $count);
 	}
 
@@ -269,8 +276,7 @@ Class PreHash
 	 */
 	public function getCount()
 	{
-		$count = $this->db->queryOneRow('SELECT COUNT(*) AS cnt FROM prehash');
-
+		$count = $this->pdo->queryOneRow('SELECT COUNT(*) AS cnt FROM prehash');
 		return ($count === false ? 0 : $count['cnt']);
 	}
 
@@ -283,7 +289,7 @@ Class PreHash
 	 */
 	public function getForRelease($preID)
 	{
-		return $this->db->query(sprintf('SELECT * FROM prehash WHERE ID = %d', $preID));
+		return $this->pdo->query(sprintf('SELECT * FROM prehash WHERE ID = %d', $preID));
 	}
 
 	/**
@@ -295,7 +301,7 @@ Class PreHash
 	 */
 	public function getOne($preID)
 	{
-		return $this->db->queryOneRow(sprintf('SELECT * FROM prehash WHERE ID = %d', $preID));
+		return $this->pdo->queryOneRow(sprintf('SELECT * FROM prehash WHERE ID = %d', $preID));
 	}
 
 }
