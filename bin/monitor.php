@@ -1219,7 +1219,7 @@ while ($i > 0) {
 	$_phpn = "nice -n$niceness $PHP";
 	$_python = $show_time . " nice -n$niceness $PYTHON";
 	$_pythonn = "nice -n$niceness $PYTHON";
-	$_sleep = "$_phpn ${DIR}/../lib/showsleep.php";
+	$_sleep = "$_phpn ${DIR}/../../../../../www/lib/showsleep.php";
 
 	//set command for running update_binaries
 	if ($binaries == 1) {
