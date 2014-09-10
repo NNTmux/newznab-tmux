@@ -152,7 +152,7 @@ class NameFixer
 
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
 		$this->relid = $this->fixed = $this->checked = 0;
-		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
 		$this->timeother = ' AND rel.adddate > (NOW() - INTERVAL 0 HOUR) AND rel.categoryID IN (1090, 2020, 3050, 6050, 5050, 7050, 8010) GROUP BY rel.ID ORDER BY postdate DESC';
 		$this->timeall = ' AND rel.adddate > (NOW() - INTERVAL 6 HOUR) GROUP BY rel.ID ORDER BY postdate DESC';
 		$this->fullother = ' AND rel.categoryID IN (1090, 2020, 3050, 6050, 5050, 7050, 8010) GROUP BY rel.ID';

@@ -302,7 +302,7 @@ Class ProcessAdditional
 		$this->_echoCLI = ($options['Echo'] && NN_ECHOCLI && (strtolower(PHP_SAPI) === 'cli'));
 		$this->_echoDebug = NN_DEBUG;
 
-		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
 		$this->_nntp = ($options['NNTP'] instanceof NNTP ? $options['NNTP'] : new NNTP(['Echo' => $this->_echoCLI, 'Settings' => $this->pdo]));
 
 		$this->_nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB($this->pdo));
@@ -315,7 +315,7 @@ Class ProcessAdditional
 		$this->_releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage($this->pdo));
 		$this->_par2Info = new Par2Info();
 		$this->utility = new Utility();
-		$this->_nfo = ($options['Nfo'] instanceof Info ? $options['Nfo'] : new Info());
+		$this->_nfo = ($options['Nfo'] instanceof Info ? $options['Nfo'] : new Info(['Echo' => $this->_echoCLI, 'Settings' => $this->pdo]));
 
 		$this->_innerFileBlacklist = ($this->pdo->getSetting('innerfileblacklist') == '' ? false : $this->pdo->getSetting('innerfileblacklist'));
 		$this->_maxNestedLevels = ($this->pdo->getSetting('maxnestedlevels') == 0 ? 3 : $this->pdo->getSetting('maxnestedlevels'));

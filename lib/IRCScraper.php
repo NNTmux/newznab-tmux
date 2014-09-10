@@ -120,7 +120,7 @@ class IRCScraper extends IRCClient
 			$this->_titleIgnoreRegex = SCRAPE_IRC_TITLE_IGNORE;
 		}
 
-		$this->_pdo = new DB();
+		$this->_pdo = new Settings();
 		$this->_groupList = array();
 		$this->_silent = $silent;
 		$this->_debug = $debug;

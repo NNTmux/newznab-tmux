@@ -9,12 +9,12 @@ require_once(dirname(__FILE__) . '/../lib/Info.php');
 require_once(dirname(__FILE__) . '/../lib/nzbcontents.php');
 require_once(dirname(__FILE__) . '/../lib/MiscSorter.php');
 
-$pdo = new DB();
+$pdo = new Settings();
 
 if (!isset($argv[1])) {
 	exit($pdo->log->error("This script is not intended to be run manually, it is called from groupfixrelnames_threaded.py."));
 } else if (isset($argv[1])) {
-	$namefixer = new NameFixer(['Settings' => $pdo]);
+	$namefixer = new \NameFixer(['Settings' => $pdo]);
 	$pieces = explode(' ', $argv[1]);
 	$guidChar = $pieces[1];
 	$maxperrun = $pieces[2];
@@ -137,7 +137,7 @@ if (!isset($argv[1])) {
 					exit($pdo->log->error("Unable to connect to usenet."));
 				}
 
-				$Nfo = new Info();
+				$Nfo = new Info(['Settings' => $pdo, 'Echo' => true]);
 				$nzbcontents = new NZBContents(
 					array(
 						'Echo' => true, 'NNTP' => $nntp, 'Nfo' => $Nfo, 'Settings' => $pdo,

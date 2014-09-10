@@ -529,7 +529,7 @@ while ($i > 0) {
 	//check the db connection
 	if ($db->ping(true) == false) {
 		unset($pdo);
-		$db = new DB();
+		$db = new Settings();
 	}
 	//kill mediainfo and ffmpeg if exceeds 60 sec
 	shell_exec("killall -o 60s -9 mediainfo 2>&1 1> /dev/null");

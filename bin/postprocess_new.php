@@ -12,7 +12,7 @@ require_once(dirname(__FILE__) . '/../lib/TvAnger.php');
 require_once(dirname(__FILE__) . '/../lib/Pprocess.php');
 require_once(dirname(__FILE__) . '/../lib/Info.php');
 
-$pdo = new DB();
+$pdo = new Settings();
 /**
 Array with possible arguments for run and
 whether or not those methods of operation require NNTP
