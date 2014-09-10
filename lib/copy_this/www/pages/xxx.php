@@ -6,13 +6,13 @@ if (!$users->isLoggedIn()) {
 	$page->show403();
 }
 
-$movie = new XXX(true);
+$movie = new XXX();
 $cat = new Category();
 
 $moviecats = $cat->getChildren(Category::CAT_PARENT_XXX);
 $mtmp = array();
 foreach ($moviecats as $mcat) {
-	$mtmp[$mcat['ID']] = $mcat;
+	$mtmp[$mcat['id']] = $mcat;
 }
 $category = Category::CAT_PARENT_XXX;
 if (isset($_REQUEST['t']) && array_key_exists($_REQUEST['t'], $mtmp)) {
@@ -24,14 +24,14 @@ $catarray[] = $category;
 $page->smarty->assign('catlist', $mtmp);
 $page->smarty->assign('category', $category);
 
-$browsecount = $movie->getXXXCount($catarray, -1, $page->userdata['categoryexclusions']);
+$browsecount = $movie->getXXXCount($catarray, -1, $userdata['categoryexclusions']);
 
 $offset = (isset($_REQUEST['offset']) && ctype_digit($_REQUEST['offset'])) ? $_REQUEST["offset"] : 0;
 $ordering = $movie->getXXXOrdering();
 $orderby = isset($_REQUEST['ob']) && in_array($_REQUEST['ob'], $ordering) ? $_REQUEST['ob'] : '';
 
 $results = $movies = array();
-$results = $movie->getXXXRange($catarray, $offset, ITEMS_PER_PAGE, $orderby, -1, $page->userdata['categoryexclusions']);
+$results = $movie->getXXXRange($catarray, $offset, ITEMS_PER_COVER_PAGE, $orderby, -1, $userdata['categoryexclusions']);
 foreach ($results as $result) {
 	$result['genre'] = $movie->makeFieldLinks($result, 'genre');
 	$result['actors'] = $movie->makeFieldLinks($result, 'actors');
@@ -56,7 +56,7 @@ $browseby_link = '&amp;title=' . $title . '&amp;actors=' . $actors . '&amp;direc
 
 $page->smarty->assign('pagertotalitems', $browsecount);
 $page->smarty->assign('pageroffset', $offset);
-$page->smarty->assign('pageritemsperpage', ITEMS_PER_PAGE);
+$page->smarty->assign('pageritemsperpage', ITEMS_PER_COVER_PAGE);
 $page->smarty->assign('pagerquerybase', WWW_TOP . "/xxx?t=" . $category . $browseby_link . "&amp;ob=" . $orderby . "&amp;offset=");
 $page->smarty->assign('pagerquerysuffix', "#results");
 
