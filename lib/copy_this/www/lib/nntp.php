@@ -113,7 +113,7 @@ class NNTP extends Net_NNTP_Client
 
 		$this->_echo = ($options['Echo'] && NN_ECHOCLI);
 
-		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
+		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 		$this->utility = new Utility();
 
 		$this->_debugBool = (NN_LOGGING || NN_DEBUG);
