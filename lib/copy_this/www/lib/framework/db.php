@@ -814,7 +814,7 @@ class DB extends PDO
 			foreach ($tableList as $tableName) {
 				$tableAnd .= ($this->escapeString($tableName) . ',');
 			}
-			$tableAnd = (' AND Name IN (' . rtrim($tableAnd, ',') . ')');
+			$tableAnd = (' AND name IN (' . rtrim($tableAnd, ',') . ')');
 		}
 
 		switch ($type) {
