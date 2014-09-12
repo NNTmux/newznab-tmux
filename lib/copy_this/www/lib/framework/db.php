@@ -1,22 +1,24 @@
 <?php
+use \PDO;
+
 require_once(WWW_DIR . "lib/framework/cache.php");
 require_once(WWW_DIR . "lib/util.php");
 require_once(WWW_DIR . "lib/ConsoleTools.php");
 require_once(WWW_DIR . "lib/ColorCLI.php");
-require_once(WWW_DIR . "lib/Logger.php");
+require_once(WWW_DIR . "lib/\Logger.php");
 
 
 /**
- * Class for handling connection to MySQL database using PDO.
+ * Class for handling connection to MySQL database using \PDO.
  *
- * The class extends PDO, thereby exposing all of PDO's functionality directly
+ * The class extends \PDO, thereby exposing all of \PDO's functionality directly
  * without the need to wrap each and every method here.
  *
  * Exceptions are caught and displayed to the user.
  * Properties are explicitly created, so IDEs can offer autocompletion for them.
- * @extends PDO
+ * @extends \PDO
  */
-class DB extends PDO
+class DB extends \PDO
 {
 	/**
 	 * @var bool Is this a Command Line Interface instance.
@@ -39,7 +41,7 @@ class DB extends PDO
 	/**
 	 * @note Setting this static causes issues when creating multiple instances of this class with different
 	 *       MySQL servers, the next instances re-uses the server of the first instance.
-	 * @var PDO Instance of PDO class.
+	 * @var \PDO Instance of \PDO class.
 	 */
 	public $pdo = null;
 
@@ -79,7 +81,7 @@ class DB extends PDO
 	private $cacheEnabled = false;
 
 	/**
-	 * Constructor. Sets up all necessary properties. Instantiates a PDO object
+	 * Constructor. Sets up all necessary properties. Instantiates a \PDO object
 	 * if needed, otherwise returns the current one.
 	 */
 	public function __construct(array $options = [])
@@ -88,7 +90,7 @@ class DB extends PDO
 
 		$defaults = [
 			'createDb'		=> false, // create dbname if it does not exist?
-			'ct'			=> new ConsoleTools(),
+			'ct'			=> new \ConsoleTools(),
 			'dbhost'		=> defined('DB_HOST') ? DB_HOST : '',
 			'dbname' 		=> defined('DB_NAME') ? DB_NAME : '',
 			'dbpass' 		=> defined('DB_PASSWORD') ? DB_PASSWORD : '',
@@ -96,7 +98,7 @@ class DB extends PDO
 			'dbsock'		=> defined('DB_SOCKET') ? DB_SOCKET : '',
 			'dbtype'		=> defined('DB_TYPE') ? DB_TYPE : '',
 			'dbuser' 		=> defined('DB_USER') ? DB_USER : '',
-			'log'			=> new ColorCLI(),
+			'log'			=> new \ColorCLI(),
 			'persist'		=> false,
 		];
 		$options += $defaults;
@@ -110,7 +112,7 @@ class DB extends PDO
 			$this->dbSystem = strtolower($this->opts['dbtype']);
 		}
 
-		if (!($this->pdo instanceof PDO)) {
+		if (!($this->pdo instanceof \PDO)) {
 			$this->initialiseDatabase();
 		}
 
@@ -131,8 +133,8 @@ class DB extends PDO
 		$this->_debug = (NN_DEBUG || NN_LOGGING);
 		if ($this->_debug) {
 			try {
-				$this->debugging = new Logger(['ColorCLI' => $this->log]);
-			} catch (LoggerException $error) {
+				$this->debugging = new \Logger(['ColorCLI' => $this->log]);
+			} catch (\LoggerException $error) {
 				$this->_debug = false;
 			}
 		}
@@ -183,7 +185,7 @@ class DB extends PDO
 			return false;
 		}
 
-		return $result->fetch(PDO::FETCH_ASSOC);
+		return $result->fetch(\PDO::FETCH_ASSOC);
 	}
 
 	public function checkColumnIndex($table, $column)
@@ -199,14 +201,14 @@ class DB extends PDO
 			return false;
 		}
 
-		return $result->fetchAll(PDO::FETCH_ASSOC);
+		return $result->fetchAll(\PDO::FETCH_ASSOC);
 	}
 
 	public function getTableList ()
 	{
 		$query  = ($this->opts['dbtype'] === 'mysql' ? 'SHOW DATABASES' : 'SELECT datname AS Database FROM pg_database');
 		$result = $this->pdo->query($query);
-		return $result->fetchAll(PDO::FETCH_ASSOC);
+		return $result->fetchAll(\PDO::FETCH_ASSOC);
 	}
 
 	/**
@@ -231,7 +233,7 @@ class DB extends PDO
 	}
 
 	/**
-	 * Init PDO instance.
+	 * Init \PDO instance.
 	 */
 	private function initialiseDatabase()
 	{
@@ -247,17 +249,17 @@ class DB extends PDO
 		$dsn .= ';charset=utf8';
 
 		$options = [
-			PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-			PDO::ATTR_TIMEOUT => 180,
-			PDO::ATTR_PERSISTENT => $this->opts['persist'],
-			PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8",
-			PDO::MYSQL_ATTR_LOCAL_INFILE => true,
+			\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+			\PDO::ATTR_TIMEOUT => 180,
+			\PDO::ATTR_PERSISTENT => $this->opts['persist'],
+			\PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8",
+			\PDO::MYSQL_ATTR_LOCAL_INFILE => true
 		];
 
 		$this->dsn = $dsn;
 		// removed try/catch to let the instantiating code handle the problem (Install for
 		// instance can output a message that connecting failed.
-		$this->pdo = new PDO($dsn, $this->opts['dbuser'], $this->opts['dbpass'], $options);
+		$this->pdo = new \PDO($dsn, $this->opts['dbuser'], $this->opts['dbpass'], $options);
 
 		if ($this->opts['dbname'] != '') {
 			if ($this->opts['createDb']) {
@@ -265,27 +267,27 @@ class DB extends PDO
 				if ($found) {
 					try {
 						$this->pdo->query("DROP DATABASE " . $this->opts['dbname']);
-					} catch (Exception $e) {
-						throw new RuntimeException("Error trying to drop your old database: '{$this->opts['dbname']}'", 2);
+					} catch (\Exception $e) {
+						throw new \RuntimeException("Error trying to drop your old database: '{$this->opts['dbname']}'", 2);
 					}
 					$found = self::checkDbExists();
 				}
 
 				if ($found) {
 					var_dump(self::getTableList());
-					throw new RuntimeException("Could not drop your old database: '{$this->opts['dbname']}'", 2);
+					throw new \RuntimeException("Could not drop your old database: '{$this->opts['dbname']}'", 2);
 				} else {
 					$this->pdo->query("CREATE DATABASE `{$this->opts['dbname']}`  DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci");
 
 					if (!self::checkDbExists()) {
-						throw new RuntimeException("Could not create new database: '{$this->opts['dbname']}'", 3);
+						throw new \RuntimeException("Could not create new database: '{$this->opts['dbname']}'", 3);
 					}
 				}
 			}
 			$this->pdo->query("USE {$this->opts['dbname']}");
 		}
 
-		// In case PDO is not set to produce exceptions (PHP's default behaviour).
+		// In case \PDO is not set to produce exceptions (PHP's default behaviour).
 		if ($this->pdo === false) {
 			$this->echoError(
 				"Unable to create connection to the Database!",
@@ -296,9 +298,9 @@ class DB extends PDO
 		}
 
 		// For backwards compatibility, no need for a patch.
-		//$this->pdo->setAttribute(PDO::ATTR_CASE, PDO::CASE_LOWER);
-		$this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-		$this->pdo->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, true);
+		//$this->pdo->setAttribute(\PDO::ATTR_CASE, \PDO::CASE_LOWER);
+		$this->pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
+		$this->pdo->setAttribute(\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, true);
 	}
 
 	/**
@@ -370,13 +372,13 @@ class DB extends PDO
 	}
 
 	/**
-	 * Verify if pdo var is instance of PDO class.
+	 * Verify if pdo var is instance of \PDO class.
 	 *
 	 * @return bool
 	 */
 	public function isInitialised()
 	{
-		return ($this->pdo instanceof PDO);
+		return ($this->pdo instanceof \PDO);
 	}
 
 	/**
@@ -418,7 +420,7 @@ class DB extends PDO
 		}
 		if ($this->_debug) {
 			$this->echoError($error, 'queryInsert', 4);
-			$this->debugging->log('DB', "queryInsert", $query, Logger::LOG_SQL);
+			$this->debugging->log('DB', "queryInsert", $query, \Logger::LOG_SQL);
 		}
 		return false;
 	}
@@ -463,7 +465,7 @@ class DB extends PDO
 		}
 		if ($silent === false && $this->_debug) {
 			$this->echoError($error, 'queryExec', 4);
-			$this->debugging->log('DB', "queryExec", $query, Logger::LOG_SQL);
+			$this->debugging->log('DB', "queryExec", $query, \Logger::LOG_SQL);
 		}
 		return false;
 	}
@@ -489,7 +491,7 @@ class DB extends PDO
 				return $this->pdo->lastInsertId();
 			}
 
-		} catch (PDOException $e) {
+		} catch (\PDOException $e) {
 			// Deadlock or lock wait timeout, try 10 times.
 			if (
 				$e->errorInfo[1] == 1213 ||
@@ -522,7 +524,7 @@ class DB extends PDO
 	 * @note If not "consumed", causes this error:
 	 *       'SQLSTATE[HY000]: General error: 2014 Cannot execute queries while other unbuffered queries are active.
 	 *        Consider using PDOStatement::fetchAll(). Alternatively, if your code is only ever going to run against mysql,
-	 *        you may enable query buffering by setting the PDO::MYSQL_ATTR_USE_BUFFERED_QUERY attribute.'
+	 *        you may enable query buffering by setting the \PDO::MYSQL_ATTR_USE_BUFFERED_QUERY attribute.'
 	 *
 	 * @param string $query
 	 * @param bool   $silent Whether to skip echoing errors to the console.
@@ -542,7 +544,7 @@ class DB extends PDO
 		try {
 			return $this->pdo->exec($query);
 
-		} catch (PDOException $e) {
+		} catch (\PDOException $e) {
 
 			// Check if we lost connection to MySQL.
 			if ($this->_checkGoneAway($e->getMessage()) !== false) {
@@ -562,7 +564,7 @@ class DB extends PDO
 				$this->echoError($e->getMessage(), 'Exec', 4, false);
 
 				if ($this->_debug) {
-					$this->debugging->log('DB', "Exec", $query, Logger::LOG_SQL);
+					$this->debugging->log('DB', "Exec", $query, \Logger::LOG_SQL);
 				}
 			}
 
@@ -646,15 +648,15 @@ class DB extends PDO
 		if ($query == '') {
 			return false;
 		}
-		$mode = $this->pdo->getAttribute(PDO::ATTR_DEFAULT_FETCH_MODE);
-		if ($mode != PDO::FETCH_ASSOC) {
-			$this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+		$mode = $this->pdo->getAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE);
+		if ($mode != \PDO::FETCH_ASSOC) {
+			$this->pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
 		}
 
 		$result = $this->queryArray($query);
 
-		if ($mode != PDO::FETCH_ASSOC) {
-			$this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+		if ($mode != \PDO::FETCH_ASSOC) {
+			$this->pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
 		}
 		return $result;
 	}
@@ -667,7 +669,7 @@ class DB extends PDO
 	 */
 	public function getAssocArray($result)
 	{
-		return $result->fetchall(PDO::FETCH_ASSOC);
+		return $result->fetchall(\PDO::FETCH_ASSOC);
 	}
 
 	/**
@@ -701,7 +703,7 @@ class DB extends PDO
 
 		try {
 			$result = $this->pdo->query($query);
-		} catch (PDOException $e) {
+		} catch (\PDOException $e) {
 
 			// Check if we lost connection to MySQL.
 			if ($this->_checkGoneAway($e->getMessage()) !== false) {
@@ -721,7 +723,7 @@ class DB extends PDO
 				if ($ignore === false) {
 					$this->echoError($e->getMessage(), 'queryDirect', 4, false);
 					if ($this->_debug) {
-						$this->debugging->log('DB', "queryDirect", $query, Logger::LOG_SQL);
+						$this->debugging->log('DB', "queryDirect", $query, \Logger::LOG_SQL);
 					}
 				}
 				$result = false;
@@ -832,7 +834,7 @@ class DB extends PDO
 		}
 
 		$optimised = 0;
-		if ($tableArray instanceof Traversable && $tableArray->rowCount()) {
+		if ($tableArray instanceof \Traversable && $tableArray->rowCount()) {
 
 			$tableNames = '';
 			foreach ($tableArray as $table) {
@@ -849,7 +851,7 @@ class DB extends PDO
 				$this->queryExec(sprintf('OPTIMIZE %s TABLE %s', $local, $tableNames));
 				$this->logOptimize($admin, 'OPTIMIZE', $tableNames);
 
-				if ($myIsamTables instanceof Traversable && $myIsamTables->rowCount()) {
+				if ($myIsamTables instanceof \Traversable && $myIsamTables->rowCount()) {
 					$tableNames = '';
 					foreach ($myIsamTables as $table) {
 						$tableNames .= $table['name'] . ',';
@@ -896,7 +898,7 @@ class DB extends PDO
 
 		}
 		if ($this->_debug) {
-			$this->debugging->log('DB', 'optimise', $message, Logger::LOG_INFO);
+			$this->debugging->log('DB', 'optimise', $message, \Logger::LOG_INFO);
 		}
 	}
 
@@ -998,7 +1000,7 @@ class DB extends PDO
 
 	/**
 	 * Checks whether the connection to the server is working. Optionally restart a new connection.
-	 * NOTE: Restart does not happen if PDO is not using exceptions (PHP's default configuration).
+	 * NOTE: Restart does not happen if \PDO is not using exceptions (PHP's default configuration).
 	 * In this case check the return value === false.
 	 *
 	 * @param boolean $restart Whether an attempt should be made to reinitialise the Db object on failure.
@@ -1009,7 +1011,7 @@ class DB extends PDO
 	{
 		try {
 			return (bool) $this->pdo->query('SELECT 1+1');
-		} catch (PDOException $e) {
+		} catch (\PDOException $e) {
 			if ($restart == true) {
 				$this->initialiseDatabase();
 			}
@@ -1034,9 +1036,9 @@ class DB extends PDO
 	{
 		try {
 			$PDOstatement = $this->pdo->prepare($query, $options);
-		} catch (PDOException $e) {
+		} catch (\PDOException $e) {
 			if ($this->_debug) {
-				$this->debugging->log('DB', "Prepare", $e->getMessage(), Logger::LOG_INFO);
+				$this->debugging->log('DB', "Prepare", $e->getMessage(), \Logger::LOG_INFO);
 			}
 			echo $this->log->error("\n" . $e->getMessage());
 			$PDOstatement = false;
@@ -1057,9 +1059,9 @@ class DB extends PDO
 		if ($attribute != '') {
 			try {
 				$result = $this->pdo->getAttribute($attribute);
-			} catch (PDOException $e) {
+			} catch (\PDOException $e) {
 				if ($this->_debug) {
-					$this->debugging->log('DB', "getAttribute", $e->getMessage(), Logger::LOG_INFO);
+					$this->debugging->log('DB', "getAttribute", $e->getMessage(), \Logger::LOG_INFO);
 				}
 				echo $this->log->error("\n" . $e->getMessage());
 				$result = false;
