@@ -251,7 +251,6 @@ class DB extends \PDO
 			\PDO::ATTR_TIMEOUT => 180,
 			\PDO::ATTR_PERSISTENT => $this->opts['persist'],
 			\PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8",
-			\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
 			\PDO::MYSQL_ATTR_LOCAL_INFILE => true
 		];
 
@@ -297,7 +296,7 @@ class DB extends \PDO
 		}
 
 		// For backwards compatibility, no need for a patch.
-		$this->pdo->setAttribute(\PDO::ATTR_CASE, \PDO::CASE_LOWER);
+		//$this->pdo->setAttribute(\PDO::ATTR_CASE, \PDO::CASE_LOWER);
 		$this->pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
 		$this->pdo->setAttribute(\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, true);
 	}
@@ -1069,6 +1068,4 @@ class DB extends \PDO
 		}
 		return $result;
 	}
-
-
 }

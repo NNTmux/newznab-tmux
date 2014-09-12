@@ -239,7 +239,7 @@ class Info
 				);
 			}
 
-			$this->db->exec(sprintf('UPDATE releases SET releasenfoID = 1, nfostatus = %d WHERE ID = %d', self::NFO_FOUND, $release['ID']));
+			$this->db->queryExec(sprintf('UPDATE releases SET releasenfoID = 1, nfostatus = %d WHERE ID = %d', self::NFO_FOUND, $release['ID']));
 
 			if (!isset($release['completion'])) {
 				$release['completion'] = 0;
@@ -352,7 +352,7 @@ class Info
 					if (!isset($ckreleaseid['ID'])) {
 						$this->db->queryInsert(sprintf('INSERT INTO releasenfo (nfo, releaseID) VALUES (' . $cp . ', %d)', $nc, $arr['ID']));
 					}
-					$this->db->exec(sprintf('UPDATE releases SET releasenfoID = 1, nfostatus = %d WHERE ID = %d', self::NFO_FOUND, $arr['ID']));
+					$this->db->queryExec(sprintf('UPDATE releases SET releasenfoID = 1, nfostatus = %d WHERE ID = %d', self::NFO_FOUND, $arr['ID']));
 					$ret++;
 					$movie->doMovieUpdate($fetchedBinary, 'nfo', $arr['ID'], $processImdb);
 
@@ -381,7 +381,7 @@ class Info
 		if ($releaseToWork === '') {
 			$relres = $this->db->query('SELECT ID FROM releases WHERE nfostatus < -6 AND releasenfoID = -1');
 			foreach ($relres as $relrow) {
-				$this->db->exec(sprintf('DELETE FROM releasenfo WHERE nfo IS NULL AND releaseID = %d', $relrow['ID']));
+				$this->db->queryExec(sprintf('DELETE FROM releasenfo WHERE nfo IS NULL AND releaseID = %d', $relrow['ID']));
 			}
 
 			if ($this->echo) {

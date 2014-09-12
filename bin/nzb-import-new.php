@@ -290,7 +290,7 @@ if (!isset($groups) || count($groups) == 0) {
 				}
 				@unlink($nzbFile);
 			} else {
-				$db->exec(sprintf("DELETE FROM releases WHERE guid = %s AND postdate = %s AND size = %d", $db->escapeString($relguid), $db->escapeString($totalsize)));
+				$db->queryExec(sprintf("DELETE FROM releases WHERE guid = %s AND postdate = %s AND size = %d", $db->escapeString($relguid), $db->escapeString($totalsize)));
 				echo $c->error("\nFailed copying NZB, deleting release from DB.\n");
 				@unlink($nzbFile);
 				flush();

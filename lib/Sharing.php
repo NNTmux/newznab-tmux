@@ -144,9 +144,9 @@ Class Sharing
 	 */
 	public function initSettings(&$siteGuid = '')
 	{
-		$this->db->exec('TRUNCATE TABLE sharing');
+		$this->db->queryExec('TRUNCATE TABLE sharing');
 		$siteName = uniqid('newznab_', true);
-		$this->db->exec(
+		$this->db->queryExec(
 			sprintf('
 				INSERT INTO sharing
 				(site_name, site_guid, max_push, max_pull, hide_users, start_position, auto_enable, fetching, max_download)
@@ -233,7 +233,7 @@ Class Sharing
 			if ($this->nntp->isError($success) === false && $success === true) {
 
 				// Update DB to say we posted the article.
-				$this->db->exec(
+				$this->db->queryExec(
 					sprintf('
 						UPDATE releasecomment
 						SET shared = 1, shareID = %s
@@ -248,7 +248,7 @@ Class Sharing
 			}
 		} else {
 			// Update the DB to say it's shared.
-			$this->db->exec(sprintf('UPDATE releasecomment SET shared = 1 WHERE ID = %d', $row['ID']));
+			$this->db->queryExec(sprintf('UPDATE releasecomment SET shared = 1 WHERE ID = %d', $row['ID']));
 		}
 	}
 
@@ -267,14 +267,14 @@ Class Sharing
 		$found = count($res);
 		if ($found > 0) {
 			foreach ($res as $row) {
-				$this->db->exec(
+				$this->db->queryExec(
 					sprintf(
 						"UPDATE releasecomment SET releaseID = %d WHERE nzb_guid = %s",
 						$row['ID'],
 						$this->db->escapeString($row['nzb_guid'])
 					)
 				);
-				$this->db->exec(sprintf('UPDATE releases SET comments = comments + 1 WHERE ID = %d', $row['ID']));
+				$this->db->queryExec(sprintf('UPDATE releases SET comments = comments + 1 WHERE ID = %d', $row['ID']));
 			}
 
 			echo '(Sharing) Matched ' . $found . ' comments.' . PHP_EOL;
@@ -381,7 +381,7 @@ Class Sharing
 						// Check if the user has auto enable on.
 						if ($this->siteSettings['auto_enable'] === false) {
 							// Insert the site so the admin can enable it later on.
-							$this->db->exec(
+							$this->db->queryExec(
 								sprintf('
 									INSERT INTO sharing_sites
 									(site_name, site_guid, last_time, first_time, enabled, comments)
@@ -393,7 +393,7 @@ Class Sharing
 							continue;
 						} else {
 							// Insert the site as enabled since the user has auto enabled on.
-							$this->db->exec(
+							$this->db->queryExec(
 								sprintf('
 									INSERT INTO sharing_sites
 									(site_name, site_guid, last_time, first_time, enabled, comments)
@@ -412,7 +412,7 @@ Class Sharing
 
 					// Insert the comment, if we got it, update the site to increment comment count.
 					if ($this->insertNewComment($header['Message-ID'], $matches['guid'])) {
-						$this->db->exec(
+						$this->db->queryExec(
 							sprintf('
 								UPDATE sharing_sites SET comments = comments + 1, last_time = NOW(), site_name = %s WHERE site_guid = %s',
 								$this->db->escapeString($matches['site']),
@@ -431,14 +431,14 @@ Class Sharing
 			// Update once in a while in case the user cancels the script.
 			if ($total++ % 10 == 0) {
 				$this->siteSettings['lastarticle'] = $currentArticle;
-				$this->db->exec(sprintf('UPDATE sharing SET last_article = %d', $currentArticle));
+				$this->db->queryExec(sprintf('UPDATE sharing SET last_article = %d', $currentArticle));
 			}
 		}
 
 		if ($currentArticle > 0) {
 			// Update sharing's last article number.
 			$this->siteSettings['lastarticle'] = $currentArticle;
-			$this->db->exec(sprintf('UPDATE sharing SET last_article = %d', $currentArticle));
+			$this->db->queryExec(sprintf('UPDATE sharing SET last_article = %d', $currentArticle));
 		}
 
 
@@ -485,7 +485,7 @@ Class Sharing
 		}
 
 		// Insert the comment.
-		if ($this->db->exec(
+		if ($this->db->queryExec(
 			sprintf('
 				INSERT IGNORE INTO releasecomment
 				(text, createddate, issynced, shareID, gid, nzb_guid, siteID, username, userID, releaseID, shared, host, sourceID)

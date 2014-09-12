@@ -146,16 +146,16 @@ class TvAnger
 
 		if (DB_TYPE === 'mysql') {
 			if (!isset($ckid['ID'])) {
-				$this->db->exec(sprintf('INSERT INTO tvrage (rageID, releasetitle, description, genre, country, createddate, imgdata) VALUES (%s, %s, %s, %s, %s, NOW(), %s)', $rageid, $this->db->escapeString($releasename), $this->db->escapeString(substr($desc, 0, 10000)), $this->db->escapeString(substr($genre, 0, 64)), $this->db->escapeString($country), $this->db->escapeString($imgbytes)));
+				$this->db->queryExec(sprintf('INSERT INTO tvrage (rageID, releasetitle, description, genre, country, createddate, imgdata) VALUES (%s, %s, %s, %s, %s, NOW(), %s)', $rageid, $this->db->escapeString($releasename), $this->db->escapeString(substr($desc, 0, 10000)), $this->db->escapeString(substr($genre, 0, 64)), $this->db->escapeString($country), $this->db->escapeString($imgbytes)));
 			} else {
-				$this->db->exec(sprintf('UPDATE tvrage SET releasetitle = %s, description = %s, genre = %s, country = %s, createddate = NOW(), imgdata = %s WHERE ID = %d', $this->db->escapeString($releasename), $this->db->escapeString(substr($desc, 0, 10000)), $this->db->escapeString(substr($genre, 0, 64)), $this->db->escapeString($country), $this->db->escapeString($imgbytes), $ckid['ID']));
+				$this->db->queryExec(sprintf('UPDATE tvrage SET releasetitle = %s, description = %s, genre = %s, country = %s, createddate = NOW(), imgdata = %s WHERE ID = %d', $this->db->escapeString($releasename), $this->db->escapeString(substr($desc, 0, 10000)), $this->db->escapeString(substr($genre, 0, 64)), $this->db->escapeString($country), $this->db->escapeString($imgbytes), $ckid['ID']));
 			}
 		} else {
 			if (!isset($ckid['ID'])) {
 				$id = $this->db->queryInsert(sprintf('INSERT INTO tvrage (rageID, releasetitle, description, genre, country, createddate) VALUES (%d, %s, %s, %s, %s, NOW())', $rageid, $this->db->escapeString($releasename), $this->db->escapeString(substr($desc, 0, 10000)), $this->db->escapeString(substr($genre, 0, 64)), $this->db->escapeString($country)));
 			} else {
 				$id = $ckid['ID'];
-				$this->db->exec(sprintf('UPDATE tvrage SET releasetitle = %s, description = %s, genre = %s, country = %s, createddate = NOW() WHERE ID = %d', $this->db->escapeString($releasename), $this->db->escapeString(substr($desc, 0, 10000)), $this->db->escapeString(substr($genre, 0, 64)), $this->db->escapeString($country), $id));
+				$this->db->queryExec(sprintf('UPDATE tvrage SET releasetitle = %s, description = %s, genre = %s, country = %s, createddate = NOW() WHERE ID = %d', $this->db->escapeString($releasename), $this->db->escapeString(substr($desc, 0, 10000)), $this->db->escapeString(substr($genre, 0, 64)), $this->db->escapeString($country), $id));
 			}
 			if ($imgbytes != '') {
 				$path = WWW_DIR . 'covers/preview/' . $id . '.jpg';
@@ -164,7 +164,7 @@ class TvAnger
 				}
 				$check = file_put_contents($path, $imgbytes);
 				if ($check !== false) {
-					$this->db->exec("UPDATE tvrage SET imgdata = 'x' WHERE ID = " . $id);
+					$this->db->queryExec("UPDATE tvrage SET imgdata = 'x' WHERE ID = " . $id);
 					chmod($path, 0755);
 				}
 			}
@@ -179,9 +179,9 @@ class TvAnger
 				$imgbytes = ', imgdata = ' . $this->db->escapeString($imgbytes);
 			}
 
-			$this->db->exec(sprintf('UPDATE tvrage SET rageID = %d, releasetitle = %s, description = %s, genre = %s, country = %s %s WHERE ID = %d', $rageid, $this->db->escapeString($releasename), $this->db->escapeString(substr($desc, 0, 10000)), $this->db->escapeString($genre), $this->db->escapeString($country), $imgbytes, $id));
+			$this->db->queryExec(sprintf('UPDATE tvrage SET rageID = %d, releasetitle = %s, description = %s, genre = %s, country = %s %s WHERE ID = %d', $rageid, $this->db->escapeString($releasename), $this->db->escapeString(substr($desc, 0, 10000)), $this->db->escapeString($genre), $this->db->escapeString($country), $imgbytes, $id));
 		} else {
-			$this->db->exec(sprintf('UPDATE tvrage SET rageID = %d, releasetitle = %s, description = %s, genre = %s, country = %s WHERE ID = %d', $rageid, $this->db->escapeString($releasename), $this->db->escapeString(substr($desc, 0, 10000)), $this->db->escapeString($genre), $this->db->escapeString($country), $id));
+			$this->db->queryExec(sprintf('UPDATE tvrage SET rageID = %d, releasetitle = %s, description = %s, genre = %s, country = %s WHERE ID = %d', $rageid, $this->db->escapeString($releasename), $this->db->escapeString(substr($desc, 0, 10000)), $this->db->escapeString($genre), $this->db->escapeString($country), $id));
 			if ($imgbytes != '') {
 				$path = WWW_DIR . 'covers/preview/' . $id . '.jpg';
 				if (file_exists($path)) {
@@ -198,7 +198,7 @@ class TvAnger
 
 	public function delete($id)
 	{
-		return $this->db->exec(sprintf("DELETE FROM tvrage WHERE ID = %d", $id));
+		return $this->db->queryExec(sprintf("DELETE FROM tvrage WHERE ID = %d", $id));
 	}
 
 	public function fetchShowQuickInfo($show, array $options = array())
@@ -393,13 +393,13 @@ class TvAnger
 							// Only stick current shows and new shows in there.
 							if (in_array($currShowId, $showarray)) {
 								if (DB_TYPE === 'mysql') {
-									$this->db->exec(sprintf("INSERT INTO episodeinfo (rageID, showtitle, fullep, airdate, link, eptitle) VALUES (%d, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE airdate = %s, link = %s ,eptitle = %s, showtitle = %s", $sShow->sid, $this->db->escapeString($currShowName), $this->db->escapeString($sShow->ep), $this->db->escapeString(date("Y-m-d H:i:s", $day_time)), $this->db->escapeString($sShow->link), $this->db->escapeString($sShow->title), $this->db->escapeString(date("Y-m-d H:i:s", $day_time)), $this->db->escapeString($sShow->link), $this->db->escapeString($sShow->title), $this->db->escapeString($currShowName)));
+									$this->db->queryExec(sprintf("INSERT INTO episodeinfo (rageID, showtitle, fullep, airdate, link, eptitle) VALUES (%d, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE airdate = %s, link = %s ,eptitle = %s, showtitle = %s", $sShow->sid, $this->db->escapeString($currShowName), $this->db->escapeString($sShow->ep), $this->db->escapeString(date("Y-m-d H:i:s", $day_time)), $this->db->escapeString($sShow->link), $this->db->escapeString($sShow->title), $this->db->escapeString(date("Y-m-d H:i:s", $day_time)), $this->db->escapeString($sShow->link), $this->db->escapeString($sShow->title), $this->db->escapeString($currShowName)));
 								} else if (DB_TYPE === 'pgsql') {
 									$check = $this->db->queryOneRow(sprintf('SELECT ID FROM episodeinfo WHERE rageID = %d', $sShow->sid));
 									if ($check === false) {
-										$this->db->exec(sprintf("INSERT INTO episodeinfo (rageID, showtitle, fullep, airdate, link, eptitle) VALUES (%d, %s, %s, %s, %s, %s)", $sShow->sid, $this->db->escapeString($currShowName), $this->db->escapeString($sShow->ep), $this->db->escapeString(date("Y-m-d H:i:s", $day_time)), $this->db->escapeString($sShow->link), $this->db->escapeString($sShow->title)));
+										$this->db->queryExec(sprintf("INSERT INTO episodeinfo (rageID, showtitle, fullep, airdate, link, eptitle) VALUES (%d, %s, %s, %s, %s, %s)", $sShow->sid, $this->db->escapeString($currShowName), $this->db->escapeString($sShow->ep), $this->db->escapeString(date("Y-m-d H:i:s", $day_time)), $this->db->escapeString($sShow->link), $this->db->escapeString($sShow->title)));
 									} else {
-										$this->db->exec(sprintf('UPDATE episodeinfo SET showtitle = %s, fullep = %s, airdate = %s, link = %s, eptitle = %s WHERE ID = %d', $this->db->escapeString($currShowName), $this->db->escapeString($sShow->ep), $this->db->escapeString(date("Y-m-d H:i:s", $day_time)), $this->db->escapeString($sShow->link), $this->db->escapeString($sShow->title), $check['ID']));
+										$this->db->queryExec(sprintf('UPDATE episodeinfo SET showtitle = %s, fullep = %s, airdate = %s, link = %s, eptitle = %s WHERE ID = %d', $this->db->escapeString($currShowName), $this->db->escapeString($sShow->ep), $this->db->escapeString(date("Y-m-d H:i:s", $day_time)), $this->db->escapeString($sShow->link), $this->db->escapeString($sShow->title), $check['ID']));
 									}
 								}
 							}
@@ -423,7 +423,7 @@ class TvAnger
 							// Next episode.
 							if (isset($epInfo['next']) && $epInfo['next']['episode'] != '') {
 								if ($prev_ep == "" && $arr['nextinfo'] != '' && $epInfo['next']['day_time'] > strtotime($arr["nextdate"]) && strtotime(date('Y-m-d', strtotime($arr["nextdate"]))) < $yesterday) {
-									$this->db->exec(sprintf("UPDATE tvrage SET prevdate = nextdate, previnfo = nextinfo WHERE ID = %d", $arr['ID']));
+									$this->db->queryExec(sprintf("UPDATE tvrage SET prevdate = nextdate, previnfo = nextinfo WHERE ID = %d", $arr['ID']));
 									$prev_ep = "SWAPPED with: " . $arr['nextinfo'] . " - " . date("r", strtotime($arr["nextdate"]));
 								}
 								$next_ep = $epInfo['next']['episode'] . ', "' . $epInfo['next']['title'] . '"';
@@ -448,7 +448,7 @@ class TvAnger
 							if (count($query) > 0) {
 								$sql = join(", ", $query);
 								$sql = sprintf("UPDATE tvrage SET {$sql} WHERE ID = %d", $arr['ID']);
-								$this->db->exec($sql);
+								$this->db->queryExec($sql);
 							}
 						}
 					}
@@ -571,7 +571,7 @@ class TvAnger
 		}
 
 		$tvairdate = (isset($show['airdate']) && !empty($show['airdate'])) ? $this->db->escapeString($this->checkDate($show['airdate'])) : "NULL";
-		$this->db->exec(sprintf("UPDATE releases SET seriesfull = %s, season = %s, episode = %s, tvairdate = %s WHERE ID = %d", $this->db->escapeString($show['seriesfull']), $this->db->escapeString($show['season']), $this->db->escapeString($show['episode']), $tvairdate, $relid));
+		$this->db->queryExec(sprintf("UPDATE releases SET seriesfull = %s, season = %s, episode = %s, tvairdate = %s WHERE ID = %d", $this->db->escapeString($show['seriesfull']), $this->db->escapeString($show['season']), $this->db->escapeString($show['episode']), $tvairdate, $relid));
 	}
 
 	public function updateRageInfo($rageid, $show, $tvrShow, $relid)
@@ -582,9 +582,9 @@ class TvAnger
 			$tvairdate = (!empty($epinfo['airdate'])) ? $this->db->escapeString($epinfo['airdate']) : "NULL";
 			$tvtitle = (!empty($epinfo['title'])) ? $this->db->escapeString($epinfo['title']) : "NULL";
 
-			$this->db->exec(sprintf("UPDATE releases set tvtitle = %s, tvairdate = %s, rageID = %d where ID = %d", $this->db->escapeString(trim($tvtitle)), $tvairdate, $tvrShow['showid'], $relid));
+			$this->db->queryExec(sprintf("UPDATE releases set tvtitle = %s, tvairdate = %s, rageID = %d where ID = %d", $this->db->escapeString(trim($tvtitle)), $tvairdate, $tvrShow['showid'], $relid));
 		} else {
-			$this->db->exec(sprintf("UPDATE releases SET rageID = %d WHERE ID = %d", $tvrShow['showid'], $relid));
+			$this->db->queryExec(sprintf("UPDATE releases SET rageID = %d WHERE ID = %d", $tvrShow['showid'], $relid));
 		}
 
 		$genre = '';
@@ -627,9 +627,9 @@ class TvAnger
 		if ($epinfo !== false) {
 			$tvairdate = (!empty($epinfo['airdate'])) ? $this->db->escapeString($epinfo['airdate']) : "NULL";
 			$tvtitle = (!empty($epinfo['title'])) ? $this->db->escapeString($epinfo['title']) : "NULL";
-			$this->db->exec(sprintf("UPDATE releases SET tvtitle = %s, tvairdate = %s, rageID = %d WHERE ID = %d", $this->db->escapeString(trim($tvtitle)), $tvairdate, $traktArray['show']['tvrage_id'], $relid));
+			$this->db->queryExec(sprintf("UPDATE releases SET tvtitle = %s, tvairdate = %s, rageID = %d WHERE ID = %d", $this->db->escapeString(trim($tvtitle)), $tvairdate, $traktArray['show']['tvrage_id'], $relid));
 		} else {
-			$this->db->exec(sprintf("UPDATE releases SET rageID = %d WHERE ID = %d", $traktArray['show']['tvrage_id'], $relid));
+			$this->db->queryExec(sprintf("UPDATE releases SET rageID = %d WHERE ID = %d", $traktArray['show']['tvrage_id'], $relid));
 		}
 
 		$genre = '';
@@ -746,17 +746,17 @@ class TvAnger
 						}
 					}
 					if ($tvairdate == "NULL") {
-						$this->db->exec(sprintf('UPDATE releases SET tvtitle = %s, rageID = %d WHERE ID = %d', $tvtitle, $id, $arr['ID']));
+						$this->db->queryExec(sprintf('UPDATE releases SET tvtitle = %s, rageID = %d WHERE ID = %d', $tvtitle, $id, $arr['ID']));
 					} else {
-						$this->db->exec(sprintf('UPDATE releases SET tvtitle = %s, tvairdate = %s, rageID = %d WHERE ID = %d', $tvtitle, $tvairdate, $id, $arr['ID']));
+						$this->db->queryExec(sprintf('UPDATE releases SET tvtitle = %s, tvairdate = %s, rageID = %d WHERE ID = %d', $tvtitle, $tvairdate, $id, $arr['ID']));
 					}
 					// Cant find rageID, so set rageID to n/a.
 				} else {
-					$this->db->exec(sprintf('UPDATE releases SET rageID = -2 WHERE ID = %d', $arr['ID']));
+					$this->db->queryExec(sprintf('UPDATE releases SET rageID = -2 WHERE ID = %d', $arr['ID']));
 				}
 				// Not a tv episode, so set rageID to n/a.
 			} else {
-				$this->db->exec(sprintf('UPDATE releases SET rageID = -2 WHERE ID = %d', $arr['ID']));
+				$this->db->queryExec(sprintf('UPDATE releases SET rageID = -2 WHERE ID = %d', $arr['ID']));
 			}
 			$ret++;
 		}

@@ -273,7 +273,7 @@ class SpotNab {
 		$sql = "DELETE FROM spotnabsources WHERE "
 			."lastbroadcast IS NOT NULL AND "
 			."lastbroadcast < NOW() - INTERVAL $max_days DAY";
-		$res = $db->exec($sql);
+		$res = $db->queryExec($sql);
 	}
 
 	// ***********************************************************************
@@ -313,7 +313,7 @@ class SpotNab {
 			//print_r($gids_missing);
 			if(count($gids_missing)){
 				$s_gids_missing = implode("','", $gids_missing);
-				$dresc = $db->exec(sprintf($sql_del, $s_gids_missing));
+				$dresc = $db->queryExec(sprintf($sql_del, $s_gids_missing));
 				$total_delcnt += count($gids_missing);
 				$offset += $batch - count($gids_missing);
 			}else{
@@ -361,11 +361,11 @@ class SpotNab {
 		$post = "UPDATE site SET "
 			."updateddate = '$reftime' "
 			."WHERE setting = 'spotnabpost'";
-		$db->exec($sources);
-		$db->exec($discovery_a);
-		$db->exec($discovery_b);
-		$db->exec($broadcast);
-		$db->exec($post);
+		$db->queryExec($sources);
+		$db->queryExec($discovery_a);
+		$db->queryExec($discovery_b);
+		$db->queryExec($broadcast);
+		$db->queryExec($post);
 	}
 
 	// ***********************************************************************
@@ -515,13 +515,13 @@ class SpotNab {
 		}
 		$sql = sprintf("UPDATE site SET value = '%d' "
 					."WHERE setting = 'spotnablastarticle'", $last);
-		$db->exec($sql);
+		$db->queryExec($sql);
 		printf("%d new and %d updated source(s).\n", $inserted, $updated);
 
 		// Update reference point
 		$q = "UPDATE site SET updateddate = NOW() WHERE "
 				."setting = 'spotnabdiscover'";
-		$db->exec($q);
+		$db->queryExec($q);
 
 		// Restore handler
 		restore_error_handler();
@@ -544,7 +544,7 @@ class SpotNab {
 				// Update post time
 				$q = "UPDATE site SET updateddate = NOW() WHERE "
 					."setting = 'spotnabbroadcast'";
-					$res = $db->exec($q);
+					$res = $db->queryExec($q);
 			}
 		}
 	}
@@ -883,7 +883,7 @@ class SpotNab {
 					."SET lastarticle = %d WHERE ID IN (%s)",
 					$last,
 					implode(",", $id_hash[$group]));
-			$res = $db->exec($sql);
+			$res = $db->queryExec($sql);
 			echo "\n";
 		}
 		// Restore handler
@@ -963,7 +963,7 @@ class SpotNab {
 				}
 
 				// Update DB With Global Identifer
-				$ures = $db->exec(sprintf($usql, $gid, $r['ID']));
+				$ures = $db->queryExec(sprintf($usql, $gid, $r['ID']));
 				if($ures < 0){
 					printf("\nPostPrc : Failed to update: %s\n", $r['name']);
 				}
@@ -980,7 +980,7 @@ class SpotNab {
 				.'AND releasecomment.GID IS NULL '
 				.'AND releases.GID IS NOT NULL ';
 
-        $affected = $db->exec(sprintf($usql));
+        $affected = $db->queryExec(sprintf($usql));
 		if($affected > 0)
 			$processed += $affected;
 		return $processed;
@@ -1023,7 +1023,7 @@ class SpotNab {
 				$sql = sprintf("UPDATE site SET value = %s "
 								."WHERE setting = 'spotnabuser'",
 				$db->escapeString(sprintf("nntp-%s",substr(md5($keys['pubkey']), 0, 4))));
-				$db->exec($sql);
+				$db->queryExec($sql);
 				// Force New Email
 				$sql = sprintf("UPDATE site SET value = %s "
 								."WHERE setting = 'spotnabemail'",
@@ -1031,18 +1031,18 @@ class SpotNab {
 					substr(md5($keys['pubkey']), 4, 8),
 					substr(md5($keys['pubkey']), 8, 16)
 				)));
-				$db->exec($sql);
+				$db->queryExec($sql);
 				// Save Keys
 				$sql = sprintf("UPDATE site SET value = %s ".
 						"WHERE setting = 'spotnabsitepubkey'",
 						$db->escapeString($keys['pubkey']));
-				$db->exec($sql);
+				$db->queryExec($sql);
 				//echo $keys['pubkey']."\n";
 
 				$sql = sprintf("UPDATE site SET value = %s ".
 						"WHERE setting = 'spotnabsiteprvkey'",
 						$db->escapeString($keys['prvkey']));
-				$db->exec($sql);
+				$db->queryExec($sql);
 
 				// Update Site Information
 				$this->_globals = $this->_site->get();
@@ -1457,7 +1457,7 @@ class SpotNab {
 							if($res && intval($res['cnt'])>0){
 								// Make some noise
 								echo '.';
-                                $updates += ($db->exec(sprintf($sql_upd_cmt,
+                                $updates += ($db->queryExec(sprintf($sql_upd_cmt,
 									$is_visible,
 									$db->escapeString($comment['comment']),
 									$hash['ID'],
@@ -1487,7 +1487,7 @@ class SpotNab {
 
 					// Update spotnabsources table, set lastupdate to the
 					// timestamp parsed from the header.
-					$db->exec(sprintf($sql_sync,
+					$db->queryExec(sprintf($sql_sync,
 						$db->escapeString(
 							$this->utc2local($body['postdate_utc'])),
 							$hash['ID']
@@ -1694,7 +1694,7 @@ class SpotNab {
 					$inserts += 1;
 				}else{
 					echo '.';
-					$res = $db->exec(sprintf($sql_upd_cmt,
+					$res = $db->queryExec(sprintf($sql_upd_cmt,
 						$db->escapeString($this->utc2local($refdate)),
 						$db->escapeString($p_user),
 						$db->escapeString($p_email),
@@ -1901,14 +1901,14 @@ class SpotNab {
 			if (!$this->_postArticle($article, $retries))
 			{
 				// Post is good; update database
-				$res = $db->exec($sql);
+				$res = $db->queryExec($sql);
 				echo "Failed.\n";
 				return false;
 			}
 			//echo "Done.\n";
 
 			// Update Database
-			$res = $db->exec($sql);
+			$res = $db->queryExec($sql);
 		}
 
 		// If code reached here then we're good
@@ -2491,7 +2491,7 @@ class SpotNab {
 	public function updateSource($id, $description,$username,$usermail,$usenetgroup,$publickey)
 	{
 		$db = new DB();
-		return $db->exec(
+		return $db->queryExec(
 			sprintf("UPDATE spotnabsources SET "
 				."description = %s, username = %s, useremail = %s,"
 				." usenetgroup = %s, publickey = %s WHERE ID= %d",
@@ -2503,13 +2503,13 @@ class SpotNab {
 	public function deleteSource($id)
 	{
 		$db = new DB();
-		return $db->exec(sprintf("DELETE FROM spotnabsources WHERE id = %d", $id));
+		return $db->queryExec(sprintf("DELETE FROM spotnabsources WHERE id = %d", $id));
 	}
 
 	public function toggleSource($id, $active)
 	{
 		$db = new DB();
-		return $db->exec(sprintf("update spotnabsources SET active = %d WHERE id = %d", $active, $id));
+		return $db->queryExec(sprintf("update spotnabsources SET active = %d WHERE id = %d", $active, $id));
 	}
 
 	public function getDefaultValue($table,$field)

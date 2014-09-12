@@ -491,7 +491,7 @@ class Film
 	{
 		if (!empty($id)) {
 
-			$this->db->exec(
+			$this->db->queryExec(
 				sprintf("
 					UPDATE movieinfo
 					SET %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, %d, updateddate = NOW()
@@ -706,7 +706,7 @@ class Film
 				);
 			} else {
 				$movieID = $ckID['ID'];
-				$this->db->exec(
+				$this->db->queryExec(
 					sprintf('
 						UPDATE movieinfo SET
 							tmdbID = %d, title = %s, rating = %s, tagline = %s, plot = %s, year = %s,
@@ -983,14 +983,14 @@ class Film
 				$this->c->doEcho($this->c->headerOver($service . ' found IMDBid: ') . $this->c->primary('tt' . $imdbID));
 			}
 
-			$this->db->exec(sprintf('UPDATE releases SET imdbID = %s WHERE ID = %d', $this->db->escapeString($imdbID), $id));
+			$this->db->queryExec(sprintf('UPDATE releases SET imdbID = %s WHERE ID = %d', $this->db->escapeString($imdbID), $id));
 
 			// If set, scan for imdb info.
 			if ($processImdb == 1) {
 				$movCheck = $this->getMovieInfo($imdbID);
 				if ($movCheck === false || (isset($movCheck['updateddate']) && (time() - strtotime($movCheck['updateddate'])) > 2592000)) {
 					if ($this->updateMovieInfo($imdbID) === false) {
-						$this->db->exec(sprintf('UPDATE releases SET imdbID = %s WHERE ID = %d', 0000000, $id));
+						$this->db->queryExec(sprintf('UPDATE releases SET imdbID = %s WHERE ID = %d', 0000000, $id));
 					}
 				}
 			}
@@ -1036,7 +1036,7 @@ class Film
 				// Try to get a name/year.
 				if ($this->parseMovieSearchName($arr['searchname']) === false) {
 					//We didn't find a name, so set to all 0's so we don't parse again.
-					$this->db->exec(sprintf("UPDATE releases SET imdbID = 0000000 WHERE ID = %d", $arr["ID"]));
+					$this->db->queryExec(sprintf("UPDATE releases SET imdbID = 0000000 WHERE ID = %d", $arr["ID"]));
 					continue;
 
 				} else {
@@ -1098,7 +1098,7 @@ class Film
 					}
 
 					// We failed to get an IMDB ID from all sources.
-					$this->db->exec(sprintf("UPDATE releases SET imdbID = 0000000 WHERE ID = %d", $arr["ID"]));
+					$this->db->queryExec(sprintf("UPDATE releases SET imdbID = 0000000 WHERE ID = %d", $arr["ID"]));
 				}
 			}
 		}
@@ -1538,7 +1538,7 @@ class Film
 	protected function updateInsUpcoming($source, $type, $info)
 	{
 		if (DB_TYPE === 'mysql') {
-			return $this->db->exec(
+			return $this->db->queryExec(
 				sprintf("
 					INSERT INTO upcoming (source, typeID, info, updateddate)
 					VALUES (%s, %d, %s, NOW())
@@ -1562,7 +1562,7 @@ class Film
 				)
 			);
 			if ($ckId === false) {
-				return $this->db->exec(
+				return $this->db->queryExec(
 					sprintf("
 						INSERT INTO upcoming (source, typeID, info, updateddate)
 						VALUES (%s, %d, %s, NOW())",
@@ -1572,7 +1572,7 @@ class Film
 					)
 				);
 			} else {
-				return $this->db->exec(
+				return $this->db->queryExec(
 					sprintf('
 						UPDATE upcoming
 						SET source = %s, typeid = %s, info = %s, updateddate = NOW()

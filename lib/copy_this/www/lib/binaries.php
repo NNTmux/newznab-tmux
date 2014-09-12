@@ -145,7 +145,7 @@ class Binaries
 			}
 			$first_record_postdate = $backfill->postdate($nntp, $first, false);
 			if ($first_record_postdate != "")
-				$db->exec(sprintf("update groups SET first_record = %s, first_record_postdate = FROM_UNIXTIME(" . $first_record_postdate . ") WHERE ID = %d", $db->escapeString($first), $groupArr['ID']));
+				$db->queryExec(sprintf("update groups SET first_record = %s, first_record_postdate = FROM_UNIXTIME(" . $first_record_postdate . ") WHERE ID = %d", $db->escapeString($first), $groupArr['ID']));
 		} else {
 			if ($data['last'] < $groupArr['last_record']) {
 				echo "Warning: Server's last num {$data['last']} is lower than the local last num {$groupArr['last_record']}" . $n;
@@ -157,11 +157,11 @@ class Binaries
 
 		// Generate postdates for first and last records, for those that upgraded
 		if ((is_null($groupArr['first_record_postdate']) || is_null($groupArr['last_record_postdate'])) && ($groupArr['last_record'] != "0" && $groupArr['first_record'] != "0"))
-			$db->exec(sprintf("update groups SET first_record_postdate = FROM_UNIXTIME(" . $backfill->postdate($nntp, $groupArr['first_record'], false) . "), last_record_postdate = FROM_UNIXTIME(" . $backfill->postdate($nntp, $groupArr['last_record'], false) . ") WHERE ID = %d", $groupArr['ID']));
+			$db->queryExec(sprintf("update groups SET first_record_postdate = FROM_UNIXTIME(" . $backfill->postdate($nntp, $groupArr['first_record'], false) . "), last_record_postdate = FROM_UNIXTIME(" . $backfill->postdate($nntp, $groupArr['last_record'], false) . ") WHERE ID = %d", $groupArr['ID']));
 
 		// Deactivate empty groups
 		if (($data['last'] - $data['first']) <= 5)
-			$db->exec(sprintf("update groups SET active = %s, last_updated = now() WHERE ID = %d", $db->escapeString('0'), $groupArr['ID']));
+			$db->queryExec(sprintf("update groups SET active = %s, last_updated = now() WHERE ID = %d", $db->escapeString('0'), $groupArr['ID']));
 
 		// Calculate total number of parts
 		$total = $grouplast - $first + 1;
@@ -200,7 +200,7 @@ class Binaries
 					//scan failed - skip group
 					return;
 				}
-				$db->exec(sprintf("update groups SET last_record = %s, last_updated = now() WHERE ID = %d", $db->escapeString($lastId), $groupArr['ID']));
+				$db->queryExec(sprintf("update groups SET last_record = %s, last_updated = now() WHERE ID = %d", $db->escapeString($lastId), $groupArr['ID']));
 
 				if ($last == $grouplast)
 					$done = true;
@@ -212,7 +212,7 @@ class Binaries
 
 			$last_record_postdate = $backfill->postdate($nntp, $last, false);
 			if ($last_record_postdate != "") {
-				$db->exec(sprintf("update groups SET last_record_postdate = FROM_UNIXTIME(" . $last_record_postdate . "), last_updated = now() WHERE ID = %d", $groupArr['ID'])); //Set group's last postdate
+				$db->queryExec(sprintf("update groups SET last_record_postdate = FROM_UNIXTIME(" . $last_record_postdate . "), last_updated = now() WHERE ID = %d", $groupArr['ID'])); //Set group's last postdate
 			}
 			$timeGroup = number_format(microtime(true) - $this->startGroup, 2);
 			echo "Group processed in $timeGroup seconds $n $n";
@@ -361,7 +361,7 @@ class Binaries
 							$partIds = array();
 							foreach ($data['Parts'] as $partdata)
 								$partIds[] = $partdata['number'];
-							$db->exec(sprintf("DELETE FROM partrepair WHERE numberID IN (%s) AND groupID=%d", implode(',', $partIds), $groupArr['ID']));
+							$db->queryExec(sprintf("DELETE FROM partrepair WHERE numberID IN (%s) AND groupID=%d", implode(',', $partIds), $groupArr['ID']));
 						}
 						continue;
 					}
@@ -394,7 +394,7 @@ class Binaries
 								$partIds = array();
 								foreach ($data['Parts'] as $partdata)
 									$partIds[] = $partdata['number'];
-								$db->exec(sprintf("DELETE FROM partrepair WHERE numberID IN (%s) AND groupID=%d", implode(',', $partIds), $groupArr['ID']));
+								$db->queryExec(sprintf("DELETE FROM partrepair WHERE numberID IN (%s) AND groupID=%d", implode(',', $partIds), $groupArr['ID']));
 								continue;
 							}
 							if ($sql != '') {
@@ -542,17 +542,17 @@ class Binaries
 					# TODO: rewrite.. stupid
 					if ($item['number'] == $item['numberID']) {
 						#printf("Repair: %s repaired.%s", $item['ID'], $this->n);
-						$db->exec(sprintf("DELETE FROM partrepair WHERE ID=%d LIMIT 1", $item['ID']));
+						$db->queryExec(sprintf("DELETE FROM partrepair WHERE ID=%d LIMIT 1", $item['ID']));
 						$repaired++;
 						continue;
 					} else {
 						#printf("Repair: %s has not arrived yet or deleted.%s", $item['numberID'], $this->n);
-						$db->exec(sprintf("update partrepair SET attempts=attempts+1 WHERE ID=%d LIMIT 1", $item['ID']));
+						$db->queryExec(sprintf("update partrepair SET attempts=attempts+1 WHERE ID=%d LIMIT 1", $item['ID']));
 					}
 				}
 			}
 
-			$delret = $db->exec(sprintf("DELETE FROM partrepair WHERE attempts >= 5 AND groupID = %d", $group['ID']));
+			$delret = $db->queryExec(sprintf("DELETE FROM partrepair WHERE attempts >= 5 AND groupID = %d", $group['ID']));
 			printf("Repair: repaired %s.%s", $repaired, $this->n);
 			printf("Repair: cleaned %s parts.%s", $delret, $this->n);
 
@@ -576,7 +576,7 @@ class Binaries
 				$chkrow = $db->queryOneRow($checksql);
 				if ($chkrow) {
 					$updsql = sprintf("update partrepair set attempts = attempts + 1 where numberID = %u and groupID = %d", $number, $groupID);
-					$db->exec($updsql);
+					$db->queryExec($updsql);
 				} else {
 					$added = true;
 					$insertStr .= sprintf("(%u, %d), ", $number, $groupID);
@@ -767,7 +767,7 @@ class Binaries
 	{
 		$db = new DB();
 
-		return $db->exec(sprintf("DELETE from binaryblacklist where ID = %d", $id));
+		return $db->queryExec(sprintf("DELETE from binaryblacklist where ID = %d", $id));
 	}
 
 	/**
@@ -785,7 +785,7 @@ class Binaries
 			$groupname = sprintf("%s", $db->escapeString($groupname));
 		}
 
-		$db->exec(sprintf("update binaryblacklist set groupname=%s, regex=%s, status=%d, description=%s, optype=%d, msgcol=%d where ID = %d ", $groupname, $db->escapeString($regex["regex"]), $regex["status"], $db->escapeString($regex["description"]), $regex["optype"], $regex["msgcol"], $regex["id"]));
+		$db->queryExec(sprintf("update binaryblacklist set groupname=%s, regex=%s, status=%d, description=%s, optype=%d, msgcol=%d where ID = %d ", $groupname, $db->escapeString($regex["regex"]), $regex["status"], $db->escapeString($regex["description"]), $regex["optype"], $regex["msgcol"], $regex["id"]));
 	}
 
 	/**
@@ -815,8 +815,8 @@ class Binaries
 	public function delete($id)
 	{
 		$db = new DB();
-		$db->exec(sprintf("DELETE from parts where binaryID = %d", $id));
-		$db->exec(sprintf("DELETE from binaries where ID = %d", $id));
+		$db->queryExec(sprintf("DELETE from parts where binaryID = %d", $id));
+		$db->queryExec(sprintf("DELETE from binaries where ID = %d", $id));
 	}
 
 	# http://php.net/manual/en/function.array-unique.php#97285

@@ -117,7 +117,7 @@ class ReleaseRegex
 	{
 		$db = new DB();
 
-		return $db->exec(sprintf("DELETE from releaseregex where ID = %d", $id));
+		return $db->queryExec(sprintf("DELETE from releaseregex where ID = %d", $id));
 	}
 
 	/**
@@ -139,7 +139,7 @@ class ReleaseRegex
 		else
 			$catid = sprintf("%d", $regex["category"]);
 
-		$db->exec(sprintf("update releaseregex set groupname=%s, regex=%s, ordinal=%d, status=%d, description=%s, categoryID=%s where ID = %d ",
+		$db->queryExec(sprintf("update releaseregex set groupname=%s, regex=%s, ordinal=%d, status=%d, description=%s, categoryID=%s where ID = %d ",
 				$groupname, $db->escapeString($regex["regex"]), $regex["ordinal"], $regex["status"], $db->escapeString($regex["description"]), $catid, $regex["id"]
 			)
 		);
@@ -179,7 +179,7 @@ class ReleaseRegex
 		if ($outcome === false) {
 			echo "ERROR: " . ($regexArr["ID"] < 10000 ? "System" : "Custom") . " release regex '" . $regexArr["ID"] . "' is not a valid regex.\n";
 			$db = new DB();
-			$db->exec(sprintf("update releaseregex set status=0 where ID = %d and status=1", $regexArr["ID"]));
+			$db->queryExec(sprintf("update releaseregex set status=0 where ID = %d and status=1", $regexArr["ID"]));
 
 			return $ret;
 		}
@@ -316,7 +316,7 @@ class ReleaseRegex
 
 		$ret = array();
 		if ($clearexistingbins == true)
-			$db->exec('truncate releaseregextesting');
+			$db->queryExec('truncate releaseregextesting');
 
 		$nntp->doConnect();
 
@@ -456,7 +456,7 @@ class ReleaseRegex
 								}
 								$binSql = "INSERT IGNORE INTO releaseregextesting (name, fromname, date, binaryhash, groupname, regexID, categoryID, reqID, blacklistID, size, dateadded) VALUES " . implode(', ', $binParams);
 								//echo $binSql;
-								$db->exec($binSql);
+								$db->queryExec($binSql);
 							}
 
 							$ret[] = "Fetched " . number_format($numarticles) . " articles from " . $group;

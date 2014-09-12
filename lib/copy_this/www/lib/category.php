@@ -260,7 +260,7 @@ class Category
 	{
 		$db = new DB();
 
-		return $db->exec(sprintf("update category set disablepreview = %d, status = %d, minsizetoformrelease = %d, maxsizetoformrelease = %d, description = %s where ID = %d", $disablepreview, $status, $minsize, $maxsize, $db->escapeString($desc), $id));
+		return $db->queryExec(sprintf("update category set disablepreview = %d, status = %d, minsizetoformrelease = %d, maxsizetoformrelease = %d, description = %s where ID = %d", $disablepreview, $status, $minsize, $maxsize, $db->escapeString($desc), $id));
 	}
 
 	/**

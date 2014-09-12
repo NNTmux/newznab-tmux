@@ -79,7 +79,7 @@ function categorizeRelease($update = true, $where, $echooutput = false)
 			$catId = $cat->determineCategory($rowrel['groupID'], $rowrel['searchname']);
 			if ($rowrel['categoryID'] != $catId) {
 				if ($update === true) {
-					$pdo->exec(
+					$pdo->queryExec(
 						sprintf("
 							UPDATE releases
 							SET iscategorized = 1,

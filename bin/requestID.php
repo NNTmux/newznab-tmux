@@ -29,7 +29,7 @@ if (preg_match('/^\[ ?(\d{4,6}) ?\]/', $pieces[1], $match) ||
 	$requestID = (int)$match[1];
 } else {
 
-	$db->exec('UPDATE releases SET reqidstatus = -2 WHERE ID = ' . $pieces[0]);
+	$db->queryExec('UPDATE releases SET reqidstatus = -2 WHERE ID = ' . $pieces[0]);
 	exit('.');
 }
 $bFound = false;
@@ -91,7 +91,7 @@ if ($bFound === true) {
 	);
 	$updated++;
 } else {
-	$db->exec('UPDATE releases SET reqidstatus = -3 WHERE ID = ' . $pieces[0]);
+	$db->queryExec('UPDATE releases SET reqidstatus = -3 WHERE ID = ' . $pieces[0]);
 	echo '.';
 }
 

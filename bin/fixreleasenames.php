@@ -54,7 +54,7 @@ if (!isset($argv[1])) {
 			} else if (preg_match('/[a-fA-F0-9]{32,40}/i', $res['filename'], $matches)) {
 				$namefixer->matchPredbHash($matches[0], $res, 1, 1, true, 1);
 			} else {
-				$db->exec(sprintf("UPDATE releases SET dehashstatus = %d - 1 WHERE ID = %d", $res['dehashstatus'], $res['releaseID']));
+				$db->queryExec(sprintf("UPDATE releases SET dehashstatus = %d - 1 WHERE ID = %d", $res['dehashstatus'], $res['releaseID']));
 				echo '.';
 			}
 		}
@@ -94,7 +94,7 @@ if (!isset($argv[1])) {
 				$searched = $res['searched'] - 1;
 				echo ".";
 			}
-			$db->exec(sprintf("UPDATE prehash SET searched = %d WHERE ID = %d", $searched, $res['preid']));
+			$db->queryExec(sprintf("UPDATE prehash SET searched = %d WHERE ID = %d", $searched, $res['preid']));
 			$namefixer->checked++;
 		}
 

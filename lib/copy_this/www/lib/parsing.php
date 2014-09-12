@@ -820,7 +820,7 @@ class Parsing
 			}
 			if (!$this->echoonly) {
 				$db = new DB();
-				$db->exec(sprintf("update releases SET name = %s, searchname = %s, categoryID = %d, imdbID = NULL, rageID = -1, bookinfoID = NULL, musicinfoID = NULL, consoleinfoID = NULL WHERE releases.ID = %d", $db->escapeString($name), $db->escapeString($searchname), $categoryID, $rel['RID']));
+				$db->queryExec(sprintf("update releases SET name = %s, searchname = %s, categoryID = %d, imdbID = NULL, rageID = -1, bookinfoID = NULL, musicinfoID = NULL, consoleinfoID = NULL WHERE releases.ID = %d", $db->escapeString($name), $db->escapeString($searchname), $categoryID, $rel['RID']));
 			}
 			$this->numupdated++;
 		}
@@ -1413,7 +1413,7 @@ class Parsing
 
 			if (count($this->cleanup['misc'])) {
 				$sql = 'update releases set categoryID = ' . Category::CAT_MISC_OTHER . ' where categoryID != ' . Category::CAT_MISC_OTHER . ' and id in (' . implode(array_keys($this->cleanup['misc']), ',') . ')';
-				$db->exec($sql);
+				$db->queryExec($sql);
 			}
 		}
 
@@ -1489,6 +1489,6 @@ class Parsing
 			echo sprintf("OLD : %s\nNEW : %s\n\n", $oldname, $newname);
 
 		if (!$this->echoonly)
-			$db->exec(sprintf("update releases set name=%s, searchname = %s WHERE ID = %d", $db->escapeString($newname), $db->escapeString($newname), $id));
+			$db->queryExec(sprintf("update releases set name=%s, searchname = %s WHERE ID = %d", $db->escapeString($newname), $db->escapeString($newname), $id));
 	}
 }

@@ -64,7 +64,7 @@ class Sites
 			$sqlKeys[] = $db->escapeString($settingK);
 		}
 
-		$db->exec(sprintf("update site SET value = CASE setting %s END WHERE setting IN (%s)", implode(' ', $sql), implode(', ', $sqlKeys)));
+		$db->queryExec(sprintf("update site SET value = CASE setting %s END WHERE setting IN (%s)", implode(' ', $sql), implode(', ', $sqlKeys)));
 
 		return $this->get(true);
 	}
@@ -133,7 +133,7 @@ class Sites
 		$db = new DB();
 		$sql = sprintf("update site set value = %s where setting = %s", $db->escapeString($value), $db->escapeString($setting));
 
-		return $db->exec($sql);
+		return $db->queryExec($sql);
 	}
 
 	public function updateLatestRegexRevision($rev)

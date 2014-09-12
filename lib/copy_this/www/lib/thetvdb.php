@@ -97,14 +97,14 @@ class TheTVDB
 			$firstaired, $db->escapeString($genre), $imdbID, $db->escapeString($network), $db->escapeString($overview), $rating,
 			$ratingcount, $runtime, $db->escapeString($seriesname), $db->escapeString($status), $tvdbID);
 
-		$db->exec($sql);
+		$db->queryExec($sql);
 	}
 
 	public function deleteTitle($tvdbID)
 	{
 		$db = new DB();
 
-		$db->exec(sprintf("DELETE FROM thetvdb WHERE tvdbID = %d", $tvdbID));
+		$db->queryExec(sprintf("DELETE FROM thetvdb WHERE tvdbID = %d", $tvdbID));
 	}
 
 	public function addEmptySeries($seriesname)
@@ -180,7 +180,7 @@ class TheTVDB
 			echo 'TheTVDB : '.$seriesName.' '.$fullep." Not found\n";
 
 		$db = new DB();
-		$db->exec(sprintf('UPDATE releases SET episodeinfoID = %d WHERE ID = %d', -2, $releaseID));
+		$db->queryExec(sprintf('UPDATE releases SET episodeinfoID = %d WHERE ID = %d', -2, $releaseID));
 	}
 
 	public function processReleases()
@@ -292,7 +292,7 @@ class TheTVDB
 						$db->escapeString($episodeArray['airdate']));
 				}
 
-				$db->exec(sprintf('UPDATE releases SET tvdbID = %d, episodeinfoID = %d %s WHERE ID = %d',
+				$db->queryExec(sprintf('UPDATE releases SET tvdbID = %d, episodeinfoID = %d %s WHERE ID = %d',
 						$TheTVDBAPIArray['tvdbID'], $episodeArray['ID'], $additionalSql, $arr['ID']));
 
 				if($this->echooutput)

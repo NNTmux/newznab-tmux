@@ -14,7 +14,7 @@ if (isset($argv[1]) && $argv[1] == "myisam")
 	{
 		$tbl = $row['Tables_in_'.DB_NAME];
 		printf("Converting $tbl\n");
-		$db->exec("ALTER TABLE $tbl ENGINE=MYISAM");
+		$db->queryExec("ALTER TABLE $tbl ENGINE=MYISAM");
 	}
 }
 else if (isset($argv[1]) && $argv[1] == "dinnodb")
@@ -24,7 +24,7 @@ else if (isset($argv[1]) && $argv[1] == "dinnodb")
 	{
 		$tbl = $row['Tables_in_'.DB_NAME];
 		printf("Converting $tbl\n");
-		$db->exec("ALTER TABLE $tbl ENGINE=INNODB ROW_FORMAT=DYNAMIC");
+		$db->queryExec("ALTER TABLE $tbl ENGINE=INNODB ROW_FORMAT=DYNAMIC");
 	}
 }
 else if (isset($argv[1]) && $argv[1] == "cinnodb")
@@ -34,7 +34,7 @@ else if (isset($argv[1]) && $argv[1] == "cinnodb")
 	{
 		$tbl = $row['Tables_in_'.DB_NAME];
 		printf("Converting $tbl\n");
-		$db->exec("ALTER TABLE $tbl ENGINE=INNODB ROW_FORMAT=COMPRESSED");
+		$db->queryExec("ALTER TABLE $tbl ENGINE=INNODB ROW_FORMAT=COMPRESSED");
 	}
 }
 

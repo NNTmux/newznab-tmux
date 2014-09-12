@@ -260,7 +260,7 @@ class Music
 	{
 		$db = new DB();
 
-		$db->exec(sprintf("update musicinfo SET title=%s, asin=%s, url=%s, salesrank=%s, artist=%s, publisher=%s, releasedate='%s', year=%s, tracks=%s, cover=%d, genreID=%d, updateddate=NOW() WHERE ID = %d",
+		$db->queryExec(sprintf("update musicinfo SET title=%s, asin=%s, url=%s, salesrank=%s, artist=%s, publisher=%s, releasedate='%s', year=%s, tracks=%s, cover=%d, genreID=%d, updateddate=NOW() WHERE ID = %d",
 				$db->escapeString($title), $db->escapeString($asin), $db->escapeString($url), $salesrank, $db->escapeString($artist), $db->escapeString($publisher), $releasedate, $db->escapeString($year), $db->escapeString($tracks), $cover, $genreID, $id));
 	}
 
@@ -477,7 +477,7 @@ class Music
 					}
 				}
 
-				$db->exec(sprintf("update releases SET musicinfoID = %d WHERE ID = %d", $albumId, $arr["ID"]));
+				$db->queryExec(sprintf("update releases SET musicinfoID = %d WHERE ID = %d", $albumId, $arr["ID"]));
 			}
 		}
 	}
@@ -607,7 +607,7 @@ class Music
 
 				$sql = sprintf("update releases set musicinfoID = %d where ID = %d", $albumId, $rel["releaseID"]);
 
-				$db->exec($sql);
+				$db->queryExec($sql);
 			}
 		}
 

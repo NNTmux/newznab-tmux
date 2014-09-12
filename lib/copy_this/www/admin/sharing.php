@@ -38,7 +38,7 @@ if (!empty($_POST)) {
 	} else {
 		$max_download = $ourSite['max_download'];
 	}
-	$db->exec(
+	$db->queryExec(
 		sprintf('
 			UPDATE sharing
 			SET site_name = %s, max_push = %d, max_pull = %d, max_download = %d',

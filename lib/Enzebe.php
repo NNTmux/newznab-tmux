@@ -195,7 +195,7 @@ class Enzebe
 			gzclose($fp);
 
 			if (is_file($path)) {
-				$this->db->exec(
+				$this->db->queryExec(
 					sprintf('
 						UPDATE releases SET nzbstatus = %d %s WHERE ID = %d',
 						Enzebe::NZB_ADDED,

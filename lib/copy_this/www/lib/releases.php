@@ -717,7 +717,7 @@ class Releases
 				$re->delete($rel['ID']);
 				$re->deleteFull($rel['ID']);
 				$ri->delete($rel['guid']);
-				$db->exec(sprintf("DELETE from releases where id = %d", $rel['ID']));
+				$db->queryExec(sprintf("DELETE from releases where id = %d", $rel['ID']));
 			}
 		}
 	}
@@ -778,7 +778,7 @@ class Releases
 	{
 		$db = new DB();
 
-		$db->exec(sprintf("update releases set name=%s, searchname=%s, fromname=%s, categoryID=%d, totalpart=%d, grabs=%d, size=%s, postdate=%s, adddate=%s, rageID=%d, seriesfull=%s, season=%s, episode=%s, imdbID=%d, anidbID=%d, tvdbID=%d,consoleinfoID=%d where id = %d",
+		$db->queryExec(sprintf("update releases set name=%s, searchname=%s, fromname=%s, categoryID=%d, totalpart=%d, grabs=%d, size=%s, postdate=%s, adddate=%s, rageID=%d, seriesfull=%s, season=%s, episode=%s, imdbID=%d, anidbID=%d, tvdbID=%d,consoleinfoID=%d where id = %d",
 				$db->escapeString($name), $db->escapeString($searchname), $db->escapeString($fromname), $category, $parts, $grabs, $db->escapeString($size), $db->escapeString($posteddate), $db->escapeString($addeddate), $rageid, $db->escapeString($seriesfull), $db->escapeString($season), $db->escapeString($episode), $imdbid, $anidbid, $tvdbid, $consoleinfoid, $id
 			)
 		);
@@ -819,7 +819,7 @@ class Releases
 
 		$sql = sprintf('update releases set ' . implode(', ', $updateSql) . ' where guid in (%s)', implode(', ', $updateGuids));
 
-		return $db->exec($sql);
+		return $db->queryExec($sql);
 	}
 
 	/**
@@ -828,7 +828,7 @@ class Releases
 	public function updateHasPreview($guid, $haspreview)
 	{
 		$db = new DB();
-		$db->exec(sprintf("update releases set haspreview = %d where guid = %s", $haspreview, $db->escapeString($guid)));
+		$db->queryExec(sprintf("update releases set haspreview = %d where guid = %s", $haspreview, $db->escapeString($guid)));
 	}
 
 	/**
@@ -1436,7 +1436,7 @@ class Releases
 		$db = new DB();
 		$res = $db->queryOneRow(sprintf("select count(ID) as num from releases where rageID = %d", $rageid));
 		$ret = $res["num"];
-		$db->exec(sprintf("update releases set rageID = -1, seriesfull = null, season = null, episode = null where rageID = %d", $rageid));
+		$db->queryExec(sprintf("update releases set rageID = -1, seriesfull = null, season = null, episode = null where rageID = %d", $rageid));
 
 		return $ret;
 	}
@@ -1449,7 +1449,7 @@ class Releases
 		$db = new DB();
 		$res = $db->queryOneRow(sprintf("SELECT count(ID) AS num FROM releases WHERE tvdbID = %d", $tvdbID));
 		$ret = $res["num"];
-		$res = $db->exec(sprintf("update releases SET tvdbID = -1 where tvdbID = %d", $tvdbID));
+		$res = $db->queryExec(sprintf("update releases SET tvdbID = -1 where tvdbID = %d", $tvdbID));
 
 		return $ret;
 	}
@@ -1459,7 +1459,7 @@ class Releases
 		$db = new DB();
 		$res = $db->queryOneRow(sprintf("SELECT count(ID) AS num FROM releases WHERE anidbID = %d", $anidbID));
 		$ret = $res["num"];
-		$db->exec(sprintf("update releases SET anidbID = -1, episode = null, tvtitle = null, tvairdate = null where anidbID = %d", $anidbID));
+		$db->queryExec(sprintf("update releases SET anidbID = -1, episode = null, tvtitle = null, tvairdate = null where anidbID = %d", $anidbID));
 
 		return $ret;
 	}
@@ -1482,7 +1482,7 @@ class Releases
 	public function updateGrab($guid)
 	{
 		$db = new DB();
-		$db->exec(sprintf("update releases set grabs = grabs + 1 where guid = %s", $db->escapeString($guid)));
+		$db->queryExec(sprintf("update releases set grabs = grabs + 1 where guid = %s", $db->escapeString($guid)));
 	}
 
 	function processReleases()
@@ -1546,7 +1546,7 @@ class Releases
 				if (!empty($regexMatches)) {
 					$matchedbins++;
 					$relparts = explode("/", $regexMatches['parts']);
-					$db->exec(sprintf("update binaries set relname = replace(%s, '_', ' '), relpart = %d, reltotalpart = %d, procstat=%d, categoryID=%s, regexID=%d, reqID=%s where ID = %d",
+					$db->queryExec(sprintf("update binaries set relname = replace(%s, '_', ' '), relpart = %d, reltotalpart = %d, procstat=%d, categoryID=%s, regexID=%d, reqID=%s where ID = %d",
 							$db->escapeString($regexMatches['name']), $relparts[0], $relparts[1], Releases::PROCSTAT_TITLEMATCHED, $regexMatches['regcatid'], $regexMatches['regexID'], $db->escapeString($regexMatches['reqID']), $rowbin["ID"]
 						)
 					);
@@ -1559,7 +1559,7 @@ class Releases
 
 			//mark as not matched
 			if (!empty($newUnmatchedBinaries))
-				$db->exec(sprintf("update binaries set procstat=%d where ID IN (%s)", Releases::PROCSTAT_TITLENOTMATCHED, implode(',', $newUnmatchedBinaries)));
+				$db->queryExec(sprintf("update binaries set procstat=%d where ID IN (%s)", Releases::PROCSTAT_TITLENOTMATCHED, implode(',', $newUnmatchedBinaries)));
 
 		}
 
@@ -1578,7 +1578,7 @@ class Releases
 			//
 			if ($row["num"] < $row["minfilestoformrelease"]) {
 				//echo "Number of files in release ".$row["relname"]." less than site/group setting (".$row['num']."/".$row["minfilestoformrelease"].")\n";
-				$db->exec(sprintf("update binaries set procattempts = procattempts + 1 where relname = %s and procstat = %d and groupID = %d and fromname = %s", $db->escapeString($row["relname"]), Releases::PROCSTAT_TITLEMATCHED, $row["groupID"], $db->escapeString($row["fromname"])));
+				$db->queryExec(sprintf("update binaries set procattempts = procattempts + 1 where relname = %s and procstat = %d and groupID = %d and fromname = %s", $db->escapeString($row["relname"]), Releases::PROCSTAT_TITLEMATCHED, $row["groupID"], $db->escapeString($row["fromname"])));
 			}
 
 			//
@@ -1627,7 +1627,7 @@ class Releases
 						// Valid release with right number of files and title now, so move it on
 						//
 						if ($newtitle != "") {
-							$db->exec(sprintf("update binaries set relname = %s, procstat=%d where relname = %s and procstat = %d and groupID = %d and fromname=%s",
+							$db->queryExec(sprintf("update binaries set relname = %s, procstat=%d where relname = %s and procstat = %d and groupID = %d and fromname=%s",
 									$db->escapeString($newtitle), Releases::PROCSTAT_READYTORELEASE, $db->escapeString($row["relname"]), Releases::PROCSTAT_TITLEMATCHED, $row["groupID"], $db->escapeString($row["fromname"])
 								)
 							);
@@ -1644,14 +1644,14 @@ class Releases
 							// If added to the index over 48 hours ago, give up trying to determine the title
 							//
 							if (strtotime($maxaddeddate['now']) - strtotime($maxaddeddate['dateadded']) > (60 * 60 * 48)) {
-								$db->exec(sprintf("update binaries set procstat=%d where relname = %s and procstat = %d and groupID = %d and fromname=%s",
+								$db->queryExec(sprintf("update binaries set procstat=%d where relname = %s and procstat = %d and groupID = %d and fromname=%s",
 										Releases::PROCSTAT_NOREQIDNAMELOOKUPFOUND, $db->escapeString($row["relname"]), Releases::PROCSTAT_TITLEMATCHED, $row["groupID"], $db->escapeString($row["fromname"])
 									)
 								);
 							}
 						}
 					} else {
-						$db->exec(sprintf("update binaries set procstat=%d where relname = %s and procstat = %d and groupID = %d and fromname=%s",
+						$db->queryExec(sprintf("update binaries set procstat=%d where relname = %s and procstat = %d and groupID = %d and fromname=%s",
 								Releases::PROCSTAT_READYTORELEASE, $db->escapeString($row["relname"]), Releases::PROCSTAT_TITLEMATCHED, $row["groupID"], $db->escapeString($row["fromname"])
 							)
 						);
@@ -1664,7 +1664,7 @@ class Releases
 			//
 			else {
 				// pointless updating of attempts, as was creating a lot of database writes for people regex groups with posts without part numbering.
-				//$db->exec(sprintf("update binaries set procattempts = procattempts + 1 where relname = %s and procstat = %d and groupID = %d and fromname=%s", $db->escapeString($row["relname"]), Releases::PROCSTAT_TITLEMATCHED, $row["groupID"], $db->escapeString($row["fromname"]) ));
+				//$db->queryExec(sprintf("update binaries set procattempts = procattempts + 1 where relname = %s and procstat = %d and groupID = %d and fromname=%s", $db->escapeString($row["relname"]), Releases::PROCSTAT_TITLEMATCHED, $row["groupID"], $db->escapeString($row["fromname"]) ));
 			}
 			if ($retcount % 100 == 0)
 				echo ".";
@@ -1720,7 +1720,7 @@ class Releases
 			//
 			// Tag every binary for this release with its parent release id
 			//
-			$db->exec(sprintf("update binaries set procstat = %d, releaseID = %d where relname = %s and procstat = %d and groupID = %d and fromname=%s",
+			$db->queryExec(sprintf("update binaries set procstat = %d, releaseID = %d where relname = %s and procstat = %d and groupID = %d and fromname=%s",
 					Releases::PROCSTAT_RELEASED, $relid, $db->escapeString($row["relname"]), Releases::PROCSTAT_READYTORELEASE, $row["groupID"], $db->escapeString($row["fromname"])
 				)
 			);
@@ -1734,7 +1734,7 @@ class Releases
 			//
 			// Remove used binaries
 			//
-			$db->exec(sprintf("DELETE parts, binaries FROM parts JOIN binaries ON binaries.ID = parts.binaryID WHERE releaseID = %d ", $relid));
+			$db->queryExec(sprintf("DELETE parts, binaries FROM parts JOIN binaries ON binaries.ID = parts.binaryID WHERE releaseID = %d ", $relid));
 
 			//
 			// If nzb successfully written, then load it and get size completion from it
@@ -1751,7 +1751,7 @@ class Releases
 					echo "Stage 3 : Duplicate - " . $cleanRelName . "\n";
 					$this->delete($relid);
 				} else {
-					$db->exec(sprintf("update releases set totalpart = %d, size = %s, completion = %d, GID=%s where ID = %d", $nzbInfo->filecount, $nzbInfo->filesize, $nzbInfo->completion, $db->escapeString($nzbInfo->gid), $relid));
+					$db->queryExec(sprintf("update releases set totalpart = %d, size = %s, completion = %d, GID=%s where ID = %d", $nzbInfo->filecount, $nzbInfo->filesize, $nzbInfo->completion, $db->escapeString($nzbInfo->gid), $relid));
 					echo "Stage 3 : Added release " . $cleanRelName . "\n";
 
 					//Increment new release count
@@ -1808,7 +1808,7 @@ class Releases
 		// aggregate the releasefiles upto the releases.
 		//
 		echo "Stage 6 : Aggregating Files\n";
-		$db->exec("update releases INNER JOIN (SELECT releaseID, COUNT(ID) AS num FROM releasefiles GROUP BY releaseID) b ON b.releaseID = releases.ID and releases.rarinnerfilecount = 0 SET rarinnerfilecount = b.num");
+		$db->queryExec("update releases INNER JOIN (SELECT releaseID, COUNT(ID) AS num FROM releasefiles GROUP BY releaseID) b ON b.releaseID = releases.ID and releases.rarinnerfilecount = 0 SET rarinnerfilecount = b.num");
 
 		// Remove the binaries and parts used to form releases, or that are duplicates.
 		//
@@ -1835,10 +1835,10 @@ class Releases
 					}
 					$pID = '(' . implode(',', $pID) . ')';
 					$bID = '(' . implode(',', $bID) . ')';
-					$fr = $db->exec("DELETE FROM parts WHERE ID IN {$pID}");
+					$fr = $db->queryExec("DELETE FROM parts WHERE ID IN {$pID}");
 					if ($fr > 0) {
 						$cc += $fr;
-						$cc += $db->exec("DELETE FROM binaries WHERE ID IN {$bID}");
+						$cc += $db->queryExec("DELETE FROM binaries WHERE ID IN {$bID}");
 					}
 					unset($pID);
 					unset($bID);
@@ -1853,7 +1853,7 @@ class Releases
 			echo "\nStage 7 : Complete - " . $cc . " rows affected\n";
 		} else {
 			echo "Stage 7 : Deleting unused binaries and parts\n";
-			$db->exec(sprintf("DELETE parts, binaries FROM parts JOIN binaries ON binaries.ID = parts.binaryID
+			$db->queryExec(sprintf("DELETE parts, binaries FROM parts JOIN binaries ON binaries.ID = parts.binaryID
 			WHERE binaries.dateadded < %s - INTERVAL %d HOUR", $db->escapeString($currTime_ori["now"]), ceil($page->site->rawretentiondays * 24)
 				)
 			);
@@ -1960,7 +1960,7 @@ class Releases
 						$queries = array_map("trim", $queries);
 						foreach ($queries as $q) {
 							if ($q) {
-								$db->exec($q);
+								$db->queryExec($q);
 							}
 						}
 

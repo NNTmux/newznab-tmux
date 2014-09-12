@@ -198,7 +198,7 @@ class Groups
 	{
 		$db = new DB();
 
-		return $db->exec(sprintf("DELETE from groups where ID = %d", $id));
+		return $db->queryExec(sprintf("DELETE from groups where ID = %d", $id));
 	}
 
 	/**
@@ -208,7 +208,7 @@ class Groups
 	{
 		$db = new DB();
 
-		return $db->exec(sprintf("update groups set backfill_target=0, first_record=0, first_record_postdate=null, last_record=0, last_record_postdate=null, last_updated=null where ID = %d", $id));
+		return $db->queryExec(sprintf("update groups set backfill_target=0, first_record=0, first_record_postdate=null, last_record=0, last_record_postdate=null, last_updated=null where ID = %d", $id));
 	}
 
 	/**
@@ -250,7 +250,7 @@ class Groups
 		else
 			$minsizetoformrelease = $db->escapeString($group["minsizetoformrelease"]);
 
-		return $db->exec(sprintf("update groups set name=%s, description = %s, backfill_target = %s , active=%d, minfilestoformrelease=%s, minsizetoformrelease=%s, regexmatchonly=%d where ID = %d ", $db->escapeString($group["name"]), $db->escapeString($group["description"]), $db->escapeString($group["backfill_target"]), $group["active"], $minfiles, $minsizetoformrelease, $group["regexmatchonly"], $group["id"]));
+		return $db->queryExec(sprintf("update groups set name=%s, description = %s, backfill_target = %s , active=%d, minfilestoformrelease=%s, minsizetoformrelease=%s, regexmatchonly=%d where ID = %d ", $db->escapeString($group["name"]), $db->escapeString($group["description"]), $db->escapeString($group["backfill_target"]), $group["active"], $minfiles, $minsizetoformrelease, $group["regexmatchonly"], $group["id"]));
 	}
 
 	/**
@@ -283,7 +283,7 @@ class Groups
 					$res = $db->queryOneRow(sprintf("SELECT ID FROM groups WHERE name = %s ", $db->escapeString($group['group'])));
 					if ($res) {
 
-						$db->exec(sprintf("update groups SET active = %d where ID = %d", $active, $res["ID"]));
+						$db->queryExec(sprintf("update groups SET active = %d where ID = %d", $active, $res["ID"]));
 						$ret[] = array('group' => $group['group'], 'msg' => 'Updated');
 					} else {
 						$desc = "";
@@ -303,7 +303,7 @@ class Groups
 	public function updateGroupStatus($id, $status = 0)
 	{
 		$db = new DB();
-		$db->exec(sprintf("update groups SET active = %d WHERE id = %d", $status, $id));
+		$db->queryExec(sprintf("update groups SET active = %d WHERE id = %d", $status, $id));
 		$status = ($status == 0) ? 'deactivated' : 'activated';
 
 		return "Group $id has been $status.";
