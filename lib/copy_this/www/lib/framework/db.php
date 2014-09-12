@@ -5,7 +5,7 @@ require_once(WWW_DIR . "lib/framework/cache.php");
 require_once(WWW_DIR . "lib/util.php");
 require_once(WWW_DIR . "lib/ConsoleTools.php");
 require_once(WWW_DIR . "lib/ColorCLI.php");
-require_once(WWW_DIR . "lib/\Logger.php");
+require_once(WWW_DIR . "lib/Logger.php");
 
 
 /**
