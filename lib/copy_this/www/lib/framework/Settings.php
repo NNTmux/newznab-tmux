@@ -46,8 +46,10 @@ class Settings extends DB
 	public function __construct(array $options = [])
 	{
 		parent::__construct($options);
-		$result         = parent::exec("describe site", true);
+		$result         = parent::exec("describe settings", true);
+		$result2		= parent::exec("describe tmux", true);
 		$this->table = ($result === false) ? 'settings' : 'site';
+		$this->table = ($result2 === false) ? 'tmux' : $this->table;
 		return $this->pdo;
 	}
 
