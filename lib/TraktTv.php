@@ -1,4 +1,5 @@
 <?php
+require_once(WWW_DIR . '/lib/framework/Settings.php');
 require_once(WWW_DIR . '/lib/Tmux.php');
 require_once(WWW_DIR . '/lib/util.php');
 
@@ -12,13 +13,21 @@ Class TraktTv
 
 	/**
 	 * Construct. Set up API key.
+	 *
+	 * @param array $options Class instances.
+	 *
+	 * @access public
 	 */
-	function __construct()
+	public function __construct(array $options = array())
 	{
-		$t = new Tmux();
-		$tmux = $t->get();
-		$this->APIKEY = $tmux->trakttvkey;
-		$this->util = new Utility();
+		$defaults = [
+			'Settings' => null,
+		];
+		$options += $defaults;
+
+		$settings = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
+		$this->APIKEY = $settings->getSetting('trakttvkey');
+		$this->utility = new Utility();
 	}
 
 	/**
@@ -29,23 +38,26 @@ Class TraktTv
 	 * @param string $ep
 	 *
 	 * @return bool|mixed
+	 *
+	 * @access public
 	 */
 	public function traktTVSEsummary($title = '', $season = '', $ep = '')
 	{
 		if (!empty($this->APIKEY)) {
-			$TVjson = $this->util->getUrl(
-			'http://api.trakt.tv/show/episode/summary.json/' .
-				$this->APIKEY . '/' .
-				str_replace(array(' ', '_', '.'), '-', $title) . '/' .
-				str_replace(array('S', 's'), '', $season) . '/' .
-				str_replace(array('E', 'e'), '', $ep)
+			$TVjson = $this->utility->getUrl([
+					'url' =>
+						'http://api.trakt.tv/show/episode/summary.json/' .
+						$this->APIKEY . '/' .
+						str_replace([' ', '_', '.'], '-', $title) . '/' .
+						str_replace(['S', 's'], '', $season) . '/' .
+						str_replace(['E', 'e'], '', $ep)
+				]
 			);
 
 			if ($TVjson !== false) {
 				return json_decode($TVjson, true);
 			}
 		}
-
 		return false;
 	}
 
@@ -54,18 +66,22 @@ Class TraktTv
 	 * Accept a title (the-big-lebowski-1998), a IMDB id, or a TMDB id.
 	 *
 	 * @param string $movie Title or IMDB id.
-	 * @param bool   $array Return the full array or just the IMDB id.
+	 * @param bool $array   Return the full array or just the IMDB id.
 	 *
 	 * @return bool|mixed
+	 *
+	 * @access public
 	 */
-	public function traktMoviesummary($movie = '', $array = false)
+	public function traktMoviesummary($movie = '', $array=false)
 	{
 		if (!empty($this->APIKEY)) {
-			$MovieJson = $this->util->getUrl(
-			'http://api.trakt.tv/movie/summary.json/' .
-				$this->APIKEY .
-				'/' .
-				str_replace(array(' ', '_', '.'), '-', str_replace(array('(', ')'), '', $movie))
+			$MovieJson = $this->utility->getUrl([
+					'url' =>
+						'http://api.trakt.tv/movie/summary.json/' .
+						$this->APIKEY .
+						'/' .
+						str_replace([' ', '_', '.'], '-',  str_replace(['(', ')'], '', $movie))
+				]
 			);
 
 			if ($MovieJson !== false) {
@@ -74,7 +90,6 @@ Class TraktTv
 					return false;
 				}
 
-
 				if ($array) {
 					return $MovieJson;
 				} elseif (isset($MovieJson["imdb_id"])) {
@@ -82,7 +97,6 @@ Class TraktTv
 				}
 			}
 		}
-
 		return false;
 	}
 }
