@@ -1,6 +1,4 @@
 <?php
-use \PDO;
-
 require_once(WWW_DIR . "lib/framework/cache.php");
 require_once(WWW_DIR . "lib/util.php");
 require_once(WWW_DIR . "lib/ConsoleTools.php");
