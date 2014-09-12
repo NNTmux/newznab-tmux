@@ -22,17 +22,6 @@ define('NN_COVERS', NN_WWW . 'covers' .DS);
 // Used to refer to the resources folder
 define('NN_RES', NN_ROOT . 'resources' . DS);
 
-//Used to define multiprocessing folder
-define('NN_MULTIPROCESSING', NN_ROOT . 'multiprocessing' . DS);
-
-//Used to define misc folder
-define('NN_MISC', NN_ROOT . '..' . DS . 'misc' . DS);
-
-//Used do define the newznab nix_updates folder
-define('NN_NIX', NN_ROOT . '..' . DS . 'misc' . DS . 'update_scripts' . DS . 'nix_scripts' . DS);
-
-//Use to define the update_scripts folder
-define('NN_UPDATE', NN_MISC . 'update_scripts' . DS);
 // Used to refer to the tmp folder
 define('NN_TMP', NN_RES . 'tmp' . DS);
 
