@@ -183,7 +183,7 @@ class DB extends \PDO
 			return false;
 		}
 
-		return $result->fetchall(\PDO::FETCH_ASSOC);
+		return $result->fetch(\PDO::FETCH_ASSOC);
 	}
 
 	public function checkColumnIndex($table, $column)
@@ -251,6 +251,7 @@ class DB extends \PDO
 			\PDO::ATTR_TIMEOUT => 180,
 			\PDO::ATTR_PERSISTENT => $this->opts['persist'],
 			\PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8",
+			\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
 			\PDO::MYSQL_ATTR_LOCAL_INFILE => true
 		];
 
