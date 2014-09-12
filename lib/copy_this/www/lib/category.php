@@ -119,7 +119,7 @@ class Category
 				$children = $this->getChildren($category);
 
 				foreach ($children as $child) {
-					$chlist .= ', ' . $child['id'];
+					$chlist .= ', ' . $child['ID'];
 				}
 			}
 
