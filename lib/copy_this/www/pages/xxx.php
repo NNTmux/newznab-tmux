@@ -24,7 +24,7 @@ $catarray[] = $category;
 $page->smarty->assign('catlist', $mtmp);
 $page->smarty->assign('category', $category);
 
-$browsecount = $movie->getXXXCount($catarray, -1, $userdata['categoryexclusions']);
+$browsecount = $movie->getXXXCount($catarray, -1, $page->userdata['categoryexclusions']);
 
 $offset = (isset($_REQUEST['offset']) && ctype_digit($_REQUEST['offset'])) ? $_REQUEST["offset"] : 0;
 $ordering = $movie->getXXXOrdering();
