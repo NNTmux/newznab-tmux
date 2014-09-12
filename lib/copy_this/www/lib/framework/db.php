@@ -183,7 +183,7 @@ class DB extends \PDO
 			return false;
 		}
 
-		return $result->fetch(\PDO::FETCH_ASSOC);
+		return $result->fetchall(\PDO::FETCH_ASSOC);
 	}
 
 	public function checkColumnIndex($table, $column)
