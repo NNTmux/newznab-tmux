@@ -2,7 +2,7 @@
 //This script will update all records in the gamesinfo table
 require_once(dirname(__FILE__) . "/../../bin/config.php");
 require_once(WWW_DIR . "/lib/Games.php");
-require_once("../ColorCLI.php");
+require_once(WWW_DIR . "/lib/ColorCLI.php");
 
 
 $game = new Games(true);

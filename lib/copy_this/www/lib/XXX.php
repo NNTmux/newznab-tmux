@@ -7,7 +7,7 @@ require_once(WWW_DIR . "/lib/AEBN.php");
 require_once(WWW_DIR . "/lib/Hotmovies.php");
 require_once(WWW_DIR . "/lib/Popporn.php");
 require_once(WWW_DIR . "/lib/category.php");
-require_once(WWW_DIR . "../misc/update_scripts/nix_scripts/tmux/lib/ColorCLI.php");
+require_once(WWW_DIR . "/lib/ColorCLI.php");
 
 
 /**

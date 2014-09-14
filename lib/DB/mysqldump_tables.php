@@ -1,6 +1,6 @@
 <?php
 require_once(dirname(__FILE__)."/../../bin/config.php");
-require_once("/../ColorCLI.php");
+require_once(WWW_DIR . "/lib/ColorCLI.php");
 
 
 //	This script can dump all tables or just collections/binaries/parts/partrepair/groups.

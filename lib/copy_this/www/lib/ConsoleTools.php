@@ -1,5 +1,5 @@
 <?php
-require_once ("ColorCLI.php");
+require_once("ColorCLI.php");
 
 class ConsoleTools
 {

@@ -1,14 +1,14 @@
 <?php
 require_once(dirname(__FILE__) . "/config.php");
-require_once(WWW_DIR . "lib/framework/db.php");
+require_once(WWW_DIR . "lib/framework/Settings.php");
 require_once(WWW_DIR . '/lib/site.php');
 require_once(WWW_DIR . '/lib/Tmux.php');
-require_once(dirname(__FILE__) . "/../lib/ColorCLI.php");
-require_once(dirname(__FILE__) . "/../lib/showsleep.php");
+require_once(WWW_DIR . "/lib/ColorCLI.php");
+require_once(WWW_DIR . "/lib/showsleep.php");
 require_once(dirname(__FILE__) . "/../lib/functions.php");
 
 
-$version = "0.4r2037";
+$version = "0.4r2100";
 
 $db = new DB();
 $s = new Sites();
@@ -525,6 +525,12 @@ $fcfirstrun = true;
 $fcnum = 0;
 
 while ($i > 0) {
+
+	//check the db connection
+	if ($db->ping(true) == false) {
+		unset($pdo);
+		$db = new Settings();
+	}
 	//kill mediainfo and ffmpeg if exceeds 60 sec
 	shell_exec("killall -o 60s -9 mediainfo 2>&1 1> /dev/null");
 	shell_exec("killall -o 60s -9 ffmpeg 2>&1 1> /dev/null");
@@ -1219,7 +1225,7 @@ while ($i > 0) {
 	$_phpn = "nice -n$niceness $PHP";
 	$_python = $show_time . " nice -n$niceness $PYTHON";
 	$_pythonn = "nice -n$niceness $PYTHON";
-	$_sleep = "$_phpn ${DIR}/../lib/showsleep.php";
+	$_sleep = "$_phpn ${DIR}/../../../../../www/lib/showsleep.php";
 
 	//set command for running update_binaries
 	if ($binaries == 1) {

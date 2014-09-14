@@ -1,165 +1,165 @@
 <?php
-require_once(WWW_DIR . "/lib/framework/cache.php");
-require_once(WWW_DIR . "/lib/util.php");
-require_once(WWW_DIR . "../misc/update_scripts/nix_scripts/tmux/lib/consoletools.php");
-require_once(WWW_DIR . "../misc/update_scripts/nix_scripts/tmux/lib/ColorCLI.php");
+require_once(WWW_DIR . "lib/framework/cache.php");
+require_once(WWW_DIR . "lib/util.php");
+require_once(WWW_DIR . "lib/ConsoleTools.php");
+require_once(WWW_DIR . "lib/ColorCLI.php");
+require_once(WWW_DIR . "lib/Logger.php");
 
-class DB
+
+/**
+ * Class for handling connection to MySQL database using PDO.
+ *
+ * The class extends PDO, thereby exposing all of PDO's functionality directly
+ * without the need to wrap each and every method here.
+ *
+ * Exceptions are caught and displayed to the user.
+ * Properties are explicitly created, so IDEs can offer autocompletion for them.
+ * @extends PDO
+ */
+class DB extends PDO
 {
 	/**
-	 * The database connection
+	 * @var bool Is this a Command Line Interface instance.
 	 *
-	 * @var null|PDO
+	 * This needs to be revisited when moving to li3. Web pages do not need this class so it shouldn't be included by default.
 	 */
-	private static $instance = null;
+	public $cli;
 
 	/**
-	 * The database constructor
+	 * @var object Instance of ConsoleTools class.
 	 */
-	public function __construct()
+	public $ct;
+
+	/**
+	 * @var ColorCLI	Instance variable for logging object. Currently only ColorCLI supported,
+	 * but expanding for full logging with agnostic API planned.
+	 */
+	public $log;
+
+	/**
+	 * @note Setting this static causes issues when creating multiple instances of this class with different
+	 *       MySQL servers, the next instances re-uses the server of the first instance.
+	 * @var PDO Instance of PDO class.
+	 */
+	public $pdo = null;
+
+	/**
+	 * @var bool
+	 */
+	protected $_debug;
+
+	/**
+	 * @var object Class instance debugging.
+	 */
+	private $debugging;
+
+	/**
+	 * @var string Lower-cased name of DBMS in use.
+	 */
+	private $dbSystem;
+
+	/**
+	 * @var string	Stored copy of the dsn used to connect.
+	 */
+	private $dsn;
+
+	/**
+	 * @var array    Options passed into the constructor or defaulted.
+	 */
+	private $opts;
+
+	/**
+	 * @var null Cache
+	 */
+	private $cacheServer = null;
+
+	/**
+	 * @var bool Should we cache the results of the query method?
+	 */
+	private $cacheEnabled = false;
+
+	/**
+	 * Constructor. Sets up all necessary properties. Instantiates a PDO object
+	 * if needed, otherwise returns the current one.
+	 */
+	public function __construct(array $options = [])
 	{
-		$this->utility = new Utility();
-		$this->cli = $this->utility->isCLI();
-		$this->log = new ColorCLI();
+		$this->cli = Utility::isCLI();
 
-		if (!(self::$instance instanceof PDO)) {
-			$dbconnstring = sprintf(
-				"%s:host=%s;dbname=%s%s",
-				DB_TYPE,
-				DB_HOST,
-				DB_NAME,
-				(defined('DB_PORT') ? ";port=" . DB_PORT : "")
-			);
-			$errmode = defined('DB_ERRORMODE') ? DB_ERRORMODE : PDO::ERRMODE_SILENT;
+		$defaults = [
+			'createDb'		=> false, // create dbname if it does not exist?
+			'ct'			=> new ConsoleTools(),
+			'dbhost'		=> defined('DB_HOST') ? DB_HOST : '',
+			'dbname' 		=> defined('DB_NAME') ? DB_NAME : '',
+			'dbpass' 		=> defined('DB_PASSWORD') ? DB_PASSWORD : '',
+			'dbport'		=> defined('DB_PORT') ? DB_PORT : '',
+			'dbsock'		=> defined('DB_SOCKET') ? DB_SOCKET : '',
+			'dbtype'		=> defined('DB_TYPE') ? DB_TYPE : '',
+			'dbuser' 		=> defined('DB_USER') ? DB_USER : '',
+			'log'			=> new ColorCLI(),
+			'persist'		=> false,
+		];
+		$options += $defaults;
 
+		if (!$this->cli) {
+			$options['log'] = null;
+		}
+		$this->opts = $options;
+
+		if (!empty($this->opts['dbtype'])) {
+			$this->dbSystem = strtolower($this->opts['dbtype']);
+		}
+
+		if (!($this->pdo instanceof PDO)) {
+			$this->initialiseDatabase();
+		}
+
+		$this->cacheEnabled = (defined('NN_CACHE_TYPE') && (NN_CACHE_TYPE > 0) ? true : false);
+
+		if ($this->cacheEnabled) {
 			try {
-				self::$instance = new PDO(
-					$dbconnstring, DB_USER, DB_PASSWORD, array(
-						PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-						PDO::ATTR_ERRMODE            => $errmode,
-						PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"
-					)
-				);
-
-				if (defined('DB_PCONNECT') && DB_PCONNECT) {
-					self::$instance->setAttribute(PDO::ATTR_PERSISTENT, true);
-				}
-			} catch (PDOException $e) {
-				die("fatal error: could not connect to database! Check your config. " . $e);
+				$this->cacheServer = new Cache();
+			} catch (CacheException $error) {
+				$this->cacheEnabled = false;
+				$this->echoError($error->getMessage(), '__construct', 4);
 			}
 		}
 
-		$this->ct = new ConsoleTools();
-		if (!empty(DB_TYPE)) {
-			$this->dbSystem = strtolower(DB_TYPE);
+		$this->ct = $this->opts['ct'];
+		$this->log = $this->opts['log'];
+
+		$this->_debug = (NN_DEBUG || NN_LOGGING);
+		if ($this->_debug) {
+			try {
+				$this->debugging = new Logger(['ColorCLI' => $this->log]);
+			} catch (LoggerException $error) {
+				$this->_debug = false;
+			}
 		}
+
+		return $this->pdo;
 	}
 
-	/**
-	 * Init PDO instance.
-	 */
-	private function initialiseDatabase()
+	public function __destruct()
 	{
-
-
-		$dsn = $this->dbSystem . ':host=' . DB_HOST;
-		if (!empty(DB_PORT)) {
-			$dsn .= ';port=' . DB_PORT;
-		}
-		$dsn .= ';charset=utf8';
-
-		$options = [
-			\PDO::ATTR_ERRMODE            => \PDO::ERRMODE_EXCEPTION,
-			\PDO::ATTR_TIMEOUT            => 180,
-			\PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8",
-			\PDO::MYSQL_ATTR_LOCAL_INFILE => true
-		];
-
-		$this->dsn = $dsn;
-		// removed try/catch to let the instantiating code handle the problem (Install for
-		// instance can output a message that connecting failed.
-		self::$instance = new \PDO($dsn, DB_USER, DB_PASSWORD, $options);
-
-		if (DB_NAME != '') {
-			self::$instance->query("USE {DB_NAME}");
-		}
-
-		// In case PDO is not set to produce exceptions (PHP's default behaviour).
-		if (self::$instance === false) {
-			$this->echoError(
-				"Unable to create connection to the Database!",
-				'initialiseDatabase',
-				1,
-				true
-			);
-		}
-
-		// For backwards compatibility, no need for a patch.
-		self::$instance->setAttribute(\PDO::ATTR_CASE, \PDO::CASE_LOWER);
-		self::$instance->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
+		$this->pdo = null;
 	}
 
-	/**
-	 * Get the plain PDO connection
-	 *
-	 * @return PDO
-	 */
-	public function getPDO()
+	public function checkDbExists ($name = null)
 	{
-		return self::$instance;
-	}
-
-	/**
-	 * Call functions from PDO
-	 *
-	 * @param $function
-	 * @param $args
-	 *
-	 * @return mixed
-	 */
-	public function __call($function, $args)
-	{
-		if (method_exists(self::$instance, $function)) {
-			return call_user_func_array(array(self::$instance, $function), $args);
-		}
-		trigger_error("Unknown PDO Method Called: $function()\n", E_USER_ERROR);
-	}
-
-	/**
-	 * Escape a string using PDO
-	 *
-	 * @param string $str
-	 *
-	 * @return string
-	 */
-	public function escapeString($str)
-	{
-		if (is_null($str)) {
-			return 'NULL';
+		if (empty($name)) {
+			$name = $this->opts['dbname'];
 		}
 
-		return self::$instance->quote($str);
-	}
-
-	/**
-	 * Formats a 'like' string. ex.(LIKE '%chocolate%')
-	 *
-	 * @param string $str   The string.
-	 * @param bool   $left  Add a % to the left.
-	 * @param bool   $right Add a % to the right.
-	 *
-	 * @return string
-	 */
-	public function likeString($str, $left = true, $right = true)
-	{
-		return (
-			'LIKE ' .
-			$this->escapeString(
-				($left ? '%' : '') .
-				$str .
-				($right ? '%' : '')
-			)
-		);
+		$found  = false;
+		$tables = self::getTableList();
+		foreach ($tables as $table) {
+			if ($table['Database'] == $name) {
+				$found = true;
+				break;
+			}
+		}
+		return $found;
 	}
 
 	/**
@@ -172,7 +172,7 @@ class DB
 	 */
 	public function checkIndex($table, $index)
 	{
-		$result = $this->query(
+		$result = $this->pdo->query(
 			sprintf(
 				"SHOW INDEX FROM %s WHERE key_name = '%s'",
 				trim($table),
@@ -183,12 +183,12 @@ class DB
 			return false;
 		}
 
-		return $result->fetch(\PDO::FETCH_ASSOC);
+		return $result->fetch(PDO::FETCH_ASSOC);
 	}
 
 	public function checkColumnIndex($table, $column)
 	{
-		$result = $this->query(
+		$result = $this->pdo->query(
 			sprintf(
 				"SHOW INDEXES IN %s WHERE non_unique = 0 AND column_name = '%s'",
 				trim($table),
@@ -199,234 +199,211 @@ class DB
 			return false;
 		}
 
-		return $result->fetchAll(\PDO::FETCH_ASSOC);
+		return $result->fetchAll(PDO::FETCH_ASSOC);
+	}
+
+	public function getTableList ()
+	{
+		$query  = ($this->opts['dbtype'] === 'mysql' ? 'SHOW DATABASES' : 'SELECT datname AS Database FROM pg_database');
+		$result = $this->pdo->query($query);
+		return $result->fetchAll(PDO::FETCH_ASSOC);
 	}
 
 	/**
-	 * PHP interpretation of MySQL's from_unixtime method.
-	 *
-	 * @param int $utime UnixTime
-	 *
-	 * @return bool|string
+	 * @return bool Whether the Db is definitely on the local machine.
 	 */
-	public function from_unixtime($utime)
+	public function isLocalDb ()
 	{
-		return 'FROM_UNIXTIME(' . $utime . ')';
-	}
-
-	/**
-	 * PHP interpretation of mysql's unix_timestamp method.
-	 *
-	 * @param string $date
-	 *
-	 * @return int
-	 */
-	public function unix_timestamp($date)
-	{
-		return strtotime($date);
-	}
-
-	/**
-	 * Get a string for MySQL with a column name in between
-	 * ie: UNIX_TIMESTAMP(column_name) AS outputName
-	 *
-	 * @param string $column     The datetime column.
-	 * @param string $outputName The name to store the SQL data into. (the word after AS)
-	 *
-	 * @return string
-	 */
-	public function unix_timestamp_column($column, $outputName = 'unix_time')
-	{
-		return ('UNIX_TIMESTAMP(' . $column . ') AS ' . $outputName);
-	}
-
-	/**
-	 * Reconnect to MySQL when the connection has been lost.
-	 *
-	 * @see ping(), _checkGoneAway() for checking the connection.
-	 *
-	 * @return bool
-	 */
-	protected function _reconnect()
-	{
-		// Check if we are really connected to MySQL.
-		if ($this->ping() === false) {
-			// If we are not reconnected, return false.
-			return false;
+		if (!empty($this->opts['dbsock']) || $this->opts['dbhost'] == 'localhost') {
+			return true;
 		}
 
-		return true;
-	}
+		preg_match_all('/inet' . '6?' . ' addr: ?([^ ]+)/', `ifconfig`, $ips);
 
-	/**
-	 * Verify that we've lost a connection to MySQL.
-	 *
-	 * @param string $errorMessage
-	 *
-	 * @return bool
-	 */
-	protected function _checkGoneAway($errorMessage)
-	{
-		if (stripos($errorMessage, 'MySQL server has gone away') !== false) {
-			return true;
+		// Check for dotted quad - if exists compare against local IP number(s)
+		if (preg_match('#^\d+\.\d+\.\d+\.\d+$#', $this->opts['dbhost'])) {
+			if (in_array($this->opts['dbhost'], $ips[1])) {
+				return true;
+			}
 		}
 
 		return false;
 	}
 
 	/**
-	 * Execute a query and return the result or last inserted id
+	 * Init PDO instance.
+	 */
+	private function initialiseDatabase()
+	{
+
+		if (!empty($this->opts['dbsock'])) {
+			$dsn = $this->dbSystem . ':unix_socket=' . $this->opts['dbsock'];
+		} else {
+			$dsn = $this->dbSystem . ':host=' . $this->opts['dbhost'];
+			if (!empty($this->opts['dbport'])) {
+				$dsn .= ';port=' . $this->opts['dbport'];
+			}
+		}
+		$dsn .= ';charset=utf8';
+
+		$options = [
+			PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+			PDO::ATTR_TIMEOUT => 180,
+			PDO::ATTR_PERSISTENT => $this->opts['persist'],
+			PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8",
+			PDO::MYSQL_ATTR_LOCAL_INFILE => true
+		];
+
+		$this->dsn = $dsn;
+		// removed try/catch to let the instantiating code handle the problem (Install for
+		// instance can output a message that connecting failed.
+		$this->pdo = new PDO($dsn, $this->opts['dbuser'], $this->opts['dbpass'], $options);
+
+		if ($this->opts['dbname'] != '') {
+			if ($this->opts['createDb']) {
+				$found = self::checkDbExists();
+				if ($found) {
+					try {
+						$this->pdo->query("DROP DATABASE " . $this->opts['dbname']);
+					} catch (Exception $e) {
+						throw new RuntimeException("Error trying to drop your old database: '{$this->opts['dbname']}'", 2);
+					}
+					$found = self::checkDbExists();
+				}
+
+				if ($found) {
+					var_dump(self::getTableList());
+					throw new RuntimeException("Could not drop your old database: '{$this->opts['dbname']}'", 2);
+				} else {
+					$this->pdo->query("CREATE DATABASE `{$this->opts['dbname']}`  DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci");
+
+					if (!self::checkDbExists()) {
+						throw new RuntimeException("Could not create new database: '{$this->opts['dbname']}'", 3);
+					}
+				}
+			}
+			$this->pdo->query("USE {$this->opts['dbname']}");
+		}
+
+		// In case PDO is not set to produce exceptions (PHP's default behaviour).
+		if ($this->pdo === false) {
+			$this->echoError(
+				"Unable to create connection to the Database!",
+				'initialiseDatabase',
+				1,
+				true
+			);
+		}
+
+		// For backwards compatibility, no need for a patch.
+		//$this->pdo->setAttribute(PDO::ATTR_CASE, PDO::CASE_LOWER);
+		$this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+	}
+
+	/**
+	 * Echo error, optionally exit.
+	 *
+	 * @param string     $error    The error message.
+	 * @param string     $method   The method where the error occured.
+	 * @param int        $severity The severity of the error.
+	 * @param bool       $exit     Exit or not?
+	 */
+	protected function echoError($error, $method, $severity, $exit = false)
+	{
+		if ($this->_debug) {
+			$this->debugging->log('DB', $method, $error, $severity);
+
+			echo(
+			($this->cli ? $this->log->error($error) . PHP_EOL : '<div class="error">' . $error . '</div>')
+			);
+		}
+
+		if ($exit) {
+			exit();
+		}
+	}
+
+	/**
+	 * @return string mysql.
+	 */
+	public function DbSystem()
+	{
+		return $this->dbSystem;
+	}
+
+	/**
+	 * Returns a string, escaped with single quotes, false on failure. http://www.php.net/manual/en/pdo.quote.php
+	 *
+	 * @param string $str
+	 *
+	 * @return string
+	 */
+	public function escapeString($str)
+	{
+		if (is_null($str)) {
+			return 'NULL';
+		}
+
+		return $this->pdo->quote($str);
+	}
+
+	/**
+	 * Formats a 'like' string. ex.(LIKE '%chocolate%')
+	 *
+	 * @param string $str    The string.
+	 * @param bool   $left   Add a % to the left.
+	 * @param bool   $right  Add a % to the right.
+	 *
+	 * @return string
+	 */
+	public function likeString($str, $left=true, $right=true)
+	{
+		return (
+			'LIKE ' .
+			$this->escapeString(
+				($left  ? '%' : '') .
+				$str .
+				($right ? '%' : '')
+			)
+		);
+	}
+
+	/**
+	 * Verify if pdo var is instance of PDO class.
+	 *
+	 * @return bool
+	 */
+	public function isInitialised()
+	{
+		return ($this->pdo instanceof PDO);
+	}
+
+	/**
+	 * For inserting a row. Returns last insert id. queryExec is better if you do not need the id.
 	 *
 	 * @param string $query
-	 * @param bool   $returnlastid
 	 *
 	 * @return bool|int
 	 */
-	public function queryInsert($query, $returnlastid = true)
-	{
-		if ($query == "")
-			return false;
-
-		if (DB_TYPE == "mysql") {
-			//$result = $this->exec(utf8_encode($query));
-			$result = self::$instance->exec($query);
-
-			return ($returnlastid) ? self::$instance->lastInsertId() : $result;
-		} elseif (DB_TYPE == "postgres") {
-			$p = self::$instance->prepare($query . ' RETURNING id');
-			$p->execute();
-
-			return $p->fetchColumn();
-		}
-	}
-
-	/**
-	 * Perform a query and return the first result
-	 *
-	 * @param string     $query
-	 * @param bool       $useCache
-	 * @param string|int $cacheTTL
-	 *
-	 * @return bool|array
-	 */
-	public function queryOneRow($query, $useCache = false, $cacheTTL = '')
-	{
-		if ($query == "")
-			return false;
-
-		$rows = $this->query($query, $useCache, $cacheTTL);
-
-		return ($rows ? $rows[0] : false);
-	}
-
-	/**
-	 * Perform a single query
-	 *
-	 * @param string     $query
-	 * @param bool       $useCache
-	 * @param string|int $cacheTTL
-	 *
-	 * @return bool|array
-	 */
-	public function query($query, $useCache = false, $cacheTTL = '')
-	{
-		if ($query == "")
-			return false;
-
-		$query = $this->utility->collapseWhiteSpace($query);
-
-		if ($useCache) {
-			$cache = new Cache();
-			if ($cache->enabled && $cache->exists($query)) {
-				$ret = $cache->fetch($query);
-				if ($ret !== false)
-					return $ret;
-			}
-		}
-
-		$result = $this->queryArray($query);
-
-		if ($result === false || $result === true)
-			return array();
-
-		if ($useCache)
-			if ($cache->enabled)
-				$cache->store($query, $result, $cacheTTL);
-
-		return $result;
-	}
-
-	/**
-	 * Query without returning an empty array like our function query(). http://php.net/manual/en/pdo.query.php
-	 *
-	 * @param string $query  The query to run.
-	 * @param bool   $ignore Ignore errors, do not log them?
-	 *
-	 * @return bool|\PDOStatement
-	 */
-	public function queryDirect($query, $ignore = false)
+	public function queryInsert($query)
 	{
 		if (empty($query)) {
 			return false;
 		}
 
-		$query = $this->utility->collapseWhiteSpace($query);
-
-
-		try {
-			$result = self::$instance->query($query);
-		} catch (\PDOException $e) {
-
-			// Check if we lost connection to MySQL.
-			if ($this->_checkGoneAway($e->getMessage()) !== false) {
-
-				// Reconnect to MySQL.
-				if ($this->_reconnect() === true) {
-
-					// If we reconnected, retry the query.
-					$result = $this->queryDirect($query);
-
-				} else {
-					// If we are not reconnected, return false.
-					$result = false;
-				}
-
-			} else {
-				if ($ignore === false) {
-					$this->echoError($e->getMessage(), 'queryDirect', 4, false);
-				}
-				$result = false;
-			}
+		if (NN_QUERY_STRIP_WHITESPACE) {
+			$query = Utility::collapseWhiteSpace($query);
 		}
-
-		return $result;
-	}
-
-	/**
-	 * Used for deleting, updating (and inserting without needing the last insert id).
-	 *
-	 * @param string $query
-	 * @param bool   $silent Echo or log errors?
-	 *
-	 * @return bool|\PDOStatement
-	 */
-	public function queryExec($query, $silent = false)
-	{
-		if (empty($query)) {
-			return false;
-		}
-
-		$query = $this->utility->collapseWhiteSpace($query);
-
 
 		$i = 2;
 		$error = '';
-		while ($i < 11) {
-			$result = $this->queryExecHelper($query);
+		while($i < 11) {
+			$result = $this->queryExecHelper($query, true);
 			if (is_array($result) && isset($result['deadlock'])) {
 				$error = $result['message'];
 				if ($result['deadlock'] === true) {
-					$this->ct->showsleep($i * ($i / 2));
+					$this->echoError("A Deadlock or lock wait timeout has occurred, sleeping.(" . ($i-1) . ")", 'queryInsert', 4);
+					$this->ct->showsleep($i * ($i/2));
 					$i++;
 				} else {
 					break;
@@ -438,10 +415,55 @@ class DB
 				return $result;
 			}
 		}
-		if ($silent === false) {
-			$this->echoError($error, 'queryExec', 4);
+		if ($this->_debug) {
+			$this->echoError($error, 'queryInsert', 4);
+			$this->debugging->log('DB', "queryInsert", $query, Logger::LOG_SQL);
+		}
+		return false;
+	}
+
+	/**
+	 * Used for deleting, updating (and inserting without needing the last insert id).
+	 *
+	 * @param string $query
+	 * @param bool   $silent Echo or log errors?
+	 *
+	 * @return bool|PDOStatement
+	 */
+	public function queryExec($query, $silent = false)
+	{
+		if (empty($query)) {
+			return false;
 		}
 
+		if (NN_QUERY_STRIP_WHITESPACE) {
+			$query = Utility::collapseWhiteSpace($query);
+		}
+
+		$i = 2;
+		$error = '';
+		while($i < 11) {
+			$result = $this->queryExecHelper($query);
+			if (is_array($result) && isset($result['deadlock'])) {
+				$error = $result['message'];
+				if ($result['deadlock'] === true) {
+					$this->echoError("A Deadlock or lock wait timeout has occurred, sleeping.(" . ($i-1) . ")", 'queryExec', 4);
+					$this->ct->showsleep($i * ($i/2));
+					$i++;
+				} else {
+					break;
+				}
+			} elseif ($result === false) {
+				$error = 'Unspecified error.';
+				break;
+			} else {
+				return $result;
+			}
+		}
+		if ($silent === false && $this->_debug) {
+			$this->echoError($error, 'queryExec', 4);
+			$this->debugging->log('DB', "queryExec", $query, Logger::LOG_SQL);
+		}
 		return false;
 	}
 
@@ -451,24 +473,22 @@ class DB
 	 * @param string $query
 	 * @param bool   $insert
 	 *
-	 * @return array|\PDOStatement
+	 * @return array|PDOStatement
 	 */
 	protected function queryExecHelper($query, $insert = false)
 	{
 		try {
-			if ($insert === false) {
-				$run = self::$instance->prepare($query);
+			if ($insert === false ) {
+				$run = $this->pdo->prepare($query);
 				$run->execute();
-
 				return $run;
 			} else {
-				$ins = self::$instance->prepare($query);
+				$ins = $this->pdo->prepare($query);
 				$ins->execute();
-
-				return self::$instance->lastInsertId();
+				return $this->pdo->lastInsertId();
 			}
 
-		} catch (\PDOException $e) {
+		} catch (PDOException $e) {
 			// Deadlock or lock wait timeout, try 10 times.
 			if (
 				$e->errorInfo[1] == 1213 ||
@@ -477,7 +497,9 @@ class DB
 				$e->getMessage() == 'SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction'
 			) {
 				return ['deadlock' => true, 'message' => $e->getMessage()];
-			} // Check if we lost connection to MySQL.
+			}
+
+			// Check if we lost connection to MySQL.
 			else if ($this->_checkGoneAway($e->getMessage()) !== false) {
 
 				// Reconnect to MySQL.
@@ -494,27 +516,97 @@ class DB
 	}
 
 	/**
-	 * Get the total number of rows in the result set
+	 * Direct query. Return the affected row count. http://www.php.net/manual/en/pdo.exec.php
 	 *
-	 * @param PDOStatement $result
+	 * @note If not "consumed", causes this error:
+	 *       'SQLSTATE[HY000]: General error: 2014 Cannot execute queries while other unbuffered queries are active.
+	 *        Consider using PDOStatement::fetchAll(). Alternatively, if your code is only ever going to run against mysql,
+	 *        you may enable query buffering by setting the PDO::MYSQL_ATTR_USE_BUFFERED_QUERY attribute.'
 	 *
-	 * @return int
+	 * @param string $query
+	 * @param bool   $silent Whether to skip echoing errors to the console.
+	 *
+	 * @return bool|int|PDOStatement
 	 */
-	public function getNumRows(PDOStatement $result)
+	public function exec($query, $silent = false)
 	{
-		return $result->rowCount();
+		if (empty($query)) {
+			return false;
+		}
+
+		if (NN_QUERY_STRIP_WHITESPACE) {
+			$query = Utility::collapseWhiteSpace($query);
+		}
+
+		try {
+			return $this->pdo->exec($query);
+
+		} catch (PDOException $e) {
+
+			// Check if we lost connection to MySQL.
+			if ($this->_checkGoneAway($e->getMessage()) !== false) {
+
+				// Reconnect to MySQL.
+				if ($this->_reconnect() === true) {
+
+					// If we reconnected, retry the query.
+					return $this->exec($query, $silent);
+
+				} else {
+					// If we are not reconnected, return false.
+					return false;
+				}
+
+			} else if (!$silent) {
+				$this->echoError($e->getMessage(), 'Exec', 4, false);
+
+				if ($this->_debug) {
+					$this->debugging->log('DB', "Exec", $query, Logger::LOG_SQL);
+				}
+			}
+
+			return false;
+		}
 	}
 
 	/**
-	 * Fetch a assoc row from a result set
+	 * Returns an array of result (empty array if no results or an error occurs)
+	 * Optional: Pass true to cache the result with a cache server.
 	 *
-	 * @param PDOStatement $result
+	 * @param string $query       SQL to execute.
+	 * @param bool   $cache       Indicates if the query result should be cached.
+	 * @param int    $cacheExpiry The time in seconds before deleting the query result from the cache server.
 	 *
-	 * @return array
+	 * @return array Array of results (possibly empty) on success, empty array on failure.
 	 */
-	public function getAssocArray(PDOStatement $result)
+	public function query($query, $cache = false, $cacheExpiry = 600)
 	{
-		return $result->fetch();
+		if (empty($query)) {
+			return false;
+		}
+
+		if (NN_QUERY_STRIP_WHITESPACE) {
+			$query = Utility::collapseWhiteSpace($query);
+		}
+
+		if ($cache === true && $this->cacheEnabled === true) {
+			try {
+				$data = $this->cacheServer->get($this->cacheServer->createKey($query));
+				if ($data !== false) {
+					return $data;
+				}
+			} catch (CacheException $error) {
+				$this->echoError($error->getMessage(), 'query', 4);
+			}
+		}
+
+		$result = $this->queryArray($query);
+
+		if ($result !== false && $cache === true && $this->cacheEnabled === true) {
+			$this->cacheServer->set($this->cacheServer->createKey($query), $result, $cacheExpiry);
+		}
+
+		return ($result === false) ? [] : $result;
 	}
 
 	/**
@@ -553,29 +645,164 @@ class DB
 		if ($query == '') {
 			return false;
 		}
-		$mode = self::$instance->getAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE);
-		if ($mode != \PDO::FETCH_ASSOC) {
-			self::$instance->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
+		$mode = $this->pdo->getAttribute(PDO::ATTR_DEFAULT_FETCH_MODE);
+		if ($mode != PDO::FETCH_ASSOC) {
+			$this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 		}
 
 		$result = $this->queryArray($query);
 
-		if ($mode != \PDO::FETCH_ASSOC) {
-			self::$instance->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
+		if ($mode != PDO::FETCH_ASSOC) {
+			$this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+		}
+		return $result;
+	}
+
+	/**
+	 * Fetch a assoc row from a result set
+	 *
+	 * @param PDOStatement $result
+	 * @return array
+	 */
+	public function getAssocArray(PDOStatement $result)
+	{
+		return $result->fetch();
+	}
+
+	/**
+	 * Get the total number of rows in the result set
+	 *
+	 * @param PDOStatement $result
+	 * @return int
+	 */
+	public function getNumRows(PDOStatement $result)
+	{
+		return $result->rowCount();
+	}
+
+	/**
+	 * Query without returning an empty array like our function query(). http://php.net/manual/en/pdo.query.php
+	 *
+	 * @param string $query  The query to run.
+	 * @param bool   $ignore Ignore errors, do not log them?
+	 *
+	 * @return bool|PDOStatement
+	 */
+	public function queryDirect($query, $ignore = false)
+	{
+		if (empty($query)) {
+			return false;
 		}
 
+		if (NN_QUERY_STRIP_WHITESPACE) {
+			$query = Utility::collapseWhiteSpace($query);
+		}
+
+		try {
+			$result = $this->pdo->query($query);
+		} catch (PDOException $e) {
+
+			// Check if we lost connection to MySQL.
+			if ($this->_checkGoneAway($e->getMessage()) !== false) {
+
+				// Reconnect to MySQL.
+				if ($this->_reconnect() === true) {
+
+					// If we reconnected, retry the query.
+					$result = $this->queryDirect($query);
+
+				} else {
+					// If we are not reconnected, return false.
+					$result = false;
+				}
+
+			} else {
+				if ($ignore === false) {
+					$this->echoError($e->getMessage(), 'queryDirect', 4, false);
+					if ($this->_debug) {
+						$this->debugging->log('DB', "queryDirect", $query, Logger::LOG_SQL);
+					}
+				}
+				$result = false;
+			}
+		}
 		return $result;
+	}
+
+	/**
+	 * Reconnect to MySQL when the connection has been lost.
+	 *
+	 * @see ping(), _checkGoneAway() for checking the connection.
+	 *
+	 * @return bool
+	 */
+	protected function _reconnect()
+	{
+		$this->initialiseDatabase();
+
+		// Check if we are really connected to MySQL.
+		if ($this->ping() === false) {
+			// If we are not reconnected, return false.
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Verify that we've lost a connection to MySQL.
+	 *
+	 * @param string $errorMessage
+	 *
+	 * @return bool
+	 */
+	protected function _checkGoneAway($errorMessage)
+	{
+		if (stripos($errorMessage, 'MySQL server has gone away') !== false) {
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Returns the first row of the query.
+	 *
+	 * @param string $query
+	 * @param bool   $appendLimit
+	 *
+	 * @return array|bool
+	 */
+	public function queryOneRow($query, $appendLimit = true)
+	{
+		// Force the query to only return 1 row, so queryArray doesn't potentially run out of memory on a large data set.
+		// First check if query already contains a LIMIT clause.
+		if (preg_match('#\s+LIMIT\s+(?P<lower>\d+)(,\s+(?P<upper>\d+))?(;)?$#i', $query, $matches)) {
+			If (!isset($matches['upper']) && isset($matches['lower']) && $matches['lower'] == 1) {
+				// good it's already correctly set.
+			} else { // We have a limit, but it's not for a single row
+				return false;
+			}
+
+		} else if ($appendLimit) {
+			$query .= ' LIMIT 1';
+		}
+
+		$rows = $this->query($query);
+		if (!$rows || count($rows) == 0) {
+			$rows = false;
+		}
+
+		return is_array($rows) ? $rows[0] : $rows;
 	}
 
 	/**
 	 * Optimises/repairs tables on mysql.
 	 *
-	 * @param bool   $admin     If we are on web, don't echo.
-	 * @param string $type      'full' | '' Force optimize of all tables.
-	 *                          'space'     Optimise tables with 5% or more free space.
-	 *                          'analyze'   Analyze tables to rebuild statistics.
-	 * @param bool   $local     Only analyze local tables. Good if running replication.
-	 * @param array  $tableList (optional) Names of tables to analyze.
+	 * @param bool   $admin    If we are on web, don't echo.
+	 * @param string $type     'full' | '' Force optimize of all tables.
+	 *                         'space'     Optimise tables with 5% or more free space.
+	 *                         'analyze'   Analyze tables to rebuild statistics.
+	 * @param bool  $local     Only analyze local tables. Good if running replication.
+	 * @param array $tableList (optional) Names of tables to analyze.
 	 *
 	 * @return int Quantity optimized/analyzed
 	 */
@@ -604,11 +831,11 @@ class DB
 		}
 
 		$optimised = 0;
-		if ($tableArray instanceof \Traversable && $tableArray->rowCount()) {
+		if ($tableArray instanceof Traversable && $tableArray->rowCount()) {
 
 			$tableNames = '';
 			foreach ($tableArray as $table) {
-				$tableNames .= $table['Name'] . ',';
+				$tableNames .= $table['name'] . ',';
 			}
 			$tableNames = rtrim($tableNames, ',');
 
@@ -621,10 +848,10 @@ class DB
 				$this->queryExec(sprintf('OPTIMIZE %s TABLE %s', $local, $tableNames));
 				$this->logOptimize($admin, 'OPTIMIZE', $tableNames);
 
-				if ($myIsamTables instanceof \Traversable && $myIsamTables->rowCount()) {
+				if ($myIsamTables instanceof Traversable && $myIsamTables->rowCount()) {
 					$tableNames = '';
 					foreach ($myIsamTables as $table) {
-						$tableNames .= $table['Name'] . ',';
+						$tableNames .= $table['name'] . ',';
 					}
 					$tableNames = rtrim($tableNames, ',');
 					$this->queryExec(sprintf('REPAIR %s TABLE %s', $local, $tableNames));
@@ -636,6 +863,18 @@ class DB
 		}
 
 		return $optimised;
+	}
+
+	/**
+	 * Get the amount of found rows after running a SELECT SQL_CALC_FOUND_ROWS query.
+	 *
+	 * @return int
+	 * @access public
+	 */
+	public function get_Found_Rows()
+	{
+		$totalCount = $this->queryOneRow('SELECT FOUND_ROWS() AS total');
+		return ($totalCount === false ? 0 : $totalCount['total']);
 	}
 
 	/**
@@ -655,6 +894,105 @@ class DB
 			echo $this->log->primary($message);
 
 		}
+		if ($this->_debug) {
+			$this->debugging->log('DB', 'optimise', $message, Logger::LOG_INFO);
+		}
+	}
+
+	/**
+	 * Turns off autocommit until commit() is ran. http://www.php.net/manual/en/pdo.begintransaction.php
+	 *
+	 * @return bool
+	 */
+	public function beginTransaction()
+	{
+		if (NN_USE_SQL_TRANSACTIONS) {
+			return $this->pdo->beginTransaction();
+		}
+		return true;
+	}
+
+	/**
+	 * Commits a transaction. http://www.php.net/manual/en/pdo.commit.php
+	 *
+	 * @return bool
+	 */
+	public function Commit()
+	{
+		if (NN_USE_SQL_TRANSACTIONS) {
+			return $this->pdo->commit();
+		}
+		return true;
+	}
+
+	/**
+	 * Rollback transcations. http://www.php.net/manual/en/pdo.rollback.php
+	 *
+	 * @return bool
+	 */
+	public function Rollback()
+	{
+		if (NN_USE_SQL_TRANSACTIONS) {
+			return $this->pdo->rollBack();
+		}
+		return true;
+	}
+
+	/**
+	 * PHP interpretation of MySQL's from_unixtime method.
+	 * @param int  $utime UnixTime
+	 *
+	 * @return bool|string
+	 */
+	public function from_unixtime($utime)
+	{
+		return 'FROM_UNIXTIME(' . $utime . ')';
+	}
+
+	/**
+	 * PHP interpretation of mysql's unix_timestamp method.
+	 * @param string $date
+	 *
+	 * @return int
+	 */
+	public function unix_timestamp($date)
+	{
+		return strtotime($date);
+	}
+
+	/**
+	 * Get a string for MySQL with a column name in between
+	 * ie: UNIX_TIMESTAMP(column_name) AS outputName
+	 *
+	 * @param string $column     The datetime column.
+	 * @param string $outputName The name to store the SQL data into. (the word after AS)
+	 *
+	 * @return string
+	 */
+	public function unix_timestamp_column($column, $outputName = 'unix_time')
+	{
+		return ('UNIX_TIMESTAMP(' . $column . ') AS ' . $outputName);
+	}
+
+	/**
+	 * Interpretation of mysql's UUID method.
+	 * Return uuid v4 string. http://www.php.net/manual/en/function.uniqid.php#94959
+	 *
+	 * @return string
+	 */
+	public function uuid()
+	{
+		return sprintf(
+			'%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+			mt_rand(0, 0xffff),
+			mt_rand(0, 0xffff),
+			mt_rand(0, 0xffff),
+			mt_rand(0, 0x0fff) | 0x4000,
+			mt_rand(0, 0x3fff) | 0x8000,
+			mt_rand(0, 0xffff),
+			mt_rand(0, 0xffff),
+			mt_rand(0, 0xffff)
+		);
 	}
 
 	/**
@@ -669,32 +1007,66 @@ class DB
 	public function ping($restart = false)
 	{
 		try {
-			return (bool)self::$instance->query('SELECT 1+1');
-		} catch (\PDOException $e) {
+			return (bool) $this->pdo->query('SELECT 1+1');
+		} catch (PDOException $e) {
 			if ($restart == true) {
 				$this->initialiseDatabase();
 			}
-
 			return false;
 		}
 	}
 
 	/**
-	 * Echo error, optionally exit.
+	 * Prepares a statement to be run by the Db engine.
+	 * To run the statement use the returned $statement with ->execute();
 	 *
-	 * @param string $error The error message.
-	 * @param bool   $exit  Exit or not?
+	 * Ideally the signature would have array before $options but that causes a strict warning.
 	 *
-	 * @internal param string $method The method where the error occured.
-	 * @internal param int $severity The severity of the error.
+	 * @param string $query SQL query to run, with optional place holders.
+	 * @param array $options Driver options.
+	 *
+	 * @return false|PDOstatement on success false on failure.
+	 *
+	 * @link http://www.php.net/pdo.prepare.php
 	 */
-	protected function echoError($error, $exit = false)
+	public function Prepare($query, $options = [])
 	{
-		echo(
-		($this->cli ? $this->log->error($error) . PHP_EOL : '<div class="error">' . $error . '</div>')
-		);
-		if ($exit) {
-			exit();
+		try {
+			$PDOstatement = $this->pdo->prepare($query, $options);
+		} catch (PDOException $e) {
+			if ($this->_debug) {
+				$this->debugging->log('DB', "Prepare", $e->getMessage(), Logger::LOG_INFO);
+			}
+			echo $this->log->error("\n" . $e->getMessage());
+			$PDOstatement = false;
 		}
+		return $PDOstatement;
 	}
+
+	/**
+	 * Retrieve db attributes http://us3.php.net/manual/en/pdo.getattribute.php
+	 *
+	 * @param int $attribute
+	 *
+	 * @return bool|mixed
+	 */
+	public function getAttribute($attribute)
+	{
+		$result = false;
+		if ($attribute != '') {
+			try {
+				$result = $this->pdo->getAttribute($attribute);
+			} catch (PDOException $e) {
+				if ($this->_debug) {
+					$this->debugging->log('DB', "getAttribute", $e->getMessage(), Logger::LOG_INFO);
+				}
+				echo $this->log->error("\n" . $e->getMessage());
+				$result = false;
+			}
+
+		}
+		return $result;
+	}
+
+
 }

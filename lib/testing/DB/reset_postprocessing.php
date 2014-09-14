@@ -1,8 +1,8 @@
 <?php
 require_once(dirname(__FILE__) . "/../../../bin/config.php");
 require_once(WWW_DIR . "/lib/framework/db.php");
-require_once("../../ColorCLI.php");
-require_once("../../consoletools.php");
+require_once(WWW_DIR . "/lib/ColorCLI.php");
+require_once(WWW_DIR . "/lib/ConsoleTools.php");
 
 $pdo = new DB();
 $consoletools = new ConsoleTools();

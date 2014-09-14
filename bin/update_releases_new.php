@@ -3,7 +3,7 @@ $time = TIME();
 require(dirname(__FILE__) . "/config.php");
 require_once(WWW_DIR . "/lib/releases.php");
 //require_once(WWW_DIR."/lib/sphinx.php");
-require_once(dirname(__FILE__) . '/../lib/ColorCLI.php');
+require_once(WWW_DIR . "/lib/ColorCLI.php");
 
 $c = new ColorCLI();
 if (!isset($argv[1])) {
