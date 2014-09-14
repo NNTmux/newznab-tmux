@@ -511,7 +511,7 @@ class Games
 		$defaultGenres = $gen->getGenres(Genres::GAME_TYPE);
 		$genreassoc = array();
 		foreach ($defaultGenres as $dg) {
-			$genreassoc[$dg['id']] = strtolower($dg['title']);
+			$genreassoc[$dg['ID']] = strtolower($dg['title']);
 		}
 
 		// Prepare database values.
