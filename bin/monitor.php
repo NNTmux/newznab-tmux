@@ -10,7 +10,7 @@ require_once(dirname(__FILE__) . "/../lib/functions.php");
 
 $version = "0.4r2100";
 
-$db = new Settings();
+$pdo = new Settings();
 $s = new Sites();
 $site = $s->get();
 $patch = $site->dbversion;
@@ -458,8 +458,8 @@ $mask4 = $c->primaryOver("%-16.16s") . " " . $c->tmuxOrange("%25.25s %25.25s");
 $mask5 = $c->tmuxOrange("%-16.16s %25.25s %25.25s");
 
 // Ananlyze tables
-printf($c->info("\nAnalyzing your tables to refresh your indexes."));
-$db->optimise(false, 'analyze', false, ['releases']);
+printf($pdo->log->info("\nAnalyzing your tables to refresh your indexes."));
+$pdo->optimise(false, 'analyze', false, ['releases']);
 
 sleep(5);
 
@@ -527,9 +527,9 @@ $fcnum = 0;
 while ($i > 0) {
 
 	//check the db connection
-	if ($db->ping(true) == false) {
+	if ($pdo->ping(true) == false) {
 		unset($pdo);
-		$db = new Settings();
+		$pdo = new Settings();
 	}
 	//kill mediainfo and ffmpeg if exceeds 60 sec
 	shell_exec("killall -o 60s -9 mediainfo 2>&1 1> /dev/null");
@@ -548,28 +548,28 @@ while ($i > 0) {
 
 	//run queries
 	$time01 = TIME();
-	$proc_tmux_result = $db->query($proc_tmux, false);
+	$proc_tmux_result = $pdo->query($proc_tmux, false);
 	$tmux_time = (TIME() - $time01);
 	if (((TIME() - $time19) >= $monitor && $running == 1) || ($i == 1)) {
 		echo $c->info("\nThe numbers(queries) above are currently being refreshed. \nNo pane(script) can be (re)started until these have completed.\n");
 
 		$time02 = TIME();
-		$split_result = $db->query($split_query, false);
+		$split_result = $pdo->query($split_query, false);
 		$split_time = (TIME() - $time02);
 		$split1_time = (TIME() - $time01);
 
 		$time03 = TIME();
-		$initquery = $db->query($qry, false);
+		$initquery = $pdo->query($qry, false);
 		$init_time = (TIME() - $time03);
 		$init1_time = (TIME() - $time01);
 
 		$time04 = TIME();
-		$proc_result = $db->query($proc);
+		$proc_result = $pdo->query($proc);
 		$proc1_time = (TIME() - $time04);
 		$proc11_time = (TIME() - $time01);
 
 		$time05 = TIME();
-		$proc_result2 = $db->query($proc2);
+		$proc_result2 = $pdo->query($proc2);
 		$proc2_time = (TIME() - $time05);
 		$proc21_time = (TIME() - $time01);
 
@@ -1210,7 +1210,7 @@ while ($i > 0) {
 		printf($mask3, "Query Block", "Time", "Cumulative");
 		printf($mask3, "======================================", "=========================", "======================================");
 
-		$pieces = explode(" ", $db->getAttribute(PDO::ATTR_SERVER_INFO));
+		$pieces = explode(" ", $pdo->getAttribute(PDO::ATTR_SERVER_INFO));
 		echo $c->primaryOver("\nThreads = ") . $c->headerOver($pieces[4]) . $c->primaryOver(', Opens ') . $c->headerOver($pieces[14]) . $c->primaryOver(', Tables = ') . $c->headerOver($pieces[22]) . $c->primaryOver(', Slow = ') . $c->headerOver($pieces[11]) . $c->primaryOver(', QPS = ') . $c->header($pieces[28]);
 	}
 
@@ -1925,8 +1925,8 @@ function run_ircscraper($tmux_session, $_php, $pane, $run_ircscraper)
 
 function run_sharing($tmux_session, $_php, $pane, $_sleep, $sharing_timer)
 {
-	$db = new Settings();
-	$sharing = $db->queryOneRow('SELECT enabled, posting, fetching FROM sharing');
+	$pdo = new Settings();
+	$sharing = $pdo->queryOneRow('SELECT enabled, posting, fetching FROM sharing');
 	$t = new Tmux();
 	$tmux = $t->get();
 	$tmux_share = (isset($tmux->run_sharing)) ? $tmux->run_sharing : 0;
