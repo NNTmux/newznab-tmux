@@ -1503,13 +1503,13 @@ class Releases
 
 		echo "\n\nStarting release update process (" . date("Y-m-d H:i:s") . ")\n";
 
-		if (!file_exists($page->site->nzbpath)) {
-			echo "Bad or missing nzb directory - " . $page->site->nzbpath;
+		if (!file_exists($page->settings->getSetting('nzbpath'))) {
+			echo "Bad or missing nzb directory - " . $page->settings->getSetting('nzbpath');
 
 			return -1;
 		}
 
-		$this->checkRegexesUptoDate($page->site->latestregexurl, $page->site->latestregexrevision, $page->site->newznabID);
+		$this->checkRegexesUptoDate($page->settings->getSetting('latestregexurl'), $page->settings->getSetting('latestregexrevision'), $page->settings->getSetting('newznabID'));
 
 		//
 		// Get all regexes for all groups which are to be applied to new binaries
@@ -1609,12 +1609,12 @@ class Releases
 					//
 					// Right number of files, but see if the binary is a allfilled/reqid post, in which case it needs its name looked up
 					//
-					if ($row['reqID'] != '' && $page->site->reqidurl != "") {
+					if ($row['reqID'] != '' && $page->settings->reqidurl != "") {
 						//
 						// Try and get the name using the group
 						//
 						$binGroup = $db->queryOneRow(sprintf("SELECT name FROM groups WHERE ID = %d", $row["groupID"]));
-						$newtitle = $this->getReleaseNameForReqId($page->site->reqidurl, $page->site->newznabID, $binGroup["name"], $row["reqID"]);
+						$newtitle = $this->getReleaseNameForReqId($page->settings->getSetting('reqidurl'), $page->settings->getSetting('newznabID'), $binGroup["name"], $row["reqID"]);
 
 						//
 						// if the feed/group wasnt supported by the scraper, then just use the release name as the title.
@@ -1716,7 +1716,7 @@ class Releases
 					$properName = true;
 				}
 			}
-			$relid = $this->insertRelease($cleanRelName, $db->escapeString(utf8_encode($cleanedName)), $row["parts"], $row["groupID"], $relguid, $catId, $row["regexID"], $row["date"], $row["fromname"], $row["reqID"], $page->site, Enzebe::NZB_NONE, $properName === true ? 1 : 0, $isReqID, $prehashID);
+			$relid = $this->insertRelease($cleanRelName, $db->escapeString(utf8_encode($cleanedName)), $row["parts"], $row["groupID"], $relguid, $catId, $row["regexID"], $row["date"], $row["fromname"], $row["reqID"], $page->settings, Enzebe::NZB_NONE, $properName === true ? 1 : 0, $isReqID, $prehashID);
 			//
 			// Tag every binary for this release with its parent release id
 			//
@@ -1728,7 +1728,7 @@ class Releases
 			//
 			// Write the nzb to disk
 			//
-			$nzbfile = $nzb->getNZBPath($relguid, $page->site->nzbpath, true);
+			$nzbfile = $nzb->getNZBPath($relguid, $page->settings->getSetting('nzbpath'), true);
 			$nzb->writeNZBforreleaseID($relid, $cleanRelName, $catId, $nzbfile);
 
 			//
@@ -1763,9 +1763,9 @@ class Releases
 		//
 		// Delete any releases under the minimum completion percent.
 		//
-		if ($page->site->completionpercent != 0) {
-			echo "Stage 4 : Deleting releases less than " . $page->site->completionpercent . " complete\n";
-			$result = $db->query(sprintf("select ID from releases where completion > 0 and completion < %d", $page->site->completionpercent));
+		if ($page->settings->getSetting('completionpercent') != 0) {
+			echo "Stage 4 : Deleting releases less than " . $page->settings->getSetting('completionpercent') . " complete\n";
+			$result = $db->query(sprintf("select ID from releases where completion > 0 and completion < %d", $page->settings->getSetting('completionpercent')));
 			foreach ($result as $row)
 				$this->delete($row["ID"]);
 		}
@@ -1812,13 +1812,13 @@ class Releases
 
 		// Remove the binaries and parts used to form releases, or that are duplicates.
 		//
-		if ($page->site->partsdeletechunks > 0) {
+		if ($page->settings->getSetting('partsdeletechunks') > 0) {
 			echo "Stage 7 : Chunk deleting unused binaries and parts";
 			$query = sprintf("SELECT parts.ID as partsID,binaries.ID as binariesID FROM parts
 						LEFT JOIN binaries ON binaries.ID = parts.binaryID
 						WHERE binaries.dateadded < %s - INTERVAL %d HOUR LIMIT 0,%d",
-				$db->escapeString($currTime_ori["now"]), ceil($page->site->rawretentiondays * 24),
-				$page->site->partsdeletechunks
+				$db->escapeString($currTime_ori["now"]), ceil($page->settings->getSetting('partsdeletechunks') * 24),
+				$page->settings->getSetting('partsdeletechunks')
 			);
 
 			$cc = 0;
@@ -1854,7 +1854,7 @@ class Releases
 		} else {
 			echo "Stage 7 : Deleting unused binaries and parts\n";
 			$db->queryExec(sprintf("DELETE parts, binaries FROM parts JOIN binaries ON binaries.ID = parts.binaryID
-			WHERE binaries.dateadded < %s - INTERVAL %d HOUR", $db->escapeString($currTime_ori["now"]), ceil($page->site->rawretentiondays * 24)
+			WHERE binaries.dateadded < %s - INTERVAL %d HOUR", $db->escapeString($currTime_ori["now"]), ceil($page->settings->getSetting('rawretentiondays') * 24)
 				)
 			);
 		}
@@ -1863,7 +1863,7 @@ class Releases
 		// User/Request housekeeping, should ideally move this to its own section, but it needs to be done automatically.
 		//
 		$users = new Users;
-		$users->pruneRequestHistory($page->site->userdownloadpurgedays);
+		$users->pruneRequestHistory($page->settings->getSetting('userdownloadpurgedays'));
 
 		echo "Done    : Added " . $retcount . " releases\n\n";
 
