@@ -6,4 +6,6 @@ INSERT IGNORE INTO settings (name , value, setting, hint) VALUES ('completionper
 INSERT IGNORE INTO settings (name , value, setting, hint) VALUES ('partsdeletechunks', '0', 'partsdeletechunks', 'How many parts to delete in one go');
 INSERT IGNORE INTO settings (name , value, setting, hint) VALUES ('rawretentiondays', '1.5', 'rawretentiondays', 'Sites retention');
 INSERT IGNORE INTO settings (name , value, setting, hint) VALUES ('userdownloadpurgedays', '0', 'userdownloadpurgedays', 'How many days to keep users downloads in database');
+INSERT IGNORE INTO settings (name , value, setting, hint) VALUES ('dbversion', '$Rev: 3174 $', 'dbversion', 'Version of the newznab database');
+
 UPDATE `tmux` SET `value` = '77' WHERE `setting` = 'sqlpatch';
