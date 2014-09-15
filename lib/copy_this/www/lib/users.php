@@ -16,13 +16,14 @@ class Users
 	const ERR_SIGNUP_UNAMEINUSE = -4;
 	const ERR_SIGNUP_EMAILINUSE = -5;
 	const ERR_SIGNUP_BADINVITECODE = -6;
-	const ERR_SIGNUP_BADCAPTCHA = -7;
+	const FAILURE = 0;
 	const SUCCESS = 1;
 
 	const ROLE_GUEST = 0;
 	const ROLE_USER = 1;
 	const ROLE_ADMIN = 2;
 	const ROLE_DISABLED = 3;
+	const ROLE_MODERATOR = 4;
 
 	const DEFAULT_INVITES = 1;
 	const DEFAULT_INVITE_EXPIRY_DAYS = 7;
@@ -33,9 +34,9 @@ class Users
 	/**
 	 * Users select queue type.
 	 */
-	const QUEUE_NONE = 0;
+	const QUEUE_NONE    = 0;
 	const QUEUE_SABNZBD = 1;
-	const QUEUE_NZBGET = 2;
+	const QUEUE_NZBGET  = 2;
 
 	public function get()
 	{

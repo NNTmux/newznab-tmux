@@ -40,6 +40,12 @@ class SABnzbd
 	public $integrated = self::INTEGRATION_TYPE_NONE;
 
 	/**
+	 * Is sab integrated into the site or not.
+	 * @var bool
+	 */
+	public $integratedBool = false;
+
+	/**
 	 * ID of the current user, to send to SAB when downloading a NZB.
 	 *
 	 * @var string
