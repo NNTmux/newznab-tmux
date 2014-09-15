@@ -109,7 +109,7 @@ class Binaries
 
 		// Connect to server
 		$data = $nntp->selectGroup($groupArr['name']);
-		if (PEAR::isError($data)) {
+		if (NNTP::isError($data)) {
 			echo "Could not select group (bad name?): {$groupArr['name']}$n $n";
 
 			return;
@@ -245,7 +245,7 @@ class Binaries
 		} else
 			$msgs = $nntp->getOverview($first . "-" . $last, true, false);
 
-		if (PEAR::isError($msgs) && ($msgs->code == 400 || $msgs->code == 503)) {
+		if (NNTP::isError($msgs) && ($msgs->code == 400 || $msgs->code == 503)) {
 			echo "NNTP connection timed out. Reconnecting...$n";
 			if (!$nntp->doConnect()) {
 				// TODO: What now?
@@ -272,7 +272,7 @@ class Binaries
 
 		$timeHeaders = number_format(microtime(true) - $this->startHeaders, 2);
 
-		if (PEAR::isError($msgs)) {
+		if (NNTP::isError($msgs)) {
 			echo "Error {$msgs->code}: {$msgs->message}$n";
 			echo "Skipping group$n";
 
