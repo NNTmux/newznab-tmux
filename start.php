@@ -1,6 +1,6 @@
 <?php
 require_once(dirname(__FILE__)."/bin/config.php");
-require_once(WWW_DIR . "lib/framework/db.php");
+require_once(WWW_DIR . "lib/framework/Settings.php");
 require_once (WWW_DIR.'/lib/site.php');
 require_once(WWW_DIR. '/lib/Tmux.php');
 require_once(WWW_DIR . "/lib/ColorCLI.php");
@@ -46,7 +46,7 @@ function writelog($pane)
 }
 
 //remove folders from tmpunrar
-if (isset($site->tmpunrarpath)) {
+if (isset ($db->getSetting('tmpunrarpath'))) {
 	$tmpunrar = $site->tmpunrarpath;
 	if ((count(glob("$tmpunrar/*", GLOB_ONLYDIR))) > 0) {
 		echo $c->info("Removing dead folders from " . $tmpunrar);
