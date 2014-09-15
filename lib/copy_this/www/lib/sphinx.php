@@ -974,7 +974,7 @@ class Sphinx
                                    $limit=100, $name="", $cat=array(-1),
                                    $maxage=-1, $indexes=array(), $lookup=true)
     {
-        $db = new DB;
+        $db = new Settings();
         $order = array("postdate", "desc");
         $search = array($name);
         if ($series != "") {
@@ -1040,7 +1040,7 @@ class Sphinx
                                    $cat=array(-1), $genre="", $maxage=-1,
                                    $indexes=array(), $lookup=true)
     {
-        $db = new DB;
+        $db = new Settings();
         $search = array();
         $order = array("postdate", "desc");
         $where = array();
@@ -1107,7 +1107,7 @@ class Sphinx
                                 $cat=array(-1), $maxage=-1, $indexes=array(),
                                 $lookup=true)
     {
-        $db = new DB;
+        $db = new Settings();
         $search = array();
         $where = array();
         $order = array("postdate", "desc");
@@ -1183,7 +1183,7 @@ class Sphinx
     public function searchBook($author, $title, $offset=0, $limit=100,
                                $maxage=-1, $indexes=array(), $lookup=true)
     {
-        $db = new DB;
+        $db = new Settings();
         $order = array("postdate", "desc");
         $search = array();
         if ($author != "") {

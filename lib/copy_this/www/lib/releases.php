@@ -1489,7 +1489,7 @@ class Releases
 	{
 		require_once(WWW_DIR . "/lib/binaries.php");
 
-		$db = new DB;
+		$db = new Settings();
 		$currTime_ori = $db->queryOneRow("SELECT NOW() as now");
 		$cat = new Categorize();
 		$nzb = new Nzb();

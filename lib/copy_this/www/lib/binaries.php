@@ -470,7 +470,7 @@ class Binaries
 	 */
 	private function partRepair($nntp, $group)
 	{
-		$db = new DB;
+		$db = new Settings();
 
 		$parts = array();
 		$chunks = array();
@@ -567,7 +567,7 @@ class Binaries
 	 */
 	private function addMissingParts($numbers, $groupID)
 	{
-		$db = new DB;
+		$db = new Settings();
 		$added = false;
 		$insertStr = "INSERT INTO partrepair (numberID, groupID) VALUES ";
 		foreach ($numbers as $number) {
