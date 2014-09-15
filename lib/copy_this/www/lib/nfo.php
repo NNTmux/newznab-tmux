@@ -6,21 +6,6 @@ require_once(WWW_DIR."/lib/nntp.php");
 require_once(WWW_DIR."/lib/nzb.php");
 require_once(WWW_DIR."/lib/nzbinfo.php");
 
-// Silent Error Handler (used to shut up noisy XML exceptions)
-function nfoHandleError($errno, $errstr, $errfile, $errline, array $errcontext){
-	if (0 === error_reporting())
-		return false;
-	if(!defined('E_STRICT'))define('E_STRICT', 2048);
-	switch($errno){
-		case E_WARNING:
-		case E_NOTICE:
-		case E_STRICT:
-			return;
-		default:
-			break;
-	};
-	throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
-}
 
 /**
  * This class looks up nfo files and handles storage/retrieval of them from the database.
