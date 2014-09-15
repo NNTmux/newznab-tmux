@@ -459,7 +459,7 @@ $mask5 = $c->tmuxOrange("%-16.16s %25.25s %25.25s");
 
 // Ananlyze tables
 printf($pdo->log->info("\nAnalyzing your tables to refresh your indexes."));
-$pdo->optimise(false, 'analyze', false, 'releases');
+$pdo->optimise(false, 'analyze', false, ['releases']);
 
 sleep(5);
 
