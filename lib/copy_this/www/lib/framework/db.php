@@ -516,7 +516,7 @@ class DB extends \PDO
 		}
 	}
 
-	/*/**
+	/**
 	 * Direct query. Return the affected row count. http://www.php.net/manual/en/pdo.exec.php
 	 *
 	 * @note If not "consumed", causes this error:
@@ -529,7 +529,7 @@ class DB extends \PDO
 	 *
 	 * @return bool|int|PDOStatement
 	 */
-	/*public function exec($query, $silent = false)
+	public function exec($query, $silent = false)
 	{
 		if (empty($query)) {
 			return false;
@@ -568,7 +568,7 @@ class DB extends \PDO
 
 			return false;
 		}
-	}*/
+	}
 
 	/**
 	 * Returns an array of result (empty array if no results or an error occurs)

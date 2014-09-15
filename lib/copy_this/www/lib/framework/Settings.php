@@ -46,9 +46,8 @@ class Settings extends DB
 	public function __construct(array $options = [])
 	{
 		parent::__construct($options);
-		$result         = parent::exec("describe settings");
+		$result         = parent::exec("describe settings", true);
 		$this->table = ($result === false) ? 'settings' : 'site';
-
 		return $this->pdo;
 	}
 
