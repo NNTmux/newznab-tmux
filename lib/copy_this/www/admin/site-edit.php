@@ -106,4 +106,3 @@ if (strpos(NNTP_SERVER, "astra")===false)
 
 $page->content = $page->smarty->fetch('site-edit.tpl');
 $page->render();
-
