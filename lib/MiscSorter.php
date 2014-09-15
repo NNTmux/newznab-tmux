@@ -1,5 +1,5 @@
 <?php
-require_once(WWW_DIR . "/lib/framework/db.php");
+require_once(WWW_DIR . "/lib/framework/Settings.php");
 require_once(WWW_DIR . "/lib/amazon.php");
 require_once(WWW_DIR . "/lib/Categorize.php");
 require_once(WWW_DIR . "/lib/book.php");

@@ -1,5 +1,5 @@
 <?php
-require_once(WWW_DIR . "/lib/framework/db.php");
+require_once(WWW_DIR . "/lib/framework/Settings.php");
 require_once(WWW_DIR . "/lib/binaries.php");
 require_once(WWW_DIR . "/lib/groups.php");
 require_once(WWW_DIR . "/lib/nntp.php");
@@ -25,7 +25,7 @@ class ReleaseRegex
 		if (!empty($this->regexes))
 			return $this->regexes;
 
-		$db = new DB();
+		$db = new Settings();
 
 		$where = "";
 		if ($activeonly)
@@ -68,7 +68,7 @@ class ReleaseRegex
 	public function getGroupsForSelect()
 	{
 
-		$db = new DB();
+		$db = new Settings();
 		$categories = $db->query("SELECT distinct coalesce(groupname,'all') as groupname from releaseregex order by groupname ");
 		$temp_array = array();
 
@@ -85,7 +85,7 @@ class ReleaseRegex
 	 */
 	public function getByID($id)
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		return $db->queryOneRow(sprintf("select * from releaseregex where ID = %d ", $id));
 	}
@@ -115,7 +115,7 @@ class ReleaseRegex
 	 */
 	public function delete($id)
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		return $db->queryExec(sprintf("DELETE from releaseregex where ID = %d", $id));
 	}
@@ -125,7 +125,7 @@ class ReleaseRegex
 	 */
 	public function update($regex)
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		$groupname = $regex["groupname"];
 		if ($groupname == "")
@@ -150,7 +150,7 @@ class ReleaseRegex
 	 */
 	public function add($regex)
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		$groupname = $regex["groupname"];
 		if ($groupname == "")
@@ -178,7 +178,7 @@ class ReleaseRegex
 		$outcome = @preg_match($regexArr["regex"], $binarySubject, $matches);
 		if ($outcome === false) {
 			echo "ERROR: " . ($regexArr["ID"] < 10000 ? "System" : "Custom") . " release regex '" . $regexArr["ID"] . "' is not a valid regex.\n";
-			$db = new DB();
+			$db = new Settings();
 			$db->queryExec(sprintf("update releaseregex set status=0 where ID = %d and status=1", $regexArr["ID"]));
 
 			return $ret;
@@ -309,7 +309,7 @@ class ReleaseRegex
 
 	public function fetchTestBinaries($groupname, $numarticles, $clearexistingbins)
 	{
-		$db = new DB();
+		$db = new Settings();
 		$nntp = new Nntp();
 		$binaries = new Binaries();
 		$groups = new Groups();

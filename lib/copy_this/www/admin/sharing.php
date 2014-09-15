@@ -6,7 +6,7 @@ require_once(WWW_DIR."/lib/framework/db.php");
 $page = new AdminPage();
 $page->title = 'Sharing Settings';
 
-$db = new DB();
+$db = new Settings();
 
 $offset = (isset($_GET['offset']) ? $_GET['offset'] : 0);
 

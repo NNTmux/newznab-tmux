@@ -79,7 +79,7 @@ Class Sharing
 		if (!is_null($db)) {
 			$this->db = $db;
 		} else {
-			$this->db = new DB();
+			$this->db = new Settings();
 		}
 
 		// Get all sharing info from DB.

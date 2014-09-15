@@ -17,7 +17,7 @@ function SplitSQL($file, $delimiter = ';')
 
 		if (is_resource($file) === true) {
 			$query = array();
-			$db = new DB();
+			$db = new Settings();
 			$dbsys = DB_TYPE;
 			$c = new ColorCLI();
 
@@ -77,7 +77,7 @@ function SplitSQL($file, $delimiter = ';')
 
 function BackupDatabase()
 {
-	$db = new DB();
+	$db = new Settings();
 	$c = new ColorCLI();
 	$DIR = dirname (__FILE__);
 
@@ -109,7 +109,7 @@ if (isset($os) && $os == "unix") {
 	$currentversion = $tmux->sqlpatch;
 	$patched = 0;
 	$patches = array();
-	$db = new DB();
+	$db = new Settings();
 	$backedup = false;
 	$c = new ColorCLI();
     $DIR = dirname (__FILE__);

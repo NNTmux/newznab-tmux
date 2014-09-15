@@ -34,7 +34,7 @@ class Music
 	 */
 	public function getMusicInfo($id)
 	{
-		$db = new DB();
+		$db = new Settings();
 		return $db->queryOneRow(sprintf("SELECT musicinfo.*, genres.title as genres FROM musicinfo left outer join genres on genres.ID = musicinfo.genreID where musicinfo.ID = %d ", $id));
 	}
 
@@ -43,7 +43,7 @@ class Music
 	 */
 	public function getMusicInfoByName($artist, $album)
 	{
-		$db = new DB();
+		$db = new Settings();
 		return $db->queryOneRow(sprintf("SELECT * FROM musicinfo where artist like %s and title like %s", $db->escapeString("%".$artist."%"),  $db->escapeString("%".$album."%")));
 	}
 
@@ -52,7 +52,7 @@ class Music
 	 */
 	public function getRange($start, $num)
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		if ($start === false)
 			$limit = "";
@@ -67,7 +67,7 @@ class Music
 	 */
 	public function getCount()
 	{
-		$db = new DB();
+		$db = new Settings();
 		$res = $db->queryOneRow("select count(ID) as num from musicinfo");
 		return $res["num"];
 	}
@@ -77,7 +77,7 @@ class Music
 	 */
 	public function getMusicCount($cat, $maxage=-1, $excludedcats=array())
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		$browseby = $this->getBrowseBy();
 
@@ -128,7 +128,7 @@ class Music
 	 */
 	public function getMusicRange($cat, $start, $num, $orderby, $maxage=-1, $excludedcats=array())
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		$browseby = $this->getBrowseBy();
 
@@ -258,7 +258,7 @@ class Music
 	 */
 	public function update($id, $title, $asin, $url, $salesrank, $artist, $publisher, $releasedate, $year, $tracks, $cover, $genreID)
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		$db->queryExec(sprintf("update musicinfo SET title=%s, asin=%s, url=%s, salesrank=%s, artist=%s, publisher=%s, releasedate='%s', year=%s, tracks=%s, cover=%d, genreID=%d, updateddate=NOW() WHERE ID = %d",
 				$db->escapeString($title), $db->escapeString($asin), $db->escapeString($url), $salesrank, $db->escapeString($artist), $db->escapeString($publisher), $releasedate, $db->escapeString($year), $db->escapeString($tracks), $cover, $genreID, $id));
@@ -269,7 +269,7 @@ class Music
 	 */
 	public function updateMusicInfo($artist, $album, $year)
 	{
-		$db = new DB();
+		$db = new Settings();
 		$gen = new Genres();
 		$ri = new ReleaseImage();
 
@@ -435,7 +435,7 @@ class Music
 	public function processMusicReleases()
 	{
 		$ret = 0;
-		$db = new DB();
+		$db = new Settings();
 		$numlookedup = 0;
 
 		$res = $db->queryDirect(sprintf("SELECT searchname, ID from releases where musicinfoID IS NULL and categoryID in ( select ID from category where parentID = %d ) ORDER BY postdate DESC LIMIT 1000", Category::CAT_PARENT_MUSIC));
@@ -559,7 +559,7 @@ class Music
 	 */
 	public function processMusicReleaseFromMediaInfo()
 	{
-		$db = new DB();
+		$db = new Settings();
 		$res = $db->query("SELECT r.searchname, ref.releaseID, ref.mediainfo FROM releaseextrafull ref INNER JOIN releases r ON r.ID = ref.releaseID WHERE r.musicinfoID = -2");
 
 		$rescount = sizeof($res);
@@ -619,7 +619,7 @@ class Music
 	 */
 	public function addUpdateMusicInfo($title, $asin, $url, $salesrank, $artist, $publisher, $releasedate, $review, $year, $genreID, $tracks, $cover)
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		if (strlen($year) > 4)  {
 			if (preg_match("/\d{4}/", $year, $matches))

@@ -45,19 +45,19 @@ class Nfo
 	 * @access public
 	 * @var Defines the maximum size a single segment can be before we can rule
 	 *      after a binary has matched a releaseregex
-	 */	
+	 */
 	const NFO_MAX_FILESIZE = 50000;
 
 	/**
 	 * @access public
 	 * @var Database flag for no NFO found
-	 */	
+	 */
 	const FLAG_NFO_MISSING = -1;
 
 	/**
 	 * @access public
 	 * @var Database flag NFO pending scan
-	 */	
+	 */
 	const FLAG_NFO_PENDING = 0;
 
 	/**
@@ -77,26 +77,26 @@ class Nfo
 		//              - 1 segment
 		//              - within byte size
 		//
-		
+
 		// Array of all possible matches to return
 		$nfo_idx = array();
-	
+
 		// Search for all entries that have a single segment
 		if (empty($nzbInfo->segmentfiles))
 			// Nothing to Return
 			return array();
-	
+
 		// Fetch Meta Information
 		if (isset($nzbInfo->metadata['name']))
 			$name = $nzbInfo->metadata['name'];
 		else
 			$name = "";
-	
+
 		$unordered_list=array();
 		foreach($nzbInfo->segmentfiles as $segment){
 			if ($segment['filesize'] > Nfo::NFO_MAX_FILESIZE)
 				continue;
-				
+
 			$unordered_list[] = array(
 				"name" => $name,
 				"subject" => $segment['subject'],
@@ -105,7 +105,7 @@ class Nfo
 				"groups" => $segment['groups']
 			);
 		}
-	
+
 		//
 		// Filter built list above based on subject line info
 		// hence... eliminate par2, nzb ... etc files
@@ -121,7 +121,7 @@ class Nfo
 				$nfo_idx[]=$n;
 			}
 		}
-	
+
 		// Handle Releases with Obfuscation
 		// Releases titled: f4ca0f95896da1d41254bf49791a86a2
 		if($this->use_obfuscated)
@@ -136,7 +136,7 @@ class Nfo
 					$nfo_idx[]=$n;
 				}
 			}
-	
+
 		// Fuzzy Parsing sees if it can identify other possible nfo's however
 		// they are appended to the end of the list obvious nfo's are always
 		// processed first
@@ -147,7 +147,7 @@ class Nfo
 					$nfo_idx[]=$n;
 				}
 			}
-	
+
 		// Return array of matched content in order (aprox)
 		// from very possible to... possible...
 		return $nfo_idx;
@@ -190,7 +190,7 @@ class Nfo
 	private function is_sfv(&$raw){
 		// scan a content and return true if it is detected to be
 		// an sfv file, otherwise return false
-	
+
 		// First we identify acceptable sfv lines, anything that
 		// does not match against the below causes this function to
 		// exit gracefully and report that were not dealing with
@@ -223,8 +223,8 @@ class Nfo
 		// the release id;  In the event we fetch the data and deem
 		// it no good, we need to add it to the skipped array which
 		// must be passed into the function.
-	
-		$db = new DB();
+
+		$db = new Settings();
 		foreach($blobhash as $uid => $blob){
 			$query = sprintf(
 				"REPLACE INTO releasenfo (ID, releaseID, binaryID, nfo) ".
@@ -297,17 +297,17 @@ class Nfo
 		//       ...
 		// The function strips indexes that appear invalid
 		// and stores the most ideal match per release
-	
+
 		$parsed_blob = array();
 		$parsed_meta = array();
-	
+
 		foreach($nfometa as $uid => $info){
 			$ideal = Null;
 			$tossed = 0;
 			$total = count($info);
 			foreach($info as $idx => $entry){
 				// Save first 'valid' entry
-	
+
 				// Some simple checks right off the top... if there is
 				// no blob or the data failed to fetch, we can rule
 				// this entry out right away
@@ -323,14 +323,14 @@ class Nfo
 					if($this->verbose) echo '-';
 					continue;
 				}
-	
+
 				// Eliminate detected xml (usually nzb) files
 				if(preg_match('/xmlns[^=]*="[^"]*"/i', $nfoblob[$uid][$idx]) ||
 					preg_match("/(\<\?xml[\d\D]*\?\>)/i", $nfoblob[$uid][$idx])){
 					if($this->verbose) echo '-';
 					continue;
 				}
-	
+
 				// We do not want to pick up sfv files
 				if($this->is_sfv($nfoblob[$uid][$idx])){
 					if($this->verbose) echo '-';
@@ -348,7 +348,7 @@ class Nfo
 				$ideal = $idx;
 				break;
 			}
-	
+
 			if($ideal !== Null){
 				// An ideal match was found
 				$parsed_blob[(string)$uid] = $nfoblob[$uid][$ideal];
@@ -360,14 +360,14 @@ class Nfo
 				unset($parsed_meta[(string)$uid]);
 			}
 		}
-	
+
 		// perform swap with new parsed data by elminating the array containing
 		// the possible matches with the absolute match itself...
 		// no longer is anyone dealing with an array of array after calling
 		// this function
 		$nfoblob = $parsed_blob;
 		$nfometa = $parsed_meta;
-	
+
 		return count($nfoblob);
 	}
 
@@ -407,7 +407,7 @@ class Nfo
 		//       ...
 		//  )
 		$nntp = new Nntp();
-	
+
 		// Connect to server (we throw an exception if we fail) which
 		// is caught upstairs with the nfo_grab() function
 		// no error handling is needed here
@@ -419,7 +419,7 @@ class Nfo
 				foreach($match["groups"] as $group){
 					// Don not try other groups if we already got it
 					if($fetched)break;
-		
+
 					// Select the group and then attempt to fetch the article
 					$blob = $nntp->getMessages($group, $match["segment"], false);
 					if ($blob === false){
@@ -430,7 +430,7 @@ class Nfo
 					// of the same thing
 					$fetched = true;
 					if($this->verbose) echo '.';
-		
+
 					// Update blob with decrypted version and store
 					if ($this->is_binary($blob)){
 						// Binary data is not acceptable, we only
@@ -473,7 +473,7 @@ class Nfo
 		}
 		// Restore handler as any future errors really are... code errors :)
 		restore_error_handler();
-	
+
 		if($retries>0){
 			foreach ($_blobhash as $k => $v)
 				$blobhash[(string)$k]=$v;
@@ -489,14 +489,14 @@ class Nfo
 		// nzb files are further parsed for nfo segments that can
 		// be extracted and applied to the release
 		$nzb = new NZB();
-		$db = new DB();
+		$db = new Settings();
 
 		// How many releases to handle at a time
 		$batch=Nfo::NNTP_BATCH_COUNT;
 
 		// Build NFO List
 		$nfometa = array();
-	
+
 		// Missing NFO Query (oldest first so they don't expire on us)
 		$mnfo = "SELECT ID,guid, name FROM releases r ".
 				"WHERE r.releasenfoID = ".Nfo::FLAG_NFO_PENDING.
@@ -515,7 +515,7 @@ class Nfo
 					$this->setNfoMissing($r["ID"]);
 					continue;
 				}
-	
+
 				$nzbInfo = new NzbInfo();
 				if (!$nzbInfo->loadFromFile($nzbfile))
                 {
@@ -524,12 +524,12 @@ class Nfo
 					$this->setNfoMissing($r["ID"]);
 					continue;
                 }
-                
+
                 $total+=1;
-	
+
 				$filename = basename($nzbfile);
 				if($this->verbose) echo sprintf("NfoProc : Scanning %s - ", $r["name"]);
-	
+
 				$matches = $this->nfo_scan($nzbInfo);
 				unset($nzbInfo);
 				if(is_array($matches)){
@@ -545,10 +545,10 @@ class Nfo
 				}
 				if($this->verbose) echo count($matches)." possible nfo(s).\n";
 				$processed++;
-	
+
 				// Hash Matches by Release ID
 				$nfometa[(string)$r["ID"]] = $matches;
-	
+
 				if(!($processed%$batch))
 				{
 					$nfoblob = array();
@@ -561,7 +561,7 @@ class Nfo
 						$this->store_blob($nfometa, $nfoblob, $removed);
 					}
 					if($this->verbose) echo "\n";
-	
+
 					// Reset nfo list array
 					$nfometa = array();
 				}
@@ -587,7 +587,7 @@ class Nfo
 	 */
 	public function deleteReleaseNfo($relid)
 	{
-		$db = new DB();
+		$db = new Settings();
 		return $db->queryExec(sprintf("DELETE from releasenfo where releaseID = %d", $relid));
 	}
 
@@ -596,7 +596,7 @@ class Nfo
 	 */
 	private function setNfoMissing($relid)
 	{
-		$db = new DB();
+		$db = new Settings();
 		$q = sprintf("UPDATE releases SET releasenfoID = %d ".
 					"WHERE ID = %d", Nfo::FLAG_NFO_MISSING, $relid);
 		return $db->queryExec($q);
@@ -607,7 +607,7 @@ class Nfo
 	 */
 	public function getNfo($relid, &$nfoout)
 	{
-		$db = new DB();
+		$db = new Settings();
 		// Has NFO Query
 		$mnfo = "SELECT uncompress(rn.nfo) as nfo FROM releases r ".
 			"INNER JOIN releasenfo rn ON rn.releaseID = r.ID AND rn.ID = r.releasenfoID ".
@@ -620,7 +620,7 @@ class Nfo
 		}
 		return false;
 	}
-		
+
 	/**
 	 * Process Nfo's
 	 */

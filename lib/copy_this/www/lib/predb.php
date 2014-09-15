@@ -21,7 +21,7 @@ class PreDB
 	 */
 	public function getByID($preID)
 	{
-		$db = new DB();
+		$db = new Settings();
 		$predbQuery = $db->query(sprintf("SELECT * FROM predb WHERE ID = %s LIMIT %d", $preID, 1));
 
 		return isset($predbQuery[0]) ? $predbQuery[0] : false;
@@ -32,7 +32,7 @@ class PreDB
 	 */
 	public function getByDirname($dirname)
 	{
-		$db = new DB();
+		$db = new Settings();
 		$dirname = str_replace(' ', '_', $dirname);
 		$predbQuery = $db->query(sprintf("SELECT * FROM predb WHERE dirname = %s LIMIT %d", $db->escapeString($dirname), 1));
 
@@ -57,12 +57,12 @@ class PreDB
     		    }
     		}
 	    }
-		
-		$db = new DB();
-		
+
+		$db = new Settings();
+
 		$dirname = empty($dirname) ? '' : sprintf("WHERE dirname LIKE %s", $db->escapeString('%'.$dirname.'%'));
 		$category = empty($category) ? '' : sprintf((empty($dirname) ? 'WHERE' : ' AND')." category = %s", $db->escapeString($category));
-		
+
 		$predbQuery = $db->queryOneRow(sprintf('SELECT COUNT(ID) AS num FROM predb %s %s', $dirname, $category), true);
 
 		return $predbQuery['num'];
@@ -86,9 +86,9 @@ class PreDB
            		}
     		}
 		}
-		
-		$db = new DB();
-		
+
+		$db = new Settings();
+
 		$dirname = str_replace(' ', '%', $dirname);
 		$dirname = empty($dirname) ? '' : sprintf('WHERE dirname LIKE %s', $db->escapeString('%'.$dirname.'%'));
 		$category = empty($category) ? '' : sprintf((empty($dirname) ? 'WHERE' : ' AND')." category = %s", $db->escapeString($category));
@@ -103,8 +103,8 @@ class PreDB
 	 */
 	public function processReleases($daysback = 3)
 	{
-		$db = new DB();
-		
+		$db = new Settings();
+
 		if ($this->echooutput)
 			echo "Predb   : Updating releases with pre data\n";
 
@@ -116,19 +116,19 @@ class PreDB
 			$sql = sprintf("SELECT ID FROM predb WHERE dirname = %s LIMIT 1", $db->escapeString($arr['searchname']));
 			$predbQuery = $db->queryOneRow($sql);
 
-			if($predbQuery) 
+			if($predbQuery)
 			{
 				$db->queryExec(sprintf('UPDATE releases SET preID = %d WHERE ID = %d', $predbQuery['ID'], $arr['ID']));
-			
+
 				$matched++;
 			}
 		}
-		
+
 		if($this->echooutput)
 			echo "Predb   : Matched pre data to ".$matched." releases\n";
-		
+
 	}
-	
+
 	/**
 	 * Add/Update predb row.
 	 */
@@ -148,31 +148,31 @@ class PreDB
 				(!empty($preArray['filecount']) ? (int) $preArray['filecount'] : 0),
 				(!empty($preArray['nuke_filename']) ? $db->escapeString($preArray['nuke_filename']) : '""')
 			));
-						
-			//$newCheck = mysql_affected_rows();			
+
+			//$newCheck = mysql_affected_rows();
 			//if($this->echooutput && $newCheck > 0)
 			//	echo "!PRE: [".date('Y-m-d H:i:s', $preArray['ctime']).'] - [ '.$preArray['dirname'].' ] - ['.$preArray['category']."]\n";
-		
+
 			return true;
 		}
-		else 
+		else
 		{
 			$db->queryExec(sprintf("update predb
 				SET nuketype=%s, nukereason=%s, nuketime=%d
 				WHERE dirname = %s",
-				$db->escapeString($preArray['category']),				
+				$db->escapeString($preArray['category']),
 				(!empty($preArray['nuke_filename']) ? $db->escapeString($preArray['nuke_filename']) : '""'),
 				$preArray['ctime'],
 				$db->escapeString($preArray['dirname'])
 			));
-			
+
 			//$newCheck = mysql_affected_rows();
 			//if($this->echooutput && $newCheck > 0)
 			//	echo $preArray['category'].': ['.date('Y-m-d H:i:s', $preArray['ctime']).'] - [ '.$preArray['dirname'].' ] - ['.$preArray['nuke_filename']."]\n";
-			
+
 			return true;
 		}
-		
+
 		return false;
 	}
 
@@ -180,7 +180,7 @@ class PreDB
 	 * XOR decode a string with a key.
 	 */
 	function xorDecode($subject, $nzprekey)
-	{	
+	{
 		return ($nzprekey ^ base64_decode($subject));
 	}
 
@@ -200,19 +200,19 @@ class PreDB
 	public function nzpreUpdate()
 	{
 		require_once(WWW_DIR."/lib/nntp.php");
-	
+
 		$s = new Sites();
 		$site = $s->get();
-		
+
 		if(empty($site->nzpregroup) || empty($site->nzpresubject) || empty($site->nzpreposter) || empty($site->nzprefield) || empty($site->nzprekey))
 			return false;
-		
-		if($this->echooutput) 
+
+		if($this->echooutput)
 			echo "Predb   : Checking for new pre data ";
-		
-		$db = new DB();
+
+		$db = new Settings();
 		$nntp = new Nntp();
-	
+
 		if(!$nntp->doConnect()) {
             echo "Failed to get NNTP connection\n";
 			return false;
@@ -229,18 +229,18 @@ class PreDB
 			echo "Predb   : Error ".$ret->getMessage()."\n";
 			return false;
 		}
-	
+
 		$added_updated = 0;
 		$nzprekey = $site->nzprekey;
 		while(strlen($nzprekey) < 1024)
 			$nzprekey = $nzprekey.$nzprekey;
-		
+
 		$cnt = !empty($site->nzprearticles) ? $site->nzprearticles : 500;
 		foreach($groupMsgs as $groupMsg) {
 			if ($cnt%50==0 && $cnt != 0 && $this->echooutput)
 				echo $cnt."..";
 			$cnt--;
-			
+
 			if(preg_match('/^'.$site->nzpresubject.'$/', $groupMsg['Subject']) && preg_match('/^'.$site->nzpreposter.'$/', $groupMsg['From'])) {
 				$ret = $msgHeader = $nntp->getHeader($groupMsg['Message-ID']);
 				if(PEAR::isError($ret))
@@ -255,7 +255,7 @@ class PreDB
 								$added_updated++;
 							}
 						}
-						
+
 						break;
 					}
 				}
@@ -263,8 +263,8 @@ class PreDB
 		}
 
 		$nntp->disconnect();
-		
-		if($this->echooutput) 
+
+		if($this->echooutput)
 			echo "\nPredb   : Added/Updated ".$added_updated." records\n";
 	}
 }

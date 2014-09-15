@@ -113,7 +113,7 @@ class Enzebe
 		$this->site = new Sites();
 		$this->bname = 'binaries';
 		$this->pname = 'parts';
-		$this->db = new DB();
+		$this->db = new Settings();
 		$fp = gzopen($path, 'w5');
 		if ($fp) {
 			$nzb_guid = '';

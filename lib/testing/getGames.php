@@ -6,7 +6,7 @@ require_once(WWW_DIR . "/lib/ColorCLI.php");
 
 
 $game = new Games(true);
-$pdo = new DB();
+$pdo = new Settings();
 $c = new ColorCLI();
 
 $res = $pdo->query(

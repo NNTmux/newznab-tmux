@@ -10,7 +10,7 @@ require_once(dirname(__FILE__) . "/../lib/functions.php");
 
 $version = "0.4r2100";
 
-$db = new DB();
+$db = new Settings();
 $s = new Sites();
 $site = $s->get();
 $patch = $site->dbversion;
@@ -1925,7 +1925,7 @@ function run_ircscraper($tmux_session, $_php, $pane, $run_ircscraper)
 
 function run_sharing($tmux_session, $_php, $pane, $_sleep, $sharing_timer)
 {
-	$db = new DB();
+	$db = new Settings();
 	$sharing = $db->queryOneRow('SELECT enabled, posting, fetching FROM sharing');
 	$t = new Tmux();
 	$tmux = $t->get();

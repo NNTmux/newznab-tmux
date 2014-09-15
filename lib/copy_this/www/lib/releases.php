@@ -1,5 +1,5 @@
 <?php
-require_once(WWW_DIR . "/lib/framework/db.php");
+require_once(WWW_DIR . "/lib/framework/Settings.php");
 require_once(WWW_DIR . "/lib/page.php");
 require_once(WWW_DIR . "/lib/users.php");
 require_once(WWW_DIR . "/lib/releaseregex.php");
@@ -85,7 +85,7 @@ class Releases
 	 */
 	public function getByNames($names)
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		$nsql = "1=2";
 		if (count($names) > 0) {
@@ -119,7 +119,7 @@ class Releases
 	 */
 	public function getCount()
 	{
-		$db = new DB();
+		$db = new Settings();
 		$res = $db->queryOneRow("select count(ID) as num from releases");
 
 		return $res["num"];
@@ -130,7 +130,7 @@ class Releases
 	 */
 	public function getRange($start, $num)
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		if ($start === false)
 			$limit = "";
@@ -145,7 +145,7 @@ class Releases
 	 */
 	public function getPreviewCount($previewtype, $cat)
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		$catsrch = "";
 		if (count($cat) > 0 && $cat[0] != -1) {
@@ -180,7 +180,7 @@ class Releases
 	 */
 	public function getPreviewRange($previewtype, $cat, $start, $num)
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		$catsrch = "";
 		if (count($cat) > 0 && $cat[0] != -1) {
@@ -220,7 +220,7 @@ class Releases
 	 */
 	public function getBrowseCount($cat, $maxage = -1, $excludedcats = array(), $grp = array())
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		$catsrch = "";
 		if (count($cat) > 0 && $cat[0] != -1) {
@@ -273,7 +273,7 @@ class Releases
 	 */
 	public function getBrowseRange($cat, $start, $num, $orderby, $maxage = -1, $excludedcats = array(), $grp = array())
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		if ($start === false)
 			$limit = "";
@@ -383,7 +383,7 @@ class Releases
 	 */
 	public function getForExport($postfrom, $postto, $group, $cat)
 	{
-		$db = new DB();
+		$db = new Settings();
 		if ($postfrom != "") {
 			$dateparts = explode("/", $postfrom);
 			if (count($dateparts) == 3)
@@ -418,7 +418,7 @@ class Releases
 	 */
 	public function getEarliestUsenetPostDate()
 	{
-		$db = new DB();
+		$db = new Settings();
 		$row = $db->queryOneRow("SELECT DATE_FORMAT(min(postdate), '%d/%m/%Y') as postdate from releases");
 
 		return $row["postdate"];
@@ -429,7 +429,7 @@ class Releases
 	 */
 	public function getLatestUsenetPostDate()
 	{
-		$db = new DB();
+		$db = new Settings();
 		$row = $db->queryOneRow("SELECT DATE_FORMAT(max(postdate), '%d/%m/%Y') as postdate from releases");
 
 		return $row["postdate"];
@@ -440,7 +440,7 @@ class Releases
 	 */
 	public function getReleasedGroupsForSelect($blnIncludeAll = true)
 	{
-		$db = new DB();
+		$db = new Settings();
 		$groups = $db->query("select distinct groups.ID, groups.name from releases inner join groups on groups.ID = releases.groupID");
 		$temp_array = array();
 
@@ -458,7 +458,7 @@ class Releases
 	 */
 	public function getRss($cat, $num, $uid = 0, $rageid, $anidbid, $airdate = -1)
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		$limit = " LIMIT 0," . ($num > 100 ? 100 : $num);
 
@@ -505,7 +505,7 @@ class Releases
 	 */
 	public function getShowsRss($num, $uid = 0, $excludedcats = array(), $airdate = -1)
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		$exccatlist = "";
 		if (count($excludedcats) > 0)
@@ -555,7 +555,7 @@ class Releases
 	 */
 	public function getMyMoviesRss($num, $uid = 0, $excludedcats = array())
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		$exccatlist = "";
 		if (count($excludedcats) > 0)
@@ -597,7 +597,7 @@ class Releases
 	 */
 	public function getShowsRange($usershows, $start, $num, $orderby, $maxage = -1, $excludedcats = array())
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		if ($start === false)
 			$limit = "";
@@ -637,7 +637,7 @@ class Releases
 	 */
 	public function getShowsCount($usershows, $maxage = -1, $excludedcats = array())
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		$exccatlist = "";
 		if (count($excludedcats) > 0)
@@ -671,7 +671,7 @@ class Releases
 	 */
 	public function delete($id, $isGuid = false)
 	{
-		$db = new DB();
+		$db = new Settings();
 		$users = new Users();
 		$s = new Sites();
 		$nfo = new Nfo();
@@ -732,7 +732,7 @@ class Releases
 	 */
 	public function deleteSingle($guid, $id, $nzb, $releaseImage)
 	{
-		$db = new DB();
+		$db = new Settings();
 		$releaseImage = new ReleaseImage();
 		// Delete NZB from disk.
 		$nzbPath = $nzb->getNZBPath($guid);
@@ -776,7 +776,7 @@ class Releases
 	 */
 	public function update($id, $name, $searchname, $fromname, $category, $parts, $grabs, $size, $posteddate, $addeddate, $rageid, $seriesfull, $season, $episode, $imdbid, $anidbid, $tvdbid, $consoleinfoid)
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		$db->queryExec(sprintf("update releases set name=%s, searchname=%s, fromname=%s, categoryID=%d, totalpart=%d, grabs=%d, size=%s, postdate=%s, adddate=%s, rageID=%d, seriesfull=%s, season=%s, episode=%s, imdbID=%d, anidbID=%d, tvdbID=%d,consoleinfoID=%d where id = %d",
 				$db->escapeString($name), $db->escapeString($searchname), $db->escapeString($fromname), $category, $parts, $grabs, $db->escapeString($size), $db->escapeString($posteddate), $db->escapeString($addeddate), $rageid, $db->escapeString($seriesfull), $db->escapeString($season), $db->escapeString($episode), $imdbid, $anidbid, $tvdbid, $consoleinfoid, $id
@@ -800,7 +800,7 @@ class Releases
 			'imdbID'     => $imdbid
 		);
 
-		$db = new DB();
+		$db = new Settings();
 		$updateSql = array();
 		foreach ($update as $updk => $updv) {
 			if ($updv != '')
@@ -827,7 +827,7 @@ class Releases
 	 */
 	public function updateHasPreview($guid, $haspreview)
 	{
-		$db = new DB();
+		$db = new Settings();
 		$db->queryExec(sprintf("update releases set haspreview = %d where guid = %s", $haspreview, $db->escapeString($guid)));
 	}
 
@@ -858,7 +858,7 @@ class Releases
 		//
 		// Search using MySQL
 		//
-		$db = new DB();
+		$db = new Settings();
 
 		$catsrch = "";
 		$usecatindex = "";
@@ -972,7 +972,7 @@ class Releases
 				return $results;
 		}
 
-		$db = new DB();
+		$db = new Settings();
 
 		if ($rageId != "-1")
 			$rageId = sprintf(" and rageID = %d ", $rageId);
@@ -1076,7 +1076,7 @@ class Releases
 				return $results;
 		}
 
-		$db = new DB();
+		$db = new Settings();
 
 		$anidbID = ($anidbID > -1) ? sprintf(" AND anidbID = %d ", $anidbID) : '';
 
@@ -1142,7 +1142,7 @@ class Releases
 				return $results;
 		}
 
-		$db = new DB();
+		$db = new Settings();
 		$searchsql = "";
 
 		if ($artist != "")
@@ -1222,7 +1222,7 @@ class Releases
 				return $results;
 		}
 
-		$db = new DB();
+		$db = new Settings();
 		$searchsql = "";
 
 		if ($author != "")
@@ -1262,7 +1262,7 @@ class Releases
 				return $results;
 		}
 
-		$db = new DB();
+		$db = new Settings();
 
 		if ($imdbId != "-1" && is_numeric($imdbId)) {
 			//pad id with zeros just in case
@@ -1383,7 +1383,7 @@ class Releases
 	 */
 	public function getByGuid($guid)
 	{
-		$db = new DB();
+		$db = new Settings();
 		if (is_array($guid)) {
 			$tmpguids = array();
 			foreach ($guid as $g)
@@ -1433,7 +1433,7 @@ class Releases
 	 */
 	public function removeRageIdFromReleases($rageid)
 	{
-		$db = new DB();
+		$db = new Settings();
 		$res = $db->queryOneRow(sprintf("select count(ID) as num from releases where rageID = %d", $rageid));
 		$ret = $res["num"];
 		$db->queryExec(sprintf("update releases set rageID = -1, seriesfull = null, season = null, episode = null where rageID = %d", $rageid));
@@ -1446,7 +1446,7 @@ class Releases
 	 */
 	public function removeThetvdbIdFromReleases($tvdbID)
 	{
-		$db = new DB();
+		$db = new Settings();
 		$res = $db->queryOneRow(sprintf("SELECT count(ID) AS num FROM releases WHERE tvdbID = %d", $tvdbID));
 		$ret = $res["num"];
 		$res = $db->queryExec(sprintf("update releases SET tvdbID = -1 where tvdbID = %d", $tvdbID));
@@ -1456,7 +1456,7 @@ class Releases
 
 	public function removeAnidbIdFromReleases($anidbID)
 	{
-		$db = new DB();
+		$db = new Settings();
 		$res = $db->queryOneRow(sprintf("SELECT count(ID) AS num FROM releases WHERE anidbID = %d", $anidbID));
 		$ret = $res["num"];
 		$db->queryExec(sprintf("update releases SET anidbID = -1, episode = null, tvtitle = null, tvairdate = null where anidbID = %d", $anidbID));
@@ -1466,14 +1466,14 @@ class Releases
 
 	public function getById($id)
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		return $db->queryOneRow(sprintf("select releases.*, groups.name as group_name from releases left outer join groups on groups.ID = releases.groupID where releases.ID = %d ", $id));
 	}
 
 	public function getReleaseNfo($id, $incnfo = true)
 	{
-		$db = new DB();
+		$db = new Settings();
 		$selnfo = ($incnfo) ? ', uncompress(nfo) as nfo' : '';
 
 		return $db->queryOneRow(sprintf("SELECT ID, releaseID" . $selnfo . " FROM releasenfo where releaseID = %d AND nfo IS NOT NULL", $id));
@@ -1481,7 +1481,7 @@ class Releases
 
 	public function updateGrab($guid)
 	{
-		$db = new DB();
+		$db = new Settings();
 		$db->queryExec(sprintf("update releases set grabs = grabs + 1 where guid = %s", $db->escapeString($guid)));
 	}
 
@@ -1872,7 +1872,7 @@ class Releases
 
 	public function insertRelease($cleanRelName, $cleanedName, $parts, $group, $guid, $catId, $regexID, $date, $fromname, $reqID, $site, $nzbstatus, $isrenamed, $isReqID, $prehashID)
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		if ($regexID == "")
 			$regexID = " null ";
@@ -1953,7 +1953,7 @@ class Releases
 				if (preg_match('/\/\*\$Rev: (\d{3,4})/i', $regfile, $matches)) {
 					$serverrev = intval($matches[1]);
 					if ($serverrev > $rev) {
-						$db = new DB();
+						$db = new Settings();
 						$site = new Sites;
 
 						$queries = explode(";", $regfile);
@@ -1980,7 +1980,7 @@ class Releases
 
 	public function getTopDownloads()
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		return $db->query("SELECT ID, searchname, guid, adddate, grabs FROM releases
 							where grabs > 0
@@ -1991,7 +1991,7 @@ class Releases
 
 	public function getTopComments()
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		return $db->query("SELECT ID, guid, searchname, adddate, comments FROM releases
 							where comments > 0
@@ -2002,7 +2002,7 @@ class Releases
 
 	public function getRecentlyAdded()
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		return $db->query("SELECT concat(cp.title, ' > ', category.title) as title, COUNT(*) AS count
                             FROM category
@@ -2021,7 +2021,7 @@ class Releases
 	 */
 	public function getNewestMovies()
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		return $db->query(
 			"SELECT DISTINCT (a.imdbID),
@@ -2047,7 +2047,7 @@ class Releases
 	 */
 	public function getNewestConsole()
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		return $db->query(
 			"SELECT DISTINCT (a.consoleinfoID),
@@ -2073,7 +2073,7 @@ class Releases
 	 */
 	public function getNewestGames()
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		return $db->query(
 			"SELECT DISTINCT (a.gamesinfo_id),
@@ -2099,7 +2099,7 @@ class Releases
 	 */
 	public function getNewestMP3s()
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		return $db->query(
 			"SELECT DISTINCT (a.musicinfoID),
@@ -2125,7 +2125,7 @@ class Releases
 	 */
 	public function getNewestBooks()
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		return $db->query(
 			"SELECT DISTINCT (a.bookinfoID),

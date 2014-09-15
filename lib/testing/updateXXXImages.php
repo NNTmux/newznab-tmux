@@ -1,9 +1,9 @@
 <?php
 require_once(dirname(__FILE__) . "/../../bin/config.php");
-require_once(WWW_DIR . "/lib/framework/db.php");
+require_once(WWW_DIR . "/lib/framework/Settings.php");
 require_once(WWW_DIR . "/lib/ColorCLI.php");
 
-$pdo = new DB();
+$pdo = new Settings();
 $c = new ColorCLI();
 $covers = $updated = $deleted = 0;
 

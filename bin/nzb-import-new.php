@@ -20,7 +20,7 @@ if (!isset($argv[1])) {
 	));
 }
 
-$db = new DB();
+$db = new Settings();
 $binaries = new Binaries();
 $s = new Sites();
 $site = $s->get();

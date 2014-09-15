@@ -1,5 +1,5 @@
 <?php
-require_once(WWW_DIR . "/lib/framework/db.php");
+require_once(WWW_DIR . "/lib/framework/Settings.php");
 require_once(WWW_DIR . "/lib/site.php");
 require_once(WWW_DIR . "/lib/category.php");
 require_once(WWW_DIR . "/lib/movie.php");
@@ -42,7 +42,7 @@ class Parsing
 	public function process()
 	{
 
-		$db = new DB();
+		$db = new Settings();
 
 		// Default query for both full db and last 4 hours.
 		$sql = "SELECT r.searchname, r.name, r.fromname, r.ID as RID, r.categoryID, r.guid, r.postdate,
@@ -819,7 +819,7 @@ class Parsing
 				echo " Status: 		Release changed\n\n";
 			}
 			if (!$this->echoonly) {
-				$db = new DB();
+				$db = new Settings();
 				$db->queryExec(sprintf("update releases SET name = %s, searchname = %s, categoryID = %d, imdbID = NULL, rageID = -1, bookinfoID = NULL, musicinfoID = NULL, consoleinfoID = NULL WHERE releases.ID = %d", $db->escapeString($name), $db->escapeString($searchname), $categoryID, $rel['RID']));
 			}
 			$this->numupdated++;

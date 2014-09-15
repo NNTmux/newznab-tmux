@@ -5,7 +5,7 @@ require_once(dirname(__FILE__) . "/../../bin/config.php");
 require_once(WWW_DIR."lib/framework/db.php");
 
 $sql = "SHOW tables";
-$db = new DB();
+$db = new Settings();
 
 if (isset($argv[1]) && $argv[1] == "myisam")
 {

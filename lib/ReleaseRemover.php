@@ -1,6 +1,6 @@
 <?php
 require_once(WWW_DIR . "/lib/framework/cache.php");
-require_once(WWW_DIR . "/lib/framework/db.php");
+require_once(WWW_DIR . "/lib/framework/Settings.php");
 require_once(WWW_DIR . "/lib/releases.php");
 require_once(WWW_DIR . "/lib/category.php");
 require_once(WWW_DIR . "/lib/releaseimage.php");
@@ -139,7 +139,7 @@ class ReleaseRemover
 	 */
 	public function __construct($browser = false, $echo = true)
 	{
-		$this->db = new DB();
+		$this->db = new Settings();
 		$this->color = new ColorCLI();
 		$this->consoleTools = new ConsoleTools();
 		$this->releases = new Releases();

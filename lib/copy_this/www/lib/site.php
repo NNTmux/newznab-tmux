@@ -1,5 +1,5 @@
 <?php
-require_once(WWW_DIR . "/lib/framework/db.php");
+require_once(WWW_DIR . "/lib/framework/Settings.php");
 require_once(WWW_DIR . "/lib/framework/cache.php");
 
 class Sites
@@ -25,7 +25,7 @@ class Sites
 
 	public function update($form)
 	{
-		$db = new DB();
+		$db = new Settings();
 		$site = $this->row2Object($form);
 
 		if (substr($site->nzbpath, strlen($site->nzbpath) - 1) != '/')
@@ -78,7 +78,7 @@ class Sites
 			$cache->delete($sql);
 		}
 
-		$db = new DB();
+		$db = new Settings();
 		$rows = $db->query($sql, true, NN_CACHE_EXPIRY_MEDIUM);
 
 		if ($rows === false)
@@ -130,7 +130,7 @@ class Sites
 
 	public function updateItem($setting, $value)
 	{
-		$db = new DB();
+		$db = new Settings();
 		$sql = sprintf("update site set value = %s where setting = %s", $db->escapeString($value), $db->escapeString($setting));
 
 		return $db->queryExec($sql);

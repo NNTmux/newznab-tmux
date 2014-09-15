@@ -11,21 +11,21 @@ class Forum
 	 */
 	public function add($parentid, $userid, $subject, $message, $locked = 0, $sticky = 0, $replies = 0)
 	{
-		$db = new DB();
-		
+		$db = new Settings();
+
 		if ($message == "")
 			return -1;
-		
+
 		if ($parentid != 0)
 		{
 			$par = $this->getParent($parentid);
 			if ($par == false)
 				return -1;
-				
+
 			$db->queryExec(sprintf("update forumpost set replies = replies + 1, updateddate = now() where ID = %d", $parentid));
 		}
-		
-		$db->queryInsert(sprintf("INSERT INTO `forumpost` (`forumID`,`parentID`,`userID`,`subject`,`message`, `locked`, `sticky`, `replies`, `createddate`, `updateddate`) VALUES ( 1,  %d, %d,  %s,  %s, %d, %d, %d,NOW(),  NOW())", 
+
+		$db->queryInsert(sprintf("INSERT INTO `forumpost` (`forumID`,`parentID`,`userID`,`subject`,`message`, `locked`, `sticky`, `replies`, `createddate`, `updateddate`) VALUES ( 1,  %d, %d,  %s,  %s, %d, %d, %d,NOW(),  NOW())",
 			$parentid, $userid, $db->escapeString($subject)	, $db->escapeString($message), $locked, $sticky, $replies));
 	}
 
@@ -34,8 +34,8 @@ class Forum
 	 */
 	public function getParent($parent)
 	{
-		$db = new DB();
-		return $db->queryOneRow(sprintf(" SELECT forumpost.*, users.username from forumpost left outer join users on users.ID = forumpost.userID where forumpost.ID = %d ", $parent));		
+		$db = new Settings();
+		return $db->queryOneRow(sprintf(" SELECT forumpost.*, users.username from forumpost left outer join users on users.ID = forumpost.userID where forumpost.ID = %d ", $parent));
 	}
 
 	/**
@@ -43,8 +43,8 @@ class Forum
 	 */
 	public function getRecentPosts($limit)
 	{
-		$db = new DB();
-		return $db->query(sprintf("select forumpost.*, users.username from forumpost join (select case when parentID = 0 then ID else parentID end as ID, max(createddate) from forumpost group by case when parentID = 0 then ID else parentID end order by max(createddate) desc) x on x.ID = forumpost.ID inner join users on userID = users.ID limit %d", $limit));		
+		$db = new Settings();
+		return $db->query(sprintf("select forumpost.*, users.username from forumpost join (select case when parentID = 0 then ID else parentID end as ID, max(createddate) from forumpost group by case when parentID = 0 then ID else parentID end order by max(createddate) desc) x on x.ID = forumpost.ID inner join users on userID = users.ID limit %d", $limit));
 	}
 
 
@@ -53,8 +53,8 @@ class Forum
 	 */
 	public function getPosts($parent)
 	{
-		$db = new DB();
-		return $db->query(sprintf(" SELECT forumpost.*, CASE WHEN role=%d THEN 1 ELSE 0 END  AS 'isadmin', users.username from forumpost left outer join users on users.ID = forumpost.userID where forumpost.ID = %d or parentID = %d order by createddate asc limit 250", Users::ROLE_ADMIN, $parent, $parent));		
+		$db = new Settings();
+		return $db->query(sprintf(" SELECT forumpost.*, CASE WHEN role=%d THEN 1 ELSE 0 END  AS 'isadmin', users.username from forumpost left outer join users on users.ID = forumpost.userID where forumpost.ID = %d or parentID = %d order by createddate asc limit 250", Users::ROLE_ADMIN, $parent, $parent));
 	}
 
 	/**
@@ -62,8 +62,8 @@ class Forum
 	 */
 	public function getPost($id)
 	{
-		$db = new DB();
-		return $db->queryOneRow(sprintf(" SELECT * from forumpost where ID = %d", $id));		
+		$db = new Settings();
+		return $db->queryOneRow(sprintf(" SELECT * from forumpost where ID = %d", $id));
 	}
 
 	/**
@@ -71,8 +71,8 @@ class Forum
 	 */
 	public function getBrowseCount()
 	{
-		$db = new DB();
-		$res = $db->queryOneRow(sprintf("select count(ID) as num from forumpost where parentID = 0"));		
+		$db = new Settings();
+		$res = $db->queryOneRow(sprintf("select count(ID) as num from forumpost where parentID = 0"));
 		return $res["num"];
 	}
 
@@ -81,14 +81,14 @@ class Forum
 	 */
 	public function getBrowseRange($start, $num)
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		if ($start === false)
 			$limit = "";
 		else
 			$limit = " LIMIT ".$start.",".$num;
 
-		return $db->query(sprintf(" SELECT forumpost.*, users.username from forumpost left outer join users on users.ID = forumpost.userID where parentID = 0 order by updateddate desc".$limit ));		
+		return $db->query(sprintf(" SELECT forumpost.*, users.username from forumpost left outer join users on users.ID = forumpost.userID where parentID = 0 order by updateddate desc".$limit ));
 	}
 
 	/**
@@ -96,7 +96,7 @@ class Forum
 	 */
 	public function deleteParent($parent)
 	{
-		$db = new DB();
+		$db = new Settings();
 		$db->queryExec(sprintf("DELETE from forumpost where ID = %d or parentID = %d", $parent, $parent));
 	}
 
@@ -105,7 +105,7 @@ class Forum
 	 */
 	public function deletePost($id)
 	{
-		$db = new DB();
+		$db = new Settings();
 		$post = $this->getPost($id);
 		if ($post)
 		{
@@ -121,32 +121,32 @@ class Forum
 	 */
 	public function deleteUser($id)
 	{
-		$db = new DB();
+		$db = new Settings();
 		$db->queryExec(sprintf("DELETE from forumpost where userID = %d", $id));
 	}
 
 	/**
 	 * Count of all posts for a user.
-	 */	
+	 */
 	public function getCountForUser($uid)
-	{			
-		$db = new DB();
-		$res = $db->queryOneRow(sprintf("select count(ID) as num from forumpost where userID = %d", $uid));		
+	{
+		$db = new Settings();
+		$res = $db->queryOneRow(sprintf("select count(ID) as num from forumpost where userID = %d", $uid));
 		return $res["num"];
 	}
-	
+
 	/**
 	 * Get forum posts for a user for paged list in profile.
-	 */	
+	 */
 	public function getForUserRange($uid, $start, $num)
-	{		
-		$db = new DB();
-		
+	{
+		$db = new Settings();
+
 		if ($start === false)
 			$limit = "";
 		else
 			$limit = " LIMIT ".$start.",".$num;
-		
-		return $db->query(sprintf(" SELECT forumpost.*, users.username FROM forumpost LEFT OUTER JOIN users ON users.ID = forumpost.userID where userID = %d order by forumpost.createddate desc ".$limit, $uid));		
+
+		return $db->query(sprintf(" SELECT forumpost.*, users.username FROM forumpost LEFT OUTER JOIN users ON users.ID = forumpost.userID where userID = %d order by forumpost.createddate desc ".$limit, $uid));
 	}
 }

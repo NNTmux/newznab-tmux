@@ -4,7 +4,7 @@
 */
 
 require_once(dirname(__FILE__) . "/../../bin/config.php");
-require_once(WWW_DIR . "/lib/framework/db.php");
+require_once(WWW_DIR . "/lib/framework/Settings.php");
 require_once(WWW_DIR . "/lib/util.php");
 require_once(WWW_DIR . "/lib/releaseimage.php");
 require_once(WWW_DIR . "/lib/Tmux.php");
@@ -14,7 +14,7 @@ class AniDBstandAlone {
 
 	const CLIENTVER = 1;
 	function __construct($echooutput=false) {
-		$this->pdo = new DB();
+		$this->pdo = new Settings();
 		$t = new Tmux();
 		$this->tmux = $t->get();
 		$s = new Sites();

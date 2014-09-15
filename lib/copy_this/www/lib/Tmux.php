@@ -1,12 +1,12 @@
 <?php
-require_once(WWW_DIR . "/lib/framework/db.php");
+require_once(WWW_DIR . "/lib/framework/Settings.php");
 require_once(WWW_DIR . "/lib/site.php");
 
 class Tmux
 {
 	function __construct()
 	{
-		$this->db = new DB();
+		$this->db = new Settings();
 	}
 
 	public function version()

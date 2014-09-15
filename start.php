@@ -5,7 +5,7 @@ require_once (WWW_DIR.'/lib/site.php');
 require_once(WWW_DIR. '/lib/Tmux.php');
 require_once(WWW_DIR . "/lib/ColorCLI.php");
 
-$db = new DB();
+$db = new Settings();
 $DIR = dirname (__FILE__);
 $c = new ColorCLI();
 $s = new Sites();
@@ -168,7 +168,7 @@ function window_ircscraper($tmux_session)
 
 function window_sharing($tmux_session)
 {
-	$db = new DB();
+	$db = new Settings();
 	$sharing = $db->queryOneRow('SELECT enabled, posting, fetching FROM sharing');
 	$t = new Tmux();
 	$tmux = $t->get();

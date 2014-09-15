@@ -35,17 +35,17 @@ class Sphinx
     function __construct()
     {
         $s = new Sites;
-		
+
 		$this->site = $s->get();
 		$this->nzb  = new Nzb;
 		$this->indexes = array("releases", "releasefiles",
 		                       "releasenfo", "nzbs", "predb");
     }
-    
+
     /**
      * Runs a Sphinx command.  This suppresses various lines of output from the
      * Sphinx binaries.
-     * 
+     *
      * @param   string  $cmd    The command to run.
      * @param   boolean $stdout If ``true`` (default), print to stdout.
      * @return  array   An array of lines returned from the popen process.
@@ -61,7 +61,7 @@ class Sphinx
             {
                 continue;
             }
-            
+
             $output[] = $line;
             if ($stdout) {
                 printf("%s", $line);
@@ -69,7 +69,7 @@ class Sphinx
         }
         return $output;
     }
-    
+
     /**
      * Returns the next merge date as a timestamp.  This value is suitable for
      * use as the `nextmergedate` value in the database.
@@ -78,7 +78,7 @@ class Sphinx
     {
         return strtotime("tomorrow ".$this->site->sphinxmergefreq);
     }
-    
+
     /**
      * Returns the next rebuild date as a timestamp.  This value is suitable
      * for use as the `nextrebuilddate` value in the database.
@@ -95,7 +95,7 @@ class Sphinx
         }
         return $rebuildDate;
     }
-    
+
     /**
      * Sets the values for ``lastrebuilddate`` and ``nextrebuilddate`` in the
      * database for the given ``$index``.
@@ -110,19 +110,19 @@ class Sphinx
             // This is an invalid index or isn't enabled
             return false;
         }
-        
-        $db = new DB();
-        
+
+        $db = new Settings();
+
         if ($lastRebuildDate == 0) {
             $lastRebuildDate = "NOW()";
         } else {
             $lastRebuildDate = sprintf("FROM_UNIXTIME(%d)", $lastRebuildDate);
         }
-        
+
         $index = $db->escapeString($index);
         $nextRebuildDate = sprintf("FROM_UNIXTIME(%d)",
                                                 $this->getNextRebuildDate());
-        
+
         $sql = "UPDATE sphinx "
              . "SET lastrebuilddate = %s, "
              . "nextrebuilddate = %s "
@@ -131,7 +131,7 @@ class Sphinx
                                  $index));
         return true;
     }
-    
+
     /**
      * Sets the value for ``lastmergedate`` and ``nextmergedate`` in the
      * database for the given ``$index``.  If ``$lastMergedDate`` is supplied
@@ -148,19 +148,19 @@ class Sphinx
             // This is an invalid index or isn't enabled
             return false;
         }
-        
-        $db = new DB();
-        
+
+        $db = new Settings();
+
         if ($lastMergedDate == 0) {
             $lastMergedDate = "NOW()";
         } else {
             $lastMergedDate = sprintf("FROM_UNIXTIME(%d)", $lastMergedDate);
         }
-        
+
         $index = $db->escapeString($index);
         $nextMergeDate = sprintf("FROM_UNIXTIME(%d)",
                                             $this->getNextMergeDate());
-        
+
         $sql = "UPDATE sphinx "
              . "SET lastmergedate = %s, "
              . "nextmergedate = %s "
@@ -169,11 +169,11 @@ class Sphinx
                                  $index));
         return true;
     }
-    
+
     /**
      * Updates the given index $index.  If $full is `true`, then the
      * 'main' index is updated, otherwise the 'delta' index is updated.
-     * 
+     *
      * @param   string  $index
      * @param   boolean $full
      * @return  null
@@ -185,17 +185,17 @@ class Sphinx
             // This is an invalid index or isn't enabled
             return false;
         }
-        
+
         if (!$full) {
             // We're doing a delta update instead
             $index .= "_delta";
         }
-        
+
         // Path to `indexer` binary
         $indexer = $this->getSphinxBinPath("indexer");
         $cmd = sprintf("%s --rotate %s", $indexer, $index);
         $this->runCmd($cmd);
-        
+
         if ($full) {
             // Since we just updated the main index, we need to update dates.
             // Notice that we also update the merge dates--we do this because a
@@ -206,11 +206,11 @@ class Sphinx
             $this->setRebuildDates($index);
         }
     }
-    
+
     /**
      * Merges a 'delta' index with a 'main' index, but only if the index is
      * enabled.
-     * 
+     *
      * @param   string  $index          The index to merge.
      * @param   boolean $updateDates    True (default) to update merge dates.
      * @return  null
@@ -226,7 +226,7 @@ class Sphinx
         $cmd = sprintf("%s --rotate --merge %s %s", $indexer, $index,
                                                     $index."_delta");
         $this->runCmd($cmd);
-        
+
         if ($updateDates) {
             $this->setMergeDates($index);
         }
@@ -234,7 +234,7 @@ class Sphinx
         // TODO: Return false if the merge fails
         return true;
     }
-    
+
     /**
      * Extracts all of the information about a given ``$index`` via the
      * ``indextool`` program provided by Sphinx.
@@ -249,14 +249,14 @@ class Sphinx
             "field_list"  => array(),
             "attr_list"   => array()
         );
-        
+
         if ($this->isIndexEnabled($index)) {
             $details["enabled"] = true;
-            
+
             if (!$main) {
                 $index .= "_delta";
             }
-            
+
             $handle = fopen($this->site->sphinxconfpath, 'r');
             if ($handle) {
                 $indexPath = "";
@@ -267,7 +267,7 @@ class Sphinx
                         $indexPath = $matches[1];
                     }
                 }
-                
+
                 if ($indexPath) {
                     $indexer = $this->getSphinxBinPath("indextool");
                     $cmd = sprintf("%s --dumpheader %s.sph", $indexer,
@@ -295,7 +295,7 @@ class Sphinx
         }
         return $details;
     }
-    
+
     /**
      * Updates indexes.  This function does quite a lot of stuff:
      *
@@ -309,34 +309,34 @@ class Sphinx
      */
     public function update()
     {
-        $db = new DB();
-        
+        $db = new Settings();
+
         if (!$this->site->sphinxenabled) {
             // Sphinx is disabled, so we don't do anything.
             return;
         }
-        
+
         // Loop over the enabled indexes and see what operations are due
         $sql = "SELECT * FROM sphinx";
         $res = $db->queryDirect($sql);
         while ($row = $db->getAssocArray($res)) {
             $index = $row["name"];
-            
+
             if (!$this->isIndexEnabled($row["name"])) {
                 continue;
             }
-            
+
             $indexDetails = $this->indexDetails($index);
             $isMergeDueDate = (strtotime($row['nextmergedate']) <= time(true));
             $isMergeDueSize = (intval($indexDetails["total-documents"]) >=
                                intval($this->site->sphinxmergefreq_count));
-            
+
             if (strtotime($row['nextrebuilddate']) <= time(true) &&
                 $this->site->sphinxrebuildfreq_day != "")
             {
                 // Rebuild required
                 printf("Index '%s' is going to be rebuilt.\n", $index);
-                
+
                 // TODO: Check for success or failure.
                 $this->updateIndex($index, true);
             } else if ($isMergeDueDate || $isMergeDueSize) {
@@ -348,7 +348,7 @@ class Sphinx
                            "and will be merged (contains %s records).\n",
                            $index, $indexDetails["total-documents"]);
                 }
-                
+
                 if ($this->mergeIndex($index)) {
                     printf("Merge successful.\n");
                 } else {
@@ -357,7 +357,7 @@ class Sphinx
                 }
             }
         }
-        
+
         printf("Updating delta indexes\n");
         foreach($this->getAllEnabledIndexes() as $index) {
             // Index `nzbs` is never updated this way because it is a RT index
@@ -368,13 +368,13 @@ class Sphinx
             }
         }
     }
-    
+
     /**
      * Returns the path to the Sphinx binary ``$bin``.  For example, if the
      * path to Sphinx's "indexer" binary is desired, this function can be used
      * to get the full path to it.  It is also desirable to use this function
      * as it properly sets the ``sphinx.conf`` file to use.
-     * 
+     *
      * @param   string $bin The Sphinx binary to run (indexer, searchd, etc.).
      * @return  string      The path to the binary.
      */
@@ -388,12 +388,12 @@ class Sphinx
             $path .= DIRECTORY_SEPARATOR ;
         }
         $path .= $bin;
-        
+
         // The '-c' sets the config file (sphinx.conf).
 		$path = sprintf("\"%s\" -c \"%s\"", trim($path), $conf);
         return $path;
     }
-    
+
     /**
      * Returns ``true`` if ``$index`` is enabled, ``false`` otherwise.
      *
@@ -406,7 +406,7 @@ class Sphinx
         if (!$this->site->sphinxenabled) {
             return false;
         }
-        
+
         // Only check "main" index, since the delta will be enabled
         // if main is as well.
         $index = strtolower(str_replace("_delta", "", $index));
@@ -425,7 +425,7 @@ class Sphinx
                 return false;
         }
     }
-    
+
     /**
      * Returns an array of all the indexes that are enabled.  If Sphinx support
      * isn't enabled, then this returns an empty array.
@@ -446,12 +446,12 @@ class Sphinx
         }
         return $enabled;
     }
-    
+
     /**
      * Generates and returns a string of the of ``sphinx.conf`` file.
      * ``$sphinxDir`` should be a string representing the directory in which to
      * store the indexes.
-     * 
+     *
      * @param   string $sphinxDir   Path to where indexes should be stored.
      * @return  string
      */
@@ -473,19 +473,19 @@ class Sphinx
             $map = array_map($fn, array_keys($dict));
             return preg_replace($map, array_values($dict), $str);
         }
-        
+
         $nnRoot = realpath(FS_ROOT."/../../");
-        
+
         if (!$sphinxDir) {
             $sphinxDir = $nnRoot."/db/sphinxdata";
         }
-        
+
         if (!$sphinxConf) {
             $sphinxConf = $sphinxDir."/sphinx.conf";
         }
-        
+
         $sphinxConfFile = fopen($sphinxConf, 'w');
-        
+
         $filename = $nnRoot."/misc/sphinx/sphinx.tpl";
         $handle = fopen($filename, "r");
         $conf = fread($handle, filesize($filename));
@@ -496,13 +496,13 @@ class Sphinx
             "db_name"           => DB_NAME,
             "sphinx_dir"        => $sphinxDir
         );
-        
+
         fwrite($sphinxConfFile, subst($conf, $vars));
         fclose($sphinxConfFile);
-        
+
         return $sphinxConf;
     }
-    
+
     /**
      * Indexing function for NZB contents.  Unlink the other indexes, 'nzbs'
      * can't be indexed from MySQL data directly since the data to be indexed
@@ -525,28 +525,28 @@ class Sphinx
      */
     public function indexNZBs($startingID=-1)
     {
-        
+
         // TODO: Use batching
         //       See: http://sphinxsearch.com/docs/2.0.1/rt-caveats.html
         //
         if (!$this->isIndexEnabled("nzbs")) {
             return 0;
         }
-        
+
         $out = fopen("php://stdout", 'w');
-        
+
         // Get connection to Sphinx's MySQL interface.
         // Connect to Sphinx
 		$hostport = explode (":", $this->site->sphinxserverhost);
         $sdb = mysqli_connect($hostport[0], "root", "", "", $hostport[1]);
         if (!$sdb) {
             // Couldn't connect to Sphinx.
-            return false;   
+            return false;
         }
-        
+
         // Get connection to Newznab's MySQL database
         $ndb = new DB;
-        
+
         // Determine which release to start with
         if ($startingID < 0) {
             $sql = "SELECT id FROM nzbs ORDER BY id DESC LIMIT 1";
@@ -558,12 +558,12 @@ class Sphinx
                 $startingID = (int)$row[0];
             }
         }
-        
+
         // Get the number of NZBs to do
         $sql = "SELECT COUNT(ID) as num FROM releases WHERE ID >= %d";
         $row = $ndb->queryOneRow(sprintf($sql, $startingID));
         $recordCount = (int)$row["num"];
-        
+
         // Start looping over the releases and build the NZB index
         printf("starting from ID %d\n", $startingID);
         $numIndexed = 0;
@@ -602,7 +602,7 @@ class Sphinx
         }
         return $numIndexed;
     }
-    
+
     /**
      * Query the indexer directly.  Returns an array of the results, unless
      * there was an error in which case ``false`` is returned.  However, if
@@ -632,21 +632,21 @@ class Sphinx
 			if ($ret !== false)
 				return $ret;
 		}
-		
+
         // Connect to Sphinx
         $hostport = explode (":", $this->site->sphinxserverhost);
         $sdb = mysqli_connect($hostport[0], "root", "", "", $hostport[1]);
         if (!$sdb) {
             // Couldn't connect to Sphinx.
-            return false;   
+            return false;
         }
-        
+
         // Get the results from Sphinx.
 		$lev = error_reporting();
 		error_reporting(0);
         $result = mysqli_query($sdb, $sphinxQuery);
 		error_reporting($lev);
-		
+
         $error = mysqli_error($sdb);
         // A 1064 error means that the query is invalid, so we don't care
         // about that.
@@ -654,7 +654,7 @@ class Sphinx
             // All other errors we will considered a failure.
             return false;
         }
-        
+
         // Get the query metadata.
         $meta = array();
         $mresult = mysqli_query($sdb,"SHOW META");
@@ -664,7 +664,7 @@ class Sphinx
         while ($row = mysqli_fetch_row($mresult)) {
             $meta[$row[0]] = $row[1];
         }
-        
+
         $results = array();
 		if ($result)
 		{
@@ -677,7 +677,7 @@ class Sphinx
 				}
 			}
 		}
-        
+
         if ($lookupQuery && count($results) > 0) {
             $ndb = new DB;
             $sql = sprintf($lookupQuery, implode(",", $results));
@@ -690,16 +690,16 @@ class Sphinx
 				}
 			}
         }
-        
+
         $count = 0;
         if ( count($results) > 0 && array_key_exists("total", $meta) ) {
             $count = (int)$meta["total_found"];
             $results[0]["_totalrows"] = ($count > MAX_MATCHES) ? MAX_MATCHES : $count;
         }
-        
+
         if ($useCache !== false && $cache->enabled)
-			$cache->store($sphinxQuery, $results, $useCache);		
-		
+			$cache->store($sphinxQuery, $results, $useCache);
+
         return $results;
     }
     /**
@@ -726,10 +726,10 @@ class Sphinx
                            &$lookupQuery="")
     {
         $ndb = new DB;
-        
+
         $offset = intval($offset);
         $limit = intval($limit);
-        
+
         if ($lookup) {
             // Since we're going to look up the data from MySQL, we don't need
             // to get all the fields from Sphinx.
@@ -737,7 +737,7 @@ class Sphinx
         } else {
             $select = "* ";
         }
-        
+
         // Create a comma separated string of indexes, but only of enabled
         // indexes
         $searchIndexes = array();
@@ -750,7 +750,7 @@ class Sphinx
             $searchIndexes = array_reverse($this->getAllEnabledIndexes(true));
         }
         $from = implode(", ", $searchIndexes);
-        
+
         // Check to see if this is an extended query.  If it is, remove the
         // leading "!" and don't touch the rest of the query.
         if (count($search) > 0) {
@@ -763,7 +763,7 @@ class Sphinx
                 /*
                     Basic Query
                  */
-                
+
                 // Check to see if the the query contains any field specifiers like:
                 // "@(field1,field2)"--if not, add in the default search fields.
                 foreach($search as $i => $q) {
@@ -772,25 +772,25 @@ class Sphinx
                         // turns the query for "ubuntu" into something like:
                         //  "@(name,searchname) ubuntu"
                         $fields = str_replace(" ", "", $this->site->sphinxsearchfields);
-                        
+
                         // Remove single "-" so that Sphinx doesn't use it as an
                         // exclusion modifier
                         $q = preg_replace('/([^\-])\-/', '\1 ', $q);
-                        
+
                         // "basic" search syntax allows a "--" exclusion modifier,
                         // but Sphinx uses "-" as a the exclusion modifier
                         $q = str_replace("--", "-", $q);
 
 						// always add on * to Season based searches
 						$q = preg_replace('/([\. ]S\d{2})( |$)/i', '\1*\2', $q);
-						
+
                         // Construct the basic query
                         $search[$i] = sprintf("@(%s) ", $fields).$q;
                     }
                 }
             }
         }
-        
+
         // Create the actual MATCH() query.  Per the Sphinx docs, each query
         // can only have one MATCH() statement.
         if (count($search) > 0) {
@@ -804,11 +804,11 @@ class Sphinx
                     // "@@relaxed" wasn't found at the beginning,
                     $search[0] = "@@relaxed ".$search[0];
                 }
-            
+
                 $where[] = sprintf("MATCH(%s)", $ndb->escapeString(implode(' ', $search)));
             }
         }
-        
+
         // Build the category query.  If any of the categories are a "parent"
         // then we need to explicitly include their children as well.
         $categoryIDs = array();
@@ -818,7 +818,7 @@ class Sphinx
                     if (!in_array($category, $categoryIDs)) {
                         $categoryIDs[] = $category;
                     }
-                    
+
                     $categ = new Category();
                     if ($categ->isParent($category)) {
                         // Inlcude all children
@@ -837,19 +837,19 @@ class Sphinx
         if ($categoryIDs) {
             $where[] = sprintf("categoryID IN (%s)", implode(",", $categoryIDs));
         }
-        
+
         // Filter on postdate.
         if ($maxage > 0) {
             // TODO: This probably isn't the best way to do this...
             $where[] = sprintf("postdate >= %d", time()-($maxage*86400));
         }
-        
+
         // Categories to exclude.
         if (count($excludedcats) > 0) {
             $where[] = sprintf("categoryID NOT IN (%s)", implode(",",
                                                             $excludedcats));
         }
-        
+
         // Usenet groups to include.
         if ($grp) {
             foreach($grp as $i => $g) {
@@ -864,33 +864,33 @@ class Sphinx
             }
             $where[] = sprintf("groupID IN (%s)", implode(",", $grp));
         }
-        
+
         // Order the results.
         // TODO: implement better default ordering behavior.
         $orderby = "";
         if (count($order) == 2) {
             $orderby = sprintf("ORDER BY %s %s", $order[0], $order[1]);
-            
+
             // Add in the ORDER BY parameters if there is a $lookupQuery
             if ($lookupQuery) {
                 $lookupQuery = $lookupQuery." ".$orderby;
             }
         }
-        
+
         // Build the full query.
         $q = sprintf("SELECT %s FROM %s ".(!empty($where)?"WHERE ":"")." %s %s LIMIT %d,%d",
                         $select, $from, implode(" AND ", $where), $orderby,
                         $offset, $limit);
-        
+
         // Sphinx imposes a 1000 result limit (max_matches) by default, so in
         // order to access results beyond this, we need to tell it to do so
         if ($offset >= 1000) {
             $q .= sprintf(" OPTION max_matches=%d", $offset+$limit);
         }
-        
+
         return $q;
     }
-    
+
     /**
      * Search ``$indexes`` for ``$search`` term(s).  ``$search`` should be a
      * string containing a valid Sphinx query, see `query syntax`_ for
@@ -922,7 +922,7 @@ class Sphinx
             // Remove predb from the default list of indexes to search
             $indexes = $this->getAllEnabledIndexes(true, array('predb'));
         }
-        
+
         $lookupQuery = "";
         if ($lookup) {
             $lookupQuery .= "SELECT releases.*, "
@@ -965,7 +965,7 @@ class Sphinx
                                          $indexes, $lookup, $where, $lookupQuery);
         return $this->searchDirect($sphinxQuery, $lookupQuery, 180);
     }
-    
+
     /**
      * Returns an array of all the releases matching the given query.  This
      * presents the same interface as :php:meth:`Releases::searchbyRageId`.
@@ -986,26 +986,26 @@ class Sphinx
 			}
 			$search[] = sprintf("@season %s", $db->escapeString($series));
 		}
-		
+
 		if ($episode != "") {
 			if (is_numeric($episode)) {
 			    $episode = sprintf('E%02d', $episode);
 			}
 			$search[] = sprintf("@episode %s", $db->escapeString($episode));
 		}
-		
+
 		$where = array();
 		if ($rageId != "-1") {
 		    $where[] = "rageid = ".$rageId;
 		}
-		
+
 		if (count($indexes) == 0) {
             // Remove predb from the default list of indexes to search
             $indexes = $this->getAllEnabledIndexes(true, array('predb'));
         }
-        
+
         $lookupQuery = "";
-        if ($lookup) {            
+        if ($lookup) {
             $lookupQuery .= "SELECT releases.*, "
                           . "CONCAT(cp.title, ' > ', c.title) AS category_name, "
                           . "CONCAT(cp.ID, ',', c.ID) AS category_ids, "
@@ -1031,7 +1031,7 @@ class Sphinx
                                          $lookup, $where, $lookupQuery);
         return $this->searchDirect($sphinxQuery, $lookupQuery, 180);
     }
-    
+
     /**
      * Returns an array of all the releases matching the given query.  This
      * presents the same interface as :php:meth:`Releases::searchbyImdbId`.
@@ -1051,16 +1051,16 @@ class Sphinx
 		} else {
 			$where[] = sprintf("imdbid != 0", $imdbId);
 		}
-		
+
 		if ($genre != "") {
 		    $search[] = sprintf("@movieinfo_genre %s", $db->escapeString($genre));
 		}
-		
+
 		if (count($indexes) == 0) {
             // Remove predb from the default list of indexes to search
             $indexes = $this->getAllEnabledIndexes(true, array('predb'));
         }
-		        
+
         $lookupQuery = "";
         if ($lookup) {
             $lookupQuery .= "SELECT releases.*, "
@@ -1097,7 +1097,7 @@ class Sphinx
                                          $lookup, $where, $lookupQuery);
         return $this->searchDirect($sphinxQuery, $lookupQuery, 180);
     }
-    
+
     /**
      * Returns an array of all the releases matching the given query.  This
      * presents the same interface as :php:meth:`Releases::searchAudio`.
@@ -1114,32 +1114,32 @@ class Sphinx
         if ($artist != "") {
             $search[] = sprintf("@musicinfo_artist %s", $db->escapeString($artist));
         }
-        
+
 		if ($album != "") {
 		    $search[] = sprintf("@musicinfo_title %s", $db->escapeString($album));
 		}
-		
+
 		if ($label != "") {
 		    $search[] = sprintf("@musicinfo_publisher %s", $db->escapeString($label));
 		}
-		
+
 		if ($track != "") {
 		    $search[] = sprintf("@musicinfo_tracks %s", $db->escapeString($track));
 		}
-		
+
 		if ($year != "") {
 		    $where[] = sprintf("musicinfo_year = %d", $year);
 		}
-		
+
 		if (count($genre) > 0 && $genre[0] != -1) {
 		    $where[] = sprintf("musicinfo_genreID IN (%s)", implode(",", $genre));
 		}
-		
+
 		if (count($indexes) == 0) {
             // Remove predb from the default list of indexes to search
             $indexes = $this->getAllEnabledIndexes(true, array('predb'));
         }
-		
+
         $lookupQuery = "";
         if ($lookup) {
             $lookupQuery .= "SELECT releases.*, "
@@ -1175,7 +1175,7 @@ class Sphinx
                                          $lookup, $where, $lookupQuery);
         return $this->searchDirect($sphinxQuery, $lookupQuery, 180);
     }
-    
+
     /**
      * Returns an array of all the releases matching the given query.  This
      * presents the same interface as :php:meth:`Releases::searchBook`.
@@ -1189,16 +1189,16 @@ class Sphinx
         if ($author != "") {
             $search[] = sprintf("@bookinfo_author %s", $db->escapeString($author));
         }
-        
+
 		if ($title != "") {
 		    $search[] = sprintf("@bookinfo_title %s", $db->escapeString($title));
 		}
-		
+
 		if (count($indexes) == 0) {
             // Remove predb from the default list of indexes to search
             $indexes = $this->getAllEnabledIndexes(true, array('predb'));
         }
-		
+
 		$lookupQuery = "";
 		if ($lookup) {
 		    $lookupQuery .= "SELECT releases.*, "
@@ -1231,13 +1231,13 @@ class Sphinx
 		                  .     "FROM site WHERE setting='showpasswordedrelease')"
 		                  . "AND releases.ID IN (%s)";
 		}
-		
+
 		$sphinxQuery = $this->buildQuery($search, array(-1), $offset, $limit,
 		                                 $order, $maxage, array(), array(),
 		                                 $indexes, $lookup, array(), $lookupQuery);
 		return $this->searchDirect($sphinxQuery, $lookupQuery, 180);
     }
-        
+
     /**
      * Returns an array of all the releases matching the given query.  This
      * presents the same interface as :php:meth:`Releases::searchbyAnidbId`.
@@ -1246,23 +1246,23 @@ class Sphinx
                                     $name='', $maxage=-1, $indexes=array(),
                                     $lookup=true)
     {
-        $db = new DB();
+        $db = new Settings();
         $where = array();
         $search = array();
         $order = array("postdate", "desc");
         if ($anidbID > -1) {
             $where[] = sprintf("anidbID = %d", $anidbID);
         }
-        
+
         if (is_numeric($epno)) {
 			$search[] = sprintf("@episode %s", $db->escapeString($epno));
 		}
-		
+
 		if (count($indexes) == 0) {
             // Remove predb from the default list of indexes to search
             $indexes = $this->getAllEnabledIndexes(true, array('predb'));
         }
-		
+
 		$lookupQuery = "";
 		if ($lookup) {
 		    $lookupQuery .= "SELECT releases.*, "
@@ -1288,14 +1288,14 @@ class Sphinx
 		                                 $indexes, $lookup, $where, $lookupQuery);
 		return $this->searchDirect($sphinxQuery, $lookupQuery, 180);
     }
-        
+
     /**
      * Get predb rows by limit and filter.  This presents the same interface as
      * :php:meth:`PreDB::getPreRange`.
      */
     public function getPreRange($start=0, $num, $dirname='', $category='')
     {
-        $db = new DB();
+        $db = new Settings();
         $dirname = empty($category) ? $dirname : $dirname." @category =".$category;
         $sphinxQuery = sprintf("SELECT id "
                                ."FROM predb, predb_delta "
@@ -1312,7 +1312,7 @@ class Sphinx
                      . "ORDER BY predb.ctime DESC";
         return $this->searchDirect($sphinxQuery, $lookupQuery, 120);
     }
-    
+
     /**
      * Get count of all predb rows that match the query.  This presents the
      * same interface as :php:meth:`PreDB::getPreCount`.  If there is an issue
@@ -1325,12 +1325,12 @@ class Sphinx
     public function getPreCount($dirname='', $category='')
     {
         $results = $this->getPreRange(0, 1, $dirname, $category);
-        if (is_array($results)) { 
+        if (is_array($results)) {
             return $results[0]['_totalrows'];
         }
         return -1;
     }
-    
+
     /**
      * Convert seconds to human readable text.  From:
      * http://csl.sublevel3.org/php-secs-to-human-text/

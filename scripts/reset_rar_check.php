@@ -1,6 +1,6 @@
 <?php
 require(dirname(__FILE__) . "/../bin/config.php");
-require_once(WWW_DIR . "/lib/framework/db.php");
+require_once(WWW_DIR . "/lib/framework/Settings.php");
 
 $db = new DB;
 

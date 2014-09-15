@@ -1,5 +1,5 @@
 <?php
-require_once(WWW_DIR . "/lib/framework/db.php");
+require_once(WWW_DIR . "/lib/framework/Settings.php");
 require_once(WWW_DIR . "/lib/category.php");
 require_once(WWW_DIR . "/lib/releases.php");
 require_once(WWW_DIR . "/lib/releaseimage.php");
@@ -36,7 +36,7 @@ class Functions
 		$this->p = new Postprocess();
 		$this->echooutput = $echooutput;
 		$this->c = new ColorCLI();
-		$this->db = new DB();
+		$this->db = new Settings();
 		$this->groups = new Groups();
 		$this->m = new Movie();
 		$this->consoleTools = new ConsoleTools();

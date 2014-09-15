@@ -7,12 +7,12 @@ require_once(WWW_DIR."/lib/binaries.php");
 /**
  * Retrieves messages from usenet based on provided backfill-to date.
  */
-class Backfill 
+class Backfill
 {
 	/**
 	 * Default constructor.
 	 */
-	function Backfill() 
+	function Backfill()
 	{
 		$this->n = "\n";
 	}
@@ -25,17 +25,17 @@ class Backfill
 		$n = $this->n;
 		$groups = new Groups;
 		$res = false;
-		if ($groupName != '') 
+		if ($groupName != '')
 		{
 			$grp = $groups->getByName($groupName);
 			if ($grp)
 				$res = array($grp);
-		} 
-		else 
+		}
+		else
 		{
 			$res = $groups->getActive();
 		}
-				
+
 		if ($res)
 		{
             foreach($res as $groupArr)
@@ -48,14 +48,14 @@ class Backfill
 			echo "No groups specified. Ensure groups are added to newznab's database for updating.$n";
 		}
 	}
-	
+
 	/**
 	 * Update a group back to a specified date.
-	 */	
+	 */
 	function backfillGroup($groupArr, $backfillDate=null, $regexOnly=false)
 	{
 
-		$db = new DB();
+		$db = new Settings();
 		$binaries = new Binaries();
         $n = $this->n;
 
@@ -66,7 +66,7 @@ class Backfill
         }
 
 		$this->startGroup = microtime(true);
-		
+
 		$nntp = new Nntp();
 		$nntpc = new Nntp();
 		//Make sure we actually have a connection going before doing anything.
@@ -173,15 +173,15 @@ class Backfill
             $timeGroup = number_format(microtime(true) - $this->startGroup, 2);
             echo "Group processed in $timeGroup seconds $n";
 		}
-		else 
+		else
 		{
             echo "Failed to get NNTP connection.$n";
         }
 	}
-	
+
 	/**
 	 * Returns single timestamp from a local article number.
-	 */	
+	 */
 	function postdate($nntp,$post,$debug=true)
 	{
 		$n = $this->n;
@@ -207,24 +207,24 @@ class Backfill
 			if($debug && $attempts > 0) echo "retried $attempts time(s)".$n;
 			$attempts++;
 		} while($attempts <= 3 && $success == false);
-		
+
 		if (!$success) { return ""; }
-		
+
 		if($debug) echo "DEBUG: postdate for post: $post came back $date (";
 		$date = strtotime($date);
 		if($debug) echo "$date seconds unixtime or ".$this->daysOld($date)." days)".$n;
 		return $date;
 	}
-	
+
 	/**
 	 * Calculates the post number for a given number of days back in a group.
-	 */	
+	 */
 	function daytopost($nntp, $group, $days, $debug=true)
 	{
 		$n = $this->n;
 		$pddebug = false; //DEBUG every postdate call?!?!
 		if ($debug) echo "INFO: daytopost finding post for $group $days days back.".$n;
-		
+
 		$data = $nntp->selectGroup($group);
 		if(PEAR::isError($data))
 		{
@@ -236,10 +236,10 @@ class Backfill
 		$totalnumberofarticles = $data['last'] - $data['first'];
 		$upperbound = $data['last'];
 		$lowerbound = $data['first'];
-		
+
 		if ($debug) echo "Total Articles: $totalnumberofarticles $n Upper: $upperbound $n Lower: $lowerbound $n Goal: ".date("r", $goaldate)." ($goaldate) $n";
 		if ($data['last']==PHP_INT_MAX) { echo "ERROR: Group data is coming back as php's max value.  You should not see this since we use a patched Net_NNTP that fixes this bug.$n"; die(); }
-		
+
 		$firstDate = $this->postdate($nntp, $data['first'], $pddebug);
 		$lastDate = $this->postdate($nntp, $data['last'], $pddebug);
 		if ($goaldate < $firstDate)
@@ -255,17 +255,17 @@ class Backfill
 			return "";
 		}
 		if ($debug) echo "DEBUG: Searching for postdate $n Goaldate: $goaldate (".date("r", $goaldate).") $n Firstdate: $firstDate (".((is_int($firstDate))?date("r", $firstDate):'n/a').") $n Lastdate: $lastDate (".date("r", $lastDate).") $n";
-			
+
 		$interval = floor(($upperbound - $lowerbound) * 0.5);
 		$dateofnextone = "";
 		$templowered = "";
-		
+
 		if ($debug) echo "Start: ".$data['first']." $n End: ".$data['last']." $n Interval: $interval $n";
-		
+
 		$dateofnextone = $lastDate;
-		
+
 		while($this->daysOld($dateofnextone) < $days)  //match on days not timestamp to speed things up
-		{		
+		{
 			$nskip = 1;
 			while(($tmpDate = $this->postdate($nntp,($upperbound-$interval),$pddebug))>$goaldate)
 			{
@@ -280,23 +280,23 @@ class Backfill
 				if($debug) echo "Set interval to $interval articles. $n";
 		 	}
 		 	$dateofnextone = $this->postdate($nntp,($upperbound-1),$pddebug);
-			
+
 			$skip = 1;
 			while(!$dateofnextone)
-			{                                                                        
-		        $upperbound = $upperbound - $skip;                               
-		        $skip = $skip * 2;                                               
-		        if($debug) echo "Getting next article date... $upperbound\n";    
+			{
+		        $upperbound = $upperbound - $skip;
+		        $skip = $skip * 2;
+		        if($debug) echo "Getting next article date... $upperbound\n";
 		        $dateofnextone = $this->postdate($nntp,($upperbound-1),$pddebug);
-			}                                                                        
+			}
 	 	}
 		echo "Determined to be article $upperbound which is ".$this->daysOld($dateofnextone)." days old (".date("r", $dateofnextone).") $n";
 		return $upperbound;
 	}
-    
+
 	/**
 	 * Calculate the number of days from a timestamp.
-	 */	    
+	 */
 	private function daysOld($timestamp)
     {
     	return round((time()-$timestamp)/86400, 1);
@@ -304,8 +304,8 @@ class Backfill
 
 	/**
 	 * Calculate the number of days from a date.
-	 */	  
-	private function dateToDays($backfillDate) 
+	 */
+	private function dateToDays($backfillDate)
 	{
 		return floor(-($backfillDate - time())/(60*60*24));
 	}

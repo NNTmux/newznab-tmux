@@ -6,7 +6,7 @@ require_once(WWW_DIR."/lib/adminpage.php");
 
 // Login check.
 $admin = new AdminPage;
-$db = new DB();
+$db = new Settings();
 
 if (isset($_GET['site_ID']) && isset($_GET['site_status'])) {
 	$db->queryExec(sprintf('UPDATE sharing_sites SET enabled = %d WHERE ID = %d', $_GET['site_status'], $_GET['site_ID']));

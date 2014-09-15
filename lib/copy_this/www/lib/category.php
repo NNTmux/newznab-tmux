@@ -1,5 +1,5 @@
 <?php
-require_once(WWW_DIR . "/lib/framework/db.php");
+require_once(WWW_DIR . "/lib/framework/Settings.php");
 require_once(WWW_DIR . "lib/Categorize.php");
 
 /**
@@ -84,7 +84,7 @@ class Category
 	 */
 	public function get($activeonly = false, $excludedcats = array())
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		$exccatlist = "";
 		if (count($excludedcats) > 0)
@@ -139,7 +139,7 @@ class Category
 	 */
 	public function isParent($cid)
 	{
-		$db = new DB();
+		$db = new Settings();
 		$ret = $db->queryOneRow(sprintf("select count(*) as count from category where ID = %d and parentID is null", $cid), true);
 		if ($ret['count'])
 			return true;
@@ -152,7 +152,7 @@ class Category
 	 */
 	public function getFlat($activeonly = false)
 	{
-		$db = new DB();
+		$db = new Settings();
 		$act = "";
 		if ($activeonly)
 			$act = sprintf(" where c.status = %d ", Category::STATUS_ACTIVE);
@@ -165,7 +165,7 @@ class Category
 	 */
 	public function getChildren($cid)
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		return $db->query(sprintf("select c.* from category c where parentID = %d", $cid), true);
 	}
@@ -177,7 +177,7 @@ class Category
 	 */
 	public function getEnabledParentNames()
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		return $db->query("SELECT title FROM category WHERE parentID IS NULL AND status = 1");
 	}
@@ -187,7 +187,7 @@ class Category
 	 */
 	public function getById($id)
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		return $db->queryOneRow(sprintf("SELECT c.disablepreview, c.ID, c.description, c.minsizetoformrelease, c.maxsizetoformrelease, CONCAT(COALESCE(cp.title,'') , CASE WHEN cp.title IS NULL THEN '' ELSE ' > ' END , c.title) as title, c.status, c.parentID from category c left outer join category cp on cp.ID = c.parentID where c.ID = %d", $id));
 	}
@@ -198,7 +198,7 @@ class Category
 	*/
 	public function getSizeRangeById($id)
 	{
-		$db = new DB();
+		$db = new Settings();
 		$res = $db->queryOneRow(sprintf("SELECT c.minsizetoformrelease, c.maxsizetoformrelease, cp.minsizetoformrelease as p_minsizetoformrelease, cp.maxsizetoformrelease as p_maxsizetoformrelease" .
 				" from category c left outer join category cp on cp.ID = c.parentID where c.ID = %d", $id
 			)
@@ -239,14 +239,14 @@ class Category
 	 */
 	public function getByIds($ids)
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		return $db->query(sprintf("SELECT concat(cp.title, ' > ',c.title) as title from category c inner join category cp on cp.ID = c.parentID where c.ID in (%s)", implode(',', $ids)));
 	}
 
 	public function getNameByID($ID)
 	{
-		$db = new DB();
+		$db = new Settings();
 		$parent = $db->queryOneRow(sprintf("SELECT title FROM category WHERE ID = %d", substr($ID, 0, 1) . "000"));
 		$cat = $db->queryOneRow(sprintf("SELECT title FROM category WHERE ID = %d", $ID));
 
@@ -258,7 +258,7 @@ class Category
 	 */
 	public function update($id, $status, $desc, $disablepreview, $minsize, $maxsize)
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		return $db->queryExec(sprintf("update category set disablepreview = %d, status = %d, minsizetoformrelease = %d, maxsizetoformrelease = %d, description = %s where ID = %d", $disablepreview, $status, $minsize, $maxsize, $db->escapeString($desc), $id));
 	}
@@ -268,7 +268,7 @@ class Category
 	 */
 	public function getForMenu($excludedcats = array())
 	{
-		$db = new DB();
+		$db = new Settings();
 		$ret = array();
 
 		$exccatlist = "";

@@ -1,6 +1,6 @@
 <?php
 require_once(WWW_DIR . "/config.php");
-require_once(WWW_DIR . "/lib/framework/db.php");
+require_once(WWW_DIR . "/lib/framework/Settings.php");
 require_once(WWW_DIR . '/../misc/update_scripts/nix_scripts/tmux/lib/functions.php');
 
 /**
@@ -152,7 +152,7 @@ if (isset($_GET['type'])) {
 		case 'r':
 		case 'requestID':
 			if (isset($_GET['reqid']) && is_numeric($_GET['reqid']) && isset($_GET['group']) && is_string($_GET['group'])) {
-				$db = new DB();
+				$db = new Settings();
 				$preData = $db->query(
 					sprintf('
 					SELECT p.*
@@ -178,7 +178,7 @@ if (isset($_GET['type'])) {
 		case 't':
 		case 'title':
 			if (isset($_GET['title'])) {
-				$db = new DB();
+				$db = new Settings();
 				$preData = $db->query(
 					sprintf('SELECT * FROM prehash p WHERE p.title %s %s %s LIKE %s LIMIT %d OFFSET %d',
 						$newer,
@@ -196,7 +196,7 @@ if (isset($_GET['type'])) {
 		case 'm':
 		case 'md5':
 			if (isset($_GET['md5']) && strlen($_GET['title']) === 32) {
-				$db = new DB();
+				$db = new Settings();
 				$preData = $db->query(
 					sprintf('SELECT * FROM prehash p INNER JOIN predbhash ph ON ph.pre_id = p.ID WHERE MATCH(hashes) AGAINST (%s) %s %s %s LIMIT %d OFFSET %d',
 						$db->escapeString($_GET['md5']),
@@ -213,7 +213,7 @@ if (isset($_GET['type'])) {
 		case 's':
 		case 'sha1':
 			if (isset($_GET['sha1']) && strlen($_GET['sha1']) === 40) {
-				$db = new DB();
+				$db = new Settings();
 				$preData = $db->query(
 					sprintf('SELECT * FROM prehash p INNER JOIN predbhash ph ON ph.pre_id = p.ID WHERE MATCH(hashes) AGAINST (%s) %s %s %s LIMIT %d OFFSET %d',
 						$db->escapeString($_GET['sha1']),
@@ -229,7 +229,7 @@ if (isset($_GET['type'])) {
 
 		case 'a':
 		case 'all':
-			$db = new DB();
+			$db = new Settings();
 			$preData = $db->query(
 				sprintf('SELECT * FROM prehash p WHERE 1=1 %s %s %s ORDER BY p.predate DESC LIMIT %d OFFSET %d',
 					$newer,

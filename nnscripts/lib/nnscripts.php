@@ -13,7 +13,7 @@ require_once(WWW_DIR."lib/site.php");
 
 /**
  * This class contains the functions used by the other NNScripts
- * 
+ *
  * @author    NN Scripts
  * @license   http://opensource.org/licenses/MIT MIT License
  * @copyright (c) 2013 - NN Scripts
@@ -30,13 +30,13 @@ abstract class NNScripts
      * @var string
      */
     protected $scriptName = 'Unknown NNScript';
-    
+
     /**
      * The script version (needs to be set in the real script)
      * @var string
      */
     protected $scriptVersion = '0.0';
-    
+
     /**
      * Allowed settings
      * @var array
@@ -54,7 +54,7 @@ abstract class NNScripts
      * @var DB
      */
     protected $db;
-    
+
     /**
      * The settings read from the ini file
      * @var string
@@ -66,7 +66,7 @@ abstract class NNScripts
      * @var null|Getopt
      */
     protected $options = null;
-    
+
     /**
      * Disable the limit option
      * @var bool
@@ -93,7 +93,7 @@ abstract class NNScripts
         $this->site = $site->get();
 
         // Initiate the database connection
-        $this->db = new DB();
+        $this->db = new Settings();
 
         // Read the settings from the ini file
         $this->readSettings();
@@ -147,7 +147,7 @@ abstract class NNScripts
      */
     protected function setLimit()
     {
-        $limit = ( isset( $this->settings['limit'] ) ? $this->settings['limit'] : null );        
+        $limit = ( isset( $this->settings['limit'] ) ? $this->settings['limit'] : null );
         if( null === $limit && in_array( 'limit', $this->allowedSettings ) )
         {
             // Not set by settings.ini
@@ -156,16 +156,16 @@ abstract class NNScripts
                 // Get the limit and convert to hours
                 $limit = (float)str_replace( ',', '.', $this->site->rawretentiondays ) * 24;
             }
-            
+
             // Set the new limit
             $this->settings['limit'] = $limit;
         }
     }
 
-    
+
     /**
      * Read the settings from the config.ini fille
-     * 
+     *
      * @return void
      */
     protected function readSettings()
@@ -183,13 +183,13 @@ abstract class NNScripts
         // Try to read the ini file
         $settingsFile = "/settings.ini";
         $iniArray = $this->parseIniFile( $settingsFile, true );
-        
+
         // Parse the "global" settings
         $this->parseIniSettings( $settings, $iniArray, 'global' );
 
         // Parse the class settings
         $this->parseIniSettings( $settings, $iniArray, get_class( $this ) );
-        
+
         // Remove all the not used settings
         if( is_array( $this->allowedSettings ) && 0 < count( $this->allowedSettings ) )
         {
@@ -224,7 +224,7 @@ abstract class NNScripts
             {
                 if( array_key_exists( $settingKey, $iniArray[ $key ] ) )
                 {
-                    $value = $iniArray[ $key ][ $settingKey ];          
+                    $value = $iniArray[ $key ][ $settingKey ];
                     if( is_numeric( $value ) )
                     {
                         $value = ( preg_match('/^[0-9]+$/', $value ) ? (int)$value : (float)$value );
@@ -301,7 +301,7 @@ abstract class NNScripts
                         $values[ $i - 1 ][ $key ] = $value;
                 }
             }
-            
+
             for( $j=0; $j<$i; $j++ )
             {
                 if( array_key_exists( $j, $sections ) && array_key_exists( $j, $values ) )
@@ -339,17 +339,17 @@ abstract class NNScripts
             if( isset( $options[ $last ][3] ) )
                 $options[ $last ][3] = $options[ $last ][3] . PHP_EOL;
         }
-        
+
         // Add the quiet option
         if( in_array( 'display', $basics ) )
         {
             $o1 = ( true === $this->settings['display'] ? ' (settings default)' : '' );
             $options[] = array( 'd', 'display', Ulrichsg\Getopt::NO_ARGUMENT, sprintf( 'Enable output%s', $o1 ) );
-            
+
             $o2 = ( false === $this->settings['display'] ? ' (settings default)' : '' );
             $options[] = array( 'q', 'quiet', Ulrichsg\Getopt::NO_ARGUMENT, sprintf( 'Disable output%s'. PHP_EOL, $o2 ) );
         }
-        
+
         // Add the nolimit option
         if( in_array( 'limit', $basics ) )
         {
@@ -366,7 +366,7 @@ abstract class NNScripts
             $o2 = ( false === $this->settings['remove'] ? ' (settings default)' : '' );
             $options[] = array( 'k', 'keep', Ulrichsg\Getopt::NO_ARGUMENT, sprintf( 'Disable the removal of releases%s'. PHP_EOL, $o2 ) );
         }
-                
+
         // Add the debug option
         if( in_array( 'debug', $basics ) )
         {
@@ -417,14 +417,14 @@ abstract class NNScripts
                 {
                     throw new Exception( 'Option \'limit\' must be numeric' );
                 }
-                
+
                 $this->settings['limit'] = false;
                 if( 0 < (float)$this->options->getOption('limit') )
                 {
                     $this->settings['limit'] = (float)$this->options->getOption('limit');
                 }
             }
-            
+
             // Full database
             if( $this->options->getOption('full') )
                 $this->settings['full'] = true;
@@ -434,7 +434,7 @@ abstract class NNScripts
                 $this->settings['remove'] = true;
             if( $this->options->getOption('keep') )
                 $this->settings['remove'] = false;
-                
+
             // Check for display options
             if( $this->options->getOption('quiet') )
                 $this->settings['display'] = false;
@@ -444,7 +444,7 @@ abstract class NNScripts
             // Debug?
             if( $this->options->getOption('debug') )
                 $this->settings['debug'] = true;
-                
+
             // Query limit
             if( $this->options->getOption('querylimit') )
                 if( is_numeric( $this->options->getOption('querylimit') ) )
@@ -518,7 +518,7 @@ abstract class NNScripts
         $this->displayTitle();
         $this->display( PHP_EOL );
     }
-    
+
     /**
      * Display app settings
      * @return void
@@ -573,7 +573,7 @@ abstract class NNScripts
                 }
                 $this->display( PHP_EOL . sprintf( "- update: %s", $line ) );
             }
-            
+
             // querylimit
             if( isset( $this->settings['querylimit'] ) && null !== $this->settings['querylimit'] )
             {
