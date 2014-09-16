@@ -51,10 +51,10 @@ class Utility
 	 */
 	static public function cutStringUsingLast($character, $string, $side, $keep_character = true)
 	{
-		$offset       = ($keep_character ? 1 : 0);
+		$offset = ($keep_character ? 1 : 0);
 		$whole_length = strlen($string);
 		$right_length = (strlen(strrchr($string, $character)) - 1);
-		$left_length  = ($whole_length - $right_length - 1);
+		$left_length = ($whole_length - $right_length - 1);
 		switch ($side) {
 			case 'left':
 				$piece = substr($string, 0, ($left_length + $offset));
@@ -67,6 +67,7 @@ class Utility
 				$piece = false;
 				break;
 		}
+
 		return ($piece);
 	}
 
@@ -97,16 +98,17 @@ class Utility
 				CURLOPT_SSL_VERIFYHOST => 0,
 			];
 		}
+
 		return $options;
 	}
 
-	static public function getDirFiles (array $options = null)
+	static public function getDirFiles(array $options = null)
 	{
 		$defaults = [
-			'dir'	=> false,
-			'ext'	=> '', // no full stop (period) separator should be used.
-			'path'	=> '',
-			'regex'	=> '',
+			'dir'   => false,
+			'ext'   => '', // no full stop (period) separator should be used.
+			'path'  => '',
+			'regex' => '',
 		];
 		$options += $defaults;
 
@@ -127,18 +129,22 @@ class Utility
 					$files[] = $fileinfo->getPathname();
 			}
 		}
+
 		return $files;
 	}
 
 	/**
 	 * Detect if the command is accessible on the system.
+	 *
 	 * @param $cmd
+	 *
 	 * @return bool|null Returns true if found, false if not found, and null if which is not detected.
 	 */
 	static public function hasCommand($cmd)
 	{
 		if ('HAS_WHICH') {
 			$returnVal = shell_exec("which $cmd");
+
 			return (empty($returnVal) ? false : true);
 		} else {
 			return null;
@@ -151,6 +157,7 @@ class Utility
 	static public function hasWhich()
 	{
 		exec('which which', $output, $error);
+
 		return !$error;
 	}
 
@@ -159,7 +166,7 @@ class Utility
 	 *
 	 * @return bool
 	 */
-	static public function isCLI ()
+	static public function isCLI()
 	{
 		return ((strtolower(PHP_SAPI) === 'cli') ? true : false);
 	}
@@ -169,7 +176,7 @@ class Utility
 		return (strtolower(substr(PHP_OS, 0, 3)) === 'win');
 	}
 
-	static public function stripBOM (&$text)
+	static public function stripBOM(&$text)
 	{
 		$bom = pack("CCC", 0xef, 0xbb, 0xbf);
 		if (0 == strncmp($text, $bom, 3)) {
@@ -183,9 +190,9 @@ class Utility
 	 * Operates directly on the text string, but also returns the result for situations requiring a
 	 * return value (use in ternary, etc.)/
 	 *
-	 * @param $text		String variable to strip.
+	 * @param $text        String variable to strip.
 	 *
-	 * @return string	The stripped variable.
+	 * @return string    The stripped variable.
 	 */
 	static public function stripNonPrintingChars(&$text)
 	{
@@ -196,6 +203,7 @@ class Utility
 			"\x18", "\x19", "\x1A", "\x1B", "\x1C", "\x1D", "\x1E", "\x1F",
 		];
 		$text = str_replace($lowChars, '', $text);
+
 		return $text;
 	}
 
@@ -204,6 +212,7 @@ class Utility
 		if (substr($path, strlen($path) - 1) != '/') {
 			$path .= '/';
 		}
+
 		return $path;
 	}
 
@@ -229,26 +238,30 @@ class Utility
 			// Close the gzip file.
 			gzclose($gzFile);
 		}
+
 		// Return the string.
 		return ($string === '' ? false : $string);
 	}
 
 
 	/**
- * Get human readable size string from bytes.
- *
- * @param int $bytes     Bytes number to convert.
- * @param int $precision How many floating point units to add.
- *
- * @return string
- */
-function bytesToSizeString ($bytes, $precision = 0)
-{
-	if ($bytes == 0) {
-		return '0B';
+	 * Get human readable size string from bytes.
+	 *
+	 * @param int $bytes     Bytes number to convert.
+	 * @param int $precision How many floating point units to add.
+	 *
+	 * @return string
+	 */
+	function bytesToSizeString($bytes, $precision = 0)
+	{
+		if ($bytes == 0) {
+			return '0B';
+		}
+		$unit = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB'];
+
+		return round($bytes / pow(1024, ($i = floor(log($bytes, 1024)))), $precision) . $unit[(int)$i];
 	}
-	$unit = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB'];
-	return round($bytes / pow(1024, ($i = floor(log($bytes, 1024)))), $precision) . $unit[(int)$i];
+
 }
 
 function checkStatus ($code)
@@ -904,4 +917,3 @@ function responseXmlToObject($input)
 	return $xml;
 }
 
-}
