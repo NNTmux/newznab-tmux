@@ -14,7 +14,7 @@ $c = new ColorCLI();
 if (!isset($argv[1])) {
 	exit($c->error("This script is not intended to be run manually, it is called from fixreleasenames_threaded.py."));
 } else if (isset($argv[1])) {
-	$db = new Settings();
+	$db = new DB();
 	$namefixer = new Namefixer(true);
 	$pieces = explode(' ', $argv[1]);
 	if (isset($pieces[1]) && $pieces[0] == 'nfo') {

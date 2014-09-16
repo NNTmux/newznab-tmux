@@ -19,7 +19,7 @@ class TheTVDB
 
 	public function addSeries($TheTVDBAPIArray)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		$airstime = $TheTVDBAPIArray['airstime'];
 		if($airstime != "")
@@ -51,7 +51,7 @@ class TheTVDB
 
 	public function addEpisodes($TheTVDBAPIArray)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		for($i=0; $i < count($TheTVDBAPIArray['episodetvdbID']); $i++) {
 			$airdate = strftime('%Y-%m-%d %H:%M:%S', strtotime($TheTVDBAPIArray['episodefirstaired'][$i].' '.$TheTVDBAPIArray['airstime']));
@@ -74,7 +74,7 @@ class TheTVDB
 
 	public function updateSeries($tvdbID, $actors, $airsday, $airstime, $contentrating, $firstaired, $genre, $imdbID, $network, $overview, $rating, $ratingcount, $runtime, $seriesname, $status)
 	{
-		$db = new Settings();
+		$db = new DB();
 		if ($airstime != "")
 			$airstime = $db->escapeString(date("H:i:s", strtotime($airstime)));
 		else
@@ -102,33 +102,33 @@ class TheTVDB
 
 	public function deleteTitle($tvdbID)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		$db->queryExec(sprintf("DELETE FROM thetvdb WHERE tvdbID = %d", $tvdbID));
 	}
 
 	public function addEmptySeries($seriesname)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		$db->queryInsert(sprintf("INSERT INTO thetvdb (tvdbID, seriesname, createddate) VALUES (0, %s, now())", $db->escapeString($seriesname)));
 	}
 
 	public function getSeriesInfoByID($tvdbID)
 	{
-		$db = new Settings();
+		$db = new DB();
 		return $db->queryOneRow(sprintf("SELECT * FROM thetvdb WHERE tvdbID = %d", $tvdbID));
 	}
 
 	public function getSeriesInfoByName($seriesname)
 	{
-		$db = new Settings();
+		$db = new DB();
 		return $db->queryOneRow(sprintf("SELECT * FROM thetvdb WHERE seriesname = %s", $db->escapeString($seriesname)));
 	}
 
 	public function getSeriesRange($start, $num, $seriesname='')
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		$limit = ($start === false) ? '' : " LIMIT ".$start.",".$num;
 
@@ -141,7 +141,7 @@ class TheTVDB
 
 	public function getSeriesCount($seriesname='')
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		$rsql = '';
 		if ($seriesname != '')
@@ -179,13 +179,13 @@ class TheTVDB
 		if($this->echooutput && $echooutput)
 			echo 'TheTVDB : '.$seriesName.' '.$fullep." Not found\n";
 
-		$db = new Settings();
+		$db = new DB();
 		$db->queryExec(sprintf('UPDATE releases SET episodeinfoID = %d WHERE ID = %d', -2, $releaseID));
 	}
 
 	public function processReleases()
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		$results = $db->queryDirect(sprintf("SELECT ID, searchname, rageID, anidbID, seriesfull, season, episode, tvtitle FROM releases WHERE episodeinfoID IS NULL AND categoryID IN ( SELECT ID FROM category WHERE parentID = %d ) LIMIT 150", Category::CAT_PARENT_TV));
 

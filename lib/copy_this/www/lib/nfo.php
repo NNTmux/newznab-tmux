@@ -224,7 +224,7 @@ class Nfo
 		// it no good, we need to add it to the skipped array which
 		// must be passed into the function.
 
-		$db = new Settings();
+		$db = new DB();
 		foreach($blobhash as $uid => $blob){
 			$query = sprintf(
 				"REPLACE INTO releasenfo (ID, releaseID, binaryID, nfo) ".
@@ -489,7 +489,7 @@ class Nfo
 		// nzb files are further parsed for nfo segments that can
 		// be extracted and applied to the release
 		$nzb = new NZB();
-		$db = new Settings();
+		$db = new DB();
 
 		// How many releases to handle at a time
 		$batch=Nfo::NNTP_BATCH_COUNT;
@@ -587,7 +587,7 @@ class Nfo
 	 */
 	public function deleteReleaseNfo($relid)
 	{
-		$db = new Settings();
+		$db = new DB();
 		return $db->queryExec(sprintf("DELETE from releasenfo where releaseID = %d", $relid));
 	}
 
@@ -596,7 +596,7 @@ class Nfo
 	 */
 	private function setNfoMissing($relid)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$q = sprintf("UPDATE releases SET releasenfoID = %d ".
 					"WHERE ID = %d", Nfo::FLAG_NFO_MISSING, $relid);
 		return $db->queryExec($q);
@@ -607,7 +607,7 @@ class Nfo
 	 */
 	public function getNfo($relid, &$nfoout)
 	{
-		$db = new Settings();
+		$db = new DB();
 		// Has NFO Query
 		$mnfo = "SELECT uncompress(rn.nfo) as nfo FROM releases r ".
 			"INNER JOIN releasenfo rn ON rn.releaseID = r.ID AND rn.ID = r.releasenfoID ".

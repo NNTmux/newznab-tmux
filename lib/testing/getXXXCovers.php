@@ -5,7 +5,7 @@ require_once(WWW_DIR . "/lib/XXX.php");
 require_once(WWW_DIR . "/lib/ColorCLI.php");
 
 
-$pdo = new Settings();
+$pdo = new DB();
 $movie = new XXX();
 $c = new ColorCLI();
 

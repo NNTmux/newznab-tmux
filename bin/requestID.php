@@ -1,7 +1,7 @@
 <?php
 
 require(dirname(__FILE__) . "/config.php");
-require_once(WWW_DIR . "/lib/framework/Settings.php");
+require_once(WWW_DIR . "/lib/framework/db.php");
 require_once(WWW_DIR . "/lib/groups.php");
 require_once(WWW_DIR . "/lib/category.php");
 require_once(WWW_DIR . "/lib/Tmux.php");
@@ -13,7 +13,7 @@ if (!isset($argv[1])) {
 	exit($c->error("This script is not intended to be run manually, it is called from requestid_threaded.py."));
 }
 $pieces = explode('                       ', $argv[1]);
-$db = new Settings();
+$db = new DB();
 $n = "\n";
 $category = new Categorize();
 $groups = new Groups();
@@ -119,7 +119,7 @@ function getReleaseNameFromRequestID($tmux, $requestID, $groupName)
 
 function localLookup($requestID, $groupName, $oldname)
 {
-	$db = new Settings();
+	$db = new DB();
 	$groups = new Groups();
 	$f = new Functions();
 	$groupID = $f->getIDByName($groupName);

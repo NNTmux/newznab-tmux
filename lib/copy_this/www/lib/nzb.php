@@ -1,5 +1,5 @@
 <?php
-require_once(WWW_DIR . "/lib/framework/Settings.php");
+require_once(WWW_DIR . "/lib/framework/db.php");
 require_once(WWW_DIR . "/lib/site.php");
 require_once(WWW_DIR . "/lib/category.php");
 require_once(WWW_DIR . "../misc/update_scripts/nix_scripts/tmux/lib/Enzebe.php");
@@ -15,7 +15,7 @@ class NZB
 	 */
 	function writeNZBforReleaseId($relid, $name, $catId, $path)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$cat = new Category();
 		$catrow = $cat->getById($catId);
 		$site = new Sites();

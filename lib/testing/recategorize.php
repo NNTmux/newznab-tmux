@@ -1,6 +1,6 @@
 <?php
 require_once(dirname(__FILE__) . "/../../bin/config.php");
-require_once(WWW_DIR . "/lib/framework/Settings.php");
+require_once(WWW_DIR . "/lib/framework/db.php");
 require_once(WWW_DIR . "/lib/category.php");
 require_once(WWW_DIR . "/lib/ColorCLI.php");
 require_once(WWW_DIR . "/lib/ConsoleTools.php");
@@ -66,7 +66,7 @@ function reCategorize($argv)
 // Returns the quantity of categorized releases.
 function categorizeRelease($update = true, $where, $echooutput = false)
 {
-	$pdo = new Settings();
+	$pdo = new DB();
 	$cat = new Categorize();
 	$consoletools = new consoleTools();
 	$relcount = $chgcount = 0;

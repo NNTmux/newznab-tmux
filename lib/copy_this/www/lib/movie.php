@@ -38,7 +38,7 @@ class Movie
 	 */
 	public function getMovieInfo($imdbId)
 	{
-		$db = new Settings();
+		$db = new DB();
 		return $db->queryOneRow(sprintf("SELECT * FROM movieinfo where imdbID = %d", $imdbId));
 	}
 
@@ -47,7 +47,7 @@ class Movie
 	 */
 	public function getMovieInfoMultiImdb($imdbIds)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$allids = implode(",", array_filter($imdbIds));
 		$sql = sprintf("SELECT DISTINCT movieinfo.*, releases.imdbID AS relimdb FROM movieinfo LEFT OUTER JOIN releases ON releases.imdbID = movieinfo.imdbID WHERE movieinfo.imdbID IN (%s)", $allids);
 		return $db->query($sql);
@@ -58,7 +58,7 @@ class Movie
 	 */
 	public function delete($imdbId)
 	{
-		$db = new Settings();
+		$db = new DB();
 		@unlink($this->imgSavePath.$imdbId.'-cover.jpg');
 		@unlink($this->imgSavePath.$imdbId.'-backdrop.jpg');
 		return $db->queryOneRow(sprintf("delete FROM movieinfo where imdbID = %d", $imdbId));
@@ -80,7 +80,7 @@ class Movie
 	 */
 	public function getRange($start, $num, $moviename="")
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		if ($start === false)
 			$limit = "";
@@ -99,7 +99,7 @@ class Movie
 	 */
 	public function getCount($moviename="")
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		$rsql = '';
 		if ($moviename != "")
@@ -114,7 +114,7 @@ class Movie
 	 */
 	public function getMovieCount($cat, $maxage=-1, $excludedcats=array())
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		$browseby = $this->getBrowseBy();
 
@@ -167,7 +167,7 @@ class Movie
 	 */
 	public function getMovieRange($cat, $start, $num, $orderby, $maxage=-1, $excludedcats=array())
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		$browseby = $this->getBrowseBy();
 
@@ -373,7 +373,7 @@ class Movie
 	 */
 	public function update($id, $title, $tagline, $plot, $year, $rating, $genre, $director, $actors, $language, $cover, $backdrop)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		$db->queryExec(sprintf("update movieinfo SET title=%s, tagline=%s, plot=%s, year=%s, rating=%s, genre=%s, director=%s, actors=%s, language=%s, cover=%d, backdrop=%d, updateddate=NOW() WHERE imdbID = %d",
 			$db->escapeString($title), $db->escapeString($tagline), $db->escapeString($plot), $db->escapeString($year), $db->escapeString($rating), $db->escapeString($genre), $db->escapeString($director), $db->escapeString($actors), $db->escapeString($language), $cover, $backdrop, $id));
@@ -492,7 +492,7 @@ class Movie
 		}
 		$mov['language'] = html_entity_decode($mov['language'], ENT_QUOTES, 'UTF-8');
 
-		$db = new Settings();
+		$db = new DB();
 		$query = sprintf("
 			INSERT INTO movieinfo
 				(imdbID, tmdbID, title, rating, tagline, trailer, plot, year, genre, director, actors, language, cover, backdrop, createddate, updateddate)
@@ -668,7 +668,7 @@ class Movie
     public function processMovieReleases()
 	{
 		$ret = 0;
-		$db = new Settings();
+		$db = new DB();
 		$nfo = new Nfo();
 
 		$res = $db->queryDirect(sprintf("SELECT searchname, ID from releases where imdbID IS NULL and categoryID in ( select ID from category where parentID = %d ) ORDER BY postdate DESC LIMIT 100", Category::CAT_PARENT_MOVIE));
@@ -767,7 +767,7 @@ class Movie
 	 */
 	public function getUpcoming($type, $source="rottentomato")
 	{
-		$db = new Settings();
+		$db = new DB();
 		$sql = sprintf("select * from upcoming where source = %s and typeid = %d", $db->escapeString($source), $type);
 		return $db->queryOneRow($sql);
 	}
@@ -810,7 +810,7 @@ class Movie
 	 */
 	public function updateInsUpcoming($source, $type, $info)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		$sql = sprintf("INSERT into upcoming (source,typeID,info,updateddate) VALUES (%s, %d, %s, now()) ON DUPLICATE KEY UPDATE info = %s",
 						$db->escapeString($source), $type, $db->escapeString($info), $db->escapeString($info));

@@ -62,7 +62,7 @@ class PostProcess
 	public function processUnwanted()
 	{
 		$r = new Releases;
-		$db = new Settings();
+		$db = new DB();
 		$currTime_ori = $db->queryOneRow("SELECT NOW() as now");
 
 		//
@@ -242,7 +242,7 @@ class PostProcess
 	 */
 	public function processUnknownCategory()
 	{
-		$db = new Settings();
+		$db = new DB();
 		$sql = sprintf("select ID from releases where categoryID = %d", Category::CAT_NOT_DETERMINED);
 		$result = $db->query($sql);
 		$rescount = sizeof($result);
@@ -335,7 +335,7 @@ class PostProcess
 		if (!file_exists($tmpPath))
 			mkdir($tmpPath, 0766, true);
 
-		$db = new Settings();
+		$db = new DB();
 		$nntp = new Nntp;
 		$nzb = new Nzb;
 
@@ -604,7 +604,7 @@ class PostProcess
 		$retval = array();
         $rar = new ArchiveInfo();
 		$rf = new ReleaseFiles;
-		$db = new Settings();
+		$db = new DB();
 
         $rar->setData($fetchedBinary, true);
         if ($rar->error)

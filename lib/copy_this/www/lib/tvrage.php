@@ -35,20 +35,20 @@ class TvRage
 
 	public function getByID($id)
 	{
-		$db = new Settings();
+		$db = new DB();
 		return $db->queryOneRow(sprintf("select * from tvrage where ID = %d", $id ));
 	}
 
 	public function getByRageID($id)
 	{
-		$db = new Settings();
+		$db = new DB();
 		return $db->query(sprintf("select * from tvrage where rageID = %d", $id ));
 	}
 
 	public function getByTitle($title)
 	{
 		// check if we already have an entry for this show
-		$db = new Settings();
+		$db = new DB();
 		$sql = sprintf("SELECT rageID from tvrage where (releasetitle = %s or releasetitle = %s)", $db->escapeString($title), $db->escapeString(str_replace(' and ', ' & ', $title)));
 		$res = $db->queryOneRow($sql);
 		if ($res)
@@ -61,14 +61,14 @@ class TvRage
 	{
 		$releasename = str_replace(array('.','_'), array(' ',' '), $releasename);
 
-		$db = new Settings();
+		$db = new DB();
 		return $db->queryInsert(sprintf("insert into tvrage (rageID, releasetitle, description, genre, country, createddate, imgdata) values (%d, %s, %s, %s, %s, now(), %s)",
 			$rageid, $db->escapeString($releasename), $db->escapeString($desc), $db->escapeString($genre), $db->escapeString($country), $db->escapeString($imgbytes)));
 	}
 
 	public function update($id, $rageid, $releasename, $desc, $genre, $country, $imgbytes)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		if ($imgbytes != "")
 			$imgbytes = sprintf(", imgdata = %s", $db->escapeString($imgbytes));
@@ -79,13 +79,13 @@ class TvRage
 
 	public function delete($id)
 	{
-		$db = new Settings();
+		$db = new DB();
 		return $db->queryExec(sprintf("DELETE from tvrage where ID = %d",$id));
 	}
 
 	public function getRange($start, $num, $ragename="")
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		if ($start === false)
 			$limit = "";
@@ -101,7 +101,7 @@ class TvRage
 
 	public function getCount($ragename="")
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		$rsql = '';
 		if ($ragename != "")
@@ -113,7 +113,7 @@ class TvRage
 
 	public function getCalendar($date = "")
 	{
-		$db = new Settings();
+		$db = new DB();
 		if(!preg_match('/\d{4}-\d{2}-\d{2}/',$date))
 			$date = date("Y-m-d");
 		$sql = sprintf("SELECT * FROM episodeinfo WHERE rageID > %d AND DATE(airdate) = %s order by airdate asc ", 0, $db->escapeString($date));
@@ -122,7 +122,7 @@ class TvRage
 
 	public function getSeriesList($uid, $letter="", $ragename="")
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		$rsql = '';
 		if ($letter != "")
@@ -144,7 +144,7 @@ class TvRage
 
 	public function updateSchedule()
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		$countries = $db->query("select distinct(country) as country from tvrage where country != ''");
 		$showsindb = $db->query("select distinct(rageid) as rageid from tvrage");
@@ -423,7 +423,7 @@ class TvRage
 			}
 		}
 
-		$db = new Settings();
+		$db = new DB();
 		$sql = sprintf("update tvrage set description = %s, imgdata = %s where id = %d", $db->escapeString($desc), $db->escapeString($imgbytes), $id);
 		return $db->queryExec($sql);
 
@@ -499,7 +499,7 @@ class TvRage
 	public function processTvReleases($lookupTvRage=true, $numtoProcess=100)
 	{
 		$ret = 0;
-		$db = new Settings();
+		$db = new DB();
 		$nfo = new Nfo();
 
 		// get all releases without a rageid which are in a tv category.

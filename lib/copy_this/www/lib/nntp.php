@@ -3,7 +3,7 @@
  * Attempt to include PEAR's nntp class if it has not already been included.
  */
 require_once(WWW_DIR . "/lib/Net_NNTP/NNTP/Client.php");
-require_once(WWW_DIR . "/lib/framework/Settings.php");
+require_once(WWW_DIR . "/lib/framework/db.php");
 require_once(WWW_DIR . "/lib/Tmux.php");
 require_once(WWW_DIR . "/lib/site.php");
 require_once(WWW_DIR . "/lib/util.php");

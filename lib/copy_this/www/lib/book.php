@@ -33,7 +33,7 @@ class Book
 	 */
 	public function getBookInfo($id)
 	{
-		$db = new Settings();
+		$db = new DB();
 		return $db->queryOneRow(sprintf("SELECT bookinfo.*, genres.title as genres FROM bookinfo left outer join genres on genres.ID = bookinfo.genreID where bookinfo.ID = %d ", $id));
 	}
 
@@ -42,7 +42,7 @@ class Book
 	 */
 	public function getBookInfoByName($author, $title)
 	{
-		$db = new Settings();
+		$db = new DB();
 		return $db->queryOneRow(sprintf("SELECT * FROM bookinfo where author like %s and title like %s", $db->escapeString("%".$author."%"),  $db->escapeString("%".$title."%")));
 	}
 
@@ -51,7 +51,7 @@ class Book
 	 */
 	public function getRange($start, $num)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		if ($start === false)
 			$limit = "";
@@ -66,7 +66,7 @@ class Book
 	 */
 	public function getCount()
 	{
-		$db = new Settings();
+		$db = new DB();
 		$res = $db->queryOneRow("select count(ID) as num from bookinfo");
 		return $res["num"];
 	}
@@ -76,7 +76,7 @@ class Book
 	 */
 	public function getBookCount($maxage=-1)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		$browseby = $this->getBrowseBy();
 
@@ -96,7 +96,7 @@ class Book
 	 */
 	public function getBookRange($start, $num, $orderby, $maxage=-1)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		$browseby = $this->getBrowseBy();
 
@@ -248,7 +248,7 @@ class Book
 	 */
 	public function update($id, $title, $asin, $url, $author, $publisher, $publishdate, $cover)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		$db->queryExec(sprintf("update bookinfo SET title=%s, asin=%s, url=%s, author=%s, publisher=%s, publishdate='%s', cover=%d, updateddate=NOW() WHERE ID = %d",
 		$db->escapeString($title), $db->escapeString($asin), $db->escapeString($url), $db->escapeString($author), $db->escapeString($publisher), $publishdate, $cover, $id));
@@ -260,7 +260,7 @@ class Book
 	 */
 	public function updateBookInfo($author, $title)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$ri = new ReleaseImage();
 
 		$mus = array();
@@ -368,7 +368,7 @@ class Book
 	public function processBookReleases()
 	{
 		$ret = 0;
-		$db = new Settings();
+		$db = new DB();
 		$numlookedup = 0;
 
 		$res = $db->queryDirect(sprintf("SELECT searchname, ID from releases where bookinfoID IS NULL and categoryID = %d ORDER BY postdate DESC LIMIT 100", Category::CAT_BOOK_EBOOK));
@@ -483,7 +483,7 @@ class Book
 	 */
 	public function addUpdateBookInfo($title, $asin, $url, $author, $publisher, $publishdate, $review, $cover, $dewey, $ean, $isbn, $pages)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		if ($pages == 0)
 			$pages = "null";

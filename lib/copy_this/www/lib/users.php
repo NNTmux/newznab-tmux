@@ -1,5 +1,5 @@
 <?php
-require_once(WWW_DIR . "/lib/framework/Settings.php");
+require_once(WWW_DIR . "/lib/framework/db.php");
 require_once(WWW_DIR . "/lib/site.php");
 require_once(WWW_DIR . "/lib/releases.php");
 require_once(WWW_DIR . "/lib/forum.php");
@@ -40,14 +40,14 @@ class Users
 
 	public function get()
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		return $db->query("select * from users");
 	}
 
 	public function delete($id)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$this->delCartForUser($id);
 		$this->delUserCategoryExclusions($id);
 		$this->delDownloadRequests($id);
@@ -70,7 +70,7 @@ class Users
 
 	public function getRange($start, $num, $orderby, $username = '', $email = '', $host = '', $role = '')
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		if ($start === false)
 			$limit = "";
@@ -138,7 +138,7 @@ class Users
 
 	public function getCount()
 	{
-		$db = new Settings();
+		$db = new DB();
 		$res = $db->queryOneRow("select count(ID) as num from users WHERE email != 'sharing@nZEDb.com'");
 
 		return $res["num"];
@@ -146,7 +146,7 @@ class Users
 
 	public function add($uname, $pass, $email, $role, $notes, $host, $invites = Users::DEFAULT_INVITES, $invitedby = 0)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		$site = new Sites();
 		$s = $site->get();
@@ -165,7 +165,7 @@ class Users
 
 	public function update($id, $uname, $email, $grabs, $role, $notes, $invites, $movieview, $musicview, $gameview, $xxxview, $consoleview, $bookview, $queueType = '', $nzbgetURL = '', $nzbgetUsername = '', $nzbgetPassword = '', $saburl = '', $sabapikey = '', $sabpriority = '', $sabapikeytype = '', $nzbvortexServerUrl, $nzbvortexApiKey = false, $cp_url = false, $cp_api = false)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		$uname = trim($uname);
 		$email = trim($email);
@@ -245,7 +245,7 @@ class Users
 
 	public function updateUserRole($uid, $role)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$db->queryExec(sprintf("update users set role = %d where id = %d", $role, $uid));
 
 		return Users::SUCCESS;
@@ -253,7 +253,7 @@ class Users
 
 	public function updateUserRoleChangeDate($uid, $date)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$db->queryExec(sprintf("update users SET rolechangedate = '%s' WHERE ID = %d", $date, $uid));
 
 		return Users::SUCCESS;
@@ -261,7 +261,7 @@ class Users
 
 	public function updateExpiredRoles($uprole, $downrole, $msgsubject, $msgbody)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		$site = new Sites;
 		$s = $site->get();
@@ -277,7 +277,7 @@ class Users
 
 	public function updateRssKey($uid)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$db->queryExec(sprintf("update users set rsstoken = md5(%s) where id = %d", $db->escapeString(uniqid()), $uid));
 
 		return Users::SUCCESS;
@@ -285,7 +285,7 @@ class Users
 
 	public function updatePassResetGuid($id, $guid)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$db->queryExec(sprintf("update users set resetguid = %s where id = %d", $db->escapeString($guid), $id));
 
 		return Users::SUCCESS;
@@ -293,7 +293,7 @@ class Users
 
 	public function updatePassword($id, $password)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$db->queryExec(sprintf("update users set password = %s, userseed=md5(%s) where id = %d", $db->escapeString($this->hashPassword($password)), $db->escapeString(generateUuid()), $id));
 
 		return Users::SUCCESS;
@@ -301,34 +301,34 @@ class Users
 
 	public function getByEmail($email)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		return $db->queryOneRow(sprintf("select * from users where lower(email) = %s ", $db->escapeString(strtolower($email))));
 	}
 
 	public function getByPassResetGuid($guid)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		return $db->queryOneRow(sprintf("select * from users where resetguid = %s ", $db->escapeString($guid)));
 	}
 
 	public function getByUsername($uname)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		return $db->queryOneRow(sprintf("select users.*, userroles.name as rolename, userroles.apirequests, userroles.downloadrequests from users inner join userroles on userroles.ID = users.role where username = %s ", $db->escapeString($uname)));
 	}
 
 	public function incrementGrabs($id, $num = 1)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$db->queryExec(sprintf("update users set grabs = grabs + %d where id = %d ", $num, $id));
 	}
 
 	public function getById($id)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$sql = sprintf("select users.*, userroles.name as rolename, userroles.hideads, userroles.canpreview, userroles.canpre, userroles.apirequests, userroles.downloadrequests, NOW() as now from users inner join userroles on userroles.ID = users.role where users.id = %d ", $id);
 
 		return $db->queryOneRow($sql);
@@ -336,7 +336,7 @@ class Users
 
 	public function getByIdAndRssToken($id, $rsstoken)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$res = $this->getById($id);
 
 		return ($res && $res["rsstoken"] == $rsstoken ? $res : null);
@@ -344,7 +344,7 @@ class Users
 
 	public function getByRssToken($rsstoken)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		return $db->queryOneRow(sprintf("select users.*, userroles.apirequests, userroles.downloadrequests, NOW() as now from users inner join userroles on userroles.ID = users.role where users.rsstoken = %s ", $db->escapeString($rsstoken)));
 	}
@@ -366,7 +366,7 @@ class Users
 
 	public function isDisabled($username)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$role = $db->queryOneRow(sprintf("select role as role from users where username = %s ", $db->escapeString($username)));
 
 		return ($role["role"] == Users::ROLE_DISABLED);
@@ -544,7 +544,7 @@ class Users
 
 	public function updateSiteAccessed($uid, $host = "")
 	{
-		$db = new Settings();
+		$db = new DB();
 		$hostSql = '';
 		if ($host != '')
 			$hostSql = sprintf(', host = %s', $db->escapeString($host));
@@ -554,7 +554,7 @@ class Users
 
 	public function updateApiAccessed($uid)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$db->queryExec(sprintf("update users set apiaccess = now() where id = %d ", $uid));
 	}
 
@@ -568,7 +568,7 @@ class Users
 
 	public function addCart($uid, $releaseid)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$sql = sprintf("insert into usercart (userID, releaseID, createddate) values (%d, %d, now())", $uid, $releaseid);
 
 		return $db->queryInsert($sql);
@@ -576,7 +576,7 @@ class Users
 
 	public function getCart($uid, $releaseid = "")
 	{
-		$db = new Settings();
+		$db = new DB();
 		if ($releaseid != "")
 			$releaseid = " and releases.ID = " . $db->escapeString($releaseid);
 
@@ -585,7 +585,7 @@ class Users
 
 	public function delCartByGuid($guids, $uid)
 	{
-		$db = new Settings();
+		$db = new DB();
 		if (!is_array($guids))
 			return false;
 
@@ -602,7 +602,7 @@ class Users
 
 	public function delCartByUserAndRelease($guid, $uid)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$rel = $db->queryOneRow(sprintf("select ID from releases where guid = %s", $db->escapeString($guid)));
 		if ($rel)
 			$db->queryExec(sprintf("DELETE FROM usercart WHERE userID = %d AND releaseID = %d", $uid, $rel["ID"]));
@@ -610,19 +610,19 @@ class Users
 
 	public function delCartForUser($uid)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$db->queryExec(sprintf("DELETE from usercart where userID = %d", $uid));
 	}
 
 	public function delCartForRelease($rid)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$db->queryExec(sprintf("DELETE from usercart where releaseID = %d", $rid));
 	}
 
 	public function addCategoryExclusions($uid, $catids)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$this->delUserCategoryExclusions($uid);
 		if (count($catids) > 0) {
 			foreach ($catids as $catid) {
@@ -633,7 +633,7 @@ class Users
 
 	public function getCategoryExclusion($uid)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$ret = array();
 		$data = $db->query(sprintf("select categoryID from userexcat where userID = %d union distinct select categoryID from roleexcat inner join users on users.role = roleexcat.role where users.ID = %d", $uid, $uid));
 		foreach ($data as $d)
@@ -644,7 +644,7 @@ class Users
 
 	public function getRoleCategoryExclusion($role)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$ret = array();
 		$data = $db->query(sprintf("select categoryID from roleexcat where role = %d", $role));
 		foreach ($data as $d)
@@ -655,7 +655,7 @@ class Users
 
 	public function addRoleCategoryExclusions($role, $catids)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$this->delRoleCategoryExclusions($role);
 		if (count($catids) > 0) {
 			foreach ($catids as $catid) {
@@ -670,7 +670,7 @@ class Users
 		$ret = array();
 
 		if ($data) {
-			$db = new Settings();
+			$db = new DB();
 			$category = new Category();
 			$data = $category->getByIds($data);
 			foreach ($data as $d)
@@ -682,19 +682,19 @@ class Users
 
 	public function delCategoryExclusion($uid, $catid)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$db->queryExec(sprintf("DELETE from userexcat where userID = %d and categoryID = %d", $uid, $catid));
 	}
 
 	public function delUserCategoryExclusions($uid)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$db->queryExec(sprintf("DELETE from userexcat where userID = %d", $uid));
 	}
 
 	public function delRoleCategoryExclusions($role)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$db->queryExec(sprintf("DELETE from roleexcat where role = %d", $role));
 	}
 
@@ -714,7 +714,7 @@ class Users
 
 	public function getInvite($inviteToken)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		//
 		// Tidy any old invites sent greater than DEFAULT_INVITE_EXPIRY_DAYS days ago.
@@ -726,13 +726,13 @@ class Users
 
 	public function addInvite($uid, $inviteToken)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$db->queryInsert(sprintf("insert into userinvite (guid, userID, createddate) values (%s, %d, now())", $db->escapeString($inviteToken), $uid));
 	}
 
 	public function deleteInvite($inviteToken)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$db->queryExec(sprintf("DELETE from userinvite where guid = %s ", $db->escapeString($inviteToken)));
 	}
 
@@ -742,7 +742,7 @@ class Users
 		if (!$invite)
 			return -1;
 
-		$db = new Settings();
+		$db = new DB();
 		$db->queryExec(sprintf("update users set invites = case when invites <= 0 then 0 else invites-1 end where ID = %d ", $invite["userID"]));
 		$this->deleteInvite($invitecode);
 
@@ -751,7 +751,7 @@ class Users
 
 	public function getTopGrabbers()
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		return $db->query("SELECT ID, username, SUM(grabs) as grabs FROM users
 							GROUP BY ID, username
@@ -763,7 +763,7 @@ class Users
 
 	public function getUsersByMonth()
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		return $db->query("SELECT DATE_FORMAT(createddate, '%M %Y') AS mth, COUNT(*) AS num
 							FROM users
@@ -775,7 +775,7 @@ class Users
 
 	public function getUsersByHostHash()
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		$site = new Sites();
 		$s = $site->get();
@@ -808,7 +808,7 @@ class Users
 
 	public function getUsersByRole()
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		return $db->query("select ur.name, count(u.ID) as num from users u
 							inner join userroles ur on ur.ID = u.role
@@ -819,7 +819,7 @@ class Users
 
 	public function getLoginCountsByMonth()
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		return $db->query("select 'Login' as type,
 			sum(case when lastlogin > curdate() - INTERVAL 1 DAY then 1 else 0 end) as 1day,
@@ -843,14 +843,14 @@ class Users
 
 	public function getRoles()
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		return $db->query("select * from userroles");
 	}
 
 	public function getRoleById($id)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$sql = sprintf("select * from userroles where ID = %d", $id);
 
 		return $db->queryOneRow($sql);
@@ -858,14 +858,14 @@ class Users
 
 	public function getDefaultRole()
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		return $db->queryOneRow("select * from userroles where isdefault = 1");
 	}
 
 	public function addRole($name, $apirequests, $downloadrequests, $defaultinvites, $canpreview, $canpre, $hideads)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$sql = sprintf("insert into userroles (name, apirequests, downloadrequests, defaultinvites, canpreview, canpre, hideads) VALUES (%s, %d, %d, %d, %d, %d)", $db->escapeString($name), $apirequests, $downloadrequests, $defaultinvites, $canpreview, $canpre, $hideads);
 
 		return $db->queryInsert($sql);
@@ -873,7 +873,7 @@ class Users
 
 	public function updateRole($id, $name, $apirequests, $downloadrequests, $defaultinvites, $isdefault, $canpreview, $canpre, $hideads)
 	{
-		$db = new Settings();
+		$db = new DB();
 		if ($isdefault == 1)
 			$db->queryExec("update userroles set isdefault=0");
 
@@ -882,7 +882,7 @@ class Users
 
 	public function deleteRole($id)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$res = $db->query(sprintf("select ID from users where role = %d", $id));
 		if (sizeof($res) > 0) {
 			$userids = array();
@@ -898,7 +898,7 @@ class Users
 
 	public function getApiRequests($userid)
 	{
-		$db = new Settings();
+		$db = new DB();
 		//clear old requests
 		//$db->queryExec(sprintf("DELETE FROM userrequests WHERE (userID = %d AND timestamp < DATE_SUB(NOW(), INTERVAL 1 DAY))", $userid));
 		$db->queryExec(sprintf("DELETE FROM userrequests WHERE timestamp < DATE_SUB(NOW(), INTERVAL 1 DAY)", $userid));
@@ -910,7 +910,7 @@ class Users
 
 	public function addApiRequest($userid, $request, $hosthash)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$hosthash = ($hosthash != "" ? $db->escapeString($hosthash) : "null");
 
 		$sql = sprintf("insert into userrequests (userID, request, timestamp, hosthash) VALUES (%d, %s, now(), %s)", $userid, $db->escapeString($request), $hosthash);
@@ -920,7 +920,7 @@ class Users
 
 	public function delApiRequests($userid)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		return $db->queryInsert(sprintf("delete from userrequests where userID = %d", $userid));
 	}
@@ -933,7 +933,7 @@ class Users
 	 */
 	public function pruneRequestHistory($days = 0)
 	{
-		$db = new Settings();
+		$db = new DB();
 		if ($days == 0) {
 			$days = 1;
 			$db->queryExec("update userdownloads set releaseID = null");
@@ -945,7 +945,7 @@ class Users
 
 	public function getDownloadRequests($userid, $hosthash = "", $site = "")
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		if ($hosthash != "" && $site->userhostexclusion != '') {
 			$ipsql = "";
@@ -965,7 +965,7 @@ class Users
 
 	public function getDownloadRequestsForUserAndAllHostHashes($userid)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		$sql = sprintf("select distinct hosthash from userdownloads where userID = %d and hosthash is not null and hosthash != ''", $userid);
 		$rows = $db->query($sql);
@@ -982,7 +982,7 @@ class Users
 
 	public function addDownloadRequest($userid, $hosthash, $relGuid)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$hosthash = ($hosthash != "" ? $db->escapeString($hosthash) : "null");
 
 		$sql = sprintf("insert into userdownloads (userID, timestamp, hosthash, releaseID) VALUES (%d, now(), %s, (select ID from releases where guid = %s))", $userid, $hosthash, $db->escapeString($relGuid));
@@ -992,14 +992,14 @@ class Users
 
 	public function delDownloadRequests($userid)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		return $db->queryInsert(sprintf("delete from userdownloads where userID = %d", $userid));
 	}
 
 	public function delDownloadRequestsForRelease($releaseID)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		return $db->queryInsert(sprintf("delete from userdownloads where releaseID = %d", $releaseID));
 	}

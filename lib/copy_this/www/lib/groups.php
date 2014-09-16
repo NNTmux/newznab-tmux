@@ -1,5 +1,5 @@
 <?php
-require_once(WWW_DIR . "/lib/framework/Settings.php");
+require_once(WWW_DIR . "/lib/framework/db.php");
 require_once(WWW_DIR . "/lib/category.php");
 require_once(WWW_DIR . "/lib/site.php");
 require_once(WWW_DIR . "/lib/releases.php");
@@ -35,7 +35,7 @@ class Groups
 		}
 		$ordersort = (isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'desc';
 		$orderby = $orderfield . " " . $ordersort;
-		$db = new Settings();
+		$db = new DB();
 
 		return $db->query(sprintf("SELECT groups.*, COALESCE(rel.num, 0) AS num_releases
 							FROM groups
@@ -51,7 +51,7 @@ class Groups
 	 */
 	public function getGroupsForSelect()
 	{
-		$db = new Settings();
+		$db = new DB();
 		$categories = $db->query("SELECT * FROM groups WHERE active = 1 ORDER BY name");
 		$temp_array = array();
 
@@ -68,7 +68,7 @@ class Groups
 	 */
 	public function getByID($id)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		return $db->queryOneRow(sprintf("select * from groups where ID = %d ", $id));
 	}
@@ -78,7 +78,7 @@ class Groups
 	 */
 	public function getActive()
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		return $db->query("SELECT * FROM groups WHERE active = 1 ORDER BY name");
 	}
@@ -88,14 +88,14 @@ class Groups
 	 */
 	public function getByName($grp)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		return $db->queryOneRow(sprintf("select * from groups where name = '%s' ", $grp));
 	}
 
 	public function getByNameByID($ID)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$res = $db->queryOneRow(sprintf("select name from groups where ID = %d ", $ID));
 
 		return $res["name"];
@@ -103,7 +103,7 @@ class Groups
 
 	public function getIDByName($name)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$res = $db->queryOneRow(sprintf("SELECT ID FROM groups WHERE name = %s", $db->escapeString($name)));
 
 		return $res["ID"];
@@ -114,7 +114,7 @@ class Groups
 	 */
 	public function getCount($groupname = "", $activeonly = false)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		$grpsql = '';
 		if ($groupname != "")
@@ -133,7 +133,7 @@ class Groups
 	 */
 	public function getRange($start, $num, $groupname = "", $activeonly = false)
 	{
-		$db = new Settings();
+		$db = new DB();
 		if ($start === false)
 			$limit = "";
 		else
@@ -161,7 +161,7 @@ class Groups
 	 */
 	public function add($group)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		if ($group["minfilestoformrelease"] == "" || $group["minfilestoformrelease"] == "0")
 			$minfiles = 'null';
@@ -196,7 +196,7 @@ class Groups
 	 */
 	public function delete($id)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		return $db->queryExec(sprintf("DELETE from groups where ID = %d", $id));
 	}
@@ -206,7 +206,7 @@ class Groups
 	 */
 	public function reset($id)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		return $db->queryExec(sprintf("update groups set backfill_target=0, first_record=0, first_record_postdate=null, last_record=0, last_record_postdate=null, last_updated=null where ID = %d", $id));
 	}
@@ -218,7 +218,7 @@ class Groups
 	{
 		require_once(WWW_DIR . "/lib/binaries.php");
 
-		$db = new Settings();
+		$db = new DB();
 		$releases = new Releases();
 		$binaries = new Binaries();
 
@@ -238,7 +238,7 @@ class Groups
 	 */
 	public function update($group)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		if ($group["minfilestoformrelease"] == "" || $group["minfilestoformrelease"] == "0")
 			$minfiles = 'null';
@@ -266,7 +266,7 @@ class Groups
 		if ($groupList == "") {
 			$ret[] = "No group list provided.";
 		} else {
-			$db = new Settings();
+			$db = new DB();
 			$nntp = new Nntp;
 			if (!$nntp->doConnect()) {
 				$ret[] = "Failed to get NNTP connection";
@@ -302,7 +302,7 @@ class Groups
 	 */
 	public function updateGroupStatus($id, $status = 0)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$db->queryExec(sprintf("update groups SET active = %d WHERE id = %d", $status, $id));
 		$status = ($status == 0) ? 'deactivated' : 'activated';
 

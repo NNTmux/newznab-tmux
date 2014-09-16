@@ -1,10 +1,10 @@
 <?php
 require_once(dirname(__FILE__) . "/../../../bin/config.php");
-require_once(WWW_DIR . "/lib/framework/Settings.php");
+require_once(WWW_DIR . "/lib/framework/db.php");
 require_once(WWW_DIR . "/lib/ColorCLI.php");
 require_once(WWW_DIR . "/lib/ConsoleTools.php");
 
-$pdo = new Settings();
+$pdo = new DB();
 $consoletools = new ConsoleTools();
 $pdo->log = new ColorCLI();
 $ran = false;

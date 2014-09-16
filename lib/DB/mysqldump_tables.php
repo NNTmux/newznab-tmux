@@ -5,7 +5,7 @@ require_once(WWW_DIR . "/lib/ColorCLI.php");
 
 //	This script can dump all tables or just collections/binaries/parts/partrepair/groups.
 
-$db = new Settings();
+$db = new DB();
 $c = new ColorCLI();
 if ($db->dbSystem() == "pgsql") {
 	exit($c->error("\nThis script is only for mysql.\n"));

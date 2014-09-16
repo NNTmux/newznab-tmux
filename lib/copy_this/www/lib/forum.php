@@ -11,7 +11,7 @@ class Forum
 	 */
 	public function add($parentid, $userid, $subject, $message, $locked = 0, $sticky = 0, $replies = 0)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		if ($message == "")
 			return -1;
@@ -34,7 +34,7 @@ class Forum
 	 */
 	public function getParent($parent)
 	{
-		$db = new Settings();
+		$db = new DB();
 		return $db->queryOneRow(sprintf(" SELECT forumpost.*, users.username from forumpost left outer join users on users.ID = forumpost.userID where forumpost.ID = %d ", $parent));
 	}
 
@@ -43,7 +43,7 @@ class Forum
 	 */
 	public function getRecentPosts($limit)
 	{
-		$db = new Settings();
+		$db = new DB();
 		return $db->query(sprintf("select forumpost.*, users.username from forumpost join (select case when parentID = 0 then ID else parentID end as ID, max(createddate) from forumpost group by case when parentID = 0 then ID else parentID end order by max(createddate) desc) x on x.ID = forumpost.ID inner join users on userID = users.ID limit %d", $limit));
 	}
 
@@ -53,7 +53,7 @@ class Forum
 	 */
 	public function getPosts($parent)
 	{
-		$db = new Settings();
+		$db = new DB();
 		return $db->query(sprintf(" SELECT forumpost.*, CASE WHEN role=%d THEN 1 ELSE 0 END  AS 'isadmin', users.username from forumpost left outer join users on users.ID = forumpost.userID where forumpost.ID = %d or parentID = %d order by createddate asc limit 250", Users::ROLE_ADMIN, $parent, $parent));
 	}
 
@@ -62,7 +62,7 @@ class Forum
 	 */
 	public function getPost($id)
 	{
-		$db = new Settings();
+		$db = new DB();
 		return $db->queryOneRow(sprintf(" SELECT * from forumpost where ID = %d", $id));
 	}
 
@@ -71,7 +71,7 @@ class Forum
 	 */
 	public function getBrowseCount()
 	{
-		$db = new Settings();
+		$db = new DB();
 		$res = $db->queryOneRow(sprintf("select count(ID) as num from forumpost where parentID = 0"));
 		return $res["num"];
 	}
@@ -81,7 +81,7 @@ class Forum
 	 */
 	public function getBrowseRange($start, $num)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		if ($start === false)
 			$limit = "";
@@ -96,7 +96,7 @@ class Forum
 	 */
 	public function deleteParent($parent)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$db->queryExec(sprintf("DELETE from forumpost where ID = %d or parentID = %d", $parent, $parent));
 	}
 
@@ -105,7 +105,7 @@ class Forum
 	 */
 	public function deletePost($id)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$post = $this->getPost($id);
 		if ($post)
 		{
@@ -121,7 +121,7 @@ class Forum
 	 */
 	public function deleteUser($id)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$db->queryExec(sprintf("DELETE from forumpost where userID = %d", $id));
 	}
 
@@ -130,7 +130,7 @@ class Forum
 	 */
 	public function getCountForUser($uid)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$res = $db->queryOneRow(sprintf("select count(ID) as num from forumpost where userID = %d", $uid));
 		return $res["num"];
 	}
@@ -140,7 +140,7 @@ class Forum
 	 */
 	public function getForUserRange($uid, $start, $num)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		if ($start === false)
 			$limit = "";

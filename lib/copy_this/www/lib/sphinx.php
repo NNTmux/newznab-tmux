@@ -111,7 +111,7 @@ class Sphinx
             return false;
         }
 
-        $db = new Settings();
+        $db = new DB();
 
         if ($lastRebuildDate == 0) {
             $lastRebuildDate = "NOW()";
@@ -149,7 +149,7 @@ class Sphinx
             return false;
         }
 
-        $db = new Settings();
+        $db = new DB();
 
         if ($lastMergedDate == 0) {
             $lastMergedDate = "NOW()";
@@ -309,7 +309,7 @@ class Sphinx
      */
     public function update()
     {
-        $db = new Settings();
+        $db = new DB();
 
         if (!$this->site->sphinxenabled) {
             // Sphinx is disabled, so we don't do anything.
@@ -974,7 +974,7 @@ class Sphinx
                                    $limit=100, $name="", $cat=array(-1),
                                    $maxage=-1, $indexes=array(), $lookup=true)
     {
-        $db = new Settings();
+        $db = new DB();
         $order = array("postdate", "desc");
         $search = array($name);
         if ($series != "") {
@@ -1040,7 +1040,7 @@ class Sphinx
                                    $cat=array(-1), $genre="", $maxage=-1,
                                    $indexes=array(), $lookup=true)
     {
-        $db = new Settings();
+        $db = new DB();
         $search = array();
         $order = array("postdate", "desc");
         $where = array();
@@ -1107,7 +1107,7 @@ class Sphinx
                                 $cat=array(-1), $maxage=-1, $indexes=array(),
                                 $lookup=true)
     {
-        $db = new Settings();
+        $db = new DB();
         $search = array();
         $where = array();
         $order = array("postdate", "desc");
@@ -1183,7 +1183,7 @@ class Sphinx
     public function searchBook($author, $title, $offset=0, $limit=100,
                                $maxage=-1, $indexes=array(), $lookup=true)
     {
-        $db = new Settings();
+        $db = new DB();
         $order = array("postdate", "desc");
         $search = array();
         if ($author != "") {
@@ -1246,7 +1246,7 @@ class Sphinx
                                     $name='', $maxage=-1, $indexes=array(),
                                     $lookup=true)
     {
-        $db = new Settings();
+        $db = new DB();
         $where = array();
         $search = array();
         $order = array("postdate", "desc");
@@ -1295,7 +1295,7 @@ class Sphinx
      */
     public function getPreRange($start=0, $num, $dirname='', $category='')
     {
-        $db = new Settings();
+        $db = new DB();
         $dirname = empty($category) ? $dirname : $dirname." @category =".$category;
         $sphinxQuery = sprintf("SELECT id "
                                ."FROM predb, predb_delta "

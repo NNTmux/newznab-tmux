@@ -2,7 +2,7 @@
 require_once(WWW_DIR . "/lib/rarinfo/par2info.php");
 require_once(WWW_DIR . "/lib/rarinfo/archiveinfo.php");
 require_once(WWW_DIR . "/lib/rarinfo/zipinfo.php");
-require_once(WWW_DIR . "/lib/framework/Settings.php");
+require_once(WWW_DIR . "/lib/framework/db.php");
 require_once(WWW_DIR . "/lib/category.php");
 require_once(WWW_DIR . "/lib/releases.php");
 require_once(WWW_DIR . "/lib/releaseimage.php");

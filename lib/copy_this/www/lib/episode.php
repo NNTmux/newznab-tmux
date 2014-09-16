@@ -11,7 +11,7 @@ class Episode
 	 */
 	public function getEpisodeInfoByID($episodeinfoID)
 	{
-		$db = new Settings();
+		$db = new DB();
 		return $db->queryOneRow(sprintf('SELECT * FROM episodeinfo WHERE ID = %d', $episodeinfoID));
 	}
 
@@ -20,7 +20,7 @@ class Episode
 	 */
 	public function getEpisodeInfoByName($showtitle, $fullep, $epabsolute='0')
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		if($epabsolute == '0') //as string - not int.
 			if(!preg_match('/[21]\d{3}\/\d{2}\/\d{2}/', $fullep))

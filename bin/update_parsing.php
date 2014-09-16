@@ -57,7 +57,7 @@ $notnforelchange = 0;
 $rescount = 0;
 $nopreCount = 0;
 $test = 0;
-$db = new Settings();
+$db = new DB();
 $updated = 0;
 
 
@@ -143,7 +143,7 @@ function updateCategory($rel,$foundName,$methodused)
 	}
 	else
 	{
-		$db = new Settings();
+		$db = new DB();
 		$releases = new Releases();
 		$foundName = html_entity_decode($foundName);
 		$foundName = str_replace('&#x27;', '', $foundName);

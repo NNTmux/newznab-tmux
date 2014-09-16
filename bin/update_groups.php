@@ -23,7 +23,7 @@ if ($nntp->isError($data)) {
 
 echo $c->header("Inserting new values into shortgroups table.");
 
-$db = new Settings();
+$db = new DB();
 $db->queryExec('TRUNCATE TABLE shortgroups');
 
 // Put into an array all active groups

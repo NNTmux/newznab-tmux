@@ -35,7 +35,7 @@ class Console
 	 */
 	public function getConsoleInfo($id)
 	{
-		$db = new Settings();
+		$db = new DB();
 		return $db->queryOneRow(sprintf("SELECT consoleinfo.*, genres.title as genres FROM consoleinfo left outer join genres on genres.ID = consoleinfo.genreID where consoleinfo.ID = %d ", $id));
 	}
 
@@ -44,7 +44,7 @@ class Console
 	 */
 	public function getConsoleInfoByName($title, $platform)
 	{
-		$db = new Settings();
+		$db = new DB();
 		return $db->queryOneRow(sprintf("SELECT * FROM consoleinfo where title like %s and platform like %s", $db->escapeString("%".$title."%"),  $db->escapeString("%".$platform."%")));
 	}
 
@@ -53,7 +53,7 @@ class Console
 	 */
 	public function getRange($start, $num)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		if ($start === false)
 			$limit = "";
@@ -68,7 +68,7 @@ class Console
 	 */
 	public function getCount()
 	{
-		$db = new Settings();
+		$db = new DB();
 		$res = $db->queryOneRow("select count(ID) as num from consoleinfo");
 		return $res["num"];
 	}
@@ -78,7 +78,7 @@ class Console
 	 */
 	public function getConsoleCount($cat, $maxage=-1, $excludedcats=array())
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		$browseby = $this->getBrowseBy();
 
@@ -129,7 +129,7 @@ class Console
 	 */
 	public function getConsoleRange($cat, $start, $num, $orderby, $maxage=-1, $excludedcats=array())
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		$browseby = $this->getBrowseBy();
 
@@ -256,7 +256,7 @@ class Console
 	 */
 	public function update($id, $title, $asin, $url, $salesrank, $platform, $publisher, $releasedate, $esrb, $cover, $genreID)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		$db->queryExec(sprintf("update consoleinfo SET title=%s, asin=%s, url=%s, salesrank=%s, platform=%s, publisher=%s, releasedate='%s', esrb=%s, cover=%d, genreID=%d, updateddate=NOW() WHERE ID = %d",
 		$db->escapeString($title), $db->escapeString($asin), $db->escapeString($url), $salesrank, $db->escapeString($platform), $db->escapeString($publisher), $releasedate, $db->escapeString($esrb), $cover, $genreID, $id));
@@ -267,7 +267,7 @@ class Console
 	 */
 	public function updateConsoleInfo($gameInfo)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$gen = new Genres();
 		$ri = new ReleaseImage();
 
@@ -520,7 +520,7 @@ class Console
 	public function processConsoleReleases()
 	{
 		$ret = 0;
-		$db = new Settings();
+		$db = new DB();
 		$numlookedup = 0;
 
 		$res = $db->queryDirect(sprintf("SELECT searchname, ID from releases where consoleinfoID IS NULL and categoryID in ( select ID from category where parentID = %d ) ORDER BY postdate DESC LIMIT 100", Category::CAT_PARENT_GAME));

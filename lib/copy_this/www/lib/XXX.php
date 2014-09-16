@@ -1,5 +1,5 @@
 <?php
-require_once(WWW_DIR . "/lib/framework/Settings.php");
+require_once(WWW_DIR . "/lib/framework/db.php");
 require_once(WWW_DIR . "/lib/releaseimage.php");
 require_once(WWW_DIR . "/lib/IAFD.php");
 require_once(WWW_DIR . "/lib/ADE.php");

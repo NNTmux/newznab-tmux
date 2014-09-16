@@ -12,7 +12,7 @@ class ReleaseComments
 	 */
 	public function getCommentById($id)
 	{
-		$db = new Settings();
+		$db = new DB();
 		return $db->queryOneRow(sprintf("SELECT * FROM releasecomment WHERE ID = %d", $id));
 	}
 
@@ -21,7 +21,7 @@ class ReleaseComments
 	 */
 	public function getCommentsByGid($gid)
 	{
-		$db = new Settings();
+		$db = new DB();
 		return $db->query(sprintf("SELECT rc.id, text, createddate, sourceid, CASE WHEN sourceid = 0 THEN (SELECT username FROM users WHERE id = userid) ELSE username END AS username FROM releasecomment rc WHERE isvisible = 1  AND gid = %s AND (userID IN (SELECT id FROM users) OR rc.username IS NOT NULL) ORDER BY createddate DESC LIMIT 100", $db->escapeString($gid)));
 	}
 
@@ -30,7 +30,7 @@ class ReleaseComments
 	 */
 	public function getCommentsByGuid($guid)
 	{
-		$db = new Settings();
+		$db = new DB();
 		return $db->query(sprintf("SELECT rc.id, text, createddate, sourceid, CASE WHEN sourceid = 0 THEN (SELECT username FROM users WHERE id = userid) ELSE username END AS username FROM releasecomment rc LEFT JOIN releases r ON r.gid = rc.gid WHERE isvisible = 1 AND guid = %s AND (userID IN (SELECT id FROM users) OR rc.username IS NOT NULL) ORDER BY createddate DESC LIMIT 100", $db->escapeString($guid)));
 	}
 
@@ -39,7 +39,7 @@ class ReleaseComments
 	 */
 	public function getCommentCount($refdate=Null, $localOnly=Null)
 	{
-		$db = new Settings();
+		$db = new DB();
 		if($refdate !== Null){
 			if(is_string($refdate)){
 			    // ensure we're in the right format
@@ -79,7 +79,7 @@ class ReleaseComments
 	 */
 	public function deleteComment($id)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$res = $this->getCommentById($id);
 		if ($res)
 		{
@@ -93,7 +93,7 @@ class ReleaseComments
 	 */
 	public function deleteCommentsForRelease($id)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$res = $this->getCommentById($id);
 		if ($res)
 		{
@@ -107,7 +107,7 @@ class ReleaseComments
 	 */
 	public function deleteCommentsForUser($id)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		$numcomments = $this->getCommentCountForUser($id);
 		if ($numcomments > 0)
@@ -129,7 +129,7 @@ class ReleaseComments
 		if(strlen(trim($text)) == 0)
 			return false;
 
-		$db = new Settings();
+		$db = new DB();
 
 		$site = new Sites();
 		$s = $site->get();
@@ -146,7 +146,7 @@ class ReleaseComments
 	 */
 	public function getCommentsRange($start, $num)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		if ($start === false)
 			$limit = "";
@@ -162,7 +162,7 @@ class ReleaseComments
 	 */
 	public function updateReleaseCommentCount($gid)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$db->queryExec(sprintf("update releases
 				SET comments = (SELECT count(ID) FROM releasecomment WHERE releasecomment.gid = releases.gid AND isvisible = 1)
 				WHERE releases.gid = %s", $db->escapeString($gid) ));
@@ -173,7 +173,7 @@ class ReleaseComments
 	 */
 	public function getCommentCountForUser($uid)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$res = $db->queryOneRow(sprintf("SELECT count(ID) AS num FROM releasecomment WHERE userID = %d AND isvisible = 1", $uid));
 		return $res["num"];
 	}
@@ -183,7 +183,7 @@ class ReleaseComments
 	 */
 	public function getCommentsForUserRange($uid, $start, $num)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		if ($start === false)
 			$limit = "";

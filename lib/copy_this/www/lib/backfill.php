@@ -55,7 +55,7 @@ class Backfill
 	function backfillGroup($groupArr, $backfillDate=null, $regexOnly=false)
 	{
 
-		$db = new Settings();
+		$db = new DB();
 		$binaries = new Binaries();
         $n = $this->n;
 

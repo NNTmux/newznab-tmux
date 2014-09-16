@@ -1,5 +1,5 @@
 <?php
-require_once(WWW_DIR . "/lib/framework/Settings.php");
+require_once(WWW_DIR . "/lib/framework/db.php");
 require_once(WWW_DIR . "/lib/util.php");
 
 /**
@@ -67,42 +67,42 @@ class ReleaseExtra
 
 	public function getVideo($id)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		return $db->queryOneRow(sprintf("select * from releasevideo where releaseID = %d", $id));
 	}
 
 	public function getAudio($id)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		return $db->query(sprintf("select * from releaseaudio where releaseID = %d order by audioID ASC", $id));
 	}
 
 	public function getAudioAndChannel($rid, $aid)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		return $db->queryOneRow(sprintf("select * from releaseaudio where releaseID = %d and audioID = %d", $rid, $aid));
 	}
 
 	public function getSubs($id)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		return $db->queryOneRow(sprintf("SELECT group_concat(subslanguage SEPARATOR ', ') as subs FROM `releasesubs` WHERE `releaseID` = %d ORDER BY `subsID` ASC", $id));
 	}
 
 	public function getBriefByGuid($guid)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		return $db->queryOneRow(sprintf("select containerformat,videocodec,videoduration,videoaspect, concat(releasevideo.videowidth,'x',releasevideo.videoheight,' @',format(videoframerate,0),'fps') as size, group_concat(distinct releaseaudio.audiolanguage SEPARATOR ', ') as audio, group_concat(distinct releaseaudio.audiobitrate SEPARATOR ', ') as audiobitrate, group_concat(distinct releaseaudio.audioformat SEPARATOR ', ') as audioformat, group_concat(distinct releaseaudio.audiomode SEPARATOR ', ') as audiomode,  group_concat(distinct releaseaudio.audiobitratemode SEPARATOR ', ') as audiobitratemode, group_concat(distinct releasesubs.subslanguage SEPARATOR ', ') as subs from releaseaudio left outer join releasesubs on releaseaudio.releaseID = releasesubs.releaseID left outer join releasevideo on releasevideo.releaseID = releaseaudio.releaseID inner join releases r on r.ID = releaseaudio.releaseID where r.guid = %s group by r.ID", $db->escapeString($guid)));
 	}
 
 	public function delete($id)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$db->queryExec(sprintf("DELETE from releaseaudio where releaseID = %d", $id));
 		$db->queryExec(sprintf("DELETE from releasesubs where releaseID = %d", $id));
 		$db->queryExec(sprintf("DELETE from releaseextrafull where releaseID = %d", $id));
@@ -214,7 +214,7 @@ class ReleaseExtra
 	 */
 	public function addVideo($releaseID, $containerformat, $overallbitrate, $videoduration, $videoformat, $videocodec, $videowidth, $videoheight, $videoaspect, $videoframerate, $videolibrary)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		$row = $this->getVideo($releaseID);
 		if ($row)
@@ -243,7 +243,7 @@ class ReleaseExtra
 	 */
 	public function addAudio($releaseID, $audioID, $audioformat, $audiomode, $audiobitratemode, $audiobitrate, $audiochannels, $audiosamplerate, $audiolibrary, $audiolanguage, $audiotitle)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		$row = $this->getAudioAndChannel($releaseID, $audioID);
 		if ($row)
@@ -263,7 +263,7 @@ class ReleaseExtra
 
 	public function addSubs($releaseID, $subsID, $subslanguage)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$row = $this->getSubs($releaseID);
 		if ($row)
 			return -1;
@@ -275,21 +275,21 @@ class ReleaseExtra
 
 	public function getFull($id)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		return $db->queryOneRow(sprintf("select * from releaseextrafull where releaseID = %d", $id));
 	}
 
 	public function deleteFull($id)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		return $db->queryExec(sprintf("DELETE from releaseextrafull where releaseID = %d", $id));
 	}
 
 	public function addFull($id, $xml)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$row = $this->getFull($id);
 		if ($row)
 			return -1;

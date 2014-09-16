@@ -10,7 +10,7 @@ require_once(dirname(__FILE__) . "/../lib/functions.php");
 
 $version = "0.4r2100";
 
-$pdo = new Settings();
+$pdo = new DB();
 $s = new Sites();
 $site = $s->get();
 $patch = $site->dbversion;
@@ -458,7 +458,7 @@ $mask4 = $c->primaryOver("%-16.16s") . " " . $c->tmuxOrange("%25.25s %25.25s");
 $mask5 = $c->tmuxOrange("%-16.16s %25.25s %25.25s");
 
 // Ananlyze tables
-printf($pdo->log->info("\nAnalyzing your tables to refresh your indexes."));
+printf($c->info("\nAnalyzing your tables to refresh your indexes."));
 $pdo->optimise(false, 'analyze', false, ['releases']);
 
 sleep(5);
@@ -529,7 +529,7 @@ while ($i > 0) {
 	//check the db connection
 	if ($pdo->ping(true) == false) {
 		unset($pdo);
-		$pdo = new Settings();
+		$pdo = new DB();
 	}
 	//kill mediainfo and ffmpeg if exceeds 60 sec
 	shell_exec("killall -o 60s -9 mediainfo 2>&1 1> /dev/null");
@@ -1925,7 +1925,7 @@ function run_ircscraper($tmux_session, $_php, $pane, $run_ircscraper)
 
 function run_sharing($tmux_session, $_php, $pane, $_sleep, $sharing_timer)
 {
-	$pdo = new Settings();
+	$pdo = new DB();
 	$sharing = $pdo->queryOneRow('SELECT enabled, posting, fetching FROM sharing');
 	$t = new Tmux();
 	$tmux = $t->get();

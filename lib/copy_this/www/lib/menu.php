@@ -12,7 +12,7 @@ class Menu
 	 */
 	public function get($role, $serverurl)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		$guest = "";
 		if ($role != Users::ROLE_GUEST)
@@ -46,7 +46,7 @@ class Menu
 	 */
 	public function getAll()
 	{
-		$db = new Settings();
+		$db = new DB();
 		return $db->query(sprintf("select * from menu order by role, ordinal"));
 	}
 
@@ -55,7 +55,7 @@ class Menu
 	 */
 	public function getById($id)
 	{
-		$db = new Settings();
+		$db = new DB();
 		return $db->queryOneRow(sprintf("select * from menu where ID = %d", $id));
 	}
 
@@ -64,7 +64,7 @@ class Menu
 	 */
 	public function delete($id)
 	{
-		$db = new Settings();
+		$db = new DB();
 		return $db->queryExec(sprintf("DELETE from menu where ID = %d", $id));
 	}
 
@@ -73,7 +73,7 @@ class Menu
 	 */
 	public function add($menu)
 	{
-		$db = new Settings();
+		$db = new DB();
 		return $db->queryInsert(sprintf("INSERT INTO menu (href, title, tooltip, role, ordinal, menueval, newwindow )
 			VALUES (%s, %s, %s, %d, %d, %s, %d) ", $db->escapeString($menu["href"]), $db->escapeString($menu["title"]), $db->escapeString($menu["tooltip"]), $menu["role"] , $menu["ordinal"], $db->escapeString($menu["menueval"]), $menu["newwindow"] ));
 	}
@@ -83,7 +83,7 @@ class Menu
 	 */
 	public function update($menu)
 	{
-		$db = new Settings();
+		$db = new DB();
 		return $db->queryExec(sprintf("update menu set href = %s, title = %s, tooltip = %s, role = %d, ordinal = %d, menueval = %s, newwindow=%d where ID = %d	", $db->escapeString($menu["href"]), $db->escapeString($menu["title"]), $db->escapeString($menu["tooltip"]), $menu["role"] , $menu["ordinal"], $db->escapeString($menu["menueval"]), $menu["newwindow"], $menu["id"] ));
 	}
 }

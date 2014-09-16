@@ -21,7 +21,7 @@ class PreDB
 	 */
 	public function getByID($preID)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$predbQuery = $db->query(sprintf("SELECT * FROM predb WHERE ID = %s LIMIT %d", $preID, 1));
 
 		return isset($predbQuery[0]) ? $predbQuery[0] : false;
@@ -32,7 +32,7 @@ class PreDB
 	 */
 	public function getByDirname($dirname)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$dirname = str_replace(' ', '_', $dirname);
 		$predbQuery = $db->query(sprintf("SELECT * FROM predb WHERE dirname = %s LIMIT %d", $db->escapeString($dirname), 1));
 
@@ -58,7 +58,7 @@ class PreDB
     		}
 	    }
 
-		$db = new Settings();
+		$db = new DB();
 
 		$dirname = empty($dirname) ? '' : sprintf("WHERE dirname LIKE %s", $db->escapeString('%'.$dirname.'%'));
 		$category = empty($category) ? '' : sprintf((empty($dirname) ? 'WHERE' : ' AND')." category = %s", $db->escapeString($category));
@@ -87,7 +87,7 @@ class PreDB
     		}
 		}
 
-		$db = new Settings();
+		$db = new DB();
 
 		$dirname = str_replace(' ', '%', $dirname);
 		$dirname = empty($dirname) ? '' : sprintf('WHERE dirname LIKE %s', $db->escapeString('%'.$dirname.'%'));
@@ -103,7 +103,7 @@ class PreDB
 	 */
 	public function processReleases($daysback = 3)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		if ($this->echooutput)
 			echo "Predb   : Updating releases with pre data\n";
@@ -210,7 +210,7 @@ class PreDB
 		if($this->echooutput)
 			echo "Predb   : Checking for new pre data ";
 
-		$db = new Settings();
+		$db = new DB();
 		$nntp = new Nntp();
 
 		if(!$nntp->doConnect()) {

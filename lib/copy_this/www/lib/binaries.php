@@ -1,5 +1,5 @@
 <?php
-require_once(WWW_DIR . "/lib/framework/Settings.php");
+require_once(WWW_DIR . "/lib/framework/db.php");
 require_once(WWW_DIR . "/lib/nntp.php");
 require_once(WWW_DIR . "/lib/groups.php");
 require_once(WWW_DIR . "/lib/backfill.php");
@@ -98,7 +98,7 @@ class Binaries
 			$blnDoDisconnect = true;
 		}
 
-		$db = new Settings();
+		$db = new DB();
 		$backfill = new Backfill();
 
 		$n = $this->n;
@@ -470,7 +470,7 @@ class Binaries
 	 */
 	private function partRepair($nntp, $group)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		$parts = array();
 		$chunks = array();
@@ -567,7 +567,7 @@ class Binaries
 	 */
 	private function addMissingParts($numbers, $groupID)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$added = false;
 		$insertStr = "INSERT INTO partrepair (numberID, groupID) VALUES ";
 		foreach ($numbers as $number) {
@@ -668,7 +668,7 @@ class Binaries
 	 */
 	public function search($search, $limit = 1000, $excludedcats = array())
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		//
 		// if the query starts with a ^ it indicates the search is looking for items which start with the term
@@ -716,7 +716,7 @@ class Binaries
 	 */
 	public function getForReleaseId($id)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		return $db->query(sprintf("select binaries.* from binaries where releaseID = %d order by relpart", $id));
 	}
@@ -726,7 +726,7 @@ class Binaries
 	 */
 	public function getById($id)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		return $db->queryOneRow(sprintf("select binaries.*, groups.name as groupname from binaries left outer join groups on binaries.groupID = groups.ID where binaries.ID = %d ", $id));
 	}
@@ -736,7 +736,7 @@ class Binaries
 	 */
 	public function getBlacklist($activeonly = true)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		$where = "";
 		if ($activeonly)
@@ -755,7 +755,7 @@ class Binaries
 	 */
 	public function getBlacklistByID($id)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		return $db->queryOneRow(sprintf("select * from binaryblacklist where ID = %d ", $id));
 	}
@@ -765,7 +765,7 @@ class Binaries
 	 */
 	public function deleteBlacklist($id)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		return $db->queryExec(sprintf("DELETE from binaryblacklist where ID = %d", $id));
 	}
@@ -775,7 +775,7 @@ class Binaries
 	 */
 	public function updateBlacklist($regex)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		$groupname = $regex["groupname"];
 		if ($groupname == "")
@@ -793,7 +793,7 @@ class Binaries
 	 */
 	public function addBlacklist($regex)
 	{
-		$db = new Settings();
+		$db = new DB();
 
 		$groupname = $regex["groupname"];
 		if ($groupname == "")
@@ -814,7 +814,7 @@ class Binaries
 	 */
 	public function delete($id)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$db->queryExec(sprintf("DELETE from parts where binaryID = %d", $id));
 		$db->queryExec(sprintf("DELETE from binaries where ID = %d", $id));
 	}
