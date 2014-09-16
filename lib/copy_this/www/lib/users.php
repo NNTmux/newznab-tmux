@@ -16,14 +16,13 @@ class Users
 	const ERR_SIGNUP_UNAMEINUSE = -4;
 	const ERR_SIGNUP_EMAILINUSE = -5;
 	const ERR_SIGNUP_BADINVITECODE = -6;
-	const FAILURE = 0;
+	const ERR_SIGNUP_BADCAPTCHA = -7;
 	const SUCCESS = 1;
 
 	const ROLE_GUEST = 0;
 	const ROLE_USER = 1;
 	const ROLE_ADMIN = 2;
 	const ROLE_DISABLED = 3;
-	const ROLE_MODERATOR = 4;
 
 	const DEFAULT_INVITES = 1;
 	const DEFAULT_INVITE_EXPIRY_DAYS = 7;
@@ -34,9 +33,9 @@ class Users
 	/**
 	 * Users select queue type.
 	 */
-	const QUEUE_NONE    = 0;
+	const QUEUE_NONE = 0;
 	const QUEUE_SABNZBD = 1;
-	const QUEUE_NZBGET  = 2;
+	const QUEUE_NZBGET = 2;
 
 	public function get()
 	{
@@ -65,7 +64,7 @@ class Users
 		$forum = new Forum();
 		$forum->deleteUser($id);
 
-		$db->queryExec(sprintf("DELETE from users where ID = %d", $id));
+		$db->exec(sprintf("DELETE from users where ID = %d", $id));
 	}
 
 	public function getRange($start, $num, $orderby, $username = '', $email = '', $host = '', $role = '')
@@ -238,7 +237,7 @@ class Users
 		}
 
 		$sql = sprintf("update users set %s where id = %d", implode(', ', $sql), $id);
-		$db->queryExec($sql);
+		$db->exec($sql);
 
 		return Users::SUCCESS;
 	}
@@ -246,7 +245,7 @@ class Users
 	public function updateUserRole($uid, $role)
 	{
 		$db = new DB();
-		$db->queryExec(sprintf("update users set role = %d where id = %d", $role, $uid));
+		$db->exec(sprintf("update users set role = %d where id = %d", $role, $uid));
 
 		return Users::SUCCESS;
 	}
@@ -254,7 +253,7 @@ class Users
 	public function updateUserRoleChangeDate($uid, $date)
 	{
 		$db = new DB();
-		$db->queryExec(sprintf("update users SET rolechangedate = '%s' WHERE ID = %d", $date, $uid));
+		$db->exec(sprintf("update users SET rolechangedate = '%s' WHERE ID = %d", $date, $uid));
 
 		return Users::SUCCESS;
 	}
@@ -269,7 +268,7 @@ class Users
 		$data = $db->query(sprintf("select ID,email from users WHERE role = %d and rolechangedate < now()", $uprole));
 		foreach ($data as $u) {
 			sendEmail($u["email"], $msgsubject, $msgbody, $s->email);
-			$db->queryExec(sprintf("update users SET role = %d, rolechangedate=null WHERE ID = %d", $downrole, $u["ID"]));
+			$db->exec(sprintf("update users SET role = %d, rolechangedate=null WHERE ID = %d", $downrole, $u["ID"]));
 		}
 
 		return Users::SUCCESS;
@@ -278,7 +277,7 @@ class Users
 	public function updateRssKey($uid)
 	{
 		$db = new DB();
-		$db->queryExec(sprintf("update users set rsstoken = md5(%s) where id = %d", $db->escapeString(uniqid()), $uid));
+		$db->exec(sprintf("update users set rsstoken = md5(%s) where id = %d", $db->escapeString(uniqid()), $uid));
 
 		return Users::SUCCESS;
 	}
@@ -286,7 +285,7 @@ class Users
 	public function updatePassResetGuid($id, $guid)
 	{
 		$db = new DB();
-		$db->queryExec(sprintf("update users set resetguid = %s where id = %d", $db->escapeString($guid), $id));
+		$db->exec(sprintf("update users set resetguid = %s where id = %d", $db->escapeString($guid), $id));
 
 		return Users::SUCCESS;
 	}
@@ -294,7 +293,7 @@ class Users
 	public function updatePassword($id, $password)
 	{
 		$db = new DB();
-		$db->queryExec(sprintf("update users set password = %s, userseed=md5(%s) where id = %d", $db->escapeString($this->hashPassword($password)), $db->escapeString(generateUuid()), $id));
+		$db->exec(sprintf("update users set password = %s, userseed=md5(%s) where id = %d", $db->escapeString($this->hashPassword($password)), $db->escapeString(generateUuid()), $id));
 
 		return Users::SUCCESS;
 	}
@@ -323,7 +322,7 @@ class Users
 	public function incrementGrabs($id, $num = 1)
 	{
 		$db = new DB();
-		$db->queryExec(sprintf("update users set grabs = grabs + %d where id = %d ", $num, $id));
+		$db->exec(sprintf("update users set grabs = grabs + %d where id = %d ", $num, $id));
 	}
 
 	public function getById($id)
@@ -549,13 +548,13 @@ class Users
 		if ($host != '')
 			$hostSql = sprintf(', host = %s', $db->escapeString($host));
 
-		$db->queryExec(sprintf("update users set lastlogin = now() %s where ID = %d ", $hostSql, $uid));
+		$db->exec(sprintf("update users set lastlogin = now() %s where ID = %d ", $hostSql, $uid));
 	}
 
 	public function updateApiAccessed($uid)
 	{
 		$db = new DB();
-		$db->queryExec(sprintf("update users set apiaccess = now() where id = %d ", $uid));
+		$db->exec(sprintf("update users set apiaccess = now() where id = %d ", $uid));
 	}
 
 	public function setCookies($uid)
@@ -605,19 +604,19 @@ class Users
 		$db = new DB();
 		$rel = $db->queryOneRow(sprintf("select ID from releases where guid = %s", $db->escapeString($guid)));
 		if ($rel)
-			$db->queryExec(sprintf("DELETE FROM usercart WHERE userID = %d AND releaseID = %d", $uid, $rel["ID"]));
+			$db->exec(sprintf("DELETE FROM usercart WHERE userID = %d AND releaseID = %d", $uid, $rel["ID"]));
 	}
 
 	public function delCartForUser($uid)
 	{
 		$db = new DB();
-		$db->queryExec(sprintf("DELETE from usercart where userID = %d", $uid));
+		$db->exec(sprintf("DELETE from usercart where userID = %d", $uid));
 	}
 
 	public function delCartForRelease($rid)
 	{
 		$db = new DB();
-		$db->queryExec(sprintf("DELETE from usercart where releaseID = %d", $rid));
+		$db->exec(sprintf("DELETE from usercart where releaseID = %d", $rid));
 	}
 
 	public function addCategoryExclusions($uid, $catids)
@@ -683,19 +682,19 @@ class Users
 	public function delCategoryExclusion($uid, $catid)
 	{
 		$db = new DB();
-		$db->queryExec(sprintf("DELETE from userexcat where userID = %d and categoryID = %d", $uid, $catid));
+		$db->exec(sprintf("DELETE from userexcat where userID = %d and categoryID = %d", $uid, $catid));
 	}
 
 	public function delUserCategoryExclusions($uid)
 	{
 		$db = new DB();
-		$db->queryExec(sprintf("DELETE from userexcat where userID = %d", $uid));
+		$db->exec(sprintf("DELETE from userexcat where userID = %d", $uid));
 	}
 
 	public function delRoleCategoryExclusions($role)
 	{
 		$db = new DB();
-		$db->queryExec(sprintf("DELETE from roleexcat where role = %d", $role));
+		$db->exec(sprintf("DELETE from roleexcat where role = %d", $role));
 	}
 
 	public function sendInvite($sitetitle, $siteemail, $serverurl, $uid, $emailto)
@@ -719,7 +718,7 @@ class Users
 		//
 		// Tidy any old invites sent greater than DEFAULT_INVITE_EXPIRY_DAYS days ago.
 		//
-		$db->queryExec(sprintf("DELETE from userinvite where createddate < now() - interval %d day", Users::DEFAULT_INVITE_EXPIRY_DAYS));
+		$db->exec(sprintf("DELETE from userinvite where createddate < now() - interval %d day", Users::DEFAULT_INVITE_EXPIRY_DAYS));
 
 		return $db->queryOneRow(sprintf("select * from userinvite inner join users on userinvite.userID = users.ID where guid = %s and invites > 0", $db->escapeString($inviteToken)));
 	}
@@ -733,7 +732,7 @@ class Users
 	public function deleteInvite($inviteToken)
 	{
 		$db = new DB();
-		$db->queryExec(sprintf("DELETE from userinvite where guid = %s ", $db->escapeString($inviteToken)));
+		$db->exec(sprintf("DELETE from userinvite where guid = %s ", $db->escapeString($inviteToken)));
 	}
 
 	public function checkAndUseInvite($invitecode)
@@ -743,7 +742,7 @@ class Users
 			return -1;
 
 		$db = new DB();
-		$db->queryExec(sprintf("update users set invites = case when invites <= 0 then 0 else invites-1 end where ID = %d ", $invite["userID"]));
+		$db->exec(sprintf("update users set invites = case when invites <= 0 then 0 else invites-1 end where ID = %d ", $invite["userID"]));
 		$this->deleteInvite($invitecode);
 
 		return $invite["userID"];
@@ -875,9 +874,9 @@ class Users
 	{
 		$db = new DB();
 		if ($isdefault == 1)
-			$db->queryExec("update userroles set isdefault=0");
+			$db->exec("update userroles set isdefault=0");
 
-		return $db->queryExec(sprintf("update userroles set name=%s, apirequests=%d, downloadrequests=%d, defaultinvites=%d, isdefault=%d, canpreview=%d, canpre=%d, hideads=%d WHERE ID=%d", $db->escapeString($name), $apirequests, $downloadrequests, $defaultinvites, $isdefault, $canpreview, $canpre, $hideads, $id));
+		return $db->exec(sprintf("update userroles set name=%s, apirequests=%d, downloadrequests=%d, defaultinvites=%d, isdefault=%d, canpreview=%d, canpre=%d, hideads=%d WHERE ID=%d", $db->escapeString($name), $apirequests, $downloadrequests, $defaultinvites, $isdefault, $canpreview, $canpre, $hideads, $id));
 	}
 
 	public function deleteRole($id)
@@ -890,18 +889,18 @@ class Users
 				$userids[] = $user['ID'];
 
 			$defaultrole = $this->getDefaultRole();
-			$db->queryExec(sprintf("update users set role=%d where ID IN (%s)", $defaultrole['ID'], implode(',', $userids)));
+			$db->exec(sprintf("update users set role=%d where ID IN (%s)", $defaultrole['ID'], implode(',', $userids)));
 		}
 
-		return $db->queryExec(sprintf("DELETE from userroles WHERE ID=%d", $id));
+		return $db->exec(sprintf("DELETE from userroles WHERE ID=%d", $id));
 	}
 
 	public function getApiRequests($userid)
 	{
 		$db = new DB();
 		//clear old requests
-		//$db->queryExec(sprintf("DELETE FROM userrequests WHERE (userID = %d AND timestamp < DATE_SUB(NOW(), INTERVAL 1 DAY))", $userid));
-		$db->queryExec(sprintf("DELETE FROM userrequests WHERE timestamp < DATE_SUB(NOW(), INTERVAL 1 DAY)", $userid));
+		//$db->exec(sprintf("DELETE FROM userrequests WHERE (userID = %d AND timestamp < DATE_SUB(NOW(), INTERVAL 1 DAY))", $userid));
+		$db->exec(sprintf("DELETE FROM userrequests WHERE timestamp < DATE_SUB(NOW(), INTERVAL 1 DAY)", $userid));
 
 		$sql = sprintf("select COUNT(ID) as num, TIME_TO_SEC(TIMEDIFF(DATE_ADD(MIN(TIMESTAMP), INTERVAL 1 DAY), NOW())) AS nextrequest FROM userrequests WHERE userID = %d AND timestamp > DATE_SUB(NOW(), INTERVAL 1 DAY)", $userid);
 
@@ -936,11 +935,11 @@ class Users
 		$db = new DB();
 		if ($days == 0) {
 			$days = 1;
-			$db->queryExec("update userdownloads set releaseID = null");
+			$db->exec("update userdownloads set releaseID = null");
 		}
 
-		$db->queryExec(sprintf("DELETE from userrequests where timestamp < DATE_SUB(NOW(), INTERVAL %d DAY)", $days));
-		$db->queryExec(sprintf("DELETE from userdownloads where timestamp < DATE_SUB(NOW(), INTERVAL %d DAY)", $days));
+		$db->exec(sprintf("DELETE from userrequests where timestamp < DATE_SUB(NOW(), INTERVAL %d DAY)", $days));
+		$db->exec(sprintf("DELETE from userdownloads where timestamp < DATE_SUB(NOW(), INTERVAL %d DAY)", $days));
 	}
 
 	public function getDownloadRequests($userid, $hosthash = "", $site = "")
