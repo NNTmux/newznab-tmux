@@ -511,7 +511,7 @@ class Games
 		$defaultGenres = $gen->getGenres(Genres::GAME_TYPE);
 		$genreassoc = array();
 		foreach ($defaultGenres as $dg) {
-			$genreassoc[$dg['id']] = strtolower($dg['title']);
+			$genreassoc[$dg['ID']] = strtolower($dg['title']);
 		}
 
 		// Prepare database values.
@@ -661,60 +661,6 @@ class Games
 			// We hit the maximum request.
 			if (empty($result)) {
 				$this->maxHitRequest = true;
-				return false;
-			}
-			if (!is_array($result['results']) || (int)$result['number_of_total_results'] === 0) {
-				$result = false;
-			} else {
-				$this->_resultsFound = count($result['results']) - 1;
-				if ($this->_resultsFound !== 0) {
-					for ($i = 0; $i <= $this->_resultsFound; $i++) {
-						similar_text($result['results'][$i]['name'], $title, $p);
-						if ($p > 77) {
-							$result = $result['results'][$i];
-							preg_match('/\/\d+\-(?<asin>\d+)\//', $result['api_detail_url'], $matches);
-							$this->_gameID = (string)$matches['asin'];
-							$result = $this->fetchGiantBombArray();
-							$this->_classUsed = "gb";
-							break;
-						}
-						if ($i === $this->_resultsFound) {
-							return false;
-						}
-					}
-
-				} else {
-					return false;
-				}
-			}
-		} catch (Exception $e) {
-			$result = false;
-		}
-
-		return $result;
-	}
-
-
-	/**
-	 * Get Giantbomb ID from title
-	 *
-	 * @param string $title
-	 *
-	 * @return bool|mixed Array if no result False
-	 */
-
-	public function fetchGiantBombID($title = '')
-	{
-		$obj = new GiantBomb($this->publicKey);
-		try {
-			$fields = array(
-				"api_detail_url", "name"
-			);
-			$result = json_decode(json_encode($obj->search($title, $fields, 10, 1, array("game"))), true);
-			// We hit the maximum request.
-			if (empty($result)) {
-				$this->maxHitRequest = true;
-
 				return false;
 			}
 			if (!is_array($result['results']) || (int)$result['number_of_total_results'] === 0) {
