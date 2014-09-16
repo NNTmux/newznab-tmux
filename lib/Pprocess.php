@@ -112,7 +112,7 @@ class PProcess
 		//\\
 
 		//\\ Class instances.
-		$this->pdo = (($options['Settings'] instanceof Settings) ? $options['Settings'] : new Settings());
+		$this->pdo = (($options['Settings'] instanceof DB) ? $options['Settings'] : new DB());
 		$this->groups = (($options['Groups'] instanceof Groups) ? $options['Groups'] : new Groups(['Settings' => $this->pdo]));
 		$this->_par2Info = new Par2Info();
 		$this->debugging = ($options['Logger'] instanceof Logger ? $options['Logger'] : new Logger(['ColorCLI' => $this->pdo->log]));

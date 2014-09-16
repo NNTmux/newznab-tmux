@@ -302,7 +302,7 @@ Class ProcessAdditional
 		$this->_echoCLI = ($options['Echo'] && NN_ECHOCLI && (strtolower(PHP_SAPI) === 'cli'));
 		$this->_echoDebug = NN_DEBUG;
 
-		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
+		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 		$this->_nntp = ($options['NNTP'] instanceof NNTP ? $options['NNTP'] : new NNTP(['Echo' => $this->_echoCLI, 'Settings' => $this->pdo]));
 
 		$this->_nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB($this->pdo));
