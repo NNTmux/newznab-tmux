@@ -27,7 +27,6 @@ Class TraktTv
 
 		$settings = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 		$this->APIKEY = $settings->getSetting('trakttvkey');
-		$this->utility = new Utility();
 	}
 
 	/**
@@ -44,7 +43,7 @@ Class TraktTv
 	public function traktTVSEsummary($title = '', $season = '', $ep = '')
 	{
 		if (!empty($this->APIKEY)) {
-			$TVjson = $this->utility->getUrl([
+			$TVjson = getUrl([
 					'url' =>
 						'http://api.trakt.tv/show/episode/summary.json/' .
 						$this->APIKEY . '/' .
@@ -75,7 +74,7 @@ Class TraktTv
 	public function traktMoviesummary($movie = '', $array=false)
 	{
 		if (!empty($this->APIKEY)) {
-			$MovieJson = $this->utility->getUrl([
+			$MovieJson = getUrl([
 					'url' =>
 						'http://api.trakt.tv/movie/summary.json/' .
 						$this->APIKEY .

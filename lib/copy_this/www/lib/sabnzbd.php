@@ -98,7 +98,6 @@ class SABnzbd
 		$this->uid = $page->userdata['ID'];
 		$this->rsstoken = $page->userdata['rsstoken'];
 		$this->serverurl = $page->serverurl;
-		$this->util = new Utility();
 
 		// Set up properties.
 		switch ($page->site->sabintegrationtype) {
@@ -156,7 +155,7 @@ class SABnzbd
 	 */
 	public function sendToSab($guid)
 	{
-		return $this->util->getUrl(
+		return getUrl(
 		$this->url .
 			'api?mode=addurl&priority=' .
 			$this->priority .
@@ -182,7 +181,7 @@ class SABnzbd
 	 */
 	public function getQueue()
 	{
-		return $this->util->getUrl(
+		return getUrl(
 		$this->url .
 			"api?mode=qstatus&output=json&apikey=" .
 			$this->apikey
@@ -196,7 +195,7 @@ class SABnzbd
 	 */
 	public function getAdvQueue()
 	{
-		return $this->util->getUrl(
+		return getUrl(
 		$this->url .
 			"api?mode=queue&start=START&limit=LIMIT&output=json&apikey=" .
 			$this->apikey
@@ -212,7 +211,7 @@ class SABnzbd
 	 */
 	public function delFromQueue($id)
 	{
-		return $this->util->getUrl(
+		return getUrl(
 		$this->url .
 			"api?mode=queue&name=delete&value=" .
 			$id .
@@ -230,7 +229,7 @@ class SABnzbd
 	 */
 	public function pauseFromQueue($id)
 	{
-		return $this->util->getUrl(
+		return getUrl(
 		$this->url .
 			"api?mode=queue&name=pause&value=" .
 			$id .
@@ -248,7 +247,7 @@ class SABnzbd
 	 */
 	public function resumeFromQueue($id)
 	{
-		return $this->util->getUrl(
+		return getUrl(
 		$this->url .
 			"api?mode=queue&name=resume&value=" .
 			$id .
@@ -264,7 +263,7 @@ class SABnzbd
 	 */
 	public function pauseAll()
 	{
-		return $this->util->getUrl(
+		return getUrl(
 		$this->url .
 			"api?mode=pause" .
 			"&apikey=" .
@@ -279,7 +278,7 @@ class SABnzbd
 	 */
 	public function resumeAll()
 	{
-		return $this->util->getUrl(
+		return getUrl(
 		$this->url .
 			"api?mode=resume" .
 			"&apikey=" .

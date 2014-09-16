@@ -44,7 +44,7 @@ class TvAnger
 		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 		$this->rageqty = ($this->pdo->getSetting('maxrageprocessed') != '') ? $this->pdo->getSetting('maxrageprocessed') : 75;
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
-		$this->utility = new Utility();
+
 
 		$this->xmlEpisodeInfoUrl =
 			"http://services.tvrage.com/myfeeds/episodeinfo.php?key=" . \TvAnger::APIKEY;
@@ -212,7 +212,7 @@ class TvAnger
 		$url = $this->showQuickInfoURL . urlencode($show);
 		$url .= !empty($options['episode']) ? '&ep=' . urlencode($options['episode']) : '';
 		$url .= !empty($options['exact']) ? '&exact=' . urlencode($options['exact']) : '';
-		$fp = fopen($url, "r", false, stream_context_create($this->utility->streamSslContextOptions()));
+		$fp = fopen($url, "r", false, stream_context_create(streamSslContextOptions()));
 		if ($fp) {
 			while (!feof($fp)) {
 				$line = fgets($fp, 1024);
@@ -362,7 +362,7 @@ class TvAnger
 				echo $this->pdo->log->headerOver('Updating schedule for: ') . $this->pdo->log->primary($country['country']);
 			}
 
-			$sched = $this->utility->getURL(['url' => $this->xmlFullScheduleUrl . $country['country']]);
+			$sched = getURL(['url' => $this->xmlFullScheduleUrl . $country['country']]);
 			if ($sched !== false && ($xml = @simplexml_load_string($sched))) {
 				$tzOffset = 60 * 60 * 6;
 				$yesterday = strtotime("-1 day") - $tzOffset;
@@ -459,14 +459,14 @@ class TvAnger
 
 		$series = str_ireplace("s", "", $series);
 		$episode = str_ireplace("e", "", $episode);
-		$xml = $this->utility->getUrl(['url' => $this->xmlEpisodeInfoUrl . "&sid=" . $rageID . "&ep=" . $series . "x" . $episode]);
+		$xml = getUrl(['url' => $this->xmlEpisodeInfoUrl . "&sid=" . $rageID . "&ep=" . $series . "x" . $episode]);
 		if ($xml !== false) {
 			if (preg_match('/no show found/i', $xml)) {
 				return false;
 			}
 
 			$xmlObj = @simplexml_load_string($xml);
-			$arrXml = $this->utility->objectsIntoArray($xmlObj);
+			$arrXml = objectsIntoArray($xmlObj);
 			if (is_array($arrXml)) {
 				if (isset($arrXml['episode']['airdate']) && $arrXml['episode']['airdate'] != '0000-00-00') {
 					$result['airdate'] = $arrXml['episode']['airdate'];
@@ -485,7 +485,7 @@ class TvAnger
 	public function getRageInfoFromPage($rageID)
 	{
 		$result = array('desc' => '', 'imgurl' => '');
-		$page = $this->utility->getUrl(['url' => $this->showInfoUrl . $rageID]);
+		$page =getUrl(['url' => $this->showInfoUrl . $rageID]);
 		$matches = '';
 		if ($page !== false) {
 			// Description.
@@ -516,9 +516,9 @@ class TvAnger
 	{
 		$result = array('genres' => '', 'country' => '', 'showid' => $rageID);
 		// Full search gives us the akas.
-		$xml = $this->utility->getUrl(['url' => $this->xmlShowInfoUrl . $rageID]);
+		$xml =getUrl(['url' => $this->xmlShowInfoUrl . $rageID]);
 		if ($xml !== false) {
-			$arrXml = $this->utility->objectsIntoArray(simplexml_load_string($xml));
+			$arrXml = objectsIntoArray(simplexml_load_string($xml));
 			if (is_array($arrXml)) {
 				$result['genres'] = (isset($arrXml['genres'])) ? $arrXml['genres'] : '';
 				$result['country'] = (isset($arrXml['origin_country'])) ? $arrXml['origin_country'] : '';
@@ -589,7 +589,7 @@ class TvAnger
 
 		$imgbytes = '';
 		if (isset($rInfo['imgurl']) && !empty($rInfo['imgurl'])) {
-			$img = $this->utility->getUrl(['url' => $rInfo['imgurl']]);
+			$img = getUrl(['url' => $rInfo['imgurl']]);
 			if ($img !== false) {
 				$im = @imagecreatefromstring($img);
 				if ($im !== false) {
@@ -630,7 +630,7 @@ class TvAnger
 
 		$imgbytes = '';
 		if (isset($rInfo['imgurl']) && !empty($rInfo['imgurl'])) {
-			$img = $this->utility->getUrl(['url' => $rInfo['imgurl']]);
+			$img = getUrl(['url' => $rInfo['imgurl']]);
 			if ($img !== false) {
 				$im = @imagecreatefromstring($img);
 				if ($im !== false) {
@@ -763,9 +763,9 @@ class TvAnger
 	{
 		$title = $showInfo['cleanname'];
 		// Full search gives us the akas.
-		$xml = $this->utility->getUrl(['url' => $this->xmlFullSearchUrl . urlencode(strtolower($title))]);
+		$xml = getUrl(['url' => $this->xmlFullSearchUrl . urlencode(strtolower($title))]);
 		if ($xml !== false) {
-			$arrXml = @$this->utility->objectsIntoArray(simplexml_load_string($xml));
+			$arrXml = @objectsIntoArray(simplexml_load_string($xml));
 			if (isset($arrXml['show']) && is_array($arrXml)) {
 				// We got a valid xml response
 				$titleMatches = $urlMatches = $akaMatches = array();

@@ -314,7 +314,6 @@ Class ProcessAdditional
 		$this->_releaseExtra = ($options['ReleaseExtra'] instanceof ReleaseExtra ? $options['ReleaseExtra'] : new ReleaseExtra($this->pdo));
 		$this->_releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage($this->pdo));
 		$this->_par2Info = new Par2Info();
-		$this->utility = new Utility();
 		$this->_nfo = ($options['Nfo'] instanceof Info ? $options['Nfo'] : new Info(['Echo' => $this->_echoCLI, 'Settings' => $this->pdo]));
 
 		$this->_innerFileBlacklist = ($this->pdo->getSetting('innerfileblacklist') == '' ? false : $this->pdo->getSetting('innerfileblacklist'));
@@ -968,7 +967,7 @@ Class ProcessAdditional
 				if ($this->_extractUsingRarInfo === false && $this->_unrarPath !== false) {
 					$fileName = $this->tmpPath . uniqid() . '.rar';
 					file_put_contents($fileName, $compressedData);
-					$this->utility->runCmd(
+					runCmd(
 						$this->_killString . $this->_unrarPath .
 						'" e -ai -ep -c- -id -inul -kb -or -p- -r -y "' .
 						$fileName . '" "' . $this->tmpPath . 'unrar/"'
@@ -984,7 +983,7 @@ Class ProcessAdditional
 				if ($this->_extractUsingRarInfo === false && $this->_7zipPath !== false) {
 					$fileName = $this->tmpPath . uniqid() . '.zip';
 					file_put_contents($fileName, $compressedData);
-					$this->utility->runCmd(
+					runCmd(
 						$this->_killString . $this->_7zipPath . '" x "' .
 						$fileName . '" -bd -y -o"' . $this->tmpPath . 'unzip/"'
 					);
@@ -1652,13 +1651,13 @@ Class ProcessAdditional
 			if ($retVal === false) {
 
 				// Get the media info for the file.
-				$xmlArray = $this->utility->runCmd(
+				$xmlArray = runCmd(
 					$this->_killString . $this->pdo->getSetting('mediainfopath') . '" --Output=XML "' . $fileLocation . '"'
 				);
 				if (is_array($xmlArray)) {
 
 					// Convert to array.
-					$arrXml = $this->utility->objectsIntoArray(@simplexml_load_string(implode("\n", $xmlArray)));
+					$arrXml = objectsIntoArray(@simplexml_load_string(implode("\n", $xmlArray)));
 
 					if (isset($arrXml['File']['track'])) {
 
@@ -1738,7 +1737,7 @@ Class ProcessAdditional
 				$audioFileName = ($this->_release['guid'] . '.ogg');
 
 				// Create an audio sample.
-				$this->utility->runCmd(
+				runCmd(
 					$this->_killString .
 					$this->pdo->getSetting('ffmpegpath') .
 					'" -t 30 -i "' .
@@ -1841,7 +1840,7 @@ Class ProcessAdditional
 
 		$tmpVideo = ($this->tmpPath . uniqid() . $extension);
 		// Get the real duration of the file.
-		$time = $this->utility->runCmd(
+		$time = runCmd(
 			$this->_killString .
 			$this->pdo->getSetting('ffmpegpath') .
 			'" -i "' . $videoLocation .
@@ -1887,7 +1886,7 @@ Class ProcessAdditional
 			$time = $this->getVideoTime($fileLocation);
 
 			// Create the image.
-			$this->utility->runCmd(
+			runCmd(
 				$this->_killString .
 				$this->pdo->getSetting('ffmpegpath') .
 				'" -i "' .
@@ -1978,7 +1977,7 @@ Class ProcessAdditional
 					}
 
 					// Try to get the sample (from the end instead of the start).
-					$this->utility->runCmd(
+					runCmd(
 						$this->_killString .
 						$this->pdo->getSetting('ffmpegpath') .
 						'" -i "' .
@@ -1995,7 +1994,7 @@ Class ProcessAdditional
 
 			if ($newMethod === false) {
 				// If longer than 60 or we could not get the video length, run the old way.
-				$this->utility->runCmd(
+				runCmd(
 					$this->_killString .
 					$this->pdo->getSetting('ffmpegpath') .
 					'" -i "' .
@@ -2070,7 +2069,7 @@ Class ProcessAdditional
 		if (is_file($fileLocation)) {
 
 			// Run media info on it.
-			$xmlArray = $this->utility->runCmd(
+			$xmlArray =runCmd(
 				$this->_killString . $this->pdo->getSetting('mediainfopath') . '" --Output=XML "' . $fileLocation . '"'
 			);
 

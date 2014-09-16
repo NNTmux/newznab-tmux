@@ -672,7 +672,7 @@ class Film
 	protected function fetchFanartTVProperties($imdbId)
 	{
 		if ($this->fanartapikey != '') {
-			$buffer = $this->utility->getUrl(['url' => 'http://api.fanart.tv/webservice/movie/' . $this->fanartapikey . '/tt' . $imdbId . '/xml/']);
+			$buffer = getUrl(['url' => 'http://api.fanart.tv/webservice/movie/' . $this->fanartapikey . '/tt' . $imdbId . '/xml/']);
 			if ($buffer !== false) {
 				$art = @simplexml_load_string($buffer);
 				if ($art !== false) {
@@ -807,7 +807,7 @@ class Film
 		);
 
 		$buffer =
-			$this->utility->getUrl([
+			getUrl([
 					'url' => 'http://' . ($this->imdburl === false ? 'www' : 'akas') . '.imdb.com/title/tt' . $imdbId . '/',
 					'language' => (($this->pdo->getSetting('imdblanguage') != '') ? $this->pdo->getSetting('imdblanguage') : 'en'),
 					'useragent' => 'Mozilla/5.0 (iPad; U; CPU OS 3_2 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) ' .
@@ -983,7 +983,7 @@ class Film
 
 					// Check OMDB api.
 					$buffer =
-						$this->utility->getUrl([
+						getUrl([
 								'url' => 'http://www.omdbapi.com/?t=' .
 									urlencode($this->currentTitle) .
 									($this->currentYear !== false ? ('&y=' . $this->currentYear) : '') .
@@ -1136,7 +1136,7 @@ class Film
 	 */
 	protected function googleSearch()
 	{
-		$buffer = $this->utility->getUrl([
+		$buffer =getUrl([
 				'url' =>
 					'https://www.google.com/search?hl=en&as_q=&as_epq=' .
 					urlencode(
@@ -1172,7 +1172,7 @@ class Film
 	 */
 	protected function bingSearch()
 	{
-		$buffer = $this->utility->getUrl([
+		$buffer = getUrl([
 				'url' =>
 					"http://www.bing.com/search?q=" .
 					urlencode(
@@ -1203,7 +1203,7 @@ class Film
 	 */
 	protected function yahooSearch()
 	{
-		$buffer = $this->utility->getUrl([
+		$buffer = getUrl([
 				'url' =>
 					"http://search.yahoo.com/search?n=10&ei=UTF-8&va_vt=title&vo_vt=any&ve_vt=any&vp_vt=any&vf=all&vm=p&fl=0&fr=fp-top&p=intitle:" .
 					urlencode(

@@ -97,7 +97,6 @@ class NZBGet
 		$this->fullURL = $this->verifyURL($this->url);
 		$this->Releases = new Releases();
 		$this->NZB = new Enzebe();
-		$this->util = new Utility();
 	}
 
 	/**
@@ -149,7 +148,7 @@ class NZBGet
 	</param>
 </params>
 </methodCall>';
-		$this->util->getUrl($this->fullURL . 'append', 'post', $header);
+		getUrl($this->fullURL . 'append', 'post', $header);
 	}
 
 	/**
@@ -198,7 +197,7 @@ class NZBGet
 	</param>
 </params>
 </methodCall>';
-		$this->util->getUrl($this->fullURL . 'appendurl', 'post', $header);
+		getUrl($this->fullURL . 'appendurl', 'post', $header);
 	}
 
 	/**
@@ -220,7 +219,7 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-		$this->util->getUrl($this->fullURL . 'pausedownload2', 'post', $header);
+		getUrl($this->fullURL . 'pausedownload2', 'post', $header);
 	}
 
 	/**
@@ -242,7 +241,7 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-		$this->util->getUrl($this->fullURL . 'resumedownload2', 'post', $header);
+		getUrl($this->fullURL . 'resumedownload2', 'post', $header);
 	}
 
 	/**
@@ -277,7 +276,7 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-		$this->util->getUrl($this->fullURL . 'editqueue', 'post', $header);
+		getUrl($this->fullURL . 'editqueue', 'post', $header);
 	}
 
 	/**
@@ -312,7 +311,7 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-		$this->util->getUrl($this->fullURL . 'editqueue', 'post', $header);
+		getUrl($this->fullURL . 'editqueue', 'post', $header);
 	}
 
 	/**
@@ -347,7 +346,7 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-		$this->util->getUrl($this->fullURL . 'editqueue', 'post', $header);
+		getUrl($this->fullURL . 'editqueue', 'post', $header);
 	}
 
 	/**
@@ -371,7 +370,7 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-		$this->util->getUrl($this->fullURL . 'rate', 'post', $header);
+		getUrl($this->fullURL . 'rate', 'post', $header);
 	}
 
 	/**
@@ -383,7 +382,7 @@ class NZBGet
 	 */
 	public function getQueue()
 	{
-		$data = $this->util->getUrl($this->fullURL . 'listgroups');
+		$data = getUrl($this->fullURL . 'listgroups');
 		$retVal = false;
 		if ($data) {
 			$xml = simplexml_load_string($data);
@@ -414,7 +413,7 @@ class NZBGet
 	 */
 	public function status()
 	{
-		$data = $this->util->getUrl($this->fullURL . 'status');
+		$data = getUrl($this->fullURL . 'status');
 		$retVal = false;
 		if ($data) {
 			$xml = simplexml_load_string($data);
