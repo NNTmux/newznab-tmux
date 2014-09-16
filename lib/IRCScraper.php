@@ -126,6 +126,31 @@ class IRCScraper extends IRCClient
 	}
 
 	/**
+	 * After updating or inserting new PRE, reset these.
+	 *
+	 * @access protected
+	 */
+	protected function resetPreVariables()
+	{
+		$this->nuked = false;
+		$this->OldPre = array();
+		$this->CurPre =
+			array(
+				'title'    => '',
+				'size'     => '',
+				'predate'  => '',
+				'category' => '',
+				'source'   => '',
+				'groupid'  => '',
+				'reqid'    => '',
+				'nuked'    => '',
+				'reason'   => '',
+				'files'    => '',
+				'filename' => ''
+			);
+	}
+
+	/**
 	 * Main method for scraping.
 	 *
 	 * @access protected
@@ -242,6 +267,25 @@ class IRCScraper extends IRCClient
 	}
 
 	/**
+	 * Get a group ID for a group name.
+	 *
+	 * @param string $groupName
+	 *
+	 * @return mixed
+	 *
+	 * @access protected
+	 */
+	protected function getGroupID($groupName)
+	{
+		if (!isset($this->groupList[$groupName])) {
+			$group = $this->db->queryOneRow(sprintf('SELECT ID FROM groups WHERE name = %s', $this->db->escapeString($groupName)));
+			$this->groupList[$groupName] = $group['ID'];
+		}
+
+		return $this->groupList[$groupName];
+	}
+
+	/**
 	 * Check if we already have the PRE, update if we have it, insert if not.
 	 *
 	 * @access protected
@@ -307,49 +351,6 @@ class IRCScraper extends IRCClient
 	}
 
 	/**
-	 * Updates PRE data in the DB.
-	 *
-	 * @access protected
-	 */
-	protected function updatePre()
-	{
-		if (empty($this->CurPre['title'])) {
-			return;
-		}
-
-		$query = 'UPDATE prehash SET ';
-
-		$query .= (!empty($this->CurPre['size']) ? 'size = ' . $this->db->escapeString($this->CurPre['size']) . ', ' : '');
-		$query .= (!empty($this->CurPre['source']) ? 'source = ' . $this->db->escapeString($this->CurPre['source']) . ', ' : '');
-		$query .= (!empty($this->CurPre['files']) ? 'files = ' . $this->db->escapeString($this->CurPre['files']) . ', ' : '');
-		$query .= (!empty($this->CurPre['reason']) ? 'nukereason = ' . $this->db->escapeString($this->CurPre['reason']) . ', ' : '');
-		$query .= (!empty($this->CurPre['reqid']) ? 'requestID = ' . $this->CurPre['reqid'] . ', ' : '');
-		$query .= (!empty($this->CurPre['groupid']) ? 'groupID = ' . $this->CurPre['groupid'] . ', ' : '');
-		$query .= (!empty($this->CurPre['predate']) ? 'predate = ' . $this->CurPre['predate'] . ', ' : '');
-		$query .= (!empty($this->CurPre['nuked']) ? 'nuked = ' . $this->CurPre['nuked'] . ', ' : '');
-		$query .= (!empty($this->CurPre['filename']) ? 'filename = ' . $this->db->escapeString($this->CurPre['filename']) . ', ' : '');
-
-		$query .= (
-		(empty($this->OldPre['category']) && !empty($this->CurPre['category']))
-			? 'category = ' . $this->db->escapeString($this->CurPre['category']) . ', '
-			: ''
-		);
-
-		if ($query === 'UPDATE prehash SET ') {
-			return;
-		}
-
-		$query .= 'title = ' . $this->db->escapeString($this->CurPre['title']);
-		$query .= ' WHERE title = ' . $this->db->escapeString($this->CurPre['title']);
-
-		$this->db->exec($query);
-
-		$this->doEcho(false);
-
-		$this->resetPreVariables();
-	}
-
-	/**
 	 * Echo new or update pre to CLI.
 	 *
 	 * @param bool $new
@@ -407,46 +408,45 @@ class IRCScraper extends IRCClient
 	}
 
 	/**
-	 * Get a group ID for a group name.
-	 *
-	 * @param string $groupName
-	 *
-	 * @return mixed
+	 * Updates PRE data in the DB.
 	 *
 	 * @access protected
 	 */
-	protected function getGroupID($groupName)
+	protected function updatePre()
 	{
-		if (!isset($this->groupList[$groupName])) {
-			$group = $this->db->queryOneRow(sprintf('SELECT ID FROM groups WHERE name = %s', $this->db->escapeString($groupName)));
-			$this->groupList[$groupName] = $group['ID'];
+		if (empty($this->CurPre['title'])) {
+			return;
 		}
 
-		return $this->groupList[$groupName];
-	}
+		$query = 'UPDATE prehash SET ';
 
-	/**
-	 * After updating or inserting new PRE, reset these.
-	 *
-	 * @access protected
-	 */
-	protected function resetPreVariables()
-	{
-		$this->nuked = false;
-		$this->OldPre = array();
-		$this->CurPre =
-			array(
-				'title'    => '',
-				'size'     => '',
-				'predate'  => '',
-				'category' => '',
-				'source'   => '',
-				'groupid'  => '',
-				'reqid'    => '',
-				'nuked'    => '',
-				'reason'   => '',
-				'files'    => '',
-				'filename' => ''
-			);
+		$query .= (!empty($this->CurPre['size']) ? 'size = ' . $this->db->escapeString($this->CurPre['size']) . ', ' : '');
+		$query .= (!empty($this->CurPre['source']) ? 'source = ' . $this->db->escapeString($this->CurPre['source']) . ', ' : '');
+		$query .= (!empty($this->CurPre['files']) ? 'files = ' . $this->db->escapeString($this->CurPre['files']) . ', ' : '');
+		$query .= (!empty($this->CurPre['reason']) ? 'nukereason = ' . $this->db->escapeString($this->CurPre['reason']) . ', ' : '');
+		$query .= (!empty($this->CurPre['reqid']) ? 'requestID = ' . $this->CurPre['reqid'] . ', ' : '');
+		$query .= (!empty($this->CurPre['groupid']) ? 'groupID = ' . $this->CurPre['groupid'] . ', ' : '');
+		$query .= (!empty($this->CurPre['predate']) ? 'predate = ' . $this->CurPre['predate'] . ', ' : '');
+		$query .= (!empty($this->CurPre['nuked']) ? 'nuked = ' . $this->CurPre['nuked'] . ', ' : '');
+		$query .= (!empty($this->CurPre['filename']) ? 'filename = ' . $this->db->escapeString($this->CurPre['filename']) . ', ' : '');
+
+		$query .= (
+		(empty($this->OldPre['category']) && !empty($this->CurPre['category']))
+			? 'category = ' . $this->db->escapeString($this->CurPre['category']) . ', '
+			: ''
+		);
+
+		if ($query === 'UPDATE prehash SET ') {
+			return;
+		}
+
+		$query .= 'title = ' . $this->db->escapeString($this->CurPre['title']);
+		$query .= ' WHERE title = ' . $this->db->escapeString($this->CurPre['title']);
+
+		$this->db->exec($query);
+
+		$this->doEcho(false);
+
+		$this->resetPreVariables();
 	}
 }

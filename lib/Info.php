@@ -18,6 +18,15 @@ require_once("getid3/getid3/getid3.php");
  */
 class Info
 {
+const NFO_UNPROC = -1;
+const NFO_NONFO = 0;
+const NFO_FOUND = 1;
+	/**
+	 * Echo to cli?
+	 *
+	 * @var bool
+	 */
+	protected $echo;
 	/**
 	 * Site settings.
 	 *
@@ -25,73 +34,54 @@ class Info
 	 * @access private
 	 */
 	private $site;
-
 	/**
 	 * How many nfo's to process per run.
 	 *
 	 * @var int
 	 */
 	private $nzbs;
-
 	/**
 	 * Max NFO size to process.
 	 *
 	 * @var int
 	 */
 	private $maxsize;
-
 	/**
 	 * Path to temporarily store files.
 	 *
 	 * @var string
 	 */
 	private $tmpPath;
-
 	/**
 	 * Instance of class ColorCLI
 	 *
 	 * @var ColorCLI
 	 */
 	private $c;
-
 	/**
 	 * Instance of class DB
 	 *
 	 * @var DB
 	 */
 	private $db;
-
 	/**
 	 * Primary color for console text output.
 	 *
 	 * @var string
 	 */
-	private $primary = 'Green';
-
-	/**
+	private $primary = 'Green'; // Release has not been processed yet.
+		/**
 	 * Color for warnings on console text output.
 	 *
 	 * @var string
 	 */
-	private $warning = 'Red';
-
-	/**
+	private $warning = 'Red'; // Release has no NFO.
+		/**
 	 * Color for headers(?) on console text output.
 	 *
 	 * @var string
 	 */
-	private $header = 'Yellow';
-
-	/**
-	 * Echo to cli?
-	 *
-	 * @var bool
-	 */
-	protected $echo;
-
-	const NFO_UNPROC = -1; // Release has not been processed yet.
-	const NFO_NONFO = 0; // Release has no NFO.
-	const NFO_FOUND = 1; // Release has an NFO.
+	private $header = 'Yellow'; // Release has an NFO.
 
 	/**
 	 * Default constructor.
@@ -119,19 +109,50 @@ class Info
 	}
 
 	/**
-	 * Look for a TvRage ID in a string.
+	 * Add an NFO from alternate sources. ex.: PreDB, rar, zip, etc...
 	 *
-	 * @param string $str The string with a TvRage ID.
+	 * @param string $nfo     The nfo.
+	 * @param array  $release The SQL row for this release.
+	 * @param object $nntp    Instance of class NNTP.
 	 *
-	 * @return string The TVRage ID on success.
-	 * @return bool   False on failure.
+	 * @return bool           True on success, False on failure.
 	 *
-	 * @access public
 	 */
-	public function parseRageId($str)
+	public function addAlternateNfo(&$nfo, $release, $nntp)
 	{
-		if (preg_match('/tvrage\.com\/shows\/id-(\d{1,6})/i', $str, $matches)) {
-			return trim($matches[1]);
+		if ($release['ID'] > 0 && $this->isNFO($nfo, $release['guid'])) {
+
+			$check = $this->db->queryOneRow(sprintf('SELECT ID FROM releasenfo WHERE releaseID = %d', $release['ID']));
+
+			if ($check === false) {
+				$this->db->queryInsert(
+					sprintf('INSERT INTO releasenfo (nfo, releaseID) VALUES (compress(%s), %d)',
+						$this->db->escapeString($nfo),
+						$release['ID']
+					)
+				);
+			}
+
+			$this->db->exec(sprintf('UPDATE releases SET releasenfoID = 1, nfostatus = %d WHERE ID = %d', self::NFO_FOUND, $release['ID']));
+
+			if (!isset($release['completion'])) {
+				$release['completion'] = 0;
+			}
+
+			if ($release['completion'] == 0) {
+				$nzbContents = new NZBContents(
+					array(
+						'echo' => $this->echo,
+						'nntp' => $nntp,
+						'nfo'  => $this,
+						'db'   => $this->db,
+						'pp'   => new PProcess(true)
+					)
+				);
+				$nzbContents->parseNZB($release['guid'], $release['ID'], $release['groupID']);
+			}
+
+			return true;
 		}
 
 		return false;
@@ -210,56 +231,6 @@ class Info
 					}
 				}
 			}
-		}
-
-		return false;
-	}
-
-	/**
-	 * Add an NFO from alternate sources. ex.: PreDB, rar, zip, etc...
-	 *
-	 * @param string $nfo     The nfo.
-	 * @param array  $release The SQL row for this release.
-	 * @param object $nntp    Instance of class NNTP.
-	 *
-	 * @return bool           True on success, False on failure.
-	 *
-	 */
-	public function addAlternateNfo(&$nfo, $release, $nntp)
-	{
-		if ($release['ID'] > 0 && $this->isNFO($nfo, $release['guid'])) {
-
-			$check = $this->db->queryOneRow(sprintf('SELECT ID FROM releasenfo WHERE releaseID = %d', $release['ID']));
-
-			if ($check === false) {
-				$this->db->queryInsert(
-					sprintf('INSERT INTO releasenfo (nfo, releaseID) VALUES (compress(%s), %d)',
-						$this->db->escapeString($nfo),
-						$release['ID']
-					)
-				);
-			}
-
-			$this->db->exec(sprintf('UPDATE releases SET releasenfoID = 1, nfostatus = %d WHERE ID = %d', self::NFO_FOUND, $release['ID']));
-
-			if (!isset($release['completion'])) {
-				$release['completion'] = 0;
-			}
-
-			if ($release['completion'] == 0) {
-				$nzbContents = new NZBContents(
-					array(
-						'echo' => $this->echo,
-						'nntp' => $nntp,
-						'nfo'  => $this,
-						'db'   => $this->db,
-						'pp'   => new PProcess(true)
-					)
-				);
-				$nzbContents->parseNZB($release['guid'], $release['ID'], $release['groupID']);
-			}
-
-			return true;
 		}
 
 		return false;
@@ -396,6 +367,25 @@ class Info
 		}
 
 		return $ret;
+	}
+
+	/**
+	 * Look for a TvRage ID in a string.
+	 *
+	 * @param string $str The string with a TvRage ID.
+	 *
+	 * @return string The TVRage ID on success.
+	 * @return bool   False on failure.
+	 *
+	 * @access public
+	 */
+	public function parseRageId($str)
+	{
+		if (preg_match('/tvrage\.com\/shows\/id-(\d{1,6})/i', $str, $matches)) {
+			return trim($matches[1]);
+		}
+
+		return false;
 	}
 
 }

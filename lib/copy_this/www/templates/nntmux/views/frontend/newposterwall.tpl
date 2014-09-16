@@ -110,7 +110,8 @@
 											   href="{$site->dereferrer_link}http://dereferer.org/?http://www.popporn.com/results/index.cfm?v=4&g=0&searchtext={$result.title|escape:"url"}/"></a>
 										</div>
 										<div class="icon icon_iafd">
-											<a class="divlink" target="_blank" title="View on Internet Adult Film Database"
+											<a class="divlink" target="_blank"
+											   title="View on Internet Adult Film Database"
 											   href="{$site->dereferrer_link}http://www.iafd.com/results.asp?searchtype=title&searchstring={$result.title|escape:"url"}/"></a>
 										</div>
 									{elseif $type == 'PC'}

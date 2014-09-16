@@ -241,13 +241,14 @@
 		<div class="hint">The giantbomb key. Used for game lookups.</div>
 	</td>
 </tr>
-<tr>
-	<td style="width:180px;"><label for="anidbkey">Anidb API key:</label></td>
-	<td>
-		<input id="anidbkey" class="long" name="anidbkey" type="text" value="{$site->anidbkey}"/>
-		<div class="hint">The Anidb api key. Used for Anime lookups.</div>
-	</td>
-</tr>
+	<tr>
+		<td style="width:180px;"><label for="anidbkey">Anidb API key:</label></td>
+		<td>
+			<input id="anidbkey" class="long" name="anidbkey" type="text" value="{$site->anidbkey}"/>
+
+			<div class="hint">The Anidb api key. Used for Anime lookups.</div>
+		</td>
+	</tr>
 
 </table>
 </fieldset>
@@ -576,21 +577,23 @@
 	</td>
 </tr>
 
-<tr>
-	<td><label for="lookupxxx">Lookup XXX</label>:</td>
-	<td>
-		{html_radios id="lookupxxx" name='lookupxxx' values=$yesno_ids output=$yesno_names selected=$fsite->lookupxxx separator='<br />'}
-		<div class="hint">Whether to attempt to lookup XXX information when processing binaries.</div>
-	</td>
-</tr>
+	<tr>
+		<td><label for="lookupxxx">Lookup XXX</label>:</td>
+		<td>
+			{html_radios id="lookupxxx" name='lookupxxx' values=$yesno_ids output=$yesno_names selected=$fsite->lookupxxx separator='<br />'}
+			<div class="hint">Whether to attempt to lookup XXX information when processing binaries.</div>
+		</td>
+	</tr>
 
-<tr>
-	<td style="width:180px;"><label for="maxxxxprocessed">Maximum xxx per run:</label></td>
-	<td>
-		<input class="short" id="maxxxxprocessed" name="maxxxxprocessed" type="text" value="{$site->maxxxxprocessed}"/>
-		<div class="hint">The maximum amount of XXX to process per run. This does not use an NNTP
-			connection or query Amazon.
-	</div>
+	<tr>
+		<td style="width:180px;"><label for="maxxxxprocessed">Maximum xxx per run:</label></td>
+		<td>
+			<input class="short" id="maxxxxprocessed" name="maxxxxprocessed" type="text"
+				   value="{$site->maxxxxprocessed}"/>
+
+			<div class="hint">The maximum amount of XXX to process per run. This does not use an NNTP
+				connection or query Amazon.
+			</div>
 	</td>
 </tr>
 

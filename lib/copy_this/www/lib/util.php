@@ -134,11 +134,6 @@ class Utility
 		return ((strtolower(PHP_SAPI) === 'cli') ? true : false);
 	}
 
-	static public function isWin()
-	{
-		return (strtolower(substr(PHP_OS, 0, 3)) === 'win');
-	}
-
 	static public function stripBOM (&$text)
 	{
 		$bom = pack("CCC", 0xef, 0xbb, 0xbf);
@@ -202,7 +197,6 @@ class Utility
 		// Return the string.
 		return ($string === '' ? false : $string);
 	}
-
 
 	/**
  * Get human readable size string from bytes.
@@ -631,6 +625,25 @@ function cp437toUTF ($str)
 }
 
 /**
+ * Fetches an embeddable video to a IMDB trailer from http://www.traileraddict.com
+ *
+ * @param $imdbID
+ *
+ * @return string
+ */
+	function imdb_trailers($imdbID)
+	{
+		$xml = self::getUrl('http://api.traileraddict.com/?imdb=' . $imdbID);
+		if ($xml !== false) {
+			if (preg_match('/(<iframe.+?<\/iframe>)/i', $xml, $html)) {
+				return $html[1];
+			}
+		}
+
+		return '';
+	}
+
+	/**
  * Use cURL To download a web page into a string.
  *
  * @param string $url       The URL to download.
@@ -715,31 +728,6 @@ function getUrl ($url, $method = 'get', $postdata = '', $language = "", $debug =
 	}
 }
 
-/**
- * Fetches an embeddable video to a IMDB trailer from http://www.traileraddict.com
- *
- * @param $imdbID
- *
- * @return string
- */
-function imdb_trailers($imdbID)
-{
-	$xml = self::getUrl('http://api.traileraddict.com/?imdb=' . $imdbID);
-	if ($xml !== false) {
-		if (preg_match('/(<iframe.+?<\/iframe>)/i', $xml, $html)) {
-			return $html[1];
-		}
-	}
-	return '';
-}
-
-// Check if O/S is windows.
-function isWindows ()
-{
-	return Utility::isWin();
-}
-
-// Convert obj to array.
 function objectsIntoArray ($arrObjData, $arrSkipIndices = [])
 {
 	$arrData = [];
@@ -763,6 +751,8 @@ function objectsIntoArray ($arrObjData, $arrSkipIndices = [])
 	}
 	return $arrData;
 }
+
+// Check if O/S is windows.
 
 /**
  * Run CLI command.
@@ -793,6 +783,18 @@ function runCmd ($command, $debug = false)
 
 	return $output;
 }
+
+// Convert obj to array.
+
+	function isWindows()
+	{
+		return Utility::isWin();
+	}
+
+	static public function isWin()
+	{
+		return (strtolower(substr(PHP_OS, 0, 3)) === 'win');
+	}
 
 /**
  * Remove unsafe chars from a filename.

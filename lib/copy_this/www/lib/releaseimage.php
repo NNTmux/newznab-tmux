@@ -20,32 +20,6 @@ class ReleaseImage
 	}
 
 	/**
-	 * Return an image from a path.
-	 */
-	public function fetchImage($imgLoc)
-	{
-		$img = false;
-		$utility = new Utility();
-		if (preg_match('/^http:/i', $imgLoc))
-			$img = $utility->getUrl($imgLoc);
-		elseif (file_exists($imgLoc))
-			$img = @file_get_contents($imgLoc);
-
-		if ($img !== false) {
-			$im = @imagecreatefromstring($img);
-			if ($im !== false) {
-				imagedestroy($im);
-
-				return $img;
-			}
-
-			return false;
-		}
-
-		return false;
-	}
-
-	/**
 	 * Create an image at a path and a thumbnailed version.
 	 */
 	public function saveImage($imgName, $imgLoc, $imgSavePath, $imgMaxWidth = '', $imgMaxHeight = '', $saveThumb = false)
@@ -85,6 +59,32 @@ class ReleaseImage
 		$coverSave = @file_put_contents($coverPath, $cover);
 
 		return ($coverSave !== false || ($coverSave === false && file_exists($coverPath))) ? 1 : 0;
+	}
+
+	/**
+	 * Return an image from a path.
+	 */
+	public function fetchImage($imgLoc)
+	{
+		$img = false;
+		$utility = new Utility();
+		if (preg_match('/^http:/i', $imgLoc))
+			$img = $utility->getUrl($imgLoc);
+		elseif (file_exists($imgLoc))
+			$img = @file_get_contents($imgLoc);
+
+		if ($img !== false) {
+			$im = @imagecreatefromstring($img);
+			if ($im !== false) {
+				imagedestroy($im);
+
+				return $img;
+			}
+
+			return false;
+		}
+
+		return false;
 	}
 
 	/**

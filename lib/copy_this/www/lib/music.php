@@ -39,15 +39,6 @@ class Music
 	}
 
 	/**
-	 * Get musicinfo row by name.
-	 */
-	public function getMusicInfoByName($artist, $album)
-	{
-		$db = new DB();
-		return $db->queryOneRow(sprintf("SELECT * FROM musicinfo where artist like %s and title like %s", $db->escapeString("%".$artist."%"),  $db->escapeString("%".$album."%")));
-	}
-
-	/**
 	 * Get musicinfo rows by limit.
 	 */
 	public function getRange($start, $num)
@@ -121,6 +112,36 @@ class Music
 		$sql = sprintf("select count(r.ID) as num from releases r inner join musicinfo m on m.ID = r.musicinfoID and m.title != '' where r.passwordstatus <= (select value from site where setting='showpasswordedrelease') and %s %s %s %s", $browseby, $catsrch, $maxage, $exccatlist);
 		$res = $db->queryOneRow($sql, true);
 		return $res["num"];
+	}
+
+	/**
+	 * Get musicinfo filter column sql for user selection.
+	 */
+	public function getBrowseBy()
+	{
+		$db = new Db;
+
+		$browseby = ' ';
+		$browsebyArr = $this->getBrowseByOptions();
+		foreach ($browsebyArr as $bbk => $bbv) {
+			if (isset($_REQUEST[$bbk]) && !empty($_REQUEST[$bbk])) {
+				$bbs = stripslashes($_REQUEST[$bbk]);
+				if (preg_match('/id/i', $bbv))
+					$browseby .= "m.{$bbv} = $bbs AND ";
+				else
+					$browseby .= "m.$bbv LIKE(" . $db->escapeString('%' . $bbs . '%') . ") AND ";
+			}
+		}
+
+		return $browseby;
+	}
+
+	/**
+	 * Get musicinfo filter columns.
+	 */
+	public function getBrowseByOptions()
+	{
+		return array('artist' => 'artist', 'title' => 'title', 'genre' => 'genreID', 'year' => 'year');
 	}
 
 	/**
@@ -223,37 +244,6 @@ class Music
 	}
 
 	/**
-	 * Get musicinfo filter columns.
-	 */
-	public function getBrowseByOptions()
-	{
-		return array('artist'=>'artist', 'title'=>'title', 'genre'=>'genreID', 'year'=>'year');
-	}
-
-	/**
-	 * Get musicinfo filter column sql for user selection.
-	 */
-	public function getBrowseBy()
-	{
-		$db = new Db;
-
-		$browseby = ' ';
-		$browsebyArr = $this->getBrowseByOptions();
-		foreach ($browsebyArr as $bbk=>$bbv)
-		{
-			if (isset($_REQUEST[$bbk]) && !empty($_REQUEST[$bbk]))
-			{
-				$bbs = stripslashes($_REQUEST[$bbk]);
-				if (preg_match('/id/i', $bbv))
-					$browseby .= "m.{$bbv} = $bbs AND ";
-				else
-					$browseby .= "m.$bbv LIKE(".$db->escapeString('%'.$bbs.'%').") AND ";
-			}
-		}
-		return $browseby;
-	}
-
-	/**
 	 * Update musicinfo row
 	 */
 	public function update($id, $title, $asin, $url, $salesrank, $artist, $publisher, $releasedate, $year, $tracks, $cover, $genreID)
@@ -261,7 +251,133 @@ class Music
 		$db = new DB();
 
 		$db->exec(sprintf("update musicinfo SET title=%s, asin=%s, url=%s, salesrank=%s, artist=%s, publisher=%s, releasedate='%s', year=%s, tracks=%s, cover=%d, genreID=%d, updateddate=NOW() WHERE ID = %d",
-				$db->escapeString($title), $db->escapeString($asin), $db->escapeString($url), $salesrank, $db->escapeString($artist), $db->escapeString($publisher), $releasedate, $db->escapeString($year), $db->escapeString($tracks), $cover, $genreID, $id));
+				$db->escapeString($title), $db->escapeString($asin), $db->escapeString($url), $salesrank, $db->escapeString($artist), $db->escapeString($publisher), $releasedate, $db->escapeString($year), $db->escapeString($tracks), $cover, $genreID, $id
+			)
+		);
+	}
+
+	/**
+	 * Process all untagged releases to see if musicinfo exists for them.
+	 */
+	public function processMusicReleases()
+	{
+		$ret = 0;
+		$db = new DB();
+		$numlookedup = 0;
+
+		$res = $db->queryDirect(sprintf("SELECT searchname, ID from releases where musicinfoID IS NULL and categoryID in ( select ID from category where parentID = %d ) ORDER BY postdate DESC LIMIT 1000", Category::CAT_PARENT_MUSIC));
+		if ($db->getNumRows($res) > 0)
+		{
+			if ($this->echooutput)
+				echo "MusicPr : Processing " . $db->getNumRows($res) . " audio releases\n";
+
+			while ($arr = $db->getAssocArray($res))
+			{
+				if ($numlookedup > Music::NUMTOPROCESSPERTIME)
+					return;
+
+				$albumId = -2;
+				$album = $this->parseArtist($arr['searchname']);
+				if ($album !== false) {
+					if ($this->echooutput)
+						echo 'MusicPr : Looking up: ' . $album["artist"] . ' - ' . $album["album"] . "\n";
+
+					//check for existing music entry
+					$albumCheck = $this->getMusicInfoByName($album["artist"], $album["album"]);
+
+					if ($albumCheck === false) {
+						//
+						// get from amazon
+						//
+						$numlookedup++;
+						$ret = $this->updateMusicInfo($album["artist"], $album["album"], $album['year']);
+						if ($ret !== false) {
+							$albumId = $ret;
+						}
+					} else {
+						$albumId = $albumCheck["ID"];
+					}
+				}
+
+				$db->exec(sprintf("update releases SET musicinfoID = %d WHERE ID = %d", $albumId, $arr["ID"]));
+			}
+		}
+	}
+
+	/**
+	 * Strip out an artist name from a release.
+	 */
+	public function parseArtist($releasename)
+	{
+		$result = array();
+		/*TODO: FIX VA lookups
+		if (substr($releasename, 0, 3) == 'VA-') {
+				$releasename = trim(str_replace('VA-', '', $releasename));
+		} elseif (substr($name, 0, 3) == 'VA ') {
+				$releasename = trim(str_replace('VA ', '', $releasename));
+		}
+		*/
+		if (preg_match('/mdvdr/i', $releasename))
+			return false;
+
+		//Replace VA with Various Artists
+		$newName = preg_replace('/VA( |\-)/', 'Various Artists -', $releasename);
+
+		//remove years, vbr etc
+		$newName = preg_replace('/\(.*?\)/i', '', $newName);
+		//remove double dashes
+		$newName = str_replace('--', '-', $newName);
+		$newName = str_replace('FLAC', '', $newName);
+
+		$name = explode("-", $newName);
+		$name = array_map("trim", $name);
+
+		if (is_array($name) && sizeof($name) > 1) {
+			$albumi = 1;
+			if ((strlen($name[0]) <= 2 || strlen($name[1]) <= 2) && !preg_match('/Various Artists/i', $name[0])) {
+				$name[0] = $name[0] . '-' . $name[1];
+				$albumi = 2;
+			} elseif (strlen($name[1]) <= 2 && preg_match('/Various Artists/i', $name[0]) && sizeof($name) > 2) {
+				$name[2] = $name[1] . '-' . $name[2];
+				$albumi = 2;
+			}
+
+			if (!isset($name[$albumi]))
+				return false;
+
+			if (preg_match('/^the /i', $name[0])) {
+				$name[0] = preg_replace('/^the /i', '', $name[0]) . ', The';
+			}
+			if (preg_match('/deluxe edition|single|nmrVBR|READ NFO/i', $name[$albumi], $albumType)) {
+				$name[$albumi] = preg_replace('/' . $albumType[0] . '/i', '', $name[$albumi]);
+			}
+			$result['artist'] = trim($name[0]);
+			$result['album'] = trim($name[$albumi]);
+		}
+
+		//make sure we've actually matched an album name
+		if (isset($result['album'])) {
+			if (preg_match('/^(nmrVBR|VBR|WEB|SAT|20\d{2}|19\d{2}|CDM|EP)$/i', $result['album'])) {
+				$result['album'] = '';
+			}
+		}
+
+		preg_match('/((?:19|20)\d{2})/i', $releasename, $year);
+		$result['year'] = (isset($year[1]) && !empty($year[1])) ? $year[1] : '';
+
+		$result['releasename'] = $releasename;
+
+		return (!empty($result['artist']) && !empty($result['album'])) ? $result : false;
+	}
+
+	/**
+	 * Get musicinfo row by name.
+	 */
+	public function getMusicInfoByName($artist, $album)
+	{
+		$db = new DB();
+
+		return $db->queryOneRow(sprintf("SELECT * FROM musicinfo where artist like %s and title like %s", $db->escapeString("%" . $artist . "%"), $db->escapeString("%" . $album . "%")));
 	}
 
 	/**
@@ -430,225 +546,6 @@ class Music
 	}
 
 	/**
-	 * Process all untagged releases to see if musicinfo exists for them.
-	 */
-	public function processMusicReleases()
-	{
-		$ret = 0;
-		$db = new DB();
-		$numlookedup = 0;
-
-		$res = $db->queryDirect(sprintf("SELECT searchname, ID from releases where musicinfoID IS NULL and categoryID in ( select ID from category where parentID = %d ) ORDER BY postdate DESC LIMIT 1000", Category::CAT_PARENT_MUSIC));
-		if ($db->getNumRows($res) > 0)
-		{
-			if ($this->echooutput)
-				echo "MusicPr : Processing ".$db->getNumRows($res)." audio releases\n";
-
-			while ($arr = $db->getAssocArray($res))
-			{
-				if ($numlookedup > Music::NUMTOPROCESSPERTIME)
-					return;
-
-				$albumId = -2;
-				$album = $this->parseArtist($arr['searchname']);
-				if ($album !== false)
-				{
-					if ($this->echooutput)
-						echo 'MusicPr : Looking up: '.$album["artist"].' - '.$album["album"]."\n";
-
-					//check for existing music entry
-					$albumCheck = $this->getMusicInfoByName($album["artist"], $album["album"]);
-
-					if ($albumCheck === false)
-					{
-						//
-						// get from amazon
-						//
-						$numlookedup++;
-						$ret = $this->updateMusicInfo($album["artist"], $album["album"], $album['year']);
-						if ($ret !== false)
-						{
-							$albumId = $ret;
-						}
-					}
-					else
-					{
-						$albumId = $albumCheck["ID"];
-					}
-				}
-
-				$db->exec(sprintf("update releases SET musicinfoID = %d WHERE ID = %d", $albumId, $arr["ID"]));
-			}
-		}
-	}
-
-	/**
-	 * Strip out an artist name from a release.
-	 */
-	public function parseArtist($releasename)
-	{
-		$result = array();
-		/*TODO: FIX VA lookups
-		if (substr($releasename, 0, 3) == 'VA-') {
-				$releasename = trim(str_replace('VA-', '', $releasename));
-		} elseif (substr($name, 0, 3) == 'VA ') {
-				$releasename = trim(str_replace('VA ', '', $releasename));
-		}
-		*/
-		if (preg_match('/mdvdr/i', $releasename))
-			return false;
-
-		//Replace VA with Various Artists
-		$newName = preg_replace('/VA( |\-)/', 'Various Artists -', $releasename);
-
-		//remove years, vbr etc
-		$newName = preg_replace('/\(.*?\)/i', '', $newName);
-		//remove double dashes
-		$newName = str_replace('--', '-', $newName);
-		$newName = str_replace('FLAC', '', $newName);
-
-		$name = explode("-", $newName);
-		$name = array_map("trim", $name);
-
-		if (is_array($name) && sizeof($name) > 1)
-		{
-			$albumi = 1;
-			if ((strlen($name[0]) <= 2 || strlen($name[1]) <= 2) && !preg_match('/Various Artists/i', $name[0]))
-			{
-				$name[0] = $name[0].'-'.$name[1];
-				$albumi = 2;
-			}
-			elseif (strlen($name[1]) <= 2 && preg_match('/Various Artists/i', $name[0]) && sizeof($name) > 2)
-			{
-				$name[2] = $name[1].'-'.$name[2];
-				$albumi = 2;
-			}
-
-			if (!isset($name[$albumi]))
-				return false;
-
-			if (preg_match('/^the /i', $name[0])) {
-				$name[0] = preg_replace('/^the /i', '', $name[0]).', The';
-			}
-			if (preg_match('/deluxe edition|single|nmrVBR|READ NFO/i', $name[$albumi], $albumType)) {
-				$name[$albumi] = preg_replace('/'.$albumType[0].'/i', '', $name[$albumi]);
-			}
-			$result['artist'] = trim($name[0]);
-			$result['album'] = trim($name[$albumi]);
-		}
-
-		//make sure we've actually matched an album name
-		if (isset($result['album']))
-		{
-			if (preg_match('/^(nmrVBR|VBR|WEB|SAT|20\d{2}|19\d{2}|CDM|EP)$/i',$result['album']))
-			{
-				$result['album'] = '';
-			}
-		}
-
-		preg_match('/((?:19|20)\d{2})/i', $releasename, $year);
-		$result['year'] = (isset($year[1]) && !empty($year[1])) ? $year[1] : '';
-
-		$result['releasename'] = $releasename;
-
-		return (!empty($result['artist']) && !empty($result['album'])) ? $result : false;
-	}
-
-	/**
-	 * Process all releases tagged as musicinfoID -2 to attempt to retrieve properties from mediainfo xml.
-	 */
-	public function processMusicReleaseFromMediaInfo()
-	{
-		$db = new DB();
-		$res = $db->query("SELECT r.searchname, ref.releaseID, ref.mediainfo FROM releaseextrafull ref INNER JOIN releases r ON r.ID = ref.releaseID WHERE r.musicinfoID = -2");
-
-		$rescount = sizeof($res);
-		if ($rescount > 0)
-		{
-			if ($this->echooutput)
-				echo "MusicPr : Processing ".$rescount." audio releases via mediainfo\n";
-
-			//load genres
-			$gen = new Genres();
-			$defaultGenres = $gen->getGenres(Genres::MUSIC_TYPE);
-			$genreassoc = array();
-			foreach($defaultGenres as $dg)
-				$genreassoc[$dg['ID']] = strtolower($dg['title']);
-
-			foreach($res as $rel)
-			{
-				$albumId = -3;
-				$mi = null;
-				$mi = @simplexml_load_string($rel["mediainfo"]);
-				if ($mi != null)
-				{
-					$artist = (string) $mi->File->track[0]->Performer;
-					$album = (string) $mi->File->track[0]->Album;
-					$year = (string) $mi->File->track[0]->Recorded_date;
-					$genre = (string) $mi->File->track[0]->Genre;
-					$publisher = (string) $mi->File->track[0]->Publisher;
-
-					$albumCheck = $this->getMusicInfoByName($artist, $album);
-					if ($albumCheck === false)
-					{
-						//
-						// insert new musicinfo
-						//
-						$genreKey = -1;
-						if ($genre != "")
-							$albumId = $this->addUpdateMusicInfo($album, "", "",  "null", $artist,
-								$publisher, "null", "", $year, $genreKey, "", 0 );
-					}
-					else
-					{
-						$albumId = $albumCheck["ID"];
-					}
-				}
-
-				$sql = sprintf("update releases set musicinfoID = %d where ID = %d", $albumId, $rel["releaseID"]);
-
-				$db->exec($sql);
-			}
-		}
-
-		return true;
-	}
-
-	/**
-	 * Insert or update a musicinfo row.
-	 */
-	public function addUpdateMusicInfo($title, $asin, $url, $salesrank, $artist, $publisher, $releasedate, $review, $year, $genreID, $tracks, $cover)
-	{
-		$db = new DB();
-
-		if (strlen($year) > 4)  {
-			if (preg_match("/\d{4}/", $year, $matches))
-				$year = $db->escapeString($matches[0]);
-			else
-				$year = "null";
-		}
-		else {
-			$year = $db->escapeString($year);
-		}
-
-		$sql = sprintf("
-		INSERT INTO musicinfo  (title, asin, url, salesrank,  artist, publisher, releasedate, review, year, genreID, tracks, cover, createddate, updateddate)
-		VALUES (%s, %s, %s,  %s,  %s, %s, %s, %s, %s,   %s, %s, %d, now(), now())
-			ON DUPLICATE KEY UPDATE  title = %s,  asin = %s,  url = %s,  salesrank = %s,  artist = %s,  publisher = %s,  releasedate = %s,  review = %s,  year = %s,  genreID = %s,  tracks = %s,  cover = %d,  createddate = now(),  updateddate = now()",
-			$db->escapeString($title), $db->escapeString($asin), $db->escapeString($url),
-			$salesrank, $db->escapeString($artist), $db->escapeString($publisher),
-			$releasedate, $db->escapeString($review), $year,
-			($genreID==-1?"null":$genreID), $db->escapeString($tracks), $cover,
-			$db->escapeString($title), $db->escapeString($asin), $db->escapeString($url),
-			$salesrank, $db->escapeString($artist), $db->escapeString($publisher),
-			$releasedate, $db->escapeString($review), $db->escapeString($year),
-			($genreID==-1?"null":$genreID), $db->escapeString($tracks), $cover  );
-
-		$musicId = $db->queryInsert($sql);
-		return $musicId;
-	}
-
-	/**
 	 * Convert Amazon browsenodes to genres.
 	 */
 	public function matchBrowseNode($nodeId)
@@ -751,5 +648,95 @@ class Music
 				break;
 		}
 		return ($str != '') ? $str : false;
+	}
+
+	/**
+	 * Insert or update a musicinfo row.
+	 */
+	public function addUpdateMusicInfo($title, $asin, $url, $salesrank, $artist, $publisher, $releasedate, $review, $year, $genreID, $tracks, $cover)
+	{
+		$db = new DB();
+
+		if (strlen($year) > 4) {
+			if (preg_match("/\d{4}/", $year, $matches))
+				$year = $db->escapeString($matches[0]);
+			else
+				$year = "null";
+		} else {
+			$year = $db->escapeString($year);
+		}
+
+		$sql = sprintf("
+		INSERT INTO musicinfo  (title, asin, url, salesrank,  artist, publisher, releasedate, review, year, genreID, tracks, cover, createddate, updateddate)
+		VALUES (%s, %s, %s,  %s,  %s, %s, %s, %s, %s,   %s, %s, %d, now(), now())
+			ON DUPLICATE KEY UPDATE  title = %s,  asin = %s,  url = %s,  salesrank = %s,  artist = %s,  publisher = %s,  releasedate = %s,  review = %s,  year = %s,  genreID = %s,  tracks = %s,  cover = %d,  createddate = now(),  updateddate = now()",
+			$db->escapeString($title), $db->escapeString($asin), $db->escapeString($url),
+			$salesrank, $db->escapeString($artist), $db->escapeString($publisher),
+			$releasedate, $db->escapeString($review), $year,
+			($genreID == -1 ? "null" : $genreID), $db->escapeString($tracks), $cover,
+			$db->escapeString($title), $db->escapeString($asin), $db->escapeString($url),
+			$salesrank, $db->escapeString($artist), $db->escapeString($publisher),
+			$releasedate, $db->escapeString($review), $db->escapeString($year),
+			($genreID == -1 ? "null" : $genreID), $db->escapeString($tracks), $cover
+		);
+
+		$musicId = $db->queryInsert($sql);
+
+		return $musicId;
+	}
+
+	/**
+	 * Process all releases tagged as musicinfoID -2 to attempt to retrieve properties from mediainfo xml.
+	 */
+	public function processMusicReleaseFromMediaInfo()
+	{
+		$db = new DB();
+		$res = $db->query("SELECT r.searchname, ref.releaseID, ref.mediainfo FROM releaseextrafull ref INNER JOIN releases r ON r.ID = ref.releaseID WHERE r.musicinfoID = -2");
+
+		$rescount = sizeof($res);
+		if ($rescount > 0) {
+			if ($this->echooutput)
+				echo "MusicPr : Processing " . $rescount . " audio releases via mediainfo\n";
+
+			//load genres
+			$gen = new Genres();
+			$defaultGenres = $gen->getGenres(Genres::MUSIC_TYPE);
+			$genreassoc = array();
+			foreach ($defaultGenres as $dg)
+				$genreassoc[$dg['ID']] = strtolower($dg['title']);
+
+			foreach ($res as $rel) {
+				$albumId = -3;
+				$mi = null;
+				$mi = @simplexml_load_string($rel["mediainfo"]);
+				if ($mi != null) {
+					$artist = (string)$mi->File->track[0]->Performer;
+					$album = (string)$mi->File->track[0]->Album;
+					$year = (string)$mi->File->track[0]->Recorded_date;
+					$genre = (string)$mi->File->track[0]->Genre;
+					$publisher = (string)$mi->File->track[0]->Publisher;
+
+					$albumCheck = $this->getMusicInfoByName($artist, $album);
+					if ($albumCheck === false) {
+						//
+						// insert new musicinfo
+						//
+						$genreKey = -1;
+						if ($genre != "")
+							$albumId = $this->addUpdateMusicInfo($album, "", "", "null", $artist,
+								$publisher, "null", "", $year, $genreKey, "", 0
+							);
+					} else {
+						$albumId = $albumCheck["ID"];
+					}
+				}
+
+				$sql = sprintf("update releases set musicinfoID = %d where ID = %d", $albumId, $rel["releaseID"]);
+
+				$db->exec($sql);
+			}
+		}
+
+		return true;
 	}
 }

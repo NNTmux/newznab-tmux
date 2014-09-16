@@ -34,9 +34,10 @@ CREATE INDEX `ix_releases_xxxinfo_id` ON `releases` (`xxxinfo_id`);
 CREATE INDEX `ix_releases_status` ON `releases` (`nzbstatus`, `iscategorized`, `isrenamed`, `nfostatus`, `ishashed`, `passwordstatus`, `dehashstatus`, `releasenfoID`, `musicinfoID`, `consoleinfoID`, `bookinfoID`, `haspreview`, `categoryID`, `imdbID`, `rageID`);
 
 ALTER TABLE users ADD COLUMN gameview INT AFTER consoleview;
-ALTER TABLE users ADD COLUMN xxxview INT AFTER consoleview;
-ALTER TABLE users ADD COLUMN cp_api  VARCHAR(255) NULL DEFAULT NULL;
-ALTER TABLE users ADD COLUMN cp_url  VARCHAR(255) NULL DEFAULT NULL;
+ALTER TABLE users ADD COLUMN xxxview INT
+AFTER consoleview;
+ALTER TABLE users ADD COLUMN cp_api VARCHAR(255) NULL DEFAULT NULL;
+ALTER TABLE users ADD COLUMN cp_url VARCHAR(255) NULL DEFAULT NULL;
 
 DROP TABLE IF EXISTS prehash;
 CREATE TABLE prehash (
@@ -488,14 +489,14 @@ CREATE TABLE         gamesinfo (
   asin        VARCHAR(128)        DEFAULT NULL,
   url         VARCHAR(1000)       DEFAULT NULL,
   publisher   VARCHAR(255)        DEFAULT NULL,
-  genre_id     INT(10)             NULL DEFAULT NULL,
+  genre_id  INT(10)             NULL     DEFAULT NULL,
   esrb        VARCHAR(255)        NULL DEFAULT NULL,
   releasedate DATETIME            DEFAULT NULL,
   review      VARCHAR(3000)       DEFAULT NULL,
   cover       TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
-  backdrop    TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
-  trailer     VARCHAR(1000)       NOT NULL DEFAULT '',
-  classused   VARCHAR(10)         NOT NULL DEFAULT 'steam' ,
+  backdrop  TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
+  trailer   VARCHAR(1000)       NOT NULL DEFAULT '',
+  classused VARCHAR(10)         NOT NULL DEFAULT 'steam',
   createddate DATETIME            NOT NULL,
   updateddate DATETIME            NOT NULL,
   PRIMARY KEY                    (id),
@@ -507,39 +508,45 @@ CREATE TABLE         gamesinfo (
   AUTO_INCREMENT  = 1;
 
 DROP TABLE IF EXISTS xxxinfo;
-CREATE TABLE         xxxinfo (
-  id          INT(10) UNSIGNED               NOT NULL AUTO_INCREMENT,
-  title       VARCHAR(255)                   NOT NULL,
-  tagline     VARCHAR(1024)                  NOT NULL,
-  plot        BLOB                           NULL DEFAULT NULL,
-  genre       VARCHAR(64)                    NOT NULL,
-  director    VARCHAR(64)                    DEFAULT NULL,
-  actors      VARCHAR(2000)                  NOT NULL,
-  extras      TEXT                           DEFAULT NULL,
-  productinfo TEXT                           DEFAULT NULL,
-  trailers    TEXT                           DEFAULT NULL,
-  directurl   VARCHAR(2000)                  NOT NULL,
-  classused   VARCHAR(3)                     NOT NULL,
-  cover       TINYINT(1) UNSIGNED            NOT NULL DEFAULT '0',
-  backdrop    TINYINT(1) UNSIGNED            NOT NULL DEFAULT '0',
-  createddate DATETIME                       NOT NULL,
-  updateddate DATETIME                       NOT NULL,
-  PRIMARY KEY                      (id),
-  INDEX        ix_xxxinfo_title  (title)
+CREATE TABLE xxxinfo (
+  id          INT(10) UNSIGNED    NOT NULL AUTO_INCREMENT,
+  title       VARCHAR(255)        NOT NULL,
+  tagline     VARCHAR(1024)       NOT NULL,
+  plot        BLOB                NULL     DEFAULT NULL,
+  genre       VARCHAR(64)         NOT NULL,
+  director    VARCHAR(64)                  DEFAULT NULL,
+  actors      VARCHAR(2000)       NOT NULL,
+  extras      TEXT                         DEFAULT NULL,
+  productinfo TEXT                         DEFAULT NULL,
+  trailers    TEXT                         DEFAULT NULL,
+  directurl   VARCHAR(2000)       NOT NULL,
+  classused   VARCHAR(3)          NOT NULL,
+  cover       TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
+  backdrop    TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
+  createddate DATETIME            NOT NULL,
+  updateddate DATETIME            NOT NULL,
+  PRIMARY KEY (id),
+  INDEX ix_xxxinfo_title  (title)
 )
-  ENGINE          = InnoDB
+  ENGINE = InnoDB
   DEFAULT CHARSET = utf8
-  COLLATE         = utf8_unicode_ci
-  AUTO_INCREMENT  = 1;
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 1;
 
 DROP TABLE IF EXISTS `genres`;
 CREATE TABLE IF NOT EXISTS `genres` (
-  `ID` int(11) NOT NULL AUTO_INCREMENT,
-  `title` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `type` int(4) DEFAULT NULL,
-  `disabled` tinyint(1) NOT NULL DEFAULT '0',
+  `ID`       INT(11)                 NOT NULL AUTO_INCREMENT,
+  `title`    VARCHAR(255)
+             COLLATE utf8_unicode_ci NOT NULL,
+  `type`     INT(4)                           DEFAULT NULL,
+  `disabled` TINYINT(1)              NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC AUTO_INCREMENT=635;
+)
+  ENGINE =InnoDB
+  DEFAULT CHARSET =utf8
+  COLLATE =utf8_unicode_ci
+  ROW_FORMAT = DYNAMIC
+  AUTO_INCREMENT =635;
 
 INSERT IGNORE INTO `genres` (`ID`, `title`, `type`, `disabled`) VALUES
   (150, 'Blues', 3000, 0),
@@ -1208,11 +1215,12 @@ ALTER IGNORE TABLE predbhash ADD UNIQUE INDEX ix_predbhash_hashes (hashes(32));
 INSERT INTO menu (href, title, tooltip, role, ordinal)
 VALUES ('prehash', 'Prehash',
         'Prehash', 1, 68);
-INSERT INTO menu (href, title, tooltip, role, ordinal ) VALUES ('newposterwall', 'New Releases', "Newest Releases Poster Wall", 1, 11);
+INSERT INTO menu (href, title, tooltip, role, ordinal)
+VALUES ('newposterwall', 'New Releases', "Newest Releases Poster Wall", 1, 11);
 
 INSERT INTO `site` (`setting`, `value`) VALUES
-  ('categorizeforeign',	'1'),
-  ('catwebdl',	'0'),
+  ('categorizeforeign', '1'),
+  ('catwebdl', '0'),
   ('giantbombkey', ''),
   ('lookupxxx', 1),
   ('maxxxxprocessed', 100),
@@ -1224,14 +1232,19 @@ ALTER TABLE animetitles CHANGE createddate unixtime INT(12) UNSIGNED NOT NULL;
 DROP TRIGGER IF EXISTS insert_hashes;
 
 DELIMITER $$
-CREATE TRIGGER insert_hashes AFTER INSERT ON prehash FOR EACH ROW BEGIN INSERT INTO predbhash (pre_id, hashes) VALUES (NEW.ID, CONCAT_WS(',', MD5(NEW.title), MD5(MD5(NEW.title)), SHA1(NEW.title)));END;
+CREATE TRIGGER insert_hashes AFTER INSERT ON prehash FOR EACH ROW BEGIN INSERT INTO predbhash (pre_id, hashes)
+VALUES (NEW.ID, CONCAT_WS(',', MD5(NEW.title), MD5(MD5(NEW.title)), SHA1(NEW.title)));
+END;
 $$
 DELIMITER ;
 
 DROP TRIGGER IF EXISTS update_hashes;
 
 DELIMITER $$
-CREATE TRIGGER update_hashes AFTER UPDATE ON prehash FOR EACH ROW BEGIN IF NEW.title != OLD.title THEN UPDATE predbhash SET hashes = CONCAT_WS(',', MD5(NEW.title), MD5(MD5(NEW.title)), SHA1(NEW.title)) WHERE pre_id = OLD.ID; END IF;
+CREATE TRIGGER update_hashes AFTER UPDATE ON prehash FOR EACH ROW BEGIN IF NEW.title != OLD.title
+THEN UPDATE predbhash
+SET hashes = CONCAT_WS(',', MD5(NEW.title), MD5(MD5(NEW.title)), SHA1(NEW.title))
+WHERE pre_id = OLD.ID; END IF;
 END;
 $$
 DELIMITER ;
@@ -1239,7 +1252,9 @@ DELIMITER ;
 DROP TRIGGER IF EXISTS delete_hashes;
 
 DELIMITER $$
-CREATE TRIGGER delete_hashes AFTER DELETE ON prehash FOR EACH ROW BEGIN DELETE FROM predbhash WHERE pre_id = OLD.ID; END;
+CREATE TRIGGER delete_hashes AFTER DELETE ON prehash FOR EACH ROW BEGIN DELETE FROM predbhash
+WHERE pre_id = OLD.ID;
+END;
 $$
 DELIMITER ;
 
@@ -1251,7 +1266,9 @@ CREATE TRIGGER check_rfinsert BEFORE INSERT ON releasefiles FOR EACH ROW BEGIN I
 THEN SET NEW.ishashed = 1; END IF;
 END;
 $$
-CREATE TRIGGER check_rfupdate BEFORE UPDATE ON releasefiles FOR EACH ROW BEGIN IF NEW.name REGEXP '[a-fA-F0-9]{32}' THEN SET NEW.ishashed = 1; END IF; END;
+CREATE TRIGGER check_rfupdate BEFORE UPDATE ON releasefiles FOR EACH ROW BEGIN IF NEW.name REGEXP '[a-fA-F0-9]{32}'
+THEN SET NEW.ishashed = 1; END IF;
+END;
 $$
 DELIMITER ;
 
@@ -1259,21 +1276,41 @@ DROP TRIGGER IF EXISTS check_insert;
 DROP TRIGGER IF EXISTS check_update;
 
 DELIMITER $$
-CREATE TRIGGER check_insert BEFORE INSERT ON releases FOR EACH ROW BEGIN IF NEW.searchname REGEXP '[a-fA-F0-9]{32}' OR NEW.name REGEXP '[a-fA-F0-9]{32}' THEN SET NEW.ishashed = 1;
-ELSEIF NEW.name REGEXP '^\\[ ?([[:digit:]]{4,6}) ?\\]|^REQ\s*([[:digit:]]{4,6})|^([[:digit:]]{4,6})-[[:digit:]]{1}\\[' THEN SET NEW.isrequestid = 1; END IF; END;
-$$
-CREATE TRIGGER check_update BEFORE UPDATE ON releases FOR EACH ROW BEGIN IF NEW.searchname REGEXP '[a-fA-F0-9]{32}' OR NEW.name REGEXP '[a-fA-F0-9]{32}' THEN SET NEW.ishashed = 1;
-ELSEIF NEW.name REGEXP '^\\[ ?([[:digit:]]{4,6}) ?\\]|^REQ\s*([[:digit:]]{4,6})|^([[:digit:]]{4,6})-[[:digit:]]{1}\\[' THEN SET NEW.isrequestid = 1;END IF;
+CREATE TRIGGER check_insert BEFORE INSERT ON releases FOR EACH ROW BEGIN IF NEW.searchname REGEXP '[a-fA-F0-9]{32}' OR
+                                                                            NEW.name REGEXP '[a-fA-F0-9]{32}'
+THEN SET NEW.ishashed = 1;
+ELSEIF NEW.name REGEXP '^\\[ ?([[:digit:]]{4,6}) ?\\]|^REQ\s*([[:digit:]]{4,6})|^([[:digit:]]{4,6})-[[:digit:]]{1}\\['
+  THEN SET NEW.isrequestid = 1; END IF;
 END;
 $$
-CREATE TRIGGER insert_search AFTER INSERT ON releases FOR EACH ROW BEGIN INSERT INTO releasesearch (releaseID, guid, name, searchname) VALUES (NEW.ID, NEW.guid, NEW.name, NEW.searchname);
+CREATE TRIGGER check_update BEFORE UPDATE ON releases FOR EACH ROW BEGIN IF NEW.searchname REGEXP '[a-fA-F0-9]{32}' OR
+                                                                            NEW.name REGEXP '[a-fA-F0-9]{32}'
+THEN SET NEW.ishashed = 1;
+ELSEIF NEW.name REGEXP '^\\[ ?([[:digit:]]{4,6}) ?\\]|^REQ\s*([[:digit:]]{4,6})|^([[:digit:]]{4,6})-[[:digit:]]{1}\\['
+  THEN SET NEW.isrequestid = 1; END IF;
 END;
 $$
-CREATE TRIGGER update_search AFTER UPDATE ON releases FOR EACH ROW BEGIN IF NEW.guid != OLD.guid THEN UPDATE releasesearch SET guid = NEW.guid WHERE releaseID = OLD.ID; END IF;
-IF NEW.name != OLD.name THEN UPDATE releasesearch SET name = NEW.name WHERE releaseID = OLD.ID; END IF; IF NEW.searchname != OLD.searchname THEN UPDATE releasesearch SET searchname = NEW.searchname WHERE releaseID = OLD.ID; END IF;
+CREATE TRIGGER insert_search AFTER INSERT ON releases FOR EACH ROW BEGIN INSERT INTO releasesearch (releaseID, guid, name, searchname)
+VALUES (NEW.ID, NEW.guid, NEW.name, NEW.searchname);
 END;
 $$
-CREATE TRIGGER delete_search AFTER DELETE ON releases FOR EACH ROW BEGIN DELETE FROM releasesearch WHERE releaseID = OLD.ID; END;
+CREATE TRIGGER update_search AFTER UPDATE ON releases FOR EACH ROW BEGIN IF NEW.guid != OLD.guid
+THEN UPDATE releasesearch
+SET guid = NEW.guid
+WHERE releaseID = OLD.ID; END IF;
+  IF NEW.name != OLD.name
+  THEN UPDATE releasesearch
+  SET name = NEW.name
+  WHERE releaseID = OLD.ID; END IF;
+  IF NEW.searchname != OLD.searchname
+  THEN UPDATE releasesearch
+  SET searchname = NEW.searchname
+  WHERE releaseID = OLD.ID; END IF;
+END;
+$$
+CREATE TRIGGER delete_search AFTER DELETE ON releases FOR EACH ROW BEGIN DELETE FROM releasesearch
+WHERE releaseID = OLD.ID;
+END;
 $$
 DELIMITER ;
 

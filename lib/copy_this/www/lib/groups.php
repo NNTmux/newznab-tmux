@@ -202,16 +202,6 @@ class Groups
 	}
 
 	/**
-	 * Reset all stats about a group, like its first_record.
-	 */
-	public function reset($id)
-	{
-		$db = new DB();
-
-		return $db->exec(sprintf("update groups set backfill_target=0, first_record=0, first_record_postdate=null, last_record=0, last_record_postdate=null, last_updated=null where ID = %d", $id));
-	}
-
-	/**
 	 * Reset all stats about a group and delete all releases and binaries associated with that group.
 	 */
 	public function purge($id)
@@ -231,6 +221,16 @@ class Groups
 		$bins = $db->query(sprintf("select ID from binaries where groupID = %d", $id));
 		foreach ($bins as $bin)
 			$binaries->delete($bin["ID"]);
+	}
+
+	/**
+	 * Reset all stats about a group, like its first_record.
+	 */
+	public function reset($id)
+	{
+		$db = new DB();
+
+		return $db->exec(sprintf("update groups set backfill_target=0, first_record=0, first_record_postdate=null, last_record=0, last_record_postdate=null, last_updated=null where ID = %d", $id));
 	}
 
 	/**

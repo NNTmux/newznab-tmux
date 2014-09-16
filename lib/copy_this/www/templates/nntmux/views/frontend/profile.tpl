@@ -60,11 +60,12 @@
 			Storage: {if $sabsetting == ''}N/A{else}{$sabsetting}{/if}
 		</td>
 	{/if}
-	<tr><th>CouchPotato Integration:</th>
-	<td>
-		Url: {if $user.cp_url == ''}N/A{else}{$user.cp_url}{/if}<br/>
-		Key: {if $user.cp_api == ''}N/A{else}{$user.cp_api}{/if}<br/>
-	</td>
+	<tr>
+		<th>CouchPotato Integration:</th>
+		<td>
+			Url: {if $user.cp_url == ''}N/A{else}{$user.cp_url}{/if}<br/>
+			Key: {if $user.cp_api == ''}N/A{else}{$user.cp_api}{/if}<br/>
+		</td>
 
 	{if ($user.ID==$userdata.ID)}
 	<tr>

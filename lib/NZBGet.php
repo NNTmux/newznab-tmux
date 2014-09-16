@@ -101,6 +101,33 @@ class NZBGet
 	}
 
 	/**
+	 * Verify if the NZBGet URL is correct.
+	 *
+	 * @param string $url NZBGet URL to verify.
+	 *
+	 * @return bool|string
+	 *
+	 * @access public
+	 */
+	public function verifyURL ($url)
+	{
+		if (preg_match('/(?P<protocol>https?):\/\/(?P<url>.+?)(:(?P<port>\d+\/)|\/)$/i', $url, $matches)) {
+			return
+				$matches['protocol'] .
+				'://' .
+				$this->userName .
+				':' .
+				$this->password .
+				'@' .
+				$matches['url'] .
+				(isset($matches['port']) ? ':' . $matches['port'] : '') .
+				'xmlrpc/';
+		} else {
+			return false;
+		}
+	}
+
+	/**
 	 * Send a NZB to NZBGet.
 	 *
 	 * @param string $guid Release identifier.
@@ -430,32 +457,5 @@ class NZBGet
 			}
 		}
 		return $retVal;
-	}
-
-	/**
-	 * Verify if the NZBGet URL is correct.
-	 *
-	 * @param string $url NZBGet URL to verify.
-	 *
-	 * @return bool|string
-	 *
-	 * @access public
-	 */
-	public function verifyURL ($url)
-	{
-		if (preg_match('/(?P<protocol>https?):\/\/(?P<url>.+?)(:(?P<port>\d+\/)|\/)$/i', $url, $matches)) {
-			return
-				$matches['protocol'] .
-				'://' .
-				$this->userName .
-				':' .
-				$this->password .
-				'@' .
-				$matches['url'] .
-				(isset($matches['port']) ? ':' . $matches['port'] : '') .
-				'xmlrpc/';
-		} else {
-			return false;
-		}
 	}
 }

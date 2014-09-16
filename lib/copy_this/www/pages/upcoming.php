@@ -1,5 +1,5 @@
 <?php
-require_once(WWW_DIR.'/../misc/update_scripts/nix_scripts/tmux/lib/Film.php');
+require_once(WWW_DIR . '/../misc/update_scripts/nix_scripts/tmux/lib/Film.php');
 if (!$users->isLoggedIn()) {
 	$page->show403();
 }
@@ -55,6 +55,7 @@ if ($data["info"] == "") {
 function replace_quality($imageURL, $userSetting)
 {
 	$types = array('thumbnail' => '_tmb.', 'profile' => '_pro.', 'detailed' => '_det.', 'original' => '_ori.');
+
 	return str_replace('_tmb.', $types[$userSetting], $imageURL);
 }
 

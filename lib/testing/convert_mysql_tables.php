@@ -7,8 +7,7 @@ require_once(WWW_DIR."lib/framework/db.php");
 $sql = "SHOW tables";
 $db = new DB();
 
-if (isset($argv[1]) && $argv[1] == "myisam")
-{
+if (isset($argv[1]) && $argv[1] == "myisam") {
 	$tables = $db->query($sql);
 	foreach($tables as $row)
 	{
@@ -17,8 +16,7 @@ if (isset($argv[1]) && $argv[1] == "myisam")
 		$db->exec("ALTER TABLE $tbl ENGINE=MYISAM");
 	}
 }
-else if (isset($argv[1]) && $argv[1] == "dinnodb")
-{
+else if (isset($argv[1]) && $argv[1] == "dinnodb") {
 	$tables = $db->query($sql);
 	foreach($tables as $row)
 	{
@@ -27,8 +25,7 @@ else if (isset($argv[1]) && $argv[1] == "dinnodb")
 		$db->exec("ALTER TABLE $tbl ENGINE=INNODB ROW_FORMAT=DYNAMIC");
 	}
 }
-else if (isset($argv[1]) && $argv[1] == "cinnodb")
-{
+else if (isset($argv[1]) && $argv[1] == "cinnodb") {
 	$tables = $db->query($sql);
 	foreach($tables as $row)
 	{

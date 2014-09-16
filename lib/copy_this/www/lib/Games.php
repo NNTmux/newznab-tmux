@@ -694,22 +694,53 @@ class Games
 		return $result;
 	}
 
+
 	/**
-	 * Fetch Giantbomb results from GameID
+	 * Get Giantbomb ID from title
 	 *
-	 * @return bool|mixed
+	 * @param string $title
+	 *
+	 * @return bool|mixed Array if no result False
 	 */
-	public function fetchGiantBombArray()
+
+	public function fetchGiantBombID($title = '')
 	{
 		$obj = new GiantBomb($this->publicKey);
 		try {
 			$fields = array(
-				"deck", "description", "original_game_rating", "api_detail_url", "image", "genres",
-				"name", "publishers", "original_release_date", "reviews",
-				"site_detail_url"
+				"api_detail_url", "name"
 			);
-			$result = json_decode(json_encode($obj->game($this->_gameID, $fields)), true);
-			$result = $result['results'];
+			$result = json_decode(json_encode($obj->search($title, $fields, 10, 1, array("game"))), true);
+			// We hit the maximum request.
+			if (empty($result)) {
+				$this->maxHitRequest = true;
+
+				return false;
+			}
+			if (!is_array($result['results']) || (int)$result['number_of_total_results'] === 0) {
+				$result = false;
+			} else {
+				$this->_resultsFound = count($result['results']) - 1;
+				if ($this->_resultsFound !== 0) {
+					for ($i = 0; $i <= $this->_resultsFound; $i++) {
+						similar_text($result['results'][$i]['name'], $title, $p);
+						if ($p > 77) {
+							$result = $result['results'][$i];
+							preg_match('/\/\d+\-(?<asin>\d+)\//', $result['api_detail_url'], $matches);
+							$this->_gameID = (string)$matches['asin'];
+							$result = $this->fetchGiantBombArray();
+							$this->_classUsed = "gb";
+							break;
+						}
+						if ($i === $this->_resultsFound) {
+							return false;
+						}
+					}
+
+				} else {
+					return false;
+				}
+			}
 		} catch (Exception $e) {
 			$result = false;
 		}
@@ -794,6 +825,29 @@ class Games
 				$this->c->doEcho($this->c->header('No games releases to process.'));
 			}
 		}
+	}
+
+	/**
+	 * Fetch Giantbomb results from GameID
+	 *
+	 * @return bool|mixed
+	 */
+	public function fetchGiantBombArray()
+	{
+		$obj = new GiantBomb($this->publicKey);
+		try {
+			$fields = array(
+				"deck", "description", "original_game_rating", "api_detail_url", "image", "genres",
+				"name", "publishers", "original_release_date", "reviews",
+				"site_detail_url"
+			);
+			$result = json_decode(json_encode($obj->game($this->_gameID, $fields)), true);
+			$result = $result['results'];
+		} catch (Exception $e) {
+			$result = false;
+		}
+
+		return $result;
 	}
 
 	/**

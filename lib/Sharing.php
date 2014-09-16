@@ -46,28 +46,25 @@ Class Sharing
 	 */
 
 	/**
+	 * Group to work in.
+	 *
+	 * @const
+	 */
+	const group = 'alt.binaries.zines';
+	/**
 	 * @var DB
 	 */
 	protected $db;
-
 	/**
 	 * @var NNTP
 	 */
 	protected $nntp;
-
 	/**
 	 * Array containing site settings.
 	 *
 	 * @var array
 	 */
 	protected $siteSettings = array();
-
-	/**
-	 * Group to work in.
-	 *
-	 * @const
-	 */
-	const group = 'alt.binaries.zines';
 
 	/**
 	 * Construct.
@@ -113,30 +110,6 @@ Class Sharing
 	}
 
 	/**
-	 * Main method.
-	 */
-	public function start()
-	{
-		// Admin has disabled sharing so return.
-		if ($this->siteSettings['enabled'] === false) {
-			return;
-		}
-
-		if (is_null($this->nntp)) {
-			$this->nntp = new NNTP();
-			$this->nntp->doConnect();
-		}
-
-		if ($this->siteSettings['fetching']) {
-			$this->fetchAll();
-		}
-		$this->matchComments();
-		if ($this->siteSettings['posting']) {
-			$this->postAll();
-		}
-	}
-
-	/**
 	 * Initialise of reset sharing settings.
 	 *
 	 * @param string $siteGuid Optional hash (must be sha1) we can set the site guid to.
@@ -161,125 +134,26 @@ Class Sharing
 	}
 
 	/**
-	 * Post all new comments to usenet.
+	 * Main method.
 	 */
-	protected function postAll()
+	public function start()
 	{
-		// Get all comments that we have no posted yet.
-		$newComments = $this->db->query(
-			sprintf(
-				'SELECT rc.text, rc.ID, %s, u.username, r.gid AS nzb_guid
-				FROM releasecomment rc
-				INNER JOIN users u ON rc.userID = u.ID
-				INNER JOIN releases r on rc.releaseID = r.ID
-				WHERE rc.shared = 0 LIMIT %d',
-				$this->db->unix_timestamp_column('rc.createddate'),
-				$this->siteSettings['max_push']
-			)
-		);
-
-		// Check if we have any comments to push.
-		if (count($newComments) === 0) {
+		// Admin has disabled sharing so return.
+		if ($this->siteSettings['enabled'] === false) {
 			return;
 		}
 
-
-		echo '(Sharing) Starting to upload comments.' . PHP_EOL;
-
-
-		// Loop over the comments.
-		foreach ($newComments as $comment) {
-			$this->postComment($comment);
+		if (is_null($this->nntp)) {
+			$this->nntp = new NNTP();
+			$this->nntp->doConnect();
 		}
 
-
-		echo PHP_EOL . '(Sharing) Finished uploading comments.' . PHP_EOL;
-
-	}
-
-	/**
-	 * Post a comment to usenet.
-	 *
-	 * @param array $row
-	 */
-	protected function postComment(&$row)
-	{
-		// Create a unique identifier for this comment.
-		$sid = sha1($row['unix_time'] . $row['text'] . $row['nzb_guid']);
-
-		// Check if the comment is already shared.
-		$check = $this->db->queryOneRow(sprintf('SELECT ID FROM releasecomment WHERE shareID = %s', $this->db->escapeString($sid)));
-		if ($check === false) {
-
-			// Example of a subject.
-			//(_nZEDb_)nZEDb_533f16e46a5091.73152965_3d12d7c1169d468aaf50d5541ef02cc88f3ede10 - [1/1] "92ba694cebc4fbbd0d9ccabc8604c71b23af1131" (1/1) yEnc
-
-			// Attempt to upload the comment to usenet.
-			$success = $this->nntp->postArticle(
-				self::group,
-				('(_nZEDb_)' . $this->siteSettings['site_name'] . '_' . $this->siteSettings['site_guid'] . ' - [1/1] "' . $sid . '" yEnc (1/1)'),
-				json_encode(
-					array(
-						'USER' => ($this->siteSettings['hide_users'] ? 'ANON' : $row['username']),
-						'TIME' => $row['unix_time'],
-						'SID'  => $sid,
-						'RID'  => $row['nzb_guid'],
-						'BODY' => $row['text']
-					)
-				),
-				'<anon@anon.com>'
-			);
-
-			// Check if we succesfully uploaded it.
-			if ($this->nntp->isError($success) === false && $success === true) {
-
-				// Update DB to say we posted the article.
-				$this->db->exec(
-					sprintf('
-						UPDATE releasecomment
-						SET shared = 1, shareID = %s
-						WHERE ID = %d',
-						$this->db->escapeString($sid),
-						$row['ID']
-					)
-				);
-
-				echo '.';
-
-			}
-		} else {
-			// Update the DB to say it's shared.
-			$this->db->exec(sprintf('UPDATE releasecomment SET shared = 1 WHERE ID = %d', $row['ID']));
+		if ($this->siteSettings['fetching']) {
+			$this->fetchAll();
 		}
-	}
-
-	/**
-	 * Match added comments to releases.
-	 */
-	protected function matchComments()
-	{
-		$res = $this->db->query('
-			SELECT r.ID, r.gid AS nzb_guid
-			FROM releases r
-			INNER JOIN releasecomment rc ON rc.nzb_guid = r.gid
-			WHERE rc.releaseID = 0'
-		);
-
-		$found = count($res);
-		if ($found > 0) {
-			foreach ($res as $row) {
-				$this->db->exec(
-					sprintf(
-						"UPDATE releasecomment SET releaseID = %d WHERE nzb_guid = %s",
-						$row['ID'],
-						$this->db->escapeString($row['nzb_guid'])
-					)
-				);
-				$this->db->exec(sprintf('UPDATE releases SET comments = comments + 1 WHERE ID = %d', $row['ID']));
-			}
-
-			echo '(Sharing) Matched ' . $found . ' comments.' . PHP_EOL;
-
+		$this->matchComments();
+		if ($this->siteSettings['posting']) {
+			$this->postAll();
 		}
 	}
 
@@ -505,6 +379,129 @@ Class Sharing
 		}
 
 		return false;
+	}
+
+	/**
+	 * Match added comments to releases.
+	 */
+	protected function matchComments()
+	{
+		$res = $this->db->query('
+			SELECT r.ID, r.gid AS nzb_guid
+			FROM releases r
+			INNER JOIN releasecomment rc ON rc.nzb_guid = r.gid
+			WHERE rc.releaseID = 0'
+		);
+
+		$found = count($res);
+		if ($found > 0) {
+			foreach ($res as $row) {
+				$this->db->exec(
+					sprintf(
+						"UPDATE releasecomment SET releaseID = %d WHERE nzb_guid = %s",
+						$row['ID'],
+						$this->db->escapeString($row['nzb_guid'])
+					)
+				);
+				$this->db->exec(sprintf('UPDATE releases SET comments = comments + 1 WHERE ID = %d', $row['ID']));
+			}
+
+			echo '(Sharing) Matched ' . $found . ' comments.' . PHP_EOL;
+
+		}
+	}
+
+	/**
+	 * Post all new comments to usenet.
+	 */
+	protected function postAll()
+	{
+		// Get all comments that we have no posted yet.
+		$newComments = $this->db->query(
+			sprintf(
+				'SELECT rc.text, rc.ID, %s, u.username, r.gid AS nzb_guid
+				FROM releasecomment rc
+				INNER JOIN users u ON rc.userID = u.ID
+				INNER JOIN releases r on rc.releaseID = r.ID
+				WHERE rc.shared = 0 LIMIT %d',
+				$this->db->unix_timestamp_column('rc.createddate'),
+				$this->siteSettings['max_push']
+			)
+		);
+
+		// Check if we have any comments to push.
+		if (count($newComments) === 0) {
+			return;
+		}
+
+
+		echo '(Sharing) Starting to upload comments.' . PHP_EOL;
+
+
+		// Loop over the comments.
+		foreach ($newComments as $comment) {
+			$this->postComment($comment);
+		}
+
+
+		echo PHP_EOL . '(Sharing) Finished uploading comments.' . PHP_EOL;
+
+	}
+
+	/**
+	 * Post a comment to usenet.
+	 *
+	 * @param array $row
+	 */
+	protected function postComment(&$row)
+	{
+		// Create a unique identifier for this comment.
+		$sid = sha1($row['unix_time'] . $row['text'] . $row['nzb_guid']);
+
+		// Check if the comment is already shared.
+		$check = $this->db->queryOneRow(sprintf('SELECT ID FROM releasecomment WHERE shareID = %s', $this->db->escapeString($sid)));
+		if ($check === false) {
+
+			// Example of a subject.
+			//(_nZEDb_)nZEDb_533f16e46a5091.73152965_3d12d7c1169d468aaf50d5541ef02cc88f3ede10 - [1/1] "92ba694cebc4fbbd0d9ccabc8604c71b23af1131" (1/1) yEnc
+
+			// Attempt to upload the comment to usenet.
+			$success = $this->nntp->postArticle(
+				self::group,
+				('(_nZEDb_)' . $this->siteSettings['site_name'] . '_' . $this->siteSettings['site_guid'] . ' - [1/1] "' . $sid . '" yEnc (1/1)'),
+				json_encode(
+					array(
+						'USER' => ($this->siteSettings['hide_users'] ? 'ANON' : $row['username']),
+						'TIME' => $row['unix_time'],
+						'SID'  => $sid,
+						'RID'  => $row['nzb_guid'],
+						'BODY' => $row['text']
+					)
+				),
+				'<anon@anon.com>'
+			);
+
+			// Check if we succesfully uploaded it.
+			if ($this->nntp->isError($success) === false && $success === true) {
+
+				// Update DB to say we posted the article.
+				$this->db->exec(
+					sprintf('
+						UPDATE releasecomment
+						SET shared = 1, shareID = %s
+						WHERE ID = %d',
+						$this->db->escapeString($sid),
+						$row['ID']
+					)
+				);
+
+				echo '.';
+
+			}
+		} else {
+			// Update the DB to say it's shared.
+			$this->db->exec(sprintf('UPDATE releasecomment SET shared = 1 WHERE ID = %d', $row['ID']));
+		}
 	}
 
 }

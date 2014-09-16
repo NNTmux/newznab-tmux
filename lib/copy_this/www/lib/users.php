@@ -37,6 +37,15 @@ class Users
 	const QUEUE_SABNZBD = 1;
 	const QUEUE_NZBGET = 2;
 
+	public static function checkPassword($password, $hash)
+	{
+		$salt = substr($hash, -self::SALTLEN);
+		$site = new Sites();
+		$s = $site->get();
+
+		return self::hashSHA1($s->siteseed . $password . $salt . $s->siteseed) === substr($hash, 0, self::SHA1LEN);
+	}
+
 	public function get()
 	{
 		$db = new DB();
@@ -65,6 +74,32 @@ class Users
 		$forum->deleteUser($id);
 
 		$db->exec(sprintf("DELETE from users where ID = %d", $id));
+	}
+
+	public function delCartForUser($uid)
+	{
+		$db = new DB();
+		$db->exec(sprintf("DELETE from usercart where userID = %d", $uid));
+	}
+
+	public function delUserCategoryExclusions($uid)
+	{
+		$db = new DB();
+		$db->exec(sprintf("DELETE from userexcat where userID = %d", $uid));
+	}
+
+	public function delDownloadRequests($userid)
+	{
+		$db = new DB();
+
+		return $db->queryInsert(sprintf("delete from userdownloads where userID = %d", $userid));
+	}
+
+	public function delApiRequests($userid)
+	{
+		$db = new DB();
+
+		return $db->queryInsert(sprintf("delete from userrequests where userID = %d", $userid));
 	}
 
 	public function getRange($start, $num, $orderby, $username = '', $email = '', $host = '', $role = '')
@@ -141,25 +176,6 @@ class Users
 		$res = $db->queryOneRow("select count(ID) as num from users WHERE email != 'sharing@nZEDb.com'");
 
 		return $res["num"];
-	}
-
-	public function add($uname, $pass, $email, $role, $notes, $host, $invites = Users::DEFAULT_INVITES, $invitedby = 0)
-	{
-		$db = new DB();
-
-		$site = new Sites();
-		$s = $site->get();
-		if ($s->storeuserips != "1")
-			$host = "";
-
-		if ($invitedby == 0)
-			$invitedby = "null";
-
-		$sql = sprintf("insert into users (username, password, email, role, notes, createddate, host, rsstoken, invites, invitedby, userseed) values (%s, %s, lower(%s), %d, %s, now(), %s, md5(%s), %d, %s, md5(%s))",
-			$db->escapeString($uname), $db->escapeString($this->hashPassword($pass)), $db->escapeString($email), $role, $db->escapeString($notes), $db->escapeString($host), $db->escapeString(uniqid()), $invites, $invitedby, $db->escapeString(uniqid())
-		);
-
-		return $db->queryInsert($sql);
 	}
 
 	public function update($id, $uname, $email, $grabs, $role, $notes, $invites, $movieview, $musicview, $gameview, $xxxview, $consoleview, $bookview, $queueType = '', $nzbgetURL = '', $nzbgetUsername = '', $nzbgetPassword = '', $saburl = '', $sabapikey = '', $sabpriority = '', $sabapikeytype = '', $nzbvortexServerUrl, $nzbvortexApiKey = false, $cp_url = false, $cp_api = false)
@@ -242,6 +258,30 @@ class Users
 		return Users::SUCCESS;
 	}
 
+	public function isValidUsername($uname)
+	{
+		return preg_match("/^[a-z][a-z0-9]{2,}$/i", $uname);
+	}
+
+	public function isValidEmail($email)
+	{
+		return preg_match("/^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([a-z0-9\-]+\.)+[a-z]{2,6}$/i", $email);
+	}
+
+	public function getByUsername($uname)
+	{
+		$db = new DB();
+
+		return $db->queryOneRow(sprintf("select users.*, userroles.name as rolename, userroles.apirequests, userroles.downloadrequests from users inner join userroles on userroles.ID = users.role where username = %s ", $db->escapeString($uname)));
+	}
+
+	public function getByEmail($email)
+	{
+		$db = new DB();
+
+		return $db->queryOneRow(sprintf("select * from users where lower(email) = %s ", $db->escapeString(strtolower($email))));
+	}
+
 	public function updateUserRole($uid, $role)
 	{
 		$db = new DB();
@@ -298,11 +338,28 @@ class Users
 		return Users::SUCCESS;
 	}
 
-	public function getByEmail($email)
+	public static function hashPassword($password)
 	{
-		$db = new DB();
+		$salt = self::randomKey(self::SALTLEN);
+		$site = new Sites();
+		$s = $site->get();
 
-		return $db->queryOneRow(sprintf("select * from users where lower(email) = %s ", $db->escapeString(strtolower($email))));
+		return self::hashSHA1($s->siteseed . $password . $salt . $s->siteseed) . $salt;
+	}
+
+	function randomKey($amount)
+	{
+		$keyset = "abcdefghijklmABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+		$randkey = "";
+		for ($i = 0; $i < $amount; $i++)
+			$randkey .= substr($keyset, rand(0, strlen($keyset) - 1), 1);
+
+		return $randkey;
+	}
+
+	public static function hashSHA1($string)
+	{
+		return sha1($string);
 	}
 
 	public function getByPassResetGuid($guid)
@@ -312,25 +369,10 @@ class Users
 		return $db->queryOneRow(sprintf("select * from users where resetguid = %s ", $db->escapeString($guid)));
 	}
 
-	public function getByUsername($uname)
-	{
-		$db = new DB();
-
-		return $db->queryOneRow(sprintf("select users.*, userroles.name as rolename, userroles.apirequests, userroles.downloadrequests from users inner join userroles on userroles.ID = users.role where username = %s ", $db->escapeString($uname)));
-	}
-
 	public function incrementGrabs($id, $num = 1)
 	{
 		$db = new DB();
 		$db->exec(sprintf("update users set grabs = grabs + %d where id = %d ", $num, $id));
-	}
-
-	public function getById($id)
-	{
-		$db = new DB();
-		$sql = sprintf("select users.*, userroles.name as rolename, userroles.hideads, userroles.canpreview, userroles.canpre, userroles.apirequests, userroles.downloadrequests, NOW() as now from users inner join userroles on userroles.ID = users.role where users.id = %d ", $id);
-
-		return $db->queryOneRow($sql);
 	}
 
 	public function getByIdAndRssToken($id, $rsstoken)
@@ -339,6 +381,14 @@ class Users
 		$res = $this->getById($id);
 
 		return ($res && $res["rsstoken"] == $rsstoken ? $res : null);
+	}
+
+	public function getById($id)
+	{
+		$db = new DB();
+		$sql = sprintf("select users.*, userroles.name as rolename, userroles.hideads, userroles.canpreview, userroles.canpre, userroles.apirequests, userroles.downloadrequests, NOW() as now from users inner join userroles on userroles.ID = users.role where users.id = %d ", $id);
+
+		return $db->queryOneRow($sql);
 	}
 
 	public function getByRssToken($rsstoken)
@@ -353,39 +403,12 @@ class Users
 		return array('username_asc', 'username_desc', 'email_asc', 'email_desc', 'host_asc', 'host_desc', 'createddate_asc', 'createddate_desc', 'lastlogin_asc', 'lastlogin_desc', 'apiaccess_asc', 'apiaccess_desc', 'grabs_asc', 'grabs_desc', 'role_asc', 'role_desc');
 	}
 
-	public function isValidUsername($uname)
-	{
-		return preg_match("/^[a-z][a-z0-9]{2,}$/i", $uname);
-	}
-
-	public function isValidPassword($pass)
-	{
-		return (strlen($pass) > 5);
-	}
-
 	public function isDisabled($username)
 	{
 		$db = new DB();
 		$role = $db->queryOneRow(sprintf("select role as role from users where username = %s ", $db->escapeString($username)));
 
 		return ($role["role"] == Users::ROLE_DISABLED);
-	}
-
-	public function isValidCaptcha($site, $challenge, $response)
-	{
-		if ($site->registerrecaptcha != 1)
-			return true;
-
-		require_once(WWW_DIR . "/lib/recaptchalib.php");
-
-		$resp = recaptcha_check_answer($site->recaptchaprivatekey, $_SERVER["REMOTE_ADDR"], $challenge, $response);
-
-		return $resp->is_valid;
-	}
-
-	public function isValidEmail($email)
-	{
-		return preg_match("/^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([a-z0-9\-]+\.)+[a-z]{2,6}$/i", $email);
 	}
 
 	public function isValidUrl($url)
@@ -453,48 +476,71 @@ class Users
 		return $this->add($uname, $pass, $email, $role, $notes, $host, $invites, $invitedby);
 	}
 
-	function randomKey($amount)
+	public function isValidPassword($pass)
 	{
-		$keyset = "abcdefghijklmABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-		$randkey = "";
-		for ($i = 0; $i < $amount; $i++)
-			$randkey .= substr($keyset, rand(0, strlen($keyset) - 1), 1);
-
-		return $randkey;
+		return (strlen($pass) > 5);
 	}
 
-	public static function hashPassword($password)
+	public function isValidCaptcha($site, $challenge, $response)
 	{
-		$salt = self::randomKey(self::SALTLEN);
+		if ($site->registerrecaptcha != 1)
+			return true;
+
+		require_once(WWW_DIR . "/lib/recaptchalib.php");
+
+		$resp = recaptcha_check_answer($site->recaptchaprivatekey, $_SERVER["REMOTE_ADDR"], $challenge, $response);
+
+		return $resp->is_valid;
+	}
+
+	public function checkAndUseInvite($invitecode)
+	{
+		$invite = $this->getInvite($invitecode);
+		if (!$invite)
+			return -1;
+
+		$db = new DB();
+		$db->exec(sprintf("update users set invites = case when invites <= 0 then 0 else invites-1 end where ID = %d ", $invite["userID"]));
+		$this->deleteInvite($invitecode);
+
+		return $invite["userID"];
+	}
+
+	public function getInvite($inviteToken)
+	{
+		$db = new DB();
+
+		//
+		// Tidy any old invites sent greater than DEFAULT_INVITE_EXPIRY_DAYS days ago.
+		//
+		$db->exec(sprintf("DELETE from userinvite where createddate < now() - interval %d day", Users::DEFAULT_INVITE_EXPIRY_DAYS));
+
+		return $db->queryOneRow(sprintf("select * from userinvite inner join users on userinvite.userID = users.ID where guid = %s and invites > 0", $db->escapeString($inviteToken)));
+	}
+
+	public function deleteInvite($inviteToken)
+	{
+		$db = new DB();
+		$db->exec(sprintf("DELETE from userinvite where guid = %s ", $db->escapeString($inviteToken)));
+	}
+
+	public function add($uname, $pass, $email, $role, $notes, $host, $invites = Users::DEFAULT_INVITES, $invitedby = 0)
+	{
+		$db = new DB();
+
 		$site = new Sites();
 		$s = $site->get();
+		if ($s->storeuserips != "1")
+			$host = "";
 
-		return self::hashSHA1($s->siteseed . $password . $salt . $s->siteseed) . $salt;
-	}
+		if ($invitedby == 0)
+			$invitedby = "null";
 
-	public static function getHostHash($host, $siteseed = "")
-	{
-		if ($siteseed == "") {
-			$site = new Sites();
-			$s = $site->get();
-			$siteseed = $s->siteseed;
-		}
+		$sql = sprintf("insert into users (username, password, email, role, notes, createddate, host, rsstoken, invites, invitedby, userseed) values (%s, %s, lower(%s), %d, %s, now(), %s, md5(%s), %d, %s, md5(%s))",
+			$db->escapeString($uname), $db->escapeString($this->hashPassword($pass)), $db->escapeString($email), $role, $db->escapeString($notes), $db->escapeString($host), $db->escapeString(uniqid()), $invites, $invitedby, $db->escapeString(uniqid())
+		);
 
-		return self::hashSHA1($siteseed . $host . $siteseed);
-	}
-
-	public static function hashSHA1($string)
-	{
-		return sha1($string);
-	}
-
-	public static function checkPassword($password, $hash)
-	{
-		$salt = substr($hash, -self::SALTLEN);
-		$site = new Sites();
-		$s = $site->get();
-
-		return self::hashSHA1($s->siteseed . $password . $salt . $s->siteseed) === substr($hash, 0, self::SHA1LEN);
+		return $db->queryInsert($sql);
 	}
 
 	public function isLoggedIn()
@@ -510,19 +556,6 @@ class Users
 		}
 
 		return isset($_SESSION['uid']);
-	}
-
-	public function currentUserId()
-	{
-		return (isset($_SESSION['uid']) ? $_SESSION['uid'] : -1);
-	}
-
-	public function logout()
-	{
-		session_unset();
-		session_destroy();
-		setcookie('uid', '', (time() - 2592000), '/', $_SERVER['SERVER_NAME'], (isset($_SERVER['HTTPS']) ? true : false));
-		setcookie('idh', '', (time() - 2592000), '/', $_SERVER['SERVER_NAME'], (isset($_SERVER['HTTPS']) ? true : false));
 	}
 
 	public function login($uid, $host = "", $remember = "")
@@ -551,18 +584,31 @@ class Users
 		$db->exec(sprintf("update users set lastlogin = now() %s where ID = %d ", $hostSql, $uid));
 	}
 
-	public function updateApiAccessed($uid)
-	{
-		$db = new DB();
-		$db->exec(sprintf("update users set apiaccess = now() where id = %d ", $uid));
-	}
-
 	public function setCookies($uid)
 	{
 		$u = $this->getById($uid);
 		$idh = $this->hashSHA1($u["userseed"] . $uid);
 		setcookie('uid', $uid, (time() + 2592000), '/', $_SERVER['SERVER_NAME'], (isset($_SERVER['HTTPS']) ? true : false));
 		setcookie('idh', $idh, (time() + 2592000), '/', $_SERVER['SERVER_NAME'], (isset($_SERVER['HTTPS']) ? true : false));
+	}
+
+	public function currentUserId()
+	{
+		return (isset($_SESSION['uid']) ? $_SESSION['uid'] : -1);
+	}
+
+	public function logout()
+	{
+		session_unset();
+		session_destroy();
+		setcookie('uid', '', (time() - 2592000), '/', $_SERVER['SERVER_NAME'], (isset($_SERVER['HTTPS']) ? true : false));
+		setcookie('idh', '', (time() - 2592000), '/', $_SERVER['SERVER_NAME'], (isset($_SERVER['HTTPS']) ? true : false));
+	}
+
+	public function updateApiAccessed($uid)
+	{
+		$db = new DB();
+		$db->exec(sprintf("update users set apiaccess = now() where id = %d ", $uid));
 	}
 
 	public function addCart($uid, $releaseid)
@@ -607,12 +653,6 @@ class Users
 			$db->exec(sprintf("DELETE FROM usercart WHERE userID = %d AND releaseID = %d", $uid, $rel["ID"]));
 	}
 
-	public function delCartForUser($uid)
-	{
-		$db = new DB();
-		$db->exec(sprintf("DELETE from usercart where userID = %d", $uid));
-	}
-
 	public function delCartForRelease($rid)
 	{
 		$db = new DB();
@@ -628,17 +668,6 @@ class Users
 				$db->queryInsert(sprintf("insert into userexcat (userID, categoryID, createddate) values (%d, %d, now())", $uid, $catid));
 			}
 		}
-	}
-
-	public function getCategoryExclusion($uid)
-	{
-		$db = new DB();
-		$ret = array();
-		$data = $db->query(sprintf("select categoryID from userexcat where userID = %d union distinct select categoryID from roleexcat inner join users on users.role = roleexcat.role where users.ID = %d", $uid, $uid));
-		foreach ($data as $d)
-			$ret[] = $d["categoryID"];
-
-		return $ret;
 	}
 
 	public function getRoleCategoryExclusion($role)
@@ -663,6 +692,12 @@ class Users
 		}
 	}
 
+	public function delRoleCategoryExclusions($role)
+	{
+		$db = new DB();
+		$db->exec(sprintf("DELETE from roleexcat where role = %d", $role));
+	}
+
 	public function getCategoryExclusionNames($uid)
 	{
 		$data = $this->getCategoryExclusion($uid);
@@ -679,22 +714,21 @@ class Users
 		return $ret;
 	}
 
+	public function getCategoryExclusion($uid)
+	{
+		$db = new DB();
+		$ret = array();
+		$data = $db->query(sprintf("select categoryID from userexcat where userID = %d union distinct select categoryID from roleexcat inner join users on users.role = roleexcat.role where users.ID = %d", $uid, $uid));
+		foreach ($data as $d)
+			$ret[] = $d["categoryID"];
+
+		return $ret;
+	}
+
 	public function delCategoryExclusion($uid, $catid)
 	{
 		$db = new DB();
 		$db->exec(sprintf("DELETE from userexcat where userID = %d and categoryID = %d", $uid, $catid));
-	}
-
-	public function delUserCategoryExclusions($uid)
-	{
-		$db = new DB();
-		$db->exec(sprintf("DELETE from userexcat where userID = %d", $uid));
-	}
-
-	public function delRoleCategoryExclusions($role)
-	{
-		$db = new DB();
-		$db->exec(sprintf("DELETE from roleexcat where role = %d", $role));
 	}
 
 	public function sendInvite($sitetitle, $siteemail, $serverurl, $uid, $emailto)
@@ -711,41 +745,10 @@ class Users
 		return $url;
 	}
 
-	public function getInvite($inviteToken)
-	{
-		$db = new DB();
-
-		//
-		// Tidy any old invites sent greater than DEFAULT_INVITE_EXPIRY_DAYS days ago.
-		//
-		$db->exec(sprintf("DELETE from userinvite where createddate < now() - interval %d day", Users::DEFAULT_INVITE_EXPIRY_DAYS));
-
-		return $db->queryOneRow(sprintf("select * from userinvite inner join users on userinvite.userID = users.ID where guid = %s and invites > 0", $db->escapeString($inviteToken)));
-	}
-
 	public function addInvite($uid, $inviteToken)
 	{
 		$db = new DB();
 		$db->queryInsert(sprintf("insert into userinvite (guid, userID, createddate) values (%s, %d, now())", $db->escapeString($inviteToken), $uid));
-	}
-
-	public function deleteInvite($inviteToken)
-	{
-		$db = new DB();
-		$db->exec(sprintf("DELETE from userinvite where guid = %s ", $db->escapeString($inviteToken)));
-	}
-
-	public function checkAndUseInvite($invitecode)
-	{
-		$invite = $this->getInvite($invitecode);
-		if (!$invite)
-			return -1;
-
-		$db = new DB();
-		$db->exec(sprintf("update users set invites = case when invites <= 0 then 0 else invites-1 end where ID = %d ", $invite["userID"]));
-		$this->deleteInvite($invitecode);
-
-		return $invite["userID"];
 	}
 
 	public function getTopGrabbers()
@@ -805,6 +808,17 @@ class Users
 		return $db->query($sql);
 	}
 
+	public static function getHostHash($host, $siteseed = "")
+	{
+		if ($siteseed == "") {
+			$site = new Sites();
+			$s = $site->get();
+			$siteseed = $s->siteseed;
+		}
+
+		return self::hashSHA1($siteseed . $host . $siteseed);
+	}
+
 	public function getUsersByRole()
 	{
 		$db = new DB();
@@ -855,13 +869,6 @@ class Users
 		return $db->queryOneRow($sql);
 	}
 
-	public function getDefaultRole()
-	{
-		$db = new DB();
-
-		return $db->queryOneRow("select * from userroles where isdefault = 1");
-	}
-
 	public function addRole($name, $apirequests, $downloadrequests, $defaultinvites, $canpreview, $canpre, $hideads)
 	{
 		$db = new DB();
@@ -895,6 +902,13 @@ class Users
 		return $db->exec(sprintf("DELETE from userroles WHERE ID=%d", $id));
 	}
 
+	public function getDefaultRole()
+	{
+		$db = new DB();
+
+		return $db->queryOneRow("select * from userroles where isdefault = 1");
+	}
+
 	public function getApiRequests($userid)
 	{
 		$db = new DB();
@@ -915,13 +929,6 @@ class Users
 		$sql = sprintf("insert into userrequests (userID, request, timestamp, hosthash) VALUES (%d, %s, now(), %s)", $userid, $db->escapeString($request), $hosthash);
 
 		return $db->queryInsert($sql);
-	}
-
-	public function delApiRequests($userid)
-	{
-		$db = new DB();
-
-		return $db->queryInsert(sprintf("delete from userrequests where userID = %d", $userid));
 	}
 
 	/**
@@ -987,13 +994,6 @@ class Users
 		$sql = sprintf("insert into userdownloads (userID, timestamp, hosthash, releaseID) VALUES (%d, now(), %s, (select ID from releases where guid = %s))", $userid, $hosthash, $db->escapeString($relGuid));
 
 		return $db->queryInsert($sql);
-	}
-
-	public function delDownloadRequests($userid)
-	{
-		$db = new DB();
-
-		return $db->queryInsert(sprintf("delete from userdownloads where userID = %d", $userid));
 	}
 
 	public function delDownloadRequestsForRelease($releaseID)

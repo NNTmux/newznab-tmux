@@ -56,6 +56,253 @@ class DB
 	}
 
 	/**
+	 * Get the plain PDO connection
+	 *
+	 * @return PDO
+	 */
+	public function getPDO()
+	{
+		return self::$instance;
+	}
+
+	/**
+	 * Call functions from PDO
+	 *
+	 * @param $function
+	 * @param $args
+	 *
+	 * @return mixed
+	 */
+	public function __call($function, $args)
+	{
+		if (method_exists(self::$instance, $function)) {
+			return call_user_func_array(array(self::$instance, $function), $args);
+		}
+		trigger_error("Unknown PDO Method Called: $function()\n", E_USER_ERROR);
+	}
+
+	/**
+	 * Formats a 'like' string. ex.(LIKE '%chocolate%')
+	 *
+	 * @param string $str   The string.
+	 * @param bool   $left  Add a % to the left.
+	 * @param bool   $right Add a % to the right.
+	 *
+	 * @return string
+	 */
+	public function likeString($str, $left = true, $right = true)
+	{
+		return (
+			'LIKE ' .
+			$this->escapeString(
+				($left ? '%' : '') .
+				$str .
+				($right ? '%' : '')
+			)
+		);
+	}
+
+	/**
+	 * Escape a string using PDO
+	 *
+	 * @param string $str
+	 *
+	 * @return string
+	 */
+	public function escapeString($str)
+	{
+		if (is_null($str)) {
+			return 'NULL';
+		}
+
+		return self::$instance->quote($str);
+	}
+
+	/**
+	 * Looks up info for index on table.
+	 *
+	 * @param $table string Table to look at.
+	 * @param $index string Index to check.
+	 *
+	 * @return bool|array False on failure, associative array of SHOW data.
+	 */
+	public function checkIndex($table, $index)
+	{
+		$result = $this->query(
+			sprintf(
+				"SHOW INDEX FROM %s WHERE key_name = '%s'",
+				trim($table),
+				trim($index)
+			)
+		);
+		if ($result === false) {
+			return false;
+		}
+
+		return $result->fetch(\PDO::FETCH_ASSOC);
+	}
+
+	/**
+	 * Perform a single query
+	 *
+	 * @param string     $query
+	 * @param bool       $useCache
+	 * @param string|int $cacheTTL
+	 *
+	 * @return bool|array
+	 */
+	public function query($query, $useCache = false, $cacheTTL = '')
+	{
+		if ($query == "")
+			return false;
+
+		$query = $this->utility->collapseWhiteSpace($query);
+
+		if ($useCache) {
+			$cache = new Cache();
+			if ($cache->enabled && $cache->exists($query)) {
+				$ret = $cache->fetch($query);
+				if ($ret !== false)
+					return $ret;
+			}
+		}
+
+		$result = $this->queryArray($query);
+
+		if ($result === false || $result === true)
+			return array();
+
+		if ($useCache)
+			if ($cache->enabled)
+				$cache->store($query, $result, $cacheTTL);
+
+		return $result;
+	}
+
+	/**
+	 * Main method for creating results as an array.
+	 *
+	 * @param string $query SQL to execute.
+	 *
+	 * @return array|boolean Array of results on success or false on failure.
+	 */
+	public function queryArray($query)
+	{
+		$result = false;
+		if (!empty($query)) {
+			$result = $this->queryDirect($query);
+
+			if (!empty($result)) {
+				$result = $result->fetchAll();
+			}
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Query without returning an empty array like our function query(). http://php.net/manual/en/pdo.query.php
+	 *
+	 * @param string $query  The query to run.
+	 * @param bool   $ignore Ignore errors, do not log them?
+	 *
+	 * @return bool|\PDOStatement
+	 */
+	public function queryDirect($query, $ignore = false)
+	{
+		if (empty($query)) {
+			return false;
+		}
+
+		$query = $this->utility->collapseWhiteSpace($query);
+
+
+		try {
+			$result = self::$instance->query($query);
+		} catch (\PDOException $e) {
+
+			// Check if we lost connection to MySQL.
+			if ($this->_checkGoneAway($e->getMessage()) !== false) {
+
+				// Reconnect to MySQL.
+				if ($this->_reconnect() === true) {
+
+					// If we reconnected, retry the query.
+					$result = $this->queryDirect($query);
+
+				} else {
+					// If we are not reconnected, return false.
+					$result = false;
+				}
+
+			} else {
+				if ($ignore === false) {
+					$this->echoError($e->getMessage(), 'queryDirect', 4, false);
+				}
+				$result = false;
+			}
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Verify that we've lost a connection to MySQL.
+	 *
+	 * @param string $errorMessage
+	 *
+	 * @return bool
+	 */
+	protected function _checkGoneAway($errorMessage)
+	{
+		if (stripos($errorMessage, 'MySQL server has gone away') !== false) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Reconnect to MySQL when the connection has been lost.
+	 *
+	 * @see ping(), _checkGoneAway() for checking the connection.
+	 *
+	 * @return bool
+	 */
+	protected function _reconnect()
+	{
+		// Check if we are really connected to MySQL.
+		if ($this->ping() === false) {
+			// If we are not reconnected, return false.
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Checks whether the connection to the server is working. Optionally restart a new connection.
+	 * NOTE: Restart does not happen if PDO is not using exceptions (PHP's default configuration).
+	 * In this case check the return value === false.
+	 *
+	 * @param boolean $restart Whether an attempt should be made to reinitialise the Db object on failure.
+	 *
+	 * @return boolean
+	 */
+	public function ping($restart = false)
+	{
+		try {
+			return (bool)self::$instance->query('SELECT 1+1');
+		} catch (\PDOException $e) {
+			if ($restart == true) {
+				$this->initialiseDatabase();
+			}
+
+			return false;
+		}
+	}
+
+	/**
 	 * Init PDO instance.
 	 */
 	private function initialiseDatabase()
@@ -100,90 +347,22 @@ class DB
 	}
 
 	/**
-	 * Get the plain PDO connection
+	 * Echo error, optionally exit.
 	 *
-	 * @return PDO
+	 * @param string $error The error message.
+	 * @param bool   $exit  Exit or not?
+	 *
+	 * @internal param string $method The method where the error occured.
+	 * @internal param int $severity The severity of the error.
 	 */
-	public function getPDO()
+	protected function echoError($error, $exit = false)
 	{
-		return self::$instance;
-	}
-
-	/**
-	 * Call functions from PDO
-	 *
-	 * @param $function
-	 * @param $args
-	 *
-	 * @return mixed
-	 */
-	public function __call($function, $args)
-	{
-		if (method_exists(self::$instance, $function)) {
-			return call_user_func_array(array(self::$instance, $function), $args);
-		}
-		trigger_error("Unknown PDO Method Called: $function()\n", E_USER_ERROR);
-	}
-
-	/**
-	 * Escape a string using PDO
-	 *
-	 * @param string $str
-	 *
-	 * @return string
-	 */
-	public function escapeString($str)
-	{
-		if (is_null($str)) {
-			return 'NULL';
-		}
-
-		return self::$instance->quote($str);
-	}
-
-	/**
-	 * Formats a 'like' string. ex.(LIKE '%chocolate%')
-	 *
-	 * @param string $str   The string.
-	 * @param bool   $left  Add a % to the left.
-	 * @param bool   $right Add a % to the right.
-	 *
-	 * @return string
-	 */
-	public function likeString($str, $left = true, $right = true)
-	{
-		return (
-			'LIKE ' .
-			$this->escapeString(
-				($left ? '%' : '') .
-				$str .
-				($right ? '%' : '')
-			)
+		echo(
+		($this->cli ? $this->log->error($error) . PHP_EOL : '<div class="error">' . $error . '</div>')
 		);
-	}
-
-	/**
-	 * Looks up info for index on table.
-	 *
-	 * @param $table string Table to look at.
-	 * @param $index string Index to check.
-	 *
-	 * @return bool|array False on failure, associative array of SHOW data.
-	 */
-	public function checkIndex($table, $index)
-	{
-		$result = $this->query(
-			sprintf(
-				"SHOW INDEX FROM %s WHERE key_name = '%s'",
-				trim($table),
-				trim($index)
-			)
-		);
-		if ($result === false) {
-			return false;
+		if ($exit) {
+			exit();
 		}
-
-		return $result->fetch(\PDO::FETCH_ASSOC);
 	}
 
 	public function checkColumnIndex($table, $column)
@@ -241,40 +420,6 @@ class DB
 	}
 
 	/**
-	 * Reconnect to MySQL when the connection has been lost.
-	 *
-	 * @see ping(), _checkGoneAway() for checking the connection.
-	 *
-	 * @return bool
-	 */
-	protected function _reconnect()
-	{
-		// Check if we are really connected to MySQL.
-		if ($this->ping() === false) {
-			// If we are not reconnected, return false.
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
-	 * Verify that we've lost a connection to MySQL.
-	 *
-	 * @param string $errorMessage
-	 *
-	 * @return bool
-	 */
-	protected function _checkGoneAway($errorMessage)
-	{
-		if (stripos($errorMessage, 'MySQL server has gone away') !== false) {
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
 	 * Execute a query and return the result or last inserted id
 	 *
 	 * @param string $query
@@ -320,180 +465,6 @@ class DB
 	}
 
 	/**
-	 * Perform a single query
-	 *
-	 * @param string     $query
-	 * @param bool       $useCache
-	 * @param string|int $cacheTTL
-	 *
-	 * @return bool|array
-	 */
-	public function query($query, $useCache = false, $cacheTTL = '')
-	{
-		if ($query == "")
-			return false;
-
-		$query = $this->utility->collapseWhiteSpace($query);
-
-		if ($useCache) {
-			$cache = new Cache();
-			if ($cache->enabled && $cache->exists($query)) {
-				$ret = $cache->fetch($query);
-				if ($ret !== false)
-					return $ret;
-			}
-		}
-
-		$result = $this->queryArray($query);
-
-		if ($result === false || $result === true)
-			return array();
-
-		if ($useCache)
-			if ($cache->enabled)
-				$cache->store($query, $result, $cacheTTL);
-
-		return $result;
-	}
-
-	/**
-	 * Query without returning an empty array like our function query(). http://php.net/manual/en/pdo.query.php
-	 *
-	 * @param string $query  The query to run.
-	 * @param bool   $ignore Ignore errors, do not log them?
-	 *
-	 * @return bool|\PDOStatement
-	 */
-	public function queryDirect($query, $ignore = false)
-	{
-		if (empty($query)) {
-			return false;
-		}
-
-		$query = $this->utility->collapseWhiteSpace($query);
-
-
-		try {
-			$result = self::$instance->query($query);
-		} catch (\PDOException $e) {
-
-			// Check if we lost connection to MySQL.
-			if ($this->_checkGoneAway($e->getMessage()) !== false) {
-
-				// Reconnect to MySQL.
-				if ($this->_reconnect() === true) {
-
-					// If we reconnected, retry the query.
-					$result = $this->queryDirect($query);
-
-				} else {
-					// If we are not reconnected, return false.
-					$result = false;
-				}
-
-			} else {
-				if ($ignore === false) {
-					$this->echoError($e->getMessage(), 'queryDirect', 4, false);
-				}
-				$result = false;
-			}
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Used for deleting, updating (and inserting without needing the last insert id).
-	 *
-	 * @param string $query
-	 * @param bool   $silent Echo or log errors?
-	 *
-	 * @return bool|\PDOStatement
-	 */
-	public function queryExec($query, $silent = false)
-	{
-		if (empty($query)) {
-			return false;
-		}
-
-		$query = $this->utility->collapseWhiteSpace($query);
-
-
-		$i = 2;
-		$error = '';
-		while ($i < 11) {
-			$result = $this->queryExecHelper($query);
-			if (is_array($result) && isset($result['deadlock'])) {
-				$error = $result['message'];
-				if ($result['deadlock'] === true) {
-					$this->ct->showsleep($i * ($i / 2));
-					$i++;
-				} else {
-					break;
-				}
-			} elseif ($result === false) {
-				$error = 'Unspecified error.';
-				break;
-			} else {
-				return $result;
-			}
-		}
-		if ($silent === false) {
-			$this->echoError($error, 'queryExec', 4);
-		}
-
-		return false;
-	}
-
-	/**
-	 * Helper method for queryInsert and queryExec, checks for deadlocks.
-	 *
-	 * @param string $query
-	 * @param bool   $insert
-	 *
-	 * @return array|\PDOStatement
-	 */
-	protected function queryExecHelper($query, $insert = false)
-	{
-		try {
-			if ($insert === false) {
-				$run = self::$instance->prepare($query);
-				$run->execute();
-
-				return $run;
-			} else {
-				$ins = self::$instance->prepare($query);
-				$ins->execute();
-
-				return self::$instance->lastInsertId();
-			}
-
-		} catch (\PDOException $e) {
-			// Deadlock or lock wait timeout, try 10 times.
-			if (
-				$e->errorInfo[1] == 1213 ||
-				$e->errorInfo[0] == 40001 ||
-				$e->errorInfo[1] == 1205 ||
-				$e->getMessage() == 'SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction'
-			) {
-				return ['deadlock' => true, 'message' => $e->getMessage()];
-			} // Check if we lost connection to MySQL.
-			else if ($this->_checkGoneAway($e->getMessage()) !== false) {
-
-				// Reconnect to MySQL.
-				if ($this->_reconnect() === true) {
-
-					// If we reconnected, retry the query.
-					return $this->queryExecHelper($query, $insert);
-
-				}
-			}
-
-			return ['deadlock' => false, 'message' => $e->getMessage()];
-		}
-	}
-
-	/**
 	 * Get the total number of rows in the result set
 	 *
 	 * @param PDOStatement $result
@@ -515,27 +486,6 @@ class DB
 	public function getAssocArray(PDOStatement $result)
 	{
 		return $result->fetch();
-	}
-
-	/**
-	 * Main method for creating results as an array.
-	 *
-	 * @param string $query SQL to execute.
-	 *
-	 * @return array|boolean Array of results on success or false on failure.
-	 */
-	public function queryArray($query)
-	{
-		$result = false;
-		if (!empty($query)) {
-			$result = $this->queryDirect($query);
-
-			if (!empty($result)) {
-				$result = $result->fetchAll();
-			}
-		}
-
-		return $result;
 	}
 
 	/**
@@ -639,6 +589,97 @@ class DB
 	}
 
 	/**
+	 * Used for deleting, updating (and inserting without needing the last insert id).
+	 *
+	 * @param string $query
+	 * @param bool   $silent Echo or log errors?
+	 *
+	 * @return bool|\PDOStatement
+	 */
+	public function queryExec($query, $silent = false)
+	{
+		if (empty($query)) {
+			return false;
+		}
+
+		$query = $this->utility->collapseWhiteSpace($query);
+
+
+		$i = 2;
+		$error = '';
+		while ($i < 11) {
+			$result = $this->queryExecHelper($query);
+			if (is_array($result) && isset($result['deadlock'])) {
+				$error = $result['message'];
+				if ($result['deadlock'] === true) {
+					$this->ct->showsleep($i * ($i / 2));
+					$i++;
+				} else {
+					break;
+				}
+			} elseif ($result === false) {
+				$error = 'Unspecified error.';
+				break;
+			} else {
+				return $result;
+			}
+		}
+		if ($silent === false) {
+			$this->echoError($error, 'queryExec', 4);
+		}
+
+		return false;
+	}
+
+	/**
+	 * Helper method for queryInsert and queryExec, checks for deadlocks.
+	 *
+	 * @param string $query
+	 * @param bool   $insert
+	 *
+	 * @return array|\PDOStatement
+	 */
+	protected function queryExecHelper($query, $insert = false)
+	{
+		try {
+			if ($insert === false) {
+				$run = self::$instance->prepare($query);
+				$run->execute();
+
+				return $run;
+			} else {
+				$ins = self::$instance->prepare($query);
+				$ins->execute();
+
+				return self::$instance->lastInsertId();
+			}
+
+		} catch (\PDOException $e) {
+			// Deadlock or lock wait timeout, try 10 times.
+			if (
+				$e->errorInfo[1] == 1213 ||
+				$e->errorInfo[0] == 40001 ||
+				$e->errorInfo[1] == 1205 ||
+				$e->getMessage() == 'SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction'
+			) {
+				return ['deadlock' => true, 'message' => $e->getMessage()];
+			} // Check if we lost connection to MySQL.
+			else if ($this->_checkGoneAway($e->getMessage()) !== false) {
+
+				// Reconnect to MySQL.
+				if ($this->_reconnect() === true) {
+
+					// If we reconnected, retry the query.
+					return $this->queryExecHelper($query, $insert);
+
+				}
+			}
+
+			return ['deadlock' => false, 'message' => $e->getMessage()];
+		}
+	}
+
+	/**
 	 * Log/echo repaired/optimized/analyzed tables.
 	 *
 	 * @param bool   $web    If we are on web, don't echo.
@@ -654,47 +695,6 @@ class DB
 		if ($web === false) {
 			echo $this->log->primary($message);
 
-		}
-	}
-
-	/**
-	 * Checks whether the connection to the server is working. Optionally restart a new connection.
-	 * NOTE: Restart does not happen if PDO is not using exceptions (PHP's default configuration).
-	 * In this case check the return value === false.
-	 *
-	 * @param boolean $restart Whether an attempt should be made to reinitialise the Db object on failure.
-	 *
-	 * @return boolean
-	 */
-	public function ping($restart = false)
-	{
-		try {
-			return (bool)self::$instance->query('SELECT 1+1');
-		} catch (\PDOException $e) {
-			if ($restart == true) {
-				$this->initialiseDatabase();
-			}
-
-			return false;
-		}
-	}
-
-	/**
-	 * Echo error, optionally exit.
-	 *
-	 * @param string $error The error message.
-	 * @param bool   $exit  Exit or not?
-	 *
-	 * @internal param string $method The method where the error occured.
-	 * @internal param int $severity The severity of the error.
-	 */
-	protected function echoError($error, $exit = false)
-	{
-		echo(
-		($this->cli ? $this->log->error($error) . PHP_EOL : '<div class="error">' . $error . '</div>')
-		);
-		if ($exit) {
-			exit();
 		}
 	}
 }

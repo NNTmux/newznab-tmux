@@ -667,62 +667,6 @@ class Releases
 	}
 
 	/**
-	 * Delete one or more releases.
-	 */
-	public function delete($id, $isGuid = false)
-	{
-		$db = new DB();
-		$users = new Users();
-		$s = new Sites();
-		$nfo = new Nfo();
-		$site = $s->get();
-		$rf = new ReleaseFiles();
-		$re = new ReleaseExtra();
-		$rc = new ReleaseComments();
-		$ri = new ReleaseImage();
-
-		if (!is_array($id))
-			$id = array($id);
-
-		foreach ($id as $identifier) {
-			//
-			// delete from disk.
-			//
-			$rel = ($isGuid) ? $this->getByGuid($identifier) : $this->getById($identifier);
-
-			$nzbpath = "";
-			if ($isGuid)
-				$nzbpath = $site->nzbpath . substr($identifier, 0, 1) . "/" . $identifier . ".nzb.gz";
-			elseif ($rel)
-				$nzbpath = $site->nzbpath . substr($rel["guid"], 0, 1) . "/" . $rel["guid"] . ".nzb.gz";
-
-			if ($nzbpath != "" && file_exists($nzbpath))
-				unlink($nzbpath);
-
-			$audiopreviewpath = "";
-			if ($isGuid)
-				$audiopreviewpath = WWW_DIR . 'covers/audio/' . $identifier . ".mp3";
-			elseif ($rel)
-				$audiopreviewpath = WWW_DIR . 'covers/audio/' . $rel["guid"] . ".mp3";
-
-			if ($audiopreviewpath && file_exists($audiopreviewpath))
-				unlink($audiopreviewpath);
-
-			if ($rel) {
-				$nfo->deleteReleaseNfo($rel['ID']);
-				$rc->deleteCommentsForRelease($rel['ID']);
-				$users->delCartForRelease($rel['ID']);
-				$users->delDownloadRequestsForRelease($rel['ID']);
-				$rf->delete($rel['ID']);
-				$re->delete($rel['ID']);
-				$re->deleteFull($rel['ID']);
-				$ri->delete($rel['guid']);
-				$db->exec(sprintf("DELETE from releases where id = %d", $rel['ID']));
-			}
-		}
-	}
-
-	/**
 	 * Deletes a single release by GUID, and all the corresponding files.
 	 *
 	 * @param              $guid
@@ -770,6 +714,15 @@ class Releases
 		$this->updateHasPreview($guid, 0);
 		$ri = new ReleaseImage();
 		$ri->delete($guid);
+	}
+
+	/**
+	 * Update whether a release has a preview.
+	 */
+	public function updateHasPreview($guid, $haspreview)
+	{
+		$db = new DB();
+		$db->exec(sprintf("update releases set haspreview = %d where guid = %s", $haspreview, $db->escapeString($guid)));
 	}
 
 	/**
@@ -824,137 +777,11 @@ class Releases
 	}
 
 	/**
-	 * Update whether a release has a preview.
-	 */
-	public function updateHasPreview($guid, $haspreview)
-	{
-		$db = new DB();
-		$db->exec(sprintf("update releases set haspreview = %d where guid = %s", $haspreview, $db->escapeString($guid)));
-	}
-
-	/**
 	 * Not yet implemented.
 	 */
 	public function searchadv($searchname, $filename, $poster, $group, $cat = array(-1), $sizefrom, $sizeto, $offset = 0, $limit = 1000, $orderby = '', $maxage = -1, $excludedcats = array())
 	{
 		return array();
-	}
-
-	/**
-	 * Search for releases.
-	 */
-	public function search($search, $cat = array(-1), $offset = 0, $limit = 1000, $orderby = '', $maxage = -1, $excludedcats = array(), $grp = array(), $minsize = -1, $maxsize = -1)
-	{
-		$s = new Sites();
-		$site = $s->get();
-
-		if ($site->sphinxenabled) {
-			$sphinx = new Sphinx();
-			$order = $this->getBrowseOrder($orderby);
-			$results = $sphinx->search($search, $cat, $offset, $limit, $order, $maxage, $excludedcats, $grp, array(), true, $minsize, $maxsize);
-			if (is_array($results))
-				return $results;
-		}
-
-		//
-		// Search using MySQL
-		//
-		$db = new DB();
-
-		$catsrch = "";
-		$usecatindex = "";
-		if (count($cat) > 0 && $cat[0] != -1) {
-			$catsrch = " and (";
-			foreach ($cat as $category) {
-				if ($category != -1) {
-					$categ = new Categorize();
-					if ($categ->isParent($category)) {
-						$children = $categ->getChildren($category);
-						$chlist = "-99";
-						foreach ($children as $child)
-							$chlist .= ", " . $child["ID"];
-
-						if ($chlist != "-99")
-							$catsrch .= " releases.categoryID in (" . $chlist . ") or ";
-					} else {
-						$catsrch .= sprintf(" releases.categoryID = %d or ", $category);
-					}
-				}
-			}
-			$catsrch .= "1=2 )";
-			$usecatindex = " use index (ix_releases_categoryID) ";
-		}
-
-		$grpsql = "";
-		if (count($grp) > 0) {
-			$grpsql = " and (";
-			foreach ($grp as $grpname) {
-				$grpsql .= sprintf(" groups.name = %s or ", $db->escapeString(str_replace("a.b.", "alt.binaries.", $grpname)));
-			}
-			$grpsql .= "1=2 )";
-		}
-
-		//
-		// if the query starts with a ^ it indicates the search is looking for items which start with the term
-		// still do the fulltext match, but mandate that all items returned must start with the provided word
-		//
-		$words = explode(" ", $search);
-		$searchsql = "";
-		$intwordcount = 0;
-		if (count($words) > 0) {
-			foreach ($words as $word) {
-				if ($word != "") {
-					//
-					// see if the first word had a caret, which indicates search must start with term
-					//
-					if ($intwordcount == 0 && (strpos($word, "^") === 0))
-						$searchsql .= sprintf(" and releases.searchname like %s", $db->escapeString(substr($word, 1) . "%"));
-					elseif (substr($word, 0, 2) == '--')
-						$searchsql .= sprintf(" and releases.searchname not like %s", $db->escapeString("%" . substr($word, 2) . "%"));
-					else
-						$searchsql .= sprintf(" and releases.searchname like %s", $db->escapeString("%" . $word . "%"));
-
-					$intwordcount++;
-				}
-			}
-		}
-
-		if ($maxage > 0)
-			$maxage = sprintf(" and postdate > now() - interval %d day ", $maxage);
-		else
-			$maxage = "";
-
-		if ($minsize != -1)
-			$minsize = sprintf(" and size > %d ", $minsize);
-		else
-			$minsize = "";
-
-		if ($maxsize != -1)
-			$maxsize = sprintf(" and size < %d ", $maxsize);
-		else
-			$maxsize = "";
-
-		$exccatlist = "";
-		if (count($excludedcats) > 0)
-			$exccatlist = " and releases.categoryID not in (" . implode(",", $excludedcats) . ")";
-
-		if ($orderby == "") {
-			$order[0] = " postdate ";
-			$order[1] = " desc ";
-		} else
-			$order = $this->getBrowseOrder($orderby);
-
-		$sql = sprintf("select releases.*, concat(cp.title, ' > ', c.title) as category_name, concat(cp.ID, ',', c.ID) as category_ids, groups.name as group_name, rn.ID as nfoID, re.releaseID as reID, cp.ID as categoryParentID, pre.ctime, pre.nuketype, coalesce(movieinfo.ID,0) as movieinfoID from releases %s left outer join movieinfo on movieinfo.imdbID = releases.imdbID left outer join releasevideo re on re.releaseID = releases.ID left outer join releasenfo rn on rn.releaseID = releases.ID left outer join groups on groups.ID = releases.groupID left outer join category c on c.ID = releases.categoryID left outer join category cp on cp.ID = c.parentID left outer join predb pre on pre.ID = releases.preID where releases.passwordstatus <= (select value from site where setting='showpasswordedrelease') %s %s %s %s %s %s %s order by %s %s limit %d, %d ", $usecatindex, $searchsql, $catsrch, $maxage, $exccatlist, $grpsql, $minsize, $maxsize, $order[0], $order[1], $offset, $limit);
-		$orderpos = strpos($sql, "order by");
-		$wherepos = strpos($sql, "where");
-		$sqlcount = "select count(releases.ID) as num from releases " . substr($sql, $wherepos, $orderpos - $wherepos);
-
-		$countres = $db->queryOneRow($sqlcount, true);
-		$res = $db->query($sql, true);
-		if (count($res) > 0)
-			$res[0]["_totalrows"] = $countres["num"];
-
-		return $res;
 	}
 
 	/**
@@ -1380,22 +1207,127 @@ class Releases
 	}
 
 	/**
-	 * Retrieve one or more releases by guid.
+	 * Search for releases.
 	 */
-	public function getByGuid($guid)
+	public function search($search, $cat = array(-1), $offset = 0, $limit = 1000, $orderby = '', $maxage = -1, $excludedcats = array(), $grp = array(), $minsize = -1, $maxsize = -1)
+	{
+		$s = new Sites();
+		$site = $s->get();
+
+		if ($site->sphinxenabled) {
+			$sphinx = new Sphinx();
+			$order = $this->getBrowseOrder($orderby);
+			$results = $sphinx->search($search, $cat, $offset, $limit, $order, $maxage, $excludedcats, $grp, array(), true, $minsize, $maxsize);
+			if (is_array($results))
+				return $results;
+		}
+
+		//
+		// Search using MySQL
+		//
+		$db = new DB();
+
+		$catsrch = "";
+		$usecatindex = "";
+		if (count($cat) > 0 && $cat[0] != -1) {
+			$catsrch = " and (";
+			foreach ($cat as $category) {
+				if ($category != -1) {
+					$categ = new Categorize();
+					if ($categ->isParent($category)) {
+						$children = $categ->getChildren($category);
+						$chlist = "-99";
+						foreach ($children as $child)
+							$chlist .= ", " . $child["ID"];
+
+						if ($chlist != "-99")
+							$catsrch .= " releases.categoryID in (" . $chlist . ") or ";
+					} else {
+						$catsrch .= sprintf(" releases.categoryID = %d or ", $category);
+					}
+				}
+			}
+			$catsrch .= "1=2 )";
+			$usecatindex = " use index (ix_releases_categoryID) ";
+		}
+
+		$grpsql = "";
+		if (count($grp) > 0) {
+			$grpsql = " and (";
+			foreach ($grp as $grpname) {
+				$grpsql .= sprintf(" groups.name = %s or ", $db->escapeString(str_replace("a.b.", "alt.binaries.", $grpname)));
+			}
+			$grpsql .= "1=2 )";
+		}
+
+		//
+		// if the query starts with a ^ it indicates the search is looking for items which start with the term
+		// still do the fulltext match, but mandate that all items returned must start with the provided word
+		//
+		$words = explode(" ", $search);
+		$searchsql = "";
+		$intwordcount = 0;
+		if (count($words) > 0) {
+			foreach ($words as $word) {
+				if ($word != "") {
+					//
+					// see if the first word had a caret, which indicates search must start with term
+					//
+					if ($intwordcount == 0 && (strpos($word, "^") === 0))
+						$searchsql .= sprintf(" and releases.searchname like %s", $db->escapeString(substr($word, 1) . "%"));
+					elseif (substr($word, 0, 2) == '--')
+						$searchsql .= sprintf(" and releases.searchname not like %s", $db->escapeString("%" . substr($word, 2) . "%"));
+					else
+						$searchsql .= sprintf(" and releases.searchname like %s", $db->escapeString("%" . $word . "%"));
+
+					$intwordcount++;
+				}
+			}
+		}
+
+		if ($maxage > 0)
+			$maxage = sprintf(" and postdate > now() - interval %d day ", $maxage);
+		else
+			$maxage = "";
+
+		if ($minsize != -1)
+			$minsize = sprintf(" and size > %d ", $minsize);
+		else
+			$minsize = "";
+
+		if ($maxsize != -1)
+			$maxsize = sprintf(" and size < %d ", $maxsize);
+		else
+			$maxsize = "";
+
+		$exccatlist = "";
+		if (count($excludedcats) > 0)
+			$exccatlist = " and releases.categoryID not in (" . implode(",", $excludedcats) . ")";
+
+		if ($orderby == "") {
+			$order[0] = " postdate ";
+			$order[1] = " desc ";
+		} else
+			$order = $this->getBrowseOrder($orderby);
+
+		$sql = sprintf("select releases.*, concat(cp.title, ' > ', c.title) as category_name, concat(cp.ID, ',', c.ID) as category_ids, groups.name as group_name, rn.ID as nfoID, re.releaseID as reID, cp.ID as categoryParentID, pre.ctime, pre.nuketype, coalesce(movieinfo.ID,0) as movieinfoID from releases %s left outer join movieinfo on movieinfo.imdbID = releases.imdbID left outer join releasevideo re on re.releaseID = releases.ID left outer join releasenfo rn on rn.releaseID = releases.ID left outer join groups on groups.ID = releases.groupID left outer join category c on c.ID = releases.categoryID left outer join category cp on cp.ID = c.parentID left outer join predb pre on pre.ID = releases.preID where releases.passwordstatus <= (select value from site where setting='showpasswordedrelease') %s %s %s %s %s %s %s order by %s %s limit %d, %d ", $usecatindex, $searchsql, $catsrch, $maxage, $exccatlist, $grpsql, $minsize, $maxsize, $order[0], $order[1], $offset, $limit);
+		$orderpos = strpos($sql, "order by");
+		$wherepos = strpos($sql, "where");
+		$sqlcount = "select count(releases.ID) as num from releases " . substr($sql, $wherepos, $orderpos - $wherepos);
+
+		$countres = $db->queryOneRow($sqlcount, true);
+		$res = $db->query($sql, true);
+		if (count($res) > 0)
+			$res[0]["_totalrows"] = $countres["num"];
+
+		return $res;
+	}
+
+	public function getById($id)
 	{
 		$db = new DB();
-		if (is_array($guid)) {
-			$tmpguids = array();
-			foreach ($guid as $g)
-				$tmpguids[] = $db->escapeString($g);
-			$gsql = sprintf('guid in (%s)', implode(',', $tmpguids));
-		} else {
-			$gsql = sprintf('guid = %s', $db->escapeString($guid));
-		}
-		$sql = sprintf("select releases.*, musicinfo.cover as mi_cover, musicinfo.review as mi_review, musicinfo.tracks as mi_tracks, musicinfo.publisher as mi_publisher, musicinfo.title as mi_title, musicinfo.artist as mi_artist, music_genre.title as music_genrename,    bookinfo.cover as bi_cover, bookinfo.review as bi_review, bookinfo.publisher as bi_publisher, bookinfo.publishdate as bi_publishdate, bookinfo.title as bi_title, bookinfo.author as bi_author, bookinfo.pages as bi_pages,  bookinfo.isbn as bi_isbn, concat(cp.title, ' > ', c.title) as category_name, concat(cp.ID, ',', c.ID) as category_ids, groups.name as group_name, movieinfo.title AS movietitle, movieinfo.year AS movieyear, (SELECT releasetitle FROM tvrage WHERE rageid = releases.rageid AND rageid > 0 LIMIT 1) AS tvreleasetitle from releases left outer join groups on groups.ID = releases.groupID left outer join category c on c.ID = releases.categoryID left outer join category cp on cp.ID = c.parentID left outer join musicinfo on musicinfo.ID = releases.musicinfoID left outer join bookinfo on bookinfo.ID = releases.bookinfoID left outer join movieinfo on movieinfo.imdbID = releases.imdbID left join genres music_genre on music_genre.ID = musicinfo.genreID where %s", $gsql);
 
-		return (is_array($guid)) ? $db->query($sql) : $db->queryOneRow($sql);
+		return $db->queryOneRow(sprintf("select releases.*, groups.name as group_name from releases left outer join groups on groups.ID = releases.groupID where releases.ID = %d ", $id));
 	}
 
 	/**
@@ -1427,6 +1359,25 @@ class Releases
 		}
 
 		return $zipfile->file();
+	}
+
+	/**
+	 * Retrieve one or more releases by guid.
+	 */
+	public function getByGuid($guid)
+	{
+		$db = new DB();
+		if (is_array($guid)) {
+			$tmpguids = array();
+			foreach ($guid as $g)
+				$tmpguids[] = $db->escapeString($g);
+			$gsql = sprintf('guid in (%s)', implode(',', $tmpguids));
+		} else {
+			$gsql = sprintf('guid = %s', $db->escapeString($guid));
+		}
+		$sql = sprintf("select releases.*, musicinfo.cover as mi_cover, musicinfo.review as mi_review, musicinfo.tracks as mi_tracks, musicinfo.publisher as mi_publisher, musicinfo.title as mi_title, musicinfo.artist as mi_artist, music_genre.title as music_genrename,    bookinfo.cover as bi_cover, bookinfo.review as bi_review, bookinfo.publisher as bi_publisher, bookinfo.publishdate as bi_publishdate, bookinfo.title as bi_title, bookinfo.author as bi_author, bookinfo.pages as bi_pages,  bookinfo.isbn as bi_isbn, concat(cp.title, ' > ', c.title) as category_name, concat(cp.ID, ',', c.ID) as category_ids, groups.name as group_name, movieinfo.title AS movietitle, movieinfo.year AS movieyear, (SELECT releasetitle FROM tvrage WHERE rageid = releases.rageid AND rageid > 0 LIMIT 1) AS tvreleasetitle from releases left outer join groups on groups.ID = releases.groupID left outer join category c on c.ID = releases.categoryID left outer join category cp on cp.ID = c.parentID left outer join musicinfo on musicinfo.ID = releases.musicinfoID left outer join bookinfo on bookinfo.ID = releases.bookinfoID left outer join movieinfo on movieinfo.imdbID = releases.imdbID left join genres music_genre on music_genre.ID = musicinfo.genreID where %s", $gsql);
+
+		return (is_array($guid)) ? $db->query($sql) : $db->queryOneRow($sql);
 	}
 
 	/**
@@ -1463,13 +1414,6 @@ class Releases
 		$db->exec(sprintf("update releases SET anidbID = -1, episode = null, tvtitle = null, tvairdate = null where anidbID = %d", $anidbID));
 
 		return $ret;
-	}
-
-	public function getById($id)
-	{
-		$db = new DB();
-
-		return $db->queryOneRow(sprintf("select releases.*, groups.name as group_name from releases left outer join groups on groups.ID = releases.groupID where releases.ID = %d ", $id));
 	}
 
 	public function getReleaseNfo($id, $incnfo = true)
@@ -1871,39 +1815,42 @@ class Releases
 		return $retcount;
 	}
 
-	public function insertRelease($cleanRelName, $cleanedName, $parts, $group, $guid, $catId, $regexID, $date, $fromname, $reqID, $site, $nzbstatus, $isrenamed, $isReqID, $prehashID)
+	public function checkRegexesUptoDate($url, $rev, $nnid)
 	{
-		$db = new DB();
+		if ($url != "") {
+			if ($nnid != "")
+				$nnid = "?newznabID=" . $nnid . "&rev=" . $rev;
 
-		if ($regexID == "")
-			$regexID = " null ";
+			$util = new Utility();
+			$regfile = $util->getUrl($url . $nnid, "get", "", "gzip");
+			if ($regfile !== false && $regfile != "") {
+				/*$Rev: 728 $*/
+				if (preg_match('/\/\*\$Rev: (\d{3,4})/i', $regfile, $matches)) {
+					$serverrev = intval($matches[1]);
+					if ($serverrev > $rev) {
+						$db = new DB();
+						$site = new Sites;
 
-		if ($reqID != "")
-			$reqID = $db->escapeString($reqID);
-		else
-			$reqID = " null ";
+						$queries = explode(";", $regfile);
+						$queries = array_map("trim", $queries);
+						foreach ($queries as $q) {
+							if ($q) {
+								$db->exec($q);
+							}
+						}
 
-		$sql = sprintf("insert into releases (name, searchname, totalpart, groupID, adddate, guid, categoryID, regexID, rageID, postdate, fromname, size, reqID, passwordstatus, completion, haspreview, nfostatus, nzbstatus,
-					isrenamed, iscategorized, reqidstatus, prehashID)
-                    values (%s, %s, %d, %d, now(), %s, %d, %s, -1, %s, %s, 0, %s, %d, 100, %d, %d, %d, %d, 1, %d, %d)",
-			$db->escapeString($cleanRelName), $cleanedName, $parts, $group, $db->escapeString($guid), $catId, $regexID,
-			$db->escapeString($date), $db->escapeString($fromname), $reqID, ($site->checkpasswordedrar > 0 ? -1 : 0), -1, -1,
-			$db->escapeString($nzbstatus), $db->escapeString($isrenamed), $db->escapeString($isReqID), $db->escapeString($prehashID)
-		);
-
-		$relid = $db->queryInsert($sql);
-
-		return $relid;
-	}
-
-	public function cleanReleaseName($relname)
-	{
-		$cleanArr = array('#', '@', '$', '%', '^', '§', '¨', '©', 'Ö');
-
-		$relname = str_replace($cleanArr, '', $relname);
-		$relname = str_replace('_', ' ', $relname);
-
-		return $relname;
+						$site->updateLatestRegexRevision($serverrev);
+						echo "Updated regexes to revision " . $serverrev . "\n";
+					} else {
+						echo "Using latest regex revision " . $rev . "\n";
+					}
+				} else {
+					echo "Error Processing Regex File\n";
+				}
+			} else {
+				echo "Error Regex File Does Not Exist or Unable to Connect\n";
+			}
+		}
 	}
 
 	public function getReleaseNameForReqId($url, $nnid, $groupname, $reqid)
@@ -1941,40 +1888,93 @@ class Releases
 		return "";
 	}
 
-	public function checkRegexesUptoDate($url, $rev, $nnid)
+	public function cleanReleaseName($relname)
 	{
-		if ($url != "") {
-			if ($nnid != "")
-				$nnid = "?newznabID=" . $nnid . "&rev=" . $rev;
+		$cleanArr = array('#', '@', '$', '%', '^', '§', '¨', '©', 'Ö');
 
-			$util = new Utility();
-			$regfile = $util->getUrl($url . $nnid, "get", "", "gzip");
-			if ($regfile !== false && $regfile != "") {
-				/*$Rev: 728 $*/
-				if (preg_match('/\/\*\$Rev: (\d{3,4})/i', $regfile, $matches)) {
-					$serverrev = intval($matches[1]);
-					if ($serverrev > $rev) {
-						$db = new DB();
-						$site = new Sites;
+		$relname = str_replace($cleanArr, '', $relname);
+		$relname = str_replace('_', ' ', $relname);
 
-						$queries = explode(";", $regfile);
-						$queries = array_map("trim", $queries);
-						foreach ($queries as $q) {
-							if ($q) {
-								$db->exec($q);
-							}
-						}
+		return $relname;
+	}
 
-						$site->updateLatestRegexRevision($serverrev);
-						echo "Updated regexes to revision " . $serverrev . "\n";
-					} else {
-						echo "Using latest regex revision " . $rev . "\n";
-					}
-				} else {
-					echo "Error Processing Regex File\n";
-				}
-			} else {
-				echo "Error Regex File Does Not Exist or Unable to Connect\n";
+	public function insertRelease($cleanRelName, $cleanedName, $parts, $group, $guid, $catId, $regexID, $date, $fromname, $reqID, $site, $nzbstatus, $isrenamed, $isReqID, $prehashID)
+	{
+		$db = new DB();
+
+		if ($regexID == "")
+			$regexID = " null ";
+
+		if ($reqID != "")
+			$reqID = $db->escapeString($reqID);
+		else
+			$reqID = " null ";
+
+		$sql = sprintf("insert into releases (name, searchname, totalpart, groupID, adddate, guid, categoryID, regexID, rageID, postdate, fromname, size, reqID, passwordstatus, completion, haspreview, nfostatus, nzbstatus,
+					isrenamed, iscategorized, reqidstatus, prehashID)
+                    values (%s, %s, %d, %d, now(), %s, %d, %s, -1, %s, %s, 0, %s, %d, 100, %d, %d, %d, %d, 1, %d, %d)",
+			$db->escapeString($cleanRelName), $cleanedName, $parts, $group, $db->escapeString($guid), $catId, $regexID,
+			$db->escapeString($date), $db->escapeString($fromname), $reqID, ($site->checkpasswordedrar > 0 ? -1 : 0), -1, -1,
+			$db->escapeString($nzbstatus), $db->escapeString($isrenamed), $db->escapeString($isReqID), $db->escapeString($prehashID)
+		);
+
+		$relid = $db->queryInsert($sql);
+
+		return $relid;
+	}
+
+	/**
+	 * Delete one or more releases.
+	 */
+	public function delete($id, $isGuid = false)
+	{
+		$db = new DB();
+		$users = new Users();
+		$s = new Sites();
+		$nfo = new Nfo();
+		$site = $s->get();
+		$rf = new ReleaseFiles();
+		$re = new ReleaseExtra();
+		$rc = new ReleaseComments();
+		$ri = new ReleaseImage();
+
+		if (!is_array($id))
+			$id = array($id);
+
+		foreach ($id as $identifier) {
+			//
+			// delete from disk.
+			//
+			$rel = ($isGuid) ? $this->getByGuid($identifier) : $this->getById($identifier);
+
+			$nzbpath = "";
+			if ($isGuid)
+				$nzbpath = $site->nzbpath . substr($identifier, 0, 1) . "/" . $identifier . ".nzb.gz";
+			elseif ($rel)
+				$nzbpath = $site->nzbpath . substr($rel["guid"], 0, 1) . "/" . $rel["guid"] . ".nzb.gz";
+
+			if ($nzbpath != "" && file_exists($nzbpath))
+				unlink($nzbpath);
+
+			$audiopreviewpath = "";
+			if ($isGuid)
+				$audiopreviewpath = WWW_DIR . 'covers/audio/' . $identifier . ".mp3";
+			elseif ($rel)
+				$audiopreviewpath = WWW_DIR . 'covers/audio/' . $rel["guid"] . ".mp3";
+
+			if ($audiopreviewpath && file_exists($audiopreviewpath))
+				unlink($audiopreviewpath);
+
+			if ($rel) {
+				$nfo->deleteReleaseNfo($rel['ID']);
+				$rc->deleteCommentsForRelease($rel['ID']);
+				$users->delCartForRelease($rel['ID']);
+				$users->delDownloadRequestsForRelease($rel['ID']);
+				$rf->delete($rel['ID']);
+				$re->delete($rel['ID']);
+				$re->deleteFull($rel['ID']);
+				$ri->delete($rel['guid']);
+				$db->exec(sprintf("DELETE from releases where id = %d", $rel['ID']));
 			}
 		}
 	}

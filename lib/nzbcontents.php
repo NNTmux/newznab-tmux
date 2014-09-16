@@ -154,39 +154,6 @@ Class NZBContents
 	}
 
 	/**
-	 * Attempts to get the releasename from a par2 file
-	 *
-	 * @param string $guid
-	 * @param int    $relID
-	 * @param int    $groupID
-	 * @param int    $nameStatus
-	 * @param int    $show
-	 *
-	 * @return bool
-	 *
-	 * @access public
-	 */
-	public function checkPAR2($guid, $relID, $groupID, $nameStatus, $show)
-	{
-		$nzbFile = $this->LoadNZB($guid);
-		if ($nzbFile !== false) {
-			foreach ($nzbFile->file as $nzbContents) {
-				if (preg_match('/\.(par[2" ]|\d{2,3}").+\(1\/1\)$/i', (string)$nzbContents->attributes()->subject)) {
-					if ($this->pp->parsePAR2((string)$nzbContents->segments->segment, $relID, $groupID, $this->nntp, $show) === true && $nameStatus === 1) {
-						$this->db->queryExec(sprintf('UPDATE releases SET proc_par2 = 1 WHERE ID = %d', $relID));
-
-						return true;
-					}
-				}
-			}
-		}
-		if ($nameStatus === 1) {
-			$this->db->queryExec(sprintf('UPDATE releases SET proc_par2 = 1 WHERE ID = %d', $relID));
-		}
-		return false;
-	}
-
-	/**
 	 * Gets the completion from the NZB, optionally looks if there is an NFO/PAR2 file.
 	 *
 	 * @param string $guid
@@ -310,5 +277,39 @@ Class NZBContents
 		}
 
 		return $nzbFile;
+	}
+
+	/**
+	 * Attempts to get the releasename from a par2 file
+	 *
+	 * @param string $guid
+	 * @param int    $relID
+	 * @param int    $groupID
+	 * @param int    $nameStatus
+	 * @param int    $show
+	 *
+	 * @return bool
+	 *
+	 * @access public
+	 */
+	public function checkPAR2($guid, $relID, $groupID, $nameStatus, $show)
+	{
+		$nzbFile = $this->LoadNZB($guid);
+		if ($nzbFile !== false) {
+			foreach ($nzbFile->file as $nzbContents) {
+				if (preg_match('/\.(par[2" ]|\d{2,3}").+\(1\/1\)$/i', (string)$nzbContents->attributes()->subject)) {
+					if ($this->pp->parsePAR2((string)$nzbContents->segments->segment, $relID, $groupID, $this->nntp, $show) === true && $nameStatus === 1) {
+						$this->db->queryExec(sprintf('UPDATE releases SET proc_par2 = 1 WHERE ID = %d', $relID));
+
+						return true;
+					}
+				}
+			}
+		}
+		if ($nameStatus === 1) {
+			$this->db->queryExec(sprintf('UPDATE releases SET proc_par2 = 1 WHERE ID = %d', $relID));
+		}
+
+		return false;
 	}
 }

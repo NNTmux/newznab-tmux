@@ -7,80 +7,70 @@ require_once(WWW_DIR . "/lib/util.php");
 class SABnzbd
 {
 	/**
-	 * URL to the SAB server.
-	 *
-	 * @var string
-	 */
-	public $url = '';
-
-	/**
-	 * The SAB API key.
-	 *
-	 * @var string
-	 */
-	public $apikey = '';
-
-	/**
-	 * Download priority of the sent NZB file.
-	 *
-	 * @var string
-	 */
-	public $priority = '';
-
-	/**
-	 * Type of SAB API key (full/nzb).
-	 *
-	 * @var string
-	 */
-	public $apikeytype = '';
-
-	/**
-	 * @var int
-	 */
-	public $integrated = self::INTEGRATION_TYPE_NONE;
-
-	/**
-	 * ID of the current user, to send to SAB when downloading a NZB.
-	 *
-	 * @var string
-	 */
-	protected $uid = '';
-
-	/**
-	 * User's newznab API key to send to SAB when downloading a NZB.
-	 *
-	 * @var string
-	 */
-	protected $rsstoken = '';
-
-	/**
-	 * newznab Site URL to send to SAB to download the NZB.
-	 *
-	 * @var string
-	 */
-	protected $serverurl = '';
-
-	/**
 	 * Type of site integration.
 	 */
-	const INTEGRATION_TYPE_NONE = 0; // Sab is completely disabled - no user can use it.
-	const INTEGRATION_TYPE_SITEWIDE = 1; // Sab is enabled, 1 remote SAB server for the whole site.
-	const INTEGRATION_TYPE_USER = 2; // Sab is enabled, every user can use their own SAB server.
-
+	const INTEGRATION_TYPE_NONE = 0;
+	const INTEGRATION_TYPE_SITEWIDE = 1;
+	const INTEGRATION_TYPE_USER = 2;
 	/**
 	 * Type of SAB API key.
 	 */
 	const API_TYPE_NZB = 1;
 	const API_TYPE_FULL = 2;
-
 	/**
 	 * Priority to send the NZB to SAB.
 	 */
 	const PRIORITY_PAUSED = -2;
 	const PRIORITY_LOW = -1;
 	const PRIORITY_NORMAL = 0;
-	const PRIORITY_HIGH = 1;
-	const PRIORITY_FORCE = 2;
+	const PRIORITY_HIGH = 1; // Sab is completely disabled - no user can use it.
+	const PRIORITY_FORCE = 2; // Sab is enabled, 1 remote SAB server for the whole site.
+	/**
+	 * URL to the SAB server.
+	 *
+	 * @var string
+	 */
+	public $url = ''; // Sab is enabled, every user can use their own SAB server.
+	/**
+	 * The SAB API key.
+	 *
+	 * @var string
+	 */
+	public $apikey = '';
+	/**
+	 * Download priority of the sent NZB file.
+	 *
+	 * @var string
+	 */
+	public $priority = '';
+	/**
+	 * Type of SAB API key (full/nzb).
+	 *
+	 * @var string
+	 */
+	public $apikeytype = '';
+	/**
+	 * @var int
+	 */
+	public $integrated = self::INTEGRATION_TYPE_NONE;
+	/**
+	 * ID of the current user, to send to SAB when downloading a NZB.
+	 *
+	 * @var string
+	 */
+	protected $uid = '';
+	/**
+	 * User's newznab API key to send to SAB when downloading a NZB.
+	 *
+	 * @var string
+	 */
+	protected $rsstoken = '';
+	/**
+	 * newznab Site URL to send to SAB to download the NZB.
+	 *
+	 * @var string
+	 */
+	protected $serverurl = '';
 
 	/**
 	 * Construct.

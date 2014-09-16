@@ -227,6 +227,119 @@ class Binaries
 	}
 
 	/**
+	 * Go through all rows in partrepair table and see if theyve arrived on usenet yet.
+	 *
+	 * @param Nntp  $nntp
+	 * @param array $group
+	 *
+	 * @return bool
+	 */
+	private function partRepair($nntp, $group)
+	{
+		$db = new DB;
+
+		$parts = array();
+		$chunks = array();
+		$result = array();
+
+		$query = sprintf
+		(
+			"SELECT numberID FROM partrepair WHERE groupID = %d AND attempts < 5 ORDER BY numberID ASC LIMIT 40000",
+			$group['ID']
+		);
+
+		$result = $db->query($query);
+		if (!count($result))
+			return false;
+
+		foreach ($result as $item)
+			$parts[] = $item['numberID'];
+
+		if (count($parts)) {
+			$matched = array();
+			printf("Repair: supposed to repair %s parts.%s", count($parts), $this->n);
+			foreach ($parts as $key => $item) {
+				if (in_array(substr($item, 0, -2), $matched))
+					continue;
+
+				# when moving to php >= 5.3
+				#preg_filter(sprintf("~%s~", substr($item, 0, -3)), '$0', $parts);
+
+				$result = preg_grep(sprintf("~%s~", substr($item, 0, -2)), $parts);
+				if (count($result)) {
+					$matched[] = substr($item, 0, -2);
+					array_push($chunks, $result);
+
+					foreach ($result as $key => $val)
+						unset($parts[$key]);
+				}
+			}
+
+			$chunks = $this->getSuperUniqueArray($chunks);
+
+			if (!count($chunks)) {
+				printf("Repair: unable to extract parts for repair! Please report this is a bug, together with a dump of your partrepair table.\n", $this->n);
+
+				return false;
+			}
+
+			$repaired = 0;
+			foreach ($chunks as $chunk) {
+				$start = current($chunk);
+				$end = end($chunk);
+
+				# TODO: if less than 3 chunks do 3 single calls to scan()
+				if (count($chunk) < 3) {
+				}
+
+				$range = ($end - $start);
+
+				printf("Repair: + %s-%s (%s missing, %s articles overhead)%s", $start, $end, count($chunk), $range, $this->n);
+				$this->scan($nntp, $group, $start, $end, 'partrepair');
+
+				$query = sprintf
+				(
+					"SELECT pr.ID, pr.numberID, p.number from partrepair pr LEFT JOIN parts p ON p.number = pr.numberID WHERE pr.groupID=%d AND pr.numberID IN (%s) ORDER BY pr.numberID ASC",
+					$group['ID'], implode(',', $chunk)
+				);
+
+				$result = $db->query($query);
+				foreach ($result as $item) {
+					# TODO: rewrite.. stupid
+					if ($item['number'] == $item['numberID']) {
+						#printf("Repair: %s repaired.%s", $item['ID'], $this->n);
+						$db->exec(sprintf("DELETE FROM partrepair WHERE ID=%d LIMIT 1", $item['ID']));
+						$repaired++;
+						continue;
+					} else {
+						#printf("Repair: %s has not arrived yet or deleted.%s", $item['numberID'], $this->n);
+						$db->exec(sprintf("update partrepair SET attempts=attempts+1 WHERE ID=%d LIMIT 1", $item['ID']));
+					}
+				}
+			}
+
+			$delret = $db->exec(sprintf("DELETE FROM partrepair WHERE attempts >= 5 AND groupID = %d", $group['ID']));
+			printf("Repair: repaired %s.%s", $repaired, $this->n);
+			printf("Repair: cleaned %s parts.%s", $delret, $this->n);
+
+			return true;
+		}
+
+		return false;
+	}
+
+	public function getSuperUniqueArray($array)
+	{
+		$result = array_map("unserialize", array_unique(array_map("serialize", $array)));
+		foreach ($result as $key => $value) {
+			if (is_array($value))
+				$result[$key] = $this->getSuperUniqueArray($value);
+		}
+
+		return $result;
+	}
+
+	/**
 	 * Download a range of usenet messages. Store binaries with subjects matching a
 	 * specific pattern in the database.
 	 */
@@ -461,108 +574,6 @@ class Binaries
 	}
 
 	/**
-	 * Go through all rows in partrepair table and see if theyve arrived on usenet yet.
-	 *
-	 * @param Nntp  $nntp
-	 * @param array $group
-	 *
-	 * @return bool
-	 */
-	private function partRepair($nntp, $group)
-	{
-		$db = new DB;
-
-		$parts = array();
-		$chunks = array();
-		$result = array();
-
-		$query = sprintf
-		(
-			"SELECT numberID FROM partrepair WHERE groupID = %d AND attempts < 5 ORDER BY numberID ASC LIMIT 40000",
-			$group['ID']
-		);
-
-		$result = $db->query($query);
-		if (!count($result))
-			return false;
-
-		foreach ($result as $item)
-			$parts[] = $item['numberID'];
-
-		if (count($parts)) {
-			$matched = array();
-			printf("Repair: supposed to repair %s parts.%s", count($parts), $this->n);
-			foreach ($parts as $key => $item) {
-				if (in_array(substr($item, 0, -2), $matched))
-					continue;
-
-				# when moving to php >= 5.3
-				#preg_filter(sprintf("~%s~", substr($item, 0, -3)), '$0', $parts);
-
-				$result = preg_grep(sprintf("~%s~", substr($item, 0, -2)), $parts);
-				if (count($result)) {
-					$matched[] = substr($item, 0, -2);
-					array_push($chunks, $result);
-
-					foreach ($result as $key => $val)
-						unset($parts[$key]);
-				}
-			}
-
-			$chunks = $this->getSuperUniqueArray($chunks);
-
-			if (!count($chunks)) {
-				printf("Repair: unable to extract parts for repair! Please report this is a bug, together with a dump of your partrepair table.\n", $this->n);
-
-				return false;
-			}
-
-			$repaired = 0;
-			foreach ($chunks as $chunk) {
-				$start = current($chunk);
-				$end = end($chunk);
-
-				# TODO: if less than 3 chunks do 3 single calls to scan()
-				if (count($chunk) < 3) {
-				}
-
-				$range = ($end - $start);
-
-				printf("Repair: + %s-%s (%s missing, %s articles overhead)%s", $start, $end, count($chunk), $range, $this->n);
-				$this->scan($nntp, $group, $start, $end, 'partrepair');
-
-				$query = sprintf
-				(
-					"SELECT pr.ID, pr.numberID, p.number from partrepair pr LEFT JOIN parts p ON p.number = pr.numberID WHERE pr.groupID=%d AND pr.numberID IN (%s) ORDER BY pr.numberID ASC",
-					$group['ID'], implode(',', $chunk)
-				);
-
-				$result = $db->query($query);
-				foreach ($result as $item) {
-					# TODO: rewrite.. stupid
-					if ($item['number'] == $item['numberID']) {
-						#printf("Repair: %s repaired.%s", $item['ID'], $this->n);
-						$db->exec(sprintf("DELETE FROM partrepair WHERE ID=%d LIMIT 1", $item['ID']));
-						$repaired++;
-						continue;
-					} else {
-						#printf("Repair: %s has not arrived yet or deleted.%s", $item['numberID'], $this->n);
-						$db->exec(sprintf("update partrepair SET attempts=attempts+1 WHERE ID=%d LIMIT 1", $item['ID']));
-					}
-				}
-			}
-
-			$delret = $db->exec(sprintf("DELETE FROM partrepair WHERE attempts >= 5 AND groupID = %d", $group['ID']));
-			printf("Repair: repaired %s.%s", $repaired, $this->n);
-			printf("Repair: cleaned %s parts.%s", $delret, $this->n);
-
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
 	 * Insert a missing part to the database.
 	 */
 	private function addMissingParts($numbers, $groupID)
@@ -590,20 +601,6 @@ class Binaries
 		}
 
 		return -1;
-	}
-
-	/**
-	 * Return internally cached list of binary blacklist patterns.
-	 */
-	public function retrieveBlackList()
-	{
-		if (is_array($this->blackList) && !empty($this->blackList)) {
-			return $this->blackList;
-		}
-		$blackList = $this->getBlacklist(true);
-		$this->blackList = $blackList;
-
-		return $blackList;
 	}
 
 	/**
@@ -661,6 +658,39 @@ class Binaries
 		}
 
 		return false;
+	}
+
+	/**
+	 * Return internally cached list of binary blacklist patterns.
+	 */
+	public function retrieveBlackList()
+	{
+		if (is_array($this->blackList) && !empty($this->blackList)) {
+			return $this->blackList;
+		}
+		$blackList = $this->getBlacklist(true);
+		$this->blackList = $blackList;
+
+		return $blackList;
+	}
+
+	/**
+	 * Get list of blacklists from database.
+	 */
+	public function getBlacklist($activeonly = true)
+	{
+		$db = new DB();
+
+		$where = "";
+		if ($activeonly)
+			$where = " where binaryblacklist.status = 1 ";
+
+		return $db->query("SELECT binaryblacklist.ID, binaryblacklist.optype, binaryblacklist.status, binaryblacklist.description, binaryblacklist.groupname AS groupname, binaryblacklist.regex,
+												groups.ID AS groupID, binaryblacklist.msgcol FROM binaryblacklist
+												left outer JOIN groups ON groups.name = binaryblacklist.groupname
+												" . $where . "
+												ORDER BY coalesce(groupname,'zzz')"
+		);
 	}
 
 	/**
@@ -732,25 +762,6 @@ class Binaries
 	}
 
 	/**
-	 * Get list of blacklists from database.
-	 */
-	public function getBlacklist($activeonly = true)
-	{
-		$db = new DB();
-
-		$where = "";
-		if ($activeonly)
-			$where = " where binaryblacklist.status = 1 ";
-
-		return $db->query("SELECT binaryblacklist.ID, binaryblacklist.optype, binaryblacklist.status, binaryblacklist.description, binaryblacklist.groupname AS groupname, binaryblacklist.regex,
-												groups.ID AS groupID, binaryblacklist.msgcol FROM binaryblacklist
-												left outer JOIN groups ON groups.name = binaryblacklist.groupname
-												" . $where . "
-												ORDER BY coalesce(groupname,'zzz')"
-		);
-	}
-
-	/**
 	 * Get a blacklist row from database.
 	 */
 	public function getBlacklistByID($id)
@@ -809,6 +820,8 @@ class Binaries
 		);
 	}
 
+	# http://php.net/manual/en/function.array-unique.php#97285
+
 	/**
 	 * Add a new binary row and its associated parts.
 	 */
@@ -817,17 +830,5 @@ class Binaries
 		$db = new DB();
 		$db->exec(sprintf("DELETE from parts where binaryID = %d", $id));
 		$db->exec(sprintf("DELETE from binaries where ID = %d", $id));
-	}
-
-	# http://php.net/manual/en/function.array-unique.php#97285
-	public function getSuperUniqueArray($array)
-	{
-		$result = array_map("unserialize", array_unique(array_map("serialize", $array)));
-		foreach ($result as $key => $value) {
-			if (is_array($value))
-				$result[$key] = $this->getSuperUniqueArray($value);
-		}
-
-		return $result;
 	}
 }

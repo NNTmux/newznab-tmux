@@ -153,6 +153,78 @@ class XXX
 	}
 
 	/**
+	 * @return string
+	 */
+	protected function getBrowseBy()
+	{
+		$browseBy = ' ';
+		$browseByArr = array('title', 'director', 'actors', 'genre', 'ID');
+		foreach ($browseByArr as $bb) {
+			if (isset($_REQUEST[$bb]) && !empty($_REQUEST[$bb])) {
+				$bbv = stripslashes($_REQUEST[$bb]);
+				if ($bb == "genre") {
+					$bbv = $this->getgenreid($bbv);
+				}
+				if ($bb == 'id') {
+					$browseBy .= 'xxx.' . $bb . '=' . $bbv . ' AND ';
+				} else {
+					$browseBy .= 'xxx.' . $bb . ' ' . $this->pdo->likeString($bbv, true, true) . ' AND ';
+				}
+			}
+		}
+
+		return $browseBy;
+	}
+
+	/**
+	 * Get Genre ID's Of the title
+	 *
+	 * @param $arr - Array or String
+	 *
+	 * @return string - If array .. 1,2,3,4 if string .. 1
+	 */
+	private function getGenreID($arr)
+	{
+		$ret = null;
+
+		if (!is_array($arr)) {
+			$res = $this->pdo->queryOneRow("SELECT ID FROM genres WHERE title = " . $this->pdo->escapeString($arr));
+			if ($res !== false) {
+				return $res["ID"];
+			}
+		}
+
+		foreach ($arr as $key => $value) {
+			$res = $this->pdo->queryOneRow("SELECT ID FROM genres WHERE title = " . $this->pdo->escapeString($value));
+			if ($res !== false) {
+				$ret .= "," . $res["ID"];
+			} else {
+				$ret .= "," . $this->insertGenre($value);
+			}
+		}
+
+		$ret = ltrim($ret, ",");
+
+		return ($ret);
+	}
+
+	/**
+	 * Inserts Genre and returns last affected row (Genre ID)
+	 *
+	 * @param $genre
+	 *
+	 * @return bool
+	 */
+	private function insertGenre($genre)
+	{
+		if (isset($genre)) {
+			$res = $this->pdo->queryInsert(sprintf("INSERT INTO genres (title, type, disabled) VALUES (%s ,%d ,%d)", $this->pdo->escapeString($genre), 6000, 0));
+
+			return $res;
+		}
+	}
+
+	/**
 	 * Get movie releases with covers for xxx browse page.
 	 *
 	 * @param       $cat
@@ -245,29 +317,6 @@ class XXX
 	}
 
 	/**
-	 * @return string
-	 */
-	protected function getBrowseBy()
-	{
-		$browseBy = ' ';
-		$browseByArr = array('title', 'director', 'actors', 'genre', 'ID');
-		foreach ($browseByArr as $bb) {
-			if (isset($_REQUEST[$bb]) && !empty($_REQUEST[$bb])) {
-				$bbv = stripslashes($_REQUEST[$bb]);
-				if ($bb == "genre") {
-					$bbv = $this->getgenreid($bbv);
-				}
-				if ($bb == 'id') {
-					$browseBy .= 'xxx.' . $bb . '=' . $bbv . ' AND ';
-				} else {
-					$browseBy .= 'xxx.' . $bb . ' ' . $this->pdo->likeString($bbv, true, true) . ' AND ';
-				}
-			}
-		}
-		return $browseBy;
-	}
-
-	/**
 	 * Create click-able links to actors/genres/directors/etc..
 	 *
 	 * @param $data
@@ -297,6 +346,30 @@ class XXX
 		}
 		return implode(', ', $newArr);
 	}
+
+	/**
+	 * Get Genres for activeonly and/or an ID
+	 *
+	 * @param bool $activeOnly
+	 * @param null $gid
+	 *
+	 * @return array|bool
+	 */
+	public function getGenres($activeOnly = false, $gid = null)
+	{
+		if (isset($gid)) {
+			$gid = " AND ID = " . $this->pdo->escapeString($gid) . " ORDER BY title";
+		} else {
+			$gid = " ORDER BY title";
+		}
+
+		if ($activeOnly) {
+			return $this->pdo->queryOneRow("SELECT title FROM genres WHERE disabled = 0 AND type = 6000" . $gid);
+		} else {
+			return $this->pdo->queryOneRow("SELECT title FROM genres WHERE disabled = 1 AND type = 6000" . $gid);
+		}
+	}
+
 	/**
 	 * Update movie on movie-edit page.
 	 *
@@ -334,6 +407,107 @@ class XXX
 				)
 			);
 		}
+	}
+
+	/**
+	 * Process releases with no xxxinfo ID's.
+	 *
+	 */
+
+	public function processXXXReleases()
+	{
+
+		// Get all releases without an IMpdo id.
+		$res = $this->pdo->query(
+			sprintf("
+				SELECT r.searchname, r.ID
+				FROM releases r
+				WHERE r.nzbstatus = 1
+				AND r.xxxinfo_id = 0
+				AND r.categoryID BETWEEN 6000 AND 6040
+				LIMIT %d",
+				$this->movieqty
+			)
+		);
+		$movieCount = count($res);
+
+		if ($movieCount > 0) {
+
+			if ($this->echooutput) {
+				$this->c->doEcho($this->c->header("Processing " . $movieCount . " XXX releases."));
+			}
+
+			// Loop over releases.
+			foreach ($res as $arr) {
+
+				$idcheck = -2;
+
+				// Try to get a name.
+				if ($this->echooutput) {
+					$this->c->doEcho("DB name: " . $arr['searchname'], true);
+				}
+				if ($this->parseXXXSearchName($arr['searchname']) !== false) {
+
+					$this->currentRelID = $arr['id'];
+					$movieName = $this->currentTitle;
+
+					if ($this->echooutput) {
+						$this->c->doEcho($this->c->primaryOver("Looking up: ") . $this->c->headerOver($movieName), true);
+					}
+
+					$idcheck = $this->updateXXXInfo($movieName);
+				} else {
+					$this->c->doEcho(".", true);
+				}
+				$this->pdo->queryExec(sprintf('UPDATE releases SET xxxinfo_id = %d WHERE ID = %d', $idcheck, $arr['ID']));
+			}
+
+		} elseif ($this->echooutput) {
+			$this->c->doEcho($this->c->header('No xxx releases to process.'));
+		}
+	}
+
+	/**
+	 * Parse a xxx name from a release search name.
+	 *
+	 * @param string $releaseName
+	 *
+	 * @return bool
+	 */
+	protected function parseXXXSearchName($releaseName)
+	{
+		$name = '';
+		$followingList = '[^\w]((2160|1080|480|720)(p|i)|AC3D|Directors([^\w]CUT)?|DD5\.1|(DVD|BD|BR)(Rip)?|BluRay|divx|HDTV|iNTERNAL|LiMiTED|(Real\.)?Proper|RE(pack|Rip)|Sub\.?(fix|pack)|Unrated|WEB-DL|(x|H)[-._ ]?264|xvid|[Dd][Ii][Ss][Cc](\d+|\s*\d+|\.\d+)|XXX|BTS|DirFix|Trailer|WEBRiP|NFO|(19|20)\d\d)[^\w]';
+
+		if (preg_match('/([^\w]{2,})?(?P<name>[\w .-]+?)' . $followingList . '/i', $releaseName, $matches)) {
+			$name = $matches['name'];
+		}
+
+		// Check if we got something.
+		if ($name !== '') {
+
+			// If we still have any of the words in $followingList, remove them.
+			$name = preg_replace('/' . $followingList . '/i', ' ', $name);
+			// Remove periods, underscored, anything between parenthesis.
+			$name = preg_replace('/\(.*?\)|[-._]/i', ' ', $name);
+			// Finally remove multiple spaces and trim leading spaces.
+			$name = trim(preg_replace('/\s{2,}/', ' ', $name));
+			// Remove Private Movies {d} from name better matching.
+			$name = trim(preg_replace('/^Private\s(Specials|Blockbusters|Sports|Gold|Lesbian|Movies|Classics|Castings|Fetish|Stars|Pictures|XXX|Private|Black\sLabel|Black)\s\d+/i', '', $name));
+			// Remove Foreign Words at the end of the name.
+			$name = trim(preg_replace('/$(brazilian|chinese|croatian|danish|deutsch|dutch|estonian|flemish|finnish|french|german|greek|hebrew|icelandic|italian|latin|nordic|norwegian|polish|portuguese|japenese|japanese|russian|serbian|slovenian|spanish|spanisch|swedish|thai|turkish)/i', '', $name));
+
+			// Check if the name is long enough and not just numbers and not file (d) of (d) and does not contain Episodes and any dated 00.00.00 which are site rips..
+			if (strlen($name) > 5 && !preg_match('/^\d+$/', $name) && !preg_match('/( File \d+ of \d+|\d+.\d+.\d+)/', $name) && !preg_match('/(E\d+)/', $name) && !preg_match('/\d\d\.\d\d.\d\d/', $name)) {
+				$this->currentTitle = $name;
+
+				return true;
+			} else {
+				$this->c->doEcho(".", false);
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -507,106 +681,6 @@ class XXX
 	}
 
 	/**
-	 * Process releases with no xxxinfo ID's.
-	 *
-	 */
-
-	public function processXXXReleases()
-	{
-
-		// Get all releases without an IMpdo id.
-		$res = $this->pdo->query(
-			sprintf("
-				SELECT r.searchname, r.ID
-				FROM releases r
-				WHERE r.nzbstatus = 1
-				AND r.xxxinfo_id = 0
-				AND r.categoryID BETWEEN 6000 AND 6040
-				LIMIT %d",
-				$this->movieqty
-			)
-		);
-		$movieCount = count($res);
-
-		if ($movieCount > 0) {
-
-			if ($this->echooutput) {
-				$this->c->doEcho($this->c->header("Processing " . $movieCount . " XXX releases."));
-			}
-
-			// Loop over releases.
-			foreach ($res as $arr) {
-
-				$idcheck = -2;
-
-				// Try to get a name.
-				if ($this->echooutput) {
-					$this->c->doEcho("DB name: " . $arr['searchname'], true);
-				}
-				if ($this->parseXXXSearchName($arr['searchname']) !== false) {
-
-					$this->currentRelID = $arr['id'];
-					$movieName = $this->currentTitle;
-
-					if ($this->echooutput) {
-						$this->c->doEcho($this->c->primaryOver("Looking up: ") . $this->c->headerOver($movieName), true);
-					}
-
-					$idcheck = $this->updateXXXInfo($movieName);
-				} else {
-					$this->c->doEcho(".", true);
-				}
-				$this->pdo->queryExec(sprintf('UPDATE releases SET xxxinfo_id = %d WHERE ID = %d', $idcheck, $arr['ID']));
-			}
-
-		} elseif ($this->echooutput) {
-			$this->c->doEcho($this->c->header('No xxx releases to process.'));
-		}
-	}
-
-	/**
-	 * Parse a xxx name from a release search name.
-	 *
-	 * @param string $releaseName
-	 *
-	 * @return bool
-	 */
-	protected function parseXXXSearchName($releaseName)
-	{
-		$name = '';
-		$followingList = '[^\w]((2160|1080|480|720)(p|i)|AC3D|Directors([^\w]CUT)?|DD5\.1|(DVD|BD|BR)(Rip)?|BluRay|divx|HDTV|iNTERNAL|LiMiTED|(Real\.)?Proper|RE(pack|Rip)|Sub\.?(fix|pack)|Unrated|WEB-DL|(x|H)[-._ ]?264|xvid|[Dd][Ii][Ss][Cc](\d+|\s*\d+|\.\d+)|XXX|BTS|DirFix|Trailer|WEBRiP|NFO|(19|20)\d\d)[^\w]';
-
-		if (preg_match('/([^\w]{2,})?(?P<name>[\w .-]+?)' . $followingList . '/i', $releaseName, $matches)) {
-			$name = $matches['name'];
-		}
-
-		// Check if we got something.
-		if ($name !== '') {
-
-			// If we still have any of the words in $followingList, remove them.
-			$name = preg_replace('/' . $followingList . '/i', ' ', $name);
-			// Remove periods, underscored, anything between parenthesis.
-			$name = preg_replace('/\(.*?\)|[-._]/i', ' ', $name);
-			// Finally remove multiple spaces and trim leading spaces.
-			$name = trim(preg_replace('/\s{2,}/', ' ', $name));
-			// Remove Private Movies {d} from name better matching.
-			$name = trim(preg_replace('/^Private\s(Specials|Blockbusters|Sports|Gold|Lesbian|Movies|Classics|Castings|Fetish|Stars|Pictures|XXX|Private|Black\sLabel|Black)\s\d+/i', '', $name));
-			// Remove Foreign Words at the end of the name.
-			$name = trim(preg_replace('/$(brazilian|chinese|croatian|danish|deutsch|dutch|estonian|flemish|finnish|french|german|greek|hebrew|icelandic|italian|latin|nordic|norwegian|polish|portuguese|japenese|japanese|russian|serbian|slovenian|spanish|spanisch|swedish|thai|turkish)/i', '', $name));
-
-			// Check if the name is long enough and not just numbers and not file (d) of (d) and does not contain Episodes and any dated 00.00.00 which are site rips..
-			if (strlen($name) > 5 && !preg_match('/^\d+$/', $name) && !preg_match('/( File \d+ of \d+|\d+.\d+.\d+)/', $name) && !preg_match('/(E\d+)/', $name) && !preg_match('/\d\d\.\d\d.\d\d/', $name)) {
-				$this->currentTitle = $name;
-				return true;
-			} else {
-				$this->c->doEcho(".", false);
-			}
-		}
-
-		return false;
-	}
-
-	/**
 	 * Get all genres for search-filter.tpl
 	 *
 	 * @param bool $activeOnly
@@ -628,77 +702,6 @@ class XXX
 			$ret[] = $value['title'];
 		}
 		return $ret;
-	}
-
-	/**
-	 * Get Genres for activeonly and/or an ID
-	 *
-	 * @param bool $activeOnly
-	 * @param null $gid
-	 *
-	 * @return array|bool
-	 */
-	public function getGenres($activeOnly = false, $gid = null)
-	{
-		if (isset($gid)) {
-			$gid = " AND ID = " . $this->pdo->escapeString($gid) . " ORDER BY title";
-		} else {
-			$gid = " ORDER BY title";
-		}
-
-		if ($activeOnly) {
-			return $this->pdo->queryOneRow("SELECT title FROM genres WHERE disabled = 0 AND type = 6000" . $gid);
-		} else {
-			return $this->pdo->queryOneRow("SELECT title FROM genres WHERE disabled = 1 AND type = 6000" . $gid);
-		}
-	}
-
-	/**
-	 * Get Genre ID's Of the title
-	 *
-	 * @param $arr - Array or String
-	 *
-	 * @return string - If array .. 1,2,3,4 if string .. 1
-	 */
-	private function getGenreID($arr)
-	{
-		$ret = null;
-
-		if (!is_array($arr)) {
-			$res = $this->pdo->queryOneRow("SELECT ID FROM genres WHERE title = " . $this->pdo->escapeString($arr));
-			if ($res !== false) {
-				return $res["ID"];
-			}
-		}
-
-		foreach ($arr as $key => $value) {
-			$res = $this->pdo->queryOneRow("SELECT ID FROM genres WHERE title = " . $this->pdo->escapeString($value));
-			if ($res !== false) {
-				$ret .= "," . $res["ID"];
-			} else {
-				$ret .= "," . $this->insertGenre($value);
-			}
-		}
-
-		$ret = ltrim($ret, ",");
-
-		return ($ret);
-	}
-
-	/**
-	 * Inserts Genre and returns last affected row (Genre ID)
-	 *
-	 * @param $genre
-	 *
-	 * @return bool
-	 */
-	private function insertGenre($genre)
-	{
-		if (isset($genre)) {
-			$res = $this->pdo->queryInsert(sprintf("INSERT INTO genres (title, type, disabled) VALUES (%s ,%d ,%d)", $this->pdo->escapeString($genre), 6000, 0));
-
-			return $res;
-		}
 	}
 
 	/**

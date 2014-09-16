@@ -95,7 +95,7 @@
 						<div class="movcover">
 							<a class="title" title="View details"
 							   href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}/{$result.grp_release_name|escape:"htmlall"}">
-							<img class="shadow"
+								<img class="shadow"
 									 src="{$smarty.const.WWW_TOP}/covers/games/{if $result.cover == 1}{$result.gamesinfo_id}.jpg{else}no-cover.jpg{/if}"
 									 width="120" border="0" alt="{$result.title|escape:"htmlall"}"/>
 							</a>

@@ -37,53 +37,45 @@ require_once("ProcessAdditional.php");
 class PProcess
 {
 	/**
+	 * Instance of NameFixer.
+	 *
+	 * @var NameFixer
+	 */
+	protected $NameFixer;
+	/**
 	 * @var DB
 	 */
 	private $db;
-
 	/**
 	 * @var Groups
 	 */
 	private $groups;
-
 	/**
 	 * @var Nfo
 	 */
 	private $Nfo;
-
 	/**
 	 * @var ReleaseFiles
 	 */
 	private $releaseFiles;
-
 	/**
 	 * Object containing site settings.
 	 *
 	 * @var bool|stdClass
 	 */
 	private $site;
-
 	/**
 	 * Add par2 info to rar list?
 	 *
 	 * @var bool
 	 */
 	private $addpar2;
-
 	/**
 	 * Should we echo to CLI?
 	 *
 	 * @var bool
 	 */
 	private $echooutput;
-
-
-	/**
-	 * Instance of NameFixer.
-	 *
-	 * @var NameFixer
-	 */
-	protected $NameFixer;
 
 	/**
 	 * Constructor.
@@ -139,67 +131,58 @@ class PProcess
 	}
 
 	/**
-	 * Lookup anidb if enabled - always run before tvrage.
+	 * Fetch titles from predb sites.
+	 *
+	 * @param $nntp
 	 *
 	 * @return void
 	 */
-	public function processAnime()
+	public function processPrehash($nntp)
 	{
-		if ($this->site->lookupanidb === '1') {
-			$anidb = new AniDB(['Echo' => $this->echooutput, 'Settings' => $this->pdo]);
-			$anidb->animetitlesUpdate();
-			$anidb->processAnimeReleases();
+		// 2014-05-31 : Web PreDB fetching is removed. Using IRC is now recommended.
+	}
+
+	/**
+	 * Check for passworded releases, RAR/ZIP contents and Sample/Media info.
+	 *
+	 * @note Called externally by tmux/bin/update_per_group and update/postprocess.php
+	 *
+	 * @param NNTP   $nntp          Class NNTP
+	 * @param string $releaseToWork String containing SQL results. Optional.
+	 * @param string $groupID       Group ID. Optional
+	 *
+	 * @return void
+	 */
+	public function processAdditional($nntp, $releaseToWork = '', $groupID = '')
+	{
+		$processAdditional = new ProcessAdditional($this->echooutput, $nntp, $this->pdo, $this->site, $this->tmux);
+		$processAdditional->start($releaseToWork, $groupID);
+	}
+
+	/**
+	 * Process nfo files.
+	 *
+	 * @param string $releaseToWork
+	 * @param        $nntp
+	 *
+	 * @return void
+	 */
+	public function processNfos($releaseToWork = '', $nntp)
+	{
+		if ($this->site->lookupnfo === '1') {
+			$this->Nfo->processNfoFiles($releaseToWork, $this->site->lookupimdb, $this->site->lookuptvrage, $groupID = '', $nntp);
 		}
 	}
 
 	/**
-	 * Process books using amazon.com.
+	 * Process comments.
 	 *
-	 * @return void
+	 * @param NNTP $nntp
 	 */
-	public function processBooks()
+	public function processSharing(&$nntp)
 	{
-		if ($this->site->lookupbooks !== '0') {
-			$books = new Books($this->echooutput);
-			$books->processBookReleases();
-		}
-	}
-
-	/**
-	 * Lookup console games if enabled.
-	 *
-	 * @return void
-	 */
-	public function processConsoleGames()
-	{
-		if ($this->site->lookupgames !== '0') {
-			$console = new Konsole($this->echooutput);
-			$console->processConsoleReleases();
-		}
-	}
-
-	/**
-	 * Lookup games if enabled.
-	 *
-	 * @return void
-	 */
-	public function processGames()
-	{
-		if ($this->site->lookupgames !== 0) {
-			$games = new Games(['Echo' => $this->echooutput, 'Settings' => $this->pdo]);
-			$games->processGamesReleases();
-		}
-	}
-
-	/**
-	 * Lookup xxx if enabled.
-	 */
-	public function processXXX()
-	{
-		if ($this->site->lookupxxx == 1) {
-			$xxx = new XXX($this->echooutput);
-			$xxx->processXXXReleases();
-		}
+		$sharing = new Sharing($this->pdo, $nntp);
+		$sharing->start();
 	}
 
 	/**
@@ -231,41 +214,43 @@ class PProcess
 	}
 
 	/**
-	 * Process nfo files.
-	 *
-	 * @param string $releaseToWork
-	 * @param        $nntp
+	 * Lookup console games if enabled.
 	 *
 	 * @return void
 	 */
-	public function processNfos($releaseToWork = '', $nntp)
+	public function processConsoleGames()
 	{
-		if ($this->site->lookupnfo === '1') {
-			$this->Nfo->processNfoFiles($releaseToWork, $this->site->lookupimdb, $this->site->lookuptvrage, $groupID = '', $nntp);
+		if ($this->site->lookupgames !== '0') {
+			$console = new Konsole($this->echooutput);
+			$console->processConsoleReleases();
 		}
 	}
 
 	/**
-	 * Fetch titles from predb sites.
-	 *
-	 * @param $nntp
+	 * Lookup games if enabled.
 	 *
 	 * @return void
 	 */
-	public function processPrehash($nntp)
+	public function processGames()
 	{
-		// 2014-05-31 : Web PreDB fetching is removed. Using IRC is now recommended.
+		if ($this->site->lookupgames !== 0) {
+			$games = new Games(['Echo' => $this->echooutput, 'Settings' => $this->pdo]);
+			$games->processGamesReleases();
+		}
 	}
 
 	/**
-	 * Process comments.
+	 * Lookup anidb if enabled - always run before tvrage.
 	 *
-	 * @param NNTP $nntp
+	 * @return void
 	 */
-	public function processSharing(&$nntp)
+	public function processAnime()
 	{
-		$sharing = new Sharing($this->pdo, $nntp);
-		$sharing->start();
+		if ($this->site->lookupanidb === '1') {
+			$anidb = new AniDB(['Echo' => $this->echooutput, 'Settings' => $this->pdo]);
+			$anidb->animetitlesUpdate();
+			$anidb->processAnimeReleases();
+		}
 	}
 
 	/**
@@ -284,20 +269,27 @@ class PProcess
 	}
 
 	/**
-	 * Check for passworded releases, RAR/ZIP contents and Sample/Media info.
-	 *
-	 * @note Called externally by tmux/bin/update_per_group and update/postprocess.php
-	 *
-	 * @param NNTP   $nntp          Class NNTP
-	 * @param string $releaseToWork String containing SQL results. Optional.
-	 * @param string $groupID       Group ID. Optional
+	 * Process books using amazon.com.
 	 *
 	 * @return void
 	 */
-	public function processAdditional($nntp, $releaseToWork = '', $groupID = '')
+	public function processBooks()
 	{
-		$processAdditional = new ProcessAdditional($this->echooutput, $nntp, $this->pdo, $this->site, $this->tmux);
-		$processAdditional->start($releaseToWork, $groupID);
+		if ($this->site->lookupbooks !== '0') {
+			$books = new Books($this->echooutput);
+			$books->processBookReleases();
+		}
+	}
+
+	/**
+	 * Lookup xxx if enabled.
+	 */
+	public function processXXX()
+	{
+		if ($this->site->lookupxxx == 1) {
+			$xxx = new XXX($this->echooutput);
+			$xxx->processXXXReleases();
+		}
 	}
 
 	/**

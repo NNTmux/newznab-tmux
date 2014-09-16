@@ -308,44 +308,10 @@ class AniDBstandAlone {
 
 	} // end public function getAniDBInfo($exitcount)
 
-	public function addTitle($AniDBAPIArray) {
-
-		$this->pdo->queryInsert(sprintf("INSERT INTO anidb VALUES (%d, 0, 0, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d)",
-			$AniDBAPIArray['anidbID'], $this->pdo->escapeString($AniDBAPIArray['title']), $this->pdo->escapeString($AniDBAPIArray['type']),
-			(empty($AniDBAPIArray['startdate']) ? 'null' : $this->pdo->escapeString($AniDBAPIArray['startdate'])),
-			(empty($AniDBAPIArray['enddate']) ? 'null' : $this->pdo->escapeString($AniDBAPIArray['enddate'])),
-			$this->pdo->escapeString($AniDBAPIArray['related']), $this->pdo->escapeString($AniDBAPIArray['creators']),
-			$this->pdo->escapeString($AniDBAPIArray['description']), $this->pdo->escapeString($AniDBAPIArray['rating']),
-			$this->pdo->escapeString($AniDBAPIArray['picture']), $this->pdo->escapeString($AniDBAPIArray['categories']),
-			$this->pdo->escapeString($AniDBAPIArray['characters']), $this->pdo->escapeString($AniDBAPIArray['epnos']),
-			$this->pdo->escapeString($AniDBAPIArray['airdates']), $this->pdo->escapeString($AniDBAPIArray['episodetitles']), time()
-			));
-		}
-
-	public function updateTitle($anidbID, $title, $type, $startdate, $enddate, $related, $creators, $description, $rating, $categories, $characters, $epnos, $airdates, $episodetitles) {
-
-              $this->pdo->queryExec(sprintf('UPDATE anidb SET title = %s, type = %s, startdate = %s, enddate = %s, related = %s, creators = %s, description = %s,
-					rating = %s, categories = %s, characters = %s, epnos = %s, airdates = %s, episodetitles = %s, unixtime = %d
-					WHERE anidbID = %d',
-					$this->pdo->escapeString($title), $this->pdo->escapeString($type), (empty($AniDBAPIArray['startdate']) ? 'null' : $this->pdo->escapeString($AniDBAPIArray['startdate'])),
-					(empty($AniDBAPIArray['enddate']) ? 'null' : $this->pdo->escapeString($AniDBAPIArray['enddate'])), $this->pdo->escapeString($related), $this->pdo->escapeString($creators),
-					$this->pdo->escapeString($description), $this->pdo->escapeString($rating), $this->pdo->escapeString($categories), $this->pdo->escapeString($characters), $this->pdo->escapeString($epnos),
-					$this->pdo->escapeString($airdates), $this->pdo->escapeString($episodetitles), time(), $anidbID
-					));
-		}
-
 	public function deleteTitle($anidbID) {
 
 		$this->pdo->queryExec(sprintf('DELETE FROM anidb WHERE anidbID = %d', $anidbID));
 		}
-
-	public function getAnimeInfo($anidbID) {
-
-		$animeInfo = $this->pdo->query(sprintf('SELECT * FROM anidb WHERE anidbID = %d', $anidbID
-					));
-		return isset($animeInfo[0]) ? $animeInfo[0] : false;
-		}
-
 
 	public function AniDBAPI($anidbID) {
 		$ch = curl_init('http://api.anidb.net:9001/httpapi?request=anime&client='.$this->APIKEY.'&clientver='.self::CLIENTVER.'&protover=1&aid='.$anidbID);
@@ -436,6 +402,39 @@ class AniDBstandAlone {
 			return $AniDBAPIArray;
 		}
 	}
+
+	public function addTitle($AniDBAPIArray) {
+
+		$this->pdo->queryInsert(sprintf("INSERT INTO anidb VALUES (%d, 0, 0, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d)",
+			$AniDBAPIArray['anidbID'], $this->pdo->escapeString($AniDBAPIArray['title']), $this->pdo->escapeString($AniDBAPIArray['type']),
+			(empty($AniDBAPIArray['startdate']) ? 'null' : $this->pdo->escapeString($AniDBAPIArray['startdate'])),
+			(empty($AniDBAPIArray['enddate']) ? 'null' : $this->pdo->escapeString($AniDBAPIArray['enddate'])),
+			$this->pdo->escapeString($AniDBAPIArray['related']), $this->pdo->escapeString($AniDBAPIArray['creators']),
+			$this->pdo->escapeString($AniDBAPIArray['description']), $this->pdo->escapeString($AniDBAPIArray['rating']),
+			$this->pdo->escapeString($AniDBAPIArray['picture']), $this->pdo->escapeString($AniDBAPIArray['categories']),
+			$this->pdo->escapeString($AniDBAPIArray['characters']), $this->pdo->escapeString($AniDBAPIArray['epnos']),
+			$this->pdo->escapeString($AniDBAPIArray['airdates']), $this->pdo->escapeString($AniDBAPIArray['episodetitles']), time()
+			));
+		}
+
+	public function updateTitle($anidbID, $title, $type, $startdate, $enddate, $related, $creators, $description, $rating, $categories, $characters, $epnos, $airdates, $episodetitles) {
+
+              $this->pdo->queryExec(sprintf('UPDATE anidb SET title = %s, type = %s, startdate = %s, enddate = %s, related = %s, creators = %s, description = %s,
+					rating = %s, categories = %s, characters = %s, epnos = %s, airdates = %s, episodetitles = %s, unixtime = %d
+					WHERE anidbID = %d',
+					$this->pdo->escapeString($title), $this->pdo->escapeString($type), (empty($AniDBAPIArray['startdate']) ? 'null' : $this->pdo->escapeString($AniDBAPIArray['startdate'])),
+					(empty($AniDBAPIArray['enddate']) ? 'null' : $this->pdo->escapeString($AniDBAPIArray['enddate'])), $this->pdo->escapeString($related), $this->pdo->escapeString($creators),
+					$this->pdo->escapeString($description), $this->pdo->escapeString($rating), $this->pdo->escapeString($categories), $this->pdo->escapeString($characters), $this->pdo->escapeString($epnos),
+					$this->pdo->escapeString($airdates), $this->pdo->escapeString($episodetitles), time(), $anidbID
+					));
+		}
+
+	public function getAnimeInfo($anidbID) {
+
+		$animeInfo = $this->pdo->query(sprintf('SELECT * FROM anidb WHERE anidbID = %d', $anidbID
+					));
+		return isset($animeInfo[0]) ? $animeInfo[0] : false;
+		}
 } // end class AniDBstandAlone
 
 $c = new ColorCLI();

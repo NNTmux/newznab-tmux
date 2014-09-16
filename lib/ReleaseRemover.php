@@ -19,118 +19,99 @@ require_once("Enzebe.php");
 class ReleaseRemover
 {
 	/**
+	 * @const New line.
+	 */
+	const N = PHP_EOL;
+	/**
 	 * @var DB
 	 */
 	protected $db;
-
 	/**
 	 * @var ColorCLI
 	 */
 	protected $color;
-
 	/**
 	 * @var ConsoleTools
 	 */
 	protected $consoleTools;
-
 	/**
 	 * @var Releases
 	 */
 	protected $releases;
-
 	/**
 	 * The query we will use to select unwanted releases.
 	 *
 	 * @var string
 	 */
 	protected $query;
-
 	/**
 	 * LIKE is case sensitive in PgSQL, get the insensitive one for it.
 	 *
 	 * @var string
 	 */
 	protected $like;
-
 	/**
 	 * If an error occurred, store it here.
 	 *
 	 * @var string
 	 */
 	protected $error;
-
 	/**
 	 * Time we started.
 	 *
 	 * @var int
 	 */
 	protected $timeStart;
-
 	/**
 	 * Result of the select query.
 	 *
 	 * @var array
 	 */
 	protected $result;
-
 	/**
 	 * Ignore user check?
 	 *
 	 * @var bool
 	 */
 	protected $ignoreUserCheck;
-
 	/**
 	 * Is is run from the browser?
 	 *
 	 * @var bool
 	 */
 	protected $browser;
-
 	/**
 	 * @var string
 	 */
 	protected $regexp;
-
 	/**
 	 * @var bool
 	 */
 	protected $mysql;
-
 	/**
 	 * @var string
 	 */
 	protected $crapTime = '';
-
 	/**
 	 * @var string
 	 */
 	protected $crapTimeOrder = '';
-
 	/**
 	 * @var string
 	 */
 	protected $method = '';
-
 	/**
 	 * @var int
 	 */
 	protected $deletedCount = 0;
-
 	/**
 	 * @var bool
 	 */
 	protected $delete;
-
 	/**
 	 * @var bool
 	 */
 	protected $echoCLI;
-
-	/**
-	 * @const New line.
-	 */
-	const N = PHP_EOL;
 
 	/**
 	 * Construct.
@@ -220,6 +201,275 @@ class ReleaseRemover
 			:
 			true
 		);
+	}
+
+	/**
+	 * Go through user arguments and format part of the query.
+	 *
+	 * @param string $argument User argument.
+	 *
+	 * @return bool|string
+	 */
+	protected function formatCriteriaQuery($argument)
+	{
+		// Check if the user wants to ignore the check.
+		if ($argument === 'ignore') {
+			$this->ignoreUserCheck = true;
+
+			return '';
+		}
+
+		$this->error = 'Invalid argument supplied: ' . $argument . self::N;
+		$args = explode('=', $argument);
+		if (count($args) === 3) {
+
+			$args[0] = $this->cleanSpaces($args[0]);
+			$args[1] = $this->cleanSpaces($args[1]);
+			$args[2] = $this->cleanSpaces($args[2]);
+			switch ($args[0]) {
+				case 'fromname':
+					switch ($args[1]) {
+						case 'equals':
+							return ' AND fromname = ' . $this->db->escapeString($args[2]);
+						case 'like':
+							return ' AND fromname ' . $this->formatLike($args[2], 'fromname');
+					}
+					break;
+				case 'groupname':
+					switch ($args[1]) {
+						case 'equals':
+							$group = $this->db->queryOneRow('SELECT ID FROM groups WHERE name = ' . $this->db->escapeString($args[2]));
+							if ($group === false) {
+								$this->error = 'This group was not found in your database: ' . $args[2] . PHP_EOL;
+								break;
+							}
+
+							return ' AND groupID = ' . $group['ID'];
+						case 'like':
+							$groups = $this->db->query('SELECT ID FROM groups WHERE name ' . $this->formatLike($args[2], 'name'));
+							if (count($groups) === 0) {
+								$this->error = 'No groups were found with this pattern in your database: ' . $args[2] . PHP_EOL;
+								break;
+							}
+							$gQuery = ' AND groupID IN (';
+							foreach ($groups as $group) {
+								$gQuery .= $group['ID'] . ',';
+							}
+							$gQuery = substr($gQuery, 0, strlen($gQuery) - 1) . ')';
+
+							return $gQuery;
+						default:
+							break;
+					}
+					break;
+				case 'guid':
+					switch ($args[1]) {
+						case 'equals':
+							return ' AND guid = ' . $this->db->escapeString($args[2]);
+						default:
+							break;
+					}
+					break;
+				case 'name':
+					switch ($args[1]) {
+						case 'equals':
+							return ' AND name = ' . $this->db->escapeString($args[2]);
+						case 'like':
+							return ' AND name ' . $this->formatLike($args[2], 'name');
+						default:
+							break;
+					}
+					break;
+				case 'searchname':
+					switch ($args[1]) {
+						case 'equals':
+							return ' AND searchname = ' . $this->db->escapeString($args[2]);
+						case 'like':
+							return ' AND searchname ' . $this->formatLike($args[2], 'searchname');
+						default:
+							break;
+					}
+					break;
+				case 'size':
+					if (!is_numeric($args[2])) {
+						break;
+					}
+					switch ($args[1]) {
+						case 'equals':
+							return ' AND size = ' . $args[2];
+						case 'bigger':
+							return ' AND size > ' . $args[2];
+						case 'smaller':
+							return ' AND size < ' . $args[2];
+						default:
+							break;
+					}
+					break;
+				case 'adddate':
+					if (!is_numeric($args[2])) {
+						break;
+					}
+					switch ($args[1]) {
+						case 'bigger':
+							return ' AND adddate <  NOW() - INTERVAL ' . $args[2] . ' HOUR';
+						case 'smaller':
+							return ' AND adddate >  NOW() - INTERVAL ' . $args[2] . ' HOUR';
+						default:
+							break;
+					}
+					break;
+				case 'postdate':
+					if (!is_numeric($args[2])) {
+						break;
+					}
+					switch ($args[1]) {
+						case 'bigger':
+							return ' AND postdate <  NOW() - INTERVAL ' . $args[2] . ' HOUR';
+						case 'smaller':
+							return ' AND postdate >  NOW() - INTERVAL ' . $args[2] . ' HOUR';
+						default:
+							break;
+					}
+					break;
+				case 'completion':
+					if (!is_numeric($args[2])) {
+						break;
+					}
+					switch ($args[1]) {
+						case 'smaller':
+							return ' AND completion > 0 AND completion < ' . $args[2];
+						default:
+							break;
+					}
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Remove multiple spaces and trim leading spaces.
+	 *
+	 * @param string $string
+	 *
+	 * @return string
+	 */
+	protected function cleanSpaces($string)
+	{
+		return trim(preg_replace('/\s{2,}/', ' ', $string));
+	}
+
+	/**
+	 * Format a "like" string. ie: "name LIKE '%test%' AND name LIKE '%123%'
+	 *
+	 * @param string $string The string to format.
+	 * @param string $type   The column name.
+	 *
+	 * @return string
+	 */
+	protected function formatLike($string, $type)
+	{
+		$newString = explode(' ', $string);
+		if (count($newString) > 1) {
+			$string = implode("%' AND {$type} LIKE '%", array_unique($newString));
+		}
+
+		return " LIKE '%" . $string . "%' ";
+	}
+
+	/**
+	 * Echo the error and return false if on CLI.
+	 * Return the error if on browser.
+	 *
+	 * @return bool/string
+	 */
+	protected function returnError()
+	{
+		if ($this->browser) {
+			return $this->error . '<br />';
+		} else {
+			if ($this->echoCLI && $this->error !== '') {
+				echo $this->color->error($this->error);
+			}
+
+			return false;
+		}
+
+	}
+
+	/**
+	 * Check if the user wants to run the current query.
+	 *
+	 * @return bool
+	 */
+	protected function checkUserResponse()
+	{
+		if ($this->ignoreUserCheck || $this->browser) {
+			return true;
+		}
+
+		// Print the query to the user, ask them if they want to continue using it.
+		echo $this->color->primary(
+			'This is the query we have formatted using your criteria, you can run it in SQL to see if you like the results:' .
+			self::N . $this->query . ';' . self::N .
+			'If you are satisfied, type yes and press enter. Anything else will exit.'
+		);
+
+		// Check the users response.
+		$userInput = trim(fgets(fopen('php://stdin', 'r')));
+		if ($userInput !== 'yes') {
+			echo $this->color->primary('You typed: "' . $userInput . '", the program will exit.');
+
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Verify if the query has any results.
+	 *
+	 * @return bool|int False on failure, count of found releases.
+	 */
+	protected function checkSelectQuery()
+	{
+		// Run the query, check if it picked up anything.
+		$result = $this->db->query($this->cleanSpaces($this->query));
+		if (count($result) <= 0) {
+			if ($this->method === 'userCriteria') {
+				$this->error = 'No releases were found to delete, try changing your criteria.';
+			} else {
+				$this->error = '';
+			}
+
+			return false;
+		}
+		$this->result = $result;
+
+		return true;
+	}
+
+	/**
+	 * Delete releases from the database.
+	 */
+	protected function deleteReleases()
+	{
+		$deletedCount = 0;
+		foreach ($this->result as $release) {
+			if ($this->delete) {
+				$this->releases->deleteSingle($release['guid'], $release['ID'], $this->nzb, $this->releaseImage);
+				if ($this->echoCLI) {
+					echo $this->color->primary('Deleting: ' . $this->method . ': ' . $release['searchname']);
+				}
+			} elseif ($this->echoCLI) {
+				echo $this->color->primary('Would be deleting: ' . $this->method . ': ' . $release['searchname']);
+			}
+			$deletedCount++;
+		}
+
+		$this->deletedCount += $deletedCount;
+
+		return true;
 	}
 
 	/**
@@ -346,338 +596,6 @@ class ReleaseRemover
 			:
 			true
 		);
-	}
-
-	/**
-	 * Remove releases with 15 or more letters or numbers, nothing else.
-	 *
-	 * @return bool
-	 */
-	protected function removeGibberish()
-	{
-		$this->method = 'Gibberish';
-		$this->query = sprintf(
-			"SELECT r.guid, r.searchname, r.ID
-			FROM releases r
-			WHERE r.nfostatus = 0
-			AND r.iscategorized = 1
-			AND r.rarinnerfilecount = 0
-			AND r.categoryID NOT IN (%d)
-			AND r.searchname REGEXP '^[a-zA-Z0-9]{15,}$'
-			%s",
-			Category::CAT_MISC_HASHED,
-			$this->crapTime
-		);
-
-		if ($this->checkSelectQuery() === false) {
-			return $this->returnError();
-		}
-
-		return $this->deleteReleases();
-	}
-
-	/**
-	 * Remove releases with 25 or more letters/numbers, probably hashed.
-	 *
-	 * @return bool
-	 */
-	protected function removeHashed()
-	{
-		$this->method = 'Hashed';
-		$this->query = sprintf(
-			"SELECT r.guid, r.searchname, r.ID
-			FROM releases r
-			WHERE r.nfostatus = 0
-			AND r.iscategorized = 1
-			AND r.rarinnerfilecount = 0
-			AND r.categoryID NOT IN (%d, %d)
-			AND r.searchname REGEXP '[a-zA-Z0-9]{25,}'
-			%s",
-			Category::CAT_MISC_OTHER, Category::CAT_MISC_HASHED, $this->crapTime
-		);
-
-		if ($this->checkSelectQuery() === false) {
-			return $this->returnError();
-		}
-
-		return $this->deleteReleases();
-	}
-
-	/**
-	 * Remove releases with 5 or less letters/numbers.
-	 *
-	 * @return bool
-	 */
-	protected function removeShort()
-	{
-		$this->method = 'Short';
-		$this->query = sprintf(
-			"SELECT r.guid, r.searchname, r.ID
-			FROM releases r
-			WHERE r.nfostatus = 0
-			AND r.iscategorized = 1
-			AND r.rarinnerfilecount = 0
-			AND r.categoryID NOT IN (%d)
-			AND r.searchname REGEXP '^[a-zA-Z0-9]{0,5}$'
-			%s",
-			Category::CAT_MISC_OTHER, $this->crapTime
-		);
-
-		if ($this->checkSelectQuery() === false) {
-			return $this->returnError();
-		}
-
-		return $this->deleteReleases();
-	}
-
-	/**
-	 * Remove releases with an exe file not in other misc or pc apps/games.
-	 *
-	 * @return bool
-	 */
-	protected function removeExecutable()
-	{
-		$this->method = 'Executable';
-		$this->query = sprintf(
-			"SELECT r.guid, r.searchname, r.ID
-			FROM releases r
-			INNER JOIN releasefiles rf ON rf.releaseID = r.ID
-			WHERE r.searchname NOT LIKE %s
-			AND rf.name LIKE %s
-			AND r.categoryID NOT IN (%d, %d, %d, %d, %d) %s",
-			"'%.exes%'",
-			"'%.exe%'",
-			Category::CAT_PC_0DAY,
-			Category::CAT_PC_GAMES,
-			Category::CAT_PC_ISO,
-			Category::CAT_MISC_OTHER,
-			Category::CAT_MISC_HASHED,
-			$this->crapTime
-		);
-
-		if ($this->checkSelectQuery() === false) {
-			return $this->returnError();
-		}
-
-		return $this->deleteReleases();
-	}
-
-	/**
-	 * Remove releases with an install.bin file.
-	 *
-	 * @return bool
-	 */
-	protected function removeInstallBin()
-	{
-		$this->method = 'Install.bin';
-		$this->query = sprintf(
-			"SELECT r.guid, r.searchname, r.ID
-			FROM releases r
-			INNER JOIN releasefiles rf ON rf.releaseID = r.ID
-			WHERE rf.name LIKE %s %s",
-			"'%install.bin%'",
-			$this->crapTime
-		);
-
-		if ($this->checkSelectQuery() === false) {
-			return $this->returnError();
-		}
-
-		return $this->deleteReleases();
-	}
-
-	/**
-	 * Remove releases with an password.url file.
-	 *
-	 * @return bool
-	 */
-	protected function removePasswordURL()
-	{
-		$this->method = 'Password.url';
-		$this->query = sprintf(
-			"SELECT r.guid, r.searchname, r.ID
-			FROM releases r
-			INNER JOIN releasefiles rf ON rf.releaseID = r.ID
-			WHERE rf.name LIKE %s %s",
-			"'%password.url%'",
-			$this->crapTime
-		);
-
-		if ($this->checkSelectQuery() === false) {
-			return $this->returnError();
-		}
-
-		return $this->deleteReleases();
-	}
-
-	/**
-	 * Remove releases with password in the search name.
-	 *
-	 * @return bool
-	 */
-	protected function removePassworded()
-	{
-		$this->method = 'Passworded';
-		$this->query = sprintf(
-			"SELECT r.guid, r.searchname, r.ID
-			FROM releases r
-			WHERE r.searchname LIKE %s
-			AND r.searchname NOT LIKE %s
-			AND r.searchname NOT LIKE %s
-			AND r.searchname NOT LIKE %s
-			AND r.searchname NOT LIKE %s
-			AND r.searchname NOT LIKE %s
-			AND r.searchname NOT LIKE %s
-			AND r.nzbstatus = 1
-			AND r.categoryID NOT IN (%d, %d, %d, %d, %d, %d, %d, %d, %d) %s",
-			// Matches passwort / passworded / etc also.
-			"'%passwor%'",
-			"'%advanced%'",
-			"'%no password%'",
-			"'%not password%'",
-			"'%recovery%'",
-			"'%reset%'",
-			"'%unlocker%'",
-			Category::CAT_PC_GAMES,
-			Category::CAT_PC_0DAY,
-			Category::CAT_PC_ISO,
-			Category::CAT_PC_MAC,
-			Category::CAT_PC_MOBILEANDROID,
-			Category::CAT_PC_MOBILEIOS,
-			Category::CAT_PC_MOBILEOTHER,
-			Category::CAT_MISC_OTHER,
-			Category::CAT_MISC_HASHED,
-			$this->crapTime
-		);
-
-		if ($this->checkSelectQuery() === false) {
-			return $this->returnError();
-		}
-
-		return $this->deleteReleases();
-	}
-
-	/**
-	 * Remove releases smaller than 2MB with 1 part not in MP3/books/misc section.
-	 *
-	 * @return bool
-	 */
-	protected function removeSize()
-	{
-		$this->method = 'Size';
-		$this->query = sprintf(
-			"SELECT r.guid, r.searchname, r.ID
-			FROM releases r
-			WHERE r.totalpart = 1
-			AND r.size < 2097152
-			AND r.categoryID NOT IN (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) %s",
-			Category::CAT_MUSIC_MP3,
-			Category::CAT_BOOK_COMICS,
-			Category::CAT_BOOK_EBOOK,
-			Category::CAT_BOOK_FOREIGN,
-			Category::CAT_BOOK_MAGS,
-			Category::CAT_BOOK_TECHNICAL,
-			Category::CAT_BOOK_OTHER,
-			Category::CAT_PC_0DAY,
-			Category::CAT_PC_GAMES,
-			Category::CAT_MISC_OTHER,
-			Category::CAT_MISC_HASHED,
-			$this->crapTime
-		);
-
-		if ($this->checkSelectQuery() === false) {
-			return $this->returnError();
-		}
-
-		return $this->deleteReleases();
-	}
-
-	/**
-	 * Remove releases bigger than 200MB with just a single file.
-	 *
-	 * @return bool
-	 */
-	protected function removeHuge()
-	{
-		$this->method = 'Huge';
-		$this->query = sprintf(
-			"SELECT r.guid, r.searchname, r.ID
-			FROM releases r
-			WHERE r.totalpart = 1
-			AND r.size > 209715200 %s",
-			$this->crapTime
-		);
-
-		if ($this->checkSelectQuery() === false) {
-			return $this->returnError();
-		}
-
-		return $this->deleteReleases();
-	}
-
-	/**
-	 * Remove releases with more than 1 part, less than 40MB, sample in name. TV/Movie sections.
-	 *
-	 * @return bool
-	 */
-	protected function removeSample()
-	{
-		$this->method = 'Sample';
-		$this->query = sprintf(
-			"SELECT r.guid, r.searchname, r.ID
-			FROM releases r
-			WHERE r.totalpart > 1
-			AND r.size < 40000000
-			AND r.name LIKE %s
-			AND r.categoryID IN (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) %s",
-			"'%sample%'",
-			Category::CAT_TV_ANIME,
-			Category::CAT_TV_DOCU,
-			Category::CAT_TV_FOREIGN,
-			Category::CAT_TV_HD,
-			Category::CAT_TV_OTHER,
-			Category::CAT_TV_SD,
-			Category::CAT_TV_SPORT,
-			Category::CAT_TV_WEBDL,
-			Category::CAT_MOVIE_3D,
-			Category::CAT_MOVIE_BLURAY,
-			Category::CAT_MOVIE_DVD,
-			Category::CAT_MOVIE_FOREIGN,
-			Category::CAT_MOVIE_HD,
-			Category::CAT_MOVIE_OTHER,
-			Category::CAT_MOVIE_SD,
-			$this->crapTime
-		);
-
-		if ($this->checkSelectQuery() === false) {
-			return $this->returnError();
-		}
-
-		return $this->deleteReleases();
-	}
-
-	/**
-	 * Remove releases with a scr file in the filename/subject.
-	 *
-	 * @return bool
-	 */
-	protected function removeSCR()
-	{
-		$this->method = '.scr';
-		$this->query = sprintf(
-			"SELECT r.guid, r.searchname, r.ID
-			FROM releases r
-			LEFT JOIN releasefiles rf on rf.releaseID = r.ID
-			WHERE (rf.name REGEXP '[.]scr[$ \"]' OR r.name REGEXP '[.]scr[$ \"]')
-			%s",
-			$this->crapTime
-		);
-
-		if ($this->checkSelectQuery() === false) {
-			return $this->returnError();
-		}
-
-		return $this->deleteReleases();
 	}
 
 	/**
@@ -938,39 +856,28 @@ class ReleaseRemover
 	}
 
 	/**
-	 * Remove releases that contain .wmv files and Codec\Setup.exe files, aka that spam poster.
-	 * Thanks to dizant from nZEDb forums for parts of the sql query
+	 * Remove releases with an exe file not in other misc or pc apps/games.
 	 *
 	 * @return bool
 	 */
-	protected function removeCodecPoster()
+	protected function removeExecutable()
 	{
-		$this->method = 'Codec Poster';
-		$regex = "rf.name REGEXP 'x264.*\.(wmv|avi)$'";
-		$codec = '%\\Codec%Setup.exe%';
-		$iferror = '%If_you_get_error.txt%';
-		$ifnotplaying = '%read me if the movie not playing.txt%';
-		$categories = sprintf("r.categoryID IN (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) AND",
-			Category::CAT_MOVIE_3D,
-			Category::CAT_MOVIE_BLURAY,
-			Category::CAT_MOVIE_DVD,
-			Category::CAT_MOVIE_FOREIGN,
-			Category::CAT_MOVIE_HD,
-			Category::CAT_MOVIE_OTHER,
-			Category::CAT_MOVIE_SD,
-			Category::CAT_XXX_WMV,
-			Category::CAT_XXX_X264,
-			Category::CAT_XXX_XVID,
-			Category::CAT_XXX_OTHER
-		);
-		$codeclike = sprintf("UNION SELECT r.guid, r.searchname, r.ID FROM releases r
-			LEFT JOIN releasefiles rf ON r.ID = rf.releaseID
-			WHERE %s rf.name LIKE '%s' OR rf.name LIKE '%s' OR rf.name LIKE '%s'", $categories, $codec, $iferror, $ifnotplaying
-		);
+		$this->method = 'Executable';
 		$this->query = sprintf(
-			"SELECT r.guid, r.searchname, r.ID FROM releases
-			r INNER JOIN releasefiles rf ON (rf.releaseID = r.ID)
-			WHERE %s %s %s %s %s", $categories, $regex, $this->crapTime, $codeclike, $this->crapTime
+			"SELECT r.guid, r.searchname, r.ID
+			FROM releases r
+			INNER JOIN releasefiles rf ON rf.releaseID = r.ID
+			WHERE r.searchname NOT LIKE %s
+			AND rf.name LIKE %s
+			AND r.categoryID NOT IN (%d, %d, %d, %d, %d) %s",
+			"'%.exes%'",
+			"'%.exe%'",
+			Category::CAT_PC_0DAY,
+			Category::CAT_PC_GAMES,
+			Category::CAT_PC_ISO,
+			Category::CAT_MISC_OTHER,
+			Category::CAT_MISC_HASHED,
+			$this->crapTime
 		);
 
 		if ($this->checkSelectQuery() === false) {
@@ -981,271 +888,349 @@ class ReleaseRemover
 	}
 
 	/**
-	 * Delete releases from the database.
-	 */
-	protected function deleteReleases()
-	{
-		$deletedCount = 0;
-		foreach ($this->result as $release) {
-			if ($this->delete) {
-				$this->releases->deleteSingle($release['guid'], $release['ID'], $this->nzb, $this->releaseImage);
-				if ($this->echoCLI) {
-					echo $this->color->primary('Deleting: ' . $this->method . ': ' . $release['searchname']);
-				}
-			} elseif ($this->echoCLI) {
-				echo $this->color->primary('Would be deleting: ' . $this->method . ': ' . $release['searchname']);
-			}
-			$deletedCount++;
-		}
-
-		$this->deletedCount += $deletedCount;
-
-		return true;
-	}
-
-	/**
-	 * Verify if the query has any results.
-	 *
-	 * @return bool|int False on failure, count of found releases.
-	 */
-	protected function checkSelectQuery()
-	{
-		// Run the query, check if it picked up anything.
-		$result = $this->db->query($this->cleanSpaces($this->query));
-		if (count($result) <= 0) {
-			if ($this->method === 'userCriteria') {
-				$this->error = 'No releases were found to delete, try changing your criteria.';
-			} else {
-				$this->error = '';
-			}
-
-			return false;
-		}
-		$this->result = $result;
-
-		return true;
-	}
-
-	/**
-	 * Go through user arguments and format part of the query.
-	 *
-	 * @param string $argument User argument.
-	 *
-	 * @return bool|string
-	 */
-	protected function formatCriteriaQuery($argument)
-	{
-		// Check if the user wants to ignore the check.
-		if ($argument === 'ignore') {
-			$this->ignoreUserCheck = true;
-
-			return '';
-		}
-
-		$this->error = 'Invalid argument supplied: ' . $argument . self::N;
-		$args = explode('=', $argument);
-		if (count($args) === 3) {
-
-			$args[0] = $this->cleanSpaces($args[0]);
-			$args[1] = $this->cleanSpaces($args[1]);
-			$args[2] = $this->cleanSpaces($args[2]);
-			switch ($args[0]) {
-				case 'fromname':
-					switch ($args[1]) {
-						case 'equals':
-							return ' AND fromname = ' . $this->db->escapeString($args[2]);
-						case 'like':
-							return ' AND fromname ' . $this->formatLike($args[2], 'fromname');
-					}
-					break;
-				case 'groupname':
-					switch ($args[1]) {
-						case 'equals':
-							$group = $this->db->queryOneRow('SELECT ID FROM groups WHERE name = ' . $this->db->escapeString($args[2]));
-							if ($group === false) {
-								$this->error = 'This group was not found in your database: ' . $args[2] . PHP_EOL;
-								break;
-							}
-
-							return ' AND groupID = ' . $group['ID'];
-						case 'like':
-							$groups = $this->db->query('SELECT ID FROM groups WHERE name ' . $this->formatLike($args[2], 'name'));
-							if (count($groups) === 0) {
-								$this->error = 'No groups were found with this pattern in your database: ' . $args[2] . PHP_EOL;
-								break;
-							}
-							$gQuery = ' AND groupID IN (';
-							foreach ($groups as $group) {
-								$gQuery .= $group['ID'] . ',';
-							}
-							$gQuery = substr($gQuery, 0, strlen($gQuery) - 1) . ')';
-
-							return $gQuery;
-						default:
-							break;
-					}
-					break;
-				case 'guid':
-					switch ($args[1]) {
-						case 'equals':
-							return ' AND guid = ' . $this->db->escapeString($args[2]);
-						default:
-							break;
-					}
-					break;
-				case 'name':
-					switch ($args[1]) {
-						case 'equals':
-							return ' AND name = ' . $this->db->escapeString($args[2]);
-						case 'like':
-							return ' AND name ' . $this->formatLike($args[2], 'name');
-						default:
-							break;
-					}
-					break;
-				case 'searchname':
-					switch ($args[1]) {
-						case 'equals':
-							return ' AND searchname = ' . $this->db->escapeString($args[2]);
-						case 'like':
-							return ' AND searchname ' . $this->formatLike($args[2], 'searchname');
-						default:
-							break;
-					}
-					break;
-				case 'size':
-					if (!is_numeric($args[2])) {
-						break;
-					}
-					switch ($args[1]) {
-						case 'equals':
-							return ' AND size = ' . $args[2];
-						case 'bigger':
-							return ' AND size > ' . $args[2];
-						case 'smaller':
-							return ' AND size < ' . $args[2];
-						default:
-							break;
-					}
-					break;
-				case 'adddate':
-					if (!is_numeric($args[2])) {
-						break;
-					}
-					switch ($args[1]) {
-						case 'bigger':
-							return ' AND adddate <  NOW() - INTERVAL ' . $args[2] . ' HOUR';
-						case 'smaller':
-							return ' AND adddate >  NOW() - INTERVAL ' . $args[2] . ' HOUR';
-						default:
-							break;
-					}
-					break;
-				case 'postdate':
-					if (!is_numeric($args[2])) {
-						break;
-					}
-					switch ($args[1]) {
-						case 'bigger':
-							return ' AND postdate <  NOW() - INTERVAL ' . $args[2] . ' HOUR';
-						case 'smaller':
-							return ' AND postdate >  NOW() - INTERVAL ' . $args[2] . ' HOUR';
-						default:
-							break;
-					}
-					break;
-				case 'completion':
-					if (!is_numeric($args[2])) {
-						break;
-					}
-					switch ($args[1]) {
-						case 'smaller':
-							return ' AND completion > 0 AND completion < ' . $args[2];
-						default:
-							break;
-					}
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	 * Check if the user wants to run the current query.
+	 * Remove releases with 15 or more letters or numbers, nothing else.
 	 *
 	 * @return bool
 	 */
-	protected function checkUserResponse()
+	protected function removeGibberish()
 	{
-		if ($this->ignoreUserCheck || $this->browser) {
-			return true;
-		}
-
-		// Print the query to the user, ask them if they want to continue using it.
-		echo $this->color->primary(
-			'This is the query we have formatted using your criteria, you can run it in SQL to see if you like the results:' .
-			self::N . $this->query . ';' . self::N .
-			'If you are satisfied, type yes and press enter. Anything else will exit.'
+		$this->method = 'Gibberish';
+		$this->query = sprintf(
+			"SELECT r.guid, r.searchname, r.ID
+			FROM releases r
+			WHERE r.nfostatus = 0
+			AND r.iscategorized = 1
+			AND r.rarinnerfilecount = 0
+			AND r.categoryID NOT IN (%d)
+			AND r.searchname REGEXP '^[a-zA-Z0-9]{15,}$'
+			%s",
+			Category::CAT_MISC_HASHED,
+			$this->crapTime
 		);
 
-		// Check the users response.
-		$userInput = trim(fgets(fopen('php://stdin', 'r')));
-		if ($userInput !== 'yes') {
-			echo $this->color->primary('You typed: "' . $userInput . '", the program will exit.');
-
-			return false;
+		if ($this->checkSelectQuery() === false) {
+			return $this->returnError();
 		}
 
-		return true;
+		return $this->deleteReleases();
 	}
 
 	/**
-	 * Remove multiple spaces and trim leading spaces.
+	 * Remove releases with 25 or more letters/numbers, probably hashed.
 	 *
-	 * @param string $string
-	 *
-	 * @return string
+	 * @return bool
 	 */
-	protected function cleanSpaces($string)
+	protected function removeHashed()
 	{
-		return trim(preg_replace('/\s{2,}/', ' ', $string));
+		$this->method = 'Hashed';
+		$this->query = sprintf(
+			"SELECT r.guid, r.searchname, r.ID
+			FROM releases r
+			WHERE r.nfostatus = 0
+			AND r.iscategorized = 1
+			AND r.rarinnerfilecount = 0
+			AND r.categoryID NOT IN (%d, %d)
+			AND r.searchname REGEXP '[a-zA-Z0-9]{25,}'
+			%s",
+			Category::CAT_MISC_OTHER, Category::CAT_MISC_HASHED, $this->crapTime
+		);
+
+		if ($this->checkSelectQuery() === false) {
+			return $this->returnError();
+		}
+
+		return $this->deleteReleases();
 	}
 
 	/**
-	 * Format a "like" string. ie: "name LIKE '%test%' AND name LIKE '%123%'
+	 * Remove releases with an install.bin file.
 	 *
-	 * @param string $string The string to format.
-	 * @param string $type   The column name.
-	 *
-	 * @return string
+	 * @return bool
 	 */
-	protected function formatLike($string, $type)
+	protected function removeInstallBin()
 	{
-		$newString = explode(' ', $string);
-		if (count($newString) > 1) {
-			$string = implode("%' AND {$type} LIKE '%", array_unique($newString));
+		$this->method = 'Install.bin';
+		$this->query = sprintf(
+			"SELECT r.guid, r.searchname, r.ID
+			FROM releases r
+			INNER JOIN releasefiles rf ON rf.releaseID = r.ID
+			WHERE rf.name LIKE %s %s",
+			"'%install.bin%'",
+			$this->crapTime
+		);
+
+		if ($this->checkSelectQuery() === false) {
+			return $this->returnError();
 		}
 
-		return " LIKE '%" . $string . "%' ";
+		return $this->deleteReleases();
 	}
 
 	/**
-	 * Echo the error and return false if on CLI.
-	 * Return the error if on browser.
+	 * Remove releases with password in the search name.
 	 *
-	 * @return bool/string
+	 * @return bool
 	 */
-	protected function returnError()
+	protected function removePassworded()
 	{
-		if ($this->browser) {
-			return $this->error . '<br />';
-		} else {
-			if ($this->echoCLI && $this->error !== '') {
-				echo $this->color->error($this->error);
-			}
+		$this->method = 'Passworded';
+		$this->query = sprintf(
+			"SELECT r.guid, r.searchname, r.ID
+			FROM releases r
+			WHERE r.searchname LIKE %s
+			AND r.searchname NOT LIKE %s
+			AND r.searchname NOT LIKE %s
+			AND r.searchname NOT LIKE %s
+			AND r.searchname NOT LIKE %s
+			AND r.searchname NOT LIKE %s
+			AND r.searchname NOT LIKE %s
+			AND r.nzbstatus = 1
+			AND r.categoryID NOT IN (%d, %d, %d, %d, %d, %d, %d, %d, %d) %s",
+			// Matches passwort / passworded / etc also.
+			"'%passwor%'",
+			"'%advanced%'",
+			"'%no password%'",
+			"'%not password%'",
+			"'%recovery%'",
+			"'%reset%'",
+			"'%unlocker%'",
+			Category::CAT_PC_GAMES,
+			Category::CAT_PC_0DAY,
+			Category::CAT_PC_ISO,
+			Category::CAT_PC_MAC,
+			Category::CAT_PC_MOBILEANDROID,
+			Category::CAT_PC_MOBILEIOS,
+			Category::CAT_PC_MOBILEOTHER,
+			Category::CAT_MISC_OTHER,
+			Category::CAT_MISC_HASHED,
+			$this->crapTime
+		);
 
-			return false;
+		if ($this->checkSelectQuery() === false) {
+			return $this->returnError();
 		}
 
+		return $this->deleteReleases();
+	}
+
+	/**
+	 * Remove releases with an password.url file.
+	 *
+	 * @return bool
+	 */
+	protected function removePasswordURL()
+	{
+		$this->method = 'Password.url';
+		$this->query = sprintf(
+			"SELECT r.guid, r.searchname, r.ID
+			FROM releases r
+			INNER JOIN releasefiles rf ON rf.releaseID = r.ID
+			WHERE rf.name LIKE %s %s",
+			"'%password.url%'",
+			$this->crapTime
+		);
+
+		if ($this->checkSelectQuery() === false) {
+			return $this->returnError();
+		}
+
+		return $this->deleteReleases();
+	}
+
+	/**
+	 * Remove releases with more than 1 part, less than 40MB, sample in name. TV/Movie sections.
+	 *
+	 * @return bool
+	 */
+	protected function removeSample()
+	{
+		$this->method = 'Sample';
+		$this->query = sprintf(
+			"SELECT r.guid, r.searchname, r.ID
+			FROM releases r
+			WHERE r.totalpart > 1
+			AND r.size < 40000000
+			AND r.name LIKE %s
+			AND r.categoryID IN (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) %s",
+			"'%sample%'",
+			Category::CAT_TV_ANIME,
+			Category::CAT_TV_DOCU,
+			Category::CAT_TV_FOREIGN,
+			Category::CAT_TV_HD,
+			Category::CAT_TV_OTHER,
+			Category::CAT_TV_SD,
+			Category::CAT_TV_SPORT,
+			Category::CAT_TV_WEBDL,
+			Category::CAT_MOVIE_3D,
+			Category::CAT_MOVIE_BLURAY,
+			Category::CAT_MOVIE_DVD,
+			Category::CAT_MOVIE_FOREIGN,
+			Category::CAT_MOVIE_HD,
+			Category::CAT_MOVIE_OTHER,
+			Category::CAT_MOVIE_SD,
+			$this->crapTime
+		);
+
+		if ($this->checkSelectQuery() === false) {
+			return $this->returnError();
+		}
+
+		return $this->deleteReleases();
+	}
+
+	/**
+	 * Remove releases with a scr file in the filename/subject.
+	 *
+	 * @return bool
+	 */
+	protected function removeSCR()
+	{
+		$this->method = '.scr';
+		$this->query = sprintf(
+			"SELECT r.guid, r.searchname, r.ID
+			FROM releases r
+			LEFT JOIN releasefiles rf on rf.releaseID = r.ID
+			WHERE (rf.name REGEXP '[.]scr[$ \"]' OR r.name REGEXP '[.]scr[$ \"]')
+			%s",
+			$this->crapTime
+		);
+
+		if ($this->checkSelectQuery() === false) {
+			return $this->returnError();
+		}
+
+		return $this->deleteReleases();
+	}
+
+	/**
+	 * Remove releases with 5 or less letters/numbers.
+	 *
+	 * @return bool
+	 */
+	protected function removeShort()
+	{
+		$this->method = 'Short';
+		$this->query = sprintf(
+			"SELECT r.guid, r.searchname, r.ID
+			FROM releases r
+			WHERE r.nfostatus = 0
+			AND r.iscategorized = 1
+			AND r.rarinnerfilecount = 0
+			AND r.categoryID NOT IN (%d)
+			AND r.searchname REGEXP '^[a-zA-Z0-9]{0,5}$'
+			%s",
+			Category::CAT_MISC_OTHER, $this->crapTime
+		);
+
+		if ($this->checkSelectQuery() === false) {
+			return $this->returnError();
+		}
+
+		return $this->deleteReleases();
+	}
+
+	/**
+	 * Remove releases smaller than 2MB with 1 part not in MP3/books/misc section.
+	 *
+	 * @return bool
+	 */
+	protected function removeSize()
+	{
+		$this->method = 'Size';
+		$this->query = sprintf(
+			"SELECT r.guid, r.searchname, r.ID
+			FROM releases r
+			WHERE r.totalpart = 1
+			AND r.size < 2097152
+			AND r.categoryID NOT IN (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) %s",
+			Category::CAT_MUSIC_MP3,
+			Category::CAT_BOOK_COMICS,
+			Category::CAT_BOOK_EBOOK,
+			Category::CAT_BOOK_FOREIGN,
+			Category::CAT_BOOK_MAGS,
+			Category::CAT_BOOK_TECHNICAL,
+			Category::CAT_BOOK_OTHER,
+			Category::CAT_PC_0DAY,
+			Category::CAT_PC_GAMES,
+			Category::CAT_MISC_OTHER,
+			Category::CAT_MISC_HASHED,
+			$this->crapTime
+		);
+
+		if ($this->checkSelectQuery() === false) {
+			return $this->returnError();
+		}
+
+		return $this->deleteReleases();
+	}
+
+	/**
+	 * Remove releases bigger than 200MB with just a single file.
+	 *
+	 * @return bool
+	 */
+	protected function removeHuge()
+	{
+		$this->method = 'Huge';
+		$this->query = sprintf(
+			"SELECT r.guid, r.searchname, r.ID
+			FROM releases r
+			WHERE r.totalpart = 1
+			AND r.size > 209715200 %s",
+			$this->crapTime
+		);
+
+		if ($this->checkSelectQuery() === false) {
+			return $this->returnError();
+		}
+
+		return $this->deleteReleases();
+	}
+
+	/**
+	 * Remove releases that contain .wmv files and Codec\Setup.exe files, aka that spam poster.
+	 * Thanks to dizant from nZEDb forums for parts of the sql query
+	 *
+	 * @return bool
+	 */
+	protected function removeCodecPoster()
+	{
+		$this->method = 'Codec Poster';
+		$regex = "rf.name REGEXP 'x264.*\.(wmv|avi)$'";
+		$regex2 = "rf.name REGEXP '((DVDrip|BRRip)\.?\.(R5|R6|HQ)|720p\.(DVDrip|HQ)|Webrip?\.(R5|R6|Xvid|AC3|US)|720p?\.WEB-DL\.Xvid\.AC3\.US|HDRip?\.Xvid\.DD5).*\.avi$'";
+		$codec = '%\\Codec%Setup.exe%';
+		$iferror = '%If_you_get_error.txt%';
+		$ifnotplaying = '%read me if the movie not playing.txt%';
+		$frenchv = '%Lisez moi si le film ne demarre pas.txt%';
+		$nl = '%lees me als de film niet spelen.txt%';
+		$german = '%Lesen Sie mir wenn der Film nicht abgespielt.txt%';
+		$categories = sprintf("r.categoryID IN (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) AND",
+			\Category::CAT_MOVIE_3D,
+			\Category::CAT_MOVIE_BLURAY,
+			\Category::CAT_MOVIE_DVD,
+			\Category::CAT_MOVIE_FOREIGN,
+			\Category::CAT_MOVIE_HD,
+			\Category::CAT_MOVIE_OTHER,
+			\Category::CAT_MOVIE_SD,
+			\Category::CAT_XXX_WMV,
+			\Category::CAT_XXX_X264,
+			\Category::CAT_XXX_XVID,
+			\Category::CAT_XXX_OTHER
+		);
+		$codeclike = sprintf("UNION SELECT r.guid, r.searchname, r.ID FROM releases r
+			LEFT JOIN releasefiles rf ON r.ID = rf.releaseID
+			WHERE %s rf.name LIKE '%s' OR rf.name LIKE '%s' OR rf.name LIKE '%s' OR rf.name LIKE '%s' OR rf.name LIKE '%s' OR rf.name LIKE '%s'", $categories, $codec, $iferror, $ifnotplaying, $frenchv, $nl, $german
+		);
+		$this->query = sprintf(
+			"SELECT r.guid, r.searchname, r.ID FROM releases
+			r INNER JOIN releasefiles rf ON (rf.releaseID = r.ID)
+			WHERE %s %s OR %s %s %s %s", $categories, $regex, $regex2, $this->crapTime, $codeclike, $this->crapTime
+		);
+
+		if ($this->checkSelectQuery() === false) {
+			return $this->returnError();
+		}
+
+		return $this->deleteReleases();
 	}
 }
