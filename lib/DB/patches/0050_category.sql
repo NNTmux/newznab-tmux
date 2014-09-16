@@ -43,8 +43,8 @@ INSERT INTO category (ID, title, parentID) VALUES (2010, 'Foreign', 2000);
 INSERT INTO category (ID, title, parentID) VALUES (2020, 'Other', 2000);
 INSERT INTO category (ID, title, parentID) VALUES (2030, 'SD', 2000);
 INSERT INTO category (ID, title, parentID) VALUES (2040, 'HD', 2000);
-INSERT INTO category (ID, title, parentID) VALUES (2050, 'BluRay', 2000);
-INSERT INTO category (ID, title, parentID) VALUES (2060, '3D', 2000);
+INSERT INTO category (ID, title, parentID) VALUES (2050, '3D', 2000);
+INSERT INTO category (ID, title, parentID) VALUES (2060, 'BluRay', 2000);
 INSERT INTO category (ID, title, parentID) VALUES (2070, 'DVD', 2000);
 
 INSERT INTO category (ID, title, parentID) VALUES (3010, 'MP3', 3000);

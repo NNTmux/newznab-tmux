@@ -15,7 +15,7 @@ $tmux = $t->get();
 $patch = (isset($tmux->sqlpatch)) ? $tmux->sqlpatch : 0;
 
 // Check database patch version
-if ($patch < 56) {
+if ($patch < 74) {
 	exit($c->error("\nYour database is not up to date. Please update.\nphp ${DIR}/lib/DB/patchDB.php\n"));
 }
 $tmux_session = (isset($tmux->tmux_session)) ? $tmux->tmux_session : 0;
@@ -144,17 +144,15 @@ function window_post($tmux_session)
     exec("tmux splitw -t $tmux_session:2 -v -p 50 'printf \"\033]2;processAnime\033\"'");
     exec("tmux selectp -t 5;tmux splitw -t $tmux_session:2 -v -p 80 'printf \"\033]2;processSpotnab\033\"'");
     exec("tmux splitw -t $tmux_session:2 -v -p 75 'printf \"\033]2;processBooks\033\"'");
-    exec("tmux splitw -t $tmux_session:2 -v -p 67 'printf \"\033]2;processOther\033\"'");
+    exec("tmux splitw -t $tmux_session:2 -v -p 67 'printf \"\033]2;processXXX\033\"'");
     exec("tmux splitw -t $tmux_session:2 -v -p 50 'printf \"\033]2;processUnwanted\033\"'");
 }
 
 function window_fixnames($tmux_session)
 {
 	exec("tmux new-window -t $tmux_session -n FixNames 'printf \"\033]2;Fix_Release_Names\033\"'");
-	exec("tmux selectp -t 0; tmux splitw -t $tmux_session:3 -v -p 50 'printf \"\033]2;RemoveCrap\033\"'");
-    exec("tmux selectp -t 0; tmux splitw -t $tmux_session:3 -h -p 50 'printf \"\033]2;PreDB_Hash_Decrypt\033\"'");
-    exec("tmux selectp -t 1; tmux splitw -t $tmux_session:3 -v -p 50 'printf \"\033]2;RequestID\033\"'");
-    exec("tmux selectp -t 3;tmux splitw -t $tmux_session:3 -h -p 50 'printf \"\033]2;PrehashUpdate\033\"'");
+	exec("tmux splitw -t $tmux_session:3 -v -p 67 'printf \"\033]2;RemoveCrap\033\"'");
+	exec("tmux splitw -t $tmux_session:3 -v -p 50 'printf \"\033]2;PrehashUpdate\033\"'");
 }
 
 function window_ircscraper($tmux_session)

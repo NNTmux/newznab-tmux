@@ -70,7 +70,7 @@ class Category
 	const CAT_PARENT_PC = 4000;
 	const CAT_PARENT_TV = 5000;
 	const CAT_PARENT_XXX = 6000;
-	const CAT_PARENT_BOOKS = 7000;
+	const CAT_PARENT_BOOK = 7000;
 	const CAT_PARENT_MISC = 8000;
 	const CAT_NOT_DETERMINED = 7900;
 	const STATUS_INACTIVE = 0;
@@ -98,6 +98,40 @@ class Category
 			$act .= $exccatlist;
 
 		return $db->query("select c.ID, concat(cp.title, ' > ',c.title) as title, cp.ID as parentID, c.status from category c inner join category cp on cp.ID = c.parentID " . $act . " ORDER BY c.ID", true);
+	}
+
+	/**
+	 * Parse category search constraints
+	 *
+	 * @param array $cat
+	 *
+	 * @return string $catsrch
+	 */
+	public function getCategorySearch($cat = array())
+	{
+		$catsrch = ' (';
+
+		foreach ($cat as $category) {
+
+			$chlist = '-99';
+
+			if ($category != -1 && $this->isParent($category)) {
+				$children = $this->getChildren($category);
+
+				foreach ($children as $child) {
+					$chlist .= ', ' . $child['id'];
+				}
+			}
+
+			if ($chlist != '-99') {
+				$catsrch .= ' r.categoryID IN (' . $chlist . ') OR ';
+			} else {
+				$catsrch .= sprintf(' r.categoryID = %d OR ', $category);
+			}
+			$catsrch .= '1=2 )';
+		}
+
+		return $catsrch;
 	}
 
 	/**
@@ -208,6 +242,15 @@ class Category
 		$db = new DB();
 
 		return $db->query(sprintf("SELECT concat(cp.title, ' > ',c.title) as title from category c inner join category cp on cp.ID = c.parentID where c.ID in (%s)", implode(',', $ids)));
+	}
+
+	public function getNameByID($ID)
+	{
+		$db = new DB();
+		$parent = $db->queryOneRow(sprintf("SELECT title FROM category WHERE ID = %d", substr($ID, 0, 1) . "000"));
+		$cat = $db->queryOneRow(sprintf("SELECT title FROM category WHERE ID = %d", $ID));
+
+		return $parent["title"] . " " . $cat["title"];
 	}
 
 	/**

@@ -44,6 +44,7 @@
 			{if $user.movieview == "1"}View movie covers{else}View standard movie category{/if}<br/>
 			{if $user.musicview == "1"}View music covers{else}View standard music category{/if}<br/>
 			{if $user.gameview == "1"}View game covers{else}View standard game category{/if}<br/>
+			{if $user.xxxview == "1"}View XXX covers{else}View standard xxx category{/if}<br/>
 			{if $user.consoleview == "1"}View console covers{else}View standard console category{/if}<br/>
 			{if $user.bookview == "1"}View book covers{else}View standard book category{/if}
 		</td>
@@ -59,6 +60,11 @@
 			Storage: {if $sabsetting == ''}N/A{else}{$sabsetting}{/if}
 		</td>
 	{/if}
+	<tr><th>CouchPotato Integration:</th>
+	<td>
+		Url: {if $user.cp_url == ''}N/A{else}{$user.cp_url}{/if}<br/>
+		Key: {if $user.cp_api == ''}N/A{else}{$user.cp_api}{/if}<br/>
+	</td>
 
 	{if ($user.ID==$userdata.ID)}
 	<tr>

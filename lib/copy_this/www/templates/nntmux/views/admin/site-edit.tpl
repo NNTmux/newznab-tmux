@@ -205,6 +205,7 @@
 	<td style="width:160px;"><label for="rottentomatokey">Rotten Tomatoes Key</label>:</td>
 	<td>
 		<input id="rottentomatokey" class="long" name="rottentomatokey" type="text" value="{$fsite->rottentomatokey}" />
+		{html_options style="width:180px;" id="rottentomatoquality" name='rottentomatoquality' values=$rottentomatoquality_ids output=$rottentomatoquality_names selected=$fsite->rottentomatoquality}
 		<div class="hint">The api key used for access to rotten tomatoes</div>
 	</td>
 </tr>
@@ -238,6 +239,13 @@
 		<input id="giantbombkey" class="long" name="giantbombkey" type="text" value="{$fsite->giantbombkey}"/>
 
 		<div class="hint">The giantbomb key. Used for game lookups.</div>
+	</td>
+</tr>
+<tr>
+	<td style="width:180px;"><label for="anidbkey">Anidb API key:</label></td>
+	<td>
+		<input id="anidbkey" class="long" name="anidbkey" type="text" value="{$site->anidbkey}"/>
+		<div class="hint">The Anidb api key. Used for Anime lookups.</div>
 	</td>
 </tr>
 
@@ -565,6 +573,24 @@
 	<td>
 		{html_radios id="lookupgames" name='lookupgames' values=$yesno_ids output=$yesno_names selected=$fsite->lookupgames separator='<br />'}
 		<div class="hint">Whether to attempt to lookup game information from Amazon when processing binaries.</div>
+	</td>
+</tr>
+
+<tr>
+	<td><label for="lookupxxx">Lookup XXX</label>:</td>
+	<td>
+		{html_radios id="lookupxxx" name='lookupxxx' values=$yesno_ids output=$yesno_names selected=$fsite->lookupxxx separator='<br />'}
+		<div class="hint">Whether to attempt to lookup XXX information when processing binaries.</div>
+	</td>
+</tr>
+
+<tr>
+	<td style="width:180px;"><label for="maxxxxprocessed">Maximum xxx per run:</label></td>
+	<td>
+		<input class="short" id="maxxxxprocessed" name="maxxxxprocessed" type="text" value="{$site->maxxxxprocessed}"/>
+		<div class="hint">The maximum amount of XXX to process per run. This does not use an NNTP
+			connection or query Amazon.
+	</div>
 	</td>
 </tr>
 

@@ -7,27 +7,25 @@
 	<table class="rndbtn" border="0" cellpadding="2" cellspacing="0">
 		<tr>
 			<th class="left"><label for="title">Title</label></th>
-			<th class="left"><label for="platform">Platform</label></th>
 			<th class="left"><label for="genre">Genre</label></th>
-			<th class="left"><label for="category">Category</label></th>
+			<th class="left"><label for="year">Year</label></th>
 			<th></th>
 		</tr>
 		<tr>
 			<td><input id="title" type="text" name="title" value="{$title}" size="15"/></td>
-			<td><input id="platform" type="text" name="platform" value="{$platform}" size="15"/></td>
 			<td>
 				<select id="genre" name="genre">
 					<option class="grouping" value=""></option>
 					{foreach from=$genres item=gen}
-						<option {if $gen.id == $genre}selected="selected"{/if} value="{$gen.id}">{$gen.title}</option>
+						<option {if $gen.ID == $genre}selected="selected"{/if} value="{$gen.ID}">{$gen.title}</option>
 					{/foreach}
 				</select>
 			</td>
 			<td>
-				<select id="category" name="t">
-					<option class="grouping" value="1000"></option>
-					{foreach from=$catlist item=ct}
-						<option {if $ct.id==$category}selected="selected"{/if} value="{$ct.id}">{$ct.title}</option>
+				<select id="year" name="year">
+					<option class="grouping" value=""></option>
+					{foreach from=$years item=yr}
+						<option {if $yr==$year}selected="selected"{/if} value="{$yr}">{$yr}</option>
 					{/foreach}
 				</select>
 			</td>
@@ -57,11 +55,6 @@
 				<th>title<br/><a title="Sort Descending" href="{$orderbytitle_desc}"><img
 								src="{$smarty.const.WWW_TOP}/templates/nntmux/images/sorting/arrow_down.gif"
 								alt=""/></a><a title="Sort Ascending" href="{$orderbytitle_asc}"><img
-								src="{$smarty.const.WWW_TOP}/templates/nntmux/images/sorting/arrow_up.gif" alt=""/></a>
-				</th>
-				<th>platform<br/><a title="Sort Descending" href="{$orderbyplatform_desc}"><img
-								src="{$smarty.const.WWW_TOP}/templates/nntmux/images/sorting/arrow_down.gif"
-								alt=""/></a><a title="Sort Ascending" href="{$orderbyplatform_asc}"><img
 								src="{$smarty.const.WWW_TOP}/templates/nntmux/images/sorting/arrow_up.gif" alt=""/></a>
 				</th>
 				<th>genre<br/><a title="Sort Descending" href="{$orderbygenre_desc}"><img
@@ -101,15 +94,16 @@
 					<td class="mid">
 						<div class="movcover">
 							<a class="title" title="View details"
-							   href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"htmlall"}">
-								<img class="shadow"
+							   href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}/{$result.grp_release_name|escape:"htmlall"}">
+							<img class="shadow"
 									 src="{$smarty.const.WWW_TOP}/covers/games/{if $result.cover == 1}{$result.gamesinfo_id}.jpg{else}no-cover.jpg{/if}"
 									 width="120" border="0" alt="{$result.title|escape:"htmlall"}"/>
 							</a>
 
 							<div class="movextra">
-								{if $result.nfoid > 0}<a href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}"
-														 title="View Nfo" class="rndbtn modal_nfo" rel="nfo">
+								{if $result.grp_release_nfoid > 0}<a
+									href="{$smarty.const.WWW_TOP}/nfo/{$result.grp_release_guid}"
+									title="View Nfo" class="rndbtn modal_nfo" rel="nfo">
 										Nfo</a>{/if}
 								<a class="rndbtn" target="_blank" href="{$site->dereferrer_link}{$result.url}"
 								   name="amazon{$result.gamesinfo_id}" title="View amazon page">Amazon</a>
@@ -125,10 +119,10 @@
 							</div>
 						</div>
 					</td>
-					<td colspan="8" class="left" id="guid{$result.guid}">
+					<td colspan="8" class="left" id="guid{$result.grp_release_guid}">
 						<h2><a class="title" title="View details"
-							   href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"htmlall"}">{$result.title|stripslashes|escape:"htmlall"}
-								- {$result.platform|escape:"htmlall"}</a></h2>
+							   href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}/{$result.grp_release_name|escape:"htmlall"}">{$result.title|stripslashes|escape:"htmlall"}</a>
+						</h2>
 						{if $result.genre != ""}<b>Genre:</b>{$result.genre}<br/>{/if}
 						{if $result.esrb != ""}<b>Rating:</b>{$result.esrb}<br/>{/if}
 						{if $result.publisher != ""}<b>Publisher:</b>{$result.publisher}<br/>{/if}

@@ -2,8 +2,8 @@
 require_once(dirname(__FILE__) . "/../bin/config.php");
 require_once(WWW_DIR . "/lib/framework/db.php");
 require_once(WWW_DIR . "/lib/releases.php");
+require_once(WWW_DIR . "/lib/util.php");
 require_once("Enzebe.php");
-require_once("functions.php");
 /**
  * Class NZBGet
  *
@@ -97,7 +97,7 @@ class NZBGet
 		$this->fullURL = $this->verifyURL($this->url);
 		$this->Releases = new Releases();
 		$this->NZB = new Enzebe();
-		$this->functions = new Functions();
+		$this->util = new Utility();
 	}
 
 	/**
@@ -149,7 +149,7 @@ class NZBGet
 	</param>
 </params>
 </methodCall>';
-		$this->functions->getUrl($this->fullURL . 'append', 'post', $header);
+		$this->util->getUrl($this->fullURL . 'append', 'post', $header);
 	}
 
 	/**
@@ -198,7 +198,7 @@ class NZBGet
 	</param>
 </params>
 </methodCall>';
-		$this->functions->getUrl($this->fullURL . 'appendurl', 'post', $header);
+		$this->util->getUrl($this->fullURL . 'appendurl', 'post', $header);
 	}
 
 	/**
@@ -220,7 +220,7 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-		$this->functions->getUrl($this->fullURL . 'pausedownload2', 'post', $header);
+		$this->util->getUrl($this->fullURL . 'pausedownload2', 'post', $header);
 	}
 
 	/**
@@ -242,7 +242,7 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-		$this->functions->getUrl($this->fullURL . 'resumedownload2', 'post', $header);
+		$this->util->getUrl($this->fullURL . 'resumedownload2', 'post', $header);
 	}
 
 	/**
@@ -277,7 +277,7 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-		$this->functions->getUrl($this->fullURL . 'editqueue', 'post', $header);
+		$this->util->getUrl($this->fullURL . 'editqueue', 'post', $header);
 	}
 
 	/**
@@ -312,7 +312,7 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-		$this->functions->getUrl($this->fullURL . 'editqueue', 'post', $header);
+		$this->util->getUrl($this->fullURL . 'editqueue', 'post', $header);
 	}
 
 	/**
@@ -347,7 +347,7 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-		$this->functions->getUrl($this->fullURL . 'editqueue', 'post', $header);
+		$this->util->getUrl($this->fullURL . 'editqueue', 'post', $header);
 	}
 
 	/**
@@ -371,7 +371,7 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-		$this->functions->getUrl($this->fullURL . 'rate', 'post', $header);
+		$this->util->getUrl($this->fullURL . 'rate', 'post', $header);
 	}
 
 	/**
@@ -383,7 +383,7 @@ class NZBGet
 	 */
 	public function getQueue()
 	{
-		$data = $this->functions->getUrl($this->fullURL . 'listgroups');
+		$data = $this->util->getUrl($this->fullURL . 'listgroups');
 		$retVal = false;
 		if ($data) {
 			$xml = simplexml_load_string($data);
@@ -414,7 +414,7 @@ class NZBGet
 	 */
 	public function status()
 	{
-		$data = $this->functions->getUrl($this->fullURL . 'status');
+		$data = $this->util->getUrl($this->fullURL . 'status');
 		$retVal = false;
 		if ($data) {
 			$xml = simplexml_load_string($data);

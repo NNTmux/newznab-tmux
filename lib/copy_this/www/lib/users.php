@@ -1,12 +1,12 @@
 <?php
-require_once(WWW_DIR."/lib/framework/db.php");
-require_once(WWW_DIR."/lib/site.php");
-require_once(WWW_DIR."/lib/releases.php");
-require_once(WWW_DIR."/lib/forum.php");
-require_once(WWW_DIR."/lib/util.php");
-require_once(WWW_DIR."/lib/releasecomments.php");
-require_once(WWW_DIR."/lib/usermovies.php");
-require_once(WWW_DIR."/lib/userseries.php");
+require_once(WWW_DIR . "/lib/framework/db.php");
+require_once(WWW_DIR . "/lib/site.php");
+require_once(WWW_DIR . "/lib/releases.php");
+require_once(WWW_DIR . "/lib/forum.php");
+require_once(WWW_DIR . "/lib/util.php");
+require_once(WWW_DIR . "/lib/releasecomments.php");
+require_once(WWW_DIR . "/lib/usermovies.php");
+require_once(WWW_DIR . "/lib/userseries.php");
 
 class Users
 {
@@ -33,13 +33,14 @@ class Users
 	/**
 	 * Users select queue type.
 	 */
-	const QUEUE_NONE    = 0;
+	const QUEUE_NONE = 0;
 	const QUEUE_SABNZBD = 1;
-	const QUEUE_NZBGET  = 2;
+	const QUEUE_NZBGET = 2;
 
 	public function get()
 	{
 		$db = new DB();
+
 		return $db->query("select * from users");
 	}
 
@@ -66,26 +67,26 @@ class Users
 		$db->exec(sprintf("DELETE from users where ID = %d", $id));
 	}
 
-	public function getRange($start, $num, $orderby, $username='', $email='', $host='', $role='')
+	public function getRange($start, $num, $orderby, $username = '', $email = '', $host = '', $role = '')
 	{
 		$db = new DB();
 
 		if ($start === false)
 			$limit = "";
 		else
-			$limit = " LIMIT ".$start.",".$num;
+			$limit = " LIMIT " . $start . "," . $num;
 
 		$usql = '';
 		if ($username != '')
-			$usql = sprintf(" and users.username like %s ", $db->escapeString("%".$username."%"));
+			$usql = sprintf(" and users.username like %s ", $db->escapeString("%" . $username . "%"));
 
 		$esql = '';
 		if ($email != '')
-			$esql = sprintf(" and users.email like %s ", $db->escapeString("%".$email."%"));
+			$esql = sprintf(" and users.email like %s ", $db->escapeString("%" . $email . "%"));
 
 		$hsql = '';
 		if ($host != '')
-			$hsql = sprintf(" and users.host like %s ", $db->escapeString("%".$host."%"));
+			$hsql = sprintf(" and users.host like %s ", $db->escapeString("%" . $host . "%"));
 
 		$rsql = '';
 		if ($role != '')
@@ -93,43 +94,44 @@ class Users
 
 		$order = $this->getBrowseOrder($orderby);
 
-		return $db->query(sprintf(" SELECT users.*, userroles.name as rolename from users inner join userroles on userroles.ID = users.role where 1=1 %s %s %s %s AND email != 'sharing@nZEDb.com' order by %s %s".$limit, $usql, $esql, $hsql, $rsql, $order[0], $order[1]));
+		return $db->query(sprintf(" SELECT users.*, userroles.name as rolename from users inner join userroles on userroles.ID = users.role where 1=1 %s %s %s %s AND email != 'sharing@nZEDb.com' order by %s %s" . $limit, $usql, $esql, $hsql, $rsql, $order[0], $order[1]));
 	}
 
 	public function getBrowseOrder($orderby)
 	{
 		$order = ($orderby == '') ? 'username_desc' : $orderby;
 		$orderArr = explode("_", $order);
-		switch($orderArr[0]) {
+		switch ($orderArr[0]) {
 			case 'username':
 				$orderfield = 'username';
-			break;
+				break;
 			case 'email':
 				$orderfield = 'email';
-			break;
+				break;
 			case 'host':
 				$orderfield = 'host';
-			break;
+				break;
 			case 'createddate':
 				$orderfield = 'createddate';
-			break;
+				break;
 			case 'lastlogin':
 				$orderfield = 'lastlogin';
-			break;
+				break;
 			case 'apiaccess':
 				$orderfield = 'apiaccess';
-			break;
+				break;
 			case 'grabs':
 				$orderfield = 'grabs';
-			break;
+				break;
 			case 'role':
 				$orderfield = 'role';
-			break;
+				break;
 			default:
 				$orderfield = 'username';
-			break;
+				break;
 		}
 		$ordersort = (isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'desc';
+
 		return array($orderfield, $ordersort);
 	}
 
@@ -137,10 +139,11 @@ class Users
 	{
 		$db = new DB();
 		$res = $db->queryOneRow("select count(ID) as num from users WHERE email != 'sharing@nZEDb.com'");
+
 		return $res["num"];
 	}
 
-	public function add($uname, $pass, $email, $role, $notes, $host, $invites=Users::DEFAULT_INVITES, $invitedby=0)
+	public function add($uname, $pass, $email, $role, $notes, $host, $invites = Users::DEFAULT_INVITES, $invitedby = 0)
 	{
 		$db = new DB();
 
@@ -153,11 +156,13 @@ class Users
 			$invitedby = "null";
 
 		$sql = sprintf("insert into users (username, password, email, role, notes, createddate, host, rsstoken, invites, invitedby, userseed) values (%s, %s, lower(%s), %d, %s, now(), %s, md5(%s), %d, %s, md5(%s))",
-			$db->escapeString($uname), $db->escapeString($this->hashPassword($pass)), $db->escapeString($email), $role, $db->escapeString($notes), $db->escapeString($host), $db->escapeString(uniqid()), $invites, $invitedby, $db->escapeString(uniqid()));
-        return $db->queryInsert($sql);
+			$db->escapeString($uname), $db->escapeString($this->hashPassword($pass)), $db->escapeString($email), $role, $db->escapeString($notes), $db->escapeString($host), $db->escapeString(uniqid()), $invites, $invitedby, $db->escapeString(uniqid())
+		);
+
+		return $db->queryInsert($sql);
 	}
 
-	public function update($id, $uname, $email, $grabs, $role, $notes, $invites, $movieview, $musicview, $gameview, $consoleview, $bookview, $queueType = '', $nzbgetURL = '', $nzbgetUsername = '', $nzbgetPassword = '', $saburl = '', $sabapikey = '', $sabpriority = '', $sabapikeytype = '', $nzbvortexServerUrl = false, $nzbvortexApiKey = false)
+	public function update($id, $uname, $email, $grabs, $role, $notes, $invites, $movieview, $musicview, $gameview, $xxxview, $consoleview, $bookview, $queueType = '', $nzbgetURL = '', $nzbgetUsername = '', $nzbgetPassword = '', $saburl = '', $sabapikey = '', $sabpriority = '', $sabapikeytype = '', $nzbvortexServerUrl, $nzbvortexApiKey = false, $cp_url = false, $cp_api = false)
 	{
 		$db = new DB();
 
@@ -186,11 +191,12 @@ class Users
 		$sql[] = sprintf('email = %s', $db->escapeString($email));
 		$sql[] = sprintf('grabs = %d', $grabs);
 		$sql[] = sprintf('role = %d', $role);
-		$sql[] = sprintf('notes = %s', $db->escapeString(substr($notes,0,255)));
+		$sql[] = sprintf('notes = %s', $db->escapeString(substr($notes, 0, 255)));
 		$sql[] = sprintf('invites = %d', $invites);
 		$sql[] = sprintf('movieview = %d', $movieview);
 		$sql[] = sprintf('musicview = %d', $musicview);
 		$sql[] = sprintf('gameview = %d', $gameview);
+		$sql[] = sprintf('xxxview = %d', $xxxview);
 		$sql[] = sprintf('consoleview = %d', $consoleview);
 		$sql[] = sprintf('bookview = %d', $bookview);
 
@@ -217,9 +223,18 @@ class Users
 		if ($sabapikeytype !== '') {
 			$sql[] = sprintf('sabapikeytype = %d', $sabapikeytype);
 		}
-
-		if ($nzbvortexApiKey !== false)
+		if ($nzbvortexServerUrl !== false) {
+			$sql[] = sprintf("nzbvortex_server_url = '%s'", $nzbvortexServerUrl);
+		}
+		if ($nzbvortexApiKey !== false) {
 			$sql[] = sprintf("nzbvortex_api_key = '%s'", $nzbvortexApiKey);
+		}
+		if ($cp_url !== false) {
+			$sql[] = sprintf('cp_url = %s', $db->escapeString($cp_url));
+		}
+		if ($cp_api !== false) {
+			$sql[] = sprintf('cp_api = %s', $db->escapeString($cp_api));
+		}
 
 		$sql = sprintf("update users set %s where id = %d", implode(', ', $sql), $id);
 		$db->exec($sql);
@@ -231,6 +246,7 @@ class Users
 	{
 		$db = new DB();
 		$db->exec(sprintf("update users set role = %d where id = %d", $role, $uid));
+
 		return Users::SUCCESS;
 	}
 
@@ -238,6 +254,7 @@ class Users
 	{
 		$db = new DB();
 		$db->exec(sprintf("update users SET rolechangedate = '%s' WHERE ID = %d", $date, $uid));
+
 		return Users::SUCCESS;
 	}
 
@@ -249,8 +266,7 @@ class Users
 		$s = $site->get();
 
 		$data = $db->query(sprintf("select ID,email from users WHERE role = %d and rolechangedate < now()", $uprole));
-		foreach ($data as $u)
-		{
+		foreach ($data as $u) {
 			sendEmail($u["email"], $msgsubject, $msgbody, $s->email);
 			$db->exec(sprintf("update users SET role = %d, rolechangedate=null WHERE ID = %d", $downrole, $u["ID"]));
 		}
@@ -261,7 +277,8 @@ class Users
 	public function updateRssKey($uid)
 	{
 		$db = new DB();
-		$db->exec(sprintf("update users set rsstoken = md5(%s) where id = %d",  $db->escapeString(uniqid()), $uid));
+		$db->exec(sprintf("update users set rsstoken = md5(%s) where id = %d", $db->escapeString(uniqid()), $uid));
+
 		return Users::SUCCESS;
 	}
 
@@ -269,6 +286,7 @@ class Users
 	{
 		$db = new DB();
 		$db->exec(sprintf("update users set resetguid = %s where id = %d", $db->escapeString($guid), $id));
+
 		return Users::SUCCESS;
 	}
 
@@ -276,28 +294,32 @@ class Users
 	{
 		$db = new DB();
 		$db->exec(sprintf("update users set password = %s, userseed=md5(%s) where id = %d", $db->escapeString($this->hashPassword($password)), $db->escapeString(generateUuid()), $id));
+
 		return Users::SUCCESS;
 	}
 
 	public function getByEmail($email)
 	{
 		$db = new DB();
+
 		return $db->queryOneRow(sprintf("select * from users where lower(email) = %s ", $db->escapeString(strtolower($email))));
 	}
 
 	public function getByPassResetGuid($guid)
 	{
 		$db = new DB();
+
 		return $db->queryOneRow(sprintf("select * from users where resetguid = %s ", $db->escapeString($guid)));
 	}
 
 	public function getByUsername($uname)
 	{
 		$db = new DB();
+
 		return $db->queryOneRow(sprintf("select users.*, userroles.name as rolename, userroles.apirequests, userroles.downloadrequests from users inner join userroles on userroles.ID = users.role where username = %s ", $db->escapeString($uname)));
 	}
 
-	public function incrementGrabs($id, $num=1)
+	public function incrementGrabs($id, $num = 1)
 	{
 		$db = new DB();
 		$db->exec(sprintf("update users set grabs = grabs + %d where id = %d ", $num, $id));
@@ -307,6 +329,7 @@ class Users
 	{
 		$db = new DB();
 		$sql = sprintf("select users.*, userroles.name as rolename, userroles.hideads, userroles.canpreview, userroles.canpre, userroles.apirequests, userroles.downloadrequests, NOW() as now from users inner join userroles on userroles.ID = users.role where users.id = %d ", $id);
+
 		return $db->queryOneRow($sql);
 	}
 
@@ -314,12 +337,14 @@ class Users
 	{
 		$db = new DB();
 		$res = $this->getById($id);
+
 		return ($res && $res["rsstoken"] == $rsstoken ? $res : null);
 	}
 
 	public function getByRssToken($rsstoken)
 	{
 		$db = new DB();
+
 		return $db->queryOneRow(sprintf("select users.*, userroles.apirequests, userroles.downloadrequests, NOW() as now from users inner join userroles on userroles.ID = users.role where users.rsstoken = %s ", $db->escapeString($rsstoken)));
 	}
 
@@ -340,9 +365,10 @@ class Users
 
 	public function isDisabled($username)
 	{
-	  $db = new DB();
- 		$role = $db->queryOneRow(sprintf("select role as role from users where username = %s ", $db->escapeString($username)));
- 		return ($role["role"] == Users::ROLE_DISABLED);
+		$db = new DB();
+		$role = $db->queryOneRow(sprintf("select role as role from users where username = %s ", $db->escapeString($username)));
+
+		return ($role["role"] == Users::ROLE_DISABLED);
 	}
 
 	public function isValidCaptcha($site, $challenge, $response)
@@ -350,7 +376,7 @@ class Users
 		if ($site->registerrecaptcha != 1)
 			return true;
 
-		require_once(WWW_DIR."/lib/recaptchalib.php");
+		require_once(WWW_DIR . "/lib/recaptchalib.php");
 
 		$resp = recaptcha_check_answer($site->recaptchaprivatekey, $_SERVER["REMOTE_ADDR"], $challenge, $response);
 
@@ -370,7 +396,7 @@ class Users
 	public function generateUsername($email)
 	{
 		//TODO: Make this generate a more friendly username based on the email address.
-		return "u".substr(md5(uniqid()), 0, 7);
+		return "u" . substr(md5(uniqid()), 0, 7);
 	}
 
 	public function generatePassword()
@@ -378,7 +404,7 @@ class Users
 		return substr(md5(uniqid()), 0, 8);
 	}
 
-	public function signup($uname, $pass, $email, $host, $role = Users::ROLE_USER, $notes, $invites=Users::DEFAULT_INVITES, $invitecode="", $forceinvitemode=false, $recaptcha_challenge=false, $recaptcha_response=false, $skip_recaptcha=false)
+	public function signup($uname, $pass, $email, $host, $role = Users::ROLE_USER, $notes, $invites = Users::DEFAULT_INVITES, $invitecode = "", $forceinvitemode = false, $recaptcha_challenge = false, $recaptcha_response = false, $skip_recaptcha = false)
 	{
 		$site = new Sites;
 		$s = $site->get();
@@ -405,8 +431,7 @@ class Users
 			return Users::ERR_SIGNUP_EMAILINUSE;
 
 		// Check Captcha
-		if (!$skip_recaptcha)
-		{
+		if (!$skip_recaptcha) {
 			if (!$this->isValidCaptcha($s, $recaptcha_challenge, $recaptcha_response))
 				return Users::ERR_SIGNUP_BADCAPTCHA;
 		}
@@ -416,8 +441,7 @@ class Users
 		// the invite would still have been used up
 		//
 		$invitedby = 0;
-		if (($s->registerstatus == Sites::REGISTER_STATUS_INVITE) && !$forceinvitemode)
-		{
+		if (($s->registerstatus == Sites::REGISTER_STATUS_INVITE) && !$forceinvitemode) {
 			if ($invitecode == '')
 				return Users::ERR_SIGNUP_BADINVITECODE;
 
@@ -431,10 +455,11 @@ class Users
 
 	function randomKey($amount)
 	{
-		$keyset  = "abcdefghijklmABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+		$keyset = "abcdefghijklmABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 		$randkey = "";
-		for ($i=0; $i<$amount; $i++)
-			$randkey .= substr($keyset, rand(0, strlen($keyset)-1), 1);
+		for ($i = 0; $i < $amount; $i++)
+			$randkey .= substr($keyset, rand(0, strlen($keyset) - 1), 1);
+
 		return $randkey;
 	}
 
@@ -443,18 +468,19 @@ class Users
 		$salt = self::randomKey(self::SALTLEN);
 		$site = new Sites();
 		$s = $site->get();
-		return self::hashSHA1($s->siteseed.$password.$salt.$s->siteseed).$salt;
+
+		return self::hashSHA1($s->siteseed . $password . $salt . $s->siteseed) . $salt;
 	}
 
 	public static function getHostHash($host, $siteseed = "")
 	{
-		if ($siteseed == "")
-		{
+		if ($siteseed == "") {
 			$site = new Sites();
 			$s = $site->get();
 			$siteseed = $s->siteseed;
 		}
-		return self::hashSHA1($siteseed.$host.$siteseed);
+
+		return self::hashSHA1($siteseed . $host . $siteseed);
 	}
 
 	public static function hashSHA1($string)
@@ -467,24 +493,22 @@ class Users
 		$salt = substr($hash, -self::SALTLEN);
 		$site = new Sites();
 		$s = $site->get();
-		return self::hashSHA1($s->siteseed.$password.$salt.$s->siteseed) === substr($hash, 0, self::SHA1LEN);
+
+		return self::hashSHA1($s->siteseed . $password . $salt . $s->siteseed) === substr($hash, 0, self::SHA1LEN);
 	}
 
 	public function isLoggedIn()
 	{
-		if (isset($_SESSION['uid']))
-		{
+		if (isset($_SESSION['uid'])) {
 			return true;
-		}
-		elseif (isset($_COOKIE['uid']) && isset($_COOKIE['idh']))
-		{
+		} elseif (isset($_COOKIE['uid']) && isset($_COOKIE['idh'])) {
 			$u = $this->getById($_COOKIE['uid']);
 
-		 	if (($_COOKIE['idh'] == $this->hashSHA1($u["userseed"].$_COOKIE['uid'])) && ($u["role"] != Users::ROLE_DISABLED) )
-		 	{
+			if (($_COOKIE['idh'] == $this->hashSHA1($u["userseed"] . $_COOKIE['uid'])) && ($u["role"] != Users::ROLE_DISABLED)) {
 				$this->login($_COOKIE['uid'], $_SERVER['REMOTE_ADDR']);
 			}
 		}
+
 		return isset($_SESSION['uid']);
 	}
 
@@ -497,11 +521,11 @@ class Users
 	{
 		session_unset();
 		session_destroy();
-		setcookie('uid', '', (time()-2592000), '/', $_SERVER['SERVER_NAME'], (isset($_SERVER['HTTPS'])? true : false));
-		setcookie('idh', '', (time()-2592000), '/', $_SERVER['SERVER_NAME'], (isset($_SERVER['HTTPS'])? true : false));
+		setcookie('uid', '', (time() - 2592000), '/', $_SERVER['SERVER_NAME'], (isset($_SERVER['HTTPS']) ? true : false));
+		setcookie('idh', '', (time() - 2592000), '/', $_SERVER['SERVER_NAME'], (isset($_SERVER['HTTPS']) ? true : false));
 	}
 
-	public function login($uid, $host="", $remember="")
+	public function login($uid, $host = "", $remember = "")
 	{
 		$_SESSION['uid'] = $uid;
 
@@ -517,7 +541,7 @@ class Users
 			$this->setCookies($uid);
 	}
 
-	public function updateSiteAccessed($uid, $host="")
+	public function updateSiteAccessed($uid, $host = "")
 	{
 		$db = new DB();
 		$hostSql = '';
@@ -536,23 +560,25 @@ class Users
 	public function setCookies($uid)
 	{
 		$u = $this->getById($uid);
-		$idh = $this->hashSHA1($u["userseed"].$uid);
-		setcookie('uid', $uid, (time()+2592000), '/', $_SERVER['SERVER_NAME'], (isset($_SERVER['HTTPS'])? true : false));
-		setcookie('idh', $idh, (time()+2592000), '/', $_SERVER['SERVER_NAME'], (isset($_SERVER['HTTPS'])? true : false));
+		$idh = $this->hashSHA1($u["userseed"] . $uid);
+		setcookie('uid', $uid, (time() + 2592000), '/', $_SERVER['SERVER_NAME'], (isset($_SERVER['HTTPS']) ? true : false));
+		setcookie('idh', $idh, (time() + 2592000), '/', $_SERVER['SERVER_NAME'], (isset($_SERVER['HTTPS']) ? true : false));
 	}
 
 	public function addCart($uid, $releaseid)
 	{
 		$db = new DB();
 		$sql = sprintf("insert into usercart (userID, releaseID, createddate) values (%d, %d, now())", $uid, $releaseid);
+
 		return $db->queryInsert($sql);
 	}
 
-	public function getCart($uid, $releaseid="")
+	public function getCart($uid, $releaseid = "")
 	{
 		$db = new DB();
 		if ($releaseid != "")
 			$releaseid = " and releases.ID = " . $db->escapeString($releaseid);
+
 		return $db->query(sprintf("select usercart.*, releases.searchname,releases.guid from usercart inner join releases on releases.ID = usercart.releaseID where userID = %d %s", $uid, $releaseid));
 	}
 
@@ -563,14 +589,13 @@ class Users
 			return false;
 
 		$del = array();
-		foreach ($guids as $id)
-		{
+		foreach ($guids as $id) {
 			$id = sprintf("%s", $db->escapeString($id));
 			if (!empty($id))
 				$del[] = $id;
 		}
 
-		$sql = sprintf("delete from usercart where userID = %d and releaseID IN (select ID from releases where guid IN (%s)) ", $uid, implode(',',$del));
+		$sql = sprintf("delete from usercart where userID = %d and releaseID IN (select ID from releases where guid IN (%s)) ", $uid, implode(',', $del));
 		$db->query($sql);
 	}
 
@@ -598,10 +623,8 @@ class Users
 	{
 		$db = new DB();
 		$this->delUserCategoryExclusions($uid);
-		if (count($catids) > 0)
-		{
-			foreach ($catids as $catid)
-			{
+		if (count($catids) > 0) {
+			foreach ($catids as $catid) {
 				$db->queryInsert(sprintf("insert into userexcat (userID, categoryID, createddate) values (%d, %d, now())", $uid, $catid));
 			}
 		}
@@ -633,10 +656,8 @@ class Users
 	{
 		$db = new DB();
 		$this->delRoleCategoryExclusions($role);
-		if (count($catids) > 0)
-		{
-			foreach ($catids as $catid)
-			{
+		if (count($catids) > 0) {
+			foreach ($catids as $catid) {
 				$db->queryInsert(sprintf("insert into roleexcat (role, categoryID, createddate) values (%d, %d, now())", $role, $catid));
 			}
 		}
@@ -647,8 +668,7 @@ class Users
 		$data = $this->getCategoryExclusion($uid);
 		$ret = array();
 
-		if ($data)
-		{
+		if ($data) {
 			$db = new DB();
 			$category = new Category();
 			$data = $category->getByIds($data);
@@ -681,9 +701,9 @@ class Users
 	{
 		$sender = $this->getById($uid);
 		$token = $this->hashSHA1(uniqid());
-		$subject = $sitetitle." Invitation";
-		$url = $serverurl."register?invitecode=".$token;
-		$contents = $sender["username"]." has sent an invite to join ".$sitetitle." to this email address. To accept the invitation click the following link.\n\n ".$url;
+		$subject = $sitetitle . " Invitation";
+		$url = $serverurl . "register?invitecode=" . $token;
+		$contents = $sender["username"] . " has sent an invite to join " . $sitetitle . " to this email address. To accept the invitation click the following link.\n\n " . $url;
 
 		sendEmail($emailto, $subject, $contents, $siteemail);
 		$this->addInvite($uid, $token);
@@ -724,27 +744,32 @@ class Users
 		$db = new DB();
 		$db->exec(sprintf("update users set invites = case when invites <= 0 then 0 else invites-1 end where ID = %d ", $invite["userID"]));
 		$this->deleteInvite($invitecode);
+
 		return $invite["userID"];
 	}
 
 	public function getTopGrabbers()
 	{
 		$db = new DB();
+
 		return $db->query("SELECT ID, username, SUM(grabs) as grabs FROM users
 							GROUP BY ID, username
 							HAVING SUM(grabs) > 0
 							ORDER BY grabs DESC
-							LIMIT 10");
+							LIMIT 10"
+		);
 	}
 
 	public function getUsersByMonth()
 	{
 		$db = new DB();
+
 		return $db->query("SELECT DATE_FORMAT(createddate, '%M %Y') AS mth, COUNT(*) AS num
 							FROM users
 							WHERE createddate IS NOT NULL AND createddate != '0000-00-00 00:00:00'
 							GROUP BY DATE_FORMAT(createddate, '%M %Y')
-							ORDER BY createddate DESC");
+							ORDER BY createddate DESC"
+		);
 	}
 
 	public function getUsersByHostHash()
@@ -755,15 +780,13 @@ class Users
 		$s = $site->get();
 		$ipsql = "('-1')";
 
-		if ($s->userhostexclusion != '')
-		{
+		if ($s->userhostexclusion != '') {
 			$ipsql = "";
 			$ips = explode(",", $s->userhostexclusion);
-			foreach ($ips as $ip)
-			{
-				$ipsql.= $db->escapeString($this->getHostHash($ip, $s->siteseed)).",";
+			foreach ($ips as $ip) {
+				$ipsql .= $db->escapeString($this->getHostHash($ip, $s->siteseed)) . ",";
 			}
-			$ipsql = "(".$ipsql." '-1')";
+			$ipsql = "(" . $ipsql . " '-1')";
 		}
 
 		$sql = sprintf("select hosthash, group_concat(userID) as user_string, group_concat(username) as user_names
@@ -776,22 +799,27 @@ class Users
 							group by hosthash
 							having CAST((LENGTH(group_concat(userID)) - LENGTH(REPLACE(group_concat(userID), ',', ''))) / LENGTH(',') AS UNSIGNED) < 9
 							order by CAST((LENGTH(group_concat(userID)) - LENGTH(REPLACE(group_concat(userID), ',', ''))) / LENGTH(',') AS UNSIGNED) desc
-							limit 10", $ipsql, $ipsql);
+							limit 10", $ipsql, $ipsql
+		);
+
 		return $db->query($sql);
 	}
 
 	public function getUsersByRole()
 	{
 		$db = new DB();
+
 		return $db->query("select ur.name, count(u.ID) as num from users u
 							inner join userroles ur on ur.ID = u.role
 							group by ur.name
-							order by count(u.ID) desc;");
+							order by count(u.ID) desc;"
+		);
 	}
 
 	public function getLoginCountsByMonth()
 	{
 		$db = new DB();
+
 		return $db->query("select 'Login' as type,
 			sum(case when lastlogin > curdate() - INTERVAL 1 DAY then 1 else 0 end) as 1day,
 			sum(case when lastlogin > curdate() - INTERVAL 7 DAY and lastlogin < curdate() - INTERVAL 1 DAY then 1 else 0 end) as 7day,
@@ -808,12 +836,14 @@ class Users
 			sum(case when apiaccess > curdate() - INTERVAL 3 MONTH and apiaccess < curdate() - INTERVAL 1 MONTH then 1 else 0 end) as 3month,
 			sum(case when apiaccess > curdate() - INTERVAL 6 MONTH and apiaccess < curdate() - INTERVAL 3 MONTH then 1 else 0 end) as 6month,
 			sum(case when apiaccess < curdate() - INTERVAL 6 MONTH then 1 else 0 end) as 12month
-			from users");
+			from users"
+		);
 	}
 
 	public function getRoles()
 	{
 		$db = new DB();
+
 		return $db->query("select * from userroles");
 	}
 
@@ -821,12 +851,14 @@ class Users
 	{
 		$db = new DB();
 		$sql = sprintf("select * from userroles where ID = %d", $id);
+
 		return $db->queryOneRow($sql);
 	}
 
 	public function getDefaultRole()
 	{
 		$db = new DB();
+
 		return $db->queryOneRow("select * from userroles where isdefault = 1");
 	}
 
@@ -834,6 +866,7 @@ class Users
 	{
 		$db = new DB();
 		$sql = sprintf("insert into userroles (name, apirequests, downloadrequests, defaultinvites, canpreview, canpre, hideads) VALUES (%s, %d, %d, %d, %d, %d)", $db->escapeString($name), $apirequests, $downloadrequests, $defaultinvites, $canpreview, $canpre, $hideads);
+
 		return $db->queryInsert($sql);
 	}
 
@@ -850,15 +883,15 @@ class Users
 	{
 		$db = new DB();
 		$res = $db->query(sprintf("select ID from users where role = %d", $id));
-		if (sizeof($res) > 0)
-		{
+		if (sizeof($res) > 0) {
 			$userids = array();
-			foreach($res as $user)
+			foreach ($res as $user)
 				$userids[] = $user['ID'];
 
 			$defaultrole = $this->getDefaultRole();
 			$db->exec(sprintf("update users set role=%d where ID IN (%s)", $defaultrole['ID'], implode(',', $userids)));
 		}
+
 		return $db->exec(sprintf("DELETE from userroles WHERE ID=%d", $id));
 	}
 
@@ -867,9 +900,10 @@ class Users
 		$db = new DB();
 		//clear old requests
 		//$db->exec(sprintf("DELETE FROM userrequests WHERE (userID = %d AND timestamp < DATE_SUB(NOW(), INTERVAL 1 DAY))", $userid));
-        $db->exec(sprintf("DELETE FROM userrequests WHERE timestamp < DATE_SUB(NOW(), INTERVAL 1 DAY)", $userid));
+		$db->exec(sprintf("DELETE FROM userrequests WHERE timestamp < DATE_SUB(NOW(), INTERVAL 1 DAY)", $userid));
 
 		$sql = sprintf("select COUNT(ID) as num, TIME_TO_SEC(TIMEDIFF(DATE_ADD(MIN(TIMESTAMP), INTERVAL 1 DAY), NOW())) AS nextrequest FROM userrequests WHERE userID = %d AND timestamp > DATE_SUB(NOW(), INTERVAL 1 DAY)", $userid);
+
 		return $db->queryOneRow($sql);
 	}
 
@@ -879,12 +913,14 @@ class Users
 		$hosthash = ($hosthash != "" ? $db->escapeString($hosthash) : "null");
 
 		$sql = sprintf("insert into userrequests (userID, request, timestamp, hosthash) VALUES (%d, %s, now(), %s)", $userid, $db->escapeString($request), $hosthash);
+
 		return $db->queryInsert($sql);
 	}
 
 	public function delApiRequests($userid)
 	{
 		$db = new DB();
+
 		return $db->queryInsert(sprintf("delete from userrequests where userID = %d", $userid));
 	}
 
@@ -897,8 +933,7 @@ class Users
 	public function pruneRequestHistory($days = 0)
 	{
 		$db = new DB();
-		if ($days == 0)
-		{
+		if ($days == 0) {
 			$days = 1;
 			$db->exec("update userdownloads set releaseID = null");
 		}
@@ -911,20 +946,16 @@ class Users
 	{
 		$db = new DB();
 
-		if ($hosthash != "" && $site->userhostexclusion != '')
-		{
+		if ($hosthash != "" && $site->userhostexclusion != '') {
 			$ipsql = "";
 			$ips = explode(",", $site->userhostexclusion);
-			foreach ($ips as $ip)
-			{
-				$ipsql.= $db->escapeString($this->getHostHash($ip, $site->siteseed)).",";
+			foreach ($ips as $ip) {
+				$ipsql .= $db->escapeString($this->getHostHash($ip, $site->siteseed)) . ",";
 			}
-			$ipsql = "(".$ipsql." '-1')";
+			$ipsql = "(" . $ipsql . " '-1')";
 
 			$sql = sprintf("select COUNT(ID) as num, TIME_TO_SEC(TIMEDIFF(DATE_ADD(MIN(TIMESTAMP), INTERVAL 1 DAY), NOW())) AS nextdl FROM userdownloads WHERE hosthash = %s AND timestamp > DATE_SUB(NOW(), INTERVAL 1 DAY) and hosthash not in %s", $db->escapeString($hosthash), $ipsql);
-		}
-		else
-		{
+		} else {
 			$sql = sprintf("select COUNT(ID) as num, TIME_TO_SEC(TIMEDIFF(DATE_ADD(MIN(TIMESTAMP), INTERVAL 1 DAY), NOW())) AS nextdl FROM userdownloads WHERE userID = %d AND timestamp > DATE_SUB(NOW(), INTERVAL 1 DAY)", $userid);
 		}
 
@@ -939,11 +970,12 @@ class Users
 		$rows = $db->query($sql);
 		$hashsql = "";
 		foreach ($rows as $row)
-			$hashsql.= sprintf("userdownloads.hosthash = %s or ", $db->escapeString($row["hosthash"]));
+			$hashsql .= sprintf("userdownloads.hosthash = %s or ", $db->escapeString($row["hosthash"]));
 
 		$hashsql .= " 1=2 ";
 
 		$sql = sprintf("select userdownloads.*, releases.guid, releases.searchname from userdownloads left outer join releases on releases.ID = userdownloads.releaseID where userdownloads.userID = %d or %s order by userdownloads.timestamp desc", $userid, $hashsql);
+
 		return $db->query($sql);
 	}
 
@@ -953,18 +985,21 @@ class Users
 		$hosthash = ($hosthash != "" ? $db->escapeString($hosthash) : "null");
 
 		$sql = sprintf("insert into userdownloads (userID, timestamp, hosthash, releaseID) VALUES (%d, now(), %s, (select ID from releases where guid = %s))", $userid, $hosthash, $db->escapeString($relGuid));
+
 		return $db->queryInsert($sql);
 	}
 
 	public function delDownloadRequests($userid)
 	{
 		$db = new DB();
+
 		return $db->queryInsert(sprintf("delete from userdownloads where userID = %d", $userid));
 	}
 
 	public function delDownloadRequestsForRelease($releaseID)
 	{
 		$db = new DB();
+
 		return $db->queryInsert(sprintf("delete from userdownloads where releaseID = %d", $releaseID));
 	}
 }

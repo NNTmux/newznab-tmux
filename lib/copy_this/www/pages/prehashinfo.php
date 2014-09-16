@@ -184,7 +184,7 @@ if (isset($_GET['type'])) {
 						$newer,
 						$older,
 						$nuked,
-						$functions->likeString(urldecode($_GET['title'])),
+						$db->likeString(urldecode($_GET['title'])),
 						$limit,
 						$offset
 					)
