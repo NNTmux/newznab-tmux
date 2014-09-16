@@ -139,7 +139,7 @@ class ReleaseRemover
 	 */
 	public function __construct($browser = false, $echo = true)
 	{
-		$this->db = new Settings();
+		$this->db = new DB();
 		$this->color = new ColorCLI();
 		$this->consoleTools = new ConsoleTools();
 		$this->releases = new Releases();

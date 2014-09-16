@@ -93,7 +93,7 @@ abstract class NNScripts
         $this->site = $site->get();
 
         // Initiate the database connection
-        $this->db = new Settings();
+        $this->db = new DB();
 
         // Read the settings from the ini file
         $this->readSettings();

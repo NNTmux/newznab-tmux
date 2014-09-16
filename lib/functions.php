@@ -36,7 +36,7 @@ class Functions
 		$this->p = new Postprocess();
 		$this->echooutput = $echooutput;
 		$this->c = new ColorCLI();
-		$this->db = new Settings();
+		$this->db = new DB();
 		$this->groups = new Groups();
 		$this->m = new Movie();
 		$this->consoleTools = new ConsoleTools();

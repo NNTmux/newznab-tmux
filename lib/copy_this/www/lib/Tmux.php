@@ -6,7 +6,7 @@ class Tmux
 {
 	function __construct()
 	{
-		$this->db = new Settings();
+		$this->db = new DB();
 	}
 
 	public function version()

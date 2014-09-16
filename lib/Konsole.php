@@ -30,7 +30,7 @@ class Konsole
 		$this->asstag = $site->amazonassociatetag;
 		$this->gameqty = (!empty($tmux->maxgamesprocessed)) ? $tmux->maxgamesprocessed : 150;
 		$this->sleeptime = (!empty($tmux->amazonsleep)) ? $tmux->amazonsleep : 1000;
-		$this->db = new Settings();
+		$this->db = new DB();
 		$this->imgSavePath = WWW_DIR . 'covers/console/';
 		$this->renamed = '';
 		$this->c = new ColorCLI();
