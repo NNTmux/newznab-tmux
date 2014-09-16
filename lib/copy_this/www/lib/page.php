@@ -10,12 +10,12 @@ require_once(WWW_DIR."/lib/menu.php");
  * This class represents every normal user page in the site.
  */
 class Page extends BasePage
-{    	
+{
 	/**
 	 * Default constructor.
 	 */
 	function Page()
-	{	
+	{
 		parent::BasePage();
 
 		$role=Users::ROLE_GUEST;
@@ -30,10 +30,10 @@ class Page extends BasePage
 		$this->smarty->assign('articlecontentlist',$content->getForMenuByTypeAndRole(Contents::TYPEARTICLE, $role));
 		if ($this->userdata != null)
 			$this->smarty->assign('recentforumpostslist',$f->getRecentPosts($this->site->showrecentforumposts));
-		
-		$this->smarty->assign('main_menu',$this->smarty->fetch('mainmenu.tpl'));		
-		$this->smarty->assign('useful_menu',$this->smarty->fetch('usefullinksmenu.tpl'));		
-		$this->smarty->assign('article_menu',$this->smarty->fetch('articlesmenu.tpl'));	
+
+		$this->smarty->assign('main_menu',$this->smarty->fetch('mainmenu.tpl'));
+		$this->smarty->assign('useful_menu',$this->smarty->fetch('usefullinksmenu.tpl'));
+		$this->smarty->assign('article_menu',$this->smarty->fetch('articlesmenu.tpl'));
 		$this->smarty->assign('recentposts_menu',$this->smarty->fetch('recentforumposts.tpl'));
 
 		$category = new Category();
@@ -47,21 +47,21 @@ class Page extends BasePage
 		if ($this->page == 'search' && isset($_REQUEST["id"]))
 			$searchStr = (string) $_REQUEST["id"];
 		$this->smarty->assign('header_menu_search',$searchStr);
-		
+
 		if (isset($_REQUEST["t"]))
 			$this->smarty->assign('header_menu_cat',$_REQUEST["t"]);
 		$header_menu = $this->smarty->fetch('headermenu.tpl');
 		$this->smarty->assign('header_menu',$header_menu);
-	}	
-	
+	}
+
 	/**
 	 * Output the page.
 	 */
-	public function render() 
+	public function render()
 	{
 		$this->smarty->assign('page',$this);
-		$this->page_template = "basepage.tpl";				
-		
+		$this->page_template = "basepage.tpl";
+
 		parent::render();
 	}
 }
