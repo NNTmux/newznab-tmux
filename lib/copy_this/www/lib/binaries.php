@@ -245,7 +245,7 @@ class Binaries
 		} else
 			$msgs = $nntp->getOverview($first . "-" . $last, true, false);
 
-		if (NNTP::isError($msgs) && ($msgs->code == 400 || $msgs->code == 503)) {
+		if ($this->isError($msgs) && ($msgs->code == 400 || $msgs->code == 503)) {
 			echo "NNTP connection timed out. Reconnecting...$n";
 			if (!$nntp->doConnect()) {
 				// TODO: What now?
@@ -272,7 +272,7 @@ class Binaries
 
 		$timeHeaders = number_format(microtime(true) - $this->startHeaders, 2);
 
-		if (NNTP::isError($msgs)) {
+		if ($this->isError($msgs)) {
 			echo "Error {$msgs->code}: {$msgs->message}$n";
 			echo "Skipping group$n";
 

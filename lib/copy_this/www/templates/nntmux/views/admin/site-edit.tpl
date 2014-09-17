@@ -823,6 +823,456 @@
 </fieldset>
 
 <fieldset>
+	<legend>TraktTV API Key</legend>
+	<table class="input">
+		<tr>
+			<td style="width:180px;"><label for="trakttvkey">Trakt.tv API key:</label></td>
+			<td>
+				<input id="trakttvkey" class="long" name="trakttvkey" type="text" value="{$fsite->trakttvkey}"/>
+
+				<div class="hint">The trakt.tv api key. Used for movie and tv lookups.</div>
+			</td>
+		</tr>
+	</table>
+</fieldset>
+
+<fieldset>
+	<legend>Fanart.tv API Key</legend>
+	<table class="input">
+		<tr>
+			<td style="width:180px;"><label for="fanarttvkey">Fanart.tv API key:</label></td>
+			<td>
+				<input id="fanarttvkey" class="long" name="fanarttvkey" type="text" value="{$fsite->fanarttvkey}"/>
+
+				<div class="hint">The Fanart.tv api key. Used for Fanart.tv lookups. Fanart.tv would appreciate it if
+					you use this service to help them out by adding high quality images not already available on TMDB.
+				</div>
+			</td>
+		</tr>
+	</table>
+</fieldset>
+
+<fieldset>
+	<legend>IMDB.com URL</legend>
+	<table class="input">
+		<tr>
+			<td style="width:180px;"><label for="imdburl">IMDB.com:</label></td>
+			<td>
+				{html_options style="width:180px;" class="imdburl" id="imdburl" name='imdburl' values=$imdb_urls output=$imdburl_names selected=$fsite->imdburl}
+				<div class="hint">Akas.imdb.com returns titles in their original title, imdb.com returns titles based on
+					your IP address (if you are in france, you will get french titles).
+				</div>
+			</td>
+		</tr>
+	</table>
+</fieldset>
+
+<fieldset>
+	<legend>Usenet Settings</legend>
+	<table class="input">
+
+		<tr>
+			<td style="width:180px;"><label for="maxsizetopostprocess">Maximum File Size to Postprocess:</label></td>
+			<td>
+				<input class="short" id="maxsizetopostprocess" name="maxsizetopostprocess" type="text"
+					   value="{$fsite->maxsizetopostprocess}"/>
+
+				<div class="hint">The maximum size in gigabytes to postprocess a release. If set to 0, then ignored.
+				</div>
+			</td>
+		</tr>
+
+		<tr>
+			<td style="width:180px;"><label for="lookuppar2">Lookup PAR2:</label></td>
+			<td>
+				{html_radios id="lookuppar2" name='lookuppar2' values=$yesno_ids output=$yesno_names selected=$fsite->lookuppar2 separator='<br />'}
+				<div class="hint">Whether to attempt to find a better name for releases in misc->other using the PAR2
+					file.<br/><strong>NOTE: this can be slow depending on the group!</strong></div>
+			</td>
+		</tr>
+
+		<tr>
+			<td style="width:180px;"><label for="addpar2">Add PAR2 contents to file contents:</label></td>
+			<td>
+				{html_radios id="addpar2" name='addpar2' values=$yesno_ids output=$yesno_names selected=$fsite->addpar2 separator='<br />'}
+				<div class="hint">When going through PAR2 files, add them to the RAR file content list of the NZB.</div>
+			</td>
+		</tr>
+	</table>
+</fieldset>
+
+<fieldset>
+	<legend>Advanced Settings - For advanced users</legend>
+	<table class="input">
+		<tr>
+			<td style="width:180px;"><label for="maxnzbsprocessed">Maximum NZBs processed:</label></td>
+			<td>
+				<input class="short" id="maxnzbsprocessed" name="maxnzbsprocessed" type="text"
+					   value="{$fsite->maxnzbsprocessed}"/>
+
+				<div class="hint">The maximum amount of NZB files to create in update_releases.</div>
+			</td>
+		</tr>
+
+		<tr>
+			<td style="width:180px;"><label for="maxpartrepair">Maximum repair per run:</label></td>
+			<td>
+				<input class="short" id="maxpartrepair" name="maxpartrepair" type="text"
+					   value="{$fsite->maxpartrepair}"/>
+
+				<div class="hint">The maximum amount of articles to attempt to repair at a time. If you notice that you
+					are getting a lot of parts into the partrepair table, it is possible that you USP is not keeping up
+					with the requests. Try to reduce the threads to safe scripts, stop using safe scripts or stop using
+					nntpproxy until improves. Ar least until the cause can be determined.
+				</div>
+			</td>
+		</tr>
+
+		<tr>
+			<td style="width:180px;"><label for="partrepair">Part Repair:</label></td>
+			<td>
+				{html_radios id="partrepair" name='partrepair' values=$yesno_ids output=$yesno_names selected=$fsite->partrepair separator='<br />'}
+				<div class="hint">Whether to attempt to repair parts or not, increases backfill/binaries updating
+					time.
+				</div>
+			</td>
+		</tr>
+
+		<tr>
+			<td style="width:180px;"><label for="zippath">7za Path:</label></td>
+			<td>
+				<input id="zippath" class="long" name="zippath" type="text" value="{$fsite->zippath}"/>
+
+				<div class="hint">The path to the 7za/p7zip in Ubuntu 13.10 (7zip command line in windows) binary, used
+					for grabbing nfos from compressed zip files.
+					<br/>Use forward slashes in windows <span style="font-family:courier;">c:/path/to/7z.exe</span>
+				</div>
+			</td>
+		</tr>
+
+		<tr>
+			<td style="width:180px;"><label for="yydecoderpath">yEnc Type:</label></td>
+			<td>
+				<input id="yydecoderpath" class="long" name="yydecoderpath" type="text"
+					   value="{$fsite->yydecoderpath}"/>
+
+				<div class="hint">
+					Leaving this empty will use PHP to decode yEnc, which is slow.
+					<br/>Putting the path to yydecode will use yydecode, which is faster than PHP. <a
+							style="color:#0082E1"
+							href="http://sourceforge.net/projects/yydecode/files/yydecode/0.2.10/">Download yydecode
+						on sourceforce.</a>
+					<br/>Putting in <strong style="color:#ac2925">simple_php_yenc_decode</strong> will use that
+					extension which is even faster <strong>(you must have the extension)</strong>. <a
+							style="color:#0082E1" href="https://github.com/kevinlekiller/simple_php_yenc_decode">View
+						simple_php_yenc_decode on github.</a>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td style="width:180px;"><label for="processjpg">Process JPG:</label></td>
+			<td>
+				{html_radios id="processjpg" name='processjpg' values=$yesno_ids output=$yesno_names selected=$fsite->processjpg separator='<br />'}
+				<div class="hint">Whether to attempt to retrieve a JPG file while additional post processing, these are
+					usually on XXX releases.<br/></div>
+			</td>
+		</tr>
+
+		<tr>
+			<td style="width:180px;"><label for="processvideos">Process Video Samples:</label></td>
+			<td>
+				{html_radios id="processvideos" name='processvideos' values=$yesno_ids output=$yesno_names selected=$fsite->processvideos separator='<br />'}
+				<div class="hint">Whether to attempt to process a video sample, these videos are very short 1-3 seconds,
+					100KB on average, in ogv format. You must have ffmpeg for this.<br/></div>
+			</td>
+		</tr>
+
+		<tr>
+			<td style="width:180px;"><label for="segmentstodownload">Number of Segments to download for video/jpg
+					samples:</label></td>
+			<td>
+				<input class="short" id="segmentstodownload" name="segmentstodownload" type="text"
+					   value="{$fsite->segmentstodownload}"/>
+
+				<div class="hint">The maximum number of segments to download to generate the sample video file or jpg
+					sample image. (Default 2)
+				</div>
+			</td>
+		</tr>
+
+		<tr>
+			<td style="width:180px;"><label for="ffmpeg_duration">Video sample file duration for ffmpeg:</label></td>
+			<td>
+				<input class="short" id="ffmpeg_duration" name="ffmpeg_duration" type="text"
+					   value="{$fsite->ffmpeg_duration}"/>
+
+				<div class="hint">The maximum duration (In Seconds) for ffmpeg to generate the sample for. (Default 5)
+				</div>
+			</td>
+		</tr>
+
+		<tr>
+			<td style="width:180px;"><label for="debuginfo">Debug information:</label></td>
+			<td>
+				{html_radios id="debuginfo" name='debuginfo' values=$yesno_ids output=$yesno_names selected=$fsite->debuginfo separator='<br />'}
+				<div class="hint">For developers. Whether to echo debug information in some scripts.</div>
+			</td>
+		</tr>
+	</table>
+</fieldset>
+
+<fieldset>
+	<legend>Advanced - Postprocessing Settings</legend>
+	<table class="input">
+		<tr>
+			<td style="width:180px;"><label for="maxaddprocessed">Maximum add PP per run:</label></td>
+			<td>
+				<input class="short" id="maxaddprocessed" name="maxaddprocessed" type="text"
+					   value="{$fsite->maxaddprocessed}"/>
+
+				<div class="hint">The maximum amount of releases to process for passwords/previews/mediainfo per run.
+					Every release gets processed here. This uses NNTP an connection, 1 per thread. This does not query
+					Amazon.
+				</div>
+			</td>
+		</tr>
+
+		<tr>
+			<td style="width:180px;"><label for="maxpartsprocessed">Maximum add PP parts downloaded:</label></td>
+			<td>
+				<input class="short" id="maxpartsprocessed" name="maxpartsprocessed" type="text"
+					   value="{$fsite->maxpartsprocessed}"/>
+
+				<div class="hint">If a part fails to download while post processing, this will retry up to the amount
+					you set, then give up.
+				</div>
+			</td>
+		</tr>
+
+		<tr>
+			<td style="width:180px;"><label for="passchkattempts">Maximum add PP parts checked:</label></td>
+			<td>
+				<input class="short" id="passchkattempts" name="passchkattempts" type="text"
+					   value="{$fsite->passchkattempts}"/>
+
+				<div class="hint">This overrides the above setting if set above 1. How many parts to check for a
+					password before giving up. This slows down post processing massively, better to leave it 1.
+				</div>
+			</td>
+		</tr>
+
+		<tr>
+			<td style="width:180px;"><label for="maxnfoprocessed">Maximum NFO files per run:</label></td>
+			<td>
+				<input class="short" id="maxnfoprocessed" name="maxnfoprocessed" type="text"
+					   value="{$fsite->maxnfoprocessed}"/>
+
+				<div class="hint">The maximum amount of NFO files to process per run. This uses NNTP an connection, 1
+					per thread. This does not query Amazon.
+				</div>
+			</td>
+		</tr>
+
+		<tr>
+			<td style="width:180px;"><label for="maxrageprocessed">Maximum TVRage per run:</label></td>
+			<td>
+				<input class="short" id="maxrageprocessed" name="maxrageprocessed" type="text"
+					   value="{$fsite->maxrageprocessed}"/>
+
+				<div class="hint">The maximum amount of TV shows to process with TVRage per run. This does not use an
+					NNTP connection or query Amazon.
+				</div>
+			</td>
+		</tr>
+
+		<tr>
+			<td style="width:180px;"><label for="maximdbprocessed">Maximum movies per run:</label></td>
+			<td>
+				<input class="short" id="maximdbprocessed" name="maximdbprocessed" type="text"
+					   value="{$fsite->maximdbprocessed}"/>
+
+				<div class="hint">The maximum amount of movies to process with IMDB per run. This does not use an NNTP
+					connection or query Amazon.
+				</div>
+			</td>
+		</tr>
+
+		<tr>
+			<td style="width:180px;"><label for="maxanidbprocessed">Maximum anidb per run:</label></td>
+			<td>
+				<input class="short" id="maxanidbprocessed" name="maxanidbprocessed" type="text"
+					   value="{$fsite->maxanidbprocessed}"/>
+
+				<div class="hint">The maximum amount of anime to process with anidb per run. This does not use an NNTP
+					connection or query Amazon.
+				</div>
+			</td>
+		</tr>
+
+		<tr>
+			<td style="width:180px;"><label for="maxmusicprocessed">Maximum music per run:</label></td>
+			<td>
+				<input class="short" id="maxmusicprocessed" name="maxmusicprocessed" type="text"
+					   value="{$fsite->maxmusicprocessed}"/>
+
+				<div class="hint">The maximum amount of music to process with amazon per run. This does not use an NNTP
+					connection.
+				</div>
+			</td>
+		</tr>
+
+		<tr>
+			<td style="width:180px;"><label for="maxgamesprocessed">Maximum games per run:</label></td>
+			<td>
+				<input class="short" id="maxgamesprocessed" name="maxgamesprocessed" type="text"
+					   value="{$fsite->maxgamesprocessed}"/>
+
+				<div class="hint">The maximum amount of games to process with amazon per run. This does not use an NNTP
+					connection.
+				</div>
+			</td>
+		</tr>
+
+		<tr>
+			<td style="width:180px;"><label for="maxbooksprocessed">Maximum books per run:</label></td>
+			<td>
+				<input class="short" id="maxbooksprocessed" name="maxbooksprocessed" type="text"
+					   value="{$fsite->maxbooksprocessed}"/>
+
+				<div class="hint">The maximum amount of books to process with amazon per run. This does not use an NNTP
+					connection
+				</div>
+			</td>
+		</tr>
+
+		<tr>
+			<td style="width:180px;"><label for="fixnamesperrun">fixReleaseNames per Run:</label></td>
+			<td>
+				<input class="short" id="fixnamesperrun" name="fixnamesperrun" type="text"
+					   value="{$fsite->fixnamesperrun}"/>
+
+				<div class="hint">The maximum number of releases to check per run(threaded script only).</div>
+			</td>
+		</tr>
+
+		<tr>
+			<td style="width:180px;"><label for="amazonsleep">Amazon sleep time:</label></td>
+			<td>
+				<input class="short" id="amazonsleep" name="amazonsleep" type="text" value="{$fsite->amazonsleep}"/>
+
+				<div class="hint">Sleep time in milliseconds to wait in between amazon requests. If you thread
+					post-proc, multiply by the number of threads. ie Postprocessing Threads = 12, Amazon sleep time =
+					12000<br/><a href="https://affiliate-program.amazon.com/gp/advertising/api/detail/faq.html">https://affiliate-program.amazon.com/gp/advertising/api/detail/faq.html</a>
+				</div>
+			</td>
+		</tr>
+
+	</table>
+</fieldset>
+
+<fieldset>
+	<legend>Connection Settings</legend>
+	<table class="input">
+
+		<tr>
+			<td style="width:180px;"><label for="nntpretries">NNTP Retry Attempts:</label></td>
+			<td>
+				<input class="short" id="nntpretries" name="nntpretries" type="text" value="{$fsite->nntpretries}"/>
+
+				<div class="hint">The maximum number of retry attmpts to connect to nntp provider. On error, each retry
+					takes approximately 5 seconds nntp returns reply. (Default 10)
+				</div>
+			</td>
+		</tr>
+	</table>
+</fieldset>
+
+<fieldset>
+	<legend>Advanced - Threaded Settings</legend>
+	<table class="input">
+		<tr>
+			<td style="width:180px;"><label for="binarythreads">Update Binaries Threads:</label></td>
+			<td>
+				<input class="short" id="binarythreads" name="binarythreads" type="text"
+					   value="{$fsite->binarythreads}"/>
+
+				<div class="hint">The number of threads for update_binaries. If you notice that you are getting a lot of
+					parts into the partrepair table, it is possible that you USP is not keeping up with the requests.
+					Try to reduce the threads. At least until the cause can be determined.
+				</div>
+			</td>
+		</tr>
+
+		<tr>
+			<td style="width:180px;"><label for="backfillthreads">Backfill Threads:</label></td>
+			<td>
+				<input class="short" id="backfillthreads" name="backfillthreads" type="text"
+					   value="{$fsite->backfillthreads}"/>
+
+				<div class="hint">The number of threads for backfill.</div>
+			</td>
+		</tr>
+
+		<tr>
+			<td style="width:180px;"><label for="releasesthreads">Update Releases Threads:</label></td>
+			<td>
+				<input class="short" id="releasethreads" name="releasethreads" type="text"
+					   value="{$fsite->releasethreads}"/>
+
+				<div class="hint">The number of threads for update_releases. This actualy makes no difference, newznab
+					update_releases is not threaded.
+				</div>
+			</td>
+		</tr>
+
+		<tr>
+			<td style="width:180px;"><label for="nzbthreads">Import-nzb Threads:</label></td>
+			<td>
+				<input class="short" id="nzbthreads" name="nzbthreads" type="text" value="{$fsite->nzbthreads}"/>
+
+				<div class="hint">The number of threads for import-nzb(bulk). This will thread each subfolder.</div>
+			</td>
+		</tr>
+
+		<tr>
+			<td style="width:180px;"><label for="postthreads">Postprocessing Additional Threads:</label></td>
+			<td>
+				<input class="short" id="postthreads" name="postthreads" type="text" value="{$fsite->postthreads}"/>
+
+				<div class="hint">The number of threads for additional postprocessing. This includes deep rar
+					inspection, preview and sample creation and nfo processing.
+				</div>
+			</td>
+		</tr>
+
+		<tr>
+			<td style="width:180px;"><label for="postthreadsnon">Postprocessing Non-Amazon Threads:</label></td>
+			<td>
+				<input class="short" id="postthreadsnon" name="postthreadsnon" type="text"
+					   value="{$fsite->postthreadsnon}"/>
+
+				<div class="hint">The number of threads for non-amazon postprocessing. This includes movies, anime and
+					tv lookups.
+				</div>
+			</td>
+		</tr>
+
+		<tr>
+			<td style="width:180px;"><label for="fixnamethreads">fixReleaseNames Threads:</label></td>
+			<td>
+				<input class="short" id="fixnamethreads" name="fixnamethreads" type="text"
+					   value="{$fsite->fixnamethreads}"/>
+
+				<div class="hint">The number of threads for fixReleasesNames. This includes md5, nfos, par2 and
+					filenames.
+				</div>
+			</td>
+		</tr>
+
+	</table>
+</fieldset>
+
+<fieldset>
 <legend>Sphinx Settings</legend>
 <table class="input">
     <tr>
