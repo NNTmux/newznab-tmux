@@ -67,12 +67,14 @@ class XXX
 			'Settings'     => null,
 		];
 		$options += $defaults;
+		$s = new Sites();
+		$this->site = $s->get();
 
 		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 		$this->releaseImage = ($options['ReleaseImage'] instanceof \ReleaseImage ? $options['ReleaseImage'] : new \ReleaseImage($this->pdo));
 
-		$this->movieqty = ($this->site->('maxxxxprocessed') != '') ? $this->site->('maxxxxprocessed') : 100;
-		$this->showPasswords = ($this->site->('showpasswordedrelease') != '') ? $this->site->('showpasswordedrelease') : 0;
+		$this->movieqty = ($this->site->maxxxxprocessed != '') ? $this->site->maxxxxprocessed : 100;
+		$this->showPasswords = ($this->site->showpasswordedrelease != '') ? $this->site->showpasswordedrelease : 0;
 		$this->debug = NN_DEBUG;
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
 		$this->imgSavePath = NN_COVERS . 'xxx' . DS;
