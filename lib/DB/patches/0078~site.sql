@@ -12,6 +12,7 @@ INSERT INTO `site` (`setting`, `value`) VALUES
 ('maxpartrepair', '15000'),
 ('partrepair', '1'),
 ('binarythreads', '1'),
+  ('backfillthreads', '1'),
 ('postthreads', '1'),
 ('releasethreads', '1'),
 ('nzbthreads', '1'),

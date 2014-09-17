@@ -233,6 +233,24 @@
 		<div class="hint">The amazon associate tag. Used for cover lookups.</div>
 	</td>
 </tr>
+	<tr>
+		<td style="width:180px;"><label for="trakttvkey">Trakt.tv API key:</label></td>
+		<td>
+			<input id="trakttvkey" class="long" name="trakttvkey" type="text" value="{$fsite->trakttvkey}"/>
+			<div class="hint">The trakt.tv api key. Used for movie and tv lookups.</div>
+		</td>
+	</tr>
+	<tr>
+		<td style="width:180px;"><label for="fanarttvkey">Fanart.tv API key:</label></td>
+		<td>
+			<input id="fanarttvkey" class="long" name="fanarttvkey" type="text" value="{$fsite->fanarttvkey}"/>
+
+			<div class="hint">The Fanart.tv api key. Used for Fanart.tv lookups. Fanart.tv would appreciate it if
+				you use this service to help them out by adding high quality images not already available on TMDB.
+			</div>
+		</td>
+	</tr>
+
 <tr>
 	<td style="width:180px;"><label for="giantbombkey">Giant Bomb API Key:</label></td>
 	<td>
@@ -299,6 +317,18 @@
 		<br/>Use forward slashes in windows <span style="font-family:courier;">c:/path/to/lame.exe</span></div>
 	</td>
 </tr>
+
+	<tr>
+		<td style="width:180px;"><label for="zippath">7za Path:</label></td>
+		<td>
+			<input id="zippath" class="long" name="zippath" type="text" value="{$fsite->zippath}"/>
+
+			<div class="hint">The path to the 7za/p7zip in Ubuntu 13.10 (7zip command line in windows) binary, used
+				for grabbing nfos from compressed zip files.
+				<br/>Use forward slashes in windows <span style="font-family:courier;">c:/path/to/7z.exe</span>
+			</div>
+		</td>
+	</tr>
 
 </table>
 </fieldset>
@@ -837,22 +867,6 @@
 </fieldset>
 
 <fieldset>
-	<legend>Fanart.tv API Key</legend>
-	<table class="input">
-		<tr>
-			<td style="width:180px;"><label for="fanarttvkey">Fanart.tv API key:</label></td>
-			<td>
-				<input id="fanarttvkey" class="long" name="fanarttvkey" type="text" value="{$fsite->fanarttvkey}"/>
-
-				<div class="hint">The Fanart.tv api key. Used for Fanart.tv lookups. Fanart.tv would appreciate it if
-					you use this service to help them out by adding high quality images not already available on TMDB.
-				</div>
-			</td>
-		</tr>
-	</table>
-</fieldset>
-
-<fieldset>
 	<legend>IMDB.com URL</legend>
 	<table class="input">
 		<tr>
@@ -939,18 +953,6 @@
 		</tr>
 
 		<tr>
-			<td style="width:180px;"><label for="zippath">7za Path:</label></td>
-			<td>
-				<input id="zippath" class="long" name="zippath" type="text" value="{$fsite->zippath}"/>
-
-				<div class="hint">The path to the 7za/p7zip in Ubuntu 13.10 (7zip command line in windows) binary, used
-					for grabbing nfos from compressed zip files.
-					<br/>Use forward slashes in windows <span style="font-family:courier;">c:/path/to/7z.exe</span>
-				</div>
-			</td>
-		</tr>
-
-		<tr>
 			<td style="width:180px;"><label for="yydecoderpath">yEnc Type:</label></td>
 			<td>
 				<input id="yydecoderpath" class="long" name="yydecoderpath" type="text"
@@ -1008,14 +1010,6 @@
 
 				<div class="hint">The maximum duration (In Seconds) for ffmpeg to generate the sample for. (Default 5)
 				</div>
-			</td>
-		</tr>
-
-		<tr>
-			<td style="width:180px;"><label for="debuginfo">Debug information:</label></td>
-			<td>
-				{html_radios id="debuginfo" name='debuginfo' values=$yesno_ids output=$yesno_names selected=$fsite->debuginfo separator='<br />'}
-				<div class="hint">For developers. Whether to echo debug information in some scripts.</div>
 			</td>
 		</tr>
 	</table>
