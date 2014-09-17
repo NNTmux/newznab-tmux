@@ -42,7 +42,7 @@ class TvAnger
 		$options += $defaults;
 
 		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
-		$this->rageqty = ($this->site->('maxrageprocessed') != '') ? $this->site->('maxrageprocessed') : 75;
+		$this->rageqty = ($this->site->maxrageprocessed != '') ? $this->site->maxrageprocessed : 75;
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
 
 
