@@ -1505,7 +1505,6 @@ class Releases
 
 		if (!file_exists($page->site->nzbpath)) {
 			echo "Bad or missing nzb directory - " . $page->site->nzbpath;
-
 			return -1;
 		}
 
@@ -1917,15 +1916,15 @@ class Releases
 			$url = $url . "&newznabID=" . $nnid;
 		}
 
-		$util = new Utility();
-		$xml = $util->getUrl($url);
+
+		$xml = getUrl($url);
 
 		if ($xml === false || preg_match('/no feed/i', $xml))
 			return "no feed";
 		else {
 			if ($xml != "") {
 				$xmlObj = @simplexml_load_string($xml);
-				$arrXml = $util->objectsIntoArray($xmlObj);
+				$arrXml = objectsIntoArray($xmlObj);
 
 				if (isset($arrXml["item"]) && is_array($arrXml["item"])) {
 					foreach ($arrXml["item"] as $item) {
@@ -1945,9 +1944,7 @@ class Releases
 		if ($url != "") {
 			if ($nnid != "")
 				$nnid = "?newznabID=" . $nnid . "&rev=" . $rev;
-
-			$util = new Utility();
-			$regfile = $util->getUrl($url . $nnid, "get", "", "gzip");
+			$regfile = getUrl($url . $nnid, "get", "", "gzip");
 			if ($regfile !== false && $regfile != "") {
 				/*$Rev: 728 $*/
 				if (preg_match('/\/\*\$Rev: (\d{3,4})/i', $regfile, $matches)) {
