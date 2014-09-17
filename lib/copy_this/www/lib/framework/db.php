@@ -836,7 +836,7 @@ class DB extends \PDO
 
 			$tableNames = '';
 			foreach ($tableArray as $table) {
-				$tableNames .= $table['name'] . ',';
+				$tableNames .= $table['Name'] . ',';
 			}
 			$tableNames = rtrim($tableNames, ',');
 
