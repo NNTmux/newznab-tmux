@@ -114,6 +114,8 @@ class NNTP extends Net_NNTP_Client
 		$this->_echo = ($options['Echo'] && NN_ECHOCLI);
 
 		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+		$s = new Sites();
+		$this->site = $s->get();
 
 		$this->_debugBool = (NN_LOGGING || NN_DEBUG);
 		if ($this->_debugBool) {
@@ -124,7 +126,7 @@ class NNTP extends Net_NNTP_Client
 			}
 		}
 
-		$this->_nntpRetries = ($this->pdo->getSetting('nntpretries') != '') ? (int)$this->pdo->getSetting('nntpretries') : 0 + 1;
+		$this->_nntpRetries = ($this->site->nntpretries != '') ? (int)$this->site->nntpretries : 0 + 1;
 
 		$this->_initiateYEncSettings();
 	}
@@ -278,7 +280,7 @@ class NNTP extends Net_NNTP_Client
 			// If we are connected and authenticated, try enabling compression if we have it enabled.
 			if ($connected === true && $authenticated === true) {
 				// Check if we should use compression on the connection.
-				if ($compression === false || $this->pdo->getSetting('compressedheaders') == 0) {
+				if ($compression === false || $this->site->compressedheaders == 0) {
 					$this->_compressionSupported = false;
 				}
 				if ($this->_debugBool) {
@@ -351,7 +353,7 @@ class NNTP extends Net_NNTP_Client
 	 */
 	public function enableCompression()
 	{
-		if (!$this->pdo->getSetting('compressedheaders') == 1) {
+		if (!$this->site->compressedheaders == 1) {
 			return;
 		}
 		$this->_enableCompression();
@@ -1157,7 +1159,7 @@ class NNTP extends Net_NNTP_Client
 	protected function _initiateYEncSettings()
 	{
 		// Check if the user wants to use yyDecode or the simple_php_yenc_decode extension.
-		$this->_yyDecoderPath  = ($this->pdo->getSetting('yydecoderpath') != '') ? (string)$this->pdo->getSetting('yydecoderpath') : false;
+		$this->_yyDecoderPath  = ($this->site->yydecoderpath != '') ? (string)$this->site->yydecoderpath : false;
 		if (strpos((string)$this->_yyDecoderPath, 'simple_php_yenc_decode') !== false) {
 			if (extension_loaded('simple_php_yenc_decode')) {
 				$this->_yEncExtension = true;

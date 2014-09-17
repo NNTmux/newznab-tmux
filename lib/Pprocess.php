@@ -122,8 +122,8 @@ class PProcess
 		//\\
 
 		//\\ Site settings.
-		$this->addpar2 = ($this->pdo->getSetting('addpar2') == 0) ? false : true;
-		$this->alternateNNTP = ($this->pdo->getSetting('alternate_nntp') == 1 ? true : false);
+		$this->addpar2 = ($this->site->('addpar2') == 0) ? false : true;
+		$this->alternateNNTP = ($this->site->('alternate_nntp') == 1 ? true : false);
 		//\\
 	}
 
@@ -156,7 +156,7 @@ class PProcess
 	 */
 	public function processAnime()
 	{
-		if ($this->pdo->getSetting('lookupanidb') == 1) {
+		if ($this->site->('lookupanidb') == 1) {
 			$anidb = new AniDB(['Echo' => $this->echooutput, 'Settings' => $this->pdo]);
 			$anidb->animetitlesUpdate();
 			$anidb->processAnimeReleases();
@@ -170,7 +170,7 @@ class PProcess
 	 */
 	public function processBooks()
 	{
-		if ($this->pdo->getSetting('lookupbooks') != 0) {
+		if ($this->site->('lookupbooks') != 0) {
 			(new Books(['Echo' => $this->echooutput, 'Settings' => $this->pdo, ]))->processBookReleases();
 		}
 	}
@@ -182,7 +182,7 @@ class PProcess
 	 */
 	public function processConsoles()
 	{
-		if ($this->pdo->getSetting('lookupgames') != 0) {
+		if ($this->site->('lookupgames') != 0) {
 			(new Console(['Settings' => $this->pdo, 'Echo' => $this->echooutput]))->processConsoleReleases();
 		}
 	}
@@ -194,7 +194,7 @@ class PProcess
 	 */
 	public function processGames()
 	{
-		if ($this->pdo->getSetting('lookupgames') != 0) {
+		if ($this->site->('lookupgames') != 0) {
 			(new Games(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processGamesReleases();
 		}
 	}
@@ -211,7 +211,7 @@ class PProcess
 	 */
 	public function processMovies($groupID = '', $guidChar = '', $processMovies = '')
 	{
-		$processMovies = (is_numeric($processMovies) ? $processMovies : $this->pdo->getSetting('lookupimdb'));
+		$processMovies = (is_numeric($processMovies) ? $processMovies : $this->site->('lookupimdb'));
 		if ($processMovies > 0) {
 			(new Movie(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processMovieReleases($groupID, $guidChar, $processMovies);
 		}
@@ -224,7 +224,7 @@ class PProcess
 	 */
 	public function processMusic()
 	{
-		if ($this->pdo->getSetting('lookupmusic') != 0) {
+		if ($this->site->('lookupmusic') != 0) {
 			(new Music(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processMusicReleases();
 		}
 	}
@@ -240,8 +240,8 @@ class PProcess
 	 */
 	public function processNfos(&$nntp, $groupID = '', $guidChar = '')
 	{
-		if ($this->pdo->getSetting('lookupnfo') == 1) {
-			$this->Nfo->processNfoFiles($nntp, $groupID, $guidChar, (int)$this->pdo->getSetting('lookupimdb'), (int)$this->pdo->getSetting('lookuptvrage'));
+		if ($this->site->('lookupnfo') == 1) {
+			$this->Nfo->processNfoFiles($nntp, $groupID, $guidChar, (int)$this->site->('lookupimdb'), (int)$this->site->('lookuptvrage'));
 		}
 	}
 
@@ -267,7 +267,7 @@ class PProcess
 	 */
 	public function processTv($groupID = '', $guidChar = '', $processTV = '')
 	{
-		$processTV = (is_numeric($processTV) ? $processTV : $this->pdo->getSetting('lookuptvrage'));
+		$processTV = (is_numeric($processTV) ? $processTV : $this->site->('lookuptvrage'));
 		if ($processTV > 0) {
 			(new TvAnger(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processTvReleases($groupID, $guidChar, $processTV);
 		}
@@ -278,7 +278,7 @@ class PProcess
 	 */
 	public function processXXX()
 	{
-		if ($this->pdo->getSetting('lookupxxx') == 1) {
+		if ($this->site->('lookupxxx') == 1) {
 			(new XXX(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processXXXReleases();
 		}
 	}

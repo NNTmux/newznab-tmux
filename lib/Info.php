@@ -88,14 +88,14 @@ class Info
 
 		$this->echo = ($options['Echo'] && NN_ECHOCLI);
 		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
-		$this->nzbs = ($this->pdo->getSetting('maxnfoprocessed') != '') ? (int)$this->pdo->getSetting('maxnfoprocessed') : 100;
-		$this->maxsize = ($this->pdo->getSetting('maxsizetoprocessnfo') != '') ? (int)$this->pdo->getSetting('maxsizetoprocessnfo') : 100;
+		$this->nzbs = ($this->site->('maxnfoprocessed') != '') ? (int)$this->site->('maxnfoprocessed') : 100;
+		$this->maxsize = ($this->site->('maxsizetoprocessnfo') != '') ? (int)$this->site->('maxsizetoprocessnfo') : 100;
 		$this->maxsize = ($this->maxsize > 0 ? ('AND size < ' . ($this->maxsize * 1073741824)) : '');
-		$this->minsize = ($this->pdo->getSetting('minsizetoprocessnfo') != '') ? (int)$this->pdo->getSetting('minsizetoprocessnfo') : 100;
+		$this->minsize = ($this->site->('minsizetoprocessnfo') != '') ? (int)$this->site->('minsizetoprocessnfo') : 100;
 		$this->minsize = ($this->minsize > 0 ? ('AND size > ' . ($this->minsize * 1048576)) : '');
-		$this->maxRetries = (int)($this->pdo->getSetting('maxnforetries') >= 0 ? -((int)$this->pdo->getSetting('maxnforetries') + 1) : self::NFO_UNPROC);
+		$this->maxRetries = (int)($this->site->('maxnforetries') >= 0 ? -((int)$this->site->('maxnforetries') + 1) : self::NFO_UNPROC);
 		$this->maxRetries = ($this->maxRetries < -8 ? -8 : $this->maxRetries);
-		$this->tmpPath = (string)$this->pdo->getSetting('tmpunrarpath');
+		$this->tmpPath = (string)$this->site->('tmpunrarpath');
 		if (!preg_match('/[\/\\\\]$/', $this->tmpPath)) {
 			$this->tmpPath .= DS;
 		}

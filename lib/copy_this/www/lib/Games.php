@@ -126,7 +126,7 @@ class Games
 		if ($this->site->lookupgames == 2) {
 			$this->renamed = 'AND isrenamed = 1';
 		}
-		//$this->cleangames = ($this->pdo->getSetting('lookupgames') == 2) ? 'AND isrenamed = 1' : '';
+		//$this->cleangames = ($this->site->('lookupgames') == 2) ? 'AND isrenamed = 1' : '';
 	}
 
 	public function getGamesInfo($id)

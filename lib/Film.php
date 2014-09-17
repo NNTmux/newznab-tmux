@@ -153,17 +153,19 @@ class Film
 		$options += $defaults;
 
 		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+		$s = new Sites();
+		$this->site = $s->get();
 		$this->releaseImage = ($options['ReleaseImage'] instanceof \ReleaseImage ? $options['ReleaseImage'] : new \ReleaseImage($this->pdo));
 
-		$this->imdbLanguage = ($this->pdo->getSetting('imdblanguage') != '') ? (string)$this->pdo->getSetting('imdblanguage') : 'en';
+		$this->imdbLanguage = ($this->site->imdblanguage != '') ? (string)$this->site->imdblanguage : 'en';
 
-		$this->tmdb = ($options['TMDb'] instanceof \TMDb ? $options['TMDb'] : new \TMDb($this->pdo->getSetting('tmdbkey'), $this->imdbLanguage));
+		$this->tmdb = ($options['TMDb'] instanceof \TMDb ? $options['TMDb'] : new \TMDb($this->site->tmdbkey, $this->imdbLanguage));
 
-		$this->fanartapikey = $this->pdo->getSetting('fanarttvkey');
-		$this->imdburl = ($this->pdo->getSetting('imdburl') == 0 ? false : true);
-		$this->movieqty = ($this->pdo->getSetting('maximdbprocessed') != '') ? $this->pdo->getSetting('maximdbprocessed') : 100;
+		$this->fanartapikey = $this->site->fanarttvkey;
+		$this->imdburl = ($this->site->imdburl == 0 ? false : true);
+		$this->movieqty = ($this->site->maximdbprocessed != '') ? $this->site->maximdbprocessed : 100;
 		$this->searchEngines = true;
-		$this->showPasswords = ($this->pdo->getSetting('showpasswordedrelease') != '') ? $this->pdo->getSetting('showpasswordedrelease') : 0;
+		$this->showPasswords = ($this->site->showpasswordedrelease != '') ? $this->site->showpasswordedrelease : 0;
 
 		$this->debug = NN_DEBUG;
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
@@ -809,7 +811,7 @@ class Film
 		$buffer =
 			getUrl([
 					'url' => 'http://' . ($this->imdburl === false ? 'www' : 'akas') . '.imdb.com/title/tt' . $imdbId . '/',
-					'language' => (($this->pdo->getSetting('imdblanguage') != '') ? $this->pdo->getSetting('imdblanguage') : 'en'),
+					'language' => (($this->site->imdblanguage != '') ? $this->site->imdblanguage : 'en'),
 					'useragent' => 'Mozilla/5.0 (iPad; U; CPU OS 3_2 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) ' .
 						'Version/4.0.4 Mobile/7B334b Safari/531.21.102011-10-16 20:23:10', 'foo=bar'
 				]
@@ -1319,7 +1321,7 @@ class Film
 	{
 		$this->pdo->log->doEcho($this->pdo->log->header('Updating movie schedule using rotten tomatoes.'));
 
-		$rt = new \RottenTomato($this->pdo->getSetting('rottentomatokey'));
+		$rt = new \RottenTomato($this->site->rottentomatokey);
 
 		if ($rt instanceof \RottenTomato) {
 
