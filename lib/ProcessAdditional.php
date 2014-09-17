@@ -315,34 +315,36 @@ Class ProcessAdditional
 		$this->_releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage($this->pdo));
 		$this->_par2Info = new Par2Info();
 		$this->_nfo = ($options['Nfo'] instanceof Info ? $options['Nfo'] : new Info(['Echo' => $this->_echoCLI, 'Settings' => $this->pdo]));
+		$s = new Sites();
+		$this->site = $s->get();
 
-		$this->_innerFileBlacklist = ($this->site->('innerfileblacklist') == '' ? false : $this->site->('innerfileblacklist'));
-		$this->_maxNestedLevels = ($this->site->('maxnestedlevels') == 0 ? 3 : $this->site->('maxnestedlevels'));
-		$this->_extractUsingRarInfo = ($this->site->('extractusingrarinfo') == 0 ? false : true);
+		$this->_innerFileBlacklist = ($this->site->innerfileblacklist == '' ? false : $this->site->innerfileblacklist);
+		$this->_maxNestedLevels = ($this->site->maxnestedlevels == 0 ? 3 : $this->site->maxnestedlevels);
+		$this->_extractUsingRarInfo = ($this->site->extractusingrarinfo == 0 ? false : true);
 
 		$this->_7zipPath = false;
 		$this->_unrarPath = false;
 
 		// Pass the binary extractors to ArchiveInfo.
 		$clients = array();
-		if ($this->site->('unrarpath') != '') {
-			$clients += array(ArchiveInfo::TYPE_RAR => $this->site->('unrarpath'));
-			$this->_unrarPath = $this->site->('unrarpath');
+		if ($this->site->unrarpath != '') {
+			$clients += array(ArchiveInfo::TYPE_RAR => $this->site->unrarpath);
+			$this->_unrarPath = $this->site->unrarpath;
 		}
-		if ($this->site->('zippath') != '') {
-			$clients += array(ArchiveInfo::TYPE_ZIP => $this->site->('zippath'));
-			$this->_7zipPath = $this->site->('zippath');
+		if ($this->site->zippath != '') {
+			$clients += array(ArchiveInfo::TYPE_ZIP => $this->site->zippath);
+			$this->_7zipPath = $this->site->zippath;
 		}
 		$this->_archiveInfo->setExternalClients($clients);
 
 		$this->_hasGNUFile = (Utility::hasCommand('file') === true ? true : false);
 
 		$this->_killString = '"';
-		if ($this->site->('timeoutpath') != '' && $this->site->('timeoutseconds') > 0) {
+		if ($this->site->timeoutpath != '' && $this->site->timeoutseconds > 0) {
 			$this->_killString = (
-				'"' . $this->site->('timeoutpath') .
+				'"' . $this->site->timeoutpath .
 				'" --foreground --signal=KILL ' .
-				$this->site->('timeoutseconds') . ' "'
+				$this->site->timeoutseconds . ' "'
 			);
 		}
 
@@ -350,48 +352,48 @@ Class ProcessAdditional
 
 		// Maximum amount of releases to fetch per run.
 		$this->_queryLimit =
-			($this->site->('maxaddprocessed') != '') ? (int)$this->site->('maxaddprocessed') : 25;
+			($this->site->maxaddprocessed != '') ? (int)$this->site->maxaddprocessed : 25;
 
 		// Maximum message ID's to download per file type in the NZB (video, jpg, etc).
 		$this->_segmentsToDownload =
-			($this->site->('segmentstodownload') != '') ? (int)$this->site->('segmentstodownload') : 2;
+			($this->site->segmentstodownload != '') ? (int)$this->site->segmentstodownload : 2;
 
 		// Maximum message ID's to download for a RAR file.
 		$this->_maximumRarSegments =
-			($this->site->('maxpartsprocessed') != '') ? (int)$this->site->('maxpartsprocessed') : 3;
+			($this->site->maxpartsprocessed != '') ? (int)$this->site->maxpartsprocessed : 3;
 
 		// Maximum RAR files to check for a password before stopping.
 		$this->_maximumRarPasswordChecks =
-			($this->site->('passchkattempts') != '') ? (int)$this->site->('passchkattempts') : 1;
+			($this->site->passchkattempts != '') ? (int)$this->site->passchkattempts : 1;
 
 		$this->_maximumRarPasswordChecks = ($this->_maximumRarPasswordChecks < 1 ? 1 : $this->_maximumRarPasswordChecks);
 
 		// Maximum size of releases in GB.
 		$this->_maxSize =
-			(string)($this->site->('maxsizetopostprocess') != '') ? $this->site->('maxsizetopostprocess') : 100;
+			(string)($this->site->maxsizetopostprocess != '') ? $this->site->maxsizetopostprocess : 100;
 		$this->_maxSize = ($this->_maxSize === 0 ? '' : 'AND r.size < ' . ($this->_maxSize * 1073741824));
 
 		// Minimum size of releases in MB.
 		$this->_minSize =
-			(string)($this->site->('minsizetopostprocess') != '') ? $this->site->('minsizetopostprocess') : 1;
+			(string)($this->site->minsizetopostprocess != '') ? $this->site->minsizetopostprocess : 1;
 		$this->_minSize = ($this->_minSize === 0 ? '' : 'AND r.size > ' . ($this->_minSize * 1048576));
 
 		// Use the alternate NNTP provider for downloading Message-ID's ?
-		$this->_alternateNNTP = ($this->site->('alternate_nntp') == 1 ? true : false);
+		$this->_alternateNNTP = ($this->site->alternate_nntp == 1 ? true : false);
 
-		$this->_ffMPEGDuration = ($this->site->('ffmpeg_duration') != '') ? (int)$this->site->('ffmpeg_duration') : 5;
+		$this->_ffMPEGDuration = ($this->site->ffmpeg_duration != '') ? (int)$this->site->ffmpeg_duration : 5;
 
-		$this->_addPAR2Files = ($this->site->('addpar2') === '0') ? false : true;
+		$this->_addPAR2Files = ($this->site->addpar2 === '0') ? false : true;
 
-		$this->_processSample = ($this->site->('ffmpegpath') == '' ? false : true);
-		$this->_processVideo = ($this->site->('processvideos') == 0) ? false : true;
-		$this->_processJPGSample = ($this->site->('processjpg') == 0) ? false : true;
-		$this->_processAudioSample = ($this->site->('processaudiosample') == 0) ? false : true;
-		$this->_processMediaInfo = ($this->site->('mediainfopath') == '') ? false : true;
+		$this->_processSample = ($this->site->ffmpegpath == '' ? false : true);
+		$this->_processVideo = ($this->site->processvideos == 0) ? false : true;
+		$this->_processJPGSample = ($this->site->processjpg == 0) ? false : true;
+		$this->_processAudioSample = ($this->site->processaudiosample == 0) ? false : true;
+		$this->_processMediaInfo = ($this->site->mediainfopath == '') ? false : true;
 		$this->_processAudioInfo = $this->_processMediaInfo;
 		$this->_processPasswords = (
-			((($this->site->('checkpasswordedrar') == 0) ? false : true)) &&
-			(($this->site->('unrarpath') == '') ? false : true)
+			((($this->site->checkpasswordedrar == 0) ? false : true)) &&
+			(($this->site->unrarpath == '') ? false : true)
 		);
 
 		$this->_audioSavePath = NN_COVERS . 'audiosample' . DS;
@@ -455,7 +457,7 @@ Class ProcessAdditional
 	protected function _setMainTempPath(&$groupID = '', &$guidChar)
 	{
 		// Set up the temporary files folder location.
-		$this->_mainTmpPath = (string)$this->site->('tmpunrarpath');
+		$this->_mainTmpPath = (string)$this->site->tmpunrarpath;
 
 		// Check if it ends with a dir separator.
 		if (!preg_match('/[\/\\\\]$/', $this->_mainTmpPath)) {
@@ -1652,7 +1654,7 @@ Class ProcessAdditional
 
 				// Get the media info for the file.
 				$xmlArray = runCmd(
-					$this->_killString . $this->site->('mediainfopath') . '" --Output=XML "' . $fileLocation . '"'
+					$this->_killString . $this->site->mediainfopath . '" --Output=XML "' . $fileLocation . '"'
 				);
 				if (is_array($xmlArray)) {
 
@@ -1739,7 +1741,7 @@ Class ProcessAdditional
 				// Create an audio sample.
 				runCmd(
 					$this->_killString .
-					$this->site->('ffmpegpath') .
+					$this->site->ffmpegpath .
 					'" -t 30 -i "' .
 					$fileLocation .
 					'" -acodec libvorbis -loglevel quiet -y "' .
@@ -1842,7 +1844,7 @@ Class ProcessAdditional
 		// Get the real duration of the file.
 		$time = runCmd(
 			$this->_killString .
-			$this->site->('ffmpegpath') .
+			$this->site->ffmpegpath .
 			'" -i "' . $videoLocation .
 			'" -vcodec copy -y 2>&1 "' .
 			$tmpVideo . '"',
@@ -1888,7 +1890,7 @@ Class ProcessAdditional
 			// Create the image.
 			runCmd(
 				$this->_killString .
-				$this->site->('ffmpegpath') .
+				$this->site->ffmpegpath .
 				'" -i "' .
 				$fileLocation .
 				'" -ss ' . ($time === '' ? '00:00:03.00' : $time)  .
@@ -1979,7 +1981,7 @@ Class ProcessAdditional
 					// Try to get the sample (from the end instead of the start).
 					runCmd(
 						$this->_killString .
-						$this->site->('ffmpegpath') .
+						$this->site->ffmpegpath .
 						'" -i "' .
 						$fileLocation .
 						'" -ss ' . $lowestLength .
@@ -1996,7 +1998,7 @@ Class ProcessAdditional
 				// If longer than 60 or we could not get the video length, run the old way.
 				runCmd(
 					$this->_killString .
-					$this->site->('ffmpegpath') .
+					$this->site->ffmpegpath .
 					'" -i "' .
 					$fileLocation .
 					'" -vcodec libtheora -filter:v scale=320:-1 -t ' .
@@ -2070,7 +2072,7 @@ Class ProcessAdditional
 
 			// Run media info on it.
 			$xmlArray =runCmd(
-				$this->_killString . $this->site->('mediainfopath') . '" --Output=XML "' . $fileLocation . '"'
+				$this->_killString . $this->site->mediainfopath . '" --Output=XML "' . $fileLocation . '"'
 			);
 
 			// Check if we got it.
