@@ -93,6 +93,9 @@ $page->smarty->assign('sphinxrebuildfreqday_days', array('', 'Monday', 'Tuesday'
 $page->smarty->assign('lookuplanguage_iso', array('en', 'de', 'es', 'fr', 'it', 'nl', 'pt', 'sv'));
 $page->smarty->assign('lookuplanguage_names', array('English', 'Deutsch', 'Español', 'Français', 'Italiano', 'Nederlands', 'Português', 'Svenska'));
 
+$page->smarty->assign('imdb_urls', array(0,1));
+$page->smarty->assign('imdburl_names', array('imdb.com', 'akas.imdb.com'));
+
 $themelist = array();
 $themes = scandir(WWW_DIR."/templates");
 foreach ($themes as $theme)
