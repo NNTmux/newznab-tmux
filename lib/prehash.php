@@ -146,7 +146,7 @@ Class PreHash
 
 		// Check if clean name matches a PreDB filename.
 		$fileCheck = $this->pdo->queryOneRow(
-			sprintf('SELECT ID, title FROM preHASH WHERE filename = %s LIMIT 1', $this->pdo->escapeString($cleanerName))
+			sprintf('SELECT ID, title FROM prehash WHERE filename = %s LIMIT 1', $this->pdo->escapeString($cleanerName))
 		);
 
 		if ($fileCheck !== false) {
