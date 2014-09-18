@@ -553,7 +553,7 @@ class TvAnger
 		}
 
 		$tvairdate = (isset($show['airdate']) && !empty($show['airdate'])) ? $this->pdo->escapeString($this->checkDate($show['airdate'])) : "NULL";
-		$this->pdo->queryExec(sprintf("UPDATE releases SET seriesfull = %s, season = %s, episode = %s, tvairdate = %sWHERE ID = %d", $this->pdo->escapeString($show['seriesfull']), $this->pdo->escapeString($show['season']), $this->pdo->escapeString($show['episode']), $tvairdate, $relid));
+		$this->pdo->queryExec(sprintf("UPDATE releases SET seriesfull = %s, season = %s, episode = %s, tvairdate = %s WHERE ID = %d", $this->pdo->escapeString($show['seriesfull']), $this->pdo->escapeString($show['season']), $this->pdo->escapeString($show['episode']), $tvairdate, $relid));
 	}
 
 	public function updateRageInfo($rageID, $show, $tvrShow, $relid)
