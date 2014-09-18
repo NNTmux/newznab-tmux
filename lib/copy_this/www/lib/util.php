@@ -767,7 +767,7 @@ function getUrl ($url, $method = 'get', $postdata = '', $language = "", $debug =
  */
 function imdb_trailers($imdbID)
 {
-	$xml = self::getUrl('http://api.traileraddict.com/?imdb=' . $imdbID);
+	$xml = getUrl('http://api.traileraddict.com/?imdb=' . $imdbID);
 	if ($xml !== false) {
 		if (preg_match('/(<iframe.+?<\/iframe>)/i', $xml, $html)) {
 			return $html[1];
@@ -796,7 +796,7 @@ function objectsIntoArray ($arrObjData, $arrSkipIndices = [])
 		foreach ($arrObjData as $index => $value) {
 			// Recursive call.
 			if (is_object($value) || is_array($value)) {
-				$value = self::objectsIntoArray($value, $arrSkipIndices);
+				$value = objectsIntoArray($value, $arrSkipIndices);
 			}
 			if (in_array($index, $arrSkipIndices)) {
 				continue;
@@ -818,7 +818,7 @@ function objectsIntoArray ($arrObjData, $arrSkipIndices = [])
 function runCmd ($command, $debug = false)
 {
 	$nl = PHP_EOL;
-	if (self::isWindows() && strpos(phpversion(), "5.2") !== false) {
+	if (isWindows() && strpos(phpversion(), "5.2") !== false) {
 		$command = "\"" . $command . "\"";
 	}
 
@@ -852,7 +852,7 @@ function safeFilename ($filename)
 // Central function for sending site email.
 function sendEmail($to, $subject, $contents, $from)
 {
-	if (self::isWindows()) {
+	if (isWindows()) {
 		$n = "\r\n";
 	} else {
 		$n = "\n";
