@@ -25,9 +25,8 @@ class ReleaseImage
 	public function fetchImage($imgLoc)
 	{
 		$img = false;
-		$utility = new Utility();
 		if (preg_match('/^http:/i', $imgLoc))
-			$img = $utility->getUrl($imgLoc);
+			$img = Utility::getUrl([$imgLoc]);
 		elseif (file_exists($imgLoc))
 			$img = @file_get_contents($imgLoc);
 

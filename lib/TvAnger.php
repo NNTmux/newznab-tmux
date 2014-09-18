@@ -364,7 +364,7 @@ class TvAnger
 				echo $this->pdo->log->headerOver('Updating schedule for: ') . $this->pdo->log->primary($country['country']);
 			}
 
-			$sched = getURL(['url' => $this->xmlFullScheduleUrl . $country['country']]);
+			$sched = Utility::getURL(['url' => $this->xmlFullScheduleUrl . $country['country']]);
 			if ($sched !== false && ($xml = @simplexml_load_string($sched))) {
 				$tzOffset = 60 * 60 * 6;
 				$yesterday = strtotime("-1 day") - $tzOffset;
@@ -461,7 +461,7 @@ class TvAnger
 
 		$series = str_ireplace("s", "", $series);
 		$episode = str_ireplace("e", "", $episode);
-		$xml = getUrl(['url' => $this->xmlEpisodeInfoUrl . "&sid=" . $rageID . "&ep=" . $series . "x" . $episode]);
+		$xml = Utility::getUrl(['url' => $this->xmlEpisodeInfoUrl . "&sid=" . $rageID . "&ep=" . $series . "x" . $episode]);
 		if ($xml !== false) {
 			if (preg_match('/no show found/i', $xml)) {
 				return false;
@@ -487,7 +487,7 @@ class TvAnger
 	public function getRageInfoFromPage($rageID)
 	{
 		$result = array('desc' => '', 'imgurl' => '');
-		$page =getUrl(['url' => $this->showInfoUrl . $rageID]);
+		$page =Utility::getUrl(['url' => $this->showInfoUrl . $rageID]);
 		$matches = '';
 		if ($page !== false) {
 			// Description.
@@ -518,7 +518,7 @@ class TvAnger
 	{
 		$result = array('genres' => '', 'country' => '', 'showid' => $rageID);
 		// Full search gives us the akas.
-		$xml =getUrl(['url' => $this->xmlShowInfoUrl . $rageID]);
+		$xml =Utility::getUrl(['url' => $this->xmlShowInfoUrl . $rageID]);
 		if ($xml !== false) {
 			$arrXml = objectsIntoArray(simplexml_load_string($xml));
 			if (is_array($arrXml)) {
@@ -591,7 +591,7 @@ class TvAnger
 
 		$imgbytes = '';
 		if (isset($rInfo['imgurl']) && !empty($rInfo['imgurl'])) {
-			$img = getUrl(['url' => $rInfo['imgurl']]);
+			$img = Utility::getUrl(['url' => $rInfo['imgurl']]);
 			if ($img !== false) {
 				$im = @imagecreatefromstring($img);
 				if ($im !== false) {
@@ -632,7 +632,7 @@ class TvAnger
 
 		$imgbytes = '';
 		if (isset($rInfo['imgurl']) && !empty($rInfo['imgurl'])) {
-			$img = getUrl(['url' => $rInfo['imgurl']]);
+			$img = Utility::getUrl(['url' => $rInfo['imgurl']]);
 			if ($img !== false) {
 				$im = @imagecreatefromstring($img);
 				if ($im !== false) {
@@ -765,7 +765,7 @@ class TvAnger
 	{
 		$title = $showInfo['cleanname'];
 		// Full search gives us the akas.
-		$xml = getUrl(['url' => $this->xmlFullSearchUrl . urlencode(strtolower($title))]);
+		$xml = Utility::getUrl(['url' => $this->xmlFullSearchUrl . urlencode(strtolower($title))]);
 		if ($xml !== false) {
 			$arrXml = @objectsIntoArray(simplexml_load_string($xml));
 			if (isset($arrXml['show']) && is_array($arrXml)) {

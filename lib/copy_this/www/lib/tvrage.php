@@ -296,7 +296,7 @@ class TvRage
 
 		$xml = $this->fetchCache($lookupUrl);
 		if ($xml === false)
-			$xml = getUrl($lookupUrl);
+			$xml = Utility::getUrl([$lookupUrl]);
 
 		if ($xml !== false)
 		{
@@ -329,7 +329,7 @@ class TvRage
 
 		$page = $this->fetchCache($lookupUrl);
 		if ($page === false)
-			$page = getUrl($lookupUrl);
+			$page = Utility::getUrl([$lookupUrl]);
 
 		if ($page !== false)
 		{
@@ -367,7 +367,7 @@ class TvRage
 
 		$xml = $this->fetchCache($lookupUrl);
 		if ($xml === false)
-			$xml = getUrl($lookupUrl);
+			$xml = Utility::getUrl([$lookupUrl]);
 
 		if ($xml !== false)
 		{
@@ -414,7 +414,7 @@ class TvRage
 		$imgbytes = '';
 		if (isset($rInfo['imgurl']) && !empty($rInfo['imgurl']))
 		{
-			$img = getUrl($rInfo['imgurl']);
+			$img = Utility::getUrl([$rInfo['imgurl']]);
 			if ($img !== false)
 			{
 				$im = @imagecreatefromstring($img);
@@ -484,7 +484,7 @@ class TvRage
 		$imgbytes = '';
 		if (isset($rInfo['imgurl']) && !empty($rInfo['imgurl']))
 		{
-			$img = getUrl($rInfo['imgurl']);
+			$img = Utility::getUrl([$rInfo['imgurl']]);
 			if ($img !== false)
 			{
 				$im = @imagecreatefromstring($img);
@@ -625,7 +625,7 @@ class TvRage
 
 		$xml = $this->fetchCache($lookupUrl);
 		if ($xml === false)
-			$xml = getUrl($lookupUrl); //full search gives us the akas
+			$xml = Utility::getUrl([$lookupUrl]); //full search gives us the akas
 
 		if ($xml !== false)
 		{

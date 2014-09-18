@@ -148,7 +148,7 @@ class NZBGet
 	</param>
 </params>
 </methodCall>';
-		getUrl($this->fullURL . 'append', 'post', $header);
+		Utility::getUrl($this->fullURL . 'append', 'post', $header);
 	}
 
 	/**
@@ -197,7 +197,7 @@ class NZBGet
 	</param>
 </params>
 </methodCall>';
-		getUrl($this->fullURL . 'appendurl', 'post', $header);
+		Utility::getUrl($this->fullURL . 'appendurl', 'post', $header);
 	}
 
 	/**
@@ -219,7 +219,7 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-		getUrl($this->fullURL . 'pausedownload2', 'post', $header);
+		Utility::getUrl($this->fullURL . 'pausedownload2', 'post', $header);
 	}
 
 	/**
@@ -241,7 +241,7 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-		getUrl($this->fullURL . 'resumedownload2', 'post', $header);
+		Utility::getUrl($this->fullURL . 'resumedownload2', 'post', $header);
 	}
 
 	/**
@@ -276,7 +276,7 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-		getUrl($this->fullURL . 'editqueue', 'post', $header);
+		Utility::getUrl($this->fullURL . 'editqueue', 'post', $header);
 	}
 
 	/**
@@ -311,7 +311,7 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-		getUrl($this->fullURL . 'editqueue', 'post', $header);
+		Utility::getUrl($this->fullURL . 'editqueue', 'post', $header);
 	}
 
 	/**
@@ -346,7 +346,7 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-		getUrl($this->fullURL . 'editqueue', 'post', $header);
+		Utility::getUrl($this->fullURL . 'editqueue', 'post', $header);
 	}
 
 	/**
@@ -370,7 +370,7 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-		getUrl($this->fullURL . 'rate', 'post', $header);
+		Utility::getUrl($this->fullURL . 'rate', 'post', $header);
 	}
 
 	/**
@@ -382,7 +382,7 @@ class NZBGet
 	 */
 	public function getQueue()
 	{
-		$data = getUrl($this->fullURL . 'listgroups');
+		$data = Utility::getUrl($this->fullURL . 'listgroups');
 		$retVal = false;
 		if ($data) {
 			$xml = simplexml_load_string($data);
@@ -413,7 +413,7 @@ class NZBGet
 	 */
 	public function status()
 	{
-		$data = getUrl($this->fullURL . 'status');
+		$data = Utility::getUrl($this->fullURL . 'status');
 		$retVal = false;
 		if ($data) {
 			$xml = simplexml_load_string($data);

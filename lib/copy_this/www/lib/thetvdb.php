@@ -154,8 +154,8 @@ class TheTVDB
 
 	public function lookupSeriesID($seriesname)
 	{
-		$util = new Utility();
-		$apiresponse = $util->getUrl($this->MIRROR.'/api/GetSeries.php?seriesname='.preg_replace('/\s+/', '+', $seriesname).'&language=all');
+
+		$apiresponse = Utility::getUrl([$this->MIRROR.'/api/GetSeries.php?seriesname='.preg_replace('/\s+/', '+', $seriesname).'&language=all']);
 
 		if(!$apiresponse)
 			return false;
@@ -305,8 +305,7 @@ class TheTVDB
 
 	public function TheTVDBAPI($seriesid, $seriesName)
 	{
-		$util = new Utility();
-		$apiresponse = $util->getUrl($this->MIRROR.'/api/'.self::APIKEY.'/series/'.$seriesid.'/all/en.xml'); //.zip?
+		$apiresponse = Utility::getUrl([$this->MIRROR.'/api/'.self::APIKEY.'/series/'.$seriesid.'/all/en.xml']); //.zip?
 
 		if(!$apiresponse)
 			return false;

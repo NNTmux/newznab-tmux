@@ -45,7 +45,7 @@ Class TraktTv
 	public function traktTVSEsummary($title = '', $season = '', $ep = '')
 	{
 		if (!empty($this->APIKEY)) {
-			$TVjson = getUrl([
+			$TVjson = Utility::getUrl([
 					'url' =>
 						'http://api.trakt.tv/show/episode/summary.json/' .
 						$this->APIKEY . '/' .
@@ -76,7 +76,7 @@ Class TraktTv
 	public function traktMoviesummary($movie = '', $array=false)
 	{
 		if (!empty($this->APIKEY)) {
-			$MovieJson = getUrl([
+			$MovieJson = Utility::getUrl([
 					'url' =>
 						'http://api.trakt.tv/movie/summary.json/' .
 						$this->APIKEY .

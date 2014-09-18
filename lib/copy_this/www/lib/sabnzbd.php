@@ -155,7 +155,7 @@ class SABnzbd
 	 */
 	public function sendToSab($guid)
 	{
-		return getUrl(
+		return Utility::getUrl([
 		$this->url .
 			'api?mode=addurl&priority=' .
 			$this->priority .
@@ -171,7 +171,7 @@ class SABnzbd
 				'&r=' .
 				$this->rsstoken
 			)
-		);
+		]);
 	}
 
 	/**
@@ -181,11 +181,11 @@ class SABnzbd
 	 */
 	public function getQueue()
 	{
-		return getUrl(
+		return Utility::getUrl([
 		$this->url .
 			"api?mode=qstatus&output=json&apikey=" .
 			$this->apikey
-		);
+		]);
 	}
 
 	/**
@@ -195,11 +195,11 @@ class SABnzbd
 	 */
 	public function getAdvQueue()
 	{
-		return getUrl(
+		return Utility::getUrl([
 		$this->url .
 			"api?mode=queue&start=START&limit=LIMIT&output=json&apikey=" .
 			$this->apikey
-		);
+		]);
 	}
 
 	/**
@@ -211,13 +211,13 @@ class SABnzbd
 	 */
 	public function delFromQueue($id)
 	{
-		return getUrl(
+		return Utility::getUrl([
 		$this->url .
 			"api?mode=queue&name=delete&value=" .
 			$id .
 			"&apikey=" .
 			$this->apikey
-		);
+		]);
 	}
 
 	/**
@@ -229,13 +229,13 @@ class SABnzbd
 	 */
 	public function pauseFromQueue($id)
 	{
-		return getUrl(
+		return Utility::getUrl([
 		$this->url .
 			"api?mode=queue&name=pause&value=" .
 			$id .
 			"&apikey=" .
 			$this->apikey
-		);
+		]);
 	}
 
 	/**
@@ -247,13 +247,13 @@ class SABnzbd
 	 */
 	public function resumeFromQueue($id)
 	{
-		return getUrl(
+		return Utility::getUrl([
 		$this->url .
 			"api?mode=queue&name=resume&value=" .
 			$id .
 			"&apikey=" .
 			$this->apikey
-		);
+		]);
 	}
 
 	/**
@@ -263,12 +263,12 @@ class SABnzbd
 	 */
 	public function pauseAll()
 	{
-		return getUrl(
+		return Utility::getUrl([
 		$this->url .
 			"api?mode=pause" .
 			"&apikey=" .
 			$this->apikey
-		);
+		]);
 	}
 
 	/**
@@ -278,12 +278,12 @@ class SABnzbd
 	 */
 	public function resumeAll()
 	{
-		return getUrl(
+		return Utility::getUrl([
 		$this->url .
 			"api?mode=resume" .
 			"&apikey=" .
 			$this->apikey
-		);
+		]);
 	}
 
 	/**
