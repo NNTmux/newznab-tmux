@@ -344,7 +344,7 @@ class PProcess
 				Category::CAT_MUSIC_OTHER,
 				Category::CAT_PC_MOBILEOTHER,
 				Category::CAT_TV_OTHER,
-				Category::CAT_OTHER_HASHED,
+				Category::CAT_MISC_HASHED,
 				Category::CAT_XXX_OTHER,
 				Category::CAT_MISC_OTHER
 			)
