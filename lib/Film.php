@@ -106,7 +106,7 @@ class Film
 	 * Language to fetch from IMDB.
 	 * @var string
 	 */
-	protected $imdbLanguage;
+	protected $lookuplanguage;
 
 	/**
 	 * @var array|bool|string
@@ -157,9 +157,9 @@ class Film
 		$this->site = $s->get();
 		$this->releaseImage = ($options['ReleaseImage'] instanceof \ReleaseImage ? $options['ReleaseImage'] : new \ReleaseImage($this->pdo));
 
-		$this->imdbLanguage = ($this->site->imdblanguage != '') ? (string)$this->site->imdblanguage : 'en';
+		$this->lookuplanguage = ($this->site->lookuplanguage != '') ? (string)$this->site->lookuplanguage : 'en';
 
-		$this->tmdb = ($options['TMDb'] instanceof \TMDb ? $options['TMDb'] : new \TMDb($this->site->tmdbkey, $this->imdbLanguage));
+		$this->tmdb = ($options['TMDb'] instanceof \TMDb ? $options['TMDb'] : new \TMDb($this->site->tmdbkey, $this->lookuplanguage));
 
 		$this->fanartapikey = $this->site->fanarttvkey;
 		$this->imdburl = ($this->site->imdburl == 0 ? false : true);
@@ -811,7 +811,7 @@ class Film
 		$buffer =
 			getUrl([
 					'url' => 'http://' . ($this->imdburl === false ? 'www' : 'akas') . '.imdb.com/title/tt' . $imdbId . '/',
-					'language' => (($this->site->imdblanguage != '') ? $this->site->imdblanguage : 'en'),
+					'language' => (($this->site->lookuplanguage != '') ? $this->site->lookuplanguage : 'en'),
 					'useragent' => 'Mozilla/5.0 (iPad; U; CPU OS 3_2 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) ' .
 						'Version/4.0.4 Mobile/7B334b Safari/531.21.102011-10-16 20:23:10', 'foo=bar'
 				]

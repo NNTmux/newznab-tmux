@@ -40,6 +40,8 @@ class TvAnger
 			'Settings' => null,
 		];
 		$options += $defaults;
+		$s = new Sites();
+		$this->site = $s->get();
 
 		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 		$this->rageqty = ($this->site->maxrageprocessed != '') ? $this->site->maxrageprocessed : 75;
