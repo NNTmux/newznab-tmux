@@ -6,6 +6,7 @@ require_once(WWW_DIR . "lib/Categorize.php");
 require_once(WWW_DIR . "lib/nzb.php");
 require_once(WWW_DIR . "lib/groups.php");
 require_once(WWW_DIR . "lib/nntp.php");
+require_once(WWW_DIR . "/lib/ReleaseSearch.php");
 require_once(WWW_DIR . "/lib/ColorCLI.php");
 require_once(WWW_DIR . "/lib/ConsoleTools.php");
 require_once("ReleaseCleaner.php");
@@ -693,14 +694,6 @@ class NameFixer
 	protected function _preFTsearchQuery($preTitle)
 	{
 		switch (NN_RELEASE_SEARCH_TYPE) {
-			case ReleaseSearch::SPHINX:
-				$titlematch = \SphinxSearch::escapeString($preTitle);
-				$join = sprintf(
-					'INNER JOIN releases_se rse ON rse.ID = r.ID
-					WHERE rse.query = "@(name,searchname) %s;mode=extended"',
-					$titlematch
-				);
-				break;
 			case ReleaseSearch::FULLTEXT:
 			default:
 				//Remove all non-printable chars from PreDB title
