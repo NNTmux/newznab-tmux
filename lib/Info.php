@@ -251,13 +251,13 @@ class Info
 	 * "AND r.nzbstatus = 1 AND r.nfostatus BETWEEN -8 AND -1 AND r.size < 1073741824 AND r.size > 1048576"
 	 * To use in a query.
 	 *
-	 * @param Settings $pdo
+	 * @param DB $pdo
 	 *
 	 * @return string
 	 * @access public
 	 * @static
 	 */
-	static public function NfoQueryString(Settings &$pdo)
+	static public function NfoQueryString(DB &$pdo)
 	{
 		$s = new Sites();
 		$site = $s->get();
