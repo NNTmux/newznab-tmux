@@ -17,7 +17,7 @@ require_once(WWW_DIR . "/lib/ColorCLI.php");
 
 $n = "\n";
 $namefixer = new Namefixer();
-$predb = new PreHash(true);
+$predb = new PreHash(['Echo' => true]);
 $c = new ColorCLI();
 
 if (isset($argv[1]) && isset($argv[2]) && isset($argv[3]) && isset($argv[4])) {
