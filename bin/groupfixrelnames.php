@@ -10,6 +10,8 @@ require_once(dirname(__FILE__) . '/../lib/nzbcontents.php');
 require_once(dirname(__FILE__) . '/../lib/MiscSorter.php');
 
 $pdo = new DB();
+$s = new Sites();
+$site = $s->get();
 
 if (!isset($argv[1])) {
 	exit($pdo->log->error("This script is not intended to be run manually, it is called from groupfixrelnames_threaded.py."));
@@ -133,7 +135,7 @@ if (!isset($argv[1])) {
 
 			if ($releases instanceof Traversable) {
 				$nntp = new NNTP(['Settings' => $pdo]);
-				if (($pdo->getSetting('alternate_nntp') == '1' ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
+				if (($site->alternate_nntp == '1' ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
 					exit($pdo->log->error("Unable to connect to usenet."));
 				}
 

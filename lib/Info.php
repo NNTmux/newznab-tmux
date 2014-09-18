@@ -90,6 +90,8 @@ class Info
 
 		$this->echo = ($options['Echo'] && NN_ECHOCLI);
 		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+		$s = new Sites();
+		$this->site = $s->get();
 		$this->nzbs = ($this->site->maxnfoprocessed != '') ? (int)$this->site->maxnfoprocessed : 100;
 		$this->maxsize = ($this->site->maxsizetoprocessnfo != '') ? (int)$this->site->maxsizetoprocessnfo : 100;
 		$this->maxsize = ($this->maxsize > 0 ? ('AND size < ' . ($this->maxsize * 1073741824)) : '');
@@ -257,9 +259,11 @@ class Info
 	 */
 	static public function NfoQueryString(Settings &$pdo)
 	{
-		$maxSize = $pdo->getSetting('maxsizetoprocessnfo');
-		$minSize = $pdo->getSetting('minsizetoprocessnfo');
-		$maxRetries = (int)($pdo->getSetting('maxnforetries') >= 0 ? -((int)$pdo->getSetting('maxnforetries') + 1) : self::NFO_UNPROC);
+		$s = new Sites();
+		$site = $s->get();
+		$maxSize = $site->maxsizetoprocessnfo;
+		$minSize = $site->minsizetoprocessnfo;
+		$maxRetries = (int)($site->maxnforetries >= 0 ? -((int)$site->maxnforetries + 1) : self::NFO_UNPROC);
 		return (
 		sprintf(
 			'AND r.nzbstatus = %d AND r.nfostatus BETWEEN %d AND %d %s %s',

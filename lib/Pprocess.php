@@ -114,7 +114,7 @@ class PProcess
 		$this->site = $s->get();
 		//\\ Class instances.
 		$this->pdo = (($options['Settings'] instanceof DB) ? $options['Settings'] : new DB());
-		$this->groups = (($options['Groups'] instanceof Groups) ? $options['Groups'] : new Groups(['Settings' => $this->pdo]));
+		$this->groups = (($options['Groups'] instanceof Groups) ? $options['Groups'] : new Groups());
 		$this->_par2Info = new Par2Info();
 		$this->debugging = ($options['Logger'] instanceof Logger ? $options['Logger'] : new Logger(['ColorCLI' => $this->pdo->log]));
 		$this->nameFixer = (($options['NameFixer'] instanceof NameFixer) ? $options['NameFixer'] : new NameFixer(['Echo' => $this->echooutput, 'Settings' => $this->pdo, 'Groups' => $this->groups]));
