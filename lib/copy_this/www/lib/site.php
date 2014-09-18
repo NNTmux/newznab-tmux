@@ -79,7 +79,7 @@ class Sites
 		}
 
 		$db = new DB();
-		$rows = $db->query($sql, true, CACHEOPT_TTLMEDIUM);
+		$rows = $db->query($sql, true, NN_CACHE_EXPIRY_MEDIUM);
 
 		if ($rows === false)
 			return false;
