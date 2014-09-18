@@ -1862,7 +1862,7 @@ class Releases
 		}
 
 
-		$xml = Utility::getUrl($url);
+		$xml = Utility::getUrl([$url]);
 
 		if ($xml === false || preg_match('/no feed/i', $xml))
 			return "no feed";
