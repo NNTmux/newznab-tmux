@@ -317,6 +317,7 @@ Class ProcessAdditional
 		$this->_nfo = ($options['Nfo'] instanceof Info ? $options['Nfo'] : new Info(['Echo' => $this->_echoCLI, 'Settings' => $this->pdo]));
 		$s = new Sites();
 		$this->site = $s->get();
+		$this->nnnzb = new NZB();
 
 		$this->_innerFileBlacklist = ($this->site->innerfileblacklist == '' ? false : $this->site->innerfileblacklist);
 		$this->_maxNestedLevels = ($this->site->maxnestedlevels == 0 ? 3 : $this->site->maxnestedlevels);
@@ -708,7 +709,7 @@ Class ProcessAdditional
 	 */
 	protected function _getNZBContents()
 	{
-		$nzbPath = $this->_nzb->NZBPath($this->_release['guid']);
+		$nzbPath = $this->nnnzb->getNZBPath($this->_release['guid']);
 		if ($nzbPath === false) {
 
 			$this->_echo('NZB not found for GUID: ' . $this->_release['guid'], 'warning');
