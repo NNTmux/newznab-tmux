@@ -388,7 +388,7 @@ Class ProcessAdditional
 		$this->_processSample = ($this->site->ffmpegpath == '' ? false : true);
 		$this->_processVideo = ($this->site->processvideos == 0) ? false : true;
 		$this->_processJPGSample = ($this->site->processjpg == 0) ? false : true;
-		$this->_processAudioSample = ($this->site->processaudiosample == 0) ? false : true;
+		$this->_processAudioSample = ($this->site->saveaudiopreview == 0) ? false : true;
 		$this->_processMediaInfo = ($this->site->mediainfopath == '') ? false : true;
 		$this->_processAudioInfo = $this->_processMediaInfo;
 		$this->_processPasswords = (
@@ -708,7 +708,7 @@ Class ProcessAdditional
 	 */
 	protected function _getNZBContents()
 	{
-		$nzbPath = $this->_nzb->NZBPath($this->_release['guid']);
+		$nzbPath = $this->_nzb->getNZBPath($this->_release['guid']);
 		if ($nzbPath === false) {
 
 			$this->_echo('NZB not found for GUID: ' . $this->_release['guid'], 'warning');
