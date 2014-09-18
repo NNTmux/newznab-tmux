@@ -553,8 +553,8 @@ class Binaries
 			}
 
 			$delret = $db->queryExec(sprintf('DELETE FROM partrepair WHERE attempts >= 5 AND groupID = %d', $group['ID']));
-			printf("Repair: repaired %s.%s", $repaired, $this->n);
-			printf("Repair: cleaned %s parts.%s", $delret, $this->n);
+			$db->log->doEcho($db->log->primary(sprintf("Repair: repaired %s.%s", $repaired, $this->n)));
+			$db->log->doEcho($db->log->primary(sprintf("Repair: cleaned %s parts.%s", $delret, $this->n)));
 
 			return true;
 		}
