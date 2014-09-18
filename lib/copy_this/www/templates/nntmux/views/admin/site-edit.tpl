@@ -421,6 +421,21 @@
 	</td>
 </tr>
 
+	<tr>
+		<td style="width:180px;"><label for="miscotherretentionhours">Other->Misc Retention Hours:</label></td>
+		<td>
+			<input class="short" id="miscotherretentionhours" name="miscotherretentionhours" type="text" value="{$site->miscotherretentionhours}"/>
+			<div class="hint">The number of hours releases categorized as Misc->Other will be retained. Set to 0 to disable.</div>
+		</td>
+	</tr>
+	<tr>
+		<td style="width:180px;"><label for="mischashedretentionhours">Other->Hashed Retention Hours:</label></td>
+		<td>
+			<input class="short" id="mischashedretentionhours" name="mischashedretentionhours" type="text" value="{$site->mischashedretentionhours}"/>
+			<div class="hint">The number of hours releases categorized as Misc->Hashed will be retained. Set to 0 to disable.</div>
+		</td>
+	</tr>
+
 <tr>
 	<td><label for="partsdeletechunks">Parts Delete In Chunks</label>:</td>
 	<td>
@@ -886,7 +901,7 @@
 	<table class="input">
 
 		<tr>
-			<td style="width:180px;"><label for="maxsizetopostprocess">Maximum File Size to Postprocess:</label></td>
+			<td style="width:180px;"><label for="maxsizetopostprocess">Maximum Release Size to Post Process:</label></td>
 			<td>
 				<input class="short" id="maxsizetopostprocess" name="maxsizetopostprocess" type="text"
 					   value="{$fsite->maxsizetopostprocess}"/>
@@ -895,6 +910,15 @@
 				</div>
 			</td>
 		</tr>
+
+		<tr>
+			<td style="width:180px;"><label for="minsizetopostprocess">Minimum Release Size to Post Process:</label></td>
+			<td>
+				<input class="short" id="minsizetopostprocess" name="minsizetopostprocess" type="text" value="{$site->minsizetopostprocess}"/>
+				<div class="hint">The minimum size in megabytes to post process (additional) a release. If set to 0, then ignored.</div>
+			</td>
+		</tr>
+		<tr>
 
 		<tr>
 			<td style="width:180px;"><label for="lookuppar2">Lookup PAR2:</label></td>
@@ -1009,6 +1033,33 @@
 					   value="{$fsite->ffmpeg_duration}"/>
 
 				<div class="hint">The maximum duration (In Seconds) for ffmpeg to generate the sample for. (Default 5)
+				</div>
+			</td>
+		</tr>
+
+		<tr>
+			<td style="width:180px;"><label for="extractusingrarinfo">Extract RAR/ZIP using rarinfo:</label></td>
+			<td>
+				{html_radios id="extractusingrarinfo" name='extractusingrarinfo' values=$yesno_ids output=$yesno_names selected=$site->extractusingrarinfo separator='<br />'}
+				<div class="hint">Whether to use rarinfo or 7zip/unrar directly to decompress zip/rar files.
+					<br /><strong>Using rarinfo is faster, but the extracted files are not as large which leads to smaller video samples/ potentially black preview screenshots.</strong>
+				</div>
+			</td>
+		</tr>
+
+		<tr>
+			<td style="width:180px;"><label for="maxnestedlevels">How many levels deep to go into nested rar/zip files:</label></td>
+			<td>
+				<input class="short" id="maxnestedlevels" name="maxnestedlevels" type="text" value="{$site->maxnestedlevels}"/>
+				<div class="hint">If a rar/zip has rar/zip inside of it, how many times should we go in those inner rar/zip files.</div>
+			</td>
+		</tr>
+		<tr>
+			<td style="width:180px;"><label for="innerfileblacklist">Inner file black list Regex:</label></td>
+			<td>
+				<textarea rows="3" placeholder="Example: /setup\.exe|password\.url/i" id="innerfileblacklist" name="innerfileblacklist">{$site->innerfileblacklist}</textarea>
+				<div class="hint">You can add a regex here to set releases to potentially passworded when a file name inside a rar/zip matches this regex.
+					<br /><strong>You must ensure this regex is valid, a non valid regex will cause errors during processing!</strong>
 				</div>
 			</td>
 		</tr>
@@ -1175,6 +1226,15 @@
 
 				<div class="hint">The maximum number of retry attmpts to connect to nntp provider. On error, each retry
 					takes approximately 5 seconds nntp returns reply. (Default 10)
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td style="width:180px;"><label for="alternate_nntp">Alternate NNTP Provider:</label></td>
+			<td>
+				{html_radios id="alternate_nntp" name='alternate_nntp' values=$yesno_ids output=$yesno_names selected=$site->alternate_nntp separator='<br />'}
+				<div class="hint">This sets Postproccessing Additional/Nfo to use the alternate NNTP provider as set in
+					config.php.
 				</div>
 			</td>
 		</tr>
