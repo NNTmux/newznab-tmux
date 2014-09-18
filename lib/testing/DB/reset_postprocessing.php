@@ -5,8 +5,7 @@ require_once(WWW_DIR . "/lib/ColorCLI.php");
 require_once(WWW_DIR . "/lib/ConsoleTools.php");
 
 $pdo = new DB();
-$consoletools = new ConsoleTools();
-$pdo->log = new ColorCLI();
+$consoletools = new \ConsoleTools(['ColorCLI' => $pdo->log]);
 $ran = false;
 
 if (isset($argv[1]) && $argv[1] === "all") {
