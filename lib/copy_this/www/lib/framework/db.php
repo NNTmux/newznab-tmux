@@ -665,9 +665,9 @@ class DB extends \PDO
 	 * @param PDOStatement $result
 	 * @return array
 	 */
-	public function getAssocArray($result)
+	public function getAssocArray( PDOStatement $result)
 	{
-		return $result->fetchall(\PDO::FETCH_ASSOC);
+		return $result->fetch();
 	}
 
 	/**
@@ -676,7 +676,7 @@ class DB extends \PDO
 	 * @param PDOStatement $result
 	 * @return int
 	 */
-	public function getNumRows($result)
+	public function getNumRows(PDOStatement $result)
 	{
 		return $result->rowCount();
 	}
