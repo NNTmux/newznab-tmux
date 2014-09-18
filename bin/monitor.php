@@ -105,7 +105,7 @@ $proc_tmux = "SELECT "
 	. "(SELECT VALUE FROM tmux WHERE SETTING = 'monitor_path') as monitor_path, "
 	. "(SELECT VALUE FROM tmux WHERE SETTING = 'monitor_path_a') as monitor_path_a, "
 	. "(SELECT VALUE FROM tmux WHERE SETTING = 'monitor_path_b') as monitor_path_b, "
-	. "(SELECT VALUE FROM settings WHERE SETTING = 'debuginfo') as debug, "
+	. "(SELECT VALUE FROM site WHERE SETTING = 'debuginfo') as debug, "
 	. "(SELECT VALUE FROM tmux WHERE SETTING = 'dehash') as dehash, "
 	. "(SELECT VALUE FROM tmux WHERE SETTING = 'dehash_timer') as dehash_timer, "
 	. "(SELECT VALUE FROM tmux WHERE SETTING = 'backfill_days') as backfilldays, "
@@ -131,10 +131,10 @@ $proc_tmux = "SELECT "
 	. "(SELECT VALUE FROM tmux WHERE SETTING = 'showquery') AS show_query, "
 	. "(SELECT VALUE FROM tmux WHERE SETTING = 'lookup_reqids') as lookup_reqids, "
 	. "(SELECT VALUE FROM tmux WHERE SETTING = 'lookup_reqids_timer') as lookup_reqids_timer, "
-	. "(SELECT VALUE FROM settings WHERE SETTING = 'lookupbooks') as processbooks, "
-	. "(SELECT VALUE FROM settings WHERE SETTING = 'lookupmusic') as processmusic, "
-	. "(SELECT VALUE FROM settings WHERE SETTING = 'lookupgames') as processgames, "
-	. "(SELECT VALUE FROM settings WHERE SETTING = 'tmpunrarpath') as tmpunrar";
+	. "(SELECT VALUE FROM site WHERE SETTING = 'lookupbooks') as processbooks, "
+	. "(SELECT VALUE FROM site WHERE SETTING = 'lookupmusic') as processmusic, "
+	. "(SELECT VALUE FROM site WHERE SETTING = 'lookupgames') as processgames, "
+	. "(SELECT VALUE FROM site WHERE SETTING = 'tmpunrarpath') as tmpunrar";
 
 
 $split_query = "SELECT
