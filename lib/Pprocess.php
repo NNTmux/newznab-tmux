@@ -172,7 +172,7 @@ class PProcess
 	public function processBooks()
 	{
 		if ($this->site->lookupbooks != 0) {
-			(new Books(['Echo' => $this->echooutput, 'Settings' => $this->pdo, ]))->processBookReleases();
+			(new Book())->processBookReleases();
 		}
 	}
 
