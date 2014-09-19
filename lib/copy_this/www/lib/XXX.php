@@ -2,6 +2,7 @@
 require_once(WWW_DIR . "/lib/framework/db.php");
 require_once(WWW_DIR . "/lib/releaseimage.php");
 require_once(WWW_DIR . "/lib/IAFD.php");
+require_once(WWW_DIR . "/lib/ADM.php");
 require_once(WWW_DIR . "/lib/ADE.php");
 require_once(WWW_DIR . "/lib/AEBN.php");
 require_once(WWW_DIR . "/lib/Hotmovies.php");
@@ -583,7 +584,7 @@ class XXX
 				}
 				if ($this->parseXXXSearchName($arr['searchname']) !== false) {
 
-					$this->currentRelID = $arr['id'];
+					$this->currentRelID = $arr['ID'];
 					$movieName = $this->currentTitle;
 
 					if ($this->echooutput) {
