@@ -14,7 +14,7 @@ class AniDBstandAlone {
 
 	const CLIENTVER = 1;
 	function __construct($echooutput=false) {
-		$this->pdo = new Settings();
+		$this->pdo = new DB();
 		$t = new Tmux();
 		$this->tmux = $t->get();
 		$s = new Sites();
