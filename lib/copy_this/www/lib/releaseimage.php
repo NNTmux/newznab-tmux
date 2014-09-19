@@ -12,7 +12,7 @@ class ReleaseImage
 	 */
 	function ReleaseImage()
 	{
-		$this->imgSavePath = NN_COVERS. 'preview' . DS;
+		$this->imgSavePath = NN_COVERS . 'preview' . DS;
 		$this->audSavePath = NN_COVERS . 'audiosample' . DS;
 		$this->jpgSavePath = NN_COVERS . 'sample' . DS;
 		$this->movieImgSavePath = NN_COVERS . 'movies' . DS;
