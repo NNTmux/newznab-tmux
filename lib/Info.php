@@ -366,9 +366,9 @@ class Info
 					$cp = 'COMPRESS(%s)';
 					$nc = $this->pdo->escapeString($fetchedBinary);
 
-					$ckreleaseid = $this->pdo->queryOneRow(sprintf('SELECT id FROM releasenfo WHERE releaseid = %d', $arr['ID']));
+					$ckreleaseid = $this->pdo->queryOneRow(sprintf('SELECT ID FROM releasenfo WHERE releaseID = %d', $arr['ID']));
 					if (!isset($ckreleaseid['ID'])) {
-						$this->pdo->queryInsert(sprintf('INSERT INTO releasenfo (nfo, releaseid) VALUES (' . $cp . ', %d)', $nc, $arr['ID']));
+						$this->pdo->queryInsert(sprintf('INSERT INTO releasenfo (nfo, releaseID) VALUES (' . $cp . ', %d)', $nc, $arr['ID']));
 					}
 					$this->pdo->queryExec(sprintf('UPDATE releases SET nfostatus = %d WHERE ID = %d', self::NFO_FOUND, $arr['ID']));
 					$ret++;

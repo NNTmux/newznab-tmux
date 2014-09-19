@@ -321,7 +321,7 @@ class PProcess
 
 		$query = $this->pdo->queryOneRow(
 			sprintf('
-				SELECT ID, groupID, categoryID, name, searchname, UNIX_TIMESTAMP(postdate) AS post_date, ID AS releaseid
+				SELECT ID, groupID, categoryID, name, searchname, UNIX_TIMESTAMP(postdate) AS post_date, ID AS releaseID
 				FROM releases
 				WHERE isrenamed = 0
 				AND ID = %d',
