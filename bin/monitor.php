@@ -8,7 +8,7 @@ require_once(WWW_DIR . "/lib/showsleep.php");
 require_once(dirname(__FILE__) . "/../lib/functions.php");
 
 
-$version = "0.4r2100";
+$version = "0.4r2150";
 
 $pdo = new DB();
 $s = new Sites();
@@ -1740,7 +1740,7 @@ while ($i > 0) {
 			shell_exec("tmux respawnp -t${tmux_session}:2.9 'echo \"\033[38;5;\"$color\"m\n$panes2[9] Has no work to process \"' 2>&1 1> /dev/null");
 		}
 
-		//run leasenames threaded in pane 3.0
+		//run fixReleaseNames threaded in pane 3.0
 		if (($maxload >= get_load()) && ($fix_names == 1)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			$log = writelog($panes3[0]);
