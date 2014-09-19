@@ -12,11 +12,11 @@ class ReleaseImage
 	 */
 	function ReleaseImage()
 	{
-		$this->imgSavePath = WWW_DIR . 'covers/preview/';
-		$this->audSavePath = WWW_DIR . 'covers/audiosample/';
-		$this->jpgSavePath = WWW_DIR . 'covers/sample/';
-		$this->movieImgSavePath = WWW_DIR . 'covers/movies/';
-		$this->vidSavePath = WWW_DIR . 'covers/video/';
+		$this->imgSavePath = NN_COVERS. 'preview' . DS;
+		$this->audSavePath = NN_COVERS . 'audiosample' . DS;
+		$this->jpgSavePath = NN_COVERS . 'sample' . DS;
+		$this->movieImgSavePath = NN_COVERS . 'movies' . DS;
+		$this->vidSavePath = NN_COVERS . 'video' . DS;
 	}
 
 	/**
@@ -87,10 +87,26 @@ class ReleaseImage
 	}
 
 	/**
-	 * Delete an image from disk.
+	 * Delete images for the release.
+	 *
+	 * @param string      $guid   The GUID of the release.
+	 *
+	 * @return void
 	 */
 	public function delete($guid)
 	{
-		@unlink($this->imgSavePath . $guid . '_thumb.jpg');
+		$thumb = $guid . '_thumb.jpg';
+
+		// Audiosample folder.
+		@unlink($this->audSavePath . $guid . '.ogg');
+
+		// Preview folder.
+		@unlink($this->imgSavePath . $thumb);
+
+		// Sample folder.
+		@unlink($this->jpgSavePath . $thumb);
+
+		// Video folder.
+		@unlink($this->vidSavePath . $guid . '.ogv');
 	}
 }

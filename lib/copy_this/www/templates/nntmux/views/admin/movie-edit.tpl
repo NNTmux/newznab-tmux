@@ -1,4 +1,4 @@
- 
+
 <h1>{$page->title}</h1>
 
 <form enctype="multipart/form-data" action="{$SCRIPT_NAME}?action=submit" method="post">
@@ -85,7 +85,7 @@
 	<td>
 		<input type="file" id="cover" name="cover" />
 		{if $movie.cover == 1}
-			<img style="max-width:200px; display:block;" src="{$smarty.const.WWW_TOP}/../covers/movies/{$movie.imdbID}-cover.jpg" alt="" />
+			<img style="max-width:200px; display:block;" src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbID}-cover.jpg" alt="" />
 		{/if}
 	</td>
 </tr>
@@ -95,7 +95,7 @@
 	<td>
 		<input type="file" name="backdrop" />
 		{if $movie.backdrop == 1}
-			<img style="max-width:200px; display:block;" src="{$smarty.const.WWW_TOP}/../covers/movies/{$movie.imdbID}-backdrop.jpg" alt="" />
+			<img style="max-width:200px; display:block;" src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbID}-backdrop.jpg" alt="" />
 		{/if}
 	</td>
 </tr>

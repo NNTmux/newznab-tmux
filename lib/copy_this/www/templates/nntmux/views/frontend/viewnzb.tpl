@@ -7,7 +7,7 @@
 															 width="180" alt="{$rage.releasetitle|escape:"htmlall"}"
 															 style="float:right;" />{/if}
 {if $movie && $release.rageID < 0 && $movie.cover == 1}<img class="shadow"
-															src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbID}-cover.jpg"
+															src="{$smarty.const.WWW_TOP}covers/movies/{$movie.imdbID}-cover.jpg"
 															width="180" alt="{$movie.title|escape:"htmlall"}"
 															style="float:right;" />{/if}
 {if $game && $game.cover == 1}<img class="shadow" src="{$smarty.const.WWW_TOP}/covers/games/{$game.id}.jpg" width="160"

@@ -3,7 +3,7 @@
 	{foreach from=$results item=result}
 		<div id="moviefull">
 			{if $result.cover == 1}<img class="shadow pic" alt="{$result.title|escape:"htmlall"} Logo"
-										src="{$smarty.const.WWW_TOP}/covers/movies/{$result.imdbID}-cover.jpg" />{/if}
+										src="{$smarty.const.WWW_TOP}covers/movies/{$result.imdbID}-cover.jpg" />{/if}
 			<h1>{$result.title|escape:"htmlall"} ({$result.year})</h1>
 
 			<h2>{if $result.genre != ''}{$result.genre|replace:"|":" / "}{/if}</h2>
