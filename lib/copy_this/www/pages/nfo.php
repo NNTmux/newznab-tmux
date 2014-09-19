@@ -15,8 +15,7 @@ if (isset($_GET["id"]))
 		$page->show404();
 
 	$nfo = $releases->getReleaseNfo($rel['ID']);
-	$util = new Utility();
-	$nfo['nfoUTF'] = $util->cp437toUTF($nfo['nfo']);
+	$nfo['nfoUTF'] = cp437toUTF($nfo['nfo']);
 
 	$page->smarty->assign('rel', $rel);
 	$page->smarty->assign('nfo', $nfo);
