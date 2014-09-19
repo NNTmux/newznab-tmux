@@ -595,7 +595,7 @@ class XXX
 				} else {
 					$this->pdo->log->doEcho(".", true);
 				}
-				$this->pdo->queryExec(sprintf('UPDATE releases SET xxxinfo_id = %d WHERE ID = %d', $idcheck, $arr['id']));
+				$this->pdo->queryExec(sprintf('UPDATE releases SET xxxinfo_id = %d WHERE ID = %d', $idcheck, $arr['ID']));
 			}
 		} elseif ($this->echooutput) {
 			$this->pdo->log->doEcho($this->pdo->log->header('No xxx releases to process.'));
@@ -722,7 +722,7 @@ class XXX
 		foreach ($arr as $key => $value) {
 			$res = $this->pdo->queryOneRow("SELECT ID FROM genres WHERE title = " . $this->pdo->escapeString($value));
 			if ($res !== false) {
-				$ret .= "," . $res["id"];
+				$ret .= "," . $res["ID"];
 			} else {
 				$ret .= "," . $this->insertGenre($value);
 			}
