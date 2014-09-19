@@ -16,6 +16,9 @@ define('NN_CORE', NN_LIB);
 // Refers to the web root for the Smarty lib
 define('NN_WWW', NN_ROOT);
 
+//refers to tmux folder
+define('NN_TMUX', NN_ROOT . '..' . DS . 'misc' . DS . 'update_scripts' . DS . 'nix_scripts' . DS . 'tmux' .DS);
+
 // Refers to the covers folder
 define('NN_COVERS', NN_WWW . 'covers' .DS);
 
