@@ -547,8 +547,8 @@ class Film
 		$mov['cover'] = $mov['backdrop'] = $movieID = 0;
 		$mov['type'] = $mov['director'] = $mov['actors'] = $mov['language'] = '';
 
-		$mov['imdbID'] = $imdbId;
-		$mov['tmdbID'] = (!isset($tmdb['tmdbID']) || $tmdb['tmdbID'] == '') ? 'NULL' : $tmdb['tmdbID'];
+		$mov['imdbid'] = $imdbId;
+		$mov['tmdbid'] = (!isset($tmdb['tmdbid']) || $tmdb['tmdbid'] == '') ? 'NULL' : $tmdb['tmdbid'];
 
 		// Prefer FanArt.tv cover over TMDB. And TMDB over IMDB.
 		if ($this->checkVariable($fanart['cover'])) {
@@ -618,8 +618,8 @@ class Film
 				ON DUPLICATE KEY UPDATE
 					imdbID = %d, tmdbID = %s, title = %s, rating = %s, tagline = %s, plot = %s, year = %s, genre = %s,
 					type = %s, director = %s, actors = %s, language = %s, cover = %d, backdrop = %d, updateddate = NOW()",
-				$mov['imdbID'],
-				$mov['tmdbID'],
+				$mov['imdbid'],
+				$mov['tmdbid'],
 				$this->pdo->escapeString($mov['title']),
 				$this->pdo->escapeString($mov['rating']),
 				$this->pdo->escapeString($mov['tagline']),
@@ -632,8 +632,8 @@ class Film
 				$this->pdo->escapeString(substr($mov['language'], 0, 64)),
 				$mov['cover'],
 				$mov['backdrop'],
-				$mov['imdbID'],
-				$mov['tmdbID'],
+				$mov['imdbid'],
+				$mov['tmdbid'],
 				$this->pdo->escapeString($mov['title']),
 				$this->pdo->escapeString($mov['rating']),
 				$this->pdo->escapeString($mov['tagline']),
@@ -656,7 +656,7 @@ class Film
 					' (' .
 					$mov['year'] .
 					') - ' .
-					$mov['imdbID']
+					$mov['imdbid']
 				)
 			);
 		}
@@ -752,9 +752,9 @@ class Film
 			}
 		}
 
-		$ret['tmdbID'] = $tmdbLookup['id'];
+		$ret['tmdbid'] = $tmdbLookup['id'];
 		$ImdbID = str_replace('tt', '', $tmdbLookup['imdbid']);
-		$ret['imdbID'] = $ImdbID;
+		$ret['imdbid'] = $ImdbID;
 		if (isset($tmdbLookup['vote_average'])) {
 			$ret['rating'] = ($tmdbLookup['vote_average'] == 0) ? '' : $tmdbLookup['vote_average'];
 		}
@@ -1094,8 +1094,8 @@ class Film
 		return (
 		($IMDBCheck === false
 			? false
-			: (is_numeric($IMDBCheck['imdbID'])
-				? (int)$IMDBCheck['imdbID']
+			: (is_numeric($IMDBCheck['imdbid'])
+				? (int)$IMDBCheck['imdbid']
 				: false
 			)
 		)
