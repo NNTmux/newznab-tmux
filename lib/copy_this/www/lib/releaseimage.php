@@ -20,27 +20,29 @@ class ReleaseImage
 	}
 
 	/**
-	 * Return an image from a path.
+	 * Get a URL or file image and convert it to string.
+	 *
+	 * @param string $imgLoc URL or file location.
+	 *
+	 * @return bool|mixed|string
 	 */
-	public function fetchImage($imgLoc)
+	protected function fetchImage($imgLoc)
 	{
 		$img = false;
-		if (preg_match('/^http:/i', $imgLoc))
-			$img = Utility::getUrl([$imgLoc]);
-		elseif (file_exists($imgLoc))
+
+		if (strpos(strtolower($imgLoc), 'http:') === 0) {
+			$img = Utility::getUrl(['url' => $imgLoc]);
+		} else if (is_file($imgLoc)) {
 			$img = @file_get_contents($imgLoc);
+		}
 
 		if ($img !== false) {
 			$im = @imagecreatefromstring($img);
 			if ($im !== false) {
 				imagedestroy($im);
-
 				return $img;
 			}
-
-			return false;
 		}
-
 		return false;
 	}
 
