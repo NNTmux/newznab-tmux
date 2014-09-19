@@ -9,6 +9,7 @@ require_once(WWW_DIR . "/lib/Hotmovies.php");
 require_once(WWW_DIR . "/lib/Popporn.php");
 require_once(WWW_DIR . "/lib/category.php");
 require_once(WWW_DIR . "/lib/ColorCLI.php");
+require_once(WWW_DIR . "/lib/Logger.php");
 
 
 /**
@@ -17,12 +18,12 @@ require_once(WWW_DIR . "/lib/ColorCLI.php");
 class XXX
 {
 	/**
-	 * @var Settings
+	 * @var DB
 	 */
 	public $pdo;
 
 	/**
-	 * We used AdultDVDEmpire or PopPorn class -- used for template and trailer information
+	 * What scraper class did we use -- used for template and trailer information
 	 *
 	 * @var string
 	 */
@@ -84,8 +85,8 @@ class XXX
 		if (NN_DEBUG || NN_LOGGING) {
 			$this->debug = true;
 			try {
-				$this->debugging = new Logger();
-			} catch (LoggerException $error) {
+				$this->debugging = new \Logger();
+			} catch (\LoggerException $error) {
 				$this->_debug = false;
 			}
 		}
@@ -148,14 +149,14 @@ class XXX
 	{
 		$catsrch = '';
 		if (count($cat) > 0 && $cat[0] != -1) {
-			$catsrch = (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
+			$catsrch = (new \Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
 		}
 
 		$res = $this->pdo->queryOneRow(
 			sprintf("
 				SELECT COUNT(DISTINCT r.xxxinfo_id) AS num
 				FROM releases r
-				INNER JOIN xxxinfo xxx ON xxx.ID = r.xxxinfo_id
+				INNER JOIN xxxinfo xxx ON xxx.id = r.xxxinfo_id
 				WHERE r.nzbstatus = 1
 				AND xxx.title != ''
 				AND r.passwordstatus <= %d
@@ -189,7 +190,7 @@ class XXX
 	{
 		$catsrch = '';
 		if (count($cat) > 0 && $cat[0] != -1) {
-			$catsrch = (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
+			$catsrch = (new \Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
 		}
 
 		$order = $this->getXXXOrder($orderBy);
@@ -211,11 +212,11 @@ class XXX
 			xxx.*, UNCOMPRESS(xxx.plot) AS plot, groups.name AS group_name, rn.ID as nfoid FROM releases r
 			LEFT OUTER JOIN groups ON groups.ID = r.groupID
 			LEFT OUTER JOIN releasenfo rn ON rn.releaseID = r.ID
-			INNER JOIN xxxinfo xxx ON xxx.ID = r.xxxinfo_id
+			INNER JOIN xxxinfo xxx ON xxx.id = r.xxxinfo_id
 			WHERE r.nzbstatus = 1
 			AND xxx.title != ''
 			AND r.passwordstatus <= %d AND %s %s %s %s
-			GROUP BY xxx.ID ORDER BY %s %s %s",
+			GROUP BY xxx.id ORDER BY %s %s %s",
 			$this->showPasswords,
 			$this->getBrowseBy(),
 			$catsrch,
@@ -309,9 +310,9 @@ class XXX
 				$ta = $this->getGenres(true,$ta);
 				$ta = $ta["title"];
 			}
-			if ($i > 5) {
+			if ($i > 7) {
 				break;
-			} //only use first 6
+			} //only use first 8
 			$newArr[] = '<a href="' . WWW_TOP . '/xxx?' . $field . '=' . urlencode($ta) . '" title="' . $ta . '">' . $ta . '</a>';
 			$i++;
 		}
@@ -380,14 +381,14 @@ class XXX
 		$res = false;
 		$this->whichclass = '';
 
-		$iafd = new IAFD();
+		$iafd = new \IAFD();
 		$iafd->searchTerm = $xxxmovie;
 
 		if ($iafd->findme() !== false) {
 
 			switch($iafd->classUsed) {
 				case "ade":
-					$mov = new ADE();
+					$mov = new \ADE();
 					$mov->directLink = (string)$iafd->directUrl;
 					$res = $mov->getDirect();
 					$res['title'] = $iafd->title;
@@ -401,21 +402,21 @@ class XXX
 		if ($res === false) {
 
 			$this->whichclass = "aebn";
-			$mov = new AEBN();
+			$mov = new \AEBN();
 			$mov->cookie = $this->cookie;
 			$mov->searchTerm = $xxxmovie;
 			$res = $mov->search();
 
 			if ($res === false) {
 				$this->whichclass = "ade";
-				$mov = new ADE();
+				$mov = new \ADE();
 				$mov->searchTerm = $xxxmovie;
 				$res = $mov->search();
 			}
 
 			if ($res === false) {
 				$this->whichclass = "pop";
-				$mov = new Popporn();
+				$mov = new \Popporn();
 				$mov->cookie = $this->cookie;
 				$mov->searchTerm = $xxxmovie;
 				$res = $mov->search();
@@ -424,7 +425,7 @@ class XXX
 			// Last in list as it doesn't have trailers
 			if ($res === false) {
 				$this->whichclass = "adm";
-				$mov = new ADM();
+				$mov = new \ADM();
 				$mov->cookie = $this->cookie;
 				$mov->searchTerm = $xxxmovie;
 				$res = $mov->search();
@@ -537,7 +538,7 @@ class XXX
 
 		if ($this->echooutput) {
 			$this->pdo->log->doEcho(
-				$this->pdo->log->headerOver(($xxxID !== false ? 'Added/updated movie: ' : 'Nothing to update for xxx movie: ')) .
+				$this->pdo->log->headerOver(($xxxID !== false ? 'Added/updated XXX movie: ' : 'Nothing to update for XXX movie: ')) .
 				$this->pdo->log->primary($mov['title'])
 			);
 		}
@@ -546,16 +547,12 @@ class XXX
 	}
 
 	/**
-	 * Process releases with no xxxinfo ID's.
+	 * Process XXX releases where xxxinfo is 0
 	 *
 	 */
-
 	public function processXXXReleases()
 	{
-
-		// Get all releases without an IMpdo id.
-		$res = $this->pdo->query(
-			sprintf("
+		$res = $this->pdo->query(sprintf("
 				SELECT r.searchname, r.ID
 				FROM releases r
 				WHERE r.nzbstatus = 1
@@ -579,32 +576,46 @@ class XXX
 				$idcheck = -2;
 
 				// Try to get a name.
-				if ($this->debug && $this->echooutput) {
-					$this->pdo->log->doEcho("DB name: " . $arr['searchname'], true);
-				}
 				if ($this->parseXXXSearchName($arr['searchname']) !== false) {
+					$check = $this->checkXXXInfoExists($this->currentTitle);
+					if ($check === false) {
+						$this->currentRelID = $arr['id'];
+						$movieName = $this->currentTitle;
+						if ($this->debug && $this->echooutput) {
+							$this->pdo->log->doEcho("DB name: " . $arr['searchname'], true);
+						}
+						if ($this->echooutput) {
+							$this->pdo->log->doEcho($this->pdo->log->primaryOver("Looking up: ") . $this->pdo->log->headerOver($movieName), true);
+						}
 
-					$this->currentRelID = $arr['ID'];
-					$movieName = $this->currentTitle;
-
-					if ($this->echooutput) {
-						$this->pdo->log->doEcho($this->pdo->log->primaryOver("Looking up: ") . $this->pdo->log->headerOver($movieName), true);
+						$idcheck = $this->updateXXXInfo($movieName);
+					} else {
+						$idcheck = (int)$check['id'];
 					}
-
-					$idcheck = $this->updateXXXInfo($movieName);
 				} else {
 					$this->pdo->log->doEcho(".", true);
 				}
-				$this->pdo->queryExec(sprintf('UPDATE releases SET xxxinfo_id = %d WHERE id = %d', $idcheck, $arr['id']));
+				$this->pdo->queryExec(sprintf('UPDATE releases SET xxxinfo_id = %d WHERE ID = %d', $idcheck, $arr['id']));
 			}
-
 		} elseif ($this->echooutput) {
 			$this->pdo->log->doEcho($this->pdo->log->header('No xxx releases to process.'));
 		}
 	}
 
 	/**
-	 * Parse a xxx name from a release search name.
+	 * Checks xxxinfo to make sure releases exist
+	 *
+	 * @param $releaseName
+	 *
+	 * @return array|bool
+	 */
+	protected function checkXXXInfoExists($releaseName)
+	{
+		return $this->pdo->queryOneRow(sprintf("SELECT id, title FROM xxxinfo WHERE title LIKE %s", "'". $releaseName . "%'"));
+	}
+
+	/**
+	 * Cleans up a searchname to make it easier to scrape.
 	 *
 	 * @param string $releaseName
 	 *
@@ -702,14 +713,14 @@ class XXX
 		$ret = null;
 
 		if (!is_array($arr)) {
-			$res = $this->pdo->queryOneRow("SELECT id FROM genres WHERE title = " . $this->pdo->escapeString($arr));
+			$res = $this->pdo->queryOneRow("SELECT ID FROM genres WHERE title = " . $this->pdo->escapeString($arr));
 			if ($res !== false) {
 				return $res["id"];
 			}
 		}
 
 		foreach ($arr as $key => $value) {
-			$res = $this->pdo->queryOneRow("SELECT id FROM genres WHERE title = " . $this->pdo->escapeString($value));
+			$res = $this->pdo->queryOneRow("SELECT ID FROM genres WHERE title = " . $this->pdo->escapeString($value));
 			if ($res !== false) {
 				$ret .= "," . $res["id"];
 			} else {
