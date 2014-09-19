@@ -205,5 +205,3 @@
 		</form>
 	{/foreach}
 {/if}
-
-
