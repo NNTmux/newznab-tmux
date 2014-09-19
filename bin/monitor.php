@@ -1616,7 +1616,7 @@ while ($i > 0) {
 			//run postprocess_releases non amazon
 			$log = writelog($panes2[2]);
 			shell_exec("tmux respawnp -t${tmux_session}:2.2 ' \
-						cd $_bin && $_php postprocess_new.php movie true $clean $log; date +\"%D %T\"; $_sleep $post_timer_non' 2>&1 1> /dev/null"
+						cd $_bin && $_php postprocess_new.php movies true $clean $log; date +\"%D %T\"; $_sleep $post_timer_non' 2>&1 1> /dev/null"
 			);
 		} else if (($maxload >= get_load()) && ($post_non != 0) && ($movie_releases_proc == 0)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
@@ -1696,7 +1696,7 @@ while ($i > 0) {
 		if (($maxload >= get_load()) && ($post_amazon == 1) && ($book_releases_proc > 0)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			$log = writelog($panes2[7]);
-			shell_exec("tmux respawnp -t${tmux_session}:2.7 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php postprocess_new.php ebook true 2>&1 $log && $_sleep $post_timer_amazon && echo \" \033[1;0;33m\"' 2>&1 1> /dev/null");
+			shell_exec("tmux respawnp -t${tmux_session}:2.7 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php postprocess_new.php book true 2>&1 $log && $_sleep $post_timer_amazon && echo \" \033[1;0;33m\"' 2>&1 1> /dev/null");
 		} else if (($maxload >= get_load()) && ($post_amazon == 1) && ($book_releases_proc == 0)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			shell_exec("tmux respawnp -t${tmux_session}:2.7 'echo \"\033[38;5;\"$color\"m\n$panes2[7] has been disabled/terminated by No Books to process\"' 2>&1 1> /dev/null");
