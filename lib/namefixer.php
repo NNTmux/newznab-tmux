@@ -877,7 +877,7 @@ class NameFixer
 				foreach ($match as $val) {
 					$title = $this->pdo->queryOneRow("SELECT title, ID from prehash WHERE title = " . $this->pdo->escapeString(trim($val)));
 					if ($title !== false) {
-						$this->updateRelease($release, $title['title'], $method = "preDB: Match", $echo, $type, $namestatus, $show, $title['id']);
+						$this->updateRelease($release, $title['title'], $method = "preDB: Match", $echo, $type, $namestatus, $show, $title['ID']);
 						$preid = true;
 					}
 				}
