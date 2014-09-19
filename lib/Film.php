@@ -891,8 +891,8 @@ class Film
 	public function doMovieUpdate($buffer, $service, $id, $processImdb = 1)
 	{
 		$imdbID = false;
-		if (preg_match('/(?:imdb.*?)?(?:tt|Title\?)(?P<imdbID>\d{5,7})/i', $buffer, $matches)) {
-			$imdbID = $matches['imdbID'];
+		if (preg_match('/(?:imdb.*?)?(?:tt|Title\?)(?P<imdbid>\d{5,7})/i', $buffer, $matches)) {
+			$imdbID = $matches['imdbid'];
 		}
 
 		if ($imdbID !== false) {
