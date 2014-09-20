@@ -1806,7 +1806,7 @@ class Releases
 		}
 		// Misc other.
 		if ($page->site->miscotherretentionhours > 0) {
-			$db->doEcho($db->log->primary('Stage 7a: Deleting releases from misc->other category'));
+			$db->log->primary('Stage 7a: Deleting releases from misc->other category');
 			$releaseImage = new ReleaseImage();
 			$releases = $db->queryDirect(
 				sprintf('
@@ -1828,7 +1828,7 @@ class Releases
 
 		// Misc hashed.
 		if ($page->site->mischashedretentionhours > 0) {
-			$db->doEcho($db->log->primary('Stage 7b: Deleting releases from misc->hashed category'));
+			$db->log->primary('Stage 7b: Deleting releases from misc->hashed category');
 			$releaseImage = new ReleaseImage();
 			$releases = $db->queryDirect(
 				sprintf('
@@ -1847,14 +1847,13 @@ class Releases
 				}
 			}
 		}
-		$db->doEcho(
+
 			$db->log->primary(
 				'Removed releases: ' .
 				number_format($miscRetentionDeleted) .
 				' from misc->other' .
 				number_format($miscHashedDeleted) .
 				' from misc->hashed'
-				)
 		);
 
 		//
