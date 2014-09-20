@@ -669,23 +669,25 @@ class Releases
 	/**
 	 * Deletes a single release by GUID, and all the corresponding files.
 	 *
-	 * @param              $guid
-	 * @param              $id
+	 * @param array        $identifiers ['g' => Release GUID(mandatory), 'id => ReleaseID(optional, pass false)]
 	 * @param NZB          $nzb
 	 * @param ReleaseImage $releaseImage
 	 */
-	public function deleteSingle($guid, $id, $nzb, $releaseImage)
+	public function deleteSingle($identifiers, $nzb, $releaseImage)
 	{
-		$db = new DB();
-		$releaseImage = new ReleaseImage();
 		// Delete NZB from disk.
-		$nzbPath = $nzb->getNZBPath($guid);
+		$nzbPath = $nzb->getNZBPath($identifiers['g']);
 		if ($nzbPath) {
 			@unlink($nzbPath);
 		}
+		$db = new DB();
 
 		// Delete images.
-		$releaseImage->delete($guid);
+		$releaseImage->delete($identifiers['g']);
+
+		// Delete from sphinx.
+		//$this->sphinxSearch->deleteRelease($identifiers, $this->pdo);
+
 		// Delete from DB.
 		$db->queryExec(
 			sprintf('
@@ -700,7 +702,7 @@ class Releases
 				LEFT OUTER JOIN releasevideo rv ON rv.releaseID = r.ID
 				LEFT OUTER JOIN releaseextrafull re ON re.releaseID = r.ID
 				WHERE r.guid = %s',
-				$db->escapeString($guid)
+				$db->escapeString($identifiers['g'])
 			)
 		);
 	}
@@ -1442,6 +1444,7 @@ class Releases
 		$page = new Page();
 		$groups = new Groups;
 		$retcount = 0;
+		$miscRetentionDeleted = $miscHashedDeleted = 0;
 
 		echo $s->getLicense();
 
@@ -1801,6 +1804,58 @@ class Releases
 				)
 			);
 		}
+		// Misc other.
+		if ($page->site->miscotherretentionhours > 0) {
+			$db->doEcho($db->log->primary('Stage 7a: Deleting releases from misc->other category'));
+			$releaseImage = new ReleaseImage();
+			$releases = $db->queryDirect(
+				sprintf('
+					SELECT ID, guid
+					FROM releases
+					WHERE categoryID = %d
+					AND adddate <= NOW() - INTERVAL %d HOUR',
+					\Category::CAT_MISC_OTHER,
+					$page->site->miscotherretentionhours
+				)
+			);
+			if ($releases instanceof \Traversable) {
+				foreach ($releases as $release) {
+					$this->deleteSingle(['g' => $release['guid'], 'i' => $release['ID']], $nzb, $releaseImage);
+					$miscRetentionDeleted++;
+				}
+			}
+		}
+
+		// Misc hashed.
+		if ($page->site->mischashedretentionhours > 0) {
+			$db->doEcho($db->log->primary('Stage 7b: Deleting releases from misc->hashed category'));
+			$releaseImage = new ReleaseImage();
+			$releases = $db->queryDirect(
+				sprintf('
+					SELECT ID, guid
+					FROM releases
+					WHERE categoryID = %d
+					AND adddate <= NOW() - INTERVAL %d HOUR',
+					\Category::CAT_MISC_HASHED,
+					$page->site->mischashedretentionhours
+				)
+			);
+			if ($releases instanceof \Traversable) {
+				foreach ($releases as $release) {
+					$this->deleteSingle(['g' => $release['guid'], 'i' => $release['ID']], $nzb, $releaseImage);
+					$miscHashedDeleted++;
+				}
+			}
+		}
+		$db->doEcho(
+			$db->log->primary(
+				'Removed releases: ' .
+				number_format($miscRetentionDeleted) .
+				' from misc->other' .
+				number_format($miscHashedDeleted) .
+				' from misc->hashed'
+				)
+		);
 
 		//
 		// User/Request housekeeping, should ideally move this to its own section, but it needs to be done automatically.
@@ -1970,7 +2025,7 @@ class Releases
 				$re->delete($rel['ID']);
 				$re->deleteFull($rel['ID']);
 				$ri->delete($rel['guid']);
-				$db->exec(sprintf("DELETE from releases where id = %d", $rel['ID']));
+				$db->queryExec(sprintf("DELETE from releases where id = %d", $rel['ID']));
 			}
 		}
 	}
