@@ -41,7 +41,7 @@ Class ProcessAdditional
 	const maxCompressedFilesToCheck = 20;
 
 	/**
-	 * @var Settings
+	 * @var DB
 	 */
 	public $pdo;
 
