@@ -144,6 +144,7 @@ class ReleaseRemover
 		$this->consoleTools = new ConsoleTools();
 		$this->releases = new Releases();
 		$this->nzb = new Enzebe();
+		$this->nnnzb = new NZB();
 		$this->releaseImage = new ReleaseImage();
 
 		$this->mysql = (DB_TYPE === 'mysql' ? true : false);
@@ -987,7 +988,7 @@ class ReleaseRemover
 		$deletedCount = 0;
 		foreach ($this->result as $release) {
 			if ($this->delete) {
-				$this->releases->deleteSingle($release['guid'], $release['ID'], $this->nzb, $this->releaseImage);
+				$this->releases->deleteSingle(['g' => $release['guid'], 'i' => $release['ID']], $this->nnnzb, $this->releaseImage);
 				if ($this->echoCLI) {
 					echo $this->color->primary('Deleting: ' . $this->method . ': ' . $release['searchname']);
 				}
