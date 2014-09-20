@@ -163,7 +163,7 @@ class IRCScraper extends IRCClient
 		}
 
 		// Join channels.
-		$this->joinChannels(array('#nZEDbPRE' => null));
+		$this->joinChannels(array('#TmuxPRE' => null));
 
 		if (!$this->_silent) {
 			echo
