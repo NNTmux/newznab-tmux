@@ -1441,6 +1441,7 @@ class Releases
 		$cat = new Categorize();
 		$nzb = new Nzb();
 		$s = new Sites();
+		$site = $s->get();
 		$releaseRegex = new ReleaseRegex();
 		$page = new Page();
 		$groups = new Groups;
@@ -1806,7 +1807,7 @@ class Releases
 			);
 		}
 		// Misc other.
-		if ($page->site->miscotherretentionhours > 0) {
+		if ($site->miscotherretentionhours > 0) {
 			$db->log->primary('Stage 7a: Deleting releases from misc->other category');
 			$releaseImage = new ReleaseImage();
 			$releases = $db->queryDirect(
@@ -1816,7 +1817,7 @@ class Releases
 					WHERE categoryID = %d
 					AND adddate <= NOW() - INTERVAL %d HOUR',
 					\Category::CAT_MISC_OTHER,
-					$page->site->miscotherretentionhours
+					$site->miscotherretentionhours
 				)
 			);
 			if ($releases instanceof \Traversable) {
@@ -1828,7 +1829,7 @@ class Releases
 		}
 
 		// Misc hashed.
-		if ($page->site->mischashedretentionhours > 0) {
+		if ($site->mischashedretentionhours > 0) {
 			$db->log->primary('Stage 7b: Deleting releases from misc->hashed category');
 			$releaseImage = new ReleaseImage();
 			$releases = $db->queryDirect(
@@ -1838,7 +1839,7 @@ class Releases
 					WHERE categoryID = %d
 					AND adddate <= NOW() - INTERVAL %d HOUR',
 					\Category::CAT_MISC_HASHED,
-					$page->site->mischashedretentionhours
+					$site->mischashedretentionhours
 				)
 			);
 			if ($releases instanceof \Traversable) {
