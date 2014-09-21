@@ -286,6 +286,7 @@ class Utility
 			'url'        => '',    // The URL to download.
 			'method'     => 'get', // Http method, get/post/etc..
 			'postdata'   => '',    // Data to send on post method.
+			'enctype'	 => '',    // Encoding type
 			'language'   => '',    // Language in header string.
 			'debug'      => false, // Show curl debug information.
 			'useragent'  => '',    // User agent string.
@@ -344,6 +345,9 @@ class Utility
 				CURLOPT_POST       => 1,
 				CURLOPT_POSTFIELDS => $options['postdata']
 			];
+		}
+		if ($options['enctype'] !== '') {
+			$context += [CURLOPT_ENCODING  => $options['enctype']];
 		}
 		if ($options['debug']) {
 			$context += [
