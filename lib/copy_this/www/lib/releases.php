@@ -1886,7 +1886,7 @@ class Releases
 						$queries = array_map("trim", $queries);
 						foreach ($queries as $q) {
 							if ($q) {
-								$db->queryExec($q);
+								$db->exec($q);
 							}
 						}
 
