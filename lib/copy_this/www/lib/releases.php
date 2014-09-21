@@ -1861,7 +1861,7 @@ class Releases
 		// User/Request housekeeping, should ideally move this to its own section, but it needs to be done automatically.
 		//
 		$users = new Users;
-		$users->pruneRequestHistory($site->userdownloadpurgedays);
+		$users->pruneRequestHistory($page->site->userdownloadpurgedays);
 
 		echo "Done    : Added " . $retcount . " releases\n\n";
 
