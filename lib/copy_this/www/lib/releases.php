@@ -1712,7 +1712,7 @@ class Releases
 		//
 		if ($page->site->completionpercent != 0) {
 			echo "Stage 4 : Deleting releases less than " . $page->site->completionpercent . " complete\n";
-			$result = $db->query(sprintf("select ID from releases where completion > 0 and completion < %d", $site->completionpercent));
+			$result = $db->query(sprintf("select ID from releases where completion > 0 and completion < %d", $page->site->completionpercent));
 			foreach ($result as $row)
 				$this->delete($row["ID"]);
 		}
