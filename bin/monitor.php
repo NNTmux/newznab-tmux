@@ -8,7 +8,7 @@ require_once(WWW_DIR . "/lib/showsleep.php");
 require_once(dirname(__FILE__) . "/../lib/functions.php");
 
 
-$version = "0.4r2150";
+$version = "0.4r2160";
 
 $pdo = new DB();
 $s = new Sites();
@@ -16,9 +16,15 @@ $site = $s->get();
 $patch = $site->dbversion;
 $c = new ColorCLI();
 $DIR = dirname(__FILE__);
+$alternate_nntp = ($site->alternate_nntp === '1') ? true : false;
 $port = NNTP_PORT;
 $host = NNTP_SERVER;
 $ip = gethostbyname($host);
+if ($alternate_nntp) {
+	$port_a = NNTP_PORT_A;
+	$host_a = NNTP_SERVER_A;
+	$ip_a = gethostbyname($host_a);
+}
 
 $t = new Tmux();
 $tmux = $t->get();
@@ -26,6 +32,7 @@ $seq = (isset($tmux->sequential)) ? $tmux->sequential : 0;
 $powerline = (isset($tmux->powerline)) ? $tmux->powerline : 0;
 $tpatch = $tmux->sqlpatch;
 $run_ircscraper = $tmux->scrape;
+
 
 
 if (command_exist("python3")) {
@@ -398,7 +405,9 @@ $run_time2 = 0;
 $run_time3 = 0;
 $run_time4 = 0;
 $uspactiveconnections = 0;
+$usp2activeconnections = 0;
 $usptotalconnections = 0;
+$usp2totalconnections = 0;
 $active_groups = 0;
 $all_groups = 0;
 $backfill_groups = 0;
@@ -466,7 +475,10 @@ sleep(5);
 //create initial display, USP connection count, prehash count and groups count adapted from nZEDb
 passthru('clear');
 printf($mask2, "Monitor Running v$version [" . $tpatch . "][" . $patch . "]: ", relativeTime("$time"));
-printf($mask1, "USP Connections:", $uspactiveconnections . " active (" . $usptotalconnections . " total) - " . $host . ":" . $port);;
+printf($mask1, "USP Connections:", $uspactiveconnections . " active (" . $usptotalconnections . " total) - " . $host . ":" . $port);
+if ($alternate_nntp) {
+	printf($mask1, "USP Alternate:", $usp2activeconnections . " active (" . $usp2totalconnections . " total) - " . (($alternate_nntp) ? $host_a . ":" . $port_a : "n/a"));
+}
 printf($mask1, "Newest Release:", "$newestname");
 printf($mask1, "Release Added:", relativeTime("$newestadd") . "ago");
 if ($predb == 1) {
@@ -1139,26 +1151,54 @@ while ($i > 0) {
 		$import_reason = "enabled";
 	}
 
-	//get usenet connections, borrowed from nZEDb
-	$uspactiveconnections = str_replace("\n", '', shell_exec("ss -n | grep " . $ip . ":" . $port . " | grep -c ESTAB"));
-	$usptotalconnections = str_replace("\n", '', shell_exec("ss -n | grep -c " . $ip . ":" . $port));
-	if ($uspactiveconnections == 0 && $usptotalconnections == 0) {
-		$uspactiveconnections = str_replace("\n", '', shell_exec("ss -n | grep " . $ip . ":https | grep -c ESTAB"));
-		$usptotalconnections = str_replace("\n", '', shell_exec("ss -n | grep -c " . $ip . ":https"));
-	}
-	if ($uspactiveconnections == 0 && $usptotalconnections == 0) {
-		$uspactiveconnections = str_replace("\n", '', shell_exec("ss -n | grep " . $port . " | grep -c ESTAB"));
-		$usptotalconnections = str_replace("\n", '', shell_exec("ss -n | grep -c " . $port));
-	}
-	if ($uspactiveconnections == 0 && $usptotalconnections == 0) {
-		$uspactiveconnections = str_replace("\n", '', shell_exec("ss -n | grep " . $ip . " | grep -c ESTAB"));
-		$usptotalconnections = str_replace("\n", '', shell_exec("ss -n | grep -c " . $ip));
+	//get usenet connections
+	if ($alternate_nntp) {
+		$usp1activeconnections = str_replace("\n", '', shell_exec("ss -n | grep " . $ip . ":" . $port . " | grep -c ESTAB"));
+		$usp1totalconnections = str_replace("\n", '', shell_exec("ss -n | grep -c " . $ip . ":" . $port));
+		$usp2activeconnections = str_replace("\n", '', shell_exec("ss -n | grep " . $ip_a . ":" . $port_a . " | grep -c ESTAB"));
+		$usp2totalconnections = str_replace("\n", '', shell_exec("ss -n | grep -c " . $ip_a . ":" . $port_a));
+		if ($usp1activeconnections == 0 && $usp1totalconnections == 0 && $usp2activeconnections == 0 && $usp2totalconnections == 0 && $port != $port_a) {
+			$usp1activeconnections = str_replace("\n", '', shell_exec("ss -n | grep " . $ip . ":https | grep -c ESTAB"));
+			$usp1totalconnections = str_replace("\n", '', shell_exec("ss -n | grep -c " . $ip . ":https"));
+			$usp2activeconnections = str_replace("\n", '', shell_exec("ss -n | grep " . $ip_a . ":https | grep -c ESTAB"));
+			$usp2totalconnections = str_replace("\n", '', shell_exec("ss -n | grep -c " . $ip_a . ":https"));
+		}
+		if ($usp1activeconnections == 0 && $usp1totalconnections == 0 && $usp2activeconnections == 0 && $usp2totalconnections == 0 && $port != $port_a) {
+			$usp1activeconnections = str_replace("\n", '', shell_exec("ss -n | grep " . $port . " | grep -c ESTAB"));
+			$usp1totalconnections = str_replace("\n", '', shell_exec("ss -n | grep -c " . $port));
+			$usp2activeconnections = str_replace("\n", '', shell_exec("ss -n | grep " . $port_a . " | grep -c ESTAB"));
+			$usp2totalconnections = str_replace("\n", '', shell_exec("ss -n | grep -c " . $port_a));
+		}
+		if ($usp1activeconnections == 0 && $usp1totalconnections == 0 && $usp2activeconnections == 0 && $usp2totalconnections == 0 && $port != $port_a) {
+			$usp1activeconnections = str_replace("\n", '', shell_exec("ss -n | grep " . $ip . " | grep -c ESTAB"));
+			$usp1totalconnections = str_replace("\n", '', shell_exec("ss -n | grep -c " . $ip));
+			$usp2activeconnections = str_replace("\n", '', shell_exec("ss -n | grep " . $ip . " | grep -c ESTAB"));
+			$usp2totalconnections = str_replace("\n", '', shell_exec("ss -n | grep -c " . $ip));
+		}
+	} else {
+		$usp1activeconnections = str_replace("\n", '', shell_exec("ss -n | grep " . $ip . ":" . $port . " | grep -c ESTAB"));
+		$usp1totalconnections = str_replace("\n", '', shell_exec("ss -n | grep -c " . $ip . ":" . $port));
+		if ($usp1activeconnections == 0 && $usp1totalconnections == 0 && $usp2activeconnections == 0 && $usp2totalconnections == 0) {
+			$usp1activeconnections = str_replace("\n", '', shell_exec("ss -n | grep " . $ip . ":https | grep -c ESTAB"));
+			$usp1totalconnections = str_replace("\n", '', shell_exec("ss -n | grep -c " . $ip . ":https"));
+		}
+		if ($usp1activeconnections == 0 && $usp1totalconnections == 0 && $usp2activeconnections == 0 && $usp2totalconnections == 0) {
+			$usp1activeconnections = str_replace("\n", '', shell_exec("ss -n | grep " . $port . " | grep -c ESTAB"));
+			$usp1totalconnections = str_replace("\n", '', shell_exec("ss -n | grep -c " . $port));
+		}
+		if ($usp1activeconnections == 0 && $usp1totalconnections == 0 && $usp2activeconnections == 0 && $usp2totalconnections == 0) {
+			$usp1activeconnections = str_replace("\n", '', shell_exec("ss -n | grep " . $ip . " | grep -c ESTAB"));
+			$usp1totalconnections = str_replace("\n", '', shell_exec("ss -n | grep -c " . $ip));
+		}
 	}
 
 	//update display
 	passthru('clear');
 	printf($mask2, "Monitor Running v$version [" . $tpatch . "][" . $patch . "]: ", relativeTime("$time"));
 	printf($mask1, "USP Connections:", $uspactiveconnections . " active (" . $usptotalconnections . " total) - " . $host . ":" . $port);
+	if ($alternate_nntp) {
+		printf($mask1, "USP Alternate:", $usp2activeconnections . " active (" . $usp2totalconnections . " total) - " . (($alternate_nntp) ? $host_a . ":" . $port_a : "n/a"));
+	}
 	printf($mask1, "Newest Release:", "$newestname");
 	printf($mask1, "Release Added:", relativeTime("$newestadd") . "ago");
 	if ($predb == 1) {
