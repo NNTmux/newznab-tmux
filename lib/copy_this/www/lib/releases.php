@@ -1441,7 +1441,6 @@ class Releases
 		$cat = new Categorize();
 		$nzb = new Nzb();
 		$s = new Sites();
-		$site = $s->get();
 		$releaseRegex = new ReleaseRegex();
 		$page = new Page();
 		$groups = new Groups;
@@ -1452,12 +1451,12 @@ class Releases
 
 		echo "\n\nStarting release update process (" . date("Y-m-d H:i:s") . ")\n";
 
-		if (!file_exists($site->nzbpath)) {
-			echo "Bad or missing nzb directory - " . $site->nzbpath;
+		if (!file_exists($page->site->nzbpath)) {
+			echo "Bad or missing nzb directory - " . $page->site->nzbpath;
 			return -1;
 		}
 
-		$this->checkRegexesUptoDate($site->latestregexurl, $site->latestregexrevision, $site->newznabID);
+		$this->checkRegexesUptoDate($page->site->latestregexurl, $page->site->latestregexrevision, $page->site->newznabID);
 
 		//
 		// Get all regexes for all groups which are to be applied to new binaries
@@ -1557,12 +1556,12 @@ class Releases
 					//
 					// Right number of files, but see if the binary is a allfilled/reqid post, in which case it needs its name looked up
 					//
-					if ($row['reqID'] != '' && $site->reqidurl != "") {
+					if ($row['reqID'] != '' && $page->site->reqidurl != "") {
 						//
 						// Try and get the name using the group
 						//
 						$binGroup = $db->queryOneRow(sprintf("SELECT name FROM groups WHERE ID = %d", $row["groupID"]));
-						$newtitle = $this->getReleaseNameForReqId($site->reqidurl, $site->newznabID, $binGroup["name"], $row["reqID"]);
+						$newtitle = $this->getReleaseNameForReqId($page->site->reqidurl, $page->site->newznabID, $binGroup["name"], $row["reqID"]);
 
 						//
 						// if the feed/group wasnt supported by the scraper, then just use the release name as the title.
@@ -1664,7 +1663,7 @@ class Releases
 					$properName = true;
 				}
 			}
-			$relid = $this->insertRelease($cleanRelName, $db->escapeString(utf8_encode($cleanedName)), $row["parts"], $row["groupID"], $relguid, $catId, $row["regexID"], $row["date"], $row["fromname"], $row["reqID"], $site, Enzebe::NZB_NONE, $properName === true ? 1 : 0, $isReqID, $prehashID);
+			$relid = $this->insertRelease($cleanRelName, $db->escapeString(utf8_encode($cleanedName)), $row["parts"], $row["groupID"], $relguid, $catId, $row["regexID"], $row["date"], $row["fromname"], $row["reqID"], $page->site, Enzebe::NZB_NONE, $properName === true ? 1 : 0, $isReqID, $prehashID);
 			//
 			// Tag every binary for this release with its parent release id
 			//
@@ -1676,7 +1675,7 @@ class Releases
 			//
 			// Write the nzb to disk
 			//
-			$nzbfile = $nzb->getNZBPath($relguid, $site->nzbpath, true);
+			$nzbfile = $nzb->getNZBPath($relguid, $page->site->nzbpath, true);
 			$nzb->writeNZBforreleaseID($relid, $cleanRelName, $catId, $nzbfile);
 
 			//
@@ -1711,8 +1710,8 @@ class Releases
 		//
 		// Delete any releases under the minimum completion percent.
 		//
-		if ($site->completionpercent != 0) {
-			echo "Stage 4 : Deleting releases less than " . $site->completionpercent . " complete\n";
+		if ($page->site->completionpercent != 0) {
+			echo "Stage 4 : Deleting releases less than " . $page->site->completionpercent . " complete\n";
 			$result = $db->query(sprintf("select ID from releases where completion > 0 and completion < %d", $site->completionpercent));
 			foreach ($result as $row)
 				$this->delete($row["ID"]);
@@ -1760,13 +1759,13 @@ class Releases
 
 		// Remove the binaries and parts used to form releases, or that are duplicates.
 		//
-		if ($site->partsdeletechunks > 0) {
+		if ($page->site->partsdeletechunks > 0) {
 			echo "Stage 7 : Chunk deleting unused binaries and parts";
 			$query = sprintf("SELECT parts.ID as partsID,binaries.ID as binariesID FROM parts
 						LEFT JOIN binaries ON binaries.ID = parts.binaryID
 						WHERE binaries.dateadded < %s - INTERVAL %d HOUR LIMIT 0,%d",
-				$db->escapeString($currTime_ori["now"]), ceil($site->rawretentiondays * 24),
-				$site->partsdeletechunks
+				$db->escapeString($currTime_ori["now"]), ceil($page->site->rawretentiondays * 24),
+				$page->site->partsdeletechunks
 			);
 
 			$cc = 0;
@@ -1802,12 +1801,12 @@ class Releases
 		} else {
 			echo "Stage 7 : Deleting unused binaries and parts\n";
 			$db->queryExec(sprintf("DELETE parts, binaries FROM parts JOIN binaries ON binaries.ID = parts.binaryID
-			WHERE binaries.dateadded < %s - INTERVAL %d HOUR", $db->escapeString($currTime_ori["now"]), ceil($site->rawretentiondays * 24)
+			WHERE binaries.dateadded < %s - INTERVAL %d HOUR", $db->escapeString($currTime_ori["now"]), ceil($page->site->rawretentiondays * 24)
 				)
 			);
 		}
 		// Misc other.
-		if ($site->miscotherretentionhours > 0) {
+		if ($page->site->miscotherretentionhours > 0) {
 			$db->log->primary('Stage 7a: Deleting releases from misc->other category');
 			$releaseImage = new ReleaseImage();
 			$releases = $db->queryDirect(
@@ -1817,7 +1816,7 @@ class Releases
 					WHERE categoryID = %d
 					AND adddate <= NOW() - INTERVAL %d HOUR',
 					\Category::CAT_MISC_OTHER,
-					$site->miscotherretentionhours
+					$page->site->miscotherretentionhours
 				)
 			);
 			if ($releases instanceof \Traversable) {
@@ -1829,7 +1828,7 @@ class Releases
 		}
 
 		// Misc hashed.
-		if ($site->mischashedretentionhours > 0) {
+		if ($page->site->mischashedretentionhours > 0) {
 			$db->log->primary('Stage 7b: Deleting releases from misc->hashed category');
 			$releaseImage = new ReleaseImage();
 			$releases = $db->queryDirect(
@@ -1839,7 +1838,7 @@ class Releases
 					WHERE categoryID = %d
 					AND adddate <= NOW() - INTERVAL %d HOUR',
 					\Category::CAT_MISC_HASHED,
-					$site->mischashedretentionhours
+					$page->site->mischashedretentionhours
 				)
 			);
 			if ($releases instanceof \Traversable) {
