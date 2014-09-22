@@ -199,7 +199,7 @@ if ($powerline == 1) {
 if ($seq == 1) {
 	exec("tmux -f $tmuxconfig new-session -d -s $tmux_session -n Monitor 'printf \"\033]2;\"Monitor\"\033\"'");
 	exec("tmux selectp -t 0; tmux splitw -t $tmux_session:0 -h -p 67 'printf \"\033]2;update_binaries\033\"'");
-    exec("tmux selectp -t 0; tmux splitw -t $tmux_session:0 -v -p 30 'printf \"\033]2;postprocessing\033\"'");
+    exec("tmux selectp -t 0; tmux splitw -t $tmux_session:0 -v -p 30 'printf \"\033]2;process_nfo\033\"'");
     exec("tmux selectp -t 2; tmux splitw -t $tmux_session:0 -v -p 75 'printf \"\033]2;backfill\033\"'");
     exec("tmux splitw -t $tmux_session:0 -v -p 67 'printf \"\033]2;import-nzb\033\"'");
     exec("tmux splitw -t $tmux_session:0 -v -p 50 'printf \"\033]2;update_releases\033\"'");
@@ -215,7 +215,7 @@ if ($seq == 1) {
 } else {
 	exec("tmux -f $tmuxconfig new-session -d -s $tmux_session -n Monitor 'printf \"\033]2;\"Monitor\"\033\"'");
 	exec("tmux selectp -t 0; tmux splitw -t $tmux_session:0 -h -p 67 'printf \"\033]2;update_binaries\033\"'");
-    exec("tmux selectp -t 0; tmux splitw -t $tmux_session:0 -v -p 30 'printf \"\033]2;postprocessing\033\"'");
+    exec("tmux selectp -t 0; tmux splitw -t $tmux_session:0 -v -p 30 'printf \"\033]2;process_nfo\033\"'");
     exec("tmux selectp -t 2; tmux splitw -t $tmux_session:0 -v -p 75 'printf \"\033]2;backfill\033\"'");
     exec("tmux splitw -t $tmux_session:0 -v -p 67 'printf \"\033]2;import-nzb\033\"'");
     exec("tmux splitw -t $tmux_session:0 -v -p 50 'printf \"\033]2;update_releases\033\"'");

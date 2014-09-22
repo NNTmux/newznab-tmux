@@ -8,7 +8,7 @@ require_once(WWW_DIR . "/lib/showsleep.php");
 require_once(dirname(__FILE__) . "/../lib/functions.php");
 
 
-$version = "0.4r2200";
+$version = "0.4r2201";
 
 $pdo = new DB();
 $s = new Sites();
@@ -1347,7 +1347,7 @@ while ($i > 0) {
 				);
 			} else {
 				$color = get_color($colors_start, $colors_end, $colors_exc);
-				shell_exec("tmux respawnp -k -t${tmux_session}:0.2 'echo \"\033[38;5;${color}m\n${panes0[1]} has been disabled/terminated by Import\"'");
+				shell_exec("tmux respawnp -k -t${tmux_session}:0.2 'echo \"\033[38;5;${color}m\n${panes2[0]} has been disabled/terminated by Import\"'");
 			}
 
 			//run update_binaries
@@ -1461,64 +1461,21 @@ while ($i > 0) {
 			shell_exec("tmux respawnp -k -t${tmux_session}:0.4 'echo \"\033[38;5;${color}m\n${panes0[4]} has been disabled/terminated by Import\"'");
 		}
 
-		//start postprocessing in pane 0.1
-
-		if (($post == 1 && ($work_remaining_now + $pc_releases_proc + $xxx_releases_proc) > 0)) {
-			//run postprocess_releases additional
-			$history = str_replace(" ", '', `tmux list-panes -t${tmux_session}:0 | grep 1: | awk '{print $4;}'`);
-			if ($last_history != $history) {
-				$last_history = $history;
-				$time29 = TIME();
-			} else {
-				if (TIME() - $time29 >= $post_kill_timer) {
-					$color = get_color($colors_start, $colors_end, $colors_exc);
-					passthru("tmux respawnp -k -t${tmux_session}:0.1 'echo \"\033[38;5;${color}m\n${panes0[1]} has been terminated by Possible Hung thread\"'");
-					$wipe = `tmux clearhist -t${tmux_session}:0.1`;
-					$time29 = TIME();
-				}
-			}
-			$dead1 = str_replace(" ", '', `tmux list-panes -t${tmux_session}:0 | grep dead | grep 1: | wc -l`);
-			if ($dead1 == 1) {
-				$time29 = TIME();
-			}
-			$log = writelog($panes0[1]);
-			shell_exec("tmux respawnp -t${tmux_session}:0.1 'echo \"\033[38;5;${color}m\"; \
-						cd $_bin && $_php postprocess.php additional true $log; date +\"%D %T\"; $_sleep $post_timer' 2>&1 1> /dev/null"
-			);
-		} else if (($post == 2) && ($nfo_remaining_now > 0)) {
-			$log = writelog($panes0[1]);
+		//start postprocessing nfo's in pane 0.1
+		if (($maxload >= get_load()) && (($post == 0) || ($post == 1)) && ($nfo_remaining_now > 0)) {
+			$log = writelog($panes2[0]);
 			shell_exec("tmux respawnp -t${tmux_session}:0.1 ' \
 						cd $_bin && $_php postprocess.php nfo true $log; date +\"%D %T\"; $_sleep $post_timer' 2>&1 1> /dev/null"
 			);
-		} else if (($post == 3) && (($nfo_remaining_now > 0) || ($work_remaining_now + $pc_releases_proc + $xxx_releases_proc > 0))) {
-			//run postprocess_releases additional
-			$history = str_replace(" ", '', `tmux list-panes -t${tmux_session}:0 | grep 1: | awk '{print $4;}'`);
-			if ($last_history != $history) {
-				$last_history = $history;
-				$time29 = TIME();
-			} else {
-				if (TIME() - $time29 >= $post_kill_timer) {
-					$color = get_color($colors_start, $colors_end, $colors_exc);
-					shell_exec("tmux respawnp -k -t${tmux_session}:0.1 'echo \"\033[38;5;${color}m\n${panes0[1]} has been terminated by Possible Hung thread\"'");
-					$wipe = `tmux clearhist -t${tmux_session}:0.1`;
-					$time29 = TIME();
-				}
-			}
-			$dead1 = str_replace(" ", '', `tmux list-panes -t${tmux_session}:0 | grep dead | grep 1: | wc -l`);
-			if ($dead1 == 1) {
-				$time29 = TIME();
-			}
-			$log = writelog($panes0[1]);
-			shell_exec("tmux respawnp -t${tmux_session}:0.1 ' \
-						cd $_bin && $_php postprocess.php additional true $log;\
-                        cd $_bin && $_php postprocess.php nfo true $log; date +\"%D %T\"; $_sleep $post_timer' 2>&1 1> /dev/null"
-			);
-		} else if (($post != 0) && ($nfo_remaining_now == 0) && ($work_remaining_now + $pc_releases_proc + $xxx_releases_proc == 0)) {
+		} else if (($maxload >= get_load()) && (($post == 0) || ($post == 1)) && ($nfo_remaining_now == 0)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -k -t${tmux_session}:0.1 'echo \"\033[38;5;${color}m\n${panes0[1]} has been disabled/terminated by No Misc/Nfo to process\"'");
+			shell_exec("tmux respawnp -k -t${tmux_session}:0.1 'echo \"\033[38;5;${color}m\n${panes0[1]} has been disabled/terminated by No Nfo to process\"'");
+		} else if ($maxload <= get_load()) {
+			$color = get_color($colors_start, $colors_end, $colors_exc);
+			shell_exec("tmux respawnp -t${tmux_session}:0.1 'echo \"\033[38;5;\"$color\"m\n$panes0[1] Disabled by Max Load\"' 2>&1 1> /dev/null");
 		} else {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -k -t${tmux_session}:0.1 'echo \"\033[38;5;${color}m\n${panes0[1]} has been disabled/terminated by Postprocess Additional\"'");
+			shell_exec("tmux respawnp -k -t${tmux_session}:0.1 'echo \"\033[38;5;${color}m\n${panes0[1]} threaded Nfo processing is running in pane 0.1\"'");
 		}
 
 		//runs update_release and in 0.5 once if needed and exits
@@ -1616,21 +1573,63 @@ while ($i > 0) {
 		}
 
 
-		//runs postprocess.php nfo in pane 2.0
-		if (($maxload >= get_load()) && (($post == 0) || ($post == 1)) && ($nfo_remaining_now > 0)) {
-			$log = writelog($panes2[0]);
+		//runs postprocess.php additional and nfo in pane 2.0
+		if (($post == 1 && ($work_remaining_now + $pc_releases_proc + $xxx_releases_proc) > 0)) {
+			//run postprocess_releases additional
+			$history = str_replace(" ", '', `tmux list-panes -t${tmux_session}:0 | grep 1: | awk '{print $4;}'`);
+			if ($last_history != $history) {
+				$last_history = $history;
+				$time29 = TIME();
+			} else {
+				if (TIME() - $time29 >= $post_kill_timer) {
+					$color = get_color($colors_start, $colors_end, $colors_exc);
+					passthru("tmux respawnp -k -t${tmux_session}:2.0 'echo \"\033[38;5;${color}m\n${panes2[0]} has been terminated by Possible Hung thread\"'");
+					$wipe = `tmux clearhist -t${tmux_session}:2.0`;
+					$time29 = TIME();
+				}
+			}
+			$dead1 = str_replace(" ", '', `tmux list-panes -t${tmux_session}:0 | grep dead | grep 1: | wc -l`);
+			if ($dead1 == 1) {
+				$time29 = TIME();
+			}
+			$log = writelog($panes0[1]);
+			shell_exec("tmux respawnp -t${tmux_session}:2.0 'echo \"\033[38;5;${color}m\"; \
+						cd $_bin && $_php postprocess.php additional true $log; date +\"%D %T\"; $_sleep $post_timer' 2>&1 1> /dev/null"
+			);
+		} else if (($post == 2) && ($nfo_remaining_now > 0)) {
+			$log = writelog($panes0[1]);
 			shell_exec("tmux respawnp -t${tmux_session}:2.0 ' \
 						cd $_bin && $_php postprocess.php nfo true $log; date +\"%D %T\"; $_sleep $post_timer' 2>&1 1> /dev/null"
 			);
-		} else if (($maxload >= get_load()) && (($post == 0) || ($post == 1)) && ($nfo_remaining_now == 0)) {
+		} else if (($post == 3) && (($nfo_remaining_now > 0) || ($work_remaining_now + $pc_releases_proc + $xxx_releases_proc > 0))) {
+			//run postprocess_releases additional
+			$history = str_replace(" ", '', `tmux list-panes -t${tmux_session}:0 | grep 1: | awk '{print $4;}'`);
+			if ($last_history != $history) {
+				$last_history = $history;
+				$time29 = TIME();
+			} else {
+				if (TIME() - $time29 >= $post_kill_timer) {
+					$color = get_color($colors_start, $colors_end, $colors_exc);
+					shell_exec("tmux respawnp -k -t${tmux_session}:2.0 'echo \"\033[38;5;${color}m\n${panes2[0]} has been terminated by Possible Hung thread\"'");
+					$wipe = `tmux clearhist -t${tmux_session}:2.0`;
+					$time29 = TIME();
+				}
+			}
+			$dead1 = str_replace(" ", '', `tmux list-panes -t${tmux_session}:0 | grep dead | grep 1: | wc -l`);
+			if ($dead1 == 1) {
+				$time29 = TIME();
+			}
+			$log = writelog($panes0[1]);
+			shell_exec("tmux respawnp -t${tmux_session}:2.0 ' \
+						cd $_bin && $_php postprocess.php additional true $log;\
+                        cd $_bin && $_php postprocess.php nfo true $log; date +\"%D %T\"; $_sleep $post_timer' 2>&1 1> /dev/null"
+			);
+		} else if (($post != 0) && ($nfo_remaining_now == 0) && ($work_remaining_now + $pc_releases_proc + $xxx_releases_proc == 0)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -k -t${tmux_session}:2.0 'echo \"\033[38;5;${color}m\n${panes2[0]} has been disabled/terminated by No Nfo to process\"'");
-		} else if ($maxload <= get_load()) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:2.0 'echo \"\033[38;5;\"$color\"m\n$panes2[0] Disabled by Max Load\"' 2>&1 1> /dev/null");
+			shell_exec("tmux respawnp -k -t${tmux_session}:2.0 'echo \"\033[38;5;${color}m\n${panes2[0]} has been disabled/terminated by No Misc/Nfo to process\"'");
 		} else {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -k -t${tmux_session}:2.0 'echo \"\033[38;5;${color}m\n${panes2[0]} threaded Nfo processing is running in pane 0.1\"'");
+			shell_exec("tmux respawnp -k -t${tmux_session}:2.0 'echo \"\033[38;5;${color}m\n${panes2[0]} has been disabled/terminated by Postprocess Additional\"'");
 		}
 
 		//Postprocess Non-amazon Releases in pane 2.1
