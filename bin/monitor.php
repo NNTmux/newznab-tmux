@@ -1657,20 +1657,20 @@ while ($i > 0) {
 		//Process Amazon in pane 2.2
 		if (($maxload >= get_load()) && ($post_amazon == 1) && ($music_releases_proc > 0 || $console_releases_proc > 0 || $pc_releases_proc > 0 || $book_releases_proc > 0)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
-			$log = writelog($panes2[3]);
-			shell_exec("tmux respawnp -t${tmux_session}:2.3 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php postprocess_new.php music true 2>&1 $log; \
+			$log = writelog($panes2[2]);
+			shell_exec("tmux respawnp -t${tmux_session}:2.2 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php postprocess_new.php music true 2>&1 $log; \
 			 $_php postprocess_new.php console true 2>&1 $log;\
 			 $_php postprocess_new.php games true 2>&1 $log;\
 			 $_php postprocess_new.php book true 2>&1 $log && $_sleep $post_timer_amazon' 2>&1 1> /dev/null");
 		} else if (($maxload >= get_load()) && ($post_amazon == 1) && ($music_releases_proc == 0 || $console_releases_proc == 0 || $pc_releases_proc == 0 || $book_releases_proc == 0)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:2.3 'echo \"\033[38;5;${color}m\n${panes2[3]} has been disabled/terminated by No Amazon to process\"'");
+			shell_exec("tmux respawnp -t${tmux_session}:2.2 'echo \"\033[38;5;${color}m\n${panes2[2]} has been disabled/terminated by No Amazon to process\"'");
 		} else if ($maxload <= get_load()) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:2.3 'echo \"\033[38;5;\"$color\"m\n$panes2[3] Disabled by Max Load\"' 2>&1 1> /dev/null");
+			shell_exec("tmux respawnp -t${tmux_session}:2.2 'echo \"\033[38;5;\"$color\"m\n$panes2[2] Disabled by Max Load\"' 2>&1 1> /dev/null");
 		} else {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -k -t${tmux_session}:2.3 'echo \"\033[38;5;${color}m\n${panes2[3]} has been disabled/terminated by Postprocess Amazon\"'");
+			shell_exec("tmux respawnp -k -t${tmux_session}:2.2 'echo \"\033[38;5;${color}m\n${panes2[2]} has been disabled/terminated by Postprocess Amazon\"'");
 		}
 
 		//run fixReleaseNames threaded in pane 3.0
