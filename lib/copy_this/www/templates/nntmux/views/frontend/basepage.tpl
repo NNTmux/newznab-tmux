@@ -116,7 +116,10 @@
 				<a title="Sabznbd - A great usenet binary downloader" href="http://www.sabnzbd.org/"><img class="menupic" alt="Sabznbd - A great usenet binary downloader" src="{$smarty.const.WWW_TOP}/templates/nntmux/images/sabnzbd.png" /></a>
 			</li>
 				<li>
-					<a title="NZBGet - The most efficient usenet downloader" href="http://www.http://nzbget.net//"><img class="menupic" alt="NZBGet - The most efficient usenet downloader" src="{$smarty.const.WWW_TOP}/templates/nntmux/images/nzbget.png" /></a>
+					<a title="NZBGet - The most efficient usenet downloader" href="http://nzbget.net/"><img class="menupic" alt="NZBGet - The most efficient usenet downloader" src="{$smarty.const.WWW_TOP}/templates/nntmux/images/nzbget.png" /></a>
+				</li>
+				<li>
+					<a title="Couchpotato - Download movies automatically, easily and in the best quality as soon as they are available" href="https://couchpota.to/"><img class="menupic" alt="Couchpotato - Download movies automatically, easily and in the best quality as soon as they are available" src="{$smarty.const.WWW_TOP}/templates/nntmux/images/couchpotato.png" /></a>
 				</li>
 			</ul>
 		</div>
