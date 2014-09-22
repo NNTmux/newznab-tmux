@@ -1475,7 +1475,7 @@ while ($i > 0) {
 			shell_exec("tmux respawnp -t${tmux_session}:0.1 'echo \"\033[38;5;\"$color\"m\n$panes0[1] Disabled by Max Load\"' 2>&1 1> /dev/null");
 		} else {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -k -t${tmux_session}:0.1 'echo \"\033[38;5;${color}m\n${panes0[1]} threaded Nfo processing is running in pane 0.1\"'");
+			shell_exec("tmux respawnp -k -t${tmux_session}:0.1 'echo \"\033[38;5;${color}m\n${panes0[1]} threaded Nfo processing is running in pane 2.0\"'");
 		}
 
 		//runs update_release and in 0.5 once if needed and exits
