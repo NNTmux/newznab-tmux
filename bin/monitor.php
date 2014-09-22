@@ -1865,7 +1865,7 @@ while ($i > 0) {
 		if ($maxload >= get_load()) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			$log = writelog($panes3[2]);
-			shell_exec("tmux respawnp -t${tmux_session}:3.2 'echo \"\033[38;5;\"$color\"m\" && cd $_lib && $_php postprocess_pre.php 2>&1 $log; ' 2>&1 1> /dev/null");
+			shell_exec("tmux respawnp -t${tmux_session}:3.2 'echo \"\033[38;5;\"$color\"m\" && cd $_lib && $_php postprocess_pre.php 7 2>&1 $log; ' 2>&1 1> /dev/null");
 			$time32 = TIME();
 		} else if ($maxload <= get_load()) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);

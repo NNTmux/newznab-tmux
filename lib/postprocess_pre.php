@@ -4,14 +4,4 @@ require_once(WWW_DIR . "/lib/nntp.php");
 require_once(WWW_DIR . "/lib/ColorCLI.php");
 require_once("prehash.php");
 
-$nntp = new Nntp();
-if ($nntp->doConnect() === false) {
-	$c = new ColorCLI();
-	echo $c->error("Unable to connect to usenet.\n");
-
-	return;
-}
-$c = new ColorCLI();
-$predb = new PreHash ($echooutput = true);
-$predb->checkPre($nntp);
-$nntp->doQuit();
+(new \PreHash(['Echo' => true]))->checkPre((isset($argv[1]) && is_numeric($argv[1]) ? $argv[1] : false));
