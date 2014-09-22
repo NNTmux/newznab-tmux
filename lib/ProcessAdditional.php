@@ -1642,7 +1642,7 @@ Class ProcessAdditional
 					Category::CAT_MOVIE_OTHER,
 					Category::CAT_TV_OTHER
 				),
-				$rQuery['ID']
+				$rQuery['id']
 			)
 		) {
 			return false;
@@ -1709,7 +1709,7 @@ Class ProcessAdditional
 												'new_name' => $newName,
 												'old_name' => $rQuery['searchname'],
 												'new_category' => $newCat,
-												'old_category' => $rQuery['ID'],
+												'old_category' => $rQuery['id'],
 												'group' => $rQuery['groupID'],
 												'release_id' => $this->_release['ID'],
 												'method' => 'ProcessAdditional->_getAudioInfo'

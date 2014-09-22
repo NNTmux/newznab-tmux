@@ -60,7 +60,7 @@ class Genres
 						FROM genres g
 						INNER JOIN
 							(SELECT DISTINCT genre_id FROM gamesinfo) x
-							ON x.genre_id = g.ID %1\$s
+							ON x.genreID = g.ID %1\$s
 							ORDER BY title",
 				$typesql
 			);
