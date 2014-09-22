@@ -99,9 +99,10 @@ Class NZBContents
 		$this->nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB());
 		$t = new Tmux();
 		$this->tmux = $t->get();
-		$this->site = new Sites();
+		$s = new Sites();
+		$this->site = $s->get();
 		$this->lookuppar2 = ($this->tmux->lookuppar2 == 1 ? true : false);
-		$this->alternateNNTP = ($this->site->get('alternate_nntp') == 1 ? true : false);
+		$this->alternateNNTP = ($this->site->alternate_nntp == 1 ? true : false);
 	}
 
 	/**
