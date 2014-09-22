@@ -608,7 +608,7 @@ class Movie
 			'language' => '/<a.*?href="\/language\/.* itemprop=["\']url["\'].*?>(.*?)<\/a>/iS'
         );
 
-		$buffer = Utility::getUrl("http://www.imdb.com/title/tt$imdbId/", 'get', '', '', '', '', '', $this->lookuplanguage);
+		$buffer = Utility::getUrl(['url' => 'http://www.imdb.com/title/tt$imdbId/', 'method'=>'get', 'language' => $this->lookuplanguage]);
 
         // make sure we got some data
         if ($buffer !== false && strlen($buffer))
@@ -704,7 +704,7 @@ class Movie
 						echo 'MovProc : '.$moviename.' ['.$arr['searchname'].']'."\n";
 
 					//$buffer = getUrl("https://www.google.com/search?source=ig&hl=en&rlz=&btnG=Google+Search&aq=f&oq=&q=".urlencode($moviename.' site:imdb.com'));
-                    $buffer = Utility::getUrl("http://www.bing.com/search?&q=".urlencode($moviename.' site:imdb.com'));
+                    $buffer = Utility::getUrl(['url' => 'http://www.bing.com/search?&q='.urlencode($moviename.' site:imdb.com')]);
 
 			        // make sure we got some data
 			        if ($buffer !== false && strlen($buffer))

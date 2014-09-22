@@ -1873,7 +1873,7 @@ class Releases
 		if ($url != "") {
 			if ($nnid != "")
 				$nnid = "?newznabID=" . $nnid . "&rev=" . $rev;
-			$regfile = Utility::getUrl([$url . $nnid, "get", "", "gzip"]);
+			$regfile = Utility::getUrl(['url' => $url . $nnid, 'method' => 'get', 'enctype' => 'gzip']);
 			if ($regfile !== false && $regfile != "") {
 				/*$Rev: 728 $*/
 				if (preg_match('/\/\*\$Rev: (\d{3,4})/i', $regfile, $matches)) {

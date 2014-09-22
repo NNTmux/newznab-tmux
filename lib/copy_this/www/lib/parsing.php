@@ -722,7 +722,7 @@ class Parsing
 						$movie = new Movie();
 						$imdbId = $matches[1];
 						$movCheck = $movie->fetchImdbProperties($imdbId);
-						$buffer = Utility::getUrl(['http://akas.imdb.com/title/tt' . $imdbId . '/']);
+						$buffer = Utility::getUrl(['url' => 'http://akas.imdb.com/title/tt' . $imdbId . '/']);
 						if (!preg_match('/content\=\"video\.tv\_show\"/i', $buffer)) {
 							if (isset($movCheck['title'])) {
 								$foundName = $movCheck['title'];

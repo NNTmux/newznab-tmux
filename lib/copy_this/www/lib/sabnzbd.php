@@ -156,7 +156,7 @@ class SABnzbd
 	public function sendToSab($guid)
 	{
 		return Utility::getUrl([
-		$this->url .
+		'url' => $this->url .
 			'api?mode=addurl&priority=' .
 			$this->priority .
 			'&apikey=' .

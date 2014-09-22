@@ -77,7 +77,7 @@ class RottenTomato
 		$url = RottenTomato::API_URL.$function."?apikey=".$this->getApikey().$params;
 		//echo $url;die();
 
-        return (string) Utility::getUrl([$url, 'get', '', 'gzip']);
+        return (string) Utility::getUrl(['url' => $url, 'method' => 'get', 'enctype' => 'gzip']);
 	}
 
 	public function setApikey($apikey)

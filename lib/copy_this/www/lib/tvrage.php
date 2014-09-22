@@ -296,7 +296,7 @@ class TvRage
 
 		$xml = $this->fetchCache($lookupUrl);
 		if ($xml === false)
-			$xml = Utility::getUrl([$lookupUrl]);
+			$xml = Utility::getUrl(['url' => $lookupUrl]);
 
 		if ($xml !== false)
 		{
