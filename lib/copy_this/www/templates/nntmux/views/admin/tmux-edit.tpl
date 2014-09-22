@@ -505,37 +505,6 @@
 </fieldset>
 
 <fieldset>
-	<legend>Update Spotnab</legend>
-	<table class="input">
-		<tr>
-			<td style="width:180px;"><label for="spotnab">Update comments from Spotnab:</label></td>
-			<td>
-				{html_options style="width:180px;" class="siteeditstyle" id="spotnab" name='spotnab' values=$spotnab_ids output=$spotnab_names selected=$ftmux->spotnab}
-				<div class="hint">Choose to update Spotnab true/false</div>
-			</td>
-		</tr>
-
-		<tr>
-			<td style="width:180px;"><label for="spotnab_timer">Spotnab Sleep Timer:</label></td>
-			<td>
-				<input id="spotnab_timer" name="spotnab_timer" class="short" type="text"
-					   value="{$ftmux->spotnab_timer}"/>
-
-				<div class="hint">The time to sleep from the time the loop ends until it is restarted, in seconds.</div>
-			</td>
-		</tr>
-		<tr>
-			<td style="width:180px;"><label for="explain">Information:</label></td>
-			<td>
-				<div class="explanation">Spotnab updates comments from newznab sites that enabled this feature.<br/>
-					You can set the privacy in admin->edit site.<br/>
-				</div>
-			</td>
-		</tr>
-	</table>
-</fieldset>
-
-<fieldset>
 	<legend>Fetch Missing Movie Info</legend>
 	<table class="input">
 		<tr>
@@ -588,47 +557,6 @@
 			<td>
 				<div class="explanation">Update PreDB data from nzpre. Enable only if you have nzpre access.<br/>
 					You need to enter nzpre details in admin->edit site, otherwise this wont do anything.<br/></div>
-			</td>
-		</tr>
-	</table>
-</fieldset>
-
-<fieldset>
-	<legend>Unwanted releases</legend>
-	<table class="input">
-		<tr>
-			<td style="width:180px;"><label for="dehash">Postprocess unwanted releases:</label></td>
-			<td>
-				{html_options style="width:180px;" class="siteeditstyle" id="unwanted" name='unwanted' values=$unwanted_ids output=$unwanted_names selected=$ftmux->unwanted}
-				<div class="hint">Choose to postprocess unwanted releases true/false</div>
-			</td>
-		</tr>
-
-		<tr>
-			<td style="width:180px;"><label for="explain">Information:</label></td>
-			<td>
-				<div class="explanation">This setting does postprocess unwanted releases.<br/></div>
-			</td>
-		</tr>
-	</table>
-</fieldset>
-
-<fieldset>
-	<legend>Postprocess Others</legend>
-	<table class="input">
-		<tr>
-			<td style="width:180px;"><label for="dehash">Postprocess other releases:</label></td>
-			<td>
-				{html_options style="width:180px;" class="siteeditstyle" id="others" name='others' values=$others_ids output=$others_names selected=$ftmux->others}
-				<div class="hint">Choose to postprocess other (misc other) releases true/false</div>
-			</td>
-		</tr>
-
-		<tr>
-			<td style="width:180px;"><label for="explain">Information:</label></td>
-			<td>
-				<div class="explanation">Postprocess others tries to find a valid release in other->misc category.<br/>
-				</div>
 			</td>
 		</tr>
 	</table>
