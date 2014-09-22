@@ -1638,9 +1638,9 @@ while ($i > 0) {
 			//run postprocess_releases non amazon
 			$log = writelog($panes2[1]);
 			shell_exec("tmux respawnp -t${tmux_session}:2.1 ' \
-						cd $_bin && $_php postprocess.php tv true $clean $log;\
-						$_php postprocess.php movies true $clean $log;\
-						$_php postprocess.php anime true 2>&1 $log;\
+						cd $_bin && $_php postprocess.php tv true $clean $log; \
+						$_php postprocess.php movies true $clean $log; \
+						$_php postprocess.php anime true 2>&1 $log; \
 						$_php postprocess.php xxx true 2>&1 $log; date +\"%D %T\"; $_sleep $post_timer_non' 2>&1 1> /dev/null"
 			);
 		} else if (($post_non != 0) && ($tvrage_releases_proc == 0 || $movie_releases_proc = 0 || $xxx_releases_proc = 0)) {
@@ -1659,8 +1659,8 @@ while ($i > 0) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			$log = writelog($panes2[2]);
 			shell_exec("tmux respawnp -t${tmux_session}:2.2 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php postprocess.php music true 2>&1 $log; \
-			 $_php postprocess.php console true 2>&1 $log;\
-			 $_php postprocess.php games true 2>&1 $log;\
+			 $_php postprocess.php console true 2>&1 $log; \
+			 $_php postprocess.php games true 2>&1 $log; \
 			 $_php postprocess.php book true 2>&1 $log && $_sleep $post_timer_amazon' 2>&1 1> /dev/null");
 		} else if (($maxload >= get_load()) && ($post_amazon == 1) && ($music_releases_proc == 0 || $console_releases_proc == 0 || $pc_releases_proc == 0 || $book_releases_proc == 0)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
