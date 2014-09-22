@@ -1094,8 +1094,8 @@ class Film
 		return (
 		($IMDBCheck === false
 			? false
-			: (is_numeric($IMDBCheck['imdbid'])
-				? (int)$IMDBCheck['imdbid']
+			: (is_numeric($IMDBCheck['imdbID'])
+				? (int)$IMDBCheck['imdbID']
 				: false
 			)
 		)

@@ -1642,7 +1642,7 @@ Class ProcessAdditional
 					Category::CAT_MOVIE_OTHER,
 					Category::CAT_TV_OTHER
 				),
-				$rQuery['id']
+				$rQuery['ID']
 			)
 		) {
 			return false;
