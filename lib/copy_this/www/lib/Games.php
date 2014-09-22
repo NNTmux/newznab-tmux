@@ -850,10 +850,10 @@ class Games
 						$gameId = $gameCheck['id'];
 					}
 					// Update release.
-					$this->pdo->queryExec(sprintf('UPDATE releases SET gamesinfo_id = %d WHERE ID = %d', $gameId, $arr['id']));
+					$this->pdo->queryExec(sprintf('UPDATE releases SET gamesinfo_id = %d WHERE ID = %d', $gameId, $arr['ID']));
 				} else {
 					// Could not parse release title.
-					$this->pdo->queryExec(sprintf('UPDATE releases SET gamesinfo_id = %d WHERE ID = %d', -2, $arr['id']));
+					$this->pdo->queryExec(sprintf('UPDATE releases SET gamesinfo_id = %d WHERE ID = %d', -2, $arr['ID']));
 
 					if ($this->echoOutput) {
 						echo '.';
