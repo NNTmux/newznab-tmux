@@ -8,7 +8,7 @@ require_once(WWW_DIR . "/lib/showsleep.php");
 require_once(dirname(__FILE__) . "/../lib/functions.php");
 
 
-$version = "0.4r2160";
+$version = "0.4r2200";
 
 $pdo = new DB();
 $s = new Sites();
@@ -1633,16 +1633,19 @@ while ($i > 0) {
 			shell_exec("tmux respawnp -k -t${tmux_session}:2.0 'echo \"\033[38;5;${color}m\n${panes2[0]} threaded Nfo processing is running in pane 0.1\"'");
 		}
 
-		//Postprocess TV Releases in pane 2.1
-		if (($maxload >= get_load()) && ($post_non != 0) && ($tvrage_releases_proc > 0)) {
+		//Postprocess Non-amazon Releases in pane 2.1
+		if (($maxload >= get_load()) && ($post_non != 0) && ($tvrage_releases_proc > 0 || $movie_releases_proc > 0 || $xxx_releases_proc > 0)) {
 			//run postprocess_releases non amazon
 			$log = writelog($panes2[1]);
 			shell_exec("tmux respawnp -t${tmux_session}:2.1 ' \
-						cd $_bin && $_php postprocess_new.php tv true $clean $log; date +\"%D %T\"; $_sleep $post_timer_non' 2>&1 1> /dev/null"
+						cd $_bin && $_php postprocess_new.php tv true $clean $log;\
+						$_php postprocess_new.php movies true $clean $log;\
+						$_php postprocess_new.php anime true 2>&1 $log;\
+						$_php postprocess_new.php xxx true 2>&1 $log; date +\"%D %T\"; $_sleep $post_timer_non' 2>&1 1> /dev/null"
 			);
-		} else if (($post_non != 0) && ($tvrage_releases_proc == 0)) {
+		} else if (($post_non != 0) && ($tvrage_releases_proc == 0 || $movie_releases_proc = 0 || $xxx_releases_proc = 0)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -k -t${tmux_session}:2.1 'echo \"\033[38;5;${color}m\n${panes2[1]} has been disabled/terminated by No TV to process\"'");
+			shell_exec("tmux respawnp -k -t${tmux_session}:2.1 'echo \"\033[38;5;${color}m\n${panes2[1]} has been disabled/terminated by No Non-Amazon to process\"'");
 		} else if ($maxload <= get_load()) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			shell_exec("tmux respawnp -t${tmux_session}:2.1 'echo \"\033[38;5;\"$color\"m\n$panes2[1] Disabled by Max Load\"' 2>&1 1> /dev/null");
@@ -1651,133 +1654,23 @@ while ($i > 0) {
 			shell_exec("tmux respawnp -k -t${tmux_session}:2.1 'echo \"\033[38;5;${color}m\n${panes2[1]} has been disabled/terminated by Postprocess Non-Amazon\"'");
 		}
 
-		//Process movies in pane 2.2
-		if (($maxload >= get_load()) && ($post_non != 0) && ($movie_releases_proc > 0)) {
-			//run postprocess_releases non amazon
-			$log = writelog($panes2[2]);
-			shell_exec("tmux respawnp -t${tmux_session}:2.2 ' \
-						cd $_bin && $_php postprocess_new.php movies true $clean $log; date +\"%D %T\"; $_sleep $post_timer_non' 2>&1 1> /dev/null"
-			);
-		} else if (($maxload >= get_load()) && ($post_non != 0) && ($movie_releases_proc == 0)) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -k -t${tmux_session}:2.2 'echo \"\033[38;5;${color}m\n${panes2[2]} has been disabled/terminated by No Movies to process\"'");
-		} else if ($maxload <= get_load()) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:2.2 'echo \"\033[38;5;\"$color\"m\n$panes2[2] Disabled by Max Load\"' 2>&1 1> /dev/null");
-		} else {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -k -t${tmux_session}:2.2 'echo \"\033[38;5;${color}m\n${panes2[2]} has been disabled/terminated by Postprocess Non-Amazon\"'");
-		}
-
-		//Process Music releases in pane 2.3 once if needed then exits
-		if (($maxload >= get_load()) && ($post_amazon == 1) && ($music_releases_proc > 0)) {
+		//Process Amazon in pane 2.2
+		if (($maxload >= get_load()) && ($post_amazon == 1) && ($music_releases_proc > 0 || $console_releases_proc > 0 || $pc_releases_proc > 0 || $book_releases_proc > 0)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			$log = writelog($panes2[3]);
-			shell_exec("tmux respawnp -t${tmux_session}:2.3 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php postprocess_new.php music true 2>&1 $log && $_sleep $post_timer_amazon' 2>&1 1> /dev/null");
-		} else if (($maxload >= get_load()) && ($post_amazon == 1) && ($music_releases_proc == 0)) {
+			shell_exec("tmux respawnp -t${tmux_session}:2.3 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php postprocess_new.php music true 2>&1 $log; \
+			 $_php postprocess_new.php console true 2>&1 $log;\
+			 $_php postprocess_new.php games true 2>&1 $log;\
+			 $_php postprocess_new.php book true 2>&1 $log && $_sleep $post_timer_amazon' 2>&1 1> /dev/null");
+		} else if (($maxload >= get_load()) && ($post_amazon == 1) && ($music_releases_proc == 0 || $console_releases_proc == 0 || $pc_releases_proc == 0 || $book_releases_proc == 0)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:2.3 'echo \"\033[38;5;${color}m\n${panes2[3]} has been disabled/terminated by No Music to process\"'");
+			shell_exec("tmux respawnp -t${tmux_session}:2.3 'echo \"\033[38;5;${color}m\n${panes2[3]} has been disabled/terminated by No Amazon to process\"'");
 		} else if ($maxload <= get_load()) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			shell_exec("tmux respawnp -t${tmux_session}:2.3 'echo \"\033[38;5;\"$color\"m\n$panes2[3] Disabled by Max Load\"' 2>&1 1> /dev/null");
 		} else {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			shell_exec("tmux respawnp -k -t${tmux_session}:2.3 'echo \"\033[38;5;${color}m\n${panes2[3]} has been disabled/terminated by Postprocess Amazon\"'");
-		}
-
-		//Process Anime releases in pane 2.4 once if needed then exits
-		if (($maxload >= get_load()) && ($post_non != 0) && ($tvrage_releases_proc > 0)) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			$log = writelog($panes2[4]);
-			shell_exec("tmux respawnp -t${tmux_session}:2.4 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php postprocess_new.php anime true 2>&1 $log && $_sleep $post_timer_non && echo \" \033[1;0;33m\"' 2>&1 1> /dev/null");
-		} else if (($maxload >= get_load()) && ($post_non != 0) && ($tvrage_releases_proc == 0)) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:2.4 'echo \"\033[38;5;${color}m\n${panes2[4]} has been disabled/terminated by No Anime to process\"'");
-		} else if ($maxload <= get_load()) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:2.4 'echo \"\033[38;5;\"$color\"m\n$panes2[4] Disabled by Max Load\"' 2>&1 1> /dev/null");
-		} else {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:2.4 'echo \"\033[38;5;${color}m\n${panes2[4]} has been disabled/terminated by Postprocess Anime\"'");
-		}
-
-		//Process Games in pane 2.5 once if needed then exits
-		if (($maxload >= get_load()) && ($post_amazon == 1) && (($console_releases_proc > 0) || ($pc_releases_proc > 0))) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			$log = writelog($panes2[5]);
-			shell_exec("tmux respawnp -t${tmux_session}:2.5 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php postprocess_new.php console true 2>&1 $log && $_php postprocess_new.php games true 2>&1 $log && $_sleep $post_timer_amazon && echo \" \033[1;0;33m\"' 2>&1 1> /dev/null");
-		} else if (($maxload >= get_load()) && ($post_amazon == 1) && (($console_releases_proc == 0) || ($pc_releases_proc > 0))) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:2.5 'echo \"\033[38;5;\"$color\"m\n$panes2[5] has been disabled/terminated by No Games to process\"'");
-		} else if ($maxload <= get_load()) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:2.5 'echo \"\033[38;5;\"$color\"m\n$panes2[5] Disabled by Max Load\"' 2>&1 1> /dev/null");
-		} else {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:2.5 'echo \"\033[38;5;${color}m\n${panes2[5]} has been disabled/terminated by Postprocess Games\"'");
-		}
-
-		//run processSpotnab.php in 2.6 every 15 minutes
-		if (((TIME() - $time20) >= $spotnab_timer) && ($spotnab == 1)) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			$log = writelog($panes2[6]);
-			shell_exec("tmux respawnp -t${tmux_session}:2.6 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php postprocess_new.php spotnab true 2>&1 $log && echo \" \033[1;0;33m\"' 2>&1 1> /dev/null");
-			$time20 = TIME();
-		} else if ($spotnab == 1) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			$run_time = relativeTime($spotnab_timer + $time20);
-			shell_exec("tmux respawnp -t${tmux_session}:2.6 'echo \"\033[38;5;\"$color\"m\n$panes2[6] will run in T[ $run_time]\"' 2>&1 1> /dev/null");
-		} else {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:2.6 'echo \"\033[38;5;\"$color\"m\n$panes2[6] Disabled by SPOTNAB\"' 2>&1 1> /dev/null");
-		}
-
-		//Process Books in pane 2.7 once if needed then exits
-		if (($maxload >= get_load()) && ($post_amazon == 1) && ($book_releases_proc > 0)) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			$log = writelog($panes2[7]);
-			shell_exec("tmux respawnp -t${tmux_session}:2.7 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php postprocess_new.php book true 2>&1 $log && $_sleep $post_timer_amazon && echo \" \033[1;0;33m\"' 2>&1 1> /dev/null");
-		} else if (($maxload >= get_load()) && ($post_amazon == 1) && ($book_releases_proc == 0)) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:2.7 'echo \"\033[38;5;\"$color\"m\n$panes2[7] has been disabled/terminated by No Books to process\"' 2>&1 1> /dev/null");
-		} else if ($maxload <= get_load()) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:2.7 'echo \"\033[38;5;\"$color\"m\n$panes2[7] Disabled by Max Load\"' 2>&1 1> /dev/null");
-		} else {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:2.7 'echo \"\033[38;5;${color}m\n${panes2[7]} has been disabled/terminated by Postprocess Books\"'");
-		}
-
-		//Process XXX releases in pane 2.8 once if needed then exits
-		if (($maxload >= get_load()) && ($xxx_releases_proc > 0)) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			$log = writelog($panes2[8]);
-			shell_exec("tmux respawnp -t${tmux_session}:2.8 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php postprocess_new.php xxx true 2>&1 $log && echo \" \033[1;0;33m\"' 2>&1 1> /dev/null");
-		} else if ($xxx_releases_proc == 0) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:2.8 'echo \"\033[38;5;\"$color\"m\n$panes2[8] Disabled by XXX\"' 2>&1 1> /dev/null");
-		} else if ($maxload <= get_load()) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:2.8 'echo \"\033[38;5;\"$color\"m\n$panes2[8] Disabled by Max Load\"' 2>&1 1> /dev/null");
-		} else {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:2.8 'echo \"\033[38;5;\"$color\"m\n$panes2[8] Has no work to process \"' 2>&1 1> /dev/null");
-		}
-
-		//Process Unwanted releases in pane 2.9 in continuous loop, will restart if exits
-		if (($maxload >= get_load()) && ($unwanted == 1)) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			$log = writelog($panes2[9]);
-			shell_exec("tmux respawnp -t${tmux_session}:2.9 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php postprocess_new.php unwanted 2>&1 $log && echo \" \033[1;0;33;33m\"' 2>&1 1> /dev/null");
-		} else if ($unwanted == 0) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:2.9 'echo \"\033[38;5;\"$color\"m\n$panes2[9] Disabled by UNWANTED\"' 2>&1 1> /dev/null");
-		} else if ($maxload <= get_load()) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:2.9 'echo \"\033[38;5;\"$color\"m\n$panes2[9] Disabled by Max Load\"' 2>&1 1> /dev/null");
-		} else {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			shell_exec("tmux respawnp -t${tmux_session}:2.9 'echo \"\033[38;5;\"$color\"m\n$panes2[9] Has no work to process \"' 2>&1 1> /dev/null");
 		}
 
 		//run fixReleaseNames threaded in pane 3.0

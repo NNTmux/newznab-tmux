@@ -15,7 +15,7 @@ $tmux = $t->get();
 $patch = (isset($tmux->sqlpatch)) ? $tmux->sqlpatch : 0;
 
 // Check database patch version
-if ($patch < 81) {
+if ($patch < 82) {
 	exit($c->error("\nYour database is not up to date. Please update.\nphp ${DIR}/lib/DB/patchDB.php\n"));
 }
 $tmux_session = (isset($tmux->tmux_session)) ? $tmux->tmux_session : 0;
@@ -136,16 +136,9 @@ function window_utilities($tmux_session)
 
 function window_post($tmux_session)
 {
-	exec("tmux new-window -t $tmux_session -n PostProcessing 'printf \"\033]2;processNfosOld\033\"'");
-	exec("tmux splitw -t $tmux_session:2 -h -p 50 'printf \"\033]2;processGames\033\"'");
-	exec("tmux selectp -t 0; tmux splitw -t $tmux_session:2 -v -p 80 'printf \"\033]2;processTV\033\"'");
-    exec("tmux splitw -t $tmux_session:2 -v -p 75 'printf \"\033]2;processMovies\033\"'");
-    exec("tmux splitw -t $tmux_session:2 -v -p 67 'printf \"\033]2;processMusic\033\"'");
-    exec("tmux splitw -t $tmux_session:2 -v -p 50 'printf \"\033]2;processAnime\033\"'");
-    exec("tmux selectp -t 5;tmux splitw -t $tmux_session:2 -v -p 80 'printf \"\033]2;processSpotnab\033\"'");
-    exec("tmux splitw -t $tmux_session:2 -v -p 75 'printf \"\033]2;processBooks\033\"'");
-    exec("tmux splitw -t $tmux_session:2 -v -p 67 'printf \"\033]2;processXXX\033\"'");
-    exec("tmux splitw -t $tmux_session:2 -v -p 50 'printf \"\033]2;processUnwanted\033\"'");
+	exec("tmux new-window -t $tmux_session -n post 'printf \"\033]2;postprocessing_additional\033\"'");
+	exec("tmux splitw -t $tmux_session:2 -v -p 67 'printf \"\033]2;postprocessing_non_amazon\033\"'");
+	exec("tmux splitw -t $tmux_session:2 -v -p 50 'printf \"\033]2;postprocessing_amazon\033\"'");
 }
 
 function window_fixnames($tmux_session)
