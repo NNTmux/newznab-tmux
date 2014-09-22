@@ -404,9 +404,9 @@ $run_time1 = 0;
 $run_time2 = 0;
 $run_time3 = 0;
 $run_time4 = 0;
-$uspactiveconnections = 0;
+$usp1activeconnections = 0;
 $usp2activeconnections = 0;
-$usptotalconnections = 0;
+$usp1totalconnections = 0;
 $usp2totalconnections = 0;
 $active_groups = 0;
 $all_groups = 0;
@@ -475,7 +475,7 @@ sleep(5);
 //create initial display, USP connection count, prehash count and groups count adapted from nZEDb
 passthru('clear');
 printf($mask2, "Monitor Running v$version [" . $tpatch . "][" . $patch . "]: ", relativeTime("$time"));
-printf($mask1, "USP Connections:", $uspactiveconnections . " active (" . $usptotalconnections . " total) - " . $host . ":" . $port);
+printf($mask1, "USP Connections:", $usp1activeconnections . " active (" . $usp1totalconnections . " total) - " . $host . ":" . $port);
 if ($alternate_nntp) {
 	printf($mask1, "USP Alternate:", $usp2activeconnections . " active (" . $usp2totalconnections . " total) - " . (($alternate_nntp) ? $host_a . ":" . $port_a : "n/a"));
 }
@@ -1195,7 +1195,7 @@ while ($i > 0) {
 	//update display
 	passthru('clear');
 	printf($mask2, "Monitor Running v$version [" . $tpatch . "][" . $patch . "]: ", relativeTime("$time"));
-	printf($mask1, "USP Connections:", $uspactiveconnections . " active (" . $usptotalconnections . " total) - " . $host . ":" . $port);
+	printf($mask1, "USP Connections:", $usp1activeconnections . " active (" . $usp1totalconnections . " total) - " . $host . ":" . $port);
 	if ($alternate_nntp) {
 		printf($mask1, "USP Alternate:", $usp2activeconnections . " active (" . $usp2totalconnections . " total) - " . (($alternate_nntp) ? $host_a . ":" . $port_a : "n/a"));
 	}

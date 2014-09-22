@@ -99,7 +99,9 @@ Class NZBContents
 		$this->nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB());
 		$t = new Tmux();
 		$this->tmux = $t->get();
+		$this->site = new Sites();
 		$this->lookuppar2 = ($this->tmux->lookuppar2 == 1 ? true : false);
+		$this->alternateNNTP = ($this->site->get('alternate_nntp') == 1 ? true : false);
 	}
 
 	/**
@@ -122,7 +124,7 @@ Class NZBContents
 
 		$messageID = $this->parseNZB($guid, $relID, $groupID, true);
 		if ($messageID !== false) {
-			$fetchedBinary = $this->nntp->getMessages($groupName, $messageID['ID']);
+			$fetchedBinary = $this->nntp->getMessages($groupName, $messageID['ID'], $this->alternateNNTP);
 			if ($this->nntp->isError($fetchedBinary)) {
 				// NFO download failed, increment attempts.
 				$this->db->queryExec(sprintf('UPDATE releases SET nfostatus = nfostatus - 1 WHERE ID = %d', $relID));
