@@ -29,14 +29,12 @@ if [ -z $TMUX_POWERLINE_LEFT_STATUS_SEGMENTS ]; then
 		#"ifstat_sys 30 255" \
 		#"lan_ip 24 255 ${TMUX_POWERLINE_SEPARATOR_RIGHT_THIN}" \
 		#"wan_ip 24 255" \
-		"vcs_branch_NN 29 88" \
-		"vcs_revision 229 0" \
-		#"vcs_compare_NN 60 255" \
-		"vcs_branch 28 235" \
-		"vcs_compare 60 255" \
+		#"vcs_branch 28 235" \
+		#"vcs_compare 60 255" \
 		#"vcs_staged 64 255" \
 		#"vcs_modified 9 255" \
 		#"vcs_others 245 0" \
+		"uspsetting 229 0" \
 	)
 fi
 
