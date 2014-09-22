@@ -21,7 +21,7 @@ $torun = $tmux->get()->post;
 
 $pieces = explode('           =+=            ', $argv[1]);
 
-$postprocess = new PProcess('Echo');
+$postprocess = new PProcess(['Echo' => true]);
 if (isset($pieces[6])) {
 	// Create the connection here and pass
 	$nntp = new NNTP();

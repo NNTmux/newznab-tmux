@@ -232,7 +232,7 @@ class queue_runner(threading.Thread):
 			else:
 				if my_ID:
 					time_of_last_run = time.time()
-					subprocess.call(["php", pathname+"/../bin/postprocess_alpha.php", ""+my_ID])
+					subprocess.call(["php", pathname+"/../bin/postprocess_threaded.php", ""+my_ID])
 					time.sleep(.02)
 					self.my_queue.task_done()
 
