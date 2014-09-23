@@ -579,7 +579,7 @@ class XXX
 				if ($this->parseXXXSearchName($arr['searchname']) !== false) {
 					$check = $this->checkXXXInfoExists($this->currentTitle);
 					if ($check === false) {
-						$this->currentRelID = $arr['id'];
+						$this->currentRelID = $arr['ID'];
 						$movieName = $this->currentTitle;
 						if ($this->debug && $this->echooutput) {
 							$this->pdo->log->doEcho("DB name: " . $arr['searchname'], true);
