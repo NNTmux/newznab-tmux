@@ -9,6 +9,7 @@ require_once(WWW_DIR . "lib/nntp.php");
 require_once(WWW_DIR . "/lib/ReleaseSearch.php");
 require_once(WWW_DIR . "/lib/ColorCLI.php");
 require_once(WWW_DIR . "/lib/ConsoleTools.php");
+require_once NN_LIB . 'SphinxSearch.php';
 require_once("ReleaseCleaner.php");
 require_once("functions.php");
 require_once("nzbcontents.php");
@@ -148,6 +149,7 @@ class NameFixer
 			'Groups'       => null,
 			'Utility'      => null,
 			'Settings'     => null,
+			'SphinxSearch' => null,
 		];
 		$options += $defaults;
 
@@ -164,6 +166,7 @@ class NameFixer
 		$this->category = ($options['Categorize'] instanceof Categorize ? $options['Categorize'] : new Categorize(['Settings' => $this->pdo]));
 		$this->utility = ($options['Utility'] instanceof Utility ? $options['Utility'] : new Utility());
 		$this->_groups = ($options['Groups'] instanceof Groups ? $options['Groups'] : new Groups(['Settings' => $this->pdo]));
+		$this->sphinx = ($options['SphinxSearch'] instanceof \SphinxSearch ? $options['SphinxSearch'] : new \SphinxSearch());
 	}
 
 	/**
@@ -586,6 +589,7 @@ class NameFixer
 								$release['releaseID']
 							)
 						);
+						$this->sphinx->updateReleaseSearchName($release['releaseID'], $newTitle);
 					} else {
 						$newTitle = $this->pdo->escapeString(substr($newName, 0, 255));
 						$this->pdo->queryExec(
@@ -602,6 +606,7 @@ class NameFixer
 								$release['releaseID']
 							)
 						);
+						$this->sphinx->updateReleaseSearchName($release['releaseID'], $newTitle);
 					}
 				}
 			}
@@ -694,6 +699,14 @@ class NameFixer
 	protected function _preFTsearchQuery($preTitle)
 	{
 		switch (NN_RELEASE_SEARCH_TYPE) {
+			case \ReleaseSearch::SPHINX:
+				$titlematch = \SphinxSearch::escapeString($preTitle);
+				$join = sprintf(
+					'INNER JOIN releases_se rse ON rse.id = r.ID
+						WHERE rse.query = "@(name,searchname) %s;mode=extended"',
+					$titlematch
+				);
+				break;
 			case ReleaseSearch::FULLTEXT:
 			default:
 				//Remove all non-printable chars from PreDB title

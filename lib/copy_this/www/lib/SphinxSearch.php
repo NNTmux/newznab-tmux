@@ -40,17 +40,17 @@ class SphinxSearch
 	 * Insert release into Sphinx RT table.
 	 * @param $parameters
 	 */
-	public function insertRelease($parameters)
+	public function insertRelease($id, $guid, $name, $searchname, $fromname)
 	{
-		if (!is_null($this->sphinxQL) && $parameters['id']) {
+		if (!is_null($this->sphinxQL) && $id) {
 			$this->sphinxQL->queryExec(
 				sprintf(
 					'REPLACE INTO releases_rt (id, guid, name, searchname, fromname) VALUES (%s, %s, %s, %s, %s)',
-					$parameters['id'],
-					$parameters['guid'],
-					$parameters['name'],
-					$parameters['searchname'],
-					$parameters['fromname']
+					$id,
+					$guid,
+					$name,
+					$searchname,
+					$fromname
 				)
 			);
 		}
@@ -99,11 +99,11 @@ class SphinxSearch
 			if ($old !== false) {
 				$this->insertRelease(
 					[
-						'id' => $releaseID,
-						'guid' => $this->sphinxQL->escapeString($old['guid']),
-						'name' => $this->sphinxQL->escapeString($old['name']),
-						'searchname' => $searchName,
-						'fromname' => $this->sphinxQL->escapeString($old['fromname'])
+						$releaseID,
+						$this->sphinxQL->escapeString($old['guid']),
+						$this->sphinxQL->escapeString($old['name']),
+						$searchName,
+						$this->sphinxQL->escapeString($old['fromname'])
 					]
 				);
 			}

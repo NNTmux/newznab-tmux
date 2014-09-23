@@ -19,6 +19,7 @@ require_once(WWW_DIR . "/lib/sphinx.php");
 require_once(WWW_DIR . "lib/Categorize.php");
 require_once(WWW_DIR . "../misc/update_scripts/nix_scripts/tmux/lib/ReleaseCleaner.php");
 require_once(WWW_DIR . "../misc/update_scripts/nix_scripts/tmux/lib/Enzebe.php");
+require_once NN_LIB . 'SphinxSearch.php';
 
 /**
  * This class handles storage and retrieval of releases rows and the main processing functions
@@ -79,6 +80,11 @@ class Releases
 	 * @var release is passworded
 	 */
 	const PASSWD_RAR = 2;
+
+	/**
+	 * @var SphinxSearch
+	 */
+	public $sphinxSearch;
 
 	/**
 	 * Get a list of releases by an array of names
@@ -1911,6 +1917,7 @@ class Releases
 	public function insertRelease($cleanRelName, $cleanedName, $parts, $group, $guid, $catId, $regexID, $date, $fromname, $reqID, $site, $nzbstatus, $isrenamed, $isReqID, $prehashID)
 	{
 		$db = new DB();
+		$sphinxSearch = new SphinxSearch();
 
 		if ($regexID == "")
 			$regexID = " null ";
@@ -1929,6 +1936,7 @@ class Releases
 		);
 
 		$relid = $db->queryInsert($sql);
+		$sphinxSearch->insertRelease($relid, $guid, $cleanRelName, $cleanedName, $fromname);
 
 		return $relid;
 	}
@@ -1998,6 +2006,7 @@ class Releases
 	 */
 	public function deleteSingle($identifiers, $nzb, $releaseImage)
 	{
+		$sphinxSearch = new SphinxSearch();
 		// Delete NZB from disk.
 		$nzb = new NZB();
 		$nzbPath = $nzb->getNZBPath($identifiers['g']);
@@ -2009,8 +2018,8 @@ class Releases
 		// Delete images.
 		$releaseImage->delete($identifiers['g']);
 
-		// Delete from sphinx.
-		//$this->sphinxSearch->deleteRelease($identifiers, $this->pdo);
+		//Delete from sphinx.
+		$sphinxSearch->deleteRelease($identifiers, $db);
 
 		// Delete from DB.
 		$db->exec(
