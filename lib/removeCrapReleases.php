@@ -5,14 +5,10 @@
  */
 
 require_once(dirname(__FILE__)."/../bin/config.php");
-require_once(WWW_DIR."/lib/framework/db.php");
-require_once(WWW_DIR."/lib/releases.php");
-require_once(WWW_DIR."/lib/site.php");
-require_once("functions.php");
 require_once(WWW_DIR . "/lib/ColorCLI.php");
 require_once("ReleaseRemover.php");
 
-$cli = new ColorCLI();
+$cli = new \ColorCLI();
 $n = PHP_EOL;
 
 $argCnt = count($argv);
@@ -20,7 +16,7 @@ if ($argCnt === 1) {
 	exit(
 	$cli->error(
 		$n .
-		'Run fixReleaseNames.php first to attempt to fix release names.' . $n .
+		'Run fixReleaseNames.php first to attempt to fix release names.'. $n .
 		'This will miss some releases if you have not set fixReleaseNames to set the release as checked.' . $n . $n .
 		"php $argv[0] false Display full usage of this script." . $n .
 		"php $argv[0] true full Run this script with all options."
@@ -72,5 +68,5 @@ if (isset($argv[3]) && $argv[3] === 'blacklist' && isset($argv[4])) {
 	$blacklistID = $argv[4];
 }
 
-$RR = new ReleaseRemover();
+$RR = new \ReleaseRemover();
 $RR->removeCrap(($argv[1] === 'true' ? true : false), $argv[2], (isset($argv[3]) ? $argv[3] : ''), (isset($blacklistID) ? $argv[4] : ''));
