@@ -947,30 +947,34 @@ class ReleaseRemover
 	{
 		$this->method = 'Codec Poster';
 		$regex = "rf.name REGEXP 'x264.*\.(wmv|avi)$'";
+		$regex2 = "rf.name REGEXP '\\\\.*((DVDrip|BRRip)[. ].*[. ](R[56]|HQ)|720p[ .](DVDrip|HQ)|Webrip.*[. ](R[56]|Xvid|AC3|US)|720p.*[. ]WEB-DL[. ]Xvid[. ]AC3[. ]US|HDRip.*[. ]Xvid[. ]DD5).*[. ]avi$'";
 		$codec = '%\\Codec%Setup.exe%';
 		$iferror = '%If_you_get_error.txt%';
 		$ifnotplaying = '%read me if the movie not playing.txt%';
+		$frenchv = '%Lisez moi si le film ne demarre pas.txt%';
+		$nl = '%lees me als de film niet spelen.txt%';
+		$german = '%Lesen Sie mir wenn der Film nicht abgespielt.txt%';
 		$categories = sprintf("r.categoryID IN (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) AND",
-			Category::CAT_MOVIE_3D,
-			Category::CAT_MOVIE_BLURAY,
-			Category::CAT_MOVIE_DVD,
-			Category::CAT_MOVIE_FOREIGN,
-			Category::CAT_MOVIE_HD,
-			Category::CAT_MOVIE_OTHER,
-			Category::CAT_MOVIE_SD,
-			Category::CAT_XXX_WMV,
-			Category::CAT_XXX_X264,
-			Category::CAT_XXX_XVID,
-			Category::CAT_XXX_OTHER
+			\Category::CAT_MOVIE_3D,
+			\Category::CAT_MOVIE_BLURAY,
+			\Category::CAT_MOVIE_DVD,
+			\Category::CAT_MOVIE_FOREIGN,
+			\Category::CAT_MOVIE_HD,
+			\Category::CAT_MOVIE_OTHER,
+			\Category::CAT_MOVIE_SD,
+			\Category::CAT_XXX_WMV,
+			\Category::CAT_XXX_X264,
+			\Category::CAT_XXX_XVID,
+			\Category::CAT_XXX_OTHER
 		);
 		$codeclike = sprintf("UNION SELECT r.guid, r.searchname, r.ID FROM releases r
 			LEFT JOIN releasefiles rf ON r.ID = rf.releaseID
-			WHERE %s rf.name LIKE '%s' OR rf.name LIKE '%s' OR rf.name LIKE '%s'", $categories, $codec, $iferror, $ifnotplaying
+			WHERE %s rf.name LIKE '%s' OR rf.name LIKE '%s' OR rf.name LIKE '%s' OR rf.name LIKE '%s' OR rf.name LIKE '%s' OR rf.name LIKE '%s'", $categories, $codec, $iferror, $ifnotplaying, $frenchv, $nl, $german
 		);
 		$this->query = sprintf(
 			"SELECT r.guid, r.searchname, r.ID FROM releases
 			r INNER JOIN releasefiles rf ON (rf.releaseID = r.ID)
-			WHERE %s %s %s %s %s", $categories, $regex, $this->crapTime, $codeclike, $this->crapTime
+			WHERE %s %s OR %s %s %s %s", $categories, $regex, $regex2, $this->crapTime, $codeclike, $this->crapTime
 		);
 
 		if ($this->checkSelectQuery() === false) {
