@@ -59,6 +59,11 @@ class DB extends \PDO
 	private $dbSystem;
 
 	/**
+	 * @var string Version of the Db server.
+	 */
+	private $dbVersion;
+
+	/**
 	 * @var string	Stored copy of the dsn used to connect.
 	 */
 	private $dsn;
@@ -87,6 +92,7 @@ class DB extends \PDO
 		$this->cli = Utility::isCLI();
 
 		$defaults = [
+			'checkVersion'	=> false,
 			'createDb'		=> false, // create dbname if it does not exist?
 			'ct'			=> new \ConsoleTools(),
 			'dbhost'		=> defined('DB_HOST') ? DB_HOST : '',
@@ -135,6 +141,10 @@ class DB extends \PDO
 			} catch (\LoggerException $error) {
 				$this->_debug = false;
 			}
+		}
+
+		if ($this->opts['checkVersion']) {
+			$this->fetchDbVersion();
 		}
 
 		return $this->pdo;
@@ -1067,5 +1077,41 @@ class DB extends \PDO
 
 		}
 		return $result;
+	}
+
+	/**
+	 * Returns the stored Db version string.
+	 *
+	 * @return string
+	 */
+	public function getDbVersion ()
+	{
+		return $this->dbVersion;
+	}
+
+	/**
+	 * @param string $requiredVersion The minimum version to compare against
+	 *
+	 * @return bool|null       TRUE if Db version is greater than or eaqual to $requiredVersion,
+	 * false if not, and null if the version isn't available to check against.
+	 */
+	public function isDbVersionAtLeast ($requiredVersion)
+	{
+		if (empty($this->dbVersion)) {
+			return null;
+		}
+		return version_compare($requiredVersion, $this->dbVersion, '<=');
+	}
+
+	/**
+	 * Performs the fetch from the Db server and stores the resulting Major.Minor.Version number.
+	 */
+	private function fetchDbVersion ()
+	{
+		$result = $this->queryOneRow("SELECT VERSION() AS version");
+		if (!empty($result)) {
+			$dummy = explode('-', $result['version'], 2);
+			$this->dbVersion = $dummy[0];
+		}
 	}
 }
