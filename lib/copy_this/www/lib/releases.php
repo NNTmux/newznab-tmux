@@ -667,48 +667,6 @@ class Releases
 	}
 
 	/**
-	 * Deletes a single release by GUID, and all the corresponding files.
-	 *
-	 * @param array        $identifiers ['g' => Release GUID(mandatory), 'id => ReleaseID(optional, pass false)]
-	 * @param NZB          $nzb
-	 * @param ReleaseImage $releaseImage
-	 */
-	public function deleteSingle($identifiers, $nzb, $releaseImage)
-	{
-		// Delete NZB from disk.
-		$nzb = new NZB();
-		$nzbPath = $nzb->getNZBPath($identifiers['g']);
-		if ($nzbPath) {
-			@unlink($nzbPath);
-		}
-		$db = new DB();
-
-		// Delete images.
-		$releaseImage->delete($identifiers['g']);
-
-		// Delete from sphinx.
-		//$this->sphinxSearch->deleteRelease($identifiers, $this->pdo);
-
-		// Delete from DB.
-		$db->exec(
-			sprintf('
-				DELETE r, rn, rc, uc, rf, ra, rs, rv, re
-				FROM releases r
-				LEFT OUTER JOIN releasenfo rn ON rn.releaseID = r.ID
-				LEFT OUTER JOIN releasecomment rc ON rc.releaseID = r.ID
-				LEFT OUTER JOIN usercart uc ON uc.releaseID = r.ID
-				LEFT OUTER JOIN releasefiles rf ON rf.releaseID = r.ID
-				LEFT OUTER JOIN releaseaudio ra ON ra.releaseID = r.ID
-				LEFT OUTER JOIN releasesubs rs ON rs.releaseID = r.ID
-				LEFT OUTER JOIN releasevideo rv ON rv.releaseID = r.ID
-				LEFT OUTER JOIN releaseextrafull re ON re.releaseID = r.ID
-				WHERE r.guid = %s',
-				$db->escapeString($identifiers['g'])
-			)
-		);
-	}
-
-	/**
 	 * Delete a preview associated with a release and update the release to indicate it doesnt have one.
 	 */
 	public function deletePreview($guid)
@@ -1453,6 +1411,7 @@ class Releases
 
 		if (!file_exists($page->site->nzbpath)) {
 			echo "Bad or missing nzb directory - " . $page->site->nzbpath;
+
 			return -1;
 		}
 
@@ -1849,12 +1808,12 @@ class Releases
 			}
 		}
 
-			$db->log->primary(
-				'Removed releases: ' .
-				number_format($miscRetentionDeleted) .
-				' from misc->other' .
-				number_format($miscHashedDeleted) .
-				' from misc->hashed'
+		$db->log->primary(
+			'Removed releases: ' .
+			number_format($miscRetentionDeleted) .
+			' from misc->other' .
+			number_format($miscHashedDeleted) .
+			' from misc->hashed'
 		);
 
 		//
@@ -2028,6 +1987,48 @@ class Releases
 				$db->exec(sprintf("DELETE from releases where id = %d", $rel['ID']));
 			}
 		}
+	}
+
+	/**
+	 * Deletes a single release by GUID, and all the corresponding files.
+	 *
+	 * @param array        $identifiers ['g' => Release GUID(mandatory), 'id => ReleaseID(optional, pass false)]
+	 * @param NZB          $nzb
+	 * @param ReleaseImage $releaseImage
+	 */
+	public function deleteSingle($identifiers, $nzb, $releaseImage)
+	{
+		// Delete NZB from disk.
+		$nzb = new NZB();
+		$nzbPath = $nzb->getNZBPath($identifiers['g']);
+		if ($nzbPath) {
+			@unlink($nzbPath);
+		}
+		$db = new DB();
+
+		// Delete images.
+		$releaseImage->delete($identifiers['g']);
+
+		// Delete from sphinx.
+		//$this->sphinxSearch->deleteRelease($identifiers, $this->pdo);
+
+		// Delete from DB.
+		$db->exec(
+			sprintf('
+				DELETE r, rn, rc, uc, rf, ra, rs, rv, re
+				FROM releases r
+				LEFT OUTER JOIN releasenfo rn ON rn.releaseID = r.ID
+				LEFT OUTER JOIN releasecomment rc ON rc.releaseID = r.ID
+				LEFT OUTER JOIN usercart uc ON uc.releaseID = r.ID
+				LEFT OUTER JOIN releasefiles rf ON rf.releaseID = r.ID
+				LEFT OUTER JOIN releaseaudio ra ON ra.releaseID = r.ID
+				LEFT OUTER JOIN releasesubs rs ON rs.releaseID = r.ID
+				LEFT OUTER JOIN releasevideo rv ON rv.releaseID = r.ID
+				LEFT OUTER JOIN releaseextrafull re ON re.releaseID = r.ID
+				WHERE r.guid = %s',
+				$db->escapeString($identifiers['g'])
+			)
+		);
 	}
 
 	public function getTopDownloads()
