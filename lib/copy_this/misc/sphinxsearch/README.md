@@ -1,4 +1,4 @@
-# nZEDb SPHINX SEARCH Readme
+# newznab SPHINX SEARCH Readme
 ---------------------------
 
 ## _Installation_:
@@ -28,7 +28,7 @@ Assuming you are on ubuntu:
 
 `sudo mv /etc/sphinxsearch/sphinx.conf /etc/sphinxsearch/sphinx.conf.1`
 
-`sudo cp /var/www/nZEDb/misc/sphinxsearch/sphinx.conf /etc/sphinxsearch/sphinx.conf`
+`sudo cp /var/www/newznab/misc/sphinxsearch/sphinx.conf /etc/sphinxsearch/sphinx.conf`
 
 ##### Edit the sphinx.conf file:
 Everything should be good by default for linux, but you can get better performance by changing some settings. Specifically the rt_mem_limit and mem_limit settings, setting those to 2048M if you have the RAM will make a difference.
@@ -61,16 +61,16 @@ Now you should be logged in to sphinxQL, type `show tables` make sure you see th
 
 If you do not see the above, or could not log in to sphinxQL, look at the log file you specified in sphinx.conf or look at the /var/log/upstart/sphinxsearch.log file if you are on linux.
 
-## _Setting up nZEDb for sphinx support_:
+## _Setting up newznab for sphinx support_:
 
 #### MAKE SURE ALL RELEASE CREATION / IMPORT SCRIPTS ARE STOPPED.
 
 ##### Edit the settings.php file:
 Open up the www/settings.php file with a text editor, if you do not have it copy the www/settings.php.example file to www/settings.php
 
-Change the `nZEDb_RELEASE_SEARCH_TYPE` to `2`
+Change the `NN_RELEASE_SEARCH_TYPE` to `2`
 
-If you changed the `listen` setting in sphinx.conf you will need to change the `nZEDb_SPHINXQL_HOST_NAME` / `nZEDb_SPHINXQL_PORT` / `nZEDb_SPHINXQL_SOCK_FILE` settings accordingly, otherwise it's fine.
+If you changed the `listen` setting in sphinx.conf you will need to change the `NN_SPHINXQL_HOST_NAME` / `NN_SPHINXQL_PORT` / `NN_SPHINXQL_SOCK_FILE` settings accordingly, otherwise it's fine.
 
 ##### Create the SphinxSE table:
 In this folder (.../misc/sphinxsearch) there is a create_se_tables.php file, run the file using your hostname / port to the sphinx server you set in sphinx.conf (by default this should be 0 and 9312).

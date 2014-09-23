@@ -1,5 +1,8 @@
 <?php
 require dirname(__FILE__) . '/../../www/config.php';
+require_once NN_LIB . 'framework' . DS . 'db.php';
+require_once NN_LIB . 'ReleaseSearch.php';
+
 
 if (!isset($argv[1]) || !in_array($argv[1], ['sphinx', 'standard'])) {
 	exit('Argument1 (required) is the method of search you would like to optimize for.  Choices are sphinx or standard.' . PHP_EOL .
@@ -91,7 +94,7 @@ function revertToStandard($pdo)
 				CREATE TRIGGER insert_search AFTER INSERT ON releases FOR EACH ROW
 					BEGIN
 						INSERT INTO releasesearch (releaseid, guid, name, searchname)
-						VALUES (NEW.id, NEW.guid, NEW.name, NEW.searchname);
+						VALUES (NEW.ID, NEW.guid, NEW.name, NEW.searchname);
 					END;
 
 				CREATE TRIGGER update_search AFTER UPDATE ON releases FOR EACH ROW
@@ -99,24 +102,24 @@ function revertToStandard($pdo)
 						IF NEW.guid != OLD.guid
 						THEN UPDATE releasesearch
 							SET guid = NEW.guid
-							WHERE releaseid = OLD.id;
+							WHERE releaseid = OLD.ID;
 						END IF;
 						IF NEW.name != OLD.name
 						THEN UPDATE releasesearch
 							SET name = NEW.name
-							WHERE releaseid = OLD.id;
+							WHERE releaseid = OLD.ID;
 						END IF;
 						IF NEW.searchname != OLD.searchname
 						THEN UPDATE releasesearch
 							SET searchname = NEW.searchname
-							WHERE releaseid = OLD.id;
+							WHERE releaseid = OLD.ID;
 						END IF;
 					END;
 
 				CREATE TRIGGER delete_search AFTER DELETE ON releases FOR EACH ROW
 					BEGIN
 						DELETE FROM releasesearch
-						WHERE releaseid = OLD.id;
+						WHERE releaseid = OLD.ID;
 					END;'
 	);
 	echo $pdo->log->header('Standard search should once again be available.' . PHP_EOL);

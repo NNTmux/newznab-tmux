@@ -1,4 +1,6 @@
 <?php
+require_once NN_LIB . 'ReleaseSearch.php';
+require_once NN_LIB . 'framework' . DS . 'db.php';
 
 class SphinxSearch
 {
@@ -64,7 +66,7 @@ class SphinxSearch
 		if (!is_null($this->sphinxQL)) {
 			if ($identifiers['i'] === false) {
 				$identifiers['i'] = $pdo->queryOneRow(
-					sprintf('SELECT id FROM releases WHERE guid = %s', $pdo->escapeString($identifiers['g']))
+					sprintf('SELECT ID FROM releases WHERE guid = %s', $pdo->escapeString($identifiers['g']))
 				);
 				if ($identifiers['i'] !== false) {
 					$identifiers['i'] = $identifiers['i']['id'];
