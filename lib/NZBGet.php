@@ -1,15 +1,14 @@
 <?php
 require_once(dirname(__FILE__) . "/../bin/config.php");
-require_once(WWW_DIR . "/lib/framework/db.php");
 require_once(WWW_DIR . "/lib/releases.php");
 require_once(WWW_DIR . "/lib/util.php");
 require_once("Enzebe.php");
 /**
  * Class NZBGet
  *
- * Transfers data between an NZBGet server and an newznab website.
+ * Transfers data between an NZBGet server and an nZEDb website.
  *
- * @package newznab-tmux
+ * @package nzedb
  */
 class NZBGet
 {
@@ -36,7 +35,7 @@ class NZBGet
 
 	/**
 	 * Full URL (containing password/username/etc).
-	 * @var string
+	 * @var string|bool
 	 * @access protected
 	 */
 	protected $fullURL = '';
@@ -56,7 +55,7 @@ class NZBGet
 	protected $rsstoken = '';
 
 	/**
-	 * URL to your newznab site.
+	 * URL to your nZEDb site.
 	 * @var string
 	 * @access protected
 	 */
@@ -85,7 +84,7 @@ class NZBGet
 	public function __construct(&$page)
 	{
 		$this->serverurl = $page->serverurl;
-		$this->uid = $page->userdata['ID'];
+		$this->uid = $page->userdata['id'];
 		$this->rsstoken = $page->userdata['rsstoken'];
 
 		if (!empty($page->userdata['nzbgeturl'])) {
@@ -95,8 +94,8 @@ class NZBGet
 		}
 
 		$this->fullURL = $this->verifyURL($this->url);
-		$this->Releases = new Releases();
-		$this->NZB = new Enzebe();
+		$this->Releases = new \Releases();
+		$this->NZB = new \Enzebe();
 	}
 
 	/**
@@ -110,17 +109,10 @@ class NZBGet
 	 */
 	public function sendNZBToNZBGet($guid)
 	{
-		$reldata = $this->Releases->getByGuid($guid);
-		$nzbpath = $this->NZB->getNZBPath($guid);
+		$relData = $this->Releases->getByGuid($guid);
 
-		$string = '';
-		$nzb = @gzopen($nzbpath, 'rb', 0);
-		if ($nzb) {
-			while (!gzeof($nzb)) {
-				$string .= gzread($nzb, 1024);
-			}
-			gzclose($nzb);
-		}
+		$string = Utility::unzipGzipFile($this->NZB->getNZBPath($guid));
+		$string = ($string === false ? '' : $string);
 
 		$header =
 			'<?xml version="1.0"?>
@@ -128,10 +120,10 @@ class NZBGet
 				<methodName>append</methodName>
 				<params>
 					<param>
-						<value><string>' . $reldata['searchname'] . '</string></value>
+						<value><string>' . $relData['searchname'] . '</string></value>
 					</param>
 					<param>
-						<value><string>' . $reldata['category_name'] . '</string></value>
+						<value><string>' . $relData['category_name'] . '</string></value>
 					</param>
 					<param>
 						<value><i4>0</i4></value>
@@ -144,11 +136,11 @@ class NZBGet
 							<string>' .
 			base64_encode($string) .
 			'</string>
-		</value>
-	</param>
-</params>
-</methodCall>';
-		Utility::getUrl($this->fullURL . 'append', 'post', $header);
+						</value>
+					</param>
+				</params>
+			</methodCall>';
+		Utility::getUrl(['url' => $this->fullURL . 'append', 'method' => 'post', 'postdata' => $header, 'verifycert' => false]);
 	}
 
 	/**
@@ -193,11 +185,11 @@ class NZBGet
 			$this->rsstoken
 			.
 			'</string>
-		</value>
-	</param>
-</params>
-</methodCall>';
-		Utility::getUrl($this->fullURL . 'appendurl', 'post', $header);
+						</value>
+					</param>
+				</params>
+			</methodCall>';
+		Utility::getUrl(['url' => $this->fullURL . 'appendurl', 'method' => 'post', 'postdata' => $header, 'verifycert' => false]);
 	}
 
 	/**
@@ -219,7 +211,7 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-		Utility::getUrl($this->fullURL . 'pausedownload2', 'post', $header);
+		Utility::getUrl(['url' => $this->fullURL . 'pausedownload2', 'method' => 'post', 'postdata' => $header, 'verifycert' => false]);
 	}
 
 	/**
@@ -241,7 +233,7 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-		Utility::getUrl($this->fullURL . 'resumedownload2', 'post', $header);
+		Utility::getUrl(['url' => $this->fullURL . 'resumedownload2', 'method' => 'post', 'postdata' => $header, 'verifycert' => false]);
 	}
 
 	/**
@@ -276,7 +268,7 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-		Utility::getUrl($this->fullURL . 'editqueue', 'post', $header);
+		Utility::getUrl(['url' => $this->fullURL . 'editqueue', 'method' => 'post', 'postdata' => $header, 'verifycert' => false]);
 	}
 
 	/**
@@ -311,7 +303,7 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-		Utility::getUrl($this->fullURL . 'editqueue', 'post', $header);
+		Utility::getUrl(['url' => $this->fullURL . 'editqueue', 'method' => 'post', 'postdata' => $header, 'verifycert' => false]);
 	}
 
 	/**
@@ -346,7 +338,7 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-		Utility::getUrl($this->fullURL . 'editqueue', 'post', $header);
+		Utility::getUrl(['url' => $this->fullURL . 'editqueue', 'method' => 'post', 'postdata' => $header, 'verifycert' => false]);
 	}
 
 	/**
@@ -370,7 +362,7 @@ class NZBGet
 					</param>
 				</params>
 			</methodCall>';
-		Utility::getUrl($this->fullURL . 'rate', 'post', $header);
+		Utility::getUrl(['url' => $this->fullURL . 'rate', 'method' => 'post', 'postdata' => $header, 'verifycert' => false]);
 	}
 
 	/**
@@ -382,12 +374,12 @@ class NZBGet
 	 */
 	public function getQueue()
 	{
-		$data = Utility::getUrl($this->fullURL . 'listgroups');
+		$data = Utility::getUrl(['url' => $this->fullURL . 'listgroups', 'verifycert' => false]);
 		$retVal = false;
 		if ($data) {
 			$xml = simplexml_load_string($data);
 			if ($xml) {
-				$retVal = array();
+				$retVal = [];
 				$i = 0;
 				foreach($xml->params->param->value->array->data->value as $value) {
 					foreach ($value->struct->member as $member) {
@@ -413,7 +405,7 @@ class NZBGet
 	 */
 	public function status()
 	{
-		$data = Utility::getUrl($this->fullURL . 'status');
+		$data = Utility::getUrl(['url' => $this->fullURL . 'status', 'verifycert' => false]);
 		$retVal = false;
 		if ($data) {
 			$xml = simplexml_load_string($data);
@@ -451,7 +443,7 @@ class NZBGet
 				$this->password .
 				'@' .
 				$matches['url'] .
-				(isset($matches['port']) ? ':' . $matches['port'] : '') .
+				(isset($matches['port']) ? ':' . $matches['port'] : (substr($matches['url'], -1) === '/' ? '' : '/')) .
 				'xmlrpc/';
 		} else {
 			return false;
