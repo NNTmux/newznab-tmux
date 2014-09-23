@@ -42,7 +42,7 @@ switch($action)
 		{
 			$site = $ret;
 			$returnid = $site->id;
-			header("Location:".WWW_TOP."/site-edit.php?id=".$returnid);
+			header("Location:".WWW_TOP."/site-edit.php?ID=".$returnid);
 		}
 		else
 		{

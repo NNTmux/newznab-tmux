@@ -4,6 +4,7 @@ class ReleaseSearch
 {
 	const FULLTEXT = 0;
 	const LIKE     = 1;
+	const SPHINX   = 2;
 
 	/***
 	 * @var DB
@@ -30,6 +31,9 @@ class ReleaseSearch
 		switch (NN_RELEASE_SEARCH_TYPE) {
 			case self::LIKE:
 				$this->fullTextJoinString = '';
+				break;
+			case self::SPHINX:
+				$this->fullTextJoinString = 'INNER JOIN releases_se rse ON rse.id = r.id';
 				break;
 			case self::FULLTEXT:
 			default:
@@ -59,6 +63,9 @@ class ReleaseSearch
 		switch (NN_RELEASE_SEARCH_TYPE) {
 			case self::LIKE:
 				$SQL = $this->likeSQL();
+				break;
+			case self::SPHINX:
+				$SQL = $this->sphinxSQL();
 				break;
 			case self::FULLTEXT:
 			default:
@@ -137,5 +144,37 @@ class ReleaseSearch
 			}
 		}
 		return $return;
+	}
+	/**
+	 * Create SQL sub-query using sphinx full text search.
+	 *
+	 * @return string
+	 */
+	private function sphinxSQL()
+	{
+		$return = '';
+		foreach ($this->searchOptions as $columnName => $searchString) {
+			$searchWords = '';
+			$words = explode(' ', $searchString);
+			foreach ($words as $word) {
+				$word = str_replace("'", "\\'", trim($word, "\n\t\r\0\x0B "));
+
+				if ($word !== '') {
+					$searchWords .= ($word . ' ');
+				}
+			}
+			$searchWords = rtrim($searchWords, "\n\t\r\0\x0B ");
+			if ($searchWords !== '') {
+				$return .= sprintf("@%s %s ", $columnName, $searchWords);
+			}
+		}
+		if ($return === '') {
+			return $this->likeSQL();
+		} else {
+			return sprintf(
+				" AND rse.query = '%s;limit=10000;maxmatches=10000;sort=relevance;mode=extended'",
+				trim($return)
+			);
+		}
 	}
 }
