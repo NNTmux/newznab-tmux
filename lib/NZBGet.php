@@ -84,7 +84,7 @@ class NZBGet
 	public function __construct(&$page)
 	{
 		$this->serverurl = $page->serverurl;
-		$this->uid = $page->userdata['id'];
+		$this->uid = $page->userdata['ID'];
 		$this->rsstoken = $page->userdata['rsstoken'];
 
 		if (!empty($page->userdata['nzbgeturl'])) {
