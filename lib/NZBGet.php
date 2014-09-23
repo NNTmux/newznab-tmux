@@ -2,7 +2,7 @@
 require_once(dirname(__FILE__) . "/../bin/config.php");
 require_once(WWW_DIR . "/lib/releases.php");
 require_once(WWW_DIR . "/lib/util.php");
-require_once("Enzebe.php");
+require_once(WWW_DIR . "/lib/nzb.php");
 /**
  * Class NZBGet
  *
@@ -95,7 +95,7 @@ class NZBGet
 
 		$this->fullURL = $this->verifyURL($this->url);
 		$this->Releases = new \Releases();
-		$this->NZB = new \Enzebe();
+		$this->NZB = new \NZB();
 	}
 
 	/**
