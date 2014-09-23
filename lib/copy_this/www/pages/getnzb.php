@@ -35,7 +35,13 @@ if ($users->isLoggedIn()) {
 if (isset($_GET["id"])) {
 	$_GET["id"] = preg_replace("/\.nzb/i", "", $_GET["id"]);
 }
-
+//
+// A hash of the users ip to record against the download
+//
+$hosthash = "";
+if ($page->site->storeuserips == 1) {
+	$hosthash = $users->getHostHash($_SERVER["REMOTE_ADDR"], $page->site->siteseed);
+}
 // Check download limit on user role.
 $dlrequests = $users->getDownloadRequests($uid);
 if ($dlrequests['num'] > $maxdls) {
