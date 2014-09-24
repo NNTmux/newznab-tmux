@@ -2011,7 +2011,7 @@ class Releases
 		else
 			$parameters['reqID'] = " null ";
 
-		$parameters['ID'] = $db->queryInsert(sprintf("insert into releases (name, searchname, totalpart, groupID, adddate, guid, categoryID, regexID, rageID, postdate, fromname, size, reqID, passwordstatus, completion, haspreview, nfostatus, nzbstatus,
+		$parameters['id'] = $db->queryInsert(sprintf("insert into releases (name, searchname, totalpart, groupID, adddate, guid, categoryID, regexID, rageID, postdate, fromname, size, reqID, passwordstatus, completion, haspreview, nfostatus, nzbstatus,
 					isrenamed, iscategorized, reqidstatus, prehashID)
                     values (%s, %s, %d, %d, now(), %s, %d, %s, -1, %s, %s, 0, %s, %d, 100,-1, -1, %d, %d, 1, %d, %d)",
 					$parameters['name'],
@@ -2032,7 +2032,7 @@ class Releases
 		));
 
 		$sphinxSearch->insertRelease($parameters);
-		return $parameters['ID'];
+		return $parameters['id'];
 	}
 
 	/**
