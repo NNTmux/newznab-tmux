@@ -24,7 +24,7 @@ switch ($argv[1]) {
 function releases_rt()
 {
 	$pdo = new \DB();
-	$rows = $pdo->queryExec('SELECT ID, guid, name, searchname, fromname FROM releases');
+	$rows = $pdo->queryExec('SELECT id, guid, name, searchname, fromname FROM releases');
 
 	if ($rows !== false && $rows->rowCount()) {
 		$sphinx = new \SphinxSearch();

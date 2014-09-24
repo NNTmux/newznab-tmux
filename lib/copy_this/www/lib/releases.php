@@ -1628,7 +1628,25 @@ class Releases
 					$properName = true;
 				}
 			}
-			$relid = $this->insertRelease($cleanRelName, $db->escapeString(utf8_encode($cleanedName)), $row["parts"], $row["groupID"], $relguid, $catId, $row["regexID"], $row["date"], $row["fromname"], $row["reqID"], $page->site, Enzebe::NZB_NONE, $properName === true ? 1 : 0, $isReqID, $prehashID);
+			$relid = $this->insertRelease(
+				[
+					'name' => $db->escapeString($cleanRelName),
+					'searchname' => $db->escapeString(utf8_encode($cleanedName)),
+					'totalpart' => $row["parts"],
+					'groupID' => $row["groupID"],
+					'guid' => $db->escapeString($row['guid']),
+					'categoryID' => $catId,
+					'regexID' => $row["regexID"],
+					'postdate' => $db->escapeString($row['date']),
+					'fromname' => $db->escapeString($row['fromname']),
+					'reqid' => $row["reqID"],
+					'passwordstatus' => ($page->site->checkpasswordedrar > 0 ? -1 : 0),
+					'nzbstatus' => \Enzebe::NZB_NONE,
+					'isrenamed' => ($properName === true ? 1 : 0),
+					'reqidstatus' => ($isReqID === true ? 1 : 0),
+					'preid' => ($prehashID === false ? 0 : $prehashID)
+				]
+			);
 			//
 			// Tag every binary for this release with its parent release id
 			//
@@ -1914,31 +1932,41 @@ class Releases
 		return $relname;
 	}
 
-	public function insertRelease($cleanRelName, $cleanedName, $parts, $group, $guid, $catId, $regexID, $date, $fromname, $reqID, $site, $nzbstatus, $isrenamed, $isReqID, $prehashID)
+	public function insertRelease(array $parameters = [])
 	{
 		$db = new DB();
 		$sphinxSearch = new SphinxSearch();
 
-		if ($regexID == "")
-			$regexID = " null ";
+		if ($parameters['regexID'] == "")
+			$parameters['regexID'] = " null ";
 
-		if ($reqID != "")
-			$reqID = $db->escapeString($reqID);
+		if ($parameters['reqID'] != "")
+			$parameters['reqID'] = $db->escapeString('reqID');
 		else
-			$reqID = " null ";
+			$parameters['reqID'] = " null ";
 
-		$sql = sprintf("insert into releases (name, searchname, totalpart, groupID, adddate, guid, categoryID, regexID, rageID, postdate, fromname, size, reqID, passwordstatus, completion, haspreview, nfostatus, nzbstatus,
+		$parameters['id'] = $db->queryInsert(sprintf("insert into releases (name, searchname, totalpart, groupID, adddate, guid, categoryID, regexID, rageID, postdate, fromname, size, reqID, passwordstatus, completion, haspreview, nfostatus, nzbstatus,
 					isrenamed, iscategorized, reqidstatus, prehashID)
-                    values (%s, %s, %d, %d, now(), %s, %d, %s, -1, %s, %s, 0, %s, %d, 100, %d, %d, %d, %d, 1, %d, %d)",
-			$db->escapeString($cleanRelName), $cleanedName, $parts, $group, $db->escapeString($guid), $catId, $regexID,
-			$db->escapeString($date), $db->escapeString($fromname), $reqID, ($site->checkpasswordedrar > 0 ? -1 : 0), -1, -1,
-			$db->escapeString($nzbstatus), $db->escapeString($isrenamed), $db->escapeString($isReqID), $db->escapeString($prehashID)
-		);
+                    values (%s, %s, %d, %d, now(), %s, %d, %s, -1, %s, %s, 0, %s, %d, 100,-1, -1, %d, %d, 1, %d, %d)",
+					$parameters['name'],
+					$parameters['searchname'],
+					$parameters['totalpart'],
+					$parameters['groupID'],
+					$parameters['guid'],
+					$parameters['categoryID'],
+					$parameters['regexID'],
+					$parameters['postdate'],
+					$parameters['fromname'],
+					$parameters['reqID'],
+					$parameters['passwordstatus'],
+					$parameters['nzbstatus'],
+					$parameters['isrenamed'],
+					$parameters['reqidstatus'],
+					$parameters['prehashID']
+		));
 
-		$relid = $db->queryInsert($sql);
-		$sphinxSearch->insertRelease($relid, $guid, $cleanRelName, $cleanedName, $fromname);
-
-		return $relid;
+		$sphinxSearch->insertRelease($parameters);
+		return $parameters['id'];
 	}
 
 	/**
