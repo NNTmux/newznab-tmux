@@ -1634,7 +1634,7 @@ class Releases
 					'searchname' => $db->escapeString(utf8_encode($cleanedName)),
 					'totalpart' => $row["parts"],
 					'groupID' => $row["groupID"],
-					'guid' => $db->escapeString($row['guid']),
+					'guid' => $db->escapeString($relguid),
 					'categoryID' => $catId,
 					'regexID' => $row["regexID"],
 					'postdate' => $db->escapeString($row['date']),
