@@ -1173,120 +1173,171 @@ class Releases
 	}
 
 	/**
-	 * Search for releases.
+	 * Function for searching on the site (by subject, searchname or advanced).
+	 *
+	 * @param string $searchName
+	 * @param string $usenetName
+	 * @param string $posterName
+	 * @param string $groupName
+	 * @param array  $cat
+	 * @param int    $sizeFrom
+	 * @param int    $sizeTo
+	 * @param int    $hasNfo
+	 * @param int    $hasComments
+	 * @param int    $daysNew
+	 * @param int    $daysOld
+	 * @param int    $offset
+	 * @param int    $limit
+	 * @param string $orderBy
+	 * @param int    $maxAge
+	 * @param array  $excludedCats
+	 * @param string $type
+	 *
+	 * @return array
 	 */
-	public function search($search, $cat = array(-1), $offset = 0, $limit = 1000, $orderby = '', $maxage = -1, $excludedcats = array(), $grp = array(), $minsize = -1, $maxsize = -1)
+	public function search(
+		$searchName, $usenetName, $posterName, $groupName, $cat = [-1], $sizeFrom,
+		$sizeTo, $hasNfo, $hasComments, $daysNew, $daysOld, $offset = 0, $limit = 1000,
+		$orderBy = '', $maxAge = -1, $excludedCats = [], $type = 'basic'
+	)
 	{
-		$s = new Sites();
-		$site = $s->get();
+		$db = new DB();
+		$sphinxSearch = new SphinxSearch();
+		$releaseSearch = new ReleaseSearch($db, $sphinxSearch);
+		$sizeRange = range(1,11);
+		$groups = new Groups();
 
-		if ($site->sphinxenabled) {
-			$sphinx = new Sphinx();
-			$order = $this->getBrowseOrder($orderby);
-			$results = $sphinx->search($search, $cat, $offset, $limit, $order, $maxage, $excludedcats, $grp, array(), true, $minsize, $maxsize);
-			if (is_array($results))
-				return $results;
+		if ($orderBy == '') {
+			$orderBy = [];
+			$orderBy[0] = 'postdate ';
+			$orderBy[1] = 'desc ';
+		} else {
+			$orderBy = $this->getBrowseOrder($orderBy);
 		}
 
-		//
-		// Search using MySQL
-		//
+		$searchOptions = [];
+		if ($searchName != -1) {
+			$searchOptions['searchname'] = $searchName;
+		}
+		if ($usenetName != -1) {
+			$searchOptions['name'] = $usenetName;
+		}
+		if ($posterName != -1) {
+			$searchOptions['fromname'] = $posterName;
+		}
+
+		$whereSql = sprintf(
+			"%s
+			WHERE r.passwordstatus <= (select value from site where setting='showpasswordedrelease') AND r.nzbstatus = %d %s %s %s %s %s %s %s %s %s %s %s",
+			$releaseSearch->getFullTextJoinString(),
+			Enzebe::NZB_ADDED,
+			($maxAge > 0 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $maxAge) : ''),
+			($groupName != -1 ? sprintf(' AND r.groupID = %d ', $groups->getIDByName($groupName)) : ''),
+			(in_array($sizeFrom, $sizeRange) ? ' AND r.size > ' . (string)(104857600 * (int)$sizeFrom) . ' ' : ''),
+			(in_array($sizeTo, $sizeRange) ? ' AND r.size < ' . (string)(104857600 * (int)$sizeTo) . ' ' : ''),
+			($hasNfo != 0 ? ' AND r.nfostatus = 1 ' : ''),
+			($hasComments != 0 ? ' AND r.comments > 0 ' : ''),
+			($type !== 'advanced' ? $this->categorySQL($cat) : ($cat[0] != '-1' ? sprintf(' AND (r.categoryID = %d) ', $cat[0]) : '')),
+			($daysNew != -1 ? sprintf(' AND r.postdate < (NOW() - INTERVAL %d DAY) ', $daysNew) : ''),
+			($daysOld != -1 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $daysOld) : ''),
+			(count($excludedCats) > 0 ? ' AND r.categoryID NOT IN (' . implode(',', $excludedCats) . ')' : ''),
+			(count($searchOptions) > 0 ? $releaseSearch->getSearchSQL($searchOptions) : '')
+		);
+
+		$baseSql = sprintf(
+			"SELECT r.*,
+				CONCAT(cp.title, ' > ', c.title) AS category_name,
+				CONCAT(cp.ID, ',', c.ID) AS category_ids,
+				groups.name AS group_name,
+				rn.ID AS nfoid,
+				re.releaseID AS reid,
+				cp.ID AS categoryparentid
+			FROM releases r
+			LEFT OUTER JOIN releasevideo re ON re.releaseID = r.ID
+			LEFT OUTER JOIN releasenfo rn ON rn.releaseID = r.ID
+			INNER JOIN groups ON groups.ID = r.groupID
+			INNER JOIN category c ON c.ID = r.categoryID
+			INNER JOIN category cp ON cp.ID = c.parentID
+			%s",
+			$whereSql
+		);
+
+		$sql = sprintf(
+			"SELECT * FROM (
+				%s
+			) r
+			ORDER BY r.%s %s
+			LIMIT %d OFFSET %d",
+			$baseSql,
+			$orderBy[0],
+			$orderBy[1],
+			$limit,
+			$offset
+		);
+		$releases = $db->query($sql);
+		if ($releases && count($releases)) {
+			$releases[0]['_totalrows'] = $this->getPagerCount($baseSql);
+		}
+		return $releases;
+	}
+
+	/**
+	 * Get count of releases for pager.
+	 *
+	 * @param string $query The query to get the count from.
+	 *
+	 * @return int
+	 */
+	private function getPagerCount($query)
+	{
 		$db = new DB();
+		$count = $db->queryOneRow(
+			sprintf(
+				'SELECT COUNT(*) AS count FROM (%s LIMIT %s) z',
+				preg_replace('/SELECT.+?FROM\s+releases/is', 'SELECT r.ID FROM releases', $query),
+				NN_MAX_PAGER_RESULTS
+			)
+		);
+		if (isset($count['count']) && is_numeric($count['count'])) {
+			return $count['count'];
+		}
+		return 0;
+	}
 
-		$catsrch = "";
-		$usecatindex = "";
-		if (count($cat) > 0 && $cat[0] != -1) {
-			$catsrch = " and (";
-			foreach ($cat as $category) {
+	/**
+	 * Creates part of a query for searches requiring the categoryID's.
+	 *
+	 * @param array $categories
+	 *
+	 * @return string
+	 */
+	public function categorySQL($categories)
+	{
+		$sql = '';
+		if (count($categories) > 0 && $categories[0] != -1) {
+			$Category = new \Category();
+			$sql = ' AND (';
+			foreach ($categories as $category) {
 				if ($category != -1) {
-					$categ = new Categorize();
-					if ($categ->isParent($category)) {
-						$children = $categ->getChildren($category);
-						$chlist = "-99";
-						foreach ($children as $child)
-							$chlist .= ", " . $child["ID"];
+					if ($Category->isParent($category)) {
+						$children = $Category->getChildren($category);
+						$childList = '-99';
+						foreach ($children as $child) {
+							$childList .= ', ' . $child['id'];
+						}
 
-						if ($chlist != "-99")
-							$catsrch .= " releases.categoryID in (" . $chlist . ") or ";
+						if ($childList != '-99') {
+							$sql .= ' r.categoryID IN (' . $childList . ') OR ';
+						}
 					} else {
-						$catsrch .= sprintf(" releases.categoryID = %d or ", $category);
+						$sql .= sprintf(' r.categoryID = %d OR ', $category);
 					}
 				}
 			}
-			$catsrch .= "1=2 )";
-			$usecatindex = " use index (ix_releases_categoryID) ";
+			$sql .= '1=2 )';
 		}
 
-		$grpsql = "";
-		if (count($grp) > 0) {
-			$grpsql = " and (";
-			foreach ($grp as $grpname) {
-				$grpsql .= sprintf(" groups.name = %s or ", $db->escapeString(str_replace("a.b.", "alt.binaries.", $grpname)));
-			}
-			$grpsql .= "1=2 )";
-		}
-
-		//
-		// if the query starts with a ^ it indicates the search is looking for items which start with the term
-		// still do the fulltext match, but mandate that all items returned must start with the provided word
-		//
-		$words = explode(" ", $search);
-		$searchsql = "";
-		$intwordcount = 0;
-		if (count($words) > 0) {
-			foreach ($words as $word) {
-				if ($word != "") {
-					//
-					// see if the first word had a caret, which indicates search must start with term
-					//
-					if ($intwordcount == 0 && (strpos($word, "^") === 0))
-						$searchsql .= sprintf(" and releases.searchname like %s", $db->escapeString(substr($word, 1) . "%"));
-					elseif (substr($word, 0, 2) == '--')
-						$searchsql .= sprintf(" and releases.searchname not like %s", $db->escapeString("%" . substr($word, 2) . "%"));
-					else
-						$searchsql .= sprintf(" and releases.searchname like %s", $db->escapeString("%" . $word . "%"));
-
-					$intwordcount++;
-				}
-			}
-		}
-
-		if ($maxage > 0)
-			$maxage = sprintf(" and postdate > now() - interval %d day ", $maxage);
-		else
-			$maxage = "";
-
-		if ($minsize != -1)
-			$minsize = sprintf(" and size > %d ", $minsize);
-		else
-			$minsize = "";
-
-		if ($maxsize != -1)
-			$maxsize = sprintf(" and size < %d ", $maxsize);
-		else
-			$maxsize = "";
-
-		$exccatlist = "";
-		if (count($excludedcats) > 0)
-			$exccatlist = " and releases.categoryID not in (" . implode(",", $excludedcats) . ")";
-
-		if ($orderby == "") {
-			$order[0] = " postdate ";
-			$order[1] = " desc ";
-		} else
-			$order = $this->getBrowseOrder($orderby);
-
-		$sql = sprintf("select releases.*, concat(cp.title, ' > ', c.title) as category_name, concat(cp.ID, ',', c.ID) as category_ids, groups.name as group_name, rn.ID as nfoID, re.releaseID as reID, cp.ID as categoryParentID, pre.ctime, pre.nuketype, coalesce(movieinfo.ID,0) as movieinfoID from releases %s left outer join movieinfo on movieinfo.imdbID = releases.imdbID left outer join releasevideo re on re.releaseID = releases.ID left outer join releasenfo rn on rn.releaseID = releases.ID left outer join groups on groups.ID = releases.groupID left outer join category c on c.ID = releases.categoryID left outer join category cp on cp.ID = c.parentID left outer join predb pre on pre.ID = releases.preID where releases.passwordstatus <= (select value from site where setting='showpasswordedrelease') %s %s %s %s %s %s %s order by %s %s limit %d, %d ", $usecatindex, $searchsql, $catsrch, $maxage, $exccatlist, $grpsql, $minsize, $maxsize, $order[0], $order[1], $offset, $limit);
-		$orderpos = strpos($sql, "order by");
-		$wherepos = strpos($sql, "where");
-		$sqlcount = "select count(releases.ID) as num from releases " . substr($sql, $wherepos, $orderpos - $wherepos);
-
-		$countres = $db->queryOneRow($sqlcount, true);
-		$res = $db->query($sql, true);
-		if (count($res) > 0)
-			$res[0]["_totalrows"] = $countres["num"];
-
-		return $res;
+		return $sql;
 	}
 
 	public function getById($id)
