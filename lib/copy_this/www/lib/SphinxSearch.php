@@ -42,11 +42,11 @@ class SphinxSearch
 	 */
 	public function insertRelease($parameters)
 	{
-		if (!is_null($this->sphinxQL) && $parameters['id']) {
+		if (!is_null($this->sphinxQL) && $parameters['ID']) {
 			$this->sphinxQL->queryExec(
 				sprintf(
 					'REPLACE INTO releases_rt (id, guid, name, searchname, fromname) VALUES (%s, %s, %s, %s, %s)',
-					$parameters['id'],
+					$parameters['ID'],
 					$parameters['guid'],
 					$parameters['name'],
 					$parameters['searchname'],
