@@ -20,6 +20,7 @@ require_once(WWW_DIR . "/lib/nzb.php");
 require_once(WWW_DIR . "/lib/util.php");
 require_once(WWW_DIR . "/lib/ConsoleTools.php");
 require_once(WWW_DIR . "/lib/ColorCLI.php");
+require_once(WWW_DIR . "/lib/SphinxSearch.php");
 require_once("nzbcontents.php");
 require_once("namefixer.php");
 require_once("Info.php");
@@ -296,6 +297,7 @@ Class ProcessAdditional
 			'ReleaseFiles' => null,
 			'ReleaseImage' => null,
 			'Settings'     => null,
+			'SphinxSearch' => null,
 		];
 		$options += $defaults;
 
@@ -315,6 +317,7 @@ Class ProcessAdditional
 		$this->_releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage($this->pdo));
 		$this->_par2Info = new Par2Info();
 		$this->_nfo = ($options['Nfo'] instanceof Info ? $options['Nfo'] : new Info(['Echo' => $this->_echoCLI, 'Settings' => $this->pdo]));
+		$this->sphinx = ($options['SphinxSearch'] instanceof \SphinxSearch ? $options['SphinxSearch'] : new \SphinxSearch());
 		$s = new Sites();
 		$this->site = $s->get();
 		$this->nnnzb = new NZB();
@@ -1701,6 +1704,7 @@ Class ProcessAdditional
 											$this->_release['ID']
 										)
 									);
+									$this->sphinx->updateReleaseSearchName($this->_release['ID'], $newTitle);
 
 									// Echo the changed name.
 									if ($this->_echoCLI) {
@@ -2288,6 +2292,7 @@ Class ProcessAdditional
 							$this->_release['ID']
 						)
 					);
+					$this->sphinx->updateReleaseSearchName($this->_release['ID'], $newTitle);
 
 					// Echo the changed name to CLI.
 					if ($this->_echoCLI) {
