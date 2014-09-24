@@ -168,7 +168,7 @@ class Film
 		$this->showPasswords = ($this->site->showpasswordedrelease != '') ? $this->site->showpasswordedrelease : 0;
 
 		$this->debug = NN_DEBUG;
-		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
+		$this->echooutput = ($options['Echo'] && NN_ECHOCLI && $this->pdo->cli);
 		$this->imgSavePath = NN_COVERS . 'movies' . DS;
 		$this->service = '';
 		$this->utility = new Utility();
@@ -1319,7 +1319,9 @@ class Film
 	 */
 	public function updateUpcoming()
 	{
-		$this->pdo->log->doEcho($this->pdo->log->header('Updating movie schedule using rotten tomatoes.'));
+		if ($this->echooutput) {
+						$this->pdo->log->doEcho($this->pdo->log->header('Updating movie schedule using rotten tomatoes.'));
+					}
 
 		$rt = new \RottenTomato($this->site->rottentomatokey);
 
@@ -1335,7 +1337,7 @@ class Film
 				$this->pdo->log->doEcho($this->pdo->log->header("Updated successfully."));
 			}
 
-		} else {
+		} else if ($this->echooutput) {
 			$this->pdo->log->doEcho($this->pdo->log->header("Error retrieving your RottenTomato API Key. Exiting..." . PHP_EOL));
 		}
 	}

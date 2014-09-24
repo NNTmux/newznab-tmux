@@ -20,24 +20,32 @@ $data = $m->getUpcoming($_GET["id"]);
 if ($data["info"] == "") {
 	$page->smarty->assign("nodata", "No upcoming data.");
 } else {
-	$page->smarty->assign('data', json_decode($data["info"])->movies);
+	$data = json_decode($data["info"]);
 
-	switch ($_GET["id"]) {
-		case Film::SRC_BOXOFFICE;
-			$page->title = "Box Office";
-			break;
-		case Film::SRC_INTHEATRE;
-			$page->title = "In Theater";
-			break;
-		case Film::SRC_OPENING;
-			$page->title = "Opening";
-			break;
-		case Film::SRC_UPCOMING;
-			$page->title = "Upcoming";
-			break;
-		case Film::SRC_DVD;
-			$page->title = "DVD Releases";
-			break;
+	if (isset($data->error)) {
+		$page->smarty->assign("nodata", $data->error);
+	} else if (!isset($data->movies)) {
+		$page->smarty->assign("nodata", 'Unspecified error.');
+	} else {
+		$page->smarty->assign('data', $data->movies);
+
+		switch ($_GET["id"]) {
+			case Movie::SRC_BOXOFFICE;
+				$page->title = "Box Office";
+				break;
+			case Movie::SRC_INTHEATRE;
+				$page->title = "In Theater";
+				break;
+			case Movie::SRC_OPENING;
+				$page->title = "Opening";
+				break;
+			case Movie::SRC_UPCOMING;
+				$page->title = "Upcoming";
+				break;
+			case Movie::SRC_DVD;
+				$page->title = "DVD Releases";
+				break;
+		}
 	}
 	$page->meta_title = "View upcoming theatre releases";
 	$page->meta_keywords = "view,series,theatre,dvd";
