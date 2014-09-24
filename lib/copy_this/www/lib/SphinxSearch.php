@@ -99,11 +99,11 @@ class SphinxSearch
 			if ($old !== false) {
 				$this->insertRelease(
 					[
-						$releaseID,
-						$this->sphinxQL->escapeString($old['guid']),
-						$this->sphinxQL->escapeString($old['name']),
-						$searchName,
-						$this->sphinxQL->escapeString($old['fromname'])
+						'id' => $releaseID,
+						'guid' => $this->sphinxQL->escapeString($old['guid']),
+						'name' => $this->sphinxQL->escapeString($old['name']),
+						'searchname' => $searchName,
+						'fromname' => $this->sphinxQL->escapeString($old['fromname'])
 					]
 				);
 			}
