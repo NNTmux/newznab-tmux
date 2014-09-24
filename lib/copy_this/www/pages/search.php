@@ -205,9 +205,9 @@ $page->smarty->assign('sizelist', $sizelist);
 $page->smarty->assign('results', $results);
 $page->smarty->assign('sadvanced', ($searchtype != "basic"));
 
-$ft1 = $db->checkIndex('releases', 'ix_releases_name_searchname_ft');
-$ft2 = $db->checkIndex('releases', 'ix_releases_name_ft');
-$ft3 = $db->checkIndex('releases', 'ix_releases_searchname_ft');
+$ft1 = $page->settings->checkIndex('releases', 'ix_releases_name_searchname_ft');
+$ft2 = $page->settings->checkIndex('releases', 'ix_releases_name_ft');
+$ft3 = $page->settings->checkIndex('releases', 'ix_releases_searchname_ft');
 switch (NN_RELEASE_SEARCH_TYPE) {
 	case ReleaseSearch::FULLTEXT:
 		$search_description =
