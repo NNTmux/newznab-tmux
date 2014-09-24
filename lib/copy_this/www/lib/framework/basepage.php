@@ -1,5 +1,6 @@
 <?php
 require_once(SMARTY_DIR.'Smarty.class.php');
+require_once(WWW_DIR."/lib/framework/db.php");
 require_once(WWW_DIR."/lib/users.php");
 require_once(WWW_DIR."/lib/site.php");
 require_once(WWW_DIR."/lib/sabnzbd.php");
@@ -41,6 +42,8 @@ class BasePage
 		$s = new Sites();
 		$this->site = $s->get();
 
+		// Buffer settings/DB connection.
+		$this->settings = new DB();
 		$this->smarty = new Smarty();
 
 		if ($this->site->style != "default")
