@@ -377,11 +377,26 @@ class Releases
 	}
 
 	/**
-	 * Get a list of available columns for sorting browse list
+	 * Return ordering types usable on site.
+	 *
+	 * @return array
 	 */
 	public function getBrowseOrdering()
 	{
-		return array('name_asc', 'name_desc', 'cat_asc', 'cat_desc', 'posted_asc', 'posted_desc', 'size_asc', 'size_desc', 'files_asc', 'files_desc', 'stats_asc', 'stats_desc');
+		return [
+			'name_asc',
+			'name_desc',
+			'cat_asc',
+			'cat_desc',
+			'posted_asc',
+			'posted_desc',
+			'size_asc',
+			'size_desc',
+			'files_asc',
+			'files_desc',
+			'stats_asc',
+			'stats_desc'
+		];
 	}
 
 	/**
