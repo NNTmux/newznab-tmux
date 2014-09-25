@@ -1,5 +1,5 @@
 <?php
-require_once(WWW_DIR.'/../misc/update_scripts/nix_scripts/tmux/lib/Film.php');
+require_once NN_TMUX . 'lib' . DS . 'Film.php';
 if (!$users->isLoggedIn()) {
 	$page->show403();
 }
@@ -30,19 +30,19 @@ if ($data["info"] == "") {
 		$page->smarty->assign('data', $data->movies);
 
 		switch ($_GET["id"]) {
-			case Movie::SRC_BOXOFFICE;
+			case Film::SRC_BOXOFFICE;
 				$page->title = "Box Office";
 				break;
-			case Movie::SRC_INTHEATRE;
+			case Film::SRC_INTHEATRE;
 				$page->title = "In Theater";
 				break;
-			case Movie::SRC_OPENING;
+			case Film::SRC_OPENING;
 				$page->title = "Opening";
 				break;
-			case Movie::SRC_UPCOMING;
+			case Film::SRC_UPCOMING;
 				$page->title = "Upcoming";
 				break;
-			case Movie::SRC_DVD;
+			case Film::SRC_DVD;
 				$page->title = "DVD Releases";
 				break;
 		}
