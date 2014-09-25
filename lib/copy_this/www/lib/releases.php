@@ -1494,7 +1494,7 @@ class Releases
 		// in order of how they should be applied
 		//
 		$releaseRegex->get();
-		echo "Stage 1 : Applying regex to binaries\n";
+		$db->log->doEcho($db->log->primary('Stage 1 : Applying regex to binaries'));
 		$activeGroups = $groups->getActive(false);
 		foreach ($activeGroups as $groupArr) {
 			//check if regexes have already been applied during update binaries
@@ -1544,7 +1544,7 @@ class Releases
 		//
 		// Move all binaries from releases which have the correct number of files on to the next stage.
 		//
-		echo "Stage 2 : Marking binaries where all parts are available";
+		$db->log->doEcho($db->log->primary('Stage 2 : Marking binaries where all parts are available'));
 		$result = $db->queryDirect(sprintf("SELECT relname, date, SUM(reltotalpart) AS reltotalpart, groupID, reqID, fromname, SUM(num) AS num, coalesce(g.minfilestoformrelease, s.minfilestoformrelease) as minfilestoformrelease FROM   ( SELECT relname, reltotalpart, groupID, reqID, fromname, max(date) as date, COUNT(ID) AS num FROM binaries     WHERE procstat = %s     GROUP BY relname, reltotalpart, groupID, reqID, fromname ORDER BY NULL ) x left outer join groups g on g.ID = x.groupID inner join ( select value as minfilestoformrelease from site where setting = 'minfilestoformrelease' ) s GROUP BY relname, groupID, reqID, fromname, minfilestoformrelease ORDER BY NULL", Releases::PROCSTAT_TITLEMATCHED));
 
 		while ($row = $db->getAssocArray($result)) {
@@ -1737,18 +1737,18 @@ class Releases
 			//
 			$nzbInfo = new nzbInfo;
 			if (!$nzbInfo->loadFromFile($nzbfile)) {
-				echo "Stage 3 : Failed to write nzb file (bad perms?) " . $nzbfile . "\n";
+				$db->log->doEcho($db->log->primary('Stage 3 : Failed to write nzb file (bad perms?) ' . $nzbfile . ''));
 				//copy($nzbfile, "./ERRORNZB_".$relguid);
 				$this->delete($relid);
 			} else {
 				// Check if gid already exists
 				$dupes = $db->queryOneRow(sprintf("SELECT EXISTS(SELECT 1 FROM releases WHERE gid = %s) as total", $db->escapeString($nzbInfo->gid)));
 				if ($dupes['total'] > 0) {
-					echo "Stage 3 : Duplicate - " . $cleanRelName . "\n";
+					$db->log->doEcho($db->log->primary('Stage 3 : Duplicate - ' . $cleanRelName . ''));
 					$this->delete($relid);
 				} else {
 					$db->exec(sprintf("update releases set totalpart = %d, size = %s, completion = %d, GID=%s where ID = %d", $nzbInfo->filecount, $nzbInfo->filesize, $nzbInfo->completion, $db->escapeString($nzbInfo->gid), $relid));
-					echo "Stage 3 : Added release " . $cleanRelName . "\n";
+					$db->log->doEcho($db->log->primary('Stage 3 : Added release ' . $cleanRelName . ''));
 
 					//Increment new release count
 					$retcount++;
@@ -1760,7 +1760,7 @@ class Releases
 		// Delete any releases under the minimum completion percent.
 		//
 		if ($page->site->completionpercent != 0) {
-			echo "Stage 4 : Deleting releases less than " . $page->site->completionpercent . " complete\n";
+			$db->log->doEcho($db->log->primary('Stage 4 : Deleting releases less than ' . $page->site->completionpercent . ' complete'));
 			$result = $db->query(sprintf("select ID from releases where completion > 0 and completion < %d", $page->site->completionpercent));
 			foreach ($result as $row)
 				$this->delete($row["ID"]);
@@ -1771,7 +1771,7 @@ class Releases
 		//
 		$result = $db->query("select releases.ID from releases left outer join (SELECT g.ID, coalesce(g.minsizetoformrelease, s.minsizetoformrelease) as minsizetoformrelease FROM groups g inner join ( select value as minsizetoformrelease from site where setting = 'minsizetoformrelease' ) s ) x on x.ID = releases.groupID where minsizetoformrelease != 0 and releases.size < minsizetoformrelease");
 		if (count($result) > 0) {
-			echo "Stage 4 : Deleting " . count($result) . " release(s) where size is smaller than minsize for site/group\n";
+			$db->log->doEcho($db->log->primary('Stage 4 : Deleting ' . count($result) . ' release(s) where size is smaller than minsize for site/group'));
 			foreach ($result as $row)
 				$this->delete($row["ID"]);
 		}
@@ -1790,26 +1790,26 @@ class Releases
 		);
 
 		if (count($result) > 0) {
-			echo "Stage 4 : Deleting release(s) not matching category min/max size ...\n";
+			$db->log->doEcho($db->log->primary('Stage 4 : Deleting release(s) not matching category min/max size'));
 			foreach ($result as $r) {
 				$this->delete($r['ID']);
 			}
 		}
 
-		echo "Stage 5 : Post processing is done in tmux\n";
+		$db->log->doEcho($db->log->primary('Stage 5 : Post processing is done in tmux'));
 		//$postprocess = new PostProcess(true);
 		//$postprocess->processAll();
 
 		//
 		// aggregate the releasefiles upto the releases.
 		//
-		echo "Stage 6 : Aggregating Files\n";
+		$db->log->doEcho($db->log->primary('Stage 6 : Aggregating Files'));
 		$db->exec("update releases INNER JOIN (SELECT releaseID, COUNT(ID) AS num FROM releasefiles GROUP BY releaseID) b ON b.releaseID = releases.ID and releases.rarinnerfilecount = 0 SET rarinnerfilecount = b.num");
 
 		// Remove the binaries and parts used to form releases, or that are duplicates.
 		//
 		if ($page->site->partsdeletechunks > 0) {
-			echo "Stage 7 : Chunk deleting unused binaries and parts";
+			$db->log->doEcho($db->log->primary('Stage 7 : Chunk deleting unused binaries and parts'));
 			$query = sprintf("SELECT parts.ID as partsID,binaries.ID as binariesID FROM parts
 						LEFT JOIN binaries ON binaries.ID = parts.binaryID
 						WHERE binaries.dateadded < %s - INTERVAL %d HOUR LIMIT 0,%d",
@@ -1846,9 +1846,9 @@ class Releases
 					$done = true;
 				}
 			}
-			echo "\nStage 7 : Complete - " . $cc . " rows affected\n";
+			$db->log->doEcho($db->log->primary('Stage 7 : Complete - ' . $cc . ' rows affected'));
 		} else {
-			echo "Stage 7 : Deleting unused binaries and parts\n";
+			$db->log->doEcho($db->log->primary('Stage 7 : Deleting unused binaries and parts'));
 			$db->exec(sprintf("DELETE parts, binaries FROM parts JOIN binaries ON binaries.ID = parts.binaryID
 			WHERE binaries.dateadded < %s - INTERVAL %d HOUR", $db->escapeString($currTime_ori["now"]), ceil($page->site->rawretentiondays * 24)
 				)
