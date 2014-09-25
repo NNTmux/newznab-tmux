@@ -563,28 +563,6 @@
 </fieldset>
 
 <fieldset>
-	<legend>Sphinx</legend>
-	<table class="input">
-		<tr>
-			<td style="width:180px;"><label for="fix_names">Run Sphinx:</label></td>
-			<td>
-				{html_radios id="sphinx" name='sphinx' values=$yesno_ids output=$yesno_names selected=$ftmux->sphinx separator='<br />'}
-				<div class="hint">Choose to run Sphinxsearch</div>
-			</td>
-		</tr>
-
-		<tr>
-			<td style="width:180px;"><label for="sphinx_timer">Sphinx Sleep Timer:</label></td>
-			<td>
-				<input id="sphinx_timer" name="sphinx_timer" class="short" type="text" value="{$ftmux->sphinx_timer}"/>
-
-				<div class="hint">The time to sleep from the time the loop ends until it is restarted, in seconds.</div>
-			</td>
-		</tr>
-	</table>
-</fieldset>
-
-<fieldset>
 	<legend>Update TV/Theater</legend>
 	<table class="input">
 		<tr>
