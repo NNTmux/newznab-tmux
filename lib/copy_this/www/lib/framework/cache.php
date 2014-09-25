@@ -196,7 +196,7 @@ Class Cache
 				if (!extension_loaded('memcached')) {
 					throw new CacheException('The memcached extension is not loaded!');
 				}
-				$this->server = Memcached();
+				$this->server = new Memcached();
 				$this->isRedis = false;
 				if ($this->serializerType !== false) {
 					$this->serializerType = $this->verifySerializer();
