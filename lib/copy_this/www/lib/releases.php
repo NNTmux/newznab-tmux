@@ -1913,7 +1913,7 @@ class Releases
 		$users = new Users;
 		$users->pruneRequestHistory($page->site->userdownloadpurgedays);
 
-		echo "Done    : Added " . $retcount . " releases\n\n";
+		$db->log->doEcho($db->log->primary('Done    : Added ' . $retcount . ' releases'));
 
 		return $retcount;
 	}
