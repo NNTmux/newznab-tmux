@@ -1651,7 +1651,7 @@ class Releases
 		$retcount = 0;
 
 
-		echo "\nStage 3 : Creating releases from complete binaries\n";
+		$db->log->doEcho($db->log->primary('Stage 3 : Creating releases from complete binaries'));
 		//
 		// Get out all distinct relname, group from binaries of STAGE2
 		//
