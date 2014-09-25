@@ -8,7 +8,7 @@ require_once(WWW_DIR . "/lib/showsleep.php");
 require_once(dirname(__FILE__) . "/../lib/functions.php");
 
 
-$version = "0.4r2201";
+$version = "0.4r2250";
 
 $pdo = new DB();
 $s = new Sites();

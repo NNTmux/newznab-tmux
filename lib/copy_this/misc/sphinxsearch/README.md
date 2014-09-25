@@ -86,6 +86,16 @@ You are now done with this guide, sphinx search should work. The index will popu
 
 Read about the benefits/drawbacks of optimizing here: http://sphinxsearch.com/docs/current.html#sphinxql-optimize-index
 
+##### Installing sphinxSE plugin in MariaDB
+
+First login to your mariadb server and type:
+
+show engines;
+
+If there is no mention of sphinx, you need to perform a one time install of the plugin by simply typing:
+
+INSTALL SONAME 'ha_sphinx';
+
 ##### Compiling SphinxSE Plugin for Percona:
 
 Please STOP mysql during the build process.
