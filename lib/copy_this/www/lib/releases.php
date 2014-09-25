@@ -1705,12 +1705,12 @@ class Releases
 					'regexID' => $row["regexID"],
 					'postdate' => $db->escapeString($row['date']),
 					'fromname' => $db->escapeString($row['fromname']),
-					'reqid' => $row["reqID"],
+					'reqID' => $row["reqID"],
 					'passwordstatus' => ($page->site->checkpasswordedrar > 0 ? -1 : 0),
 					'nzbstatus' => \Enzebe::NZB_NONE,
 					'isrenamed' => ($properName === true ? 1 : 0),
 					'reqidstatus' => ($isReqID === true ? 1 : 0),
-					'preid' => ($prehashID === false ? 0 : $prehashID)
+					'prehashID' => ($prehashID === false ? 0 : $prehashID)
 				]
 			);
 			//
