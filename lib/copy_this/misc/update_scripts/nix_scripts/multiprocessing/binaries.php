@@ -6,4 +6,5 @@ if (!isset($argv[1]) || !is_numeric($argv[1])) {
 }
 declare(ticks=1);
 require('.do_not_run/require.php');
+require_once('Forking.php');
 (new \Forking())->processWorkType('binaries', array(0 => $argv[1]));

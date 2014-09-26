@@ -13,4 +13,5 @@ if (!isset($argv[1]) || !in_array($argv[1], ['nfo', 'filename', 'md5', 'par2', '
 
 declare(ticks=1);
 require('.do_not_run/require.php');
+require_once('Forking.php');
 (new \Forking())->processWorkType('fixRelNames_' . $argv[1], [0 => $argv[1]]);

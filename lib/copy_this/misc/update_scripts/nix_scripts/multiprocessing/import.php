@@ -1,6 +1,7 @@
 <?php
 declare(ticks=1);
 require('.do_not_run/require.php');
+require_once('ForkingImportNZB.php');
 
 if (!isset($argv[1]) || !is_dir($argv[1])) {
 	exit(
