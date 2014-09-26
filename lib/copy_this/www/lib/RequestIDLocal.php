@@ -1,4 +1,5 @@
 <?php
+require_once NN_LIB . 'RequestID.php';
 
 /**
  * Attempts to find a PRE name for a release using a request ID from our local pre database,
