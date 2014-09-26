@@ -1,6 +1,6 @@
 <?php
-require_once NN_LIB . 'ReleaseSearch.php';
-require_once NN_LIB . 'framework' . DS . 'db.php';
+require_once (NN_LIB . 'ReleaseSearch.php');
+require_once (NN_LIB . 'framework' . DS . 'db.php');
 
 class SphinxSearch
 {

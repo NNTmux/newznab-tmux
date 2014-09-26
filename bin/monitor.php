@@ -169,6 +169,7 @@ $_cj = dirname(__FILE__) . "/../nnscripts";
 $_lib = dirname(__FILE__) . "/../lib";
 $_py = dirname(__FILE__) . "/../python";
 $_user = dirname(__FILE__) . "/../user_scripts";
+$_multi = dirname(_FILE_) . "/../../multiprocessing";
 
 
 $NNPATH = "/var/www/newznab/misc/update_scripts/";
@@ -1677,13 +1678,12 @@ while ($i > 0) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			$log = writelog($panes3[0]);
 			shell_exec("tmux respawnp -t${tmux_session}:3.0 ' \
-                    cd $_lib && $_php fixReleaseNames.php 1 true other yes show 2>&1 $log; \
-                    cd $_py && $_python ${DIR}/../python/groupfixrelnames_threaded.py nfo 2>&1 $log; \
-                    $_python ${DIR}/../python/groupfixrelnames_threaded.py md5 2>&1 $log; \
-                    $_python ${DIR}/../python/groupfixrelnames_threaded.py filename 2>&1 $log; \
-                    $_python ${DIR}/../python/groupfixrelnames_threaded.py par2 2>&1 $log; \
-                    $_python ${DIR}/../python/groupfixrelnames_threaded.py miscsorter 2>&1 $log; \
-                    $_python ${DIR}/../python/groupfixrelnames_threaded.py predbft 2>&1 $log; $_sleep $fix_timer' 2>&1 1> /dev/null"
+                    cd $_multi && $_php fixrelnames.php md5 $log; \
+					$_php fixrelnames.php filename $log; \
+					$_php fixrelnames.php nfo $log; \
+					$_php fixrelnames.php par2 $log; \
+					$_php fixrelnames.php miscsorter $log; \
+					$_php fixrelnames.php predbft $log; $_sleep $fix_timer' 2>&1 1> /dev/null"
 			);
 			$time27 = TIME();
 		} elseif (($maxload >= get_load()) && ($fix_names == 1)) {

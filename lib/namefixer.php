@@ -9,7 +9,7 @@ require_once(WWW_DIR . "lib/nntp.php");
 require_once(WWW_DIR . "/lib/ReleaseSearch.php");
 require_once(WWW_DIR . "/lib/ColorCLI.php");
 require_once(WWW_DIR . "/lib/ConsoleTools.php");
-require_once NN_LIB . 'SphinxSearch.php';
+require_once (NN_LIB . 'SphinxSearch.php');
 require_once("ReleaseCleaner.php");
 require_once("functions.php");
 require_once("nzbcontents.php");

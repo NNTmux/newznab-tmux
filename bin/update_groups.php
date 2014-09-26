@@ -1,7 +1,7 @@
 <?php
 
 require_once(dirname(__FILE__).'/config.php');
-require_once(WWW_DIR.'/lib/nntp.php');
+require_once(WWW_DIR . '/lib/nntp.php');
 require_once(WWW_DIR . "/lib/ColorCLI.php");
 require_once(WWW_DIR . "/lib/ConsoleTools.php");
 
@@ -11,31 +11,31 @@ $c = new ColorCLI();
 $consoleTools = new ConsoleTools();
 
 // Create the connection here and pass
-$nntp = new NNTP();
+$nntp = new \NNTP(['Settings' => $pdo]);
 if ($nntp->doConnect() !== true) {
-	exit($c->error("Unable to connect to usenet."));
+	exit($pdo->log->error("Unable to connect to usenet."));
 }
-echo $c->header("Getting first/last for all your active groups.");
+
+echo $pdo->log->header("Getting first/last for all your active groups.");
 $data = $nntp->getGroups();
 if ($nntp->isError($data)) {
-	exit($c->error("Failed to getGroups() from nntp server."));
+	exit($pdo->log->error("Failed to getGroups() from nntp server."));
 }
 
-echo $c->header("Inserting new values into shortgroups table.");
+echo $pdo->log->header("Inserting new values into shortgroups table.");
 
-$db = new DB();
-$db->queryExec('TRUNCATE TABLE shortgroups');
+$pdo->queryExec('TRUNCATE TABLE shortgroups');
 
 // Put into an array all active groups
-$res = $db->query('SELECT name FROM groups WHERE active = 1');
+$res = $pdo->query('SELECT name FROM groups WHERE active = 1 OR backfill = 1');
 
 foreach ($data as $newgroup) {
 	if (myInArray($res, $newgroup['group'], 'name')) {
-		$db->queryInsert(sprintf('INSERT INTO shortgroups (name, first_record, last_record, updated) VALUES (%s, %s, %s, NOW())', $db->escapeString($newgroup['group']), $db->escapeString($newgroup['first']), $db->escapeString($newgroup['last'])));
-		echo $c->primary('Updated ' . $newgroup['group']);
+		$pdo->queryInsert(sprintf('INSERT INTO shortgroups (name, first_record, last_record, updated) VALUES (%s, %s, %s, NOW())', $pdo->escapeString($newgroup['group']), $pdo->escapeString($newgroup['first']), $pdo->escapeString($newgroup['last'])));
+		echo $pdo->log->primary('Updated ' . $newgroup['group']);
 	}
 }
-echo $c->header('Running time: ' . $consoleTools->convertTimer(TIME() - $start));
+echo $pdo->log->header('Running time: ' . $consoleTools->convertTimer(TIME() - $start));
 
 function myInArray($array, $value, $key)
 {

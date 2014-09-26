@@ -19,7 +19,7 @@ require_once(WWW_DIR . "/lib/sphinx.php");
 require_once(WWW_DIR . "lib/Categorize.php");
 require_once(WWW_DIR . "../misc/update_scripts/nix_scripts/tmux/lib/ReleaseCleaner.php");
 require_once(WWW_DIR . "../misc/update_scripts/nix_scripts/tmux/lib/Enzebe.php");
-require_once NN_LIB . 'SphinxSearch.php';
+require_once (NN_LIB . 'SphinxSearch.php');
 
 /**
  * This class handles storage and retrieval of releases rows and the main processing functions

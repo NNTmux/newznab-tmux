@@ -1,7 +1,7 @@
 <?php
 require dirname(__FILE__) . '/../../www/config.php';
-require_once NN_LIB . 'framework' . DS . 'db.php';
-require_once NN_LIB . 'ReleaseSearch.php';
+require_once (NN_LIB . 'framework' . DS . 'db.php');
+require_once (NN_LIB . 'ReleaseSearch.php');
 
 
 if (!isset($argv[1]) || !in_array($argv[1], ['sphinx', 'standard'])) {

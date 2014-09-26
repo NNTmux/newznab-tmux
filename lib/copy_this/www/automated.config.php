@@ -16,8 +16,20 @@ define('NN_CORE', NN_LIB);
 // Refers to the web root for the Smarty lib
 define('NN_WWW', NN_ROOT);
 
+//Refers to the misc folder
+define('NN_MISC', NN_WWW . '..' . DS . 'misc' . DS);
+
+//Refers to update_scripts folder
+define('NN_UPDATE', NN_MISC . 'update_scripts' . DS);
+
+//Refers to nix_scripts folder
+define('NN_NIX', NN_UPDATE . 'nix_scripts' . DS );
+
+//Refers to multiprocessing folder
+define('NN_MULTI', NN_NIX . 'multiprocessing' . DS);
+
 //refers to tmux folder
-define('NN_TMUX', NN_ROOT . '..' . DS . 'misc' . DS . 'update_scripts' . DS . 'nix_scripts' . DS . 'tmux' .DS);
+define('NN_TMUX', NN_NIX . 'tmux' . DS);
 
 // Refers to the covers folder
 define('NN_COVERS', NN_WWW . 'covers' .DS);

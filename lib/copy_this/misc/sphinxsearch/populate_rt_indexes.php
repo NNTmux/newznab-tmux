@@ -1,8 +1,8 @@
 <?php
 require dirname(__FILE__) . '/../../www/config.php';
-require_once NN_LIB . 'framework' . DS . 'db.php';
-require_once NN_LIB . 'ReleaseSearch.php';
-require_once NN_LIB . 'SphinxSearch.php';
+require_once (NN_LIB . 'framework' . DS . 'db.php');
+require_once (NN_LIB . 'ReleaseSearch.php');
+require_once (NN_LIB . 'SphinxSearch.php');
 
 if (NN_RELEASE_SEARCH_TYPE != \ReleaseSearch::SPHINX) {
 	exit('Error, NN_RELEASE_SEARCH_TYPE in www/settings.php must be set to SPHINX!' . PHP_EOL);

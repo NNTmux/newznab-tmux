@@ -1,9 +1,9 @@
 <?php
-require_once NN_LIB . 'framework' . DS . 'db.php';
-require_once NN_LIB . 'Categorize.php';
-require_once NN_LIB . 'groups.php';
-require_once NN_LIB . 'ConsoleTools.php';
-require_once NN_LIB . 'SphinxSearch.php';
+require_once (NN_LIB . 'framework' . DS . 'db.php');
+require_once (NN_LIB . 'Categorize.php');
+require_once (NN_LIB . 'groups.php');
+require_once (NN_LIB . 'ConsoleTools.php');
+require_once (NN_LIB . 'SphinxSearch.php');
 
 abstract class RequestID
 {

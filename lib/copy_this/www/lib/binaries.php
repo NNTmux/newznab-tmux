@@ -468,7 +468,7 @@ class Binaries
 	 *
 	 * @return bool
 	 */
-	private function partRepair($nntp, $group)
+	public function partRepair($nntp, $group)
 	{
 		$db = new DB();
 
