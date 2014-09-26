@@ -897,7 +897,7 @@ class Forking extends \fork_daemon
 		$this->register_child_run([0 => $this, 1 => 'requestIDChildWorker']);
 		$this->work = $this->pdo->query(
 			sprintf('
-				SELECT DISTINCT(g.id)
+				SELECT DISTINCT(g.ID)
 				FROM groups g
 				INNER JOIN releases r ON r.groupID = g.ID
 				WHERE (g.active = 1 OR g.backfill = 1)
