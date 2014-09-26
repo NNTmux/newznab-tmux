@@ -260,14 +260,14 @@ class RequestIDLocal extends RequestID
 				sprintf('
 					UPDATE releases
 					SET prehashID = %d, reqidstatus = %d, isrenamed = 1, iscategorized = 1, searchname = %s
-					WHERE id = %d',
-					$this->_newTitle['id'],
+					WHERE ID = %d',
+					$this->_newTitle['ID'],
 					self::REQID_FOUND,
 					$newTitle,
-					$this->_release['id']
+					$this->_release['ID']
 				)
 			);
-			$this->sphinx->updateReleaseSearchName($this->_release['id'], $newTitle);
+			$this->sphinx->updateReleaseSearchName($this->_release['ID'], $newTitle);
 		} else {
 			$newTitle = $this->pdo->escapeString($this->_newTitle['title']);
 			$this->pdo->queryExec(
