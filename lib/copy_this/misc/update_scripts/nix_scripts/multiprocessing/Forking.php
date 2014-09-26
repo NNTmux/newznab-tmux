@@ -757,7 +757,7 @@ class Forking extends \fork_daemon
 						SELECT ID
 						FROM releases
 						WHERE nzbstatus = %d
-						AND imdbiID IS NULL
+						AND imdbID IS NULL
 						AND categoryID BETWEEN 2000 AND 2999
 						%s %s
 						LIMIT 1',
