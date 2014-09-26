@@ -188,7 +188,7 @@ switch ($options[1]) {
 		$nntp = nntp($pdo);
 		$groups = new \Groups();
 		$groupMySQL = $groups->getByName($options[2]);
-		(new \Binaries())->updateGroup($groupMySQL);
+		(new \Binaries())->updateGroup($nntp, $groupMySQL);
 		break;
 
 

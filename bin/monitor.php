@@ -1274,10 +1274,10 @@ while ($i > 0) {
 		$_update_cmd = "cd $_bin && $_php update_binaries.php 2>&1 $log";
 	} else if ($binaries == 2) {
 		$log = writelog($panes0[2]);
-		$_update_cmd = "$_python ${DIR}/../python/binaries_threaded.py 2>&1 $log";
+		$_update_cmd = "$_php ${DIR}/../../multiprocessing/binaries.php 0 2>&1 $log";
 	} else if ($binaries == 3) {
 		$log = writelog($panes0[2]);
-		$_update_cmd = "$_python ${DIR}/../python/binaries_safe_threaded.py 2>&1 $log";
+		$_update_cmd = "$_php ${DIR}/../../multiprocessing/safe.php binaries 2>&1 $log";
 	}
 
 	if ($releases_run != 0) {
