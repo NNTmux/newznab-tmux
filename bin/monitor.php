@@ -1679,7 +1679,8 @@ while ($i > 0) {
 					cd $_multi && $_php fixrelnames.php nfo $log; \
 					cd $_multi && $_php fixrelnames.php par2 $log; \
 					cd $_multi && $_php fixrelnames.php miscsorter $log; \
-					cd $_multi && $_php fixrelnames.php predbft $log; $_sleep $fix_timer' 2>&1 1> /dev/null"
+					cd $_multi && $_php fixrelnames.php predbft $log;
+					cd $_multi && $_php requestid.php $log; $_sleep $fix_timer' 2>&1 1> /dev/null"
 			);
 			$time27 = TIME();
 		} elseif (($maxload >= get_load()) && ($fix_names == 1)) {

@@ -415,7 +415,7 @@ class Forking extends \fork_daemon
 	{
 		foreach ($groups as $group) {
 			$this->_executeCommand(
-				PHP_BINARY . ' ' . NN_UPDATE  . 'update_binaries.php ' . $group['name'] . ' ' . $group['max']
+				PHP_BINARY . ' ' . NN_UPDATE  . 'update_binaries.php ' . $group['name']
 			);
 		}
 	}
