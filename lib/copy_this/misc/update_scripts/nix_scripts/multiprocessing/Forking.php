@@ -4,7 +4,9 @@ require_once(NN_LIB . 'framework' .DS . 'db.php');
 require_once(NN_LIB . 'ColorCLI.php');
 require_once(NN_LIB . 'site.php');
 require_once(NN_LIB . 'nntp.php');
+require_once(NN_LIB . 'RequestID.php');
 require_once(NN_TMUX . 'lib' . DS . 'Pprocess.php');
+require_once(NN_TMUX . 'lib' . DS . 'Enzebe.php');
 
 
 

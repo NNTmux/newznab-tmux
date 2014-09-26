@@ -8,7 +8,7 @@ require_once(WWW_DIR . "/lib/showsleep.php");
 require_once(dirname(__FILE__) . "/../lib/functions.php");
 
 
-$version = "0.4r2250";
+$version = "0.4r2300";
 
 $pdo = new DB();
 $s = new Sites();
@@ -1595,12 +1595,12 @@ while ($i > 0) {
 			}
 			$log = writelog($panes0[1]);
 			shell_exec("tmux respawnp -t${tmux_session}:2.0 'echo \"\033[38;5;${color}m\"; \
-						cd $_bin && $_php postprocess.php additional true $log; date +\"%D %T\"; $_sleep $post_timer' 2>&1 1> /dev/null"
+						cd $_multi && $_php postprocess.php add $log; date +\"%D %T\"; $_sleep $post_timer' 2>&1 1> /dev/null"
 			);
 		} else if (($post == 2) && ($nfo_remaining_now > 0)) {
 			$log = writelog($panes0[1]);
 			shell_exec("tmux respawnp -t${tmux_session}:2.0 ' \
-						cd $_bin && $_php postprocess.php nfo true $log; date +\"%D %T\"; $_sleep $post_timer' 2>&1 1> /dev/null"
+						cd $_multi && $_php postprocess.php nfo $log; date +\"%D %T\"; $_sleep $post_timer' 2>&1 1> /dev/null"
 			);
 		} else if (($post == 3) && (($nfo_remaining_now > 0) || ($work_remaining_now + $pc_releases_proc + $xxx_releases_proc > 0))) {
 			//run postprocess_releases additional
@@ -1622,8 +1622,8 @@ while ($i > 0) {
 			}
 			$log = writelog($panes0[1]);
 			shell_exec("tmux respawnp -t${tmux_session}:2.0 ' \
-						cd $_bin && $_php postprocess.php additional true $log;\
-                        cd $_bin && $_php postprocess.php nfo true $log; date +\"%D %T\"; $_sleep $post_timer' 2>&1 1> /dev/null"
+						cd $_multi && $_php postprocess.php add $log;\
+                        cd $_multi && $_php postprocess.php nfo $log; date +\"%D %T\"; $_sleep $post_timer' 2>&1 1> /dev/null"
 			);
 		} else if (($post != 0) && ($nfo_remaining_now == 0) && ($work_remaining_now + $pc_releases_proc + $xxx_releases_proc == 0)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
@@ -1638,10 +1638,9 @@ while ($i > 0) {
 			//run postprocess_releases non amazon
 			$log = writelog($panes2[1]);
 			shell_exec("tmux respawnp -t${tmux_session}:2.1 ' \
-						cd $_bin && $_php postprocess.php tv true $clean $log; \
-						$_php postprocess.php movies true $clean $log; \
-						$_php postprocess.php anime true 2>&1 $log; \
-						$_php postprocess.php xxx true 2>&1 $log; date +\"%D %T\"; $_sleep $post_timer_non' 2>&1 1> /dev/null"
+						cd $_multi && $_php postprocess.php tv $clean $log; \
+						cd $_multi && $_php postprocess.php mov $clean $log; \
+						cd $_bin && $_php postprocess.php anime true 2>&1 $log; date +\"%D %T\"; $_sleep $post_timer_non' 2>&1 1> /dev/null"
 			);
 		} else if (($post_non != 0) && ($tvrage_releases_proc == 0 || $movie_releases_proc = 0 || $xxx_releases_proc = 0)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
@@ -1658,10 +1657,7 @@ while ($i > 0) {
 		if (($maxload >= get_load()) && ($post_amazon == 1) && ($music_releases_proc > 0 || $console_releases_proc > 0 || $pc_releases_proc > 0 || $book_releases_proc > 0)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			$log = writelog($panes2[2]);
-			shell_exec("tmux respawnp -t${tmux_session}:2.2 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php postprocess.php music true 2>&1 $log; \
-			 $_php postprocess.php console true 2>&1 $log; \
-			 $_php postprocess.php games true 2>&1 $log; \
-			 $_php postprocess.php book true 2>&1 $log && $_sleep $post_timer_amazon' 2>&1 1> /dev/null");
+			shell_exec("tmux respawnp -t${tmux_session}:2.2 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php postprocess.php amazon true 2>&1 $log; $_sleep $post_timer_amazon' 2>&1 1> /dev/null");
 		} else if (($maxload >= get_load()) && ($post_amazon == 1) && ($music_releases_proc == 0 || $console_releases_proc == 0 || $pc_releases_proc == 0 || $book_releases_proc == 0)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			shell_exec("tmux respawnp -t${tmux_session}:2.2 'echo \"\033[38;5;${color}m\n${panes2[2]} has been disabled/terminated by No Amazon to process\"'");
