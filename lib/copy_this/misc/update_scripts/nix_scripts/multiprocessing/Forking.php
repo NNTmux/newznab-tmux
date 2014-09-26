@@ -900,7 +900,7 @@ class Forking extends \fork_daemon
 				SELECT DISTINCT(g.ID)
 				FROM groups g
 				INNER JOIN releases r ON r.groupID = g.ID
-				WHERE (g.active = 1 OR g.backfill = 1)
+				WHERE g.active = 1
 				AND r.nzbstatus = %d
 				AND r.prehashID = 0
 				AND r.isrequestid = 1
