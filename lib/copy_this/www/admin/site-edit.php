@@ -56,7 +56,7 @@ switch($action)
 	default:
 
 		$page->title = "Site Edit";
-		$site = $sites->get(true);
+		$site = $sites->get();
 		$page->smarty->assign('fsite', $site);
 
 		break;
