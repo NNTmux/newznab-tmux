@@ -1066,6 +1066,35 @@
 	</table>
 </fieldset>
 
+<fieldset id="site_requidset">
+	<legend>RequestID Settings</legend>
+	<table class="input">
+		<tr>
+			<td style="width:180px;"><label for="lookup_reqids">Lookup Request IDs:</label></td>
+			<td>
+				{html_options style="width:180px;" id="lookup_reqids" name='lookup_reqids' values=$lookup_reqids_ids output=$lookup_reqids_names selected=$site->lookup_reqids}
+				<div class="hint">Whether to attempt to lookup Request IDs using the Request ID link below. This will rename your releases to proper PreDB names.</div>
+			</td>
+		</tr>
+		<tr>
+			<td style="width:180px;"><label for="request_url">Request ID Link:</label></td>
+			<td>
+				<input id="request_url" class="long" name="request_url" type="text" value="{$site->request_url}"/>
+				<div class="hint">Optional URL to lookup Request IDs. [REQUEST_ID] gets replaced with the request ID from the
+					post. [GROUP_NM] Gets replaced with the group name.
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td style="width:180px;"><label for="request_hours">Max hours to recheck Request IDs:</label></td>
+			<td>
+				<input id="request_hours" class="short" name="request_hours" type="text" value="{$site->request_hours}"/>
+				<div class="hint">The maximum hours after a release is added to recheck for a Request ID match.</div>
+			</td>
+		</tr>
+	</table>
+</fieldset>
+
 <fieldset>
 	<legend>Advanced - Postprocessing Settings</legend>
 	<table class="input">

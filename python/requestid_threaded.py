@@ -44,10 +44,10 @@ except:
 
 print(bcolors.HEADER + "\n\nRequestID Threaded Started at {}".format(datetime.datetime.now().strftime("%H:%M:%S")) + bcolors.ENDC)
 
-cur[0].execute("SELECT value FROM tmux WHERE setting = 'request_hours'")
+cur[0].execute("SELECT value FROM site WHERE setting = 'request_hours'")
 dbgrab = cur[0].fetchone()
 request_hours = str(dbgrab[0])
-cur[0].execute("SELECT r.ID, r.name, g.name AS groupname FROM releases r LEFT JOIN groups g ON r.groupID = g.ID WHERE nzbstatus = 1 AND isrenamed = 0 AND isrequestid = 1 AND reqidstatus in (0, -1) OR (reqidstatus = -3 AND adddate > NOW() - INTERVAL " + request_hours + " HOUR) LIMIT 100000")
+cur[0].execute("SELECT DISTINCT(g.ID) FROM releases r INNER JOIN groups g ON r.groupID = g.ID WHERE r.nzbstatus = 1 AND r.prehashID = 0 AND r.isrequestid = 1 AND r.reqidstatus in (0, -1) OR (r.reqidstatus = -3 AND r.adddate > NOW() - INTERVAL " + request_hours + " HOUR)")
 datas = cur[0].fetchall()
 
 #close connection to mysql
