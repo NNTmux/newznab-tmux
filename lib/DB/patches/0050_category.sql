@@ -46,6 +46,7 @@ INSERT INTO category (ID, title, parentID) VALUES (2040, 'HD', 2000);
 INSERT INTO category (ID, title, parentID) VALUES (2050, '3D', 2000);
 INSERT INTO category (ID, title, parentID) VALUES (2060, 'BluRay', 2000);
 INSERT INTO category (ID, title, parentID) VALUES (2070, 'DVD', 2000);
+INSERT INTO category (ID, title, parentID) VALUES (2080, 'WEB-DL', 2000);
 
 INSERT INTO category (ID, title, parentID) VALUES (3010, 'MP3', 3000);
 INSERT INTO category (ID, title, parentID) VALUES (3020, 'Video', 3000);
