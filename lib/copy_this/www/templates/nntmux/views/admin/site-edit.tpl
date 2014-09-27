@@ -542,6 +542,15 @@
 		<div class="hint">Scan back X (posts/days) for each new group?  Can backfill to scan further.</div>
 	</td>
 </tr>
+	<tr>
+		<td style="width:180px;"><label for="safebackfilldate">Safe Backfill Date:</label></td>
+		<td>
+			<input class="small" id="safebackfilldate" name="safebackfilldate" type="text"
+				   value="{$fsite->safebackfilldate}"/>
+
+			<div class="hint">The target date for safe backfill. Format: YYYY-MM-DD</div>
+		</td>
+	</tr>
 
 </table>
 </fieldset>

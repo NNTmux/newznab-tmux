@@ -13,6 +13,7 @@ INSERT INTO `site` (`setting`, `value`) VALUES
 ('partrepair', '1'),
 ('binarythreads', '1'),
   ('backfillthreads', '1'),
+  ('safebackfilldate', '2012-06-24'),
 ('postthreads', '1'),
 ('releasethreads', '1'),
 ('nzbthreads', '1'),
