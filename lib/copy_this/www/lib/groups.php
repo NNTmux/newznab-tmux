@@ -308,4 +308,17 @@ class Groups
 
 		return "Group $id has been $status.";
 	}
+
+	/**
+	 * @param     $id
+	 * @param int $status
+	 *
+	 * @return string
+	 */
+	public function updateBackfillStatus($id, $status = 0)
+	{
+		$db = new DB();
+		$db->queryExec(sprintf("UPDATE groups SET backfill = %d WHERE id = %d", $status, $id));
+		return "Group $id has been " . (($status == 0) ? 'deactivated' : 'activated') . '.';
+	}
 }
