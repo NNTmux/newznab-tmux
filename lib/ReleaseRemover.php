@@ -816,7 +816,7 @@ class ReleaseRemover
 
 					$groupID = ' AND r.groupID in (' . $groupIDs . ') ';
 				}
-				$this->method = 'Blacklist [' . $regex['id'] . ']';
+				$this->method = 'Blacklist [' . $regex['ID'] . ']';
 
 				// Check if using FT Match and declare for echo
 				if ($ftMatch !== '' && $opTypeName == "Subject") {
