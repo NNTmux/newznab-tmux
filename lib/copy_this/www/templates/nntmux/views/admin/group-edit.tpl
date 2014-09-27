@@ -1,4 +1,4 @@
- 
+
 <h1>{$page->title}</h1>
 
 <form action="{$SCRIPT_NAME}?action=submit" method="POST">
@@ -10,7 +10,7 @@
 	<td>
 		<input type="hidden" name="id" value="{$group.ID}" />
 		<input id="name" class="long" name="name" type="text" value="{$group.name}" />
-		<div class="hint">Changing the name to an invalid group will break things.</div>		
+		<div class="hint">Changing the name to an invalid group will break things.</div>
 	</td>
 </tr>
 
@@ -57,9 +57,16 @@
 	<td><label for="active">Active</label>:</td>
 	<td>
 		{html_radios id="active" name='active' values=$yesno_ids output=$yesno_names selected=$group.active separator='<br />'}
-		<div class="hint">Inactive groups will not have headers downloaded for them.</div>		
+		<div class="hint">Inactive groups will not have headers downloaded for them.</div>
 	</td>
 </tr>
+	<tr>
+		<td><label for="backfill">Backfill:</label></td>
+		<td>
+			{html_radios id="backfill" name='backfill' values=$yesno_ids output=$yesno_names selected=$group.backfill separator='<br />'}
+			<div class="hint">If set to false, backfill.php will ignore this group. This works even if the above setting is no.</div>
+		</td>
+	</tr>
 
 
 <tr>
