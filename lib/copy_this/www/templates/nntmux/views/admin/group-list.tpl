@@ -1,4 +1,4 @@
-<div id="group_list"> 
+<div id="group_list">
 
     <h1>{$page->title}</h1>
 
@@ -9,11 +9,11 @@
 			&bull; Purge will delete all releases for the group.
 		</p>
 
-	
+
 	<div style="float:right;">
-	
+
 		<form name="groupsearch" method="GET">
-			
+
 			<label for="groupname">Filter</label>
 			<input id="groupname" type="text" name="groupname" value="{$groupname}" size="15" />
 			&nbsp;&nbsp;
@@ -22,12 +22,12 @@
 			<input type="submit" value="Go" />
 		</form>
 	</div>
-	
+
     {if $grouplist}
 
 	{$pager}
 	<br/><br/>
-	
+
     <div id="message">msg</div>
     <table style="width:100%;" class="data highlight">
 
@@ -44,7 +44,7 @@
             <th>Backfill Days</th>
 			<th>options</th>
         </tr>
-        
+
         {foreach from=$grouplist item=group}
         <tr id="grouprow-{$group.ID}" class="{cycle values=",alt"}">
             <td>
@@ -55,6 +55,7 @@
             <td class="less mid">{$group.last_record_postdate|timeago}</td>
             <td class="less">{$group.last_updated|timeago} ago</td>
             <td class="less" id="group-{$group.ID}">{if $group.active=="1"}<a href="javascript:ajax_group_status({$group.ID}, 0)" class="group_active">Deactivate</a>{else}<a href="javascript:ajax_group_status({$group.ID}, 1)" class="group_deactive">Activate</a>{/if}</td>
+			<td class="less" id="backfill-{$group.ID}">{if $group.backfill=="1"}<a href="javascript:ajax_backfill_status({$group.ID}, 0)" class="backfill_active">Deactivate</a>{else}<a href="javascript:ajax_backfill_status({$group.ID}, 1)" class="backfill_deactive">Activate</a>{/if}</td>
             <td class="less mid">{if $group.regexmatchonly == "1"}Yes{else}No{/if}</td>
             <td class="less right"><a href="{$smarty.const.WWW_TOP}/../browse?g={$group.name}">{$group.num_releases}</a></td>
             <td class="less mid">{if $group.minfilestoformrelease==""}n/a{else}{$group.minfilestoformrelease}{/if}</td>
@@ -72,5 +73,5 @@
     <p>No groups available (eg. none have been added).</p>
     {/if}
 
-</div>		
+</div>
 
