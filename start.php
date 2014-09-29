@@ -28,7 +28,7 @@ if (count($nntpkill) === 0) {
 }
 
 // Check database patch version
-if ($patch < 87) {
+if ($patch < 88) {
 	exit($c->error("\nYour database is not up to date. Please update.\nphp ${DIR}/lib/DB/patchDB.php\n"));
 }
 $tmux_session = (isset($tmux->tmux_session)) ? $tmux->tmux_session : 0;
@@ -253,10 +253,12 @@ if ($seq == 1) {
 	window_utilities($tmux_session);
 	window_post($tmux_session);
 	if ($nntpproxy == 1) {
+		window_fixnames($tmux_session);
 		window_ircscraper($tmux_session);
-		window_proxy($tmux_session, 4);
 		window_sharing($tmux_session);
+		window_proxy($tmux_session, 6);
 	} else {
+		window_fixnames($tmux_session);
 		window_ircscraper($tmux_session);
 		window_sharing($tmux_session);
 	}
@@ -273,10 +275,12 @@ if ($seq == 1) {
 	window_utilities($tmux_session);
 	window_post($tmux_session);
 	if ($nntpproxy == 1) {
+		window_fixnames($tmux_session);
 		window_ircscraper($tmux_session);
-		window_proxy($tmux_session, 4);
 		window_sharing($tmux_session);
+		window_proxy($tmux_session, 6);
 	} else {
+		window_fixnames($tmux_session);
 		window_ircscraper($tmux_session);
 		window_sharing($tmux_session);
 	}
