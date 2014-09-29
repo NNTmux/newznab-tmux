@@ -7,6 +7,7 @@ require_once(WWW_DIR."/lib/genres.php");
 require_once(WWW_DIR."/lib/releaseimage.php");
 require_once(WWW_DIR."lib/Tmux.php");
 require_once(WWW_DIR . "/lib/ColorCLI.php");
+require_once(NN_TMUX . 'lib' . DS . 'Enzebe.php');
 
 
 class Konsole
