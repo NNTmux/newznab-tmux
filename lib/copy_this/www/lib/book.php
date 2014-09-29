@@ -524,7 +524,7 @@ class Book
 				)
 			);
 		} else {
-			$bookId = $check['id'];
+			$bookId = $check['ID'];
 			$this->pdo->queryExec(
 				sprintf('
 							UPDATE bookinfo
