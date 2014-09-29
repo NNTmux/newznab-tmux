@@ -13,7 +13,7 @@ require_once(NN_TMUX . 'lib' . DS . 'Enzebe.php');
 /**
  * Class Forking
  *
- * This forks various nZEDb scripts.
+ * This forks various newznab scripts.
  *
  * For example, you get all the ID's of the active groups in the groups table, you then iterate over them and spawn
  * processes of misc/update_binaries.php passing the group ID's.

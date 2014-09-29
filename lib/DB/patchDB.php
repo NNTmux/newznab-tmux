@@ -128,7 +128,7 @@ if (isset($os) && $os == "unix") {
 
 	/* 	if ($db->dbSystem() == "mysql")
 	  $patchpath = preg_replace('/\/misc\/testing\/DB/i', '/db/patches/mysql/',
-	nZEDb_ROOT);
+	NN_ROOT);
 	  else if ($db->dbSystem() == "pgsql")
 	  $patchpath = preg_replace('/\/misc\/testing\/DB/i', '/db/patches/pgsql/', nZEDb_ROOT);
 	 */ sort($patches);

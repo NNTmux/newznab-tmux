@@ -1,21 +1,21 @@
 # This script will check the number of connections to your USP, and display it on the powerline bar in tmux.
 
-if [ -e "nZEDbBase.php" ]
+if [ -e "NNBase.php" ]
 then
-    export NZEDB_ROOT="$(pwd)"
-elif [ -e "../../../nZEDbBase.php" ]
+    export NN_ROOT="$(pwd)"
+elif [ -e "../../..NNBase.php" ]
 then
-    export NZEDB_ROOT="$(php ../../../nZEDbBase.php)"
-elif [ -e "../../../../nZEDbBase.php" ]
+    export NN_ROOT="$(php ../../../www/NNBase.php)"
+elif [ -e "../../../../NNBase.php" ]
 then
-    export NZEDB_ROOT="$(php ../../../../nZEDbBase.php)"
+    export NN_ROOT="$(php ../../../../www/NNBase.php)"
 else
-    export NZEDB_ROOT="$(php ../../../../../nZEDbBase.php)"
+    export NN_ROOT="$(php ../../../../../www/NNBase.php)"
 fi
 
 run_segment() {
     # get USP settings from config.php
-    uspsetting=( $(cat ${NZEDB_ROOT}/www/config.php | awk '/NNTP/ && /SERVER|PORT/ {print $2}' | sed 's/);//' | sed "s/'//g") )
+    uspsetting=( $(cat ${NN_ROOT}/config.php | awk '/NNTP/ && /SERVER|PORT/ {print $2}' | sed 's/);//' | sed "s/'//g") )
 
     # Get info about primary NNTP connections.
     mainusp=`( dig ${uspsetting} A +short | tail -n1; \

@@ -817,7 +817,7 @@ class NNTP extends Net_NNTP_Client
 	 * @param $body     string  The message.     ie.: $message = 'This is only a test, please disregard.';
 	 * @param $from     string  The poster.      ie.: $from = '<anon@anon.com>';
 	 * @param $extra    string  Extra, separated by \r\n
-	 *                                           ie.: $extra  = 'Organization: <nZEDb>\r\nNNTP-Posting-Host: <127.0.0.1>';
+	 *                                           ie.: $extra  = 'Organization: <newznab>\r\nNNTP-Posting-Host: <127.0.0.1>';
 	 * @param $yEnc     bool    Encode the message with yEnc?
 	 * @param $compress bool    Compress the message with GZip?
 	 *

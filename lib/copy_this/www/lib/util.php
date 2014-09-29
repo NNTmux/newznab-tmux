@@ -908,7 +908,7 @@ function sendEmail($to, $subject, $contents, $from)
 	$headers = 'From: ' . $from . $n;
 	$headers .= 'Reply-To: ' . $from . $n;
 	$headers .= 'Return-Path: ' . $from . $n;
-	$headers .= 'X-Mailer: nZEDb' . $n;
+	$headers .= 'X-Mailer: newznab' . $n;
 	$headers .= 'MIME-Version: 1.0' . $n;
 	$headers .= 'Content-type: text/html; charset=iso-8859-1' . $n;
 	$headers .= $n;
