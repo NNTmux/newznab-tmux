@@ -16,6 +16,11 @@ switch($action)
 {
 	case 'submit':
 
+		if (!empty($_POST['book_reqids'])) {
+			// book_reqids is an array it needs to be a comma separated string, make it so.
+			$_POST['book_reqids'] = is_array($_POST['book_reqids']) ?
+				implode(', ', $_POST['book_reqids']) : $_POST['book_reqids'];
+		}
 		$error = "";
 		$ret = $sites->update($_POST);
 		if (is_int($ret))
@@ -98,6 +103,30 @@ $page->smarty->assign('imdburl_names', array('imdb.com', 'akas.imdb.com'));
 
 $page->smarty->assign('lookup_reqids_ids', array(0,1,2));
 $page->smarty->assign('lookup_reqids_names', array('Disabled', 'Lookup Request IDs', 'Lookup Request IDs Threaded'));
+
+// return a list of audiobooks, ebooks, technical and foreign books
+$result = $page->settings->query("SELECT ID, title FROM category WHERE ID in (3030, 7010, 7040, 7060)");
+
+// setup the display lists for these categories, this could have been static, but then if names changed they would be wrong
+$book_reqids_ids = array();
+$book_reqids_names = array();
+foreach ($result as $bookcategory)
+{
+	$book_reqids_ids[]   = $bookcategory["ID"];
+	$book_reqids_names[] = $bookcategory["title"];
+}
+
+// convert from a string array to an int array as we want to use int
+$book_reqids_ids = array_map(create_function('$value', 'return (int)$value;'), $book_reqids_ids);
+$page->smarty->assign('book_reqids_ids', $book_reqids_ids);
+$page->smarty->assign('book_reqids_names', $book_reqids_names);
+
+// convert from a list to an array as we need to use an array, but teh sites table only saves strings
+$books_selected = explode(",", $page->site->book_reqids);
+
+// convert from a string array to an int array
+$books_selected = array_map(create_function('$value', 'return (int)$value;'), $books_selected);
+$page->smarty->assign('book_reqids_selected', $books_selected);
 
 $themelist = array();
 $themes = scandir(WWW_DIR."/templates");
