@@ -3,6 +3,8 @@ require_once(WWW_DIR . "/lib/framework/db.php");
 require_once(WWW_DIR . "/lib/nntp.php");
 require_once(WWW_DIR . "/lib/groups.php");
 require_once(WWW_DIR . "/lib/backfill.php");
+require_once(WWW_DIR . "/lib/ColorCLI.php");
+require_once(WWW_DIR . "/lib/Logger.php");
 
 /**
  * This class manages the downloading of binaries and parts from usenet, and the
@@ -21,6 +23,13 @@ class Binaries
 	const BLACKLIST_FIELD_MESSAGEID = 3;
 
 	/**
+	 * How many headers do we download per loop?
+	 *
+	 * @var int
+	 */
+	public $messageBuffer;
+
+	/**
 	 * Default constructor
 	 */
 	function Binaries()
@@ -29,18 +38,33 @@ class Binaries
 
 		$s = new Sites();
 		$site = $s->get();
+		$this->messageBuffer = ($site->maxmssgs != '') ? $site->maxmssgs : 20000;
 		$this->compressedHeaders = ($site->compressedheaders == "1") ? true : false;
 		$this->messagebuffer = (!empty($site->maxmssgs)) ? $site->maxmssgs : 20000;
 		$this->MaxMsgsPerRun = (!empty($site->maxmsgsperrun)) ? $site->maxmsgsperrun : 200000;
 		$this->NewGroupScanByDays = ($site->newgroupscanmethod == "1") ? true : false;
 		$this->NewGroupMsgsToScan = (!empty($site->newgroupmsgstoscan)) ? $site->newgroupmsgstoscan : 50000;
 		$this->NewGroupDaysToScan = (!empty($site->newgroupdaystoscan)) ? $site->newgroupdaystoscan : 3;
+		$this->_tablePerGroup = ($site->tablepergroup == 1 ? true : false);
 
 		$this->blackList = array(); //cache of our black/white list
 		$this->blackList_by_group = array();
 		$this->message = array();
 
 		$this->onlyProcessRegexBinaries = false;
+		$this->_colorCLI =  new \ColorCLI();
+		$this->_echoCLI = NN_ECHOCLI;
+		$this->_pdo = new DB();
+		$this->_nntp = new \NNTP(['Echo' => $this->_colorCLI, 'Settings' => $this->_pdo, 'ColorCLI' => $this->_colorCLI]);
+		$this->_groups = new Groups();
+		$this->_debug = (NN_DEBUG || NN_LOGGING);
+		if ($this->_debug) {
+			try {
+				$this->_debugging = new \Logger(['ColorCLI' => $this->_colorCLI]);
+			} catch (\LoggerException $error) {
+				$this->_debug = false;
+			}
+		}
 	}
 
 	/**
@@ -210,7 +234,7 @@ class Binaries
 				}
 			}
 
-			$last_record_postdate = $backfill->postdate($nntp, $last, false);
+			$last_record_postdate = $this->postdate($last, $data);
 			if ($last_record_postdate != "") {
 				$db->queryExec(sprintf("update groups SET last_record_postdate = FROM_UNIXTIME(" . $last_record_postdate . "), last_updated = now() WHERE ID = %d", $groupArr['ID'])); //Set group's last postdate
 			}
@@ -830,5 +854,215 @@ class Binaries
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Returns article number based on # of days.
+	 *
+	 * @param int   $days      How many days back we want to go.
+	 * @param array $data      Group data from usenet.
+	 *
+	 * @return string
+	 */
+	public function daytopost($days, $data)
+	{
+		$goalTime =          // The time we want =
+			time()           // current unix time (ex. 1395699114)
+			-                // minus
+			(86400 * $days); // 86400 (seconds in a day) times days wanted. (ie 1395699114 - 2592000 (30days)) = 1393107114
+
+		// The servers oldest date.
+		$firstDate = $this->postdate($data['first'], $data);
+		if ($goalTime < $firstDate) {
+			// If the date we want is older than the oldest date in the group return the groups oldest article.
+			return $data['first'];
+		}
+
+		// The servers newest date.
+		$lastDate = $this->postdate($data['last'], $data);
+		if ($goalTime > $lastDate) {
+			// If the date we want is newer than the groups newest date, return the groups newest article.
+			return $data['last'];
+		}
+
+		$totalArticles = (int)($lastDate - $firstDate);
+
+		if ($this->_echoCLI) {
+			$this->_colorCLI->doEcho(
+				$this->_colorCLI->primary(
+					'Searching for an approximate article number for group ' . $data['group'] . ' ' . $days . ' days back.'
+				)
+			);
+		}
+
+		switch (true) {
+			case $totalArticles < 1000000:
+				$matchPercentage = 1.0100;
+				break;
+			case $totalArticles < 10000000:
+				$matchPercentage = 1.0070;
+
+				break;
+			case $totalArticles < 100000000:
+				$matchPercentage = 1.0030;
+				break;
+			case $totalArticles < 500000000:
+				$matchPercentage = 1.0010;
+				break;
+			case $totalArticles < 1000000000:
+				$matchPercentage = 1.0008;
+				break;
+			default:
+				$matchPercentage = 1.0005;
+				break;
+		}
+
+		$wantedArticle = ($data['last'] * (($goalTime - $firstDate) / ($totalArticles)));
+		$articleTime = 0;
+		$percent = 1.01;
+		for ($i = 0; $i < 100; $i++) {
+			$wantedArticle = (int)$wantedArticle;
+
+			if ($wantedArticle <= $data['first'] || $wantedArticle >= $data['last']) {
+				break;
+			}
+
+			$articleTime = $this->postdate($wantedArticle, $data);
+			if ($articleTime >= ($goalTime / $matchPercentage) && $articleTime <= ($goalTime * $matchPercentage)) {
+				break;
+			}
+
+			if ($articleTime > $goalTime) {
+				$wantedArticle /= $percent;
+			} else if ($articleTime < $goalTime) {
+				$wantedArticle *= $percent;
+			}
+			$percent -= 0.001;
+		}
+
+		$wantedArticle = (int)$wantedArticle;
+		if ($this->_echoCLI) {
+			$this->_colorCLI->doEcho(
+				$this->_colorCLI->primary(
+					'Found article #' . $wantedArticle . ' which has a date of ' . date('r', $articleTime) .
+					', vs wanted date of ' . date('r', $goalTime) . '.'
+				)
+			);
+		}
+
+		return $wantedArticle;
+	}
+
+	/**
+	 * Convert unix time to days ago.
+	 *
+	 * @param int $timestamp unix time
+	 *
+	 * @return float
+	 */
+	private function daysOld($timestamp)
+	{
+		return round((time() - (!is_numeric($timestamp) ? strtotime($timestamp) : $timestamp)) / 86400, 1);
+	}
+
+	/**
+	 * Returns unix time for an article number.
+	 *
+	 * @param int    $post      The article number to get the time from.
+	 * @param array  $groupData Usenet group info from NNTP selectGroup method.
+	 *
+	 * @return bool|int
+	 */
+	public function postdate($post, array $groupData)
+	{
+		// Set table names
+		$groupID = $this->_groups->getIDByName($groupData['group']);
+		$group = [];
+		if ($groupID !== '') {
+			$group = $this->_groups->getCBPTableNames($this->_tablePerGroup, $groupID);
+		}
+
+		$currentPost = $post;
+
+		$attempts = $date = 0;
+		do {
+			// Try to get the article date locally first.
+			if ($groupID !== '') {
+				// Try to get locally.
+				$local = $this->_pdo->queryOneRow(
+					sprintf('
+						SELECT b.date AS date
+						FROM %s b, %s p
+						WHERE b.ID = p.binaryID
+						AND b.groupID = %s
+						AND p.number = %s LIMIT 1',
+						$group['bname'],
+						$group['pname'],
+						$groupID,
+						$currentPost
+					)
+				);
+				if ($local !== false) {
+					$date = $local['date'];
+					break;
+				}
+			}
+
+			// If we could not find it locally, try usenet.
+			$header = $this->_nntp->getXOVER($currentPost);
+			if (!$this->_nntp->isError($header)) {
+				// Check if the date is set.
+				if (isset($header[0]['Date']) && strlen($header[0]['Date']) > 0) {
+					$date = $header[0]['Date'];
+					break;
+				}
+			}
+
+			// Try to get a different article number.
+			if (abs($currentPost - $groupData['first']) > abs($groupData['last'] - $currentPost)) {
+				$tempPost = round($currentPost / (mt_rand(1005, 1012) / 1000), 0, PHP_ROUND_HALF_UP);
+				if ($tempPost < $groupData['first']) {
+					$tempPost = $groupData['first'];
+				}
+			} else {
+				$tempPost = round((mt_rand(1005, 1012) / 1000) * $currentPost, 0, PHP_ROUND_HALF_UP);
+				if ($tempPost > $groupData['last']) {
+					$tempPost = $groupData['last'];
+				}
+			}
+			// If we got the same article number as last time, give up.
+			if ($tempPost === $currentPost) {
+				break;
+			}
+			$currentPost = $tempPost;
+
+			if ($this->_debug) {
+				$this->_colorCLI->doEcho($this->_colorCLI->debug('Postdate retried ' . $attempts . " time(s)."));
+			}
+		} while ($attempts++ <= 20);
+
+		// If we didn't get a date, set it to now.
+		if (!$date) {
+			$date = time();
+		} else {
+			$date = strtotime($date);
+		}
+
+		if ($this->_debug) {
+			$this->_debugging->log(
+				'Binaries',
+				"postdate",
+				'Article (' .
+				$post .
+				"'s) date is (" .
+				$date .
+				') (' .
+				$this->daysOld($date) .
+				" days old)",
+				\Logger::LOG_INFO
+			);
+		}
+
+		return $date;
 	}
 }

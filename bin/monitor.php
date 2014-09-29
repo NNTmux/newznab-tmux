@@ -8,7 +8,7 @@ require_once(WWW_DIR . "/lib/showsleep.php");
 require_once(dirname(__FILE__) . "/../lib/functions.php");
 
 
-$version = "0.4r2300";
+$version = "0.4r2301";
 
 $pdo = new DB();
 $s = new Sites();
@@ -149,7 +149,7 @@ $split_query = "SELECT
 $split_query = "SELECT "
 	. "(SELECT COUNT(*) FROM groups WHERE first_record IS NOT NULL AND (now() - interval backfill_target day) < first_record_postdate) AS backfill_groups_days, "
 	. "(SELECT COUNT(*) FROM groups WHERE first_record IS NOT NULL AND (now() - interval datediff(curdate(), "
-	. "(SELECT VALUE FROM tmux WHERE SETTING = 'safebackfilldate')) day) < first_record_postdate) AS backfill_groups_date, "
+	. "(SELECT VALUE FROM site WHERE SETTING = 'safebackfilldate')) day) < first_record_postdate) AS backfill_groups_date, "
 	. "(SELECT UNIX_TIMESTAMP(adddate) FROM releases USE INDEX(ix_releases_status) ORDER BY adddate DESC LIMIT 1 ) AS newestadd";
 
 //get first release inserted datetime and oldest posted datetime
@@ -1314,7 +1314,7 @@ while ($i > 0) {
 			if (($backfill == 4) && ($kill_pp == "false") && (TIME() - $time6 <= 4800)) {
 				$log = writelog($panes0[3]);
 				shell_exec("tmux respawnp -t${tmux_session}:0.3 ' \
-						$_python ${DIR}/../python/backfill_safe_threaded.py $log; date +\"%D %T\"; $_sleep $backsleep' 2>&1 1> /dev/null"
+						cd $_multi && $_php safe.php backfill $log; date +\"%D %T\"; $_sleep $backsleep' 2>&1 1> /dev/null"
 				);
 			} else if (($backfill != 0) && ($kill_pp == "false") && (TIME() - $time6 <= 4800)) {
 				$log = writelog($panes0[3]);
@@ -1324,7 +1324,7 @@ while ($i > 0) {
 			} else if (($backfill != 0) && ($kill_pp == "false") && (TIME() - $time6 >= 4800)) {
 				$log = writelog($panes0[3]);
 				shell_exec("tmux respawnp -k -t${tmux_session}:0.3 ' \
-						$_python ${DIR}/../python/backfill_threaded.py all $log; date +\"%D %T\"; $_sleep $backsleep' 2>&1 1> /dev/null"
+						cd $_multi && $_php backfill.php $log; $log; date +\"%D %T\"; $_sleep $backsleep' 2>&1 1> /dev/null"
 				);
 				$time6 = TIME();
 			} else if ($kill_pp == "true") {

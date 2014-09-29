@@ -984,6 +984,31 @@
 				</div>
 			</td>
 		</tr>
+		<tr>
+			<td style="width:180px;"><label for="safepartrepair">Part Repair for Backfill Scripts:</label></td>
+			<td>
+				{html_radios id="safepartrepair" name='safepartrepair' values=$yesno_ids output=$yesno_names selected=$site->safepartrepair separator='<br />'}
+				<div class="hint">Whether to put unreceived parts into partrepair table when running binaries(safe) or backfill scripts.</div>
+			</td>
+		</tr>
+		<tr>
+			<td style="width:180px;"><label for="maxpartrepair">Maximum repair per run:</label></td>
+			<td>
+				<input class="short" id="maxpartrepair" name="maxpartrepair" type="text" value="{$site->maxpartrepair}"/>
+				<div class="hint">The maximum amount of articles to attempt to repair at a time. If you notice that you
+					are getting a lot of parts into the partrepair table, it is possible that you USP is not keeping up
+					with the requests. Try to reduce the threads to safe scripts, stop using safe scripts or stop using
+					nntpproxy until improves. Ar least until the cause can be determined.
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td style="width:180px;"><label for="partrepairmaxtries">Maximum repair tries:</label></td>
+			<td>
+				<input class="short" id="partrepairmaxtries" name="partrepairmaxtries" type="text" value="{$site->partrepairmaxtries}"/>
+				<div class="hint">Maximum amount of times to try part repair.</div>
+			</td>
+		</tr>
 
 		<tr>
 			<td style="width:180px;"><label for="yydecoderpath">yEnc Type:</label></td>

@@ -11,6 +11,7 @@ require_once(WWW_DIR . "/lib/releases.php");
 require_once(WWW_DIR . "/lib/groups.php");
 require_once(WWW_DIR . "/lib/backfill.php");
 require_once(WWW_DIR . "/lib/nntp.php");
+require_once(WWW_DIR . "/lib/site.php");
 require_once(NN_LIB . 'RequestIDLocal.php');
 
 
@@ -65,6 +66,8 @@ switch ($options[1]) {
 		$pdo = new \DB();
 		$nntp = nntp($pdo);
 		$groups = new \Groups();
+		$s = new Sites();
+		$site = $s->get();
 		$groupMySQL = $groups->getByName($options[3]);
 		if ($nntp->isError($nntp->selectGroup($groupMySQL['name']))) {
 			if ($nntp->isError($nntp->dataError($nntp, $groupMySQL['name']))) {
@@ -72,7 +75,7 @@ switch ($options[1]) {
 			}
 		}
 		$binaries = new \Binaries();
-		$return = $binaries->scan($groupMySQL, $options[4], $options[5], ($site->safepartrepair == 1 ? 'update' : 'backfill'));
+		$return = $binaries->scan($nntp, $groupMySQL, $options[4], $options[5], ($site->safepartrepair == 1 ? 'update' : 'backfill'));
 		if (empty($return)) {
 			exit();
 		}

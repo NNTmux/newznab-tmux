@@ -321,4 +321,71 @@ class Groups
 		$db->queryExec(sprintf("UPDATE groups SET backfill = %d WHERE id = %d", $status, $id));
 		return "Group $id has been " . (($status == 0) ? 'deactivated' : 'activated') . '.';
 	}
+
+	/**
+	 * @return array
+	 */
+	public function getActiveBackfill()
+	{
+		$db = new DB();
+		return $db->query("SELECT * FROM groups WHERE backfill = 1 AND last_record != 0 ORDER BY name");
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getActiveByDateBackfill()
+	{
+		$db = new DB();
+		return $db->query("SELECT * FROM groups WHERE backfill = 1 AND last_record != 0 ORDER BY first_record_postdate DESC");
+	}
+
+	/**
+	 * @var array
+	 */
+	private $cbppTableNames;
+
+	/**
+	 * Get the names of the binaries/parts/part repair tables.
+	 * If TPG is on, try to create new tables for the group_id, if we fail, log the error and exit.
+	 *
+	 * @param bool $tpgSetting false, tpg is off in site setting, true tpg is on in site setting.
+	 * @param int  $groupID    ID of the group.
+	 *
+	 * @return array The table names.
+	 */
+	public function getCBPTableNames($tpgSetting, $groupID)
+	{
+		$groupKey = ($groupID);
+
+		// Check if buffered and return. Prevents re-querying MySQL when TPG is on.
+		if (isset($this->cbppTableNames[$groupKey])) {
+			return $this->cbppTableNames[$groupKey];
+		}
+
+		$tables = [];
+		$tables['bname']  = 'binaries';
+		$tables['pname']  = 'parts';
+		$tables['prname'] = 'partrepair';
+
+		if ($tpgSetting === true) {
+			if ($groupID == '') {
+				exit('Error: You must use releases_threaded.py since you have enabled TPG!');
+			}
+
+			if ($this->createNewTPGTables($groupID) === false && NN_ECHOCLI) {
+				exit('There is a problem creating new TPG tables for this group ID: ' . $groupID . PHP_EOL);
+			}
+
+			$groupEnding = '_' . $groupID;
+			$tables['bname']  .= $groupEnding;
+			$tables['pname']  .= $groupEnding;
+			$tables['prname'] .= $groupEnding;
+		}
+
+		// Buffer.
+		$this->cbppTableNames[$groupKey] = $tables;
+
+		return $tables;
+	}
 }
