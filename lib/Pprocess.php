@@ -185,7 +185,7 @@ class PProcess
 	public function processConsoles()
 	{
 		if ($this->site->lookupgames != 0) {
-			(new Konsole())->processConsoleReleases();
+			(new \Console(['Settings' => $this->pdo, 'Echo' => $this->echooutput]))->processConsoleReleases();
 		}
 	}
 
