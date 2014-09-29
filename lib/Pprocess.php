@@ -9,6 +9,7 @@ require_once(WWW_DIR . "lib/releaseimage.php");
 require_once(WWW_DIR . "lib/releaseextra.php");
 require_once(WWW_DIR . "lib/groups.php");
 require_once(WWW_DIR . 'lib/nntp.php');
+require_once(WWW_DIR . 'lib/music.php');
 require_once(WWW_DIR . "lib/site.php");
 require_once(WWW_DIR . "lib/Tmux.php");
 require_once(WWW_DIR . "lib/amazon.php");
@@ -184,7 +185,7 @@ class PProcess
 	public function processConsoles()
 	{
 		if ($this->site->lookupgames != 0) {
-			(new Console())->processConsoleReleases();
+			(new Konsole())->processConsoleReleases();
 		}
 	}
 
