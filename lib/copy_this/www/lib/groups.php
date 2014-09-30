@@ -250,7 +250,7 @@ class Groups
 		else
 			$minsizetoformrelease = $db->escapeString($group["minsizetoformrelease"]);
 
-		return $db->queryExec(sprintf("update groups set name=%s, description = %s, backfill_target = %s , active=%d, backfill = %s, minfilestoformrelease=%s, minsizetoformrelease=%s, regexmatchonly=%d where ID = %d ", $db->escapeString($group["name"]), $db->escapeString($group["description"]), $db->escapeString($group["backfill_target"]), $group["active"], $group["backfill"], $minfiles, $minsizetoformrelease, $group["regexmatchonly"], $group["id"]));
+		return $db->queryExec(sprintf("update groups set name = %s, description = %s, backfill_target = %s , active=%d, backfill = %s, minfilestoformrelease=%s, minsizetoformrelease=%s, regexmatchonly=%d where ID = %d ", $db->escapeString($group["name"]), $db->escapeString($group["description"]), $db->escapeString($group["backfill_target"]), $group["active"], $group["backfill"], $minfiles, $minsizetoformrelease, $group["regexmatchonly"], $group["id"]));
 	}
 
 	/**
@@ -303,7 +303,7 @@ class Groups
 	public function updateGroupStatus($id, $status = 0)
 	{
 		$db = new DB();
-		$db->queryExec(sprintf("update groups SET active = %d WHERE id = %d", $status, $id));
+		$db->queryExec(sprintf("update groups SET active = %d WHERE ID = %d", $status, $id));
 		$status = ($status == 0) ? 'deactivated' : 'activated';
 
 		return "Group $id has been $status.";
