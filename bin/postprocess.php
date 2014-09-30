@@ -36,6 +36,8 @@ $args = array(
 	'sharing'    => true,
 	'tv'         => false,
 	'xxx'        => false,
+	'booknn'     => false,
+	'musicnn'    => false,
 );
 
 $bool = array(
@@ -63,6 +65,8 @@ if (!isset($argv[1]) || !in_array($argv[1], $args) || !isset($argv[2]) || !in_ar
 		. "php postprocess.php sharing true     ...: Processes uploading/downloading comments.\n"
 		. "php postprocess.php allinf true      ...: Does all the types of post processing on a loop, sleeping 15 seconds between.\n"
 		. "php postprocess.php amazon true      ...: Does all the amazon (books/console/games/music/xxx).\n"
+		. "php postprocess.php booknn true      ...: Process books using nn scripts.\n"
+		. "php postprocess.php musicnn true     ...: Process music using nn scripts.\n"
 	)
 	);
 }
@@ -76,6 +80,7 @@ if ($args[$argv[1]] === true) {
 }
 
 $postProcess = new PProcess(['Settings' => $pdo, 'Echo' => ($argv[2] === 'true' ? true : false)]);
+$pp = new PostProcess(true);
 
 $charArray = ['a','b','c','d','e','f','0','1','2','3','4','5','6','7','8','9'];
 
@@ -108,6 +113,9 @@ switch ($argv[1]) {
 	case 'book':
 		$postProcess->processBooks();
 		break;
+	case 'booknn':
+		$pp->processBooks();
+		break;
 	case 'console':
 		$postProcess->processConsoles();
 		break;
@@ -122,6 +130,9 @@ switch ($argv[1]) {
 		break;
 	case 'music':
 		$postProcess->processMusic();
+		break;
+	case 'musicnn':
+		$pp->processMusic();
 		break;
 	case 'pre':
 		break;
