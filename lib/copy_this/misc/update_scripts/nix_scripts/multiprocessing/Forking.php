@@ -4,6 +4,7 @@ require_once(NN_LIB . 'framework' .DS . 'db.php');
 require_once(NN_LIB . 'ColorCLI.php');
 require_once(NN_LIB . 'site.php');
 require_once(NN_LIB . 'nntp.php');
+require_once(NN_LIB . 'postprocess.php');
 require_once(NN_LIB . 'RequestID.php');
 require_once(NN_TMUX . 'lib' . DS . 'Pprocess.php');
 require_once(NN_TMUX . 'lib' . DS . 'Enzebe.php');
@@ -880,11 +881,14 @@ class Forking extends \fork_daemon
 	private function processSingle()
 	{
 		$postProcess = new PProcess(['Settings' => $this->pdo, 'ColorCLI' => $this->_colorCLI]);
+		$pp = new PostProcess(true);
 		//$postProcess->processAnime();
 		$postProcess->processBooks();
+		$pp->processBooks();
 		$postProcess->processConsoles();
 		$postProcess->processGames();
 		$postProcess->processMusic();
+		$pp->processMusic();
 		$postProcess->processXXX();
 	}
 
