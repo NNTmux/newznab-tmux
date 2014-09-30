@@ -28,7 +28,7 @@ if (count($nntpkill) === 0) {
 }
 
 // Check database patch version
-if ($patch < 90) {
+if ($patch < 91) {
 	exit($c->error("\nYour database is not up to date. Please update.\nphp ${DIR}/lib/DB/patchDB.php\n"));
 }
 $tmux_session = (isset($tmux->tmux_session)) ? $tmux->tmux_session : 0;

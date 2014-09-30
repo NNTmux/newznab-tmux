@@ -714,7 +714,9 @@ class NameFixer
 				$titlematch = '+' . implode(' +', $matches[0]);
 				$join = sprintf(
 					"INNER JOIN releasesearch rs ON rs.releaseID = r.ID
-					WHERE MATCH (rs.name, rs.searchname) AGAINST ('%s' IN BOOLEAN MODE)",
+					WHERE
+							(MATCH (rs.name) AGAINST ('%1\$s' IN BOOLEAN MODE)
+							OR MATCH (rs.searchname) AGAINST ('%1\$s' IN BOOLEAN MODE))",
 					$titlematch
 				);
 				break;
