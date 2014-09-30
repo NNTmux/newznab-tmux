@@ -10,7 +10,7 @@ require_once(NN_TMUX . 'lib' . DS . 'Enzebe.php');
 /*
  * Class for processing book info.
  */
-class Book
+class Books
 {
 	/**
 	 * @var DB

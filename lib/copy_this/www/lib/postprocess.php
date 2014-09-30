@@ -16,6 +16,7 @@ require_once(WWW_DIR."/lib/console.php");
 require_once(WWW_DIR."/lib/nfo.php");
 require_once(WWW_DIR."/lib/category.php");
 require_once(WWW_DIR."/lib/book.php");
+require_once(WWW_DIR."/lib/Books.php");
 require_once(WWW_DIR."/lib/nzbinfo.php");
 require_once(WWW_DIR."/lib/spotnab.php");
 require_once(WWW_DIR."/lib/parsing.php");

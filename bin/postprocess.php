@@ -36,8 +36,6 @@ $args = array(
 	'sharing'    => true,
 	'tv'         => false,
 	'xxx'        => false,
-	'booknn'     => false,
-	'musicnn'    => false,
 );
 
 $bool = array(
@@ -65,8 +63,6 @@ if (!isset($argv[1]) || !in_array($argv[1], $args) || !isset($argv[2]) || !in_ar
 		. "php postprocess.php sharing true     ...: Processes uploading/downloading comments.\n"
 		. "php postprocess.php allinf true      ...: Does all the types of post processing on a loop, sleeping 15 seconds between.\n"
 		. "php postprocess.php amazon true      ...: Does all the amazon (books/console/games/music/xxx).\n"
-		. "php postprocess.php booknn true      ...: Process books using nn scripts.\n"
-		. "php postprocess.php musicnn true     ...: Process music using nn scripts.\n"
 	)
 	);
 }
@@ -101,9 +97,11 @@ switch ($argv[1]) {
 		break;
 	case 'amazon':
 		$postProcess->processBooks();
+		$pp->processBooks();
 		$postProcess->processConsoles();
 		$postProcess->processGames();
 		$postProcess->processMusic();
+		$pp->processMusic();
 		$postProcess->processXXX();
 		break;
 	case 'anime':
@@ -112,8 +110,6 @@ switch ($argv[1]) {
 	//break;
 	case 'book':
 		$postProcess->processBooks();
-		break;
-	case 'booknn':
 		$pp->processBooks();
 		break;
 	case 'console':
@@ -130,8 +126,6 @@ switch ($argv[1]) {
 		break;
 	case 'music':
 		$postProcess->processMusic();
-		break;
-	case 'musicnn':
 		$pp->processMusic();
 		break;
 	case 'pre':
