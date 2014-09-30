@@ -186,7 +186,7 @@ class Groups
 		$first = (isset($group["first_record"]) ? $group["first_record"] : "0");
 		$last = (isset($group["last_record"]) ? $group["last_record"] : "0");
 
-		$sql = sprintf("insert into groups (name, description, first_record, last_record, last_updated, active, minfilestoformrelease, minsizetoformrelease, backfill_target, regexmatchonly) values (%s, %s, %s, %s, null, %d, %s, %s, %d, %d) ", $db->escapeString($group["name"]), $db->escapeString($group["description"]), $db->escapeString($first), $db->escapeString($last), $group["active"], $minfiles, $minsizetoformrelease, $backfill_target, $regexmatchonly);
+		$sql = sprintf("insert into groups (name, description, first_record, last_record, last_updated, active, backfill, minfilestoformrelease, minsizetoformrelease, backfill_target, regexmatchonly) values (%s, %s, %s, %s, null, %d, %s, %s, %d, %d) ", $db->escapeString($group["name"]), $db->escapeString($group["description"]), $db->escapeString($first), $db->escapeString($last), $group["active"], $group["backfill"], $minfiles, $minsizetoformrelease, $backfill_target, $regexmatchonly);
 
 		return $db->queryInsert($sql);
 	}
@@ -250,13 +250,13 @@ class Groups
 		else
 			$minsizetoformrelease = $db->escapeString($group["minsizetoformrelease"]);
 
-		return $db->queryExec(sprintf("update groups set name=%s, description = %s, backfill_target = %s , active=%d, minfilestoformrelease=%s, minsizetoformrelease=%s, regexmatchonly=%d where ID = %d ", $db->escapeString($group["name"]), $db->escapeString($group["description"]), $db->escapeString($group["backfill_target"]), $group["active"], $minfiles, $minsizetoformrelease, $group["regexmatchonly"], $group["id"]));
+		return $db->queryExec(sprintf("update groups set name=%s, description = %s, backfill_target = %s , active=%d, backfill = %s, minfilestoformrelease=%s, minsizetoformrelease=%s, regexmatchonly=%d where ID = %d ", $db->escapeString($group["name"]), $db->escapeString($group["description"]), $db->escapeString($group["backfill_target"]), $group["active"], $group["backfill"], $minfiles, $minsizetoformrelease, $group["regexmatchonly"], $group["id"]));
 	}
 
 	/**
 	 * Update the list of newsgroups from nntp provider matching a regex and return an array of messages.
 	 */
-	function addBulk($groupList, $active = 1)
+	function addBulk($groupList, $active = 1, $backfill = 1)
 	{
 		require_once(WWW_DIR . "/lib/binaries.php");
 		require_once(WWW_DIR . "/lib/nntp.php");
@@ -267,7 +267,7 @@ class Groups
 			$ret[] = "No group list provided.";
 		} else {
 			$db = new DB();
-			$nntp = new Nntp;
+			$nntp = new Nntp(['Echo' => false]);
 			if (!$nntp->doConnect()) {
 				$ret[] = "Failed to get NNTP connection";
 
@@ -287,7 +287,7 @@ class Groups
 						$ret[] = array('group' => $group['group'], 'msg' => 'Updated');
 					} else {
 						$desc = "";
-						$db->queryInsert(sprintf("INSERT INTO groups (name, description, active) VALUES (%s, %s, %d)", $db->escapeString($group['group']), $db->escapeString($desc), $active));
+						$db->queryInsert(sprintf("INSERT INTO groups (name, description, active, backfill) VALUES (%s, %s, %d, %s)", $db->escapeString($group['group']), $db->escapeString($desc), $active, $backfill));
 						$ret[] = array('group' => $group['group'], 'msg' => 'Created');
 					}
 				}
@@ -387,5 +387,25 @@ class Groups
 		$this->cbppTableNames[$groupKey] = $tables;
 
 		return $tables;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getActiveIDs()
+	{
+		$db = new DB();
+		return $db->query("SELECT ID FROM groups WHERE active = 1 ORDER BY name");
+	}
+
+	/**
+	 * Set the backfill to 0 when the group is backfilled to max.
+	 *
+	 * @param $name
+	 */
+	public function disableForPost($name)
+	{
+		$db = new DB();
+		$db->queryExec(sprintf("UPDATE groups SET backfill = 0 WHERE name = %s", $db->escapeString($name)));
 	}
 }

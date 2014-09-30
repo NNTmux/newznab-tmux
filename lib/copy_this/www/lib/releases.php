@@ -20,6 +20,9 @@ require_once(WWW_DIR . "lib/Categorize.php");
 require_once(WWW_DIR . "../misc/update_scripts/nix_scripts/tmux/lib/ReleaseCleaner.php");
 require_once(WWW_DIR . "../misc/update_scripts/nix_scripts/tmux/lib/Enzebe.php");
 require_once (NN_LIB . 'SphinxSearch.php');
+require_once (NN_LIB . 'ConsoleTools.php');
+require_once (NN_LIB . 'RequestIDLocal.php');
+require_once (NN_LIB . 'RequestIDWeb.php');
 
 /**
  * This class handles storage and retrieval of releases rows and the main processing functions
@@ -1476,6 +1479,7 @@ class Releases
 		$groups = new Groups;
 		$retcount = 0;
 		$miscRetentionDeleted = $miscHashedDeleted = 0;
+		$echoCLI = NN_ECHOCLI;
 
 		echo $s->getLicense();
 
@@ -1753,6 +1757,33 @@ class Releases
 					//Increment new release count
 					$retcount++;
 				}
+			}
+		}
+
+		$DIR = NN_MISC;
+		$PYTHON = shell_exec('which python3 2>/dev/null');
+		$PYTHON = (empty($PYTHON) ? 'python -OOu' : 'python3 -OOu');
+		$processRequestIDs = (int)$page->site->lookup_reqids;
+		$consoleTools = new ConsoleTools(['ColorCLI' => $db->log]);
+
+		if ($processRequestIDs === 0) {
+			$this->processRequestIDs($groupArr['ID'], 5000, true);
+		} else if ($processRequestIDs === 1) {
+			$this->processRequestIDs($groupArr['ID'], 5000, true);
+			$this->processRequestIDs($groupArr['ID'], 1000, false);
+		} else if ($processRequestIDs === 2) {
+			$requestIDTime = time();
+			if ($echoCLI) {
+				$db->log->doEcho($db->log->header("Process Releases -> Request ID Threaded lookup."));
+			}
+			passthru("$PYTHON ${DIR}update_scripts/nix_scripts/tmux/python/requestid_threaded.py");
+			if ($echoCLI) {
+				$db->log->doEcho(
+					$db->log->primary(
+						"\nReleases updated in " .
+						$consoleTools->convertTime(time() - $requestIDTime)
+					)
+				);
 			}
 		}
 
@@ -2298,5 +2329,66 @@ class Releases
 			ORDER BY a.postdate
 			DESC LIMIT 24"
 		);
+	}
+
+	/**
+	 * Process RequestID's.
+	 *
+	 * @param int|string  $groupID
+	 * @param int  $limit
+	 * @param bool $local
+	 *
+	 * @access public
+	 * @void
+	 */
+	public function processRequestIDs($groupID = '', $limit = 5000, $local = true)
+	{
+		$db = new DB();
+		$echoCLI = NN_ECHOCLI;
+		$groups = new Groups();
+		$s = new Sites();
+		$site = $s->get();
+		$consoleTools = new ConsoleTools(['ColorCLI' => $db->log]);
+		if ($local === false && $site->lookup_reqids == 0) {
+			return;
+		}
+
+		$startTime = time();
+		if ($echoCLI) {
+			$db->log->doEcho(
+				$db->log->header(
+					sprintf(
+						"Process Releases -> Request ID %s lookup -- limit %s",
+						($local === true ? 'local' : 'web'),
+						$limit
+					)
+				)
+			);
+		}
+
+		if ($local === true) {
+			$foundRequestIDs = (
+			new \RequestIDLocal(
+				['Echo' => $echoCLI, 'ConsoleTools' => $consoleTools,
+				 'Groups' => $groups, 'Settings' => $db]
+			)
+			)->lookupRequestIDs(['GroupID' => $groupID, 'limit' => $limit, 'time' => 168]);
+		} else {
+			$foundRequestIDs = (
+			new \RequestIDWeb(
+				['Echo' => $echoCLI, 'ConsoleTools' => $consoleTools,
+				 'Groups' => $groups, 'Settings' => $db]
+			)
+			)->lookupRequestIDs(['GroupID' => $groupID, 'limit' => $limit, 'time' => 168]);
+		}
+		if ($echoCLI) {
+			$db->log->doEcho(
+				$db->log->primary(
+					number_format($foundRequestIDs) .
+					' releases updated in ' .
+					$consoleTools->convertTime(time() - $startTime)
+				), true
+			);
+		}
 	}
 }
