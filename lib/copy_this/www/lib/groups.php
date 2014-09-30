@@ -318,7 +318,7 @@ class Groups
 	public function updateBackfillStatus($id, $status = 0)
 	{
 		$db = new DB();
-		$db->queryExec(sprintf("UPDATE groups SET backfill = %d WHERE id = %d", $status, $id));
+		$db->queryExec(sprintf("UPDATE groups SET backfill = %d WHERE ID = %d", $status, $id));
 		return "Group $id has been " . (($status == 0) ? 'deactivated' : 'activated') . '.';
 	}
 
