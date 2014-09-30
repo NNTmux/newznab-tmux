@@ -16,7 +16,7 @@ require_once(WWW_DIR . "lib/amazon.php");
 require_once(WWW_DIR . "lib/genres.php");
 require_once(WWW_DIR . "lib/anidb.php");
 require_once(WWW_DIR . "lib/book.php");
-require_once(WWW_DIR."/lib/Books.php");
+require_once(WWW_DIR.  "lib/Books.php");
 require_once(WWW_DIR . "lib/Games.php");
 require_once(WWW_DIR . "lib/XXX.php");
 require_once(WWW_DIR . "lib/Logger.php");
