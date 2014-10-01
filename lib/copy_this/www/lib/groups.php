@@ -90,23 +90,35 @@ class Groups
 	{
 		$db = new DB();
 
-		return $db->queryOneRow(sprintf("select * from groups where name = '%s' ", $grp));
+		return $db->queryOneRow(sprintf("SELECT * FROM groups WHERE name = %s", $db->escapeString($grp)));
 	}
 
-	public function getByNameByID($ID)
+	/**
+	 * Get a group name using its ID.
+	 *
+	 * @param int|string $id The group ID.
+	 *
+	 * @return string Empty string on failure, groupName on success.
+	 */
+	public function getByNameByID($id)
 	{
 		$db = new DB();
-		$res = $db->queryOneRow(sprintf("select name from groups where ID = %d ", $ID));
-
-		return $res["name"];
+		$res = $db->queryOneRow(sprintf("SELECT name FROM groups WHERE ID = %d ", $id));
+		return ($res === false ? '' : $res["name"]);
 	}
 
+	/**
+	 * Get a group name using its name.
+	 *
+	 * @param string $name The group name.
+	 *
+	 * @return string Empty string on failure, group_id on success.
+	 */
 	public function getIDByName($name)
 	{
 		$db = new DB();
-		$res = $db->queryOneRow(sprintf("SELECT ID FROM groups WHERE name = %s", $db->escapeString($name)));
-
-		return $res["ID"];
+		$res = $db->queryOneRow(sprintf("SELECT id FROM groups WHERE name = %s", $db->escapeString($name)));
+		return ($res === false ? '' : $res["ID"]);
 	}
 
 	/**
