@@ -30,6 +30,19 @@ class Binaries
 	public $messageBuffer;
 
 	/**
+	 * Does the user have any blacklists enabled?
+	 * @var bool
+	 */
+	protected $_blackListEmpty = false;
+
+	/**
+	 * Is the blacklist already cached?
+	 *
+	 * @var bool
+	 */
+	protected $_blackListLoaded = false;
+
+	/**
 	 * Default constructor
 	 */
 	function Binaries()
@@ -39,15 +52,17 @@ class Binaries
 		$s = new Sites();
 		$site = $s->get();
 		$this->messageBuffer = ($site->maxmssgs != '') ? $site->maxmssgs : 20000;
+		$this->_partRepair = ($site->partrepair == 0 ? false : true);
 		$this->compressedHeaders = ($site->compressedheaders == "1") ? true : false;
-		$this->messagebuffer = (!empty($site->maxmssgs)) ? $site->maxmssgs : 20000;
 		$this->MaxMsgsPerRun = (!empty($site->maxmsgsperrun)) ? $site->maxmsgsperrun : 200000;
 		$this->NewGroupScanByDays = ($site->newgroupscanmethod == "1") ? true : false;
 		$this->NewGroupMsgsToScan = (!empty($site->newgroupmsgstoscan)) ? $site->newgroupmsgstoscan : 50000;
 		$this->NewGroupDaysToScan = (!empty($site->newgroupdaystoscan)) ? $site->newgroupdaystoscan : 3;
 		$this->_tablePerGroup = ($site->tablepergroup == 1 ? true : false);
+		$this->_showDroppedYEncParts = ($site->showdroppedyencparts == 1 ? true : false);
 
-		$this->blackList = array(); //cache of our black/white list
+		$this->blackList = [];
+		$this->_blackListLoaded = false;
 		$this->blackList_by_group = array();
 		$this->message = array();
 
@@ -203,15 +218,15 @@ class Binaries
 
 			$done = false;
 
-			// Get all the parts (in portions of $this->messagebuffer to not use too much memory)
+			// Get all the parts (in portions of $this->messageBuffer to not use too much memory)
 			while ($done === false) {
 				$this->startLoop = microtime(true);
 
-				if ($total > $this->messagebuffer) {
-					if ($first + $this->messagebuffer > $grouplast)
+				if ($total > $this->messageBuffer) {
+					if ($first + $this->messageBuffer > $grouplast)
 						$last = $grouplast;
 					else
-						$last = $first + $this->messagebuffer;
+						$last = $first + $this->messageBuffer;
 				}
 
 				echo "Getting " . number_format($last - $first + 1) . " parts (" . $first . " to " . $last . ") - " . number_format($grouplast - $last) . " in queue" . $n;
@@ -251,237 +266,348 @@ class Binaries
 	}
 
 	/**
-	 * Download a range of usenet messages. Store binaries with subjects matching a
-	 * specific pattern in the database.
+	 * Loop over range of wanted headers, insert headers into DB.
+	 *
+	 * @param array      $groupMySQL   The group info from mysql.
+	 * @param int        $first        The oldest wanted header.
+	 * @param int        $last         The newest wanted header.
+	 * @param string     $type         Is this partrepair or update or backfill?
+	 * @param null|array $missingParts If we are running in partrepair, the list of missing article numbers.
+	 *
+	 * @return array Empty on failure.
 	 */
-	function scan($nntp, $groupArr, $first, $last, $type = 'update')
+	public function scan($groupMySQL, $first, $last, $type = 'update', $missingParts = null)
 	{
-		$db = new Db();
-		$releaseRegex = new ReleaseRegex;
-		$n = $this->n;
-		$this->startHeaders = microtime(true);
+		// Start time of scan method and of fetching headers.
+		$startLoop = microtime(true);
 
-		if ($this->compressedHeaders) {
-			$nntpn = new Nntp();
-			$nntpn->doConnect(true);
-			$msgs = $nntp->getOverview($first . "-" . $last, true, false);
-			$nntpn->doQuit();
-		} else
-			$msgs = $nntp->getOverview($first . "-" . $last, true, false);
+		// Check if MySQL tables exist, create if they do not, get their names at the same time.
+		$tableNames = $this->_groups->getCBPTableNames($this->_tablePerGroup, $groupMySQL['ID']);
 
-		if (PEAR::isError($msgs) && ($msgs->code == 400 || $msgs->code == 503)) {
-			echo "NNTP connection timed out. Reconnecting...$n";
-			if (!$nntp->doConnect()) {
-				// TODO: What now?
-				echo "Failed to get NNTP connection.$n";
+		$returnArray = [];
 
-				return;
-			}
-			$nntp->selectGroup($groupArr['name']);
-			if ($this->compressedHeaders) {
-				$nntpn = new Nntp();
-				$nntpn->doConnect(true);
-				$msgs = $nntp->getOverview($first . "-" . $last, true, false);
-				$nntpn->doQuit();
-			} else
-				$msgs = $nntp->getOverview($first . "-" . $last, true, false);
-		}
+		$partRepair = ($type === 'partrepair');
+		$addToPartRepair = ($type === 'update' && $this->_partRepair);
 
-		$rangerequested = range($first, $last);
-		$msgsreceived = array();
-		$msgsblacklisted = array();
-		$msgsignored = array();
-		$msgsinserted = array();
-		$msgsnotinserted = array();
-
-		$timeHeaders = number_format(microtime(true) - $this->startHeaders, 2);
-
-		if (PEAR::isError($msgs)) {
-			echo "Error {$msgs->code}: {$msgs->message}$n";
-			echo "Skipping group$n";
-
-			return false;
-		}
-
-		$this->startUpdate = microtime(true);
-		$this->startLoop = microtime(true);
-		if (is_array($msgs)) {
-			//loop headers, figure out parts
-			foreach ($msgs AS $msg) {
-				if (!isset($msg['Number']))
-					continue;
-
-				$msgsreceived[] = $msg['Number'];
-				$msgPart = $msgTotalParts = 0;
-
-				$pattern = '|\((\d+)[\/](\d+)\)|i';
-				preg_match_all($pattern, $msg['Subject'], $matches, PREG_PATTERN_ORDER);
-				$matchcnt = sizeof($matches[0]);
-				for ($i = 0; $i < $matchcnt; $i++) {
-					$msgPart = $matches[1][$i];
-					$msgTotalParts = $matches[2][$i];
-				}
-
-				if (!isset($msg['Subject']) || $matchcnt == 0) // not a binary post most likely.. continue
-				{
-					$msgsignored[] = $msg['Number'];
-					continue;
-				}
-
-				if ((int)$msgPart > 0 && (int)$msgTotalParts > 0) {
-					$subject = utf8_encode(trim(preg_replace('|\(' . $msgPart . '[\/]' . $msgTotalParts . '\)|i', '', $msg['Subject'])));
-
-					if (!isset($this->message[$subject])) {
-						$this->message[$subject] = $msg;
-						$this->message[$subject]['MaxParts'] = (int)$msgTotalParts;
-						$this->message[$subject]['Date'] = strtotime($this->message[$subject]['Date']);
-					}
-					if ((int)$msgPart > 0) {
-						$this->message[$subject]['Parts'][(int)$msgPart] = array('Message-ID' => substr($msg['Message-ID'], 1, -1), 'number' => $msg['Number'], 'part' => (int)$msgPart, 'size' => $msg['Bytes']);
-						$this->message[$subject]['PartNumbers'][(int)$msgPart] = $msg['Number'];
-					}
-				}
-			}
-			unset($msg);
-			unset($msgs);
-			$count = 0;
-			$updatecount = 0;
-			$partcount = 0;
-			$rangenotreceived = array_diff($rangerequested, $msgsreceived);
-
-			if ($type != 'partrepair')
-				echo "Received " . sizeof($msgsreceived) . " articles of " . ($last - $first + 1) . " requested, " . sizeof($msgsignored) . " not binaries $n";
-
-			if ($type == 'update' && sizeof($msgsreceived) == 0) {
-				echo "Error: Server did not return any articles.$n";
-				echo "Skipping group$n";
-
-				return false;
-			}
-
-			if (sizeof($rangenotreceived) > 0) {
-				switch ($type) {
-					case 'backfill':
-						//don't add missing articles
-						break;
-					case 'partrepair':
-					case 'update':
-					default:
-						$this->addMissingParts($rangenotreceived, $groupArr['ID']);
-						break;
-				}
-				echo "Server did not return " . count($rangenotreceived) . " article(s).$n";
-			}
-
-			if (isset($this->message) && count($this->message)) {
-				$groupRegexes = $releaseRegex->getForGroup($groupArr['name']);
-
-				//insert binaries and parts into database. when binary already exists; only insert new parts
-				foreach ($this->message AS $subject => $data) {
-					//Filter binaries based on black/white list
-					if ($this->isBlackListed($data, $groupArr['name'])) {
-						$msgsblacklisted[] = count($data['Parts']);
-						if ($type == 'partrepair') {
-							$partIds = array();
-							foreach ($data['Parts'] as $partdata)
-								$partIds[] = $partdata['number'];
-							$db->queryExec(sprintf("DELETE FROM partrepair WHERE numberID IN (%s) AND groupID=%d", implode(',', $partIds), $groupArr['ID']));
-						}
-						continue;
-					}
-
-					if (isset($data['Parts']) && count($data['Parts']) > 0 && $subject != '') {
-						//Check for existing binary
-						$binaryID = 0;
-						$binaryHash = md5($subject . $data['From'] . $groupArr['ID']);
-						$res = $db->queryOneRow(sprintf("SELECT ID FROM binaries WHERE binaryhash = %s", $db->escapeString($binaryHash)));
-						if (!$res) {
-
-							//Apply Regexes
-							$regexMatches = array();
-							foreach ($groupRegexes as $groupRegex) {
-								$regexCheck = $releaseRegex->performMatch($groupRegex, $subject);
-								if ($regexCheck !== false) {
-									$regexMatches = $regexCheck;
-									break;
-								}
-							}
-
-							$sql = '';
-							if (!empty($regexMatches)) {
-								$relparts = explode("/", $regexMatches['parts']);
-								$sql = sprintf("INSERT INTO binaries (name, fromname, date, xref, totalparts, groupID, procstat, categoryID, regexID, reqID, relpart, reltotalpart, binaryhash, relname, dateadded) VALUES (%s, %s, FROM_UNIXTIME(%s), %s, %s, %d, %d, %s, %d, %s, %d, %d, %s, %s, now())", $db->escapeString($subject), $db->escapeString(utf8_encode($data['From'])), $db->escapeString($data['Date']), $db->escapeString($data['Xref']), $db->escapeString($data['MaxParts']), $groupArr['ID'], Releases::PROCSTAT_TITLEMATCHED, $regexMatches['regcatid'], $regexMatches['regexID'], $db->escapeString($regexMatches['reqID']), $relparts[0], $relparts[1], $db->escapeString($binaryHash), $db->escapeString(str_replace('_', ' ', $regexMatches['name'])));
-							} elseif ($this->onlyProcessRegexBinaries === false) {
-								$sql = sprintf("INSERT INTO binaries (name, fromname, date, xref, totalparts, groupID, binaryhash, dateadded) VALUES (%s, %s, FROM_UNIXTIME(%s), %s, %s, %d, %s, now())", $db->escapeString($subject), $db->escapeString(utf8_encode($data['From'])), $db->escapeString($data['Date']), $db->escapeString($data['Xref']), $db->escapeString($data['MaxParts']), $groupArr['ID'], $db->escapeString($binaryHash));
-							} //onlyProcessRegexBinaries is true, there was no regex match and we are doing part repair so delete them
-							elseif ($type == 'partrepair') {
-								$partIds = array();
-								foreach ($data['Parts'] as $partdata)
-									$partIds[] = $partdata['number'];
-								$db->queryExec(sprintf("DELETE FROM partrepair WHERE numberID IN (%s) AND groupID=%d", implode(',', $partIds), $groupArr['ID']));
-								continue;
-							}
-							if ($sql != '') {
-								$binaryID = $db->queryInsert($sql);
-								$count++;
-								if ($count % 500 == 0) echo "$count bin adds...";
-							}
-						} else {
-							$binaryID = $res["ID"];
-							$updatecount++;
-							if ($updatecount % 500 == 0) echo "$updatecount bin updates...";
-						}
-
-						if ($binaryID != 0) {
-							$partParams = array();
-							$partNumbers = array();
-							foreach ($data['Parts'] AS $partdata) {
-								$partcount++;
-
-								$partParams[] = sprintf("(%d, %s, %s, %s, %s)", $binaryID, $db->escapeString($partdata['Message-ID']), $db->escapeString($partdata['number']), $db->escapeString(round($partdata['part'])), $db->escapeString($partdata['size']));
-								$partNumbers[] = $partdata['number'];
-							}
-
-							$partSql = "INSERT INTO parts (binaryID, messageID, number, partnumber, size) VALUES " . implode(', ', $partParams);
-							$pidata = $db->queryInsert($partSql, false);
-							if (!$pidata) {
-								$msgsnotinserted = array_merge($msgsnotinserted, $partNumbers);
-							} else {
-								$msgsinserted = array_merge($msgsinserted, $partNumbers);
-							}
-						}
-					}
-				}
-				//TODO: determine whether to add to missing articles if insert failed
-				if (sizeof($msgsnotinserted) > 0) {
-					echo 'WARNING: ' . count($msgsnotinserted) . ' Parts failed to insert' . $n;
-					$this->addMissingParts($msgsnotinserted, $groupArr['ID']);
-				}
-				if (($count >= 500) || ($updatecount >= 500)) {
-					echo $n;
-				} //line break for bin adds output
-			}
-
-			$timeUpdate = number_format(microtime(true) - $this->startUpdate, 2);
-			$timeLoop = number_format(microtime(true) - $this->startLoop, 2);
-
-			if (sizeof($msgsblacklisted) > 0)
-				echo "Blacklisted " . array_sum($msgsblacklisted) . " parts in " . sizeof($msgsblacklisted) . " binaries" . $n;
-
-			if ($type != 'partrepair') {
-				echo number_format($count) . ' new, ' . number_format($updatecount) . ' updated, ' . number_format($partcount) . ' parts.';
-				echo " $timeHeaders headers, $timeUpdate update, $timeLoop range.$n";
-			}
-			unset($this->message);
-			unset($data);
-
-			return $last;
+		// Download the headers.
+		if ($partRepair === true) {
+			// This is slower but possibly is better with missing headers.
+			$headers = $this->_nntp->getOverview($first . '-' . $last, true, false);
 		} else {
-			echo "Error: Can't get parts from server (msgs not array) $n";
-			echo "Skipping group$n";
-
-			return false;
+			$headers = $this->_nntp->getXOVER($first . '-' . $last);
 		}
+
+		// If there was an error, try to reconnect.
+		if ($this->_nntp->isError($headers)) {
+
+			// Increment if part repair and return false.
+			if ($partRepair === true) {
+				$this->_pdo->queryExec(
+					sprintf(
+						'UPDATE partrepair SET attempts = attempts + 1 WHERE groupID = %d AND numberid %s',
+						$groupMySQL['ID'],
+						($first == $last ? '= ' . $first : 'IN (' . implode(',', range($first, $last)) . ')')
+					)
+				);
+				return $returnArray;
+			}
+
+			// This is usually a compression error, so try disabling compression.
+			$this->_nntp->doQuit();
+			if ($this->_nntp->doConnect(false) !== true) {
+				return $returnArray;
+			}
+
+			// Re-select group, download headers again without compression and re-enable compression.
+			$this->_nntp->selectGroup($groupMySQL['name']);
+			$headers = $this->_nntp->getXOVER($first . '-' . $last);
+			$this->_nntp->enableCompression();
+
+			// Check if the non-compression headers have an error.
+			if ($this->_nntp->isError($headers)) {
+				$this->log(
+					"Code {$headers->code}: {$headers->message}\nSkipping group: ${$groupMySQL['name']}",
+					'scan',
+					\Logger::LOG_WARNING,
+					'error'
+				);
+				return $returnArray;
+			}
+		}
+
+		// Start of processing headers.
+		$startCleaning = microtime(true);
+
+		// End of the getting data from usenet.
+		$timeHeaders = number_format($startCleaning - $startLoop, 2);
+
+		// Check if we got headers.
+		$msgCount = count($headers);
+
+		if ($msgCount < 1) {
+			return $returnArray;
+		}
+
+		// Get highest and lowest article numbers/dates.
+		$iterator1 = 0;
+		$iterator2 = $msgCount - 1;
+		while (true) {
+			if (!isset($returnArray['firstArticleNumber']) && isset($headers[$iterator1]['Number'])) {
+				$returnArray['firstArticleNumber'] = $headers[$iterator1]['Number'];
+				$returnArray['firstArticleDate'] = $headers[$iterator1]['Date'];
+			}
+
+			if (!isset($returnArray['lastArticleNumber']) && isset($headers[$iterator2]['Number'])) {
+				$returnArray['lastArticleNumber'] = $headers[$iterator2]['Number'];
+				$returnArray['lastArticleDate'] = $headers[$iterator2]['Date'];
+			}
+
+			// Break if we found non empty articles.
+			if (isset($returnArray['firstArticleNumber']) && isset($returnArray['lastArticleNumber'])) {
+				break;
+			}
+
+			// Break out if we couldn't find anything.
+			if ($iterator1++ >= $msgCount - 1 || $iterator2-- <= 0) {
+				break;
+			}
+		}
+
+		$headersRepaired = $articles = $rangeNotReceived = $binariesUpdate = $headersReceived = $headersNotInserted = [];
+		$notYEnc = $headersBlackListed = 0;
+
+		$partsQuery = $partsCheck = sprintf('INSERT INTO %s (binaryID, number, messageID, partnumber, size) VALUES ', $tableNames['pname']);
+
+		$this->_pdo->beginTransaction();
+		// Loop articles, figure out files/parts.
+		foreach ($headers as $header) {
+
+			// Check if we got the article or not.
+			if (isset($header['Number'])) {
+				$headersReceived[] = $header['Number'];
+			} else {
+				if ($addToPartRepair) {
+					$rangeNotReceived[] = $header['Number'];
+				}
+				continue;
+			}
+
+			// If set we are running in partRepair mode.
+			if ($partRepair === true && !is_null($missingParts)) {
+				if (!in_array($header['Number'], $missingParts)) {
+					// If article isn't one that is missing skip it.
+					continue;
+				} else {
+					// We got the part this time. Remove article from part repair.
+					$headersRepaired[] = $header['Number'];
+				}
+			}
+
+			/*
+			 * Find part / total parts. Ignore if no part count found.
+			 *
+			 * \s* Trims the leading space.
+			 * (?!"Usenet Index Post) ignores these types of articles, they are useless.
+			 * (.+) Fetches the subject.
+			 * \s+ Trims trailing space after the subject.
+			 * \((\d+)\/(\d+)\) Gets the part count.
+			 * No ending ($) as there are cases of subjects with extra data after the part count.
+			 */
+			if (preg_match('/^\s*(?!"Usenet Index Post)(.+)\s+\((\d+)\/(\d+)\)/', $header['Subject'], $matches)) {
+				// Add yEnc to subjects that do not have them, but have the part number at the end of the header.
+				if (!stristr($header['Subject'], 'yEnc')) {
+					$matches[1] .= ' yEnc';
+				}
+			} else {
+				if ($this->_showDroppedYEncParts === true && strpos($header['Subject'], '"Usenet Index Post') !== 0) {
+					file_put_contents(
+						NN_LOGS . 'not_yenc' . $groupMySQL['name'] . '.dropped.log',
+						$header['Subject'] . PHP_EOL, FILE_APPEND
+					);
+				}
+				$notYEnc++;
+				continue;
+			}
+
+			// Filter subject based on black/white list.
+			if ($this->_blackListEmpty === false && $this->isBlackListed($header, $groupMySQL['name'])) {
+				$headersBlackListed++;
+				continue;
+			}
+
+			if (!isset($header['Bytes'])) {
+				$header['Bytes'] = (isset($header[':bytes']) ? $header[':bytes'] : 0);
+			}
+			$header['Bytes'] = (int) $header['Bytes'];
+
+			// Set up the info for inserting into parts/binaries/collections tables.
+			if (!isset($articles[$matches[1]])) {
+
+				// Attempt to find the file count. If it is not found, set it to 0.
+				if (!preg_match('/[[(\s](\d{1,5})(\/|[\s_]of[\s_]|-)(\d{1,5})[])\s$:]/i', $matches[1], $fileCount)) {
+					$fileCount[1] = $fileCount[3] = 0;
+
+					if ($this->_showDroppedYEncParts === true) {
+						file_put_contents(
+							NN_LOGS . 'no_files' . $groupMySQL['name'] . '.log',
+							$header['Subject'] . PHP_EOL, FILE_APPEND
+						);
+					}
+				}
+
+				$binaryID = $this->_pdo->queryInsert(
+					sprintf("
+						INSERT INTO %s (binaryhash, name, totalparts, currentparts, filenumber, partsize)
+						VALUES ('%s', %s, %d, %d, 1, %d, %d)
+						ON DUPLICATE KEY UPDATE currentparts = currentparts + 1, partsize = partsize + %d",
+						$tableNames['bname'],
+						md5($matches[1] . $header['From'] . $groupMySQL['ID']),
+						$this->_pdo->escapeString(utf8_encode($matches[1])),
+						$matches[3],
+						$fileCount[1],
+						$header['Bytes'],
+						$header['Bytes']
+					)
+				);
+
+				if ($binaryID === false) {
+					if ($addToPartRepair) {
+						$headersNotInserted[] = $header['Number'];
+					}
+					$this->_pdo->Rollback();
+					$this->_pdo->beginTransaction();
+					continue;
+				}
+
+				$binariesUpdate[$binaryID]['Size'] = 0;
+				$binariesUpdate[$binaryID]['Parts'] = 0;
+
+				$articles[$matches[1]]['BinaryID'] = $binaryID;
+
+			} else {
+				$binaryID = $articles[$matches[1]]['BinaryID'];
+				$binariesUpdate[$binaryID]['Size'] += $header['Bytes'];
+				$binariesUpdate[$binaryID]['Parts']++;
+			}
+
+			// Strip the < and >, saves space in DB.
+			$header['Message-ID'][0] = "'";
+
+			$partsQuery .=
+				'(' . $binaryID . ',' . $header['Number'] . ',' . rtrim($header['Message-ID'], '>') . "'," .
+				$matches[2] . ',' . $header['Bytes'] . ',' ;
+
+		}
+		unset($headers); // Reclaim memory.
+
+		// Start of inserting into SQL.
+		$startUpdate = microtime(true);
+
+		// End of processing headers.
+		$timeCleaning = number_format($startUpdate - $startCleaning, 2);
+
+		$binariesQuery = $binariesCheck = sprintf('INSERT INTO %s (id, partsize, currentparts) VALUES ', $tableNames['bname']);
+		foreach ($binariesUpdate as $binaryID => $binary) {
+			$binariesQuery .= '(' . $binaryID . ',' . $binary['Size'] . ',' . $binary['Parts'] . '),';
+		}
+		$binariesEnd = ' ON DUPLICATE KEY UPDATE partsize = VALUES(partsize) + partsize, currentparts = VALUES(currentparts) + currentparts';
+		$binariesQuery = rtrim($binariesQuery, ',') . $binariesEnd;
+
+		// Check if we got any binaries. If we did, try to insert them.
+		if (((strlen($binariesCheck . $binariesEnd) === strlen($binariesQuery)) ? true : $this->_pdo->queryExec($binariesQuery))) {
+			if ($this->_debug) {
+				$this->_colorCLI->doEcho(
+					$this->_colorCLI->debug(
+						'Sending ' . round(strlen($partsQuery) / 1024, 2) . ' KB of parts to MySQL'
+					)
+				);
+			}
+
+			if (((strlen($partsQuery) === strlen($partsCheck)) ? true  : $this->_pdo->queryExec(rtrim($partsQuery, ',')))) {
+				$this->_pdo->Commit();
+			} else {
+				if ($addToPartRepair) {
+					$headersNotInserted += $headersReceived;
+				}
+				$this->_pdo->Rollback();
+			}
+		} else {
+			if ($addToPartRepair) {
+				$headersNotInserted += $headersReceived;
+			}
+			$this->_pdo->Rollback();
+		}
+
+		if ($this->_echoCLI && $partRepair === false) {
+			$this->_colorCLI->doEcho(
+				$this->_colorCLI->primary(
+					'Received ' . count($headersReceived) .
+					' articles of ' . (number_format($last - $first + 1)) . ' requested, ' .
+					$headersBlackListed . ' blacklisted, ' . $notYEnc . ' not yEnc.'
+				)
+			);
+		}
+
+		// Start of part repair.
+		$startPR = microtime(true);
+
+		// End of inserting.
+		$timeInsert = number_format($startPR - $startUpdate, 2);
+
+		if ($partRepair && count($headersRepaired) > 0) {
+			$this->removeRepairedParts($headersRepaired, $tableNames['prname'], $groupMySQL['ID']);
+		}
+
+		if ($addToPartRepair) {
+
+			$notInsertedCount = count($headersNotInserted);
+			if ($notInsertedCount > 0) {
+				$this->addMissingParts($headersNotInserted, $tableNames['prname'], $groupMySQL['ID']);
+
+				$this->log(
+					$notInsertedCount . ' articles failed to insert!',
+					'scan',
+					\Logger::LOG_WARNING,
+					'warning'
+				);
+			}
+
+			// Check if we have any missing headers.
+			if (($last - $first - $notYEnc - $headersBlackListed + 1) > count($headersReceived)) {
+				$rangeNotReceived = array_merge($rangeNotReceived, array_diff(range($first, $last), $headersReceived));
+			}
+			$notReceivedCount = count($rangeNotReceived);
+
+			if ($notReceivedCount > 0) {
+				$this->addMissingParts($rangeNotReceived, $tableNames['prname'], $groupMySQL['id']);
+
+				if ($this->_echoCLI) {
+					$this->_colorCLI->doEcho(
+						$this->_colorCLI->alternate(
+							'Server did not return ' . $notReceivedCount .
+							' articles from ' . $groupMySQL['name'] . '.'
+						), true
+					);
+				}
+			}
+		}
+
+		$currentMicroTime = microtime(true);
+		if ($this->_echoCLI) {
+			$this->_colorCLI->doEcho(
+				$this->_colorCLI->alternateOver($timeHeaders . 's') .
+				$this->_colorCLI->primaryOver(' to download articles, ') .
+				$this->_colorCLI->alternateOver($timeCleaning . 's') .
+				$this->_colorCLI->primaryOver(' to process collections, ') .
+				$this->_colorCLI->alternateOver($timeInsert . 's') .
+				$this->_colorCLI->primaryOver(' to insert binaries/parts, ') .
+				$this->_colorCLI->alternateOver(number_format($currentMicroTime - $startPR, 2) . 's') .
+				$this->_colorCLI->primaryOver(' for part repair, ') .
+				$this->_colorCLI->alternateOver(number_format($currentMicroTime - $startLoop, 2) . 's') .
+				$this->_colorCLI->primary(' total.')
+			);
+		}
+		return $returnArray;
 	}
 
 	/**
@@ -618,17 +744,20 @@ class Binaries
 	}
 
 	/**
-	 * Return internally cached list of binary blacklist patterns.
+	 * Get blacklist and cache it. Return if already cached.
+	 *
+	 * @return void
 	 */
-	public function retrieveBlackList()
+	protected function retrieveBlackList()
 	{
-		if (is_array($this->blackList) && !empty($this->blackList)) {
-			return $this->blackList;
+		if ($this->_blackListLoaded) {
+			return;
 		}
-		$blackList = $this->getBlacklist(true);
-		$this->blackList = $blackList;
-
-		return $blackList;
+		$this->blackList = $this->getBlacklist(true);
+		$this->_blackListLoaded = true;
+		if (count($this->blackList) === 0) {
+			$this->_blackListEmpty = true;
+		}
 	}
 
 	/**
@@ -1064,5 +1193,26 @@ class Binaries
 		}
 
 		return $date;
+	}
+
+	/**
+	 * Log / Echo message.
+	 *
+	 * @param string $message Message to log.
+	 * @param string $method  Method that called this.
+	 * @param int    $level   Logger severity level constant.
+	 * @param string $color   ColorCLI method name.
+	 */
+	private function log($message, $method, $level, $color)
+	{
+		if ($this->_echoCLI) {
+			$this->_colorCLI->doEcho(
+				$this->_colorCLI->$color($message), true
+			);
+		}
+
+		if ($this->_debug) {
+			$this->_debugging->log('Binaries', $method, $message, $level);
+		}
 	}
 }
