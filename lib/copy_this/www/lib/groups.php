@@ -117,7 +117,7 @@ class Groups
 	public function getIDByName($name)
 	{
 		$db = new DB();
-		$res = $db->queryOneRow(sprintf("SELECT id FROM groups WHERE name = %s", $db->escapeString($name)));
+		$res = $db->queryOneRow(sprintf("SELECT ID FROM groups WHERE name = %s", $db->escapeString($name)));
 		return ($res === false ? '' : $res["ID"]);
 	}
 

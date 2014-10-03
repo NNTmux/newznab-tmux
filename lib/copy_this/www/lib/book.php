@@ -34,7 +34,7 @@ class Book
 	public function getBookInfo($id)
 	{
 		$db = new DB();
-		return $db->queryOneRow(sprintf("SELECT bookinfo.*, genres.title as genres FROM bookinfo left outer join genres on genres.ID = bookinfo.genreID where bookinfo.ID = %fcategory ", $id));
+		return $db->queryOneRow(sprintf("SELECT bookinfo.*, genres.title as genres FROM bookinfo left outer join genres on genres.ID = bookinfo.genreID where bookinfo.ID = %d ", $id));
 	}
 
 	/**
