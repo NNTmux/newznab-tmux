@@ -26,11 +26,15 @@
 									class="library-console"
 								{elseif $type == 'Movies'}
 									class="library-show"
+								{elseif $type == 'XXX'}
+									class="library-show"
 								{elseif $type == 'Audio'}
 									class="library-music"
 								{elseif $type == 'Books'}
 									class="library-show"
 								{elseif $type == 'PC'}
+									class="library-games"
+								{elseif $type == 'TV'}
 									class="library-games"
 								{/if}
 								>
@@ -39,19 +43,25 @@
 								   href="{$smarty.const.WWW_TOP}/details/{$result.guid}">
 									{if $type == 'Console'}
 										<img width="130px" alt=""
-											 src="{$smarty.const.WWW_TOP}covers/console/{$result.consoleinfoID}.jpg"/>
+											 src="{$smarty.const.WWW_TOP}/covers/console/{$result.consoleinfoID}.jpg"/>
 									{elseif $type == 'Movies'}
 										<img width="140px" height="205px" alt=""
-											 src="{$smarty.const.WWW_TOP}covers/movies/{$result.imdbID}-cover.jpg"/>
+											 src="{$smarty.const.WWW_TOP}/covers/movies/{$result.imdbID}-cover.jpg"/>
+									{elseif $type == 'XXX'}
+										<img width="140px" height="205px" alt=""
+											 src="{$smarty.const.WWW_TOP}/covers/xxx/{$result.xxxinfo_id}-cover.jpg"/>
 									{elseif $type == 'Audio'}
 										<img height="250px" width="250px" alt=""
-											 src="{$smarty.const.WWW_TOP}covers/music/{$result.musicinfoID}.jpg"/>
+											 src="{$smarty.const.WWW_TOP}/covers/music/{$result.musicinfoID}.jpg"/>
 									{elseif $type == 'Books'}
 										<img height="140px" width="205px" alt=""
-											 src="{$smarty.const.WWW_TOP}covers/book/{$result.bookinfoID}.jpg"/>
+											 src="{$smarty.const.WWW_TOP}/covers/book/{$result.bookinfoID}.jpg"/>
 									{elseif $type == 'PC'}
 										<img height="130px" width="130px" alt=""
-											 src="{$smarty.const.WWW_TOP}covers/games/{$result.gamesinfo_id}.jpg"/>
+											 src="{$smarty.const.WWW_TOP}/covers/games/{$result.gamesinfo_id}.jpg"/>
+									{elseif $type == 'TV'}
+										<img height="130px" width="130px" alt=""
+											 src="{$smarty.const.WWW_TOP}/getimage?type=tvrage&amp;id={$result.tvid}"/>
 									{/if}
 								</a>
 							</div>
@@ -129,6 +139,7 @@
 											   href="{$site->dereferrer_link}http://predb.me/?cats=games&search={$result.searchname|escape:"url"}"
 											   target="_blank"></a>
 										</div>
+
 									{elseif $type == 'Audio'}
 										<div class="icon icon_discogs">
 											<a class="divlink" title="Find on Discogs"
@@ -159,6 +170,12 @@
 										<div class="icon icon_shelfari">
 											<a class="divlink" title="Find on Shelfari"
 											   href="{$site->dereferrer_link}http://www.shelfari.com/search/books?Keywords={if $result.author != ""}{$result.author|escape:"url"}{"+-+"}{/if}{$result.booktitle|escape:"url"}"
+											   target="_blank"></a>
+										</div>
+									{elseif $type == 'TV'}
+										<div class="icon icon_tvrage">
+											<a class="divlink" title="View in TvRage"
+											   href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$result.rageID}"
 											   target="_blank"></a>
 										</div>
 									{/if}

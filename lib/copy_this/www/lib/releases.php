@@ -2336,6 +2336,52 @@ class Releases
 	}
 
 	/**
+	 * Get all newest xxx with covers for poster wall.
+	 *
+	 * @return array
+	 */
+	public function getNewestXXX()
+	{
+		$db = new DB();
+		return $db->queryDirect(
+			"SELECT r.xxxinfo_id, r.guid, r.name, r.searchname, r.size, r.completion,
+				r.postdate, r.categoryID, r.comments, r.grabs,
+				xxx.cover, xxx.title
+			FROM releases r
+			INNER JOIN xxxinfo xxx ON r.xxxinfo_id = xxx.id
+			WHERE r.categoryID BETWEEN 6000 AND 6040
+			AND xxx.id > 0
+			AND xxx.cover = 1
+			GROUP BY xxx.id
+			ORDER BY r.postdate DESC
+			LIMIT 24"
+		);
+	}
+
+	/**
+	 * Get all newest TV with covers for poster wall.
+	 *
+	 * @return array
+	 */
+	public function getNewestTV()
+	{
+		$db = new DB();
+		return $db->queryDirect(
+			"SELECT r.rageID, r.guid, r.name, r.searchname, r.size, r.completion,
+				r.postdate, r.categoryID, r.comments, r.grabs,
+				tv.ID as tvid, tv.imgdata, tv.releasetitle as tvtitle
+			FROM releases r
+			INNER JOIN tvrage tv USING (rageID)
+			WHERE r.categoryID BETWEEN 5000 AND 5999
+			AND tv.rageID > 0
+			AND length(tv.imgdata) > 0
+			GROUP BY tv.rageID
+			ORDER BY r.postdate DESC
+			LIMIT 24"
+		);
+	}
+
+	/**
 	 * Process RequestID's.
 	 *
 	 * @param int|string  $groupID
