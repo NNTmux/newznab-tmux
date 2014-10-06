@@ -22,6 +22,7 @@ require_once(WWW_DIR . "lib/XXX.php");
 require_once(WWW_DIR . "lib/Logger.php");
 require_once(WWW_DIR . "/lib/ConsoleTools.php");
 require_once(WWW_DIR . "/lib/ColorCLI.php");
+require_once(WWW_DIR . "/post/AniDB.php");
 require_once("nzbcontents.php");
 require_once("namefixer.php");
 require_once("Info.php");
@@ -159,10 +160,8 @@ class PProcess
 	 */
 	public function processAnime()
 	{
-		if ($this->site->lookupanidb == 1) {
-			$anidb = new AniDB(['Echo' => $this->echooutput, 'Settings' => $this->pdo]);
-			$anidb->animetitlesUpdate();
-			$anidb->processAnimeReleases();
+		if ($this->site->lookupanidb != 0) {
+			(new \PostAniDB(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processAnimeReleases();
 		}
 	}
 

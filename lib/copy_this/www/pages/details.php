@@ -161,7 +161,7 @@ if (isset($_GET["id"]))
 	$AniDBAPIArray = '';
 	if ($data["anidbID"] > 0)
 	{
-		$AniDB = new AniDB();
+		$AniDB = new AniDB(['Settings' => $releases->db]);
 		$AniDBAPIArray = $AniDB->getAnimeInfo($data["anidbID"]);
 	}
 

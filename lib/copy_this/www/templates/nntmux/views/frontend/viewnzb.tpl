@@ -15,7 +15,7 @@
 {if $xxx && $xxx.cover == 1}<img class="shadow" src="{$smarty.const.WWW_TOP}/covers/xxx/{$xxx.id}-cover.jpg" width="160"
 								 alt="{$movie.title|escape:"htmlall"}" style="float:right;" />{/if}
 {if $anidb && $release.anidbID > 0 && $anidb.picture != ""}<img class="shadow"
-																src="{$smarty.const.WWW_TOP}/covers/anime/{$anidb.anidbID}.jpg"
+																src="{$smarty.const.WWW_TOP}/covers/anime/{$anidb.anidbid}.jpg"
 																width="180" alt="{$anidb.title|escape:"htmlall"}"
 																style="float:right;" />{/if}
 {if $con && $con.cover == 1}<img class="shadow" src="{$smarty.const.WWW_TOP}/covers/console/{$con.ID}.jpg" width="160"
@@ -165,7 +165,7 @@
 				<a class="rndbtn" title="View all episodes from this anime"
 				   href="{$smarty.const.WWW_TOP}/anime/{$release.anidbID}">All Episodes</a>
 				<a class="rndbtn" target="_blank"
-				   href="{$site->dereferrer_link}http://anidb.net/perl-bin/animedb.pl?show=anime&aid={$anidb.anidbID}"
+				   href="{$site->dereferrer_link}http://anidb.net/perl-bin/animedb.pl?show=anime&aid={$anidb.anidbid}"
 				   title="View at AniDB">AniDB</a>
 				{if $release.tvdbID > 0}<a class="rndbtn" target="_blank"
 										   href="{$site->dereferrer_link}http://thetvdb.com/?tab=series&id={$release.tvdbID}&lid=7"

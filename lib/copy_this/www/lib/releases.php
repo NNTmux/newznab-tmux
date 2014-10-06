@@ -90,6 +90,10 @@ class Releases
 	public $sphinxSearch;
 
 	/**
+	 * @var DB
+	 */
+	public $db;
+	/**
 	 * Get a list of releases by an array of names
 	 */
 	public function getByNames($names)

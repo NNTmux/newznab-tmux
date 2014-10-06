@@ -105,9 +105,8 @@ switch ($argv[1]) {
 		$postProcess->processXXX();
 		break;
 	case 'anime':
-		exit;
-	//$postProcess->processAnime();
-	//break;
+		$postProcess->processAnime();
+		break;
 	case 'book':
 		$postProcess->processBooks();
 		$pp->processBooks();
