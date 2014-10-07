@@ -1,8 +1,8 @@
 <?php
-//This inserts the patches into MySQL and PostgreSQL.
 
 require_once(dirname(__FILE__)."/../../bin/config.php");
 require_once (WWW_DIR.'/lib/site.php');
+require_once (WWW_DIR.'/lib/util.php');
 require_once(WWW_DIR . "/lib/ColorCLI.php");
 require_once(WWW_DIR.'/lib/Tmux.php');
 require_once(WWW_DIR.'/lib/smarty/Smarty.class.php');
@@ -81,7 +81,7 @@ function BackupDatabase()
 	$c = new ColorCLI();
 	$DIR = dirname (__FILE__);
 
-	if (Util::hasCommand("php5")) {
+	if (Utility::hasCommand("php5")) {
 		$PHP = "php5";
 	} else {
 		$PHP = "php";
