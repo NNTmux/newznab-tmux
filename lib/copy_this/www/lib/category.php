@@ -184,6 +184,17 @@ class Category
 	}
 
 	/**
+	 * Returns category ID's for site disabled categories.
+	 *
+	 * @return array
+	 */
+	public function getDisabledIDs()
+	{
+		$db = new DB();
+
+		return $db->query("SELECT ID FROM category WHERE status = 2 OR parentID IN (SELECT ID FROM category WHERE status = 2 AND parentID IS NULL)");
+	}
+	/**
 	 * Get a category row by its ID.
 	 */
 	public function getById($id)

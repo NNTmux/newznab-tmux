@@ -40,7 +40,6 @@ class Binaries
 		$site = $s->get();
 		$this->messageBuffer = ($site->maxmssgs != '') ? $site->maxmssgs : 20000;
 		$this->compressedHeaders = ($site->compressedheaders == "1") ? true : false;
-		$this->messagebuffer = (!empty($site->maxmssgs)) ? $site->maxmssgs : 20000;
 		$this->MaxMsgsPerRun = (!empty($site->maxmsgsperrun)) ? $site->maxmsgsperrun : 200000;
 		$this->NewGroupScanByDays = ($site->newgroupscanmethod == "1") ? true : false;
 		$this->NewGroupMsgsToScan = (!empty($site->newgroupmsgstoscan)) ? $site->newgroupmsgstoscan : 50000;
@@ -181,7 +180,7 @@ class Binaries
 
 		// Generate postdates for first and last records, for those that upgraded
 		if ((is_null($groupArr['first_record_postdate']) || is_null($groupArr['last_record_postdate'])) && ($groupArr['last_record'] != "0" && $groupArr['first_record'] != "0"))
-			$db->queryExec(sprintf("update groups SET first_record_postdate = FROM_UNIXTIME(" . $this->postdate($groupArr['first_record'], $data) . "), last_record_postdate = FROM_UNIXTIME(" . $this->postdate($groupArr['last_record'], $data) . ") WHERE ID = %d", $groupArr['ID']));
+			$db->queryExec(sprintf("update groups SET first_record_postdate = FROM_UNIXTIME(" . $this->postdate($groupArr['first_record'], $data) . "), last_record_postdate = FROM_UNIXTIME(" . $backfill->postdate($nntp, $groupArr['last_record'], false) . ") WHERE ID = %d", $groupArr['ID']));
 
 		// Deactivate empty groups
 		if (($data['last'] - $data['first']) <= 5)
@@ -203,15 +202,15 @@ class Binaries
 
 			$done = false;
 
-			// Get all the parts (in portions of $this->messagebuffer to not use too much memory)
+			// Get all the parts (in portions of $this->messageBuffer to not use too much memory)
 			while ($done === false) {
 				$this->startLoop = microtime(true);
 
-				if ($total > $this->messagebuffer) {
-					if ($first + $this->messagebuffer > $grouplast)
+				if ($total > $this->messageBuffer) {
+					if ($first + $this->messageBuffer > $grouplast)
 						$last = $grouplast;
 					else
-						$last = $first + $this->messagebuffer;
+						$last = $first + $this->messageBuffer;
 				}
 
 				echo "Getting " . number_format($last - $first + 1) . " parts (" . $first . " to " . $last . ") - " . number_format($grouplast - $last) . " in queue" . $n;

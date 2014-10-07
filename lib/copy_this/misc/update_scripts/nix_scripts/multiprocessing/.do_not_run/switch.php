@@ -76,47 +76,48 @@ switch ($options[1]) {
 		}
 		$binaries = new \Binaries();
 		$return = $binaries->scan($nntp, $groupMySQL, $options[4], $options[5], ($site->safepartrepair == 1 ? 'update' : 'backfill'));
+		var_dump($return);
 		if (empty($return)) {
 			exit();
 		}
 		$columns = [];
 		switch ($options[2]) {
 			case 'binaries':
-				if ($return['lastArticleNumber'] <= $groupMySQL['last_record']){
+				if ($return['last_record'] <= $groupMySQL['last_record']){
 					exit();
 				}
 				$columns[1] = sprintf(
 					'last_record_postdate = %s',
 					$pdo->from_unixtime(
-						(is_numeric($return['lastArticleDate']) ? $return['lastArticleDate'] : strtotime($return['lastArticleDate']))
+						(is_numeric($return['last_record_postdate']) ? $return['last_record_postdate'] : strtotime($return['last_record_postdate']))
 					)
 				);
-				$columns[2] = sprintf('last_record = %s', $return['lastArticleNumber']);
+				$columns[2] = sprintf('last_record = %s', $return['last_record']);
 				$query = sprintf(
 					'UPDATE groups SET %s, %s, last_updated = NOW() WHERE ID = %d AND last_record < %s',
 					$columns[1],
 					$columns[2],
 					$groupMySQL['ID'],
-					$return['lastArticleNumber']
+					$return['last_record']
 				);
 				break;
 			case 'backfill':
-				if ($return['firstArticleNumber'] >= $groupMySQL['first_record']){
+				if ($return['first_record'] >= $groupMySQL['first_record']){
 					exit();
 				}
 				$columns[1] = sprintf(
 					'first_record_postdate = %s',
 					$pdo->from_unixtime(
-						(is_numeric($return['firstArticleDate']) ? $return['firstArticleDate'] : strtotime($return['firstArticleDate']))
+						(is_numeric($return['first_record_postadate']) ? $return['first_record_postdate'] : strtotime($return['first_record_postdate']))
 					)
 				);
-				$columns[2] = sprintf('first_record = %s', $return['firstArticleNumber']);
+				$columns[2] = sprintf('first_record = %s', $return['first_record']);
 				$query = sprintf(
 					'UPDATE groups SET %s, %s, last_updated = NOW() WHERE ID = %d AND first_record > %s',
 					$columns[1],
 					$columns[2],
 					$groupMySQL['ID'],
-					$return['firstArticleNumber']
+					$return['first_record']
 				);
 				break;
 			default:
@@ -148,15 +149,10 @@ switch ($options[1]) {
 	// $options[2] => (string)groupCount, number of groups terminated by _ | (int)groupID, group to work on
 	case 'releases':
 		$pdo = new \DB();
-		$releases = new \Releases();
+		$releases = new \Releases(['Settings' => $pdo]);
 
 		//Runs function that are per group
 		if (is_numeric($options[2])) {
-
-			if ($options[0] === 'python') {
-				collectionCheck($pdo, $options[2]);
-			}
-
 			processReleases($releases, $options[2]);
 
 		} else {
@@ -219,11 +215,8 @@ switch ($options[1]) {
 			// BackFill the group with 20k articles.
 			$backFill->backfillAllGroups($groupMySQL['name'], 20000, 'normal');
 
-			// Check if we got anything from binaries/backFill, exit if not.
-			collectionCheck($pdo, $options[2]);
-
 			// Create releases.
-			processReleases(new \Releases(), $options[2]);
+			processReleases(new \Releases(['Settings' => $pdo]), $options[2]);
 
 			// Post process the releases.
 			(new \ProcessAdditional(['Echo' => true, 'NNTP' => $nntp, 'Settings' => $pdo]))->start($options[2]);
@@ -283,12 +276,8 @@ switch ($options[1]) {
  */
 function processReleases($releases, $groupID)
 {
-	$releases->processIncompleteCollections($groupID);
-	$releases->processCollectionSizes($groupID);
-	$releases->deleteUnwantedCollections($groupID);
 	$releases->createReleases($groupID);
 	$releases->createNZBs($groupID);
-	$releases->deleteCollections($groupID);
 }
 
 /**
