@@ -885,20 +885,6 @@
 </fieldset>
 
 <fieldset>
-	<legend>TraktTV API Key</legend>
-	<table class="input">
-		<tr>
-			<td style="width:180px;"><label for="trakttvkey">Trakt.tv API key:</label></td>
-			<td>
-				<input id="trakttvkey" class="long" name="trakttvkey" type="text" value="{$fsite->trakttvkey}"/>
-
-				<div class="hint">The trakt.tv api key. Used for movie and tv lookups.</div>
-			</td>
-		</tr>
-	</table>
-</fieldset>
-
-<fieldset>
 	<legend>IMDB.com URL</legend>
 	<table class="input">
 		<tr>
