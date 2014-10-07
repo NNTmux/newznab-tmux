@@ -181,7 +181,7 @@ class Binaries
 
 		// Generate postdates for first and last records, for those that upgraded
 		if ((is_null($groupArr['first_record_postdate']) || is_null($groupArr['last_record_postdate'])) && ($groupArr['last_record'] != "0" && $groupArr['first_record'] != "0"))
-			$db->queryExec(sprintf("update groups SET first_record_postdate = FROM_UNIXTIME(" . $this->postdate($groupArr['first_record'], $data) . "), last_record_postdate = FROM_UNIXTIME(" . $backfill->postdate($nntp, $groupArr['last_record'], false) . ") WHERE ID = %d", $groupArr['ID']));
+			$db->queryExec(sprintf("update groups SET first_record_postdate = FROM_UNIXTIME(" . $this->postdate($groupArr['first_record'], $data) . "), last_record_postdate = FROM_UNIXTIME(" . $this->postdate($groupArr['last_record'], $data) . ") WHERE ID = %d", $groupArr['ID']));
 
 		// Deactivate empty groups
 		if (($data['last'] - $data['first']) <= 5)
