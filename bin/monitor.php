@@ -1282,8 +1282,8 @@ while ($i > 0) {
 
 	if ($releases_run != 0) {
 		$run_releases = ($site->tablepergroup == 0
-			? "cd $_bin && $_php update_releases.php 1 false 2>&1 $log"
-			: "$_php ${DIR}/../../multiprocessing/releases.php 2>&1 $log"
+			? "cd $_bin && $_php update_releases.php 1 false "
+			: "$_php ${DIR}/../../multiprocessing/releases.php "
 		);
 	}
 
@@ -1486,7 +1486,7 @@ while ($i > 0) {
 		if (($maxloadr >= get_load()) && ($releases_run == 2)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			$log = writelog($panes0[5]);
-			shell_exec("tmux respawnp -t${tmux_session}:0.5 'echo \"\033[38;5;\"$color\"m\" && cd $_py && $_python ${DIR}/../python/releases_threaded.py $log; $_sleep $rel_timer' 2>&1 1> /dev/null");
+			shell_exec("tmux respawnp -t${tmux_session}:0.5 'echo \"\033[38;5;\"$color\"m\" &&  $_sleep $rel_timer' 2>&1 1> /dev/null");
 		} elseif (($maxloadr >= get_load()) && ($releases_run == 1)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			$log = writelog($panes0[5]);
@@ -1494,7 +1494,7 @@ while ($i > 0) {
 		} elseif (($maxloadr >= get_load()) && ($releases_run == 2)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			$log = writelog($panes0[5]);
-			shell_exec("tmux respawnp -t${tmux_session}:0.5 'echo \"\033[38;5;\"$color\"m\" && cd $_py && $_python ${DIR}/../python/releases_threaded.py $log; $_sleep $rel_timer' 2>&1 1> /dev/null");
+			shell_exec("tmux respawnp -t${tmux_session}:0.5 'echo \"\033[38;5;\"$color\"m\" && $run_releases $log; $_sleep $rel_timer' 2>&1 1> /dev/null");
 		} elseif (($maxloadr >= get_load()) && ($releases_run == 1)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			$log = writelog($panes0[5]);
