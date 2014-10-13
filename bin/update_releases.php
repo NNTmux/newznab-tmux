@@ -5,6 +5,7 @@ require_once(WWW_DIR . "/lib/releases.php");
 require_once(WWW_DIR . "/lib/ColorCLI.php");
 require_once(WWW_DIR . "/lib/nntp.php");
 require_once(WWW_DIR . "/lib/site.php");
+require_once(WWW_DIR . "/lib/ConsoleTools.php");
 
 
 

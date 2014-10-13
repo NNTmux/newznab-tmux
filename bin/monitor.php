@@ -8,7 +8,7 @@ require_once(WWW_DIR . "/lib/showsleep.php");
 require_once(dirname(__FILE__) . "/../lib/functions.php");
 
 
-$version = "0.5r0000";
+$version = "0.5r0002";
 
 $pdo = new DB();
 $s = new Sites();
@@ -17,6 +17,7 @@ $patch = $site->dbversion;
 $c = new ColorCLI();
 $DIR = dirname(__FILE__);
 $alternate_nntp = ($site->alternate_nntp === '1') ? true : false;
+$tablepergroup = (isset($site->tablepergroup)) ? $site->tablepergroup : 0;
 $port = NNTP_PORT;
 $host = NNTP_SERVER;
 $ip = gethostbyname($host);
@@ -59,11 +60,12 @@ $proc = "SELECT
 ( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE categoryID BETWEEN 5000 AND 5999 AND rageID = -1) AS tv,
 ( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE categoryID = 7020 AND bookinfoID IS NULL ) AS book,
 ( SELECT COUNT(*) FROM releases r INNER JOIN category c ON c.ID = r.categoryID WHERE r.nzbstatus = 1 AND ((r.passwordstatus BETWEEN -6 AND -1 AND r.haspreview = -1 AND c.disablepreview = 0) OR (r.categoryID = 4050 AND r.gamesinfo_id IS NULL) OR (categoryID BETWEEN 6000 AND 6040 AND xxxinfo_id = 0))) AS work,
+( SELECT COUNT(*) FROM partrepair WHERE attempts < 5) AS partrepair_table,
 ( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status)) AS releases,
 ( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE releasenfoID = 0 AND nfostatus BETWEEN -6 AND -1) AS nforemains,
 ( SELECT COUNT(*) FROM releases USE INDEX(ix_releases_status) WHERE nfostatus = 1 OR releasenfoID > 0) AS nfo,
 ( SELECT table_rows AS cnt FROM information_schema.TABLES WHERE table_name = 'parts' AND TABLE_SCHEMA = '" . DB_NAME . "' ) AS parts,
-( SELECT COUNT(ID) FROM binaries WHERE procstat = 0 ) AS binaries,
+( SELECT COUNT(ID) FROM binaries WHERE procstat = 0 ) AS binaries_table,
 ( SELECT table_rows AS cnt FROM information_schema.TABLES WHERE table_name = 'binaries' AND TABLE_SCHEMA = '" . DB_NAME . "' ) AS binaries_total,
 ( SELECT concat(round((data_length+index_length)/(1024*1024*1024),2),'GB') AS cnt FROM information_schema.tables WHERE table_name = 'parts' AND TABLE_SCHEMA = '" . DB_NAME . "' ) AS partsize,
 ( SELECT concat(round((data_length+index_length)/(1024*1024*1024),2),'GB') AS cnt FROM information_schema.tables WHERE table_name = 'binaries' AND TABLE_SCHEMA = '" . DB_NAME . "' ) AS binariessize,
@@ -73,6 +75,7 @@ $proc = "SELECT
 ( SELECT UNIX_TIMESTAMP(predate) from prehash order by predate DESC limit 1 ) AS newestprehash,
 ( SELECT UNIX_TIMESTAMP(updatedate) from predb order by updatedate DESC limit 1 ) AS newestpredb,
 ( SELECT TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES WHERE table_name = 'prehash' AND TABLE_SCHEMA = '" . DB_NAME . "' ) AS prehash,
+( SELECT TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES WHERE table_name = 'parts' AND TABLE_SCHEMA = '" . DB_NAME . "' ) AS parts_table,
 ( SELECT name from releases order by adddate desc limit 1 ) AS newestaddname";
 //$proc = "SELECT * FROM procCnt;";
 $proc2 = "SELECT
@@ -409,6 +412,7 @@ $usp1activeconnections = 0;
 $usp2activeconnections = 0;
 $usp1totalconnections = 0;
 $usp2totalconnections = 0;
+$parts_table = $binaries_table = $partrepair_table = 0;
 $active_groups = 0;
 $all_groups = 0;
 $backfill_groups = 0;
@@ -490,15 +494,18 @@ if ($fix_names == 1) {
 }
 printf($mask3, "Category", "State", "Reason");
 printf($mask3, "====================", "====================", "====================");
-printf($mask4, "Binaries", "$binaries_state", "$binaries_reason");
 printf($mask4, "Backfill", "$backfill_state", "$backfill_reason");
 printf($mask4, "Import", "$import_state", "$import_reason");
 printf($mask4, "Releases", "$releases_state", "$releases_reason");
-printf($mask4, "Parts", "$parts_size_gb", "$parts_rows rows");
-printf($mask4, "Binaries", "$binaries_size_gb", $binaries_rows . "/" . $binaries_total . " bins");
 if ($monitor_path != "") {
 	printf($mask4, "Ramdisk", "$disk_use", "$disk_free");
 }
+printf($mask4, "Parts in Repair:", number_format($partrepair_table));
+echo "\n";
+printf($mask3, "Binaries", "Parts");
+printf($mask3, "=========================", "======================================");
+printf($mask5,  number_format($binaries_table), number_format($parts_table));
+echo "\n";
 printf($mask3, "Category", "In Process", "In Database");
 printf($mask3, "====================", "====================", "====================");
 if ($fix_names == 1) {
@@ -586,6 +593,36 @@ while ($i > 0) {
 		$proc2_time = (TIME() - $time05);
 		$proc21_time = (TIME() - $time01);
 
+		$time07 = TIME();
+		if ($tablepergroup == 1) {
+			$sql = 'SHOW table status';
+			$tables = $pdo->queryDirect($sql);
+			$binaries_table = $parts_table = $partrepair_table = 0;
+			if (count($tables) > 0) {
+				foreach ($tables as $row) {
+					$tbl = $row['Name'];
+					$stamp = 'UNIX_TIMESTAMP(dateadded)';
+					if (strpos($tbl, 'binaries_') !== false) {
+						$run = $pdo->query('SELECT COUNT(*) AS count FROM ' . $tbl);
+						if (isset($run[0]['count']) && is_numeric($run[0]['count'])) {
+							$binaries_table += $run[0]['count'];
+						}
+					} else if (strpos($tbl, 'parts_') !== false) {
+						$run = $pdo->query('SELECT COUNT(*) AS count FROM ' . $tbl);
+						if (isset($run[0]['count']) && is_numeric($run[0]['count'])) {
+							$parts_table += $run[0]['count'];
+						}
+					} else if (strpos($tbl, 'partrepair_') !== false) {
+						$run = $pdo->query('SELECT COUNT(*) AS count FROM ' . $tbl);
+						if (isset($run[0]['count']) && is_numeric($run[0]['count'])) {
+							$partrepair_table += $run[0]['count'];
+						}
+					}
+				}
+				$tpg_count_time = (TIME() - $time07);
+				$tpg_count_1_time = (TIME() - $time01);
+			}
+		}
 		$time19 = TIME();
 	}
 
@@ -715,16 +752,16 @@ while ($i > 0) {
 		$parts_size_gb = $proc_result[0]['partsize'];
 	}
 
-	if (@$proc_result[0]['binaries'] != null) {
-		$binaries_rows_unformatted = $proc_result[0]['binaries'];
+	if (@$proc_result[0]['binaries_table'] != null) {
+		$binaries_rows_unformatted = $proc_result[0]['binaries_table'];
 	}
-	if (@$proc_result[0]['binaries'] != null) {
-		$binaries_rows = number_format($proc_result[0]['binaries']);
+	if (@$proc_result[0]['binaries_table'] != null) {
+		$binaries_rows = number_format($proc_result[0]['binaries_table']);
 	}
-	if (@$proc_result[0]['binaries'] != null) {
+	if (@$proc_result[0]['binaries_table'] != null) {
 		$binaries_total_unformatted = $proc_result[0]['binaries_total'];
 	}
-	if (@$proc_result[0]['binaries'] != null) {
+	if (@$proc_result[0]['binaries_table'] != null) {
 		$binaries_total = number_format($proc_result[0]['binaries_total']);
 	}
 
@@ -897,6 +934,18 @@ while ($i > 0) {
 	}
 	if ($proc_tmux_result[0]['sharing_timer'] != null) {
 		$sharing_timer = $proc_tmux_result[0]['sharing_timer'];
+	}
+
+	if ($tablepergroup == 0) {
+		if ($proc_result[0]['binaries_table'] != null) {
+			$binaries_table = $proc_result[0]['binaries_table'];
+		}
+		if ($split_result[0]['parts_table'] != null) {
+			$parts_table = $split_result[0]['parts_table'];
+		}
+		if ($proc_result[0]['partrepair_table'] != null) {
+			$partrepair_table = $proc_result[0]['partrepair_table'];
+		}
 	}
 
 
@@ -1215,8 +1264,11 @@ while ($i > 0) {
 	printf($mask4, "Backfill", "$backfill_state", "$backfill_reason");
 	printf($mask4, "Import", "$import_state", "$import_reason");
 	printf($mask4, "Releases", "$releases_state", "$releases_reason");
-	printf($mask4, "Parts", "$parts_size_gb", "$parts_rows rows");
-	printf($mask4, "Binaries", "$binaries_size_gb", $binaries_rows . "/" . $binaries_total . " bins");
+	printf($mask4, "Parts in Repair:", number_format($partrepair_table));
+	echo "\n";
+	printf($mask3, "Binaries", "Parts");
+	printf($mask3,  "=========================", "======================================");
+	printf($mask5, number_format($binaries_table), number_format($parts_table));
 	if ($monitor_path != "") {
 		printf($mask4, "Ramdisk", "$disk_use used", "$disk_free free");
 	}
@@ -1282,8 +1334,8 @@ while ($i > 0) {
 
 	if ($releases_run != 0) {
 		$run_releases = ($site->tablepergroup == 0
-			? "cd $_bin && $_php update_releases.php 1 false "
-			: "$_php ${DIR}/../../multiprocessing/releases.php "
+			? " cd $_bin && $_php update_releases.php 1 false "
+			: " cd $_multi && $_php releases.php "
 		);
 	}
 
@@ -1482,23 +1534,11 @@ while ($i > 0) {
 			shell_exec("tmux respawnp -k -t${tmux_session}:0.1 'echo \"\033[38;5;${color}m\n${panes0[1]} threaded Nfo processing is running in pane 2.0\"'");
 		}
 
-		//runs update_release and in 0.5 once if needed and exits
-		if (($maxloadr >= get_load()) && ($releases_run == 2)) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			$log = writelog($panes0[5]);
-			shell_exec("tmux respawnp -t${tmux_session}:0.5 'echo \"\033[38;5;\"$color\"m\" &&  $_sleep $rel_timer' 2>&1 1> /dev/null");
-		} elseif (($maxloadr >= get_load()) && ($releases_run == 1)) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			$log = writelog($panes0[5]);
-			shell_exec("tmux respawnp -t${tmux_session}:0.5 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php update_releases.php $log; $_sleep $rel_timer' 2>&1 1> /dev/null");
-		} elseif (($maxloadr >= get_load()) && ($releases_run == 2)) {
+		//runs update_releases in 0.5 once if needed and exits
+		if (($maxloadr >= get_load()) && ($releases_run != 0)) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			$log = writelog($panes0[5]);
 			shell_exec("tmux respawnp -t${tmux_session}:0.5 'echo \"\033[38;5;\"$color\"m\" && $run_releases $log; $_sleep $rel_timer' 2>&1 1> /dev/null");
-		} elseif (($maxloadr >= get_load()) && ($releases_run == 1)) {
-			$color = get_color($colors_start, $colors_end, $colors_exc);
-			$log = writelog($panes0[5]);
-			shell_exec("tmux respawnp -t${tmux_session}:0.5 'echo \"\033[38;5;\"$color\"m\" && cd $_bin && $_php update_releases.php $log; $_sleep $rel_timer' 2>&1 1> /dev/null");
 		} elseif (($releases_run !== 0) && ($maxloadr <= get_load())) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);
 			shell_exec("tmux respawnp -t${tmux_session}:0.5 'echo \"\033[38;5;\"$color\"m\n$panes0[5] Disabled by Max Load Releases\"' 2>&1 1> /dev/null");
