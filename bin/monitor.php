@@ -8,7 +8,7 @@ require_once(WWW_DIR . "/lib/showsleep.php");
 require_once(dirname(__FILE__) . "/../lib/functions.php");
 
 
-$version = "0.5r0002";
+$version = "0.5r0005";
 
 $pdo = new DB();
 $s = new Sites();
@@ -500,11 +500,10 @@ printf($mask4, "Releases", "$releases_state", "$releases_reason");
 if ($monitor_path != "") {
 	printf($mask4, "Ramdisk", "$disk_use", "$disk_free");
 }
-printf($mask4, "Parts in Repair:", number_format($partrepair_table));
 echo "\n";
-printf($mask3, "Binaries", "Parts");
-printf($mask3, "=========================", "======================================");
-printf($mask5,  number_format($binaries_table), number_format($parts_table));
+printf($mask3, "Binaries", "Parts", "Parts in Repair");
+printf($mask3, "=========================", "======================================", "=========================");
+printf($mask3,  number_format($binaries_table), number_format($parts_table), number_format($partrepair_table));
 echo "\n";
 printf($mask3, "Category", "In Process", "In Database");
 printf($mask3, "====================", "====================", "====================");
@@ -940,8 +939,8 @@ while ($i > 0) {
 		if ($proc_result[0]['binaries_table'] != null) {
 			$binaries_table = $proc_result[0]['binaries_table'];
 		}
-		if ($split_result[0]['parts_table'] != null) {
-			$parts_table = $split_result[0]['parts_table'];
+		if ($proc_result[0]['parts_table'] != null) {
+			$parts_table = $proc_result[0]['parts_table'];
 		}
 		if ($proc_result[0]['partrepair_table'] != null) {
 			$partrepair_table = $proc_result[0]['partrepair_table'];
@@ -1264,11 +1263,10 @@ while ($i > 0) {
 	printf($mask4, "Backfill", "$backfill_state", "$backfill_reason");
 	printf($mask4, "Import", "$import_state", "$import_reason");
 	printf($mask4, "Releases", "$releases_state", "$releases_reason");
-	printf($mask4, "Parts in Repair:", number_format($partrepair_table));
 	echo "\n";
-	printf($mask3, "Binaries", "Parts");
-	printf($mask3,  "=========================", "======================================");
-	printf($mask5, number_format($binaries_table), number_format($parts_table));
+	printf($mask3, "Binaries", "Parts", "Parts in Repair");
+	printf($mask3, "=========================", "======================================", "=========================");
+	printf($mask3,  number_format($binaries_table), number_format($parts_table), number_format($partrepair_table));
 	if ($monitor_path != "") {
 		printf($mask4, "Ramdisk", "$disk_use used", "$disk_free free");
 	}
