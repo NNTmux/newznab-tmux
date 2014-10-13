@@ -82,7 +82,7 @@ start_time = time.time()
 pathname = os.path.abspath(os.path.dirname(sys.argv[0]))
 
 if len(sys.argv) > 1 and sys.argv[1] == "additional":
-	cur[0].execute("SELECT (SELECT value FROM tmux WHERE setting = 'postthreads') AS a, (SELECT value FROM tmux WHERE setting = 'maxaddprocessed') AS b, (SELECT value FROM tmux WHERE setting = 'maxnfoprocessed') AS c, (SELECT value FROM tmux WHERE setting = 'maximdbprocessed') AS d, (SELECT value FROM tmux WHERE setting = 'maxrageprocessed') AS e, (SELECT value FROM tmux WHERE setting = 'maxsizetopostprocess') AS f, (SELECT value FROM site WHERE setting = 'tmpunrarpath') AS g, (SELECT value FROM tmux WHERE setting = 'post') AS h, (SELECT value FROM tmux WHERE setting = 'post_non') AS i, (SELECT count(*) FROM releases WHERE haspreview = -1 and passwordstatus = -1 "+groupID+") as j, (SELECT count(*) FROM releases WHERE haspreview = -1 and passwordstatus = -2 "+groupID+") as k, (SELECT count(*) FROM releases WHERE haspreview = -1 and passwordstatus = -3 "+groupID+") as l, (SELECT count(*) FROM releases WHERE haspreview = -1 and passwordstatus = -4 "+groupID+") as m, (SELECT count(*) FROM releases WHERE haspreview = -1 and passwordstatus = -5 "+groupID+") as n, (SELECT count(*) FROM releases WHERE haspreview = -1 and passwordstatus = -6 "+groupID+") as o")
+	cur[0].execute("SELECT (SELECT value FROM site WHERE setting = 'postthreads') AS a, (SELECT value FROM site WHERE setting = 'maxaddprocessed') AS b, (SELECT value FROM site WHERE setting = 'maxnfoprocessed') AS c, (SELECT value FROM site WHERE setting = 'maximdbprocessed') AS d, (SELECT value FROM site WHERE setting = 'maxrageprocessed') AS e, (SELECT value FROM site WHERE setting = 'maxsizetopostprocess') AS f, (SELECT value FROM site WHERE setting = 'tmpunrarpath') AS g, (SELECT value FROM tmux WHERE setting = 'post') AS h, (SELECT value FROM tmux WHERE setting = 'post_non') AS i, (SELECT count(*) FROM releases WHERE haspreview = -1 and passwordstatus = -1 "+groupID+") as j, (SELECT count(*) FROM releases WHERE haspreview = -1 and passwordstatus = -2 "+groupID+") as k, (SELECT count(*) FROM releases WHERE haspreview = -1 and passwordstatus = -3 "+groupID+") as l, (SELECT count(*) FROM releases WHERE haspreview = -1 and passwordstatus = -4 "+groupID+") as m, (SELECT count(*) FROM releases WHERE haspreview = -1 and passwordstatus = -5 "+groupID+") as n, (SELECT count(*) FROM releases WHERE haspreview = -1 and passwordstatus = -6 "+groupID+") as o")
 	dbgrab = cur[0].fetchall()
 	ps1 = format(int(dbgrab[0][9]))
 	ps2 = format(int(dbgrab[0][10]))
@@ -91,7 +91,7 @@ if len(sys.argv) > 1 and sys.argv[1] == "additional":
 	ps5 = format(int(dbgrab[0][13]))
 	ps6 = format(int(dbgrab[0][14]))
 elif len(sys.argv) > 1 and sys.argv[1] == "nfo":
-	cur[0].execute("SELECT (SELECT value FROM tmux WHERE setting = 'postthreads') AS a, (SELECT value FROM tmux WHERE setting = 'maxaddprocessed') AS b, (SELECT value FROM tmux WHERE setting = 'maxnfoprocessed') AS c, (SELECT value FROM tmux WHERE setting = 'maximdbprocessed') AS d, (SELECT value FROM tmux WHERE setting = 'maxrageprocessed') AS e, (SELECT value FROM tmux WHERE setting = 'maxsizetopostprocess') AS f, (SELECT value FROM site WHERE setting = 'tmpunrarpath') AS g, (SELECT value FROM tmux WHERE setting = 'post') AS h, (SELECT value FROM tmux WHERE setting = 'post_non') AS i, (SELECT count(*) FROM releases WHERE nfostatus = -1 AND releasenfoID = 0 "+groupID+") as j, (SELECT count(*) FROM releases WHERE nfostatus = -2 AND releasenfoID = 0 "+groupID+") as k, (SELECT count(*) FROM releases WHERE nfostatus = -3 AND releasenfoID = 0 "+groupID+") as l, (SELECT count(*) FROM releases WHERE nfostatus = -4 AND releasenfoID = 0 "+groupID+") as m, (SELECT count(*) FROM releases WHERE nfostatus = -5 AND releasenfoID = 0 "+groupID+") as n, (SELECT count(*) FROM releases WHERE nfostatus = -6 AND releasenfoID = 0 "+groupID+") as o")
+	cur[0].execute("SELECT (SELECT value FROM site WHERE setting = 'nfothreads') AS a, (SELECT value FROM site WHERE setting = 'maxaddprocessed') AS b, (SELECT value FROM site WHERE setting = 'maxnfoprocessed') AS c, (SELECT value FROM site WHERE setting = 'maximdbprocessed') AS d, (SELECT value FROM site WHERE setting = 'maxrageprocessed') AS e, (SELECT value FROM site WHERE setting = 'maxsizetopostprocess') AS f, (SELECT value FROM site WHERE setting = 'tmpunrarpath') AS g, (SELECT value FROM tmux WHERE setting = 'post') AS h, (SELECT value FROM tmux WHERE setting = 'post_non') AS i, (SELECT count(*) FROM releases WHERE nfostatus = -1 "+groupID+") as j, (SELECT count(*) FROM releases WHERE nfostatus = -2 "+groupID+") as k, (SELECT count(*) FROM releases WHERE nfostatus = -3 "+groupID+") as l, (SELECT count(*) FROM releases WHERE nfostatus = -4 "+groupID+") as m, (SELECT count(*) FROM releases WHERE nfostatus = -5 "+groupID+") as n, (SELECT count(*) FROM releases WHERE nfostatus = -6 "+groupID+") as o")
 	dbgrab = cur[0].fetchall()
 	ps1 = format(int(dbgrab[0][9]))
 	ps2 = format(int(dbgrab[0][10]))
@@ -100,7 +100,7 @@ elif len(sys.argv) > 1 and sys.argv[1] == "nfo":
 	ps5 = format(int(dbgrab[0][13]))
 	ps6 = format(int(dbgrab[0][14]))
 elif len(sys.argv) > 1 and (sys.argv[1] == "movie" or sys.argv[1] == "tv"):
-	cur[0].execute("SELECT(SELECT value FROM tmux WHERE setting = 'postthreadsnon') AS a, (SELECT value FROM tmux WHERE setting = 'maxaddprocessed') AS b, (SELECT value FROM tmux WHERE setting = 'maxnfoprocessed') AS c, (SELECT value FROM tmux WHERE setting = 'maximdbprocessed') AS d, (SELECT value FROM tmux WHERE setting = 'maxrageprocessed') AS e, (SELECT value FROM tmux WHERE setting = 'maxsizetopostprocess') AS f, (SELECT value FROM site WHERE setting = 'tmpunrarpath') AS g, (SELECT value FROM tmux WHERE setting = 'post') AS h, (SELECT value FROM tmux WHERE setting = 'post_non') AS i")
+	cur[0].execute("SELECT(SELECT value FROM site WHERE setting = 'postthreadsnon') AS a, (SELECT value FROM site WHERE setting = 'maxaddprocessed') AS b, (SELECT value FROM site WHERE setting = 'maxnfoprocessed') AS c, (SELECT value FROM site WHERE setting = 'maximdbprocessed') AS d, (SELECT value FROM site WHERE setting = 'maxrageprocessed') AS e, (SELECT value FROM site WHERE setting = 'maxsizetopostprocess') AS f, (SELECT value FROM site WHERE setting = 'tmpunrarpath') AS g, (SELECT value FROM tmux WHERE setting = 'post') AS h, (SELECT value FROM tmux WHERE setting = 'post_non') AS i")
 	dbgrab = cur[0].fetchall()
 else:
 	print(bcolors.ERROR + "\nAn argument is required, \npostprocess_threaded.py [additional, nfo, movie, tv]\n" + bcolors.ENDC)
@@ -117,8 +117,6 @@ posttorun = int(dbgrab[0][7])
 postnon = dbgrab[0][8]
 maxsize = (int(maxsizeck * 1073741824))
 
-if sys.argv[1] == "additional" or sys.argv[1] == "nfo":
-	print(bcolors.HEADER + "Available to process: -6 = {}, -5 = {}, -4 = {}, -3 = {}, -2 = {}, -1 = {}".format(ps6, ps5, ps4, ps3, ps2, ps1) + bcolors.ENDC);
 
 if maxsize == 0:
 	maxsize = ''
@@ -132,78 +130,23 @@ process_additional = run_threads * ppperrun
 process_nfo = run_threads * nfoperrun
 
 if sys.argv[1] == "additional":
-	run = "SELECT r.ID, r.guid, r.name, c.disablepreview, r.size, r.groupID, r.nfostatus, r.releasenfoID, r.categoryID, r.searchname from releases r LEFT JOIN category c ON c.ID = r.categoryID WHERE nzbstatus = 1 "+maxsize+" AND r.passwordstatus = -1 AND r.haspreview = -1 AND c.disablepreview = 0 "+groupID+" ORDER BY postdate DESC LIMIT %s"
-	cur[0].execute(run, process_additional)
+	cur[0].execute("SELECT LEFT(r.guid, 1) FROM releases r LEFT JOIN category c ON c.ID = r.categoryID WHERE r.nzbstatus = 1 "+maxsize+" AND (r.haspreview = -1 AND c.disablepreview = 0) AND r.passwordstatus BETWEEN -6 AND -1 GROUP BY LEFT(r.guid, 1) LIMIT 16")
 	datas = cur[0].fetchall()
-	maxtries = -1
-	if len(datas) < process_additional:
-		run = "SELECT r.ID, r.guid, r.name, c.disablepreview, r.size, r.groupID, r.nfostatus, r.releasenfoID, r.categoryID, r.searchname from releases r LEFT JOIN category c ON c.ID = r.categoryID WHERE nzbstatus = 1 "+maxsize+" AND r.passwordstatus = -2 AND r.haspreview = -1 AND c.disablepreview = 0 "+groupID+" ORDER BY postdate DESC LIMIT %s"
-		cur[0].execute(run, (process_additional - len(datas)))
-		datas += cur[0].fetchall()
-		maxtries = -2
-		if len(datas) < process_additional:
-			run = "SELECT r.ID, r.guid, r.name, c.disablepreview, r.size, r.groupID, r.nfostatus, r.releasenfoID, r.categoryID, r.searchname from releases r LEFT JOIN category c ON c.ID = r.categoryID WHERE nzbstatus = 1 "+maxsize+" AND r.passwordstatus = -3 AND r.haspreview = -1 AND c.disablepreview = 0 "+groupID+" ORDER BY postdate DESC LIMIT %s"
-			cur[0].execute(run, (process_additional - len(datas)))
-			datas += cur[0].fetchall()
-			maxtries = -3
-			if len(datas) < process_additional:
-				run = "SELECT r.ID, r.guid, r.name, c.disablepreview, r.size, r.groupID, r.nfostatus, r.releasenfoID, r.categoryID, r.searchname from releases r LEFT JOIN category c ON c.ID = r.categoryID WHERE nzbstatus = 1 "+maxsize+" AND r.passwordstatus = -4 AND r.haspreview = -1 AND c.disablepreview = 0 "+groupID+" ORDER BY postdate DESC LIMIT %s"
-				cur[0].execute(run, (process_additional - len(datas)))
-				datas += cur[0].fetchall()
-				maxtries = -4
-				if len(datas) < process_additional:
-					run = "SELECT r.ID, r.guid, r.name, c.disablepreview, r.size, r.groupID, r.nfostatus, r.releasenfoID, r.categoryID, r.searchname from releases r LEFT JOIN category c ON c.ID = r.categoryID WHERE nzbstatus = 1 "+maxsize+" AND r.passwordstatus = -5 AND r.haspreview = -1 AND c.disablepreview = 0 "+groupID+" ORDER BY postdate DESC LIMIT %s"
-					cur[0].execute(run, (process_additional - len(datas)))
-					datas += cur[0].fetchall()
-					maxtries = -5
-					if len(datas) < process_additional:
-						run = "SELECT r.ID, r.guid, r.name, c.disablepreview, r.size, r.groupID, r.nfostatus, r.releasenfoID, r.categoryID, r.searchname from releases r LEFT JOIN category c ON c.ID = r.categoryID WHERE nzbstatus = 1 "+maxsize+" AND r.passwordstatus = -6 AND r.haspreview = -1 AND c.disablepreview = 0 "+groupID+" ORDER BY postdate DESC LIMIT %s"
-						cur[0].execute(run, (process_additional - len(datas)))
-						datas += cur[0].fetchall()
-						maxtries = -6
-
 elif sys.argv[1] == "nfo":
-	cur[0].execute("SELECT ID, guid, groupID, name from releases WHERE nzbstatus = 1 AND releasenfoID = 0 AND nfostatus = -1 "+groupID+" ORDER BY postdate DESC LIMIT "+str(process_nfo))
+	cur[0].execute("SELECT LEFT(guid, 1) FROM releases WHERE nzbstatus = 1 AND nfostatus BETWEEN -8 AND -1 GROUP BY LEFT(guid, 1) LIMIT 16")
 	datas = cur[0].fetchall()
-	maxtries = -1
-	if len(datas) < process_nfo:
-		cur[0].execute("SELECT ID, guid, groupID, name from releases WHERE nzbstatus = 1 AND releasenfoID = 0 AND nfostatus = -2 "+groupID+" ORDER BY postdate DESC LIMIT "+str(process_nfo - len(datas)))
-		datas += cur[0].fetchall()
-		maxtries = -2
-		if len(datas) < process_nfo:
-			cur[0].execute("SELECT ID, guid, groupID, name from releases WHERE nzbstatus = 1 AND releasenfoID = 0 AND nfostatus = -3 "+groupID+" ORDER BY postdate DESC LIMIT "+str(process_nfo - len(datas)))
-			datas += cur[0].fetchall()
-			maxtries = -3
-			if len(datas) < process_nfo:
-				cur[0].execute("SELECT ID, guid, groupID, name from releases WHERE nzbstatus = 1 AND releasenfoID = 0 AND nfostatus = -4 "+groupID+" ORDER BY postdate DESC LIMIT "+str(process_nfo - len(datas)))
-				datas += cur[0].fetchall()
-				maxtries = -4
-				if len(datas) < process_nfo:
-					cur[0].execute("SELECT ID, guid, groupID, name from releases WHERE nzbstatus = 1 AND releasenfoID = 0 AND nfostatus = -5 "+groupID+" ORDER BY postdate DESC LIMIT "+str(process_nfo - len(datas)))
-					datas += cur[0].fetchall()
-					maxtries = -5
-					if len(datas) < process_nfo:
-						cur[0].execute("SELECT ID, guid, groupID, name from releases WHERE nzbstatus = 1 AND releasenfoID = 0 AND nfostatus = -6 "+groupID+" ORDER BY postdate DESC LIMIT "+str(process_nfo - len(datas)))
-						datas += cur[0].fetchall()
-						maxtries = -6
-
-
 elif sys.argv[1] == "movie" and len(sys.argv) == 3 and sys.argv[2] == "clean":
-		run = "SELECT DISTINCT searchname AS name, ID, categoryID from releases WHERE nzbstatus = 1 AND isrenamed = 1 AND searchname IS NOT NULL AND imdbID IS NULL AND categoryID IN (SELECT ID FROM category WHERE parentID = 2000) ORDER BY postdate DESC LIMIT %s"
-		cur[0].execute(run, (run_threads * movieperrun))
-		datas = cur[0].fetchall()
+	cur[0].execute("SELECT LEFT(guid, 1) FROM releases WHERE nzbstatus = 1 AND isrenamed = 1 AND searchname IS NOT NULL AND imdbid IS NULL AND categoryID BETWEEN 2000 AND 2999 GROUP BY LEFT(guid, 1) "+orderBY+" LIMIT 16")
+	datas = cur[0].fetchall()
 elif sys.argv[1] == "movie":
-		run = "SELECT searchname AS name, ID, categoryID from releases WHERE nzbstatus = 1 AND searchname IS NOT NULL AND imdbID IS NULL AND categoryID IN (SELECT ID FROM category WHERE parentID = 2000) ORDER BY postdate DESC LIMIT %s"
-		cur[0].execute(run, (run_threads * movieperrun))
-		datas = cur[0].fetchall()
+	cur[0].execute("SELECT LEFT(guid, 1) FROM releases WHERE nzbstatus = 1 AND searchname IS NOT NULL AND imdbid IS NULL AND categoryID BETWEEN 2000 AND 2999 GROUP BY LEFT(guid, 1) "+orderBY+" LIMIT 16")
+	datas = cur[0].fetchall()
 elif sys.argv[1] == "tv" and len(sys.argv) == 3 and sys.argv[2] == "clean":
-		run = "SELECT searchname, ID from releases WHERE nzbstatus = 1 AND isrenamed = 1 AND searchname IS NOT NULL AND rageID = -1 AND categoryID IN (SELECT ID FROM category WHERE parentID = 5000 ) "+orderBY+" LIMIT %s"
-		cur[0].execute(run, (run_threads * tvrageperrun))
-		datas = cur[0].fetchall()
+	cur[0].execute("SELECT LEFT(guid, 1) FROM releases WHERE nzbstatus = 1 AND isrenamed = 1 AND searchname IS NOT NULL AND rageid = -1 AND categoryID BETWEEN 5000 AND 5999 GROUP BY LEFT(guid, 1) "+orderBY+" LIMIT 16")
+	datas = cur[0].fetchall()
 elif sys.argv[1] == "tv":
-		run = "SELECT searchname, ID from releases WHERE nzbstatus = 1 AND searchname IS NOT NULL AND rageID = -1 AND categoryID IN (SELECT ID FROM category WHERE parentID = 5000 ) "+orderBY+" LIMIT %s"
-		cur[0].execute(run, (run_threads * tvrageperrun))
-		datas = cur[0].fetchall()
+	cur[0].execute("SELECT LEFT(guid, 1) FROM releases WHERE nzbstatus = 1 AND searchname IS NOT NULL AND rageid = -1 AND categoryID BETWEEN 5000 AND 5999 GROUP BY LEFT(guid, 1) "+orderBY+" LIMIT 16")
+	datas = cur[0].fetchall()
 
 #close connection to mysql
 info.disconnect(cur[0], cur[1])
@@ -225,14 +168,14 @@ class queue_runner(threading.Thread):
 
 		while True:
 			try:
-				my_ID = self.my_queue.get(True, 1)
+				my_id = self.my_queue.get(True, 1)
 			except:
 				if time.time() - time_of_last_run > 3:
 					return
 			else:
-				if my_ID:
+				if my_id:
 					time_of_last_run = time.time()
-					subprocess.call(["php", pathname+"/../bin/postprocess_threaded.php", ""+my_ID])
+					subprocess.call(["php", pathname+"/../../multiprocessing/.do_not_run/switch.php", "python  pp_"+my_id])
 					time.sleep(.02)
 					self.my_queue.task_done()
 
@@ -247,12 +190,8 @@ def main(args):
 	global time_of_last_run
 	time_of_last_run = time.time()
 
-	if sys.argv[1] == "additional":
-		print(bcolors.HEADER + "We will be using a max of {} threads, a queue of {} {} releases. passwordstatus range {} to -1".format(run_threads, "{:,}".format(len(datas)), sys.argv[1], maxtries) + bcolors.ENDC)
-	elif sys.argv[1] == "nfo":
-		print(bcolors.HEADER + "We will be using a max of {} threads, a queue of {} {} releases. nfostatus range {} to -1".format(run_threads, "{:,}".format(len(datas)), sys.argv[1], maxtries) + bcolors.ENDC)
-	else:
-		print(bcolors.HEADER + "We will be using a max of {} threads, a queue of {} {} releases.".format(run_threads, "{:,}".format(len(datas)), sys.argv[1]) + bcolors.ENDC)
+	print(bcolors.HEADER + "We will be using a max of {} threads, a queue of {}.".format(run_threads, "{:,}".format(len(datas))) + bcolors.ENDC)
+
 	time.sleep(2)
 
 	def signal_handler(signal, frame):
@@ -267,29 +206,29 @@ def main(args):
 			p.setDaemon(False)
 			p.start()
 
-		#now load some arbitrary jobs into the queue
+	#now load some arbitrary jobs into the queue
 	if sys.argv[1] == "additional":
 		for release in datas:
 			time.sleep(.02)
-			my_queue.put(u("%s           =+=            %s           =+=            %s           =+=            %s           =+=            %s           =+=            %s           =+=            %s           =+=            %s           =+=            %s           =+=            %s") % (release[0], release[1], release[2], release[3], release[4], release[5], release[6], release[7], release[8], release[9]))
+			my_queue.put(u("%s  %s") % (sys.argv[1], release[0]))
 	elif sys.argv[1] == "nfo":
 		for release in datas:
 			time.sleep(.02)
-			my_queue.put(u("%s           =+=            %s           =+=            %s           =+=            %s") % (release[0], release[1], release[2], release[3]))
+			my_queue.put(u("%s  %s") % (sys.argv[1], release[0]))
 	elif sys.argv[1] == "movie":
 		for release in datas:
 			time.sleep(.02)
-			my_queue.put(u("%s           =+=            %s           =+=            %s") % (release[0], release[1], release[2]))
+			my_queue.put(u("%s  %s") % (sys.argv[1], release[0]))
 	elif sys.argv[1] == "tv":
 		for release in datas:
 			time.sleep(.02)
-			my_queue.put(u("%s           =+=            %s") % (release[0], release[1]))
+			my_queue.put(u("%s  %s") % (sys.argv[1], release[0]))
 
 	my_queue.join()
 
 	if sys.argv[1] == "nfo":
 		cur = info.connect()
-		cur[0].execute("SELECT ID from releases WHERE nfostatus <= -6")
+		cur[0].execute("SELECT id from releases WHERE nfostatus <= -6")
 		final = cur[0].fetchall()
 		if len(datas) > 0:
 			for item in final:

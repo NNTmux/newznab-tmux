@@ -129,7 +129,7 @@ class Backfill
 			$done = false;
 			//set first and last, moving the window by maxxMssgs
 			$last = $groupArr['first_record'] - 1;
-			$first = $last - $binaries->messagebuffer + 1; //set initial "chunk"
+			$first = $last - $binaries->messageBuffer + 1; //set initial "chunk"
 			if($targetpost > $first)	//just in case this is the last chunk we needed
 				$first = $targetpost;
 			while($done === false)
@@ -154,7 +154,7 @@ class Backfill
 				else
 				{	//Keep going: set new last, new first, check for last chunk.
 					$last = $first - 1;
-					$first = $last - $binaries->messagebuffer + 1;
+					$first = $last - $binaries->messageBuffer + 1;
 					if($targetpost > $first)
 						$first = $targetpost;
 				}

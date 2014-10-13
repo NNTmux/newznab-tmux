@@ -8,7 +8,7 @@ require_once(WWW_DIR . "/lib/showsleep.php");
 require_once(dirname(__FILE__) . "/../lib/functions.php");
 
 
-$version = "0.4r2305";
+$version = "0.5r0000";
 
 $pdo = new DB();
 $s = new Sites();
@@ -1281,7 +1281,10 @@ while ($i > 0) {
 	}
 
 	if ($releases_run != 0) {
-		$run_releases = "$_python ${DIR}/../python/releases_threaded.py";
+		$run_releases = ($site->tablepergroup == 0
+			? "cd $_bin && $_php update_releases.php 1 false 2>&1 $log"
+			: "$_php ${DIR}/../../multiprocessing/releases.php 2>&1 $log"
+		);
 	}
 
 

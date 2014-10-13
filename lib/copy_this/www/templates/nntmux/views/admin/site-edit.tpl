@@ -404,6 +404,15 @@
 		<div class="hint">The directory where nzb files will be stored.</div>
 	</td>
 </tr>
+	<tr>
+		<td style="width:180px;"><label for="nzbsplitlevel">Nzb File Path Level Deep:</label></td>
+		<td>
+			<input id="nzbsplitlevel" class="short" name="nzbsplitlevel" type="text" value="{$site->nzbsplitlevel}"/>
+			<div class="hint">Levels deep to store the nzb Files.
+				<br /><strong>If you change this you must run the misc/testing/DB/nzb-reorg.php script!</strong>
+			</div>
+		</td>
+	</tr>
 
 <tr>
 	<td><label for="rawretentiondays">Header Retention</label>:</td>
@@ -459,6 +468,15 @@
 		<div class="hint">The minimum total size in bytes to make a release. If set to 0, then ignored.</div>
 	</td>
 </tr>
+	<tr>
+		<td style="width:180px;"><label for="maxsizetoformrelease">Maximum File Size to Make a Release:</label></td>
+		<td>
+			<input class="small" id="maxsizetoformrelease" name="maxsizetoformrelease" type="text" value="{$site->maxsizetoformrelease}"/>
+			<div class="hint">The maximum total size in bytes to make a release. If set to 0, then ignored. Only deletes
+				during release creation.
+			</div>
+		</td>
+	</tr>
 
 <tr>
 	<td><label for="completionpercent">Minimum Completion Percent to Make a Release</label>:</td>
@@ -467,6 +485,21 @@
 		<div class="hint">The minimum completion percent to make a release. i.e. if set to 97, then releases under 97% completion will not be created. If set to 0, then ignored.</div>
 	</td>
 </tr>
+
+	<tr>
+		<td style="width:180px;"><label for="grabstatus">Update grabs:</label></td>
+		<td>
+			{html_radios id="grabstatus" name='grabstatus' values=$yesno_ids output=$yesno_names selected=$site->grabstatus separator='<br />'}
+			<div class="hint">Whether to update download counts when someone downloads a release.</div>
+		</td>
+	</tr>
+	<tr>
+		<td style="width:180px;"><label for="crossposttime">Crossposted Time Check:</label></td>
+		<td>
+			<input class="short" id="crossposttime" name="crossposttime" type="text" value="{$site->crossposttime}"/>
+			<div class="hint">The time in hours to check for crossposted releases - this will delete 1 of the releases if the 2 are posted by the same person in the same time period.</div>
+		</td>
+	</tr>
 
 <tr>
 	<td><label for="removespam">Remove Spam</label>:</td>
@@ -733,6 +766,13 @@
 		<div class="hint">Whether to delete releases which are passworded or potentially passworded.<br/></div>
 	</td>
 </tr>
+	<tr>
+		<td style="width:180px;"><label for="deletepossiblerelease">Delete Possibly Passworded Releases:</label></td>
+		<td>
+			{html_radios id="deletepossiblerelease" name='deletepossiblerelease' values=$yesno_ids output=$yesno_names selected=$site->deletepossiblerelease separator='<br />'}
+			<div class="hint">Whether to delete releases which are potentially passworded. This applies to your post process additional inner file blacklist.<br/></div>
+		</td>
+	</tr>
 
 <tr>
 	<td><label for="showpasswordedrelease">Show Passworded Releases</label>:</td>
@@ -945,6 +985,21 @@
 <fieldset>
 	<legend>Advanced Settings - For advanced users</legend>
 	<table class="input">
+		<tr>
+			<td style="width:180px;"><label for="tablepergroup">Table Per Group:</label></td>
+			<td>
+				{html_radios id="tablepergroup" name='tablepergroup' values=$yesno_ids output=$yesno_names selected=$site->tablepergroup separator='<br />'}
+				<div class="hint">This uses separate tables for binaries and parts for each group.<br/>This
+					requires you to run convert_to_tpg.php or reset_truncate.php.<br/>This requires that you also run
+					releases_threaded.py.
+					<br/>Run: show variables like '%open%files%'; results should be higher than 10k, twice that if you
+					are using TokuDB.;
+					<br/><b>You may need to increase table_open_cache, open_files_limit and max_allowed_packet in
+						my.cnf. Also, you may need to add the following to /etc/security/limits.conf<br/>mysql soft
+						nofile 24000<br/>mysql hard nofile 32000</b>
+				</div>
+			</td>
+		</tr>
 		<tr>
 			<td style="width:180px;"><label for="maxnzbsprocessed">Maximum NZBs processed:</label></td>
 			<td>
@@ -1350,8 +1405,7 @@
 				<input class="short" id="releasethreads" name="releasethreads" type="text"
 					   value="{$fsite->releasethreads}"/>
 
-				<div class="hint">The number of threads for update_releases. This actualy makes no difference, newznab
-					update_releases is not threaded.
+				<div class="hint">The number of threads for releases update scripts.
 				</div>
 			</td>
 		</tr>

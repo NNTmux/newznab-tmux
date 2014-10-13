@@ -76,7 +76,6 @@ switch ($options[1]) {
 		}
 		$binaries = new \Binaries();
 		$return = $binaries->scan($nntp, $groupMySQL, $options[4], $options[5], ($site->safepartrepair == 1 ? 'update' : 'backfill'));
-		var_dump($return);
 		if (empty($return)) {
 			exit();
 		}
@@ -210,7 +209,7 @@ switch ($options[1]) {
 			$backFill = new \Backfill();
 
 			// Update the group for new binaries.
-			(new \Binaries())->updateGroup($groupMySQL);
+			(new \Binaries())->updateGroup($nntp, $groupMySQL);
 
 			// BackFill the group with 20k articles.
 			$backFill->backfillAllGroups($groupMySQL['name'], 20000, 'normal');
@@ -276,8 +275,11 @@ switch ($options[1]) {
  */
 function processReleases($releases, $groupID)
 {
+    	$releases->applyRegex($groupID);
+	$releases->processIncompleteBinaries($groupID);
 	$releases->createReleases($groupID);
-	$releases->createNZBs($groupID);
+	$releases->deleteBinaries($groupID);
+
 }
 
 /**

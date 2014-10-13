@@ -10,13 +10,47 @@ require_once(WWW_DIR . "../misc/update_scripts/nix_scripts/tmux/lib/Enzebe.php")
 class NZB
 {
 	/**
+	 * Default constructor.
+	 *
+	 * @param \DB $pdo
+	 *
+	 * @access public
+	 */
+	public function __construct(&$pdo = null)
+	{
+		$this->pdo = ($pdo instanceof \DB ? $pdo : new \DB());
+		$s = new Sites();
+		$this->site = $s->get();
+
+		$this->tablePerGroup = ($this->site->tablepergroup == 0 ? false : true);
+		$nzbSplitLevel = $this->site->nzbsplitlevel;
+		$this->nzbSplitLevel = (empty($nzbSplitLevel) ? 1 : $nzbSplitLevel);
+		$this->siteNzbPath = (string)$this->site->nzbpath;
+		if (substr($this->siteNzbPath, -1) !== DS) {
+			$this->siteNzbPath .= DS;
+		}
+	}
+
+	/**
 	 * Writes out the nzb when processing releases. Performed outside of smarty due to memory issues
 	 * of holding all parts in an array.
 	 */
-	function writeNZBforReleaseId($relid, $name, $catId, $path)
+	function writeNZBforReleaseId($relid, $name, $catId, $path, $groupID)
 	{
 		$db = new DB();
 		$cat = new Category();
+		$this->groupID = $groupID;
+		// Set table names
+		if ($this->tablePerGroup === true) {
+			if ($this->groupID == '') {
+				exit("$this->groupID is missing\n");
+			}
+			$bName = 'binaries_' . $this->groupID;
+			$pName = 'parts_' . $this->groupID;
+		} else {
+			$bName = 'binaries';
+			$pName = 'parts';
+		}
 		$catrow = $cat->getById($catId);
 		$site = new Sites();
 
@@ -32,7 +66,13 @@ class NZB
 				gzwrite($fp, " <meta type=\"name\">" . htmlspecialchars($name, ENT_QUOTES, 'utf-8') . "</meta>\n");
 			gzwrite($fp, "</head>\n\n");
 
-			$result = $db->queryDirect(sprintf("SELECT binaries.*, UNIX_TIMESTAMP(date) AS unixdate, groups.name as groupname FROM binaries inner join groups on binaries.groupID = groups.ID WHERE binaries.releaseID = %d ORDER BY binaries.name", $relid));
+			$result = $db->queryDirect(sprintf("SELECT %s.*, UNIX_TIMESTAMP(date) AS unixdate, groups.name as groupname FROM %s inner join groups on %s.groupID = groups.ID WHERE %s.releaseID = %d ORDER BY %s.name",
+					$bName,
+					$bName,
+					$bName,
+					$bName,
+					$relid,
+					$bName));
 			while ($binrow = $db->getAssocArray($result)) {
 				$groups = array();
 				$groupsRaw = explode(' ', $binrow['xref']);
@@ -50,7 +90,9 @@ class NZB
 				gzwrite($fp, " </groups>\n");
 				gzwrite($fp, " <segments>\n");
 
-				$resparts = $db->queryDirect(sprintf("SELECT DISTINCT(messageID), size, partnumber FROM parts WHERE binaryID = %d ORDER BY partnumber", $binrow["ID"]));
+				$resparts = $db->queryDirect(sprintf("SELECT DISTINCT(messageID), size, partnumber FROM %s WHERE binaryID = %d ORDER BY partnumber",
+						$pName,
+						$binrow["ID"]));
 				while ($partsrow = $db->getAssocArray($resparts)) {
 					gzwrite($fp, "  <segment bytes=\"" . $partsrow["size"] . "\" number=\"" . $partsrow["partnumber"] . "\">" . htmlspecialchars($partsrow["messageID"], ENT_QUOTES, 'utf-8') . "</segment>\n");
 				}

@@ -582,8 +582,8 @@ class Forking extends \fork_daemon
 
 			if ($groups instanceof \Traversable) {
 				foreach($groups as $group) {
-					if ($this->pdo->queryOneRow(sprintf('SELECT ID FROM collections_%d  LIMIT 1',$group['id'])) !== false) {
-						$this->work[] = ['id' => $group['id']];
+					if ($this->pdo->queryOneRow(sprintf('SELECT ID FROM binaries_%d  LIMIT 1',$group['ID'])) !== false) {
+						$this->work[] = ['ID' => $group['ID']];
 					}
 				}
 			}
@@ -591,7 +591,7 @@ class Forking extends \fork_daemon
 			$this->work = $this->pdo->query('SELECT name FROM groups WHERE (active = 1 OR backfill = 1)');
 		}
 
-		return $this->site->releasesthreads;
+		return $this->site->releasethreads;
 	}
 
 	public function releasesChildWorker($groups, $identifier = '')
@@ -599,11 +599,11 @@ class Forking extends \fork_daemon
 		foreach ($groups as $group) {
 			if ($this->tablePerGroup === true) {
 				$this->_executeCommand(
-					$this->dnr_path . 'releases  ' .  $group['id'] . '"'
+					$this->dnr_path . 'releases  ' .  $group['ID'] . '"'
 				);
 			} else {
 				$this->_executeCommand(
-					PHP_BINARY . ' ' . NN_UPDATE . 'update_releases.php 1 false ' . $group['name']
+					PHP_BINARY . ' ' . NN_TMUX . 'bin' . DS . 'update_releases.php 1 false ' . $group['name']
 				);
 			}
 		}
@@ -635,7 +635,7 @@ class Forking extends \fork_daemon
 
 			if ($type !== '') {
 				$this->_executeCommand(
-					$this->dnr_path . $type .  $group['id'] . (isset($group['renamed']) ? ('  ' . $group['renamed']) : '') . '"'
+					$this->dnr_path . $type .  $group['ID'] . (isset($group['renamed']) ? ('  ' . $group['renamed']) : '') . '"'
 				);
 			}
 		}
@@ -684,7 +684,7 @@ class Forking extends \fork_daemon
 			$this->register_child_run([0 => $this, 1 => 'postProcessChildWorker']);
 			$this->work = $this->pdo->query(
 				sprintf('
-					SELECT LEFT(r.guid, 1) AS id
+					SELECT LEFT(r.guid, 1) AS ID
 					FROM releases r
 					LEFT JOIN category c ON c.ID = r.categoryID
 					WHERE r.nzbstatus = %d
@@ -734,7 +734,7 @@ class Forking extends \fork_daemon
 			$this->register_child_run([0 => $this, 1 => 'postProcessChildWorker']);
 			$this->work = $this->pdo->query(
 				sprintf('
-					SELECT LEFT(r.guid, 1) AS id
+					SELECT LEFT(r.guid, 1) AS ID
 					FROM releases r
 					WHERE 1=1 %s
 					GROUP BY LEFT(r.guid, 1)
@@ -782,7 +782,7 @@ class Forking extends \fork_daemon
 			$this->register_child_run([0 => $this, 1 => 'postProcessChildWorker']);
 			$this->work = $this->pdo->query(
 				sprintf('
-					SELECT LEFT(guid, 1) AS id, %d AS renamed
+					SELECT LEFT(guid, 1) AS ID, %d AS renamed
 					FROM releases
 					WHERE nzbstatus = %d
 					AND imdbID IS NULL
@@ -837,7 +837,7 @@ class Forking extends \fork_daemon
 			$this->register_child_run([0 => $this, 1 => 'postProcessChildWorker']);
 			$this->work = $this->pdo->query(
 				sprintf('
-					SELECT LEFT(guid, 1) AS id, %d AS renamed
+					SELECT LEFT(guid, 1) AS ID, %d AS renamed
 					FROM releases
 					WHERE nzbstatus = %d
 					AND rageID = -1
@@ -933,14 +933,14 @@ class Forking extends \fork_daemon
 	{
 		$this->register_child_run([0 => $this, 1 => 'updatePerGroupChildWorker']);
 		$this->work = $this->pdo->query('SELECT ID FROM groups WHERE (active = 1 OR backfill = 1)');
-		return $this->site->releasesthreads;
+		return $this->site->releasethreads;
 	}
 
 	public function updatePerGroupChildWorker($groups, $identifier = '')
 	{
 		foreach ($groups as $group) {
 			$this->_executeCommand(
-				$this->dnr_path . 'update_per_group  ' .  $group['id'] . '"'
+				$this->dnr_path . 'update_per_group  ' .  $group['ID'] . '"'
 			);
 		}
 	}

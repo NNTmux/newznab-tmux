@@ -912,7 +912,7 @@ class ReleaseRemover
 					$groupID = ' AND r.groupID in (' . $groupIDs . ') ';
 				}
 
-				$this->method = 'Blacklist ' . $regex['id'];
+				$this->method = 'Blacklist ' . $regex['ID'];
 				$this->query = sprintf(
 					"SELECT r.guid, r.searchname, r.ID
 					FROM releases r %s %s %s", $regexSQL, $groupID, $this->crapTime
