@@ -8,7 +8,7 @@ require_once(WWW_DIR . "/lib/showsleep.php");
 require_once(dirname(__FILE__) . "/../lib/functions.php");
 
 
-$version = "0.5r0005";
+$version = "0.5r0006";
 
 $pdo = new DB();
 $s = new Sites();
@@ -503,7 +503,7 @@ if ($monitor_path != "") {
 echo "\n";
 printf($mask3, "Binaries", "Parts", "Parts in Repair");
 printf($mask3, "=========================", "======================================", "=========================");
-printf($mask3,  number_format($binaries_table), number_format($parts_table), number_format($partrepair_table));
+printf($mask4,  number_format($binaries_table), number_format($parts_table), number_format($partrepair_table));
 echo "\n";
 printf($mask3, "Category", "In Process", "In Database");
 printf($mask3, "====================", "====================", "====================");
@@ -1266,7 +1266,8 @@ while ($i > 0) {
 	echo "\n";
 	printf($mask3, "Binaries", "Parts", "Parts in Repair");
 	printf($mask3, "=========================", "======================================", "=========================");
-	printf($mask3,  number_format($binaries_table), number_format($parts_table), number_format($partrepair_table));
+	printf($mask4,  number_format($binaries_table), number_format($parts_table), number_format($partrepair_table));
+	echo "\n";
 	if ($monitor_path != "") {
 		printf($mask4, "Ramdisk", "$disk_use used", "$disk_free free");
 	}
