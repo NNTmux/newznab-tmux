@@ -3020,4 +3020,13 @@ class Releases
 			sprintf('UPDATE releases SET categoryID = %d, iscategorized = 0 %s', \Category::CAT_MISC_OTHER, $where)
 		);
 	}
+
+	/**
+	 * Create a GUID for a release.
+	 * @return string
+	 */
+	public function createGUID()
+	{
+		return sha1(uniqid('', true) . mt_rand());
+	}
 }

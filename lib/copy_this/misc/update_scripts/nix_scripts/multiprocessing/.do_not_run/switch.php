@@ -82,7 +82,7 @@ switch ($options[1]) {
 		$columns = [];
 		switch ($options[2]) {
 			case 'binaries':
-				if ($return['last_record'] <= $groupMySQL['last_record']){
+				if ($return['last'] <= $groupMySQL['last_record']){
 					exit();
 				}
 				$columns[1] = sprintf(
@@ -91,23 +91,23 @@ switch ($options[1]) {
 						(is_numeric($return['last_record_postdate']) ? $return['last_record_postdate'] : strtotime($return['last_record_postdate']))
 					)
 				);
-				$columns[2] = sprintf('last_record = %s', $return['last_record']);
+				$columns[2] = sprintf('last_record = %s', $return['last']);
 				$query = sprintf(
 					'UPDATE groups SET %s, %s, last_updated = NOW() WHERE ID = %d AND last_record < %s',
 					$columns[1],
 					$columns[2],
 					$groupMySQL['ID'],
-					$return['last_record']
+					$return['last']
 				);
 				break;
 			case 'backfill':
-				if ($return['first_record'] >= $groupMySQL['first_record']){
+				if ($return['first'] >= $groupMySQL['first_record']){
 					exit();
 				}
 				$columns[1] = sprintf(
 					'first_record_postdate = %s',
 					$pdo->from_unixtime(
-						(is_numeric($return['first_record_postadate']) ? $return['first_record_postdate'] : strtotime($return['first_record_postdate']))
+						(is_numeric($return['first_record_postdate']) ? $return['first_record_postdate'] : strtotime($return['first_record_postdate']))
 					)
 				);
 				$columns[2] = sprintf('first_record = %s', $return['first_record']);

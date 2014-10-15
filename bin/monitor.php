@@ -8,7 +8,7 @@ require_once(WWW_DIR . "/lib/showsleep.php");
 require_once(dirname(__FILE__) . "/../lib/functions.php");
 
 
-$version = "0.5r0006";
+$version = "0.5r0010";
 
 $pdo = new DB();
 $s = new Sites();
@@ -33,6 +33,7 @@ $seq = (isset($tmux->sequential)) ? $tmux->sequential : 0;
 $powerline = (isset($tmux->powerline)) ? $tmux->powerline : 0;
 $tpatch = $tmux->sqlpatch;
 $run_ircscraper = $tmux->scrape;
+$tmuxImport = $tmux->import;
 
 
 
@@ -1394,11 +1395,21 @@ while ($i > 0) {
 		//run update_binaries, backfill and import using seq in pane 0.2
 		$dead = `tmux list-panes -t${tmux_session}:0 | grep 2: | grep dead`;
 		if (($seq == 1) && (strlen($dead) > "4")) {
+			switch ($tmuxImport) {
+				case 1:
+					$useFilenames = 'false';
+					break;
+				case 2:
+					$useFilenames = 'true';
+					break;
+				default:
+					$useFilenames = 'false';
+			}
 			//run nzb-import
 			if (($import != 0) && ($kill_pp == "false")) {
 				$log = writelog($panes0[2]);
 				shell_exec("tmux respawnp -t${tmux_session}:0.2 ' \
-						$_python ${DIR}/../python/import_threaded.py $log; date +\"%D %T\"; $_sleep $import_timer' 2>&1 1> /dev/null"
+						cd $_multi && $_php import.php $site->nzbs $site->nzbthreads true $useFilename false $log; date +\"%D %T\"; $_sleep $import_timer' 2>&1 1> /dev/null"
 				);
 			} else {
 				$color = get_color($colors_start, $colors_end, $colors_exc);
@@ -1501,9 +1512,19 @@ while ($i > 0) {
 
 		//runs nzb-import in 0.4
 		if (($import != 0) && ($kill_pp == "false")) {
+			switch ($tmuxImport) {
+				case 1:
+					$useFilenames = 'false';
+					break;
+				case 2:
+					$useFilenames = 'true';
+					break;
+				default:
+					$useFilenames = 'false';
+			}
 			$log = writelog($panes0[4]);
 			shell_exec("tmux respawnp -t${tmux_session}:0.4 ' \
-						$_python ${DIR}/../python/import_threaded.py $log; date +\"%D %T\"; $_sleep $import_timer' 2>&1 1> /dev/null"
+						cd $_multi && $_php import.php $site->nzbs $site->nzbthreads true $useFilenames false $log; date +\"%D %T\"; $_sleep $import_timer' 2>&1 1> /dev/null"
 			);
 		} else if (($import == 1) && ($maxload <= get_load())) {
 			$color = get_color($colors_start, $colors_end, $colors_exc);

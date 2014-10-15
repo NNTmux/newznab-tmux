@@ -481,7 +481,6 @@
 			<td>
 				{html_radios id="fix_crap_opt" name='fix_crap_opt' onchange="enableFixCrapCustom()" values=$fix_crap_radio_ids output=$fix_crap_radio_names selected=$ftmux->fix_crap_opt separator='<br />'}
 				<br>
-
 				<div class="checkbox-grid">
 					{if $ftmux->fix_crap_opt == "Custom"}
 						{html_checkboxes id="fix_crap" name='fix_crap' values=$fix_crap_check_ids output=$fix_crap_check_names selected=explode(', ', $ftmux->fix_crap)}
@@ -492,12 +491,10 @@
 				<div class="hint">Choose to run Remove Crap Releases. You can all or some.</div>
 			</td>
 		</tr>
-
 		<tr>
 			<td style="width:180px;"><label for="crap_timer">Remove Crap Releases Sleep Timer:</label></td>
 			<td>
 				<input id="crap_timer" name="crap_timer" class="short" type="text" value="{$ftmux->crap_timer}"/>
-
 				<div class="hint">The time to sleep from the time the loop ends until it is restarted, in seconds.</div>
 			</td>
 		</tr>
