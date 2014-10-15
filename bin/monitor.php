@@ -1409,7 +1409,7 @@ while ($i > 0) {
 			if (($import != 0) && ($kill_pp == "false")) {
 				$log = writelog($panes0[2]);
 				shell_exec("tmux respawnp -t${tmux_session}:0.2 ' \
-						cd $_multi && $_php import.php $site->nzbs $site->nzbthreads true $useFilename false $log; date +\"%D %T\"; $_sleep $import_timer' 2>&1 1> /dev/null"
+						cd $_multi && $_php import.php $tmux->nzbs $site->nzbthreads true $useFilename false $log; date +\"%D %T\"; $_sleep $import_timer' 2>&1 1> /dev/null"
 				);
 			} else {
 				$color = get_color($colors_start, $colors_end, $colors_exc);
