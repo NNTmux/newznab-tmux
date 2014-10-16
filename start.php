@@ -174,9 +174,8 @@ function window_proxy($tmux_session, $window)
 function window_utilities($tmux_session)
 {
 	exec("tmux new-window -t $tmux_session -n Utils 'printf \"\033]2;update_predb\033\"'");
-	exec("tmux selectp -t 0;tmux splitw -t $tmux_session:1 -v -p 75 'printf \"\033]2;Sphinx\033\"'");
     exec("tmux splitw -t $tmux_session:1 -v -p 67 'printf \"\033]2;Update_Missing_Movie_Info\033\"'");
-	exec("tmux selectp -t 2; tmux splitw -t $tmux_session:1 -h -p 50 'printf \"\033]2;UpdateTV\033\"'");
+	exec("tmux splitw -t $tmux_session:1 -v -p 50 'printf \"\033]2;UpdateTV\033\"'");
 }
 
 
