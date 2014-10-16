@@ -954,7 +954,7 @@ class Functions
 	 * @return void
 	 */
 	public
-	function updateGroup($groupArr, $nntp)
+	function updateGroup($groupArr)
 	{
 		if (!isset($nntp)) {
 			$message = "Not connected to usenet(binaries->updateGroup).";

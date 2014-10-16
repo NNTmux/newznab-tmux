@@ -39,12 +39,13 @@ class Binaries
 		$s = new Sites();
 		$site = $s->get();
 		$this->messageBuffer = ($site->maxmssgs != '') ? $site->maxmssgs : 20000;
-		$this->compressedHeaders = ($site->compressedheaders == "1") ? true : false;
+		$this->_compressedHeaders = ($site->compressedheaders == "1") ? true : false;
 		$this->MaxMsgsPerRun = (!empty($site->maxmsgsperrun)) ? $site->maxmsgsperrun : 200000;
-		$this->NewGroupScanByDays = ($site->newgroupscanmethod == "1") ? true : false;
-		$this->NewGroupMsgsToScan = (!empty($site->newgroupmsgstoscan)) ? $site->newgroupmsgstoscan : 50000;
-		$this->NewGroupDaysToScan = (!empty($site->newgroupdaystoscan)) ? $site->newgroupdaystoscan : 3;
+		$this->_newGroupScanByDays = ($site->newgroupscanmethod == "1") ? true : false;
+		$this->_newGroupMessagesToScan = (!empty($site->newgroupmsgstoscan)) ? $site->newgroupmsgstoscan : 50000;
+		$this->_newGroupDaysToScan = (!empty($site->newgroupdaystoscan)) ? $site->newgroupdaystoscan : 3;
 		$this->_tablePerGroup = ($site->tablepergroup == 1 ? true : false);
+		$this->_partRepair = ($site->partrepair == 0 ? false : true);
 
 		$this->blackList = array(); //cache of our black/white list
 		$this->blackList_by_group = array();
@@ -67,186 +68,303 @@ class Binaries
 	}
 
 	/**
-	 * Process headers and store in database for all active groups.
+	 * Download new headers for all active groups.
+	 *
+	 * @param int $maxHeaders (Optional) How many headers to download max.
+	 *
+	 * @return void
 	 */
-	function updateAllGroups()
+	public function updateAllGroups($maxHeaders = 0)
 	{
-		$n = $this->n;
-		$groups = new Groups;
-		$res = $groups->getActive();
+		$groups = $this->_groups->getActive();
 
-		$s = new Sites();
-		echo $s->getLicense();
+		$groupCount = count($groups);
+		if ($groupCount > 0) {
+			$counter = 1;
+			$allTime = microtime(true);
 
-		if ($res) {
-			shuffle($res);
-			$alltime = microtime(true);
-			echo 'Updating: ' . sizeof($res) . ' groups - Using compression? ' . (($this->compressedHeaders) ? 'Yes' : 'No') . $n;
+			$this->log(
+				'Updating: ' . $groupCount . ' group(s) - Using compression? ' . ($this->_compressedHeaders ? 'Yes' : 'No'),
+				'updateAllGroups',
+				\Logger::LOG_INFO,
+				'header'
+			);
 
-			$nntp = new Nntp();
-			if ($nntp->doConnect()) {
-
-				$pos = 0;
-				foreach ($res as $groupArr) {
-					$pos++;
-					echo 'Group ' . $pos . ' of ' . sizeof($res) . $n;
-					$this->message = array();
-					$this->updateGroup($nntp, $groupArr);
-				}
-
-				$nntp->doQuit();
-				echo 'Updating completed in ' . number_format(microtime(true) - $alltime, 2) . ' seconds' . $n;
-			} else {
-				echo "Failed to get NNTP connection.$n";
+			// Loop through groups.
+			foreach ($groups as $group) {
+				$this->log(
+					'Starting group ' . $counter . ' of ' . $groupCount,
+					'updateAllGroups',
+					\Logger::LOG_INFO,
+					'header'
+				);
+				$this->updateGroup($group, $maxHeaders);
+				$counter++;
 			}
+
+			$this->log(
+				'Updating completed in ' . number_format(microtime(true) - $allTime, 2) . ' seconds.',
+				'updateAllGroups',
+				\Logger::LOG_INFO,
+				'primary'
+			);
 		} else {
-			echo "No groups specified. Ensure groups are added to newznab's database and activated before updating.$n";
+			$this->log(
+				'No groups specified. Ensure groups are added to nZEDb\'s database for updating.',
+				'updateAllGroups',
+				\Logger::LOG_NOTICE,
+				'warning'
+			);
 		}
 	}
 
 	/**
-	 * Process headers and store in database for a group.
+	 * Download new headers for a single group.
+	 *
+	 * @param array $groupMySQL Array of MySQL results for a single group.
+	 * @param int   $maxHeaders (Optional) How many headers to download max.
+	 *
+	 * @return void
 	 */
-	function updateGroup($nntp = null, $groupArr)
+	public function updateGroup($groupMySQL, $maxHeaders = 0)
 	{
-		$blnDoDisconnect = false;
-		if ($nntp == null) {
-			$nntp = new Nntp();
-			if (!$nntp->doConnect()) {
-				echo "Failed to get NNTP connection.";
+		$startGroup = microtime(true);
 
+		// Select the group on the NNTP server, gets the latest info on it.
+		$groupNNTP = $this->_nntp->selectGroup($groupMySQL['name']);
+		if ($this->_nntp->isError($groupNNTP)) {
+			$groupNNTP = $this->_nntp->dataError($this->_nntp, $groupMySQL['name']);
+			if ($this->_nntp->isError($groupNNTP)) {
 				return;
 			}
-			$this->message = array();
-			$blnDoDisconnect = true;
 		}
 
-		$db = new DB();
-		$backfill = new Backfill();
-
-		$n = $this->n;
-		$this->startGroup = microtime(true);
-		$this->startLoop = microtime(true);
-
-		echo 'Processing ' . $groupArr['name'] . $n;
-
-		// Connect to server
-		$data = $nntp->selectGroup($groupArr['name']);
-		if (NNTP::isError($data)) {
-			echo "Could not select group (bad name?): {$groupArr['name']}$n $n";
-
-			return;
+		if ($this->_echoCLI) {
+			$this->_colorCLI->doEcho($this->_colorCLI->primary('Processing ' . $groupMySQL['name']), true);
 		}
-
-		if ($groupArr['regexmatchonly'] == 1) {
+		if ($groupMySQL['regexmatchonly'] == 1)
+		{
 			$this->onlyProcessRegexBinaries = true;
-			echo "Note: Discarding parts that do not match a regex" . $n;
-		} else {
+			if ($this->_echoCLI) {
+				$this->_colorCLI->doEcho($this->_colorCLI->primary('Note: Discarding parts that do not match a regex', true));
+			}
+		}
+		else
+		{
 			$this->onlyProcessRegexBinaries = false;
 		}
 
-		//Attempt to repair any missing parts before grabbing new ones
-		$this->partRepair($nntp, $groupArr);
-
-		//Get first and last part numbers from newsgroup
-		$last = $grouplast = $data['last'];
-
-		// For new newsgroups - determine here how far you want to go back.
-		if ($groupArr['last_record'] == 0) {
-			if ($this->NewGroupScanByDays) {
-				$first = $backfill->daytopost($nntp, $groupArr['name'], $this->NewGroupDaysToScan, true);
-				if ($first == '') {
-					echo "Skipping group: {$groupArr['name']}$n";
-
-					return;
+		// Attempt to repair any missing parts before grabbing new ones.
+		if ($groupMySQL['last_record'] != 0) {
+			if ($this->_partRepair) {
+				if ($this->_echoCLI) {
+					$this->_colorCLI->doEcho($this->_colorCLI->primary('Part repair enabled. Checking for missing parts.'), true);
 				}
-			} else {
-				if ($data['first'] > ($data['last'] - $this->NewGroupMsgsToScan))
-					$first = $data['first'];
-				else
-					$first = $data['last'] - $this->NewGroupMsgsToScan;
+				$this->partRepair($this->_nntp, $groupMySQL);
+			} else if ($this->_echoCLI) {
+				$this->_colorCLI->doEcho($this->_colorCLI->primary('Part repair disabled by user.'), true);
 			}
-			$first_record_postdate = $this->postdate($first, $data);
-			$last_record_postdate = $this->postdate($last, $data);
-			if ($first_record_postdate != '')
-				$db->queryExec(sprintf('update groups SET first_record = %s, first_record_postdate = FROM_UNIXTIME(' . $first_record_postdate . ') WHERE ID = %d', $db->escapeString($first), $groupArr['ID']));
-		} else {
-			if ($data['last'] < $groupArr['last_record']) {
-				echo "Warning: Server's last num {$data['last']} is lower than the local last num {$groupArr['last_record']}" . $n;
-
-				return;
-			}
-			$first = $groupArr['last_record'] + 1;
 		}
 
-		// Generate postdates for first and last records, for those that upgraded
-		if ((is_null($groupArr['first_record_postdate']) || is_null($groupArr['last_record_postdate'])) && ($groupArr['last_record'] != '0' && $groupArr['first_record'] != '0'))
-			$db->queryExec(sprintf('update groups SET first_record_postdate = FROM_UNIXTIME('.$backfill->postdate($nntp,$groupArr['first_record'],false).'), last_record_postdate = FROM_UNIXTIME('.$backfill->postdate($nntp,$groupArr['last_record'],false).') WHERE ID = %d', $groupArr['ID']));
+		// Generate postdate for first record, for those that upgraded.
+		if (is_null($groupMySQL['first_record_postdate']) && $groupMySQL['first_record'] != 0) {
 
-		// Deactivate empty groups
-		if (($data['last'] - $data['first']) <= 5)
-			$db->queryExec(sprintf('update groups SET active = %s, last_updated = now() WHERE ID = %d', $db->escapeString('0'), $groupArr['ID']));
+			$groupMySQL['first_record_postdate'] = $this->postdate($groupMySQL['first_record'], $groupNNTP);
 
-		// Calculate total number of parts
-		$total = $grouplast - $first + 1;
+			$this->_pdo->queryExec(
+				sprintf('
+					UPDATE groups
+					SET first_record_postdate = %s
+					WHERE ID = %d',
+					$this->_pdo->from_unixtime($groupMySQL['first_record_postdate']),
+					$groupMySQL['ID']
+				)
+			);
+		}
 
-		// If total is bigger than 0 it means we have new parts in the newsgroup
-		if ($total > 0) {
-			echo "Group " . $data["group"] . " has " . number_format($total) . " new parts." . $n;
-			if ($total > $this->MaxMsgsPerRun) {
-				$grouplast = $first + $this->MaxMsgsPerRun;
-				echo "NOTICE: Only processing first " . number_format($this->MaxMsgsPerRun) . " parts." . $n;
+		// Get first article we want aka the oldest.
+		if ($groupMySQL['last_record'] == 0) {
+			if ($this->_newGroupScanByDays) {
+				// For new newsgroups - determine here how far we want to go back using date.
+				$first = $this->daytopost($this->_newGroupDaysToScan, $groupNNTP);
+			} else if ($groupNNTP['first'] >= ($groupNNTP['last'] - ($this->_newGroupMessagesToScan + $this->messageBuffer))) {
+				// If what we want is lower than the groups first article, set the wanted first to the first.
+				$first = $groupNNTP['first'];
+			} else {
+				// Or else, use the newest article minus how much we should get for new groups.
+				$first = (string)($groupNNTP['last'] - ($this->_newGroupMessagesToScan + $this->messageBuffer));
 			}
-			echo "First: " . $data['first'] . " Last: " . $data['last'] . " Local last: " . $groupArr['last_record'] . $n;
-			if ($groupArr['last_record'] == 0)
-				echo "New group starting with " . (($this->NewGroupScanByDays) ? $this->NewGroupDaysToScan . " days" : $this->NewGroupMsgsToScan . " messages") . " worth." . $n;
+
+			// We will use this to subtract so we leave articles for the next time (in case the server doesn't have them yet)
+			$leaveOver = $this->messageBuffer;
+
+			// If this is not a new group, go from our newest to the servers newest.
+		} else {
+			// Set our oldest wanted to our newest local article.
+			$first = $groupMySQL['last_record'];
+
+			// This is how many articles we will grab. (the servers newest minus our newest).
+			$totalCount = (string)($groupNNTP['last'] - $first);
+
+			// Check if the server has more articles than our loop limit x 2.
+			if ($totalCount > ($this->messageBuffer * 2)) {
+				// Get the remainder of $totalCount / $this->message buffer
+				$leaveOver = round(($totalCount % $this->messageBuffer), 0, PHP_ROUND_HALF_DOWN) + $this->messageBuffer;
+			} else {
+				// Else get half of the available.
+				$leaveOver = round(($totalCount / 2), 0, PHP_ROUND_HALF_DOWN);
+			}
+		}
+
+		// The last article we want, aka the newest.
+		$last = $groupLast = (string)($groupNNTP['last'] - $leaveOver);
+
+		// If the newest we want is older than the oldest we want somehow.. set them equal.
+		if ($last < $first) {
+			$last = $groupLast = $first;
+		}
+
+		// This is how many articles we are going to get.
+		$total = (string)($groupLast - $first);
+		// This is how many articles are available (without $leaveOver).
+		$realTotal = (string)($groupNNTP['last'] - $first);
+
+		// Check if we should limit the amount of fetched new headers.
+		if ($maxHeaders > 0) {
+			if ($maxHeaders < ($groupLast - $first)) {
+				$groupLast = $last = (string)($first + $maxHeaders);
+			}
+			$total = (string)($groupLast - $first);
+		}
+
+		// If total is bigger than 0 it means we have new parts in the newsgroup.
+		if ($total > 0) {
+
+			if ($this->_echoCLI) {
+				$this->_colorCLI->doEcho(
+					$this->_colorCLI->primary(
+						($groupMySQL['last_record'] == 0
+							? 'New group ' . $groupNNTP['group'] . ' starting with ' .
+							($this->_newGroupScanByDays
+								? $this->_newGroupDaysToScan . ' days'
+								: number_format($this->_newGroupMessagesToScan) . ' messages'
+							) . ' worth.'
+							: 'Group ' . $groupNNTP['group'] . ' has ' . number_format($realTotal) . ' new articles.'
+						) .
+						' Leaving ' . number_format($leaveOver) .
+						" for next pass.\nServer oldest: " . number_format($groupNNTP['first']) .
+						' Server newest: ' . number_format($groupNNTP['last']) .
+						' Local newest: ' . number_format($groupMySQL['last_record'])
+					), true
+				);
+			}
 
 			$done = false;
-
-			// Get all the parts (in portions of $this->messageBuffer to not use too much memory)
+			// Get all the parts (in portions of $this->messageBuffer to not use too much memory).
 			while ($done === false) {
-				$this->startLoop = microtime(true);
 
+				// Increment last until we reach $groupLast (group newest article).
 				if ($total > $this->messageBuffer) {
-					if ($first + $this->messageBuffer > $grouplast)
-						$last = $grouplast;
-					else
-						$last = $first + $this->messageBuffer;
+					if ((string)($first + $this->messageBuffer) > $groupLast) {
+						$last = $groupLast;
+					} else {
+						$last = (string)($first + $this->messageBuffer);
+					}
+				}
+				// Increment first so we don't get an article we already had.
+				$first++;
+
+				if ($this->_echoCLI) {
+					$this->_colorCLI->doEcho(
+						$this->_colorCLI->header(
+							"\nGetting " . number_format($last - $first + 1) . ' articles (' . number_format($first) .
+							' to ' . number_format($last) . ') from ' . $groupMySQL['name'] . " - (" .
+							number_format($groupLast - $last) . " articles in queue)."
+						)
+					);
 				}
 
-				echo "Getting " . number_format($last - $first + 1) . " parts (" . $first . " to " . $last . ") - " . number_format($grouplast - $last) . " in queue" . $n;
-				flush();
+				// Get article headers from newsgroup.
+				$scanSummary = $this->scan($this->_nntp, $groupMySQL, $first, $last);
 
-				//get headers from newsgroup
-				$lastId = $this->scan($nntp, $groupArr, $first, $last);
+				// Check if we fetched headers.
+				if (!empty($scanSummary)) {
 
-				if ($lastId === false) {
-					//scan failed - skip group
-					return;
+					// If new group, update first record & postdate
+					if (is_null($groupMySQL['first_record_postdate']) && $groupMySQL['first_record'] == 0) {
+						$groupMySQL['first_record'] = $scanSummary['firstArticleNumber'];
+
+						if (isset($scanSummary['firstArticleDate'])) {
+							$groupMySQL['first_record_postdate'] = strtotime($scanSummary['firstArticleDate']);
+						} else {
+							$groupMySQL['first_record_postdate'] = $this->postdate($groupMySQL['first_record'], $groupNNTP);
+						}
+
+						$this->_pdo->queryExec(
+							sprintf('
+								UPDATE groups
+								SET first_record = %s, first_record_postdate = %s
+								WHERE ID = %d',
+								$scanSummary['firstArticleNumber'],
+								$this->_pdo->from_unixtime($this->_pdo->escapeString($groupMySQL['first_record_postdate'])),
+								$groupMySQL['ID']
+							)
+						);
+					}
+
+					if (isset($scanSummary['lastArticleDate'])) {
+						$scanSummary['lastArticleDate'] = strtotime($scanSummary['lastArticleDate']);
+					} else {
+						$scanSummary['lastArticleDate'] = $this->postdate($scanSummary['lastArticleNumber'], $groupNNTP);
+					}
+
+					$this->_pdo->queryExec(
+						sprintf('
+							UPDATE groups
+							SET last_record = %s, last_record_postdate = %s, last_updated = NOW()
+							WHERE ID = %d',
+							$this->_pdo->escapeString($scanSummary['lastArticleNumber']),
+							$this->_pdo->from_unixtime($scanSummary['lastArticleDate']),
+							$groupMySQL['ID']
+						)
+					);
+				} else {
+					// If we didn't fetch headers, update the record still.
+					$this->_pdo->queryExec(
+						sprintf('
+							UPDATE groups
+							SET last_record = %s, last_updated = NOW()
+							WHERE ID = %d',
+							$this->_pdo->escapeString($last),
+							$groupMySQL['ID']
+						)
+					);
 				}
-				$db->queryExec(sprintf("update groups SET last_record = %s, last_updated = now() WHERE ID = %d", $db->escapeString($lastId), $groupArr['ID']));
 
-				if ($last == $grouplast)
+				if ($last == $groupLast) {
 					$done = true;
-				else {
-					$last = $lastId;
-					$first = $last + 1;
+				} else {
+					$first = $last;
 				}
 			}
 
-			$last_record_postdate = $this->postdate($last, $data);
-			if ($last_record_postdate != "") {
-				$db->queryExec(sprintf("update groups SET last_record_postdate = FROM_UNIXTIME(" . $last_record_postdate . "), last_updated = now() WHERE ID = %d", $groupArr['ID'])); //Set group's last postdate
+			if ($this->_echoCLI) {
+				$this->_colorCLI->doEcho(
+					$this->_colorCLI->primary(
+						PHP_EOL . 'Group ' . $groupMySQL['name'] . ' processed in ' .
+						number_format(microtime(true) - $startGroup, 2) . ' seconds.'
+					), true
+				);
 			}
-			$timeGroup = number_format(microtime(true) - $this->startGroup, 2);
-			echo "Group processed in $timeGroup seconds $n $n";
-		} else {
-			echo "No new records for " . $data["group"] . " (first $first last $last total $total) grouplast " . $groupArr['last_record'] . $n . $n;
-
-		}
-
-		if ($blnDoDisconnect) {
-			$nntp->doQuit();
+		} else if ($this->_echoCLI) {
+			$this->_colorCLI->doEcho(
+				$this->_colorCLI->primary(
+					'No new articles for ' . $groupMySQL['name'] . ' (first ' . number_format($first) .
+					', last ' . number_format($last) . ', grouplast ' . number_format($groupMySQL['last_record']) .
+					', total ' . number_format($total) . ")\n" . 'Server oldest: ' . number_format($groupNNTP['first']) .
+					' Server newest: ' . number_format($groupNNTP['last']) . ' Local newest: ' . number_format($groupMySQL['last_record'])
+				), true
+			);
 		}
 	}
 
@@ -262,8 +380,9 @@ class Binaries
 		$this->startHeaders = microtime(true);
 		// Check if MySQL tables exist, create if they do not, get their names at the same time.
 		$tableNames = $this->_groups->getCBPTableNames($this->_tablePerGroup, $groupArr['ID']);
+		$returnArray = [];
 
-		if ($this->compressedHeaders) {
+		if ($this->_compressedHeaders) {
 			$nntpn = new Nntp();
 			$nntpn->doConnect(true);
 			$msgs = $nntp->getOverview($first . "-" . $last, true, false);
@@ -277,10 +396,10 @@ class Binaries
 				// TODO: What now?
 				echo "Failed to get NNTP connection.$n";
 
-				return;
+				return $returnArray;
 			}
 			$nntp->selectGroup($groupArr['name']);
-			if ($this->compressedHeaders) {
+			if ($this->_compressedHeaders) {
 				$nntpn = new Nntp();
 				$nntpn->doConnect(true);
 				$msgs = $nntp->getOverview($first . "-" . $last, true, false);
@@ -302,7 +421,39 @@ class Binaries
 			echo "Error {$msgs->code}: {$msgs->message}$n";
 			echo "Skipping group$n";
 
-			return false;
+			return $returnArray;
+		}
+
+		// Check if we got headers.
+		$msgCount = count($msgs);
+
+		if ($msgCount < 1) {
+			return $returnArray;
+		}
+
+		// Get highest and lowest article numbers/dates.
+		$iterator1 = 0;
+		$iterator2 = $msgCount - 1;
+		while (true) {
+			if (!isset($returnArray['firstArticleNumber']) && isset($msgs[$iterator1]['Number'])) {
+				$returnArray['firstArticleNumber'] = $msgs[$iterator1]['Number'];
+				$returnArray['firstArticleDate'] = $msgs[$iterator1]['Date'];
+			}
+
+			if (!isset($returnArray['lastArticleNumber']) && isset($msgs[$iterator2]['Number'])) {
+				$returnArray['lastArticleNumber'] = $msgs[$iterator2]['Number'];
+				$returnArray['lastArticleDate'] = $msgs[$iterator2]['Date'];
+			}
+
+			// Break if we found non empty articles.
+			if (isset($returnArray['firstArticleNumber']) && isset($returnArray['lastArticleNumber'])) {
+				break;
+			}
+
+			// Break out if we couldn't find anything.
+			if ($iterator1++ >= $msgCount - 1 || $iterator2-- <= 0) {
+				break;
+			}
 		}
 
 		$this->startUpdate = microtime(true);
@@ -358,7 +509,7 @@ class Binaries
 				echo "Error: Server did not return any articles.$n";
 				echo "Skipping group$n";
 
-				return false;
+				return $returnArray;
 			}
 
 			if (sizeof($rangenotreceived) > 0) {
@@ -471,18 +622,32 @@ class Binaries
 				echo "Blacklisted " . array_sum($msgsblacklisted) . " parts in " . sizeof($msgsblacklisted) . " binaries" . $n;
 
 			if ($type != 'partrepair') {
-				echo number_format($count) . ' new, ' . number_format($updatecount) . ' updated, ' . number_format($partcount) . ' parts.';
-				echo " $timeHeaders headers, $timeUpdate update, $timeLoop range.$n";
+				if ($this->_echoCLI) {
+					$this->_colorCLI->doEcho(
+						$this->_colorCLI->alternateOver(number_format($count)).
+						$this->_colorCLI->primaryOver(' new, ') .
+						$this->_colorCLI->alternateOver(number_format($updatecount)).
+						$this->_colorCLI->primaryOver(' updated, ') .
+						$this->_colorCLI->alternateOver(number_format($partcount)).
+						$this->_colorCLI->primaryOver(' parts, ') .
+						$this->_colorCLI->alternateOver($timeHeaders . 's') .
+						$this->_colorCLI->primaryOver(' to download articles, ') .
+						$this->_colorCLI->alternateOver($timeUpdate . 's') .
+						$this->_colorCLI->primaryOver(' to insert binaries/parts, ') .
+						$this->_colorCLI->alternateOver(number_format($timeLoop) . 's') .
+						$this->_colorCLI->primary(' total.')
+					);
+				}
 			}
 			unset($this->message);
 			unset($data);
 
-			return $last;
+			return $returnArray;
 		} else {
 			echo "Error: Can't get parts from server (msgs not array) $n";
 			echo "Skipping group$n";
 
-			return false;
+			return $returnArray;
 		}
 	}
 
@@ -1067,5 +1232,25 @@ class Binaries
 		}
 
 		return $date;
+	}
+	/**
+	 * Log / Echo message.
+	 *
+	 * @param string $message Message to log.
+	 * @param string $method  Method that called this.
+	 * @param int    $level   Logger severity level constant.
+	 * @param string $color   ColorCLI method name.
+	 */
+	private function log($message, $method, $level, $color)
+	{
+		if ($this->_echoCLI) {
+			$this->_colorCLI->doEcho(
+				$this->_colorCLI->$color($message), true
+			);
+		}
+
+		if ($this->_debug) {
+			$this->_debugging->log('Binaries', $method, $message, $level);
+		}
 	}
 }

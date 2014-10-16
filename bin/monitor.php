@@ -7,7 +7,7 @@ require_once(WWW_DIR . "/lib/ColorCLI.php");
 require_once(WWW_DIR . "/lib/showsleep.php");
 
 
-$version = "0.5r0011";
+$version = "0.5r0012";
 
 $pdo = new DB();
 $s = new Sites();

@@ -15,7 +15,7 @@ if (isset($argv[1])) {
 	$group = $g->getByName($group);
 
 	$bin = new Binaries;
-	$bin->updateGroup(null, $group);
+	$bin->updateGroup($group);
 } else {
 	$binaries = new Binaries;
 	$binaries->updateAllGroups();
