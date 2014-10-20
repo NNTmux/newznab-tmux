@@ -500,37 +500,7 @@
 		</tr>
 	</table>
 </fieldset>
-
 <fieldset>
-	<legend>Fetch Missing Movie Info</legend>
-	<table class="input">
-		<tr>
-			<td style="width:180px;"><label for="fetch_movie">Fetch missing movie info from imdb:</label></td>
-			<td>
-				{html_options style="width:180px;" class="siteeditstyle" id="fetch_movie" name='fetch_movie' values=$fetch_movie_ids output=$fetch_movie_names selected=$ftmux->fetch_movie}
-				<div class="hint">Choose to update missing movie info from imdb true/false</div>
-			</td>
-		</tr>
-
-		<tr>
-			<td style="width:180px;"><label for="movie_timer">Fetch Movie Sleep Timer:</label></td>
-			<td>
-				<input id="movie_timer" name="movie_timer" class="short" type="text" value="{$ftmux->movie_timer}"/>
-
-				<div class="hint">The time to sleep from the time the loop ends until it is restarted, in seconds.</div>
-			</td>
-		</tr>
-		<tr>
-			<td style="width:180px;"><label for="explain">Information:</label></td>
-			<td>
-				<div class="explanation">Fetch missing movie info will fetch data from imdb that is missing from movie
-					releases.<br/></div>
-			</td>
-		</tr>
-	</table>
-</fieldset>
-
-<fieldset id="tmux_decrypthashes">
 	<legend>Decrypt Hashes</legend>
 	<table class="input">
 		<tr>
