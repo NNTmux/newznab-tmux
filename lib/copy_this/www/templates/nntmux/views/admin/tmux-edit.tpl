@@ -530,6 +530,38 @@
 	</table>
 </fieldset>
 
+<fieldset id="tmux_decrypthashes">
+	<legend>Decrypt Hashes</legend>
+	<table class="input">
+		<tr>
+			<td style="width:180px;"><label for="dehash">Decrypt Hash Based Release Names:</label></td>
+			<td>
+				{html_options style="width:180px;" class="siteeditstyle" id="dehash" name='dehash' values=$dehash_ids output=$dehash_names selected=$ftmux->dehash}
+				<div class="hint">Choose to run Decrypt Hashes true/false</div>
+			</td>
+		</tr>
+		<tr>
+			<td style="width:180px;"><label for="dehash_timer">Decrypt Hashes Sleep Timer:</label></td>
+			<td>
+				<input id="dehash_timer" name="dehash_timer" class="short" type="text" value="{$ftmux->dehash_timer}"/>
+				<div class="hint">The time to sleep from the time the loop ends until it is restarted, in seconds.</div>
+			</td>
+		</tr>
+		<tr>
+			<td style="width:180px;"><label for="explain">Information:</label></td>
+			<td>
+				<div class="explanation">Decrypt hashes works by matching a hashed release to the md5 of a release in
+					the predb.<br/>
+					Included in the same pane is Update Predb. This scrapes several predb sites and then tries to match
+					against releases.<br/>
+					This should be run along with fixReleasenames.php, this is faster, but only looks at releases.names.
+					fixReleasenames.php goes further and looks at releasefiles.name.
+				</div>
+			</td>
+		</tr>
+	</table>
+</fieldset>
+
 <fieldset>
 	<legend>Update PreDB</legend>
 	<table class="input">
