@@ -364,7 +364,7 @@ class Forking extends \fork_daemon
 
 		$count = 0;
 		if ($data['name']) {
-			$this->safeBackfillGroup = $data['name'];
+			$this->safeBackfillGroup = $data['Name'];
 
 			$count = ($data['our_first'] - $data['their_first']);
 		}
@@ -378,7 +378,7 @@ class Forking extends \fork_daemon
 
 			$queue = array();
 			for ($i = 0; $i <= $geteach - 1; $i++) {
-				$queue[$i] = sprintf("get_range  backfill  %s  %s  %s  %s", $data['name'], $data['our_first'] - $i * $run[0]['maxmsgs'] - $run[0]['maxmsgs'], $data['our_first'] - $i * $run[0]['maxmsgs'] - 1, $i + 1);
+				$queue[$i] = sprintf("get_range  backfill  %s  %s  %s  %s", $data['Name'], $data['our_first'] - $i * $run[0]['maxmsgs'] - $run[0]['maxmsgs'], $data['our_first'] - $i * $run[0]['maxmsgs'] - 1, $i + 1);
 			}
 			$this->work = $queue;
 		}
