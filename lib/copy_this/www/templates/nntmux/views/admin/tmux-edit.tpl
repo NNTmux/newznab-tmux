@@ -531,36 +531,6 @@
 		</tr>
 	</table>
 </fieldset>
-
-<fieldset>
-	<legend>Update PreDB</legend>
-	<table class="input">
-		<tr>
-			<td style="width:180px;"><label for="predb">Update PreDB:</label></td>
-			<td>
-				{html_options style="width:180px;" class="siteeditstyle" id="predb" name='predb' values=$predb_ids output=$predb_names selected=$ftmux->predb}
-				<div class="hint">Choose to update PreDb from nzpre true/false</div>
-			</td>
-		</tr>
-
-		<tr>
-			<td style="width:180px;"><label for="predb_timer">PreDB Sleep Timer:</label></td>
-			<td>
-				<input id="predb_timer" name="predb_timer" class="short" type="text" value="{$ftmux->predb_timer}"/>
-
-				<div class="hint">The time to sleep from the time the loop ends until it is restarted, in seconds.</div>
-			</td>
-		</tr>
-		<tr>
-			<td style="width:180px;"><label for="explain">Information:</label></td>
-			<td>
-				<div class="explanation">Update PreDB data from nzpre. Enable only if you have nzpre access.<br/>
-					You need to enter nzpre details in admin->edit site, otherwise this wont do anything.<br/></div>
-			</td>
-		</tr>
-	</table>
-</fieldset>
-
 <fieldset>
 	<legend>Update TV/Theater</legend>
 	<table class="input">
