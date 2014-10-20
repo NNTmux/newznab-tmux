@@ -1979,10 +1979,11 @@ class Releases
 					$this->pdo->log->doEcho($this->pdo->log->primary('Duplicate - ' . $cleanRelName . ''));
 					$this->delete($relid);
 				} else {
-					$this->pdo->queryExec(sprintf("UPDATE releases SET totalpart = %d, size = %s, COMPLETION = %d, GID=%s WHERE ID = %d",
+					$this->pdo->queryExec(sprintf("UPDATE releases SET totalpart = %d, size = %s, COMPLETION = %d, GID=%s , nzb_guid = %s WHERE ID = %d",
 							$nzbInfo->filecount,
 							$nzbInfo->filesize,
 							$nzbInfo->completion,
+							$this->pdo->escapeString($nzbInfo->gid),
 							$this->pdo->escapeString($nzbInfo->gid),
 							$relid
 						)
