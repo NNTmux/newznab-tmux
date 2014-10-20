@@ -1979,10 +1979,11 @@ class Releases
 					$this->pdo->log->doEcho($this->pdo->log->primary('Duplicate - ' . $cleanRelName . ''));
 					$this->delete($relid);
 				} else {
-					$this->pdo->queryExec(sprintf("UPDATE releases SET totalpart = %d, size = %s, COMPLETION = %d, GID=%s WHERE ID = %d",
+					$this->pdo->queryExec(sprintf("UPDATE releases SET totalpart = %d, size = %s, COMPLETION = %d, GID=%s , nzb_guid = %s WHERE ID = %d",
 							$nzbInfo->filecount,
 							$nzbInfo->filesize,
 							$nzbInfo->completion,
+							$this->pdo->escapeString($nzbInfo->gid),
 							$this->pdo->escapeString($nzbInfo->gid),
 							$relid
 						)
@@ -2183,7 +2184,7 @@ class Releases
 		else
 			$parameters['reqID'] = " null ";
 
-		$parameters['ID'] = $this->pdo->queryInsert(sprintf("INSERT INTO releases (name, searchname, totalpart, groupID, adddate, guid, categoryID, regexID, rageID, postdate, fromname, size, reqID, passwordstatus, completion, haspreview, nfostatus, nzbstatus,
+		$parameters['id'] = $this->pdo->queryInsert(sprintf("INSERT INTO releases (name, searchname, totalpart, groupID, adddate, guid, categoryID, regexID, rageID, postdate, fromname, size, reqID, passwordstatus, completion, haspreview, nfostatus, nzbstatus,
 					isrenamed, iscategorized, reqidstatus, prehashID)
                     VALUES (%s, %s, %d, %d, now(), %s, %d, %s, -1, %s, %s, 0, %s, %d, 100,-1, -1, %d, %d, 1, %d, %d)",
 				$parameters['name'],
@@ -2206,7 +2207,7 @@ class Releases
 
 		$this->sphinxSearch->insertRelease($parameters);
 
-		return $parameters['ID'];
+		return $parameters['id'];
 	}
 
 	/**

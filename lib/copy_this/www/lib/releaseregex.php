@@ -212,11 +212,11 @@ class ReleaseRegex
 					$regcatid = $regexArr["categoryID"];
 				//override
 				if ($regcatid == Category::CAT_PC_0DAY) {
-					if ($cat->isMobileAndroid($matches['name']))
+					if ($cat->isPhone($matches['name']))
 						$regcatid = Category::CAT_PC_MOBILEANDROID;
-					if ($cat->isMobileiOS($matches['name']))
+					if ($cat->isPhone($matches['name']))
 						$regcatid = Category::CAT_PC_MOBILEIOS;
-					if ($cat->isMobileOther($matches['name']))
+					if ($cat->isPhone($matches['name']))
 						$regcatid = Category::CAT_PC_MOBILEOTHER;
 					if ($cat->isIso($matches['name']))
 						$regcatid = Category::CAT_PC_ISO;
@@ -224,7 +224,7 @@ class ReleaseRegex
 						$regcatid = Category::CAT_PC_MAC;
 					if ($cat->isPcGame($matches['name']))
 						$regcatid = Category::CAT_PC_GAMES;
-					if ($cat->isBookEBook($matches['name']))
+					if ($cat->isEBook($matches['name']))
 						$regcatid = Category::CAT_BOOK_EBOOK;
 				}
 
@@ -348,11 +348,11 @@ class ReleaseRegex
 				$done = false;
 
 				while ($done === false) {
-					if ($rangeTotal > $binaries->messagebuffer) {
-						if ($rangeStart + $binaries->messagebuffer > $groupEnd)
+					if ($rangeTotal > $binaries->messageBuffer) {
+						if ($rangeStart + $binaries->messageBuffer > $groupEnd)
 							$rangeEnd = $groupEnd;
 						else
-							$rangeEnd = $rangeStart + $binaries->messagebuffer;
+							$rangeEnd = $rangeStart + $binaries->messageBuffer;
 					}
 
 					if ($binaries->compressedHeaders)
