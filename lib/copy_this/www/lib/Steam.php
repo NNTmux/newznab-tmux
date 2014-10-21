@@ -1,15 +1,10 @@
 <?php
 
 require_once(WWW_DIR . "../misc/update_scripts/nix_scripts/tmux/lib/simple_html_dom.php");
+require_once(WWW_DIR . "lib/util.php");
 
-Class Steam
+class Steam
 {
-
-	const STEAMURL = "http://store.steampowered.com";
-	const STEAMVARS = "/search/?category1=998&os=win&sort_order=ASC&page=1&term=";
-	const AGECHECKURL = "http://store.steampowered.com/agecheck/app/";
-	const GAMEURL = "http://store.steampowered.com/app/";
-	const CDNURL = "http://cdn.akamai.steamstatic.com/steam/apps/";
 
 	/**
 	 * @var
@@ -21,15 +16,16 @@ Class Steam
 	 */
 	public $searchTerm;
 
+	const AGECHECKURL = "http://store.steampowered.com/agecheck/app/";
+	const CDNURL = "http://cdn.akamai.steamstatic.com/steam/apps/";
+	const GAMEURL = "http://store.steampowered.com/app/";
+	const STEAMURL = "http://store.steampowered.com";
+	const STEAMVARS = "/search/?category1=998&os=win&sort_order=ASC&page=1&term=";
+
 	/**
 	 * @var bool
 	 */
 	protected $_ageCheckSet = false;
-
-	/**
-	 * @var string
-	 */
-	protected $_directURL = '';
 
 	/**
 	 * @var bool
@@ -40,6 +36,11 @@ Class Steam
 	 * @var
 	 */
 	protected $_ch;
+
+	/**
+	 * @var string
+	 */
+	protected $_directURL = '';
 
 	/**
 	 * @var
@@ -101,7 +102,7 @@ Class Steam
 		$this->_html = new simple_html_dom();
 		$this->_editHtml = new simple_html_dom();
 		if (isset($this->cookie)) {
-			@$this->_getURL(self::STEAMURL);
+			$this->getUrl(self::STEAMURL);
 		}
 	}
 
@@ -118,6 +119,47 @@ Class Steam
 	}
 
 	/**
+	 * Get Details of the game (Studio,Release Date, Developer)
+	 *
+	 * @return array
+	 */
+	public function details()
+	{
+		if ($this->_ret = $this->_html->find("div.details_block", 0)) {
+			$textarr = array();
+			foreach ($this->_ret->find('text') as $text) {
+				$text = trim($text->plaintext);
+				if (!empty($text)) {
+					$textarr[] = rtrim($text, ":");
+				}
+			}
+			$totaldetails = count($textarr) - 1;
+			for ($i = 0; $i <= $totaldetails;) {
+				if ($textarr[$i] == "Release Date") {
+					$pregmatchdate = $textarr[$i+1];
+					if (preg_match_all('#(?P<day>[0-3]?\d)[^\d]|(?P<month>Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)|(?P<year>(19|20)\d{2})#i',
+						$pregmatchdate,
+						$matches)) {
+
+						$matches    = array_map('array_filter', $matches);
+						$matches    = array_map('array_values', $matches);
+						$matchday   = isset($matches['day'][0]) ? $matches['day'][0] : '1';
+						$matchmonth = isset($matches['month'][0]) ? $matches['month'][0] : '';
+						$matchyear  = isset($matches['year'][0]) ? $matches['year'][0] : '';
+						if (!empty($matchday) && !empty($matchmonth) && !empty($matchyear)) {
+							$textarr[$i + 1] = $matchmonth . '/' . $matchday . '/' . $matchyear;
+						}
+					}
+				}
+				$this->_res['gamedetails'][$textarr[$i]] = $textarr[$i+1];
+				$i = $i+2;
+			}
+		}
+
+		return $this->_res;
+	}
+
+	/**
 	 * Game Description Snippet
 	 *
 	 * @return array
@@ -129,194 +171,6 @@ Class Steam
 		}
 
 		return $this->_res;
-	}
-
-	/**
-	 * Game System Requirements - Minimum and Recommended
-	 *
-	 * @return array
-	 */
-	public function gameRequirements()
-	{
-		if ($this->_ret = $this->_html->find("div#game_area_sys_req_leftCol", 0)) {
-			foreach ($this->_ret->find("li") as $req) {
-				$this->_res['gamerequirements']['minimum'][] = trim($req->plaintext);
-			}
-			if (false !== $key = preg_grep("/Partner Requirements/",
-					$this->_res['gamerequirements']['minimum']
-				)
-			) {
-				$key = array_keys($key);
-				if (isset($key[0])) {
-					unset($this->_res['gamerequirements']['minimum'][$key[0]]);
-				}
-			}
-		}
-
-		if ($this->_ret = $this->_html->find("div#game_area_sys_req_rightCol", 0)) {
-			foreach ($this->_ret->find("li") as $req) {
-				$this->_res['gamerequirements']['recommended'][] = trim($req->plaintext);
-			}
-		}
-
-		return $this->_res;
-	}
-
-	/**
-	 * Gets the metacritic Rating
-	 *
-	 * @return array
-	 */
-	public function rating()
-	{
-		if (isset($this->_response) && isset($this->_title)) {
-			if ($this->_ret = $this->_html->find("div#game_area_metascore", 0)) {
-				$this->_res['rating'] = (int)$this->_ret->plaintext;
-			}
-		}
-
-		return $this->_res;
-	}
-
-	/**
-	 * Gets the (cover and backdrop image)
-	 *
-	 * @return array
-	 */
-	public function images()
-	{
-		if (isset($this->_response) && isset($this->_title)) {
-			if ($this->_ret = $this->_html->find("img.game_header_image", 0)) {
-				$this->_res['cover'] = $this->_ret->src;
-			}
-			if ($this->_ret = $this->_html->find("div.screenshot_holder", 0)) {
-				if ($this->_ret = $this->_ret->find("a", 0)) {
-					if (preg_match('/\?url\=(?<imgurl>.*)/', $this->_ret->href, $matches)) {
-						$this->_res['backdrop'] = trim($matches['imgurl']);
-					} else {
-						$this->_res['backdrop'] = trim($this->_ret->href);
-					}
-
-				}
-			}
-		}
-
-		return $this->_res;
-	}
-
-	/**
-	 * Get Details of the game (Studio,Release Date, Developer)
-	 *
-	 * @return array
-	 */
-	public function details()
-	{
-		if ($this->_ret = $this->_html->find("div.details_block", 0)) {
-			foreach ($this->_ret->find("br") as $b) {
-				$this->_ret = rtrim($b->next_sibling()->innertext, ":");
-				$ret2 = trim($b->next_sibling()->next_sibling()->innertext);
-				if ($this->_ret !== "Languages") {
-					if ($this->_ret === "Release Date") {
-						preg_match('/(?<releasedate>[0-9]{1,2}\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+[0-9]{4})/i', $this->_response, $matches);
-						if (isset($matches['releasedate'])) {
-							$ret2 = $matches['releasedate'];
-						}
-					}
-					$this->_res['gamedetails'][$this->_ret] = $ret2;
-				} else {
-					break;
-				}
-			}
-		}
-
-		return $this->_res;
-	}
-
-	/**
-	 * Gets the Video for the game
-	 *
-	 * @return array
-	 */
-	public function trailer()
-	{
-		if (preg_match('/store.steampowered.com\/video\//', $this->_response)) {
-			$this->_res['trailer'] = self::STEAMURL . '/video/' . $this->_steamGameID;
-			@$this->_getURL($this->_res['trailer']);
-			if (preg_match('@FILENAME\:\s+(?<videourl>\"\b(([\w-]+://?|www[.])[^\s()<>]+(?:\([\w\d]+\)|([^[:punct:]\s]|/)))")@',
-				$this->_response,
-				$matches
-			)
-			) {
-				if (isset($matches['videourl'])) {
-					$this->_res['trailer'] = trim($matches['videourl'], '"');
-				}
-			}
-		} else {
-			if (preg_match('/movie480.webm\?t\=(?<videoidentifier>\d+)/', $this->_response, $matches)) {
-				$this->_res['trailer'] = self::CDNURL . $this->_steamGameID . '/movie480.webm?t=' . trim($matches['videoidentifier'], '"');
-			}
-		}
-
-		return $this->_res;
-	}
-
-	/**
-	 * Searches for a game for a 90% match
-	 *
-	 * @return bool
-	 */
-	public function search()
-	{
-		if (!isset($this->searchTerm)) {
-			return false;
-		}
-
-		if ($this->_getURL(self::STEAMURL . self::STEAMVARS . rawurlencode($this->searchTerm)) !== false) {
-			$title = null;
-			if ($this->_ret = $this->_html->find("div.search_pagination_left", 1)) {
-				if (preg_match('/\d+ of (?<total>\d+)/', trim($this->_ret->plaintext), $matches)) {
-					$this->_totalResults = (int)$matches['total'];
-				}
-				if ($this->_totalResults > 0) {
-					foreach ($this->_html->find("a.search_result_row") as $result) {
-						if (preg_match('/\<h4\>(?<name>.*)\<\/h4\>/i',
-							$result->innertext,
-							$matches
-						)
-						) {
-							$title = $matches['name'];
-						}
-						if (isset($title)) {
-							similar_text($title, $this->searchTerm, $p);
-							if ($p > 90) {
-								$this->_title = $title;
-								if (isset($result->href)) {
-									preg_match('/\/app\/(?<id>\d+)\//', $result->href, $matches);
-									$this->_steamGameID = $matches['id'];
-									$this->_directURL = self::GAMEURL . $this->_steamGameID . '/';
-									@$this->_getURL($result->href);
-									@$this->ageCheck();
-									break;
-								} else {
-									return false;
-								}
-							}
-						}
-					}
-					if (empty($this->_title)) {
-						return false;
-					}
-				} else {
-					return false;
-				}
-			} else {
-				return false;
-			}
-
-			return true;
-		}
-
-		return false;
 	}
 
 	/**
@@ -335,9 +189,6 @@ Class Steam
 		if (is_array($this->gameDescription())) {
 			$results = array_merge($results, $this->gameDescription());
 		}
-		if (is_array($this->gameRequirements())) {
-			$results = array_merge($results, $this->gameRequirements());
-		}
 		if (is_array($this->details())) {
 			$results = array_merge($results, $this->details());
 		}
@@ -355,6 +206,123 @@ Class Steam
 	}
 
 	/**
+	 * Gets the (cover and backdrop image)
+	 *
+	 * @return array
+	 */
+	public function images()
+	{
+		if ($this->_ret = $this->_html->find("img.game_header_image_full", 0)) {
+			$this->_res['cover'] = $this->_ret->src;
+		}
+		if ($this->_ret = $this->_html->find("div.screenshot_holder", 0)) {
+			if ($this->_ret = $this->_ret->find("a", 0)) {
+				if(preg_match('/\?url\=(?<imgurl>.*)/', $this->_ret->href, $matches)){
+					$this->_res['backdrop'] = trim($matches['imgurl']);
+				}else{
+					$this->_res['backdrop'] = trim($this->_ret->href);
+				}
+
+			}
+		}
+
+		return $this->_res;
+	}
+
+	/**
+	 * Gets the metacritic Rating
+	 *
+	 * @return array
+	 */
+	public function rating()
+	{
+		if ($this->_ret = $this->_html->find("div#game_area_metascore", 0)) {
+			$this->_res['rating'] = (int)$this->_ret->plaintext;
+		}
+		return $this->_res;
+	}
+
+	/**
+	 * Searches for a game for a 90% match
+	 *
+	 * @return bool
+	 */
+	public function search()
+	{
+		if (!isset($this->searchTerm)) {
+			return false;
+		}
+
+		if ($this->getUrl(self::STEAMURL . self::STEAMVARS . rawurlencode($this->searchTerm)) !== false) {
+			$title = null;
+			if ($this->_ret = $this->_html->find("div.search_pagination_left", 0)) {
+				if (preg_match('/\d+ of (?<total>\d+)/', trim($this->_ret->plaintext), $matches)) {
+					$this->_totalResults = (int)$matches['total'];
+				}
+				if ($this->_totalResults > 0) {
+					foreach ($this->_html->find("a.search_result_row") as $result) {
+						foreach ($result->find("span.title") as $searchtitle) {
+							$title = (string)trim($searchtitle->innertext);
+						}
+						if (isset($title)) {
+							similar_text(strtolower($title), strtolower($this->searchTerm), $p);
+							if ($p > 90) {
+								$this->_title = $title;
+								if (isset($result->href)) {
+									preg_match('/\/app\/(?<id>\d+)\//', $result->href, $matches);
+									$this->_steamGameID = $matches['id'];
+									$this->_directURL = self::GAMEURL . $this->_steamGameID . '/';
+									$this->getUrl($result->href);
+									$this->ageCheck();
+									return true;
+								} else {
+									return false;
+								}
+							}
+						}
+					}
+					if (empty($this->_title)) {
+						return false;
+					}
+				} else {
+					return false;
+				}
+			} else {
+				return false;
+			}
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Gets the Video for the game
+	 *
+	 * @return array
+	 */
+	public function trailer()
+	{
+		if (preg_match('/store.steampowered.com\/video\//', $this->_response)) {
+			$this->_res['trailer'] = self::STEAMURL . '/video/' . $this->_steamGameID;
+			$this->getUrl($this->_res['trailer']);
+			if (preg_match('@FILENAME\:\s+(?<videourl>\"\b(([\w-]+://?|www[.])[^\s()<>]+(?:\([\w\d]+\)|([^[:punct:]\s]|/)))")@', $this->_response, $matches)
+			) {
+				if (isset($matches['videourl'])) {
+					$this->_res['trailer'] = trim($matches['videourl'], '"');
+				}
+			}
+		} else {
+			if (preg_match('/movie480.webm\?t\=(?<videoidentifier>\d+)/', $this->_response, $matches)
+			) {
+				$this->_res['trailer'] = self::CDNURL . $this->_steamGameID . '/movie480.webm?t=' . trim($matches['videoidentifier'], '"');
+			}
+		}
+
+		return $this->_res;
+	}
+
+	/**
 	 * Sets agecheck, retreive agecheck cookie information
 	 *
 	 */
@@ -362,30 +330,29 @@ Class Steam
 	{
 		if (isset($this->cookie)) {
 			$this->extractCookies(file_get_contents($this->cookie));
-			if ($this->_ageCheckSet === false) {
+			if($this->_ageCheckSet === false) {
 				$this->_postParams = array(
-					"snr"      => "1_agecheck_agecheck__age-gate",
-					"ageDay"   => "1",
+					"snr" => "1_agecheck_agecheck__age-gate",
+					"ageDay" => "1",
 					"ageMonth" => "May",
-					"ageYear"  => "1966"
+					"ageYear" => "1966"
 				);
-				// Do twice so steam can set a birthtime/lastagecheckage cookie value
-				@$this->_getURL(self::AGECHECKURL . $this->_steamGameID . '/', true);
-				@$this->_getURL(self::AGECHECKURL . $this->_steamGameID . '/', true);
+
+				$this->getUrl(self::AGECHECKURL . $this->_steamGameID . '/', true);
 			}
 		}
-		@$this->_getURL(self::GAMEURL . $this->_steamGameID . '/');
+		$this->getUrl(self::GAMEURL . $this->_steamGameID . '/');
 	}
 
 	/**
 	 * Gets Raw Html
 	 *
 	 * @param string $fetchURL
-	 * @param bool   $usePost
+	 * @param bool $usePost
 	 *
 	 * @return bool
 	 */
-	private function _getURL($fetchURL, $usePost = false)
+	private function getUrl($fetchURL, $usePost = false)
 	{
 		if (isset($fetchURL)) {
 			$this->_ch = curl_init($fetchURL);
@@ -403,6 +370,7 @@ Class Steam
 			curl_setopt($this->_ch, CURLOPT_COOKIEJAR, $this->cookie);
 			curl_setopt($this->_ch, CURLOPT_COOKIEFILE, $this->cookie);
 		}
+		curl_setopt_array($this->_ch, Utility::curlSslContextOptions());
 		$this->_response = curl_exec($this->_ch);
 		if (!$this->_response) {
 			curl_close($this->_ch);

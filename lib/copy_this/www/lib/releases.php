@@ -342,125 +342,83 @@ class Releases
 
 
 	/**
-	 * Get a count of releases for main browse pager.
+	 * Used for pager on browse page.
+	 *
+	 * @param array  $cat
+	 * @param int    $maxAge
+	 * @param array  $excludedCats
+	 * @param string $groupName
+	 *
+	 * @return int
 	 */
-	public function getBrowseCount($cat, $maxage = -1, $excludedcats = array(), $grp = array())
+	public function getBrowseCount($cat, $maxAge = -1, $excludedCats = [], $groupName = '')
 	{
-
-
-		$catsrch = "";
-		if (count($cat) > 0 && $cat[0] != -1) {
-			$catsrch = " and (";
-			foreach ($cat as $category) {
-				if ($category != -1) {
-					$categ = new Categorize();
-					if ($categ->isParent($category)) {
-						$children = $categ->getChildren($category);
-						$chlist = "-99";
-						foreach ($children as $child)
-							$chlist .= ", " . $child["ID"];
-
-						if ($chlist != "-99")
-							$catsrch .= " releases.categoryID in (" . $chlist . ") or ";
-					} else {
-						$catsrch .= sprintf(" releases.categoryID = %d or ", $category);
-					}
-				}
-			}
-			$catsrch .= "1=2 )";
-		}
-
-		if ($maxage > 0)
-			$maxage = sprintf(" and postdate > now() - interval %d day ", $maxage);
-		else
-			$maxage = "";
-
-		$grpsql = "";
-		if (count($grp) > 0) {
-			$grpsql = " and (";
-			foreach ($grp as $grpname) {
-				$grpsql .= sprintf(" groups.name = %s or ", $this->pdo->escapeString(str_replace("a.b.", "alt.binaries.", $grpname)));
-			}
-			$grpsql .= "1=2 )";
-		}
-
-		$exccatlist = "";
-		if (count($excludedcats) > 0)
-			$exccatlist = " and categoryID not in (" . implode(",", $excludedcats) . ")";
-
-		$sql = sprintf("SELECT count(releases.ID) AS num FROM releases LEFT OUTER JOIN groups ON groups.ID = releases.groupID WHERE releases.passwordstatus <= (SELECT value FROM site WHERE setting='showpasswordedrelease') %s %s %s %s", $catsrch, $maxage, $exccatlist, $grpsql);
-		$res = $this->pdo->queryOneRow($sql, true);
-
-		return $res["num"];
+		return $this->getPagerCount(
+			sprintf(
+				'SELECT r.id
+				FROM releases r
+				%s
+				WHERE r.nzbstatus = %d
+				AND r.passwordstatus %s
+				%s %s %s %s',
+				($groupName != '' ? 'INNER JOIN groups g ON g.ID = r.groupID' : ''),
+				Enzebe::NZB_ADDED,
+				$this->showPasswords(),
+				($groupName != '' ? sprintf(' AND g.name = %s', $this->pdo->escapeString($groupName)) : ''),
+				$this->categorySQL($cat),
+				($maxAge > 0 ? (' AND r.postdate > NOW() - INTERVAL ' . $maxAge . ' DAY ') : ''),
+				(count($excludedCats) ? (' AND r.categoryID NOT IN (' . implode(',', $excludedCats) . ')') : '')
+			)
+		);
 	}
 
 	/**
-	 * Get a releases for main browse pages.
+	 * Used for browse results.
+	 *
+	 * @param array  $cat
+	 * @param        $start
+	 * @param        $num
+	 * @param string $orderBy
+	 * @param int    $maxAge
+	 * @param array  $excludedCats
+	 * @param string $groupName
+	 *
+	 * @return array
 	 */
-	public function getBrowseRange($cat, $start, $num, $orderby, $maxage = -1, $excludedcats = array(), $grp = array())
+	public function getBrowseRange($cat, $start, $num, $orderBy, $maxAge = -1, $excludedCats = [], $groupName = '')
 	{
-
-
-		if ($start === false)
-			$limit = "";
-		else
-			$limit = " LIMIT " . $start . "," . $num;
-
-		$usecatindex = "";
-		$catsrch = "";
-		if (count($cat) > 0 && $cat[0] != -1) {
-			$catsrch = " and (";
-			foreach ($cat as $category) {
-				if ($category != -1) {
-					$categ = new Categorize();
-					if ($categ->isParent($category)) {
-						$children = $categ->getChildren($category);
-						$chlist = "-99";
-						foreach ($children as $child)
-							$chlist .= ", " . $child["ID"];
-
-						if ($chlist != "-99")
-							$catsrch .= " releases.categoryID in (" . $chlist . ") or ";
-					} else {
-						$catsrch .= sprintf(" releases.categoryID = %d or ", $category);
-					}
-				}
-			}
-			$catsrch .= "1=2 )";
-			$usecatindex = " use index (ix_releases_categoryID) ";
-		}
-
-		$maxagesql = "";
-		if ($maxage > 0)
-			$maxagesql = sprintf(" and postdate > now() - interval %d day ", $maxage);
-
-		$grpsql = "";
-		if (count($grp) > 0) {
-			$grpsql = "SELECT ID FROM groups WHERE (";
-			foreach ($grp as $grpname)
-				$grpsql .= sprintf(" groups.name = %s or ", $this->pdo->escapeString(str_replace("a.b.", "alt.binaries.", $grpname)));
-
-			$grpsql .= "1=2 )";
-
-			$grpres = $this->pdo->query($grpsql);
-			if (count($grpsql) > 0) {
-				$grpsql = " and ( ";
-				foreach ($grpres as $grpresrow)
-					$grpsql .= sprintf(" groups.ID = %d or ", $grpresrow["ID"]);
-
-				$grpsql = substr($grpsql, 0, strlen($grpsql) - 3) . " ) ";
-			} else
-				$grpsql = "";
-		}
-
-		$exccatlist = "";
-		if (count($excludedcats) > 0)
-			$exccatlist = " and releases.categoryID not in (" . implode(",", $excludedcats) . ")";
-
-		$order = $this->getBrowseOrder($orderby);
-		$sql = sprintf(" SELECT releases.*, concat(cp.title, ' > ', c.title) AS category_name, concat(cp.ID, ',', c.ID) AS category_ids, groups.name AS group_name, rn.ID AS nfoID, re.releaseID AS reID, pre.ctime, pre.nuketype, coalesce(movieinfo.ID,0) AS movieinfoID FROM releases %s LEFT OUTER JOIN groups ON groups.ID = releases.groupID LEFT OUTER JOIN movieinfo ON movieinfo.imdbID = releases.imdbID LEFT OUTER JOIN releaseaudio re ON re.releaseID = releases.ID AND re.audioID = 1 LEFT OUTER JOIN releasenfo rn ON rn.releaseID = releases.ID AND rn.nfo IS NOT NULL LEFT OUTER JOIN category c ON c.ID = releases.categoryID LEFT OUTER JOIN category cp ON cp.ID = c.parentID LEFT OUTER JOIN predb pre ON pre.ID = releases.preID WHERE releases.passwordstatus <= (SELECT VALUE FROM site WHERE setting='showpasswordedrelease') %s %s %s %s ORDER BY %s %s" . $limit, $usecatindex, $catsrch, $maxagesql, $exccatlist, $grpsql, $order[0], $order[1]);
-
-		return $this->pdo->query($sql, true);
+		$orderBy = $this->getBrowseOrder($orderBy);
+		return $this->pdo->query(
+			sprintf(
+				"SELECT r.*,
+					CONCAT(cp.title, ' > ', c.title) AS category_name,
+					CONCAT(cp.id, ',', c.ID) AS category_ids,
+					g.name AS group_name,
+					rn.ID AS nfoid,
+					re.releaseID AS reid
+				FROM releases r
+				STRAIGHT_JOIN groups g ON g.ID = r.groupID
+				STRAIGHT_JOIN category c ON c.ID = r.categoryID
+				INNER JOIN category cp ON cp.ID = c.parentID
+				LEFT OUTER JOIN releasevideo re ON re.releaseID = r.ID
+				LEFT OUTER JOIN releasenfo rn ON rn.releaseID = r.ID
+				AND rn.nfo IS NOT NULL
+				WHERE r.nzbstatus = %d
+				AND r.passwordstatus %s
+				%s %s %s %s
+				ORDER BY %s %s %s",
+				Enzebe::NZB_ADDED,
+				$this->showPasswords(),
+				$this->categorySQL($cat),
+				($maxAge > 0 ? (" AND postdate > NOW() - INTERVAL " . $maxAge . ' DAY ') : ''),
+				(count($excludedCats) ? (' AND r.categoryID NOT IN (' . implode(',', $excludedCats) . ')') : ''),
+				($groupName != '' ? sprintf(' AND g.name = %s ', $this->pdo->escapeString($groupName)) : ''),
+				$orderBy[0],
+				$orderBy[1],
+				($start === false ? '' : ' LIMIT ' . $num . ' OFFSET ' . $start)
+			),
+			true, NN_CACHE_EXPIRY_MEDIUM
+		);
 	}
 
 	/**
@@ -3029,5 +2987,41 @@ class Releases
 	public function createGUID()
 	{
 		return sha1(uniqid('', true) . mt_rand());
+	}
+
+	/**
+	 * Buffer of the password status string to form part of the query.
+	 * @var null|string
+	 */
+	private $passwordSettingBuffer = null;
+
+	/**
+	 * Return site setting for hiding/showing passworded releases.
+	 *
+	 * @return int
+	 */
+	public function showPasswords()
+	{
+		if (!is_null($this->passwordSettingBuffer)) {
+			return $this->passwordSettingBuffer;
+		}
+		$setting = $this->pdo->queryOneRow(
+			"SELECT value
+			FROM site
+			WHERE setting = 'showpasswordedrelease'"
+		);
+		$passwordStatus = ('= ' . \Releases::PASSWD_NONE);
+		if ($setting !== false) {
+			switch ($setting['value']) {
+				case 1:
+					$passwordStatus = ('<= ' . \Releases::PASSWD_POTENTIAL);
+					break;
+				case 10:
+					$passwordStatus = ('<= ' . \Releases::PASSWD_RAR);
+					break;
+			}
+		}
+		$this->passwordSettingBuffer = $passwordStatus;
+		return $passwordStatus;
 	}
 }

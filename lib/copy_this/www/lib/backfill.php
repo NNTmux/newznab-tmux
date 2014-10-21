@@ -349,10 +349,10 @@ class Backfill
 				sprintf('
 					UPDATE groups
 					SET first_record_postdate = %s, first_record = %s, last_updated = NOW()
-					WHERE id = %d',
+					WHERE ID = %d',
 					$this->pdo->from_unixtime($newdate),
 					$this->pdo->escapeString($first),
-					$groupArr['id'])
+					$groupArr['ID'])
 			);
 			if ($first == $targetpost) {
 				$done = true;
