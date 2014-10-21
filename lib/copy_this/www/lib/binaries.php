@@ -1253,4 +1253,18 @@ class Binaries
 			$this->_debugging->log('Binaries', $method, $message, $level);
 		}
 	}
+
+	/**
+	 * Delete all Binaries/Parts for a group ID.
+	 *
+	 * @param int $groupID The ID of the group.
+	 *
+	 * @note A trigger automatically deletes the parts.
+	 *
+	 * @return void
+	 */
+	public function purgeGroup($groupID)
+	{
+		$this->_pdo->queryExec(sprintf('DELETE b FROM binaries b WHERE b.groupID = %d', $groupID));
+	}
 }
