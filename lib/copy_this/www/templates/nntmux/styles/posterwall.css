@@ -112,7 +112,7 @@ h3 a.see-more{
 
 h3 a.see-more:hover{
     color:#07637a;
-    ;
+;
 }
 
 
@@ -218,12 +218,12 @@ br.clear{
 */
 
 .title-overflow{
-	background:url("../images/title-overflow.png") repeat-y 100% 0;
-	width:30px;
-	height:40px;
-	position:absolute;
-	top:0;
-	right:0;
+    background:url("../images/title-overflow.png") repeat-y 100% 0;
+    width:30px;
+    height:40px;
+    position:absolute;
+    top:0;
+    right:0;
 }
 
 .main-content {
@@ -433,7 +433,7 @@ br.clear{
 
 .library-wrapper .library-show h4 a:hover{
     color:#000;
-	text-decoration:none;
+    text-decoration:none;
 }
 
 .library-wrapper .library-show h5{
@@ -774,8 +774,8 @@ br.clear{
     border-top: 1px solid rgb(119, 119, 119);
     border-bottom: 1px solid rgb(51, 51, 51);
     background-color: rgb(95, 95, 95);
-	position:relative;
-	}
+    position:relative;
+}
 
 .main-title {
     color: rgb(255, 255, 255);
@@ -798,62 +798,62 @@ br.clear{
 
 
 h2{
-	font-weight:normal;
-	line-height:22px;
-	font-size:22px;
-	position:relative;
-	}
+    font-weight:normal;
+    line-height:22px;
+    font-size:22px;
+    position:relative;
+}
 
 
 h2{
-	font-weight:normal;
-	line-height:21px;
-	font-size:17px;
-	color:#000;
-	}
+    font-weight:normal;
+    line-height:21px;
+    font-size:17px;
+    color:#000;
+}
 
 
 h2 span{
-	font-weight:bold;
-	}
+    font-weight:bold;
+}
 
 
 h2 a:hover{
-	text-decoration:underline;
-	}
+    text-decoration:underline;
+}
 
 
 h2 a.show{
-	font-weight:bold;
-	}
+    font-weight:bold;
+}
 
 
 h2 a.see-more{
-	float:right;
-	font-size:16px;
-	line-height:22px;
-	margin-left:20px;
+    float:right;
+    font-size:16px;
+    line-height:22px;
+    margin-left:20px;
     color:#ddd;
-	}
+}
 
 
 h2 .help-text{
-	float:right;
-	font-weight:normal;
-	color:#aaa;
-	font-style:italic;
-	font-size:14px;
-	line-height:22px;
-	}
+    float:right;
+    font-weight:normal;
+    color:#aaa;
+    font-style:italic;
+    font-size:14px;
+    line-height:22px;
+}
 
 
 h2 .hide-watched{
-	font-size:13px;
-	padding-top:1px;
-	padding-bottom:1px;
-	}
+    font-size:13px;
+    padding-top:1px;
+    padding-bottom:1px;
+}
 
 
 h2 .hide-watched:hover{
-	text-decoration:none;
-	}
+    text-decoration:none;
+}
