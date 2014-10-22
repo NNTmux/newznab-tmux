@@ -226,7 +226,7 @@ class Groups
 				$minFileString,
 				$minSizeString,
 				$group["regexmatchonly"],
-				$group["ID"]
+				$group["id"]
 			)
 		);
 	}

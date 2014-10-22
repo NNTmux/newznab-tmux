@@ -6,40 +6,34 @@ require_once(WWW_DIR."/lib/groups.php");
 require_once(WWW_DIR."/lib/category.php");
 
 $page = new AdminPage();
-$groups = new Groups();
-$category = new Category();
+$groups = new Groups(['Settings' => $page->settings]);
 $id = 0;
 
-// set the current action
+// Set the current action.
 $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view';
 
-switch($action)
-{
+switch($action) {
 	case 'submit':
-		if ($_POST["id"] == "")
-		{
+		if ($_POST["id"] == "") {
+			// Add a new group.
 			$groups->add($_POST);
-		}
-		else
-		{
+		} else {
+			// Update an existing group.
 			$groups->update($_POST);
 		}
 		header("Location:".WWW_TOP."/group-list.php");
 		break;
+
 	case 'view':
 	default:
-
-		if (isset($_GET["id"]))
-		{
+		if (isset($_GET["id"])) {
 			$page->title = "Newsgroup Edit";
 			$id = $_GET["id"];
 			$group = $groups->getByID($id);
-		}
-		else
-		{
+		} else {
 			$page->title = "Newsgroup Add";
 			$group = array();
-			$group["active"] = "1";
+			$group["active"] = "0";
 			$group["backfill"] = "0";
 			$group["minfilestoformrelease"] = "0";
 			$group["minsizetoformrelease"] = "0";
@@ -49,7 +43,6 @@ switch($action)
 			$group["regexmatchonly"] = "1";
 		}
 		$page->smarty->assign('group', $group);
-
 		break;
 }
 

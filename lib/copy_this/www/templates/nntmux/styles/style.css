@@ -1,15 +1,17 @@
-/* Site-wide html styles */
-body { margin: 0 auto; padding: 0; background: #FFF url(../images/menu.gif) repeat-x left top; font-family: Calibri, Arial, Helvetica, sans-serif; font-size: 12px; color: #515151; }
-h1, h2, h3 { margin: 0; font-weight: normal; color: #485459; }
-input, select, textarea { font-family: Calibri, Arial, Helvetica, sans-serif; }
-textarea { height:50px; width:300px; }
-h1 { font-size: 44px; padding-bottom:10px; }
+/*
+site wide html styles
+*/
+body { margin: 0; padding: 0; background: #FFF url(../images/menu.gif) repeat-x left top; font-family: Calibri, Arial, Helvetica, sans-serif;	font-size: 12px; color: #515151; }
+h1, h2, h3 {	margin: 0;	font-weight: normal; color: #485459; }
+input, select, textarea { font-family: Calibri, Arial, Helvetica, sans-serif;}
+textarea { height:100px; width:300px;}
+h1 { font-size: 44px; padding-bottom:10px;}
 h2 { padding-bottom:5px; font-size: 1.6em; }
-h3 { padding:10px 0 5px 0; }
-p, ul, ol { margin-top: 0; line-height: 240%; text-align: justify; }
+h3 { padding:10px 0 5px 0;}
+p, ul, ol { margin-top: 0; line-height: 240%;	text-align: justify; }
 ul, ol { }
 blockquote { }
-a { color: #108120; text-decoration: none; }
+a { color: #4D9408; text-decoration: none;}
 a:hover { text-decoration: underline; }
 a img { border: none; }
 img.left { float: left; margin: 7px 30px 0 0; }
@@ -25,32 +27,32 @@ input[type=text], input[type=password], textarea, select { background: #fff; bac
 /*
 page structure
 */
-#header { width: 940px; 	margin: 0 auto; }
-#page { width: 940px; margin: 0 auto; padding: 50px 0px 0px 0px;}
+#header { width: 1282px; 	margin: 0 auto; }
+#page { width: 1282px; margin: 0 auto; padding: 50px 0px 0px 0px;}
 
-#logo { width: 940px; margin: 0 auto; height: 65px; padding-left:5px; margin-top:4px; background:url("../images/banner.jpg") no-repeat bottom left; }
-#logo h1, #logo p { display:none; margin: 0px; line-height: normal; text-transform: lowercase; font-weight: normal; color: #485459; }
-#logo p { margin-top: 2px; font-size: 13px; color: #A8A8A8; }
-#logo h1 { padding-top: 10px; font-size: 48px; }
-#logo a { color: #A8A8A8; }
-#logo .logolink { float:left; }
-#logo img { margin-top:15px; }
-#logo h1 a { color: #485459; }
+#logo { width: 1282px; height: 65px; margin: 0 auto; padding-left:5px; margin-top:4px; background:url("../images/banner.jpg") no-repeat bottom left; }
+#logo h1, #logo p { display:none; margin: 0px; line-height: normal; text-transform: lowercase; font-weight: normal; color: #485459;}
+#logo p { margin-top: 2px; text-transform: lowercase; font-size: 13px; color: #A8A8A8;}
+#logo h1 { padding-top: 10px; font-size: 48px;}
+#logo a { text-decoration: none; color: #A8A8A8;}
+#logo .logolink {float:left;}
+#logo img { margxin-top:15px; }
+#logo h1 a { text-decoration: none; color: #485459;}
 
-#statusbar { width: 940px; margin: 0 auto; text-align:right; padding:5px 10px 0 0;}
-#statusbar a { color: #515151;}
+#statusbar { width:1282px; margin: 0 auto; text-align:right; padding:5px 10px 0 0;}
+#statusbar a { text-decoration: none; color: #515151;}
 
-#content { float: right; width: 750px;}
+#content { float: right; width: 1092px;}
 #content h1 { font-size: 2.3em;}
 #content p { margin-bottom:20px;}
 
-#sidebar { float: left; width: 160px;}
+#sidebar { float: left; width: 160px; font-size: 12px;}
 #sidebar ul {margin: 0; padding: 0; line-height: normal; list-style-type: none; text-align: left; }
 #sidebar li { margin-bottom: 30px; padding: 0 0 0 0;}
 #sidebar li ul { list-style-type: none;  list-style-position:inside; margin: 0px 10px; padding: 0; margin-left: 1em;}
 #sidebar li li { background-image: url('../images/bullet.jpg'); background-repeat: no-repeat; background-position: 0.7em 1.1em; margin: 0;	padding-left: .5em; padding-top: .8em;padding-bottom:10px; border-bottom: 1px solid #E9E8DD;}
 #sidebar li li a {padding: 0 0 0 20px; font-weight: normal; color: #808080;}
-#sidebar li li a:hover {color: #108120;}
+#sidebar li li a:hover {color: #4D9408;}
 #sidebar li li:hover { cursor:pointer; background-color:#EEE; background-image: url('../images/bullet_hov.jpg');}
 
 #sidebar p { margin: 0; padding: 0px 14px;}
@@ -76,16 +78,16 @@ browse by category top menu
 
 .menupic {padding-left:15px;}
 
-#menulink { float: left; }
+#menulink { float: center; }
 #menulink ul { list-style-type: none; padding: 0; margin: 0; }
 #menulink li { float: left; position: relative; z-index: 100; }
-#menulink a, #menulink :visited {height:32px; display: block; font-size: 0.9em; width: 70px; padding: 1px 0px 0px 5px; color: #000; background-color: #e5e5e5; text-decoration: none; text-align: left; vertical-align: middle; }
+#menulink a, #menulink :visited {height:32px; display: block; font-size: 0.9em; width: 70px; padding: 1px 0px 0px 5px; color: #000; background-color: #e5e5e5; text-decoration: none; text-align: center; vertical-align: middle; }
 #menulink :hover, #menulink a.selected {color:#fff; background-color: #777; }
 #menulink ul ul { visibility: hidden; position: absolute; width: 60px; height: 0; }
 #menulink ul li:hover ul, #menulink ul a:hover ul { visibility: visible; }
 #menusearchlink { padding-top:5px; float:right; }
 #menusearchlink input, #menusearchlink select { font-size: 0.9em; color:#555; }
-#menucontainer { width:940px; height:10px; }
+#menucontainer { width:1282px; height:10px; }
 
 select#headcat {width:120px; float:right; margin-left:5px; height:25px;}
 select#headcat option { padding-left: 10px; }
@@ -119,7 +121,7 @@ table.data td { white-space:normal; vertical-align:top; padding:5px; border-colo
 table.data td.less { color: #888; font-size: 0.9em; white-space:nowrap; }
 table.data td.icons { white-space:nowrap; padding-left:0px; padding-right:0px; width:60px; }
 table.data td.check {cursor:pointer;}
-table.highlight tr:hover td { background-color: #e8fbe6; }
+table.highlight tr:hover td { background-color: #E1F0D9; }
 table tr.alt { background-color: #F6F6F6; }
 table tr.new { background-color: #f6f8ff; }
 table.data em {font-weight:bolder; color:red;}
@@ -212,8 +214,8 @@ div.movextra tr.mlextra {display:none;}
 
 div.movcover { width:140px; }
 div.movcover img { margin-bottom:5px;}
-div.movcover .rndbtn {display:inline-block; margin-top:2px;}
-.mediainfo, .seriesinfo, .preinfo .prehashinfo {cursor:pointer;}
+
+.mediainfo, .seriesinfo, .preinfo {cursor:pointer;}
 
 a.external { background: url('../images/newwindow.png') center right no-repeat !important; padding-right:13px !important;}
 
@@ -292,12 +294,11 @@ movie, console and music modals with backdrop images.
 #musicinfo p {text-align: left; line-height: 180%;}
 
 #moviefull .pic { margin-left: 20px; float: right; }
-#moviefull {padding-bottom:20px;}
-#moviepreviews {text-align: center;}
-#moviepreviews img {max-width:600px;}
-#moviepreviews .previewtitle {margin-bottom: 20px;}
 
-/*
+
+
+
+/* 
 icons and multioperation buttons
 */
 input.nzb_check_all { margin-left:5px; }
@@ -313,19 +314,11 @@ div.icon_cart_clicked	{ background-image:url('../images/icons/cartdown.png'); }
 div.icon_nzb			{ background-image:url('../images/icons/nzbup.png'); }
 div.icon_nzb_clicked	{ background-image:url('../images/icons/nzbdown.png'); }
 div.icon_nzb a			{ text-decoration:none; padding-bottom:2px; padding-right:12px; }
-
-div.icon_sab {
-    background-image: url('../images/icons/queueup.png');
-}
-
-div.icon_sab_clicked {
-    background-image: url('../images/icons/queuedown.png');
-}
-
+div.icon_sab			{ background-image:url('../images/icons/sabup.png'); }
+div.icon_sab_clicked	{ background-image:url('../images/icons/sabdown.png'); }
 div.icon_tvrage			{ background-image:url('../images/icons/tvrage.png'); }
 div.icon_check			{ background-image:url('../images/icons/check.png'); }
-div.icon_nzbvortex		{ background-image: url('../images/icons/vortex/bigsmile.png'); }
-div.icon_nzbvortex_clicked		{ background-image: url('../images/icons/vortex/bigsmiledown.png'); }
+div.icon_nzbvortex		{ background-image: url('../images/icons/tvrage.png'); }
 
 
 
@@ -377,7 +370,7 @@ div.icon_nzbvortex_clicked		{ background-image: url('../images/icons/vortex/bigs
         .cboxSlideshow_off #cboxSlideshow.hover{background-position:-75px -25px;}
 
 /*
-    The following fixes png-transparency for IE6.
+    The following fixes png-transparency for IE6.  
 */
 .cboxIE #cboxTopLeft{background:transparent; filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=images/colorbox/internet_explorer/borderTopLeft.png, sizingMethod='scale');}
 .cboxIE #cboxTopCenter{background:transparent; filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=images/colorbox/internet_explorer/borderTopCenter.png, sizingMethod='scale');}
