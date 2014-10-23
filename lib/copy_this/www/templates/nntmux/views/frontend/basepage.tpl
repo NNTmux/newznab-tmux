@@ -19,13 +19,13 @@
 {/if}
 	<!-- Included CSS files - Bootstrap 2.3.2 - Font Awesome 3.2.0 - plugins master style.css -->
 	<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
-	<link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/3.2.0/css/font-awesome.css" rel="stylesheet" media="screen">
+	<!--<link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/3.2.0/css/font-awesome.css" rel="stylesheet" media="screen">-->
 	<link href="{$smarty.const.WWW_TOP}/templates/nntmux/styles/jquery.qtip.css" rel="stylesheet" media="screen">
 	<!-- <link href="{$smarty.const.WWW_TOP}/themes_shared/styles/subnav.css" rel="stylesheet" media="screen"> -->
 	<link href="{$smarty.const.WWW_TOP}/templates/nntmux/styles/posterwall.css" rel="stylesheet" type="text/css" media="screen" />
 	<link href="{$smarty.const.WWW_TOP}/templates/nntmux/styles/style.css" rel="stylesheet" media="screen">
 	<link rel="shortcut icon" type="image/ico" href="{$smarty.const.WWW_TOP}/templates/nntmux/images/favicon.ico"/>
-	<link rel="search" type="application/opensearchdescription+xml" href="{$smarty.const.WWW_TOP}/opensearch" title="{$site->title|escape}" />
+	<!--<link rel="search" type="application/opensearchdescription+xml" href="{$smarty.const.WWW_TOP}/opensearch" title="{$site->title|escape}" />-->
 	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/nntmux/scripts/jquery.colorbox-min.js"></script>
 	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/nntmux/scripts/jquery.autosize-min.js"></script>
