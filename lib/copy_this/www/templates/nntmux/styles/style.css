@@ -298,7 +298,7 @@ movie, console and music modals with backdrop images.
 
 
 
-/* 
+/*
 icons and multioperation buttons
 */
 input.nzb_check_all { margin-left:5px; }
@@ -370,7 +370,7 @@ div.icon_nzbvortex		{ background-image: url('../images/icons/tvrage.png'); }
         .cboxSlideshow_off #cboxSlideshow.hover{background-position:-75px -25px;}
 
 /*
-    The following fixes png-transparency for IE6.  
+    The following fixes png-transparency for IE6.
 */
 .cboxIE #cboxTopLeft{background:transparent; filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=images/colorbox/internet_explorer/borderTopLeft.png, sizingMethod='scale');}
 .cboxIE #cboxTopCenter{background:transparent; filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src=images/colorbox/internet_explorer/borderTopCenter.png, sizingMethod='scale');}

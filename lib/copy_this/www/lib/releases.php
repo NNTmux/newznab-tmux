@@ -2165,7 +2165,7 @@ class Releases
 
 		$this->sphinxSearch->insertRelease($parameters);
 
-		return $parameters['id'];
+		return $parameters['ID'];
 	}
 
 	/**
