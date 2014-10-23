@@ -1,6 +1,6 @@
 <?php
-require_once(WWW_DIR . '/../misc/update_scripts/nix_scripts/tmux/lib/prehash.php');
-require_once(WWW_DIR . '/../misc/update_scripts/nix_scripts/tmux/lib/IRCScraper.php');
+require_once(NN_TMUX . 'lib/prehash.php');
+require_once(NN_TMUX . 'lib/IRCScraper.php');
 if (!$users->isLoggedIn()) {
 	$page->show403();
 }
@@ -18,7 +18,7 @@ if (!$predata) {
 	print "<table>\n";
 	if (isset($predata['nuked'])) {
 		$nuked = '';
-		switch ($predata['nuked']) {
+		switch($predata['nuked']) {
 			case PreHash::PRE_NUKED:
 				$nuked = 'NUKED';
 				break;
@@ -53,7 +53,7 @@ if (!$predata) {
 		}
 	}
 	if (isset($predata['files'])) {
-		print "<tr><th>Files:</th><td>" . htmlentities((strpos($predata['files'], 'B') ? $predata["files"] : ($predata["files"] . 'MB')), ENT_QUOTES) . "</td></tr>\n";
+		print "<tr><th>Files:</th><td>" . htmlentities((preg_match('/F|B/', $predata['files'], $match) ? $predata["files"] : ($predata["files"] . 'MB')), ENT_QUOTES) . "</td></tr>\n";
 	}
 	print "<tr><th>Pred:</th><td>" . htmlentities($predata["predate"], ENT_QUOTES) . "</td></tr>\n";
 	print "</table>";

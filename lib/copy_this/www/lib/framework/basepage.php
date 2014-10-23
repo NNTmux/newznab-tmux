@@ -23,12 +23,14 @@ class BasePage
 	public $site = '';
 	public $secure_connection = false;
 
-	const FLOOD_THREE_REQUESTS_WITHIN_X_SECONDS = 1.000;
-	const FLOOD_PUNISHMENT_SECONDS = 3.0;
 
 	function BasePage()
 	{
 		@session_start();
+
+		if (NN_FLOOD_CHECK) {
+			$this->floodCheck();
+		}
 
 		if((function_exists("get_magic_quotes_gpc") && get_magic_quotes_gpc()) || ini_get('magic_quotes_sybase'))
 		{
@@ -122,79 +124,52 @@ class BasePage
 		$this->smarty->assign('page', $this);
 	}
 
-	public function floodCheck($loggedin, $role)
+	/**
+	 * Check if the user is flooding.
+	 */
+	public function floodCheck()
 	{
-		//
-		// if flood wait set, the user must wait x seconds until they can access a page
-		//
-		if (empty($argc) &&
-			$role != Users::ROLE_ADMIN &&
-			isset($_SESSION['flood_wait_until']) &&
-			$_SESSION['flood_wait_until'] > microtime(true))
-		{
-			$this->showFloodWarning();
-		}
-		else
-		{
-			//
-			// if user not an admin, they are allowed three requests in FLOOD_THREE_REQUESTS_WITHIN_X_SECONDS seconds
-			//
-			if(empty($argc) && $role != Users::ROLE_ADMIN)
-			{
-				if (!isset($_SESSION['flood_check']))
-				{
-					$_SESSION['flood_check'] = "1_".microtime(true);
-				}
-				else
-				{
-					$hit = substr($_SESSION['flood_check'], 0, strpos($_SESSION['flood_check'], "_", 0));
-					if ($hit >= 3)
-					{
-						$onetime = substr($_SESSION['flood_check'], strpos($_SESSION['flood_check'], "_") + 1);
-						if ($onetime + BasePage::FLOOD_THREE_REQUESTS_WITHIN_X_SECONDS > microtime(true))
-						{
-							$_SESSION['flood_wait_until'] = microtime(true) + BasePage::FLOOD_PUNISHMENT_SECONDS;
-							unset($_SESSION['flood_check']);
-							$this->showFloodWarning();
+		$waitTime = (NN_FLOOD_WAIT_TIME < 1 ? 5 : NN_FLOOD_WAIT_TIME);
+		// Check if this is not from CLI.
+		if (empty($argc)) {
+			// If flood wait set, the user must wait x seconds until they can access a page.
+			if (isset($_SESSION['flood_wait_until']) && $_SESSION['flood_wait_until'] > microtime(true)) {
+				$this->showFloodWarning($waitTime);
+			} else {
+				// If user not an admin, they are allowed three requests in FLOOD_THREE_REQUESTS_WITHIN_X_SECONDS seconds.
+				if (!isset($_SESSION['flood_check_hits'])) {
+					$_SESSION['flood_check_hits'] = 1;
+					$_SESSION['flood_check_time'] = microtime(true);
+				} else {
+					if ($_SESSION['flood_check_hits'] >= (NN_FLOOD_MAX_REQUESTS_PER_SECOND < 1 ? 5 : NN_FLOOD_MAX_REQUESTS_PER_SECOND)) {
+						if ($_SESSION['flood_check_time'] + 1 > microtime(true)) {
+							$_SESSION['flood_wait_until'] = microtime(true) + $waitTime;
+							unset($_SESSION['flood_check_hits']);
+							$this->showFloodWarning($waitTime);
+						} else {
+							$_SESSION['flood_check_hits'] = 1;
+							$_SESSION['flood_check_time'] = microtime(true);
 						}
-						else
-						{
-							$_SESSION['flood_check'] = "1_".microtime(true);
-						}
-					}
-					else
-					{
-						$hit++;
-						$_SESSION['flood_check'] = $hit.substr($_SESSION['flood_check'], strpos($_SESSION['flood_check'], "_", 0));
+					} else {
+						$_SESSION['flood_check_hits']++;
 					}
 				}
 			}
 		}
 	}
 
-	//
-	// Done in html here to reduce any smarty processing burden if a large flood is underway
-	//
-	public function showFloodWarning()
+	/**
+	 * Done in html here to reduce any smarty processing burden if a large flood is underway.
+	 */
+	public function showFloodWarning($seconds = 5)
 	{
-		header('HTTP/1.1 503 Service Temporarily Unavailable');
-		header('Retry-After: '.BasePage::FLOOD_PUNISHMENT_SECONDS);
-		echo "
-			<html>
-			<head>
-				<title>Service Unavailable</title>
-			</head>
-
-			<body>
-				<h1>Service Unavailable</h1>
-
-				<p>Too many requests!</p>
-
-				<p>You must <b>wait ".BasePage::FLOOD_PUNISHMENT_SECONDS." seconds</b> before trying again.</p>
-
-			</body>
-			</html>";
-		die();
+		header('Retry-After: ' . $seconds);
+		$this->show503(
+			sprintf(
+				'Too many requests!</p><p>You must wait <b>%s seconds</b> before trying again.',
+				$seconds
+			)
+		);
 	}
 
 	//
