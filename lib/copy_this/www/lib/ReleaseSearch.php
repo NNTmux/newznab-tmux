@@ -33,7 +33,7 @@ class ReleaseSearch
 				$this->fullTextJoinString = '';
 				break;
 			case self::SPHINX:
-				$this->fullTextJoinString = 'INNER JOIN releases_se rse ON rse.id = r.id';
+				$this->fullTextJoinString = 'INNER JOIN releases_se rse ON rse.id = r.ID';
 				break;
 			case self::FULLTEXT:
 			default:
