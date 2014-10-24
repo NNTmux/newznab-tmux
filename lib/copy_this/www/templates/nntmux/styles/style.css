@@ -232,7 +232,7 @@ div.movextra tr.mlextra {display:none;}
 div.movcover { width:140px; }
 div.movcover img { margin-bottom:5px;}
 
-.mediainfo, .seriesinfo {cursor:pointer;}
+.mediainfo, .seriesinfo, .preinfo .prehashinfo {cursor:pointer;}
 
 a.external { background: url('../images/newwindow.png') center right no-repeat !important; padding-right:13px !important;}
 
@@ -257,7 +257,7 @@ div.nosearchresults ul { line-height: 150%;}
 
 span.warning { color: red; }
 
-/*! nZEDb tooltip style */
+/*! Tmux tooltip style */
 .ui-tooltip-tmux .ui-tooltip-titlebar,
 .ui-tooltip-tmux .ui-tooltip-content{
     border-color: #90D93F;

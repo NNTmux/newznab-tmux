@@ -252,6 +252,11 @@ class ReleaseRegex
 	{
 		$db = new Db();
 		$cat = new Categorize();
+		$s = new Sites();
+		$site = $s->get();
+		$groups = new Groups();
+		$groupID = $groups->getByNameByID($groupname);
+		$group = $groups->getCBPTableNames($site->tablePerGroup, $groupID);
 
 		$catList = $cat->getForSelect();
 		$matches = array();
@@ -260,7 +265,7 @@ class ReleaseRegex
 			$groupname = '.*';
 
 		if ($matchagainstbins !== '')
-			$sql = sprintf("select b.*, '0' as size, '0' as blacklistID, g.name as groupname from binaries b left join groups g on g.ID = b.groupID where b.groupID IN (select g.ID from groups g where g.name REGEXP %s) order by b.date desc", $db->escapeString('^' . $groupname . '$'));
+			$sql = sprintf("select b.*, '0' as size, '0' as blacklistID, g.name as groupname from %s b left join groups g on g.ID = b.groupID where b.groupID IN (select g.ID from groups g where g.name REGEXP %s) order by b.date desc", $group['bname'], $db->escapeString('^' . $groupname . '$'));
 		else
 			$sql = sprintf("select rrt.* from releaseregextesting rrt where rrt.groupname REGEXP %s order by rrt.date desc", $db->escapeString('^' . $groupname . '$'));
 
@@ -355,10 +360,8 @@ class ReleaseRegex
 							$rangeEnd = $rangeStart + $binaries->messageBuffer;
 					}
 
-					if ($binaries->compressedHeaders)
-						$msgs = $nntp->getXOverview($rangeStart . "-" . $rangeEnd, true, false);
-					else
-						$msgs = $nntp->getOverview($rangeStart . "-" . $rangeEnd, true, false);
+
+						$msgs = $nntp->getXOver($rangeStart . "-" . $rangeEnd, true, false);
 
 					if (PEAR::isError($msgs)) {
 						$ret[] = "Error {$msgs->code}: {$msgs->message} on " . $group;
