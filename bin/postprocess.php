@@ -35,6 +35,7 @@ $args = array(
 	'pre'        => true,
 	'sharing'    => true,
 	'tv'         => false,
+	'tvdb'       => false,
 	'xxx'        => false,
 );
 
@@ -58,6 +59,7 @@ if (!isset($argv[1]) || !in_array($argv[1], $args) || !isset($argv[2]) || !in_ar
 		. "php postprocess.php book true        ...: Processes books.\n"
 		. "php postprocess.php anime true       ...: Processes anime.\n"
 		. "php postprocess.php tv true          ...: Processes tv.\n"
+		. "php postprocess.php tvdb true        ...: Processes tvdb.\n"
 		. "php postprocess.php xxx true         ...: Processes xxx.\n"
 		. "php postprocess.php additional true  ...: Processes previews/mediainfo/etc...\n"
 		. "php postprocess.php sharing true     ...: Processes uploading/downloading comments.\n"
@@ -134,6 +136,9 @@ switch ($argv[1]) {
 		break;
 	case 'tv':
 		$postProcess->processTV('', (isset($argv[3]) && in_array($argv[3], $charArray) ? $argv[3] : ''));
+		break;
+	case 'tvdb':
+		$postProcess->processTvDB();
 		break;
 	case 'xxx':
 		$postProcess->processXXX();

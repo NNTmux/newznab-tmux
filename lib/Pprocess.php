@@ -18,6 +18,7 @@ require_once(WWW_DIR . "lib/anidb.php");
 require_once(WWW_DIR . "lib/book.php");
 require_once(WWW_DIR.  "lib/Books.php");
 require_once(WWW_DIR . "lib/Games.php");
+require_once(WWW_DIR . "lib/thetvdb.php");
 require_once(WWW_DIR . "lib/XXX.php");
 require_once(WWW_DIR . "lib/Logger.php");
 require_once(WWW_DIR . "/lib/ConsoleTools.php");
@@ -149,6 +150,7 @@ class PProcess
 		$this->processGames();
 		$this->processAnime();
 		$this->processTv();
+		$this->processTvDB();
 		$this->processXXX();
 		$this->processBooks();
 	}
@@ -272,6 +274,15 @@ class PProcess
 		$processTV = (is_numeric($processTV) ? $processTV : $this->site->lookuptvrage);
 		if ($processTV > 0) {
 			(new TvAnger(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processTvReleases($groupID, $guidChar, $processTV);
+		}
+	}
+
+	public function processTvDB()
+	{
+		if ($this->site->lookupthetvdb == 1)
+		{
+			$thetvdb = new TheTVDB($this->echooutput);
+			$thetvdb->processReleases();
 		}
 	}
 
