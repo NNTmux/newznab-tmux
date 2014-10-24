@@ -1,6 +1,3 @@
-ALTER TABLE `predb`
-ADD `md5` VARCHAR(32) NULL,
-ADD INDEX (`md5`);
 ALTER TABLE `releases`
 ADD `dehashstatus` TINYINT(1) NOT NULL DEFAULT 0,
 ADD `nfostatus` TINYINT NOT NULL DEFAULT 0,
