@@ -413,7 +413,7 @@ class TvAnger
 							// Next episode.
 							if (isset($epInfo['next']) && $epInfo['next']['episode'] != '') {
 								if ($prev_ep == "" && $arr['nextinfo'] != '' && $epInfo['next']['day_time'] > strtotime($arr["nextdate"]) && strtotime(date('Y-m-d', strtotime($arr["nextdate"]))) < $yesterday) {
-									$this->pdo->queryExec(sprintf("UPDATE tvrage SET prevdate = nextdate, previnfo = nextinfo WHERE ID = %d", $arr['ID']));
+									$this->pdo->queryExec(sprintf("UPDATE tvrage SET prevdate = nextdate, previnfo = nextinfo  WHERE ID = %d", $arr['ID']));
 									$prev_ep = "SWAPPED with: " . $arr['nextinfo'] . " - " . date("r", strtotime($arr["nextdate"]));
 								}
 								$next_ep = $epInfo['next']['episode'] . ', "' . $epInfo['next']['title'] . '"';

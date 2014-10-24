@@ -133,8 +133,8 @@ if (isset($argv[1]) && isset($argv[2]) && $argv[2] == "fmyisam") {
 	} else {
 		printf($cli->header("Not converting releasesearch / predbhash as your INNODB version does not support fulltext indexes"));
 	}
-} else if (isset($argv[1]) && $argv[1] == "collections") {
-	$arr = array("parts", "binaries", "collections");
+} else if (isset($argv[1]) && $argv[1] == "binaries") {
+	$arr = array("parts", "binaries");
 	foreach ($arr as $row) {
 		$tbl = $row;
 		printf($cli->header("Converting $tbl"));
@@ -177,7 +177,7 @@ if (isset($argv[1]) && isset($argv[2]) && $argv[2] == "fmyisam") {
 		. "php convert_mysql_tables.php cinnodb-noparts                                ...: Converts all the tables to InnoDB Compressed. All tables except parts and releasenfo will be converted to Compressed row format.\n"
 		. "                                                                                 Alls parts* will be converted to MyISAM Dynamic. This is recommended when using Table Per Group.\n"
 		. "                                                                                 NB if your innodb version < 5.6 releasesearch / predbhash will not be converted as fulltext indexes are not supported.\n"
-		. "php convert_mysql_tables.php collections                                    ...: Converts collections, binaries, parts to MyIsam.\n"
+		. "php convert_mysql_tables.php binaries                                   	   ...: Converts binaries, parts to MyIsam.\n"
 		. "php convert_mysql_tables.php mariadb-tokudb                                 ...: Converts all the tables to MariaDB Tokutek DB. Use this is you installed mariadb-tokudb-engine. \n"
 		. "                                                                                 The TokuDB engine needs to be activated first.\n"
 		. "                                                                                 https://mariadb.com/kb/en/how-to-enable-tokudb-in-mariadb/\n"

@@ -50,7 +50,7 @@
 							{/foreach}
 						</ul>
 					</li>
-				{elseif ($parentcat.ID == 6000 && $userdata.xxxview=="1" && $site->lookupxxx=="1")}
+				{elseif ($parentcat.id == 6000 && $userdata.xxxview=="1" && $site->lookupxxx=="1")}
 					<li class="dropdown">
 						<a id="cat3"
 						   class="dropdown-toggle"
@@ -61,13 +61,36 @@
 						<ul class="dropdown-menu" role="menu" aria-labelledby="cat3">
 							<li><a href="{$smarty.const.WWW_TOP}/xxx">All {$parentcat.title}</a></li>
 							{foreach from=$parentcat.subcatlist item=subcat}
-								{if $subcat.ID == 6010 OR 6020 OR 6030 OR 6040}
+								{if $subcat.id == 6010 OR 6020 OR 6030 OR 6040}
 									<li><a title="Browse {$subcat.title}"
-										   href="{$smarty.const.WWW_TOP}/xxx?t={$subcat.ID}">{$subcat.title}</a>
+										   href="{$smarty.const.WWW_TOP}/xxx?t={$subcat.id}">{$subcat.title}</a>
 									</li>
 								{else}
 									<li><a title="Browse {$subcat.title}"
-										   href="{$smarty.const.WWW_TOP}/browse?t={$subcat.ID}">{$subcat.title}</a>
+										   href="{$smarty.const.WWW_TOP}/browse?t={$subcat.id}">{$subcat.title}</a>
+									</li>
+								{/if}
+							{/foreach}
+						</ul>
+					</li>
+				{elseif ($parentcat.id == 6000 && $userdata.xxxview=="1" && $site->lookupxxx=="1")}
+					<li class="dropdown">
+						<a id="cat3"
+						   class="dropdown-toggle"
+						   data-toggle="dropdown"
+						   data-hover="dropdown"
+						   href="{$smarty.const.WWW_TOP}/xxx">{$parentcat.title}
+							<b class="caret"></b></a>
+						<ul class="dropdown-menu" role="menu" aria-labelledby="cat3">
+							<li><a href="{$smarty.const.WWW_TOP}/xxx">All {$parentcat.title}</a></li>
+							{foreach from=$parentcat.subcatlist item=subcat}
+								{if $subcat.id == 6010 OR 6020 OR 6030 OR 6040}
+									<li><a title="Browse {$subcat.title}"
+										   href="{$smarty.const.WWW_TOP}/xxx?t={$subcat.id}">{$subcat.title}</a>
+									</li>
+								{else}
+									<li><a title="Browse {$subcat.title}"
+										   href="{$smarty.const.WWW_TOP}/browse?t={$subcat.id}">{$subcat.title}</a>
 									</li>
 								{/if}
 							{/foreach}
@@ -101,15 +124,13 @@
 	<div id="menusearchlink">
 		<form id="headsearch_form" action="{$smarty.const.WWW_TOP}/search/" method="get">
 
-			<div class="gobutton" title="Submit search"><input id="headsearch_go" type="button" value="" tabindex="3"/>
-			</div>
+			<div class="gobutton" title="Submit search"><input ID="headsearch_go" type="submit" value="" tabindex="3" /></div>
 
 			<label style="display:none;" for="headcat">Search Category</label>
 			<select id="headcat" name="t" tabindex="2">
 				<option class="grouping" value="-1">All</option>
 				{foreach from=$parentcatlist item=parentcat}
-					<option {if $header_menu_cat==$parentcat.ID}selected="selected"{/if} class="grouping"
-							value="{$parentcat.ID}">{$parentcat.title}</option>
+					<option {if $header_menu_cat==$parentcat.ID}selected="selected"{/if} class="grouping" value="{$parentcat.ID}">{$parentcat.title}</option>
 					{foreach from=$parentcat.subcatlist item=subcat}
 						<option {if $header_menu_cat==$subcat.ID}selected="selected"{/if} value="{$subcat.ID}">&nbsp;&nbsp;{$subcat.title}</option>
 					{/foreach}
@@ -117,9 +138,7 @@
 			</select>
 
 			<label style="display:none;" for="headsearch">Search Text</label>
-			<input id="headsearch" name="search"
-				   value="{if $header_menu_search == ""}Enter keywords{else}{$header_menu_search|escape:"htmlall"}{/if}"
-				   style="width:85px;" type="text" tabindex="1"/>
+			<input id="headsearch" name="search" value="{if $header_menu_search == ""}Enter keywords{else}{$header_menu_search|escape:"htmlall"}{/if}" style="width:85px;" type="text" tabindex="1" />
 
 		</form>
 	</div>
