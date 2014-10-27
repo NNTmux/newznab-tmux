@@ -55,7 +55,7 @@ function getPreName($argv)
 			}
 
 			if ($success === 0) {
-				$pdo->queryDirect(sprintf('UPDATE releases SET dehashstatus = dehashstatus - 1 WHERE ID = %d', $row['releaseID']));
+				$pdo->queryDirect(sprintf('UPDATE releases SET dehashstatus = dehashstatus - 1 WHERE ID = %d', $row['releaseid']));
 			} else {
 				$counted++;
 			}

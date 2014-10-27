@@ -5,12 +5,12 @@ if (!$users->isLoggedIn()) {
 	$page->show403();
 }
 
-if (!isset($_REQUEST["ID"])) {
+if (!isset($_REQUEST["id"])) {
 	$page->show404();
 }
 
 $pre = new PreHash();
-$predata = $pre->getOne($_REQUEST["ID"]);
+$predata = $pre->getOne($_REQUEST["id"]);
 
 if (!$predata) {
 	print "No pre info";

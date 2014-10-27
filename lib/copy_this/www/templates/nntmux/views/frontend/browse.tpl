@@ -98,7 +98,7 @@
 						{/if}
 
 						<div class="resextra">
-							<div class="btns">{strip}
+							<div class="btns" style="float:right">
 									{if $result.nfoID > 0}<a href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}"
 															 title="View Nfo" class="modal_nfo rndbtn" rel="nfo">
 											Nfo</a>{/if}

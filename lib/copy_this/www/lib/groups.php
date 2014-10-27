@@ -460,7 +460,7 @@ class Groups
 	 */
 	public function getCBPTableNames($tpgSetting, $groupID)
 	{
-		$groupKey = ($groupID);
+		$groupKey = ($groupID . '_' . (int) $tpgSetting);
 
 		// Check if buffered and return. Prevents re-querying MySQL when TPG is on.
 		if (isset($this->cbppTableNames[$groupKey])) {

@@ -620,7 +620,7 @@ class Konsole
 					$con['salesrank'],
 					$this->pdo->escapeString($con['platform']),
 					$this->pdo->escapeString($con['publisher']),
-					($con['consolegenreID'] == -1 ? "null" : $con['consolegenreid']),
+					($con['consolegenreid'] == -1 ? "null" : $con['consolegenreid']),
 					$this->pdo->escapeString($con['esrb']),
 					($con['releasedate'] != "" ? $this->pdo->escapeString($con['releasedate']) : "null"),
 					$this->pdo->escapeString(substr($con['review'], 0, 3000)),
