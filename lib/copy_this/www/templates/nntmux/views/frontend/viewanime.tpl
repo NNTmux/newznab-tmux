@@ -104,7 +104,7 @@
 					<td class="check"><input id="chk{$result.guid|substr:0:7}" type="checkbox" class="nzb_check"
 											 name="{$seasonnum}" value="{$result.guid}"/></td>
 					<td class="less"><a title="This anime in {$result.category_name}"
-										href="{$smarty.const.WWW_TOP}/anime/{$result.anidbID}?t={$result.categoryID}">{$result.category_name}</a>
+										href="{$smarty.const.WWW_TOP}/anime/{$result.anidbid}?t={$result.categoryID}">{$result.category_name}</a>
 					</td>
 					<td class="less mid" width="40" title="{$result.postdate}">{$result.postdate|timeago}</td>
 					<td width="40" class="less right">{$result.size|fsize_format:"MB"}{if $result.completion > 0}

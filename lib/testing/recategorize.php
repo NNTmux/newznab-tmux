@@ -95,7 +95,7 @@ function categorizeRelease($update = true, $where, $echooutput = false)
 								gamesinfo_id = 0,
 								xxxinfo_id = 0,
 								bookinfoID = NULL,
-								anidbID = NULL,
+								anidbid = NULL,
 								categoryID = %d
 							WHERE ID = %d",
 							$catId,

@@ -1,4 +1,4 @@
- 
+
 <h1>{$page->title}</h1>
 
 <form action="{$SCRIPT_NAME}?action=submit" method="POST">
@@ -74,9 +74,9 @@
 </tr>
 
 <tr>
-	<td><label for="anidbID">AniDB Id</label>:</td>
+	<td><label for="anidbid">AniDB Id</label>:</td>
 	<td>
-		<input id="anidbID" class="short" name="anidbID" type="text" value="{$release.anidbID}" />
+		<input id="anidbid" class="short" name="anidbid" type="text" value="{$release.anidbid}" />
 	</td>
 </tr>
 

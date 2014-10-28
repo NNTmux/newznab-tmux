@@ -91,7 +91,7 @@ class Backfill
 	{
 		$defaults = [
 			'Echo'      => true,
-			'Logger' => null,
+			'Logger'    => null,
 			'Groups'    => null,
 			'NNTP'      => null,
 			'Settings'  => null
@@ -199,7 +199,7 @@ class Backfill
 				$this->pdo->log->doEcho($this->pdo->log->primary($dMessage));
 			}
 		} else {
-			$dMessage = "No groups specified. Ensure groups are added to nZEDb's database for updating.";
+			$dMessage = "No groups specified. Ensure groups are added to newznab's database for updating.";
 			if ($this->_debug) {
 				$this->_debugging->log('Backfill', "backfillAllGroups", $dMessage, \Logger::LOG_FATAL);
 			}

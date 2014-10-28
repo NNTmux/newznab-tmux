@@ -15,13 +15,13 @@
 {literal}
 <script type="text/javascript">
 	$('#release').submit(function(){return false;});
-	
-	$('#save').click(function() {	
+
+	$('#save').click(function() {
 		var formData = $('#release').serialize();
 		$.post($('#release').attr('action') + '&' + formData, function(resp){
 			$('#updatePanel').html(resp);
 		});
-	
+
 	});
 </script>
 {/literal}
@@ -63,9 +63,9 @@
 </tr>
 
 <tr>
-	<td><label for="anidbID">AniDB Id</label>:</td>
+	<td><label for="anidbid">AniDB Id</label>:</td>
 	<td>
-		<input id="anidbID" class="short" name="anidbID" type="text" value="{$release.anidbID}" />
+		<input id="anidbid" class="short" name="anidbid" type="text" value="{$release.anidbid}" />
 	</td>
 </tr>
 

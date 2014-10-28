@@ -579,7 +579,7 @@ class NameFixer
 								UPDATE releases
 								SET rageID = -1, seriesfull = NULL, season = NULL, episode = NULL,
 									tvtitle = NULL, tvairdate = NULL, imdbID = NULL, musicinfoID = NULL,
-									consoleinfoID = NULL, bookinfoID = NULL, anidbID = NULL, prehashID = %d,
+									consoleinfoID = NULL, bookinfoID = NULL, anidbid = NULL, prehashID = %d,
 									searchname = %s, %s categoryID = %d
 								WHERE ID = %d',
 								$preId,
@@ -597,7 +597,7 @@ class NameFixer
 								UPDATE releases
 								SET rageID = -1, seriesfull = NULL, season = NULL, episode = NULL,
 									tvtitle = NULL, tvairdate = NULL, imdbID = NULL, musicinfoID = NULL,
-									consoleinfoID = NULL, bookinfoID = NULL, anidbID = NULL, prehashID = %d,
+									consoleinfoID = NULL, bookinfoID = NULL, anidbid = NULL, prehashID = %d,
 									searchname = %s, iscategorized = 1, categoryID = %d
 								WHERE ID = %d',
 								$preId,

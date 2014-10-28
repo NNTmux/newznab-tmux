@@ -363,7 +363,7 @@ class Forking extends \fork_daemon
 		);
 
 		$count = 0;
-		if ($data['name']) {
+		if ($data['Name']) {
 			$this->safeBackfillGroup = $data['Name'];
 
 			$count = ($data['our_first'] - $data['their_first']);

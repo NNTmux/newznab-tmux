@@ -379,7 +379,7 @@ class Utility
 	 *
 	 * @return string
 	 */
-	function bytesToSizeString($bytes, $precision = 0)
+	static public function bytesToSizeString($bytes, $precision = 0)
 	{
 		if ($bytes == 0) {
 			return '0B';

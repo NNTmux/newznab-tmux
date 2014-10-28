@@ -14,7 +14,7 @@
 								   alt="{$con.title|escape:"htmlall"}" style="float:right;" />{/if}
 {if $xxx && $xxx.cover == 1}<img class="shadow" src="{$smarty.const.WWW_TOP}/covers/xxx/{$xxx.id}-cover.jpg" width="160"
 								 alt="{$movie.title|escape:"htmlall"}" style="float:right;" />{/if}
-{if $anidb && $release.anidbID > 0 && $anidb.picture != ""}<img class="shadow"
+{if $anidb && $release.anidbid > 0 && $anidb.picture != ""}<img class="shadow"
 																src="{$smarty.const.WWW_TOP}/covers/anime/{$anidb.anidbid}.jpg"
 																width="180" alt="{$anidb.title|escape:"htmlall"}"
 																style="float:right;" />{/if}
@@ -127,7 +127,7 @@
 	</tr>
 {/if}
 
-{if $anidb && $release.anidbID > 0}
+{if $anidb && $release.anidbid > 0}
 	<tr>
 		<th>Anime Info:</th>
 		<td>
@@ -163,7 +163,7 @@
 			{/if}
 			<div style="margin-top:10px;">
 				<a class="rndbtn" title="View all episodes from this anime"
-				   href="{$smarty.const.WWW_TOP}/anime/{$release.anidbID}">All Episodes</a>
+				   href="{$smarty.const.WWW_TOP}/anime/{$release.anidbid}">All Episodes</a>
 				<a class="rndbtn" target="_blank"
 				   href="{$site->dereferrer_link}http://anidb.net/perl-bin/animedb.pl?show=anime&aid={$anidb.anidbid}"
 				   title="View at AniDB">AniDB</a>
@@ -171,7 +171,7 @@
 										   href="{$site->dereferrer_link}http://thetvdb.com/?tab=series&id={$release.tvdbID}&lid=7"
 										   title="View at TheTVDB">TheTVDB</a>{/if}
 				<a class="rndbtn"
-				   href="{$smarty.const.WWW_TOP}/rss?anidb={$release.anidbID}&amp;dl=1&amp;i={$userdata.ID}&amp;r={$userdata.rsstoken}"
+				   href="{$smarty.const.WWW_TOP}/rss?anidb={$release.anidbid}&amp;dl=1&amp;i={$userdata.ID}&amp;r={$userdata.rsstoken}"
 				   title="RSS feed for this anime">Anime RSS Feed</a>
 			</div>
 		</td>

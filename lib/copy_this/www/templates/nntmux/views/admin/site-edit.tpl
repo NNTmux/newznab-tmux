@@ -329,6 +329,18 @@
 			</div>
 		</td>
 	</tr>
+	<tr>
+		<td style="width:180px;"><label for="timeoutpath">GNU Timeout Path:</label></td>
+		<td>
+			<input id="timeoutpath" class="long" name="timeoutpath" type="text" value="{$site->timeoutpath}"/>
+			<div class="hint">The path to the <a href="http://linux.die.net/man/1/timeout">timeout</a> binary.
+				This is used to limit the amount of time unrar/7zip/mediainfo/ffmpeg/avconv can run.
+				You can the time limit in the process additional section.
+				You can leave this empty to disable this.
+				<br/>Use forward slashes in windows <span style="font-family:courier;">c:/path/to/timeout.exe</span>
+			</div>
+		</td>
+	</tr>
 
 </table>
 </fieldset>
@@ -1181,6 +1193,14 @@
 <fieldset>
 	<legend>Advanced - Postprocessing Settings</legend>
 	<table class="input">
+		<tr>
+			<td style="width:180px;"><label for="timeoutseconds">Time in seconds to kill unrar/7zip/mediainfo/ffmpeg/avconv:</label></td>
+			<td>
+				<input class="short" id="timeoutseconds" name="timeoutseconds" type="text" value="{$site->timeoutseconds}"/>
+				<div class="hint">How much time to wait for unrar/7zip/mediainfo/ffmpeg/avconv before killing it, set to 0 to disable.
+					60 is a good value. Requires the GNU Timeout path to be set.</div>
+			</td>
+		</tr>
 		<tr>
 			<td style="width:180px;"><label for="maxaddprocessed">Maximum add PP per run:</label></td>
 			<td>

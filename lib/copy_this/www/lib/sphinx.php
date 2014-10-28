@@ -1251,7 +1251,7 @@ class Sphinx
         $search = array();
         $order = array("postdate", "desc");
         if ($anidbID > -1) {
-            $where[] = sprintf("anidbID = %d", $anidbID);
+            $where[] = sprintf("anidbid = %d", $anidbID);
         }
 
         if (is_numeric($epno)) {

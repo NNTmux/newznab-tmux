@@ -187,7 +187,7 @@ class TheTVDB
 	{
 		$db = new DB();
 
-		$results = $db->queryDirect(sprintf("SELECT ID, searchname, rageID, anidbID, seriesfull, season, episode, tvtitle FROM releases WHERE episodeinfoID IS NULL AND categoryID IN ( SELECT ID FROM category WHERE parentID = %d ) LIMIT 150", Category::CAT_PARENT_TV));
+		$results = $db->queryDirect(sprintf("SELECT ID, searchname, rageID, anidbid, seriesfull, season, episode, tvtitle FROM releases WHERE episodeinfoID IS NULL AND categoryID IN ( SELECT ID FROM category WHERE parentID = %d ) LIMIT 150", Category::CAT_PARENT_TV));
 
 		if ($db->getNumRows($results) > 0)
 		{
@@ -202,8 +202,8 @@ class TheTVDB
 				if($arr['rageID'] > 0) {
 					$seriesName = $db->queryOneRow(sprintf('SELECT releasetitle AS seriesName FROM tvrage WHERE rageID = %d', $arr['rageID']));
 				}
-				elseif($arr['anidbID'] > 0) {
-					$seriesName = $db->queryOneRow(sprintf('SELECT title AS seriesName FROM anidb WHERE anidbID = %d', $arr['anidbID']));
+				elseif($arr['anidbid'] > 0) {
+					$seriesName = $db->queryOneRow(sprintf('SELECT title AS seriesName FROM anidb WHERE anidbid = %d', $arr['anidbid']));
 				}
 
 				if(empty($seriesName) || !$seriesName)
@@ -258,7 +258,7 @@ class TheTVDB
 				if($TheTVDBAPIArray['tvdbID'] > 0)
 				{
 					$epabsolute = '0';
-					if($arr['anidbID'] > 0)
+					if($arr['anidbid'] > 0)
 					{
 						if(preg_match('/S(?P<season>\d+)[ED](?P<episode>\d+)/', $arr['episode'], $seasonEpisode))
 						{
@@ -284,7 +284,7 @@ class TheTVDB
 				}
 
 				$additionalSql = '';
-				if($arr['anidbID'] > 0 && $episodeArray['epabsolute'] > 0)
+				if($arr['anidbid'] > 0 && $episodeArray['epabsolute'] > 0)
 				{
 					$additionalSql = sprintf(', season = NULL, episode = %d, tvtitle = %s, tvairdate = %s',
 						$episodeArray['epabsolute'],

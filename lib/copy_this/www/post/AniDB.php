@@ -71,7 +71,7 @@ class PostAniDB
 							SELECT searchname, ID
 							FROM releases
 							WHERE nzbstatus = %d
-							AND anidbID IS NULL
+							AND anidbid IS NULL
 							AND categoryID = %d
 							ORDER BY postdate DESC
 							LIMIT %d',
@@ -96,7 +96,7 @@ class PostAniDB
 					$this->pdo->queryExec(
 							  sprintf('
 									UPDATE releases
-									SET anidbID = %d
+									SET anidbid = %d
 									WHERE ID = %d',
 									  $this->status,
 									  $release['ID']
@@ -291,7 +291,7 @@ class PostAniDB
 		$this->pdo->queryExec(
 				  sprintf("
 						UPDATE releases
-						SET anidbID = %d, seriesfull = %s, season = 'S01', episode = %s,
+						SET anidbid = %d, seriesfull = %s, season = 'S01', episode = %s,
 							tvtitle = %s, tvairdate = %s
 						WHERE ID = %d",
 						  $anidbId,

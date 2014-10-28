@@ -512,7 +512,7 @@ class Groups
 	}
 
 	/**
-	 * Check if the tables exists for the groupID, make new tables for table per group.
+	 * Check if the tables exists for the group_id, make new tables for table per group.
 	 *
 	 * @param int $groupID
 	 *
@@ -524,7 +524,17 @@ class Groups
 			if ($this->pdo->queryExec(sprintf('SELECT * FROM %s_%s LIMIT 1', $tableName, $groupID), true) === false) {
 				if ($this->pdo->queryExec(sprintf('CREATE TABLE %s_%s LIKE %s', $tableName, $groupID, $tableName), true) === false) {
 					return false;
-				}
+				} /*else {
+					if ($tableName === 'binaries') {
+						$this->pdo->queryExec(
+							sprintf(
+								'CREATE TRIGGER delete_binaries_%s BEFORE DELETE ON binaries_%s FOR EACH ROW BEGIN' .
+								' DELETE FROM parts_%s WHERE binaryID = OLD.ID; END',
+								$groupID, $groupID, $groupID
+							)
+						);
+					}
+				}*/
 			}
 		}
 		return true;

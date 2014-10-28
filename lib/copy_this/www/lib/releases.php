@@ -591,7 +591,7 @@ class Releases
 		}
 
 		$rage = ($rageid > -1) ? sprintf(" and releases.rageID = %d ", $rageid) : '';
-		$anidb = ($anidbid > -1) ? sprintf(" and releases.anidbID = %d ", $anidbid) : '';
+		$anidb = ($anidbid > -1) ? sprintf(" and releases.anidbid = %d ", $anidbid) : '';
 		$airdate = ($airdate > -1) ? sprintf(" and releases.tvairdate >= DATE_SUB(CURDATE(), INTERVAL %d DAY) ", $airdate) : '';
 
 		$sql = sprintf(" SELECT releases.*, rn.ID AS nfoID, m.title AS imdbtitle, m.cover, m.imdbID, m.rating, m.plot, m.year, m.genre, m.director, m.actors, g.name AS group_name, concat(cp.title, ' > ', c.title) AS category_name, concat(cp.ID, ',', c.ID) AS category_ids, coalesce(cp.ID,0) AS parentCategoryID, mu.title AS mu_title, mu.url AS mu_url, mu.artist AS mu_artist, mu.publisher AS mu_publisher, mu.releasedate AS mu_releasedate, mu.review AS mu_review, mu.tracks AS mu_tracks, mu.cover AS mu_cover, mug.title AS mu_genre, co.title AS co_title, co.url AS co_url, co.publisher AS co_publisher, co.releasedate AS co_releasedate, co.review AS co_review, co.cover AS co_cover, cog.title AS co_genre,   bo.title AS bo_title, bo.url AS bo_url, bo.publisher AS bo_publisher, bo.author AS bo_author, bo.publishdate AS bo_publishdate, bo.review AS bo_review, bo.cover AS bo_cover  FROM releases LEFT OUTER JOIN category c ON c.ID = releases.categoryID LEFT OUTER JOIN category cp ON cp.ID = c.parentID LEFT OUTER JOIN groups g ON g.ID = releases.groupID LEFT OUTER JOIN releasenfo rn ON rn.releaseID = releases.ID AND rn.nfo IS NOT NULL LEFT OUTER JOIN movieinfo m ON m.imdbID = releases.imdbID AND m.title != '' LEFT OUTER JOIN musicinfo mu ON mu.ID = releases.musicinfoID LEFT OUTER JOIN genres mug ON mug.ID = mu.genreID LEFT OUTER JOIN bookinfo bo ON bo.ID = releases.bookinfoID LEFT OUTER JOIN consoleinfo co ON co.ID = releases.consoleinfoID LEFT OUTER JOIN genres cog ON cog.ID = co.genreID %s WHERE releases.passwordstatus <= (SELECT value FROM site WHERE setting='showpasswordedrelease') %s %s %s %s ORDER BY postdate DESC %s", $cartsrch, $catsrch, $rage, $anidb, $airdate, $limit);
@@ -791,7 +791,7 @@ class Releases
 	{
 
 
-		$this->pdo->queryExec(sprintf("UPDATE releases SET name=%s, searchname=%s, fromname=%s, categoryID=%d, totalpart=%d, grabs=%d, size=%s, postdate=%s, adddate=%s, rageID=%d, seriesfull=%s, season=%s, episode=%s, imdbID=%d, anidbID=%d, tvdbID=%d,consoleinfoID=%d WHERE id = %d",
+		$this->pdo->queryExec(sprintf("UPDATE releases SET name=%s, searchname=%s, fromname=%s, categoryID=%d, totalpart=%d, grabs=%d, size=%s, postdate=%s, adddate=%s, rageID=%d, seriesfull=%s, season=%s, episode=%s, imdbID=%d, anidbid=%d, tvdbID=%d,consoleinfoID=%d WHERE id = %d",
 				$this->pdo->escapeString($name), $this->pdo->escapeString($searchname), $this->pdo->escapeString($fromname), $category, $parts, $grabs, $this->pdo->escapeString($size), $this->pdo->escapeString($posteddate), $this->pdo->escapeString($addeddate), $rageid, $this->pdo->escapeString($seriesfull), $this->pdo->escapeString($season), $this->pdo->escapeString($episode), $imdbid, $anidbid, $tvdbid, $consoleinfoid, $id
 			)
 		);
@@ -956,7 +956,7 @@ class Releases
 		}
 
 
-		$anidbID = ($anidbID > -1) ? sprintf(" AND anidbID = %d ", $anidbID) : '';
+		$anidbID = ($anidbID > -1) ? sprintf(" AND anidbid = %d ", $anidbID) : '';
 
 		$epno = is_numeric($epno) ? sprintf(" AND releases.episode LIKE '%s' ", $this->pdo->escapeString('%' . $epno . '%')) : '';
 
@@ -1511,9 +1511,9 @@ class Releases
 	public function removeAnidbIdFromReleases($anidbID)
 	{
 
-		$res = $this->pdo->queryOneRow(sprintf("SELECT count(ID) AS num FROM releases WHERE anidbID = %d", $anidbID));
+		$res = $this->pdo->queryOneRow(sprintf("SELECT count(ID) AS num FROM releases WHERE anidbid = %d", $anidbID));
 		$ret = $res["num"];
-		$this->pdo->queryExec(sprintf("UPDATE releases SET anidbID = -1, episode = NULL, tvtitle = NULL, tvairdate = NULL WHERE anidbID = %d", $anidbID));
+		$this->pdo->queryExec(sprintf("UPDATE releases SET anidbid = -1, episode = NULL, tvtitle = NULL, tvairdate = NULL WHERE anidbid = %d", $anidbID));
 
 		return $ret;
 	}
@@ -2138,7 +2138,7 @@ class Releases
 			$parameters['regexID'] = " null ";
 
 		if ($parameters['reqID'] != "")
-			$parameters['reqID'] = $this->pdo->escapeString('reqID');
+			$parameters['reqID'] = $this->pdo->escapeString($parameters['reqID']);
 		else
 			$parameters['reqID'] = " null ";
 
@@ -2219,7 +2219,7 @@ class Releases
 				$re->delete($rel['ID']);
 				$re->deleteFull($rel['ID']);
 				$ri->delete($rel['guid']);
-				$this->pdo->queryExec(sprintf("DELETE FROM releases WHERE id = %d", $rel['ID']));
+				$this->pdo->queryExec(sprintf("DELETE FROM releases WHERE ID = %d", $rel['ID']));
 			}
 		}
 	}

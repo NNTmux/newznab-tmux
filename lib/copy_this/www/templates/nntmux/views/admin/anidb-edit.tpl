@@ -1,4 +1,4 @@
- 
+
 <h1>{$page->title}</h1>
 
 <form enctype="multipart/form-data" action="{$SCRIPT_NAME}?action=submit" method="POST">
@@ -8,9 +8,9 @@
 <table class="input">
 
 <tr>
-	<td><label for="anidbID">AniDB Id</label>:</td>
+	<td><label for="anidbid">AniDB Id</label>:</td>
 	<td>
-		<input id="anidbID" class="long" name="anidbID" type="text" value="{$anime.anidbID|escape:'htmlall'}" />
+		<input id="anidbid" class="long" name="anidbid" type="text" value="{$anime.anidbid|escape:'htmlall'}" />
 	</td>
 </tr>
 

@@ -292,7 +292,7 @@ class RequestIDWeb extends RequestID
 			sprintf('
 				UPDATE releases
 				SET rageID = -1, seriesfull = NULL, season = NULL, episode = NULL, tvtitle = NULL,
-				tvairdate = NULL, imdbID = NULL, musicinfoID = NULL, consoleinfoID = NULL, bookinfoID = NULL, anidbID = NULL,
+				tvairdate = NULL, imdbID = NULL, musicinfoID = NULL, consoleinfoID = NULL, bookinfoID = NULL, anidbid = NULL,
 				reqidstatus = %d, isrenamed = 1, proc_files = 1, searchname = %s, categoryID = %d,
 				prehashID = %d
 				WHERE ID = %d',

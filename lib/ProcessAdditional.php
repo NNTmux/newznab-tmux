@@ -2284,7 +2284,7 @@ Class ProcessAdditional
 							UPDATE releases
 							SET rageID = -1, seriesfull = NULL, season = NULL, episode = NULL,
 								tvtitle = NULL, tvairdate = NULL, imdbID = NULL, musicinfoID = NULL,
-								consoleinfoID = NULL, bookinfoID = NULL, anidbID = NULL, prehashID = 0,
+								consoleinfoID = NULL, bookinfoID = NULL, anidbid = NULL, prehashID = 0,
 								searchname = %s, isrenamed = 1, iscategorized = 1, proc_files = 1, categoryID = %d
 							WHERE ID = %d',
 							$newTitle,
