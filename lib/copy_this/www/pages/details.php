@@ -6,6 +6,7 @@ require_once(WWW_DIR."/lib/releaseextra.php");
 require_once(WWW_DIR."/lib/tvrage.php");
 require_once(WWW_DIR."/lib/anidb.php");
 require_once(WWW_DIR."/lib/predb.php");
+require_once(WWW_DIR."/lib/Musik.php");
 require_once(WWW_DIR."/lib/episode.php");
 require_once(WWW_DIR . "/lib/XXX.php");
 require_once(WWW_DIR . "/lib/Games.php");
@@ -140,7 +141,7 @@ if (isset($_GET["id"]))
 	$mus = '';
 	if ($data['musicinfoID'] != '') {
 		require_once(WWW_DIR."/lib/music.php");
-		$music = new Music();
+		$music = new Musik(['Settings' => $page->settings]);
 		$mus = $music->getMusicInfo($data['musicinfoID']);
 	}
 

@@ -5,6 +5,7 @@ require_once(WWW_DIR . "/lib/Categorize.php");
 require_once(WWW_DIR . "/lib/book.php");
 require_once(WWW_DIR . "/lib/groups.php");
 require_once(WWW_DIR . "/lib/music.php");
+require_once(WWW_DIR . "/lib/Musik.php");
 require_once(WWW_DIR . "/lib/site.php");
 require_once(WWW_DIR . "/lib/nzb.php");
 require_once(WWW_DIR . "/lib/ColorCLI.php");
@@ -46,7 +47,7 @@ class MiscSorter
 		$this->category = new Categorize();
 		$this->movie = new Film();
 		$this->namefixer = new NameFixer();
-		$this->music = new Music();
+		$this->music = new Musik();
 		$this->console = new Konsole();
 		$s = new Sites();
 		$this->site = $s->get();
