@@ -10,6 +10,7 @@ require_once(WWW_DIR . "lib/releaseextra.php");
 require_once(WWW_DIR . "lib/groups.php");
 require_once(WWW_DIR . 'lib/nntp.php');
 require_once(WWW_DIR . 'lib/music.php');
+require_once(WWW_DIR . 'lib/Musik.php');
 require_once(WWW_DIR . "lib/site.php");
 require_once(WWW_DIR . "lib/Tmux.php");
 require_once(WWW_DIR . "lib/amazon.php");
@@ -229,7 +230,7 @@ class PProcess
 	public function processMusic()
 	{
 		if ($this->site->lookupmusic != 0) {
-			(new Music())->processMusicReleases();
+			(new Musik())->processMusicReleases();
 		}
 	}
 

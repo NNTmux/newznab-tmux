@@ -14,13 +14,11 @@
 {if $results|@count > 0}
 	<form id="nzb_multi_operations_form" action="get">
 
-		<div class="nzb_multi_operations">
-			{if $section != ''}View:
-				<a href="{$smarty.const.WWW_TOP}/{$section}?t={$category}">Covers</a>
-				|
-				<b>List</b>
-				<br/>
-			{/if}
+	<div class="nzb_multi_operations">
+		{if $covgroup != ''}
+			View:
+			<a href="{$smarty.const.WWW_TOP}/{$covgroup}?t={$category}">Covers</a> | <b>List</b><br />
+		{/if}
 			<small>With Selected:</small>
 			<input type="button" class="rndbtn nzb_multi_operations_download" value="Download NZBs"/>
 			<input type="button" class="rndbtn nzb_multi_operations_cart" value="Add to Cart"/>
