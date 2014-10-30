@@ -387,7 +387,7 @@ class Musik
 		$defaultGenres = $gen->getGenres(\Genres::MUSIC_TYPE);
 		$genreassoc = array();
 		foreach ($defaultGenres as $dg) {
-			$genreassoc[$dg['id']] = strtolower($dg['title']);
+			$genreassoc[$dg['ID']] = strtolower($dg['title']);
 		}
 
 		// Get album properties.
