@@ -99,11 +99,9 @@ switch ($argv[1]) {
 		break;
 	case 'amazon':
 		$postProcess->processBooks();
-		$pp->processBooks();
 		$postProcess->processConsoles();
 		$postProcess->processGames();
 		$postProcess->processMusic();
-		$pp->processMusic();
 		$postProcess->processXXX();
 		break;
 	case 'anime':

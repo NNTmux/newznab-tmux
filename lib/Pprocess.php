@@ -176,7 +176,7 @@ class PProcess
 	public function processBooks()
 	{
 		if ($this->site->lookupbooks != 0) {
-			(new Books())->processBookReleases();
+			(new \Books(['Echo' => $this->echooutput, 'Settings' => $this->pdo, ]))->processBookReleases();
 		}
 	}
 
@@ -230,7 +230,7 @@ class PProcess
 	public function processMusic()
 	{
 		if ($this->site->lookupmusic != 0) {
-			(new Musik())->processMusicReleases();
+			(new \Musik(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processMusicReleases();
 		}
 	}
 
