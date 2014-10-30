@@ -160,10 +160,10 @@ if (isset($_GET["id"]))
 	}
 
 	$AniDBAPIArray = '';
-	if ($data["anidbid"] > 0)
+	if ($data["anidbID"] > 0)
 	{
-		$AniDB = new AniDB(['Settings' => $releases->db]);
-		$AniDBAPIArray = $AniDB->getAnimeInfo($data["anidbid"]);
+		$AniDB = new AniDB(['Settings' => $releases->pdo]);
+		$AniDBAPIArray = $AniDB->getAnimeInfo($data["anidbID"]);
 	}
 
 	$predbQuery = '';
