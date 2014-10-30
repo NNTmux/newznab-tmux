@@ -837,173 +837,178 @@ class Releases
 
 
 	/**
-	 * Search for releases by rage id. Used by API/Sickbeard.
+	 * @param        $rageId
+	 * @param string $series
+	 * @param string $episode
+	 * @param int    $offset
+	 * @param int    $limit
+	 * @param string $name
+	 * @param array  $cat
+	 * @param int    $maxAge
+	 *
+	 * @return array
 	 */
-	public function searchbyRageId($rageId, $series = "", $episode = "", $offset = 0, $limit = 100, $name = "", $cat = array(-1), $maxage = -1)
+	public function searchbyRageId($rageId, $series = '', $episode = '', $offset = 0, $limit = 100, $name = '', $cat = [-1], $maxAge = -1)
 	{
-		$s = new Sites();
-		$site = $s->get();
+		$whereSql = sprintf(
+			"%s
+			WHERE r.categoryID BETWEEN 5000 AND 5999
+			AND r.nzbstatus = %d
+			AND r.passwordstatus %s %s %s %s %s %s %s",
+			($name !== '' ? $this->releaseSearch->getFullTextJoinString() : ''),
+			Enzebe::NZB_ADDED,
+			$this->showPasswords(),
+			($rageId != -1 ? sprintf(' AND rageID = %d ', $rageId) : ''),
+			($series != '' ? sprintf(' AND UPPER(r.season) = UPPER(%s)', $this->pdo->escapeString(((is_numeric($series) && strlen($series) != 4) ? sprintf('S%02d', $series) : $series))) : ''),
+			($episode != '' ? sprintf(' AND r.episode %s', $this->pdo->likeString((is_numeric($episode) ? sprintf('E%02d', $episode) : $episode))) : ''),
+			($name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : ''),
+			$this->categorySQL($cat),
+			($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : '')
+		);
 
-		// Sphinx appears much slower than searching mysql directly when you have a rage ID already
-		if ($site->sphinxenabled && $rageId == "-1") {
-			$sphinx = new Sphinx();
-			$results = $sphinx->searchbyRageId($rageId, $series, $episode, $offset, $limit, $name, $cat, $maxage, array(), true);
-			if (is_array($results))
-				return $results;
+		$baseSql = sprintf(
+			"SELECT r.*,
+				concat(cp.title, ' > ', c.title) AS category_name,
+				CONCAT(cp.ID, ',', c.ID) AS category_ids,
+				groups.name AS group_name,
+				rn.ID AS nfoid,
+				re.releaseID AS reid
+			FROM releases r
+			INNER JOIN category c ON c.ID = r.categoryID
+			INNER JOIN groups ON groups.ID = r.groupID
+			LEFT OUTER JOIN releasevideo re ON re.releaseID = r.ID
+			LEFT OUTER JOIN releasenfo rn ON rn.releaseID = r.ID AND rn.nfo IS NOT NULL
+			INNER JOIN category cp ON cp.ID = c.parentID
+			%s",
+			$whereSql
+		);
+
+		$sql = sprintf(
+			"%s
+			ORDER BY postdate DESC
+			LIMIT %d OFFSET %d",
+			$baseSql,
+			$limit,
+			$offset
+		);
+		$releases = $this->pdo->query($sql);
+		if ($releases && count($releases)) {
+			$releases[0]['_totalrows'] = $this->getPagerCount($baseSql);
 		}
-
-
-		if ($rageId != "-1")
-			$rageId = sprintf(" and rageID = %d ", $rageId);
-		else
-			$rageId = "";
-
-		if ($series != "") {
-			//
-			// Exclude four digit series, which will be the year 2010 etc
-			//
-			if (is_numeric($series) && strlen($series) != 4)
-				$series = sprintf('S%02d', $series);
-
-			$series = sprintf(" and releases.season = %s", $this->pdo->escapeString($series));
-		}
-		if ($episode != "") {
-			if (is_numeric($episode))
-				$episode = sprintf('E%02d', $episode);
-
-			$episode = sprintf(" and releases.episode like %s", $this->pdo->escapeString('%' . $episode . '%'));
-		}
-
-		//
-		// if the query starts with a ^ it indicates the search is looking for items which start with the term
-		// still do the fulltext match, but mandate that all items returned must start with the provided word
-		//
-		$words = explode(" ", $name);
-		$searchsql = "";
-		$intwordcount = 0;
-		if (count($words) > 0) {
-			foreach ($words as $word) {
-				if ($word != "") {
-					//
-					// see if the first word had a caret, which indicates search must start with term
-					//
-					if ($intwordcount == 0 && (strpos($word, "^") === 0))
-						$searchsql .= sprintf(" and releases.searchname like %s", $this->pdo->escapeString(substr($word, 1) . "%"));
-					elseif (substr($word, 0, 2) == '--')
-						$searchsql .= sprintf(" and releases.searchname not like %s", $this->pdo->escapeString("%" . substr($word, 2) . "%"));
-					else
-						$searchsql .= sprintf(" and releases.searchname like %s", $this->pdo->escapeString("%" . $word . "%"));
-
-					$intwordcount++;
-				}
-			}
-		}
-
-		$catsrch = "";
-		$usecatindex = "";
-		if (count($cat) > 0 && $cat[0] != -1) {
-			$catsrch = " and (";
-			foreach ($cat as $category) {
-				if ($category != -1) {
-					$categ = new Categorize();
-					if ($categ->isParent($category)) {
-						$children = $categ->getChildren($category);
-						$chlist = "-99";
-						foreach ($children as $child)
-							$chlist .= ", " . $child["ID"];
-
-						if ($chlist != "-99")
-							$catsrch .= " releases.categoryID in (" . $chlist . ") or ";
-					} else {
-						$catsrch .= sprintf(" releases.categoryID = %d or ", $category);
-					}
-				}
-			}
-			$catsrch .= "1=2 )";
-			$usecatindex = " use index (ix_releases_categoryID) ";
-		}
-
-		if ($maxage > 0)
-			$maxage = sprintf(" and postdate > now() - interval %d day ", $maxage);
-		else
-			$maxage = "";
-
-		$sql = sprintf("SELECT releases.*, concat(cp.title, ' > ', c.title) AS category_name, concat(cp.ID, ',', c.ID) AS category_ids, groups.name AS group_name, rn.ID AS nfoID, re.releaseID AS reID FROM releases %s LEFT OUTER JOIN category c ON c.ID = releases.categoryID LEFT OUTER JOIN groups ON groups.ID = releases.groupID LEFT OUTER JOIN releasevideo re ON re.releaseID = releases.ID LEFT OUTER JOIN releasenfo rn ON rn.releaseID = releases.ID AND rn.nfo IS NOT NULL LEFT OUTER JOIN category cp ON cp.ID = c.parentID WHERE releases.passwordstatus <= (SELECT VALUE FROM site WHERE setting='showpasswordedrelease') %s %s %s %s %s %s ORDER BY postdate DESC LIMIT %d, %d ", $usecatindex, $rageId, $series, $episode, $searchsql, $catsrch, $maxage, $offset, $limit);
-		$orderpos = strpos($sql, "order by");
-		$wherepos = strpos($sql, "where");
-		$sqlcount = "SELECT count(releases.ID) AS num FROM releases " . substr($sql, $wherepos, $orderpos - $wherepos);
-
-		$countres = $this->pdo->queryOneRow($sqlcount, true);
-		$res = $this->pdo->query($sql, true);
-		if (count($res) > 0)
-			$res[0]["_totalrows"] = $countres["num"];
-
-		return $res;
+		return $releases;
 	}
 
 	/**
-	 * Search for releases by anidb id. Used by API/Sickbeard.
+	 * @param int    $aniDbID
+	 * @param string $episodeNumber
+	 * @param int    $offset
+	 * @param int    $limit
+	 * @param string $name
+	 * @param array  $cat
+	 * @param int    $maxAge
+	 *
+	 * @return array
 	 */
-	public function searchbyAnidbId($anidbID, $epno = '', $offset = 0, $limit = 100, $name = '', $maxage = -1)
+	public function searchbyAnidbId($aniDbID, $episodeNumber = '', $offset = 0, $limit = 100, $name = '', $cat = [-1], $maxAge = -1)
 	{
-		$s = new Sites();
-		$site = $s->get();
-		if ($site->sphinxenabled) {
-			$sphinx = new Sphinx();
-			$results = $sphinx->searchbyAnidbId($anidbID, $epno, $offset, $limit, $name, $maxage, array(), true);
-			if (is_array($results))
-				return $results;
-		}
-
-
-		$anidbID = ($anidbID > -1) ? sprintf(" AND anidbid = %d ", $anidbID) : '';
-
-		$epno = is_numeric($epno) ? sprintf(" AND releases.episode LIKE '%s' ", $this->pdo->escapeString('%' . $epno . '%')) : '';
-
-		//
-		// if the query starts with a ^ it indicates the search is looking for items which start with the term
-		// still do the fulltext match, but mandate that all items returned must start with the provided word
-		//
-		$words = explode(" ", $name);
-		$searchsql = "";
-		$intwordcount = 0;
-		if (count($words) > 0) {
-			foreach ($words as $word) {
-				if ($word != "") {
-					//
-					// see if the first word had a caret, which indicates search must start with term
-					//
-					if ($intwordcount == 0 && (strpos($word, "^") === 0))
-						$searchsql .= sprintf(" AND releases.searchname LIKE '%s' ", $this->pdo->escapeString(substr($word, 1) . "%"));
-					elseif (substr($word, 0, 2) == '--')
-						$searchsql .= sprintf(" AND releases.searchname NOT LIKE '%s' ", $this->pdo->escapeString("%" . substr($word, 2) . "%"));
-					else
-						$searchsql .= sprintf(" AND releases.searchname LIKE '%s' ", $this->pdo->escapeString("%" . $word . "%"));
-
-					$intwordcount++;
-				}
-			}
-		}
-
-		$maxage = ($maxage > 0) ? sprintf(" and postdate > now() - interval %d day ", $maxage) : '';
-
-		$sql = sprintf("SELECT releases.*, concat(cp.title, ' > ', c.title)
-			AS category_name, concat(cp.ID, ',', c.ID) AS category_ids, groups.name AS group_name, rn.ID AS nfoID
-			FROM releases LEFT OUTER JOIN category c ON c.ID = releases.categoryID LEFT OUTER JOIN groups ON groups.ID = releases.groupID
-			LEFT OUTER JOIN releasenfo rn ON rn.releaseID = releases.ID AND rn.nfo IS NOT NULL LEFT OUTER JOIN category cp ON cp.ID = c.parentID
-			WHERE releases.passwordstatus <= (SELECT value FROM site WHERE setting='showpasswordedrelease') %s %s %s %s ORDER BY postdate DESC LIMIT %d, %d ",
-			$anidbID, $epno, $searchsql, $maxage, $offset, $limit
+		$whereSql = sprintf(
+			"%s
+			WHERE r.passwordstatus %s AND r.nzbstatus = %d %s %s %s %s %s",
+			($name !== '' ? $this->releaseSearch->getFullTextJoinString() : ''),
+			$this->showPasswords(),
+			Enzebe::NZB_ADDED,
+			($aniDbID > -1 ? sprintf(' AND anidbID = %d ', $aniDbID) : ''),
+			(is_numeric($episodeNumber) ? sprintf(" AND r.episode '%s' ", $this->pdo->likeString($episodeNumber)) : ''),
+			($name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : ''),
+			$this->categorySQL($cat),
+			($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : '')
 		);
-		$orderpos = strpos($sql, "ORDER BY");
-		$wherepos = strpos($sql, "WHERE");
-		$sqlcount = "SELECT count(releases.ID) AS num FROM releases " . substr($sql, $wherepos, $orderpos - $wherepos);
 
-		$countres = $this->pdo->queryOneRow($sqlcount, true);
-		$res = $this->pdo->query($sql, true);
-		if (count($res) > 0)
-			$res[0]["_totalrows"] = $countres["num"];
+		$baseSql = sprintf(
+			"SELECT r.*,
+				CONCAT(cp.title, ' > ', c.title) AS category_name,
+				CONCAT(cp.ID, ',', c.ID) AS category_ids,
+				groups.name AS group_name,
+				rn.ID AS nfoid
+			FROM releases r
+			INNER JOIN category c ON c.ID = r.categoryID
+			INNER JOIN groups ON groups.ID = r.groupID
+			LEFT OUTER JOIN releasenfo rn ON rn.releaseID = r.ID AND rn.nfo IS NOT NULL
+			INNER JOIN category cp ON cp.ID = c.parentID
+			%s",
+			$whereSql
+		);
 
-		return $res;
+		$sql = sprintf(
+			"%s
+			ORDER BY postdate DESC
+			LIMIT %d OFFSET %d",
+			$baseSql,
+			$limit,
+			$offset
+		);
+		$releases = $this->pdo->query($sql);
+		if ($releases && count($releases)) {
+			$releases[0]['_totalrows'] = $this->getPagerCount($baseSql);
+		}
+		return $releases;
+	}
+
+	/**
+	 * @param int    $imDbId
+	 * @param int    $offset
+	 * @param int    $limit
+	 * @param string $name
+	 * @param array  $cat
+	 * @param int    $maxAge
+	 *
+	 * @return array
+	 */
+	public function searchbyImdbId($imDbId, $offset = 0, $limit = 100, $name = '', $cat = [-1], $maxAge = -1)
+	{
+		$whereSql = sprintf(
+			"%s
+			WHERE r.categoryID BETWEEN 2000 AND 2999
+			AND r.nzbstatus = %d
+			AND r.passwordstatus %s
+			%s %s %s %s",
+			($name !== '' ? $this->releaseSearch->getFullTextJoinString() : ''),
+			Enzebe::NZB_ADDED,
+			$this->showPasswords(),
+			($name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : ''),
+			(($imDbId != '-1' && is_numeric($imDbId)) ? sprintf(' AND imdbID = %d ', str_pad($imDbId, 7, '0', STR_PAD_LEFT)) : ''),
+			$this->categorySQL($cat),
+			($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : '')
+		);
+
+		$baseSql = sprintf(
+			"SELECT r.*,
+				concat(cp.title, ' > ', c.title) AS category_name,
+				CONCAT(cp.ID, ',', c.ID) AS category_ids,
+				g.name AS group_name,
+				rn.id AS nfoid
+			FROM releases r
+			INNER JOIN groups g ON g.ID = r.groupID
+			INNER JOIN category c ON c.ID = r.categoryID
+			LEFT OUTER JOIN releasenfo rn ON rn.releaseID = r.ID AND rn.nfo IS NOT NULL
+			INNER JOIN category cp ON cp.ID = c.parentID
+			%s",
+			$whereSql
+		);
+
+		$sql = sprintf(
+			"%s
+			ORDER BY postdate DESC
+			LIMIT %d OFFSET %d",
+			$baseSql,
+			$limit,
+			$offset
+		);
+		$releases = $this->pdo->query($sql);
+		if ($releases && count($releases)) {
+			$releases[0]['_totalrows'] = $this->getPagerCount($baseSql);
+		}
+		return $releases;
 	}
 
 	/**
@@ -1117,98 +1122,6 @@ class Releases
 		$orderpos = strpos($sql, "order by");
 		$wherepos = strpos($sql, "where");
 		$sqlcount = "SELECT count(releases.ID) AS num FROM releases INNER JOIN bookinfo ON bookinfo.ID = releases.bookinfoID " . substr($sql, $wherepos, $orderpos - $wherepos);
-
-		$countres = $this->pdo->queryOneRow($sqlcount, true);
-		$res = $this->pdo->query($sql, true);
-		if (count($res) > 0)
-			$res[0]["_totalrows"] = $countres["num"];
-
-		return $res;
-	}
-
-	/**
-	 * Search for releases by imdbID/movieinfo. Used by API/Couchpotato.
-	 */
-	public function searchbyImdbId($imdbId, $offset = 0, $limit = 100, $name = "", $cat = array(-1), $genre = "", $maxage = -1)
-	{
-		$s = new Sites();
-		$site = $s->get();
-		if ($site->sphinxenabled) {
-			$sphinx = new Sphinx();
-			$results = $sphinx->searchbyImdbId($imdbId, $offset, $limit, $name, $cat, $genre, $maxage, array(), true);
-			if (is_array($results))
-				return $results;
-		}
-
-
-		if ($imdbId != "-1" && is_numeric($imdbId)) {
-			//pad id with zeros just in case
-			$imdbId = str_pad($imdbId, 7, "0", STR_PAD_LEFT);
-			$imdbId = sprintf(" and releases.imdbID = %d ", $imdbId);
-		} else {
-			$imdbId = "";
-		}
-
-		//
-		// if the query starts with a ^ it indicates the search is looking for items which start with the term
-		// still do the fulltext match, but mandate that all items returned must start with the provided word
-		//
-		$words = explode(" ", $name);
-		$searchsql = "";
-		$intwordcount = 0;
-		if (count($words) > 0) {
-			foreach ($words as $word) {
-				if ($word != "") {
-					//
-					// see if the first word had a caret, which indicates search must start with term
-					//
-					if ($intwordcount == 0 && (strpos($word, "^") === 0))
-						$searchsql .= sprintf(" and releases.searchname like %s", $this->pdo->escapeString(substr($word, 1) . "%"));
-					elseif (substr($word, 0, 2) == '--')
-						$searchsql .= sprintf(" and releases.searchname not like %s", $this->pdo->escapeString("%" . substr($word, 2) . "%"));
-					else
-						$searchsql .= sprintf(" and releases.searchname like %s", $this->pdo->escapeString("%" . $word . "%"));
-
-					$intwordcount++;
-				}
-			}
-		}
-
-		$catsrch = "";
-		if (count($cat) > 0 && $cat[0] != -1) {
-			$catsrch = " and (";
-			foreach ($cat as $category) {
-				if ($category != -1) {
-					$categ = new Categorize();
-					if ($categ->isParent($category)) {
-						$children = $categ->getChildren($category);
-						$chlist = "-99";
-						foreach ($children as $child)
-							$chlist .= ", " . $child["ID"];
-
-						if ($chlist != "-99")
-							$catsrch .= " releases.categoryID in (" . $chlist . ") or ";
-					} else {
-						$catsrch .= sprintf(" releases.categoryID = %d or ", $category);
-					}
-				}
-			}
-			$catsrch .= "1=2 )";
-		}
-
-		if ($maxage > 0)
-			$maxage = sprintf(" and releases.postdate > now() - interval %d day ", $maxage);
-		else
-			$maxage = "";
-
-		if ($genre != "") {
-			$genre = sprintf(" and movieinfo.genre like %s", $this->pdo->escapeString("%" . $genre . "%"));
-		}
-
-		$sql = sprintf("SELECT releases.*, movieinfo.title AS moi_title, movieinfo.tagline AS moi_tagline, movieinfo.rating AS moi_rating, movieinfo.plot AS moi_plot, movieinfo.year AS moi_year, movieinfo.genre AS moi_genre, movieinfo.director AS moi_director, movieinfo.actors AS moi_actors, movieinfo.cover AS moi_cover, movieinfo.backdrop AS moi_backdrop, concat(cp.title, ' > ', c.title) AS category_name, concat(cp.ID, ',', c.ID) AS category_ids, groups.name AS group_name, rn.ID AS nfoID FROM releases LEFT OUTER JOIN groups ON groups.ID = releases.groupID LEFT OUTER JOIN category c ON c.ID = releases.categoryID LEFT OUTER JOIN releasenfo rn ON rn.releaseID = releases.ID AND rn.nfo IS NOT NULL LEFT OUTER JOIN category cp ON cp.ID = c.parentID LEFT OUTER JOIN movieinfo ON releases.imdbID = movieinfo.imdbID WHERE releases.passwordstatus <= (SELECT value FROM site WHERE setting='showpasswordedrelease') %s %s %s %s %s ORDER BY postdate DESC LIMIT %d, %d ", $searchsql, $imdbId, $catsrch, $maxage, $genre, $offset, $limit);
-		$orderpos = strpos($sql, "order by");
-		$wherepos = strpos($sql, "where");
-		$sqlcount = "SELECT count(releases.ID) AS num FROM releases LEFT OUTER JOIN movieinfo ON releases.imdbID = movieinfo.imdbID " . substr($sql, $wherepos, $orderpos - $wherepos);
 
 		$countres = $this->pdo->queryOneRow($sqlcount, true);
 		$res = $this->pdo->query($sql, true);

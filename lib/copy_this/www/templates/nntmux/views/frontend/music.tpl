@@ -1,3 +1,6 @@
+{if $site->adbrowse}
+	{$site->adbrowse}
+{/if}
 <h1>Browse Music</h1>
 
 <form name="browseby" action="music">
@@ -34,36 +37,28 @@
 				<select id="category" name="t">
 					<option class="grouping" value="3000"></option>
 					{foreach from=$catlist item=ct}
-						<option {if $ct.ID==$category}selected="selected"{/if} value="{$ct.ID}">{$ct.title}</option>
+						<option {if $ct.id==$category}selected="selected"{/if} value="{$ct.ID}">{$ct.title}</option>
 					{/foreach}
 				</select>
 			</td>
-			<td><input type="submit" value="Go"/></td>
+			<td><input class='rndbtn' type="submit" value="Go"/></td>
 		</tr>
 	</table>
 </form>
 <p></p>
 
-{$site->adbrowse}
-
-<div class="nzb_multi_operations">
-	View: <b>Covers</b> | <a href="{$smarty.const.WWW_TOP}/browse?t={$category}">List</a>
-</div>
-
-{if $results|@count <= 0}
-	<p>
-		No covers found.
-		<br>Switch to <a href="{$smarty.const.WWW_TOP}/browse?t={$category}">List View</a>.
-	</p>
-{else}
+{if $results|@count > 0}
 	<form id="nzb_multi_operations_form" action="get">
 
 		<div class="nzb_multi_operations">
+			View: <b>Covers</b> | <a href="{$smarty.const.WWW_TOP}/browse?t={$category}">List</a><br/>
 			<small>With Selected:</small>
-			<input type="button" class="rndbtn nzb_multi_operations_download" value="Download NZBs"/>
-			<input type="button" class="rndbtn nzb_multi_operations_cart" value="Add to Cart"/>
-			{if $sabintegrated}<input type="button" class="rndbtn nzb_multi_operations_sab" value="Send to SAB"/>{/if}
+			<input type="button" class="nzb_multi_operations_download" value="Download NZBs"/>
+			<input type="button" class="nzb_multi_operations_cart" value="Add to Cart"/>
+			{if $sabintegrated}<input type="button" class="nzb_multi_operations_sab" value="Send to my Queue"/>{/if}
 		</div>
+		<br/>
+
 		{$pager}
 
 		<table style="width:100%;" class="data highlight icons" id="coverstable">
@@ -111,7 +106,7 @@
 					<td class="mid">
 						<div class="movcover">
 							<a class="title" title="View details"
-							   href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"seourl"}">
+							   href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"htmlall"}">
 								<img class="shadow"
 									 src="{$smarty.const.WWW_TOP}/covers/music/{if $result.cover == 1}{$result.musicinfoID}.jpg{else}no-cover.jpg{/if}"
 									 width="120" border="0"
@@ -119,95 +114,114 @@
 							</a>
 
 							<div class="movextra">
-								{if $result.nfoID > 0}<a href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}"
+								{if $result.nfoid > 0}<a href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}"
 														 title="View Nfo" class="rndbtn modal_nfo" rel="nfo">
 										Nfo</a>{/if}
-								{if $result.url != ""}<a class="rndbtn" target="_blank"
-														 href="{$site->dereferrer_link}{$result.url}"
-														 name="amazon{$result.musicinfoID}" title="View amazon page">
-										Amazon</a>{/if}
+								<a class="rndbtn" target="_blank" href="{$site->dereferrer_link}{$result.url}"
+								   name="amazon{$result.musicinfoID}" title="View amazon page">Amazon</a>
 								<a class="rndbtn" href="{$smarty.const.WWW_TOP}/browse?g={$result.group_name}"
 								   title="Browse releases in {$result.group_name|replace:"alt.binaries":"a.b"}">Grp</a>
 							</div>
 						</div>
 					</td>
 					<td colspan="7" class="left" id="guid{$result.guid}">
-						<h2><a class="title" title="View details"
-							   href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"seourl"}">{$result.artist|escape:"htmlall"}
-								- {$result.title|escape:"htmlall"}</a> (<a class="title" title="{$result.year}"
-																		   href="{$smarty.const.WWW_TOP}/music?year={$result.year}">{$result.year}</a>)
-						</h2>
-						{if $result.genre != ""}
-							<b>Genre:</b>
-							<a href="{$smarty.const.WWW_TOP}/music/?genre={$result.genreID}">{$result.genre|escape:"htmlall"}</a>
-							<br/>
-						{/if}
+						<h2>{$result.artist}{" - "}{$result.title}</h2>
+						{if $result.genre != ""}<b>Genre:</b>{$result.genre|escape:"htmlall"}<br/>{/if}
 						{if $result.publisher != ""}<b>Publisher:</b>{$result.publisher|escape:"htmlall"}<br/>{/if}
 						{if $result.releasedate != ""}<b>Released:</b>{$result.releasedate|date_format}<br/>{/if}
-
-						{if $result.haspreview == 2 && $userdata.canpreview == 1}
-							<b>Preview:</b>
-							<a href="#" name="audio{$result.guid}"
-							   title="Listen to {$result.searchname|escape:"htmlall"}" class="audioprev rndbtn"
-							   rel="audio">Listen</a>
-						<audio id="audprev{$result.guid}" preload="none">
-							<source src="{$smarty.const.WWW_TOP}/covers/audio/{$result.guid}.mp3" type="audio/mpeg">
-							<source src="{$smarty.const.WWW_TOP}/covers/audio/{$result.guid}.ogg" type="audio/ogg">
-							</audio>{/if}
+						{if $result.review != ""}<b>Review:</b>{$result.review|escape:'htmlall'}<br>{/if}
 						<br/>
 
 						<div class="movextra">
-							<b>{$result.searchname|escape:"htmlall"}</b> <a class="rndbtn"
-																			href="{$smarty.const.WWW_TOP}/music?artist={$result.artist|escape:"url"}"
-																			title="View similar nzbs">Similar</a>
-							{if $isadmin}
-								<a class="rndbtn"
-								   href="{$smarty.const.WWW_TOP}/admin/release-edit.php?id={$result.releaseID}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}"
-								   title="Edit Release">Edit</a>
-								<a class="rndbtn confirm_action"
-								   href="{$smarty.const.WWW_TOP}/admin/release-delete.php?id={$result.releaseID}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}"
-								   title="Delete Release">Del</a>
-							{/if}
-							<br/>
-							<b>Info:</b> {$result.postdate|timeago},  {$result.size|fsize_format:"MB"}, <a
-									title="View file list"
-									href="{$smarty.const.WWW_TOP}/filelist/{$result.guid}">{$result.totalpart} files</a>,
-							<a title="View comments for {$result.searchname|escape:"htmlall"}"
-							   href="{$smarty.const.WWW_TOP}/details/{$result.guid}/#comments">{$result.comments}
-								cmt{if $result.comments != 1}s{/if}</a>, {$result.grabs}
-							grab{if $result.grabs != 1}s{/if}
-							<br/>
+							<table>
+								{assign var="msplits" value=","|explode:$result.grp_release_id}
+								{assign var="mguid" value=","|explode:$result.grp_release_guid}
+								{assign var="mnfo" value=","|explode:$result.grp_release_nfoid}
+								{assign var="mgrp" value=","|explode:$result.grp_release_grpname}
+								{assign var="mname" value="#"|explode:$result.grp_release_name}
+								{assign var="mpostdate" value=","|explode:$result.grp_release_postdate}
+								{assign var="msize" value=","|explode:$result.grp_release_size}
+								{assign var="mtotalparts" value=","|explode:$result.grp_release_totalparts}
+								{assign var="mcomments" value=","|explode:$result.grp_release_comments}
+								{assign var="mgrabs" value=","|explode:$result.grp_release_grabs}
+								{assign var="mpass" value=","|explode:$result.grp_release_password}
+								{assign var="minnerfiles" value=","|explode:$result.grp_rarinnerfilecount}
+								{assign var="mhaspreview" value=","|explode:$result.grp_haspreview}
+								{foreach from=$msplits item=m}
+									<tr id="guid{$mguid[$m@index]}" {if $m@index > 1}class="mlextra"{/if}>
+										<td>
+											<div class="icon"><input type="checkbox" class="nzb_check"
+																	 value="{$mguid[$m@index]}"/></div>
+										</td>
+										<td>
+											<a href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}">{$mname[$m@index]|escape:"htmlall"}</a>
 
-							<div class="icon"><input type="checkbox" class="nzb_check" value="{$result.guid}"/></div>
-							<div class="icon icon_nzb"><a title="Download Nzb"
-														  href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}/{$result.searchname|escape:"url"}">
-									&nbsp;</a></div>
-							<div class="icon icon_cart" title="Add to Cart"></div>
-							{if $sabintegrated}
-								<div class="icon icon_sab" title="Send to my Queue"></div>
-							{/if}
-							{if $weHasVortex}
-								<div class="icon icon_nzbvortex" title="Send to NZBVortex"></div>
-							{/if}
+											<div>
+												<i class="icon-calendar"></i> Posted {$mpostdate[$m@index]|timeago} | <i
+														class="icon-hdd"></i> {$msize[$m@index]|fsize_format:"MB"} | <i
+														class="icon-file"></i> <a title="View file list"
+																				  href="{$smarty.const.WWW_TOP}/filelist/{$mguid[$m@index]}">{$mtotalparts[$m@index]}
+													files</a> | <i class="icon-comments"></i> <a
+														title="View comments for {$mname[$m@index]|escape:"htmlall"}"
+														href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}#comments">{$mcomments[$m@index]}
+													cmt{if $mcomments[$m@index] != 1}s{/if}</a> | <i
+														class="icon-download"></i> {$mgrabs[$m@index]}
+												grab{if $mgrabs[$m@index] != 1}s{/if} |
+												{if $mnfo[$m@index] > 0}<a
+													href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}"
+													title="View Nfo" class="modal_nfo" rel="nfo">Nfo</a> | {/if}
+												{if $mpass[$m@index] == 1}Passworded | {elseif $mpass[$m@index] == 2}Potential Password | {/if}
+												<a href="{$smarty.const.WWW_TOP}/browse?g={$mgrp[$m@index]}"
+												   title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}">Grp</a>
+												{if $mhaspreview[$m@index] == 1 && $userdata.canpreview == 1} | <a
+														href="{$smarty.const.WWW_TOP}/covers/preview/{$mguid[$m@index]}_thumb.jpg"
+														name="name{$mguid[$m@index]}"
+														title="Screenshot of {$mname[$m@index]|escape:"htmlall"}"
+														class="modal_prev" rel="preview">Preview</a>{/if}
+												{if $minnerfiles[$m@index] > 0} | <a href="#" onclick="return false;"
+																					 class="mediainfo"
+																					 title="{$mguid[$m@index]}">
+														Media</a>{/if}
+											</div>
+										</td>
+										<td class="icons">
+											<div class="icon icon_nzb"><a title="Download Nzb"
+																		  href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}">
+													&nbsp;</a></div>
+											<div class="icon icon_cart" title="Add to Cart"></div>
+											{if $sabintegrated}
+												<div class="icon icon_sab" title="Send to my Queue"></div>
+											{/if}
+										</td>
+									</tr>
+									{if $m@index == 1 && $m@total > 2}
+										<tr>
+											<td colspan="5"><a class="mlmore" href="#">{$m@total-2} more...</a></td>
+										</tr>
+									{/if}
+								{/foreach}
+							</table>
 						</div>
 					</td>
 				</tr>
 			{/foreach}
 
 		</table>
-
-		<div class="nzb_multi_operations">
-			<small>With Selected:</small>
-			<input type="button" class="rndbtn nzb_multi_operations_download" value="Download NZBs"/>
-			<input type="button" class="rndbtn nzb_multi_operations_cart" value="Add to Cart"/>
-			{if $sabintegrated}<input type="button" class="rndbtn nzb_multi_operations_sab" value="Send to SAB"/>{/if}
-		</div>
-
 		<br/>
 
 		{$pager}
 
+		<div class="nzb_multi_operations">
+			<small>With Selected:</small>
+			<input type="button" class="nzb_multi_operations_download" value="Download NZBs"/>
+			<input type="button" class="nzb_multi_operations_cart" value="Add to Cart"/>
+			{if $sabintegrated}<input type="button" class="nzb_multi_operations_sab" value="Send to my Queue"/>{/if}
+		</div>
+
 	</form>
+{else}
+	<h4>There doesn't seem to be any releases here. Please try the <a
+				href="{$smarty.const.WWW_TOP}/browse?t={$category}">list</a> view.</h4>
 {/if}
 
 <br/><br/><br/>
