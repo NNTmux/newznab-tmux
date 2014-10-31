@@ -54,20 +54,20 @@ There is a lib folder in main tmux folder. In that folder you will find two fold
 
   Note: After installing you can change the yEnc setting in tmux edit accordingly.
 
-  #Threaded Scripts
+# Threaded Scripts:
 
   Tmux comes with php threaded scripts, python scripts are still there, but are not used, and will be removed in future
 
-  #Table per group
+# Table per group:
 
   Tmux can now be used with TPG ported from nZEDb, you need to run lib/testing/DB/convert_to_tpg.php to convert binaries, parts and partrepair tables, after this you will be able to use
   threaded releases.php
 
-  #Alternate NNTP provider
+# Alternate NNTP provider:
 
   Newznab-tmux has added support for dual NNTP providers, you need to edit the provided config.php in lib/copy_this/config_edit_before_copy folder
 
-  #Sphinx support
+# Sphinx support:
 
   Newznab-tmux now comes with its own Sphinx support, ported from nZEDb. Installation readme is in misc/sphinxsearch folder, and in copy_this/misc/sphinxsearch folder
 
