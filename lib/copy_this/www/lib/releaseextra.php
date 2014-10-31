@@ -14,33 +14,6 @@ class ReleaseExtra
 	const VIDEO_RESOLUTION_1080 = 3;
 
 	/**
-	 * Work out the res based on height and width
-	 */
-	public function determineVideoResolution($width, $height)
-	{
-		if ($width == 0 || $height == 0) {
-			return self::VIDEO_RESOLUTION_NA;
-		} elseif ($width <= 720 && $height <= 480) {
-			return self::VIDEO_RESOLUTION_SD; //SD 480
-		} elseif ($width <= 768 && $height <= 576) // 720x576 (PAL) (768 when rescaled for square pixels)
-		{
-			return self::VIDEO_RESOLUTION_SD; //SD 576
-		} else if ($width <= 960 && $height <= 544) // 960x540 (sometimes 544 which is multiple of 16)
-		{
-			return self::VIDEO_RESOLUTION_SD; //SD 540
-		} else if ($width <= 1280 && $height <= 720) // 1280x720
-		{
-			return self::VIDEO_RESOLUTION_720; //HD 720
-		} else // 1920x1080
-		{
-			return self::VIDEO_RESOLUTION_1080; //HD 1080
-		}
-
-		return self::VIDEO_RESOLUTION_NA; //catch all
-
-	}
-
-	/**
 	 * Convert a codec string to a user friendly format.
 	 */
 	public function makeCodecPretty($codec)
@@ -65,32 +38,11 @@ class ReleaseExtra
 		return $codec;
 	}
 
-	public function getVideo($id)
-	{
-		$db = new DB();
-
-		return $db->queryOneRow(sprintf("select * from releasevideo where releaseID = %d", $id));
-	}
-
 	public function getAudio($id)
 	{
 		$db = new DB();
 
 		return $db->query(sprintf("select * from releaseaudio where releaseID = %d order by audioID ASC", $id));
-	}
-
-	public function getAudioAndChannel($rid, $aid)
-	{
-		$db = new DB();
-
-		return $db->queryOneRow(sprintf("select * from releaseaudio where releaseID = %d and audioID = %d", $rid, $aid));
-	}
-
-	public function getSubs($id)
-	{
-		$db = new DB();
-
-		return $db->queryOneRow(sprintf("SELECT group_concat(subslanguage SEPARATOR ', ') as subs FROM `releasesubs` WHERE `releaseID` = %d ORDER BY `subsID` ASC", $id));
 	}
 
 	public function getBriefByGuid($guid)
@@ -237,6 +189,40 @@ class ReleaseExtra
 		return $db->queryInsert($sql);
 	}
 
+	public function getVideo($id)
+	{
+		$db = new DB();
+
+		return $db->queryOneRow(sprintf("select * from releasevideo where releaseID = %d", $id));
+	}
+
+	/**
+	 * Work out the res based on height and width
+	 */
+	public function determineVideoResolution($width, $height)
+	{
+		if ($width == 0 || $height == 0) {
+			return self::VIDEO_RESOLUTION_NA;
+		} elseif ($width <= 720 && $height <= 480) {
+			return self::VIDEO_RESOLUTION_SD; //SD 480
+		} elseif ($width <= 768 && $height <= 576) // 720x576 (PAL) (768 when rescaled for square pixels)
+		{
+			return self::VIDEO_RESOLUTION_SD; //SD 576
+		} else if ($width <= 960 && $height <= 544) // 960x540 (sometimes 544 which is multiple of 16)
+		{
+			return self::VIDEO_RESOLUTION_SD; //SD 540
+		} else if ($width <= 1280 && $height <= 720) // 1280x720
+		{
+			return self::VIDEO_RESOLUTION_720; //HD 720
+		} else // 1920x1080
+		{
+			return self::VIDEO_RESOLUTION_1080; //HD 1080
+		}
+
+		return self::VIDEO_RESOLUTION_NA; //catch all
+
+	}
+
 	/**
 	 * Add a releaseaudio row.
 	 */
@@ -260,6 +246,13 @@ class ReleaseExtra
 		return $db->queryInsert($sql);
 	}
 
+	public function getAudioAndChannel($rid, $aid)
+	{
+		$db = new DB();
+
+		return $db->queryOneRow(sprintf("select * from releaseaudio where releaseID = %d and audioID = %d", $rid, $aid));
+	}
+
 	public function addSubs($releaseID, $subsID, $subslanguage)
 	{
 		$db = new DB();
@@ -272,11 +265,11 @@ class ReleaseExtra
 		return $db->queryInsert($sql);
 	}
 
-	public function getFull($id)
+	public function getSubs($id)
 	{
 		$db = new DB();
 
-		return $db->queryOneRow(sprintf("select * from releaseextrafull where releaseID = %d", $id));
+		return $db->queryOneRow(sprintf("SELECT group_concat(subslanguage SEPARATOR ', ') as subs FROM `releasesubs` WHERE `releaseID` = %d ORDER BY `subsID` ASC", $id));
 	}
 
 	public function deleteFull($id)
@@ -294,5 +287,12 @@ class ReleaseExtra
 			return -1;
 
 		return $db->queryInsert(sprintf("insert into releaseextrafull (releaseID, mediainfo) values (%d, %s)", $id, $db->escapeString($xml)));
+	}
+
+	public function getFull($id)
+	{
+		$db = new DB();
+
+		return $db->queryOneRow(sprintf("select * from releaseextrafull where releaseID = %d", $id));
 	}
 }

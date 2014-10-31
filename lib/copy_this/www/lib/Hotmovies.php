@@ -6,27 +6,6 @@ class Hotmovies
 {
 
 	/**
-	 * Keyword Search.
-	 *
-	 * @var string
-	 */
-	public $searchTerm = "";
-
-	/**
-	 * Define a cookie location
-	 *
-	 * @var string
-	 */
-	public $cookie = "";
-
-	/**
-	 * If a direct link is set parse it instead of search for it.
-	 *
-	 * @var string
-	 */
-	public $directLink = "";
-
-	/**
 	 * Constant Urls used within this class
 	 * Needed Search Queries Variables
 	 */
@@ -34,7 +13,24 @@ class Hotmovies
 	const HMURL = "http://www.hotmovies.com";
 	const IF18 = true;
 	const TRAILINGSEARCH = "/search.php?words=";
-
+	/**
+	 * Keyword Search.
+	 *
+	 * @var string
+	 */
+	public $searchTerm = "";
+	/**
+	 * Define a cookie location
+	 *
+	 * @var string
+	 */
+	public $cookie = "";
+	/**
+	 * If a direct link is set parse it instead of search for it.
+	 *
+	 * @var string
+	 */
+	public $directLink = "";
 	/**
 	 * Sets the direct url in the getAll method
 	 *
@@ -98,26 +94,107 @@ class Hotmovies
 	/*
 	 * Remove from memory if it still exists
 	 */
+
+	/**
+	 * Get Raw html of webpage
+	 *
+	 * @param bool $usepost
+	 *
+	 * @return bool
+	 */
+	private function getUrl($usepost = false)
+	{
+		if (isset($this->_getLink)) {
+			$ch = curl_init($this->_getLink);
+		} else {
+			$ch = curl_init(self::HMURL);
+		}
+		if (isset($this->directLink)) {
+			$ch = curl_init($this->directLink);
+			$this->directLink = "";
+		}
+		if ($usepost === true){
+			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+			curl_setopt($ch, CURLOPT_POST, 1);
+			curl_setopt($ch, CURLOPT_POSTFIELDS, $this->_postParams);
+		}
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_HEADER, 0);
+		curl_setopt($ch, CURLOPT_VERBOSE, 0);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+		curl_setopt($ch, CURLOPT_USERAGENT, "Firefox/2.0.0.1");
+		curl_setopt($ch, CURLOPT_FAILONERROR, 1);
+		if (isset($this->cookie)) {
+			curl_setopt($ch, CURLOPT_COOKIEJAR, $this->cookie);
+			curl_setopt($ch, CURLOPT_COOKIEFILE, $this->cookie);
+		}
+		$this->_response = curl_exec($ch);
+		if (!$this->_response) {
+			curl_close($ch);
+
+			return false;
+		}
+		$this->_html->load($this->_response);
+		curl_close($ch);
+		return true;
+	}
+
 	public function __destruct()
 	{
 		$this->_html->clear();
 		unset($this->_response);
 		unset($this->_res);
 	}
+
 	/**
-	 * Get Box Cover Images
-	 * @return array - boxcover,backcover
+	 * Directly gets the link if directlink is set, and parses it.
+	 *
+	 * @return array
 	 */
-	public function covers()
+	public function getDirect()
 	{
-		if ($ret = $this->_html->find('div#large_cover, img#cover', 1)) {
-			$this->_res['boxcover'] = trim($ret->src);
-			$this->_res['backcover'] = str_ireplace(".cover", ".back", trim($ret->src));
-		}else{
-			return false;
+		if (isset($this->directLink)) {
+			if ($this->getUrl() === false) {
+				return false;
+			} else {
+				return $this->getAll();
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Gets all information
+	 * @return array
+	 */
+	public function getAll()
+	{
+		$results = array();
+		if (isset($this->_directUrl)) {
+			$results['title'] = $this->_title;
+			$results['directurl'] = $this->_directUrl;
+		}
+		if (is_array($this->sypnosis())) {
+			$results = array_merge($results, $this->sypnosis());
+		}
+		if (is_array($this->productInfo())) {
+			$results = array_merge($results, $this->productInfo());
+		}
+		if (is_array($this->cast())) {
+			$results = array_merge($results, $this->cast());
+		}
+		if (is_array($this->genres())) {
+			$results = array_merge($results, $this->genres());
+		}
+		if (is_array($this->covers())) {
+			$results = array_merge($results, $this->covers());
 		}
 
-		return $this->_res;
+		if (empty($results) === true){
+			return false;
+		}else{
+			return $results;
+		}
 	}
 
 	/**
@@ -230,22 +307,20 @@ class Hotmovies
 	}
 
 	/**
-	 * Directly gets the link if directlink is set, and parses it.
-	 *
-	 * @return array
+	 * Get Box Cover Images
+	 * @return array - boxcover,backcover
 	 */
-	public function getDirect()
+	public function covers()
 	{
-		if (isset($this->directLink)) {
-			if ($this->getUrl() === false) {
-				return false;
-			} else {
-				return $this->getAll();
-			}
+		if ($ret = $this->_html->find('div#large_cover, img#cover', 1)) {
+			$this->_res['boxcover'] = trim($ret->src);
+			$this->_res['backcover'] = str_ireplace(".cover", ".back", trim($ret->src));
+		}else{
+			return false;
 		}
-		return false;
-	}
 
+		return $this->_res;
+	}
 
 	/**
 	 * Searches for match against searchterm
@@ -288,83 +363,5 @@ class Hotmovies
 				return false;
 			}
 		}
-	}
-
-	/**
-	 * Gets all information
-	 * @return array
-	 */
-	public function getAll()
-	{
-		$results = array();
-		if (isset($this->_directUrl)) {
-			$results['title'] = $this->_title;
-			$results['directurl'] = $this->_directUrl;
-		}
-		if (is_array($this->sypnosis())) {
-			$results = array_merge($results, $this->sypnosis());
-		}
-		if (is_array($this->productInfo())) {
-			$results = array_merge($results, $this->productInfo());
-		}
-		if (is_array($this->cast())) {
-			$results = array_merge($results, $this->cast());
-		}
-		if (is_array($this->genres())) {
-			$results = array_merge($results, $this->genres());
-		}
-		if (is_array($this->covers())) {
-			$results = array_merge($results, $this->covers());
-		}
-
-		if (empty($results) === true){
-			return false;
-		}else{
-			return $results;
-		}
-	}
-
-	/**
-	 * Get Raw html of webpage
-	 *
-	 * @param bool $usepost
-	 *
-	 * @return bool
-	 */
-	private function getUrl($usepost = false)
-	{
-		if (isset($this->_getLink)) {
-			$ch = curl_init($this->_getLink);
-		} else {
-			$ch = curl_init(self::HMURL);
-		}
-		if (isset($this->directLink)) {
-			$ch = curl_init($this->directLink);
-			$this->directLink = "";
-		}
-		if ($usepost === true){
-			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-			curl_setopt($ch, CURLOPT_POST, 1);
-			curl_setopt($ch, CURLOPT_POSTFIELDS, $this->_postParams);
-		}
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_HEADER, 0);
-		curl_setopt($ch, CURLOPT_VERBOSE, 0);
-		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-		curl_setopt($ch, CURLOPT_USERAGENT, "Firefox/2.0.0.1");
-		curl_setopt($ch, CURLOPT_FAILONERROR, 1);
-		if (isset($this->cookie)) {
-			curl_setopt($ch, CURLOPT_COOKIEJAR, $this->cookie);
-			curl_setopt($ch, CURLOPT_COOKIEFILE, $this->cookie);
-		}
-		$this->_response = curl_exec($ch);
-		if (!$this->_response) {
-			curl_close($ch);
-
-			return false;
-		}
-		$this->_html->load($this->_response);
-		curl_close($ch);
-		return true;
 	}
 }

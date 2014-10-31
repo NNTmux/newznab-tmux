@@ -103,7 +103,8 @@
 						<div class="movextra">
 							<a href="#" name="name{$result.imdbID}" title="View movie info" class="rndbtn modal_imdb"
 							   rel="movie">Cover</a>
-							{if $result.trailer != ""}<a href="#" name="name{$result.imdbID}" title="View movie trailer" class="rndbtn modal_imdbtrailer" rel="trailer">Trailer</a>{/if}
+							{if $result.trailer != ""}<a href="#" name="name{$result.imdbID}" title="View movie trailer"
+														 class="rndbtn modal_imdbtrailer" rel="trailer">Trailer</a>{/if}
 							<a class="rndbtn badge badge-trakt" target="_blank"
 							   href="{$site->dereferrer_link}http://trakt.tv/search/imdb?q=tt{$result.imdbID}/"
 							   name="trakt{$result.imdbID}" title="View trakt page">Trakt</a>

@@ -62,7 +62,8 @@
 	<tr>
 		<th><input type="checkbox" class="nzb_check_all"></th>
 		<th>title<a title="Sort Descending" href="{$orderbytitle_desc}"><i class="icon-chevron-down icon-black"></i></a><a
-					title="Sort Ascending" href="{$orderbytitle_asc}"><i class="icon-chevron-up icon-black"></i></a></th>
+					title="Sort Ascending" href="{$orderbytitle_asc}"><i class="icon-chevron-up icon-black"></i></a>
+		</th>
 		<th>year<a title="Sort Descending" href="{$orderbyyear_desc}"><i class="icon-chevron-down icon-black"></i></a><a
 					title="Sort Ascending" href="{$orderbyyear_asc}"><i class="icon-chevron-up icon-black"></i></a></th>
 		<th>rating<a title="Sort Descending" href="{$orderbyrating_desc}"><i
@@ -87,6 +88,7 @@
 							src="{$smarty.const.WWW_TOP}/covers/xxx/{if $result.cover == 1}{$result.id}-cover.jpg{else}no-cover.jpg{/if}"
 							width="130" border="0" alt="{$result.title|escape:"htmlall"}"
 							></a>
+
 				<div class="relextra" style="margin-top:5px;">
 					{if $result.classused == "ade"}
 						<a
@@ -182,6 +184,7 @@
 				<br>
 			{/if}
 			<br>
+
 			<div class="relextra">
 				<table class="table table-condensed table-hover data">
 					{assign var="msplits" value=","|explode:$result.grp_release_id}
@@ -208,6 +211,7 @@
 									<b>{$mname[$m@index]|escape:"htmlall"}</b>
 								</a>
 								<br>
+
 								<div class="resextra">
 									<div class="pull-left">
 										<i class="icon-calendar"></i> Posted {$mpostdate[$m@index]|timeago} |
@@ -224,7 +228,8 @@
 												href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}#comments">{$mcomments[$m@index]}
 											cmt{if $mcomments[$m@index] != 1}s{/if}
 										</a> |
-										<i class="icon-download"></i> {$mgrabs[$m@index]} grab{if $mgrabs[$m@index] != 1}s{/if}
+										<i class="icon-download"></i> {$mgrabs[$m@index]}
+										grab{if $mgrabs[$m@index] != 1}s{/if}
 									</div>
 									<div class="pull-right">
 										{if $mnfo[$m@index] > 0}
@@ -263,11 +268,17 @@
 															><i class="icon-share-alt"></i></a></span
 												>
 										{if $mpass[$m@index] == 1}
-											<span class="icon-stack" title="Potentially Passworded"><i class="icon-check-empty icon-stack-base"></i><i class="icon-unlock-alt"></i></span>
+											<span class="icon-stack" title="Potentially Passworded"><i
+														class="icon-check-empty icon-stack-base"></i><i
+														class="icon-unlock-alt"></i></span>
 										{elseif $mpass[$m@index] == 2}
-											<span class="icon-stack" title="Broken Post"><i class="icon-check-empty icon-stack-base"></i><i class="icon-unlink"></i></span>
+											<span class="icon-stack" title="Broken Post"><i
+														class="icon-check-empty icon-stack-base"></i><i
+														class="icon-unlink"></i></span>
 										{elseif $mpass[$m@index] == 10}
-											<span class="icon-stack" title="Passworded Archive"><i class="icon-check-empty icon-stack-base"></i><i class="icon-lock"></i></span>
+											<span class="icon-stack" title="Passworded Archive"><i
+														class="icon-check-empty icon-stack-base"></i><i
+														class="icon-lock"></i></span>
 										{/if}
 									</div>
 								</div>
@@ -325,7 +336,8 @@
 			<h2 style="margin-top: 7px;"> ಠ_ಠ </h2>
 		</div>
 		<p>No movie releases have XXX covers.
-			<br>This might mean the Administrator's has file permission issues, or he has disabled looking up XXX covers.
+			<br>This might mean the Administrator's has file permission issues, or he has disabled looking up XXX
+			covers.
 			<br>This could also mean there are no movie releases.
 			<br>Please try looking in the
 			<a href="{$smarty.const.WWW_TOP}/browse?t={$category}" style="text-decoration:underline;"

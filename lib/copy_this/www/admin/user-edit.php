@@ -92,7 +92,7 @@ switch ($action) {
 	case 'view':
 	default:
 
-		if (isset($_GET["id"])) {
+	if (isset($_GET["id"])) {
 			$page->title = "User Edit";
 			$id = $_GET["id"];
 			$user = $users->getByID($id);
