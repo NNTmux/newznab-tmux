@@ -1,6 +1,6 @@
 <?php
 //This script will update all records in the movieinfo table where there is no cover
-require_once(dirname(__FILE__) . "/../../bin/config.php");
+require_once(dirname(__FILE__) . "/../../../bin/config.php");
 require_once(WWW_DIR . "/lib/framework/db.php");
 require_once(NN_TMUX . 'lib' . DS. 'Film.php');
 

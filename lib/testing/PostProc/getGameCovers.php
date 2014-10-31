@@ -1,6 +1,6 @@
 <?php
 //This script will update all records in the gamesinfo table
-require_once(dirname(__FILE__) . "/../../bin/config.php");
+require_once(dirname(__FILE__) . "/../../../bin/config.php");
 require_once(WWW_DIR . "/lib/framework/db.php");
 require_once(WWW_DIR . "/lib/Games.php");
 

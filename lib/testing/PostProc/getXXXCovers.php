@@ -1,6 +1,7 @@
 <?php
 //This script will update all records in the xxxinfo table where there is no cover
-require_once(dirname(__FILE__) . "/../../bin/config.php");
+require_once(dirname(__FILE__) . "/../../../bin/config.php");
+require_once(WWW_DIR . "/lib/framework/db.php");
 require_once(WWW_DIR . "/lib/XXX.php");
 require_once(WWW_DIR . "/lib/ColorCLI.php");
 
@@ -11,7 +12,7 @@ $c = new ColorCLI();
 
 $movies = $pdo->queryDirect("SELECT title FROM xxxinfo WHERE cover = 0");
 if ($movies instanceof Traversable) {
-	echo $c->primary("Updating " . number_format($movies->rowCount()) . " movie covers.");
+	echo $c->primary("Updating " . number_format($movies->rowCount()) . " XXX movie covers.");
 	foreach ($movies as $mov) {
 		$starttime = microtime(true);
 		$mov = $movie->updateXXXInfo($mov['title']);
