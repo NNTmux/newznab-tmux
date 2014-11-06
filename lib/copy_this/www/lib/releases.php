@@ -1447,11 +1447,11 @@ class Releases
 
 
 	/**
-	 * @param $categorize
-	 * @param $postProcess
-	 * @param $groupName
-	 * @param $nntp
-	 * @param $echooutput
+	 * @param int    $categorize
+	 * @param int    $postProcess
+	 * @param string $groupName (optional)
+	 * @param \NNTP   $nntp
+	 * @param bool   $echooutput
 	 *
 	 * @return int
 	 */
@@ -1469,7 +1469,9 @@ class Releases
 			$groupID = $groupInfo['ID'];
 		}
 
-		$this->pdo->log->doEcho($this->pdo->log->primary('Starting release update process' . date("Y-m-d H:i:s")), true);
+		if ($this->echoCLI) {
+			$this->pdo->log->doEcho($this->pdo->log->header("Starting release update process (" . date('Y-m-d H:i:s') . ")"), true);
+		}
 
 		if (!file_exists($page->site->nzbpath)) {
 			$this->pdo->log->doEcho($this->pdo->log->primary('Bad or missing nzb directory - ' . $page->site->nzbpath), true);
@@ -1531,7 +1533,14 @@ class Releases
 
 		return $retcount;
 	}
-
+	/**
+	 * Delete unwanted binaries based on size/file count using admin settings.
+	 *
+	 * @param int|string $groupID (optional)
+	 *
+	 * @void
+	 * @access public
+	 */
 	public function deleteBinaries($groupID)
 	{
 		$group = $this->groups->getCBPTableNames($this->tablePerGroup, $groupID);
@@ -1606,7 +1615,9 @@ class Releases
 	}
 
 	/**
-	 * @param $groupID
+	 * @param int $groupID
+	 * @void
+	 * @access public
 	 */
 	public function processIncompleteBinaries($groupID)
 	{
@@ -1698,7 +1709,7 @@ class Releases
 						// Valid release with right number of files and title now, so move it on
 						//
 						if ($newtitle != "") {
-							$this->pdo->queryExec(sprintf("UPDATE %s SET relname = %s, procstat=%d WHERE relname = %s AND procstat = %d AND groupID = %d AND fromname=%s",
+							$test = $this->pdo->queryExec(sprintf("UPDATE %s SET relname = %s, procstat=%d WHERE relname = %s AND procstat = %d AND groupID = %d AND fromname=%s",
 									$group['bname'], $this->pdo->escapeString($newtitle), Releases::PROCSTAT_READYTORELEASE, $this->pdo->escapeString($row["relname"]), Releases::PROCSTAT_TITLEMATCHED, $groupID, $this->pdo->escapeString($row["fromname"])
 								)
 							);
@@ -1743,7 +1754,12 @@ class Releases
 	}
 
 	/**
-	 * @param $groupID
+	 * Create releases from complete binaries.
+	 *
+	 * @param int|string $groupID (optional)
+	 *
+	 * @return int
+	 * @access public
 	 */
 	public function createReleases($groupID)
 	{
@@ -1751,7 +1767,7 @@ class Releases
 		$page = new Page();
 		$this->pdo->log->doEcho($this->pdo->log->primary('Creating releases from complete binaries'));
 		//
-		// Get out all distinct relname, group from binaries of STAGE2
+		// Get out all distinct relname, group from binaries
 		//
 		$categorize = new \Categorize(['Settings' => $this->pdo]);
 		$result = $this->pdo->queryDirect(sprintf("SELECT relname, groupID, g.name AS group_name, fromname, max(categoryID) AS categoryID, max(regexID) AS regexID, max(reqID) AS reqID, MAX(date) AS date, count(%s.ID) AS parts FROM %s INNER JOIN groups g ON g.ID = %s.groupID WHERE procstat = %d AND relname IS NOT NULL GROUP BY relname, g.name, groupID, fromname ORDER BY COUNT(%s.ID) DESC", $group['bname'], $group['bname'], $group['bname'], Releases::PROCSTAT_READYTORELEASE, $group['bname']));
@@ -1931,10 +1947,9 @@ class Releases
 		}
 	}
 
+
 	/**
-	 * Apply regexes to groups
-	 *
-	 * @param $groupID
+	 * @param int|string $groupID (optional)
 	 */
 	public function applyRegex($groupID)
 	{
@@ -1999,6 +2014,14 @@ class Releases
 		}
 	}
 
+	/**
+	 * @param $url
+	 * @param $nnid
+	 * @param $groupname
+	 * @param $reqid
+	 *
+	 * @return string
+	 */
 	public function getReleaseNameForReqId($url, $nnid, $groupname, $reqid)
 	{
 		if ($reqid == " null " || $reqid == "0" || $reqid == "")
@@ -2081,8 +2104,10 @@ class Releases
 		return $parameters['ID'];
 	}
 
+
 	/**
-	 * Delete one or more releases.
+	 * @param      $id
+	 * @param bool $isGuid
 	 */
 	public function delete($id, $isGuid = false)
 	{

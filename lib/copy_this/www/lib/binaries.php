@@ -595,7 +595,7 @@ class Binaries
 								$partNumbers[] = $partdata['number'];
 							}
 
-							$partSql = sprintf('INSERT INTO %s (binaryID, messageID, number, partnumber, size) VALUES (%d, %s, %s, %s, %s)', $tableNames['pname'], $binaryID, $db->escapeString($partdata['Message-ID']), $db->escapeString($partdata['number']), $db->escapeString(round($partdata['part'])), $db->escapeString($partdata['size']));
+							$partSql = sprintf('INSERT INTO ' . $tableNames['pname'] . ' (binaryID, messageID, number, partnumber, size) VALUES '.implode(', ', $partParams));
 							$pidata = $db->queryInsert($partSql);
 							if (!$pidata) {
 								$msgsnotinserted = array_merge($msgsnotinserted, $partNumbers);
