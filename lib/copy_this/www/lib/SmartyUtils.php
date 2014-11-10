@@ -19,7 +19,7 @@
  * @copyright 2014 nZEDb
  */
 
-// Function inpsired by c0r3@newznabforums adds country flags on the browse page.
+// Function inspired by c0r3@newznabforums adds country flags on the browse page.
 function release_flag ($x, $t)
 {
 	$y = $d = "";

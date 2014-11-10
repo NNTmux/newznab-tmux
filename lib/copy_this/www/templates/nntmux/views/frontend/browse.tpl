@@ -80,6 +80,7 @@
 						<label for="chk{$result.guid|substr:0:7}"><a class="title" title="View details"
 																	 href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"seourl"}">{$result.searchname|escape:"htmlall"|replace:".":" "}</a></label>
 
+						{release_flag($result.searchname, browse)}
 						{if $result.passwordstatus == 2}
 							<img title="Passworded Rar Archive"
 								 src="{$smarty.const.WWW_TOP}/templates/nntmux/images/icons/lock.gif"
