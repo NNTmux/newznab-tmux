@@ -109,7 +109,7 @@
 							{if $result.trailer != ""}<a href="#" name="name{$result.imdbID}" title="View movie trailer" class="rndbtn modal_imdbtrailer" rel="trailer">Trailer</a>{/if}
 							<a
 									target="_blank"
-									href="{$site->dereferrer_link}http://trakt.tv/search/imdb?q=tt{$result.imdbid}/"
+									href="{$site->dereferrer_link}http://trakt.tv/search/imdb?q=tt{$result.imdbID}/"
 									name="trakt{$result.imdbid}"
 									title="View trakt page"
 									><img src="{$smarty.const.WWW_TOP}/templates/nntmux/images/icons/trakt.png"></a>
@@ -133,7 +133,7 @@
 				</td>
 				<td colspan="3" class="left">
 					<h2><a title="{$result.title|stripslashes|escape:"htmlall"}"
-						   href="{$smarty.const.WWW_TOP}/movies/?imdb={$result.imdbid}">{$result.title|stripslashes|escape:"htmlall"}</a>
+						   href="{$smarty.const.WWW_TOP}/movies/?imdb={$result.imdbID}">{$result.title|stripslashes|escape:"htmlall"}</a>
 						(<a class="title" title="{$result.year}"
 							href="{$smarty.const.WWW_TOP}/movies?year={$result.year}">{$result.year}</a>) {if $result.rating != ''}{$result.rating}/10{/if}
 
