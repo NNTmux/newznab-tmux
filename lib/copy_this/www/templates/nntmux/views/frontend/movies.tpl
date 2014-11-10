@@ -93,41 +93,52 @@
 			<tr class="{cycle values=",alt"}">
 				<td class="mid">
 					<div class="movcover">
-						<a target="_blank" href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$result.imdbID}/"
-						   name="name{$result.imdbID}" title="View movie info" class="modal_imdb" rel="movie">
-							<img class="shadow"
-								 src="{$smarty.const.WWW_TOP}/covers/movies/{if $result.cover == 1}{$result.imdbID}-cover.jpg{else}no-cover.jpg{/if}"
-								 width="120" border="0" alt="{$result.title|escape:"htmlall"}"/>
-						</a>
+						<a
+								target="_blank"
+								href="{$smarty.const.WWW_TOP}/movies/?imdb={$result.imdbID}"
+								name="name{$result.imdbID}"
+								title="View movie info"
+								class="modal_imdb thumbnail" rel="movie"
+								><img
+									class="shadow" style="margin: 3px 0;"
+									src="{$smarty.const.WWW_TOP}/covers/movies/{if $result.cover == 1}{$result.imdbID}-cover.jpg{else}no-cover.jpg{/if}"
+									width="120" border="0" alt="{$result.title|escape:"htmlall"}"
+									></a>
 
 						<div class="movextra">
-							<a href="#" name="name{$result.imdbID}" title="View movie info" class="rndbtn modal_imdb"
-							   rel="movie">Cover</a>
 							{if $result.trailer != ""}<a href="#" name="name{$result.imdbID}" title="View movie trailer" class="rndbtn modal_imdbtrailer" rel="trailer">Trailer</a>{/if}
-							<a class="rndbtn badge badge-trakt" target="_blank"
-							   href="{$site->dereferrer_link}http://trakt.tv/search/imdb?q=tt{$result.imdbID}/"
-							   name="trakt{$result.imdbID}" title="View trakt page">Trakt</a>
-							<a class="rndbtn" target="_blank"
-							   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$result.imdbID}/"
-							   name="imdb{$result.imdbID}" title="View imdb page">Imdb</a>
+							<a
+									target="_blank"
+									href="{$site->dereferrer_link}http://trakt.tv/search/imdb?q=tt{$result.imdbid}/"
+									name="trakt{$result.imdbid}"
+									title="View trakt page"
+									><img src="{$smarty.const.WWW_TOP}/templates/nntmux/images/icons/trakt.png"></a>
 							{if $cpurl != '' && $cpapi != ''}
 								<a
-										class="rndbtn sendtocouch" target="blackhole"
+										class="sendtocouch"
+										target="blackhole"
 										href="javascript:;"
 										rel="{$cpurl}/api/{$cpapi}/movie.add/?identifier=tt{$result.imdbID}&title={$result.title}"
-										name="CP{$result.imdbID}" title="Add to CouchPotato">
-									Couch
-								</a>
+										name="CP{$result.imdbID}"
+										title="Add to CouchPotato"
+										><img src="{$smarty.const.WWW_TOP}/templates/nntmux/images/icons/couch.png"></a>
 							{/if}
+							<a
+									target="_blank"
+									href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$result.imdbID}/"
+									name="imdb{$result.imdbID}"
+									title="View imdb page"><img src="{$smarty.const.WWW_TOP}/templates/nntmux/images/icons/imdb.png"></a>
 						</div>
 					</div>
 				</td>
 				<td colspan="3" class="left">
-					<h2><a title="View Movie"
-						   href="{$smarty.const.WWW_TOP}/movies/?imdb={$result.imdbID}">{$result.title|escape:"htmlall"}</a>
+					<h2><a title="{$result.title|stripslashes|escape:"htmlall"}"
+						   href="{$smarty.const.WWW_TOP}/movies/?imdb={$result.imdbid}">{$result.title|stripslashes|escape:"htmlall"}</a>
 						(<a class="title" title="{$result.year}"
 							href="{$smarty.const.WWW_TOP}/movies?year={$result.year}">{$result.year}</a>) {if $result.rating != ''}{$result.rating}/10{/if}
-					</h2>
+						{foreach from=$result.languages item=movielanguage}
+							{release_flag($movielanguage, browse)}
+						{/foreach}</h2>
 					{if $result.tagline != ''}<b>{$result.tagline}</b><br/>{/if}
 					{if $result.plot != ''}{$result.plot}<br/><br/>{/if}
 					{if $result.genre != ''}<b>Genre:</b>{$result.genre}<br/>{/if}
