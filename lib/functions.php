@@ -27,6 +27,28 @@ require_once("Enzebe.php");
 class Functions
 
 {
+	/**
+	 * How many headers do we download per loop?
+	 *
+	 * @var int
+	 */
+	public
+		$messagebuffer;
+	/**
+	 * Should we use part repair?
+	 *
+	 * @var bool
+	 */
+	private
+		$DoPartRepair;
+	/**
+	 * How many days to go back on a new group?
+	 *
+	 * @var bool
+	 */
+	private
+		$NewGroupScanByDays;
+
 	function __construct($echooutput = true)
 	{
 		$s = new Sites();
@@ -59,38 +81,6 @@ class Functions
 		$this->partrepairlimit = (!empty($this->tmux->maxpartrepair)) ? (int)$this->tmux->maxpartrepair : 15000;
 	}
 
-	/**
-	 * Should we use part repair?
-	 *
-	 * @var bool
-	 */
-	private
-		$DoPartRepair;
-
-	/**
-	 * How many headers do we download per loop?
-	 *
-	 * @var int
-	 */
-	public
-		$messagebuffer;
-
-	/**
-	 * How many days to go back on a new group?
-	 *
-	 * @var bool
-	 */
-	private
-		$NewGroupScanByDays;
-
-
-	function doecho($str)
-	{
-		if ($this->echooutput)
-			echo $this->c->header($str);
-	}
-
-	// Convert 2012-24-07 to 2012-07-24, there is probably a better way
 	public
 	function checkDate($date)
 	{
@@ -106,6 +96,8 @@ class Functions
 
 		return null;
 	}
+
+	// Convert 2012-24-07 to 2012-07-24, there is probably a better way
 
 	public
 	function updateReleaseHasPreview($guid)
@@ -332,56 +324,10 @@ class Functions
 		return $date;
 	}
 
-	/**
-	 * Backfill groups using user specified article count.
-	 *
-	 * @param object $nntp
-	 * @param string $groupName
-	 * @param string $articles
-	 * @param string $type
-	 *
-	 * @return void
-	 */
-	public
-	function backfillPostAllGroups($nntp, $groupName = '', $articles = '', $type = '')
+	function doecho($str)
 	{
-		if (!isset($nntp)) {
-			$dmessage = "Not connected to usenet(backfill->backfillPostAllGroups).\n";
-			exit($this->c->error($dmessage));
-		}
-
-		$res = false;
-		$groups = new Groups();
-		if ($groupName != '') {
-			$grp = $groups->getByName($groupName);
-			if ($grp) {
-				$res = array($grp);
-			}
-		} else {
-			if ($type == 'normal') {
-				$res = $this->getActiveBackfill();
-			} else if ($type == 'date') {
-				$res = $this->getActiveByDateBackfill();
-			}
-		}
-
-		if ($res) {
-			$counter = 1;
-			$binaries = new Binaries();
-			foreach ($res as $groupArr) {
-				if ($groupName === '') {
-					$dmessage = "\nStarting group " . $counter . ' of ' . sizeof($res);
-
-					$this->c->header . $dmessage . $this->c->rsetColor();
-				}
-				$this->backfillPostGroup($nntp, $this->db, $binaries, $groupArr, sizeof($res) - $counter, $articles);
-				$counter++;
-			}
-		} else {
-			$dmessage = "No groups specified. Ensure groups are added to newznab's database for updating.";
-
-			$this->c->warning($dmessage);
-		}
+		if ($this->echooutput)
+			echo $this->c->header($str);
 	}
 
 	/**
@@ -762,6 +708,58 @@ class Functions
 			exit($dmessage);
 		} else {
 			$this->backfillPostAllGroups($nntp, $groupname['name'], $articles, $type = '');
+		}
+	}
+
+	/**
+	 * Backfill groups using user specified article count.
+	 *
+	 * @param object $nntp
+	 * @param string $groupName
+	 * @param string $articles
+	 * @param string $type
+	 *
+	 * @return void
+	 */
+	public
+	function backfillPostAllGroups($nntp, $groupName = '', $articles = '', $type = '')
+	{
+		if (!isset($nntp)) {
+			$dmessage = "Not connected to usenet(backfill->backfillPostAllGroups).\n";
+			exit($this->c->error($dmessage));
+		}
+
+		$res = false;
+		$groups = new Groups();
+		if ($groupName != '') {
+			$grp = $groups->getByName($groupName);
+			if ($grp) {
+				$res = array($grp);
+			}
+		} else {
+			if ($type == 'normal') {
+				$res = $this->getActiveBackfill();
+			} else if ($type == 'date') {
+				$res = $this->getActiveByDateBackfill();
+			}
+		}
+
+		if ($res) {
+			$counter = 1;
+			$binaries = new Binaries();
+			foreach ($res as $groupArr) {
+				if ($groupName === '') {
+					$dmessage = "\nStarting group " . $counter . ' of ' . sizeof($res);
+
+					$this->c->header . $dmessage . $this->c->rsetColor();
+				}
+				$this->backfillPostGroup($nntp, $this->db, $binaries, $groupArr, sizeof($res) - $counter, $articles);
+				$counter++;
+			}
+		} else {
+			$dmessage = "No groups specified. Ensure groups are added to newznab's database for updating.";
+
+			$this->c->warning($dmessage);
 		}
 	}
 

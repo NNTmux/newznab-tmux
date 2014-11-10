@@ -81,27 +81,6 @@ class Category
 	private $tmpCat = 0;
 
 	/**
-	 * Get a list of categories.
-	 */
-	public function get($activeonly = false, $excludedcats = array())
-	{
-		$db = new DB();
-
-		$exccatlist = "";
-		if (count($excludedcats) > 0)
-			$exccatlist = " and c.ID not in (" . implode(",", $excludedcats) . ")";
-
-		$act = "";
-		if ($activeonly)
-			$act = sprintf(" where c.status = %d ", Category::STATUS_ACTIVE);
-
-		if ($exccatlist != "")
-			$act .= $exccatlist;
-
-		return $db->query("select c.ID, concat(cp.title, ' > ',c.title) as title, cp.ID as parentID, c.status from category c inner join category cp on cp.ID = c.parentID " . $act . " ORDER BY c.ID", true);
-	}
-
-	/**
 	 * Parse category search constraints
 	 *
 	 * @param array $cat
@@ -149,6 +128,16 @@ class Category
 	}
 
 	/**
+	 * Get a list of all child categories for a parent.
+	 */
+	public function getChildren($cid)
+	{
+		$db = new DB();
+
+		return $db->query(sprintf("select c.* from category c where parentID = %d", $cid), true);
+	}
+
+	/**
 	 * Get a list of categories and their parents.
 	 */
 	public function getFlat($activeonly = false)
@@ -159,16 +148,6 @@ class Category
 			$act = sprintf(" where c.status = %d ", Category::STATUS_ACTIVE);
 
 		return $db->query("select c.*, (SELECT title FROM category WHERE ID=c.parentID) AS parentName from category c " . $act . " ORDER BY c.ID");
-	}
-
-	/**
-	 * Get a list of all child categories for a parent.
-	 */
-	public function getChildren($cid)
-	{
-		$db = new DB();
-
-		return $db->query(sprintf("select c.* from category c where parentID = %d", $cid), true);
 	}
 
 	/**
@@ -204,10 +183,6 @@ class Category
 		return $db->queryOneRow(sprintf("SELECT c.disablepreview, c.ID, c.description, c.minsizetoformrelease, c.maxsizetoformrelease, CONCAT(COALESCE(cp.title,'') , CASE WHEN cp.title IS NULL THEN '' ELSE ' > ' END , c.title) as title, c.status, c.parentID from category c left outer join category cp on cp.ID = c.parentID where c.ID = %d", $id));
 	}
 
-	/*
-	* Return min/max size range (in array(min, max)) otherwise, none is returned
-	* if no size restrictions are set
-	*/
 	public function getSizeRangeById($id)
 	{
 		$db = new DB();
@@ -245,6 +220,11 @@ class Category
 		# If code reaches here, then content is enabled
 		return array('min' => $min, 'max' => $max);
 	}
+
+	/*
+	* Return min/max size range (in array(min, max)) otherwise, none is returned
+	* if no size restrictions are set
+	*/
 
 	/**
 	 * Get a list of categories by an array of IDs.
@@ -329,6 +309,27 @@ class Category
 			$temp_array[$category["ID"]] = $category["title"];
 
 		return $temp_array;
+	}
+
+	/**
+	 * Get a list of categories.
+	 */
+	public function get($activeonly = false, $excludedcats = array())
+	{
+		$db = new DB();
+
+		$exccatlist = "";
+		if (count($excludedcats) > 0)
+			$exccatlist = " and c.ID not in (" . implode(",", $excludedcats) . ")";
+
+		$act = "";
+		if ($activeonly)
+			$act = sprintf(" where c.status = %d ", Category::STATUS_ACTIVE);
+
+		if ($exccatlist != "")
+			$act .= $exccatlist;
+
+		return $db->query("select c.ID, concat(cp.title, ' > ',c.title) as title, cp.ID as parentID, c.status from category c inner join category cp on cp.ID = c.parentID " . $act . " ORDER BY c.ID", true);
 	}
 
 }

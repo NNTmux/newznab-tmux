@@ -223,7 +223,7 @@
 			{if $game.genres != ""}<strong>Genre:</strong>{$game.genres|escape:"htmlall"}<br/>{/if}
 			{if $game.publisher != ""}<strong>Publisher:</strong>{$game.publisher|escape:"htmlall"}<br/>{/if}
 			{if $game.platform != ""}<strong>Platform:</strong>{$game.platform|escape:"htmlall"}<br/>{/if}
-			{if $game.releasedate != ""}<strong>Released:</strong> {$game.releasedate|date_format}{/if}
+			{if $game.releasedate != ""}<strong>Released:</strong>{$game.releasedate|date_format}{/if}
 			<div style="margin-top:10px;">
 				{if $game.classused == "gb"}
 					<a class="rndbtn" target="_blank" href="{$site->dereferrer_link}{$game.url}"
@@ -249,7 +249,8 @@
 			<strong>Genre:</strong> {$xxx.genres}
 			<br/><strong>Starring:</strong> {$xxx.actors}
 			{if $xxx.trailer != ''}
-				<br /><strong>Trailer:</strong>
+				<br/>
+				<strong>Trailer:</strong>
 				<div>{$xxx.trailer}</div>
 			{/if}
 			<div style="margin-top:10px;">

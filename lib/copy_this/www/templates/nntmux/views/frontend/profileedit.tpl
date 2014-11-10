@@ -70,7 +70,9 @@
 			<tr>
 				<th>View XXX Page:</th>
 				<td>
-					<input id="xxxview" name="xxxview" value="1" type="checkbox" {if $user.xxxview=="1"}checked="checked"{/if}>
+					<input id="xxxview" name="xxxview" value="1" type="checkbox"
+						   {if $user.xxxview=="1"}checked="checked"{/if}>
+
 					<div class="hint">Browse XXX covers. Only shows XXX releases with known lookup info.</div>
 				</td>
 			</tr>
@@ -234,7 +236,8 @@
 			<tr>
 				<td style="width:180px;"><label for="cp_api">CouchPotato API key:</label></td>
 				<td>
-					<input id="cp_api" class="long" name="cp_api" type="text" value="{$cp_api_selected}" />
+					<input id="cp_api" class="long" name="cp_api" type="text" value="{$cp_api_selected}"/>
+
 					<div class="hint">The CouchPotato api key. Used for 'Add To CouchPotato'.</div>
 				</td>
 			</tr>
@@ -242,8 +245,11 @@
 			<tr>
 				<td style="width:180px;"><label for="cp_url">CouchPotato Url:</label></td>
 				<td>
-					<input id="cp_url" class="long" name="cp_url" type="text" value="{$cp_url_selected}" />
-					<div class="hint">The CouchPotato url. Used for 'Add To CouchPotato', for example: http://192.168.10.10:5050</div>
+					<input id="cp_url" class="long" name="cp_url" type="text" value="{$cp_url_selected}"/>
+
+					<div class="hint">The CouchPotato url. Used for 'Add To CouchPotato', for example:
+						http://192.168.10.10:5050
+					</div>
 				</td>
 			</tr>
 		</table>
