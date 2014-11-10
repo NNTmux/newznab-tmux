@@ -1724,8 +1724,8 @@ class Releases
 						// Valid release with right number of files and title now, so move it on
 						//
 						if ($newtitle != "") {
-							$this->pdo->queryExec(sprintf("UPDATE %s SET relname = %s, procstat = %d WHERE relname = %s AND procstat = %d %s AND fromname = %s",
-									$group['bname'], $this->pdo->escapeString($newtitle), Releases::PROCSTAT_READYTORELEASE, $this->pdo->escapeString($row["relname"]), Releases::PROCSTAT_TITLEMATCHED, (!empty($groupID) ? ' groupID = ' . $groupID . ' AND ' : ' '), $this->pdo->escapeString($row["fromname"])
+							$this->pdo->queryExec(sprintf("UPDATE %s SET relname = %s, procstat = %d WHERE %s relname = %s AND procstat = %d AND fromname = %s",
+									$group['bname'], $this->pdo->escapeString($newtitle), Releases::PROCSTAT_READYTORELEASE, (!empty($groupID) ? ' groupID = ' . $groupID . ' AND ' : ' '), $this->pdo->escapeString($row["relname"]), Releases::PROCSTAT_TITLEMATCHED, $this->pdo->escapeString($row["fromname"])
 								)
 							);
 						} else {
