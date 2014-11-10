@@ -1724,8 +1724,8 @@ class Releases
 						// Valid release with right number of files and title now, so move it on
 						//
 						if ($newtitle != "") {
-							$test = $this->pdo->queryExec(sprintf("UPDATE %s SET relname = %s, procstat=%d WHERE relname = %s AND procstat = %d AND groupID = %d AND fromname=%s",
-									$group['bname'], $this->pdo->escapeString($newtitle), Releases::PROCSTAT_READYTORELEASE, $this->pdo->escapeString($row["relname"]), Releases::PROCSTAT_TITLEMATCHED, $groupID, $this->pdo->escapeString($row["fromname"])
+							$this->pdo->queryExec(sprintf("UPDATE %s SET relname = %s, procstat = %d WHERE relname = %s AND procstat = %d %s AND fromname = %s",
+									$group['bname'], $this->pdo->escapeString($newtitle), Releases::PROCSTAT_READYTORELEASE, $this->pdo->escapeString($row["relname"]), Releases::PROCSTAT_TITLEMATCHED, (!empty($groupID) ? ' groupID = ' . $groupID . ' AND ' : ' '), $this->pdo->escapeString($row["fromname"])
 								)
 							);
 						} else {
@@ -1748,8 +1748,8 @@ class Releases
 							}
 						}
 					} else {
-						$this->pdo->queryExec(sprintf("UPDATE %s SET procstat=%d WHERE relname = %s AND procstat = %d AND groupID = %d AND fromname=%s",
-								$group['bname'], Releases::PROCSTAT_READYTORELEASE, $this->pdo->escapeString($row["relname"]), Releases::PROCSTAT_TITLEMATCHED, $groupID, $this->pdo->escapeString($row["fromname"])
+						$this->pdo->queryExec(sprintf("UPDATE %s SET procstat = %d WHERE relname = %s AND procstat = %d AND %s fromname=%s",
+								$group['bname'], Releases::PROCSTAT_READYTORELEASE, $this->pdo->escapeString($row["relname"]), Releases::PROCSTAT_TITLEMATCHED,(!empty($groupID) ? ' groupID = ' . $groupID . ' AND ' : ' '), $this->pdo->escapeString($row["fromname"])
 							)
 						);
 					}
@@ -1787,7 +1787,7 @@ class Releases
 		// Get out all distinct relname, group from binaries
 		//
 		$categorize = new \Categorize(['Settings' => $this->pdo]);
-		$result = $this->pdo->queryDirect(sprintf("SELECT relname, groupID, g.name AS group_name, fromname, max(categoryID) AS categoryID, max(regexID) AS regexID, max(reqID) AS reqID, MAX(date) AS date, count(%s.ID) AS parts FROM %s INNER JOIN groups g ON g.ID = %s.groupID WHERE procstat = %d AND relname IS NOT NULL GROUP BY relname, g.name, groupID, fromname ORDER BY COUNT(%s.ID) DESC LIMIT %d", $group['bname'], $group['bname'], $group['bname'], Releases::PROCSTAT_READYTORELEASE, $group['bname'], $this->releaseCreationLimit));
+		$result = $this->pdo->queryDirect(sprintf("SELECT %s.*, g.name AS group_name, count(%s.ID) AS parts FROM %s INNER JOIN groups g ON g.ID = %s.groupID WHERE %s procstat = %d AND relname IS NOT NULL GROUP BY relname, g.name, groupID, fromname ORDER BY COUNT(%s.ID) DESC LIMIT %d", $group['bname'], $group['bname'], $group['bname'], $group['bname'], (!empty($groupID) ? ' groupID = ' . $groupID . ' AND ' : ' '), Releases::PROCSTAT_READYTORELEASE, $group['bname'], $this->releaseCreationLimit));
 		while ($row = $this->pdo->getAssocArray($result)) {
 			$relguid = md5(uniqid());
 			// Clean release name
@@ -1839,8 +1839,8 @@ class Releases
 			//
 			// Tag every binary for this release with its parent release id
 			//
-			$this->pdo->queryExec(sprintf("UPDATE %s SET procstat = %d, releaseID = %d WHERE relname = %s AND procstat = %d AND groupID = %d AND fromname=%s",
-					$group['bname'], Releases::PROCSTAT_RELEASED, $relid, $this->pdo->escapeString($row["relname"]), Releases::PROCSTAT_READYTORELEASE, $groupID, $this->pdo->escapeString($row["fromname"])
+			$this->pdo->queryExec(sprintf("UPDATE %s SET procstat = %d, releaseID = %d WHERE relname = %s AND procstat = %d AND %s fromname=%s",
+					$group['bname'], Releases::PROCSTAT_RELEASED, $relid, $this->pdo->escapeString($row["relname"]), Releases::PROCSTAT_READYTORELEASE, (!empty($groupID) ? ' groupID = ' . $groupID . ' AND ' : ' '), $this->pdo->escapeString($row["fromname"])
 				)
 			);
 		$cat = new \Categorize(['Settings' => $this->pdo]);
