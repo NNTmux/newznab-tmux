@@ -275,11 +275,10 @@ switch ($options[1]) {
  */
 function processReleases($releases, $groupID)
 {
-    	$releases->applyRegex($groupID);
+    $releases->applyRegex($groupID);
 	$releases->processIncompleteBinaries($groupID);
 	$releases->createReleases($groupID);
 	$releases->deleteBinaries($groupID);
-
 }
 
 /**

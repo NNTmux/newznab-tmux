@@ -104,7 +104,7 @@
 											Nfo</a>{/if}
 									{if $result.preID > 0 && $userdata.canpre == 1}<span class="preinfo rndbtn"
 																						 title="{$result.searchname}">
-										Pre'd {$result.ctime|timeago}</span>{/if}
+										PreDB</span>{/if}
 									{if $result.prehashID > 0}<span class="prehashinfo rndbtn"
 																	title="{$result.prehashID}">Prehash</span>{/if}
 									{if $result.movieinfoID > 0}<a

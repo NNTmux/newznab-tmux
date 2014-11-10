@@ -1447,17 +1447,16 @@ class Releases
 
 
 	/**
-	 * @param $categorize
-	 * @param $postProcess
-	 * @param $groupName
-	 * @param $nntp
-	 * @param $echooutput
+	 * @param int    $categorize
+	 * @param int    $postProcess
+	 * @param string $groupName (optional)
+	 * @param \NNTP   $nntp
+	 * @param bool   $echooutput
 	 *
 	 * @return int
 	 */
 	public function processReleases($categorize, $postProcess, $groupName, &$nntp, $echooutput)
 	{
-		$retcount = 0;
 		$this->echoCLI = ($echooutput && NN_ECHOCLI);
 		$page = new Page();
 		$groupID = '';
@@ -1469,7 +1468,10 @@ class Releases
 			$groupID = $groupInfo['ID'];
 		}
 
-		$this->pdo->log->doEcho($this->pdo->log->primary('Starting release update process' . date("Y-m-d H:i:s")), true);
+		$processReleases = microtime(true);
+		if ($this->echoCLI) {
+			$this->pdo->log->doEcho($this->pdo->log->header("Starting release update process (" . date('Y-m-d H:i:s') . ")"), true);
+		}
 
 		if (!file_exists($page->site->nzbpath)) {
 			$this->pdo->log->doEcho($this->pdo->log->primary('Bad or missing nzb directory - ' . $page->site->nzbpath), true);
@@ -1489,7 +1491,7 @@ class Releases
 		$consoleTools = new ConsoleTools(['ColorCLI' => $this->pdo->log]);
 		$totalReleasesAdded = $loops = 0;
 		do {
-			$releasesAdded = $nzbFilesAdded = $this->createReleases($groupID);
+			$releasesAdded = $this->createReleases($groupID);
 			$totalReleasesAdded += $releasesAdded;
 
 			if ($processRequestIDs === 0) {
@@ -1516,7 +1518,7 @@ class Releases
 			$this->postProcessReleases($postProcess, $nntp);
 			$this->deleteBinaries($groupID);
 			// This loops as long as there were releases created or 3 loops, otherwise, you could loop indefinately
-		} while (($nzbFilesAdded > 0 || $releasesAdded > 0) && $loops++ < 3);
+		} while ($releasesAdded > 0 && $loops++ < 3);
 
 		$this->deletedReleasesByGroup($groupID);
 		$this->deleteReleases();
@@ -1527,11 +1529,33 @@ class Releases
 		$users = new Users;
 		$users->pruneRequestHistory($page->site->userdownloadpurgedays);
 
-		$this->pdo->log->doEcho($this->pdo->log->primary('Done    : Added ' . $retcount . ' releases'));
+		//Print amount of added releases and time it took.
+		if ($this->echoCLI && $this->tablePerGroup === false) {
+			$countID = $this->pdo->queryOneRow('SELECT COUNT(ID) AS count FROM binaries ' . (!empty($groupID) ? ' WHERE groupID = ' . $groupID : ''));
+			$this->pdo->log->doEcho(
+				$this->pdo->log->primary(
+					'Completed adding ' .
+					number_format($totalReleasesAdded) .
+					' releases in ' .
+					$this->consoleTools->convertTime(number_format(microtime(true) - $processReleases, 2)) .
+					'. ' .
+					number_format(($countID === false ? 0 : $countID['count'])) .
+					' binaries waiting to be converted (still incomplete or in queue for creation)'
+				), true
+			);
+		}
 
-		return $retcount;
+		return $totalReleasesAdded;
+
 	}
-
+	/**
+	 * Delete unwanted binaries based on size/file count using admin settings.
+	 *
+	 * @param int|string $groupID (optional)
+	 *
+	 * @void
+	 * @access public
+	 */
 	public function deleteBinaries($groupID)
 	{
 		$group = $this->groups->getCBPTableNames($this->tablePerGroup, $groupID);
@@ -1606,7 +1630,9 @@ class Releases
 	}
 
 	/**
-	 * @param $groupID
+	 * @param int $groupID
+	 * @void
+	 * @access public
 	 */
 	public function processIncompleteBinaries($groupID)
 	{
@@ -1698,8 +1724,8 @@ class Releases
 						// Valid release with right number of files and title now, so move it on
 						//
 						if ($newtitle != "") {
-							$this->pdo->queryExec(sprintf("UPDATE %s SET relname = %s, procstat=%d WHERE relname = %s AND procstat = %d AND groupID = %d AND fromname=%s",
-									$group['bname'], $this->pdo->escapeString($newtitle), Releases::PROCSTAT_READYTORELEASE, $this->pdo->escapeString($row["relname"]), Releases::PROCSTAT_TITLEMATCHED, $groupID, $this->pdo->escapeString($row["fromname"])
+							$this->pdo->queryExec(sprintf("UPDATE %s SET relname = %s, procstat = %d WHERE relname = %s AND procstat = %d %s AND fromname = %s",
+									$group['bname'], $this->pdo->escapeString($newtitle), Releases::PROCSTAT_READYTORELEASE, $this->pdo->escapeString($row["relname"]), Releases::PROCSTAT_TITLEMATCHED, (!empty($groupID) ? ' groupID = ' . $groupID . ' AND ' : ' '), $this->pdo->escapeString($row["fromname"])
 								)
 							);
 						} else {
@@ -1722,8 +1748,8 @@ class Releases
 							}
 						}
 					} else {
-						$this->pdo->queryExec(sprintf("UPDATE %s SET procstat=%d WHERE relname = %s AND procstat = %d AND groupID = %d AND fromname=%s",
-								$group['bname'], Releases::PROCSTAT_READYTORELEASE, $this->pdo->escapeString($row["relname"]), Releases::PROCSTAT_TITLEMATCHED, $groupID, $this->pdo->escapeString($row["fromname"])
+						$this->pdo->queryExec(sprintf("UPDATE %s SET procstat = %d WHERE relname = %s AND procstat = %d AND %s fromname=%s",
+								$group['bname'], Releases::PROCSTAT_READYTORELEASE, $this->pdo->escapeString($row["relname"]), Releases::PROCSTAT_TITLEMATCHED,(!empty($groupID) ? ' groupID = ' . $groupID . ' AND ' : ' '), $this->pdo->escapeString($row["fromname"])
 							)
 						);
 					}
@@ -1743,18 +1769,27 @@ class Releases
 	}
 
 	/**
-	 * @param $groupID
+	 * Create releases from complete binaries.
+	 *
+	 * @param int|string $groupID (optional)
+	 *
+	 * @return int
+	 * @access public
 	 */
 	public function createReleases($groupID)
 	{
+		$startTime = time();
 		$group = $this->groups->getCBPTableNames($this->tablePerGroup, $groupID);
 		$page = new Page();
 		$this->pdo->log->doEcho($this->pdo->log->primary('Creating releases from complete binaries'));
+
+		$this->pdo->ping(true);
 		//
-		// Get out all distinct relname, group from binaries of STAGE2
+		// Get out all distinct relname, group from binaries
 		//
 		$categorize = new \Categorize(['Settings' => $this->pdo]);
-		$result = $this->pdo->queryDirect(sprintf("SELECT relname, groupID, g.name AS group_name, fromname, max(categoryID) AS categoryID, max(regexID) AS regexID, max(reqID) AS reqID, MAX(date) AS date, count(%s.ID) AS parts FROM %s INNER JOIN groups g ON g.ID = %s.groupID WHERE procstat = %d AND relname IS NOT NULL GROUP BY relname, g.name, groupID, fromname ORDER BY COUNT(%s.ID) DESC", $group['bname'], $group['bname'], $group['bname'], Releases::PROCSTAT_READYTORELEASE, $group['bname']));
+		$returnCount = $duplicate = 0;
+		$result = $this->pdo->queryDirect(sprintf("SELECT %s.*, g.name AS group_name, count(%s.ID) AS parts FROM %s INNER JOIN groups g ON g.ID = %s.groupID WHERE %s procstat = %d AND relname IS NOT NULL GROUP BY relname, g.name, groupID, fromname ORDER BY COUNT(%s.ID) DESC LIMIT %d", $group['bname'], $group['bname'], $group['bname'], $group['bname'], (!empty($groupID) ? ' groupID = ' . $groupID . ' AND ' : ' '), Releases::PROCSTAT_READYTORELEASE, $group['bname'], $this->releaseCreationLimit));
 		while ($row = $this->pdo->getAssocArray($result)) {
 			$relguid = md5(uniqid());
 			// Clean release name
@@ -1806,14 +1841,12 @@ class Releases
 			//
 			// Tag every binary for this release with its parent release id
 			//
-			$this->pdo->queryExec(sprintf("UPDATE %s SET procstat = %d, releaseID = %d WHERE relname = %s AND procstat = %d AND groupID = %d AND fromname=%s",
-					$group['bname'], Releases::PROCSTAT_RELEASED, $relid, $this->pdo->escapeString($row["relname"]), Releases::PROCSTAT_READYTORELEASE, $groupID, $this->pdo->escapeString($row["fromname"])
+			$this->pdo->queryExec(sprintf("UPDATE %s SET procstat = %d, releaseID = %d WHERE relname = %s AND procstat = %d AND %s fromname=%s",
+					$group['bname'], Releases::PROCSTAT_RELEASED, $relid, $this->pdo->escapeString($row["relname"]), Releases::PROCSTAT_READYTORELEASE, (!empty($groupID) ? ' groupID = ' . $groupID . ' AND ' : ' '), $this->pdo->escapeString($row["fromname"])
 				)
 			);
 		$cat = new \Categorize(['Settings' => $this->pdo]);
-		//
-		// Write the nzb to disk
-		//
+
 			//
 			// Write the nzb to disk
 			//
@@ -1849,6 +1882,7 @@ class Releases
 				if ($dupes['total'] > 0) {
 					$this->pdo->log->doEcho($this->pdo->log->primary('Duplicate - ' . $cleanRelName . ''));
 					$this->delete($relid);
+					$duplicate++;
 				} else {
 					$this->pdo->queryExec(sprintf("UPDATE releases SET totalpart = %d, size = %s, COMPLETION = %d, GID=%s , nzb_guid = %s WHERE ID = %d",
 							$nzbInfo->filecount,
@@ -1860,10 +1894,29 @@ class Releases
 						)
 					);
 					$this->pdo->log->doEcho($this->pdo->log->primary('Added release ' . $cleanRelName . ''));
+					$returnCount++;
+
+					if ($this->echoCLI) {
+						echo "Added $returnCount releases.\r";
+					}
 
 				}
              }
 		}
+		if ($this->echoCLI) {
+			$this->pdo->log->doEcho(
+				$this->pdo->log->primary(
+					PHP_EOL .
+					number_format($returnCount) .
+					' Releases added and ' .
+					number_format($duplicate) .
+					' duplicate releases deleted in ' .
+					$this->consoleTools->convertTime(time() - $startTime)
+				), true
+			);
+		}
+
+		return $returnCount;
 	}
 	/**
 	 * @param $url
@@ -1931,10 +1984,9 @@ class Releases
 		}
 	}
 
+
 	/**
-	 * Apply regexes to groups
-	 *
-	 * @param $groupID
+	 * @param int|string $groupID (optional)
 	 */
 	public function applyRegex($groupID)
 	{
@@ -1999,6 +2051,14 @@ class Releases
 		}
 	}
 
+	/**
+	 * @param $url
+	 * @param $nnid
+	 * @param $groupname
+	 * @param $reqid
+	 *
+	 * @return string
+	 */
 	public function getReleaseNameForReqId($url, $nnid, $groupname, $reqid)
 	{
 		if ($reqid == " null " || $reqid == "0" || $reqid == "")
@@ -2081,8 +2141,10 @@ class Releases
 		return $parameters['ID'];
 	}
 
+
 	/**
-	 * Delete one or more releases.
+	 * @param      $id
+	 * @param bool $isGuid
 	 */
 	public function delete($id, $isGuid = false)
 	{
@@ -2544,10 +2606,10 @@ class Releases
 		if ($this->echoCLI) {
 			$this->pdo->log->doEcho(
 				$this->pdo->log->primary(
-					'Deleted ' . ($minSizeDeleted + $maxSizeDeleted + $minFilesDeleted) .
-					' releases: ' . PHP_EOL .
-					$minSizeDeleted . ' smaller than, ' . $maxSizeDeleted . ' bigger than, ' . $minFilesDeleted .
-					' with less files than site/groups setting in: ' .
+					'Deleted ' . ($minSizeDeleted + $maxSizeDeleted + $minFilesDeleted) . ' releases: ' . PHP_EOL .
+					$minSizeDeleted . ' smaller than, ' .
+					$maxSizeDeleted . ' bigger than, ' .
+					$minFilesDeleted . ' with less files than site/group settings in: ' .
 					$this->consoleTools->convertTime(time() - $startTime)
 				), true
 			);
