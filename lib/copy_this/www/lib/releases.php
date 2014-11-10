@@ -1778,6 +1778,7 @@ class Releases
 	 */
 	public function createReleases($groupID)
 	{
+		$startTime = time();
 		$group = $this->groups->getCBPTableNames($this->tablePerGroup, $groupID);
 		$page = new Page();
 		$this->pdo->log->doEcho($this->pdo->log->primary('Creating releases from complete binaries'));
@@ -1787,6 +1788,7 @@ class Releases
 		// Get out all distinct relname, group from binaries
 		//
 		$categorize = new \Categorize(['Settings' => $this->pdo]);
+		$returnCount = $duplicate = 0;
 		$result = $this->pdo->queryDirect(sprintf("SELECT %s.*, g.name AS group_name, count(%s.ID) AS parts FROM %s INNER JOIN groups g ON g.ID = %s.groupID WHERE %s procstat = %d AND relname IS NOT NULL GROUP BY relname, g.name, groupID, fromname ORDER BY COUNT(%s.ID) DESC LIMIT %d", $group['bname'], $group['bname'], $group['bname'], $group['bname'], (!empty($groupID) ? ' groupID = ' . $groupID . ' AND ' : ' '), Releases::PROCSTAT_READYTORELEASE, $group['bname'], $this->releaseCreationLimit));
 		while ($row = $this->pdo->getAssocArray($result)) {
 			$relguid = md5(uniqid());
@@ -1880,6 +1882,7 @@ class Releases
 				if ($dupes['total'] > 0) {
 					$this->pdo->log->doEcho($this->pdo->log->primary('Duplicate - ' . $cleanRelName . ''));
 					$this->delete($relid);
+					$duplicate++;
 				} else {
 					$this->pdo->queryExec(sprintf("UPDATE releases SET totalpart = %d, size = %s, COMPLETION = %d, GID=%s , nzb_guid = %s WHERE ID = %d",
 							$nzbInfo->filecount,
@@ -1891,10 +1894,29 @@ class Releases
 						)
 					);
 					$this->pdo->log->doEcho($this->pdo->log->primary('Added release ' . $cleanRelName . ''));
+					$returnCount++;
+
+					if ($this->echoCLI) {
+						echo "Added $returnCount releases.\r";
+					}
 
 				}
              }
 		}
+		if ($this->echoCLI) {
+			$this->pdo->log->doEcho(
+				$this->pdo->log->primary(
+					PHP_EOL .
+					number_format($returnCount) .
+					' Releases added and ' .
+					number_format($duplicate) .
+					' duplicate releases deleted in ' .
+					$this->consoleTools->convertTime(time() - $startTime)
+				), true
+			);
+		}
+
+		return $returnCount;
 	}
 	/**
 	 * @param $url
