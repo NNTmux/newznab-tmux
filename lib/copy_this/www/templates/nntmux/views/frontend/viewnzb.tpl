@@ -122,6 +122,10 @@
 						name="CP{$release.imdbID}" title="Add to CouchPotato">
 					CouchPotato
 				</a>
+				<br><strong>Subtitle Search:</strong>
+				<br><a target="_blank" href="http://www.opensubtitles.org/search/sublanguageid-all/moviename-{$movie.title|replace:" ":"+"}"title="Opensubtitles">OpenSubtitles</a> <a target="_blank" href="http://www.subtitleseeker.com/search/MOVIE_TITLES/{$movie.title}"title="SubtitleSeeker">SubtitleSeeker</a>
+							<span class="label label-default">
+
 			</div>
 		</td>
 	</tr>

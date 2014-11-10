@@ -99,9 +99,13 @@
 
 						<div class="resextra">
 							<div class="btns" style="float:right">
+								{release_flag($result.searchname, browse)}
 									{if $result.nfoID > 0}<a href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}"
 															 title="View Nfo" class="modal_nfo rndbtn" rel="nfo">
 											Nfo</a>{/if}
+								{if $result.imdbID > 0}
+									<a href="#" name="name{$result.imdbID}" title="View movie info" class="modal_imdb rndbtn" rel="movie" >Cover</a>
+								{/if}
 									{if $result.preID > 0 && $userdata.canpre == 1}<span class="preinfo rndbtn"
 																						 title="{$result.searchname}">
 										PreDB</span>{/if}
@@ -154,6 +158,9 @@
 										Aired {if $result.tvairdate|strtotime > $smarty.now}in future{else}{$result.tvairdate|daysago}{/if}</span>{/if}
 									{if $result.reID > 0}<span class="mediainfo rndbtn" title="{$result.guid}">
 											Media</span>{/if}
+								{if $result.group_name != ""}
+									<a class="rndbtn" href="{$smarty.const.WWW_TOP}/browse?g={$result.group_name|escape:"htmlall"}" title="Browse {$result.group_name}">{$result.group_name|escape:"htmlall"|replace:"alt.binaries.":"a.b."}</a>
+								{/if}
 								{/strip}</div>
 						</div>
 					</td>
