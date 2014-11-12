@@ -27,34 +27,20 @@
 		</p>
 
 	</div>
-	<b><a title="Manage your shows" href="{$smarty.const.WWW_TOP}/myshows">My Shows</a></b>
-	:
-<span>
-	{if $myshows.ID != ''}
-		<a href="{$smarty.const.WWW_TOP}/myshows/edit/{$rage[0].rageID}?from={$smarty.server.REQUEST_URI|escape:"url"}"
-		   class="myshows" rel="edit" name="series{$rage[0].rageID}" title="Edit Categories for this show">Edit</a>
-
-				 |
-
-
-		<a href="{$smarty.const.WWW_TOP}/myshows/delete/{$rage[0].rageID}?from={$smarty.server.REQUEST_URI|escape:"url"}"
-		   class="myshows" rel="remove" name="series{$rage[0].rageID}" title="Remove from My Shows">Remove</a>
-
-
-						{else}
-
-
-		<a href="{$smarty.const.WWW_TOP}/myshows/add/{$rage[0].rageID}?from={$smarty.server.REQUEST_URI|escape:"url"}"
-		   class="myshows" rel="add" name="series{$rage[0].rageID}" title="Add to My Shows">Add</a>
-	{/if}
-	<div style="padding-bottom:10px; float:right;">
-		{if $rage|@count == 1 && $isadmin}<a
-			href="{$smarty.const.WWW_TOP}/admin/rage-edit.php?id={$r.ID}&amp;action=update&amp;from={$smarty.server.REQUEST_URI|escape:"url"}">
-				Update From Tv Rage</a> | {/if}
-		<a target="_blank" href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$rage[0].rageID}"
-		   title="View in TvRage">View in Tv Rage</a> |
-		<a href="{$smarty.const.WWW_TOP}/rss?rage={$rage[0].rageID}{if $category != ''}&amp;t={$category}{/if}&amp;dl=1&amp;i={$userdata.ID}&amp;r={$userdata.rsstoken}">Rss
-			Feed for this Series</a>
+	<div class="btn-group">
+		<a class="btn btn-small" title="Manage your shows" href="{$smarty.const.WWW_TOP}/myshows">My Shows</a>
+		{if $myshows.ID != ''}
+			<a class="btn btn-small" href="{$smarty.const.WWW_TOP}/myshows/delete/{$rage[0].rageID}?from={$smarty.server.REQUEST_URI|escape:"url"}" class="myshows" rel="remove" name="series{$rage[0].rageID}" title="Remove from My Shows"><i class="icon-minus-sign"></i></a>
+			<a class="btn btn-small" href="{$smarty.const.WWW_TOP}/myshows/edit/{$rage[0].rageID}?from={$smarty.server.REQUEST_URI|escape:"url"}" class="myshows" rel="edit" name="series{$rage[0].rageID}" title="Edit Categories for this show"><i class="icon-edit"></i></a>
+		{else}
+			<a class="btn btn-small" href="{$smarty.const.WWW_TOP}/myshows/add/{$rage[0].rageID}?from={$smarty.server.REQUEST_URI|escape:"url"}" class="myshows" rel="add" name="series{$rage[0].rageID}" title="Add to My Shows"><i class="icon-plus-sign"></i></a>
+		{/if}
+	</div>
+ <form id="nzb_multi_operations_form" action="get">
+	<div class="btn-group">
+		{if $rage|@count == 1 && $isadmin}<a class="btn btn-mini btn-inverse" href="{$smarty.const.WWW_TOP}/admin/rage-edit.php?id={$r.ID}&amp;action=update&amp;from={$smarty.server.REQUEST_URI|escape:"url"}">Update From Tv Rage</a> | {/if}
+		<a class="btn btn-mini" target="_blank" href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$rage[0].rageID}" title="View in TvRage">View in Tv Rage</a> |
+		<a class="btn btn-mini" href="{$smarty.const.WWW_TOP}/rss?rage={$rage[0].rageID}{if $category != ''}&amp;t={$category}{/if}&amp;dl=1&amp;i={$userdata.ID}&amp;r={$userdata.rsstoken}">Series RSS <i class="fa-icon-rss"></i></a>
 	</div>
 	<form id="nzb_multi_operations_form" action="get">
 
@@ -71,15 +57,17 @@
 			{/foreach}
 		</ul>
 
-		<div class="nzb_multi_operations" style="float:right; clear:none;">
-			<small>With Selected:</small>
-			<input type="button" class="rndbtn nzb_multi_operations_download" value="Download NZBs"/>
-			<input type="button" class="rndbtn nzb_multi_operations_cart" value="Add to Cart"/>
-			{if $sabintegrated}<input type="button" class="rndbtn nzb_multi_operations_sab" value="Send to SAB"/>{/if}
-			{if $isadmin}
-				<input type="button" class="rndbtn nzb_multi_operations_edit" value="Edit"/>
-				<input type="button" class="rndbtn nzb_multi_operations_delete" value="Del"/>
-			{/if}
+		<div class="nzb_multi_operations">
+			<small>With selected:</small>
+			<div class="btn-group">
+				<button type="button" class="btn btn-mini nzb_multi_operations_download"><i class="icon-download"></i> Download NZBs</button>
+				<button type="button" class="btn btn-mini nzb_multi_operations_cart"><i class="icon-shopping-cart"></i> Add to cart</button>
+				{if $sabintegrated}<button type="button" class="btn btn-mini nzb_multi_operations_sab"><i class="icon-download-alt"></i> Send to my Queue</button>{/if}
+				{if $isadmin}
+					<button type="button" class="btn btn-mini btn-inverse nzb_multi_operations_edit"><i class="icon-edit icon-white"></i></button>
+					<button type="button" class="btn btn-mini btn-inverse nzb_multi_operations_delete"><i class="icon-trash icon-white"></i></button>
+				{/if}
+			</div>
 		</div>
 
 		{foreach $seasons as $seasonnum => $season name=tv}

@@ -3,35 +3,45 @@
 {$site->adbrowse}
 
 {if $shows}
-	<p>
-		<a href="{$smarty.const.WWW_TOP}/series" title="View available TV series">Series List</a> |
-		<a title="Manage your shows" href="{$smarty.const.WWW_TOP}/myshows">Manage My Shows</a> |
-		<a title="All releases in your shows as an RSS feed"
-		   href="{$smarty.const.WWW_TOP}/rss?t=-3&amp;dl=1&amp;i={$userdata.ID}&amp;r={$userdata.rsstoken}">Rss Feed</a>
-	</p>
+	<center>
+		<div class="btn-group">
+			<a class="btn btn-small" href="{$smarty.const.WWW_TOP}/series" title="View available TV series">Series List</a> |
+			<a class="btn btn-small" title="Manage your shows" href="{$smarty.const.WWW_TOP}/myshows">Manage My Shows</a> |
+			<a class="btn btn-small" title="All releases in your shows as an RSS feed" href="{$smarty.const.WWW_TOP}/rss?t=-3&amp;dl=1&amp;i={$userdata.ID}&amp;r={$userdata.rsstoken}">Rss <i class="fa-icon-rss"></i></a>
+		</div>
+	</center>
+	<br/>
 {/if}
 
 {if $results|@count > 0}
+
 	<form id="nzb_multi_operations_form" action="get">
 
-	<div class="nzb_multi_operations">
-		{if $covgroup != ''}
-			View:
-			<a href="{$smarty.const.WWW_TOP}/{$covgroup}?t={$category}">Covers</a> | <b>List</b><br />
-		{/if}
-			<small>With Selected:</small>
-			<input type="button" class="rndbtn nzb_multi_operations_download" value="Download NZBs"/>
-			<input type="button" class="rndbtn nzb_multi_operations_cart" value="Add to Cart"/>
-			{if $sabintegrated}
-				<input type="button" class="nzb_multi_operations_sab" value="Send to my Queue" />
-			{/if}
-			{if $isadmin}
-				<input type="button" class="rndbtn nzb_multi_operations_edit" value="Edit"/>
-				<input type="button" class="rndbtn nzb_multi_operations_delete" value="Del"/>
-			{/if}
-		</div>
-
-		{$pager}
+	<table width="100%">
+		<tr>
+			<td>{$pager}</td>
+			<td style="text-align:right"><div class="nzb_multi_operations">
+					<small>With selected:</small>
+					<div class="btn-group">
+						<button type="button" class="btn btn-mini nzb_multi_operations_download"><i class="icon-download"></i> Download NZBs</button>
+						<button type="button" class="btn btn-mini nzb_multi_operations_cart"><i class="icon-shopping-cart"></i> Add to cart</button>
+						{if $sabintegrated}<button type="button" class="btn btn-mini nzb_multi_operations_sab"><i class="icon-download-alt"></i> Send to my Queue</button>{/if}
+						{if $isadmin}
+							<button type="button" class="btn btn-mini btn-inverse nzb_multi_operations_edit"><i class="icon-edit icon-white"></i></button>
+							<button type="button" class="btn btn-mini btn-inverse nzb_multi_operations_delete"><i class="icon-trash icon-white"></i></button>
+							<button type="button" class="btn btn-mini btn-inverse nzb_multi_operations_rebuild"><i class="icon-repeat icon-white"></i></button>
+						{/if}</div>
+					{if $category==1000}<div class="btn-group"><a class="btn btn-mini" href="{$smarty.const.WWW_TOP}/console" title="Covers"><i class="icon-picture"></i></a><span class="btn btn-mini disabled"><i class="icon-list"></i></span></div>
+					{elseif $category==2000}<div class="btn-group"><a class="btn btn-mini" href="{$smarty.const.WWW_TOP}/movies" title="Covers"><i class="icon-picture"></i></a><span class="btn btn-mini disabled"><i class="icon-list"></i></span></div>
+					{elseif $category==3000}<div class="btn-group"><a class="btn btn-mini" href="{$smarty.const.WWW_TOP}/music" title="Covers"><i class="icon-picture"></i></a><span class="btn btn-mini disabled"><i class="icon-list"></i></span></div>
+					{elseif $category==4050}<div class="btn-group"><a class="btn btn-mini" href="{$smarty.const.WWW_TOP}/games" title="Covers"><i class="icon-picture"></i></a><span class="btn btn-mini disabled"><i class="icon-list"></i></span></div>
+					{elseif $category==6000}<div class="btn-group"><a class="btn btn-mini" href="{$smarty.const.WWW_TOP}/xxx" title="Covers"><i class="icon-picture"></i></a><span class="btn btn-mini disabled"><i class="icon-list"></i></span></div>
+					{elseif $category==7020}<div class="btn-group"><a class="btn btn-mini" href="{$smarty.const.WWW_TOP}/books" title="Covers"><i class="icon-picture"></i></a><span class="btn btn-mini disabled"><i class="icon-list"></i></span></div>
+					{/if}
+				</div>
+			</td>
+		</tr>
+	</table>
 
 		<table style="width:100%;" class="data highlight icons" id="browsetable">
 			<tr>
