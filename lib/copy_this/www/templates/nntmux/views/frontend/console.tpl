@@ -52,7 +52,7 @@
 			<small>With Selected:</small>
 			<input type="button" class="rndbtn nzb_multi_operations_download" value="Download NZBs"/>
 			<input type="button" class="rndbtn nzb_multi_operations_cart" value="Add to Cart"/>
-			{if $sabintegrated}<input type="button" class="rndbtn nzb_multi_operations_sab" value="Send to SAB"/>{/if}
+			{if $sabintegrated}<input type="button" class="rndbtn nzb_multi_operations_sab" value="Send to my Queue"/>{/if}
 		</div>
 
 		{$pager}
