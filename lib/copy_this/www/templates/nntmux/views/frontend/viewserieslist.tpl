@@ -20,7 +20,6 @@
 
 <div style="float:right;">
 	<form name="ragesearch" action="" method="get">
-		<label for="title">Search:</label>
 		&nbsp;&nbsp;<input id="title" type="text" name="title" value="{$ragename}" size="25" />
 		&nbsp;&nbsp;
 		<button type="submit" class="btn"><i class="icon-search"></i></button>
