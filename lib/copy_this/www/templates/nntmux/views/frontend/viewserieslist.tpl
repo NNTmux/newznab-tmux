@@ -19,11 +19,11 @@
 </div>
 
 <div style="float:right;">
-	<form class="form-search" name="ragesearch" action="" method="get">
-		<div class="input-append">
-			<input id="title" name="title" type="text" class="span2 search-query" value="{$ragename|escape:'html'}" placeholder="Search TV Series">
-			<button type="submit" class="btn"><i class="icon-search"></i></button>
-		</div>
+	<form name="ragesearch" action="" method="get">
+		<label for="title">Search:</label>
+		&nbsp;&nbsp;<input id="title" type="text" name="title" value="{$ragename}" size="25" />
+		&nbsp;&nbsp;
+		<button type="submit" class="btn"><i class="icon-search"></i></button>
 
 
 	</form>
