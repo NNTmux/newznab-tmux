@@ -4,7 +4,7 @@
 <h1>Browse Games</h1>
 
 <form name="browseby" action="games">
-	<table class="rndbtn" border="0" cellpadding="2" cellspacing="0">
+	<table class="btn btn-mini" border="0" cellpadding="2" cellspacing="0">
 		<tr>
 			<th class="left"><label for="title">Title</label></th>
 			<th class="left"><label for="genre">Genre</label></th>
@@ -29,7 +29,7 @@
 					{/foreach}
 				</select>
 			</td>
-			<td><input class='rndbtn' type="submit" value="Go"/></td>
+			<td><input class='btn btn-mini' type="submit" value="Go"/></td>
 		</tr>
 	</table>
 </form>
@@ -48,7 +48,7 @@
 					<div class="btn-group">
 						<button type="button" class="btn btn-mini nzb_multi_operations_download"><i class="icon-download"></i> Download NZBs</button>
 						<button type="button" class="btn btn-mini nzb_multi_operations_cart"><i class="icon-shopping-cart"></i> Add to cart</button>
-						{if $sabintegrated}<button type="button" class="btn btn-mini nzb_multi_operations_sab"><i class="icon-download-alt"></i> Send to SAB</button>{/if}
+						{if $sabintegrated}<button type="button" class="btn btn-mini nzb_multi_operations_sab"><i class="icon-download-alt"></i> Send to my Queue</button>{/if}
 						{if $isadmin}
 							<button type="button" class="btn btn-mini btn-inverse nzb_multi_operations_edit"><i class="icon-edit icon-white"></i></button>
 							<button type="button" class="btn btn-mini btn-inverse nzb_multi_operations_delete"><i class="icon-trash icon-white"></i></button>
@@ -116,31 +116,31 @@
 
 							<div class="movextra">
 								{if $result.nfoid > 0}<a href="{$smarty.const.WWW_TOP}/nfo/{$result.grp_release_guid}"
-														 title="View Nfo" class="rndbtn modal_nfo" rel="nfo">
+														 title="View Nfo" class="btn btn-mini modal_nfo" rel="nfo">
 										Nfo</a>{/if}
 								{if $result.classused == "gb"}
-									<a class="rndbtn" target="_blank" href="{$site->dereferrer_link}{$result.url}"
+									<a class="btn btn-mini" target="_blank" href="{$site->dereferrer_link}{$result.url}"
 									   name="giantbomb{$result.gamesinfo_id}" title="View giantbomb page">Giantbomb</a>
 								{/if}
 								{if $result.classused == "steam"}
-									<a class="rndbtn" target="_blank"
+									<a class="btn btn-mini" target="_blank"
 									   href="{$site->dereferrer_link}{$result.url|escape:"htmlall"}"
 									   name="steam{$result.gamesinfo_id}" title="View Steam page">Steam</a>
 								{/if}
 								{if $result.classused == "gl"}
-									<a class="rndbtn" target="_blank"
+									<a class="btn btn-mini" target="_blank"
 									   href="{$site->dereferrer_link}{$result.url|escape:"htmlall"}"
 									   name="greenlight{$result.gamesinfo_id}" title="View greenlight page">Greenlight</a>
 								{/if}
 								{if $result.classused == "desura"}
-									<a class="rndbtn" target="_blank"
+									<a class="btn btn-mini" target="_blank"
 									   href="{$site->dereferrer_link}{$result.url|escape:"htmlall"}"
 									   name="desura{$result.gamesinfo_id}" title="View Desura page">Desura</a>
 								{/if}
-								<a class="rndbtn" target="_blank"
+								<a class="btn btn-mini" target="_blank"
 								   href="{$site->dereferrer_link}http://ign.com/search?q={$result.title|escape:"htmlall"}&page=0&count=10&type=object&objectType=game&filter=games&"
 								   name="ign{$result.id}"	title="Find game on IGN">IGN</a>
-								<a class="rndbtn" target="_blank"
+								<a class="btn btn-mini" target="_blank"
 								   href="{$site->dereferrer_link}http://www.gamespot.com/search/?q={$result.title|escape:"htmlall"}"
 								   name="gamespot{$result.id}"
 								   title="Find game on Gamespot">Gamespot</a>

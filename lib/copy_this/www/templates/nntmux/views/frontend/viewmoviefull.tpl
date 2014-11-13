@@ -61,7 +61,7 @@
 				<input type="button" class="rndbtn nzb_multi_operations_download" value="Download NZBs"/>
 				<input type="button" class="rndbtn nzb_multi_operations_cart" value="Add to Cart"/>
 				{if $sabintegrated}
-					<input type="button" class="rndbtn nzb_multi_operations_sab" value="Send to SAB"/>
+					<input type="button" class="rndbtn nzb_multi_operations_sab" value="Send to my Queue"/>
 				{/if}
 				{if $isadmin}
 					<input type="button" class="rndbtn nzb_multi_operations_edit" value="Edit"/>
@@ -194,7 +194,7 @@
 				<input type="button" class="rndbtn nzb_multi_operations_download" value="Download NZBs"/>
 				<input type="button" class="rndbtn nzb_multi_operations_cart" value="Add to Cart"/>
 				{if $sabintegrated}
-					<input type="button" class="rndbtn nzb_multi_operations_sab" value="Send to SAB"/>
+					<input type="button" class="rndbtn nzb_multi_operations_sab" value="Send to my Queue"/>
 				{/if}
 				{if $isadmin}
 					<input type="button" class="rndbtn nzb_multi_operations_edit" value="Edit"/>

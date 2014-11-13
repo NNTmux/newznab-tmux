@@ -68,7 +68,7 @@
 					<div class="btn-group">
 						<button type="button" class="btn btn-mini nzb_multi_operations_download"><i class="icon-download"></i> Download NZBs</button>
 						<button type="button" class="btn btn-mini nzb_multi_operations_cart"><i class="icon-shopping-cart"></i> Add to cart</button>
-						{if $sabintegrated}<button type="button" class="btn btn-mini nzb_multi_operations_sab"><i class="icon-download-alt"></i> Send to SAB</button>{/if}
+						{if $sabintegrated}<button type="button" class="btn btn-mini nzb_multi_operations_sab"><i class="icon-download-alt"></i> Send to my Queue</button>{/if}
 						{if $isadmin}
 							<button type="button" class="btn btn-mini btn-inverse nzb_multi_operations_edit"><i class="icon-edit icon-white"></i></button>
 							<button type="button" class="btn btn-mini btn-inverse nzb_multi_operations_delete"><i class="icon-trash icon-white"></i></button>
@@ -114,7 +114,7 @@
 								title="View movie info"
 								class="modal_imdb thumbnail" rel="movie"
 								><img
-									class="shadow" style="margin: 3px 0;"
+									class="img-rounded" style="margin: 3px 0;"
 									src="{$smarty.const.WWW_TOP}/covers/movies/{if $result.cover == 1}{$result.imdbID}-cover.jpg{else}no-cover.jpg{/if}"
 									width="120" border="0" alt="{$result.title|escape:"htmlall"}"
 									></a>
@@ -242,7 +242,7 @@
 		<small>With Selected:</small>
 		<input type="button" class="rndbtn nzb_multi_operations_download" value="Download NZBs"/>
 		<input type="button" class="rndbtn nzb_multi_operations_cart" value="Add to Cart"/>
-		{if $sabintegrated}<input type="button" class="rndbtn nzb_multi_operations_sab" value="Send to SAB"/>{/if}
+		{if $sabintegrated}<input type="button" class="rndbtn nzb_multi_operations_sab" value="Send to my Queue"/>{/if}
 	</div>
 
 	<br/>

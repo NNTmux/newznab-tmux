@@ -1,7 +1,7 @@
 <h1>
 	{if $isadmin}
 		<a title="Edit AniDB data"
-		   href="{$smarty.const.WWW_TOP}/admin/anidb-edit.php?id={$animeAnidbID}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}">{$animeTitle} </a>
+		   href="{$smarty.const.WWW_TOP}/admin/anidb-edit.php?id={$animeAnidbid}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}">{$animeTitle} </a>
 	{else}
 		{$animeTitle}
 	{/if}
@@ -12,7 +12,7 @@
 <div class="tvseriesheading">
 	{if $animeType != ''}<i>({$animeType|escape:"htmlall"})</i>{/if}
 	{if animePicture != ""}<img class="shadow" alt="{$animeTitle} Picture"
-								src="{$smarty.const.WWW_TOP}/covers/anime/{$animeAnidbID}.jpg" />{/if}
+								src="{$smarty.const.WWW_TOP}/covers/anime/{$animeAnidbid}.jpg" />{/if}
 	<p>
 		{if $animeCategories != ''}<b>{$animeCategories}</b><br/>{/if}
 		<span class="descinitial">{$animeDescription|escape:"htmlall"|nl2br|magicurl|truncate:"1500":" </span><a class=\"descmore\" href=\"#\">more...</a>"}
@@ -29,7 +29,7 @@
 	<div class="nzb_multi_operations">
 		<div style="padding-bottom:10px;">
 			<a target="_blank"
-			   href="{$site->dereferrer_link}http://anidb.net/perl-bin/animedb.pl?show=anime&amp;aid={$animeAnidbID}"
+			   href="{$site->dereferrer_link}http://anidb.net/perl-bin/animedb.pl?show=anime&amp;aid={$animeAnidbid}"
 			   title="View AniDB">View AniDB</a> |
 			{if $animeTvdbID > 0}<a target="_blank"
 									href="{$site->dereferrer_link}http://thetvdb.com/?tab=series&id={$animeTvdbID}"
@@ -37,17 +37,18 @@
 			{if $animeImdbID > 0}<a target="_blank"
 									href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$animeImdbID}"
 									title="View IMDb">View IMDb</a> | {/if}
-			<a href="{$smarty.const.WWW_TOP}/rss?anidb={$animeAnidbID}&amp;dl=1&amp;i={$userdata.ID}&amp;r={$userdata.rsstoken}">RSS
+			<a href="{$smarty.const.WWW_TOP}/rss?anidb={$animeAnidbid}&amp;dl=1&amp;i={$userdata.ID}&amp;r={$userdata.rsstoken}">RSS
 				feed for this Anime</a>
 		</div>
-		<small>With Selected:</small>
-		<input type="button" class="rndbtn nzb_multi_operations_download" value="Download NZBs"/>
-		<input type="button" class="rndbtn nzb_multi_operations_cart" value="Add to Cart"/>
-		{if $sabintegrated}<input type="button" class="rndbtn nzb_multi_operations_sab" value="Send to SAB"/>{/if}
-		{if $isadmin}
-			<input type="button" class="rndbtn nzb_multi_operations_edit" value="Edit"/>
-			<input type="button" class="rndbtn nzb_multi_operations_delete" value="Del"/>
-		{/if}
+		<div class="btn-group">
+			<button type="button" class="btn btn-mini nzb_multi_operations_download"><i class="icon-download"></i> Download NZBs</button>
+			<button type="button" class="btn btn-mini nzb_multi_operations_cart"><i class="icon-shopping-cart"></i> Add to cart</button>
+			{if $sabintegrated}<button type="button" class="btn btn-mini nzb_multi_operations_sab"><i class="icon-download-alt"></i> Send to my Queue</button>{/if}
+			{if $isadmin}
+				<button type="button" class="btn btn-mini btn-inverse nzb_multi_operations_edit"><i class="icon-edit icon-white"></i></button>
+				<button type="button" class="btn btn-mini btn-inverse nzb_multi_operations_delete"><i class="icon-trash icon-white"></i></button>
+			{/if}
+		</div>
 	</div>
 
 

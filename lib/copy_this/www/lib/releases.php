@@ -1313,7 +1313,7 @@ class Releases
 	{
 		$sql = '';
 		if (count($categories) > 0 && $categories[0] != -1) {
-			$Category = new \Category();
+			$Category = new \Category(['Settings' => $this->pdo]);
 			$sql = ' AND (';
 			foreach ($categories as $category) {
 				if ($category != -1) {
