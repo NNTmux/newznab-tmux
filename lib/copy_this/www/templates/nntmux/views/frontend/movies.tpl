@@ -142,6 +142,11 @@
 									href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$result.imdbID}/"
 									name="imdb{$result.imdbID}"
 									title="View imdb page"><img src="{$smarty.const.WWW_TOP}/templates/nntmux/images/icons/imdb.png"></a>
+							<a
+									target="_blank"
+									href="{$site->dereferrer_link}http://www.rottentomatoes.com/m/{$result.title|replace:" ":"_"}/"
+									name="rottentomatoes{$result.title|replace:" ":"_"}}"
+									title="View RT page"><img src="{$smarty.const.WWW_TOP}/templates/nntmux/images/icons/rottentomatoes.png"></a>
 						</div>
 					</div>
 				</td>
