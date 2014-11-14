@@ -27,9 +27,9 @@
 			{assign var="completion" value=0|number_format:1}
 		{/if}
 
-		<td><img title=".{$file.ext}" alt="{$file.ext}" src="{$smarty.const.WWW_TOP}/templates/nntmux/images/fileicons/{$icon}.png" /></td>
-		<td class="less right">{if $completion < 100}<span class="warning">{$completion}%</span>{else}{$completion}%{/if}</td>
-		<td class="less right">{if $file.size < 100000}{$file.size|fsize_format:"KB"}{else}{$file.size|fsize_format:"MB"}{/if}</td>
+		<td width="30"><img title=".{$file.ext}" alt="{$file.ext}" src="{$smarty.const.WWW_TOP}/templates/nntmux/images/fileicons/{$icon}.png" /></td>
+		<td class="less right"><center>{if $completion < 100}<span class="label label-important">{$completion}%</span>{else}<span class="label label-success">{$completion}%</span>{/if}</center></td>
+		<td width="80" class="less right">{if $file.size < 100000}{$file.size|fsize_format:"KB"}{else}{$file.size|fsize_format:"MB"}{/if}</td>
 	</tr>
 	{/foreach}
 
