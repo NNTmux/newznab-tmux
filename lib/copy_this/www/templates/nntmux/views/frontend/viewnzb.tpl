@@ -242,6 +242,8 @@
 		<li><a href="#viewnfo" data-toggle="tab" style="color: black;"><i class="icon-file"></i> View NFO</a></li>
 	{/if}
 	<li><a href="#fileinfo" data-toggle="tab" style="color: black;"><i class="icon-folder-open"></i> File Info</a></li>
+	<li><a href="#nzbcontents" data-toggle="tab" style="color: black;"><i class="icon-list"></i> NZB Contents</a></li>
+
 	{if ($release.haspreview == 1 && $userdata.canpreview == 1) || ($release.haspreview == 2 && $userdata.canpreview == 1)}
 		<li><a href="#preview" data-toggle="tab" style="color: black;"><i class="icon-picture"></i> Preview</a></li>
 	{/if}
@@ -257,6 +259,7 @@
 	{if $isadmin}
 		<li><a href="#admin" data-toggle="tab" style="color: black;"><i class="icon-font"></i> Admin Info</a></li>
 	{/if}
+	<li><a href="#comments" data-toggle="tab" style="color:black;"><i class="icon-comment"></i> Comments</a></li>
 </ul>
 
 <div class="tab-content">
@@ -280,7 +283,7 @@
 			<tr>
 				<th>Prehash:</th>
 				<td style="padding:0;">
-					<table style="width:100%;" class="innerdata highlight">
+					<table style="width:100%;">
 						<tr>
 							<th>Title</th>
 							<th class="mid">Date</th>
@@ -502,18 +505,9 @@
 				</td>
 			</tr>
 		{/if}
-		<tr><th>Files:</th>
-			<td>
-				<div id="viewfiles_btn">
-					<button class="btn btn-mini" onclick="$('#viewfiles').load('{$smarty.const.WWW_TOP}/filelist/{$release.guid}&modal'),jQuery('#viewfiles_btn').toggle();">View {$release.totalpart} file{if $release.totalpart==1}{else}s{/if}</button>
-				</div>
-				<div id="viewfiles">
-				</div>
-				<a title="View file list" href="{$smarty.const.WWW_TOP}/filelist/{$release.guid}"></a>
-			</td>
-		</tr>
 	</table>
 </div>
+<div class="tab-pane" id="nzbcontents"></div>
 {if $release.haspreview == 1 && $userdata.canpreview == 1}
 	<div class="tab-pane" id="preview">
 		<img class="img-rounded" width="770" src="{$smarty.const.WWW_TOP}/covers/preview/{$release.guid}_thumb.jpg" alt="{$release.searchname|escape:"htmlall"} screenshot" />
@@ -567,20 +561,14 @@
 		</table>
 	</div>
 {/if}
-</div>
-
-<div class="comments">
-	<a id="comments"></a>
+<div class="tab-pane" id="comments">
 	<h2><i class="icon-comment"></i> Comments</h2>
-
 	{if $comments|@count > 0}
-
 		<table style="margin-bottom:20px;" class="table table-striped Sortable">
 			<tr class="{cycle values=",alt"}">
 				<th width="80">User</th>
 				<th>Comment</th>
 			</tr>
-
 			{foreach from=$comments|@array_reverse:true item=comment}
 				<tr>
 					<td class="less" title="{$comment.createddate}">
@@ -599,17 +587,34 @@
 				</tr>
 			{/foreach}
 		</table>
-
 	{/if}
-
 	<form action="" method="post">
 		<label for="txtAddComment">Add Comment:</label><br/>
 		<textarea id="txtAddComment" name="txtAddComment" rows="6" cols="60"></textarea>
 		<br/>
 		<input class="btn" type="submit" value="Submit"/>
 	</form>
+	</div>
+</div
 
 </div>
+<script>
+	// nzbcontents loader
+	$(document).ready(function() {
+		$('#nzbcontents').load('{$smarty.const.WWW_TOP}/filelist/{$release.guid}&modal', function() {
+			$('.tabs').tab('show'); //reinitialize tabs
+		});
+
+		$('.tabs').bind('change', function(e) {
+			var pattern=/#.+/gi //set a regex pattern (all the things after "#").
+			var contentID = e.target.toString().match(pattern)[0]; //find pattern
+
+			$(contentID).load('/'+contentID.replace('#',''), function(){
+				$('.tabs').tabs(); //reinitialize tabs
+			});
+		});
+	});
+</script>
 
 {if $nfo.ID|@count > 0}
 <script>
