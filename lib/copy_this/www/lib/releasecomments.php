@@ -22,7 +22,7 @@ class ReleaseComments
 	public function getCommentsByGid($gid)
 	{
 		$db = new DB();
-		return $db->query(sprintf("SELECT rc.id, text, createddate, sourceid, CASE WHEN sourceid = 0 THEN (SELECT username FROM users WHERE id = userid) ELSE username END AS username FROM releasecomment rc WHERE isvisible = 1  AND gid = %s AND (userID IN (SELECT id FROM users) OR rc.username IS NOT NULL) ORDER BY createddate DESC LIMIT 100", $db->escapeString($gid)));
+		return $db->query(sprintf("SELECT rc.id, text, createddate, sourceid, CASE WHEN sourceid = 0 THEN (SELECT username FROM users WHERE id = userid) ELSE username END AS username, CASE WHEN sourceid = 0 THEN (SELECT role FROM users WHERE id = userid) ELSE '-1' END AS role, CASE WHEN sourceid =0 THEN (SELECT r.name AS rolename FROM users AS u LEFT JOIN userroles AS r ON r.ID = u.role WHERE u.id = userid) ELSE (SELECT description AS rolename FROM spotnabsources WHERE ID = sourceid) END AS rolename FROM releasecomment rc WHERE isvisible = 1  AND gid = %s AND (userID IN (SELECT id FROM users) OR rc.username IS NOT NULL) ORDER BY createddate DESC LIMIT 100", $db->escapeString($gid)));
 	}
 
 	/**
@@ -153,7 +153,7 @@ class ReleaseComments
 		else
 			$limit = " LIMIT ".$start.",".$num;
 
-		$sql = "SELECT rc.ID, userID, guid, text, createddate, sourceid, CASE WHEN sourceID = 0 THEN (SELECT username FROM users WHERE id = userID) ELSE username END AS username FROM releasecomment rc LEFT JOIN releases r ON r.gid = rc.gid WHERE isvisible = 1 AND (userID IN (SELECT id FROM users) OR rc.username IS NOT NULL) ORDER BY createddate DESC ".$limit;
+		$sql = "SELECT rc.ID, userID, guid, text, createddate, sourceid, CASE WHEN sourceID = 0 THEN (SELECT username FROM users WHERE id = userID) ELSE username END AS username, CASE WHEN sourceid = 0 THEN (SELECT role FROM users WHERE id = userid) ELSE '-1' END AS role, CASE WHEN sourceid =0 THEN (SELECT r.name AS rolename FROM users AS u LEFT JOIN userroles AS r ON r.ID = u.role WHERE u.id = userid) ELSE (SELECT description AS rolename FROM spotnabsources WHERE ID = sourceid) END AS rolename FROM releasecomment rc LEFT JOIN releases r ON r.gid = rc.gid WHERE isvisible = 1 AND (userID IN (SELECT id FROM users) OR rc.username IS NOT NULL) ORDER BY createddate DESC ".$limit;
 		return $db->query($sql);
 	}
 

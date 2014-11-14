@@ -13,6 +13,7 @@ require_once(WWW_DIR . "/lib/Games.php");
 require_once(WWW_DIR . "/lib/util.php");
 require_once(WWW_DIR . "../misc/update_scripts/nix_scripts/tmux/lib/Film.php");
 require_once(WWW_DIR . "../misc/update_scripts/nix_scripts/tmux/lib/TraktTv.php");
+require_once(WWW_DIR . "../misc/update_scripts/nix_scripts/tmux/lib/TvAnger.php");
 
 
 if (!$users->isLoggedIn())
@@ -40,7 +41,7 @@ if (isset($_GET["id"]))
 	$rage = '';
 	if ($data["rageID"] != '')
 	{
-		$tvrage = new TvRage();
+		$tvrage = new TvAnger();
 
 		$rageinfo = $tvrage->getByRageID($data["rageID"]);
 		if (count($rageinfo) > 0)

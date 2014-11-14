@@ -103,20 +103,39 @@
 {elseif ($search || $subject || $searchadvr || $searchadvsubject || $selectedgroup || $selectedsizefrom || $searchadvdaysold) == ""}
 {else}
 	<form style="padding-top:10px;" id="nzb_multi_operations_form" method="get" action="{$smarty.const.WWW_TOP}/search">
-		{$pager}
-		<div class="nzb_multi_operations">
-			<small>With selected:</small>
-			<input type="button" class="nzb_multi_operations_download" value="Download NZBs">
-			<input type="button" class="nzb_multi_operations_cart" value="Add to Cart">
-			{if $sabintegrated}
-				<input type="button" class="nzb_multi_operations_sab" value="Send to my Queue">
-			{/if}
-			{if $isadmin}
-				&nbsp;&nbsp;
-				<input type="button" class="nzb_multi_operations_edit" value="Edit">
-				<input type="button" class="nzb_multi_operations_delete" value="Del">
-			{/if}
-		</div>
+	<table width="100%">
+		<tr>
+			<td>{$pager}</td>
+			<td style="text-align:right">
+				<div class="nzb_multi_operations">
+					<small>With selected:</small>
+					<div class="btn-group">
+						<button type="button" class="btn btn-mini nzb_multi_operations_download">
+							<i class="icon-download"></i> Download NZBs
+						</button>
+						<button type="button" class="btn btn-mini nzb_multi_operations_cart">
+							<i class="icon-shopping-cart"></i> Add to cart</button>
+						{if $sabintegrated}
+							<button type="button" class="btn btn-mini nzb_multi_operations_sab">
+								<i class="icon-download-alt"></i> Send to my Queue
+							</button>
+						{/if}
+						{if $isadmin}
+							<button type="button" class="btn btn-mini btn-inverse nzb_multi_operations_edit">
+								<i class="icon-edit icon-white"></i>
+							</button>
+							<button type="button" class="btn btn-mini btn-inverse nzb_multi_operations_delete">
+								<i class="icon-trash icon-white"></i>
+							</button>
+							<button type="button" class="btn btn-mini btn-inverse nzb_multi_operations_rebuild">
+								<i class="icon-repeat icon-white"></i>
+							</button>
+						{/if}
+					</div>
+				</div>
+			</td>
+		</tr>
+	</table>
 		<table style="width:100%;" class="data highlight icons" id="browsetable">
 			<tr>
 				<th></th>
@@ -231,7 +250,7 @@
 									<a class="rndbtn" href="{$smarty.const.WWW_TOP}/series/{$result.rageID}" title="View all episodes">View Series</a>
 								{/if}
 								{if $result.anidbid > 0}
-									<a class="rndbtn" href="{$smarty.const.WWW_TOP}/anime/{$result.anidbid}" title="View all episodes">View Anime</a>
+									<a class="rndbtn" href="{$smarty.const.WWW_TOP}/anime/{$result.anidbID}" title="View all episodes">View Anime</a>
 								{/if}
 								{if $result.tvairdate != ""}
 									<span class="seriesinfo rndbtn" title="{$result.guid}">Aired {if $result.tvairdate|strtotime > $smarty.now}in future{else}{$result.tvairdate|daysago}{/if}</span>

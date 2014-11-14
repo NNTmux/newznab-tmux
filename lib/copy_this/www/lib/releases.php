@@ -1313,7 +1313,7 @@ class Releases
 	{
 		$sql = '';
 		if (count($categories) > 0 && $categories[0] != -1) {
-			$Category = new \Category();
+			$Category = new \Category(['Settings' => $this->pdo]);
 			$sql = ' AND (';
 			foreach ($categories as $category) {
 				if ($category != -1) {
@@ -1893,12 +1893,12 @@ class Releases
 							$relid
 						)
 					);
-					$this->pdo->log->doEcho($this->pdo->log->primary('Added release ' . $cleanRelName . ''));
+					//$this->pdo->log->doEcho($this->pdo->log->primary('Added release ' . $cleanRelName . ''));
 					$returnCount++;
 
-					if ($this->echoCLI) {
-						echo "Added $returnCount releases.\r";
-					}
+					/*if ($this->echoCLI) {
+						$this->pdo->log->doEcho($this->pdo->log->primary('Added ' . $returnCount . 'releases.'));
+					}*/
 
 				}
              }
