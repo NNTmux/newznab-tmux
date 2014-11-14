@@ -1893,11 +1893,11 @@ class Releases
 							$relid
 						)
 					);
-					$this->pdo->log->doEcho($this->pdo->log->primary('Added release ' . $cleanRelName . ''));
+					//$this->pdo->log->doEcho($this->pdo->log->primary('Added release ' . $cleanRelName . ''));
 					$returnCount++;
 
 					if ($this->echoCLI) {
-						echo "Added $returnCount releases.\r";
+						$this->pdo->log->doEcho($this->pdo->log->primary('Added ' . $returnCount . 'releases.'));
 					}
 
 				}
