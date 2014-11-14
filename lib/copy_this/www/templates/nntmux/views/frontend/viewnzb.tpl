@@ -39,16 +39,16 @@
 <br />
 
 <!-- ### -- IMAGE ON RIGHT -->
-{if $rage && $release.rageID > 0 && $rage.imgdata != ""}<img class="img-rounded" src="{$smarty.const.WWW_TOP}/getimage?type=tvrage&amp;id={$rage.ID}" width="160" height="auto" alt="{$rage.releasetitle|escape:"htmlall"}" style="float:right;" />{/if}
-{if $movie && $release.rageID < 0 && $movie.cover == 1}<img class="img-rounded" src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbID}-cover.jpg" width="160" height="auto" alt="{$movie.title|escape:"htmlall"}" style="float:right;" />{/if}
+{if $rage && $release.rageID > 0 && $rage.imgdata != ""}<img class="img-rounded" src="{$smarty.const.WWW_TOP}/getimage?type=tvrage&amp;id={$rage.ID}" width="220" height="auto" alt="{$rage.releasetitle|escape:"htmlall"}" style="float:right;" />{/if}
+{if $movie && $release.rageID < 0 && $movie.cover == 1}<img class="img-rounded" src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbID}-cover.jpg" width="220" height="auto" alt="{$movie.title|escape:"htmlall"}" style="float:right;" />{/if}
 {if $game && $game.cover == 1}<img class="img-rounded" src="{$smarty.const.WWW_TOP}/covers/games/{$game.id}.jpg" width="160"
 								   alt="{$con.title|escape:"htmlall"}" style="float:right;" />{/if}
 {if $xxx && $xxx.cover == 1}<img class="img-rounded" src="{$smarty.const.WWW_TOP}/covers/xxx/{$xxx.id}-cover.jpg" width="160"
 								 alt="{$movie.title|escape:"htmlall"}" style="float:right;" />{/if}
-{if $anidb && $release.anidbID > 0 && $anidb.picture != ""}<img class="img-rounded" src="{$smarty.const.WWW_TOP}/covers/anime/{$anidb.anidbID}.jpg" width="160" alt="{$anidb.title|escape:"htmlall"}" style="float:right;" />{/if}
-{if $con && $con.cover == 1}<img class="img-rounded" src="{$smarty.const.WWW_TOP}/covers/console/{$con.ID}.jpg" width="160" alt="{$con.title|escape:"htmlall"}" style="float:right;" />{/if}
-{if $music && $music.cover == 1}<img class="img-rounded" src="{$smarty.const.WWW_TOP}/covers/music/{$music.ID}.jpg" width="160" alt="{$music.title|escape:"htmlall"}" style="float:right;" />{/if}
-{if $book && $book.cover == 1}<img class="img-rounded" src="{$smarty.const.WWW_TOP}/covers/book/{$book.ID}.jpg" width="160" alt="{$book.title|escape:"htmlall"}" style="float:right;" />{/if}
+{if $anidb && $release.anidbID > 0 && $anidb.picture != ""}<img class="img-rounded" src="{$smarty.const.WWW_TOP}/covers/anime/{$anidb.anidbID}.jpg" width="220" alt="{$anidb.title|escape:"htmlall"}" style="float:right;" />{/if}
+{if $con && $con.cover == 1}<img class="img-rounded" src="{$smarty.const.WWW_TOP}/covers/console/{$con.ID}.jpg" width="220" alt="{$con.title|escape:"htmlall"}" style="float:right;" />{/if}
+{if $music && $music.cover == 1}<img class="img-rounded" src="{$smarty.const.WWW_TOP}/covers/music/{$music.ID}.jpg" width="220" alt="{$music.title|escape:"htmlall"}" style="float:right;" />{/if}
+{if $book && $book.cover == 1}<img class="img-rounded" src="{$smarty.const.WWW_TOP}/covers/book/{$book.ID}.jpg" width="220" alt="{$book.title|escape:"htmlall"}" style="float:right;" />{/if}
 
 <!-- ### -- MEDIA DESCRIPTION -->
 {if $rage && $release.rageID > 0}
