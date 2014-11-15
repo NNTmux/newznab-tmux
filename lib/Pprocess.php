@@ -19,6 +19,7 @@ require_once(WWW_DIR . "lib/anidb.php");
 require_once(WWW_DIR . "lib/book.php");
 require_once(WWW_DIR.  "lib/Books.php");
 require_once(WWW_DIR . "lib/Games.php");
+require_once(WWW_DIR . "lib/spotnab.php");
 require_once(WWW_DIR . "lib/thetvdb.php");
 require_once(WWW_DIR . "lib/XXX.php");
 require_once(WWW_DIR . "lib/Logger.php");
@@ -144,6 +145,7 @@ class PProcess
 	{
 		$this->processAdditional($nntp);
 		$this->processNfos($nntp);
+		$this->processSpotnab();
 		$this->processSharing($nntp);
 		$this->processMovies();
 		$this->processMusic();
@@ -248,6 +250,27 @@ class PProcess
 		if ($this->site->lookupnfo == 1) {
 			$this->Nfo->processNfoFiles($nntp, $groupID, $guidChar, (int)$this->site->lookupimdb, (int)$this->site->lookuptvrage);
 		}
+	}
+
+	/**
+	 * Process Global IDs
+	 */
+	public function processSpotnab(&$nntp)
+	{
+		$spotnab = new SpotNab();
+		$processed = $spotnab->processGID(500);
+		if ($processed > 0) {
+			if ($this->echooutput) {
+				$this->pdo->log->doEcho(
+					$this->pdo->log->primary('Updating GID in releases table ' . $processed . ' release(s) updated')
+				);
+			}
+		}
+		$spotnab->auto_post_discovery();
+		$spotnab->fetch_discovery();
+		$spotnab->fetch();
+		$spotnab->post();
+		$spotnab->auto_clean();
 	}
 
 	/**
