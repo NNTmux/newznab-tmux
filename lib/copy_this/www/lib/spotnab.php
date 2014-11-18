@@ -886,11 +886,14 @@ class SpotNab {
 					continue;
 				}
 			}
-			$sql = sprintf("UPDATE spotnabsources "
+			/*$sql = sprintf("UPDATE spotnabsources "
 					."SET lastarticle = %d WHERE ID IN (%s)",
 					$last,
-					implode(",", $id_hash[$group]));
-			$res = $db->queryExec($sql);
+					implode(",", $id_hash[$group]));*/
+			$db->queryExec(sprintf('UPDATE spotnabsources '
+					.'SET lastarticle = %d WHERE ID IN (%s)',
+					$last,
+					implode(",", $id_hash[$group])));
 			echo "\n";
 		}
 		// Restore handler
