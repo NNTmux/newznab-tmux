@@ -145,7 +145,7 @@ class PProcess
 	{
 		$this->processAdditional($nntp);
 		$this->processNfos($nntp);
-		$this->processSpotnab();
+		$this->processSpotnab($nntp);
 		$this->processSharing($nntp);
 		$this->processMovies();
 		$this->processMusic();
