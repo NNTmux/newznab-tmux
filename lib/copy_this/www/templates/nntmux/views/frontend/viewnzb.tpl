@@ -314,7 +314,7 @@
 		<tr id="guid{$release.guid}"><th>Download:</th><td>
 				<div class="icon icon_nzb"><a title="Download Nzb" href="{$smarty.const.WWW_TOP}/getnzb/{$release.guid}/{$release.searchname|escape:"url"}">&nbsp;</a></div>
 				<div class="icon icon_cart" title="{$themevars.cart_name_add}"></div>
-				{if $sabintegrated}<div class="icon icon_sab" title="Send to my Sabnzbd"></div>{/if}
+				{if $sabintegrated}<div class="icon icon_sab" title="Send to my Queue"></div>{/if}
 			</td></tr>
 		<tr>
 			<th>Similar:</th>
