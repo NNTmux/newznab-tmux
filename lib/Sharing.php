@@ -483,16 +483,18 @@ Class Sharing
 		if (!isset($body['USER']) || !isset($body['SID']) || !isset($body['RID']) || !isset($body['TIME']) | !isset($body['BODY'])) {
 			return false;
 		}
+		$cid = md5($body['SID'].$body['USER'].$body['TIME'].$siteID);
 
 		// Insert the comment.
 		if ($this->db->queryExec(
 			sprintf('
 				INSERT IGNORE INTO releasecomment
-				(text, createddate, issynced, shareID, gid, nzb_guid, siteID, username, userID, releaseID, shared, host, sourceID)
-				VALUES (%s, %s, 1, %s, %s, %s, %s, %s, 0, 0, 2, "", 999)',
+				(text, createddate, issynced, shareID, cid, gid, nzb_guid, siteID, username, userID, releaseID, shared, host, sourceID)
+				VALUES (%s, %s, 1, %s, %s, %s, %s, %s, %s, 0, 0, 2, "", 999)',
 				$this->db->escapeString($body['BODY']),
 				$this->db->from_unixtime(($body['TIME'] > time() ? time() : $body['TIME'])),
 				$this->db->escapeString($body['SID']),
+				$this->db->escapeString($cid),
 				$this->db->escapeString($body['RID']),
 				$this->db->escapeString($body['RID']),
 				$this->db->escapeString($siteID),

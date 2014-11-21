@@ -699,6 +699,7 @@ class TmuxRun extends Tmux
 			if (shell_exec("tmux list-panes -t{$runVar['constants']['tmux_session']}:${pane} | grep ^0 | grep -c dead") == 1) {
 				shell_exec(
 					"tmux respawnp -t{$runVar['constants']['tmux_session']}:${pane}.0 ' \
+						{$runVar['commands']['_php']} {$runVar['paths']['misc']}/update_scripts/nix_scripts/tmux/bin/postprocess.php spotnab true; \
 						{$runVar['commands']['_php']} {$runVar['paths']['misc']}/update_scripts/nix_scripts/tmux/bin/postprocess.php sharing true; \
 						{$runVar['commands']['_sleep']} {$runVar['settings']['sharing_timer']}' 2>&1 1> /dev/null"
 				);

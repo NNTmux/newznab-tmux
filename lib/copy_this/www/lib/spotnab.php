@@ -158,10 +158,12 @@ class SpotNab {
 	/* Track the last article scanned when preforming a discovery */
 	private $_discovery_lastarticle;
 
-	function __construct($post_user=Null, $post_email=Null, $post_group=Null) {
-		$this->_nntp = new NNTP();
-		$this->_site = new Sites();
-		$this->_globals = $this->_site->get();
+	public function __construct($post_user=Null, $post_email=Null, $post_group=Null) {
+		$this->_pdo = new DB();
+		$this->_nntp = new NNTP(['Settings' => $this->_pdo]);
+		$s = new Sites();
+		$this->_site = $s->get();
+		$this->_globals = $this->_site;
 
 		$this->_post_user = $post_user;
 		$this->_post_email = $post_email;
@@ -404,7 +406,9 @@ class SpotNab {
 
 		// Connect to server
 		try{
-			$this->_nntp->doConnect(1, true, true);
+			if (($this->_site->alternate_nntp == 1 ? $this->_nntp->doConnect(true, true) : $this->_nntp->doConnect()) !== true) {
+				exit($this->_pdo->log->error("Unable to connect to usenet." . PHP_EOL));
+			}
 		}
 		catch(Exception $e){
 			printf("Failed to connect to Usenet\n");
@@ -771,7 +775,9 @@ class SpotNab {
 
 		// Connect to server
 		try{
-			$this->_nntp->doConnect(1, true, true);
+			if (($this->_site->alternate_nntp == 1 ? $this->_nntp->doConnect(true, true) : $this->_nntp->doConnect()) !== true) {
+				exit($this->_pdo->log->error("Unable to connect to usenet." . PHP_EOL));
+			}
 		}
 		catch(Exception $e){
 			printf("Failed to connect to Usenet");
@@ -880,11 +886,14 @@ class SpotNab {
 					continue;
 				}
 			}
-			$sql = sprintf("UPDATE spotnabsources "
+			/*$sql = sprintf("UPDATE spotnabsources "
 					."SET lastarticle = %d WHERE ID IN (%s)",
 					$last,
-					implode(",", $id_hash[$group]));
-			$res = $db->queryExec($sql);
+					implode(",", $id_hash[$group]));*/
+			$db->queryExec(sprintf('UPDATE spotnabsources '
+					.'SET lastarticle = %d WHERE ID IN (%s)',
+					$last,
+					implode(",", $id_hash[$group])));
 			echo "\n";
 		}
 		// Restore handler
@@ -1046,7 +1055,7 @@ class SpotNab {
 				$db->queryExec($sql);
 
 				// Update Site Information
-				$this->_globals = $this->_site->get();
+				$this->_globals = $this->_site;
 				$this->_post_user = trim($this->_globals->spotnabuser);
 				$this->_post_email = trim($this->_globals->spotnabemail);
 				$this->_ssl_pubkey = $this->decompstr($this->_globals->spotnabsitepubkey);
@@ -1930,7 +1939,9 @@ class SpotNab {
 		set_error_handler('snHandleError');
 
 		// Connect to server
-		$this->_nntp->doConnect(1, true, true);
+		if (($this->_site->alternate_nntp == 1 ? $this->_nntp->doConnect(true, true) : $this->_nntp->doConnect()) !== true) {
+			exit($this->_pdo->log->error("Unable to connect to usenet." . PHP_EOL));
+		}
 		while($retries > 0)
 		{
 			try
@@ -2025,7 +2036,11 @@ class SpotNab {
 		{/* do nothing */}
 
 		// Attempt to reconnect
-		try{$this->_nntp->doConnect(1, true, true);}
+		try{
+			if (($this->_site->alternate_nntp == 1 ? $this->_nntp->doConnect(true, true) : $this->_nntp->doConnect()) !== true) {
+			exit($this->_pdo->log->error("Unable to connect to usenet." . PHP_EOL));
+		}
+		}
 		catch(Exception $e){return false;}
 
 		if($group !== Null)
@@ -2055,7 +2070,7 @@ class SpotNab {
 	public function decodePost($message, $key=Null, $decrypt=true) {
 
 		// Decode Yenc
-		$message = $this->_nntp->decodeYenc($message);
+		$message = $this->_nntp->decodeYenc2($message);
 
 		// Decompress Messsage
 		$message = @gzuncompress($message);
@@ -2111,6 +2126,7 @@ class SpotNab {
 		// Assumed to be in Y-m-d H:i:s format or int
 		// convert local time into UTC
 		$reftime = $this->local2utc($reftime, "YmdHis");
+		$s = new Sites();
 
 		$msgid = sprintf('<%s.%s.%d@%s>',
 			$this->getRandomStr(30),
@@ -2153,7 +2169,7 @@ class SpotNab {
 		$message = @gzcompress($message, 9);
 
 		// Yenc Binary Content
-		$message = $this->_nntp->encodeYenc($message, md5($message));
+		$message = $this->_nntp->encodeYenc2($message, md5($message));
 
 		//
 		// Prepare Header
@@ -2180,7 +2196,7 @@ class SpotNab {
 		$header  = "Subject: " . $subject . "\r\n";
 		$header .= "Newsgroups: " . $group . "\r\n";
 		$header .= "Message-ID: $msgid\r\n";
-		$header .= "X-Newsreader: NewzNab v" . $this->_site->version() ."\r\n";
+		$header .= "X-Newsreader: NewzNab v" . $s->version() ."\r\n";
 		$header .= "X-No-Archive: yes\r\n";
 
 		$header .= "From: ".$user. " <" . $email . ">\r\n";

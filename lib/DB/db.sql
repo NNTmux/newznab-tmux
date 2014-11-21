@@ -1181,7 +1181,7 @@ ALTER TABLE releasecomment ADD COLUMN text_hash VARCHAR(32) NOT NULL DEFAULT '';
 
 UPDATE releasecomment
 SET text_hash = MD5(text);
-ALTER IGNORE TABLE releasecomment ADD UNIQUE INDEX ix_releasecomment_hash_releaseID (text_hash, releaseID);
+ALTER IGNORE TABLE releasecomment ADD UNIQUE INDEX ix_releasecomment_hash_gid (text_hash, gid);
 
 ALTER TABLE `releasefiles` ADD COLUMN `ishashed` TINYINT(1) NOT NULL DEFAULT '0'
 AFTER `size`;

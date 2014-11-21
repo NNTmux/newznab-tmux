@@ -120,7 +120,7 @@
 									></a>
 
 						<div class="movextra">
-							{if $result.trailer != ""}<a href="#" name="name{$result.imdbID}" title="View movie trailer" class="rndbtn modal_imdbtrailer" rel="trailer">Trailer</a>{/if}
+							{if $result.trailer != ""}<a href="#" name="name{$result.imdbID}" title="View movie trailer" class="btn btn-mini modal_imdbtrailer" rel="trailer">Trailer</a>{/if}
 							<a
 									target="_blank"
 									href="{$site->dereferrer_link}http://trakt.tv/search/imdb?q=tt{$result.imdbID}/"

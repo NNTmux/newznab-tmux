@@ -1051,6 +1051,73 @@ class NNTP extends Net_NNTP_Client
 	}
 
 	/**
+	 * Encode a yenc encoded string.
+	 */
+	function encodeYenc2($message, $filename, $linelen = 128, $crc32 = true)
+	{
+		/*
+		* This code was found http://everything2.com/title/yEnc+PHP+Class
+		*/
+
+		// yEnc 1.3 draft doesn't allow line lengths of more than 254 bytes.
+		if ($linelen > 254)
+			$linelen = 254;
+
+		if ($linelen < 1)
+			return false;
+
+		$encoded = "";
+
+		// Encode each character of the message one at a time.
+		for( $i = 0; $i < strlen($message); $i++)
+		{
+			$value = (ord($message{$i}) + 42) % 256;
+
+			// Escape NULL, TAB, LF, CR, space, . and = characters.
+			if ($value == 0 || $value == 9 || $value == 10 ||
+				$value == 13 || $value == 32 || $value == 46 ||
+				$value == 61)
+				$encoded .= "=".chr(($value + 64) % 256);
+			else
+				$encoded .= chr($value);
+		}
+
+		// Wrap the lines to $linelen characters
+		$encoded = trim(chunk_split($encoded, $linelen));
+
+		// Tack a yEnc header onto the encoded message.
+		$encoded = "=ybegin line=$linelen size=".strlen($message)
+			." name=".trim($filename)."\r\n".$encoded;
+		$encoded .= "\r\n=yend size=".strlen($message);
+
+		// Add a CRC32 checksum if desired.
+		if ($crc32 === true)
+			$encoded .= " crc32=".strtolower(sprintf("%04X", crc32($message)));
+
+		return $encoded."\r\n";
+	}
+
+	/**
+	 * Decode a yenc encoded string.
+	 */
+	function decodeYenc2($yencodedvar)
+	{
+		$input = array();
+		preg_match("/^(=ybegin.*=yend[^$]*)$/ims", $yencodedvar, $input);
+		if (isset($input[1])) {
+			$ret = "";
+			$input = trim(preg_replace("/\r\n/im", "", preg_replace("/(^=yend.*)/im", "", preg_replace("/(^=ypart.*\\r\\n)/im", "", preg_replace("/(^=ybegin.*\\r\\n)/im", "", $input[1], 1), 1), 1)));
+
+			for ($chr = 0; $chr < strlen($input); $chr++)
+				$ret .= ($input[$chr] != "=" ? chr(ord($input[$chr]) - 42) : chr((ord($input[++$chr]) - 64) - 42));
+
+			return $ret;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Decode a string of text encoded with yEnc. Ignores all errors.
 	 *
 	 * @param  string $data The encoded text to decode.
