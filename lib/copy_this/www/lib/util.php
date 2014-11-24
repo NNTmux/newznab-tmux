@@ -389,6 +389,27 @@ class Utility
 		return round($bytes / pow(1024, ($i = floor(log($bytes, 1024)))), $precision) . $unit[(int)$i];
 	}
 
+	public static function getCoverURL(array $options = [])
+	{
+		$defaults = [
+			'ID' => null,
+			'suffix' => '-cover.jpg',
+			'type' => '',
+		];
+		$options += $defaults;
+		$fileSpecTemplate = '%s/%s%s';
+		$fileSpec = '';
+
+		if (!empty($options['id']) && in_array($options['type'],
+				['anime', 'audio', 'audiosample', 'book', 'console',  'games', 'movies', 'music', 'preview', 'sample', 'tvrage', 'video', 'xxx'])) {
+			$fileSpec = sprintf($fileSpecTemplate, $options['type'], $options['ID'], $options['suffix']);
+			$fileSpec = file_exists(NN_COVERS . $fileSpec) ? $fileSpec :
+				sprintf($fileSpecTemplate, $options['type'], 'no', $options['suffix']);
+		}
+
+		return $fileSpec;
+	}
+
 }
 
 function checkStatus ($code)
