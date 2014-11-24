@@ -1,28 +1,28 @@
- 
+
 			<h1>{$page->title}</h1>
 
 			{if $site->apienabled != "1"}
-			
+
 			<p>
 				The api is currently disabled. <a href="{$smarty.const.WWW_TOP}/contact-us">Contact us</a> if you require api access.
-			</p>			
-			
+			</p>
+
 			{else}
-			
+
 			<p>
 				Here lives the documentation for the api for accessing nzb and index data. Api functions can be
 				called by either logged in users, or by providing an apikey.
 			</p>
-			
+
 			{if $loggedin=="true"}
 				<p>
 					Your credentials should be provided as <span style="font-family:courier;">?apikey={$userdata.rsstoken}</span>
 				</p>
 			{/if}
-			
+
 			<h2>Available Functions</h2>
 			<p>Use the parameter <span style="font-family:courier;">?t=</span> to specify the function being called.</p>
-			
+
 			<h3>Server Functions</h3>
 			<ul>
 				<li>
@@ -31,9 +31,9 @@
 					Reports the capabilities of the server. Includes information about the server name, available search categories and version number of the newznab protocol being used.
 					<br/>
 					Capabilities does not require any credentials in order to be ran.
-				</li>	
+				</li>
 			</ul>
-			
+
 			<h3>User Functions</h3>
 			<ul>
 				<li>
@@ -42,35 +42,9 @@
 					Registers a new user account. Does not require any credentials in order to be ran.
 					<br/>
 					Returns either the registered username and password if successful or an error code.
-				</li>	
-
-				<li>
-					<b>User</b> <span style="font-family:courier;"><a href="{$smarty.const.WWW_TOP}/api?t=user">?t=user&amp;username=user123</a></span>
-					<br/>
-					Returns public information about a user.
-					<br/>
-					Returns either the user information or an error code.
-				</li>		
-
-				<li>
-					<b>Cart</b> <span style="font-family:courier;"><a href="{$smarty.const.WWW_TOP}/rss?t=-2">rss?t=-2&amp;del=1</a></span>
-					<br/>
-					Returns the items in a users cart in the form of an rss feed. The optional parameter <span style="font-family:courier;">&amp;del=1</span> will remove the items from the cart after the feed is requested.
-				</li>					
-				
-				<li>
-					<b>CartAdd</b> <span style="font-family:courier;"><a href="{$smarty.const.WWW_TOP}/api?t=cartadd&amp;id=9ca52909ba9b9e5e6758d815fef4ecda">?t=cartadd&amp;id=9ca52909ba9b9e5e6758d815fef4ecda</a></span>
-					<br/>
-					Adds an nzb to a users cart.
-				</li>					
-
-				<li>
-					<b>CartDelete</b> <span style="font-family:courier;"><a href="{$smarty.const.WWW_TOP}/api?t=cartdel&amp;id=9ca52909ba9b9e5e6758d815fef4ecda">?t=cartdel&amp;id=9ca52909ba9b9e5e6758d815fef4ecda</a></span>
-					<br/>
-					Remove an nzb from a users cart.
-				</li>					
+				</li>
 			</ul>
-			
+
 			<h3>Search Functions</h3>
 			<ul>
 				<li>
@@ -102,7 +76,7 @@
 					<b>Details</b> <span style="font-family:courier;"><a href="{$smarty.const.WWW_TOP}/api?t=details&amp;id=9ca52909ba9b9e5e6758d815fef4ecda">?t=details&amp;id=9ca52909ba9b9e5e6758d815fef4ecda</a></span>
 					<br/>
 					Returns detailed information about an nzb.
-				</li>	
+				</li>
 				<li>
 					<b>GetNfo</b> <span style="font-family:courier;"><a href="{$smarty.const.WWW_TOP}/api?t=getnfo&amp;id=9ca52909ba9b9e5e6758d815fef4ecda">?t=getnfo&amp;id=9ca52909ba9b9e5e6758d815fef4ecda</a></span>
 					<br/>
@@ -112,9 +86,9 @@
 					<b>Comments</b> <span style="font-family:courier;"><a href="{$smarty.const.WWW_TOP}/api?t=comments&amp;id=9ca52909ba9b9e5e6758d815fef4ecda">?t=comments&amp;id=9ca52909ba9b9e5e6758d815fef4ecda</a></span>
 					<br/>
 					Returns comments for an nzb.
-				</li>						
+				</li>
 			</ul>
-			
+
 			<h3>NZB Functions</h3>
 			<ul>
 				<li>
@@ -141,49 +115,49 @@
 					Json <span style="font-family:courier;">?t=search&amp;q=linux&amp;o=json</span>
 					<br/>
 					Returns the data in a json object.
-				</li>						
+				</li>
 			</ul>
-			
+
 			<h2>Extended Attributes</h2>
-			<p>Using the attrs tag and a comma separated list of supported values, extended information can be returned in the search results. <br/>For example <span style="font-family:courier;">?attrs=files,poster,group</span>. Note that not every attribute is available for every release type. Below is a list of some of the supported attributes. To return all known attributes per release use the parameter <span style="font-family:courier;">?extended=1</span>. See the API specification for a full list.</p> 
+			<p>Using the attrs tag and a comma separated list of supported values, extended information can be returned in the search results. <br/>For example <span style="font-family:courier;">?attrs=files,poster,group</span>. Note that not every attribute is available for every release type. Below is a list of some of the supported attributes. To return all known attributes per release use the parameter <span style="font-family:courier;">?extended=1</span>. See the API specification for a full list.</p>
 			<ul>
-				<li>files</li>          
-				<li>poster</li>         
-				<li>group </li>         
-				<li>team  </li>         
-				<li>grabs </li>         
-				<li>password  </li>     
-				<li>comments  </li>     
-				<li>usenetdate </li>    
-				<li>info    </li>       
-				<li>year   </li>        
-				<li>season  </li>       
-				<li>episode </li>       
-				<li>rageid </li>        
-				<li>tvtitle  </li>      
-				<li>tvairdate </li>     
-				<li>video  </li>        
-				<li>audio  </li>        
-				<li>resolution </li>    
-				<li>framerate</li>      
-				<li>language  </li>     
-				<li>subs    </li>       
-				<li>imdb   </li>        
-				<li>imdbscore </li>     
-				<li>imdbtitle  </li>    
-				<li>imdbtagline   </li> 
-				<li>imdbplot </li>      
-				<li>imdbyear   </li>    
-				<li>imdbdirector  </li> 
-				<li>imdbactors</li>     
-				<li>genre   </li>       
-				<li>artist  </li>       
-				<li>album </li>         
-				<li>publisher </li>     
-				<li>tracks  </li>       
-				<li>coverurl  </li>     
+				<li>files</li>
+				<li>poster</li>
+				<li>group </li>
+				<li>team  </li>
+				<li>grabs </li>
+				<li>password  </li>
+				<li>comments  </li>
+				<li>usenetdate </li>
+				<li>info    </li>
+				<li>year   </li>
+				<li>season  </li>
+				<li>episode </li>
+				<li>rageid </li>
+				<li>tvtitle  </li>
+				<li>tvairdate </li>
+				<li>video  </li>
+				<li>audio  </li>
+				<li>resolution </li>
+				<li>framerate</li>
+				<li>language  </li>
+				<li>subs    </li>
+				<li>imdb   </li>
+				<li>imdbscore </li>
+				<li>imdbtitle  </li>
+				<li>imdbtagline   </li>
+				<li>imdbplot </li>
+				<li>imdbyear   </li>
+				<li>imdbdirector  </li>
+				<li>imdbactors</li>
+				<li>genre   </li>
+				<li>artist  </li>
+				<li>album </li>
+				<li>publisher </li>
+				<li>tracks  </li>
+				<li>coverurl  </li>
 				<li>backdropcoverurl</li>
-				<li>review   </li>      					
+				<li>review   </li>
 			</ul>
 
 			{/if}

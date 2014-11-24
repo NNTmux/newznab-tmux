@@ -1132,40 +1132,44 @@ class Releases
 	}
 
 	/**
-	 * Return a list of releases with a similar name to that provided.
+	 * @param       $currentID
+	 * @param       $name
+	 * @param int   $limit
+	 * @param array $excludedCats
+	 *
+	 * @return array
 	 */
-	public function searchSimilar($currentid, $name, $limit = 6, $excludedcats = array())
+	public function searchSimilar($currentID, $name, $limit = 6, $excludedCats = [])
 	{
-		$name = $this->getSimilarName($name);
-		$results = $this->search($name, array(-1), 0, $limit, '', -1, $excludedcats);
-		if (!$results)
+		// Get the category for the parent of this release.
+		$currRow = $this->getById($currentID);
+		$catRow = (new \Category(['Settings' => $this->pdo]))->getById($currRow['categoryID']);
+		$parentCat = $catRow['parentID'];
+
+		$results = $this->search(
+			$this->getSimilarName($name), -1, -1, -1, [$parentCat], -1, -1, 0, 0, -1, -1, 0, $limit, '', -1, $excludedCats
+		);
+		if (!$results) {
 			return $results;
+		}
 
-		//
-		// Get the category for the parent of this release
-		//
-		$currRow = $this->getById($currentid);
-		$cat = new Categorize();
-		$catrow = $cat->getById($currRow["categoryID"]);
-		$parentCat = $catrow["parentID"];
-
-		$ret = array();
-		foreach ($results as $res)
-			if ($res["ID"] != $currentid && $res["categoryParentID"] == $parentCat)
+		$ret = [];
+		foreach ($results as $res) {
+			if ($res['id'] != $currentID && $res['categoryParentID'] == $parentCat) {
 				$ret[] = $res;
-
+			}
+		}
 		return $ret;
 	}
 
 	/**
-	 * Return a similar release name.
+	 * @param string $name
+	 *
+	 * @return string
 	 */
 	public function getSimilarName($name)
 	{
-		$words = str_word_count(str_replace(array(".", "_"), " ", $name), 2);
-		$firstwords = array_slice($words, 0, 2);
-
-		return implode(' ', $firstwords);
+		return implode(' ', array_slice(str_word_count(str_replace(['.', '_'], ' ', $name), 2), 0, 2));
 	}
 
 	/**
@@ -1247,7 +1251,7 @@ class Releases
 				groups.name AS group_name,
 				rn.ID AS nfoid,
 				re.releaseID AS reid,
-				cp.ID AS categoryparentid
+				cp.ID AS categoryParentID
 			FROM releases r
 			LEFT OUTER JOIN releasevideo re ON re.releaseID = r.ID
 			LEFT OUTER JOIN releasenfo rn ON rn.releaseID = r.ID
@@ -1338,11 +1342,22 @@ class Releases
 		return $sql;
 	}
 
+	/**
+	 * @param int $id
+	 *
+	 * @return array|bool
+	 */
 	public function getById($id)
 	{
-
-
-		return $this->pdo->queryOneRow(sprintf("SELECT releases.*, groups.name AS group_name FROM releases LEFT OUTER JOIN groups ON groups.ID = releases.groupID WHERE releases.ID = %d ", $id));
+		return $this->pdo->queryOneRow(
+			sprintf(
+				'SELECT r.*, g.name AS group_name
+				FROM releases r
+				INNER JOIN groups g ON g.ID = r.groupID
+				WHERE r.ID = %d',
+				$id
+			)
+		);
 	}
 
 	/**
