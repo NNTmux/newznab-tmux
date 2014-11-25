@@ -1,18 +1,9 @@
 <?php
 require_once(WWW_DIR."/lib/releases.php");
 require_once(WWW_DIR."/lib/category.php");
-require_once(WWW_DIR."/lib/groups.php");
-require_once(WWW_DIR."/lib/genres.php");
-require_once(WWW_DIR."/lib/nzb.php");
-require_once(WWW_DIR."/lib/movie.php");
 require_once(WWW_DIR."/lib/util.php");
 
 $rc = new ReleaseComments;
-$gen = new Genres;
-$category = new Category;
-$grp = new Groups;
-$nzb = new NZB;
-$movie = new Movie;
 
 
 // API functions.
@@ -79,7 +70,7 @@ if (isset($_GET['t'])) {
 }
 
 $uid = $apiKey = '';
-$hosthash = "";
+$hosthash = '';
 $catExclusions = [];
 $maxRequests = 0;
 // Page is accessible only by the apikey, or logged in users.
