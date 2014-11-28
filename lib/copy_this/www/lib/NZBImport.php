@@ -406,7 +406,7 @@ class NZBImport
 					'postdate' => $this->pdo->escapeString($nzbDetails['postDate']),
 					'fromname' => $escapedFromName,
 					'size' => $this->pdo->escapeString($nzbDetails['totalSize']),
-					'categoryID' => $this->category->determineCategory($cleanName, $nzbDetails['groupID']),
+					'categoryID' => $this->category->determineCategory($nzbDetails['groupID'], $cleanName),
 					'isrenamed' => $renamed,
 					'reqidstatus' => 0,
 					'prehashID' => 0,
