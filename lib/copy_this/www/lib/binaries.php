@@ -110,7 +110,7 @@ class Binaries
 			);
 		} else {
 			$this->log(
-				'No groups specified. Ensure groups are added to nZEDb\'s database for updating.',
+				'No groups specified. Ensure groups are added to newznab\'s database for updating.',
 				'updateAllGroups',
 				\Logger::LOG_NOTICE,
 				'warning'
