@@ -180,7 +180,7 @@ class TheTVDB
 			echo 'TheTVDB : '.$seriesName.' '.$fullep." Not found\n";
 
 		$db = new DB();
-		$db->queryExec(sprintf('UPDATE releases SET episodeinfoID = %d WHERE ID = %d', -2, $releaseID));
+		$db->queryExec(sprintf('UPDATE releases SET episodeinfoID = -2 WHERE ID = %d', $releaseID));
 	}
 
 	public function processReleases()
