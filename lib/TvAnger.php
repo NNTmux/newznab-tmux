@@ -665,7 +665,7 @@ class TvAnger
 				%s %s %s
 				ORDER BY r.postdate DESC
 				LIMIT %d",
-				($groupID === '' ? '' : 'AND r.group_id = ' . $groupID),
+				($groupID === '' ? '' : 'AND r.groupID = ' . $groupID),
 				($guidChar === '' ? '' : 'AND r.guid ' . $this->pdo->likeString($guidChar, false, true)),
 				($lookupTvRage == 2 ? 'AND r.isrenamed = 1' : ''),
 				$this->rageqty

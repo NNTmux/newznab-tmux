@@ -110,6 +110,8 @@ class NZBImport
 		];
 		$options += $defaults;
 
+		$s = new Sites();
+		$this->site = $s->get();
 		$this->echoCLI = (!$this->browser && NN_ECHOCLI && $options['Echo']);
 		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 		$this->binaries = ($options['Binaries'] instanceof \Binaries ? $options['Binaries'] : new \Binaries(['Settings' => $this->pdo, 'Echo' => $this->echoCLI]));
@@ -190,7 +192,7 @@ class NZBImport
 				if ($inserted) {
 
 					// Try to copy the NZB to the NZB folder.
-					$path = $this->nzb->getNZBPath($this->relGuid, 0, true);
+					$path = $this->nzb->getNZBPath($this->relGuid, '', true);
 
 					// Try to compress the NZB file in the NZB folder.
 					$fp = gzopen ($path, 'w5');
@@ -403,8 +405,11 @@ class NZBImport
 					'totalpart' => $nzbDetails['totalFiles'],
 					'groupID' => $nzbDetails['groupID'],
 					'guid' => $this->pdo->escapeString($this->relGuid),
+					'regexID' => NULL,
 					'postdate' => $this->pdo->escapeString($nzbDetails['postDate']),
 					'fromname' => $escapedFromName,
+					'reqID' => NULL,
+					'passwordstatus' => ($this->site->checkpasswordedrar > 0 ? -1 : 0),
 					'size' => $this->pdo->escapeString($nzbDetails['totalSize']),
 					'categoryID' => $this->category->determineCategory($nzbDetails['groupID'], $cleanName),
 					'isrenamed' => $renamed,
