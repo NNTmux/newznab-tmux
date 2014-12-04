@@ -591,11 +591,14 @@ class Binaries
 							foreach ($data['Parts'] AS $partdata) {
 								$partcount++;
 
-								$partParams[] = sprintf('(%d, %s, %s, %s, %s)', $binaryID, $db->escapeString($partdata['Message-ID']), $db->escapeString($partdata['number']), $db->escapeString(round($partdata['part'])), $db->escapeString($partdata['size']));
+								//$partParams[] = sprintf('(%d, %s, %s, %s, %s)', $tableNames['pname'], $binaryID, $db->escapeString($partdata['Message-ID']), $db->escapeString($partdata['number']), $db->escapeString(round($partdata['part'])), $db->escapeString($partdata['size']));
 								$partNumbers[] = $partdata['number'];
 							}
+							$partdata['Message-ID'][0] = "'";
 
-							$partSql = sprintf('INSERT INTO ' . $tableNames['pname'] . ' (binaryID, messageID, number, partnumber, size) VALUES '.implode(', ', $partParams));
+							$partSql = sprintf('INSERT INTO %s (binaryID, messageID, number, partnumber, size) VALUES ', $tableNames['pname']);
+							$partSql .= '(' . $binaryID . ',' . rtrim($partdata['Message-ID'], '>') . "'," . $partdata['number'] . "," .
+							round($partdata['part']) . ',' . $partdata['size'] . ')';
 							$pidata = $db->queryInsert($partSql);
 							if (!$pidata) {
 								$msgsnotinserted = array_merge($msgsnotinserted, $partNumbers);
