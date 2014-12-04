@@ -91,7 +91,7 @@ if ($users->isLoggedIn()) {
 			showApiError(100, 'Incorrect user credentials (wrong API key)');
 		}
 
-		$uid = $res['id'];
+		$uid = $res['ID'];
 		$catExclusions = $users->getCategoryExclusion($uid);
 		//
 		// A hash of the users ip to record against the api hit
@@ -381,7 +381,7 @@ switch ($function) {
 
 		addCoverURL($relData,
 			function ($release) {
-				return Utility::getCoverURL(['type' => 'movies', 'id' => $release['imdbid']]);
+				return Utility::getCoverURL(['type' => 'movies', 'ID' => $release['imdbID']]);
 			}
 		);
 
@@ -442,7 +442,7 @@ switch ($function) {
 	case 'r':
 		verifyEmptyParameter('email');
 
-		if (!in_array((int)$page->settings->getSetting('registerstatus'), [Settings::REGISTER_STATUS_OPEN, Settings::REGISTER_STATUS_API_ONLY])) {
+		if (!in_array((int)$page->site->registerstatus, [Sites::REGISTER_STATUS_OPEN, Sites::REGISTER_STATUS_API_ONLY])) {
 			showApiError(104);
 		}
 
@@ -663,7 +663,7 @@ function addLanguage(&$releases, DB $settings)
 {
 	if ($releases && count($releases)) {
 		foreach ($releases as $key => $release) {
-			if (isset($release['id'])) {
+			if (isset($release['ID'])) {
 				$language = $settings->queryOneRow(sprintf('SELECT audiolanguage FROM audiodata WHERE releaseID = %d', $release['ID']));
 				if ($language !== false) {
 					$releases[$key]['searchname'] = $releases[$key]['searchname'] . ' ' . $language['audiolanguage'];

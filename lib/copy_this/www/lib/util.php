@@ -401,7 +401,7 @@ class Utility
 		$fileSpecTemplate = '%s/%s%s';
 		$fileSpec = '';
 
-		if (!empty($options['id']) && in_array($options['type'],
+		if (!empty($options['ID']) && in_array($options['type'],
 				['anime', 'audio', 'audiosample', 'book', 'console',  'games', 'movies', 'music', 'preview', 'sample', 'tvrage', 'video', 'xxx'])) {
 			$fileSpec = sprintf($fileSpecTemplate, $options['type'], $options['ID'], $options['suffix']);
 			$fileSpec = file_exists(NN_COVERS . $fileSpec) ? $fileSpec :
