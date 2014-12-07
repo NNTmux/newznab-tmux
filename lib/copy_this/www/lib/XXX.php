@@ -715,7 +715,7 @@ class XXX
 		if (!is_array($arr)) {
 			$res = $this->pdo->queryOneRow("SELECT ID FROM genres WHERE title = " . $this->pdo->escapeString($arr));
 			if ($res !== false) {
-				return $res["id"];
+				return $res["ID"];
 			}
 		}
 
