@@ -507,6 +507,50 @@ class Utility
 		return $sent;
 	}
 
+	/**
+	 * Return file type/info using magic numbers.
+	 * Try using `file` program where available, fallback to using PHP's finfo class.
+	 *
+	 * @param string $path Path to the file / folder to check.
+	 *
+	 * @return string File info. Empty string on failure.
+	 */
+	static public function fileInfo($path)
+	{
+		$output = '';
+		$magicPath = (new Sites())->get->magic_file_path;
+		if (self::hasCommand('file') && (!self::isWin() || !empty($magicPath))) {
+			$magicSwitch = empty($magicPath) ? '' : " -m $magicPath";
+			$output = runCmd('file' . $magicSwitch . ' -b "' . $path . '"');
+
+			if (is_array($output)) {
+				switch (count($output)) {
+					case 0:
+						$output = '';
+						break;
+					case 1:
+						$output = $output[0];
+						break;
+					default:
+						$output = implode(' ', $output);
+						break;
+				}
+			} else {
+				$output = '';
+			}
+		} else {
+			$fileInfo = empty($magicPath) ? new finfo(FILEINFO_RAW) : new finfo(FILEINFO_RAW, $magicPath);
+
+			$output = $fileInfo->file($path);
+			if (empty($output)) {
+				$output = '';
+			}
+			$fileInfo->close();
+		}
+
+		return $output;
+	}
+
 }
 
 function checkStatus ($code)
