@@ -9,7 +9,6 @@
  */
 require_once("namefixer.php");
 require_once("prehash.php");
-require_once("functions.php");
 require_once(WWW_DIR . "/lib/ColorCLI.php");
 require_once(WWW_DIR . "/lib/nntp.php");
 require_once(WWW_DIR . "/lib/site.php");

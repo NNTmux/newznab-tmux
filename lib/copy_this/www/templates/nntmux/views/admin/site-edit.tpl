@@ -262,7 +262,7 @@
 	<tr>
 		<td style="width:180px;"><label for="anidbkey">Anidb API key:</label></td>
 		<td>
-			<input id="anidbkey" class="long" name="anidbkey" type="text" value="{$site->anidbkey}"/>
+			<input id="anidbkey" class="long" name="anidbkey" type="text" value="{$fsite->anidbkey}"/>
 
 			<div class="hint">The Anidb api key. Used for Anime lookups.</div>
 		</td>
@@ -431,7 +431,7 @@
 	<tr>
 		<td style="width:180px;"><label for="nzbsplitlevel">Nzb File Path Level Deep:</label></td>
 		<td>
-			<input id="nzbsplitlevel" class="short" name="nzbsplitlevel" type="text" value="{$site->nzbsplitlevel}"/>
+			<input id="nzbsplitlevel" class="short" name="nzbsplitlevel" type="text" value="{$fsite->nzbsplitlevel}"/>
 			<div class="hint">Levels deep to store the nzb Files.
 				<br /><strong>If you change this you must run the misc/testing/DB/nzb-reorg.php script!</strong>
 			</div>
@@ -457,14 +457,14 @@
 	<tr>
 		<td style="width:180px;"><label for="miscotherretentionhours">Other->Misc Retention Hours:</label></td>
 		<td>
-			<input class="short" id="miscotherretentionhours" name="miscotherretentionhours" type="text" value="{$site->miscotherretentionhours}"/>
+			<input class="short" id="miscotherretentionhours" name="miscotherretentionhours" type="text" value="{$fsite->miscotherretentionhours}"/>
 			<div class="hint">The number of hours releases categorized as Misc->Other will be retained. Set to 0 to disable.</div>
 		</td>
 	</tr>
 	<tr>
 		<td style="width:180px;"><label for="mischashedretentionhours">Other->Hashed Retention Hours:</label></td>
 		<td>
-			<input class="short" id="mischashedretentionhours" name="mischashedretentionhours" type="text" value="{$site->mischashedretentionhours}"/>
+			<input class="short" id="mischashedretentionhours" name="mischashedretentionhours" type="text" value="{$fsite->mischashedretentionhours}"/>
 			<div class="hint">The number of hours releases categorized as Misc->Hashed will be retained. Set to 0 to disable.</div>
 		</td>
 	</tr>
@@ -495,7 +495,7 @@
 	<tr>
 		<td style="width:180px;"><label for="maxsizetoformrelease">Maximum File Size to Make a Release:</label></td>
 		<td>
-			<input class="small" id="maxsizetoformrelease" name="maxsizetoformrelease" type="text" value="{$site->maxsizetoformrelease}"/>
+			<input class="small" id="maxsizetoformrelease" name="maxsizetoformrelease" type="text" value="{$fsite->maxsizetoformrelease}"/>
 			<div class="hint">The maximum total size in bytes to make a release. If set to 0, then ignored. Only deletes
 				during release creation.
 			</div>
@@ -513,14 +513,14 @@
 	<tr>
 		<td style="width:180px;"><label for="grabstatus">Update grabs:</label></td>
 		<td>
-			{html_radios id="grabstatus" name='grabstatus' values=$yesno_ids output=$yesno_names selected=$site->grabstatus separator='<br />'}
+			{html_radios id="grabstatus" name='grabstatus' values=$yesno_ids output=$yesno_names selected=$fsite->grabstatus separator='<br />'}
 			<div class="hint">Whether to update download counts when someone downloads a release.</div>
 		</td>
 	</tr>
 	<tr>
 		<td style="width:180px;"><label for="crossposttime">Crossposted Time Check:</label></td>
 		<td>
-			<input class="short" id="crossposttime" name="crossposttime" type="text" value="{$site->crossposttime}"/>
+			<input class="short" id="crossposttime" name="crossposttime" type="text" value="{$fsite->crossposttime}"/>
 			<div class="hint">The time in hours to check for crossposted releases - this will delete 1 of the releases if the 2 are posted by the same person in the same time period.</div>
 		</td>
 	</tr>
@@ -707,7 +707,7 @@
 		<td style="width:180px;"><label for="maxxxxprocessed">Maximum xxx per run:</label></td>
 		<td>
 			<input class="short" id="maxxxxprocessed" name="maxxxxprocessed" type="text"
-				   value="{$site->maxxxxprocessed}"/>
+				   value="{$fsite->maxxxxprocessed}"/>
 
 			<div class="hint">The maximum amount of XXX to process per run. This does not use an NNTP
 				connection or query Amazon.
@@ -795,7 +795,7 @@
 	<tr>
 		<td style="width:180px;"><label for="deletepossiblerelease">Delete Possibly Passworded Releases:</label></td>
 		<td>
-			{html_radios id="deletepossiblerelease" name='deletepossiblerelease' values=$yesno_ids output=$yesno_names selected=$site->deletepossiblerelease separator='<br />'}
+			{html_radios id="deletepossiblerelease" name='deletepossiblerelease' values=$yesno_ids output=$yesno_names selected=$fsite->deletepossiblerelease separator='<br />'}
 			<div class="hint">Whether to delete releases which are potentially passworded. This applies to your post process additional inner file blacklist.<br/></div>
 		</td>
 	</tr>
@@ -983,7 +983,7 @@
 		<tr>
 			<td style="width:180px;"><label for="minsizetopostprocess">Minimum Release Size to Post Process:</label></td>
 			<td>
-				<input class="short" id="minsizetopostprocess" name="minsizetopostprocess" type="text" value="{$site->minsizetopostprocess}"/>
+				<input class="short" id="minsizetopostprocess" name="minsizetopostprocess" type="text" value="{$fsite->minsizetopostprocess}"/>
 				<div class="hint">The minimum size in megabytes to post process (additional) a release. If set to 0, then ignored.</div>
 			</td>
 		</tr>
@@ -1014,7 +1014,7 @@
 		<tr>
 			<td style="width:180px;"><label for="tablepergroup">Table Per Group:</label></td>
 			<td>
-				{html_radios id="tablepergroup" name='tablepergroup' values=$yesno_ids output=$yesno_names selected=$site->tablepergroup separator='<br />'}
+				{html_radios id="tablepergroup" name='tablepergroup' values=$yesno_ids output=$yesno_names selected=$fsite->tablepergroup separator='<br />'}
 				<div class="hint">This uses separate tables for binaries and parts for each group.<br/>This
 					requires you to run convert_to_tpg.php or reset_truncate.php.<br/>This requires that you also run
 					releases_threaded.py.
@@ -1037,20 +1037,6 @@
 		</tr>
 
 		<tr>
-			<td style="width:180px;"><label for="maxpartrepair">Maximum repair per run:</label></td>
-			<td>
-				<input class="short" id="maxpartrepair" name="maxpartrepair" type="text"
-					   value="{$fsite->maxpartrepair}"/>
-
-				<div class="hint">The maximum amount of articles to attempt to repair at a time. If you notice that you
-					are getting a lot of parts into the partrepair table, it is possible that you USP is not keeping up
-					with the requests. Try to reduce the threads to safe scripts, stop using safe scripts or stop using
-					nntpproxy until improves. Ar least until the cause can be determined.
-				</div>
-			</td>
-		</tr>
-
-		<tr>
 			<td style="width:180px;"><label for="partrepair">Part Repair:</label></td>
 			<td>
 				{html_radios id="partrepair" name='partrepair' values=$yesno_ids output=$yesno_names selected=$fsite->partrepair separator='<br />'}
@@ -1062,14 +1048,14 @@
 		<tr>
 			<td style="width:180px;"><label for="safepartrepair">Part Repair for Backfill Scripts:</label></td>
 			<td>
-				{html_radios id="safepartrepair" name='safepartrepair' values=$yesno_ids output=$yesno_names selected=$site->safepartrepair separator='<br />'}
+				{html_radios id="safepartrepair" name='safepartrepair' values=$yesno_ids output=$yesno_names selected=$fsite->safepartrepair separator='<br />'}
 				<div class="hint">Whether to put unreceived parts into partrepair table when running binaries(safe) or backfill scripts.</div>
 			</td>
 		</tr>
 		<tr>
 			<td style="width:180px;"><label for="maxpartrepair">Maximum repair per run:</label></td>
 			<td>
-				<input class="short" id="maxpartrepair" name="maxpartrepair" type="text" value="{$site->maxpartrepair}"/>
+				<input class="short" id="maxpartrepair" name="maxpartrepair" type="text" value="{$fsite->maxpartrepair}"/>
 				<div class="hint">The maximum amount of articles to attempt to repair at a time. If you notice that you
 					are getting a lot of parts into the partrepair table, it is possible that you USP is not keeping up
 					with the requests. Try to reduce the threads to safe scripts, stop using safe scripts or stop using
@@ -1080,7 +1066,7 @@
 		<tr>
 			<td style="width:180px;"><label for="partrepairmaxtries">Maximum repair tries:</label></td>
 			<td>
-				<input class="short" id="partrepairmaxtries" name="partrepairmaxtries" type="text" value="{$site->partrepairmaxtries}"/>
+				<input class="short" id="partrepairmaxtries" name="partrepairmaxtries" type="text" value="{$fsite->partrepairmaxtries}"/>
 				<div class="hint">Maximum amount of times to try part repair.</div>
 			</td>
 		</tr>
@@ -1149,7 +1135,7 @@
 		<tr>
 			<td style="width:180px;"><label for="extractusingrarinfo">Extract RAR/ZIP using rarinfo:</label></td>
 			<td>
-				{html_radios id="extractusingrarinfo" name='extractusingrarinfo' values=$yesno_ids output=$yesno_names selected=$site->extractusingrarinfo separator='<br />'}
+				{html_radios id="extractusingrarinfo" name='extractusingrarinfo' values=$yesno_ids output=$yesno_names selected=$fsite->extractusingrarinfo separator='<br />'}
 				<div class="hint">Whether to use rarinfo or 7zip/unrar directly to decompress zip/rar files.
 					<br /><strong>Using rarinfo is faster, but the extracted files are not as large which leads to smaller video samples/ potentially black preview screenshots.</strong>
 				</div>
@@ -1159,14 +1145,14 @@
 		<tr>
 			<td style="width:180px;"><label for="maxnestedlevels">How many levels deep to go into nested rar/zip files:</label></td>
 			<td>
-				<input class="short" id="maxnestedlevels" name="maxnestedlevels" type="text" value="{$site->maxnestedlevels}"/>
+				<input class="short" id="maxnestedlevels" name="maxnestedlevels" type="text" value="{$fsite->maxnestedlevels}"/>
 				<div class="hint">If a rar/zip has rar/zip inside of it, how many times should we go in those inner rar/zip files.</div>
 			</td>
 		</tr>
 		<tr>
 			<td style="width:180px;"><label for="innerfileblacklist">Inner file black list Regex:</label></td>
 			<td>
-				<textarea rows="3" placeholder="Example: /setup\.exe|password\.url/i" id="innerfileblacklist" name="innerfileblacklist">{$site->innerfileblacklist}</textarea>
+				<textarea rows="3" placeholder="Example: /setup\.exe|password\.url/i" id="innerfileblacklist" name="innerfileblacklist">{$fsite->innerfileblacklist}</textarea>
 				<div class="hint">You can add a regex here to set releases to potentially passworded when a file name inside a rar/zip matches this regex.
 					<br /><strong>You must ensure this regex is valid, a non valid regex will cause errors during processing!</strong>
 				</div>
@@ -1181,14 +1167,14 @@
 		<tr>
 			<td style="width:180px;"><label for="lookup_reqids">Lookup Request IDs:</label></td>
 			<td>
-				{html_options style="width:180px;" id="lookup_reqids" name='lookup_reqids' values=$lookup_reqids_ids output=$lookup_reqids_names selected=$site->lookup_reqids}
+				{html_options style="width:180px;" id="lookup_reqids" name='lookup_reqids' values=$lookup_reqids_ids output=$lookup_reqids_names selected=$fsite->lookup_reqids}
 				<div class="hint">Whether to attempt to lookup Request IDs using the Request ID link below. This will rename your releases to proper PreDB names.</div>
 			</td>
 		</tr>
 		<tr>
 			<td style="width:180px;"><label for="request_url">Request ID Link:</label></td>
 			<td>
-				<input id="request_url" class="long" name="request_url" type="text" value="{$site->request_url}"/>
+				<input id="request_url" class="long" name="request_url" type="text" value="{$fsite->request_url}"/>
 				<div class="hint">Optional URL to lookup Request IDs. [REQUEST_ID] gets replaced with the request ID from the
 					post. [GROUP_NM] Gets replaced with the group name.
 				</div>
@@ -1197,7 +1183,7 @@
 		<tr>
 			<td style="width:180px;"><label for="request_hours">Max hours to recheck Request IDs:</label></td>
 			<td>
-				<input id="request_hours" class="short" name="request_hours" type="text" value="{$site->request_hours}"/>
+				<input id="request_hours" class="short" name="request_hours" type="text" value="{$fsite->request_hours}"/>
 				<div class="hint">The maximum hours after a release is added to recheck for a Request ID match.</div>
 			</td>
 		</tr>
@@ -1210,7 +1196,7 @@
 		<tr>
 			<td style="width:180px;"><label for="timeoutseconds">Time in seconds to kill unrar/7zip/mediainfo/ffmpeg/avconv:</label></td>
 			<td>
-				<input class="short" id="timeoutseconds" name="timeoutseconds" type="text" value="{$site->timeoutseconds}"/>
+				<input class="short" id="timeoutseconds" name="timeoutseconds" type="text" value="{$fsite->timeoutseconds}"/>
 				<div class="hint">How much time to wait for unrar/7zip/mediainfo/ffmpeg/avconv before killing it, set to 0 to disable.
 					60 is a good value. Requires the GNU Timeout path to be set.</div>
 			</td>
@@ -1379,7 +1365,7 @@
 		<tr>
 			<td style="width:180px;"><label for="nntpproxy">Use NNTP Proxy:</label></td>
 			<td>
-				{html_radios id="nntpproxy" name='nntpproxy' values=$yesno_ids output=$yesno_names selected=$site->nntpproxy separator='<br />'}
+				{html_radios id="nntpproxy" name='nntpproxy' values=$yesno_ids output=$yesno_names selected=$fsite->nntpproxy separator='<br />'}
 				<div class="hint">
 					<strong>nntpproxy does not support the POST usenet command which is required for uploading usenet comments when using sharing.</strong>
 					Using the NNTP Proxy for newznab can improve performance of newznab. It uses
@@ -1398,7 +1384,7 @@
 		<tr>
 			<td style="width:180px;"><label for="alternate_nntp">Alternate NNTP Provider:</label></td>
 			<td>
-				{html_radios id="alternate_nntp" name='alternate_nntp' values=$yesno_ids output=$yesno_names selected=$site->alternate_nntp separator='<br />'}
+				{html_radios id="alternate_nntp" name='alternate_nntp' values=$yesno_ids output=$yesno_names selected=$fsite->alternate_nntp separator='<br />'}
 				<div class="hint">This sets Postproccessing Additional/Nfo to use the alternate NNTP provider as set in
 					config.php.
 				</div>
