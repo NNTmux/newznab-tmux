@@ -431,7 +431,7 @@ class Utility
 			$headers = 'From: ' . $from . $eol;
 			$headers .= 'Reply-To: ' . $from . $eol;
 			$headers .= 'Return-Path: ' . $from . $eol;
-			$headers .= 'X-Mailer: nZEDb' . $eol;
+			$headers .= 'X-Mailer: newznab' . $eol;
 			$headers .= 'MIME-Version: 1.0' . $eol;
 			$headers .= 'Content-type: text/html; charset=iso-8859-1' . $eol;
 			$headers .= $eol;
