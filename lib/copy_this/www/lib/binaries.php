@@ -422,14 +422,14 @@ class Binaries
 			}
 
 			// Re-select group, download headers again without compression and re-enable compression.
-			$this->_nntp->selectGroup($groupArr['Name']);
+			$this->_nntp->selectGroup($groupArr['name']);
 			$msgs = $this->_nntp->getXOVER($first . '-' . $last);
 			$this->_nntp->enableCompression();
 
 			// Check if the non-compression headers have an error.
 			if ($this->_nntp->isError($msgs)) {
 				$this->log(
-					"Code {$msgs->code}: {$msgs->message}\nSkipping group: ${$groupArr['Name']}",
+					"Code {$msgs->code}: {$msgs->message}\nSkipping group: ${$groupArr['name']}",
 					'scan',
 					\Logger::LOG_WARNING,
 					'error'
