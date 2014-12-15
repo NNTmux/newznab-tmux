@@ -156,6 +156,7 @@ class TheTVDB
 	{
 
 		$apiresponse = Utility::getUrl(['url' => $this->MIRROR.'/api/GetSeries.php?seriesname='.preg_replace('/\s+/', '+', $seriesname).'&language=all']);
+		var_dump($apiresponse);
 
 		if(!$apiresponse)
 			return false;
@@ -224,7 +225,8 @@ class TheTVDB
 					$seriesid = $this->lookupSeriesID($seriesName);
 					if($seriesid > 0)
 					{
-						if($TheTVDBAPIArray = $this->TheTVDBAPI($seriesid, $seriesName))
+						$TheTVDBAPIArray = $this->TheTVDBAPI($seriesid, $seriesName);
+						if($TheTVDBAPIArray)
 						{
 							$this->addSeries($TheTVDBAPIArray);
 							$this->addEpisodes($TheTVDBAPIArray);

@@ -307,7 +307,7 @@ class Users
 
 		$data = $db->query(sprintf("select ID,email from users WHERE role = %d and rolechangedate < now()", $uprole));
 		foreach ($data as $u) {
-			sendEmail($u["email"], $msgsubject, $msgbody, $s->email);
+			Utility::sendEmail($u["email"], $msgsubject, $msgbody, $s->email);
 			$db->exec(sprintf("update users SET role = %d, rolechangedate=null WHERE ID = %d", $downrole, $u["ID"]));
 		}
 
@@ -739,7 +739,7 @@ class Users
 		$url = $serverurl . "register?invitecode=" . $token;
 		$contents = $sender["username"] . " has sent an invite to join " . $sitetitle . " to this email address. To accept the invitation click the following link.\n\n " . $url;
 
-		sendEmail($emailto, $subject, $contents, $siteemail);
+		Utility::sendEmail($emailto, $subject, $contents, $siteemail);
 		$this->addInvite($uid, $token);
 
 		return $url;
