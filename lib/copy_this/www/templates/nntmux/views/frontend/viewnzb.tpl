@@ -251,10 +251,10 @@
 		<li><a href="#sample" data-toggle="tab" style="color: black;"><i class="icon-picture"></i> Sample</a></li>
 	{/if}
 	{if ($release.videostatus == 1 && $userdata.canpreview == 1)}
-		<li><a href="#sample" data-toggle="tab" style="color: black;"><i class="icon-picture"></i> Video</a></li>
+		<li><a href="#video" data-toggle="tab" style="color: black;"><i class="icon-picture"></i> Video</a></li>
 	{/if}
 	{if ($release.audiostatus == 1 && $userdata.canpreview == 1)}
-		<li><a href="#sample" data-toggle="tab" style="color: black;"><i class="icon-picture"></i> Audio</a></li>
+		<li><a href="#audio" data-toggle="tab" style="color: black;"><i class="icon-picture"></i> Audio</a></li>
 	{/if}
 	{if $isadmin}
 		<li><a href="#admin" data-toggle="tab" style="color: black;"><i class="icon-font"></i> Admin Info</a></li>
