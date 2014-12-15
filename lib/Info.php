@@ -150,15 +150,8 @@ class Info
 			file_put_contents($tmpPath, $possibleNFO);
 
 			// Linux boxes have 'file' (so should Macs), Windows *can* have it too: see GNUWIN.txt in docs.
-			if (Utility::hasCommand('file')) {
-				exec('file -b "' . $tmpPath . '"', $result);
-				if (is_array($result)) {
-					if (count($result) > 1) {
-						$result = implode(',', $result[0]);
-					} else {
-						$result = $result[0];
-					}
-				}
+			$result = Utility::fileInfo($tmpPath);
+			if (!empty($result)) {
 
 				// Check if it's text.
 				if (preg_match('/(ASCII|ISO-8859|UTF-(8|16|32).*?)\s*text/', $result)) {

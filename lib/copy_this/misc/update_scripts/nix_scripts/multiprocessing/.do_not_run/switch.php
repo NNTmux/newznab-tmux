@@ -75,7 +75,7 @@ switch ($options[1]) {
 			}
 		}
 		$binaries = new \Binaries();
-		$return = $binaries->scan($nntp, $groupMySQL, $options[4], $options[5], ($site->safepartrepair == 1 ? 'update' : 'backfill'));
+		$return = $binaries->scan($groupMySQL, $options[4], $options[5], ($site->safepartrepair == 1 ? 'update' : 'backfill'));
 		if (empty($return)) {
 			exit();
 		}

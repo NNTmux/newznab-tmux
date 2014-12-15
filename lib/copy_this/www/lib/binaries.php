@@ -9,7 +9,8 @@ require_once(WWW_DIR . "/lib/Logger.php");
 /**
  * This class manages the downloading of binaries and parts from usenet, and the
  * managing of data in the binaries and parts tables.
- */
+ *
+*/
 class Binaries
 {
 	const OPT_BLACKLIST = 1;
@@ -46,10 +47,15 @@ class Binaries
 		$this->_newGroupDaysToScan = (!empty($site->newgroupdaystoscan)) ? $site->newgroupdaystoscan : 3;
 		$this->_tablePerGroup = ($site->tablepergroup == 1 ? true : false);
 		$this->_partRepair = ($site->partrepair == 0 ? false : true);
+		$this->_partRepairLimit = ($site->maxpartrepair != '') ? (int)$site->maxpartrepair : 15000;
+		$this->_partRepairMaxTries = ($site->partrepairmaxtries != '' ? (int)$site->partrepairmaxtries : 3);
 
 		$this->blackList = array(); //cache of our black/white list
 		$this->blackList_by_group = array();
 		$this->message = array();
+		$this->startUpdate = microtime(true);
+		$this->startLoop = microtime(true);
+		$this->startHeaders = microtime(true);
 
 		$this->onlyProcessRegexBinaries = false;
 		$this->_colorCLI =  new \ColorCLI();
@@ -160,7 +166,7 @@ class Binaries
 				if ($this->_echoCLI) {
 					$this->_colorCLI->doEcho($this->_colorCLI->primary('Part repair enabled. Checking for missing parts.'), true);
 				}
-				$this->partRepair($this->_nntp, $groupMySQL);
+				$this->partRepair($groupMySQL);
 			} else if ($this->_echoCLI) {
 				$this->_colorCLI->doEcho($this->_colorCLI->primary('Part repair disabled by user.'), true);
 			}
@@ -232,7 +238,7 @@ class Binaries
 		// Check if we should limit the amount of fetched new headers.
 		if ($maxHeaders > 0) {
 			if ($maxHeaders < ($groupLast - $first)) {
-				$groupLast = $last = (string)($first + $maxHeaders);
+				$groupLast = $last = (string)($maxHeaders + $first);
 			}
 			$total = (string)($groupLast - $first);
 		}
@@ -265,11 +271,7 @@ class Binaries
 
 				// Increment last until we reach $groupLast (group newest article).
 				if ($total > $this->messageBuffer) {
-					if ((string)($first + $this->messageBuffer) > $groupLast) {
-						$last = $groupLast;
-					} else {
-						$last = (string)($first + $this->messageBuffer);
-					}
+					$last = (string)($first + $this->messageBuffer) > $groupLast ? $groupLast : (string)($first + $this->messageBuffer);
 				}
 				// Increment first so we don't get an article we already had.
 				$first++;
@@ -285,7 +287,7 @@ class Binaries
 				}
 
 				// Get article headers from newsgroup.
-				$scanSummary = $this->scan($this->_nntp, $groupMySQL, $first, $last);
+				$scanSummary = $this->scan($groupMySQL, $first, $last);
 
 				// Check if we fetched headers.
 				if (!empty($scanSummary)) {
@@ -371,41 +373,69 @@ class Binaries
 	/**
 	 * Download a range of usenet messages. Store binaries with subjects matching a
 	 * specific pattern in the database.
+	 *
+	 * @param        $groupArr
+	 * @param        $first
+	 * @param        $last
+	 * @param string $type
+	 *
+	 * @return array
 	 */
-	function scan($nntp, $groupArr, $first, $last, $type = 'update')
+	function scan($groupArr, $first, $last, $type = 'update')
 	{
 		$db = new Db();
 		$releaseRegex = new ReleaseRegex;
 		$n = $this->n;
-		$this->startHeaders = microtime(true);
 		// Check if MySQL tables exist, create if they do not, get their names at the same time.
 		$tableNames = $this->_groups->getCBPTableNames($this->_tablePerGroup, $groupArr['ID']);
+		$partRepair = ($type === 'partrepair');
 		$returnArray = [];
 
-		if ($this->_compressedHeaders) {
-			$nntpn = new Nntp();
-			$nntpn->doConnect(true);
-			$msgs = $nntp->getOverview($first . "-" . $last, true, false);
-			$nntpn->doQuit();
-		} else
-			$msgs = $nntp->getOverview($first . "-" . $last, true, false);
+		// Download the headers.
+		if ($partRepair === true) {
+			// This is slower but possibly is better with missing headers.
+			$msgs = $this->_nntp->getOverview($first . '-' . $last, true, false);
+		} else {
+			$msgs = $this->_nntp->getXOVER($first . '-' . $last);
+		}
 
-		if (PEAR::isError($msgs) && ($msgs->code == 400 || $msgs->code == 503)) {
-			echo "NNTP connection timed out. Reconnecting...$n";
-			if (!$nntp->doConnect()) {
-				// TODO: What now?
-				echo "Failed to get NNTP connection.$n";
+		// If there was an error, try to reconnect.
+		if ($this->_nntp->isError($msgs)) {
 
+			// Increment if part repair and return false.
+			if ($partRepair === true) {
+				$this->_pdo->queryExec(
+					sprintf(
+						'UPDATE %s SET attempts = attempts + 1 WHERE groupID = %d AND numberID %s',
+						$tableNames['prname'],
+						$groupArr['ID'],
+						($first == $last ? '= ' . $first : 'IN (' . implode(',', range($first, $last)) . ')')
+					)
+				);
 				return $returnArray;
 			}
-			$nntp->selectGroup($groupArr['name']);
-			if ($this->_compressedHeaders) {
-				$nntpn = new Nntp();
-				$nntpn->doConnect(true);
-				$msgs = $nntp->getOverview($first . "-" . $last, true, false);
-				$nntpn->doQuit();
-			} else
-				$msgs = $nntp->getOverview($first . "-" . $last, true, false);
+
+			// This is usually a compression error, so try disabling compression.
+			$this->_nntp->doQuit();
+			if ($this->_nntp->doConnect(false) !== true) {
+				return $returnArray;
+			}
+
+			// Re-select group, download headers again without compression and re-enable compression.
+			$this->_nntp->selectGroup($groupArr['Name']);
+			$msgs = $this->_nntp->getXOVER($first . '-' . $last);
+			$this->_nntp->enableCompression();
+
+			// Check if the non-compression headers have an error.
+			if ($this->_nntp->isError($msgs)) {
+				$this->log(
+					"Code {$msgs->code}: {$msgs->message}\nSkipping group: ${$groupArr['Name']}",
+					'scan',
+					\Logger::LOG_WARNING,
+					'error'
+				);
+				return $returnArray;
+			}
 		}
 
 		$rangerequested = range($first, $last);
@@ -456,8 +486,6 @@ class Binaries
 			}
 		}
 
-		$this->startUpdate = microtime(true);
-		$this->startLoop = microtime(true);
 		if (is_array($msgs)) {
 			//loop headers, figure out parts
 			foreach ($msgs AS $msg) {
@@ -577,12 +605,12 @@ class Binaries
 							if ($sql != '') {
 								$binaryID = $db->queryInsert($sql);
 								$count++;
-								if ($count % 500 == 0) echo "$count bin adds...";
+								//if ($count % 500 == 0) echo "$count bin adds...";
 							}
 						} else {
 							$binaryID = $res["ID"];
 							$updatecount++;
-							if ($updatecount % 500 == 0) echo "$updatecount bin updates...";
+							//if ($updatecount % 500 == 0) echo "$updatecount bin updates...";
 						}
 
 						if ($binaryID != 0) {
@@ -652,107 +680,134 @@ class Binaries
 	}
 
 	/**
-	 * Go through all rows in partrepair table and see if theyve arrived on usenet yet.
+	 * Attempt to get missing article headers.
 	 *
-	 * @param Nntp  $nntp
-	 * @param array $group
+	 * @param array $groupArr The info for this group from mysql.
 	 *
-	 * @return bool
+	 * @return void
 	 */
-	public function partRepair($nntp, $group)
+	public function partRepair($groupArr)
 	{
-		$db = new DB();
-		$tableNames = $this->_groups->getCBPTableNames($this->_tablePerGroup, $group['ID']);
-
-		$parts = array();
-		$chunks = array();
-		$result = array();
-
-		$query = sprintf
-		(
-			"SELECT numberID FROM %s WHERE groupID = %d AND attempts < 5 ORDER BY numberID ASC LIMIT 40000",
-			$tableNames['prname'], $group['ID']
+		$tableNames = $this->_groups->getCBPTableNames($this->_tablePerGroup, $groupArr['ID']);
+		// Get all parts in partrepair table.
+		$missingParts = $this->_pdo->query(
+			sprintf('
+				SELECT * FROM %s
+				WHERE groupID = %d AND attempts < %d
+				ORDER BY numberID ASC LIMIT %d',
+				$tableNames['prname'],
+				$groupArr['ID'],
+				$this->_partRepairMaxTries,
+				$this->_partRepairLimit
+			)
 		);
 
-		$result = $db->query($query);
-		if (!count($result))
-			return false;
-
-		foreach ($result as $item)
-			$parts[] = $item['numberID'];
-
-		if (count($parts)) {
-			$matched = array();
-			printf("Repair: supposed to repair %s parts.%s", count($parts), $this->n);
-			foreach ($parts as $key => $item) {
-				if (in_array(substr($item, 0, -2), $matched))
-					continue;
-
-				# when moving to php >= 5.3
-				#preg_filter(sprintf("~%s~", substr($item, 0, -3)), '$0', $parts);
-
-				$result = preg_grep(sprintf("~%s~", substr($item, 0, -2)), $parts);
-				if (count($result)) {
-					$matched[] = substr($item, 0, -2);
-					array_push($chunks, $result);
-
-					foreach ($result as $key => $val)
-						unset($parts[$key]);
-				}
-			}
-
-			$chunks = $this->getSuperUniqueArray($chunks);
-
-			if (!count($chunks)) {
-				printf("Repair: unable to extract parts for repair! Please report this is a bug, together with a dump of your partrepair table.\n", $this->n);
-
-				return false;
-			}
-
-			$repaired = 0;
-			foreach ($chunks as $chunk) {
-				$start = current($chunk);
-				$end = end($chunk);
-
-				# TODO: if less than 3 chunks do 3 single calls to scan()
-				if (count($chunk) < 3) {
-				}
-
-				$range = ($end - $start);
-
-				printf("Repair: + %s-%s (%s missing, %s articles overhead)%s", $start, $end, count($chunk), $range, $this->n);
-				$this->scan($nntp, $group, $start, $end, 'partrepair');
-
-				$query = sprintf
-				(
-					"SELECT pr.ID, pr.numberID, p.number from %s pr LEFT JOIN %s p ON p.number = pr.numberID WHERE pr.groupID=%d AND pr.numberID IN (%s) ORDER BY pr.numberID ASC",
-					$tableNames['prname'], $tableNames['pname'], $group['ID'], implode(',', $chunk)
+		$missingCount = count($missingParts);
+		if ($missingCount > 0) {
+			if ($this->_echoCLI) {
+				$this->_colorCLI->doEcho(
+					$this->_colorCLI->primary(
+						'Attempting to repair ' .
+						number_format($missingCount) .
+						' parts.'
+					), true
 				);
-
-				$result = $db->query($query);
-				foreach ($result as $item) {
-					# TODO: rewrite.. stupid
-					if ($item['number'] == $item['numberID']) {
-						#printf("Repair: %s repaired.%s", $item['ID'], $this->n);
-						$db->queryExec(sprintf("DELETE FROM %s WHERE ID=%d LIMIT 1", $tableNames['prname'], $item['ID']));
-						$repaired++;
-						continue;
-					} else {
-						#printf("Repair: %s has not arrived yet or deleted.%s", $item['numberID'], $this->n);
-						$db->queryExec(sprintf("update %s SET attempts=attempts+1 WHERE ID=%d LIMIT 1", $tableNames['prname'], $item['ID']));
-					}
-				}
 			}
 
-			$delret = $db->queryExec(sprintf('DELETE FROM %s WHERE attempts >= 5 AND groupID = %d', $tableNames['prname'], $group['ID']));
-			$delcnt = $delret->rowCount();
-			$db->log->doEcho($db->log->primary(sprintf('Repair: repaired %s', $repaired)));
-			$db->log->doEcho($db->log->primary(sprintf('Repair: cleaned %s parts.', $delcnt)));
+			// Loop through each part to group into continuous ranges with a maximum range of messagebuffer/4.
+			$ranges = $partList = [];
+			$firstPart = $lastNum = $missingParts[0]['numberID'];
 
-			return true;
+			foreach ($missingParts as $part) {
+				if (($part['numberID'] - $firstPart) > ($this->messageBuffer / 4)) {
+
+					$ranges[] = [
+						'partfrom' => $firstPart,
+						'partto'   => $lastNum,
+						'partlist' => $partList
+					];
+
+					$firstPart = $part['numberID'];
+					$partList = [];
+				}
+				$partList[] = $part['numberID'];
+				$lastNum = $part['numberID'];
+			}
+
+			$ranges[] = [
+				'partfrom' => $firstPart,
+				'partto'   => $lastNum,
+				'partlist' => $partList
+			];
+
+			// Download missing parts in ranges.
+			foreach ($ranges as $range) {
+
+				$partFrom = $range['partfrom'];
+				$partTo   = $range['partto'];
+				$partList = $range['partlist'];
+
+				if ($this->_echoCLI) {
+					echo chr(rand(45,46)) . "\r";
+				}
+
+				// Get article headers from newsgroup.
+				$this->scan($groupArr, $partFrom, $partTo, 'partrepair', $partList);
+			}
+
+			// Calculate parts repaired
+			$result = $this->_pdo->queryOneRow(
+				sprintf('
+					SELECT COUNT(ID) AS num
+					FROM %s
+					WHERE groupID = %d
+					AND numberID <= %d',
+					$tableNames['prname'],
+					$groupArr['ID'],
+					$missingParts[$missingCount - 1]['numberID']
+				)
+			);
+
+			$partsRepaired = 0;
+			if ($result !== false) {
+				$partsRepaired = ($missingCount - $result['num']);
+			}
+
+			// Update attempts on remaining parts for active group
+			if (isset($missingParts[$missingCount - 1]['ID'])) {
+				$this->_pdo->queryExec(
+					sprintf('
+						UPDATE %s
+						SET attempts = attempts + 1
+						WHERE group_id = %d
+						AND numberid <= %d',
+						$tableNames['prname'],
+						$groupArr['ID'],
+						$missingParts[$missingCount - 1]['numberID']
+					)
+				);
+			}
+
+			if ($this->_echoCLI) {
+				$this->_colorCLI->doEcho(
+					$this->_colorCLI->primary(
+						PHP_EOL .
+						number_format($partsRepaired) .
+						' parts repaired.'
+					), true
+				);
+			}
 		}
 
-		return false;
+		// Remove articles that we cant fetch after x attempts.
+		$this->_pdo->queryExec(
+			sprintf(
+				'DELETE FROM %s WHERE attempts >= %d AND groupID = %d',
+				$tableNames['prname'],
+				$this->_partRepairMaxTries,
+				$groupArr['ID']
+			)
+		);
 	}
 
 	/**

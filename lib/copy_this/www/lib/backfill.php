@@ -334,7 +334,7 @@ class Backfill
 			}
 
 			flush();
-			$lastMsg = $this->_binaries->scan($this->_nntp, $groupArr, $first, $last, $this->_safePartRepair);
+			$lastMsg = $this->_binaries->scan($groupArr, $first, $last, $this->_safePartRepair);
 
 			// Get the oldest date.
 			if (isset($lastMsg['firstArticleDate'])) {
