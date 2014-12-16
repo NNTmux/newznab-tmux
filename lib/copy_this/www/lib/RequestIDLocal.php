@@ -261,7 +261,7 @@ class RequestIDLocal extends RequestID
 					UPDATE releases
 					SET prehashID = %d, reqidstatus = %d, isrenamed = 1, iscategorized = 1, searchname = %s
 					WHERE ID = %d',
-					$this->_newTitle['ID'],
+					$this->_newTitle['id'],
 					self::REQID_FOUND,
 					$newTitle,
 					$this->_release['ID']
@@ -278,7 +278,7 @@ class RequestIDLocal extends RequestID
 						bookinfoID = NULL, anidbid = NULL, prehashID = %d, reqidstatus = %d, isrenamed = 1,
 						iscategorized = 1, searchname = %s, categoryID = %d
 					WHERE ID = %d',
-					$this->_newTitle['ID'],
+					$this->_newTitle['id'],
 					self::REQID_FOUND,
 					$newTitle,
 					$determinedCat,

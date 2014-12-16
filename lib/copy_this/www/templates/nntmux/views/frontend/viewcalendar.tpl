@@ -2,7 +2,7 @@
 
 <div style="float:right;">
 {foreach $cal as $c}
-<a href="{$smarty.const.WWW_TOP}/calendar?date={$c}">{$c}</a>&nbsp;&nbsp;&nbsp;             
+<a href="{$smarty.const.WWW_TOP}/calendar?date={$c}">{$c}</a>&nbsp;&nbsp;&nbsp;
 {/foreach}
 </div>
 <table><tr valign="top"><td width="33%";>
