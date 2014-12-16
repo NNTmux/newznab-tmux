@@ -515,7 +515,12 @@ class Users
 		//
 		$db->exec(sprintf("DELETE from userinvite where createddate < now() - interval %d day", Users::DEFAULT_INVITE_EXPIRY_DAYS));
 
-		return $db->queryOneRow(sprintf("select * from userinvite inner join users on userinvite.userID = users.ID where guid = %s and invites > 0", $db->escapeString($inviteToken)));
+		return $db->queryOneRow(
+			sprintf(
+				"SELECT * FROM userinvite WHERE guid = %s",
+				$db->escapeString($inviteToken)
+			)
+		);
 	}
 
 	public function deleteInvite($inviteToken)
