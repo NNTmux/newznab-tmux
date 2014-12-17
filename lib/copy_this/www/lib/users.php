@@ -427,7 +427,7 @@ class Users
 		return substr(md5(uniqid()), 0, 8);
 	}
 
-	public function signup($uname, $pass, $email, $host, $role = Users::ROLE_USER, $notes, $invites = Users::DEFAULT_INVITES, $invitecode = "", $forceinvitemode = false, $recaptcha_challenge = false, $recaptcha_response = false, $skip_recaptcha = false)
+	public function signup($uname, $pass, $email, $host, $role = Users::ROLE_USER, $notes, $invites = Users::DEFAULT_INVITES, $invitecode = '', $forceinvitemode = false, $recaptcha_challenge = false, $recaptcha_response = false, $skip_recaptcha = false)
 	{
 		$site = new Sites;
 		$s = $site->get();
