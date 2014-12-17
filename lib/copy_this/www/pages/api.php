@@ -624,6 +624,7 @@ function printOutput($data, $xml = true, $page, $offset = 0)
 	if ($xml) {
 		$page->smarty->assign('offset', $offset);
 		$page->smarty->assign('releases', $data);
+		$page->smarty->assign('rsshead',$page->smarty->fetch('rssheader.tpl'));
 		header('Content-type: text/xml');
 		echo trim($page->smarty->fetch('apiresult.tpl'));
 	} else {
