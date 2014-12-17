@@ -41,11 +41,11 @@ else {
 			$email = htmlspecialchars($_POST['email']);
 			$invitecode = htmlspecialchars($_POST["invitecode"]);
 
-			$page->smarty->assign('username', $_POST['username']);
-			$page->smarty->assign('password', $_POST['password']);
-			$page->smarty->assign('confirmpassword', $_POST['confirmpassword']);
-			$page->smarty->assign('email', $_POST['email']);
-			$page->smarty->assign('invitecode', $_POST["invitecode"]);
+			$page->smarty->assign('username', $username);
+			$page->smarty->assign('password', $password);
+			$page->smarty->assign('confirmpassword', $confirmpassword);
+			$page->smarty->assign('email', $email);
+			$page->smarty->assign('invitecode', $invitecode);
 
 			//
 			// check uname/email isnt in use, password valid.
@@ -92,7 +92,7 @@ else {
 			}
 			break;
 		case "view": {
-			$invitecode = htmlspecialchars($_GET["invitecode"]);
+			//$invitecode = htmlspecialchars($_GET["invitecode"]);
 			if (isset($invitecode))
 				{
 					//
