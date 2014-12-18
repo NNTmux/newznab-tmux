@@ -228,7 +228,7 @@ SQL_ADD_GROUPS;
 	// Insert and update table
 	$sqlInsert = <<<SQL_INSERT
 INSERT INTO $table (title, nfo, size, files, filename, nuked, nukereason, category, predate, SOURCE, requestID, groupID)
-  SELECT t.title, t.nfo, t.size, t.files, t.filename, t.nuked, t.nukereason, t.category, t.predate, t.source, t.requestID, IF(g.ID IS NOT NULL, g.ID, 0)
+  SELECT t.title, t.nfo, t.size, t.files, t.filename, t.nuked, t.nukereason, t.category, t.predate, t.source, t.requestID, t.groupID
     FROM tmp_pre AS t
   ON DUPLICATE KEY UPDATE prehash.nfo = IF(prehash.nfo IS NULL, t.nfo, prehash.nfo),
 	  prehash.size = IF(prehash.size IS NULL, t.size, prehash.size),
