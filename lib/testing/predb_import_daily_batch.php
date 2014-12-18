@@ -222,11 +222,14 @@ SQL_ADD_GROUPS;
 
 	$pdo->queryDirect($sqlAddGroups);
 
+	// Fill the groupID
+	$pdo->queryDirect("UPDATE tmp_pre AS t SET groupID = (SELECT ID FROM groups WHERE name = t.groupname) WHERE groupname IS NOT NULL");
+
 	// Insert and update table
 	$sqlInsert = <<<SQL_INSERT
 INSERT INTO $table (title, nfo, size, files, filename, nuked, nukereason, category, predate, SOURCE, requestID, groupID)
   SELECT t.title, t.nfo, t.size, t.files, t.filename, t.nuked, t.nukereason, t.category, t.predate, t.source, t.requestID, IF(g.ID IS NOT NULL, g.ID, 0)
-    FROM tmp_pre AS t LEFT OUTER JOIN groups g ON t.groupname = g.name
+    FROM tmp_pre AS t
   ON DUPLICATE KEY UPDATE prehash.nfo = IF(prehash.nfo IS NULL, t.nfo, prehash.nfo),
 	  prehash.size = IF(prehash.size IS NULL, t.size, prehash.size),
 	  prehash.files = IF(prehash.files IS NULL, t.files, prehash.files),
@@ -235,7 +238,7 @@ INSERT INTO $table (title, nfo, size, files, filename, nuked, nukereason, catego
 	  prehash.nukereason = IF(t.nuked > 0, t.nukereason, prehash.nukereason),
 	  prehash.category = IF(prehash.category IS NULL, t.category, prehash.category),
 	  prehash.requestID = IF(prehash.requestID = 0, t.requestID, prehash.requestID),
-	  prehash.groupID = IF(g.ID IS NOT NULL, g.ID, 0);
+	  prehash.groupID = IF(prehash.groupID = 0, t.groupID, prehash.groupID);
 SQL_INSERT;
 
 	echo $pdo->log->info("Inserting records from temporary table into $table");
