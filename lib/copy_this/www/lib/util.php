@@ -518,7 +518,7 @@ class Utility
 	static public function fileInfo($path)
 	{
 		$output = '';
-		$magicPath = (new Sites())->get->magic_file_path;
+		$magicPath = (new Sites())->get()->magic_file_path;
 		if (self::hasCommand('file') && (!self::isWin() || !empty($magicPath))) {
 			$magicSwitch = empty($magicPath) ? '' : " -m $magicPath";
 			$output = runCmd('file' . $magicSwitch . ' -b "' . $path . '"');
