@@ -662,7 +662,7 @@ class Binaries
 						$this->_colorCLI->primaryOver(' to download articles, ') .
 						$this->_colorCLI->alternateOver($timeUpdate . 's') .
 						$this->_colorCLI->primaryOver(' to insert binaries/parts, ') .
-						$this->_colorCLI->alternateOver(number_format($timeLoop) . 's') .
+						$this->_colorCLI->alternateOver($timeLoop . 's') .
 						$this->_colorCLI->primary(' total.')
 					);
 				}
