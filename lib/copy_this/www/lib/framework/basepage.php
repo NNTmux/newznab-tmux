@@ -61,9 +61,15 @@ class BasePage
 			require_once(WWW_DIR.'templates/'.$this->site->style.'/theme.php');
 		$this->smarty->assign('themevars', (isset($themevars) ? $themevars : null));
 
-		if (isset($_SERVER["SERVER_NAME"]))
+		$servername = null;
+		if (defined('EXTERNAL_PROXY_IP') && defined('EXTERNAL_HOST_NAME') && isset($_SERVER["REMOTE_ADDR"]) && $_SERVER["REMOTE_ADDR"] == EXTERNAL_PROXY_IP)
+			$servername = EXTERNAL_HOST_NAME;
+		elseif (isset($_SERVER["SERVER_NAME"]))
+			$servername = $_SERVER["SERVER_NAME"];
+
+		if ($servername != "")
 		{
-			$this->serverurl = ($this->secure_connection ? "https://" : "http://").$_SERVER["SERVER_NAME"].(($_SERVER["SERVER_PORT"] != "80" && $_SERVER["SERVER_PORT"] != "443") ? ":".$_SERVER["SERVER_PORT"] : "").WWW_TOP.'/';
+			$this->serverurl = ($this->secure_connection ? "https://" : "http://").$servername.(($_SERVER["SERVER_PORT"] != "80" && $_SERVER["SERVER_PORT"] != "443") ? ":".$_SERVER["SERVER_PORT"] : "").WWW_TOP.'/';
 			$this->smarty->assign('serverroot', $this->serverurl);
 		}
 
@@ -111,13 +117,13 @@ class BasePage
 				$this->site->addetail="";
 			}
 
-			$this->floodCheck(true, $this->userdata["role"]);
+			$this->floodCheck($this->userdata["role"]);
 		}
 		else
 		{
 			$this->smarty->assign('isadmin',"false");
 			$this->smarty->assign('loggedin',"false");
-			$this->floodCheck(false, "");
+			$this->floodCheck();
 		}
 
 		$this->smarty->assign('site', $this->site);

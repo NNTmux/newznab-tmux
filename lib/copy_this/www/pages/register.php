@@ -11,7 +11,7 @@ if ($page->site->registerstatus == Sites::REGISTER_STATUS_CLOSED)
 	$page->smarty->assign('error', "Registrations are currently disabled.");
 	$showregister = 0;
 }
-elseif ($page->site->registerstatus == Sites::REGISTER_STATUS_INVITE && (!isset($_REQUEST["invitecode"]) || empty($_REQUEST['invitecode'])))
+elseif ($page->site->registerstatus == Sites::REGISTER_STATUS_INVITE && (!isset($_REQUEST['invitecode']) || empty($_REQUEST['invitecode'])))
 {
 	$page->smarty->assign('error', "Registrations are currently invite only.");
 	$showregister = 0;
@@ -28,50 +28,41 @@ if ($showregister == 0)
 {
 	$page->smarty->assign('showregister', "0");
 }
-else
-{
+else {
 
 	$action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view';
 
-	switch($action)
-	{
+	switch ($action) {
 		case 'submit':
 
 			$username = htmlspecialchars($_POST['username']);
 			$password = htmlspecialchars($_POST['password']);
 			$confirmpassword = htmlspecialchars($_POST['confirmpassword']);
 			$email = htmlspecialchars($_POST['email']);
-			$invitecode = htmlspecialchars($_POST["invitecode"]);
+			$invitecode = htmlspecialchars($_POST['invitecode']);
 
-			$page->smarty->assign('username', $_POST['username']);
-			$page->smarty->assign('password', $_POST['password']);
-			$page->smarty->assign('confirmpassword', $_POST['confirmpassword']);
-			$page->smarty->assign('email', $_POST['email']);
-			$page->smarty->assign('invitecode', $_POST["invitecode"]);
+			$page->smarty->assign('username', $username);
+			$page->smarty->assign('password', $password);
+			$page->smarty->assign('confirmpassword', $confirmpassword);
+			$page->smarty->assign('email', $email);
+			$page->smarty->assign('invitecode', $invitecode);
 
 			//
 			// check uname/email isnt in use, password valid.
 			// if all good create new user account and redirect back to home page
 			//
-			if ($password != $confirmpassword)
-			{
+			if ($password != $confirmpassword) {
 				$page->smarty->assign('error', "Password Mismatch");
-			}
-			else
-			{
+			} else {
 				//get the default user role
 				$userdefault = $users->getDefaultRole();
 
 				$ret = $users->signup($username, $password, $email, $_SERVER['REMOTE_ADDR'], $userdefault['ID'], "", $userdefault['defaultinvites'], $invitecode, false, isset($_POST['recaptcha_challenge_field']) ? $_POST['recaptcha_challenge_field'] : null, isset($_POST['recaptcha_response_field']) ? $_POST['recaptcha_response_field'] : null);
-				if ($ret > 0)
-				{
+				if ($ret > 0) {
 					$users->login($ret, $_SERVER['REMOTE_ADDR']);
-					header("Location: ".WWW_TOP."/");
-				}
-				else
-				{
-					switch ($ret)
-					{
+					header("Location: " . WWW_TOP . "/");
+				} else {
+					switch ($ret) {
 						case Users::ERR_SIGNUP_BADUNAME:
 							$page->smarty->assign('error', "Your username must be longer than three characters.");
 							break;
@@ -100,28 +91,23 @@ else
 				}
 			}
 			break;
-		case "view":
-		{
-			if (isset($_GET["invitecode"]))
-			{
-				//
-				// see if its a valid invite
-				//
-				$invite = $users->getInvite($invitecode);
-				if (!$invite)
-				{
-					$page->smarty->assign('error', sprintf("Bad or invite code older than %d days.", Users::DEFAULT_INVITE_EXPIRY_DAYS));
-					$page->smarty->assign('showregister', "0");
+		case "view": {
+			if (isset($_GET["invitecode"])) {
+					//
+					// see if its a valid invite
+					//
+					$invite = $users->getInvite($_GET["invitecode"]);
+					if (!$invite) {
+						$page->smarty->assign('error', sprintf("Bad or invite code older than %d days.", Users::DEFAULT_INVITE_EXPIRY_DAYS));
+						$page->smarty->assign('showregister', "0");
+					} else {
+						$page->smarty->assign('invitecode', $invite["guid"]);
+					}
 				}
-				else
-				{
-					$page->smarty->assign('invitecode', $invite["guid"]);
-				}
+				break;
 			}
-			break;
 		}
 	}
-}
 
 $page->meta_title = "Register";
 $page->meta_keywords = "register,signup,registration";

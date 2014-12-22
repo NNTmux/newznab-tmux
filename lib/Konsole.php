@@ -191,6 +191,7 @@ class Konsole
 				. "LEFT OUTER JOIN groups ON groups.ID = r.groupID "
 				. "LEFT OUTER JOIN releasenfo rn ON rn.releaseID = r.ID "
 				. "INNER JOIN consoleinfo con ON con.ID = r.consoleinfoID "
+				. "INNER JOIN genres ON con.genreID = genres.ID "
 				. "WHERE r.nzbstatus = 1 AND con.title != '' AND "
 				. "r.passwordstatus <= (SELECT value FROM site WHERE setting='showpasswordedrelease') AND %s %s
 				%s "

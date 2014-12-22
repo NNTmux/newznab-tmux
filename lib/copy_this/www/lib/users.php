@@ -252,10 +252,9 @@ class Users
 			$sql[] = sprintf('cp_api = %s', $db->escapeString($cp_api));
 		}
 
-		$sql = sprintf("update users set %s where id = %d", implode(', ', $sql), $id);
-		$db->exec($sql);
+		$db->queryExec(sprintf("update users set %s where id = %d", implode(', ', $sql), $id));
 
-		return Users::SUCCESS;
+		return self::SUCCESS;
 	}
 
 	public function isValidUsername($uname)
@@ -263,9 +262,16 @@ class Users
 		return preg_match("/^[a-z][a-z0-9]{2,}$/i", $uname);
 	}
 
+	/**
+	 * When a user is registering or updating their profile, check if the email is valid.
+	 *
+	 * @param string $email
+	 *
+	 * @return bool
+	 */
 	public function isValidEmail($email)
 	{
-		return preg_match("/^([a-z0-9\+_\-]+)(\.[a-z0-9\+_\-]+)*@([a-z0-9\-]+\.)+[a-z]{2,6}$/i", $email);
+		return (bool)preg_match('/^([\w\+-]+)(\.[\w\+-]+)*@([a-z0-9-]+\.)+[a-z]{2,6}$/i', $email);
 	}
 
 	public function getByUsername($uname)
@@ -340,11 +346,11 @@ class Users
 
 	public static function hashPassword($password)
 	{
-		$salt = self::randomKey(self::SALTLEN);
+		$salt = Users::randomKey(Users::SALTLEN);
 		$site = new Sites();
 		$s = $site->get();
 
-		return self::hashSHA1($s->siteseed . $password . $salt . $s->siteseed) . $salt;
+		return Users::hashSHA1($s->siteseed . $password . $salt . $s->siteseed) . $salt;
 	}
 
 	function randomKey($amount)
@@ -416,10 +422,21 @@ class Users
 		return (!preg_match('/^(http|https|ftp):\/\/([A-Z0-9][A-Z0-9_-]*(?:\.[A-Z0-9][A-Z0-9_-]*)+):?(\d+)?\/?/i', $url)) ? false : true;
 	}
 
+	/**
+	 * Create a random username.
+	 *
+	 * @param string $email
+	 *
+	 * @return string
+	 */
 	public function generateUsername($email)
 	{
-		//TODO: Make this generate a more friendly username based on the email address.
-		return "u" . substr(md5(uniqid()), 0, 7);
+		$string = '';
+		if (preg_match('/[A-Za-z0-9]+/', $email, $matches)) {
+			$string = $matches[0];
+		}
+
+		return "u" . substr(md5(uniqid()), 0, 7) . $string;
 	}
 
 	public function generatePassword()
@@ -427,7 +444,7 @@ class Users
 		return substr(md5(uniqid()), 0, 8);
 	}
 
-	public function signup($uname, $pass, $email, $host, $role = Users::ROLE_USER, $notes, $invites = Users::DEFAULT_INVITES, $invitecode = "", $forceinvitemode = false, $recaptcha_challenge = false, $recaptcha_response = false, $skip_recaptcha = false)
+	public function signup($uname, $pass, $email, $host, $role = self::ROLE_USER, $notes, $invites = self::DEFAULT_INVITES, $invitecode = '', $forceinvitemode = false, $recaptcha_challenge = false, $recaptcha_response = false, $skip_recaptcha = false)
 	{
 		$site = new Sites;
 		$s = $site->get();
@@ -442,8 +459,9 @@ class Users
 		if (!$this->isValidPassword($pass))
 			return Users::ERR_SIGNUP_BADPASS;
 
-		if (!$this->isValidEmail($email))
-			return Users::ERR_SIGNUP_BADEMAIL;
+		if (!$this->isValidEmail($email)) {
+			return self::ERR_SIGNUP_BADEMAIL;
+		}
 
 		$res = $this->getByUsername($uname);
 		if ($res)
@@ -513,9 +531,14 @@ class Users
 		//
 		// Tidy any old invites sent greater than DEFAULT_INVITE_EXPIRY_DAYS days ago.
 		//
-		$db->exec(sprintf("DELETE from userinvite where createddate < now() - interval %d day", Users::DEFAULT_INVITE_EXPIRY_DAYS));
+		$db->queryExec(sprintf("DELETE from userinvite where createddate < now() - INTERVAL %d DAY", self::DEFAULT_INVITE_EXPIRY_DAYS));
 
-		return $db->queryOneRow(sprintf("select * from userinvite inner join users on userinvite.userID = users.ID where guid = %s and invites > 0", $db->escapeString($inviteToken)));
+		return $db->queryOneRow(
+			sprintf(
+				"SELECT * FROM userinvite WHERE guid = %s",
+				$db->escapeString($inviteToken)
+			)
+		);
 	}
 
 	public function deleteInvite($inviteToken)
@@ -524,7 +547,7 @@ class Users
 		$db->exec(sprintf("DELETE from userinvite where guid = %s ", $db->escapeString($inviteToken)));
 	}
 
-	public function add($uname, $pass, $email, $role, $notes, $host, $invites = Users::DEFAULT_INVITES, $invitedby = 0)
+	public function add($uname, $pass, $email, $role, $notes, $host, $invites = self::DEFAULT_INVITES, $invitedby = 0)
 	{
 		$db = new DB();
 

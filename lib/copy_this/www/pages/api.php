@@ -2,6 +2,7 @@
 require_once(WWW_DIR."/lib/releases.php");
 require_once(WWW_DIR."/lib/category.php");
 require_once(WWW_DIR."/lib/util.php");
+require_once(WWW_DIR."/lib/releasecomments.php");
 
 $rc = new ReleaseComments;
 
@@ -453,7 +454,7 @@ switch ($function) {
 
 		// Check email isn't taken.
 		$ret = $users->getByEmail($_GET['email']);
-		if (isset($ret['id'])) {
+		if (isset($ret['ID'])) {
 			showApiError(105);
 		}
 
@@ -463,8 +464,8 @@ switch ($function) {
 
 		// Register.
 		$userDefault = $users->getDefaultRole();
-		$uid = $users->signUp(
-			$username, $password, $_GET['email'], $_SERVER['REMOTE_ADDR'], $userDefault['id'], $userDefault['defaultinvites']
+		$uid = $users->signup(
+			$username, $password, $_GET['email'], $_SERVER['REMOTE_ADDR'], $userDefault['ID'], "", $userDefault['defaultinvites'], "", false, false, false, true
 		);
 
 		// Check if it succeeded.
@@ -624,6 +625,7 @@ function printOutput($data, $xml = true, $page, $offset = 0)
 	if ($xml) {
 		$page->smarty->assign('offset', $offset);
 		$page->smarty->assign('releases', $data);
+		$page->smarty->assign('rsshead',$page->smarty->fetch('rssheader.tpl'));
 		header('Content-type: text/xml');
 		echo trim($page->smarty->fetch('apiresult.tpl'));
 	} else {

@@ -20,7 +20,7 @@ class Sites
 
 	public function version()
 	{
-		return "0.3.5 nn-tmux";
+		return "0.3.6 nn-tmux";
 	}
 
 	public function update($form)

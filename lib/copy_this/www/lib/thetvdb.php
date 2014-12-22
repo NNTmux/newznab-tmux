@@ -156,7 +156,6 @@ class TheTVDB
 	{
 
 		$apiresponse = Utility::getUrl(['url' => $this->MIRROR.'/api/GetSeries.php?seriesname='.preg_replace('/\s+/', '+', $seriesname).'&language=all']);
-		var_dump($apiresponse);
 
 		if(!$apiresponse)
 			return false;
