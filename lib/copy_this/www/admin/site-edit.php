@@ -88,8 +88,10 @@ $page->smarty->assign('sabpriority_names', array( 'Force', 'High', 'Normal', 'Lo
 $page->smarty->assign('curlproxytype_names', array( '', 'HTTP', 'SOCKS5'));
 
 $page->smarty->assign('newgroupscan_names', array('Days','Posts'));
-$page->smarty->assign('registerstatus_ids', array(Sites::REGISTER_STATUS_OPEN, Sites::REGISTER_STATUS_INVITE, Sites::REGISTER_STATUS_CLOSED));
-$page->smarty->assign('registerstatus_names', array( 'Open', 'Invite', 'Closed'));
+
+$page->smarty->assign('registerstatus_ids', array(Sites::REGISTER_STATUS_API_ONLY, Sites::REGISTER_STATUS_OPEN, Sites::REGISTER_STATUS_INVITE, Sites::REGISTER_STATUS_CLOSED));
+$page->smarty->assign('registerstatus_names', array('API Only', 'Open', 'Invite', 'Closed'));
+
 $page->smarty->assign('passworded_ids', array(0,1,2));
 $page->smarty->assign('passworded_names', array( 'Dont show passworded or potentially passworded', 'Dont show passworded', 'Show everything'));
 
@@ -100,6 +102,21 @@ $page->smarty->assign('lookuplanguage_names', array('English', 'Deutsch', 'EspaÃ
 
 $page->smarty->assign('imdb_urls', array(0,1));
 $page->smarty->assign('imdburl_names', array('imdb.com', 'akas.imdb.com'));
+
+$page->smarty->assign('lookupbooks_ids', [0,1,2]);
+$page->smarty->assign('lookupbooks_names', ['Disabled', 'Lookup All Books', 'Lookup Renamed Books']);
+
+$page->smarty->assign('lookupgames_ids', [0,1,2]);
+$page->smarty->assign('lookupgames_names', ['Disabled', 'Lookup All Consoles', 'Lookup Renamed Consoles']);
+
+$page->smarty->assign('lookupmusic_ids', [0,1,2]);
+$page->smarty->assign('lookupmusic_names', ['Disabled', 'Lookup All Music', 'Lookup Renamed Music']);
+
+$page->smarty->assign('lookupmovies_ids', [0,1,2]);
+$page->smarty->assign('lookupmovies_names', ['Disabled', 'Lookup All Movies', 'Lookup Renamed Movies']);
+
+$page->smarty->assign('lookuptv_ids', [0,1,2]);
+$page->smarty->assign('lookuptv_names', ['Disabled', 'Lookup All TV', 'Lookup Renamed TV']);
 
 $page->smarty->assign('lookup_reqids_ids', array(0,1,2));
 $page->smarty->assign('lookup_reqids_names', array('Disabled', 'Lookup Request IDs', 'Lookup Request IDs Threaded'));

@@ -11,7 +11,7 @@ if ($page->site->registerstatus == Sites::REGISTER_STATUS_CLOSED)
 	$page->smarty->assign('error', "Registrations are currently disabled.");
 	$showregister = 0;
 }
-elseif ($page->site->registerstatus == Sites::REGISTER_STATUS_INVITE && (!isset($_REQUEST["invitecode"]) || empty($_REQUEST['invitecode'])))
+elseif ($page->site->registerstatus == Sites::REGISTER_STATUS_INVITE && (!isset($_REQUEST['invitecode']) || empty($_REQUEST['invitecode'])))
 {
 	$page->smarty->assign('error', "Registrations are currently invite only.");
 	$showregister = 0;
@@ -39,7 +39,7 @@ else {
 			$password = htmlspecialchars($_POST['password']);
 			$confirmpassword = htmlspecialchars($_POST['confirmpassword']);
 			$email = htmlspecialchars($_POST['email']);
-			$invitecode = htmlspecialchars($_POST["invitecode"]);
+			$invitecode = htmlspecialchars($_POST['invitecode']);
 
 			$page->smarty->assign('username', $username);
 			$page->smarty->assign('password', $password);
@@ -92,13 +92,11 @@ else {
 			}
 			break;
 		case "view": {
-			//$invitecode = htmlspecialchars($_GET["invitecode"]);
-			if (isset($invitecode))
-				{
+			if (isset($_GET["invitecode"])) {
 					//
 					// see if its a valid invite
 					//
-					$invite = $users->getInvite($invitecode);
+					$invite = $users->getInvite($_GET["invitecode"]);
 					if (!$invite) {
 						$page->smarty->assign('error', sprintf("Bad or invite code older than %d days.", Users::DEFAULT_INVITE_EXPIRY_DAYS));
 						$page->smarty->assign('showregister', "0");

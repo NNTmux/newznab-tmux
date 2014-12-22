@@ -639,13 +639,13 @@
 	</td>
 </tr>
 
-<tr>
-	<td><label for="lookuptvrage">Lookup TV Rage</label>:</td>
-	<td>
-		{html_radios id="lookuptvrage" name='lookuptvrage' values=$yesno_ids output=$yesno_names selected=$fsite->lookuptvrage separator='<br />'}
-		<div class="hint">Whether to attempt to lookup tv rage ids on the web when processing binaries.</div>
-	</td>
-</tr>
+	<tr>
+		<td style="width:180px;"><label for="lookuptvrage">Lookup TV:</label></td>
+		<td>
+			{html_options style="width:180px;" id="lookuptvrage" name='lookuptvrage' values=$lookuptv_ids output=$lookuptv_names selected=$site->lookuptvrage}
+			<div class="hint">Whether to attempt to lookup TvRage ids on the web.</div>
+		</td>
+	</tr>
 
 <tr>
 	<td><label for="lookupthetvdb">Lookup TheTVDB</label>:</td>
@@ -663,13 +663,13 @@
 		</td>
 	</tr>
 
-<tr>
-	<td><label for="lookupimdb">Lookup Movies</label>:</td>
-	<td>
-		{html_radios id="lookupimdb" name='lookupimdb' values=$yesno_ids output=$yesno_names selected=$fsite->lookupimdb separator='<br />'}
-		<div class="hint">Whether to attempt to lookup film information from IMDB or TheMovieDB when processing binaries.</div>
-	</td>
-</tr>
+	<tr>
+		<td style="width:180px;"><label for="lookupimdb">Lookup Movies:</label></td>
+		<td>
+			{html_options style="width:180px;" id="lookupimdb" name='lookupimdb' values=$lookupmovies_ids output=$lookupmovies_names selected=$fsite->lookupimdb}
+			<div class="hint">Whether to attempt to lookup film information from IMDB or TheMovieDB.</div>
+		</td>
+	</tr>
 
 <tr>
 	<td><label for="lookupanidb">Lookup AniDB</label>:</td>
@@ -679,21 +679,21 @@
 	</td>
 </tr>
 
-<tr>
-	<td><label for="lookupmusic">Lookup Music</label>:</td>
-	<td>
-		{html_radios id="lookupmusic" name='lookupmusic' values=$yesno_ids output=$yesno_names selected=$fsite->lookupmusic separator='<br />'}
-		<div class="hint">Whether to attempt to lookup music information from Amazon when processing binaries.</div>
-	</td>
-</tr>
+	<tr>
+		<td style="width:180px;"><label for="lookupmusic">Lookup Music:</label></td>
+		<td>
+			{html_options style="width:180px;" id="lookupmusic" name='lookupmusic' values=$lookupmusic_ids output=$lookupmusic_names selected=$fsite->lookupmusic}
+			<div class="hint">Whether to attempt to lookup music information from Amazon.</div>
+		</td>
+	</tr>
 
-<tr>
-	<td><label for="lookupgames">Lookup Games</label>:</td>
-	<td>
-		{html_radios id="lookupgames" name='lookupgames' values=$yesno_ids output=$yesno_names selected=$fsite->lookupgames separator='<br />'}
-		<div class="hint">Whether to attempt to lookup game information from Amazon when processing binaries.</div>
-	</td>
-</tr>
+	<tr>
+		<td style="width:180px;"><label for="lookupgames">Lookup Games:</label></td>
+		<td>
+			{html_options style="width:180px;" id="lookupgames" name='lookupgames' values=$lookupgames_ids output=$lookupgames_names selected=$fsite->lookupgames}
+			<div class="hint">Whether to attempt to lookup game information from Amazon.</div>
+		</td>
+	</tr>
 
 	<tr>
 		<td><label for="lookupxxx">Lookup XXX</label>:</td>
@@ -715,13 +715,13 @@
 	</td>
 </tr>
 
-<tr>
-	<td><label for="lookupbooks">Lookup Books</label>:</td>
-	<td>
-		{html_radios id="lookupbooks" name='lookupbooks' values=$yesno_ids output=$yesno_names selected=$fsite->lookupbooks separator='<br />'}
-		<div class="hint">Whether to attempt to lookup book information from Amazon when processing binaries.</div>
-	</td>
-</tr>
+	<tr>
+		<td style="width:180px;"><label for="lookupbooks">Lookup Books:</label></td>
+		<td>
+			{html_options style="width:180px;" id="lookupbooks" name='lookupbooks' values=$lookupbooks_ids output=$lookupbooks_names selected=$fsite->lookupbooks}
+			<div class="hint">Whether to attempt to lookup book information from Amazon.</div>
+		</td>
+	</tr>
 
 <tr>
 	<td><label for="lookuplanguage">Movie Lookup Language</label>:</td>
