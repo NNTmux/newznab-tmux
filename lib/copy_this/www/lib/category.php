@@ -57,6 +57,7 @@ class Category
 	const CAT_XXX_PACK = 6050;
 	const CAT_XXX_IMAGESET = 6060;
 	const CAT_XXX_OTHER = 6070;
+	const CAT_XXX_SD = 6080;
 	const CAT_BOOK_MAGS = 7010;
 	const CAT_BOOK_EBOOK = 7020;
 	const CAT_BOOK_COMICS = 7030;
