@@ -801,7 +801,7 @@ class Categorize extends Category
 
 	public function isXxx264()
 	{
-		if (preg_match('/720p|1080(hd|[ip])|[xh][^a-z0-9]?264/i', $this->releaseName) && !preg_match('/\bwmv\b/i', $this->releaseName)) {
+		if (preg_match('/720p|1080(hd|[ip])|[xh][^a-z0-9]?264/i', $this->releaseName) && !preg_match('/\bwmv\b/i', $this->releaseName) && !preg_match('/SDX264XXX/i', $this->releaseName)) {
 			$this->tmpCat = \Category::CAT_XXX_X264;
 			return true;
 		}
@@ -810,7 +810,7 @@ class Categorize extends Category
 
 	public function isXxxWMV()
 	{
-		if (preg_match('/(\d{2}\.\d{2}\.\d{2})|([ex]\d{2,})|[^a-z0-9](f4v|flv|isom|(issue\.\d{2,})|mov|mp(4|eg)|multiformat|pack-|realmedia|uhq|wmv)[^a-z0-9]/i', $this->releaseName)) {
+		if (preg_match('/(\d{2}\.\d{2}\.\d{2})|([ex]\d{2,})|[^a-z0-9](f4v|flv|isom|(issue\.\d{2,})|mov|mp(4|eg)|multiformat|pack-|realmedia|uhq|wmv)[^a-z0-9]/i', $this->releaseName) && !preg_match('/SDX264XXX/i', $this->releaseName)) {
 			$this->tmpCat = \Category::CAT_XXX_WMV;
 			return true;
 		}
