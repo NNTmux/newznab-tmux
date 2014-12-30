@@ -1449,6 +1449,23 @@
 				</div>
 			</td>
 		</tr>
+		<tr>
+			<td style="width:180px;"><label for="nfothreads">NFO Threads:</label></td>
+			<td>
+				<input class="short" id="nfothreads" name="nfothreads" type="text" value="{$fsite->nfothreads}"/>
+				<div class="hint">The number of threads for nfo postprocessing.
+					The max is 16, if you set anything higher it will use 16.
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td style="width:180px;"><label for="reqidthreads">Request ID Threads:</label></td>
+			<td>
+				<input class="short" id="reqidthreads" name="reqidthreads" type="text" value="{$fsite->reqidthreads}"/>
+				<div class="hint">The number of threads for local Request ID processing.
+				</div>
+			</td>
+		</tr>
 
 		<tr>
 			<td style="width:180px;"><label for="postthreadsnon">Postprocessing Non-Amazon Threads:</label></td>
