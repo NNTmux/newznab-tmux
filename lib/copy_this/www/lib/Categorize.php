@@ -162,10 +162,15 @@ class Categorize extends Category
 					$this->tmpCat = \Category::CAT_MUSIC_MP3;
 					break;
 				case $group === 'alt.binaries.triballs':
-					if ($this->isMusic()) {
+					switch (true) {
+						case $this->isMusic():
+						case $this->isPCGame():
+						case $this->isMovie():
 						break;
+						default:
+							$this->tmpCat = \Category::CAT_MISC_OTHER;
+							break;
 					}
-					$this->tmpCat = \Category::CAT_MISC_OTHER;
 					break;
 				case preg_match('/alt\.binaries\.dvd(\-?r)?(\.(movies|))?$/i', $group):
 					if ($this->isMovie()) {
