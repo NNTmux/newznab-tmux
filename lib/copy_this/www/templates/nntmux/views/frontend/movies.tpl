@@ -123,7 +123,7 @@
 							{if $result.trailer != ""}<a href="#" name="name{$result.imdbID}" title="View movie trailer" class="btn btn-mini modal_imdbtrailer" rel="trailer">Trailer</a>{/if}
 							<a
 									target="_blank"
-									href="{$site->dereferrer_link}http://trakt.tv/search/imdb?q=tt{$result.imdbID}/"
+									href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{$result.imdbID}/"
 									name="trakt{$result.imdbid}"
 									title="View trakt page"
 									><img src="{$smarty.const.WWW_TOP}/templates/nntmux/images/icons/trakt.png"></a>

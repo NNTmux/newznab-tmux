@@ -101,7 +101,7 @@
 										</div>
 										<div class="icon icon_trakt">
 											<a class="divlink" target="_blank" title="View on Trakt"
-											   href="{$site->dereferrer_link}http://trakt.tv/search/imdb?q=tt{$result.imdbID}/"></a>
+											   href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{$result.imdbID}/"></a>
 										</div>
 										{if $cpapi != '' && $cpurl != ''}
 											<div class="icon icon_cp">
