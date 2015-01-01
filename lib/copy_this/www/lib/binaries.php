@@ -447,7 +447,7 @@ class Binaries
 
 		$timeHeaders = number_format(microtime(true) - $this->startHeaders, 2);
 
-		if (PEAR::isError($msgs)) {
+		if ($this->_nntp->isError($msgs)) {
 			echo "Error {$msgs->code}: {$msgs->message}$n";
 			echo "Skipping group$n";
 
