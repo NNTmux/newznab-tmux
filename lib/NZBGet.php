@@ -6,7 +6,7 @@ require_once(WWW_DIR . "/lib/nzb.php");
 /**
  * Class NZBGet
  *
- * Transfers data between an NZBGet server and an nZEDb website.
+ * Transfers data between an NZBGet server and a newznab website.
  *
  * @package nzedb
  */
