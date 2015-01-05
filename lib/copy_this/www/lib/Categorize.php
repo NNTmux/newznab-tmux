@@ -162,10 +162,15 @@ class Categorize extends Category
 					$this->tmpCat = \Category::CAT_MUSIC_MP3;
 					break;
 				case $group === 'alt.binaries.triballs':
-					if ($this->isMusic()) {
+					switch (true) {
+						case $this->isMusic():
+						case $this->isPCGame():
+						case $this->isMovie():
 						break;
+						default:
+							$this->tmpCat = \Category::CAT_MISC_OTHER;
+							break;
 					}
-					$this->tmpCat = \Category::CAT_MISC_OTHER;
 					break;
 				case preg_match('/alt\.binaries\.dvd(\-?r)?(\.(movies|))?$/i', $group):
 					if ($this->isMovie()) {
@@ -791,6 +796,7 @@ class Categorize extends Category
 			case $this->isXxxWMV():
 			case $this->isXxxDVD():
 			case $this->isXxxOther():
+			case $this->isXxxSD():
 				return true;
 			default:
 				$this->tmpCat = \Category::CAT_XXX_OTHER;
@@ -800,7 +806,7 @@ class Categorize extends Category
 
 	public function isXxx264()
 	{
-		if (preg_match('/720p|1080(hd|[ip])|[xh][^a-z0-9]?264/i', $this->releaseName) && !preg_match('/\bwmv\b/i', $this->releaseName)) {
+		if (preg_match('/720p|1080(hd|[ip])|[xh][^a-z0-9]?264/i', $this->releaseName) && !preg_match('/\bwmv\b/i', $this->releaseName) && !preg_match('/SDX264XXX/i', $this->releaseName)) {
 			$this->tmpCat = \Category::CAT_XXX_X264;
 			return true;
 		}
@@ -809,7 +815,7 @@ class Categorize extends Category
 
 	public function isXxxWMV()
 	{
-		if (preg_match('/(\d{2}\.\d{2}\.\d{2})|([ex]\d{2,})|[^a-z0-9](f4v|flv|isom|(issue\.\d{2,})|mov|mp(4|eg)|multiformat|pack-|realmedia|uhq|wmv)[^a-z0-9]/i', $this->releaseName)) {
+		if (preg_match('/(\d{2}\.\d{2}\.\d{2})|([ex]\d{2,})|[^a-z0-9](f4v|flv|isom|(issue\.\d{2,})|mov|mp(4|eg)|multiformat|pack-|realmedia|uhq|wmv)[^a-z0-9]/i', $this->releaseName) && !preg_match('/SDX264XXX/i', $this->releaseName)) {
 			$this->tmpCat = \Category::CAT_XXX_WMV;
 			return true;
 		}
@@ -857,6 +863,15 @@ class Categorize extends Category
 		// If nothing else matches, then try these words.
 		if (preg_match('/[-._ ]Brazzers|Creampie|[-._ ]JAV[-._ ]|North\.Pole|^Nubiles|She[-._ ]?Male|Transsexual|OLDER ANGELS/i', $this->releaseName)) {
 			$this->tmpCat = \Category::CAT_XXX_OTHER;
+			return true;
+		}
+		return false;
+	}
+
+	public function isXxxSD()
+	{
+		if (preg_match('/SDX264XXX/i', $this->releaseName)) {
+			$this->tmpCat = \Category::CAT_XXX_SD;
 			return true;
 		}
 		return false;

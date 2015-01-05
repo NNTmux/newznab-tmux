@@ -219,13 +219,13 @@ class PreDB
 		}
 
 		$ret = $groupData = $nntp->selectGroup($site->nzpregroup);
-		if(PEAR::isError($ret)) {
+		if($nntp->isError($ret)) {
 			echo "Predb   : Error ".$ret->getMessage()."\n";
 			return false;
 		}
 
 		$ret = $groupMsgs = $nntp->getOverview(($groupData['last']-(!empty($site->nzprearticles) ? $site->nzprearticles : 500)).'-'.$groupData['last']);
-		if(PEAR::isError($ret)) {
+		if($nntp->isError($ret)) {
 			echo "Predb   : Error ".$ret->getMessage()."\n";
 			return false;
 		}
@@ -243,7 +243,7 @@ class PreDB
 
 			if(preg_match('/^'.$site->nzpresubject.'$/', $groupMsg['Subject']) && preg_match('/^'.$site->nzpreposter.'$/', $groupMsg['From'])) {
 				$ret = $msgHeader = $nntp->getHeader($groupMsg['Message-ID']);
-				if(PEAR::isError($ret))
+				if($nntp->isError($ret))
 					continue;
 
 				for($i=0; $i < count($msgHeader); $i++) {
