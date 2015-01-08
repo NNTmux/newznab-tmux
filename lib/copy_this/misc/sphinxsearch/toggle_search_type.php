@@ -1,5 +1,5 @@
 <?php
-require dirname(__FILE__) . '/../../www/config.php';
+require_once dirname(__FILE__) . '/../../www/config.php';
 require_once (NN_LIB . 'framework' . DS . 'db.php');
 require_once (NN_LIB . 'ReleaseSearch.php');
 

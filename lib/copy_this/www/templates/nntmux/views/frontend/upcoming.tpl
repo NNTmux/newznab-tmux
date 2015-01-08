@@ -88,6 +88,11 @@
 						<br/>
 						<br/>
 					{/if}
+					{if $ourmovies[$result->alternate_ids->imdb] != ""}
+						<a class="rndbtn" href="{$smarty.const.WWW_TOP}/movies?imdb={$result->alternate_ids->imdb}">Download</a>
+					{/if}
+					<a style="display:{if $userimdbs[$result->alternate_ids->imdb] == ""}inline{else}none;{/if}" onclick="mymovie_add('{$result->alternate_ids->imdb}', this);return false;" class="rndbtn" href="#">Add To My Movies</a>
+					<a style="display:{if $userimdbs[$result->alternate_ids->imdb] != ""}inline{else}none;{/if}" onclick="mymovie_del('{$result->alternate_ids->imdb}', this);return false;" href="#" class="rndbtn">Remove From My Movies</a>
 				</td>
 			</tr>
 		{/foreach}

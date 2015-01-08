@@ -779,8 +779,8 @@ class Binaries
 					sprintf('
 						UPDATE %s
 						SET attempts = attempts + 1
-						WHERE group_id = %d
-						AND numberid <= %d',
+						WHERE groupID = %d
+						AND numberID <= %d',
 						$tableNames['prname'],
 						$groupArr['ID'],
 						$missingParts[$missingCount - 1]['numberID']
