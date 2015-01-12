@@ -6,7 +6,7 @@ require_once(WWW_DIR . "/lib/binaries.php");
 
 
 /* This script will update the groups table to get the new article numbers for each group you have activated.
-  It will also truncate the parts, binaries, collections, and missed_parts tables.
+  It will also truncate the parts, binaries, collections, and partrepair tables.
  */
 // TODO: Make this threaded so it goes faster.
 

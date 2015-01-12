@@ -319,12 +319,12 @@ class Groups
 		(new \Binaries(['Groups' => $this, 'Settings' => $this->pdo]))->purgeGroup($id);
 
 		// Remove rows from part repair.
-		$this->pdo->queryExec(sprintf("DELETE FROM missed_parts WHERE group_id = %d", $id));
+		$this->pdo->queryExec(sprintf("DELETE FROM partrepair WHERE group_id = %d", $id));
 
 		$this->pdo->queryExec(sprintf('DROP TABLE IF EXISTS collections_%d', $id));
 		$this->pdo->queryExec(sprintf('DROP TABLE IF EXISTS binaries_%d', $id));
 		$this->pdo->queryExec(sprintf('DROP TABLE IF EXISTS parts_%d', $id));
-		$this->pdo->queryExec(sprintf('DROP TABLE IF EXISTS missed_parts_%d', $id));
+		$this->pdo->queryExec(sprintf('DROP TABLE IF EXISTS partrepair_%d', $id));
 
 		// Reset the group stats.
 		return $this->pdo->queryExec(
@@ -346,13 +346,13 @@ class Groups
 		$this->pdo->queryExec("TRUNCATE TABLE collections");
 		$this->pdo->queryExec("TRUNCATE TABLE binaries");
 		$this->pdo->queryExec("TRUNCATE TABLE parts");
-		$this->pdo->queryExec("TRUNCATE TABLE missed_parts");
+		$this->pdo->queryExec("TRUNCATE TABLE partrepair");
 		$groups = $this->pdo->query("SELECT id FROM groups");
 		foreach ($groups as $group) {
 			$this->pdo->queryExec('DROP TABLE IF EXISTS collections_' . $group['id']);
 			$this->pdo->queryExec('DROP TABLE IF EXISTS binaries_' . $group['id']);
 			$this->pdo->queryExec('DROP TABLE IF EXISTS parts_' . $group['id']);
-			$this->pdo->queryExec('DROP TABLE IF EXISTS missed_parts_' . $group['id']);
+			$this->pdo->queryExec('DROP TABLE IF EXISTS partrepair_' . $group['id']);
 		}
 
 		// Reset the group stats.
@@ -453,8 +453,8 @@ class Groups
 	private $cbppTableNames;
 
 	/**
-	 * Get the names of the binaries/parts/part repair tables.
-	 * If TPG is on, try to create new tables for the groupID, if we fail, log the error and exit.
+	 * Get the names of the collections/binaries/parts/part repair tables.
+	 * If TPG is on, try to create new tables for the group_id, if we fail, log the error and exit.
 	 *
 	 * @param bool $tpgSetting false, tpg is off in site setting, true tpg is on in site setting.
 	 * @param int  $groupID    ID of the group.
@@ -471,6 +471,7 @@ class Groups
 		}
 
 		$tables = [];
+		$tables['cname']  = 'collections';
 		$tables['bname']  = 'binaries';
 		$tables['pname']  = 'parts';
 		$tables['prname'] = 'partrepair';
@@ -485,6 +486,7 @@ class Groups
 			}
 
 			$groupEnding = '_' . $groupID;
+			$tables['cname']  .= $groupEnding;
 			$tables['bname']  .= $groupEnding;
 			$tables['pname']  .= $groupEnding;
 			$tables['prname'] .= $groupEnding;

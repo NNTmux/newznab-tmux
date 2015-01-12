@@ -10,7 +10,7 @@ require_once(WWW_DIR . "/lib/ReleaseSearch.php");
 require_once(WWW_DIR . "/lib/ColorCLI.php");
 require_once(WWW_DIR . "/lib/ConsoleTools.php");
 require_once (NN_LIB . 'SphinxSearch.php');
-require_once("ReleaseCleaner.php");
+require_once (NN_LIB . 'ReleaseCleaning.php');
 require_once("nzbcontents.php");
 require_once("Info.php");
 require_once("Pprocess.php");

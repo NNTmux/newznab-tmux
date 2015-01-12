@@ -8,6 +8,9 @@ require_once(NN_LIB . 'ReleaseCleaning.php');
 require_once(NN_LIB . 'releaseimage.php');
 require_once(NN_LIB . 'releases.php');
 require_once(NN_LIB . 'site.php');
+require_once(NN_LIB . 'RequestIDLocal.php');
+require_once(NN_LIB . 'RequestIDWeb.php');
+require_once(NN_TMUX . 'lib' . DS . 'prehash.php');
 
 
 
@@ -128,7 +131,7 @@ class ProcessReleases
 		$this->collectionDelayTime = ($this->site->delaytime!= '' ? (int)$this->site->delaytime : 2);
 		$this->crossPostTime = ($this->site->crossposttime!= '' ? (int)$this->site->crossposttime : 2);
 		$this->releaseCreationLimit = ($this->site->maxnzbsprocessed != '' ? (int)$this->site->maxnzbsprocessed : 1000);
-		$this->completion = ($this->site->releasecompletion != '' ? (int)$this->site->releasecompletion : 0);
+		$this->completion = ($this->site->completionpercent != '' ? (int)$this->site->completionpercent : 0);
 		$this->processRequestIDs = (int)$this->site->lookup_reqids;
 		if ($this->completion > 100) {
 			$this->completion = 100;
@@ -264,11 +267,11 @@ class ProcessReleases
 	{
 		$cat = new \Categorize(['Settings' => $this->pdo]);
 		$categorized = $total = 0;
-		$releases = $this->pdo->queryDirect(sprintf('SELECT id, %s, group_id FROM releases %s', $type, $where));
+		$releases = $this->pdo->queryDirect(sprintf('SELECT id, %s, groupID FROM releases %s', $type, $where));
 		if ($releases && $releases->rowCount()) {
 			$total = $releases->rowCount();
 			foreach ($releases as $release) {
-				$catId = $cat->determineCategory($release[$type], $release['group_id']);
+				$catId = $cat->determineCategory($release[$type], $release['groupID']);
 				$this->pdo->queryExec(
 					sprintf('UPDATE releases SET categoryID = %d, iscategorized = 1 WHERE id = %d', $catId, $release['id'])
 				);
@@ -401,9 +404,9 @@ class ProcessReleases
 
 		$minSizeDeleted = $maxSizeDeleted = $minFilesDeleted = 0;
 
-		$maxSizeSetting = $this->pdo->getSetting('maxsizetoformrelease');
-		$minSizeSetting = $this->pdo->getSetting('minsizetoformrelease');
-		$minFilesSetting = $this->pdo->getSetting('minfilestoformrelease');
+		$maxSizeSetting = $this->site->maxsizetoformrelease;
+		$minSizeSetting = $this->site->minsizetoformrelease;
+		$minFilesSetting = $this->site->minfilestoformrelease;
 
 		foreach ($groupIDs as $groupID) {
 			if ($this->pdo->queryOneRow(
@@ -445,7 +448,7 @@ class ProcessReleases
 							AND filesize > %d',
 							$group['cname'],
 							self::COLLFC_SIZED,
-							$groupID['id'],
+							$groupID['ID'],
 							$maxSizeSetting
 						)
 					);
@@ -532,7 +535,7 @@ class ProcessReleases
 		}
 
 		if ($collections instanceof \Traversable) {
-			$preDB = new \PreDb(['Echo' => $this->echoCLI, 'Settings' => $this->pdo]);
+			$preDB = new \PreHash(['Echo' => $this->echoCLI, 'Settings' => $this->pdo]);
 
 			foreach ($collections as $collection) {
 
@@ -593,7 +596,7 @@ class ProcessReleases
 							'name' => $cleanRelName,
 							'searchname' => $this->pdo->escapeString(utf8_encode($cleanedName)),
 							'totalpart' => $collection['totalfiles'],
-							'group_id' => $collection['group_id'],
+							'groupID' => $collection['group_id'],
 							'guid' => $this->pdo->escapeString($this->releases->createGUID($cleanRelName)),
 							'postdate' => $this->pdo->escapeString($collection['date']),
 							'fromname' => $fromName,
@@ -601,7 +604,7 @@ class ProcessReleases
 							'categoryID' => $categorize->determineCategory($cleanedName, $collection['group_id']),
 							'isrenamed' => ($properName === true ? 1 : 0),
 							'reqidstatus' => ($isReqID === true ? 1 : 0),
-							'preid' => ($preID === false ? 0 : $preID),
+							'prehashID' => ($preID === false ? 0 : $preID),
 							'nzbstatus' => \NZB::NZB_NONE
 						]
 					);
@@ -682,7 +685,7 @@ class ProcessReleases
 				INNER JOIN category c ON r.categoryID = c.id
 				INNER JOIN category cp ON cp.id = c.parentid
 				WHERE %s nzbstatus = 0",
-				(!empty($groupID) ? ' r.group_id = ' . $groupID . ' AND ' : ' ')
+				(!empty($groupID) ? ' r.groupID = ' . $groupID . ' AND ' : ' ')
 			)
 		);
 
@@ -757,7 +760,7 @@ class ProcessReleases
 	 */
 	public function processRequestIDs($groupID = '', $limit = 5000, $local = true)
 	{
-		if ($local === false && $this->pdo->getSetting('lookup_reqids') == 0) {
+		if ($local === false && $this->site->lookup_reqids == 0) {
 			return;
 		}
 
@@ -827,7 +830,7 @@ class ProcessReleases
 		}
 		$this->categorizeRelease(
 			$type,
-			(!empty($groupID) ? 'WHERE iscategorized = 0 AND group_id = ' . $groupID : 'WHERE iscategorized = 0')
+			(!empty($groupID) ? 'WHERE iscategorized = 0 AND groupID = ' . $groupID : 'WHERE iscategorized = 0')
 		);
 
 		if ($this->echoCLI) {
@@ -888,7 +891,7 @@ class ProcessReleases
 			sprintf(
 				'DELETE FROM %s WHERE dateadded < (NOW() - INTERVAL %d HOUR) %s',
 				$group['cname'],
-				$this->pdo->getSetting('partretentionhours'),
+				$this->site->rawretentiondays,
 				(!empty($groupID) && $this->tablePerGroup === false ? ' AND group_id = ' . $groupID : '')
 			)
 		);
@@ -1064,20 +1067,20 @@ class ProcessReleases
 			$groupIDs = [['id' => $groupID]];
 		}
 
-		$maxSizeSetting = $this->pdo->getSetting('maxsizetoformrelease');
-		$minSizeSetting = $this->pdo->getSetting('minsizetoformrelease');
-		$minFilesSetting = $this->pdo->getSetting('minfilestoformrelease');
+		$maxSizeSetting = $this->site->maxsizetoformrelease;
+		$minSizeSetting = $this->site->minsizetoformrelease;
+		$minFilesSetting = $this->site->minfilestoformrelease;
 
 		foreach ($groupIDs as $groupID) {
 			$releases = $this->pdo->queryDirect(
 				sprintf("
 					SELECT r.guid, r.id
 					FROM releases r
-					INNER JOIN groups g ON g.id = r.group_id
-					WHERE r.group_id = %d
+					INNER JOIN groups g ON g.id = r.groupID
+					WHERE r.groupID = %d
 					AND greatest(IFNULL(g.minsizetoformrelease, 0), %d) > 0
 					AND r.size < greatest(IFNULL(g.minsizetoformrelease, 0), %d)",
-					$groupID['id'],
+					$groupID['ID'],
 					$minSizeSetting,
 					$minSizeSetting
 				)
@@ -1094,9 +1097,9 @@ class ProcessReleases
 					sprintf('
 						SELECT id, guid
 						FROM releases
-						WHERE group_id = %d
+						WHERE groupID = %d
 						AND size > %d',
-						$groupID['id'],
+						$groupID['ID'],
 						$maxSizeSetting
 					)
 				);
@@ -1112,11 +1115,11 @@ class ProcessReleases
 				sprintf("
 					SELECT r.id, r.guid
 					FROM releases r
-					INNER JOIN groups g ON g.id = r.group_id
-					WHERE r.group_id = %d
+					INNER JOIN groups g ON g.id = r.groupID
+					WHERE r.groupID = %d
 					AND greatest(IFNULL(g.minfilestoformrelease, 0), %d) > 0
 					AND r.totalpart < greatest(IFNULL(g.minfilestoformrelease, 0), %d)",
-					$groupID['id'],
+					$groupID['ID'],
 					$minFilesSetting,
 					$minFilesSetting
 				)
@@ -1163,11 +1166,11 @@ class ProcessReleases
 		}
 
 		// Releases past retention.
-		if ($this->pdo->getSetting('releaseretentiondays') != 0) {
+		if ($this->site->releaseretentiondays != 0) {
 			$releases = $this->pdo->queryDirect(
 				sprintf(
 					'SELECT id, guid FROM releases WHERE postdate < (NOW() - INTERVAL %d DAY)',
-					$this->pdo->getSetting('releaseretentiondays')
+					$this->site->releaseretentiondays
 				)
 			);
 			if ($releases instanceof \Traversable) {
@@ -1179,7 +1182,7 @@ class ProcessReleases
 		}
 
 		// Passworded releases.
-		if ($this->pdo->getSetting('deletepasswordedrelease') == 1) {
+		if ($this->site->deletepasswordedrelease == 1) {
 			$releases = $this->pdo->queryDirect(
 				sprintf(
 					'SELECT id, guid FROM releases WHERE passwordstatus = %d',
@@ -1195,7 +1198,7 @@ class ProcessReleases
 		}
 
 		// Possibly passworded releases.
-		if ($this->pdo->getSetting('deletepossiblerelease') == 1) {
+		if ($this->site->deletepossiblerelease == 1) {
 			$releases = $this->pdo->queryDirect(
 				sprintf(
 					'SELECT id, guid FROM releases WHERE passwordstatus = %d',
@@ -1261,7 +1264,7 @@ class ProcessReleases
 		// Delete smaller than category minimum sizes.
 		$categories = $this->pdo->queryDirect('
 			SELECT c.id AS id,
-			CASE WHEN c.minsize = 0 THEN cp.minsize ELSE c.minsize END AS minsize
+			CASE WHEN c.minsizetoformrelease = 0 THEN cp.minsizetoformrelease ELSE c.minsizetoformrelease END AS minsize
 			FROM category c
 			INNER JOIN category cp ON cp.id = c.parentid
 			WHERE c.parentid IS NOT NULL'
@@ -1313,15 +1316,15 @@ class ProcessReleases
 		}
 
 		// Misc other.
-		if ($this->pdo->getSetting('miscotherretentionhours') > 0) {
+		if ($this->site->miscotherretentionhours > 0) {
 			$releases = $this->pdo->queryDirect(
 				sprintf('
 					SELECT id, guid
 					FROM releases
 					WHERE categoryID = %d
 					AND adddate <= NOW() - INTERVAL %d HOUR',
-					\Category::CAT_MISC,
-					$this->pdo->getSetting('miscotherretentionhours')
+					\Category::CAT_MISC_OTHER,
+					$this->site->miscotherretentionhours
 				)
 			);
 			if ($releases instanceof \Traversable) {
@@ -1333,7 +1336,7 @@ class ProcessReleases
 		}
 
 		// Misc hashed.
-		if ($this->pdo->getSetting('mischashedretentionhours') > 0) {
+		if ($this->site->mischashedretentionhours > 0) {
 			$releases = $this->pdo->queryDirect(
 				sprintf('
 					SELECT ID, guid
