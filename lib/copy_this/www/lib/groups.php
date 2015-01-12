@@ -319,11 +319,12 @@ class Groups
 		(new \Binaries(['Groups' => $this, 'Settings' => $this->pdo]))->purgeGroup($id);
 
 		// Remove rows from part repair.
-		$this->pdo->queryExec(sprintf("DELETE FROM partrepair WHERE groupID = %d", $id));
+		$this->pdo->queryExec(sprintf("DELETE FROM missed_parts WHERE group_id = %d", $id));
 
+		$this->pdo->queryExec(sprintf('DROP TABLE IF EXISTS collections_%d', $id));
 		$this->pdo->queryExec(sprintf('DROP TABLE IF EXISTS binaries_%d', $id));
 		$this->pdo->queryExec(sprintf('DROP TABLE IF EXISTS parts_%d', $id));
-		$this->pdo->queryExec(sprintf('DROP TABLE IF EXISTS partrepair_%d', $id));
+		$this->pdo->queryExec(sprintf('DROP TABLE IF EXISTS missed_parts_%d', $id));
 
 		// Reset the group stats.
 		return $this->pdo->queryExec(
@@ -331,7 +332,7 @@ class Groups
 				UPDATE groups
 				SET backfill_target = 0, first_record = 0, first_record_postdate = NULL, last_record = 0,
 					last_record_postdate = NULL, last_updated = NULL
-				WHERE ID = %d", $id)
+				WHERE id = %d", $id)
 		);
 	}
 
@@ -342,14 +343,16 @@ class Groups
 	 */
 	public function resetall()
 	{
+		$this->pdo->queryExec("TRUNCATE TABLE collections");
 		$this->pdo->queryExec("TRUNCATE TABLE binaries");
 		$this->pdo->queryExec("TRUNCATE TABLE parts");
-		$this->pdo->queryExec("TRUNCATE TABLE partrepair");
-		$groups = $this->pdo->query("SELECT ID FROM groups");
+		$this->pdo->queryExec("TRUNCATE TABLE missed_parts");
+		$groups = $this->pdo->query("SELECT id FROM groups");
 		foreach ($groups as $group) {
-			$this->pdo->queryExec('DROP TABLE IF EXISTS binaries_' . $group['ID']);
-			$this->pdo->queryExec('DROP TABLE IF EXISTS parts_' . $group['ID']);
-			$this->pdo->queryExec('DROP TABLE IF EXISTS partrepair_' . $group['ID']);
+			$this->pdo->queryExec('DROP TABLE IF EXISTS collections_' . $group['id']);
+			$this->pdo->queryExec('DROP TABLE IF EXISTS binaries_' . $group['id']);
+			$this->pdo->queryExec('DROP TABLE IF EXISTS parts_' . $group['id']);
+			$this->pdo->queryExec('DROP TABLE IF EXISTS missed_parts_' . $group['id']);
 		}
 
 		// Reset the group stats.
@@ -520,21 +523,21 @@ class Groups
 	 */
 	public function createNewTPGTables($groupID)
 	{
-		foreach (['binaries', 'parts', 'partrepair'] as $tableName) {
+		foreach (['collections', 'binaries', 'parts', 'partrepair'] as $tableName) {
 			if ($this->pdo->queryExec(sprintf('SELECT * FROM %s_%s LIMIT 1', $tableName, $groupID), true) === false) {
 				if ($this->pdo->queryExec(sprintf('CREATE TABLE %s_%s LIKE %s', $tableName, $groupID, $tableName), true) === false) {
 					return false;
-				} /*else {
-					if ($tableName === 'binaries') {
+				} else {
+					if ($tableName === 'collections') {
 						$this->pdo->queryExec(
 							sprintf(
-								'CREATE TRIGGER delete_binaries_%s BEFORE DELETE ON binaries_%s FOR EACH ROW BEGIN' .
-								' DELETE FROM parts_%s WHERE binaryID = OLD.ID; END',
-								$groupID, $groupID, $groupID
+								'CREATE TRIGGER delete_collections_%s BEFORE DELETE ON collections_%s FOR EACH ROW BEGIN' .
+								' DELETE FROM binaries_%s WHERE collection_id = OLD.id; DELETE FROM parts_%s WHERE collection_id = OLD.id; END',
+								$groupID, $groupID, $groupID, $groupID
 							)
 						);
 					}
-				}*/
+				}
 			}
 		}
 		return true;

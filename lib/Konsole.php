@@ -7,7 +7,7 @@ require_once(WWW_DIR."/lib/genres.php");
 require_once(WWW_DIR."/lib/releaseimage.php");
 require_once(WWW_DIR."lib/Tmux.php");
 require_once(WWW_DIR . "/lib/ColorCLI.php");
-require_once(NN_TMUX . 'lib' . DS . 'Enzebe.php');
+require_once(WWW_DIR."/lib/nzb.php");
 
 
 class Konsole
@@ -669,7 +669,7 @@ class Konsole
 							AND categoryID BETWEEN 1000 AND 1999
 							ORDER BY postdate DESC
 							LIMIT %d',
-				\Enzebe::NZB_ADDED,
+				\NZB::NZB_ADDED,
 				$this->renamed,
 				$this->gameqty
 			)

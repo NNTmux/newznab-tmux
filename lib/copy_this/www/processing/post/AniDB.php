@@ -5,7 +5,7 @@ require_once(WWW_DIR . "/lib/releaseimage.php");
 require_once(WWW_DIR . "/lib/site.php");
 require_once(WWW_DIR . "/lib/ColorCLI.php");
 require_once(WWW_DIR . "/populate/AniDB.php");
-require_once(NN_TMUX . 'lib' . DS . 'Enzebe.php');
+require_once(WWW_DIR . "/lib/nzb.php");
 
 class PostAniDB
 {
@@ -75,7 +75,7 @@ class PostAniDB
 							AND categoryID = %d
 							ORDER BY postdate DESC
 							LIMIT %d',
-									 \Enzebe::NZB_ADDED,
+									 \NZB::NZB_ADDED,
 									 \Category::CAT_TV_ANIME,
 									 $this->aniqty
 							 )

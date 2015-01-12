@@ -12,6 +12,7 @@ require_once(WWW_DIR . "/lib/groups.php");
 require_once(WWW_DIR . "/lib/backfill.php");
 require_once(WWW_DIR . "/lib/nntp.php");
 require_once(WWW_DIR . "/lib/site.php");
+require_once(WWW_DIR . "/processing/ProcessReleases.php");
 require_once(NN_LIB . 'RequestIDLocal.php');
 
 
@@ -148,10 +149,15 @@ switch ($options[1]) {
 	// $options[2] => (string)groupCount, number of groups terminated by _ | (int)groupID, group to work on
 	case 'releases':
 		$pdo = new \DB();
-		$releases = new \Releases(['Settings' => $pdo]);
+		$releases = new ProcessReleases(['Settings' => $pdo]);
 
 		//Runs function that are per group
 		if (is_numeric($options[2])) {
+
+			if ($options[0] === 'python') {
+				collectionCheck($pdo, $options[2]);
+			}
+
 			processReleases($releases, $options[2]);
 
 		} else {
@@ -186,7 +192,7 @@ switch ($options[1]) {
 		$nntp = nntp($pdo);
 		$groups = new \Groups();
 		$groupMySQL = $groups->getByName($options[2]);
-		(new \Binaries())->updateGroup($groupMySQL);
+		(new \Binaries(['NNTP' => $nntp, 'Groups' => $groups, 'Settings' => $pdo]))->updateGroup($groupMySQL);
 		break;
 
 
@@ -270,15 +276,17 @@ switch ($options[1]) {
 /**
  * Create / process releases for a groupID.
  *
- * @param \Releases $releases
+ * @param \ProcessReleases $releases
  * @param int             $groupID
  */
 function processReleases($releases, $groupID)
 {
-    $releases->applyRegex($groupID);
-	$releases->processIncompleteBinaries($groupID);
+	$releases->processIncompleteCollections($groupID);
+	$releases->processCollectionSizes($groupID);
+	$releases->deleteUnwantedCollections($groupID);
 	$releases->createReleases($groupID);
-	$releases->deleteBinaries($groupID);
+	$releases->createNZBs($groupID);
+	$releases->deleteCollections($groupID);
 }
 
 /**

@@ -215,6 +215,7 @@ class Tmux
 					(%1\$s 'rel_timer') AS rel_timer,
 					(%1\$s 'fix_timer') AS fix_timer,
 					(%1\$s 'post_timer') AS post_timer,
+					(%1\$s 'collections_kill') AS collections_kill,
 					(%1\$s 'postprocess_kill') AS postprocess_kill,
 					(%1\$s 'crap_timer') AS crap_timer,
 					(%1\$s 'fix_crap') AS fix_crap,
@@ -419,6 +420,7 @@ class Tmux
 					(SELECT TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES WHERE table_name = 'partrepair' AND TABLE_SCHEMA = %1\$s) AS partrepair_table,
 					(SELECT TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES WHERE table_name = 'parts' AND TABLE_SCHEMA = %1\$s) AS parts_table,
 					(SELECT TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES WHERE table_name = 'binaries' AND TABLE_SCHEMA = %1\$s) AS binaries_table,
+					(SELECT TABLE_ROWS FROM information_schema.TABLES WHERE table_name = 'collections' AND TABLE_SCHEMA = %1\$s) AS collections_table,
 					(SELECT TABLE_ROWS FROM INFORMATION_SCHEMA.TABLES WHERE table_name = 'releases' AND TABLE_SCHEMA = %1\$s) AS releases,
 					(SELECT COUNT(*) FROM groups WHERE first_record IS NOT NULL AND backfill = 1
 						AND (now() - INTERVAL backfill_target DAY) < first_record_postdate
@@ -430,6 +432,7 @@ class Tmux
 			case 6:
 				return "SELECT
 					(SELECT searchname FROM releases ORDER BY ID DESC LIMIT 1) AS newestrelname,
+					(SELECT UNIX_TIMESTAMP(MIN(dateadded)) FROM collections) AS oldestcollection,
 					(SELECT UNIX_TIMESTAMP(MAX(predate)) FROM prehash) AS newestprehash,
 					(SELECT UNIX_TIMESTAMP(MAX(ctime)) FROM predb) AS newestpredb,
 					(SELECT UNIX_TIMESTAMP(adddate) FROM releases ORDER BY ID DESC LIMIT 1) AS newestrelease";

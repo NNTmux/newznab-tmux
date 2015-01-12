@@ -2,6 +2,7 @@
 require_once(WWW_DIR . "/lib/framework/db.php");
 require_once(WWW_DIR . "/lib/site.php");
 require_once(WWW_DIR . "/lib/Tmux.php");
+require_once(WWW_DIR . "/lib/nzb.php");
 require_once(WWW_DIR . "/lib/util.php");
 require_once(WWW_DIR . "/lib/rarinfo/par2info.php");
 require_once(WWW_DIR . "/lib/rarinfo/sfvinfo.php");
@@ -260,7 +261,7 @@ class Info
 		return (
 		sprintf(
 			'AND r.nzbstatus = %d AND r.nfostatus BETWEEN %d AND %d %s %s',
-			Enzebe::NZB_ADDED,
+			NZB::NZB_ADDED,
 			($maxRetries < -8 ? -8 : $maxRetries),
 			self::NFO_UNPROC,
 			(($maxSize != '' && $maxSize > 0) ? ('AND r.size < ' . ($maxSize * 1073741824)) : ''),
@@ -395,7 +396,7 @@ class Info
 				FROM releases r
 				WHERE r.nzbstatus = %d
 				AND r.nfostatus < %d %s %s',
-				Enzebe::NZB_ADDED,
+				NZB::NZB_ADDED,
 				$this->maxRetries,
 				$groupIDQuery,
 				$guidCharQuery
@@ -418,7 +419,7 @@ class Info
 				WHERE r.nzbstatus = %d
 				AND r.nfostatus < %d %s %s',
 				self::NFO_FAILED,
-				Enzebe::NZB_ADDED,
+				NZB::NZB_ADDED,
 				$this->maxRetries,
 				$groupIDQuery,
 				$guidCharQuery

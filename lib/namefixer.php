@@ -14,7 +14,6 @@ require_once("ReleaseCleaner.php");
 require_once("nzbcontents.php");
 require_once("Info.php");
 require_once("Pprocess.php");
-require_once("Enzebe.php");
 
 
 //This script is ported from nZEDb and adapted for newznab
@@ -191,7 +190,7 @@ class NameFixer
 					INNER JOIN releasenfo nfo ON (nfo.releaseID = rel.ID)
 					WHERE nzbstatus = %d
 					AND prehashID = 0',
-				Enzebe::NZB_ADDED
+				NZB::NZB_ADDED
 			);
 			$cats = 2;
 			$preId = true;
@@ -271,7 +270,7 @@ class NameFixer
 					INNER JOIN releasefiles rf ON (rf.releaseID = rel.ID)
 					WHERE nzbstatus = %d
 					AND prehashID = 0',
-				Enzebe::NZB_ADDED
+				NZB::NZB_ADDED
 			);
 			$cats = 2;
 			$preId = true;
@@ -331,7 +330,7 @@ class NameFixer
 					FROM releases rel
 					WHERE nzbstatus = %d
 					AND prehashID = 0',
-				Enzebe::NZB_ADDED
+				NZB::NZB_ADDED
 			);
 			$cats = 2;
 		} else {

@@ -25,7 +25,7 @@ require_once(WWW_DIR . "lib/XXX.php");
 require_once(WWW_DIR . "lib/Logger.php");
 require_once(WWW_DIR . "/lib/ConsoleTools.php");
 require_once(WWW_DIR . "/lib/ColorCLI.php");
-require_once(WWW_DIR . "/post/AniDB.php");
+require_once(WWW_DIR . "/processing/post/AniDB.php");
 require_once("nzbcontents.php");
 require_once("namefixer.php");
 require_once("Info.php");
