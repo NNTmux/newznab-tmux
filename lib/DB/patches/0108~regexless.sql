@@ -80,6 +80,6 @@ CREATE TABLE partrepair (
 )
   ENGINE = MYISAM
   DEFAULT CHARSET = utf8
-  COLLATE = utf8_unicode_ci
+  COLLATE = utf8_unicode_ci;
 
 UPDATE `tmux` SET `value` = '108' WHERE `setting` = 'sqlpatch';
