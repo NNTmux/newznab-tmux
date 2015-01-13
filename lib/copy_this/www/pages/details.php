@@ -11,9 +11,9 @@ require_once(WWW_DIR."/lib/episode.php");
 require_once(WWW_DIR . "/lib/XXX.php");
 require_once(WWW_DIR . "/lib/Games.php");
 require_once(WWW_DIR . "/lib/util.php");
-require_once(WWW_DIR . "../misc/update_scripts/nix_scripts/tmux/lib/Film.php");
-require_once(WWW_DIR . "../misc/update_scripts/nix_scripts/tmux/lib/TraktTv.php");
-require_once(WWW_DIR . "../misc/update_scripts/nix_scripts/tmux/lib/TvAnger.php");
+require_once(NN_TMUX . 'lib' . DS . 'Film.php');
+require_once(NN_TMUX . 'lib' . DS . 'TraktTv.php');
+require_once(NN_TMUX . 'lib' . DS . 'TvAnger.php');
 
 
 if (!$users->isLoggedIn())
@@ -21,7 +21,7 @@ if (!$users->isLoggedIn())
 
 if (isset($_GET["id"]))
 {
-	$releases = new Releases;
+	$releases = new Releases(['Settings' => $page->settings]);
 	$rc = new ReleaseComments;
 	$re = new ReleaseExtra;
 	$data = $releases->getByGuid($_GET["id"]);
@@ -30,7 +30,7 @@ if (isset($_GET["id"]))
 		$page->show404();
 
 	if ($page->isPostBack())
-		$rc->addComment($data["ID"], $data["gid"], $_POST["txtAddComment"], $users->currentUserId(), $_SERVER['REMOTE_ADDR']);
+		$rc->addComment($data["id"], $data["gid"], $_POST["txtAddComment"], $users->currentUserId(), $_SERVER['REMOTE_ADDR']);
 
 	$nfo = $releases->getReleaseNfo($data["ID"], false);
 	$reVideo = $re->getVideo($data["ID"]);
@@ -39,7 +39,7 @@ if (isset($_GET["id"]))
 	$comments = $rc->getCommentsByGid($data["gid"]);
 
 	$rage = '';
-	if ($data["rageID"] != '')
+	if ($data["rageid"] != '')
 	{
 		$tvrage = new TvAnger();
 
@@ -61,7 +61,7 @@ if (isset($_GET["id"]))
 
 				if (!empty($r['imgdata'])) {
 					$seriesimg[] = $r['imgdata'];
-					$seriesid[] = $r['ID'];
+					$seriesid[] = $r['id'];
 				}
 			}
 			$rage = array(

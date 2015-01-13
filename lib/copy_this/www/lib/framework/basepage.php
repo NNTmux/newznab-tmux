@@ -1,6 +1,6 @@
 <?php
 require_once(SMARTY_DIR.'Smarty.class.php');
-require_once(WWW_DIR."/lib/framework/db.php");
+require_once(NN_LIB .'framework' . DS . 'db.php');
 require_once(WWW_DIR."/lib/users.php");
 require_once(WWW_DIR."/lib/site.php");
 require_once(WWW_DIR."/lib/sabnzbd.php");
@@ -8,6 +8,16 @@ require_once (NN_LIB . 'SmartyUtils.php');
 
 class BasePage
 {
+	/**
+	 * @var DB
+	 */
+	public $settings = null;
+
+	/**
+	 * @var Users
+	 */
+	public $users = null;
+
 	public $title = '';
 	public $content = '';
 	public $head = '';
