@@ -184,6 +184,7 @@ class Tmux
 					(%2\$s 'sqlpatch') AS sqlpatch,
 					(%2\$s 'alternate_nntp') AS alternate_nntp,
 					(%2\$s 'tablepergroup') AS tablepergroup,
+					(%2\$s 'delaytime') AS delaytime,
 					(%2\$s 'nntpproxy') AS nntpproxy",
 					$tmuxstr,
 					$settstr

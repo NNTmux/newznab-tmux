@@ -50,16 +50,16 @@ if (count($session) !== 0) {
 }
 
 //reset collections dateadded to now if dateadded > delay time check
-echo $pdo->log->header("Resetting expired collections dateadded to now. This could take a minute or two. Really.");
+echo $db->log->header("Resetting expired collections dateadded to now. This could take a minute or two. Really.");
 
 if ($tablepergroup == 1) {
 	$sql    = "SHOW table status";
-	$tables = $pdo->queryDirect($sql);
+	$tables = $db->queryDirect($sql);
 	$ran    = 0;
 	foreach ($tables as $row) {
-		$tbl = $row['name'];
+		$tbl = $row['Name'];
 		if (preg_match('/collections_\d+/', $tbl)) {
-			$run = $pdo->queryExec('UPDATE ' . $tbl .
+			$run = $db->queryExec('UPDATE ' . $tbl .
 				' SET dateadded = now() WHERE dateadded < now() - INTERVAL ' .
 				$delaytimet . ' HOUR');
 			if ($run !== false) {
@@ -67,15 +67,15 @@ if ($tablepergroup == 1) {
 			}
 		}
 	}
-	echo $pdo->log->primary(number_format($ran) . " collections reset.");
+	echo $db->log->primary(number_format($ran) . " collections reset.");
 } else {
 	$ran = 0;
-	$run = $pdo->queryExec('update collections set dateadded = now() WHERE dateadded < now() - INTERVAL ' .
+	$run = $db->queryExec('update collections set dateadded = now() WHERE dateadded < now() - INTERVAL ' .
 		$delaytimet . ' HOUR');
 	if ($run !== false) {
 		$ran += $run->rowCount();
 	}
-	echo $pdo->log->primary(number_format($ran) . " collections reset.");
+	echo $db->log->primary(number_format($ran) . " collections reset.");
 }
 sleep(2);
 
@@ -239,8 +239,8 @@ function window_optimize($tmux_session)
 
 function window_sharing($tmux_session)
 {
-	$pdo = new DB();
-	$sharing = $pdo->queryOneRow('SELECT enabled, posting, fetching FROM sharing');
+	$db = new DB();
+	$sharing = $db->queryOneRow('SELECT enabled, posting, fetching FROM sharing');
 	$t = new \Tmux();
 	$tmux = $t->get();
 	$tmux_share = (isset($tmux->run_sharing)) ? $tmux->run_sharing : 0;

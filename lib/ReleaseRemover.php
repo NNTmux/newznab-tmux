@@ -3,10 +3,12 @@ require_once(WWW_DIR . "/lib/framework/cache.php");
 require_once(WWW_DIR . "/lib/framework/db.php");
 require_once(WWW_DIR . "/lib/releases.php");
 require_once(WWW_DIR . "/lib/category.php");
+require_once(WWW_DIR . "/lib/binaries.php");
 require_once(WWW_DIR . "/lib/releaseimage.php");
 require_once(WWW_DIR . "/lib/ConsoleTools.php");
 require_once(WWW_DIR . "/lib/ColorCLI.php");
-require_once("Enzebe.php");
+require_once(WWW_DIR . "/lib/nzb.php");
+
 
 /**
  * Handles removing of various unwanted releases.
@@ -684,7 +686,7 @@ class ReleaseRemover
 				'SELECT regex, ID, groupname, msgcol
 				FROM binaryblacklist
 				WHERE optype = %d %s %s',
-				\Binaries::OPT_BLACKLIST,
+				\Binaries::OPTYPE_BLACKLIST,
 				$this->blacklistID,
 				$status
 			)
@@ -876,7 +878,7 @@ class ReleaseRemover
 				AND optype = %d
 				AND msgcol = %d',
 				\Binaries::BLACKLIST_ENABLED,
-				\Binaries::OPT_BLACKLIST,
+				\Binaries::OPTYPE_BLACKLIST,
 				\Binaries::BLACKLIST_FIELD_SUBJECT
 			)
 		);

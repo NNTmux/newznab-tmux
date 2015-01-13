@@ -57,6 +57,9 @@ $runVar['counts']['iterations'] = 1;
 $runVar['modsettings']['fc']['firstrun'] = true;
 $runVar['modsettings']['fc']['num'] = 0;
 
+$tblCount = "SELECT TABLE_ROWS AS count FROM information_schema.TABLES WHERE TABLE_NAME = :table AND TABLE_SCHEMA = " . $pdo->escapeString($db_name);
+$psTableRowCount = $pdo->Prepare($tblCount);
+
 while ($runVar['counts']['iterations'] > 0) {
 
 	//check the db connection
@@ -197,7 +200,7 @@ while ($runVar['counts']['iterations'] > 0) {
 			} else {
 				if ($tables instanceof \Traversable) {
 					foreach ($tables as $row) {
-						$tbl   = $row['name'];
+						$tbl   = $row['Name'];
 						$stamp = 'UNIX_TIMESTAMP(MIN(dateadded))';
 
 						switch (true) {
@@ -222,7 +225,7 @@ while ($runVar['counts']['iterations'] > 0) {
 								break;
 							// This case must come before the 'parts_' one.
 							case strpos($tbl, 'partrepair_') !== false:
-								$runVar['counts']['now']['missed_parts_table'] += getTableRowCount($psTableRowCount,
+								$runVar['counts']['now']['partrepair_table'] += getTableRowCount($psTableRowCount,
 									$tbl);
 
 								break;
@@ -315,6 +318,10 @@ while ($runVar['counts']['iterations'] > 0) {
 		? true
 		: false
 	);
+	$runVar['killswitch']['coll'] = (($runVar['settings']['collections_kill'] < $runVar['counts']['now']['collections_table']) && ($runVar['settings']['collections_kill'] != 0)
+		? true
+		: false
+	);
 
 	$tOut->updateMonitorPane($runVar);
 
@@ -370,4 +377,16 @@ function errorOnSQL($pdo)
 {
 	echo $pdo->log->error(PHP_EOL . "Monitor encountered severe errors retrieving process data from MySQL.  Please diagnose and try running again." . PHP_EOL);
 	exit;
+}
+
+function getTableRowCount(PDOStatement &$ps, $table)
+{
+	$success = $ps->execute([':table' => $table]);
+	if ($success) {
+		$result = $ps->fetch();
+
+		return is_numeric($result['count']) ? $result['count'] : 0;
+	}
+
+	return false;
 }

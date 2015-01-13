@@ -891,7 +891,7 @@ class Releases
 						$children = $Category->getChildren($category);
 						$childList = '-99';
 						foreach ($children as $child) {
-							$childList .= ', ' . $child['id'];
+							$childList .= ', ' . $child['ID'];
 						}
 
 						if ($childList != '-99') {

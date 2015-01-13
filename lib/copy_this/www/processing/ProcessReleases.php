@@ -586,7 +586,7 @@ class ProcessReleases
 						$preMatch = $preDB->matchPre($cleanedName);
 						if ($preMatch !== false) {
 							$cleanedName = $preMatch['title'];
-							$preID = $preMatch['preid'];
+							$preID = $preMatch['prehashID'];
 							$properName = true;
 						}
 					}
