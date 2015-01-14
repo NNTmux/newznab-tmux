@@ -75,7 +75,7 @@ switch ($options[1]) {
 				return;
 			}
 		}
-		$binaries = new \Binaries();
+		$binaries = new \Binaries(['NNTP' => $nntp, 'Settings' => $pdo, 'Groups' => $groups]);
 		$return = $binaries->scan($groupMySQL, $options[4], $options[5], ($site->safepartrepair == 1 ? 'update' : 'backfill'));
 		if (empty($return)) {
 			exit();
@@ -142,7 +142,7 @@ switch ($options[1]) {
 				exit();
 			}
 		}
-		(new \Binaries())->partRepair($nntp, $groupMySQL);
+		(new \Binaries(['NNTP' => $nntp, 'Groups' => $groups, 'Settings' => $pdo]))->partRepair($groupMySQL);
 		break;
 
 	// Process releases.

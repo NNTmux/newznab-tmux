@@ -30,7 +30,6 @@ require_once("TraktTv.php");
 require_once("Film.php");
 require_once("TvAnger.php");
 require_once("Konsole.php");
-require_once("Enzebe.php");
 
 Class ProcessAdditional
 {
@@ -307,7 +306,7 @@ Class ProcessAdditional
 		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 		$this->_nntp = ($options['NNTP'] instanceof NNTP ? $options['NNTP'] : new NNTP(['Echo' => $this->_echoCLI, 'Settings' => $this->pdo]));
 
-		$this->_nzb = ($options['NZB'] instanceof Enzebe ? $options['NZB'] : new Enzebe($this->pdo));
+		$this->_nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB($this->pdo));
 		$this->_groups = ($options['Groups'] instanceof Groups ? $options['Groups'] : new Groups(['Settings' => $this->pdo]));
 		$this->_archiveInfo = new ArchiveInfo();
 		$this->_releaseFiles = ($options['ReleaseFiles'] instanceof ReleaseFiles ? $options['ReleaseFiles'] : new ReleaseFiles($this->pdo));
@@ -320,7 +319,6 @@ Class ProcessAdditional
 		$this->sphinx = ($options['SphinxSearch'] instanceof \SphinxSearch ? $options['SphinxSearch'] : new \SphinxSearch());
 		$s = new Sites();
 		$this->site = $s->get();
-		$this->nnnzb = new NZB();
 
 		$this->_innerFileBlacklist = ($this->site->innerfileblacklist == '' ? false : $this->site->innerfileblacklist);
 		$this->_maxNestedLevels = ($this->site->maxnestedlevels == 0 ? 3 : $this->site->maxnestedlevels);
@@ -712,7 +710,7 @@ Class ProcessAdditional
 	 */
 	protected function _getNZBContents()
 	{
-		$nzbPath = $this->nnnzb->getNZBPath($this->_release['guid']);
+		$nzbPath = $this->_nzb->NZBPath($this->_release['guid']);
 		if ($nzbPath === false) {
 
 			$this->_echo('NZB not found for GUID: ' . $this->_release['guid'], 'warning');

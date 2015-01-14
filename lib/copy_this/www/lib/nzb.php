@@ -2,7 +2,6 @@
 require_once(WWW_DIR . "/lib/framework/db.php");
 require_once(WWW_DIR . "/lib/site.php");
 require_once(WWW_DIR . "/lib/category.php");
-require_once(WWW_DIR . "../misc/update_scripts/nix_scripts/tmux/lib/Enzebe.php");
 
 /**
  * Class for reading and writing NZB files on the hard disk,
@@ -171,6 +170,7 @@ class NZB
 		$fp = gzopen($path, 'wb7');
 		if ($fp) {
 			$nzb_guid = '';
+			$gid = '';
 			gzwrite(
 				$fp,
 				sprintf(
@@ -203,6 +203,9 @@ class NZB
 									if ($nzb_guid === '') {
 										$nzb_guid = $part['messageid'];
 									}
+									if ($gid === '') {
+										$gid = $part['messageid'];
+									}
 									$string .= (
 										'  <segment bytes="' . $part['size']
 										. '" number="' . $part['partnumber'] . '">'
@@ -230,9 +233,10 @@ class NZB
 			if (is_file($path)) {
 				$this->pdo->queryExec(
 					sprintf('
-						UPDATE releases SET nzbstatus = %d %s WHERE id = %d',
+						UPDATE releases SET nzbstatus = %d %s %s WHERE id = %d',
 						\NZB::NZB_ADDED,
 						($nzb_guid === '' ? '' : ', nzb_guid = ' . $this->pdo->escapestring(md5($nzb_guid))),
+						($gid === '' ? '' : ', gid = ' . $this->pdo->escapestring(md5($gid))),
 						$relID
 					)
 				);

@@ -912,6 +912,7 @@ class SpotNab {
 
 		$db = new DB();
 		$nzb = new NZB();
+		$releaseImage = new ReleaseImage();
 
 		$processed = 0;
 
@@ -927,13 +928,13 @@ class SpotNab {
 			if($limit > 0 && $processed >= $limit)
 				break;
         	$batch=($limit > 0 && $batch > $limit)?$limit:$batch;
-			$res = $db->query(sprintf($fsql, $offset, $batch));
+			$res = $db->queryExec(sprintf($fsql, $offset, $batch));
 			if(!$res)break;
 			if(count($res) <= 0)break;
 			$offset += $batch;
 
 			foreach ($res as $r){
-				$nzbfile = $nzb->getNZBPath($r["guid"]);
+				$nzbfile = $nzb->NZBPath($r["guid"]);
 				if($nzbfile === Null){
 					continue;
 				}
@@ -943,7 +944,7 @@ class SpotNab {
 				{
 					if($delete_broken_releases){
 						$release = new Releases();
-						$release->delete($r['ID']);
+						$release->deleteSingle(['g' => $r['guid'], 'i' => $r['ID']], $nzb, $releaseImage);
 						// Free the variable in an attempt to recover memory
 						unset($release);
 				        echo '-';
@@ -962,7 +963,7 @@ class SpotNab {
 				if(!$gid){
 					if($delete_broken_releases){
 						$release = new Releases();
-						$release->delete($r['ID']);
+						$release->deleteSingle(['g' => $r['guid'], 'i' => $r['ID']], $nzb, $releaseImage);
 						unset($release);
 				        echo '-';
 					}else{
@@ -974,6 +975,7 @@ class SpotNab {
 
 				// Update DB With Global Identifer
 				$ures = $db->queryExec(sprintf($usql, $gid, $r['ID']));
+				var_dump($ures);
 				if($ures < 0){
 					printf("\nPostPrc : Failed to update: %s\n", $r['name']);
 				}
@@ -991,6 +993,7 @@ class SpotNab {
 				.'AND releases.GID IS NOT NULL ';
 
         $affected = $db->queryExec(sprintf($usql));
+		var_dump($affected);
 		if($affected > 0)
 			$processed += $affected;
 		return $processed;
