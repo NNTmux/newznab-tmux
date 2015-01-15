@@ -141,7 +141,7 @@ switch ($options[1]) {
 				exit();
 			}
 		}
-		(new \Binaries())->partRepair($nntp, $groupMySQL);
+		(new \Binaries())->partRepair($groupMySQL);
 		break;
 
 	// Process releases.
