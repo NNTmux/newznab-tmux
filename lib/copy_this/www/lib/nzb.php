@@ -300,22 +300,6 @@ class NZB
 	}
 
 	/**
-	 * Determine is an NZB exists, returning the path+filename, if not return false.
-	 *
-	 * @param  string $releaseGuid              The guid of the release.
-	 *
-	 * @return bool|string On success: (string) Path+file name of the nzb.
-	 *                     On failure: (bool)   False.
-	 *
-	 * @access public
-	 */
-	public function NZBPath($releaseGuid)
-	{
-		$nzbFile = $this->NZBPath($releaseGuid);
-		return (is_file($nzbFile) ? $nzbFile : false);
-	}
-
-	/**
 	 * Retrieve various information on a NZB file (the subject, # of pars,
 	 * file extensions, file sizes, file completion, group names, # of parts).
 	 *
