@@ -376,7 +376,7 @@ class PostProcess
                 // only load nzbs and check for rar files if we are doing something with them.
                 if ($processVideoSample || $processMediainfo || $processPasswords || $processAudioSample)
                 {
-                    $nzbfile = $nzb->getNZBPath($rel['guid'], $this->site->nzbpath);
+                    $nzbfile = $nzb->NZBPath($rel['guid'], $this->site->nzbpath);
                     if (!$nzbInfo->loadFromFile($nzbfile))
                     {
                         continue;

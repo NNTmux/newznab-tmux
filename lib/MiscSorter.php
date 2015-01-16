@@ -11,7 +11,6 @@ require_once(WWW_DIR . "/lib/nzb.php");
 require_once(WWW_DIR . "/lib/ColorCLI.php");
 require_once("Info.php");
 require_once("Film.php");
-require_once("Enzebe.php");
 require_once("namefixer.php");
 require_once("Konsole.php");
 require_once(WWW_DIR . "/lib/ReleaseCleaning.php");

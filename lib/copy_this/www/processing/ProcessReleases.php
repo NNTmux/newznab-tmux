@@ -3,7 +3,6 @@ require_once(NN_LIB . 'framework' . DS . 'db.php');
 require_once(NN_LIB . 'nzb.php');
 require_once(NN_LIB . 'groups.php');
 require_once(NN_LIB . 'ConsoleTools.php');
-require_once(NN_TMUX . 'lib' . DS . 'Enzebe.php');
 require_once(NN_LIB . 'ReleaseCleaning.php');
 require_once(NN_LIB . 'releaseimage.php');
 require_once(NN_LIB . 'releases.php');
@@ -11,6 +10,7 @@ require_once(NN_LIB . 'site.php');
 require_once(NN_LIB . 'RequestIDLocal.php');
 require_once(NN_LIB . 'RequestIDWeb.php');
 require_once(NN_TMUX . 'lib' . DS . 'prehash.php');
+require_once(NN_TMUX . 'lib' . DS . 'Pprocess.php');
 
 
 
@@ -222,7 +222,7 @@ class ProcessReleases
 
 		//Print amount of added releases and time it took.
 		if ($this->echoCLI && $this->tablePerGroup === false) {
-			$countID = $this->pdo->queryOneRow('SELECT COUNT(ID) AS count FROM collections ' . (!empty($groupID) ? ' WHERE group_id = ' . $groupID : ''));
+			$countID = $this->pdo->queryOneRow('SELECT COUNT(id) AS count FROM collections ' . (!empty($groupID) ? ' WHERE group_id = ' . $groupID : ''));
 			$this->pdo->log->doEcho(
 				$this->pdo->log->primary(
 					'Completed adding ' .
@@ -250,7 +250,7 @@ class ProcessReleases
 	public function resetCategorize($where = '')
 	{
 		$this->pdo->queryExec(
-			sprintf('UPDATE releases SET categoryID = %d, iscategorized = 0 %s', \Category::CAT_MISC, $where)
+			sprintf('UPDATE releases SET categoryID = %d, iscategorized = 0 %s', \Category::CAT_MISC_OTHER, $where)
 		);
 	}
 
@@ -267,13 +267,13 @@ class ProcessReleases
 	{
 		$cat = new \Categorize(['Settings' => $this->pdo]);
 		$categorized = $total = 0;
-		$releases = $this->pdo->queryDirect(sprintf('SELECT id, %s, groupID FROM releases %s', $type, $where));
+		$releases = $this->pdo->queryDirect(sprintf('SELECT ID, %s, groupID FROM releases %s', $type, $where));
 		if ($releases && $releases->rowCount()) {
 			$total = $releases->rowCount();
 			foreach ($releases as $release) {
 				$catId = $cat->determineCategory($release[$type], $release['groupID']);
 				$this->pdo->queryExec(
-					sprintf('UPDATE releases SET categoryID = %d, iscategorized = 1 WHERE id = %d', $catId, $release['id'])
+					sprintf('UPDATE releases SET categoryID = %d, iscategorized = 1 WHERE ID = %d', $catId, $release['ID'])
 				);
 				$categorized++;
 				if ($this->echoCLI) {
@@ -411,7 +411,7 @@ class ProcessReleases
 		foreach ($groupIDs as $groupID) {
 			if ($this->pdo->queryOneRow(
 					sprintf(
-						'SELECT id FROM %s WHERE filecheck = %d AND filesize > 0 AND group_id = %d LIMIT 1',
+						'SELECT ID FROM %s WHERE filecheck = %d AND filesize > 0 AND group_id = %d LIMIT 1',
 						$group['cname'],
 						self::COLLFC_SIZED,
 						$groupID['id']
@@ -552,7 +552,7 @@ class ProcessReleases
 				// A 1% variance in size is considered the same size when the subject and poster are the same
 				$dupeCheck = $this->pdo->queryOneRow(
 					sprintf("
-						SELECT id
+						SELECT ID
 						FROM releases
 						WHERE name = %s
 						AND fromname = %s
@@ -680,10 +680,10 @@ class ProcessReleases
 		$releases = $this->pdo->queryDirect(
 			sprintf("
 				SELECT CONCAT(COALESCE(cp.title,'') , CASE WHEN cp.title IS NULL THEN '' ELSE ' > ' END , c.title) AS title,
-					r.name, r.id, r.guid
+					r.name, r.ID, r.guid
 				FROM releases r
-				INNER JOIN category c ON r.categoryID = c.id
-				INNER JOIN category cp ON cp.id = c.parentid
+				INNER JOIN category c ON r.categoryID = c.ID
+				INNER JOIN category cp ON cp.ID = c.parentID
 				WHERE %s nzbstatus = 0",
 				(!empty($groupID) ? ' r.groupID = ' . $groupID . ' AND ' : ' ')
 			)
@@ -697,7 +697,7 @@ class ProcessReleases
 			$this->nzb->initiateForWrite($groupID);
 			foreach ($releases as $release) {
 
-				if ($this->nzb->writeNZBforReleaseId($release['id'], $release['guid'], $release['name'], $release['title']) === true) {
+				if ($this->nzb->writeNZBforReleaseId($release['ID'], $release['guid'], $release['name'], $release['title']) === true) {
 					$nzbCount++;
 					if ($this->echoCLI) {
 						echo $this->pdo->log->primaryOver("Creating NZBs:\t" . $nzbCount . '/' . $total . "\r");
@@ -720,7 +720,7 @@ class ProcessReleases
 			$deleteQuery = $this->pdo->queryExec(
 				sprintf('
 					DELETE c FROM %s c
-					INNER JOIN releases r ON r.id = c.releaseid
+					INNER JOIN releases r ON r.ID = c.releaseid
 					WHERE r.nzbstatus = %d
 					AND c.filecheck = %d',
 					$group['cname'],
@@ -850,7 +850,7 @@ class ProcessReleases
 	public function postProcessReleases($postProcess, &$nntp)
 	{
 		if ($postProcess == 1) {
-			(new PostProcess(['Echo' => $this->echoCLI, 'Settings' => $this->pdo, 'Groups' => $this->groups]))->processAll($nntp);
+			(new PProcess(['Echo' => $this->echoCLI, 'Settings' => $this->pdo, 'Groups' => $this->groups]))->processAll($nntp);
 		} else {
 			if ($this->echoCLI) {
 				$this->pdo->log->doEcho(
@@ -937,7 +937,7 @@ class ProcessReleases
 		if (mt_rand(0, 100) <= 5) {
 			$deleteQuery = $this->pdo->queryExec(
 				sprintf(
-					'DELETE FROM %s WHERE binaryid NOT IN (SELECT id FROM %s) %s',
+					'DELETE FROM %s WHERE binaryid NOT IN (SELECT ID FROM %s) %s',
 					$group['pname'], $group['bname'], $this->minMaxQueryFormulator($group['pname'], 40000)
 				)
 			);
@@ -960,7 +960,7 @@ class ProcessReleases
 		// Binaries that somehow have no collection. Don't delete currently inserting binaries by checking the max id.
 		$deleteQuery = $this->pdo->queryExec(
 			sprintf(
-				'DELETE FROM %s WHERE collection_id NOT IN (SELECT id FROM %s) %s',
+				'DELETE FROM %s WHERE collection_id NOT IN (SELECT ID FROM %s) %s',
 				$group['bname'], $group['cname'], $this->minMaxQueryFormulator($group['bname'], 20000)
 			)
 		);
@@ -982,7 +982,7 @@ class ProcessReleases
 		// Collections that somehow have no binaries.
 		$collectionIDs = $this->pdo->queryDirect(
 			sprintf(
-				'SELECT id FROM %s WHERE id NOT IN (SELECT collection_id FROM %s) %s',
+				'SELECT ID FROM %s WHERE id NOT IN (SELECT collection_id FROM %s) %s',
 				$group['cname'], $group['bname'], $this->minMaxQueryFormulator($group['cname'], 10000)
 			)
 		);
@@ -1074,9 +1074,9 @@ class ProcessReleases
 		foreach ($groupIDs as $groupID) {
 			$releases = $this->pdo->queryDirect(
 				sprintf("
-					SELECT r.guid, r.id
+					SELECT r.guid, r.ID
 					FROM releases r
-					INNER JOIN groups g ON g.id = r.groupID
+					INNER JOIN groups g ON g.ID = r.groupID
 					WHERE r.groupID = %d
 					AND greatest(IFNULL(g.minsizetoformrelease, 0), %d) > 0
 					AND r.size < greatest(IFNULL(g.minsizetoformrelease, 0), %d)",
@@ -1087,7 +1087,7 @@ class ProcessReleases
 			);
 			if ($releases instanceof \Traversable) {
 				foreach ($releases as $release) {
-					$this->releases->deleteSingle(['g' => $release['guid'], 'i' => $release['id']], $this->nzb, $this->releaseImage);
+					$this->releases->deleteSingle(['g' => $release['guid'], 'i' => $release['ID']], $this->nzb, $this->releaseImage);
 					$minSizeDeleted++;
 				}
 			}
@@ -1095,7 +1095,7 @@ class ProcessReleases
 			if ($maxSizeSetting > 0) {
 				$releases = $this->pdo->queryDirect(
 					sprintf('
-						SELECT id, guid
+						SELECT ID, guid
 						FROM releases
 						WHERE groupID = %d
 						AND size > %d',
@@ -1105,7 +1105,7 @@ class ProcessReleases
 				);
 				if ($releases instanceof \Traversable) {
 					foreach ($releases as $release) {
-						$this->releases->deleteSingle(['g' => $release['guid'], 'i' => $release['id']], $this->nzb, $this->releaseImage);
+						$this->releases->deleteSingle(['g' => $release['guid'], 'i' => $release['ID']], $this->nzb, $this->releaseImage);
 						$maxSizeDeleted++;
 					}
 				}
@@ -1113,9 +1113,9 @@ class ProcessReleases
 
 			$releases = $this->pdo->queryDirect(
 				sprintf("
-					SELECT r.id, r.guid
+					SELECT r.ID, r.guid
 					FROM releases r
-					INNER JOIN groups g ON g.id = r.groupID
+					INNER JOIN groups g ON g.ID = r.groupID
 					WHERE r.groupID = %d
 					AND greatest(IFNULL(g.minfilestoformrelease, 0), %d) > 0
 					AND r.totalpart < greatest(IFNULL(g.minfilestoformrelease, 0), %d)",
@@ -1126,7 +1126,7 @@ class ProcessReleases
 			);
 			if ($releases instanceof \Traversable) {
 				foreach ($releases as $release) {
-					$this->releases->deleteSingle(['g' => $release['guid'], 'i' => $release['id']], $this->nzb, $this->releaseImage);
+					$this->releases->deleteSingle(['g' => $release['guid'], 'i' => $release['ID']], $this->nzb, $this->releaseImage);
 					$minFilesDeleted++;
 				}
 			}
@@ -1169,13 +1169,13 @@ class ProcessReleases
 		if ($this->site->releaseretentiondays != 0) {
 			$releases = $this->pdo->queryDirect(
 				sprintf(
-					'SELECT id, guid FROM releases WHERE postdate < (NOW() - INTERVAL %d DAY)',
+					'SELECT ID, guid FROM releases WHERE postdate < (NOW() - INTERVAL %d DAY)',
 					$this->site->releaseretentiondays
 				)
 			);
 			if ($releases instanceof \Traversable) {
 				foreach ($releases as $release) {
-					$this->releases->deleteSingle(['g' => $release['guid'], 'i' => $release['id']], $this->nzb, $this->releaseImage);
+					$this->releases->deleteSingle(['g' => $release['guid'], 'i' => $release['ID']], $this->nzb, $this->releaseImage);
 					$retentionDeleted++;
 				}
 			}
@@ -1185,13 +1185,13 @@ class ProcessReleases
 		if ($this->site->deletepasswordedrelease == 1) {
 			$releases = $this->pdo->queryDirect(
 				sprintf(
-					'SELECT id, guid FROM releases WHERE passwordstatus = %d',
+					'SELECT ID, guid FROM releases WHERE passwordstatus = %d',
 					\Releases::PASSWD_RAR
 				)
 			);
 			if ($releases instanceof \Traversable) {
 				foreach ($releases as $release) {
-					$this->releases->deleteSingle(['g' => $release['guid'], 'i' => $release['id']], $this->nzb, $this->releaseImage);
+					$this->releases->deleteSingle(['g' => $release['guid'], 'i' => $release['ID']], $this->nzb, $this->releaseImage);
 					$passwordDeleted++;
 				}
 			}
@@ -1201,13 +1201,13 @@ class ProcessReleases
 		if ($this->site->deletepossiblerelease == 1) {
 			$releases = $this->pdo->queryDirect(
 				sprintf(
-					'SELECT id, guid FROM releases WHERE passwordstatus = %d',
+					'SELECT ID, guid FROM releases WHERE passwordstatus = %d',
 					\Releases::PASSWD_POTENTIAL
 				)
 			);
 			if ($releases instanceof \Traversable) {
 				foreach ($releases as $release) {
-					$this->releases->deleteSingle(['g' => $release['guid'], 'i' => $release['id']], $this->nzb, $this->releaseImage);
+					$this->releases->deleteSingle(['g' => $release['guid'], 'i' => $release['ID']], $this->nzb, $this->releaseImage);
 					$passwordDeleted++;
 				}
 			}
@@ -1218,7 +1218,7 @@ class ProcessReleases
 			do {
 				$releases = $this->pdo->queryDirect(
 					sprintf(
-						'SELECT id, guid FROM releases WHERE adddate > (NOW() - INTERVAL %d HOUR) GROUP BY name HAVING COUNT(name) > 1',
+						'SELECT ID, guid FROM releases WHERE adddate > (NOW() - INTERVAL %d HOUR) GROUP BY name HAVING COUNT(name) > 1',
 						$this->crossPostTime
 					)
 				);
@@ -1226,7 +1226,7 @@ class ProcessReleases
 				if ($releases && $releases->rowCount()) {
 					$total = $releases->rowCount();
 					foreach ($releases as $release) {
-						$this->releases->deleteSingle(['g' => $release['guid'], 'i' => $release['id']], $this->nzb, $this->releaseImage);
+						$this->releases->deleteSingle(['g' => $release['guid'], 'i' => $release['ID']], $this->nzb, $this->releaseImage);
 						$duplicateDeleted++;
 					}
 				}
@@ -1235,11 +1235,11 @@ class ProcessReleases
 
 		if ($this->completion > 0) {
 			$releases = $this->pdo->queryDirect(
-				sprintf('SELECT id, guid FROM releases WHERE completion < %d AND completion > 0', $this->completion)
+				sprintf('SELECT ID, guid FROM releases WHERE completion < %d AND completion > 0', $this->completion)
 			);
 			if ($releases instanceof \Traversable) {
 				foreach ($releases as $release) {
-					$this->releases->deleteSingle(['g' => $release['guid'], 'i' => $release['id']], $this->nzb, $this->releaseImage);
+					$this->releases->deleteSingle(['g' => $release['guid'], 'i' => $release['ID']], $this->nzb, $this->releaseImage);
 					$completionDeleted++;
 				}
 			}
@@ -1250,12 +1250,12 @@ class ProcessReleases
 		if (count($disabledCategories) > 0) {
 			foreach ($disabledCategories as $disabledCategory) {
 				$releases = $this->pdo->queryDirect(
-					sprintf('SELECT id, guid FROM releases WHERE categoryID = %d', $disabledCategory['id'])
+					sprintf('SELECT ID, guid FROM releases WHERE categoryID = %d', $disabledCategory['ID'])
 				);
 				if ($releases instanceof \Traversable) {
 					foreach ($releases as $release) {
 						$disabledCategoryDeleted++;
-						$this->releases->deleteSingle(['g' => $release['guid'], 'i' => $release['id']], $this->nzb, $this->releaseImage);
+						$this->releases->deleteSingle(['g' => $release['guid'], 'i' => $release['ID']], $this->nzb, $this->releaseImage);
 					}
 				}
 			}
@@ -1263,11 +1263,11 @@ class ProcessReleases
 
 		// Delete smaller than category minimum sizes.
 		$categories = $this->pdo->queryDirect('
-			SELECT c.id AS id,
+			SELECT c.ID AS id,
 			CASE WHEN c.minsizetoformrelease = 0 THEN cp.minsizetoformrelease ELSE c.minsizetoformrelease END AS minsize
 			FROM category c
-			INNER JOIN category cp ON cp.id = c.parentid
-			WHERE c.parentid IS NOT NULL'
+			INNER JOIN category cp ON cp.ID = c.parentID
+			WHERE c.parentID IS NOT NULL'
 		);
 
 		if ($categories instanceof \Traversable) {
@@ -1275,17 +1275,17 @@ class ProcessReleases
 				if ($category['minsize'] > 0) {
 					$releases = $this->pdo->queryDirect(
 						sprintf('
-							SELECT r.id, r.guid
+							SELECT r.ID, r.guid
 							FROM releases r
 							WHERE r.categoryID = %d
 							AND r.size < %d',
-							$category['id'],
+							$category['ID'],
 							$category['minsize']
 						)
 					);
 					if ($releases instanceof \Traversable) {
 						foreach ($releases as $release) {
-							$this->releases->deleteSingle(['g' => $release['guid'], 'i' => $release['id']], $this->nzb, $this->releaseImage);
+							$this->releases->deleteSingle(['g' => $release['guid'], 'i' => $release['ID']], $this->nzb, $this->releaseImage);
 							$categoryMinSizeDeleted++;
 						}
 					}
@@ -1299,17 +1299,17 @@ class ProcessReleases
 			foreach ($genrelist as $genre) {
 				$releases = $this->pdo->queryDirect(
 					sprintf('
-						SELECT id, guid
+						SELECT ID, guid
 						FROM releases
-						INNER JOIN (SELECT id AS mid FROM musicinfo WHERE musicinfo.genre_id = %d) mi
-						ON musicinfoid = mid',
-						$genre['id']
+						INNER JOIN (SELECT ID AS mid FROM musicinfo WHERE musicinfo.genreID = %d) mi
+						ON musicinfoID = mid',
+						$genre['ID']
 					)
 				);
 				if ($releases instanceof \Traversable) {
 					foreach ($releases as $release) {
 						$disabledGenreDeleted++;
-						$this->releases->deleteSingle(['g' => $release['guid'], 'i' => $release['id']], $this->nzb, $this->releaseImage);
+						$this->releases->deleteSingle(['g' => $release['guid'], 'i' => $release['ID']], $this->nzb, $this->releaseImage);
 					}
 				}
 			}
@@ -1319,7 +1319,7 @@ class ProcessReleases
 		if ($this->site->miscotherretentionhours > 0) {
 			$releases = $this->pdo->queryDirect(
 				sprintf('
-					SELECT id, guid
+					SELECT ID, guid
 					FROM releases
 					WHERE categoryID = %d
 					AND adddate <= NOW() - INTERVAL %d HOUR',
@@ -1329,7 +1329,7 @@ class ProcessReleases
 			);
 			if ($releases instanceof \Traversable) {
 				foreach ($releases as $release) {
-					$this->releases->deleteSingle(['g' => $release['guid'], 'i' => $release['id']], $this->nzb, $this->releaseImage);
+					$this->releases->deleteSingle(['g' => $release['guid'], 'i' => $release['ID']], $this->nzb, $this->releaseImage);
 					$miscRetentionDeleted++;
 				}
 			}

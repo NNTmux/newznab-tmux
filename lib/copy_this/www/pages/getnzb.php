@@ -83,7 +83,7 @@ if (isset($_GET["id"]) && isset($_GET["zip"]) && $_GET["zip"] == "1") {
 
 if (isset($_GET["id"])) {
 	$reldata = $rel->getByGuid($_GET["id"]);
-	$nzbpath = $nzb->getNZBPath($_GET["id"]);
+	$nzbpath = $nzb->NZBPath($_GET["id"]);
 
 	if (!file_exists($nzbpath)) {
 		header("X-DNZB-RCode: 404");

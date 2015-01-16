@@ -678,7 +678,7 @@ class Parsing
 				// do par check if user has elected for downloading extra stuff
 				if ($this->site->unrarpath != '' && $foundName == "") {
 					$nzb = new NZB();
-					$nzbfile = $nzb->getNZBPath($rel['guid'], $this->site->nzbpath, true);
+					$nzbfile = $nzb->NZBPath($rel['guid'], $this->site->nzbpath, true);
 					$nzbInfo = new nzbInfo;
 					$nzbInfo->loadFromFile($nzbfile);
 					if (!empty($nzbInfo->parfiles) && empty($nzbInfo->rarfiles) && empty($nzbInfo->audiofiles)) {

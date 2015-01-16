@@ -7,7 +7,6 @@ require_once(WWW_DIR . "/lib/site.php");
 require_once(WWW_DIR . "/lib/util.php");
 require_once(WWW_DIR . "/lib/Categorize.php");
 require_once(NN_TMUX . 'lib' . DS . 'ReleaseCleaning.php');
-require_once(NN_TMUX . 'lib' . DS . 'Enzebe.php');
 
 /**
  * Import NZB files into the database.
@@ -192,7 +191,7 @@ class NZBImport
 				if ($inserted) {
 
 					// Try to copy the NZB to the NZB folder.
-					$path = $this->nzb->getNZBPath($this->relGuid, '', true);
+					$path = $this->nzb->NZBPath($this->relGuid, '', true);
 
 					// Try to compress the NZB file in the NZB folder.
 					$fp = gzopen ($path, 'w5');

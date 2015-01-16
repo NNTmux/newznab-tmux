@@ -508,7 +508,7 @@ class Nfo
 		$res = $db->query($mnfo);
 		if($res){
 			foreach($res as $r){
-				$nzbfile = $nzb->getNZBPath($r["guid"]);
+				$nzbfile = $nzb->NZBPath($r["guid"]);
 				if(!is_file($nzbfile)){
 					if($this->verbose) echo sprintf("%s Missing NZB File: %d/%s ...\n",
 						'NfoProc', intval($r["ID"]), $r["name"]);

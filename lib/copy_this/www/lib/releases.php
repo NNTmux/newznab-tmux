@@ -711,7 +711,7 @@ class Releases
 	public function deleteSingle($identifiers, $nzb, $releaseImage)
 	{
 		// Delete NZB from disk.
-		$nzbPath = $nzb->getNZBPath($identifiers['g']);
+		$nzbPath = $nzb->NZBPath($identifiers['g']);
 		if ($nzbPath) {
 			@unlink($nzbPath);
 		}
@@ -1293,7 +1293,7 @@ class Releases
 		$zipFile = new \ZipFile();
 
 		foreach ($guids as $guid) {
-			$nzbPath = $nzb->getNZBPath($guid);
+			$nzbPath = $nzb->NZBPath($guid);
 
 			if ($nzbPath) {
 				$nzbContents = Utility::unzipGzipFile($nzbPath);

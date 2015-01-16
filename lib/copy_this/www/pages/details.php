@@ -39,7 +39,7 @@ if (isset($_GET["id"]))
 	$comments = $rc->getCommentsByGid($data["gid"]);
 
 	$rage = '';
-	if ($data["rageid"] != '')
+	if ($data["rageID"] != '')
 	{
 		$tvrage = new TvAnger();
 

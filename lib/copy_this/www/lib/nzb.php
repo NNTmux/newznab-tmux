@@ -290,7 +290,7 @@ class NZB
 	 *
 	 * @access public
 	 */
-	public function getNZBPath($releaseGuid, $levelsToSplit = 0, $createIfNotExist = false)
+	public function NZBPath($releaseGuid, $levelsToSplit = 0, $createIfNotExist = false)
 	{
 		if ($levelsToSplit === 0) {
 			$levelsToSplit = $this->nzbSplitLevel;
@@ -311,7 +311,7 @@ class NZB
 	 */
 	public function NZBPath($releaseGuid)
 	{
-		$nzbFile = $this->getNZBPath($releaseGuid);
+		$nzbFile = $this->NZBPath($releaseGuid);
 		return (is_file($nzbFile) ? $nzbFile : false);
 	}
 

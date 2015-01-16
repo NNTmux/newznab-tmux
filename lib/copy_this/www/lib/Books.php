@@ -5,7 +5,6 @@ require_once(WWW_DIR."/lib/category.php");
 require_once(WWW_DIR."/lib/site.php");
 require_once(WWW_DIR."/lib/util.php");
 require_once(WWW_DIR."/lib/releaseimage.php");
-require_once(NN_TMUX . 'lib' . DS . 'Enzebe.php');
 
 /*
  * Class for processing book info.

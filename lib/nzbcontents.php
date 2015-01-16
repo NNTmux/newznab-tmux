@@ -247,7 +247,7 @@ Class NZBContents
 	public function LoadNZB(&$guid)
 	{
 		// Fetch the NZB location using the GUID.
-		$nzbPath = $this->nzb->getNZBPath($guid);
+		$nzbPath = $this->nzb->NZBPath($guid);
 		if ($nzbPath === false) {
 			if ($this->echooutput) {
 				echo PHP_EOL . $guid . ' appears to be missing the nzb file, skipping.' . PHP_EOL;
