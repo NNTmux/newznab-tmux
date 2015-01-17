@@ -91,12 +91,12 @@ Class NZBContents
 		$options += $defaults;
 
 		$this->echooutput = ($options['Echo']);
-		$this->db = ($options['DB'] instanceof DB ? $options['DB'] : new DB());
-		$this->nntp = ($options['NNTP'] instanceof NNTP ? $options['NNTP'] : new NNTP());
-		$this->nfo = ($options['Nfo'] instanceof Info ? $options['Nfo'] : new Info());
+		$this->db = ($options['DB'] instanceof \DB ? $options['DB'] : new \DB());
+		$this->nntp = ($options['NNTP'] instanceof \NNTP ? $options['NNTP'] : new \NNTP());
+		$this->nfo = ($options['Nfo'] instanceof \Info ? $options['Nfo'] : new \Info());
 		$this->pp = (
-		$options['PostProcess'] instanceof PProcess ? $options['PostProcess'] : new PProcess());
-		$this->nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB());
+		$options['PostProcess'] instanceof \PProcess ? $options['PostProcess'] : new \PProcess());
+		$this->nzb = ($options['NZB'] instanceof \NZB ? $options['NZB'] : new \NZB());
 		$t = new Tmux();
 		$this->tmux = $t->get();
 		$s = new Sites();

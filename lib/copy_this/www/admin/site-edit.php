@@ -70,8 +70,8 @@ switch($action)
 $page->smarty->assign('yesno_ids', array(1,0));
 $page->smarty->assign('yesno_names', array( 'Yes', 'No'));
 
-$page->smarty->assign('passwd_ids', array(2,1,0));
-$page->smarty->assign('passwd_names', array( 'Deep (requires unrar)', 'Shallow', 'None'));
+$page->smarty->assign('passwd_ids', array(1,0));
+$page->smarty->assign('passwd_names', array( 'Deep (requires unrar)', 'None'));
 
 $page->smarty->assign('rottentomatoquality_ids', array('thumbnail', 'profile', 'detailed', 'original'));
 $page->smarty->assign('rottentomatoquality_names', array('Thumbnail', 'Profile', 'Detailed', 'Original'));

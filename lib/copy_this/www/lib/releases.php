@@ -57,7 +57,7 @@ class Releases
 		];
 		$options += $defaults;
 		$s = new Sites();
-		$this->site = $s ->get();
+		$this->site = $s->get();
 
 		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 		$this->groups = ($options['Groups'] instanceof \Groups ? $options['Groups'] : new \Groups(['Settings' => $this->pdo]));

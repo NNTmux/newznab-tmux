@@ -587,9 +587,9 @@ class SpotNab {
 
 		// Fetch some date ranges
 		$last_month = date("Y-m-d",strtotime(
-			date("Y-m-d", time()) . " - 30 day"));
+			date("Y-m-d", mktime()) . " - 30 day"));
 		$last_year = date('Y-m-d',strtotime(
-			date("Y-m-d", time()) . " - 365 day"));
+			date("Y-m-d", mktime()) . " - 365 day"));
 
 		// Header
 		$message = array(
@@ -912,7 +912,6 @@ class SpotNab {
 
 		$db = new DB();
 		$nzb = new NZB();
-		$releaseImage = new ReleaseImage();
 
 		$processed = 0;
 
@@ -928,7 +927,7 @@ class SpotNab {
 			if($limit > 0 && $processed >= $limit)
 				break;
         	$batch=($limit > 0 && $batch > $limit)?$limit:$batch;
-			$res = $db->queryExec(sprintf($fsql, $offset, $batch));
+			$res = $db->query(sprintf($fsql, $offset, $batch));
 			if(!$res)break;
 			if(count($res) <= 0)break;
 			$offset += $batch;
@@ -944,7 +943,7 @@ class SpotNab {
 				{
 					if($delete_broken_releases){
 						$release = new Releases();
-						$release->deleteSingle(['g' => $r['guid'], 'i' => $r['ID']], $nzb, $releaseImage);
+						$release->delete($r['ID']);
 						// Free the variable in an attempt to recover memory
 						unset($release);
 				        echo '-';
@@ -963,7 +962,7 @@ class SpotNab {
 				if(!$gid){
 					if($delete_broken_releases){
 						$release = new Releases();
-						$release->deleteSingle(['g' => $r['guid'], 'i' => $r['ID']], $nzb, $releaseImage);
+						$release->delete($r['ID']);
 						unset($release);
 				        echo '-';
 					}else{
@@ -974,7 +973,7 @@ class SpotNab {
 				}
 
 				// Update DB With Global Identifer
-				$ures = $db->query(sprintf($usql, $gid, $r['ID']));
+				$ures = $db->queryExec(sprintf($usql, $gid, $r['ID']));
 				if($ures < 0){
 					printf("\nPostPrc : Failed to update: %s\n", $r['name']);
 				}
@@ -991,7 +990,7 @@ class SpotNab {
 				.'AND releasecomment.GID IS NULL '
 				.'AND releases.GID IS NOT NULL ';
 
-        $affected = $db->query(sprintf($usql));
+        $affected = $db->exec(sprintf($usql));
 		if($affected > 0)
 			$processed += $affected;
 		return $processed;

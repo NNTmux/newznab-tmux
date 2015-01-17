@@ -145,7 +145,7 @@ class PProcess
 	{
 		$this->processAdditional($nntp);
 		$this->processNfos($nntp);
-		$this->processSpotnab($nntp);
+		$this->processSpotnab();
 		$this->processSharing($nntp);
 		$this->processMovies();
 		$this->processMusic();
@@ -255,7 +255,7 @@ class PProcess
 	/**
 	 * Process Global IDs
 	 */
-	public function processSpotnab(&$nntp)
+	public function processSpotnab()
 	{
 		$spotnab = new SpotNab();
 		$processed = $spotnab->processGID(500);

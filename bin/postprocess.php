@@ -135,7 +135,7 @@ switch ($argv[1]) {
 		$postProcess->processSharing($nntp);
 		break;
 	case 'spotnab':
-		$postProcess->processSpotnab($nntp);
+		$postProcess->processSpotnab();
 		break;
 	case 'tv':
 		$postProcess->processTV('', (isset($argv[3]) && in_array($argv[3], $charArray) ? $argv[3] : ''));
