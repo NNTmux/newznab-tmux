@@ -411,7 +411,7 @@ class ProcessReleases
 		foreach ($groupIDs as $groupID) {
 			if ($this->pdo->queryOneRow(
 					sprintf(
-						'SELECT ID FROM %s WHERE filecheck = %d AND filesize > 0 AND group_id = %d LIMIT 1',
+						'SELECT id FROM %s WHERE filecheck = %d AND filesize > 0 AND group_id = %d LIMIT 1',
 						$group['cname'],
 						self::COLLFC_SIZED,
 						$groupID['id']
@@ -937,7 +937,7 @@ class ProcessReleases
 		if (mt_rand(0, 100) <= 5) {
 			$deleteQuery = $this->pdo->queryExec(
 				sprintf(
-					'DELETE FROM %s WHERE binaryid NOT IN (SELECT ID FROM %s) %s',
+					'DELETE FROM %s WHERE binaryid NOT IN (SELECT id FROM %s) %s',
 					$group['pname'], $group['bname'], $this->minMaxQueryFormulator($group['pname'], 40000)
 				)
 			);
@@ -960,7 +960,7 @@ class ProcessReleases
 		// Binaries that somehow have no collection. Don't delete currently inserting binaries by checking the max id.
 		$deleteQuery = $this->pdo->queryExec(
 			sprintf(
-				'DELETE FROM %s WHERE collection_id NOT IN (SELECT ID FROM %s) %s',
+				'DELETE FROM %s WHERE collection_id NOT IN (SELECT id FROM %s) %s',
 				$group['bname'], $group['cname'], $this->minMaxQueryFormulator($group['bname'], 20000)
 			)
 		);
@@ -982,7 +982,7 @@ class ProcessReleases
 		// Collections that somehow have no binaries.
 		$collectionIDs = $this->pdo->queryDirect(
 			sprintf(
-				'SELECT ID FROM %s WHERE id NOT IN (SELECT collection_id FROM %s) %s',
+				'SELECT id FROM %s WHERE id NOT IN (SELECT collection_id FROM %s) %s',
 				$group['cname'], $group['bname'], $this->minMaxQueryFormulator($group['cname'], 10000)
 			)
 		);
