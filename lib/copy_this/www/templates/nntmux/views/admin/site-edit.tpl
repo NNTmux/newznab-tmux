@@ -349,63 +349,107 @@
 </fieldset>
 
 
-<fieldset>
-	<legend>SABnzbd Integration Settings</legend>
-	<table class="input">
-		<tr>
-			<td style="width:180px;"><label for="sabintegrationtype">Integration Type:</label></td>
-			<td>
-				{html_radios id="sabintegrationtype" name='sabintegrationtype' values=$sabintegrationtype_ids output=$sabintegrationtype_names selected=$fsite->sabintegrationtype separator='<br />'}
-				<div class="hint">
-					Whether to allow integration with a SAB install and if so what type of integration.<br/>
-					<strong>Setting this to integrated also disables NZBGet from being selectable to the user.</strong><br />
-				</div>
-			</td>
-		</tr>
-		<tr>
-			<td style="width:180px;"><label for="saburl">SABnzbd Url:</label></td>
-			<td>
-				<input id="saburl" class="long" name="saburl" type="text" value="{$fsite->saburl}" />
-				<div class="hint">The url of the SAB installation, for example: http://localhost:8080/sabnzbd/</div>
-			</td>
-		</tr>
-		<tr>
-			<td style="width:180px;"><label for="sabapikey">SABnzbd Api Key:</label></td>
-			<td>
-				<input id="sabapikey" class="long" name="sabapikey" type="text" value="{$fsite->sabapikey}" />
-				<div class="hint">The Api key of the SAB installation. Can be the full api key or the nzb api key (as of SAB 0.6)</div>
-			</td>
-		</tr>
-		<tr>
-			<td style="width:180px;"><label for="sabapikeytype">Api Key Type:</label></td>
-			<td>
-				{html_radios id="sabapikeytype" name='sabapikeytype' values=$sabapikeytype_ids output=$sabapikeytype_names selected=$fsite->sabapikeytype separator='<br />'}
-				<div class="hint">Select the type of api key you entered in the above setting</div>
-			</td>
-		</tr>
-		<tr>
-			<td style="width:180px;"><label for="sabpriority">Priority Level:</label></td>
-			<td>
-				{html_options style="width:180px;" id="sabpriority" name='sabpriority' values=$sabpriority_ids output=$sabpriority_names selected=$fsite->sabpriority}
-				<div class="hint">Set the priority level for NZBs that are added to your queue</div>
-			</td>
-		</tr>
-		<tr>
-			<td><label for="sabcompletedir">SABnzbd Complete Path</label>:</td>
-			<td>
-				<input id="sabcompletedir" class="long" name="sabcompletedir" type="text" value="{$fsite->sabcompletedir}" />
-				<div class="hint">The downloads/complete folder for a local sab install, for example: /var/www/sab/downloads/complete</div>
-			</td>
-		</tr>
-		<tr>
-			<td><label for="sabvdir">SABnzbd Complete Vdir URL</label>:</td>
-			<td>
-				<input id="sabvdir" class="long" name="sabvdir" type="text" value="{$fsite->sabvdir}" />
-				<div class="hint">A url to a hosted virtual directory pointing to the sab downloads/complete folder, e.g. http://server/complete</div>
-			</td>
-		</tr>
-	</table>
-</fieldset>
+	<fieldset>
+		<legend>Download Queue Integration Settings</legend>
+
+		<table class="input">
+			<tr>
+				<td style="width:160px;"><label for="sabintegrationtype">Integration Type</label>:</td>
+				<td>
+					{html_radios id="sabintegrationtype" name='sabintegrationtype' values=$sabintegrationtype_ids output=$sabintegrationtype_names selected=$fsite->sabintegrationtype separator='<br />'}
+					<div class="hint">Whether to allow integration with a SAB/NZBGet install and if so what type of integration<br/></div>
+				</td>
+			</tr>
+
+			<tr>
+				<td><label for="sabcompletedir">Download Complete Path</label>:</td>
+				<td>
+					<input id="sabcompletedir" class="long" name="sabcompletedir" type="text" value="{$fsite->sabcompletedir}" />
+					<div class="hint">The downloads/complete folder for a local sab install, for example: /var/www/sab/downloads/complete</div>
+				</td>
+			</tr>
+
+			<tr>
+				<td><label for="sabvdir">Download Complete Vdir URL</label>:</td>
+				<td>
+					<input id="sabvdir" class="long" name="sabvdir" type="text" value="{$fsite->sabvdir}" />
+					<div class="hint">A url to a hosted virtual directory pointing to the sab downloads/complete folder, e.g. http://server/complete</div>
+				</td>
+			</tr>
+		</table>
+
+		<fieldset>
+			<legend>SABnzbd</legend>
+			<table>
+
+				<tr>
+					<td><label for="saburl">SABnzbd Url</label>:</td>
+					<td>
+						<input id="saburl" class="long" name="saburl" type="text" value="{$fsite->saburl}" />
+						<div class="hint">The url of the SAB installation, for example: http://localhost:8080/sabnzbd/</div>
+					</td>
+				</tr>
+
+				<tr>
+					<td><label for="sabapikey">SABnzbd Api Key</label>:</td>
+					<td>
+						<input id="sabapikey" class="long" name="sabapikey" type="text" value="{$fsite->sabapikey}" />
+						<div class="hint">The Api key of the SAB installation. Can be the full api key or the nzb api key (as of SAB 0.6)</div>
+					</td>
+				</tr>
+
+				<tr>
+					<td><label for="sabapikeytype">Api Key Type</label>:</td>
+					<td>
+						{html_radios id="sabapikeytype" name='sabapikeytype' values=$sabapikeytype_ids output=$sabapikeytype_names selected=$fsite->sabapikeytype separator='<br />'}
+						<div class="hint">Select the type of api key you entered in the above setting</div>
+					</td>
+				</tr>
+
+				<tr>
+					<td><label for="sabpriority">Priority Level</label>:</td>
+					<td>
+						{html_options id="sabpriority" name='sabpriority' values=$sabpriority_ids output=$sabpriority_names selected=$fsite->sabpriority}
+						<div class="hint">Set the priority level for NZBs that are added to your queue</div>
+					</td>
+				</tr>
+
+			</table>
+		</fieldset>
+
+
+		<fieldset>
+			<legend>NZBGet</legend>
+			<table class="input">
+
+				<tr>
+					<td><label for="nzbgeturl">NZBGet Url</label>:</td>
+					<td>
+						<input id="nzbgeturl" class="long" name="nzbgeturl" type="text" value="{$fsite->nzbgeturl}" />
+						<div class="hint">The url of the NZBGet installation, for example: http://localhost:6789/</div>
+					</td>
+				</tr>
+
+				<tr>
+					<td><label for="nzbgetusername">NZBGet Username</label>:</td>
+					<td>
+						<input id="nzbgetusername" class="long" name="nzbgetusername" type="text" value="{$fsite->nzbgetusername}" />
+						<div class="hint">The NZBGet ControlUsername e.g. nzbget</div>
+					</td>
+				</tr>
+
+				<tr>
+					<td><label for="nzbgetpassword">NZBGet Password</label>:</td>
+					<td>
+						<input id="nzbgetpassword" class="long" name="nzbgetpassword" type="text" value="{$fsite->nzbgetpassword}" />
+						<div class="hint">The NZBGet ControlPassword e.g. tegbzn6789</div>
+					</td>
+				</tr>
+
+			</table>
+		</fieldset>
+
+	</fieldset>
 
 
 <fieldset>
