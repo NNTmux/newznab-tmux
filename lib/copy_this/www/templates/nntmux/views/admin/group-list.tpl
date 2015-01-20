@@ -47,7 +47,6 @@
 					<td class="less">{$group.last_record_postdate}<br />{$group.last_record_postdate|timeago}</td>
 					<td class="less">{$group.last_updated|timeago} ago</td>
 					<td class="less" id="group-{$group.ID}">{if $group.active=="1"}<a href="javascript:ajax_group_status({$group.ID}, 0)" class="group_active">Deactivate</a>{else}<a href="javascript:ajax_group_status({$group.ID}, 1)" class="group_deactive">Activate</a>{/if}</td>
-					<td class="less">{if $group.regexmatchonly == "1"}Yes{else}No{/if}</td>
 					<td class="less" id="backfill-{$group.ID}">{if $group.backfill=="1"}<a href="javascript:ajax_backfill_status({$group.ID}, 0)" class="backfill_active">Deactivate</a>{else}<a href="javascript:ajax_backfill_status({$group.ID}, 1)" class="backfill_deactive">Activate</a>{/if}</td>
 					<td class="less">{$group.num_releases}</td>
 					<td class="less">{if $group.minfilestoformrelease==""}n/a{else}{$group.minfilestoformrelease}{/if}</td>
