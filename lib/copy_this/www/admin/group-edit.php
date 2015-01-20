@@ -40,7 +40,6 @@ switch($action) {
 			$group["first_record"] = "0";
 			$group["last_record"] = "0";
 			$group["backfill_target"] = "0";
-			$group["regexmatchonly"] = "1";
 		}
 		$page->smarty->assign('group', $group);
 		break;

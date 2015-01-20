@@ -37,13 +37,6 @@
 			</td>
 		</tr>
 		<tr>
-			<td><label for="regexmatchonly">Pre Filter Binaries</label>:</td>
-			<td>
-				{html_radios id="regexmatchonly" name='regexmatchonly' values=$yesno_ids output=$yesno_names selected=$group.regexmatchonly separator='<br />'}
-				<div class="hint">Enabling pre-filter will only store binaries and parts in the database when they match release regex. Disabling will store all incoming binaries and parts until header retention met.</div>
-			</td>
-		</tr>
-		<tr>
 			<td><label for="first_record">First Record ID:</label></td>
 			<td>
 				<input class="small" id="first_record" name="first_record" type="text" value="{$group.first_record}" />

@@ -123,15 +123,6 @@
 		<div class="hint">Text displayed in the terms and conditions page.</div>
 	</td>
 </tr>
-
-<tr>
-	<td><label for="newznabID">newznab id</label>:</td>
-	<td>
-		<input id="newznabID" class="long" name="newznabID" type="text" value="{$fsite->newznabID}" />
-		<div class="hint">Your registered newznab id. Used for access to additional features.</div>
-	</td>
-</tr>
-
 </table>
 </fieldset>
 
@@ -622,15 +613,6 @@
 		<div class="hint">The url to use to translate allfilled style reqid usenet posts into real release titles. Leave blank to not perform lookup.</div>
 	</td>
 </tr>
-
-<tr>
-	<td><label for="reqidurl">Latest Regex Lookup URL</label>:</td>
-	<td>
-		<input class="long" id="latestregexurl" name="latestregexurl" type="text" value="{$fsite->latestregexurl}" />
-		<div class="hint">The url to use to get the latest regexs. Leave blank to not perform lookup. This will retrieve all user contributed regexes.</div>
-	</td>
-</tr>
-
 <tr>
 	<td><label for="lookupnfo">Lookup Nfo</label>:</td>
 	<td>
@@ -1390,8 +1372,29 @@
 				</div>
 			</td>
 		</tr>
+		<tr>
+			<td style="width:180px;"><label for="delaytime">Delay Time Check:</label></td>
+			<td>
+				<input class="short" id="delaytime" name="delaytime" type="text" value="{$fsite->delaytime}"/>
+				<div class="hint">The time in hours to wait, since last activity, before releases without parts counts
+					in the subject are are created<br \> Setting this below 2 hours could create incomplete releases..
+				</div>
+			</td>
+		</tr>
 	</table>
 </fieldset>
+	<fieldset id="site_developerset">
+		<legend>Developer Settings</legend>
+		<table class="input">
+			<tr>
+				<td style="width:180px;"><label for="showdroppedyencparts">Log Dropped Headers:</label></td>
+				<td>
+					{html_radios id="showdroppedyencparts" name='showdroppedyencparts' values=$yesno_ids output=$yesno_names selected=$fsite->showdroppedyencparts separator='<br />'}
+					<div class="hint">For developers. Whether to log all headers that have 'yEnc' and are dropped. Logged to not_yenc/groupname.dropped.txt.</div>
+				</td>
+			</tr>
+		</table>
+	</fieldset>
 
 <fieldset>
 	<legend>Advanced - Threaded Settings</legend>

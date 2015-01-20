@@ -30,7 +30,6 @@
 				<th>Last Post</th>
 				<th>last updated</th>
 				<th>active</th>
-				<th>Pre Filter</th>
 				<th>backfill</th>
 				<th>releases</th>
 				<th>Min Files</th>

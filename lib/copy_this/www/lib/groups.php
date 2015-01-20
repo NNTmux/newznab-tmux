@@ -215,7 +215,7 @@ class Groups
 			sprintf(
 				"UPDATE groups
 				SET name = %s, description = %s, backfill_target = %s, first_record = %s, last_record = %s,
-				last_updated = NOW(), active = %s, backfill = %s, %s %s, regexmatchonly = %s
+				last_updated = NOW(), active = %s, backfill = %s, %s %s
 				WHERE ID = %d",
 				$this->pdo->escapeString(trim($group["name"])),
 				$this->pdo->escapeString(trim($group["description"])),
@@ -226,8 +226,7 @@ class Groups
 				$this->formatNumberString($group["backfill"]),
 				$minFileString,
 				$minSizeString,
-				$group["regexmatchonly"],
-				$group["id"]
+				$group["ID"]
 			)
 		);
 	}
@@ -253,18 +252,12 @@ class Groups
 				sprintf("%d", $this->formatNumberString($group["minsizetoformrelease"], false))
 			);
 
-		$regexmatchonly =
-			($group["regexmatchonly"] == '' ?
-				'0' :
-				sprintf("%d", $this->formatNumberString($group["regexmatchonly"], false))
-			);
-
 
 		return $this->pdo->queryInsert(
 			sprintf("
 				INSERT INTO groups
 					(name, description, backfill_target, first_record, last_record, last_updated,
-					active, backfill, minfilestoformrelease, minsizetoformrelease, regexmatchonly)
+					active, backfill, minfilestoformrelease, minsizetoformrelease)
 				VALUES (%s, %s, %s, %s, %s, NOW(), %s, %s, %s, %s, %s)",
 				$this->pdo->escapeString(trim($group["name"])),
 				$this->pdo->escapeString(trim($group["description"])),
@@ -274,8 +267,7 @@ class Groups
 				$this->formatNumberString($group["active"]),
 				$this->formatNumberString($group["backfill"]),
 				$minFileString,
-				$minSizeString,
-				$regexmatchonly
+				$minSizeString
 			)
 		);
 	}
