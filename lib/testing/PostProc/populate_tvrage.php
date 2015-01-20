@@ -24,8 +24,11 @@ if ($tvshows !== false) {
 			$pdo->queryInsert(sprintf('INSERT INTO tvrage (rageID, releasetitle, country) VALUES (%s, %s, %s)', $pdo->escapeString($rage->id), $pdo->escapeString($rage->name), $pdo->escapeString($rage->country)));
 			$updated++;
 			echo "added\n";
+		} elseif (isset($rage->id) && isset($rage->name) && !empty($rage->id) && !empty($rage->name) &&
+			$dupecheck !== false && $dupecheck['count'] > 0) {
+			echo "Up to date\n";
 		} else {
-			echo "FAILED!!\n";
+			echo "FAILED\n";
 		}
 	}
 } else {
