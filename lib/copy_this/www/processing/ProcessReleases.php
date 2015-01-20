@@ -271,7 +271,7 @@ class ProcessReleases
 		if ($releases && $releases->rowCount()) {
 			$total = $releases->rowCount();
 			foreach ($releases as $release) {
-				$catId = $cat->determineCategory($release[$type], $release['groupID']);
+				$catId = $cat->determineCategory($release['groupID'], $release[$type]);
 				$this->pdo->queryExec(
 					sprintf('UPDATE releases SET categoryID = %d, iscategorized = 1 WHERE ID = %d', $catId, $release['ID'])
 				);
