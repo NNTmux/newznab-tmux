@@ -698,7 +698,7 @@ class Binaries
 								$partIds = array();
 								foreach ($data['Parts'] as $partdata)
 									$partIds[] = $partdata['number'];
-								$db->queryExec(sprintf('DELETE FROM %s WHERE numberID IN (%s) AND groupID=%d', $tableNames['prname'], implode(',', $partIds), $groupArr['ID']));
+								$db->queryExec(sprintf('DELETE FROM %s WHERE numberID IN (%s) AND groupID = %d', $tableNames['prname'], implode(',', $partIds), $groupArr['ID']));
 								continue;
 							}
 							if ($sql != '') {
@@ -722,7 +722,7 @@ class Binaries
 								$partNumbers[] = $partdata['number'];
 							}
 
-							$partSql = sprintf('INSERT INTO ' . $tableNames['pname'] . ' (binaryID, messageID, number, partnumber, size) VALUES '.implode(', ', $partParams));
+							$partSql = ('INSERT INTO ' . $tableNames['pname'] . ' (binaryID, messageID, number, partnumber, size) VALUES '.implode(', ', $partParams));
 							$pidata = $db->queryInsert($partSql);
 							if (!$pidata) {
 								$msgsnotinserted = array_merge($msgsnotinserted, $partNumbers);
