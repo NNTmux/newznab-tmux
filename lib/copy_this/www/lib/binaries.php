@@ -31,10 +31,122 @@ class Binaries
 	public $messageBuffer;
 
 	/**
-	 * Default constructor
+	 * @var ColorCLI
 	 */
-	function Binaries()
+	protected $_colorCLI;
+
+	/**
+	 * @var Logger
+	 */
+	protected $_debugging;
+
+	/**
+	 * @var Groups
+	 */
+	protected $_groups;
+
+	/**
+	 * @var NNTP
+	 */
+	protected $_nntp;
+
+	/**
+	 * Should we use part repair?
+	 *
+	 * @var bool
+	 */
+	protected $_partRepair;
+
+	/**
+	 * @var DB
+	 */
+	protected $_pdo;
+
+	/**
+	 * How many days to go back on a new group?
+	 *
+	 * @var bool
+	 */
+	protected $_newGroupScanByDays;
+
+	/**
+	 * How many headers to download on new groups?
+	 *
+	 * @var int
+	 */
+	protected $_newGroupMessagesToScan;
+
+	/**
+	 * How many days to go back on new groups?
+	 *
+	 * @var int
+	 */
+	protected $_newGroupDaysToScan;
+
+	/**
+	 * How many headers to download per run of part repair?
+	 *
+	 * @var int
+	 */
+	protected $_partRepairLimit;
+
+	/**
+	 * Should we use table per group?
+	 *
+	 * @var bool
+	 */
+	protected $_tablePerGroup;
+
+	/**
+	 * Echo to cli?
+	 *
+	 * @var bool
+	 */
+	protected $_echoCLI;
+
+	/**
+	 * @var bool
+	 */
+	protected $_debug = false;
+
+	/**
+	 * Max tries to download headers.
+	 * @var int
+	 */
+	protected $_partRepairMaxTries;
+
+	/**
+	 * Constructor.
+	 *
+	 * @param array $options Class instances / echo to CLI?
+	 */
+	function Binaries(array $options = [])
 	{
+		$defaults = [
+			'Echo'                => true,
+			'ColorCLI'            => null,
+			'Logger'              => null,
+			'Groups'              => null,
+			'NNTP'                => null,
+			'Settings'            => null,
+		];
+		$options += $defaults;
+
+		$this->_colorCLI = ($options['ColorCLI'] instanceof \ColorCLI ? $options['ColorCLI'] : new \ColorCLI());
+		$this->_echoCLI = ($options['Echo'] && NN_ECHOCLI);
+		$this->_pdo = ($options['Settings'] instanceof \DB ? $options['Settings'] : new \DB());
+		$this->_nntp = ($options['NNTP'] instanceof \NNTP ? $options['NNTP'] : new \NNTP(['Echo' => $this->_colorCLI, 'Settings' => $this->_pdo, 'ColorCLI' => $this->_colorCLI]));
+		$this->_groups = ($options['Groups'] instanceof \Groups ? $options['Groups'] : new \Groups(['Settings' => $this->_pdo]));
+
+		$this->_debug = (NN_DEBUG || NN_LOGGING);
+		if ($this->_debug) {
+			try {
+				$this->_debugging = new \Logger(['ColorCLI' => $this->_colorCLI]);
+			} catch (\LoggerException $error) {
+				$this->_debug = false;
+			}
+		}
+
 		$this->n = "\n";
 
 		$s = new Sites();
@@ -58,19 +170,6 @@ class Binaries
 		$this->startHeaders = microtime(true);
 
 		$this->onlyProcessRegexBinaries = false;
-		$this->_colorCLI =  new \ColorCLI();
-		$this->_echoCLI = NN_ECHOCLI;
-		$this->_pdo = new DB();
-		$this->_nntp = new \NNTP(['Echo' => $this->_colorCLI, 'Settings' => $this->_pdo, 'ColorCLI' => $this->_colorCLI]);
-		$this->_groups = new Groups();
-		$this->_debug = (NN_DEBUG || NN_LOGGING);
-		if ($this->_debug) {
-			try {
-				$this->_debugging = new \Logger(['ColorCLI' => $this->_colorCLI]);
-			} catch (\LoggerException $error) {
-				$this->_debug = false;
-			}
-		}
 	}
 
 	/**
@@ -599,7 +698,7 @@ class Binaries
 								$partIds = array();
 								foreach ($data['Parts'] as $partdata)
 									$partIds[] = $partdata['number'];
-								$db->queryExec(sprintf('DELETE FROM %s WHERE numberID IN (%s) AND groupID=%d', $tableNames['prname'], implode(',', $partIds), $groupArr['ID']));
+								$db->queryExec(sprintf('DELETE FROM %s WHERE numberID IN (%s) AND groupID = %d', $tableNames['prname'], implode(',', $partIds), $groupArr['ID']));
 								continue;
 							}
 							if ($sql != '') {
@@ -623,7 +722,7 @@ class Binaries
 								$partNumbers[] = $partdata['number'];
 							}
 
-							$partSql = sprintf('INSERT INTO ' . $tableNames['pname'] . ' (binaryID, messageID, number, partnumber, size) VALUES '.implode(', ', $partParams));
+							$partSql = ('INSERT INTO ' . $tableNames['pname'] . ' (binaryID, messageID, number, partnumber, size) VALUES '.implode(', ', $partParams));
 							$pidata = $db->queryInsert($partSql);
 							if (!$pidata) {
 								$msgsnotinserted = array_merge($msgsnotinserted, $partNumbers);

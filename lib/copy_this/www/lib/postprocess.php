@@ -857,10 +857,10 @@ class PostProcess
                     //$execstring = '"'.$ffmpeginfo.'" -i "'.$samplefile.'" -qscale:v 1 -vframes 300 "'.$ramdrive.'zzzz%03d.jpg"';
 
                     //2.0
-                    //$execstring = '"'.$ffmpeginfo.'" -i "'.$samplefile.'"  -vframes 300 "'.$ramdrive.'zzzz%03d.jpg"';
+                    $execstring = '"'.$ffmpeginfo.'" -i "'.$samplefile.'"  -vframes 300 "'.$ramdrive.'zzzz%03d.jpg"';
 
                     //1.x
-                    $execstring = '"'.$ffmpeginfo.'" -q:v 0 -i "'.$samplefile.'" -vframes 300 "'.$ramdrive.'zzzz%03d.jpg"';
+                    //$execstring = '"'.$ffmpeginfo.'" -q:v 0 -i "'.$samplefile.'" -vframes 300 "'.$ramdrive.'zzzz%03d.jpg"';
 
                     runCmd($execstring, false, true);
 					$all_files = scandir($ramdrive,1);

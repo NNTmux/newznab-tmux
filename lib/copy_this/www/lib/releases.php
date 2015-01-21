@@ -1670,7 +1670,6 @@ class Releases
 			//
 			if ($row["num"] < $row["minfilestoformrelease"]) {
 				//echo "Number of files in release ".$row["relname"]." less than site/group setting (".$row['num']."/".$row["minfilestoformrelease"].")\n";
-				$this->pdo->queryExec(sprintf("UPDATE %s SET procattempts = procattempts + 1 WHERE relname = %s AND procstat = %d AND groupID = %d AND fromname = %s", $group['bname'], $this->pdo->escapeString($row["relname"]), Releases::PROCSTAT_TITLEMATCHED, $groupID, $this->pdo->escapeString($row["fromname"])));
 			}
 
 			//
@@ -1769,14 +1768,6 @@ class Releases
 						);
 					}
 				}
-			}
-
-			//
-			// Theres less than the expected number of files, so update the attempts and move on.
-			//
-			else {
-				// pointless updating of attempts, as was creating a lot of database writes for people regex groups with posts without part numbering.
-				//$this->pdo->exec(sprintf("update binaries set procattempts = procattempts + 1 where relname = %s and procstat = %d and groupID = %d and fromname=%s", $this->pdo->escapeString($row["relname"]), Releases::PROCSTAT_TITLEMATCHED, $groupID, $this->pdo->escapeString($row["fromname"]) ));
 			}
 			if ($retcount % 100 == 0)
 				echo ".";
