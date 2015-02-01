@@ -552,9 +552,11 @@
 			</tr>
 			<tr><th>Release Info:</th>
 				<td>
-					Regex Id (<a href="{$smarty.const.WWW_TOP}/admin/regex-list.php#{$release.regexID}">{$release.regexID}</a>) <br/>
 					{if $release.reqID != ""}
-						Request Id ({$release.reqID})
+						Request ID ({$release.reqID})
+					{/if}
+					{if $release.prehashID != "0"}
+						Prehash ID ({$release.prehashID})
 					{/if}
 				</td>
 			</tr>
