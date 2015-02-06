@@ -6,7 +6,7 @@ CREATE TABLE         gamesinfo (
   url         VARCHAR(1000)       DEFAULT NULL,
   platform    VARCHAR(255)        DEFAULT NULL,
   publisher   VARCHAR(255)        DEFAULT NULL,
-  genreid     INT(10)             NULL DEFAULT NULL,
+  genre_id     INT(10)            NULL DEFAULT NULL,
   esrb        VARCHAR(255)        NULL DEFAULT NULL,
   releasedate DATETIME            DEFAULT NULL,
   review      VARCHAR(3000)       DEFAULT NULL,
