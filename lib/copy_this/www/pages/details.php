@@ -61,7 +61,7 @@ if (isset($_GET["id"]))
 
 				if (!empty($r['imgdata'])) {
 					$seriesimg[] = $r['imgdata'];
-					$seriesid[] = $r['id'];
+					$seriesid[] = $r['ID'];
 				}
 			}
 			$rage = array(
