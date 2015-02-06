@@ -201,20 +201,31 @@ class ReleaseExtra
 	 */
 	public function determineVideoResolution($width, $height)
 	{
-		if ($width == 0 || $height == 0) {
+		if ($width == 0 || $height == 0)
+		{
 			return self::VIDEO_RESOLUTION_NA;
-		} elseif ($width <= 720 && $height <= 480) {
+		}
+		elseif ($width <= 720 && $height <= 480)
+		{
 			return self::VIDEO_RESOLUTION_SD; //SD 480
-		} elseif ($width <= 768 && $height <= 576) // 720x576 (PAL) (768 when rescaled for square pixels)
+		}
+		elseif ($width <= 768 && $height <= 576) // 720x576 (PAL) (768 when rescaled for square pixels)
 		{
 			return self::VIDEO_RESOLUTION_SD; //SD 576
-		} else if ($width <= 960 && $height <= 544) // 960x540 (sometimes 544 which is multiple of 16)
+		}
+		elseif ($width <= 1048 && $height <= 576) // 1024x576 (PAL) (1048 when rescaled for square pixels) (16x9)
+		{
+			return self::VIDEO_RESOLUTION_SD; //SD 576 16x9
+		}
+		elseif ($width <= 960 && $height <= 544) // 960x540 (sometimes 544 which is multiple of 16)
 		{
 			return self::VIDEO_RESOLUTION_SD; //SD 540
-		} else if ($width <= 1280 && $height <= 720) // 1280x720
+		}
+		elseif ($width <= 1280 && $height <= 720) // 1280x720
 		{
 			return self::VIDEO_RESOLUTION_720; //HD 720
-		} else // 1920x1080
+		}
+		else // 1920x1080
 		{
 			return self::VIDEO_RESOLUTION_1080; //HD 1080
 		}
