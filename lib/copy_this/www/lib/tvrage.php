@@ -251,11 +251,11 @@ class TvRage
 									$prev_ep = "SWAPPED with: ".$arr['nextinfo']." - ".date("r", $arr['nextDateU']);
 								}
 								$next_ep = $epInfo['next']['episode'].', "'.$epInfo['next']['title'].'"';
-								$query[] = sprintf("nextdate = FROM_UNIXTIME(%s), nextinfo = %s", $epInfo['next']['day_time'], $db->escapeString($next_ep));
+								$query[] = sprintf("nextdate = FROM_UNIXTIME(%s), nextinfo = %s ", $epInfo['next']['day_time'], $db->escapeString($next_ep));
 							}
 							else
 							{
-								$query[] = "nextdate = null, nextinfo = null";
+								$query[] = "nextdate = null, nextinfo = null ";
 							}
 
 							// output

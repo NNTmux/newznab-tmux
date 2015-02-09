@@ -33,6 +33,12 @@ require_once(NN_LIB . 'RequestIDWeb.php');
  */
 class Releases
 {
+	// RAR/ZIP Passworded indicator.
+	const PASSWD_NONE      =  0; // No password.
+	const PASSWD_POTENTIAL =  1; // Might have a password.
+	const BAD_FILE         =  2; // Possibly broken RAR/ZIP.
+	const PASSWD_RAR       = 10; // Definitely passworded.
+
 	/**
 	 * @access public
 	 * @var initial binary state after being added from usenet
@@ -68,24 +74,6 @@ class Releases
 	 * @var after a series of attempts to lookup the allfilled style reqid to get a name, its given up
 	 */
 	const PROCSTAT_NOREQIDNAMELOOKUPFOUND = 7;
-
-	/**
-	 * @access public
-	 * @var release is not passworded
-	 */
-	const PASSWD_NONE = 0;
-
-	/**
-	 * @access public
-	 * @var release may be passworded, ie contains inner rar/ace files
-	 */
-	const PASSWD_POTENTIAL = 1;
-
-	/**
-	 * @access public
-	 * @var release is passworded
-	 */
-	const PASSWD_RAR = 2;
 
 	/**
 	 * @var SphinxSearch
