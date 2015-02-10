@@ -258,7 +258,7 @@ class Groups
 				INSERT INTO groups
 					(name, description, backfill_target, first_record, last_record, last_updated,
 					active, backfill, minfilestoformrelease, minsizetoformrelease)
-				VALUES (%s, %s, %s, %s, %s, NOW(), %s, %s, %s, %s, %s)",
+				VALUES (%s, %s, %s, %s, %s, NOW(), %s, %s, %s, %s)",
 				$this->pdo->escapeString(trim($group["name"])),
 				$this->pdo->escapeString(trim($group["description"])),
 				$this->formatNumberString($group["backfill_target"]),
