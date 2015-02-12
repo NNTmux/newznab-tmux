@@ -77,7 +77,7 @@ class ReleaseRemover
 	protected $method = '';
 
 	/**
-	 * @var nzedb\db\Settings
+	 * @var DB
 	 */
 	protected $pdo;
 
