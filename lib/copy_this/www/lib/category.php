@@ -54,6 +54,8 @@ class Category
 	const CAT_XXX_WMV = 6020;
 	const CAT_XXX_XVID = 6030;
 	const CAT_XXX_X264 = 6040;
+	const CAT_XXX_CLIPHD = 6041;
+	const CAT_XXX_CLIPSD = 6042;
 	const CAT_XXX_PACK = 6050;
 	const CAT_XXX_IMAGESET = 6060;
 	const CAT_XXX_OTHER = 6070;
