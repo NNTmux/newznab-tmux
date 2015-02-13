@@ -817,7 +817,7 @@ class Categorize extends Category
 
 	public function isXxxClipHD()
 	{
-		if (preg_match('/MP4\-(KTR|GUSH|SEXORS|hUSHhUSH)/i', $this->releaseName) && !preg_match('/WEBRIP/i', $this->releaseName) && !preg_match('/\bwmv\b/i', $this->releaseName)) {
+		if (preg_match('/^[\w.]+(\d{2}\.\d{2}\.\d{2})[\w.]+(MP4-(KTR|GUSH|FaiLED|SEXORS|hUSHhUSH))/i', $this->releaseName)) {
 			$this->tmpCat = \Category::CAT_XXX_CLIPHD;
 			return true;
 		}
@@ -881,7 +881,7 @@ class Categorize extends Category
 
 	public function isXxxClipSD()
 	{
-		if (preg_match('/(\d{2}\.\d{2}\.\d{2})/i', $this->releaseName) && !preg_match('/IMAGESET|PICTURESET|ABPEA/i', $this->releaseName) && !preg_match('/\bwmv\b/i', $this->releaseName)) {
+		if (preg_match('/^[\w.]+(\d{2}\.\d{2}\.\d{2})[\w.]+(MP4-(SDX264XXX|XXX\.HR\.))/i', $this->releaseName)) {
 			$this->tmpCat = \Category::CAT_XXX_CLIPSD;
 			return true;
 		}
@@ -889,7 +889,7 @@ class Categorize extends Category
 	}
 	public function isXxxSD()
 	{
-		if (preg_match('/SDX264XXX|XXX\.HR\./i', $this->releaseName)) {
+		if (preg_match('/^[\w.]+(\d{2}\.\d{2}\.\d{2})[\w.]+(MP4-\w+)/i', $this->releaseName)) {
 			$this->tmpCat = \Category::CAT_XXX_SD;
 			return true;
 		}
