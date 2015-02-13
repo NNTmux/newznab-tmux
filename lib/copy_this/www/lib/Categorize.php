@@ -790,6 +790,8 @@ class Categorize extends Category
 			case !preg_match('/\bXXX\b|(a\.b\.erotica|ClubSeventeen|Cum(ming|shot)|Err?oticax?|Porn(o|lation)?|Imageset|PICTURESET|JAV Uncensored|lesb(ians?|os?)|mastur(bation|e?bate)|My_Stepfather_Made_Me|nympho?|OLDER ANGELS|pictures\.erotica\.anime|sexontv|slut|Squirt|SWE6RUS|Transsexual|whore)/i', $this->releaseName):
 				return false;
 			case $this->isXxxPack():
+			case $this->IsXxxClipHD():
+			case $this->isXxxClipSD():
 			case $this->isXxx264():
 			case $this->isXxxXvid():
 			case $this->isXxxImageset():
@@ -808,6 +810,15 @@ class Categorize extends Category
 	{
 		if (preg_match('/720p|1080(hd|[ip])|[xh][^a-z0-9]?264/i', $this->releaseName) && !preg_match('/\bwmv\b/i', $this->releaseName) && !preg_match('/SDX264XXX/i', $this->releaseName)) {
 			$this->tmpCat = \Category::CAT_XXX_X264;
+			return true;
+		}
+		return false;
+	}
+
+	public function isXxxClipHD()
+	{
+		if (preg_match('/MP4\-(KTR|GUSH|SEXORS|hUSHhUSH)/i', $this->releaseName) && !preg_match('/WEBRIP/i', $this->releaseName) && !preg_match('/\bwmv\b/i', $this->releaseName)) {
+			$this->tmpCat = \Category::CAT_XXX_CLIPHD;
 			return true;
 		}
 		return false;
@@ -868,6 +879,14 @@ class Categorize extends Category
 		return false;
 	}
 
+	public function isXxxClipSD()
+	{
+		if (preg_match('/(\d{2}\.\d{2}\.\d{2})/i', $this->releaseName) && !preg_match('/IMAGESET|PICTURESET|ABPEA/i', $this->releaseName) && !preg_match('/\bwmv\b/i', $this->releaseName)) {
+			$this->tmpCat = \Category::CAT_XXX_CLIPSD;
+			return true;
+		}
+		return false;
+	}
 	public function isXxxSD()
 	{
 		if (preg_match('/SDX264XXX|XXX\.HR\./i', $this->releaseName)) {
