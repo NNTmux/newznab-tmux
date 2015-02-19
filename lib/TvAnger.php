@@ -417,9 +417,9 @@ class TvAnger
 									$prev_ep = "SWAPPED with: " . $arr['nextinfo'] . " - " . date("r", strtotime($arr["nextdate"]));
 								}
 								$next_ep = $epInfo['next']['episode'] . ', "' . $epInfo['next']['title'] . '"';
-								$query[] = sprintf("nextdate = %s, nextinfo = %s", $this->pdo->from_unixtime($epInfo['next']['day_time']), $this->pdo->escapeString($next_ep));
+								$query[] = sprintf("nextdate = %s, nextinfo = %s ", $this->pdo->from_unixtime($epInfo['next']['day_time']), $this->pdo->escapeString($next_ep));
 							} else {
-								$query[] = "nextdate = NULL, nextinfo = NULL";
+								$query[] = "nextdate = NULL, nextinfo = NULL ";
 							}
 
 							// Output.
