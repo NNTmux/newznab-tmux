@@ -178,7 +178,13 @@ class Categorize extends Category
 					}
 					$this->tmpCat = \Category::CAT_MISC_OTHER;
 					break;
-				case $this->categorizeForeign && preg_match('/alt\.binaries\.(dvdnordic\.org|nordic\.(dvdr?|xvid))|dk\.(binaer|binaries)\.film(\.divx)?/', $group):
+				case preg_match('/alt\.binaries\.(dvdnordic\.org|nordic\.(dvdr?|xvid))|dk\.(binaer|binaries)\.film(\.divx)?/', $group):
+					if ($this->categorizeForeign && $this->isMovieForeign()) {
+						break;
+					}
+					if ($this->isMovie()) {
+						break;
+					}
 					$this->tmpCat = \Category::CAT_MOVIE_FOREIGN;
 					break;
 				case $group === 'alt.binaries.documentaries':
