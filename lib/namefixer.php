@@ -106,7 +106,7 @@ class NameFixer
 	protected $fullall;
 
 	/**
-	 * @var Settings
+	 * @var DB
 	 */
 	public $pdo;
 
