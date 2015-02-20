@@ -1,6 +1,7 @@
 <?php
 require_once(WWW_DIR . "lib/framework/db.php");
 require_once(WWW_DIR . "lib/groups.php");
+require_once(WWW_DIR . "lib/CollectionsCleaning.php");
 require_once(NN_TMUX . 'lib' . DS . 'prehash.php');
 /*
  * Cleans names for releases/imports/namefixer.
@@ -77,10 +78,10 @@ class ReleaseCleaning
 	public function __construct($settings = null)
 	{
 		// Extensions.
-		$this->e0  = self::REGEX_FILE_EXTENSIONS;
-		$this->e1  = self::REGEX_FILE_EXTENSIONS . self::REGEX_END;
-		$this->e2  = self::REGEX_FILE_EXTENSIONS .
-			self::REGEX_SUBJECT_SIZE . self::REGEX_END;
+		$this->e0  = \CollectionsCleaning::REGEX_FILE_EXTENSIONS;
+		$this->e1  = \CollectionsCleaning::REGEX_FILE_EXTENSIONS . \CollectionsCleaning::REGEX_END;
+		$this->e2  = \CollectionsCleaning::REGEX_FILE_EXTENSIONS .
+			\CollectionsCleaning::REGEX_SUBJECT_SIZE . \CollectionsCleaning::REGEX_END;
 		$this->pdo = ($settings instanceof DB ? $settings : new DB());
 	}
 
