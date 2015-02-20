@@ -102,7 +102,7 @@ function preName($argv, $argc)
 		$consoletools = new \ConsoleTools(['ColorCLI' => $pdo->log]);
 		foreach ($res as $row) {
 			$groupname = $groups->getByNameByID($row['groupID']);
-			$cleanerName = releaseCleaner($row['name'], $row['fromname'], $row['size'], $groupname, $usepre);
+			$cleanerName = releaseCleaner($row['name'], $row['fromname'], $groupname, $usepre);
 			$preid = 0;
 			$predb = $predbfile = $increment = false;
 			if (!is_array($cleanerName)) {
@@ -296,11 +296,11 @@ function catRelease($type, $where, $echooutput = false)
 	return $relcount;
 }
 
-function releaseCleaner($subject, $fromName, $size, $groupname, $usepre)
+function releaseCleaner($subject, $fromName, $groupname, $usepre)
 {
 	$groups = new \Groups();
 	$releaseCleaning = new \ReleaseCleaning($groups->pdo);
-	$cleanerName = $releaseCleaning->releaseCleaner($subject, $fromName, $size, $groupname, $usepre);
+	$cleanerName = $releaseCleaning->releaseCleaner($subject, $fromName, $groupname, $usepre);
 	if (!is_array($cleanerName) && $cleanerName != false) {
 		return array("cleansubject" => $cleanerName, "properlynamed" => true, "increment" => false);
 	} else {
