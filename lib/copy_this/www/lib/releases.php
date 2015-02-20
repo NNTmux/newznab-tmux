@@ -1786,7 +1786,7 @@ class Releases
 		$returnCount = $duplicate = 0;
 		$result = $this->pdo->queryDirect(sprintf("SELECT %s.*, g.name AS group_name, count(%s.ID) AS parts FROM %s INNER JOIN groups g ON g.ID = %s.groupID WHERE %s procstat = %d AND relname IS NOT NULL GROUP BY relname, g.name, groupID, fromname ORDER BY COUNT(%s.ID) DESC LIMIT %d", $group['bname'], $group['bname'], $group['bname'], $group['bname'], (!empty($groupID) ? ' groupID = ' . $groupID . ' AND ' : ' '), Releases::PROCSTAT_READYTORELEASE, $group['bname'], $this->releaseCreationLimit));
 		while ($row = $this->pdo->getAssocArray($result)) {
-			$relguid = md5(uniqid());
+			$relguid = $this->createGUID();
 			// Clean release name
 			$releaseCleaning = new ReleaseCleaning();
 			$cleanRelName = $this->cleanReleaseName($row['relname']);
@@ -1820,7 +1820,7 @@ class Releases
 					'searchname'     => $this->pdo->escapeString(utf8_encode($cleanedName)),
 					'totalpart'      => $row["parts"],
 					'groupID'        => $row["groupID"],
-					'guid'           => $this->pdo->escapeString($relguid),
+					'guid'           => $this->pdo->escapeString($this->createGUID($cleanRelName)),
 					'categoryID'     => $categorize->determineCategory($groupID, $cleanedName),
 					'regexID'        => $row["regexID"],
 					'postdate'       => $this->pdo->escapeString($row['date']),
@@ -1869,7 +1869,6 @@ class Releases
 			$nzbInfo = new nzbInfo;
 			if (!$nzbInfo->loadFromFile($nzbfile)) {
 				$this->pdo->log->doEcho($this->pdo->log->primary('Failed to write nzb file (bad perms?) ' . $nzbfile . ''));
-				//copy($nzbfile, "./ERRORNZB_".$relguid);
 				$this->delete($relid);
 			} else {
 				// Check if gid already exists
