@@ -798,6 +798,7 @@ class Categorize extends Category
 			case $this->isXxxPack():
 			case $this->IsXxxClipHD():
 			case $this->isXxxClipSD():
+			case $this->catWebDL && $this->isXxxWEBDL():
 			case $this->isXxx264():
 			case $this->isXxxXvid():
 			case $this->isXxxImageset():
@@ -805,6 +806,7 @@ class Categorize extends Category
 			case $this->isXxxDVD():
 			case $this->isXxxOther():
 			case $this->isXxxSD():
+
 				return true;
 			default:
 				$this->tmpCat = \Category::CAT_XXX_OTHER;
@@ -817,6 +819,12 @@ class Categorize extends Category
 		if (preg_match('/720p|1080(hd|[ip])|[xh][^a-z0-9]?264/i', $this->releaseName) && !preg_match('/\bwmv\b/i', $this->releaseName) && !preg_match('/SDX264XXX/i', $this->releaseName)) {
 			$this->tmpCat = \Category::CAT_XXX_X264;
 			return true;
+		}
+		if ($this->catWebDL == false) {
+			if (preg_match('/web[-._ ]dl|web-?rip/i', $this->releaseName)) {
+				$this->tmpCat = \Category::CAT_XXX_X264;
+				return true;
+			}
 		}
 		return false;
 	}
@@ -893,10 +901,20 @@ class Categorize extends Category
 		}
 		return false;
 	}
+
 	public function isXxxSD()
 	{
 		if (preg_match('/^[\w.]+(\d{2}\.\d{2}\.\d{2})[\w.]+(MP4-\w+)/i', $this->releaseName)) {
 			$this->tmpCat = \Category::CAT_XXX_SD;
+			return true;
+		}
+		return false;
+	}
+
+	public function isXxxWEBDL()
+	{
+		if (preg_match('/web[-._ ]dl|web-?rip/i', $this->releaseName)) {
+			$this->tmpCat = \Category::CAT_XXX_WEBDL;
 			return true;
 		}
 		return false;
