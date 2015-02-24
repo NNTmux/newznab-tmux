@@ -831,7 +831,7 @@ class Categorize extends Category
 
 	public function isXxxClipHD()
 	{
-		if (preg_match('/^[\w.]+(\d{2}\.\d{2}\.\d{2})[\w.]+(M[PO][V4]-(KTR|GUSH|FaiLED|SEXORS|hUSHhUSH))/i', $this->releaseName)) {
+		if (preg_match('/^[\w-.]+(\d{2}\.\d{2}\.\d{2})[\w-.]+(M[PO][V4]-(KTR|GUSH|FaiLED|SEXORS|hUSHhUSH))/i', $this->releaseName)) {
 			$this->tmpCat = \Category::CAT_XXX_CLIPHD;
 			return true;
 		}
