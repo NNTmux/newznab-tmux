@@ -601,7 +601,7 @@ class ProcessReleases
 							'postdate' => $this->pdo->escapeString($collection['date']),
 							'fromname' => $fromName,
 							'size' => $collection['filesize'],
-							'categoryID' => $categorize->determineCategory($cleanedName, $collection['group_id']),
+							'categoryID' => $categorize->determineCategory($collection['group_id'], $cleanedName),
 							'isrenamed' => ($properName === true ? 1 : 0),
 							'reqidstatus' => ($isReqID === true ? 1 : 0),
 							'prehashID' => ($preID === false ? 0 : $preID),
