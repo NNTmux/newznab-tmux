@@ -2268,7 +2268,7 @@ Class ProcessAdditional
 					}
 
 					// Get a new category ID.
-					$newCategory = $this->_categorize->determineCategory($newName, $this->_release['groupID']);
+					$newCategory = $this->_categorize->determineCategory($this->_release['groupID'], $newName);
 
 					$newTitle = $this->pdo->escapeString(substr($newName, 0, 255));
 					// Update the release with the data.

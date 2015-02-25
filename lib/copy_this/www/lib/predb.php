@@ -93,7 +93,7 @@ class PreDB
 		$dirname = empty($dirname) ? '' : sprintf('WHERE dirname LIKE %s', $db->escapeString('%'.$dirname.'%'));
 		$category = empty($category) ? '' : sprintf((empty($dirname) ? 'WHERE' : ' AND')." category = %s", $db->escapeString($category));
 
-		$sql = sprintf('SELECT predb.*, r.guid FROM predb left outer join releases r on r.preID = predb.ID %s %s ORDER BY ctime DESC LIMIT %d,%d', $dirname, $category, $start, $num);
+		$sql = sprintf('SELECT p.*, r.guid FROM predb p left outer join releases r on p.ID = r.preID %s %s ORDER BY ctime DESC LIMIT %d,%d', $dirname, $category, $start, $num);
 
 		return $db->query($sql, true);
 	}
