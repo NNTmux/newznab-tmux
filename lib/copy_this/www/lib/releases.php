@@ -1518,7 +1518,7 @@ class Releases
 				xxx.cover, xxx.title
 			FROM releases r
 			INNER JOIN xxxinfo xxx ON r.xxxinfo_id = xxx.ID
-			WHERE r.categoryID IN (6010, 6020, 6030, 6040, 6080)
+			WHERE r.categoryID BETWEEN 6000 AND 6999
 			AND xxx.ID > 0
 			AND xxx.cover = 1
 			AND r.ID in (select max(ID) from releases where xxxinfo_id > 0 group by xxxinfo_id)
