@@ -293,7 +293,7 @@
 		</tr>
 
 		<tr>
-			<td style="width:180px;"><label for="nzbs">Nzbs:</label></td>
+			<td style="width:180px;"><label for="nzbs">Nzbs Folder:</label></td>
 			<td>
 				<input id="nzbs" class="long" name="nzbs" type="text" value="{$ftmux->nzbs}"/>
 
@@ -301,6 +301,14 @@
 					files folder of nzbs. This is by default, recursive and threaded. You set the threads in Advanced
 					Settings.
 				</div>
+			</td>
+		</tr>
+
+		<tr>
+			<td style="width:180px;"><label for="import_count">Import nzbs per process:</label></td>
+			<td>
+				<input id="import_count" name="import_count" class="short" type="text" value="{$ftmux->import_count}"/>
+				<div class="hint">How many NZB files to import per process.</div>
 			</td>
 		</tr>
 
