@@ -1990,7 +1990,7 @@ class Releases
 		//
 		$group = $this->groups->getCBPTableNames($this->tablePerGroup, $groupID);
 		$groups = $this->groups->getByID($groupID);
-		$activeGroups = $this->groups->getActive(false);
+		$activeGroups = $this->groups->getActive();
 		$this->releaseRegex->get();
 		$this->pdo->log->doEcho($this->pdo->log->primary('Applying regex to binaries'), true);
 	   foreach($activeGroups as $groupArr) {
