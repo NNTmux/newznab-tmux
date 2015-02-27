@@ -92,7 +92,6 @@ class Musik
 	 */
 	public function getMusicInfo($id)
 	{
-		$pdo = $this->pdo;
 		return $this->pdo->queryOneRow(sprintf("SELECT musicinfo.*, genres.title AS genres FROM musicinfo LEFT OUTER JOIN genres ON genres.ID = musicinfo.genreID WHERE musicinfo.ID = %d ", $id));
 	}
 
