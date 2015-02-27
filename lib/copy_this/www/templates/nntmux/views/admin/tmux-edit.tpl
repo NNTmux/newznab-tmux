@@ -639,27 +639,6 @@
 		</tr>
 
 		<tr>
-			<td style="width:180px;"><label for="max_load">Maximum Load:</label></td>
-			<td>
-				<input id="max_load" name="max_load" class="short" type="text" value="{$ftmux->max_load}"/>
-
-				<div class="hint">Set this to limit the load on your system to value entered. Default value is 2.0.
-				</div>
-			</td>
-		</tr>
-
-		<tr>
-			<td style="width:180px;"><label for="max_load_releases">Maximum Releases Load:</label></td>
-			<td>
-				<input id="max_load_releases" name="max_load_releases" class="short" type="text"
-					   value="{$ftmux->max_load_releases}"/>
-
-				<div class="hint">Set this to limit the load on your system to value entered. Default value is 2.0.
-				</div>
-			</td>
-		</tr>
-
-		<tr>
 			<td style="width:180px;"><label for="safebackfilldate">Safe Backfill Date:</label></td>
 			<td>
 				<input class="small" id="safebackfilldate" name="safebackfilldate" type="text"
