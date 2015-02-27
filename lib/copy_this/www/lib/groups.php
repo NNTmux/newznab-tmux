@@ -471,7 +471,7 @@ class Groups
 
 		if ($tpgSetting === true) {
 			if ($groupID == '') {
-				exit('Error: You must use releases_threaded.py since you have enabled TPG!');
+				exit('Error: You must use .../misc/update_scripts/nix_scripts/multiprocessing/releases.php since you have enabled TPG!');
 			}
 
 			if ($this->createNewTPGTables($groupID) === false && NN_ECHOCLI) {
