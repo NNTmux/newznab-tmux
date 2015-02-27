@@ -293,7 +293,7 @@
 		</tr>
 
 		<tr>
-			<td style="width:180px;"><label for="nzbs">Nzbs:</label></td>
+			<td style="width:180px;"><label for="nzbs">Nzbs Folder:</label></td>
 			<td>
 				<input id="nzbs" class="long" name="nzbs" type="text" value="{$ftmux->nzbs}"/>
 
@@ -301,6 +301,14 @@
 					files folder of nzbs. This is by default, recursive and threaded. You set the threads in Advanced
 					Settings.
 				</div>
+			</td>
+		</tr>
+
+		<tr>
+			<td style="width:180px;"><label for="import_count">Import nzbs per process:</label></td>
+			<td>
+				<input id="import_count" name="import_count" class="short" type="text" value="{$ftmux->import_count}"/>
+				<div class="hint">How many NZB files to import per process.</div>
 			</td>
 		</tr>
 
@@ -626,27 +634,6 @@
 						fork</a> or <a href="https://github.com/Lokaltog/powerline-fonts">the original git</a><br \>You
 					will need to copy the default theme located at powerline/powerline/themes/default.sh to
 					powerline/powerline/themes/tmux.sh and edit that file for what is displayed, colors, etc.
-				</div>
-			</td>
-		</tr>
-
-		<tr>
-			<td style="width:180px;"><label for="max_load">Maximum Load:</label></td>
-			<td>
-				<input id="max_load" name="max_load" class="short" type="text" value="{$ftmux->max_load}"/>
-
-				<div class="hint">Set this to limit the load on your system to value entered. Default value is 2.0.
-				</div>
-			</td>
-		</tr>
-
-		<tr>
-			<td style="width:180px;"><label for="max_load_releases">Maximum Releases Load:</label></td>
-			<td>
-				<input id="max_load_releases" name="max_load_releases" class="short" type="text"
-					   value="{$ftmux->max_load_releases}"/>
-
-				<div class="hint">Set this to limit the load on your system to value entered. Default value is 2.0.
 				</div>
 			</td>
 		</tr>
