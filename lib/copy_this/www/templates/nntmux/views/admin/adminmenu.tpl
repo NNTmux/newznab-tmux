@@ -15,6 +15,13 @@
 					<li class="last"><a href="{$smarty.const.WWW_TOP}/collection_regexes-list.php">View</a></li>
 				</ul>
 			</li>
+			<li class="has-sub"><a href="#">Release Names</a>
+				<ul>
+					<li><a href="{$smarty.const.WWW_TOP}/release_name_regexes-edit.php?action=add">Add</a></li>
+					<li><a href="{$smarty.const.WWW_TOP}/release_name_regexes-test.php?action=add">Test</a></li>
+					<li class="last"><a href="{$smarty.const.WWW_TOP}/release_name_regexes-list.php">View</a></li>
+				</ul>
+			</li>
             <li><a href="{$smarty.const.WWW_TOP}/binaryblacklist-list.php">View</a> <a style="padding:0;" href="{$smarty.const.WWW_TOP}/binaryblacklist-edit.php?action=add">Add</a> Blacklist</li>
             <li><a href="{$smarty.const.WWW_TOP}/release-list.php">View Releases</a></li>
             <li><a href="{$smarty.const.WWW_TOP}/preview-list.php">View Previews</a></li>

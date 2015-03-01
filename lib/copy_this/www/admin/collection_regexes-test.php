@@ -1,16 +1,11 @@
 <?php
-require_once("config.php");
-require_once(WWW_DIR."/lib/adminpage.php");
-require_once(WWW_DIR."/lib/site.php");
-require_once(WWW_DIR."/lib/CollectionsCleaning.php");
+require_once './config.php';
 
 $page = new AdminPage();
-$s = new Sites();
-$site = $s->get();
 
 $page->title = "Collections Regex Test";
 
-$tpg = $page->site->tablepergroup;
+$tpg = $page->settings->getSetting('tablepergroup');
 $page->smarty->assign('tpg', $tpg);
 
 if ($tpg) {
@@ -21,7 +16,7 @@ if ($tpg) {
 	$page->smarty->assign(['group' => $group, 'regex' => $regex, 'limit' => $limit]);
 
 	if ($group && $regex) {
-		$page->smarty->assign('data', (new CollectionsCleaning(['Settings' => $page->settings]))->testRegex($group, $regex, $limit));
+		$page->smarty->assign('data', (new Regexes(['Settings' => $page->settings, 'Table_Name' => 'collection_regexes']))->testCollectionRegex($group, $regex, $limit));
 	}
 
 }

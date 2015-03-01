@@ -70,19 +70,22 @@ Class Sharing
 	/**
 	 * Construct.
 	 *
-	 * @param DB   $db
-	 * @param NNTP $nntp
+	 * @param array $options Class instances.
+	 *
+	 * @access public
 	 */
-	public function __construct(&$db = null, &$nntp = null)
+	public function __construct(array $options = [])
 	{
-		if (!is_null($db)) {
-			$this->db = $db;
-		} else {
-			$this->db = new DB();
-		}
+		$defaults= [
+			'Settings' => null,
+			'NNTP'     => null,
+		];
+		$options += $defaults;
+
+		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 
 		// Get all sharing info from DB.
-		$check = $this->db->queryOneRow('SELECT * FROM sharing');
+		$check = $this->pdo->queryOneRow('SELECT * FROM sharing');
 
 		// Initiate sharing settings if this is the first time..
 		if (empty($check)) {
@@ -94,7 +97,7 @@ Class Sharing
 			return;
 		}
 
-		$this->nntp = $nntp;
+		$this->nntp = ($options['NNTP'] instanceof \NNTP ? $options['NNTP'] : new \NNTP(['Settings' => $this->pdo]));
 
 		// Cache sharing settings.
 		$this->siteSettings = $check;
