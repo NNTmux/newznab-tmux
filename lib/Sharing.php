@@ -145,19 +145,19 @@ Class Sharing
 	 */
 	public function initSettings(&$siteGuid = '')
 	{
-		$this->db->queryExec('TRUNCATE TABLE sharing');
+		$this->pdo->queryExec('TRUNCATE TABLE sharing');
 		$siteName = uniqid('newznab_', true);
-		$this->db->queryExec(
+		$this->pdo->queryExec(
 			sprintf('
 				INSERT INTO sharing
 				(site_name, site_guid, max_push, max_pull, hide_users, start_position, auto_enable, fetching, max_download)
 				VALUES (%s, %s, 40 , 20000, 1, 1, 1, 1, 150)',
-				$this->db->escapeString($siteName),
-				$this->db->escapeString(($siteGuid === '' ? sha1($siteName) : $siteGuid))
+				$this->pdo->escapeString($siteName),
+				$this->pdo->escapeString(($siteGuid === '' ? sha1($siteName) : $siteGuid))
 			)
 		);
 
-		return $this->db->queryOneRow('SELECT * FROM sharing');
+		return $this->pdo->queryOneRow('SELECT * FROM sharing');
 	}
 
 	/**
@@ -166,14 +166,14 @@ Class Sharing
 	protected function postAll()
 	{
 		// Get all comments that we have no posted yet.
-		$newComments = $this->db->query(
+		$newComments = $this->pdo->query(
 			sprintf(
 				'SELECT rc.text, rc.ID, %s, u.username, r.nzb_guid
 				FROM releasecomment rc
 				INNER JOIN users u ON rc.userID = u.ID
 				INNER JOIN releases r on rc.releaseID = r.ID
 				WHERE rc.shared = 0 LIMIT %d',
-				$this->db->unix_timestamp_column('rc.createddate'),
+				$this->pdo->unix_timestamp_column('rc.createddate'),
 				$this->siteSettings['max_push']
 			)
 		);
@@ -208,7 +208,7 @@ Class Sharing
 		$sid = sha1($row['unix_time'] . $row['text'] . $row['nzb_guid']);
 
 		// Check if the comment is already shared.
-		$check = $this->db->queryOneRow(sprintf('SELECT ID FROM releasecomment WHERE shareID = %s', $this->db->escapeString($sid)));
+		$check = $this->pdo->queryOneRow(sprintf('SELECT ID FROM releasecomment WHERE shareID = %s', $this->pdo->escapeString($sid)));
 		if ($check === false) {
 
 			// Example of a subject.
@@ -234,12 +234,12 @@ Class Sharing
 			if ($this->nntp->isError($success) === false && $success === true) {
 
 				// Update DB to say we posted the article.
-				$this->db->queryExec(
+				$this->pdo->queryExec(
 					sprintf('
 						UPDATE releasecomment
 						SET shared = 1, shareID = %s
 						WHERE ID = %d',
-						$this->db->escapeString($sid),
+						$this->pdo->escapeString($sid),
 						$row['ID']
 					)
 				);
@@ -249,7 +249,7 @@ Class Sharing
 			}
 		} else {
 			// Update the DB to say it's shared.
-			$this->db->queryExec(sprintf('UPDATE releasecomment SET shared = 1 WHERE ID = %d', $row['ID']));
+			$this->pdo->queryExec(sprintf('UPDATE releasecomment SET shared = 1 WHERE ID = %d', $row['ID']));
 		}
 	}
 
@@ -258,7 +258,7 @@ Class Sharing
 	 */
 	protected function matchComments()
 	{
-		$res = $this->db->query('
+		$res = $this->pdo->query('
 			SELECT r.ID, r.nzb_guid
 			FROM releases r
 			INNER JOIN releasecomment rc ON rc.nzb_guid = r.nzb_guid
@@ -268,14 +268,14 @@ Class Sharing
 		$found = count($res);
 		if ($found > 0) {
 			foreach ($res as $row) {
-				$this->db->queryExec(
+				$this->pdo->queryExec(
 					sprintf(
 						"UPDATE releasecomment SET releaseID = %d WHERE nzb_guid = %s",
 						$row['ID'],
-						$this->db->escapeString($row['nzb_guid'])
+						$this->pdo->escapeString($row['nzb_guid'])
 					)
 				);
-				$this->db->queryExec(sprintf('UPDATE releases SET comments = comments + 1 WHERE ID = %d', $row['ID']));
+				$this->pdo->queryExec(sprintf('UPDATE releases SET comments = comments + 1 WHERE ID = %d', $row['ID']));
 			}
 
 			echo '(Sharing) Matched ' . $found . ' comments.' . PHP_EOL;
@@ -362,9 +362,9 @@ Class Sharing
 				}
 
 				// Check if we already have the comment.
-				$check = $this->db->queryOneRow(
+				$check = $this->pdo->queryOneRow(
 					sprintf('SELECT ID FROM releasecomment WHERE shareID = %s',
-						$this->db->escapeString($matches['sid'])
+						$this->pdo->escapeString($matches['sid'])
 					)
 				);
 
@@ -372,9 +372,9 @@ Class Sharing
 				if ($check === false) {
 
 					// Check if we have the site and if it is enabled.
-					$check = $this->db->queryOneRow(
+					$check = $this->pdo->queryOneRow(
 						sprintf('SELECT enabled FROM sharing_sites WHERE site_guid = %s',
-							$this->db->escapeString($matches['guid'])
+							$this->pdo->escapeString($matches['guid'])
 						)
 					);
 
@@ -382,25 +382,25 @@ Class Sharing
 						// Check if the user has auto enable on.
 						if ($this->siteSettings['auto_enable'] === false) {
 							// Insert the site so the admin can enable it later on.
-							$this->db->queryExec(
+							$this->pdo->queryExec(
 								sprintf('
 									INSERT INTO sharing_sites
 									(site_name, site_guid, last_time, first_time, enabled, comments)
 									VALUES (%s, %s, NOW(), NOW(), 0, 0)',
-									$this->db->escapeString($matches['site']),
-									$this->db->escapeString($matches['guid'])
+									$this->pdo->escapeString($matches['site']),
+									$this->pdo->escapeString($matches['guid'])
 								)
 							);
 							continue;
 						} else {
 							// Insert the site as enabled since the user has auto enabled on.
-							$this->db->queryExec(
+							$this->pdo->queryExec(
 								sprintf('
 									INSERT INTO sharing_sites
 									(site_name, site_guid, last_time, first_time, enabled, comments)
 									VALUES (%s, %s, NOW(), NOW(), 1, 0)',
-									$this->db->escapeString($matches['site']),
-									$this->db->escapeString($matches['guid'])
+									$this->pdo->escapeString($matches['site']),
+									$this->pdo->escapeString($matches['guid'])
 								)
 							);
 						}
@@ -413,11 +413,11 @@ Class Sharing
 
 					// Insert the comment, if we got it, update the site to increment comment count.
 					if ($this->insertNewComment($header['Message-ID'], $matches['guid'])) {
-						$this->db->queryExec(
+						$this->pdo->queryExec(
 							sprintf('
 								UPDATE sharing_sites SET comments = comments + 1, last_time = NOW(), site_name = %s WHERE site_guid = %s',
-								$this->db->escapeString($matches['site']),
-								$this->db->escapeString($matches['guid'])
+								$this->pdo->escapeString($matches['site']),
+								$this->pdo->escapeString($matches['guid'])
 							)
 						);
 						$found++;
@@ -432,14 +432,14 @@ Class Sharing
 			// Update once in a while in case the user cancels the script.
 			if ($total++ % 10 == 0) {
 				$this->siteSettings['lastarticle'] = $currentArticle;
-				$this->db->queryExec(sprintf('UPDATE sharing SET last_article = %d', $currentArticle));
+				$this->pdo->queryExec(sprintf('UPDATE sharing SET last_article = %d', $currentArticle));
 			}
 		}
 
 		if ($currentArticle > 0) {
 			// Update sharing's last article number.
 			$this->siteSettings['lastarticle'] = $currentArticle;
-			$this->db->queryExec(sprintf('UPDATE sharing SET last_article = %d', $currentArticle));
+			$this->pdo->queryExec(sprintf('UPDATE sharing SET last_article = %d', $currentArticle));
 		}
 
 
@@ -487,19 +487,19 @@ Class Sharing
 		$cid = md5($body['SID'].$body['USER'].$body['TIME'].$siteID);
 
 		// Insert the comment.
-		if ($this->db->queryExec(
+		if ($this->pdo->queryExec(
 			sprintf('
 				INSERT IGNORE INTO releasecomment
 				(text, createddate, issynced, shareID, cid, gid, nzb_guid, siteID, username, userID, releaseID, shared, host, sourceID)
 				VALUES (%s, %s, 1, %s, %s, %s, %s, %s, %s, 0, 0, 2, "", 999)',
-				$this->db->escapeString($body['BODY']),
-				$this->db->from_unixtime(($body['TIME'] > time() ? time() : $body['TIME'])),
-				$this->db->escapeString($body['SID']),
-				$this->db->escapeString($cid),
-				$this->db->escapeString($body['RID']),
-				$this->db->escapeString($body['RID']),
-				$this->db->escapeString($siteID),
-				$this->db->escapeString((substr($body['USER'], 0, 3) === 'sn-' ? 'SH_ANON' : 'SH_' . $body['USER']))
+				$this->pdo->escapeString($body['BODY']),
+				$this->pdo->from_unixtime(($body['TIME'] > time() ? time() : $body['TIME'])),
+				$this->pdo->escapeString($body['SID']),
+				$this->pdo->escapeString($cid),
+				$this->pdo->escapeString($body['RID']),
+				$this->pdo->escapeString($body['RID']),
+				$this->pdo->escapeString($siteID),
+				$this->pdo->escapeString((substr($body['USER'], 0, 3) === 'sn-' ? 'SH_ANON' : 'SH_' . $body['USER']))
 			)
 		)
 		) {
