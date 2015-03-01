@@ -907,7 +907,7 @@ class ReleaseRemover
 					if ($groupIDCount === 0) {
 						continue;
 					} elseif ($groupIDCount === 1) {
-						$groupIDs = $groupIDs[0]['id'];
+						$groupIDs = $groupIDs[0]['ID'];
 					} else {
 						$string = '';
 						foreach ($groupIDs as $fID) {
