@@ -689,15 +689,7 @@ Class ProcessAdditional
 			if (!is_dir($this->tmpPath)) {
 
 				$this->_echo('Unable to create directory: ' . $this->tmpPath, 'warning');
-
-				// Decrement password status.
-				$this->pdo->queryExec(
-					sprintf(
-						'UPDATE releases SET passwordstatus = passwordstatus - 1 WHERE ID = %d',
-						$this->_release['ID']
-					)
-				);
-				return false;
+				return $this->_decrementPasswordStatus();
 			}
 		}
 		return true;
@@ -714,39 +706,45 @@ Class ProcessAdditional
 		if ($nzbPath === false) {
 
 			$this->_echo('NZB not found for GUID: ' . $this->_release['guid'], 'warning');
-
-			// The nzb was not located. decrement the password status.
-			$this->pdo->queryExec(
-				sprintf(
-					'UPDATE releases SET passwordstatus = passwordstatus - 1 WHERE ID = %d',
-					$this->_release['ID']
-				)
-			);
-			return false;
+			return $this->_decrementPasswordStatus();
 		}
 
 		$nzbContents = Utility::unzipGzipFile($nzbPath);
+		if (!$nzbContents) {
+			$this->_echo('NZB is empty or broken for GUID: ' . $this->_release['guid'], 'warning');
+			return $this->_decrementPasswordStatus();
+		}
 
 		// Get a list of files in the nzb.
 		$this->_nzbContents = $this->_nzb->nzbFileList($nzbContents);
 		if (count($this->_nzbContents) === 0) {
 
-			$this->_echo('NZB is empty or broken for GUID: ' . $this->_release['guid'], 'warning');
-
-			// There does not appear to be any files in the nzb, decrement password status.
-			$this->pdo->queryExec(
-				sprintf(
-					'UPDATE releases SET passwordstatus = passwordstatus - 1 WHERE ID = %d',
-					$this->_release['ID']
-				)
-			);
-			return false;
+			$this->_echo('NZB is potentially broken for GUID: ' . $this->_release['guid'], 'warning');
+			return $this->_decrementPasswordStatus();
 		}
 
 		// Sort the files inside the NZB.
-		usort($this->_nzbContents, ['ProcessAdditional', '_sortNZB']);
+		usort($this->_nzbContents, ['\tmux\lib\ProcessAdditional', '_sortNZB']);
 
 		return true;
+	}
+
+	/**
+	 * Decrement password status for the current release.
+	 *
+	 * @param bool $return Return value.
+	 *
+	 * @return bool
+	 */
+	protected function _decrementPasswordStatus($return = false)
+	{
+		$this->pdo->queryExec(
+			sprintf(
+				'UPDATE releases SET passwordstatus = passwordstatus - 1 WHERE ID = %d',
+				$this->_release['ID']
+			)
+		);
+		return $return;
 	}
 
 	/**
