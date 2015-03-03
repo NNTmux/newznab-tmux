@@ -254,8 +254,7 @@ Class NZBContents
 			}
 			return false;
 		}
-		$utility = new Utility();
-		$nzbContents = $utility->unzipGzipFile($nzbPath);
+		$nzbContents = Utility::unzipGzipFile($nzbPath);
 		if (!$nzbContents) {
 			if ($this->echooutput) {
 				echo
