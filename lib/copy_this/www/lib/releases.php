@@ -2725,7 +2725,7 @@ class Releases
 							FROM releases r
 							WHERE r.categoryID = %d
 							AND r.size < %d',
-							$category['ID'],
+							$category['id'],
 							$category['minsize']
 						)
 					);
