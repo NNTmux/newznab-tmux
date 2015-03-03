@@ -724,7 +724,7 @@ Class ProcessAdditional
 		}
 
 		// Sort the files inside the NZB.
-		usort($this->_nzbContents, ['\tmux\lib\ProcessAdditional', '_sortNZB']);
+		usort($this->_nzbContents, ['ProcessAdditional', '_sortNZB']);
 
 		return true;
 	}
