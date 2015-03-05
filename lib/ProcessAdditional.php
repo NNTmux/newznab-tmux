@@ -718,7 +718,7 @@ Class ProcessAdditional
 		}
 
 		// Get a list of files in the nzb.
-		$this->_nzbContents = $this->_nzb->nzbFileList($nzbContents);
+		$this->_nzbContents = $this->nnnzb->nzbFileList($nzbContents);
 		if (count($this->_nzbContents) === 0) {
 
 			$this->_echo('NZB is potentially broken for GUID: ' . $this->_release['guid'], 'warning');
