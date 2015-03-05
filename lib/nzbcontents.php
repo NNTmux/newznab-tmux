@@ -70,10 +70,10 @@ Class NZBContents
 	 *     array(
 	 *         'Echo'        => bool        ; To echo to CLI or not.
 	 *         'NNTP'        => NNTP        ; Class NNTP.
-	 *         'Nfo'         => Nfo         ; Class Info.
+	 *         'Nfo'         => Nfo         ; Class Nfo.
 	 *         'NZB'         => NZB         ; Class NZB.
-	 *         'DB'          => DB          ; Class DB.
-	 *         'PostProcess' => PProcess ; Class PProcess.
+	 *         'Settings'    => DB          ; Class nzedb\db\Settings.
+	 *         'PostProcess' => PostProcess ; Class PostProcess.
 	 *     )
 	 *
 	 * @access public
@@ -85,18 +85,21 @@ Class NZBContents
 			'NNTP'        => null,
 			'Nfo'         => null,
 			'NZB'         => null,
-			'DB'          => null,
+			'Settings'    => null,
 			'PostProcess' => null,
 		];
 		$options += $defaults;
 
-		$this->echooutput = ($options['Echo']);
-		$this->db = ($options['DB'] instanceof DB ? $options['DB'] : new DB());
-		$this->nntp = ($options['NNTP'] instanceof NNTP ? $options['NNTP'] : new NNTP());
-		$this->nfo = ($options['Nfo'] instanceof Info ? $options['Nfo'] : new Info());
+		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
+		$this->pdo = ($options['Settings'] instanceof \DB ? $options['Settings'] : new \DB());
+		$this->nntp = ($options['NNTP'] instanceof \NNTP ? $options['NNTP'] : new \NNTP(['Echo' => $this->echooutput, 'Settings' => $this->pdo]));
+		$this->nfo = ($options['Info'] instanceof Info ? $options['Nfo'] : new \Info(['Echo' => $this->echooutput, 'Settings' => $this->pdo]));
 		$this->pp = (
-		$options['PostProcess'] instanceof PProcess ? $options['PostProcess'] : new PProcess());
-		$this->nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB());
+		$options['PostProcess'] instanceof PProcess
+			? $options['PostProcess']
+			: new PProcess(['Echo' => $this->echooutput, 'Nfo' => $this->nfo, 'Settings' => $this->pdo])
+		);
+		$this->nzb = ($options['NZB'] instanceof \NZB ? $options['NZB'] : new \NZB($this->pdo));
 		$t = new Tmux();
 		$this->tmux = $t->get();
 		$s = new Sites();
@@ -128,7 +131,7 @@ Class NZBContents
 			$fetchedBinary = $this->nntp->getMessages($groupName, $messageID['ID'], $this->alternateNNTP);
 			if ($this->nntp->isError($fetchedBinary)) {
 				// NFO download failed, increment attempts.
-				$this->db->queryExec(sprintf('UPDATE releases SET nfostatus = nfostatus - 1 WHERE ID = %d', $relID));
+				$this->pdo->queryExec(sprintf('UPDATE releases SET nfostatus = nfostatus - 1 WHERE ID = %d', $relID));
 				if ($this->echooutput) {
 					echo 'f';
 				}
@@ -142,14 +145,14 @@ Class NZBContents
 				if ($this->echooutput) {
 					echo '-';
 				}
-				$this->db->queryExec(sprintf('UPDATE releases SET nfostatus = %d WHERE ID = %d', Info::NFO_NONFO, $relID));
+				$this->pdo->queryExec(sprintf('UPDATE releases SET nfostatus = %d WHERE ID = %d', Info::NFO_NONFO, $relID));
 				$fetchedBinary = false;
 			}
 		} else {
 			if ($this->echooutput) {
 				echo '-';
 			}
-			$this->db->queryExec(sprintf('UPDATE releases SET nfostatus = %d WHERE ID = %d', Info::NFO_NONFO, $relID));
+			$this->pdo->queryExec(sprintf('UPDATE releases SET nfostatus = %d WHERE ID = %d', Info::NFO_NONFO, $relID));
 		}
 
 		return $fetchedBinary;
@@ -208,7 +211,7 @@ Class NZBContents
 				if ($foundPAR2 === false) {
 					if (preg_match('/\.(par[2" ]|\d{2,3}").+\(1\/1\)$/i', $subject)) {
 						if ($this->pp->parsePAR2((string)$nzbcontents->segments->segment, $relID, $groupID, $this->nntp, 1) === true) {
-							$this->db->queryExec(sprintf('UPDATE releases SET proc_par2 = 1 WHERE ID = %d', $relID));
+							$this->pdo->queryExec(sprintf('UPDATE releases SET proc_par2 = 1 WHERE ID = %d', $relID));
 							$foundPAR2 = true;
 						}
 					}
@@ -224,7 +227,7 @@ Class NZBContents
 				$completion = 100;
 			}
 
-			$this->db->queryExec(sprintf('UPDATE releases SET completion = %d WHERE ID = %d', $completion, $relID));
+			$this->pdo->queryExec(sprintf('UPDATE releases SET completion = %d WHERE ID = %d', $completion, $relID));
 
 			if ($foundNFO === true && strlen($messageID) > 1) {
 				return array('hidden' => false, 'ID' => $messageID);
@@ -244,7 +247,7 @@ Class NZBContents
 	 *
 	 * @access public
 	 */
-	public function LoadNZB(&$guid)
+	public function LoadNZB($guid)
 	{
 		// Fetch the NZB location using the GUID.
 		$nzbPath = $this->nzb->getNZBPath($guid);
@@ -301,7 +304,7 @@ Class NZBContents
 			foreach ($nzbFile->file as $nzbContents) {
 				if (preg_match('/\.(par[2" ]|\d{2,3}").+\(1\/1\)$/i', (string)$nzbContents->attributes()->subject)) {
 					if ($this->pp->parsePAR2((string)$nzbContents->segments->segment, $relID, $groupID, $this->nntp, $show) === true && $nameStatus === 1) {
-						$this->db->queryExec(sprintf('UPDATE releases SET proc_par2 = 1 WHERE ID = %d', $relID));
+						$this->pdo->queryExec(sprintf('UPDATE releases SET proc_par2 = 1 WHERE ID = %d', $relID));
 
 						return true;
 					}
@@ -309,7 +312,7 @@ Class NZBContents
 			}
 		}
 		if ($nameStatus === 1) {
-			$this->db->queryExec(sprintf('UPDATE releases SET proc_par2 = 1 WHERE ID = %d', $relID));
+			$this->pdo->queryExec(sprintf('UPDATE releases SET proc_par2 = 1 WHERE ID = %d', $relID));
 		}
 
 		return false;
