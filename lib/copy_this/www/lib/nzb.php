@@ -290,6 +290,26 @@ class NZB
 	 *
 	 * @access public
 	 */
+	public function getNZBPath($releaseGuid, $levelsToSplit = 0, $createIfNotExist = false)
+	{
+		if ($levelsToSplit === 0) {
+			$levelsToSplit = $this->nzbSplitLevel;
+		}
+
+		return ($this->buildNZBPath($releaseGuid, $levelsToSplit, $createIfNotExist) . $releaseGuid . '.nzb.gz');
+	}
+
+	/**
+	 * Retrieve path + filename of the NZB to be stored.
+	 *
+	 * @param string $releaseGuid         The guid of the release.
+	 * @param int    $levelsToSplit       How many sub-paths the folder will be in. (optional)
+	 * @param bool   $createIfNotExist Create the folder if it doesn't exist. (optional)
+	 *
+	 * @return string Path+filename.
+	 *
+	 * @access public
+	 */
 	public function NZBPath($releaseGuid, $levelsToSplit = 0, $createIfNotExist = false)
 	{
 		if ($levelsToSplit === 0) {
