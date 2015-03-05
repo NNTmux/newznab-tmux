@@ -1820,7 +1820,7 @@ class Releases
 					'searchname'     => $this->pdo->escapeString(utf8_encode($cleanedName)),
 					'totalpart'      => $row["parts"],
 					'groupID'        => $row["groupID"],
-					'guid'           => $this->pdo->escapeString($this->createGUID($cleanRelName)),
+					'guid'           => $this->pdo->escapeString($relguid),
 					'categoryID'     => $categorize->determineCategory($groupID, $cleanedName),
 					'regexID'        => $row["regexID"],
 					'postdate'       => $this->pdo->escapeString($row['date']),
