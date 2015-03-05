@@ -1,6 +1,7 @@
 <?php
 require_once(WWW_DIR . "/lib/category.php");
 require_once(WWW_DIR . "/lib/site.php");
+require_once(WWW_DIR . "/lib/Regexes.php");
 
 /**
  * Categorizing of releases by name/group.
@@ -38,6 +39,11 @@ class Categorize extends Category
 	public $groupID;
 
 	/**
+	 * @var Regexes
+	 */
+	public $regexes;
+
+	/**
 	 * Construct.
 	 *
 	 * @param array $options Class instances.
@@ -50,6 +56,7 @@ class Categorize extends Category
 		$this->pdo = new DB();
 		$this->categorizeForeign = ($this->site->categorizeforeign == "0") ? false : true;
 		$this->catWebDL = ($this->site->catwebdl == "0") ? false : true;
+		$this->regexes = new Regexes(['Settings' => $this->pdo, 'Table_Name' => 'category_regexes']);
 	}
 
 	/**
@@ -70,9 +77,10 @@ class Categorize extends Category
 
 		switch (true) {
 			case $this->isMisc():
-				// Note that in byGroup() some overrides occur...
-			case $this->byGroup():
-				//Try against all functions, if still nothing, return Cat Misc.
+			// Note that in byGroup() some overrides occur...
+			case $this->databaseRegex():
+			case $this->byGroup(): // Note that in byGroup() some overrides occur...
+			//Try against all functions, if still nothing, return Cat Misc.
 			case $this->isPC():
 			case $this->isXXX():
 			case $this->isTV():
@@ -86,15 +94,35 @@ class Categorize extends Category
 	}
 
 	/**
+	 * Cache of group names for group ID's.
+	 * @var array
+	 */
+	private $groups = [];
+
+	/**
+	 * Sets/Gets a group name for the current group ID in the buffer.
+	 *
+	 * @return string Group Name.
+	 */
+	private function groupName()
+	{
+		if (!isset($this->groups[$this->groupID])) {
+			$group = $this->pdo->queryOneRow(sprintf('SELECT LOWER(name) AS name FROM groups WHERE id = %d', $this->groupID));
+			$this->groups[$this->groupID] = ($group === false ? false : $group['name']);
+		}
+
+		return $this->groups[$this->groupID];
+	}
+
+	/**
 	 * Determine category by group name.
 	 *
 	 * @return bool
 	 */
 	public function byGroup()
 	{
-		$group = $this->pdo->queryOneRow(sprintf('SELECT LOWER(name) AS name FROM groups WHERE ID = %d', $this->groupID));
+		$group = $this->groupName();
 		if ($group !== false) {
-			$group = $group['name'];
 			switch (true) {
 				case $group === 'alt.binaries.0day.stuffz':
 					switch (true) {
@@ -427,9 +455,6 @@ class Categorize extends Category
 					}
 					$this->tmpCat = \Category::CAT_GAME_PSP;
 					break;
-				case $group === 'alt.binaries.sony.psvita':
-					$this->tmpCat = \Category::CAT_GAME_PSVITA;
-					break;
 				case $group === 'alt.binaries.warez':
 					switch (true) {
 						case $this->isTV():
@@ -457,6 +482,20 @@ class Categorize extends Category
 				default:
 					return false;
 			}
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Try database regexes against a group / release name.
+	 * @return bool
+	 */
+	public function databaseRegex()
+	{
+		$cat = $this->regexes->tryRegex($this->releaseName, $this->groupName());
+		if ($cat) {
+			$this->tmpCat = $cat;
 			return true;
 		}
 		return false;
