@@ -317,7 +317,8 @@ class Enzebe
 			return $result;
 		}
 
-		$xml = @simplexml_load_string(str_replace("\x0F", '', $nzb));
+		$nzb = str_replace("\x0F", '', $nzb);
+		$xml = @simplexml_load_string($nzb);
 		if (!$xml || strtolower($xml->getName()) !== 'nzb') {
 			return $result;
 		}
