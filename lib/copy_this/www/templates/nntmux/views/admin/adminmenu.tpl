@@ -8,6 +8,12 @@
             <li><a href="{$smarty.const.WWW_TOP}/category-list.php?action=add">Edit</a> Categories</li>
             <li><a href="{$smarty.const.WWW_TOP}/group-list.php">View</a> <a style="padding:0;" href="{$smarty.const.WWW_TOP}/group-edit.php">Add</a> <a style="padding:0;" href="{$smarty.const.WWW_TOP}/group-bulk.php">BulkAdd</a> Groups</li>
             <li><a href="{$smarty.const.WWW_TOP}/regex-list.php">View</a> <a style="padding:0;" href="{$smarty.const.WWW_TOP}/regex-edit.php?action=add">Add</a> <a style="padding:0;" href="{$smarty.const.WWW_TOP}/regex-test.php">Test</a> <a style="padding:0;" href="{$smarty.const.WWW_TOP}/regex-submit.php">Send</a> Regex</li>
+			<li class="has-sub"><a href="#">Categorization</a>
+				<ul>
+					<li><a href="{$smarty.const.WWW_TOP}/category_regexes-edit.php?action=add">Add</a></li>
+					<li class="last"><a href="{$smarty.const.WWW_TOP}/category_regexes-list.php">View</a></li>
+				</ul>
+			</li>
 			<li class="has-sub"><a href="#">Collections</a>
 				<ul>
 					<li><a href="{$smarty.const.WWW_TOP}/collection_regexes-edit.php?action=add">Add</a></li>
