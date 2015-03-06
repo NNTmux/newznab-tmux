@@ -72,7 +72,7 @@ Class NZBContents
 	 *         'NNTP'        => NNTP        ; Class NNTP.
 	 *         'Nfo'         => Nfo         ; Class Nfo.
 	 *         'NZB'         => NZB         ; Class NZB.
-	 *         'Settings'    => DB          ; Class nzedb\db\Settings.
+	 *         'Settings'    => DB          ; Class DB.
 	 *         'PostProcess' => PostProcess ; Class PostProcess.
 	 *     )
 	 *
