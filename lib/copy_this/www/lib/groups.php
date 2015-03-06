@@ -216,7 +216,7 @@ class Groups
 				"UPDATE groups
 				SET name = %s, description = %s, backfill_target = %s, first_record = %s, last_record = %s,
 				last_updated = NOW(), active = %s, backfill = %s, %s %s
-				WHERE ID = %d",
+				WHERE id = %d",
 				$this->pdo->escapeString(trim($group["name"])),
 				$this->pdo->escapeString(trim($group["description"])),
 				$this->formatNumberString($group["backfill_target"]),
@@ -226,7 +226,7 @@ class Groups
 				$this->formatNumberString($group["backfill"]),
 				$minFileString,
 				$minSizeString,
-				$group["ID"]
+				$group["id"]
 			)
 		);
 	}
