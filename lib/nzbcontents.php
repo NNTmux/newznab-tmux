@@ -19,7 +19,7 @@ Class NZBContents
 	 * @var DB
 	 * @access protected
 	 */
-	public $db;
+	public $pdo;
 
 	/**
 	 * @var NNTP
@@ -72,7 +72,7 @@ Class NZBContents
 	 *         'NNTP'        => NNTP        ; Class NNTP.
 	 *         'Nfo'         => Nfo         ; Class Info.
 	 *         'NZB'         => NZB         ; Class NZB.
-	 *         'DB'          => DB          ; Class DB.
+	 *         'Settings'    => DB          ; Class DB.
 	 *         'PostProcess' => PProcess ; Class PProcess.
 	 *     )
 	 *
@@ -85,21 +85,21 @@ Class NZBContents
 			'NNTP'        => null,
 			'Nfo'         => null,
 			'NZB'         => null,
-			'DB'          => null,
+			'Settings'    => null,
 			'PostProcess' => null,
 		];
 		$options += $defaults;
 
-		$this->echooutput = ($options['Echo']);
-		$this->pdo = ($options['DB'] instanceof \DB ? $options['DB'] : new \DB());
-		$this->nntp = ($options['NNTP'] instanceof \NNTP ? $options['NNTP'] : new \NNTP());
-		$this->nfo = ($options['Nfo'] instanceof \Info ? $options['Nfo'] : new \Info());
+		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
+		$this->pdo = ($options['Settings'] instanceof \DB ? $options['Settings'] : new \DB());
+		$this->nntp = ($options['NNTP'] instanceof \NNTP ? $options['NNTP'] : new \NNTP(['Echo' => $this->echooutput, 'Settings' => $this->pdo]));
+		$this->nfo = ($options['Nfo'] instanceof \Info ? $options['Nfo'] : new \Info(['Echo' => $this->echooutput, 'Settings' => $this->pdo]));
 		$this->pp = (
 		$options['PostProcess'] instanceof PProcess
 			? $options['PostProcess']
 			: new PProcess(['Echo' => $this->echooutput, 'Nfo' => $this->nfo, 'Settings' => $this->pdo])
 		);
-		$this->nzb = ($options['NZB'] instanceof \NZB ? $options['NZB'] : new \NZB());
+		$this->nzb = ($options['NZB'] instanceof \NZB ? $options['NZB'] : new \NZB($this->pdo));
 		$t = new Tmux();
 		$this->tmux = $t->get();
 		$s = new Sites();
