@@ -93,7 +93,7 @@ Class NZBContents
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
 		$this->pdo = ($options['Settings'] instanceof \DB ? $options['Settings'] : new \DB());
 		$this->nntp = ($options['NNTP'] instanceof \NNTP ? $options['NNTP'] : new \NNTP(['Echo' => $this->echooutput, 'Settings' => $this->pdo]));
-		$this->nfo = ($options['Info'] instanceof \Info ? $options['Nfo'] : new \Info(['Echo' => $this->echooutput, 'Settings' => $this->pdo]));
+		$this->nfo = ($options['Nfo'] instanceof \Info ? $options['Nfo'] : new \Info(['Echo' => $this->echooutput, 'Settings' => $this->pdo]));
 		$this->pp = (
 		$options['PostProcess'] instanceof PProcess
 			? $options['PostProcess']
