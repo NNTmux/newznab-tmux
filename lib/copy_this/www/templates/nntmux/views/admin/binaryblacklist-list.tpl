@@ -1,4 +1,4 @@
- 
+
 <h1>{$page->title}</h1>
 
 <p>
@@ -18,7 +18,7 @@
 		<th class="mid">status</th>
 		<th class="mid">Options</th>
 	</tr>
-	
+
 	{foreach from=$binlist item=bin}
 	<tr id="row-{$bin.ID}" class="{cycle values=",alt"}">
 		<td>{$bin.ID}</td>
@@ -30,7 +30,7 @@
 		<td>{if $bin.optype==1}black{else}white{/if}</td>
 		<td>{if $bin.msgcol==1}subject{elseif $bin.msgcol==2}poster{else}messageid{/if}</td>
 		<td>{if $bin.status==1}active{else}disabled{/if}</td>
-		<td width="80" class="mid"><a href="{$smarty.const.WWW_TOP}/binaryblacklist-edit.php?id={$bin.ID}">edit</a> | <a href="javascript:ajax_binaryblacklist_delete({$bin.ID})">delete</a></td>
+		<td width="80" class="mid"><a href="{$smarty.const.WWW_TOP}/binaryblacklist-edit.php?id={$bin.id}">edit</a> | <a href="javascript:ajax_binaryblacklist_delete({$bin.id})">delete</a></td>
 	</tr>
 	{/foreach}
 
