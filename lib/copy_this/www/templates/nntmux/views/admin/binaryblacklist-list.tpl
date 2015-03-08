@@ -20,8 +20,8 @@
 	</tr>
 
 	{foreach from=$binlist item=bin}
-	<tr id="row-{$bin.ID}" class="{cycle values=",alt"}">
-		<td>{$bin.ID}</td>
+	<tr id="row-{$bin.id}" class="{cycle values=",alt"}">
+		<td>{$bin.id}</td>
 		<td title="{$bin.description}">{$bin.groupname|replace:"alt.binaries":"a.b"}</td>
 		<td>
 			{$bin.regex|escape:html}<br>
