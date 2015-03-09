@@ -242,7 +242,7 @@ class PreDB
 			$cnt--;
 
 			if(preg_match('/^'.$site->nzpresubject.'$/', $groupMsg['Subject']) && preg_match('/^'.$site->nzpreposter.'$/', $groupMsg['From'])) {
-				$ret = $msgHeader = $nntp->getHeader($groupMsg['Message-id']);
+				$ret = $msgHeader = $nntp->getHeader($groupMsg['Message-ID']);
 				if($nntp->isError($ret))
 					continue;
 

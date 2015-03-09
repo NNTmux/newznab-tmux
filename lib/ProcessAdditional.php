@@ -380,7 +380,7 @@ Class ProcessAdditional
 			(string)($this->site->minsizetopostprocess != '') ? $this->site->minsizetopostprocess : 1;
 		$this->_minSize = ($this->_minSize === 0 ? '' : 'AND r.size > ' . ($this->_minSize * 1048576));
 
-		// Use the alternate NNTP provider for downloading Message-id's ?
+		// Use the alternate NNTP provider for downloading Message-ID's ?
 		$this->_alternateNNTP = ($this->site->alternate_nntp == 1 ? true : false);
 
 		$this->_ffMPEGDuration = ($this->site->ffmpeg_duration != '') ? (int)$this->site->ffmpeg_duration : 5;
@@ -615,7 +615,7 @@ Class ProcessAdditional
 				$this->_processVideo === true
 			) {
 
-				// Process usenet Message-id downloads.
+				// Process usenet Message-ID downloads.
 				$this->_processMessageIDDownloads();
 
 				// Process compressed (RAR/ZIP) files inside the NZB.
@@ -760,7 +760,7 @@ Class ProcessAdditional
 	protected $_NZBHasCompressedFile;
 
 	/**
-	 * Process the files inside the NZB, find Message-id's to download.
+	 * Process the files inside the NZB, find Message-ID's to download.
 	 * If we find files with book extensions, return the amount.
 	 *
 	 * @return int

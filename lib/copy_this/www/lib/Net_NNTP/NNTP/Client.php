@@ -277,7 +277,7 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 	 *
 	 * @return mixed <br>
 	 *  - (integer) Article number, if $ret=0 (default)
-	 *  - (string)  Message-id, if $ret=1
+	 *  - (string)  Message-ID, if $ret=1
 	 *  - (array)   Both article number and message-id, if $ret=-1
 	 *  - (bool)    False if no previous article exists
 	 *  - (object)  Pear_Error on failure
@@ -295,7 +295,7 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 
 		switch ($_ret) {
 			case -1:
-				return array('Number' => (int)$response[0], 'Message-id' => (string)$response[1]);
+				return array('Number' => (int)$response[0], 'Message-ID' => (string)$response[1]);
 			case 0:
 				return (int)$response[0];
 			case 1:
@@ -317,7 +317,7 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 	 *
 	 * @return mixed <br>
 	 *  - (integer) Article number, if $ret=0 (default)
-	 *  - (string)  Message-id, if $ret=1
+	 *  - (string)  Message-ID, if $ret=1
 	 *  - (array)   Both article number and message-id, if $ret=-1
 	 *  - (bool)    False if no further articles exist
 	 *  - (object)  Pear_Error on unexpected failure
@@ -335,7 +335,7 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 
 		switch ($_ret) {
 			case -1:
-				return array('Number' => (int)$response[0], 'Message-id' => (string)$response[1]);
+				return array('Number' => (int)$response[0], 'Message-ID' => (string)$response[1]);
 			case 0:
 				return (int)$response[0];
 			case 1:
@@ -372,7 +372,7 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 
 		switch ($_ret) {
 			case -1:
-				return array('Number' => (int)$response[0], 'Message-id' => (string)$response[1]);
+				return array('Number' => (int)$response[0], 'Message-ID' => (string)$response[1]);
 				break;
 			case 0:
 				return (int)$response[0];
@@ -868,7 +868,7 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 	 *   - 'Subject' - header content.
 	 *   - 'From' - header content.
 	 *   - 'Date' - header content.
-	 *   - 'Message-id' - header content.
+	 *   - 'Message-ID' - header content.
 	 *   - 'References' - header content.
 	 *   - ':bytes' - metadata item.
 	 *   - ':lines' - metadata item.
@@ -924,8 +924,8 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 					// Rename 'Number' field into 'number'
 					$article = array_merge(array('number' => array_shift($article)), $article);
 
-					// Use 'Message-id' field as key
-					$articles[$article['Message-id']] = $article;
+					// Use 'Message-ID' field as key
+					$articles[$article['Message-ID']] = $article;
 				}
 				return $articles;
 		}
@@ -1039,7 +1039,7 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 					'Subject'    => false,
 					'From'       => false,
 					'Date'       => false,
-					'Message-id' => false,
+					'Message-ID' => false,
 					'References' => false,
 					':bytes'     => false,
 					':lines'     => false

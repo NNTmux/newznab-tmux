@@ -420,7 +420,7 @@ class NNTP extends Net_NNTP_Client
 	 *        'Subject'    => string(18) "This is an example"
 	 *        'From'       => string(19) "Example@example.com"
 	 *        'Date'       => string(24) "26 Jun 2014 13:08:22 GMT"
-	 *        'Message-id' => string(57) "<part1of1.uS*yYxQvtAYt$5t&wmE%UejhjkCKXBJ!@example.local>"
+	 *        'Message-ID' => string(57) "<part1of1.uS*yYxQvtAYt$5t&wmE%UejhjkCKXBJ!@example.local>"
 	 *        'References' => string(0)  ""
 	 *        'Bytes'      => string(3)  "123"
 	 *        'Lines'      => string(1)  "9"
@@ -432,7 +432,7 @@ class NNTP extends Net_NNTP_Client
 	 *                      Range of article numbers:      "679871775-679999999"
 	 *                      All newer than article number: "679871775-"
 	 *                      All older than article number: "-679871775"
-	 *                      Message-id:                    "<part1of1.uS*yYxQvtAYt$5t&wmE%UejhjkCKXBJ!@example.local>"
+	 *                      Message-ID:                    "<part1of1.uS*yYxQvtAYt$5t&wmE%UejhjkCKXBJ!@example.local>"
 	 *
 	 * @return array|object Multi-dimensional Array of headers on success, PEAR object on failure.
 	 */
@@ -534,9 +534,9 @@ class NNTP extends Net_NNTP_Client
 	 * Download multiple article bodies and string them together.
 	 *
 	 * @param string $groupName   The name of the group the articles are in.
-	 * @param mixed  $identifiers (string) Message-id.
+	 * @param mixed  $identifiers (string) Message-ID.
 	 *                            (int)    Article number.
-	 *                            (array)  Article numbers or Message-id's (can contain both in the same array)
+	 *                            (array)  Article numbers or Message-ID's (can contain both in the same array)
 	 * @param bool   $alternate   Use the alternate NNTP provider?
 	 *
 	 * @return mixed On success : (string) The article bodies.
@@ -1462,11 +1462,11 @@ class NNTP extends Net_NNTP_Client
 	}
 
 	/**
-	 * Check if the Message-id has the required opening and closing brackets.
+	 * Check if the Message-ID has the required opening and closing brackets.
 	 *
-	 * @param  string $messageID The Message-id with or without brackets.
+	 * @param  string $messageID The Message-ID with or without brackets.
 	 *
-	 * @return string            Message-id with brackets.
+	 * @return string            Message-ID with brackets.
 	 *
 	 * @access protected
 	 */

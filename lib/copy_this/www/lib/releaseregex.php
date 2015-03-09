@@ -396,7 +396,7 @@ class ReleaseRegex
 									$headers[$subject]['Subject'] = $subject;
 									$headers[$subject]['From'] = $msg['From'];
 									$headers[$subject]['Date'] = strtotime($msg['Date']);
-									$headers[$subject]['Message-id'] = $msg['Message-id'];
+									$headers[$subject]['Message-ID'] = $msg['Message-ID'];
 									$headers[$subject]['Size'] = $msg['Bytes'];
 								} else
 									$headers[$subject]['Size'] += $msg['Bytes'];

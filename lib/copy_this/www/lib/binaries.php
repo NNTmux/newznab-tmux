@@ -776,10 +776,10 @@ class Binaries
 			}
 
 			// Strip the < and >, saves space in DB.
-			$header['Message-id'][0] = "'";
+			$header['Message-ID'][0] = "'";
 
 			$partsQuery .=
-				'(' . $binaryID . ',' . $header['Number'] . ',' . rtrim($header['Message-id'], '>') . "'," .
+				'(' . $binaryID . ',' . $header['Number'] . ',' . rtrim($header['Message-ID'], '>') . "'," .
 				$matches[2] . ',' . $header['Bytes'] . ',' . $collectionID . '),';
 
 		}
@@ -1339,7 +1339,7 @@ class Binaries
 		$field = [
 			self::BLACKLIST_FIELD_SUBJECT   => $msg['Subject'],
 			self::BLACKLIST_FIELD_FROM      => $msg['From'],
-			self::BLACKLIST_FIELD_MESSAGEID => $msg['Message-id']
+			self::BLACKLIST_FIELD_MESSAGEID => $msg['Message-ID']
 		];
 
 		// Try white lists first.

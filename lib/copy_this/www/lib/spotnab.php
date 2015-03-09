@@ -1285,7 +1285,7 @@ class SpotNab {
 		*				'Subject': <string>
 		*				'From': <string>
 		*				'Date': <string>
-		*				'Message-id': <string>
+		*				'Message-ID': <string>
 		*				'Bytes': <int>
 		*				'Lines': <int>
 		*				'Epoch': <int>
@@ -1349,7 +1349,7 @@ class SpotNab {
 			// Preform some general scanning the header to determine
 			// if it could possibly be a valid post.
 			if(!preg_match(SpotNab::FETCH_MSGID_REGEX,
-				$header['Message-id'], $matches)){
+				$header['Message-ID'], $matches)){
 				continue;
 			}
 			if($matches['domain'] != SpotNab::SEGID_DOMAIN)
@@ -1410,7 +1410,7 @@ class SpotNab {
 				if($save){
 					// Download Body
 					$body = $this->_get_body($header['Group'],
-								$header['Message-id']);
+								$header['Message-ID']);
 					if($body === false){
 						continue;
 					}
@@ -1531,7 +1531,7 @@ class SpotNab {
 		*				'Subject': <string>
 		*				'From': <string>
 		*				'Date': <string>
-		*				'Message-id': <string>
+		*				'Message-ID': <string>
 		*				'Bytes': <int>
 		*				'Lines': <int>
 		*				'Epoch': <int>
@@ -1571,7 +1571,7 @@ class SpotNab {
 			// Now we check the subject line; it provides the first part of
 			// the key to determining if we should handle the message or not
 			if(!preg_match(SpotNab::FETCH_MSGID_REGEX,
-				$header['Message-id'], $matches)){
+				$header['Message-ID'], $matches)){
 				continue;
 			}
 			if($matches['domain'] != SpotNab::SEGID_DOMAIN)
@@ -1625,7 +1625,7 @@ class SpotNab {
 			if($save){
 				// Download Body
 				$body = $this->_get_body($header['Group'],
-							$header['Message-id']);
+							$header['Message-ID']);
 				if($body === false){
 					continue;
 				}
@@ -1719,7 +1719,7 @@ class SpotNab {
 	// ***********************************************************************
 	protected function _get_body($group, $id, $retries=3){
 		/*
-		*	Fetch the body of a given Message-id taken from the headers
+		*	Fetch the body of a given Message-ID taken from the headers
 		*	The function then returns the raw content
 		*/
 
@@ -1780,7 +1780,7 @@ class SpotNab {
 
 		// Header parsing for associative array returned
 		$min_headers = array('Number', 'Subject', 'From', 'Date',
-							'Message-id', 'Bytes', 'Lines');
+							'Message-ID', 'Bytes', 'Lines');
 		do
 		{
 			$msgs = $this->_nntp->getOverview($range, true, false);
@@ -1929,7 +1929,7 @@ class SpotNab {
 	private function _postArticle ($article, $retries=3)
 	{
 		// Extract message id
-		if(!preg_match('/Message-id: <(?P<id>[^>]+)>/', $article[0], $matches)){
+		if(!preg_match('/Message-ID: <(?P<id>[^>]+)>/', $article[0], $matches)){
 			// we couldn't extract the message id
 			return false;
 		}
@@ -2006,14 +2006,14 @@ class SpotNab {
 			// // Okay we have headers to scan (we'll work back from the end to
 			// // the front to speed the process up)
 			// for($i=count($headers)-1; $i >0; $i--){
-			// 	if(!array_key_exists('Message-id', $headers[$i]))
+			// 	if(!array_key_exists('Message-ID', $headers[$i]))
 			// 		continue;
 
-			// 	if ($headers[$i]['Message-id'] == "<$msg_id>")
+			// 	if ($headers[$i]['Message-ID'] == "<$msg_id>")
 			// 		// Great! we found the post we just posted
 			// 		return true;
 			// }
-			// // Otherwise we didn't find the Message-id so we fail
+			// // Otherwise we didn't find the Message-ID so we fail
 			// return false;
 
 			// Restore handler
@@ -2195,7 +2195,7 @@ class SpotNab {
 
 		$header  = "Subject: " . $subject . "\r\n";
 		$header .= "Newsgroups: " . $group . "\r\n";
-		$header .= "Message-id: $msgid\r\n";
+		$header .= "Message-ID: $msgid\r\n";
 		$header .= "X-Newsreader: NewzNab v" . $s->version() ."\r\n";
 		$header .= "X-No-Archive: yes\r\n";
 
@@ -2216,7 +2216,7 @@ class SpotNab {
 				'From' => sprintf('%s <%s>', $user, $email),
 				'Date' => date(DATE_RFC822, strtotime(
 								$this->utc2local($reftime))),
-				'Message-id' => $msgid,
+				'Message-ID' => $msgid,
 				'Bytes' => strlen($message),
 				'Lines' => '1',
 				'Epoch' => strtotime($this->utc2local($reftime)),
