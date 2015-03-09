@@ -17,9 +17,9 @@ $roles = array();
 $defaultrole = Users::ROLE_USER;
 $defaultinvites = Users::DEFAULT_INVITES;
 foreach ($userroles as $r) {
-	$roles[$r['ID']] = $r['name'];
+	$roles[$r['id']] = $r['name'];
 	if ($r['isdefault'] == 1) {
-		$defaultrole = $r['ID'];
+		$defaultrole = $r['id'];
 		$defaultinvites = $r['defaultinvites'];
 	}
 }
@@ -43,7 +43,7 @@ switch ($action) {
 		if ($_POST["id"] == "") {
 			$invites = $defaultinvites;
 			foreach ($userroles as $role) {
-				if ($role['ID'] == $_POST['role'])
+				if ($role['id'] == $_POST['role'])
 					$invites = $role['defaultinvites'];
 			}
 			$ret = $users->signup($_POST["username"], $_POST["password"], $_POST["email"], '', $_POST["role"], $_POST["notes"], $invites, "", true, false, false, true);
@@ -77,7 +77,7 @@ switch ($action) {
 					break;
 			}
 			$user = array();
-			$user["ID"] = $_POST["id"];
+			$user["id"] = $_POST["id"];
 			$user["username"] = $_POST["username"];
 			$user["email"] = $_POST["email"];
 			$user["grabs"] = (isset($_POST["grabs"]) ? $_POST["grabs"] : "0");

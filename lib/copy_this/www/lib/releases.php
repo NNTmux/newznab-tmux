@@ -68,7 +68,7 @@ class Releases
 	}
 
 	/**
-	 * Insert a single release returning the ID on success or false on failure.
+	 * Insert a single release returning the id on success or false on failure.
 	 *
 	 * @param array $parameters Insert parameters, must be escaped if string.
 	 *
@@ -79,24 +79,24 @@ class Releases
 		$parameters['id'] = $this->pdo->queryInsert(
 			sprintf(
 				"INSERT INTO releases
-					(name, searchname, totalpart, groupID, adddate, guid, rageID, postdate, fromname,
-					size, passwordstatus, haspreview, categoryID, nfostatus, nzbstatus,
-					isrenamed, iscategorized, reqidstatus, prehashID)
+					(name, searchname, totalpart, groupid, adddate, guid, rageid, postdate, fromname,
+					size, passwordstatus, haspreview, categoryid, nfostatus, nzbstatus,
+					isrenamed, iscategorized, reqidstatus, prehashid)
 				 VALUES (%s, %s, %d, %d, NOW(), %s, -1, %s, %s, %s, %d, -1, %d, -1, %d, %d, 1, %d, %d)",
 				$parameters['name'],
 				$parameters['searchname'],
 				$parameters['totalpart'],
-				$parameters['groupID'],
+				$parameters['groupid'],
 				$parameters['guid'],
 				$parameters['postdate'],
 				$parameters['fromname'],
 				$parameters['size'],
 				$this->passwordStatus,
-				$parameters['categoryID'],
+				$parameters['categoryid'],
 				$parameters['nzbstatus'],
 				$parameters['isrenamed'],
 				$parameters['reqidstatus'],
-				$parameters['prehashID']
+				$parameters['prehashid']
 			)
 		);
 		$this->sphinxSearch->insertRelease($parameters);
@@ -121,8 +121,8 @@ class Releases
 			sprintf(
 				'SELECT r.*, g.name AS group_name, c.title AS category_name
 				FROM releases r
-				INNER JOIN category c ON c.ID = r.categoryID
-				INNER JOIN groups g ON g.ID = r.groupID
+				INNER JOIN category c ON c.id = r.categoryid
+				INNER JOIN groups g ON g.id = r.groupid
 				WHERE r.nzbstatus = %d',
 				NZB::NZB_ADDED
 			)
@@ -143,8 +143,8 @@ class Releases
 			sprintf(
 				"SELECT r.*, CONCAT(cp.title, ' > ', c.title) AS category_name
 				FROM releases r
-				INNER JOIN category c ON c.ID = r.categoryID
-				INNER JOIN category cp ON cp.ID = c.parentID
+				INNER JOIN category c ON c.id = r.categoryid
+				INNER JOIN category cp ON cp.id = c.parentid
 				WHERE r.nzbstatus = %d
 				ORDER BY r.postdate DESC %s",
 				NZB::NZB_ADDED,
@@ -167,19 +167,19 @@ class Releases
 	{
 		return $this->getPagerCount(
 			sprintf(
-				'SELECT r.ID
+				'SELECT r.id
 				FROM releases r
 				%s
 				WHERE r.nzbstatus = %d
 				AND r.passwordstatus %s
 				%s %s %s %s',
-				($groupName != '' ? 'INNER JOIN groups g ON g.ID = r.groupID' : ''),
+				($groupName != '' ? 'INNER JOIN groups g ON g.id = r.groupid' : ''),
 				NZB::NZB_ADDED,
 				$this->showPasswords(),
 				($groupName != '' ? sprintf(' AND g.name = %s', $this->pdo->escapeString($groupName)) : ''),
 				$this->categorySQL($cat),
 				($maxAge > 0 ? (' AND r.postdate > NOW() - INTERVAL ' . $maxAge . ' DAY ') : ''),
-				(count($excludedCats) ? (' AND r.categoryID NOT IN (' . implode(',', $excludedCats) . ')') : '')
+				(count($excludedCats) ? (' AND r.categoryid NOT IN (' . implode(',', $excludedCats) . ')') : '')
 			)
 		);
 	}
@@ -204,16 +204,16 @@ class Releases
 			sprintf(
 				"SELECT r.*,
 					CONCAT(cp.title, ' > ', c.title) AS category_name,
-					CONCAT(cp.ID, ',', c.ID) AS category_ids,
+					CONCAT(cp.id, ',', c.id) AS category_ids,
 					g.name AS group_name,
-					rn.ID AS nfoid,
-					re.releaseID AS reid
+					rn.id AS nfoid,
+					re.releaseid AS reid
 				FROM releases r
-				STRAIGHT_JOIN groups g ON g.ID = r.groupID
-				STRAIGHT_JOIN category c ON c.ID = r.categoryID
-				INNER JOIN category cp ON cp.ID = c.parentID
-				LEFT OUTER JOIN releasevideo re ON re.releaseID = r.ID
-				LEFT OUTER JOIN releasenfo rn ON rn.releaseID = r.ID
+				STRAIGHT_JOIN groups g ON g.id = r.groupid
+				STRAIGHT_JOIN category c ON c.id = r.categoryid
+				INNER JOIN category cp ON cp.id = c.parentid
+				LEFT OUTER JOIN releasevideo re ON re.releaseid = r.id
+				LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
 				AND rn.nfo IS NOT NULL
 				WHERE r.nzbstatus = %d
 				AND r.passwordstatus %s
@@ -223,7 +223,7 @@ class Releases
 				$this->showPasswords(),
 				$this->categorySQL($cat),
 				($maxAge > 0 ? (" AND postdate > NOW() - INTERVAL " . $maxAge . ' DAY ') : ''),
-				(count($excludedCats) ? (' AND r.categoryID NOT IN (' . implode(',', $excludedCats) . ')') : ''),
+				(count($excludedCats) ? (' AND r.categoryid NOT IN (' . implode(',', $excludedCats) . ')') : ''),
 				($groupName != '' ? sprintf(' AND g.name = %s ', $this->pdo->escapeString($groupName)) : ''),
 				$orderBy[0],
 				$orderBy[1],
@@ -281,7 +281,7 @@ class Releases
 		$orderArr = explode('_', ($orderBy == '' ? 'posted_desc' : $orderBy));
 		switch ($orderArr[0]) {
 			case 'cat':
-				$orderField = 'categoryID';
+				$orderField = 'categoryid';
 				break;
 			case 'name':
 				$orderField = 'searchname';
@@ -331,7 +331,7 @@ class Releases
 	 *
 	 * @param string $postFrom (optional) Date in this format : 01/01/2014
 	 * @param string $postTo   (optional) Date in this format : 01/01/2014
-	 * @param string $groupID  (optional) Group ID.
+	 * @param string $groupID  (optional) Group id.
 	 *
 	 * @return array
 	 */
@@ -341,15 +341,15 @@ class Releases
 			sprintf(
 				"SELECT searchname, guid, groups.name AS gname, CONCAT(cp.title,'_',category.title) AS catName
 				FROM releases r
-				INNER JOIN category ON r.categoryID = category.ID
-				INNER JOIN groups ON r.groupID = groups.ID
-				INNER JOIN category cp ON cp.ID = category.parentID
+				INNER JOIN category ON r.categoryid = category.id
+				INNER JOIN groups ON r.groupid = groups.id
+				INNER JOIN category cp ON cp.id = category.parentid
 				WHERE r.nzbstatus = %d
 				%s %s %s",
 				NZB::NZB_ADDED,
 				$this->exportDateString($postFrom),
 				$this->exportDateString($postTo, false),
-				(($groupID != '' && $groupID != '-1') ? sprintf(' AND groupID = %d ', $groupID) : '')
+				(($groupID != '' && $groupID != '-1') ? sprintf(' AND groupid = %d ', $groupID) : '')
 			)
 		);
 	}
@@ -416,9 +416,9 @@ class Releases
 	public function getReleasedGroupsForSelect($blnIncludeAll = true)
 	{
 		$groups = $this->pdo->query(
-			'SELECT DISTINCT g.ID, g.name
+			'SELECT DISTINCT g.id, g.name
 			FROM releases r
-			INNER JOIN groups g ON g.ID = r.groupID'
+			INNER JOIN groups g ON g.id = r.groupid'
 		);
 		$temp_array = [];
 
@@ -448,11 +448,11 @@ class Releases
 	{
 		$catSearch = $cartSearch = '';
 
-		$catLimit = "AND r.categoryID BETWEEN 5000 AND 5999";
+		$catLimit = "AND r.categoryid BETWEEN 5000 AND 5999";
 
 		if (count($cat)) {
 			if ($cat[0] == -2) {
-				$cartSearch = sprintf(' INNER JOIN usercart ON usercart.userID = %d AND usercart.releaseID = r.ID ', $userID);
+				$cartSearch = sprintf(' INNER JOIN usercart ON usercart.userID = %d AND usercart.releaseid = r.id ', $userID);
 			} else if ($cat[0] != -1) {
 				$catSearch = ' AND (';
 				$Category = new \Category(['Settings' => $this->pdo]);
@@ -466,10 +466,10 @@ class Releases
 							}
 
 							if ($childList != '-99') {
-								$catSearch .= ' r.categoryID IN (' . $childList . ') OR ';
+								$catSearch .= ' r.categoryid IN (' . $childList . ') OR ';
 							}
 						} else {
-							$catSearch .= sprintf(' r.categoryID = %d OR ', $category);
+							$catSearch .= sprintf(' r.categoryid = %d OR ', $category);
 						}
 					}
 				}
@@ -479,11 +479,11 @@ class Releases
 
 		return $this->pdo->query(
 			sprintf(
-				"SELECT r.*, m.cover, m.imdbID, m.rating, m.plot,
+				"SELECT r.*, m.cover, m.imdbid, m.rating, m.plot,
 					m.year, m.genre, m.director, m.actors, g.name AS group_name,
 					CONCAT(cp.title, ' > ', c.title) AS category_name,
-					CONCAT(cp.ID, ',', c.ID) AS category_ids,
-					COALESCE(cp.ID,0) AS parentCategoryid,
+					CONCAT(cp.id, ',', c.id) AS category_ids,
+					COALESCE(cp.id,0) AS parentCategoryid,
 					mu.title AS mu_title, mu.url AS mu_url, mu.artist AS mu_artist,
 					mu.publisher AS mu_publisher, mu.releasedate AS mu_releasedate,
 					mu.review AS mu_review, mu.tracks AS mu_tracks, mu.cover AS mu_cover,
@@ -491,14 +491,14 @@ class Releases
 					co.publisher AS co_publisher, co.releasedate AS co_releasedate,
 					co.review AS co_review, co.cover AS co_cover, cog.title AS co_genre
 				FROM releases r
-				INNER JOIN category c ON c.ID = r.categoryID
-				INNER JOIN category cp ON cp.ID = c.parentID
-				INNER JOIN groups g ON g.ID = r.groupID
-				LEFT OUTER JOIN movieinfo m ON m.imdbID = r.imdbID AND m.title != ''
-				LEFT OUTER JOIN musicinfo mu ON mu.ID = r.musicinfoID
-				LEFT OUTER JOIN genres mug ON mug.ID = mu.genreID
-				LEFT OUTER JOIN consoleinfo co ON co.ID = r.consoleinfoID
-				LEFT OUTER JOIN genres cog ON cog.ID = co.genreID %s
+				INNER JOIN category c ON c.id = r.categoryid
+				INNER JOIN category cp ON cp.id = c.parentid
+				INNER JOIN groups g ON g.id = r.groupid
+				LEFT OUTER JOIN movieinfo m ON m.imdbid = r.imdbid AND m.title != ''
+				LEFT OUTER JOIN musicinfo mu ON mu.id = r.musicinfoid
+				LEFT OUTER JOIN genres mug ON mug.id = mu.genreID
+				LEFT OUTER JOIN consoleinfo co ON co.id = r.consoleinfoid
+				LEFT OUTER JOIN genres cog ON cog.id = co.genreID %s
 				WHERE r.passwordstatus %s
 				AND r.nzbstatus = %d
 				%s %s %s %s
@@ -507,8 +507,8 @@ class Releases
 				$this->showPasswords(),
 				NZB::NZB_ADDED,
 				$catSearch,
-				($rageID > -1 ? sprintf(' AND r.rageID = %d %s ', $rageID, ($catSearch == '' ? $catLimit : '')) : ''),
-				($aniDbID > -1 ? sprintf(' AND r.anidbID = %d %s ', $aniDbID, ($catSearch == '' ? $catLimit : '')) : ''),
+				($rageID > -1 ? sprintf(' AND r.rageid = %d %s ', $rageID, ($catSearch == '' ? $catLimit : '')) : ''),
+				($aniDbID > -1 ? sprintf(' AND r.anidbid = %d %s ', $aniDbID, ($catSearch == '' ? $catLimit : '')) : ''),
 				($airDate > -1 ? sprintf(' AND r.tvairdate >= DATE_SUB(CURDATE(), INTERVAL %d DAY) ', $airDate) : ''),
 				(' LIMIT 0,' . ($offset > 100 ? 100 : $offset))
 			)
@@ -529,22 +529,22 @@ class Releases
 	{
 		return $this->pdo->query(
 			sprintf("
-				SELECT r.*, tvr.rageID, tvr.releasetitle, g.name AS group_name,
+				SELECT r.*, tvr.rageid, tvr.releasetitle, g.name AS group_name,
 					CONCAT(cp.title, '-', c.title) AS category_name,
-					CONCAT(cp.ID, ',', c.ID) AS category_ids,
-					COALESCE(cp.ID,0) AS parentCategoryid
+					CONCAT(cp.id, ',', c.id) AS category_ids,
+					COALESCE(cp.id,0) AS parentCategoryid
 				FROM releases r
-				INNER JOIN category c ON c.ID = r.categoryID
-				INNER JOIN category cp ON cp.ID = c.parentID
-				INNER JOIN groups g ON g.ID = r.groupID
-				LEFT OUTER JOIN tvrage tvr ON tvr.rageID = r.rageID
+				INNER JOIN category c ON c.id = r.categoryid
+				INNER JOIN category cp ON cp.id = c.parentid
+				INNER JOIN groups g ON g.id = r.groupid
+				LEFT OUTER JOIN tvrage tvr ON tvr.rageid = r.rageid
 				WHERE %s %s %s
 				AND r.nzbstatus = %d
-				AND r.categoryID BETWEEN 5000 AND 5999
+				AND r.categoryid BETWEEN 5000 AND 5999
 				AND r.passwordstatus %s
 				ORDER BY postdate DESC %s",
-				$this->uSQL($this->pdo->query(sprintf('SELECT rageID, categoryID FROM userseries WHERE userID = %d', $userID), true), 'rageID'),
-				(count($excludedCats) ? ' AND r.categoryID NOT IN (' . implode(',', $excludedCats) . ')' : ''),
+				$this->uSQL($this->pdo->query(sprintf('SELECT rageid, categoryid FROM userseries WHERE userID = %d', $userID), true), 'rageid'),
+				(count($excludedCats) ? ' AND r.categoryid NOT IN (' . implode(',', $excludedCats) . ')' : ''),
 				($airDate > -1 ? sprintf(' AND r.tvairdate >= DATE_SUB(CURDATE(), INTERVAL %d DAY) ', $airDate) : ''),
 				NZB::NZB_ADDED,
 				$this->showPasswords(),
@@ -568,20 +568,20 @@ class Releases
 			sprintf("
 				SELECT r.*, mi.title AS releasetitle, g.name AS group_name,
 					CONCAT(cp.title, '-', c.title) AS category_name,
-					CONCAT(cp.ID, ',', c.ID) AS category_ids,
-					COALESCE(cp.ID,0) AS parentCategoryid
+					CONCAT(cp.id, ',', c.id) AS category_ids,
+					COALESCE(cp.id,0) AS parentCategoryid
 				FROM releases r
-				INNER JOIN category c ON c.ID = r.categoryID
-				INNER JOIN category cp ON cp.ID = c.parentID
-				INNER JOIN groups g ON g.ID = r.groupID
-				LEFT OUTER JOIN movieinfo mi ON mi.imdbID = r.imdbID
+				INNER JOIN category c ON c.id = r.categoryid
+				INNER JOIN category cp ON cp.id = c.parentid
+				INNER JOIN groups g ON g.id = r.groupid
+				LEFT OUTER JOIN movieinfo mi ON mi.imdbid = r.imdbid
 				WHERE %s %s
 				AND r.nzbstatus = %d
-				AND r.categoryID BETWEEN 2000 AND 2999
+				AND r.categoryid BETWEEN 2000 AND 2999
 				AND r.passwordstatus %s
 				ORDER BY postdate DESC %s",
-				$this->uSQL($this->pdo->query(sprintf('SELECT imdbID, categoryID FROM usermovies WHERE userID = %d', $userID), true), 'imdbID'),
-				(count($excludedCats) ? ' AND r.categoryID NOT IN (' . implode(',', $excludedCats) . ')' : ''),
+				$this->uSQL($this->pdo->query(sprintf('SELECT imdbid, categoryid FROM usermovies WHERE userID = %d', $userID), true), 'imdbid'),
+				(count($excludedCats) ? ' AND r.categoryid NOT IN (' . implode(',', $excludedCats) . ')' : ''),
 				NZB::NZB_ADDED,
 				$this->showPasswords(),
 				(' LIMIT ' . ($limit > 100 ? 100 : $limit) . ' OFFSET 0')
@@ -607,22 +607,22 @@ class Releases
 		return $this->pdo->query(
 			sprintf(
 				"SELECT r.*, CONCAT(cp.title, '-', c.title) AS category_name,
-					CONCAT(cp.ID, ',', c.ID) AS category_ids, groups.name AS group_name,
-					rn.ID AS nfoid, re.releaseID AS reid
+					CONCAT(cp.id, ',', c.id) AS category_ids, groups.name AS group_name,
+					rn.id AS nfoid, re.releaseid AS reid
 				FROM releases r
-				LEFT OUTER JOIN releasevideo re ON re.releaseID = r.ID
-				INNER JOIN groups ON groups.ID = r.groupID
-				LEFT OUTER JOIN releasenfo rn ON rn.releaseID = r.ID AND rn.nfo IS NOT NULL
-				INNER JOIN category c ON c.ID = r.categoryID
-				INNER JOIN category cp ON cp.ID = c.parentID
+				LEFT OUTER JOIN releasevideo re ON re.releaseid = r.id
+				INNER JOIN groups ON groups.id = r.groupid
+				LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id AND rn.nfo IS NOT NULL
+				INNER JOIN category c ON c.id = r.categoryid
+				INNER JOIN category cp ON cp.id = c.parentid
 				WHERE %s %s
 				AND r.nzbstatus = %d
-				AND r.categoryID BETWEEN 5000 AND 5999
+				AND r.categoryid BETWEEN 5000 AND 5999
 				AND r.passwordstatus %s
 				%s
 				ORDER BY %s %s %s",
-				$this->uSQL($userShows, 'rageID'),
-				(count($excludedCats) ? ' AND r.categoryID NOT IN (' . implode(',', $excludedCats) . ')' : ''),
+				$this->uSQL($userShows, 'rageid'),
+				(count($excludedCats) ? ' AND r.categoryid NOT IN (' . implode(',', $excludedCats) . ')' : ''),
 				NZB::NZB_ADDED,
 				$this->showPasswords(),
 				($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : ''),
@@ -646,15 +646,15 @@ class Releases
 	{
 		return $this->getPagerCount(
 			sprintf(
-				'SELECT r.ID
+				'SELECT r.id
 				FROM releases r
 				WHERE %s %s
 				AND r.nzbstatus = %d
-				AND r.categoryID BETWEEN 5000 AND 5999
+				AND r.categoryid BETWEEN 5000 AND 5999
 				AND r.passwordstatus %s
 				%s',
-				$this->uSQL($userShows, 'rageID'),
-				(count($excludedCats) ? ' AND r.categoryID NOT IN (' . implode(',', $excludedCats) . ')' : ''),
+				$this->uSQL($userShows, 'rageid'),
+				(count($excludedCats) ? ' AND r.categoryid NOT IN (' . implode(',', $excludedCats) . ')' : ''),
 				NZB::NZB_ADDED,
 				$this->showPasswords(),
 				($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : '')
@@ -669,15 +669,15 @@ class Releases
 	 */
 	public function getCount()
 	{
-		$res = $this->pdo->queryOneRow('SELECT COUNT(ID) AS num FROM releases');
+		$res = $this->pdo->queryOneRow('SELECT COUNT(id) AS num FROM releases');
 		return ($res === false ? 0 : $res['num']);
 	}
 
 	/**
-	 * Delete multiple releases, or a single by ID.
+	 * Delete multiple releases, or a single by id.
 	 *
-	 * @param array|int|string $list   Array of GUID or ID of releases to delete.
-	 * @param bool             $isGUID Are the identifiers GUID or ID?
+	 * @param array|int|string $list   Array of GUID or id of releases to delete.
+	 * @param bool             $isGUID Are the identifiers GUID or id?
 	 */
 	public function deleteMultiple($list, $isGUID = false)
 	{
@@ -692,7 +692,7 @@ class Releases
 			if ($isGUID) {
 				$this->deleteSingle(['g' => $identifier, 'i' => false], $nzb, $releaseImage);
 			} else {
-				$release = $this->pdo->queryOneRow(sprintf('SELECT guid FROM releases WHERE ID = %d', $identifier));
+				$release = $this->pdo->queryOneRow(sprintf('SELECT guid FROM releases WHERE id = %d', $identifier));
 				if ($release === false) {
 					continue;
 				}
@@ -704,7 +704,7 @@ class Releases
 	/**
 	 * Deletes a single release by GUID, and all the corresponding files.
 	 *
-	 * @param array        $identifiers ['g' => Release GUID(mandatory), 'id => releaseID(optional, pass false)]
+	 * @param array        $identifiers ['g' => Release GUID(mandatory), 'id => releaseid(optional, pass false)]
 	 * @param NZB          $nzb
 	 * @param ReleaseImage $releaseImage
 	 */
@@ -727,14 +727,14 @@ class Releases
 			sprintf('
 				DELETE r, rn, rc, uc, rf, ra, rs, rv, re
 				FROM releases r
-				LEFT OUTER JOIN releasenfo rn ON rn.releaseID = r.ID
-				LEFT OUTER JOIN releasecomment rc ON rc.releaseID = r.ID
-				LEFT OUTER JOIN usercart uc ON uc.releaseID = r.ID
-				LEFT OUTER JOIN releasefiles rf ON rf.releaseID = r.ID
-				LEFT OUTER JOIN releaseaudio ra ON ra.releaseID = r.ID
-				LEFT OUTER JOIN releasesubs rs ON rs.releaseID = r.ID
-				LEFT OUTER JOIN releasevideo rv ON rv.releaseID = r.ID
-				LEFT OUTER JOIN releaseextrafull re ON re.releaseID = r.ID
+				LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
+				LEFT OUTER JOIN releasecomment rc ON rc.releaseid = r.id
+				LEFT OUTER JOIN usercart uc ON uc.releaseid = r.id
+				LEFT OUTER JOIN releasefiles rf ON rf.releaseid = r.id
+				LEFT OUTER JOIN releaseaudio ra ON ra.releaseid = r.id
+				LEFT OUTER JOIN releasesubs rs ON rs.releaseid = r.id
+				LEFT OUTER JOIN releasevideo rv ON rv.releaseid = r.id
+				LEFT OUTER JOIN releaseextrafull re ON re.releaseid = r.id
 				WHERE r.guid = %s',
 				$this->pdo->escapeString($identifiers['g'])
 			)
@@ -769,9 +769,9 @@ class Releases
 		$this->pdo->queryExec(
 			sprintf(
 				'UPDATE releases
-				SET name = %s, searchname = %s, fromname = %s, categoryID = %d,
-					totalpart = %d, grabs = %d, size = %s, postdate = %s, adddate = %s, rageID = %d,
-					seriesfull = %s, season = %s, episode = %s, imdbID = %d, anidbID = %d
+				SET name = %s, searchname = %s, fromname = %s, categoryid = %d,
+					totalpart = %d, grabs = %d, size = %s, postdate = %s, adddate = %s, rageid = %d,
+					seriesfull = %s, season = %s, episode = %s, imdbid = %d, anidbid = %d
 				WHERE id = %d',
 				$this->pdo->escapeString($name),
 				$this->pdo->escapeString($searchName),
@@ -813,11 +813,11 @@ class Releases
 		}
 
 		$update = [
-			'categoryID' => (($category == '-1') ? '' : $category),
+			'categoryid' => (($category == '-1') ? '' : $category),
 			'grabs'      => $grabs,
-			'rageID'     => $rageID,
+			'rageid'     => $rageID,
 			'season'     => $season,
-			'imdbID'     => $imdDbID
+			'imdbid'     => $imdDbID
 		];
 
 		$updateSql = [];
@@ -858,12 +858,12 @@ class Releases
 		$sql = '(1=2 ';
 		foreach ($userQuery as $query) {
 			$sql .= sprintf('OR (r.%s = %d', $type, $query[$type]);
-			if ($query['categoryID'] != '') {
-				$catsArr = explode('|', $query['categoryID']);
+			if ($query['categoryid'] != '') {
+				$catsArr = explode('|', $query['categoryid']);
 				if (count($catsArr) > 1) {
-					$sql .= sprintf(' AND r.categoryID IN (%s)', implode(',', $catsArr));
+					$sql .= sprintf(' AND r.categoryid IN (%s)', implode(',', $catsArr));
 				} else {
-					$sql .= sprintf(' AND r.categoryID = %d', $catsArr[0]);
+					$sql .= sprintf(' AND r.categoryid = %d', $catsArr[0]);
 				}
 			}
 			$sql .= ') ';
@@ -874,7 +874,7 @@ class Releases
 	}
 
 	/**
-	 * Creates part of a query for searches requiring the categoryID's.
+	 * Creates part of a query for searches requiring the categoryid's.
 	 *
 	 * @param array $categories
 	 *
@@ -892,14 +892,14 @@ class Releases
 						$children = $Category->getChildren($category);
 						$childList = '-99';
 						foreach ($children as $child) {
-							$childList .= ', ' . $child['ID'];
+							$childList .= ', ' . $child['id'];
 						}
 
 						if ($childList != '-99') {
-							$sql .= ' r.categoryID IN (' . $childList . ') OR ';
+							$sql .= ' r.categoryid IN (' . $childList . ') OR ';
 						}
 					} else {
-						$sql .= sprintf(' r.categoryID = %d OR ', $category);
+						$sql .= sprintf(' r.categoryid = %d OR ', $category);
 					}
 				}
 			}
@@ -966,32 +966,32 @@ class Releases
 			$this->showPasswords(),
 			NZB::NZB_ADDED,
 			($maxAge > 0 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $maxAge) : ''),
-			($groupName != -1 ? sprintf(' AND r.groupID = %d ', $this->groups->getIDByName($groupName)) : ''),
+			($groupName != -1 ? sprintf(' AND r.groupid = %d ', $this->groups->getIDByName($groupName)) : ''),
 			(in_array($sizeFrom, $sizeRange) ? ' AND r.size > ' . (string)(104857600 * (int)$sizeFrom) . ' ' : ''),
 			(in_array($sizeTo, $sizeRange) ? ' AND r.size < ' . (string)(104857600 * (int)$sizeTo) . ' ' : ''),
 			($hasNfo != 0 ? ' AND r.nfostatus = 1 ' : ''),
 			($hasComments != 0 ? ' AND r.comments > 0 ' : ''),
-			($type !== 'advanced' ? $this->categorySQL($cat) : ($cat[0] != '-1' ? sprintf(' AND (r.categoryID = %d) ', $cat[0]) : '')),
+			($type !== 'advanced' ? $this->categorySQL($cat) : ($cat[0] != '-1' ? sprintf(' AND (r.categoryid = %d) ', $cat[0]) : '')),
 			($daysNew != -1 ? sprintf(' AND r.postdate < (NOW() - INTERVAL %d DAY) ', $daysNew) : ''),
 			($daysOld != -1 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $daysOld) : ''),
-			(count($excludedCats) > 0 ? ' AND r.categoryID NOT IN (' . implode(',', $excludedCats) . ')' : ''),
+			(count($excludedCats) > 0 ? ' AND r.categoryid NOT IN (' . implode(',', $excludedCats) . ')' : ''),
 			(count($searchOptions) > 0 ? $this->releaseSearch->getSearchSQL($searchOptions) : '')
 		);
 
 		$baseSql = sprintf(
 			"SELECT r.*,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
-				CONCAT(cp.ID, ',', c.ID) AS category_ids,
+				CONCAT(cp.id, ',', c.id) AS category_ids,
 				groups.name AS group_name,
-				rn.ID AS nfoid,
-				re.releaseID AS reid,
-				cp.ID AS categoryparentid
+				rn.id AS nfoid,
+				re.releaseid AS reid,
+				cp.id AS categoryparentid
 			FROM releases r
-			LEFT OUTER JOIN releasevideo re ON re.releaseID = r.ID
-			LEFT OUTER JOIN releasenfo rn ON rn.releaseID = r.ID
-			INNER JOIN groups ON groups.ID = r.groupID
-			INNER JOIN category c ON c.ID = r.categoryID
-			INNER JOIN category cp ON cp.ID = c.parentID
+			LEFT OUTER JOIN releasevideo re ON re.releaseid = r.id
+			LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
+			INNER JOIN groups ON groups.id = r.groupid
+			INNER JOIN category c ON c.id = r.categoryid
+			INNER JOIN category cp ON cp.id = c.parentid
 			%s",
 			$whereSql
 		);
@@ -1031,13 +1031,13 @@ class Releases
 	{
 		$whereSql = sprintf(
 			"%s
-			WHERE r.categoryID BETWEEN 5000 AND 5999
+			WHERE r.categoryid BETWEEN 5000 AND 5999
 			AND r.nzbstatus = %d
 			AND r.passwordstatus %s %s %s %s %s %s %s",
 			($name !== '' ? $this->releaseSearch->getFullTextJoinString() : ''),
 			NZB::NZB_ADDED,
 			$this->showPasswords(),
-			($rageId != -1 ? sprintf(' AND rageID = %d ', $rageId) : ''),
+			($rageId != -1 ? sprintf(' AND rageid = %d ', $rageId) : ''),
 			($series != '' ? sprintf(' AND UPPER(r.season) = UPPER(%s)', $this->pdo->escapeString(((is_numeric($series) && strlen($series) != 4) ? sprintf('S%02d', $series) : $series))) : ''),
 			($episode != '' ? sprintf(' AND r.episode %s', $this->pdo->likeString((is_numeric($episode) ? sprintf('E%02d', $episode) : $episode))) : ''),
 			($name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : ''),
@@ -1048,16 +1048,16 @@ class Releases
 		$baseSql = sprintf(
 			"SELECT r.*,
 				concat(cp.title, ' > ', c.title) AS category_name,
-				CONCAT(cp.ID, ',', c.ID) AS category_ids,
+				CONCAT(cp.id, ',', c.id) AS category_ids,
 				groups.name AS group_name,
-				rn.ID AS nfoid,
-				re.releaseID AS reid
+				rn.id AS nfoid,
+				re.releaseid AS reid
 			FROM releases r
-			INNER JOIN category c ON c.ID = r.categoryID
-			INNER JOIN groups ON groups.ID = r.groupID
-			LEFT OUTER JOIN releasevideo re ON re.releaseID = r.ID
-			LEFT OUTER JOIN releasenfo rn ON rn.releaseID = r.ID AND rn.nfo IS NOT NULL
-			INNER JOIN category cp ON cp.ID = c.parentID
+			INNER JOIN category c ON c.id = r.categoryid
+			INNER JOIN groups ON groups.id = r.groupid
+			LEFT OUTER JOIN releasevideo re ON re.releaseid = r.id
+			LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id AND rn.nfo IS NOT NULL
+			INNER JOIN category cp ON cp.id = c.parentid
 			%s",
 			$whereSql
 		);
@@ -1096,7 +1096,7 @@ class Releases
 			($name !== '' ? $this->releaseSearch->getFullTextJoinString() : ''),
 			$this->showPasswords(),
 			NZB::NZB_ADDED,
-			($aniDbID > -1 ? sprintf(' AND anidbID = %d ', $aniDbID) : ''),
+			($aniDbID > -1 ? sprintf(' AND anidbid = %d ', $aniDbID) : ''),
 			(is_numeric($episodeNumber) ? sprintf(" AND r.episode '%s' ", $this->pdo->likeString($episodeNumber)) : ''),
 			($name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : ''),
 			$this->categorySQL($cat),
@@ -1106,14 +1106,14 @@ class Releases
 		$baseSql = sprintf(
 			"SELECT r.*,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
-				CONCAT(cp.ID, ',', c.ID) AS category_ids,
+				CONCAT(cp.id, ',', c.id) AS category_ids,
 				groups.name AS group_name,
-				rn.ID AS nfoid
+				rn.id AS nfoid
 			FROM releases r
-			INNER JOIN category c ON c.ID = r.categoryID
-			INNER JOIN groups ON groups.ID = r.groupID
-			LEFT OUTER JOIN releasenfo rn ON rn.releaseID = r.ID AND rn.nfo IS NOT NULL
-			INNER JOIN category cp ON cp.ID = c.parentID
+			INNER JOIN category c ON c.id = r.categoryid
+			INNER JOIN groups ON groups.id = r.groupid
+			LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id AND rn.nfo IS NOT NULL
+			INNER JOIN category cp ON cp.id = c.parentid
 			%s",
 			$whereSql
 		);
@@ -1147,7 +1147,7 @@ class Releases
 	{
 		$whereSql = sprintf(
 			"%s
-			WHERE r.categoryID BETWEEN 2000 AND 2999
+			WHERE r.categoryid BETWEEN 2000 AND 2999
 			AND r.nzbstatus = %d
 			AND r.passwordstatus %s
 			%s %s %s %s",
@@ -1155,7 +1155,7 @@ class Releases
 			NZB::NZB_ADDED,
 			$this->showPasswords(),
 			($name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : ''),
-			(($imDbId != '-1' && is_numeric($imDbId)) ? sprintf(' AND imdbID = %d ', str_pad($imDbId, 7, '0', STR_PAD_LEFT)) : ''),
+			(($imDbId != '-1' && is_numeric($imDbId)) ? sprintf(' AND imdbid = %d ', str_pad($imDbId, 7, '0', STR_PAD_LEFT)) : ''),
 			$this->categorySQL($cat),
 			($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : '')
 		);
@@ -1163,14 +1163,14 @@ class Releases
 		$baseSql = sprintf(
 			"SELECT r.*,
 				concat(cp.title, ' > ', c.title) AS category_name,
-				CONCAT(cp.ID, ',', c.ID) AS category_ids,
+				CONCAT(cp.id, ',', c.id) AS category_ids,
 				g.name AS group_name,
-				rn.ID AS nfoid
+				rn.id AS nfoid
 			FROM releases r
-			INNER JOIN groups g ON g.ID = r.groupID
-			INNER JOIN category c ON c.ID = r.categoryID
-			LEFT OUTER JOIN releasenfo rn ON rn.releaseID = r.ID AND rn.nfo IS NOT NULL
-			INNER JOIN category cp ON cp.ID = c.parentID
+			INNER JOIN groups g ON g.id = r.groupid
+			INNER JOIN category c ON c.id = r.categoryid
+			LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id AND rn.nfo IS NOT NULL
+			INNER JOIN category cp ON cp.id = c.parentid
 			%s",
 			$whereSql
 		);
@@ -1202,7 +1202,7 @@ class Releases
 		$count = $this->pdo->queryOneRow(
 			sprintf(
 				'SELECT COUNT(*) AS count FROM (%s LIMIT %s) z',
-				preg_replace('/SELECT.+?FROM\s+releases/is', 'SELECT r.ID FROM releases', $query),
+				preg_replace('/SELECT.+?FROM\s+releases/is', 'SELECT r.id FROM releases', $query),
 				NN_MAX_PAGER_RESULTS
 			)
 		);
@@ -1224,8 +1224,8 @@ class Releases
 	{
 		// Get the category for the parent of this release.
 		$currRow = $this->getById($currentID);
-		$catRow = (new \Category(['Settings' => $this->pdo]))->getById($currRow['categoryID']);
-		$parentCat = $catRow['parentID'];
+		$catRow = (new \Category(['Settings' => $this->pdo]))->getById($currRow['categoryid']);
+		$parentCat = $catRow['parentid'];
 
 		$results = $this->search(
 			$this->getSimilarName($name), -1, -1, -1, [$parentCat], -1, -1, 0, 0, -1, -1, 0, $limit, '', -1, $excludedCats
@@ -1236,7 +1236,7 @@ class Releases
 
 		$ret = [];
 		foreach ($results as $res) {
-			if ($res['ID'] != $currentID && $res['categoryparentid'] == $parentCat) {
+			if ($res['id'] != $currentID && $res['categoryparentid'] == $parentCat) {
 				$ret[] = $res;
 			}
 		}
@@ -1270,11 +1270,11 @@ class Releases
 			$gSql = sprintf('r.guid = %s', $this->pdo->escapeString($guid));
 		}
 		$sql = sprintf(
-			"SELECT r.*, CONCAT(cp.title, ' > ', c.title) AS category_name, CONCAT(cp.ID, ',', c.ID) AS category_ids,
+			"SELECT r.*, CONCAT(cp.title, ' > ', c.title) AS category_name, CONCAT(cp.id, ',', c.id) AS category_ids,
 				g.name AS group_name FROM releases r
-			INNER JOIN groups g ON g.ID = r.groupID
-			INNER JOIN category c ON c.ID = r.categoryID
-			INNER JOIN category cp ON cp.ID = c.parentID
+			INNER JOIN groups g ON g.id = r.groupid
+			INNER JOIN category c ON c.id = r.categoryid
+			INNER JOIN category cp ON cp.id = c.parentid
 			WHERE %s",
 			$gSql
 		);
@@ -1343,12 +1343,12 @@ class Releases
 				"SELECT r.*, CONCAT(cp.title, ' > ', c.title) AS category_name,
 				groups.name AS group_name
 				FROM releases r
-				INNER JOIN groups ON groups.ID = r.groupID
-				INNER JOIN category c ON c.ID = r.categoryID
-				INNER JOIN category cp ON cp.ID = c.parentID
-				WHERE r.categoryID BETWEEN 5000 AND 5999
+				INNER JOIN groups ON groups.id = r.groupid
+				INNER JOIN category c ON c.id = r.categoryid
+				INNER JOIN category cp ON cp.id = c.parentid
+				WHERE r.categoryid BETWEEN 5000 AND 5999
 				AND r.passwordstatus %s
-				AND rageID = %d %s %s",
+				AND rageid = %d %s %s",
 				$this->showPasswords(),
 				$rageID,
 				$series,
@@ -1365,10 +1365,10 @@ class Releases
 	public function removeRageIdFromReleases($rageID)
 	{
 		$res = $this->pdo->queryOneRow(
-			sprintf('SELECT COUNT(r.ID) AS num FROM releases r WHERE rageID = %d', $rageID)
+			sprintf('SELECT COUNT(r.id) AS num FROM releases r WHERE rageid = %d', $rageID)
 		);
 		$this->pdo->queryExec(
-			sprintf('UPDATE releases SET rageID = -1, seriesfull = NULL, season = NULL, episode = NULL WHERE rageID = %d', $rageID)
+			sprintf('UPDATE releases SET rageid = -1, seriesfull = NULL, season = NULL, episode = NULL WHERE rageid = %d', $rageID)
 		);
 
 		return ($res === false ? 0 : $res['num']);
@@ -1382,10 +1382,10 @@ class Releases
 	public function removeAnidbIdFromReleases($anidbID)
 	{
 		$res = $this->pdo->queryOneRow(
-			sprintf('SELECT COUNT(r.ID) AS num FROM releases r WHERE anidbID = %d', $anidbID)
+			sprintf('SELECT COUNT(r.id) AS num FROM releases r WHERE anidbid = %d', $anidbID)
 		);
 		$this->pdo->queryExec(
-			sprintf('UPDATE releases SET anidbID = -1, episode = NULL, tvtitle = NULL, tvairdate = NULL WHERE anidbID = %d', $anidbID)
+			sprintf('UPDATE releases SET anidbid = -1, episode = NULL, tvtitle = NULL, tvairdate = NULL WHERE anidbid = %d', $anidbID)
 		);
 
 		return ($res === false ? 0 : $res['num']);
@@ -1402,8 +1402,8 @@ class Releases
 			sprintf(
 				'SELECT r.*, g.name AS group_name
 				FROM releases r
-				INNER JOIN groups g ON g.ID = r.groupID
-				WHERE r.ID = %d',
+				INNER JOIN groups g ON g.id = r.groupid
+				WHERE r.id = %d',
 				$id
 			)
 		);
@@ -1419,7 +1419,7 @@ class Releases
 	{
 		return $this->pdo->queryOneRow(
 			sprintf(
-				'SELECT ID, releaseID %s FROM releasenfo WHERE releaseID = %d AND nfo IS NOT NULL',
+				'SELECT id, releaseid %s FROM releasenfo WHERE releaseid = %d AND nfo IS NOT NULL',
 				($getNfoString ? ", UNCOMPRESS(nfo) AS nfo" : ''),
 				$id
 			)
@@ -1444,10 +1444,10 @@ class Releases
 	public function getTopDownloads()
 	{
 		return $this->pdo->query(
-			'SELECT ID, searchname, guid, adddate, SUM(grabs) AS grabs
+			'SELECT id, searchname, guid, adddate, SUM(grabs) AS grabs
 			FROM releases
 			WHERE grabs > 0
-			GROUP BY ID, searchname, adddate
+			GROUP BY id, searchname, adddate
 			HAVING SUM(grabs) > 0
 			ORDER BY grabs DESC
 			LIMIT 10'
@@ -1460,10 +1460,10 @@ class Releases
 	public function getTopComments()
 	{
 		return $this->pdo->query(
-			'SELECT ID, guid, searchname, adddate, SUM(comments) AS comments
+			'SELECT id, guid, searchname, adddate, SUM(comments) AS comments
 			FROM releases
 			WHERE comments > 0
-			GROUP BY ID, searchname, adddate
+			GROUP BY id, searchname, adddate
 			HAVING SUM(comments) > 0
 			ORDER BY comments DESC
 			LIMIT 10'
@@ -1475,8 +1475,8 @@ class Releases
 		return $this->pdo->query(
 			"SELECT CONCAT(cp.title, ' > ', category.title) AS title, COUNT(*) AS count
 			FROM category
-			INNER JOIN category cp on cp.ID = category.parentID
-			INNER JOIN releases r ON r.categoryID = category.ID
+			INNER JOIN category cp on cp.id = category.parentid
+			INNER JOIN releases r ON r.categoryid = category.id
 			WHERE r.adddate > NOW() - INTERVAL 1 WEEK
 			GROUP BY concat(cp.title, ' > ', category.title)
 			ORDER BY COUNT(*) DESC"
@@ -1491,15 +1491,15 @@ class Releases
 	public function getNewestMovies()
 	{
 		return $this->pdo->queryDirect(
-			"SELECT r.imdbID, r.guid, r.name, r.searchname, r.size, r.completion,
-				postdate, categoryID, comments, grabs,
+			"SELECT r.imdbid, r.guid, r.name, r.searchname, r.size, r.completion,
+				postdate, categoryid, comments, grabs,
 				m.cover
 			FROM releases r
-			INNER JOIN movieinfo m USING (imdbID)
-			WHERE r.categoryID BETWEEN 2000 AND 2999
-			AND m.imdbID > 0
+			INNER JOIN movieinfo m USING (imdbid)
+			WHERE r.categoryid BETWEEN 2000 AND 2999
+			AND m.imdbid > 0
 			AND m.cover = 1
-			AND r.ID in (select max(ID) from releases where imdbID > 0 group by imdbID)
+			AND r.id in (select max(id) from releases where imdbid > 0 group by imdbid)
 			ORDER BY r.postdate DESC
 			LIMIT 24"
 		);
@@ -1514,14 +1514,14 @@ class Releases
 	{
 		return $this->pdo->queryDirect(
 			"SELECT r.xxxinfo_id, r.guid, r.name, r.searchname, r.size, r.completion,
-				r.postdate, r.categoryID, r.comments, r.grabs,
+				r.postdate, r.categoryid, r.comments, r.grabs,
 				xxx.cover, xxx.title
 			FROM releases r
-			INNER JOIN xxxinfo xxx ON r.xxxinfo_id = xxx.ID
-			WHERE r.categoryID BETWEEN 6000 AND 6999
-			AND xxx.ID > 0
+			INNER JOIN xxxinfo xxx ON r.xxxinfo_id = xxx.id
+			WHERE r.categoryid BETWEEN 6000 AND 6999
+			AND xxx.id > 0
 			AND xxx.cover = 1
-			AND r.ID in (select max(ID) from releases where xxxinfo_id > 0 group by xxxinfo_id)
+			AND r.id in (select max(id) from releases where xxxinfo_id > 0 group by xxxinfo_id)
 			ORDER BY r.postdate DESC
 			LIMIT 24"
 		);
@@ -1535,15 +1535,15 @@ class Releases
 	public function getNewestConsole()
 	{
 		return $this->pdo->queryDirect(
-			"SELECT r.consoleinfoID, r.guid, r.name, r.searchname, r.size, r.completion,
-				r.postdate, r.categoryID, r.comments, r.grabs,
+			"SELECT r.consoleinfoid, r.guid, r.name, r.searchname, r.size, r.completion,
+				r.postdate, r.categoryid, r.comments, r.grabs,
 				con.cover
 			FROM releases r
-			INNER JOIN consoleinfo con ON r.consoleinfoID = con.ID
-			WHERE r.categoryID BETWEEN 1000 AND 1999
-			AND con.ID > 0
+			INNER JOIN consoleinfo con ON r.consoleinfoid = con.id
+			WHERE r.categoryid BETWEEN 1000 AND 1999
+			AND con.id > 0
 			AND con.cover > 0
-			AND r.ID in (select max(ID) from releases where consoleinfoID > 0 group by consoleinfoID)
+			AND r.id in (select max(id) from releases where consoleinfoid > 0 group by consoleinfoid)
 			ORDER BY r.postdate DESC
 			LIMIT 35"
 		);
@@ -1558,14 +1558,14 @@ class Releases
 	{
 		return $this->pdo->queryDirect(
 			"SELECT r.gamesinfo_id, r.guid, r.name, r.searchname, r.size, r.completion,
-				r.postdate, r.categoryID, r.comments, r.grabs,
+				r.postdate, r.categoryid, r.comments, r.grabs,
 				gi.cover
 			FROM releases r
 			INNER JOIN gamesinfo gi ON r.gamesinfo_id = gi.id
-			WHERE r.categoryID = 4050
+			WHERE r.categoryid = 4050
 			AND gi.id > 0
 			AND gi.cover > 0
-			AND r.ID in (select max(ID) from releases where gamesinfo_id > 0 group by gamesinfo_id)
+			AND r.id in (select max(id) from releases where gamesinfo_id > 0 group by gamesinfo_id)
 			ORDER BY r.postdate DESC
 			LIMIT 35"
 		);
@@ -1579,16 +1579,16 @@ class Releases
 	public function getNewestMP3s()
 	{
 		return $this->pdo->queryDirect(
-			"SELECT r.musicinfoID, r.guid, r.name, r.searchname, r.size, r.completion,
-				r.postdate, r.categoryID, r.comments, r.grabs,
+			"SELECT r.musicinfoid, r.guid, r.name, r.searchname, r.size, r.completion,
+				r.postdate, r.categoryid, r.comments, r.grabs,
 				m.cover
 			FROM releases r
-			INNER JOIN musicinfo m ON r.musicinfoID = m.ID
-			WHERE r.categoryID BETWEEN 3000 AND 3999
-			AND r.categoryID != 3030
-			AND m.ID > 0
+			INNER JOIN musicinfo m ON r.musicinfoid = m.id
+			WHERE r.categoryid BETWEEN 3000 AND 3999
+			AND r.categoryid != 3030
+			AND m.id > 0
 			AND m.cover > 0
-			AND r.ID in (select max(ID) from releases where musicinfoID > 0 group by musicinfoID)
+			AND r.id in (select max(id) from releases where musicinfoid > 0 group by musicinfoid)
 			ORDER BY r.postdate DESC
 			LIMIT 24"
 		);
@@ -1602,16 +1602,16 @@ class Releases
 	public function getNewestBooks()
 	{
 		return $this->pdo->queryDirect(
-			"SELECT r.bookinfoID, r.guid, r.name, r.searchname, r.size, r.completion,
-				r.postdate, r.categoryID, r.comments, r.grabs,
+			"SELECT r.bookinfoid, r.guid, r.name, r.searchname, r.size, r.completion,
+				r.postdate, r.categoryid, r.comments, r.grabs,
 				b.url,	b.cover, b.title as booktitle, b.author
 			FROM releases r
-			INNER JOIN bookinfo b ON r.bookinfoID = b.ID
-			WHERE r.categoryID BETWEEN 8000 AND 8999
-			OR r.categoryID = 3030
-			AND b.ID > 0
+			INNER JOIN bookinfo b ON r.bookinfoid = b.id
+			WHERE r.categoryid BETWEEN 8000 AND 8999
+			OR r.categoryid = 3030
+			AND b.id > 0
 			AND b.cover > 0
-			AND r.ID in (select max(ID) from releases where bookinfoID > 0 group by bookinfoID)
+			AND r.id in (select max(id) from releases where bookinfoid > 0 group by bookinfoid)
 			ORDER BY r.postdate DESC
 			LIMIT 24"
 		);
@@ -1625,15 +1625,15 @@ class Releases
 	public function getNewestTV()
 	{
 		return $this->pdo->queryDirect(
-			"SELECT r.rageID, r.guid, r.name, r.searchname, r.size, r.completion,
-				r.postdate, r.categoryID, r.comments, r.grabs,
-				tv.ID as tvid, tv.imgdata, tv.releasetitle as tvtitle
+			"SELECT r.rageid, r.guid, r.name, r.searchname, r.size, r.completion,
+				r.postdate, r.categoryid, r.comments, r.grabs,
+				tv.id as tvid, tv.imgdata, tv.releasetitle as tvtitle
 			FROM releases r
-			INNER JOIN tvrage tv USING (rageID)
-			WHERE r.categoryID BETWEEN 5000 AND 5999
-			AND tv.rageID > 0
+			INNER JOIN tvrage tv USING (rageid)
+			WHERE r.categoryid BETWEEN 5000 AND 5999
+			AND tv.rageid > 0
 			AND length(tv.imgdata) > 0
-			GROUP BY tv.rageID
+			GROUP BY tv.rageid
 			ORDER BY r.postdate DESC
 			LIMIT 24"
 		);

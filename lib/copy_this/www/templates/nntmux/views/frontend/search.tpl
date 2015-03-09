@@ -234,23 +234,23 @@
 									<a href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}" title="View Nfo" class="modal_nfo rndbtn" rel="nfo">Nfo</a>
 								{/if}
 								{if $result.imdbid > 0}
-									<a href="#" name="name{$result.imdbID}" title="View movie info" class="modal_imdb rndbtn" rel="movie" >Cover</a>
+									<a href="#" name="name{$result.imdbid}" title="View movie info" class="modal_imdb rndbtn" rel="movie" >Cover</a>
 								{/if}
 								{if $result.haspreview == 1 && $userdata.canpreview == 1}
 								<a href="{$smarty.const.WWW_TOP}/covers/preview/{$result.guid}_thumb.jpg" name="name{$result.guid}" title="Screenshot of {$result.searchname|escape:"htmlall"}" class="modal_prev rndbtn" rel="preview">Preview</a>{/if}
 								{if $result.jpgstatus == 1 && $userdata.canpreview == 1}
 								<a href="{$smarty.const.WWW_TOP}/covers/sample/{$result.guid}_thumb.jpg" name="name{$result.guid}" title="Sample of {$result.searchname|escape:"htmlall"}" class="modal_prev rndbtn" rel="preview">Sample</a>{/if}
 								{if $result.musicinfoid > 0}
-									<a href="#" name="name{$result.musicinfoID}" title="View music info" class="modal_music rndbtn" rel="music" >Cover</a>
+									<a href="#" name="name{$result.musicinfoid}" title="View music info" class="modal_music rndbtn" rel="music" >Cover</a>
 								{/if}
 								{if $result.consoleinfoid > 0}
-									<a href="#" name="name{$result.consoleinfoID}" title="View console info" class="modal_console rndbtn" rel="console" >Cover</a>
+									<a href="#" name="name{$result.consoleinfoid}" title="View console info" class="modal_console rndbtn" rel="console" >Cover</a>
 								{/if}
 								{if $result.rageid > 0}
-									<a class="rndbtn" href="{$smarty.const.WWW_TOP}/series/{$result.rageID}" title="View all episodes">View Series</a>
+									<a class="rndbtn" href="{$smarty.const.WWW_TOP}/series/{$result.rageid}" title="View all episodes">View Series</a>
 								{/if}
 								{if $result.anidbid > 0}
-									<a class="rndbtn" href="{$smarty.const.WWW_TOP}/anime/{$result.anidbID}" title="View all episodes">View Anime</a>
+									<a class="rndbtn" href="{$smarty.const.WWW_TOP}/anime/{$result.anidbid}" title="View all episodes">View Anime</a>
 								{/if}
 								{if $result.tvairdate != ""}
 									<span class="seriesinfo rndbtn" title="{$result.guid}">Aired {if $result.tvairdate|strtotime > $smarty.now}in future{else}{$result.tvairdate|daysago}{/if}</span>
@@ -259,10 +259,10 @@
 									<span class="mediainfo rndbtn" title="{$result.guid}">Media</span>
 								{/if}
 								{if $result.preid > 0}
-									<span class="preinfo rndbtn" title="{$result.preID}">PreDB</span>
+									<span class="preinfo rndbtn" title="{$result.preid}">PreDB</span>
 								{/if}
 								{if $result.prehashid > 0}
-									<span class="prehashinfo rndbtn" title="{$result.prehashID}">PreHash</span>
+									<span class="prehashinfo rndbtn" title="{$result.prehashid}">PreHash</span>
 								{/if}
 								{if $result.group_name != ""}
 									<a class="rndbtn" href="{$smarty.const.WWW_TOP}/browse?g={$result.group_name|escape:"htmlall"}" title="Browse {$result.group_name}">{$result.group_name|escape:"htmlall"|replace:"alt.binaries.":"a.b."}</a>
@@ -271,7 +271,7 @@
 						</div>
 					</td>
 					<td class="category">
-						<a title="Browse {$result.category_name}" href="{$smarty.const.WWW_TOP}/browse?t={$result.categoryID}">{$result.category_name}</a>
+						<a title="Browse {$result.category_name}" href="{$smarty.const.WWW_TOP}/browse?t={$result.categoryid}">{$result.category_name}</a>
 					</td>
 					<td class="posted" title="{$result.postdate}">
 						{$result.postdate|timeago}

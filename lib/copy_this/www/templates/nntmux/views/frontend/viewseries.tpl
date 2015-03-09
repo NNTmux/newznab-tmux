@@ -6,7 +6,7 @@
 		{foreach $rage as $r}
 			{if $isadmin}
 				<a title="Edit rage data"
-				   href="{$smarty.const.WWW_TOP}/admin/rage-edit.php?id={$r.ID}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}">{$r.releasetitle} </a>
+				   href="{$smarty.const.WWW_TOP}/admin/rage-edit.php?id={$r.id}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}">{$r.releasetitle} </a>
 			{else}
 				{$r.releasetitle}
 			{/if}
@@ -18,7 +18,7 @@
 	</h1>
 	<div class="tvseriesheading">
 		{if $rage[0].imgdata != ""}<img class="shadow" alt="{$rage[0].releasetitle} Logo"
-										src="{$smarty.const.WWW_TOP}/getimage?type=tvrage&amp;id={$rage[0].ID}" />{/if}
+										src="{$smarty.const.WWW_TOP}/getimage?type=tvrage&amp;id={$rage[0].id}" />{/if}
 		<p>
 			{if $seriesgenre != ''}<b>{$seriesgenre}</b><br/>{/if}
 			<span class="descinitial">{$seriesdescription|escape:"htmlall"|nl2br|magicurl|truncate:"1000":" </span><a class=\"descmore\" href=\"#\">more...</a>"}
@@ -29,18 +29,18 @@
 	</div>
 	<div class="btn-group">
 		<a class="btn btn-small" title="Manage your shows" href="{$smarty.const.WWW_TOP}/myshows">My Shows</a>
-		{if $myshows.ID != ''}
-			<a class="btn btn-small" href="{$smarty.const.WWW_TOP}/myshows/delete/{$rage[0].rageID}?from={$smarty.server.REQUEST_URI|escape:"url"}" class="myshows" rel="remove" name="series{$rage[0].rageID}" title="Remove from My Shows"><i class="icon-minus-sign"></i></a>
-			<a class="btn btn-small" href="{$smarty.const.WWW_TOP}/myshows/edit/{$rage[0].rageID}?from={$smarty.server.REQUEST_URI|escape:"url"}" class="myshows" rel="edit" name="series{$rage[0].rageID}" title="Edit Categories for this show"><i class="icon-edit"></i></a>
+		{if $myshows.id != ''}
+			<a class="btn btn-small" href="{$smarty.const.WWW_TOP}/myshows/delete/{$rage[0].rageid}?from={$smarty.server.REQUEST_URI|escape:"url"}" class="myshows" rel="remove" name="series{$rage[0].rageid}" title="Remove from My Shows"><i class="icon-minus-sign"></i></a>
+			<a class="btn btn-small" href="{$smarty.const.WWW_TOP}/myshows/edit/{$rage[0].rageid}?from={$smarty.server.REQUEST_URI|escape:"url"}" class="myshows" rel="edit" name="series{$rage[0].rageid}" title="Edit Categories for this show"><i class="icon-edit"></i></a>
 		{else}
-			<a class="btn btn-small" href="{$smarty.const.WWW_TOP}/myshows/add/{$rage[0].rageID}?from={$smarty.server.REQUEST_URI|escape:"url"}" class="myshows" rel="add" name="series{$rage[0].rageID}" title="Add to My Shows"><i class="icon-plus-sign"></i></a>
+			<a class="btn btn-small" href="{$smarty.const.WWW_TOP}/myshows/add/{$rage[0].rageid}?from={$smarty.server.REQUEST_URI|escape:"url"}" class="myshows" rel="add" name="series{$rage[0].rageid}" title="Add to My Shows"><i class="icon-plus-sign"></i></a>
 		{/if}
 	</div>
  <form id="nzb_multi_operations_form" action="get">
 	<div class="btn-group">
-		{if $rage|@count == 1 && $isadmin}<a class="btn btn-mini btn-inverse" href="{$smarty.const.WWW_TOP}/admin/rage-edit.php?id={$r.ID}&amp;action=update&amp;from={$smarty.server.REQUEST_URI|escape:"url"}">Update From Tv Rage</a> | {/if}
-		<a class="btn btn-mini" target="_blank" href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$rage[0].rageID}" title="View in TvRage">View in Tv Rage</a> |
-		<a class="btn btn-mini" href="{$smarty.const.WWW_TOP}/rss?rage={$rage[0].rageID}{if $category != ''}&amp;t={$category}{/if}&amp;dl=1&amp;i={$userdata.ID}&amp;r={$userdata.rsstoken}">Series RSS <i class="fa-icon-rss"></i></a>
+		{if $rage|@count == 1 && $isadmin}<a class="btn btn-mini btn-inverse" href="{$smarty.const.WWW_TOP}/admin/rage-edit.php?id={$r.id}&amp;action=update&amp;from={$smarty.server.REQUEST_URI|escape:"url"}">Update From Tv Rage</a> | {/if}
+		<a class="btn btn-mini" target="_blank" href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$rage[0].rageid}" title="View in TvRage">View in Tv Rage</a> |
+		<a class="btn btn-mini" href="{$smarty.const.WWW_TOP}/rss?rage={$rage[0].rageid}{if $category != ''}&amp;t={$category}{/if}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">Series RSS <i class="fa-icon-rss"></i></a>
 	</div>
 	<form id="nzb_multi_operations_form" action="get">
 
@@ -103,7 +103,7 @@
 
 								<div class="resextra">
 									<div class="btns">
-										{if $result.nfoID > 0}<a href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}"
+										{if $result.nfoid > 0}<a href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}"
 																 title="View Nfo" class="modal_nfo rndbtn" rel="nfo">
 												Nfo</a>{/if}
 										{if $result.haspreview == 1 && $userdata.canpreview == 1}<a
@@ -120,9 +120,9 @@
 									{if $isadmin}
 										<div class="admin">
 											<a class="rndbtn"
-											   href="{$smarty.const.WWW_TOP}/admin/release-edit.php?id={$result.ID}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}"
+											   href="{$smarty.const.WWW_TOP}/admin/release-edit.php?id={$result.id}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}"
 											   title="Edit Release">Edit</a> <a class="rndbtn confirm_action"
-																				href="{$smarty.const.WWW_TOP}/admin/release-delete.php?id={$result.ID}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}"
+																				href="{$smarty.const.WWW_TOP}/admin/release-delete.php?id={$result.id}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}"
 																				title="Delete Release">Del</a>
 										</div>
 									{/if}
@@ -131,7 +131,7 @@
 							<td class="check"><input id="chk{$result.guid|substr:0:7}" type="checkbox" class="nzb_check"
 													 name="{$seasonnum}" value="{$result.guid}"/></td>
 							<td class="less"><a title="This series in {$result.category_name}"
-												href="{$smarty.const.WWW_TOP}/series/{$result.rageID}?t={$result.categoryID}">{$result.category_name}</a>
+												href="{$smarty.const.WWW_TOP}/series/{$result.rageid}?t={$result.categoryid}">{$result.category_name}</a>
 							</td>
 							<td class="less mid" width="40" title="{$result.postdate}">{$result.postdate|timeago}</td>
 							<td width="40"

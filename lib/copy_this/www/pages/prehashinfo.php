@@ -20,7 +20,7 @@ require_once(WWW_DIR . '/../misc/update_scripts/nix_scripts/tmux/lib/functions.p
  *
  *         Parameters:
  *         ----------
- *         reqid : The request ID
+ *         reqid : The request id
  *         group : The group name.
  *
  *         Example URL:
@@ -150,15 +150,15 @@ if (isset($_GET['type'])) {
 
 	switch ($_GET['type']) {
 		case 'r':
-		case 'requestID':
+		case 'requestid':
 			if (isset($_GET['reqid']) && is_numeric($_GET['reqid']) && isset($_GET['group']) && is_string($_GET['group'])) {
 				$db = new DB();
 				$preData = $db->query(
 					sprintf('
 					SELECT p.*
 					FROM prehash p
-					INNER JOIN groups g ON g.ID = p.groupID
-					WHERE requestID = %d
+					INNER JOIN groups g ON g.id = p.groupid
+					WHERE requestid = %d
 					AND g.name = %s
 					%s %s %s
 					LIMIT %d
@@ -198,7 +198,7 @@ if (isset($_GET['type'])) {
 			if (isset($_GET['md5']) && strlen($_GET['title']) === 32) {
 				$db = new DB();
 				$preData = $db->query(
-					sprintf('SELECT * FROM prehash p INNER JOIN predbhash ph ON ph.pre_id = p.ID WHERE MATCH(hashes) AGAINST (%s) %s %s %s LIMIT %d OFFSET %d',
+					sprintf('SELECT * FROM prehash p INNER JOIN predbhash ph ON ph.pre_id = p.id WHERE MATCH(hashes) AGAINST (%s) %s %s %s LIMIT %d OFFSET %d',
 						$db->escapeString($_GET['md5']),
 						$newer,
 						$older,
@@ -215,7 +215,7 @@ if (isset($_GET['type'])) {
 			if (isset($_GET['sha1']) && strlen($_GET['sha1']) === 40) {
 				$db = new DB();
 				$preData = $db->query(
-					sprintf('SELECT * FROM prehash p INNER JOIN predbhash ph ON ph.pre_id = p.ID WHERE MATCH(hashes) AGAINST (%s) %s %s %s LIMIT %d OFFSET %d',
+					sprintf('SELECT * FROM prehash p INNER JOIN predbhash ph ON ph.pre_id = p.id WHERE MATCH(hashes) AGAINST (%s) %s %s %s LIMIT %d OFFSET %d',
 						$db->escapeString($_GET['sha1']),
 						$newer,
 						$older,
@@ -253,7 +253,7 @@ if ($json === false) {
 		foreach ($preData as $data) {
 			echo
 			'<request',
-				' reqid="' . (!empty($data['requestID']) ? $data['requestID'] : '') . '"',
+				' reqid="' . (!empty($data['requestid']) ? $data['requestid'] : '') . '"',
 				' md5="' . (!empty($data['md5']) ? $data['md5'] : '') . '"',
 				' sha1="' . (!empty($data['sha1']) ? $data['sha1'] : '') . '"',
 				' nuked="' . (!empty($data['nuked']) ? $data['nuked'] : '') . '"',

@@ -1,4 +1,4 @@
- 
+
 <h1>{$page->title}</h1>
 
 <div style="float:right;">
@@ -43,20 +43,20 @@
 		<th>options</th>
 	</tr>
 
-	
+
 	{foreach from=$userlist item=user}
 	<tr class="{cycle values=",alt"}">
-		<td><a title="Edit user" href="{$smarty.const.WWW_TOP}/user-edit.php?id={$user.ID}">{$user.username}</a></td>
-		<td><a title="View profile" href="{$smarty.const.WWW_TOP}/../profile?id={$user.ID}">{$user.email}</a></td>
+		<td><a title="Edit user" href="{$smarty.const.WWW_TOP}/user-edit.php?id={$user.id}">{$user.username}</a></td>
+		<td><a title="View profile" href="{$smarty.const.WWW_TOP}/../profile?id={$user.id}">{$user.email}</a></td>
 		<td>{$user.host}</td>
 		<td title="{$user.createddate}">{$user.createddate|date_format}</td>
 		<td title="{$user.lastlogin}">{$user.lastlogin|date_format}</td>
 		<td title="{$user.apiaccess}">{$user.apiaccess|date_format}</td>
 		<td class="mid">{$user.grabs}</td>
 		<td class="mid">{$user.invites}</td>
-		<td class="mid"><a title="{if $user.notes|count_characters > 0}View{else}Add{/if} Notes" href="{$smarty.const.WWW_TOP}/user-edit.php?id={$user.ID}#notes"><img src="{$smarty.const.WWW_TOP}/../templates/nntmux/images/icons/{if $user.notes|count_characters > 0}note_edit.png{else}note_add.png{/if}" alt="" /></a></td>
+		<td class="mid"><a title="{if $user.notes|count_characters > 0}View{else}Add{/if} Notes" href="{$smarty.const.WWW_TOP}/user-edit.php?id={$user.id}#notes"><img src="{$smarty.const.WWW_TOP}/../templates/nntmux/images/icons/{if $user.notes|count_characters > 0}note_edit.png{else}note_add.png{/if}" alt="" /></a></td>
 		<td>{$user.rolename}</td>
-		<td>{if $user.role!="2"}<a class="confirm_action" href="{$smarty.const.WWW_TOP}/user-delete.php?id={$user.ID}">delete</a>{/if}</td>
+		<td>{if $user.role!="2"}<a class="confirm_action" href="{$smarty.const.WWW_TOP}/user-delete.php?id={$user.id}">delete</a>{/if}</td>
 	</tr>
 	{/foreach}
 

@@ -5,7 +5,7 @@ ADD `jpgstatus` TINYINT(1) NOT NULL DEFAULT 0,
 ADD `audiostatus` TINYINT(1) NOT NULL DEFAULT 0,
 ADD `videostatus` TINYINT(1) NOT NULL DEFAULT 0,
 ADD `reqidstatus` TINYINT(1) NOT NULL DEFAULT 0,
-ADD `prehashID` INT UNSIGNED NOT NULL DEFAULT 0,
+ADD `prehashid` INT UNSIGNED NOT NULL DEFAULT 0,
 ADD `iscategorized` BIT NOT NULL DEFAULT 0,
 ADD `isrenamed` BIT NOT NULL DEFAULT 0,
 ADD `ishashed` BIT NOT NULL DEFAULT 0,
@@ -21,14 +21,14 @@ ADD `proc_sorter` TINYINT(1) NOT NULL DEFAULT '0';
 CREATE INDEX `ix_releases_nfostatus` ON `releases` (`nfostatus` ASC) USING HASH;
 CREATE INDEX `ix_releases_reqidstatus` ON `releases` (`reqidstatus` ASC) USING HASH;
 CREATE INDEX `ix_releases_passwordstatus` ON `releases` (`passwordstatus`);
-CREATE INDEX `ix_releases_releasenfoID` ON `releases` (`releasenfoID`);
+CREATE INDEX `ix_releases_releasenfoID` ON `releases` (`releasenfoid`);
 CREATE INDEX `ix_releases_dehashstatus` ON `releases` (`dehashstatus`);
 CREATE INDEX `ix_releases_haspreview` ON `releases` (`haspreview` ASC) USING HASH;
 CREATE INDEX `ix_releases_postdate_name` ON `releases` (`postdate`, `name`);
-CREATE INDEX `ix_releases_prehashid_searchname` ON `releases` (`prehashID`, `searchname`);
+CREATE INDEX `ix_releases_prehashid_searchname` ON `releases` (`prehashid`, `searchname`);
 CREATE INDEX `ix_releases_gamesinfo_id` ON `releases` (`gamesinfo_id`);
 CREATE INDEX `ix_releases_xxxinfo_id` ON `releases` (`xxxinfo_id`);
-CREATE INDEX `ix_releases_status` ON `releases` (`nzbstatus`, `iscategorized`, `isrenamed`, `nfostatus`, `ishashed`, `passwordstatus`, `dehashstatus`, `releasenfoID`, `musicinfoID`, `consoleinfoID`, `bookinfoID`, `haspreview`, `categoryID`, `imdbID`, `rageID`);
+CREATE INDEX `ix_releases_status` ON `releases` (`nzbstatus`, `iscategorized`, `isrenamed`, `nfostatus`, `ishashed`, `passwordstatus`, `dehashstatus`, `releasenfoid`, `musicinfoid`, `consoleinfoid`, `bookinfoid`, `haspreview`, `categoryid`, `imdbid`, `rageid`);
 
 ALTER TABLE users ADD COLUMN gameview INT AFTER consoleview;
 ALTER TABLE users ADD COLUMN xxxview INT AFTER consoleview;
@@ -39,7 +39,7 @@ ALTER TABLE users ADD COLUMN queuetype TINYINT(1) NOT NULL DEFAULT 1;
 
 DROP TABLE IF EXISTS prehash;
 CREATE TABLE prehash (
-  ID         INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  id         INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
   filename   VARCHAR(255)     NOT NULL DEFAULT '',
   title      VARCHAR(255)     NOT NULL DEFAULT '',
   nfo        VARCHAR(255)     NULL,
@@ -47,13 +47,13 @@ CREATE TABLE prehash (
   category   VARCHAR(255)     NULL,
   predate    DATETIME DEFAULT NULL,
   source     VARCHAR(50)      NOT NULL DEFAULT '',
-  requestID  INT(10) UNSIGNED NOT NULL DEFAULT '0',
-  groupID    INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  requestid  INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  groupid    INT(10) UNSIGNED NOT NULL DEFAULT '0',
   nuked      TINYINT(1)       NOT NULL DEFAULT '0',
   nukereason VARCHAR(255)     NULL,
   files      VARCHAR(50)      NULL,
   searched   TINYINT(1)       NOT NULL DEFAULT '0',
-  PRIMARY KEY (ID)
+  PRIMARY KEY (id)
 )
   ENGINE =INNODB
   DEFAULT CHARACTER SET utf8
@@ -65,20 +65,20 @@ CREATE UNIQUE INDEX `ix_prehash_title` ON `prehash` (`title`);
 CREATE INDEX `ix_prehash_nfo` ON `prehash` (`nfo`);
 CREATE INDEX `ix_prehash_predate` ON `prehash` (`predate`);
 CREATE INDEX `ix_prehash_source` ON `prehash` (`source`);
-CREATE INDEX `ix_prehash_requestid` ON `prehash` (`requestID`, `groupID`);
+CREATE INDEX `ix_prehash_requestid` ON `prehash` (`requestid`, `groupid`);
 CREATE INDEX `ix_prehash_size` ON `prehash` (`size`);
 CREATE INDEX `ix_prehash_category` ON `prehash` (`category`);
 CREATE INDEX `ix_prehash_searched` ON `prehash` (`searched`);
 
 DROP TABLE IF EXISTS tmux;
 CREATE TABLE tmux (
-  ID          INT(10) UNSIGNED        NOT NULL AUTO_INCREMENT,
+  id          INT(10) UNSIGNED        NOT NULL AUTO_INCREMENT,
   setting     VARCHAR(64)
               COLLATE utf8_unicode_ci NOT NULL,
   value       VARCHAR(19000)
               COLLATE utf8_unicode_ci DEFAULT NULL,
   updateddate TIMESTAMP               NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (ID),
+  PRIMARY KEY (id),
   UNIQUE KEY setting (setting)
 )
   ENGINE =INNODB
@@ -208,12 +208,12 @@ INSERT INTO tmux (setting, value) VALUES ('defrag_cache', '900'),
 
 DROP TABLE IF EXISTS releasesearch;
 CREATE TABLE releasesearch (
-  ID         INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-  releaseID  INT(11) UNSIGNED NOT NULL,
+  id         INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  releaseid  INT(11) UNSIGNED NOT NULL,
   guid       VARCHAR(50)      NOT NULL,
   name       VARCHAR(255)     NOT NULL DEFAULT '',
   searchname VARCHAR(255)     NOT NULL DEFAULT '',
-  PRIMARY KEY (ID)
+  PRIMARY KEY (id)
 )
   ENGINE =MYISAM
   DEFAULT CHARSET =utf8
@@ -221,15 +221,15 @@ CREATE TABLE releasesearch (
   AUTO_INCREMENT =1;
 
 CREATE FULLTEXT INDEX ix_releasesearch_name_searchname_ft ON releasesearch (name, searchname);
-CREATE INDEX ix_releasesearch_releaseid ON releasesearch (releaseID);
+CREATE INDEX ix_releasesearch_releaseid ON releasesearch (releaseid);
 CREATE INDEX ix_releasesearch_guid ON releasesearch (guid);
 
 DROP TABLE IF EXISTS country;
 CREATE TABLE country (
-  ID   INT(11)      NOT NULL AUTO_INCREMENT,
+  id   INT(11)      NOT NULL AUTO_INCREMENT,
   name VARCHAR(255) NOT NULL DEFAULT "",
   code CHAR(2)      NOT NULL DEFAULT "",
-  PRIMARY KEY (ID)
+  PRIMARY KEY (id)
 )
   ENGINE =INNODB
   DEFAULT CHARACTER SET utf8
@@ -336,7 +336,7 @@ INSERT INTO country (code, name) VALUES ('AF', 'Afghanistan'),
 ('HU', 'Hungary'),
 ('IS', 'Iceland'),
 ('IN', 'India'),
-('ID', 'Indonesia'),
+('id', 'Indonesia'),
 ('IR', 'Iran'),
 ('IQ', 'Iraq'),
 ('IE', 'Ireland'),
@@ -530,14 +530,14 @@ CREATE TABLE         xxxinfo (
 
 DROP TABLE IF EXISTS `genres`;
 CREATE TABLE IF NOT EXISTS `genres` (
-  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `type` int(4) DEFAULT NULL,
   `disabled` tinyint(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`ID`)
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC AUTO_INCREMENT=635;
 
-INSERT IGNORE INTO `genres` (`ID`, `title`, `type`, `disabled`) VALUES
+INSERT IGNORE INTO `genres` (`id`, `title`, `type`, `disabled`) VALUES
   (150, 'Blues', 3000, 0),
   (151, 'Classic Rock', 3000, 0),
   (152, 'Country', 3000, 0),
@@ -1026,27 +1026,27 @@ INSERT IGNORE INTO `genres` (`ID`, `title`, `type`, `disabled`) VALUES
 
 DROP TABLE IF EXISTS shortgroups;
 CREATE TABLE shortgroups (
-  ID           INT(11)         NOT NULL AUTO_INCREMENT,
+  id           INT(11)         NOT NULL AUTO_INCREMENT,
   name         VARCHAR(255)    NOT NULL DEFAULT "",
   first_record BIGINT UNSIGNED NOT NULL DEFAULT "0",
   last_record  BIGINT UNSIGNED NOT NULL DEFAULT "0",
   updated      DATETIME DEFAULT NULL,
-  PRIMARY KEY (ID)
+  PRIMARY KEY (id)
 )
   ENGINE =InnoDB
   DEFAULT CHARACTER SET utf8
   COLLATE utf8_unicode_ci
   AUTO_INCREMENT =1;
 
-CREATE INDEX ix_shortgroups_id ON shortgroups (ID);
+CREATE INDEX ix_shortgroups_id ON shortgroups (id);
 CREATE INDEX ix_shortgroups_name ON shortgroups (name);
 
 DROP TABLE IF EXISTS `category`;
 CREATE TABLE category
 (
-  `ID`                   INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `id`                   INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `title`                VARCHAR(255)    NOT NULL,
-  `parentID`             INT             NULL,
+  `parentid`             INT             NULL,
   `status`               INT             NOT NULL DEFAULT '1',
   `minsizetoformrelease` BIGINT UNSIGNED NOT NULL DEFAULT '0',
   `maxsizetoformrelease` BIGINT UNSIGNED NOT NULL DEFAULT '0',
@@ -1058,90 +1058,90 @@ CREATE TABLE category
   COLLATE utf8_unicode_ci
   AUTO_INCREMENT =100000;
 
-INSERT INTO category (ID, title) VALUES (1000, 'Console');
-INSERT INTO category (ID, title) VALUES (2000, 'Movies');
-INSERT INTO category (ID, title) VALUES (3000, 'Audio');
-INSERT INTO category (ID, title) VALUES (4000, 'PC');
-INSERT INTO category (ID, title) VALUES (5000, 'TV');
-INSERT INTO category (ID, title) VALUES (6000, 'XXX');
-INSERT INTO category (ID, title) VALUES (7000, 'Books');
-INSERT INTO category (ID, title) VALUES (8000, 'Other');
+INSERT INTO category (id, title) VALUES (1000, 'Console');
+INSERT INTO category (id, title) VALUES (2000, 'Movies');
+INSERT INTO category (id, title) VALUES (3000, 'Audio');
+INSERT INTO category (id, title) VALUES (4000, 'PC');
+INSERT INTO category (id, title) VALUES (5000, 'TV');
+INSERT INTO category (id, title) VALUES (6000, 'XXX');
+INSERT INTO category (id, title) VALUES (7000, 'Books');
+INSERT INTO category (id, title) VALUES (8000, 'Other');
 
-INSERT INTO category (ID, title, parentID) VALUES (1010, 'NDS', 1000);
-INSERT INTO category (ID, title, parentID) VALUES (1020, 'PSP', 1000);
-INSERT INTO category (ID, title, parentID) VALUES (1030, 'Wii', 1000);
-INSERT INTO category (ID, title, parentID) VALUES (1040, 'Xbox', 1000);
-INSERT INTO category (ID, title, parentID) VALUES (1050, 'Xbox 360', 1000);
-INSERT INTO category (ID, title, parentID) VALUES (1060, 'WiiWare/VC', 1000);
-INSERT INTO category (ID, title, parentID) VALUES (1070, 'XBOX 360 DLC', 1000);
-INSERT INTO category (ID, title, parentID) VALUES (1080, 'PS3', 1000);
-INSERT INTO category (ID, title, parentID) VALUES (1090, 'Other', 1000);
-INSERT INTO category (ID, title, parentID) VALUES (1110, '3DS', 1000);
-INSERT INTO category (ID, title, parentID) VALUES (1120, 'PS Vita', 1000);
-INSERT INTO category (ID, title, parentID) VALUES (1130, 'WiiU', 1000);
-INSERT INTO category (ID, title, parentID) VALUES (1140, 'Xbox One', 1000);
-INSERT INTO category (ID, title, parentID) VALUES (1180, 'PS4', 1000);
+INSERT INTO category (id, title, parentid) VALUES (1010, 'NDS', 1000);
+INSERT INTO category (id, title, parentid) VALUES (1020, 'PSP', 1000);
+INSERT INTO category (id, title, parentid) VALUES (1030, 'Wii', 1000);
+INSERT INTO category (id, title, parentid) VALUES (1040, 'Xbox', 1000);
+INSERT INTO category (id, title, parentid) VALUES (1050, 'Xbox 360', 1000);
+INSERT INTO category (id, title, parentid) VALUES (1060, 'WiiWare/VC', 1000);
+INSERT INTO category (id, title, parentid) VALUES (1070, 'XBOX 360 DLC', 1000);
+INSERT INTO category (id, title, parentid) VALUES (1080, 'PS3', 1000);
+INSERT INTO category (id, title, parentid) VALUES (1090, 'Other', 1000);
+INSERT INTO category (id, title, parentid) VALUES (1110, '3DS', 1000);
+INSERT INTO category (id, title, parentid) VALUES (1120, 'PS Vita', 1000);
+INSERT INTO category (id, title, parentid) VALUES (1130, 'WiiU', 1000);
+INSERT INTO category (id, title, parentid) VALUES (1140, 'Xbox One', 1000);
+INSERT INTO category (id, title, parentid) VALUES (1180, 'PS4', 1000);
 
-INSERT INTO category (ID, title, parentID) VALUES (2010, 'Foreign', 2000);
-INSERT INTO category (ID, title, parentID) VALUES (2020, 'Other', 2000);
-INSERT INTO category (ID, title, parentID) VALUES (2030, 'SD', 2000);
-INSERT INTO category (ID, title, parentID) VALUES (2040, 'HD', 2000);
-INSERT INTO category (ID, title, parentID) VALUES (2050, '3D', 2000);
-INSERT INTO category (ID, title, parentID) VALUES (2060, 'BluRay', 2000);
-INSERT INTO category (ID, title, parentID) VALUES (2070, 'DVD', 2000);
+INSERT INTO category (id, title, parentid) VALUES (2010, 'Foreign', 2000);
+INSERT INTO category (id, title, parentid) VALUES (2020, 'Other', 2000);
+INSERT INTO category (id, title, parentid) VALUES (2030, 'SD', 2000);
+INSERT INTO category (id, title, parentid) VALUES (2040, 'HD', 2000);
+INSERT INTO category (id, title, parentid) VALUES (2050, '3D', 2000);
+INSERT INTO category (id, title, parentid) VALUES (2060, 'BluRay', 2000);
+INSERT INTO category (id, title, parentid) VALUES (2070, 'DVD', 2000);
 
-INSERT INTO category (ID, title, parentID) VALUES (3010, 'MP3', 3000);
-INSERT INTO category (ID, title, parentID) VALUES (3020, 'Video', 3000);
-INSERT INTO category (ID, title, parentID) VALUES (3030, 'Audiobook', 3000);
-INSERT INTO category (ID, title, parentID) VALUES (3040, 'Lossless', 3000);
-INSERT INTO category (ID, title, parentID) VALUES (3050, 'Other', 3000);
-INSERT INTO category (ID, title, parentID) VALUES (3060, 'Foreign', 3000);
+INSERT INTO category (id, title, parentid) VALUES (3010, 'MP3', 3000);
+INSERT INTO category (id, title, parentid) VALUES (3020, 'Video', 3000);
+INSERT INTO category (id, title, parentid) VALUES (3030, 'Audiobook', 3000);
+INSERT INTO category (id, title, parentid) VALUES (3040, 'Lossless', 3000);
+INSERT INTO category (id, title, parentid) VALUES (3050, 'Other', 3000);
+INSERT INTO category (id, title, parentid) VALUES (3060, 'Foreign', 3000);
 
-INSERT INTO category (ID, title, parentID) VALUES (4010, '0day', 4000);
-INSERT INTO category (ID, title, parentID) VALUES (4020, 'ISO', 4000);
-INSERT INTO category (ID, title, parentID) VALUES (4030, 'Mac', 4000);
-INSERT INTO category (ID, title, parentID) VALUES (4040, 'Mobile-Other', 4000);
-INSERT INTO category (ID, title, parentID) VALUES (4050, 'Games', 4000);
-INSERT INTO category (ID, title, parentID) VALUES (4060, 'Mobile-iOS', 4000);
-INSERT INTO category (ID, title, parentID) VALUES (4070, 'Mobile-Android', 4000);
+INSERT INTO category (id, title, parentid) VALUES (4010, '0day', 4000);
+INSERT INTO category (id, title, parentid) VALUES (4020, 'ISO', 4000);
+INSERT INTO category (id, title, parentid) VALUES (4030, 'Mac', 4000);
+INSERT INTO category (id, title, parentid) VALUES (4040, 'Mobile-Other', 4000);
+INSERT INTO category (id, title, parentid) VALUES (4050, 'Games', 4000);
+INSERT INTO category (id, title, parentid) VALUES (4060, 'Mobile-iOS', 4000);
+INSERT INTO category (id, title, parentid) VALUES (4070, 'Mobile-Android', 4000);
 
-INSERT INTO category (ID, title, parentID) VALUES (5010, 'WEB-DL', 5000);
-INSERT INTO category (ID, title, parentID) VALUES (5020, 'Foreign', 5000);
-INSERT INTO category (ID, title, parentID) VALUES (5030, 'SD', 5000);
-INSERT INTO category (ID, title, parentID) VALUES (5040, 'HD', 5000);
-INSERT INTO category (ID, title, parentID) VALUES (5050, 'Other', 5000);
-INSERT INTO category (ID, title, parentID) VALUES (5060, 'Sport', 5000);
-INSERT INTO category (ID, title, parentID) VALUES (5070, 'Anime', 5000);
-INSERT INTO category (ID, title, parentID) VALUES (5080, 'Documentary', 5000);
+INSERT INTO category (id, title, parentid) VALUES (5010, 'WEB-DL', 5000);
+INSERT INTO category (id, title, parentid) VALUES (5020, 'Foreign', 5000);
+INSERT INTO category (id, title, parentid) VALUES (5030, 'SD', 5000);
+INSERT INTO category (id, title, parentid) VALUES (5040, 'HD', 5000);
+INSERT INTO category (id, title, parentid) VALUES (5050, 'Other', 5000);
+INSERT INTO category (id, title, parentid) VALUES (5060, 'Sport', 5000);
+INSERT INTO category (id, title, parentid) VALUES (5070, 'Anime', 5000);
+INSERT INTO category (id, title, parentid) VALUES (5080, 'Documentary', 5000);
 
-INSERT INTO category (ID, title, parentID) VALUES (6010, 'DVD', 6000);
-INSERT INTO category (ID, title, parentID) VALUES (6020, 'WMV', 6000);
-INSERT INTO category (ID, title, parentID) VALUES (6030, 'XviD', 6000);
-INSERT INTO category (ID, title, parentID) VALUES (6040, 'x264', 6000);
-INSERT INTO category (ID, title, parentID) VALUES (6050, 'Pack', 6000);
-INSERT INTO category (ID, title, parentID) VALUES (6060, 'ImgSet', 6000);
-INSERT INTO category (ID, title, parentID) VALUES (6070, 'Other', 6000);
+INSERT INTO category (id, title, parentid) VALUES (6010, 'DVD', 6000);
+INSERT INTO category (id, title, parentid) VALUES (6020, 'WMV', 6000);
+INSERT INTO category (id, title, parentid) VALUES (6030, 'XviD', 6000);
+INSERT INTO category (id, title, parentid) VALUES (6040, 'x264', 6000);
+INSERT INTO category (id, title, parentid) VALUES (6050, 'Pack', 6000);
+INSERT INTO category (id, title, parentid) VALUES (6060, 'ImgSet', 6000);
+INSERT INTO category (id, title, parentid) VALUES (6070, 'Other', 6000);
 
-INSERT INTO category (ID, title, parentID) VALUES (7010, 'Mags', 7000);
-INSERT INTO category (ID, title, parentID) VALUES (7020, 'Ebook', 7000);
-INSERT INTO category (ID, title, parentID) VALUES (7030, 'Comics', 7000);
-INSERT INTO category (ID, title, parentID) VALUES (7040, 'Technical', 7000);
-INSERT INTO category (ID, title, parentID) VALUES (7050, 'Other', 7000);
-INSERT INTO category (ID, title, parentID) VALUES (7060, 'Foreign', 7000);
+INSERT INTO category (id, title, parentid) VALUES (7010, 'Mags', 7000);
+INSERT INTO category (id, title, parentid) VALUES (7020, 'Ebook', 7000);
+INSERT INTO category (id, title, parentid) VALUES (7030, 'Comics', 7000);
+INSERT INTO category (id, title, parentid) VALUES (7040, 'Technical', 7000);
+INSERT INTO category (id, title, parentid) VALUES (7050, 'Other', 7000);
+INSERT INTO category (id, title, parentid) VALUES (7060, 'Foreign', 7000);
 
-INSERT INTO category (ID, title, parentID) VALUES (8010, 'Misc', 8000);
-INSERT INTO category (ID, title, parentID) VALUES (8020, 'Hashed', 8000);
+INSERT INTO category (id, title, parentid) VALUES (8010, 'Misc', 8000);
+INSERT INTO category (id, title, parentid) VALUES (8020, 'Hashed', 8000);
 
 DROP TABLE IF EXISTS sharing_sites;
 CREATE TABLE sharing_sites (
-  ID         INT(11) UNSIGNED   NOT NULL AUTO_INCREMENT,
+  id         INT(11) UNSIGNED   NOT NULL AUTO_INCREMENT,
   site_name  VARCHAR(255)       NOT NULL DEFAULT '',
   site_guid  VARCHAR(40)        NOT NULL DEFAULT '',
   last_time  DATETIME DEFAULT NULL,
   first_time DATETIME DEFAULT NULL,
   enabled    TINYINT(1)         NOT NULL DEFAULT '0',
   comments   MEDIUMINT UNSIGNED NOT NULL DEFAULT '0',
-  PRIMARY KEY (ID)
+  PRIMARY KEY (id)
 )
   ENGINE =InnoDB
   DEFAULT CHARACTER SET utf8
@@ -1194,7 +1194,7 @@ CREATE TABLE predbhash (
   COLLATE =utf8mb4_unicode_ci;
 
 INSERT INTO predbhash (pre_id, hashes) (SELECT
-                                          ID,
+                                          id,
                                           CONCAT_WS(',', MD5(title), MD5(MD5(title)), SHA1(title))
                                         FROM prehash);
 
@@ -1220,14 +1220,14 @@ ALTER TABLE animetitles CHANGE createddate unixtime INT(12) UNSIGNED NOT NULL;
 DROP TRIGGER IF EXISTS insert_hashes;
 
 DELIMITER $$
-CREATE TRIGGER insert_hashes AFTER INSERT ON prehash FOR EACH ROW BEGIN INSERT INTO predbhash (pre_id, hashes) VALUES (NEW.ID, CONCAT_WS(',', MD5(NEW.title), MD5(MD5(NEW.title)), SHA1(NEW.title)));END;
+CREATE TRIGGER insert_hashes AFTER INSERT ON prehash FOR EACH ROW BEGIN INSERT INTO predbhash (pre_id, hashes) VALUES (NEW.id, CONCAT_WS(',', MD5(NEW.title), MD5(MD5(NEW.title)), SHA1(NEW.title)));END;
 $$
 DELIMITER ;
 
 DROP TRIGGER IF EXISTS update_hashes;
 
 DELIMITER $$
-CREATE TRIGGER update_hashes AFTER UPDATE ON prehash FOR EACH ROW BEGIN IF NEW.title != OLD.title THEN UPDATE predbhash SET hashes = CONCAT_WS(',', MD5(NEW.title), MD5(MD5(NEW.title)), SHA1(NEW.title)) WHERE pre_id = OLD.ID; END IF;
+CREATE TRIGGER update_hashes AFTER UPDATE ON prehash FOR EACH ROW BEGIN IF NEW.title != OLD.title THEN UPDATE predbhash SET hashes = CONCAT_WS(',', MD5(NEW.title), MD5(MD5(NEW.title)), SHA1(NEW.title)) WHERE pre_id = OLD.id; END IF;
 END;
 $$
 DELIMITER ;
@@ -1235,7 +1235,7 @@ DELIMITER ;
 DROP TRIGGER IF EXISTS delete_hashes;
 
 DELIMITER $$
-CREATE TRIGGER delete_hashes AFTER DELETE ON prehash FOR EACH ROW BEGIN DELETE FROM predbhash WHERE pre_id = OLD.ID; END;
+CREATE TRIGGER delete_hashes AFTER DELETE ON prehash FOR EACH ROW BEGIN DELETE FROM predbhash WHERE pre_id = OLD.id; END;
 $$
 DELIMITER ;
 
@@ -1262,14 +1262,14 @@ CREATE TRIGGER check_update BEFORE UPDATE ON releases FOR EACH ROW BEGIN IF NEW.
 ELSEIF NEW.name REGEXP '^\\[ ?([[:digit:]]{4,6}) ?\\]|^REQ\s*([[:digit:]]{4,6})|^([[:digit:]]{4,6})-[[:digit:]]{1}\\[' THEN SET NEW.isrequestid = 1;END IF;
 END;
 $$
-CREATE TRIGGER insert_search AFTER INSERT ON releases FOR EACH ROW BEGIN INSERT INTO releasesearch (releaseID, guid, name, searchname) VALUES (NEW.ID, NEW.guid, NEW.name, NEW.searchname);
+CREATE TRIGGER insert_search AFTER INSERT ON releases FOR EACH ROW BEGIN INSERT INTO releasesearch (releaseid, guid, name, searchname) VALUES (NEW.id, NEW.guid, NEW.name, NEW.searchname);
 END;
 $$
-CREATE TRIGGER update_search AFTER UPDATE ON releases FOR EACH ROW BEGIN IF NEW.guid != OLD.guid THEN UPDATE releasesearch SET guid = NEW.guid WHERE releaseID = OLD.ID; END IF;
-IF NEW.name != OLD.name THEN UPDATE releasesearch SET name = NEW.name WHERE releaseID = OLD.ID; END IF; IF NEW.searchname != OLD.searchname THEN UPDATE releasesearch SET searchname = NEW.searchname WHERE releaseID = OLD.ID; END IF;
+CREATE TRIGGER update_search AFTER UPDATE ON releases FOR EACH ROW BEGIN IF NEW.guid != OLD.guid THEN UPDATE releasesearch SET guid = NEW.guid WHERE releaseid = OLD.id; END IF;
+IF NEW.name != OLD.name THEN UPDATE releasesearch SET name = NEW.name WHERE releaseid = OLD.id; END IF; IF NEW.searchname != OLD.searchname THEN UPDATE releasesearch SET searchname = NEW.searchname WHERE releaseid = OLD.id; END IF;
 END;
 $$
-CREATE TRIGGER delete_search AFTER DELETE ON releases FOR EACH ROW BEGIN DELETE FROM releasesearch WHERE releaseID = OLD.ID; END;
+CREATE TRIGGER delete_search AFTER DELETE ON releases FOR EACH ROW BEGIN DELETE FROM releasesearch WHERE releaseid = OLD.id; END;
 $$
 DELIMITER ;
 

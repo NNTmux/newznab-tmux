@@ -85,7 +85,7 @@ class CollectionsCleaning
 	}
 
 	/**
-	 * Cleans a usenet subject returning a string that can be used to "merge" files together, a pretty subject, a categoryID and the name status.
+	 * Cleans a usenet subject returning a string that can be used to "merge" files together, a pretty subject, a categoryid and the name status.
 	 *
 	 * @param string $subject   Subject to parse.
 	 * @param string $groupName Group to work in.

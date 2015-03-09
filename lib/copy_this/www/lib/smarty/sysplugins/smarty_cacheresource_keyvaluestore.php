@@ -172,7 +172,7 @@ abstract class Smarty_CacheResource_KeyValueStore extends Smarty_CacheResource
 	}
 
 	/**
-	 * Get template's unique ID
+	 * Get template's unique id
 	 *
 	 * @param  Smarty $smarty        Smarty object
 	 * @param  string $resource_name template name

@@ -355,7 +355,7 @@ Class Regexes
 							$returnString .= $value; // Concatenate the string to return.
 							break;
 						case 'category_regexes':
-							$returnString = $this->_categoryID; // Regex matched, so return the category ID.
+							$returnString = $this->_categoryID; // Regex matched, so return the category id.
 							break 2;
 					}
 				}

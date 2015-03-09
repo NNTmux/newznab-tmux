@@ -12,7 +12,7 @@ if (!$users->isLoggedIn())
 $moviecats = $cat->getChildren(Category::CAT_PARENT_MOVIE);
 $mtmp = array();
 foreach($moviecats as $mcat) {
-	$mtmp[$mcat['ID']] = $mcat;
+	$mtmp[$mcat['id']] = $mcat;
 }
 
 $category = (isset($_GET["imdb"]) ? -1 : Category::CAT_PARENT_MOVIE);

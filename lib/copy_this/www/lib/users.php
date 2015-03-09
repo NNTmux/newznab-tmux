@@ -73,7 +73,7 @@ class Users
 		$forum = new Forum();
 		$forum->deleteUser($id);
 
-		$db->exec(sprintf("DELETE from users where ID = %d", $id));
+		$db->exec(sprintf("DELETE from users where id = %d", $id));
 	}
 
 	public function delCartForUser($uid)
@@ -129,7 +129,7 @@ class Users
 
 		$order = $this->getBrowseOrder($orderby);
 
-		return $db->query(sprintf(" SELECT users.*, userroles.name as rolename from users inner join userroles on userroles.ID = users.role where 1=1 %s %s %s %s AND email != 'sharing@nZEDb.com' order by %s %s" . $limit, $usql, $esql, $hsql, $rsql, $order[0], $order[1]));
+		return $db->query(sprintf(" SELECT users.*, userroles.name as rolename from users inner join userroles on userroles.id = users.role where 1=1 %s %s %s %s AND email != 'sharing@nZEDb.com' order by %s %s" . $limit, $usql, $esql, $hsql, $rsql, $order[0], $order[1]));
 	}
 
 	public function getBrowseOrder($orderby)
@@ -173,7 +173,7 @@ class Users
 	public function getCount()
 	{
 		$db = new DB();
-		$res = $db->queryOneRow("select count(ID) as num from users WHERE email != 'sharing@nZEDb.com'");
+		$res = $db->queryOneRow("select count(id) as num from users WHERE email != 'sharing@nZEDb.com'");
 
 		return $res["num"];
 	}
@@ -193,12 +193,12 @@ class Users
 
 		$res = $this->getByUsername($uname);
 		if ($res)
-			if ($res["ID"] != $id)
+			if ($res["id"] != $id)
 				return Users::ERR_SIGNUP_UNAMEINUSE;
 
 		$res = $this->getByEmail($email);
 		if ($res)
-			if ($res["ID"] != $id)
+			if ($res["id"] != $id)
 				return Users::ERR_SIGNUP_EMAILINUSE;
 
 		$sql = array();
@@ -278,7 +278,7 @@ class Users
 	{
 		$db = new DB();
 
-		return $db->queryOneRow(sprintf("select users.*, userroles.name as rolename, userroles.apirequests, userroles.downloadrequests from users inner join userroles on userroles.ID = users.role where username = %s ", $db->escapeString($uname)));
+		return $db->queryOneRow(sprintf("select users.*, userroles.name as rolename, userroles.apirequests, userroles.downloadrequests from users inner join userroles on userroles.id = users.role where username = %s ", $db->escapeString($uname)));
 	}
 
 	public function getByEmail($email)
@@ -299,7 +299,7 @@ class Users
 	public function updateUserRoleChangeDate($uid, $date)
 	{
 		$db = new DB();
-		$db->exec(sprintf("update users SET rolechangedate = '%s' WHERE ID = %d", $date, $uid));
+		$db->exec(sprintf("update users SET rolechangedate = '%s' WHERE id = %d", $date, $uid));
 
 		return Users::SUCCESS;
 	}
@@ -311,10 +311,10 @@ class Users
 		$site = new Sites;
 		$s = $site->get();
 
-		$data = $db->query(sprintf("select ID,email from users WHERE role = %d and rolechangedate < now()", $uprole));
+		$data = $db->query(sprintf("select id,email from users WHERE role = %d and rolechangedate < now()", $uprole));
 		foreach ($data as $u) {
 			Utility::sendEmail($u["email"], $msgsubject, $msgbody, $s->email);
-			$db->exec(sprintf("update users SET role = %d, rolechangedate=null WHERE ID = %d", $downrole, $u["ID"]));
+			$db->exec(sprintf("update users SET role = %d, rolechangedate=null WHERE id = %d", $downrole, $u["id"]));
 		}
 
 		return Users::SUCCESS;
@@ -392,7 +392,7 @@ class Users
 	public function getById($id)
 	{
 		$db = new DB();
-		$sql = sprintf("select users.*, userroles.name as rolename, userroles.hideads, userroles.canpreview, userroles.canpre, userroles.apirequests, userroles.downloadrequests, NOW() as now from users inner join userroles on userroles.ID = users.role where users.id = %d ", $id);
+		$sql = sprintf("select users.*, userroles.name as rolename, userroles.hideads, userroles.canpreview, userroles.canpre, userroles.apirequests, userroles.downloadrequests, NOW() as now from users inner join userroles on userroles.id = users.role where users.id = %d ", $id);
 
 		return $db->queryOneRow($sql);
 	}
@@ -401,7 +401,7 @@ class Users
 	{
 		$db = new DB();
 
-		return $db->queryOneRow(sprintf("select users.*, userroles.apirequests, userroles.downloadrequests, NOW() as now from users inner join userroles on userroles.ID = users.role where users.rsstoken = %s ", $db->escapeString($rsstoken)));
+		return $db->queryOneRow(sprintf("select users.*, userroles.apirequests, userroles.downloadrequests, NOW() as now from users inner join userroles on userroles.id = users.role where users.rsstoken = %s ", $db->escapeString($rsstoken)));
 	}
 
 	public function getBrowseOrdering()
@@ -518,7 +518,7 @@ class Users
 			return -1;
 
 		$db = new DB();
-		$db->exec(sprintf("update users set invites = case when invites <= 0 then 0 else invites-1 end where ID = %d ", $invite["userID"]));
+		$db->exec(sprintf("update users set invites = case when invites <= 0 then 0 else invites-1 end where id = %d ", $invite["userID"]));
 		$this->deleteInvite($invitecode);
 
 		return $invite["userID"];
@@ -604,7 +604,7 @@ class Users
 		if ($host != '')
 			$hostSql = sprintf(', host = %s', $db->escapeString($host));
 
-		$db->exec(sprintf("update users set lastlogin = now() %s where ID = %d ", $hostSql, $uid));
+		$db->exec(sprintf("update users set lastlogin = now() %s where id = %d ", $hostSql, $uid));
 	}
 
 	public function setCookies($uid)
@@ -637,7 +637,7 @@ class Users
 	public function addCart($uid, $releaseid)
 	{
 		$db = new DB();
-		$sql = sprintf("insert into usercart (userID, releaseID, createddate) values (%d, %d, now())", $uid, $releaseid);
+		$sql = sprintf("insert into usercart (userID, releaseid, createddate) values (%d, %d, now())", $uid, $releaseid);
 
 		return $db->queryInsert($sql);
 	}
@@ -646,9 +646,9 @@ class Users
 	{
 		$db = new DB();
 		if ($releaseid != "")
-			$releaseid = " and releases.ID = " . $db->escapeString($releaseid);
+			$releaseid = " and releases.id = " . $db->escapeString($releaseid);
 
-		return $db->query(sprintf("select usercart.*, releases.searchname,releases.guid from usercart inner join releases on releases.ID = usercart.releaseID where userID = %d %s", $uid, $releaseid));
+		return $db->query(sprintf("select usercart.*, releases.searchname,releases.guid from usercart inner join releases on releases.id = usercart.releaseid where userID = %d %s", $uid, $releaseid));
 	}
 
 	public function delCartByGuid($guids, $uid)
@@ -664,22 +664,22 @@ class Users
 				$del[] = $id;
 		}
 
-		$sql = sprintf("delete from usercart where userID = %d and releaseID IN (select ID from releases where guid IN (%s)) ", $uid, implode(',', $del));
+		$sql = sprintf("delete from usercart where userID = %d and releaseid IN (select id from releases where guid IN (%s)) ", $uid, implode(',', $del));
 		$db->query($sql);
 	}
 
 	public function delCartByUserAndRelease($guid, $uid)
 	{
 		$db = new DB();
-		$rel = $db->queryOneRow(sprintf("select ID from releases where guid = %s", $db->escapeString($guid)));
+		$rel = $db->queryOneRow(sprintf("select id from releases where guid = %s", $db->escapeString($guid)));
 		if ($rel)
-			$db->exec(sprintf("DELETE FROM usercart WHERE userID = %d AND releaseID = %d", $uid, $rel["ID"]));
+			$db->exec(sprintf("DELETE FROM usercart WHERE userID = %d AND releaseid = %d", $uid, $rel["id"]));
 	}
 
 	public function delCartForRelease($rid)
 	{
 		$db = new DB();
-		$db->exec(sprintf("DELETE from usercart where releaseID = %d", $rid));
+		$db->exec(sprintf("DELETE from usercart where releaseid = %d", $rid));
 	}
 
 	public function addCategoryExclusions($uid, $catids)
@@ -688,7 +688,7 @@ class Users
 		$this->delUserCategoryExclusions($uid);
 		if (count($catids) > 0) {
 			foreach ($catids as $catid) {
-				$db->queryInsert(sprintf("insert into userexcat (userID, categoryID, createddate) values (%d, %d, now())", $uid, $catid));
+				$db->queryInsert(sprintf("insert into userexcat (userID, categoryid, createddate) values (%d, %d, now())", $uid, $catid));
 			}
 		}
 	}
@@ -697,9 +697,9 @@ class Users
 	{
 		$db = new DB();
 		$ret = array();
-		$data = $db->query(sprintf("select categoryID from roleexcat where role = %d", $role));
+		$data = $db->query(sprintf("select categoryid from roleexcat where role = %d", $role));
 		foreach ($data as $d)
-			$ret[] = $d["categoryID"];
+			$ret[] = $d["categoryid"];
 
 		return $ret;
 	}
@@ -710,7 +710,7 @@ class Users
 		$this->delRoleCategoryExclusions($role);
 		if (count($catids) > 0) {
 			foreach ($catids as $catid) {
-				$db->queryInsert(sprintf("insert into roleexcat (role, categoryID, createddate) values (%d, %d, now())", $role, $catid));
+				$db->queryInsert(sprintf("insert into roleexcat (role, categoryid, createddate) values (%d, %d, now())", $role, $catid));
 			}
 		}
 	}
@@ -741,9 +741,9 @@ class Users
 	{
 		$db = new DB();
 		$ret = array();
-		$data = $db->query(sprintf("select categoryID from userexcat where userID = %d union distinct select categoryID from roleexcat inner join users on users.role = roleexcat.role where users.ID = %d", $uid, $uid));
+		$data = $db->query(sprintf("select categoryid from userexcat where userID = %d union distinct select categoryid from roleexcat inner join users on users.role = roleexcat.role where users.id = %d", $uid, $uid));
 		foreach ($data as $d)
-			$ret[] = $d["categoryID"];
+			$ret[] = $d["categoryid"];
 
 		return $ret;
 	}
@@ -751,7 +751,7 @@ class Users
 	public function delCategoryExclusion($uid, $catid)
 	{
 		$db = new DB();
-		$db->exec(sprintf("DELETE from userexcat where userID = %d and categoryID = %d", $uid, $catid));
+		$db->exec(sprintf("DELETE from userexcat where userID = %d and categoryid = %d", $uid, $catid));
 	}
 
 	public function sendInvite($sitetitle, $siteemail, $serverurl, $uid, $emailto)
@@ -778,8 +778,8 @@ class Users
 	{
 		$db = new DB();
 
-		return $db->query("SELECT ID, username, SUM(grabs) as grabs FROM users
-							GROUP BY ID, username
+		return $db->query("SELECT id, username, SUM(grabs) as grabs FROM users
+							GROUP BY id, username
 							HAVING SUM(grabs) > 0
 							ORDER BY grabs DESC
 							LIMIT 10"
@@ -818,9 +818,9 @@ class Users
 		$sql = sprintf("select hosthash, group_concat(userID) as user_string, group_concat(username) as user_names
 							from
 							(
-							select hosthash, userID, username from userdownloads left outer join users on users.ID = userdownloads.userID where hosthash is not null and hosthash not in %s group by hosthash, userID
+							select hosthash, userID, username from userdownloads left outer join users on users.id = userdownloads.userID where hosthash is not null and hosthash not in %s group by hosthash, userID
 							union distinct
-							select hosthash, userID, username from userrequests left outer join users on users.ID = userrequests.userID where hosthash is not null and hosthash not in %s group by hosthash, userID
+							select hosthash, userID, username from userrequests left outer join users on users.id = userrequests.userID where hosthash is not null and hosthash not in %s group by hosthash, userID
 							) x
 							group by hosthash
 							having CAST((LENGTH(group_concat(userID)) - LENGTH(REPLACE(group_concat(userID), ',', ''))) / LENGTH(',') AS UNSIGNED) < 9
@@ -846,10 +846,10 @@ class Users
 	{
 		$db = new DB();
 
-		return $db->query("select ur.name, count(u.ID) as num from users u
-							inner join userroles ur on ur.ID = u.role
+		return $db->query("select ur.name, count(u.id) as num from users u
+							inner join userroles ur on ur.id = u.role
 							group by ur.name
-							order by count(u.ID) desc;"
+							order by count(u.id) desc;"
 		);
 	}
 
@@ -887,7 +887,7 @@ class Users
 	public function getRoleById($id)
 	{
 		$db = new DB();
-		$sql = sprintf("select * from userroles where ID = %d", $id);
+		$sql = sprintf("select * from userroles where id = %d", $id);
 
 		return $db->queryOneRow($sql);
 	}
@@ -906,23 +906,23 @@ class Users
 		if ($isdefault == 1)
 			$db->exec("update userroles set isdefault=0");
 
-		return $db->exec(sprintf("update userroles set name=%s, apirequests=%d, downloadrequests=%d, defaultinvites=%d, isdefault=%d, canpreview=%d, canpre=%d, hideads=%d WHERE ID=%d", $db->escapeString($name), $apirequests, $downloadrequests, $defaultinvites, $isdefault, $canpreview, $canpre, $hideads, $id));
+		return $db->exec(sprintf("update userroles set name=%s, apirequests=%d, downloadrequests=%d, defaultinvites=%d, isdefault=%d, canpreview=%d, canpre=%d, hideads=%d WHERE id=%d", $db->escapeString($name), $apirequests, $downloadrequests, $defaultinvites, $isdefault, $canpreview, $canpre, $hideads, $id));
 	}
 
 	public function deleteRole($id)
 	{
 		$db = new DB();
-		$res = $db->query(sprintf("select ID from users where role = %d", $id));
+		$res = $db->query(sprintf("select id from users where role = %d", $id));
 		if (sizeof($res) > 0) {
 			$userids = array();
 			foreach ($res as $user)
-				$userids[] = $user['ID'];
+				$userids[] = $user['id'];
 
 			$defaultrole = $this->getDefaultRole();
-			$db->exec(sprintf("update users set role=%d where ID IN (%s)", $defaultrole['ID'], implode(',', $userids)));
+			$db->exec(sprintf("update users set role=%d where id IN (%s)", $defaultrole['id'], implode(',', $userids)));
 		}
 
-		return $db->exec(sprintf("DELETE from userroles WHERE ID=%d", $id));
+		return $db->exec(sprintf("DELETE from userroles WHERE id=%d", $id));
 	}
 
 	public function getDefaultRole()
@@ -939,7 +939,7 @@ class Users
 		//$db->exec(sprintf("DELETE FROM userrequests WHERE (userID = %d AND timestamp < DATE_SUB(NOW(), INTERVAL 1 DAY))", $userid));
 		$db->exec(sprintf("DELETE FROM userrequests WHERE timestamp < DATE_SUB(NOW(), INTERVAL 1 DAY)", $userid));
 
-		$sql = sprintf("select COUNT(ID) as num, TIME_TO_SEC(TIMEDIFF(DATE_ADD(MIN(TIMESTAMP), INTERVAL 1 DAY), NOW())) AS nextrequest FROM userrequests WHERE userID = %d AND timestamp > DATE_SUB(NOW(), INTERVAL 1 DAY)", $userid);
+		$sql = sprintf("select COUNT(id) as num, TIME_TO_SEC(TIMEDIFF(DATE_ADD(MIN(TIMESTAMP), INTERVAL 1 DAY), NOW())) AS nextrequest FROM userrequests WHERE userID = %d AND timestamp > DATE_SUB(NOW(), INTERVAL 1 DAY)", $userid);
 
 		return $db->queryOneRow($sql);
 	}
@@ -965,7 +965,7 @@ class Users
 		$db = new DB();
 		if ($days == 0) {
 			$days = 1;
-			$db->exec("update userdownloads set releaseID = null");
+			$db->exec("update userdownloads set releaseid = null");
 		}
 
 		$db->exec(sprintf("DELETE from userrequests where timestamp < DATE_SUB(NOW(), INTERVAL %d DAY)", $days));
@@ -984,9 +984,9 @@ class Users
 			}
 			$ipsql = "(" . $ipsql . " '-1')";
 
-			$sql = sprintf("select COUNT(ID) as num, TIME_TO_SEC(TIMEDIFF(DATE_ADD(MIN(TIMESTAMP), INTERVAL 1 DAY), NOW())) AS nextdl FROM userdownloads WHERE hosthash = %s AND timestamp > DATE_SUB(NOW(), INTERVAL 1 DAY) and hosthash not in %s", $db->escapeString($hosthash), $ipsql);
+			$sql = sprintf("select COUNT(id) as num, TIME_TO_SEC(TIMEDIFF(DATE_ADD(MIN(TIMESTAMP), INTERVAL 1 DAY), NOW())) AS nextdl FROM userdownloads WHERE hosthash = %s AND timestamp > DATE_SUB(NOW(), INTERVAL 1 DAY) and hosthash not in %s", $db->escapeString($hosthash), $ipsql);
 		} else {
-			$sql = sprintf("select COUNT(ID) as num, TIME_TO_SEC(TIMEDIFF(DATE_ADD(MIN(TIMESTAMP), INTERVAL 1 DAY), NOW())) AS nextdl FROM userdownloads WHERE userID = %d AND timestamp > DATE_SUB(NOW(), INTERVAL 1 DAY)", $userid);
+			$sql = sprintf("select COUNT(id) as num, TIME_TO_SEC(TIMEDIFF(DATE_ADD(MIN(TIMESTAMP), INTERVAL 1 DAY), NOW())) AS nextdl FROM userdownloads WHERE userID = %d AND timestamp > DATE_SUB(NOW(), INTERVAL 1 DAY)", $userid);
 		}
 
 		return $db->queryOneRow($sql);
@@ -1004,7 +1004,7 @@ class Users
 
 		$hashsql .= " 1=2 ";
 
-		$sql = sprintf("select userdownloads.*, releases.guid, releases.searchname from userdownloads left outer join releases on releases.ID = userdownloads.releaseID where userdownloads.userID = %d or %s order by userdownloads.timestamp desc", $userid, $hashsql);
+		$sql = sprintf("select userdownloads.*, releases.guid, releases.searchname from userdownloads left outer join releases on releases.id = userdownloads.releaseid where userdownloads.userID = %d or %s order by userdownloads.timestamp desc", $userid, $hashsql);
 
 		return $db->query($sql);
 	}
@@ -1014,7 +1014,7 @@ class Users
 		$db = new DB();
 		$hosthash = ($hosthash != "" ? $db->escapeString($hosthash) : "null");
 
-		$sql = sprintf("insert into userdownloads (userID, timestamp, hosthash, releaseID) VALUES (%d, now(), %s, (select ID from releases where guid = %s))", $userid, $hosthash, $db->escapeString($relGuid));
+		$sql = sprintf("insert into userdownloads (userID, timestamp, hosthash, releaseid) VALUES (%d, now(), %s, (select id from releases where guid = %s))", $userid, $hosthash, $db->escapeString($relGuid));
 
 		return $db->queryInsert($sql);
 	}
@@ -1023,6 +1023,6 @@ class Users
 	{
 		$db = new DB();
 
-		return $db->queryInsert(sprintf("delete from userdownloads where releaseID = %d", $releaseID));
+		return $db->queryInsert(sprintf("delete from userdownloads where releaseid = %d", $releaseID));
 	}
 }

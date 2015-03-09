@@ -15,11 +15,11 @@ require_once(WWW_DIR . "/lib/ColorCLI.php");
 
 class Games
 {
-	const REQID_FOUND 		= 1; // Request ID found and release was updated.
-	const REQID_NO_LOCAL	= -1; // Request ID was not found via local lookup.
-	const REQID_NONE		= -3; // The Request ID was not found locally or via web lookup.
+	const REQID_FOUND 		= 1; // Request id found and release was updated.
+	const REQID_NO_LOCAL	= -1; // Request id was not found via local lookup.
+	const REQID_NONE		= -3; // The Request id was not found locally or via web lookup.
 	const REQID_UNPROCESSED	= 0; // Release has not been processed.
-	const REQID_ZERO		= -2; // The Request ID was 0.
+	const REQID_ZERO		= -2; // The Request id was 0.
 
 	/**
 	 * @var string
@@ -134,7 +134,7 @@ class Games
 			sprintf("
 				SELECT gamesinfo.*, genres.title AS genres
 				FROM gamesinfo
-				LEFT OUTER JOIN genres ON genres.ID = gamesinfo.genre_id
+				LEFT OUTER JOIN genres ON genres.id = gamesinfo.genre_id
 				WHERE gamesinfo.id = %d",
 				$id
 			)
@@ -157,7 +157,7 @@ class Games
 	{
 		return $this->pdo->query(
 			sprintf(
-				"SELECT gi.*, g.title AS genretitle FROM gamesinfo gi INNER JOIN genres g ON gi.genre_id = g.ID ORDER BY createddate DESC %s",
+				"SELECT gi.*, g.title AS genretitle FROM gamesinfo gi INNER JOIN genres g ON gi.genre_id = g.id ORDER BY createddate DESC %s",
 				($start === false ? '' : 'LIMIT ' . $num . ' OFFSET ' . $start)
 			)
 		);
@@ -189,7 +189,7 @@ class Games
 				$this->getBrowseBy(),
 				$catsrch,
 				($maxage > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxage) : ''),
-				(count($excludedcats) > 0 ? " AND r.categoryID NOT IN (" . implode(",", $excludedcats) . ")" : '')
+				(count($excludedcats) > 0 ? " AND r.categoryid NOT IN (" . implode(",", $excludedcats) . ")" : '')
 			)
 		);
 
@@ -219,19 +219,19 @@ class Games
 
 		$exccatlist = "";
 		if (count($excludedcats) > 0) {
-			$exccatlist = " AND r.categoryID NOT IN (" . implode(",", $excludedcats) . ")";
+			$exccatlist = " AND r.categoryid NOT IN (" . implode(",", $excludedcats) . ")";
 		}
 
 		$order = $this->getGamesOrder($orderby);
 
 		return $this->pdo->query(
 			sprintf(
-				"SELECT GROUP_CONCAT(r.ID ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id, "
+				"SELECT GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id, "
 				. "GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') as grp_rarinnerfilecount, "
 				. "GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') AS grp_haspreview, "
 				. "GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_password, "
 				. "GROUP_CONCAT(r.guid ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_guid, "
-				. "GROUP_CONCAT(rn.ID ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_nfoid, "
+				. "GROUP_CONCAT(rn.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_nfoid, "
 				. "GROUP_CONCAT(groups.name ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grpname, "
 				. "GROUP_CONCAT(r.searchname ORDER BY r.postdate DESC SEPARATOR '#') AS grp_release_name, "
 				. "GROUP_CONCAT(r.postdate ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_postdate, "
@@ -240,9 +240,9 @@ class Games
 				. "GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_comments, "
 				. "GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grabs, "
 				. "con.*, YEAR (con.releasedate) as year, r.gamesinfo_id, groups.name AS group_name,
-				rn.ID as nfoid FROM releases r "
-				. "LEFT OUTER JOIN groups ON groups.ID = r.groupID "
-				. "LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.ID "
+				rn.id as nfoid FROM releases r "
+				. "LEFT OUTER JOIN groups ON groups.id = r.groupid "
+				. "LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id "
 				. "INNER JOIN gamesinfo con ON con.id = r.gamesinfo_id "
 				. "WHERE r.nzbstatus = 1 AND con.title != '' AND "
 				. "r.passwordstatus <= (SELECT value FROM site WHERE setting='showpasswordedrelease') AND %s %s %s %s "
@@ -600,7 +600,7 @@ class Games
 		$defaultGenres = $gen->getGenres(\Genres::GAME_TYPE);
 		$genreassoc = array();
 		foreach ($defaultGenres as $dg) {
-			$genreassoc[$dg['ID']] = strtolower($dg['title']);
+			$genreassoc[$dg['id']] = strtolower($dg['title']);
 		}
 
 		// Prepare database values.
@@ -733,7 +733,7 @@ class Games
 	}
 
 	/**
-	 * Get Giantbomb ID from title
+	 * Get Giantbomb id from title
 	 *
 	 * @param string $title
 	 *
@@ -811,11 +811,11 @@ class Games
 	{
 		$res = $this->pdo->queryDirect(
 			sprintf('
-				SELECT searchname, ID
+				SELECT searchname, id
 				FROM releases
 				WHERE nzbstatus = 1 %s
 				AND gamesinfo_id = 0
-				AND categoryID = 4050
+				AND categoryid = 4050
 				ORDER BY postdate DESC
 				LIMIT %d',
 				$this->renamed,
@@ -863,10 +863,10 @@ class Games
 						$gameId = $gameCheck['id'];
 					}
 					// Update release.
-					$this->pdo->queryExec(sprintf('UPDATE releases SET gamesinfo_id = %d WHERE ID = %d', $gameId, $arr['ID']));
+					$this->pdo->queryExec(sprintf('UPDATE releases SET gamesinfo_id = %d WHERE id = %d', $gameId, $arr['id']));
 				} else {
 					// Could not parse release title.
-					$this->pdo->queryExec(sprintf('UPDATE releases SET gamesinfo_id = %d WHERE ID = %d', -2, $arr['ID']));
+					$this->pdo->queryExec(sprintf('UPDATE releases SET gamesinfo_id = %d WHERE id = %d', -2, $arr['id']));
 
 					if ($this->echoOutput) {
 						echo '.';

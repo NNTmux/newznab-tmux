@@ -26,7 +26,7 @@
 		<td>{$comment.host}</td>
 		<td class="mid" width="70">
 			{if $comment.guid != ""}<a href="{$smarty.const.WWW_TOP}/../details/{$comment.guid}#comments">view</a> | {/if}
-			<a class="confirm_action" href="{$smarty.const.WWW_TOP}/comments-delete.php?id={$comment.ID}">delete</a>
+			<a class="confirm_action" href="{$smarty.const.WWW_TOP}/comments-delete.php?id={$comment.id}">delete</a>
 		</td>
 	</tr>
 	{/foreach}

@@ -49,7 +49,7 @@ if ($argCnt === 2) {
 			'                  size        = Remove releases smaller than 2MB and have only 1 file and not in books or mp3 section.' . $n .
 			'                  huge        = Remove releases bigger than 200MB with just a single file.' . $n . $n .
 			'arg4 (Optional) = blacklist regular expression id number.  Only works when blacklist is selected as third argument.' . $n .
-			'                  100001      = Remove releases where the Binary Blacklist ID is 100001.' . $n . $n .
+			'                  100001      = Remove releases where the Binary Blacklist id is 100001.' . $n . $n .
 			'examples:' . $n .
 			"php $argv[0] true 12 blacklist     = Remove releases up to 12 hours old using site blacklists." . $n .
 			"php $argv[0] false full            = Show what releases could have been removed." . $n .

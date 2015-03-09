@@ -1,9 +1,9 @@
- 
+
 <h1>{$page->title}</h1>
 
 <form enctype="multipart/form-data" action="{$SCRIPT_NAME}?action=submit" method="post">
 
-<input type="hidden" name="id" value="{$book.ID}" />
+<input type="hidden" name="id" value="{$book.id}" />
 
 <table class="input">
 
@@ -54,7 +54,7 @@
 	<td>
 		<input type="file" id="cover" name="cover" />
 		{if $book.cover == 1}
-			<img style="max-width:200px; display:block;" src="{$smarty.const.WWW_TOP}/../covers/book/{$book.ID}.jpg" alt="" />
+			<img style="max-width:200px; display:block;" src="{$smarty.const.WWW_TOP}/../covers/book/{$book.id}.jpg" alt="" />
 		{/if}
 	</td>
 </tr>

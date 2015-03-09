@@ -656,7 +656,7 @@ class Logger
 			// Resource usage (user time, system time, major page faults, memory swaps).
 			(($this->showResourceUsage && !$this->isWindows) ? ' [' . $this->getResUsage() . ']' : '') .
 
-			// Running process ID.
+			// Running process id.
 			($pid ? ' [PID:' . $pid . ']' : '') .
 
 			// The class/function.

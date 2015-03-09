@@ -322,7 +322,7 @@ class DB extends \PDO
 		}
 
 		// For backwards compatibility, no need for a patch.
-		//$this->pdo->setAttribute(\PDO::ATTR_CASE, \PDO::CASE_LOWER);
+		$this->pdo->setAttribute(\PDO::ATTR_CASE, \PDO::CASE_LOWER);
 		$this->pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
 		$this->pdo->setAttribute(\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, true);
 	}
@@ -862,7 +862,7 @@ class DB extends \PDO
 
 			$tableNames = '';
 			foreach ($tableArray as $table) {
-				$tableNames .= $table['Name'] . ',';
+				$tableNames .= $table['name'] . ',';
 			}
 			$tableNames = rtrim($tableNames, ',');
 
@@ -878,7 +878,7 @@ class DB extends \PDO
 				if ($myIsamTables instanceof \Traversable && $myIsamTables->rowCount()) {
 					$tableNames = '';
 					foreach ($myIsamTables as $table) {
-						$tableNames .= $table['Name'] . ',';
+						$tableNames .= $table['name'] . ',';
 					}
 					$tableNames = rtrim($tableNames, ',');
 					$this->queryExec(sprintf('REPAIR %s TABLE %s', $local, $tableNames));

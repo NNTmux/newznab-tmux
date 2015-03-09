@@ -60,7 +60,7 @@ class SABnzbd
 	public $integratedBool = false;
 
 	/**
-	 * ID of the current user, to send to SAB when downloading a NZB.
+	 * id of the current user, to send to SAB when downloading a NZB.
 	 *
 	 * @var string
 	 */
@@ -85,7 +85,7 @@ class SABnzbd
 	 */
 	public function __construct(&$page)
 	{
-		$this->uid = $page->userdata['ID'];
+		$this->uid = $page->userdata['id'];
 		$this->rsstoken = $page->userdata['rsstoken'];
 		$this->serverurl = $page->serverurl;
 

@@ -168,7 +168,7 @@ class XXX
 					? 'AND r.postdate > NOW() - INTERVAL ' . $maxAge . 'DAY '
 					: ''
 				),
-				(count($excludedCats) > 0 ? ' AND r.categoryID NOT IN (' . implode(',', $excludedCats) . ')' : '')
+				(count($excludedCats) > 0 ? ' AND r.categoryid NOT IN (' . implode(',', $excludedCats) . ')' : '')
 			)
 		);
 		return ($res === false ? 0 : $res['num']);
@@ -196,12 +196,12 @@ class XXX
 		$order = $this->getXXXOrder($orderBy);
 		$sql = sprintf("
 			SELECT
-			GROUP_CONCAT(r.ID ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id,
+			GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id,
 			GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') as grp_rarinnerfilecount,
 			GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') AS grp_haspreview,
 			GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_password,
 			GROUP_CONCAT(r.guid ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_guid,
-			GROUP_CONCAT(rn.ID ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_nfoid,
+			GROUP_CONCAT(rn.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_nfoid,
 			GROUP_CONCAT(groups.name ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grpname,
 			GROUP_CONCAT(r.searchname ORDER BY r.postdate DESC SEPARATOR '#') AS grp_release_name,
 			GROUP_CONCAT(r.postdate ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_postdate,
@@ -209,9 +209,9 @@ class XXX
 			GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_totalparts,
 			GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_comments,
 			GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grabs,
-			xxx.*, UNCOMPRESS(xxx.plot) AS plot, groups.name AS group_name, rn.ID as nfoid FROM releases r
-			LEFT OUTER JOIN groups ON groups.ID = r.groupID
-			LEFT OUTER JOIN releasenfo rn ON rn.releaseID = r.ID
+			xxx.*, UNCOMPRESS(xxx.plot) AS plot, groups.name AS group_name, rn.id as nfoid FROM releases r
+			LEFT OUTER JOIN groups ON groups.id = r.groupid
+			LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
 			INNER JOIN xxxinfo xxx ON xxx.id = r.xxxinfo_id
 			WHERE r.nzbstatus = 1
 			AND xxx.title != ''
@@ -224,7 +224,7 @@ class XXX
 				? 'AND r.postdate > NOW() - INTERVAL ' . $maxAge . 'DAY '
 				: ''
 			),
-			(count($excludedCats) > 0 ? ' AND r.categoryID NOT IN (' . implode(',', $excludedCats) . ')' : ''),
+			(count($excludedCats) > 0 ? ' AND r.categoryid NOT IN (' . implode(',', $excludedCats) . ')' : ''),
 			$order[0],
 			$order[1],
 			($start === false ? '' : ' LIMIT ' . $num . ' OFFSET ' . $start)
@@ -553,11 +553,11 @@ class XXX
 	public function processXXXReleases()
 	{
 		$res = $this->pdo->query(sprintf("
-				SELECT r.searchname, r.ID
+				SELECT r.searchname, r.id
 				FROM releases r
 				WHERE r.nzbstatus = 1
 				AND r.xxxinfo_id = 0
-				AND r.categoryID IN (6010, 6020, 6030, 6040, 6041, 6042, 6080, 6090)
+				AND r.categoryid IN (6010, 6020, 6030, 6040, 6041, 6042, 6080, 6090)
 				LIMIT %d",
 				$this->movieqty
 			)
@@ -579,7 +579,7 @@ class XXX
 				if ($this->parseXXXSearchName($arr['searchname']) !== false) {
 					$check = $this->checkXXXInfoExists($this->currentTitle);
 					if ($check === false) {
-						$this->currentRelID = $arr['ID'];
+						$this->currentRelID = $arr['id'];
 						$movieName = $this->currentTitle;
 						if ($this->debug && $this->echooutput) {
 							$this->pdo->log->doEcho("DB name: " . $arr['searchname'], true);
@@ -595,7 +595,7 @@ class XXX
 				} else {
 					$this->pdo->log->doEcho(".", true);
 				}
-				$this->pdo->queryExec(sprintf('UPDATE releases SET xxxinfo_id = %d WHERE ID = %d', $idcheck, $arr['ID']));
+				$this->pdo->queryExec(sprintf('UPDATE releases SET xxxinfo_id = %d WHERE id = %d', $idcheck, $arr['id']));
 			}
 		} elseif ($this->echooutput) {
 			$this->pdo->log->doEcho($this->pdo->log->header('No xxx releases to process.'));
@@ -679,7 +679,7 @@ class XXX
 	}
 
 	/**
-	 * Get Genres for activeonly and/or an ID
+	 * Get Genres for activeonly and/or an id
 	 *
 	 * @param bool $activeOnly
 	 * @param null $gid
@@ -702,7 +702,7 @@ class XXX
 	}
 
 	/**
-	 * Get Genre ID's Of the title
+	 * Get Genre id's Of the title
 	 *
 	 * @param $arr - Array or String
 	 *
@@ -713,16 +713,16 @@ class XXX
 		$ret = null;
 
 		if (!is_array($arr)) {
-			$res = $this->pdo->queryOneRow("SELECT ID FROM genres WHERE title = " . $this->pdo->escapeString($arr));
+			$res = $this->pdo->queryOneRow("SELECT id FROM genres WHERE title = " . $this->pdo->escapeString($arr));
 			if ($res !== false) {
-				return $res["ID"];
+				return $res["id"];
 			}
 		}
 
 		foreach ($arr as $key => $value) {
-			$res = $this->pdo->queryOneRow("SELECT ID FROM genres WHERE title = " . $this->pdo->escapeString($value));
+			$res = $this->pdo->queryOneRow("SELECT id FROM genres WHERE title = " . $this->pdo->escapeString($value));
 			if ($res !== false) {
-				$ret .= "," . $res["ID"];
+				$ret .= "," . $res["id"];
 			} else {
 				$ret .= "," . $this->insertGenre($value);
 			}
@@ -733,7 +733,7 @@ class XXX
 	}
 
 	/**
-	 * Inserts Genre and returns last affected row (Genre ID)
+	 * Inserts Genre and returns last affected row (Genre id)
 	 *
 	 * @param $genre
 	 *

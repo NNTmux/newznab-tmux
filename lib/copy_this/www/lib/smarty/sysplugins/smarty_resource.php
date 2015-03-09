@@ -653,7 +653,7 @@ class Smarty_Template_Source
 	public $template_parser_class = null;
 
 	/**
-	 * Unique Template ID
+	 * Unique Template id
 	 *
 	 * @var string
 	 */

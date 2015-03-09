@@ -374,7 +374,7 @@ class Smarty_Internal_Configfileparser #line 80 "smarty_internal_configfileparse
 
 	public $yyTokenName = array(
 		'$', 'OPENB', 'SECTION', 'CLOSEB',
-		'DOT', 'ID', 'EQUAL', 'FLOAT',
+		'DOT', 'id', 'EQUAL', 'FLOAT',
 		'INT', 'BOOL', 'SINGLE_QUOTED_STRING', 'DOUBLE_QUOTED_STRING',
 		'TRIPPLE_QUOTES', 'TRIPPLE_TEXT', 'TRIPPLE_QUOTES_END', 'NAKED_STRING',
 		'OTHER', 'NEWLINE', 'COMMENTSTART', 'error',
@@ -402,7 +402,7 @@ class Smarty_Internal_Configfileparser #line 80 "smarty_internal_configfileparse
 		/*   8 */
 		"var_list ::=",
 		/*   9 */
-		"var ::= ID EQUAL value",
+		"var ::= id EQUAL value",
 		/*  10 */
 		"value ::= FLOAT",
 		/*  11 */

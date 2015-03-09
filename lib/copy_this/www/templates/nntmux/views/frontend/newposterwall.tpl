@@ -43,19 +43,19 @@
 								   href="{$smarty.const.WWW_TOP}/details/{$result.guid}">
 									{if $type == 'Console'}
 										<img width="130px" alt=""
-											 src="{$smarty.const.WWW_TOP}/covers/console/{$result.consoleinfoID}.jpg"/>
+											 src="{$smarty.const.WWW_TOP}/covers/console/{$result.consoleinfoid}.jpg"/>
 									{elseif $type == 'Movies'}
 										<img width="140px" height="205px" alt=""
-											 src="{$smarty.const.WWW_TOP}/covers/movies/{$result.imdbID}-cover.jpg"/>
+											 src="{$smarty.const.WWW_TOP}/covers/movies/{$result.imdbid}-cover.jpg"/>
 									{elseif $type == 'XXX'}
 										<img width="140px" height="205px" alt=""
 											 src="{$smarty.const.WWW_TOP}/covers/xxx/{$result.xxxinfo_id}-cover.jpg"/>
 									{elseif $type == 'Audio'}
 										<img height="250px" width="250px" alt=""
-											 src="{$smarty.const.WWW_TOP}/covers/music/{$result.musicinfoID}.jpg"/>
+											 src="{$smarty.const.WWW_TOP}/covers/music/{$result.musicinfoid}.jpg"/>
 									{elseif $type == 'Books'}
 										<img height="140px" width="205px" alt=""
-											 src="{$smarty.const.WWW_TOP}/covers/book/{$result.bookinfoID}.jpg"/>
+											 src="{$smarty.const.WWW_TOP}/covers/book/{$result.bookinfoid}.jpg"/>
 									{elseif $type == 'PC'}
 										<img height="130px" width="130px" alt=""
 											 src="{$smarty.const.WWW_TOP}/covers/games/{$result.gamesinfo_id}.jpg"/>
@@ -97,17 +97,17 @@
 									{elseif $type == 'Movies'}
 										<div class="icon icon_imdb">
 											<a class="divlink" target="_blank" title="View on IMDB"
-											   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$result.imdbID}/"></a>
+											   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$result.imdbid}/"></a>
 										</div>
 										<div class="icon icon_trakt">
 											<a class="divlink" target="_blank" title="View on Trakt"
-											   href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{$result.imdbID}/"></a>
+											   href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{$result.imdbid}/"></a>
 										</div>
 										{if $cpapi != '' && $cpurl != ''}
 											<div class="icon icon_cp">
 												<a class="divlink sendtocouch" target="_blank"
 												   title="Send to CouchPotato" href="javascript:;"
-												   rel="{$cpurl}/api/{$cpapi}/movie.add/?identifier=tt{$result.imdbID}&title={$result.searchname|escape:"url"}"></a>
+												   rel="{$cpurl}/api/{$cpapi}/movie.add/?identifier=tt{$result.imdbid}&title={$result.searchname|escape:"url"}"></a>
 											</div>
 										{/if}
 									{elseif $type == 'XXX'}
@@ -176,7 +176,7 @@
 									{elseif $type == 'TV'}
 										<div class="icon icon_tvrage">
 											<a class="divlink" title="View in TvRage"
-											   href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$result.rageID}"
+											   href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$result.rageid}"
 											   target="_blank"></a>
 										</div>
 									{/if}

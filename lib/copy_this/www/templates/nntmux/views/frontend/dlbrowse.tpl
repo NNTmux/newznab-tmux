@@ -4,7 +4,7 @@
 <h2>/{$subpath|escape:"htmlall"}</h2>
 
 <div class="nzb_multi_operations">
-View: 
+View:
 	{if $lm}<a href="{$smarty.server.REQUEST_URI|replace:"&lm=1":""}&lm=0">Covers</a> | <b>List</b>
 	{else}<b>Covers</b> | <a href="{$smarty.server.REQUEST_URI|replace:"&lm=0":""}&lm=1">List</a>{/if}
 </div>
@@ -24,19 +24,19 @@ View:
 			<td colspan="5"><a href="{if $parentpath==-1}dlbrowse?lm={if $lm}1{else}0{/if}{else}?sp={$parentpath}&lm={if $lm}1{else}0{/if}{/if}"><strong>..</strong></a></td>
 		</tr>
 	{/if}
-	
+
 	{foreach from=$results item=result}
 		<tr class="{cycle values=",alt"}">
-		
-			{assign var="icon" value='templates/nntmux/images/fileicons/'|cat:$result.pathinfo.extension|cat:".png"} 
+
+			{assign var="icon" value='templates/nntmux/images/fileicons/'|cat:$result.pathinfo.extension|cat:".png"}
 			{if $result.isdir == "1"}
 				{assign var="icon" value='folder'}
 			{elseif $result.pathinfo.extension == "" || !is_file("$icon")}
 				{assign var="icon" value='file'}
 			{else}
 				{assign var="icon" value=$result.pathinfo.extension}
-			{/if}		
-		
+			{/if}
+
 			<td><img title=".{$result.pathinfo.extension}" alt="{$result.pathinfo.extension}" src="{$smarty.const.WWW_TOP}/templates/nntmux/images/fileicons/{$icon}.png" /></td>
 			<td class="item">
 				{if $result.isdir == 1}
@@ -62,7 +62,7 @@ View:
 						{if $result.release.ep_airdate != ''}<b>Aired:</b> {$result.release.ep_airdate|date_format}<br />{/if}
 						{if $result.release.ep_fullep != ''}<b>Episode:</b> {$result.release.ep_fullep}<br />{/if}
 					</div>
-				{/if}				
+				{/if}
 
 				{if $result.release.music_id != ""}
 					<div style="padding-top:10px;">
@@ -70,12 +70,12 @@ View:
 						{if $result.release.mu_artist != ''}{$result.release.mu_artist}<br /><br />{/if}
 						{if $result.release.mu_year != ''}<b>Year:</b> {$result.release.mu_year}<br />{/if}
 					</div>
-				{/if}	
-				
+				{/if}
+
 				{if $result.release.music_id == "" && $result.release.ep_id == "" && $result.release.movie_id == ""}
 					<br/>
 				{/if}
-				{if $result.release.ID != ""}
+				{if $result.release.id != ""}
 					<br/><a class="rndbtn" title="More info" href="{$smarty.const.WWW_TOP}/details/{$result.release.guid}">More Info</a><br/><br/>
 				{/if}
 			</td>
@@ -85,25 +85,25 @@ View:
 				{/if}
 			</td>
 			<td class="less mid">
-				{if $result.release.categoryID != ""}
-				<a href="{$smarty.const.WWW_TOP}/browse?t={$result.release.categoryID}">{$result.release.category_name}</a>
+				{if $result.release.categoryid != ""}
+				<a href="{$smarty.const.WWW_TOP}/browse?t={$result.release.categoryid}">{$result.release.category_name}</a>
 				{/if}
 			</td>
 			<td>
 				{if $result.release.movie_id != ""}
-					<img class="shadow" src="{$smarty.const.WWW_TOP}/covers/movies/{if $result.release.cover == 1}{$result.release.imdbID}-cover.jpg{else}no-cover.jpg{/if}" width="120" border="0" alt="{$result.release.title|escape:"htmlall"}" />
+					<img class="shadow" src="{$smarty.const.WWW_TOP}/covers/movies/{if $result.release.cover == 1}{$result.release.imdbid}-cover.jpg{else}no-cover.jpg{/if}" width="120" border="0" alt="{$result.release.title|escape:"htmlall"}" />
 				{/if}
 				{if $result.release.rage_imgdata != ""}
 					<img width="120" class="shadow" alt="{$result.release.showtitle} Logo" src="{$smarty.const.WWW_TOP}/getimage?type=tvrage&amp;id={$result.release.rg_ID}" />
-				{/if}				
+				{/if}
 				{if $result.release.mu_cover == "1"}
 					<img class="shadow" src="{$smarty.const.WWW_TOP}/covers/music/{if $result.release.mu_cover == 1}{$result.release.music_id}.jpg{else}no-cover.jpg{/if}" width="120" border="0" alt="{$result.release.title|escape:"htmlall"}" />
-				{/if}				
+				{/if}
 			</td>
 			<td class="less mid" title="{$result.mtime|date_format:"%d/%m/%Y %H:%M:%S"}">{$result.mtime|timeago}</td>
 		</tr>
 	{/foreach}
-	
+
 </table>
 
 <br/><br/><br/>

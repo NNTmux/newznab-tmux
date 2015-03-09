@@ -1194,14 +1194,14 @@
 			<td style="width:180px;"><label for="lookup_reqids">Lookup Request IDs:</label></td>
 			<td>
 				{html_options style="width:180px;" id="lookup_reqids" name='lookup_reqids' values=$lookup_reqids_ids output=$lookup_reqids_names selected=$fsite->lookup_reqids}
-				<div class="hint">Whether to attempt to lookup Request IDs using the Request ID link below. This will rename your releases to proper PreDB names.</div>
+				<div class="hint">Whether to attempt to lookup Request IDs using the Request id link below. This will rename your releases to proper PreDB names.</div>
 			</td>
 		</tr>
 		<tr>
-			<td style="width:180px;"><label for="request_url">Request ID Link:</label></td>
+			<td style="width:180px;"><label for="request_url">Request id Link:</label></td>
 			<td>
 				<input id="request_url" class="long" name="request_url" type="text" value="{$fsite->request_url}"/>
-				<div class="hint">Optional URL to lookup Request IDs. [REQUEST_ID] gets replaced with the request ID from the
+				<div class="hint">Optional URL to lookup Request IDs. [REQUEST_ID] gets replaced with the request id from the
 					post. [GROUP_NM] Gets replaced with the group name.
 				</div>
 			</td>
@@ -1210,7 +1210,7 @@
 			<td style="width:180px;"><label for="request_hours">Max hours to recheck Request IDs:</label></td>
 			<td>
 				<input id="request_hours" class="short" name="request_hours" type="text" value="{$fsite->request_hours}"/>
-				<div class="hint">The maximum hours after a release is added to recheck for a Request ID match.</div>
+				<div class="hint">The maximum hours after a release is added to recheck for a Request id match.</div>
 			</td>
 		</tr>
 	</table>
@@ -1506,10 +1506,10 @@
 			</td>
 		</tr>
 		<tr>
-			<td style="width:180px;"><label for="reqidthreads">Request ID Threads:</label></td>
+			<td style="width:180px;"><label for="reqidthreads">Request id Threads:</label></td>
 			<td>
 				<input class="short" id="reqidthreads" name="reqidthreads" type="text" value="{$fsite->reqidthreads}"/>
-				<div class="hint">The number of threads for local Request ID processing.
+				<div class="hint">The number of threads for local Request id processing.
 				</div>
 			</td>
 		</tr>

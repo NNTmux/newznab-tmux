@@ -38,7 +38,7 @@ if (!$site->tablepergroup) {
 	exit("Tables per groups is not enabled, quitting!");
 }
 
-$groups = $pdo->queryDirect('SELECT ID FROM groups WHERE active = 1 OR backfill = 1');
+$groups = $pdo->queryDirect('SELECT id FROM groups WHERE active = 1 OR backfill = 1');
 
 if ($groups === false) {
 	echo "No active groups. Fix not needed.\n";
@@ -60,24 +60,24 @@ if ($groups === false) {
 	$groupCount = $groups->rowCount();
 	if ($groups instanceof \Traversable && count($queries) && $groupCount) {
 		foreach ($groups as $group) {
-			echo 'Fixing group ' . $group['ID'] . PHP_EOL;
+			echo 'Fixing group ' . $group['id'] . PHP_EOL;
 			foreach ($queries as $query) {
 				switch ($query['t']) {
-					// Queries needing 1 group ID.
+					// Queries needing 1 group id.
 					case 1:
-						$pdo->queryExec(sprintf($query['q'], $group['ID']), true);
+						$pdo->queryExec(sprintf($query['q'], $group['id']), true);
 						break;
 					// Queries needing 2 group IDs.
 					case 2:
-						$pdo->queryExec(sprintf($query['q'], $group['ID'], $group['ID']), true);
+						$pdo->queryExec(sprintf($query['q'], $group['id'], $group['id']), true);
 						break;
 					// Queries needing 3 group IDs.
 					case 3:
-						$pdo->queryExec(sprintf($query['q'], $group['ID'], $group['ID'], $group['ID']), true);
+						$pdo->queryExec(sprintf($query['q'], $group['id'], $group['id'], $group['id']), true);
 						break;
 				}
 			}
-			echo 'Finished fixing group ' . $group['ID'] . ', ' . (--$groupCount) . ' to go!' .PHP_EOL;
+			echo 'Finished fixing group ' . $group['id'] . ', ' . (--$groupCount) . ' to go!' .PHP_EOL;
 		}
 	}
 	echo 'All done!' . PHP_EOL;

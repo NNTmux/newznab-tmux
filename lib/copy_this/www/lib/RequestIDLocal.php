@@ -2,7 +2,7 @@
 require_once (NN_LIB . 'RequestID.php');
 
 /**
- * Attempts to find a PRE name for a release using a request ID from our local pre database,
+ * Attempts to find a PRE name for a release using a request id from our local pre database,
  * or internet request id database using a Standalone -- more intensive methods
  *
  * Class RequestIDLocal
@@ -18,21 +18,21 @@ class RequestIDLocal extends RequestID
 	}
 
 	/**
-	 * Fetch releases with requestID's from MySQL.
+	 * Fetch releases with requestid's from MySQL.
 	 */
 	protected function _getReleases()
 	{
 		$query = (
-			'SELECT r.ID, r.name, r.categoryID, r.reqidstatus, g.name AS groupname, g.ID as gid
+			'SELECT r.id, r.name, r.categoryid, r.reqidstatus, g.name AS groupname, g.id as gid
 			FROM releases r
-			INNER JOIN groups g ON r.groupID = g.ID
+			INNER JOIN groups g ON r.groupid = g.id
 			WHERE r.nzbstatus = 1
-			AND r.prehashID = 0
+			AND r.prehashid = 0
 			AND r.isrequestID = 1'
 		);
 
 		$query .= ($this->_charGUID === '' ? '' : ' AND r.guid ' . $this->pdo->likeString($this->_charGUID, false, true));
-		$query .= ($this->_groupID === '' ? '' : ' AND r.groupID = ' . $this->_groupID);
+		$query .= ($this->_groupID === '' ? '' : ' AND r.groupid = ' . $this->_groupID);
 		$query .= ($this->_maxTime === 0 ? '' : sprintf(' AND r.adddate > NOW() - INTERVAL %d HOUR', $this->_maxTime));
 
 		switch ($this->_limit) {
@@ -61,7 +61,7 @@ class RequestIDLocal extends RequestID
 	}
 
 	/**
-	 * Process releases for requestID's.
+	 * Process releases for requestid's.
 	 *
 	 * @return int How many did we rename?
 	 */
@@ -79,7 +79,7 @@ class RequestIDLocal extends RequestID
 					$this->_updateRelease();
 					$renamed++;
 				} else {
-					$this->_requestIdNotFound($this->_release['ID'], ($this->_release['reqidstatus'] == self::REQID_UPROC ? self::REQID_NOLL : self::REQID_NONE));
+					$this->_requestIdNotFound($this->_release['id'], ($this->_release['reqidstatus'] == self::REQID_UPROC ? self::REQID_NOLL : self::REQID_NONE));
 				}
 
 				if ($this->echoOutput && $this->_show === 0) {
@@ -96,7 +96,7 @@ class RequestIDLocal extends RequestID
 	}
 
 	/**
-	 * Get a new title / pre ID for a release.
+	 * Get a new title / pre id for a release.
 	 *
 	 * @return array|bool
 	 */
@@ -108,7 +108,7 @@ class RequestIDLocal extends RequestID
 
 		$check = $this->pdo->queryDirect(
 			sprintf(
-				'SELECT ID, title FROM prehash WHERE requestID = %d AND groupID = %d',
+				'SELECT id, title FROM prehash WHERE requestid = %d AND groupid = %d',
 				$this->_requestID,
 				$this->_release['gid']
 			)
@@ -120,7 +120,7 @@ class RequestIDLocal extends RequestID
 					if (preg_match('/s\d+/i', $row['title']) && !preg_match('/s\d+e\d+/i', $row['title'])) {
 						return false;
 					}
-					return array('title' => $row['title'], 'id' => $row['ID']);
+					return array('title' => $row['title'], 'id' => $row['id']);
 				}
 			} else {
 				//Prevents multiple releases with the same request id/group from being renamed to the same Pre.
@@ -128,7 +128,7 @@ class RequestIDLocal extends RequestID
 			}
 		} else {
 			$result = $this->_singleAltLookup();
-			if (is_array($result) && is_numeric($result['ID']) && $result['title'] !== '') {
+			if (is_array($result) && is_numeric($result['id']) && $result['title'] !== '') {
 				return $result;
 			} else {
 				return $this->_multiLookup();
@@ -165,7 +165,7 @@ class RequestIDLocal extends RequestID
 			case preg_match($regex2, $this->_release['name'], $matches):
 				$check = $this->pdo->queryOneRow(
 					sprintf(
-						"SELECT ID, title FROM prehash WHERE title = %s OR filename = %s %s",
+						"SELECT id, title FROM prehash WHERE title = %s OR filename = %s %s",
 						$this->pdo->escapeString($matches['title']),
 						$this->pdo->escapeString($matches['title']),
 						(
@@ -181,7 +181,7 @@ class RequestIDLocal extends RequestID
 					)
 				);
 				if ($check !== false) {
-					return array('title' => $check['title'], 'id' => $check['ID']);
+					return array('title' => $check['title'], 'id' => $check['id']);
 				}
 				continue;
 			default:
@@ -193,7 +193,7 @@ class RequestIDLocal extends RequestID
 	private $groupIDCache = array();
 
 	/**
-	 * Attempts to remap the release groupID by extracting the new group name from the release usenet name.
+	 * Attempts to remap the release groupid by extracting the new group name from the release usenet name.
 	 *
 	 * @return array|bool
 	 */
@@ -237,55 +237,55 @@ class RequestIDLocal extends RequestID
 		}
 		$check = $this->pdo->queryOneRow(
 			sprintf("
-				SELECT ID, title FROM prehash WHERE requestID = %d AND groupID = %d",
+				SELECT id, title FROM prehash WHERE requestid = %d AND groupid = %d",
 				$this->_requestID,
 				($groupID === '' ? 0 : $groupID)
 			)
 		);
 		if ($check !== false) {
-			return array('title' => $check['title'], 'id' => $check['ID']);
+			return array('title' => $check['title'], 'id' => $check['id']);
 		}
 		return false;
 	}
 
 	/**
-	 * Updates release information when a proper Request ID match is found.
+	 * Updates release information when a proper Request id match is found.
 	 */
 	protected function _updateRelease()
 	{
 		$determinedCat = $this->category->determineCategory($this->_release['gid'], $this->_newTitle['title']);
-		if ($determinedCat == $this->_release['categoryID']) {
+		if ($determinedCat == $this->_release['categoryid']) {
 			$newTitle = $this->pdo->escapeString($this->_newTitle['title']);
 			$this->pdo->queryExec(
 				sprintf('
 					UPDATE releases
-					SET prehashID = %d, reqidstatus = %d, isrenamed = 1, iscategorized = 1, searchname = %s
-					WHERE ID = %d',
+					SET prehashid = %d, reqidstatus = %d, isrenamed = 1, iscategorized = 1, searchname = %s
+					WHERE id = %d',
 					$this->_newTitle['id'],
 					self::REQID_FOUND,
 					$newTitle,
-					$this->_release['ID']
+					$this->_release['id']
 				)
 			);
-			$this->sphinx->updateReleaseSearchName($this->_release['ID'], $newTitle);
+			$this->sphinx->updateReleaseSearchName($this->_release['id'], $newTitle);
 		} else {
 			$newTitle = $this->pdo->escapeString($this->_newTitle['title']);
 			$this->pdo->queryExec(
 				sprintf('
 					UPDATE releases SET
-						rageID = -1, seriesfull = NULL, season = NULL, episode = NULL, tvtitle = NULL,
-						tvairdate = NULL, imdbID = NULL, musicinfoID = NULL, consoleinfoID = NULL,
-						bookinfoID = NULL, anidbid = NULL, prehashID = %d, reqidstatus = %d, isrenamed = 1,
-						iscategorized = 1, searchname = %s, categoryID = %d
-					WHERE ID = %d',
+						rageid = -1, seriesfull = NULL, season = NULL, episode = NULL, tvtitle = NULL,
+						tvairdate = NULL, imdbid = NULL, musicinfoid = NULL, consoleinfoid = NULL,
+						bookinfoid = NULL, anidbid = NULL, prehashid = %d, reqidstatus = %d, isrenamed = 1,
+						iscategorized = 1, searchname = %s, categoryid = %d
+					WHERE id = %d',
 					$this->_newTitle['id'],
 					self::REQID_FOUND,
 					$newTitle,
 					$determinedCat,
-					$this->_release['ID']
+					$this->_release['id']
 				)
 			);
-			$this->sphinx->updateReleaseSearchName($this->_release['ID'], $newTitle);
+			$this->sphinx->updateReleaseSearchName($this->_release['id'], $newTitle);
 		}
 
 		if ($this->_release['name'] !== $this->_newTitle['title'] && $this->_show == 1) {
@@ -294,9 +294,9 @@ class RequestIDLocal extends RequestID
 					'new_name'     => $this->_newTitle['title'],
 					'old_name'     => $this->_release['name'],
 					'new_category' => $this->category->getNameByID($determinedCat),
-					'old_category' => $this->category->getNameByID($this->_release['categoryID']),
+					'old_category' => $this->category->getNameByID($this->_release['categoryid']),
 					'group'        => $this->_release['groupname'],
-					'release_id'   => $this->_release['ID'],
+					'release_id'   => $this->_release['id'],
 					'method'       => 'RequestIDLocal'
 				)
 			);

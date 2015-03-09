@@ -1,4 +1,4 @@
- 
+
 <h1>{$page->title}</h1>
 
 <form enctype="multipart/form-data" action="{$SCRIPT_NAME}" method="post">
@@ -12,7 +12,7 @@
 </tr>
 
 <tr>
-	<td><label for="title">IMDB ID</label>:</td>
+	<td><label for="title">IMDB id</label>:</td>
 	<td>
 		<input id="id" class="long" name="id" type="text" value="" />
 	</td>

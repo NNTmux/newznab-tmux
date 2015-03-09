@@ -71,7 +71,7 @@ if ($tablepergroup == 1) {
 	$tables = $db->queryDirect($sql);
 	$ran    = 0;
 	foreach ($tables as $row) {
-		$tbl = $row['Name'];
+		$tbl = $row['name'];
 		if (preg_match('/collections_\d+/', $tbl)) {
 			$run = $db->queryExec('UPDATE ' . $tbl .
 				' SET dateadded = now() WHERE dateadded < now() - INTERVAL ' .

@@ -13,7 +13,7 @@
 	</tr>
 	{foreach $predata as $s}
 		<tr class="{cycle values=",alt"}">
-			<td><a class="title" title="View series" href="{$smarty.const.WWW_TOP}/series/{$s.rageID}">{$s.showtitle}</a><br/>{$s.fullep} - {$s.eptitle}</td>
+			<td><a class="title" title="View series" href="{$smarty.const.WWW_TOP}/series/{$s.rageid}">{$s.showtitle}</a><br/>{$s.fullep} - {$s.eptitle}</td>
 		</tr>
 	{/foreach}
 {else}
@@ -28,7 +28,7 @@
 	</tr>
 	{foreach $daydata as $s}
 		<tr class="{cycle values=",alt"}">
-			<td><a class="title" title="View series" href="{$smarty.const.WWW_TOP}/series/{$s.rageID}">{$s.showtitle}</a><br/>{$s.fullep} - {$s.eptitle}</td>
+			<td><a class="title" title="View series" href="{$smarty.const.WWW_TOP}/series/{$s.rageid}">{$s.showtitle}</a><br/>{$s.fullep} - {$s.eptitle}</td>
 		</tr>
 	{/foreach}
 {else}
@@ -43,7 +43,7 @@
 	</tr>
 	{foreach $nxtdata as $s}
 		<tr class="{cycle values=",alt"}">
-			<td><a class="title" title="View series" href="{$smarty.const.WWW_TOP}/series/{$s.rageID}">{$s.showtitle}</a><br/>{$s.fullep} - {$s.eptitle}</td>
+			<td><a class="title" title="View series" href="{$smarty.const.WWW_TOP}/series/{$s.rageid}">{$s.showtitle}</a><br/>{$s.fullep} - {$s.eptitle}</td>
 		</tr>
 	{/foreach}
 {else}

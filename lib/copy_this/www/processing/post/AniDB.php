@@ -10,7 +10,7 @@ require_once(WWW_DIR . "/lib/nzb.php");
 class PostAniDB
 {
 	const PROC_EXTFAIL = -1; // Release Anime title/episode # could not be extracted from searchname
-	const PROC_NOMATCH = -2; // AniDB ID was not found in anidb table using extracted title/episode #
+	const PROC_NOMATCH = -2; // AniDB id was not found in anidb table using extracted title/episode #
 
 	const REGEX_NOFORN = 'English|Japanese|German|Danish|Flemish|Dutch|French|Swe(dish|sub)|Deutsch|Norwegian';
 
@@ -68,11 +68,11 @@ class PostAniDB
 	{
 		$results = $this->pdo->queryDirect(
 							 sprintf('
-							SELECT searchname, ID
+							SELECT searchname, id
 							FROM releases
 							WHERE nzbstatus = %d
 							AND anidbid IS NULL
-							AND categoryID = %d
+							AND categoryid = %d
 							ORDER BY postdate DESC
 							LIMIT %d',
 									 \NZB::NZB_ADDED,
@@ -97,9 +97,9 @@ class PostAniDB
 							  sprintf('
 									UPDATE releases
 									SET anidbid = %d
-									WHERE ID = %d',
+									WHERE id = %d',
 									  $this->status,
-									  $release['ID']
+									  $release['id']
 							  )
 					);
 				}
@@ -237,7 +237,7 @@ class PostAniDB
 						$type       = 'Remote';
 					} else {
 						echo PHP_EOL .
-							 $this->pdo->log->info("This AniDB ID was not found to be accurate locally, but has been updated too recently to check AniDB.") .
+							 $this->pdo->log->info("This AniDB id was not found to be accurate locally, but has been updated too recently to check AniDB.") .
 							 PHP_EOL;
 					}
 				}
@@ -246,10 +246,10 @@ class PostAniDB
 									 $cleanArr['epno'],
 									 $updatedAni['episode_title'],
 									 $updatedAni['airdate'],
-									 $release['ID']);
+									 $release['id']);
 
 				$this->pdo->log->doEcho(
-							   $this->pdo->log->headerOver("Matched {$type} AniDB ID: ") .
+							   $this->pdo->log->headerOver("Matched {$type} AniDB id: ") .
 							   $this->pdo->log->primary($anidbId['anidbid']) .
 							   $this->pdo->log->alternateOver("   Title: ") .
 							   $this->pdo->log->primary($anidbId['title']) .
@@ -293,7 +293,7 @@ class PostAniDB
 						UPDATE releases
 						SET anidbid = %d, seriesfull = %s, season = 'S01', episode = %s,
 							tvtitle = %s, tvairdate = %s
-						WHERE ID = %d",
+						WHERE id = %d",
 						  $anidbId,
 						  $this->pdo->escapeString('S01' . $epno),
 						  $this->pdo->escapeString($epno),

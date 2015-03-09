@@ -20,8 +20,8 @@
 				<select id="genre" name="genre">
 					<option class="grouping" value=""></option>
 					{foreach from=$genres item=gen}
-						<option {if $gen.ID == $genre}selected="selected"{/if}
-								value="{$gen.ID}">{$gen.title|escape:"htmlall"}</option>
+						<option {if $gen.id == $genre}selected="selected"{/if}
+								value="{$gen.id}">{$gen.title|escape:"htmlall"}</option>
 					{/foreach}
 				</select>
 			</td>
@@ -37,7 +37,7 @@
 				<select id="category" name="t">
 					<option class="grouping" value="3000"></option>
 					{foreach from=$catlist item=ct}
-						<option {if $ct.id==$category}selected="selected"{/if} value="{$ct.ID}">{$ct.title}</option>
+						<option {if $ct.id==$category}selected="selected"{/if} value="{$ct.id}">{$ct.title}</option>
 					{/foreach}
 				</select>
 			</td>
@@ -126,7 +126,7 @@
 							<a class="title" title="View details"
 							   href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"htmlall"}">
 								<img class="shadow"
-									 src="{$smarty.const.WWW_TOP}/covers/music/{if $result.cover == 1}{$result.musicinfoID}.jpg{else}no-cover.jpg{/if}"
+									 src="{$smarty.const.WWW_TOP}/covers/music/{if $result.cover == 1}{$result.musicinfoid}.jpg{else}no-cover.jpg{/if}"
 									 width="120" border="0"
 									 alt="{$result.artist|escape:"htmlall"} - {$result.title|escape:"htmlall"}"/>
 							</a>
@@ -136,7 +136,7 @@
 														 title="View Nfo" class="btn btn-mini modal_nfo" rel="nfo">
 										Nfo</a>{/if}
 								<a class="btn btn-mini" target="_blank" href="{$site->dereferrer_link}{$result.url}"
-								   name="amazon{$result.musicinfoID}" title="View amazon page">Amazon</a>
+								   name="amazon{$result.musicinfoid}" title="View amazon page">Amazon</a>
 								<a class="btn btn-mini" href="{$smarty.const.WWW_TOP}/browse?g={$result.group_name}"
 								   title="Browse releases in {$result.group_name|replace:"alt.binaries":"a.b"}">Grp</a>
 							</div>
