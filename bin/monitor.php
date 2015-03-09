@@ -200,7 +200,7 @@ while ($runVar['counts']['iterations'] > 0) {
 			} else {
 				if ($tables instanceof \Traversable) {
 					foreach ($tables as $row) {
-						$tbl   = $row['Name'];
+						$tbl   = $row['name'];
 						$stamp = 'UNIX_TIMESTAMP(MIN(dateadded))';
 
 						switch (true) {
