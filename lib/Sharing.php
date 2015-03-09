@@ -208,7 +208,7 @@ Class Sharing
 		$sid = sha1($row['unix_time'] . $row['text'] . $row['nzb_guid']);
 
 		// Check if the comment is already shared.
-		$check = $this->pdo->queryOneRow(sprintf('SELECT id FROM releasecomment WHERE shareID = %s', $this->pdo->escapeString($sid)));
+		$check = $this->pdo->queryOneRow(sprintf('SELECT id FROM releasecomment WHERE shareid = %s', $this->pdo->escapeString($sid)));
 		if ($check === false) {
 
 			// Example of a subject.
@@ -237,7 +237,7 @@ Class Sharing
 				$this->pdo->queryExec(
 					sprintf('
 						UPDATE releasecomment
-						SET shared = 1, shareID = %s
+						SET shared = 1, shareid = %s
 						WHERE id = %d',
 						$this->pdo->escapeString($sid),
 						$row['id']
@@ -285,6 +285,8 @@ Class Sharing
 
 	/**
 	 * Get all new comments from usenet.
+	 *
+	 * @access protected
 	 */
 	protected function fetchAll()
 	{
@@ -300,10 +302,13 @@ Class Sharing
 		if ($this->siteSettings['last_article'] == 0) {
 			// If the user picked to start from the oldest, get the oldest.
 			if ($this->siteSettings['start_position'] === true) {
-				$this->siteSettings['last_article'] = $ourOldest = (string)($group['first']);
+				$this->siteSettings['last_article'] = $ourOldest = $group['first'];
 				// Else get the newest.
 			} else {
-				$this->siteSettings['last_article'] = $ourOldest = (string)($group['last'] - 1000);
+				$this->siteSettings['last_article'] = $ourOldest = (string)($group['last'] - $this->siteSettings['max_download']);
+				if ($ourOldest < $group['first']) {
+					$this->siteSettings['last_article'] = $ourOldest = $group['first'];
+				}
 			}
 		} else {
 			$ourOldest = (string)($this->siteSettings['last_article'] + 1);
@@ -322,12 +327,12 @@ Class Sharing
 			return;
 		}
 
-
-		echo '(Sharing) Starting to fetch new comments.' . PHP_EOL;
-
+		if (NN_ECHOCLI) {
+			echo '(Sharing) Starting to fetch new comments.' . PHP_EOL;
+		}
 
 		// Get the wanted aritcles
-		$headers = $this->nntp->getXOVER($ourOldest . '-' . $newest);
+		$headers = $this->nntp->getOverview($ourOldest . '-' . $newest, true, false);
 
 		// Check if we received nothing or there was an error.
 		if ($this->nntp->isError($headers) || count($headers) === 0) {
@@ -351,10 +356,10 @@ Class Sharing
 				break;
 			}
 
+			$matches = [];
 			//(_nZEDb_)nZEDb_533f16e46a5091.73152965_3d12d7c1169d468aaf50d5541ef02cc88f3ede10 - [1/1] "92ba694cebc4fbbd0d9ccabc8604c71b23af1131" (1/1) yEnc
 			if ($header['From'] === '<anon@anon.com>' &&
-				preg_match('/^\(_nZEDb_\)(?P<site>.+?)_(?P<guid>[a-f0-9]{40}) - \[1\/1\] "(?P<sid>[a-f0-9]{40})" yEnc \(1\/1\)$/i', $header['Subject'], $matches)
-			) {
+				preg_match('/^\(_nZEDb_\)(?P<site>.+?)_(?P<guid>[a-f0-9]{40}) - \[1\/1\] "(?P<sid>[a-f0-9]{40})" yEnc \(1\/1\)$/i', $header['Subject'], $matches)) {
 
 				// Check if this is from our own site.
 				if ($matches['guid'] === $this->siteSettings['site_guid']) {
@@ -363,7 +368,7 @@ Class Sharing
 
 				// Check if we already have the comment.
 				$check = $this->pdo->queryOneRow(
-					sprintf('SELECT id FROM releasecomment WHERE shareID = %s',
+					sprintf('SELECT id FROM releasecomments WHERE shareid = %s',
 						$this->pdo->escapeString($matches['sid'])
 					)
 				);
@@ -421,10 +426,11 @@ Class Sharing
 							)
 						);
 						$found++;
-
-						echo '.';
-						if ($found % 40 == 0) {
-							echo '[' . $found . ']' . PHP_EOL;
+						if (NN_ECHOCLI) {
+							echo '.';
+							if ($found % 40 == 0) {
+								echo '[' . $found . ']' . PHP_EOL;
+							}
 						}
 					}
 				}
@@ -442,11 +448,12 @@ Class Sharing
 			$this->pdo->queryExec(sprintf('UPDATE sharing SET last_article = %d', $currentArticle));
 		}
 
-
-		if ($found > 0) {
-			echo PHP_EOL . '(Sharing) Fetched ' . $found . ' new comments.' . PHP_EOL;
-		} else {
-			echo '(Sharing) Finish looking for new comments, but did not find any.' . PHP_EOL;
+		if (NN_ECHOCLI) {
+			if ($found > 0) {
+				echo PHP_EOL . '(Sharing) Fetched ' . $found . ' new comments.' . PHP_EOL;
+			} else {
+				echo '(Sharing) Finish looking for new comments, but did not find any.' . PHP_EOL;
+			}
 		}
 	}
 
@@ -490,7 +497,7 @@ Class Sharing
 		if ($this->pdo->queryExec(
 			sprintf('
 				INSERT IGNORE INTO releasecomment
-				(text, createddate, issynced, shareID, cid, gid, nzb_guid, siteID, username, userID, releaseid, shared, host, sourceID)
+				(text, createddate, issynced, shareid, cid, gid, nzb_guid, siteid, username, userID, releaseid, shared, host, sourceID)
 				VALUES (%s, %s, 1, %s, %s, %s, %s, %s, %s, 0, 0, 2, "", 999)',
 				$this->pdo->escapeString($body['BODY']),
 				$this->pdo->from_unixtime(($body['TIME'] > time() ? time() : $body['TIME'])),
