@@ -121,10 +121,10 @@
 					release.<br/><br/>
 					The 'In Process' NZBs are total nzbs, inside the parenthesis is distinct nzbs and 'In Database' are
 					nzbs that have all parts available and will be processed on next run.<br/><br/>
-					The 'In Process' requestID is the number waiting to be processed and inside the parenthesis is the
+					The 'In Process' requestid is the number waiting to be processed and inside the parenthesis is the
 					number changed since the script started. The 'In Database' is the total matches of releases to
 					requestIDs and inside the parenthesis is percentage of total releases that you have matched to a
-					requestID.<br/><br/>
+					requestid.<br/><br/>
 					The 'In Process' rows PC and Pron are simply subsets of the 'In Process' row Misc. There is no
 					postprocessing specifically for these categories. The 'In Database' is the actual count for the
 					category.

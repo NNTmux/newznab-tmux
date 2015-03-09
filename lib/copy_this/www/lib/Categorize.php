@@ -33,7 +33,7 @@ class Categorize extends Category
 	public $releaseName;
 
 	/**
-	 * Group ID of the releasename we are sorting through.
+	 * Group id of the releasename we are sorting through.
 	 * @var int|string
 	 */
 	public $groupID;
@@ -65,14 +65,14 @@ class Categorize extends Category
 	 * Returns Category::CAT_MISC_OTHER if no category is appropriate.
 	 *
 	 * @param string     $releaseName The name to parse.
-	 * @param int|string $groupID     The groupID.
+	 * @param int|string $groupID     The groupid.
 	 *
-	 * @return int The categoryID.
+	 * @return int The categoryid.
 	 */
 	public function determineCategory($groupID, $releaseName = '')
 	{
 		$this->releaseName = $releaseName;
-		$this->groupID     = $groupID;
+		$this->groupid     = $groupID;
 		$this->tmpCat      = \Category::CAT_MISC_OTHER;
 
 		switch (true) {
@@ -94,24 +94,24 @@ class Categorize extends Category
 	}
 
 	/**
-	 * Cache of group names for group ID's.
+	 * Cache of group names for group id's.
 	 * @var array
 	 */
 	private $groups = [];
 
 	/**
-	 * Sets/Gets a group name for the current group ID in the buffer.
+	 * Sets/Gets a group name for the current group id in the buffer.
 	 *
 	 * @return string Group Name.
 	 */
 	private function groupName()
 	{
-		if (!isset($this->groups[$this->groupID])) {
-			$group = $this->pdo->queryOneRow(sprintf('SELECT LOWER(name) AS name FROM groups WHERE id = %d', $this->groupID));
-			$this->groups[$this->groupID] = ($group === false ? false : $group['name']);
+		if (!isset($this->groups[$this->groupid])) {
+			$group = $this->pdo->queryOneRow(sprintf('SELECT LOWER(name) AS name FROM groups WHERE id = %d', $this->groupid));
+			$this->groups[$this->groupid] = ($group === false ? false : $group['name']);
 		}
 
-		return $this->groups[$this->groupID];
+		return $this->groups[$this->groupid];
 	}
 
 	/**

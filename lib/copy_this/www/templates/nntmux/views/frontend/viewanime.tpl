@@ -37,7 +37,7 @@
 			{if $animeImdbID > 0}<a target="_blank"
 									href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$animeImdbID}"
 									title="View IMDb">View IMDb</a> | {/if}
-			<a href="{$smarty.const.WWW_TOP}/rss?anidb={$animeAnidbid}&amp;dl=1&amp;i={$userdata.ID}&amp;r={$userdata.rsstoken}">RSS
+			<a href="{$smarty.const.WWW_TOP}/rss?anidb={$animeAnidbid}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">RSS
 				feed for this Anime</a>
 		</div>
 		<div class="btn-group">
@@ -94,9 +94,9 @@
 							{if $isadmin}
 								<div class="admin">
 									<a class="rndbtn"
-									   href="{$smarty.const.WWW_TOP}/admin/release-edit.php?id={$result.ID}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}"
+									   href="{$smarty.const.WWW_TOP}/admin/release-edit.php?id={$result.id}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}"
 									   title="Edit Release">Edit</a> <a class="rndbtn confirm_action"
-																		href="{$smarty.const.WWW_TOP}/admin/release-delete.php?id={$result.ID}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}"
+																		href="{$smarty.const.WWW_TOP}/admin/release-delete.php?id={$result.id}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}"
 																		title="Delete Release">Del</a>
 								</div>
 							{/if}
@@ -105,7 +105,7 @@
 					<td class="check"><input id="chk{$result.guid|substr:0:7}" type="checkbox" class="nzb_check"
 											 name="{$seasonnum}" value="{$result.guid}"/></td>
 					<td class="less"><a title="This anime in {$result.category_name}"
-										href="{$smarty.const.WWW_TOP}/anime/{$result.anidbid}?t={$result.categoryID}">{$result.category_name}</a>
+										href="{$smarty.const.WWW_TOP}/anime/{$result.anidbid}?t={$result.categoryid}">{$result.category_name}</a>
 					</td>
 					<td class="less mid" width="40" title="{$result.postdate}">{$result.postdate|timeago}</td>
 					<td width="40" class="less right">{$result.size|fsize_format:"MB"}{if $result.completion > 0}

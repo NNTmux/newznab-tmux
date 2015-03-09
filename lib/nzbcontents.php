@@ -128,10 +128,10 @@ Class NZBContents
 
 		$messageID = $this->parseNZB($guid, $relID, $groupID, true);
 		if ($messageID !== false) {
-			$fetchedBinary = $this->nntp->getMessages($groupName, $messageID['ID'], $this->alternateNNTP);
+			$fetchedBinary = $this->nntp->getMessages($groupName, $messageID['id'], $this->alternateNNTP);
 			if ($this->nntp->isError($fetchedBinary)) {
 				// NFO download failed, increment attempts.
-				$this->pdo->queryExec(sprintf('UPDATE releases SET nfostatus = nfostatus - 1 WHERE ID = %d', $relID));
+				$this->pdo->queryExec(sprintf('UPDATE releases SET nfostatus = nfostatus - 1 WHERE id = %d', $relID));
 				if ($this->echooutput) {
 					echo 'f';
 				}
@@ -145,14 +145,14 @@ Class NZBContents
 				if ($this->echooutput) {
 					echo '-';
 				}
-				$this->pdo->queryExec(sprintf('UPDATE releases SET nfostatus = %d WHERE ID = %d', Info::NFO_NONFO, $relID));
+				$this->pdo->queryExec(sprintf('UPDATE releases SET nfostatus = %d WHERE id = %d', Info::NFO_NONFO, $relID));
 				$fetchedBinary = false;
 			}
 		} else {
 			if ($this->echooutput) {
 				echo '-';
 			}
-			$this->pdo->queryExec(sprintf('UPDATE releases SET nfostatus = %d WHERE ID = %d', Info::NFO_NONFO, $relID));
+			$this->pdo->queryExec(sprintf('UPDATE releases SET nfostatus = %d WHERE id = %d', Info::NFO_NONFO, $relID));
 		}
 
 		return $fetchedBinary;
@@ -211,7 +211,7 @@ Class NZBContents
 				if ($foundPAR2 === false) {
 					if (preg_match('/\.(par[2" ]|\d{2,3}").+\(1\/1\)$/i', $subject)) {
 						if ($this->pp->parsePAR2((string)$nzbcontents->segments->segment, $relID, $groupID, $this->nntp, 1) === true) {
-							$this->pdo->queryExec(sprintf('UPDATE releases SET proc_par2 = 1 WHERE ID = %d', $relID));
+							$this->pdo->queryExec(sprintf('UPDATE releases SET proc_par2 = 1 WHERE id = %d', $relID));
 							$foundPAR2 = true;
 						}
 					}
@@ -227,12 +227,12 @@ Class NZBContents
 				$completion = 100;
 			}
 
-			$this->pdo->queryExec(sprintf('UPDATE releases SET completion = %d WHERE ID = %d', $completion, $relID));
+			$this->pdo->queryExec(sprintf('UPDATE releases SET completion = %d WHERE id = %d', $completion, $relID));
 
 			if ($foundNFO === true && strlen($messageID) > 1) {
-				return array('hidden' => false, 'ID' => $messageID);
+				return array('hidden' => false, 'id' => $messageID);
 			} elseif ($hiddenNFO === true && strlen($hiddenID) > 1) {
-				return array('hidden' => true, 'ID' => $hiddenID);
+				return array('hidden' => true, 'id' => $hiddenID);
 			}
 		}
 		return false;
@@ -303,7 +303,7 @@ Class NZBContents
 			foreach ($nzbFile->file as $nzbContents) {
 				if (preg_match('/\.(par[2" ]|\d{2,3}").+\(1\/1\)$/i', (string)$nzbContents->attributes()->subject)) {
 					if ($this->pp->parsePAR2((string)$nzbContents->segments->segment, $relID, $groupID, $this->nntp, $show) === true && $nameStatus === 1) {
-						$this->pdo->queryExec(sprintf('UPDATE releases SET proc_par2 = 1 WHERE ID = %d', $relID));
+						$this->pdo->queryExec(sprintf('UPDATE releases SET proc_par2 = 1 WHERE id = %d', $relID));
 
 						return true;
 					}
@@ -311,7 +311,7 @@ Class NZBContents
 			}
 		}
 		if ($nameStatus === 1) {
-			$this->pdo->queryExec(sprintf('UPDATE releases SET proc_par2 = 1 WHERE ID = %d', $relID));
+			$this->pdo->queryExec(sprintf('UPDATE releases SET proc_par2 = 1 WHERE id = %d', $relID));
 		}
 
 		return false;

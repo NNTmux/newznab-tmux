@@ -57,19 +57,19 @@ class MiscSorter
 	// Main function that determines which operation(s) should be run based on the releases NFO file
 	public function nfosorter($category = 0, $id = 0)
 	{
-		$idarr = ($id != 0 ? sprintf('AND r.ID = %d', $id) : '');
-		$cat = ($category = 0 ? sprintf('AND r.categoryID = %d', Category::CAT_MISC) : sprintf('AND r.categoryID = %d', $category));
+		$idarr = ($id != 0 ? sprintf('AND r.id = %d', $id) : '');
+		$cat = ($category = 0 ? sprintf('AND r.categoryid = %d', Category::CAT_MISC) : sprintf('AND r.categoryid = %d', $category));
 
 		$res = $this->pdo->queryDirect(
 			sprintf("
 							SELECT UNCOMPRESS(rn.nfo) AS nfo,
-								r.ID, r.name, r.searchname
+								r.id, r.name, r.searchname
 							FROM releasenfo rn
-							INNER JOIN releases r ON rn.releaseID = r.ID
-							INNER JOIN groups g ON r.groupID = g.ID
+							INNER JOIN releases r ON rn.releaseid = r.id
+							INNER JOIN groups g ON r.groupid = g.id
 							WHERE rn.nfo IS NOT NULL
 							AND r.proc_sorter = %d
-							AND r.prehashID = 0 %s",
+							AND r.prehashid = 0 %s",
 				self::PROC_SORTER_NONE,
 				($idarr = '' ? $cat : $idarr)
 			)
@@ -257,14 +257,14 @@ class MiscSorter
 			case 'iphone':
 			case 'ipad':
 			case 'ipod':
-				$ok = $this->doOS($nfo, $row['ID']);
+				$ok = $this->doOS($nfo, $row['id']);
 				break;
 			case 'game':
 				$set = preg_split('/\>(.*)\</Ui', $nfo, 0, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
 				if (isset($set[1])) {
-					$ok = $this->dodbupdate($row['ID'], $this->cleanname($set[1]));
+					$ok = $this->dodbupdate($row['id'], $this->cleanname($set[1]));
 				} else {
-					$ok = $this->doOS($nfo, $row['ID']);
+					$ok = $this->doOS($nfo, $row['id']);
 				}
 				break;
 			case 'imdb':
@@ -282,7 +282,7 @@ class MiscSorter
 				break;
 			case 'comicbook':
 			case 'comix':
-				$ok = $this->dodbupdate($row['ID'], $this->cleanname($row['searchname']));
+				$ok = $this->dodbupdate($row['id'], $this->cleanname($row['searchname']));
 				break;
 			case "asin":
 			case "isbn":
@@ -292,20 +292,20 @@ class MiscSorter
 					if (strlen($set[1]) <= 13) {
 						$set[2] = $set[1];
 						$set[1] = "com";
-						$ok = $this->doAmazon($row['name'], $row['ID'], $nfo, $set[2], $set[1], $case, $row);
+						$ok = $this->doAmazon($row['name'], $row['id'], $nfo, $set[2], $set[1], $case, $row);
 					}
 				}
 				break;
 			case "amazon.":
 				if (preg_match('/amazon\.([a-z]*?\.?[a-z]{2,3}?)\/.*\/dp\/([a-zA-Z0-9]{8,10}?)/iU', $nfo, $set)) {
-					$ok = $this->doAmazon($row['name'], $row['ID'], $nfo, $set[2], $set[1], 'asin', $row);
+					$ok = $this->doAmazon($row['name'], $row['id'], $nfo, $set[2], $set[1], 'asin', $row);
 				}
 				break;
 			case "upc":
 				if (preg_match('/UPC\:?? *?([a-zA-Z0-9]*?)/iU', $nfo, $set)) {
 					$set[2] = $set[1];
 					$set[1] = "All";
-					$ok = $this->doAmazon($row['name'], $row['ID'], $nfo, $set[2], $set[1], $case, $row);
+					$ok = $this->doAmazon($row['name'], $row['id'], $nfo, $set[2], $set[1], $case, $row);
 				}
 				break;
 		}
@@ -340,7 +340,7 @@ class MiscSorter
 				$artist[1] = $artist[3];
 			}
 			if (isset($title[1]) && isset($artist[1])) {
-				return $this->dodbupdate($row['ID'], $this->cleanname($artist[1] . " - " . $title[1]), null, 'audioNFO');
+				return $this->dodbupdate($row['id'], $this->cleanname($artist[1] . " - " . $title[1]), null, 'audioNFO');
 			}
 		}
 
@@ -353,10 +353,10 @@ class MiscSorter
 
 		$release = $this->pdo->queryOneRow(
 			sprintf("
-							SELECT r.ID AS releaseID, r.searchname AS searchname,
-								r.name AS name, r.categoryID, r.groupID
+							SELECT r.id AS releaseid, r.searchname AS searchname,
+								r.name AS name, r.categoryid, r.groupid
 							FROM releases r
-							WHERE r.ID = %d",
+							WHERE r.id = %d",
 				$id
 			)
 		);
@@ -368,12 +368,12 @@ class MiscSorter
 			$this->_setProcSorter(self::PROC_SORTER_DONE, $id);
 		}
 
-		if ($type !== '' && in_array($type, ['bookinfoID', 'consoleinfoID', 'imdbID', 'musicinfoID'])) {
+		if ($type !== '' && in_array($type, ['bookinfoid', 'consoleinfoid', 'imdbid', 'musicinfoid'])) {
 			$this->pdo->queryExec(
 				sprintf('
 								UPDATE releases
 								SET %s = %d
-								WHERE ID = %d',
+								WHERE id = %d',
 					$type,
 					$typeid,
 					$id
@@ -390,7 +390,7 @@ class MiscSorter
 			sprintf('
 						UPDATE releases
 						SET proc_sorter = %d
-						WHERE ID = %d',
+						WHERE id = %d',
 				$status,
 				$id
 			)
@@ -457,9 +457,9 @@ class MiscSorter
 
 	private function _matchNfoImdb($nfo, $row)
 	{
-		$imdb = $this->movie->doMovieUpdate($nfo, "sorter", $row['ID']);
+		$imdb = $this->movie->doMovieUpdate($nfo, "sorter", $row['id']);
 		if (isset($imdb) && $imdb > 0) {
-			return $this->dodbupdate($row['ID'], $this->moviename($row['ID'], $row['searchname']), $imdb, 'imdbID');
+			return $this->dodbupdate($row['id'], $this->moviename($row['id'], $row['searchname']), $imdb, 'imdbid');
 		}
 
 		return false;
@@ -522,13 +522,13 @@ class MiscSorter
 		$title = preg_split('/(?:t\s?i\s?t\s?l\s?e\b|b\s?o\s?o\s?k\b)+? *?(?!(?:[^\s\.\:\}\]\*\xb0-\x{3000}\?] ?){2,}?\b)(?:[\*\?\-\=\|\;\:\.\[\}\]\(\s\xb0-\x{3000}\?]+?)[\s\.\>\:\(\)]((?!\:) ?[a-z0-9\&].+)(?:\s\s\s|$|\.\.\.)/Uuim', $nfo, 0, PREG_SPLIT_DELIM_CAPTURE);
 
 		if (isset($author[1]) && isset($title[1])) {
-			return $this->dodbupdate($row['ID'], Category::CAT_MUSIC_AUDIOBOOK, $this->cleanname($author[1] . " - " . $title[1]));
+			return $this->dodbupdate($row['id'], Category::CAT_MUSIC_AUDIOBOOK, $this->cleanname($author[1] . " - " . $title[1]));
 		} else if (preg_match('/[\h\_\.\:\xb0-\x{3000}]{2,}?([a-z].+) \- (.+)(?:[\s\_\.\:\xb0-\x{3000}]{2,}|$)/iu', $nfo, $matches)) {
 			$pos = $this->nfopos($this->_cleanStrForPos($nfo), $this->_cleanStrForPos($matches[1] . " - " . $matches[2]));
 			if ($pos !== false && $pos < 0.4 && !preg_match('/\:\d\d$/', $matches[2]) && strlen($matches[1]) < 48 && strlen($matches[2]) < 48
 				&& strpos('title', $matches[1]) === false && strpos('title', $matches[2]) === false
 			) {
-				return $this->dodbupdate($row['ID'], $this->cleanname($matches[1] . " - " . $matches[2]), null, 'bookNFO');
+				return $this->dodbupdate($row['id'], $this->cleanname($matches[1] . " - " . $matches[2]), null, 'bookNFO');
 			}
 		}
 
@@ -608,7 +608,7 @@ class MiscSorter
 			$bookId = $this->book->updateBookInfo('', $amaz);
 			unset($book);
 		} else {
-			$bookId = $rel['ID'];
+			$bookId = $rel['id'];
 		}
 
 		if ($audiobook) {
@@ -626,7 +626,7 @@ class MiscSorter
 	{
 		return $this->pdo->queryOneRow(
 			sprintf('
-						SELECT ID
+						SELECT id
 						FROM %s
 						WHERE asin = %s',
 				$table,
@@ -635,7 +635,7 @@ class MiscSorter
 		);
 	}
 
-	// tries to derive the IMDB ID from release NFO
+	// tries to derive the IMDB id from release NFO
 
 	private function _doAmazonMusic($amaz = array(), $id = 0)
 	{
@@ -648,10 +648,10 @@ class MiscSorter
 		$rel = $this->_doAmazonLocal('musicinfo', (string)$amaz->Items->Item->ASIN);
 
 		if ($rel !== false) {
-			$ok = $this->dodbupdate($id, $name, $rel['ID'], 'musicinfoID');
+			$ok = $this->dodbupdate($id, $name, $rel['id'], 'musicinfoid');
 		} else {
 			$musicId = $this->music->updateMusicInfo('', '', $amaz);
-			$ok = $this->dodbupdate($id, $name, $musicId, 'musicinfoID');
+			$ok = $this->dodbupdate($id, $name, $musicId, 'musicinfoid');
 		}
 
 		return $ok;
@@ -679,7 +679,7 @@ class MiscSorter
 		$rel = $this->_doAmazonLocal('consoleinfo', (string)$amaz->Items->Item->ASIN);
 
 		if ($rel !== false) {
-			$ok = $this->dodbupdate($id, $name, $rel['ID'], 'consoleinfoID');
+			$ok = $this->dodbupdate($id, $name, $rel['id'], 'consoleinfoid');
 		} else {
 			$consoleId = $this->console->
 				updateConsoleInfo([
@@ -688,7 +688,7 @@ class MiscSorter
 						'platform' => (string)$amaz->Items->Item->ItemAttributes->Platform
 					]
 				);
-			$ok = $this->dodbupdate($id, $name, $consoleId, 'consoleinfoID');
+			$ok = $this->dodbupdate($id, $name, $consoleId, 'consoleinfoid');
 		}
 
 		return $ok;

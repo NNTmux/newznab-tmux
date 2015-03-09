@@ -36,13 +36,13 @@ print(bcolors.HEADER + "\nBinaries Threaded Started at {}".format(datetime.datet
 #get active groups
 if len(sys.argv) == 2:
 	try:
-		cur[0].execute("SELECT name FROM groups WHERE ID IN " + sys.argv[1])
+		cur[0].execute("SELECT name FROM groups WHERE id IN " + sys.argv[1])
 		datas = cur[0].fetchall()
 	except:
 		cur[0].execute("SELECT name FROM groups WHERE name = '" + sys.argv[1] + "'")
 		datas = cur[0].fetchall()
 		if len(datas) == 0:
-			cur[0].execute("SELECT name FROM groups WHERE ID = " + sys.argv[1])
+			cur[0].execute("SELECT name FROM groups WHERE id = " + sys.argv[1])
 			datas = cur[0].fetchall()
 			if len(datas) == 0:
 				print(bcolors.ERROR + "No Active Groups" + bcolors.ENDC)

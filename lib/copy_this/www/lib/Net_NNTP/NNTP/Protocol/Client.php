@@ -1120,7 +1120,7 @@ class Net_NNTP_Protocol_Client extends PEAR
 	/**
 	 * Tell the news server we want to upload an article, the server will check if it has the message-id first.
 	 *
-	 * @param string $id Message-ID.
+	 * @param string $id Message-id.
 	 *
 	 * @return mixed (bool) true on success
 	 *               (object) pear_error on failure

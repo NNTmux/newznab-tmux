@@ -18,7 +18,7 @@
 {if $data}
 	<table style="margin-top:10px;" class="data Sortable highlight">
 		<tr>
-			<th>Release ID</th>
+			<th>Release id</th>
 			<th>Usenet Subject</th>
 			<th>Old Search Name</th>
 			<th>New Search Name</th>

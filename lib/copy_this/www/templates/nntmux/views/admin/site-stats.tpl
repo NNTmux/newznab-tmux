@@ -1,4 +1,4 @@
- 
+
 <h1>{$page->title}</h1>
 
 {if $topgrabs|count > 0}
@@ -12,11 +12,11 @@
 
 		{foreach from=$topgrabs item=result}
 			<tr class="{cycle values=",alt"}">
-				<td width="75%"><a href="{$smarty.const.WWW_TOP}/user-edit.php?id={$result.ID}">{$result.username}</a></td>
+				<td width="75%"><a href="{$smarty.const.WWW_TOP}/user-edit.php?id={$result.id}">{$result.username}</a></td>
 				<td>{$result.grabs}</td>
 			</tr>
 		{/foreach}
-		
+
 	</table>
 
 	<br/><br/>
@@ -73,19 +73,19 @@
 
 	{foreach from=$usersbyhosthash item=result}
 		<tr class="{cycle values=",alt"}">
-		
+
 			<td width="25%">{$result.hosthash}</td>
 			<td>
 			{assign var="usersplits" value=","|explode:$result.user_string}
 			{foreach from=$usersplits item=usersplit}
 				<a href="{$smarty.const.WWW_TOP}/user-edit.php?id={$usersplit}">{$usersplit}</a>
-			{/foreach}			
+			{/foreach}
 			</td>
 			<td>
 			{assign var="usernsplits" value=","|explode:$result.user_names}
 			{foreach from=$usernsplits item=usernsplit}
 				<a href="{$smarty.const.WWW_TOP}/../profile?name={$usernsplit}">{$usernsplit}</a>
-			{/foreach}			
+			{/foreach}
 			</td>
 		</tr>
 	{/foreach}
@@ -134,12 +134,12 @@
 		{foreach from=$topdownloads item=result}
 			<tr class="{cycle values=",alt"}">
 				<td width="75%"><a href="{$smarty.const.WWW_TOP}/../details/{$result.guid}">{$result.searchname|escape:"htmlall"|replace:".":" "}</a>
-				{if $isadmin}<a href="{$smarty.const.WWW_TOP}/release-edit.php?id={$result.ID}">[Edit]</a>{/if}</td>
+				{if $isadmin}<a href="{$smarty.const.WWW_TOP}/release-edit.php?id={$result.id}">[Edit]</a>{/if}</td>
 				<td>{$result.grabs}</td>
 				<td>{$result.adddate|timeago}</td>
 			</tr>
 		{/foreach}
-		
+
 	</table>
 
 	<br/><br/>
@@ -159,7 +159,7 @@
 			<td>{$result.count}</td>
 		</tr>
 	{/foreach}
-	
+
 </table>
 
 <br/><br/>
@@ -181,6 +181,6 @@
 				<td>{$result.adddate|timeago}</td>
 			</tr>
 		{/foreach}
-		
+
 	</table>
 {/if}

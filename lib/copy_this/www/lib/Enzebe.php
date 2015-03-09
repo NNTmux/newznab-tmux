@@ -29,7 +29,7 @@ class Enzebe
 	private $siteNzbPath;
 
 	/**
-	 * Group ID when writing NZBs.
+	 * Group id when writing NZBs.
 	 * @var int
 	 * @access protected
 	 */
@@ -104,15 +104,15 @@ class Enzebe
 	 */
 	public function initiateForWrite($groupID)
 	{
-		$this->groupID = $groupID;
+		$this->groupid = $groupID;
 		$site = new Sites();
 		// Set table names
 		if ($this->tablePerGroup === true) {
-			if ($this->groupID == '') {
-				exit("$this->groupID is missing\n");
+			if ($this->groupid == '') {
+				exit("$this->groupid is missing\n");
 			}
-			$bName = 'binaries_' . $this->groupID;
-			$pName = 'parts_' . $this->groupID;
+			$bName = 'binaries_' . $this->groupid;
+			$pName = 'parts_' . $this->groupid;
 		} else {
 			$bName = 'binaries';
 			$pName = 'parts';
@@ -121,8 +121,8 @@ class Enzebe
 		$this->_binariesQuery = sprintf(
 			'SELECT %s.*, UNIX_TIMESTAMP(%s.date) AS udate, groups.name AS groupname
 			FROM %s
-			INNER JOIN groups ON %s.groupID = groups.ID
-			WHERE %s.releaseID = ',
+			INNER JOIN groups ON %s.groupid = groups.id
+			WHERE %s.releaseid = ',
 			$bName,
 			$bName,
 			$bName,
@@ -143,7 +143,7 @@ class Enzebe
 	/**
 	 * Write an NZB to the hard drive for a single release.
 	 *
-	 * @param int    $relID   The ID of the release in the DB.
+	 * @param int    $relID   The id of the release in the DB.
 	 * @param string $relGuid The guid of the release.
 	 * @param string $name    The name of the release.
 	 * @param string $cTitle  The name of the category this release is in.
@@ -181,7 +181,7 @@ class Enzebe
 							// Buffer segment writes, increases performance.
 							$string = '';
 
-							$parts = $this->pdo->queryDirect(sprintf($this->_partsQuery, $bin['ID']));
+							$parts = $this->pdo->queryDirect(sprintf($this->_partsQuery, $bin['id']));
 
 							if ($parts instanceof \Traversable) {
 
@@ -217,7 +217,7 @@ class Enzebe
 			if (is_file($path)) {
 				$this->pdo->queryExec(
 					sprintf('
-						UPDATE releases SET nzbstatus = %d %s WHERE ID = %d',
+						UPDATE releases SET nzbstatus = %d %s WHERE id = %d',
 						\NZB::NZB_ADDED,
 						($nzb_guid === '' ? '' : ', nzb_guid = ' . $this->pdo->escapestring(md5($nzb_guid))),
 						$relID

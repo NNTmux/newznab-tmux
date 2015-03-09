@@ -420,7 +420,7 @@ class NNTP extends Net_NNTP_Client
 	 *        'Subject'    => string(18) "This is an example"
 	 *        'From'       => string(19) "Example@example.com"
 	 *        'Date'       => string(24) "26 Jun 2014 13:08:22 GMT"
-	 *        'Message-ID' => string(57) "<part1of1.uS*yYxQvtAYt$5t&wmE%UejhjkCKXBJ!@example.local>"
+	 *        'Message-id' => string(57) "<part1of1.uS*yYxQvtAYt$5t&wmE%UejhjkCKXBJ!@example.local>"
 	 *        'References' => string(0)  ""
 	 *        'Bytes'      => string(3)  "123"
 	 *        'Lines'      => string(1)  "9"
@@ -432,7 +432,7 @@ class NNTP extends Net_NNTP_Client
 	 *                      Range of article numbers:      "679871775-679999999"
 	 *                      All newer than article number: "679871775-"
 	 *                      All older than article number: "-679871775"
-	 *                      Message-ID:                    "<part1of1.uS*yYxQvtAYt$5t&wmE%UejhjkCKXBJ!@example.local>"
+	 *                      Message-id:                    "<part1of1.uS*yYxQvtAYt$5t&wmE%UejhjkCKXBJ!@example.local>"
 	 *
 	 * @return array|object Multi-dimensional Array of headers on success, PEAR object on failure.
 	 */
@@ -534,9 +534,9 @@ class NNTP extends Net_NNTP_Client
 	 * Download multiple article bodies and string them together.
 	 *
 	 * @param string $groupName   The name of the group the articles are in.
-	 * @param mixed  $identifiers (string) Message-ID.
+	 * @param mixed  $identifiers (string) Message-id.
 	 *                            (int)    Article number.
-	 *                            (array)  Article numbers or Message-ID's (can contain both in the same array)
+	 *                            (array)  Article numbers or Message-id's (can contain both in the same array)
 	 * @param bool   $alternate   Use the alternate NNTP provider?
 	 *
 	 * @return mixed On success : (string) The article bodies.
@@ -562,7 +562,7 @@ class NNTP extends Net_NNTP_Client
 
 			$loops = $messageSize = 0;
 
-			// Loop over the message-ID's or article numbers.
+			// Loop over the message-id's or article numbers.
 			foreach ($identifiers as $wanted) {
 
 				/* This is to attempt to prevent string size overflow.
@@ -632,7 +632,7 @@ class NNTP extends Net_NNTP_Client
 				}
 			}
 
-			// If it's a string check if it's a valid message-ID.
+			// If it's a string check if it's a valid message-id.
 		} else if (is_string($identifiers) || is_numeric($identifiers)) {
 			$body = $this->_getMessage($groupName, $identifiers);
 			if ($alternate === true && $this->isError($body)) {
@@ -662,7 +662,7 @@ class NNTP extends Net_NNTP_Client
 	 * associated values, optionally decode the body using yEnc.
 	 *
 	 * @param string $groupName  The name of the group the article is in.
-	 * @param mixed  $identifier (string)The message-ID of the article to download.
+	 * @param mixed  $identifier (string)The message-id of the article to download.
 	 *                           (int) The article number.
 	 * @param bool   $yEnc       Attempt to yEnc decode the body.
 	 *
@@ -691,9 +691,9 @@ class NNTP extends Net_NNTP_Client
 			}
 		}
 
-		// Check if it's an article number or message-ID.
+		// Check if it's an article number or message-id.
 		if (!is_numeric($identifier)) {
-			// If it's a message-ID, check if it has the required triangular brackets.
+			// If it's a message-id, check if it has the required triangular brackets.
 			$identifier = $this->_formatMessageID($identifier);
 		}
 
@@ -746,7 +746,7 @@ class NNTP extends Net_NNTP_Client
 	 * Download a full article header.
 	 *
 	 * @param string $groupName  The name of the group the article is in.
-	 * @param mixed $identifier (string) The message-ID of the article to download.
+	 * @param mixed $identifier (string) The message-id of the article to download.
 	 *                          (int)    The article number.
 	 *
 	 * @return mixed On success : (array)  The header.
@@ -1462,11 +1462,11 @@ class NNTP extends Net_NNTP_Client
 	}
 
 	/**
-	 * Check if the Message-ID has the required opening and closing brackets.
+	 * Check if the Message-id has the required opening and closing brackets.
 	 *
-	 * @param  string $messageID The Message-ID with or without brackets.
+	 * @param  string $messageID The Message-id with or without brackets.
 	 *
-	 * @return string            Message-ID with brackets.
+	 * @return string            Message-id with brackets.
 	 *
 	 * @access protected
 	 */
@@ -1493,7 +1493,7 @@ class NNTP extends Net_NNTP_Client
 	 * Download an article body (an article without the header).
 	 *
 	 * @param string $groupName The name of the group the article is in.
-	 * @param mixed $identifier (string) The message-ID of the article to download.
+	 * @param mixed $identifier (string) The message-id of the article to download.
 	 *                          (int)    The article number.
 	 *
 	 * @return mixed On success : (string) The article's body.

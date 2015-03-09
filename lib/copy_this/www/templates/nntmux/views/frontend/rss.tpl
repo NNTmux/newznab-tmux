@@ -5,43 +5,43 @@
 	<title>{$release.searchname|escape:html}</title>
 	<guid isPermaLink="true">{$serverroot}details/{$release.guid}</guid>
 	<link>{$serverroot}{if $dl=="1"}getnzb{else}details{/if}/{$release.guid}{if $dl=="1"}.nzb&amp;i={$uid}&amp;r={$rsstoken}{/if}{if $del=="1"}&amp;del=1{/if}</link>
-	<comments>{$serverroot}details/{$release.guid}#comments</comments> 	
-	<pubDate>{$release.adddate|phpdate_format:"DATE_RSS"}</pubDate> 
-	<category>{$release.category_name|escape:html}</category> 	
+	<comments>{$serverroot}details/{$release.guid}#comments</comments>
+	<pubDate>{$release.adddate|phpdate_format:"DATE_RSS"}</pubDate>
+	<category>{$release.category_name|escape:html}</category>
 	<description>{if $api=="1"}{$release.searchname}{else}
 <![CDATA[{strip}
 	<div>
 	{if $release.cover == 1}
-		<img style="margin-left:10px;margin-bottom:10px;float:right;" src="{$serverroot}covers/movies/{$release.imdbID}-cover.jpg" width="120" border="0" alt="{$release.searchname|escape:"htmlall"}" />
+		<img style="margin-left:10px;margin-bottom:10px;float:right;" src="{$serverroot}covers/movies/{$release.imdbid}-cover.jpg" width="120" border="0" alt="{$release.searchname|escape:"htmlall"}" />
 	{/if}
 	{if $release.mu_cover == 1}
-		<img style="margin-left:10px;margin-bottom:10px;float:right;" src="{$serverroot}covers/music/{$release.musicinfoID}.jpg" width="120" border="0" alt="{$release.searchname|escape:"htmlall"}" />
-	{/if}	
+		<img style="margin-left:10px;margin-bottom:10px;float:right;" src="{$serverroot}covers/music/{$release.musicinfoid}.jpg" width="120" border="0" alt="{$release.searchname|escape:"htmlall"}" />
+	{/if}
 	{if $release.co_cover == 1}
-		<img style="margin-left:10px;margin-bottom:10px;float:right;" src="{$serverroot}covers/console/{$release.consoleinfoID}.jpg" width="120" border="0" alt="{$release.searchname|escape:"htmlall"}" />
-	{/if}	
+		<img style="margin-left:10px;margin-bottom:10px;float:right;" src="{$serverroot}covers/console/{$release.consoleinfoid}.jpg" width="120" border="0" alt="{$release.searchname|escape:"htmlall"}" />
+	{/if}
 	{if $release.bo_cover == 1}
-		<img style="margin-left:10px;margin-bottom:10px;float:right;" src="{$serverroot}covers/book/{$release.bookinfoID}.jpg" width="120" border="0" alt="{$release.searchname|escape:"htmlall"}" />
-	{/if}	
+		<img style="margin-left:10px;margin-bottom:10px;float:right;" src="{$serverroot}covers/book/{$release.bookinfoid}.jpg" width="120" border="0" alt="{$release.searchname|escape:"htmlall"}" />
+	{/if}
 	<ul>
-	<li>ID: {$release.guid}</li>
+	<li>id: {$release.guid}</li>
 	<li>Name: <a href="{$serverroot}details/{$release.guid}">{$release.searchname}</a></li>
 	<li>Size: {$release.size|fsize_format:"MB"} </li>
-	<li>Attributes: Category - <a href="{$serverroot}browse?t={$release.categoryID}">{$release.category_name}</a></li>
+	<li>Attributes: Category - <a href="{$serverroot}browse?t={$release.categoryid}">{$release.category_name}</a></li>
 	<li>Groups: <a href="{$serverroot}browse?g={$release.group_name}">{$release.group_name}</a></li>
 	<li>Poster: {$release.fromname|escape:"htmlall"}</li>
 	<li>PostDate: {$release.postdate|phpdate_format:"DATE_RSS"}</li>
 	<li>Password: {if $release.passwordstatus == 0}None{elseif $release.passwordstatus == 2}Passworded Rar Archive{elseif $release.passwordstatus == 1}Contains Cab/Ace/RAR Archive{else}Unknown{/if}</li>
-	
+
 	{if $release.nfoID != ""}
 		<li>Nfo: <a href="{$serverroot}api?t=getnfo&amp;id={$release.guid}&amp;raw=1&amp;i={$uid}&amp;r={$rsstoken}">{$release.searchname}.nfo</a></li>
 	{/if}
-	
+
 	{if $release.parentCategoryID == 2000}
-		{if $release.imdbID != ""}
-		<li>Imdb Info: 
+		{if $release.imdbid != ""}
+		<li>Imdb Info:
 			<ul>
-				<li>IMDB Link: <a href="http://www.imdb.com/title/tt{$release.imdbID}/">{$release.imdbtitle|escape:"htmlall"}</a></li>
+				<li>IMDB Link: <a href="http://www.imdb.com/title/tt{$release.imdbid}/">{$release.imdbtitle|escape:"htmlall"}</a></li>
 				{if $release.rating != ""}<li>Rating: <span style="font-weight:bold; color:{if $release.rating < 4}#FF0000{elseif $release.rating < 7}#FFAA2A{else}#2AFF00{/if};">{$release.rating|escape:"htmlall"}</span></li>{/if}
 				{if $release.plot != ""}<li>Plot: {$release.plot|escape:"htmlall"}</li>{/if}
 				{if $release.year != ""}<li>Year: {$release.year|escape:"htmlall"}</li>{/if}
@@ -52,10 +52,10 @@
 		</li>
 		{/if}
 	{/if}
-	
+
 	{if $release.parentCategoryID == 3000}
-		{if $release.musicinfoID > 0}
-		<li>Music Info: 
+		{if $release.musicinfoid > 0}
+		<li>Music Info:
 			<ul>
 				{if $release.mu_url != ""}<li>Amazon: <a href="{$release.mu_url}">{$release.mu_title|escape:"htmlall"}</a></li>{/if}
 				{if $release.mu_artist != ""}<li>Artist: {$release.mu_artist|escape:"htmlall"}</li>{/if}
@@ -69,18 +69,18 @@
 						{assign var="tracksplits" value="|"|explode:$release.mu_tracks}
 						{foreach from=$tracksplits item=tracksplit}
 						<li>{$tracksplit|trim|escape:"htmlall"}</li>
-						{/foreach}		
+						{/foreach}
 					</ol>
-				</li>				
+				</li>
 				{/if}
 			</ul>
 		</li>
 		{/if}
-	{/if}	
+	{/if}
 
 	{if $release.parentCategoryID == 1000}
-		{if $release.consoleinfoID > 0}
-		<li>Console Info: 
+		{if $release.consoleinfoid > 0}
+		<li>Console Info:
 			<ul>
 				{if $release.co_url != ""}<li>Amazon: <a href="{$release.co_url}">{$release.co_title|escape:"htmlall"}</a></li>{/if}
 				{if $release.co_genre != ""}<li>Genre: {$release.co_genre|escape:"htmlall"}</li>{/if}
@@ -90,11 +90,11 @@
 			</ul>
 		</li>
 		{/if}
-	{/if}	
+	{/if}
 
-	{if $release.categoryID == 7020}
-		{if $release.bookinfoID > 0}
-		<li>Console Info: 
+	{if $release.categoryid == 7020}
+		{if $release.bookinfoid > 0}
+		<li>Console Info:
 			<ul>
 				{if $release.bo_author != ""}<li>Author: <a href="{$serverroot}books?author={$release.bo_author|escape:"url"}">{$release.bo_author|escape:"htmlall"}</a></li>{/if}
 				{if $release.bo_url != ""}<li>Amazon: <a href="{$release.bo_url}">{$release.bo_title|escape:"htmlall"}</a></li>{/if}
@@ -104,10 +104,10 @@
 			</ul>
 		</li>
 		{/if}
-	{/if}		
-	
+	{/if}
+
 	</ul>
-	
+
 	</div>
 	<div style="clear:both;">
 	{/strip}]]>
@@ -129,15 +129,15 @@
 {/if}
 {if $release.showtitle != ""}	<newznab:attr name="showtitle">{$release.showtitle|escape:html}</newznab:attr>
 {/if}
-{if $release.rageID != "-1" && $release.rageID != "-2"}	<newznab:attr name="rageid" value="{$release.rageID}" />
+{if $release.rageid != "-1" && $release.rageid != "-2"}	<newznab:attr name="rageid" value="{$release.rageid}" />
 {/if}
 {if $release.tvtitle != ""}	<newznab:attr name="tvtitle" value="{$release.tvtitle|escape:html}" />
 {/if}
 {if $release.tvairdate != ""}	<newznab:attr name="tvairdate" value="{$release.tvairdate|phpdate_format:"DATE_RSS"}" />
 {/if}
-{if $release.imdbID != ""}	<newznab:attr name="imdb" value="{$release.imdbID}" />
+{if $release.imdbid != ""}	<newznab:attr name="imdb" value="{$release.imdbid}" />
 {/if}
-{if $release.tvdbID != ""}	<newznab:attr name="tvdb-show" value="{$release.tvdbID}" />
+{if $release.tvdbid != ""}	<newznab:attr name="tvdb-show" value="{$release.tvdbid}" />
 {/if}
 {if $release.ep_tvdbID != ""}	<newznab:attr name="tvdb-ep" value="{$release.ep_tvdbID}" />
 {/if}
@@ -163,9 +163,9 @@
 	<newznab:attr name="grabs" value="{$release.grabs}" />
 	<newznab:attr name="comments" value="{$release.comments|escape:"htmlall"}" />
 	<newznab:attr name="password" value="{$release.passwordstatus}" />
-	<newznab:attr name="usenetdate" value="{$release.postdate|phpdate_format:"DATE_RSS"}" />	
+	<newznab:attr name="usenetdate" value="{$release.postdate|phpdate_format:"DATE_RSS"}" />
 	<newznab:attr name="group" value="{$release.group_name|escape:html}" />
-		
+
 </item>
 {/foreach}
 

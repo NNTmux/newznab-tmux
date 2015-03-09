@@ -31,7 +31,7 @@ if int(allowed[0]) == 0:
 	info.disconnect(cur[0], cur[1])
 	sys.exit()
 
-cur[0].execute("SELECT ID FROM groups WHERE active = 1 ORDER by cast(last_record as signed) - cast(first_record as signed) DESC")
+cur[0].execute("SELECT id FROM groups WHERE active = 1 ORDER by cast(last_record as signed) - cast(first_record as signed) DESC")
 datas = cur[0].fetchall()
 
 #close connection to mysql

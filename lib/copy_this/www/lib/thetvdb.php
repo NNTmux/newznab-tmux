@@ -40,11 +40,11 @@ class TheTVDB
 			$rating = "null";
 
 		$db->queryInsert(sprintf("INSERT INTO thetvdb
-		(tvdbID, actors, airsday, airstime, contentrating, firstaired, genre, imdbID, network, overview, rating, ratingcount, runtime, seriesname, status, createddate)
+		(tvdbid, actors, airsday, airstime, contentrating, firstaired, genre, imdbid, network, overview, rating, ratingcount, runtime, seriesname, status, createddate)
 		VALUES (%d, %s, %s, %s, %s, %s, %s, %d, %s, %s, %F, %d, %d, %s, %s, now())",
-				$TheTVDBAPIArray['tvdbID'], $db->escapeString($TheTVDBAPIArray['actors']), $db->escapeString($TheTVDBAPIArray['airsday']),
+				$TheTVDBAPIArray['tvdbid'], $db->escapeString($TheTVDBAPIArray['actors']), $db->escapeString($TheTVDBAPIArray['airsday']),
 				$airstime, $db->escapeString($TheTVDBAPIArray['contentrating']), $firstaired,
-				$db->escapeString($TheTVDBAPIArray['genre']), $TheTVDBAPIArray['imdbID'], $db->escapeString($TheTVDBAPIArray['network']), $db->escapeString($TheTVDBAPIArray['overview']),
+				$db->escapeString($TheTVDBAPIArray['genre']), $TheTVDBAPIArray['imdbid'], $db->escapeString($TheTVDBAPIArray['network']), $db->escapeString($TheTVDBAPIArray['overview']),
 				$rating, $TheTVDBAPIArray['ratingcount'], $TheTVDBAPIArray['runtime'], $db->escapeString($TheTVDBAPIArray['seriesname']),
 				$db->escapeString($TheTVDBAPIArray['status'])));
 	}
@@ -59,10 +59,10 @@ class TheTVDB
 				continue;
 
 			$db->queryInsert(sprintf('INSERT INTO episodeinfo
-			(rageID, tvdbID, imdbID, showtitle, airdate, fullep, eptitle, director, gueststars, overview, rating, writer, epabsolute)
+			(rageid, tvdbid, imdbid, showtitle, airdate, fullep, eptitle, director, gueststars, overview, rating, writer, epabsolute)
 			VALUES (0, %d, %d, %s, %s, %s, %s, %s, %s, %s, %F, %s, %d)
 			ON DUPLICATE KEY UPDATE
-			tvdbID=%1$d, imdbID=%2$d, showtitle=%3$s, airdate=%4$s, fullep=%5$s, eptitle=%6$s, director=%7$s,
+			tvdbid=%1$d, imdbid=%2$d, showtitle=%3$s, airdate=%4$s, fullep=%5$s, eptitle=%6$s, director=%7$s,
 			gueststars=%8$s, overview=%9$s, rating=%10$F, writer=%11$s, epabsolute=%12$s',
 					$TheTVDBAPIArray['episodetvdbID'][$i], $TheTVDBAPIArray['episodeimdbID'][$i], $db->escapeString($TheTVDBAPIArray['seriesname']), $db->escapeString($airdate),
 					$db->escapeString(str_pad($TheTVDBAPIArray['episodeseason'][$i], 2, '0', STR_PAD_LEFT).'x'.str_pad($TheTVDBAPIArray['episodenumber'][$i], 2, '0', STR_PAD_LEFT)),
@@ -91,9 +91,9 @@ class TheTVDB
 			$rating = "null";
 
 		$sql = sprintf('UPDATE thetvdb
-		SET actors=%s, airsday=%s, airstime=%s, contentrating=%s, firstaired=%s, genre=%s, imdbID=%d, network=%s,
+		SET actors=%s, airsday=%s, airstime=%s, contentrating=%s, firstaired=%s, genre=%s, imdbid=%d, network=%s,
 		overview=%s, rating=%s, ratingcount=%d, runtime=%d, seriesname=%s, status=%s, createddate=now()
-		WHERE tvdbID = %d', $db->escapeString($actors), $db->escapeString($airsday), $airstime, $db->escapeString($contentrating),
+		WHERE tvdbid = %d', $db->escapeString($actors), $db->escapeString($airsday), $airstime, $db->escapeString($contentrating),
 			$firstaired, $db->escapeString($genre), $imdbID, $db->escapeString($network), $db->escapeString($overview), $rating,
 			$ratingcount, $runtime, $db->escapeString($seriesname), $db->escapeString($status), $tvdbID);
 
@@ -104,20 +104,20 @@ class TheTVDB
 	{
 		$db = new DB();
 
-		$db->queryExec(sprintf("DELETE FROM thetvdb WHERE tvdbID = %d", $tvdbID));
+		$db->queryExec(sprintf("DELETE FROM thetvdb WHERE tvdbid = %d", $tvdbID));
 	}
 
 	public function addEmptySeries($seriesname)
 	{
 		$db = new DB();
 
-		$db->queryInsert(sprintf("INSERT INTO thetvdb (tvdbID, seriesname, createddate) VALUES (0, %s, now())", $db->escapeString($seriesname)));
+		$db->queryInsert(sprintf("INSERT INTO thetvdb (tvdbid, seriesname, createddate) VALUES (0, %s, now())", $db->escapeString($seriesname)));
 	}
 
 	public function getSeriesInfoByID($tvdbID)
 	{
 		$db = new DB();
-		return $db->queryOneRow(sprintf("SELECT * FROM thetvdb WHERE tvdbID = %d", $tvdbID));
+		return $db->queryOneRow(sprintf("SELECT * FROM thetvdb WHERE tvdbid = %d", $tvdbID));
 	}
 
 	public function getSeriesInfoByName($seriesname)
@@ -136,7 +136,7 @@ class TheTVDB
 		if ($seriesname != '')
 			$rsql .= sprintf("AND thetvdb.seriesname LIKE %s ", $db->escapeString("%".$seriesname."%"));
 
-		return $db->query(sprintf(" SELECT ID, tvdbID, seriesname, overview FROM thetvdb WHERE 1=1 %s AND tvdbID > %d ORDER BY tvdbID ASC".$limit, $rsql, 0));
+		return $db->query(sprintf(" SELECT id, tvdbid, seriesname, overview FROM thetvdb WHERE 1=1 %s AND tvdbid > %d ORDER BY tvdbid ASC".$limit, $rsql, 0));
 	}
 
 	public function getSeriesCount($seriesname='')
@@ -147,7 +147,7 @@ class TheTVDB
 		if ($seriesname != '')
 			$rsql .= sprintf("AND thetvdb.seriesname LIKE %s ", $db->escapeString("%".$seriesname."%"));
 
-		$res = $db->queryOneRow(sprintf("SELECT count(ID) AS num FROM thetvdb WHERE 1=1 %s ", $rsql));
+		$res = $db->queryOneRow(sprintf("SELECT count(id) AS num FROM thetvdb WHERE 1=1 %s ", $rsql));
 
 		return $res["num"];
 	}
@@ -180,14 +180,14 @@ class TheTVDB
 			echo 'TheTVDB : '.$seriesName.' '.$fullep." Not found\n";
 
 		$db = new DB();
-		$db->queryExec(sprintf('UPDATE releases SET episodeinfoID = -2 WHERE ID = %d', $releaseID));
+		$db->queryExec(sprintf('UPDATE releases SET episodeinfoid = -2 WHERE id = %d', $releaseID));
 	}
 
 	public function processReleases()
 	{
 		$db = new DB();
 
-		$results = $db->queryDirect(sprintf("SELECT ID, searchname, rageID, anidbid, seriesfull, season, episode, tvtitle FROM releases WHERE episodeinfoID IS NULL AND categoryID IN ( SELECT ID FROM category WHERE parentID = %d ) LIMIT 150", Category::CAT_PARENT_TV));
+		$results = $db->queryDirect(sprintf("SELECT id, searchname, rageid, anidbid, seriesfull, season, episode, tvtitle FROM releases WHERE episodeinfoid IS NULL AND categoryid IN ( SELECT id FROM category WHERE parentID = %d ) LIMIT 150", Category::CAT_PARENT_TV));
 
 		if ($db->getNumRows($results) > 0)
 		{
@@ -199,8 +199,8 @@ class TheTVDB
 				unset($TheTVDBAPIArray, $episodeArray, $fullep, $epabsolute, $additionalSql);
 
 				$seriesName = '';
-				if($arr['rageID'] > 0) {
-					$seriesName = $db->queryOneRow(sprintf('SELECT releasetitle AS seriesName FROM tvrage WHERE rageID = %d', $arr['rageID']));
+				if($arr['rageid'] > 0) {
+					$seriesName = $db->queryOneRow(sprintf('SELECT releasetitle AS seriesName FROM tvrage WHERE rageid = %d', $arr['rageid']));
 				}
 				elseif($arr['anidbid'] > 0) {
 					$seriesName = $db->queryOneRow(sprintf('SELECT title AS seriesName FROM anidb WHERE anidbid = %d', $arr['anidbid']));
@@ -208,7 +208,7 @@ class TheTVDB
 
 				if(empty($seriesName) || !$seriesName)
 				{
-					$this->notFound($seriesName, "", $arr['ID'], false);
+					$this->notFound($seriesName, "", $arr['id'], false);
 					continue;
 				}
 
@@ -233,30 +233,30 @@ class TheTVDB
 						else
 						{
 							$this->addEmptySeries($seriesName);
-							$this->notFound($seriesName, $fullep, $arr['ID']);
+							$this->notFound($seriesName, $fullep, $arr['id']);
 							continue;
 						}
 					}
 					else
 					{
 						$this->addEmptySeries($seriesName);
-						$this->notFound($seriesName, $fullep, $arr['ID']);
+						$this->notFound($seriesName, $fullep, $arr['id']);
 						continue;
 					}
 				}
-				else if($TheTVDBAPIArray['tvdbID'] > 0 && ((time() - strtotime($TheTVDBAPIArray['createddate'])) > 604800))
+				else if($TheTVDBAPIArray['tvdbid'] > 0 && ((time() - strtotime($TheTVDBAPIArray['createddate'])) > 604800))
 				{
-					$TheTVDBAPIArray = $this->TheTVDBAPI($TheTVDBAPIArray['tvdbID'], $seriesName);
+					$TheTVDBAPIArray = $this->TheTVDBAPI($TheTVDBAPIArray['tvdbid'], $seriesName);
 
-					$this->updateSeries($TheTVDBAPIArray['tvdbID'], $TheTVDBAPIArray['actors'], $TheTVDBAPIArray['airsday'],
+					$this->updateSeries($TheTVDBAPIArray['tvdbid'], $TheTVDBAPIArray['actors'], $TheTVDBAPIArray['airsday'],
 						$TheTVDBAPIArray['airstime'], $TheTVDBAPIArray['contentrating'], $TheTVDBAPIArray['firstaired'], $TheTVDBAPIArray['genre'],
-						$TheTVDBAPIArray['imdbID'], $TheTVDBAPIArray['network'], $TheTVDBAPIArray['overview'], $TheTVDBAPIArray['rating'],
+						$TheTVDBAPIArray['imdbid'], $TheTVDBAPIArray['network'], $TheTVDBAPIArray['overview'], $TheTVDBAPIArray['rating'],
 						$TheTVDBAPIArray['ratingcount'], $TheTVDBAPIArray['runtime'], $TheTVDBAPIArray['seriesname'], $TheTVDBAPIArray['status']);
 
 					$this->addEpisodes($TheTVDBAPIArray);
 				}
 
-				if($TheTVDBAPIArray['tvdbID'] > 0)
+				if($TheTVDBAPIArray['tvdbid'] > 0)
 				{
 					$epabsolute = '0';
 					if($arr['anidbid'] > 0)
@@ -274,13 +274,13 @@ class TheTVDB
 					$episodeArray = $Episode->getEpisodeInfoByName($seriesName, $fullep, (string) $epabsolute);
 					if(!$episodeArray)
 					{
-						$this->notFound($seriesName, $fullep, $arr['ID']);
+						$this->notFound($seriesName, $fullep, $arr['id']);
 						continue;
 					}
 				}
 				else
 				{
-					$this->notFound($seriesName, $fullep, $arr['ID']);
+					$this->notFound($seriesName, $fullep, $arr['id']);
 					continue;
 				}
 
@@ -293,12 +293,12 @@ class TheTVDB
 						$db->escapeString($episodeArray['airdate']));
 				}
 
-				$db->queryExec(sprintf('UPDATE releases SET tvdbID = %d, episodeinfoID = %d %s WHERE ID = %d',
-						$TheTVDBAPIArray['tvdbID'], $episodeArray['ID'], $additionalSql, $arr['ID']));
+				$db->queryExec(sprintf('UPDATE releases SET tvdbid = %d, episodeinfoid = %d %s WHERE id = %d',
+						$TheTVDBAPIArray['tvdbid'], $episodeArray['id'], $additionalSql, $arr['id']));
 
 				if($this->echooutput)
 				{
-					echo 'TheTVDB : '.$seriesName.' '.$fullep." returned ".$episodeArray['tvdbID']."\n";
+					echo 'TheTVDB : '.$seriesName.' '.$fullep." returned ".$episodeArray['tvdbid']."\n";
 				}
 			}
 		}
@@ -331,14 +331,14 @@ class TheTVDB
 		}
 
 		$TheTVDBAPIArray = array(
-			'tvdbID' => $seriesid,
+			'tvdbid' => $seriesid,
 			'actors' => preg_replace('/^\||\|$/', '', (string) $TheTVDBAPIXML->Series->Actors),
 			'airsday' => preg_replace('/^\||\|$/', '', (string) $TheTVDBAPIXML->Series->Airs_DayOfWeek),
 			'airstime' => preg_replace('/^\||\|$/', '', (string) $TheTVDBAPIXML->Series->Airs_Time),
 			'contentrating' => (string) $TheTVDBAPIXML->Series->ContentRating,
 			'firstaired' => (string) $TheTVDBAPIXML->Series->FirstAired,
 			'genre' => preg_replace('/^\||\|$/', '', (string) $TheTVDBAPIXML->Series->Genre),
-			'imdbID' => (int) preg_replace('/^[^\d]+/', '', (string) $TheTVDBAPIXML->Series->IMDB_ID),
+			'imdbid' => (int) preg_replace('/^[^\d]+/', '', (string) $TheTVDBAPIXML->Series->IMDB_ID),
 			'network' => (string) $TheTVDBAPIXML->Series->Network,
 			'overview' => (string) $TheTVDBAPIXML->Series->Overview,
 			'rating' => (float) $TheTVDBAPIXML->Series->Rating,

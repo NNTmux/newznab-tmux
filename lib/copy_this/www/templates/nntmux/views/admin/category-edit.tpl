@@ -1,4 +1,4 @@
- 
+
 <h1>{$page->title}</h1>
 
 {if $error != ''}
@@ -12,7 +12,7 @@
 <tr>
 	<td>Title:</td>
 	<td>
-		<input type="hidden" name="id" value="{$category.ID}" />
+		<input type="hidden" name="id" value="{$category.id}" />
 		{$category.title}
 	</td>
 </tr>

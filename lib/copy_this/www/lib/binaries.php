@@ -299,7 +299,7 @@ class Binaries
 					SET first_record_postdate = %s
 					WHERE id = %d',
 					$this->_pdo->from_unixtime($groupMySQL['first_record_postdate']),
-					$groupMySQL['ID']
+					$groupMySQL['id']
 				)
 			);
 		}
@@ -429,7 +429,7 @@ class Binaries
 								WHERE id = %d',
 								$scanSummary['firstArticleNumber'],
 								$this->_pdo->from_unixtime($this->_pdo->escapeString($groupMySQL['first_record_postdate'])),
-								$groupMySQL['ID']
+								$groupMySQL['id']
 							)
 						);
 					}
@@ -447,7 +447,7 @@ class Binaries
 							WHERE id = %d',
 							$this->_pdo->escapeString($scanSummary['lastArticleNumber']),
 							$this->_pdo->from_unixtime($scanSummary['lastArticleDate']),
-							$groupMySQL['ID']
+							$groupMySQL['id']
 						)
 					);
 				} else {
@@ -458,7 +458,7 @@ class Binaries
 							SET last_record = %s, last_updated = NOW()
 							WHERE id = %d',
 							$this->_pdo->escapeString($last),
-							$groupMySQL['ID']
+							$groupMySQL['id']
 						)
 					);
 				}
@@ -507,7 +507,7 @@ class Binaries
 		$startLoop = microtime(true);
 
 		// Check if MySQL tables exist, create if they do not, get their names at the same time.
-		$tableNames = $this->_groups->getCBPTableNames($this->_tablePerGroup, $groupMySQL['ID']);
+		$tableNames = $this->_groups->getCBPTableNames($this->_tablePerGroup, $groupMySQL['id']);
 
 		$returnArray = [];
 
@@ -530,7 +530,7 @@ class Binaries
 				$this->_pdo->queryExec(
 					sprintf(
 						'UPDATE partrepair SET attempts = attempts + 1 WHERE group_id = %d AND numberid %s',
-						$groupMySQL['ID'],
+						$groupMySQL['id'],
 						($first == $last ? '= ' . $first : 'IN (' . implode(',', range($first, $last)) . ')')
 					)
 				);
@@ -691,7 +691,7 @@ class Binaries
 				$header['CollectionKey'] = (
 					$this->_collectionsCleaning->collectionsCleaner($matches[1], $groupMySQL['name']) .
 					$header['From'] .
-					$groupMySQL['ID'] .
+					$groupMySQL['id'] .
 					$fileCount[3]
 				);
 
@@ -717,7 +717,7 @@ class Binaries
 							$this->_pdo->escapeString(utf8_encode($header['From'])),
 							(is_numeric($header['Date']) ? ($header['Date'] > $now ? $now : $header['Date']) : $now),
 							$this->_pdo->escapeString(substr($header['Xref'], 0, 255)),
-							$groupMySQL['ID'],
+							$groupMySQL['id'],
 							$fileCount[3],
 							sha1($header['CollectionKey']),
 							bin2hex(openssl_random_pseudo_bytes(16))
@@ -743,7 +743,7 @@ class Binaries
 						VALUES ('%s', %s, %d, %d, 1, %d, %d)
 						ON DUPLICATE KEY UPDATE currentparts = currentparts + 1, partsize = partsize + %d",
 						$tableNames['bname'],
-						md5($matches[1] . $header['From'] . $groupMySQL['ID']),
+						md5($matches[1] . $header['From'] . $groupMySQL['id']),
 						$this->_pdo->escapeString(utf8_encode($matches[1])),
 						$collectionID,
 						$matches[3],
@@ -776,10 +776,10 @@ class Binaries
 			}
 
 			// Strip the < and >, saves space in DB.
-			$header['Message-ID'][0] = "'";
+			$header['Message-id'][0] = "'";
 
 			$partsQuery .=
-				'(' . $binaryID . ',' . $header['Number'] . ',' . rtrim($header['Message-ID'], '>') . "'," .
+				'(' . $binaryID . ',' . $header['Number'] . ',' . rtrim($header['Message-id'], '>') . "'," .
 				$matches[2] . ',' . $header['Bytes'] . ',' . $collectionID . '),';
 
 		}
@@ -840,14 +840,14 @@ class Binaries
 		$timeInsert = number_format($startPR - $startUpdate, 2);
 
 		if ($partRepair && count($headersRepaired) > 0) {
-			$this->removeRepairedParts($headersRepaired, $tableNames['prname'], $groupMySQL['ID']);
+			$this->removeRepairedParts($headersRepaired, $tableNames['prname'], $groupMySQL['id']);
 		}
 
 		if ($addToPartRepair) {
 
 			$notInsertedCount = count($headersNotInserted);
 			if ($notInsertedCount > 0) {
-				$this->addMissingParts($headersNotInserted, $tableNames['prname'], $groupMySQL['ID']);
+				$this->addMissingParts($headersNotInserted, $tableNames['prname'], $groupMySQL['id']);
 
 				$this->log(
 					$notInsertedCount . ' articles failed to insert!',
@@ -864,7 +864,7 @@ class Binaries
 			$notReceivedCount = count($rangeNotReceived);
 
 			if ($notReceivedCount > 0) {
-				$this->addMissingParts($rangeNotReceived, $tableNames['prname'], $groupMySQL['ID']);
+				$this->addMissingParts($rangeNotReceived, $tableNames['prname'], $groupMySQL['id']);
 
 				if ($this->_echoCLI) {
 					$this->_colorCLI->doEcho(
@@ -925,7 +925,7 @@ class Binaries
 	 */
 	public function partRepair($groupArr)
 	{
-		$tableNames = $this->_groups->getCBPTableNames($this->_tablePerGroup, $groupArr['ID']);
+		$tableNames = $this->_groups->getCBPTableNames($this->_tablePerGroup, $groupArr['id']);
 		// Get all parts in partrepair table.
 		$missingParts = $this->_pdo->query(
 			sprintf('
@@ -933,7 +933,7 @@ class Binaries
 				WHERE group_id = %d AND attempts < %d
 				ORDER BY numberid ASC LIMIT %d',
 				$tableNames['prname'],
-				$groupArr['ID'],
+				$groupArr['id'],
 				$this->_partRepairMaxTries,
 				$this->_partRepairLimit
 			)
@@ -1000,7 +1000,7 @@ class Binaries
 					WHERE group_id = %d
 					AND numberid <= %d',
 					$tableNames['prname'],
-					$groupArr['ID'],
+					$groupArr['id'],
 					$missingParts[$missingCount - 1]['numberid']
 				)
 			);
@@ -1019,7 +1019,7 @@ class Binaries
 						WHERE group_id = %d
 						AND numberid <= %d',
 						$tableNames['prname'],
-						$groupArr['ID'],
+						$groupArr['id'],
 						$missingParts[$missingCount - 1]['numberid']
 					)
 				);
@@ -1042,7 +1042,7 @@ class Binaries
 				'DELETE FROM %s WHERE attempts >= %d AND group_id = %d',
 				$tableNames['prname'],
 				$this->_partRepairMaxTries,
-				$groupArr['ID']
+				$groupArr['id']
 			)
 		);
 	}
@@ -1262,7 +1262,7 @@ class Binaries
 	 *
 	 * @param array  $numbers   The article numbers of the missing headers.
 	 * @param string $tableName Name of the partrepair table to insert into.
-	 * @param int    $groupID   The ID of this groups.
+	 * @param int    $groupID   The id of this groups.
 	 *
 	 * @return bool
 	 */
@@ -1280,7 +1280,7 @@ class Binaries
 	 *
 	 * @param array  $numbers   The article numbers.
 	 * @param string $tableName Name of the part repair table to work on.
-	 * @param int    $groupID   The ID of the group.
+	 * @param int    $groupID   The id of the group.
 	 *
 	 * @return void
 	 */
@@ -1339,7 +1339,7 @@ class Binaries
 		$field = [
 			self::BLACKLIST_FIELD_SUBJECT   => $msg['Subject'],
 			self::BLACKLIST_FIELD_FROM      => $msg['From'],
-			self::BLACKLIST_FIELD_MESSAGEID => $msg['Message-ID']
+			self::BLACKLIST_FIELD_MESSAGEID => $msg['Message-id']
 		];
 
 		// Try white lists first.
@@ -1411,7 +1411,7 @@ class Binaries
 	/**
 	 * Return the specified blacklist.
 	 *
-	 * @param int $id The blacklist ID.
+	 * @param int $id The blacklist id.
 	 *
 	 * @return array|bool
 	 */
@@ -1423,7 +1423,7 @@ class Binaries
 	/**
 	 * Delete a blacklist.
 	 *
-	 * @param int $id The ID of the blacklist.
+	 * @param int $id The id of the blacklist.
 	 *
 	 * @return bool
 	 */
@@ -1486,9 +1486,9 @@ class Binaries
 	}
 
 	/**
-	 * Delete Collections/Binaries/Parts for a Collection ID.
+	 * Delete Collections/Binaries/Parts for a Collection id.
 	 *
-	 * @param int $collectionID Collections table ID
+	 * @param int $collectionID Collections table id
 	 *
 	 * @note A trigger automatically deletes the parts/binaries.
 	 *
@@ -1500,9 +1500,9 @@ class Binaries
 	}
 
 	/**
-	 * Delete all Collections/Binaries/Parts for a group ID.
+	 * Delete all Collections/Binaries/Parts for a group id.
 	 *
-	 * @param int $groupID The ID of the group.
+	 * @param int $groupID The id of the group.
 	 *
 	 * @note A trigger automatically deletes the parts/binaries.
 	 *

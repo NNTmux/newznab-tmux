@@ -248,7 +248,7 @@ class TmuxOutput extends Tmux
 							)
 		);
 		$buffer .= sprintf($this->tmpMasks[4],
-						   "requestID",
+						   "requestid",
 						   sprintf(
 							   "%s(%s)",
 							   number_format($this->runVar['counts']['now']['requestid_inprogress']),

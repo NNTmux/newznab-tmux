@@ -7,7 +7,7 @@
 		<div class="btn-group">
 			<a class="btn btn-small" href="{$smarty.const.WWW_TOP}/series" title="View available TV series">Series List</a> |
 			<a class="btn btn-small" title="Manage your shows" href="{$smarty.const.WWW_TOP}/myshows">Manage My Shows</a> |
-			<a class="btn btn-small" title="All releases in your shows as an RSS feed" href="{$smarty.const.WWW_TOP}/rss?t=-3&amp;dl=1&amp;i={$userdata.ID}&amp;r={$userdata.rsstoken}">Rss <i class="fa-icon-rss"></i></a>
+			<a class="btn btn-small" title="All releases in your shows as an RSS feed" href="{$smarty.const.WWW_TOP}/rss?t=-3&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">Rss <i class="fa-icon-rss"></i></a>
 		</div>
 	</center>
 	<br/>
@@ -113,16 +113,16 @@
 									{if $result.nfoID > 0}<a href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}"
 															 title="View Nfo" class="modal_nfo rndbtn" rel="nfo">
 											Nfo</a>{/if}
-								{if $result.imdbID > 0}
-									<a href="#" name="name{$result.imdbID}" title="View movie info" class="modal_imdb rndbtn" rel="movie" >Cover</a>
+								{if $result.imdbid > 0}
+									<a href="#" name="name{$result.imdbid}" title="View movie info" class="modal_imdb rndbtn" rel="movie" >Cover</a>
 								{/if}
-									{if $result.preID > 0 && $userdata.canpre == 1}<span class="preinfo rndbtn"
+									{if $result.preid > 0 && $userdata.canpre == 1}<span class="preinfo rndbtn"
 																						 title="{$result.searchname}">
 										PreDB</span>{/if}
-									{if $result.prehashID > 0}<span class="prehashinfo rndbtn"
-																	title="{$result.prehashID}">Prehash</span>{/if}
+									{if $result.prehashid > 0}<span class="prehashinfo rndbtn"
+																	title="{$result.prehashid}">Prehash</span>{/if}
 									{if $result.movieinfoID > 0}<a
-										href="{$smarty.const.WWW_TOP}/movies?imdb={$result.imdbID}"
+										href="{$smarty.const.WWW_TOP}/movies?imdb={$result.imdbid}"
 										title="View movie info" class="rndbtn" rel="movie" >Movie</a>{/if}
 									{if $result.haspreview == 1 && $userdata.canpreview == 1}<a
 										href="{$smarty.const.WWW_TOP}/covers/preview/{$result.guid}_thumb.jpg"
@@ -148,18 +148,18 @@
 												type="audio/mpeg">
 										<source src="{$smarty.const.WWW_TOP}/covers/audio/{$result.guid}.ogg"
 												type="audio/ogg"></audio>{/if}
-									{if $result.musicinfoID > 0}<a href="#" name="name{$result.musicinfoID}"
+									{if $result.musicinfoid > 0}<a href="#" name="name{$result.musicinfoid}"
 																   title="View music info" class="modal_music rndbtn"
 																   rel="music" >Cover</a>{/if}
-									{if $result.consoleinfoID > 0}<a href="#" name="name{$result.consoleinfoID}"
+									{if $result.consoleinfoid > 0}<a href="#" name="name{$result.consoleinfoid}"
 																	 title="View console info"
 																	 class="modal_console rndbtn" rel="console" >
 											Cover</a>{/if}
-									{if $result.bookinfoID > 0}<a href="#" name="name{$result.bookinfoID}"
+									{if $result.bookinfoid > 0}<a href="#" name="name{$result.bookinfoid}"
 																  title="View book info" class="modal_book rndbtn"
 																  rel="console" >Cover</a>{/if}
-									{if $result.rageID > 0}<a class="rndbtn"
-															  href="{$smarty.const.WWW_TOP}/series/{$result.rageID}"
+									{if $result.rageid > 0}<a class="rndbtn"
+															  href="{$smarty.const.WWW_TOP}/series/{$result.rageid}"
 															  title="View all episodes">View Series</a>{/if}
 									{if $result.anidbid > 0}<a class="rndbtn"
 															   href="{$smarty.const.WWW_TOP}/anime/{$result.anidbid}"
@@ -175,7 +175,7 @@
 						</div>
 					</td>
 					<td class="less"><a title="Browse {$result.category_name}"
-										href="{$smarty.const.WWW_TOP}/browse?t={$result.categoryID}">{$result.category_name}</a>
+										href="{$smarty.const.WWW_TOP}/browse?t={$result.categoryid}">{$result.category_name}</a>
 					</td>
 					<td class="less mid" title="{$result.postdate}">{$result.postdate|timeago}</td>
 					<td class="less right">{$result.size|fsize_format:"MB"}{if $result.completion > 0}

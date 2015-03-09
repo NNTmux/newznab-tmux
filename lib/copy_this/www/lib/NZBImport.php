@@ -284,14 +284,14 @@ class NZBImport
 			}
 
 			// Make a fake message array to use to check the blacklist.
-			$msg = array("Subject" => (string) $file->attributes()->subject, "From" => (string) $file->attributes()->poster, "Message-ID" => "");
+			$msg = array("Subject" => (string) $file->attributes()->subject, "From" => (string) $file->attributes()->poster, "Message-id" => "");
 
-			// Get the group names, groupID, check if it's blacklisted.
+			// Get the group names, groupid, check if it's blacklisted.
 			$groupArr = array();
 			foreach ($file->groups->group as $group) {
 				$group = (string) $group;
 
-				// If groupID is -1 try to get a groupID.
+				// If groupid is -1 try to get a groupid.
 				if ($groupID === -1) {
 					if (array_key_exists($group, $this->allGroups)) {
 						$groupID = $this->allGroups[$group];
@@ -339,7 +339,7 @@ class NZBImport
 				'useFName'   => $useNzbName,
 				'postDate'   => (empty($postDate) ? date("Y-m-d H:i:s") : $postDate),
 				'from'       => (empty($posterName) ? '' : $posterName),
-				'groupID'    => $groupID,
+				'groupid'    => $groupID,
 				'groupName'  => $groupName,
 				'totalFiles' => $totalFiles,
 				'totalSize'  => $totalSize
@@ -386,7 +386,7 @@ class NZBImport
 		// Look for a duplicate on name, poster and size.
 		$dupeCheck = $this->pdo->queryOneRow(
 			sprintf(
-				'SELECT ID FROM releases WHERE name = %s AND fromname = %s AND size BETWEEN %s AND %s',
+				'SELECT id FROM releases WHERE name = %s AND fromname = %s AND size BETWEEN %s AND %s',
 				$escapedSubject,
 				$escapedFromName,
 				$this->pdo->escapeString($nzbDetails['totalSize'] * 0.99),
@@ -402,18 +402,18 @@ class NZBImport
 					'name' => $escapedSubject,
 					'searchname' => $escapedSearchName,
 					'totalpart' => $nzbDetails['totalFiles'],
-					'groupID' => $nzbDetails['groupID'],
+					'groupid' => $nzbDetails['groupid'],
 					'guid' => $this->pdo->escapeString($this->relGuid),
-					'regexID' => NULL,
+					'regexid' => NULL,
 					'postdate' => $this->pdo->escapeString($nzbDetails['postDate']),
 					'fromname' => $escapedFromName,
-					'reqID' => NULL,
+					'reqid' => NULL,
 					'passwordstatus' => ($this->site->checkpasswordedrar > 0 ? -1 : 0),
 					'size' => $this->pdo->escapeString($nzbDetails['totalSize']),
-					'categoryID' => $this->category->determineCategory($nzbDetails['groupID'], $cleanName),
+					'categoryid' => $this->category->determineCategory($nzbDetails['groupid'], $cleanName),
 					'isrenamed' => $renamed,
 					'reqidstatus' => 0,
-					'prehashID' => 0,
+					'prehashid' => 0,
 					'nzbstatus' => \NZB::NZB_ADDED
 				]
 			);
@@ -437,9 +437,9 @@ class NZBImport
 	protected function getAllGroups()
 	{
 		$this->allGroups = [];
-		$groups = $this->pdo->query("SELECT ID, name FROM groups");
+		$groups = $this->pdo->query("SELECT id, name FROM groups");
 		foreach ($groups as $group) {
-			$this->allGroups[$group["name"]] = $group["ID"];
+			$this->allGroups[$group["name"]] = $group["id"];
 		}
 
 		if (count($this->allGroups) === 0) {

@@ -47,7 +47,7 @@ switch($action)
 		{
 			$site = $ret;
 			$returnid = $site->id;
-			header("Location:".WWW_TOP."/site-edit.php?ID=".$returnid);
+			header("Location:".WWW_TOP."/site-edit.php?id=".$returnid);
 		}
 		else
 		{
@@ -122,14 +122,14 @@ $page->smarty->assign('lookup_reqids_ids', array(0,1,2));
 $page->smarty->assign('lookup_reqids_names', array('Disabled', 'Lookup Request IDs', 'Lookup Request IDs Threaded'));
 
 // return a list of audiobooks, ebooks, technical and foreign books
-$result = $page->settings->query("SELECT ID, title FROM category WHERE ID in (3030, 7010, 7040, 7060)");
+$result = $page->settings->query("SELECT id, title FROM category WHERE id in (3030, 7010, 7040, 7060)");
 
 // setup the display lists for these categories, this could have been static, but then if names changed they would be wrong
 $book_reqids_ids = array();
 $book_reqids_names = array();
 foreach ($result as $bookcategory)
 {
-	$book_reqids_ids[]   = $bookcategory["ID"];
+	$book_reqids_ids[]   = $bookcategory["id"];
 	$book_reqids_names[] = $bookcategory["title"];
 }
 

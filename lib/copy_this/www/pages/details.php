@@ -32,18 +32,18 @@ if (isset($_GET["id"]))
 	if ($page->isPostBack())
 		$rc->addComment($data["id"], $data["gid"], $_POST["txtAddComment"], $users->currentUserId(), $_SERVER['REMOTE_ADDR']);
 
-	$nfo = $releases->getReleaseNfo($data["ID"], false);
-	$reVideo = $re->getVideo($data["ID"]);
-	$reAudio = $re->getAudio($data["ID"]);
-	$reSubs = $re->getSubs($data["ID"]);
+	$nfo = $releases->getReleaseNfo($data["id"], false);
+	$reVideo = $re->getVideo($data["id"]);
+	$reAudio = $re->getAudio($data["id"]);
+	$reSubs = $re->getSubs($data["id"]);
 	$comments = $rc->getCommentsByGid($data["gid"]);
 
 	$rage = '';
-	if ($data["rageID"] != '')
+	if ($data["rageid"] != '')
 	{
 		$tvrage = new TvAnger();
 
-		$rageinfo = $tvrage->getByRageID($data["rageID"]);
+		$rageinfo = $tvrage->getByRageID($data["rageid"]);
 		if (count($rageinfo) > 0)
 		{
 			$seriesnames = $seriesdescription = $seriescountry = $seriesgenre = $seriesimg = $seriesid = array();
@@ -61,7 +61,7 @@ if (isset($_GET["id"]))
 
 				if (!empty($r['imgdata'])) {
 					$seriesimg[] = $r['imgdata'];
-					$seriesid[] = $r['ID'];
+					$seriesid[] = $r['id'];
 				}
 			}
 			$rage = array(
@@ -70,25 +70,25 @@ if (isset($_GET["id"]))
 				'country'      => array_shift($seriescountry),
 				'genre'        => array_shift($seriesgenre),
 				'imgdata'      => array_shift($seriesimg),
-				'ID'=>array_shift($seriesid)
+				'id'=>array_shift($seriesid)
 			);
 		}
 	}
 
 	$episodeArray = '';
-	if ($data['episodeinfoID'] > 0)
+	if ($data['episodeinfoid'] > 0)
 	{
 		$episode = new Episode();
-		$episodeArray = $episode->getEpisodeInfoByID($data['episodeinfoID']);
+		$episodeArray = $episode->getEpisodeInfoByID($data['episodeinfoid']);
 	}
 
 	$mov = '';
-	if ($data['imdbID'] != '' && $data['imdbID'] != 0000000) {
+	if ($data['imdbid'] != '' && $data['imdbid'] != 0000000) {
 		$movie = new Film();
-		$mov = $movie->getMovieInfo($data['imdbID']);
+		$mov = $movie->getMovieInfo($data['imdbid']);
 
 		$trakt = new TraktTv();
-		$traktSummary = $trakt->traktMoviesummary('tt' . $data['imdbID'], true);
+		$traktSummary = $trakt->traktMoviesummary('tt' . $data['imdbid'], true);
 		if ($traktSummary !== false &&
 			isset($traktSummary['trailer']) &&
 			$traktSummary['trailer'] !== '' &&
@@ -99,7 +99,7 @@ if (isset($_GET["id"]))
 				'https://www.youtube.com/v/' . $youtubeM[1] .
 				'" type="application/x-shockwave-flash"></embed>';
 		} else {
-			$mov['trailer'] = imdb_trailers($data['imdbID']);
+			$mov['trailer'] = imdb_trailers($data['imdbid']);
 		}
 
 		if ($mov && isset($mov['title'])) {
@@ -140,45 +140,45 @@ if (isset($_GET["id"]))
 	}
 
 	$mus = '';
-	if ($data['musicinfoID'] != '') {
+	if ($data['musicinfoid'] != '') {
 		require_once(WWW_DIR."/lib/music.php");
 		$music = new Musik(['Settings' => $page->settings]);
-		$mus = $music->getMusicInfo($data['musicinfoID']);
+		$mus = $music->getMusicInfo($data['musicinfoid']);
 	}
 
 	$book = '';
-	if ($data['bookinfoID'] != '') {
+	if ($data['bookinfoid'] != '') {
 		require_once(WWW_DIR."/lib/book.php");
 		$b = new Book();
-		$book = $b->getBookInfo($data['bookinfoID']);
+		$book = $b->getBookInfo($data['bookinfoid']);
 	}
 
 	$con = '';
-	if ($data['consoleinfoID'] != '') {
+	if ($data['consoleinfoid'] != '') {
 		require_once(WWW_DIR."/lib/console.php");
 		$c = new Console();
-		$con = $c->getConsoleInfo($data['consoleinfoID']);
+		$con = $c->getConsoleInfo($data['consoleinfoid']);
 	}
 
 	$AniDBAPIArray = '';
-	if ($data["anidbID"] > 0)
+	if ($data["anidbid"] > 0)
 	{
 		$AniDB = new AniDB(['Settings' => $releases->pdo]);
-		$AniDBAPIArray = $AniDB->getAnimeInfo($data["anidbID"]);
+		$AniDBAPIArray = $AniDB->getAnimeInfo($data["anidbid"]);
 	}
 
 	$predbQuery = '';
-	if ($data["preID"] > 0)
+	if ($data["preid"] > 0)
 	{
 		$PreDB = new PreDB();
-		$predbQuery = $PreDB->getByID($data["preID"]);
+		$predbQuery = $PreDB->getByID($data["preid"]);
 	}
 
 	$prehash = new PreHash();
-	$pre = $prehash->getForRelease($data["prehashID"]);
+	$pre = $prehash->getForRelease($data["prehashid"]);
 
 	$rf = new ReleaseFiles;
-	$releasefiles = $rf->get($data["ID"]);
+	$releasefiles = $rf->get($data["id"]);
 
 	$page->smarty->assign('releasefiles',$releasefiles);
 	$page->smarty->assign('release',$data);

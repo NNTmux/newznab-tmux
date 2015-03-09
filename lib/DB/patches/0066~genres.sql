@@ -1,13 +1,13 @@
 DROP TABLE IF EXISTS `genres`;
 CREATE TABLE IF NOT EXISTS `genres` (
-  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `type` int(4) DEFAULT NULL,
   `disabled` tinyint(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`ID`)
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC AUTO_INCREMENT=635;
 
-INSERT IGNORE INTO `genres` (`ID`, `title`, `type`, `disabled`) VALUES
+INSERT IGNORE INTO `genres` (`id`, `title`, `type`, `disabled`) VALUES
 (150, 'Blues', 3000, 0),
 (151, 'Classic Rock', 3000, 0),
 (152, 'Country', 3000, 0),

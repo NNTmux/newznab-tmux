@@ -29,12 +29,12 @@ class Book
 	}
 
 	/**
-	 * Get bookinfo row for ID.
+	 * Get bookinfo row for id.
 	 */
 	public function getBookInfo($id)
 	{
 		$db = new DB();
-		return $db->queryOneRow(sprintf("SELECT bookinfo.*, genres.title as genres FROM bookinfo left outer join genres on genres.ID = bookinfo.genreID where bookinfo.ID = %d ", $id));
+		return $db->queryOneRow(sprintf("SELECT bookinfo.*, genres.title as genres FROM bookinfo left outer join genres on genres.id = bookinfo.genreID where bookinfo.id = %d ", $id));
 	}
 
 	/**
@@ -67,7 +67,7 @@ class Book
 	public function getCount()
 	{
 		$db = new DB();
-		$res = $db->queryOneRow("select count(ID) as num from bookinfo");
+		$res = $db->queryOneRow("select count(id) as num from bookinfo");
 		return $res["num"];
 	}
 
@@ -85,7 +85,7 @@ class Book
 		else
 			$maxage = "";
 
-		$sql = sprintf("select count(distinct r.bookinfoID) as num from releases r inner join bookinfo b on b.ID = r.bookinfoID and b.title != '' where r.passwordstatus <= (select value from site where setting='showpasswordedrelease') %s %s", $browseby, $maxage);
+		$sql = sprintf("select count(distinct r.bookinfoid) as num from releases r inner join bookinfo b on b.id = r.bookinfoid and b.title != '' where r.passwordstatus <= (select value from site where setting='showpasswordedrelease') %s %s", $browseby, $maxage);
 
 		$res = $db->queryOneRow($sql, true);
 		return $res["num"];
@@ -110,7 +110,7 @@ class Book
 			$maxagesql = sprintf(" and r.postdate > now() - interval %d day ", $maxage);
 
 		$order = $this->getBrowseOrder($orderby);
-		$sql = sprintf(" SELECT r.bookinfoID, max(postdate), b.* from releases r inner join bookinfo b on b.ID = r.bookinfoID and b.title != '' where r.passwordstatus <= (select value from site where setting='showpasswordedrelease') %s %s group by r.bookinfoID order by %s %s".$limit, $browseby, $maxagesql, $order[0], $order[1]);
+		$sql = sprintf(" SELECT r.bookinfoid, max(postdate), b.* from releases r inner join bookinfo b on b.id = r.bookinfoid and b.title != '' where r.passwordstatus <= (select value from site where setting='showpasswordedrelease') %s %s group by r.bookinfoid order by %s %s".$limit, $browseby, $maxagesql, $order[0], $order[1]);
 		$rows = $db->query($sql, true);
 
 		//
@@ -118,7 +118,7 @@ class Book
 		//
 		$ids = "";
 		foreach ($rows as $row)
-			$ids .= $row["bookinfoID"]. ", ";
+			$ids .= $row["bookinfoid"]. ", ";
 
 		if (strlen($ids) > 0)
 		{
@@ -127,7 +127,7 @@ class Book
 			//
 			// get all releases matching these ids
 			//
-			$sql = sprintf("select r.*, releasenfo.ID as nfoID, groups.name as grpname from releases r left outer join releasenfo on releasenfo.releaseID = r.ID left outer join groups on groups.ID = r.groupID where bookinfoID in (%s) %s order by r.postdate desc", $ids, $maxagesql);
+			$sql = sprintf("select r.*, releasenfo.id as nfoID, groups.name as grpname from releases r left outer join releasenfo on releasenfo.releaseid = r.id left outer join groups on groups.id = r.groupid where bookinfoid in (%s) %s order by r.postdate desc", $ids, $maxagesql);
 			$allrows = $db->query($sql, true);
 			$arr = array();
 
@@ -136,20 +136,20 @@ class Book
 			//
 			foreach ($allrows as &$allrow)
 			{
-				$arr[$allrow["bookinfoID"]]["ID"] = (isset($arr[$allrow["bookinfoID"]]["ID"]) ? $arr[$allrow["bookinfoID"]]["ID"] : "") . $allrow["ID"] . ",";
-				$arr[$allrow["bookinfoID"]]["rarinnerfilecount"] = (isset($arr[$allrow["bookinfoID"]]["rarinnerfilecount"]) ? $arr[$allrow["bookinfoID"]]["rarinnerfilecount"] : "") . $allrow["rarinnerfilecount"] . ",";
-				$arr[$allrow["bookinfoID"]]["haspreview"] = (isset($arr[$allrow["bookinfoID"]]["haspreview"]) ? $arr[$allrow["bookinfoID"]]["haspreview"] : "") . $allrow["haspreview"] . ",";
-				$arr[$allrow["bookinfoID"]]["passwordstatus"] = (isset($arr[$allrow["bookinfoID"]]["passwordstatus"]) ? $arr[$allrow["bookinfoID"]]["passwordstatus"] : "") . $allrow["passwordstatus"] . ",";
-				$arr[$allrow["bookinfoID"]]["guid"] = (isset($arr[$allrow["bookinfoID"]]["guid"]) ? $arr[$allrow["bookinfoID"]]["guid"] : "") . $allrow["guid"] . ",";
-				$arr[$allrow["bookinfoID"]]["nfoID"] = (isset($arr[$allrow["bookinfoID"]]["nfoID"]) ? $arr[$allrow["bookinfoID"]]["nfoID"] : "") . $allrow["nfoID"] . ",";
-				$arr[$allrow["bookinfoID"]]["grpname"] = (isset($arr[$allrow["bookinfoID"]]["grpname"]) ? $arr[$allrow["bookinfoID"]]["grpname"] : "") . $allrow["grpname"] . ",";
-				$arr[$allrow["bookinfoID"]]["searchname"] = (isset($arr[$allrow["bookinfoID"]]["searchname"]) ? $arr[$allrow["bookinfoID"]]["searchname"] : "") . $allrow["searchname"] . "#";
-				$arr[$allrow["bookinfoID"]]["postdate"] = (isset($arr[$allrow["bookinfoID"]]["postdate"]) ? $arr[$allrow["bookinfoID"]]["postdate"] : "") . $allrow["postdate"] . ",";
-				$arr[$allrow["bookinfoID"]]["size"] = (isset($arr[$allrow["bookinfoID"]]["size"]) ? $arr[$allrow["bookinfoID"]]["size"] : "") . $allrow["size"] . ",";
-				$arr[$allrow["bookinfoID"]]["totalpart"] = (isset($arr[$allrow["bookinfoID"]]["totalpart"]) ? $arr[$allrow["bookinfoID"]]["totalpart"] : "") . $allrow["totalpart"] . ",";
-				$arr[$allrow["bookinfoID"]]["comments"] = (isset($arr[$allrow["bookinfoID"]]["comments"]) ? $arr[$allrow["bookinfoID"]]["comments"] : "") . $allrow["comments"] . ",";
-				$arr[$allrow["bookinfoID"]]["grabs"] = (isset($arr[$allrow["bookinfoID"]]["grabs"]) ? $arr[$allrow["bookinfoID"]]["grabs"] : "") . $allrow["grabs"] . ",";
-				$arr[$allrow["bookinfoID"]]["categoryID"] = (isset($arr[$allrow["bookinfoID"]]["categoryID"]) ? $arr[$allrow["bookinfoID"]]["categoryID"] : "") . $allrow["categoryID"] . ",";
+				$arr[$allrow["bookinfoid"]]["id"] = (isset($arr[$allrow["bookinfoid"]]["id"]) ? $arr[$allrow["bookinfoid"]]["id"] : "") . $allrow["id"] . ",";
+				$arr[$allrow["bookinfoid"]]["rarinnerfilecount"] = (isset($arr[$allrow["bookinfoid"]]["rarinnerfilecount"]) ? $arr[$allrow["bookinfoid"]]["rarinnerfilecount"] : "") . $allrow["rarinnerfilecount"] . ",";
+				$arr[$allrow["bookinfoid"]]["haspreview"] = (isset($arr[$allrow["bookinfoid"]]["haspreview"]) ? $arr[$allrow["bookinfoid"]]["haspreview"] : "") . $allrow["haspreview"] . ",";
+				$arr[$allrow["bookinfoid"]]["passwordstatus"] = (isset($arr[$allrow["bookinfoid"]]["passwordstatus"]) ? $arr[$allrow["bookinfoid"]]["passwordstatus"] : "") . $allrow["passwordstatus"] . ",";
+				$arr[$allrow["bookinfoid"]]["guid"] = (isset($arr[$allrow["bookinfoid"]]["guid"]) ? $arr[$allrow["bookinfoid"]]["guid"] : "") . $allrow["guid"] . ",";
+				$arr[$allrow["bookinfoid"]]["nfoID"] = (isset($arr[$allrow["bookinfoid"]]["nfoID"]) ? $arr[$allrow["bookinfoid"]]["nfoID"] : "") . $allrow["nfoID"] . ",";
+				$arr[$allrow["bookinfoid"]]["grpname"] = (isset($arr[$allrow["bookinfoid"]]["grpname"]) ? $arr[$allrow["bookinfoid"]]["grpname"] : "") . $allrow["grpname"] . ",";
+				$arr[$allrow["bookinfoid"]]["searchname"] = (isset($arr[$allrow["bookinfoid"]]["searchname"]) ? $arr[$allrow["bookinfoid"]]["searchname"] : "") . $allrow["searchname"] . "#";
+				$arr[$allrow["bookinfoid"]]["postdate"] = (isset($arr[$allrow["bookinfoid"]]["postdate"]) ? $arr[$allrow["bookinfoid"]]["postdate"] : "") . $allrow["postdate"] . ",";
+				$arr[$allrow["bookinfoid"]]["size"] = (isset($arr[$allrow["bookinfoid"]]["size"]) ? $arr[$allrow["bookinfoid"]]["size"] : "") . $allrow["size"] . ",";
+				$arr[$allrow["bookinfoid"]]["totalpart"] = (isset($arr[$allrow["bookinfoid"]]["totalpart"]) ? $arr[$allrow["bookinfoid"]]["totalpart"] : "") . $allrow["totalpart"] . ",";
+				$arr[$allrow["bookinfoid"]]["comments"] = (isset($arr[$allrow["bookinfoid"]]["comments"]) ? $arr[$allrow["bookinfoid"]]["comments"] : "") . $allrow["comments"] . ",";
+				$arr[$allrow["bookinfoid"]]["grabs"] = (isset($arr[$allrow["bookinfoid"]]["grabs"]) ? $arr[$allrow["bookinfoid"]]["grabs"] : "") . $allrow["grabs"] . ",";
+				$arr[$allrow["bookinfoid"]]["categoryid"] = (isset($arr[$allrow["bookinfoid"]]["categoryid"]) ? $arr[$allrow["bookinfoid"]]["categoryid"] : "") . $allrow["categoryid"] . ",";
 			}
 
 			//
@@ -157,20 +157,20 @@ class Book
 			//
 			foreach ($rows as &$row)
 			{
-				$row["grp_release_id"] = substr($arr[$row["bookinfoID"]]["ID"], 0, -1);
-				$row["grp_rarinnerfilecount"] = substr($arr[$row["bookinfoID"]]["rarinnerfilecount"], 0, -1);
-				$row["grp_haspreview"] = substr($arr[$row["bookinfoID"]]["haspreview"], 0, -1);
-				$row["grp_release_password"] = substr($arr[$row["bookinfoID"]]["passwordstatus"], 0, -1);
-				$row["grp_release_guid"] = substr($arr[$row["bookinfoID"]]["guid"], 0, -1);
-				$row["grp_release_nfoID"] = substr($arr[$row["bookinfoID"]]["nfoID"], 0, -1);
-				$row["grp_release_grpname"] = substr($arr[$row["bookinfoID"]]["grpname"], 0, -1);
-				$row["grp_release_name"] = substr($arr[$row["bookinfoID"]]["searchname"], 0, -1);
-				$row["grp_release_postdate"] = substr($arr[$row["bookinfoID"]]["postdate"], 0, -1);
-				$row["grp_release_size"] = substr($arr[$row["bookinfoID"]]["size"], 0, -1);
-				$row["grp_release_totalparts"] = substr($arr[$row["bookinfoID"]]["totalpart"], 0, -1);
-				$row["grp_release_comments"] = substr($arr[$row["bookinfoID"]]["comments"], 0, -1);
-				$row["grp_release_grabs"] = substr($arr[$row["bookinfoID"]]["grabs"], 0, -1);
-				$row["grp_release_categoryID"] = substr($arr[$row["bookinfoID"]]["categoryID"], 0, -1);
+				$row["grp_release_id"] = substr($arr[$row["bookinfoid"]]["id"], 0, -1);
+				$row["grp_rarinnerfilecount"] = substr($arr[$row["bookinfoid"]]["rarinnerfilecount"], 0, -1);
+				$row["grp_haspreview"] = substr($arr[$row["bookinfoid"]]["haspreview"], 0, -1);
+				$row["grp_release_password"] = substr($arr[$row["bookinfoid"]]["passwordstatus"], 0, -1);
+				$row["grp_release_guid"] = substr($arr[$row["bookinfoid"]]["guid"], 0, -1);
+				$row["grp_release_nfoID"] = substr($arr[$row["bookinfoid"]]["nfoID"], 0, -1);
+				$row["grp_release_grpname"] = substr($arr[$row["bookinfoid"]]["grpname"], 0, -1);
+				$row["grp_release_name"] = substr($arr[$row["bookinfoid"]]["searchname"], 0, -1);
+				$row["grp_release_postdate"] = substr($arr[$row["bookinfoid"]]["postdate"], 0, -1);
+				$row["grp_release_size"] = substr($arr[$row["bookinfoid"]]["size"], 0, -1);
+				$row["grp_release_totalparts"] = substr($arr[$row["bookinfoid"]]["totalpart"], 0, -1);
+				$row["grp_release_comments"] = substr($arr[$row["bookinfoid"]]["comments"], 0, -1);
+				$row["grp_release_grabs"] = substr($arr[$row["bookinfoid"]]["grabs"], 0, -1);
+				$row["grp_release_categoryID"] = substr($arr[$row["bookinfoid"]]["categoryid"], 0, -1);
 			}
 		}
 		return $rows;
@@ -250,7 +250,7 @@ class Book
 	{
 		$db = new DB();
 
-		$db->queryExec(sprintf("update bookinfo SET title=%s, asin=%s, url=%s, author=%s, publisher=%s, publishdate='%s', cover=%d, updateddate=NOW() WHERE ID = %d",
+		$db->queryExec(sprintf("update bookinfo SET title=%s, asin=%s, url=%s, author=%s, publisher=%s, publishdate='%s', cover=%d, updateddate=NOW() WHERE id = %d",
 				$db->escapeString($title), $db->escapeString($asin), $db->escapeString($url), $db->escapeString($author), $db->escapeString($publisher), $publishdate, $cover, $id));
 	}
 
@@ -371,7 +371,7 @@ class Book
 		$db = new DB();
 		$numlookedup = 0;
 
-		$res = $db->queryDirect(sprintf("SELECT searchname, ID from releases where bookinfoID IS NULL and categoryID = %d ORDER BY postdate DESC LIMIT 100", Category::CAT_BOOK_EBOOK));
+		$res = $db->queryDirect(sprintf("SELECT searchname, id from releases where bookinfoid IS NULL and categoryid = %d ORDER BY postdate DESC LIMIT 100", Category::CAT_BOOK_EBOOK));
 		if ($db->getNumRows($res) > 0)
 		{
 			if ($this->echooutput)
@@ -406,10 +406,10 @@ class Book
 					}
 					else
 					{
-						$bookId = $bookCheck["ID"];
+						$bookId = $bookCheck["id"];
 					}
 				}
-				$db->queryExec(sprintf("update releases SET bookinfoID = %d WHERE ID = %d", $bookId, $arr["ID"]));
+				$db->queryExec(sprintf("update releases SET bookinfoid = %d WHERE id = %d", $bookId, $arr["id"]));
 			}
 		}
 	}

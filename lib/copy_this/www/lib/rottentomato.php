@@ -146,7 +146,7 @@ class RottenTomato
 	 * Detailed information on a specific movie specified by Id.
 	 * You can use the movies search endpoint or peruse the lists of movies/dvds to get the urls to movies.
 	 *
-	 * @param int $ID The RT ID.
+	 * @param int $ID The RT id.
 	 *
 	 * @return string
 	 */
@@ -159,7 +159,7 @@ class RottenTomato
 	 * Retrieves the reviews for a movie.
 	 * Results are paginated if they go past the specified page limit.
 	 *
-	 * @param int    $ID      The RT ID.
+	 * @param int    $ID      The RT id.
 	 * @param string $type    Three different review types are possible:
 	 *                        "all", "top_critic" and "dvd".
 	 *                        "top_critic" shows all the Rotten Tomatoes designated top critics.
@@ -188,7 +188,7 @@ class RottenTomato
 	/**
 	 * Pulls the complete movie cast for a movie.
 	 *
-	 * @param int $ID The RT ID.
+	 * @param int $ID The RT id.
 	 *
 	 * @return string
 	 */

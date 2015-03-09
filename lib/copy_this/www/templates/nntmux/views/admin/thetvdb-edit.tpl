@@ -8,9 +8,9 @@
 <table class="input">
 
 <tr>
-	<td><label for="tvdbID">tvdbID</label>:</td>
+	<td><label for="tvdbid">tvdbid</label>:</td>
 	<td>
-		<input id="tvdbID" class="long" name="tvdbID" type="text" value="{$series.tvdbID|escape:'htmlall'}" />
+		<input id="tvdbid" class="long" name="tvdbid" type="text" value="{$series.tvdbid|escape:'htmlall'}" />
 	</td>
 </tr>
 
@@ -57,9 +57,9 @@
 </tr>
 
 <tr>
-	<td><label for="imdbID">imdbID</label>:</td>
+	<td><label for="imdbid">imdbid</label>:</td>
 	<td>
-		<input id="imdbID" class="long" name="imdbID" type="text" value="{$series.imdbID|escape:'htmlall'}" />
+		<input id="imdbid" class="long" name="imdbid" type="text" value="{$series.imdbid|escape:'htmlall'}" />
 	</td>
 </tr>
 

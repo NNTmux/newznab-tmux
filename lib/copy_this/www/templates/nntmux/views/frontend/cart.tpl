@@ -2,7 +2,7 @@
 <h1>My Cart</h1>
 
 <p>
-Your cart can be downloaded as an <a href="{$smarty.const.WWW_TOP}/rss?t=-2&amp;dl=1&amp;i={$userdata.ID}&amp;r={$userdata.rsstoken}&amp;del=1">Rss Feed</a>.
+Your cart can be downloaded as an <a href="{$smarty.const.WWW_TOP}/rss?t=-2&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}&amp;del=1">Rss Feed</a>.
 </p>
 
 {if $results|@count > 0}
@@ -36,7 +36,7 @@ Your cart can be downloaded as an <a href="{$smarty.const.WWW_TOP}/rss?t=-2&amp;
 			<td><a title="Delete from your cart" href="?delete={$result.guid}">delete</a></td>
 		</tr>
 	{/foreach}
-	
+
 </table>
 </form>
 

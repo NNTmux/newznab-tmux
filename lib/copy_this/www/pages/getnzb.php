@@ -23,11 +23,11 @@ if ($users->isLoggedIn()) {
 		$res = $users->getByIdAndRssToken($_GET["i"], $_GET["r"]);
 		if (!$res) {
 			header("X-DNZB-RCode: 401");
-			header("X-DNZB-RText: Unauthorised, wrong user ID or rss key!");
+			header("X-DNZB-RText: Unauthorised, wrong user id or rss key!");
 			$page->show403();
 		}
 	}
-	$uid = $res["ID"];
+	$uid = $res["id"];
 	$maxdls = $res["downloadrequests"];
 }
 

@@ -17,12 +17,12 @@ class PreDB
 	}
 
 	/**
-	 * Get a predb row by ID.
+	 * Get a predb row by id.
 	 */
 	public function getByID($preID)
 	{
 		$db = new DB();
-		$predbQuery = $db->query(sprintf("SELECT * FROM predb WHERE ID = %s LIMIT %d", $preID, 1));
+		$predbQuery = $db->query(sprintf("SELECT * FROM predb WHERE id = %s LIMIT %d", $preID, 1));
 
 		return isset($predbQuery[0]) ? $predbQuery[0] : false;
 	}
@@ -63,7 +63,7 @@ class PreDB
 		$dirname = empty($dirname) ? '' : sprintf("WHERE dirname LIKE %s", $db->escapeString('%'.$dirname.'%'));
 		$category = empty($category) ? '' : sprintf((empty($dirname) ? 'WHERE' : ' AND')." category = %s", $db->escapeString($category));
 
-		$predbQuery = $db->queryOneRow(sprintf('SELECT COUNT(ID) AS num FROM predb %s %s', $dirname, $category), true);
+		$predbQuery = $db->queryOneRow(sprintf('SELECT COUNT(id) AS num FROM predb %s %s', $dirname, $category), true);
 
 		return $predbQuery['num'];
 	}
@@ -93,7 +93,7 @@ class PreDB
 		$dirname = empty($dirname) ? '' : sprintf('WHERE dirname LIKE %s', $db->escapeString('%'.$dirname.'%'));
 		$category = empty($category) ? '' : sprintf((empty($dirname) ? 'WHERE' : ' AND')." category = %s", $db->escapeString($category));
 
-		$sql = sprintf('SELECT p.*, r.guid FROM predb p left outer join releases r on p.ID = r.preID %s %s ORDER BY ctime DESC LIMIT %d,%d', $dirname, $category, $start, $num);
+		$sql = sprintf('SELECT p.*, r.guid FROM predb p left outer join releases r on p.id = r.preid %s %s ORDER BY ctime DESC LIMIT %d,%d', $dirname, $category, $start, $num);
 
 		return $db->query($sql, true);
 	}
@@ -109,16 +109,16 @@ class PreDB
 			echo "Predb   : Updating releases with pre data\n";
 
 		$matched = 0;
-		$releasesQuery = $db->queryDirect(sprintf('SELECT ID, searchname FROM releases WHERE preID IS NULL AND adddate > DATE_SUB(NOW(), INTERVAL %d DAY)', $daysback));
+		$releasesQuery = $db->queryDirect(sprintf('SELECT id, searchname FROM releases WHERE preid IS NULL AND adddate > DATE_SUB(NOW(), INTERVAL %d DAY)', $daysback));
 		while($arr = $db->getAssocArray($releasesQuery))
 		{
 			$arr['searchname'] = str_replace(' ', '_', $arr['searchname']);
-			$sql = sprintf("SELECT ID FROM predb WHERE dirname = %s LIMIT 1", $db->escapeString($arr['searchname']));
+			$sql = sprintf("SELECT id FROM predb WHERE dirname = %s LIMIT 1", $db->escapeString($arr['searchname']));
 			$predbQuery = $db->queryOneRow($sql);
 
 			if($predbQuery)
 			{
-				$db->queryExec(sprintf('UPDATE releases SET preID = %d WHERE ID = %d', $predbQuery['ID'], $arr['ID']));
+				$db->queryExec(sprintf('UPDATE releases SET preid = %d WHERE id = %d', $predbQuery['id'], $arr['id']));
 
 				$matched++;
 			}
@@ -242,7 +242,7 @@ class PreDB
 			$cnt--;
 
 			if(preg_match('/^'.$site->nzpresubject.'$/', $groupMsg['Subject']) && preg_match('/^'.$site->nzpreposter.'$/', $groupMsg['From'])) {
-				$ret = $msgHeader = $nntp->getHeader($groupMsg['Message-ID']);
+				$ret = $msgHeader = $nntp->getHeader($groupMsg['Message-id']);
 				if($nntp->isError($ret))
 					continue;
 

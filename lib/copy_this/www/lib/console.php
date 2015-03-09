@@ -31,12 +31,12 @@ class Console
 	}
 
 	/**
-	 * Get consoleinfo row by ID.
+	 * Get consoleinfo row by id.
 	 */
 	public function getConsoleInfo($id)
 	{
 		$db = new DB();
-		return $db->queryOneRow(sprintf("SELECT consoleinfo.*, genres.title as genres FROM consoleinfo left outer join genres on genres.ID = consoleinfo.genreID where consoleinfo.ID = %d ", $id));
+		return $db->queryOneRow(sprintf("SELECT consoleinfo.*, genres.title as genres FROM consoleinfo left outer join genres on genres.id = consoleinfo.genreID where consoleinfo.id = %d ", $id));
 	}
 
 	/**
@@ -69,7 +69,7 @@ class Console
 	public function getCount()
 	{
 		$db = new DB();
-		$res = $db->queryOneRow("select count(ID) as num from consoleinfo");
+		$res = $db->queryOneRow("select count(id) as num from consoleinfo");
 		return $res["num"];
 	}
 
@@ -96,14 +96,14 @@ class Console
 						$children = $categ->getChildren($category);
 						$chlist = "-99";
 						foreach ($children as $child)
-							$chlist.=", ".$child["ID"];
+							$chlist.=", ".$child["id"];
 
 						if ($chlist != "-99")
-								$catsrch .= " r.categoryID in (".$chlist.") or ";
+								$catsrch .= " r.categoryid in (".$chlist.") or ";
 					}
 					else
 					{
-						$catsrch .= sprintf(" r.categoryID = %d or ", $category);
+						$catsrch .= sprintf(" r.categoryid = %d or ", $category);
 					}
 				}
 			}
@@ -117,9 +117,9 @@ class Console
 
 		$exccatlist = "";
 		if (count($excludedcats) > 0)
-			$exccatlist = " and r.categoryID not in (".implode(",", $excludedcats).")";
+			$exccatlist = " and r.categoryid not in (".implode(",", $excludedcats).")";
 
-		$sql = sprintf("select count(r.ID) as num from releases r inner join consoleinfo con on con.ID = r.consoleinfoID and con.title != '' where r.passwordstatus <= (select value from site where setting='showpasswordedrelease') and %s %s %s %s", $browseby, $catsrch, $maxage, $exccatlist);
+		$sql = sprintf("select count(r.id) as num from releases r inner join consoleinfo con on con.id = r.consoleinfoid and con.title != '' where r.passwordstatus <= (select value from site where setting='showpasswordedrelease') and %s %s %s %s", $browseby, $catsrch, $maxage, $exccatlist);
 		$res = $db->queryOneRow($sql, true);
 		return $res["num"];
 	}
@@ -152,14 +152,14 @@ class Console
 						$children = $categ->getChildren($category);
 						$chlist = "-99";
 						foreach ($children as $child)
-							$chlist.=", ".$child["ID"];
+							$chlist.=", ".$child["id"];
 
 						if ($chlist != "-99")
-							$catsrch .= " r.categoryID in (".$chlist.") or ";
+							$catsrch .= " r.categoryid in (".$chlist.") or ";
 					}
 					else
 					{
-						$catsrch .= sprintf(" r.categoryID = %d or ", $category);
+						$catsrch .= sprintf(" r.categoryid = %d or ", $category);
 					}
 				}
 			}
@@ -172,10 +172,10 @@ class Console
 
 		$exccatlist = "";
 		if (count($excludedcats) > 0)
-			$exccatlist = " and r.categoryID not in (".implode(",", $excludedcats).")";
+			$exccatlist = " and r.categoryid not in (".implode(",", $excludedcats).")";
 
 		$order = $this->getConsoleOrder($orderby);
-		$sql = sprintf(" SELECT r.*, r.ID as releaseID, con.*, g.title as genre, groups.name as group_name, concat(cp.title, ' > ', c.title) as category_name, concat(cp.ID, ',', c.ID) as category_ids, rn.ID as nfoID from releases r left outer join groups on groups.ID = r.groupID inner join consoleinfo con on con.ID = r.consoleinfoID left outer join releasenfo rn on rn.releaseID = r.ID and rn.nfo is not null left outer join category c on c.ID = r.categoryID left outer join category cp on cp.ID = c.parentID left outer join genres g on g.ID = con.genreID where r.passwordstatus <= (select value from site where setting='showpasswordedrelease') and %s %s %s %s order by %s %s".$limit, $browseby, $catsrch, $maxagesql, $exccatlist, $order[0], $order[1]);
+		$sql = sprintf(" SELECT r.*, r.id as releaseid, con.*, g.title as genre, groups.name as group_name, concat(cp.title, ' > ', c.title) as category_name, concat(cp.id, ',', c.id) as category_ids, rn.id as nfoID from releases r left outer join groups on groups.id = r.groupid inner join consoleinfo con on con.id = r.consoleinfoid left outer join releasenfo rn on rn.releaseid = r.id and rn.nfo is not null left outer join category c on c.id = r.categoryid left outer join category cp on cp.id = c.parentID left outer join genres g on g.id = con.genreID where r.passwordstatus <= (select value from site where setting='showpasswordedrelease') and %s %s %s %s order by %s %s".$limit, $browseby, $catsrch, $maxagesql, $exccatlist, $order[0], $order[1]);
 		return $db->query($sql, true);
 	}
 
@@ -258,7 +258,7 @@ class Console
 	{
 		$db = new DB();
 
-		$db->queryExec(sprintf("update consoleinfo SET title=%s, asin=%s, url=%s, salesrank=%s, platform=%s, publisher=%s, releasedate='%s', esrb=%s, cover=%d, genreID=%d, updateddate=NOW() WHERE ID = %d",
+		$db->queryExec(sprintf("update consoleinfo SET title=%s, asin=%s, url=%s, salesrank=%s, platform=%s, publisher=%s, releasedate='%s', esrb=%s, cover=%d, genreID=%d, updateddate=NOW() WHERE id = %d",
 		$db->escapeString($title), $db->escapeString($asin), $db->escapeString($url), $salesrank, $db->escapeString($platform), $db->escapeString($publisher), $releasedate, $db->escapeString($esrb), $cover, $genreID, $id));
 	}
 
@@ -280,7 +280,7 @@ class Console
 		$defaultGenres = $gen->getGenres(Genres::CONSOLE_TYPE);
 		$genreassoc = array();
 		foreach($defaultGenres as $dg) {
-			$genreassoc[$dg['ID']] = strtolower($dg['title']);
+			$genreassoc[$dg['id']] = strtolower($dg['title']);
 		}
 
 		//
@@ -523,7 +523,7 @@ class Console
 		$db = new DB();
 		$numlookedup = 0;
 
-		$res = $db->queryDirect(sprintf("SELECT searchname, ID from releases where consoleinfoID IS NULL and categoryID in ( select ID from category where parentID = %d ) ORDER BY postdate DESC LIMIT 100", Category::CAT_PARENT_GAME));
+		$res = $db->queryDirect(sprintf("SELECT searchname, id from releases where consoleinfoid IS NULL and categoryid in ( select id from category where parentID = %d ) ORDER BY postdate DESC LIMIT 100", Category::CAT_PARENT_GAME));
 		if ( $db->getNumRows($res) > 0)
 		{
 			if ($this->echooutput)
@@ -555,16 +555,16 @@ class Console
 					}
 					else
 					{
-						$gameId = $gameCheck["ID"];
+						$gameId = $gameCheck["id"];
 					}
 
 					//update release
-					$db->queryExec(sprintf("update releases SET consoleinfoID = %d WHERE ID = %d", $gameId, $arr["ID"]));
+					$db->queryExec(sprintf("update releases SET consoleinfoid = %d WHERE id = %d", $gameId, $arr["id"]));
 
 				}
 				else {
 					//could not parse release title
-					$db->queryExec(sprintf("update releases SET consoleinfoID = %d WHERE ID = %d", -2, $arr["ID"]));
+					$db->queryExec(sprintf("update releases SET consoleinfoid = %d WHERE id = %d", -2, $arr["id"]));
 				}
 			}
 		}
@@ -624,7 +624,7 @@ class Console
 		$result['release'] = $releasename;
 		array_map("trim", $result);
 		//make sure we got a title and platform otherwise the resulting lookup will probably be shit
-		//other option is to pass the $release->categoryID here if we dont find a platform but that would require an extra lookup to determine the name
+		//other option is to pass the $release->categoryid here if we dont find a platform but that would require an extra lookup to determine the name
 		//in either case we should have a title at the minimum
 		return (isset($result['title']) && !empty($result['title']) && isset($result['platform'])) ? $result : false;
 	}

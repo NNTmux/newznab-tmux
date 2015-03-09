@@ -1,4 +1,4 @@
- 
+
 <h1>{$page->title}</h1>
 
 <p>
@@ -16,11 +16,11 @@
 		<th>active</th>
 		<th>disable preview</th>
 	</tr>
-	
+
 	{foreach from=$categorylist item=category}
 	<tr class="{cycle values=",alt"}">
-		<td>{$category.ID}</td>
-		<td><a href="{$smarty.const.WWW_TOP}/category-edit.php?id={$category.ID}">{$category.title}</a></td>
+		<td>{$category.id}</td>
+		<td><a href="{$smarty.const.WWW_TOP}/category-edit.php?id={$category.id}">{$category.title}</a></td>
 		<td>
 			{if $category.parentID != null}
 				{$category.parentName}

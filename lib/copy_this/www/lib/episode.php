@@ -7,12 +7,12 @@ require_once(WWW_DIR."/lib/framework/db.php");
 class Episode
 {
 	/**
-	 * Get an episodeinfo row by ID.
+	 * Get an episodeinfo row by id.
 	 */
 	public function getEpisodeInfoByID($episodeinfoID)
 	{
 		$db = new DB();
-		return $db->queryOneRow(sprintf('SELECT * FROM episodeinfo WHERE ID = %d', $episodeinfoID));
+		return $db->queryOneRow(sprintf('SELECT * FROM episodeinfo WHERE id = %d', $episodeinfoID));
 	}
 
 	/**

@@ -678,7 +678,7 @@ class Smarty_Internal_Template extends Smarty_Internal_TemplateBase
 					throw new SmartyException('Missing template name');
 				}
 				$this->source = Smarty_Resource::source($this);
-				// cache template object under a unique ID
+				// cache template object under a unique id
 				// do not cache eval resources
 				if ($this->source->type != 'eval') {
 					if ($this->smarty->allow_ambiguous_resources) {
