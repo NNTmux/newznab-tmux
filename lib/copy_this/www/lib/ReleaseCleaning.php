@@ -212,6 +212,8 @@ class ReleaseCleaning
 				return $this->audio_warez();
 			case 'alt.binaries.b4e':
 				return $this->b4e();
+			case 'alt.binaries.b4e.erotica':
+				return $this->b4e_erotica();
 			case 'alt.binaries.barbarella':
 				return $this->barbarella();
 			case 'alt.binaries.big':
@@ -893,6 +895,45 @@ class ReleaseCleaning
 			return $match[1];
 		} //- "as-jew3.vol03+3.PAR2" - yEnc
 		if (preg_match('/^- "([\w\säöüÄÖÜß+¤¶!.,&_()\[\]\'\`{}#-]{8,}?\b.?)' . $this->e1,
+			$this->subject,
+			$match)
+		) {
+			return $match[1];
+		}
+		return array(
+			"cleansubject" => $this->releaseCleanerHelper($this->subject), "properlynamed" => false
+		);
+	}
+
+	public function b4e_erotica()
+	{
+		 //Uploader.Presents-Mutter.und.Sohn.German.2013.DVDRiP.x264-XFi[01/27]"xf-mutterusohn.nfo" yEnc
+		if (preg_match('/^Uploader\.Presents-(.+)[\(\[]\d+\/\d+[\)\]]".+" yEnc$/',
+			$this->subject,
+			$match)
+		) {
+			return $match[1];
+		}//Uploader.Presents-Metal.Gear.Rising.Revengeance-RELOADED(51/65]"rld-megerire.r48" yEnc
+		if (preg_match('/^Uploader\.Presents-(.+)[\(\[]\d+\/\d+\]".+" yEnc$/',
+			$this->subject,
+			$match)
+		) {
+			return $match[1];
+		}//Uploader.Presents-ACDC.Let.There.Be.Rock.1980.720p.BluRay.DD5.1.x264-DON(00/47]"rock.ac3.720p.nzb" yEnc
+		if (preg_match('/^Uploader\.Presents-([\w. ()-]{8,}?\b)[\(\[]\d+\/\d+\]".+?" yEnc$/',
+			$this->subject,
+			$match)
+		) {
+			return $match[1];
+		}//Uploader.Presents-LEGO.The.Hobbit-RELOADED (????) [01/90] - "rld-legoho.nfo" yEnc
+		if (preg_match('/^Uploader\.Presents-(.+?) \(\?+\) \[\d+\/\d+\] - ".+?' . $this->e1,
+			$this->subject,
+			$match)
+		) {
+			return $match[1];
+		}//Uploader.Presents-Injustice.Gods.Among.Us.Ultimate.Edition.XBOX360-COMPLEX(02/92]"complex-injustice.ultimate.nfo" yEnc
+		//Uploader.Presents-Need.For.Speed.Rivals.XBOX360-PROTOCOL[10/94]"nfs.r-ptc.r07" yEnc
+		if (preg_match('/^Uploader.Presents-(.+?)[\(\[]\d+\/\d+\]".+?" yEnc$/',
 			$this->subject,
 			$match)
 		) {

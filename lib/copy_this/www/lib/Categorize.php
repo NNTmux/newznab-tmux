@@ -151,6 +151,30 @@ class Categorize extends Category
 							return false;
 					}
 					break;
+				case $group === 'alt.binaries.b4e':
+					switch (true) {
+						case $this->isHDTV():
+						case $this->isSDTV():
+						case $this->isPC():
+						case $this->isMovie():
+						case $this->isXxx():
+							break;
+						default:
+							return false;
+					}
+					break;
+				case $group === 'alt.binaries.b4e.erotica':
+					switch (true) {
+						case $this->isHDTV():
+						case $this->isSDTV():
+						case $this->isPC():
+						case $this->isMovie():
+						case $this->isXxx():
+							break;
+						default:
+							return false;
+					}
+					break;
 				case $this->categorizeForeign && $group === 'alt.binaries.cartoons.french':
 					$this->tmpCat = \Category::CAT_TV_FOREIGN;
 					break;
@@ -261,7 +285,7 @@ class Categorize extends Category
 							break;
 					}
 					break;
-				case preg_match('/alt\.binaries\..*(erotica|ijsklontje|xxx)/', $group):
+				case preg_match('/alt\.binaries\..*(erotica|ijsklontje|xxx)/', $group) && !preg_match('/alt\.binaries\.b4e\.erotica/', $group):
 					if ($this->isXxx()) {
 						break;
 					}
