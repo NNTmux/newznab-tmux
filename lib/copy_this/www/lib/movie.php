@@ -232,7 +232,7 @@ class Movie
 			//
 			// get all releases matching these ids
 			//
-			$sql = sprintf("select r.*, releasenfo.id as nfoid, groups.name as grpname, concat(cp.title, ' > ', c.title) as categoryName from releases r left outer join category c on c.id = r.categoryid left outer join category cp on cp.id = c.parentid left outer join releasenfo on releasenfo.releaseid = r.id left outer join groups on groups.id = r.groupid where imdbid in (%s) and %s %s %s order by r.postdate desc", $imdbds, $catsrch, $maxagesql, $exccatlist);
+			$sql = sprintf("select r.*, releasenfo.id as nfoid, groups.name as grpname, concat(cp.title, ' > ', c.title) as categoryname from releases r left outer join category c on c.id = r.categoryid left outer join category cp on cp.id = c.parentid left outer join releasenfo on releasenfo.releaseid = r.id left outer join groups on groups.id = r.groupid where imdbid in (%s) and %s %s %s order by r.postdate desc", $imdbds, $catsrch, $maxagesql, $exccatlist);
 			$allrows = $db->query($sql, true);
 			$arr = array();
 
@@ -255,7 +255,7 @@ class Movie
 				$arr[$allrow["imdbid"]]["comments"] = (isset($arr[$allrow["imdbid"]]["comments"]) ? $arr[$allrow["imdbid"]]["comments"] : "") . $allrow["comments"] . ",";
 				$arr[$allrow["imdbid"]]["grabs"] = (isset($arr[$allrow["imdbid"]]["grabs"]) ? $arr[$allrow["imdbid"]]["grabs"] : "") . $allrow["grabs"] . ",";
 				$arr[$allrow["imdbid"]]["categoryid"] = (isset($arr[$allrow["imdbid"]]["categoryid"]) ? $arr[$allrow["imdbid"]]["categoryid"] : "") . $allrow["categoryid"] . ",";
-				$arr[$allrow["imdbid"]]["categoryName"] = (isset($arr[$allrow["imdbid"]]["categoryName"]) ? $arr[$allrow["imdbid"]]["categoryName"] : "") . $allrow["categoryName"] . ",";
+				$arr[$allrow["imdbid"]]["categoryname"] = (isset($arr[$allrow["imdbid"]]["categoryname"]) ? $arr[$allrow["imdbid"]]["categoryname"] : "") . $allrow["categoryname"] . ",";
 			}
 
 			//
@@ -277,7 +277,7 @@ class Movie
 				$row["grp_release_comments"] = substr($arr[$row["imdbid"]]["comments"], 0, -1);
 				$row["grp_release_grabs"] = substr($arr[$row["imdbid"]]["grabs"], 0, -1);
 				$row["grp_release_categoryID"] = substr($arr[$row["imdbid"]]["categoryid"], 0, -1);
-				$row["grp_release_categoryName"] = substr($arr[$row["imdbid"]]["categoryName"], 0, -1);
+				$row["grp_release_categoryName"] = substr($arr[$row["imdbid"]]["categoryname"], 0, -1);
 			}
 		}
 		return $rows;
