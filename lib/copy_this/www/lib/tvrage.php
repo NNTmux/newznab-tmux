@@ -503,7 +503,7 @@ class TvRage
 		$nfo = new Nfo();
 
 		// get all releases without a rageid which are in a tv category.
-		$result = $db->queryDirect(sprintf("SELECT searchname, id from releases where rageid = -1 and categoryid in ( select id from category where parentID = %d ) order by postdate desc limit %d ", Category::CAT_PARENT_TV, $numtoProcess));
+		$result = $db->queryDirect(sprintf("SELECT searchname, id from releases where rageid = -1 and categoryid in ( select id from category where parentid = %d ) order by postdate desc limit %d ", Category::CAT_PARENT_TV, $numtoProcess));
 
         if ($db->getNumRows($result) > 0)
         {

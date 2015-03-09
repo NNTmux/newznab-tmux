@@ -232,7 +232,7 @@ class Movie
 			//
 			// get all releases matching these ids
 			//
-			$sql = sprintf("select r.*, releasenfo.id as nfoID, groups.name as grpname, concat(cp.title, ' > ', c.title) as categoryName from releases r left outer join category c on c.id = r.categoryid left outer join category cp on cp.id = c.parentID left outer join releasenfo on releasenfo.releaseid = r.id left outer join groups on groups.id = r.groupid where imdbid in (%s) and %s %s %s order by r.postdate desc", $imdbds, $catsrch, $maxagesql, $exccatlist);
+			$sql = sprintf("select r.*, releasenfo.id as nfoID, groups.name as grpname, concat(cp.title, ' > ', c.title) as categoryName from releases r left outer join category c on c.id = r.categoryid left outer join category cp on cp.id = c.parentid left outer join releasenfo on releasenfo.releaseid = r.id left outer join groups on groups.id = r.groupid where imdbid in (%s) and %s %s %s order by r.postdate desc", $imdbds, $catsrch, $maxagesql, $exccatlist);
 			$allrows = $db->query($sql, true);
 			$arr = array();
 
@@ -671,7 +671,7 @@ class Movie
 		$db = new DB();
 		$nfo = new Nfo();
 
-		$res = $db->queryDirect(sprintf("SELECT searchname, id from releases where imdbid IS NULL and categoryid in ( select id from category where parentID = %d ) ORDER BY postdate DESC LIMIT 100", Category::CAT_PARENT_MOVIE));
+		$res = $db->queryDirect(sprintf("SELECT searchname, id from releases where imdbid IS NULL and categoryid in ( select id from category where parentid = %d ) ORDER BY postdate DESC LIMIT 100", Category::CAT_PARENT_MOVIE));
 		if ($db->getNumRows($res) > 0)
 		{
 			if ($this->echooutput)

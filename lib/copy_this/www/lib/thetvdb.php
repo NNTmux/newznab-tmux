@@ -187,7 +187,7 @@ class TheTVDB
 	{
 		$db = new DB();
 
-		$results = $db->queryDirect(sprintf("SELECT id, searchname, rageid, anidbid, seriesfull, season, episode, tvtitle FROM releases WHERE episodeinfoid IS NULL AND categoryid IN ( SELECT id FROM category WHERE parentID = %d ) LIMIT 150", Category::CAT_PARENT_TV));
+		$results = $db->queryDirect(sprintf("SELECT id, searchname, rageid, anidbid, seriesfull, season, episode, tvtitle FROM releases WHERE episodeinfoid IS NULL AND categoryid IN ( SELECT id FROM category WHERE parentid = %d ) LIMIT 150", Category::CAT_PARENT_TV));
 
 		if ($db->getNumRows($results) > 0)
 		{

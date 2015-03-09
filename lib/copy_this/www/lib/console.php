@@ -175,7 +175,7 @@ class Console
 			$exccatlist = " and r.categoryid not in (".implode(",", $excludedcats).")";
 
 		$order = $this->getConsoleOrder($orderby);
-		$sql = sprintf(" SELECT r.*, r.id as releaseid, con.*, g.title as genre, groups.name as group_name, concat(cp.title, ' > ', c.title) as category_name, concat(cp.id, ',', c.id) as category_ids, rn.id as nfoID from releases r left outer join groups on groups.id = r.groupid inner join consoleinfo con on con.id = r.consoleinfoid left outer join releasenfo rn on rn.releaseid = r.id and rn.nfo is not null left outer join category c on c.id = r.categoryid left outer join category cp on cp.id = c.parentID left outer join genres g on g.id = con.genreID where r.passwordstatus <= (select value from site where setting='showpasswordedrelease') and %s %s %s %s order by %s %s".$limit, $browseby, $catsrch, $maxagesql, $exccatlist, $order[0], $order[1]);
+		$sql = sprintf(" SELECT r.*, r.id as releaseid, con.*, g.title as genre, groups.name as group_name, concat(cp.title, ' > ', c.title) as category_name, concat(cp.id, ',', c.id) as category_ids, rn.id as nfoID from releases r left outer join groups on groups.id = r.groupid inner join consoleinfo con on con.id = r.consoleinfoid left outer join releasenfo rn on rn.releaseid = r.id and rn.nfo is not null left outer join category c on c.id = r.categoryid left outer join category cp on cp.id = c.parentid left outer join genres g on g.id = con.genreID where r.passwordstatus <= (select value from site where setting='showpasswordedrelease') and %s %s %s %s order by %s %s".$limit, $browseby, $catsrch, $maxagesql, $exccatlist, $order[0], $order[1]);
 		return $db->query($sql, true);
 	}
 
@@ -523,7 +523,7 @@ class Console
 		$db = new DB();
 		$numlookedup = 0;
 
-		$res = $db->queryDirect(sprintf("SELECT searchname, id from releases where consoleinfoid IS NULL and categoryid in ( select id from category where parentID = %d ) ORDER BY postdate DESC LIMIT 100", Category::CAT_PARENT_GAME));
+		$res = $db->queryDirect(sprintf("SELECT searchname, id from releases where consoleinfoid IS NULL and categoryid in ( select id from category where parentid = %d ) ORDER BY postdate DESC LIMIT 100", Category::CAT_PARENT_GAME));
 		if ( $db->getNumRows($res) > 0)
 		{
 			if ($this->echooutput)

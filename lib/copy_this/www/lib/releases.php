@@ -144,7 +144,7 @@ class Releases
 				"SELECT r.*, CONCAT(cp.title, ' > ', c.title) AS category_name
 				FROM releases r
 				INNER JOIN category c ON c.id = r.categoryid
-				INNER JOIN category cp ON cp.id = c.parentID
+				INNER JOIN category cp ON cp.id = c.parentid
 				WHERE r.nzbstatus = %d
 				ORDER BY r.postdate DESC %s",
 				NZB::NZB_ADDED,
@@ -211,7 +211,7 @@ class Releases
 				FROM releases r
 				STRAIGHT_JOIN groups g ON g.id = r.groupid
 				STRAIGHT_JOIN category c ON c.id = r.categoryid
-				INNER JOIN category cp ON cp.id = c.parentID
+				INNER JOIN category cp ON cp.id = c.parentid
 				LEFT OUTER JOIN releasevideo re ON re.releaseid = r.id
 				LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
 				AND rn.nfo IS NOT NULL
@@ -343,7 +343,7 @@ class Releases
 				FROM releases r
 				INNER JOIN category ON r.categoryid = category.id
 				INNER JOIN groups ON r.groupid = groups.id
-				INNER JOIN category cp ON cp.id = category.parentID
+				INNER JOIN category cp ON cp.id = category.parentid
 				WHERE r.nzbstatus = %d
 				%s %s %s",
 				NZB::NZB_ADDED,
@@ -492,7 +492,7 @@ class Releases
 					co.review AS co_review, co.cover AS co_cover, cog.title AS co_genre
 				FROM releases r
 				INNER JOIN category c ON c.id = r.categoryid
-				INNER JOIN category cp ON cp.id = c.parentID
+				INNER JOIN category cp ON cp.id = c.parentid
 				INNER JOIN groups g ON g.id = r.groupid
 				LEFT OUTER JOIN movieinfo m ON m.imdbid = r.imdbid AND m.title != ''
 				LEFT OUTER JOIN musicinfo mu ON mu.id = r.musicinfoid
@@ -535,7 +535,7 @@ class Releases
 					COALESCE(cp.id,0) AS parentCategoryid
 				FROM releases r
 				INNER JOIN category c ON c.id = r.categoryid
-				INNER JOIN category cp ON cp.id = c.parentID
+				INNER JOIN category cp ON cp.id = c.parentid
 				INNER JOIN groups g ON g.id = r.groupid
 				LEFT OUTER JOIN tvrage tvr ON tvr.rageid = r.rageid
 				WHERE %s %s %s
@@ -572,7 +572,7 @@ class Releases
 					COALESCE(cp.id,0) AS parentCategoryid
 				FROM releases r
 				INNER JOIN category c ON c.id = r.categoryid
-				INNER JOIN category cp ON cp.id = c.parentID
+				INNER JOIN category cp ON cp.id = c.parentid
 				INNER JOIN groups g ON g.id = r.groupid
 				LEFT OUTER JOIN movieinfo mi ON mi.imdbid = r.imdbid
 				WHERE %s %s
@@ -614,7 +614,7 @@ class Releases
 				INNER JOIN groups ON groups.id = r.groupid
 				LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id AND rn.nfo IS NOT NULL
 				INNER JOIN category c ON c.id = r.categoryid
-				INNER JOIN category cp ON cp.id = c.parentID
+				INNER JOIN category cp ON cp.id = c.parentid
 				WHERE %s %s
 				AND r.nzbstatus = %d
 				AND r.categoryid BETWEEN 5000 AND 5999
@@ -991,7 +991,7 @@ class Releases
 			LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
 			INNER JOIN groups ON groups.id = r.groupid
 			INNER JOIN category c ON c.id = r.categoryid
-			INNER JOIN category cp ON cp.id = c.parentID
+			INNER JOIN category cp ON cp.id = c.parentid
 			%s",
 			$whereSql
 		);
@@ -1057,7 +1057,7 @@ class Releases
 			INNER JOIN groups ON groups.id = r.groupid
 			LEFT OUTER JOIN releasevideo re ON re.releaseid = r.id
 			LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id AND rn.nfo IS NOT NULL
-			INNER JOIN category cp ON cp.id = c.parentID
+			INNER JOIN category cp ON cp.id = c.parentid
 			%s",
 			$whereSql
 		);
@@ -1113,7 +1113,7 @@ class Releases
 			INNER JOIN category c ON c.id = r.categoryid
 			INNER JOIN groups ON groups.id = r.groupid
 			LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id AND rn.nfo IS NOT NULL
-			INNER JOIN category cp ON cp.id = c.parentID
+			INNER JOIN category cp ON cp.id = c.parentid
 			%s",
 			$whereSql
 		);
@@ -1170,7 +1170,7 @@ class Releases
 			INNER JOIN groups g ON g.id = r.groupid
 			INNER JOIN category c ON c.id = r.categoryid
 			LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id AND rn.nfo IS NOT NULL
-			INNER JOIN category cp ON cp.id = c.parentID
+			INNER JOIN category cp ON cp.id = c.parentid
 			%s",
 			$whereSql
 		);
@@ -1225,7 +1225,7 @@ class Releases
 		// Get the category for the parent of this release.
 		$currRow = $this->getById($currentID);
 		$catRow = (new \Category(['Settings' => $this->pdo]))->getById($currRow['categoryid']);
-		$parentCat = $catRow['parentID'];
+		$parentCat = $catRow['parentid'];
 
 		$results = $this->search(
 			$this->getSimilarName($name), -1, -1, -1, [$parentCat], -1, -1, 0, 0, -1, -1, 0, $limit, '', -1, $excludedCats
@@ -1274,7 +1274,7 @@ class Releases
 				g.name AS group_name FROM releases r
 			INNER JOIN groups g ON g.id = r.groupid
 			INNER JOIN category c ON c.id = r.categoryid
-			INNER JOIN category cp ON cp.id = c.parentID
+			INNER JOIN category cp ON cp.id = c.parentid
 			WHERE %s",
 			$gSql
 		);
@@ -1345,7 +1345,7 @@ class Releases
 				FROM releases r
 				INNER JOIN groups ON groups.id = r.groupid
 				INNER JOIN category c ON c.id = r.categoryid
-				INNER JOIN category cp ON cp.id = c.parentID
+				INNER JOIN category cp ON cp.id = c.parentid
 				WHERE r.categoryid BETWEEN 5000 AND 5999
 				AND r.passwordstatus %s
 				AND rageid = %d %s %s",
@@ -1475,7 +1475,7 @@ class Releases
 		return $this->pdo->query(
 			"SELECT CONCAT(cp.title, ' > ', category.title) AS title, COUNT(*) AS count
 			FROM category
-			INNER JOIN category cp on cp.id = category.parentID
+			INNER JOIN category cp on cp.id = category.parentid
 			INNER JOIN releases r ON r.categoryid = category.id
 			WHERE r.adddate > NOW() - INTERVAL 1 WEEK
 			GROUP BY concat(cp.title, ' > ', category.title)

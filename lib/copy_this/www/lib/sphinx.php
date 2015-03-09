@@ -944,7 +944,7 @@ class Sphinx
                           . "LEFT OUTER JOIN category c "
                           . "ON c.id = releases.categoryid "
                           . "LEFT OUTER JOIN category cp "
-                          . "ON cp.id = c.parentID "
+                          . "ON cp.id = c.parentid "
                           . "LEFT OUTER JOIN predb pre "
                           . "ON pre.id = releases.preid "
                           . "WHERE releases.passwordstatus <= (SELECT value "
@@ -1021,7 +1021,7 @@ class Sphinx
                           . "LEFT OUTER JOIN releasenfo rn "
                           . "ON rn.releaseid = releases.id AND rn.nfo IS NOT NULL "
                           . "LEFT OUTER JOIN category cp "
-                          . "ON cp.id = c.parentID "
+                          . "ON cp.id = c.parentid "
                           . "WHERE releases.passwordstatus <= (SELECT value "
                           .      "FROM site WHERE setting='showpasswordedrelease') "
                           . "AND releases.id IN (%s)";
@@ -1085,7 +1085,7 @@ class Sphinx
                           . "LEFT OUTER JOIN releasenfo rn "
                           . "ON rn.releaseid = releases.id AND rn.nfo IS NOT NULL "
                           . "LEFT OUTER JOIN category cp "
-                          . "ON cp.id = c.parentID "
+                          . "ON cp.id = c.parentid "
                           . "LEFT OUTER JOIN movieinfo "
                           . "ON releases.imdbid = movieinfo.imdbid "
                           . "WHERE releases.passwordstatus <= (SELECT value "
@@ -1165,7 +1165,7 @@ class Sphinx
                           . "LEFT OUTER JOIN releasenfo rn "
                           . "ON rn.releaseid = releases.id AND rn.nfo IS NOT NULL "
                           . "LEFT OUTER JOIN category cp "
-                          . "ON cp.id = c.parentID "
+                          . "ON cp.id = c.parentid "
                           . "WHERE releases.passwordstatus <= (SELECT value "
                           .      "FROM site WHERE setting='showpasswordedrelease') "
                           . "AND releases.id IN (%s)";
@@ -1226,7 +1226,7 @@ class Sphinx
 		                  . "LEFT OUTER JOIN releasenfo rn "
 		                  . "ON rn.releaseid = releases.id AND rn.nfo IS NOT NULL "
 		                  . "LEFT OUTER JOIN category cp "
-		                  . "ON cp.id = c.parentID "
+		                  . "ON cp.id = c.parentid "
 		                  . "WHERE releases.passwordstatus <= (SELECT value "
 		                  .     "FROM site WHERE setting='showpasswordedrelease')"
 		                  . "AND releases.id IN (%s)";
@@ -1278,7 +1278,7 @@ class Sphinx
 			              . "LEFT OUTER JOIN releasenfo rn "
 			              . "ON rn.releaseid = releases.id AND rn.nfo IS NOT NULL "
 			              . "LEFT OUTER JOIN category cp "
-			              . "ON cp.id = c.parentID "
+			              . "ON cp.id = c.parentid "
 			              . "WHERE releases.passwordstatus <= (SELECT value "
 			              .     "FROM site WHERE setting='showpasswordedrelease')"
 			              . "AND releases.id IN (%s)";

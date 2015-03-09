@@ -683,7 +683,7 @@ class ProcessReleases
 					r.name, r.id, r.guid
 				FROM releases r
 				INNER JOIN category c ON r.categoryid = c.id
-				INNER JOIN category cp ON cp.id = c.parentID
+				INNER JOIN category cp ON cp.id = c.parentid
 				WHERE %s nzbstatus = 0",
 				(!empty($groupID) ? ' r.groupid = ' . $groupID . ' AND ' : ' ')
 			)
@@ -1266,8 +1266,8 @@ class ProcessReleases
 			SELECT c.id AS id,
 			CASE WHEN c.minsizetoformrelease = 0 THEN cp.minsizetoformrelease ELSE c.minsizetoformrelease END AS minsize
 			FROM category c
-			INNER JOIN category cp ON cp.id = c.parentID
-			WHERE c.parentID IS NOT NULL'
+			INNER JOIN category cp ON cp.id = c.parentid
+			WHERE c.parentid IS NOT NULL'
 		);
 
 		if ($categories instanceof \Traversable) {

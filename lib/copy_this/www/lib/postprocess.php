@@ -94,7 +94,7 @@ class PostProcess
 		//
 		if($this->site->audiopreviewprune > 0)
 		{
-			$result = $db->query(sprintf("select guid from releases where categoryid in (select id from category where parentID = ".Category::CAT_PARENT_MUSIC.") and haspreview = 2 and adddate < %s - interval %d day", $db->escapeString($currTime_ori["now"]), $this->site->audiopreviewprune));
+			$result = $db->query(sprintf("select guid from releases where categoryid in (select id from category where parentid = ".Category::CAT_PARENT_MUSIC.") and haspreview = 2 and adddate < %s - interval %d day", $db->escapeString($currTime_ori["now"]), $this->site->audiopreviewprune));
 
             if (sizeof($result) > 0)
             {
@@ -117,7 +117,7 @@ class PostProcess
 			//
 			// all releases where the only file inside the rars is *.exe and they are not in the PC category
 			//
-			$sql = "select releasefiles.releaseid as id from releasefiles inner join  ( select releaseid, count(*) as totnum from  releasefiles group by releaseid ) x on x.releaseid = releasefiles.releaseid and x.totnum = 1 inner join releases on releases.id = releasefiles.releaseid left join releasenfo on releasenfo.releaseid = releases.id where (releasefiles.name like '%.exe' or releasefiles.name like '%.scr') and (releases.categoryid not in (select id from category where parentID = ".Category::CAT_PARENT_PC.") or (releases.categoryid in (select id from category where parentID = ".Category::CAT_PARENT_PC.") and releasenfo.id is null)) group by releasefiles.releaseid";
+			$sql = "select releasefiles.releaseid as id from releasefiles inner join  ( select releaseid, count(*) as totnum from  releasefiles group by releaseid ) x on x.releaseid = releasefiles.releaseid and x.totnum = 1 inner join releases on releases.id = releasefiles.releaseid left join releasenfo on releasenfo.releaseid = releases.id where (releasefiles.name like '%.exe' or releasefiles.name like '%.scr') and (releases.categoryid not in (select id from category where parentid = ".Category::CAT_PARENT_PC.") or (releases.categoryid in (select id from category where parentid = ".Category::CAT_PARENT_PC.") and releasenfo.id is null)) group by releasefiles.releaseid";
 			$result = $db->query($sql);
 			$spamIDs = array_merge($result, $spamIDs);
 
@@ -148,7 +148,7 @@ class PostProcess
 			//
 			// all audio which contains a file with .exe in
 			//
-			$sql = "select distinct r.id from releasefiles rf inner join releases r on r.id = rf.releaseid and r.categoryid in (select id from category where parentID = ".Category::CAT_PARENT_MUSIC.") where (rf.name like '%.exe' or rf.name like '%.bin')";
+			$sql = "select distinct r.id from releasefiles rf inner join releases r on r.id = rf.releaseid and r.categoryid in (select id from category where parentid = ".Category::CAT_PARENT_MUSIC.") where (rf.name like '%.exe' or rf.name like '%.bin')";
 			$result = $db->query($sql);
 			$spamIDs = array_merge($result, $spamIDs);
 

@@ -20,7 +20,7 @@
 <tr>
 	<td>Parent:</td>
 	<td>
-		{$category.parentID}
+		{$category.parentid}
 	</td>
 </tr>
 

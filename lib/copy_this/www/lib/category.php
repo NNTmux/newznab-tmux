@@ -124,7 +124,7 @@ class Category
 	public function isParent($cid)
 	{
 		$db = new DB();
-		$ret = $db->queryOneRow(sprintf("select count(*) as count from category where id = %d and parentID is null", $cid), true);
+		$ret = $db->queryOneRow(sprintf("select count(*) as count from category where id = %d and parentid is null", $cid), true);
 		if ($ret['count'])
 			return true;
 		else
@@ -138,7 +138,7 @@ class Category
 	{
 		$db = new DB();
 
-		return $db->query(sprintf("select c.* from category c where parentID = %d", $cid), true);
+		return $db->query(sprintf("select c.* from category c where parentid = %d", $cid), true);
 	}
 
 	/**
@@ -151,7 +151,7 @@ class Category
 		if ($activeonly)
 			$act = sprintf(" where c.status = %d ", Category::STATUS_ACTIVE);
 
-		return $db->query("select c.*, (SELECT title FROM category WHERE id=c.parentID) AS parentName from category c " . $act . " ORDER BY c.id");
+		return $db->query("select c.*, (SELECT title FROM category WHERE id=c.parentid) AS parentName from category c " . $act . " ORDER BY c.id");
 	}
 
 	/**
@@ -163,7 +163,7 @@ class Category
 	{
 		$db = new DB();
 
-		return $db->query("SELECT title FROM category WHERE parentID IS NULL AND status = 1");
+		return $db->query("SELECT title FROM category WHERE parentid IS NULL AND status = 1");
 	}
 
 	/**
@@ -175,7 +175,7 @@ class Category
 	{
 		$db = new DB();
 
-		return $db->query("SELECT id FROM category WHERE status = 2 OR parentID IN (SELECT id FROM category WHERE status = 2 AND parentID IS NULL)");
+		return $db->query("SELECT id FROM category WHERE status = 2 OR parentid IN (SELECT id FROM category WHERE status = 2 AND parentid IS NULL)");
 	}
 	/**
 	 * Get a category row by its id.
@@ -184,14 +184,14 @@ class Category
 	{
 		$db = new DB();
 
-		return $db->queryOneRow(sprintf("SELECT c.disablepreview, c.id, c.description, c.minsizetoformrelease, c.maxsizetoformrelease, CONCAT(COALESCE(cp.title,'') , CASE WHEN cp.title IS NULL THEN '' ELSE ' > ' END , c.title) as title, c.status, c.parentID from category c left outer join category cp on cp.id = c.parentID where c.id = %d", $id));
+		return $db->queryOneRow(sprintf("SELECT c.disablepreview, c.id, c.description, c.minsizetoformrelease, c.maxsizetoformrelease, CONCAT(COALESCE(cp.title,'') , CASE WHEN cp.title IS NULL THEN '' ELSE ' > ' END , c.title) as title, c.status, c.parentid from category c left outer join category cp on cp.id = c.parentid where c.id = %d", $id));
 	}
 
 	public function getSizeRangeById($id)
 	{
 		$db = new DB();
 		$res = $db->queryOneRow(sprintf("SELECT c.minsizetoformrelease, c.maxsizetoformrelease, cp.minsizetoformrelease as p_minsizetoformrelease, cp.maxsizetoformrelease as p_maxsizetoformrelease" .
-				" from category c left outer join category cp on cp.id = c.parentID where c.id = %d", $id
+				" from category c left outer join category cp on cp.id = c.parentid where c.id = %d", $id
 			)
 		);
 		if (!$res)
@@ -237,7 +237,7 @@ class Category
 	{
 		$db = new DB();
 
-		return $db->query(sprintf("SELECT concat(cp.title, ' > ',c.title) as title from category c inner join category cp on cp.id = c.parentID where c.id in (%s)", implode(',', $ids)));
+		return $db->query(sprintf("SELECT concat(cp.title, ' > ',c.title) as title from category c inner join category cp on cp.id = c.parentid where c.id in (%s)", implode(',', $ids)));
 	}
 
 	public function getNameByID($ID)
@@ -273,14 +273,14 @@ class Category
 
 		$arr = $db->query(sprintf("select * from category where status = %d %s", Category::STATUS_ACTIVE, $exccatlist), true);
 		foreach ($arr as $a)
-			if ($a["parentID"] == "")
+			if ($a["parentid"] == "")
 				$ret[] = $a;
 
 		foreach ($ret as $key => $parent) {
 			$subcatlist = array();
 			$subcatnames = array();
 			foreach ($arr as $a) {
-				if ($a["parentID"] == $parent["id"]) {
+				if ($a["parentid"] == $parent["id"]) {
 					$subcatlist[] = $a;
 					$subcatnames[] = $a["title"];
 				}
@@ -333,7 +333,7 @@ class Category
 		if ($exccatlist != "")
 			$act .= $exccatlist;
 
-		return $db->query("select c.id, concat(cp.title, ' > ',c.title) as title, cp.id as parentID, c.status from category c inner join category cp on cp.id = c.parentID " . $act . " ORDER BY c.id", true);
+		return $db->query("select c.id, concat(cp.title, ' > ',c.title) as title, cp.id as parentid, c.status from category c inner join category cp on cp.id = c.parentid " . $act . " ORDER BY c.id", true);
 	}
 
 }
