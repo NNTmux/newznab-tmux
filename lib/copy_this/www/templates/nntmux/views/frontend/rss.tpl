@@ -33,7 +33,7 @@
 	<li>PostDate: {$release.postdate|phpdate_format:"DATE_RSS"}</li>
 	<li>Password: {if $release.passwordstatus == 0}None{elseif $release.passwordstatus == 2}Passworded Rar Archive{elseif $release.passwordstatus == 1}Contains Cab/Ace/RAR Archive{else}Unknown{/if}</li>
 
-	{if $release.nfoID != ""}
+	{if $release.nfoid != ""}
 		<li>Nfo: <a href="{$serverroot}api?t=getnfo&amp;id={$release.guid}&amp;raw=1&amp;i={$uid}&amp;r={$rsstoken}">{$release.searchname}.nfo</a></li>
 	{/if}
 

@@ -46,7 +46,7 @@ class Parsing
 
 		// Default query for both full db and last 4 hours.
 		$sql = "SELECT r.searchname, r.name, r.fromname, r.id as RID, r.categoryid, r.guid, r.postdate,
-			   rn.id as nfoID,
+			   rn.id as nfoid,
 			   g.name as groupname,
 			   GROUP_CONCAT(rf.name) as filenames
 		FROM releases r
@@ -837,7 +837,7 @@ class Parsing
 		$catsql = "select id from groups";
 		$res = $db->query($catsql);
 		foreach ($res as $r2) {
-			$sql = sprintf("select r.id, name, searchname, categoryid, size, totalpart, musicinfoid, preid, groupid, rn.id as nfoID from releases r left outer join releasenfo rn ON rn.releaseid = r.id where groupid = %d", $r2['id']) . " %s ";
+			$sql = sprintf("select r.id, name, searchname, categoryid, size, totalpart, musicinfoid, preid, groupid, rn.id as nfoid from releases r left outer join releasenfo rn ON rn.releaseid = r.id where groupid = %d", $r2['id']) . " %s ";
 			$unbuf = $db->queryDirect(sprintf($sql, ($this->limited ? " and r.adddate BETWEEN NOW() - INTERVAL 1 DAY AND NOW() " : "")));
 
 			while ($r = $db->getAssocArray($unbuf)) {
@@ -1112,7 +1112,7 @@ class Parsing
 							$this->handleClean($r, "Modifying Release PC 0Day Size: " . $r['name'] . " - ", true);
 							continue;
 						}
-						if (strlen($r['name']) < 20 && $r['nfoID'] == null && !$r['preid']) {
+						if (strlen($r['name']) < 20 && $r['nfoid'] == null && !$r['preid']) {
 							$this->handleClean($r, "Modifying Release PC 0Day ReleaseLEN: " . $r['name'] . " - ");
 							continue;
 						}

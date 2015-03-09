@@ -232,7 +232,7 @@ class Movie
 			//
 			// get all releases matching these ids
 			//
-			$sql = sprintf("select r.*, releasenfo.id as nfoID, groups.name as grpname, concat(cp.title, ' > ', c.title) as categoryName from releases r left outer join category c on c.id = r.categoryid left outer join category cp on cp.id = c.parentid left outer join releasenfo on releasenfo.releaseid = r.id left outer join groups on groups.id = r.groupid where imdbid in (%s) and %s %s %s order by r.postdate desc", $imdbds, $catsrch, $maxagesql, $exccatlist);
+			$sql = sprintf("select r.*, releasenfo.id as nfoid, groups.name as grpname, concat(cp.title, ' > ', c.title) as categoryName from releases r left outer join category c on c.id = r.categoryid left outer join category cp on cp.id = c.parentid left outer join releasenfo on releasenfo.releaseid = r.id left outer join groups on groups.id = r.groupid where imdbid in (%s) and %s %s %s order by r.postdate desc", $imdbds, $catsrch, $maxagesql, $exccatlist);
 			$allrows = $db->query($sql, true);
 			$arr = array();
 
@@ -246,7 +246,7 @@ class Movie
 				$arr[$allrow["imdbid"]]["haspreview"] = (isset($arr[$allrow["imdbid"]]["haspreview"]) ? $arr[$allrow["imdbid"]]["haspreview"] : "") . $allrow["haspreview"] . ",";
 				$arr[$allrow["imdbid"]]["passwordstatus"] = (isset($arr[$allrow["imdbid"]]["passwordstatus"]) ? $arr[$allrow["imdbid"]]["passwordstatus"] : "") . $allrow["passwordstatus"] . ",";
 				$arr[$allrow["imdbid"]]["guid"] = (isset($arr[$allrow["imdbid"]]["guid"]) ? $arr[$allrow["imdbid"]]["guid"] : "") . $allrow["guid"] . ",";
-				$arr[$allrow["imdbid"]]["nfoID"] = (isset($arr[$allrow["imdbid"]]["nfoID"]) ? $arr[$allrow["imdbid"]]["nfoID"] : "") . $allrow["nfoID"] . ",";
+				$arr[$allrow["imdbid"]]["nfoid"] = (isset($arr[$allrow["imdbid"]]["nfoid"]) ? $arr[$allrow["imdbid"]]["nfoid"] : "") . $allrow["nfoid"] . ",";
 				$arr[$allrow["imdbid"]]["grpname"] = (isset($arr[$allrow["imdbid"]]["grpname"]) ? $arr[$allrow["imdbid"]]["grpname"] : "") . $allrow["grpname"] . ",";
 				$arr[$allrow["imdbid"]]["searchname"] = (isset($arr[$allrow["imdbid"]]["searchname"]) ? $arr[$allrow["imdbid"]]["searchname"] : "") . $allrow["searchname"] . "#";
 				$arr[$allrow["imdbid"]]["postdate"] = (isset($arr[$allrow["imdbid"]]["postdate"]) ? $arr[$allrow["imdbid"]]["postdate"] : "") . $allrow["postdate"] . ",";
@@ -268,7 +268,7 @@ class Movie
 				$row["grp_haspreview"] = substr($arr[$row["imdbid"]]["haspreview"], 0, -1);
 				$row["grp_release_password"] = substr($arr[$row["imdbid"]]["passwordstatus"], 0, -1);
 				$row["grp_release_guid"] = substr($arr[$row["imdbid"]]["guid"], 0, -1);
-				$row["grp_release_nfoID"] = substr($arr[$row["imdbid"]]["nfoID"], 0, -1);
+				$row["grp_release_nfoID"] = substr($arr[$row["imdbid"]]["nfoid"], 0, -1);
 				$row["grp_release_grpname"] = substr($arr[$row["imdbid"]]["grpname"], 0, -1);
 				$row["grp_release_name"] = substr($arr[$row["imdbid"]]["searchname"], 0, -1);
 				$row["grp_release_postdate"] = substr($arr[$row["imdbid"]]["postdate"], 0, -1);

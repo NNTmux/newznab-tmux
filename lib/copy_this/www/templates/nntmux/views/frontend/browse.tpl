@@ -110,7 +110,7 @@
 						<div class="resextra">
 							<div class="btns" style="float:right">
 								{release_flag($result.searchname, browse)}
-									{if $result.nfoID > 0}<a href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}"
+									{if $result.nfoid > 0}<a href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}"
 															 title="View Nfo" class="modal_nfo rndbtn" rel="nfo">
 											Nfo</a>{/if}
 								{if $result.imdbid > 0}

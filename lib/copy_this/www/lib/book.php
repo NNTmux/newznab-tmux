@@ -127,7 +127,7 @@ class Book
 			//
 			// get all releases matching these ids
 			//
-			$sql = sprintf("select r.*, releasenfo.id as nfoID, groups.name as grpname from releases r left outer join releasenfo on releasenfo.releaseid = r.id left outer join groups on groups.id = r.groupid where bookinfoid in (%s) %s order by r.postdate desc", $ids, $maxagesql);
+			$sql = sprintf("select r.*, releasenfo.id as nfoid, groups.name as grpname from releases r left outer join releasenfo on releasenfo.releaseid = r.id left outer join groups on groups.id = r.groupid where bookinfoid in (%s) %s order by r.postdate desc", $ids, $maxagesql);
 			$allrows = $db->query($sql, true);
 			$arr = array();
 
@@ -141,7 +141,7 @@ class Book
 				$arr[$allrow["bookinfoid"]]["haspreview"] = (isset($arr[$allrow["bookinfoid"]]["haspreview"]) ? $arr[$allrow["bookinfoid"]]["haspreview"] : "") . $allrow["haspreview"] . ",";
 				$arr[$allrow["bookinfoid"]]["passwordstatus"] = (isset($arr[$allrow["bookinfoid"]]["passwordstatus"]) ? $arr[$allrow["bookinfoid"]]["passwordstatus"] : "") . $allrow["passwordstatus"] . ",";
 				$arr[$allrow["bookinfoid"]]["guid"] = (isset($arr[$allrow["bookinfoid"]]["guid"]) ? $arr[$allrow["bookinfoid"]]["guid"] : "") . $allrow["guid"] . ",";
-				$arr[$allrow["bookinfoid"]]["nfoID"] = (isset($arr[$allrow["bookinfoid"]]["nfoID"]) ? $arr[$allrow["bookinfoid"]]["nfoID"] : "") . $allrow["nfoID"] . ",";
+				$arr[$allrow["bookinfoid"]]["nfoid"] = (isset($arr[$allrow["bookinfoid"]]["nfoid"]) ? $arr[$allrow["bookinfoid"]]["nfoid"] : "") . $allrow["nfoid"] . ",";
 				$arr[$allrow["bookinfoid"]]["grpname"] = (isset($arr[$allrow["bookinfoid"]]["grpname"]) ? $arr[$allrow["bookinfoid"]]["grpname"] : "") . $allrow["grpname"] . ",";
 				$arr[$allrow["bookinfoid"]]["searchname"] = (isset($arr[$allrow["bookinfoid"]]["searchname"]) ? $arr[$allrow["bookinfoid"]]["searchname"] : "") . $allrow["searchname"] . "#";
 				$arr[$allrow["bookinfoid"]]["postdate"] = (isset($arr[$allrow["bookinfoid"]]["postdate"]) ? $arr[$allrow["bookinfoid"]]["postdate"] : "") . $allrow["postdate"] . ",";
@@ -162,7 +162,7 @@ class Book
 				$row["grp_haspreview"] = substr($arr[$row["bookinfoid"]]["haspreview"], 0, -1);
 				$row["grp_release_password"] = substr($arr[$row["bookinfoid"]]["passwordstatus"], 0, -1);
 				$row["grp_release_guid"] = substr($arr[$row["bookinfoid"]]["guid"], 0, -1);
-				$row["grp_release_nfoID"] = substr($arr[$row["bookinfoid"]]["nfoID"], 0, -1);
+				$row["grp_release_nfoID"] = substr($arr[$row["bookinfoid"]]["nfoid"], 0, -1);
 				$row["grp_release_grpname"] = substr($arr[$row["bookinfoid"]]["grpname"], 0, -1);
 				$row["grp_release_name"] = substr($arr[$row["bookinfoid"]]["searchname"], 0, -1);
 				$row["grp_release_postdate"] = substr($arr[$row["bookinfoid"]]["postdate"], 0, -1);

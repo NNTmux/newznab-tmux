@@ -125,7 +125,7 @@
 							</a>
 
 							<div class="movextra">
-								{if $result.nfoID > 0}<a href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}"
+								{if $result.nfoid > 0}<a href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}"
 														 title="View Nfo" class="btn btn-mini modal_nfo" rel="nfo">
 										Nfo</a>{/if}
 								{if $result.url != ""}<a class="btn btn-mini" target="_blank"

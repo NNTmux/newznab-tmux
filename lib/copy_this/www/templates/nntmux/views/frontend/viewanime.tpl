@@ -77,7 +77,7 @@
 
 						<div class="resextra">
 							<div class="btns">
-								{if $result.nfoID > 0}<a href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}"
+								{if $result.nfoid > 0}<a href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}"
 														 title="View Nfo" class="modal_nfo rndbtn" rel="nfo">
 										Nfo</a>{/if}
 								{if $result.haspreview == 1 && $userdata.canpreview == 1}<a
