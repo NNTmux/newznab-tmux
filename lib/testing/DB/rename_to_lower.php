@@ -48,7 +48,7 @@ if (count($list) == 0) {
 		if (strtolower($column['column_name']) === 'id' && strtolower($column['extra']) !== 'auto_increment') {
 			echo $pdo->log->header("Renaming Table " . $column['table_name'] . " Column " . $column['column_name']);
 			$extra = 'AUTO_INCREMENT';
-			if ($column['table_name'] !== "releases_se") {
+			if ($column['table_name'] != "releases_se") {
 				$placeholder = $pdo->queryDirect("SELECT MAX(id) FROM " . $column['table_name']);
 				$pdo->queryDirect("ALTER IGNORE TABLE " . $column['table_name'] . " CHANGE " . $column['column_name'] . " " . strtolower($column['column_name']) . " " . $column['upper(column_type)'] . " " . $extra);
 				$pdo->queryDirect("ALTER IGNORE TABLE " . $column['table_name'] . " AUTO_INCREMENT = " . $placeholder + 1);

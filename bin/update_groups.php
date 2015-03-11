@@ -8,9 +8,8 @@ require_once(WWW_DIR . "/lib/ConsoleTools.php");
 
 
 $start = TIME();
-$c = new ColorCLI();
-$consoleTools = new ConsoleTools();
 $pdo = new DB();
+$consoleTools = new \ConsoleTools(['ColorCLI' => $pdo->log]);
 
 // Create the connection here and pass
 $nntp = new \NNTP(['Settings' => $pdo]);
