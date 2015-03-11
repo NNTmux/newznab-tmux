@@ -47,4 +47,5 @@
             <li><a href="{$smarty.const.WWW_TOP}/role-list.php">View</a> <a style="padding:0;" href="{$smarty.const.WWW_TOP}/role-edit.php?action=add">Add</a> Roles</li>
             <li><a href="{$smarty.const.WWW_TOP}/site-stats.php">Site Stats</a> <a style="padding:0;" href="{$smarty.const.WWW_TOP}/site-debug.php">Debug</a></li>
             <li><a href="{$smarty.const.WWW_TOP}/tmux-edit.php">Tmux Settings</a></li>
+			<li style="border-bottom: 1px solid #000000;"><a href="{$smarty.const.WWW_TOP}/view-logs.php">View Logs</a></li>
 		</ul>
