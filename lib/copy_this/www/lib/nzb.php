@@ -111,16 +111,16 @@ class NZB
 	 */
 	public function initiateForWrite($groupID)
 	{
-		$this->groupid = $groupID;
+		$this->groupID = $groupID;
 		$site = new Sites();
 		// Set table names
 		if ($this->tablePerGroup === true) {
-			if ($this->groupid == '') {
-				exit("$this->groupid is missing\n");
+			if ($this->groupID == '') {
+				exit("$this->groupID is missing\n");
 			}
-			$cName = 'collections_' .$this->groupid;
-			$bName = 'binaries_' . $this->groupid;
-			$pName = 'parts_' . $this->groupid;
+			$cName = 'collections_' .$this->groupID;
+			$bName = 'binaries_' . $this->groupID;
+			$pName = 'parts_' . $this->groupID;
 		} else {
 			$cName = 'collections';
 			$bName = 'binaries';
