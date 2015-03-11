@@ -688,7 +688,7 @@ class Users
 		$this->delUserCategoryExclusions($uid);
 		if (count($catids) > 0) {
 			foreach ($catids as $catid) {
-				$db->queryInsert(sprintf("insert into userexcat (userid, categoryid, createddate) values (%d, %d, now())", $uid, $catid));
+				$db->queryInsert(sprintf("insert into userexcat (userid, caregoryid, createddate) values (%d, %d, now())", $uid, $catid));
 			}
 		}
 	}
@@ -697,9 +697,9 @@ class Users
 	{
 		$db = new DB();
 		$ret = array();
-		$data = $db->query(sprintf("select categoryid from roleexcat where role = %d", $role));
+		$data = $db->query(sprintf("select caregoryid from roleexcat where role = %d", $role));
 		foreach ($data as $d)
-			$ret[] = $d["categoryid"];
+			$ret[] = $d["caregoryid"];
 
 		return $ret;
 	}
@@ -710,7 +710,7 @@ class Users
 		$this->delRoleCategoryExclusions($role);
 		if (count($catids) > 0) {
 			foreach ($catids as $catid) {
-				$db->queryInsert(sprintf("insert into roleexcat (role, categoryid, createddate) values (%d, %d, now())", $role, $catid));
+				$db->queryInsert(sprintf("insert into roleexcat (role, caregoryid, createddate) values (%d, %d, now())", $role, $catid));
 			}
 		}
 	}
@@ -741,9 +741,9 @@ class Users
 	{
 		$db = new DB();
 		$ret = array();
-		$data = $db->query(sprintf("select categoryid from userexcat where userid = %d union distinct select categoryid from roleexcat inner join users on users.role = roleexcat.role where users.id = %d", $uid, $uid));
+		$data = $db->query(sprintf("select caregoryid from userexcat where userid = %d union distinct select caregoryid from roleexcat inner join users on users.role = roleexcat.role where users.id = %d", $uid, $uid));
 		foreach ($data as $d)
-			$ret[] = $d["categoryid"];
+			$ret[] = $d["caregoryid"];
 
 		return $ret;
 	}
@@ -751,7 +751,7 @@ class Users
 	public function delCategoryExclusion($uid, $catid)
 	{
 		$db = new DB();
-		$db->exec(sprintf("DELETE from userexcat where userid = %d and categoryid = %d", $uid, $catid));
+		$db->exec(sprintf("DELETE from userexcat where userid = %d and caregoryid = %d", $uid, $catid));
 	}
 
 	public function sendInvite($sitetitle, $siteemail, $serverurl, $uid, $emailto)
@@ -971,13 +971,29 @@ class Users
 		$db->exec(sprintf("DELETE from userdownloads where timestamp < DATE_SUB(NOW(), INTERVAL %d DAY)", $days));
 	}
 
-	public function getDownloadRequests($userid, $site = "")
+	/**
+	 * Get the count of how many NZB's the user has downloaded in the past day.
+	 *
+	 * @param int $userID
+	 *
+	 * @return array|bool
+	 */
+	public function getDownloadRequests($userID)
 	{
 		$db = new DB();
-
-		$sql = sprintf("select COUNT(id) as num, TIME_TO_SEC(TIMEDIFF(DATE_ADD(MIN(TIMESTAMP), INTERVAL 1 DAY), NOW())) AS nextdl FROM userdownloads WHERE userid = %d AND timestamp > DATE_SUB(NOW(), INTERVAL 1 DAY)", $userid);
-
-		return $db->queryOneRow($sql);
+		// Clear old requests.
+		$db->queryExec(
+			sprintf(
+				'DELETE FROM userdownloads WHERE userid = %d AND timestamp < DATE_SUB(NOW(), INTERVAL 1 DAY)',
+				$userID
+			)
+		);
+		return $db->queryOneRow(
+			sprintf(
+				'SELECT COUNT(id) AS num FROM userdownloads WHERE userid = %d AND timestamp > DATE_SUB(NOW(), INTERVAL 1 DAY)',
+				$userID
+			)
+		);
 	}
 
 	public function getDownloadRequestsForUserAndAllHostHashes($userid)
@@ -997,13 +1013,22 @@ class Users
 		return $db->query($sql);
 	}
 
-	public function addDownloadRequest($userid, $relGuid)
+	/**
+	 * If a user downloads a NZB, log it.
+	 *
+	 * @param int $userID id of the user.
+	 *
+	 * @return bool|int
+	 */
+	public function addDownloadRequest($userID)
 	{
 		$db = new DB();
-
-		$sql = sprintf("insert into userdownloads (userid, timestamp, releaseid) VALUES (%d, now(), (select id from releases where guid = %s))", $userid, $db->escapeString($relGuid));
-
-		return $db->queryInsert($sql);
+		return $db->queryInsert(
+			sprintf(
+				"INSERT INTO userdownloads (userid, timestamp) VALUES (%d, NOW())",
+				$userID
+			)
+		);
 	}
 
 	public function delDownloadRequestsForRelease($releaseID)

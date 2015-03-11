@@ -2,8 +2,8 @@
 require_once(WWW_DIR . "/lib/releases.php");
 require_once(WWW_DIR . "/lib/nzb.php");
 
-$nzb = new NZB($page->settings);
-$rel = new Releases(['Settings' => $page->settings]);
+$nzb = new NZB();
+$rel = new Releases();
 $uid = 0;
 
 // Page is accessible only by the rss token, or logged in users.
@@ -23,11 +23,11 @@ if ($users->isLoggedIn()) {
 		$res = $users->getByIdAndRssToken($_GET["i"], $_GET["r"]);
 		if (!$res) {
 			header("X-DNZB-RCode: 401");
-			header("X-DNZB-RText: Unauthorised, wrong user id or rss key!");
+			header("X-DNZB-RText: Unauthorised, wrong user ID or rss key!");
 			$page->show403();
 		}
 	}
-	$uid = $res["id"];
+	$uid = $res["ID"];
 	$maxdls = $res["downloadrequests"];
 }
 
@@ -35,7 +35,13 @@ if ($users->isLoggedIn()) {
 if (isset($_GET['id'])) {
 	$_GET['id'] = str_ireplace('.nzb','', $_GET['id']);
 }
-
+//
+// A hash of the users ip to record against the download
+//
+$hosthash = "";
+if ($page->site->storeuserips == 1) {
+	$hosthash = $users->getHostHash($_SERVER["REMOTE_ADDR"], $page->site->siteseed);
+}
 // Check download limit on user role.
 $dlrequests = $users->getDownloadRequests($uid);
 if ($dlrequests['num'] > $maxdls) {
@@ -58,7 +64,7 @@ if (isset($_GET["id"]) && isset($_GET["zip"]) && $_GET["zip"] == "1") {
 		$users->incrementGrabs($uid, count($guids));
 		foreach ($guids as $guid) {
 			$rel->updateGrab($guid);
-			$users->addDownloadRequest($uid, $page->site);
+			$users->addDownloadRequest($uid);
 
 			if (isset($_GET["del"]) && $_GET["del"] == 1) {
 				$users->delCartByUserAndRelease($guid, $uid);
@@ -87,7 +93,7 @@ if (isset($_GET["id"])) {
 
 	if ($reldata) {
 		$rel->updateGrab($_GET["id"]);
-		$users->addDownloadRequest($uid, $page->site);
+		$users->addDownloadRequest($uid);
 		$users->incrementGrabs($uid);
 		if (isset($_GET["del"]) && $_GET["del"] == 1) {
 			$users->delCartByUserAndRelease($_GET["id"], $uid);
