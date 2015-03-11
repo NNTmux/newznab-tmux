@@ -1328,7 +1328,7 @@ class SpotNab {
 
 		// Comments
 		$sql_new_cmt = "INSERT INTO releasecomment (".
-			"id, sourceID, username, userID, gid, cid, isvisible, ".
+			"id, sourceID, username, userid, gid, cid, isvisible, ".
 			"releaseid, `text`, createddate, issynced) VALUES (".
 			"NULL, %d, %s, 0, %s, %s, %d, 0, %s, %s, 1)";
 		$sql_upd_cmt = "UPDATE releasecomment SET ".
@@ -2243,7 +2243,7 @@ class SpotNab {
 				."rc.isvisible, rc.createddate, rc.host "
 				."FROM releasecomment rc "
 				."JOIN releases r ON r.id = rc.releaseid AND rc.releaseid != 0 "
-				."JOIN users u ON rc.userID = u.id AND rc.userID != 0 "
+				."JOIN users u ON rc.userid = u.id AND rc.userid != 0 "
 				."WHERE r.gid IS NOT NULL "
 				."AND sourceID = 0 AND issynced = 0 "
 				."LIMIT %d", $limit);

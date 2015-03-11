@@ -2,8 +2,8 @@
 require_once(WWW_DIR . "/lib/releases.php");
 require_once(WWW_DIR . "/lib/nzb.php");
 
-$nzb = new NZB();
-$rel = new Releases();
+$nzb = new NZB($page->settings);
+$rel = new Releases(['Settings' => $page->settings]);
 $uid = 0;
 
 // Page is accessible only by the rss token, or logged in users.
@@ -32,16 +32,10 @@ if ($users->isLoggedIn()) {
 }
 
 // Remove any suffixed id with .nzb which is added to help weblogging programs see nzb traffic.
-if (isset($_GET["id"])) {
-	$_GET["id"] = preg_replace("/\.nzb/i", "", $_GET["id"]);
+if (isset($_GET['id'])) {
+	$_GET['id'] = str_ireplace('.nzb','', $_GET['id']);
 }
-//
-// A hash of the users ip to record against the download
-//
-$hosthash = "";
-if ($page->site->storeuserips == 1) {
-	$hosthash = $users->getHostHash($_SERVER["REMOTE_ADDR"], $page->site->siteseed);
-}
+
 // Check download limit on user role.
 $dlrequests = $users->getDownloadRequests($uid);
 if ($dlrequests['num'] > $maxdls) {
@@ -64,7 +58,7 @@ if (isset($_GET["id"]) && isset($_GET["zip"]) && $_GET["zip"] == "1") {
 		$users->incrementGrabs($uid, count($guids));
 		foreach ($guids as $guid) {
 			$rel->updateGrab($guid);
-			$users->addDownloadRequest($uid, $hosthash, $page->site);
+			$users->addDownloadRequest($uid, $page->site);
 
 			if (isset($_GET["del"]) && $_GET["del"] == 1) {
 				$users->delCartByUserAndRelease($guid, $uid);
@@ -83,7 +77,7 @@ if (isset($_GET["id"]) && isset($_GET["zip"]) && $_GET["zip"] == "1") {
 
 if (isset($_GET["id"])) {
 	$reldata = $rel->getByGuid($_GET["id"]);
-	$nzbpath = $nzb->NZBPath($_GET["id"]);
+	$nzbpath = $nzb->getNZBPath($_GET["id"]);
 
 	if (!file_exists($nzbpath)) {
 		header("X-DNZB-RCode: 404");
@@ -93,7 +87,7 @@ if (isset($_GET["id"])) {
 
 	if ($reldata) {
 		$rel->updateGrab($_GET["id"]);
-		$users->addDownloadRequest($uid, $hosthash, $page->site);
+		$users->addDownloadRequest($uid, $page->site);
 		$users->incrementGrabs($uid);
 		if (isset($_GET["del"]) && $_GET["del"] == 1) {
 			$users->delCartByUserAndRelease($_GET["id"], $uid);

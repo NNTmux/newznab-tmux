@@ -452,7 +452,7 @@ class Releases
 
 		if (count($cat)) {
 			if ($cat[0] == -2) {
-				$cartSearch = sprintf(' INNER JOIN usercart ON usercart.userID = %d AND usercart.releaseid = r.id ', $userID);
+				$cartSearch = sprintf(' INNER JOIN usercart ON usercart.userid = %d AND usercart.releaseid = r.id ', $userID);
 			} else if ($cat[0] != -1) {
 				$catSearch = ' AND (';
 				$Category = new \Category(['Settings' => $this->pdo]);
@@ -543,7 +543,7 @@ class Releases
 				AND r.categoryid BETWEEN 5000 AND 5999
 				AND r.passwordstatus %s
 				ORDER BY postdate DESC %s",
-				$this->uSQL($this->pdo->query(sprintf('SELECT rageid, categoryid FROM userseries WHERE userID = %d', $userID), true), 'rageid'),
+				$this->uSQL($this->pdo->query(sprintf('SELECT rageid, categoryid FROM userseries WHERE userid = %d', $userID), true), 'rageid'),
 				(count($excludedCats) ? ' AND r.categoryid NOT IN (' . implode(',', $excludedCats) . ')' : ''),
 				($airDate > -1 ? sprintf(' AND r.tvairdate >= DATE_SUB(CURDATE(), INTERVAL %d DAY) ', $airDate) : ''),
 				NZB::NZB_ADDED,
@@ -580,7 +580,7 @@ class Releases
 				AND r.categoryid BETWEEN 2000 AND 2999
 				AND r.passwordstatus %s
 				ORDER BY postdate DESC %s",
-				$this->uSQL($this->pdo->query(sprintf('SELECT imdbid, categoryid FROM usermovies WHERE userID = %d', $userID), true), 'imdbid'),
+				$this->uSQL($this->pdo->query(sprintf('SELECT imdbid, categoryid FROM usermovies WHERE userid = %d', $userID), true), 'imdbid'),
 				(count($excludedCats) ? ' AND r.categoryid NOT IN (' . implode(',', $excludedCats) . ')' : ''),
 				NZB::NZB_ADDED,
 				$this->showPasswords(),

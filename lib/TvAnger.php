@@ -338,7 +338,7 @@ class TvAnger
 				SELECT tvrage.id, tvrage.rageid, tvrage.releasetitle, tvrage.genre, tvrage.country, tvrage.createddate, tvrage.prevdate, tvrage.nextdate,
 					userseries.id AS userseriesid
 				FROM tvrage
-				LEFT OUTER JOIN userseries ON userseries.userID = %d
+				LEFT OUTER JOIN userseries ON userseries.userid = %d
 					AND userseries.rageid = tvrage.rageid
 				WHERE tvrage.rageid IN (SELECT DISTINCT rageid FROM releases WHERE categoryid BETWEEN 5000 AND 5999 AND rageid > 0)
 				AND tvrage.rageid > 0 %s %s
