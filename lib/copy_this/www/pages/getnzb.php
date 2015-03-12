@@ -32,8 +32,8 @@ if ($users->isLoggedIn()) {
 }
 
 // Remove any suffixed id with .nzb which is added to help weblogging programs see nzb traffic.
-if (isset($_GET["id"])) {
-	$_GET["id"] = preg_replace("/\.nzb/i", "", $_GET["id"]);
+if (isset($_GET['id'])) {
+	$_GET['id'] = str_ireplace('.nzb','', $_GET['id']);
 }
 //
 // A hash of the users ip to record against the download
@@ -64,7 +64,7 @@ if (isset($_GET["id"]) && isset($_GET["zip"]) && $_GET["zip"] == "1") {
 		$users->incrementGrabs($uid, count($guids));
 		foreach ($guids as $guid) {
 			$rel->updateGrab($guid);
-			$users->addDownloadRequest($uid, $hosthash, $page->site);
+			$users->addDownloadRequest($uid);
 
 			if (isset($_GET["del"]) && $_GET["del"] == 1) {
 				$users->delCartByUserAndRelease($guid, $uid);
@@ -93,7 +93,7 @@ if (isset($_GET["id"])) {
 
 	if ($reldata) {
 		$rel->updateGrab($_GET["id"]);
-		$users->addDownloadRequest($uid, $hosthash, $page->site);
+		$users->addDownloadRequest($uid);
 		$users->incrementGrabs($uid);
 		if (isset($_GET["del"]) && $_GET["del"] == 1) {
 			$users->delCartByUserAndRelease($_GET["id"], $uid);

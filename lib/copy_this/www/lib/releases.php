@@ -1820,7 +1820,7 @@ class Releases
 					'searchname'     => $this->pdo->escapeString(utf8_encode($cleanedName)),
 					'totalpart'      => $row["parts"],
 					'groupID'        => $row["groupID"],
-					'guid'           => $this->pdo->escapeString($this->createGUID($cleanRelName)),
+					'guid'           => $this->pdo->escapeString($relguid),
 					'categoryID'     => $categorize->determineCategory($groupID, $cleanedName),
 					'regexID'        => $row["regexID"],
 					'postdate'       => $this->pdo->escapeString($row['date']),
@@ -2725,7 +2725,7 @@ class Releases
 							FROM releases r
 							WHERE r.categoryID = %d
 							AND r.size < %d',
-							$category['ID'],
+							$category['id'],
 							$category['minsize']
 						)
 					);
@@ -2936,7 +2936,7 @@ class Releases
 	 */
 	public function createGUID()
 	{
-		return sha1(uniqid('', true) . mt_rand());
+		return bin2hex(openssl_random_pseudo_bytes(20));
 	}
 
 	/**

@@ -437,7 +437,7 @@ class TvAnger
 							// Update info.
 							if (count($query) > 0) {
 								$sql = join(", ", $query);
-								$sql = sprintf("UPDATE tvrage SET {$sql}WHERE ID = %d", $arr['ID']);
+								$sql = sprintf("UPDATE tvrage SET {$sql} WHERE ID = %d", $arr['ID']);
 								$this->pdo->queryExec($sql);
 							}
 						}
