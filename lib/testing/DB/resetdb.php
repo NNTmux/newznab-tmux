@@ -48,7 +48,7 @@ $sql = "SHOW table status";
 
 $tables = $pdo->query($sql);
 foreach ($tables as $row) {
-	$tbl = $row['Name'];
+	$tbl = $row['name'];
 	if (preg_match('/binaries_\d+/', $tbl) || preg_match('/parts_\d+/', $tbl) || preg_match('/partrepair_\d+/', $tbl) || preg_match('/\d+_binaries/', $tbl) || preg_match('/\d+_parts/', $tbl) || preg_match('/\d+_partrepair_\d+/', $tbl)) {
 		$rel = $pdo->queryDirect(sprintf('DROP TABLE %s', $tbl));
 		if ($rel !== false)
