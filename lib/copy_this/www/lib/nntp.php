@@ -113,15 +113,15 @@ class NNTP extends Net_NNTP_Client
 
 		$this->_echo = ($options['Echo'] && NN_ECHOCLI);
 
-		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+		$this->pdo = ($options['Settings'] instanceof \DB ? $options['Settings'] : new \DB());
 		$s = new Sites();
 		$this->site = $s->get();
 
 		$this->_debugBool = (NN_LOGGING || NN_DEBUG);
 		if ($this->_debugBool) {
 			try {
-				$this->_debugging = ($options['Logger'] instanceof Logger ? $options['Logger'] : new Logger(['ColorCLI' => $this->pdo->log]));
-			} catch (LoggerException $error) {
+				$this->_debugging = ($options['Logger'] instanceof \Logger ? $options['Logger'] : new \Logger(['ColorCLI' => $this->pdo->log]));
+			} catch (\LoggerException $error) {
 				$this->_debugBool = false;
 			}
 		}
@@ -229,7 +229,7 @@ class NNTP extends Net_NNTP_Client
 					': ' .
 					$cError;
 				if ($this->_debugBool) {
-					$this->_debugging->log('NNTP', "doConnect", $message, Logger::LOG_ERROR);
+					$this->_debugging->log('NNTP', "doConnect", $message, \Logger::LOG_ERROR);
 				}
 				return $this->throwError($this->pdo->log->error($message));
 			}
@@ -270,7 +270,7 @@ class NNTP extends Net_NNTP_Client
 							$userName .
 							' (' . $aError . ')';
 						if ($this->_debugBool) {
-							$this->_debugging->log('NNTP', "doConnect", $message, Logger::LOG_ERROR);
+							$this->_debugging->log('NNTP', "doConnect", $message, \Logger::LOG_ERROR);
 						}
 						return $this->throwError($this->pdo->log->error($message));
 					}
@@ -284,7 +284,7 @@ class NNTP extends Net_NNTP_Client
 					$this->_compressionSupported = false;
 				}
 				if ($this->_debugBool) {
-					$this->_debugging->log('NNTP', "doConnect", "Connected to " . $this->_currentServer . '.', Logger::LOG_INFO);
+					$this->_debugging->log('NNTP', "doConnect", "Connected to " . $this->_currentServer . '.', \Logger::LOG_INFO);
 				}
 				return true;
 			}
@@ -299,7 +299,7 @@ class NNTP extends Net_NNTP_Client
 		// If we somehow got out of the loop, return an error.
 		$message = 'Unable to connect to ' . $this->_currentServer . $enc;
 		if ($this->_debugBool) {
-			$this->_debugging->log('NNTP', "doConnect", $message, Logger::LOG_ERROR);
+			$this->_debugging->log('NNTP', "doConnect", $message, \Logger::LOG_ERROR);
 		}
 		return $this->throwError($this->pdo->log->error($message));
 	}
@@ -321,7 +321,7 @@ class NNTP extends Net_NNTP_Client
 		// Check if we are connected to usenet.
 		if ($force === true || parent::_isConnected(false)) {
 			if ($this->_debugBool) {
-				$this->_debugging->log('NNTP', "doQuit", "Disconnecting from " . $this->_currentServer, Logger::LOG_INFO);
+				$this->_debugging->log('NNTP', "doQuit", "Disconnecting from " . $this->_currentServer, \Logger::LOG_INFO);
 			}
 			// Disconnect from usenet.
 			return parent::disconnect();
@@ -614,7 +614,7 @@ class NNTP extends Net_NNTP_Client
 									return $body;
 								}
 								if ($this->_debugBool) {
-									$this->_debugging->log('NNTP', "getMessages", $newBody->getMessage(), Logger::LOG_NOTICE);
+									$this->_debugging->log('NNTP', "getMessages", $newBody->getMessage(), \Logger::LOG_NOTICE);
 								}
 								// Return the error.
 								return $newBody;
@@ -645,7 +645,7 @@ class NNTP extends Net_NNTP_Client
 		} else {
 			$message = 'Wrong Identifier type, array, int or string accepted. This type of var was passed: ' . gettype($identifiers);
 			if ($this->_debugBool) {
-				$this->_debugging->log('NNTP', "getMessages", $message, Logger::LOG_WARNING);
+				$this->_debugging->log('NNTP', "getMessages", $message, \Logger::LOG_WARNING);
 			}
 			return $this->throwError($this->pdo->log->error($message));
 		}
@@ -685,7 +685,7 @@ class NNTP extends Net_NNTP_Client
 			// If there was an error selecting the group, return PEAR error object.
 			if ($this->isError($summary)) {
 				if ($this->_debugBool) {
-					$this->_debugging->log('NNTP', "get_Article", $summary->getMessage(), Logger::LOG_NOTICE);
+					$this->_debugging->log('NNTP', "get_Article", $summary->getMessage(), \Logger::LOG_NOTICE);
 				}
 				return $summary;
 			}
@@ -702,7 +702,7 @@ class NNTP extends Net_NNTP_Client
 		// If there was an error downloading the article, return a PEAR error object.
 		if ($this->isError($article)) {
 			if ($this->_debugBool) {
-				$this->_debugging->log('NNTP', "get_Article", $article->getMessage(), Logger::LOG_NOTICE);
+				$this->_debugging->log('NNTP', "get_Article", $article->getMessage(), \Logger::LOG_NOTICE);
 			}
 			return $article;
 		}
@@ -768,7 +768,7 @@ class NNTP extends Net_NNTP_Client
 			// Return PEAR error object on failure.
 			if ($this->isError($summary)) {
 				if ($this->_debugBool) {
-					$this->_debugging->log('NNTP', "get_Header", $summary->getMessage(), Logger::LOG_NOTICE);
+					$this->_debugging->log('NNTP', "get_Header", $summary->getMessage(), \Logger::LOG_NOTICE);
 				}
 				return $summary;
 			}
@@ -785,7 +785,7 @@ class NNTP extends Net_NNTP_Client
 		// If we failed, return PEAR error object.
 		if ($this->isError($header)) {
 			if ($this->_debugBool) {
-				$this->_debugging->log('NNTP', "get_Header", $header->getMessage(), Logger::LOG_NOTICE);
+				$this->_debugging->log('NNTP', "get_Header", $header->getMessage(), \Logger::LOG_NOTICE);
 			}
 			return $header;
 		}
@@ -831,7 +831,7 @@ class NNTP extends Net_NNTP_Client
 		if (!$this->_postingAllowed) {
 			$message = 'You do not have the right to post articles on server ' . $this->_currentServer;
 			if ($this->_debugBool) {
-				$this->_debugging->log('NNTP', "postArticle", $message, Logger::LOG_NOTICE);
+				$this->_debugging->log('NNTP', "postArticle", $message, \Logger::LOG_NOTICE);
 			}
 			return $this->throwError($this->pdo->log->error($message));
 		}
@@ -845,7 +845,7 @@ class NNTP extends Net_NNTP_Client
 		if (strlen($subject) > 510) {
 			$message = 'Max length of subject is 510 chars.';
 			if ($this->_debugBool) {
-				$this->_debugging->log('NNTP', "postArticle", $message, Logger::LOG_WARNING);
+				$this->_debugging->log('NNTP', "postArticle", $message, \Logger::LOG_WARNING);
 			}
 			return $this->throwError($this->pdo->log->error($message));
 		}
@@ -853,7 +853,7 @@ class NNTP extends Net_NNTP_Client
 		if (strlen($from) > 510) {
 			$message = 'Max length of from is 510 chars.';
 			if ($this->_debugBool) {
-				$this->_debugging->log('NNTP', "postArticle", $message, Logger::LOG_WARNING);
+				$this->_debugging->log('NNTP', "postArticle", $message, \Logger::LOG_WARNING);
 			}
 			return $this->throwError($this->pdo->log->error($message));
 		}
@@ -901,7 +901,7 @@ class NNTP extends Net_NNTP_Client
 		// Try reconnecting. This uses another round of max retries.
 		if ($nntp->doConnect($comp) !== true) {
 			if ($this->_debugBool) {
-				$this->_debugging->log('NNTP', "dataError", 'Unable to reconnect to usenet!', Logger::LOG_NOTICE);
+				$this->_debugging->log('NNTP', "dataError", 'Unable to reconnect to usenet!', \Logger::LOG_NOTICE);
 			}
 			return $this->throwError('Unable to reconnect to usenet!');
 		}
@@ -911,7 +911,7 @@ class NNTP extends Net_NNTP_Client
 		if ($this->isError($data)) {
 			$message = "Code {$data->code}: {$data->message}\nSkipping group: {$group}";
 			if ($this->_debugBool) {
-				$this->_debugging->log('NNTP', "dataError", $message, Logger::LOG_NOTICE);
+				$this->_debugging->log('NNTP', "dataError", $message, \Logger::LOG_NOTICE);
 			}
 
 			if ($this->_echo) {
@@ -945,7 +945,7 @@ class NNTP extends Net_NNTP_Client
 		if ($lineLength < 1) {
 			$message = $lineLength . ' is not a valid line length.';
 			if ($this->_debugBool) {
-				$this->_debugging->log('NNTP', 'encodeYEnc', $message, Logger::LOG_NOTICE);
+				$this->_debugging->log('NNTP', 'encodeYEnc', $message, \Logger::LOG_NOTICE);
 			}
 			return $this->throwError($message);
 		}
@@ -1017,7 +1017,7 @@ class NNTP extends Net_NNTP_Client
 		if ($headerSize != $trailerSize) {
 			$message = 'Header and trailer file sizes do not match. This is a violation of the yEnc specification.';
 			if ($this->_debugBool) {
-				$this->_debugging->log('NNTP', 'decodeYEnc', $message, Logger::LOG_NOTICE);
+				$this->_debugging->log('NNTP', 'decodeYEnc', $message, \Logger::LOG_NOTICE);
 			}
 			return $this->throwError($message);
 		}
@@ -1033,7 +1033,7 @@ class NNTP extends Net_NNTP_Client
 		if (strlen($decoded) != $headerSize) {
 			$message = 'Header file size and actual file size do not match. The file is probably corrupt.';
 			if ($this->_debugBool) {
-				$this->_debugging->log('NNTP', 'decodeYEnc', $message, Logger::LOG_NOTICE);
+				$this->_debugging->log('NNTP', 'decodeYEnc', $message, \Logger::LOG_NOTICE);
 			}
 			return $this->throwError($message);
 		}
@@ -1042,7 +1042,7 @@ class NNTP extends Net_NNTP_Client
 		if ($crc !== '' && (strtolower($crc) !== strtolower(sprintf("%04X", crc32($decoded))))) {
 			$message = 'CRC32 checksums do not match. The file is probably corrupt.';
 			if ($this->_debugBool) {
-				$this->_debugging->log('NNTP', 'decodeYEnc', $message, Logger::LOG_NOTICE);
+				$this->_debugging->log('NNTP', 'decodeYEnc', $message, \Logger::LOG_NOTICE);
 			}
 			return $this->throwError($message);
 		}
@@ -1301,14 +1301,14 @@ class NNTP extends Net_NNTP_Client
 		// Check if it's good.
 		if ($this->isError($response)) {
 			if ($this->_debugBool) {
-				$this->_debugging->log('NNTP', "_enableCompression", $response->getMessage(), Logger::LOG_NOTICE);
+				$this->_debugging->log('NNTP', "_enableCompression", $response->getMessage(), \Logger::LOG_NOTICE);
 			}
 			$this->_compressionSupported = false;
 			return $response;
 		} else if ($response !== 290) {
 			$msg = "XFeature GZip Compression not supported. Consider disabling compression in site settings.";
 			if ($this->_debugBool) {
-				$this->_debugging->log('NNTP', "_enableCompression", $msg, Logger::LOG_NOTICE);
+				$this->_debugging->log('NNTP', "_enableCompression", $msg, \Logger::LOG_NOTICE);
 			}
 
 			if ($this->_echo) {
@@ -1412,7 +1412,7 @@ class NNTP extends Net_NNTP_Client
 					} else {
 						$message = 'Decompression of OVER headers failed.';
 						if ($this->_debugBool) {
-							$this->_debugging->log('NNTP', "_getXFeatureTextResponse", $message, Logger::LOG_NOTICE);
+							$this->_debugging->log('NNTP', "_getXFeatureTextResponse", $message, \Logger::LOG_NOTICE);
 						}
 						$message = $this->throwError($this->pdo->log->error($message), 1000);
 						return $message;
@@ -1436,7 +1436,7 @@ class NNTP extends Net_NNTP_Client
 				if (empty($buffer)) {
 					$message = 'Error fetching data from usenet server while downloading OVER headers.';
 					if ($this->_debugBool) {
-						$this->_debugging->log('NNTP', "_getXFeatureTextResponse", $message, Logger::LOG_NOTICE);
+						$this->_debugging->log('NNTP', "_getXFeatureTextResponse", $message, \Logger::LOG_NOTICE);
 					}
 					$message = $this->throwError($this->pdo->log->error($message), 1000);
 					return $message;
@@ -1455,7 +1455,7 @@ class NNTP extends Net_NNTP_Client
 
 		$message = 'Unspecified error while downloading OVER headers.';
 		if ($this->_debugBool) {
-			$this->_debugging->log('NNTP', "_getXFeatureTextResponse", $message, Logger::LOG_NOTICE);
+			$this->_debugging->log('NNTP', "_getXFeatureTextResponse", $message, \Logger::LOG_NOTICE);
 		}
 		$message = $this->throwError($this->pdo->log->error($message), 1000);;
 		return $message;
@@ -1510,7 +1510,7 @@ class NNTP extends Net_NNTP_Client
 			// If there was an error selecting the group, return PEAR error object.
 			if ($this->isError($summary)) {
 				if ($this->_debugBool) {
-					$this->_debugging->log('NNTP', "getMessage", $summary->getMessage(), Logger::LOG_WARNING);
+					$this->_debugging->log('NNTP', "getMessage", $summary->getMessage(), \Logger::LOG_WARNING);
 				}
 				return $summary;
 			}
@@ -1549,7 +1549,7 @@ class NNTP extends Net_NNTP_Client
 					if ($line === ".\r\n") {
 						if ($this->_debugBool) {
 							$this->_debugging->log('NNTP',
-								'getMessage', 'Fetched body for article ' . $identifier, Logger::LOG_INFO
+								'getMessage', 'Fetched body for article ' . $identifier, \Logger::LOG_INFO
 							);
 						}
 						// Attempt to yEnc decode and return the body.
