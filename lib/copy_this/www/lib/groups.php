@@ -34,37 +34,16 @@ class Groups
 	/**
 	 * Get all group rows.
 	 */
-	public function getAll($orderby = null)
+	public function getAll()
 	{
-		$order = ($orderby == null) ? 'name_desc' : $orderby;
-		$orderArr = explode("_", $order);
-		switch ($orderArr[0]) {
-			case 'name':
-				$orderfield = 'groups.name';
-				break;
-			case 'description':
-				$orderfield = 'groups.description';
-				break;
-			case 'releases':
-				$orderfield = 'num_releases';
-				break;
-			case 'updated':
-				$orderfield = 'groups.last_updated';
-				break;
-			default:
-				$orderfield = 'groups.name';
-				break;
-		}
-		$ordersort = (isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'desc';
-		$orderby = $orderfield . " " . $ordersort;
-
-
-		return $this->pdo->query(sprintf("SELECT groups.*, COALESCE(rel.num, 0) AS num_releases
-							FROM groups
-							LEFT OUTER JOIN
-							( SELECT groupid, COUNT(id) AS num FROM releases group by groupid ) rel ON rel.groupid = groups.id
-							ORDER BY %s", $orderby
-			)
+		return $this->pdo->query(
+			"SELECT groups.*,
+			COALESCE(rel.num, 0) AS num_releases
+			FROM groups
+			LEFT OUTER JOIN
+				(SELECT groupid, COUNT(id) AS num FROM releases GROUP BY groupid) rel
+			ON rel.groupid = groups.id
+			ORDER BY groups.name"
 		);
 	}
 
