@@ -18,7 +18,7 @@
 		<span class="badge label-warning">
 			<!--<tr><th>Pre:</th><td>{$predb.ctime|date_format:"%b %e, %Y %T"} ({$predb.ctime|daysago})</td></tr>-->
 			<i class="icon-warning-sign icon-white"></i>
-			{if preg_match('/^(UN)?((MOD)?NUKED?|DELPRE|MOD|LOCAL)$/', $predb.nuketype)}
+			{if preg_match('/^(UN)?((MOD)?NUKED?|DELPRE)$/', $predb.nuketype)}
 				{$predb.nuketype}NUKE:{$predb.nukereason}
 			{else}
 				{$predb.nukereason} [{$predb.nuketype}]
@@ -312,7 +312,7 @@
 		<tr><th>Posted:</th><td title="{$release.postdate}">{$release.postdate|date_format:"%b %e, %Y %T"} ({$release.postdate|daysago})</td></tr>
 		<tr><th>Added:</th><td title="{$release.adddate}">{$release.adddate|date_format:"%b %e, %Y %T"} ({$release.adddate|daysago})</td></tr>
 		<tr id="guid{$release.guid}"><th>Download:</th><td>
-				<div class="icon icon_nzb"><a title="Download Nzb" href="{$smarty.const.WWW_TOP}/getnzb/{$release.guid}/{$release.searchname|escape:"url"}">&nbsp;</a></div>
+				<div class="icon icon_nzb"><a title="Download Nzb" href="{$smarty.const.WWW_TOP}/getnzb/{$release.guid}/{$release.searchname|escape:"htmlall"}">&nbsp;</a></div>
 				<div class="icon icon_cart" title="{$themevars.cart_name_add}"></div>
 				{if $sabintegrated}<div class="icon icon_sab" title="Send to my Queue"></div>{/if}
 			</td></tr>

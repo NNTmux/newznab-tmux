@@ -2,8 +2,8 @@
 require_once(WWW_DIR . "/lib/releases.php");
 require_once(WWW_DIR . "/lib/nzb.php");
 
-$nzb = new NZB();
-$rel = new Releases();
+$nzb = new NZB($page->settings);
+$rel = new Releases(['Settings' => $page->settings]);
 $uid = 0;
 
 // Page is accessible only by the rss token, or logged in users.
@@ -27,7 +27,7 @@ if ($users->isLoggedIn()) {
 			$page->show403();
 		}
 	}
-	$uid = $res["ID"];
+	$uid = $res["id"];
 	$maxdls = $res["downloadrequests"];
 }
 
@@ -110,7 +110,7 @@ if (isset($_GET["id"])) {
 	readgzfile($nzbpath);
 
 	// Set the NZB file name.
-	header("Content-Disposition: attachment; filename=\"" . str_replace(" ", "_", $reldata["searchname"]) . ".nzb\"");
+	header("Content-Disposition: attachment; filename=" . str_replace(array(',', ' '), '_', $reldata["searchname"]) . ".nzb");
 	// Get the size of the NZB file.
 	header("Content-Length: " . ob_get_length());
 	header("Content-Type: application/x-nzb");
