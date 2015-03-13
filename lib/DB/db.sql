@@ -29,6 +29,7 @@ CREATE INDEX `ix_releases_prehashid_searchname` ON `releases` (`prehashid`, `sea
 CREATE INDEX `ix_releases_gamesinfo_id` ON `releases` (`gamesinfo_id`);
 CREATE INDEX `ix_releases_xxxinfo_id` ON `releases` (`xxxinfo_id`);
 CREATE INDEX `ix_releases_status` ON `releases` (`nzbstatus`, `iscategorized`, `isrenamed`, `nfostatus`, `ishashed`, `passwordstatus`, `dehashstatus`, `releasenfoid`, `musicinfoid`, `consoleinfoid`, `bookinfoid`, `haspreview`, `categoryid`, `imdbid`, `rageid`);
+UPDATE releases SET `nzbstatus` = 1 WHERE `nzbstatus` = 0;
 
 ALTER TABLE users ADD COLUMN gameview INT AFTER consoleview;
 ALTER TABLE users ADD COLUMN xxxview INT AFTER consoleview;
