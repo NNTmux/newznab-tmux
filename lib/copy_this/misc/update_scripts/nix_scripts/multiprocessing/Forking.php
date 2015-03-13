@@ -582,7 +582,7 @@ class Forking extends \fork_daemon
 
 			if ($groups instanceof \Traversable) {
 				foreach($groups as $group) {
-					if ($this->pdo->queryOneRow(sprintf('SELECT id FROM binaries_%d  LIMIT 1',$group['id'])) !== false) {
+					if ($this->pdo->queryOneRow(sprintf('SELECT id FROM collections_%d  LIMIT 1',$group['id'])) !== false) {
 						$this->work[] = ['id' => $group['id']];
 					}
 				}
