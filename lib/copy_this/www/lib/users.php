@@ -193,12 +193,12 @@ class Users
 
 		$res = $this->getByUsername($uname);
 		if ($res)
-			if ($res["id"] != $id)
+			if ($res["ID"] != $id)
 				return Users::ERR_SIGNUP_UNAMEINUSE;
 
 		$res = $this->getByEmail($email);
 		if ($res)
-			if ($res["id"] != $id)
+			if ($res["ID"] != $id)
 				return Users::ERR_SIGNUP_EMAILINUSE;
 
 		$sql = array();
