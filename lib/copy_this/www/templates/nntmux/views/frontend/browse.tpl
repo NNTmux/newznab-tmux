@@ -198,7 +198,7 @@
 					</td>
 					<td class="icons">
 						<div class="icon icon_nzb"><a title="Download Nzb"
-													  href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}/{$result.searchname|escape:"url"}">
+													  href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}/{$result.searchname|escape:"htmlall"}">
 								&nbsp;</a></div>
 						<div class="icon icon_cart" title="Add to Cart"></div>
 						{if $sabintegrated}
