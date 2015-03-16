@@ -76,10 +76,9 @@ else if (isset($_GET['toggle_all'])) {
 }
 
 else if (isset($_GET['reset_settings'])) {
-	$s = new Sharing($db);
 	$guid = $db->queryOneRow('SELECT site_guid FROM sharing');
 	$guid = ($guid === false ? '' : $guid['site_guid']);
-	$s->initSettings($guid);
+	(new Sharing(['Settings' => $admin->settings]))->initSettings($guid);
 	print 'Re-initiated sharing settings!';
 }
 
