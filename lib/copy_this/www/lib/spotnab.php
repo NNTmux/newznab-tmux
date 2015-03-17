@@ -70,7 +70,7 @@ class SpotNab {
 	const FETCH_DISCOVERY_SUBJECT_REGEX =
 			'/^(?P<checksum>[0-9a-z]{40})-(?P<utcref>[0-9]{14})$/i';
 
-	// The Message ID can be parsed as follows
+	// The Message id can be parsed as follows
 	const FETCH_MSGID_REGEX =
 		'/^<(?P<crap>[a-z0-9]{30})\.(?P<type>[0-9]{2})\.(?P<local>[0-9]+)[^@]*@(?P<domain>.*)>$/i';
 
@@ -285,7 +285,7 @@ class SpotNab {
 		// comments they do not have a release for... Makes sense :)
 		$offset = 0;
 		$sql = "SELECT DISTINCT(GID) as GID FROM releasecomment "
-				."WHERE releaseID = 0 "
+				."WHERE releaseid = 0 "
 				."AND createddate < NOW() - INTERVAL $max_days DAY "
 				."ORDER BY createddate "
 				."LIMIT %d,%d";
@@ -704,7 +704,7 @@ class SpotNab {
 				// Initialize our article start point
 				$group_article_start[$ghash] = 0;
 
-				// Initialize ID Hash
+				// Initialize id Hash
 				$id_hash[$ghash] = array();
 			}
 
@@ -735,12 +735,12 @@ class SpotNab {
 						$article:$group_article_start[$ghash];
 			}
 
-			// Store ID
-			$id_hash[$ghash][] = $source['ID'];
+			// Store id
+			$id_hash[$ghash][] = $source['id'];
 
 			// Store Source Details
 			$group_hash[$ghash][] = array(
-				'ID' => $source['ID'],
+				'id' => $source['id'],
 				'key' => $this->decompstr(trim($source['publickey'])),
 				'user' => trim($source['username']),
 				'email' => trim($source['useremail']),
@@ -887,11 +887,11 @@ class SpotNab {
 				}
 			}
 			/*$sql = sprintf("UPDATE spotnabsources "
-					."SET lastarticle = %d WHERE ID IN (%s)",
+					."SET lastarticle = %d WHERE id IN (%s)",
 					$last,
 					implode(",", $id_hash[$group]));*/
 			$db->queryExec(sprintf('UPDATE spotnabsources '
-					.'SET lastarticle = %d WHERE ID IN (%s)',
+					.'SET lastarticle = %d WHERE id IN (%s)',
 					$last,
 					implode(",", $id_hash[$group])));
 			echo "\n";
@@ -918,9 +918,9 @@ class SpotNab {
 		// We need an offset for tracking unhandled issues
 		$offset = 0;
 
-		$fsql = 'SELECT ID, name, guid FROM releases '
+		$fsql = 'SELECT id, name, guid FROM releases '
 				.'WHERE GID IS NULL ORDER BY adddate DESC LIMIT %d,%d';
-		$usql = "UPDATE releases SET GID = '%s' WHERE ID = %d";
+		$usql = "UPDATE releases SET GID = '%s' WHERE id = %d";
 
 		while(1){
 			// finish
@@ -933,7 +933,7 @@ class SpotNab {
 			$offset += $batch;
 
 			foreach ($res as $r){
-				$nzbfile = $nzb->getNZBPath($r["guid"]);
+				$nzbfile = $nzb->NZBPath($r["guid"]);
 				if($nzbfile === Null){
 					continue;
 				}
@@ -943,7 +943,7 @@ class SpotNab {
 				{
 					if($delete_broken_releases){
 						$release = new Releases();
-						$release->delete($r['ID']);
+						$release->delete($r['id']);
 						// Free the variable in an attempt to recover memory
 						unset($release);
 				        echo '-';
@@ -962,7 +962,7 @@ class SpotNab {
 				if(!$gid){
 					if($delete_broken_releases){
 						$release = new Releases();
-						$release->delete($r['ID']);
+						$release->delete($r['id']);
 						unset($release);
 				        echo '-';
 					}else{
@@ -973,7 +973,7 @@ class SpotNab {
 				}
 
 				// Update DB With Global Identifer
-				$ures = $db->queryExec(sprintf($usql, $gid, $r['ID']));
+				$ures = $db->queryExec(sprintf($usql, $gid, $r['id']));
 				if($ures < 0){
 					printf("\nPostPrc : Failed to update: %s\n", $r['name']);
 				}
@@ -985,12 +985,15 @@ class SpotNab {
 
 		# Batch update for comment table
 		$usql = 'UPDATE releasecomment, releases '
-				.'SET releasecomment.GID = releases.GID '
-				.'WHERE releases.ID = releasecomment.releaseID '
+				.'SET releasecomment.GID = releases.GID, '
+				.'releasecomment.nzb_guid = releases.nzb_guid '
+				.'WHERE releases.id = releasecomment.releaseid '
 				.'AND releasecomment.GID IS NULL '
+				.'AND releasecomment.nzb_guid = "" '
+				.'AND releases.nzb_guid IS NOT NULL '
 				.'AND releases.GID IS NOT NULL ';
 
-        $affected = $db->queryExec(sprintf($usql));
+        $affected = $db->exec(sprintf($usql));
 		if($affected > 0)
 			$processed += $affected;
 		return $processed;
@@ -1298,14 +1301,14 @@ class SpotNab {
 		*	A group_hash() record looks like this:
 		*		array(
 		*			array(
-		*				'ID': <int>,
+		*				'id': <int>,
 		*				'key': <string>,
 		*				'user': <string>,
 		*				'email': <string>,
 		*				'ref': <int>,
 		*			),
 		*			array(
-		*				'ID': <int>,
+		*				'id': <int>,
 		*				'key': <string>,
 		*				'user': <string>,
 		*				'email': <string>,
@@ -1328,18 +1331,18 @@ class SpotNab {
 
 		// Comments
 		$sql_new_cmt = "INSERT INTO releasecomment (".
-			"ID, sourceID, username, userID, gid, cid, isvisible, ".
-			"releaseID, `text`, createddate, issynced) VALUES (".
-			"NULL, %d, %s, 0, %s, %s, %d, 0, %s, %s, 1)";
+			"id, sourceID, username, userid, gid, cid, isvisible, ".
+			"releaseid, `text`, createddate, issynced, nzb_guid) VALUES (".
+			"NULL, %d, %s, 0, %s, %s, %d, 0, %s, %s, 1, %s)";
 		$sql_upd_cmt = "UPDATE releasecomment SET ".
 			"isvisible = %d, `text` = %s".
-			"WHERE sourceID = %d AND gid = %s AND cid = %s";
-		$sql_fnd_cmt = "SELECT count(ID) as cnt FROM releasecomment ".
+			"WHERE sourceID = %d AND gid = %s AND cid = %s AND nzb_guid = %s";
+		$sql_fnd_cmt = "SELECT count(id) as cnt FROM releasecomment ".
 			"WHERE sourceID = %d AND gid = %s AND cid = %s";
 
 		// Sync Times
 		$sql_sync = "UPDATE spotnabsources SET lastupdate = %s ".
-			"WHERE ID = %d";
+			"WHERE id = %d";
 
 		$matches = Null;
 		$processed = 0;
@@ -1459,7 +1462,7 @@ class SpotNab {
 
 							// Check that comment doesn't already exist
 							$res = $db->queryOneRow(sprintf($sql_fnd_cmt,
-								$hash['ID'],
+								$hash['id'],
 								$db->escapeString($comment['gid']),
 								$db->escapeString($comment['cid'])));
 
@@ -1470,16 +1473,17 @@ class SpotNab {
                                 $updates += ($db->queryExec(sprintf($sql_upd_cmt,
 									$is_visible,
 									$db->escapeString($comment['comment']),
-									$hash['ID'],
+									$hash['id'],
 									$db->escapeString($comment['gid']),
-									$db->escapeString($comment['cid'])
+									$db->escapeString($comment['cid']),
+										$db->escapeString($comment['gid'])
 								))>0)?1:0;
 							}else{
 								// Make some noise
 								echo '+';
 								// Perform Insert
 								$res = $db->queryInsert(sprintf($sql_new_cmt,
-									$hash['ID'],
+									$hash['id'],
 									$db->escapeString($comment['username']),
 									$db->escapeString($comment['gid']),
 									$db->escapeString($comment['cid']),
@@ -1487,7 +1491,8 @@ class SpotNab {
 									$db->escapeString($comment['comment']),
 									// Convert createddate to Local
 									$db->escapeString($this->utc2local(
-														$comment['postdate_utc']))
+														$comment['postdate_utc'])),
+									$db->escapeString($comment['gid'])
 								));
 								$inserts += 1;
 							}
@@ -1500,7 +1505,7 @@ class SpotNab {
 					$db->queryExec(sprintf($sql_sync,
 						$db->escapeString(
 							$this->utc2local($body['postdate_utc'])),
-							$hash['ID']
+							$hash['id']
 						)
 					);
 				}else{
@@ -1551,13 +1556,13 @@ class SpotNab {
 
 		// Spotnab Sources
 		$sql_new_cmt = "INSERT INTO spotnabsources (".
-			"ID, username, useremail, usenetgroup, publickey, ".
+			"id, username, useremail, usenetgroup, publickey, ".
 			"active, description, lastupdate, lastbroadcast, dateadded) VALUES (".
 			"NULL, %s, %s, %s, %s, $auto_enable, %s, NULL, %s, NOW())";
 		$sql_upd_cmt = "UPDATE spotnabsources SET ".
 			"lastbroadcast = %s ".
 			"WHERE username = %s AND useremail = %s AND usenetgroup = %s";
-		$sql_fnd_cmt = "SELECT count(ID) as cnt FROM spotnabsources ".
+		$sql_fnd_cmt = "SELECT count(id) as cnt FROM spotnabsources ".
 			"WHERE username = %s AND useremail = %s AND usenetgroup = %s";
 
 		$matches = Null;
@@ -1726,7 +1731,7 @@ class SpotNab {
 		$matches = Null;
 		if(preg_match("/^\s*<(.*)>\s*$/", $id, $matches))
 			// Ensure we're always dealing with a properly
-			// formatted ID
+			// formatted id
 			$id = $matches[1];
 
 		// The returned result will be stored in $raw
@@ -1884,7 +1889,7 @@ class SpotNab {
 
 			$db = new DB();
 			$sql = sprintf("UPDATE releasecomment "
-					."SET issynced = 1 WHERE ID IN (%s)",
+					."SET issynced = 1 WHERE id IN (%s)",
 					implode(",", $data['ids']));
 
 			// Generate keys if one doesn't exist
@@ -2175,7 +2180,7 @@ class SpotNab {
 		// Prepare Header
 		//
 
-		// Checksum ID
+		// Checksum id
 		$checksum = sha1($message);
 
 		// Prepare Subject
@@ -2239,11 +2244,11 @@ class SpotNab {
 		$db = new DB();
 
 		// Now we fetch for any new posts since reference point
-		$sql = sprintf("SELECT r.gid, rc.ID, rc.text, u.username, "
+		$sql = sprintf("SELECT r.gid, rc.id, rc.text, u.username, "
 				."rc.isvisible, rc.createddate, rc.host "
 				."FROM releasecomment rc "
-				."JOIN releases r ON r.ID = rc.releaseID AND rc.releaseID != 0 "
-				."JOIN users u ON rc.userID = u.ID AND rc.userID != 0 "
+				."JOIN releases r ON r.id = rc.releaseid AND rc.releaseid != 0 "
+				."JOIN users u ON rc.userid = u.id AND rc.userid != 0 "
 				."WHERE r.gid IS NOT NULL "
 				."AND sourceID = 0 AND issynced = 0 "
 				."LIMIT %d", $limit);
@@ -2273,17 +2278,17 @@ class SpotNab {
 			else
 				$username = $comment['username'];
 
-			// Hash a unique Comment ID to associate with this message
-			$cid = md5($comment['ID'].$comment['username'].$comment['createddate'].$comment['host']);
+			// Hash a unique Comment id to associate with this message
+			$cid = md5($comment['id'].$comment['username'].$comment['createddate'].$comment['host']);
 
 			// Keep list of IDs (required for cleanup)
-			$ids[] = $comment['ID'];
+			$ids[] = $comment['id'];
 
 			// Build Comment
 			$comments[] = array(
-				// Release Global ID
+				// Release Global id
 				'gid' => $comment['gid'],
-				// Comment ID
+				// Comment id
 				'cid' => $cid,
 				// Store comment
 				'comment' => $comment['text'],
@@ -2480,8 +2485,8 @@ class SpotNab {
 	public function getSources()
 	{
 		$db = new DB();
-		return $db->query("SELECT ID, lastupdate,lastbroadcast, active, description, "
-					."(SELECT count(ID) from releasecomment where sourceid = s.ID)"
+		return $db->query("SELECT id, lastupdate,lastbroadcast, active, description, "
+					."(SELECT count(id) from releasecomment where sourceid = s.id)"
 					." AS comments FROM spotnabsources s");
 	}
 
@@ -2511,7 +2516,7 @@ class SpotNab {
 		return $db->queryExec(
 			sprintf("UPDATE spotnabsources SET "
 				."description = %s, username = %s, useremail = %s,"
-				." usenetgroup = %s, publickey = %s WHERE ID= %d",
+				." usenetgroup = %s, publickey = %s WHERE id= %d",
 				$db->escapeString($description), $db->escapeString($username),
 				$db->escapeString($usermail), $db->escapeString($usenetgroup),
 				$db->escapeString($publickey), $id));
