@@ -141,6 +141,17 @@ class Categorize extends Category
 				case preg_match('/alt\.binaries\.(multimedia\.erotica\.|cartoons\.french\.|dvd\.|multimedia\.)?anime(\.highspeed|\.repost|s-fansub|\.german)?/', $group):
 					$this->tmpCat = \Category::CAT_TV_ANIME;
 					break;
+				case $group === 'alt.binaries.b4e.erotica':
+					switch (true) {
+						case $this->isTV():
+						case $this->isMovie():
+						case $this->isXxx():
+							break;
+						default:
+							$this->tmpCat = \Category::CAT_XXX_OTHER;
+							break;
+					}
+					break;
 				case $group === 'alt.binaries.british.drama':
 					switch (true) {
 						case $this->isHDTV():
@@ -152,18 +163,6 @@ class Categorize extends Category
 					}
 					break;
 				case $group === 'alt.binaries.b4e':
-					switch (true) {
-						case $this->isHDTV():
-						case $this->isSDTV():
-						case $this->isPC():
-						case $this->isMovie():
-						case $this->isXxx():
-							break;
-						default:
-							return false;
-					}
-					break;
-				case $group === 'alt.binaries.b4e.erotica':
 					switch (true) {
 						case $this->isHDTV():
 						case $this->isSDTV():
@@ -285,7 +284,7 @@ class Categorize extends Category
 							break;
 					}
 					break;
-				case preg_match('/alt\.binaries\..*(erotica|ijsklontje|xxx)/', $group) && !preg_match('/alt\.binaries\.b4e\.erotica/', $group):
+				case preg_match('/alt\.binaries\..*(erotica|ijsklontje|xxx)/', $group):
 					if ($this->isXxx()) {
 						break;
 					}
