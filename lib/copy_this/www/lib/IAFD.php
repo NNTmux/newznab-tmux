@@ -7,8 +7,8 @@ class IAFD
 
 
 	const ADE = "Adult DVD Empire";
-	const IAFDSEARCHURL = "http://www.iafd.com/results.asp?searchtype=title&searchstring=";
-	const IAFDURL = "http://www.iafd.com";
+	const IAFDSEARCHURL = "http://iafd.com.prx.proxyunblocker.org/results.asp?searchtype=title&searchstring=";
+	const IAFDURL = "http://iafd.com.prx.proxyunblocker.org";
 	const HM = "Hot Movies";
 	public $classUsed = "";
 	public $cookie = "";
