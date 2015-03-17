@@ -985,9 +985,12 @@ class SpotNab {
 
 		# Batch update for comment table
 		$usql = 'UPDATE releasecomment, releases '
-				.'SET releasecomment.GID = releases.GID '
+				.'SET releasecomment.GID = releases.GID, '
+				.'releasecomment.nzb_guid = releases.nzb_guid '
 				.'WHERE releases.id = releasecomment.releaseid '
 				.'AND releasecomment.GID IS NULL '
+				.'AND releasecomment.nzb_guid = "" '
+				.'AND releases.nzb_guid IS NOT NULL '
 				.'AND releases.GID IS NOT NULL ';
 
         $affected = $db->exec(sprintf($usql));
@@ -1329,11 +1332,11 @@ class SpotNab {
 		// Comments
 		$sql_new_cmt = "INSERT INTO releasecomment (".
 			"id, sourceID, username, userid, gid, cid, isvisible, ".
-			"releaseid, `text`, createddate, issynced) VALUES (".
-			"NULL, %d, %s, 0, %s, %s, %d, 0, %s, %s, 1)";
+			"releaseid, `text`, createddate, issynced, nzb_guid) VALUES (".
+			"NULL, %d, %s, 0, %s, %s, %d, 0, %s, %s, 1, %s)";
 		$sql_upd_cmt = "UPDATE releasecomment SET ".
 			"isvisible = %d, `text` = %s".
-			"WHERE sourceID = %d AND gid = %s AND cid = %s";
+			"WHERE sourceID = %d AND gid = %s AND cid = %s AND nzb_guid = %s";
 		$sql_fnd_cmt = "SELECT count(id) as cnt FROM releasecomment ".
 			"WHERE sourceID = %d AND gid = %s AND cid = %s";
 
@@ -1472,7 +1475,8 @@ class SpotNab {
 									$db->escapeString($comment['comment']),
 									$hash['id'],
 									$db->escapeString($comment['gid']),
-									$db->escapeString($comment['cid'])
+									$db->escapeString($comment['cid']),
+										$db->escapeString($comment['gid'])
 								))>0)?1:0;
 							}else{
 								// Make some noise
@@ -1487,7 +1491,8 @@ class SpotNab {
 									$db->escapeString($comment['comment']),
 									// Convert createddate to Local
 									$db->escapeString($this->utc2local(
-														$comment['postdate_utc']))
+														$comment['postdate_utc'])),
+									$db->escapeString($comment['gid'])
 								));
 								$inserts += 1;
 							}

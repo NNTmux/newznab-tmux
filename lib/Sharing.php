@@ -133,6 +133,7 @@ Class Sharing
 		$this->matchComments();
 		if ($this->siteSettings['posting']) {
 			$this->postAll();
+			$this->postSC();
 		}
 	}
 
@@ -165,14 +166,14 @@ Class Sharing
 	 */
 	protected function postAll()
 	{
-		// Get all comments that we have no posted yet.
+		// Get all comments that we have not posted yet.
 		$newComments = $this->pdo->query(
 			sprintf(
 				'SELECT rc.text, rc.id, %s, u.username, r.nzb_guid
 				FROM releasecomment rc
 				INNER JOIN users u ON rc.userid = u.id
 				INNER JOIN releases r on rc.releaseid = r.id
-				WHERE rc.shared = 0 LIMIT %d',
+				WHERE (rc.shared = 0 or issynced = 1) LIMIT %d',
 				$this->pdo->unix_timestamp_column('rc.createddate'),
 				$this->siteSettings['max_push']
 			)
@@ -194,6 +195,40 @@ Class Sharing
 
 
 		echo PHP_EOL . '(Sharing) Finished uploading comments.' . PHP_EOL;
+
+	}
+
+	/**
+	 * Post all new comments to usenet.
+	 */
+	protected function postSC()
+	{
+		// Get all comments from spotnab that we have not posted yet.
+		$newComments = $this->pdo->query(
+			sprintf(
+				'SELECT id, text, UNIX_TIMESTAMP(createddate) AS unix_time,
+				username, nzb_guid FROM releasecomment
+				WHERE issynced = 1 AND shared = 1 AND shareid IS NULL
+				ORDER BY id DESC'
+			)
+		);
+
+		// Check if we have any comments to push.
+		if (count($newComments) === 0) {
+			return;
+		}
+
+
+		echo '(Sharing) Starting to upload spotnab comments.' . PHP_EOL;
+
+
+		// Loop over the comments.
+		foreach ($newComments as $comment) {
+			$this->postComment($comment);
+		}
+
+
+		echo PHP_EOL . '(Sharing) Finished uploading spotnab comments.' . PHP_EOL;
 
 	}
 
