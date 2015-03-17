@@ -40,8 +40,8 @@ if (count($nntpkill) !== 0) {
 }
 
 // Check database patch version
-if ($patch < 121) {
-	exit($c->error("\nYour database is not up to date. Please update.\nphp ${DIR}/tmux/lib/DB/patchDB.php\n"));
+if ($patch < 123) {
+	exit($c->error("\nYour database is not up to date. Please update.\nphp /var/www/newznab/misc/update_scripts/nix_scripts/tmux/lib/DB/patchDB.php\n"));
 }
 
 //check if session exists
