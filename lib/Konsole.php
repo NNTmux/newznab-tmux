@@ -685,7 +685,7 @@ class Konsole
 							AND categoryid BETWEEN 1000 AND 1999
 							ORDER BY postdate DESC
 							LIMIT %d',
-				\NZB::NZB_ADDED,
+				\Enzebe::NZB_ADDED,
 				$this->renamed,
 				$this->gameqty
 			)
