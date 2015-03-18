@@ -322,7 +322,7 @@ class DB extends \PDO
 		}
 
 		// For backwards compatibility, no need for a patch.
-		//$this->pdo->setAttribute(\PDO::ATTR_CASE, \PDO::CASE_LOWER);
+		$this->pdo->setAttribute(\PDO::ATTR_CASE, \PDO::CASE_LOWER);
 		$this->pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
 		$this->pdo->setAttribute(\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, true);
 	}
