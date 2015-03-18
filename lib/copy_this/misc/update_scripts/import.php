@@ -35,9 +35,9 @@ if (empty($argc) || $argc <= 1) {
 		$categoryoverride = $argv[5];
 }
 
-$groups = $db->query("SELECT ID, name FROM groups");
+$groups = $db->query("SELECT id, name FROM groups");
 foreach ($groups as $group)
-	$siteGroups[$group["name"]] = $group["ID"];
+	$siteGroups[$group["name"]] = $group["id"];
 
 echo "\nUsage: php import.php [path(string)] [usefilename(true/false)] [dupecheck(true/false)] [movefiles(true/false)] [overridecategory(number)]\n";
 
@@ -101,7 +101,7 @@ foreach ($filestoprocess as $nzbFile) {
 				$name = $releases->cleanReleaseName(str_replace(".nzb", "", basename($nzbFile)));
 				$catId = $cat->determineCategory($groupName, $name);
 				$relid = $releases->insertRelease($name, $nzbInfo->filecount, $groupID, $relguid, $catId, "", date("Y-m-d H:i:s", $nzbInfo->postedlast), $nzbInfo->poster, "", $page->site);
-				$db->queryExec(sprintf("update releases set totalpart = %d, size = %s, completion = %d, GID=%s where ID = %d", $nzbInfo->filecount, $nzbInfo->filesize, $nzbInfo->completion, $db->escapeString($nzbInfo->gid), $relid));
+				$db->queryExec(sprintf("update releases set totalpart = %d, size = %s, completion = %d, GID=%s where id = %d", $nzbInfo->filecount, $nzbInfo->filesize, $nzbInfo->completion, $db->escapeString($nzbInfo->gid), $relid));
 
 				$nzbfilename = $nzb->getNZBPath($relguid, $page->site->nzbpath, true);
 				$fp = gzopen($nzbfilename, "w");
@@ -141,8 +141,8 @@ foreach ($filestoprocess as $nzbFile) {
 						$relparts = explode("/", $regexMatches['parts']);
 						$regexMatches['regcatid'] = ($categoryoverride != -1 ? $categoryoverride : $regexMatches['regcatid']);
 
-						$sql = sprintf("INSERT INTO binaries (name, fromname, date, xref, totalParts, groupID, binaryhash, dateadded,
-                        categoryID, regexID, reqID, procstat, relpart, reltotalpart, relname)
+						$sql = sprintf("INSERT INTO binaries (name, fromname, date, xref, totalParts, groupid, binaryhash, dateadded,
+                        categoryid, regexid, reqid, procstat, relpart, reltotalpart, relname)
                         values (%s, %s, %s, %s, %d, %d, %s, NOW(), %s, %d, %s, %d, %d, %d, %s )",
 							$db->escapeString($postFile["subject"]), $db->escapeString($postFile["poster"]),
 							$db->escapeString(date("Y-m-d H:i:s", $postFile["posted"])),
@@ -150,7 +150,7 @@ foreach ($filestoprocess as $nzbFile) {
 							$postFile["segmenttotal"], $groupID,
 							$db->escapeString(md5($postFile["subject"] . $postFile["poster"] . $groupID)),
 							$regexMatches['regcatid'],
-							$regexMatches['regexID'], $db->escapeString($regexMatches['reqID']),
+							$regexMatches['regexid'], $db->escapeString($regexMatches['reqid']),
 							Releases::PROCSTAT_TITLEMATCHED, $relparts[0], $relparts[1], $db->escapeString(str_replace('_', ' ', $regexMatches['name']))
 						);
 						$binaryId = $db->queryInsert($sql);
@@ -167,7 +167,7 @@ foreach ($filestoprocess as $nzbFile) {
 					}
 				}
 				if ($binaryId != 0) {
-					echo sprintf("%0" . $digits . "d %.2f%% Imported %s (%d:%s-%d/%d)\n", $items - $num, $num / $items * 100, basename($nzbFile), $regexMatches['regcatid'], $regexMatches['regexID'], $numbins, $numparts);
+					echo sprintf("%0" . $digits . "d %.2f%% Imported %s (%d:%s-%d/%d)\n", $items - $num, $num / $items * 100, basename($nzbFile), $regexMatches['regcatid'], $regexMatches['regexid'], $numbins, $numparts);
 					if ($movefiles) {
 						if (!file_exists($importedpath)) mkdir($importedpath);
 						if (!file_exists($importedpath . basename($nzbFile))) rename($nzbFile, $importedpath . basename($nzbFile));

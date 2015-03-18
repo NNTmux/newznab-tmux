@@ -178,7 +178,7 @@ class AniDB
 	}
 
 	/**
-	 * Retrieves all info for a specific AniDB ID
+	 * Retrieves all info for a specific AniDB id
 	 *
 	 * @param int $anidbID
 	 * @return

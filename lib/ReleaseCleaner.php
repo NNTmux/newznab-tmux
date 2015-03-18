@@ -108,13 +108,13 @@ class ReleaseCleaning
 							"properlynamed" => true,
 							"increment"     => false,
 							"predb"         => $title['ID'],
-							"requestID"     => false
+							"requestid"     => false
 						);
 					}
 				}
 			}
 		}
-		// Get pre style name from requestID
+		// Get pre style name from requestid
 		if (preg_match('/^\[ ?(\d{4,6}) ?\]/', $this->subject, $match) ||
 			preg_match('/^REQ\s*(\d{4,6})/i', $this->subject, $match) ||
 			preg_match('/^(\d{4,6})-\d{1}\[/', $this->subject, $match) ||
@@ -122,7 +122,7 @@ class ReleaseCleaning
 		) {
 			$title = $this->pdo->queryOneRow(
 				sprintf(
-					'SELECT p.title , p.ID from prehash p INNER JOIN groups g on g.ID = p.groupID WHERE p.requestID = %d and g.name = %s',
+					'SELECT p.title , p.ID from prehash p INNER JOIN groups g on g.ID = p.groupid WHERE p.requestid = %d and g.name = %s',
 					$match[1],
 					$this->pdo->escapeString($this->groupName)
 				)
@@ -152,8 +152,8 @@ class ReleaseCleaning
 			if ($title === false && !empty($reqGname)) {
 				$title = $this->pdo->queryOneRow(
 					sprintf(
-						"SELECT p.title as title, p.ID as ID from prehash p INNER JOIN groups g on g.ID = p.groupID
-								WHERE p.requestID = %d and g.name = %s",
+						"SELECT p.title as title, p.ID as ID from prehash p INNER JOIN groups g on g.ID = p.groupid
+								WHERE p.requestid = %d and g.name = %s",
 						$match[1],
 						$this->pdo->escapeString($reqGname)
 					)
@@ -169,7 +169,7 @@ class ReleaseCleaning
 					"properlynamed" => true,
 					"increment"     => false,
 					"predb"         => $title['ID'],
-					"requestID"     => true
+					"requestid"     => true
 				);
 			}
 		}

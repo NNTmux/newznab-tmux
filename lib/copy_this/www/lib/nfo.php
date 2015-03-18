@@ -227,14 +227,14 @@ class Nfo
 		$db = new DB();
 		foreach($blobhash as $uid => $blob){
 			$query = sprintf(
-				"REPLACE INTO releasenfo (ID, releaseID, binaryID, nfo) ".
+				"REPLACE INTO releasenfo (id, releaseid, binaryID, nfo) ".
 				"VALUES (NULL, %d, 0, compress(%s));",
 				$uid, $db->escapeString($blob));
 			$id = $db->queryInsert($query);
 			if(!$id){
 				if($this->verbose) echo "!";
 			}else{
-				$query = sprintf("UPDATE releases SET releasenfoID = %d WHERE ID = %d LIMIT 1",
+				$query = sprintf("UPDATE releases SET releasenfoid = %d WHERE id = %d LIMIT 1",
 								$id, $uid);
 				$res = $db->queryExec($query);
 				if($this->verbose) echo "s";
@@ -260,12 +260,12 @@ class Nfo
 		// $nfoblob is expected as follows
 		//
 		//	$nfoblob = array(
-		//       [<releaseID>] = array(
+		//       [<releaseid>] = array(
 		//           [0] = <potential nfo file>,
 		//           [1] = <potential nfo file>,
 		//           ...
 		//       ),
-		//       [<releaseID>] = array(
+		//       [<releaseid>] = array(
 		//           [0] = <potential nfo file>,
 		//       ),
 		//       ...
@@ -273,7 +273,7 @@ class Nfo
 		//
 		// Meanwhile, $nfometa is expected as follows:
 		//	$nfometa = array(
-		//       [<releaseID>] = array(
+		//       [<releaseid>] = array(
 		//           [groups] = array(
 		//                       "alt.binaries.mygroupa",
 		//                       "alt.binaries.mygroupb",
@@ -287,7 +287,7 @@ class Nfo
 		//                       ...
 		//                    )
 		//       ),
-		//       [<releaseID>] = array(
+		//       [<releaseid>] = array(
 		//           [groups] = array(
 		//                       "alt.binaries.mygroupa",
 		//                       ...
@@ -383,7 +383,7 @@ class Nfo
 		// back of the array
 		//
 		//	$nfometa = array(
-		//       [<releaseID>] = array(
+		//       [<releaseid>] = array(
 		//           [groups] = array(
 		//                       "alt.binaries.mygroupa",
 		//                       "alt.binaries.mygroupb",
@@ -397,7 +397,7 @@ class Nfo
 		//                       ...
 		//                    )
 		//       ),
-		//       [<releaseID>] = array(
+		//       [<releaseid>] = array(
 		//           [groups] = array(
 		//                       "alt.binaries.mygroupa",
 		//                       ...
@@ -498,8 +498,8 @@ class Nfo
 		$nfometa = array();
 
 		// Missing NFO Query (oldest first so they don't expire on us)
-		$mnfo = "SELECT ID,guid, name FROM releases r ".
-				"WHERE r.releasenfoID = ".Nfo::FLAG_NFO_PENDING.
+		$mnfo = "SELECT id,guid, name FROM releases r ".
+				"WHERE r.releasenfoid = ".Nfo::FLAG_NFO_PENDING.
 				" ORDER BY postdate DESC";
 
 		if ($limit !==Null and $limit > 0)
@@ -511,8 +511,8 @@ class Nfo
 				$nzbfile = $nzb->getNZBPath($r["guid"]);
 				if(!is_file($nzbfile)){
 					if($this->verbose) echo sprintf("%s Missing NZB File: %d/%s ...\n",
-						'NfoProc', intval($r["ID"]), $r["name"]);
-					$this->setNfoMissing($r["ID"]);
+						'NfoProc', intval($r["id"]), $r["name"]);
+					$this->setNfoMissing($r["id"]);
 					continue;
 				}
 
@@ -520,8 +520,8 @@ class Nfo
 				if (!$nzbInfo->loadFromFile($nzbfile))
                 {
                    if($this->verbose) echo sprintf("%s Unable to parse NZB File: %d/%s ...\n",
-						'NfoProc', intval($r["ID"]), $r["name"]);
-					$this->setNfoMissing($r["ID"]);
+						'NfoProc', intval($r["id"]), $r["name"]);
+					$this->setNfoMissing($r["id"]);
 					continue;
                 }
 
@@ -535,19 +535,19 @@ class Nfo
 				if(is_array($matches)){
 					if(!count($matches)){
 						if($this->verbose) echo "nfo missing.\n";
-						$this->setNfoMissing($r["ID"]);
+						$this->setNfoMissing($r["id"]);
 						continue;
 					}
 				}else{
 					if($this->verbose) echo "corrupt nzb.\n";
-					$this->setNfoMissing($r["ID"]);
+					$this->setNfoMissing($r["id"]);
 					continue;
 				}
 				if($this->verbose) echo count($matches)." possible nfo(s).\n";
 				$processed++;
 
-				// Hash Matches by Release ID
-				$nfometa[(string)$r["ID"]] = $matches;
+				// Hash Matches by Release id
+				$nfometa[(string)$r["id"]] = $matches;
 
 				if(!($processed%$batch))
 				{
@@ -588,7 +588,7 @@ class Nfo
 	public function deleteReleaseNfo($relid)
 	{
 		$db = new DB();
-		return $db->queryExec(sprintf("DELETE from releasenfo where releaseID = %d", $relid));
+		return $db->queryExec(sprintf("DELETE from releasenfo where releaseid = %d", $relid));
 	}
 
 	/**
@@ -597,8 +597,8 @@ class Nfo
 	private function setNfoMissing($relid)
 	{
 		$db = new DB();
-		$q = sprintf("UPDATE releases SET releasenfoID = %d ".
-					"WHERE ID = %d", Nfo::FLAG_NFO_MISSING, $relid);
+		$q = sprintf("UPDATE releases SET releasenfoid = %d ".
+					"WHERE id = %d", Nfo::FLAG_NFO_MISSING, $relid);
 		return $db->queryExec($q);
 	}
 
@@ -610,8 +610,8 @@ class Nfo
 		$db = new DB();
 		// Has NFO Query
 		$mnfo = "SELECT uncompress(rn.nfo) as nfo FROM releases r ".
-			"INNER JOIN releasenfo rn ON rn.releaseID = r.ID AND rn.ID = r.releasenfoID ".
-			"WHERE rn.nfo IS NOT NULL AND r.ID = %d LIMIT 1";
+			"INNER JOIN releasenfo rn ON rn.releaseid = r.id AND rn.id = r.releasenfoid ".
+			"WHERE rn.nfo IS NOT NULL AND r.id = %d LIMIT 1";
 		$res = $db->queryOneRow(sprintf($mnfo, $relid));
 		if($res && isset($res['nfo']))
 		{

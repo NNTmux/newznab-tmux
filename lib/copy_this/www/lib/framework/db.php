@@ -862,7 +862,7 @@ class DB extends \PDO
 
 			$tableNames = '';
 			foreach ($tableArray as $table) {
-				$tableNames .= $table['Name'] . ',';
+				$tableNames .= $table['name'] . ',';
 			}
 			$tableNames = rtrim($tableNames, ',');
 
@@ -878,7 +878,7 @@ class DB extends \PDO
 				if ($myIsamTables instanceof \Traversable && $myIsamTables->rowCount()) {
 					$tableNames = '';
 					foreach ($myIsamTables as $table) {
-						$tableNames .= $table['Name'] . ',';
+						$tableNames .= $table['name'] . ',';
 					}
 					$tableNames = rtrim($tableNames, ',');
 					$this->queryExec(sprintf('REPAIR %s TABLE %s', $local, $tableNames));

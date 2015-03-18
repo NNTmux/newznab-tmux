@@ -151,16 +151,16 @@ class Konsole
 
 		$res = $this->pdo->queryOneRow(
 			sprintf("
-				SELECT COUNT(DISTINCT r.consoleinfoID) AS num
+				SELECT COUNT(DISTINCT r.consoleinfoid) AS num
 				FROM releases r
-				INNER JOIN consoleinfo con ON con.ID = r.consoleinfoID AND con.title != '' AND con.cover = 1
+				INNER JOIN consoleinfo con ON con.ID = r.consoleinfoid AND con.title != '' AND con.cover = 1
 				WHERE r.nzbstatus = 1
 				AND r.passwordstatus <= (SELECT value FROM site WHERE setting='showpasswordedrelease')
 				AND %s %s %s %s",
 				$this->getBrowseBy(),
 				$catsrch,
 				($maxage > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxage) : ''),
-				(count($excludedcats) > 0 ? (' AND r.categoryID NOT IN (' . implode(',', $excludedcats) . ')') : '')
+				(count($excludedcats) > 0 ? (' AND r.categoryid NOT IN (' . implode(',', $excludedcats) . ')') : '')
 			)
 		);
 		return ($res === false ? 0 : $res["num"]);
@@ -184,7 +184,7 @@ class Konsole
 
 		$exccatlist = "";
 		if (count($excludedcats) > 0) {
-			$exccatlist = " AND r.categoryID NOT IN (" . implode(",", $excludedcats) . ")";
+			$exccatlist = " AND r.categoryid NOT IN (" . implode(",", $excludedcats) . ")";
 		}
 
 		$order = $this->getConsoleOrder($orderby);
@@ -203,10 +203,10 @@ class Konsole
 				. "GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_totalparts, "
 				. "GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_comments, "
 				. "GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grabs, "
-				. "con.*, r.consoleinfoID, groups.name AS group_name, rn.ID as nfoid FROM releases r "
-				. "LEFT OUTER JOIN groups ON groups.ID = r.groupID "
-				. "LEFT OUTER JOIN releasenfo rn ON rn.releaseID = r.ID "
-				. "INNER JOIN consoleinfo con ON con.ID = r.consoleinfoID "
+				. "con.*, r.consoleinfoid, groups.name AS group_name, rn.ID as nfoid FROM releases r "
+				. "LEFT OUTER JOIN groups ON groups.ID = r.groupid "
+				. "LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.ID "
+				. "INNER JOIN consoleinfo con ON con.ID = r.consoleinfoid "
 				. "INNER JOIN genres ON con.genreID = genres.ID "
 				. "WHERE r.nzbstatus = 1 AND con.title != '' AND "
 				. "r.passwordstatus <= (SELECT value FROM site WHERE setting='showpasswordedrelease') AND %s %s
@@ -681,8 +681,8 @@ class Konsole
 							SELECT searchname, ID
 							FROM releases
 							WHERE nzbstatus = %d %s
-							AND consoleinfoID IS NULL
-							AND categoryID BETWEEN 1000 AND 1999
+							AND consoleinfoid IS NULL
+							AND categoryid BETWEEN 1000 AND 1999
 							ORDER BY postdate DESC
 							LIMIT %d',
 				\Enzebe::NZB_ADDED,
@@ -740,7 +740,7 @@ class Konsole
 				$this->pdo->queryExec(
 					sprintf('
 								UPDATE releases
-								SET consoleinfoID = %d
+								SET consoleinfoid = %d
 								WHERE ID = %d',
 						$gameId,
 						$arr['ID']
@@ -819,7 +819,7 @@ class Konsole
 		array_map("trim", $result);
 
 		/* Make sure we got a title and platform otherwise the resulting lookup will probably be shit.
-		   Other option is to pass the $release->categoryID here if we don't find a platform but that
+		   Other option is to pass the $release->categoryid here if we don't find a platform but that
 		   would require an extra lookup to determine the name. In either case we should have a title at the minimum. */
 
 		return (isset($result['title']) && !empty($result['title']) && isset($result['platform'])) ? $result : false;

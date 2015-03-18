@@ -32,7 +32,7 @@ class Categorize extends Category
 	public $releaseName;
 
 	/**
-	 * Group ID of the releasename we are sorting through.
+	 * Group id of the releasename we are sorting through.
 	 * @var int|string
 	 */
 	public $groupID;
@@ -58,9 +58,9 @@ class Categorize extends Category
 	 * Returns Category::CAT_MISC_OTHER if no category is appropriate.
 	 *
 	 * @param string     $releaseName The name to parse.
-	 * @param int|string $groupID     The groupID.
+	 * @param int|string $groupID     The groupid.
 	 *
-	 * @return int The categoryID.
+	 * @return int The categoryid.
 	 */
 	public function determineCategory($groupID, $releaseName = '')
 	{
@@ -92,7 +92,7 @@ class Categorize extends Category
 	 */
 	public function byGroup()
 	{
-		$group = $this->pdo->queryOneRow(sprintf('SELECT LOWER(name) AS name FROM groups WHERE ID = %d', $this->groupID));
+		$group = $this->pdo->queryOneRow(sprintf('SELECT LOWER(name) AS name FROM groups WHERE id = %d', $this->groupID));
 		if ($group !== false) {
 			$group = $group['name'];
 			switch (true) {

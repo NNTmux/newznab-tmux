@@ -93,7 +93,7 @@ class BasePage
 
 			//update lastlogin every 15 mins
 			if (strtotime($this->userdata['now'])-900 > strtotime($this->userdata['lastlogin']))
-				$users->updateSiteAccessed($this->userdata['ID']);
+				$users->updateSiteAccessed($this->userdata['id']);
 
 			$this->smarty->assign('userdata',$this->userdata);
 			$this->smarty->assign('loggedin',"true");

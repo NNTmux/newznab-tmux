@@ -1,4 +1,4 @@
- 
+
 <h1>{$page->title}</h1>
 
 {if $error != ''}
@@ -14,7 +14,7 @@
 	<td>
 		<input type="text" id="groupname" name="groupname" value="{$groupname|escape:html}" />
 		or
-		<select name="groupID">
+		<select name="groupid">
 		{html_options values=$gid output=$gnames selected=$groupID}
 		</select>
 	</td>
@@ -69,14 +69,14 @@
                     <th width="21%">poster</th>
                     <th width="8%">Bin Count</th>
                     <th width="8%">Bin Size</th>
-                    <th width="10%">Regex ID</th>
-                    <th width="10%">Req ID</th>
+                    <th width="10%">Regex id</th>
+                    <th width="10%">Req id</th>
                     <th width="20%">Group</th>
                     <th width="8%">Age</th>
                 </tr>
             {/if}
 
-            <tr {if $match.bininfo[0].blacklistID == 1}style="background-color:#ff9;"{elseif $match.bininfo[0].regexID != ''}style="background-color:#9f6;"{else}class="{cycle values=",alt"}{/if}">
+            <tr {if $match.bininfo[0].blacklistID == 1}style="background-color:#ff9;"{elseif $match.bininfo[0].regexid != ''}style="background-color:#9f6;"{else}class="{cycle values=",alt"}{/if}">
                 <td colspan="8">
                     <table width="100%" class="innerdata">
                         <tr>
@@ -87,8 +87,8 @@
                             <td width="21%"><small>{$match.bininfo[0].fromname|escape:"htmlall"}</small></td>
                             <td width="8%"><small>{$match.bincount}{if $match.reltotalparts != ''}/{$match.reltotalparts}{/if}</small></td>
                             <td width="8%"><small>{$match.totalsize|fsize_format:"MB"}</small></td>
-                            <td width="10%"><small><a href="regex-list.php#{$match.bininfo[0].regexID}">{$match.bininfo[0].regexID}</a></small></td>
-                            <td width="10%"><small>{$match.reqID}</small></td>
+                            <td width="10%"><small><a href="regex-list.php#{$match.bininfo[0].regexid}">{$match.bininfo[0].regexid}</a></small></td>
+                            <td width="10%"><small>{$match.reqid}</small></td>
                             <td width="20%"><small>{$match.bininfo[0].groupname|replace:"alt.binaries":"a.b"}</small></td>
                             <td width="8%"><small>{$match.bininfo[0].date|timeago}</small></td>
                         </tr>
@@ -114,7 +114,7 @@
 	<td>
 		<input type="text" id="groupname" name="groupname" value="{$groupname|escape:html}" />
 		or
-		<select name="groupID">
+		<select name="groupid">
 		{html_options values=$gid output=$gnames selected=$groupID}
 		</select>
 	</td>

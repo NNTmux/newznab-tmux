@@ -1,4 +1,4 @@
- 
+
 <h1>{$page->title}</h1>
 
 <form action="{$SCRIPT_NAME}?action=submit" method="POST">
@@ -8,7 +8,7 @@
 <tr>
 	<td><label for="title">Title</label>:</td>
 	<td>
-		<input type="hidden" name="id" value="{$menu.ID}" />
+		<input type="hidden" name="id" value="{$menu.id}" />
 		<input id="title" class="long" name="title" type="text" value="{$menu.title|escape:'htmlall'}" />
 	</td>
 </tr>

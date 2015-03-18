@@ -17,7 +17,7 @@
 	{foreach from=$commentslist item=comment}
 	<tr class="{cycle values=",alt"}">
 		<td>
-			{if $comment.sourceid == 0}<a title="View {$comment.username}'s profile" href="{$smarty.const.WWW_TOP}/user-edit.php?id={$comment.userID}">{$comment.username}</a>{else}{$comment.username}<br/><span style="color: #ce0000;">(syndicated)</span>{/if}
+			{if $comment.sourceid == 0}<a title="View {$comment.username}'s profile" href="{$smarty.const.WWW_TOP}/user-edit.php?id={$comment.userid}">{$comment.username}</a>{else}{$comment.username}<br/><span style="color: #ce0000;">(syndicated)</span>{/if}
 		</td>
 		<td width="70" title="{$comment.createddate}">{$comment.createddate|date_format} ({$comment.createddate|timeago}
 			ago)
@@ -26,7 +26,7 @@
 		<td>{$comment.host}</td>
 		<td class="mid" width="70">
 			{if $comment.guid != ""}<a href="{$smarty.const.WWW_TOP}/../details/{$comment.guid}#comments">view</a> | {/if}
-			<a class="confirm_action" href="{$smarty.const.WWW_TOP}/comments-delete.php?id={$comment.ID}">delete</a>
+			<a class="confirm_action" href="{$smarty.const.WWW_TOP}/comments-delete.php?id={$comment.id}">delete</a>
 		</td>
 	</tr>
 	{/foreach}

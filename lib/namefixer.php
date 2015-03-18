@@ -155,9 +155,9 @@ class NameFixer
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
 		$this->relid = $this->fixed = $this->checked = 0;
 		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
-		$this->timeother = ' AND rel.adddate > (NOW() - INTERVAL 0 HOUR) AND rel.categoryID IN (1090, 2020, 3050, 6050, 5050, 7050, 8010) GROUP BY rel.ID ORDER BY postdate DESC';
+		$this->timeother = ' AND rel.adddate > (NOW() - INTERVAL 0 HOUR) AND rel.categoryid IN (1090, 2020, 3050, 6050, 5050, 7050, 8010) GROUP BY rel.ID ORDER BY postdate DESC';
 		$this->timeall = ' AND rel.adddate > (NOW() - INTERVAL 6 HOUR) GROUP BY rel.ID ORDER BY postdate DESC';
-		$this->fullother = ' AND rel.categoryID IN (1090, 2020, 3050, 6050, 5050, 7050, 8010) GROUP BY rel.ID';
+		$this->fullother = ' AND rel.categoryid IN (1090, 2020, 3050, 6050, 5050, 7050, 8010) GROUP BY rel.ID';
 		$this->fullall = '';
 		$this->_fileName = '';
 		$this->done = $this->matched = false;
@@ -186,21 +186,21 @@ class NameFixer
 		$preId = false;
 		if ($cats === 3) {
 			$query = sprintf('
-					SELECT rel.ID AS releaseID
+					SELECT rel.ID AS releaseid
 					FROM releases rel
-					INNER JOIN releasenfo nfo ON (nfo.releaseID = rel.ID)
+					INNER JOIN releasenfo nfo ON (nfo.releaseid = rel.ID)
 					WHERE nzbstatus = %d
-					AND prehashID = 0',
+					AND prehashid = 0',
 				Enzebe::NZB_ADDED
 			);
 			$cats = 2;
 			$preId = true;
 		} else {
 			$query = sprintf('
-					SELECT rel.ID AS releaseID
+					SELECT rel.ID AS releaseid
 					FROM releases rel
-					INNER JOIN releasenfo nfo ON (nfo.releaseID = rel.ID)
-					WHERE (isrenamed = %d OR rel.categoryID = %d)
+					INNER JOIN releasenfo nfo ON (nfo.releaseid = rel.ID)
+					WHERE (isrenamed = %d OR rel.categoryid = %d)
 					AND proc_nfo = %d',
 				self::IS_RENAMED_NONE,
 				Category::CAT_MISC_OTHER,
@@ -220,12 +220,12 @@ class NameFixer
 				foreach ($releases as $rel) {
 					$releaseRow = $this->pdo->queryOneRow(
 						sprintf('
-							SELECT nfo.releaseID AS nfoid, rel.groupID, rel.categoryID, rel.name, rel.searchname,
-								UNCOMPRESS(nfo) AS textstring, rel.ID AS releaseID
+							SELECT nfo.releaseid AS nfoid, rel.groupid, rel.categoryid, rel.name, rel.searchname,
+								UNCOMPRESS(nfo) AS textstring, rel.ID AS releaseid
 							FROM releases rel
-							INNER JOIN releasenfo nfo ON (nfo.releaseID = rel.ID)
+							INNER JOIN releasenfo nfo ON (nfo.releaseid = rel.ID)
 							WHERE rel.ID = %d',
-							$rel['releaseID']
+							$rel['releaseid']
 						)
 					);
 
@@ -233,7 +233,7 @@ class NameFixer
 
 					// Ignore encrypted NFOs.
 					if (preg_match('/^=newz\[NZB\]=\w+/', $releaseRow['textstring'])) {
-						$this->_updateSingleColumn('proc_nfo', self::PROC_NFO_DONE, $rel['releaseID']);
+						$this->_updateSingleColumn('proc_nfo', self::PROC_NFO_DONE, $rel['releaseid']);
 						continue;
 					}
 
@@ -265,23 +265,23 @@ class NameFixer
 		$preId = false;
 		if ($cats === 3) {
 			$query = sprintf('
-					SELECT rf.name AS textstring, rel.categoryID, rel.name, rel.searchname, rel.groupID,
-						rf.releaseID AS fileid, rel.ID AS releaseID
+					SELECT rf.name AS textstring, rel.categoryid, rel.name, rel.searchname, rel.groupid,
+						rf.releaseid AS fileid, rel.ID AS releaseid
 					FROM releases rel
-					INNER JOIN releasefiles rf ON (rf.releaseID = rel.ID)
+					INNER JOIN releasefiles rf ON (rf.releaseid = rel.ID)
 					WHERE nzbstatus = %d
-					AND prehashID = 0',
+					AND prehashid = 0',
 				Enzebe::NZB_ADDED
 			);
 			$cats = 2;
 			$preId = true;
 		} else {
 			$query = sprintf('
-					SELECT rf.name AS textstring, rel.categoryID, rel.name, rel.searchname, rel.groupID,
-						rf.releaseID AS fileid, rel.ID AS releaseID
+					SELECT rf.name AS textstring, rel.categoryid, rel.name, rel.searchname, rel.groupid,
+						rf.releaseid AS fileid, rel.ID AS releaseid
 					FROM releases rel
-					INNER JOIN releasefiles rf ON (rf.releaseID = rel.ID)
-					WHERE (isrenamed = %d OR rel.categoryID = %d)
+					INNER JOIN releasefiles rf ON (rf.releaseid = rel.ID)
+					WHERE (isrenamed = %d OR rel.categoryid = %d)
 					AND proc_files = %d',
 				self::IS_RENAMED_NONE,
 				Category::CAT_MISC_OTHER,
@@ -327,18 +327,18 @@ class NameFixer
 
 		if ($cats === 3) {
 			$query = sprintf('
-					SELECT rel.ID AS releaseID, rel.guid, rel.groupID
+					SELECT rel.ID AS releaseid, rel.guid, rel.groupid
 					FROM releases rel
 					WHERE nzbstatus = %d
-					AND prehashID = 0',
+					AND prehashid = 0',
 				Enzebe::NZB_ADDED
 			);
 			$cats = 2;
 		} else {
 			$query = sprintf('
-					SELECT rel.ID AS releaseID, rel.guid, rel.groupID
+					SELECT rel.ID AS releaseid, rel.guid, rel.groupid
 					FROM releases rel
-					WHERE (isrenamed = %d OR rel.categoryID = %d)
+					WHERE (isrenamed = %d OR rel.categoryid = %d)
 					AND proc_par2 = %d',
 				self::IS_RENAMED_NONE,
 				Category::CAT_MISC_OTHER,
@@ -367,7 +367,7 @@ class NameFixer
 				);
 
 				foreach ($releases as $release) {
-					if (($nzbContents->checkPAR2($release['guid'], $release['releaseID'], $release['groupID'], $nameStatus, $show)) === true) {
+					if (($nzbContents->checkPAR2($release['guid'], $release['releaseid'], $release['groupid'], $nameStatus, $show)) === true) {
 						$this->fixed++;
 					}
 
@@ -488,14 +488,14 @@ class NameFixer
 	 */
 	public function updateRelease($release, $name, $method, $echo, $type, $nameStatus, $show, $preId = 0)
 	{
-		if ($this->relid !== $release['releaseID']) {
+		if ($this->relid !== $release['releaseid']) {
 			$releaseCleaning = new ReleaseCleaning($this->pdo);
 			$newName = $releaseCleaning->fixerCleaner($name);
 			if (strtolower($newName) != strtolower($release["searchname"])) {
 				$this->matched = true;
-				$this->relid = $release["releaseID"];
+				$this->relid = $release["releaseid"];
 
-				$determinedCategory = $this->category->determineCategory($release['groupID'], $newName);
+				$determinedCategory = $this->category->determineCategory($release['groupid'], $newName);
 
 				if ($type === "PAR2, ") {
 					$newName = ucwords($newName);
@@ -510,8 +510,8 @@ class NameFixer
 				$newName = preg_replace(array('/^[-=_\.:\s]+/', '/[-=_\.:\s]+$/'), '',  $newName[0]);
 
 				if ($this->echooutput === true && $show === 1) {
-					$groupName = $this->_groups->getByNameByID($release['groupID']);
-					$oldCatName = $this->category->getNameByID($release['categoryID']);
+					$groupName = $this->_groups->getByNameByID($release['groupid']);
+					$oldCatName = $this->category->getNameByID($release['categoryid']);
 					$newCatName = $this->category->getNameByID($determinedCategory);
 
 					if ($type === "PAR2, ") {
@@ -534,7 +534,7 @@ class NameFixer
 						$this->pdo->log->headerOver("Method:    ") .
 						$this->pdo->log->primary($type . $method) .
 						$this->pdo->log->headerOver("ReleaseID: ") .
-						$this->pdo->log->primary($release["releaseID"]);
+						$this->pdo->log->primary($release["releaseid"]);
 					if (isset($release['filename']) && $release['filename'] != "") {
 						echo
 							$this->pdo->log->headerOver("Filename:  ") .
@@ -576,36 +576,36 @@ class NameFixer
 						$this->pdo->queryExec(
 							sprintf('
 								UPDATE releases
-								SET rageID = -1, seriesfull = NULL, season = NULL, episode = NULL,
-									tvtitle = NULL, tvairdate = NULL, imdbID = NULL, musicinfoID = NULL,
-									consoleinfoID = NULL, bookinfoID = NULL, anidbid = NULL, prehashID = %d,
-									searchname = %s, %s categoryID = %d
+								SET rageid = -1, seriesfull = NULL, season = NULL, episode = NULL,
+									tvtitle = NULL, tvairdate = NULL, imdbid = NULL, musicinfoid = NULL,
+									consoleinfoid = NULL, bookinfoid = NULL, anidbid = NULL, prehashid = %d,
+									searchname = %s, %s categoryid = %d
 								WHERE ID = %d',
 								$preId,
 								$newTitle,
 								$status,
 								$determinedCategory,
-								$release['releaseID']
+								$release['releaseid']
 							)
 						);
-						$this->sphinx->updateReleaseSearchName($release['releaseID'], $newTitle);
+						$this->sphinx->updateReleaseSearchName($release['releaseid'], $newTitle);
 					} else {
 						$newTitle = $this->pdo->escapeString(substr($newName, 0, 255));
 						$this->pdo->queryExec(
 							sprintf('
 								UPDATE releases
-								SET rageID = -1, seriesfull = NULL, season = NULL, episode = NULL,
-									tvtitle = NULL, tvairdate = NULL, imdbID = NULL, musicinfoID = NULL,
-									consoleinfoID = NULL, bookinfoID = NULL, anidbid = NULL, prehashID = %d,
-									searchname = %s, iscategorized = 1, categoryID = %d
+								SET rageid = -1, seriesfull = NULL, season = NULL, episode = NULL,
+									tvtitle = NULL, tvairdate = NULL, imdbid = NULL, musicinfoid = NULL,
+									consoleinfoid = NULL, bookinfoid = NULL, anidbid = NULL, prehashid = %d,
+									searchname = %s, iscategorized = 1, categoryid = %d
 								WHERE ID = %d',
 								$preId,
 								$newTitle,
 								$determinedCategory,
-								$release['releaseID']
+								$release['releaseid']
 							)
 						);
-						$this->sphinx->updateReleaseSearchName($release['releaseID'], $newTitle);
+						$this->sphinx->updateReleaseSearchName($release['releaseid'], $newTitle);
 					}
 				}
 			}
@@ -663,12 +663,12 @@ class NameFixer
 		//Find release matches with fulltext and then identify exact matches with cleaned LIKE string
 		$res = $this->pdo->queryDirect(
 			sprintf("
-							SELECT r.ID AS releaseID, r.name, r.searchname,
-								r.groupID, r.categoryID
+							SELECT r.ID AS releaseid, r.name, r.searchname,
+								r.groupid, r.categoryid
 							FROM releases r
 							%1\$s
 							AND (r.name %2\$s OR r.searchname %2\$s)
-							AND r.prehashID = 0
+							AND r.prehashid = 0
 							LIMIT 21",
 				$join,
 				$this->pdo->likeString($pre['title'], true, true)
@@ -683,10 +683,10 @@ class NameFixer
 		if ($total > 0 && $total <= 15 && $res instanceof Traversable) {
 			foreach ($res as $row) {
 				if ($pre['title'] !== $row['searchname']) {
-					$this->updateRelease($row, $pre['title'], $method = "Title Match source: " . $pre['source'], $echo, "PreDB FT Exact, ", $namestatus, $show, $pre['prehashID']);
+					$this->updateRelease($row, $pre['title'], $method = "Title Match source: " . $pre['source'], $echo, "PreDB FT Exact, ", $namestatus, $show, $pre['prehashid']);
 					$matching++;
 				} else {
-					$this->_updateSingleColumn('prehashID', $pre['prehashID'], $row['releaseID']);
+					$this->_updateSingleColumn('prehashid', $pre['prehashid'], $row['releaseid']);
 				}
 			}
 		} elseif ($total >= 16) {
@@ -712,7 +712,7 @@ class NameFixer
 				preg_match_all('#[a-zA-Z0-9]{3,}#', $preTitle, $matches, PREG_PATTERN_ORDER);
 				$titlematch = '+' . implode(' +', $matches[0]);
 				$join = sprintf(
-					"INNER JOIN releasesearch rs ON rs.releaseID = r.ID
+					"INNER JOIN releasesearch rs ON rs.releaseid = r.ID
 					WHERE
 							(MATCH (rs.name) AGAINST ('%1\$s' IN BOOLEAN MODE)
 							OR MATCH (rs.searchname) AGAINST ('%1\$s' IN BOOLEAN MODE))",
@@ -740,13 +740,13 @@ class NameFixer
 
 		$query = $this->pdo->queryDirect(
 			sprintf('
-							SELECT r.ID AS releaseID, r.name, r.searchname,
-								r.groupID, r.categoryID,
+							SELECT r.ID AS releaseid, r.name, r.searchname,
+								r.groupid, r.categoryid,
 								rf.name AS filename
 							FROM releases r
-							INNER JOIN releasefiles rf ON r.ID = rf.releaseID
+							INNER JOIN releasefiles rf ON r.ID = rf.releaseid
 							AND rf.name IS NOT NULL
-							WHERE r.prehashID = 0
+							WHERE r.prehashid = 0
 							GROUP BY r.ID
 							%s %s',
 				$orderby,
@@ -788,7 +788,7 @@ class NameFixer
 		if ($this->_fileName !== '') {
 			$pre = $this->pdo->queryOneRow(
 				sprintf('
-							SELECT ID AS prehashID, title, source
+							SELECT ID AS prehashid, title, source
 							FROM prehash
 							WHERE filename = %s
 							OR title = %1$s',
@@ -799,9 +799,9 @@ class NameFixer
 
 		if (isset($pre) && $pre !== false) {
 			if ($pre['title'] !== $release['searchname']) {
-				$this->updateRelease($release, $pre['title'], $method = "file matched source: " . $pre['source'], $echo, "PreDB file match, ", $namestatus, $show, $pre['prehashID']);
+				$this->updateRelease($release, $pre['title'], $method = "file matched source: " . $pre['source'], $echo, "PreDB file match, ", $namestatus, $show, $pre['prehashid']);
 			} else {
-				$this->_updateSingleColumn('prehashID', $pre['prehashID'], $release['releaseID']);
+				$this->_updateSingleColumn('prehashid', $pre['prehashid'], $release['releaseid']);
 			}
 			$matching++;
 		}
@@ -863,7 +863,7 @@ class NameFixer
 
 		$row = $pdo->queryOneRow(
 			sprintf("
-						SELECT p.ID AS prehashID, p.title, p.source
+						SELECT p.ID AS prehashid, p.title, p.source
 						FROM prehash p INNER JOIN predbhash h ON h.pre_id = p.ID
 						WHERE MATCH (h.hashes) AGAINST (%s)
 						LIMIT 1",
@@ -873,11 +873,11 @@ class NameFixer
 
 		if ($row !== false) {
 			if ($row["title"] !== $release["searchname"]) {
-				$this->updateRelease($release, $row["title"], $method = "predb hash release name: " . $row["source"], $echo, $hashtype, $namestatus, $show, $row['prehashID']);
+				$this->updateRelease($release, $row["title"], $method = "predb hash release name: " . $row["source"], $echo, $hashtype, $namestatus, $show, $row['prehashid']);
 				$matching++;
 			}
 		} else {
-			$this->_updateSingleColumn('dehashstatus', $release['dehashstatus'] - 1, $release['releaseID']);
+			$this->_updateSingleColumn('dehashstatus', $release['dehashstatus'] - 1, $release['releaseid']);
 		}
 		return $matching;
 	}
@@ -926,13 +926,13 @@ class NameFixer
 			if ($namestatus == 1 && $this->matched === false) {
 				switch ($type) {
 					case  "NFO, ":
-						$this->_updateSingleColumn('proc_nfo', self::PROC_NFO_DONE, $release['releaseID']);
+						$this->_updateSingleColumn('proc_nfo', self::PROC_NFO_DONE, $release['releaseid']);
 						break;
 					case "Filenames, ":
-						$this->_updateSingleColumn('proc_files', self::PROC_FILES_DONE, $release['releaseID']);
+						$this->_updateSingleColumn('proc_files', self::PROC_FILES_DONE, $release['releaseid']);
 						break;
 					case "PAR2, ":
-						$this->_updateSingleColumn('proc_par2', self::PROC_FILES_DONE, $release['releaseID']);
+						$this->_updateSingleColumn('proc_par2', self::PROC_FILES_DONE, $release['releaseid']);
 						break;
 				}
 			}
@@ -970,7 +970,7 @@ class NameFixer
 	{
 		$result = array();
 
-		if ($this->done === false && $this->relid !== $release["releaseID"]) {
+		if ($this->done === false && $this->relid !== $release["releaseid"]) {
 
 			if (preg_match('/\w[-\w.\',;& ]+((s\d{1,2}[._ -]?[bde]\d{1,2})|(?<!\d)[S|]\d{1,2}[E|x]\d{1,}(?!\d)|ep[._ -]?\d{2})[-\w.\',;.()]+(BD(-?(25|50|RIP))?|Blu-?Ray ?(3D)?|BRRIP|CAM(RIP)?|DBrip|DTV|DVD\-?(5|9|(R(IP)?|scr(eener)?))?|[HPS]D?(RIP|TV(RIP)?)?|NTSC|PAL|R5|Ripped |S?VCD|scr(eener)?|SAT(RIP)?|TS|VHS(RIP)?|VOD|WEB-DL)[._ -][-\w.\',;& ]+\w/i', $release["textstring"], $result)) {
 				$this->updateRelease($release, $result["0"], $method = "tvCheck: Title.SxxExx.Text.source.group", $echo, $type, $namestatus, $show);
@@ -997,7 +997,7 @@ class NameFixer
 	{
 		$result = array();
 
-		if ($this->done === false && $this->relid !== $release["releaseID"]) {
+		if ($this->done === false && $this->relid !== $release["releaseid"]) {
 
 			if (preg_match('/\w[-\w.\',;& ]+((19|20)\d\d)[-\w.\',;& ]+(480|720|1080)[ip][._ -](DivX|[HX][._ -]?264|MPEG2|XviD(HD)?|WMV)[-\w.\',;& ]+\w/i', $release["textstring"], $result)) {
 				$this->updateRelease($release, $result["0"], $method = "movieCheck: Title.year.Text.res.vcod.group", $echo, $type, $namestatus, $show);
@@ -1034,7 +1034,7 @@ class NameFixer
 	{
 		$result = array();
 
-		if ($this->done === false && $this->relid !== $release["releaseID"]) {
+		if ($this->done === false && $this->relid !== $release["releaseid"]) {
 
 			if (preg_match('/\w[-\w.\',;& ]+(ASIA|DLC|EUR|GOTY|JPN|KOR|MULTI\d{1}|NTSCU?|PAL|RF|Region[._ -]?Free|USA|XBLA)[._ -](DLC[._ -]Complete|FRENCH|GERMAN|MULTI\d{1}|PROPER|PSN|READ[._ -]?NFO|UMD)?[._ -]?(GC|NDS|NGC|PS3|PSP|WII|XBOX(360)?)[-\w.\',;& ]+\w/i', $release["textstring"], $result)) {
 				$this->updateRelease($release, $result["0"], $method = "gameCheck: Videogames 1", $echo, $type, $namestatus, $show);
@@ -1055,7 +1055,7 @@ class NameFixer
 	{
 		$result = array();
 
-		if ($this->done === false && $this->relid !== $release["releaseID"]) {
+		if ($this->done === false && $this->relid !== $release["releaseid"]) {
 
 			if (preg_match('/\w[-\w.\',;& ]+(\d{1,10}|Linux|UNIX)[._ -](RPM)?[._ -]?(X64)?[._ -]?(Incl)[._ -](Keygen)[-\w.\',;& ]+\w/i', $release["textstring"], $result)) {
 				$this->updateRelease($release, $result["0"], $method = "appCheck: Apps 1", $echo, $type, $namestatus, $show);
@@ -1074,7 +1074,7 @@ class NameFixer
 	{
 		$result = array();
 
-		if ($this->done === false && $this->relid !== $release["releaseID"]) {
+		if ($this->done === false && $this->relid !== $release["releaseid"]) {
 
 			if (preg_match('/:\s*.*[\\\\\/]([A-Z0-9].+?S\d+[.-_ ]?[ED]\d+.+?)\.\w{2,}\s+/i', $release["textstring"], $result)) {
 				$this->updateRelease($release, $result["1"], $method = "nfoCheck: Generic TV 1", $echo, $type, $namestatus, $show);
@@ -1089,7 +1089,7 @@ class NameFixer
 	{
 		$result = array();
 
-		if ($this->done === false && $this->relid !== $release["releaseID"]) {
+		if ($this->done === false && $this->relid !== $release["releaseid"]) {
 
 			if (preg_match('/(?:((?<!Source\s)\:\s{1,}))(.+?(19|20)\d\d.+?(BDRip|bluray|DVD(R|Rip)?|XVID).+?)(\s{2,}|\r|\n)/i', $release["textstring"], $result)) {
 				$this->updateRelease($release, $result["2"], $method = "nfoCheck: Generic Movies 1", $echo, $type, $namestatus, $show);
@@ -1106,7 +1106,7 @@ class NameFixer
 	{
 		$result = array();
 
-		if ($this->done === false && $this->relid !== $release["releaseID"]) {
+		if ($this->done === false && $this->relid !== $release["releaseid"]) {
 
 			if (preg_match('/(?:\s{2,})(.+?-FM-\d{2}-\d{2})/i', $release["textstring"], $result)) {
 				$newname = str_replace('-FM-', '-FM-Radio-MP3-', $result["1"]);
@@ -1120,7 +1120,7 @@ class NameFixer
 	{
 		$result = array();
 
-		if ($this->done === false && $this->relid !== $release["releaseID"]) {
+		if ($this->done === false && $this->relid !== $release["releaseid"]) {
 			if (preg_match('/(\w[-\w`~!@#$%^&*()_+={}|"<>?\[\]\\;\',.\/ ]+\s?\((19|20)\d\d\))/i', $release["textstring"], $result) && !preg_match('/\.pdf|Audio ?Book/i', $release["textstring"])) {
 				$releasename = $result[0];
 				if (preg_match('/(idiomas|lang|language|langue|sprache).*?\b(?P<lang>Brazilian|Chinese|Croatian|Danish|DE|Deutsch|Dutch|Estonian|ES|English|Englisch|Finnish|Flemish|Francais|French|FR|German|Greek|Hebrew|Icelandic|Italian|Japenese|Japan|Japanese|Korean|Latin|Nordic|Norwegian|Polish|Portuguese|Russian|Serbian|Slovenian|Swedish|Spanisch|Spanish|Thai|Turkish)\b/i', $release["textstring"], $result)) {
@@ -1288,7 +1288,7 @@ class NameFixer
 	{
 		$result = array();
 
-		if ($this->done === false && $this->relid !== $release["releaseID"]) {
+		if ($this->done === false && $this->relid !== $release["releaseid"]) {
 
 			if (preg_match('/ALiAS|BAT-TEAM|FAiRLiGHT|Game Type|Glamoury|HI2U|iTWINS|JAGUAR|(LARGE|MEDIUM)ISO|MAZE|nERv|PROPHET|PROFiT|PROCYON|RELOADED|REVOLVER|ROGUE|ViTALiTY/i', $release["textstring"])) {
 
@@ -1307,7 +1307,7 @@ class NameFixer
 	public function nfoCheckMisc($release, $echo, $type, $namestatus, $show)
 	{
 
-		if ($this->done === false && $this->relid !== $release["releaseID"]) {
+		if ($this->done === false && $this->relid !== $release["releaseid"]) {
 
 			if (preg_match('/Supplier.+?IGUANA/i', $release["textstring"])) {
 				$releasename = '';
@@ -1344,7 +1344,7 @@ class NameFixer
 	{
 		$result = array();
 
-		if ($this->done === false && $this->relid !== $release["releaseID"]) {
+		if ($this->done === false && $this->relid !== $release["releaseid"]) {
 
 			if (preg_match('/^(.+?(x264|XviD)\-TVP)\\\\/i', $release["textstring"], $result)) {
 				$this->updateRelease($release, $result["1"], $method = "fileCheck: TVP", $echo, $type, $namestatus, $show);

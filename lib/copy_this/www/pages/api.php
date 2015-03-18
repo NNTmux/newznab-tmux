@@ -76,7 +76,7 @@ $catExclusions = [];
 $maxRequests = 0;
 // Page is accessible only by the apikey, or logged in users.
 if ($users->isLoggedIn()) {
-	$uid = $page->userdata['ID'];
+	$uid = $page->userdata['id'];
 	$apiKey = $page->userdata['rsstoken'];
 	$catExclusions = $page->userdata['categoryexclusions'];
 	$maxRequests = $page->userdata['apirequests'];
@@ -92,7 +92,7 @@ if ($users->isLoggedIn()) {
 			showApiError(100, 'Incorrect user credentials (wrong API key)');
 		}
 
-		$uid = $res['ID'];
+		$uid = $res['id'];
 		$catExclusions = $users->getCategoryExclusion($uid);
 		//
 		// A hash of the users ip to record against the api hit
@@ -138,7 +138,7 @@ switch ($function) {
 		verifyEmptyParameter('q');
 		$maxAge = maxAge();
 		$users->addApiRequest($uid, $_SERVER['REQUEST_URI'], $hosthash);
-		$categoryID = categoryID();
+		$categoryID = categoryid();
 		$limit = limit();
 		$offset = offset();
 
@@ -174,7 +174,7 @@ switch ($function) {
 			$offset,
 			limit(),
 			(isset($_GET['q']) ? $_GET['q'] : ''),
-			categoryID(),
+			categoryid(),
 			$maxAge
 		);
 
@@ -195,7 +195,7 @@ switch ($function) {
 		if (!$reldata)
 			showApiError(300);
 
-		$nfo = $releases->getReleaseNfo($reldata["ID"], true);
+		$nfo = $releases->getReleaseNfo($reldata["id"], true);
 		if (!$nfo)
 			showApiError(300);
 
@@ -262,7 +262,7 @@ switch ($function) {
 		$reldata = $releases->getByGuid($_GET["id"]);
 		if ($reldata)
 		{
-			$ret = $rc->addComment($reldata["ID"], $reldata["gid"], $_GET["text"], $uid, $_SERVER['REMOTE_ADDR']);
+			$ret = $rc->addComment($reldata["id"], $reldata["gid"], $_GET["text"], $uid, $_SERVER['REMOTE_ADDR']);
 
 			$content = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
 			$content.= "<commentadd id=\"".$ret."\" />\n";
@@ -376,13 +376,13 @@ switch ($function) {
 			$offset,
 			limit(),
 			(isset($_GET['q']) ? $_GET['q'] : ''),
-			categoryID(),
+			categoryid(),
 			$maxAge
 		);
 
 		addCoverURL($relData,
 			function ($release) {
-				return Utility::getCoverURL(['type' => 'movies', 'ID' => $release['imdbID']]);
+				return Utility::getCoverURL(['type' => 'movies', 'id' => $release['imdbid']]);
 			}
 		);
 
@@ -454,7 +454,7 @@ switch ($function) {
 
 		// Check email isn't taken.
 		$ret = $users->getByEmail($_GET['email']);
-		if (isset($ret['ID'])) {
+		if (isset($ret['id'])) {
 			showApiError(105);
 		}
 
@@ -465,7 +465,7 @@ switch ($function) {
 		// Register.
 		$userDefault = $users->getDefaultRole();
 		$uid = $users->signup(
-			$username, $password, $_GET['email'], $_SERVER['REMOTE_ADDR'], $userDefault['ID'], "", $userDefault['defaultinvites'], "", false, false, false, true
+			$username, $password, $_GET['email'], $_SERVER['REMOTE_ADDR'], $userDefault['id'], "", $userDefault['defaultinvites'], "", false, false, false, true
 		);
 
 		// Check if it succeeded.
@@ -572,12 +572,12 @@ function maxAge()
  * Verify cat parameter.
  * @return array
  */
-function categoryID()
+function categoryid()
 {
 	$categoryID[] = -1;
 	if (isset($_GET['cat'])) {
 		$categoryIDs = $_GET['cat'];
-		// Append Web-DL category ID if HD present for SickBeard / NZBDrone compatibility.
+		// Append Web-DL category id if HD present for SickBeard / NZBDrone compatibility.
 		if (strpos($_GET['cat'], (string)Category::CAT_TV_HD) !== false &&
 			strpos($_GET['cat'], (string)Category::CAT_TV_WEBDL) === false) {
 			$categoryIDs .= (',' . Category::CAT_TV_WEBDL);
@@ -665,8 +665,8 @@ function addLanguage(&$releases, DB $settings)
 {
 	if ($releases && count($releases)) {
 		foreach ($releases as $key => $release) {
-			if (isset($release['ID'])) {
-				$language = $settings->queryOneRow(sprintf('SELECT audiolanguage FROM releaseaudio WHERE releaseID = %d', $release['ID']));
+			if (isset($release['id'])) {
+				$language = $settings->queryOneRow(sprintf('SELECT audiolanguage FROM releaseaudio WHERE releaseid = %d', $release['id']));
 				if ($language !== false) {
 					$releases[$key]['searchname'] = $releases[$key]['searchname'] . ' ' . $language['audiolanguage'];
 				}

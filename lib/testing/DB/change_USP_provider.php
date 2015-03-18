@@ -18,7 +18,7 @@ if (!isset($argv[1]) || $argv[1] != 'true') {
 }
 
 
-$groups = $pdo->query("SELECT ID, name, first_record_postdate, last_record_postdate FROM groups WHERE active = 1");
+$groups = $pdo->query("SELECT id, name, first_record_postdate, last_record_postdate FROM groups WHERE active = 1");
 $numofgroups = count($groups);
 $guesstime = $numofgroups * 2;
 $totalstart = microtime(true);
@@ -37,7 +37,7 @@ foreach ($groups as $group) {
 	echo "Our Current backfill postdate was: " . $pdo->log->setColor('Yellow') . date('r', strtotime($group['first_record_postdate'])) . $pdo->log->rsetcolor() . "\n";
 	$currartnum = daytopost($nntp, $group['name'], $currdays, true, false);
 	echo "Our Current current postdate was: " . $pdo->log->setColor('Yellow') . date('r', strtotime($group['last_record_postdate'])) . $pdo->log->rsetcolor() . "\n";
-	$pdo->queryExec(sprintf("UPDATE groups SET first_record = %s, last_record = %s WHERE ID = %d", $pdo->escapeString($bfartnum), $pdo->escapeString($currartnum), $group['ID']));
+	$pdo->queryExec(sprintf("UPDATE groups SET first_record = %s, last_record = %s WHERE id = %d", $pdo->escapeString($bfartnum), $pdo->escapeString($currartnum), $group['id']));
 	$endtime = microtime(true);
 	echo $pdo->log->setColor('Gray', 'Dim') . "This group took " . gmdate("H:i:s", $endtime - $starttime) . " to process.\n";
 	$numofgroups--;

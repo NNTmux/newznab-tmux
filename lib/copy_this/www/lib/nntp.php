@@ -562,7 +562,7 @@ class NNTP extends Net_NNTP_Client
 
 			$loops = $messageSize = 0;
 
-			// Loop over the message-ID's or article numbers.
+			// Loop over the message-id's or article numbers.
 			foreach ($identifiers as $wanted) {
 
 				/* This is to attempt to prevent string size overflow.
@@ -632,7 +632,7 @@ class NNTP extends Net_NNTP_Client
 				}
 			}
 
-			// If it's a string check if it's a valid message-ID.
+			// If it's a string check if it's a valid message-id.
 		} else if (is_string($identifiers) || is_numeric($identifiers)) {
 			$body = $this->_getMessage($groupName, $identifiers);
 			if ($alternate === true && $this->isError($body)) {
@@ -662,7 +662,7 @@ class NNTP extends Net_NNTP_Client
 	 * associated values, optionally decode the body using yEnc.
 	 *
 	 * @param string $groupName  The name of the group the article is in.
-	 * @param mixed  $identifier (string)The message-ID of the article to download.
+	 * @param mixed  $identifier (string)The message-id of the article to download.
 	 *                           (int) The article number.
 	 * @param bool   $yEnc       Attempt to yEnc decode the body.
 	 *
@@ -691,9 +691,9 @@ class NNTP extends Net_NNTP_Client
 			}
 		}
 
-		// Check if it's an article number or message-ID.
+		// Check if it's an article number or message-id.
 		if (!is_numeric($identifier)) {
-			// If it's a message-ID, check if it has the required triangular brackets.
+			// If it's a message-id, check if it has the required triangular brackets.
 			$identifier = $this->_formatMessageID($identifier);
 		}
 
@@ -746,7 +746,7 @@ class NNTP extends Net_NNTP_Client
 	 * Download a full article header.
 	 *
 	 * @param string $groupName  The name of the group the article is in.
-	 * @param mixed $identifier (string) The message-ID of the article to download.
+	 * @param mixed $identifier (string) The message-id of the article to download.
 	 *                          (int)    The article number.
 	 *
 	 * @return mixed On success : (array)  The header.
@@ -1493,7 +1493,7 @@ class NNTP extends Net_NNTP_Client
 	 * Download an article body (an article without the header).
 	 *
 	 * @param string $groupName The name of the group the article is in.
-	 * @param mixed $identifier (string) The message-ID of the article to download.
+	 * @param mixed $identifier (string) The message-id of the article to download.
 	 *                          (int)    The article number.
 	 *
 	 * @return mixed On success : (string) The article's body.

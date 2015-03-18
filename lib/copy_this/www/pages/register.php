@@ -57,7 +57,7 @@ else {
 				//get the default user role
 				$userdefault = $users->getDefaultRole();
 
-				$ret = $users->signup($username, $password, $email, $_SERVER['REMOTE_ADDR'], $userdefault['ID'], "", $userdefault['defaultinvites'], $invitecode, false, isset($_POST['recaptcha_challenge_field']) ? $_POST['recaptcha_challenge_field'] : null, isset($_POST['recaptcha_response_field']) ? $_POST['recaptcha_response_field'] : null);
+				$ret = $users->signup($username, $password, $email, $_SERVER['REMOTE_ADDR'], $userdefault['id'], "", $userdefault['defaultinvites'], $invitecode, false, isset($_POST['recaptcha_challenge_field']) ? $_POST['recaptcha_challenge_field'] : null, isset($_POST['recaptcha_response_field']) ? $_POST['recaptcha_response_field'] : null);
 				if ($ret > 0) {
 					$users->login($ret, $_SERVER['REMOTE_ADDR']);
 					header("Location: " . WWW_TOP . "/");

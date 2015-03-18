@@ -16,8 +16,8 @@ require_once(NN_TMUX . 'lib' . DS . 'Enzebe.php');
  *
  * This forks various newznab scripts.
  *
- * For example, you get all the ID's of the active groups in the groups table, you then iterate over them and spawn
- * processes of misc/update_binaries.php passing the group ID's.
+ * For example, you get all the id's of the active groups in the groups table, you then iterate over them and spawn
+ * processes of misc/update_binaries.php passing the group id's.
  *
  * @package nzedb\libraries
  */
@@ -363,8 +363,8 @@ class Forking extends \fork_daemon
 		);
 
 		$count = 0;
-		if ($data['Name']) {
-			$this->safeBackfillGroup = $data['Name'];
+		if ($data['name']) {
+			$this->safeBackfillGroup = $data['name'];
 
 			$count = ($data['our_first'] - $data['their_first']);
 		}
@@ -378,7 +378,7 @@ class Forking extends \fork_daemon
 
 			$queue = array();
 			for ($i = 0; $i <= $geteach - 1; $i++) {
-				$queue[$i] = sprintf("get_range  backfill  %s  %s  %s  %s", $data['Name'], $data['our_first'] - $i * $run[0]['maxmsgs'] - $run[0]['maxmsgs'], $data['our_first'] - $i * $run[0]['maxmsgs'] - 1, $i + 1);
+				$queue[$i] = sprintf("get_range  backfill  %s  %s  %s  %s", $data['name'], $data['our_first'] - $i * $run[0]['maxmsgs'] - $run[0]['maxmsgs'], $data['our_first'] - $i * $run[0]['maxmsgs'] - 1, $i + 1);
 			}
 			$this->work = $queue;
 		}
@@ -493,7 +493,7 @@ class Forking extends \fork_daemon
 		$groupby = "GROUP BY guidchar";
 		$orderby = "ORDER BY guidchar ASC";
 		$rowLimit = "LIMIT 16";
-		$extrawhere = "AND r.prehashID = 0 AND r.nzbstatus = 1";
+		$extrawhere = "AND r.prehashid = 0 AND r.nzbstatus = 1";
 		$select = "DISTINCT LEFT(r.guid, 1) AS guidchar, COUNT(*) AS count";
 
 
@@ -505,7 +505,7 @@ class Forking extends \fork_daemon
 		}
 		switch($this->workTypeOptions[0]) {
 			case "md5":
-				$join = "LEFT OUTER JOIN releasefiles rf ON r.ID = rf.releaseID AND rf.ishashed = 1";
+				$join = "LEFT OUTER JOIN releasefiles rf ON r.id = rf.releaseid AND rf.ishashed = 1";
 				$where = "r.ishashed = 1 AND r.dehashstatus BETWEEN -6 AND 0";
 				break;
 
@@ -514,7 +514,7 @@ class Forking extends \fork_daemon
 				break;
 
 			case "filename":
-				$join = "INNER JOIN releasefiles rf ON r.ID = rf.releaseID";
+				$join = "INNER JOIN releasefiles rf ON r.id = rf.releaseid";
 				$where = "r.proc_files = 0";
 				break;
 
@@ -578,12 +578,12 @@ class Forking extends \fork_daemon
 		$this->tablePerGroup = ($this->site->tablepergroup == 1 ? true : false);
 		if ($this->tablePerGroup === true) {
 
-			$groups = $this->pdo->queryDirect('SELECT ID FROM groups WHERE (active = 1 OR backfill = 1)');
+			$groups = $this->pdo->queryDirect('SELECT id FROM groups WHERE (active = 1 OR backfill = 1)');
 
 			if ($groups instanceof \Traversable) {
 				foreach($groups as $group) {
-					if ($this->pdo->queryOneRow(sprintf('SELECT ID FROM binaries_%d  LIMIT 1',$group['ID'])) !== false) {
-						$this->work[] = ['ID' => $group['ID']];
+					if ($this->pdo->queryOneRow(sprintf('SELECT id FROM binaries_%d  LIMIT 1',$group['id'])) !== false) {
+						$this->work[] = ['id' => $group['id']];
 					}
 				}
 			}
@@ -599,7 +599,7 @@ class Forking extends \fork_daemon
 		foreach ($groups as $group) {
 			if ($this->tablePerGroup === true) {
 				$this->_executeCommand(
-					$this->dnr_path . 'releases  ' .  $group['ID'] . '"'
+					$this->dnr_path . 'releases  ' .  $group['id'] . '"'
 				);
 			} else {
 				$this->_executeCommand(
@@ -635,7 +635,7 @@ class Forking extends \fork_daemon
 
 			if ($type !== '') {
 				$this->_executeCommand(
-					$this->dnr_path . $type .  $group['ID'] . (isset($group['renamed']) ? ('  ' . $group['renamed']) : '') . '"'
+					$this->dnr_path . $type .  $group['id'] . (isset($group['renamed']) ? ('  ' . $group['renamed']) : '') . '"'
 				);
 			}
 		}
@@ -659,9 +659,9 @@ class Forking extends \fork_daemon
 		return (
 			$this->pdo->queryOneRow(
 				sprintf('
-					SELECT r.ID
+					SELECT r.id
 					FROM releases r
-					LEFT JOIN category c ON c.ID = r.categoryID
+					LEFT JOIN category c ON c.id = r.categoryid
 					WHERE r.nzbstatus = %d
 					AND r.passwordstatus BETWEEN -6 AND -1
 					AND r.haspreview = -1
@@ -684,9 +684,9 @@ class Forking extends \fork_daemon
 			$this->register_child_run([0 => $this, 1 => 'postProcessChildWorker']);
 			$this->work = $this->pdo->query(
 				sprintf('
-					SELECT LEFT(r.guid, 1) AS ID
+					SELECT LEFT(r.guid, 1) AS id
 					FROM releases r
-					LEFT JOIN category c ON c.ID = r.categoryID
+					LEFT JOIN category c ON c.id = r.categoryid
 					WHERE r.nzbstatus = %d
 					AND r.passwordstatus BETWEEN -6 AND -1
 					AND r.haspreview = -1
@@ -717,7 +717,7 @@ class Forking extends \fork_daemon
 			return (
 				$this->pdo->queryOneRow(
 					sprintf(
-						'SELECT r.ID FROM releases r WHERE 1=1 %s LIMIT 1',
+						'SELECT r.id FROM releases r WHERE 1=1 %s LIMIT 1',
 						$this->nfoQueryString
 					)
 				) === false ? false : true
@@ -734,7 +734,7 @@ class Forking extends \fork_daemon
 			$this->register_child_run([0 => $this, 1 => 'postProcessChildWorker']);
 			$this->work = $this->pdo->query(
 				sprintf('
-					SELECT LEFT(r.guid, 1) AS ID
+					SELECT LEFT(r.guid, 1) AS id
 					FROM releases r
 					WHERE 1=1 %s
 					GROUP BY LEFT(r.guid, 1)
@@ -757,11 +757,11 @@ class Forking extends \fork_daemon
 			return (
 				$this->pdo->queryOneRow(
 					sprintf('
-						SELECT ID
+						SELECT id
 						FROM releases
 						WHERE nzbstatus = %d
-						AND imdbID IS NULL
-						AND categoryID BETWEEN 2000 AND 2999
+						AND imdbid IS NULL
+						AND categoryid BETWEEN 2000 AND 2999
 						%s %s
 						LIMIT 1',
 						\Enzebe::NZB_ADDED,
@@ -782,11 +782,11 @@ class Forking extends \fork_daemon
 			$this->register_child_run([0 => $this, 1 => 'postProcessChildWorker']);
 			$this->work = $this->pdo->query(
 				sprintf('
-					SELECT LEFT(guid, 1) AS ID, %d AS renamed
+					SELECT LEFT(guid, 1) AS id, %d AS renamed
 					FROM releases
 					WHERE nzbstatus = %d
-					AND imdbID IS NULL
-					AND categoryID BETWEEN 2000 AND 2999
+					AND imdbid IS NULL
+					AND categoryid BETWEEN 2000 AND 2999
 					%s %s
 					GROUP BY LEFT(guid, 1)
 					LIMIT 16',
@@ -811,12 +811,12 @@ class Forking extends \fork_daemon
 			return (
 				$this->pdo->queryOneRow(
 					sprintf('
-						SELECT ID
+						SELECT id
 						FROM releases
 						WHERE nzbstatus = %d
 						AND size > 1048576
-						AND rageID = -1
-						AND categoryID BETWEEN 5000 AND 5999
+						AND rageid = -1
+						AND categoryid BETWEEN 5000 AND 5999
 						%s %s
 						LIMIT 1',
 						\Enzebe::NZB_ADDED,
@@ -837,12 +837,12 @@ class Forking extends \fork_daemon
 			$this->register_child_run([0 => $this, 1 => 'postProcessChildWorker']);
 			$this->work = $this->pdo->query(
 				sprintf('
-					SELECT LEFT(guid, 1) AS ID, %d AS renamed
+					SELECT LEFT(guid, 1) AS id, %d AS renamed
 					FROM releases
 					WHERE nzbstatus = %d
-					AND rageID = -1
+					AND rageid = -1
 					AND size > 1048576
-					AND categoryID BETWEEN 5000 AND 5999
+					AND categoryid BETWEEN 5000 AND 5999
 					%s %s
 					GROUP BY LEFT(guid, 1)
 					LIMIT 16',
@@ -893,7 +893,7 @@ class Forking extends \fork_daemon
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////// All requestID code goes here ////////////////////////////////////////////////
+	////////////////////////////////////// All requestid code goes here ////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private function requestIDMainMethod()
@@ -901,12 +901,12 @@ class Forking extends \fork_daemon
 		$this->register_child_run([0 => $this, 1 => 'requestIDChildWorker']);
 		$this->work = $this->pdo->query(
 			sprintf('
-				SELECT DISTINCT(g.ID)
+				SELECT DISTINCT(g.id)
 				FROM groups g
-				INNER JOIN releases r ON r.groupID = g.ID
+				INNER JOIN releases r ON r.groupid = g.id
 				WHERE g.active = 1
 				AND r.nzbstatus = %d
-				AND r.prehashID = 0
+				AND r.prehashid = 0
 				AND r.isrequestid = 1
 				AND r.reqidstatus = %d',
 				\Enzebe::NZB_ADDED,
@@ -920,7 +920,7 @@ class Forking extends \fork_daemon
 	{
 		foreach ($groups as $group) {
 			$this->_executeCommand(
-				$this->dnr_path . 'requestid  ' .  $group['ID'] . '"'
+				$this->dnr_path . 'requestid  ' .  $group['id'] . '"'
 			);
 		}
 	}
@@ -932,7 +932,7 @@ class Forking extends \fork_daemon
 	private function updatePerGroupMainMethod()
 	{
 		$this->register_child_run([0 => $this, 1 => 'updatePerGroupChildWorker']);
-		$this->work = $this->pdo->query('SELECT ID FROM groups WHERE (active = 1 OR backfill = 1)');
+		$this->work = $this->pdo->query('SELECT id FROM groups WHERE (active = 1 OR backfill = 1)');
 		return $this->site->releasethreads;
 	}
 
@@ -940,7 +940,7 @@ class Forking extends \fork_daemon
 	{
 		foreach ($groups as $group) {
 			$this->_executeCommand(
-				$this->dnr_path . 'update_per_group  ' .  $group['ID'] . '"'
+				$this->dnr_path . 'update_per_group  ' .  $group['id'] . '"'
 			);
 		}
 	}
@@ -1020,7 +1020,7 @@ class Forking extends \fork_daemon
 		if (NN_ECHOCLI) {
 			$this->_colorCLI->doEcho(
 				$this->_colorCLI->header(
-					'Process ID #' . $pid . ' has completed.' . PHP_EOL .
+					'Process id #' . $pid . ' has completed.' . PHP_EOL .
 					'There are ' . ($this->forked_children_count - 1) . ' process(es) still active with ' .
 					(--$this->_workCount) . ' job(s) left in the queue.' . PHP_EOL
 				)

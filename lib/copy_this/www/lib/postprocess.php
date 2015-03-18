@@ -72,9 +72,9 @@ class PostProcess
 		if($this->site->deletepasswordedrelease == 1)
 		{
 			echo "PostPrc : Removing unwanted releases\n";
-			$result = $db->query("select ID from releases where passwordstatus > 0");
+			$result = $db->query("select id from releases where passwordstatus > 0");
 			foreach ($result as $row)
-				$r->delete($row["ID"]);
+				$r->delete($row["id"]);
 		}
 
 		//
@@ -84,9 +84,9 @@ class PostProcess
 		{
 			echo "PostPrc : Deleting releases older than ".$this->site->releaseretentiondays." days\n";
 
-			$result = $db->query(sprintf("select ID from releases where postdate < %s - interval %d day", $db->escapeString($currTime_ori["now"]), $this->site->releaseretentiondays));
+			$result = $db->query(sprintf("select id from releases where postdate < %s - interval %d day", $db->escapeString($currTime_ori["now"]), $this->site->releaseretentiondays));
 			foreach ($result as $row)
-				$r->delete($row["ID"]);
+				$r->delete($row["id"]);
 		}
 
 		//
@@ -94,7 +94,7 @@ class PostProcess
 		//
 		if($this->site->audiopreviewprune > 0)
 		{
-			$result = $db->query(sprintf("select guid from releases where categoryID in (select ID from category where parentID = ".Category::CAT_PARENT_MUSIC.") and haspreview = 2 and adddate < %s - interval %d day", $db->escapeString($currTime_ori["now"]), $this->site->audiopreviewprune));
+			$result = $db->query(sprintf("select guid from releases where categoryid in (select id from category where parentid = ".Category::CAT_PARENT_MUSIC.") and haspreview = 2 and adddate < %s - interval %d day", $db->escapeString($currTime_ori["now"]), $this->site->audiopreviewprune));
 
             if (sizeof($result) > 0)
             {
@@ -117,7 +117,7 @@ class PostProcess
 			//
 			// all releases where the only file inside the rars is *.exe and they are not in the PC category
 			//
-			$sql = "select releasefiles.releaseID as ID from releasefiles inner join  ( select releaseID, count(*) as totnum from  releasefiles group by releaseID ) x on x.releaseID = releasefiles.releaseID and x.totnum = 1 inner join releases on releases.ID = releasefiles.releaseID left join releasenfo on releasenfo.releaseID = releases.ID where (releasefiles.name like '%.exe' or releasefiles.name like '%.scr') and (releases.categoryID not in (select ID from category where parentID = ".Category::CAT_PARENT_PC.") or (releases.categoryID in (select ID from category where parentID = ".Category::CAT_PARENT_PC.") and releasenfo.ID is null)) group by releasefiles.releaseID";
+			$sql = "select releasefiles.releaseid as id from releasefiles inner join  ( select releaseid, count(*) as totnum from  releasefiles group by releaseid ) x on x.releaseid = releasefiles.releaseid and x.totnum = 1 inner join releases on releases.id = releasefiles.releaseid left join releasenfo on releasenfo.releaseid = releases.id where (releasefiles.name like '%.exe' or releasefiles.name like '%.scr') and (releases.categoryid not in (select id from category where parentid = ".Category::CAT_PARENT_PC.") or (releases.categoryid in (select id from category where parentid = ".Category::CAT_PARENT_PC.") and releasenfo.id is null)) group by releasefiles.releaseid";
 			$result = $db->query($sql);
 			$spamIDs = array_merge($result, $spamIDs);
 
@@ -126,7 +126,7 @@ class PostProcess
 			//
 			if ($this->site->exepermittedcategories != '')
 			{
-				$sql = sprintf("select releasefiles.releaseID as ID from releasefiles  inner join releases on releases.ID = releasefiles.releaseID  left join releasenfo on releasenfo.releaseID = releases.ID  where releasefiles.name like '%%.exe'  and releases.categoryID not in (%s)  group by releasefiles.releaseID", $this->site->exepermittedcategories);
+				$sql = sprintf("select releasefiles.releaseid as id from releasefiles  inner join releases on releases.id = releasefiles.releaseid  left join releasenfo on releasenfo.releaseid = releases.id  where releasefiles.name like '%%.exe'  and releases.categoryid not in (%s)  group by releasefiles.releaseid", $this->site->exepermittedcategories);
 				$result = $db->query($sql);
 				$spamIDs = array_merge($result, $spamIDs);
 			}
@@ -134,21 +134,21 @@ class PostProcess
 			//
 			// delete all releases which contain a file with password.url in it
 			//
-			$sql = "select distinct releasefiles.releaseID as ID from releasefiles where name = 'password.url'";
+			$sql = "select distinct releasefiles.releaseid as id from releasefiles where name = 'password.url'";
 			$result = $db->query($sql);
 			$spamIDs = array_merge($result, $spamIDs);
 
 			//
 			// all releases where the only file inside the rars is *.rar
 			//
-			$sql = "select releasefiles.releaseID as ID from releasefiles  inner join  ( select releaseID, count(*) as totnum from releasefiles group by releaseID ) x on x.releaseID = releasefiles.releaseID and x.totnum = 1 inner join releases on releases.ID = releasefiles.releaseID where releasefiles.name like '%.rar' group by releasefiles.releaseID";
+			$sql = "select releasefiles.releaseid as id from releasefiles  inner join  ( select releaseid, count(*) as totnum from releasefiles group by releaseid ) x on x.releaseid = releasefiles.releaseid and x.totnum = 1 inner join releases on releases.id = releasefiles.releaseid where releasefiles.name like '%.rar' group by releasefiles.releaseid";
 			$result = $db->query($sql);
 			$spamIDs = array_merge($result, $spamIDs);
 
 			//
 			// all audio which contains a file with .exe in
 			//
-			$sql = "select distinct r.ID from releasefiles rf inner join releases r on r.id = rf.releaseID and r.categoryID in (select ID from category where parentID = ".Category::CAT_PARENT_MUSIC.") where (rf.name like '%.exe' or rf.name like '%.bin')";
+			$sql = "select distinct r.id from releasefiles rf inner join releases r on r.id = rf.releaseid and r.categoryid in (select id from category where parentid = ".Category::CAT_PARENT_MUSIC.") where (rf.name like '%.exe' or rf.name like '%.bin')";
 			$result = $db->query($sql);
 			$spamIDs = array_merge($result, $spamIDs);
 
@@ -156,7 +156,7 @@ class PostProcess
 			{
 				echo "PostPrc : Deleting ".count($spamIDs)." spam releases\n" ;
 				foreach ($spamIDs as $row)
-					$r->delete($row["ID"]);
+					$r->delete($row["id"]);
 			}
 		}
 	}
@@ -244,20 +244,20 @@ class PostProcess
 	public function processUnknownCategory()
 	{
 		$db = new DB();
-		$sql = sprintf("select ID from releases where categoryID = %d", Category::CAT_NOT_DETERMINED);
+		$sql = sprintf("select id from releases where categoryid = %d", Category::CAT_NOT_DETERMINED);
 		$result = $db->query($sql);
 		$rescount = sizeof($result);
 		if ($rescount > 0)
 		{
 			echo "PostPrc : Attempting to fix ".$rescount." uncategorised release(s)\n";
 
-			$sql = sprintf("update releases inner join releasevideo rv on rv.releaseID = releases.ID set releases.categoryID = %d where imdbid is not null and categoryid = %d and videocodec = 'XVID'", Category::CAT_MOVIE_SD, Category::CAT_NOT_DETERMINED);
+			$sql = sprintf("update releases inner join releasevideo rv on rv.releaseid = releases.id set releases.categoryid = %d where imdbid is not null and categoryid = %d and videocodec = 'XVID'", Category::CAT_MOVIE_SD, Category::CAT_NOT_DETERMINED);
 			$db->queryExec($sql);
 
-			$sql = sprintf("update releases inner join releasevideo rv on rv.releaseID = releases.ID set releases.categoryID = %d where imdbid is not null and categoryid = %d and videocodec = 'V_MPEG4/ISO/AVC'", Category::CAT_MOVIE_HD, Category::CAT_NOT_DETERMINED);
+			$sql = sprintf("update releases inner join releasevideo rv on rv.releaseid = releases.id set releases.categoryid = %d where imdbid is not null and categoryid = %d and videocodec = 'V_MPEG4/ISO/AVC'", Category::CAT_MOVIE_HD, Category::CAT_NOT_DETERMINED);
 			$db->queryExec($sql);
 
-			$sql = sprintf("update releases set categoryID = %d where categoryID = %d", Category::CAT_MISC_OTHER, Category::CAT_NOT_DETERMINED);
+			$sql = sprintf("update releases set categoryid = %d where categoryid = %d", Category::CAT_MISC_OTHER, Category::CAT_NOT_DETERMINED);
 			$db->queryExec($sql);
 		}
 	}
@@ -343,8 +343,8 @@ class PostProcess
 		//
 		// Get out all releases which have not been checked more than max attempts for password.
 		//
-        $sql = sprintf("select r.ID, r.guid, r.name, c.disablepreview from releases r
-			left join category c on c.ID = r.categoryID
+        $sql = sprintf("select r.id, r.guid, r.name, c.disablepreview from releases r
+			left join category c on c.id = r.categoryid
 			where (r.passwordstatus between %d and -1)
 			or (r.haspreview = -1 and c.disablepreview = 0) order by r.postdate desc limit %d ", ($maxattemptstocheckpassworded + 1) * -1, $numtoProcess);
 		$result = $db->query($sql);
@@ -365,7 +365,7 @@ class PostProcess
                 $blnTookSample = ($rel['disablepreview'] == 1) ? true : false; //only attempt sample if not disabled
 
                 if ($blnTookSample)
-                    $db->queryExec(sprintf("update releases set haspreview = 0 where id = %d", $rel['ID']));
+                    $db->queryExec(sprintf("update releases set haspreview = 0 where id = %d", $rel['id']));
 
                 //
                 // Go through the binaries for this release looking for a rar, a sample, and a mediafile
@@ -446,7 +446,7 @@ class PostProcess
 						}
 
 						if ($processMediainfo)
-							$blnTookMediainfo = $this->getMediainfo($tmpPath, $this->site->mediainfopath, $rel['ID']);
+							$blnTookMediainfo = $this->getMediainfo($tmpPath, $this->site->mediainfopath, $rel['id']);
 
 						unlink($mediafile);
 					}
@@ -478,7 +478,7 @@ class PostProcess
 							$this->updateReleaseHasPreview($rel['guid'], 2);
 
 						if ($processMediainfo)
-							$blnTookMediainfo = $this->getMediainfo($tmpPath, $this->site->mediainfopath, $rel['ID']);
+							$blnTookMediainfo = $this->getMediainfo($tmpPath, $this->site->mediainfopath, $rel['id']);
 
 						if ($this->site->lamepath != "")
 							$this->lameAudioSample($this->site->lamepath, $rel['guid']);
@@ -511,12 +511,12 @@ class PostProcess
 						if ($fetchedBinary === false)
 						{
 							//echo "\nPostPrc : Failed fetching rar file\n";
-							$db->queryExec(sprintf("update releases set passwordstatus = passwordstatus - 1 where ID = %d", $rel['ID']));
+							$db->queryExec(sprintf("update releases set passwordstatus = passwordstatus - 1 where id = %d", $rel['id']));
 							continue;
 						}
 						else
 						{
-							$relFiles = $this->processReleaseFiles($fetchedBinary, $rel['ID']);
+							$relFiles = $this->processReleaseFiles($fetchedBinary, $rel['id']);
 
 							if ($this->site->checkpasswordedrar > 0 && $processPasswords)
 							{
@@ -553,7 +553,7 @@ class PostProcess
 
 							if ($processMediainfo && $blnTookMediainfo === false)
 							{
-								$blnTookMediainfo = $this->getMediainfo($tmpPath, $this->site->mediainfopath, $rel['ID']);
+								$blnTookMediainfo = $this->getMediainfo($tmpPath, $this->site->mediainfopath, $rel['id']);
 							}
 
 							//
@@ -583,7 +583,7 @@ class PostProcess
 				if (!$blnTookSample)
 					$hpsql = ', haspreview = 0';
 
-				$sql = sprintf("update releases set passwordstatus = %d %s where ID = %d", max($passStatus), $hpsql, $rel["ID"]);
+				$sql = sprintf("update releases set passwordstatus = %d %s where id = %d", max($passStatus), $hpsql, $rel["id"]);
 				$db->queryExec($sql);
 
 			} //end foreach result

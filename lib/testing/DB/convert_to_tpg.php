@@ -44,7 +44,7 @@ $begintime = time();
 echo "Creating new binaries, and parts tables for each active group...\n";
 
 foreach ($actgroups as $group) {
-	if ($groups->createNewTPGTables($group['ID']) === false) {
+	if ($groups->createNewTPGTables($group['id']) === false) {
 		exit($pdo->log->error("There is a problem creating new parts/files tables for group ${group['name']}."));
 	}
 	$consoletools->overWrite("Tables Created: " . $consoletools->percentString($gdone * 3, $newtables));
@@ -66,8 +66,8 @@ while ($bdone < $blen['total']) {
 			$binary['binaryhash'] = $pdo->escapeString($binary['binarynhash']);
 			$binary['dateadded'] = $pdo->escapeString($binary['dateadded']);
 			$binary['xref'] = $pdo->escapeString($binary['xref']);
-			$binary['releaseID'] = $pdo->escapeString($binary['releaseID']);
-			$binary['categoryID'] = $pdo->escapeString($binary['categoryID']);
+			$binary['releaseid'] = $pdo->escapeString($binary['releaseid']);
+			$binary['categoryid'] = $pdo->escapeString($binary['categoryid']);
 			$binary['totalParts'] = $pdo->escapeString($binary['totalParts']);
 			$binary['relpart'] = $pdo->escapeString($binary['relpart']);
 			$binary['reltotalpart'] = $pdo->escapeString($binary['reltotalpart']);
@@ -76,9 +76,9 @@ while ($bdone < $blen['total']) {
 			if ($debug) {
 				echo "\n\nBinaries insert:\n";
 				print_r($binary);
-				echo sprintf("\nINSERT INTO binaries_%d (name, fromname, date, xref, groupID,  dateadded, releaseID, categoryID, totalParts, binaryhash, relpart, reltotalpart) VALUES (%s)\n\n", $binary['groupID'], implode(', ', $binary));
+				echo sprintf("\nINSERT INTO binaries_%d (name, fromname, date, xref, groupid,  dateadded, releaseid, categoryid, totalParts, binaryhash, relpart, reltotalpart) VALUES (%s)\n\n", $binary['groupid'], implode(', ', $binary));
 			}
-			$newbid = array('binaryID' => $pdo->queryInsert(sprintf('INSERT INTO binaries_%d (NAME, fromname, date, xref, groupID, dateadded, releaseID, categoryID, totalParts,  binaryhash, relpart, reltotalpart) VALUES (%s);', $binary['groupID'], implode(', ', $binarynew))));
+			$newbid = array('binaryID' => $pdo->queryInsert(sprintf('INSERT INTO binaries_%d (NAME, fromname, date, xref, groupid, dateadded, releaseid, categoryid, totalParts,  binaryhash, relpart, reltotalpart) VALUES (%s);', $binary['groupid'], implode(', ', $binarynew))));
 
 			//Get parts and split to correct group tables.
 			$parts = $pdo->queryAssoc('SELECT * FROM parts WHERE binaryID = ' . $oldbid . ';');
@@ -94,9 +94,9 @@ while ($bdone < $blen['total']) {
 				$partsnew = substr($partsnew, 0, -2);
 				if ($debug) {
 					echo "\n\nParts insert:\n";
-					echo sprintf("\nINSERT INTO parts_%d (binaryID, messageID, number, partnumber, size) VALUES %s;\n\n", $binary['groupID'], $partsnew);
+					echo sprintf("\nINSERT INTO parts_%d (binaryID, messageID, number, partnumber, size) VALUES %s;\n\n", $binary['groupid'], $partsnew);
 				}
-				$sql = sprintf('INSERT INTO parts_%d (binaryID, messageID, number, partnumber, size) VALUES %s;', $binary['groupID'], $partsnew);
+				$sql = sprintf('INSERT INTO parts_%d (binaryID, messageID, number, partnumber, size) VALUES %s;', $binary['groupid'], $partsnew);
 				$pdo->queryExec($sql);
 			}
 
@@ -110,22 +110,22 @@ if ($DoPartRepair === true) {
 	foreach ($actgroups as $group) {
 		$pcount = 1;
 		$pdone = 0;
-		$sql = sprintf('SELECT COUNT(*) AS total FROM partrepair WHERE groupID = %d;', $group['ID']);
+		$sql = sprintf('SELECT COUNT(*) AS total FROM partrepair WHERE groupid = %d;', $group['id']);
 		$plen = $pdo->queryOneRow($sql);
 		while ($pdone < $plen['total']) {
 			// Only load 10000 partrepair records per loop to not overload memory.
-			$partrepairs = $pdo->queryAssoc(sprintf('SELECT * FROM partrepair WHERE groupID = %d LIMIT %d, 10000;', $group['ID'], $pdone));
+			$partrepairs = $pdo->queryAssoc(sprintf('SELECT * FROM partrepair WHERE groupid = %d LIMIT %d, 10000;', $group['id'], $pdone));
 			if ($partrepairs instanceof \Traversable) {
 				foreach ($partrepairs as $partrepair) {
 					$partrepair['numberID'] = $pdo->escapeString($partrepair['numberID']);
-					$partrepair['groupID'] = $pdo->escapeString($partrepair['groupID']);
+					$partrepair['groupid'] = $pdo->escapeString($partrepair['groupid']);
 					$partrepair['attempts'] = $pdo->escapeString($partrepair['attempts']);
 					if ($debug) {
 						echo "\n\nPart Repair insert:\n";
 						print_r($partrepair);
-						echo sprintf("\nINSERT INTO partrepair_%d (numberID, groupID, attempts) VALUES (%s, %s, %s)\n\n", $group['ID'], $partrepair['numberID'], $partrepair['groupID'], $partrepair['attempts']);
+						echo sprintf("\nINSERT INTO partrepair_%d (numberID, groupid, attempts) VALUES (%s, %s, %s)\n\n", $group['id'], $partrepair['numberID'], $partrepair['groupid'], $partrepair['attempts']);
 					}
-					$pdo->queryExec(sprintf('INSERT INTO partrepair_%d (numberID, groupID, attempts) VALUES (%s, %s, %s);', $group['ID'], $partrepair['numberID'], $partrepair['groupID'], $partrepair['attempts']));
+					$pdo->queryExec(sprintf('INSERT INTO partrepair_%d (numberID, groupid, attempts) VALUES (%s, %s, %s);', $group['id'], $partrepair['numberID'], $partrepair['groupid'], $partrepair['attempts']));
 					$consoletools->overWrite('Part Repairs Completed for ' . $group['name'] . ':' . $consoletools->percentString($pcount, $plen['total']));
 					$pcount++;
 				}

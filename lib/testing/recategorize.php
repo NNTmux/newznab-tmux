@@ -15,7 +15,7 @@ if (!(isset($argv[1]) && ($argv[1] == "all" || $argv[1] == "misc" || preg_match(
 		. "but will not update the database.\n\n"
 		. "php $argv[0] all                     ...: To process all releases.\n"
 		. "php $argv[0] misc                    ...: To process all releases in misc categories.\n"
-		. "php $argv[0] 155                     ...: To process all releases in groupID 155.\n"
+		. "php $argv[0] 155                     ...: To process all releases in groupid 155.\n"
 		. "php $argv[0] '(155, 140)'            ...: To process all releases in group_ids 155 and 140.\n"
 	));
 }
@@ -28,11 +28,11 @@ function reCategorize($argv)
 	$where = '';
 	$update = true;
 	if (isset($argv[1]) && is_numeric($argv[1])) {
-		$where = ' AND groupID = ' . $argv[1];
+		$where = ' AND groupid = ' . $argv[1];
 	} else if (isset($argv[1]) && preg_match('/\([\d, ]+\)/', $argv[1])) {
-		$where = ' AND groupID IN ' . $argv[1];
+		$where = ' AND groupid IN ' . $argv[1];
 	} else if (isset($argv[1]) && $argv[1] === 'misc') {
-		$where = ' AND categoryID IN (1090, 2020, 3050, 4040, 5050, 6050, 7050, 8010)';
+		$where = ' AND categoryid IN (1090, 2020, 3050, 4040, 5050, 6050, 7050, 8010)';
 	}
 	if (isset($argv[2]) && $argv[2] === 'test') {
 		$update = false;
@@ -71,35 +71,35 @@ function categorizeRelease($update = true, $where, $echooutput = false)
 	$consoletools = new consoleTools();
 	$relcount = $chgcount = 0;
 	$c = new ColorCLI();
-	echo $c->primary("SELECT ID, searchname, groupID, categoryID FROM releases " . $where);
-	$resrel = $pdo->queryDirect("SELECT ID, searchname, groupID, categoryID FROM releases " . $where);
+	echo $c->primary("SELECT id, searchname, groupid, categoryid FROM releases " . $where);
+	$resrel = $pdo->queryDirect("SELECT id, searchname, groupid, categoryid FROM releases " . $where);
 	$total = $resrel->rowCount();
 	if ($total > 0) {
 		foreach ($resrel as $rowrel) {
-			$catId = $cat->determineCategory($rowrel['groupID'], $rowrel['searchname']);
-			if ($rowrel['categoryID'] != $catId) {
+			$catId = $cat->determineCategory($rowrel['groupid'], $rowrel['searchname']);
+			if ($rowrel['categoryid'] != $catId) {
 				if ($update === true) {
 					$pdo->queryExec(
 						sprintf("
 							UPDATE releases
 							SET iscategorized = 1,
-								rageID = -1,
+								rageid = -1,
 								seriesfull = NULL,
 								season = NULL,
 								episode = NULL,
 								tvtitle = NULL,
 								tvairdate = NULL,
-								imdbID = NULL,
-								musicinfoID = NULL,
-								consoleinfoID = NULL,
+								imdbid = NULL,
+								musicinfoid = NULL,
+								consoleinfoid = NULL,
 								gamesinfo_id = 0,
 								xxxinfo_id = 0,
-								bookinfoID = NULL,
+								bookinfoid = NULL,
 								anidbid = NULL,
-								categoryID = %d
-							WHERE ID = %d",
+								categoryid = %d
+							WHERE id = %d",
 							$catId,
-							$rowrel['ID']
+							$rowrel['id']
 						)
 					);
 				}

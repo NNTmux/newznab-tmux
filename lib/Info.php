@@ -205,11 +205,11 @@ class Info
 	{
 		if ($release['ID'] > 0 && $this->isNFO($nfo, $release['guid'])) {
 
-			$check = $this->pdo->queryOneRow(sprintf('SELECT ID FROM releasenfo WHERE releaseID = %d', $release['ID']));
+			$check = $this->pdo->queryOneRow(sprintf('SELECT ID FROM releasenfo WHERE releaseid = %d', $release['ID']));
 
 			if ($check === false) {
 				$this->pdo->queryInsert(
-					sprintf('INSERT INTO releasenfo (nfo, releaseID) VALUES (compress(%s), %d)',
+					sprintf('INSERT INTO releasenfo (nfo, releaseid) VALUES (compress(%s), %d)',
 						$this->pdo->escapeString($nfo),
 						$release['ID']
 					)
@@ -232,7 +232,7 @@ class Info
 						'PostProcess'   => new PProcess(['Echo' => $this->echo, 'Settings' => $this->pdo, 'Nfo' => $this])
 					]
 				);
-				$nzbContents->parseNZB($release['guid'], $release['ID'], $release['groupID']);
+				$nzbContents->parseNZB($release['guid'], $release['ID'], $release['groupid']);
 			}
 			return true;
 		}
@@ -286,12 +286,12 @@ class Info
 	{
 		$ret = 0;
 		$guidCharQuery = ($guidChar === '' ? '' : 'AND r.guid ' . $this->pdo->likeString($guidChar, false, true));
-		$groupIDQuery = ($groupID === '' ? '' : 'AND r.groupID = ' . $groupID);
+		$groupIDQuery = ($groupID === '' ? '' : 'AND r.groupid = ' . $groupID);
 		$optionsQuery = self::NfoQueryString($this->pdo);
 
 		$res = $this->pdo->query(
 			sprintf('
-				SELECT r.ID, r.guid, r.groupID, r.name
+				SELECT r.ID, r.guid, r.groupid, r.name
 				FROM releases r
 				WHERE 1=1 %s %s %s
 				ORDER BY r.nfostatus ASC, r.postdate DESC
@@ -353,15 +353,15 @@ class Info
 			$tvRage = new TvAnger(['Echo' => $this->echo, 'Settings' => $this->pdo]);
 
 			foreach ($res as $arr) {
-				$fetchedBinary = $nzbContents->getNFOfromNZB($arr['guid'], $arr['ID'], $arr['groupID'], $groups->getByNameByID($arr['groupID']));
+				$fetchedBinary = $nzbContents->getNFOfromNZB($arr['guid'], $arr['ID'], $arr['groupid'], $groups->getByNameByID($arr['groupid']));
 				if ($fetchedBinary !== false) {
 					// Insert nfo into database.
 					$cp = 'COMPRESS(%s)';
 					$nc = $this->pdo->escapeString($fetchedBinary);
 
-					$ckreleaseid = $this->pdo->queryOneRow(sprintf('SELECT ID FROM releasenfo WHERE releaseID = %d', $arr['ID']));
+					$ckreleaseid = $this->pdo->queryOneRow(sprintf('SELECT ID FROM releasenfo WHERE releaseid = %d', $arr['ID']));
 					if (!isset($ckreleaseid['ID'])) {
-						$this->pdo->queryInsert(sprintf('INSERT INTO releasenfo (nfo, releaseID) VALUES (' . $cp . ', %d)', $nc, $arr['ID']));
+						$this->pdo->queryInsert(sprintf('INSERT INTO releasenfo (nfo, releaseid) VALUES (' . $cp . ', %d)', $nc, $arr['ID']));
 					}
 					$this->pdo->queryExec(sprintf('UPDATE releases SET nfostatus = %d WHERE ID = %d', self::NFO_FOUND, $arr['ID']));
 					$ret++;
@@ -405,7 +405,7 @@ class Info
 		if ($releases instanceof Traversable) {
 			foreach ($releases as $release) {
 				$this->pdo->queryExec(
-					sprintf('DELETE FROM releasenfo WHERE nfo IS NULL AND releaseID = %d', $release['ID'])
+					sprintf('DELETE FROM releasenfo WHERE nfo IS NULL AND releaseid = %d', $release['ID'])
 				);
 			}
 		}

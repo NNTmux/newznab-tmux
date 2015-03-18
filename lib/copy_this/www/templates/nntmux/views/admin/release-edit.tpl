@@ -10,7 +10,7 @@
 <tr>
 	<td><label for="name">Original Name</label>:</td>
 	<td>
-		<input type="hidden" name="id" value="{$release.ID}" />
+		<input type="hidden" name="id" value="{$release.id}" />
 		<input id="name" class="long" name="name" type="text" value="{$release.name|escape:'htmlall'}" />
 	</td>
 </tr>
@@ -41,7 +41,7 @@
 <tr>
 	<td><label for="category">Category</label>:</td>
 	<td>
-		{html_options id="category" name=category options=$catlist selected=$release.categoryID}
+		{html_options id="category" name=category options=$catlist selected=$release.categoryid}
 	</td>
 </tr>
 
@@ -60,16 +60,16 @@
 </tr>
 
 <tr>
-	<td><label for="rageID">Tv Rage Id</label>:</td>
+	<td><label for="rageid">Tv Rage Id</label>:</td>
 	<td>
-		<input id="rageID" class="short" name="rageID" type="text" value="{$release.rageID}" />
+		<input id="rageid" class="short" name="rageid" type="text" value="{$release.rageid}" />
 	</td>
 </tr>
 
 <tr>
-	<td><label for="tvdbID">TheTVDB Id</label>:</td>
+	<td><label for="tvdbid">TheTVDB Id</label>:</td>
 	<td>
-		<input id="tvdbID" class="short" name="tvdbID" type="text" value="{$release.tvdbID}" />
+		<input id="tvdbid" class="short" name="tvdbid" type="text" value="{$release.tvdbid}" />
 	</td>
 </tr>
 
@@ -102,16 +102,16 @@
 </tr>
 
 <tr>
-	<td><label for="imdbID">IMDB Id</label>:</td>
+	<td><label for="imdbid">IMDB Id</label>:</td>
 	<td>
-		<input id="imdbID" class="long" name="imdbID" type="text" value="{$release.imdbID}" />
+		<input id="imdbid" class="long" name="imdbid" type="text" value="{$release.imdbid}" />
 	</td>
 </tr>
 
 <tr>
-	<td><label for="consoleinfoID">Console Id</label>:</td>
+	<td><label for="consoleinfoid">Console Id</label>:</td>
 	<td>
-		<input id="consoleinfoID" class="short" name="consoleinfoID" type="text" value="{$release.consoleinfoID}" />
+		<input id="consoleinfoid" class="short" name="consoleinfoid" type="text" value="{$release.consoleinfoid}" />
 	</td>
 </tr>
 
@@ -123,9 +123,9 @@
 </tr>
 
 <tr>
-	<td>Regex ID:</td>
+	<td>Regex id:</td>
 	<td>
-		{$release.regexID}
+		{$release.regexid}
 	</td>
 </tr>
 

@@ -4,7 +4,7 @@
 		<tr>
 			<td>Name:</td>
 			<td>
-				<input type="hidden" name="id" value="{$group.ID}" />
+				<input type="hidden" name="id" value="{$group.id}" />
 				<input id="name" class="long" name="name" type="text" value="{$group.name}" />
 				<div class="hint">Changing the name to an invalid group will break things.</div>
 			</td>
@@ -44,14 +44,14 @@
 			</td>
 		</tr>
 		<tr>
-			<td><label for="first_record">First Record ID:</label></td>
+			<td><label for="first_record">First Record id:</label></td>
 			<td>
 				<input class="small" id="first_record" name="first_record" type="text" value="{$group.first_record}" />
 				<div class="hint">The oldest record number for the group.</div>
 			</td>
 		</tr>
 		<tr>
-			<td><label for="last_record">Last Record ID:</label></td>
+			<td><label for="last_record">Last Record id:</label></td>
 			<td>
 				<input class="small" id="last_record" name="last_record" type="text" value="{$group.last_record}" />
 				<div class="hint">The newest record number for the group.</div>

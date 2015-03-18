@@ -62,7 +62,7 @@ class Groups
 		return $this->pdo->query(sprintf("SELECT groups.*, COALESCE(rel.num, 0) AS num_releases
 							FROM groups
 							LEFT OUTER JOIN
-							( SELECT groupID, COUNT(ID) AS num FROM releases group by groupID ) rel ON rel.groupID = groups.ID
+							( SELECT groupid, COUNT(id) AS num FROM releases group by groupid ) rel ON rel.groupid = groups.id
 							ORDER BY %s", $orderby
 			)
 		);
@@ -86,13 +86,13 @@ class Groups
 	}
 
 	/**
-	 * Get a group row by its ID.
+	 * Get a group row by its id.
 	 */
 	public function getByID($id)
 	{
 
 
-		return $this->pdo->queryOneRow(sprintf("select * from groups where ID = %d ", $id));
+		return $this->pdo->queryOneRow(sprintf("select * from groups where id = %d ", $id));
 	}
 
 	/**
@@ -115,16 +115,16 @@ class Groups
 	}
 
 	/**
-	 * Get a group name using its ID.
+	 * Get a group name using its id.
 	 *
-	 * @param int|string $id The group ID.
+	 * @param int|string $id The group id.
 	 *
 	 * @return string Empty string on failure, groupName on success.
 	 */
 	public function getByNameByID($id)
 	{
 
-		$res = $this->pdo->queryOneRow(sprintf("SELECT name FROM groups WHERE ID = %d ", $id));
+		$res = $this->pdo->queryOneRow(sprintf("SELECT name FROM groups WHERE id = %d ", $id));
 		return ($res === false ? '' : $res["name"]);
 	}
 
@@ -133,13 +133,13 @@ class Groups
 	 *
 	 * @param string $name The group name.
 	 *
-	 * @return string Empty string on failure, groupID on success.
+	 * @return string Empty string on failure, groupid on success.
 	 */
 	public function getIDByName($name)
 	{
 
-		$res = $this->pdo->queryOneRow(sprintf("SELECT ID FROM groups WHERE name = %s", $this->pdo->escapeString($name)));
-		return ($res === false ? '' : $res["ID"]);
+		$res = $this->pdo->queryOneRow(sprintf("SELECT id FROM groups WHERE name = %s", $this->pdo->escapeString($name)));
+		return ($res === false ? '' : $res["id"]);
 	}
 
 	/**
@@ -156,7 +156,7 @@ class Groups
 		if ($activeonly == true)
 			$grpsql .= "and active=1 ";
 
-		$res = $this->pdo->queryOneRow(sprintf("select count(ID) as num from groups where 1=1 %s", $grpsql));
+		$res = $this->pdo->queryOneRow(sprintf("select count(id) as num from groups where 1=1 %s", $grpsql));
 
 		return $res["num"];
 	}
@@ -182,8 +182,8 @@ class Groups
 							FROM groups
 							LEFT OUTER JOIN
 							(
-							SELECT groupID, COUNT(ID) AS num FROM releases group by groupID
-							) rel ON rel.groupID = groups.ID WHERE 1=1 %s ORDER BY groups.name " . $limit, $grpsql
+							SELECT groupid, COUNT(id) AS num FROM releases group by groupid
+							) rel ON rel.groupid = groups.id WHERE 1=1 %s ORDER BY groups.name " . $limit, $grpsql
 		);
 
 		return $this->pdo->query($sql);
@@ -216,7 +216,7 @@ class Groups
 				"UPDATE groups
 				SET name = %s, description = %s, backfill_target = %s, first_record = %s, last_record = %s,
 				last_updated = NOW(), active = %s, backfill = %s, %s %s, regexmatchonly = %s
-				WHERE ID = %d",
+				WHERE id = %d",
 				$this->pdo->escapeString(trim($group["name"])),
 				$this->pdo->escapeString(trim($group["description"])),
 				$this->formatNumberString($group["backfill_target"]),
@@ -304,13 +304,13 @@ class Groups
 	public function delete($id)
 	{
 
-		return $this->pdo->queryExec(sprintf("DELETE from groups where ID = %d", $id));
+		return $this->pdo->queryExec(sprintf("DELETE from groups where id = %d", $id));
 	}
 
 	/**
 	 * Reset a group.
 	 *
-	 * @param string|int $id The group ID.
+	 * @param string|int $id The group id.
 	 *
 	 * @return bool
 	 */
@@ -320,7 +320,7 @@ class Groups
 		(new \Binaries(['Groups' => $this, 'Settings' => $this->pdo]))->purgeGroup($id);
 
 		// Remove rows from part repair.
-		$this->pdo->queryExec(sprintf("DELETE FROM partrepair WHERE groupID = %d", $id));
+		$this->pdo->queryExec(sprintf("DELETE FROM partrepair WHERE groupid = %d", $id));
 
 		$this->pdo->queryExec(sprintf('DROP TABLE IF EXISTS binaries_%d', $id));
 		$this->pdo->queryExec(sprintf('DROP TABLE IF EXISTS parts_%d', $id));
@@ -332,7 +332,7 @@ class Groups
 				UPDATE groups
 				SET backfill_target = 0, first_record = 0, first_record_postdate = NULL, last_record = 0,
 					last_record_postdate = NULL, last_updated = NULL
-				WHERE ID = %d", $id)
+				WHERE id = %d", $id)
 		);
 	}
 
@@ -346,11 +346,11 @@ class Groups
 		$this->pdo->queryExec("TRUNCATE TABLE binaries");
 		$this->pdo->queryExec("TRUNCATE TABLE parts");
 		$this->pdo->queryExec("TRUNCATE TABLE partrepair");
-		$groups = $this->pdo->query("SELECT ID FROM groups");
+		$groups = $this->pdo->query("SELECT id FROM groups");
 		foreach ($groups as $group) {
-			$this->pdo->queryExec('DROP TABLE IF EXISTS binaries_' . $group['ID']);
-			$this->pdo->queryExec('DROP TABLE IF EXISTS parts_' . $group['ID']);
-			$this->pdo->queryExec('DROP TABLE IF EXISTS partrepair_' . $group['ID']);
+			$this->pdo->queryExec('DROP TABLE IF EXISTS binaries_' . $group['id']);
+			$this->pdo->queryExec('DROP TABLE IF EXISTS parts_' . $group['id']);
+			$this->pdo->queryExec('DROP TABLE IF EXISTS partrepair_' . $group['id']);
 		}
 
 		// Reset the group stats.
@@ -388,10 +388,10 @@ class Groups
 
 			foreach ($groups AS $group) {
 				if (preg_match($regfilter, $group['group']) > 0) {
-					$res = $this->pdo->queryOneRow(sprintf("SELECT ID FROM groups WHERE name = %s ", $this->pdo->escapeString($group['group'])));
+					$res = $this->pdo->queryOneRow(sprintf("SELECT id FROM groups WHERE name = %s ", $this->pdo->escapeString($group['group'])));
 					if ($res) {
 
-						$this->pdo->queryExec(sprintf("update groups SET active = %d where ID = %d", $active, $res["ID"]));
+						$this->pdo->queryExec(sprintf("update groups SET active = %d where id = %d", $active, $res["id"]));
 						$ret[] = array('group' => $group['group'], 'msg' => 'Updated');
 					} else {
 						$desc = "";
@@ -413,7 +413,7 @@ class Groups
 	 */
 	public function updateGroupStatus($id, $status = 0)
 	{
-		$this->pdo->queryExec(sprintf("UPDATE groups SET active = %d WHERE ID = %d", $status, $id));
+		$this->pdo->queryExec(sprintf("UPDATE groups SET active = %d WHERE id = %d", $status, $id));
 		return "Group $id has been " . (($status == 0) ? 'deactivated' : 'activated') . '.';
 	}
 
@@ -425,7 +425,7 @@ class Groups
 	 */
 	public function updateBackfillStatus($id, $status = 0)
 	{
-		$this->pdo->queryExec(sprintf("UPDATE groups SET backfill = %d WHERE ID = %d", $status, $id));
+		$this->pdo->queryExec(sprintf("UPDATE groups SET backfill = %d WHERE id = %d", $status, $id));
 		return "Group $id has been " . (($status == 0) ? 'deactivated' : 'activated') . '.';
 	}
 
@@ -452,10 +452,10 @@ class Groups
 
 	/**
 	 * Get the names of the binaries/parts/part repair tables.
-	 * If TPG is on, try to create new tables for the groupID, if we fail, log the error and exit.
+	 * If TPG is on, try to create new tables for the groupid, if we fail, log the error and exit.
 	 *
 	 * @param bool $tpgSetting false, tpg is off in site setting, true tpg is on in site setting.
-	 * @param int  $groupID    ID of the group.
+	 * @param int  $groupID    id of the group.
 	 *
 	 * @return array The table names.
 	 */
@@ -479,7 +479,7 @@ class Groups
 			}
 
 			if ($this->createNewTPGTables($groupID) === false && NN_ECHOCLI) {
-				exit('There is a problem creating new TPG tables for this group ID: ' . $groupID . PHP_EOL);
+				exit('There is a problem creating new TPG tables for this group id: ' . $groupID . PHP_EOL);
 			}
 
 			$groupEnding = '_' . $groupID;
@@ -499,7 +499,7 @@ class Groups
 	 */
 	public function getActiveIDs()
 	{
-		return $this->pdo->query("SELECT ID FROM groups WHERE active = 1 ORDER BY name");
+		return $this->pdo->query("SELECT id FROM groups WHERE active = 1 ORDER BY name");
 	}
 
 	/**
@@ -530,7 +530,7 @@ class Groups
 						$this->pdo->queryExec(
 							sprintf(
 								'CREATE TRIGGER delete_binaries_%s BEFORE DELETE ON binaries_%s FOR EACH ROW BEGIN' .
-								' DELETE FROM parts_%s WHERE binaryID = OLD.ID; END',
+								' DELETE FROM parts_%s WHERE binaryID = OLD.id; END',
 								$groupID, $groupID, $groupID
 							)
 						);
@@ -544,7 +544,7 @@ class Groups
 	/**
 	 * Purge a single group or all groups.
 	 *
-	 * @param int|string|bool $id The group ID. If false, purge all groups.
+	 * @param int|string|bool $id The group id. If false, purge all groups.
 	 */
 	public function purge($id = false)
 	{
@@ -555,7 +555,7 @@ class Groups
 		}
 
 		$releaseArray = $this->pdo->queryDirect(
-			sprintf("SELECT ID, guid FROM releases %s", ($id === false ? '' : 'WHERE groupID = ' . $id))
+			sprintf("SELECT id, guid FROM releases %s", ($id === false ? '' : 'WHERE groupid = ' . $id))
 		);
 
 		if ($releaseArray instanceof \Traversable) {
@@ -563,7 +563,7 @@ class Groups
 			$nzb = new \NZB($this->pdo);
 			$releaseImage = new \ReleaseImage($this->pdo);
 			foreach ($releaseArray as $release) {
-				$releases->deleteSingle(['g' => $release['guid'], 'i' => $release['ID']], $nzb, $releaseImage);
+				$releases->deleteSingle(['g' => $release['guid'], 'i' => $release['id']], $nzb, $releaseImage);
 			}
 		}
 	}
@@ -577,7 +577,7 @@ class Groups
 	{
 		$res = $this->pdo->queryOneRow(
 			sprintf("
-				SELECT COUNT(ID) AS num
+				SELECT COUNT(id) AS num
 				FROM groups
 				WHERE 1 = 1 %s
 				AND active = 1",
@@ -603,7 +603,7 @@ class Groups
 	{
 		$res = $this->pdo->queryOneRow(
 			sprintf("
-				SELECT COUNT(ID) AS num
+				SELECT COUNT(id) AS num
 				FROM groups
 				WHERE 1 = 1 %s
 				AND active = 0",
@@ -634,11 +634,11 @@ class Groups
 				SELECT groups.*, COALESCE(rel.num, 0) AS num_releases
 				FROM groups
 				LEFT OUTER JOIN
-					(SELECT groupID, COUNT(ID) AS num
+					(SELECT groupid, COUNT(id) AS num
 						FROM releases
-						GROUP BY groupID
+						GROUP BY groupid
 					) rel
-				ON rel.groupID = groups.ID
+				ON rel.groupid = groups.id
 				WHERE 1 = 1 %s
 				AND active = 1
 				ORDER BY groups.name " . ($start === false ? '' : " LIMIT " . $num . " OFFSET " .$start),
@@ -668,11 +668,11 @@ class Groups
 				SELECT groups.*, COALESCE(rel.num, 0) AS num_releases
 				FROM groups
 				LEFT OUTER JOIN
-					(SELECT groupID, COUNT(ID) AS num
+					(SELECT groupid, COUNT(id) AS num
 						FROM releases
-						GROUP BY groupID
+						GROUP BY groupid
 					) rel
-				ON rel.groupID = groups.ID
+				ON rel.groupid = groups.id
 				WHERE 1 = 1 %s
 				AND active = 0
 				ORDER BY groups.name " . ($start === false ? '' : " LIMIT ".$num." OFFSET ".$start),

@@ -162,7 +162,7 @@
 		</div>
 		<table style="margin-top:5px;margin-bottom:5px;width:733px" class="data Sortable highlight">
 			<tr>
-				<th style="width:22px;text-align:center;">ID</th>
+				<th style="width:22px;text-align:center;">id</th>
 				<th style="width:300px;text-align:center;">Name</th>
 				<th style="width:100px;text-align:center;">First seen</th>
 				<th style="width:100px;text-align:center;">Last seen</th>
@@ -171,21 +171,21 @@
 				<th style="width:40px;text-align:center;"></th>
 			</tr>
 			{foreach from=$sites item=site}
-				<tr id="row-{$site.ID}" class="{cycle values=",alt"}">
-					<td style="text-align:center;">{$site.ID}</td>
+				<tr id="row-{$site.id}" class="{cycle values=",alt"}">
+					<td style="text-align:center;">{$site.id}</td>
 					<td style="text-align:center;">{$site.site_name}</td>
 					<td style="text-align:center;">{$site.first_time|timeago}</td>
 					<td style="text-align:center;">{$site.last_time|timeago}</td>
-					<td style="text-align:center;" id="site-{$site.ID}">
+					<td style="text-align:center;" id="site-{$site.id}">
 						{if $site.enabled=="1"}
-							<a href="javascript:ajax_sharing_site_status({$site.ID}, 0)" class="sharing_site_active">Disable</a>
+							<a href="javascript:ajax_sharing_site_status({$site.id}, 0)" class="sharing_site_active">Disable</a>
 						{else}
-							<a href="javascript:ajax_sharing_site_status({$site.ID}, 1)" class="sharing_site_deactive">Enable</a>
+							<a href="javascript:ajax_sharing_site_status({$site.id}, 1)" class="sharing_site_deactive">Enable</a>
 						{/if}
 					</td>
 					<td style="text-align:center;">{$site.comments}</td>
 					<td style="text-align:center;">
-						<a href="javascript:ajax_sharing_site_purge({$site.ID})" class="sharing_site_purge" onclick="return confirm('Are you sure? This will delete all comments from this site!');">Purge</a>
+						<a href="javascript:ajax_sharing_site_purge({$site.id})" class="sharing_site_purge" onclick="return confirm('Are you sure? This will delete all comments from this site!');">Purge</a>
 					</td>
 				</tr>
 			{/foreach}

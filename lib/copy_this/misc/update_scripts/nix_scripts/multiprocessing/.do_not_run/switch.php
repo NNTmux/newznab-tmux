@@ -93,10 +93,10 @@ switch ($options[1]) {
 				);
 				$columns[2] = sprintf('last_record = %s', $return['lastArticleNumber']);
 				$query = sprintf(
-					'UPDATE groups SET %s, %s, last_updated = NOW() WHERE ID = %d AND last_record < %s',
+					'UPDATE groups SET %s, %s, last_updated = NOW() WHERE id = %d AND last_record < %s',
 					$columns[1],
 					$columns[2],
-					$groupMySQL['ID'],
+					$groupMySQL['id'],
 					$return['lastArticleNumber']
 				);
 				break;
@@ -112,10 +112,10 @@ switch ($options[1]) {
 				);
 				$columns[2] = sprintf('first_record = %s', $return['firstArticleNumber']);
 				$query = sprintf(
-					'UPDATE groups SET %s, %s, last_updated = NOW() WHERE ID = %d AND first_record > %s',
+					'UPDATE groups SET %s, %s, last_updated = NOW() WHERE id = %d AND first_record > %s',
 					$columns[1],
 					$columns[2],
-					$groupMySQL['ID'],
+					$groupMySQL['id'],
 					$return['firstArticleNumber']
 				);
 				break;
@@ -145,7 +145,7 @@ switch ($options[1]) {
 		break;
 
 	// Process releases.
-	// $options[2] => (string)groupCount, number of groups terminated by _ | (int)groupID, group to work on
+	// $options[2] => (string)groupCount, number of groups terminated by _ | (int)groupid, group to work on
 	case 'releases':
 		$pdo = new \DB();
 		$releases = new \Releases(['Settings' => $pdo]);
@@ -169,8 +169,8 @@ switch ($options[1]) {
 		}
 		break;
 
-	// Process all local requestID for a single group.
-	// $options[2] => (int)groupID, group to work on
+	// Process all local requestid for a single group.
+	// $options[2] => (int)groupid, group to work on
 	case 'requestid':
 		if (is_numeric($options[2])) {
 			(new \RequestIDLocal(['Echo' => true]))->lookupRequestIDs(['GroupID' => $options[2], 'limit' => 5000]);
@@ -191,17 +191,17 @@ switch ($options[1]) {
 
 
 	// Do a single group (update_binaries/backFill/update_releases/postprocess).
-	// $options[2] => (int)groupID, group to work on
+	// $options[2] => (int)groupid, group to work on
 	case 'update_per_group':
 		if (is_numeric($options[2])) {
 
 			$pdo = new \DB();
 
 			// Get the group info from MySQL.
-			$groupMySQL = $pdo->queryOneRow(sprintf('SELECT * FROM groups WHERE ID = %d', $options[2]));
+			$groupMySQL = $pdo->queryOneRow(sprintf('SELECT * FROM groups WHERE id = %d', $options[2]));
 
 			if ($groupMySQL === false) {
-				exit('ERROR: Group not found with ID ' . $options[2] . PHP_EOL);
+				exit('ERROR: Group not found with id ' . $options[2] . PHP_EOL);
 			}
 
 			// Connect to NNTP.
@@ -268,7 +268,7 @@ switch ($options[1]) {
 }
 
 /**
- * Create / process releases for a groupID.
+ * Create / process releases for a groupid.
  *
  * @param \Releases $releases
  * @param int             $groupID
@@ -304,7 +304,7 @@ function charCheck($char)
  */
 function collectionCheck(&$pdo, $groupID)
 {
-	if ($pdo->queryOneRow(sprintf('SELECT ID FROM collections_%d LIMIT 1', $groupID)) === false) {
+	if ($pdo->queryOneRow(sprintf('SELECT id FROM collections_%d LIMIT 1', $groupID)) === false) {
 		exit();
 	}
 }

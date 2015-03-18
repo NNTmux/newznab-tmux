@@ -37,23 +37,23 @@ class ReleaseRegex
 			$where .= sprintf(" and releaseregex.groupname = %s", $db->escapeString($groupname));
 
 		if ($userReleaseRegex === true) {
-			$where .= ' AND releaseregex.ID >= 100000';
+			$where .= ' AND releaseregex.id >= 100000';
 		} else if ($userReleaseRegex === false) {
-			$where .= ' AND releaseregex.ID < 100000';
+			$where .= ' AND releaseregex.id < 100000';
 		}
 
 		$relcountjoin = "";
 		$relcountcol = "";
 		if ($blnIncludeReleaseCount) {
 			$relcountcol = " , coalesce(x.count, 0) as num_releases, coalesce(x.adddate, 'n/a') as max_releasedate ";
-			$relcountjoin = " left outer join (  select regexID, max(adddate) adddate, count(ID) as count from releases group by regexID) x on x.regexID = releaseregex.ID ";
+			$relcountjoin = " left outer join (  select regexid, max(adddate) adddate, count(id) as count from releases group by regexid) x on x.regexid = releaseregex.id ";
 		}
 
-		$this->regexes = $db->query("SELECT releaseregex.ID, releaseregex.categoryID, category.title as categoryTitle, releaseregex.status, releaseregex.description, releaseregex.groupname AS groupname, releaseregex.regex,
-												groups.ID AS groupID, releaseregex.ordinal " . $relcountcol . "
+		$this->regexes = $db->query("SELECT releaseregex.id, releaseregex.categoryid, category.title as categoryTitle, releaseregex.status, releaseregex.description, releaseregex.groupname AS groupname, releaseregex.regex,
+												groups.id AS groupid, releaseregex.ordinal " . $relcountcol . "
 												FROM releaseregex
 												left outer JOIN groups ON groups.name = releaseregex.groupname
-												left outer join category on category.ID = releaseregex.categoryID
+												left outer join category on category.id = releaseregex.categoryid
 												" . $relcountjoin . "
 												where 1=1 " . $where . "
 												ORDER BY groupname LIKE '%*' ASC, coalesce(groupname,'zzz') DESC, ordinal ASC"
@@ -81,17 +81,17 @@ class ReleaseRegex
 	}
 
 	/**
-	 * Get a releaseregex row by ID.
+	 * Get a releaseregex row by id.
 	 */
 	public function getByID($id)
 	{
 		$db = new DB();
 
-		return $db->queryOneRow(sprintf("select * from releaseregex where ID = %d ", $id));
+		return $db->queryOneRow(sprintf("select * from releaseregex where id = %d ", $id));
 	}
 
 	/**
-	 * Get a releaseregex row by ID.
+	 * Get a releaseregex row by id.
 	 */
 	public function getForGroup($groupname)
 	{
@@ -103,7 +103,7 @@ class ReleaseRegex
 				if ($outcome)
 					$ret[] = $groupRegex;
 				elseif ($outcome === false)
-					echo "ERROR: " . ($groupRegex["ID"] < 10000 ? "System" : "Custom") . " release regex '" . $groupRegex["ID"] . "'. Group name '" . $groupRegex["groupname"] . "' should be a valid regex.\n";
+					echo "ERROR: " . ($groupRegex["id"] < 10000 ? "System" : "Custom") . " release regex '" . $groupRegex["id"] . "'. Group name '" . $groupRegex["groupname"] . "' should be a valid regex.\n";
 			}
 		}
 
@@ -117,7 +117,7 @@ class ReleaseRegex
 	{
 		$db = new DB();
 
-		return $db->queryExec(sprintf("DELETE from releaseregex where ID = %d", $id));
+		return $db->queryExec(sprintf("DELETE from releaseregex where id = %d", $id));
 	}
 
 	/**
@@ -139,7 +139,7 @@ class ReleaseRegex
 		else
 			$catid = sprintf("%d", $regex["category"]);
 
-		$db->queryExec(sprintf("update releaseregex set groupname=%s, regex=%s, ordinal=%d, status=%d, description=%s, categoryID=%s where ID = %d ",
+		$db->queryExec(sprintf("update releaseregex set groupname=%s, regex=%s, ordinal=%d, status=%d, description=%s, categoryid=%s where id = %d ",
 				$groupname, $db->escapeString($regex["regex"]), $regex["ordinal"], $regex["status"], $db->escapeString($regex["description"]), $catid, $regex["id"]
 			)
 		);
@@ -164,7 +164,7 @@ class ReleaseRegex
 		else
 			$catid = sprintf("%d", $regex["category"]);
 
-		return $db->queryInsert(sprintf("insert into releaseregex (groupname, regex, ordinal, status, description, categoryID) values (%s, %s, %d, %d, %s, %s) ",
+		return $db->queryInsert(sprintf("insert into releaseregex (groupname, regex, ordinal, status, description, categoryid) values (%s, %s, %d, %d, %s, %s) ",
 				$groupname, $db->escapeString($regex["regex"]), $regex["ordinal"], $regex["status"], $db->escapeString($regex["description"]), $catid
 			)
 		);
@@ -177,9 +177,9 @@ class ReleaseRegex
 
 		$outcome = @preg_match($regexArr["regex"], $binarySubject, $matches);
 		if ($outcome === false) {
-			echo "ERROR: " . ($regexArr["ID"] < 10000 ? "System" : "Custom") . " release regex '" . $regexArr["ID"] . "' is not a valid regex.\n";
+			echo "ERROR: " . ($regexArr["id"] < 10000 ? "System" : "Custom") . " release regex '" . $regexArr["id"] . "' is not a valid regex.\n";
 			$db = new DB();
-			$db->queryExec(sprintf("update releaseregex set status=0 where ID = %d and status=1", $regexArr["ID"]));
+			$db->queryExec(sprintf("update releaseregex set status=0 where id = %d and status=1", $regexArr["id"]));
 
 			return $ret;
 		}
@@ -194,7 +194,7 @@ class ReleaseRegex
 
 			// Check that the regex provided the correct parameters
 			if (!isset($matches['name']) || empty($matches['name'])) {
-				//echo "ERROR: Regex applied which didnt return right number of capture groups - '".$regexArr["ID"]."'\n";
+				//echo "ERROR: Regex applied which didnt return right number of capture groups - '".$regexArr["id"]."'\n";
 				return $ret;
 			}
 
@@ -208,8 +208,8 @@ class ReleaseRegex
 				}
 
 				$regcatid = "null ";
-				if ($regexArr["categoryID"] != "")
-					$regcatid = $regexArr["categoryID"];
+				if ($regexArr["categoryid"] != "")
+					$regcatid = $regexArr["categoryid"];
 				//override
 				if ($regcatid == Category::CAT_PC_0DAY) {
 					if ($cat->isPhone($matches['name']))
@@ -238,8 +238,8 @@ class ReleaseRegex
 				}
 
 				$matches['regcatid'] = $regcatid;
-				$matches['regexID'] = $regexArr['ID'];
-				$matches['reqID'] = $reqID;
+				$matches['regexid'] = $regexArr['id'];
+				$matches['reqid'] = $reqID;
 
 				$ret = $matches;
 			}
@@ -265,17 +265,17 @@ class ReleaseRegex
 			$groupname = '.*';
 
 		if ($matchagainstbins !== '')
-			$sql = sprintf("select b.*, '0' as size, '0' as blacklistID, g.name as groupname from %s b left join groups g on g.ID = b.groupID where b.groupID IN (select g.ID from groups g where g.name REGEXP %s) order by b.date desc", $group['bname'], $db->escapeString('^' . $groupname . '$'));
+			$sql = sprintf("select b.*, '0' as size, '0' as blacklistID, g.name as groupname from %s b left join groups g on g.id = b.groupid where b.groupid IN (select g.id from groups g where g.name REGEXP %s) order by b.date desc", $group['bname'], $db->escapeString('^' . $groupname . '$'));
 		else
 			$sql = sprintf("select rrt.* from releaseregextesting rrt where rrt.groupname REGEXP %s order by rrt.date desc", $db->escapeString('^' . $groupname . '$'));
 
 		$resbin = $db->queryDirect($sql);
 
 		while ($rowbin = $db->getAssocArray($resbin)) {
-			if ($ignorematched !== '' && ($rowbin['regexID'] != '' || $rowbin['blacklistID'] == 1))
+			if ($ignorematched !== '' && ($rowbin['regexid'] != '' || $rowbin['blacklistID'] == 1))
 				continue;
 
-			$regexarr = array("ID" => "", 'regex' => $regex, 'poster' => $poster, "categoryID" => "");
+			$regexarr = array("id" => "", 'regex' => $regex, 'poster' => $poster, "categoryid" => "");
 			$regexCheck = $this->performMatch($regexarr, $rowbin['name'], $rowbin['fromname']);
 
 			if ($regexCheck !== false) {
@@ -294,7 +294,7 @@ class ReleaseRegex
 				$matches[$relname]['relparts'][$relparts[1]] = $relparts[1];
 				$matches[$relname]['reltotalparts'] = array_sum($matches[$relname]['relparts']);
 
-				$matches[$relname]['regexID'] = $regexCheck['regexID'];
+				$matches[$relname]['regexid'] = $regexCheck['regexid'];
 
 				if (ctype_digit($regexCheck['regcatid']))
 					$matches[$relname]['catname'] = $catList[$regexCheck['regcatid']];
@@ -416,9 +416,9 @@ class ReleaseRegex
 									'date'         => $data['Date'],
 									'binaryhash'   => md5($subject . $data['From'] . $group),
 									'groupname'    => $group,
-									'regexID'      => "null",
-									'categoryID'   => "null",
-									'reqID'        => "null",
+									'regexid'      => "null",
+									'categoryid'   => "null",
+									'reqid'        => "null",
 									'blacklistID'  => 0,
 									'size'         => $data['Size'],
 									'relname'      => "null",
@@ -439,9 +439,9 @@ class ReleaseRegex
 									if ($regexCheck !== false) {
 										$regexMatches = $regexCheck;
 
-										$binData['regexID'] = $regexCheck['regexID'];
-										$binData['categoryID'] = $regexCheck['regcatid'];
-										$binData['reqID'] = empty($regexCheck['reqID']) ? "null" : $regexCheck['reqID'];
+										$binData['regexid'] = $regexCheck['regexid'];
+										$binData['categoryid'] = $regexCheck['regcatid'];
+										$binData['reqid'] = empty($regexCheck['reqid']) ? "null" : $regexCheck['reqid'];
 										$binData['relname'] = $regexCheck['name'];
 										break;
 									}
@@ -455,9 +455,9 @@ class ReleaseRegex
 
 							foreach ($binChunks as $binChunk) {
 								foreach ($binChunk as $chunk) {
-									$binParams[] = sprintf("(%s, %s, FROM_UNIXTIME(%s), %s, %s, %s, %s, %s, %d, %d, now())", $db->escapeString($chunk['name']), $db->escapeString($chunk['fromname']), $db->escapeString($chunk['date']), $db->escapeString($chunk['binaryhash']), $db->escapeString($chunk['groupname']), $chunk['regexID'], $chunk['categoryID'], $chunk['reqID'], $chunk['blacklistID'], $chunk['size']);
+									$binParams[] = sprintf("(%s, %s, FROM_UNIXTIME(%s), %s, %s, %s, %s, %s, %d, %d, now())", $db->escapeString($chunk['name']), $db->escapeString($chunk['fromname']), $db->escapeString($chunk['date']), $db->escapeString($chunk['binaryhash']), $db->escapeString($chunk['groupname']), $chunk['regexid'], $chunk['categoryid'], $chunk['reqid'], $chunk['blacklistID'], $chunk['size']);
 								}
-								$binSql = "INSERT IGNORE INTO releaseregextesting (name, fromname, date, binaryhash, groupname, regexID, categoryID, reqID, blacklistID, size, dateadded) VALUES " . implode(', ', $binParams);
+								$binSql = "INSERT IGNORE INTO releaseregextesting (name, fromname, date, binaryhash, groupname, regexid, categoryid, reqid, blacklistID, size, dateadded) VALUES " . implode(', ', $binParams);
 								//echo $binSql;
 								$db->queryExec($binSql);
 							}

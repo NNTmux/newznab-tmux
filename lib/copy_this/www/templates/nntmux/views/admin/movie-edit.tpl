@@ -3,17 +3,17 @@
 
 <form enctype="multipart/form-data" action="{$SCRIPT_NAME}?action=submit" method="post">
 
-<input type="hidden" name="id" value="{$movie.imdbID}" />
+<input type="hidden" name="id" value="{$movie.imdbid}" />
 
 <table class="input">
 
 <tr>
-	<td><label for="title">IMDB ID</label>:</td>
-	<td>{$movie.imdbID}</td>
+	<td><label for="title">IMDB id</label>:</td>
+	<td>{$movie.imdbid}</td>
 </tr>
 
 <tr>
-	<td><label for="title">TMDb ID</label>:</td>
+	<td><label for="title">TMDb id</label>:</td>
 	<td>{$movie.tmdbID}</td>
 </tr>
 
@@ -85,7 +85,7 @@
 	<td>
 		<input type="file" id="cover" name="cover" />
 		{if $movie.cover == 1}
-			<img style="max-width:200px; display:block;" src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbID}-cover.jpg" alt="" />
+			<img style="max-width:200px; display:block;" src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbid}-cover.jpg" alt="" />
 		{/if}
 	</td>
 </tr>
@@ -95,7 +95,7 @@
 	<td>
 		<input type="file" name="backdrop" />
 		{if $movie.backdrop == 1}
-			<img style="max-width:200px; display:block;" src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbID}-backdrop.jpg" alt="" />
+			<img style="max-width:200px; display:block;" src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbid}-backdrop.jpg" alt="" />
 		{/if}
 	</td>
 </tr>

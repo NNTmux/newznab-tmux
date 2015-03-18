@@ -59,18 +59,18 @@ class MiscSorter
 	public function nfosorter($category = 0, $id = 0)
 	{
 		$idarr = ($id != 0 ? sprintf('AND r.ID = %d', $id) : '');
-		$cat = ($category = 0 ? sprintf('AND r.categoryID = %d', Category::CAT_MISC) : sprintf('AND r.categoryID = %d', $category));
+		$cat = ($category = 0 ? sprintf('AND r.categoryid = %d', Category::CAT_MISC) : sprintf('AND r.categoryid = %d', $category));
 
 		$res = $this->pdo->queryDirect(
 			sprintf("
 							SELECT UNCOMPRESS(rn.nfo) AS nfo,
 								r.ID, r.name, r.searchname
 							FROM releasenfo rn
-							INNER JOIN releases r ON rn.releaseID = r.ID
-							INNER JOIN groups g ON r.groupID = g.ID
+							INNER JOIN releases r ON rn.releaseid = r.ID
+							INNER JOIN groups g ON r.groupid = g.ID
 							WHERE rn.nfo IS NOT NULL
 							AND r.proc_sorter = %d
-							AND r.prehashID = 0 %s",
+							AND r.prehashid = 0 %s",
 				self::PROC_SORTER_NONE,
 				($idarr = '' ? $cat : $idarr)
 			)
@@ -354,8 +354,8 @@ class MiscSorter
 
 		$release = $this->pdo->queryOneRow(
 			sprintf("
-							SELECT r.ID AS releaseID, r.searchname AS searchname,
-								r.name AS name, r.categoryID, r.groupID
+							SELECT r.ID AS releaseid, r.searchname AS searchname,
+								r.name AS name, r.categoryid, r.groupid
 							FROM releases r
 							WHERE r.ID = %d",
 				$id
@@ -369,7 +369,7 @@ class MiscSorter
 			$this->_setProcSorter(self::PROC_SORTER_DONE, $id);
 		}
 
-		if ($type !== '' && in_array($type, ['bookinfoID', 'consoleinfoID', 'imdbID', 'musicinfoID'])) {
+		if ($type !== '' && in_array($type, ['bookinfoid', 'consoleinfoid', 'imdbid', 'musicinfoid'])) {
 			$this->pdo->queryExec(
 				sprintf('
 								UPDATE releases
@@ -460,7 +460,7 @@ class MiscSorter
 	{
 		$imdb = $this->movie->doMovieUpdate($nfo, "sorter", $row['ID']);
 		if (isset($imdb) && $imdb > 0) {
-			return $this->dodbupdate($row['ID'], $this->moviename($row['ID'], $row['searchname']), $imdb, 'imdbID');
+			return $this->dodbupdate($row['ID'], $this->moviename($row['ID'], $row['searchname']), $imdb, 'imdbid');
 		}
 
 		return false;
@@ -649,10 +649,10 @@ class MiscSorter
 		$rel = $this->_doAmazonLocal('musicinfo', (string)$amaz->Items->Item->ASIN);
 
 		if ($rel !== false) {
-			$ok = $this->dodbupdate($id, $name, $rel['ID'], 'musicinfoID');
+			$ok = $this->dodbupdate($id, $name, $rel['ID'], 'musicinfoid');
 		} else {
 			$musicId = $this->music->updateMusicInfo('', '', $amaz);
-			$ok = $this->dodbupdate($id, $name, $musicId, 'musicinfoID');
+			$ok = $this->dodbupdate($id, $name, $musicId, 'musicinfoid');
 		}
 
 		return $ok;
@@ -680,7 +680,7 @@ class MiscSorter
 		$rel = $this->_doAmazonLocal('consoleinfo', (string)$amaz->Items->Item->ASIN);
 
 		if ($rel !== false) {
-			$ok = $this->dodbupdate($id, $name, $rel['ID'], 'consoleinfoID');
+			$ok = $this->dodbupdate($id, $name, $rel['ID'], 'consoleinfoid');
 		} else {
 			$consoleId = $this->console->
 				updateConsoleInfo([
@@ -689,7 +689,7 @@ class MiscSorter
 						'platform' => (string)$amaz->Items->Item->ItemAttributes->Platform
 					]
 				);
-			$ok = $this->dodbupdate($id, $name, $consoleId, 'consoleinfoID');
+			$ok = $this->dodbupdate($id, $name, $consoleId, 'consoleinfoid');
 		}
 
 		return $ok;

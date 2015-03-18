@@ -49,24 +49,24 @@
 			</tr>
 			{foreach $series as $s}
 				<tr class="{cycle values=",alt"}">
-					<td><a class="title" title="View series" href="{$smarty.const.WWW_TOP}/series/{$s.rageID}">{$s.releasetitle|escape:"htmlall"}</a>{if $s.prevdate != ''}<br />Last: {$s.previnfo|escape:"htmlall"} aired {$s.prevdate|date_format}{/if}</td>
+					<td><a class="title" title="View series" href="{$smarty.const.WWW_TOP}/series/{$s.rageid}">{$s.releasetitle|escape:"htmlall"}</a>{if $s.prevdate != ''}<br />Last: {$s.previnfo|escape:"htmlall"} aired {$s.prevdate|date_format}{/if}</td>
 					<td>{$s.country|escape:"htmlall"}</td>
 					<td>{$s.genre|escape:"htmlall"|replace:'|':', '}</td>
 					<td class="mid"><div class="btn-group">
 							{if $s.userseriesID != ''}
 
-								<a class="btn btn-mini" href="{$smarty.const.WWW_TOP}/myshows/delete/{$s.rageID}?from={$smarty.server.REQUEST_URI|escape:"url"}" class="myshows" rel="remove" name="series{$s.rageID}" title="Remove from My Shows"><i class="icon-minus-sign"></i></a>
-								<a class="btn btn-mini" href="{$smarty.const.WWW_TOP}/myshows/edit/{$s.rageID}?from={$smarty.server.REQUEST_URI|escape:"url"}" class="myshows" rel="edit" name="series{$s.rageID}" title="Edit"><i class="icon-edit"></i></a>
+								<a class="btn btn-mini" href="{$smarty.const.WWW_TOP}/myshows/delete/{$s.rageid}?from={$smarty.server.REQUEST_URI|escape:"url"}" class="myshows" rel="remove" name="series{$s.rageid}" title="Remove from My Shows"><i class="icon-minus-sign"></i></a>
+								<a class="btn btn-mini" href="{$smarty.const.WWW_TOP}/myshows/edit/{$s.rageid}?from={$smarty.server.REQUEST_URI|escape:"url"}" class="myshows" rel="edit" name="series{$s.rageid}" title="Edit"><i class="icon-edit"></i></a>
 
 							{else}
-								<a class="btn btn-mini" href="{$smarty.const.WWW_TOP}/myshows/add/{$s.rageID}?from={$smarty.server.REQUEST_URI|escape:"url"}" class="myshows" rel="add" name="series{$s.rageID}" title="Add to My Shows"><i class="icon-plus-sign"></i></a>
+								<a class="btn btn-mini" href="{$smarty.const.WWW_TOP}/myshows/add/{$s.rageid}?from={$smarty.server.REQUEST_URI|escape:"url"}" class="myshows" rel="add" name="series{$s.rageid}" title="Add to My Shows"><i class="icon-plus-sign"></i></a>
 							{/if}
 						</div></td>
 					<td class="mid">
 						<div class="btn-group">
-							<a class="btn btn-mini" title="View series" href="{$smarty.const.WWW_TOP}/series/{$s.rageID}">Series</a>
-							{if $s.rageID > 0}<a class="btn btn-mini" title="View at TVRage" target="_blank" href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$s.rageID}">TVRage</a>
-							<a class="btn btn-mini" title="RSS Feed for {$s.releasetitle|escape:"htmlall"}" href="{$smarty.const.WWW_TOP}/rss?rage={$s.rageID}&amp;dl=1&amp;i={$userdata.ID}&amp;r={$userdata.rsstoken}"><i class="icon-rss"></i></a>{/if}
+							<a class="btn btn-mini" title="View series" href="{$smarty.const.WWW_TOP}/series/{$s.rageid}">Series</a>
+							{if $s.rageid > 0}<a class="btn btn-mini" title="View at TVRage" target="_blank" href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$s.rageid}">TVRage</a>
+							<a class="btn btn-mini" title="RSS Feed for {$s.releasetitle|escape:"htmlall"}" href="{$smarty.const.WWW_TOP}/rss?rage={$s.rageid}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}"><i class="icon-rss"></i></a>{/if}
 
 						</div>
 					</td>

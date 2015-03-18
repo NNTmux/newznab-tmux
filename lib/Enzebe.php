@@ -121,8 +121,8 @@ class Enzebe
 		$this->_binariesQuery = sprintf(
 			'SELECT %s.*, UNIX_TIMESTAMP(%s.date) AS udate, groups.name AS groupname
 			FROM %s
-			INNER JOIN groups ON %s.groupID = groups.ID
-			WHERE %s.releaseID = ',
+			INNER JOIN groups ON %s.groupid = groups.ID
+			WHERE %s.releaseid = ',
 			$bName,
 			$bName,
 			$bName,

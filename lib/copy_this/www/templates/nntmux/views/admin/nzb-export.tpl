@@ -1,4 +1,4 @@
- 
+
 <h1>{$page->title}</h1>
 
 <p>
@@ -43,9 +43,9 @@ If you are exporting a large number of nzb files, run this script from the comma
 </tr>
 
 <tr>
-	<td><label for="categoryID">Category</label>:</td>
+	<td><label for="categoryid">Category</label>:</td>
 	<td>
-		{html_options id="categoryID" name='categoryID' options=$catlist selected=$cat}
+		{html_options id="categoryid" name='categoryid' options=$catlist selected=$cat}
 		<div class="hint">Posted to this category</div>
 	</td>
 </tr>

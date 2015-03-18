@@ -14,7 +14,7 @@ $gen = new Genres(['Settings' => $page->settings]);
 $musiccats = $cat->getChildren(Category::CAT_PARENT_MUSIC);
 $mtmp = array();
 foreach ($musiccats as $mcat) {
-	$mtmp[$mcat['ID']] = $mcat;
+	$mtmp[$mcat['id']] = $mcat;
 }
 $category = Category::CAT_PARENT_MUSIC;
 if (isset($_REQUEST['t']) && array_key_exists($_REQUEST['t'], $mtmp)) {

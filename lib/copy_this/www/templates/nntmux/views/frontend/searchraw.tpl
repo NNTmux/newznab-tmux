@@ -43,15 +43,15 @@
 
 	{foreach from=$results item=result}
 		<tr class="{cycle values=",alt"}">
-			<!--<td class="selection"><input name="file{$result.ID}" id="file{$result.ID}" value="{$result.ID}" type="checkbox"/></td>-->
+			<!--<td class="selection"><input name="file{$result.id}" id="file{$result.id}" value="{$result.id}" type="checkbox"/></td>-->
 			<td title="{$result.xref|escape:"htmlall"}">{$result.name|escape:"htmlall"}</td>
 			<td class="less">{$result.group_name|replace:"alt.binaries":"a.b"}</td>
 			<td class="less" title="{$result.date}">{$result.date|date_format}</td>
 			{if $isadmin}
-			<td><span title="procstat">{$result.procstat}</span>/<span title="totalparts">{$result.totalParts}</span>/<span title="regex">{if $result.regexID==""}_{else}{$result.regexID}{/if}</span>/<span title="relpart">{$result.relpart}</span>/<span title="reltotalpart">{$result.reltotalpart}</span></td>
+			<td><span title="procstat">{$result.procstat}</span>/<span title="totalparts">{$result.totalParts}</span>/<span title="regex">{if $result.regexid==""}_{else}{$result.regexid}{/if}</span>/<span title="relpart">{$result.relpart}</span>/<span title="reltotalpart">{$result.reltotalpart}</span></td>
 			<td class="less">{if $result.binnum < $result.totalParts}<span style="color:red;">{$result.binnum}/{$result.totalParts}</span>{else}100%{/if}</td>
 			{/if}
-			<td class="less">{if $result.releaseID > 0}<a title="View Nzb details" href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.filename|escape:"seourl"}">Yes</a>{/if}</td>
+			<td class="less">{if $result.releaseid > 0}<a title="View Nzb details" href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.filename|escape:"seourl"}">Yes</a>{/if}</td>
 		</tr>
 	{/foreach}
 

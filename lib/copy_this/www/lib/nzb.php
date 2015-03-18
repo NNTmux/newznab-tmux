@@ -66,7 +66,7 @@ class NZB
 				gzwrite($fp, " <meta type=\"name\">" . htmlspecialchars($name, ENT_QUOTES, 'utf-8') . "</meta>\n");
 			gzwrite($fp, "</head>\n\n");
 
-			$result = $db->queryDirect(sprintf("SELECT %s.*, UNIX_TIMESTAMP(date) AS unixdate, groups.name as groupname FROM %s inner join groups on %s.groupID = groups.ID WHERE %s.releaseID = %d ORDER BY %s.name",
+			$result = $db->queryDirect(sprintf("SELECT %s.*, UNIX_TIMESTAMP(date) AS unixdate, groups.name as groupname FROM %s inner join groups on %s.groupid = groups.id WHERE %s.releaseid = %d ORDER BY %s.name",
 					$bName,
 					$bName,
 					$bName,
@@ -92,7 +92,7 @@ class NZB
 
 				$resparts = $db->queryDirect(sprintf("SELECT DISTINCT(messageID), size, partnumber FROM %s WHERE binaryID = %d ORDER BY partnumber",
 						$pName,
-						$binrow["ID"]));
+						$binrow["id"]));
 				while ($partsrow = $db->getAssocArray($resparts)) {
 					gzwrite($fp, "  <segment bytes=\"" . $partsrow["size"] . "\" number=\"" . $partsrow["partnumber"] . "\">" . htmlspecialchars($partsrow["messageID"], ENT_QUOTES, 'utf-8') . "</segment>\n");
 				}
@@ -104,7 +104,7 @@ class NZB
 			if (is_file($path)) {
 				$db->queryExec(
 					sprintf('
-						UPDATE releases SET nzbstatus = %d WHERE ID = %d',
+						UPDATE releases SET nzbstatus = %d WHERE id = %d',
 						Enzebe::NZB_ADDED,
 						$relid
 					)

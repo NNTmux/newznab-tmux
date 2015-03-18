@@ -13,7 +13,7 @@ if (isset($_GET["id"])) {
 	if (!$rel)
 		$page->show404();
 
-	$nfo = $releases->getReleaseNfo($rel['ID']);
+	$nfo = $releases->getReleaseNfo($rel['id']);
 	$nfo['nfoUTF'] = cp437toUTF($nfo['nfo']);
 
 	$page->smarty->assign('rel', $rel);

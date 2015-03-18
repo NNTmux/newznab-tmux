@@ -192,7 +192,7 @@ class Film
 	 */
 	public function getMovieInfo($imdbId)
 	{
-		return $this->pdo->queryOneRow(sprintf("SELECT * FROM movieinfo WHERE imdbID = %d", $imdbId));
+		return $this->pdo->queryOneRow(sprintf("SELECT * FROM movieinfo WHERE imdbid = %d", $imdbId));
 	}
 
 	/**
@@ -206,10 +206,10 @@ class Film
 	{
 		return $this->pdo->query(
 			sprintf("
-				SELECT DISTINCT movieinfo.*, releases.imdbID AS relimdb
+				SELECT DISTINCT movieinfo.*, releases.imdbid AS relimdb
 				FROM movieinfo
-				LEFT OUTER JOIN releases ON releases.imdbID = movieinfo.imdbID
-				WHERE movieinfo.imdbID IN (%s)",
+				LEFT OUTER JOIN releases ON releases.imdbid = movieinfo.imdbid
+				WHERE movieinfo.imdbid IN (%s)",
 				str_replace(
 					',,',
 					',',
@@ -272,11 +272,11 @@ class Film
 
 		$res = $this->pdo->queryOneRow(
 			sprintf("
-				SELECT COUNT(DISTINCT r.imdbID) AS num
+				SELECT COUNT(DISTINCT r.imdbid) AS num
 				FROM releases r
-				INNER JOIN movieinfo m ON m.imdbID = r.imdbID
+				INNER JOIN movieinfo m ON m.imdbid = r.imdbid
 				WHERE r.nzbstatus = 1
-				AND r.imdbID != '0000000'
+				AND r.imdbid != '0000000'
 				AND m.cover = 1
 				AND m.title != ''
 				AND r.passwordstatus <= %d
@@ -285,7 +285,7 @@ class Film
 				$this->getBrowseBy(),
 				$catsrch,
 				($maxAge > 0 ? 'AND r.postdate > NOW() - INTERVAL ' . $maxAge . ' DAY' : ''),
-				(count($excludedCats) > 0 ? ' AND r.categoryID NOT IN (' . implode(',', $excludedCats) . ')' : '')
+				(count($excludedCats) > 0 ? ' AND r.categoryid NOT IN (' . implode(',', $excludedCats) . ')' : '')
 			)
 		);
 
@@ -328,13 +328,13 @@ class Film
 			GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_comments,
 			GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grabs,
 			m.*, groups.name AS group_name, rn.ID as nfoid FROM releases r
-			LEFT OUTER JOIN groups ON groups.ID = r.groupID
-			LEFT OUTER JOIN releasenfo rn ON rn.releaseID = r.ID
-			INNER JOIN movieinfo m ON m.imdbID = r.imdbID
-			WHERE r.nzbstatus = 1 AND r.imdbID != '0000000'
+			LEFT OUTER JOIN groups ON groups.ID = r.groupid
+			LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.ID
+			INNER JOIN movieinfo m ON m.imdbid = r.imdbid
+			WHERE r.nzbstatus = 1 AND r.imdbid != '0000000'
 			AND m.title != ''
 			AND r.passwordstatus <= %d AND %s %s %s %s
-			GROUP BY m.imdbID ORDER BY %s %s %s",
+			GROUP BY m.imdbid ORDER BY %s %s %s",
 			$this->showPasswords,
 			$this->getBrowseBy(),
 			$catsrch,
@@ -342,7 +342,7 @@ class Film
 				? 'AND r.postdate > NOW() - INTERVAL ' . $maxAge . 'DAY '
 				: ''
 			),
-			(count($excludedCats) > 0 ? ' AND r.categoryID NOT IN (' . implode(',', $excludedCats) . ')' : ''),
+			(count($excludedCats) > 0 ? ' AND r.categoryid NOT IN (' . implode(',', $excludedCats) . ')' : ''),
 			$order[0],
 			$order[1],
 			($start === false ? '' : ' LIMIT ' . $num . ' OFFSET ' . $start)
@@ -466,7 +466,7 @@ class Film
 				sprintf("
 					UPDATE movieinfo
 					SET %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, %d, updateddate = NOW()
-					WHERE imdbID = %d",
+					WHERE imdbid = %d",
 					(empty($title)    ? '' : 'title = '    . $this->pdo->escapeString($title)),
 					(empty($tagLine)  ? '' : 'tagline = '  . $this->pdo->escapeString($tagLine)),
 					(empty($plot)     ? '' : 'plot = '     . $this->pdo->escapeString($plot)),
@@ -611,12 +611,12 @@ class Film
 		$movieID = $this->pdo->queryInsert(
 			sprintf("
 				INSERT INTO movieinfo
-					(imdbID, tmdbID, title, rating, tagline, plot, year, genre, type,
+					(imdbid, tmdbID, title, rating, tagline, plot, year, genre, type,
 					director, actors, language, cover, backdrop, createddate, updateddate)
 				VALUES
 					(%d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, %d, NOW(), NOW())
 				ON DUPLICATE KEY UPDATE
-					imdbID = %d, tmdbID = %s, title = %s, rating = %s, tagline = %s, plot = %s, year = %s, genre = %s,
+					imdbid = %d, tmdbID = %s, title = %s, rating = %s, tagline = %s, plot = %s, year = %s, genre = %s,
 					type = %s, director = %s, actors = %s, language = %s, cover = %d, backdrop = %d, updateddate = NOW()",
 				$mov['imdbid'],
 				$mov['tmdbid'],
@@ -901,14 +901,14 @@ class Film
 				$this->pdo->log->doEcho($this->pdo->log->headerOver($service . ' found IMDBid: ') . $this->pdo->log->primary('tt' . $imdbID));
 			}
 
-			$this->pdo->queryExec(sprintf('UPDATE releases SET imdbID = %s WHERE ID = %d', $this->pdo->escapeString($imdbID), $id));
+			$this->pdo->queryExec(sprintf('UPDATE releases SET imdbid = %s WHERE ID = %d', $this->pdo->escapeString($imdbID), $id));
 
 			// If set, scan for imdb info.
 			if ($processImdb == 1) {
 				$movCheck = $this->getMovieInfo($imdbID);
 				if ($movCheck === false || (isset($movCheck['updateddate']) && (time() - strtotime($movCheck['updateddate'])) > 2592000)) {
 					if ($this->updateMovieInfo($imdbID) === false) {
-						$this->pdo->queryExec(sprintf('UPDATE releases SET imdbID = %s WHERE ID = %d', 0000000, $id));
+						$this->pdo->queryExec(sprintf('UPDATE releases SET imdbid = %s WHERE ID = %d', 0000000, $id));
 					}
 				}
 			}
@@ -935,12 +935,12 @@ class Film
 			sprintf("
 				SELECT r.searchname, r.ID
 				FROM releases r
-				WHERE r.imdbID IS NULL
+				WHERE r.imdbid IS NULL
 				AND r.nzbstatus = 1
-				AND r.categoryID BETWEEN 2000 AND 2999
+				AND r.categoryid BETWEEN 2000 AND 2999
 				%s %s %s
 				LIMIT %d",
-				($groupID === '' ? '' : ('AND r.groupID = ' . $groupID)),
+				($groupID === '' ? '' : ('AND r.groupid = ' . $groupID)),
 				($guidChar === '' ? '' : ('AND r.guid ' . $this->pdo->likeString($guidChar, false, true))),
 				($lookupIMDB == 2 ? 'AND r.isrenamed = 1' : ''),
 				$this->movieqty
@@ -958,7 +958,7 @@ class Film
 				// Try to get a name/year.
 				if ($this->parseMovieSearchName($arr['searchname']) === false) {
 					//We didn't find a name, so set to all 0's so we don't parse again.
-					$this->pdo->queryExec(sprintf("UPDATE releases SET imdbID = 0000000 WHERE ID = %d", $arr["ID"]));
+					$this->pdo->queryExec(sprintf("UPDATE releases SET imdbid = 0000000 WHERE ID = %d", $arr["ID"]));
 					continue;
 
 				} else {
@@ -996,8 +996,8 @@ class Film
 					if ($buffer !== false) {
 						$getIMDBid = json_decode($buffer);
 
-						if (isset($getIMDBid->imdbID)) {
-							$imdbID = $this->doMovieUpdate($getIMDBid->imdbID, 'OMDbAPI', $arr['ID']);
+						if (isset($getIMDBid->imdbid)) {
+							$imdbID = $this->doMovieUpdate($getIMDBid->imdbid, 'OMDbAPI', $arr['ID']);
 							if ($imdbID !== false) {
 								continue;
 							}
@@ -1021,7 +1021,7 @@ class Film
 					}
 
 					// We failed to get an IMDB id from all sources.
-					$this->pdo->queryExec(sprintf("UPDATE releases SET imdbID = 0000000 WHERE ID = %d", $arr["ID"]));
+					$this->pdo->queryExec(sprintf("UPDATE releases SET imdbid = 0000000 WHERE ID = %d", $arr["ID"]));
 				}
 			}
 		}
@@ -1030,11 +1030,11 @@ class Film
 	/**
 	 * Try to fetch an IMDB id locally.
 	 *
-	 * @return int|bool   Int, the imdbID when true, Bool when false.
+	 * @return int|bool   Int, the imdbid when true, Bool when false.
 	 */
 	protected function localIMDBsearch()
 	{
-		$query = 'SELECT imdbID FROM movieinfo';
+		$query = 'SELECT imdbid FROM movieinfo';
 		$andYearIn = '';
 
 		//If we found a year, try looking in a 4 year range.
@@ -1094,8 +1094,8 @@ class Film
 		return (
 		($IMDBCheck === false
 			? false
-			: (is_numeric($IMDBCheck['imdbID'])
-				? (int)$IMDBCheck['imdbID']
+			: (is_numeric($IMDBCheck['imdbid'])
+				? (int)$IMDBCheck['imdbid']
 				: false
 			)
 		)

@@ -80,7 +80,7 @@ class Contents
 	}
 
 	/**
-	 * Get a content row by its ID.
+	 * Get a content row by its id.
 	 */
 	public function getByID($id, $role)
 	{

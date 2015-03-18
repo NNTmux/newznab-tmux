@@ -357,7 +357,7 @@ class PProcess
 
 		$query = $this->pdo->queryOneRow(
 			sprintf('
-				SELECT ID, groupID, categoryID, name, searchname, UNIX_TIMESTAMP(postdate) AS post_date, ID AS releaseID
+				SELECT ID, groupid, categoryid, name, searchname, UNIX_TIMESTAMP(postdate) AS post_date, ID AS releaseid
 				FROM releases
 				WHERE isrenamed = 0
 				AND ID = %d',
@@ -372,7 +372,7 @@ class PProcess
 		// Only get a new name if the category is OTHER.
 		$foundName = true;
 		if (!in_array(
-			(int)$query['categoryID'],
+			(int)$query['categoryid'],
 			array(
 				Category::CAT_BOOK_OTHER,
 				Category::CAT_GAME_OTHER,
@@ -426,7 +426,7 @@ class PProcess
 							sprintf('
 								SELECT ID
 								FROM releasefiles
-								WHERE releaseID = %d
+								WHERE releaseid = %d
 								AND name = %s',
 								$relID,
 								$this->pdo->escapeString($file['name'])
