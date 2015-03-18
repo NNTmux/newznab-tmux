@@ -3,20 +3,73 @@ require_once(WWW_DIR . "/lib/framework/db.php");
 require_once(WWW_DIR . "/lib/util.php");
 
 /**
- * This class handles storage and retrieval of release preview files obtained via ffmpeg.
+ * Resize/save/delete images to disk.
+ *
+ * Class ReleaseImage
  */
 class ReleaseImage
 {
 	/**
-	 * Default constructor.
+	 * Path to save ogg audio samples.
+	 *
+	 * @var string
 	 */
-	function ReleaseImage()
+	public $audSavePath;
+
+	/**
+	 * Path to save video preview jpg pictures.
+	 *
+	 * @var string
+	 */
+	public $imgSavePath;
+
+	/**
+	 * Path to save large jpg pictures(xxx).
+	 *
+	 * @var string
+	 */
+	public $jpgSavePath;
+
+	/**
+	 * Path to save movie jpg covers.
+	 *
+	 * @var string
+	 */
+	public $movieImgSavePath;
+
+	/**
+	 * Path to save video ogv files.
+	 *
+	 * @var string
+	 */
+	public $vidSavePath;
+
+	/**
+	 * Construct.
+	 * @param \DB()
+	 */
+	public function __construct(&$pdo = null)
 	{
-		$this->imgSavePath = NN_COVERS . 'preview' . DS;
-		$this->audSavePath = NN_COVERS . 'audiosample' . DS;
-		$this->jpgSavePath = NN_COVERS . 'sample' . DS;
-		$this->movieImgSavePath = NN_COVERS . 'movies' . DS;
-		$this->vidSavePath = NN_COVERS . 'video' . DS;
+		// Creates the NN_COVERS constant
+		if ($pdo === null) {
+			$pdo = new \DB();
+		}
+		//                                                            Table    |  Column
+		$this->audSavePath    = NN_COVERS . 'audiosample' . DS; // releases    guid
+		$this->imgSavePath    = NN_COVERS . 'preview'     . DS; // releases    guid
+		$this->jpgSavePath    = NN_COVERS . 'sample'      . DS; // releases    guid
+		$this->movieImgSavePath = NN_COVERS . 'movies'      . DS; // releases    imdbid
+		$this->vidSavePath    = NN_COVERS . 'video'       . DS; // releases    guid
+
+		/* For reference. *
+		$this->anidbImgPath   = NN_COVERS . 'anime'       . DS; // anidb       anidbid | used in populate_anidb.php, not anidb.php
+		$this->bookImgPath    = NN_COVERS . 'book'        . DS; // bookinfo    id
+		$this->consoleImgPath = NN_COVERS . 'console'     . DS; // consoleinfo id
+		$this->musicImgPath   = NN_COVERS . 'music'       . DS; // musicinfo   id
+		$this->tvRageImgPath  = NN_COVERS . 'tvrage'      . DS; // tvrage      id (not rageid)
+
+		$this->audioImgPath   = NN_COVERS . 'audio'       . DS; // unused folder, music folder already exists.
+		**/
 	}
 
 	/**
@@ -47,45 +100,60 @@ class ReleaseImage
 	}
 
 	/**
-	 * Create an image at a path and a thumbnailed version.
+	 * Save an image to disk, optionally resizing it.
+	 * @param string $imgName      What to name the new image.
+	 * @param string $imgLoc       URL or location on the disk the original image is in.
+	 * @param string $imgSavePath  Folder to save the new image in.
+	 * @param string $imgMaxWidth  Max width to resize image to.   (OPTIONAL)
+	 * @param string $imgMaxHeight Max height to resize image to.  (OPTIONAL)
+	 * @param bool   $saveThumb    Save a thumbnail of this image? (OPTIONAL)
+	 *
+	 * @return int 1 on success, 0 on failure Used on site to check if there is an image.
 	 */
-	public function saveImage($imgName, $imgLoc, $imgSavePath, $imgMaxWidth = '', $imgMaxHeight = '', $saveThumb = false)
+	public function saveImage($imgName, $imgLoc, $imgSavePath, $imgMaxWidth='', $imgMaxHeight='', $saveThumb=false)
 	{
+		// Try to get the image as a string.
 		$cover = $this->fetchImage($imgLoc);
-		if ($cover === false)
+		if ($cover === false) {
 			return 0;
+		}
 
+		// Check if we need to resize it.
 		if ($imgMaxWidth != '' && $imgMaxHeight != '') {
 			$im = @imagecreatefromstring($cover);
-			$width = imagesx($im);
-			$height = imagesy($im);
-			$ratioh = $imgMaxHeight / $height;
-			$ratiow = $imgMaxWidth / $width;
-			$ratio = min($ratioh, $ratiow);
+			$width = @imagesx($im);
+			$height = @imagesy($im);
+			$ratio = min($imgMaxHeight/$height, $imgMaxWidth/$width);
 			// New dimensions
-			$new_width = intval($ratio * $width);
-			$new_height = intval($ratio * $height);
-			if ($new_width < $width) {
-				$new_image = imagecreatetruecolor($new_width, $new_height);
-				imagecopyresampled($new_image, $im, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
+			$new_width = intval($ratio*$width);
+			$new_height = intval($ratio*$height);
+			if ($new_width < $width && $new_width > 10 && $new_height > 10) {
+				$new_image = @imagecreatetruecolor($new_width, $new_height);
+				@imagecopyresampled($new_image, $im, 0, 0, 0, 0, $new_width, $new_height, $width, $height);
 				ob_start();
-				imagejpeg($new_image, null, 85);
+				@imagejpeg($new_image, null, 85);
 				$thumb = ob_get_clean();
-				imagedestroy($new_image);
+				@imagedestroy($new_image);
 
-				if ($saveThumb)
-					@file_put_contents($imgSavePath . $imgName . '_thumb.jpg', $thumb);
-				else
+				if ($saveThumb) {
+					@file_put_contents($imgSavePath.$imgName.'_thumb.jpg', $thumb);
+				} else {
 					$cover = $thumb;
+				}
 
 				unset($thumb);
 			}
-			imagedestroy($im);
+			@imagedestroy($im);
 		}
-		$coverPath = $imgSavePath . $imgName . '.jpg';
+		// Store it on the hard drive.
+		$coverPath = $imgSavePath.$imgName.'.jpg';
 		$coverSave = @file_put_contents($coverPath, $cover);
 
-		return ($coverSave !== false || ($coverSave === false && file_exists($coverPath))) ? 1 : 0;
+		// Check if it's on the drive.
+		if ($coverSave === false || !is_file($coverPath)) {
+			return 0;
+		}
+		return 1;
 	}
 
 	/**
