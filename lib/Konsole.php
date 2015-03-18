@@ -93,7 +93,7 @@ class Konsole
 	{
 		return $this->pdo->queryOneRow(
 			sprintf(
-				"SELECT consoleinfo.*, genres.title AS genres FROM consoleinfo LEFT OUTER JOIN genres ON genres.id = consoleinfo.genreID WHERE consoleinfo.id = %d ",
+				"SELECT consoleinfo.*, genres.title AS genres FROM consoleinfo LEFT OUTER JOIN genres ON genres.id = consoleinfo.genreid WHERE consoleinfo.id = %d ",
 				$id
 			)
 		);
@@ -207,7 +207,7 @@ class Konsole
 				. "LEFT OUTER JOIN groups ON groups.id = r.groupid "
 				. "LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id "
 				. "INNER JOIN consoleinfo con ON con.id = r.consoleinfoid "
-				. "INNER JOIN genres ON con.genreID = genres.id "
+				. "INNER JOIN genres ON con.genreid = genres.id "
 				. "WHERE r.nzbstatus = 1 AND con.title != '' AND "
 				. "r.passwordstatus <= (SELECT value FROM site WHERE setting='showpasswordedrelease') AND %s %s
 				%s "
@@ -231,7 +231,7 @@ class Konsole
 				$orderfield = 'con.releasedate';
 				break;
 			case 'genre':
-				$orderfield = 'con.genreID';
+				$orderfield = 'con.genreid';
 				break;
 			case 'size':
 				$orderfield = 'r.size';
@@ -258,7 +258,7 @@ class Konsole
 
 	public function getBrowseByOptions()
 	{
-		return array('platform' => 'platform', 'title' => 'title', 'genre' => 'genreID');
+		return array('platform' => 'platform', 'title' => 'title', 'genre' => 'genreid');
 	}
 
 	public function getBrowseBy()
@@ -298,7 +298,7 @@ class Konsole
 				UPDATE consoleinfo
 				SET
 					title = %s, asin = %s, url = %s, salesrank = %s, platform = %s, publisher = %s,
-					releasedate= %s, esrb = %s, cover = %d, genreID = %d, review = %s, updateddate = NOW()
+					releasedate= %s, esrb = %s, cover = %d, genreid = %d, review = %s, updateddate = NOW()
 				WHERE id = %d",
 				$this->pdo->escapeString($title),
 				$this->pdo->escapeString($asin),
@@ -629,7 +629,7 @@ class Konsole
 		if ($check === false) {
 			$consoleId = $this->pdo->queryInsert(
 				sprintf(
-					"INSERT INTO consoleinfo (title, asin, url, salesrank, platform, publisher, genreID, esrb, releasedate, review, cover, createddate, updateddate)
+					"INSERT INTO consoleinfo (title, asin, url, salesrank, platform, publisher, genreid, esrb, releasedate, review, cover, createddate, updateddate)
 					VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, NOW(), NOW())",
 					$this->pdo->escapeString($con['title']),
 					$this->pdo->escapeString($con['asin']),
