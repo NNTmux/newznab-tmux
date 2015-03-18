@@ -83,7 +83,7 @@ class NZB
 				if (count($groups) == 0)
 					$groups[] = $binrow["groupname"];
 
-				gzwrite($fp, "<file poster=\"" . htmlspecialchars($binrow["fromname"], ENT_QUOTES, 'utf-8') . "\" date=\"" . $binrow["unixdate"] . "\" subject=\"" . htmlspecialchars($binrow["name"], ENT_QUOTES, 'utf-8') . " (1/" . $binrow["totalParts"] . ")\">\n");
+				gzwrite($fp, "<file poster=\"" . htmlspecialchars($binrow["fromname"], ENT_QUOTES, 'utf-8') . "\" date=\"" . $binrow["unixdate"] . "\" subject=\"" . htmlspecialchars($binrow["name"], ENT_QUOTES, 'utf-8') . " (1/" . $binrow["totalparts"] . ")\">\n");
 				gzwrite($fp, " <groups>\n");
 				foreach ($groups as $group)
 					gzwrite($fp, "  <group>" . $group . "</group>\n");

@@ -1672,7 +1672,7 @@ class Releases
 					$incomplete = true;
 				} else {
 					// Check that the binary is complete
-					$binlist = $this->pdo->query(sprintf('SELECT %s.id, totalParts, date, COUNT(DISTINCT %s.messageid) AS num FROM %s,
+					$binlist = $this->pdo->query(sprintf('SELECT %s.id, totalparts, date, COUNT(DISTINCT %s.messageid) AS num FROM %s,
 					%s WHERE %s.id=%s.binaryid AND %s.relname = %s
 					AND %s.procstat = %d AND %s.groupid = %d AND %s.fromname = %s
 					GROUP BY %s.id ORDER BY NULL',
@@ -1695,7 +1695,7 @@ class Releases
 					);
 
 					foreach ($binlist as $rowbin) {
-						if ($rowbin['num'] < $rowbin['totalParts']) {
+						if ($rowbin['num'] < $rowbin['totalparts']) {
 							// Allow to binary to release if posted to usenet longer than four hours ago and we still don't have all the parts
 							if (!(strtotime($currTime_ori['now']) - strtotime($rowbin['date']) > 14400)) {
 								$incomplete = true;
@@ -2004,7 +2004,7 @@ class Releases
 
 			// Get out all binaries of STAGE0 for current group
 			$newUnmatchedBinaries = array();
-			$ressql = sprintf('SELECT id, name, date, totalParts, procstat, fromname FROM %s b
+			$ressql = sprintf('SELECT id, name, date, totalparts, procstat, fromname FROM %s b
  								WHERE groupid = %d AND procstat IN (%d, %d) AND regexid IS NULL ORDER BY b.date ASC',
 								$group['bname'],
 								$groupArr['id'],

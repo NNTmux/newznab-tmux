@@ -68,7 +68,7 @@ while ($bdone < $blen['total']) {
 			$binary['xref'] = $pdo->escapeString($binary['xref']);
 			$binary['releaseid'] = $pdo->escapeString($binary['releaseid']);
 			$binary['categoryid'] = $pdo->escapeString($binary['categoryid']);
-			$binary['totalParts'] = $pdo->escapeString($binary['totalParts']);
+			$binary['totalparts'] = $pdo->escapeString($binary['totalparts']);
 			$binary['relpart'] = $pdo->escapeString($binary['relpart']);
 			$binary['reltotalpart'] = $pdo->escapeString($binary['reltotalpart']);
 			$oldbid = array_shift($binary);
@@ -76,9 +76,9 @@ while ($bdone < $blen['total']) {
 			if ($debug) {
 				echo "\n\nBinaries insert:\n";
 				print_r($binary);
-				echo sprintf("\nINSERT INTO binaries_%d (name, fromname, date, xref, groupid,  dateadded, releaseid, categoryid, totalParts, binaryhash, relpart, reltotalpart) VALUES (%s)\n\n", $binary['groupid'], implode(', ', $binary));
+				echo sprintf("\nINSERT INTO binaries_%d (name, fromname, date, xref, groupid,  dateadded, releaseid, categoryid, totalparts, binaryhash, relpart, reltotalpart) VALUES (%s)\n\n", $binary['groupid'], implode(', ', $binary));
 			}
-			$newbid = array('binaryid' => $pdo->queryInsert(sprintf('INSERT INTO binaries_%d (NAME, fromname, date, xref, groupid, dateadded, releaseid, categoryid, totalParts,  binaryhash, relpart, reltotalpart) VALUES (%s);', $binary['groupid'], implode(', ', $binarynew))));
+			$newbid = array('binaryid' => $pdo->queryInsert(sprintf('INSERT INTO binaries_%d (NAME, fromname, date, xref, groupid, dateadded, releaseid, categoryid, totalparts,  binaryhash, relpart, reltotalpart) VALUES (%s);', $binary['groupid'], implode(', ', $binarynew))));
 
 			//Get parts and split to correct group tables.
 			$parts = $pdo->queryAssoc('SELECT * FROM parts WHERE binaryid = ' . $oldbid . ';');
