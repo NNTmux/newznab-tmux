@@ -523,9 +523,9 @@ Class ProcessAdditional
 		$this->_releases = $this->pdo->query(
 			sprintf(
 				'
-				SELECT r.ID, r.guid, r.name, c.disablepreview, r.size, r.groupid, r.nfostatus, r.completion, r.categoryid, r.searchname, r.prehashid
+				SELECT r.id, r.guid, r.name, c.disablepreview, r.size, r.groupid, r.nfostatus, r.completion, r.categoryid, r.searchname, r.prehashid
 				FROM releases r
-				LEFT JOIN category c ON c.ID = r.categoryid
+				LEFT JOIN category c ON c.id = r.categoryid
 				WHERE r.nzbstatus = 1
 				%s %s %s %s
 				AND r.passwordstatus BETWEEN -6 AND -1
@@ -578,14 +578,14 @@ Class ProcessAdditional
 	{
 		foreach ($this->_releases as $this->_release) {
 			$this->_echo(
-				PHP_EOL . '[' . $this->_release['ID'] . '][' .
+				PHP_EOL . '[' . $this->_release['id'] . '][' .
 				$this->_readableBytesString($this->_release['size']) . ']',
 				'primaryOver',
 				false
 			);
 
 			if ($this->_showCLIReleaseID) {
-				cli_set_process_title($this->_showCLIReleaseID . $this->_release['ID']);
+				cli_set_process_title($this->_showCLIReleaseID . $this->_release['id']);
 			}
 
 			// Create folder to store temporary files.
@@ -742,8 +742,8 @@ Class ProcessAdditional
 	{
 		$this->pdo->queryExec(
 			sprintf(
-				'UPDATE releases SET passwordstatus = passwordstatus - 1 WHERE ID = %d',
-				$this->_release['ID']
+				'UPDATE releases SET passwordstatus = passwordstatus - 1 WHERE id = %d',
+				$this->_release['id']
 			)
 		);
 		return $return;
@@ -1091,16 +1091,16 @@ Class ProcessAdditional
 				$this->pdo->queryOneRow(
 					sprintf(
 						'
-						SELECT ID FROM releasefiles
+						SELECT id FROM releasefiles
 						WHERE releaseid = %d
 						AND name = %s
 						AND size = %d',
-						$this->_release['ID'], $this->pdo->escapeString($file['name']), $file['size']
+						$this->_release['id'], $this->pdo->escapeString($file['name']), $file['size']
 					)
 				) === false
 			) {
 
-				if ($this->_releaseFiles->add($this->_release['ID'], $file['name'], $file['size'], $file['date'], $file['pass'])) {
+				if ($this->_releaseFiles->add($this->_release['id'], $file['name'], $file['size'], $file['date'], $file['pass'])) {
 					$this->_addedFileInfo++;
 
 					if ($this->_echoCLI) {
@@ -1117,7 +1117,7 @@ Class ProcessAdditional
 					} //Run a PreDB filename check on insert to try and match the release
 					else if (strpos($file['name'], '.') != 0 && strlen($file['name']) > 0) {
 						$this->_release['filename'] = $file['name'];
-						$this->_release['releaseid'] = $this->_release['ID'];
+						$this->_release['releaseid'] = $this->_release['id'];
 						$this->_nameFixer->matchPredbFiles($this->_release, 1, 1, true, 1);
 					}
 				}
@@ -1468,9 +1468,9 @@ Class ProcessAdditional
 							'
 							UPDATE releases
 							SET jpgstatus = %d
-							WHERE ID = %d',
+							WHERE id = %d',
 							1,
-							$this->_release['ID']
+							$this->_release['id']
 						)
 					);
 
@@ -1516,7 +1516,7 @@ Class ProcessAdditional
 				SUM(releasefiles.size) AS size
 				FROM releasefiles
 				WHERE releaseid = %d',
-				$this->_release['ID']
+				$this->_release['id']
 			)
 		);
 
@@ -1537,12 +1537,12 @@ Class ProcessAdditional
 				'
 								UPDATE releases
 								SET passwordstatus = passwordstatus - 1, rarinnerfilecount = %d %s %s %s
-								WHERE ID = %d',
+								WHERE id = %d',
 				$releaseFiles['count'],
 				$iSQL,
 				$vSQL,
 				$jSQL,
-				$this->_release['ID']
+				$this->_release['id']
 			);
 		} // Else update the release with the password status (if the admin enabled the setting).
 		else {
@@ -1550,13 +1550,13 @@ Class ProcessAdditional
 				'
 				UPDATE releases
 				SET passwordstatus = %d, rarinnerfilecount = %d %s %s %s
-				WHERE ID = %d',
+				WHERE id = %d',
 				($this->_processPasswords === true ? $this->_passwordStatus : Releases::PASSWD_NONE),
 				$releaseFiles['count'],
 				$iSQL,
 				$vSQL,
 				$jSQL,
-				$this->_release['ID']
+				$this->_release['id']
 			);
 		}
 
@@ -1623,8 +1623,8 @@ Class ProcessAdditional
 		// Make sure the category is music or other.
 		$rQuery = $this->pdo->queryOneRow(
 			sprintf(
-				'SELECT searchname, categoryid AS id, groupid FROM releases WHERE proc_pp = 0 AND ID = %d',
-				$this->_release['ID']
+				'SELECT searchname, categoryid AS id, groupid FROM releases WHERE proc_pp = 0 AND id = %d',
+				$this->_release['id']
 			)
 		);
 
@@ -1690,13 +1690,13 @@ Class ProcessAdditional
 											'
 											UPDATE releases
 											SET searchname = %s, categoryid = %d, iscategorized = 1, isrenamed = 1, proc_pp = 1
-											WHERE ID = %d',
+											WHERE id = %d',
 											$newTitle,
 											$newCat,
-											$this->_release['ID']
+											$this->_release['id']
 										)
 									);
-									$this->sphinx->updateReleaseSearchName($this->_release['ID'], $newTitle);
+									$this->sphinx->updateReleaseSearchName($this->_release['id'], $newTitle);
 
 									// Echo the changed name.
 									if ($this->_echoCLI) {
@@ -1707,7 +1707,7 @@ Class ProcessAdditional
 												'new_category' => $newCat,
 												'old_category' => $rQuery['id'],
 												'group' => $rQuery['groupid'],
-												'release_id' => $this->_release['ID'],
+												'release_id' => $this->_release['id'],
 												'method' => 'ProcessAdditional->_getAudioInfo'
 											)
 										);
@@ -1715,7 +1715,7 @@ Class ProcessAdditional
 								}
 
 								// Add the media info.
-								$this->_releaseExtra->addFromXml($this->_release['ID'], $xmlArray);
+								$this->_releaseExtra->addFromXml($this->_release['id'], $xmlArray);
 
 								$retVal = true;
 								$this->_foundAudioInfo = true;
@@ -1774,8 +1774,8 @@ Class ProcessAdditional
 							'
 							UPDATE releases
 							SET audiostatus = 1
-							WHERE ID = %d',
-							$this->_release['ID']
+							WHERE id = %d',
+							$this->_release['id']
 						)
 					);
 
@@ -1813,9 +1813,9 @@ Class ProcessAdditional
 					'
 					UPDATE releases
 					SET jpgstatus = %d
-					WHERE ID = %d',
+					WHERE id = %d',
 					1,
-					$this->_release['ID']
+					$this->_release['id']
 				)
 			);
 		}
@@ -2083,8 +2083,8 @@ Class ProcessAdditional
 				}
 
 				// Insert it into the DB.
-				$this->_releaseExtra->addFull($this->_release['ID'], $xmlArray);
-				$this->_releaseExtra->addFromXml($this->_release['ID'], $xmlArray);
+				$this->_releaseExtra->addFull($this->_release['id'], $xmlArray);
+				$this->_releaseExtra->addFromXml($this->_release['id'], $xmlArray);
 
 				if ($this->_echoCLI) {
 					$this->_echo('m', 'primaryOver', false);
@@ -2113,8 +2113,8 @@ Class ProcessAdditional
 				'
 				SELECT UNIX_TIMESTAMP(postdate) AS postdate, proc_pp
 				FROM releases
-				WHERE ID = %d',
-				$this->_release['ID']
+				WHERE id = %d',
+				$this->_release['id']
 			)
 		);
 
@@ -2163,14 +2163,14 @@ Class ProcessAdditional
 				if ($filesAdded < 11 &&
 					$this->pdo->queryOneRow(
 						sprintf(
-							'SELECT ID FROM releasefiles WHERE releaseid = %d AND name = %s',
-							$this->_release['ID'], $this->pdo->escapeString($file['name'])
+							'SELECT id FROM releasefiles WHERE releaseid = %d AND name = %s',
+							$this->_release['id'], $this->pdo->escapeString($file['name'])
 						)
 					) === false
 				) {
 
 					// Try to add the files to the DB.
-					if ($this->_releaseFiles->add($this->_release['ID'], $file['name'], $file['size'], $releaseInfo['postdate'], 0)) {
+					if ($this->_releaseFiles->add($this->_release['id'], $file['name'], $file['size'], $releaseInfo['postdate'], 0)) {
 						$filesAdded++;
 					}
 				}
@@ -2181,7 +2181,7 @@ Class ProcessAdditional
 			// Try to get a new name.
 			if ($foundName === false) {
 				$this->_release['textstring'] = $file['name'];
-				$this->_release['releaseid'] = $this->_release['ID'];
+				$this->_release['releaseid'] = $this->_release['id'];
 				if ($this->_nameFixer->checkName($this->_release, ($this->_echoCLI ? 1 : 0), 'PAR2, ', 1, 1) === true) {
 					$foundName = true;
 				}
@@ -2190,9 +2190,9 @@ Class ProcessAdditional
 		// Update the file count with the new file count + old file count.
 		$this->pdo->queryExec(
 			sprintf(
-				'UPDATE releases SET rarinnerfilecount = rarinnerfilecount + %d WHERE ID = %d',
+				'UPDATE releases SET rarinnerfilecount = rarinnerfilecount + %d WHERE id = %d',
 				$filesAdded,
-				$this->_release['ID']
+				$this->_release['id']
 			)
 		);
 		$this->_foundPAR2Info = true;
@@ -2265,7 +2265,7 @@ Class ProcessAdditional
 						continue;
 					}
 
-					// Get a new category ID.
+					// Get a new category id.
 					$newCategory = $this->_categorize->determineCategory($this->_release['groupid'], $newName);
 
 					$newTitle = $this->pdo->escapeString(substr($newName, 0, 255));
@@ -2278,13 +2278,13 @@ Class ProcessAdditional
 								tvtitle = NULL, tvairdate = NULL, imdbid = NULL, musicinfoid = NULL,
 								consoleinfoid = NULL, bookinfoid = NULL, anidbid = NULL, prehashid = 0,
 								searchname = %s, isrenamed = 1, iscategorized = 1, proc_files = 1, categoryid = %d
-							WHERE ID = %d',
+							WHERE id = %d',
 							$newTitle,
 							$newCategory,
-							$this->_release['ID']
+							$this->_release['id']
 						)
 					);
-					$this->sphinx->updateReleaseSearchName($this->_release['ID'], $newTitle);
+					$this->sphinx->updateReleaseSearchName($this->_release['id'], $newTitle);
 
 					// Echo the changed name to CLI.
 					if ($this->_echoCLI) {
@@ -2295,7 +2295,7 @@ Class ProcessAdditional
 								'new_category' => $newCategory,
 								'old_category' => $this->_release['categoryid'],
 								'group' => $this->_release['groupid'],
-								'release_id' => $this->_release['ID'],
+								'release_id' => $this->_release['id'],
 								'method' => 'ProcessAdditional->_processU4ETitle'
 							)
 						);
