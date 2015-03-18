@@ -2144,7 +2144,7 @@ class Smarty_Internal_Templateparser #line 80 "smarty_internal_templateparser.ph
 		'ASPENDTAG', 'FAKEPHPSTARTTAG', 'XMLTAG', 'TEXT',
 		'STRIPON', 'STRIPOFF', 'BLOCKSOURCE', 'LITERALSTART',
 		'LITERALEND', 'LITERAL', 'LDEL', 'DOLLAR',
-		'ID', 'EQUAL', 'PTR', 'LDELIF',
+		'id', 'EQUAL', 'PTR', 'LDELIF',
 		'LDELFOR', 'SEMICOLON', 'INCDEC', 'TO',
 		'STEP', 'LDELFOREACH', 'SPACE', 'AS',
 		'APTR', 'LDELSETFILTER', 'SMARTYBLOCKCHILDPARENT', 'LDELSLASH',
@@ -2240,23 +2240,23 @@ class Smarty_Internal_Templateparser #line 80 "smarty_internal_templateparser.ph
 		/*  32 */
 		"smartytag ::= LDEL expr attributes",
 		/*  33 */
-		"smartytag ::= LDEL DOLLAR ID EQUAL value",
+		"smartytag ::= LDEL DOLLAR id EQUAL value",
 		/*  34 */
-		"smartytag ::= LDEL DOLLAR ID EQUAL expr",
+		"smartytag ::= LDEL DOLLAR id EQUAL expr",
 		/*  35 */
-		"smartytag ::= LDEL DOLLAR ID EQUAL expr attributes",
+		"smartytag ::= LDEL DOLLAR id EQUAL expr attributes",
 		/*  36 */
 		"smartytag ::= LDEL varindexed EQUAL expr attributes",
 		/*  37 */
-		"smartytag ::= LDEL ID attributes",
+		"smartytag ::= LDEL id attributes",
 		/*  38 */
-		"smartytag ::= LDEL ID",
+		"smartytag ::= LDEL id",
 		/*  39 */
-		"smartytag ::= LDEL ID PTR ID attributes",
+		"smartytag ::= LDEL id PTR id attributes",
 		/*  40 */
-		"smartytag ::= LDEL ID modifierlist attributes",
+		"smartytag ::= LDEL id modifierlist attributes",
 		/*  41 */
-		"smartytag ::= LDEL ID PTR ID modifierlist attributes",
+		"smartytag ::= LDEL id PTR id modifierlist attributes",
 		/*  42 */
 		"smartytag ::= LDELIF expr",
 		/*  43 */
@@ -2286,19 +2286,19 @@ class Smarty_Internal_Templateparser #line 80 "smarty_internal_templateparser.ph
 		/*  55 */
 		"smartytag ::= LDELFOREACH SPACE expr AS DOLLAR varvar APTR DOLLAR varvar attributes",
 		/*  56 */
-		"smartytag ::= LDELSETFILTER ID modparameters",
+		"smartytag ::= LDELSETFILTER id modparameters",
 		/*  57 */
-		"smartytag ::= LDELSETFILTER ID modparameters modifierlist",
+		"smartytag ::= LDELSETFILTER id modparameters modifierlist",
 		/*  58 */
 		"smartytag ::= LDEL SMARTYBLOCKCHILDPARENT",
 		/*  59 */
-		"smartytag ::= LDELSLASH ID",
+		"smartytag ::= LDELSLASH id",
 		/*  60 */
-		"smartytag ::= LDELSLASH ID modifierlist",
+		"smartytag ::= LDELSLASH id modifierlist",
 		/*  61 */
-		"smartytag ::= LDELSLASH ID PTR ID",
+		"smartytag ::= LDELSLASH id PTR id",
 		/*  62 */
-		"smartytag ::= LDELSLASH ID PTR ID modifierlist",
+		"smartytag ::= LDELSLASH id PTR id modifierlist",
 		/*  63 */
 		"attributes ::= attributes attribute",
 		/*  64 */
@@ -2306,13 +2306,13 @@ class Smarty_Internal_Templateparser #line 80 "smarty_internal_templateparser.ph
 		/*  65 */
 		"attributes ::=",
 		/*  66 */
-		"attribute ::= SPACE ID EQUAL ID",
+		"attribute ::= SPACE id EQUAL id",
 		/*  67 */
 		"attribute ::= ATTR expr",
 		/*  68 */
 		"attribute ::= ATTR value",
 		/*  69 */
-		"attribute ::= SPACE ID",
+		"attribute ::= SPACE id",
 		/*  70 */
 		"attribute ::= SPACE expr",
 		/*  71 */
@@ -2334,7 +2334,7 @@ class Smarty_Internal_Templateparser #line 80 "smarty_internal_templateparser.ph
 		/*  79 */
 		"expr ::= ternary",
 		/*  80 */
-		"expr ::= DOLLAR ID COLON ID",
+		"expr ::= DOLLAR id COLON id",
 		/*  81 */
 		"expr ::= expr MATH value",
 		/*  82 */
@@ -2374,11 +2374,11 @@ class Smarty_Internal_Templateparser #line 80 "smarty_internal_templateparser.ph
 		/*  99 */
 		"expr ::= expr ISNOTODDBY expr",
 		/* 100 */
-		"expr ::= value INSTANCEOF ID",
+		"expr ::= value INSTANCEOF id",
 		/* 101 */
 		"expr ::= value INSTANCEOF value",
 		/* 102 */
-		"ternary ::= OPENP expr CLOSEP QMARK DOLLAR ID COLON expr",
+		"ternary ::= OPENP expr CLOSEP QMARK DOLLAR id COLON expr",
 		/* 103 */
 		"ternary ::= OPENP expr CLOSEP QMARK expr COLON expr",
 		/* 104 */
@@ -2402,7 +2402,7 @@ class Smarty_Internal_Templateparser #line 80 "smarty_internal_templateparser.ph
 		/* 113 */
 		"value ::= DOT INTEGER",
 		/* 114 */
-		"value ::= ID",
+		"value ::= id",
 		/* 115 */
 		"value ::= function",
 		/* 116 */
@@ -2412,7 +2412,7 @@ class Smarty_Internal_Templateparser #line 80 "smarty_internal_templateparser.ph
 		/* 118 */
 		"value ::= doublequoted_with_quotes",
 		/* 119 */
-		"value ::= ID DOUBLECOLON static_class_access",
+		"value ::= id DOUBLECOLON static_class_access",
 		/* 120 */
 		"value ::= varindexed DOUBLECOLON static_class_access",
 		/* 121 */
@@ -2422,13 +2422,13 @@ class Smarty_Internal_Templateparser #line 80 "smarty_internal_templateparser.ph
 		/* 123 */
 		"variable ::= varindexed",
 		/* 124 */
-		"variable ::= DOLLAR varvar AT ID",
+		"variable ::= DOLLAR varvar AT id",
 		/* 125 */
 		"variable ::= object",
 		/* 126 */
-		"variable ::= HATCH ID HATCH",
+		"variable ::= HATCH id HATCH",
 		/* 127 */
-		"variable ::= HATCH ID HATCH arrayindex",
+		"variable ::= HATCH id HATCH arrayindex",
 		/* 128 */
 		"variable ::= HATCH variable HATCH",
 		/* 129 */
@@ -2442,17 +2442,17 @@ class Smarty_Internal_Templateparser #line 80 "smarty_internal_templateparser.ph
 		/* 133 */
 		"indexdef ::= DOT DOLLAR varvar",
 		/* 134 */
-		"indexdef ::= DOT DOLLAR varvar AT ID",
+		"indexdef ::= DOT DOLLAR varvar AT id",
 		/* 135 */
-		"indexdef ::= DOT ID",
+		"indexdef ::= DOT id",
 		/* 136 */
 		"indexdef ::= DOT INTEGER",
 		/* 137 */
 		"indexdef ::= DOT LDEL expr RDEL",
 		/* 138 */
-		"indexdef ::= OPENB ID CLOSEB",
+		"indexdef ::= OPENB id CLOSEB",
 		/* 139 */
-		"indexdef ::= OPENB ID DOT ID CLOSEB",
+		"indexdef ::= OPENB id DOT id CLOSEB",
 		/* 140 */
 		"indexdef ::= OPENB expr CLOSEB",
 		/* 141 */
@@ -2462,7 +2462,7 @@ class Smarty_Internal_Templateparser #line 80 "smarty_internal_templateparser.ph
 		/* 143 */
 		"varvar ::= varvar varvarele",
 		/* 144 */
-		"varvarele ::= ID",
+		"varvarele ::= id",
 		/* 145 */
 		"varvarele ::= LDEL expr RDEL",
 		/* 146 */
@@ -2472,21 +2472,21 @@ class Smarty_Internal_Templateparser #line 80 "smarty_internal_templateparser.ph
 		/* 148 */
 		"objectchain ::= objectchain objectelement",
 		/* 149 */
-		"objectelement ::= PTR ID arrayindex",
+		"objectelement ::= PTR id arrayindex",
 		/* 150 */
 		"objectelement ::= PTR DOLLAR varvar arrayindex",
 		/* 151 */
 		"objectelement ::= PTR LDEL expr RDEL arrayindex",
 		/* 152 */
-		"objectelement ::= PTR ID LDEL expr RDEL arrayindex",
+		"objectelement ::= PTR id LDEL expr RDEL arrayindex",
 		/* 153 */
 		"objectelement ::= PTR method",
 		/* 154 */
-		"function ::= ID OPENP params CLOSEP",
+		"function ::= id OPENP params CLOSEP",
 		/* 155 */
-		"method ::= ID OPENP params CLOSEP",
+		"method ::= id OPENP params CLOSEP",
 		/* 156 */
-		"method ::= DOLLAR ID OPENP params CLOSEP",
+		"method ::= DOLLAR id OPENP params CLOSEP",
 		/* 157 */
 		"params ::= params COMMA expr",
 		/* 158 */
@@ -2498,9 +2498,9 @@ class Smarty_Internal_Templateparser #line 80 "smarty_internal_templateparser.ph
 		/* 161 */
 		"modifierlist ::= modifier modparameters",
 		/* 162 */
-		"modifier ::= VERT AT ID",
+		"modifier ::= VERT AT id",
 		/* 163 */
-		"modifier ::= VERT ID",
+		"modifier ::= VERT id",
 		/* 164 */
 		"modparameters ::= modparameters modparameter",
 		/* 165 */
@@ -2514,11 +2514,11 @@ class Smarty_Internal_Templateparser #line 80 "smarty_internal_templateparser.ph
 		/* 169 */
 		"static_class_access ::= method objectchain",
 		/* 170 */
-		"static_class_access ::= ID",
+		"static_class_access ::= id",
 		/* 171 */
-		"static_class_access ::= DOLLAR ID arrayindex",
+		"static_class_access ::= DOLLAR id arrayindex",
 		/* 172 */
-		"static_class_access ::= DOLLAR ID arrayindex objectchain",
+		"static_class_access ::= DOLLAR id arrayindex objectchain",
 		/* 173 */
 		"ifcond ::= EQUALS",
 		/* 174 */
@@ -2554,7 +2554,7 @@ class Smarty_Internal_Templateparser #line 80 "smarty_internal_templateparser.ph
 		/* 189 */
 		"arrayelement ::= value APTR expr",
 		/* 190 */
-		"arrayelement ::= ID APTR expr",
+		"arrayelement ::= id APTR expr",
 		/* 191 */
 		"arrayelement ::= expr",
 		/* 192 */

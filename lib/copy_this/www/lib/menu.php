@@ -51,12 +51,12 @@ class Menu
 	}
 
 	/**
-	 * Get a menu row by its ID.
+	 * Get a menu row by its id.
 	 */
 	public function getById($id)
 	{
 		$db = new DB();
-		return $db->queryOneRow(sprintf("select * from menu where ID = %d", $id));
+		return $db->queryOneRow(sprintf("select * from menu where id = %d", $id));
 	}
 
 	/**
@@ -65,7 +65,7 @@ class Menu
 	public function delete($id)
 	{
 		$db = new DB();
-		return $db->queryExec(sprintf("DELETE from menu where ID = %d", $id));
+		return $db->queryExec(sprintf("DELETE from menu where id = %d", $id));
 	}
 
 	/**
@@ -84,6 +84,6 @@ class Menu
 	public function update($menu)
 	{
 		$db = new DB();
-		return $db->queryExec(sprintf("update menu set href = %s, title = %s, tooltip = %s, role = %d, ordinal = %d, menueval = %s, newwindow=%d where ID = %d	", $db->escapeString($menu["href"]), $db->escapeString($menu["title"]), $db->escapeString($menu["tooltip"]), $menu["role"] , $menu["ordinal"], $db->escapeString($menu["menueval"]), $menu["newwindow"], $menu["id"] ));
+		return $db->queryExec(sprintf("update menu set href = %s, title = %s, tooltip = %s, role = %d, ordinal = %d, menueval = %s, newwindow=%d where id = %d	", $db->escapeString($menu["href"]), $db->escapeString($menu["title"]), $db->escapeString($menu["tooltip"]), $menu["role"] , $menu["ordinal"], $db->escapeString($menu["menueval"]), $menu["newwindow"], $menu["id"] ));
 	}
 }

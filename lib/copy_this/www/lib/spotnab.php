@@ -1331,14 +1331,14 @@ class SpotNab {
 
 		// Comments
 		$sql_new_cmt = "INSERT INTO releasecomment (".
-			"id, sourceID, username, userid, gid, cid, isvisible, ".
+			"id, sourceid, username, userid, gid, cid, isvisible, ".
 			"releaseid, `text`, createddate, issynced, nzb_guid) VALUES (".
 			"NULL, %d, %s, 0, %s, %s, %d, 0, %s, %s, 1, %s)";
 		$sql_upd_cmt = "UPDATE releasecomment SET ".
 			"isvisible = %d, `text` = %s".
-			"WHERE sourceID = %d AND gid = %s AND cid = %s AND nzb_guid = %s";
+			"WHERE sourceid = %d AND gid = %s AND cid = %s AND nzb_guid = %s";
 		$sql_fnd_cmt = "SELECT count(id) as cnt FROM releasecomment ".
-			"WHERE sourceID = %d AND gid = %s AND cid = %s";
+			"WHERE sourceid = %d AND gid = %s AND cid = %s";
 
 		// Sync Times
 		$sql_sync = "UPDATE spotnabsources SET lastupdate = %s ".
@@ -2250,7 +2250,7 @@ class SpotNab {
 				."JOIN releases r ON r.id = rc.releaseid AND rc.releaseid != 0 "
 				."JOIN users u ON rc.userid = u.id AND rc.userid != 0 "
 				."WHERE r.gid IS NOT NULL "
-				."AND sourceID = 0 AND issynced = 0 "
+				."AND sourceid = 0 AND issynced = 0 "
 				."LIMIT %d", $limit);
 
 		$res = $db->query($sql);

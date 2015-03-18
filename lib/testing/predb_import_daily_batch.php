@@ -1,7 +1,7 @@
 <?php
 
 /* TODO better tune the queries for performance, including using prepared statements and
-   pre-fetching groupID and other data for faster inclusion in the main query.
+   pre-fetching groupid and other data for faster inclusion in the main query.
 */
 
 require_once(dirname(__FILE__) . "/../../bin/config.php");
@@ -83,9 +83,9 @@ if ($result) {
 	$pdo->queryExec('CREATE TABLE tmp_pre LIKE prehash');
 
 	// Drop id as it is not needed and incurs overhead creating each id.
-	$pdo->queryExec('ALTER TABLE tmp_pre DROP COLUMN ID');
+	$pdo->queryExec('ALTER TABLE tmp_pre DROP COLUMN id');
 
-	// Add a column for the group's name which is included instead of the groupID, which may be
+	// Add a column for the group's name which is included instead of the groupid, which may be
 	// different between individual databases
 	$pdo->queryExec('ALTER TABLE tmp_pre ADD COLUMN groupname VARCHAR (255)');
 
@@ -196,7 +196,7 @@ function importDump($path, $local, $verbose = true, $table = 'prehash')
 
 	// Import file into tmp_pre
 	$sqlLoad = sprintf(
-		"LOAD DATA %s INFILE '%s' IGNORE INTO TABLE tmp_pre FIELDS TERMINATED BY '\\t\\t' ENCLOSED BY \"'\" LINES TERMINATED BY '\\r\\n' (title, nfo, size, files, filename, nuked, nukereason, category, predate, source, requestID, groupname);",
+		"LOAD DATA %s INFILE '%s' IGNORE INTO TABLE tmp_pre FIELDS TERMINATED BY '\\t\\t' ENCLOSED BY \"'\" LINES TERMINATED BY '\\r\\n' (title, nfo, size, files, filename, nuked, nukereason, category, predate, source, requestid, groupname);",
 		($local === false ? 'LOCAL' : ''),
 		$path
 	);
@@ -222,13 +222,13 @@ SQL_ADD_GROUPS;
 
 	$pdo->queryDirect($sqlAddGroups);
 
-	// Fill the groupID
-	$pdo->queryDirect("UPDATE tmp_pre AS t SET groupID = (SELECT ID FROM groups WHERE name = t.groupname) WHERE groupname IS NOT NULL");
+	// Fill the groupid
+	$pdo->queryDirect("UPDATE tmp_pre AS t SET groupid = (SELECT id FROM groups WHERE name = t.groupname) WHERE groupname IS NOT NULL");
 
 	// Insert and update table
 	$sqlInsert = <<<SQL_INSERT
-INSERT INTO $table (title, nfo, size, files, filename, nuked, nukereason, category, predate, SOURCE, requestID, groupID)
-  SELECT t.title, t.nfo, t.size, t.files, t.filename, t.nuked, t.nukereason, t.category, t.predate, t.source, t.requestID, t.groupID
+INSERT INTO $table (title, nfo, size, files, filename, nuked, nukereason, category, predate, SOURCE, requestid, groupid)
+  SELECT t.title, t.nfo, t.size, t.files, t.filename, t.nuked, t.nukereason, t.category, t.predate, t.source, t.requestid, t.groupid
     FROM tmp_pre AS t
   ON DUPLICATE KEY UPDATE prehash.nfo = IF(prehash.nfo IS NULL, t.nfo, prehash.nfo),
 	  prehash.size = IF(prehash.size IS NULL, t.size, prehash.size),
@@ -237,8 +237,8 @@ INSERT INTO $table (title, nfo, size, files, filename, nuked, nukereason, catego
 	  prehash.nuked = IF(t.nuked > 0, t.nuked, prehash.nuked),
 	  prehash.nukereason = IF(t.nuked > 0, t.nukereason, prehash.nukereason),
 	  prehash.category = IF(prehash.category IS NULL, t.category, prehash.category),
-	  prehash.requestID = IF(prehash.requestID = 0, t.requestID, prehash.requestID),
-	  prehash.groupID = IF(prehash.groupID = 0, t.groupID, prehash.groupID);
+	  prehash.requestid = IF(prehash.requestid = 0, t.requestid, prehash.requestid),
+	  prehash.groupid = IF(prehash.groupid = 0, t.groupid, prehash.groupid);
 SQL_INSERT;
 
 	echo $pdo->log->info("Inserting records from temporary table into $table");

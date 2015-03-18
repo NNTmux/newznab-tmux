@@ -7,7 +7,7 @@ require_once(WWW_DIR."/lib/genres.php");
 require_once(WWW_DIR."/lib/releaseimage.php");
 require_once(WWW_DIR."lib/Tmux.php");
 require_once(WWW_DIR . "/lib/ColorCLI.php");
-require_once(NN_TMUX . 'lib' . DS . 'Enzebe.php');
+require_once("Enzebe.php");
 
 
 class Konsole
@@ -93,7 +93,7 @@ class Konsole
 	{
 		return $this->pdo->queryOneRow(
 			sprintf(
-				"SELECT consoleinfo.*, genres.title AS genres FROM consoleinfo LEFT OUTER JOIN genres ON genres.ID = consoleinfo.genreID WHERE consoleinfo.ID = %d ",
+				"SELECT consoleinfo.*, genres.title AS genres FROM consoleinfo LEFT OUTER JOIN genres ON genres.id = consoleinfo.genreid WHERE consoleinfo.id = %d ",
 				$id
 			)
 		);
@@ -138,7 +138,7 @@ class Konsole
 
 	public function getCount()
 	{
-		$res = $this->pdo->queryOneRow("SELECT COUNT(ID) AS num FROM consoleinfo");
+		$res = $this->pdo->queryOneRow("SELECT COUNT(id) AS num FROM consoleinfo");
 		return ($res === false ? 0 : $res['num']);
 	}
 
@@ -151,16 +151,16 @@ class Konsole
 
 		$res = $this->pdo->queryOneRow(
 			sprintf("
-				SELECT COUNT(DISTINCT r.consoleinfoID) AS num
+				SELECT COUNT(DISTINCT r.consoleinfoid) AS num
 				FROM releases r
-				INNER JOIN consoleinfo con ON con.ID = r.consoleinfoID AND con.title != '' AND con.cover = 1
+				INNER JOIN consoleinfo con ON con.id = r.consoleinfoid AND con.title != '' AND con.cover = 1
 				WHERE r.nzbstatus = 1
 				AND r.passwordstatus <= (SELECT value FROM site WHERE setting='showpasswordedrelease')
 				AND %s %s %s %s",
 				$this->getBrowseBy(),
 				$catsrch,
 				($maxage > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxage) : ''),
-				(count($excludedcats) > 0 ? (' AND r.categoryID NOT IN (' . implode(',', $excludedcats) . ')') : '')
+				(count($excludedcats) > 0 ? (' AND r.categoryid NOT IN (' . implode(',', $excludedcats) . ')') : '')
 			)
 		);
 		return ($res === false ? 0 : $res["num"]);
@@ -184,18 +184,18 @@ class Konsole
 
 		$exccatlist = "";
 		if (count($excludedcats) > 0) {
-			$exccatlist = " AND r.categoryID NOT IN (" . implode(",", $excludedcats) . ")";
+			$exccatlist = " AND r.categoryid NOT IN (" . implode(",", $excludedcats) . ")";
 		}
 
 		$order = $this->getConsoleOrder($orderby);
 		return $this->pdo->query(
 			sprintf(
-				"SELECT GROUP_CONCAT(r.ID ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id, "
+				"SELECT GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id, "
 				. "GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') as grp_rarinnerfilecount, "
 				. "GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') AS grp_haspreview, "
 				. "GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_password, "
 				. "GROUP_CONCAT(r.guid ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_guid, "
-				. "GROUP_CONCAT(rn.ID ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_nfoid, "
+				. "GROUP_CONCAT(rn.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_nfoid, "
 				. "GROUP_CONCAT(groups.name ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grpname, "
 				. "GROUP_CONCAT(r.searchname ORDER BY r.postdate DESC SEPARATOR '#') AS grp_release_name, "
 				. "GROUP_CONCAT(r.postdate ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_postdate, "
@@ -203,15 +203,15 @@ class Konsole
 				. "GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_totalparts, "
 				. "GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_comments, "
 				. "GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grabs, "
-				. "con.*, r.consoleinfoID, groups.name AS group_name, rn.ID as nfoid FROM releases r "
-				. "LEFT OUTER JOIN groups ON groups.ID = r.groupID "
-				. "LEFT OUTER JOIN releasenfo rn ON rn.releaseID = r.ID "
-				. "INNER JOIN consoleinfo con ON con.ID = r.consoleinfoID "
-				. "INNER JOIN genres ON con.genreID = genres.ID "
+				. "con.*, r.consoleinfoid, groups.name AS group_name, rn.id as nfoid FROM releases r "
+				. "LEFT OUTER JOIN groups ON groups.id = r.groupid "
+				. "LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id "
+				. "INNER JOIN consoleinfo con ON con.id = r.consoleinfoid "
+				. "INNER JOIN genres ON con.genreid = genres.id "
 				. "WHERE r.nzbstatus = 1 AND con.title != '' AND "
 				. "r.passwordstatus <= (SELECT value FROM site WHERE setting='showpasswordedrelease') AND %s %s
 				%s "
-				. "GROUP BY con.ID ORDER BY %s %s" . $limit, $browseby, $catsrch, $exccatlist, $order[0], $order[1]
+				. "GROUP BY con.id ORDER BY %s %s" . $limit, $browseby, $catsrch, $exccatlist, $order[0], $order[1]
 			)
 		);
 	}
@@ -231,7 +231,7 @@ class Konsole
 				$orderfield = 'con.releasedate';
 				break;
 			case 'genre':
-				$orderfield = 'con.genreID';
+				$orderfield = 'con.genreid';
 				break;
 			case 'size':
 				$orderfield = 'r.size';
@@ -258,7 +258,7 @@ class Konsole
 
 	public function getBrowseByOptions()
 	{
-		return array('platform' => 'platform', 'title' => 'title', 'genre' => 'genreID');
+		return array('platform' => 'platform', 'title' => 'title', 'genre' => 'genreid');
 	}
 
 	public function getBrowseBy()
@@ -298,8 +298,8 @@ class Konsole
 				UPDATE consoleinfo
 				SET
 					title = %s, asin = %s, url = %s, salesrank = %s, platform = %s, publisher = %s,
-					releasedate= %s, esrb = %s, cover = %d, genreID = %d, review = %s, updateddate = NOW()
-				WHERE ID = %d",
+					releasedate= %s, esrb = %s, cover = %d, genreid = %d, review = %s, updateddate = NOW()
+				WHERE id = %d",
 				$this->pdo->escapeString($title),
 				$this->pdo->escapeString($asin),
 				$this->pdo->escapeString($url),
@@ -541,7 +541,7 @@ class Konsole
 		$defaultGenres = $gen->getGenres(\Genres::CONSOLE_TYPE);
 		$genreassoc = array();
 		foreach ($defaultGenres as $dg) {
-			$genreassoc[$dg['ID']] = strtolower($dg['title']);
+			$genreassoc[$dg['id']] = strtolower($dg['title']);
 		}
 		return $genreassoc;
 	}
@@ -619,7 +619,7 @@ class Konsole
 
 		$check = $this->pdo->queryOneRow(
 			sprintf('
-							SELECT ID
+							SELECT id
 							FROM consoleinfo
 							WHERE asin = %s',
 				$this->pdo->escapeString($con['asin'])
@@ -629,7 +629,7 @@ class Konsole
 		if ($check === false) {
 			$consoleId = $this->pdo->queryInsert(
 				sprintf(
-					"INSERT INTO consoleinfo (title, asin, url, salesrank, platform, publisher, genreID, esrb, releasedate, review, cover, createddate, updateddate)
+					"INSERT INTO consoleinfo (title, asin, url, salesrank, platform, publisher, genreid, esrb, releasedate, review, cover, createddate, updateddate)
 					VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, NOW(), NOW())",
 					$this->pdo->escapeString($con['title']),
 					$this->pdo->escapeString($con['asin']),
@@ -678,11 +678,11 @@ class Konsole
 	{
 		$res = $this->pdo->queryDirect(
 			sprintf('
-							SELECT searchname, ID
+							SELECT searchname, id
 							FROM releases
 							WHERE nzbstatus = %d %s
-							AND consoleinfoID IS NULL
-							AND categoryID BETWEEN 1000 AND 1999
+							AND consoleinfoid IS NULL
+							AND categoryid BETWEEN 1000 AND 1999
 							ORDER BY postdate DESC
 							LIMIT %d',
 				\Enzebe::NZB_ADDED,
@@ -729,7 +729,7 @@ class Konsole
 								PHP_EOL
 							);
 						}
-						$gameId = $gameCheck['ID'];
+						$gameId = $gameCheck['id'];
 					}
 
 				} elseif ($this->echooutput) {
@@ -740,10 +740,10 @@ class Konsole
 				$this->pdo->queryExec(
 					sprintf('
 								UPDATE releases
-								SET consoleinfoID = %d
-								WHERE ID = %d',
+								SET consoleinfoid = %d
+								WHERE id = %d',
 						$gameId,
-						$arr['ID']
+						$arr['id']
 					)
 				);
 
@@ -819,7 +819,7 @@ class Konsole
 		array_map("trim", $result);
 
 		/* Make sure we got a title and platform otherwise the resulting lookup will probably be shit.
-		   Other option is to pass the $release->categoryID here if we don't find a platform but that
+		   Other option is to pass the $release->categoryid here if we don't find a platform but that
 		   would require an extra lookup to determine the name. In either case we should have a title at the minimum. */
 
 		return (isset($result['title']) && !empty($result['title']) && isset($result['platform'])) ? $result : false;

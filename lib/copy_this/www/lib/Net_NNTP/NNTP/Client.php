@@ -277,7 +277,7 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 	 *
 	 * @return mixed <br>
 	 *  - (integer) Article number, if $ret=0 (default)
-	 *  - (string)  Message-id, if $ret=1
+	 *  - (string)  Message-ID, if $ret=1
 	 *  - (array)   Both article number and message-id, if $ret=-1
 	 *  - (bool)    False if no previous article exists
 	 *  - (object)  Pear_Error on failure
@@ -317,7 +317,7 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 	 *
 	 * @return mixed <br>
 	 *  - (integer) Article number, if $ret=0 (default)
-	 *  - (string)  Message-id, if $ret=1
+	 *  - (string)  Message-ID, if $ret=1
 	 *  - (array)   Both article number and message-id, if $ret=-1
 	 *  - (bool)    False if no further articles exist
 	 *  - (object)  Pear_Error on unexpected failure

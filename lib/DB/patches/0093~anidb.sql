@@ -1,7 +1,7 @@
 DROP TABLE IF EXISTS anidb_episodes;
 CREATE TABLE anidb_episodes (
   anidbid       INT(10) UNSIGNED        NOT NULL
-  COMMENT 'ID of title from AniDB',
+  COMMENT 'id of title from AniDB',
   episodeid     INT(10) UNSIGNED        NOT NULL DEFAULT '0'
   COMMENT 'anidb id for this episode',
   episode_no    SMALLINT(5) UNSIGNED    NOT NULL
@@ -20,7 +20,7 @@ CREATE TABLE anidb_episodes (
 DROP TABLE IF EXISTS anidb_info;
 CREATE TABLE anidb_info (
   anidbid     INT(10) UNSIGNED NOT NULL
-  COMMENT 'ID of title from AniDB',
+  COMMENT 'id of title from AniDB',
   type        VARCHAR(32)
               COLLATE utf8_unicode_ci DEFAULT NULL,
   startdate   DATE                    DEFAULT NULL,
@@ -53,7 +53,7 @@ CREATE TABLE anidb_info (
 DROP TABLE IF EXISTS anidb_titles;
 CREATE TABLE anidb_titles (
   anidbid INT(10) UNSIGNED        NOT NULL
-  COMMENT 'ID of title from AniDB',
+  COMMENT 'id of title from AniDB',
   type    VARCHAR(25)
           COLLATE utf8_unicode_ci NOT NULL
   COMMENT 'type of title.',

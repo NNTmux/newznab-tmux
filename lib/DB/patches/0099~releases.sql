@@ -23,12 +23,12 @@ DROP INDEX ix_releases_nzb_guid ON releases;
 DROP INDEX ix_releases_prehashid_searchname ON releases;
 DROP INDEX idx_releases_multi_name_fromname_size ON releases;
 
-ALTER TABLE releases MODIFY ID INT(11) UNSIGNED NOT NULL;
+ALTER TABLE releases MODIFY id INT(11) UNSIGNED NOT NULL;
 ALTER TABLE releases DROP PRIMARY KEY;
-ALTER TABLE releases ADD PRIMARY KEY (ID, categoryID);
-ALTER TABLE releases MODIFY ID INT(11) UNSIGNED NOT NULL AUTO_INCREMENT;
+ALTER TABLE releases ADD PRIMARY KEY (id, categoryid);
+ALTER TABLE releases MODIFY id INT(11) UNSIGNED NOT NULL AUTO_INCREMENT;
 
-ALTER TABLE releases PARTITION BY RANGE (categoryID) (
+ALTER TABLE releases PARTITION BY RANGE (categoryid) (
 PARTITION unused VALUES LESS THAN (1000),
 PARTITION console VALUES LESS THAN (2000),
 PARTITION movies VALUES LESS THAN (3000),
@@ -40,21 +40,21 @@ PARTITION books VALUES LESS THAN (8000),
 PARTITION misc VALUES LESS THAN (9000) );
 
 ALTER TABLE releases ADD INDEX ix_releases_adddate (adddate);
-ALTER TABLE releases ADD INDEX ix_releases_rageid (rageID);
-ALTER TABLE releases ADD INDEX ix_releases_imdbid (imdbID);
+ALTER TABLE releases ADD INDEX ix_releases_rageid (rageid);
+ALTER TABLE releases ADD INDEX ix_releases_imdbid (imdbid);
 ALTER TABLE releases ADD INDEX ix_releases_guid (guid);
 ALTER TABLE releases ADD INDEX ix_releases_name (name);
-ALTER TABLE releases ADD INDEX ix_releases_groupid (groupID);
+ALTER TABLE releases ADD INDEX ix_releases_groupid (groupid);
 ALTER TABLE releases ADD INDEX ix_releases_dehashstatus (dehashstatus);
 ALTER TABLE releases ADD INDEX ix_releases_reqidstatus (reqidstatus);
 ALTER TABLE releases ADD INDEX ix_releases_nfostatus (nfostatus);
-ALTER TABLE releases ADD INDEX ix_releases_musicinfoid (musicinfoID);
-ALTER TABLE releases ADD INDEX ix_releases_consoleinfoid (consoleinfoID);
-ALTER TABLE releases ADD INDEX ix_releases_bookinfoid (bookinfoID);
+ALTER TABLE releases ADD INDEX ix_releases_musicinfoid (musicinfoid);
+ALTER TABLE releases ADD INDEX ix_releases_consoleinfoid (consoleinfoid);
+ALTER TABLE releases ADD INDEX ix_releases_bookinfoid (bookinfoid);
 ALTER TABLE releases ADD INDEX ix_releases_haspreview_passwordstatus (haspreview, passwordstatus);
-ALTER TABLE releases ADD INDEX ix_releases_status (nzbstatus, iscategorized, isrenamed, nfostatus, ishashed, isrequestid, passwordstatus, dehashstatus, reqidstatus, musicinfoID, consoleinfoID, bookinfoID, haspreview, categoryID, imdbID, rageID);
+ALTER TABLE releases ADD INDEX ix_releases_status (nzbstatus, iscategorized, isrenamed, nfostatus, ishashed, isrequestid, passwordstatus, dehashstatus, reqidstatus, musicinfoid, consoleinfoid, bookinfoid, haspreview, categoryid, imdbid, rageid);
 ALTER TABLE releases ADD INDEX ix_releases_postdate_searchname (postdate, searchname);
 ALTER TABLE releases ADD INDEX ix_releases_nzb_guid (nzb_guid);
-ALTER TABLE releases ADD INDEX ix_releases_prehash_searchname (prehashID, searchname);
+ALTER TABLE releases ADD INDEX ix_releases_prehash_searchname (prehashid, searchname);
 
 UPDATE tmux set value = '99' where setting = 'sqlpatch';

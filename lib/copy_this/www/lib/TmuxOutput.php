@@ -117,7 +117,7 @@ class TmuxOutput extends Tmux
 		$buffer = '';
 		$state = ($this->runVar['settings']['is_running'] == 1) ? 'Running' : 'Disabled';
 		//$version = $this->_tvers . 'r' . $this->_vers;
-		$tversion = '0.5r01174';
+		$tversion = '0.5r01185';
 
 		$buffer .= sprintf($this->tmpMasks[2],
 					"Monitor $state v$tversion @ $this->_tvers [" . $this->_vers ."]: ",
@@ -231,7 +231,7 @@ class TmuxOutput extends Tmux
 							)
 		);
 		$buffer .= sprintf($this->tmpMasks[4],
-						   "requestID",
+						   "requestid",
 						   sprintf(
 							   "%s(%s)",
 							   number_format($this->runVar['counts']['now']['requestid_inprogress']),

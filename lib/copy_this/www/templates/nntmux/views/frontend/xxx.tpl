@@ -93,7 +93,7 @@
 			<div class="movcover">
 				<a
 						target="_blank"
-						href="{$smarty.const.WWW_TOP}/xxx/?ID={$result.id}"
+						href="{$smarty.const.WWW_TOP}/xxx/?id={$result.id}"
 						name="name{$result.id}"
 						title="View XXX info"
 						class="modal_xxx thumbnail" rel="viewxxx"

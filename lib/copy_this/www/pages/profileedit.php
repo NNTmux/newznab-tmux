@@ -47,7 +47,7 @@ switch ($action) {
 			$errorStr = "Your email is not a valid format.";
 		} else {
 			$res = $users->getByEmail($_POST['email']);
-			if ($res && $res["ID"] != $userid) {
+			if ($res && $res["id"] != $userid) {
 				$errorStr = "Sorry, the email is already in use.";
 			} elseif ((empty($_POST['saburl']) && !empty($_POST['sabapikey'])) || (!empty($_POST['saburl']) && empty($_POST['sabapikey']))) {
 				$errorStr = "Insert a SABnzdb URL and API key.";

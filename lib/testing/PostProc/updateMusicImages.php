@@ -18,11 +18,11 @@ foreach ($itr as $filePath) {
     if (is_file($filePath) && preg_match('/\d+\.jpg/', $filePath)) {
         preg_match('/(\d+)\.jpg/', basename($filePath), $match);
         if (isset($match[1])) {
-            $run = $pdo->queryDirect("UPDATE musicinfo SET cover = 1 WHERE cover = 0 AND ID = " . $match[1]);
+            $run = $pdo->queryDirect("UPDATE musicinfo SET cover = 1 WHERE cover = 0 AND id = " . $match[1]);
             if ($run->rowCount() >= 1) {
                 $covers++;
             } else {
-                $run = $pdo->queryDirect("SELECT ID FROM musicinfo WHERE ID = " . $match[1]);
+                $run = $pdo->queryDirect("SELECT id FROM musicinfo WHERE id = " . $match[1]);
                 if ($run->rowCount() == 0) {
                     echo $pdo->log->info($filePath . " not found in db.");
                 }
@@ -31,12 +31,12 @@ foreach ($itr as $filePath) {
     }
 }
 
-$qry = $pdo->queryDirect("SELECT ID FROM musicinfo WHERE cover = 1");
+$qry = $pdo->queryDirect("SELECT id FROM musicinfo WHERE cover = 1");
 if ($qry instanceof \Traversable) {
 	foreach ($qry as $rows) {
-		if (!is_file($path2covers . $rows['ID'] . '.jpg')) {
-			$pdo->queryDirect("UPDATE musicinfo SET cover = 0 WHERE cover = 1 AND ID = " . $rows['ID']);
-			echo $pdo->log->info($path2covers . $rows['ID'] . ".jpg does not exist.");
+		if (!is_file($path2covers . $rows['id'] . '.jpg')) {
+			$pdo->queryDirect("UPDATE musicinfo SET cover = 0 WHERE cover = 1 AND id = " . $rows['id']);
+			echo $pdo->log->info($path2covers . $rows['id'] . ".jpg does not exist.");
 			$deleted++;
 		}
 	}

@@ -30,7 +30,7 @@ if (isset($_GET["id"]) && ctype_digit($_GET['id'])) {
 	} elseif (!$rel) {
 		$page->smarty->assign("nodata", "No releases for this series.");
 	} else {
-		$myshows = $us->getShow($users->currentUserId(), $rage[0]['rageID']);
+		$myshows = $us->getShow($users->currentUserId(), $rage[0]['rageid']);
 
 		// Sort releases by season, episode, date posted.
 		$season = $episode = $posted = array();

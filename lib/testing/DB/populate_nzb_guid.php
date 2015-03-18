@@ -32,9 +32,9 @@ function create_guids($live, $delete = false)
 
 	$relrecs = false;
 	if ($live == "true") {
-		$relrecs = $pdo->queryDirect(sprintf("SELECT ID, guid FROM releases WHERE nzbstatus = 1 AND nzb_guid IS NULL ORDER BY ID DESC"));
+		$relrecs = $pdo->queryDirect(sprintf("SELECT id, guid FROM releases WHERE nzbstatus = 1 AND nzb_guid IS NULL ORDER BY id DESC"));
 	} else if ($live == "limited") {
-		$relrecs = $pdo->queryDirect(sprintf("SELECT ID, guid FROM releases WHERE nzbstatus = 1 AND nzb_guid IS NULL ORDER BY ID DESC LIMIT 10000"));
+		$relrecs = $pdo->queryDirect(sprintf("SELECT id, guid FROM releases WHERE nzbstatus = 1 AND nzb_guid IS NULL ORDER BY id DESC LIMIT 10000"));
 	}
 	if ($relrecs) {
 		$total = $relrecs->rowCount();
@@ -57,7 +57,7 @@ function create_guids($live, $delete = false)
 					if (!$nzbfile) {
 						if (isset($delete) && $delete == 'delete') {
 							//echo "\n".$nzb->NZBPath($relrec['guid'])." is not a valid xml, deleting release.\n";
-							$releases->deleteSingle(['g' => $relrec['guid'], 'i' => $relrec['ID']], $nzb, $releaseImage);
+							$releases->deleteSingle(['g' => $relrec['guid'], 'i' => $relrec['id']], $nzb, $releaseImage);
 							$deleted++;
 						}
 						continue;
@@ -69,7 +69,7 @@ function create_guids($live, $delete = false)
 					if (count($binary_names) == 0) {
 						if (isset($delete) && $delete == 'delete') {
 							//echo "\n".$nzb->NZBPath($relrec['guid'])." has no binaries, deleting release.\n";
-							$releases->deleteSingle(['g' => $relrec['guid'], 'i' => $relrec['ID']], $nzb, $releaseImage);
+							$releases->deleteSingle(['g' => $relrec['guid'], 'i' => $relrec['id']], $nzb, $releaseImage);
 							$deleted++;
 						}
 						continue;
@@ -81,7 +81,7 @@ function create_guids($live, $delete = false)
 							$segment = $file->segments->segment;
 							$nzb_guid = md5($segment);
 
-							$pdo->queryExec("UPDATE releases set nzb_guid = " . $pdo->escapestring($nzb_guid) . " WHERE ID = " . $relrec["ID"]);
+							$pdo->queryExec("UPDATE releases set nzb_guid = " . $pdo->escapestring($nzb_guid) . " WHERE id = " . $relrec["id"]);
 							$relcount++;
 							$consoletools->overWritePrimary("Created: [" . $deleted . "] " . $consoletools->percentString($reccnt, $total) . " Time:" . $consoletools->convertTimer(TIME() - $timestart));
 							break;
@@ -90,7 +90,7 @@ function create_guids($live, $delete = false)
 				} else {
 					if (isset($delete) && $delete == 'delete') {
 						//echo $pdo->log->primary($nzb->NZBPath($relrec['guid']) . " does not have an nzb, deleting.");
-						$releases->deleteSingle(['g' => $relrec['guid'], 'i' => $relrec['ID']], $nzb, $releaseImage);
+						$releases->deleteSingle(['g' => $relrec['guid'], 'i' => $relrec['id']], $nzb, $releaseImage);
 					}
 				}
 			}

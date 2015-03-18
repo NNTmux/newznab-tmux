@@ -10,7 +10,7 @@ CREATE TABLE predbhash (
   COLLATE =utf8mb4_unicode_ci;
 
 INSERT INTO predbhash (pre_id, hashes) (SELECT
-                                          ID,
+                                          id,
                                           CONCAT_WS(',', MD5(title), MD5(MD5(title)), SHA1(title))
                                         FROM prehash);
 
@@ -21,7 +21,7 @@ DROP TRIGGER IF EXISTS insert_hashes;
 
 DELIMITER $$
 CREATE TRIGGER insert_hashes AFTER INSERT ON prehash FOR EACH ROW BEGIN INSERT INTO predbhash (pre_id, hashes)
-VALUES (NEW.ID, CONCAT_WS(',', MD5(NEW.title), MD5(MD5(NEW.title)), SHA1(NEW.title)));
+VALUES (NEW.id, CONCAT_WS(',', MD5(NEW.title), MD5(MD5(NEW.title)), SHA1(NEW.title)));
 END;
 $$
 DELIMITER ;
@@ -40,7 +40,7 @@ DROP TRIGGER IF EXISTS delete_hashes;
 
 DELIMITER $$
 CREATE TRIGGER delete_hashes AFTER DELETE ON prehash FOR EACH ROW BEGIN DELETE FROM predbhash
-WHERE pre_id = OLD.ID;
+WHERE pre_id = OLD.id;
 END;
 $$
 DELIMITER ;

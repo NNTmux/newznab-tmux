@@ -44,7 +44,7 @@
 				<select id="category" name="t">
 					<option class="grouping" value="2000"></option>
 					{foreach from=$catlist item=ct}
-						<option {if $ct.ID==$category}selected="selected"{/if} value="{$ct.ID}">{$ct.title}</option>
+						<option {if $ct.id==$category}selected="selected"{/if} value="{$ct.id}">{$ct.title}</option>
 					{/foreach}
 				</select>
 			</td>
@@ -109,21 +109,21 @@
 					<div class="movcover">
 						<a
 								target="_blank"
-								href="{$smarty.const.WWW_TOP}/movies/?imdb={$result.imdbID}"
-								name="name{$result.imdbID}"
+								href="{$smarty.const.WWW_TOP}/movies/?imdb={$result.imdbid}"
+								name="name{$result.imdbid}"
 								title="View movie info"
 								class="modal_imdb thumbnail" rel="movie"
 								><img
 									class="img-rounded" style="margin: 3px 0;"
-									src="{$smarty.const.WWW_TOP}/covers/movies/{if $result.cover == 1}{$result.imdbID}-cover.jpg{else}no-cover.jpg{/if}"
+									src="{$smarty.const.WWW_TOP}/covers/movies/{if $result.cover == 1}{$result.imdbid}-cover.jpg{else}no-cover.jpg{/if}"
 									width="120" border="0" alt="{$result.title|escape:"htmlall"}"
 									></a>
 
 						<div class="movextra">
-							{if $result.trailer != ""}<a href="#" name="name{$result.imdbID}" title="View movie trailer" class="btn btn-mini modal_imdbtrailer" rel="trailer">Trailer</a>{/if}
+							{if $result.trailer != ""}<a href="#" name="name{$result.imdbid}" title="View movie trailer" class="btn btn-mini modal_imdbtrailer" rel="trailer">Trailer</a>{/if}
 							<a
 									target="_blank"
-									href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{$result.imdbID}/"
+									href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{$result.imdbid}/"
 									name="trakt{$result.imdbid}"
 									title="View trakt page"
 									><img src="{$smarty.const.WWW_TOP}/templates/nntmux/images/icons/trakt.png"></a>
@@ -132,15 +132,15 @@
 										class="sendtocouch"
 										target="blackhole"
 										href="javascript:;"
-										rel="{$cpurl}/api/{$cpapi}/movie.add/?identifier=tt{$result.imdbID}&title={$result.title}"
-										name="CP{$result.imdbID}"
+										rel="{$cpurl}/api/{$cpapi}/movie.add/?identifier=tt{$result.imdbid}&title={$result.title}"
+										name="CP{$result.imdbid}"
 										title="Add to CouchPotato"
 										><img src="{$smarty.const.WWW_TOP}/templates/nntmux/images/icons/couch.png"></a>
 							{/if}
 							<a
 									target="_blank"
-									href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$result.imdbID}/"
-									name="imdb{$result.imdbID}"
+									href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$result.imdbid}/"
+									name="imdb{$result.imdbid}"
 									title="View imdb page"><img src="{$smarty.const.WWW_TOP}/templates/nntmux/images/icons/imdb.png"></a>
 							<a
 									target="_blank"
@@ -152,7 +152,7 @@
 				</td>
 				<td colspan="3" class="left">
 					<h2><a title="{$result.title|stripslashes|escape:"htmlall"}"
-						   href="{$smarty.const.WWW_TOP}/movies/?imdb={$result.imdbID}">{$result.title|stripslashes|escape:"htmlall"}</a>
+						   href="{$smarty.const.WWW_TOP}/movies/?imdb={$result.imdbid}">{$result.title|stripslashes|escape:"htmlall"}</a>
 						(<a class="title" title="{$result.year}"
 							href="{$smarty.const.WWW_TOP}/movies?year={$result.year}">{$result.year}</a>) {if $result.rating != ''}{$result.rating}/10{/if}
 

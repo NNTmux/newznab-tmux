@@ -23,7 +23,7 @@ pathname = os.path.abspath(os.path.dirname(sys.argv[0]))
 if len(sys.argv) == 1:
 	print(bcolors.ERROR + "\nAn argument is required\n\n"
 		+ "python " + sys.argv[0] + " [md5, nfo, filename, par2]     ...: To process all previously unprocessed releases, using [md5, nfo, filename, par2].\n"
-		+ "python " + sys.argv[0] + " [nfo, filename, par2] prehashid                ...: To process all releases not matched to prehashID, using [nfo, filename, par2].\n"
+		+ "python " + sys.argv[0] + " [nfo, filename, par2] prehashid                ...: To process all releases not matched to prehashid, using [nfo, filename, par2].\n"
 		+ "python " + sys.argv[0] + " nfo clean                                  ...: To process all releases processed by filename, using nfo.\n"
 		+ "python " + sys.argv[0] + " par2 clean                                 ...: To process all releases processed by filename and nfo, using par2.\n"
 		+ "python " + sys.argv[0] + " predbft clean                                  ...: To process all releases using reverse match by PreDB title.\n"
@@ -39,11 +39,11 @@ if len(sys.argv) == 3 and sys.argv[1] == "nfo" and sys.argv[2] == "clean":
 elif len(sys.argv) == 3 and sys.argv[1] == "par2" and sys.argv[2] == "clean":
 	clean = " isrenamed = 0 AND proc_files = 1 AND proc_nfo = 1 "
 elif len(sys.argv) == 3 and sys.argv[1] == "nfo" and sys.argv[2] == "prehashid":
-	clean = " prehashID = IS NULL "
+	clean = " prehashid = IS NULL "
 elif len(sys.argv) == 3 and sys.argv[1] == "par2" and sys.argv[2] == "prehashid":
-	clean = " prehashID = IS NULL "
+	clean = " prehashid = IS NULL "
 elif len(sys.argv) == 3 and sys.argv[1] == "filename" and sys.argv[2] == "prehashid":
-	clean = " prehashID = IS NULL "
+	clean = " prehashid = IS NULL "
 else:
 	clean = " isrenamed = 0 "
 
@@ -58,27 +58,27 @@ datas = []
 maxtries = 0
 
 if len(sys.argv) > 1 and sys.argv[1] == "nfo":
-    run = "SELECT DISTINCT ID AS releaseID FROM releases WHERE nzbstatus = 1 AND nfostatus = 1 AND proc_nfo = 0 AND" + clean + "ORDER BY postdate DESC LIMIT %s"
+    run = "SELECT DISTINCT id AS releaseid FROM releases WHERE nzbstatus = 1 AND nfostatus = 1 AND proc_nfo = 0 AND" + clean + "ORDER BY postdate DESC LIMIT %s"
     cur[0].execute(run, (int(perrun[0]) * int(run_threads[0])))
     datas = cur[0].fetchall()
 elif len(sys.argv) > 1 and (sys.argv[1] == "filename"):
-    run = "SELECT DISTINCT rel.ID AS releaseID FROM releases rel INNER JOIN releasefiles relfiles ON (relfiles.releaseID = rel.ID) WHERE categoryID IN (8010, 8020) AND proc_files = 0 AND" + clean + "ORDER BY postdate ASC LIMIT %s"
+    run = "SELECT DISTINCT rel.id AS releaseid FROM releases rel INNER JOIN releasefiles relfiles ON (relfiles.releaseid = rel.id) WHERE categoryid IN (8010, 8020) AND proc_files = 0 AND" + clean + "ORDER BY postdate ASC LIMIT %s"
     cur[0].execute(run, (int(perrun[0]) * int(run_threads[0])))
     datas = cur[0].fetchall()
 elif len(sys.argv) > 1 and (sys.argv[1] == "md5"):
     while len(datas) == 0 and maxtries >= -5:
-        run = "SELECT DISTINCT rel.ID FROM releases rel INNER JOIN releasefiles rf ON rel.ID = rf.releaseID WHERE rel.dehashstatus BETWEEN %s AND 0 AND (rel.ishashed = 1 OR rf.ishashed = 1) AND prehashID = 0 ORDER BY postdate ASC LIMIT %s"
+        run = "SELECT DISTINCT rel.id FROM releases rel INNER JOIN releasefiles rf ON rel.id = rf.releaseid WHERE rel.dehashstatus BETWEEN %s AND 0 AND (rel.ishashed = 1 OR rf.ishashed = 1) AND prehashid = 0 ORDER BY postdate ASC LIMIT %s"
         cur[0].execute(run, (maxtries, int(perrun[0])*int(run_threads[0])))
         datas = cur[0].fetchall()
         maxtries = maxtries - 1
 elif len(sys.argv) > 1 and (sys.argv[1] == "par2"):
 	#This one does from oldest posts to newest posts, since nfo pp does same thing but newest to oldest
-    run = "SELECT ID AS releaseID, guid, groupID FROM releases WHERE categoryID IN (8010, 8020) AND proc_par2 = 0 AND" + clean + "ORDER BY postdate ASC LIMIT %s"
+    run = "SELECT id AS releaseid, guid, groupid FROM releases WHERE categoryid IN (8010, 8020) AND proc_par2 = 0 AND" + clean + "ORDER BY postdate ASC LIMIT %s"
     cur[0].execute(run, (int(perrun[0]) * int(run_threads[0])))
     datas = cur[0].fetchall()
 elif len(sys.argv) > 1 and (sys.argv[1] == "predbft"):
 	#This one does from oldest posts to newest posts since there are many other more efficient PreDB matching schemes
-	run = "SELECT ID AS preid FROM prehash WHERE LENGTH(title) >= 15 AND searched = 0 AND title NOT REGEXP '[\"\<\> ]' ORDER BY predate ASC LIMIT %s"
+	run = "SELECT id AS preid FROM prehash WHERE LENGTH(title) >= 15 AND searched = 0 AND title NOT REGEXP '[\"\<\> ]' ORDER BY predate ASC LIMIT %s"
 	cur[0].execute(run, (int(perrun[0])/10 * int(run_threads[0])))
 	datas = cur[0].fetchall()
 

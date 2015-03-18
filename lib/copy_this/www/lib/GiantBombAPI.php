@@ -158,7 +158,7 @@ class GiantBomb
 	 * Get information about given object type
 	 *
 	 * @param string $type
-	 * @param string $id         string ID to request
+	 * @param string $id         string id to request
 	 * @param array $field_list array list of fields to response
 	 *
 	 * @return array response
@@ -184,7 +184,7 @@ class GiantBomb
 	 * @param $filter     array filter by given values - no "," accepted
 	 * @param $limit      integer limit result count by given limit
 	 * @param $offset     integer offset of results
-	 * @param $platform   integer ID of platform to limit
+	 * @param $platform   integer id of platform to limit
 	 * @param $sort       array list of keys to sort, format key => asc/desc,
 	 * @param $field_list array list of field to result
 	 *
@@ -209,7 +209,7 @@ class GiantBomb
 	/**
 	 * Get information about a game
 	 *
-	 * @param $id         string ID to request
+	 * @param $id         string id to request
 	 * @param $field_list array list of fields to response
 	 *
 	 * @return array response
@@ -225,7 +225,7 @@ class GiantBomb
 	 * @param $filter     array filter by given values - no "," accepted
 	 * @param $limit      integer limit result count by given limit
 	 * @param $offset     integer offset of results
-	 * @param $platform   integer ID of platform to limit
+	 * @param $platform   integer id of platform to limit
 	 * @param $sort       array list of keys to sort, format key => asc/desc,
 	 * @param $field_list array list of field to result
 	 *
@@ -240,7 +240,7 @@ class GiantBomb
 	/**
 	 * Get review by id
 	 *
-	 * @param $review_id         string ID to request
+	 * @param $review_id         string id to request
 	 * @param $field_list array list of fields to response
 	 *
 	 * @return array response
@@ -253,7 +253,7 @@ class GiantBomb
 	/**
 	 * Get game_rating by id
 	 *
-	 * @param $rating_id         string ID to request
+	 * @param $rating_id         string id to request
 	 * @param $field_list array list of fields to response
 	 *
 	 * @return array response
@@ -266,7 +266,7 @@ class GiantBomb
 	/**
 	 * Get company by id
 	 *
-	 * @param $company_id         string ID to request
+	 * @param $company_id         string id to request
 	 * @param $field_list array list of fields to response
 	 *
 	 * @return array response
@@ -279,7 +279,7 @@ class GiantBomb
 	/**
 	 * Get character by id
 	 *
-	 * @param $character_id         string ID to request
+	 * @param $character_id         string id to request
 	 * @param $field_list array list of fields to response
 	 *
 	 * @return array response

@@ -64,7 +64,7 @@ class Smarty_Internal_Templatelexer
 										'COMMA'           => '","',
 										'ANDSYM'          => '"&"',
 										'QMARK'           => '"?"',
-										'ID'              => 'identifier',
+										'id'              => 'identifier',
 										'TEXT'            => 'text',
 										'FAKEPHPSTARTTAG' => 'Fake PHP start tag',
 										'PHPSTARTTAG'     => 'PHP start tag',

@@ -9,7 +9,7 @@ require_once (NN_LIB . 'util.php');
 $pdo = new DB();
 $tvrage = new \TvAnger(['Settings' => $pdo, 'Echo' => true]);
 
-$shows = $pdo->queryDirect("SELECT rageID FROM tvrage WHERE imgdata IS NULL ORDER BY rageID DESC LIMIT 2000");
+$shows = $pdo->queryDirect("SELECT rageid FROM tvrage WHERE imgdata IS NULL ORDER BY rageid DESC LIMIT 2000");
 if ($shows->rowCount() > 0) {
 	echo "\n";
 	echo $pdo->log->header("Updating " . number_format($shows->rowCount()) . " tv shows.\n");
@@ -22,7 +22,7 @@ $loop = 0;
 if ($shows instanceof \Traversable) {
 	foreach ($shows as $show) {
 		$starttime = microtime(true);
-		$rageid = $show['rageID'];
+		$rageid = $show['rageid'];
 		$tvrShow = $tvrage->getRageInfoFromService($rageid);
 		$genre = '';
 		if (isset($tvrShow['genres']) && is_array($tvrShow['genres']) && !empty($tvrShow['genres'])) {
@@ -53,8 +53,8 @@ if ($shows instanceof \Traversable) {
 				}
 			}
 		}
-		$pdo->queryDirect(sprintf("UPDATE tvrage SET description = %s, genre = %s, country = %s, imgdata = %s WHERE rageID = %d", $pdo->escapeString(substr($desc, 0, 10000)), $pdo->escapeString(substr($genre, 0, 64)), $pdo->escapeString($country), $pdo->escapeString($imgbytes), $rageid));
-		$name = $pdo->query("Select releasetitle from tvrage where rageID = " . $rageid);
+		$pdo->queryDirect(sprintf("UPDATE tvrage SET description = %s, genre = %s, country = %s, imgdata = %s WHERE rageid = %d", $pdo->escapeString(substr($desc, 0, 10000)), $pdo->escapeString(substr($genre, 0, 64)), $pdo->escapeString($country), $pdo->escapeString($imgbytes), $rageid));
+		$name = $pdo->query("Select releasetitle from tvrage where rageid = " . $rageid);
 		echo $pdo->log->primary("Updated: " . $name[0]['releasetitle']);
 		$diff = floor((microtime(true) - $starttime) * 1000000);
 		if (1000000 - $diff > 0) {
