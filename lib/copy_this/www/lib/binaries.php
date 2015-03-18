@@ -505,7 +505,7 @@ class Binaries
 			if ($partRepair === true) {
 				$this->_pdo->queryExec(
 					sprintf(
-						'UPDATE %s SET attempts = attempts + 1 WHERE groupid = %d AND numberID %s',
+						'UPDATE %s SET attempts = attempts + 1 WHERE groupid = %d AND numberid %s',
 						$tableNames['prname'],
 						$groupArr['id'],
 						($first == $last ? '= ' . $first : 'IN (' . implode(',', range($first, $last)) . ')')
@@ -665,7 +665,7 @@ class Binaries
 							$partIds = array();
 							foreach ($data['Parts'] as $partdata)
 								$partIds[] = $partdata['number'];
-							$db->queryExec(sprintf("DELETE FROM %s WHERE numberID IN (%s) AND groupid=%d", $tableNames['prname'], implode(',', $partIds), $groupArr['id']));
+							$db->queryExec(sprintf("DELETE FROM %s WHERE numberid IN (%s) AND groupid=%d", $tableNames['prname'], implode(',', $partIds), $groupArr['id']));
 						}
 						continue;
 					}
@@ -698,7 +698,7 @@ class Binaries
 								$partIds = array();
 								foreach ($data['Parts'] as $partdata)
 									$partIds[] = $partdata['number'];
-								$db->queryExec(sprintf('DELETE FROM %s WHERE numberID IN (%s) AND groupid = %d', $tableNames['prname'], implode(',', $partIds), $groupArr['id']));
+								$db->queryExec(sprintf('DELETE FROM %s WHERE numberid IN (%s) AND groupid = %d', $tableNames['prname'], implode(',', $partIds), $groupArr['id']));
 								continue;
 							}
 							if ($sql != '') {
@@ -722,7 +722,7 @@ class Binaries
 								$partNumbers[] = $partdata['number'];
 							}
 
-							$partSql = ('INSERT INTO ' . $tableNames['pname'] . ' (binaryID, messageID, number, partnumber, size) VALUES '.implode(', ', $partParams));
+							$partSql = ('INSERT INTO ' . $tableNames['pname'] . ' (binaryid, messageid, number, partnumber, size) VALUES '.implode(', ', $partParams));
 							$pidata = $db->queryInsert($partSql);
 							if (!$pidata) {
 								$msgsnotinserted = array_merge($msgsnotinserted, $partNumbers);
@@ -793,7 +793,7 @@ class Binaries
 			sprintf('
 				SELECT * FROM %s
 				WHERE groupid = %d AND attempts < %d
-				ORDER BY numberID ASC LIMIT %d',
+				ORDER BY numberid ASC LIMIT %d',
 				$tableNames['prname'],
 				$groupArr['id'],
 				$this->_partRepairMaxTries,
@@ -815,10 +815,10 @@ class Binaries
 
 			// Loop through each part to group into continuous ranges with a maximum range of messagebuffer/4.
 			$ranges = $partList = [];
-			$firstPart = $lastNum = $missingParts[0]['numberID'];
+			$firstPart = $lastNum = $missingParts[0]['numberid'];
 
 			foreach ($missingParts as $part) {
-				if (($part['numberID'] - $firstPart) > ($this->messageBuffer / 4)) {
+				if (($part['numberid'] - $firstPart) > ($this->messageBuffer / 4)) {
 
 					$ranges[] = [
 						'partfrom' => $firstPart,
@@ -826,11 +826,11 @@ class Binaries
 						'partlist' => $partList
 					];
 
-					$firstPart = $part['numberID'];
+					$firstPart = $part['numberid'];
 					$partList = [];
 				}
-				$partList[] = $part['numberID'];
-				$lastNum = $part['numberID'];
+				$partList[] = $part['numberid'];
+				$lastNum = $part['numberid'];
 			}
 
 			$ranges[] = [
@@ -860,10 +860,10 @@ class Binaries
 					SELECT COUNT(id) AS num
 					FROM %s
 					WHERE groupid = %d
-					AND numberID <= %d',
+					AND numberid <= %d',
 					$tableNames['prname'],
 					$groupArr['id'],
-					$missingParts[$missingCount - 1]['numberID']
+					$missingParts[$missingCount - 1]['numberid']
 				)
 			);
 
@@ -879,10 +879,10 @@ class Binaries
 						UPDATE %s
 						SET attempts = attempts + 1
 						WHERE groupid = %d
-						AND numberID <= %d',
+						AND numberid <= %d',
 						$tableNames['prname'],
 						$groupArr['id'],
-						$missingParts[$missingCount - 1]['numberID']
+						$missingParts[$missingCount - 1]['numberid']
 					)
 				);
 			}
@@ -916,13 +916,13 @@ class Binaries
 	{
 		$db = new DB();
 		$added = false;
-		$insertStr = "INSERT INTO $tablename (numberID, groupid) VALUES ";
+		$insertStr = "INSERT INTO $tablename (numberid, groupid) VALUES ";
 		foreach ($numbers as $number) {
 			if ($number > 0) {
-				$checksql = sprintf("select numberID from $tablename where numberID = %u and groupid = %d", $number, $groupID);
+				$checksql = sprintf("select numberid from $tablename where numberid = %u and groupid = %d", $number, $groupID);
 				$chkrow = $db->queryOneRow($checksql);
 				if ($chkrow) {
-					$updsql = sprintf('update ' . $tablename . ' set attempts = attempts + 1 where numberID = %u and groupid = %d', $number, $groupID);
+					$updsql = sprintf('update ' . $tablename . ' set attempts = attempts + 1 where numberid = %u and groupid = %d', $number, $groupID);
 					$db->queryExec($updsql);
 				} else {
 					$added = true;
@@ -1046,7 +1046,7 @@ class Binaries
 					SELECT b.*,
 					g.name AS group_name,
 					r.guid,
-					(SELECT COUNT(id) FROM parts p where p.binaryID = b.id) as 'binnum'
+					(SELECT COUNT(id) FROM parts p where p.binaryid = b.id) as 'binnum'
 					FROM binaries b
 					INNER JOIN groups g ON g.id = b.groupid
 					LEFT OUTER JOIN releases r ON r.id = b.releaseid
@@ -1162,7 +1162,7 @@ class Binaries
 	public function delete($id)
 	{
 		$db = new DB();
-		$db->queryExec(sprintf("DELETE from parts where binaryID = %d", $id));
+		$db->queryExec(sprintf("DELETE from parts where binaryid = %d", $id));
 		$db->queryExec(sprintf("DELETE from binaries where id = %d", $id));
 	}
 
@@ -1315,7 +1315,7 @@ class Binaries
 					sprintf('
 						SELECT b.date AS date
 						FROM %s b, %s p
-						WHERE b.id = p.binaryID
+						WHERE b.id = p.binaryid
 						AND b.groupid = %s
 						AND p.number = %s LIMIT 1',
 						$group['bname'],

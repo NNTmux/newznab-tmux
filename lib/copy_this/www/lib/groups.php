@@ -530,7 +530,7 @@ class Groups
 						$this->pdo->queryExec(
 							sprintf(
 								'CREATE TRIGGER delete_binaries_%s BEFORE DELETE ON binaries_%s FOR EACH ROW BEGIN' .
-								' DELETE FROM parts_%s WHERE binaryID = OLD.id; END',
+								' DELETE FROM parts_%s WHERE binaryid = OLD.id; END',
 								$groupID, $groupID, $groupID
 							)
 						);

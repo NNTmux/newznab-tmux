@@ -157,7 +157,7 @@ foreach ($filestoprocess as $nzbFile) {
 						$numbins++;
 
 						if (count($postFile['segments']) > 0) {
-							$sql = "INSERT INTO parts (binaryID, messageID, number, partnumber, size) values ";
+							$sql = "INSERT INTO parts (binaryid, messageid, number, partnumber, size) values ";
 							foreach ($postFile['segments'] as $fileSegmentNum => $fileSegment) {
 								$sql .= sprintf("(%d, %s, 0, %d, %d),", $binaryId, $db->escapeString($fileSegment), $fileSegmentNum, $postFile['segmentbytes'][$fileSegmentNum]);
 								$numparts++;

@@ -90,11 +90,11 @@ class NZB
 				gzwrite($fp, " </groups>\n");
 				gzwrite($fp, " <segments>\n");
 
-				$resparts = $db->queryDirect(sprintf("SELECT DISTINCT(messageID), size, partnumber FROM %s WHERE binaryID = %d ORDER BY partnumber",
+				$resparts = $db->queryDirect(sprintf("SELECT DISTINCT(messageid), size, partnumber FROM %s WHERE binaryid = %d ORDER BY partnumber",
 						$pName,
 						$binrow["id"]));
 				while ($partsrow = $db->getAssocArray($resparts)) {
-					gzwrite($fp, "  <segment bytes=\"" . $partsrow["size"] . "\" number=\"" . $partsrow["partnumber"] . "\">" . htmlspecialchars($partsrow["messageID"], ENT_QUOTES, 'utf-8') . "</segment>\n");
+					gzwrite($fp, "  <segment bytes=\"" . $partsrow["size"] . "\" number=\"" . $partsrow["partnumber"] . "\">" . htmlspecialchars($partsrow["messageid"], ENT_QUOTES, 'utf-8') . "</segment>\n");
 				}
 				gzwrite($fp, " </segments>\n</file>\n");
 			}

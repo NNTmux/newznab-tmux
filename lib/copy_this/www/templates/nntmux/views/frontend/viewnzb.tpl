@@ -398,7 +398,7 @@
 			{/if}
 			{foreach from=$reAudio item=audio}
 				<tr>
-					<td><strong>Audio {$audio.audioID}</strong></td>
+					<td><strong>Audio {$audio.audioid}</strong></td>
 					<td>Format</td>
 					<td class="right">{$audio.audioformat}</td>
 				</tr>

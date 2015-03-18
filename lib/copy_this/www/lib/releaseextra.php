@@ -42,7 +42,7 @@ class ReleaseExtra
 	{
 		$db = new DB();
 
-		return $db->query(sprintf("select * from releaseaudio where releaseid = %d order by audioID ASC", $id));
+		return $db->query(sprintf("select * from releaseaudio where releaseid = %d order by audioid ASC", $id));
 	}
 
 	public function getBriefByGuid($guid)
@@ -246,7 +246,7 @@ class ReleaseExtra
 			return -1;
 
 		$sql = sprintf("insert into releaseaudio
-						(releaseid,	audioID,audioformat,audiomode, audiobitratemode, audiobitrate,
+						(releaseid,	audioid,audioformat,audiomode, audiobitratemode, audiobitrate,
 						audiochannels,audiosamplerate,audiolibrary,audiolanguage,audiotitle)
 						values ( %d, %d, %s, %s, %s, %s, %s, %s, %s, %s, %s )",
 			$releaseID, $audioID, $db->escapeString($audioformat), $db->escapeString($audiomode), $db->escapeString($audiobitratemode),
@@ -261,7 +261,7 @@ class ReleaseExtra
 	{
 		$db = new DB();
 
-		return $db->queryOneRow(sprintf("select * from releaseaudio where releaseid = %d and audioID = %d", $rid, $aid));
+		return $db->queryOneRow(sprintf("select * from releaseaudio where releaseid = %d and audioid = %d", $rid, $aid));
 	}
 
 	public function addSubs($releaseID, $subsID, $subslanguage)

@@ -78,10 +78,10 @@ while ($bdone < $blen['total']) {
 				print_r($binary);
 				echo sprintf("\nINSERT INTO binaries_%d (name, fromname, date, xref, groupid,  dateadded, releaseid, categoryid, totalParts, binaryhash, relpart, reltotalpart) VALUES (%s)\n\n", $binary['groupid'], implode(', ', $binary));
 			}
-			$newbid = array('binaryID' => $pdo->queryInsert(sprintf('INSERT INTO binaries_%d (NAME, fromname, date, xref, groupid, dateadded, releaseid, categoryid, totalParts,  binaryhash, relpart, reltotalpart) VALUES (%s);', $binary['groupid'], implode(', ', $binarynew))));
+			$newbid = array('binaryid' => $pdo->queryInsert(sprintf('INSERT INTO binaries_%d (NAME, fromname, date, xref, groupid, dateadded, releaseid, categoryid, totalParts,  binaryhash, relpart, reltotalpart) VALUES (%s);', $binary['groupid'], implode(', ', $binarynew))));
 
 			//Get parts and split to correct group tables.
-			$parts = $pdo->queryAssoc('SELECT * FROM parts WHERE binaryID = ' . $oldbid . ';');
+			$parts = $pdo->queryAssoc('SELECT * FROM parts WHERE binaryid = ' . $oldbid . ';');
 			if ($parts instanceof \Traversable) {
 				$firstpart = true;
 				$partsnew = '';
@@ -94,9 +94,9 @@ while ($bdone < $blen['total']) {
 				$partsnew = substr($partsnew, 0, -2);
 				if ($debug) {
 					echo "\n\nParts insert:\n";
-					echo sprintf("\nINSERT INTO parts_%d (binaryID, messageID, number, partnumber, size) VALUES %s;\n\n", $binary['groupid'], $partsnew);
+					echo sprintf("\nINSERT INTO parts_%d (binaryid, messageid, number, partnumber, size) VALUES %s;\n\n", $binary['groupid'], $partsnew);
 				}
-				$sql = sprintf('INSERT INTO parts_%d (binaryID, messageID, number, partnumber, size) VALUES %s;', $binary['groupid'], $partsnew);
+				$sql = sprintf('INSERT INTO parts_%d (binaryid, messageid, number, partnumber, size) VALUES %s;', $binary['groupid'], $partsnew);
 				$pdo->queryExec($sql);
 			}
 
@@ -117,15 +117,15 @@ if ($DoPartRepair === true) {
 			$partrepairs = $pdo->queryAssoc(sprintf('SELECT * FROM partrepair WHERE groupid = %d LIMIT %d, 10000;', $group['id'], $pdone));
 			if ($partrepairs instanceof \Traversable) {
 				foreach ($partrepairs as $partrepair) {
-					$partrepair['numberID'] = $pdo->escapeString($partrepair['numberID']);
+					$partrepair['numberid'] = $pdo->escapeString($partrepair['numberid']);
 					$partrepair['groupid'] = $pdo->escapeString($partrepair['groupid']);
 					$partrepair['attempts'] = $pdo->escapeString($partrepair['attempts']);
 					if ($debug) {
 						echo "\n\nPart Repair insert:\n";
 						print_r($partrepair);
-						echo sprintf("\nINSERT INTO partrepair_%d (numberID, groupid, attempts) VALUES (%s, %s, %s)\n\n", $group['id'], $partrepair['numberID'], $partrepair['groupid'], $partrepair['attempts']);
+						echo sprintf("\nINSERT INTO partrepair_%d (numberid, groupid, attempts) VALUES (%s, %s, %s)\n\n", $group['id'], $partrepair['numberid'], $partrepair['groupid'], $partrepair['attempts']);
 					}
-					$pdo->queryExec(sprintf('INSERT INTO partrepair_%d (numberID, groupid, attempts) VALUES (%s, %s, %s);', $group['id'], $partrepair['numberID'], $partrepair['groupid'], $partrepair['attempts']));
+					$pdo->queryExec(sprintf('INSERT INTO partrepair_%d (numberid, groupid, attempts) VALUES (%s, %s, %s);', $group['id'], $partrepair['numberid'], $partrepair['groupid'], $partrepair['attempts']));
 					$consoletools->overWrite('Part Repairs Completed for ' . $group['name'] . ':' . $consoletools->percentString($pcount, $plen['total']));
 					$pcount++;
 				}

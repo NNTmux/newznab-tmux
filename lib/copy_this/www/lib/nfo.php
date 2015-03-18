@@ -227,7 +227,7 @@ class Nfo
 		$db = new DB();
 		foreach($blobhash as $uid => $blob){
 			$query = sprintf(
-				"REPLACE INTO releasenfo (id, releaseid, binaryID, nfo) ".
+				"REPLACE INTO releasenfo (id, releaseid, binaryid, nfo) ".
 				"VALUES (NULL, %d, 0, compress(%s));",
 				$uid, $db->escapeString($blob));
 			$id = $db->queryInsert($query);

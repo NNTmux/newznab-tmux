@@ -76,7 +76,7 @@
                 </tr>
             {/if}
 
-            <tr {if $match.bininfo[0].blacklistID == 1}style="background-color:#ff9;"{elseif $match.bininfo[0].regexid != ''}style="background-color:#9f6;"{else}class="{cycle values=",alt"}{/if}">
+            <tr {if $match.bininfo[0].blacklistid == 1}style="background-color:#ff9;"{elseif $match.bininfo[0].regexid != ''}style="background-color:#9f6;"{else}class="{cycle values=",alt"}{/if}">
                 <td colspan="8">
                     <table width="100%" class="innerdata">
                         <tr>

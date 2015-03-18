@@ -1576,7 +1576,7 @@ class Releases
 		if ($page->site->partsdeletechunks > 0) {
 			$this->pdo->log->doEcho($this->pdo->log->primary('Chunk deleting unused binaries and parts'));
 			$query = sprintf("SELECT p.id AS partsID,b.id AS binariesID FROM %s p
-						LEFT JOIN %s b ON b.id = p.binaryID
+						LEFT JOIN %s b ON b.id = p.binaryid
 						WHERE b.dateadded < %s - INTERVAL %d HOUR LIMIT 0,%d",
 				$group['pname'],
 				$group['bname'],
@@ -1617,7 +1617,7 @@ class Releases
 			$this->pdo->log->doEcho($this->pdo->log->primary('Complete - ' . $cc . ' rows affected'));
 		} else {
 			$this->pdo->log->doEcho($this->pdo->log->primary('Deleting unused binaries and parts'));
-			$this->pdo->queryExec(sprintf("DELETE %s, %s FROM %s JOIN %s  ON %s.id = %s.binaryID
+			$this->pdo->queryExec(sprintf("DELETE %s, %s FROM %s JOIN %s  ON %s.id = %s.binaryid
 			WHERE %s.dateadded < %s - INTERVAL %d HOUR",
 					$group['pname'],
 					$group['bname'],
@@ -1672,8 +1672,8 @@ class Releases
 					$incomplete = true;
 				} else {
 					// Check that the binary is complete
-					$binlist = $this->pdo->query(sprintf('SELECT %s.id, totalParts, date, COUNT(DISTINCT %s.messageID) AS num FROM %s,
-					%s WHERE %s.id=%s.binaryID AND %s.relname = %s
+					$binlist = $this->pdo->query(sprintf('SELECT %s.id, totalParts, date, COUNT(DISTINCT %s.messageid) AS num FROM %s,
+					%s WHERE %s.id=%s.binaryid AND %s.relname = %s
 					AND %s.procstat = %d AND %s.groupid = %d AND %s.fromname = %s
 					GROUP BY %s.id ORDER BY NULL',
 					$group['bname'],
@@ -1852,7 +1852,7 @@ class Releases
 			//
 			// Remove used binaries
 			//
-			$this->pdo->queryExec(sprintf("DELETE %s, %s FROM %s JOIN %s ON %s.id = %s.binaryID WHERE releaseid = %d ",
+			$this->pdo->queryExec(sprintf("DELETE %s, %s FROM %s JOIN %s ON %s.id = %s.binaryid WHERE releaseid = %d ",
 					$group['pname'],
 					$group['bname'],
 					$group['pname'],
