@@ -250,7 +250,7 @@ class Film
 	 */
 	public function getCount()
 	{
-		$res = $this->pdo->queryOneRow('SELECT COUNT(ID) AS num FROM movieinfo');
+		$res = $this->pdo->queryOneRow('SELECT COUNT(id) AS num FROM movieinfo');
 		return ($res === false ? 0 : $res['num']);
 	}
 
@@ -314,12 +314,12 @@ class Film
 		$order = $this->getMovieOrder($orderBy);
 		$sql = sprintf("
 			SELECT
-			GROUP_CONCAT(r.ID ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id,
+			GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id,
 			GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') as grp_rarinnerfilecount,
 			GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') AS grp_haspreview,
 			GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_password,
 			GROUP_CONCAT(r.guid ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_guid,
-			GROUP_CONCAT(rn.ID ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_nfoid,
+			GROUP_CONCAT(rn.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_nfoid,
 			GROUP_CONCAT(groups.name ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grpname,
 			GROUP_CONCAT(r.searchname ORDER BY r.postdate DESC SEPARATOR '#') AS grp_release_name,
 			GROUP_CONCAT(r.postdate ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_postdate,
@@ -327,9 +327,9 @@ class Film
 			GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_totalparts,
 			GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_comments,
 			GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grabs,
-			m.*, groups.name AS group_name, rn.ID as nfoid FROM releases r
-			LEFT OUTER JOIN groups ON groups.ID = r.groupid
-			LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.ID
+			m.*, groups.name AS group_name, rn.id as nfoid FROM releases r
+			LEFT OUTER JOIN groups ON groups.id = r.groupid
+			LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
 			INNER JOIN movieinfo m ON m.imdbid = r.imdbid
 			WHERE r.nzbstatus = 1 AND r.imdbid != '0000000'
 			AND m.title != ''
@@ -527,7 +527,7 @@ class Film
 	public function updateMovieInfo($imdbId)
 	{
 		if ($this->echooutput && $this->service !== '') {
-			$this->pdo->log->doEcho($this->pdo->log->primary("Fetching IMDB info from TMDB using IMDB ID: " . $imdbId));
+			$this->pdo->log->doEcho($this->pdo->log->primary("Fetching IMDB info from TMDB using IMDB id: " . $imdbId));
 		}
 
 		// Check TMDB for IMDB info.
@@ -883,7 +883,7 @@ class Film
 	 *
 	 * @param string $buffer       Data to parse a IMDB id from.
 	 * @param string $service      Method that called this method.
-	 * @param int    $id           ID of the release.
+	 * @param int    $id           id of the release.
 	 * @param int    $processImdb  To get IMDB info on this IMDB id or not.
 	 *
 	 * @return string
@@ -901,14 +901,14 @@ class Film
 				$this->pdo->log->doEcho($this->pdo->log->headerOver($service . ' found IMDBid: ') . $this->pdo->log->primary('tt' . $imdbID));
 			}
 
-			$this->pdo->queryExec(sprintf('UPDATE releases SET imdbid = %s WHERE ID = %d', $this->pdo->escapeString($imdbID), $id));
+			$this->pdo->queryExec(sprintf('UPDATE releases SET imdbid = %s WHERE id = %d', $this->pdo->escapeString($imdbID), $id));
 
 			// If set, scan for imdb info.
 			if ($processImdb == 1) {
 				$movCheck = $this->getMovieInfo($imdbID);
 				if ($movCheck === false || (isset($movCheck['updateddate']) && (time() - strtotime($movCheck['updateddate'])) > 2592000)) {
 					if ($this->updateMovieInfo($imdbID) === false) {
-						$this->pdo->queryExec(sprintf('UPDATE releases SET imdbid = %s WHERE ID = %d', 0000000, $id));
+						$this->pdo->queryExec(sprintf('UPDATE releases SET imdbid = %s WHERE id = %d', 0000000, $id));
 					}
 				}
 			}
@@ -917,9 +917,9 @@ class Film
 	}
 
 	/**
-	 * Process releases with no IMDB ID's.
+	 * Process releases with no IMDB id's.
 	 *
-	 * @param string $groupID    (Optional) ID of a group to work on.
+	 * @param string $groupID    (Optional) id of a group to work on.
 	 * @param string $guidChar   (Optional) First letter of a release GUID to use to get work.
 	 * @param int    $lookupIMDB (Optional) 0 Don't lookup IMDB, 1 lookup IMDB, 2 lookup IMDB on releases that were renamed.
 	 */
@@ -933,7 +933,7 @@ class Film
 		// Get all releases without an IMDB id.
 		$res = $this->pdo->query(
 			sprintf("
-				SELECT r.searchname, r.ID
+				SELECT r.searchname, r.id
 				FROM releases r
 				WHERE r.imdbid IS NULL
 				AND r.nzbstatus = 1
@@ -958,11 +958,11 @@ class Film
 				// Try to get a name/year.
 				if ($this->parseMovieSearchName($arr['searchname']) === false) {
 					//We didn't find a name, so set to all 0's so we don't parse again.
-					$this->pdo->queryExec(sprintf("UPDATE releases SET imdbid = 0000000 WHERE ID = %d", $arr["ID"]));
+					$this->pdo->queryExec(sprintf("UPDATE releases SET imdbid = 0000000 WHERE id = %d", $arr["id"]));
 					continue;
 
 				} else {
-					$this->currentRelID = $arr['ID'];
+					$this->currentRelID = $arr['id'];
 
 					$movieName = $this->currentTitle;
 					if ($this->currentYear !== false) {
@@ -977,7 +977,7 @@ class Film
 					$getIMDBid = $this->localIMDBsearch();
 
 					if ($getIMDBid !== false) {
-						$imdbID = $this->doMovieUpdate('tt' . $getIMDBid, 'Local DB', $arr['ID']);
+						$imdbID = $this->doMovieUpdate('tt' . $getIMDBid, 'Local DB', $arr['id']);
 						if ($imdbID !== false) {
 							continue;
 						}
@@ -997,7 +997,7 @@ class Film
 						$getIMDBid = json_decode($buffer);
 
 						if (isset($getIMDBid->imdbid)) {
-							$imdbID = $this->doMovieUpdate($getIMDBid->imdbid, 'OMDbAPI', $arr['ID']);
+							$imdbID = $this->doMovieUpdate($getIMDBid->imdbid, 'OMDbAPI', $arr['id']);
 							if ($imdbID !== false) {
 								continue;
 							}
@@ -1007,7 +1007,7 @@ class Film
 					// Check on trakt.
 					$getIMDBid = $trakTv->traktMoviesummary($movieName);
 					if ($getIMDBid !== false) {
-						$imdbID = $this->doMovieUpdate($getIMDBid, 'Trakt', $arr['ID']);
+						$imdbID = $this->doMovieUpdate($getIMDBid, 'Trakt', $arr['id']);
 						if ($imdbID !== false) {
 							continue;
 						}
@@ -1021,7 +1021,7 @@ class Film
 					}
 
 					// We failed to get an IMDB id from all sources.
-					$this->pdo->queryExec(sprintf("UPDATE releases SET imdbid = 0000000 WHERE ID = %d", $arr["ID"]));
+					$this->pdo->queryExec(sprintf("UPDATE releases SET imdbid = 0000000 WHERE id = %d", $arr["id"]));
 				}
 			}
 		}

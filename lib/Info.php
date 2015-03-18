@@ -106,10 +106,10 @@ class Info
 	}
 
 	/**
-	 * Look for a TvRage ID in a string.
+	 * Look for a TvRage id in a string.
 	 *
-	 * @param string  $str   The string with a TvRage ID.
-	 * @return string The TVRage ID on success.
+	 * @param string  $str   The string with a TvRage id.
+	 * @return string The TVRage id on success.
 	 *
 	 * @return bool   False on failure.
 	 *
@@ -203,20 +203,20 @@ class Info
 	 */
 	public function addAlternateNfo(&$nfo, $release, $nntp)
 	{
-		if ($release['ID'] > 0 && $this->isNFO($nfo, $release['guid'])) {
+		if ($release['id'] > 0 && $this->isNFO($nfo, $release['guid'])) {
 
-			$check = $this->pdo->queryOneRow(sprintf('SELECT ID FROM releasenfo WHERE releaseid = %d', $release['ID']));
+			$check = $this->pdo->queryOneRow(sprintf('SELECT id FROM releasenfo WHERE releaseid = %d', $release['id']));
 
 			if ($check === false) {
 				$this->pdo->queryInsert(
 					sprintf('INSERT INTO releasenfo (nfo, releaseid) VALUES (compress(%s), %d)',
 						$this->pdo->escapeString($nfo),
-						$release['ID']
+						$release['id']
 					)
 				);
 			}
 
-			$this->pdo->queryExec(sprintf('UPDATE releases SET nfostatus = %d WHERE ID = %d', self::NFO_FOUND, $release['ID']));
+			$this->pdo->queryExec(sprintf('UPDATE releases SET nfostatus = %d WHERE id = %d', self::NFO_FOUND, $release['id']));
 
 			if (!isset($release['completion'])) {
 				$release['completion'] = 0;
@@ -232,7 +232,7 @@ class Info
 						'PostProcess'   => new PProcess(['Echo' => $this->echo, 'Settings' => $this->pdo, 'Nfo' => $this])
 					]
 				);
-				$nzbContents->parseNZB($release['guid'], $release['ID'], $release['groupid']);
+				$nzbContents->parseNZB($release['guid'], $release['id'], $release['groupid']);
 			}
 			return true;
 		}
@@ -273,7 +273,7 @@ class Info
 	 * Attempt to find NFO files inside the NZB's of releases.
 	 *
 	 * @param object $nntp           Instance of class NNTP.
-	 * @param string $groupID        (optional) Group ID.
+	 * @param string $groupID        (optional) Group id.
 	 * @param string $guidChar       (optional) First character of the release GUID (used for multi-processing).
 	 * @param int    $processImdb    (optional) Attempt to find IMDB id's in the NZB?
 	 * @param int    $processTvrage  (optional) Attempt to find TvRage id's in the NZB?
@@ -291,7 +291,7 @@ class Info
 
 		$res = $this->pdo->query(
 			sprintf('
-				SELECT r.ID, r.guid, r.groupid, r.name
+				SELECT r.id, r.guid, r.groupid, r.name
 				FROM releases r
 				WHERE 1=1 %s %s %s
 				ORDER BY r.nfostatus ASC, r.postdate DESC
@@ -353,19 +353,19 @@ class Info
 			$tvRage = new TvAnger(['Echo' => $this->echo, 'Settings' => $this->pdo]);
 
 			foreach ($res as $arr) {
-				$fetchedBinary = $nzbContents->getNFOfromNZB($arr['guid'], $arr['ID'], $arr['groupid'], $groups->getByNameByID($arr['groupid']));
+				$fetchedBinary = $nzbContents->getNFOfromNZB($arr['guid'], $arr['id'], $arr['groupid'], $groups->getByNameByID($arr['groupid']));
 				if ($fetchedBinary !== false) {
 					// Insert nfo into database.
 					$cp = 'COMPRESS(%s)';
 					$nc = $this->pdo->escapeString($fetchedBinary);
 
-					$ckreleaseid = $this->pdo->queryOneRow(sprintf('SELECT ID FROM releasenfo WHERE releaseid = %d', $arr['ID']));
-					if (!isset($ckreleaseid['ID'])) {
-						$this->pdo->queryInsert(sprintf('INSERT INTO releasenfo (nfo, releaseid) VALUES (' . $cp . ', %d)', $nc, $arr['ID']));
+					$ckreleaseid = $this->pdo->queryOneRow(sprintf('SELECT id FROM releasenfo WHERE releaseid = %d', $arr['id']));
+					if (!isset($ckreleaseid['id'])) {
+						$this->pdo->queryInsert(sprintf('INSERT INTO releasenfo (nfo, releaseid) VALUES (' . $cp . ', %d)', $nc, $arr['id']));
 					}
-					$this->pdo->queryExec(sprintf('UPDATE releases SET nfostatus = %d WHERE ID = %d', self::NFO_FOUND, $arr['ID']));
+					$this->pdo->queryExec(sprintf('UPDATE releases SET nfostatus = %d WHERE id = %d', self::NFO_FOUND, $arr['id']));
 					$ret++;
-					$movie->doMovieUpdate($fetchedBinary, 'nfo', $arr['ID'], $processImdb);
+					$movie->doMovieUpdate($fetchedBinary, 'nfo', $arr['id'], $processImdb);
 
 					// If set scan for tvrage info.
 					if ($processTvrage == 1) {
@@ -374,12 +374,12 @@ class Info
 							$show = $tvRage->parseNameEpSeason($arr['name']);
 							if (is_array($show) && $show['name'] != '') {
 								// Update release with season, ep, and air date info (if available) from release title.
-								$tvRage->updateEpInfo($show, $arr['ID']);
+								$tvRage->updateEpInfo($show, $arr['id']);
 
 								$rid = $tvRage->getByRageID($rageId);
 								if (!$rid) {
 									$tvrShow = $tvRage->getRageInfoFromService($rageId);
-									$tvRage->updateRageInfo($rageId, $show, $tvrShow, $arr['ID']);
+									$tvRage->updateRageInfo($rageId, $show, $tvrShow, $arr['id']);
 								}
 							}
 						}
@@ -391,7 +391,7 @@ class Info
 		// Remove nfo that we cant fetch after 5 attempts.
 		$releases = $this->pdo->queryDirect(
 			sprintf(
-				'SELECT r.ID
+				'SELECT r.id
 				FROM releases r
 				WHERE r.nzbstatus = %d
 				AND r.nfostatus < %d %s %s',
@@ -405,7 +405,7 @@ class Info
 		if ($releases instanceof Traversable) {
 			foreach ($releases as $release) {
 				$this->pdo->queryExec(
-					sprintf('DELETE FROM releasenfo WHERE nfo IS NULL AND releaseid = %d', $release['ID'])
+					sprintf('DELETE FROM releasenfo WHERE nfo IS NULL AND releaseid = %d', $release['id'])
 				);
 			}
 		}

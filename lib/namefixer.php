@@ -81,7 +81,7 @@ class NameFixer
 	protected $_fileName;
 
 	/**
-	 * The release ID we are trying to rename
+	 * The release id we are trying to rename
 	 * @var int
 	 */
 	protected $relid;
@@ -155,9 +155,9 @@ class NameFixer
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
 		$this->relid = $this->fixed = $this->checked = 0;
 		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
-		$this->timeother = ' AND rel.adddate > (NOW() - INTERVAL 0 HOUR) AND rel.categoryid IN (1090, 2020, 3050, 6050, 5050, 7050, 8010) GROUP BY rel.ID ORDER BY postdate DESC';
-		$this->timeall = ' AND rel.adddate > (NOW() - INTERVAL 6 HOUR) GROUP BY rel.ID ORDER BY postdate DESC';
-		$this->fullother = ' AND rel.categoryid IN (1090, 2020, 3050, 6050, 5050, 7050, 8010) GROUP BY rel.ID';
+		$this->timeother = ' AND rel.adddate > (NOW() - INTERVAL 0 HOUR) AND rel.categoryid IN (1090, 2020, 3050, 6050, 5050, 7050, 8010) GROUP BY rel.id ORDER BY postdate DESC';
+		$this->timeall = ' AND rel.adddate > (NOW() - INTERVAL 6 HOUR) GROUP BY rel.id ORDER BY postdate DESC';
+		$this->fullother = ' AND rel.categoryid IN (1090, 2020, 3050, 6050, 5050, 7050, 8010) GROUP BY rel.id';
 		$this->fullall = '';
 		$this->_fileName = '';
 		$this->done = $this->matched = false;
@@ -186,9 +186,9 @@ class NameFixer
 		$preId = false;
 		if ($cats === 3) {
 			$query = sprintf('
-					SELECT rel.ID AS releaseid
+					SELECT rel.id AS releaseid
 					FROM releases rel
-					INNER JOIN releasenfo nfo ON (nfo.releaseid = rel.ID)
+					INNER JOIN releasenfo nfo ON (nfo.releaseid = rel.id)
 					WHERE nzbstatus = %d
 					AND prehashid = 0',
 				Enzebe::NZB_ADDED
@@ -197,9 +197,9 @@ class NameFixer
 			$preId = true;
 		} else {
 			$query = sprintf('
-					SELECT rel.ID AS releaseid
+					SELECT rel.id AS releaseid
 					FROM releases rel
-					INNER JOIN releasenfo nfo ON (nfo.releaseid = rel.ID)
+					INNER JOIN releasenfo nfo ON (nfo.releaseid = rel.id)
 					WHERE (isrenamed = %d OR rel.categoryid = %d)
 					AND proc_nfo = %d',
 				self::IS_RENAMED_NONE,
@@ -221,10 +221,10 @@ class NameFixer
 					$releaseRow = $this->pdo->queryOneRow(
 						sprintf('
 							SELECT nfo.releaseid AS nfoid, rel.groupid, rel.categoryid, rel.name, rel.searchname,
-								UNCOMPRESS(nfo) AS textstring, rel.ID AS releaseid
+								UNCOMPRESS(nfo) AS textstring, rel.id AS releaseid
 							FROM releases rel
-							INNER JOIN releasenfo nfo ON (nfo.releaseid = rel.ID)
-							WHERE rel.ID = %d',
+							INNER JOIN releasenfo nfo ON (nfo.releaseid = rel.id)
+							WHERE rel.id = %d',
 							$rel['releaseid']
 						)
 					);
@@ -266,9 +266,9 @@ class NameFixer
 		if ($cats === 3) {
 			$query = sprintf('
 					SELECT rf.name AS textstring, rel.categoryid, rel.name, rel.searchname, rel.groupid,
-						rf.releaseid AS fileid, rel.ID AS releaseid
+						rf.releaseid AS fileid, rel.id AS releaseid
 					FROM releases rel
-					INNER JOIN releasefiles rf ON (rf.releaseid = rel.ID)
+					INNER JOIN releasefiles rf ON (rf.releaseid = rel.id)
 					WHERE nzbstatus = %d
 					AND prehashid = 0',
 				Enzebe::NZB_ADDED
@@ -278,9 +278,9 @@ class NameFixer
 		} else {
 			$query = sprintf('
 					SELECT rf.name AS textstring, rel.categoryid, rel.name, rel.searchname, rel.groupid,
-						rf.releaseid AS fileid, rel.ID AS releaseid
+						rf.releaseid AS fileid, rel.id AS releaseid
 					FROM releases rel
-					INNER JOIN releasefiles rf ON (rf.releaseid = rel.ID)
+					INNER JOIN releasefiles rf ON (rf.releaseid = rel.id)
 					WHERE (isrenamed = %d OR rel.categoryid = %d)
 					AND proc_files = %d',
 				self::IS_RENAMED_NONE,
@@ -327,7 +327,7 @@ class NameFixer
 
 		if ($cats === 3) {
 			$query = sprintf('
-					SELECT rel.ID AS releaseid, rel.guid, rel.groupid
+					SELECT rel.id AS releaseid, rel.guid, rel.groupid
 					FROM releases rel
 					WHERE nzbstatus = %d
 					AND prehashid = 0',
@@ -336,7 +336,7 @@ class NameFixer
 			$cats = 2;
 		} else {
 			$query = sprintf('
-					SELECT rel.ID AS releaseid, rel.guid, rel.groupid
+					SELECT rel.id AS releaseid, rel.guid, rel.groupid
 					FROM releases rel
 					WHERE (isrenamed = %d OR rel.categoryid = %d)
 					AND proc_par2 = %d',
@@ -580,7 +580,7 @@ class NameFixer
 									tvtitle = NULL, tvairdate = NULL, imdbid = NULL, musicinfoid = NULL,
 									consoleinfoid = NULL, bookinfoid = NULL, anidbid = NULL, prehashid = %d,
 									searchname = %s, %s categoryid = %d
-								WHERE ID = %d',
+								WHERE id = %d',
 								$preId,
 								$newTitle,
 								$status,
@@ -598,7 +598,7 @@ class NameFixer
 									tvtitle = NULL, tvairdate = NULL, imdbid = NULL, musicinfoid = NULL,
 									consoleinfoid = NULL, bookinfoid = NULL, anidbid = NULL, prehashid = %d,
 									searchname = %s, iscategorized = 1, categoryid = %d
-								WHERE ID = %d',
+								WHERE id = %d',
 								$preId,
 								$newTitle,
 								$determinedCategory,
@@ -620,10 +620,10 @@ class NameFixer
 	 *        array(
 	 *              'new_name'     => (string) The new release search name.
 	 *              'old_name'     => (string) The old release search name.
-	 *              'new_category' => (string) The new category name or ID for the release.
-	 *              'old_category' => (string) The old category name or ID for the release.
-	 *              'group'        => (string) The group name or ID of the release.
-	 *              'release_id'   => (int)    The ID of the release.
+	 *              'new_category' => (string) The new category name or id for the release.
+	 *              'old_category' => (string) The old category name or id for the release.
+	 *              'group'        => (string) The group name or id of the release.
+	 *              'release_id'   => (int)    The id of the release.
 	 *              'method'       => (string) The method used to rename the release.
 	 *        )
 	 *
@@ -649,7 +649,7 @@ class NameFixer
 			ColorCLI::headerOver('New category: ') . ColorCLI::primaryOver($data['new_category']) . PHP_EOL .
 			ColorCLI::headerOver('Old category: ') . ColorCLI::primaryOver($data['old_category']) . PHP_EOL .
 			ColorCLI::headerOver('Group:        ') . ColorCLI::primaryOver($data['group']) . PHP_EOL .
-			ColorCLI::headerOver('Release ID:   ') . ColorCLI::primaryOver($data['release_id']) . PHP_EOL .
+			ColorCLI::headerOver('Release id:   ') . ColorCLI::primaryOver($data['release_id']) . PHP_EOL .
 			ColorCLI::headerOver('Method:       ') . ColorCLI::primaryOver($data['method']) . PHP_EOL;
 	}
 
@@ -663,7 +663,7 @@ class NameFixer
 		//Find release matches with fulltext and then identify exact matches with cleaned LIKE string
 		$res = $this->pdo->queryDirect(
 			sprintf("
-							SELECT r.ID AS releaseid, r.name, r.searchname,
+							SELECT r.id AS releaseid, r.name, r.searchname,
 								r.groupid, r.categoryid
 							FROM releases r
 							%1\$s
@@ -701,7 +701,7 @@ class NameFixer
 			case \ReleaseSearch::SPHINX:
 				$titlematch = \SphinxSearch::escapeString($preTitle);
 				$join = sprintf(
-					'INNER JOIN releases_se rse ON rse.id = r.ID
+					'INNER JOIN releases_se rse ON rse.id = r.id
 						WHERE rse.query = "@(name,searchname) %s;mode=extended"',
 					$titlematch
 				);
@@ -712,7 +712,7 @@ class NameFixer
 				preg_match_all('#[a-zA-Z0-9]{3,}#', $preTitle, $matches, PREG_PATTERN_ORDER);
 				$titlematch = '+' . implode(' +', $matches[0]);
 				$join = sprintf(
-					"INNER JOIN releasesearch rs ON rs.releaseid = r.ID
+					"INNER JOIN releasesearch rs ON rs.releaseid = r.id
 					WHERE
 							(MATCH (rs.name) AGAINST ('%1\$s' IN BOOLEAN MODE)
 							OR MATCH (rs.searchname) AGAINST ('%1\$s' IN BOOLEAN MODE))",
@@ -731,7 +731,7 @@ class NameFixer
 		$show = (isset($args[2]) && $args[2] === 'show') ? 1 : 0;
 
 		if (isset($args[1]) && is_numeric($args[1])) {
-			$orderby = "ORDER BY r.ID DESC";
+			$orderby = "ORDER BY r.id DESC";
 			$limit = "LIMIT " . $args[1];
 		}
 
@@ -740,14 +740,14 @@ class NameFixer
 
 		$query = $this->pdo->queryDirect(
 			sprintf('
-							SELECT r.ID AS releaseid, r.name, r.searchname,
+							SELECT r.id AS releaseid, r.name, r.searchname,
 								r.groupid, r.categoryid,
 								rf.name AS filename
 							FROM releases r
-							INNER JOIN releasefiles rf ON r.ID = rf.releaseid
+							INNER JOIN releasefiles rf ON r.id = rf.releaseid
 							AND rf.name IS NOT NULL
 							WHERE r.prehashid = 0
-							GROUP BY r.ID
+							GROUP BY r.id
 							%s %s',
 				$orderby,
 				$limit
@@ -788,7 +788,7 @@ class NameFixer
 		if ($this->_fileName !== '') {
 			$pre = $this->pdo->queryOneRow(
 				sprintf('
-							SELECT ID AS prehashid, title, source
+							SELECT id AS prehashid, title, source
 							FROM prehash
 							WHERE filename = %s
 							OR title = %1$s',
@@ -863,8 +863,8 @@ class NameFixer
 
 		$row = $pdo->queryOneRow(
 			sprintf("
-						SELECT p.ID AS prehashid, p.title, p.source
-						FROM prehash p INNER JOIN predbhash h ON h.pre_id = p.ID
+						SELECT p.id AS prehashid, p.title, p.source
+						FROM prehash p INNER JOIN predbhash h ON h.pre_id = p.id
 						WHERE MATCH (h.hashes) AGAINST (%s)
 						LIMIT 1",
 				$pdo->escapeString(strtolower($hash))
@@ -889,9 +889,9 @@ class NameFixer
 		if (preg_match_all(self::PREDB_REGEX, $release['textstring'], $matches) && !preg_match('/Source\s\:/i', $release['textstring'])) {
 			foreach ($matches as $match) {
 				foreach ($match as $val) {
-					$title = $this->pdo->queryOneRow("SELECT title, ID from prehash WHERE title = " . $this->pdo->escapeString(trim($val)));
+					$title = $this->pdo->queryOneRow("SELECT title, id from prehash WHERE title = " . $this->pdo->escapeString(trim($val)));
 					if ($title !== false) {
-						$this->updateRelease($release, $title['title'], $method = "preDB: Match", $echo, $type, $namestatus, $show, $title['ID']);
+						$this->updateRelease($release, $title['title'], $method = "preDB: Match", $echo, $type, $namestatus, $show, $title['id']);
 						$preid = true;
 					}
 				}
@@ -943,7 +943,7 @@ class NameFixer
 
 	/** This function updates a single variable column in releases
 	 *  The first parameter is the column to update, the second is the value
-	 *  The final parameter is the ID of the release to update
+	 *  The final parameter is the id of the release to update
 	 *
 	 * @param string $column
 	 * @param string|int $status
@@ -956,7 +956,7 @@ class NameFixer
 				sprintf('
 							UPDATE releases
 							SET %s = %s
-							WHERE ID = %d',
+							WHERE id = %d',
 					$column,
 					(is_numeric($status) ? $status : $this->pdo->escapeString($status)),
 					$id

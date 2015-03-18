@@ -452,7 +452,7 @@ Class Sharing
 					}
 
 					// Insert the comment, if we got it, update the site to increment comment count.
-					if ($this->insertNewComment($header['Message-ID'], $matches['guid'])) {
+					if ($this->insertNewComment($header['Message-id'], $matches['guid'])) {
 						$this->pdo->queryExec(
 							sprintf('
 								UPDATE sharing_sites SET comments = comments + 1, last_time = NOW(), site_name = %s WHERE site_guid = %s',
@@ -495,7 +495,7 @@ Class Sharing
 	/**
 	 * Fetch a comment and insert it.
 	 *
-	 * @param string $messageID Message-ID for the article.
+	 * @param string $messageID Message-id for the article.
 	 * @param string $siteID    id of the site.
 	 *
 	 * @return bool

@@ -23,7 +23,7 @@ class IRCScraper extends IRCClient
 	protected $_curPre;
 
 	/**
-	 * List of groups and their ID's
+	 * List of groups and their id's
 	 * @var array
 	 * @access protected
 	 */
@@ -418,7 +418,7 @@ class IRCScraper extends IRCClient
 	}
 
 	/**
-	 * Get a group ID for a group name.
+	 * Get a group id for a group name.
 	 *
 	 * @param string $groupName
 	 *
@@ -429,8 +429,8 @@ class IRCScraper extends IRCClient
 	protected function _getGroupID($groupName)
 	{
 		if (!isset($this->_groupList[$groupName])) {
-			$group = $this->_pdo->queryOneRow(sprintf('SELECT ID FROM groups WHERE name = %s', $this->_pdo->escapeString($groupName)));
-			$this->_groupList[$groupName] = $group['ID'];
+			$group = $this->_pdo->queryOneRow(sprintf('SELECT id FROM groups WHERE name = %s', $this->_pdo->escapeString($groupName)));
+			$this->_groupList[$groupName] = $group['id'];
 		}
 		return $this->_groupList[$groupName];
 	}

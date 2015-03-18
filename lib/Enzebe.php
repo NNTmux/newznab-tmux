@@ -29,7 +29,7 @@ class Enzebe
 	private $siteNzbPath;
 
 	/**
-	 * Group ID when writing NZBs.
+	 * Group id when writing NZBs.
 	 * @var int
 	 * @access protected
 	 */
@@ -121,7 +121,7 @@ class Enzebe
 		$this->_binariesQuery = sprintf(
 			'SELECT %s.*, UNIX_TIMESTAMP(%s.date) AS udate, groups.name AS groupname
 			FROM %s
-			INNER JOIN groups ON %s.groupid = groups.ID
+			INNER JOIN groups ON %s.groupid = groups.id
 			WHERE %s.releaseid = ',
 			$bName,
 			$bName,
@@ -143,7 +143,7 @@ class Enzebe
 	/**
 	 * Write an NZB to the hard drive for a single release.
 	 *
-	 * @param int    $relID   The ID of the release in the DB.
+	 * @param int    $relID   The id of the release in the DB.
 	 * @param string $relGuid The guid of the release.
 	 * @param string $name    The name of the release.
 	 * @param string $cTitle  The name of the category this release is in.
@@ -181,7 +181,7 @@ class Enzebe
 							// Buffer segment writes, increases performance.
 							$string = '';
 
-							$parts = $this->pdo->queryDirect(sprintf($this->_partsQuery, $bin['ID']));
+							$parts = $this->pdo->queryDirect(sprintf($this->_partsQuery, $bin['id']));
 
 							if ($parts instanceof \Traversable) {
 
@@ -217,7 +217,7 @@ class Enzebe
 			if (is_file($path)) {
 				$this->pdo->queryExec(
 					sprintf('
-						UPDATE releases SET nzbstatus = %d %s WHERE ID = %d',
+						UPDATE releases SET nzbstatus = %d %s WHERE id = %d',
 						\Enzebe::NZB_ADDED,
 						($nzb_guid === '' ? '' : ', nzb_guid = ' . $this->pdo->escapestring(md5($nzb_guid))),
 						$relID

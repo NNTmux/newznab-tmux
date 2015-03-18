@@ -30,7 +30,7 @@ function getPreName($argv)
 
 	$res = false;
 	if (isset($argv[1]) && $argv[1] === "all") {
-		$res = $pdo->queryDirect('SELECT ID AS releaseid, name, searchname, groupid, categoryid, dehashstatus FROM releases WHERE prehashid = 0 AND ishashed = 1');
+		$res = $pdo->queryDirect('SELECT id AS releaseid, name, searchname, groupid, categoryid, dehashstatus FROM releases WHERE prehashid = 0 AND ishashed = 1');
 	} else if (isset($argv[1]) && $argv[1] === "full") {
 		$res = $pdo->queryDirect('SELECT id AS releaseid, name, searchname, groupid, categoryid, dehashstatus FROM releases WHERE categoryid = 8020 AND dehashstatus BETWEEN -6 AND 0');
 	} else if (isset($argv[1]) && is_numeric($argv[1])) {
@@ -55,7 +55,7 @@ function getPreName($argv)
 			}
 
 			if ($success === 0) {
-				$pdo->queryDirect(sprintf('UPDATE releases SET dehashstatus = dehashstatus - 1 WHERE ID = %d', $row['releaseid']));
+				$pdo->queryDirect(sprintf('UPDATE releases SET dehashstatus = dehashstatus - 1 WHERE id = %d', $row['releaseid']));
 			} else {
 				$counted++;
 			}

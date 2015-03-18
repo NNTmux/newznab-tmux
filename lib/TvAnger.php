@@ -53,7 +53,7 @@ class TvAnger
 	}
 
 	/**
-	 * Get rage info for a ID.
+	 * Get rage info for a id.
 	 *
 	 * @param int $id
 	 *
@@ -61,11 +61,11 @@ class TvAnger
 	 */
 	public function getByID($id)
 	{
-		return $this->pdo->queryOneRow(sprintf("SELECT * FROM tvrage WHERE ID = %d", $id));
+		return $this->pdo->queryOneRow(sprintf("SELECT * FROM tvrage WHERE id = %d", $id));
 	}
 
 	/**
-	 * Get rage info for a rage ID.
+	 * Get rage info for a rage id.
 	 *
 	 * @param int $id
 	 *
@@ -174,15 +174,15 @@ class TvAnger
 		$country = $this->countryCode($country);
 
 		if ($rageID != -2) {
-			$ckid = $this->pdo->queryOneRow('SELECT ID FROM tvrage WHERE rageid = ' . $rageID);
+			$ckid = $this->pdo->queryOneRow('SELECT id FROM tvrage WHERE rageid = ' . $rageID);
 		} else {
-			$ckid = $this->pdo->queryOneRow('SELECT ID FROM tvrage WHERE releasetitle = ' . $this->pdo->escapeString($releasename));
+			$ckid = $this->pdo->queryOneRow('SELECT id FROM tvrage WHERE releasetitle = ' . $this->pdo->escapeString($releasename));
 		}
 
-		if (!isset($ckid['ID'])) {
+		if (!isset($ckid['id'])) {
 			$this->pdo->queryExec(sprintf('INSERT INTO tvrage (rageid, releasetitle, description, genre, country, createddate, imgdata) VALUES (%s, %s, %s, %s, %s, NOW(), %s)', $rageID, $this->pdo->escapeString($releasename), $this->pdo->escapeString(substr($desc, 0, 10000)), $this->pdo->escapeString(substr($genre, 0, 64)), $this->pdo->escapeString($country), $this->pdo->escapeString($imgbytes)));
 		} else {
-			$this->pdo->queryExec(sprintf('UPDATE tvrage SET releasetitle = %s, description = %s, genre = %s, country = %s, createddate = NOW(), imgdata = %sWHERE ID = %d', $this->pdo->escapeString($releasename), $this->pdo->escapeString(substr($desc, 0, 10000)), $this->pdo->escapeString(substr($genre, 0, 64)), $this->pdo->escapeString($country), $this->pdo->escapeString($imgbytes), $ckid['ID']));
+			$this->pdo->queryExec(sprintf('UPDATE tvrage SET releasetitle = %s, description = %s, genre = %s, country = %s, createddate = NOW(), imgdata = %sWHERE id = %d', $this->pdo->escapeString($releasename), $this->pdo->escapeString(substr($desc, 0, 10000)), $this->pdo->escapeString(substr($genre, 0, 64)), $this->pdo->escapeString($country), $this->pdo->escapeString($imgbytes), $ckid['id']));
 		}
 	}
 
@@ -193,12 +193,12 @@ class TvAnger
 			$imgbytes = ', imgdata = ' . $this->pdo->escapeString($imgbytes);
 		}
 
-		$this->pdo->queryExec(sprintf('UPDATE tvrage SET rageid = %d, releasetitle = %s, description = %s, genre = %s, country = %s %sWHERE ID = %d', $rageID, $this->pdo->escapeString($releasename), $this->pdo->escapeString(substr($desc, 0, 10000)), $this->pdo->escapeString($genre), $this->pdo->escapeString($country), $imgbytes, $id));
+		$this->pdo->queryExec(sprintf('UPDATE tvrage SET rageid = %d, releasetitle = %s, description = %s, genre = %s, country = %s %sWHERE id = %d', $rageID, $this->pdo->escapeString($releasename), $this->pdo->escapeString(substr($desc, 0, 10000)), $this->pdo->escapeString($genre), $this->pdo->escapeString($country), $imgbytes, $id));
 	}
 
 	public function delete($id)
 	{
-		return $this->pdo->queryExec(sprintf("DELETE FROM tvrage WHERE ID = %d", $id));
+		return $this->pdo->queryExec(sprintf("DELETE FROM tvrage WHERE id = %d", $id));
 	}
 
 	public function fetchShowQuickInfo($show, array $options = array())
@@ -222,7 +222,7 @@ class TvAnger
 				$val = trim($val);
 
 				switch ($sec) {
-					case 'Show ID':
+					case 'Show id':
 						$ret['rageid'] = $val;
 						break;
 					case 'Show Name':
@@ -295,7 +295,7 @@ class TvAnger
 			$rsql .= sprintf("AND tvrage.releasetitle LIKE %s ", $this->pdo->escapeString("%" . $ragename . "%"));
 		}
 
-		return $this->pdo->query(sprintf("SELECT ID, rageid, releasetitle, description, createddate FROM tvrage WHERE 1=1 %s ORDER BY rageid ASC" . $limit, $rsql));
+		return $this->pdo->query(sprintf("SELECT id, rageid, releasetitle, description, createddate FROM tvrage WHERE 1=1 %s ORDER BY rageid ASC" . $limit, $rsql));
 	}
 
 	public function getCount($ragename = "")
@@ -335,8 +335,8 @@ class TvAnger
 
 		return $this->pdo->query(
 			sprintf("
-				SELECT tvrage.ID, tvrage.rageid, tvrage.releasetitle, tvrage.genre, tvrage.country, tvrage.createddate, tvrage.prevdate, tvrage.nextdate,
-					userseries.ID AS userseriesid
+				SELECT tvrage.id, tvrage.rageid, tvrage.releasetitle, tvrage.genre, tvrage.country, tvrage.createddate, tvrage.prevdate, tvrage.nextdate,
+					userseries.id AS userseriesid
 				FROM tvrage
 				LEFT OUTER JOIN userseries ON userseries.userid = %d
 					AND userseries.rageid = tvrage.rageid
@@ -413,7 +413,7 @@ class TvAnger
 							// Next episode.
 							if (isset($epInfo['next']) && $epInfo['next']['episode'] != '') {
 								if ($prev_ep == "" && $arr['nextinfo'] != '' && $epInfo['next']['day_time'] > strtotime($arr["nextdate"]) && strtotime(date('Y-m-d', strtotime($arr["nextdate"]))) < $yesterday) {
-									$this->pdo->queryExec(sprintf("UPDATE tvrage SET prevdate = nextdate, previnfo = nextinfo  WHERE ID = %d", $arr['ID']));
+									$this->pdo->queryExec(sprintf("UPDATE tvrage SET prevdate = nextdate, previnfo = nextinfo  WHERE id = %d", $arr['id']));
 									$prev_ep = "SWAPPED with: " . $arr['nextinfo'] . " - " . date("r", strtotime($arr["nextdate"]));
 								}
 								$next_ep = $epInfo['next']['episode'] . ', "' . $epInfo['next']['title'] . '"';
@@ -437,7 +437,7 @@ class TvAnger
 							// Update info.
 							if (count($query) > 0) {
 								$sql = join(", ", $query);
-								$sql = sprintf("UPDATE tvrage SET {$sql} WHERE ID = %d", $arr['ID']);
+								$sql = sprintf("UPDATE tvrage SET {$sql} WHERE id = %d", $arr['id']);
 								$this->pdo->queryExec($sql);
 							}
 						}
@@ -553,7 +553,7 @@ class TvAnger
 		}
 
 		$tvairdate = (isset($show['airdate']) && !empty($show['airdate'])) ? $this->pdo->escapeString($this->checkDate($show['airdate'])) : "NULL";
-		$this->pdo->queryExec(sprintf("UPDATE releases SET seriesfull = %s, season = %s, episode = %s, tvairdate = %s WHERE ID = %d", $this->pdo->escapeString($show['seriesfull']), $this->pdo->escapeString($show['season']), $this->pdo->escapeString($show['episode']), $tvairdate, $relid));
+		$this->pdo->queryExec(sprintf("UPDATE releases SET seriesfull = %s, season = %s, episode = %s, tvairdate = %s WHERE id = %d", $this->pdo->escapeString($show['seriesfull']), $this->pdo->escapeString($show['season']), $this->pdo->escapeString($show['episode']), $tvairdate, $relid));
 	}
 
 	public function updateRageInfo($rageID, $show, $tvrShow, $relid)
@@ -564,9 +564,9 @@ class TvAnger
 			$tvairdate = (!empty($epinfo['airdate'])) ? $this->pdo->escapeString($epinfo['airdate']) : "NULL";
 			$tvtitle = (!empty($epinfo['title'])) ? $this->pdo->escapeString($epinfo['title']) : "NULL";
 
-			$this->pdo->queryExec(sprintf("UPDATE releases set tvtitle = %s, tvairdate = %s, rageid = %d where ID = %d", $this->pdo->escapeString(trim($tvtitle)), $tvairdate, $tvrShow['showid'], $relid));
+			$this->pdo->queryExec(sprintf("UPDATE releases set tvtitle = %s, tvairdate = %s, rageid = %d where id = %d", $this->pdo->escapeString(trim($tvtitle)), $tvairdate, $tvrShow['showid'], $relid));
 		} else {
-			$this->pdo->queryExec(sprintf("UPDATE releases SET rageid = %d WHERE ID = %d", $tvrShow['showid'], $relid));
+			$this->pdo->queryExec(sprintf("UPDATE releases SET rageid = %d WHERE id = %d", $tvrShow['showid'], $relid));
 		}
 
 		$genre = '';
@@ -609,9 +609,9 @@ class TvAnger
 		if ($epinfo !== false) {
 			$tvairdate = (!empty($epinfo['airdate'])) ? $this->pdo->escapeString($epinfo['airdate']) : "NULL";
 			$tvtitle = (!empty($epinfo['title'])) ? $this->pdo->escapeString($epinfo['title']) : "NULL";
-			$this->pdo->queryExec(sprintf("UPDATE releases SET tvtitle = %s, tvairdate = %s, rageid = %d WHERE ID = %d", $this->pdo->escapeString(trim($tvtitle)), $tvairdate, $traktArray['show']['tvrage_id'], $relid));
+			$this->pdo->queryExec(sprintf("UPDATE releases SET tvtitle = %s, tvairdate = %s, rageid = %d WHERE id = %d", $this->pdo->escapeString(trim($tvtitle)), $tvairdate, $traktArray['show']['tvrage_id'], $relid));
 		} else {
-			$this->pdo->queryExec(sprintf("UPDATE releases SET rageid = %d WHERE ID = %d", $traktArray['show']['tvrage_id'], $relid));
+			$this->pdo->queryExec(sprintf("UPDATE releases SET rageid = %d WHERE id = %d", $traktArray['show']['tvrage_id'], $relid));
 		}
 
 		$genre = '';
@@ -656,7 +656,7 @@ class TvAnger
 
 		$res = $this->pdo->query(
 			sprintf("
-				SELECT r.searchname, r.ID
+				SELECT r.searchname, r.id
 				FROM releases r
 				WHERE r.nzbstatus = 1
 				AND r.rageid = -1
@@ -681,7 +681,7 @@ class TvAnger
 			$show = $this->parseNameEpSeason($arr['searchname']);
 			if (is_array($show) && $show['name'] != '') {
 				// Update release with season, ep, and airdate info (if available) from releasetitle.
-				$this->updateEpInfo($show, $arr['ID']);
+				$this->updateEpInfo($show, $arr['id']);
 
 				// Find the rageid.
 				$id = $this->getByTitle($show['cleanname']);
@@ -694,22 +694,22 @@ class TvAnger
 				if ($id === false && $lookupTvRage) {
 					// If it doesnt exist locally and lookups are allowed lets try to get it.
 					if ($this->echooutput) {
-						echo $this->pdo->log->primaryOver("TVRage ID for ") . $this->pdo->log->headerOver($show['cleanname']) . $this->pdo->log->primary(" not found in local db, checking web.");
+						echo $this->pdo->log->primaryOver("TVRage id for ") . $this->pdo->log->headerOver($show['cleanname']) . $this->pdo->log->primary(" not found in local db, checking web.");
 					}
 
 					$tvrShow = $this->getRageMatch($show);
 					if ($tvrShow !== false && is_array($tvrShow)) {
 						// Get all tv info and add show.
-						$this->updateRageInfo($tvrShow['showid'], $show, $tvrShow, $arr['ID']);
+						$this->updateRageInfo($tvrShow['showid'], $show, $tvrShow, $arr['id']);
 					} else if ($tvrShow === false) {
 						// If tvrage fails, try trakt.
 						$traktArray = $trakt->traktTVSEsummary($show['name'], $show['season'], $show['episode']);
 						if ($traktArray !== false) {
 							if (isset($traktArray['show']['tvrage_id']) && $traktArray['show']['tvrage_id'] !== 0) {
 								if ($this->echooutput) {
-									echo $this->pdo->log->primary('Found TVRage ID on trakt:' . $traktArray['show']['tvrage_id']);
+									echo $this->pdo->log->primary('Found TVRage id on trakt:' . $traktArray['show']['tvrage_id']);
 								}
-								$this->updateRageInfoTrakt($traktArray['show']['tvrage_id'], $show, $traktArray, $arr['ID']);
+								$this->updateRageInfoTrakt($traktArray['show']['tvrage_id'], $show, $traktArray, $arr['id']);
 							}
 							// No match, add to tvrage with rageid = -2 and $show['cleanname'] title only.
 							else {
@@ -744,17 +744,17 @@ class TvAnger
 						}
 					}
 					if ($tvairdate == "NULL") {
-						$this->pdo->queryExec(sprintf('UPDATE releases SET tvtitle = %s, rageid = %d WHERE ID = %d', $tvtitle, $id, $arr['ID']));
+						$this->pdo->queryExec(sprintf('UPDATE releases SET tvtitle = %s, rageid = %d WHERE id = %d', $tvtitle, $id, $arr['id']));
 					} else {
-						$this->pdo->queryExec(sprintf('UPDATE releases SET tvtitle = %s, tvairdate = %s, rageid = %d WHERE ID = %d', $tvtitle, $tvairdate, $id, $arr['ID']));
+						$this->pdo->queryExec(sprintf('UPDATE releases SET tvtitle = %s, tvairdate = %s, rageid = %d WHERE id = %d', $tvtitle, $tvairdate, $id, $arr['id']));
 					}
 					// Cant find rageid, so set rageid to n/a.
 				} else {
-					$this->pdo->queryExec(sprintf('UPDATE releases SET rageid = -2 WHERE ID = %d', $arr['ID']));
+					$this->pdo->queryExec(sprintf('UPDATE releases SET rageid = -2 WHERE id = %d', $arr['id']));
 				}
 				// Not a tv episode, so set rageid to n/a.
 			} else {
-				$this->pdo->queryExec(sprintf('UPDATE releases SET rageid = -2 WHERE ID = %d', $arr['ID']));
+				$this->pdo->queryExec(sprintf('UPDATE releases SET rageid = -2 WHERE id = %d', $arr['id']));
 			}
 			$ret++;
 		}
