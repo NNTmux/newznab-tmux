@@ -31,19 +31,64 @@ class Users
 	const SHA1LEN = 40;
 
 	/**
+	 * @var int
+	 */
+	public $password_hash_cost;
+
+	/**
 	 * Users select queue type.
 	 */
 	const QUEUE_NONE = 0;
 	const QUEUE_SABNZBD = 1;
 	const QUEUE_NZBGET = 2;
 
-	public static function checkPassword($password, $hash)
+	/**
+	 * @param array $options Class instances.
+	 */
+	public function __construct(array $options = [])
 	{
-		$salt = substr($hash, -self::SALTLEN);
-		$site = new Sites();
-		$s = $site->get();
+		$defaults = [
+			'Settings' => null,
+		];
+		$options += $defaults;
 
-		return self::hashSHA1($s->siteseed . $password . $salt . $s->siteseed) === substr($hash, 0, self::SHA1LEN);
+		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+
+		$this->password_hash_cost = (defined('NN_PASSWORD_HASH_COST') ? NN_PASSWORD_HASH_COST : 11);
+	}
+
+	/**
+	 * Verify a password against a hash.
+	 *
+	 * Automatically update the hash if it needs to be.
+	 *
+	 * @param string $password Password to check against hash.
+	 * @param string $hash     Hash to check against password.
+	 * @param int    $userID   ID of the user.
+	 *
+	 * @return bool
+	 */
+	public function checkPassword($password, $hash, $userID = -1)
+	{
+		if (password_verify($password, $hash) === false) {
+			return false;
+		}
+
+		// Update the hash if it needs to be.
+		if (is_numeric($userID) && $userID > 0 && password_needs_rehash($hash, PASSWORD_DEFAULT, ['cost' => $this->password_hash_cost])) {
+			$hash = $this->hashPassword($password);
+
+			if ($hash !== false) {
+				$this->pdo->queryExec(
+					sprintf(
+						'UPDATE users SET password = %s WHERE id = %d',
+						$this->pdo->escapeString((string)$hash),
+						$userID
+					)
+				);
+			}
+		}
+		return true;
 	}
 
 	public function get()
@@ -344,23 +389,16 @@ class Users
 		return Users::SUCCESS;
 	}
 
-	public static function hashPassword($password)
+	/**
+	 * Hash a password using crypt.
+	 *
+	 * @param string $password
+	 *
+	 * @return string|bool
+	 */
+	public function hashPassword($password)
 	{
-		$salt = Users::randomKey(Users::SALTLEN);
-		$site = new Sites();
-		$s = $site->get();
-
-		return Users::hashSHA1($s->siteseed . $password . $salt . $s->siteseed) . $salt;
-	}
-
-	function randomKey($amount)
-	{
-		$keyset = "abcdefghijklmABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-		$randkey = "";
-		for ($i = 0; $i < $amount; $i++)
-			$randkey .= substr($keyset, rand(0, strlen($keyset) - 1), 1);
-
-		return $randkey;
+		return password_hash($password, PASSWORD_DEFAULT, ['cost' => $this->password_hash_cost]);
 	}
 
 	public static function hashSHA1($string)
