@@ -35,6 +35,7 @@
             <li><a href="{$smarty.const.WWW_TOP}/thetvdb-list.php">View TheTVDB List</a></li>
             <li><a href="{$smarty.const.WWW_TOP}/movie-list.php">View</a> <a style="padding:0;" href="{$smarty.const.WWW_TOP}/movie-add.php">Add</a> Movie List</li>
             <li><a href="{$smarty.const.WWW_TOP}/anidb-list.php">View AniDB List</a></li>
+			<li><a href="{$smarty.const.WWW_TOP}/game-list.php">View Games</a></li>
             <li><a href="{$smarty.const.WWW_TOP}/music-list.php">View Music List</a></li>
             <li><a href="{$smarty.const.WWW_TOP}/console-list.php">View Console List</a></li>
             <li><a href="{$smarty.const.WWW_TOP}/book-list.php">View Book List</a></li>
