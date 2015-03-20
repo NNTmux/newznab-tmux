@@ -8,7 +8,7 @@
 <div id="movieinfo">
 
 <h1>{$movie.title|ss} {if $movie.year != ''}({$movie.year}){/if}</h1>
-<h2>{if $movie.cover == 1}<img src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbid}-cover.jpg" class="cover" alt="{$movie.title|ss}" align="left" />{/if}
+<h2>{if $movie.cover == 1}<img src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbid}-cover.jpg" class="cover" alt="{$movie.title|ss}" align="left" width="180" border="0"/>{/if}
 {if $movie.tagline != ''}<b>{$movie.tagline|ss}</b>{/if}</h2>
 
 {if $movie.plot != ''}
