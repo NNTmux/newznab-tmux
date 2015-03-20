@@ -673,7 +673,8 @@ class Film
 	 */
 	protected function fetchFanartTVProperties($imdbId)
 	{
-		if ($this->fanartapikey != '') {
+		if ($this->fanartapikey != '')
+		{
 			$buffer = Utility::getUrl(['url' => 'https://webservice.fanart.tv/v3/movies/' . 'tt' . $imdbId . '?api_key=' . $this->fanartapikey , 'verifycert' => false]);
 			if ($buffer !== false) {
 				$art = json_decode($buffer, true);
@@ -686,13 +687,10 @@ class Film
 				} else if (isset($art['moviethumb'[0]['url']])) {
 					$ret['backdrop'] = $art['moviethumb'][0]['url'];
 				}
-
 				if (isset($art['movieposter'][0]['url'])) {
 					$ret['cover'] = $art['movieposter'][0]['url'];
 				}
-
 				if (isset($ret['backdrop']) && isset($ret['cover'])) {
-
 					$ret['title'] = $imdbId;
 					if (isset($art['name'])) {
 						$ret['title'] = $art['name'];
@@ -704,8 +702,8 @@ class Film
 				}
 			}
 		}
-return false;
-}
+		return false;
+	}
 
 	/**
 	 * Fetch info for IMDB id from TMDB.
