@@ -121,7 +121,7 @@
 										PreDB</span>{/if}
 									{if $result.prehashid > 0}<span class="prehashinfo rndbtn"
 																	title="{$result.prehashid}">Prehash</span>{/if}
-									{if $result.movieinfoID > 0}<a
+									{if $result.movieinfoid > 0}<a
 										href="{$smarty.const.WWW_TOP}/movies?imdb={$result.imdbid}"
 										title="View movie info" class="rndbtn" rel="movie" >Movie</a>{/if}
 									{if $result.haspreview == 1 && $userdata.canpreview == 1}<a

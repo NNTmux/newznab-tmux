@@ -931,7 +931,7 @@ class Sphinx
                           . "groups.name as group_name, rn.id AS nfoid, "
                           . "re.releaseid as reID, cp.id AS categoryParentID, "
                           . "pre.ctime, pre.nuketype, "
-                          . "COALESCE(movieinfo.id, 0) AS movieinfoID "
+                          . "COALESCE(movieinfo.id, 0) AS movieinfoid "
                           . "FROM releases "
                           . "LEFT OUTER JOIN movieinfo "
                           . "ON movieinfo.imdbid = releases.imdbid "
