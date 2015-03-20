@@ -37,7 +37,7 @@
 <tr>
 	<td><label for="category">Category</label>:</td>
 	<td>
-		{html_options id="category" name=category options=$catlist selected=$release.categoryID}
+		{html_options id="category" name=category options=$catlist selected=$release.categoryid}
 	</td>
 </tr>
 
@@ -49,16 +49,16 @@
 </tr>
 
 <tr>
-	<td><label for="rageID">Tv Rage Id</label>:</td>
+	<td><label for="rageid">Tv Rage Id</label>:</td>
 	<td>
-		<input id="rageID" class="short" name="rageID" type="text" value="{$release.rageID}" />
+		<input id="rageid" class="short" name="rageid" type="text" value="{$release.rageid}" />
 	</td>
 </tr>
 
 <tr>
-	<td><label for="tvdbID">TheTVDB ID</label>:</td>
+	<td><label for="tvdbid">TheTVDB id</label>:</td>
 	<td>
-		<input id="tvdbID" class="short" name="tvdbID" type="text" value="{$release.tvdbID}" />
+		<input id="tvdbid" class="short" name="tvdbid" type="text" value="{$release.tvdbid}" />
 	</td>
 </tr>
 
@@ -86,7 +86,7 @@
 <tr>
 	<td><label for="episode">IMDB Id</label>:</td>
 	<td>
-		<input id="imdbID" class="short" name="imdbID" type="text" value="{$release.imdbID}" />
+		<input id="imdbid" class="short" name="imdbid" type="text" value="{$release.imdbid}" />
 	</td>
 </tr>
 

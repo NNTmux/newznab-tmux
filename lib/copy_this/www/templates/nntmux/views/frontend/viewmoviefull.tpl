@@ -3,7 +3,7 @@
 	{foreach from=$results item=result}
 		<div id="moviefull">
 			{if $result.cover == 1}<img class="shadow pic" alt="{$result.title|escape:"htmlall"} Logo"
-										src="{$smarty.const.WWW_TOP}/covers/movies/{$result.imdbID}-cover.jpg" />{/if}
+										src="{$smarty.const.WWW_TOP}/covers/movies/{$result.imdbid}-cover.jpg" width="180" border="0"/>{/if}
 			<h1>{$result.title|escape:"htmlall"} ({$result.year})</h1>
 
 			<h2>{if $result.genre != ''}{$result.genre|replace:"|":" / "}{/if}</h2>
@@ -27,7 +27,7 @@
 				{if $result.trailer != ''}
 					<br/>
 					<strong>Trailer:</strong>
-				<a name="name{$result.imdbID}" class="modal_imdbtrailer" href="#">Show trailer</a>{/if}
+				<a name="name{$result.imdbid}" class="modal_imdbtrailer" href="#">Show trailer</a>{/if}
 			</p>
 		</div>
 		{if in_array("1", ","|explode:$result.grp_haspreview) && $userdata.canpreview == 1}

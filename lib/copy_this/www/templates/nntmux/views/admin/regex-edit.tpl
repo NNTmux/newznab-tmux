@@ -1,7 +1,7 @@
- 
+
 <h1>{$page->title}</h1>
 
-{if $regex.ID > 0 && $regex.ID < 100000 && $site->reqidurl != ""}
+{if $regex.id > 0 && $regex.id < 100000 && $site->reqidurl != ""}
 	<div class="error">Warning: Editing system regex, these changes will be overwritten next update releases.</div>
 {/if}
 
@@ -17,7 +17,7 @@
 <tr>
 	<td>Group:</td>
 	<td>
-		<input type="hidden" name="id" value="{$regex.ID}" />
+		<input type="hidden" name="id" value="{$regex.id}" />
 		<input id="groupname" name="groupname" value="{$regex.groupname|escape:html}" />
 		<div class="hint">The full name of a valid newsgroup. This value can be a regular expression. Use .* to apply regex to all newsgroups.</div>
 	</td>
@@ -30,7 +30,7 @@
 		<div class="hint">The regex to be applied.<br />
 		Regex requires at least 1 named capturing group in the form of (?P&lt;name&gt;) to work.<br />
 		If the subjects contains the number of parts (ie [1/10]) then it is wise to also use (?P&lt;parts&gt;) to match the parts.
-		</div>		
+		</div>
 	</td>
 </tr>
 
@@ -38,15 +38,15 @@
 	<td>Description:</td>
 	<td>
 		<textarea class="autosize" id="description" name="description" >{$regex.description|escape:html}</textarea>
-		<div class="hint">A description for this regex</div>		
+		<div class="hint">A description for this regex</div>
 	</td>
 </tr>
 
 <tr>
 	<td><label for="category">Category</label>:</td>
 	<td>
-		{html_options id="category" name=category options=$catlist selected=$regex.categoryID}
-		<div class="hint">If this regex indicates the release category then supply it here. If left blank the standard method of determining the category will apply.</div>	
+		{html_options id="category" name=category options=$catlist selected=$regex.categoryid}
+		<div class="hint">If this regex indicates the release category then supply it here. If left blank the standard method of determining the category will apply.</div>
 	</td>
 </tr>
 
@@ -54,7 +54,7 @@
 	<td>Ordinal:</td>
 	<td>
 		<input id="ordinal" class="short" name="ordinal" value="{$regex.ordinal|escape:html}" />
-		<div class="hint">The zero-based order in which the regex should be applied.</div>		
+		<div class="hint">The zero-based order in which the regex should be applied.</div>
 	</td>
 </tr>
 
@@ -62,7 +62,7 @@
 	<td><label for="status">Active</label>:</td>
 	<td>
 		{html_radios id="status" name='status' values=$status_ids output=$status_names selected=$regex.status separator='<br />'}
-		<div class="hint">Only active regexes are applied during the release process.</div>		
+		<div class="hint">Only active regexes are applied during the release process.</div>
 	</td>
 </tr>
 

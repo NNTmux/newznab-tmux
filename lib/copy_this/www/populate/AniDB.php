@@ -26,7 +26,7 @@ class PopulateAniDB
 	public $pdo;
 
 	/**
-	 * The AniDB ID we are looking up
+	 * The AniDB id we are looking up
 	 * @var bool
 	 */
 	private $anidbId;
@@ -104,7 +104,7 @@ class PopulateAniDB
 	/**
 	 * Checks for an existing anime title in anidb table
 	 *
-	 * @param int    $id    The AniDB ID to be inserted
+	 * @param int    $id    The AniDB id to be inserted
 	 * @param string $type  The title type
 	 * @param string $lang  The title language
 	 * @param string $title The title of the Anime
@@ -132,7 +132,7 @@ class PopulateAniDB
 	/**
 	 * Retrieves supplemental anime info from the AniDB API
 	 *
-	 * @param int    $id    The AniDB ID to be inserted
+	 * @param int    $id    The AniDB id to be inserted
 	 * @param string $type  The title type
 	 * @param string $lang  The title language
 	 * @param string $title The title of the Anime
@@ -273,7 +273,7 @@ class PopulateAniDB
 	/**
 	 * Inserts new anime info from AniDB to anidb table
 	 *
-	 * @param int    $id    The AniDB ID to be inserted
+	 * @param int    $id    The AniDB id to be inserted
 	 * @param string $type  The title type
 	 * @param string $lang  The title language
 	 * @param string $title The title of the Anime
@@ -431,12 +431,12 @@ class PopulateAniDB
 									true);
 			exit;
 		} elseif ($AniDBAPIArray === false && $this->echooutput) {
-			$this->pdo->log->doEcho($this->pdo->log->info("Anime ID: {$this->anidbId} not available for update yet."),
+			$this->pdo->log->doEcho($this->pdo->log->info("Anime id: {$this->anidbId} not available for update yet."),
 									true);
 		} else {
 			$this->updateAniChildTables($AniDBAPIArray);
 			if (NN_DEBUG) {
-				$this->pdo->log->doEcho($this->pdo->log->headerOver("Added/Updated AniDB ID: {$this->anidbId}"),
+				$this->pdo->log->doEcho($this->pdo->log->headerOver("Added/Updated AniDB id: {$this->anidbId}"),
 										true);
 			}
 		}

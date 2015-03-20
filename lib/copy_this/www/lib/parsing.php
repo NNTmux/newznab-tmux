@@ -45,17 +45,17 @@ class Parsing
 		$db = new DB();
 
 		// Default query for both full db and last 4 hours.
-		$sql = "SELECT r.searchname, r.name, r.fromname, r.ID as RID, r.categoryID, r.guid, r.postdate,
-			   rn.ID as nfoID,
+		$sql = "SELECT r.searchname, r.name, r.fromname, r.id as RID, r.categoryid, r.guid, r.postdate,
+			   rn.id as nfoid,
 			   g.name as groupname,
 			   GROUP_CONCAT(rf.name) as filenames
 		FROM releases r
-		LEFT JOIN releasenfo rn ON (rn.releaseID = r.ID)
-		LEFT JOIN groups g ON (g.ID = r.groupID)
-		LEFT JOIN releasefiles rf ON (rf.releaseID = r.ID)
-		WHERE r.categoryID in (" . Category::CAT_TV_OTHER . "," . Category::CAT_MOVIE_OTHER . "," . Category::CAT_MISC_OTHER . "," . Category::CAT_XXX_OTHER . ")
+		LEFT JOIN releasenfo rn ON (rn.releaseid = r.id)
+		LEFT JOIN groups g ON (g.id = r.groupid)
+		LEFT JOIN releasefiles rf ON (rf.releaseid = r.id)
+		WHERE r.categoryid in (" . Category::CAT_TV_OTHER . "," . Category::CAT_MOVIE_OTHER . "," . Category::CAT_MISC_OTHER . "," . Category::CAT_XXX_OTHER . ")
 		%s
-		GROUP BY r.ID";
+		GROUP BY r.id";
 
 		$res = $db->query(sprintf($sql, $this->limited ? "AND r.adddate BETWEEN NOW() - INTERVAL 4 HOUR AND NOW()" : ""));
 		$this->releasestocheck = sizeof($res);
@@ -90,7 +90,7 @@ class Parsing
 				///
 				///Use the Nfo to try to get the proper Releasename.
 				///
-				$nfo = $db->queryOneRow(sprintf("select uncompress(nfo) as nfo from releasenfo where releaseID = %d", $rel['RID']));
+				$nfo = $db->queryOneRow(sprintf("select uncompress(nfo) as nfo from releasenfo where releaseid = %d", $rel['RID']));
 				if ($nfo && $foundName == "") {
 					$this->nfosprocessed++;
 					$nfo = $nfo['nfo'];
@@ -799,7 +799,7 @@ class Parsing
 		if (($methodused == 'a.b.hdtv.x264') && ($rel['groupname'] == 'alt.binaries.hdtv.x264')) {
 			$categoryID = Category::CAT_MOVIE_HD;
 		}
-		if (($categoryID == $rel['categoryID'] || $categoryID == '7900') || ($foundName == $rel['name'] || $foundName == $rel['searchname'])) {
+		if (($categoryID == $rel['categoryid'] || $categoryID == '7900') || ($foundName == $rel['name'] || $foundName == $rel['searchname'])) {
 			$foundName = null;
 			$methodused = null;
 		} else {
@@ -813,14 +813,14 @@ class Parsing
 				echo ' Old SearchName: 	' . $rel['searchname'] . "\n";
 				echo ' New Name: 		' . $name . "\n";
 				echo ' New SearchName: 	' . $searchname . "\n";
-				echo ' Old Cat: 		' . $rel['categoryID'] . "\n";
+				echo ' Old Cat: 		' . $rel['categoryid'] . "\n";
 				echo ' New Cat: 		' . $categoryID . "\n";
 				echo ' Method: 		' . $methodused . "\n";
 				echo " Status: 		Release changed\n\n";
 			}
 			if (!$this->echoonly) {
 				$db = new DB();
-				$db->queryExec(sprintf("update releases SET name = %s, searchname = %s, categoryID = %d, imdbID = NULL, rageID = -1, bookinfoID = NULL, musicinfoID = NULL, consoleinfoID = NULL WHERE releases.ID = %d", $db->escapeString($name), $db->escapeString($searchname), $categoryID, $rel['RID']));
+				$db->queryExec(sprintf("update releases SET name = %s, searchname = %s, categoryid = %d, imdbid = NULL, rageid = -1, bookinfoid = NULL, musicinfoid = NULL, consoleinfoid = NULL WHERE releases.id = %d", $db->escapeString($name), $db->escapeString($searchname), $categoryID, $rel['RID']));
 			}
 			$this->numupdated++;
 		}
@@ -834,10 +834,10 @@ class Parsing
 		echo "PostPrc : Performing cleanup \n";
 
 		$db = new Db;
-		$catsql = "select ID from groups";
+		$catsql = "select id from groups";
 		$res = $db->query($catsql);
 		foreach ($res as $r2) {
-			$sql = sprintf("select r.ID, name, searchname, categoryID, size, totalpart, musicinfoID, preID, groupID, rn.id as nfoID from releases r left outer join releasenfo rn ON rn.releaseID = r.ID where groupid = %d", $r2['ID']) . " %s ";
+			$sql = sprintf("select r.id, name, searchname, categoryid, size, totalpart, musicinfoid, preID, groupid, rn.id as nfoid from releases r left outer join releasenfo rn ON rn.releaseid = r.id where groupid = %d", $r2['id']) . " %s ";
 			$unbuf = $db->queryDirect(sprintf($sql, ($this->limited ? " and r.adddate BETWEEN NOW() - INTERVAL 1 DAY AND NOW() " : "")));
 
 			while ($r = $db->getAssocArray($unbuf)) {
@@ -871,7 +871,7 @@ class Parsing
 
 				//Remove releases if it starts with a IMDBID.
 				if (preg_match('/^tt\d{6}/i', $r['name'])) {
-					$this->handleClean($r, "Modifying Release because it starts with a IMDB ID: " . $r['name'] . " - ");
+					$this->handleClean($r, "Modifying Release because it starts with a IMDB id: " . $r['name'] . " - ");
 					continue;
 				}
 
@@ -883,7 +883,7 @@ class Parsing
 
 				//Remove releases if the name contains http(s): .
 				// try stripos, its faster than preg_match
-				if (preg_match('/sample/i', $r['name']) && $r['categoryID'] > 5000 && $r['categoryID'] < 5999) {
+				if (preg_match('/sample/i', $r['name']) && $r['categoryid'] > 5000 && $r['categoryid'] < 5999) {
 					$this->handleClean($r, "Modifying Release because it contains Sample in the Release Name: " . $r['name'] . " - ", true);
 					continue;
 				}
@@ -896,7 +896,7 @@ class Parsing
 				///This section will cleanup releases based on the category and things such as release size and release name length
 				///
 
-				switch ($r['categoryID']) {
+				switch ($r['categoryid']) {
 					//CONSOLE
 					case Category::CAT_GAME_NDS: //NDS
 						if ($r['size'] < 2000000) {
@@ -1064,7 +1064,7 @@ class Parsing
 							$this->handleClean($r, "Modifying Release Audio MP3 Size: " . $r['name'] . " - ", true);
 							continue;
 						}
-						if (strlen($r['name']) < 25 && !preg_match('/(discography|\b((19|20)\d{2})\b)/i', $r['name']) && $r['musicinfoID'] == '-2' && !$r['preID']) {
+						if (strlen($r['name']) < 25 && !preg_match('/(discography|\b((19|20)\d{2})\b)/i', $r['name']) && $r['musicinfoid'] == '-2' && !$r['preID']) {
 							$this->handleClean($r, "Modifying Release Audio MP3 ReleaseLEN: " . $r['name'] . " - ");
 							continue;
 						}
@@ -1075,7 +1075,7 @@ class Parsing
 							$this->handleClean($r, "Modifying Release Audio Video Size: " . $r['name'] . " - ", true);
 							continue;
 						}
-						if (strlen($r['name']) < 20 && !preg_match('/(discography|\b((19|20)\d{2})\b)/i', $r['name']) && $r['musicinfoID'] == '-2' && !$r['preID']) {
+						if (strlen($r['name']) < 20 && !preg_match('/(discography|\b((19|20)\d{2})\b)/i', $r['name']) && $r['musicinfoid'] == '-2' && !$r['preID']) {
 							//echo "Modifying Release Audio Video ReleaseLEN: ".$r['name']." - ";
 							//handleClean($r); not sure what to
 							continue;
@@ -1087,7 +1087,7 @@ class Parsing
 							$this->handleClean($r, "Modifying Release Audiobook Size: " . $r['name'] . " - ", true);
 							continue;
 						}
-						if (strlen($r['name']) < 20 && !preg_match('/(discography|\b((19|20)\d{2})\b)/i', $r['name']) && $r['musicinfoID'] == '-2' && !$r['preID']) {
+						if (strlen($r['name']) < 20 && !preg_match('/(discography|\b((19|20)\d{2})\b)/i', $r['name']) && $r['musicinfoid'] == '-2' && !$r['preID']) {
 							$this->handleClean($r, "Modifying Release Audiobook ReleaseLEN: " . $r['name'] . " - ");
 							continue;
 						}
@@ -1099,7 +1099,7 @@ class Parsing
 							//handleClean($r,true);
 							continue;
 						}
-						if (strlen($r['name']) < 20 && !preg_match('/(discography|\b((19|20)\d{2})\b)/i', $r['name']) && $r['musicinfoID'] == '-2' && !$r['preID']) {
+						if (strlen($r['name']) < 20 && !preg_match('/(discography|\b((19|20)\d{2})\b)/i', $r['name']) && $r['musicinfoid'] == '-2' && !$r['preID']) {
 							//echo "Modifying Release Audio Lossless ReleaseLEN: ".$r['name']." - ";
 							//handleClean($r);
 							continue;
@@ -1112,7 +1112,7 @@ class Parsing
 							$this->handleClean($r, "Modifying Release PC 0Day Size: " . $r['name'] . " - ", true);
 							continue;
 						}
-						if (strlen($r['name']) < 20 && $r['nfoID'] == null && !$r['preID']) {
+						if (strlen($r['name']) < 20 && $r['nfoid'] == null && !$r['preID']) {
 							$this->handleClean($r, "Modifying Release PC 0Day ReleaseLEN: " . $r['name'] . " - ");
 							continue;
 						}
@@ -1387,10 +1387,10 @@ class Parsing
 	private function handleClean($row, $reason = "", $forceNuke = false)
 	{
 		if (!$forceNuke) {
-			$this->cleanup['misc'][$row['ID']] = true;
+			$this->cleanup['misc'][$row['id']] = true;
 			if ($this->verbose) echo $reason . "Moving to Misc Other\n";
 		} else {
-			$this->cleanup['nuke'][$row['ID']] = true;
+			$this->cleanup['nuke'][$row['id']] = true;
 			if ($this->verbose) echo $reason . "Removing Release\n";
 		}
 	}
@@ -1412,7 +1412,7 @@ class Parsing
 			}
 
 			if (count($this->cleanup['misc'])) {
-				$sql = 'update releases set categoryID = ' . Category::CAT_MISC_OTHER . ' where categoryID != ' . Category::CAT_MISC_OTHER . ' and id in (' . implode(array_keys($this->cleanup['misc']), ',') . ')';
+				$sql = 'update releases set categoryid = ' . Category::CAT_MISC_OTHER . ' where categoryid != ' . Category::CAT_MISC_OTHER . ' and id in (' . implode(array_keys($this->cleanup['misc']), ',') . ')';
 				$db->queryExec($sql);
 			}
 		}
@@ -1427,7 +1427,7 @@ class Parsing
 	{
 		$db = new Db;
 
-		$sql = "select ID, searchname from releases where 1 = 1 ";
+		$sql = "select id, searchname from releases where 1 = 1 ";
 		$sql .= ($this->limited ? "AND adddate BETWEEN NOW() - INTERVAL 1 DAY AND NOW()" : "");
 		$sql .= " order by postdate desc";
 
@@ -1439,43 +1439,43 @@ class Parsing
 				while (preg_match('/^(\:|\"|\-| |\_)+/', $r['searchname'])) {
 					$r['searchname'] = substr($r['searchname'], 1);
 				}
-				$this->updateName($db, $r['ID'], $oldname, $r['searchname']);
+				$this->updateName($db, $r['id'], $oldname, $r['searchname']);
 			}
 			if (preg_match('/^000\-/', $r['searchname'])) {
 				while (preg_match('/^000\-/', $r['searchname'])) {
 					$r['searchname'] = substr($r['searchname'], 4);
 				}
-				$this->updateName($db, $r['ID'], $oldname, $r['searchname']);
+				$this->updateName($db, $r['id'], $oldname, $r['searchname']);
 			}
 			if (preg_match('/(\:|\"|\-| |\/)$/', $r['searchname'])) {
 				while (preg_match('/(\:|\"|\-| |\/)$/', $r['searchname'])) {
 					$r['searchname'] = substr($r['searchname'], 0, -1);
 				}
-				$this->updateName($db, $r['ID'], $oldname, $r['searchname']);
+				$this->updateName($db, $r['id'], $oldname, $r['searchname']);
 			}
 			if (preg_match('/\"/', $r['searchname'])) {
 				while (preg_match('/\"/', $r['searchname'])) {
 					$r['searchname'] = str_replace('"', '', $r['searchname']);
 				}
-				$this->updateName($db, $r['ID'], $oldname, $r['searchname']);
+				$this->updateName($db, $r['id'], $oldname, $r['searchname']);
 			}
 			if (preg_match('/\-\d{1}$/', $r['searchname'])) {
 				while (preg_match('/\-\d{1}$/', $r['searchname'])) {
 					$r['searchname'] = preg_replace('/\-\d{1}$/', '', $r['searchname']);
 				}
-				$this->updateName($db, $r['ID'], $oldname, $r['searchname']);
+				$this->updateName($db, $r['id'], $oldname, $r['searchname']);
 			}
 			if (preg_match('/\!+.*?mom.*?\!+/i', $r['searchname'])) {
 				while (preg_match('/\!+.*?mom.*?\!+/i', $r['searchname'])) {
 					$r['searchname'] = preg_replace('/\!+.*?mom.*?\!+/i', '', $r['searchname']);
 				}
-				$this->updateName($db, $r['ID'], $oldname, $r['searchname']);
+				$this->updateName($db, $r['id'], $oldname, $r['searchname']);
 			}
 			if (preg_match('/(\\/)/i', $r['searchname'])) {
 				while (preg_match('/(\\/)/i', $r['searchname'])) {
 					$r['searchname'] = preg_replace('/(\\/)/i', '', $r['searchname']);
 				}
-				$this->updateName($db, $r['ID'], $oldname, $r['searchname']);
+				$this->updateName($db, $r['id'], $oldname, $r['searchname']);
 			}
 		}
 	}
@@ -1489,6 +1489,6 @@ class Parsing
 			echo sprintf("OLD : %s\nNEW : %s\n\n", $oldname, $newname);
 
 		if (!$this->echoonly)
-			$db->queryExec(sprintf("update releases set name=%s, searchname = %s WHERE ID = %d", $db->escapeString($newname), $db->escapeString($newname), $id));
+			$db->queryExec(sprintf("update releases set name=%s, searchname = %s WHERE id = %d", $db->escapeString($newname), $db->escapeString($newname), $id));
 	}
 }

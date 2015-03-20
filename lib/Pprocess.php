@@ -209,7 +209,7 @@ class PProcess
 	/**
 	 * Lookup imdb if enabled.
 	 *
-	 * @param string     $groupID       (Optional) ID of a group to work on.
+	 * @param string     $groupID       (Optional) id of a group to work on.
 	 * @param string     $guidChar      (Optional) First letter of a release GUID to use to get work.
 	 * @param int|string $processMovies (Optional) 0 Don't process, 1 process all releases,
 	 *                                             2 process renamed releases only, '' check site setting
@@ -240,7 +240,7 @@ class PProcess
 	 * Process nfo files.
 	 *
 	 * @param NNTP   $nntp
-	 * @param string $groupID  (Optional) ID of a group to work on.
+	 * @param string $groupID  (Optional) id of a group to work on.
 	 * @param string $guidChar (Optional) First letter of a release GUID to use to get work.
 	 *
 	 * @return void
@@ -286,7 +286,7 @@ class PProcess
 	/**
 	 * Process all TV related releases which will assign their series/episode/rage data.
 	 *
-	 * @param string     $groupID   (Optional) ID of a group to work on.
+	 * @param string     $groupID   (Optional) id of a group to work on.
 	 * @param string     $guidChar  (Optional) First letter of a release GUID to use to get work.
 	 * @param string|int $processTV (Optional) 0 Don't process, 1 process all releases,
 	 *                                         2 process renamed releases only, '' check site setting
@@ -326,7 +326,7 @@ class PProcess
 	 * @note Called externally by tmux/bin/update_per_group and update/postprocess.php
 	 *
 	 * @param NNTP       $nntp    Class NNTP
-	 * @param int|string $groupID  (Optional) ID of a group to work on.
+	 * @param int|string $groupID  (Optional) id of a group to work on.
 	 * @param string     $guidChar (Optional) First char of release GUID, can be used to select work.
 	 *
 	 * @return void
@@ -342,8 +342,8 @@ class PProcess
 	 * @note Called from NZBContents.php
 	 *
 	 * @param string $messageID MessageID from NZB file.
-	 * @param int    $relID     ID of the release.
-	 * @param int    $groupID   Group ID of the release.
+	 * @param int    $relID     id of the release.
+	 * @param int    $groupID   Group id of the release.
 	 * @param NNTP   $nntp      Class NNTP
 	 * @param int    $show      Only show result or apply iy.
 	 *
@@ -357,10 +357,10 @@ class PProcess
 
 		$query = $this->pdo->queryOneRow(
 			sprintf('
-				SELECT ID, groupID, categoryID, name, searchname, UNIX_TIMESTAMP(postdate) AS post_date, ID AS releaseID
+				SELECT id, groupid, categoryid, name, searchname, UNIX_TIMESTAMP(postdate) AS post_date, id AS releaseid
 				FROM releases
 				WHERE isrenamed = 0
-				AND ID = %d',
+				AND id = %d',
 				$relID
 			)
 		);
@@ -372,7 +372,7 @@ class PProcess
 		// Only get a new name if the category is OTHER.
 		$foundName = true;
 		if (!in_array(
-			(int)$query['categoryID'],
+			(int)$query['categoryid'],
 			array(
 				Category::CAT_BOOK_OTHER,
 				Category::CAT_GAME_OTHER,
@@ -424,9 +424,9 @@ class PProcess
 					if ($filesAdded < 11 &&
 						$this->pdo->queryOneRow(
 							sprintf('
-								SELECT ID
+								SELECT id
 								FROM releasefiles
-								WHERE releaseID = %d
+								WHERE releaseid = %d
 								AND name = %s',
 								$relID,
 								$this->pdo->escapeString($file['name'])
@@ -461,7 +461,7 @@ class PProcess
 					sprintf('
 						UPDATE releases
 						SET rarinnerfilecount = rarinnerfilecount + %d
-						WHERE ID = %d',
+						WHERE id = %d',
 						$filesAdded,
 						$relID
 					)

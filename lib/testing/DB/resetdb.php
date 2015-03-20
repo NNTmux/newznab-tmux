@@ -48,7 +48,7 @@ $sql = "SHOW table status";
 
 $tables = $pdo->query($sql);
 foreach ($tables as $row) {
-	$tbl = $row['Name'];
+	$tbl = $row['name'];
 	if (preg_match('/binaries_\d+/', $tbl) || preg_match('/parts_\d+/', $tbl) || preg_match('/partrepair_\d+/', $tbl) || preg_match('/\d+_binaries/', $tbl) || preg_match('/\d+_parts/', $tbl) || preg_match('/\d+_partrepair_\d+/', $tbl)) {
 		$rel = $pdo->queryDirect(sprintf('DROP TABLE %s', $tbl));
 		if ($rel !== false)
@@ -93,7 +93,7 @@ $tvshows = @simplexml_load_file('http://services.tvrage.com/feeds/show_list.php'
 if ($tvshows !== false) {
 	foreach ($tvshows->show as $rage) {
 		if (isset($rage->id) && isset($rage->name) && !empty($rage->id) && !empty($rage->name))
-			$pdo->queryInsert(sprintf('INSERT INTO tvrage (rageID, releasetitle, country) VALUES (%s, %s, %s)', $pdo->escapeString($rage->id), $pdo->escapeString($rage->name), $pdo->escapeString($rage->country)));
+			$pdo->queryInsert(sprintf('INSERT INTO tvrage (rageid, releasetitle, country) VALUES (%s, %s, %s)', $pdo->escapeString($rage->id), $pdo->escapeString($rage->name), $pdo->escapeString($rage->country)));
 	}
 } else {
 	echo $pdo->log->error("TVRage site has a hard limit of 400 concurrent api requests. At the moment, they have reached that limit. Please wait before retrying again.");

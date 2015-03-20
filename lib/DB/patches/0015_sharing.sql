@@ -1,13 +1,13 @@
 DROP TABLE IF EXISTS sharing_sites;
 CREATE TABLE sharing_sites (
-	ID             INT(11) UNSIGNED   NOT NULL AUTO_INCREMENT,
+	id             INT(11) UNSIGNED   NOT NULL AUTO_INCREMENT,
 	site_name      VARCHAR(255)       NOT NULL DEFAULT '',
 	site_guid      VARCHAR(40)        NOT NULL DEFAULT '',
 	last_time      DATETIME           DEFAULT NULL,
 	first_time     DATETIME           DEFAULT NULL,
 	enabled        TINYINT(1)         NOT NULL DEFAULT '0',
 	comments       MEDIUMINT UNSIGNED NOT NULL DEFAULT '0',
-	PRIMARY KEY    (ID)
+	PRIMARY KEY    (id)
 ) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS sharing;
@@ -27,8 +27,8 @@ CREATE TABLE sharing (
 ) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ;
 
 ALTER TABLE releasecomment ADD COLUMN shared   TINYINT(1)  NOT NULL DEFAULT '1';
-ALTER TABLE releasecomment ADD COLUMN shareID  VARCHAR(40) NOT NULL DEFAULT '';
-ALTER TABLE releasecomment ADD COLUMN siteID   VARCHAR(40) NOT NULL DEFAULT '';
+ALTER TABLE releasecomment ADD COLUMN shareid  VARCHAR(40) NOT NULL DEFAULT '';
+ALTER TABLE releasecomment ADD COLUMN siteid   VARCHAR(40) NOT NULL DEFAULT '';
 ALTER TABLE releasecomment ADD COLUMN nzb_guid VARCHAR(32) NOT NULL DEFAULT '';
 
 UPDATE tmux SET value = '15' WHERE setting = 'sqlpatch';

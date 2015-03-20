@@ -7,13 +7,13 @@ require_once (NN_LIB . 'SphinxSearch.php');
 
 abstract class RequestID
 {
-	// Request ID.
+	// Request id.
 	const REQID_OLD    = -4; // We rechecked the web a second time and didn't find a title so don't process it again.
-	const REQID_NONE   = -3; // The Request ID was not found locally or via web lookup.
-	const REQID_ZERO   = -2; // The Request ID was 0.
-	const REQID_NOLL   = -1; // Request ID was not found via local lookup.
+	const REQID_NONE   = -3; // The Request id was not found locally or via web lookup.
+	const REQID_ZERO   = -2; // The Request id was 0.
+	const REQID_NOLL   = -1; // Request id was not found via local lookup.
 	const REQID_UPROC  =  0; // Release has not been processed.
-	const REQID_FOUND  =  1; // Request ID found and release was updated.
+	const REQID_FOUND  =  1; // Request id found and release was updated.
 
 	/**
 	 * @var Groups
@@ -44,11 +44,11 @@ abstract class RequestID
 	}
 
 	/**
-	 * Look up request ID's for releases.
+	 * Look up request id's for releases.
 	 *
 	 * @param array $options
 	 *
-	 * @return int Quantity of releases matched to a request ID.
+	 * @return int Quantity of releases matched to a request id.
 	 */
 	public function lookupRequestIDs(array $options = array())
 	{
@@ -89,19 +89,19 @@ abstract class RequestID
 	}
 
 	/**
-	 * Fetch releases with requestID's from MySQL.
+	 * Fetch releases with requestid's from MySQL.
 	 */
 	protected function _getReleases() { }
 
 	/**
-	 * Process releases for requestID's.
+	 * Process releases for requestid's.
 	 *
 	 * @return int How many did we rename?
 	 */
 	protected function _processReleases() { }
 
 	/**
-	 * No request ID was found, update the release.
+	 * No request id was found, update the release.
 	 *
 	 * @param int $releaseID
 	 * @param int $status
@@ -114,14 +114,14 @@ abstract class RequestID
 
 		$this->pdo->queryExec(
 			sprintf('
-				UPDATE releases SET reqidstatus = %d WHERE ID = %d',
+				UPDATE releases SET reqidstatus = %d WHERE id = %d',
 				$status, $releaseID
 			)
 		);
 	}
 
 	/**
-	 * Get a new title / pre ID for a release.
+	 * Get a new title / pre id for a release.
 	 *
 	 * @return array|bool
 	 */
@@ -174,19 +174,19 @@ abstract class RequestID
 	protected $colorCLI;
 
 	/**
-	 * The found request ID for the release.
+	 * The found request id for the release.
 	 * @var int
 	 */
 	protected $_requestID = self::REQID_ZERO;
 
 	/**
-	 * The title found from a request ID lookup.
+	 * The title found from a request id lookup.
 	 * @var bool|string|array
 	 */
 	protected $_newTitle = false;
 
 	/**
-	 * Releases with potential Request ID's we can work on.
+	 * Releases with potential Request id's we can work on.
 	 * @var \PDOStatement|bool
 	 */
 	protected $_releases;

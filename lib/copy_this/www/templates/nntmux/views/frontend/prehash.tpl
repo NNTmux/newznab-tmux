@@ -216,15 +216,15 @@
 		{/if}
 	</td>
 	<td class="prehash" style="text-align:center;">
-		{if is_numeric({$result.requestID}) && {$result.requestID} != 0}
+		{if is_numeric({$result.requestid}) && {$result.requestid} != 0}
 			<a
 					class="requestid"
-					title="{$result.requestID}"
-					href="{$smarty.const.WWW_TOP}/search?searchadvr=&searchadvsubject={$result.requestID}
+					title="{$result.requestid}"
+					href="{$smarty.const.WWW_TOP}/search?searchadvr=&searchadvsubject={$result.requestid}
 						&searchadvposter=&searchadvdaysnew=&searchadvdaysold=&searchadvgroups=-1&searchadvcat=-1
 						&searchadvsizefrom=-1&searchadvsizeto=-1&searchadvhasnfo=0&searchadvhascomments=0&search_type=adv"
 					>
-				{$result.requestID}
+				{$result.requestid}
 			</a>
 		{else}
 			N/A

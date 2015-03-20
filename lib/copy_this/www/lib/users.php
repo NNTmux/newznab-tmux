@@ -688,7 +688,7 @@ class Users
 		$this->delUserCategoryExclusions($uid);
 		if (count($catids) > 0) {
 			foreach ($catids as $catid) {
-				$db->queryInsert(sprintf("insert into userexcat (userid, categoryID, createddate) values (%d, %d, now())", $uid, $catid));
+				$db->queryInsert(sprintf("insert into userexcat (userid, categoryid, createddate) values (%d, %d, now())", $uid, $catid));
 			}
 		}
 	}
@@ -697,9 +697,9 @@ class Users
 	{
 		$db = new DB();
 		$ret = array();
-		$data = $db->query(sprintf("select categoryID from roleexcat where role = %d", $role));
+		$data = $db->query(sprintf("select categoryid from roleexcat where role = %d", $role));
 		foreach ($data as $d)
-			$ret[] = $d["categoryID"];
+			$ret[] = $d["categoryid"];
 
 		return $ret;
 	}
@@ -710,7 +710,7 @@ class Users
 		$this->delRoleCategoryExclusions($role);
 		if (count($catids) > 0) {
 			foreach ($catids as $catid) {
-				$db->queryInsert(sprintf("insert into roleexcat (role, categoryID, createddate) values (%d, %d, now())", $role, $catid));
+				$db->queryInsert(sprintf("insert into roleexcat (role, categoryid, createddate) values (%d, %d, now())", $role, $catid));
 			}
 		}
 	}
@@ -741,9 +741,9 @@ class Users
 	{
 		$db = new DB();
 		$ret = array();
-		$data = $db->query(sprintf("select categoryID from userexcat where userid = %d union distinct select categoryID from roleexcat inner join users on users.role = roleexcat.role where users.id = %d", $uid, $uid));
+		$data = $db->query(sprintf("select categoryid from userexcat where userid = %d union distinct select categoryid from roleexcat inner join users on users.role = roleexcat.role where users.id = %d", $uid, $uid));
 		foreach ($data as $d)
-			$ret[] = $d["categoryID"];
+			$ret[] = $d["categoryid"];
 
 		return $ret;
 	}
@@ -751,7 +751,7 @@ class Users
 	public function delCategoryExclusion($uid, $catid)
 	{
 		$db = new DB();
-		$db->exec(sprintf("DELETE from userexcat where userid = %d and categoryID = %d", $uid, $catid));
+		$db->exec(sprintf("DELETE from userexcat where userid = %d and categoryid = %d", $uid, $catid));
 	}
 
 	public function sendInvite($sitetitle, $siteemail, $serverurl, $uid, $emailto)

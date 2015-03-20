@@ -280,9 +280,9 @@ class Binaries
 				sprintf('
 					UPDATE groups
 					SET first_record_postdate = %s
-					WHERE ID = %d',
+					WHERE id = %d',
 					$this->_pdo->from_unixtime($groupMySQL['first_record_postdate']),
-					$groupMySQL['ID']
+					$groupMySQL['id']
 				)
 			);
 		}
@@ -405,10 +405,10 @@ class Binaries
 							sprintf('
 								UPDATE groups
 								SET first_record = %s, first_record_postdate = %s
-								WHERE ID = %d',
+								WHERE id = %d',
 								$scanSummary['firstArticleNumber'],
 								$this->_pdo->from_unixtime($this->_pdo->escapeString($groupMySQL['first_record_postdate'])),
-								$groupMySQL['ID']
+								$groupMySQL['id']
 							)
 						);
 					}
@@ -423,10 +423,10 @@ class Binaries
 						sprintf('
 							UPDATE groups
 							SET last_record = %s, last_record_postdate = %s, last_updated = NOW()
-							WHERE ID = %d',
+							WHERE id = %d',
 							$this->_pdo->escapeString($scanSummary['lastArticleNumber']),
 							$this->_pdo->from_unixtime($scanSummary['lastArticleDate']),
-							$groupMySQL['ID']
+							$groupMySQL['id']
 						)
 					);
 				} else {
@@ -435,9 +435,9 @@ class Binaries
 						sprintf('
 							UPDATE groups
 							SET last_record = %s, last_updated = NOW()
-							WHERE ID = %d',
+							WHERE id = %d',
 							$this->_pdo->escapeString($last),
-							$groupMySQL['ID']
+							$groupMySQL['id']
 						)
 					);
 				}
@@ -486,7 +486,7 @@ class Binaries
 		$releaseRegex = new ReleaseRegex;
 		$n = $this->n;
 		// Check if MySQL tables exist, create if they do not, get their names at the same time.
-		$tableNames = $this->_groups->getCBPTableNames($this->_tablePerGroup, $groupArr['ID']);
+		$tableNames = $this->_groups->getCBPTableNames($this->_tablePerGroup, $groupArr['id']);
 		$partRepair = ($type === 'partrepair');
 		$returnArray = [];
 
@@ -505,9 +505,9 @@ class Binaries
 			if ($partRepair === true) {
 				$this->_pdo->queryExec(
 					sprintf(
-						'UPDATE %s SET attempts = attempts + 1 WHERE groupID = %d AND numberID %s',
+						'UPDATE %s SET attempts = attempts + 1 WHERE groupid = %d AND numberid %s',
 						$tableNames['prname'],
-						$groupArr['ID'],
+						$groupArr['id'],
 						($first == $last ? '= ' . $first : 'IN (' . implode(',', range($first, $last)) . ')')
 					)
 				);
@@ -647,7 +647,7 @@ class Binaries
 					case 'partrepair':
 					case 'update':
 					default:
-						$this->addMissingParts($rangenotreceived, $tableNames['prname'], $groupArr['ID']);
+						$this->addMissingParts($rangenotreceived, $tableNames['prname'], $groupArr['id']);
 						break;
 				}
 				echo "Server did not return " . count($rangenotreceived) . " article(s).$n";
@@ -665,7 +665,7 @@ class Binaries
 							$partIds = array();
 							foreach ($data['Parts'] as $partdata)
 								$partIds[] = $partdata['number'];
-							$db->queryExec(sprintf("DELETE FROM %s WHERE numberID IN (%s) AND groupID=%d", $tableNames['prname'], implode(',', $partIds), $groupArr['ID']));
+							$db->queryExec(sprintf("DELETE FROM %s WHERE numberid IN (%s) AND groupid=%d", $tableNames['prname'], implode(',', $partIds), $groupArr['id']));
 						}
 						continue;
 					}
@@ -673,8 +673,8 @@ class Binaries
 					if (isset($data['Parts']) && count($data['Parts']) > 0 && $subject != '') {
 						//Check for existing binary
 						$binaryID = 0;
-						$binaryHash = md5($subject . $data['From'] . $groupArr['ID']);
-						$res = $db->queryOneRow(sprintf("SELECT ID FROM %s WHERE binaryhash = %s", $tableNames['bname'], $db->escapeString($binaryHash)));
+						$binaryHash = md5($subject . $data['From'] . $groupArr['id']);
+						$res = $db->queryOneRow(sprintf("SELECT id FROM %s WHERE binaryhash = %s", $tableNames['bname'], $db->escapeString($binaryHash)));
 						if (!$res) {
 
 							//Apply Regexes
@@ -690,15 +690,15 @@ class Binaries
 							$sql = '';
 							if (!empty($regexMatches)) {
 								$relparts = explode("/", $regexMatches['parts']);
-								$sql = sprintf('INSERT INTO %s (name, fromname, date, xref, totalparts, groupID, procstat, categoryID, regexID, reqID, relpart, reltotalpart, binaryhash, relname, dateadded) VALUES (%s, %s, FROM_UNIXTIME(%s), %s, %s, %d, %d, %s, %d, %s, %d, %d, %s, %s, now())', $tableNames['bname'], $db->escapeString($subject), $db->escapeString(utf8_encode($data['From'])), $db->escapeString($data['Date']), $db->escapeString($data['Xref']), $db->escapeString($data['MaxParts']), $groupArr['ID'], Releases::PROCSTAT_TITLEMATCHED, $regexMatches['regcatid'], $regexMatches['regexID'], $db->escapeString($regexMatches['reqID']), $relparts[0], $relparts[1], $db->escapeString($binaryHash), $db->escapeString(str_replace('_', ' ', $regexMatches['name'])));
+								$sql = sprintf('INSERT INTO %s (name, fromname, date, xref, totalparts, groupid, procstat, categoryid, regexid, reqid, relpart, reltotalpart, binaryhash, relname, dateadded) VALUES (%s, %s, FROM_UNIXTIME(%s), %s, %s, %d, %d, %s, %d, %s, %d, %d, %s, %s, now())', $tableNames['bname'], $db->escapeString($subject), $db->escapeString(utf8_encode($data['From'])), $db->escapeString($data['Date']), $db->escapeString($data['Xref']), $db->escapeString($data['MaxParts']), $groupArr['id'], Releases::PROCSTAT_TITLEMATCHED, $regexMatches['regcatid'], $regexMatches['regexid'], $db->escapeString($regexMatches['reqid']), $relparts[0], $relparts[1], $db->escapeString($binaryHash), $db->escapeString(str_replace('_', ' ', $regexMatches['name'])));
 							} elseif ($this->onlyProcessRegexBinaries === false) {
-								$sql = sprintf('INSERT INTO %s (name, fromname, date, xref, totalparts, groupID, binaryhash, dateadded) VALUES (%s, %s, FROM_UNIXTIME(%s), %s, %s, %d, %s, now())', $tableNames['bname'], $db->escapeString($subject), $db->escapeString(utf8_encode($data['From'])), $db->escapeString($data['Date']), $db->escapeString($data['Xref']), $db->escapeString($data['MaxParts']), $groupArr['ID'], $db->escapeString($binaryHash));
+								$sql = sprintf('INSERT INTO %s (name, fromname, date, xref, totalparts, groupid, binaryhash, dateadded) VALUES (%s, %s, FROM_UNIXTIME(%s), %s, %s, %d, %s, now())', $tableNames['bname'], $db->escapeString($subject), $db->escapeString(utf8_encode($data['From'])), $db->escapeString($data['Date']), $db->escapeString($data['Xref']), $db->escapeString($data['MaxParts']), $groupArr['id'], $db->escapeString($binaryHash));
 							} //onlyProcessRegexBinaries is true, there was no regex match and we are doing part repair so delete them
 							elseif ($type == 'partrepair') {
 								$partIds = array();
 								foreach ($data['Parts'] as $partdata)
 									$partIds[] = $partdata['number'];
-								$db->queryExec(sprintf('DELETE FROM %s WHERE numberID IN (%s) AND groupID = %d', $tableNames['prname'], implode(',', $partIds), $groupArr['ID']));
+								$db->queryExec(sprintf('DELETE FROM %s WHERE numberid IN (%s) AND groupid = %d', $tableNames['prname'], implode(',', $partIds), $groupArr['id']));
 								continue;
 							}
 							if ($sql != '') {
@@ -707,7 +707,7 @@ class Binaries
 								//if ($count % 500 == 0) echo "$count bin adds...";
 							}
 						} else {
-							$binaryID = $res["ID"];
+							$binaryID = $res["id"];
 							$updatecount++;
 							//if ($updatecount % 500 == 0) echo "$updatecount bin updates...";
 						}
@@ -722,7 +722,7 @@ class Binaries
 								$partNumbers[] = $partdata['number'];
 							}
 
-							$partSql = ('INSERT INTO ' . $tableNames['pname'] . ' (binaryID, messageID, number, partnumber, size) VALUES '.implode(', ', $partParams));
+							$partSql = ('INSERT INTO ' . $tableNames['pname'] . ' (binaryid, messageid, number, partnumber, size) VALUES '.implode(', ', $partParams));
 							$pidata = $db->queryInsert($partSql);
 							if (!$pidata) {
 								$msgsnotinserted = array_merge($msgsnotinserted, $partNumbers);
@@ -735,7 +735,7 @@ class Binaries
 				//TODO: determine whether to add to missing articles if insert failed
 				if (sizeof($msgsnotinserted) > 0) {
 					echo 'WARNING: ' . count($msgsnotinserted) . ' Parts failed to insert' . $n;
-					$this->addMissingParts($msgsnotinserted, $tableNames['prname'], $groupArr['ID']);
+					$this->addMissingParts($msgsnotinserted, $tableNames['prname'], $groupArr['id']);
 				}
 				if (($count >= 500) || ($updatecount >= 500)) {
 					echo $n;
@@ -787,15 +787,15 @@ class Binaries
 	 */
 	public function partRepair($groupArr)
 	{
-		$tableNames = $this->_groups->getCBPTableNames($this->_tablePerGroup, $groupArr['ID']);
+		$tableNames = $this->_groups->getCBPTableNames($this->_tablePerGroup, $groupArr['id']);
 		// Get all parts in partrepair table.
 		$missingParts = $this->_pdo->query(
 			sprintf('
 				SELECT * FROM %s
-				WHERE groupID = %d AND attempts < %d
-				ORDER BY numberID ASC LIMIT %d',
+				WHERE groupid = %d AND attempts < %d
+				ORDER BY numberid ASC LIMIT %d',
 				$tableNames['prname'],
-				$groupArr['ID'],
+				$groupArr['id'],
 				$this->_partRepairMaxTries,
 				$this->_partRepairLimit
 			)
@@ -815,10 +815,10 @@ class Binaries
 
 			// Loop through each part to group into continuous ranges with a maximum range of messagebuffer/4.
 			$ranges = $partList = [];
-			$firstPart = $lastNum = $missingParts[0]['numberID'];
+			$firstPart = $lastNum = $missingParts[0]['numberid'];
 
 			foreach ($missingParts as $part) {
-				if (($part['numberID'] - $firstPart) > ($this->messageBuffer / 4)) {
+				if (($part['numberid'] - $firstPart) > ($this->messageBuffer / 4)) {
 
 					$ranges[] = [
 						'partfrom' => $firstPart,
@@ -826,11 +826,11 @@ class Binaries
 						'partlist' => $partList
 					];
 
-					$firstPart = $part['numberID'];
+					$firstPart = $part['numberid'];
 					$partList = [];
 				}
-				$partList[] = $part['numberID'];
-				$lastNum = $part['numberID'];
+				$partList[] = $part['numberid'];
+				$lastNum = $part['numberid'];
 			}
 
 			$ranges[] = [
@@ -857,13 +857,13 @@ class Binaries
 			// Calculate parts repaired
 			$result = $this->_pdo->queryOneRow(
 				sprintf('
-					SELECT COUNT(ID) AS num
+					SELECT COUNT(id) AS num
 					FROM %s
-					WHERE groupID = %d
-					AND numberID <= %d',
+					WHERE groupid = %d
+					AND numberid <= %d',
 					$tableNames['prname'],
-					$groupArr['ID'],
-					$missingParts[$missingCount - 1]['numberID']
+					$groupArr['id'],
+					$missingParts[$missingCount - 1]['numberid']
 				)
 			);
 
@@ -873,16 +873,16 @@ class Binaries
 			}
 
 			// Update attempts on remaining parts for active group
-			if (isset($missingParts[$missingCount - 1]['ID'])) {
+			if (isset($missingParts[$missingCount - 1]['id'])) {
 				$this->_pdo->queryExec(
 					sprintf('
 						UPDATE %s
 						SET attempts = attempts + 1
-						WHERE groupID = %d
-						AND numberID <= %d',
+						WHERE groupid = %d
+						AND numberid <= %d',
 						$tableNames['prname'],
-						$groupArr['ID'],
-						$missingParts[$missingCount - 1]['numberID']
+						$groupArr['id'],
+						$missingParts[$missingCount - 1]['numberid']
 					)
 				);
 			}
@@ -901,10 +901,10 @@ class Binaries
 		// Remove articles that we cant fetch after x attempts.
 		$this->_pdo->queryExec(
 			sprintf(
-				'DELETE FROM %s WHERE attempts >= %d AND groupID = %d',
+				'DELETE FROM %s WHERE attempts >= %d AND groupid = %d',
 				$tableNames['prname'],
 				$this->_partRepairMaxTries,
-				$groupArr['ID']
+				$groupArr['id']
 			)
 		);
 	}
@@ -916,13 +916,13 @@ class Binaries
 	{
 		$db = new DB();
 		$added = false;
-		$insertStr = "INSERT INTO $tablename (numberID, groupID) VALUES ";
+		$insertStr = "INSERT INTO $tablename (numberid, groupid) VALUES ";
 		foreach ($numbers as $number) {
 			if ($number > 0) {
-				$checksql = sprintf("select numberID from $tablename where numberID = %u and groupID = %d", $number, $groupID);
+				$checksql = sprintf("select numberid from $tablename where numberid = %u and groupid = %d", $number, $groupID);
 				$chkrow = $db->queryOneRow($checksql);
 				if ($chkrow) {
-					$updsql = sprintf('update ' . $tablename . ' set attempts = attempts + 1 where numberID = %u and groupID = %d', $number, $groupID);
+					$updsql = sprintf('update ' . $tablename . ' set attempts = attempts + 1 where numberid = %u and groupid = %d', $number, $groupID);
 					$db->queryExec($updsql);
 				} else {
 					$added = true;
@@ -1040,16 +1040,16 @@ class Binaries
 
 		$exccatlist = "";
 		if (count($excludedcats) > 0)
-			$exccatlist = " and b.categoryID not in (" . implode(",", $excludedcats) . ") ";
+			$exccatlist = " and b.categoryid not in (" . implode(",", $excludedcats) . ") ";
 
 		$res = $db->query(sprintf("
 					SELECT b.*,
 					g.name AS group_name,
 					r.guid,
-					(SELECT COUNT(ID) FROM parts p where p.binaryID = b.ID) as 'binnum'
+					(SELECT COUNT(id) FROM parts p where p.binaryid = b.id) as 'binnum'
 					FROM binaries b
-					INNER JOIN groups g ON g.ID = b.groupID
-					LEFT OUTER JOIN releases r ON r.ID = b.releaseID
+					INNER JOIN groups g ON g.id = b.groupid
+					LEFT OUTER JOIN releases r ON r.id = b.releaseid
 					WHERE 1=1 %s %s order by DATE DESC LIMIT %d ",
 				$searchsql, $exccatlist, $limit
 			)
@@ -1065,7 +1065,7 @@ class Binaries
 	{
 		$db = new DB();
 
-		return $db->query(sprintf("select binaries.* from binaries where releaseID = %d order by relpart", $id));
+		return $db->query(sprintf("select binaries.* from binaries where releaseid = %d order by relpart", $id));
 	}
 
 	/**
@@ -1075,7 +1075,7 @@ class Binaries
 	{
 		$db = new DB();
 
-		return $db->queryOneRow(sprintf("select binaries.*, groups.name as groupname from binaries left outer join groups on binaries.groupID = groups.ID where binaries.ID = %d ", $id));
+		return $db->queryOneRow(sprintf("select binaries.*, groups.name as groupname from binaries left outer join groups on binaries.groupid = groups.id where binaries.id = %d ", $id));
 	}
 
 	/**
@@ -1089,8 +1089,8 @@ class Binaries
 		if ($activeonly)
 			$where = " where binaryblacklist.status = 1 ";
 
-		return $db->query("SELECT binaryblacklist.ID, binaryblacklist.optype, binaryblacklist.status, binaryblacklist.description, binaryblacklist.groupname AS groupname, binaryblacklist.regex,
-												groups.ID AS groupID, binaryblacklist.msgcol FROM binaryblacklist
+		return $db->query("SELECT binaryblacklist.id, binaryblacklist.optype, binaryblacklist.status, binaryblacklist.description, binaryblacklist.groupname AS groupname, binaryblacklist.regex,
+												groups.id AS groupid, binaryblacklist.msgcol FROM binaryblacklist
 												left outer JOIN groups ON groups.name = binaryblacklist.groupname
 												" . $where . "
 												ORDER BY coalesce(groupname,'zzz')"
@@ -1104,7 +1104,7 @@ class Binaries
 	{
 		$db = new DB();
 
-		return $db->queryOneRow(sprintf("select * from binaryblacklist where ID = %d ", $id));
+		return $db->queryOneRow(sprintf("select * from binaryblacklist where id = %d ", $id));
 	}
 
 	/**
@@ -1114,7 +1114,7 @@ class Binaries
 	{
 		$db = new DB();
 
-		return $db->queryExec(sprintf("DELETE from binaryblacklist where ID = %d", $id));
+		return $db->queryExec(sprintf("DELETE from binaryblacklist where id = %d", $id));
 	}
 
 	/**
@@ -1132,7 +1132,7 @@ class Binaries
 			$groupname = sprintf("%s", $db->escapeString($groupname));
 		}
 
-		$db->queryExec(sprintf("update binaryblacklist set groupname=%s, regex=%s, status=%d, description=%s, optype=%d, msgcol=%d where ID = %d ", $groupname, $db->escapeString($regex["regex"]), $regex["status"], $db->escapeString($regex["description"]), $regex["optype"], $regex["msgcol"], $regex["id"]));
+		$db->queryExec(sprintf("update binaryblacklist set groupname=%s, regex=%s, status=%d, description=%s, optype=%d, msgcol=%d where id = %d ", $groupname, $db->escapeString($regex["regex"]), $regex["status"], $db->escapeString($regex["description"]), $regex["optype"], $regex["msgcol"], $regex["id"]));
 	}
 
 	/**
@@ -1162,8 +1162,8 @@ class Binaries
 	public function delete($id)
 	{
 		$db = new DB();
-		$db->queryExec(sprintf("DELETE from parts where binaryID = %d", $id));
-		$db->queryExec(sprintf("DELETE from binaries where ID = %d", $id));
+		$db->queryExec(sprintf("DELETE from parts where binaryid = %d", $id));
+		$db->queryExec(sprintf("DELETE from binaries where id = %d", $id));
 	}
 
 	# http://php.net/manual/en/function.array-unique.php#97285
@@ -1315,8 +1315,8 @@ class Binaries
 					sprintf('
 						SELECT b.date AS date
 						FROM %s b, %s p
-						WHERE b.ID = p.binaryID
-						AND b.groupID = %s
+						WHERE b.id = p.binaryid
+						AND b.groupid = %s
 						AND p.number = %s LIMIT 1',
 						$group['bname'],
 						$group['pname'],
@@ -1409,9 +1409,9 @@ class Binaries
 	}
 
 	/**
-	 * Delete all Binaries/Parts for a group ID.
+	 * Delete all Binaries/Parts for a group id.
 	 *
-	 * @param int $groupID The ID of the group.
+	 * @param int $groupID The id of the group.
 	 *
 	 * @note A trigger automatically deletes the parts.
 	 *
@@ -1419,6 +1419,6 @@ class Binaries
 	 */
 	public function purgeGroup($groupID)
 	{
-		$this->_pdo->queryExec(sprintf('DELETE b FROM binaries b WHERE b.groupID = %d', $groupID));
+		$this->_pdo->queryExec(sprintf('DELETE b FROM binaries b WHERE b.groupid = %d', $groupID));
 	}
 }

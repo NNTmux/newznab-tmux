@@ -26,9 +26,9 @@ switch($action)
 			//
 			// reset the password, inform the user, send out the email
 			//
-			$users->updatePassResetGuid($ret["ID"], "");
+			$users->updatePassResetGuid($ret["id"], "");
 			$newpass = $users->generatePassword();
-			$users->updatePassword($ret["ID"], $newpass);
+			$users->updatePassword($ret["id"], $newpass);
 
 			$to = $ret["email"];
 			$subject = $page->site->title." Password Reset";
@@ -66,7 +66,7 @@ switch($action)
 				// Generate a forgottenpassword guid, store it in the user table
 				//
 				$guid = md5(uniqid());
-				$users->updatePassResetGuid($ret["ID"], $guid);
+				$users->updatePassResetGuid($ret["id"], $guid);
 
 				//
 				// Send the email

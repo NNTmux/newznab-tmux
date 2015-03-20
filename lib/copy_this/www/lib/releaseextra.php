@@ -42,23 +42,23 @@ class ReleaseExtra
 	{
 		$db = new DB();
 
-		return $db->query(sprintf("select * from releaseaudio where releaseID = %d order by audioID ASC", $id));
+		return $db->query(sprintf("select * from releaseaudio where releaseid = %d order by audioid ASC", $id));
 	}
 
 	public function getBriefByGuid($guid)
 	{
 		$db = new DB();
 
-		return $db->queryOneRow(sprintf("select containerformat,videocodec,videoduration,videoaspect, concat(releasevideo.videowidth,'x',releasevideo.videoheight,' @',format(videoframerate,0),'fps') as size, group_concat(distinct releaseaudio.audiolanguage SEPARATOR ', ') as audio, group_concat(distinct releaseaudio.audiobitrate SEPARATOR ', ') as audiobitrate, group_concat(distinct releaseaudio.audioformat SEPARATOR ', ') as audioformat, group_concat(distinct releaseaudio.audiomode SEPARATOR ', ') as audiomode,  group_concat(distinct releaseaudio.audiobitratemode SEPARATOR ', ') as audiobitratemode, group_concat(distinct releasesubs.subslanguage SEPARATOR ', ') as subs from releaseaudio left outer join releasesubs on releaseaudio.releaseID = releasesubs.releaseID left outer join releasevideo on releasevideo.releaseID = releaseaudio.releaseID inner join releases r on r.ID = releaseaudio.releaseID where r.guid = %s group by r.ID", $db->escapeString($guid)));
+		return $db->queryOneRow(sprintf("select containerformat,videocodec,videoduration,videoaspect, concat(releasevideo.videowidth,'x',releasevideo.videoheight,' @',format(videoframerate,0),'fps') as size, group_concat(distinct releaseaudio.audiolanguage SEPARATOR ', ') as audio, group_concat(distinct releaseaudio.audiobitrate SEPARATOR ', ') as audiobitrate, group_concat(distinct releaseaudio.audioformat SEPARATOR ', ') as audioformat, group_concat(distinct releaseaudio.audiomode SEPARATOR ', ') as audiomode,  group_concat(distinct releaseaudio.audiobitratemode SEPARATOR ', ') as audiobitratemode, group_concat(distinct releasesubs.subslanguage SEPARATOR ', ') as subs from releaseaudio left outer join releasesubs on releaseaudio.releaseid = releasesubs.releaseid left outer join releasevideo on releasevideo.releaseid = releaseaudio.releaseid inner join releases r on r.id = releaseaudio.releaseid where r.guid = %s group by r.id", $db->escapeString($guid)));
 	}
 
 	public function delete($id)
 	{
 		$db = new DB();
-		$db->queryExec(sprintf("DELETE from releaseaudio where releaseID = %d", $id));
-		$db->queryExec(sprintf("DELETE from releasesubs where releaseID = %d", $id));
-		$db->queryExec(sprintf("DELETE from releaseextrafull where releaseID = %d", $id));
-		$db->queryExec(sprintf("DELETE from releasevideo where releaseID = %d", $id));
+		$db->queryExec(sprintf("DELETE from releaseaudio where releaseid = %d", $id));
+		$db->queryExec(sprintf("DELETE from releasesubs where releaseid = %d", $id));
+		$db->queryExec(sprintf("DELETE from releaseextrafull where releaseid = %d", $id));
+		$db->queryExec(sprintf("DELETE from releasevideo where releaseid = %d", $id));
 	}
 
 	/**
@@ -177,7 +177,7 @@ class ReleaseExtra
 			$videoframerate = 0.0;
 
 		$sql = sprintf("insert into releasevideo
-						(releaseID, containerformat, overallbitrate, videoduration,
+						(releaseid, containerformat, overallbitrate, videoduration,
 						videoformat, videocodec, videowidth, videoheight,
 						videoaspect, videoframerate, 	videolibrary, definition)
 						values ( %d, %s, %s, %s, %s, %s, %d, %d, %s, %s, %s, %d )",
@@ -193,7 +193,7 @@ class ReleaseExtra
 	{
 		$db = new DB();
 
-		return $db->queryOneRow(sprintf("select * from releasevideo where releaseID = %d", $id));
+		return $db->queryOneRow(sprintf("select * from releasevideo where releaseid = %d", $id));
 	}
 
 	/**
@@ -246,7 +246,7 @@ class ReleaseExtra
 			return -1;
 
 		$sql = sprintf("insert into releaseaudio
-						(releaseID,	audioID,audioformat,audiomode, audiobitratemode, audiobitrate,
+						(releaseid,	audioid,audioformat,audiomode, audiobitratemode, audiobitrate,
 						audiochannels,audiosamplerate,audiolibrary,audiolanguage,audiotitle)
 						values ( %d, %d, %s, %s, %s, %s, %s, %s, %s, %s, %s )",
 			$releaseID, $audioID, $db->escapeString($audioformat), $db->escapeString($audiomode), $db->escapeString($audiobitratemode),
@@ -261,7 +261,7 @@ class ReleaseExtra
 	{
 		$db = new DB();
 
-		return $db->queryOneRow(sprintf("select * from releaseaudio where releaseID = %d and audioID = %d", $rid, $aid));
+		return $db->queryOneRow(sprintf("select * from releaseaudio where releaseid = %d and audioid = %d", $rid, $aid));
 	}
 
 	public function addSubs($releaseID, $subsID, $subslanguage)
@@ -271,7 +271,7 @@ class ReleaseExtra
 		if ($row)
 			return -1;
 
-		$sql = sprintf("insert into releasesubs (releaseID,	subsID, subslanguage) values ( %d, %d, %s)", $releaseID, $subsID, $db->escapeString($subslanguage));
+		$sql = sprintf("insert into releasesubs (releaseid,	subsID, subslanguage) values ( %d, %d, %s)", $releaseID, $subsID, $db->escapeString($subslanguage));
 
 		return $db->queryInsert($sql);
 	}
@@ -280,14 +280,14 @@ class ReleaseExtra
 	{
 		$db = new DB();
 
-		return $db->queryOneRow(sprintf("SELECT group_concat(subslanguage SEPARATOR ', ') as subs FROM `releasesubs` WHERE `releaseID` = %d ORDER BY `subsID` ASC", $id));
+		return $db->queryOneRow(sprintf("SELECT group_concat(subslanguage SEPARATOR ', ') as subs FROM `releasesubs` WHERE `releaseid` = %d ORDER BY `subsID` ASC", $id));
 	}
 
 	public function deleteFull($id)
 	{
 		$db = new DB();
 
-		return $db->queryExec(sprintf("DELETE from releaseextrafull where releaseID = %d", $id));
+		return $db->queryExec(sprintf("DELETE from releaseextrafull where releaseid = %d", $id));
 	}
 
 	public function addFull($id, $xml)
@@ -297,13 +297,13 @@ class ReleaseExtra
 		if ($row)
 			return -1;
 
-		return $db->queryInsert(sprintf("insert into releaseextrafull (releaseID, mediainfo) values (%d, %s)", $id, $db->escapeString($xml)));
+		return $db->queryInsert(sprintf("insert into releaseextrafull (releaseid, mediainfo) values (%d, %s)", $id, $db->escapeString($xml)));
 	}
 
 	public function getFull($id)
 	{
 		$db = new DB();
 
-		return $db->queryOneRow(sprintf("select * from releaseextrafull where releaseID = %d", $id));
+		return $db->queryOneRow(sprintf("select * from releaseextrafull where releaseid = %d", $id));
 	}
 }

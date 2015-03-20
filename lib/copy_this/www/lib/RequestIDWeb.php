@@ -4,17 +4,17 @@ require_once (NN_LIB . 'util.php');
 require_once (NN_LIB . 'RequestID.php');
 
 /**
- * Attempts to find a PRE name for a release using a request ID from our local pre database,
+ * Attempts to find a PRE name for a release using a request id from our local pre database,
  * or internet request id database.
  *
  * Class RequestIDWeb
  */
 class RequestIDWeb extends RequestID
 {
-	const MAX_WEB_LOOKUPS = 100; // Please don't exceed this, not to be to harsh on the Request ID server.
+	const MAX_WEB_LOOKUPS = 100; // Please don't exceed this, not to be to harsh on the Request id server.
 
 	/**
-	 * The ID of the PRE entry the found request ID belongs to.
+	 * The id of the PRE entry the found request id belongs to.
 	 * @var bool|int
 	 */
 	protected $_preDbID = false;
@@ -38,17 +38,17 @@ class RequestIDWeb extends RequestID
 	}
 
 	/**
-	 * Get all results from the releases table that have request ID's to be processed.
+	 * Get all results from the releases table that have request id's to be processed.
 	 */
 	protected function _getReleases()
 	{
 		$this->_releases = $this->pdo->queryDirect(
 			sprintf ('
-				SELECT r.ID, r.name, r.searchname, g.name AS groupname, r.groupID, r.categoryID
+				SELECT r.id, r.name, r.searchname, g.name AS groupname, r.groupid, r.categoryid
 				FROM releases r
-				INNER JOIN groups g ON r.groupID = g.ID
+				INNER JOIN groups g ON r.groupid = g.id
 				WHERE r.nzbstatus = 1
-				AND r.prehashID = 0
+				AND r.prehashid = 0
 				AND r.isrequestID = 1
 				AND (
 					r.reqidstatus = %d
@@ -60,7 +60,7 @@ class RequestIDWeb extends RequestID
 				self::REQID_NOLL,
 				self::REQID_NONE,
 				$this->_request_hours,
-				(empty($this->_groupID) ? '' : ('AND r.groupID = ' . $this->_groupID)),
+				(empty($this->_groupID) ? '' : ('AND r.groupid = ' . $this->_groupID)),
 				$this->_getReqIdGroups(),
 				($this->_maxTime === '' ? '' : sprintf(' AND r.adddate > NOW() - INTERVAL %d HOUR', $this->_maxTime)),
 				$this->_limit
@@ -69,8 +69,8 @@ class RequestIDWeb extends RequestID
 	}
 
 	/**
-	 * Create "AND" part of query for request ID groups.
-	 * Less load on the request ID web server, by limiting results.
+	 * Create "AND" part of query for request id groups.
+	 * Less load on the request id web server, by limiting results.
 	 *
 	 * @return string
 	 */
@@ -102,7 +102,7 @@ class RequestIDWeb extends RequestID
 	}
 
 	/**
-	 * Process releases for requestID's.
+	 * Process releases for requestid's.
 	 *
 	 * @return int How many did we rename?
 	 */
@@ -116,12 +116,12 @@ class RequestIDWeb extends RequestID
 			foreach($this->_releases as $release) {
 
 				$this->_release['name'] = $release['name'];
-				// Try to find a request ID for the release.
+				// Try to find a request id for the release.
 				$requestId = $this->_siftReqId();
 
 				// If there's none, update the release and continue.
 				if ($requestId === self::REQID_ZERO) {
-					$this->_requestIdNotFound($release['ID'], self::REQID_NONE);
+					$this->_requestIdNotFound($release['id'], self::REQID_NONE);
 					if ($this->echoOutput) {
 						echo '-';
 					}
@@ -133,10 +133,10 @@ class RequestIDWeb extends RequestID
 					$release['groupname'] = 'alt.binaries.teevee';
 				}
 
-				// Send the release ID so we can track the return data.
-				$requestArray[$release['ID']] = array(
+				// Send the release id so we can track the return data.
+				$requestArray[$release['id']] = array(
 					'reqid' => $requestId,
-					'ident' => $release['ID'],
+					'ident' => $release['id'],
 					'group' => $release['groupname'],
 					'sname' => $release['searchname']
 				);
@@ -174,24 +174,24 @@ class RequestIDWeb extends RequestID
 					if (isset($result['name']) && isset($result['ident']) && (int)$result['ident'] > 0) {
 						$this->_newTitle['title'] = (string)$result['name'];
 						$this->_requestID = (int)$result['reqid'];
-						$this->_release['ID'] = (int)$result['ident'];
+						$this->_release['id'] = (int)$result['ident'];
 
-						// Buffer groupID queries.
+						// Buffer groupid queries.
 						$this->_release['groupname'] = $requestArray[(int)$result['ident']]['group'];
 						if (isset($groupIDarray[$this->_release['groupname']])) {
-							$this->_release['groupID'] = $groupIDArray[$this->_release['groupname']];
+							$this->_release['groupid'] = $groupIDArray[$this->_release['groupname']];
 						} else {
-							$this->_release['groupID'] = $this->groups->getIDByName($this->_release['groupname']);
-							$groupIDArray[$this->_release['groupname']] = $this->_release['groupID'];
+							$this->_release['groupid'] = $this->groups->getIDByName($this->_release['groupname']);
+							$groupIDArray[$this->_release['groupname']] = $this->_release['groupid'];
 						}
-						$this->_release['gid'] = $this->_release['groupID'];
+						$this->_release['gid'] = $this->_release['groupid'];
 
 						$this->_release['searchname'] = $requestArray[(int)$result['ident']]['sname'];
 						$this->_insertIntoPreDB();
 						if ($this->_preDbID === false) {
 							$this->_preDbID = 0;
 						}
-						$this->_newTitle['ID'] = $this->_preDbID;
+						$this->_newTitle['id'] = $this->_preDbID;
 						$this->_updateRelease();
 						$renamed++;
 						if ($this->echoOutput) {
@@ -215,7 +215,7 @@ class RequestIDWeb extends RequestID
 
 					$addDate = $this->pdo->queryOneRow(
 						sprintf(
-							'SELECT UNIX_TIMESTAMP(adddate) AS adddate FROM releases WHERE ID = %d', $request['ident']
+							'SELECT UNIX_TIMESTAMP(adddate) AS adddate FROM releases WHERE id = %d', $request['ident']
 						)
 					);
 
@@ -242,13 +242,13 @@ class RequestIDWeb extends RequestID
 	}
 
 	/**
-	 * If we found a request ID on the internet, check if our PRE database has it, insert it if not.
+	 * If we found a request id on the internet, check if our PRE database has it, insert it if not.
 	 */
 	protected function _insertIntoPreDB()
 	{
 		$dupeCheck = $this->pdo->queryOneRow(
 			sprintf('
-				SELECT ID AS prehashID, requestID, groupID
+				SELECT id AS prehashid, requestid, groupid
 				FROM prehash
 				WHERE title = %s',
 				$this->pdo->escapeString($this->_newTitle['title'])
@@ -258,23 +258,23 @@ class RequestIDWeb extends RequestID
 		if ($dupeCheck === false) {
 			$this->_preDbID = (int)$this->pdo->queryInsert(
 				sprintf("
-					INSERT INTO prehash (title, source, requestID, groupID, predate)
+					INSERT INTO prehash (title, source, requestid, groupid, predate)
 					VALUES (%s, %s, %d, %d, NOW())",
 					$this->pdo->escapeString($this->_newTitle['title']),
 					$this->pdo->escapeString('requestWEB'),
 					$this->_requestID,
-					$this->_release['groupID']
+					$this->_release['groupid']
 				)
 			);
 		} else {
-			$this->_preDbID = $dupeCheck['prehashID'];
+			$this->_preDbID = $dupeCheck['prehashid'];
 			$this->pdo->queryExec(
 				sprintf('
 					UPDATE prehash
-					SET requestID = %d, groupID = %d
-					WHERE ID = %d',
+					SET requestid = %d, groupid = %d
+					WHERE id = %d',
 					$this->_requestID,
-					$this->_release['groupID'],
+					$this->_release['groupid'],
 					$this->_preDbID
 				)
 			);
@@ -286,24 +286,24 @@ class RequestIDWeb extends RequestID
 	 */
 	protected function _updateRelease()
 	{
-		$determinedCategory = $this->category->determineCategory($this->_release['groupID'], $this->_newTitle['title']);
+		$determinedCategory = $this->category->determineCategory($this->_release['groupid'], $this->_newTitle['title']);
 		$newTitle = $this->pdo->escapeString($this->_newTitle['title']);
 		$this->pdo->queryExec(
 			sprintf('
 				UPDATE releases
-				SET rageID = -1, seriesfull = NULL, season = NULL, episode = NULL, tvtitle = NULL,
-				tvairdate = NULL, imdbID = NULL, musicinfoID = NULL, consoleinfoID = NULL, bookinfoID = NULL, anidbid = NULL,
-				reqidstatus = %d, isrenamed = 1, proc_files = 1, searchname = %s, categoryID = %d,
-				prehashID = %d
-				WHERE ID = %d',
+				SET rageid = -1, seriesfull = NULL, season = NULL, episode = NULL, tvtitle = NULL,
+				tvairdate = NULL, imdbid = NULL, musicinfoid = NULL, consoleinfoid = NULL, bookinfoid = NULL, anidbid = NULL,
+				reqidstatus = %d, isrenamed = 1, proc_files = 1, searchname = %s, categoryid = %d,
+				prehashid = %d
+				WHERE id = %d',
 				self::REQID_FOUND,
 				$newTitle,
 				$determinedCategory,
 				$this->_preDbID,
-				$this->_release['ID']
+				$this->_release['id']
 			)
 		);
-		$this->sphinx->updateReleaseSearchName($this->_release['ID'], $newTitle);
+		$this->sphinx->updateReleaseSearchName($this->_release['id'], $newTitle);
 
 		if ($this->echoOutput) {
 			\NameFixer::echoChangedReleaseName(array(
@@ -312,7 +312,7 @@ class RequestIDWeb extends RequestID
 					'new_category' => $this->category->getNameByID($determinedCategory),
 					'old_category' => '',
 					'group' => $this->_release['groupname'],
-					'release_id' => $this->_release['ID'],
+					'release_id' => $this->_release['id'],
 					'method' => 'RequestID->updateRelease<web>'
 				)
 			);

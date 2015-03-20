@@ -1,4 +1,4 @@
-<h1>{$page->title}</h1> 
+<h1>{$page->title}</h1>
 
 {if $tvragelist}
 
@@ -24,13 +24,13 @@
 		<th class="mid" style="width:80px;">date</th>
 		<th class="mid">options</th>
 	</tr>
-	
+
 	{foreach from=$tvragelist item=tvrage}
 	<tr class="{cycle values=",alt"}">
-		<td class="less"><a href="http://www.tvrage.com/shows/id-{$tvrage.rageID}" title="View in TvRage">{$tvrage.rageID}</a></td>
-		<td><a title="Edit" href="{$smarty.const.WWW_TOP}/rage-edit.php?id={$tvrage.ID}">{$tvrage.releasetitle|escape:"htmlall"}</a></td>
+		<td class="less"><a href="http://www.tvrage.com/shows/id-{$tvrage.rageid}" title="View in TvRage">{$tvrage.rageid}</a></td>
+		<td><a title="Edit" href="{$smarty.const.WWW_TOP}/rage-edit.php?id={$tvrage.id}">{$tvrage.releasetitle|escape:"htmlall"}</a></td>
 		<td class="mid less">{$tvrage.createddate|date_format}</td>
-		<td class="mid"><a title="delete this rage entry" href="{$smarty.const.WWW_TOP}/rage-delete.php?id={$tvrage.ID}">delete</a> | <a title="remove this rageid from all releases" href="{$smarty.const.WWW_TOP}/rage-remove.php?id={$tvrage.rageID}">remove</a></td>
+		<td class="mid"><a title="delete this rage entry" href="{$smarty.const.WWW_TOP}/rage-delete.php?id={$tvrage.id}">delete</a> | <a title="remove this rageid from all releases" href="{$smarty.const.WWW_TOP}/rage-remove.php?id={$tvrage.rageid}">remove</a></td>
 	</tr>
 	{/foreach}
 

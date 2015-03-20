@@ -162,7 +162,7 @@ class ReleaseRemover
 		$this->timeStart = TIME();
 
 		// Start forming the query.
-		$this->query = 'SELECT ID, guid, searchname FROM releases WHERE 1=1';
+		$this->query = 'SELECT id, guid, searchname FROM releases WHERE 1=1';
 
 		// Keep forming the query based on the user's criteria, return if any errors.
 		foreach ($arguments as $arg) {
@@ -226,7 +226,7 @@ class ReleaseRemover
 		$this->blacklistID = '';
 
 		if (isset($blacklistID) && is_numeric($blacklistID)) {
-			$this->blacklistID = sprintf("AND ID = %d", $blacklistID);
+			$this->blacklistID = sprintf("AND id = %d", $blacklistID);
 		}
 
 		$time = trim($time);
@@ -345,12 +345,12 @@ class ReleaseRemover
 	{
 		$this->method = 'Gibberish';
 		$this->query = sprintf(
-			"SELECT r.guid, r.searchname, r.ID
+			"SELECT r.guid, r.searchname, r.id
 			FROM releases r
 			WHERE r.nfostatus = 0
 			AND r.iscategorized = 1
 			AND r.rarinnerfilecount = 0
-			AND r.categoryID NOT IN (%d)
+			AND r.categoryid NOT IN (%d)
 			AND r.searchname REGEXP '^[a-zA-Z0-9]{15,}$'
 			%s",
 			\Category::CAT_MISC_HASHED,
@@ -373,12 +373,12 @@ class ReleaseRemover
 	{
 		$this->method = 'Hashed';
 		$this->query = sprintf(
-			"SELECT r.guid, r.searchname, r.ID
+			"SELECT r.guid, r.searchname, r.id
 			FROM releases r
 			WHERE r.nfostatus = 0
 			AND r.iscategorized = 1
 			AND r.rarinnerfilecount = 0
-			AND r.categoryID NOT IN (%d, %d)
+			AND r.categoryid NOT IN (%d, %d)
 			AND r.searchname REGEXP '[a-zA-Z0-9]{25,}'
 			%s",
 			\Category::CAT_MISC_OTHER, \Category::CAT_MISC_HASHED, $this->crapTime
@@ -400,12 +400,12 @@ class ReleaseRemover
 	{
 		$this->method = 'Short';
 		$this->query = sprintf(
-			"SELECT r.guid, r.searchname, r.ID
+			"SELECT r.guid, r.searchname, r.id
 			FROM releases r
 			WHERE r.nfostatus = 0
 			AND r.iscategorized = 1
 			AND r.rarinnerfilecount = 0
-			AND r.categoryID NOT IN (%d)
+			AND r.categoryid NOT IN (%d)
 			AND r.searchname REGEXP '^[a-zA-Z0-9]{0,5}$'
 			%s",
 			\Category::CAT_MISC_OTHER, $this->crapTime
@@ -427,12 +427,12 @@ class ReleaseRemover
 	{
 		$this->method = 'Executable';
 		$this->query = sprintf(
-			"SELECT r.guid, r.searchname, r.ID
+			"SELECT r.guid, r.searchname, r.id
 			FROM releases r
-			INNER JOIN releasefiles rf ON rf.releaseID = r.ID
+			INNER JOIN releasefiles rf ON rf.releaseid = r.id
 			WHERE r.searchname NOT LIKE %s
 			AND rf.name LIKE %s
-			AND r.categoryID NOT IN (%d, %d, %d, %d, %d, %d) %s",
+			AND r.categoryid NOT IN (%d, %d, %d, %d, %d, %d) %s",
 			"'%.exes%'",
 			"'%.exe%'",
 			\Category::CAT_PC_0DAY,
@@ -460,9 +460,9 @@ class ReleaseRemover
 	{
 		$this->method = 'Install.bin';
 		$this->query = sprintf(
-			"SELECT r.guid, r.searchname, r.ID
+			"SELECT r.guid, r.searchname, r.id
 			FROM releases r
-			INNER JOIN releasefiles rf ON rf.releaseID = r.ID
+			INNER JOIN releasefiles rf ON rf.releaseid = r.id
 			WHERE rf.name LIKE %s %s",
 			"'%install.bin%'",
 			$this->crapTime
@@ -484,9 +484,9 @@ class ReleaseRemover
 	{
 		$this->method = 'Password.url';
 		$this->query = sprintf(
-			"SELECT r.guid, r.searchname, r.ID
+			"SELECT r.guid, r.searchname, r.id
 			FROM releases r
-			INNER JOIN releasefiles rf ON rf.releaseID = r.ID
+			INNER JOIN releasefiles rf ON rf.releaseid = r.id
 			WHERE rf.name LIKE %s %s",
 			"'%password.url%'",
 			$this->crapTime
@@ -508,7 +508,7 @@ class ReleaseRemover
 	{
 		$this->method = 'Passworded';
 		$this->query = sprintf(
-			"SELECT r.guid, r.searchname, r.ID
+			"SELECT r.guid, r.searchname, r.id
 			FROM releases r
 			WHERE r.searchname LIKE %s
 			AND r.searchname NOT LIKE %s
@@ -518,7 +518,7 @@ class ReleaseRemover
 			AND r.searchname NOT LIKE %s
 			AND r.searchname NOT LIKE %s
 			AND r.nzbstatus = 1
-			AND r.categoryID NOT IN (%d, %d, %d, %d, %d, %d, %d, %d, %d) %s",
+			AND r.categoryid NOT IN (%d, %d, %d, %d, %d, %d, %d, %d, %d) %s",
 			// Matches passwort / passworded / etc also.
 			"'%passwor%'",
 			"'%advanced%'",
@@ -555,11 +555,11 @@ class ReleaseRemover
 	{
 		$this->method = 'Size';
 		$this->query = sprintf(
-			"SELECT r.guid, r.searchname, r.ID
+			"SELECT r.guid, r.searchname, r.id
 			FROM releases r
 			WHERE r.totalpart = 1
 			AND r.size < 2097152
-			AND r.categoryID NOT IN (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) %s",
+			AND r.categoryid NOT IN (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) %s",
 			\Category::CAT_MUSIC_MP3,
 			\Category::CAT_BOOK_COMICS,
 			\Category::CAT_BOOK_EBOOK,
@@ -590,7 +590,7 @@ class ReleaseRemover
 	{
 		$this->method = 'Huge';
 		$this->query = sprintf(
-			"SELECT r.guid, r.searchname, r.ID
+			"SELECT r.guid, r.searchname, r.id
 			FROM releases r
 			WHERE r.totalpart = 1
 			AND r.size > 209715200 %s",
@@ -613,12 +613,12 @@ class ReleaseRemover
 	{
 		$this->method = 'Sample';
 		$this->query = sprintf(
-			"SELECT r.guid, r.searchname, r.ID
+			"SELECT r.guid, r.searchname, r.id
 			FROM releases r
 			WHERE r.totalpart > 1
 			AND r.size < 40000000
 			AND r.name LIKE %s
-			AND r.categoryID IN (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) %s",
+			AND r.categoryid IN (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) %s",
 			"'%sample%'",
 			\Category::CAT_TV_ANIME,
 			\Category::CAT_TV_DOCU,
@@ -654,9 +654,9 @@ class ReleaseRemover
 	{
 		$this->method = '.scr';
 		$this->query = sprintf(
-			"SELECT r.guid, r.searchname, r.ID
+			"SELECT r.guid, r.searchname, r.id
 			FROM releases r
-			LEFT JOIN releasefiles rf on rf.releaseID = r.ID
+			LEFT JOIN releasefiles rf on rf.releaseid = r.id
 			WHERE (rf.name REGEXP '[.]scr[$ \"]' OR r.name REGEXP '[.]scr[$ \"]')
 			%s",
 			$this->crapTime
@@ -684,7 +684,7 @@ class ReleaseRemover
 
 		$regexList = $this->pdo->query(
 			sprintf(
-				'SELECT regex, ID, groupname, msgcol
+				'SELECT regex, id, groupname, msgcol
 				FROM binaryblacklist
 				WHERE optype = %d %s %s',
 				\Binaries::OPT_BLACKLIST,
@@ -795,12 +795,12 @@ class ReleaseRemover
 					continue;
 				}
 
-				// Get the group ID if the regex is set to work against a group.
+				// Get the group id if the regex is set to work against a group.
 				$groupID = '';
 				if (strtolower($regex['groupname']) !== 'alt.binaries.*') {
 
 					$groupIDs = $this->pdo->query(
-						'SELECT ID FROM groups WHERE name REGEXP ' .
+						'SELECT id FROM groups WHERE name REGEXP ' .
 						$this->pdo->escapeString($regex['groupname'])
 					);
 
@@ -808,18 +808,18 @@ class ReleaseRemover
 					if ($groupIDCount === 0) {
 						continue;
 					} elseif ($groupIDCount === 1) {
-						$groupIDs = $groupIDs[0]['ID'];
+						$groupIDs = $groupIDs[0]['id'];
 					} else {
 						$string = '';
 						foreach ($groupIDs as $ID) {
-							$string .= $ID['ID'] . ',';
+							$string .= $ID['id'] . ',';
 						}
 						$groupIDs = (substr($string, 0, -1));
 					}
 
-					$groupID = ' AND r.groupID in (' . $groupIDs . ') ';
+					$groupID = ' AND r.groupid in (' . $groupIDs . ') ';
 				}
-				$this->method = 'Blacklist [' . $regex['ID'] . ']';
+				$this->method = 'Blacklist [' . $regex['id'] . ']';
 
 				// Check if using FT Match and declare for echo
 				if ($ftMatch !== '' && $opTypeName == "Subject") {
@@ -837,13 +837,13 @@ class ReleaseRemover
 				);
 
 				if ($opTypeName == 'Subject') {
-					$join = (NN_RELEASE_SEARCH_TYPE == \ReleaseSearch::SPHINX ? 'INNER JOIN releases_se rse ON rse.id = r.ID' : 'INNER JOIN releasesearch rs ON rs.releaseid = r.ID');
+					$join = (NN_RELEASE_SEARCH_TYPE == \ReleaseSearch::SPHINX ? 'INNER JOIN releases_se rse ON rse.id = r.id' : 'INNER JOIN releasesearch rs ON rs.releaseid = r.id');
 				} else {
 					$join = '';
 				}
 
 				$this->query = sprintf("
-							SELECT r.guid, r.searchname, r.ID
+							SELECT r.guid, r.searchname, r.id
 							FROM releases r %s %s %s %s",
 					$join,
 					$regexSQL,
@@ -858,7 +858,7 @@ class ReleaseRemover
 
 			}
 		} else {
-			echo $this->pdo->log->error("No regular expressions were selected for blacklist removal. Make sure you have activated REGEXPs in Site Edit and you're specifying a valid ID.\n");
+			echo $this->pdo->log->error("No regular expressions were selected for blacklist removal. Make sure you have activated REGEXPs in Site Edit and you're specifying a valid id.\n");
 		}
 
 		return true;
@@ -873,7 +873,7 @@ class ReleaseRemover
 	{
 		$allRegex = $this->pdo->query(
 			sprintf(
-				'SELECT regex, ID, groupname
+				'SELECT regex, id, groupname
 				FROM binaryblacklist
 				WHERE status = %d
 				AND optype = %d
@@ -888,7 +888,7 @@ class ReleaseRemover
 
 			foreach ($allRegex as $regex) {
 
-				$regexSQL = sprintf("LEFT JOIN releasefiles rf ON r.ID = rf.releaseID
+				$regexSQL = sprintf("LEFT JOIN releasefiles rf ON r.id = rf.releaseid
 				WHERE rf.name REGEXP %s ", $this->pdo->escapeString($regex['regex'])
 				);
 
@@ -896,32 +896,32 @@ class ReleaseRemover
 					continue;
 				}
 
-				// Get the group ID if the regex is set to work against a group.
+				// Get the group id if the regex is set to work against a group.
 				$groupID = '';
 				if (strtolower($regex['groupname']) !== 'alt.binaries.*') {
 					$groupIDs = $this->pdo->query(
-						'SELECT ID FROM groups WHERE name REGEXP ' .
+						'SELECT id FROM groups WHERE name REGEXP ' .
 						$this->pdo->escapeString($regex['groupname'])
 					);
 					$groupIDCount = count($groupIDs);
 					if ($groupIDCount === 0) {
 						continue;
 					} elseif ($groupIDCount === 1) {
-						$groupIDs = $groupIDs[0]['ID'];
+						$groupIDs = $groupIDs[0]['id'];
 					} else {
 						$string = '';
 						foreach ($groupIDs as $fID) {
-							$string .= $fID['ID'] . ',';
+							$string .= $fID['id'] . ',';
 						}
 						$groupIDs = (substr($string, 0, -1));
 					}
 
-					$groupID = ' AND r.groupID in (' . $groupIDs . ') ';
+					$groupID = ' AND r.groupid in (' . $groupIDs . ') ';
 				}
 
-				$this->method = 'Blacklist ' . $regex['ID'];
+				$this->method = 'Blacklist ' . $regex['id'];
 				$this->query = sprintf(
-					"SELECT r.guid, r.searchname, r.ID
+					"SELECT r.guid, r.searchname, r.id
 					FROM releases r %s %s %s", $regexSQL, $groupID, $this->crapTime
 				);
 
@@ -954,7 +954,7 @@ class ReleaseRemover
 		$frenchv = '%Lisez moi si le film ne demarre pas.txt%';
 		$nl = '%lees me als de film niet spelen.txt%';
 		$german = '%Lesen Sie mir wenn der Film nicht abgespielt.txt%';
-		$categories = sprintf("r.categoryID IN (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) AND",
+		$categories = sprintf("r.categoryid IN (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) AND",
 			\Category::CAT_MOVIE_3D,
 			\Category::CAT_MOVIE_BLURAY,
 			\Category::CAT_MOVIE_DVD,
@@ -967,13 +967,13 @@ class ReleaseRemover
 			\Category::CAT_XXX_XVID,
 			\Category::CAT_XXX_OTHER
 		);
-		$codeclike = sprintf("UNION SELECT r.guid, r.searchname, r.ID FROM releases r
-			LEFT JOIN releasefiles rf ON r.ID = rf.releaseID
+		$codeclike = sprintf("UNION SELECT r.guid, r.searchname, r.id FROM releases r
+			LEFT JOIN releasefiles rf ON r.id = rf.releaseid
 			WHERE %s rf.name LIKE '%s' OR rf.name LIKE '%s' OR rf.name LIKE '%s' OR rf.name LIKE '%s' OR rf.name LIKE '%s' OR rf.name LIKE '%s'", $categories, $codec, $iferror, $ifnotplaying, $frenchv, $nl, $german
 		);
 		$this->query = sprintf(
-			"SELECT r.guid, r.searchname, r.ID FROM releases
-			r INNER JOIN releasefiles rf ON (rf.releaseID = r.ID)
+			"SELECT r.guid, r.searchname, r.id FROM releases
+			r INNER JOIN releasefiles rf ON (rf.releaseid = r.id)
 			WHERE %s %s OR %s %s %s %s", $categories, $regex, $regex2, $this->crapTime, $codeclike, $this->crapTime
 		);
 
@@ -992,7 +992,7 @@ class ReleaseRemover
 		$deletedCount = 0;
 		foreach ($this->result as $release) {
 			if ($this->delete) {
-				$this->releases->deleteSingle(['g' => $release['guid'], 'i' => $release['ID']], $this->nzb, $this->releaseImage);
+				$this->releases->deleteSingle(['g' => $release['guid'], 'i' => $release['id']], $this->nzb, $this->releaseImage);
 				if ($this->echoCLI) {
 					echo $this->pdo->log->primary('Deleting: ' . $this->method . ': ' . $release['searchname']);
 				}
@@ -1057,7 +1057,7 @@ class ReleaseRemover
 				case 'categoryid':
 					switch ($args[1]) {
 						case 'equals':
-							return ' AND categoryID = ' . $args[2];
+							return ' AND categoryid = ' . $args[2];
 						default:
 							break;
 					}
@@ -1066,10 +1066,10 @@ class ReleaseRemover
 					switch ($args[1]) {
 						case 'equals':
 							if ($args[2] === 'NULL') {
-								return ' AND imdbID IS NULL ';
+								return ' AND imdbid IS NULL ';
 							}
 							else {
-								return ' AND imdbID = ' . $args[2];
+								return ' AND imdbid = ' . $args[2];
 							}
 						default:
 							break;
@@ -1086,7 +1086,7 @@ class ReleaseRemover
 				case 'rageid':
 					switch ($args[1]) {
 						case 'equals':
-							return ' AND rageID = ' . $args[2];
+							return ' AND rageid = ' . $args[2];
 						default:
 							break;
 					}
@@ -1114,22 +1114,22 @@ class ReleaseRemover
 				case 'groupname':
 					switch ($args[1]) {
 						case 'equals':
-							$group = $this->pdo->queryOneRow('SELECT ID FROM groups WHERE name = ' . $this->pdo->escapeString($args[2]));
+							$group = $this->pdo->queryOneRow('SELECT id FROM groups WHERE name = ' . $this->pdo->escapeString($args[2]));
 							if ($group === false) {
 								$this->error = 'This group was not found in your database: ' . $args[2] . PHP_EOL;
 								break;
 							}
 
-							return ' AND groupID = ' . $group['ID'];
+							return ' AND groupid = ' . $group['id'];
 						case 'like':
-							$groups = $this->pdo->query('SELECT ID FROM groups WHERE name ' . $this->formatLike($args[2], 'name'));
+							$groups = $this->pdo->query('SELECT id FROM groups WHERE name ' . $this->formatLike($args[2], 'name'));
 							if (count($groups) === 0) {
 								$this->error = 'No groups were found with this pattern in your database: ' . $args[2] . PHP_EOL;
 								break;
 							}
-							$gQuery = ' AND groupID IN (';
+							$gQuery = ' AND groupid IN (';
 							foreach ($groups as $group) {
-								$gQuery .= $group['ID'] . ',';
+								$gQuery .= $group['id'] . ',';
 							}
 							$gQuery = substr($gQuery, 0, strlen($gQuery) - 1) . ')';
 

@@ -13,7 +13,7 @@ $gen = new Genres();
 $concats = $cat->getChildren(Category::CAT_PARENT_PC);
 $ctmp = array();
 foreach ($concats as $ccat) {
-	$ctmp[$ccat['ID']] = $ccat;
+	$ctmp[$ccat['id']] = $ccat;
 }
 $category = Category::CAT_PC_GAMES;
 if (isset($_REQUEST["t"]) && array_key_exists($_REQUEST['t'], $ctmp)) {
@@ -55,7 +55,7 @@ $page->smarty->assign('title', $title);
 $genres = $gen->getGenres(Genres::GAME_TYPE, true);
 $tmpgnr = array();
 foreach ($genres as $gn) {
-	$tmpgnr[$gn['ID']] = $gn['title'];
+	$tmpgnr[$gn['id']] = $gn['title'];
 }
 $genre = (isset($_REQUEST['genre']) && array_key_exists($_REQUEST['genre'], $tmpgnr)) ? $_REQUEST['genre'] : '';
 $page->smarty->assign('genres', $genres);

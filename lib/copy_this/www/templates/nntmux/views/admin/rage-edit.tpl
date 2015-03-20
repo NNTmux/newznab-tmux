@@ -1,7 +1,7 @@
- 
+
 <h1>{$page->title}</h1>
 
-<a href="?action=update&id={$rage.ID}">Update from TV Rage</a>
+<a href="?action=update&id={$rage.id}">Update from TV Rage</a>
 
 <br/><br/>
 
@@ -12,10 +12,10 @@
 <table class="input">
 
 <tr>
-	<td><label for="rageID">Rage Id</label>:</td>
+	<td><label for="rageid">Rage Id</label>:</td>
 	<td>
-		<input type="hidden" name="id" value="{$rage.ID}" />
-		<input id="rageID" class="short" name="rageID" type="text" value="{$rage.rageID}" />
+		<input type="hidden" name="id" value="{$rage.id}" />
+		<input id="rageid" class="short" name="rageid" type="text" value="{$rage.rageid}" />
 		<div class="hint">The numeric TVRage Id.</div>
 	</td>
 </tr>
@@ -55,7 +55,7 @@
 	<td><label for="imagedata">Series Image</label>:</td>
 	<td>
 		{if $rage.imgdata != ""}
-			<img style="max-width:200px; display:block;" src="{$smarty.const.WWW_TOP}/../getimage?type=tvrage&id={$rage.ID}">
+			<img style="max-width:200px; display:block;" src="{$smarty.const.WWW_TOP}/../getimage?type=tvrage&id={$rage.id}">
 		{/if}
 		<input type="file" id="imagedata" name="imagedata">
 		<div class="hint">Shown in the TV series view page.</div>
@@ -81,7 +81,7 @@ function doDelete()
 {
 	if (confirm('Are you sure?'))
 	{
-		window.location = "rage-delete.php?id={$rage.ID}&from={$smarty.get.from}";
+		window.location = "rage-delete.php?id={$rage.id}&from={$smarty.get.from}";
 	}
 }
 </script>

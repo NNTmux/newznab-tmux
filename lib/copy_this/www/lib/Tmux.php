@@ -380,20 +380,20 @@ class Tmux
 		switch ((int) $qry) {
 			case 1:
 				return sprintf("SELECT
-					(SELECT COUNT(*) FROM releases WHERE nzbstatus = 1 AND categoryID BETWEEN 5000 AND 5999 AND rageID = -1) AS processtvrage,
-					(SELECT COUNT(*) FROM releases WHERE nzbstatus = 1 AND categoryID = 5070 AND anidbid IS NULL) AS processanime,
-					(SELECT COUNT(*) FROM releases WHERE nzbstatus = 1 AND categoryID BETWEEN 2000 AND 2999 AND imdbID IS NULL) AS processmovies,
-					(SELECT COUNT(*) FROM releases WHERE nzbstatus = 1 AND categoryID IN (3010, 3040, 3050) AND musicinfoID IS NULL) AS processmusic,
-					(SELECT COUNT(*) FROM releases WHERE nzbstatus = 1 AND categoryID BETWEEN 1000 AND 1999 AND consoleinfoID IS NULL) AS processconsole,
-					(SELECT COUNT(*) FROM releases WHERE nzbstatus = 1 AND categoryID IN (%s) AND bookinfoID IS NULL) AS processbooks,
-					(SELECT COUNT(*) FROM releases WHERE nzbstatus = 1 AND categoryID = 4050 AND gamesinfo_id = 0) AS processgames,
-					(SELECT COUNT(*) FROM releases WHERE nzbstatus = 1 AND categoryID BETWEEN 6000 AND 6040 AND xxxinfo_id = 0) AS processxxx,
+					(SELECT COUNT(*) FROM releases WHERE nzbstatus = 1 AND categoryid BETWEEN 5000 AND 5999 AND rageid = -1) AS processtvrage,
+					(SELECT COUNT(*) FROM releases WHERE nzbstatus = 1 AND categoryid = 5070 AND anidbid IS NULL) AS processanime,
+					(SELECT COUNT(*) FROM releases WHERE nzbstatus = 1 AND categoryid BETWEEN 2000 AND 2999 AND imdbid IS NULL) AS processmovies,
+					(SELECT COUNT(*) FROM releases WHERE nzbstatus = 1 AND categoryid IN (3010, 3040, 3050) AND musicinfoid IS NULL) AS processmusic,
+					(SELECT COUNT(*) FROM releases WHERE nzbstatus = 1 AND categoryid BETWEEN 1000 AND 1999 AND consoleinfoid IS NULL) AS processconsole,
+					(SELECT COUNT(*) FROM releases WHERE nzbstatus = 1 AND categoryid IN (%s) AND bookinfoid IS NULL) AS processbooks,
+					(SELECT COUNT(*) FROM releases WHERE nzbstatus = 1 AND categoryid = 4050 AND gamesinfo_id = 0) AS processgames,
+					(SELECT COUNT(*) FROM releases WHERE nzbstatus = 1 AND categoryid BETWEEN 6000 AND 6040 AND xxxinfo_id = 0) AS processxxx,
 					(SELECT COUNT(*) FROM releases r WHERE 1=1 %s) AS processnfo", $bookreqids, \Info::NfoQueryString($this->pdo));
 			case 2:
 				return "SELECT
 					(SELECT COUNT(*) FROM releases WHERE nzbstatus = 1 AND nfostatus = 1) AS nfo,
 					(SELECT COUNT(*) FROM releases r
-						INNER JOIN category c ON c.ID = r.categoryID
+						INNER JOIN category c ON c.id = r.categoryid
 						WHERE r.nzbstatus = 1
 						AND r.passwordstatus BETWEEN -6 AND -1 AND r.haspreview = -1 AND c.disablepreview = 0
 					) AS work,
@@ -401,17 +401,17 @@ class Tmux
 					(SELECT COUNT(*) FROM groups WHERE name IS NOT NULL) AS all_groups";
 			case 3:
 				return sprintf("SELECT
-					(SELECT COUNT(*) FROM releases WHERE nzbstatus = 1 AND isrequestid = 1 AND prehashID = 0 AND reqidstatus = 0) +
-					(SELECT COUNT(*) FROM releases WHERE nzbstatus = 1 AND isrequestid = 1 AND prehashID = 0 AND reqidstatus = -1) +
+					(SELECT COUNT(*) FROM releases WHERE nzbstatus = 1 AND isrequestid = 1 AND prehashid = 0 AND reqidstatus = 0) +
+					(SELECT COUNT(*) FROM releases WHERE nzbstatus = 1 AND isrequestid = 1 AND prehashid = 0 AND reqidstatus = -1) +
 					(SELECT COUNT(*) FROM releases
 						WHERE nzbstatus = 1
-						AND isrequestid = 1 AND prehashID = 0 AND reqidstatus = -3 AND adddate > NOW() - INTERVAL %s HOUR
+						AND isrequestid = 1 AND prehashid = 0 AND reqidstatus = -3 AND adddate > NOW() - INTERVAL %s HOUR
 					) AS requestid_inprogress,
-					(SELECT COUNT(*) FROM releases WHERE prehashID > 0 AND nzbstatus = 1 AND isrequestid = 1 AND reqidstatus = 1) AS requestid_matched,
-					(SELECT COUNT(*) FROM releases WHERE prehashID > 0 AND searchname IS NOT NULL) AS prehash_matched,
+					(SELECT COUNT(*) FROM releases WHERE prehashid > 0 AND nzbstatus = 1 AND isrequestid = 1 AND reqidstatus = 1) AS requestid_matched,
+					(SELECT COUNT(*) FROM releases WHERE prehashid > 0 AND searchname IS NOT NULL) AS prehash_matched,
 					(SELECT COUNT(*) FROM releases WHERE preid > 0 AND searchname IS NOT NULL) AS predb_matched,
 					(SELECT COUNT(DISTINCT(preid)) FROM releases WHERE preid > 0 AND searchname IS NOT NULL) AS distinct_predb_matched,
-					(SELECT COUNT(DISTINCT(prehashID)) FROM releases WHERE prehashID > 0 AND searchname IS NOT NULL) AS distinct_prehash_matched", $request_hours);
+					(SELECT COUNT(DISTINCT(prehashid)) FROM releases WHERE prehashid > 0 AND searchname IS NOT NULL) AS distinct_prehash_matched", $request_hours);
 			case 4:
 				return sprintf("
 					SELECT
@@ -430,10 +430,10 @@ class Tmux
 				);
 			case 6:
 				return "SELECT
-					(SELECT searchname FROM releases ORDER BY ID DESC LIMIT 1) AS newestrelname,
+					(SELECT searchname FROM releases ORDER BY id DESC LIMIT 1) AS newestrelname,
 					(SELECT UNIX_TIMESTAMP(MAX(predate)) FROM prehash) AS newestprehash,
 					(SELECT UNIX_TIMESTAMP(MAX(ctime)) FROM predb) AS newestpredb,
-					(SELECT UNIX_TIMESTAMP(adddate) FROM releases ORDER BY ID DESC LIMIT 1) AS newestrelease";
+					(SELECT UNIX_TIMESTAMP(adddate) FROM releases ORDER BY id DESC LIMIT 1) AS newestrelease";
 			default:
 				return false;
 		}

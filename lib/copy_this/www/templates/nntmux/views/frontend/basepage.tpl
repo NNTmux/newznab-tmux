@@ -11,7 +11,7 @@
 	<meta name="description" content="{$page->meta_description}{if $page->meta_description != "" && $site->metadescription != ""} - {/if}{$site->metadescription}" />
 	<meta name="application-name" content="newznab-{$site->version}" />
 	<title>{$page->meta_title}{if $page->meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
-{if $loggedin=="true"}	<link rel="alternate" type="application/rss+xml" title="{$site->title} Full Rss Feed" href="{$smarty.const.WWW_TOP}/rss?t=0&amp;dl=1&amp;i={$userdata.ID}&amp;r={$userdata.rsstoken}" />{/if}
+{if $loggedin=="true"}	<link rel="alternate" type="application/rss+xml" title="{$site->title} Full Rss Feed" href="{$smarty.const.WWW_TOP}/rss?t=0&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}" />{/if}
 
 	<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
 	<link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/3.2.0/css/font-awesome.css" rel="stylesheet" media="screen">
@@ -47,7 +47,7 @@
 	/* <![CDATA[ */
 		var WWW_TOP = "{$smarty.const.WWW_TOP}";
 		var SERVERROOT = "{$serverroot}";
-		var UID = "{if $loggedin=="true"}{$userdata.ID}{else}{/if}";
+		var UID = "{if $loggedin=="true"}{$userdata.id}{else}{/if}";
 		var RSSTOKEN = "{if $loggedin=="true"}{$userdata.rsstoken}{else}{/if}";
 	/* ]]> */
 	</script>
@@ -181,7 +181,7 @@
 	{/if}
 
 {if $loggedin=="true"}
-<input type="hidden" name="UID" value="{$userdata.ID}" />
+<input type="hidden" name="UID" value="{$userdata.id}" />
 <input type="hidden" name="RSSTOKEN" value="{$userdata.rsstoken}" />
 {/if}
 

@@ -52,12 +52,12 @@ if threads > 16:
 maxperrun = int(run_perrun[0])
 
 if sys.argv[1] == "md5":
-	join = "LEFT OUTER JOIN releasefiles rf ON r.ID = rf.releaseID AND rf.ishashed = 1"
+	join = "LEFT OUTER JOIN releasefiles rf ON r.id = rf.releaseid AND rf.ishashed = 1"
 	where = "r.ishashed = 1 AND r.dehashstatus BETWEEN -6 AND 0"
 elif sys.argv[1] == "nfo":
 	where = "r.proc_nfo = 0 AND r.nfostatus = 1"
 elif sys.argv[1] == "filename":
-	join = "INNER JOIN releasefiles rf ON r.ID = rf.releaseID"
+	join = "INNER JOIN releasefiles rf ON r.id = rf.releaseid"
 	where = "r.proc_files = 0"
 elif sys.argv[1] == "par2":
 	where = "r.proc_par2 = 0"
@@ -67,7 +67,7 @@ elif sys.argv[1] == "predbft":
 	where = "1=1"
 	rowlimit = "LIMIT %s" % (threads)
 
-cur[0].execute("SELECT DISTINCT LEFT(r.guid, 1), COUNT(*) AS count FROM releases r %s WHERE %s AND r.prehashID = 0 AND r.nzbstatus = 1 %s %s %s %s" % (join, where, datelimit, groupby, orderby, rowlimit))
+cur[0].execute("SELECT DISTINCT LEFT(r.guid, 1), COUNT(*) AS count FROM releases r %s WHERE %s AND r.prehashid = 0 AND r.nzbstatus = 1 %s %s %s %s" % (join, where, datelimit, groupby, orderby, rowlimit))
 datas = cur[0].fetchall()
 
 guids = int(len(datas))

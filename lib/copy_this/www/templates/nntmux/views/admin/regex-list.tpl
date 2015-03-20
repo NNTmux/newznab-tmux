@@ -1,4 +1,4 @@
- 
+
 <h1>{$page->title}</h1>
 
 <p>
@@ -29,21 +29,21 @@
 		<th style="display:none;width:60px;">Order</th>
 		<th style="width:75px;">Options</th>
 	</tr>
-	
+
 	{foreach from=$regexlist item=regex}
-	<tr id="row-{$regex.ID}" class="{cycle values=",alt"}">
-		<td><a id="{$regex.ID}"></a>{$regex.ID}</td>
+	<tr id="row-{$regex.id}" class="{cycle values=",alt"}">
+		<td><a id="{$regex.id}"></a>{$regex.id}</td>
 		<td title="{$regex.description}">{if $regex.groupname==""}all{else}{$regex.groupname|replace:"alt.binaries":"a.b"}{/if}</td>
-		<td title="Edit regex"><a href="{$smarty.const.WWW_TOP}/regex-edit.php?id={$regex.ID}">{$regex.regex|escape:html}</a><br>
+		<td title="Edit regex"><a href="{$smarty.const.WWW_TOP}/regex-edit.php?id={$regex.id}">{$regex.regex|escape:html}</a><br>
 			{$regex.description}</td>
 		<td>{$regex.poster}</td>
-		<td title="{$regex.categoryID}">{if $regex.categoryID!=""}{$regex.categoryTitle}{/if}</td>
+		<td title="{$regex.categoryid}">{if $regex.categoryid!=""}{$regex.categoryTitle}{/if}</td>
 		<td>{if $regex.status==1}active{else}disabled{/if}</td>
 		<td class="right">{$regex.num_releases}</td>
 		<td class="mid">{$regex.max_releasedate}</td>
 		<td style="text-align:center;">{$regex.ordinal}</td>
 		<td style="display:none;"><a title="Move up" href="#">up</a> | <a title="Move down" href="#">down</a></td>
-		<td><a href="javascript:ajax_releaseregex_delete({$regex.ID})">delete</a>{if $regex.groupname != ""} | <a href="{$smarty.const.WWW_TOP}/regex-test.php?action=test&groupname={$regex.groupname}&regex={$regex.regex|urlencode}">test</a>{/if}</td>
+		<td><a href="javascript:ajax_releaseregex_delete({$regex.id})">delete</a>{if $regex.groupname != ""} | <a href="{$smarty.const.WWW_TOP}/regex-test.php?action=test&groupname={$regex.groupname}&regex={$regex.regex|urlencode}">test</a>{/if}</td>
 	</tr>
 	{/foreach}
 

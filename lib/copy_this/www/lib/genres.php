@@ -48,19 +48,19 @@ class Genres
 						FROM genres g
 						INNER JOIN
 							(SELECT DISTINCT genreID FROM musicinfo) x
-							ON x.genreID = g.ID %1\$s
+							ON x.genreID = g.id %1\$s
 						UNION
 						SELECT g.*
 						FROM genres g
 						INNER JOIN
 							(SELECT DISTINCT genreID FROM consoleinfo) x
-							ON x.genreID = g.ID %1\$s
+							ON x.genreID = g.id %1\$s
 						UNION
 						SELECT g.*
 						FROM genres g
 						INNER JOIN
 							(SELECT DISTINCT genre_id FROM gamesinfo) x
-							ON x.genre_id = g.ID %1\$s
+							ON x.genre_id = g.id %1\$s
 							ORDER BY title",
 				$typesql
 			);
@@ -92,23 +92,23 @@ class Genres
 						FROM genres g
 						INNER JOIN
 							(SELECT DISTINCT genreID FROM musicinfo) x
-							ON x.genreID = g.ID %1\$s
+							ON x.genreID = g.id %1\$s
 						+
 						SELECT COUNT(*) AS num
 						FROM genres g
 						INNER JOIN
 							(SELECT DISTINCT genreID FROM consoleinfo) y
-							ON y.genreID = g.ID %1\$s
+							ON y.genreID = g.id %1\$s
 						+
 						SELECT COUNT(*) AS num
 						FROM genres g
 						INNER JOIN
 							(SELECT DISTINCT genre_id FROM gamesinfo) x
-							ON x.genre_id = g.ID %1\$s",
+							ON x.genre_id = g.id %1\$s",
 				$typesql
 			);
 		else
-			$sql = sprintf("SELECT COUNT(g.ID) AS num FROM genres g WHERE 1 %s ORDER BY g.title", $typesql);
+			$sql = sprintf("SELECT COUNT(g.id) AS num FROM genres g WHERE 1 %s ORDER BY g.title", $typesql);
 
 		$res = $this->pdo->queryOneRow($sql);
 
@@ -117,16 +117,16 @@ class Genres
 
 	public function getById($id)
 	{
-		return $this->pdo->queryOneRow(sprintf("SELECT * FROM genres WHERE ID = %d", $id));
+		return $this->pdo->queryOneRow(sprintf("SELECT * FROM genres WHERE id = %d", $id));
 	}
 
 	public function update($id, $disabled)
 	{
-		return $this->pdo->queryExec(sprintf("UPDATE genres SET disabled = %d WHERE ID = %d", $disabled, $id));
+		return $this->pdo->queryExec(sprintf("UPDATE genres SET disabled = %d WHERE id = %d", $disabled, $id));
 	}
 
 	public function getDisabledIDs()
 	{
-		return $this->pdo->query("SELECT ID FROM genres WHERE disabled = 1");
+		return $this->pdo->query("SELECT id FROM genres WHERE disabled = 1");
 	}
 }

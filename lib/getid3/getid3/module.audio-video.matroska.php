@@ -261,7 +261,7 @@ class getid3_matroska extends getid3_handler
 				$track_info = array();
 				$track_info['dataformat'] = self::CodecIDtoCommonName($trackarray['CodecID']);
 				$track_info['default'] = (isset($trackarray['FlagDefault']) ? $trackarray['FlagDefault'] : true);
-				if (isset($trackarray['Name'])) { $track_info['name'] = $trackarray['Name']; }
+				if (isset($trackarray['name'])) { $track_info['name'] = $trackarray['name']; }
 
 				switch ($trackarray['TrackType']) {
 
@@ -539,7 +539,7 @@ class getid3_matroska extends getid3_handler
 							default:
 								$this->unhandledElement('header', __LINE__, $element_data);
 						}
-						
+
 						unset($element_data['offset'], $element_data['end']);
 						$info['matroska']['header']['elements'][] = $element_data;
 					}
@@ -1669,7 +1669,7 @@ class getid3_matroska extends getid3_handler
 			$EBMLidList[EBML_ID_MAXCACHE]                   = 'MaxCache';
 			$EBMLidList[EBML_ID_MINCACHE]                   = 'MinCache';
 			$EBMLidList[EBML_ID_MUXINGAPP]                  = 'MuxingApp';
-			$EBMLidList[EBML_ID_NAME]                       = 'Name';
+			$EBMLidList[EBML_ID_NAME]                       = 'name';
 			$EBMLidList[EBML_ID_NEXTFILENAME]               = 'NextFilename';
 			$EBMLidList[EBML_ID_NEXTUID]                    = 'NextUID';
 			$EBMLidList[EBML_ID_OUTPUTSAMPLINGFREQUENCY]    = 'OutputSamplingFrequency';

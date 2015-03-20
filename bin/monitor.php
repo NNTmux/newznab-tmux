@@ -35,8 +35,8 @@ $tRun->runPane('scraper', $runVar);
 //get list of panes by name
 $runVar['panes'] = $tRun->getListOfPanes($runVar['constants']);
 
-//totals per category in db, results by parentID
-$catcntqry = "SELECT c.parentID AS parentID, COUNT(r.ID) AS count FROM category c, releases r WHERE r.categoryID = c.ID GROUP BY c.parentID";
+//totals per category in db, results by parentid
+$catcntqry = "SELECT c.parentid AS parentid, COUNT(r.id) AS count FROM category c, releases r WHERE r.categoryid = c.id GROUP BY c.parentid";
 
 //create timers and set to now
 $runVar['timers']['timer1'] = $runVar['timers']['timer2'] = $runVar['timers']['timer3'] =
@@ -196,7 +196,7 @@ while ($runVar['counts']['iterations'] > 0) {
 				foreach ($tables as $row) {
 					$cntsql = '';
 
-					$tbl = $row['Name'];
+					$tbl = $row['name'];
 					$stamp = 'UNIX_TIMESTAMP(MIN(dateadded))';
 					$orderlim = '';
 					$cntsql = sprintf('

@@ -34,12 +34,12 @@ class Movie
 	}
 
 	/**
-	 * Get a movieinfo row by its imdbID.
+	 * Get a movieinfo row by its imdbid.
 	 */
 	public function getMovieInfo($imdbId)
 	{
 		$db = new DB();
-		return $db->queryOneRow(sprintf("SELECT * FROM movieinfo where imdbID = %d", $imdbId));
+		return $db->queryOneRow(sprintf("SELECT * FROM movieinfo where imdbid = %d", $imdbId));
 	}
 
 	/**
@@ -49,19 +49,19 @@ class Movie
 	{
 		$db = new DB();
 		$allids = implode(",", array_filter($imdbIds));
-		$sql = sprintf("SELECT DISTINCT movieinfo.*, releases.imdbID AS relimdb FROM movieinfo LEFT OUTER JOIN releases ON releases.imdbID = movieinfo.imdbID WHERE movieinfo.imdbID IN (%s)", $allids);
+		$sql = sprintf("SELECT DISTINCT movieinfo.*, releases.imdbid AS relimdb FROM movieinfo LEFT OUTER JOIN releases ON releases.imdbid = movieinfo.imdbid WHERE movieinfo.imdbid IN (%s)", $allids);
 		return $db->query($sql);
 	}
 
 	/**
-	 * Delete movieinfo row by its imdbID.
+	 * Delete movieinfo row by its imdbid.
 	 */
 	public function delete($imdbId)
 	{
 		$db = new DB();
 		@unlink($this->imgSavePath.$imdbId.'-cover.jpg');
 		@unlink($this->imgSavePath.$imdbId.'-backdrop.jpg');
-		return $db->queryOneRow(sprintf("delete FROM movieinfo where imdbID = %d", $imdbId));
+		return $db->queryOneRow(sprintf("delete FROM movieinfo where imdbid = %d", $imdbId));
 	}
 
 	/**
@@ -105,7 +105,7 @@ class Movie
 		if ($moviename != "")
 			$rsql .= sprintf("and movieinfo.title like %s ", $db->escapeString("%".$moviename."%"));
 
-		$res = $db->queryOneRow(sprintf("select count(ID) as num from movieinfo where 1=1 %s ", $rsql));
+		$res = $db->queryOneRow(sprintf("select count(id) as num from movieinfo where 1=1 %s ", $rsql));
 		return $res["num"];
 	}
 
@@ -132,14 +132,14 @@ class Movie
 						$children = $categ->getChildren($category);
 						$chlist = "-99";
 						foreach ($children as $child)
-							$chlist.=", ".$child["ID"];
+							$chlist.=", ".$child["id"];
 
 						if ($chlist != "-99")
-								$catsrch .= " r.categoryID in (".$chlist.") or ";
+								$catsrch .= " r.categoryid in (".$chlist.") or ";
 					}
 					else
 					{
-						$catsrch .= sprintf(" r.categoryID = %d or ", $category);
+						$catsrch .= sprintf(" r.categoryid = %d or ", $category);
 					}
 				}
 			}
@@ -155,9 +155,9 @@ class Movie
 
 		$exccatlist = "";
 		if (count($excludedcats) > 0)
-			$exccatlist = " and r.categoryID not in (".implode(",", $excludedcats).")";
+			$exccatlist = " and r.categoryid not in (".implode(",", $excludedcats).")";
 
-		$sql = sprintf("select count(distinct r.imdbID) as num from releases r inner join movieinfo m on m.imdbID = r.imdbID and m.title != '' where r.passwordstatus <= (select value from site where setting='showpasswordedrelease') and %s %s %s %s ", $browseby, $catsrch, $maxage, $exccatlist);
+		$sql = sprintf("select count(distinct r.imdbid) as num from releases r inner join movieinfo m on m.imdbid = r.imdbid and m.title != '' where r.passwordstatus <= (select value from site where setting='showpasswordedrelease') and %s %s %s %s ", $browseby, $catsrch, $maxage, $exccatlist);
 		$res = $db->queryOneRow($sql, true);
 		return $res["num"];
 	}
@@ -190,14 +190,14 @@ class Movie
 						$children = $categ->getChildren($category);
 						$chlist = "-99";
 						foreach ($children as $child)
-							$chlist.=", ".$child["ID"];
+							$chlist.=", ".$child["id"];
 
 						if ($chlist != "-99")
-								$catsrch .= " r.categoryID in (".$chlist.") or ";
+								$catsrch .= " r.categoryid in (".$chlist.") or ";
 					}
 					else
 					{
-						$catsrch .= sprintf(" r.categoryID = %d or ", $category);
+						$catsrch .= sprintf(" r.categoryid = %d or ", $category);
 					}
 				}
 			}
@@ -212,10 +212,10 @@ class Movie
 
 		$exccatlist = "";
 		if (count($excludedcats) > 0)
-			$exccatlist = " and r.categoryID not in (".implode(",", $excludedcats).")";
+			$exccatlist = " and r.categoryid not in (".implode(",", $excludedcats).")";
 
 		$order = $this->getMovieOrder($orderby);
-		$sql = sprintf(" SELECT r.imdbID, max(r.postdate) as postdate, m.* from releases r inner join movieinfo m on m.imdbID = r.imdbID where r.passwordstatus <= (select value from site where setting='showpasswordedrelease') and m.title != '' and r.imdbID != 0000000 and %s %s %s %s group by r.imdbID order by %s %s".$limit, $browseby, $catsrch, $maxagesql, $exccatlist, $order[0], $order[1]);
+		$sql = sprintf(" SELECT r.imdbid, max(r.postdate) as postdate, m.* from releases r inner join movieinfo m on m.imdbid = r.imdbid where r.passwordstatus <= (select value from site where setting='showpasswordedrelease') and m.title != '' and r.imdbid != 0000000 and %s %s %s %s group by r.imdbid order by %s %s".$limit, $browseby, $catsrch, $maxagesql, $exccatlist, $order[0], $order[1]);
 		$rows = $db->query($sql, true);
 
 		//
@@ -223,7 +223,7 @@ class Movie
 		//
 		$imdbds = "";
 		foreach ($rows as $row)
-			$imdbds .= $row["imdbID"]. ", ";
+			$imdbds .= $row["imdbid"]. ", ";
 
 		if (strlen($imdbds) > 0)
 		{
@@ -232,7 +232,7 @@ class Movie
 			//
 			// get all releases matching these ids
 			//
-			$sql = sprintf("select r.*, releasenfo.ID as nfoID, groups.name as grpname, concat(cp.title, ' > ', c.title) as categoryName from releases r left outer join category c on c.ID = r.categoryID left outer join category cp on cp.ID = c.parentID left outer join releasenfo on releasenfo.releaseID = r.ID left outer join groups on groups.ID = r.groupID where imdbID in (%s) and %s %s %s order by r.postdate desc", $imdbds, $catsrch, $maxagesql, $exccatlist);
+			$sql = sprintf("select r.*, releasenfo.id as nfoid, groups.name as grpname, concat(cp.title, ' > ', c.title) as categoryname from releases r left outer join category c on c.id = r.categoryid left outer join category cp on cp.id = c.parentid left outer join releasenfo on releasenfo.releaseid = r.id left outer join groups on groups.id = r.groupid where imdbid in (%s) and %s %s %s order by r.postdate desc", $imdbds, $catsrch, $maxagesql, $exccatlist);
 			$allrows = $db->query($sql, true);
 			$arr = array();
 
@@ -241,21 +241,21 @@ class Movie
 			//
 			foreach ($allrows as &$allrow)
 			{
-				$arr[$allrow["imdbID"]]["ID"] = (isset($arr[$allrow["imdbID"]]["ID"]) ? $arr[$allrow["imdbID"]]["ID"] : "") . $allrow["ID"] . ",";
-				$arr[$allrow["imdbID"]]["rarinnerfilecount"] = (isset($arr[$allrow["imdbID"]]["rarinnerfilecount"]) ? $arr[$allrow["imdbID"]]["rarinnerfilecount"] : "") . $allrow["rarinnerfilecount"] . ",";
-				$arr[$allrow["imdbID"]]["haspreview"] = (isset($arr[$allrow["imdbID"]]["haspreview"]) ? $arr[$allrow["imdbID"]]["haspreview"] : "") . $allrow["haspreview"] . ",";
-				$arr[$allrow["imdbID"]]["passwordstatus"] = (isset($arr[$allrow["imdbID"]]["passwordstatus"]) ? $arr[$allrow["imdbID"]]["passwordstatus"] : "") . $allrow["passwordstatus"] . ",";
-				$arr[$allrow["imdbID"]]["guid"] = (isset($arr[$allrow["imdbID"]]["guid"]) ? $arr[$allrow["imdbID"]]["guid"] : "") . $allrow["guid"] . ",";
-				$arr[$allrow["imdbID"]]["nfoID"] = (isset($arr[$allrow["imdbID"]]["nfoID"]) ? $arr[$allrow["imdbID"]]["nfoID"] : "") . $allrow["nfoID"] . ",";
-				$arr[$allrow["imdbID"]]["grpname"] = (isset($arr[$allrow["imdbID"]]["grpname"]) ? $arr[$allrow["imdbID"]]["grpname"] : "") . $allrow["grpname"] . ",";
-				$arr[$allrow["imdbID"]]["searchname"] = (isset($arr[$allrow["imdbID"]]["searchname"]) ? $arr[$allrow["imdbID"]]["searchname"] : "") . $allrow["searchname"] . "#";
-				$arr[$allrow["imdbID"]]["postdate"] = (isset($arr[$allrow["imdbID"]]["postdate"]) ? $arr[$allrow["imdbID"]]["postdate"] : "") . $allrow["postdate"] . ",";
-				$arr[$allrow["imdbID"]]["size"] = (isset($arr[$allrow["imdbID"]]["size"]) ? $arr[$allrow["imdbID"]]["size"] : "") . $allrow["size"] . ",";
-				$arr[$allrow["imdbID"]]["totalpart"] = (isset($arr[$allrow["imdbID"]]["totalpart"]) ? $arr[$allrow["imdbID"]]["totalpart"] : "") . $allrow["totalpart"] . ",";
-				$arr[$allrow["imdbID"]]["comments"] = (isset($arr[$allrow["imdbID"]]["comments"]) ? $arr[$allrow["imdbID"]]["comments"] : "") . $allrow["comments"] . ",";
-				$arr[$allrow["imdbID"]]["grabs"] = (isset($arr[$allrow["imdbID"]]["grabs"]) ? $arr[$allrow["imdbID"]]["grabs"] : "") . $allrow["grabs"] . ",";
-				$arr[$allrow["imdbID"]]["categoryID"] = (isset($arr[$allrow["imdbID"]]["categoryID"]) ? $arr[$allrow["imdbID"]]["categoryID"] : "") . $allrow["categoryID"] . ",";
-				$arr[$allrow["imdbID"]]["categoryName"] = (isset($arr[$allrow["imdbID"]]["categoryName"]) ? $arr[$allrow["imdbID"]]["categoryName"] : "") . $allrow["categoryName"] . ",";
+				$arr[$allrow["imdbid"]]["id"] = (isset($arr[$allrow["imdbid"]]["id"]) ? $arr[$allrow["imdbid"]]["id"] : "") . $allrow["id"] . ",";
+				$arr[$allrow["imdbid"]]["rarinnerfilecount"] = (isset($arr[$allrow["imdbid"]]["rarinnerfilecount"]) ? $arr[$allrow["imdbid"]]["rarinnerfilecount"] : "") . $allrow["rarinnerfilecount"] . ",";
+				$arr[$allrow["imdbid"]]["haspreview"] = (isset($arr[$allrow["imdbid"]]["haspreview"]) ? $arr[$allrow["imdbid"]]["haspreview"] : "") . $allrow["haspreview"] . ",";
+				$arr[$allrow["imdbid"]]["passwordstatus"] = (isset($arr[$allrow["imdbid"]]["passwordstatus"]) ? $arr[$allrow["imdbid"]]["passwordstatus"] : "") . $allrow["passwordstatus"] . ",";
+				$arr[$allrow["imdbid"]]["guid"] = (isset($arr[$allrow["imdbid"]]["guid"]) ? $arr[$allrow["imdbid"]]["guid"] : "") . $allrow["guid"] . ",";
+				$arr[$allrow["imdbid"]]["nfoid"] = (isset($arr[$allrow["imdbid"]]["nfoid"]) ? $arr[$allrow["imdbid"]]["nfoid"] : "") . $allrow["nfoid"] . ",";
+				$arr[$allrow["imdbid"]]["grpname"] = (isset($arr[$allrow["imdbid"]]["grpname"]) ? $arr[$allrow["imdbid"]]["grpname"] : "") . $allrow["grpname"] . ",";
+				$arr[$allrow["imdbid"]]["searchname"] = (isset($arr[$allrow["imdbid"]]["searchname"]) ? $arr[$allrow["imdbid"]]["searchname"] : "") . $allrow["searchname"] . "#";
+				$arr[$allrow["imdbid"]]["postdate"] = (isset($arr[$allrow["imdbid"]]["postdate"]) ? $arr[$allrow["imdbid"]]["postdate"] : "") . $allrow["postdate"] . ",";
+				$arr[$allrow["imdbid"]]["size"] = (isset($arr[$allrow["imdbid"]]["size"]) ? $arr[$allrow["imdbid"]]["size"] : "") . $allrow["size"] . ",";
+				$arr[$allrow["imdbid"]]["totalpart"] = (isset($arr[$allrow["imdbid"]]["totalpart"]) ? $arr[$allrow["imdbid"]]["totalpart"] : "") . $allrow["totalpart"] . ",";
+				$arr[$allrow["imdbid"]]["comments"] = (isset($arr[$allrow["imdbid"]]["comments"]) ? $arr[$allrow["imdbid"]]["comments"] : "") . $allrow["comments"] . ",";
+				$arr[$allrow["imdbid"]]["grabs"] = (isset($arr[$allrow["imdbid"]]["grabs"]) ? $arr[$allrow["imdbid"]]["grabs"] : "") . $allrow["grabs"] . ",";
+				$arr[$allrow["imdbid"]]["categoryid"] = (isset($arr[$allrow["imdbid"]]["categoryid"]) ? $arr[$allrow["imdbid"]]["categoryid"] : "") . $allrow["categoryid"] . ",";
+				$arr[$allrow["imdbid"]]["categoryname"] = (isset($arr[$allrow["imdbid"]]["categoryname"]) ? $arr[$allrow["imdbid"]]["categoryname"] : "") . $allrow["categoryname"] . ",";
 			}
 
 			//
@@ -263,21 +263,21 @@ class Movie
 			//
 			foreach ($rows as &$row)
 			{
-				$row["grp_release_id"] = substr($arr[$row["imdbID"]]["ID"], 0, -1);
-				$row["grp_rarinnerfilecount"] = substr($arr[$row["imdbID"]]["rarinnerfilecount"], 0, -1);
-				$row["grp_haspreview"] = substr($arr[$row["imdbID"]]["haspreview"], 0, -1);
-				$row["grp_release_password"] = substr($arr[$row["imdbID"]]["passwordstatus"], 0, -1);
-				$row["grp_release_guid"] = substr($arr[$row["imdbID"]]["guid"], 0, -1);
-				$row["grp_release_nfoID"] = substr($arr[$row["imdbID"]]["nfoID"], 0, -1);
-				$row["grp_release_grpname"] = substr($arr[$row["imdbID"]]["grpname"], 0, -1);
-				$row["grp_release_name"] = substr($arr[$row["imdbID"]]["searchname"], 0, -1);
-				$row["grp_release_postdate"] = substr($arr[$row["imdbID"]]["postdate"], 0, -1);
-				$row["grp_release_size"] = substr($arr[$row["imdbID"]]["size"], 0, -1);
-				$row["grp_release_totalparts"] = substr($arr[$row["imdbID"]]["totalpart"], 0, -1);
-				$row["grp_release_comments"] = substr($arr[$row["imdbID"]]["comments"], 0, -1);
-				$row["grp_release_grabs"] = substr($arr[$row["imdbID"]]["grabs"], 0, -1);
-				$row["grp_release_categoryID"] = substr($arr[$row["imdbID"]]["categoryID"], 0, -1);
-				$row["grp_release_categoryName"] = substr($arr[$row["imdbID"]]["categoryName"], 0, -1);
+				$row["grp_release_id"] = substr($arr[$row["imdbid"]]["id"], 0, -1);
+				$row["grp_rarinnerfilecount"] = substr($arr[$row["imdbid"]]["rarinnerfilecount"], 0, -1);
+				$row["grp_haspreview"] = substr($arr[$row["imdbid"]]["haspreview"], 0, -1);
+				$row["grp_release_password"] = substr($arr[$row["imdbid"]]["passwordstatus"], 0, -1);
+				$row["grp_release_guid"] = substr($arr[$row["imdbid"]]["guid"], 0, -1);
+				$row["grp_release_nfoID"] = substr($arr[$row["imdbid"]]["nfoid"], 0, -1);
+				$row["grp_release_grpname"] = substr($arr[$row["imdbid"]]["grpname"], 0, -1);
+				$row["grp_release_name"] = substr($arr[$row["imdbid"]]["searchname"], 0, -1);
+				$row["grp_release_postdate"] = substr($arr[$row["imdbid"]]["postdate"], 0, -1);
+				$row["grp_release_size"] = substr($arr[$row["imdbid"]]["size"], 0, -1);
+				$row["grp_release_totalparts"] = substr($arr[$row["imdbid"]]["totalpart"], 0, -1);
+				$row["grp_release_comments"] = substr($arr[$row["imdbid"]]["comments"], 0, -1);
+				$row["grp_release_grabs"] = substr($arr[$row["imdbid"]]["grabs"], 0, -1);
+				$row["grp_release_categoryID"] = substr($arr[$row["imdbid"]]["categoryid"], 0, -1);
+				$row["grp_release_categoryName"] = substr($arr[$row["imdbid"]]["categoryname"], 0, -1);
 			}
 		}
 		return $rows;
@@ -340,7 +340,7 @@ class Movie
 				$bbv = stripslashes($_REQUEST[$bb]);
 				if ($bb == 'rating') { $bbv .= '.'; }
 				if ($bb == 'imdb') {
-					$browseby .= "m.{$bb}ID = $bbv AND ";
+					$browseby .= "m.{$bb}id = $bbv AND ";
 				} else {
 					$browseby .= "m.$bb LIKE(".$db->escapeString('%'.$bbv.'%').") AND ";
 				}
@@ -375,7 +375,7 @@ class Movie
 	{
 		$db = new DB();
 
-		$db->queryExec(sprintf("update movieinfo SET title=%s, tagline=%s, plot=%s, year=%s, rating=%s, genre=%s, director=%s, actors=%s, language=%s, cover=%d, backdrop=%d, updateddate=NOW() WHERE imdbID = %d",
+		$db->queryExec(sprintf("update movieinfo SET title=%s, tagline=%s, plot=%s, year=%s, rating=%s, genre=%s, director=%s, actors=%s, language=%s, cover=%d, backdrop=%d, updateddate=NOW() WHERE imdbid = %d",
 			$db->escapeString($title), $db->escapeString($tagline), $db->escapeString($plot), $db->escapeString($year), $db->escapeString($rating), $db->escapeString($genre), $db->escapeString($director), $db->escapeString($actors), $db->escapeString($language), $cover, $backdrop, $id));
 	}
 
@@ -495,11 +495,11 @@ class Movie
 		$db = new DB();
 		$query = sprintf("
 			INSERT INTO movieinfo
-				(imdbID, tmdbID, title, rating, tagline, trailer, plot, year, genre, director, actors, language, cover, backdrop, createddate, updateddate)
+				(imdbid, tmdbID, title, rating, tagline, trailer, plot, year, genre, director, actors, language, cover, backdrop, createddate, updateddate)
 			VALUES
 				(%d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, %d, NOW(), NOW())
 			ON DUPLICATE KEY UPDATE
-				imdbID=%d, tmdbID=%s, title=%s, rating=%s, tagline=%s, trailer=%s, plot=%s, year=%s, genre=%s, director=%s, actors=%s, language=%s, cover=%d, backdrop=%d, updateddate=NOW()",
+				imdbid=%d, tmdbID=%s, title=%s, rating=%s, tagline=%s, trailer=%s, plot=%s, year=%s, genre=%s, director=%s, actors=%s, language=%s, cover=%d, backdrop=%d, updateddate=NOW()",
 		$mov['imdb_id'], $mov['tmdb_id'], $db->escapeString($mov['title']), $db->escapeString($mov['rating']), $db->escapeString($mov['tagline']), $db->escapeString($mov['trailer']), $db->escapeString($mov['plot']), $db->escapeString($mov['year']), $db->escapeString($mov['genre']), $db->escapeString($mov['director']), $db->escapeString($mov['actors']), $db->escapeString($mov['language']), $mov['cover'], $mov['backdrop'],
 		$mov['imdb_id'], $mov['tmdb_id'], $db->escapeString($mov['title']), $db->escapeString($mov['rating']), $db->escapeString($mov['tagline']), $db->escapeString($mov['trailer']), $db->escapeString($mov['plot']), $db->escapeString($mov['year']), $db->escapeString($mov['genre']), $db->escapeString($mov['director']), $db->escapeString($mov['actors']), $db->escapeString($mov['language']), $mov['cover'], $mov['backdrop']);
 
@@ -509,7 +509,7 @@ class Movie
 	}
 
 	/**
-	 * Lookup a movie on tmdb by ID
+	 * Lookup a movie on tmdb by id
 	 */
 	public function fetchTmdbProperties($id, $isImdbId=true)
 	{
@@ -671,7 +671,7 @@ class Movie
 		$db = new DB();
 		$nfo = new Nfo();
 
-		$res = $db->queryDirect(sprintf("SELECT searchname, ID from releases where imdbID IS NULL and categoryID in ( select ID from category where parentID = %d ) ORDER BY postdate DESC LIMIT 100", Category::CAT_PARENT_MOVIE));
+		$res = $db->queryDirect(sprintf("SELECT searchname, id from releases where imdbid IS NULL and categoryid in ( select id from category where parentid = %d ) ORDER BY postdate DESC LIMIT 100", Category::CAT_PARENT_MOVIE));
 		if ($db->getNumRows($res) > 0)
 		{
 			if ($this->echooutput)
@@ -680,14 +680,14 @@ class Movie
 			while ($arr = $db->getAssocArray($res))
 			{
 				$imdbID = false;
-				/* Preliminary IMDB ID Detection from NFO file */
+				/* Preliminary IMDB id Detection from NFO file */
 				$rawnfo = '';
-				if($nfo->getNfo($arr['ID'], $rawnfo))
+				if($nfo->getNfo($arr['id'], $rawnfo))
 					$imdbID = $this->parseImdbFromNfo($rawnfo);
 
 				if($imdbID !== false){
 					// Set IMDB (if found in nfo) and move along
-					$db->queryExec(sprintf("update releases set imdbID = %s where ID = %d",  $db->escapeString($imdbID), $arr["ID"]));
+					$db->queryExec(sprintf("update releases set imdbid = %s where id = %d",  $db->escapeString($imdbID), $arr["id"]));
 					//check for existing movie entry
 					$movCheck = $this->getMovieInfo($imdbID);
 					if ($movCheck === false || (isset($movCheck['updateddate']) && (time() - strtotime($movCheck['updateddate'])) > 2592000))
@@ -713,7 +713,7 @@ class Movie
 						if ($imdbId !== false)
 						{
 							//update release with imdb id
-							$db->queryExec(sprintf("update releases SET imdbID = %s WHERE ID = %d", $db->escapeString($imdbId), $arr["ID"]));
+							$db->queryExec(sprintf("update releases SET imdbid = %s WHERE id = %d", $db->escapeString($imdbId), $arr["id"]));
 
 							//check for existing movie entry
 							$movCheck = $this->getMovieInfo($imdbId);
@@ -724,7 +724,7 @@ class Movie
 
 						} else {
 							//no imdb id found, set to all zeros so we dont process again
-							$db->queryExec(sprintf("update releases SET imdbID = %d WHERE ID = %d", 0, $arr["ID"]));
+							$db->queryExec(sprintf("update releases SET imdbid = %d WHERE id = %d", 0, $arr["id"]));
 						}
 
 					} else {
@@ -734,7 +734,7 @@ class Movie
 
 				} else {
 					//no valid movie name found, set to all zeros so we dont process again
-					$db->queryExec(sprintf("update releases SET imdbID = %d WHERE ID = %d", 0, $arr["ID"]));
+					$db->queryExec(sprintf("update releases SET imdbid = %d WHERE id = %d", 0, $arr["id"]));
 				}
 			}
 		}

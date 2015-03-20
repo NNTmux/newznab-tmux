@@ -93,13 +93,42 @@ class Books
 
 	public function getBookInfo($id)
 	{
-		return $this->pdo->queryOneRow(sprintf('SELECT bookinfo.* FROM bookinfo WHERE bookinfo.ID = %d', $id));
+		return $this->pdo->queryOneRow(sprintf('SELECT bookinfo.* FROM bookinfo WHERE bookinfo.id = %d', $id));
 	}
 
 	public function getBookInfoByName($author, $title)
 	{
-		return $this->pdo->queryOneRow(sprintf('SELECT * FROM bookinfo WHERE author %s AND title %s', $this->pdo->likeString($author, true, true), $this->pdo->likeString($title, true, true)));
+		$pdo = $this->pdo;
+		$like = 'ILIKE';
+		if ($pdo->dbSystem() === 'mysql') {
+			$like = 'LIKE';
+		}
+
+		//only used to get a count of words
+		$searchwords = $searchsql = '';
+		$ft = $pdo->queryDirect("SHOW INDEX FROM bookinfo WHERE key_name = 'ix_bookinfo_author_title_ft'");
+		if ($ft->rowCount() !== 2) {
+			$searchsql .= sprintf(" author LIKE %s AND title %s %s'", $pdo->escapeString('%' . $author . '%'), $like, $pdo->escapeString('%' . $title . '%'));
+		} else {
+			$title = preg_replace('/( - | -|\(.+\)|\(|\))/', ' ', $title);
+			$title = preg_replace('/[^\w ]+/', '', $title);
+			$title = trim(preg_replace('/\s\s+/i', ' ', $title));
+			$title = trim($title);
+			$words = explode(' ', $title);
+
+			foreach ($words as $word) {
+				$word = trim(rtrim(trim($word), '-'));
+				if ($word !== '' && $word !== '-') {
+					$word = '+' . $word;
+					$searchwords .= sprintf('%s ', $word);
+				}
+			}
+			$searchwords = trim($searchwords);
+			$searchsql .= sprintf(" MATCH(author, title) AGAINST(%s IN BOOLEAN MODE)", $pdo->escapeString($searchwords));
+		}
+		return $pdo->queryOneRow(sprintf("SELECT * FROM bookinfo WHERE %s", $searchsql));
 	}
+
 
 	public function getRange($start, $num)
 	{
@@ -114,7 +143,7 @@ class Books
 
 	public function getCount()
 	{
-		$res = $this->pdo->queryOneRow('SELECT COUNT(ID) AS num FROM bookinfo');
+		$res = $this->pdo->queryOneRow('SELECT COUNT(id) AS num FROM bookinfo');
 		return $res['num'];
 	}
 
@@ -137,13 +166,13 @@ class Books
 
 		$exccatlist = '';
 		if (count($excludedcats) > 0) {
-			$exccatlist = ' AND r.categoryID NOT IN (' . implode(',', $excludedcats) . ')';
+			$exccatlist = ' AND r.categoryid NOT IN (' . implode(',', $excludedcats) . ')';
 		}
 
 		$res = $this->pdo->queryOneRow(
 			sprintf(
-				"SELECT COUNT(DISTINCT r.bookinfoID) AS num FROM releases r "
-				. "INNER JOIN bookinfo boo ON boo.ID = r.bookinfoID AND boo.title != '' and boo.cover = 1 "
+				"SELECT COUNT(DISTINCT r.bookinfoid) AS num FROM releases r "
+				. "INNER JOIN bookinfo boo ON boo.id = r.bookinfoid AND boo.title != '' and boo.cover = 1 "
 				. "WHERE r.nzbstatus = 1 AND  r.passwordstatus <= (SELECT value FROM site WHERE setting='showpasswordedrelease') "
 				. "AND %s %s %s %s", $browseby, $catsrch, $maxage, $exccatlist
 			)
@@ -174,17 +203,17 @@ class Books
 
 		$exccatlist = '';
 		if (count($excludedcats) > 0) {
-			$exccatlist = ' AND r.categoryID NOT IN (' . implode(',', $excludedcats) . ')';
+			$exccatlist = ' AND r.categoryid NOT IN (' . implode(',', $excludedcats) . ')';
 		}
 
 		$order = $this->getBookOrder($orderby);
 		$sql = sprintf(
-			"SELECT GROUP_CONCAT(r.ID ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id, "
+			"SELECT GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id, "
 			. "GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') as grp_rarinnerfilecount, "
 			. "GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') AS grp_haspreview, "
 			. "GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_password, "
 			. "GROUP_CONCAT(r.guid ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_guid, "
-			. "GROUP_CONCAT(rn.ID ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_nfoid, "
+			. "GROUP_CONCAT(rn.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_nfoid, "
 			. "GROUP_CONCAT(groups.name ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grpname, "
 			. "GROUP_CONCAT(r.searchname ORDER BY r.postdate DESC SEPARATOR '#') AS grp_release_name, "
 			. "GROUP_CONCAT(r.postdate ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_postdate, "
@@ -192,13 +221,13 @@ class Books
 			. "GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_totalparts, "
 			. "GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_comments, "
 			. "GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grabs, "
-			. "boo.*, r.bookinfoID, groups.name AS group_name, rn.ID as nfoid FROM releases r "
-			. "LEFT OUTER JOIN groups ON groups.ID = r.groupID "
-			. "LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.ID "
-			. "INNER JOIN bookinfo boo ON boo.ID = r.bookinfoID "
+			. "boo.*, r.bookinfoid, groups.name AS group_name, rn.id as nfoid FROM releases r "
+			. "LEFT OUTER JOIN groups ON groups.id = r.groupid "
+			. "LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id "
+			. "INNER JOIN bookinfo boo ON boo.id = r.bookinfoid "
 			. "WHERE r.nzbstatus = 1 AND boo.cover = 1 AND boo.title != '' AND "
 			. "r.passwordstatus <= (SELECT value FROM site WHERE setting='showpasswordedrelease') AND %s %s %s %s "
-			. "GROUP BY boo.ID ORDER BY %s %s" . $limit, $browseby, $catsrch, $maxage, $exccatlist, $order[0], $order[1]
+			. "GROUP BY boo.id ORDER BY %s %s" . $limit, $browseby, $catsrch, $maxage, $exccatlist, $order[0], $order[1]
 		);
 
 		return $this->pdo->queryDirect($sql);
@@ -305,11 +334,11 @@ class Books
 				$this->processBookReleasesHelper(
 					$this->pdo->queryDirect(
 						sprintf('
-						SELECT searchname, ID, categoryID
+						SELECT searchname, id, categoryid
 						FROM releases
 						WHERE nzbstatus = 1 %s
-						AND bookinfoID IS NULL
-						AND categoryID in (%s)
+						AND bookinfoid IS NULL
+						AND categoryid in (%s)
 						ORDER BY postdate
 						DESC LIMIT %d', $this->renamed, $bookids[$i], $this->bookqty)
 					), $bookids[$i]
@@ -329,19 +358,19 @@ class Books
 	{
 		if ($res instanceof \Traversable && $res->rowCount() > 0) {
 			if ($this->echooutput) {
-				$this->pdo->log->doEcho($this->pdo->log->header("\nProcessing " . $res->rowCount() . ' book release(s) for category ID ' . $categoryID));
+				$this->pdo->log->doEcho($this->pdo->log->header("\nProcessing " . $res->rowCount() . ' book release(s) for category id ' . $categoryID));
 			}
 
 			foreach ($res as $arr) {
 				$startTime = microtime(true);
 				$usedAmazon = false;
 				// audiobooks are also books and should be handled in an identical manor, even though it falls under a music category
-				if ($arr['categoryID'] == '3030') {
+				if ($arr['categoryid'] == '3030') {
 					// audiobook
-					$bookInfo = $this->parseTitle($arr['searchname'], $arr['ID'], 'audiobook');
+					$bookInfo = $this->parseTitle($arr['searchname'], $arr['id'], 'audiobook');
 				} else {
 					// ebook
-					$bookInfo = $this->parseTitle($arr['searchname'], $arr['ID'], 'ebook');
+					$bookInfo = $this->parseTitle($arr['searchname'], $arr['id'], 'ebook');
 				}
 
 				if ($bookInfo !== false) {
@@ -359,13 +388,13 @@ class Books
 							$bookId = -2;
 						}
 					} else {
-						$bookId = $bookCheck['ID'];
+						$bookId = $bookCheck['id'];
 					}
 
 					// Update release.
-					$this->pdo->queryExec(sprintf('UPDATE releases SET bookinfoID = %d WHERE ID = %d', $bookId, $arr['ID']));
+					$this->pdo->queryExec(sprintf('UPDATE releases SET bookinfoid = %d WHERE id = %d', $bookId, $arr['id']));
 				} else { // Could not parse release title.
-					$this->pdo->queryExec(sprintf('UPDATE releases SET bookinfoID = %d WHERE ID = %d', -2, $arr['ID']));
+					$this->pdo->queryExec(sprintf('UPDATE releases SET bookinfoid = %d WHERE id = %d', -2, $arr['id']));
 					if ($this->echooutput) {
 						echo '.';
 					}
@@ -402,7 +431,7 @@ class Books
 						$this->pdo->log->headerOver('Changing category to misc books: ') . $this->pdo->log->primary($releasename)
 					);
 				}
-				$this->pdo->queryExec(sprintf('UPDATE releases SET categoryID = %d WHERE ID = %d', 7050, $releaseID));
+				$this->pdo->queryExec(sprintf('UPDATE releases SET categoryid = %d WHERE id = %d', 7050, $releaseID));
 				return false;
 			} else if (preg_match('/^([a-z0-9ü!]+ ){1,2}(N|Vol)?\d{1,4}(a|b|c)?$|^([a-z0-9]+ ){1,2}(Jan( |unar|$)|Feb( |ruary|$)|Mar( |ch|$)|Apr( |il|$)|May(?![a-z0-9])|Jun( |e|$)|Jul( |y|$)|Aug( |ust|$)|Sep( |tember|$)|O(c|k)t( |ober|$)|Nov( |ember|$)|De(c|z)( |ember|$))/i', $releasename) && !preg_match('/Part \d+/i', $releasename)) {
 
@@ -411,7 +440,7 @@ class Books
 						$this->pdo->log->headerOver('Changing category to magazines: ') . $this->pdo->log->primary($releasename)
 					);
 				}
-				$this->pdo->queryExec(sprintf('UPDATE releases SET categoryID = %d WHERE ID = %d', 7030, $releaseID));
+				$this->pdo->queryExec(sprintf('UPDATE releases SET categoryid = %d WHERE id = %d', 7030, $releaseID));
 				return false;
 			} else if (!empty($releasename) && !preg_match('/^[a-z0-9]+$|^([0-9]+ ){1,}$|Part \d+/i', $releasename)) {
 				return $releasename;
@@ -506,7 +535,7 @@ class Books
 			$book['cover'] = 0;
 		}
 
-		$check = $this->pdo->queryOneRow(sprintf('SELECT ID FROM bookinfo WHERE asin = %s', $this->pdo->escapeString($book['asin'])));
+		$check = $this->pdo->queryOneRow(sprintf('SELECT id FROM bookinfo WHERE asin = %s', $this->pdo->escapeString($book['asin'])));
 		if ($check === false) {
 			$bookId = $this->pdo->queryInsert(
 				sprintf("
@@ -524,13 +553,13 @@ class Books
 				)
 			);
 		} else {
-			$bookId = $check['ID'];
+			$bookId = $check['id'];
 			$this->pdo->queryExec(
 				sprintf('
 							UPDATE bookinfo
 							SET title = %s, author = %s, asin = %s, isbn = %s, ean = %s, url = %s, salesrank = %s, publisher = %s,
 								publishdate = %s, pages = %s, overview = %s, genre = %s, cover = %d, updateddate = NOW()
-							WHERE ID = %d',
+							WHERE id = %d',
 					$this->pdo->escapeString($book['title']), $this->pdo->escapeString($book['author']),
 					$this->pdo->escapeString($book['asin']), $this->pdo->escapeString($book['isbn']),
 					$this->pdo->escapeString($book['ean']), $this->pdo->escapeString($book['url']),
