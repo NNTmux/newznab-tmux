@@ -268,7 +268,7 @@ class Movie
 				$row["grp_haspreview"] = substr($arr[$row["imdbid"]]["haspreview"], 0, -1);
 				$row["grp_release_password"] = substr($arr[$row["imdbid"]]["passwordstatus"], 0, -1);
 				$row["grp_release_guid"] = substr($arr[$row["imdbid"]]["guid"], 0, -1);
-				$row["grp_release_nfoID"] = substr($arr[$row["imdbid"]]["nfoid"], 0, -1);
+				$row["grp_release_nfoid"] = substr($arr[$row["imdbid"]]["nfoid"], 0, -1);
 				$row["grp_release_grpname"] = substr($arr[$row["imdbid"]]["grpname"], 0, -1);
 				$row["grp_release_name"] = substr($arr[$row["imdbid"]]["searchname"], 0, -1);
 				$row["grp_release_postdate"] = substr($arr[$row["imdbid"]]["postdate"], 0, -1);
@@ -276,8 +276,8 @@ class Movie
 				$row["grp_release_totalparts"] = substr($arr[$row["imdbid"]]["totalpart"], 0, -1);
 				$row["grp_release_comments"] = substr($arr[$row["imdbid"]]["comments"], 0, -1);
 				$row["grp_release_grabs"] = substr($arr[$row["imdbid"]]["grabs"], 0, -1);
-				$row["grp_release_categoryID"] = substr($arr[$row["imdbid"]]["categoryid"], 0, -1);
-				$row["grp_release_categoryName"] = substr($arr[$row["imdbid"]]["categoryname"], 0, -1);
+				$row["grp_release_categoryid"] = substr($arr[$row["imdbid"]]["categoryid"], 0, -1);
+				$row["grp_release_categoryname"] = substr($arr[$row["imdbid"]]["categoryname"], 0, -1);
 			}
 		}
 		return $rows;

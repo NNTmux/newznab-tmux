@@ -2,8 +2,10 @@
 
 	{foreach from=$results item=result}
 		<div id="moviefull">
-			{if $result.cover == 1}<img class="shadow pic" alt="{$result.title|escape:"htmlall"} Logo"
-										src="{$smarty.const.WWW_TOP}/covers/movies/{$result.imdbid}-cover.jpg" width="180" border="0"/>{/if}
+			{if $result.banner == 1}<img class="shadow img-thumbnail" alt="{$result.title|escape:"htmlall"} Logo"
+										src="{$smarty.const.WWW_TOP}/covers/movies/{$result.imdbid}-banner.jpg"/>
+			{elseif $result.cover == 1}<img class="shadow pic" alt="{$result.title|escape:"htmlall"} Logo"
+											 src="{$smarty.const.WWW_TOP}/covers/movies/{$result.imdbid}-cover.jpg" width="180" border="0"/>{/if}
 			<h1>{$result.title|escape:"htmlall"} ({$result.year})</h1>
 
 			<h2>{if $result.genre != ''}{$result.genre|replace:"|":" / "}{/if}</h2>
@@ -110,7 +112,7 @@
 
 				{assign var="msplits" value=","|explode:$result.grp_release_id}
 				{assign var="mguid" value=","|explode:$result.grp_release_guid}
-				{assign var="mnfo" value=","|explode:$result.grp_release_nfoID}
+				{assign var="mnfo" value=","|explode:$result.grp_release_nfoid}
 				{assign var="mgrp" value=","|explode:$result.grp_release_grpname}
 				{assign var="mname" value="#"|explode:$result.grp_release_name}
 				{assign var="mpostdate" value=","|explode:$result.grp_release_postdate}
@@ -121,8 +123,8 @@
 				{assign var="mpass" value=","|explode:$result.grp_release_password}
 				{assign var="minnerfiles" value=","|explode:$result.grp_rarinnerfilecount}
 				{assign var="mhaspreview" value=","|explode:$result.grp_haspreview}
-				{assign var="mcat" value=","|explode:$result.grp_release_categoryID}
-				{assign var="mcatname" value=","|explode:$result.grp_release_categoryName}
+				{assign var="mcat" value=","|explode:$result.grp_release_categoryid}
+				{assign var="mcatname" value=","|explode:$result.grp_release_categoryname}
 
 				{foreach from=$msplits item=m}
 					<tr class="{cycle values=",alt"}" id="guid{$mguid[$m@index]}">
