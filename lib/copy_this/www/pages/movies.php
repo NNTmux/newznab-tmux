@@ -3,7 +3,7 @@ require_once(WWW_DIR."/lib/movie.php");
 require_once(WWW_DIR."/lib/category.php");
 
 $movie = new Movie;
-$cat = new Category;
+$cat = new Category(['Settings' => $page->settings]);
 
 if (!$users->isLoggedIn())
 	$page->show403();
