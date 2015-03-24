@@ -1,13 +1,13 @@
 <?php
-require_once(WWW_DIR . "/lib/releases.php");
-require_once(WWW_DIR . "/lib/releasefiles.php");
-require_once(WWW_DIR . "/lib/releasecomments.php");
-require_once(WWW_DIR . "/lib/releaseextra.php");
-require_once(WWW_DIR . "/lib/tvrage.php");
-require_once(WWW_DIR . "/lib/anidb.php");
-require_once(WWW_DIR . "/lib/predb.php");
-require_once(WWW_DIR . "/lib/Musik.php");
-require_once(WWW_DIR . "/lib/episode.php");
+require_once(WWW_DIR."/lib/releases.php");
+require_once(WWW_DIR."/lib/releasefiles.php");
+require_once(WWW_DIR."/lib/releasecomments.php");
+require_once(WWW_DIR."/lib/releaseextra.php");
+require_once(WWW_DIR."/lib/tvrage.php");
+require_once(WWW_DIR."/lib/anidb.php");
+require_once(WWW_DIR."/lib/predb.php");
+require_once(WWW_DIR."/lib/Musik.php");
+require_once(WWW_DIR."/lib/episode.php");
 require_once(WWW_DIR . "/lib/XXX.php");
 require_once(WWW_DIR . "/lib/Games.php");
 require_once(WWW_DIR . "/lib/util.php");
@@ -16,23 +16,21 @@ require_once(NN_TMUX . 'lib' . DS . 'TraktTv.php');
 require_once(NN_TMUX . 'lib' . DS . 'TvAnger.php');
 
 
-if (!$users->isLoggedIn()) {
+if (!$users->isLoggedIn())
 	$page->show403();
-}
 
-if (isset($_GET["id"])) {
+if (isset($_GET["id"]))
+{
 	$releases = new Releases(['Settings' => $page->settings]);
 	$rc = new ReleaseComments;
 	$re = new ReleaseExtra;
 	$data = $releases->getByGuid($_GET["id"]);
 
-	if (!$data) {
-			$page->show404();
-	}
+	if (!$data)
+		$page->show404();
 
-	if ($page->isPostBack()) {
-			$rc->addComment($data["id"], $data["gid"], $_POST["txtAddComment"], $users->currentUserId(), $_SERVER['REMOTE_ADDR']);
-	}
+	if ($page->isPostBack())
+		$rc->addComment($data["id"], $data["gid"], $_POST["txtAddComment"], $users->currentUserId(), $_SERVER['REMOTE_ADDR']);
 
 	$nfo = $releases->getReleaseNfo($data["id"], false);
 	$reVideo = $re->getVideo($data["id"]);
@@ -49,7 +47,7 @@ if (isset($_GET["id"])) {
 		if (count($rageinfo) > 0)
 		{
 			$seriesnames = $seriesdescription = $seriescountry = $seriesgenre = $seriesimg = $seriesid = array();
-			foreach ($rageinfo as $r)
+			foreach($rageinfo as $r)
 			{
 				$seriesnames[] = $r['releasetitle'];
 				if (!empty($r['description']))
@@ -78,7 +76,8 @@ if (isset($_GET["id"])) {
 	}
 
 	$episodeArray = '';
-	if ($data['episodeinfoid'] > 0) {
+	if ($data['episodeinfoid'] > 0)
+	{
 		$episode = new Episode();
 		$episodeArray = $episode->getEpisodeInfoByID($data['episodeinfoid']);
 	}
@@ -142,33 +141,35 @@ if (isset($_GET["id"])) {
 
 	$mus = '';
 	if ($data['musicinfoid'] != '') {
-		require_once(WWW_DIR . "/lib/music.php");
+		require_once(WWW_DIR."/lib/music.php");
 		$music = new Musik(['Settings' => $page->settings]);
 		$mus = $music->getMusicInfo($data['musicinfoid']);
 	}
 
 	$book = '';
 	if ($data['bookinfoid'] != '') {
-		require_once(WWW_DIR . "/lib/book.php");
+		require_once(WWW_DIR."/lib/book.php");
 		$b = new Book();
 		$book = $b->getBookInfo($data['bookinfoid']);
 	}
 
 	$con = '';
 	if ($data['consoleinfoid'] != '') {
-		require_once(WWW_DIR . "/lib/console.php");
+		require_once(WWW_DIR."/lib/console.php");
 		$c = new Console();
 		$con = $c->getConsoleInfo($data['consoleinfoid']);
 	}
 
 	$AniDBAPIArray = '';
-	if ($data["anidbid"] > 0) {
+	if ($data["anidbid"] > 0)
+	{
 		$AniDB = new AniDB(['Settings' => $releases->pdo]);
 		$AniDBAPIArray = $AniDB->getAnimeInfo($data["anidbid"]);
 	}
 
 	$predbQuery = '';
-	if ($data["preid"] > 0) {
+	if ($data["preid"] > 0)
+	{
 		$PreDB = new PreDB();
 		$predbQuery = $PreDB->getByID($data["preid"]);
 	}
@@ -179,29 +180,29 @@ if (isset($_GET["id"])) {
 	$rf = new ReleaseFiles;
 	$releasefiles = $rf->get($data["id"]);
 
-	$page->smarty->assign('releasefiles', $releasefiles);
-	$page->smarty->assign('release', $data);
-	$page->smarty->assign('reVideo', $reVideo);
-	$page->smarty->assign('reAudio', $reAudio);
-	$page->smarty->assign('reSubs', $reSubs);
-	$page->smarty->assign('nfo', $nfo);
-	$page->smarty->assign('rage', $rage);
-	$page->smarty->assign('movie', $mov);
+	$page->smarty->assign('releasefiles',$releasefiles);
+	$page->smarty->assign('release',$data);
+	$page->smarty->assign('reVideo',$reVideo);
+	$page->smarty->assign('reAudio',$reAudio);
+	$page->smarty->assign('reSubs',$reSubs);
+	$page->smarty->assign('nfo',$nfo);
+	$page->smarty->assign('rage',$rage);
+	$page->smarty->assign('movie',$mov);
 	$page->smarty->assign('xxx', $xxx);
-	$page->smarty->assign('episode', $episodeArray);
-	$page->smarty->assign('anidb', $AniDBAPIArray);
-	$page->smarty->assign('music', $mus);
-	$page->smarty->assign('con', $con);
+	$page->smarty->assign('episode',$episodeArray);
+	$page->smarty->assign('anidb',$AniDBAPIArray);
+	$page->smarty->assign('music',$mus);
+	$page->smarty->assign('con',$con);
 	$page->smarty->assign('game', $game);
-	$page->smarty->assign('book', $book);
-	$page->smarty->assign('predb', $predbQuery);
+	$page->smarty->assign('book',$book);
+	$page->smarty->assign('predb',$predbQuery);
 	$page->smarty->assign('prehash', $pre);
-	$page->smarty->assign('comments', $comments);
-	$page->smarty->assign('searchname', $releases->getSimilarName($data['searchname']));
+	$page->smarty->assign('comments',$comments);
+	$page->smarty->assign('searchname',$releases->getSimilarName($data['searchname']));
 
 	$page->meta_title = "View NZB";
 	$page->meta_keywords = "view,nzb,description,details";
-	$page->meta_description = "View NZB for" . $data["searchname"];
+	$page->meta_description = "View NZB for".$data["searchname"] ;
 
 	$page->content = $page->smarty->fetch('viewnzb.tpl');
 	$page->render();

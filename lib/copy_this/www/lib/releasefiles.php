@@ -1,5 +1,5 @@
 <?php
-require_once(WWW_DIR . "/lib/framework/db.php");
+require_once(WWW_DIR."/lib/framework/db.php");
 
 /**
  * This class handles storage and retrieval of releasefiles.
@@ -39,7 +39,7 @@ class ReleaseFiles
 	public function add($id, $name, $size, $createddate, $passworded)
 	{
 		$db = new DB();
-		$sql = sprintf("INSERT INTO releasefiles  (releaseid,   name,   size,   createddate,   passworded) VALUES (%d, %s, %s, from_unixtime(%d), %d)", $id, $db->escapeString($name), $db->escapeString($size), $createddate, $passworded);
+		$sql = sprintf("INSERT INTO releasefiles  (releaseid,   name,   size,   createddate,   passworded) VALUES (%d, %s, %s, from_unixtime(%d), %d)", $id, $db->escapeString($name), $db->escapeString($size), $createddate, $passworded );
 		return $db->queryInsert($sql);
 	}
 }

@@ -558,7 +558,7 @@ class Musik
 	}
 
 	/**
-	 * @param string $title
+	 * @param $title
 	 *
 	 * @return boolean
 	 */

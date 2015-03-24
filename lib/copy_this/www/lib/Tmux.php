@@ -298,9 +298,6 @@ class Tmux
 		return ((float)$usec + (float)$sec);
 	}
 
-	/**
-	 * @param double $bytes
-	 */
 	public function decodeSize($bytes)
 	{
 		$types = ['B', 'KB', 'MB', 'GB', 'TB'];
@@ -382,7 +379,7 @@ class Tmux
 
 	public function proc_query($qry, $bookreqids, $request_hours, $db_name)
 	{
-		switch ((int)$qry) {
+		switch ((int) $qry) {
 			case 1:
 				return sprintf("SELECT
 					(SELECT COUNT(*) FROM releases WHERE nzbstatus = 1 AND categoryid BETWEEN 5000 AND 5999 AND rageid = -1) AS processtvrage,

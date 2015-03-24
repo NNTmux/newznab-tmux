@@ -1,9 +1,9 @@
 <?php
-require_once(dirname(__FILE__) . "/bin/config.php");
+require_once(dirname(__FILE__)."/bin/config.php");
 require_once(WWW_DIR . "lib/framework/db.php");
-require_once (WWW_DIR . '/lib/site.php');
-require_once (WWW_DIR . '/lib/util.php');
-require_once(WWW_DIR . '/lib/Tmux.php');
+require_once (WWW_DIR.'/lib/site.php');
+require_once (WWW_DIR.'/lib/util.php');
+require_once(WWW_DIR. '/lib/Tmux.php');
 require_once(WWW_DIR . "/lib/ColorCLI.php");
 
 $db = new DB();
@@ -93,9 +93,6 @@ if ($tablepergroup == 1) {
 }
 sleep(2);
 
-/**
- * @param string $pane
- */
 function writelog($pane)
 {
 	$path = dirname(__FILE__) . "/bin/logs";
@@ -118,9 +115,6 @@ if (isset($site->tmpunrarpath)) {
 	}
 }
 
-/**
- * @param string $cmd
- */
 function command_exist($cmd)
 {
 	$returnVal = exec("which $cmd 2>/dev/null");

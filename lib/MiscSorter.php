@@ -221,9 +221,6 @@ class MiscSorter
 		return $str;
 	}
 
-	/**
-	 * @param string $nfo
-	 */
 	private function matchnfo($case, $nfo, $row)
 	{
 		$ok = false;
@@ -662,9 +659,6 @@ class MiscSorter
 
 	// tries to derive author and title of book from release NFO
 
-	/**
-	 * @param string $nfo
-	 */
 	private function _doAmazonMovies($amaz = array(), $id = 0, $nfo)
 	{
 		$new = (string)$amaz->Items->Item->ItemAttributes->Title;

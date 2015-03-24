@@ -105,27 +105,27 @@ class PreDB
 	{
 		$db = new DB();
 
-		if ($this->echooutput) {
-					echo "Predb   : Updating releases with pre data\n";
-		}
+		if ($this->echooutput)
+			echo "Predb   : Updating releases with pre data\n";
 
 		$matched = 0;
 		$releasesQuery = $db->queryDirect(sprintf('SELECT id, searchname FROM releases WHERE preid IS NULL AND adddate > DATE_SUB(NOW(), INTERVAL %d DAY)', $daysback));
-		while ($arr = $db->getAssocArray($releasesQuery)) {
+		while ($arr = $db->getAssocArray($releasesQuery))
+		{
 			$arr['searchname'] = str_replace(' ', '_', $arr['searchname']);
 			$sql = sprintf("SELECT id FROM predb WHERE dirname = %s LIMIT 1", $db->escapeString($arr['searchname']));
 			$predbQuery = $db->queryOneRow($sql);
 
-			if ($predbQuery) {
+			if ($predbQuery)
+			{
 				$db->queryExec(sprintf('UPDATE releases SET preid = %d WHERE id = %d', $predbQuery['id'], $arr['id']));
 
 				$matched++;
 			}
 		}
 
-		if ($this->echooutput) {
-					echo "Predb   : Matched pre data to " . $matched . " releases\n";
-		}
+		if ($this->echooutput)
+			echo "Predb   : Matched pre data to " . $matched . " releases\n";
 
 	}
 
@@ -136,7 +136,8 @@ class PreDB
 	 */
 	public function updatePreDB($db, $preArray)
 	{
-		if (!preg_match('/^(UN)?((MOD)?NUKED?|DELPRE)$/', $preArray['category'])) {
+		if (!preg_match('/^(UN)?((MOD)?NUKED?|DELPRE)$/', $preArray['category']))
+		{
 			$db->queryExec(sprintf('INSERT INTO predb
 				(ctime, dirname, category, filesize, filecount, filename)
 				VALUES (%d, %s, %s, %F, %d, %s)
@@ -199,61 +200,61 @@ class PreDB
 	 */
 	public function nzpreUpdate()
 	{
-		require_once(WWW_DIR . "/lib/nntp.php");
+		require_once(WWW_DIR."/lib/nntp.php");
 
 		$s = new Sites();
 		$site = $s->get();
 
-		if (empty($site->nzpregroup) || empty($site->nzpresubject) || empty($site->nzpreposter) || empty($site->nzprefield) || empty($site->nzprekey)) {
+		if(empty($site->nzpregroup) || empty($site->nzpresubject) || empty($site->nzpreposter) || empty($site->nzprefield) || empty($site->nzprekey)) {
 					return false;
 		}
 
-		if ($this->echooutput) {
+		if($this->echooutput) {
 					echo "Predb   : Checking for new pre data ";
 		}
 
 		$db = new DB();
 		$nntp = new Nntp();
 
-		if (!$nntp->doConnect()) {
+		if(!$nntp->doConnect()) {
 			echo "Failed to get NNTP connection\n";
 			return false;
 		}
 
 		$ret = $groupData = $nntp->selectGroup($site->nzpregroup);
-		if ($nntp->isError($ret)) {
-			echo "Predb   : Error " . $ret->getMessage() . "\n";
+		if($nntp->isError($ret)) {
+			echo "Predb   : Error ".$ret->getMessage()."\n";
 			return false;
 		}
 
-		$ret = $groupMsgs = $nntp->getOverview(($groupData['last'] - (!empty($site->nzprearticles) ? $site->nzprearticles : 500)) . '-' . $groupData['last']);
-		if ($nntp->isError($ret)) {
-			echo "Predb   : Error " . $ret->getMessage() . "\n";
+		$ret = $groupMsgs = $nntp->getOverview(($groupData['last']-(!empty($site->nzprearticles) ? $site->nzprearticles : 500)).'-'.$groupData['last']);
+		if($nntp->isError($ret)) {
+			echo "Predb   : Error ".$ret->getMessage()."\n";
 			return false;
 		}
 
 		$added_updated = 0;
 		$nzprekey = $site->nzprekey;
-		while (strlen($nzprekey) < 1024) {
-					$nzprekey = $nzprekey . $nzprekey;
+		while(strlen($nzprekey) < 1024) {
+					$nzprekey = $nzprekey.$nzprekey;
 		}
 
 		$cnt = !empty($site->nzprearticles) ? $site->nzprearticles : 500;
-		foreach ($groupMsgs as $groupMsg) {
-			if ($cnt % 50 == 0 && $cnt != 0 && $this->echooutput) {
-							echo $cnt . "..";
+		foreach($groupMsgs as $groupMsg) {
+			if ($cnt%50==0 && $cnt != 0 && $this->echooutput) {
+							echo $cnt."..";
 			}
 			$cnt--;
 
-			if (preg_match('/^' . $site->nzpresubject . '$/', $groupMsg['Subject']) && preg_match('/^' . $site->nzpreposter . '$/', $groupMsg['From'])) {
+			if(preg_match('/^'.$site->nzpresubject.'$/', $groupMsg['Subject']) && preg_match('/^'.$site->nzpreposter.'$/', $groupMsg['From'])) {
 				$ret = $msgHeader = $nntp->getHeader($groupMsg['Message-ID']);
-				if ($nntp->isError($ret)) {
+				if($nntp->isError($ret)) {
 									continue;
 				}
 
-				for ($i = 0; $i < count($msgHeader); $i++) {
-					if (preg_match('/^' . $site->nzprefield . ': /', $msgHeader[$i])) {
-						if ($nzpreParse = $this->nzpreParse(str_replace($site->nzprefield . ': ', '', $msgHeader[$i]), $nzprekey)) {
+				for($i=0; $i < count($msgHeader); $i++) {
+					if(preg_match('/^'.$site->nzprefield.': /', $msgHeader[$i])) {
+						if($nzpreParse = $this->nzpreParse(str_replace($site->nzprefield.': ', '', $msgHeader[$i]), $nzprekey)) {
 							if ($this->updatePreDB($db, $nzpreParse)) {
 								$added_updated++;
 							}
@@ -267,8 +268,7 @@ class PreDB
 
 		$nntp->disconnect();
 
-		if ($this->echooutput) {
-					echo "\nPredb   : Added/Updated " . $added_updated . " records\n";
-		}
+		if ($this->echooutput)
+			echo "\nPredb   : Added/Updated " . $added_updated . " records\n";
 	}
 }

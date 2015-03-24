@@ -1,17 +1,15 @@
 <?php
-require_once(WWW_DIR . "/lib/releases.php");
-require_once(WWW_DIR . "/lib/category.php");
+require_once(WWW_DIR."/lib/releases.php");
+require_once(WWW_DIR."/lib/category.php");
 
 $releases = new Releases(['Settings' => $page->settings]);
 
-if (!$users->isLoggedIn()) {
+if (!$users->isLoggedIn())
 	$page->show403();
-}
 
 $category = -1;
-if (isset($_REQUEST["t"]) && ctype_digit($_REQUEST["t"])) {
+if (isset($_REQUEST["t"]) && ctype_digit($_REQUEST["t"]))
 	$category = $_REQUEST["t"];
-}
 
 $grp = "";
 if (isset($_REQUEST["g"])) {
@@ -31,9 +29,9 @@ $orderby = isset($_REQUEST["ob"]) && in_array($_REQUEST['ob'], $ordering) ? $_RE
 $results = array();
 $results = $releases->getBrowseRange($catarray, $offset, ITEMS_PER_PAGE, $orderby, -1, $page->userdata["categoryexclusions"], $grp);
 
-$page->smarty->assign('pagertotalitems', $browsecount);
-$page->smarty->assign('pageroffset', $offset);
-$page->smarty->assign('pageritemsperpage', ITEMS_PER_PAGE);
+$page->smarty->assign('pagertotalitems',$browsecount);
+$page->smarty->assign('pageroffset',$offset);
+$page->smarty->assign('pageritemsperpage',ITEMS_PER_PAGE);
 $page->smarty->assign('pagerquerybase', WWW_TOP . "/browse?t=" . $category . "&amp;g=" . $grp . "&amp;ob=" . $orderby . "&amp;offset=");
 $page->smarty->assign('pagerquerysuffix', "#results");
 
@@ -73,9 +71,9 @@ $page->smarty->assign('covgroup', $covgroup);
 foreach ($ordering as $ordertype) {
 	$page->smarty->assign('orderby' . $ordertype, WWW_TOP . "/browse?t=" . $category . "&amp;g=" . $grp . "&amp;ob=" . $ordertype . "&amp;offset=0");
 }
-$page->smarty->assign('lastvisit', $page->userdata['lastlogin']);
+$page->smarty->assign('lastvisit',$page->userdata['lastlogin']);
 
-$page->smarty->assign('results', $results);
+$page->smarty->assign('results',$results);
 
 $page->meta_title = "Browse Nzbs";
 $page->meta_keywords = "browse,nzb,description,details";

@@ -12,8 +12,8 @@ abstract class RequestID
 	const REQID_NONE   = -3; // The Request id was not found locally or via web lookup.
 	const REQID_ZERO   = -2; // The Request id was 0.
 	const REQID_NOLL   = -1; // Request id was not found via local lookup.
-	const REQID_UPROC  = 0; // Release has not been processed.
-	const REQID_FOUND  = 1; // Request id found and release was updated.
+	const REQID_UPROC  =  0; // Release has not been processed.
+	const REQID_FOUND  =  1; // Request id found and release was updated.
 
 	/**
 	 * @var Groups
@@ -91,18 +91,14 @@ abstract class RequestID
 	/**
 	 * Fetch releases with requestid's from MySQL.
 	 */
-	protected function _getReleases()
-	{
-}
+	protected function _getReleases() { }
 
 	/**
 	 * Process releases for requestid's.
 	 *
 	 * @return int How many did we rename?
 	 */
-	protected function _processReleases()
-	{
-}
+	protected function _processReleases() { }
 
 	/**
 	 * No request id was found, update the release.
@@ -129,9 +125,7 @@ abstract class RequestID
 	 *
 	 * @return array|bool
 	 */
-	protected function _getNewTitle()
-	{
-}
+	protected function _getNewTitle() { }
 
 	/**
 	 * Find a RequestID in a usenet subject.
@@ -146,9 +140,9 @@ abstract class RequestID
 			case preg_match('/\[\s*(\d+)\s*\]/', $this->_release['name'], $requestID):
 			case preg_match('/^REQ\s*(\d{4,6})/i', $this->_release['name'], $requestID):
 			case preg_match('/^(\d{4,6})-\d{1}\[/', $this->_release['name'], $requestID):
-			case preg_match('/(\d{4,6}) -/', $this->_release['name'], $requestID):
-				if ((int)$requestID[1] > 0) {
-					return (int)$requestID[1];
+			case preg_match('/(\d{4,6}) -/',$this->_release['name'], $requestID):
+				if ((int) $requestID[1] > 0) {
+					return (int) $requestID[1];
 				}
 		}
 		return self::REQID_ZERO;

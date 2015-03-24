@@ -350,7 +350,7 @@ Class ProcessAdditional
 			);
 		}
 
-		$this->_showCLIReleaseID = (PHP_BINARY . ' ' . __DIR__ . DS . 'ProcessAdditional.php ReleaseID: ');
+		$this->_showCLIReleaseID = (PHP_BINARY . ' ' . __DIR__ . DS .  'ProcessAdditional.php ReleaseID: ');
 
 		// Maximum amount of releases to fetch per run.
 		$this->_queryLimit =
@@ -645,7 +645,7 @@ Class ProcessAdditional
 	 * Deletes files and folders recursively.
 	 *
 	 * @param string $path           Path to a folder or file.
-	 * @param string[]  $ignoredFolders Array with paths to folders to ignore.
+	 * @param array  $ignoredFolders Array with paths to folders to ignore.
 	 *
 	 * @void
 	 * @access protected
@@ -1678,7 +1678,7 @@ Class ProcessAdditional
 									} else if ($ext === 'FLAC') {
 										$newCat = Category::CAT_MUSIC_LOSSLESS;
 									} else {
-										$newCat = $this->_categorize->determineCategory($rQuery['groupid'], $newName);
+										$newCat = $this->_categorize->determineCategory($rQuery['groupid'],$newName);
 									}
 
 									$newTitle = $this->pdo->escapeString(substr($newName, 0, 255));
@@ -1888,7 +1888,7 @@ Class ProcessAdditional
 				$this->site->ffmpegpath .
 				'" -i "' .
 				$fileLocation .
-				'" -ss ' . ($time === '' ? '00:00:03.00' : $time) .
+				'" -ss ' . ($time === '' ? '00:00:03.00' : $time)  .
 				' -vframes 1 -loglevel quiet -y "' .
 				$fileName .
 				'"'
@@ -1949,14 +1949,12 @@ Class ProcessAdditional
 					$newMethod = true;
 
 					// Get the lowest time we can start making the video at based on how many seconds the admin wants the video to be.
-					if ($numbers[1] <= $this->_ffMPEGDuration) {
-// If the clip is shorter than the length we want.
+					if ($numbers[1] <= $this->_ffMPEGDuration) { // If the clip is shorter than the length we want.
 
 						// The lowest we want is 0.
 						$lowestLength = '00:00:00.00';
 
-					} else {
-// If the clip is longer than the length we want.
+					} else { // If the clip is longer than the length we want.
 
 						// The lowest we want is the the difference between the max video length and our wanted total time.
 						$lowestLength = ($numbers[1] - $this->_ffMPEGDuration);
@@ -2068,7 +2066,7 @@ Class ProcessAdditional
 		if (is_file($fileLocation)) {
 
 			// Run media info on it.
-			$xmlArray = runCmd(
+			$xmlArray =runCmd(
 				$this->_killString . $this->site->mediainfopath . '" --Output=XML "' . $fileLocation . '"'
 			);
 
@@ -2244,7 +2242,7 @@ Class ProcessAdditional
 	/**
 	 * Try to get a title from a Linux_2rename.sh file for alt.binaries.u4e group.
 	 *
-	 * @param string $fileLocation
+	 * @param $fileLocation
 	 */
 	protected function _processU4ETitle($fileLocation)
 	{
@@ -2560,6 +2558,4 @@ Class ProcessAdditional
 	}
 }
 
-class ProcessAdditionalException extends Exception
-{
-}
+class ProcessAdditionalException extends Exception { }

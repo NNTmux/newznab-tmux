@@ -120,7 +120,7 @@ class TmuxOutput extends Tmux
 		$tversion = '0.6r0138';
 
 		$buffer .= sprintf($this->tmpMasks[2],
-					"Monitor $state v$tversion @ $this->_tvers [" . $this->_vers . "]: ",
+					"Monitor $state v$tversion @ $this->_tvers [" . $this->_vers ."]: ",
 					$this->relativeTime($this->runVar['timers']['timer1'])
 		);
 
@@ -518,9 +518,9 @@ class TmuxOutput extends Tmux
 			$this->pdo->log->alternateOver("%-20s") . " " . $this->pdo->log->tmuxOrange("%-33.33s");
 		$this->_colourMasks[2.1] =
 			$this->pdo->log->headerOver("%-20s") . " " . $this->pdo->log->tmuxOrange("%-33.33s");
-		$this->_colourMasks[3]   = $this->pdo->log->header("%-16.16s %25.25s %25.25s"); ;
+		$this->_colourMasks[3]   = $this->pdo->log->header("%-16.16s %25.25s %25.25s");;
 		$this->_colourMasks[4] = $this->pdo->log->primaryOver("%-16.16s") .
-								 " " . $this->pdo->log->tmuxOrange("%25.25s %25.25s"); ;
+								 " " . $this->pdo->log->tmuxOrange("%25.25s %25.25s");;
 		$this->_colourMasks[5] = $this->pdo->log->tmuxOrange("%-16.16s %25.25s %25.25s");
 	}
 }

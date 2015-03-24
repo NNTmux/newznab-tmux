@@ -4,12 +4,12 @@ require_once(WWW_DIR . "/lib/releases.php");
 require_once(WWW_DIR . "/lib/util.php");
 require_once(WWW_DIR . "/lib/nzb.php");
 /**
-	 * Class NZBGet
-	 *
-	 * Transfers data between an NZBGet server and a newznab website.
-	 *
-	 * @package nzedb
-	 */
+ * Class NZBGet
+ *
+ * Transfers data between an NZBGet server and a newznab website.
+ *
+ * @package nzedb
+ */
 class NZBGet
 {
 	/**
@@ -88,7 +88,7 @@ class NZBGet
 		$this->rsstoken = $page->userdata['rsstoken'];
 
 		if (!empty($page->userdata['nzbgeturl'])) {
-			$this->url = $page->userdata['nzbgeturl'];
+			$this->url  = $page->userdata['nzbgeturl'];
 			$this->userName = (empty($page->userdata['nzbgetusername']) ? '' : $page->userdata['nzbgetusername']);
 			$this->password = (empty($page->userdata['nzbgetpassword']) ? '' : $page->userdata['nzbgetpassword']);
 		}
@@ -381,7 +381,7 @@ class NZBGet
 			if ($xml) {
 				$retVal = [];
 				$i = 0;
-				foreach ($xml->params->param->value->array->data->value as $value) {
+				foreach($xml->params->param->value->array->data->value as $value) {
 					foreach ($value->struct->member as $member) {
 						$value = (array)$member->value;
 						$value = array_shift($value);
@@ -410,7 +410,7 @@ class NZBGet
 		if ($data) {
 			$xml = simplexml_load_string($data);
 			if ($xml) {
-				foreach ($xml->params->param->value->struct->member as $member) {
+				foreach($xml->params->param->value->struct->member as $member) {
 					$value = (array)$member->value;
 					$value = array_shift($value);
 					if (!is_object($value)) {
@@ -432,7 +432,7 @@ class NZBGet
 	 *
 	 * @access public
 	 */
-	public function verifyURL($url)
+	public function verifyURL ($url)
 	{
 		if (preg_match('/(?P<protocol>https?):\/\/(?P<url>.+?)(:(?P<port>\d+\/)|\/)$/i', $url, $matches)) {
 			return

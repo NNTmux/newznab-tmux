@@ -53,11 +53,10 @@ class Book
 	{
 		$db = new DB();
 
-		if ($start === false) {
-					$limit = "";
-		} else {
-					$limit = " LIMIT " . $start . "," . $num;
-		}
+		if ($start === false)
+			$limit = "";
+		else
+			$limit = " LIMIT " . $start . "," . $num;
 
 		return $db->query(" SELECT * FROM bookinfo ORDER BY createddate DESC" . $limit);
 	}
@@ -102,16 +101,14 @@ class Book
 
 		$browseby = $this->getBrowseBy();
 
-		if ($start === false) {
-					$limit = "";
-		} else {
-					$limit = " LIMIT " . $start . "," . $num;
-		}
+		if ($start === false)
+			$limit = "";
+		else
+			$limit = " LIMIT " . $start . "," . $num;
 
 		$maxagesql = "";
-		if ($maxage > 0) {
-					$maxagesql = sprintf(" and r.postdate > now() - interval %d day ", $maxage);
-		}
+		if ($maxage > 0)
+			$maxagesql = sprintf(" and r.postdate > now() - interval %d day ", $maxage);
 
 		$order = $this->getBrowseOrder($orderby);
 		$sql = sprintf(" SELECT r.bookinfoid, max(postdate), b.* from releases r inner join bookinfo b on b.id = r.bookinfoid and b.title != '' where r.passwordstatus <= (select value from site where setting='showpasswordedrelease') %s %s group by r.bookinfoid order by %s %s" . $limit, $browseby, $maxagesql, $order[0], $order[1]);
@@ -121,11 +118,11 @@ class Book
 		//get a copy of all the bookinfoids
 		//
 		$ids = "";
-		foreach ($rows as $row) {
-					$ids .= $row["bookinfoid"] . ", ";
-		}
+		foreach ($rows as $row)
+			$ids .= $row["bookinfoid"] . ", ";
 
-		if (strlen($ids) > 0) {
+		if (strlen($ids) > 0)
+		{
 			$ids = substr($ids, 0, -2);
 
 			//
@@ -267,7 +264,8 @@ class Book
 
 		$mus = array();
 		$amaz = $this->fetchAmazonProperties($author . " " . $title);
-		if (!$amaz) {
+		if (!$amaz)
+		{
 			//echo "tried to lookup ".$author." ".$title;
 			return false;
 		}
@@ -280,11 +278,10 @@ class Book
 		$item["asin"] = (string)$amaz->Items->Item->ASIN;
 		$item["url"] = (string)$amaz->Items->Item->DetailPageURL;
 		$item["coverurl"] = (string)$amaz->Items->Item->LargeImage->URL;
-		if ($item['coverurl'] != "") {
-					$item['cover'] = 1;
-		} else {
-					$item['cover'] = 0;
-		}
+		if ($item['coverurl'] != "")
+			$item['cover'] = 1;
+		else
+			$item['cover'] = 0;
 		$item["author"] = (string)$amaz->Items->Item->ItemAttributes->Author;
 		$item["dewey"] = (string)$amaz->Items->Item->ItemAttributes->DeweyDecimalNumber;
 		$item["ean"] = (string)$amaz->Items->Item->ItemAttributes->EAN;
@@ -294,9 +291,8 @@ class Book
 		$item["pages"] = (string)$amaz->Items->Item->ItemAttributes->NumberOfPages;
 		$item["title"] = (string)$amaz->Items->Item->ItemAttributes->Title;
 		$item["review"] = "";
-		if (isset($amaz->Items->Item->EditorialReviews)) {
-					$item["review"] = trim(strip_tags((string)$amaz->Items->Item->EditorialReviews->EditorialReview->Content));
-		}
+		if (isset($amaz->Items->Item->EditorialReviews))
+			$item["review"] = trim(strip_tags((string)$amaz->Items->Item->EditorialReviews->EditorialReview->Content));
 
 		//This is to verify the result back from amazon was at least somewhat related to what was intended.
 		//If you are debugging releases comment out the following code to show all info
@@ -348,9 +344,12 @@ class Book
 	public function fetchAmazonProperties($title)
 	{
 		$obj = new AmazonProductAPI($this->pubkey, $this->privkey, $this->asstag);
-		try {
+		try
+		{
 			$result = $obj->searchProducts($title, AmazonProductAPI::BOOKS, "TITLE");
-		} catch (Exception $e) {
+		}
+		catch (Exception $e)
+		{
 			$result = false;
 		}
 
@@ -367,36 +366,40 @@ class Book
 		$numlookedup = 0;
 
 		$res = $db->queryDirect(sprintf("SELECT searchname, id from releases where bookinfoid IS NULL and categoryid = %d ORDER BY postdate DESC LIMIT 100", Category::CAT_BOOK_EBOOK));
-		if ($db->getNumRows($res) > 0) {
-			if ($this->echooutput) {
-							echo "BookPrc : Processing " . $db->getNumRows($res) . " book releases\n";
-			}
+		if ($db->getNumRows($res) > 0)
+		{
+			if ($this->echooutput)
+				echo "BookPrc : Processing " . $db->getNumRows($res) . " book releases\n";
 
-			while ($arr = $db->getAssocArray($res)) {
-				if ($numlookedup > Book::NUMTOPROCESSPERTIME) {
-									return;
-				}
+			while ($arr = $db->getAssocArray($res))
+			{
+				if ($numlookedup > Book::NUMTOPROCESSPERTIME)
+					return;
 
 				$bookId = -2;
 				$book = $this->parseAuthor($arr['searchname']);
-				if ($book !== false) {
-					if ($this->echooutput) {
-											echo 'BookPrc : ' . $book["author"] . ' - ' . $book["title"] . "\n";
-					}
+				if ($book !== false)
+				{
+					if ($this->echooutput)
+						echo 'BookPrc : ' . $book["author"] . ' - ' . $book["title"] . "\n";
 
 					//check for existing book entry
 					$bookCheck = $this->getBookInfoByName($book["author"], $book["title"]);
 
-					if ($bookCheck === false) {
+					if ($bookCheck === false)
+					{
 						//
 						// get from amazon
 						//
 						$numlookedup++;
 						$ret = $this->updateBookInfo($book["author"], $book["title"]);
-						if ($ret !== false) {
+						if ($ret !== false)
+						{
 							$bookId = $ret;
 						}
-					} else {
+					}
+					else
+					{
 						$bookId = $bookCheck["id"];
 					}
 				}
@@ -453,9 +456,11 @@ class Book
 
 			// switch Cratchett, Bob to Bob Cratchett
 			preg_match_all('/[,]/i', $result['author'], $matches);
-			if (sizeof($matches[0]) == 1) {
+			if (sizeof($matches[0]) == 1)
+			{
 				$pos = strpos($result['author'], ",");
-				if ($pos !== false) {
+				if ($pos !== false)
+				{
 					$firstname = substr($result['author'], $pos + 1);
 					$surname = substr($result['author'], 0, $pos);
 					$result['author'] = trim($firstname . " " . $surname);
@@ -474,21 +479,19 @@ class Book
 	{
 		$db = new DB();
 
-		if ($pages == 0) {
-					$pages = "null";
-		} else {
-					$pages = $pages + 0;
-		}
+		if ($pages == 0)
+			$pages = "null";
+		else
+			$pages = $pages + 0;
 
-		if ($publishdate == "") {
-					$publishdate = "null";
-		} elseif (strlen($publishdate) == 4) {
-					$publishdate = $db->escapeString($publishdate . "-01-01");
-		} elseif (strlen($publishdate) == 7) {
-					$publishdate = $db->escapeString($publishdate . "-01");
-		} else {
-					$publishdate = $db->escapeString($publishdate);
-		}
+		if ($publishdate == "")
+			$publishdate = "null";
+		elseif (strlen($publishdate) == 4)
+			$publishdate = $db->escapeString($publishdate . "-01-01");
+		elseif (strlen($publishdate) == 7)
+			$publishdate = $db->escapeString($publishdate . "-01");
+		else
+			$publishdate = $db->escapeString($publishdate);
 
 		$sql = sprintf("INSERT INTO bookinfo  (title, asin, url, author, publisher, publishdate, review, cover, createddate, updateddate, dewey, ean, isbn, pages)
 		VALUES (%s,  %s, %s, %s, %s, %s,  %s, %d, now(), now(), %s, %s, %s, %s)

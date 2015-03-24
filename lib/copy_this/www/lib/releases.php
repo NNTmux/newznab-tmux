@@ -16,9 +16,9 @@ require_once(WWW_DIR . "/lib/util.php");
 class Releases
 {
 	// RAR/ZIP Passworded indicator.
-	const PASSWD_NONE      = 0; // No password.
-	const PASSWD_POTENTIAL = 1; // Might have a password.
-	const BAD_FILE         = 2; // Possibly broken RAR/ZIP.
+	const PASSWD_NONE      =  0; // No password.
+	const PASSWD_POTENTIAL =  1; // Might have a password.
+	const BAD_FILE         =  2; // Possibly broken RAR/ZIP.
 	const PASSWD_RAR       = 10; // Definitely passworded.
 
 	/**
@@ -242,7 +242,7 @@ class Releases
 	/**
 	 * Return site setting for hiding/showing passworded releases.
 	 *
-	 * @return string
+	 * @return int
 	 */
 	public function showPasswords()
 	{
@@ -306,7 +306,7 @@ class Releases
 	/**
 	 * Return ordering types usable on site.
 	 *
-	 * @return string[]
+	 * @return array
 	 */
 	public function getBrowseOrdering()
 	{
@@ -764,7 +764,8 @@ class Releases
 	public function update(
 		$ID, $name, $searchName, $fromName, $categoryID, $parts, $grabs, $size,
 		$postedDate, $addedDate, $rageID, $seriesFull, $season, $episode, $imDbID, $aniDbID
-	) {
+	)
+	{
 		$this->pdo->queryExec(
 			sprintf(
 				'UPDATE releases
@@ -935,7 +936,8 @@ class Releases
 		$searchName, $usenetName, $posterName, $groupName, $cat = [-1], $sizeFrom,
 		$sizeTo, $hasNfo, $hasComments, $daysNew, $daysOld, $offset = 0, $limit = 1000,
 		$orderBy = '', $maxAge = -1, $excludedCats = [], $type = 'basic'
-	) {
+	)
+	{
 		$sizeRange = array(
 			1 => 1,
 			2 => 2.5,
@@ -1266,7 +1268,7 @@ class Releases
 	/**
 	 * @param string $guid
 	 *
-	 * @return string
+	 * @return array|bool
 	 */
 	public function getByGuid($guid)
 	{

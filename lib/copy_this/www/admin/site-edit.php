@@ -12,7 +12,8 @@ $id = 0;
 // set the current action
 $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view';
 
-switch ($action) {
+switch ($action)
+{
 	case 'submit':
 
 		if (!empty($_POST['book_reqids'])) {
@@ -22,31 +23,34 @@ switch ($action) {
 		}
 		$error = "";
 		$ret = $sites->update($_POST);
-		if (is_int($ret)) {
-			if ($ret == Sites::ERR_BADUNRARPATH) {
-							$error = "The unrar path does not point to a valid binary";
-			} elseif ($ret == Sites::ERR_BADFFMPEGPATH) {
-							$error = "The ffmpeg path does not point to a valid binary";
-			} elseif ($ret == Sites::ERR_BADMEDIAINFOPATH) {
-							$error = "The mediainfo path does not point to a valid binary";
-			} elseif ($ret == Sites::ERR_BADNZBPATH) {
-							$error = "The nzb path does not point to a valid directory";
-			} elseif ($ret == Sites::ERR_DEEPNOUNRAR) {
-							$error = "Deep password check requires a valid path to unrar binary";
-			} elseif ($ret == Sites::ERR_BADTMPUNRARPATH) {
-							$error = "The temp unrar path is not a valid directory";
-			} elseif ($ret == Sites::ERR_BADLAMEPATH) {
-							$error = "The lame path is not a valid directory";
-			} elseif ($ret == Sites::ERR_SABCOMPLETEPATH) {
-							$error = "The sab complete path is not a valid directory";
-			}
+		if (is_int($ret))
+		{
+			if ($ret == Sites::ERR_BADUNRARPATH)
+				$error = "The unrar path does not point to a valid binary";
+			elseif ($ret == Sites::ERR_BADFFMPEGPATH)
+				$error = "The ffmpeg path does not point to a valid binary";
+			elseif ($ret == Sites::ERR_BADMEDIAINFOPATH)
+				$error = "The mediainfo path does not point to a valid binary";
+			elseif ($ret == Sites::ERR_BADNZBPATH)
+				$error = "The nzb path does not point to a valid directory";
+			elseif ($ret == Sites::ERR_DEEPNOUNRAR)
+				$error = "Deep password check requires a valid path to unrar binary";
+			elseif ($ret == Sites::ERR_BADTMPUNRARPATH)
+				$error = "The temp unrar path is not a valid directory";
+			elseif ($ret == Sites::ERR_BADLAMEPATH)
+				$error = "The lame path is not a valid directory";
+			elseif ($ret == Sites::ERR_SABCOMPLETEPATH)
+				$error = "The sab complete path is not a valid directory";
 		}
 
-		if ($error == "") {
+		if ($error == "")
+		{
 			$site = $ret;
 			$returnid = $site->id;
 			header("Location:" . WWW_TOP . "/site-edit.php?id=" . $returnid);
-		} else {
+		}
+		else
+		{
 			$page->smarty->assign('error', $error);
 			$site = $sites->row2Object($_POST);
 			$page->smarty->assign('fsite', $site);
@@ -142,16 +146,14 @@ $page->smarty->assign('book_reqids_selected', $books_selected);
 
 $themelist = array();
 $themes = scandir(WWW_DIR . "/templates");
-foreach ($themes as $theme) {
+foreach ($themes as $theme)
 	if (strpos($theme, ".") === false && is_dir(WWW_DIR . "/templates/" . $theme))
 		$themelist[] = $theme;
-}
 
 $page->smarty->assign('themelist', $themelist);
 
-if (strpos(NNTP_SERVER, "astra") === false) {
+if (strpos(NNTP_SERVER, "astra") === false)
 	$page->smarty->assign('compress_headers_warning', "compress_headers_warning");
-}
 
 $page->content = $page->smarty->fetch('site-edit.tpl');
 $page->render();

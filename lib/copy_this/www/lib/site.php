@@ -28,44 +28,35 @@ class Sites
 		$db = new DB();
 		$site = $this->row2Object($form);
 
-		if (substr($site->nzbpath, strlen($site->nzbpath) - 1) != '/') {
-					$site->nzbpath = $site->nzbpath . "/";
-		}
+		if (substr($site->nzbpath, strlen($site->nzbpath) - 1) != '/')
+			$site->nzbpath = $site->nzbpath . "/";
 
 		//
 		// Validate site settings
 		//
-		if ($site->mediainfopath != "" && !is_file($site->mediainfopath)) {
-					return Sites::ERR_BADMEDIAINFOPATH;
-		}
+		if ($site->mediainfopath != "" && !is_file($site->mediainfopath))
+			return Sites::ERR_BADMEDIAINFOPATH;
 
-		if ($site->ffmpegpath != "" && !is_file($site->ffmpegpath)) {
-					return Sites::ERR_BADFFMPEGPATH;
-		}
+		if ($site->ffmpegpath != "" && !is_file($site->ffmpegpath))
+			return Sites::ERR_BADFFMPEGPATH;
 
-		if ($site->unrarpath != "" && !is_file($site->unrarpath)) {
-					return Sites::ERR_BADUNRARPATH;
-		}
+		if ($site->unrarpath != "" && !is_file($site->unrarpath))
+			return Sites::ERR_BADUNRARPATH;
 
-		if ($site->nzbpath != "" && !file_exists($site->nzbpath)) {
-					return Sites::ERR_BADNZBPATH;
-		}
+		if ($site->nzbpath != "" && !file_exists($site->nzbpath))
+			return Sites::ERR_BADNZBPATH;
 
-		if ($site->checkpasswordedrar == 2 && !is_file($site->unrarpath)) {
-					return Sites::ERR_DEEPNOUNRAR;
-		}
+		if ($site->checkpasswordedrar == 2 && !is_file($site->unrarpath))
+			return Sites::ERR_DEEPNOUNRAR;
 
-		if ($site->tmpunrarpath != "" && !file_exists($site->tmpunrarpath)) {
-					return Sites::ERR_BADTMPUNRARPATH;
-		}
+		if ($site->tmpunrarpath != "" && !file_exists($site->tmpunrarpath))
+			return Sites::ERR_BADTMPUNRARPATH;
 
-		if ($site->lamepath != "" && !file_exists($site->lamepath)) {
-					return Sites::ERR_BADLAMEPATH;
-		}
+		if ($site->lamepath != "" && !file_exists($site->lamepath))
+			return Sites::ERR_BADLAMEPATH;
 
-		if ($site->sabcompletedir != "" && !file_exists($site->sabcompletedir)) {
-					return Sites::ERR_SABCOMPLETEPATH;
-		}
+		if ($site->sabcompletedir != "" && !file_exists($site->sabcompletedir))
+			return Sites::ERR_SABCOMPLETEPATH;
 
 		$sql = $sqlKeys = array();
 		foreach ($form as $settingK => $settingV) {
@@ -90,9 +81,8 @@ class Sites
 		$db = new DB();
 		$rows = $db->query($sql, true, NN_CACHE_EXPIRY_MEDIUM);
 
-		if ($rows === false) {
-					return false;
-		}
+		if ($rows === false)
+			return false;
 
 		return $this->rows2Object($rows);
 	}
@@ -100,9 +90,8 @@ class Sites
 	public function rows2Object($rows)
 	{
 		$obj = new stdClass;
-		foreach ($rows as $row) {
-					$obj->{$row['setting']} = $row['value'];
-		}
+		foreach ($rows as $row)
+			$obj->{$row['setting']} = $row['value'];
 
 		$obj->{'version'} = $this->version();
 
@@ -113,9 +102,8 @@ class Sites
 	{
 		$obj = new stdClass;
 		$rowKeys = array_keys($row);
-		foreach ($rowKeys as $key) {
-					$obj->{$key} = $row[$key];
-		}
+		foreach ($rowKeys as $key)
+			$obj->{$key} = $row[$key];
 
 		return $obj;
 	}
@@ -132,9 +120,8 @@ class Sites
 			$filecontents = file_get_contents($file);
 			if (preg_match("/Rev\: (\d+)/", $filecontents, $matches)) {
 				$patchrev = $matches[1];
-				if ($patchrev > $currentrev) {
-									$missingpatch[] = $file;
-				}
+				if ($patchrev > $currentrev)
+					$missingpatch[] = $file;
 			}
 		}
 
@@ -157,9 +144,8 @@ class Sites
 	public function getLicense($html = false)
 	{
 		$n = "\r\n";
-		if ($html) {
-					$n = "<br/>";
-		}
+		if ($html)
+			$n = "<br/>";
 
 		return $n . "newznab " . $this->version() . " Copyright (C) " . date("Y") . " newznab.com" . $n . "
 

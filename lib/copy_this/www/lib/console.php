@@ -55,11 +55,10 @@ class Console
 	{
 		$db = new DB();
 
-		if ($start === false) {
-					$limit = "";
-		} else {
-					$limit = " LIMIT " . $start . "," . $num;
-		}
+		if ($start === false)
+			$limit = "";
+		else
+			$limit = " LIMIT " . $start . "," . $num;
 
 		return $db->query(" SELECT * FROM consoleinfo ORDER BY createddate DESC" . $limit);
 	}
@@ -84,22 +83,26 @@ class Console
 		$browseby = $this->getBrowseBy();
 
 		$catsrch = "";
-		if (count($cat) > 0 && $cat[0] != -1) {
+		if (count($cat) > 0 && $cat[0] != -1)
+		{
 			$catsrch = " (";
-			foreach ($cat as $category) {
-				if ($category != -1) {
+			foreach ($cat as $category)
+			{
+				if ($category != -1)
+				{
 					$categ = new Category();
-					if ($categ->isParent($category)) {
+					if ($categ->isParent($category))
+					{
 						$children = $categ->getChildren($category);
 						$chlist = "-99";
-						foreach ($children as $child) {
-													$chlist .= ", " . $child["id"];
-						}
+						foreach ($children as $child)
+							$chlist .= ", " . $child["id"];
 
-						if ($chlist != "-99") {
-														$catsrch .= " r.categoryid in (" . $chlist . ") or ";
-						}
-					} else {
+						if ($chlist != "-99")
+								$catsrch .= " r.categoryid in (" . $chlist . ") or ";
+					}
+					else
+					{
 						$catsrch .= sprintf(" r.categoryid = %d or ", $category);
 					}
 				}
@@ -107,16 +110,14 @@ class Console
 			$catsrch .= "1=2 )";
 		}
 
-		if ($maxage > 0) {
-					$maxage = sprintf(" and r.postdate > now() - interval %d day ", $maxage);
-		} else {
-					$maxage = "";
-		}
+		if ($maxage > 0)
+			$maxage = sprintf(" and r.postdate > now() - interval %d day ", $maxage);
+		else
+			$maxage = "";
 
 		$exccatlist = "";
-		if (count($excludedcats) > 0) {
-					$exccatlist = " and r.categoryid not in (" . implode(",", $excludedcats) . ")";
-		}
+		if (count($excludedcats) > 0)
+			$exccatlist = " and r.categoryid not in (" . implode(",", $excludedcats) . ")";
 
 		$sql = sprintf("select count(r.id) as num from releases r inner join consoleinfo con on con.id = r.consoleinfoid and con.title != '' where r.passwordstatus <= (select value from site where setting='showpasswordedrelease') and %s %s %s %s", $browseby, $catsrch, $maxage, $exccatlist);
 		$res = $db->queryOneRow($sql, true);
@@ -132,29 +133,32 @@ class Console
 
 		$browseby = $this->getBrowseBy();
 
-		if ($start === false) {
-					$limit = "";
-		} else {
-					$limit = " LIMIT " . $start . "," . $num;
-		}
+		if ($start === false)
+			$limit = "";
+		else
+			$limit = " LIMIT " . $start . "," . $num;
 
 		$catsrch = "";
-		if (count($cat) > 0 && $cat[0] != -1) {
+		if (count($cat) > 0 && $cat[0] != -1)
+		{
 			$catsrch = " (";
-			foreach ($cat as $category) {
-				if ($category != -1) {
+			foreach ($cat as $category)
+			{
+				if ($category != -1)
+				{
 					$categ = new Category();
-					if ($categ->isParent($category)) {
+					if ($categ->isParent($category))
+					{
 						$children = $categ->getChildren($category);
 						$chlist = "-99";
-						foreach ($children as $child) {
-													$chlist .= ", " . $child["id"];
-						}
+						foreach ($children as $child)
+							$chlist .= ", " . $child["id"];
 
-						if ($chlist != "-99") {
-													$catsrch .= " r.categoryid in (" . $chlist . ") or ";
-						}
-					} else {
+						if ($chlist != "-99")
+							$catsrch .= " r.categoryid in (" . $chlist . ") or ";
+					}
+					else
+					{
 						$catsrch .= sprintf(" r.categoryid = %d or ", $category);
 					}
 				}
@@ -163,14 +167,12 @@ class Console
 		}
 
 		$maxagesql = "";
-		if ($maxage > 0) {
-					$maxagesql = sprintf(" and r.postdate > now() - interval %d day ", $maxage);
-		}
+		if ($maxage > 0)
+			$maxagesql = sprintf(" and r.postdate > now() - interval %d day ", $maxage);
 
 		$exccatlist = "";
-		if (count($excludedcats) > 0) {
-					$exccatlist = " and r.categoryid not in (" . implode(",", $excludedcats) . ")";
-		}
+		if (count($excludedcats) > 0)
+			$exccatlist = " and r.categoryid not in (" . implode(",", $excludedcats) . ")";
 
 		$order = $this->getConsoleOrder($orderby);
 		$sql = sprintf(" SELECT r.*, r.id as releaseid, con.*, g.title as genre, groups.name as group_name, concat(cp.title, ' > ', c.title) as category_name, concat(cp.id, ',', c.id) as category_ids, rn.id as nfoid from releases r left outer join groups on groups.id = r.groupid inner join consoleinfo con on con.id = r.consoleinfoid left outer join releasenfo rn on rn.releaseid = r.id and rn.nfo is not null left outer join category c on c.id = r.categoryid left outer join category cp on cp.id = c.parentid left outer join genres g on g.id = con.genreID where r.passwordstatus <= (select value from site where setting='showpasswordedrelease') and %s %s %s %s order by %s %s" . $limit, $browseby, $catsrch, $maxagesql, $exccatlist, $order[0], $order[1]);
@@ -286,62 +288,70 @@ class Console
 		// get game properties
 		//
 		$con['coverurl'] = (string)$amaz->Items->Item->LargeImage->URL;
-		if ($con['coverurl'] != "") {
-					$con['cover'] = 1;
-		} else {
-					$con['cover'] = 0;
-		}
+		if ($con['coverurl'] != "")
+			$con['cover'] = 1;
+		else
+			$con['cover'] = 0;
 
 		$con['title'] = (string)$amaz->Items->Item->ItemAttributes->Title;
-		if (empty($con['title'])) {
-					$con['title'] = $gameInfo['title'];
-		}
+		if (empty($con['title']))
+			$con['title'] = $gameInfo['title'];
 
 		$con['platform'] = (string)$amaz->Items->Item->ItemAttributes->Platform;
-		if (empty($con['platform'])) {
-					$con['platform'] = $gameInfo['platform'];
-		}
+		if (empty($con['platform']))
+			$con['platform'] = $gameInfo['platform'];
 
 		//Beginning of Recheck Code
 		//This is to verify the result back from amazon was at least somewhat related to what was intended.
 
 		//Some of the Platforms don't match Amazon's exactly. This code is needed to facilitate rechecking.
-		if (preg_match('/^X360$/i', $gameInfo['platform'])) {
+		if (preg_match('/^X360$/i', $gameInfo['platform']))
+		{
 			$gameInfo['platform'] = str_replace('X360', 'Xbox 360', $gameInfo['platform']); // baseline single quote
 		}
-		if (preg_match('/^XBOX360$/i', $gameInfo['platform'])) {
+		if (preg_match('/^XBOX360$/i', $gameInfo['platform']))
+		{
 			$gameInfo['platform'] = str_replace('XBOX360', 'Xbox 360', $gameInfo['platform']); // baseline single quote
 		}
-		if (preg_match('/^NDS$/i', $gameInfo['platform'])) {
+		if (preg_match('/^NDS$/i', $gameInfo['platform']))
+		{
 			$gameInfo['platform'] = str_replace('NDS', 'Nintendo DS', $gameInfo['platform']); // baseline single quote
 		}
-		if (preg_match('/^PS3$/i', $gameInfo['platform'])) {
+		if (preg_match('/^PS3$/i', $gameInfo['platform']))
+		{
 			$gameInfo['platform'] = str_replace('PS3', 'PlayStation 3', $gameInfo['platform']); // baseline single quote
 		}
-		if (preg_match('/^PSP$/i', $gameInfo['platform'])) {
+		if (preg_match('/^PSP$/i', $gameInfo['platform']))
+		{
 			$gameInfo['platform'] = str_replace('PSP', 'Sony PSP', $gameInfo['platform']); // baseline single quote
 		}
-		if (preg_match('/^Wii$/i', $gameInfo['platform'])) {
+		if (preg_match('/^Wii$/i', $gameInfo['platform']))
+		{
 			$gameInfo['platform'] = str_replace('Wii', 'Nintendo Wii', $gameInfo['platform']); // baseline single quote
 			$gameInfo['platform'] = str_replace('WII', 'Nintendo Wii', $gameInfo['platform']); // baseline single quote
 		}
-		if (preg_match('/^N64$/i', $gameInfo['platform'])) {
+		if (preg_match('/^N64$/i', $gameInfo['platform']))
+		{
 			$gameInfo['platform'] = str_replace('N64', 'Nintendo 64', $gameInfo['platform']); // baseline single quote
 		}
-		if (preg_match('/^NES$/i', $gameInfo['platform'])) {
+		if (preg_match('/^NES$/i', $gameInfo['platform']))
+		{
 			$gameInfo['platform'] = str_replace('NES', 'Nintendo NES', $gameInfo['platform']); // baseline single quote
 		}
-		if (preg_match('/Super/i', $con['platform'])) {
+		if (preg_match('/Super/i', $con['platform']))
+		{
 			$con['platform'] = str_replace('Super Nintendo', 'SNES', $con['platform']); // baseline single quote
 			$con['platform'] = str_replace('Nintendo Super NES', 'SNES', $con['platform']); // baseline single quote
 		}
 		//Remove Online Game Code So Titles Match Properly.
-		if (preg_match('/\[Online Game Code\]/i', $con['title'])) {
+		if (preg_match('/\[Online Game Code\]/i', $con['title']))
+		{
 			$con['title'] = str_replace(' [Online Game Code]', '', $con['title']); // baseline single quote
 		}
 
 		//Basically the XBLA names contain crap, this is to reduce the title down far enough to be usable
-		if (preg_match('/xbla/i', $gameInfo['platform'])) {
+		if (preg_match('/xbla/i', $gameInfo['platform']))
+		{
 			 	$gameInfo['title'] = substr($gameInfo['title'], 0, 10);
 				$con['substr'] = $gameInfo['title'];
 		}
@@ -372,58 +382,60 @@ class Console
 		//echo("Matched: Platform Percentage: $platformpercent%");
 
 		//If the Title is less than 80% Platform must be 100% unless it is XBLA
-		if ($titlepercent < 70) {
-			if ($platformpercent != 100) {
+		if ($titlepercent < 70)
+		{
+			if ($platformpercent != 100)
+			{
 				return false;
 			}
 		}
 
 		//If title is less than 80% then its most likely not a match
-		if ($titlepercent < 70) {
-				return false;
-		}
+		if ($titlepercent < 70)
+		return false;
 
 		//Platform must equal 100%
-		if ($platformpercent != 100) {
-					return false;
-		}
+		if ($platformpercent != 100)
+			return false;
 
 		$con['asin'] = (string)$amaz->Items->Item->ASIN;
 		$con['url'] = (string)$amaz->Items->Item->DetailPageURL;
 
 		$con['salesrank'] = (string)$amaz->Items->Item->SalesRank;
-		if ($con['salesrank'] == "") {
-					$con['salesrank'] = 'null';
-		}
+		if ($con['salesrank'] == "")
+			$con['salesrank'] = 'null';
 
 		$con['publisher'] = (string)$amaz->Items->Item->ItemAttributes->Publisher;
 
 		$con['esrb'] = (string)$amaz->Items->Item->ItemAttributes->ESRBAgeRating;
 
 		$con['releasedate'] = $db->escapeString((string)$amaz->Items->Item->ItemAttributes->ReleaseDate);
-		if ($con['releasedate'] == "''") {
-					$con['releasedate'] = 'null';
-		}
+		if ($con['releasedate'] == "''")
+			$con['releasedate'] = 'null';
 
 		$con['review'] = "";
-		if (isset($amaz->Items->Item->EditorialReviews)) {
-					$con['review'] = trim(strip_tags((string)$amaz->Items->Item->EditorialReviews->EditorialReview->Content));
-		}
+		if (isset($amaz->Items->Item->EditorialReviews))
+			$con['review'] = trim(strip_tags((string)$amaz->Items->Item->EditorialReviews->EditorialReview->Content));
 
 		$genreKey = -1;
 		$genreName = '';
-		if (isset($amaz->Items->Item->BrowseNodes) || isset($amaz->Items->Item->ItemAttributes->Genre)) {
-			if (isset($amaz->Items->Item->BrowseNodes)) {
+		if (isset($amaz->Items->Item->BrowseNodes) || isset($amaz->Items->Item->ItemAttributes->Genre))
+		{
+			if (isset($amaz->Items->Item->BrowseNodes))
+			{
 				//had issues getting this out of the browsenodes obj
 				//workaround is to get the xml and load that into its own obj
 				$amazGenresXml = $amaz->Items->Item->BrowseNodes->asXml();
 				$amazGenresObj = simplexml_load_string($amazGenresXml);
 				$amazGenres = $amazGenresObj->xpath("//Name");
-				foreach ($amazGenres as $amazGenre) {
+				foreach ($amazGenres as $amazGenre)
+				{
 					$currName = trim($amazGenre[0]);
-					if (empty($genreName)) {
+					if (empty($genreName))
+					{
 						$genreMatch = $this->matchBrowseNode($currName);
-						if ($genreMatch !== false) {
+						if ($genreMatch !== false)
+						{
 							$genreName = $genreMatch;
 							break;
 						}
@@ -431,13 +443,16 @@ class Console
 				}
 			}
 
-			if (empty($genreName) && isset($amaz->Items->Item->ItemAttributes->Genre)) {
+			if (empty($genreName) && isset($amaz->Items->Item->ItemAttributes->Genre))
+			{
 				$tmpGenre = (string)$amaz->Items->Item->ItemAttributes->Genre;
 				$tmpGenre = str_replace('-', ' ', $tmpGenre);
 				$tmpGenre = explode(' ', $tmpGenre);
-				foreach ($tmpGenre as $tg) {
+				foreach ($tmpGenre as $tg)
+				{
 					$genreMatch = $this->matchBrowseNode(ucwords($tg));
-					if ($genreMatch !== false) {
+					if ($genreMatch !== false)
+					{
 						$genreName = $genreMatch;
 						break;
 					}
@@ -483,9 +498,12 @@ class Console
 	public function fetchAmazonProperties($title, $node)
 	{
 		$obj = new AmazonProductAPI($this->pubkey, $this->privkey, $this->asstag);
-		try {
+		try
+		{
 			$result = $obj->searchProducts($title, AmazonProductAPI::GAMES, "NODE", $node);
-		} catch (Exception $e) {
+		}
+		catch (Exception $e)
+		{
 			$result = false;
 		}
 		return $result;
@@ -501,40 +519,45 @@ class Console
 		$numlookedup = 0;
 
 		$res = $db->queryDirect(sprintf("SELECT searchname, id from releases where consoleinfoid IS NULL and categoryid in ( select id from category where parentid = %d ) ORDER BY postdate DESC LIMIT 100", Category::CAT_PARENT_GAME));
-		if ($db->getNumRows($res) > 0) {
-			if ($this->echooutput) {
-							echo "ConsPrc : Processing " . $db->getNumRows($res) . " console releases\n";
-			}
+		if ($db->getNumRows($res) > 0)
+		{
+			if ($this->echooutput)
+				echo "ConsPrc : Processing " . $db->getNumRows($res) . " console releases\n";
 
-			while ($arr = $db->getAssocArray($res)) {
-				if ($numlookedup > Console::NUMTOPROCESSPERTIME) {
-									return;
-				}
+			while ($arr = $db->getAssocArray($res))
+			{
+				if ($numlookedup > Console::NUMTOPROCESSPERTIME)
+					return;
 
 				$gameInfo = $this->parseTitle($arr['searchname']);
-				if ($gameInfo !== false) {
+				if ($gameInfo !== false)
+				{
 
-					if ($this->echooutput) {
-											echo 'ConsPrc : ' . $gameInfo["title"] . ' (' . $gameInfo["platform"] . ')' . "\n";
-					}
+					if ($this->echooutput)
+						echo 'ConsPrc : ' . $gameInfo["title"] . ' (' . $gameInfo["platform"] . ')' . "\n";
 
 					//check for existing console entry
 					$gameCheck = $this->getConsoleInfoByName($gameInfo["title"], $gameInfo["platform"]);
 
-					if ($gameCheck === false) {
+					if ($gameCheck === false)
+					{
 						$numlookedup++;
 						$gameId = $this->updateConsoleInfo($gameInfo);
-						if ($gameId === false) {
+						if ($gameId === false)
+						{
 							$gameId = -2;
 						}
-					} else {
+					}
+					else
+					{
 						$gameId = $gameCheck["id"];
 					}
 
 					//update release
 					$db->queryExec(sprintf("update releases SET consoleinfoid = %d WHERE id = %d", $gameId, $arr["id"]));
 
-				} else {
+				}
+				else {
 					//could not parse release title
 					$db->queryExec(sprintf("update releases SET consoleinfoid = %d WHERE id = %d", -2, $arr["id"]));
 				}
@@ -572,10 +595,13 @@ class Console
 
 		//get the platform of the release
 		preg_match('/[\.\-_ ](?P<platform>XBLA|WiiWARE|N64|SNES|NES|PS2|PS3|PS 3|PSP|WII|XBOX360|X\-?BOX|X360|NDS|NGC)/i', $releasename, $matches);
-		if (isset($matches['platform'])) {
+		if (isset($matches['platform']))
+		{
 			$platform = $matches['platform'];
-			if (preg_match('/^(XBLA)$/i', $platform)) {
-				if (preg_match('/DLC/i', $title)) {
+			if (preg_match('/^(XBLA)$/i', $platform))
+			{
+				if (preg_match('/DLC/i', $title))
+				{
 					$platform = str_replace('XBLA', 'XBOX360', $platform); // baseline single quote
 				}
 			}
@@ -597,7 +623,8 @@ class Console
 	 */
 	function getBrowseNode($platform)
 	{
-		switch ($platform) {
+		switch ($platform)
+		{
 			case 'PS2':
 				$nodeId = '301712';
 			break;
@@ -650,7 +677,8 @@ class Console
 	{
 		$str = '';
 
-		switch ($nodeName) {
+		switch ($nodeName)
+		{
 			case 'Action':
 			case 'Adventure':
 			case 'Arcade':

@@ -84,11 +84,10 @@ class Forum
 	{
 		$db = new DB();
 
-		if ($start === false) {
-					$limit = "";
-		} else {
-					$limit = " LIMIT " . $start . "," . $num;
-		}
+		if ($start === false)
+			$limit = "";
+		else
+			$limit = " LIMIT " . $start . "," . $num;
 
 		return $db->query(sprintf(" SELECT forumpost.*, users.username from forumpost left outer join users on users.id = forumpost.userid where parentid = 0 order by updateddate desc" . $limit));
 	}
@@ -144,11 +143,10 @@ class Forum
 	{
 		$db = new DB();
 
-		if ($start === false) {
-					$limit = "";
-		} else {
-					$limit = " LIMIT " . $start . "," . $num;
-		}
+		if ($start === false)
+			$limit = "";
+		else
+			$limit = " LIMIT " . $start . "," . $num;
 
 		return $db->query(sprintf(" SELECT forumpost.*, users.username FROM forumpost LEFT OUTER JOIN users ON users.id = forumpost.userid where userid = %d order by forumpost.createddate desc " . $limit, $uid));
 	}

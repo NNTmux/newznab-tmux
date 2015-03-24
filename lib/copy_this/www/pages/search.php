@@ -1,8 +1,8 @@
 <?php
-require_once(WWW_DIR . "/lib/releases.php");
-require_once(WWW_DIR . "/lib/groups.php");
-require_once(WWW_DIR . "/lib/category.php");
-require_once(WWW_DIR . "/lib/ReleaseSearch.php");
+require_once(WWW_DIR."/lib/releases.php");
+require_once(WWW_DIR."/lib/groups.php");
+require_once(WWW_DIR."/lib/category.php");
+require_once(WWW_DIR."/lib/ReleaseSearch.php");
 
 
 if (!$users->isLoggedIn()) {
@@ -31,7 +31,7 @@ if (isset($_REQUEST["id"]) && !isset($_REQUEST["searchadvr"]) && !isset($_REQUES
 	$orderby = isset($_REQUEST["ob"]) && in_array($_REQUEST['ob'], $ordering) ? $_REQUEST["ob"] : '';
 
 	if ($searchtype == "basic") {
-		$searchStr = (string)$_REQUEST["id"];
+		$searchStr = (string) $_REQUEST["id"];
 		$categoryId = array();
 		if (isset($_REQUEST["t"])) {
 			$categoryId = explode(",", $_REQUEST["t"]);
@@ -74,7 +74,7 @@ if (isset($_REQUEST["subject"]) && !isset($_REQUEST["searchadvr"]) && !isset($_R
 	$orderby = isset($_REQUEST["ob"]) && in_array($_REQUEST['ob'], $ordering) ? $_REQUEST["ob"] : '';
 
 	if ($searchtype == "basic") {
-		$searchStr = (string)$_REQUEST["subject"];
+		$searchStr = (string) $_REQUEST["subject"];
 
 		$categoryId = array();
 		if (isset($_REQUEST["t"])) {
@@ -116,17 +116,17 @@ if (isset($_REQUEST["searchadvr"]) && !isset($_REQUEST["id"]) && !isset($_REQUES
 
 	if ($searchtype !== "basic") {
 
-		$searchSearchName = (string)$_REQUEST["searchadvr"];
-		$searchUsenetName = (string)$_REQUEST["searchadvsubject"];
-		$searchPoster = (string)$_REQUEST["searchadvposter"];
-		$searchdaysnew = (string)$_REQUEST["searchadvdaysnew"];
-		$searchdaysold = (string)$_REQUEST["searchadvdaysold"];
-		$searchGroups = (string)$_REQUEST["searchadvgroups"];
-		$searchCat = (string)$_REQUEST["searchadvcat"];
-		$searchSizeFrom = (string)$_REQUEST["searchadvsizefrom"];
-		$searchSizeTo = (string)$_REQUEST["searchadvsizeto"];
-		$searchHasNFO = (string)$_REQUEST["searchadvhasnfo"];
-		$searchHascomments = (string)$_REQUEST["searchadvhascomments"];
+		$searchSearchName = (string) $_REQUEST["searchadvr"];
+		$searchUsenetName = (string) $_REQUEST["searchadvsubject"];
+		$searchPoster = (string) $_REQUEST["searchadvposter"];
+		$searchdaysnew = (string) $_REQUEST["searchadvdaysnew"];
+		$searchdaysold = (string) $_REQUEST["searchadvdaysold"];
+		$searchGroups = (string) $_REQUEST["searchadvgroups"];
+		$searchCat = (string) $_REQUEST["searchadvcat"];
+		$searchSizeFrom = (string) $_REQUEST["searchadvsizefrom"];
+		$searchSizeTo = (string) $_REQUEST["searchadvsizeto"];
+		$searchHasNFO = (string) $_REQUEST["searchadvhasnfo"];
+		$searchHascomments = (string) $_REQUEST["searchadvhascomments"];
 
 		$page->smarty->assign('searchadvr', $searchSearchName);
 		$page->smarty->assign('searchadvsubject', $searchUsenetName);

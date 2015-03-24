@@ -69,42 +69,42 @@ class nzbInfo
 		return $this->isLoaded;
 	}
 
-	/**
-	 * @param string $loc
-	 */
-	public function loadFromFile($loc, $loadAllVars=false)
-	{
-		$this->source = $loc;
-		$this->loadAllVars = $loadAllVars;
+    /**
+     * @param string $loc
+     */
+    public function loadFromFile($loc, $loadAllVars=false)
+    {
+        $this->source = $loc;
+        $this->loadAllVars = $loadAllVars;
 
-		if (file_exists($loc))
-		{
-			if (preg_match('/\.(gz|zip)$/i', $loc, $ext))
-			{
-				switch (strtolower($ext[1]))
-				{
-					case 'gz':
-						$loc = 'compress.zlib://' . $loc;
-						break;
-					case 'zip':
-						$zip = new ZipArchive;
-						if ($zip->open($loc) === true && $zip->numFiles == 1)
-							return $this->loadFromString($zip->getFromIndex(0), $loadAllVars);
-						else
-							$loc = 'zip://' . $loc;
-						break;
-				}
-			}
+        if (file_exists($loc))
+        {
+            if (preg_match('/\.(gz|zip)$/i', $loc, $ext))
+            {
+                switch (strtolower($ext[1]))
+                {
+                    case 'gz':
+                        $loc = 'compress.zlib://' . $loc;
+                        break;
+                    case 'zip':
+                        $zip = new ZipArchive;
+                        if ($zip->open($loc) === true && $zip->numFiles == 1)
+                            return $this->loadFromString($zip->getFromIndex(0), $loadAllVars);
+                        else
+                            $loc = 'zip://' . $loc;
+                        break;
+                }
+            }
 
-			libxml_use_internal_errors(true);
-			$xmlObj = @simplexml_load_file($loc);
-			if ($this->isValidNzb($xmlObj))
-				$this->parseNzb($xmlObj);
+            libxml_use_internal_errors(true);
+            $xmlObj = @simplexml_load_file($loc);
+            if ($this->isValidNzb($xmlObj))
+                $this->parseNzb($xmlObj);
 
-			unset($xmlObj);
-		}
-		return $this->isLoaded;
-	}
+            unset($xmlObj);
+        }
+        return $this->isLoaded;
+    }
 	
 	public function summarize()
 	{
@@ -122,23 +122,23 @@ class nzbInfo
 		if (!empty($this->metadata))
 		{
 			$out[] = ' -metadata:';
-			foreach ($this->metadata as $mk=>$mv)
-				$out[] = '       -' . $mk . ': ' . $mv;
+			foreach($this->metadata as $mk=>$mv)
+				$out[] = '       -'.$mk.': '.$mv;
 		}
 		
-		$out[] = ' -sngl: ' . sizeof($this->segmentfiles);
+		$out[] = ' -sngl: '.sizeof($this->segmentfiles);
 		
-		$out[] = ' -pstr: ' . $this->poster;
-		$out[] = ' -grps: ' . implode(', ', $this->groups);
-		$out[] = ' -size: ' . round(($this->filesize / 1048576), 2) . ' MB in ' . $this->filecount . ' Files';
-		$out[] = '       -' . $this->rarcount . ' rars';
-		$out[] = '       -' . $this->parcount . ' pars';
-		$out[] = '       -' . $this->sfvcount . ' sfvs';
-		$out[] = '       -' . $this->zipcount . ' zips';
-		$out[] = '       -' . $this->videocount . ' videos';
-		$out[] = '       -' . $this->audiocount . ' audios';
-		$out[] = ' -cmpltn: ' . $this->completion . '% (' . $this->segmentactual . '/' . $this->segmenttotal . ')';
-		$out[] = ' -pstd: ' . date("Y-m-d H:i:s", $this->postedlast);
+		$out[] = ' -pstr: '.$this->poster;
+		$out[] = ' -grps: '.implode(', ', $this->groups);
+		$out[] = ' -size: '.round(($this->filesize / 1048576), 2).' MB in '.$this->filecount.' Files';
+		$out[] = '       -'.$this->rarcount.' rars';
+		$out[] = '       -'.$this->parcount.' pars';
+		$out[] = '       -'.$this->sfvcount.' sfvs';
+		$out[] = '       -'.$this->zipcount.' zips';
+		$out[] = '       -'.$this->videocount.' videos';
+		$out[] = '       -'.$this->audiocount.' audios';
+		$out[] = ' -cmpltn: '.$this->completion.'% ('.$this->segmentactual.'/'.$this->segmenttotal.')';
+		$out[] = ' -pstd: '.date("Y-m-d H:i:s", $this->postedlast);
 		$out[] = '';
 		$out[] = '';
 		
@@ -147,19 +147,21 @@ class nzbInfo
 	
 	private function isValidNzb($xmlObj)
 	{
-		if (!$xmlObj || strtolower($xmlObj->getName()) != 'nzb' || !isset($xmlObj->file)) {
-					return false;
-		}
+		if (!$xmlObj || strtolower($xmlObj->getName()) != 'nzb' || !isset($xmlObj->file))
+			return false;
 
 		return true;
 	}
 	
 	private function parseNzb($xmlObj)
-	{
+	{		
 		//Metadata
-		if (isset($xmlObj->head->meta)) {
-			foreach ($xmlObj->head->meta as $meta) {
-				if (isset($meta->attributes()->type)) {
+		if (isset($xmlObj->head->meta))
+		{
+			foreach ($xmlObj->head->meta as $meta)
+			{
+				if (isset($meta->attributes()->type))
+				{
 					$metaKey = (string)$meta->attributes()->type;
 					$this->metadata[$metaKey] = (string)$meta;
 				}
@@ -168,11 +170,11 @@ class nzbInfo
 		
 		//NZB GID = first segment of first file
 		$gid = (string)$xmlObj->file->segments->segment;
-		if (!empty($gid)) {
-					$this->gid = md5($gid);
-		}
+		if (!empty($gid))
+			$this->gid = md5($gid);
 		
-		foreach ($xmlObj->file as $file) {
+		foreach ($xmlObj->file as $file) 
+		{	
 			$fileArr = array();
 			$fileArr['subject'] = (string)$file->attributes()->subject;
 			$fileArr['poster'] = (string)$file->attributes()->poster;
@@ -203,21 +205,21 @@ class nzbInfo
 			
 			//groups
 			foreach ($file->groups->group as $group) {
-				$this->groups[] = (string)$group;
-				$fileArr['groups'][] = (string)$group;
+				$this->groups[] = (string) $group;
+				$fileArr['groups'][] = (string) $group;
 			}
 			
 			//file segments
-			foreach ($file->segments->segment as $segment) {
-				$bytes = (int)$segment->attributes()->bytes;
-				$number = (int)$segment->attributes()->number;
+			foreach($file->segments->segment as $segment) {
+				$bytes = (int) $segment->attributes()->bytes;
+				$number = (int) $segment->attributes()->number;
 				
 				$this->filesize += $bytes;
 				$this->segmentactual++;
 				
 				$fileArr['filesize'] += $bytes;
 				$fileArr['segmentactual']++;
-				$fileArr['segments'][$number] = (string)$segment;
+				$fileArr['segments'][$number] = (string) $segment;
 				$fileArr['segmentbytes'][$number] = $bytes;
 			}
 			
@@ -225,19 +227,19 @@ class nzbInfo
 			preg_match_all($pattern, $subject, $matches, PREG_PATTERN_ORDER);
 			$matchcnt = sizeof($matches[0]);
 			$msgPart = $msgTotalParts = 0;
-			for ($i = 0; $i < $matchcnt; $i++)
+			for ($i=0; $i<$matchcnt; $i++)
 			{
 				//not (int)'d here because of the preg_replace later on
 				$msgPart = $matches[1][$i];
 				$msgTotalParts = $matches[2][$i];
 			}
-			if ((int)$msgPart > 0 && (int)$msgTotalParts > 0)
+			if((int)$msgPart > 0 && (int)$msgTotalParts > 0)
 			{
-				$this->segmenttotal += (int)$msgTotalParts;
-				$fileArr['segmenttotal'] = (int)$msgTotalParts;
-				$fileArr['completion'] = number_format(($fileArr['segmentactual'] / $fileArr['segmenttotal']) * 100, 0);
+				$this->segmenttotal += (int) $msgTotalParts;
+				$fileArr['segmenttotal'] = (int) $msgTotalParts;
+				$fileArr['completion'] = number_format(($fileArr['segmentactual']/$fileArr['segmenttotal'])*100, 0);
 
-				$fileArr['subject'] = utf8_encode(trim(preg_replace('|\(' . $msgPart . '[\/]' . $msgTotalParts . '\)|i', '', $subject)));
+				$fileArr['subject'] = utf8_encode(trim(preg_replace('|\('.$msgPart.'[\/]'.$msgTotalParts.'\)|i', '', $subject)));
 			}
 
 			//file counts
@@ -332,27 +334,27 @@ class nzbInfo
 		if (!empty($this->metadata))
 		{
 			$nzb .= "<head>\n";
-			foreach ($this->metadata as $mk=>$mv)
-				$out[] = ' <meta type="' . $mk . '">' . $mv . "</meta>\n";
+			foreach($this->metadata as $mk=>$mv)
+				$out[] = ' <meta type="'.$mk.'">'.$mv."</meta>\n";
 			$nzb .= "</head>\n";
 		}
-		foreach ($this->nzb as $postFile)
+		foreach($this->nzb as $postFile)
 		{
-			$nzb .= "<file poster=\"" . htmlspecialchars($postFile["poster"], ENT_QUOTES, 'utf-8') . "\" date=\"" . $postFile["posted"] . "\" subject=\"" . htmlspecialchars($postFile["subject"], ENT_QUOTES, 'utf-8') . " (1/" . $postFile["segmenttotal"] . ")\">\n";
+			$nzb .= "<file poster=\"".htmlspecialchars($postFile["poster"], ENT_QUOTES, 'utf-8')."\" date=\"".$postFile["posted"]."\" subject=\"".htmlspecialchars($postFile["subject"], ENT_QUOTES, 'utf-8')." (1/".$postFile["segmenttotal"].")\">\n";
 			$nzb .= " <groups>\n";
-			foreach ($postFile['groups'] as $fileGroup)
+			foreach($postFile['groups'] as $fileGroup)
 			{
-				$nzb .= "  <group>" . $fileGroup . "</group>\n";
+				$nzb .= "  <group>".$fileGroup."</group>\n";
 			}
 			$nzb .= " </groups>\n";
 			$nzb .= " <segments>\n";
-			foreach ($postFile['segments'] as $fileSegmentNum=>$fileSegment)
+			foreach($postFile['segments'] as $fileSegmentNum=>$fileSegment)
 			{
-				$nzb .= "  <segment bytes=\"" . $postFile['segmentbytes'][$fileSegmentNum] . "\" number=\"" . $fileSegmentNum . "\">" . htmlspecialchars($fileSegment, ENT_QUOTES, 'utf-8') . "</segment>\n";
+				$nzb .= "  <segment bytes=\"".$postFile['segmentbytes'][$fileSegmentNum]."\" number=\"".$fileSegmentNum."\">".htmlspecialchars($fileSegment, ENT_QUOTES, 'utf-8')."</segment>\n";
 			}
 			$nzb .= " </segments>\n</file>\n";
 		}
-		$nzb .= "<!-- newznab " . date("Y-m-d H:i:s") . " -->\n</nzb>";
+		$nzb .= "<!-- newznab ".date("Y-m-d H:i:s")." -->\n</nzb>";
 
 		return $nzb;
 	}

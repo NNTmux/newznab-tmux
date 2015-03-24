@@ -71,7 +71,7 @@ Class TraktTv
 	 *
 	 * @access public
 	 */
-	public function traktMoviesummary($movie = '', $array = false)
+	public function traktMoviesummary($movie = '', $array=false)
 	{
 		if (!empty($this->APIKEY)) {
 			$MovieJson = Utility::getUrl([
@@ -79,7 +79,7 @@ Class TraktTv
 						'http://api.trakt.tv/movie/summary.json/' .
 						$this->APIKEY .
 						'/' .
-						str_replace([' ', '_', '.'], '-', str_replace(['(', ')'], '', $movie))
+						str_replace([' ', '_', '.'], '-',  str_replace(['(', ')'], '', $movie))
 				]
 			);
 

@@ -1,6 +1,6 @@
 <?php
-require_once(WWW_DIR . "/lib/sabnzbd.php");
-require_once(WWW_DIR . '/../misc/update_scripts/nix_scripts/tmux/lib/NZBGet.php');
+require_once(WWW_DIR."/lib/sabnzbd.php");
+require_once(WWW_DIR.'/../misc/update_scripts/nix_scripts/tmux/lib/NZBGet.php');
 
 if (!$users->isLoggedIn()) {
 	$page->show403();
@@ -14,7 +14,7 @@ $page->smarty->assign('user', $userData);
 
 $queueType = $error = '';
 $queue = null;
-switch ($page->site->sabintegrationtype) {
+switch($page->site->sabintegrationtype) {
 	case SABnzbd::INTEGRATION_TYPE_NONE:
 		if ($userData['queuetype'] == 2) {
 			$queueType = 'NZBGet';
@@ -26,7 +26,7 @@ switch ($page->site->sabintegrationtype) {
 		$queue = new SABnzbd($page);
 		break;
 	case SABnzbd::INTEGRATION_TYPE_USER:
-		switch ((int)$userData['queuetype']) {
+		switch((int)$userData['queuetype']) {
 			case 1:
 				$queueType = 'Sabnzbd';
 				$queue = new SABnzbd($page);
@@ -83,7 +83,7 @@ if (!is_null($queue)) {
 $page->smarty->assign(array('queueType' => $queueType, 'error' => $error, 'user', $users));
 $page->title = "Your $queueType Download Queue";
 $page->meta_title = "View $queueType Queue";
-$page->meta_keywords = "view," . strtolower($queueType) . ",queue";
+$page->meta_keywords = "view," . strtolower($queueType) .",queue";
 $page->meta_description = "View $queueType Queue";
 
 $page->content = $page->smarty->fetch('viewqueue.tpl');

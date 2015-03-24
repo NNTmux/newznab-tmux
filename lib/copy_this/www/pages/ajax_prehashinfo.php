@@ -18,7 +18,7 @@ if (!$predata) {
 	print "<table>\n";
 	if (isset($predata['nuked'])) {
 		$nuked = '';
-		switch ($predata['nuked']) {
+		switch($predata['nuked']) {
 			case PreHash::PRE_NUKED:
 				$nuked = 'NUKED';
 				break;

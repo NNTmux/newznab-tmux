@@ -1,10 +1,9 @@
 <?php
-require_once(WWW_DIR . '/lib/releases.php');
-require_once(WWW_DIR . '/lib/anidb.php');
+require_once(WWW_DIR.'/lib/releases.php');
+require_once(WWW_DIR.'/lib/anidb.php');
 
-if (!$users->isLoggedIn()) {
+if (!$users->isLoggedIn())
 	$page->show403();
-}
 
 $Releases = new Releases(['Settings' => $page->settings]);
 $AniDB = new AniDB(['Settings' => $page->settings]);

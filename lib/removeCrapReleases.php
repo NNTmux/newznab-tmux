@@ -4,7 +4,7 @@
  * This script deletes releases that match certain criteria, type php removeCrapReleases.php false for details.
  */
 
-require_once(dirname(__FILE__) . "/../bin/config.php");
+require_once(dirname(__FILE__)."/../bin/config.php");
 require_once(WWW_DIR . "/lib/ColorCLI.php");
 require_once("ReleaseRemover.php");
 
@@ -16,7 +16,7 @@ if ($argCnt === 1) {
 	exit(
 	$cli->error(
 		$n .
-		'Run fixReleaseNames.php first to attempt to fix release names.' . $n .
+		'Run fixReleaseNames.php first to attempt to fix release names.'. $n .
 		'This will miss some releases if you have not set fixReleaseNames to set the release as checked.' . $n . $n .
 		"php $argv[0] false Display full usage of this script." . $n .
 		"php $argv[0] true full Run this script with all options."

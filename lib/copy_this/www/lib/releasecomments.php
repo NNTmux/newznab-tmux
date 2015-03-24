@@ -1,6 +1,6 @@
 <?php
-require_once(WWW_DIR . "/lib/framework/db.php");
-require_once(WWW_DIR . "/lib/site.php");
+require_once(WWW_DIR."/lib/framework/db.php");
+require_once(WWW_DIR."/lib/site.php");
 
 /**
  * This class handles storage and retrieval of release comments.
@@ -36,18 +36,16 @@ class ReleaseComments
 
 	/**
 	 * Get all count of all comments.
-	 * @param string $refdate
-	 * @param boolean $localOnly
 	 */
 	public function getCommentCount($refdate=Null, $localOnly=Null)
 	{
 		$db = new DB();
 		if($refdate !== Null){
 			if(is_string($refdate)){
-				// ensure we're in the right format
+			    // ensure we're in the right format
 				$refdate=date("Y-m-d H:i:s", strtotime($refdate));
 			}else if(is_int($refdate)){
-				// ensure we're in the right format
+			    // ensure we're in the right format
 				$refdate=date("Y-m-d H:i:s", $refdate);
 			}else{
 				// leave it as null (bad content anyhow)
@@ -60,9 +58,9 @@ class ReleaseComments
 		if($refdate !== Null)
 			$clause[] = "createddate >= '$refdate'";
 
-		// set localOnly to Null to include both local and remote
-		// set localOnly to true to only receive local comment count
-		// set localOnly to false to only receive remote comment count
+        // set localOnly to Null to include both local and remote
+        // set localOnly to true to only receive local comment count
+        // set localOnly to false to only receive remote comment count
 		if($localOnly === true){
 			$clause[] = "sourceID = 0";
 		}else if($localOnly === false){
@@ -83,7 +81,8 @@ class ReleaseComments
 	{
 		$db = new DB();
 		$res = $this->getCommentById($id);
-		if ($res) {
+		if ($res)
+		{
 			$db->queryExec(sprintf("update releasecomment SET isvisible = 0 WHERE id = %d", $id));
 			$this->updateReleaseCommentCount($res["gid"]);
 		}
@@ -96,7 +95,8 @@ class ReleaseComments
 	{
 		$db = new DB();
 		$res = $this->getCommentById($id);
-		if ($res) {
+		if ($res)
+		{
 			$db->queryExec(sprintf("DELETE rc.* FROM releasecomment rc JOIN releases r ON r.gid = rc.gid WHERE r.id = %d", $id));
 			$this->updateReleaseCommentCount($res["gid"]);
 		}
@@ -110,9 +110,11 @@ class ReleaseComments
 		$db = new DB();
 
 		$numcomments = $this->getCommentCountForUser($id);
-		if ($numcomments > 0) {
+		if ($numcomments > 0)
+		{
 			$comments = $this->getCommentsForUserRange($id, 0, $numcomments);
-			foreach ($comments as $comment) {
+			foreach ($comments as $comment)
+			{
 				$this->deleteComment($comment["id"]);
 				$this->updateReleaseCommentCount($comment["gid"]);
 			}
@@ -124,7 +126,7 @@ class ReleaseComments
 	 */
 	public function addComment($id, $gid, $text, $userid, $host)
 	{
-		if (strlen(trim($text)) == 0)
+		if(strlen(trim($text)) == 0)
 			return false;
 
 		$db = new DB();
@@ -149,9 +151,9 @@ class ReleaseComments
 		if ($start === false)
 			$limit = "";
 		else
-			$limit = " LIMIT " . $start . "," . $num;
+			$limit = " LIMIT ".$start.",".$num;
 
-		$sql = "SELECT rc.id, userid, guid, text, createddate, sourceid, CASE WHEN sourceID = 0 THEN (SELECT username FROM users WHERE id = userid) ELSE username END AS username, CASE WHEN sourceid = 0 THEN (SELECT role FROM users WHERE id = userid) ELSE '-1' END AS role, CASE WHEN sourceid =0 THEN (SELECT r.name AS rolename FROM users AS u LEFT JOIN userroles AS r ON r.id = u.role WHERE u.id = userid) ELSE (SELECT description AS rolename FROM spotnabsources WHERE id = sourceid) END AS rolename FROM releasecomment rc LEFT JOIN releases r ON r.gid = rc.gid WHERE isvisible = 1 AND (userid IN (SELECT id FROM users) OR rc.username IS NOT NULL) ORDER BY createddate DESC " . $limit;
+		$sql = "SELECT rc.id, userid, guid, text, createddate, sourceid, CASE WHEN sourceID = 0 THEN (SELECT username FROM users WHERE id = userid) ELSE username END AS username, CASE WHEN sourceid = 0 THEN (SELECT role FROM users WHERE id = userid) ELSE '-1' END AS role, CASE WHEN sourceid =0 THEN (SELECT r.name AS rolename FROM users AS u LEFT JOIN userroles AS r ON r.id = u.role WHERE u.id = userid) ELSE (SELECT description AS rolename FROM spotnabsources WHERE id = sourceid) END AS rolename FROM releasecomment rc LEFT JOIN releases r ON r.gid = rc.gid WHERE isvisible = 1 AND (userid IN (SELECT id FROM users) OR rc.username IS NOT NULL) ORDER BY createddate DESC ".$limit;
 		return $db->query($sql);
 	}
 
@@ -163,7 +165,7 @@ class ReleaseComments
 		$db = new DB();
 		$db->queryExec(sprintf("update releases
 				SET comments = (SELECT count(id) FROM releasecomment WHERE releasecomment.gid = releases.gid AND isvisible = 1)
-				WHERE releases.gid = %s", $db->escapeString($gid)));
+				WHERE releases.gid = %s", $db->escapeString($gid) ));
 	}
 
 	/**
@@ -178,7 +180,6 @@ class ReleaseComments
 
 	/**
 	 * Get comments for a user by limit.
-	 * @param integer $start
 	 */
 	public function getCommentsForUserRange($uid, $start, $num)
 	{
@@ -187,8 +188,8 @@ class ReleaseComments
 		if ($start === false)
 			$limit = "";
 		else
-			$limit = " LIMIT " . $start . "," . $num;
+			$limit = " LIMIT ".$start.",".$num;
 
-		return $db->query(sprintf("SELECT releasecomment.*, r.guid, r.searchname, users.username FROM releasecomment INNER JOIN releases r ON r.id = releasecomment.releaseid LEFT OUTER JOIN users ON users.id = releasecomment.userid WHERE userid = %d ORDER BY releasecomment.createddate DESC " . $limit, $uid));
+		return $db->query(sprintf("SELECT releasecomment.*, r.guid, r.searchname, users.username FROM releasecomment INNER JOIN releases r ON r.id = releasecomment.releaseid LEFT OUTER JOIN users ON users.id = releasecomment.userid WHERE userid = %d ORDER BY releasecomment.createddate DESC ".$limit, $uid));
 	}
 }

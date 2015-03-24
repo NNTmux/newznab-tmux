@@ -16,12 +16,12 @@ require_once(NN_TMUX . 'lib' . DS . 'Pprocess.php');
 
 class ProcessReleases
 {
-	const COLLFC_DEFAULT  = 0; // Collection has default filecheck status
-	const COLLFC_COMPCOLL = 1; // Collection is a complete collection
-	const COLLFC_COMPPART = 2; // Collection is a complete collection and has all parts available
-	const COLLFC_SIZED    = 3; // Collection has been calculated for total size
-	const COLLFC_INSERTED = 4; // Collection has been inserted into releases
-	const COLLFC_DELETE   = 5; // Collection is ready for deletion
+	const COLLFC_DEFAULT  =  0; // Collection has default filecheck status
+	const COLLFC_COMPCOLL =  1; // Collection is a complete collection
+	const COLLFC_COMPPART =  2; // Collection is a complete collection and has all parts available
+	const COLLFC_SIZED    =  3; // Collection has been calculated for total size
+	const COLLFC_INSERTED =  4; // Collection has been inserted into releases
+	const COLLFC_DELETE   =  5; // Collection is ready for deletion
 	const COLLFC_TEMPCOMP = 15; // Collection is complete and being checked for complete parts
 	const COLLFC_ZEROPART = 16; // Collection has a 00/0XX designator (temporary)
 
@@ -128,8 +128,8 @@ class ProcessReleases
 		$this->site = $s ->get();
 
 		$this->tablePerGroup = ($this->site->tablepergroup == 0 ? false : true);
-		$this->collectionDelayTime = ($this->site->delaytime != '' ? (int)$this->site->delaytime : 2);
-		$this->crossPostTime = ($this->site->crossposttime != '' ? (int)$this->site->crossposttime : 2);
+		$this->collectionDelayTime = ($this->site->delaytime!= '' ? (int)$this->site->delaytime : 2);
+		$this->crossPostTime = ($this->site->crossposttime!= '' ? (int)$this->site->crossposttime : 2);
 		$this->releaseCreationLimit = ($this->site->maxnzbsprocessed != '' ? (int)$this->site->maxnzbsprocessed : 1000);
 		$this->completion = ($this->site->completionpercent != '' ? (int)$this->site->completionpercent : 0);
 		$this->processRequestIDs = (int)$this->site->lookup_reqids;
@@ -1017,7 +1017,7 @@ class ProcessReleases
 		);
 
 		if ($collections instanceof \Traversable) {
-			foreach ($collections as $collection) {
+			foreach($collections as $collection) {
 				$deleted++;
 				$this->pdo->queryExec(
 					sprintf('

@@ -1,9 +1,9 @@
 <?php
-require_once(WWW_DIR . "/lib/framework/db.php");
+require_once(WWW_DIR."/lib/framework/db.php");
 
 class UserSeries
 {
-	public function addShow($uid, $rageid, $catid = array())
+	public function addShow($uid, $rageid, $catid=array())
 	{
 		$db = new DB();
 
@@ -45,7 +45,7 @@ class UserSeries
 		$db->queryExec(sprintf("DELETE from userseries where rageid = %d", $sid));
 	}
 
-	public function updateShow($uid, $rageid, $catid = array())
+	public function updateShow($uid, $rageid, $catid=array())
 	{
 		$db = new DB();
 

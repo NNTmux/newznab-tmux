@@ -64,9 +64,6 @@ function reCategorize($argv)
 
 // Categorizes releases.
 // Returns the quantity of categorized releases.
-/**
- * @param string $where
- */
 function categorizeRelease($update = true, $where, $echooutput = false)
 {
 	$pdo = new DB();

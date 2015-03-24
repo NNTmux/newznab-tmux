@@ -17,7 +17,7 @@ require_once(WWW_DIR . "lib/amazon.php");
 require_once(WWW_DIR . "lib/genres.php");
 require_once(WWW_DIR . "lib/anidb.php");
 require_once(WWW_DIR . "lib/book.php");
-require_once(WWW_DIR . "lib/Books.php");
+require_once(WWW_DIR.  "lib/Books.php");
 require_once(WWW_DIR . "lib/Games.php");
 require_once(WWW_DIR . "lib/spotnab.php");
 require_once(WWW_DIR . "lib/thetvdb.php");
@@ -124,7 +124,7 @@ class PProcess
 		$this->_par2Info = new Par2Info();
 		$this->debugging = ($options['Logger'] instanceof Logger ? $options['Logger'] : new Logger(['ColorCLI' => $this->pdo->log]));
 		$this->nameFixer = (($options['NameFixer'] instanceof NameFixer) ? $options['NameFixer'] : new NameFixer(['Echo' => $this->echooutput, 'Settings' => $this->pdo, 'Groups' => $this->groups]));
-		$this->Nfo = (($options['Nfo'] instanceof Info) ? $options['Nfo'] : new Info(['Echo' => $this->echooutput, 'Settings' => $this->pdo]));
+		$this->Nfo = (($options['Nfo'] instanceof Info ) ? $options['Nfo'] : new Info(['Echo' => $this->echooutput, 'Settings' => $this->pdo]));
 		$this->releaseFiles = (($options['ReleaseFiles'] instanceof ReleaseFiles) ? $options['ReleaseFiles'] : new ReleaseFiles($this->pdo));
 		//\\
 
@@ -303,7 +303,8 @@ class PProcess
 
 	public function processTvDB()
 	{
-		if ($this->site->lookupthetvdb == 1) {
+		if ($this->site->lookupthetvdb == 1)
+		{
 			$thetvdb = new TheTVDB($this->echooutput);
 			$thetvdb->processReleases();
 		}

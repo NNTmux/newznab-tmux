@@ -151,31 +151,26 @@ class Users
 	{
 		$db = new DB();
 
-		if ($start === false) {
-					$limit = "";
-		} else {
-					$limit = " LIMIT " . $start . "," . $num;
-		}
+		if ($start === false)
+			$limit = "";
+		else
+			$limit = " LIMIT " . $start . "," . $num;
 
 		$usql = '';
-		if ($username != '') {
-					$usql = sprintf(" and users.username like %s ", $db->escapeString("%" . $username . "%"));
-		}
+		if ($username != '')
+			$usql = sprintf(" and users.username like %s ", $db->escapeString("%" . $username . "%"));
 
 		$esql = '';
-		if ($email != '') {
-					$esql = sprintf(" and users.email like %s ", $db->escapeString("%" . $email . "%"));
-		}
+		if ($email != '')
+			$esql = sprintf(" and users.email like %s ", $db->escapeString("%" . $email . "%"));
 
 		$hsql = '';
-		if ($host != '') {
-					$hsql = sprintf(" and users.host like %s ", $db->escapeString("%" . $host . "%"));
-		}
+		if ($host != '')
+			$hsql = sprintf(" and users.host like %s ", $db->escapeString("%" . $host . "%"));
 
 		$rsql = '';
-		if ($role != '') {
-					$rsql = sprintf(" and users.role = %d ", $role);
-		}
+		if ($role != '')
+			$rsql = sprintf(" and users.role = %d ", $role);
 
 		$order = $this->getBrowseOrder($orderby);
 
@@ -235,25 +230,21 @@ class Users
 		$uname = trim($uname);
 		$email = trim($email);
 
-		if (!$this->isValidUsername($uname)) {
-					return Users::ERR_SIGNUP_BADUNAME;
-		}
+		if (!$this->isValidUsername($uname))
+			return Users::ERR_SIGNUP_BADUNAME;
 
-		if (!$this->isValidEmail($email)) {
-					return Users::ERR_SIGNUP_BADEMAIL;
-		}
+		if (!$this->isValidEmail($email))
+			return Users::ERR_SIGNUP_BADEMAIL;
 
 		$res = $this->getByUsername($uname);
-		if ($res) {
-					if ($res["id"] != $id)
+		if ($res)
+			if ($res["id"] != $id)
 				return Users::ERR_SIGNUP_UNAMEINUSE;
-		}
 
 		$res = $this->getByEmail($email);
-		if ($res) {
-					if ($res["id"] != $id)
+		if ($res)
+			if ($res["id"] != $id)
 				return Users::ERR_SIGNUP_EMAILINUSE;
-		}
 
 		$sql = array();
 
@@ -311,9 +302,6 @@ class Users
 		return self::SUCCESS;
 	}
 
-	/**
-	 * @param string $uname
-	 */
 	public function isValidUsername($uname)
 	{
 		return preg_match("/^[a-z][a-z0-9]{2,}$/i", $uname);
@@ -331,9 +319,6 @@ class Users
 		return (bool)preg_match('/^([\w\+-]+)(\.[\w\+-]+)*@([a-z0-9-]+\.)+[a-z]{2,6}$/i', $email);
 	}
 
-	/**
-	 * @param string $uname
-	 */
 	public function getByUsername($uname)
 	{
 		$db = new DB();
@@ -341,9 +326,6 @@ class Users
 		return $db->queryOneRow(sprintf("select users.*, userroles.name as rolename, userroles.apirequests, userroles.downloadrequests from users inner join userroles on userroles.id = users.role where username = %s ", $db->escapeString($uname)));
 	}
 
-	/**
-	 * @param string $email
-	 */
 	public function getByEmail($email)
 	{
 		$db = new DB();
@@ -419,9 +401,6 @@ class Users
 		return password_hash($password, PASSWORD_DEFAULT, ['cost' => $this->password_hash_cost]);
 	}
 
-	/**
-	 * @param string $string
-	 */
 	public static function hashSHA1($string)
 	{
 		return sha1($string);
@@ -512,33 +491,28 @@ class Users
 		$pass = trim($pass);
 		$email = trim($email);
 
-		if (!$this->isValidUsername($uname)) {
-					return Users::ERR_SIGNUP_BADUNAME;
-		}
+		if (!$this->isValidUsername($uname))
+			return Users::ERR_SIGNUP_BADUNAME;
 
-		if (!$this->isValidPassword($pass)) {
-					return Users::ERR_SIGNUP_BADPASS;
-		}
+		if (!$this->isValidPassword($pass))
+			return Users::ERR_SIGNUP_BADPASS;
 
 		if (!$this->isValidEmail($email)) {
 			return self::ERR_SIGNUP_BADEMAIL;
 		}
 
 		$res = $this->getByUsername($uname);
-		if ($res) {
-					return Users::ERR_SIGNUP_UNAMEINUSE;
-		}
+		if ($res)
+			return Users::ERR_SIGNUP_UNAMEINUSE;
 
 		$res = $this->getByEmail($email);
-		if ($res) {
-					return Users::ERR_SIGNUP_EMAILINUSE;
-		}
+		if ($res)
+			return Users::ERR_SIGNUP_EMAILINUSE;
 
 		// Check Captcha
 		if (!$skip_recaptcha) {
-			if (!$this->isValidCaptcha($s, $recaptcha_challenge, $recaptcha_response)) {
-							return Users::ERR_SIGNUP_BADCAPTCHA;
-			}
+			if (!$this->isValidCaptcha($s, $recaptcha_challenge, $recaptcha_response))
+				return Users::ERR_SIGNUP_BADCAPTCHA;
 		}
 
 		//
@@ -547,36 +521,26 @@ class Users
 		//
 		$invitedby = 0;
 		if (($s->registerstatus == Sites::REGISTER_STATUS_INVITE) && !$forceinvitemode) {
-			if ($invitecode == '') {
-							return Users::ERR_SIGNUP_BADINVITECODE;
-			}
+			if ($invitecode == '')
+				return Users::ERR_SIGNUP_BADINVITECODE;
 
 			$invitedby = $this->checkAndUseInvite($invitecode);
-			if ($invitedby < 0) {
-							return Users::ERR_SIGNUP_BADINVITECODE;
-			}
+			if ($invitedby < 0)
+				return Users::ERR_SIGNUP_BADINVITECODE;
 		}
 
 		return $this->add($uname, $pass, $email, $role, $notes, $host, $invites, $invitedby);
 	}
 
-	/**
-	 * @param string $pass
-	 */
 	public function isValidPassword($pass)
 	{
 		return (strlen($pass) > 5);
 	}
 
-	/**
-	 * @param boolean $challenge
-	 * @param boolean $response
-	 */
 	public function isValidCaptcha($site, $challenge, $response)
 	{
-		if ($site->registerrecaptcha != 1) {
-					return true;
-		}
+		if ($site->registerrecaptcha != 1)
+			return true;
 
 		require_once(WWW_DIR . "/lib/recaptchalib.php");
 
@@ -585,15 +549,11 @@ class Users
 		return $resp->is_valid;
 	}
 
-	/**
-	 * @param string $invitecode
-	 */
 	public function checkAndUseInvite($invitecode)
 	{
 		$invite = $this->getInvite($invitecode);
-		if (!$invite) {
-					return -1;
-		}
+		if (!$invite)
+			return -1;
 
 		$db = new DB();
 		$db->exec(sprintf("update users set invites = case when invites <= 0 then 0 else invites-1 end where id = %d ", $invite["userid"]));
@@ -625,25 +585,17 @@ class Users
 		$db->exec(sprintf("DELETE from userinvite where guid = %s ", $db->escapeString($inviteToken)));
 	}
 
-	/**
-	 * @param string $uname
-	 * @param string $pass
-	 * @param string $email
-	 * @param integer $role
-	 */
 	public function add($uname, $pass, $email, $role, $notes, $host, $invites = self::DEFAULT_INVITES, $invitedby = 0)
 	{
 		$db = new DB();
 
 		$site = new Sites();
 		$s = $site->get();
-		if ($s->storeuserips != "1") {
-					$host = "";
-		}
+		if ($s->storeuserips != "1")
+			$host = "";
 
-		if ($invitedby == 0) {
-					$invitedby = "null";
-		}
+		if ($invitedby == 0)
+			$invitedby = "null";
 
 		$sql = sprintf("insert into users (username, password, email, role, notes, createddate, host, rsstoken, invites, invitedby, userseed) values (%s, %s, lower(%s), %d, %s, now(), %s, md5(%s), %d, %s, md5(%s))",
 			$db->escapeString($uname), $db->escapeString($this->hashPassword($pass)), $db->escapeString($email), $role, $db->escapeString($notes), $db->escapeString($host), $db->escapeString(uniqid()), $invites, $invitedby, $db->escapeString(uniqid())
@@ -674,24 +626,21 @@ class Users
 		$site = new Sites();
 		$s = $site->get();
 
-		if ($s->storeuserips != "1") {
-					$host = '';
-		}
+		if ($s->storeuserips != "1")
+			$host = '';
 
 		$this->updateSiteAccessed($uid, $host);
 
-		if ($remember == 1) {
-					$this->setCookies($uid);
-		}
+		if ($remember == 1)
+			$this->setCookies($uid);
 	}
 
 	public function updateSiteAccessed($uid, $host = "")
 	{
 		$db = new DB();
 		$hostSql = '';
-		if ($host != '') {
-					$hostSql = sprintf(', host = %s', $db->escapeString($host));
-		}
+		if ($host != '')
+			$hostSql = sprintf(', host = %s', $db->escapeString($host));
 
 		$db->exec(sprintf("update users set lastlogin = now() %s where id = %d ", $hostSql, $uid));
 	}
@@ -734,9 +683,8 @@ class Users
 	public function getCart($uid, $releaseid = "")
 	{
 		$db = new DB();
-		if ($releaseid != "") {
-					$releaseid = " and releases.id = " . $db->escapeString($releaseid);
-		}
+		if ($releaseid != "")
+			$releaseid = " and releases.id = " . $db->escapeString($releaseid);
 
 		return $db->query(sprintf("select usercart.*, releases.searchname,releases.guid from usercart inner join releases on releases.id = usercart.releaseid where userid = %d %s", $uid, $releaseid));
 	}
@@ -744,16 +692,14 @@ class Users
 	public function delCartByGuid($guids, $uid)
 	{
 		$db = new DB();
-		if (!is_array($guids)) {
-					return false;
-		}
+		if (!is_array($guids))
+			return false;
 
 		$del = array();
 		foreach ($guids as $id) {
 			$id = sprintf("%s", $db->escapeString($id));
-			if (!empty($id)) {
-							$del[] = $id;
-			}
+			if (!empty($id))
+				$del[] = $id;
 		}
 
 		$sql = sprintf("delete from usercart where userid = %d and releaseid IN (select id from releases where guid IN (%s)) ", $uid, implode(',', $del));
@@ -764,9 +710,8 @@ class Users
 	{
 		$db = new DB();
 		$rel = $db->queryOneRow(sprintf("select id from releases where guid = %s", $db->escapeString($guid)));
-		if ($rel) {
-					$db->exec(sprintf("DELETE FROM usercart WHERE userid = %d AND releaseid = %d", $uid, $rel["id"]));
-		}
+		if ($rel)
+			$db->exec(sprintf("DELETE FROM usercart WHERE userid = %d AND releaseid = %d", $uid, $rel["id"]));
 	}
 
 	public function delCartForRelease($rid)
@@ -791,9 +736,8 @@ class Users
 		$db = new DB();
 		$ret = array();
 		$data = $db->query(sprintf("select caregoryid from roleexcat where role = %d", $role));
-		foreach ($data as $d) {
-					$ret[] = $d["caregoryid"];
-		}
+		foreach ($data as $d)
+			$ret[] = $d["caregoryid"];
 
 		return $ret;
 	}
@@ -824,9 +768,8 @@ class Users
 			$db = new DB();
 			$category = new Category();
 			$data = $category->getByIds($data);
-			foreach ($data as $d) {
-							$ret[] = $d["title"];
-			}
+			foreach ($data as $d)
+				$ret[] = $d["title"];
 		}
 
 		return $ret;
@@ -837,9 +780,8 @@ class Users
 		$db = new DB();
 		$ret = array();
 		$data = $db->query(sprintf("select caregoryid from userexcat where userid = %d union distinct select caregoryid from roleexcat inner join users on users.role = roleexcat.role where users.id = %d", $uid, $uid));
-		foreach ($data as $d) {
-					$ret[] = $d["caregoryid"];
-		}
+		foreach ($data as $d)
+			$ret[] = $d["caregoryid"];
 
 		return $ret;
 	}
@@ -864,9 +806,6 @@ class Users
 		return $url;
 	}
 
-	/**
-	 * @param string $inviteToken
-	 */
 	public function addInvite($uid, $inviteToken)
 	{
 		$db = new DB();
@@ -1002,9 +941,8 @@ class Users
 	public function updateRole($id, $name, $apirequests, $downloadrequests, $defaultinvites, $isdefault, $canpreview, $canpre, $hideads)
 	{
 		$db = new DB();
-		if ($isdefault == 1) {
-					$db->exec("update userroles set isdefault=0");
-		}
+		if ($isdefault == 1)
+			$db->exec("update userroles set isdefault=0");
 
 		return $db->exec(sprintf("update userroles set name=%s, apirequests=%d, downloadrequests=%d, defaultinvites=%d, isdefault=%d, canpreview=%d, canpre=%d, hideads=%d WHERE id=%d", $db->escapeString($name), $apirequests, $downloadrequests, $defaultinvites, $isdefault, $canpreview, $canpre, $hideads, $id));
 	}
@@ -1015,9 +953,8 @@ class Users
 		$res = $db->query(sprintf("select id from users where role = %d", $id));
 		if (sizeof($res) > 0) {
 			$userids = array();
-			foreach ($res as $user) {
-							$userids[] = $user['id'];
-			}
+			foreach ($res as $user)
+				$userids[] = $user['id'];
 
 			$defaultrole = $this->getDefaultRole();
 			$db->exec(sprintf("update users set role=%d where id IN (%s)", $defaultrole['id'], implode(',', $userids)));
@@ -1104,9 +1041,8 @@ class Users
 		$sql = sprintf("select distinct hosthash from userdownloads where userid = %d and hosthash is not null and hosthash != ''", $userid);
 		$rows = $db->query($sql);
 		$hashsql = "";
-		foreach ($rows as $row) {
-					$hashsql .= sprintf("userdownloads.hosthash = %s or ", $db->escapeString($row["hosthash"]));
-		}
+		foreach ($rows as $row)
+			$hashsql .= sprintf("userdownloads.hosthash = %s or ", $db->escapeString($row["hosthash"]));
 
 		$hashsql .= " 1=2 ";
 

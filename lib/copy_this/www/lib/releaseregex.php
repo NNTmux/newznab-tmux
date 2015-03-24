@@ -22,22 +22,19 @@ class ReleaseRegex
 	 */
 	public function get($activeonly = true, $groupname = "-1", $blnIncludeReleaseCount = false, $userReleaseRegex = null)
 	{
-		if (!empty($this->regexes)) {
-					return $this->regexes;
-		}
+		if (!empty($this->regexes))
+			return $this->regexes;
 
 		$db = new DB();
 
 		$where = "";
-		if ($activeonly) {
-					$where .= " and releaseregex.status = 1";
-		}
+		if ($activeonly)
+			$where .= " and releaseregex.status = 1";
 
-		if ($groupname == "all") {
-					$where .= " and releaseregex.groupname is null";
-		} elseif ($groupname != "-1") {
-					$where .= sprintf(" and releaseregex.groupname = %s", $db->escapeString($groupname));
-		}
+		if ($groupname == "all")
+			$where .= " and releaseregex.groupname is null";
+		elseif ($groupname != "-1")
+			$where .= sprintf(" and releaseregex.groupname = %s", $db->escapeString($groupname));
 
 		if ($userReleaseRegex === true) {
 			$where .= ' AND releaseregex.id >= 100000';
@@ -77,9 +74,8 @@ class ReleaseRegex
 
 		$temp_array[-1] = "--Please Select--";
 
-		foreach ($categories as $category) {
-					$temp_array[$category["groupname"]] = $category["groupname"];
-		}
+		foreach ($categories as $category)
+			$temp_array[$category["groupname"]] = $category["groupname"];
 
 		return $temp_array;
 	}
@@ -104,11 +100,10 @@ class ReleaseRegex
 		if ($groupRegexes) {
 			foreach ($groupRegexes as $groupRegex) {
 				$outcome = @preg_match("/^" . $groupRegex["groupname"] . "$/i", $groupname);
-				if ($outcome) {
-									$ret[] = $groupRegex;
-				} elseif ($outcome === false) {
-									echo "ERROR: " . ($groupRegex["id"] < 10000 ? "System" : "Custom") . " release regex '" . $groupRegex["id"] . "'. Group name '" . $groupRegex["groupname"] . "' should be a valid regex.\n";
-				}
+				if ($outcome)
+					$ret[] = $groupRegex;
+				elseif ($outcome === false)
+					echo "ERROR: " . ($groupRegex["id"] < 10000 ? "System" : "Custom") . " release regex '" . $groupRegex["id"] . "'. Group name '" . $groupRegex["groupname"] . "' should be a valid regex.\n";
 			}
 		}
 
@@ -133,18 +128,16 @@ class ReleaseRegex
 		$db = new DB();
 
 		$groupname = $regex["groupname"];
-		if ($groupname == "") {
-					$groupname = "null";
-		} else {
-					$groupname = sprintf("%s", $db->escapeString($regex["groupname"]));
-		}
+		if ($groupname == "")
+			$groupname = "null";
+		else
+			$groupname = sprintf("%s", $db->escapeString($regex["groupname"]));
 
 		$catid = $regex["category"];
-		if ($catid == "-1") {
-					$catid = "null";
-		} else {
-					$catid = sprintf("%d", $regex["category"]);
-		}
+		if ($catid == "-1")
+			$catid = "null";
+		else
+			$catid = sprintf("%d", $regex["category"]);
 
 		$db->queryExec(sprintf("update releaseregex set groupname=%s, regex=%s, ordinal=%d, status=%d, description=%s, categoryid=%s where id = %d ",
 				$groupname, $db->escapeString($regex["regex"]), $regex["ordinal"], $regex["status"], $db->escapeString($regex["description"]), $catid, $regex["id"]
@@ -160,18 +153,16 @@ class ReleaseRegex
 		$db = new DB();
 
 		$groupname = $regex["groupname"];
-		if ($groupname == "") {
-					$groupname = "null";
-		} else {
-					$groupname = sprintf("%s", $db->escapeString($regex["groupname"]));
-		}
+		if ($groupname == "")
+			$groupname = "null";
+		else
+			$groupname = sprintf("%s", $db->escapeString($regex["groupname"]));
 
 		$catid = $regex["category"];
-		if ($catid == "-1") {
-					$catid = "null";
-		} else {
-					$catid = sprintf("%d", $regex["category"]);
-		}
+		if ($catid == "-1")
+			$catid = "null";
+		else
+			$catid = sprintf("%d", $regex["category"]);
 
 		return $db->queryInsert(sprintf("insert into releaseregex (groupname, regex, ordinal, status, description, categoryid) values (%s, %s, %d, %d, %s, %s) ",
 				$groupname, $db->escapeString($regex["regex"]), $regex["ordinal"], $regex["status"], $db->escapeString($regex["description"]), $catid
@@ -217,38 +208,29 @@ class ReleaseRegex
 				}
 
 				$regcatid = "null ";
-				if ($regexArr["categoryid"] != "") {
-									$regcatid = $regexArr["categoryid"];
-				}
+				if ($regexArr["categoryid"] != "")
+					$regcatid = $regexArr["categoryid"];
 				//override
 				if ($regcatid == Category::CAT_PC_0DAY) {
-					if ($cat->isPhone($matches['name'])) {
-											$regcatid = Category::CAT_PC_MOBILEANDROID;
-					}
-					if ($cat->isPhone($matches['name'])) {
-											$regcatid = Category::CAT_PC_MOBILEIOS;
-					}
-					if ($cat->isPhone($matches['name'])) {
-											$regcatid = Category::CAT_PC_MOBILEOTHER;
-					}
-					if ($cat->isIso($matches['name'])) {
-											$regcatid = Category::CAT_PC_ISO;
-					}
-					if ($cat->isMac($matches['name'])) {
-											$regcatid = Category::CAT_PC_MAC;
-					}
-					if ($cat->isPcGame($matches['name'])) {
-											$regcatid = Category::CAT_PC_GAMES;
-					}
-					if ($cat->isEBook($matches['name'])) {
-											$regcatid = Category::CAT_BOOK_EBOOK;
-					}
+					if ($cat->isPhone($matches['name']))
+						$regcatid = Category::CAT_PC_MOBILEANDROID;
+					if ($cat->isPhone($matches['name']))
+						$regcatid = Category::CAT_PC_MOBILEIOS;
+					if ($cat->isPhone($matches['name']))
+						$regcatid = Category::CAT_PC_MOBILEOTHER;
+					if ($cat->isIso($matches['name']))
+						$regcatid = Category::CAT_PC_ISO;
+					if ($cat->isMac($matches['name']))
+						$regcatid = Category::CAT_PC_MAC;
+					if ($cat->isPcGame($matches['name']))
+						$regcatid = Category::CAT_PC_GAMES;
+					if ($cat->isEBook($matches['name']))
+						$regcatid = Category::CAT_BOOK_EBOOK;
 				}
 
 				$reqID = "";
-				if (isset($matches['reqid'])) {
-									$reqID = $matches['reqid'];
-				}
+				if (isset($matches['reqid']))
+					$reqID = $matches['reqid'];
 
 				//check if post is repost
 				if (preg_match('/(repost\d?|re\-?up)/i', $binarySubject, $repost) && !preg_match('/repost|re\-?up/i', $matches['name'])) {
@@ -279,22 +261,19 @@ class ReleaseRegex
 		$catList = $cat->getForSelect();
 		$matches = array();
 
-		if ($groupname === 0) {
-					$groupname = '.*';
-		}
+		if ($groupname === 0)
+			$groupname = '.*';
 
-		if ($matchagainstbins !== '') {
-					$sql = sprintf("select b.*, '0' as size, '0' as blacklistID, g.name as groupname from %s b left join groups g on g.id = b.groupid where b.groupid IN (select g.id from groups g where g.name REGEXP %s) order by b.date desc", $group['bname'], $db->escapeString('^' . $groupname . '$'));
-		} else {
-					$sql = sprintf("select rrt.* from releaseregextesting rrt where rrt.groupname REGEXP %s order by rrt.date desc", $db->escapeString('^' . $groupname . '$'));
-		}
+		if ($matchagainstbins !== '')
+			$sql = sprintf("select b.*, '0' as size, '0' as blacklistID, g.name as groupname from %s b left join groups g on g.id = b.groupid where b.groupid IN (select g.id from groups g where g.name REGEXP %s) order by b.date desc", $group['bname'], $db->escapeString('^' . $groupname . '$'));
+		else
+			$sql = sprintf("select rrt.* from releaseregextesting rrt where rrt.groupname REGEXP %s order by rrt.date desc", $db->escapeString('^' . $groupname . '$'));
 
 		$resbin = $db->queryDirect($sql);
 
 		while ($rowbin = $db->getAssocArray($resbin)) {
-			if ($ignorematched !== '' && ($rowbin['regexid'] != '' || $rowbin['blacklistID'] == 1)) {
-							continue;
-			}
+			if ($ignorematched !== '' && ($rowbin['regexid'] != '' || $rowbin['blacklistID'] == 1))
+				continue;
 
 			$regexarr = array("id" => "", 'regex' => $regex, 'poster' => $poster, "categoryid" => "");
 			$regexCheck = $this->performMatch($regexarr, $rowbin['name'], $rowbin['fromname']);
@@ -317,11 +296,10 @@ class ReleaseRegex
 
 				$matches[$relname]['regexid'] = $regexCheck['regexid'];
 
-				if (ctype_digit($regexCheck['regcatid'])) {
-									$matches[$relname]['catname'] = $catList[$regexCheck['regcatid']];
-				} else {
-									$matches[$relname]['catname'] = $catList[$cat->determineCategory($groupname, $relname)];
-				}
+				if (ctype_digit($regexCheck['regcatid']))
+					$matches[$relname]['catname'] = $catList[$regexCheck['regcatid']];
+				else
+					$matches[$relname]['catname'] = $catList[$cat->determineCategory($groupname, $relname)];
 
 			}
 
@@ -342,23 +320,21 @@ class ReleaseRegex
 		$groups = new Groups();
 
 		$ret = array();
-		if ($clearexistingbins == true) {
-					$db->queryExec('truncate releaseregextesting');
-		}
+		if ($clearexistingbins == true)
+			$db->queryExec('truncate releaseregextesting');
 
 		$nntp->doConnect();
 
 		$groupsToFetch = array();
-		if (preg_match('/^[a-z]{2,3}(\.[a-z0-9\-]+)+$/', $groupname)) {
-					$groupsToFetch[] = array('name' => $groupname);
-		} elseif ($groupname === 0) {
-					$groupsToFetch = $groups->getAll();
-		} else {
+		if (preg_match('/^[a-z]{2,3}(\.[a-z0-9\-]+)+$/', $groupname))
+			$groupsToFetch[] = array('name' => $groupname);
+		elseif ($groupname === 0)
+			$groupsToFetch = $groups->getAll();
+		else {
 			$newsgroups = $nntp->getGroups();
 			foreach ($newsgroups as $ngroup) {
-				if (preg_match('/' . $groupname . '/', $ngroup['group'])) {
-									$groupsToFetch[] = array('name' => $ngroup['group']);
-				}
+				if (preg_match('/' . $groupname . '/', $ngroup['group']))
+					$groupsToFetch[] = array('name' => $ngroup['group']);
 			}
 		}
 
@@ -378,11 +354,10 @@ class ReleaseRegex
 
 				while ($done === false) {
 					if ($rangeTotal > $binaries->messageBuffer) {
-						if ($rangeStart + $binaries->messageBuffer > $groupEnd) {
-													$rangeEnd = $groupEnd;
-						} else {
-													$rangeEnd = $rangeStart + $binaries->messageBuffer;
-						}
+						if ($rangeStart + $binaries->messageBuffer > $groupEnd)
+							$rangeEnd = $groupEnd;
+						else
+							$rangeEnd = $rangeStart + $binaries->messageBuffer;
 					}
 
 
@@ -397,9 +372,8 @@ class ReleaseRegex
 					if (is_array($msgs)) {
 						//loop headers, figure out parts
 						foreach ($msgs AS $msg) {
-							if (!isset($msg['Number'])) {
-															continue;
-							}
+							if (!isset($msg['Number']))
+								continue;
 
 							$msgPart = $msgTotalParts = 0;
 
@@ -412,10 +386,8 @@ class ReleaseRegex
 								$msgTotalParts = $matches[2][$i];
 							}
 
-							if (!isset($msg['Subject']) || $matchcnt == 0) {
-								// not a binary post most likely.. continue
+							if (!isset($msg['Subject']) || $matchcnt == 0) // not a binary post most likely.. continue
 								continue;
-							}
 
 							if ((int)$msgPart > 0 && (int)$msgTotalParts > 0) {
 								$subject = utf8_encode(trim(preg_replace('|\(' . $msgPart . '[\/]' . $msgTotalParts . '\)|i', '', $msg['Subject'])));
@@ -426,9 +398,8 @@ class ReleaseRegex
 									$headers[$subject]['Date'] = strtotime($msg['Date']);
 									$headers[$subject]['Message-ID'] = $msg['Message-ID'];
 									$headers[$subject]['Size'] = $msg['Bytes'];
-								} else {
-																	$headers[$subject]['Size'] += $msg['Bytes'];
-								}
+								} else
+									$headers[$subject]['Size'] += $msg['Bytes'];
 							}
 						}
 						unset($msgs);

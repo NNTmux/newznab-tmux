@@ -5,8 +5,8 @@
 */
 
 require_once(dirname(__FILE__) . "/../../bin/config.php");
-require_once(WWW_DIR . "/lib/util.php");
-require_once(WWW_DIR . "/lib/framework/db.php");
+require_once(WWW_DIR."/lib/util.php");
+require_once(WWW_DIR."/lib/framework/db.php");
 
 $config = dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR .
 		  'config.php';

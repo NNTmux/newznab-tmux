@@ -9,7 +9,7 @@ require_once(NN_TMUX . 'lib' . DS . 'Konsole.php');
 $pdo = new DB();
 $console = new \Konsole(['Echo' => true, 'Settings' => $pdo]);
 
-$res = $pdo->queryDirect(sprintf("SELECT searchname, id FROM releases WHERE consoleinfoid IS NULL AND categoryid BETWEEN 1000 AND 1999 ORDER BY id DESC"));
+$res = $pdo->queryDirect(sprintf("SELECT searchname, id FROM releases WHERE consoleinfoid IS NULL AND categoryid BETWEEN 1000 AND 1999 ORDER BY id DESC" ));
 if ($res instanceof \Traversable) {
 	echo $pdo->log->header("Updating console info for " . number_format($res->rowCount()) . " releases.");
 

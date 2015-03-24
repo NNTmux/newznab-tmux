@@ -271,10 +271,6 @@ function resetSearchnames()
 // Categorizes releases.
 // $type = name or searchname
 // Returns the quantity of categorized releases.
-/**
- * @param string $type
- * @param string $where
- */
 function catRelease($type, $where, $echooutput = false)
 {
 	global $pdo;
@@ -300,10 +296,6 @@ function catRelease($type, $where, $echooutput = false)
 	return $relcount;
 }
 
-/**
- * @param string $groupname
- * @param boolean $usepre
- */
 function releaseCleaner($subject, $fromName, $size, $groupname, $usepre)
 {
 	$groups = new \Groups();

@@ -10,17 +10,15 @@ $sab = new SABnzbd($page);
 $nzbGet = new NZBGet($page);
 $users = new Users();
 
-if (!$users->isLoggedIn()) {
+if (!$users->isLoggedIn())
 	$page->show403();
-}
 
 $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view';
 
 $userid = $users->currentUserId();
 $data = $users->getById($userid);
-if (!$data) {
+if (!$data)
 	$page->show404();
-}
 
 $errorStr = '';
 
@@ -36,9 +34,8 @@ switch ($action) {
 	case 'submit':
 
 		$data["email"] = $_POST['email'];
-		if (isset($_POST['saburl']) && strlen(trim($_POST['saburl'])) > 0 && !endsWith($_POST['saburl'], "/")) {
-					$_POST['saburl'] = $_POST['saburl'] . "/";
-		}
+		if (isset($_POST['saburl']) && strlen(trim($_POST['saburl'])) > 0 && !endsWith($_POST['saburl'], "/"))
+			$_POST['saburl'] = $_POST['saburl'] . "/";
 
 		if ($_POST['password'] != "" && $_POST['password'] != $_POST['confirmpassword']) {
 			$errorStr = "Password Mismatch";
@@ -91,9 +88,8 @@ switch ($action) {
 				$_POST['exccat'] = (!isset($_POST['exccat']) || !is_array($_POST['exccat'])) ? array() : $_POST['exccat'];
 				$users->addCategoryExclusions($userid, $_POST['exccat']);
 
-				if ($_POST['password'] != "") {
-									$users->updatePassword($userid, $_POST['password']);
-				}
+				if ($_POST['password'] != "")
+					$users->updatePassword($userid, $_POST['password']);
 
 				header("Location:" . WWW_TOP . "/profile");
 				die();

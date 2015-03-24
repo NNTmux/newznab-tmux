@@ -9,17 +9,15 @@ require_once(WWW_DIR . "/lib/SphinxSearch.php");
 passthru('clear');
 $pdo = new DB();
 
-if (!isset($argv[1]) || (isset($argv[1]) && $argv[1] !== 'true')) {
+if (!isset($argv[1]) || (isset($argv[1]) && $argv[1] !== 'true'))
 	exit($pdo->log->error("\nThis script removes all releases and release related files. To run:\nphp resetdb.php true\n"));
-}
 
 echo $pdo->log->warning("This script removes all releases, nzb files, samples, previews , nfos, truncates all article tables and resets all groups.");
 echo $pdo->log->header("Are you sure you want reset the DB?  Type 'DESTROY' to continue:  \n");
 echo $pdo->log->warningOver("\n");
 $line = fgets(STDIN);
-if (trim($line) != 'DESTROY') {
+if (trim($line) != 'DESTROY')
 	exit($pdo->log->error("This script is dangerous you must type DESTROY for it function."));
-}
 
 echo "\n";
 echo $pdo->log->header("Thank you, continuing...\n\n");
@@ -41,10 +39,9 @@ $arr = [
 ];
 foreach ($arr as &$value) {
 	$rel = $pdo->queryExec("TRUNCATE TABLE $value");
-	if ($rel !== false) {
-			echo $pdo->log->primary("Truncating ${value} completed.");
-	}
-	}
+	if ($rel !== false)
+		echo $pdo->log->primary("Truncating ${value} completed.");
+}
 unset($value);
 
 $sql = "SHOW table status";
@@ -54,9 +51,8 @@ foreach ($tables as $row) {
 	$tbl = $row['name'];
 	if (preg_match('/binaries_\d+/', $tbl) || preg_match('/parts_\d+/', $tbl) || preg_match('/partrepair_\d+/', $tbl) || preg_match('/\d+_binaries/', $tbl) || preg_match('/\d+_parts/', $tbl) || preg_match('/\d+_partrepair_\d+/', $tbl)) {
 		$rel = $pdo->queryDirect(sprintf('DROP TABLE %s', $tbl));
-		if ($rel !== false) {
-					echo $pdo->log->primary("Dropping ${tbl} completed.");
-		}
+		if ($rel !== false)
+			echo $pdo->log->primary("Dropping ${tbl} completed.");
 	}
 }
 
@@ -96,9 +92,8 @@ echo $pdo->log->header("Getting Updated List of TV Shows from TVRage.");
 $tvshows = @simplexml_load_file('http://services.tvrage.com/feeds/show_list.php');
 if ($tvshows !== false) {
 	foreach ($tvshows->show as $rage) {
-		if (isset($rage->id) && isset($rage->name) && !empty($rage->id) && !empty($rage->name)) {
-					$pdo->queryInsert(sprintf('INSERT INTO tvrage (rageid, releasetitle, country) VALUES (%s, %s, %s)', $pdo->escapeString($rage->id), $pdo->escapeString($rage->name), $pdo->escapeString($rage->country)));
-		}
+		if (isset($rage->id) && isset($rage->name) && !empty($rage->id) && !empty($rage->name))
+			$pdo->queryInsert(sprintf('INSERT INTO tvrage (rageid, releasetitle, country) VALUES (%s, %s, %s)', $pdo->escapeString($rage->id), $pdo->escapeString($rage->name), $pdo->escapeString($rage->country)));
 	}
 } else {
 	echo $pdo->log->error("TVRage site has a hard limit of 400 concurrent api requests. At the moment, they have reached that limit. Please wait before retrying again.");

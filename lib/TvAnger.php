@@ -168,9 +168,6 @@ class TvAnger
 		return $country;
 	}
 
-	/**
-	 * @param string $desc
-	 */
 	public function add($rageID, $releasename, $desc, $genre, $country, $imgbytes)
 	{
 		$releasename = str_replace(array('.', '_'), array(' ', ' '), $releasename);
@@ -517,9 +514,6 @@ class TvAnger
 		return $result;
 	}
 
-	/**
-	 * @param string $rageID
-	 */
 	public function getRageInfoFromService($rageID)
 	{
 		$result = array('genres' => '', 'country' => '', 'showid' => $rageID);

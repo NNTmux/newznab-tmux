@@ -69,8 +69,8 @@ class Info
 
 	const NFO_FAILED = -9; // We failed to get a NFO after admin set max retries.
 	const NFO_UNPROC = -1; // Release has not been processed yet.
-	const NFO_NONFO  = 0; // Release has no NFO.
-	const NFO_FOUND  = 1; // Release has an NFO.
+	const NFO_NONFO  =  0; // Release has no NFO.
+	const NFO_FOUND  =  1; // Release has an NFO.
 
 	/**
 	 * Default constructor.
@@ -116,8 +116,7 @@ class Info
 	 *
 	 * @access public
 	 */
-	public function parseRageId($str)
-	{
+	public function parseRageId($str) {
 		if (preg_match('/tvrage\.com\/shows\/id-(\d{1,6})/i', $str, $matches)) {
 			return trim($matches[1]);
 		}
@@ -134,8 +133,7 @@ class Info
 	 *
 	 * @access public
 	 */
-	public function isNFO(&$possibleNFO, $guid)
-	{
+	public function isNFO(&$possibleNFO, $guid) {
 		if ($possibleNFO === false) {
 			return false;
 		}
@@ -146,7 +144,8 @@ class Info
 			$size > 11 &&
 			!preg_match(
 				'/\A(\s*<\?xml|=newz\[NZB\]=|RIFF|\s*[RP]AR|.{0,10}(JFIF|matroska|ftyp|ID3))|;\s*Generated\s*by.*SF\w/i'
-				, $possibleNFO)) {
+				, $possibleNFO))
+		{
 			// File/GetId3 work with files, so save to disk.
 			$tmpPath = $this->tmpPath . $guid . '.nfo';
 			file_put_contents($tmpPath, $possibleNFO);
@@ -162,7 +161,8 @@ class Info
 
 					// Or binary.
 				} else if (preg_match('/^(JPE?G|Parity|PNG|RAR|XML|(7-)?[Zz]ip)/', $result) ||
-					preg_match('/[\x00-\x08\x12-\x1F\x0B\x0E\x0F]/', $possibleNFO)) {
+					preg_match('/[\x00-\x08\x12-\x1F\x0B\x0E\x0F]/', $possibleNFO))
+				{
 					@unlink($tmpPath);
 					return false;
 				}
@@ -251,7 +251,7 @@ class Info
 	 * @access public
 	 * @static
 	 */
-	static public function NfoQueryString(DB & $pdo)
+	static public function NfoQueryString(DB &$pdo)
 	{
 		$s = new Sites();
 		$site = $s->get();

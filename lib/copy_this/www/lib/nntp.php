@@ -1061,28 +1061,26 @@ class NNTP extends Net_NNTP_Client
 		*/
 
 		// yEnc 1.3 draft doesn't allow line lengths of more than 254 bytes.
-		if ($linelen > 254) {
-					$linelen = 254;
-		}
+		if ($linelen > 254)
+			$linelen = 254;
 
-		if ($linelen < 1) {
-					return false;
-		}
+		if ($linelen < 1)
+			return false;
 
 		$encoded = "";
 
 		// Encode each character of the message one at a time.
-		for ($i = 0; $i < strlen($message); $i++) {
+		for ($i = 0; $i < strlen($message); $i++)
+		{
 			$value = (ord($message{$i}) + 42) % 256;
 
 			// Escape NULL, TAB, LF, CR, space, . and = characters.
 			if ($value == 0 || $value == 9 || $value == 10 ||
 				$value == 13 || $value == 32 || $value == 46 ||
-				$value == 61) {
-							$encoded .= "=" . chr(($value + 64) % 256);
-			} else {
-							$encoded .= chr($value);
-			}
+				$value == 61)
+				$encoded .= "=" . chr(($value + 64) % 256);
+			else
+				$encoded .= chr($value);
 		}
 
 		// Wrap the lines to $linelen characters
@@ -1094,9 +1092,8 @@ class NNTP extends Net_NNTP_Client
 		$encoded .= "\r\n=yend size=" . strlen($message);
 
 		// Add a CRC32 checksum if desired.
-		if ($crc32 === true) {
-					$encoded .= " crc32=" . strtolower(sprintf("%04X", crc32($message)));
-		}
+		if ($crc32 === true)
+			$encoded .= " crc32=" . strtolower(sprintf("%04X", crc32($message)));
 
 		return $encoded . "\r\n";
 	}
@@ -1112,9 +1109,8 @@ class NNTP extends Net_NNTP_Client
 			$ret = "";
 			$input = trim(preg_replace("/\r\n/im", "", preg_replace("/(^=yend.*)/im", "", preg_replace("/(^=ypart.*\\r\\n)/im", "", preg_replace("/(^=ybegin.*\\r\\n)/im", "", $input[1], 1), 1), 1)));
 
-			for ($chr = 0; $chr < strlen($input); $chr++) {
-							$ret .= ($input[$chr] != "=" ? chr(ord($input[$chr]) - 42) : chr((ord($input[++$chr]) - 64) - 42));
-			}
+			for ($chr = 0; $chr < strlen($input); $chr++)
+				$ret .= ($input[$chr] != "=" ? chr(ord($input[$chr]) - 42) : chr((ord($input[++$chr]) - 64) - 42));
 
 			return $ret;
 		}
