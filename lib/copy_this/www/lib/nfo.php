@@ -1,17 +1,17 @@
 <?php
-require_once(WWW_DIR."/lib/framework/db.php");
-require_once(WWW_DIR."/lib/movie.php");
-require_once(WWW_DIR."/lib/tvrage.php");
-require_once(WWW_DIR."/lib/nntp.php");
-require_once(WWW_DIR."/lib/nzb.php");
-require_once(WWW_DIR."/lib/nzbinfo.php");
+require_once(WWW_DIR . "/lib/framework/db.php");
+require_once(WWW_DIR . "/lib/movie.php");
+require_once(WWW_DIR . "/lib/tvrage.php");
+require_once(WWW_DIR . "/lib/nntp.php");
+require_once(WWW_DIR . "/lib/nzb.php");
+require_once(WWW_DIR . "/lib/nzbinfo.php");
 
 // Silent Error Handler (used to shut up noisy XML exceptions)
-function nfoHandleError($errno, $errstr, $errfile, $errline, array $errcontext){
+function nfoHandleError($errno, $errstr, $errfile, $errline, array $errcontext) {
 	if (0 === error_reporting())
 		return false;
-	if(!defined('E_STRICT'))define('E_STRICT', 2048);
-	switch($errno){
+	if (!defined('E_STRICT'))define('E_STRICT', 2048);
+	switch ($errno) {
 		case E_WARNING:
 		case E_NOTICE:
 		case E_STRICT:
@@ -70,6 +70,9 @@ class Nfo
 		$this->verbose=$verbose;
 	}
 
+	/**
+	 * @param nzbInfo $nzbInfo
+	 */
 	private function nfo_scan(&$nzbInfo){
 		//
 		// Phase 1, iterate over nzb file for a relative
@@ -92,8 +95,8 @@ class Nfo
 		else
 			$name = "";
 
-		$unordered_list=array();
-		foreach($nzbInfo->segmentfiles as $segment){
+		$unordered_list = array();
+		foreach ($nzbInfo->segmentfiles as $segment) {
 			if ($segment['filesize'] > Nfo::NFO_MAX_FILESIZE)
 				continue;
 
@@ -115,36 +118,36 @@ class Nfo
 		// of potential others in the unlikelyhood the content
 		// parsed here is bad
 		//
-		foreach($unordered_list as $idx => $n){
-			if (preg_match("/\.(nfo)([^a-z0-9]+|$)/i", $n["subject"])){
-				if($this->verbose) echo "[nfo] ";
-				$nfo_idx[]=$n;
+		foreach ($unordered_list as $idx => $n) {
+			if (preg_match("/\.(nfo)([^a-z0-9]+|$)/i", $n["subject"])) {
+				if ($this->verbose) echo "[nfo] ";
+				$nfo_idx[] = $n;
 			}
 		}
 
 		// Handle Releases with Obfuscation
 		// Releases titled: f4ca0f95896da1d41254bf49791a86a2
-		if($this->use_obfuscated)
-			foreach($unordered_list as $idx => $n){
+		if ($this->use_obfuscated)
+			foreach ($unordered_list as $idx => $n) {
 				if (preg_match("/\.(sfv)([^a-z0-9]+|$)/i", $n["subject"]))
 					continue;
 				if (preg_match("/\.(nzb)([^a-z0-9]+|$)/i", $n["subject"]))
 					continue;
 
-				if (preg_match("/\.[0-9]+([^a-z0-9\.-]+|$)/i", $n["subject"])){
-					if($this->verbose) echo "[obfs] ";
-					$nfo_idx[]=$n;
+				if (preg_match("/\.[0-9]+([^a-z0-9\.-]+|$)/i", $n["subject"])) {
+					if ($this->verbose) echo "[obfs] ";
+					$nfo_idx[] = $n;
 				}
 			}
 
 		// Fuzzy Parsing sees if it can identify other possible nfo's however
 		// they are appended to the end of the list obvious nfo's are always
 		// processed first
-		if($this->use_fuzzy)
-			foreach($unordered_list as $idx => $n){
-				if (preg_match("/\.(txt|diz)([^a-z0-9]+|$)/i", $n["subject"])){
-					if($this->verbose) echo "[fuzz] ";
-					$nfo_idx[]=$n;
+		if ($this->use_fuzzy)
+			foreach ($unordered_list as $idx => $n) {
+				if (preg_match("/\.(txt|diz)([^a-z0-9]+|$)/i", $n["subject"])) {
+					if ($this->verbose) echo "[fuzz] ";
+					$nfo_idx[] = $n;
 				}
 			}
 
@@ -153,20 +156,20 @@ class Nfo
 		return $nfo_idx;
 	}
 
-	private function is_binary(&$raw){
+	private function is_binary(&$raw) {
 		// Returns true if data passed in is binary, otherwise
 		// returns false,
 		$has_binary = (
-			0 or substr_count($raw, "^\r\n")/512 > 0.3
-			or substr_count($raw, "^ -~")/512 > 0.3
+			0 or substr_count($raw, "^\r\n") / 512 > 0.3
+			or substr_count($raw, "^ -~") / 512 > 0.3
 			or substr_count($raw, "\x00") > 0
 		);
 
-		if($has_binary)
+		if ($has_binary)
 		{
 			// Before we rule it completely out, see if we can detect it
 			// as utf-16
-			$result = iconv($in_charset = 'UTF-16LE' , $out_charset = 'UTF-8', $raw);
+			$result = iconv($in_charset = 'UTF-16LE', $out_charset = 'UTF-8', $raw);
 			if (false !== $result)
 			{
 				// not binary, we decoded it
@@ -178,16 +181,16 @@ class Nfo
 		}
 
 		// Return the binary flag
-		return ($has_binary)?true:false;
+		return ($has_binary) ? true : false;
 	}
 
-	private function is_par2(&$raw){
+	private function is_par2(&$raw) {
 		// Returns true if data passed in is binary, otherwise
 		// returns false,
 		return (substr($raw, 4) == "PAR2");
 	}
 
-	private function is_sfv(&$raw){
+	private function is_sfv(&$raw) {
 		// scan a content and return true if it is detected to be
 		// an sfv file, otherwise return false
 
@@ -205,55 +208,55 @@ class Nfo
 		);
 		// itreate over each line of file, if all regex's match
 		// on every line then we are dealing with an sfv file
-		foreach(preg_split("/((\r?\n)|(\r\n?))/", $raw) as $line){
-			$matches=false;
-			foreach($sfv_regex as $regex)
-				if(preg_match($regex, $line)){
-					$matches=true;
+		foreach (preg_split("/((\r?\n)|(\r\n?))/", $raw) as $line) {
+			$matches = false;
+			foreach ($sfv_regex as $regex)
+				if (preg_match($regex, $line)) {
+					$matches = true;
 					break;
 				}
-			if(!$matches)
+			if (!$matches)
 				return false;
 		}
 		return true;
 	}
 
-	private function store_blob($nfometa, $blobhash, $removed){
+	private function store_blob($nfometa, $blobhash, $removed) {
 		// This takes a array of blobs with their index id being
 		// the release id;  In the event we fetch the data and deem
 		// it no good, we need to add it to the skipped array which
 		// must be passed into the function.
 
 		$db = new DB();
-		foreach($blobhash as $uid => $blob){
+		foreach ($blobhash as $uid => $blob) {
 			$query = sprintf(
-				"REPLACE INTO releasenfo (id, releaseid, binaryID, nfo) ".
+				"REPLACE INTO releasenfo (id, releaseid, binaryID, nfo) " .
 				"VALUES (NULL, %d, 0, compress(%s));",
 				$uid, $db->escapeString($blob));
 			$id = $db->queryInsert($query);
-			if(!$id){
-				if($this->verbose) echo "!";
-			}else{
+			if (!$id) {
+				if ($this->verbose) echo "!";
+			} else {
 				$query = sprintf("UPDATE releases SET releasenfoid = %d WHERE id = %d LIMIT 1",
 								$id, $uid);
 				$res = $db->queryExec($query);
-				if($this->verbose) echo "s";
+				if ($this->verbose) echo "s";
 			}
 		}
 
 		// Now we update the database with entries that have no nfo files
 		// associated with the release
-		foreach($removed as $uid){
+		foreach ($removed as $uid) {
 			$res = $this->setNfoMissing($uid);
-			if($res <= 0){
-				if($this->verbose) echo "!";
-			}else{
-				if($this->verbose) echo "s";
+			if ($res <= 0) {
+				if ($this->verbose) echo "!";
+			} else {
+				if ($this->verbose) echo "s";
 			}
 		}
 	}
 
-	private function parse_blobs(&$nfometa, &$nfoblob){
+	private function parse_blobs(&$nfometa, &$nfoblob) {
 		// Parses an array of array of blobs and determines the most
 		// ideal nfo from them.
 		//
@@ -301,45 +304,45 @@ class Nfo
 		$parsed_blob = array();
 		$parsed_meta = array();
 
-		foreach($nfometa as $uid => $info){
+		foreach ($nfometa as $uid => $info) {
 			$ideal = Null;
 			$tossed = 0;
 			$total = count($info);
-			foreach($info as $idx => $entry){
+			foreach ($info as $idx => $entry) {
 				// Save first 'valid' entry
 
 				// Some simple checks right off the top... if there is
 				// no blob or the data failed to fetch, we can rule
 				// this entry out right away
-				if(!array_key_exists($uid, $nfoblob)){
-					if($this->verbose) echo '-';
+				if (!array_key_exists($uid, $nfoblob)) {
+					if ($this->verbose) echo '-';
 					continue;
 				}
-				if(!array_key_exists($idx, $nfoblob[$uid])){
-					if($this->verbose) echo '-';
+				if (!array_key_exists($idx, $nfoblob[$uid])) {
+					if ($this->verbose) echo '-';
 					continue;
 				}
-				if($nfoblob[(string)$uid][$idx] === Null){
-					if($this->verbose) echo '-';
+				if ($nfoblob[(string)$uid][$idx] === Null) {
+					if ($this->verbose) echo '-';
 					continue;
 				}
 
 				// Eliminate detected xml (usually nzb) files
-				if(preg_match('/xmlns[^=]*="[^"]*"/i', $nfoblob[$uid][$idx]) ||
-					preg_match("/(\<\?xml[\d\D]*\?\>)/i", $nfoblob[$uid][$idx])){
-					if($this->verbose) echo '-';
+				if (preg_match('/xmlns[^=]*="[^"]*"/i', $nfoblob[$uid][$idx]) ||
+					preg_match("/(\<\?xml[\d\D]*\?\>)/i", $nfoblob[$uid][$idx])) {
+					if ($this->verbose) echo '-';
 					continue;
 				}
 
 				// We do not want to pick up sfv files
-				if($this->is_sfv($nfoblob[$uid][$idx])){
-					if($this->verbose) echo '-';
+				if ($this->is_sfv($nfoblob[$uid][$idx])) {
+					if ($this->verbose) echo '-';
 					continue;
 				}
 
 				// We do not want to pick up par2 files
-				if($this->is_par2($nfoblob[$uid][$idx])){
-					if($this->verbose) echo '-';
+				if ($this->is_par2($nfoblob[$uid][$idx])) {
+					if ($this->verbose) echo '-';
 					continue;
 				}
 				// Ideally if code reaches this far
@@ -349,12 +352,12 @@ class Nfo
 				break;
 			}
 
-			if($ideal !== Null){
+			if ($ideal !== Null) {
 				// An ideal match was found
 				$parsed_blob[(string)$uid] = $nfoblob[$uid][$ideal];
 				$parsed_meta[(string)$uid] = $nfometa[$uid][$ideal];
-				if($this->verbose) echo '+';
-			}else{
+				if ($this->verbose) echo '+';
+			} else {
 				// No valid data
 				unset($parsed_blob[(string)$uid]);
 				unset($parsed_meta[(string)$uid]);
@@ -371,7 +374,7 @@ class Nfo
 		return count($nfoblob);
 	}
 
-	private function _nfo_grab($nfometa, &$blobhash){
+	private function _nfo_grab($nfometa, &$blobhash) {
 		// nfometa should be an array() of segments from nzb file
 		// it will then populate the blobhash which uses the segments
 		// as hash entries for the blob data.
@@ -412,27 +415,27 @@ class Nfo
 		// is caught upstairs with the nfo_grab() function
 		// no error handling is needed here
 		$nntp->doConnect(1, true);
-		foreach($nfometa as $uid => $matches){
+		foreach ($nfometa as $uid => $matches) {
 			$blobhash[$uid] = array();
-			foreach($matches as $idx => $match){
+			foreach ($matches as $idx => $match) {
 				$fetched = false;
-				foreach($match["groups"] as $group){
+				foreach ($match["groups"] as $group) {
 					// Don not try other groups if we already got it
-					if($fetched)break;
+					if ($fetched)break;
 
 					// Select the group and then attempt to fetch the article
 					$blob = $nntp->getMessages($group, $match["segment"], false);
-					if ($blob === false){
-						if($this->verbose) echo '*';
+					if ($blob === false) {
+						if ($this->verbose) echo '*';
 						continue;
 					}
 					// Mark that we fetched it to prevent fetching more
 					// of the same thing
 					$fetched = true;
-					if($this->verbose) echo '.';
+					if ($this->verbose) echo '.';
 
 					// Update blob with decrypted version and store
-					if ($this->is_binary($blob)){
+					if ($this->is_binary($blob)) {
 						// Binary data is not acceptable, we only
 						// work with text from here on out.
 						continue;
@@ -440,7 +443,7 @@ class Nfo
 					// Read-able ascii at this point... store it
 					$blobhash[$uid][$idx] = $blob;
 				}
-				if(!$fetched)
+				if (!$fetched)
 					// handle empty/failed segments
 					$blobhash[$uid][$idx] = Null;
 			}
@@ -448,7 +451,7 @@ class Nfo
 		$nntp->doQuit();
 	}
 
-	private function nfo_grab($nfometa, &$blobhash){
+	private function nfo_grab($nfometa, &$blobhash) {
 		// It is possible for connection to drop while attempting
 		// to fetch nfo content, to accomodate for the exceptions
 		// thrown during this time we wrap the real nfo_grab()
@@ -456,13 +459,13 @@ class Nfo
 		$retries = nfo::USENET_RETRY_COUNT;
 		set_error_handler('nfoHandleError');
 		$_blobhash = array();
-		while($retries >0){
-			try{
+		while ($retries > 0) {
+			try {
 				$this->_nfo_grab($nfometa, $_blobhash);
 				break;
-			}catch (Exception $e){
+			} catch (Exception $e) {
 				// Connection lost
-				if($this->verbose) echo sprintf("\n%s Connection lost to usenet (%d retries left).\n",
+				if ($this->verbose) echo sprintf("\n%s Connection lost to usenet (%d retries left).\n",
 							'NfoProc', $retries);
 				// Decrement retry count
 				$retries--;
@@ -482,6 +485,11 @@ class Nfo
 		return false;
 	}
 
+	/**
+	 * @param integer $processed
+	 * @param integer $total
+	 * @param integer $limit
+	 */
 	private function scan_releases(&$processed, &$total, $limit=Null){
 		// Scan all nzb files whos releases match against data
 		// that has no nfo files associated with it.
@@ -492,25 +500,25 @@ class Nfo
 		$db = new DB();
 
 		// How many releases to handle at a time
-		$batch=Nfo::NNTP_BATCH_COUNT;
+		$batch = Nfo::NNTP_BATCH_COUNT;
 
 		// Build NFO List
 		$nfometa = array();
 
 		// Missing NFO Query (oldest first so they don't expire on us)
-		$mnfo = "SELECT id,guid, name FROM releases r ".
-				"WHERE r.releasenfoid = ".Nfo::FLAG_NFO_PENDING.
+		$mnfo = "SELECT id,guid, name FROM releases r " .
+				"WHERE r.releasenfoid = " . Nfo::FLAG_NFO_PENDING .
 				" ORDER BY postdate DESC";
 
-		if ($limit !==Null and $limit > 0)
+		if ($limit !== Null and $limit > 0)
 			$mnfo .= " LIMIT $limit";
 
 		$res = $db->query($mnfo);
-		if($res){
-			foreach($res as $r){
+		if ($res) {
+			foreach ($res as $r) {
 				$nzbfile = $nzb->NZBPath($r["guid"]);
-				if(!is_file($nzbfile)){
-					if($this->verbose) echo sprintf("%s Missing NZB File: %d/%s ...\n",
+				if (!is_file($nzbfile)) {
+					if ($this->verbose) echo sprintf("%s Missing NZB File: %d/%s ...\n",
 						'NfoProc', intval($r["id"]), $r["name"]);
 					$this->setNfoMissing($r["id"]);
 					continue;
@@ -518,65 +526,80 @@ class Nfo
 
 				$nzbInfo = new NzbInfo();
 				if (!$nzbInfo->loadFromFile($nzbfile))
-                {
-                   if($this->verbose) echo sprintf("%s Unable to parse NZB File: %d/%s ...\n",
+				{
+				   if($this->verbose) echo sprintf("%s Unable to parse NZB File: %d/%s ...\n",
 						'NfoProc', intval($r["id"]), $r["name"]);
 					$this->setNfoMissing($r["id"]);
 					continue;
-                }
+				}
 
-                $total+=1;
+				$total+=1;
 
 				$filename = basename($nzbfile);
-				if($this->verbose) echo sprintf("NfoProc : Scanning %s - ", $r["name"]);
+				if($this->verbose) {
+					echo sprintf("NfoProc : Scanning %s - ", $r["name"]);
+				}
 
 				$matches = $this->nfo_scan($nzbInfo);
 				unset($nzbInfo);
-				if(is_array($matches)){
-					if(!count($matches)){
-						if($this->verbose) echo "nfo missing.\n";
+				if(is_array($matches)) {
+					if(!count($matches)) {
+						if($this->verbose) {
+							echo "nfo missing.\n";
+						}
 						$this->setNfoMissing($r["id"]);
 						continue;
 					}
-				}else{
-					if($this->verbose) echo "corrupt nzb.\n";
+				} else {
+					if($this->verbose) {
+						echo "corrupt nzb.\n";
+					}
 					$this->setNfoMissing($r["id"]);
 					continue;
 				}
-				if($this->verbose) echo count($matches)." possible nfo(s).\n";
+				if($this->verbose) {
+					echo count($matches)." possible nfo(s).\n";
+				}
 				$processed++;
 
 				// Hash Matches by Release id
 				$nfometa[(string)$r["id"]] = $matches;
 
-				if(!($processed%$batch))
-				{
+				if(!($processed%$batch)) {
 					$nfoblob = array();
-					if($this->verbose) echo "NfoProc : Retrieval ...";
-					if($this->nfo_grab($nfometa, $nfoblob)){
+					if($this->verbose) {
+						echo "NfoProc : Retrieval ...";
+					}
+					if($this->nfo_grab($nfometa, $nfoblob)) {
 						$before = array_keys($nfoblob);
 						$this->parse_blobs($nfometa, $nfoblob);
 						$after = array_keys($nfoblob);
 						$removed = array_diff($before, $after);
 						$this->store_blob($nfometa, $nfoblob, $removed);
 					}
-					if($this->verbose) echo "\n";
+					if($this->verbose) {
+						echo "\n";
+					}
 
 					// Reset nfo list array
 					$nfometa = array();
 				}
 			}
-			if(($processed%$batch)){
+			if(($processed%$batch)) {
 				$nfoblob = array();
-				if($this->verbose) echo "NfoProc : Retrieval ...";
-				if($this->nfo_grab($nfometa, $nfoblob)){
+				if($this->verbose) {
+					echo "NfoProc : Retrieval ...";
+				}
+				if($this->nfo_grab($nfometa, $nfoblob)) {
 					$before = array_keys($nfoblob);
 					$this->parse_blobs($nfometa, $nfoblob);
 					$after = array_keys($nfoblob);
 					$removed = array_diff($before, $after);
 					$this->store_blob($nfometa, $nfoblob, $removed);
 				}
-				if($this->verbose) echo "\n";
+				if($this->verbose) {
+					echo "\n";
+				}
 			}
 		}
 		return true;
@@ -597,25 +620,26 @@ class Nfo
 	private function setNfoMissing($relid)
 	{
 		$db = new DB();
-		$q = sprintf("UPDATE releases SET releasenfoid = %d ".
+		$q = sprintf("UPDATE releases SET releasenfoid = %d " .
 					"WHERE id = %d", Nfo::FLAG_NFO_MISSING, $relid);
 		return $db->queryExec($q);
 	}
 
 	/**
 	 * Returns the nfo from the database (blob)
+	 * @param string $nfoout
 	 */
 	public function getNfo($relid, &$nfoout)
 	{
 		$db = new DB();
 		// Has NFO Query
-		$mnfo = "SELECT uncompress(rn.nfo) as nfo FROM releases r ".
-			"INNER JOIN releasenfo rn ON rn.releaseid = r.id AND rn.id = r.releasenfoid ".
+		$mnfo = "SELECT uncompress(rn.nfo) as nfo FROM releases r " .
+			"INNER JOIN releasenfo rn ON rn.releaseid = r.id AND rn.id = r.releasenfoid " .
 			"WHERE rn.nfo IS NOT NULL AND r.id = %d LIMIT 1";
 		$res = $db->queryOneRow(sprintf($mnfo, $relid));
-		if($res && isset($res['nfo']))
+		if ($res && isset($res['nfo']))
 		{
-			$nfoout=$res['nfo'];
+			$nfoout = $res['nfo'];
 			return true;
 		}
 		return false;
@@ -624,12 +648,12 @@ class Nfo
 	/**
 	 * Process Nfo's
 	 */
-	public function processNfoFiles($batch=50)
+	public function processNfoFiles($batch = 50)
 	{
 		$processed = 0;
 		$total = 0;
 		$this->scan_releases($processed, $total, $batch);
-		if($this->verbose) echo sprintf("NfoProc : Complete %d NFOs detected from %d scanned NZB files.\n", $processed, $total);
+		if ($this->verbose) echo sprintf("NfoProc : Complete %d NFOs detected from %d scanned NZB files.\n", $processed, $total);
 
 		return $total;
 	}

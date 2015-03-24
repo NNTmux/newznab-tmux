@@ -172,6 +172,9 @@ class ColorCLI
 		return $colored_string;
 	}
 
+	/**
+	 * @param string $fg
+	 */
 	public static function set256($fg, $opt = "None", $bg = "None")
 	{
 		$colored_string = "\033[38;5;" . self::$colors256[$fg];
@@ -185,6 +188,9 @@ class ColorCLI
 		return $colored_string;
 	}
 
+	/**
+	 * @param string $str
+	 */
 	public static function debug($str)
 	{
 		$debugstring = "\033[" . self::$foreground_colors['Gray'] . "mDebug: $str\033[0m\n";
@@ -197,6 +203,9 @@ class ColorCLI
 		return $infostring;
 	}
 
+	/**
+	 * @param string $str
+	 */
 	public static function notice($str)
 	{
 		$noticstring = "\033[38;5;" . self::$colors256['Blue'] . "mNotice: $str\033[0m\n";
@@ -227,12 +236,18 @@ class ColorCLI
 		return $str;
 	}
 
+	/**
+	 * @param string $str
+	 */
 	public static function alternate($str)
 	{
 		$str = "\033[38;5;" . self::$colors256['DeepPink1'] . "m$str\033[0m\n";
 		return $str;
 	}
 
+	/**
+	 * @param string $str
+	 */
 	public static function tmuxOrange($str)
 	{
 		$str = "\033[38;5;" . self::$colors256['Orange'] . "m$str\033[0m\n";
@@ -251,6 +266,9 @@ class ColorCLI
 		return $str;
 	}
 
+	/**
+	 * @param string $str
+	 */
 	public static function alternateOver($str)
 	{
 		$str = "\033[38;5;" . self::$colors256['DeepPink1'] . "m$str\033[0m";

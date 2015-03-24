@@ -16,7 +16,7 @@ $logPath = $logPath['LogPath'];
 
 $regex = false;
 
-switch($type) {
+switch ($type) {
 	case 'info':
 		$regex = '/\[INFO\]/';
 		break;

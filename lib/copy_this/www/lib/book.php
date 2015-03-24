@@ -1,10 +1,10 @@
 <?php
-require_once(WWW_DIR."/lib/framework/db.php");
-require_once(WWW_DIR."/lib/amazon.php");
-require_once(WWW_DIR."/lib/category.php");
-require_once(WWW_DIR."/lib/site.php");
-require_once(WWW_DIR."/lib/util.php");
-require_once(WWW_DIR."/lib/releaseimage.php");
+require_once(WWW_DIR . "/lib/framework/db.php");
+require_once(WWW_DIR . "/lib/amazon.php");
+require_once(WWW_DIR . "/lib/category.php");
+require_once(WWW_DIR . "/lib/site.php");
+require_once(WWW_DIR . "/lib/util.php");
+require_once(WWW_DIR . "/lib/releaseimage.php");
 
 /**
  * This class manages the lookup of book information and storage/retrieve of book metadata.
@@ -16,7 +16,7 @@ class Book
 	/**
 	 * Default constructor.
 	 */
-	function Book($echooutput=false)
+	function Book($echooutput = false)
 	{
 		$this->echooutput = $echooutput;
 		$s = new Sites();
@@ -25,7 +25,7 @@ class Book
 		$this->privkey = $site->amazonprivkey;
 		$this->asstag = $site->amazonassociatetag;
 
-		$this->imgSavePath = WWW_DIR.'covers/book/';
+		$this->imgSavePath = WWW_DIR . 'covers/book/';
 	}
 
 	/**
@@ -43,7 +43,7 @@ class Book
 	public function getBookInfoByName($author, $title)
 	{
 		$db = new DB();
-		return $db->queryOneRow(sprintf("SELECT * FROM bookinfo where author like %s and title like %s", $db->escapeString("%".$author."%"),  $db->escapeString("%".$title."%")));
+		return $db->queryOneRow(sprintf("SELECT * FROM bookinfo where author like %s and title like %s", $db->escapeString("%" . $author . "%"), $db->escapeString("%" . $title . "%")));
 	}
 
 	/**
@@ -56,9 +56,9 @@ class Book
 		if ($start === false)
 			$limit = "";
 		else
-			$limit = " LIMIT ".$start.",".$num;
+			$limit = " LIMIT " . $start . "," . $num;
 
-		return $db->query(" SELECT * FROM bookinfo ORDER BY createddate DESC".$limit);
+		return $db->query(" SELECT * FROM bookinfo ORDER BY createddate DESC" . $limit);
 	}
 
 	/**
@@ -74,16 +74,17 @@ class Book
 	/**
 	 * Get count of all bookinfo rows for browse list.
 	 */
-	public function getBookCount($maxage=-1)
+	public function getBookCount($maxage = -1)
 	{
 		$db = new DB();
 
 		$browseby = $this->getBrowseBy();
 
-		if ($maxage > 0)
-			$maxage = sprintf(" and r.postdate > now() - interval %d day ", $maxage);
-		else
-			$maxage = "";
+		if ($maxage > 0) {
+					$maxage = sprintf(" and r.postdate > now() - interval %d day ", $maxage);
+		} else {
+					$maxage = "";
+		}
 
 		$sql = sprintf("select count(distinct r.bookinfoid) as num from releases r inner join bookinfo b on b.id = r.bookinfoid and b.title != '' where r.passwordstatus <= (select value from site where setting='showpasswordedrelease') %s %s", $browseby, $maxage);
 
@@ -94,7 +95,7 @@ class Book
 	/**
 	 * Get range of bookinfo rows for browse list.
 	 */
-	public function getBookRange($start, $num, $orderby, $maxage=-1)
+	public function getBookRange($start, $num, $orderby, $maxage = -1)
 	{
 		$db = new DB();
 
@@ -103,14 +104,14 @@ class Book
 		if ($start === false)
 			$limit = "";
 		else
-			$limit = " LIMIT ".$start.",".$num;
+			$limit = " LIMIT " . $start . "," . $num;
 
 		$maxagesql = "";
 		if ($maxage > 0)
 			$maxagesql = sprintf(" and r.postdate > now() - interval %d day ", $maxage);
 
 		$order = $this->getBrowseOrder($orderby);
-		$sql = sprintf(" SELECT r.bookinfoid, max(postdate), b.* from releases r inner join bookinfo b on b.id = r.bookinfoid and b.title != '' where r.passwordstatus <= (select value from site where setting='showpasswordedrelease') %s %s group by r.bookinfoid order by %s %s".$limit, $browseby, $maxagesql, $order[0], $order[1]);
+		$sql = sprintf(" SELECT r.bookinfoid, max(postdate), b.* from releases r inner join bookinfo b on b.id = r.bookinfoid and b.title != '' where r.passwordstatus <= (select value from site where setting='showpasswordedrelease') %s %s group by r.bookinfoid order by %s %s" . $limit, $browseby, $maxagesql, $order[0], $order[1]);
 		$rows = $db->query($sql, true);
 
 		//
@@ -118,11 +119,11 @@ class Book
 		//
 		$ids = "";
 		foreach ($rows as $row)
-			$ids .= $row["bookinfoid"]. ", ";
+			$ids .= $row["bookinfoid"] . ", ";
 
 		if (strlen($ids) > 0)
 		{
-			$ids = substr($ids,0,-2);
+			$ids = substr($ids, 0, -2);
 
 			//
 			// get all releases matching these ids
@@ -134,8 +135,7 @@ class Book
 			//
 			// build array indexed by bookinfoid
 			//
-			foreach ($allrows as &$allrow)
-			{
+			foreach ($allrows as &$allrow) {
 				$arr[$allrow["bookinfoid"]]["id"] = (isset($arr[$allrow["bookinfoid"]]["id"]) ? $arr[$allrow["bookinfoid"]]["id"] : "") . $allrow["id"] . ",";
 				$arr[$allrow["bookinfoid"]]["rarinnerfilecount"] = (isset($arr[$allrow["bookinfoid"]]["rarinnerfilecount"]) ? $arr[$allrow["bookinfoid"]]["rarinnerfilecount"] : "") . $allrow["rarinnerfilecount"] . ",";
 				$arr[$allrow["bookinfoid"]]["haspreview"] = (isset($arr[$allrow["bookinfoid"]]["haspreview"]) ? $arr[$allrow["bookinfoid"]]["haspreview"] : "") . $allrow["haspreview"] . ",";
@@ -155,8 +155,7 @@ class Book
 			//
 			// stuff back into the results set
 			//
-			foreach ($rows as &$row)
-			{
+			foreach ($rows as &$row) {
 				$row["grp_release_id"] = substr($arr[$row["bookinfoid"]]["id"], 0, -1);
 				$row["grp_rarinnerfilecount"] = substr($arr[$row["bookinfoid"]]["rarinnerfilecount"], 0, -1);
 				$row["grp_haspreview"] = substr($arr[$row["bookinfoid"]]["haspreview"], 0, -1);
@@ -183,7 +182,7 @@ class Book
 	{
 		$order = ($orderby == '') ? 'r.postdate' : $orderby;
 		$orderArr = explode("_", $order);
-		switch($orderArr[0]) {
+		switch ($orderArr[0]) {
 			case 'artist':
 				$orderfield = 'b.author';
 				break;
@@ -236,7 +235,7 @@ class Book
 				if (preg_match('/id/i', $bbv)) {
 					$browseby .= " and b.{$bbv} = $bbs ";
 				} else {
-					$browseby .= " and b.$bbv LIKE(".$db->escapeString('%'.$bbs.'%').") ";
+					$browseby .= " and b.$bbv LIKE(" . $db->escapeString('%' . $bbs . '%') . ") ";
 				}
 			}
 		}
@@ -264,7 +263,7 @@ class Book
 		$ri = new ReleaseImage();
 
 		$mus = array();
-		$amaz = $this->fetchAmazonProperties($author." ".$title);
+		$amaz = $this->fetchAmazonProperties($author . " " . $title);
 		if (!$amaz)
 		{
 			//echo "tried to lookup ".$author." ".$title;
@@ -276,24 +275,24 @@ class Book
 		// get album properties
 		//
 		$item = array();
-		$item["asin"] = (string) $amaz->Items->Item->ASIN;
-		$item["url"] = (string) $amaz->Items->Item->DetailPageURL;
-		$item["coverurl"] = (string) $amaz->Items->Item->LargeImage->URL;
+		$item["asin"] = (string)$amaz->Items->Item->ASIN;
+		$item["url"] = (string)$amaz->Items->Item->DetailPageURL;
+		$item["coverurl"] = (string)$amaz->Items->Item->LargeImage->URL;
 		if ($item['coverurl'] != "")
 			$item['cover'] = 1;
 		else
 			$item['cover'] = 0;
-		$item["author"] = (string) $amaz->Items->Item->ItemAttributes->Author;
-		$item["dewey"] = (string) $amaz->Items->Item->ItemAttributes->DeweyDecimalNumber;
-		$item["ean"] = (string) $amaz->Items->Item->ItemAttributes->EAN;
-		$item["isbn"] = (string) $amaz->Items->Item->ItemAttributes->ISBN;
-		$item["publisher"] = (string) $amaz->Items->Item->ItemAttributes->Publisher;
-		$item["publishdate"] = (string) $amaz->Items->Item->ItemAttributes->PublicationDate;
-		$item["pages"] = (string) $amaz->Items->Item->ItemAttributes->NumberOfPages;
-		$item["title"] = (string) $amaz->Items->Item->ItemAttributes->Title;
+		$item["author"] = (string)$amaz->Items->Item->ItemAttributes->Author;
+		$item["dewey"] = (string)$amaz->Items->Item->ItemAttributes->DeweyDecimalNumber;
+		$item["ean"] = (string)$amaz->Items->Item->ItemAttributes->EAN;
+		$item["isbn"] = (string)$amaz->Items->Item->ItemAttributes->ISBN;
+		$item["publisher"] = (string)$amaz->Items->Item->ItemAttributes->Publisher;
+		$item["publishdate"] = (string)$amaz->Items->Item->ItemAttributes->PublicationDate;
+		$item["pages"] = (string)$amaz->Items->Item->ItemAttributes->NumberOfPages;
+		$item["title"] = (string)$amaz->Items->Item->ItemAttributes->Title;
 		$item["review"] = "";
 		if (isset($amaz->Items->Item->EditorialReviews))
-			$item["review"] = trim(strip_tags((string) $amaz->Items->Item->EditorialReviews->EditorialReview->Content));
+			$item["review"] = trim(strip_tags((string)$amaz->Items->Item->EditorialReviews->EditorialReview->Content));
 
 		//This is to verify the result back from amazon was at least somewhat related to what was intended.
 		//If you are debugging releases comment out the following code to show all info
@@ -302,10 +301,8 @@ class Book
 		$match = similar_text($title, $item['title'], $titlepercent);
 
 		//If the author is less than 80% album must be 100%
-		if ($authorpercent < '60')
-		{
-			if ($titlepercent != '100')
-			{
+		if ($authorpercent < '60') {
+			if ($titlepercent != '100') {
 				//echo "\nAuthor Under 80 Title Under 100 \n".$author." - ".$item['author']." - ".$authorpercent."\n";
 				$temptitle = $title;
 				$tempauthor = $author;
@@ -313,10 +310,8 @@ class Book
 				$author = $temptitle;
 				$match = similar_text($author, $item['author'], $authorpercent);
 				$match = similar_text($title, $item['title'], $titlepercent);
-				if ($authorpercent < '60')
-				{
-					if ($titlepercent != '100')
-					{
+				if ($authorpercent < '60') {
+					if ($titlepercent != '100') {
 						//echo "\nAuthor Under 80 Title Under 100 second check\n".$author." - ".$item['author']." - ".$authorpercent."\n";
 						//echo $title." - ".$item['title']." - ".$titlepercent."\n";
 						return false;
@@ -326,18 +321,16 @@ class Book
 		}
 
 		//If the title is ever under 30%, it's probably not a match.
-		if ($titlepercent < '30')
-		{
+		if ($titlepercent < '30') {
 			//echo "Title Under 30 ".$title." - ".$item['title']." - ".$titlepercent;
 			return false;
 		}
 
 		$bookId = $this->addUpdateBookInfo($item['title'], $item['asin'], $item['url'],
 			$item['author'], $item['publisher'], $item['publishdate'], $item['review'],
-			$item['cover'], $item['dewey'], $item['ean'], $item['isbn'], $item['pages'] );
+			$item['cover'], $item['dewey'], $item['ean'], $item['isbn'], $item['pages']);
 
-		if ($bookId)
-		{
+		if ($bookId) {
 			$item['cover'] = $ri->saveImage($bookId, $item['coverurl'], $this->imgSavePath, 250, 250);
 		}
 
@@ -346,6 +339,7 @@ class Book
 
 	/**
 	 * Query amazon for a title.
+	 * @param string $title
 	 */
 	public function fetchAmazonProperties($title)
 	{
@@ -354,7 +348,7 @@ class Book
 		{
 			$result = $obj->searchProducts($title, AmazonProductAPI::BOOKS, "TITLE");
 		}
-		catch(Exception $e)
+		catch (Exception $e)
 		{
 			$result = false;
 		}
@@ -387,7 +381,7 @@ class Book
 				if ($book !== false)
 				{
 					if ($this->echooutput)
-						echo 'BookPrc : '.$book["author"].' - '.$book["title"]."\n";
+						echo 'BookPrc : ' . $book["author"] . ' - ' . $book["title"] . "\n";
 
 					//check for existing book entry
 					$bookCheck = $this->getBookInfoByName($book["author"], $book["title"]);
@@ -428,35 +422,34 @@ class Book
 		//	return false;
 
 		//remove things in brackets and double hyphens
-		$newName = preg_replace("%(\([\w\s-.,]*\)|\[[\w\s-.,]*\]|[0-9])%","",$newName);
-		$newName = preg_replace("%(\-\s.*\-)%","-",$newName);
+		$newName = preg_replace("%(\([\w\s-.,]*\)|\[[\w\s-.,]*\]|[0-9])%", "", $newName);
+		$newName = preg_replace("%(\-\s.*\-)%", "-", $newName);
 
 		$name = explode("-", $newName);
 		$name = array_map("trim", $name);
 
 
-		if (is_array($name) && sizeof($name) > 1)
-		{
+		if (is_array($name) && sizeof($name) > 1) {
 			$result['author'] = trim($name[0]);
 			$result['title'] = trim($name[1]);
-			$result['title'] = preg_replace('/retail/i','',$result['title']);
-			$result['title'] = preg_replace('/\.epub/i','',$result['title']);
-			$result['title'] = preg_replace('/\.mobi/i','',$result['title']);
-			$result['title'] = preg_replace('/\.prc/i','',$result['title']);
-			$result['title'] = preg_replace('/\.lit/i','',$result['title']);
-			$result['title'] = preg_replace('/\.obi/i','',$result['title']);
-			$result['title'] = preg_replace('/\.azw3/i','',$result['title']);
-			$result['title'] = preg_replace('/\.azw/i','',$result['title']);
-			$result['title'] = preg_replace('/\.pdf/i','',$result['title']);
-			$result['title'] = preg_replace('/\.html/i','',$result['title']);
-			$result['title'] = preg_replace('/\./i',' ',$result['title']);
-			$result['title'] = preg_replace('/\d{4}/i','',$result['title']);
-			$result['title'] = preg_replace('/repost/i','',$result['title']);
-			$result['title'] = preg_replace('/ebook/i','',$result['title']);
-			$result['title'] = preg_replace('/\(.*?\) WW/i','',$result['title']);
-			$result['title'] = preg_replace('/ WW/i','',$result['title']);
-			$result['title'] = preg_replace('/\(.*?\)$/i','',$result['title']);
-			$result['title'] = preg_replace('/\:.*?$/i','',$result['title']);
+			$result['title'] = preg_replace('/retail/i', '', $result['title']);
+			$result['title'] = preg_replace('/\.epub/i', '', $result['title']);
+			$result['title'] = preg_replace('/\.mobi/i', '', $result['title']);
+			$result['title'] = preg_replace('/\.prc/i', '', $result['title']);
+			$result['title'] = preg_replace('/\.lit/i', '', $result['title']);
+			$result['title'] = preg_replace('/\.obi/i', '', $result['title']);
+			$result['title'] = preg_replace('/\.azw3/i', '', $result['title']);
+			$result['title'] = preg_replace('/\.azw/i', '', $result['title']);
+			$result['title'] = preg_replace('/\.pdf/i', '', $result['title']);
+			$result['title'] = preg_replace('/\.html/i', '', $result['title']);
+			$result['title'] = preg_replace('/\./i', ' ', $result['title']);
+			$result['title'] = preg_replace('/\d{4}/i', '', $result['title']);
+			$result['title'] = preg_replace('/repost/i', '', $result['title']);
+			$result['title'] = preg_replace('/ebook/i', '', $result['title']);
+			$result['title'] = preg_replace('/\(.*?\) WW/i', '', $result['title']);
+			$result['title'] = preg_replace('/ WW/i', '', $result['title']);
+			$result['title'] = preg_replace('/\(.*?\)$/i', '', $result['title']);
+			$result['title'] = preg_replace('/\:.*?$/i', '', $result['title']);
 
 			//echo "author parsed - ".$result['author']."\n";
 			//echo "title parsed - ".$result['title']."\n";
@@ -468,18 +461,19 @@ class Book
 				$pos = strpos($result['author'], ",");
 				if ($pos !== false)
 				{
-					$firstname = substr($result['author'], $pos+1);
+					$firstname = substr($result['author'], $pos + 1);
 					$surname = substr($result['author'], 0, $pos);
 					$result['author'] = trim($firstname . " " . $surname);
 				}
 			}
 		}
 
-		return (!empty($result['author'])  ? $result : false);
+		return (!empty($result['author']) ? $result : false);
 	}
 
 	/**
 	 * Insert or update a bookinfo row.
+	 * @param string $review
 	 */
 	public function addUpdateBookInfo($title, $asin, $url, $author, $publisher, $publishdate, $review, $cover, $dewey, $ean, $isbn, $pages)
 	{
@@ -493,9 +487,9 @@ class Book
 		if ($publishdate == "")
 			$publishdate = "null";
 		elseif (strlen($publishdate) == 4)
-			$publishdate = $db->escapeString($publishdate."-01-01");
+			$publishdate = $db->escapeString($publishdate . "-01-01");
 		elseif (strlen($publishdate) == 7)
-			$publishdate = $db->escapeString($publishdate."-01");
+			$publishdate = $db->escapeString($publishdate . "-01");
 		else
 			$publishdate = $db->escapeString($publishdate);
 
@@ -504,10 +498,10 @@ class Book
 			ON DUPLICATE KEY UPDATE  title = %s,  asin = %s,  url = %s,   author = %s,  publisher = %s,  publishdate = %s,  review = %s, cover = %d,  createddate = now(),  updateddate = now(), dewey = %s, ean = %s, isbn = %s, pages = %s",
 			$db->escapeString($title), $db->escapeString($asin), $db->escapeString($url),
 			$db->escapeString($author), $db->escapeString($publisher),
-			$publishdate, $db->escapeString($review), $cover,  $db->escapeString($dewey), $db->escapeString($ean), $db->escapeString($isbn), $pages,
+			$publishdate, $db->escapeString($review), $cover, $db->escapeString($dewey), $db->escapeString($ean), $db->escapeString($isbn), $pages,
 			$db->escapeString($title), $db->escapeString($asin), $db->escapeString($url),
 			$db->escapeString($author), $db->escapeString($publisher),
-			$db->escapeString($publishdate), $db->escapeString($review), $cover,  $db->escapeString($dewey), $db->escapeString($ean), $db->escapeString($isbn), $pages );
+			$db->escapeString($publishdate), $db->escapeString($review), $cover, $db->escapeString($dewey), $db->escapeString($ean), $db->escapeString($isbn), $pages);
 
 		$bookId = $db->queryInsert($sql);
 		return $bookId;

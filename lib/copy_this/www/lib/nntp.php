@@ -1,7 +1,7 @@
 <?php
 /**
- * Attempt to include PEAR's nntp class if it has not already been included.
- */
+	 * Attempt to include PEAR's nntp class if it has not already been included.
+	 */
 require_once(WWW_DIR . "/lib/Net_NNTP/NNTP/Client.php");
 require_once(WWW_DIR . "/lib/framework/db.php");
 require_once(WWW_DIR . "/lib/Tmux.php");
@@ -449,7 +449,7 @@ class NNTP extends Net_NNTP_Client
 
 		// Send XOVER command to NNTP with wanted articles.
 		$response = $this->_sendCommand('XOVER ' . $range);
-		if ($this->isError($response)){
+		if ($this->isError($response)) {
 			return $response;
 		}
 
@@ -811,11 +811,11 @@ class NNTP extends Net_NNTP_Client
 	/**
 	 * Post an article to usenet.
 	 *
-	 * @param $groups   mixed   (array)  Groups. ie.: $groups = array('alt.test', 'alt.testing', 'free.pt');
+	 * @param string $groups   mixed   (array)  Groups. ie.: $groups = array('alt.test', 'alt.testing', 'free.pt');
 	 *                          (string) Group.  ie.: $groups = 'alt.test';
-	 * @param $subject  string  The subject.     ie.: $subject = 'Test article';
-	 * @param $body     string  The message.     ie.: $message = 'This is only a test, please disregard.';
-	 * @param $from     string  The poster.      ie.: $from = '<anon@anon.com>';
+	 * @param string $subject  string  The subject.     ie.: $subject = 'Test article';
+	 * @param string $body     string  The message.     ie.: $message = 'This is only a test, please disregard.';
+	 * @param string $from     string  The poster.      ie.: $from = '<anon@anon.com>';
 	 * @param $extra    string  Extra, separated by \r\n
 	 *                                           ie.: $extra  = 'Organization: <newznab>\r\nNNTP-Posting-Host: <127.0.0.1>';
 	 * @param $yEnc     bool    Encode the message with yEnc?
@@ -909,7 +909,7 @@ class NNTP extends Net_NNTP_Client
 		// Try re-selecting the group.
 		$data = $nntp->selectGroup($group);
 		if ($this->isError($data)) {
-			$message = "Code {$data->code}: {$data->message}\nSkipping group: {$group}";
+			$message = "code {$data->code}: {$data->message}\nSkipping group: {$group}";
 			if ($this->_debugBool) {
 				$this->_debugging->log('NNTP', "dataError", $message, \Logger::LOG_NOTICE);
 			}
@@ -930,7 +930,7 @@ class NNTP extends Net_NNTP_Client
 	 * @param int    $lineLength Line length to use (can be up to 254 characters).
 	 * @param bool   $crc32      Pass True to include a CRC checksum in the trailer to allow decoders to verify data integrity.
 	 *
-	 * @return mixed On success: (string) yEnc encoded string.
+	 * @return string|null On success: (string) yEnc encoded string.
 	 *               On failure: (bool)   False.
 	 *
 	 * @access public
@@ -1052,6 +1052,7 @@ class NNTP extends Net_NNTP_Client
 
 	/**
 	 * Encode a yenc encoded string.
+	 * @param string $filename
 	 */
 	function encodeYenc2($message, $filename, $linelen = 128, $crc32 = true)
 	{
@@ -1069,7 +1070,7 @@ class NNTP extends Net_NNTP_Client
 		$encoded = "";
 
 		// Encode each character of the message one at a time.
-		for( $i = 0; $i < strlen($message); $i++)
+		for ($i = 0; $i < strlen($message); $i++)
 		{
 			$value = (ord($message{$i}) + 42) % 256;
 
@@ -1077,7 +1078,7 @@ class NNTP extends Net_NNTP_Client
 			if ($value == 0 || $value == 9 || $value == 10 ||
 				$value == 13 || $value == 32 || $value == 46 ||
 				$value == 61)
-				$encoded .= "=".chr(($value + 64) % 256);
+				$encoded .= "=" . chr(($value + 64) % 256);
 			else
 				$encoded .= chr($value);
 		}
@@ -1086,15 +1087,15 @@ class NNTP extends Net_NNTP_Client
 		$encoded = trim(chunk_split($encoded, $linelen));
 
 		// Tack a yEnc header onto the encoded message.
-		$encoded = "=ybegin line=$linelen size=".strlen($message)
-			." name=".trim($filename)."\r\n".$encoded;
-		$encoded .= "\r\n=yend size=".strlen($message);
+		$encoded = "=ybegin line=$linelen size=" . strlen($message)
+			." name=" . trim($filename) . "\r\n" . $encoded;
+		$encoded .= "\r\n=yend size=" . strlen($message);
 
 		// Add a CRC32 checksum if desired.
 		if ($crc32 === true)
-			$encoded .= " crc32=".strtolower(sprintf("%04X", crc32($message)));
+			$encoded .= " crc32=" . strtolower(sprintf("%04X", crc32($message)));
 
-		return $encoded."\r\n";
+		return $encoded . "\r\n";
 	}
 
 	/**
@@ -1226,7 +1227,7 @@ class NNTP extends Net_NNTP_Client
 	protected function _initiateYEncSettings()
 	{
 		// Check if the user wants to use yyDecode or the simple_php_yenc_decode extension.
-		$this->_yyDecoderPath  = ($this->site->yydecoderpath != '') ? (string)$this->site->yydecoderpath : false;
+		$this->_yyDecoderPath = ($this->site->yydecoderpath != '') ? (string)$this->site->yydecoderpath : false;
 		if (strpos((string)$this->_yyDecoderPath, 'simple_php_yenc_decode') !== false) {
 			if (extension_loaded('simple_php_yenc_decode')) {
 				$this->_yEncExtension = true;
@@ -1354,7 +1355,6 @@ class NNTP extends Net_NNTP_Client
 	 *
 	 * @return string/print Have we failed to decompress the data, was there a
 	 *                 problem downloading the data, etc..
-
 	 * @return mixed  On success : (array)  The headers.
 	 *                On failure : (object) PEAR_Error.
 	 *
@@ -1457,7 +1457,7 @@ class NNTP extends Net_NNTP_Client
 		if ($this->_debugBool) {
 			$this->_debugging->log('NNTP', "_getXFeatureTextResponse", $message, \Logger::LOG_NOTICE);
 		}
-		$message = $this->throwError($this->pdo->log->error($message), 1000);;
+		$message = $this->throwError($this->pdo->log->error($message), 1000); ;
 		return $message;
 	}
 
@@ -1496,7 +1496,7 @@ class NNTP extends Net_NNTP_Client
 	 * @param mixed $identifier (string) The message-id of the article to download.
 	 *                          (int)    The article number.
 	 *
-	 * @return mixed On success : (string) The article's body.
+	 * @return string On success : (string) The article's body.
 	 *               On failure : (object) PEAR_Error.
 	 *
 	 * @access protected
@@ -1589,7 +1589,7 @@ class NNTP extends Net_NNTP_Client
 		if (parent::_isConnected()) {
 			$retVal = true;
 		} else {
-			switch($this->_currentServer) {
+			switch ($this->_currentServer) {
 				case NNTP_SERVER:
 					if (is_resource($this->_socket)) {
 						$this->doQuit(true);
@@ -1605,7 +1605,7 @@ class NNTP extends Net_NNTP_Client
 				default:
 					$retVal = $this->throwError('Wrong server constant used in NNTP checkConnection()!');
 			}
-			if ($retVal === true && $reSelectGroup){
+			if ($retVal === true && $reSelectGroup) {
 				$group = $this->selectGroup($currentGroup);
 				if ($this->isError($group)) {
 					$retVal = $group;

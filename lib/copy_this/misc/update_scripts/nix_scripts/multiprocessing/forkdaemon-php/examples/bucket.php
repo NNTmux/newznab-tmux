@@ -1,6 +1,6 @@
 <?php
 
-declare(ticks=1);
+declare(ticks = 1);
 
 require_once(__DIR__ . '/../fork_daemon.php');
 
@@ -27,7 +27,7 @@ function test_bucket()
 	$server->max_children_set(5, BUCKET2);
 
 	$data_set = array();
-	for($i=0; $i<100; $i++) $data_set[] = $i;
+	for ($i = 0; $i < 100; $i++) $data_set[] = $i;
 
 	/* add work to bucket 1 */
 	shuffle($data_set);
@@ -38,17 +38,19 @@ function test_bucket()
 	$server->addwork($data_set, "", BUCKET2);
 
 	/* wait until all work allocated */
-	while ($server->work_sets_count(BUCKET1) > 0 || $server->work_sets_count(BUCKET2) > 0)
-	{
+	while ($server->work_sets_count(BUCKET1) > 0 || $server->work_sets_count(BUCKET2) > 0) {
 		echo "work set count(1): " . $server->work_sets_count(BUCKET1) . ", count(2): " . $server->work_sets_count(BUCKET2) . "\n";
-		if ($server->work_sets_count(BUCKET1) > 0) $server->process_work(false, BUCKET1);
-		if ($server->work_sets_count(BUCKET2) > 0) $server->process_work(false, BUCKET2);
+		if ($server->work_sets_count(BUCKET1) > 0) {
+			$server->process_work(false, BUCKET1);
+		}
+		if ($server->work_sets_count(BUCKET2) > 0) {
+			$server->process_work(false, BUCKET2);
+		}
 		sleep(1);
 	}
 
 	/* wait until all children finish */
-	while ($server->children_running() > 0)
-	{
+	while ($server->children_running() > 0) {
 		echo "waiting for " . $server->children_running() . " children to finish\n";
 		sleep(1);
 	}
@@ -62,13 +64,13 @@ function test_bucket()
 function process_child_run($data_set, $identifier = "")
 {
 	echo "I'm child working on: " . implode(",", $data_set) . ($identifier == "" ? "" : " (id:$identifier)") . "\n";
-	sleep(rand(4,8));
+	sleep(rand(4, 8));
 }
 
 /* registered call back function */
 function process_child_exit($pid, $identifier = "")
 {
-	echo "Child $pid just finished" . ($identifier == "" ? "" : " (id:$identifier)") . "\n";
+	echo "child $pid just finished" . ($identifier == "" ? "" : " (id:$identifier)") . "\n";
 }
 
 /* registered call back function */

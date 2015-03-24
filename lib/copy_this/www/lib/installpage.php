@@ -4,7 +4,7 @@ require_once('../lib/smarty/Smarty.class.php');
 /**
  * This class represents each page during installation.
  */
-class Installpage 
+class Installpage
 {
 	public $title = '';
 	public $content = '';
@@ -18,7 +18,7 @@ class Installpage
 	 * Default constructor.
 	 */
 	function Installpage()
-	{			
+	{
 		@session_start();
 		
 		$this->smarty = new Smarty();
@@ -32,7 +32,7 @@ class Installpage
 	/**
 	 * Writes out the page.
 	 */
-	public function render() 
+	public function render()
 	{
 		$this->page_template = "installpage.tpl";
 		$this->smarty->display($this->page_template);

@@ -1,7 +1,7 @@
 <?php
-require_once(WWW_DIR."/lib/framework/db.php");
-require_once(WWW_DIR."/lib/site.php");
-require_once(WWW_DIR."/lib/sphinx.php");
+require_once(WWW_DIR . "/lib/framework/db.php");
+require_once(WWW_DIR . "/lib/site.php");
+require_once(WWW_DIR . "/lib/sphinx.php");
 
 /**
  * This class handles lookup of nzpre lookups and storage/retrieval of pre data.
@@ -11,7 +11,7 @@ class PreDB
 	/**
 	 * Default constructor.
 	 */
-	function PreDB($echooutput=true)
+	function PreDB($echooutput = true)
 	{
 		$this->echooutput = $echooutput;
 	}
@@ -42,26 +42,26 @@ class PreDB
 	/**
 	 * Get count of all predb rows.
 	 */
-	public function getPreCount($dirname='', $category='')
+	public function getPreCount($dirname = '', $category = '')
 	{
-	    // Only use Sphinx if this is a search request
-	    if ($dirname) {
-	        $s = new Sites();
-    		$site = $s->get();
-    		if ($site->sphinxenabled && $site->sphinxindexpredb) {
-    		    // Search using Sphinx
-    		    $sphinx = new Sphinx();
-    		    $count = $sphinx->getPreCount($dirname, $category);
-    		    if ($count > -1) {
-    		        return $count;
-    		    }
-    		}
-	    }
+		// Only use Sphinx if this is a search request
+		if ($dirname) {
+			$s = new Sites();
+			$site = $s->get();
+			if ($site->sphinxenabled && $site->sphinxindexpredb) {
+				// Search using Sphinx
+				$sphinx = new Sphinx();
+				$count = $sphinx->getPreCount($dirname, $category);
+				if ($count > -1) {
+					return $count;
+				}
+			}
+		}
 
 		$db = new DB();
 
-		$dirname = empty($dirname) ? '' : sprintf("WHERE dirname LIKE %s", $db->escapeString('%'.$dirname.'%'));
-		$category = empty($category) ? '' : sprintf((empty($dirname) ? 'WHERE' : ' AND')." category = %s", $db->escapeString($category));
+		$dirname = empty($dirname) ? '' : sprintf("WHERE dirname LIKE %s", $db->escapeString('%' . $dirname . '%'));
+		$category = empty($category) ? '' : sprintf((empty($dirname) ? 'WHERE' : ' AND') . " category = %s", $db->escapeString($category));
 
 		$predbQuery = $db->queryOneRow(sprintf('SELECT COUNT(id) AS num FROM predb %s %s', $dirname, $category), true);
 
@@ -71,27 +71,27 @@ class PreDB
 	/**
 	 * Get predb rows by limit and filter.
 	 */
-	public function getPreRange($start=0, $num, $dirname='', $category='')
+	public function getPreRange($start = 0, $num, $dirname = '', $category = '')
 	{
-	    // Only use Sphinx if this is a search request
-	    if ($dirname) {
-	        $s = new Sites();
-    		$site = $s->get();
+		// Only use Sphinx if this is a search request
+		if ($dirname) {
+			$s = new Sites();
+			$site = $s->get();
 			if ($site->sphinxenabled && $site->sphinxindexpredb) {
-    		    // Search using Sphinx
-    		    $sphinx = new Sphinx();
-    		    $results = $sphinx->getPreRange($start, $num, $dirname, $category);
-           		if (is_array($results)) {
-           		    return $results;
-           		}
-    		}
+				// Search using Sphinx
+				$sphinx = new Sphinx();
+				$results = $sphinx->getPreRange($start, $num, $dirname, $category);
+		   		if (is_array($results)) {
+		   			return $results;
+		   		}
+			}
 		}
 
 		$db = new DB();
 
 		$dirname = str_replace(' ', '%', $dirname);
-		$dirname = empty($dirname) ? '' : sprintf('WHERE dirname LIKE %s', $db->escapeString('%'.$dirname.'%'));
-		$category = empty($category) ? '' : sprintf((empty($dirname) ? 'WHERE' : ' AND')." category = %s", $db->escapeString($category));
+		$dirname = empty($dirname) ? '' : sprintf('WHERE dirname LIKE %s', $db->escapeString('%' . $dirname . '%'));
+		$category = empty($category) ? '' : sprintf((empty($dirname) ? 'WHERE' : ' AND') . " category = %s", $db->escapeString($category));
 
 		$sql = sprintf('SELECT p.*, r.guid FROM predb p left outer join releases r on p.id = r.preid %s %s ORDER BY ctime DESC LIMIT %d,%d', $dirname, $category, $start, $num);
 
@@ -110,13 +110,13 @@ class PreDB
 
 		$matched = 0;
 		$releasesQuery = $db->queryDirect(sprintf('SELECT id, searchname FROM releases WHERE preid IS NULL AND adddate > DATE_SUB(NOW(), INTERVAL %d DAY)', $daysback));
-		while($arr = $db->getAssocArray($releasesQuery))
+		while ($arr = $db->getAssocArray($releasesQuery))
 		{
 			$arr['searchname'] = str_replace(' ', '_', $arr['searchname']);
 			$sql = sprintf("SELECT id FROM predb WHERE dirname = %s LIMIT 1", $db->escapeString($arr['searchname']));
 			$predbQuery = $db->queryOneRow($sql);
 
-			if($predbQuery)
+			if ($predbQuery)
 			{
 				$db->queryExec(sprintf('UPDATE releases SET preid = %d WHERE id = %d', $predbQuery['id'], $arr['id']));
 
@@ -124,17 +124,19 @@ class PreDB
 			}
 		}
 
-		if($this->echooutput)
-			echo "Predb   : Matched pre data to ".$matched." releases\n";
+		if ($this->echooutput)
+			echo "Predb   : Matched pre data to " . $matched . " releases\n";
 
 	}
 
 	/**
 	 * Add/Update predb row.
+	 * @param DB $db
+	 * @param string[] $preArray
 	 */
 	public function updatePreDB($db, $preArray)
 	{
-		if(!preg_match('/^(UN)?((MOD)?NUKED?|DELPRE)$/', $preArray['category']))
+		if (!preg_match('/^(UN)?((MOD)?NUKED?|DELPRE)$/', $preArray['category']))
 		{
 			$db->queryExec(sprintf('INSERT INTO predb
 				(ctime, dirname, category, filesize, filecount, filename)
@@ -144,8 +146,8 @@ class PreDB
 				$preArray['ctime'],
 				$db->escapeString($preArray['dirname']),
 				$db->escapeString($preArray['category']),
-				(!empty($preArray['filesize']) ? (float) $preArray['filesize'] : 0),
-				(!empty($preArray['filecount']) ? (int) $preArray['filecount'] : 0),
+				(!empty($preArray['filesize']) ? (float)$preArray['filesize'] : 0),
+				(!empty($preArray['filecount']) ? (int)$preArray['filecount'] : 0),
 				(!empty($preArray['nuke_filename']) ? $db->escapeString($preArray['nuke_filename']) : '""')
 			));
 
@@ -154,9 +156,7 @@ class PreDB
 			//	echo "!PRE: [".date('Y-m-d H:i:s', $preArray['ctime']).'] - [ '.$preArray['dirname'].' ] - ['.$preArray['category']."]\n";
 
 			return true;
-		}
-		else
-		{
+		} else {
 			$db->queryExec(sprintf("update predb
 				SET nuketype=%s, nukereason=%s, nuketime=%d
 				WHERE dirname = %s",
@@ -178,6 +178,7 @@ class PreDB
 
 	/**
 	 * XOR decode a string with a key.
+	 * @return string
 	 */
 	function xorDecode($subject, $nzprekey)
 	{
@@ -204,17 +205,19 @@ class PreDB
 		$s = new Sites();
 		$site = $s->get();
 
-		if(empty($site->nzpregroup) || empty($site->nzpresubject) || empty($site->nzpreposter) || empty($site->nzprefield) || empty($site->nzprekey))
-			return false;
+		if(empty($site->nzpregroup) || empty($site->nzpresubject) || empty($site->nzpreposter) || empty($site->nzprefield) || empty($site->nzprekey)) {
+					return false;
+		}
 
-		if($this->echooutput)
-			echo "Predb   : Checking for new pre data ";
+		if($this->echooutput) {
+					echo "Predb   : Checking for new pre data ";
+		}
 
 		$db = new DB();
 		$nntp = new Nntp();
 
 		if(!$nntp->doConnect()) {
-            echo "Failed to get NNTP connection\n";
+			echo "Failed to get NNTP connection\n";
 			return false;
 		}
 
@@ -232,26 +235,27 @@ class PreDB
 
 		$added_updated = 0;
 		$nzprekey = $site->nzprekey;
-		while(strlen($nzprekey) < 1024)
-			$nzprekey = $nzprekey.$nzprekey;
+		while(strlen($nzprekey) < 1024) {
+					$nzprekey = $nzprekey.$nzprekey;
+		}
 
 		$cnt = !empty($site->nzprearticles) ? $site->nzprearticles : 500;
 		foreach($groupMsgs as $groupMsg) {
-			if ($cnt%50==0 && $cnt != 0 && $this->echooutput)
-				echo $cnt."..";
+			if ($cnt%50==0 && $cnt != 0 && $this->echooutput) {
+							echo $cnt."..";
+			}
 			$cnt--;
 
 			if(preg_match('/^'.$site->nzpresubject.'$/', $groupMsg['Subject']) && preg_match('/^'.$site->nzpreposter.'$/', $groupMsg['From'])) {
 				$ret = $msgHeader = $nntp->getHeader($groupMsg['Message-ID']);
-				if($nntp->isError($ret))
-					continue;
+				if($nntp->isError($ret)) {
+									continue;
+				}
 
 				for($i=0; $i < count($msgHeader); $i++) {
 					if(preg_match('/^'.$site->nzprefield.': /', $msgHeader[$i])) {
-						if($nzpreParse = $this->nzpreParse(str_replace($site->nzprefield.': ', '', $msgHeader[$i]), $nzprekey))
-						{
-							if ($this->updatePreDB($db, $nzpreParse))
-							{
+						if($nzpreParse = $this->nzpreParse(str_replace($site->nzprefield.': ', '', $msgHeader[$i]), $nzprekey)) {
+							if ($this->updatePreDB($db, $nzpreParse)) {
 								$added_updated++;
 							}
 						}
@@ -264,7 +268,7 @@ class PreDB
 
 		$nntp->disconnect();
 
-		if($this->echooutput)
-			echo "\nPredb   : Added/Updated ".$added_updated." records\n";
+		if ($this->echooutput)
+			echo "\nPredb   : Added/Updated " . $added_updated . " records\n";
 	}
 }

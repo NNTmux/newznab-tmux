@@ -1,9 +1,9 @@
 <?php
 
 require_once("config.php");
-require_once(WWW_DIR."/lib/adminpage.php");
-require_once(WWW_DIR."/lib/releases.php");
-require_once(WWW_DIR."/lib/category.php");
+require_once(WWW_DIR . "/lib/adminpage.php");
+require_once(WWW_DIR . "/lib/releases.php");
+require_once(WWW_DIR . "/lib/category.php");
 
 $page = new AdminPage();
 $releases = new Releases();
@@ -13,19 +13,19 @@ $id = 0;
 // set the current action
 $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view';
 
-switch($action)
+switch ($action)
 {
 	case 'submit':
 
 		$releases->update($_POST["id"], $_POST["name"], $_POST["searchname"], $_POST["fromname"], $_POST["category"], $_POST["totalpart"], $_POST["grabs"], $_POST["size"], $_POST["postdate"], $_POST["adddate"], $_POST["rageid"], $_POST["seriesfull"], $_POST["season"], $_POST["episode"], $_POST['imdbid'], $_POST['anidbid'], $_POST['tvdbid'], $_POST['consoleinfoid']);
 
-		if(isset($_POST['from']) && !empty($_POST['from']))
+		if (isset($_POST['from']) && !empty($_POST['from']))
 		{
-			header("Location:".$_POST['from']);
+			header("Location:" . $_POST['from']);
 			exit;
 		}
 
-		header("Location:".WWW_TOP."/release-list.php");
+		header("Location:" . WWW_TOP . "/release-list.php");
 		break;
 	case 'view':
 	default:
@@ -39,7 +39,7 @@ switch($action)
 
 			if ($release && $release["imdbid"] != "")
 			{
-				require_once(WWW_DIR."/lib/movie.php");
+				require_once(WWW_DIR . "/lib/movie.php");
 				$movie = new Movie();
 				$mov = $movie->getMovieInfo($release['imdbid']);
 				$page->smarty->assign('updatename', $mov["title"]);
@@ -47,10 +47,10 @@ switch($action)
 
 			if ($release && $release["musicinfoid"] != "")
 			{
-				require_once(WWW_DIR."/lib/music.php");
+				require_once(WWW_DIR . "/lib/music.php");
 				$music = new Music();
 				$mus = $music->getMusicInfo($release['musicinfoid']);
-				$page->smarty->assign('updatename', $mus["artist"]." - ".$mus["title"].($mus["year"] != "" ? " - ".$mus["year"] : ""));
+				$page->smarty->assign('updatename', $mus["artist"] . " - " . $mus["title"] . ($mus["year"] != "" ? " - " . $mus["year"] : ""));
 			}
 
 			$page->smarty->assign('release', $release);
@@ -59,9 +59,9 @@ switch($action)
 		break;
 }
 
-$page->smarty->assign('yesno_ids', array(1,0));
-$page->smarty->assign('yesno_names', array( 'Yes', 'No'));
-$page->smarty->assign('catlist',$category->getForSelect(false));
+$page->smarty->assign('yesno_ids', array(1, 0));
+$page->smarty->assign('yesno_names', array('Yes', 'No'));
+$page->smarty->assign('catlist', $category->getForSelect(false));
 
 $page->content = $page->smarty->fetch('release-edit.tpl');
 $page->render();
