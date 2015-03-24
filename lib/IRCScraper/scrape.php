@@ -1,8 +1,8 @@
 <?php
-require_once(dirname(__FILE__)."/../../bin/config.php");
+require_once(dirname(__FILE__) . "/../../bin/config.php");
 require_once(dirname(__FILE__) . "/../IRCScraper.php");
 
-if (!is_file(NN_TMUX . 'lib' . DS . 'IRCScraper' .DS . 'settings.php')) {
+if (!is_file(NN_TMUX . 'lib' . DS . 'IRCScraper' . DS . 'settings.php')) {
 	exit('Copy settings_example.php to settings.php and change the settings.' . PHP_EOL);
 }
 
@@ -19,7 +19,7 @@ if (!isset($argv[1]) || $argv[1] !== 'true') {
 	);
 }
 
-require_once (NN_TMUX . 'lib' . DS . 'IRCScraper' .DS . 'settings.php');
+require_once (NN_TMUX . 'lib' . DS . 'IRCScraper' . DS . 'settings.php');
 
 if (!defined('SCRAPE_IRC_NICKNAME')) {
 	exit('ERROR! You must update settings.php using settings_example.php.');

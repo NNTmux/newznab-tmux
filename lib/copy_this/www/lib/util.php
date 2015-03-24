@@ -1,5 +1,5 @@
 <?php
-require_once(WWW_DIR."/lib/site.php");
+require_once(WWW_DIR . "/lib/site.php");
 require_once(NN_TMUX . 'lib' . DS . 'PHPMailer' . DS . 'class.phpmailer.php');
 
 /*
@@ -15,10 +15,8 @@ class Utility
 
 	static public function clearScreen()
 	{
-		if (self::isCLI())
-		{
-			if (self::isWin())
-			{
+		if (self::isCLI()) {
+			if (self::isWin()) {
 				passthru('cls');
 			} else {
 				passthru('clear');
@@ -119,7 +117,7 @@ class Utility
 	/**
 	 * Detect if the command is accessible on the system.
 	 *
-	 * @param $cmd
+	 * @param string $cmd
 	 *
 	 * @return bool|null Returns true if found, false if not found, and null if which is not detected.
 	 */
@@ -158,7 +156,8 @@ class Utility
 	{
 		$gzipped = null;
 		if (($fp = fopen($filename, 'r')) !== false) {
-			if (@fread($fp, 2) == "\x1F\x8B") { // this is a gzip'd file
+			if (@fread($fp, 2) == "\x1F\x8B") {
+// this is a gzip'd file
 				fseek($fp, -4, SEEK_END);
 				if (strlen($datum = @fread($fp, 4)) == 4) {
 					$gzipped = $datum;
@@ -220,7 +219,7 @@ class Utility
 	 *
 	 * @param string $filePath
 	 *
-	 * @return bool|string
+	 * @return string
 	 */
 	static public function unzipGzipFile($filePath)
 	{
@@ -319,15 +318,15 @@ class Utility
 	public static function getUrl(array $options = [])
 	{
 		$defaults = [
-			'url'        => '',    // The URL to download.
+			'url'        => '', // The URL to download.
 			'method'     => 'get', // Http method, get/post/etc..
-			'postdata'   => '',    // Data to send on post method.
-			'enctype'	 => '',    // Encoding type
-			'language'   => '',    // Language in header string.
+			'postdata'   => '', // Data to send on post method.
+			'enctype'	 => '', // Encoding type
+			'language'   => '', // Language in header string.
 			'debug'      => false, // Show curl debug information.
-			'useragent'  => '',    // User agent string.
-			'cookie'     => '',    // Cookie string.
-			'verifycert' => true,  /* Verify certificate authenticity?
+			'useragent'  => '', // User agent string.
+			'cookie'     => '', // Cookie string.
+			'verifycert' => true, /* Verify certificate authenticity?
 									  Since curl does not have a verify self signed certs option,
 									  you should use this instead if your cert is self signed. */
 		];
@@ -437,10 +436,9 @@ class Utility
 		$fileSpec = '';
 
 		if (!empty($options['id']) && in_array($options['type'],
-				['anime', 'audio', 'audiosample', 'book', 'console',  'games', 'movies', 'music', 'preview', 'sample', 'tvrage', 'video', 'xxx'])) {
+				['anime', 'audio', 'audiosample', 'book', 'console', 'games', 'movies', 'music', 'preview', 'sample', 'tvrage', 'video', 'xxx'])) {
 			$fileSpec = sprintf($fileSpecTemplate, $options['type'], $options['id'], $options['suffix']);
-			$fileSpec = file_exists(NN_COVERS . $fileSpec) ? $fileSpec :
-				sprintf($fileSpecTemplate, $options['type'], 'no', $options['suffix']);
+			$fileSpec = file_exists(NN_COVERS . $fileSpec) ? $fileSpec : sprintf($fileSpecTemplate, $options['type'], 'no', $options['suffix']);
 		}
 
 		return $fileSpec;
@@ -485,8 +483,7 @@ class Utility
 			}
 
 			// If the user enabled SMTP & Auth but did not setup credentials, throw an exception.
-			if (defined('PHPMAILER_SMTP_AUTH') && PHPMAILER_SMTP_AUTH == true)
-			{
+			if (defined('PHPMAILER_SMTP_AUTH') && PHPMAILER_SMTP_AUTH == true) {
 				if ((!defined('PHPMAILER_SMTP_USER') || PHPMAILER_SMTP_USER === '') ||
 					(!defined('PHPMAILER_SMTP_PASSWORD') || PHPMAILER_SMTP_PASSWORD === '')
 				) {
@@ -523,7 +520,7 @@ class Utility
 		$fromName  = (PHPMAILER_FROM_NAME === '') ? $settings->title : PHPMAILER_FROM_NAME;
 		$replyTo   = (PHPMAILER_REPLYTO === '') ? $site_email : PHPMAILER_REPLYTO;
 
-		(PHPMAILER_BCC !== '') ?	$mail->addBCC(PHPMAILER_BCC) : null;
+		(PHPMAILER_BCC !== '') ? $mail->addBCC(PHPMAILER_BCC) : null;
 
 		$mail->setFrom($fromEmail, $fromName);
 		$mail->addAddress($to);
@@ -588,7 +585,7 @@ class Utility
 
 }
 
-function checkStatus ($code)
+function checkStatus($code)
 {
 	return ($code == 0) ? true : false;
 }
@@ -600,7 +597,7 @@ function checkStatus ($code)
  *
  * @return string
  */
-function cp437toUTF ($str)
+function cp437toUTF($str)
 {
 	$out = '';
 	for ($i = 0; $i < strlen($str); $i++) {
@@ -1016,13 +1013,13 @@ function imdb_trailers($imdbID)
 }
 
 // Check if O/S is windows.
-function isWindows ()
+function isWindows()
 {
 	return Utility::isWin();
 }
 
 // Convert obj to array.
-function objectsIntoArray ($arrObjData, $arrSkipIndices = [])
+function objectsIntoArray($arrObjData, $arrSkipIndices = [])
 {
 	$arrData = [];
 
@@ -1054,7 +1051,7 @@ function objectsIntoArray ($arrObjData, $arrSkipIndices = [])
  *
  * @return array
  */
-function runCmd ($command, $debug = false)
+function runCmd($command, $debug = false)
 {
 	$nl = PHP_EOL;
 	if (isWindows() && strpos(phpversion(), "5.2") !== false) {
@@ -1083,34 +1080,37 @@ function runCmd ($command, $debug = false)
  *
  * @return string
  */
-function safeFilename ($filename)
+function safeFilename($filename)
 {
 	return trim(preg_replace('/[^\w\s.-]*/i', '', $filename));
 }
 
 function generateUuid()
 {
-	$key = sprintf
-	(
+	$key = sprintf(
 		'%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
 		// 32 bits for "time_low"
-		mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff ),
+		mt_rand(0, 0xffff), mt_rand(0, 0xffff),
 		// 16 bits for "time_mid"
-		mt_rand( 0, 0xffff ),
+		mt_rand(0, 0xffff),
 		// 16 bits for "time_hi_and_version",
 		// four most significant bits holds version number 4
-		mt_rand( 0, 0x0fff ) | 0x4000,
+		mt_rand(0, 0x0fff) | 0x4000,
 		// 16 bits, 8 bits for "clk_seq_hi_res",
 		// 8 bits for "clk_seq_low",
 		// two most significant bits holds zero and one for variant DCE1.1
-		mt_rand( 0, 0x3fff ) | 0x8000,
+		mt_rand(0, 0x3fff) | 0x8000,
 		// 48 bits for "node"
-		mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff )
+		mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
 	);
 
 	return $key;
 }
 
+/**
+ * @param string $haystack
+ * @param string $needle
+ */
 function startsWith($haystack, $needle)
 {
 	$length = strlen($needle);

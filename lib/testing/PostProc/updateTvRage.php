@@ -45,7 +45,7 @@ if ($shows instanceof \Traversable) {
 
 		$imgbytes = '';
 		if (isset($rInfo['imgurl']) && !empty($rInfo['imgurl'])) {
-			$img =Utility::getUrl(['url' => $rInfo['imgurl']]);
+			$img = Utility::getUrl(['url' => $rInfo['imgurl']]);
 			if ($img !== false) {
 				$im = @imagecreatefromstring($img);
 				if ($im !== false) {

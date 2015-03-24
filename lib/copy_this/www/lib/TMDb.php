@@ -1,16 +1,16 @@
 <?php
 /**
- * TMDb PHP API class - API 'themoviedb.org'
- * API Documentation: http://help.themoviedb.org/kb/api/
- * Documentation and usage in README file
- *
- * @author Jonas De Smet - Glamorous
- * @since 09.11.2009
- * @date 16.11.2012
- * @copyright Jonas De Smet - Glamorous
- * @version 1.5.1
- * @license BSD http://www.opensource.org/licenses/bsd-license.php
- */
+	 * TMDb PHP API class - API 'themoviedb.org'
+	 * API Documentation: http://help.themoviedb.org/kb/api/
+	 * Documentation and usage in README file
+	 *
+	 * @author Jonas De Smet - Glamorous
+	 * @since 09.11.2009
+	 * @date 16.11.2012
+	 * @copyright Jonas De Smet - Glamorous
+	 * @version 1.5.1
+	 * @license BSD http://www.opensource.org/licenses/bsd-license.php
+	 */
 
 class TMDb
 {
@@ -74,11 +74,11 @@ class TMDb
 	 */
 	public function __construct($apikey, $default_lang = 'en', $config = FALSE, $scheme = TMDb::API_SCHEME)
 	{
-		$this->_apikey = (string) $apikey;
+		$this->_apikey = (string)$apikey;
 		$this->_apischeme = ($scheme == TMDb::API_SCHEME) ? TMDb::API_SCHEME : TMDb::API_SCHEME_SSL;
 		$this->setLang($default_lang);
 
-		if($config === TRUE)
+		if ($config === TRUE)
 		{
 			$this->getConfiguration();
 		}
@@ -97,9 +97,9 @@ class TMDb
 	{
 		$params = array(
 			'query' => $query,
-			'page' => (int) $page,
+			'page' => (int)$page,
 			'language' => ($lang !== NULL) ? $lang : $this->getLang(),
-			'include_adult' => (bool) $adult,
+			'include_adult' => (bool)$adult,
 			'year' => $year,
 		);
 		return $this->_makeCall('search/movie', $params);
@@ -117,8 +117,8 @@ class TMDb
 	{
 		$params = array(
 			'query' => $query,
-			'page' => (int) $page,
-			'include_adult' => (bool) $adult,
+			'page' => (int)$page,
+			'include_adult' => (bool)$adult,
 		);
 		return $this->_makeCall('search/person', $params);
 	}
@@ -151,7 +151,7 @@ class TMDb
 		$params = array(
 			'language' => ($lang !== NULL) ? $lang : $this->getLang(),
 		);
-		return $this->_makeCall('collection/'.$id, $params);
+		return $this->_makeCall('collection/' . $id, $params);
 	}
 
 	/**
@@ -165,9 +165,9 @@ class TMDb
 	{
 		$params = array(
 			'language' => ($lang !== NULL) ? $lang : $this->getLang(),
-            'append_to_response' => 'releases,trailers',
+			'append_to_response' => 'releases,trailers',
 		);
-		return $this->_makeCall('movie/'.$id, $params);
+		return $this->_makeCall('movie/' . $id, $params);
 	}
 
 	/**
@@ -182,7 +182,7 @@ class TMDb
 		$params = array(
 			'country' => $country,
 		);
-		return $this->_makeCall('movie/'.$id.'/alternative_titles', $params);
+		return $this->_makeCall('movie/' . $id . '/alternative_titles', $params);
 	}
 
 	/**
@@ -193,7 +193,7 @@ class TMDb
 	 */
 	public function getMovieCast($id)
 	{
-		return $this->_makeCall('movie/'.$id.'/casts');
+		return $this->_makeCall('movie/' . $id . '/casts');
 	}
 
 	/**
@@ -204,7 +204,7 @@ class TMDb
 	 */
 	public function getMovieKeywords($id)
 	{
-		return $this->_makeCall('movie/'.$id.'/keywords');
+		return $this->_makeCall('movie/' . $id . '/keywords');
 	}
 
 	/**
@@ -215,7 +215,7 @@ class TMDb
 	 */
 	public function getMovieReleases($id)
 	{
-		return $this->_makeCall('movie/'.$id.'/releases');
+		return $this->_makeCall('movie/' . $id . '/releases');
 	}
 
 	/**
@@ -226,7 +226,7 @@ class TMDb
 	 */
 	public function getMovieTranslations($id)
 	{
-		return $this->_makeCall('movie/'.$id.'/translations');
+		return $this->_makeCall('movie/' . $id . '/translations');
 	}
 
 	/**
@@ -241,7 +241,7 @@ class TMDb
 		$params = array(
 			'language' => ($lang !== NULL) ? $lang : $this->getLang(),
 		);
-		return $this->_makeCall('movie/'.$id.'/trailers', $params);
+		return $this->_makeCall('movie/' . $id . '/trailers', $params);
 	}
 
 	/**
@@ -256,7 +256,7 @@ class TMDb
 		$params = array(
 			'language' => ($lang !== NULL) ? $lang : $this->getLang(),
 		);
-		return $this->_makeCall('movie/'.$id.'/images', $params);
+		return $this->_makeCall('movie/' . $id . '/images', $params);
 	}
 
 	/**
@@ -270,10 +270,10 @@ class TMDb
 	public function getSimilarMovies($id, $page = 1, $lang = NULL)
 	{
 		$params = array(
-			'page' => (int) $page,
+			'page' => (int)$page,
 			'language' => ($lang !== NULL) ? $lang : $this->getLang(),
 		);
-		return $this->_makeCall('movie/'.$id.'/similar_movies', $params);
+		return $this->_makeCall('movie/' . $id . '/similar_movies', $params);
 	}
 
 	/**
@@ -296,7 +296,7 @@ class TMDb
 	public function getUpcomingMovies($page = 1, $lang = NULL)
 	{
 		$params = array(
-			'page' => (int) $page,
+			'page' => (int)$page,
 			'language' => ($lang !== NULL) ? $lang : $this->getLang(),
 		);
 		return $this->_makeCall('movie/upcoming', $params);
@@ -312,7 +312,7 @@ class TMDb
 	public function getNowPlayingMovies($page = 1, $lang = NULL)
 	{
 		$params = array(
-			'page' => (int) $page,
+			'page' => (int)$page,
 			'language' => ($lang !== NULL) ? $lang : $this->getLang(),
 		);
 		return $this->_makeCall('movie/now_playing', $params);
@@ -328,7 +328,7 @@ class TMDb
 	public function getPopularMovies($page = 1, $lang = NULL)
 	{
 		$params = array(
-			'page' => (int) $page,
+			'page' => (int)$page,
 			'language' => ($lang !== NULL) ? $lang : $this->getLang(),
 		);
 		return $this->_makeCall('movie/popular', $params);
@@ -344,7 +344,7 @@ class TMDb
 	public function getTopRatedMovies($page = 1, $lang = NULL)
 	{
 		$params = array(
-			'page' => (int) $page,
+			'page' => (int)$page,
 			'language' => ($lang !== NULL) ? $lang : $this->getLang(),
 		);
 		return $this->_makeCall('movie/top_rated', $params);
@@ -358,7 +358,7 @@ class TMDb
 	 */
 	public function getMovieChanges($id)
 	{
-		return $this->_makeCall('movie/'.$id.'/changes');
+		return $this->_makeCall('movie/' . $id . '/changes');
 	}
 
 	/**
@@ -372,7 +372,7 @@ class TMDb
 	public function getChangedMovies($page = 1, $start_date = NULL, $end_date = NULL)
 	{
 		$params = array(
-			'page' => (int) $page,
+			'page' => (int)$page,
 			'start_date' => $start_date,
 			'end_date' => $end_date,
 		);
@@ -387,7 +387,7 @@ class TMDb
 	 */
 	public function getPerson($id)
 	{
-		return $this->_makeCall('person/'.$id);
+		return $this->_makeCall('person/' . $id);
 	}
 
 	/**
@@ -402,7 +402,7 @@ class TMDb
 		$params = array(
 			'language' => ($lang !== NULL) ? $lang : $this->getLang(),
 		);
-		return $this->_makeCall('person/'.$id.'/credits', $params);
+		return $this->_makeCall('person/' . $id . '/credits', $params);
 	}
 
 	/**
@@ -413,7 +413,7 @@ class TMDb
 	 */
 	public function getPersonImages($id)
 	{
-		return $this->_makeCall('person/'.$id.'/images');
+		return $this->_makeCall('person/' . $id . '/images');
 	}
 
 	/**
@@ -424,7 +424,7 @@ class TMDb
 	 */
 	public function getPersonChanges($id)
 	{
-		return $this->_makeCall('person/'.$id.'/changes');
+		return $this->_makeCall('person/' . $id . '/changes');
 	}
 
 	/**
@@ -438,7 +438,7 @@ class TMDb
 	public function getChangedPersons($page = 1, $start_date = NULL, $end_date = NULL)
 	{
 		$params = array(
-			'page' => (int) $page,
+			'page' => (int)$page,
 			'start_date' => $start_date,
 			'start_date' => $end_date,
 		);
@@ -453,7 +453,7 @@ class TMDb
 	 */
 	public function getCompany($id)
 	{
-		return $this->_makeCall('company/'.$id);
+		return $this->_makeCall('company/' . $id);
 	}
 
 	/**
@@ -467,10 +467,10 @@ class TMDb
 	public function getMoviesByCompany($id, $page = 1, $lang = NULL)
 	{
 		$params = array(
-			'page' => (int) $page,
+			'page' => (int)$page,
 			'language' => ($lang !== NULL) ? $lang : $this->getLang(),
 		);
-		return $this->_makeCall('company/'.$id.'/movies', $params);
+		return $this->_makeCall('company/' . $id . '/movies', $params);
 	}
 
 	/**
@@ -498,10 +498,10 @@ class TMDb
 	public function getMoviesByGenre($id, $page = 1, $lang = NULL)
 	{
 		$params = array(
-			'page' => (int) $page,
+			'page' => (int)$page,
 			'language' => ($lang !== NULL) ? $lang : $this->getLang(),
 		);
-		return $this->_makeCall('genre/'.$id.'/movies', $params);
+		return $this->_makeCall('genre/' . $id . '/movies', $params);
 	}
 
 	/**
@@ -514,9 +514,9 @@ class TMDb
 	{
 		$result = $this->_makeCall('authentication/token/new');
 
-		if( ! isset($result['request_token']))
+		if (!isset($result['request_token']))
 		{
-			if($this->getDebugMode())
+			if ($this->getDebugMode())
 			{
 				throw new TMDbException('No valid request token from TMDb');
 			}
@@ -544,7 +544,7 @@ class TMDb
 
 		$result = $this->_makeCall('authentication/session/new', $params);
 
-		if(isset($result['session_id']))
+		if (isset($result['session_id']))
 		{
 			$this->setAuthSession($result['session_id']);
 		}
@@ -588,10 +588,10 @@ class TMDb
 	{
 		$session_id = ($session_id === NULL) ? $this->_session_id : $session_id;
 		$params = array(
-			'page' => (int) $page,
+			'page' => (int)$page,
 			'language' => ($lang !== NULL) ? $lang : '',
 		);
-		return $this->_makeCall('account/'.$account_id.'/favorite_movies', $params, $session_id);
+		return $this->_makeCall('account/' . $account_id . '/favorite_movies', $params, $session_id);
 	}
 
 	/**
@@ -607,10 +607,10 @@ class TMDb
 	{
 		$session_id = ($session_id === NULL) ? $this->_session_id : $session_id;
 		$params = array(
-			'page' => (int) $page,
+			'page' => (int)$page,
 			'language' => ($lang !== NULL) ? $lang : '',
 		);
-		return $this->_makeCall('account/'.$account_id.'/rated_movies', $params, $session_id);
+		return $this->_makeCall('account/' . $account_id . '/rated_movies', $params, $session_id);
 	}
 
 	/**
@@ -626,10 +626,10 @@ class TMDb
 	{
 		$session_id = ($session_id === NULL) ? $this->_session_id : $session_id;
 		$params = array(
-			'page' => (int) $page,
+			'page' => (int)$page,
 			'language' => ($lang !== NULL) ? $lang : '',
 		);
-		return $this->_makeCall('account/'.$account_id.'/movie_watchlist', $params, $session_id);
+		return $this->_makeCall('account/' . $account_id . '/movie_watchlist', $params, $session_id);
 	}
 
 	/**
@@ -645,10 +645,10 @@ class TMDb
 	{
 		$session_id = ($session_id === NULL) ? $this->_session_id : $session_id;
 		$params = array(
-			'movie_id' => (int) $movie_id,
-			'favorite' => (bool) $favorite,
+			'movie_id' => (int)$movie_id,
+			'favorite' => (bool)$favorite,
 		);
-		return $this->_makeCall('account/'.$account_id.'/favorite', $params, $session_id, TMDb::POST);
+		return $this->_makeCall('account/' . $account_id . '/favorite', $params, $session_id, TMDb::POST);
 	}
 
 	/**
@@ -664,10 +664,10 @@ class TMDb
 	{
 		$session_id = ($session_id === NULL) ? $this->_session_id : $session_id;
 		$params = array(
-			'movie_id' => (int) $movie_id,
-			'movie_watchlist' => (bool) $watchlist,
+			'movie_id' => (int)$movie_id,
+			'movie_watchlist' => (bool)$watchlist,
 		);
-		return $this->_makeCall('account/'.$account_id.'/movie_watchlist', $params, $session_id, TMDb::POST);
+		return $this->_makeCall('account/' . $account_id . '/movie_watchlist', $params, $session_id, TMDb::POST);
 	}
 
 	/**
@@ -684,7 +684,7 @@ class TMDb
 		$params = array(
 			'value' => is_numeric($value) ? floatval($value) : 0,
 		);
-		return $this->_makeCall('movie/'.$movie_id.'/rating', $params, $session_id, TMDb::POST);
+		return $this->_makeCall('movie/' . $movie_id . '/rating', $params, $session_id, TMDb::POST);
 	}
 
 	/**
@@ -696,7 +696,7 @@ class TMDb
 	{
 		$config = $this->_makeCall('configuration');
 
-		if( ! empty($config))
+		if (!empty($config))
 		{
 			$this->setConfig($config);
 		}
@@ -716,18 +716,18 @@ class TMDb
 	{
 		$config = $this->getConfig();
 
-		if(isset($config['images']))
+		if (isset($config['images']))
 		{
 			$base_url = $config['images']['base_url'];
 			$available_sizes = $this->getAvailableImageSizes($imagetype);
 
-			if(in_array($size, $available_sizes))
+			if (in_array($size, $available_sizes))
 			{
-				return $base_url.$size.$filepath;
+				return $base_url . $size . $filepath;
 			}
 			else
 			{
-				throw new TMDbException('The size "'.$size.'" is not supported by TMDb');
+				throw new TMDbException('The size "' . $size . '" is not supported by TMDb');
 			}
 		}
 		else
@@ -746,9 +746,9 @@ class TMDb
 	{
 		$config = $this->getConfig();
 
-		if(isset($config['images'][$imagetype.'_sizes']))
+		if (isset($config['images'][$imagetype . '_sizes']))
 		{
-			return $config['images'][$imagetype.'_sizes'];
+			return $config['images'][$imagetype . '_sizes'];
 		}
 		else
 		{
@@ -779,24 +779,24 @@ class TMDb
 	 */
 	private function _makeCall($function, $params = NULL, $session_id = NULL, $method = TMDb::GET)
 	{
-		$params = ( ! is_array($params)) ? array() : $params;
+		$params = (!is_array($params)) ? array() : $params;
 		$auth_array = array('api_key' => $this->_apikey);
 
-		if($session_id !== NULL)
+		if ($session_id !== NULL)
 		{
 			$auth_array['session_id'] = $session_id;
 		}
 
-		$url = $this->_apischeme.TMDb::API_URL.'/'.TMDb::API_VERSION.'/'.$function.'?'.http_build_query($auth_array, '', '&');
+		$url = $this->_apischeme . TMDb::API_URL . '/' . TMDb::API_VERSION . '/' . $function . '?' . http_build_query($auth_array, '', '&');
 
-		if($method === TMDb::GET)
+		if ($method === TMDb::GET)
 		{
-			if(isset($params['language']) AND $params['language'] === FALSE)
+			if (isset($params['language']) AND $params['language'] === FALSE)
 			{
 				unset($params['language']);
 			}
 
-			$url .= ( ! empty($params)) ? '&'.http_build_query($params, '', '&') : '';
+			$url .= (!empty($params)) ? '&' . http_build_query($params, '', '&') : '';
 		}
 
 		$results = '{}';
@@ -809,15 +809,15 @@ class TMDb
 
 			$ch = curl_init();
 
-			if($method == TMDB::POST)
+			if ($method == TMDB::POST)
 			{
 				$json_string = json_encode($params);
-				curl_setopt($ch,CURLOPT_POST, 1);
-				curl_setopt($ch,CURLOPT_POSTFIELDS, $json_string);
+				curl_setopt($ch, CURLOPT_POST, 1);
+				curl_setopt($ch, CURLOPT_POSTFIELDS, $json_string);
 				$headers[] = 'Content-Type: application/json';
-				$headers[] = 'Content-Length: '.strlen($json_string);
+				$headers[] = 'Content-Length: ' . strlen($json_string);
 			}
-			elseif($method == TMDb::HEAD)
+			elseif ($method == TMDb::HEAD)
 			{
 				curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'HEAD');
 				curl_setopt($ch, CURLOPT_NOBODY, 1);
@@ -837,9 +837,9 @@ class TMDb
 			$error_number = curl_errno($ch);
 			$error_message = curl_error($ch);
 
-			if($error_number > 0)
+			if ($error_number > 0)
 			{
-				throw new TMDbException('Method failed: '.$function.' - '.$error_message);
+				throw new TMDbException('Method failed: ' . $function . ' - ' . $error_message);
 			}
 
 			curl_close($ch);
@@ -851,17 +851,17 @@ class TMDb
 
 		$results = json_decode($body, TRUE);
 
-		if(strpos($function, 'authentication/token/new') !== FALSE)
+		if (strpos($function, 'authentication/token/new') !== FALSE)
 		{
 			$parsed_headers = $this->_http_parse_headers($header);
 			$results['Authentication-Callback'] = $parsed_headers['Authentication-Callback'];
 		}
 
-		if($results !== NULL)
+		if ($results !== NULL)
 		{
 			return $results;
 		}
-		elseif($method == TMDb::HEAD)
+		elseif ($method == TMDb::HEAD)
 		{
 			return $this->_http_parse_headers($header);
 		}
@@ -910,7 +910,7 @@ class TMDb
 	 */
 	public function getConfig()
 	{
-		if(empty($this->_config))
+		if (empty($this->_config))
 		{
 			$this->_config = $this->getConfiguration();
 		}
@@ -928,12 +928,12 @@ class TMDb
 	{
 		$return = array();
 		$fields = explode("\r\n", preg_replace('/\x0D\x0A[\x09\x20]+/', ' ', $header));
-		foreach($fields as $field)
+		foreach ($fields as $field)
 		{
-			if(preg_match('/([^:]+): (.+)/m', $field, $match))
+			if (preg_match('/([^:]+): (.+)/m', $field, $match))
 			{
 				$match[1] = preg_replace('/(?<=^|[\x09\x20\x2D])./e', 'strtoupper("\0")', strtolower(trim($match[1])));
-				if( isset($return[$match[1]]) )
+				if (isset($return[$match[1]]))
 				{
 					$return[$match[1]] = array($return[$match[1]], $match[2]);
 				}
@@ -952,4 +952,4 @@ class TMDb
  *
  * @author Jonas De Smet - Glamorous
  */
-class TMDbException extends Exception{}
+class TMDbException extends Exception {}

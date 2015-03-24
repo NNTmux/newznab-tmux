@@ -277,8 +277,9 @@ class Category
 
 		$arr = $db->query(sprintf("select * from category where status = %d %s", Category::STATUS_ACTIVE, $exccatlist), true);
 		foreach ($arr as $a) {
-					if ($a["parentid"] == "")
-				$ret[] = $a;
+					if ($a["parentid"] == "") {
+									$ret[] = $a;
+					}
 		}
 
 		foreach ($ret as $key => $parent) {

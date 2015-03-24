@@ -24,7 +24,7 @@ if ($total > 0) {
 				echo $pdo->log->primary($gameInfo['release'] . ' not found');
 			} else {
 				if (file_exists(NN_COVERS . 'games' . DS . $gameData . '.jpg')) {
-					$pdo->queryExec(sprintf('UPDATE gamesinfo SET cover = 1 WHERE id = %d',	$arr['id']));
+					$pdo->queryExec(sprintf('UPDATE gamesinfo SET cover = 1 WHERE id = %d', $arr['id']));
 				}
 			}
 		}

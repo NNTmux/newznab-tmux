@@ -1,7 +1,7 @@
 <?php
-require_once(WWW_DIR."/lib/Musik.php");
-require_once(WWW_DIR."/lib/category.php");
-require_once(WWW_DIR."/lib/genres.php");
+require_once(WWW_DIR . "/lib/Musik.php");
+require_once(WWW_DIR . "/lib/category.php");
+require_once(WWW_DIR . "/lib/genres.php");
 
 if (!$users->isLoggedIn()) {
 	$page->show403();

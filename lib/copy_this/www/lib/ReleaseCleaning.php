@@ -367,6 +367,10 @@ class ReleaseCleaning
 			"cleansubject" => $this->releaseCleanerHelper($this->subject), "properlynamed" => false
 		);
 	}
+
+	/**
+	 * @param string $subject
+	 */
 	public function releaseCleanerHelper($subject)
 	{
 		$cleanerName = preg_replace('/(- )?yEnc$/', '', $subject);
@@ -375,6 +379,10 @@ class ReleaseCleaning
 	//
 	//	Cleans release name for the namefixer class.
 	//
+
+	/**
+	 * @param string $name
+	 */
 	public function fixerCleaner($name)
 	{
 		//Extensions.

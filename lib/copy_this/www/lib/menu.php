@@ -15,26 +15,24 @@ class Menu
 		$db = new DB();
 
 		$guest = "";
-		if ($role != Users::ROLE_GUEST)
-			$guest = sprintf(" and role != %d ", Users::ROLE_GUEST);
+		if ($role != Users::ROLE_GUEST) {
+					$guest = sprintf(" and role != %d ", Users::ROLE_GUEST);
+		}
 
-		if ($role != Users::ROLE_ADMIN)
-			$guest .= sprintf(" and role != %d ", Users::ROLE_ADMIN);
+		if ($role != Users::ROLE_ADMIN) {
+					$guest .= sprintf(" and role != %d ", Users::ROLE_ADMIN);
+		}
 
 		$sql = sprintf("select * from menu where role <= %d %s order by ordinal", $role, $guest);
 
 		$data = $db->query($sql);
 
 		$ret = array();
-		foreach ($data as $d)
-		{
-			if (!preg_match("/http/i", $d["href"]))
-			{
+		foreach ($data as $d) {
+			if (!preg_match("/http/i", $d["href"])) {
 				$d["href"] = $serverurl . $d["href"];
 				$ret[] = $d;
-			}
-			else
-			{
+			} else {
 				$ret[] = $d;
 			}
 		}

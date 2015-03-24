@@ -129,8 +129,7 @@ class AmazonProductAPI
 		$allowedTypes = array("UPC", "TITLE", "ARTIST", "KEYWORD", "NODE");
 		$allowedCategories = array("Music", "DVD", "VideoGames", "MP3Downloads");
 
-		switch ($searchType)
-		{
+		switch ($searchType) {
 			case "UPC" :    $parameters = array("Operation"     => "ItemLookup",
 												"ItemId"        => $search,
 												"SearchIndex"   => $category,

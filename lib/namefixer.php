@@ -160,7 +160,7 @@ class NameFixer
 		$this->fullall = '';
 		$this->_fileName = '';
 		$this->done = $this->matched = false;
-		$this->consoletools = ($options['ConsoleTools'] instanceof ConsoleTools ? $options['ConsoleTools'] :new ConsoleTools(['ColorCLI' => $this->pdo->log]));
+		$this->consoletools = ($options['ConsoleTools'] instanceof ConsoleTools ? $options['ConsoleTools'] : new ConsoleTools(['ColorCLI' => $this->pdo->log]));
 		$this->category = ($options['Categorize'] instanceof Categorize ? $options['Categorize'] : new Categorize(['Settings' => $this->pdo]));
 		$this->utility = ($options['Utility'] instanceof Utility ? $options['Utility'] : new Utility());
 		$this->_groups = ($options['Groups'] instanceof Groups ? $options['Groups'] : new Groups(['Settings' => $this->pdo]));
@@ -506,7 +506,7 @@ class NameFixer
 				$this->fixed++;
 
 				$newName = explode("\\", $newName);
-				$newName = preg_replace(array('/^[-=_\.:\s]+/', '/[-=_\.:\s]+$/'), '',  $newName[0]);
+				$newName = preg_replace(array('/^[-=_\.:\s]+/', '/[-=_\.:\s]+$/'), '', $newName[0]);
 
 				if ($this->echooutput === true && $show === 1) {
 					$groupName = $this->_groups->getByNameByID($release['groupid']);
@@ -753,7 +753,7 @@ class NameFixer
 			)
 		);
 
-		if ($query !== false){
+		if ($query !== false) {
 
 			$total = $query->rowCount();
 
@@ -778,6 +778,13 @@ class NameFixer
 	}
 
 	// Match a release filename to a PreDB filename or title.
+
+	/**
+	 * @param integer $echo
+	 * @param integer $namestatus
+	 * @param boolean $echooutput
+	 * @param integer $show
+	 */
 	public function matchPredbFiles($release, $echo, $namestatus, $echooutput, $show)
 	{
 		$matching = 0;
@@ -847,6 +854,11 @@ class NameFixer
 	}
 
 	// Match a Hash from the predb to a release.
+
+	/**
+	 * @param string $hash
+	 * @param boolean $echooutput
+	 */
 	public function matchPredbHash($hash, $release, $echo, $namestatus, $echooutput, $show)
 	{
 		$pdo = $this->pdo;
@@ -882,6 +894,11 @@ class NameFixer
 	}
 
 	//  Check the array using regex for a clean name.
+
+	/**
+	 * @param integer $echo
+	 * @param string $type
+	 */
 	public function checkName($release, $echo, $type, $namestatus, $show, $preid = false)
 	{
 		// Get pre style name from releases.name
@@ -945,7 +962,7 @@ class NameFixer
 	 *  The final parameter is the id of the release to update
 	 *
 	 * @param string $column
-	 * @param string|int $status
+	 * @param integer $status
 	 * @param int $id
 	 **/
 	private function _updateSingleColumn($column = '', $status = 0, $id = 0)

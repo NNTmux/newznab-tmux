@@ -40,7 +40,8 @@ declare(ticks = 1);
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-class PowerProcess {
+class PowerProcess
+{
 	const CALLBACK_STOP_PROPOGATION = -1;
 	const CALLBACK_IGNORE = 0;
 	const CALLBACK_CONTINUE 		= 1;
@@ -177,6 +178,9 @@ class PowerProcess {
 		SIGUSR2		// User-Defined 2
 	);
 
+	/**
+	 * @param string $signal
+	 */
 	static public function SignalName($signal)
 	{
 		switch ($signal) {
@@ -534,7 +538,8 @@ class PowerProcess {
 	 *
 	 * @param boolean $exit When set to true, Shutdown causes the script to exit
 	 */
-	public function Shutdown($exit = false) {
+	public function Shutdown($exit = false)
+	{
 		$this->Log("Initiating shutdown", true);
 
 		while ($this->ThreadCount()) {
@@ -690,7 +695,8 @@ class PowerProcess {
 	 *
 	 * @return null|boolean
 	 */
-	private function Daemonize() {
+	private function Daemonize()
+	{
 		$this->Log("Attempting to Daemonize", true);
 
 		// First need to fork
@@ -699,8 +705,14 @@ class PowerProcess {
 		// Tick to catch signals
 		$this->Tick();
 
-		if ($pid < 0) exit; // Error
-		if ($pid) exit; // Parent
+		if ($pid < 0) {
+			exit;
+		}
+		// Error
+		if ($pid) {
+			exit;
+		}
+		// Parent
 
 		$this->parentSID = posix_setsid();
 
@@ -747,7 +759,9 @@ class PowerProcess {
 		$this->Log("SIGTERM callback registered", true);
 
 		// Install the signal handler
-		foreach ($this->signalArray as $signal) $this->RegisterCallback($signal);
+		foreach ($this->signalArray as $signal) {
+			$this->RegisterCallback($signal);
+		}
 		$this->Log("Signal Dispatcher installed", true);
 	}
 

@@ -1,8 +1,8 @@
 <?php
-require_once(WWW_DIR."/lib/releases.php");
-require_once(WWW_DIR."/lib/category.php");
-require_once(WWW_DIR."/lib/util.php");
-require_once(WWW_DIR."/lib/releasecomments.php");
+require_once(WWW_DIR . "/lib/releases.php");
+require_once(WWW_DIR . "/lib/category.php");
+require_once(WWW_DIR . "/lib/util.php");
+require_once(WWW_DIR . "/lib/releasecomments.php");
 
 $rc = new ReleaseComments;
 
@@ -97,8 +97,9 @@ if ($users->isLoggedIn()) {
 		//
 		// A hash of the users ip to record against the api hit
 		//
-		if ($page->site->storeuserips == 1)
-			$hosthash = $users->getHostHash($_SERVER["REMOTE_ADDR"], $page->site->siteseed);
+		if ($page->site->storeuserips == 1) {
+					$hosthash = $users->getHostHash($_SERVER["REMOTE_ADDR"], $page->site->siteseed);
+		}
 		$maxRequests = $res['apirequests'];
 	}
 }
@@ -134,354 +135,354 @@ if (isset($_GET['o'])) {
 
 switch ($function) {
 	// Search releases.
-	case 's':
-		verifyEmptyParameter('q');
-		$maxAge = maxAge();
-		$users->addApiRequest($uid, $_SERVER['REQUEST_URI'], $hosthash);
-		$categoryID = categoryid();
-		$limit = limit();
-		$offset = offset();
+		case 's':
+			verifyEmptyParameter('q');
+			$maxAge = maxAge();
+			$users->addApiRequest($uid, $_SERVER['REQUEST_URI'], $hosthash);
+			$categoryID = categoryid();
+			$limit = limit();
+			$offset = offset();
 
-		if (isset($_GET['q'])) {
-			$relData = $releases->search(
-				$_GET['q'], -1, -1, -1, $categoryID, -1, -1, 0, 0, -1, -1, $offset, $limit, '', $maxAge, $catExclusions
-			);
-		} else {
-			$totalRows = $releases->getBrowseCount($categoryID, $maxAge, $catExclusions);
-			$relData = $releases->getBrowseRange($categoryID, $offset, $limit, '', $maxAge, $catExclusions);
-			if ($totalRows > 0 && count($relData) > 0) {
-				$relData[0]['_totalrows'] = $totalRows;
+			if (isset($_GET['q'])) {
+				$relData = $releases->search(
+					$_GET['q'], -1, -1, -1, $categoryID, -1, -1, 0, 0, -1, -1, $offset, $limit, '', $maxAge, $catExclusions
+				);
+			} else {
+				$totalRows = $releases->getBrowseCount($categoryID, $maxAge, $catExclusions);
+				$relData = $releases->getBrowseRange($categoryID, $offset, $limit, '', $maxAge, $catExclusions);
+				if ($totalRows > 0 && count($relData) > 0) {
+					$relData[0]['_totalrows'] = $totalRows;
+				}
 			}
-		}
-
-		printOutput($relData, $outputXML, $page, $offset);
-		break;
-
-	// Search tv releases.
-	case 'tv':
-		verifyEmptyParameter('q');
-		verifyEmptyParameter('rid');
-		verifyEmptyParameter('season');
-		verifyEmptyParameter('ep');
-		$maxAge = maxAge();
-		$users->addApiRequest($uid, $_SERVER['REQUEST_URI'], $hosthash);
-		$offset = offset();
-
-		$relData = $releases->searchbyRageId(
-			(isset($_GET['rid']) ? $_GET['rid'] : '-1'),
-			(isset($_GET['season']) ? $_GET['season'] : ''),
-			(isset($_GET['ep']) ? $_GET['ep'] : ''),
-			$offset,
-			limit(),
-			(isset($_GET['q']) ? $_GET['q'] : ''),
-			categoryid(),
-			$maxAge
-		);
-
-		addLanguage($relData, $page->settings);
-		printOutput($relData, $outputXML, $page, $offset);
-		break;
-
-	//
-	// get nfo
-	//
-	case "gn":
-		if (!isset($_GET["id"]))
-			showApiError(200);
-
-		$users->addApiRequest($uid, $_SERVER['REQUEST_URI'], $hosthash);
-
-		$reldata = $releases->getByGuid($_GET["id"]);
-		if (!$reldata)
-			showApiError(300);
-
-		$nfo = $releases->getReleaseNfo($reldata["id"], true);
-		if (!$nfo)
-			showApiError(300);
-
-		$nforaw = cp437toUTF($nfo["nfo"]);
-		$page->smarty->assign('release',$reldata);
-		$page->smarty->assign('nfo',$nfo);
-		$page->smarty->assign('nfoutf',$nforaw);
-
-		if (isset($_GET["raw"]))
-		{
-			header("Content-type: text/x-nfo");
-			header("Content-Disposition: attachment; filename=".str_replace(" ", "_", $reldata["searchname"]).".nfo");
-			echo $nforaw;
-			die();
-		}
-		else
-		{
-			$page->smarty->assign('rsstitle',"NFO");
-			$page->smarty->assign('rssdesc',"NFO");
-			$page->smarty->assign('rsshead',$page->smarty->fetch('rssheader.tpl'));
-			$content = trim($page->smarty->fetch('apinfo.tpl'));
 
 			printOutput($relData, $outputXML, $page, $offset);
-		}
-		break;
+			break;
 
-	//
-	// get comments
-	//
-	case "co":
-		if (!isset($_GET["id"]))
-			showApiError(200);
+		// Search tv releases.
+		case 'tv':
+			verifyEmptyParameter('q');
+			verifyEmptyParameter('rid');
+			verifyEmptyParameter('season');
+			verifyEmptyParameter('ep');
+			$maxAge = maxAge();
+			$users->addApiRequest($uid, $_SERVER['REQUEST_URI'], $hosthash);
+			$offset = offset();
 
-		$users->addApiRequest($uid, $_SERVER['REQUEST_URI'], $hosthash);
-
-		$data = $rc->getCommentsByGuid($_GET["id"]);
-		if ($data)
-			$reldata = $data;
-		else
-			$reldata = array();
-
-		$page->smarty->assign('comments',$reldata);
-		$page->smarty->assign('rsstitle',"API Comments");
-		$page->smarty->assign('rssdesc',"API Comments");
-		$page->smarty->assign('rsshead',$page->smarty->fetch('rssheader.tpl'));
-		$content = trim($page->smarty->fetch('apicomments.tpl'));
-
-		printOutput($relData, $outputXML, $page, $offset);
-
-		break;
-
-	//
-	// add comment
-	//
-	case "ca":
-		if (!isset($_GET["id"]))
-			showApiError(200);
-
-		if (!isset($_GET["text"]))
-			showApiError(200);
-
-		$users->addApiRequest($uid, $_SERVER['REQUEST_URI'], $hosthash);
-
-		$reldata = $releases->getByGuid($_GET["id"]);
-		if ($reldata)
-		{
-			$ret = $rc->addComment($reldata["id"], $reldata["gid"], $_GET["text"], $uid, $_SERVER['REMOTE_ADDR']);
-
-			$content = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
-			$content.= "<commentadd id=\"".$ret."\" />\n";
-
-			printOutput($content, $outputXML, $page);
-		}
-		else
-		{
-			showApiError(300);
-		}
-
-		break;
-
-	//
-	// search book releases
-	//
-	case "b":
-		if (isset($_GET["author"]) && $_GET["author"]=="" && isset($_GET["title"]) && $_GET["title"]=="")
-			showApiError(200);
-
-		$maxage = -1;
-		if (isset($_GET["maxage"]))
-		{
-			if ($_GET["maxage"]=="")
-				showApiError(200);
-			elseif (!is_numeric($_GET["maxage"]))
-				showApiError(201);
-			else
-				$maxage = $_GET["maxage"];
-		}
-
-		$users->addApiRequest($uid, $_SERVER['REQUEST_URI'], $hosthash);
-
-		$limit = 100;
-		if (isset($_GET["limit"]) && is_numeric($_GET["limit"]) && $_GET["limit"] < 100)
-			$limit = $_GET["limit"];
-
-		$offset = 0;
-		if (isset($_GET["offset"]) && is_numeric($_GET["offset"]))
-			$offset = $_GET["offset"];
-		$reldata = $releases->searchBook((isset($_GET["author"]) ? $_GET["author"] : ""), (isset($_GET["title"]) ? $_GET["title"] : ""), $offset, $limit, $maxage );
-
-		$page->smarty->assign('offset',$offset);
-		$page->smarty->assign('releases',$reldata);
-		$page->smarty->assign('rsshead',$page->smarty->fetch('rssheader.tpl'));
-		$output = trim($page->smarty->fetch('apiresult.tpl'));
-
-		printOutput($relData, $outputXML, $page, $offset);
-		break;
-
-	//
-	// search music releases
-	//
-	case "mu":
-		if (isset($_GET["artist"]) && $_GET["artist"]=="" && isset($_GET["album"]) && $_GET["album"]=="")
-			showApiError(200);
-		$categoryId = array();
-		if (isset($_GET["cat"]))
-			$categoryId = explode(",",$_GET["cat"]);
-		else
-			$categoryId[] = -1;
-
-		$maxage = -1;
-		if (isset($_GET["maxage"]))
-		{
-			if ($_GET["maxage"]=="")
-				showApiError(200);
-			elseif (!is_numeric($_GET["maxage"]))
-				showApiError(201);
-			else
-				$maxage = $_GET["maxage"];
-		}
-
-		$genreId = array();
-		if (isset($_GET["genre"]))
-			$genreId = explode(",",$_GET["genre"]);
-		else
-			$genreId[] = -1;
-
-		$users->addApiRequest($uid, $_SERVER['REQUEST_URI'], $hosthash);
-
-		$limit = 100;
-		if (isset($_GET["limit"]) && is_numeric($_GET["limit"]) && $_GET["limit"] < 100)
-			$limit = $_GET["limit"];
-
-		$offset = 0;
-		if (isset($_GET["offset"]) && is_numeric($_GET["offset"]))
-			$offset = $_GET["offset"];
-		$reldata = $releases->searchAudio((isset($_GET["artist"]) ? $_GET["artist"] : ""), (isset($_GET["album"]) ? $_GET["album"] : ""), (isset($_GET["label"]) ? $_GET["label"] : ""), (isset($_GET["track"]) ? $_GET["track"] : ""), (isset($_GET["year"]) ? $_GET["year"] : ""), $genreId, $offset, $limit, $categoryId, $maxage );
-
-		$page->smarty->assign('offset',$offset);
-		$page->smarty->assign('releases',$reldata);
-		$page->smarty->assign('rsshead',$page->smarty->fetch('rssheader.tpl'));
-		$output = trim($page->smarty->fetch('apiresult.tpl'));
-
-		printOutput($relData, $outputXML, $page, $offset);
-		break;
-
-	// Search movie releases.
-	case 'm':
-		verifyEmptyParameter('q');
-		verifyEmptyParameter('imdbid');
-		$maxAge = maxAge();
-		$users->addApiRequest($uid, $_SERVER['REQUEST_URI'], $hosthash);
-		$offset = offset();
-
-		$imdbId = (isset($_GET['imdbid']) ? $_GET['imdbid'] : '-1');
-
-		$relData = $releases->searchbyImdbId(
-			$imdbId,
-			$offset,
-			limit(),
-			(isset($_GET['q']) ? $_GET['q'] : ''),
-			categoryid(),
-			$maxAge
-		);
-
-		addCoverURL($relData,
-			function ($release) {
-				return Utility::getCoverURL(['type' => 'movies', 'id' => $release['imdbid']]);
-			}
-		);
-
-		addLanguage($relData, $page->settings);
-		printOutput($relData, $outputXML, $page, $offset);
-		break;
-
-	// Get NZB.
-	case 'g':
-		if (!isset($_GET['id'])) {
-			showApiError(200, 'Missing parameter (id is required for downloading an NZB)');
-		}
-
-		$relData = $releases->getByGuid($_GET['id']);
-		if ($relData) {
-			header(
-				'Location:' .
-				WWW_TOP .
-				'/getnzb?i=' .
-				$uid .
-				'&r=' .
-				$apiKey .
-				'&id=' .
-				$relData['guid'] .
-				((isset($_GET['del']) && $_GET['del'] == '1') ? '&del=1' : '')
+			$relData = $releases->searchbyRageId(
+				(isset($_GET['rid']) ? $_GET['rid'] : '-1'),
+				(isset($_GET['season']) ? $_GET['season'] : ''),
+				(isset($_GET['ep']) ? $_GET['ep'] : ''),
+				$offset,
+				limit(),
+				(isset($_GET['q']) ? $_GET['q'] : ''),
+				categoryid(),
+				$maxAge
 			);
-		} else {
-			showApiError(300, 'No such item (the guid you provided has no release in our database)');
-		}
-		break;
 
-	// Get individual NZB details.
-	case 'd':
-		if (!isset($_GET['id'])) {
-			showApiError(200, 'Missing parameter (id is required for downloading an NZB)');
-		}
+			addLanguage($relData, $page->settings);
+			printOutput($relData, $outputXML, $page, $offset);
+			break;
 
-		$users->addApiRequest($uid, $_SERVER['REQUEST_URI'], $hosthash);
-		$data = $releases->getByGuid($_GET['id']);
+		//
+		// get nfo
+		//
+		case "gn":
+			if (!isset($_GET["id"]))
+				showApiError(200);
 
-		$relData = [];
-		if ($data) {
-			$relData[] = $data;
-		}
+			$users->addApiRequest($uid, $_SERVER['REQUEST_URI'], $hosthash);
 
-		printOutput($relData, $outputXML, $page, offset());
-		break;
+			$reldata = $releases->getByGuid($_GET["id"]);
+			if (!$reldata)
+				showApiError(300);
 
-	// Capabilities request.
-	case 'c':
-		$category = new Category(['Settings' => $page->settings]);
-		$page->smarty->assign('parentcatlist', $category->getForMenu());
-		header('Content-type: text/xml');
-		echo $page->smarty->fetch('apicaps.tpl');
-		break;
+			$nfo = $releases->getReleaseNfo($reldata["id"], true);
+			if (!$nfo)
+				showApiError(300);
 
-	// Register request.
-	case 'r':
-		verifyEmptyParameter('email');
+			$nforaw = cp437toUTF($nfo["nfo"]);
+			$page->smarty->assign('release',$reldata);
+			$page->smarty->assign('nfo',$nfo);
+			$page->smarty->assign('nfoutf',$nforaw);
 
-		if (!in_array((int)$page->site->registerstatus, [Sites::REGISTER_STATUS_OPEN, Sites::REGISTER_STATUS_API_ONLY])) {
-			showApiError(104);
-		}
+			if (isset($_GET["raw"]))
+			{
+				header("Content-type: text/x-nfo");
+				header("Content-Disposition: attachment; filename=".str_replace(" ", "_", $reldata["searchname"]).".nfo");
+				echo $nforaw;
+				die();
+			}
+			else
+			{
+				$page->smarty->assign('rsstitle',"NFO");
+				$page->smarty->assign('rssdesc',"NFO");
+				$page->smarty->assign('rsshead',$page->smarty->fetch('rssheader.tpl'));
+				$content = trim($page->smarty->fetch('apinfo.tpl'));
 
-		// Check email is valid format.
-		if (!$users->isValidEmail($_GET['email'])) {
-			showApiError(106);
-		}
+				printOutput($relData, $outputXML, $page, $offset);
+			}
+			break;
 
-		// Check email isn't taken.
-		$ret = $users->getByEmail($_GET['email']);
-		if (isset($ret['id'])) {
-			showApiError(105);
-		}
+		//
+		// get comments
+		//
+		case "co":
+			if (!isset($_GET["id"]))
+				showApiError(200);
 
-		// Create username/pass and register.
-		$username = $users->generateUsername($_GET['email']);
-		$password = $users->generatePassword();
+			$users->addApiRequest($uid, $_SERVER['REQUEST_URI'], $hosthash);
 
-		// Register.
-		$userDefault = $users->getDefaultRole();
-		$uid = $users->signup(
-			$username, $password, $_GET['email'], $_SERVER['REMOTE_ADDR'], $userDefault['id'], "", $userDefault['defaultinvites'], "", false, false, false, true
-		);
+			$data = $rc->getCommentsByGuid($_GET["id"]);
+			if ($data)
+				$reldata = $data;
+			else
+				$reldata = array();
 
-		// Check if it succeeded.
-		$userData = $users->getById($uid);
-		if (!$userData) {
-			showApiError(107);
-		}
+			$page->smarty->assign('comments',$reldata);
+			$page->smarty->assign('rsstitle',"API Comments");
+			$page->smarty->assign('rssdesc',"API Comments");
+			$page->smarty->assign('rsshead',$page->smarty->fetch('rssheader.tpl'));
+			$content = trim($page->smarty->fetch('apicomments.tpl'));
 
-		header('Content-type: text/xml');
-		echo
-			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" .
-			'<register username="' . $username .
-			'" password="' . $password .
-			'" apikey="' . $userdata['rsstoken'] .
-			"\"/>\n";
-		break;
+			printOutput($relData, $outputXML, $page, $offset);
+
+			break;
+
+		//
+		// add comment
+		//
+		case "ca":
+			if (!isset($_GET["id"]))
+				showApiError(200);
+
+			if (!isset($_GET["text"]))
+				showApiError(200);
+
+			$users->addApiRequest($uid, $_SERVER['REQUEST_URI'], $hosthash);
+
+			$reldata = $releases->getByGuid($_GET["id"]);
+			if ($reldata)
+			{
+				$ret = $rc->addComment($reldata["id"], $reldata["gid"], $_GET["text"], $uid, $_SERVER['REMOTE_ADDR']);
+
+				$content = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+				$content.= "<commentadd id=\"".$ret."\" />\n";
+
+				printOutput($content, $outputXML, $page);
+			}
+			else
+			{
+				showApiError(300);
+			}
+
+			break;
+
+		//
+		// search book releases
+		//
+		case "b":
+			if (isset($_GET["author"]) && $_GET["author"]=="" && isset($_GET["title"]) && $_GET["title"]=="")
+				showApiError(200);
+
+			$maxage = -1;
+			if (isset($_GET["maxage"]))
+			{
+				if ($_GET["maxage"]=="")
+					showApiError(200);
+				elseif (!is_numeric($_GET["maxage"]))
+					showApiError(201);
+				else
+					$maxage = $_GET["maxage"];
+			}
+
+			$users->addApiRequest($uid, $_SERVER['REQUEST_URI'], $hosthash);
+
+			$limit = 100;
+			if (isset($_GET["limit"]) && is_numeric($_GET["limit"]) && $_GET["limit"] < 100)
+				$limit = $_GET["limit"];
+
+			$offset = 0;
+			if (isset($_GET["offset"]) && is_numeric($_GET["offset"]))
+				$offset = $_GET["offset"];
+			$reldata = $releases->searchBook((isset($_GET["author"]) ? $_GET["author"] : ""), (isset($_GET["title"]) ? $_GET["title"] : ""), $offset, $limit, $maxage );
+
+			$page->smarty->assign('offset',$offset);
+			$page->smarty->assign('releases',$reldata);
+			$page->smarty->assign('rsshead',$page->smarty->fetch('rssheader.tpl'));
+			$output = trim($page->smarty->fetch('apiresult.tpl'));
+
+			printOutput($relData, $outputXML, $page, $offset);
+			break;
+
+		//
+		// search music releases
+		//
+		case "mu":
+			if (isset($_GET["artist"]) && $_GET["artist"]=="" && isset($_GET["album"]) && $_GET["album"]=="")
+				showApiError(200);
+			$categoryId = array();
+			if (isset($_GET["cat"]))
+				$categoryId = explode(",",$_GET["cat"]);
+			else
+				$categoryId[] = -1;
+
+			$maxage = -1;
+			if (isset($_GET["maxage"]))
+			{
+				if ($_GET["maxage"]=="")
+					showApiError(200);
+				elseif (!is_numeric($_GET["maxage"]))
+					showApiError(201);
+				else
+					$maxage = $_GET["maxage"];
+			}
+
+			$genreId = array();
+			if (isset($_GET["genre"]))
+				$genreId = explode(",",$_GET["genre"]);
+			else
+				$genreId[] = -1;
+
+			$users->addApiRequest($uid, $_SERVER['REQUEST_URI'], $hosthash);
+
+			$limit = 100;
+			if (isset($_GET["limit"]) && is_numeric($_GET["limit"]) && $_GET["limit"] < 100)
+				$limit = $_GET["limit"];
+
+			$offset = 0;
+			if (isset($_GET["offset"]) && is_numeric($_GET["offset"]))
+				$offset = $_GET["offset"];
+			$reldata = $releases->searchAudio((isset($_GET["artist"]) ? $_GET["artist"] : ""), (isset($_GET["album"]) ? $_GET["album"] : ""), (isset($_GET["label"]) ? $_GET["label"] : ""), (isset($_GET["track"]) ? $_GET["track"] : ""), (isset($_GET["year"]) ? $_GET["year"] : ""), $genreId, $offset, $limit, $categoryId, $maxage );
+
+			$page->smarty->assign('offset',$offset);
+			$page->smarty->assign('releases',$reldata);
+			$page->smarty->assign('rsshead',$page->smarty->fetch('rssheader.tpl'));
+			$output = trim($page->smarty->fetch('apiresult.tpl'));
+
+			printOutput($relData, $outputXML, $page, $offset);
+			break;
+
+		// Search movie releases.
+		case 'm':
+			verifyEmptyParameter('q');
+			verifyEmptyParameter('imdbid');
+			$maxAge = maxAge();
+			$users->addApiRequest($uid, $_SERVER['REQUEST_URI'], $hosthash);
+			$offset = offset();
+
+			$imdbId = (isset($_GET['imdbid']) ? $_GET['imdbid'] : '-1');
+
+			$relData = $releases->searchbyImdbId(
+				$imdbId,
+				$offset,
+				limit(),
+				(isset($_GET['q']) ? $_GET['q'] : ''),
+				categoryid(),
+				$maxAge
+			);
+
+			addCoverURL($relData,
+				function ($release) {
+					return Utility::getCoverURL(['type' => 'movies', 'id' => $release['imdbid']]);
+				}
+			);
+
+			addLanguage($relData, $page->settings);
+			printOutput($relData, $outputXML, $page, $offset);
+			break;
+
+		// Get NZB.
+		case 'g':
+			if (!isset($_GET['id'])) {
+				showApiError(200, 'Missing parameter (id is required for downloading an NZB)');
+			}
+
+			$relData = $releases->getByGuid($_GET['id']);
+			if ($relData) {
+				header(
+					'Location:' .
+					WWW_TOP .
+					'/getnzb?i=' .
+					$uid .
+					'&r=' .
+					$apiKey .
+					'&id=' .
+					$relData['guid'] .
+					((isset($_GET['del']) && $_GET['del'] == '1') ? '&del=1' : '')
+				);
+			} else {
+				showApiError(300, 'No such item (the guid you provided has no release in our database)');
+			}
+			break;
+
+		// Get individual NZB details.
+		case 'd':
+			if (!isset($_GET['id'])) {
+				showApiError(200, 'Missing parameter (id is required for downloading an NZB)');
+			}
+
+			$users->addApiRequest($uid, $_SERVER['REQUEST_URI'], $hosthash);
+			$data = $releases->getByGuid($_GET['id']);
+
+			$relData = [];
+			if ($data) {
+				$relData[] = $data;
+			}
+
+			printOutput($relData, $outputXML, $page, offset());
+			break;
+
+		// Capabilities request.
+		case 'c':
+			$category = new Category(['Settings' => $page->settings]);
+			$page->smarty->assign('parentcatlist', $category->getForMenu());
+			header('Content-type: text/xml');
+			echo $page->smarty->fetch('apicaps.tpl');
+			break;
+
+		// Register request.
+		case 'r':
+			verifyEmptyParameter('email');
+
+			if (!in_array((int)$page->site->registerstatus, [Sites::REGISTER_STATUS_OPEN, Sites::REGISTER_STATUS_API_ONLY])) {
+				showApiError(104);
+			}
+
+			// Check email is valid format.
+			if (!$users->isValidEmail($_GET['email'])) {
+				showApiError(106);
+			}
+
+			// Check email isn't taken.
+			$ret = $users->getByEmail($_GET['email']);
+			if (isset($ret['id'])) {
+				showApiError(105);
+			}
+
+			// Create username/pass and register.
+			$username = $users->generateUsername($_GET['email']);
+			$password = $users->generatePassword();
+
+			// Register.
+			$userDefault = $users->getDefaultRole();
+			$uid = $users->signup(
+				$username, $password, $_GET['email'], $_SERVER['REMOTE_ADDR'], $userDefault['id'], "", $userDefault['defaultinvites'], "", false, false, false, true
+			);
+
+			// Check if it succeeded.
+			$userData = $users->getById($uid);
+			if (!$userData) {
+				showApiError(107);
+			}
+
+			header('Content-type: text/xml');
+			echo
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" .
+				'<register username="' . $username .
+				'" password="' . $password .
+				'" apikey="' . $userdata['rsstoken'] .
+				"\"/>\n";
+			break;
 }
 
 /**
@@ -625,7 +626,7 @@ function printOutput($data, $xml = true, $page, $offset = 0)
 	if ($xml) {
 		$page->smarty->assign('offset', $offset);
 		$page->smarty->assign('releases', $data);
-		$page->smarty->assign('rsshead',$page->smarty->fetch('rssheader.tpl'));
+		$page->smarty->assign('rsshead', $page->smarty->fetch('rssheader.tpl'));
 		header('Content-type: text/xml');
 		echo trim($page->smarty->fetch('apiresult.tpl'));
 	} else {

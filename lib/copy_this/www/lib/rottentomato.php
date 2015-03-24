@@ -1,5 +1,5 @@
 <?php
-require_once(WWW_DIR."/lib/util.php");
+require_once(WWW_DIR . "/lib/util.php");
 
 /**
  * Fetches and returns JSON documents from the Rotten Tomato API using a supplied API key.

@@ -33,7 +33,7 @@ if ($users->isLoggedIn()) {
 
 // Remove any suffixed id with .nzb which is added to help weblogging programs see nzb traffic.
 if (isset($_GET['id'])) {
-	$_GET['id'] = str_ireplace('.nzb','', $_GET['id']);
+	$_GET['id'] = str_ireplace('.nzb', '', $_GET['id']);
 }
 //
 // A hash of the users ip to record against the download
