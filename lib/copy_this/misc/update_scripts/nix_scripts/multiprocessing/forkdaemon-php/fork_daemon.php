@@ -1097,7 +1097,7 @@ class fork_daemon
 	 * @param string $identifier helper process unique identifier
 	 * @param bool $respawn whether to respawn the helper process when it dies
 	 */
-	public function helper_process_spawn($function_name, $arguments = array(), $idenfifier = '', $respawn = true)
+	public function helper_process_spawn($function_name, $arguments = array(), $identifier = '', $respawn = true)
 	{
 		if ((is_array($function_name) && method_exists($function_name[0], $function_name[1])) || function_exists($function_name))
 		{
@@ -1147,7 +1147,7 @@ class fork_daemon
 				// track the child
 				$this->forked_children[$pid] = array(
 					'ctime' => time(),
-					'identifier' => $idenfifier,
+					'identifier' => $identifier,
 					'status' => self::HELPER,
 					'bucket' => self::DEFAULT_BUCKET,
 					'respawn' => true,
