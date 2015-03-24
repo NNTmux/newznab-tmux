@@ -498,14 +498,13 @@ class RarInfo extends ArchiveReader
 	 *
 	 * @param   string $filename name of the file to extract
 	 *
-	 * @return  false|string  file data, or false on error
+	 * @return  string|boolean  file data, or false on error
 	 */
 	public function getFileData($filename)
 	{
 		// Check that blocks are stored and data source is available
-		if (empty($this->blocks) || ($this->data == '' && $this->handle == null)) {
-					return false;
-		}
+		if (empty($this->blocks) || ($this->data == '' && $this->handle == null))
+			return false;
 
 		// Get the absolute start/end positions
 		if (!($info = $this->getFileInfo($filename)) || empty($info['range'])) {
@@ -530,9 +529,8 @@ class RarInfo extends ArchiveReader
 	public function saveFileData($filename, $destination)
 	{
 		// Check that blocks are stored and data source is available
-		if (empty($this->blocks) || ($this->data == '' && $this->handle == null)) {
-					return false;
-		}
+		if (empty($this->blocks) || ($this->data == '' && $this->handle == null))
+			return false;
 
 		// Get the absolute start/end positions
 		if (!($info = $this->getFileInfo($filename)) || empty($info['range'])) {
@@ -555,9 +553,8 @@ class RarInfo extends ArchiveReader
 	 */
 	public function setExternalClient($client)
 	{
-		if ($client && (!is_file($client) || !is_executable($client))) {
-					throw new InvalidArgumentException("Not a valid client: {$client}");
-		}
+		if ($client && (!is_file($client) || !is_executable($client)))
+			throw new InvalidArgumentException("Not a valid client: {$client}");
 
 		$this->externalClient = $client;
 	}
@@ -760,7 +757,7 @@ class RarInfo extends ArchiveReader
 	 *
 	 * @param   string $filename the filename to search
 	 *
-	 * @return  string  the file info or false on error
+	 * @return  array|boolean  the file info or false on error
 	 */
 	protected function getFileInfo($filename)
 	{
@@ -780,7 +777,7 @@ class RarInfo extends ArchiveReader
 	 * This quite slow hack is only useful when handling RAR file fragments, and
 	 * only with RAR format 1.5 - 4.x.
 	 *
-	 * @return  integer  the header offset, or false if none is found
+	 * @return  integer|boolean  the header offset, or false if none is found
 	 */
 	protected function findFileHeader()
 	{
@@ -794,14 +791,11 @@ class RarInfo extends ArchiveReader
 		}
 
 		// Get all the offsets to test
-		if (!($positions = self::strposall($buffer, pack('C', self::BLOCK_FILE)))) {
-					return false;
-		}
+		if (!($positions = self::strposall($buffer, pack('C', self::BLOCK_FILE))))
+			return false;
 
-		foreach ($positions as $offset) {
-			try {
+		foreach ($positions as $offset) try {
 			$offset += $start;
-		}
 			$this->seek($offset - 2);
 
 			// Run a File header CRC & sanity check
@@ -880,13 +874,12 @@ class RarInfo extends ArchiveReader
 	/**
 	 * Returns the position of the archive marker/signature in the stored data or file.
 	 *
-	 * @return  integer  Marker position, or false if marker is missing
+	 * @return  mixed  Marker position, or false if marker is missing
 	 */
 	public function findMarker()
 	{
-		if ($this->markerPosition !== null) {
-					return $this->markerPosition;
-		}
+		if ($this->markerPosition !== null)
+			return $this->markerPosition;
 
 		try {
 			$buff = $this->read(min($this->length, $this->maxReadBytes));
@@ -940,12 +933,10 @@ class RarInfo extends ArchiveReader
 		}
 
 		// Analyze all valid blocks
-		while ($this->offset < $this->length) {
-			try {
+		while ($this->offset < $this->length) try {
 
 			// Get the next block header
 			$block = $this->getNextBlock();
-		}
 
 			// Process the current block by type
 			$this->processBlock($block);
@@ -954,9 +945,8 @@ class RarInfo extends ArchiveReader
 			$this->blocks[] = $block;
 
 			// Bail if this is an encrypted archive
-			if ($this->isEncrypted) {
-							break;
-			}
+			if ($this->isEncrypted)
+				break;
 
 			// Skip to the next block, if any
 			if ($this->offset != $block['next_offset']) {
@@ -1000,9 +990,8 @@ class RarInfo extends ArchiveReader
 	 */
 	protected function getNextBlock()
 	{
-		if ($this->format == self::FMT_RAR50) {
-					return $this->getNextBlockR50();
-		}
+		if ($this->format == self::FMT_RAR50)
+			return $this->getNextBlockR50();
 
 		// Start the block info
 		$block = array('offset' => $this->offset);
@@ -1039,9 +1028,8 @@ class RarInfo extends ArchiveReader
 	 */
 	protected function processBlock(&$block)
 	{
-		if ($this->format == self::FMT_RAR50) {
-					return $this->processBlockR50($block);
-		}
+		if ($this->format == self::FMT_RAR50)
+			return $this->processBlockR50($block);
 
 		// Block type: ARCHIVE
 		if ($block['head_type'] == self::BLOCK_MAIN) {
@@ -1242,9 +1230,8 @@ class RarInfo extends ArchiveReader
 		elseif ($block['head_type'] == self::R50_BLOCK_FILE
 			|| $block['head_type'] == self::R50_BLOCK_SERVICE
 		) {
-			if (!isset($block['data_size'])) {
-							throw new RuntimeException('Required block data size is missing');
-			}
+			if (!isset($block['data_size']))
+				throw new RuntimeException('Required block data size is missing');
 
 			$block['flags'] = $this->getVarInt();
 			$block['pack_size'] = $block['data_size'];
@@ -1433,7 +1420,7 @@ class RarInfo extends ArchiveReader
 	 * flag (where 0 = end of the sequence), the remaining 7 bits are the value.
 	 * The maximum value is an unsigned 64-bit integer in a 10-byte sequence.
 	 *
-	 * @return  integer  the variable length value, or zero on under/overflow
+	 * @return  integer|float  the variable length value, or zero on under/overflow
 	 */
 	protected function getVarInt()
 	{
@@ -1517,7 +1504,7 @@ class RarUnicodeFilename
 	 * Decompresses the unicode filename by combining the standard filename with
 	 * the additional unicode data, return value is encoded as UTF-16LE.
 	 *
-	 * @return  false|string  the unicode filename, or false on failure
+	 * @return  mixed  the unicode filename, or false on failure
 	 */
 	public function decode()
 	{
