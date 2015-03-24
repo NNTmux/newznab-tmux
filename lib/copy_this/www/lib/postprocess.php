@@ -687,7 +687,9 @@ class PostProcess
 
 						if (is_array($tmp)) {
 												// it's a rar
+						{
 							for ($x = 0;
+						}
 						$x < sizeof($tmp); $x++) {
 								if (preg_match('/\\\\/', $tmp[$x])) {
 									$tmp[$x] = ltrim((strrchr($tmp[$x], "\\")), "\\");
