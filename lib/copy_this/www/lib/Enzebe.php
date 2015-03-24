@@ -167,7 +167,7 @@ class Enzebe
 				)
 			);
 
-			$binaries = $this->pdo->queryDirect($this->_binariesQuery . $relID . ' ORDER BY name');
+			$binaries = $this->pdo->queryDirect($this->_binariesQuery. $relID . ' ORDER BY name');
 
 			if ($binaries instanceof \Traversable) {
 
@@ -287,7 +287,7 @@ class Enzebe
 	 *
 	 * @param  string $releaseGuid              The guid of the release.
 	 *
-	 * @return string|false On success: (string) Path+file name of the nzb.
+	 * @return bool|string On success: (string) Path+file name of the nzb.
 	 *                     On failure: (bool)   False.
 	 *
 	 * @access public
@@ -365,7 +365,7 @@ class Enzebe
 
 			// File size.
 			foreach ($file->segments->segment as $segment) {
-				array_push($result[$i]['segments'], (string)$segment);
+				array_push($result[$i]['segments'], (string) $segment);
 				$fileSize += $segment->attributes()->bytes;
 				$numSegments++;
 			}
@@ -382,7 +382,7 @@ class Enzebe
 				$result[$i]['groups'] = array();
 			}
 			foreach ($file->groups->group as $g) {
-				array_push($result[$i]['groups'], (string)$g);
+				array_push($result[$i]['groups'], (string) $g);
 			}
 
 			unset($result[$i]['segments']['@attributes']);

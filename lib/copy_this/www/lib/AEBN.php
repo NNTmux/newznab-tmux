@@ -196,7 +196,7 @@ class AEBN
 					}
 					$i = $i + 1;
 				}
-				if ($i === $count or $count === 0) {
+				if ($i === $count OR $count === 0) {
 					if ($this->_currentSite === "gay") {
 						return false;
 					}
@@ -365,7 +365,7 @@ class AEBN
 		if ($ret = $this->_html->find("a[itemprop=trailer]", 0)) {
 			if (preg_match('/movieId=(?<movieid>\d+)&/', trim($ret->href), $matches)) {
 				$movieid = $matches['movieid'];
-				$this->_res['trailers']['url'] = $this->_whichSite[$this->_currentSite] . self::TRAILERURL . $movieid; ;
+				$this->_res['trailers']['url'] = $this->_whichSite[$this->_currentSite] . self::TRAILERURL . $movieid;;
 			}
 		}
 

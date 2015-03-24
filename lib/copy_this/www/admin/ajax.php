@@ -7,37 +7,37 @@ if (!isset($_GET['action'])) {
 }
 
 require_once("config.php");
-require_once(WWW_DIR . "/lib/adminpage.php");
-require_once(WWW_DIR . "/lib/binaries.php");
-require_once(WWW_DIR . "/lib/Regexes.php");
-require_once(WWW_DIR . "/lib/groups.php");
-require_once(WWW_DIR . "/lib/releasecomments.php");
+require_once(WWW_DIR."/lib/adminpage.php");
+require_once(WWW_DIR."/lib/binaries.php");
+require_once(WWW_DIR."/lib/Regexes.php");
+require_once(WWW_DIR."/lib/groups.php");
+require_once(WWW_DIR."/lib/releasecomments.php");
 
 // Make sure the user is an admin and logged in.
 $admin = new AdminPage;
 
 $settings = ['Settings' => $admin->settings];
-switch ($_GET['action']) {
+switch($_GET['action']) {
 	case 'binary_blacklist_delete':
-		$id = (int)$_GET['row_id'];
+		$id = (int) $_GET['row_id'];
 		(new Binaries($settings))->deleteBlacklist($id);
 		print "Blacklist $id deleted.";
 		break;
 
 	case 'category_regex_delete':
-		$id = (int)$_GET['row_id'];
+		$id = (int) $_GET['row_id'];
 		(new Regexes(['Settings' => $admin->settings, 'Table_Name' => 'category_regexes']))->deleteRegex($id);
 		print "Regex $id deleted.";
 		break;
 
 	case 'collection_regex_delete':
-		$id = (int)$_GET['row_id'];
+		$id = (int) $_GET['row_id'];
 		(new Regexes(['Settings' => $admin->settings, 'Table_Name' => 'collection_regexes']))->deleteRegex($id);
 		print "Regex $id deleted.";
 		break;
 
 	case 'release_naming_regex_delete':
-		$id = (int)$_GET['row_id'];
+		$id = (int) $_GET['row_id'];
 		(new Regexes(['Settings' => $admin->settings, 'Table_Name' => 'release_naming_regexes']))->deleteRegex($id);
 		print "Regex $id deleted.";
 		break;
@@ -57,21 +57,21 @@ switch ($_GET['action']) {
 		$id = (int)$_GET['group_id'];
 		session_write_close();
 		(new Groups($settings))->purge($id);
-		print "group $id purged.";
+		print "Group $id purged.";
 		break;
 
 	case 'group_edit_reset_single':
 		$id = (int)$_GET['group_id'];
 		session_write_close();
 		(new Groups($settings))->reset($id);
-		print "group $id reset.";
+		print "Group $id reset.";
 		break;
 
 	case 'group_edit_delete_single':
 		$id = (int)$_GET['group_id'];
 		session_write_close();
 		(new Groups($settings))->delete($id);
-		print "group $id deleted.";
+		print "Group $id deleted.";
 		break;
 
 	case 'toggle_group_active_status':
@@ -139,7 +139,7 @@ switch ($_GET['action']) {
 
 	case 'sharing_toggle_hide_users':
 		$admin->settings->queryExec(sprintf('UPDATE sharing SET hide_users = %d', $_GET['hide_status']));
-		print ($_GET['hide_status'] == 1 ? 'Enabled' : 'Disabled') . ' hiding of user names!';
+		print ($_GET['hide_status'] == 1? 'Enabled' : 'Disabled') . ' hiding of user names!';
 		break;
 
 	case 'sharing_toggle_all_sites':

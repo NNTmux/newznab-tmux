@@ -9,9 +9,9 @@ class ADM
 	 * Define Adult DVD Marketplace url
 	 * Needed Search Queries Constant
 	 */
-	const ADMURL = "http://www.adultdvdmarketplace.com";
-	const IF18 = "http://www.adultdvdmarketplace.com/xcart/adult_dvd/disclaimer.php?action=enter&site=intl&return_url=";
-	const TRAILINGSEARCH = "/xcart/adult_dvd/advanced_search.php?sort_by=relev&title=";
+	const ADMURL			= "http://www.adultdvdmarketplace.com";
+	const IF18				= "http://www.adultdvdmarketplace.com/xcart/adult_dvd/disclaimer.php?action=enter&site=intl&return_url=";
+	const TRAILINGSEARCH	= "/xcart/adult_dvd/advanced_search.php?sort_by=relev&title=";
 
 	/**
 	 * Define a cookie file location for curl
@@ -118,11 +118,11 @@ class ADM
 	public function sypnosis()
 	{
 		if ($ret = $this->_html->find('span[itemprop=description]', 0)) {
-			if (preg_match('/(?<tagline>\<b\>(.*)\<\/b\>)/i', $ret->innertext, $matches)) {
+			if(preg_match('/(?<tagline>\<b\>(.*)\<\/b\>)/i', $ret->innertext, $matches)){
 				$this->_res['tagline'] = trim(strip_tags($matches['tagline']));
 				$ret->plaintext = str_replace($matches['tagline'], '', $ret->innertext);
 			}
-			$this->_res['sypnosis'] = trim(strip_tags($ret->plaintext, "<br>"));
+			$this->_res['sypnosis'] = trim(strip_tags($ret->plaintext,"<br>"));
 		} else {
 			$this->_res['sypnosis'] = "N/A";
 		}
@@ -217,11 +217,11 @@ class ADM
 								$comparesearch = preg_replace('/[^\w]/', '', $this->searchTerm);
 								similar_text($comparetitle, $comparesearch, $p);
 								if ($p == 100) {
-									if (preg_match('/\/(?<sku>\d+)\.jpg/i', $ret->src, $matches)) {
+									if(preg_match('/\/(?<sku>\d+)\.jpg/i', $ret->src, $matches)){
 										$this->_title = trim($title);
 										$this->_trailUrl = "/dvd_view_" . (string)$matches['sku'] . ".html";
 										$this->_directUrl = self::ADMURL . $this->_trailUrl;
-										if ($this->getUrl() !== false) {
+										if($this->getUrl() !== false){
 											$result = true;
 										}
 									}
@@ -286,7 +286,7 @@ class ADM
 			$ch = curl_init(self::IF18);
 		}
 
-		if ($usepost === true) {
+		if($usepost === true){
 			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
 			curl_setopt($ch, CURLOPT_POST, 1);
 			curl_setopt($ch, CURLOPT_POSTFIELDS, $this->_postParams);

@@ -1,9 +1,9 @@
 <?php
-require_once(SMARTY_DIR . 'Smarty.class.php');
-require_once(NN_LIB . 'framework' . DS . 'db.php');
-require_once(WWW_DIR . "/lib/users.php");
-require_once(WWW_DIR . "/lib/site.php");
-require_once(WWW_DIR . "/lib/sabnzbd.php");
+require_once(SMARTY_DIR.'Smarty.class.php');
+require_once(NN_LIB .'framework' . DS . 'db.php');
+require_once(WWW_DIR."/lib/users.php");
+require_once(WWW_DIR."/lib/site.php");
+require_once(WWW_DIR."/lib/sabnzbd.php");
 require_once (NN_LIB . 'SmartyUtils.php');
 
 class BasePage
@@ -42,12 +42,12 @@ class BasePage
 			$this->floodCheck();
 		}
 
-		if ((function_exists("get_magic_quotes_gpc") && get_magic_quotes_gpc()) || ini_get('magic_quotes_sybase'))
+		if((function_exists("get_magic_quotes_gpc") && get_magic_quotes_gpc()) || ini_get('magic_quotes_sybase'))
 		{
-			foreach ($_GET as $k => $v) $_GET[$k] = (is_array($v)) ? array_map("stripslashes", $v) : stripslashes($v);
-			foreach ($_POST as $k => $v) $_POST[$k] = (is_array($v)) ? array_map("stripslashes", $v) : stripslashes($v);
-			foreach ($_REQUEST as $k => $v) $_REQUEST[$k] = (is_array($v)) ? array_map("stripslashes", $v) : stripslashes($v);
-			foreach ($_COOKIE as $k => $v) $_COOKIE[$k] = (is_array($v)) ? array_map("stripslashes", $v) : stripslashes($v);
+			foreach($_GET as $k => $v) $_GET[$k] = (is_array($v)) ? array_map("stripslashes", $v) : stripslashes($v);
+			foreach($_POST as $k => $v) $_POST[$k] = (is_array($v)) ? array_map("stripslashes", $v) : stripslashes($v);
+			foreach($_REQUEST as $k => $v) $_REQUEST[$k] = (is_array($v)) ? array_map("stripslashes", $v) : stripslashes($v);
+			foreach($_COOKIE as $k => $v) $_COOKIE[$k] = (is_array($v)) ? array_map("stripslashes", $v) : stripslashes($v);
 		}
 
 		// set site variable
@@ -59,16 +59,16 @@ class BasePage
 		$this->smarty = new Smarty();
 
 		if ($this->site->style != "default")
-			$this->smarty->addTemplateDir(WWW_DIR . 'templates/' . $this->site->style . '/views/frontend', 'style_frontend');
-		$this->smarty->addTemplateDir(WWW_DIR . 'templates/default/views/frontend', 'frontend');
-		$this->smarty->setCompileDir(SMARTY_DIR . 'templates_c' . DIRECTORY_SEPARATOR);
-		$this->smarty->setConfigDir(SMARTY_DIR . 'configs' . DIRECTORY_SEPARATOR);
-		$this->smarty->setCacheDir(SMARTY_DIR . 'cache' . DIRECTORY_SEPARATOR);
+			$this->smarty->addTemplateDir(WWW_DIR.'templates/'.$this->site->style.'/views/frontend', 'style_frontend');
+		$this->smarty->addTemplateDir(WWW_DIR.'templates/default/views/frontend', 'frontend');
+		$this->smarty->setCompileDir(SMARTY_DIR.'templates_c'.DIRECTORY_SEPARATOR);
+		$this->smarty->setConfigDir(SMARTY_DIR.'configs'.DIRECTORY_SEPARATOR);
+		$this->smarty->setCacheDir(SMARTY_DIR.'cache'.DIRECTORY_SEPARATOR);
 		$this->smarty->error_reporting = (E_ALL - E_NOTICE);
-		$this->secure_connection = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443));
+		$this->secure_connection = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443)) ;
 
-		if (file_exists(WWW_DIR . 'templates/' . $this->site->style . '/theme.php'))
-			require_once(WWW_DIR . 'templates/' . $this->site->style . '/theme.php');
+		if (file_exists(WWW_DIR.'templates/'.$this->site->style.'/theme.php'))
+			require_once(WWW_DIR.'templates/'.$this->site->style.'/theme.php');
 		$this->smarty->assign('themevars', (isset($themevars) ? $themevars : null));
 
 		$servername = null;
@@ -79,20 +79,22 @@ class BasePage
 
 		if ($servername != "")
 		{
-			$this->serverurl = ($this->secure_connection ? "https://" : "http://") . $servername . (($_SERVER["SERVER_PORT"] != "80" && $_SERVER["SERVER_PORT"] != "443") ? ":" . $_SERVER["SERVER_PORT"] : "") . WWW_TOP . '/';
+			$this->serverurl = ($this->secure_connection ? "https://" : "http://").$servername.(($_SERVER["SERVER_PORT"] != "80" && $_SERVER["SERVER_PORT"] != "443") ? ":".$_SERVER["SERVER_PORT"] : "").WWW_TOP.'/';
 			$this->smarty->assign('serverroot', $this->serverurl);
 		}
 
 		$this->page = (isset($_GET['page'])) ? $_GET['page'] : 'content';
 
 		$users = new Users();
-		if ($users->isLoggedIn()) {
+		if ($users->isLoggedIn())
+		{
 			$this->userdata = $users->getById($users->currentUserId());
 
 			//
 			// user can still be logged in but have been disabled by admin, so if they are, log them off
 			//
-			if ($this->userdata["role"] == Users::ROLE_DISABLED) {
+			if ($this->userdata["role"] == Users::ROLE_DISABLED)
+			{
 				$users->logout();
 				$this->show403();
 			}
@@ -100,37 +102,37 @@ class BasePage
 			$this->userdata["categoryexclusions"] = $users->getCategoryExclusion($users->currentUserId());
 
 			//update lastlogin every 15 mins
-			if (strtotime($this->userdata['now']) - 900 > strtotime($this->userdata['lastlogin']))
+			if (strtotime($this->userdata['now'])-900 > strtotime($this->userdata['lastlogin']))
 				$users->updateSiteAccessed($this->userdata['id']);
 
-			$this->smarty->assign('userdata', $this->userdata);
-			$this->smarty->assign('loggedin', "true");
+			$this->smarty->assign('userdata',$this->userdata);
+			$this->smarty->assign('loggedin',"true");
 
 			if (!empty($this->userdata['nzbvortex_api_key']) && (!empty($this->userdata['nzbvortex_server_url'])))
 				$this->smarty->assign('weHasVortex', true);
 
 			$sab = new SABnzbd($this);
-			if ($sab->integrated !== false && $sab->url != '' && $sab->apikey != '')
+			if ($sab->integrated !== false && $sab->url !='' && $sab->apikey != '')
 			{
 				$this->smarty->assign('sabintegrated', $sab->integrated);
 				$this->smarty->assign('sabapikeytype', $sab->apikeytype);
 			}
 			if ($this->userdata["role"] == Users::ROLE_ADMIN)
-				$this->smarty->assign('isadmin', "true");
+				$this->smarty->assign('isadmin',"true");
 
 			if ($this->userdata["hideads"] == "1")
 			{
-				$this->site->adheader = "";
-				$this->site->adbrowse = "";
-				$this->site->addetail = "";
+				$this->site->adheader="";
+				$this->site->adbrowse="";
+				$this->site->addetail="";
 			}
 
 			$this->floodCheck($this->userdata["role"]);
 		}
 		else
 		{
-			$this->smarty->assign('isadmin', "false");
-			$this->smarty->assign('loggedin', "false");
+			$this->smarty->assign('isadmin',"false");
+			$this->smarty->assign('loggedin',"false");
 			$this->floodCheck();
 		}
 
@@ -191,7 +193,7 @@ class BasePage
 	//
 	public function addToHead($headcontent)
 	{
-		$this->head = $this->head . "\n" . $headcontent;
+		$this->head = $this->head."\n".$headcontent;
 	}
 
 	//
@@ -199,7 +201,7 @@ class BasePage
 	//
 	public function addToBody($attr)
 	{
-		$this->body = $this->body . " " . $attr;
+		$this->body = $this->body." ".$attr;
 	}
 
 	public function isPostBack()
@@ -216,16 +218,16 @@ class BasePage
 	public function show403($from_admin = false)
 	{
 		$redirect_path = ($from_admin) ? str_replace('/admin', '', WWW_TOP) : WWW_TOP;
-		header("Location: $redirect_path/login?redirect=" . urlencode($_SERVER["REQUEST_URI"]));
+		header("Location: $redirect_path/login?redirect=".urlencode($_SERVER["REQUEST_URI"]));
 		die();
 	}
 
-	public function show503($retry = '')
+	public function show503($retry='')
 	{
 		header('HTTP/1.1 503 Service Temporarily Unavailable');
 		header('Status: 503 Service Temporarily Unavailable');
 		if ($retry != '')
-			header('Retry-After: ' . $retry);
+			header('Retry-After: '.$retry);
 
 		echo "
 			<html>
@@ -243,11 +245,11 @@ class BasePage
 		die();
 	}
 
-	public function show429($retry = '')
+	public function show429($retry='')
 	{
 		header('HTTP/1.1 429 Too Many Requests');
 		if ($retry != '')
-			header('Retry-After: ' . $retry);
+			header('Retry-After: '.$retry);
 
 		echo "
 			<html>
@@ -258,7 +260,7 @@ class BasePage
 			<body>
 				<h1>Too Many Requests</h1>
 
-				<p>Wait ".(($retry != '') ? ceil($retry / 60) . ' minutes ' : '') . "or risk being temporarily banned.</p>
+				<p>Wait ".(($retry != '') ? ceil($retry/60).' minutes ' : '')."or risk being temporarily banned.</p>
 
 			</body>
 			</html>";

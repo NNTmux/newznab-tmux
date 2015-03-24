@@ -52,7 +52,7 @@ abstract class ArchiveReader
 	 * @param   integer $low  the low 32 bits
 	 * @param   integer $high the high 32 bits
 	 *
-	 * @return  integer
+	 * @return  float|integer
 	 */
 	public static function int64($low, $high)
 	{
@@ -121,9 +121,8 @@ abstract class ArchiveReader
 	public static function getFileSize($file)
 	{
 		// 64-bit systems should be OK
-		if (PHP_INT_SIZE > 4) {
-					return filesize($file);
-		}
+		if (PHP_INT_SIZE > 4)
+			return filesize($file);
 
 		// Hack for Windows
 		if (DIRECTORY_SEPARATOR === '\\') {
@@ -176,9 +175,8 @@ abstract class ArchiveReader
 	 */
 	public static function makeDirectory($dir)
 	{
-		if (file_exists($dir)) {
-					return false;
-		}
+		if (file_exists($dir))
+			return false;
 
 		mkdir($dir, 0777, true);
 		chmod($dir, 0777);
@@ -192,7 +190,7 @@ abstract class ArchiveReader
 	 * as keys and a list of all matching needle keys as the values.
 	 *
 	 * @param   string       $haystack the string to search
-	 * @param   string $needle   the string or list of strings to find
+	 * @param   string|array $needle   the string or list of strings to find
 	 *
 	 * @return  array|boolean  the needle positions, or false if none found
 	 */
@@ -204,9 +202,8 @@ abstract class ArchiveReader
 		$results = array();
 
 		foreach ((array)$needle as $key => $value) {
-			if (($vlen = strlen($value)) == 0) {
-							continue;
-			}
+			if (($vlen = strlen($value)) == 0)
+				continue;
 			while ($offset < $hlen && ($pos = strpos($haystack, $value, $offset)) !== false) {
 				$offset = $pos + $vlen;
 				if ($isArray) {
@@ -253,9 +250,7 @@ abstract class ArchiveReader
 	 */
 	public function __construct($file = null, $isFragment = false, array $range = null)
 	{
-		if ($file) {
-			$this->open($file, $isFragment, $range);
-		}
+		if ($file) $this->open($file, $isFragment, $range);
 	}
 
 	/**
@@ -384,7 +379,7 @@ abstract class ArchiveReader
 	 *
 	 * @param   string $name the property name
 	 *
-	 * @return  string   the property value
+	 * @return  mixed   the property value
 	 * @throws  RuntimeException
 	 * @throws  LogicException
 	 */
@@ -395,9 +390,8 @@ abstract class ArchiveReader
 			return $this->file;
 		}
 
-		if (!isset($this->$name)) {
-					throw new RuntimeException('Undefined property: ' . get_class($this) . '::$' . $name);
-		}
+		if (!isset($this->$name))
+			throw new RuntimeException('Undefined property: ' . get_class($this) . '::$' . $name);
 
 		throw new LogicException('Cannot access protected property ' . get_class($this) . '::$' . $name);
 	}
@@ -596,7 +590,7 @@ abstract class ArchiveReader
 	 *
 	 * @param   array $range the absolute start and end positions
 	 *
-	 * @return  false|string  the requested data or false on error
+	 * @return  string|boolean  the requested data or false on error
 	 */
 	protected function getRange(array $range)
 	{
@@ -667,15 +661,12 @@ abstract class ArchiveReader
 	 */
 	protected function read($num)
 	{
-		if ($num == 0) {
-			return '';
-		}
+		if ($num == 0) return '';
 
 		// Check that enough data is available
 		$newPos = $this->offset + $num;
-		if ($num < 1 || $newPos > $this->length) {
-					throw new InvalidArgumentException("Could not read {$num} bytes from offset {$this->offset}");
-		}
+		if ($num < 1 || $newPos > $this->length)
+			throw new InvalidArgumentException("Could not read {$num} bytes from offset {$this->offset}");
 
 		// Read the requested bytes
 		if ($this->file && is_resource($this->handle)) {
@@ -713,9 +704,8 @@ abstract class ArchiveReader
 	 */
 	protected function seek($pos)
 	{
-		if ($pos > $this->length || $pos < 0) {
-					throw new InvalidArgumentException("Could not seek to {$pos} (max: {$this->length})");
-		}
+		if ($pos > $this->length || $pos < 0)
+			throw new InvalidArgumentException("Could not seek to {$pos} (max: {$this->length})");
 
 		if ($this->file && is_resource($this->handle)) {
 			$max = PHP_INT_MAX;
@@ -738,9 +728,8 @@ abstract class ArchiveReader
 	 */
 	protected function tell()
 	{
-		if ($this->file && is_resource($this->handle)) {
-					return ftell($this->handle);
-		}
+		if ($this->file && is_resource($this->handle))
+			return ftell($this->handle);
 
 		return $this->start + $this->offset;
 	}
@@ -767,9 +756,8 @@ abstract class ArchiveReader
 	{
 		list($hash, $dest) = $this->getTempFileName();
 
-		if (file_exists($dest)) {
-					return $this->tempFiles[$hash] = $dest;
-		}
+		if (file_exists($dest))
+			return $this->tempFiles[$hash] = $dest;
 
 		file_put_contents($dest, $this->data);
 		chmod($dest, 0777);
@@ -783,7 +771,7 @@ abstract class ArchiveReader
 	 *
 	 * @param   string $data the source data to be hashed
 	 *
-	 * @return  string[]   the hash and temporary file path values
+	 * @return  array   the hash and temporary file path values
 	 */
 	protected function getTempFileName($data = null)
 	{

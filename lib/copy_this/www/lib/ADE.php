@@ -142,7 +142,7 @@ class ADE
 	public function sypnosis($tagline = false)
 	{
 		if ($tagline === true) {
-			if ($ret = $this->_html->find("p.Tagline", 0)) {
+			if ($ret = $this->_html->find("p.Tagline", 0)){
 				if (!empty($ret->plaintext)) {
 					$this->_res['tagline'] = trim($ret->plaintext);
 				}
@@ -335,7 +335,7 @@ class ADE
 	/**
 	 * Gets raw html content using adeurl and any trailing url.
 	 *
-	 * @param string|null $trailing - required
+	 * @param null $trailing - required
 	 *
 	 * @return bool - true if page has content
 	 */
@@ -384,7 +384,7 @@ class ADE
 			return false;
 		} else {
 			$this->_html->load($this->_response);
-			if ($ret = $this->_html->find("a.boxcover", 0)) {
+			if ($ret = $this->_html->find("a.boxcover", 0)){
 				$title = $ret->title;
 				$title = preg_replace('/XXX/', '', $title);
 				$title = preg_replace('/\(.*?\)|[-._]/i', ' ', $title);

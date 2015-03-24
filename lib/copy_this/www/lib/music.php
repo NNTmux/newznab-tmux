@@ -1,11 +1,11 @@
 <?php
-require_once(WWW_DIR . "/lib/framework/db.php");
-require_once(WWW_DIR . "/lib/amazon.php");
-require_once(WWW_DIR . "/lib/category.php");
-require_once(WWW_DIR . "/lib/genres.php");
-require_once(WWW_DIR . "/lib/site.php");
-require_once(WWW_DIR . "/lib/util.php");
-require_once(WWW_DIR . "/lib/releaseimage.php");
+require_once(WWW_DIR."/lib/framework/db.php");
+require_once(WWW_DIR."/lib/amazon.php");
+require_once(WWW_DIR."/lib/category.php");
+require_once(WWW_DIR."/lib/genres.php");
+require_once(WWW_DIR."/lib/site.php");
+require_once(WWW_DIR."/lib/util.php");
+require_once(WWW_DIR."/lib/releaseimage.php");
 
 /**
  * This class looks up music info from external sources and stores/retrieves musicinfo data.
@@ -17,7 +17,7 @@ class Music
 	/**
 	 * Default constructor.
 	 */
-	function Music($echooutput = false)
+	function Music($echooutput=false)
 	{
 		$this->echooutput = $echooutput;
 		$s = new Sites();
@@ -26,7 +26,7 @@ class Music
 		$this->privkey = $site->amazonprivkey;
 		$this->asstag = $site->amazonassociatetag;
 
-		$this->imgSavePath = WWW_DIR . 'covers/music/';
+		$this->imgSavePath = WWW_DIR.'covers/music/';
 	}
 
 	/**
@@ -44,7 +44,7 @@ class Music
 	public function getMusicInfoByName($artist, $album)
 	{
 		$db = new DB();
-		return $db->queryOneRow(sprintf("SELECT * FROM musicinfo where artist like %s and title like %s", $db->escapeString("%" . $artist . "%"), $db->escapeString("%" . $album . "%")));
+		return $db->queryOneRow(sprintf("SELECT * FROM musicinfo where artist like %s and title like %s", $db->escapeString("%".$artist."%"),  $db->escapeString("%".$album."%")));
 	}
 
 	/**
@@ -57,9 +57,9 @@ class Music
 		if ($start === false)
 			$limit = "";
 		else
-			$limit = " LIMIT " . $start . "," . $num;
+			$limit = " LIMIT ".$start.",".$num;
 
-		return $db->query(" SELECT * FROM musicinfo ORDER BY createddate DESC" . $limit);
+		return $db->query(" SELECT * FROM musicinfo ORDER BY createddate DESC".$limit);
 	}
 
 	/**
@@ -75,7 +75,7 @@ class Music
 	/**
 	 * Get count of all musicinfo rows by filter.
 	 */
-	public function getMusicCount($cat, $maxage = -1, $excludedcats = array())
+	public function getMusicCount($cat, $maxage=-1, $excludedcats=array())
 	{
 		$db = new DB();
 
@@ -95,10 +95,10 @@ class Music
 						$children = $categ->getChildren($category);
 						$chlist = "-99";
 						foreach ($children as $child)
-							$chlist .= ", " . $child["id"];
+							$chlist.=", ".$child["id"];
 
 						if ($chlist != "-99")
-							$catsrch .= " r.categoryid in (" . $chlist . ") or ";
+							$catsrch .= " r.categoryid in (".$chlist.") or ";
 					}
 					else
 					{
@@ -106,7 +106,7 @@ class Music
 					}
 				}
 			}
-			$catsrch .= "1=2 )";
+			$catsrch.= "1=2 )";
 		}
 
 		if ($maxage > 0)
@@ -116,7 +116,7 @@ class Music
 
 		$exccatlist = "";
 		if (count($excludedcats) > 0)
-			$exccatlist = " and r.categoryid not in (" . implode(",", $excludedcats) . ")";
+			$exccatlist = " and r.categoryid not in (".implode(",", $excludedcats).")";
 
 		$sql = sprintf("select count(r.id) as num from releases r inner join musicinfo m on m.id = r.musicinfoid and m.title != '' where r.passwordstatus <= (select value from site where setting='showpasswordedrelease') and %s %s %s %s", $browseby, $catsrch, $maxage, $exccatlist);
 		$res = $db->queryOneRow($sql, true);
@@ -126,7 +126,7 @@ class Music
 	/**
 	 * Get musicinfo rows for browse list by filters and limit.
 	 */
-	public function getMusicRange($cat, $start, $num, $orderby, $maxage = -1, $excludedcats = array())
+	public function getMusicRange($cat, $start, $num, $orderby, $maxage=-1, $excludedcats=array())
 	{
 		$db = new DB();
 
@@ -135,7 +135,7 @@ class Music
 		if ($start === false)
 			$limit = "";
 		else
-			$limit = " LIMIT " . $start . "," . $num;
+			$limit = " LIMIT ".$start.",".$num;
 
 		$catsrch = "";
 		if (count($cat) > 0 && $cat[0] != -1)
@@ -151,10 +151,10 @@ class Music
 						$children = $categ->getChildren($category);
 						$chlist = "-99";
 						foreach ($children as $child)
-							$chlist .= ", " . $child["id"];
+							$chlist.=", ".$child["id"];
 
 						if ($chlist != "-99")
-							$catsrch .= " r.categoryid in (" . $chlist . ") or ";
+							$catsrch .= " r.categoryid in (".$chlist.") or ";
 					}
 					else
 					{
@@ -162,7 +162,7 @@ class Music
 					}
 				}
 			}
-			$catsrch .= "1=2 )";
+			$catsrch.= "1=2 )";
 		}
 
 		$maxagesql = "";
@@ -171,7 +171,7 @@ class Music
 
 		$exccatlist = "";
 		if (count($excludedcats) > 0)
-			$exccatlist = " and r.categoryid not in (" . implode(",", $excludedcats) . ")";
+			$exccatlist = " and r.categoryid not in (".implode(",", $excludedcats).")";
 
 		$order = $this->getMusicOrder($orderby);
 		// query modified to join to musicinfo after limiting releases as performance issue prevented sane sql.
@@ -186,7 +186,7 @@ class Music
 	{
 		$order = ($orderby == '') ? 'r.postdate' : $orderby;
 		$orderArr = explode("_", $order);
-		switch ($orderArr[0]) {
+		switch($orderArr[0]) {
 			case 'artist':
 				$orderfield = 'm.artist';
 				break;
@@ -247,7 +247,7 @@ class Music
 				if (preg_match('/id/i', $bbv))
 					$browseby .= "m.{$bbv} = $bbs AND ";
 				else
-					$browseby .= "m.$bbv LIKE(" . $db->escapeString('%' . $bbs . '%') . ") AND ";
+					$browseby .= "m.$bbv LIKE(".$db->escapeString('%'.$bbs.'%').") AND ";
 			}
 		}
 		return $browseby;
@@ -274,7 +274,7 @@ class Music
 		$ri = new ReleaseImage();
 
 		$mus = array();
-		$amaz = $this->fetchAmazonProperties($artist . " " . $album);
+		$amaz = $this->fetchAmazonProperties($artist." ".$album);
 		if (!$amaz)
 			return false;
 
@@ -283,44 +283,44 @@ class Music
 		//load genres
 		$defaultGenres = $gen->getGenres(Genres::MUSIC_TYPE);
 		$genreassoc = array();
-		foreach ($defaultGenres as $dg) {
+		foreach($defaultGenres as $dg) {
 			$genreassoc[$dg['id']] = strtolower($dg['title']);
 		}
 
 		//
 		// get album properties
 		//
-		$mus['coverurl'] = (string)$amaz->Items->Item->LargeImage->URL;
+		$mus['coverurl'] = (string) $amaz->Items->Item->LargeImage->URL;
 		if ($mus['coverurl'] != "")
 			$mus['cover'] = 1;
 		else
 			$mus['cover'] = 0;
 
-		$mus['title'] = (string)$amaz->Items->Item->ItemAttributes->Title;
+		$mus['title'] = (string) $amaz->Items->Item->ItemAttributes->Title;
 		if (empty($mus['title']))
 			$mus['title'] = $album;
 
-		$mus['asin'] = (string)$amaz->Items->Item->ASIN;
+		$mus['asin'] = (string) $amaz->Items->Item->ASIN;
 
-		$mus['url'] = (string)$amaz->Items->Item->DetailPageURL;
+		$mus['url'] = (string) $amaz->Items->Item->DetailPageURL;
 
-		$mus['salesrank'] = (string)$amaz->Items->Item->SalesRank;
+		$mus['salesrank'] = (string) $amaz->Items->Item->SalesRank;
 		if ($mus['salesrank'] == "")
 			$mus['salesrank'] = 'null';
 
-		$mus['artist'] = (string)$amaz->Items->Item->ItemAttributes->Artist;
+		$mus['artist'] = (string) $amaz->Items->Item->ItemAttributes->Artist;
 		if (empty($mus['artist']))
 			$mus['artist'] = $artist;
 
-		$mus['publisher'] = (string)$amaz->Items->Item->ItemAttributes->Publisher;
+		$mus['publisher'] = (string) $amaz->Items->Item->ItemAttributes->Publisher;
 
-		$mus['releasedate'] = $db->escapeString((string)$amaz->Items->Item->ItemAttributes->ReleaseDate);
+		$mus['releasedate'] = $db->escapeString((string) $amaz->Items->Item->ItemAttributes->ReleaseDate);
 		if ($mus['releasedate'] == "''")
 			$mus['releasedate'] = 'null';
 
 		$mus['review'] = "";
 		if (isset($amaz->Items->Item->EditorialReviews))
-			$mus['review'] = trim(strip_tags((string)$amaz->Items->Item->EditorialReviews->EditorialReview->Content));
+			$mus['review'] = trim(strip_tags((string) $amaz->Items->Item->EditorialReviews->EditorialReview->Content));
 
 		$mus['year'] = $year;
 		if ($mus['year'] == "")
@@ -329,7 +329,7 @@ class Music
 		$mus['tracks'] = "";
 		if (isset($amaz->Items->Item->Tracks))
 		{
-			$tmpTracks = (array)$amaz->Items->Item->Tracks->Disc;
+			$tmpTracks = (array) $amaz->Items->Item->Tracks->Disc;
 			$tracks = $tmpTracks['Track'];
 			$mus['tracks'] = (is_array($tracks) && !empty($tracks)) ? implode('|', $tracks) : '';
 		}
@@ -369,7 +369,7 @@ class Music
 			$amazGenresObj = simplexml_load_string($amazGenresXml);
 			$amazGenres = $amazGenresObj->xpath("//BrowseNodeId");
 
-			foreach ($amazGenres as $amazGenre)
+			foreach($amazGenres as $amazGenre)
 			{
 				$currNode = trim($amazGenre[0]);
 				if (empty($genreName))
@@ -387,9 +387,10 @@ class Music
 
 		$musicId = $this->addUpdateMusicInfo($mus['title'], $mus['asin'], $mus['url'],
 			$mus['salesrank'], $mus['artist'], $mus['publisher'], $mus['releasedate'], $mus['review'],
-			$mus['year'], $mus['musicgenreID'], $mus['tracks'], $mus['cover']);
+			$mus['year'],$mus['musicgenreID'], $mus['tracks'], $mus['cover'] );
 
-		if ($musicId) {
+		if ($musicId)
+		{
 			//if ($this->echooutput)
 			//	echo "added/updated album: ".$mus['title']." (".$mus['year'].")\n";
 
@@ -401,7 +402,6 @@ class Music
 
 	/**
 	 * Retrieve info from Amazon for a title.
-	 * @param string $title
 	 */
 	public function fetchAmazonProperties($title)
 	{
@@ -410,7 +410,7 @@ class Music
 		{
 			$result = $obj->searchProducts($title, AmazonProductAPI::MP3, "TITLE");
 		}
-		catch (Exception $e)
+		catch(Exception $e)
 		{
 			//if first search failed try the mp3downloads section
 			try
@@ -420,7 +420,7 @@ class Music
 				$result = $obj->searchProducts($title, AmazonProductAPI::MUSIC, "TITLE");
 
 			}
-			catch (Exception $e2)
+			catch(Exception $e2)
 			{
 				$result = false;
 			}
@@ -442,7 +442,7 @@ class Music
 		if ($db->getNumRows($res) > 0)
 		{
 			if ($this->echooutput)
-				echo "MusicPr : Processing " . $db->getNumRows($res) . " audio releases\n";
+				echo "MusicPr : Processing ".$db->getNumRows($res)." audio releases\n";
 
 			while ($arr = $db->getAssocArray($res))
 			{
@@ -454,7 +454,7 @@ class Music
 				if ($album !== false)
 				{
 					if ($this->echooutput)
-						echo 'MusicPr : Looking up: ' . $album["artist"] . ' - ' . $album["album"] . "\n";
+						echo 'MusicPr : Looking up: '.$album["artist"].' - '.$album["album"]."\n";
 
 					//check for existing music entry
 					$albumCheck = $this->getMusicInfoByName($album["artist"], $album["album"]);
@@ -495,9 +495,8 @@ class Music
 				$releasename = trim(str_replace('VA ', '', $releasename));
 		}
 		*/
-		if (preg_match('/mdvdr/i', $releasename)) {
-					return false;
-		}
+		if (preg_match('/mdvdr/i', $releasename))
+			return false;
 
 		//Replace VA with Various Artists
 		$newName = preg_replace('/VA( |\-)/', 'Various Artists -', $releasename);
@@ -516,12 +515,12 @@ class Music
 			$albumi = 1;
 			if ((strlen($name[0]) <= 2 || strlen($name[1]) <= 2) && !preg_match('/Various Artists/i', $name[0]))
 			{
-				$name[0] = $name[0] . '-' . $name[1];
+				$name[0] = $name[0].'-'.$name[1];
 				$albumi = 2;
 			}
 			elseif (strlen($name[1]) <= 2 && preg_match('/Various Artists/i', $name[0]) && sizeof($name) > 2)
 			{
-				$name[2] = $name[1] . '-' . $name[2];
+				$name[2] = $name[1].'-'.$name[2];
 				$albumi = 2;
 			}
 
@@ -529,10 +528,10 @@ class Music
 				return false;
 
 			if (preg_match('/^the /i', $name[0])) {
-				$name[0] = preg_replace('/^the /i', '', $name[0]) . ', The';
+				$name[0] = preg_replace('/^the /i', '', $name[0]).', The';
 			}
 			if (preg_match('/deluxe edition|single|nmrVBR|READ NFO/i', $name[$albumi], $albumType)) {
-				$name[$albumi] = preg_replace('/' . $albumType[0] . '/i', '', $name[$albumi]);
+				$name[$albumi] = preg_replace('/'.$albumType[0].'/i', '', $name[$albumi]);
 			}
 			$result['artist'] = trim($name[0]);
 			$result['album'] = trim($name[$albumi]);
@@ -541,7 +540,7 @@ class Music
 		//make sure we've actually matched an album name
 		if (isset($result['album']))
 		{
-			if (preg_match('/^(nmrVBR|VBR|WEB|SAT|20\d{2}|19\d{2}|CDM|EP)$/i', $result['album']))
+			if (preg_match('/^(nmrVBR|VBR|WEB|SAT|20\d{2}|19\d{2}|CDM|EP)$/i',$result['album']))
 			{
 				$result['album'] = '';
 			}
@@ -567,27 +566,27 @@ class Music
 		if ($rescount > 0)
 		{
 			if ($this->echooutput)
-				echo "MusicPr : Processing " . $rescount . " audio releases via mediainfo\n";
+				echo "MusicPr : Processing ".$rescount." audio releases via mediainfo\n";
 
 			//load genres
 			$gen = new Genres();
 			$defaultGenres = $gen->getGenres(Genres::MUSIC_TYPE);
 			$genreassoc = array();
-			foreach ($defaultGenres as $dg)
+			foreach($defaultGenres as $dg)
 				$genreassoc[$dg['id']] = strtolower($dg['title']);
 
-			foreach ($res as $rel)
+			foreach($res as $rel)
 			{
 				$albumId = -3;
 				$mi = null;
 				$mi = @simplexml_load_string($rel["mediainfo"]);
 				if ($mi != null)
 				{
-					$artist = (string)$mi->File->track[0]->Performer;
-					$album = (string)$mi->File->track[0]->Album;
-					$year = (string)$mi->File->track[0]->Recorded_date;
-					$genre = (string)$mi->File->track[0]->Genre;
-					$publisher = (string)$mi->File->track[0]->Publisher;
+					$artist = (string) $mi->File->track[0]->Performer;
+					$album = (string) $mi->File->track[0]->Album;
+					$year = (string) $mi->File->track[0]->Recorded_date;
+					$genre = (string) $mi->File->track[0]->Genre;
+					$publisher = (string) $mi->File->track[0]->Publisher;
 
 					$albumCheck = $this->getMusicInfoByName($artist, $album);
 					if ($albumCheck === false)
@@ -597,8 +596,8 @@ class Music
 						//
 						$genreKey = -1;
 						if ($genre != "")
-							$albumId = $this->addUpdateMusicInfo($album, "", "", "null", $artist,
-								$publisher, "null", "", $year, $genreKey, "", 0);
+							$albumId = $this->addUpdateMusicInfo($album, "", "",  "null", $artist,
+								$publisher, "null", "", $year, $genreKey, "", 0 );
 					}
 					else
 					{
@@ -617,13 +616,12 @@ class Music
 
 	/**
 	 * Insert or update a musicinfo row.
-	 * @param integer $genreID
 	 */
 	public function addUpdateMusicInfo($title, $asin, $url, $salesrank, $artist, $publisher, $releasedate, $review, $year, $genreID, $tracks, $cover)
 	{
 		$db = new DB();
 
-		if (strlen($year) > 4) {
+		if (strlen($year) > 4)  {
 			if (preg_match("/\d{4}/", $year, $matches))
 				$year = $db->escapeString($matches[0]);
 			else
@@ -640,11 +638,11 @@ class Music
 			$db->escapeString($title), $db->escapeString($asin), $db->escapeString($url),
 			$salesrank, $db->escapeString($artist), $db->escapeString($publisher),
 			$releasedate, $db->escapeString($review), $year,
-			($genreID == -1 ? "null" : $genreID), $db->escapeString($tracks), $cover,
+			($genreID==-1?"null":$genreID), $db->escapeString($tracks), $cover,
 			$db->escapeString($title), $db->escapeString($asin), $db->escapeString($url),
 			$salesrank, $db->escapeString($artist), $db->escapeString($publisher),
 			$releasedate, $db->escapeString($review), $db->escapeString($year),
-			($genreID == -1 ? "null" : $genreID), $db->escapeString($tracks), $cover);
+			($genreID==-1?"null":$genreID), $db->escapeString($tracks), $cover  );
 
 		$musicId = $db->queryInsert($sql);
 		return $musicId;
@@ -652,14 +650,13 @@ class Music
 
 	/**
 	 * Convert Amazon browsenodes to genres.
-	 * @param string $nodeId
 	 */
 	public function matchBrowseNode($nodeId)
 	{
 		$str = '';
 
 		//music nodes above mp3 download nodes
-		switch ($nodeId)
+		switch($nodeId)
 		{
 			case '163420':
 				$str = 'Music Video & Concerts';

@@ -1,8 +1,8 @@
 <?php
 require_once("config.php");
-require_once(WWW_DIR . "/lib/adminpage.php");
-require_once(WWW_DIR . "/lib/Games.php");
-require_once(WWW_DIR . "/lib/genres.php");
+require_once(WWW_DIR."/lib/adminpage.php");
+require_once(WWW_DIR."/lib/Games.php");
+require_once(WWW_DIR."/lib/genres.php");
 
 $page = new AdminPage();
 $games = new Games(['Settings' => $page->settings]);
@@ -20,14 +20,14 @@ if (isset($_REQUEST["id"])) {
 		$page->show404();
 	}
 
-	switch ($action) {
+	switch($action) {
 		case 'submit':
 			$coverLoc = NN_COVERS . "games/" . $id . '.jpg';
 
-			if ($_FILES['cover']['size'] > 0) {
+			if($_FILES['cover']['size'] > 0) {
 				$tmpName = $_FILES['cover']['tmp_name'];
 				$file_info = getimagesize($tmpName);
-				if (!empty($file_info)) {
+				if(!empty($file_info)) {
 					move_uploaded_file($_FILES['cover']['tmp_name'], $coverLoc);
 				}
 			}
@@ -37,7 +37,7 @@ if (isset($_REQUEST["id"])) {
 
 			$games->update($id, $_POST["title"], $_POST['asin'], $_POST['url'], $_POST["publisher"], $_POST["releasedate"], $_POST["esrb"], $_POST["cover"], $_POST['trailerurl'], $_POST["genre"]);
 
-			header("Location:" . WWW_TOP . "/game-list.php");
+			header("Location:".WWW_TOP."/game-list.php");
 			die();
 		break;
 

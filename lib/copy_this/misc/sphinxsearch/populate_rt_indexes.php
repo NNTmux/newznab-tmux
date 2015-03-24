@@ -13,11 +13,11 @@ if (!isset($argv[1]) || !in_array($argv[1], ['releases_rt'])) {
 }
 
 switch ($argv[1]) {
-		case 'releases_rt':
-			releases_rt();
-			break;
-		default:
-			exit();
+	case 'releases_rt':
+		releases_rt();
+		break;
+	default:
+		exit();
 }
 
 // Bulk insert releases into sphinx RT index.
@@ -37,7 +37,7 @@ function releases_rt()
 		foreach ($rows as $row) {
 			$i++;
 			$tempString .= sprintf(
-				'(%d, %s, %s, %s, %s),',
+				'(%d, %s, %s, %s, %s),' ,
 				$row['id'],
 				$sphinx->sphinxQL->escapeString($row['guid']),
 				$sphinx->sphinxQL->escapeString($row['name']),

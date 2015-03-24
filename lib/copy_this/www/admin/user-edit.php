@@ -25,38 +25,38 @@ foreach ($userroles as $r) {
 }
 
 switch ($action) {
-		case 'add':
-			$user = array();
-			$user["role"] = $defaultrole;
-			$user["notes"] = "";
-			$user["invites"] = $defaultinvites;
-			$user["movieview"] = "1";
-			$user["musicview"] = "1";
-			$user["gameview"] = "1";
-			$user["xxxview"] = "1";
-			$user["consoleview"] = "1";
-			$user["bookview"] = "1";
-			$page->smarty->assign('user', $user);
-			break;
-		case 'submit':
+	case 'add':
+		$user = array();
+		$user["role"] = $defaultrole;
+		$user["notes"] = "";
+		$user["invites"] = $defaultinvites;
+		$user["movieview"] = "1";
+		$user["musicview"] = "1";
+		$user["gameview"] = "1";
+		$user["xxxview"] = "1";
+		$user["consoleview"] = "1";
+		$user["bookview"] = "1";
+		$page->smarty->assign('user', $user);
+		break;
+	case 'submit':
 
-			if ($_POST["id"] == "") {
-				$invites = $defaultinvites;
-				foreach ($userroles as $role) {
-					if ($role['id'] == $_POST['role'])
-						$invites = $role['defaultinvites'];
-				}
-				$ret = $users->signup($_POST["username"], $_POST["password"], $_POST["email"], '', $_POST["role"], $_POST["notes"], $invites, "", true, false, false, true);
-			} else {
-				$ret = $users->update($_POST["id"], $_POST["username"], $_POST["email"], $_POST["grabs"], $_POST["role"], $_POST["notes"], $_POST["invites"], (isset($_POST['movieview']) ? "1" : "0"), (isset($_POST['musicview']) ? "1" : "0"), (isset($_POST['gameview']) ? "1" : "0"), (isset($_POST['xxxview']) ? "1" : "0"), (isset($_POST['consoleview']) ? "1" : "0"), (isset($_POST['bookview']) ? "1" : "0"));
-				if ($_POST['password'] != "")
-					$users->updatePassword($_POST["id"], $_POST['password']);
+		if ($_POST["id"] == "") {
+			$invites = $defaultinvites;
+			foreach ($userroles as $role) {
+				if ($role['id'] == $_POST['role'])
+					$invites = $role['defaultinvites'];
 			}
+			$ret = $users->signup($_POST["username"], $_POST["password"], $_POST["email"], '', $_POST["role"], $_POST["notes"], $invites, "", true, false, false, true);
+		} else {
+			$ret = $users->update($_POST["id"], $_POST["username"], $_POST["email"], $_POST["grabs"], $_POST["role"], $_POST["notes"], $_POST["invites"], (isset($_POST['movieview']) ? "1" : "0"), (isset($_POST['musicview']) ? "1" : "0"), (isset($_POST['gameview']) ? "1" : "0"), (isset($_POST['xxxview']) ? "1" : "0"), (isset($_POST['consoleview']) ? "1" : "0"), (isset($_POST['bookview']) ? "1" : "0"));
+			if ($_POST['password'] != "")
+				$users->updatePassword($_POST["id"], $_POST['password']);
+		}
 
-			if ($ret >= 0)
-				header("Location:" . WWW_TOP . "/user-list.php");
-			else {
-				switch ($ret) {
+		if ($ret >= 0)
+			header("Location:" . WWW_TOP . "/user-list.php");
+		else {
+			switch ($ret) {
 				case Users::ERR_SIGNUP_BADUNAME:
 					$page->smarty->assign('error', "Bad username. Try a better one.");
 					break;
@@ -75,7 +75,7 @@ switch ($action) {
 				default:
 					$page->smarty->assign('error', "Unknown save error.");
 					break;
-				}
+			}
 			$user = array();
 			$user["id"] = $_POST["id"];
 			$user["username"] = $_POST["username"];
@@ -89,18 +89,18 @@ switch ($action) {
 			$page->smarty->assign('user', $user);
 		}
 		break;
-		case 'view':
-		default:
+	case 'view':
+	default:
 
-		if (isset($_GET["id"])) {
-				$page->title = "User Edit";
-				$id = $_GET["id"];
-				$user = $users->getByID($id);
+	if (isset($_GET["id"])) {
+			$page->title = "User Edit";
+			$id = $_GET["id"];
+			$user = $users->getByID($id);
 
-				$page->smarty->assign('user', $user);
-			}
+			$page->smarty->assign('user', $user);
+		}
 
-			break;
+		break;
 }
 
 $page->smarty->assign('yesno_ids', array(1, 0));

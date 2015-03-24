@@ -58,9 +58,8 @@ class Groups
 
 		$temp_array[-1] = "--Please Select--";
 
-		foreach ($categories as $category) {
-					$temp_array[$category["name"]] = $category["name"];
-		}
+		foreach ($categories as $category)
+			$temp_array[$category["name"]] = $category["name"];
 
 		return $temp_array;
 	}
@@ -86,7 +85,6 @@ class Groups
 
 	/**
 	 * Get a group row by name.
-	 * @param string $grp
 	 */
 	public function getByName($grp)
 	{
@@ -131,13 +129,11 @@ class Groups
 
 
 		$grpsql = '';
-		if ($groupname != "") {
-					$grpsql .= sprintf("and groups.name like %s ", $this->pdo->escapeString("%" . $groupname . "%"));
-		}
+		if ($groupname != "")
+			$grpsql .= sprintf("and groups.name like %s ", $this->pdo->escapeString("%" . $groupname . "%"));
 
-		if ($activeonly == true) {
-					$grpsql .= "and active=1 ";
-		}
+		if ($activeonly == true)
+			$grpsql .= "and active=1 ";
 
 		$res = $this->pdo->queryOneRow(sprintf("select count(id) as num from groups where 1=1 %s", $grpsql));
 
@@ -150,19 +146,16 @@ class Groups
 	public function getRange($start, $num, $groupname = "", $activeonly = false)
 	{
 
-		if ($start === false) {
-					$limit = "";
-		} else {
-					$limit = " LIMIT " . $start . "," . $num;
-		}
+		if ($start === false)
+			$limit = "";
+		else
+			$limit = " LIMIT " . $start . "," . $num;
 
 		$grpsql = '';
-		if ($groupname != "") {
-					$grpsql .= sprintf("and groups.name like %s ", $this->pdo->escapeString("%" . $groupname . "%"));
-		}
-		if ($activeonly == true) {
-					$grpsql .= "and active=1 ";
-		}
+		if ($groupname != "")
+			$grpsql .= sprintf("and groups.name like %s ", $this->pdo->escapeString("%" . $groupname . "%"));
+		if ($activeonly == true)
+			$grpsql .= "and active=1 ";
 
 		$sql = sprintf("SELECT groups.*, COALESCE(rel.num, 0) AS num_releases
 							FROM groups
@@ -187,12 +180,14 @@ class Groups
 
 		$minFileString =
 			($group["minfilestoformrelease"] == '' ?
-				"minfilestoformrelease = NULL," : sprintf(" minfilestoformrelease = %d,", $this->formatNumberString($group["minfilestoformrelease"], false))
+				"minfilestoformrelease = NULL," :
+				sprintf(" minfilestoformrelease = %d,", $this->formatNumberString($group["minfilestoformrelease"], false))
 			);
 
 		$minSizeString =
 			($group["minsizetoformrelease"] == '' ?
-				"minsizetoformrelease = NULL" : sprintf(" minsizetoformrelease = %d", $this->formatNumberString($group["minsizetoformrelease"], false))
+				"minsizetoformrelease = NULL" :
+				sprintf(" minsizetoformrelease = %d", $this->formatNumberString($group["minsizetoformrelease"], false))
 			);
 
 		return $this->pdo->queryExec(
@@ -226,12 +221,14 @@ class Groups
 	{
 		$minFileString =
 			($group["minfilestoformrelease"] == '' ?
-				"NULL" : sprintf("%d", $this->formatNumberString($group["minfilestoformrelease"], false))
+				"NULL" :
+				sprintf("%d", $this->formatNumberString($group["minfilestoformrelease"], false))
 			);
 
 		$minSizeString =
 			($group["minsizetoformrelease"] == '' ?
-				"NULL" : sprintf("%d", $this->formatNumberString($group["minsizetoformrelease"], false))
+				"NULL" :
+				sprintf("%d", $this->formatNumberString($group["minsizetoformrelease"], false))
 			);
 
 
@@ -262,7 +259,7 @@ class Groups
 	 *
 	 * @return string|int
 	 */
-	protected function formatNumberString($setting, $escape = true)
+	protected function formatNumberString($setting, $escape=true)
 	{
 		$setting = trim($setting);
 		if ($setting === "0" || !is_numeric($setting)) {
@@ -363,7 +360,7 @@ class Groups
 
 			$regfilter = "/(" . str_replace(array('.', '*'), array('\.', '.*?'), $groupList) . ")$/";
 
-			foreach ($groups as $group) {
+			foreach ($groups AS $group) {
 				if (preg_match($regfilter, $group['group']) > 0) {
 					$res = $this->pdo->queryOneRow(sprintf("SELECT id FROM groups WHERE name = %s ", $this->pdo->escapeString($group['group'])));
 					if ($res) {
@@ -391,7 +388,7 @@ class Groups
 	public function updateGroupStatus($id, $status = 0)
 	{
 		$this->pdo->queryExec(sprintf("UPDATE groups SET active = %d WHERE id = %d", $status, $id));
-		return "group $id has been " . (($status == 0) ? 'deactivated' : 'activated') . '.';
+		return "Group $id has been " . (($status == 0) ? 'deactivated' : 'activated') . '.';
 	}
 
 	/**
@@ -403,7 +400,7 @@ class Groups
 	public function updateBackfillStatus($id, $status = 0)
 	{
 		$this->pdo->queryExec(sprintf("UPDATE groups SET backfill = %d WHERE id = %d", $status, $id));
-		return "group $id has been " . (($status == 0) ? 'deactivated' : 'activated') . '.';
+		return "Group $id has been " . (($status == 0) ? 'deactivated' : 'activated') . '.';
 	}
 
 	/**
@@ -438,7 +435,7 @@ class Groups
 	 */
 	public function getCBPTableNames($tpgSetting, $groupID)
 	{
-		$groupKey = ($groupID . '_' . (int)$tpgSetting);
+		$groupKey = ($groupID . '_' . (int) $tpgSetting);
 
 		// Check if buffered and return. Prevents re-querying MySQL when TPG is on.
 		if (isset($this->cbppTableNames[$groupKey])) {
@@ -552,7 +549,7 @@ class Groups
 	 *
 	 * @return mixed
 	 */
-	public function getCountActive($groupname = "")
+	public function getCountActive($groupname="")
 	{
 		$res = $this->pdo->queryOneRow(
 			sprintf("
@@ -564,7 +561,7 @@ class Groups
 					?
 					sprintf(
 						"AND groups.name LIKE %s ",
-						$this->pdo->escapeString("%" . $groupname . "%")
+						$this->pdo->escapeString("%".$groupname."%")
 					)
 					: ''
 				)
@@ -578,7 +575,7 @@ class Groups
 	 *
 	 * @return mixed
 	 */
-	public function getCountInactive($groupname = "")
+	public function getCountInactive($groupname="")
 	{
 		$res = $this->pdo->queryOneRow(
 			sprintf("
@@ -590,7 +587,7 @@ class Groups
 					?
 					sprintf(
 						"AND groups.name LIKE %s ",
-						$this->pdo->escapeString("%" . $groupname . "%")
+						$this->pdo->escapeString("%".$groupname."%")
 					)
 					: ''
 				)
@@ -606,7 +603,7 @@ class Groups
 	 *
 	 * @return mixed
 	 */
-	public function getRangeActive($start, $num, $groupname = "")
+	public function getRangeActive($start, $num, $groupname="")
 	{
 		return $this->pdo->query(
 			sprintf("
@@ -620,12 +617,12 @@ class Groups
 				ON rel.groupid = groups.id
 				WHERE 1 = 1 %s
 				AND active = 1
-				ORDER BY groups.name " . ($start === false ? '' : " LIMIT " . $num . " OFFSET " . $start),
+				ORDER BY groups.name " . ($start === false ? '' : " LIMIT " . $num . " OFFSET " .$start),
 				($groupname !== ''
 					?
 					sprintf(
 						"AND groups.name LIKE %s ",
-						$this->pdo->escapeString("%" . $groupname . "%")
+						$this->pdo->escapeString("%".$groupname."%")
 					)
 					: ''
 				)
@@ -640,7 +637,7 @@ class Groups
 	 *
 	 * @return mixed
 	 */
-	public function getRangeInactive($start, $num, $groupname = "")
+	public function getRangeInactive($start, $num, $groupname="")
 	{
 		return $this->pdo->query(
 			sprintf("
@@ -654,11 +651,11 @@ class Groups
 				ON rel.groupid = groups.id
 				WHERE 1 = 1 %s
 				AND active = 0
-				ORDER BY groups.name " . ($start === false ? '' : " LIMIT " . $num . " OFFSET " . $start),
+				ORDER BY groups.name " . ($start === false ? '' : " LIMIT ".$num." OFFSET ".$start),
 				($groupname !== ''
 					? sprintf(
 						"AND groups.name LIKE %s ",
-						$this->pdo->escapeString("%" . $groupname . "%")
+						$this->pdo->escapeString("%".$groupname."%")
 					)
 					: ''
 				)

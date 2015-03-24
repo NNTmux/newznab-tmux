@@ -148,7 +148,7 @@ class IAFD
 					$secondtitle = $ret->find("dd", 0)->innertext;
 				}
 				unset($ret);
-				if (isset($secondtitle) or isset($firsttitle)) {
+				if (isset($secondtitle) OR isset($firsttitle)) {
 					$firsttitle = preg_replace('/\(([0-9]+)\)/', "", $firsttitle);
 					$firsttitle = preg_replace('/XXX/', '', $firsttitle);
 					$firsttitle = preg_replace('/\(.*?\)|[-._]/i', ' ', $firsttitle);

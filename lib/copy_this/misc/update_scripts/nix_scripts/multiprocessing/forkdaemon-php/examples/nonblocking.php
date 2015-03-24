@@ -1,6 +1,6 @@
 <?php
 
-declare(ticks = 1);
+declare(ticks=1);
 
 require_once(__DIR__ . '/../fork_daemon.php');
 
@@ -22,7 +22,7 @@ function test_nonblocking()
 
 	/* add work */
 	$data_set = array();
-	for ($i = 0; $i < 100; $i++) $data_set[] = $i;
+	for($i=0; $i<100; $i++) $data_set[] = $i;
 	shuffle($data_set);
 	$server->addwork($data_set);
 
@@ -32,14 +32,16 @@ function test_nonblocking()
 	$server->process_work(false);
 
 	/* wait until all work allocated */
-	while ($server->work_sets_count() > 0) {
+	while ($server->work_sets_count() > 0)
+	{
 		echo "work set count: " . $server->work_sets_count() . "\n";
 		$server->process_work(false);
 		sleep(1);
 	}
 
 	/* wait until all children finish */
-	while ($server->children_running() > 0) {
+	while ($server->children_running() > 0)
+	{
 		echo "waiting for " . $server->children_running() . " children to finish\n";
 		sleep(1);
 	}
@@ -53,13 +55,13 @@ function test_nonblocking()
 function process_child_run($data_set, $identifier = "")
 {
 	echo "I'm child working on: " . implode(",", $data_set) . ($identifier == "" ? "" : " (id:$identifier)") . "\n";
-	sleep(rand(4, 8));
+	sleep(rand(4,8));
 }
 
 /* registered call back function */
 function process_child_exit($pid, $identifier = "")
 {
-	echo "child $pid just finished" . ($identifier == "" ? "" : " (id:$identifier)") . "\n";
+	echo "Child $pid just finished" . ($identifier == "" ? "" : " (id:$identifier)") . "\n";
 }
 
 /* registered call back function */

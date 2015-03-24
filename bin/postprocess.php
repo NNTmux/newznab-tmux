@@ -82,7 +82,7 @@ if ($args[$argv[1]] === true) {
 $postProcess = new PProcess(['Settings' => $pdo, 'Echo' => ($argv[2] === 'true' ? true : false)]);
 $pp = new PostProcess(true);
 
-$charArray = ['a', 'b', 'c', 'd', 'e', 'f', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+$charArray = ['a','b','c','d','e','f','0','1','2','3','4','5','6','7','8','9'];
 
 switch ($argv[1]) {
 

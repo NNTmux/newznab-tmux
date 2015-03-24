@@ -1,9 +1,9 @@
 <?php
 /**
-	 * System process functions
-	 * @category system
-	 * @package fork_daemon
-	 */
+ * System process functions
+ * @category system
+ * @package fork_daemon
+ */
 
 class fork_daemon
 {
@@ -266,7 +266,8 @@ class fork_daemon
 	 */
 	public function max_children_set($value, $bucket = self::DEFAULT_BUCKET)
 	{
-		if ($value < 1) {
+		if ($value < 1)
+		{
 			$value = 0;
 			$this->log(($bucket === self::DEFAULT_BUCKET ? 'default' : $bucket) . ' bucket max_children set to 0, bucket will be disabled', self::LOG_LEVEL_WARN);
 		}
@@ -293,11 +294,13 @@ class fork_daemon
 	 */
 	public function max_work_per_child_set($value, $bucket = self::DEFAULT_BUCKET)
 	{
-		if ($this->child_single_work_item[$bucket]) {
+		if ($this->child_single_work_item[$bucket])
+		{
 			$value = 1;
 		}
 
-		if ($value < 1) {
+		if ($value < 1)
+		{
 			$value = 0;
 			$this->log(($bucket === self::DEFAULT_BUCKET ? 'default' : $bucket) . ' bucket max_work_per_child set to 0, bucket will be disabled', self::LOG_LEVEL_WARN);
 		}
@@ -324,7 +327,8 @@ class fork_daemon
 	 */
 	public function child_max_run_time_set($value, $bucket = self::DEFAULT_BUCKET)
 	{
-		if ($value < 1) {
+		if ($value < 1)
+		{
 			$value = 0;
 			$this->log(($bucket === self::DEFAULT_BUCKET ? 'default' : $bucket) . ' bucket child_max_run_time set to 0', self::LOG_LEVEL_WARN);
 		}
@@ -351,7 +355,8 @@ class fork_daemon
 	 */
 	public function child_single_work_item_set($value, $bucket = self::DEFAULT_BUCKET)
 	{
-		if ($value < 1) {
+		if ($value < 1)
+		{
 			$value = 0;
 			$this->log(($bucket === self::DEFAULT_BUCKET ? 'default' : $bucket) . ' bucket child_single_work_item set to 0', self::LOG_LEVEL_WARN);
 		}
@@ -398,9 +403,7 @@ class fork_daemon
 	public function child_bucket_get()
 	{
 		// this function does not apply to the parent
-		if (self::$parent_pid == getmypid()) {
-			return false;
-		}
+		if (self::$parent_pid == getmypid()) return false;
 
 		return($this->child_bucket);
 	}
@@ -440,7 +443,7 @@ class fork_daemon
 	public function register_child_run($function_name, $bucket = self::DEFAULT_BUCKET)
 	{
 		/* call child function */
-		if ((is_array($function_name) && method_exists($function_name[0], $function_name[1])) || method_exists($this, $function_name) || function_exists($function_name))
+		if ( ( is_array($function_name) && method_exists($function_name[0], $function_name[1]) ) || method_exists($this, $function_name) || function_exists($function_name) )
 		{
 			$this->child_function_run[$bucket] = $function_name;
 			return true;
@@ -471,7 +474,7 @@ class fork_daemon
 	public function register_parent_fork($function_name, $bucket = self::DEFAULT_BUCKET)
 	{
 		/* call child function */
-		if ((is_array($function_name) && method_exists($function_name[0], $function_name[1])) || method_exists($this, $function_name) || function_exists($function_name))
+		if ( ( is_array($function_name) && method_exists($function_name[0], $function_name[1]) ) || method_exists($this, $function_name) || function_exists($function_name) )
 		{
 			$this->parent_function_fork[$bucket] = $function_name;
 			return true;
@@ -485,12 +488,13 @@ class fork_daemon
 	 * @access public
 	 * @param string name of function to be called.
 	 * @param bool $cascade_signal if true, the parent will send a sighup to all of it's children
+	 * @param int $bucket the bucket to use
 	 * @return bool true if the callback was successfully registered, false if it failed
 	 */
 	public function register_parent_sighup($function_name, $cascade_signal = true)
 	{
 		/* call child function */
-		if ((is_array($function_name) && method_exists($function_name[0], $function_name[1])) || method_exists($this, $function_name) || function_exists($function_name))
+		if ( ( is_array($function_name) && method_exists($function_name[0], $function_name[1]) ) || method_exists($this, $function_name) || function_exists($function_name) )
 		{
 			$this->parent_function_sighup         = $function_name;
 			$this->parent_function_sighup_cascade = $cascade_signal;
@@ -510,7 +514,7 @@ class fork_daemon
 	public function register_child_sighup($function_name, $bucket = self::DEFAULT_BUCKET)
 	{
 		/* call child function */
-		if ((is_array($function_name) && method_exists($function_name[0], $function_name[1])) || method_exists($this, $function_name) || function_exists($function_name))
+		if ( ( is_array($function_name) && method_exists($function_name[0], $function_name[1]) ) || method_exists($this, $function_name) || function_exists($function_name) )
 		{
 			$this->child_function_sighup[$bucket] = $function_name;
 			return true;
@@ -529,7 +533,7 @@ class fork_daemon
 	public function register_child_exit($function_name, $bucket = self::DEFAULT_BUCKET)
 	{
 		/* call child function */
-		if ((is_array($function_name) && method_exists($function_name[0], $function_name[1])) || method_exists($this, $function_name) || function_exists($function_name))
+		if ( ( is_array($function_name) && method_exists($function_name[0], $function_name[1]) ) || method_exists($this, $function_name) || function_exists($function_name) )
 		{
 			$this->child_function_exit[$bucket] = $function_name;
 			return true;
@@ -548,7 +552,7 @@ class fork_daemon
 	public function register_child_timeout($function_name, $bucket = self::DEFAULT_BUCKET)
 	{
 		/* call child function */
-		if ((is_array($function_name) && method_exists($function_name[0], $function_name[1])) || method_exists($this, $function_name) || function_exists($function_name))
+		if ( ( is_array($function_name) && method_exists($function_name[0], $function_name[1]) ) || method_exists($this, $function_name) || function_exists($function_name) )
 		{
 			$this->child_function_timeout[$bucket] = $function_name;
 			return true;
@@ -566,7 +570,7 @@ class fork_daemon
 	public function register_parent_exit($function_name)
 	{
 		// call parent function
-		if ((is_array($function_name) && method_exists($function_name[0], $function_name[1])) || method_exists($this, $function_name) || function_exists($function_name))
+		if ( ( is_array($function_name) && method_exists($function_name[0], $function_name[1]) ) || method_exists($this, $function_name) || function_exists($function_name) )
 		{
 			$this->parent_function_exit = $function_name;
 			return true;
@@ -585,7 +589,7 @@ class fork_daemon
 	public function register_parent_child_exit($function_name, $bucket = self::DEFAULT_BUCKET)
 	{
 		/* call parent function */
-		if ((is_array($function_name) && method_exists($function_name[0], $function_name[1])) || method_exists($this, $function_name) || function_exists($function_name))
+		if ( ( is_array($function_name) && method_exists($function_name[0], $function_name[1]) ) || method_exists($this, $function_name) || function_exists($function_name) )
 		{
 			$this->parent_function_child_exited[$bucket] = $function_name;
 			return true;
@@ -603,7 +607,7 @@ class fork_daemon
 	public function register_parent_results($function_name, $bucket = self::DEFAULT_BUCKET)
 	{
 		// call parent function
-		if ((is_array($function_name) && method_exists($function_name[0], $function_name[1])) || method_exists($this, $function_name) || function_exists($function_name))
+		if ( ( is_array($function_name) && method_exists($function_name[0], $function_name[1]) ) || method_exists($this, $function_name) || function_exists($function_name) )
 		{
 			$this->parent_function_results[$bucket] = $function_name;
 			return true;
@@ -622,7 +626,7 @@ class fork_daemon
 	public function register_logging($function_name, $severity)
 	{
 		/* call parent function */
-		if ((is_array($function_name) && method_exists($function_name[0], $function_name[1])) || method_exists($this, $function_name) || function_exists($function_name))
+		if ( ( is_array($function_name) && method_exists($function_name[0], $function_name[1]) ) || method_exists($this, $function_name) || function_exists($function_name) )
 		{
 			$this->log_function[$severity] = $function_name;
 			return true;
@@ -644,20 +648,20 @@ class fork_daemon
 
 		/* install signal handlers */
 		declare(ticks = 1);
-		pcntl_signal(SIGHUP, array(&$this, 'signal_handler_sighup'));
+		pcntl_signal(SIGHUP,  array(&$this, 'signal_handler_sighup'));
 		pcntl_signal(SIGCHLD, array(&$this, 'signal_handler_sigchild'));
 		pcntl_signal(SIGTERM, array(&$this, 'signal_handler_sigint'));
-		pcntl_signal(SIGINT, array(&$this, 'signal_handler_sigint'));
+		pcntl_signal(SIGINT,  array(&$this, 'signal_handler_sigint'));
 		pcntl_signal(SIGALRM, SIG_IGN);
 		pcntl_signal(SIGUSR2, SIG_IGN);
-		pcntl_signal(SIGBUS, SIG_IGN);
+		pcntl_signal(SIGBUS,  SIG_IGN);
 		pcntl_signal(SIGPIPE, SIG_IGN);
 		pcntl_signal(SIGABRT, SIG_IGN);
-		pcntl_signal(SIGFPE, SIG_IGN);
-		pcntl_signal(SIGILL, SIG_IGN);
+		pcntl_signal(SIGFPE,  SIG_IGN);
+		pcntl_signal(SIGILL,  SIG_IGN);
 		pcntl_signal(SIGQUIT, SIG_IGN);
 		pcntl_signal(SIGTRAP, SIG_IGN);
-		pcntl_signal(SIGSYS, SIG_IGN);
+		pcntl_signal(SIGSYS,  SIG_IGN);
 
 		/* add barracuda specific prefork functions (doesn't hurt anything) */
 		$this->parent_function_prefork = array('db_clear_connection_cache', 'memcache_clear_connection_cache');
@@ -666,7 +670,7 @@ class fork_daemon
 	/**
 	 * Destructor does not do anything.
 	 * @access public
-	 */
+	*/
 	public function __destruct()
 	{
 	}
@@ -679,7 +683,8 @@ class fork_daemon
 	 */
 	public function signal_handler_sighup($signal_number)
 	{
-		if (self::$parent_pid == getmypid()) {
+		if (self::$parent_pid == getmypid())
+		{
 			// parent received sighup
 			$this->log('parent process [' . getmypid() . '] received sighup', self::LOG_LEVEL_DEBUG);
 
@@ -687,16 +692,19 @@ class fork_daemon
 			$this->invoke_callback($this->parent_function_sighup, $parameters = array(), true);
 
 			// if cascading, send sighup to all child processes
-			if ($this->parent_function_sighup_cascade === true) {
-				foreach ($this->forked_children as $pid => $pid_info) {
-					if ($pid_info['status'] == self::STOPPED) {
-											continue;
-					}
+			if ($this->parent_function_sighup_cascade === true)
+			{
+				foreach ($this->forked_children as $pid => $pid_info)
+				{
+					if ($pid_info['status'] == self::STOPPED)
+						continue;
 					$this->log('parent process [' . getmypid() . '] sending sighup to child ' . $pid, self::LOG_LEVEL_DEBUG);
 					posix_kill($pid, SIGHUP);
 				}
 			}
-		} else {
+		}
+		else
+		{
 			// child received sighup. note a child is only in one bucket, do not loop through all buckets
 			$this->log('child process [' . getmypid() . '] received sighup with bucket type [' . $this->child_bucket . ']', self::LOG_LEVEL_DEBUG);
 			$this->invoke_callback(
@@ -719,16 +727,20 @@ class fork_daemon
 		declare(ticks = 0)
 		{
 			// reap all child zombie processes
-			if (self::$parent_pid == getmypid()) {
+			if (self::$parent_pid == getmypid())
+			{
 				$status = '';
 
-				do {
+				do
+				{
 					// get child pid that exited
 					$child_pid = pcntl_waitpid(0, $status, WNOHANG);
-					if ($child_pid > 0) {
+					if ($child_pid > 0)
+					{
 						// child exited
 						$identifier = false;
-						if (!isset($this->forked_children[$child_pid])) {
+						if (!isset($this->forked_children[$child_pid]))
+						{
 							die("Cannot find $child_pid in array!\n");
 						}
 
@@ -737,7 +749,7 @@ class fork_daemon
 
 						// call exit function if and only if its declared */
 						if ($child['status'] == self::WORKER)
-							$this->invoke_callback($this->parent_function_child_exited[$this->forked_children[$child_pid]['bucket']], array($child_pid, $this->forked_children[$child_pid]['identifier']), true);
+							$this->invoke_callback($this->parent_function_child_exited[ $this->forked_children[$child_pid]['bucket'] ], array($child_pid, $this->forked_children[$child_pid]['identifier']), true);
 
 						// stop the child pid
 						$this->forked_children[$child_pid]['status'] = self::STOPPED;
@@ -781,16 +793,16 @@ class fork_daemon
 		$this->received_exit_request(true);
 
 		// kill child processes
-		if (self::$parent_pid == getmypid()) {
-			foreach ($this->forked_children as $pid => &$pid_info) {
-				if ($pid_info['status'] == self::STOPPED) {
-									continue;
-				}
+		if (self::$parent_pid == getmypid())
+		{
+			foreach ($this->forked_children as $pid => &$pid_info)
+			{
+				if ($pid_info['status'] == self::STOPPED)
+					continue;
 
 				// tell helpers not to respawn
-				if ($pid_info['status'] == self::HELPER) {
-									$pid_info['respawn'] = false;
-				}
+				if ($pid_info['status'] == self::HELPER)
+					$pid_info['respawn'] = false;
 
 				$this->log('requesting child exit for pid: ' . $pid, self::LOG_LEVEL_INFO);
 				posix_kill($pid, SIGINT);
@@ -804,12 +816,14 @@ class fork_daemon
 			$start_time = time();
 
 			// wait for child processes to go away
-			while ($this->forked_children_count > 0) {
-				if (time() > ($start_time + $this->children_max_timeout)) {
-					foreach ($this->forked_children as $pid => $child) {
-						if ($child['status'] == self::STOPPED) {
-													continue;
-						}
+			while ($this->forked_children_count > 0)
+			{
+				if (time() > ($start_time + $this->children_max_timeout))
+				{
+					foreach ($this->forked_children as $pid => $child)
+					{
+						if ($child['status'] == self::STOPPED)
+							continue;
 
 						$this->log('force killing child pid: ' . $pid, self::LOG_LEVEL_INFO);
 						posix_kill($pid, SIGKILL);
@@ -818,7 +832,9 @@ class fork_daemon
 						$this->forked_children[$pid]['status'] = self::STOPPED;
 						$this->forked_children_count--;
 					}
-				} else {
+				}
+				else
+				{
 					$this->log('waiting ' . ($start_time + $this->children_max_timeout - time()) . ' seconds for ' . $this->forked_children_count . ' children to clean up', self::LOG_LEVEL_INFO);
 					sleep(1);
 					$this->housekeeping_check();
@@ -827,11 +843,12 @@ class fork_daemon
 
 			// make call back to parent exit function if it exists
 			$this->invoke_callback($this->parent_function_exit, $parameters = array(self::$parent_pid), true);
-		} else {
+		}
+		else
+		{
 			// invoke child cleanup callback
-			if (isset($this->child_bucket)) {
-							$this->invoke_callback($this->child_function_exit[$this->child_bucket], $parameters = array($this->child_bucket), true);
-			}
+			if (isset($this->child_bucket))
+				$this->invoke_callback($this->child_function_exit[$this->child_bucket], $parameters = array($this->child_bucket), true);
 		}
 
 		exit(-1);
@@ -841,7 +858,7 @@ class fork_daemon
 	 * Check or set if we have recieved an exit request
 	 *
 	 * @param boolen $requested (optional) have we received the request
-	 * @return boolean exit request status
+	 * @return current exit request status
 	 */
 	public function received_exit_request($requested = null)
 	{
@@ -852,7 +869,7 @@ class fork_daemon
 		}
 
 		// ensure we have good data, or set to false if not
-		if (!is_bool($requested))
+		if (! is_bool($requested))
 		{
 			$requested = false;
 		}
@@ -872,7 +889,7 @@ class fork_daemon
 	public function addwork(array $new_work_units, $identifier = '', $bucket = self::DEFAULT_BUCKET, $sort_queue = false)
 	{
 		// ensure bucket is setup before we try to add data to it
-		if (!array_key_exists($bucket, $this->work_units))
+		if (! array_key_exists($bucket, $this->work_units))
 			$this->add_bucket($bucket);
 
 		// add to queue to send
@@ -907,8 +924,10 @@ class fork_daemon
 	 */
 	public function is_work_running($identifier, $bucket = self::DEFAULT_BUCKET)
 	{
-		foreach ($this->forked_children as $info) {
-			if (($info['status'] != self::STOPPED) && ($info['identifier'] == $identifier) && ($info['bucket'] == $bucket)) {
+		foreach ($this->forked_children as $info)
+		{
+			if (($info['status'] != self::STOPPED) && ($info['identifier'] == $identifier) && ($info['bucket'] == $bucket))
+			{
 				return true;
 			}
 		}
@@ -925,10 +944,10 @@ class fork_daemon
 	public function work_running($bucket = self::DEFAULT_BUCKET)
 	{
 		$results = array();
-		foreach ($this->forked_children as $pid => $child) {
-			if ($child['status'] != self::STOPPED) {
-							$results[$pid] = $child;
-			}
+		foreach ($this->forked_children as $pid => $child)
+		{
+			if ($child['status'] != self::STOPPED)
+				$results[$pid] = $child;
 		}
 		return $results;
 	}
@@ -943,10 +962,10 @@ class fork_daemon
 	{
 		$bucket_list = array();
 
-		foreach ($this->buckets as $bucket_id)
+		foreach($this->buckets as $bucket_id)
 		{
 			// skip the default bucket if ignored
-			if (($include_default_bucket === false) && ($bucket_id === self::DEFAULT_BUCKET))
+			if ( ($include_default_bucket === false) && ($bucket_id === self::DEFAULT_BUCKET) )
 				continue;
 
 			$bucket_list[] = $bucket_id;
@@ -982,7 +1001,7 @@ class fork_daemon
 		if ($process_all_buckets === true)
 		{
 			$count = 0;
-			foreach ($this->buckets as $bucket_slot)
+			foreach($this->buckets as $bucket_slot)
 			{
 				$count += count($this->work_units[$bucket_slot]);
 			}
@@ -1021,18 +1040,20 @@ class fork_daemon
 		$this->signal_handler_sigchild(SIGCHLD);
 
 		// return global count if bucket is default
-		if ($bucket == self::DEFAULT_BUCKET) {
-					return ($show_pending ? count($this->forked_children) : $this->forked_children_count);
-		}
+		if ($bucket == self::DEFAULT_BUCKET)
+			return ($show_pending ? count($this->forked_children) : $this->forked_children_count);
 
 		// count within the specified bucket
 		$count = 0;
-		foreach ($this->forked_children as $child) {
-			if ($show_pending) {
-				if ($child['bucket'] == $bucket) {
-									$count++;
-				}
-			} else if (($child['bucket'] == $bucket) && ($child['status'] != self::STOPPED)) {
+		foreach ($this->forked_children as $child)
+		{
+			if ($show_pending)
+			{
+				if ($child['bucket'] == $bucket)
+					$count++;
+			}
+			else if (($child['bucket'] == $bucket) && ($child['status'] != self::STOPPED))
+			{
 				$count++;
 			}
 		}
@@ -1045,7 +1066,7 @@ class fork_daemon
 	 * work sets that have not been allocated.  Children running includes those
 	 * that have not had their results retrieved yet.
 	 *
-	 * @param integer $bucket The bucket to check for pending children items
+	 * @param type $bucket The bucket to check for pending children items
 	 * @return int Number of pending children items
 	 */
 	public function children_pending($bucket = self::DEFAULT_BUCKET)
@@ -1073,12 +1094,13 @@ class fork_daemon
 	 * @access public
 	 * @param string $function_name helper function to call
 	 * @param array $arguments function arguments
-	 * @param string $idenfifier helper process unique identifier
+	 * @param string $identifier helper process unique identifier
 	 * @param bool $respawn whether to respawn the helper process when it dies
 	 */
 	public function helper_process_spawn($function_name, $arguments = array(), $idenfifier = '', $respawn = true)
 	{
-		if ((is_array($function_name) && method_exists($function_name[0], $function_name[1])) || function_exists($function_name)) {
+		if ((is_array($function_name) && method_exists($function_name[0], $function_name[1])) || function_exists($function_name))
+		{
 			// init the IPC sockets
 			list($socket_child, $socket_parent) = $this->ipc_init();
 
@@ -1086,9 +1108,12 @@ class fork_daemon
 			declare(ticks = 0);
 			$pid = pcntl_fork();
 
-			if ($pid == -1) {
+			if ($pid == -1)
+			{
 				die("Forking error!\n");
-			} elseif ($pid == 0) {
+			}
+			elseif ($pid == 0)
+			{
 				/*
 				 * Child process
 				 */
@@ -1106,7 +1131,9 @@ class fork_daemon
 				self::socket_send($socket_parent, $result);
 
 				exit(0);
-			} else {
+			}
+			else
+			{
 				/*
 				 * Parent process
 				 */
@@ -1131,7 +1158,9 @@ class fork_daemon
 				);
 				$this->forked_children_count++;
 			}
-		} else {
+		}
+		else
+		{
 			$this->log("Unable to spawn undefined helper function '" . $function_name . "'", self::LOG_LEVEL_CRIT);
 		}
 	}
@@ -1143,12 +1172,12 @@ class fork_daemon
 	 */
 	public function helper_process_respawn($identifier)
 	{
-		if ($identifier == '') {
-			return false;
-		}
+		if ($identifier == '') return false;
 
-		foreach ($this->forked_children as $pid => $child) {
-			if ($child['status'] == self::HELPER && $child['identifier'] == $identifier) {
+		foreach ($this->forked_children as $pid => $child)
+		{
+			if ($child['status'] == self::HELPER && $child['identifier'] == $identifier)
+			{
 				$this->log('Forcing helper process \'' . $identifier . '\' with pid ' . $pid . ' to respawn', self::LOG_LEVEL_INFO);
 				posix_kill($pid, SIGKILL);
 			}
@@ -1166,13 +1195,13 @@ class fork_daemon
 	 */
 	public function kill_child_pid($pids, $kill_delay = 30)
 	{
-		if (!is_array($pids)) $pids = array($pids);
+		if (! is_array($pids)) $pids = array($pids);
 
 		// send int sigs to the children
 		foreach ($pids as $index => $pid)
 		{
 			// make sure we own this pid
-			if (!array_key_exists($pid, $this->forked_children) || $this->forked_children[$pid]['status'] == self::STOPPED)
+			if (! array_key_exists($pid, $this->forked_children) || $this->forked_children[$pid]['status'] == self::STOPPED)
 			{
 				$this->log('Skipping kill request on pid ' . $pid . ' because we dont own it', self::LOG_LEVEL_INFO);
 				unset($pids[$index]);
@@ -1188,17 +1217,21 @@ class fork_daemon
 		$time = 0;
 
 		// make sure the children exit
-		while ((count($pids) > 0) && ($time >= $kill_delay)) {
-			foreach ($pids as $index => $pid) {
+		while ((count($pids) > 0) && ($time >= $kill_delay))
+		{
+			foreach ($pids as $index => $pid)
+			{
 				// check if the pid exited gracefully
-				if ($this->forked_children[$pid]['status'] == self::STOPPED) {
+				if ($this->forked_children[$pid]['status'] == self::STOPPED)
+				{
 					$this->log('Pid ' . $pid . ' has exited gracefully', self::LOG_LEVEL_INFO);
 					unset($pids[$index]);
 					continue;
 				}
 
 				$time = microtime(true) - $request_time;
-				if ($time < $kill_delay) {
+				if ($time < $kill_delay)
+				{
 					$this->log('Waiting ' . round($time, 0) . ' seconds for ' . count($pids) . ' to exit gracefully', self::LOG_LEVEL_INFO);
 					sleep(1);
 					continue;
@@ -1233,7 +1266,7 @@ class fork_daemon
 		// process work on all buckets if desired
 		if ($process_all_buckets === true)
 		{
-			foreach ($this->buckets as $bucket_slot)
+			foreach($this->buckets as $bucket_slot)
 			{
 				$this->process_work($blocking, $bucket_slot, false);
 			}
@@ -1247,7 +1280,7 @@ class fork_daemon
 			while ($this->work_sets_count($bucket) > 0)
 			{
 				// check to make sure we have not hit or exceded the max children (globally or within the bucket)
-				while ($this->children_running($bucket) >= $this->max_children[$bucket])
+				while ( $this->children_running($bucket) >= $this->max_children[$bucket] )
 				{
 					$this->housekeeping_check();
 					$this->signal_handler_sigchild(SIGCHLD);
@@ -1258,7 +1291,8 @@ class fork_daemon
 			}
 
 			// wait until work finishes
-			while ($this->children_running($bucket) > 0) {
+			while ($this->children_running($bucket) > 0)
+			{
 				sleep(1);
 				$this->housekeeping_check();
 				$this->signal_handler_sigchild(SIGCHLD);
@@ -1270,7 +1304,7 @@ class fork_daemon
 		else
 		{
 			// fork children until max
-			while ($this->children_running($bucket) < $this->max_children[$bucket])
+			while ( $this->children_running($bucket) < $this->max_children[$bucket] )
 			{
 				if ($this->work_sets_count($bucket) == 0)
 					return true;
@@ -1286,7 +1320,7 @@ class fork_daemon
 	 * Returns the first result available from the bucket.  This will run
 	 * a non-blocking poll of the children for updated results.
 	 *
-	 * @param integer $bucket The bucket to check
+	 * @param string $bucket The bucket to check
 	 * @return mixed The data retrieved from a child process on the buckets
 	 */
 	public function get_result($bucket = self::DEFAULT_BUCKET)
@@ -1294,7 +1328,7 @@ class fork_daemon
 		// check for additional results
 		$this->post_results($bucket);
 
-		if (!$this->has_result($bucket))
+		if (! $this->has_result($bucket))
 			return null;
 
 		return array_shift($this->results[$bucket]);
@@ -1304,7 +1338,7 @@ class fork_daemon
 	 * Returns all the results currently in the results queue.  This will
 	 * run a non-blocking poll of the children for updated results.
 	 *
-	 * @param integer $bucket The bucket to retrieves results
+	 * @param string $bucket The bucket to retrieves results
 	 * @return mixed Array of results from each child that has finished.
 	 */
 	public function get_all_results($bucket = self::DEFAULT_BUCKET)
@@ -1312,7 +1346,7 @@ class fork_daemon
 		// check for additional results
 		$this->post_results($bucket);
 
-		if (!$this->has_result($bucket))
+		if (! $this->has_result($bucket))
 			return array();
 
 		$results = $this->results[$bucket];
@@ -1325,21 +1359,21 @@ class fork_daemon
 	 * Checks if there is a result on the bucket.  Before checking,
 	 * runs a non-blocking poll of the children for updated results.
 	 *
-	 * @param integer $bucket The bucket to check
-	 * @return boolean Returns true if there is a result
+	 * @param string $bucket The bucket to check
+	 * @return int Returns true if there is a result
 	 */
 	public function has_result($bucket = self::DEFAULT_BUCKET)
 	{
 		// check for additional results
 		$this->post_results($bucket);
 
-		return (!empty($this->results[$bucket]));
+		return (! empty($this->results[$bucket]));
 	}
 
 	/**
 	 * Checks if any changed child sockets are in the bucket.
 	 *
-	 * @param integer $bucket The bucket to get results in
+	 * @param type $bucket The bucket to get results in
 	 * @return type Returns the number of changed sockets for children workers in $bucket,
 	 * or empty array if none.
 	 */
@@ -1356,7 +1390,7 @@ class fork_daemon
 				$sockets[$pid] = $child['socket'];
 		}
 
-		if (!empty($sockets))
+		if (! empty($sockets))
 		{
 			// find changed sockets and return the array of them
 			$result = @socket_select($sockets, $write_dummy, $exception_dummy, $timeout);
@@ -1375,7 +1409,7 @@ class fork_daemon
 	 * NOTE: This must be polled to check for changed sockets.
 	 *
 	 * @param type $blocking Set to true to block until a result comes in
-	 * @param integer $bucket The bucket to look in
+	 * @param type $bucket The bucket to look in
 	 * @return type The result of the child worker
 	 */
 	private function fetch_results($blocking = true, $timeout = 0, $bucket = self::DEFAULT_BUCKET)
@@ -1393,7 +1427,7 @@ class fork_daemon
 				foreach ($ready_sockets as $pid => $socket)
 				{
 					$result = $this->socket_receive($socket);
-					if ($result !== false && (!is_null($result)))
+					if ($result !== false && (! is_null($result)))
 					{
 						$this->forked_children[$pid]['last_active'] = $start;
 						$results[$pid] = $result;
@@ -1403,8 +1437,10 @@ class fork_daemon
 
 			// clean up forked children that have stopped and did not have recently
 			// active sockets.
-			foreach ($this->forked_children as $pid => &$child) {
-				if (isset($child['last_active']) && ($child['last_active'] < $start) && ($child['status'] == self::STOPPED)) {
+			foreach ($this->forked_children as $pid => &$child)
+			{
+				if (isset($child['last_active']) && ($child['last_active'] < $start) && ($child['status'] == self::STOPPED))
+				{
 					// close the socket from the parent
 					unset($this->forked_children[$pid]);
 				}
@@ -1416,7 +1452,7 @@ class fork_daemon
 				return $results;
 
 			// return null if not blocking and we haven't seen results
-			if (!$blocking)
+			if (! $blocking)
 			{
 				return $results;
 			}
@@ -1434,8 +1470,8 @@ class fork_daemon
 	 *
 	 * NOTE: This should be polled to update results.
 	 *
-	 * @param integer $bucket The bucket to post the results in
-	 * @return boolean Returns true on successfully posting results, even if none
+	 * @param type $bucket The bucket to post the results in
+	 * @return type Returns true on successfully posting results, even if none
 	 * to post.  Returns false on error from this function or error from
 	 * the $this->parent_function_results callback.
 	 */
@@ -1446,7 +1482,7 @@ class fork_daemon
 		if (is_array($results) && empty($results))
 			return true;
 
-		if (!empty($this->parent_function_results[$bucket]))
+		if (! empty($this->parent_function_results[$bucket]))
 		{
 			if ($this->invoke_callback($this->parent_function_results[$bucket], array($results), true) === false)
 				return false;
@@ -1472,19 +1508,22 @@ class fork_daemon
 	{
 		$child_work_units = array_splice($this->work_units[$bucket], 0, $this->max_work_per_child[$bucket]);
 
-		if (count($child_work_units) > 0) {
-			if ($this->child_single_work_item[$bucket]) {
+		if (count($child_work_units) > 0)
+		{
+			if ($this->child_single_work_item[$bucket])
+			{
 				// break out identifier and unit
 				list($child_identifier, $child_work_unit) = each($child_work_units);
 
 				// strip preceeding 'id-' from the identifier
-				if (strpos($child_identifier, 'id-') === 0) {
-									$child_identifier = substr($child_identifier, 3);
-				}
+				if (strpos($child_identifier, 'id-') === 0)
+					$child_identifier = substr($child_identifier, 3);
 
 				// process work unit
 				$this->fork_work_unit(array($child_work_unit, $child_identifier), $child_identifier, $bucket);
-			} else {
+			}
+			else
+			{
 				$this->fork_work_unit(array($child_work_units), '', $bucket);
 			}
 		}
@@ -1507,7 +1546,8 @@ class fork_daemon
 	private function fork_work_unit($work_unit, $identifier = '', $bucket = self::DEFAULT_BUCKET)
 	{
 		// prefork callback
-		foreach ($this->parent_function_prefork as $function) {
+		foreach ($this->parent_function_prefork as $function)
+		{
 			$this->invoke_callback($function, array(), true);
 		}
 
@@ -1520,14 +1560,17 @@ class fork_daemon
 		// spoon!
 		$pid = pcntl_fork();
 
-		if ($pid == -1) {
+		if ($pid == -1)
+		{
 			/**
 			 * Fork Error
 			 */
 
 			$this->log('failed to fork', self::LOG_LEVEL_CRIT);
 			return false;
-		} elseif ($pid) {
+		}
+		elseif ($pid)
+		{
 			/**
 			 * Parent Process
 			 */
@@ -1554,7 +1597,9 @@ class fork_daemon
 
 			// parent spawned child callback
 			$this->invoke_callback($this->parent_function_fork[$bucket], $parameters = array($pid, $identifier), true);
-		} else {
+		}
+		else
+		{
 			/**
 			 * Child Process
 			 */
@@ -1598,7 +1643,8 @@ class fork_daemon
 	 */
 	private function housekeeping_check()
 	{
-		if ((time() - $this->housekeeping_last_check) >= $this->housekeeping_check_interval) {
+		if ((time() - $this->housekeeping_last_check) >= $this->housekeeping_check_interval)
+		{
 			// check to make sure no children are violating the max run time
 			$this->kill_maxtime_violators();
 
@@ -1616,12 +1662,13 @@ class fork_daemon
 	 */
 	private function kill_maxtime_violators()
 	{
-		foreach ($this->forked_children as $pid => $pid_info) {
-			if ($pid_info['status'] == self::STOPPED) {
-							continue;
-			}
+		foreach ($this->forked_children as $pid => $pid_info)
+		{
+			if ($pid_info['status'] == self::STOPPED)
+				continue;
 
-			if ((time() - $pid_info['ctime']) > $this->child_max_run_time[$pid_info['bucket']]) {
+			if ((time() - $pid_info['ctime']) > $this->child_max_run_time[$pid_info['bucket']])
+			{
 				$this->log('Force kill ' . $pid . ' has run too long', self::LOG_LEVEL_INFO);
 
 				// notify app that child process timed out
@@ -1657,7 +1704,7 @@ class fork_daemon
 			if (!is_array($parameters)) $parameters = array($parameters);
 			return call_user_func_array($function_name, $parameters);
 		}
-		elseif (method_exists($this, $function_name))
+		elseif (method_exists($this, $function_name) )
 		{
 			if (!is_array($parameters)) $parameters = array($parameters);
 			return call_user_func_array($this->$function_name, $parameters);
@@ -1687,7 +1734,8 @@ class fork_daemon
 
 		// create a socket pair for IPC
 		$sockets = array();
-		if (socket_create_pair($domain, SOCK_STREAM, 0, $sockets) === false) {
+		if (socket_create_pair($domain, SOCK_STREAM, 0, $sockets) === false)
+		{
 			$this->log('socket_create_pair failed: ' . socket_strerror(socket_last_error()), self::LOG_LEVEL_CRIT);
 			return false;
 		}
@@ -1701,12 +1749,13 @@ class fork_daemon
 	 *
 	 * @param type $socket The socket to send the message on
 	 * @param type $message The serializable message to send
-	 * @return boolean Returns true on success, false on failure
+	 * @return type Returns true on success, false on failure
 	 */
 	private function socket_send($socket, $message)
 	{
 		$serialized_message = @serialize($message);
-		if ($serialized_message == false) {
+		if ($serialized_message == false)
+		{
 			$this->log('socket_send failed to serialize message', self::LOG_LEVEL_CRIT);
 			return false;
 		}
@@ -1714,9 +1763,11 @@ class fork_daemon
 		$header = pack('N', strlen($serialized_message));
 		$data = $header . $serialized_message;
 		$bytes_left = strlen($data);
-		while ($bytes_left > 0) {
+		while ($bytes_left > 0)
+		{
 			$bytes_sent = @socket_write($socket, $data);
-			if ($bytes_sent === false) {
+			if ($bytes_sent === false)
+			{
 				$this->log('socket_send error: ' . socket_strerror(socket_last_error()), self::LOG_LEVEL_CRIT);
 				return false;
 			}
@@ -1742,22 +1793,24 @@ class fork_daemon
 		$bytes_read = 0;
 		$have_header = false;
 		$socket_message = '';
-		while ($bytes_read < $bytes_total) {
+		while ($bytes_read < $bytes_total)
+		{
 			$read = @socket_read($socket, $bytes_total - $bytes_read);
-			if ($read === false) {
+			if ($read === false)
+			{
 				$this->log('socket_receive error: ' . socket_strerror(socket_last_error()), self::LOG_LEVEL_CRIT);
 				return false;
 			}
 
 			// blank socket_read means done
-			if ($read == '') {
-							break;
-			}
+			if ($read == '')
+				break;
 
 			$bytes_read += strlen($read);
 			$socket_message .= $read;
 
-			if (!$have_header && $bytes_read >= self::SOCKET_HEADER_SIZE) {
+			if (!$have_header && $bytes_read >= self::SOCKET_HEADER_SIZE)
+			{
 				$have_header = true;
 				list($bytes_total) = array_values(unpack('N', $socket_message));
 				$bytes_read = 0;
@@ -1780,15 +1833,20 @@ class fork_daemon
 	 */
 	private function log($message, $severity)
 	{
-		if (!empty($this->log_function)) {
-			if (isset($this->log_function[$severity])) {
+		if (!empty($this->log_function))
+		{
+			if (isset($this->log_function[$severity]))
+			{
 				return call_user_func($this->log_function[$severity], $message);
-			} elseif (isset($this->log_function[self::LOG_LEVEL_ALL])) {
+			}
+			elseif (isset($this->log_function[self::LOG_LEVEL_ALL]))
+			{
 				return call_user_func($this->log_function[self::LOG_LEVEL_ALL], $message);
 			}
 		}
 		// Barracuda specific logging class, to keep internal code working
-		elseif (method_exists('Log', 'message')) {
+		elseif (method_exists('Log', 'message'))
+		{
 			return Log::message($message, $severity);
 		}
 

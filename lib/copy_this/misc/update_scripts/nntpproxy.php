@@ -10,7 +10,7 @@ $pdo = new DB();
 $t = new \Tmux();
 $tmux = $t->get();
 $powerline = (isset($tmux->powerline)) ? $tmux->powerline : 0;
-$s = new Sites();
+$s= new Sites();
 $site = $s->get();
 
 $tmux_session = 'NNTPProxy';
@@ -51,7 +51,7 @@ function window_proxy($tmux_session, $powerline)
 		$nntpproxypy = $DIR . "update_scripts/nix_scripts/_tmux/python/nntpproxy.py";
 		if (file_exists($DIR . "update_scripts/nix_scripts/tmux//python/lib/nntpproxy.conf")) {
 			$nntpproxyconf = $DIR . "update_scripts/nix_scripts/tmux/python/lib/nntpproxy.conf";
-			shell_exec("cd ${dir}/update_scripts/nix_scripts/tmux; tmux -f $tmuxconfig attach-session -t $tmux_session || tmux -f $tmuxconfig new-session -d -s $tmux_session -n NNTPProxy 'printf \"\033]2;\"NNTPProxy\"\033\" && python $nntpproxypy $nntpproxyconf'");
+			shell_exec("cd ${DIR}/update_scripts/nix_scripts/tmux; tmux -f $tmuxconfig attach-session -t $tmux_session || tmux -f $tmuxconfig new-session -d -s $tmux_session -n NNTPProxy 'printf \"\033]2;\"NNTPProxy\"\033\" && python $nntpproxypy $nntpproxyconf'");
 		}
 	}
 

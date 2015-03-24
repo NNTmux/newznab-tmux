@@ -1,7 +1,7 @@
 <?php
 
 require_once(WWW_DIR . "../misc/update_scripts/nix_scripts/tmux/lib/simple_html_dom.php");
-require_once(WWW_DIR . "/lib/util.php");
+require_once(WWW_DIR."/lib/util.php");
 
 class Desura
 {
@@ -120,7 +120,7 @@ class Desura
 	{
 			if ($this->_ret = $this->_html->find("img[alt=Boxshot]", 0)) {
 				$this->_ret->src = preg_replace('#cache/#', '', $this->_ret->src);
-				$this->_ret->src = preg_replace('#thumb_150x150/#', '', $this->_ret->src);
+				$this->_ret->src = preg_replace('#thumb_150x150/#','',$this->_ret->src);
 				$this->_res['cover'] = $this->_ret->src;
 			}
 
@@ -196,8 +196,8 @@ class Desura
 			$this->searchTerm = preg_replace('#\s#', '-', strtolower($this->searchTerm));
 			if ($this->getUrl(self::DESURAURL . '/games/' . $this->searchTerm) !== false) {
 				if (!preg_match('#(Games system error)#i', $this->_response)) {
-					if ($this->_ret = $this->_html->find("a#watchtoggle", 0)) {
-						if (preg_match('#siteareaid=(?<gameid>\d+)#', $this->_ret->href, $matches)) {
+					if($this->_ret = $this->_html->find("a#watchtoggle", 0)){
+						if(preg_match('#siteareaid=(?<gameid>\d+)#', $this->_ret->href, $matches)){
 							$this->_desuraGameID = $matches['gameid'];
 							$this->_directURL = self::DESURAURL . '/games/' . $this->searchTerm;
 							$result = true;

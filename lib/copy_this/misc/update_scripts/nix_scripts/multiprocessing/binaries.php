@@ -4,7 +4,7 @@ if (!isset($argv[1]) || !is_numeric($argv[1])) {
 		'Argument 1 => (Number) Set to 0 to ignore, else fetches up to x new headers for every active group.' . PHP_EOL
 	);
 }
-declare(ticks = 1);
+declare(ticks=1);
 require('.do_not_run/require.php');
 require_once('Forking.php');
 (new \Forking())->processWorkType('binaries', array(0 => $argv[1]));

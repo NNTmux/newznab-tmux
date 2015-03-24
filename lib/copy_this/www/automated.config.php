@@ -23,7 +23,7 @@ define('NN_MISC', NN_WWW . '..' . DS . 'misc' . DS);
 define('NN_UPDATE', NN_MISC . 'update_scripts' . DS);
 
 //Refers to nix_scripts folder
-define('NN_NIX', NN_UPDATE . 'nix_scripts' . DS);
+define('NN_NIX', NN_UPDATE . 'nix_scripts' . DS );
 
 //Refers to multiprocessing folder
 define('NN_MULTI', NN_NIX . 'multiprocessing' . DS);
@@ -32,7 +32,7 @@ define('NN_MULTI', NN_NIX . 'multiprocessing' . DS);
 define('NN_TMUX', NN_NIX . 'tmux' . DS);
 
 // Refers to the covers folder
-define('NN_COVERS', NN_WWW . 'covers' . DS);
+define('NN_COVERS', NN_WWW . 'covers' .DS);
 
 // Used to refer to the resources folder
 define('NN_RES', NN_ROOT . 'resources' . DS);

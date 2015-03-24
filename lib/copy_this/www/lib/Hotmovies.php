@@ -113,7 +113,7 @@ class Hotmovies
 			$ch = curl_init($this->directLink);
 			$this->directLink = "";
 		}
-		if ($usepost === true) {
+		if ($usepost === true){
 			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
 			curl_setopt($ch, CURLOPT_POST, 1);
 			curl_setopt($ch, CURLOPT_POSTFIELDS, $this->_postParams);
@@ -190,9 +190,9 @@ class Hotmovies
 			$results = array_merge($results, $this->covers());
 		}
 
-		if (empty($results) === true) {
+		if (empty($results) === true){
 			return false;
-		} else {
+		}else{
 			return $results;
 		}
 	}
@@ -205,7 +205,7 @@ class Hotmovies
 	public function sypnosis()
 	{
 		if ($this->_html->find('.desc_link', 0)) {
-			preg_match("/var descfullcontent = (?<content>.*)/", $this->_response, $matches);
+			preg_match("/var descfullcontent = (?<content>.*)/", $this->_response,$matches);
 			if (is_array($matches)) {
 				$this->_res['sypnosis'] = rawurldecode($matches['content']);
 			}
@@ -274,7 +274,7 @@ class Hotmovies
 		if ($this->_html->find('a[itemprop=actor]')) {
 			foreach ($this->_html->find('a[itemprop=actor]') as $e) {
 				$e = trim($e->title);
-				$e = preg_replace('/\((.*)\)/', "", $e);
+				$e = preg_replace('/\((.*)\)/',"",$e);
 				$cast[] = trim($e);
 			}
 			$this->_res['cast'] = & $cast;
@@ -292,10 +292,10 @@ class Hotmovies
 	public function genres()
 	{
 		$genres = array();
-		if ($ret = $this->_html->find('div.categories', 0)) {
+		if ($ret = $this->_html->find('div.categories',0)) {
 			foreach ($ret->find('a') as $e) {
 				if (stristr($e->title, "->")) {
-					$e = explode("->", $e->plaintext);
+					$e = explode("->",$e->plaintext);
 					$genres[] = trim($e[1]);
 				}
 			}
@@ -315,7 +315,7 @@ class Hotmovies
 		if ($ret = $this->_html->find('div#large_cover, img#cover', 1)) {
 			$this->_res['boxcover'] = trim($ret->src);
 			$this->_res['backcover'] = str_ireplace(".cover", ".back", trim($ret->src));
-		} else {
+		}else{
 			return false;
 		}
 
@@ -336,7 +336,7 @@ class Hotmovies
 			return false;
 		} else {
 			if ($ret = $this->_html->find('h3[class=title]', 0)) {
-				if ($ret->find('a[title]', 0)) {
+				if ($ret->find('a[title]',0)){
 					$ret = $ret->find('a[title]', 0);
 					$title = trim($ret->title);
 					$title = preg_replace('/XXX/', '', $title);

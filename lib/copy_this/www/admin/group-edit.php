@@ -1,9 +1,9 @@
 <?php
 
 require_once("config.php");
-require_once(WWW_DIR . "/lib/adminpage.php");
-require_once(WWW_DIR . "/lib/groups.php");
-require_once(WWW_DIR . "/lib/category.php");
+require_once(WWW_DIR."/lib/adminpage.php");
+require_once(WWW_DIR."/lib/groups.php");
+require_once(WWW_DIR."/lib/category.php");
 
 $page = new AdminPage();
 $groups = new Groups(['Settings' => $page->settings]);
@@ -12,7 +12,7 @@ $id = 0;
 // Set the current action.
 $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view';
 
-switch ($action) {
+switch($action) {
 	case 'submit':
 		if ($_POST["id"] == "") {
 			// Add a new group.
@@ -21,7 +21,7 @@ switch ($action) {
 			// Update an existing group.
 			$groups->update($_POST);
 		}
-		header("Location:" . WWW_TOP . "/group-list.php");
+		header("Location:".WWW_TOP."/group-list.php");
 		break;
 
 	case 'view':
@@ -45,8 +45,8 @@ switch ($action) {
 		break;
 }
 
-$page->smarty->assign('yesno_ids', array(1, 0));
-$page->smarty->assign('yesno_names', array('Yes', 'No'));
+$page->smarty->assign('yesno_ids', array(1,0));
+$page->smarty->assign('yesno_names', array( 'Yes', 'No'));
 
 $page->content = $page->smarty->fetch('group-edit.tpl');
 $page->render();

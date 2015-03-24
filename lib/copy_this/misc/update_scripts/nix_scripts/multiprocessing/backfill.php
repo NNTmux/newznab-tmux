@@ -1,5 +1,5 @@
 <?php
-declare(ticks = 1);
+declare(ticks=1);
 require('.do_not_run/require.php');
 require_once('Forking.php');
 // Check if argument 1 is numeric, which is to limit article count.

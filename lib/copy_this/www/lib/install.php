@@ -3,7 +3,7 @@
 /**
  * Structure for holding data during install.
  */
-class Install
+class Install 
 {
 	public $DB_TYPE;
 	public $DB_HOST = "localhost";
@@ -75,20 +75,20 @@ class Install
 	/**
 	 * Default constructor.
 	 */
-	function Install()
+	function Install() 
 	{
 		$this->WWW_DIR = dirname(realpath('.'));
-		$this->SMARTY_DIR = $this->WWW_DIR . '/lib/smarty';
-		$this->DB_DIR = dirname(realpath('..')) . '/db';
-		$this->MISC_DIR = dirname(realpath('..')) . '/misc';
-		$this->NZB_PATH = str_replace('\\', '/', dirname(realpath('..'))) . '/nzbfiles/';
-		$this->INSTALL_DIR = $this->WWW_DIR . '/install';
+		$this->SMARTY_DIR = $this->WWW_DIR.'/lib/smarty';
+		$this->DB_DIR = dirname(realpath('..')).'/db';
+		$this->MISC_DIR = dirname(realpath('..')).'/misc';
+		$this->NZB_PATH = str_replace('\\', '/', dirname(realpath('..'))).'/nzbfiles/';
+		$this->INSTALL_DIR = $this->WWW_DIR.'/install';
 	}
 	
 	/**
 	 * Save this structure in session.
 	 */
-	public function setSession()
+	public function setSession() 
 	{
 		$_SESSION['cfg'] = serialize($this);
 	}
@@ -96,7 +96,7 @@ class Install
 	/**
 	 * Return this structure from session.
 	 */
-	public function getSession()
+	public function getSession() 
 	{
 		$tmpCfg = unserialize($_SESSION['cfg']);
 		$tmpCfg->error = false;
@@ -107,7 +107,7 @@ class Install
 	/**
 	 * Determine if this structure has been populated.
 	 */
-	public function isInitialized()
+	public function isInitialized() 
 	{
 		return (isset($_SESSION['cfg']) && is_object(unserialize($_SESSION['cfg'])));
 	}
@@ -115,21 +115,22 @@ class Install
 	/**
 	 * Determine if this installation has already been installed, and .lock file is present.
 	 */
-	public function isLocked()
+	public function isLocked() 
 	{
-		return (file_exists($this->INSTALL_DIR . '/install.lock') ? true : false);
+		return (file_exists($this->INSTALL_DIR.'/install.lock') ? true : false);
 	}
 	
 	/**
 	 * Populate default config values from provided string.
 	 */
-	public function setConfig($tmpCfg)
+	public function setConfig($tmpCfg) 
 	{
 		preg_match_all('/define\((.*?)\)/i', $tmpCfg, $matches);
 		$defines = $matches[1];
-		foreach ($defines as $define) {
+		foreach ($defines as $define) 
+		{
 			$define = str_replace('\'', '', $define);
-			list($defName, $defVal) = explode(',', $define);
+			list($defName,$defVal) = explode(',', $define);
 			$this->{$defName} = trim($defVal);
 		}
 	}
@@ -137,9 +138,9 @@ class Install
 	/**
 	 * Write the config file to disk.
 	 */
-	public function saveConfig()
+	public function saveConfig() 
 	{
-		$tmpCfg = file_get_contents($this->INSTALL_DIR . '/config.php.tpl');
+		$tmpCfg = file_get_contents($this->INSTALL_DIR.'/config.php.tpl');
 		$tmpCfg = str_replace('%%DB_HOST%%', $this->DB_HOST, $tmpCfg);
 		$tmpCfg = str_replace('%%DB_USER%%', $this->DB_USER, $tmpCfg);
 		$tmpCfg = str_replace('%%DB_PORT%%', $this->DB_PORT, $tmpCfg);
@@ -151,19 +152,19 @@ class Install
 		$tmpCfg = str_replace('%%NNTP_PASSWORD%%', $this->NNTP_PASSWORD, $tmpCfg);
 		$tmpCfg = str_replace('%%NNTP_SERVER%%', $this->NNTP_SERVER, $tmpCfg);
 		$tmpCfg = str_replace('%%NNTP_PORT%%', $this->NNTP_PORT, $tmpCfg);
-		$tmpCfg = str_replace('%%NNTP_SSLENABLED%%', ($this->NNTP_SSLENABLED ? "true" : "false"), $tmpCfg);
+		$tmpCfg = str_replace('%%NNTP_SSLENABLED%%', ($this->NNTP_SSLENABLED?"true":"false"), $tmpCfg);
 
 		$tmpCfg = str_replace('%%CACHEOPT_METHOD%%', $this->CACHE_TYPE, $tmpCfg);
 
 		$this->COMPILED_CONFIG = $tmpCfg;
-		return @file_put_contents($this->WWW_DIR . '/config.php', $tmpCfg);
+		return @file_put_contents($this->WWW_DIR.'/config.php', $tmpCfg);
 	}
 	
 	/**
 	 * Create the installation lock file.
 	 */
-	public function saveInstallLock()
+	public function saveInstallLock() 
 	{
-		return @file_put_contents($this->INSTALL_DIR . '/install.lock', '');
+		return @file_put_contents($this->INSTALL_DIR.'/install.lock', '');
 	}
 }

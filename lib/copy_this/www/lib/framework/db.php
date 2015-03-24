@@ -155,7 +155,7 @@ class DB extends \PDO
 		$this->pdo = null;
 	}
 
-	public function checkDbExists($name = null)
+	public function checkDbExists ($name = null)
 	{
 		if (empty($name)) {
 			$name = $this->opts['dbname'];
@@ -228,7 +228,7 @@ class DB extends \PDO
 		}
 	}
 
-	public function getTableList()
+	public function getTableList ()
 	{
 		$query  = ($this->opts['dbtype'] === 'mysql' ? 'SHOW DATABASES' : 'SELECT datname AS Database FROM pg_database');
 		$result = $this->pdo->query($query);
@@ -238,7 +238,7 @@ class DB extends \PDO
 	/**
 	 * @return bool Whether the Db is definitely on the local machine.
 	 */
-	public function isLocalDb()
+	public function isLocalDb ()
 	{
 		if (!empty($this->opts['dbsock']) || $this->opts['dbhost'] == 'localhost') {
 			return true;
@@ -308,7 +308,7 @@ class DB extends \PDO
 					}
 				}
 			}
-			$this->pdo->query("use {$this->opts['dbname']}");
+			$this->pdo->query("USE {$this->opts['dbname']}");
 		}
 
 		// In case \PDO is not set to produce exceptions (PHP's default behaviour).
@@ -383,12 +383,12 @@ class DB extends \PDO
 	 *
 	 * @return string
 	 */
-	public function likeString($str, $left = true, $right = true)
+	public function likeString($str, $left=true, $right=true)
 	{
 		return (
 			'LIKE ' .
 			$this->escapeString(
-				($left ? '%' : '') .
+				($left  ? '%' : '') .
 				$str .
 				($right ? '%' : '')
 			)
@@ -424,13 +424,13 @@ class DB extends \PDO
 
 		$i = 2;
 		$error = '';
-		while ($i < 11) {
+		while($i < 11) {
 			$result = $this->queryExecHelper($query, true);
 			if (is_array($result) && isset($result['deadlock'])) {
 				$error = $result['message'];
 				if ($result['deadlock'] === true) {
-					$this->echoError("A Deadlock or lock wait timeout has occurred, sleeping.(" . ($i - 1) . ")", 'queryInsert', 4);
-					$this->ct->showsleep($i * ($i / 2));
+					$this->echoError("A Deadlock or lock wait timeout has occurred, sleeping.(" . ($i-1) . ")", 'queryInsert', 4);
+					$this->ct->showsleep($i * ($i/2));
 					$i++;
 				} else {
 					break;
@@ -469,13 +469,13 @@ class DB extends \PDO
 
 		$i = 2;
 		$error = '';
-		while ($i < 11) {
+		while($i < 11) {
 			$result = $this->queryExecHelper($query);
 			if (is_array($result) && isset($result['deadlock'])) {
 				$error = $result['message'];
 				if ($result['deadlock'] === true) {
-					$this->echoError("A Deadlock or lock wait timeout has occurred, sleeping.(" . ($i - 1) . ")", 'queryExec', 4);
-					$this->ct->showsleep($i * ($i / 2));
+					$this->echoError("A Deadlock or lock wait timeout has occurred, sleeping.(" . ($i-1) . ")", 'queryExec', 4);
+					$this->ct->showsleep($i * ($i/2));
 					$i++;
 				} else {
 					break;
@@ -505,7 +505,7 @@ class DB extends \PDO
 	protected function queryExecHelper($query, $insert = false)
 	{
 		try {
-			if ($insert === false) {
+			if ($insert === false ) {
 				$run = $this->pdo->prepare($query);
 				$run->execute();
 				return $run;
@@ -803,10 +803,9 @@ class DB extends \PDO
 		// Force the query to only return 1 row, so queryArray doesn't potentially run out of memory on a large data set.
 		// First check if query already contains a LIMIT clause.
 		if (preg_match('#\s+LIMIT\s+(?P<lower>\d+)(,\s+(?P<upper>\d+))?(;)?$#i', $query, $matches)) {
-			if (!isset($matches['upper']) && isset($matches['lower']) && $matches['lower'] == 1) {
+			If (!isset($matches['upper']) && isset($matches['lower']) && $matches['lower'] == 1) {
 				// good it's already correctly set.
-			} else {
-// We have a limit, but it's not for a single row
+			} else { // We have a limit, but it's not for a single row
 				return false;
 			}
 
@@ -970,7 +969,7 @@ class DB extends \PDO
 	 * PHP interpretation of MySQL's from_unixtime method.
 	 * @param int  $utime UnixTime
 	 *
-	 * @return string
+	 * @return bool|string
 	 */
 	public function from_unixtime($utime)
 	{
@@ -1035,7 +1034,7 @@ class DB extends \PDO
 	public function ping($restart = false)
 	{
 		try {
-			return (bool)$this->pdo->query('SELECT 1+1');
+			return (bool) $this->pdo->query('SELECT 1+1');
 		} catch (\PDOException $e) {
 			if ($restart == true) {
 				$this->initialiseDatabase();
@@ -1101,7 +1100,7 @@ class DB extends \PDO
 	 *
 	 * @return string
 	 */
-	public function getDbVersion()
+	public function getDbVersion ()
 	{
 		return $this->dbVersion;
 	}
@@ -1112,7 +1111,7 @@ class DB extends \PDO
 	 * @return bool|null       TRUE if Db version is greater than or eaqual to $requiredVersion,
 	 * false if not, and null if the version isn't available to check against.
 	 */
-	public function isDbVersionAtLeast($requiredVersion)
+	public function isDbVersionAtLeast ($requiredVersion)
 	{
 		if (empty($this->dbVersion)) {
 			return null;
@@ -1123,7 +1122,7 @@ class DB extends \PDO
 	/**
 	 * Performs the fetch from the Db server and stores the resulting Major.Minor.Version number.
 	 */
-	private function fetchDbVersion()
+	private function fetchDbVersion ()
 	{
 		$result = $this->queryOneRow("SELECT VERSION() AS version");
 		if (!empty($result)) {

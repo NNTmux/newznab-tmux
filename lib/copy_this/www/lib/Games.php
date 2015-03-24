@@ -15,10 +15,10 @@ require_once(WWW_DIR . "/lib/ColorCLI.php");
 
 class Games
 {
-	const REQID_FOUND = 1; // Request id found and release was updated.
-	const REQID_NO_LOCAL = -1; // Request id was not found via local lookup.
+	const REQID_FOUND 		= 1; // Request id found and release was updated.
+	const REQID_NO_LOCAL	= -1; // Request id was not found via local lookup.
 	const REQID_NONE		= -3; // The Request id was not found locally or via web lookup.
-	const REQID_UNPROCESSED = 0; // Release has not been processed.
+	const REQID_UNPROCESSED	= 0; // Release has not been processed.
 	const REQID_ZERO		= -2; // The Request id was 0.
 
 	/**
@@ -401,7 +401,7 @@ class Games
 		$this->_classUsed = "steam";
 		$this->_getGame->cookie = $this->cookie;
 		$this->_getGame->searchTerm = $gameInfo['title'];
-		if ($this->_getGame->search() !== false) {
+		if($this->_getGame->search() !== false){
 			$this->_gameResults = $this->_getGame->getAll();
 		}
 		if (count($this->_gameResults) < 1) {
@@ -428,10 +428,10 @@ class Games
 				return false;
 			}
 		}
-		if (empty($this->_gameResults['title'])) {
+		if(empty($this->_gameResults['title'])){
 			return false;
 		}
-		if (!is_array($this->_gameResults)) {
+		if(!is_array($this->_gameResults)){
 			return false;
 		}
 		if (count($this->_gameResults) > 1) {
@@ -620,14 +620,14 @@ class Games
 		if (empty($con['title'])) {
 			$con['title'] = $gameInfo['title'];
 		}
-		if (!isset($con['releasedate'])) {
+		if(!isset($con['releasedate'])){
 			$con['releasedate'] = "";
 		}
 
 		if ($con['releasedate'] == "''") {
 			$con['releasedate'] = "";
 		}
-		if (!isset($con['review'])) {
+		if(!isset($con['review'])){
 			$con['review'] = 'No Review';
 		}
 		$con['classused'] = $this->_classUsed;
@@ -714,17 +714,17 @@ class Games
 					$this->pdo->log->primary($con['title'])
 				);
 			}
-			if ($con['cover'] === 1) {
+			if($con['cover'] === 1){
 				$con['cover'] = $ri->saveImage($gamesId, $con['coverurl'], $this->imgSavePath, 250, 250);
 			}
-			if ($con['backdrop'] === 1) {
+			if($con['backdrop'] === 1){
 				$con['backdrop'] = $ri->saveImage($gamesId . '-backdrop', $con['backdropurl'], $this->imgSavePath, 1920, 1024);
 			}
 		} else {
 			if ($this->echoOutput) {
 				$this->pdo->log->doEcho(
 					$this->pdo->log->headerOver("Nothing to update: ") .
-					$this->pdo->log->primary($con['title'] . ' (PC)')
+					$this->pdo->log->primary($con['title'] . ' (PC)' )
 				);
 			}
 		}
@@ -840,7 +840,7 @@ class Games
 					if ($this->echoOutput) {
 						$this->pdo->log->doEcho(
 							$this->pdo->log->headerOver('Looking up: ') .
-							$this->pdo->log->primary($gameInfo['title'] . ' (PC)')
+							$this->pdo->log->primary($gameInfo['title'] . ' (PC)' )
 						);
 					}
 
@@ -854,7 +854,7 @@ class Games
 							$gameId = -2;
 
 							// Leave gamesinfo_id 0 to parse again
-							if ($this->maxHitRequest === true) {
+							if($this->maxHitRequest === true){
 								$gameId = 0;
 							}
 						}
@@ -926,7 +926,7 @@ class Games
 					$result['title'] = $dlc[0];
 				}
 			}
-			if (empty($result['title'])) {
+			if(empty($result['title'])){
 				return false;
 			}
 			$browseNode = '94';
@@ -942,7 +942,7 @@ class Games
 	/**
 	 * See if genre name exists
 	 *
-	 * @param string $nodeName
+	 * @param $nodeName
 	 *
 	 * @return bool|string
 	 */
@@ -994,7 +994,7 @@ class Games
 					break;
 				}
 			}
-			if (empty($genreName)) {
+			if(empty($genreName)){
 				$genreName = $tmpGenre[0];
 			}
 		} else {

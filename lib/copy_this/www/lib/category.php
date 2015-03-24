@@ -125,11 +125,10 @@ class Category
 	{
 		$db = new DB();
 		$ret = $db->queryOneRow(sprintf("select count(*) as count from category where id = %d and parentid is null", $cid), true);
-		if ($ret['count']) {
-					return true;
-		} else {
-					return false;
-		}
+		if ($ret['count'])
+			return true;
+		else
+			return false;
 	}
 
 	/**
@@ -149,9 +148,8 @@ class Category
 	{
 		$db = new DB();
 		$act = "";
-		if ($activeonly) {
-					$act = sprintf(" where c.status = %d ", Category::STATUS_ACTIVE);
-		}
+		if ($activeonly)
+			$act = sprintf(" where c.status = %d ", Category::STATUS_ACTIVE);
 
 		return $db->query("select c.*, (SELECT title FROM category WHERE id=c.parentid) AS parentName from category c " . $act . " ORDER BY c.id");
 	}
@@ -196,9 +194,8 @@ class Category
 				" from category c left outer join category cp on cp.id = c.parentid where c.id = %d", $id
 			)
 		);
-		if (!$res) {
-					return null;
-		}
+		if (!$res)
+			return null;
 
 		$min = intval($res['minsizetoformrelease']);
 		$max = intval($res['maxsizetoformrelease']);
@@ -271,15 +268,13 @@ class Category
 		$ret = array();
 
 		$exccatlist = "";
-		if (count($excludedcats) > 0) {
-					$exccatlist = " and id not in (" . implode(",", $excludedcats) . ")";
-		}
+		if (count($excludedcats) > 0)
+			$exccatlist = " and id not in (" . implode(",", $excludedcats) . ")";
 
 		$arr = $db->query(sprintf("select * from category where status = %d %s", Category::STATUS_ACTIVE, $exccatlist), true);
-		foreach ($arr as $a) {
-					if ($a["parentid"] == "")
+		foreach ($arr as $a)
+			if ($a["parentid"] == "")
 				$ret[] = $a;
-		}
 
 		foreach ($ret as $key => $parent) {
 			$subcatlist = array();
@@ -314,9 +309,8 @@ class Category
 			$temp_array[-1] = "--Please Select--";
 		}
 
-		foreach ($categories as $category) {
-					$temp_array[$category["id"]] = $category["title"];
-		}
+		foreach ($categories as $category)
+			$temp_array[$category["id"]] = $category["title"];
 
 		return $temp_array;
 	}
@@ -329,18 +323,15 @@ class Category
 		$db = new DB();
 
 		$exccatlist = "";
-		if (count($excludedcats) > 0) {
-					$exccatlist = " and c.id not in (" . implode(",", $excludedcats) . ")";
-		}
+		if (count($excludedcats) > 0)
+			$exccatlist = " and c.id not in (" . implode(",", $excludedcats) . ")";
 
 		$act = "";
-		if ($activeonly) {
-					$act = sprintf(" where c.status = %d ", Category::STATUS_ACTIVE);
-		}
+		if ($activeonly)
+			$act = sprintf(" where c.status = %d ", Category::STATUS_ACTIVE);
 
-		if ($exccatlist != "") {
-					$act .= $exccatlist;
-		}
+		if ($exccatlist != "")
+			$act .= $exccatlist;
 
 		return $db->query("select c.id, concat(cp.title, ' > ',c.title) as title, cp.id as parentid, c.status from category c inner join category cp on cp.id = c.parentid " . $act . " ORDER BY c.id", true);
 	}

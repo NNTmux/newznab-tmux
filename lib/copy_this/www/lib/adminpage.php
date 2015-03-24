@@ -1,7 +1,7 @@
 <?php
 require_once("config.php");
-require_once(WWW_DIR . "/lib/framework/basepage.php");
-require_once(WWW_DIR . "/lib/users.php");
+require_once(WWW_DIR."/lib/framework/basepage.php");
+require_once(WWW_DIR."/lib/users.php");
 
 /**
  * All admin pages implement this class. Enforces admin role for requesting user.
@@ -17,9 +17,9 @@ class AdminPage extends BasePage
 
 		$tplpaths = array();
 		if ($this->site->style != "default") 
-			$tplpaths["style_admin"] = WWW_DIR . 'templates/' . $this->site->style . '/views/admin';
-		$tplpaths["admin"] = WWW_DIR . 'templates/default/views/admin';
-		$tplpaths["frontend"] = WWW_DIR . 'templates/default/views/frontend';
+			$tplpaths["style_admin"] = WWW_DIR.'templates/'.$this->site->style.'/views/admin';
+		$tplpaths["admin"] = WWW_DIR.'templates/default/views/admin';
+		$tplpaths["frontend"] = WWW_DIR.'templates/default/views/frontend';
 		$this->smarty->setTemplateDir($tplpaths);
 				
 		$users = new Users();
@@ -33,10 +33,10 @@ class AdminPage extends BasePage
 	 */		
 	public function render() 
 	{			
-		$this->smarty->assign('page', $this);
+		$this->smarty->assign('page',$this);
 		
 		$admin_menu = $this->smarty->fetch('adminmenu.tpl');
-		$this->smarty->assign('admin_menu', $admin_menu);
+		$this->smarty->assign('admin_menu',$admin_menu);
 		
 		$this->page_template = "baseadminpage.tpl";				
 		
