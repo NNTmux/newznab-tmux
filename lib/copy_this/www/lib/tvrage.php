@@ -1,22 +1,22 @@
 <?php
-require_once(WWW_DIR."/lib/util.php");
-require_once(WWW_DIR."/lib/category.php");
-require_once(WWW_DIR."/lib/nfo.php");
-require_once(WWW_DIR."/lib/framework/db.php");
-require_once(WWW_DIR."/lib/framework/cache.php");
+require_once(WWW_DIR . "/lib/util.php");
+require_once(WWW_DIR . "/lib/category.php");
+require_once(WWW_DIR . "/lib/nfo.php");
+require_once(WWW_DIR . "/lib/framework/db.php");
+require_once(WWW_DIR . "/lib/framework/cache.php");
 
 class TvRage
 {
 	const APIKEY = '7FwjZ8loweFcOhHfnU3E';
 	const MATCH_PROBABILITY = 75;
 
-	function TvRage($echooutput=false)
+	function TvRage($echooutput = false)
 	{
 		$this->echooutput = $echooutput;
 
 		$this->xmlFullSearchUrl = "http://services.tvrage.com/feeds/full_search.php?show=";
 		$this->xmlFullShowInfoUrl = "http://services.tvrage.com/feeds/full_show_info.php?sid=";
-		$this->xmlEpisodeInfoUrl = "http://services.tvrage.com/myfeeds/episodeinfo.php?key=".TvRage::APIKEY;
+		$this->xmlEpisodeInfoUrl = "http://services.tvrage.com/myfeeds/episodeinfo.php?key=" . TvRage::APIKEY;
 		$this->xmlFullScheduleUrl = "http://services.tvrage.com/feeds/fullschedule.php?country=";
 
 		$this->showInfoUrl = "http://www.tvrage.com/shows/id-";
@@ -24,25 +24,27 @@ class TvRage
 
 	/**
 	 * Find an tvrage URL in an string.
+	 * @param string $str
 	 */
 	public function parseRageIdFromNfo($str)
 	{
 		preg_match('/tvrage\.com\/shows\/id-(\d{1,6})/si', $str, $matches);
-		if (isset($matches[1]))
-			return trim($matches[1]);
+		if (isset($matches[1])) {
+					return trim($matches[1]);
+		}
 		return false;
 	}
 
 	public function getByID($id)
 	{
 		$db = new DB();
-		return $db->queryOneRow(sprintf("select * from tvrage where id = %d", $id ));
+		return $db->queryOneRow(sprintf("select * from tvrage where id = %d", $id));
 	}
 
 	public function getByRageID($id)
 	{
 		$db = new DB();
-		return $db->query(sprintf("select * from tvrage where rageid = %d", $id ));
+		return $db->query(sprintf("select * from tvrage where rageid = %d", $id));
 	}
 
 	public function getByTitle($title)
@@ -51,15 +53,19 @@ class TvRage
 		$db = new DB();
 		$sql = sprintf("SELECT rageid from tvrage where (releasetitle = %s or releasetitle = %s)", $db->escapeString($title), $db->escapeString(str_replace(' and ', ' & ', $title)));
 		$res = $db->queryOneRow($sql);
-		if ($res)
-			return $res["rageid"];
+		if ($res) {
+					return $res["rageid"];
+		}
 
 		return false;
 	}
 
+	/**
+	 * @param string $desc
+	 */
 	public function add($rageid, $releasename, $desc, $genre, $country, $imgbytes)
 	{
-		$releasename = str_replace(array('.','_'), array(' ',' '), $releasename);
+		$releasename = str_replace(array('.', '_'), array(' ', ' '), $releasename);
 
 		$db = new DB();
 		return $db->queryInsert(sprintf("insert into tvrage (rageid, releasetitle, description, genre, country, createddate, imgdata) values (%d, %s, %s, %s, %s, now(), %s)",
@@ -70,42 +76,43 @@ class TvRage
 	{
 		$db = new DB();
 
-		if ($imgbytes != "")
-			$imgbytes = sprintf(", imgdata = %s", $db->escapeString($imgbytes));
+		if ($imgbytes != "") {
+					$imgbytes = sprintf(", imgdata = %s", $db->escapeString($imgbytes));
+		}
 
 		$db->queryExec(sprintf("update tvrage set rageid = %d, releasetitle = %s, description = %s, genre = %s, country = %s %s where id = %d",
-			$rageid, $db->escapeString($releasename), $db->escapeString($desc), $db->escapeString($genre), $db->escapeString($country), $imgbytes, $id ));
+			$rageid, $db->escapeString($releasename), $db->escapeString($desc), $db->escapeString($genre), $db->escapeString($country), $imgbytes, $id));
 	}
 
 	public function delete($id)
 	{
 		$db = new DB();
-		return $db->queryExec(sprintf("DELETE from tvrage where id = %d",$id));
+		return $db->queryExec(sprintf("DELETE from tvrage where id = %d", $id));
 	}
 
-	public function getRange($start, $num, $ragename="")
+	public function getRange($start, $num, $ragename = "")
 	{
 		$db = new DB();
 
 		if ($start === false)
 			$limit = "";
 		else
-			$limit = " LIMIT ".$start.",".$num;
+			$limit = " LIMIT " . $start . "," . $num;
 
 		$rsql = '';
 		if ($ragename != "")
-			$rsql .= sprintf("and tvrage.releasetitle like %s ", $db->escapeString("%".$ragename."%"));
+			$rsql .= sprintf("and tvrage.releasetitle like %s ", $db->escapeString("%" . $ragename . "%"));
 
-		return $db->query(sprintf(" SELECT id, rageid, releasetitle, description, createddate from tvrage where 1=1 %s order by rageid asc".$limit, $rsql));
+		return $db->query(sprintf(" SELECT id, rageid, releasetitle, description, createddate from tvrage where 1=1 %s order by rageid asc" . $limit, $rsql));
 	}
 
-	public function getCount($ragename="")
+	public function getCount($ragename = "")
 	{
 		$db = new DB();
 
 		$rsql = '';
 		if ($ragename != "")
-			$rsql .= sprintf("and tvrage.releasetitle like %s ", $db->escapeString("%".$ragename."%"));
+			$rsql .= sprintf("and tvrage.releasetitle like %s ", $db->escapeString("%" . $ragename . "%"));
 
 		$res = $db->queryOneRow(sprintf("select count(id) as num from tvrage where 1=1 %s ", $rsql));
 		return $res["num"];
@@ -114,13 +121,13 @@ class TvRage
 	public function getCalendar($date = "")
 	{
 		$db = new DB();
-		if(!preg_match('/\d{4}-\d{2}-\d{2}/',$date))
+		if (!preg_match('/\d{4}-\d{2}-\d{2}/', $date))
 			$date = date("Y-m-d");
 		$sql = sprintf("SELECT * FROM episodeinfo WHERE rageid > %d AND DATE(airdate) = %s order by airdate asc ", 0, $db->escapeString($date));
 		return $db->query($sql);
 	}
 
-	public function getSeriesList($uid, $letter="", $ragename="")
+	public function getSeriesList($uid, $letter = "", $ragename = "")
 	{
 		$db = new DB();
 
@@ -130,12 +137,12 @@ class TvRage
 			if ($letter == '0-9')
 				$letter = '[0-9]';
 
-			$rsql .= sprintf("and tvrage.releasetitle REGEXP %s", $db->escapeString('^'.$letter));
+			$rsql .= sprintf("and tvrage.releasetitle REGEXP %s", $db->escapeString('^' . $letter));
 		}
 		$tsql = '';
 		if ($ragename != '')
 		{
-			$tsql .= sprintf("and tvrage.releasetitle like %s", $db->escapeString("%".$ragename."%"));
+			$tsql .= sprintf("and tvrage.releasetitle like %s", $db->escapeString("%" . $ragename . "%"));
 		}
 
 		$sql = sprintf(" SELECT tvrage.id, tvrage.rageid, tvrage.releasetitle, tvrage.genre, tvrage.country, tvrage.createddate, tvrage.prevdate, tvrage.nextdate, userseries.id as userseriesID from tvrage left outer join userseries on userseries.userid = %d and userseries.rageid = tvrage.rageid where tvrage.rageid > 0 %s %s group by tvrage.rageid order by tvrage.releasetitle asc", $uid, $rsql, $tsql);
@@ -149,7 +156,7 @@ class TvRage
 		$countries = $db->query("select distinct(country) as country from tvrage where country != ''");
 		$showsindb = $db->query("select distinct(rageid) as rageid from tvrage");
 		$showarray = array();
-		foreach($showsindb as $show)
+		foreach ($showsindb as $show)
 		{
 			$showarray[] = $show['rageid'];
 		}
@@ -168,7 +175,7 @@ class TvRage
 				$xml = new SimpleXMLElement($raw);
 				$sched = $xml->xpath('/schedule/DAY');
 			}catch(Exception $e){
-            # Simply no data or unparseable
+			# Simply no data or unparseable
 				continue;
 			}
 
@@ -183,12 +190,12 @@ class TvRage
 					$currDay = (string)$dayObj['attr'];
 					foreach ($dayObj->time as $sTime)
 					{
-						$currTime = (string) $sTime['attr'];
+						$currTime = (string)$sTime['attr'];
 						foreach ($sTime as $sShow)
 						{
-							$currShowName = (string) $sShow['name'];
-							$currShowId = (string) $sShow->sid;
-							$day_time= strtotime($currDay.' '.$currTime);
+							$currShowName = (string)$sShow['name'];
+							$currShowId = (string)$sShow->sid;
+							$day_time = strtotime($currDay . ' ' . $currTime);
 							$tag = ($currDay < $yesterday) ? 'prev' : 'next';
 							if ($tag == 'prev' || ($tag == 'next' && !isset($xmlSchedule[$currShowId]['next'])))
 							{
@@ -203,13 +210,13 @@ class TvRage
 								);
 								$xmlSchedule[$currShowId]['showname'] = $currShowName;
 							}
-							if($sShow->ep == "01x01")
+							if ($sShow->ep == "01x01")
 								{
 								// Only add it here, no point adding it to tvrage aswell
 								// that will automatically happen when an ep gets posted
 								$showarray[] = $sShow->sid;
 								}
-							if(in_array($currShowId,$showarray)) //only stick current shows and new shows in there
+							if (in_array($currShowId, $showarray)) //only stick current shows and new shows in there
 							{
 								$showname = $db->escapeString($currShowName);
 								$title = $db->escapeString($sShow->title);
@@ -218,7 +225,7 @@ class TvRage
 								$airdate = $db->escapeString(date("Y-m-d H:i:s", $day_time));
 								$sql = sprintf('INSERT into episodeinfo (rageid,showtitle,fullep,airdate,link,eptitle) VALUES (%d,%s,%s,%s,%s,%s)
 										ON DUPLICATE KEY UPDATE rageid = %1$d, airdate = %4$s, link = %5$s, eptitle = %6$s, showtitle = %2$s',
-										$sShow->sid,$showname,$fullep,$airdate,$link,$title);
+										$sShow->sid, $showname, $fullep, $airdate, $link, $title);
 								$db->queryInsert($sql);
 							}
 						}
@@ -238,7 +245,7 @@ class TvRage
 							// previous episode
 							if (isset($epInfo['prev']) && $epInfo['prev']['episode'] != '')
 							{
-								$prev_ep = $epInfo['prev']['episode'].', "'.$epInfo['prev']['title'].'"';
+								$prev_ep = $epInfo['prev']['episode'] . ', "' . $epInfo['prev']['title'] . '"';
 								$query[] = sprintf("prevdate = FROM_UNIXTIME(%s), previnfo = %s", $epInfo['prev']['day_time'], $db->escapeString($prev_ep));
 							}
 
@@ -248,9 +255,9 @@ class TvRage
 								if ($prev_ep == "" && $arr['nextinfo'] != '' && $epInfo['next']['day_time'] > $arr['nextDateU'] && $arr['nextDateDay'] < $yesterday)
 								{
 									$db->queryExec(sprintf("update tvrage set prevdate = nextdate, previnfo = nextinfo where id = %d", $arr['id']));
-									$prev_ep = "SWAPPED with: ".$arr['nextinfo']." - ".date("r", $arr['nextDateU']);
+									$prev_ep = "SWAPPED with: " . $arr['nextinfo'] . " - " . date("r", $arr['nextDateU']);
 								}
-								$next_ep = $epInfo['next']['episode'].', "'.$epInfo['next']['title'].'"';
+								$next_ep = $epInfo['next']['episode'] . ', "' . $epInfo['next']['title'] . '"';
 								$query[] = sprintf("nextdate = FROM_UNIXTIME(%s), nextinfo = %s", $epInfo['next']['day_time'], $db->escapeString($next_ep));
 							}
 							else
@@ -269,8 +276,7 @@ class TvRage
 							*/
 
 							// update info
-							if (count($query) > 0)
-							{
+							if (count($query) > 0) {
 								$sql = str_ireplace("%", "%%", join(", ", $query));
 								$sql = sprintf("update tvrage set {$sql} where id = %d", $arr['id']);
 								$db->queryExec($sql);
@@ -281,8 +287,9 @@ class TvRage
 			}
 		} // end foreach country
 
-		if ($this->echooutput)
-			echo "TVRage  : Schedule complete...\n";
+		if ($this->echooutput) {
+					echo "TVRage  : Schedule complete...\n";
+		}
 	}
 
 	public function getEpisodeInfo($rageid, $series, $episode)
@@ -292,27 +299,29 @@ class TvRage
 		$series = str_ireplace("s", "", $series);
 		$episode = str_ireplace("e", "", $episode);
 
-		$lookupUrl = $this->xmlEpisodeInfoUrl."&sid=".$rageid."&ep=".$series."x".$episode;
+		$lookupUrl = $this->xmlEpisodeInfoUrl . "&sid=" . $rageid . "&ep=" . $series . "x" . $episode;
 
 		$xml = $this->fetchCache($lookupUrl);
-		if ($xml === false)
-			$xml = Utility::getUrl(['url' => $lookupUrl]);
+		if ($xml === false) {
+					$xml = Utility::getUrl(['url' => $lookupUrl]);
+		}
 
-		if ($xml !== false)
-		{
+		if ($xml !== false) {
 			$this->storeCache($lookupUrl, $xml);
 
-			if (preg_match('/no show found/i', $xml))
-				return false;
+			if (preg_match('/no show found/i', $xml)) {
+							return false;
+			}
 
 			$xmlObj = @simplexml_load_string($xml);
 			$arrXml = objectsIntoArray($xmlObj);
-			if (is_array($arrXml))
-			{
-				if (isset($arrXml['episode']['airdate']) && $arrXml['episode']['airdate'] != '0000-00-00')
-					$result['airdate'] = $arrXml['episode']['airdate'];
-				if (isset($arrXml['episode']['title']))
-					$result['title'] = $arrXml['episode']['title'];
+			if (is_array($arrXml)) {
+				if (isset($arrXml['episode']['airdate']) && $arrXml['episode']['airdate'] != '0000-00-00') {
+									$result['airdate'] = $arrXml['episode']['airdate'];
+				}
+				if (isset($arrXml['episode']['title'])) {
+									$result['title'] = $arrXml['episode']['title'];
+				}
 
 				return $result;
 			}
@@ -325,14 +334,14 @@ class TvRage
 	{
 		$result = array('desc'=>'', 'imgurl'=>'');
 
-		$lookupUrl = $this->showInfoUrl.$rageid;
+		$lookupUrl = $this->showInfoUrl . $rageid;
 
 		$page = $this->fetchCache($lookupUrl);
-		if ($page === false)
-			$page = Utility::getUrl([$lookupUrl]);
+		if ($page === false) {
+					$page = Utility::getUrl([$lookupUrl]);
+		}
 
-		if ($page !== false)
-		{
+		if ($page !== false) {
 			$this->storeCache($lookupUrl, $page);
 
 			//description
@@ -363,22 +372,21 @@ class TvRage
 	{
 		$result = array('genres'=>'', 'country'=>'', 'showid'=>$rageid);
 
-		$lookupUrl = $this->xmlFullShowInfoUrl.$rageid;
+		$lookupUrl = $this->xmlFullShowInfoUrl . $rageid;
 
 		$xml = $this->fetchCache($lookupUrl);
-		if ($xml === false)
-			$xml = Utility::getUrl([$lookupUrl]);
+		if ($xml === false) {
+					$xml = Utility::getUrl([$lookupUrl]);
+		}
 
-		if ($xml !== false)
-		{
+		if ($xml !== false) {
 			$this->storeCache($lookupUrl, $xml);
 
 			$xml = str_replace('<genre></genre>', '', $xml);
 			$xmlObj = @simplexml_load_string($xml);
 			$arrXml = objectsIntoArray($xmlObj);
 
-			if (is_array($arrXml))
-			{
+			if (is_array($arrXml)) {
 				$result['genres'] = (isset($arrXml['genres'])) ? $arrXml['genres'] : '';
 				$result['country'] = (isset($arrXml['origin_country'])) ? $arrXml['origin_country'] : '';
 				return $result;
@@ -392,11 +400,11 @@ class TvRage
 	{
 		$db = new Db;
 
-        if (empty($show['airdate']) || !strtotime($show['airdate'])) {
-            $tvairdate = "null";
-        } else {
-            $tvairdate = $db->escapestring($show['airdate']);
-        }
+		if (empty($show['airdate']) || !strtotime($show['airdate'])) {
+			$tvairdate = "null";
+		} else {
+			$tvairdate = $db->escapestring($show['airdate']);
+		}
 		$db->queryExec(sprintf("update releases set seriesfull = %s, season = %s, episode = %s, tvairdate=%s where id = %d",
 					$db->escapeString($show['seriesfull']), $db->escapeString($show['season']), $db->escapeString($show['episode']), $tvairdate, $relid));
 	}
@@ -418,7 +426,7 @@ class TvRage
 			if ($img !== false)
 			{
 				$im = @imagecreatefromstring($img);
-				if($im !== false)
+				if ($im !== false)
 					$imgbytes = $img;
 			}
 		}
@@ -444,7 +452,7 @@ class TvRage
 
 			//check tvdb episodeinfo data
 			if ($epinfo == false)
-				$epinfo = $db->queryOneRow(sprintf("select eptitle as title, airdate as airdate from episodeinfo where airdate is not null and fullep = %s and rageid = %d", $db->escapeString(str_replace('S', '', $show['season']).'x'.str_replace('E', '', $show['episode'])), $idCheck[0]['rageid']));
+				$epinfo = $db->queryOneRow(sprintf("select eptitle as title, airdate as airdate from episodeinfo where airdate is not null and fullep = %s and rageid = %d", $db->escapeString(str_replace('S', '', $show['season']) . 'x' . str_replace('E', '', $show['episode'])), $idCheck[0]['rageid']));
 		}
 
 		// try and get the episode specific info from tvrage if its not available locally
@@ -488,7 +496,7 @@ class TvRage
 			if ($img !== false)
 			{
 				$im = @imagecreatefromstring($img);
-				if($im !== false)
+				if ($im !== false)
 					$imgbytes = $img;
 			}
 		}
@@ -496,7 +504,7 @@ class TvRage
 		$this->add($rageid, $show['cleanname'], $desc, $genre, $country, $imgbytes);
 	}
 
-	public function processTvReleases($lookupTvRage=true, $numtoProcess=100)
+	public function processTvReleases($lookupTvRage = true, $numtoProcess = 100)
 	{
 		$ret = 0;
 		$db = new DB();
@@ -505,114 +513,114 @@ class TvRage
 		// get all releases without a rageid which are in a tv category.
 		$result = $db->queryDirect(sprintf("SELECT searchname, id from releases where rageid = -1 and categoryid in ( select id from category where parentid = %d ) order by postdate desc limit %d ", Category::CAT_PARENT_TV, $numtoProcess));
 
-        if ($db->getNumRows($result) > 0)
-        {
-            if ($this->echooutput)
-                echo "TVRage  : Looking up ".$db->getNumRows($result)." releases".($lookupTvRage?" using local and web\n":" local only\n");
+		if ($db->getNumRows($result) > 0)
+		{
+			if ($this->echooutput)
+				echo "TVRage  : Looking up ".$db->getNumRows($result)." releases".($lookupTvRage?" using local and web\n":" local only\n");
 
-            while ($arr = $db->getAssocArray($result))
-            {
-                $rageID = false;
-                /* Preliminary Rage id Detection from NFO file */
-                $rawnfo = '';
-                if($nfo->getNfo($arr['id'], $rawnfo))
-                    $rageID = $this->parseRageIdFromNfo($rawnfo);
+			while ($arr = $db->getAssocArray($result))
+			{
+				$rageID = false;
+				/* Preliminary Rage id Detection from NFO file */
+				$rawnfo = '';
+				if($nfo->getNfo($arr['id'], $rawnfo))
+					$rageID = $this->parseRageIdFromNfo($rawnfo);
 
-                if($rageID){
-                    // Set RageID (if matched db) and move along
-                    $res = $db->query(sprintf("SELECT count(id) as cnt from tvrage where rageid = %d", $rageID));
-                    if(count($res) >= 1 && intval($res[0]['cnt']) > 1)
-                    {
-                        $db->queryExec(sprintf("update releases set rageid = %d where id = %d", $rageID, $arr["id"]));
-                        continue;
-                    }
-                }
+				if($rageID){
+					// Set RageID (if matched db) and move along
+					$res = $db->query(sprintf("SELECT count(id) as cnt from tvrage where rageid = %d", $rageID));
+					if(count($res) >= 1 && intval($res[0]['cnt']) > 1)
+					{
+						$db->queryExec(sprintf("update releases set rageid = %d where id = %d", $rageID, $arr["id"]));
+						continue;
+					}
+				}
 
-                $show = $this->parseNameEpSeason($arr['searchname']);
-                if (is_array($show) && $show['name'] != '')
-                {
-                    // update release with season, ep, and airdate info (if available) from releasetitle
-                    $this->updateEpInfo($show, $arr['id']);
+				$show = $this->parseNameEpSeason($arr['searchname']);
+				if (is_array($show) && $show['name'] != '')
+				{
+					// update release with season, ep, and airdate info (if available) from releasetitle
+					$this->updateEpInfo($show, $arr['id']);
 
-                    // find the rageid
-                    $id = $this->getByTitle($show['cleanname']);
+					// find the rageid
+					$id = $this->getByTitle($show['cleanname']);
 
-                    if ($id === false && $lookupTvRage)
-                    {
-                        // if it doesnt exist locally and lookups are allowed lets try to get it
-                        if ($this->echooutput)
-                            echo "TVRage  : Didnt find ".$show['cleanname']." locally, checking web\n";
+					if ($id === false && $lookupTvRage)
+					{
+						// if it doesnt exist locally and lookups are allowed lets try to get it
+						if ($this->echooutput)
+							echo "TVRage  : Didnt find ".$show['cleanname']." locally, checking web\n";
 
-                        $tvrShow = $this->getRageMatch($show);
-                        if ($tvrShow !== false && is_array($tvrShow))
-                        {
-                            // get all tv info and add show
-                            $this->updateRageInfo($tvrShow['showid'], $show, $tvrShow, $arr['id']);
-                        }
-                        elseif ($tvrShow === false)
-                        {
-                            // no match
-                            //add to tvrage with rageid = -2 and $show['cleanname'] title only
-                            $this->add(-2, $show['cleanname'], '', '', '', '');
-                        }
-                        else
-                        {
-                            // $tvrShow probably equals -1 but we'll do this as a catchall instead of a specific elseif
+						$tvrShow = $this->getRageMatch($show);
+						if ($tvrShow !== false && is_array($tvrShow))
+						{
+							// get all tv info and add show
+							$this->updateRageInfo($tvrShow['showid'], $show, $tvrShow, $arr['id']);
+						}
+						elseif ($tvrShow === false)
+						{
+							// no match
+							//add to tvrage with rageid = -2 and $show['cleanname'] title only
+							$this->add(-2, $show['cleanname'], '', '', '', '');
+						}
+						else
+						{
+							// $tvrShow probably equals -1 but we'll do this as a catchall instead of a specific elseif
 
-                            //skip because we couldnt connect to tvrage.com
-                        }
+							//skip because we couldnt connect to tvrage.com
+						}
 
-                    }
-                    elseif ($id > 0)
-                    {
-                        $tvairdate = (isset($show['airdate']) && !empty($show['airdate'])) ? $db->escapeString($show['airdate']) : "null";
-                        $tvtitle = "null";
+					}
+					elseif ($id > 0)
+					{
+						$tvairdate = (isset($show['airdate']) && !empty($show['airdate'])) ? $db->escapeString($show['airdate']) : "null";
+						$tvtitle = "null";
 
-                        if ($lookupTvRage)
-                        {
-                            if ($tvairdate == "null")
-                            {
+						if ($lookupTvRage)
+						{
+							if ($tvairdate == "null")
+							{
 
-                                //check local releases to see if we already have the data
-                                $epinfo = $db->queryOneRow(sprintf("select tvtitle as title, tvairdate as airdate from releases where tvairdate is not null and season = %s and episode = %s and rageid = %d", $db->escapeString($show['season']), $db->escapeString($show['episode']), $id));
+								//check local releases to see if we already have the data
+								$epinfo = $db->queryOneRow(sprintf("select tvtitle as title, tvairdate as airdate from releases where tvairdate is not null and season = %s and episode = %s and rageid = %d", $db->escapeString($show['season']), $db->escapeString($show['episode']), $id));
 
-                                //check tvdb episodeinfo data
-                                if ($epinfo == false)
-                                {
-                                    $sql = sprintf("select eptitle as title, airdate as airdate from episodeinfo where airdate is not null and fullep = %s and rageid = %d", $db->escapeString(str_replace('S', '', $show['season']).'x'.str_replace('E', '', $show['episode'])), $id);
-                                    $epinfo = $db->queryOneRow($sql);
-                                }
+								//check tvdb episodeinfo data
+								if ($epinfo == false)
+								{
+									$sql = sprintf("select eptitle as title, airdate as airdate from episodeinfo where airdate is not null and fullep = %s and rageid = %d", $db->escapeString(str_replace('S', '', $show['season']).'x'.str_replace('E', '', $show['episode'])), $id);
+									$epinfo = $db->queryOneRow($sql);
+								}
 
-                                if ($epinfo == false)
-                                    $epinfo = $this->getEpisodeInfo($id, $show['season'], $show['episode']);
+								if ($epinfo == false)
+									$epinfo = $this->getEpisodeInfo($id, $show['season'], $show['episode']);
 
-                                if ($epinfo !== false)
-                                {
-                                    if (!empty($epinfo['airdate']))
-                                        $tvairdate = $db->escapeString($epinfo['airdate']);
+								if ($epinfo !== false)
+								{
+									if (!empty($epinfo['airdate']))
+										$tvairdate = $db->escapeString($epinfo['airdate']);
 
-                                    if (!empty($epinfo['title']))
-                                        $tvtitle = $db->escapeString($epinfo['title']);
-                                }
-                            }
-                        }
-                        $db->queryExec(sprintf("update releases set tvtitle=trim(%s), tvairdate=%s, rageid = %d where id = %d", $tvtitle, $tvairdate, $id, $arr["id"]));
-                    }
-                    else
-                    {
-                        // cant find rageid, so set rageid to n/a
-                        $db->queryExec(sprintf("update releases set rageid = -2 where id = %d", $arr["id"]));
-                    }
-                }
-                else
-                {
-                    // not a tv episode, so set rageid to n/a
-                    $db->queryExec(sprintf("update releases set rageid = -2 where id = %d", $arr["id"]));
-                }
-                $ret++;
-            }
+									if (!empty($epinfo['title']))
+										$tvtitle = $db->escapeString($epinfo['title']);
+								}
+							}
+						}
+						$db->queryExec(sprintf("update releases set tvtitle=trim(%s), tvairdate=%s, rageid = %d where id = %d", $tvtitle, $tvairdate, $id, $arr["id"]));
+					}
+					else
+					{
+						// cant find rageid, so set rageid to n/a
+						$db->queryExec(sprintf("update releases set rageid = -2 where id = %d", $arr["id"]));
+					}
+				}
+				else
+				{
+					// not a tv episode, so set rageid to n/a
+					$db->queryExec(sprintf("update releases set rageid = -2 where id = %d", $arr["id"]));
+				}
+				$ret++;
+			}
 
-        }
+		}
 
 		return $ret;
 	}
@@ -621,29 +629,28 @@ class TvRage
 	{
 		$title = $showInfo['cleanname'];
 
-		$lookupUrl = $this->xmlFullSearchUrl.urlencode(strtolower($title));
+		$lookupUrl = $this->xmlFullSearchUrl . urlencode(strtolower($title));
 
 		$xml = $this->fetchCache($lookupUrl);
-		if ($xml === false)
-			$xml = Utility::getUrl([$lookupUrl]); //full search gives us the akas
+		if ($xml === false) {
+					$xml = Utility::getUrl([$lookupUrl]);
+		}
+		//full search gives us the akas
 
-		if ($xml !== false)
-		{
+		if ($xml !== false) {
 			$this->storeCache($lookupUrl, $xml);
 
 			$xml = str_replace('<genre></genre>', '', $xml);
 			$xmlObj = @simplexml_load_string($xml);
 			$arrXml = objectsIntoArray($xmlObj);
 
-			if (isset($arrXml['show']) && is_array($arrXml['show']))
-			{
+			if (isset($arrXml['show']) && is_array($arrXml['show'])) {
 				// we got a valid xml response
 				$titleMatches = array();
 				$urlMatches = array();
 				$akaMatches = array();
 
-				if (isset($arrXml['show']['showid']))
-				{
+				if (isset($arrXml['show']['showid'])) {
 					// we got exactly 1 match so lets convert it to an array so we can use it in the logic below
 					$newArr = array();
 					$newArr[] = $arrXml['show'];
@@ -675,7 +682,7 @@ class TvRage
 						if (is_array($arr['akas']['aka']))
 						{
 							// multuple akas
-							foreach($arr['akas']['aka'] as $aka)
+							foreach ($arr['akas']['aka'] as $aka)
 							{
 								$akapct = $this->checkMatch($title, $aka);
 								if ($akapct !== false)
@@ -700,7 +707,7 @@ class TvRage
 				if (isset($titleMatches[100]))
 				{
 					if ($this->echooutput)
-						echo 'TVRage  : Found 100% match: "'.$titleMatches[100][0]['title'].'"'."\n";
+						echo 'TVRage  : Found 100% match: "' . $titleMatches[100][0]['title'] . '"' . "\n";
 					return $titleMatches[100][0];
 				}
 
@@ -708,7 +715,7 @@ class TvRage
 				if (isset($urlMatches[100]))
 				{
 					if ($this->echooutput)
-						echo 'TVRage  : Found 100% url match: "'.$urlMatches[100][0]['title'].'"'."\n";
+						echo 'TVRage  : Found 100% url match: "' . $urlMatches[100][0]['title'] . '"' . "\n";
 					return $urlMatches[100][0];
 				}
 
@@ -716,12 +723,12 @@ class TvRage
 				if (isset($akaMatches[100]))
 				{
 					if ($this->echooutput)
-						echo 'TVRage  : Found 100% aka match: "'.$akaMatches[100][0]['title'].'"'."\n";
+						echo 'TVRage  : Found 100% aka match: "' . $akaMatches[100][0]['title'] . '"' . "\n";
 					return $akaMatches[100][0];
 				}
 
 				// no 100% matches, loop through what we got and if our next closest match is more than TvRage::MATCH_PROBABILITY % of the title lets take it
-				foreach($titleMatches as $mk=>$mv)
+				foreach ($titleMatches as $mk=>$mv)
 				{
 					// since its not 100 match if we have country info lets use that to make sure we get the right show
 					if (isset($showInfo['country']) && !empty($showInfo['country']) && !empty($mv[0]['country']))
@@ -729,19 +736,19 @@ class TvRage
 							continue;
 
 					if ($this->echooutput)
-						echo 'TVRage  : Found '.$mk.'% match: "'.$titleMatches[$mk][0]['title'].'"'."\n";
+						echo 'TVRage  : Found ' . $mk . '% match: "' . $titleMatches[$mk][0]['title'] . '"' . "\n";
 					return $titleMatches[$mk][0];
 				}
 
 				// same as above but for akas
-				foreach($akaMatches as $ak=>$av)
+				foreach ($akaMatches as $ak=>$av)
 				{
 					if (isset($showInfo['country']) && !empty($showInfo['country']) && !empty($av[0]['country']))
 						if (strtolower($showInfo['country']) != strtolower($av[0]['country']))
 							continue;
 
 					if ($this->echooutput)
-						echo 'TVRage  : Found '.$ak.'% aka match: "'.$akaMatches[$ak][0]['title'].'"'."\n";
+						echo 'TVRage  : Found ' . $ak . '% aka match: "' . $akaMatches[$ak][0]['title'] . '"' . "\n";
 					return $akaMatches[$ak][0];
 				}
 
@@ -753,12 +760,12 @@ class TvRage
 
 		} else {
 			if ($this->echooutput)
-				echo 'TVRage  : Error connecting to tvrage'."\n";
+				echo 'TVRage  : Error connecting to tvrage' . "\n";
 			return -1;
 		}
 
 		if ($this->echooutput)
-			echo 'TVRage  : No match found online'."\n";
+			echo 'TVRage  : No match found online' . "\n";
 		return false;
 	}
 
@@ -775,17 +782,17 @@ class TvRage
 
 		// set our match counts
 		$numMatches = 0;
-		$totalMatches = sizeof($ourArr)+sizeof($tvrArr);
+		$totalMatches = sizeof($ourArr) + sizeof($tvrArr);
 
 		// loop through each array matching again the opposite value, if they match increment!
-		foreach($ourArr as $oname)
+		foreach ($ourArr as $oname)
 		{
-			if (preg_match('/ '.preg_quote($oname, '/').' /i', ' '.$tvrName.' '))
+			if (preg_match('/ ' . preg_quote($oname, '/') . ' /i', ' ' . $tvrName . ' '))
 				$numMatches++;
 		}
-		foreach($tvrArr as $tname)
+		foreach ($tvrArr as $tname)
 		{
-			if (preg_match('/ '.preg_quote($tname, '/').' /i', ' '.$ourName.' '))
+			if (preg_match('/ ' . preg_quote($tname, '/') . ' /i', ' ' . $ourName . ' '))
 				$numMatches++;
 		}
 
@@ -793,7 +800,7 @@ class TvRage
 		if ($numMatches <= 0)
 			return false;
 		else
-			$matchpct = ($numMatches/$totalMatches)*100;
+			$matchpct = ($numMatches / $totalMatches) * 100;
 
 		if ($matchpct >= TvRage::MATCH_PROBABILITY)
 			return $matchpct;
@@ -805,12 +812,12 @@ class TvRage
 	{
 		$str = str_replace(array('.', '_', '-'), ' ', $str);
 
-		$str = str_replace(array('à','á','â','ã','ä','æ','À','Á','Â','Ã','Ä'), 'a', $str);
-		$str = str_replace(array('ç','Ç'), 'c', $str);
-		$str = str_replace(array('Σ','è','é','ê','ë','È','É','Ê','Ë'), 'e', $str);
-		$str = str_replace(array('ì','í','î','ï','Ì','Í','Î','Ï'), 'i', $str);
-		$str = str_replace(array('ò','ó','ô','õ','ö','Ò','Ó','Ô','Õ','Ö'), 'o', $str);
-		$str = str_replace(array('ù','ú','û','ü','ū','Ú','Û','Ü','Ū'), 'u', $str);
+		$str = str_replace(array('à', 'á', 'â', 'ã', 'ä', 'æ', 'À', 'Á', 'Â', 'Ã', 'Ä'), 'a', $str);
+		$str = str_replace(array('ç', 'Ç'), 'c', $str);
+		$str = str_replace(array('Σ', 'è', 'é', 'ê', 'ë', 'È', 'É', 'Ê', 'Ë'), 'e', $str);
+		$str = str_replace(array('ì', 'í', 'î', 'ï', 'Ì', 'Í', 'Î', 'Ï'), 'i', $str);
+		$str = str_replace(array('ò', 'ó', 'ô', 'õ', 'ö', 'Ò', 'Ó', 'Ô', 'Õ', 'Ö'), 'o', $str);
+		$str = str_replace(array('ù', 'ú', 'û', 'ü', 'ū', 'Ú', 'Û', 'Ü', 'Ū'), 'u', $str);
 		$str = str_replace('ß', 'ss', $str);
 
 		$str = str_replace('&', 'and', $str);
@@ -822,23 +829,30 @@ class TvRage
 		return trim($str);
 	}
 
+	/**
+	 * @param string $key
+	 */
 	public function fetchCache($key)
 	{
 		$cache = new Cache;
-		if ($cache->enabled && $cache->exists($key))
-		{
+		if ($cache->enabled && $cache->exists($key)) {
 			$ret = $cache->fetch($key);
-			if ($ret !== false)
-				return $ret;
+			if ($ret !== false) {
+							return $ret;
+			}
 		}
 		return false;
 	}
 
+	/**
+	 * @param string $key
+	 */
 	public function storeCache($key, $data)
 	{
 		$cache = new Cache;
-		if ($cache->enabled)
-			return $cache->store($key, $data);
+		if ($cache->enabled) {
+					return $cache->store($key, $data);
+		}
 
 		return false;
 	}
@@ -893,30 +907,30 @@ class TvRage
 		//2009-01-01
 		} elseif (preg_match('/^(.*?)[\. \-](19|20)(\d{2})[\.\-](\d{2})[\.\-](\d{2})\./i', $relname, $matches)) {
 			$showInfo['name'] = $matches[1];
-			$showInfo['season'] = $matches[2].$matches[3];
-			$showInfo['episode'] = $matches[4].'/'.$matches[5];
-			$showInfo['airdate'] = $matches[2].$matches[3].'-'.$matches[4].'-'.$matches[5]; //yy-m-d
+			$showInfo['season'] = $matches[2] . $matches[3];
+			$showInfo['episode'] = $matches[4] . '/' . $matches[5];
+			$showInfo['airdate'] = $matches[2] . $matches[3] . '-' . $matches[4] . '-' . $matches[5]; //yy-m-d
 		//01.01.2009
 		} elseif (preg_match('/^(.*?)[\. \-](\d{2}).(\d{2})\.(19|20)(\d{2})\./i', $relname, $matches)) {
 			$showInfo['name'] = $matches[1];
-			$showInfo['season'] = $matches[4].$matches[5];
-			$showInfo['episode'] = $matches[2].'/'.$matches[3];
-			$showInfo['airdate'] = $matches[4].$matches[5].'-'.$matches[2].'-'.$matches[3]; //yy-m-d
+			$showInfo['season'] = $matches[4] . $matches[5];
+			$showInfo['episode'] = $matches[2] . '/' . $matches[3];
+			$showInfo['airdate'] = $matches[4] . $matches[5] . '-' . $matches[2] . '-' . $matches[3]; //yy-m-d
 		//01.01.09
 		} elseif (preg_match('/^(.*?)[\. \-](\d{2}).(\d{2})\.(\d{2})\./i', $relname, $matches)) {
 			$showInfo['name'] = $matches[1];
-			$showInfo['season'] = ($matches[4] <= 99 && $matches[4] > 15) ? '19'.$matches[4] : '20'.$matches[4];
-			$showInfo['episode'] = $matches[2].'/'.$matches[3];
-			$showInfo['airdate'] = $showInfo['season'].'-'.$matches[2].'-'.$matches[3]; //yy-m-d
+			$showInfo['season'] = ($matches[4] <= 99 && $matches[4] > 15) ? '19' . $matches[4] : '20' . $matches[4];
+			$showInfo['episode'] = $matches[2] . '/' . $matches[3];
+			$showInfo['airdate'] = $showInfo['season'] . '-' . $matches[2] . '-' . $matches[3]; //yy-m-d
 		//2009.E01
 		} elseif (preg_match('/^(.*?)[\. \-]20(\d{2})\.e(\d{1,3})\./i', $relname, $matches)) {
 			$showInfo['name'] = $matches[1];
-			$showInfo['season'] = '20'.$matches[2];
+			$showInfo['season'] = '20' . $matches[2];
 			$showInfo['episode'] = intval($matches[3]);
 		//2009.Part1
 		} elseif (preg_match('/^(.*?)[\. \-]20(\d{2})\.Part(\d{1,2})\./i', $relname, $matches)) {
 			$showInfo['name'] = $matches[1];
-			$showInfo['season'] = '20'.$matches[2];
+			$showInfo['season'] = '20' . $matches[2];
 			$showInfo['episode'] = intval($matches[3]);
 		//Part1/Pt1
 		} elseif (preg_match('/^(.*?)[\. \-](?:Part|Pt)\.?(\d{1,2})\./i', $relname, $matches)) {
@@ -928,7 +942,7 @@ class TvRage
 			$showInfo['name'] = $matches[1];
 			$showInfo['season'] = 1;
 			$epLow = strtolower($matches[2]);
-			switch($epLow) {
+			switch ($epLow) {
 				case 'i': $e = 1; break;
 				case 'ii': $e = 2; break;
 				case 'iii': $e = 3; break;
@@ -965,16 +979,16 @@ class TvRage
 
 		if (!empty($showInfo['name'])) {
 			//country or origin matching
-			if (preg_match('/[\._ ](US|UK|AU|NZ|CA|NL|Canada|Australia|America)/', $showInfo['name'], $countryMatch))
-			{
-				if (strtolower($countryMatch[1]) == 'canada')
-					$showInfo['country'] = 'CA';
-				elseif (strtolower($countryMatch[1]) == 'australia')
-					$showInfo['country'] = 'AU';
-				elseif (strtolower($countryMatch[1]) == 'america')
-					$showInfo['country'] = 'US';
-				else
-					$showInfo['country'] = strtoupper($countryMatch[1]);
+			if (preg_match('/[\._ ](US|UK|AU|NZ|CA|NL|Canada|Australia|America)/', $showInfo['name'], $countryMatch)) {
+				if (strtolower($countryMatch[1]) == 'canada') {
+									$showInfo['country'] = 'CA';
+				} elseif (strtolower($countryMatch[1]) == 'australia') {
+									$showInfo['country'] = 'AU';
+				} elseif (strtolower($countryMatch[1]) == 'america') {
+									$showInfo['country'] = 'US';
+				} else {
+									$showInfo['country'] = strtoupper($countryMatch[1]);
+				}
 			}
 
 			//clean show name
@@ -982,11 +996,11 @@ class TvRage
 
 			//check for dates instead of seasons
 			if (strlen($showInfo['season']) == 4) {
-				$showInfo['seriesfull'] = $showInfo['season']."/".$showInfo['episode'];
+				$showInfo['seriesfull'] = $showInfo['season'] . "/" . $showInfo['episode'];
 			} else {
 				//get year if present (not for releases with dates as seasons)
 				if (preg_match('/[\._ ](19|20)(\d{2})/i', $relname, $yearMatch))
-					$showInfo['year'] = $yearMatch[1].$yearMatch[2];
+					$showInfo['year'] = $yearMatch[1] . $yearMatch[2];
 
 				$showInfo['season'] = sprintf('S%02d', $showInfo['season']);
 				//check for multi episode release
@@ -999,9 +1013,9 @@ class TvRage
 				} else {
 					$showInfo['episode'] = sprintf('E%02d', $showInfo['episode']);
 				}
-				$showInfo['seriesfull'] = $showInfo['season'].$showInfo['episode'];
+				$showInfo['seriesfull'] = $showInfo['season'] . $showInfo['episode'];
 			}
-			$showInfo['airdate'] = (!empty($showInfo['airdate'])) ? $showInfo['airdate'].' 00:00:00' : '';
+			$showInfo['airdate'] = (!empty($showInfo['airdate'])) ? $showInfo['airdate'] . ' 00:00:00' : '';
 			return $showInfo;
 		}
 
@@ -1009,9 +1023,9 @@ class TvRage
 	}
 
 	public function getGenres()
-    {
-    	return array(
-    		'Action',
+	{
+		return array(
+			'Action',
 			'Adult/Porn',
 			'Adventure',
 			'Anthology',
@@ -1066,5 +1080,5 @@ class TvRage
 			'Western',
 			'Wildlife'
 		);
-    }
+	}
 }

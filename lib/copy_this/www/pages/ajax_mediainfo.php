@@ -1,5 +1,5 @@
 <?php
-require_once(WWW_DIR."/lib/releaseextra.php");
+require_once(WWW_DIR . "/lib/releaseextra.php");
 if (!$users->isLoggedIn()) {
 	$page->show403();
 }

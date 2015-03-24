@@ -17,13 +17,11 @@ class Contents
 	 */
 	public function validate($content)
 	{
-		if (substr($content["url"], 0, 1) != '/')
-		{
+		if (substr($content["url"], 0, 1) != '/') {
 			$content["url"] = "/" . $content["url"];
 		}
 
-		if (substr($content["url"], strlen($content["url"]) - 1) != '/')
-		{
+		if (substr($content["url"], strlen($content["url"]) - 1) != '/') {
 			$content["url"] = $content["url"] . "/";
 		}
 

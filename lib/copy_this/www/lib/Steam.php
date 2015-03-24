@@ -136,7 +136,7 @@ class Steam
 			$totaldetails = count($textarr) - 1;
 			for ($i = 0; $i <= $totaldetails;) {
 				if ($textarr[$i] == "Release Date") {
-					$pregmatchdate = $textarr[$i+1];
+					$pregmatchdate = $textarr[$i + 1];
 					if (preg_match_all('#(?P<day>[0-3]?\d)[^\d]|(?P<month>Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)|(?P<year>(19|20)\d{2})#i',
 						$pregmatchdate,
 						$matches)) {
@@ -151,8 +151,8 @@ class Steam
 						}
 					}
 				}
-				$this->_res['gamedetails'][$textarr[$i]] = $textarr[$i+1];
-				$i = $i+2;
+				$this->_res['gamedetails'][$textarr[$i]] = $textarr[$i + 1];
+				$i = $i + 2;
 			}
 		}
 
@@ -217,9 +217,9 @@ class Steam
 		}
 		if ($this->_ret = $this->_html->find("div.screenshot_holder", 0)) {
 			if ($this->_ret = $this->_ret->find("a", 0)) {
-				if(preg_match('/\?url\=(?<imgurl>.*)/', $this->_ret->href, $matches)){
+				if (preg_match('/\?url\=(?<imgurl>.*)/', $this->_ret->href, $matches)) {
 					$this->_res['backdrop'] = trim($matches['imgurl']);
-				}else{
+				} else {
 					$this->_res['backdrop'] = trim($this->_ret->href);
 				}
 
@@ -330,7 +330,7 @@ class Steam
 	{
 		if (isset($this->cookie)) {
 			$this->extractCookies(file_get_contents($this->cookie));
-			if($this->_ageCheckSet === false) {
+			if ($this->_ageCheckSet === false) {
 				$this->_postParams = array(
 					"snr" => "1_agecheck_agecheck__age-gate",
 					"ageDay" => "1",
@@ -388,7 +388,7 @@ class Steam
 	 *
 	 * @param string $string The contents of the cookie file.
 	 *
-	 * @return bool True/False if lastagecheckage and birthtime exists.
+	 * @return boolean|null True/False if lastagecheckage and birthtime exists.
 	 */
 	private function extractCookies($string)
 	{

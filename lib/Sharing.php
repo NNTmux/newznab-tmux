@@ -76,7 +76,7 @@ Class Sharing
 	 */
 	public function __construct(array $options = [])
 	{
-		$defaults= [
+		$defaults = [
 			'Settings' => null,
 			'NNTP'     => null,
 		];
@@ -526,7 +526,7 @@ Class Sharing
 		if (!isset($body['USER']) || !isset($body['SID']) || !isset($body['RID']) || !isset($body['TIME']) | !isset($body['BODY'])) {
 			return false;
 		}
-		$cid = md5($body['SID'].$body['USER'].$body['TIME'].$siteID);
+		$cid = md5($body['SID'] . $body['USER'] . $body['TIME'] . $siteID);
 
 		// Insert the comment.
 		if ($this->pdo->queryExec(

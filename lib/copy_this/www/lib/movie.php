@@ -84,14 +84,16 @@ class Movie
 	{
 		$db = new DB();
 
-		if ($start === false)
-			$limit = "";
-		else
-			$limit = " LIMIT " . $start . "," . $num;
+		if ($start === false) {
+					$limit = "";
+		} else {
+					$limit = " LIMIT " . $start . "," . $num;
+		}
 
 		$rsql = '';
-		if ($moviename != "")
-			$rsql .= sprintf("and movieinfo.title like %s ", $db->escapeString("%" . $moviename . "%"));
+		if ($moviename != "") {
+					$rsql .= sprintf("and movieinfo.title like %s ", $db->escapeString("%" . $moviename . "%"));
+		}
 
 		return $db->query(sprintf(" SELECT * FROM movieinfo where 1=1 %s ORDER BY createddate DESC" . $limit, $rsql));
 	}
@@ -104,8 +106,9 @@ class Movie
 		$db = new DB();
 
 		$rsql = '';
-		if ($moviename != "")
-			$rsql .= sprintf("and movieinfo.title like %s ", $db->escapeString("%" . $moviename . "%"));
+		if ($moviename != "") {
+					$rsql .= sprintf("and movieinfo.title like %s ", $db->escapeString("%" . $moviename . "%"));
+		}
 
 		$res = $db->queryOneRow(sprintf("select count(id) as num from movieinfo where 1=1 %s ", $rsql));
 		return $res["num"];
@@ -121,43 +124,41 @@ class Movie
 		$browseby = $this->getBrowseBy();
 
 		$catsrch = "";
-		if (count($cat) > 0 && $cat[0] != -1)
-		{
+		if (count($cat) > 0 && $cat[0] != -1) {
 			$catsrch = " (";
-			foreach ($cat as $category)
-			{
-				if ($category != -1)
-				{
+			foreach ($cat as $category) {
+				if ($category != -1) {
 					$categ = new Category();
-					if ($categ->isParent($category))
-					{
+					if ($categ->isParent($category)) {
 						$children = $categ->getChildren($category);
 						$chlist = "-99";
-						foreach ($children as $child)
-							$chlist .= ", " . $child["id"];
+						foreach ($children as $child) {
+													$chlist .= ", " . $child["id"];
+						}
 
-						if ($chlist != "-99")
-								$catsrch .= " r.categoryid in (" . $chlist . ") or ";
-					}
-					else
-					{
+						if ($chlist != "-99") {
+														$catsrch .= " r.categoryid in (" . $chlist . ") or ";
+						}
+					} else {
 						$catsrch .= sprintf(" r.categoryid = %d or ", $category);
 					}
 				}
 			}
 			$catsrch .= "1=2 )";
+		} else {
+					$catsrch = " 1=1 ";
 		}
-		else
-			$catsrch = " 1=1 ";
 
-		if ($maxage > 0)
-			$maxage = sprintf(" and r.postdate > now() - interval %d day ", $maxage);
-		else
-			$maxage = "";
+		if ($maxage > 0) {
+					$maxage = sprintf(" and r.postdate > now() - interval %d day ", $maxage);
+		} else {
+					$maxage = "";
+		}
 
 		$exccatlist = "";
-		if (count($excludedcats) > 0)
-			$exccatlist = " and r.categoryid not in (" . implode(",", $excludedcats) . ")";
+		if (count($excludedcats) > 0) {
+					$exccatlist = " and r.categoryid not in (" . implode(",", $excludedcats) . ")";
+		}
 
 		$sql = sprintf("select count(distinct r.imdbid) as num from releases r inner join movieinfo m on m.imdbid = r.imdbid and m.title != '' where r.passwordstatus <= (select value from site where setting='showpasswordedrelease') and %s %s %s %s ", $browseby, $catsrch, $maxage, $exccatlist);
 		$res = $db->queryOneRow($sql, true);
@@ -173,48 +174,47 @@ class Movie
 
 		$browseby = $this->getBrowseBy();
 
-		if ($start === false)
-			$limit = "";
-		else
-			$limit = " LIMIT " . $start . "," . $num;
+		if ($start === false) {
+					$limit = "";
+		} else {
+					$limit = " LIMIT " . $start . "," . $num;
+		}
 
 		$catsrch = "";
-		if (count($cat) > 0 && $cat[0] != -1)
-		{
+		if (count($cat) > 0 && $cat[0] != -1) {
 			$catsrch = " (";
-			foreach ($cat as $category)
-			{
-				if ($category != -1)
-				{
+			foreach ($cat as $category) {
+				if ($category != -1) {
 					$categ = new Category();
-					if ($categ->isParent($category))
-					{
+					if ($categ->isParent($category)) {
 						$children = $categ->getChildren($category);
 						$chlist = "-99";
-						foreach ($children as $child)
-							$chlist .= ", " . $child["id"];
+						foreach ($children as $child) {
+													$chlist .= ", " . $child["id"];
+						}
 
-						if ($chlist != "-99")
-								$catsrch .= " r.categoryid in (" . $chlist . ") or ";
-					}
-					else
-					{
+						if ($chlist != "-99") {
+														$catsrch .= " r.categoryid in (" . $chlist . ") or ";
+						}
+					} else {
 						$catsrch .= sprintf(" r.categoryid = %d or ", $category);
 					}
 				}
 			}
 			$catsrch .= "1=2 )";
+		} else {
+					$catsrch = " 1=1 ";
 		}
-		else
-			$catsrch = " 1=1 ";
 
 		$maxagesql = "";
-		if ($maxage > 0)
-			$maxagesql = sprintf(" and r.postdate > now() - interval %d day ", $maxage);
+		if ($maxage > 0) {
+					$maxagesql = sprintf(" and r.postdate > now() - interval %d day ", $maxage);
+		}
 
 		$exccatlist = "";
-		if (count($excludedcats) > 0)
-			$exccatlist = " and r.categoryid not in (" . implode(",", $excludedcats) . ")";
+		if (count($excludedcats) > 0) {
+					$exccatlist = " and r.categoryid not in (" . implode(",", $excludedcats) . ")";
+		}
 
 		$order = $this->getMovieOrder($orderby);
 		$sql = sprintf(" SELECT r.imdbid, max(r.postdate) as postdate, m.* from releases r inner join movieinfo m on m.imdbid = r.imdbid where r.passwordstatus <= (select value from site where setting='showpasswordedrelease') and m.title != '' and r.imdbid != 0000000 and %s %s %s %s group by r.imdbid order by %s %s" . $limit, $browseby, $catsrch, $maxagesql, $exccatlist, $order[0], $order[1]);
@@ -224,11 +224,11 @@ class Movie
 		//get a copy of all the imdbs
 		//
 		$imdbds = "";
-		foreach ($rows as $row)
-			$imdbds .= $row["imdbid"] . ", ";
+		foreach ($rows as $row) {
+					$imdbds .= $row["imdbid"] . ", ";
+		}
 
-		if (strlen($imdbds) > 0)
-		{
+		if (strlen($imdbds) > 0) {
 			$imdbds = substr($imdbds, 0, -2);
 
 			//
@@ -546,7 +546,7 @@ class Movie
 		}
 		if (isset($movie['trailers']) && isset($movie['trailers']['youtube']) && sizeof($movie['trailers']['youtube']) > 0)
 		{
-			foreach($movie['trailers']['youtube'] as $trailer)
+			foreach ($movie['trailers']['youtube'] as $trailer)
 			{
 				$ret['trailer'] = $trailer['source'];
 				break;
@@ -577,15 +577,16 @@ class Movie
 
 		$ret = array();
 		$c = 0;
-		foreach ($movies['results'] as $movie)
-		{
+		foreach ($movies['results'] as $movie) {
 			$c++;
-			if ($c >= $limit)
-				continue;
+			if ($c >= $limit) {
+							continue;
+			}
 
 			$m = $this->fetchTmdbProperties($movie['id'], false);
-			if ($m !== false)
-				$ret[] = $m;
+			if ($m !== false) {
+							$ret[] = $m;
+			}
 		}
 		return $ret;
 	}
@@ -612,13 +613,10 @@ class Movie
 		$buffer = Utility::getUrl(['url' => 'http://www.imdb.com/title/tt$imdbId/', 'method'=>'get', 'language' => $this->lookuplanguage]);
 
 		// make sure we got some data
-		if ($buffer !== false && strlen($buffer))
-		{
+		if ($buffer !== false && strlen($buffer)) {
 			$ret = array();
-			foreach ($imdb_regex as $field => $regex)
-			{
-				if (preg_match($regex, $buffer, $matches))
-				{
+			foreach ($imdb_regex as $field => $regex) {
+				if (preg_match($regex, $buffer, $matches)) {
 					$match = $matches[1];
 					$match = strip_tags(trim(rtrim($match)));
 					$ret[$field] = $match;
@@ -627,10 +625,8 @@ class Movie
 				}
 			}
 
-			foreach ($imdb_regex_multi as $field => $regex)
-			{
-				if (preg_match_all($regex, $buffer, $matches))
-				{
+			foreach ($imdb_regex_multi as $field => $regex) {
+				if (preg_match_all($regex, $buffer, $matches)) {
 					$match = $matches[1];
 					$match = array_map("trim", $match);
 					$ret[$field] = $match;
@@ -640,20 +636,16 @@ class Movie
 
 
 			//directors
-			if (preg_match('/<div.*?itemprop="director".*?>(.*?)<\/div>/is', $buffer, $hit))
-			{
-				if (preg_match_all('/<span.*?itemprop="name".*?>(.*?)<\/span>/is', $hit[1], $results, PREG_PATTERN_ORDER))
-				{
+			if (preg_match('/<div.*?itemprop="director".*?>(.*?)<\/div>/is', $buffer, $hit)) {
+				if (preg_match_all('/<span.*?itemprop="name".*?>(.*?)<\/span>/is', $hit[1], $results, PREG_PATTERN_ORDER)) {
 					$ret['director'] = $results[1];
 				}
 			}
 
 
 			//actors
-			if (preg_match('/<h4.*?Stars?:<\/h4>(.*?)<\/div>/is', $buffer, $hit))
-			{
-				if (preg_match_all('/<span.*?itemprop=\"name\".*?>(.*?)<\/span>/is', $hit[1], $results, PREG_PATTERN_ORDER))
-				{
+			if (preg_match('/<h4.*?Stars?:<\/h4>(.*?)<\/div>/is', $buffer, $hit)) {
+				if (preg_match_all('/<span.*?itemprop=\"name\".*?>(.*?)<\/span>/is', $hit[1], $results, PREG_PATTERN_ORDER)) {
 					$ret['actors'] = $results[1];
 				}
 			}
@@ -702,10 +694,10 @@ class Movie
 				if ($moviename !== false)
 				{
 					if ($this->echooutput)
-						echo 'MovProc : '.$moviename.' ['.$arr['searchname'].']'."\n";
+						echo 'MovProc : ' . $moviename . ' [' . $arr['searchname'] . ']' . "\n";
 
 					//$buffer = getUrl("https://www.google.com/search?source=ig&hl=en&rlz=&btnG=Google+Search&aq=f&oq=&q=".urlencode($moviename.' site:imdb.com'));
-					$buffer = Utility::getUrl(['url' => 'http://www.bing.com/search?&q='.urlencode($moviename.' site:imdb.com')]);
+					$buffer = Utility::getUrl(['url' => 'http://www.bing.com/search?&q=' . urlencode($moviename . ' site:imdb.com')]);
 
 					// make sure we got some data
 					if ($buffer !== false && strlen($buffer))

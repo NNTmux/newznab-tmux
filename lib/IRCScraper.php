@@ -215,7 +215,7 @@ class IRCScraper extends IRCClient
 			}
 			if ($matches['req'] !== 'N/A' && preg_match('/^(?P<req>\d+):(?P<group>.+)$/i', $matches['req'], $matches2)) {
 				$this->_curPre['reqid'] = $matches2['req'];
-				$this->_curPre['group_id']  = $this->_getGroupID($matches2['group']);
+				$this->_curPre['group_id'] = $this->_getGroupID($matches2['group']);
 			}
 			if ($matches['size'] !== 'N/A') {
 				$this->_curPre['size'] = $matches['size'];
@@ -281,28 +281,28 @@ class IRCScraper extends IRCClient
 
 		$query = 'INSERT INTO prehash (';
 
-		$query .= (!empty($this->_curPre['size'])     ? 'size, '       : '');
-		$query .= (!empty($this->_curPre['category']) ? 'category, '   : '');
-		$query .= (!empty($this->_curPre['source'])   ? 'source, '     : '');
-		$query .= (!empty($this->_curPre['reason'])   ? 'nukereason, ' : '');
-		$query .= (!empty($this->_curPre['files'])    ? 'files, '      : '');
-		$query .= (!empty($this->_curPre['reqid'])    ? 'requestid, '  : '');
-		$query .= (!empty($this->_curPre['group_id'])  ? 'groupid, '    : '');
-		$query .= (!empty($this->_curPre['nuked'])    ? 'nuked, '      : '');
-		$query .= (!empty($this->_curPre['filename']) ? 'filename, '   : '');
+		$query .= (!empty($this->_curPre['size']) ? 'size, ' : '');
+		$query .= (!empty($this->_curPre['category']) ? 'category, ' : '');
+		$query .= (!empty($this->_curPre['source']) ? 'source, ' : '');
+		$query .= (!empty($this->_curPre['reason']) ? 'nukereason, ' : '');
+		$query .= (!empty($this->_curPre['files']) ? 'files, ' : '');
+		$query .= (!empty($this->_curPre['reqid']) ? 'requestid, ' : '');
+		$query .= (!empty($this->_curPre['group_id']) ? 'groupid, ' : '');
+		$query .= (!empty($this->_curPre['nuked']) ? 'nuked, ' : '');
+		$query .= (!empty($this->_curPre['filename']) ? 'filename, ' : '');
 
 		$query .= 'predate, title) VALUES (';
 
-		$query .= (!empty($this->_curPre['size'])     ? $this->_pdo->escapeString($this->_curPre['size'])     . ', '   : '');
-		$query .= (!empty($this->_curPre['category']) ? $this->_pdo->escapeString($this->_curPre['category']) . ', '   : '');
-		$query .= (!empty($this->_curPre['source'])   ? $this->_pdo->escapeString($this->_curPre['source'])   . ', '   : '');
-		$query .= (!empty($this->_curPre['reason'])   ? $this->_pdo->escapeString($this->_curPre['reason'])   . ', '   : '');
-		$query .= (!empty($this->_curPre['files'])    ? $this->_pdo->escapeString($this->_curPre['files'])    . ', '   : '');
-		$query .= (!empty($this->_curPre['reqid'])    ? $this->_curPre['reqid']                             . ', '   : '');
-		$query .= (!empty($this->_curPre['group_id'])  ? $this->_curPre['group_id']                           . ', '   : '');
-		$query .= (!empty($this->_curPre['nuked'])    ? $this->_curPre['nuked']                             . ', '   : '');
-		$query .= (!empty($this->_curPre['filename']) ? $this->_pdo->escapeString($this->_curPre['filename']) . ', '   : '');
-		$query .= (!empty($this->_curPre['predate'])  ? $this->_curPre['predate']                           . ', '   : 'NOW(), ');
+		$query .= (!empty($this->_curPre['size']) ? $this->_pdo->escapeString($this->_curPre['size']) . ', ' : '');
+		$query .= (!empty($this->_curPre['category']) ? $this->_pdo->escapeString($this->_curPre['category']) . ', ' : '');
+		$query .= (!empty($this->_curPre['source']) ? $this->_pdo->escapeString($this->_curPre['source']) . ', ' : '');
+		$query .= (!empty($this->_curPre['reason']) ? $this->_pdo->escapeString($this->_curPre['reason']) . ', ' : '');
+		$query .= (!empty($this->_curPre['files']) ? $this->_pdo->escapeString($this->_curPre['files']) . ', ' : '');
+		$query .= (!empty($this->_curPre['reqid']) ? $this->_curPre['reqid'] . ', ' : '');
+		$query .= (!empty($this->_curPre['group_id']) ? $this->_curPre['group_id'] . ', ' : '');
+		$query .= (!empty($this->_curPre['nuked']) ? $this->_curPre['nuked'] . ', ' : '');
+		$query .= (!empty($this->_curPre['filename']) ? $this->_pdo->escapeString($this->_curPre['filename']) . ', ' : '');
+		$query .= (!empty($this->_curPre['predate']) ? $this->_curPre['predate'] . ', ' : 'NOW(), ');
 
 		$query .= '%s)';
 
@@ -331,26 +331,26 @@ class IRCScraper extends IRCClient
 
 		$query = 'UPDATE prehash SET ';
 
-		$query .= (!empty($this->_curPre['size'])     ? 'size = '       . $this->_pdo->escapeString($this->_curPre['size'])     . ', ' : '');
-		$query .= (!empty($this->_curPre['source'])   ? 'source = '     . $this->_pdo->escapeString($this->_curPre['source'])   . ', ' : '');
-		$query .= (!empty($this->_curPre['files'])    ? 'files = '      . $this->_pdo->escapeString($this->_curPre['files'])    . ', ' : '');
-		$query .= (!empty($this->_curPre['reason'])   ? 'nukereason = ' . $this->_pdo->escapeString($this->_curPre['reason'])   . ', ' : '');
-		$query .= (!empty($this->_curPre['reqid'])    ? 'requestid = '  . $this->_curPre['reqid']                             . ', ' : '');
-		$query .= (!empty($this->_curPre['group_id'])  ? 'groupid = '    . $this->_curPre['group_id']                           . ', ' : '');
-		$query .= (!empty($this->_curPre['predate'])  ? 'predate = '    . $this->_curPre['predate']                           . ', ' : '');
-		$query .= (!empty($this->_curPre['nuked'])    ? 'nuked = '      . $this->_curPre['nuked']                             . ', ' : '');
-		$query .= (!empty($this->_curPre['filename']) ? 'filename = '   . $this->_pdo->escapeString($this->_curPre['filename']) . ', ' : '');
+		$query .= (!empty($this->_curPre['size']) ? 'size = ' . $this->_pdo->escapeString($this->_curPre['size']) . ', ' : '');
+		$query .= (!empty($this->_curPre['source']) ? 'source = ' . $this->_pdo->escapeString($this->_curPre['source']) . ', ' : '');
+		$query .= (!empty($this->_curPre['files']) ? 'files = ' . $this->_pdo->escapeString($this->_curPre['files']) . ', ' : '');
+		$query .= (!empty($this->_curPre['reason']) ? 'nukereason = ' . $this->_pdo->escapeString($this->_curPre['reason']) . ', ' : '');
+		$query .= (!empty($this->_curPre['reqid']) ? 'requestid = ' . $this->_curPre['reqid'] . ', ' : '');
+		$query .= (!empty($this->_curPre['group_id']) ? 'groupid = ' . $this->_curPre['group_id'] . ', ' : '');
+		$query .= (!empty($this->_curPre['predate']) ? 'predate = ' . $this->_curPre['predate'] . ', ' : '');
+		$query .= (!empty($this->_curPre['nuked']) ? 'nuked = ' . $this->_curPre['nuked'] . ', ' : '');
+		$query .= (!empty($this->_curPre['filename']) ? 'filename = ' . $this->_pdo->escapeString($this->_curPre['filename']) . ', ' : '');
 		$query .= (
 		(empty($this->_oldPre['category']) && !empty($this->_curPre['category']))
 			? 'category = ' . $this->_pdo->escapeString($this->_curPre['category']) . ', '
 			: ''
 		);
 
-		if ($query === 'UPDATE prehash SET '){
+		if ($query === 'UPDATE prehash SET ') {
 			return;
 		}
 
-		$query .= 'title = '      . $this->_pdo->escapeString($this->_curPre['title']);
+		$query .= 'title = ' . $this->_pdo->escapeString($this->_curPre['title']);
 		$query .= ' WHERE title = ' . $this->_pdo->escapeString($this->_curPre['title']);
 
 		$this->_pdo->ping(true);
@@ -373,7 +373,7 @@ class IRCScraper extends IRCClient
 
 			$nukeString = '';
 			if ($this->_nuked !== false) {
-				switch((int)$this->_curPre['nuked']) {
+				switch ((int)$this->_curPre['nuked']) {
 					case PreHash::PRE_NUKED:
 						$nukeString = '[ NUKED ] ';
 						break;

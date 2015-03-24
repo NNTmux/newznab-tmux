@@ -1,14 +1,14 @@
 <?php
-require_once(dirname(__FILE__)."/../bin/config.php");
-require_once(WWW_DIR."/lib/framework/db.php");
-require_once(WWW_DIR."/lib/TMDb.php");
-require_once(WWW_DIR."/lib/site.php");
-require_once(WWW_DIR."/lib/util.php");
-require_once(WWW_DIR."/lib/category.php");
-require_once(WWW_DIR."/lib/releaseimage.php");
-require_once(WWW_DIR."/lib/rottentomato.php");
-require_once(WWW_DIR."/lib/Logger.php");
-require_once(WWW_DIR."/lib/Tmux.php");
+require_once(dirname(__FILE__) . "/../bin/config.php");
+require_once(WWW_DIR . "/lib/framework/db.php");
+require_once(WWW_DIR . "/lib/TMDb.php");
+require_once(WWW_DIR . "/lib/site.php");
+require_once(WWW_DIR . "/lib/util.php");
+require_once(WWW_DIR . "/lib/category.php");
+require_once(WWW_DIR . "/lib/releaseimage.php");
+require_once(WWW_DIR . "/lib/rottentomato.php");
+require_once(WWW_DIR . "/lib/Logger.php");
+require_once(WWW_DIR . "/lib/Tmux.php");
 require_once(WWW_DIR . "/lib/ColorCLI.php");
 require_once("TraktTv.php");
 
@@ -36,7 +36,7 @@ class Film
 	 * Current year of parsed search name.
 	 * @var string
 	 */
-	protected $currentYear  = '';
+	protected $currentYear = '';
 
 	/**
 	 * Current release id of parsed search name.
@@ -382,7 +382,7 @@ class Film
 	/**
 	 * Order types for movies page.
 	 *
-	 * @return array
+	 * @return string[]
 	 */
 	public function getMovieOrdering()
 	{
@@ -458,8 +458,7 @@ class Film
 	public function update(
 		$id = '', $title = '', $tagLine = '', $plot = '', $year = '', $rating = '', $genre = '', $director = '',
 		$actors = '', $language = '', $cover = '', $backdrop = ''
-	)
-	{
+	) {
 		if (!empty($id)) {
 
 			$this->pdo->queryExec(
@@ -467,16 +466,16 @@ class Film
 					UPDATE movieinfo
 					SET %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, %d, updateddate = NOW()
 					WHERE imdbid = %d",
-					(empty($title)    ? '' : 'title = '    . $this->pdo->escapeString($title)),
-					(empty($tagLine)  ? '' : 'tagline = '  . $this->pdo->escapeString($tagLine)),
-					(empty($plot)     ? '' : 'plot = '     . $this->pdo->escapeString($plot)),
-					(empty($year)     ? '' : 'year = '     . $this->pdo->escapeString($year)),
-					(empty($rating)   ? '' : 'rating = '   . $this->pdo->escapeString($rating)),
-					(empty($genre)    ? '' : 'genre = '    . $this->pdo->escapeString($genre)),
+					(empty($title) ? '' : 'title = ' . $this->pdo->escapeString($title)),
+					(empty($tagLine) ? '' : 'tagline = ' . $this->pdo->escapeString($tagLine)),
+					(empty($plot) ? '' : 'plot = ' . $this->pdo->escapeString($plot)),
+					(empty($year) ? '' : 'year = ' . $this->pdo->escapeString($year)),
+					(empty($rating) ? '' : 'rating = ' . $this->pdo->escapeString($rating)),
+					(empty($genre) ? '' : 'genre = ' . $this->pdo->escapeString($genre)),
 					(empty($director) ? '' : 'director = ' . $this->pdo->escapeString($director)),
-					(empty($actors)   ? '' : 'actors = '   . $this->pdo->escapeString($actors)),
+					(empty($actors) ? '' : 'actors = ' . $this->pdo->escapeString($actors)),
 					(empty($language) ? '' : 'language = ' . $this->pdo->escapeString($language)),
-					(empty($cover)    ? '' : 'cover = '    . $cover),
+					(empty($cover) ? '' : 'cover = ' . $cover),
 					(empty($backdrop) ? '' : 'backdrop = ' . $backdrop),
 					$id
 				)
@@ -489,7 +488,7 @@ class Film
 	 *
 	 * @param $variable
 	 *
-	 * @return string
+	 * @return boolean
 	 */
 	protected function checkVariable(&$variable)
 	{
@@ -520,7 +519,7 @@ class Film
 	/**
 	 * Fetch IMDB/TMDB info for the movie.
 	 *
-	 * @param $imdbId
+	 * @param string $imdbId
 	 *
 	 * @return bool
 	 */
@@ -571,12 +570,12 @@ class Film
 			$mov['banner'] = $this->releaseImage->saveImage($imdbId . '-banner', $fanart['banner'], $this->imgSavePath);
 		}
 
-		$mov['title']   = $this->setTmdbImdbVar($imdb['title']  , $tmdb['title']);
-		$mov['rating']  = $this->setTmdbImdbVar($imdb['rating'] , $tmdb['rating']);
-		$mov['plot']    = $this->setTmdbImdbVar($imdb['plot']   , $tmdb['plot']);
+		$mov['title']   = $this->setTmdbImdbVar($imdb['title'], $tmdb['title']);
+		$mov['rating']  = $this->setTmdbImdbVar($imdb['rating'], $tmdb['rating']);
+		$mov['plot']    = $this->setTmdbImdbVar($imdb['plot'], $tmdb['plot']);
 		$mov['tagline'] = $this->setTmdbImdbVar($imdb['tagline'], $tmdb['tagline']);
-		$mov['year']    = $this->setTmdbImdbVar($imdb['year']   , $tmdb['year']);
-		$mov['genre']   = $this->setTmdbImdbVar($imdb['genre']  , $tmdb['genre']);
+		$mov['year']    = $this->setTmdbImdbVar($imdb['year'], $tmdb['year']);
+		$mov['genre']   = $this->setTmdbImdbVar($imdb['genre'], $tmdb['genre']);
 
 		if ($this->checkVariable($imdb['type'])) {
 			$mov['type'] = $imdb['type'];
@@ -602,15 +601,15 @@ class Film
 			$mov['type'] = implode(', ', array_unique($mov['type']));
 		}
 
-		$mov['title']    = html_entity_decode($mov['title']   , ENT_QUOTES, 'UTF-8');
+		$mov['title']    = html_entity_decode($mov['title'], ENT_QUOTES, 'UTF-8');
 		$mov['plot']     = html_entity_decode(preg_replace('/\s+See full summary »/', ' ', $mov['plot']), ENT_QUOTES, 'UTF-8');
-		$mov['tagline']  = html_entity_decode($mov['tagline'] , ENT_QUOTES, 'UTF-8');
-		$mov['genre']    = html_entity_decode($mov['genre']   , ENT_QUOTES, 'UTF-8');
+		$mov['tagline']  = html_entity_decode($mov['tagline'], ENT_QUOTES, 'UTF-8');
+		$mov['genre']    = html_entity_decode($mov['genre'], ENT_QUOTES, 'UTF-8');
 		$mov['director'] = html_entity_decode($mov['director'], ENT_QUOTES, 'UTF-8');
-		$mov['actors']   = html_entity_decode($mov['actors']  , ENT_QUOTES, 'UTF-8');
+		$mov['actors']   = html_entity_decode($mov['actors'], ENT_QUOTES, 'UTF-8');
 		$mov['language'] = html_entity_decode($mov['language'], ENT_QUOTES, 'UTF-8');
 
-		$mov['type']    = html_entity_decode(ucwords(preg_replace('/[\.\_]/', ' ', $mov['type'])), ENT_QUOTES, 'UTF-8');
+		$mov['type'] = html_entity_decode(ucwords(preg_replace('/[\.\_]/', ' ', $mov['type'])), ENT_QUOTES, 'UTF-8');
 
 		$mov['title'] = str_replace(array('/', '\\'), '', $mov['title']);
 		$movieID = $this->pdo->queryInsert(
@@ -682,7 +681,7 @@ class Film
 	{
 		if ($this->fanartapikey != '')
 		{
-			$buffer = Utility::getUrl(['url' => 'https://webservice.fanart.tv/v3/movies/' . 'tt' . $imdbId . '?api_key=' . $this->fanartapikey , 'verifycert' => false]);
+			$buffer = Utility::getUrl(['url' => 'https://webservice.fanart.tv/v3/movies/' . 'tt' . $imdbId . '?api_key=' . $this->fanartapikey, 'verifycert' => false]);
 			if ($buffer !== false) {
 				$art = json_decode($buffer, true);
 				if (isset($art['status']) && $art['status'] === 'error') {
@@ -1049,8 +1048,8 @@ class Film
 
 		//If we found a year, try looking in a 4 year range.
 		if ($this->currentYear !== false) {
-			$start = (int) $this->currentYear - 2;
-			$end   = (int) $this->currentYear + 2;
+			$start = (int)$this->currentYear - 2;
+			$end   = (int)$this->currentYear + 2;
 			$andYearIn = 'AND year IN (';
 			while ($start < $end) {
 				$andYearIn .= $start . ',';
@@ -1148,7 +1147,7 @@ class Film
 	 */
 	protected function googleSearch()
 	{
-		$buffer =Utility::getUrl([
+		$buffer = Utility::getUrl([
 				'url' =>
 					'https://www.google.com/search?hl=en&as_q=&as_epq=' .
 					urlencode(
@@ -1352,6 +1351,9 @@ class Film
 		}
 	}
 
+	/**
+	 * @param RottenTomato $rt
+	 */
 	protected function _getRTData($operation = '', $rt)
 	{
 		$count = 0;
@@ -1416,7 +1418,7 @@ class Film
 	/**
 	 * Update upcoming table.
 	 *
-	 * @param $source
+	 * @param string $source
 	 * @param $type
 	 * @param $info
 	 *
@@ -1440,7 +1442,7 @@ class Film
 	/**
 	 * Get IMDB genres.
 	 *
-	 * @return array
+	 * @return string[]
 	 */
 	public function getGenres()
 	{

@@ -4,14 +4,16 @@ require_once(WWW_DIR . "/lib/util.php");
 
 $releases = new Releases;
 
-if (!$users->isLoggedIn())
+if (!$users->isLoggedIn()) {
 	$page->show403();
+}
 
 if (isset($_GET["id"])) {
 	$rel = $releases->getByGuid($_GET["id"]);
 
-	if (!$rel)
-		$page->show404();
+	if (!$rel) {
+			$page->show404();
+	}
 
 	$nfo = $releases->getReleaseNfo($rel['id']);
 	$nfo['nfoUTF'] = cp437toUTF($nfo['nfo']);
@@ -32,8 +34,9 @@ if (isset($_GET["id"])) {
 
 	$page->content = $page->smarty->fetch('viewnfo.tpl');
 
-	if ($modal)
-		echo $page->content;
-	else
-		$page->render();
-}
+	if ($modal) {
+			echo $page->content;
+	} else {
+			$page->render();
+	}
+	}

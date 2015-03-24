@@ -43,38 +43,40 @@ switch ($action) {
 			if ($_POST["id"] == "") {
 				$invites = $defaultinvites;
 				foreach ($userroles as $role) {
-					if ($role['id'] == $_POST['role'])
-						$invites = $role['defaultinvites'];
+					if ($role['id'] == $_POST['role']) {
+											$invites = $role['defaultinvites'];
+					}
 				}
 				$ret = $users->signup($_POST["username"], $_POST["password"], $_POST["email"], '', $_POST["role"], $_POST["notes"], $invites, "", true, false, false, true);
 			} else {
 				$ret = $users->update($_POST["id"], $_POST["username"], $_POST["email"], $_POST["grabs"], $_POST["role"], $_POST["notes"], $_POST["invites"], (isset($_POST['movieview']) ? "1" : "0"), (isset($_POST['musicview']) ? "1" : "0"), (isset($_POST['gameview']) ? "1" : "0"), (isset($_POST['xxxview']) ? "1" : "0"), (isset($_POST['consoleview']) ? "1" : "0"), (isset($_POST['bookview']) ? "1" : "0"));
-				if ($_POST['password'] != "")
-					$users->updatePassword($_POST["id"], $_POST['password']);
+				if ($_POST['password'] != "") {
+									$users->updatePassword($_POST["id"], $_POST['password']);
+				}
 			}
 
-			if ($ret >= 0)
-				header("Location:" . WWW_TOP . "/user-list.php");
-			else {
+			if ($ret >= 0) {
+							header("Location:" . WWW_TOP . "/user-list.php");
+			} else {
 				switch ($ret) {
-				case Users::ERR_SIGNUP_BADUNAME:
-					$page->smarty->assign('error', "Bad username. Try a better one.");
-					break;
-				case Users::ERR_SIGNUP_BADPASS:
-					$page->smarty->assign('error', "Bad password. Try a longer one.");
-					break;
-				case Users::ERR_SIGNUP_BADEMAIL:
-					$page->smarty->assign('error', "Bad email.");
-					break;
-				case Users::ERR_SIGNUP_UNAMEINUSE:
-					$page->smarty->assign('error', "Username in use.");
-					break;
-				case Users::ERR_SIGNUP_EMAILINUSE:
-					$page->smarty->assign('error', "Email in use.");
-					break;
-				default:
-					$page->smarty->assign('error', "Unknown save error.");
-					break;
+					case Users::ERR_SIGNUP_BADUNAME:
+						$page->smarty->assign('error', "Bad username. Try a better one.");
+						break;
+					case Users::ERR_SIGNUP_BADPASS:
+						$page->smarty->assign('error', "Bad password. Try a longer one.");
+						break;
+					case Users::ERR_SIGNUP_BADEMAIL:
+						$page->smarty->assign('error', "Bad email.");
+						break;
+					case Users::ERR_SIGNUP_UNAMEINUSE:
+						$page->smarty->assign('error', "Username in use.");
+						break;
+					case Users::ERR_SIGNUP_EMAILINUSE:
+						$page->smarty->assign('error', "Email in use.");
+						break;
+					default:
+						$page->smarty->assign('error', "Unknown save error.");
+						break;
 				}
 			$user = array();
 			$user["id"] = $_POST["id"];

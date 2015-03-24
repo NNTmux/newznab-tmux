@@ -1,6 +1,6 @@
 <?php
-require_once(WWW_DIR."/lib/sabnzbd.php");
-require_once(WWW_DIR.'/../misc/update_scripts/nix_scripts/tmux/lib/NZBGet.php');
+require_once(WWW_DIR . "/lib/sabnzbd.php");
+require_once(WWW_DIR . '/../misc/update_scripts/nix_scripts/tmux/lib/NZBGet.php');
 
 if (!$users->isLoggedIn()) {
 	$page->show403();

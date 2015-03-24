@@ -9,8 +9,7 @@ $page = new AdminPage();
 // set the current action
 $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view';
 
-switch ($action)
-{
+switch ($action) {
 	case 'submit':
 		if (isset($_POST['groupfilter']) && !empty($_POST['groupfilter'])) {
 			$groups = new Groups;

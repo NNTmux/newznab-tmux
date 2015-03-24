@@ -188,18 +188,15 @@ class PopulateAniDB
 						}
 					}
 
-					$episodeArray[$i]['episode_title'] = empty($titleArray) ? '' :
-						implode(', ', $titleArray);
+					$episodeArray[$i]['episode_title'] = empty($titleArray) ? '' : implode(', ', $titleArray);
 					$i++;
 				}
 			}
 
 			$episodeArray = [];
 			//start and end date come from AniDB API as date strings -- no manipulation needed
-			$AniDBAPIArray['startdate'] = isset($AniDBAPIXML->startdate) ? $AniDBAPIXML->startdate :
-				'0000-00-00';
-			$AniDBAPIArray['enddate']   = isset($AniDBAPIXML->enddate) ? $AniDBAPIXML->enddate :
-				'0000-00-00';
+			$AniDBAPIArray['startdate'] = isset($AniDBAPIXML->startdate) ? $AniDBAPIXML->startdate : '0000-00-00';
+			$AniDBAPIArray['enddate']   = isset($AniDBAPIXML->enddate) ? $AniDBAPIXML->enddate : '0000-00-00';
 
 			if (isset($AniDBAPIXML->ratings->permanent)) {
 				$AniDBAPIArray['rating'] = $AniDBAPIXML->ratings->permanent;
@@ -212,8 +209,7 @@ class PopulateAniDB
 				'type'        => isset($AniDBAPIXML->type[0]) ? (string)$AniDBAPIXML->type : '',
 				'description' => isset($AniDBAPIXML->description) ?
 						(string)$AniDBAPIXML->description : '',
-				'picture'     => isset($AniDBAPIXML->picture[0]) ? (string)$AniDBAPIXML->picture :
-						'',
+				'picture'     => isset($AniDBAPIXML->picture[0]) ? (string)$AniDBAPIXML->picture : '',
 				'epsarr'      => $episodeArray,
 			);
 

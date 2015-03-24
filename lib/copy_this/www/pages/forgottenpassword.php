@@ -1,12 +1,12 @@
 <?php
-require_once(WWW_DIR."/lib/util.php");
+require_once(WWW_DIR . "/lib/util.php");
 
 if ($users->isLoggedIn())
 	$page->show404();
 
 $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view';
 
-switch($action)
+switch ($action)
 {
 	case "reset":
 		if (!isset($_REQUEST['guid']))
@@ -31,8 +31,8 @@ switch($action)
 			$users->updatePassword($ret["id"], $newpass);
 
 			$to = $ret["email"];
-			$subject = $page->site->title." Password Reset";
-			$contents = "Your password has been reset to ".$newpass;
+			$subject = $page->site->title . " Password Reset";
+			$contents = "Your password has been reset to " . $newpass;
 			Utility::sendEmail($to, $subject, $contents, $page->site->email);
 
 			$page->smarty->assign('confirmed', "true");
@@ -45,7 +45,7 @@ switch($action)
 
 		$page->smarty->assign('email', $_POST['email']);
 
-		if ($_POST['email'] =="")
+		if ($_POST['email'] == "")
 		{
 			$page->smarty->assign('error', "Missing Email");
 		}
@@ -72,8 +72,8 @@ switch($action)
 				// Send the email
 				//
 				$to = $ret["email"];
-				$subject = $page->site->title." Forgotten Password Request";
-				$contents = "Someone has requested a password reset for this email address. To reset the password use the following link.\n\n ".$page->serverurl."forgottenpassword?action=reset&guid=".$guid;
+				$subject = $page->site->title . " Forgotten Password Request";
+				$contents = "Someone has requested a password reset for this email address. To reset the password use the following link.\n\n " . $page->serverurl . "forgottenpassword?action=reset&guid=" . $guid;
 				$page->smarty->assign('sent', "true");
 				Utility::sendEmail($to, $subject, $contents, $page->site->email);
 				break;
