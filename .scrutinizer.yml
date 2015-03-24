@@ -70,3 +70,11 @@ coding_style:
                 general: lower
             constants:
                 true_false_null: undefined
+
+filter:
+    excluded_paths:
+        - lib/copy_this/www/lib/smarty/*
+        - lib/copy_this/www/lib/Net_NNTP/*
+        - lib/PHPMailer/*
+        - lib/getid3/*
+        - lib/copy_this/misc/update_scripts/multiprocessing/forkdaemon-php/*
