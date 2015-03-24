@@ -1,6 +1,6 @@
 <?php
-require_once(WWW_DIR."/lib/framework/db.php");
-require_once(WWW_DIR."/lib/users.php");
+require_once(WWW_DIR . "/lib/framework/db.php");
+require_once(WWW_DIR . "/lib/users.php");
 
 /**
  * This class looks up site menu data.
@@ -30,7 +30,7 @@ class Menu
 		{
 			if (!preg_match("/http/i", $d["href"]))
 			{
-				$d["href"] = $serverurl.$d["href"];
+				$d["href"] = $serverurl . $d["href"];
 				$ret[] = $d;
 			}
 			else
@@ -75,7 +75,7 @@ class Menu
 	{
 		$db = new DB();
 		return $db->queryInsert(sprintf("INSERT INTO menu (href, title, tooltip, role, ordinal, menueval, newwindow )
-			VALUES (%s, %s, %s, %d, %d, %s, %d) ", $db->escapeString($menu["href"]), $db->escapeString($menu["title"]), $db->escapeString($menu["tooltip"]), $menu["role"] , $menu["ordinal"], $db->escapeString($menu["menueval"]), $menu["newwindow"] ));
+			VALUES (%s, %s, %s, %d, %d, %s, %d) ", $db->escapeString($menu["href"]), $db->escapeString($menu["title"]), $db->escapeString($menu["tooltip"]), $menu["role"], $menu["ordinal"], $db->escapeString($menu["menueval"]), $menu["newwindow"]));
 	}
 
 	/**
@@ -84,6 +84,6 @@ class Menu
 	public function update($menu)
 	{
 		$db = new DB();
-		return $db->queryExec(sprintf("update menu set href = %s, title = %s, tooltip = %s, role = %d, ordinal = %d, menueval = %s, newwindow=%d where id = %d	", $db->escapeString($menu["href"]), $db->escapeString($menu["title"]), $db->escapeString($menu["tooltip"]), $menu["role"] , $menu["ordinal"], $db->escapeString($menu["menueval"]), $menu["newwindow"], $menu["id"] ));
+		return $db->queryExec(sprintf("update menu set href = %s, title = %s, tooltip = %s, role = %d, ordinal = %d, menueval = %s, newwindow=%d where id = %d	", $db->escapeString($menu["href"]), $db->escapeString($menu["title"]), $db->escapeString($menu["tooltip"]), $menu["role"], $menu["ordinal"], $db->escapeString($menu["menueval"]), $menu["newwindow"], $menu["id"]));
 	}
 }

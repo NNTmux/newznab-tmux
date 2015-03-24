@@ -41,11 +41,11 @@ declare(ticks = 1);
  * SOFTWARE.
  */
 class PowerProcess {
-	const CALLBACK_STOP_PROPOGATION	=	-1;
-	const CALLBACK_IGNORE			=	0;
-	const CALLBACK_CONTINUE 		=	1;
-	const CALLBACK_SHUTDOWN 		=	2;
-	const CALLBACK_RESTART			=	3;
+	const CALLBACK_STOP_PROPOGATION = -1;
+	const CALLBACK_IGNORE = 0;
+	const CALLBACK_CONTINUE 		= 1;
+	const CALLBACK_SHUTDOWN 		= 2;
+	const CALLBACK_RESTART = 3;
 
 	/**
 	 * Current PowerProcess version
@@ -173,11 +173,12 @@ class PowerProcess {
 	 * @var array
 	 */
 	public $signalArray = array(
-		SIGUSR1,	// User-Defined 1
+		SIGUSR1, // User-Defined 1
 		SIGUSR2		// User-Defined 2
 	);
 
-	static public function SignalName($signal) {
+	static public function SignalName($signal)
+	{
 		switch ($signal) {
 			case SIGHUP:
 				return 'SIGHUP';
@@ -269,7 +270,8 @@ class PowerProcess {
 	 *
 	 * @return object	Instanced PowerProcess object
 	 */
-	public function __construct($maxThreads = 10, $threadTimeLimit = 300, $daemon = false, $logTo = false, $debugLogging = false) {
+	public function __construct($maxThreads = 10, $threadTimeLimit = 300, $daemon = false, $logTo = false, $debugLogging = false)
+	{
 		if (function_exists('pcntl_fork') && function_exists('posix_getpid')) {
 			// Set the current thread name
 			$this->currentThread = 'CONTROL';
@@ -288,13 +290,13 @@ class PowerProcess {
 				if (!$this->Daemonize()) {
 					die("Could not daemonize");
 				} else {
-					$this->Log("Daemonized successfully",true);
+					$this->Log("Daemonized successfully", true);
 				}
 			} else {
 				// Register control process PID
 				$this->parentPID = $this->GetPID();
 				$this->parentSID = false;
-				$this->Log("Parent PID detected as {$this->parentPID}",true);
+				$this->Log("Parent PID detected as {$this->parentPID}", true);
 			}
 
 			// The the complete flag to false
@@ -307,7 +309,7 @@ class PowerProcess {
 			$this->myThreads = array();
 
 			// Log completion of startup
-			$this->Log("Startup process complete",true);
+			$this->Log("Startup process complete", true);
 		} else {
 			die("PowerProcess requires both the POSIX and PCNTL extensions to operate.\n");
 		}
@@ -316,7 +318,8 @@ class PowerProcess {
 	/**
 	 * Frees up memory
 	 */
-	public function __destruct() {
+	public function __destruct()
+	{
 		unset($this->callbacks);
 		unset($this->myThreads);
 
@@ -332,7 +335,8 @@ class PowerProcess {
 	 * @param string $process	Path to the binary process to execute
 	 * @param array $args		Array of argument strings to pass to the program
 	 */
-	public function Exec($process, $args = null) {
+	public function Exec($process, $args = null)
+	{
 		if ($args == null) {
 			pcntl_exec($process);
 		} else {
@@ -345,7 +349,8 @@ class PowerProcess {
 	 *
 	 * @return integer
 	 */
-	public function GetPID() {
+	public function GetPID()
+	{
 		return posix_getpid();
 	}
 
@@ -354,7 +359,8 @@ class PowerProcess {
 	 *
 	 * @return integer
 	 */
-	public function GetControlPID() {
+	public function GetControlPID()
+	{
 		return posix_getppid();
 	}
 
@@ -364,8 +370,11 @@ class PowerProcess {
 	 * @param string|integer $name The name or PID of the process for which you want status information
 	 * @return array|boolean
 	 */
-	public function GetThreadStatus($name = false) {
-		if ($name === false) return false;
+	public function GetThreadStatus($name = false)
+	{
+		if ($name === false) {
+			return false;
+		}
 		if (isset($this->myThreads[$name])) {
 			return $this->myThreads[$name];
 		} else {
@@ -378,7 +387,8 @@ class PowerProcess {
 	 *
 	 * @return boolean
 	 */
-	public function IsDaemon() {
+	public function IsDaemon()
+	{
 		return $this->parentSID !== false;
 	}
 
@@ -388,7 +398,8 @@ class PowerProcess {
 	 * @param string $msg The message to log
 	 * @param boolean $internal Whether this is an internal debug logging message
 	 */
-	public function Log($msg, $internal = false) {
+	public function Log($msg, $internal = false)
+	{
 		if ($this->logSocket !== false) {
 			if (!$internal || $this->debugLogging) {
 				if ($this->timeStampLogs) {
@@ -403,11 +414,12 @@ class PowerProcess {
 	/**
 	 * Restarts the control process
 	 */
-	public function Restart() {
+	public function Restart()
+	{
 		// Build Path of Script
 		if (isset($_SERVER['_'])) {
 			$cmd = $_SERVER['_'];
-			$this->Log("Attempting to restart using {$cmd}",true);
+			$this->Log("Attempting to restart using {$cmd}", true);
 		} else {
 			$this->Log("Can not restart - Shutting down", true);
 			return $this->Shutdown();
@@ -420,7 +432,9 @@ class PowerProcess {
 		}
 
 		// Remove the first arg if this is a stand-alone
-		if ($cmd == $_SERVER['argv'][0]) unset($_SERVER['argv'][0]);
+		if ($cmd == $_SERVER['argv'][0]) {
+			unset($_SERVER['argv'][0]);
+		}
 
 		// Execute Restart
 		$this->Exec($cmd, $_SERVER['argv']);
@@ -438,16 +452,19 @@ class PowerProcess {
 	 * @param int|string $signal The signal to register a callback for
 	 * @param callback $callback The callback function
 	 */
-	public function RegisterCallback($signal, $callback = false) {
-		if ($callback !== false) $this->callbacks[$signal][] = $callback;
+	public function RegisterCallback($signal, $callback = false)
+	{
+		if ($callback !== false) {
+			$this->callbacks[$signal][] = $callback;
+		}
 
 		// Register with PCNTL
 		if (is_int($signal)) {
-			$this->Log("Registering signal {$signal} with dispatcher",true);
+			$this->Log("Registering signal {$signal} with dispatcher", true);
 			pcntl_signal($signal, array(&$this, 'SignalDispatch'));
 
 			// Unblock the Signal
-			pcntl_sigprocmask(SIG_UNBLOCK,array($signal));
+			pcntl_sigprocmask(SIG_UNBLOCK, array($signal));
 		}
 	}
 
@@ -456,7 +473,8 @@ class PowerProcess {
 	 *
 	 * @return boolean
 	 */
-	public function RunControlCode() {
+	public function RunControlCode()
+	{
 		$this->Tick();
 		if (!$this->complete) {
 			return $this->ControlCheck();
@@ -471,7 +489,8 @@ class PowerProcess {
 	 *
 	 * @return boolean
 	 */
-	public function RunThreadCode() {
+	public function RunThreadCode()
+	{
 		return !$this->ControlCheck();
 	}
 
@@ -481,7 +500,8 @@ class PowerProcess {
 	 * @param integer $pid
 	 * @param integer $signal
 	 */
-	public function SendSignal($pid = 0, $signal = 0) {
+	public function SendSignal($pid = 0, $signal = 0)
+	{
 		if ($signal > 0 && $pid > 0) {
 			return posix_kill($pid, $signal) && pcntl_signal_dispatch();
 		} else {
@@ -494,7 +514,8 @@ class PowerProcess {
 	 *
 	 * @param integer $maxThreads The max number of threads to run concurrently
 	 */
-	public function SetMaxThreads($maxThreads = 10) {
+	public function SetMaxThreads($maxThreads = 10)
+	{
 		$this->maxThreads = $maxThreads;
 	}
 
@@ -503,7 +524,8 @@ class PowerProcess {
 	 *
 	 * @param integer $threadTimeLimit The max number of seconds a thread can run
 	 */
-	public function SetThreadTimeLimit($threadTimeLimit = 300) {
+	public function SetThreadTimeLimit($threadTimeLimit = 300)
+	{
 		$this->threadTimeLimit = $threadTimeLimit;
 	}
 
@@ -513,7 +535,7 @@ class PowerProcess {
 	 * @param boolean $exit When set to true, Shutdown causes the script to exit
 	 */
 	public function Shutdown($exit = false) {
-		$this->Log("Initiating shutdown",true);
+		$this->Log("Initiating shutdown", true);
 
 		while ($this->ThreadCount()) {
 			$this->CheckThreads();
@@ -526,7 +548,9 @@ class PowerProcess {
 		$this->SignalDispatch('shutdown');
 
 		$this->Log("Shutdown Complete");
-		if ($exit) exit;
+		if ($exit) {
+			exit;
+		}
 
 		return self::CALLBACK_IGNORE;
 	}
@@ -536,7 +560,8 @@ class PowerProcess {
 	 *
 	 * @return boolean
 	 */
-	public function SpawnReady() {
+	public function SpawnReady()
+	{
 		$this->Tick();
 		return ($this->ThreadCount() < $this->maxThreads);
 	}
@@ -549,10 +574,11 @@ class PowerProcess {
 	 *
 	 * @return boolean|integer
 	 */
-	public function SpawnThread($name = false, $returnPid = false) {
+	public function SpawnThread($name = false, $returnPid = false)
+	{
 		// Check to make sure we can spawn another thread
 		if (!$this->SpawnReady()) {
-			$this->Log("The maximum number of threads are already running",true);
+			$this->Log("The maximum number of threads are already running", true);
 			$this->Tick();
 			return false;
 		}
@@ -560,7 +586,7 @@ class PowerProcess {
 		if ($name !== false) {
 			// Check to make sure there is not already a named thread with this name
 			if ($this->GetThreadStatus($name) !== false) {
-				$this->Log("There is already a thread named '{$name}' running",true);
+				$this->Log("There is already a thread named '{$name}' running", true);
 				$this->Tick();
 				return false;
 			}
@@ -577,12 +603,12 @@ class PowerProcess {
 				'time'	=>	time(),
 				'name'	=>	$name
 			);
-			$this->Log("Spawned thread: {$name}",true);
+			$this->Log("Spawned thread: {$name}", true);
 			$this->Tick();
 			return ($returnPid) ? $pid : true;
 		} else {
 			// We are the child thread so change the current thread var
-			$this->currentThread = ($name === false) ? "THREAD:".$this->GetPID() : $name;
+			$this->currentThread = ($name === false) ? "THREAD:" . $this->GetPID() : $name;
 			return ($returnPid) ? $pid : true;
 		}
 	}
@@ -592,19 +618,23 @@ class PowerProcess {
 	 *
 	 * @return integer
 	 */
-	public function ThreadCount() {
+	public function ThreadCount()
+	{
 		return count($this->myThreads);
 	}
 
 	/**
 	 * Process signals to be dispatched and sleep for a number of microseconds
 	 */
-	public function Tick() {
+	public function Tick()
+	{
 		// Dispatch Pending Signals
 		pcntl_signal_dispatch();
 
 		// Check Running Threads
-		if ($this->parentPID == $this->GetPID()) $this->CheckThreads();
+		if ($this->parentPID == $this->GetPID()) {
+			$this->CheckThreads();
+		}
 
 		// Tick
 		usleep($this->tickCount);
@@ -615,7 +645,8 @@ class PowerProcess {
 	 *
 	 * @return string The name of the current thread
 	 */
-	public function WhoAmI() {
+	public function WhoAmI()
+	{
 		return $this->currentThread;
 	}
 
@@ -626,7 +657,8 @@ class PowerProcess {
 	 * If a thread has exceeded it's time limit, this method will kill that process
 	 * and dispatch the special signal 'threadotl'
 	 */
-	private function CheckThreads() {
+	private function CheckThreads()
+	{
 		foreach ($this->myThreads as $i => $thread) {
 			// Check to make sure the process is still running
 			if ($this->PIDDead($thread['pid']) != 0) {
@@ -635,7 +667,7 @@ class PowerProcess {
 			} elseif ($this->threadTimeLimit > 0) {
 				if (time() - $thread['time'] > $this->threadTimeLimit) {
 					$this->KillThread($thread['pid']);
-					$this->Log("Thread {$thread['name']} has exceeded the thread time limit",true);
+					$this->Log("Thread {$thread['name']} has exceeded the thread time limit", true);
 					$this->SignalDispatch('threadotl');
 					unset($this->myThreads[$i]);
 				}
@@ -648,17 +680,18 @@ class PowerProcess {
 	 *
 	 * @return boolean
 	 */
-	private function ControlCheck() {
+	private function ControlCheck()
+	{
 		return $this->parentPID == $this->GetPID();
 	}
 
 	/**
 	 * Attempts to daemonize the current process
 	 *
-	 * @return integer
+	 * @return null|boolean
 	 */
 	private function Daemonize() {
-		$this->Log("Attempting to Daemonize",true);
+		$this->Log("Attempting to Daemonize", true);
 
 		// First need to fork
 		$pid = pcntl_fork();
@@ -667,14 +700,14 @@ class PowerProcess {
 		$this->Tick();
 
 		if ($pid < 0) exit; // Error
-		if ($pid) exit;		// Parent
+		if ($pid) exit; // Parent
 
 		$this->parentSID = posix_setsid();
 
 		// Need to reset the parent PID
 		$this->parentPID = $this->GetPID();
-		$this->Log("Parent PID {$this->parentPID}",true);
-		$this->Log("Parent SID {$this->parentSID}",true);
+		$this->Log("Parent PID {$this->parentPID}", true);
+		$this->Log("Parent SID {$this->parentSID}", true);
 
 		return ($this->parentSID > 0);
 	}
@@ -683,8 +716,10 @@ class PowerProcess {
 	 * Initialize the logging stream if enabled
 	 *
 	 * @param string|boolean $logTo The path or stream to log to or false to disable
+	 * @param boolean $debugLogging
 	 */
-	private function InitializeLogger($logTo, $debugLogging) {
+	private function InitializeLogger($logTo, $debugLogging)
+	{
 		if ($logTo !== false) {
 			$this->logSocket = @fopen($logTo, 'w');
 			$this->debugLogging = $debugLogging;
@@ -697,22 +732,23 @@ class PowerProcess {
 	/**
 	 * Installs the default signal handlers
 	 */
-	private function InstallSignalHandler() {
+	private function InstallSignalHandler()
+	{
 		// Register the callback for thread completion
-		$this->RegisterCallback(SIGCHLD, array($this,'CheckThreads'));
-		$this->Log("SIGCHLD callback registered",true);
+		$this->RegisterCallback(SIGCHLD, array($this, 'CheckThreads'));
+		$this->Log("SIGCHLD callback registered", true);
 
 		// Register the callback for restart requests
 		$this->RegisterCallback(SIGHUP, array($this, 'Restart'));
-		$this->Log("SIGHUP callback registered",true);
+		$this->Log("SIGHUP callback registered", true);
 
 		// Register the callback for shutdown requests
 		$this->RegisterCallback(SIGTERM, array($this, 'Shutdown'));
-		$this->Log("SIGTERM callback registered",true);
+		$this->Log("SIGTERM callback registered", true);
 
 		// Install the signal handler
 		foreach ($this->signalArray as $signal) $this->RegisterCallback($signal);
-		$this->Log("Signal Dispatcher installed",true);
+		$this->Log("Signal Dispatcher installed", true);
 	}
 
 	/**
@@ -720,7 +756,8 @@ class PowerProcess {
 	 *
 	 * @param integer $pid The PID of the thread to kill
 	 */
-	private function KillThread($pid = 0) {
+	private function KillThread($pid = 0)
+	{
 		$this->SendSignal($pid, SIGTERM);
 	}
 
@@ -732,9 +769,10 @@ class PowerProcess {
 	 * @param integer $pid The PID to check
 	 * @return integer
 	 */
-	private function PIDDead($pid = 0) {
+	private function PIDDead($pid = 0)
+	{
 		if ($pid > 0) {
-			return pcntl_waitpid($pid, $status, WUNTRACED OR WNOHANG);
+			return pcntl_waitpid($pid, $status, WUNTRACED or WNOHANG);
 		} else {
 			return 0;
 		}
@@ -743,7 +781,8 @@ class PowerProcess {
 	/**
 	 * Closes the logging stream
 	 */
-	private function RemoveLogger() {
+	private function RemoveLogger()
+	{
 		if ($this->logSocket) {
 			@fclose($this->logSocket);
 		}
@@ -752,12 +791,13 @@ class PowerProcess {
 	/**
 	 * Handles dispatching of signals to user-defined callbacks
 	 *
-	 * @param integer|string $signal
+	 * @param string $signal
 	 */
-	public function SignalDispatch($signal) {
+	public function SignalDispatch($signal)
+	{
 		// Log Dispatch
 		$signalName = self::SignalName($signal);
-		$this->Log("Received signal: {$signalName}",true);
+		$this->Log("Received signal: {$signalName}", true);
 
 		// Check the callback array for this signal number
 		if (isset($this->callbacks[$signal])) {
@@ -798,11 +838,13 @@ class PowerProcess {
 			}
 		} else {
 			// No callback registered
-			$this->Log("There is no callback registered for signal {$signalName}",true);
+			$this->Log("There is no callback registered for signal {$signalName}", true);
 		}
 
 		// Handle SIGTERM for threads
-		if ($signal == 15) exit(0);
+		if ($signal == 15) {
+			exit(0);
+		}
 	}
 
 }

@@ -1,7 +1,7 @@
 <?php
 require_once 'config.php';
-require_once(WWW_DIR."/lib/adminpage.php");
-require_once(WWW_DIR."/lib/Regexes.php");
+require_once(WWW_DIR . "/lib/adminpage.php");
+require_once(WWW_DIR . "/lib/Regexes.php");
 
 $page = new AdminPage();
 $regexes = new Regexes(['Settings' => $page->settings, 'Table_Name' => 'collection_regexes']);
@@ -9,7 +9,7 @@ $regexes = new Regexes(['Settings' => $page->settings, 'Table_Name' => 'collecti
 // Set the current action.
 $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view';
 
-switch($action) {
+switch ($action) {
 	case 'submit':
 		if ($_POST["group_regex"] == "") {
 			$page->smarty->assign('error', "Group regex must not be empty!");
@@ -36,7 +36,7 @@ switch($action) {
 			$regexes->updateRegex($_POST);
 		}
 
-		header("Location:".WWW_TOP."/collection_regexes-list.php");
+		header("Location:" . WWW_TOP . "/collection_regexes-list.php");
 		break;
 
 	case 'view':
@@ -53,8 +53,8 @@ switch($action) {
 		break;
 }
 
-$page->smarty->assign('status_ids', array(Category::STATUS_ACTIVE,Category::STATUS_INACTIVE));
-$page->smarty->assign('status_names', array( 'Yes', 'No'));
+$page->smarty->assign('status_ids', array(Category::STATUS_ACTIVE, Category::STATUS_INACTIVE));
+$page->smarty->assign('status_names', array('Yes', 'No'));
 
 $page->content = $page->smarty->fetch('collection_regexes-edit.tpl');
 $page->render();

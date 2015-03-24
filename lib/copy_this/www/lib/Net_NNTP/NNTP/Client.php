@@ -126,7 +126,7 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 	 * {@example docs/examples/phpdoc/connect.php}
 	 *
 	 * @param string $host                   (optional) The address of the NNTP-server to connect to, defaults to 'localhost'.
-	 * @param mixed  $encryption             (optional) Use TLS/SSL on the connection?
+	 * @param string|false  $encryption             (optional) Use TLS/SSL on the connection?
 	 *                                       (string) 'tcp'                 => Use no encryption.
 	 *                                       'ssl', 'sslv3', 'tls' => Use encryption.
 	 *                                       (null)|(false) Use no encryption.
@@ -223,7 +223,7 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 	 * {@example docs/examples/phpdoc/selectGroup.php}
 	 *
 	 * @param string $group    Name of the group to select
-	 * @param mixed  $articles (optional) experimental! When true the article numbers is returned in 'articles'
+	 * @param boolean  $articles (optional) experimental! When true the article numbers is returned in 'articles'
 	 *
 	 * @return mixed <br>
 	 *  - (array)  Summary about the selected group
@@ -1156,7 +1156,7 @@ class Net_NNTP_Client extends Net_NNTP_Protocol_Client
 	 * <b>Usage example:</b>
 	 * {@example docs/examples/phpdoc/getReferences.php}
 	 *
-	 * @param mixed $range        (optional)
+	 * @param string $range        (optional)
 	 *                            '<message number>'
 	 *                            '<message number>-<message number>'
 	 *                            '<message number>-'

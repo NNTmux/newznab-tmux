@@ -1,11 +1,11 @@
 <?php
-require_once(dirname(__FILE__).'/config.php');
-require_once(WWW_DIR.'/lib/nntp.php');
-require_once(WWW_DIR.'/lib/site.php');
-require_once(WWW_DIR.'/lib/anidb.php');
-require_once(WWW_DIR.'/lib/tvrage.php');
-require_once(WWW_DIR.'/lib/thetvdb.php');
-require_once(WWW_DIR.'/lib/Tmux.php');
+require_once(dirname(__FILE__) . '/config.php');
+require_once(WWW_DIR . '/lib/nntp.php');
+require_once(WWW_DIR . '/lib/site.php');
+require_once(WWW_DIR . '/lib/anidb.php');
+require_once(WWW_DIR . '/lib/tvrage.php');
+require_once(WWW_DIR . '/lib/thetvdb.php');
+require_once(WWW_DIR . '/lib/Tmux.php');
 require_once(WWW_DIR . "/lib/ColorCLI.php");
 require_once(dirname(__FILE__) . '/../lib/Pprocess.php');
 
@@ -25,7 +25,7 @@ $postprocess = new PProcess(['Echo' => true]);
 if (isset($pieces[6])) {
 	// Create the connection here and pass
 	$nntp = new NNTP();
-	if  ($nntp->doConnect() === false) {
+	if ($nntp->doConnect() === false) {
 		exit($c->error("Unable to connect to usenet."));
 	}
 

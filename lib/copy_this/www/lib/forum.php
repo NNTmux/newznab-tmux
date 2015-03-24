@@ -1,5 +1,5 @@
 <?php
-require_once(WWW_DIR."/lib/framework/db.php");
+require_once(WWW_DIR . "/lib/framework/db.php");
 
 /**
  * This class handles data access for forum and post data.
@@ -13,20 +13,21 @@ class Forum
 	{
 		$db = new DB();
 
-		if ($message == "")
-			return -1;
+		if ($message == "") {
+					return -1;
+		}
 
-		if ($parentid != 0)
-		{
+		if ($parentid != 0) {
 			$par = $this->getParent($parentid);
-			if ($par == false)
-				return -1;
+			if ($par == false) {
+							return -1;
+			}
 
 			$db->queryExec(sprintf("update forumpost set replies = replies + 1, updateddate = now() where id = %d", $parentid));
 		}
 
 		$db->queryInsert(sprintf("INSERT INTO `forumpost` (`forumID`,`parentid`,`userid`,`subject`,`message`, `locked`, `sticky`, `replies`, `createddate`, `updateddate`) VALUES ( 1,  %d, %d,  %s,  %s, %d, %d, %d,NOW(),  NOW())",
-			$parentid, $userid, $db->escapeString($subject)	, $db->escapeString($message), $locked, $sticky, $replies));
+			$parentid, $userid, $db->escapeString($subject), $db->escapeString($message), $locked, $sticky, $replies));
 	}
 
 	/**
@@ -86,9 +87,9 @@ class Forum
 		if ($start === false)
 			$limit = "";
 		else
-			$limit = " LIMIT ".$start.",".$num;
+			$limit = " LIMIT " . $start . "," . $num;
 
-		return $db->query(sprintf(" SELECT forumpost.*, users.username from forumpost left outer join users on users.id = forumpost.userid where parentid = 0 order by updateddate desc".$limit ));
+		return $db->query(sprintf(" SELECT forumpost.*, users.username from forumpost left outer join users on users.id = forumpost.userid where parentid = 0 order by updateddate desc" . $limit));
 	}
 
 	/**
@@ -107,12 +108,12 @@ class Forum
 	{
 		$db = new DB();
 		$post = $this->getPost($id);
-		if ($post)
-		{
-			if ($post["parentid"] == "0")
-				$this->deleteParent($id);
-			else
-				$db->queryExec(sprintf("DELETE from forumpost where id = %d", $id));
+		if ($post) {
+			if ($post["parentid"] == "0") {
+							$this->deleteParent($id);
+			} else {
+							$db->queryExec(sprintf("DELETE from forumpost where id = %d", $id));
+			}
 		}
 	}
 
@@ -145,8 +146,8 @@ class Forum
 		if ($start === false)
 			$limit = "";
 		else
-			$limit = " LIMIT ".$start.",".$num;
+			$limit = " LIMIT " . $start . "," . $num;
 
-		return $db->query(sprintf(" SELECT forumpost.*, users.username FROM forumpost LEFT OUTER JOIN users ON users.id = forumpost.userid where userid = %d order by forumpost.createddate desc ".$limit, $uid));
+		return $db->query(sprintf(" SELECT forumpost.*, users.username FROM forumpost LEFT OUTER JOIN users ON users.id = forumpost.userid where userid = %d order by forumpost.createddate desc " . $limit, $uid));
 	}
 }

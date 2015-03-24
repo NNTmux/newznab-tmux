@@ -10,8 +10,7 @@ final class NZBVortex
 
     public function __construct()
     {
-        if (is_null($this->session))
-        {
+        if (is_null($this->session)) {
             $this->getNonce();
             $this->login();
         }
@@ -24,8 +23,7 @@ final class NZBVortex
      */
     public function getState($code = 0)
     {
-        $states = array
-        (
+        $states = array(
             0  => 'Waiting',
             1  => 'Downloading',
             2  => 'Waiting for save',
@@ -65,8 +63,7 @@ final class NZBVortex
     {
         $params   = array('sessionid' => $this->session);
         $response = $this->sendRequest(sprintf('app/webUpdate'), $params);
-        foreach ($response['nzbs'] as &$nzb)
-        {
+        foreach ($response['nzbs'] as &$nzb) {
             $nzb['original_state'] = $nzb['state'];
             $nzb['state'] = (1 == $nzb['isPaused']) ? 'Paused' : $this->getState($nzb['state']);
         }
@@ -82,8 +79,7 @@ final class NZBVortex
      */
     public function addQueue($nzb = '')
     {
-        if (!empty($nzb))
-        {
+        if (!empty($nzb)) {
             $page = new Page;
             $user = new Users;
 
@@ -91,8 +87,7 @@ final class NZBVortex
             $data     = $user->getById($user->currentUserId());
             $url      = sprintf("%sgetnzb/%s.nzb&i=%s&r=%s", $host, $nzb, $data['id'], $data['rsstoken']);
 
-            $params   = array
-            (
+            $params   = array(
                 'sessionid' => $this->session,
                 'url'       => $url
             );
@@ -109,8 +104,7 @@ final class NZBVortex
      */
     public function resume($id = 0)
     {
-        if ($id > 0)
-        {
+        if ($id > 0) {
             # /nzb/(id)/resume
             $params   = array('sessionid' => $this->session);
             $response = $this->sendRequest(sprintf('nzb/%s/resume', $id), $params);
@@ -125,8 +119,7 @@ final class NZBVortex
      */
     public function pause($id = 0)
     {
-        if ($id > 0)
-        {
+        if ($id > 0) {
             # /nzb/(id)/pause
             $params   = array('sessionid' => $this->session);
             $response = $this->sendRequest(sprintf('nzb/%s/pause', $id), $params);
@@ -141,8 +134,7 @@ final class NZBVortex
      */
     public function moveUp($id = 0)
     {
-        if ($id > 0)
-        {
+        if ($id > 0) {
             # nzb/(nzbid)/moveup
             $params   = array('sessionid' => $this->session);
             $response = $this->sendRequest(sprintf('nzb/%s/moveup', $id), $params);
@@ -157,8 +149,7 @@ final class NZBVortex
      */
     public function moveDown($id = 0)
     {
-        if ($id > 0)
-        {
+        if ($id > 0) {
             # nzb/(nzbid)/movedown
             $params   = array('sessionid' => $this->session);
             $response = $this->sendRequest(sprintf('nzb/%s/movedown', $id), $params);
@@ -173,8 +164,7 @@ final class NZBVortex
      */
     public function moveBottom($id = 0)
     {
-        if ($id > 0)
-        {
+        if ($id > 0) {
             # nzb/(nzbid)/movebottom
             $params   = array('sessionid' => $this->session);
             $response = $this->sendRequest(sprintf('nzb/%s/movebottom', $id), $params);
@@ -189,8 +179,7 @@ final class NZBVortex
      */
     public function delete($id = 0)
     {
-        if ($id > 0)
-        {
+        if ($id > 0) {
             # nzb/(nzbid)/movebottom
             $params   = array('sessionid' => $this->session);
             $response = $this->sendRequest(sprintf('nzb/%s/cancelDelete', $id), $params);
@@ -205,8 +194,7 @@ final class NZBVortex
      */
     public function moveTop($id = 0)
     {
-        if ($id > 0)
-        {
+        if ($id > 0) {
             # nzb/(nzbid)/movebottom
             $params   = array('sessionid' => $this->session);
             $response = $this->sendRequest(sprintf('nzb/%s/movetop', $id), $params);
@@ -221,8 +209,7 @@ final class NZBVortex
      */
     public function getFilelist($id = 0)
     {
-        if ($id > 0)
-        {
+        if ($id > 0) {
             # ﬁle/(nzbid)
             $params   = array('sessionid' => $this->session);
             $response = $this->sendRequest(sprintf('file/%s', $id), $params);
@@ -254,8 +241,7 @@ final class NZBVortex
         $hash     = hash('sha256', sprintf("%s:%s:%s", $this->nonce, $cnonce, $data['nzbvortex_api_key']), true);
         $hash     = base64_encode($hash);
 
-        $params   = array
-        (
+        $params   = array(
             'nonce'  => $this->nonce,
             'cnonce' => $cnonce,
             'hash'   => $hash
@@ -263,14 +249,16 @@ final class NZBVortex
 
         $response = $this->sendRequest('auth/login', $params);
 
-        if ('successful' == $response['loginResult'])
-            $this->session = $response['sessionID'];
+        if ('successful' == $response['loginResult']) {
+                    $this->session = $response['sessionID'];
+        }
 
         if ('failed' == $response['loginResult']) { }
     }
 
     /**
      * sendRequest()
+     * @param string $path
      * @return array
      */
     protected function sendRequest($path, $params = array())
@@ -298,8 +286,7 @@ final class NZBVortex
 
         curl_close($ch);
 
-        switch ($status)
-        {
+        switch ($status) {
             case 0:
                 throw new Exception(sprintf('Unable to connect. Is NZBVortex running? Is your API key correct? Is something blocking ports? (Err: %s)', $error));
                 break;

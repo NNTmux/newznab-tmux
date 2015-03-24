@@ -1,6 +1,6 @@
 <?php
-require_once(WWW_DIR."/lib/users.php");
-require_once(WWW_DIR."/lib/framework/db.php");
+require_once(WWW_DIR . "/lib/users.php");
+require_once(WWW_DIR . "/lib/framework/db.php");
 
 
 /**
@@ -17,14 +17,14 @@ class Contents
 	 */
 	public function validate($content)
 	{
-		if (substr($content["url"],0,1) != '/')
+		if (substr($content["url"], 0, 1) != '/')
 		{
-			$content["url"] = "/".$content["url"];
+			$content["url"] = "/" . $content["url"];
 		}
 
 		if (substr($content["url"], strlen($content["url"]) - 1) != '/')
 		{
-			$content["url"] = $content["url"]."/";
+			$content["url"] = $content["url"] . "/";
 		}
 
 		return $content;
@@ -46,7 +46,7 @@ class Contents
 	{
 		$db = new DB();
 		$content = $this->validate($content);
-		$db->queryExec(sprintf("update content set	role=%d, title = %s , 	url = %s , 	body = %s , 	metadescription = %s , 	metakeywords = %s , 	contenttype = %d , 	showinmenu = %d , 	status = %d , 	ordinal = %d	where	id = %d ", $content["role"], $db->escapeString($content["title"]), $db->escapeString($content["url"]), $db->escapeString($content["body"]), $db->escapeString($content["metadescription"]), $db->escapeString($content["metakeywords"]), $content["contenttype"], $content["showinmenu"], $content["status"], $content["ordinal"], $content["id"] ));
+		$db->queryExec(sprintf("update content set	role=%d, title = %s , 	url = %s , 	body = %s , 	metadescription = %s , 	metakeywords = %s , 	contenttype = %d , 	showinmenu = %d , 	status = %d , 	ordinal = %d	where	id = %d ", $content["role"], $db->escapeString($content["title"]), $db->escapeString($content["url"]), $db->escapeString($content["body"]), $db->escapeString($content["metadescription"]), $db->escapeString($content["metakeywords"]), $content["contenttype"], $content["showinmenu"], $content["status"], $content["ordinal"], $content["id"]));
 	}
 
 	/**
@@ -58,7 +58,7 @@ class Contents
 
 		$content = $this->validate($content);
 
-		return $db->queryInsert(sprintf("insert into content (role, title, url, body, metadescription, metakeywords, 	contenttype, 	showinmenu, 	status, 	ordinal	)	values	(%d, %s, 	%s, 	%s, 	%s, 	%s, 	%d, 	%d, 	%d, 	%d 	)", $content["role"], $db->escapeString($content["title"]),  $db->escapeString($content["url"]),  $db->escapeString($content["body"]),  $db->escapeString($content["metadescription"]),  $db->escapeString($content["metakeywords"]), $content["contenttype"], $content["showinmenu"], $content["status"], $content["ordinal"] ));
+		return $db->queryInsert(sprintf("insert into content (role, title, url, body, metadescription, metakeywords, 	contenttype, 	showinmenu, 	status, 	ordinal	)	values	(%d, %s, 	%s, 	%s, 	%s, 	%s, 	%d, 	%d, 	%d, 	%d 	)", $content["role"], $db->escapeString($content["title"]), $db->escapeString($content["url"]), $db->escapeString($content["body"]), $db->escapeString($content["metadescription"]), $db->escapeString($content["metakeywords"]), $content["contenttype"], $content["showinmenu"], $content["status"], $content["ordinal"]));
 	}
 
 	/**
@@ -85,10 +85,11 @@ class Contents
 	public function getByID($id, $role)
 	{
 		$db = new DB();
-		if ($role == Users::ROLE_ADMIN)
-			$role = "";
-		else
-			$role = sprintf("and (role=%d or role=0)", $role);
+		if ($role == Users::ROLE_ADMIN) {
+					$role = "";
+		} else {
+					$role = sprintf("and (role=%d or role=0)", $role);
+		}
 
 		return $db->queryOneRow(sprintf("select * from content where id = %d %s", $id, $role));
 	}
@@ -108,10 +109,11 @@ class Contents
 	public function getForMenuByTypeAndRole($id, $role)
 	{
 		$db = new DB();
-		if ($role == Users::ROLE_ADMIN)
-			$role = "";
-		else
-			$role = sprintf("and (role=%d or role=0)", $role);
+		if ($role == Users::ROLE_ADMIN) {
+					$role = "";
+		} else {
+					$role = sprintf("and (role=%d or role=0)", $role);
+		}
 		return $db->query(sprintf("select * from content where showinmenu=1 and status=1 and contenttype = %d %s ", $id, $role));
 	}
 }

@@ -1,10 +1,10 @@
 <?php
-require_once(WWW_DIR."/lib/framework/db.php");
-require_once(WWW_DIR."/lib/amazon.php");
-require_once(WWW_DIR."/lib/category.php");
-require_once(WWW_DIR."/lib/site.php");
-require_once(WWW_DIR."/lib/util.php");
-require_once(WWW_DIR."/lib/releaseimage.php");
+require_once(WWW_DIR . "/lib/framework/db.php");
+require_once(WWW_DIR . "/lib/amazon.php");
+require_once(WWW_DIR . "/lib/category.php");
+require_once(WWW_DIR . "/lib/site.php");
+require_once(WWW_DIR . "/lib/util.php");
+require_once(WWW_DIR . "/lib/releaseimage.php");
 
 /*
  * Class for processing book info.
@@ -95,6 +95,10 @@ class Books
 		return $this->pdo->queryOneRow(sprintf('SELECT bookinfo.* FROM bookinfo WHERE bookinfo.id = %d', $id));
 	}
 
+	/**
+	 * @param string $author
+	 * @param string|null $title
+	 */
 	public function getBookInfoByName($author, $title)
 	{
 		$pdo = $this->pdo;
@@ -304,6 +308,9 @@ class Books
 		return $browseby;
 	}
 
+	/**
+	 * @param string $title
+	 */
 	public function fetchAmazonProperties($title)
 	{
 		$obj = new \AmazonProductAPI($this->pubkey, $this->privkey, $this->asstag);
@@ -392,7 +399,8 @@ class Books
 
 					// Update release.
 					$this->pdo->queryExec(sprintf('UPDATE releases SET bookinfoid = %d WHERE id = %d', $bookId, $arr['id']));
-				} else { // Could not parse release title.
+				} else {
+// Could not parse release title.
 					$this->pdo->queryExec(sprintf('UPDATE releases SET bookinfoid = %d WHERE id = %d', -2, $arr['id']));
 					if ($this->echooutput) {
 						echo '.';
@@ -409,6 +417,9 @@ class Books
 		}
 	}
 
+	/**
+	 * @param string $releasetype
+	 */
 	public function parseTitle($release_name, $releaseID, $releasetype)
 	{
 		$a = preg_replace('/\d{1,2} \d{1,2} \d{2,4}|(19|20)\d\d|anybody got .+?[a-z]\? |[-._ ](Novel|TIA)([-._ ]|$)|( |\.)HQ(-|\.| )|[\(\)\.\-_ ](AVI|AZW3?|DOC|EPUB|LIT|MOBI|NFO|RETAIL|(si)?PDF|RTF|TXT)[\)\]\.\-_ ](?![a-z0-9])|compleet|DAGSTiDNiNGEN|DiRFiX|\+ extra|r?e ?Books?([\.\-_ ]English|ers)?|azw3?|ePu(b|p)s?|html|mobi|^NEW[\.\-_ ]|PDF([\.\-_ ]English)?|Please post more|Post description|Proper|Repack(fix)?|[\.\-_ ](Chinese|English|French|German|Italian|Retail|Scan|Swedish)|^R4 |Repost|Skytwohigh|TIA!+|TruePDF|V413HAV|(would someone )?please (re)?post.+? "|with the authors name right/i', '', $release_name);

@@ -1,11 +1,11 @@
 <?php
-require_once(WWW_DIR."/lib/framework/db.php");
-require_once(WWW_DIR."/lib/groups.php");
-require_once(WWW_DIR."/lib/nntp.php");
-require_once(WWW_DIR."/lib/site.php");
-require_once(WWW_DIR."/lib/binaries.php");
-require_once(WWW_DIR."/lib/ColorCLI.php");
-require_once(WWW_DIR."/lib/Logger.php");
+require_once(WWW_DIR . "/lib/framework/db.php");
+require_once(WWW_DIR . "/lib/groups.php");
+require_once(WWW_DIR . "/lib/nntp.php");
+require_once(WWW_DIR . "/lib/site.php");
+require_once(WWW_DIR . "/lib/binaries.php");
+require_once(WWW_DIR . "/lib/ColorCLI.php");
+require_once(WWW_DIR . "/lib/Logger.php");
 
 class Backfill
 {
@@ -127,12 +127,12 @@ class Backfill
 	 * Backfill all the groups up to user specified time/date.
 	 *
 	 * @param string $groupName
-	 * @param string|int $articles
+	 * @param string $articles
 	 * @param string $type
 	 *
 	 * @return void
 	 */
-	public function backfillAllGroups($groupName = '', $articles ='', $type = '')
+	public function backfillAllGroups($groupName = '', $articles = '', $type = '')
 	{
 		$res = [];
 		if ($groupName !== '') {

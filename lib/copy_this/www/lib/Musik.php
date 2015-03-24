@@ -96,8 +96,8 @@ class Musik
 	}
 
 	/**
-	 * @param $artist
-	 * @param $album
+	 * @param string $artist
+	 * @param string $album
 	 *
 	 * @return array|bool
 	 */
@@ -290,7 +290,7 @@ class Musik
 	}
 
 	/**
-	 * @return array
+	 * @return string[]
 	 */
 	public function getMusicOrdering()
 	{
@@ -377,7 +377,7 @@ class Musik
 	}
 
 	/**
-	 * @param      $title
+	 * @param      string $title
 	 * @param      $year
 	 * @param null $amazdata
 	 *
@@ -560,7 +560,7 @@ class Musik
 	/**
 	 * @param $title
 	 *
-	 * @return bool|mixed
+	 * @return boolean
 	 */
 	public function fetchAmazonProperties($title)
 	{
@@ -617,7 +617,7 @@ class Musik
 		if ($res instanceof \Traversable && $res->rowCount() > 0) {
 			if ($this->echooutput) {
 				$this->pdo->log->doEcho(
-					$this->pdo->log->header("Processing " . $res->rowCount() .' music release(s).'
+					$this->pdo->log->header("Processing " . $res->rowCount() . ' music release(s).'
 					)
 				);
 			}
@@ -719,9 +719,9 @@ class Musik
 	}
 
 	/**
-	 * @param $nodeId
+	 * @param string $nodeId
 	 *
-	 * @return bool|string
+	 * @return string|false
 	 */
 	public function matchBrowseNode($nodeId)
 	{

@@ -529,7 +529,7 @@ class Parsing
 					// Scene regex
 					$sceneRegex = '/([a-z0-9\'\-\.\_\(\)\+\ ]+\-[a-z0-9\'\-\.\_\(\)\ ]+)(.*?\\\\.*?|)\.(?:\w{3,4})$/i';
 
-					foreach ($files AS $file) {
+					foreach ($files as $file) {
 						// Petje Releases
 						if (preg_match('/Petje \<petje\@pietamientje\.com\>/', $rel['fromname'], $matches3) && $foundName == '') {
 							if (preg_match('/.*\.(mkv|avi|mp4|wmv|divx)/', $file, $matches4)) {
@@ -607,29 +607,29 @@ class Parsing
 
 							//Check to see if file is inside of a folder. Use folder name if it is
 							if (preg_match('/^(.*?\\\\)(.*?\\\\|)(.*?)$/i', $file, $matches1) && $foundName == '') {
-								If (preg_match('/^([a-z0-9\.\_\- ]+\-[a-z0-9\_]+)(\\\\|)$/i', $matches1['1'], $res)) {
+								if (preg_match('/^([a-z0-9\.\_\- ]+\-[a-z0-9\_]+)(\\\\|)$/i', $matches1['1'], $res)) {
 									$foundName = $res['1'];
 									$methodused = "Release Files-1";
 									$this->determineCategory($rel, $foundName, $methodused);
 								}
-								If (preg_match('/(?!UTC)([a-z0-9]+[a-z0-9\.\_\- \'\)\(]+(\d{4}|HDTV).*?\-[a-z0-9]+)/i', $matches1['1'], $res) && $foundName == '') {
+								if (preg_match('/(?!UTC)([a-z0-9]+[a-z0-9\.\_\- \'\)\(]+(\d{4}|HDTV).*?\-[a-z0-9]+)/i', $matches1['1'], $res) && $foundName == '') {
 									$foundName = $res['1'];
 									$methodused = "Release Files-2";
 									$this->determineCategory($rel, $foundName, $methodused);
 								}
-								If (preg_match('/^([a-z0-9\.\_\- ]+\-[a-z0-9\_]+)(\\\\|)$/i', $matches1['2'], $res) && $foundName == '') {
+								if (preg_match('/^([a-z0-9\.\_\- ]+\-[a-z0-9\_]+)(\\\\|)$/i', $matches1['2'], $res) && $foundName == '') {
 									$foundName = $res['1'];
 									$methodused = "Release Files-3";
 									$this->determineCategory($rel, $foundName, $methodused);
 								}
-								If (preg_match('/^([a-z0-9\.\_\- ]+\-(?:.+)\(html\))\\\\/i', $matches1['1'], $res) && $foundName == '') {
+								if (preg_match('/^([a-z0-9\.\_\- ]+\-(?:.+)\(html\))\\\\/i', $matches1['1'], $res) && $foundName == '') {
 									$foundName = $res['1'];
 									$methodused = "Release Files-4";
 									$this->determineCategory($rel, $foundName, $methodused);
 								}
 
 							}
-							If (preg_match('/(?!UTC)([a-z0-9]+[a-z0-9\.\_\- \'\)\(]+(\d{4}|HDTV).*?\-[a-z0-9]+)/i', $file, $matches2) && $foundName == '') {
+							if (preg_match('/(?!UTC)([a-z0-9]+[a-z0-9\.\_\- \'\)\(]+(\d{4}|HDTV).*?\-[a-z0-9]+)/i', $file, $matches2) && $foundName == '') {
 								$foundName = $matches2['1'];
 								$methodused = "Release Files-4";
 								$this->determineCategory($rel, $foundName, $methodused);
@@ -685,7 +685,9 @@ class Parsing
 						$nntp = new Nntp;
 						$nntp->doConnect();
 
-						if ($this->verbose) echo "Checking Par\n";
+						if ($this->verbose) {
+							echo "Checking Par\n";
+						}
 						foreach ($nzbInfo->parfiles as $parfile) {
 							$this->parsprocessed++;
 							$parBinary = $nntp->getMessages($parfile['groups'][0], $parfile['segments'], $this->verbose);
@@ -706,8 +708,9 @@ class Parsing
 							}
 							unset($parBinary);
 
-							if ($foundName != "")
-								break;
+							if ($foundName != "") {
+															break;
+							}
 						}
 						$nntp->doQuit();
 					}
@@ -790,6 +793,7 @@ class Parsing
 
 	/**
 	 * Work out the category based on the name, resets to null if no category matched.
+	 * @param string $methodused
 	 */
 	private function determineCategory($rel, &$foundName, &$methodused)
 	{
@@ -1388,10 +1392,14 @@ class Parsing
 	{
 		if (!$forceNuke) {
 			$this->cleanup['misc'][$row['id']] = true;
-			if ($this->verbose) echo $reason . "Moving to Misc Other\n";
+			if ($this->verbose) {
+				echo $reason . "Moving to Misc Other\n";
+			}
 		} else {
 			$this->cleanup['nuke'][$row['id']] = true;
-			if ($this->verbose) echo $reason . "Removing Release\n";
+			if ($this->verbose) {
+				echo $reason . "Removing Release\n";
+			}
 		}
 	}
 
@@ -1482,13 +1490,16 @@ class Parsing
 
 	/**
 	 * update a release name
+	 * @param DB $db
 	 */
 	private function updateName($db, $id, $oldname, $newname)
 	{
-		if ($this->verbose)
-			echo sprintf("OLD : %s\nNEW : %s\n\n", $oldname, $newname);
+		if ($this->verbose) {
+					echo sprintf("OLD : %s\nNEW : %s\n\n", $oldname, $newname);
+		}
 
-		if (!$this->echoonly)
-			$db->queryExec(sprintf("update releases set name=%s, searchname = %s WHERE id = %d", $db->escapeString($newname), $db->escapeString($newname), $id));
+		if (!$this->echoonly) {
+					$db->queryExec(sprintf("update releases set name=%s, searchname = %s WHERE id = %d", $db->escapeString($newname), $db->escapeString($newname), $id));
+		}
 	}
 }

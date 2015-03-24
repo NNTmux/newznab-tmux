@@ -180,7 +180,7 @@ class GiantBomb
 	/**
 	 * Get list of objects by given filters
 	 *
-	 * @param $type
+	 * @param string $type
 	 * @param $filter     array filter by given values - no "," accepted
 	 * @param $limit      integer limit result count by given limit
 	 * @param $offset     integer offset of results
@@ -209,7 +209,7 @@ class GiantBomb
 	/**
 	 * Get information about a game
 	 *
-	 * @param $id         string id to request
+	 * @param string $id         string id to request
 	 * @param $field_list array list of fields to response
 	 *
 	 * @return array response
@@ -292,7 +292,7 @@ class GiantBomb
 	/**
 	 * Perform a search with given keyword
 	 *
-	 * @param $query      string keyword to search
+	 * @param string $query      string keyword to search
 	 * @param $field_list array list of fields to response
 	 * @param $limit      integer limit result count by given limit
 	 * @param $page
@@ -411,7 +411,7 @@ class GiantBombException extends Exception
 	/**
 	 * Redefine the exception so message isn't optional
 	 *
-	 * @param $message  string message to set in exception
+	 * @param string $message  string message to set in exception
 	 * @param $code     integer error code
 	 * @param $previous Exception previous Exception to save
 	 *

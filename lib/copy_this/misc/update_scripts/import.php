@@ -25,19 +25,24 @@ if (empty($argc) || $argc <= 1) {
 } else {
 	$util = new Utility();
 	$path = (!$util->endsWith($argv[1], "/") ? $argv[1] . "/" : $argv[1]);
-	if (isset($argv[2]))
-		$usefilename = strtolower($argv[2]) == 'true';
-	if (isset($argv[3]))
-		$dupecheck = strtolower($argv[3]) == 'true';
-	if (isset($argv[4]))
-		$movefiles = strtolower($argv[4]) == 'true';
-	if (isset($argv[5]) && is_numeric($argv[5]))
-		$categoryoverride = $argv[5];
-}
+	if (isset($argv[2])) {
+			$usefilename = strtolower($argv[2]) == 'true';
+	}
+	if (isset($argv[3])) {
+			$dupecheck = strtolower($argv[3]) == 'true';
+	}
+	if (isset($argv[4])) {
+			$movefiles = strtolower($argv[4]) == 'true';
+	}
+	if (isset($argv[5]) && is_numeric($argv[5])) {
+			$categoryoverride = $argv[5];
+	}
+	}
 
 $groups = $db->query("SELECT id, name FROM groups");
-foreach ($groups as $group)
+foreach ($groups as $group) {
 	$siteGroups[$group["name"]] = $group["id"];
+}
 
 echo "\nUsage: php import.php [path(string)] [usefilename(true/false)] [dupecheck(true/false)] [movefiles(true/false)] [overridecategory(number)]\n";
 
@@ -62,8 +67,12 @@ foreach ($filestoprocess as $nzbFile) {
 	if (!$nzbInfo->loadFromFile($nzbFile, true)) {
 		echo "Failed to load nzb from disk " . $nzbFile . "\n";
 		if ($movefiles) {
-			if (!file_exists($errorpath)) mkdir($errorpath);
-			if (!file_exists($errorpath . basename($nzbFile))) rename($nzbFile, $errorpath . basename($nzbFile));
+			if (!file_exists($errorpath)) {
+				mkdir($errorpath);
+			}
+			if (!file_exists($errorpath . basename($nzbFile))) {
+				rename($nzbFile, $errorpath . basename($nzbFile));
+			}
 		}
 	} else {
 		if ($dupecheck) {
@@ -71,8 +80,12 @@ foreach ($filestoprocess as $nzbFile) {
 			if ($dupes['total'] > 0) {
 				echo sprintf("%0" . $digits . "d %.2f%% Error : Dupe %s - GID(%s)\n", $items - $num, $num / $items * 100, $nzbFile, $nzbInfo->gid);
 				if ($movefiles) {
-					if (!file_exists($dupepath)) mkdir($dupepath);
-					if (!file_exists($dupepath . basename($nzbFile))) rename($nzbFile, $dupepath . basename($nzbFile));
+					if (!file_exists($dupepath)) {
+						mkdir($dupepath);
+					}
+					if (!file_exists($dupepath . basename($nzbFile))) {
+						rename($nzbFile, $dupepath . basename($nzbFile));
+					}
 				}
 				continue;
 			}
@@ -90,8 +103,12 @@ foreach ($filestoprocess as $nzbFile) {
 		if ($groupID == -1) {
 			echo sprintf("%0" . $digits . "d %.2f%% Error : Missing group %s - Group(%s)\n", $items - $num, $num / $items * 100, $nzbFile, str_replace("alt.binaries.", "a.b.", implode(",", $nzbInfo->groups)));
 			if ($movefiles) {
-				if (!file_exists($nogrouppath)) mkdir($nogrouppath);
-				if (!file_exists($nogrouppath . basename($nzbFile))) rename($nzbFile, $nogrouppath . basename($nzbFile));
+				if (!file_exists($nogrouppath)) {
+					mkdir($nogrouppath);
+				}
+				if (!file_exists($nogrouppath . basename($nzbFile))) {
+					rename($nzbFile, $nogrouppath . basename($nzbFile));
+				}
 				$missinggroups = array_merge($missinggroups, $nzbInfo->groups);
 			}
 			continue;
@@ -110,14 +127,22 @@ foreach ($filestoprocess as $nzbFile) {
 					gzclose($fp);
 					echo sprintf("%0" . $digits . "d %.2f%% Imported %s\n", $items - $num, $num / $items * 100, $name);
 					if ($movefiles) {
-						if (!file_exists($importedpath)) mkdir($importedpath);
-						if (!file_exists($importedpath . basename($nzbFile))) rename($nzbFile, $importedpath . basename($nzbFile));
+						if (!file_exists($importedpath)) {
+							mkdir($importedpath);
+						}
+						if (!file_exists($importedpath . basename($nzbFile))) {
+							rename($nzbFile, $importedpath . basename($nzbFile));
+						}
 					}
 				} else {
 					echo sprintf("%0" . $digits . "d %.2f%% Error : Failed to write file to disk %s\n", $items - $num, $num / $items * 100, $nzbfilename);
 					if ($movefiles) {
-						if (!file_exists($errorpath)) mkdir($errorpath);
-						if (!file_exists($errorpath . basename($nzbFile))) rename($nzbFile, $errorpath . basename($nzbFile));
+						if (!file_exists($errorpath)) {
+							mkdir($errorpath);
+						}
+						if (!file_exists($errorpath . basename($nzbFile))) {
+							rename($nzbFile, $errorpath . basename($nzbFile));
+						}
 					}
 					$releases->delete($relid);
 				}
@@ -169,14 +194,22 @@ foreach ($filestoprocess as $nzbFile) {
 				if ($binaryId != 0) {
 					echo sprintf("%0" . $digits . "d %.2f%% Imported %s (%d:%s-%d/%d)\n", $items - $num, $num / $items * 100, basename($nzbFile), $regexMatches['regcatid'], $regexMatches['regexid'], $numbins, $numparts);
 					if ($movefiles) {
-						if (!file_exists($importedpath)) mkdir($importedpath);
-						if (!file_exists($importedpath . basename($nzbFile))) rename($nzbFile, $importedpath . basename($nzbFile));
+						if (!file_exists($importedpath)) {
+							mkdir($importedpath);
+						}
+						if (!file_exists($importedpath . basename($nzbFile))) {
+							rename($nzbFile, $importedpath . basename($nzbFile));
+						}
 					}
 				} else {
 					echo sprintf("%0" . $digits . "d %.2f%% Error : No Regex Match %s\n", $items - $num, $num / $items * 100, basename($nzbFile));
 					if ($movefiles) {
-						if (!file_exists($noregexpath)) mkdir($noregexpath);
-						if (!file_exists($noregexpath . basename($nzbFile))) rename($nzbFile, $noregexpath . basename($nzbFile));
+						if (!file_exists($noregexpath)) {
+							mkdir($noregexpath);
+						}
+						if (!file_exists($noregexpath . basename($nzbFile))) {
+							rename($nzbFile, $noregexpath . basename($nzbFile));
+						}
 					}
 				}
 			}
@@ -188,8 +221,9 @@ if (count($missinggroups) > 0) {
 	$missinggroups = array_unique($missinggroups);
 	$grpsql = "INSERT INTO groups (name, backfill_target, first_record, first_record_postdate, last_record, last_record_postdate, last_updated, minfilestoformrelease, minsizetoformrelease, active, regexmatchonly, description) VALUES ('%s', 0, 0, null, 0, null, null, null, null, 0, 1, 'Added by import');\n";
 	$grpout = "";
-	foreach ($missinggroups as $mg)
-		$grpout .= sprintf($grpsql, $mg);
+	foreach ($missinggroups as $mg) {
+			$grpout .= sprintf($grpsql, $mg);
+	}
 
 	@file_put_contents(sprintf("missing_groups_%s.sql", uniqid()), $grpout);
 }

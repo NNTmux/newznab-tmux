@@ -1,7 +1,7 @@
 <?php
 
 require_once("config.php");
-require_once(WWW_DIR."/lib/adminpage.php");
+require_once(WWW_DIR . "/lib/adminpage.php");
 
 $page = new AdminPage();
 
@@ -10,8 +10,12 @@ unset($s->siteseed);
 unset($s->amazonprivkey);
 unset($s->tmdbkey);
 unset($s->rottentomatokey);
-if ($s->newznabID != "") $s->newznabID = "SET";
-if ($s->spotnabsiteprvkey != "") $s->spotnabsiteprvkey = "SET";
+if ($s->newznabID != "") {
+	$s->newznabID = "SET";
+}
+if ($s->spotnabsiteprvkey != "") {
+	$s->spotnabsiteprvkey = "SET";
+}
 unset($s->nzprekey);
 unset($s->recaptchaprivatekey);
 unset($s->saburl);
@@ -22,12 +26,11 @@ unset($s->sabvdir);
 $db = new DB;
 $totalsize = 0;
 $alltables = $db->query("show table status");
-foreach ($alltables as $tablename)
-{
+foreach ($alltables as $tablename) {
 	$ret[] = $tablename['Name'];
 	//$row = $db->queryOneRow("check table `".$tablename['Name']."`");
 	//$mysql[]  = array ("name" => $row["Table"].":".$row["Msg_type"]."=".$row["Msg_text"], "indexsize" => $tablename["Index_length"], "datasize" => $tablename["Data_length"]) ;
-	$mysql[]  = array ("name" => $tablename['name'], "indexsize" => $tablename["index_length"], "datasize" => $tablename["data_length"]) ;
+	$mysql[] = array("name" => $tablename['name'], "indexsize" => $tablename["index_length"], "datasize" => $tablename["data_length"]);
 	$totalsize = $totalsize + ($tablename["index_length"] + $tablename["data_length"]);
 }
 

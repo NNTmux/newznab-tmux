@@ -1,7 +1,7 @@
 <?php
 require_once 'config.php';
-require_once(WWW_DIR."/lib/adminpage.php");
-require_once(WWW_DIR."/lib/Regexes.php");
+require_once(WWW_DIR . "/lib/adminpage.php");
+require_once(WWW_DIR . "/lib/Regexes.php");
 
 $page = new AdminPage();
 $regexes = new Regexes(['Settings' => $page->settings, 'Table_Name' => 'category_regexes']);
@@ -9,7 +9,7 @@ $regexes = new Regexes(['Settings' => $page->settings, 'Table_Name' => 'category
 // Set the current action.
 $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view';
 
-switch($action) {
+switch ($action) {
 	case 'submit':
 		if ($_POST["group_regex"] == '') {
 			$page->smarty->assign('error', "Group regex must not be empty!");
@@ -36,7 +36,7 @@ switch($action) {
 			$regexes->updateRegex($_POST);
 		}
 
-		header("Location:".WWW_TOP."/category_regexes-list.php");
+		header("Location:" . WWW_TOP . "/category_regexes-list.php");
 		break;
 
 	case 'view':
@@ -53,7 +53,7 @@ switch($action) {
 		break;
 }
 
-$page->smarty->assign('status_ids', [Category::STATUS_ACTIVE,Category::STATUS_INACTIVE]);
+$page->smarty->assign('status_ids', [Category::STATUS_ACTIVE, Category::STATUS_INACTIVE]);
 $page->smarty->assign('status_names', ['Yes', 'No']);
 
 $categories_db = $page->settings->queryDirect(
@@ -65,7 +65,7 @@ $categories_db = $page->settings->queryDirect(
 );
 $categories = ['category_names', 'category_ids'];
 if ($categories_db) {
-	foreach($categories_db as $category_db) {
+	foreach ($categories_db as $category_db) {
 		$categories['category_names'][] = $category_db['parent_title'] . ' ' . $category_db['title'] . ': ' . $category_db['id'];
 		$categories['category_ids'][] = $category_db['id'];
 	}

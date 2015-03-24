@@ -38,21 +38,21 @@ class AmazonProductAPI
 	 * @access private
 	 * @var string
 	 */
-	private $public_key     = "";
+	private $public_key = "";
 
 	/**
 	 * Your Amazon Secret Access Key
 	 * @access private
 	 * @var string
 	 */
-	private $private_key    = "";
+	private $private_key = "";
 
 	/**
 	 * Your Amazon Secret Access Key
 	 * @access private
 	 * @var string
 	 */
-	private $associate_tag    = "";
+	private $associate_tag = "";
 
 	/**
 	 * Constants for product types
@@ -77,9 +77,9 @@ class AmazonProductAPI
 
 	public function __construct($pubk, $privk, $asstag = "")
 	{
-		$this->public_key = (string) $pubk;
-		$this->private_key = (string) $privk;
-		$this->associate_tag = (string) $asstag;
+		$this->public_key = (string)$pubk;
+		$this->private_key = (string)$privk;
+		$this->associate_tag = (string)$asstag;
 	}
 
 	/**
@@ -92,18 +92,12 @@ class AmazonProductAPI
 	 */
 	private function verifyXmlResponse($response)
 	{
-		if ($response === False)
-		{
+		if ($response === False) {
 			throw new Exception("Could not connect to Amazon");
-		}
-		else
-		{
-			if (isset($response->Items->Item->ItemAttributes->Title))
-			{
+		} else {
+			if (isset($response->Items->Item->ItemAttributes->Title)) {
 				return ($response);
-			}
-			else
-			{
+			} else {
 				throw new Exception("Invalid xml response.");
 			}
 		}
@@ -128,14 +122,14 @@ class AmazonProductAPI
 	 * @param string $search search term
 	 * @param string $category search category
 	 * @param string $searchType type of search
-	 * @return mixed simpleXML object
+	 * @return boolean simpleXML object
 	 */
-	public function searchProducts($search, $category, $searchType = "UPC", $searchNode="")
+	public function searchProducts($search, $category, $searchType = "UPC", $searchNode = "")
 	{
 		$allowedTypes = array("UPC", "TITLE", "ARTIST", "KEYWORD", "NODE");
 		$allowedCategories = array("Music", "DVD", "VideoGames", "MP3Downloads");
 
-		switch($searchType)
+		switch ($searchType)
 		{
 			case "UPC" :    $parameters = array("Operation"     => "ItemLookup",
 												"ItemId"        => $search,
@@ -174,7 +168,7 @@ class AmazonProductAPI
 	 *
 	 * @param int $upc_code UPC code of the product to search
 	 * @param string $product_type type of the product
-	 * @return mixed simpleXML object
+	 * @return boolean simpleXML object
 	 */
 	public function getItemByUpc($upc_code, $product_type)
 	{
@@ -195,7 +189,7 @@ class AmazonProductAPI
 	 * Return details of a product searched by ASIN
 	 *
 	 * @param int $asin_code ASIN code of the product to search
-	 * @return mixed simpleXML object
+	 * @return boolean simpleXML object
 	 */
 	public function getItemByAsin($asin_code)
 	{
@@ -214,7 +208,7 @@ class AmazonProductAPI
 	 *
 	 * @param string $keyword keyword to search
 	 * @param string $product_type type of the product
-	 * @return mixed simpleXML object
+	 * @return boolean simpleXML object
 	 */
 	public function getItemByKeyword($keyword, $product_type)
 	{
@@ -230,18 +224,24 @@ class AmazonProductAPI
 }
 
 
+/**
+ * @param string $region
+ * @param string $public_key
+ * @param string $private_key
+ */
 function  aws_signed_request($region, $params, $public_key, $private_key, $associate_tag = "")
 {
 
 	$method = "GET";
-	$host = "ecs.amazonaws.".$region; // must be in small case
+	$host = "ecs.amazonaws." . $region; // must be in small case
 	$uri = "/onca/xml";
 
 
 	$params["Service"]          = "AWSECommerceService";
 	$params["AWSAccessKeyId"]   = $public_key;
-	if ($associate_tag != "")
-		$params["AssociateTag"] = $associate_tag;
+	if ($associate_tag != "") {
+			$params["AssociateTag"] = $associate_tag;
+	}
 
 	$params["Timestamp"]        = gmdate("Y-m-d\TH:i:s\Z");
 	$params["Version"]          = "2009-03-31";
@@ -255,16 +255,15 @@ function  aws_signed_request($region, $params, $public_key, $private_key, $assoc
 
 	$canonicalized_query = array();
 
-	foreach ($params as $param=>$value)
-	{
+	foreach ($params as $param=>$value) {
 		$param = str_replace("%7E", "~", rawurlencode($param));
 		$value = str_replace("%7E", "~", rawurlencode($value));
-		$canonicalized_query[] = $param."=".$value;
+		$canonicalized_query[] = $param . "=" . $value;
 	}
 
 	$canonicalized_query = implode("&", $canonicalized_query);
 
-	$string_to_sign = $method."\n".$host."\n".$uri."\n".$canonicalized_query;
+	$string_to_sign = $method . "\n" . $host . "\n" . $uri . "\n" . $canonicalized_query;
 
 	/* calculate the signature using HMAC with SHA256 and base64-encoding.
 	   The 'hash_hmac' function is only available from PHP 5 >= 5.1.2.
@@ -275,12 +274,12 @@ function  aws_signed_request($region, $params, $public_key, $private_key, $assoc
 	$signature = str_replace("%7E", "~", rawurlencode($signature));
 
 	/* create request */
-	$request = "http://".$host.$uri."?".$canonicalized_query."&Signature=".$signature;
+	$request = "http://" . $host . $uri . "?" . $canonicalized_query . "&Signature=" . $signature;
 	//echo $request;die();
 
 	/* I prefer using CURL */
 	$ch = curl_init();
-	curl_setopt($ch, CURLOPT_URL,$request);
+	curl_setopt($ch, CURLOPT_URL, $request);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 	curl_setopt($ch, CURLOPT_TIMEOUT, 15);
 	curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
@@ -292,12 +291,9 @@ function  aws_signed_request($region, $params, $public_key, $private_key, $assoc
 	*/
 	//$xml_response = file_get_contents($request);
 
-	if ($xml_response === False)
-	{
+	if ($xml_response === False) {
 		return False;
-	}
-	else
-	{
+	} else {
 		/* parse XML */
 		$parsed_xml = @simplexml_load_string($xml_response);
 		return ($parsed_xml === False) ? False : $parsed_xml;

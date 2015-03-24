@@ -37,10 +37,11 @@ class Genres
 
 	private function getListQuery($type = '', $activeonly = false)
 	{
-		if (!empty($type))
-			$typesql = sprintf(" AND g.type = %d", $type);
-		else
-			$typesql = '';
+		if (!empty($type)) {
+					$typesql = sprintf(" AND g.type = %d", $type);
+		} else {
+					$typesql = '';
+		}
 
 		if ($activeonly) {
 			$sql = sprintf("
@@ -81,13 +82,14 @@ class Genres
 
 	public function getCount($type = '', $activeonly = false)
 	{
-		if (!empty($type))
-			$typesql = sprintf(" AND g.type = %d", $type);
-		else
-			$typesql = '';
+		if (!empty($type)) {
+					$typesql = sprintf(" AND g.type = %d", $type);
+		} else {
+					$typesql = '';
+		}
 
-		if ($activeonly)
-			$sql = sprintf("
+		if ($activeonly) {
+					$sql = sprintf("
 						SELECT COUNT(*) AS num
 						FROM genres g
 						INNER JOIN
@@ -107,8 +109,9 @@ class Genres
 							ON x.genre_id = g.id %1\$s",
 				$typesql
 			);
-		else
-			$sql = sprintf("SELECT COUNT(g.id) AS num FROM genres g WHERE 1 %s ORDER BY g.title", $typesql);
+		} else {
+					$sql = sprintf("SELECT COUNT(g.id) AS num FROM genres g WHERE 1 %s ORDER BY g.title", $typesql);
+		}
 
 		$res = $this->pdo->queryOneRow($sql);
 

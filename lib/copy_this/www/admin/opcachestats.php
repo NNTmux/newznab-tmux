@@ -4,7 +4,7 @@
 
 /* #newznab-tmux */
 require_once("config.php");
-require_once(WWW_DIR."/lib/adminpage.php");
+require_once(WWW_DIR . "/lib/adminpage.php");
 $page = new AdminPage();
 $NNURL = $page->serverurl;
 /* #newznab-tmux */
@@ -59,6 +59,9 @@ class OpCacheService
 		return $self;
 	}
 
+	/**
+	 * @param string $name
+	 */
 	public function getOption($name = null)
 	{
 		if ($name === null) {
@@ -108,8 +111,7 @@ class OpCacheService
 	{
 		$status = opcache_get_status();
 		$config = opcache_get_configuration();
-		$memsize = function($size, $precision = 3, $space = false)
-		{
+		$memsize = function($size, $precision = 3, $space = false) {
 			$i = 0;
 			$val = array(' bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB');
 			while (($size / 1024) > 1) {

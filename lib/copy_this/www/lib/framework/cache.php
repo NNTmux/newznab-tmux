@@ -1,10 +1,10 @@
 <?php
 /**
- * Class Cache
- *
- * Class for connecting to a memcached or redis server to cache data.
- *
- */
+	 * Class Cache
+	 *
+	 * Class for connecting to a memcached or redis server to cache data.
+	 *
+	 */
 Class Cache
 {
 	const SERIALIZER_PHP      = 0;
@@ -100,7 +100,7 @@ Class Cache
 	public function delete($key)
 	{
 		if ($this->connected === true && $this->ping() === true) {
-			return (bool) $this->server->delete($key);
+			return (bool)$this->server->delete($key);
 		}
 		return false;
 	}
@@ -177,7 +177,7 @@ Class Cache
 			$this->serializerType = true;
 		}
 
-		switch(NN_CACHE_TYPE) {
+		switch (NN_CACHE_TYPE) {
 
 			case self::TYPE_REDIS:
 				if (!extension_loaded('redis')) {
@@ -217,7 +217,7 @@ Class Cache
 	 */
 	public function __destruct()
 	{
-		switch(NN_CACHE_TYPE) {
+		switch (NN_CACHE_TYPE) {
 			case self::TYPE_REDIS:
 				$this->server->close();
 				break;
@@ -277,7 +277,7 @@ Class Cache
 	{
 		if ($this->isRedis === true) {
 			try {
-				return (bool) $this->server->ping();
+				return (bool)$this->server->ping();
 			} catch (RedisException $error) {
 				$this->connect();
 				return $this->connected;
@@ -295,7 +295,7 @@ Class Cache
 	 */
 	private function verifySerializer()
 	{
-		switch(NN_CACHE_SERIALIZER) {
+		switch (NN_CACHE_SERIALIZER) {
 			case self::SERIALIZER_IGBINARY:
 				if (extension_loaded('igbinary')) {
 					$this->IgBinarySupport = true;
@@ -333,4 +333,6 @@ Class Cache
  * Class CacheException
  *
  */
-Class CacheException extends Exception {}
+Class CacheException extends Exception
+{
+}
