@@ -127,6 +127,7 @@ if (isset($_GET["id"])) {
 	if ($reldata['nfostatus'] == 1) {
 		header("X-DNZB-NFO: " . $page->serverurl . 'nfo/' . $_GET["id"]);
 	}
+	header("X-DNZB-Failure: " . $page->serverurl . 'failed/' . $_GET["id"]);
 	header("X-DNZB-RCode: 200");
 	header("X-DNZB-RText: OK, NZB content follows.");
 
