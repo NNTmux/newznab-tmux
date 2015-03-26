@@ -320,7 +320,7 @@
 		<tr>
 			<th>Similar:</th>
 			<td>
-				<a title="Search for similar Nzbs" href="{$smarty.const.WWW_TOP}/search/{$searchname|escape:"url"}">Search for similar</a><br/>
+				<a title="Search for similar Nzbs" href="{$smarty.const.WWW_TOP}/search/{$searchname|escape:"htmlall"}">Search for similar</a><br/>
 			</td>
 		</tr>
 

@@ -1656,12 +1656,12 @@ class Releases
 	 *
 	 * @param $searchname
 	 * @param $guid
-	 * @return bool|PDOStatement
+	 * @return string
 	 */
 
 	public function getAlternate($guid, $searchname)
 	{
-		$alternate = $this->pdo->queryOneRow(sprintf("SELECT * FROM releases where guid != %s AND searchname %s", $this->pdo->escapeString($guid), $this->pdo->likeString($searchname)));
+		$alternate = $this->pdo->queryOneRow(sprintf('SELECT * FROM releases where guid != %s AND searchname %s', $this->pdo->escapeString($guid), $this->pdo->likeString($searchname)));
 		return $alternate;
 	}
 
