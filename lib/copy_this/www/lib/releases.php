@@ -2974,4 +2974,17 @@ class Releases
 		$this->passwordSettingBuffer = $passwordStatus;
 		return $passwordStatus;
 	}
+	/**
+	 * Retrieve alternate release with same or similar searchname
+	 *
+	 * @param $searchname
+	 * @param $guid
+	 * @return string
+	 */
+
+	public function getAlternate($guid, $searchname)
+	{
+		$alternate = $this->pdo->queryOneRow(sprintf('SELECT * FROM releases where guid != %s AND searchname %s', $this->pdo->escapeString($guid), $this->pdo->likeString($searchname)));
+		return $alternate;
+	}
 }
