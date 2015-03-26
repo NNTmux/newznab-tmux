@@ -691,7 +691,7 @@ class Film
 				$ret = array();
 				if (isset($art['moviebackground'][0]['url'])) {
 					$ret['backdrop'] = $art['moviebackground'][0]['url'];
-				} elseif (isset($art['moviethumb'[0]['url']])) {
+				} elseif (isset($art['moviethumb'][0]['url'])) {
 					$ret['backdrop'] = $art['moviethumb'][0]['url'];
 				}
 				if (isset($art['movieposter'][0]['url'])) {
