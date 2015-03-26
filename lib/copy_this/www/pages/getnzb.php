@@ -116,6 +116,7 @@ if (isset($_GET["id"])) {
 	header("Content-Type: application/x-nzb");
 	header("Expires: " . date('r', time() + 31536000));
 	// Set X-DNZB header data.
+	header("X-DNZB-Failure: " . $page->serverurl . 'failed/' . $_GET["id"]);
 	header("X-DNZB-Category: " . $reldata["category_name"]);
 	header("X-DNZB-Details: " . $page->serverurl . 'details/' . $_GET["id"]);
 	if (!empty($reldata['imdbid']) && $reldata['imdbid'] > 0) {
@@ -127,7 +128,6 @@ if (isset($_GET["id"])) {
 	if ($reldata['nfostatus'] == 1) {
 		header("X-DNZB-NFO: " . $page->serverurl . 'nfo/' . $_GET["id"]);
 	}
-	header("X-DNZB-Failure: " . $page->serverurl . 'failed/' . $_GET["id"]);
 	header("X-DNZB-RCode: 200");
 	header("X-DNZB-RText: OK, NZB content follows.");
 
