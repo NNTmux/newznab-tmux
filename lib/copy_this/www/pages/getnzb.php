@@ -2,14 +2,15 @@
 require_once(WWW_DIR . "/lib/releases.php");
 require_once(WWW_DIR . "/lib/nzb.php");
 
-$nzb = new NZB();
-$rel = new Releases();
+$nzb = new NZB($page->settings);
+$rel = new Releases(['Settings' => $page->settings]);
 $uid = 0;
 
 // Page is accessible only by the rss token, or logged in users.
 if ($users->isLoggedIn()) {
 	$uid = $users->currentUserId();
 	$maxdls = $page->userdata["downloadrequests"];
+	$rsstoken = $page->userdata['rsstoken'];
 } else {
 	if ($page->site->registerstatus == Sites::REGISTER_STATUS_API_ONLY) {
 		$res = $users->getById(0);
@@ -23,11 +24,12 @@ if ($users->isLoggedIn()) {
 		$res = $users->getByIdAndRssToken($_GET["i"], $_GET["r"]);
 		if (!$res) {
 			header("X-DNZB-RCode: 401");
-			header("X-DNZB-RText: Unauthorised, wrong user id or rss key!");
+			header("X-DNZB-RText: Unauthorised, wrong user ID or rss key!");
 			$page->show403();
 		}
 	}
 	$uid = $res["id"];
+	$rsstoken = $res['rsstoken'];
 	$maxdls = $res["downloadrequests"];
 }
 
@@ -110,12 +112,13 @@ if (isset($_GET["id"])) {
 	readgzfile($nzbpath);
 
 	// Set the NZB file name.
-	header("Content-Disposition: attachment; filename=\"" . str_replace(" ", "_", $reldata["searchname"]) . ".nzb\"");
+	header("Content-Disposition: attachment; filename=" . str_replace(array(',', ' '), '_', $reldata["searchname"]) . ".nzb");
 	// Get the size of the NZB file.
 	header("Content-Length: " . ob_get_length());
 	header("Content-Type: application/x-nzb");
 	header("Expires: " . date('r', time() + 31536000));
 	// Set X-DNZB header data.
+	header("X-DNZB-Failure: " . $page->serverurl . 'failed/' . '?guid=' . $_GET['id'] . '&userid=' . $uid . '&rsstoken=' . $rsstoken);
 	header("X-DNZB-Category: " . $reldata["category_name"]);
 	header("X-DNZB-Details: " . $page->serverurl . 'details/' . $_GET["id"]);
 	if (!empty($reldata['imdbid']) && $reldata['imdbid'] > 0) {
