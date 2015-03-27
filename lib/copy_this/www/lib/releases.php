@@ -1668,9 +1668,9 @@ class Releases
 		// 1 = failed
 		// 2 = success (not used yet)
 
-		$this->pdo->queryInsert(sprintf("INSERT INTO failed_downloads (guid, userid, status) VALUES (%s, %s, 1) ON DUPLICATE KEY UPDATE guid = %s, userid = %s, status = %d",
-			$this->pdo->escapeString($guid), $this->pdo->escapeString($userid),
-			$this->pdo->escapeString($guid), $this->pdo->escapeString($userid), '1'
+		$this->pdo->queryInsert(sprintf("INSERT INTO failed_downloads (guid, userid, status) VALUES (%s, %d, 1) ON DUPLICATE KEY UPDATE guid = %s, userid = %d, status = %d",
+			$this->pdo->escapeString($guid), $userid,
+			$this->pdo->escapeString($guid), $userid, '1'
 				)
 		);
 		$alternate = $this->pdo->queryOneRow(sprintf('SELECT * FROM releases r WHERE r.searchname %s AND r.guid NOT IN (SELECT guid FROM failed_downloads WHERE userid = %s)', $this->pdo->likeString($searchname), $this->pdo->escapeString($userid)));
