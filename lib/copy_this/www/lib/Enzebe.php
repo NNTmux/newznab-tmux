@@ -292,7 +292,7 @@ class Enzebe
 	 *
 	 * @access public
 	 */
-	public function NZBPath($releaseGuid)
+	public function getNZBPath($releaseGuid)
 	{
 		$nzbFile = $this->NZBPath($releaseGuid);
 		return (is_file($nzbFile) ? $nzbFile : false);

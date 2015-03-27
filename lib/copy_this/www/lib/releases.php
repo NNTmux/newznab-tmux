@@ -1673,7 +1673,7 @@ class Releases
 			$this->pdo->escapeString($guid), $userid, '1'
 				)
 		);
-		$alternate = $this->pdo->queryOneRow(sprintf('SELECT * FROM releases r WHERE r.searchname %s AND r.guid NOT IN (SELECT guid FROM failed_downloads WHERE userid = %s)', $this->pdo->likeString($searchname), $this->pdo->escapeString($userid)));
+		$alternate = $this->pdo->queryOneRow(sprintf('SELECT * FROM releases r WHERE r.searchname %s AND r.guid NOT IN (SELECT guid FROM failed_downloads WHERE userid = %d)', $this->pdo->likeString($searchname), $userid));
 		return $alternate;
 	}
 
