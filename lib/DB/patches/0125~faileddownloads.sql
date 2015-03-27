@@ -13,3 +13,4 @@ CREATE TABLE failed_downloads (
   CREATE INDEX ix_failed_downloads_guid ON failed_downloads (guid);
   CREATE INDEX ix_failed_downloads_userid ON failed_downloads (userid);
   CREATE UNIQUE INDEX ux_index_failed ON failed_downloads (guid, userid);
+  UPDATE `tmux` set `value` = '125' where `setting` = 'sqlpatch';
