@@ -7,13 +7,13 @@ $releases = new Releases(['Settings' => $page->settings]);
 $users = new Users();
 $page = new Page();
 
-	if (isset($_GET["userid"]) && isset($_GET['rsstoken']) && isset($_GET['guid'])) {
+	if (isset($_GET['userid']) && is_numeric($_GET['userid']) && isset($_GET['rsstoken']) && isset($_GET['guid'])) {
 		$rel = $releases->getByGuid($_GET["guid"]);
 
 		if (!$rel)
 			$page->show404();
 
-		$alt = $releases->getAlternate($rel['guid'], $rel['searchname'], $_GET['userid']);
+		$alt = $releases->getAlternate($rel['guid'], $rel['searchname'], $userid);
 		if (!$alt) {
 			$page->show404();
 		}
