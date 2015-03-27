@@ -1,7 +1,7 @@
 <?php
 
 class nzbInfo
-{	
+{
 	public $source = '';
 	public $metadata = array();
 	public $groups = array();
@@ -23,7 +23,7 @@ class nzbInfo
 	public $segmenttotal = 0;
 	public $segmentactual = 0;
 	public $gid = '';
-	
+
 	public $nzb = array();
 	public $nfofiles = array();
 	public $samplefiles = array();
@@ -39,7 +39,7 @@ class nzbInfo
 
     private $isLoaded = false;
 	private $loadAllVars = false;
-	
+
 	function nzbInfo()
 	{
         $this->nfofileregex = '/[ "\(\[].*?\.(nfo|ofn)[ "\)\]]/iS';
@@ -51,19 +51,19 @@ class nzbInfo
         $this->txtfileregex = '/\.(txt)[ "\)\]]/iS';
         $this->sfvfileregex = '/\.(sfv)[ "\)\]]/iS';
     }
-	
+
 	public function loadFromString($str, $loadAllVars=false)
 	{
 		if (empty($this->source))
 			$this->source = 'string';
 		$this->loadAllVars = $loadAllVars;
-			
+
 		$xmlObj = @simplexml_load_string($str);
 		if ($this->isValidNzb($xmlObj))
 			$this->parseNzb($xmlObj);
-			
+
 		unset($xmlObj);
-		
+
 		return $this->isLoaded;
 	}
 
@@ -100,7 +100,7 @@ class nzbInfo
         }
         return $this->isLoaded;
     }
-	
+
 	public function summarize()
 	{
 		$out = array();
@@ -113,16 +113,16 @@ class nzbInfo
 			$out[] = ' -media detected';
 		if (!empty($this->audio))
 			$out[] = ' -audio detected';
-		
+
 		if (!empty($this->metadata))
 		{
 			$out[] = ' -metadata:';
 			foreach($this->metadata as $mk=>$mv)
 				$out[] = '       -'.$mk.': '.$mv;
 		}
-		
+
 		$out[] = ' -sngl: '.sizeof($this->segmentfiles);
-		
+
 		$out[] = ' -pstr: '.$this->poster;
 		$out[] = ' -grps: '.implode(', ', $this->groups);
 		$out[] = ' -size: '.round(($this->filesize / 1048576), 2).' MB in '.$this->filecount.' Files';
@@ -136,10 +136,10 @@ class nzbInfo
 		$out[] = ' -pstd: '.date("Y-m-d H:i:s", $this->postedlast);
 		$out[] = '';
 		$out[] = '';
-		
+
 		return implode(PHP_EOL, $out);
 	}
-	
+
 	private function isValidNzb($xmlObj)
 	{
 		if (!$xmlObj || strtolower($xmlObj->getName()) != 'nzb' || !isset($xmlObj->file))
@@ -147,9 +147,9 @@ class nzbInfo
 
         return true;
 	}
-	
+
 	private function parseNzb($xmlObj)
-	{		
+	{
 		//Metadata
 		if (isset($xmlObj->head->meta))
 		{
@@ -162,14 +162,14 @@ class nzbInfo
 				}
 			}
 		}
-		
+
 		//NZB GID = first segment of first file
 		$gid = (string) $xmlObj->file->segments->segment;
 		if (!empty($gid))
 			$this->gid = md5($gid);
-		
-		foreach($xmlObj->file as $file) 
-		{	
+
+		foreach($xmlObj->file as $file)
+		{
 			$fileArr = array();
 			$fileArr['subject'] = (string) $file->attributes()->subject;
 			$fileArr['poster'] = (string) $file->attributes()->poster;
@@ -180,44 +180,44 @@ class nzbInfo
 			$fileArr['segmentactual'] = 0;
 			$fileArr['completion'] = 0;
 			$fileArr['segments'] = array();
-			
+
 			//subject
 			$subject = $fileArr['subject'];
-			
+
 			//poster
 			$this->poster = $fileArr['poster'];
-			
+
 			//dates
 			$date = $fileArr['posted'];
 			if ($date > $this->postedlast || $this->postedlast == 0)
 				$this->postedlast = $date;
-			
+
 			if ($date < $this->postedfirst || $this->postedfirst == 0)
 				$this->postedfirst = $date;
-			
-			
+
+
 			//groups
 			foreach ($file->groups->group as $group)
 			{
 				$this->groups[] = (string) $group;
 				$fileArr['groups'][] = (string) $group;
 			}
-			
+
 			//file segments
-			foreach($file->segments->segment as $segment) 
+			foreach($file->segments->segment as $segment)
 			{
 				$bytes = (int) $segment->attributes()->bytes;
 				$number = (int) $segment->attributes()->number;
-				
+
 				$this->filesize += $bytes;
 				$this->segmentactual++;
-				
+
 				$fileArr['filesize'] += $bytes;
 				$fileArr['segmentactual']++;
 				$fileArr['segments'][$number] = (string) $segment;
                 $fileArr['segmentbytes'][$number] = $bytes;
 			}
-			
+
             $pattern = '|\((\d+)[\/](\d+)\)|i';
             preg_match_all($pattern, $subject, $matches, PREG_PATTERN_ORDER);
             $matchcnt = sizeof($matches[0]);
@@ -239,28 +239,28 @@ class nzbInfo
 
 			//file counts
 			$this->filecount++;
-			
+
 			if ($fileArr['segmenttotal'] == 1)
 				$this->segmentfiles[] = $fileArr;
-			
+
 			if (preg_match($this->nfofileregex, $subject))
 				$this->nfofiles[] = $fileArr;
-			
+
 			if (preg_match($this->mediafileregex, $subject) && preg_match('/sample[\.\-]/i', $subject) && !preg_match('/\.par2|\.srs/i', $subject))
 				$this->samplefiles[] = $fileArr;
-		
+
 			if (preg_match($this->mediafileregex, $subject) && !preg_match('/sample[\.\-]/i', $subject) && !preg_match('/\.par2|\.srs/i', $subject))
 			{
 				$this->mediafiles[] = $fileArr;
 				$this->videocount++;
 			}
-			
+
 			if (preg_match('/\.(rar|r\d{2,3})(?!\.)/i', $subject) && !preg_match('/\.(par2|vol\d+\+|sfv|nzb)/i', $subject))
 				$this->rarcount++;
-				
+
 			if (preg_match($this->rarfileregex, $subject) && !preg_match('/\.(par2|vol\d+\+|sfv|nzb)/i', $subject))
 				$this->rarfiles[] = $fileArr;
-			
+
 			if (preg_match($this->audiofileregex, $subject) && !preg_match('/\.(par2|vol\d+\+|sfv|nzb)/i', $subject))
 			{
 				$this->audiofiles[] = $fileArr;
@@ -300,7 +300,7 @@ class nzbInfo
 
 			if (preg_match('/\.zip(?!\.)/i', $subject) && !preg_match('/\.(par2|vol\d+\+|sfv|nzb)/i', $subject))
 				$this->zipcount++;
-			
+
 			if ($this->loadAllVars === true)
 				$this->nzb[] = $fileArr;
 			else
@@ -308,13 +308,13 @@ class nzbInfo
 		}
 
 		$this->groups = array_unique($this->groups);
-		
+
 		if ($this->segmenttotal > 0)
 			$this->completion = number_format(($this->segmentactual/$this->segmenttotal)*100, 0);
-		
+
 		if (is_array($this->nzb) && !empty($this->nzb))
 			$this->isLoaded = true;
-			
+
 		return $this->isLoaded;
 	}
 
@@ -329,6 +329,7 @@ class nzbInfo
         if (!empty($this->metadata))
         {
             $nzb .= "<head>\n";
+			$out = array();
             foreach($this->metadata as $mk=>$mv)
                 $out[] = ' <meta type="'.$mk.'">'.$mv."</meta>\n";
             $nzb .= "</head>\n";
