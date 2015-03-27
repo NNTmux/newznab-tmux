@@ -67,10 +67,12 @@ class TMDb
 	/**
 	 * Default constructor
 	 *
-	 * @param string $apikey			API-key recieved from TMDb
-	 * @param string $defaultLang		Default language (ISO 3166-1)
-	 * @param boolean $config			Load the TMDb-config
-	 * @return void
+	 * @param string  $apikey API-key recieved from TMDb
+	 * @param string  $default_lang
+	 * @param boolean $config Load the TMDb-config
+	 * @param string  $scheme
+	 *
+	 * @internal param string $defaultLang Default language (ISO 3166-1)
 	 */
 	public function __construct($apikey, $default_lang = 'en', $config = FALSE, $scheme = TMDb::API_SCHEME)
 	{
@@ -87,11 +89,15 @@ class TMDb
 	/**
 	 * Search a movie by querystring
 	 *
-	 * @param string $text				Query to search after in the TMDb database
-	 * @param int $page					Number of the page with results (default first page)
-	 * @param bool $adult				Whether of not to include adult movies in the results (default FALSE)
-	 * @param mixed $lang				Filter the result with a language (ISO 3166-1) other then default, use FALSE to retrieve results from all languages
+	 * @param       $query
+	 * @param int   $page  Number of the page with results (default first page)
+	 * @param bool  $adult Whether of not to include adult movies in the results (default FALSE)
+	 * @param null  $year
+	 * @param mixed $lang  Filter the result with a language (ISO 3166-1) other then default, use FALSE to retrieve results from all languages
+	 *
 	 * @return TMDb result array
+	 * @throws TMDbException
+	 * @internal param string $text Query to search after in the TMDb database
 	 */
 	public function searchMovie($query, $page = 1, $adult = FALSE, $year = NULL, $lang = NULL)
 	{
@@ -108,10 +114,13 @@ class TMDb
 	/**
 	 * Search a person by querystring
 	 *
-	 * @param string $text				Query to search after in the TMDb database
-	 * @param int $page					Number of the page with results (default first page)
-	 * @param bool $adult				Whether of not to include adult movies in the results (default FALSE)
+	 * @param      $query
+	 * @param int  $page  Number of the page with results (default first page)
+	 * @param bool $adult Whether of not to include adult movies in the results (default FALSE)
+	 *
 	 * @return TMDb result array
+	 * @throws TMDbException
+	 * @internal param string $text Query to search after in the TMDb database
 	 */
 	public function searchPerson($query, $page = 1, $adult = FALSE)
 	{
@@ -126,9 +135,12 @@ class TMDb
 	/**
 	 * Search a company by querystring
 	 *
-	 * @param string $text				Query to search after in the TMDb database
-	 * @param int $page					Number of the page with results (default first page)
+	 * @param     $query
+	 * @param int $page Number of the page with results (default first page)
+	 *
 	 * @return TMDb result array
+	 * @throws TMDbException
+	 * @internal param string $text Query to search after in the TMDb database
 	 */
 	public function searchCompany($query, $page = 1)
 	{
@@ -673,10 +685,12 @@ class TMDb
 	/**
 	 * Add a rating to a movie
 	 *
-	 * @param string $session_id		Set session_id for the account you want to retrieve information from
-	 * @param int $movie_id				TMDb movie-id
-	 * @param float $value				Value between 1 and 10
+	 * @param string    $session_id Set session_id for the account you want to retrieve information from
+	 * @param int       $movie_id   TMDb movie-id
+	 * @param float|int $value      Value between 1 and 10
+	 *
 	 * @return TMDb result array
+	 * @throws TMDbException
 	 */
 	public function addMovieRating($session_id = NULL, $movie_id = 0, $value = 0)
 	{
@@ -707,10 +721,12 @@ class TMDb
 	/**
 	 * Get Image URL
 	 *
-	 * @param string $filepath			Filepath to image
-	 * @param const $imagetype			Image type: TMDb::IMAGE_BACKDROP, TMDb::IMAGE_POSTER, TMDb::IMAGE_PROFILE
-	 * @param string $size				Valid size for the image
+	 * @param string $filepath  Filepath to image
+	 * @param const  $imagetype Image type: TMDb::IMAGE_BACKDROP, TMDb::IMAGE_POSTER, TMDb::IMAGE_PROFILE
+	 * @param string $size      Valid size for the image
+	 *
 	 * @return string
+	 * @throws TMDbException
 	 */
 	public function getImageUrl($filepath, $imagetype, $size)
 	{
@@ -739,8 +755,10 @@ class TMDb
 	/**
 	 * Get available image sizes for a particular image type
 	 *
-	 * @param const $imagetype			Image type: TMDb::IMAGE_BACKDROP, TMDb::IMAGE_POSTER, TMDb::IMAGE_PROFILE
+	 * @param const $imagetype Image type: TMDb::IMAGE_BACKDROP, TMDb::IMAGE_POSTER, TMDb::IMAGE_PROFILE
+	 *
 	 * @return array
+	 * @throws TMDbException
 	 */
 	public function getAvailableImageSizes($imagetype)
 	{
@@ -771,11 +789,13 @@ class TMDb
 	/**
 	 * Makes the call to the API
 	 *
-	 * @param string $function			API specific function name for in the URL
-	 * @param array $params				Unencoded parameters for in the URL
-	 * @param string $session_id		Session_id for authentication to the API for specific API methods
-	 * @param const $method				TMDb::GET or TMDb:POST (default TMDb::GET)
+	 * @param string       $function   API specific function name for in the URL
+	 * @param array        $params     Unencoded parameters for in the URL
+	 * @param string       $session_id Session_id for authentication to the API for specific API methods
+	 * @param const|string $method     TMDb::GET or TMDb:POST (default TMDb::GET)
+	 *
 	 * @return TMDb result array
+	 * @throws TMDbException
 	 */
 	private function _makeCall($function, $params = NULL, $session_id = NULL, $method = TMDb::GET)
 	{
@@ -791,7 +811,7 @@ class TMDb
 
 		if($method === TMDb::GET)
 		{
-			if(isset($params['language']) AND $params['language'] === FALSE)
+			if(isset($params['language']) && $params['language'] === FALSE)
 			{
 				unset($params['language']);
 			}

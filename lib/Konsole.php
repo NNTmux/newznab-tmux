@@ -417,6 +417,7 @@ class Konsole
 
 	protected function _setConBeforeMatch($amaz, $gameInfo)
 	{
+		$con = array();
 		$con['platform'] = (string)$amaz->Items->Item->ItemAttributes->Platform;
 		if (empty($con['platform'])) {
 			$con['platform'] = $gameInfo['platform'];
@@ -439,6 +440,7 @@ class Konsole
 
 	protected function _setConAfterMatch($amaz = array())
 	{
+		$con = array();
 		$con['asin'] = (string)$amaz->Items->Item->ASIN;
 
 		$con['url'] = (string)$amaz->Items->Item->DetailPageURL;

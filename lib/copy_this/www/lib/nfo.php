@@ -157,9 +157,9 @@ class Nfo
 		// Returns true if data passed in is binary, otherwise
 		// returns false,
 		$has_binary = (
-			0 or substr_count($raw, "^\r\n")/512 > 0.3
-			or substr_count($raw, "^ -~")/512 > 0.3
-			or substr_count($raw, "\x00") > 0
+			0 || substr_count($raw, "^\r\n")/512 > 0.3
+			|| substr_count($raw, "^ -~")/512 > 0.3
+			|| substr_count($raw, "\x00") > 0
 		);
 
 		if($has_binary)
@@ -502,7 +502,7 @@ class Nfo
 				"WHERE r.releasenfoid = ".Nfo::FLAG_NFO_PENDING.
 				" ORDER BY postdate DESC";
 
-		if ($limit !==Null and $limit > 0)
+		if ($limit !== Null && $limit > 0)
 			$mnfo .= " LIMIT $limit";
 
 		$res = $db->query($mnfo);
