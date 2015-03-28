@@ -105,6 +105,7 @@ if (isset($_GET["id"])) {
 		header("X-DNZB-RText: Release not found!");
 		$page->show404();
 	}
+	$altdata = $rel->getAlternate($_GET['id'], $reldata['searchname'], $uid);
 
 	// Start reading output buffer.
 	ob_start();
@@ -118,7 +119,9 @@ if (isset($_GET["id"])) {
 	header("Content-Type: application/x-nzb");
 	header("Expires: " . date('r', time() + 31536000));
 	// Set X-DNZB header data.
-	header("X-DNZB-Failure: " . $page->serverurl . 'failed/' . '?guid=' . $_GET['id'] . '&userid=' . $uid . '&rsstoken=' . $rsstoken);
+	if (!empty($altdata['guid']) && $altdata['guid'] != NULL) {
+		header("X-DNZB-Failure: " . $page->serverurl . 'failed/' . '?guid=' . $_GET['id'] . '&userid=' . $uid . '&rsstoken=' . $rsstoken);
+	}
 	header("X-DNZB-Category: " . $reldata["category_name"]);
 	header("X-DNZB-Details: " . $page->serverurl . 'details/' . $_GET["id"]);
 	if (!empty($reldata['imdbid']) && $reldata['imdbid'] > 0) {
