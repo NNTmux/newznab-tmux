@@ -1673,8 +1673,8 @@ class Releases
 		$this->pdo->queryInsert(sprintf("INSERT INTO failed_downloads (guid, userid, status) VALUES (%s, %d, %d) ON DUPLICATE KEY UPDATE status = %d",
 				$this->pdo->escapeString($guid),
 				$userid,
-				($failed == true ? 1 : 2),
-				($failed == true ? 1 : 2)
+				($failed === true ? 1 : 2),
+				($failed === true ? 1 : 2)
 				)
 		);
 
