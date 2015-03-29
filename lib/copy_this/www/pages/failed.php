@@ -15,7 +15,7 @@ $page = new Page();
 		if (!$rel)
 			$page->show404();
 
-		$alt = $releases->getAlternate($rel['guid'], $rel['searchname'], $userid);
+		$alt = $releases->getAlternate($rel['guid'], $rel['searchname'], $userid, true);
 		if (!$alt) {
 			$page->show404();
 		}

@@ -105,7 +105,7 @@ if (isset($_GET["id"])) {
 		header("X-DNZB-RText: Release not found!");
 		$page->show404();
 	}
-	$altdata = $rel->getAlternate($_GET['id'], $reldata['searchname'], $uid);
+	$altdata = $rel->getAlternate($_GET['id'], $reldata['searchname'], $uid, false);
 
 	// Start reading output buffer.
 	ob_start();
