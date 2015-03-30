@@ -27,9 +27,10 @@
 	</style>
 	<link rel="shortcut icon" type="image/ico" href="{$smarty.const.WWW_TOP}/templates/nntmux/images/favicon.ico"/>
 	<link rel="search" type="application/opensearchdescription+xml" href="{$smarty.const.WWW_TOP}/opensearch" title="{$site->title|escape}" />
-	<script type="text/javascript" src="https://code.jquery.com/jquery-1.9.1.js"></script>
-	{literal}<script>window.jQuery || document.write('<script src="{/literal}{$smarty.const.WWW_TOP}{literal}/templates/nntmux/scripts/jquery-1.9.1.js"><\/script>')</script>{/literal}
-	<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+	<link href="//netdna.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-glyphicons.css" rel="stylesheet">
+	<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.3.js"></script>
+	{literal}<script>window.jQuery || document.write('<script src="{/literal}{$smarty.const.WWW_TOP}{literal}/templates/nntmux/scripts/jquery-2.1.3.js"><\/script>')</script>{/literal}
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 	{literal}<script>window.jQuery || document.write('<script src="{/literal}{$smarty.const.WWW_TOP}{literal}/templates/nntmux/scripts/bootstrap.min.js"><\/script>')</script>{/literal}
 	<script type="text/javascript" src="https://code.jquery.com/jquery-migrate-1.2.1.js"></script>
 	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/nntmux/scripts/jquery.colorbox-min.js"></script>
