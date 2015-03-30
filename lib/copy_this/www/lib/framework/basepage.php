@@ -34,7 +34,7 @@ class BasePage
 	public $secure_connection = false;
 
 
-	function BasePage()
+	public function __construct()
 	{
 		@session_start();
 

@@ -13,7 +13,7 @@ class AdminPage extends BasePage
 	 */
 	public function __construct()
 	{
-		parent::BasePage();
+		parent::__construct();
 
 		$tplpaths = [];
 		if ($this->site->style != "default")
