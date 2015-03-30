@@ -10,8 +10,10 @@ class PreDB
 {
 	/**
 	 * Default constructor.
+	 *
+	 * @param bool $echooutput
 	 */
-	function PreDB($echooutput=true)
+	public function __construct($echooutput=true)
 	{
 		$this->echooutput = $echooutput;
 	}

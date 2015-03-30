@@ -14,7 +14,7 @@ class Page extends BasePage
 	/**
 	 * Default constructor.
 	 */
-	function Page()
+	public function __construct()
 	{
 		parent::BasePage();
 

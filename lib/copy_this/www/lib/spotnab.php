@@ -158,7 +158,7 @@ class SpotNab {
 	/* Track the last article scanned when preforming a discovery */
 	private $_discovery_lastarticle;
 
-	public function __construct($post_user=Null, $post_email=Null, $post_group=Null) {
+	public function __construct($post_user = Null, $post_email = Null, $post_group = Null) {
 		$this->_pdo = new DB();
 		$this->_nntp = new NNTP(['Settings' => $this->_pdo]);
 		$s = new Sites();

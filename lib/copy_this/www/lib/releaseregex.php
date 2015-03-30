@@ -12,9 +12,9 @@ require_once(WWW_DIR . "/lib/site.php");
 class ReleaseRegex
 {
 
-	public function ReleaseRegex()
+	public function __construct()
 	{
-		$this->regexes = array();
+		$this->regexes = [];
 	}
 
 	/**

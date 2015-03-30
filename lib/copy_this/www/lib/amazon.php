@@ -86,9 +86,9 @@ class AmazonProductAPI
 	 * Check if the xml received from Amazon is valid
 	 *
 	 * @param mixed $response xml response to check
+	 *
 	 * @return bool false if the xml is invalid
-	 * @return mixed the xml response if it is valid
-	 * @return exception if we could not connect to Amazon
+	 * @throws Exception
 	 */
 	private function verifyXmlResponse($response)
 	{
