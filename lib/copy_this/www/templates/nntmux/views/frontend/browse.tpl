@@ -134,7 +134,7 @@
 										class="modal_prev rndbtn" rel="preview">Sample</a>{/if}
 									{if $result.videostatus == 1}
 									<a href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"htmlall"}"
-									   title="This release has a video preview." class="model_prev rndbtn"
+									   title="This release has a video preview." class="modal_prev rndbtn"
 									   rel="preview">
 										<img src="{$smarty.const.WWW_TOP}/templates/nntmux/images/multimedia/video.png"/>
 										</a>{/if}
