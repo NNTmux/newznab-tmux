@@ -220,17 +220,12 @@ class Groups
 	public function add($group)
 	{
 		$minFileString =
-			($group["minfilestoformrelease"] == '' ?
-				"NULL" :
-				sprintf("%d", $this->formatNumberString($group["minfilestoformrelease"], false))
+			($group["minfilestoformrelease"] == '' ? "NULL" : sprintf("%d", $this->formatNumberString($group["minfilestoformrelease"], false))
 			);
 
 		$minSizeString =
-			($group["minsizetoformrelease"] == '' ?
-				"NULL" :
-				sprintf("%d", $this->formatNumberString($group["minsizetoformrelease"], false))
+			($group["minsizetoformrelease"] == '' ? "NULL" : sprintf("%d", $this->formatNumberString($group["minsizetoformrelease"], false))
 			);
-
 
 		return $this->pdo->queryInsert(
 			sprintf("

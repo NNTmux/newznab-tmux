@@ -32,7 +32,7 @@ switch($action) {
 			$group = $groups->getByID($id);
 		} else {
 			$page->title = "Newsgroup Add";
-			$group = array();
+			$group = [];
 			$group["active"] = "0";
 			$group["backfill"] = "0";
 			$group["minfilestoformrelease"] = "0";
@@ -45,8 +45,8 @@ switch($action) {
 		break;
 }
 
-$page->smarty->assign('yesno_ids', array(1,0));
-$page->smarty->assign('yesno_names', array( 'Yes', 'No'));
+$page->smarty->assign('yesno_ids', [1,0]);
+$page->smarty->assign('yesno_names', ['Yes', 'No']);
 
 $page->content = $page->smarty->fetch('group-edit.tpl');
 $page->render();
