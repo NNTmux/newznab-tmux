@@ -8,6 +8,7 @@ require_once(WWW_DIR . "/lib/nzb.php");
 require_once(WWW_DIR . "/lib/nzbinfo.php");
 require_once(WWW_DIR . "/lib/nntp.php");
 require_once(WWW_DIR . "/lib/rarinfo/par2info.php");
+require_once(WWW_DIR . "/lib/ColorCLI.php");
 
 /**
  * This class handles parsing misc>other releases into real names.
@@ -17,8 +18,12 @@ class Parsing
 
 	/**
 	 * Default constructor.
+	 *
+	 * @param bool $echoonly
+	 * @param bool $limited
+	 * @param bool $verbose
 	 */
-	function Parsing($echoonly = false, $limited = true, $verbose = false)
+	public function __construct($echoonly = false, $limited = true, $verbose = false)
 	{
 		$this->echoonly = $echoonly;
 		$this->limited = $limited;
@@ -31,7 +36,7 @@ class Parsing
 		$this->nfosprocessed = 0;
 		$this->parsprocessed = 0;
 		$this->releasefilesprocessed = 0;
-		$this->cleanup = array('nuke' => array(), 'misc' => array());
+		$this->cleanup = ['nuke' => [], 'misc' => []];
 		$s = new Sites();
 		$this->site = $s->get();
 	}
@@ -45,7 +50,7 @@ class Parsing
 		$db = new DB();
 
 		// Default query for both full db and last 4 hours.
-		$sql = "SELECT r.searchname, r.name, r.fromname, r.id as RID, r.categoryid, r.guid, r.postdate,
+		$sql = "SELECT r.searchname, r.name, r.fromname, r.id as rid, r.categoryid, r.guid, r.postdate,
 			   rn.id as nfoid,
 			   g.name as groupname,
 			   GROUP_CONCAT(rf.name) as filenames
@@ -53,7 +58,7 @@ class Parsing
 		LEFT JOIN releasenfo rn ON (rn.releaseid = r.id)
 		LEFT JOIN groups g ON (g.id = r.groupid)
 		LEFT JOIN releasefiles rf ON (rf.releaseid = r.id)
-		WHERE r.categoryid in (" . Category::CAT_TV_OTHER . "," . Category::CAT_MOVIE_OTHER . "," . Category::CAT_MISC_OTHER . "," . Category::CAT_XXX_OTHER . ")
+		WHERE r.categoryid in (' . Category::CAT_TV_OTHER . ',' . Category::CAT_MOVIE_OTHER . ',' . Category::CAT_MISC_OTHER . ',' . Category::CAT_XXX_OTHER . ')
 		%s
 		GROUP BY r.id";
 
@@ -90,7 +95,7 @@ class Parsing
 				///
 				///Use the Nfo to try to get the proper Releasename.
 				///
-				$nfo = $db->queryOneRow(sprintf("select uncompress(nfo) as nfo from releasenfo where releaseid = %d", $rel['RID']));
+				$nfo = $db->queryOneRow(sprintf("select uncompress(nfo) as nfo from releasenfo where releaseid = %d", $rel['rid']));
 				if ($nfo && $foundName == "") {
 					$this->nfosprocessed++;
 					$nfo = $nfo['nfo'];
@@ -522,8 +527,8 @@ class Parsing
 				if ($rel['filenames'] && $foundName == '') {
 					$this->releasefilesprocessed++;
 					$files = explode(',', $rel['filenames']);
-					if (!array($files)) {
-						$files = array($files);
+					if (![$files]) {
+						$files = [$files];
 					}
 
 					// Scene regex
@@ -638,12 +643,12 @@ class Parsing
 					}
 
 					//RAR file contents release name matching
-					/*
-					if (sizeof($files) > 0 && $foundName == '')
+
+					/*if (sizeof($files) > 0 && $foundName == '')
 					{
 						echo "RAR checking\n";
 						//Loop through releaseFiles to find a match
-						foreach($releaseFiles as $rarFile)
+						foreach($files as $rarFile)
 						{
 							//echo "-{$rarFile}\n";
 							if ($foundName == '')
@@ -651,10 +656,10 @@ class Parsing
 								//Lookup name via reqid (filename)
 								if (preg_match('/\.(avi|mkv|mp4|mov|wmv|iso|img|gcm|ps3|wad|ac3|nds|bin|cue|mdf)/i', $rarFile))
 								{
-									$this->site->reqidurl
+									$this->site->reqidurl;
 									$lookupUrl = 'http://allfilled/query.php?t=alt.binaries.srrdb&reqid='.urlencode(basename($rarFile));
 									echo '-lookup: '.$lookupUrl."\n";
-									$xml = getUrl($lookupUrl);
+									$xml = Utility::getUrl(['url' => $lookupUrl]);
 									//$xml = false;
 
 									if ($xml !== false)
@@ -670,8 +675,7 @@ class Parsing
 								}
 							}
 						}
-					}
-					*/
+					}*/
 
 				}
 
@@ -770,7 +774,7 @@ class Parsing
 				}
 
 				if ($foundName == '' && $this->verbose) {
-					echo "ReleaseID: 		" . $rel["RID"] . "\n" .
+					echo "ReleaseID: 		" . $rel["rid"] . "\n" .
 						" Group: 		" . $rel["groupname"] . "\n" .
 						" Old Name: 		" . $rel["name"] . "\n" .
 						" Old SearchName: 	" . $rel["searchname"] . "\n" .
@@ -806,21 +810,20 @@ class Parsing
 			$foundName = str_replace('&#x27;', '', trim(html_entity_decode($foundName)));
 			$name = str_replace(' ', '_', $foundName);
 			$searchname = str_replace('_', ' ', $foundName);
-			if ($this->verbose) {
-				echo 'ReleaseID: 		' . $rel['RID'] . "\n";
-				echo ' Group: 		' . $rel['groupname'] . "\n";
-				echo ' Old Name: 		' . $rel['name'] . "\n";
-				echo ' Old SearchName: 	' . $rel['searchname'] . "\n";
-				echo ' New Name: 		' . $name . "\n";
-				echo ' New SearchName: 	' . $searchname . "\n";
-				echo ' Old Cat: 		' . $rel['categoryid'] . "\n";
-				echo ' New Cat: 		' . $categoryID . "\n";
-				echo ' Method: 		' . $methodused . "\n";
-				echo " Status: 		Release changed\n\n";
-			}
+			echo
+				PHP_EOL .
+				ColorCLI::headerOver('ReleaseID: 		') . ColorCLI::primaryOver($rel['rid']) . PHP_EOL .
+				ColorCLI::headerOver(' Group: 		') . ColorCLI::primaryOver($rel['groupname']) . PHP_EOL .
+				ColorCLI::headerOver(' Old Name: 		') . ColorCLI::primaryOver($rel['name']) . PHP_EOL .
+				ColorCLI::headerOver(' Old SearchName: 	') . ColorCLI::primaryOver($rel['searchname']) . PHP_EOL .
+				ColorCLI::headerOver(' New Name: 		') . ColorCLI::primaryOver($name) . PHP_EOL .
+				ColorCLI::headerOver(' New SearchName: 	') . ColorCLI::primaryOver($searchname) . PHP_EOL .
+				ColorCLI::headerOver(' Old Cat: 		') . ColorCLI::primaryOver($rel['categoryid']) . PHP_EOL .
+				ColorCLI::headerOver(' New Cat: 		') . ColorCLI::primaryOver($categoryID) . PHP_EOL .
+				ColorCLI::headerOver(' Method: 		') . ColorCLI::primaryOver($methodused) . PHP_EOL ;
 			if (!$this->echoonly) {
 				$db = new DB();
-				$db->queryExec(sprintf("update releases SET name = %s, searchname = %s, categoryid = %d, imdbid = NULL, rageid = -1, bookinfoid = NULL, musicinfoid = NULL, consoleinfoid = NULL WHERE releases.id = %d", $db->escapeString($name), $db->escapeString($searchname), $categoryID, $rel['RID']));
+				$db->queryExec(sprintf("update releases SET name = %s, searchname = %s, categoryid = %d, imdbid = NULL, rageid = -1, bookinfoid = NULL, musicinfoid = NULL, consoleinfoid = NULL WHERE releases.id = %d", $db->escapeString($name), $db->escapeString($searchname), $categoryID, $rel['rid']));
 			}
 			$this->numupdated++;
 		}
