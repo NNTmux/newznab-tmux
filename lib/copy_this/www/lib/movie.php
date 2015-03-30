@@ -21,8 +21,10 @@ class Movie
 
 	/**
 	 * Default constructor.
+	 *
+	 * @param bool $echooutput
 	 */
-	function Movie($echooutput=false)
+	public function __construct($echooutput=false)
 	{
 		$this->echooutput = $echooutput;
 		$s = new Sites();

@@ -62,8 +62,12 @@ class Nfo
 
 	/**
 	 * Default constructor.
+	 *
+	 * @param bool $verbose
+	 * @param bool $use_obfuscated
+	 * @param bool $use_fuzzy
 	 */
-	function Nfo($verbose=false, $use_obfuscated=true, $use_fuzzy=false)
+	public function __construct($verbose=false, $use_obfuscated=true, $use_fuzzy=false)
 	{
 		$this->use_fuzzy=$use_fuzzy;
 		$this->use_obfuscated=$use_obfuscated;

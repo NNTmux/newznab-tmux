@@ -10,7 +10,7 @@ class TvRage
 	const APIKEY = '7FwjZ8loweFcOhHfnU3E';
 	const MATCH_PROBABILITY = 75;
 
-	function TvRage($echooutput=false)
+	public function __construct($echooutput = false)
 	{
 		$this->echooutput = $echooutput;
 

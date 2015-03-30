@@ -11,7 +11,7 @@ class TheTVDB
 	const PROJECT	= 'newznab';
 	const APIKEY	= '5F84ECB91B42D719';
 
-	public function TheTVDB($echooutput=true)
+	public function __construct($echooutput = true)
 	{
 		$this->echooutput = $echooutput;
 		$this->MIRROR = 'http://www.thetvdb.com';

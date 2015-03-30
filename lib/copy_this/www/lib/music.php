@@ -16,8 +16,10 @@ class Music
 
 	/**
 	 * Default constructor.
+	 *
+	 * @param bool $echooutput
 	 */
-	function Music($echooutput=false)
+	public function __construct($echooutput=false)
 	{
 		$this->echooutput = $echooutput;
 		$s = new Sites();

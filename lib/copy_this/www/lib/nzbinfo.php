@@ -40,7 +40,7 @@ class nzbInfo
     private $isLoaded = false;
 	private $loadAllVars = false;
 
-	function nzbInfo()
+	public function __construct()
 	{
         $this->nfofileregex = '/[ "\(\[].*?\.(nfo|ofn)[ "\)\]]/iS';
         $this->mediafileregex = '/.*\.(AVI|VOB|MKV|MP4|TS|WMV|MOV|M4V|F4V|MPG|MPEG)(\.001)?[ "\)\]]/iS';
