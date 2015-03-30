@@ -6,7 +6,7 @@ require_once(WWW_DIR . "/lib/nzb.php");
 require_once(WWW_DIR . "/lib/site.php");
 require_once(WWW_DIR . "/lib/util.php");
 require_once(WWW_DIR . "/lib/Categorize.php");
-require_once(NN_TMUX . 'lib' . DS . 'ReleaseCleaning.php');
+require_once(WWW_DIR . "/lib/ReleaseCleaning.php");
 
 /**
  * Import NZB files into the database.
