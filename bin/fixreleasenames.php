@@ -14,7 +14,7 @@ if (!isset($argv[1])) {
 	exit($c->error("This script is not intended to be run manually, it is called from fixreleasenames_threaded.py."));
 } else if (isset($argv[1])) {
 	$db = new DB();
-	$namefixer = new Namefixer(true);
+	$namefixer = new \NameFixer(['Settings' => $pdo]);
 	$pieces = explode(' ', $argv[1]);
 	if (isset($pieces[1]) && $pieces[0] == 'nfo') {
 		$release = $pieces[1];
@@ -66,7 +66,7 @@ if (!isset($argv[1])) {
 		$relID = $pieces[1];
 		$guid = $pieces[2];
 		$groupID = $pieces[3];
-		$nzbcontents = new NZBContents(array('echo' => true, 'nntp' => $nntp, 'nfo' => new Info(), 'db' => $db, 'pp' => new PProcess(true)));
+		$nzbcontents = new NZBContents(array('echo' => true, 'nntp' => $nntp, 'nfo' => new Info(), 'db' => $db, 'pp' => new PProcess(['Settings' => $pdo, 'Nfo' => $Nfo, 'NameFixer' => $namefixer])));
 		$res = $nzbcontents->checkPAR2($guid, $relID, $groupID, 1, 1);
 		if ($res === false) {
 			echo '.';
