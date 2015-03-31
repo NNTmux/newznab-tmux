@@ -30,6 +30,22 @@ class Movie
 	public $echooutput;
 
 	/**
+	 * Language to fetch from IMDB.
+	 * @var string
+	 */
+	protected $lookuplanguage;
+
+	/**
+	 * @var string
+	 */
+	public $imgSavePath;
+
+	/**
+	 * @var array|bool|string
+	 */
+	public $apikey;
+
+	/**
 	 * Default constructor.
 	 *
 	 * @param bool $echooutput
