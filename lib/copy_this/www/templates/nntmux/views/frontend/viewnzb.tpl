@@ -260,7 +260,7 @@
 	{if $isadmin}
 		<li><a href="#admin" data-toggle="tab" style="color: black;"><i class="icon-font"></i> Admin Info</a></li>
 	{/if}
-	<li><a href="#comments" data-toggle="tab" style="color:black;"><i class="icon-comment"></i> Comments</a></li>
+	<li><a href="#comments" data-toggle="tab" style="color:black;"><i class="icon-comments"></i> Comments</a></li>
 </ul>
 
 <div class="tab-content">
@@ -565,7 +565,7 @@
 	</div>
 {/if}
 <div class="tab-pane" id="comments">
-	<h2><i class="icon-comment"></i> Comments</h2>
+	<h2><i class="icon-comments"></i> Comments</h2>
 	{if $comments|@count > 0}
 		<table style="margin-bottom:20px;" class="table table-striped Sortable">
 			<tr class="{cycle values=",alt"}">
