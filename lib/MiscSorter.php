@@ -38,7 +38,7 @@ class MiscSorter
 	 */
 	public function __construct($echooutput = false, &$pdo = null)
 	{
-		$this->echooutput = $echooutput;
+		$this->echooutput = (NN_ECHOCLI && $echooutput);
 		$this->qty = 100;
 
 		$this->pdo = ($pdo instanceof DB ? $pdo : new DB());
