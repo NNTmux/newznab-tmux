@@ -3,8 +3,8 @@
 class nzbInfo
 {
 	public $source = '';
-	public $metadata = array();
-	public $groups = array();
+	public $metadata = [];
+	public $groups = [];
 	public $filecount = 0;
 	public $parcount = 0;
 	public $rarcount = 0;
@@ -24,18 +24,18 @@ class nzbInfo
 	public $segmentactual = 0;
 	public $gid = '';
 
-	public $nzb = array();
-	public $nfofiles = array();
-	public $samplefiles = array();
-	public $mediafiles = array();
-	public $audiofiles = array();
-	public $rarfiles = array();
-    public $imgfiles = array();
-    public $srrfiles = array();
-    public $txtfiles = array();
-    public $sfvfiles = array();
-	public $segmentfiles = array();
-    public $parfiles = array();
+	public $nzb = [];
+	public $nfofiles = [];
+	public $samplefiles = [];
+	public $mediafiles = [];
+	public $audiofiles = [];
+	public $rarfiles = [];
+    public $imgfiles = [];
+    public $srrfiles = [];
+    public $txtfiles = [];
+    public $sfvfiles = [];
+	public $segmentfiles = [];
+    public $parfiles = [];
 
     private $isLoaded = false;
 	private $loadAllVars = false;
@@ -103,7 +103,7 @@ class nzbInfo
 
 	public function summarize()
 	{
-		$out = array();
+		$out = [];
 		$out[] = 'Reading from '.basename($this->source).'...';
 		if (!empty($this->nfofiles))
 			$out[] = ' -nfo detected';
@@ -170,16 +170,16 @@ class nzbInfo
 
 		foreach($xmlObj->file as $file)
 		{
-			$fileArr = array();
+			$fileArr = [];
 			$fileArr['subject'] = (string) $file->attributes()->subject;
 			$fileArr['poster'] = (string) $file->attributes()->poster;
 			$fileArr['posted'] = (int) $file->attributes()->date;
-			$fileArr['groups'] = array();
+			$fileArr['groups'] = [];
 			$fileArr['filesize'] = 0;
 			$fileArr['segmenttotal'] = 0;
 			$fileArr['segmentactual'] = 0;
 			$fileArr['completion'] = 0;
-			$fileArr['segments'] = array();
+			$fileArr['segments'] = [];
 
 			//subject
 			$subject = $fileArr['subject'];
@@ -329,7 +329,7 @@ class nzbInfo
         if (!empty($this->metadata))
         {
             $nzb .= "<head>\n";
-			$out = array();
+			$out = [];
             foreach($this->metadata as $mk=>$mv)
                 $out[] = ' <meta type="'.$mk.'">'.$mv."</meta>\n";
             $nzb .= "</head>\n";

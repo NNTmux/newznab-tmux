@@ -689,20 +689,20 @@ class DB extends \PDO
 	 * Fetch a assoc row from a result set
 	 *
 	 * @param PDOStatement $result
-	 * @return array
+	 * @return array|PDOStatement
 	 */
-	public function getAssocArray(PDOStatement $result)
+	public function getAssocArray($result)
 	{
-		return $result->fetch();
+		return $result->fetch(\PDO::FETCH_ASSOC);
 	}
 
 	/**
 	 * Get the total number of rows in the result set
 	 *
 	 * @param PDOStatement $result
-	 * @return int
+	 * @return int|PDOStatement
 	 */
-	public function getNumRows(PDOStatement $result)
+	public function getNumRows($result)
 	{
 		return $result->rowCount();
 	}
