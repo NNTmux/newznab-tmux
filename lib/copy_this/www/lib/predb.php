@@ -9,13 +9,24 @@ require_once(WWW_DIR."/lib/sphinx.php");
 class PreDB
 {
 	/**
+	 * @var DB
+	 */
+	public $pdo;
+
+	/**
+	 * @var bool
+	 */
+	public $echooutput;
+
+	/**
 	 * Default constructor.
 	 *
 	 * @param bool $echooutput
 	 */
-	public function __construct($echooutput=true)
+	public function __construct($echooutput = true)
 	{
-		$this->echooutput = (NN_ECHOCLI && $echooutput);;
+		$this->echooutput = (NN_ECHOCLI && $echooutput);
+		$this->pdo = new \DB();
 	}
 
 	/**
@@ -23,8 +34,7 @@ class PreDB
 	 */
 	public function getByID($preID)
 	{
-		$db = new DB();
-		$predbQuery = $db->query(sprintf("SELECT * FROM predb WHERE id = %s LIMIT %d", $preID, 1));
+		$predbQuery = $this->pdo->query(sprintf("SELECT * FROM predb WHERE id = %s LIMIT %d", $preID, 1));
 
 		return isset($predbQuery[0]) ? $predbQuery[0] : false;
 	}
@@ -34,9 +44,8 @@ class PreDB
 	 */
 	public function getByDirname($dirname)
 	{
-		$db = new DB();
 		$dirname = str_replace(' ', '_', $dirname);
-		$predbQuery = $db->query(sprintf("SELECT * FROM predb WHERE dirname = %s LIMIT %d", $db->escapeString($dirname), 1));
+		$predbQuery = $this->pdo->query(sprintf("SELECT * FROM predb WHERE dirname = %s LIMIT %d", $this->pdo->escapeString($dirname), 1));
 
 		return isset($predbQuery[0]) ? $predbQuery[0] : false;
 	}
@@ -60,12 +69,10 @@ class PreDB
     		}
 	    }
 
-		$db = new DB();
+		$dirname = empty($dirname) ? '' : sprintf("WHERE dirname LIKE %s", $this->pdo->escapeString('%'.$dirname.'%'));
+		$category = empty($category) ? '' : sprintf((empty($dirname) ? 'WHERE' : ' AND')." category = %s", $this->pdo->escapeString($category));
 
-		$dirname = empty($dirname) ? '' : sprintf("WHERE dirname LIKE %s", $db->escapeString('%'.$dirname.'%'));
-		$category = empty($category) ? '' : sprintf((empty($dirname) ? 'WHERE' : ' AND')." category = %s", $db->escapeString($category));
-
-		$predbQuery = $db->queryOneRow(sprintf('SELECT COUNT(id) AS num FROM predb %s %s', $dirname, $category), true);
+		$predbQuery = $this->pdo->queryOneRow(sprintf('SELECT COUNT(id) AS num FROM predb %s %s', $dirname, $category), true);
 
 		return $predbQuery['num'];
 	}
@@ -89,15 +96,13 @@ class PreDB
     		}
 		}
 
-		$db = new DB();
-
 		$dirname = str_replace(' ', '%', $dirname);
-		$dirname = empty($dirname) ? '' : sprintf('WHERE dirname LIKE %s', $db->escapeString('%'.$dirname.'%'));
-		$category = empty($category) ? '' : sprintf((empty($dirname) ? 'WHERE' : ' AND')." category = %s", $db->escapeString($category));
+		$dirname = empty($dirname) ? '' : sprintf('WHERE dirname LIKE %s', $this->pdo->escapeString('%'.$dirname.'%'));
+		$category = empty($category) ? '' : sprintf((empty($dirname) ? 'WHERE' : ' AND')." category = %s", $this->pdo->escapeString($category));
 
 		$sql = sprintf('SELECT p.*, r.guid FROM predb p left outer join releases r on p.id = r.preid %s %s ORDER BY ctime DESC LIMIT %d,%d', $dirname, $category, $start, $num);
 
-		return $db->query($sql, true);
+		return $this->pdo->query($sql, true);
 	}
 
 	/**
@@ -105,22 +110,21 @@ class PreDB
 	 */
 	public function processReleases($daysback = 3)
 	{
-		$db = new DB();
 
 		if ($this->echooutput)
 			echo "Predb   : Updating releases with pre data\n";
 
 		$matched = 0;
-		$releasesQuery = $db->queryDirect(sprintf('SELECT id, searchname FROM releases WHERE preid IS NULL AND adddate > DATE_SUB(NOW(), INTERVAL %d DAY)', $daysback));
-		while($arr = $db->getAssocArray($releasesQuery))
+		$releasesQuery = $this->pdo->queryDirect(sprintf('SELECT id, searchname FROM releases WHERE preid IS NULL AND adddate > DATE_SUB(NOW(), INTERVAL %d DAY)', $daysback));
+		while($arr = $this->pdo->getAssocArray($releasesQuery))
 		{
 			$arr['searchname'] = str_replace(' ', '_', $arr['searchname']);
-			$sql = sprintf("SELECT id FROM predb WHERE dirname = %s LIMIT 1", $db->escapeString($arr['searchname']));
-			$predbQuery = $db->queryOneRow($sql);
+			$sql = sprintf("SELECT id FROM predb WHERE dirname = %s LIMIT 1", $this->pdo->escapeString($arr['searchname']));
+			$predbQuery = $this->pdo->queryOneRow($sql);
 
 			if($predbQuery)
 			{
-				$db->queryExec(sprintf('UPDATE releases SET preid = %d WHERE id = %d', $predbQuery['id'], $arr['id']));
+				$this->pdo->queryExec(sprintf('UPDATE releases SET preid = %d WHERE id = %d', $predbQuery['id'], $arr['id']));
 
 				$matched++;
 			}
@@ -133,22 +137,26 @@ class PreDB
 
 	/**
 	 * Add/Update predb row.
+	 *
+	 * @param DB $pdo
+	 * @param    $preArray
+	 * @return bool
 	 */
-	public function updatePreDB($db, $preArray)
+	public function updatePreDB(DB $pdo, $preArray)
 	{
 		if(!preg_match('/^(UN)?((MOD)?NUKED?|DELPRE)$/', $preArray['category']))
 		{
-			$db->queryExec(sprintf('INSERT INTO predb
+			$this->pdo->queryExec(sprintf('INSERT INTO predb
 				(ctime, dirname, category, filesize, filecount, filename)
 				VALUES (%d, %s, %s, %F, %d, %s)
 				ON DUPLICATE KEY UPDATE
 				category=%3$s, filesize=%4$F, filecount=%5$d, filename=%6$s',
 				$preArray['ctime'],
-				$db->escapeString($preArray['dirname']),
-				$db->escapeString($preArray['category']),
+				$this->pdo->escapeString($preArray['dirname']),
+				$this->pdo->escapeString($preArray['category']),
 				(!empty($preArray['filesize']) ? (float) $preArray['filesize'] : 0),
 				(!empty($preArray['filecount']) ? (int) $preArray['filecount'] : 0),
-				(!empty($preArray['nuke_filename']) ? $db->escapeString($preArray['nuke_filename']) : '""')
+				(!empty($preArray['nuke_filename']) ? $this->pdo->escapeString($preArray['nuke_filename']) : '""')
 			));
 
 			//$newCheck = mysql_affected_rows();
@@ -159,13 +167,13 @@ class PreDB
 		}
 		else
 		{
-			$db->queryExec(sprintf("update predb
+			$this->pdo->queryExec(sprintf("update predb
 				SET nuketype=%s, nukereason=%s, nuketime=%d
 				WHERE dirname = %s",
-				$db->escapeString($preArray['category']),
-				(!empty($preArray['nuke_filename']) ? $db->escapeString($preArray['nuke_filename']) : '""'),
+				$this->pdo->escapeString($preArray['category']),
+				(!empty($preArray['nuke_filename']) ? $this->pdo->escapeString($preArray['nuke_filename']) : '""'),
 				$preArray['ctime'],
-				$db->escapeString($preArray['dirname'])
+				$this->pdo->escapeString($preArray['dirname'])
 			));
 
 			//$newCheck = mysql_affected_rows();
@@ -212,7 +220,6 @@ class PreDB
 		if($this->echooutput)
 			echo "Predb   : Checking for new pre data ";
 
-		$db = new DB();
 		$nntp = new Nntp();
 
 		if(!$nntp->doConnect()) {
@@ -252,7 +259,7 @@ class PreDB
 					if(preg_match('/^'.$site->nzprefield.': /', $msgHeader[$i])) {
 						if($nzpreParse = $this->nzpreParse(str_replace($site->nzprefield.': ', '', $msgHeader[$i]), $nzprekey))
 						{
-							if ($this->updatePreDB($db, $nzpreParse))
+							if ($this->updatePreDB($this->pdo, $nzpreParse))
 							{
 								$added_updated++;
 							}
