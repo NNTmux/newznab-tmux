@@ -15,7 +15,7 @@ class PreDB
 	 */
 	public function __construct($echooutput=true)
 	{
-		$this->echooutput = $echooutput;
+		$this->echooutput = (NN_ECHOCLI && $echooutput);;
 	}
 
 	/**

@@ -13,7 +13,7 @@ class TheTVDB
 
 	public function __construct($echooutput = true)
 	{
-		$this->echooutput = $echooutput;
+		$this->echooutput = (NN_ECHOCLI && $echooutput);;
 		$this->MIRROR = 'http://www.thetvdb.com';
 	}
 
