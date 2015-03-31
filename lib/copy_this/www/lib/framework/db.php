@@ -688,7 +688,7 @@ class DB extends \PDO
 	/**
 	 * Fetch a assoc row from a result set
 	 *
-	 * @param PDOStatement $result
+	 * @param $result
 	 * @return array|PDOStatement
 	 */
 	public function getAssocArray($result)
