@@ -14,13 +14,23 @@ class Book
 	const NUMTOPROCESSPERTIME = 100;
 
 	/**
+	 * @var DB
+	 */
+	public $pdo;
+
+	/**
+	 * @var bool
+	 */
+	public $echooutput;
+
+	/**
 	 * Default constructor.
 	 *
 	 * @param bool $echooutput
 	 */
 	public function __construct($echooutput = false)
 	{
-		$this->echooutput = (NN_ECHOCLI && $echooutput);;
+		$this->echooutput = (NN_ECHOCLI && $echooutput);
 		$s = new Sites();
 		$site = $s->get();
 		$this->pubkey = $site->amazonpubkey;

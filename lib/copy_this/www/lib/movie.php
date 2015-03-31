@@ -20,18 +20,28 @@ class Movie
 	const SRC_DVD = 5;
 
 	/**
+	 * @var DB
+	 */
+	public $pdo;
+
+	/**
+	 * @var bool
+	 */
+	public $echooutput;
+
+	/**
 	 * Default constructor.
 	 *
 	 * @param bool $echooutput
 	 */
-	public function __construct($echooutput=false)
+	public function __construct($echooutput = false)
 	{
-		$this->echooutput = (NN_ECHOCLI && $echooutput);;
-		$s = new Sites();
+		$this->echooutput = (NN_ECHOCLI && $echooutput);
+		$s = new \Sites();
 		$site = $s->get();
 		$this->apikey = $site->tmdbkey;
 		$this->lookuplanguage = $site->lookuplanguage;
-
+		$this->pdo = new \DB();
 		$this->imgSavePath = WWW_DIR.'covers/movies/';
 	}
 
@@ -40,8 +50,7 @@ class Movie
 	 */
 	public function getMovieInfo($imdbId)
 	{
-		$db = new DB();
-		return $db->queryOneRow(sprintf("SELECT * FROM movieinfo where imdbid = %d", $imdbId));
+		return $this->pdo->queryOneRow(sprintf("SELECT * FROM movieinfo where imdbid = %d", $imdbId));
 	}
 
 	/**
@@ -49,10 +58,9 @@ class Movie
 	 */
 	public function getMovieInfoMultiImdb($imdbIds)
 	{
-		$db = new DB();
 		$allids = implode(",", array_filter($imdbIds));
 		$sql = sprintf("SELECT DISTINCT movieinfo.*, releases.imdbid AS relimdb FROM movieinfo LEFT OUTER JOIN releases ON releases.imdbid = movieinfo.imdbid WHERE movieinfo.imdbid IN (%s)", $allids);
-		return $db->query($sql);
+		return $this->pdo->query($sql);
 	}
 
 	/**
@@ -60,10 +68,9 @@ class Movie
 	 */
 	public function delete($imdbId)
 	{
-		$db = new DB();
 		@unlink($this->imgSavePath.$imdbId.'-cover.jpg');
 		@unlink($this->imgSavePath.$imdbId.'-backdrop.jpg');
-		return $db->queryOneRow(sprintf("delete FROM movieinfo where imdbid = %d", $imdbId));
+		return $this->pdo->queryOneRow(sprintf("delete FROM movieinfo where imdbid = %d", $imdbId));
 	}
 
 	/**
@@ -82,7 +89,6 @@ class Movie
 	 */
 	public function getRange($start, $num, $moviename="")
 	{
-		$db = new DB();
 
 		if ($start === false)
 			$limit = "";
@@ -91,9 +97,9 @@ class Movie
 
 		$rsql = '';
 		if ($moviename != "")
-			$rsql .= sprintf("and movieinfo.title like %s ", $db->escapeString("%".$moviename."%"));
+			$rsql .= sprintf("and movieinfo.title like %s ", $this->pdo->escapeString("%".$moviename."%"));
 
-		return $db->query(sprintf(" SELECT * FROM movieinfo where 1=1 %s ORDER BY createddate DESC".$limit, $rsql));
+		return $this->pdo->query(sprintf(" SELECT * FROM movieinfo where 1=1 %s ORDER BY createddate DESC".$limit, $rsql));
 	}
 
 	/**
@@ -101,13 +107,12 @@ class Movie
 	 */
 	public function getCount($moviename="")
 	{
-		$db = new DB();
 
 		$rsql = '';
 		if ($moviename != "")
-			$rsql .= sprintf("and movieinfo.title like %s ", $db->escapeString("%".$moviename."%"));
+			$rsql .= sprintf("and movieinfo.title like %s ", $this->pdo->escapeString("%".$moviename."%"));
 
-		$res = $db->queryOneRow(sprintf("select count(id) as num from movieinfo where 1=1 %s ", $rsql));
+		$res = $this->pdo->queryOneRow(sprintf("select count(id) as num from movieinfo where 1=1 %s ", $rsql));
 		return $res["num"];
 	}
 
@@ -116,7 +121,6 @@ class Movie
 	 */
 	public function getMovieCount($cat, $maxage=-1, $excludedcats=array())
 	{
-		$db = new DB();
 
 		$browseby = $this->getBrowseBy();
 
@@ -160,7 +164,7 @@ class Movie
 			$exccatlist = " and r.categoryid not in (".implode(",", $excludedcats).")";
 
 		$sql = sprintf("select count(distinct r.imdbid) as num from releases r inner join movieinfo m on m.imdbid = r.imdbid and m.title != '' where r.passwordstatus <= (select value from site where setting='showpasswordedrelease') and %s %s %s %s ", $browseby, $catsrch, $maxage, $exccatlist);
-		$res = $db->queryOneRow($sql, true);
+		$res = $this->pdo->queryOneRow($sql, true);
 		return $res["num"];
 	}
 
@@ -169,7 +173,6 @@ class Movie
 	 */
 	public function getMovieRange($cat, $start, $num, $orderby, $maxage=-1, $excludedcats=array())
 	{
-		$db = new DB();
 
 		$browseby = $this->getBrowseBy();
 
@@ -218,7 +221,7 @@ class Movie
 
 		$order = $this->getMovieOrder($orderby);
 		$sql = sprintf(" SELECT r.imdbid, max(r.postdate) as postdate, m.* from releases r inner join movieinfo m on m.imdbid = r.imdbid where r.passwordstatus <= (select value from site where setting='showpasswordedrelease') and m.title != '' and r.imdbid != 0000000 and %s %s %s %s group by r.imdbid order by %s %s".$limit, $browseby, $catsrch, $maxagesql, $exccatlist, $order[0], $order[1]);
-		$rows = $db->query($sql, true);
+		$rows = $this->pdo->query($sql, true);
 
 		//
 		//get a copy of all the imdbs
@@ -235,7 +238,7 @@ class Movie
 			// get all releases matching these ids
 			//
 			$sql = sprintf("select r.*, releasenfo.id as nfoid, groups.name as grpname, concat(cp.title, ' > ', c.title) as categoryname from releases r left outer join category c on c.id = r.categoryid left outer join category cp on cp.id = c.parentid left outer join releasenfo on releasenfo.releaseid = r.id left outer join groups on groups.id = r.groupid where imdbid in (%s) and %s %s %s order by r.postdate desc", $imdbds, $catsrch, $maxagesql, $exccatlist);
-			$allrows = $db->query($sql, true);
+			$allrows = $this->pdo->query($sql, true);
 			$arr = array();
 
 			//
@@ -333,7 +336,7 @@ class Movie
 	 */
 	public function getBrowseBy()
 	{
-		$db = new Db;
+		$this->pdo = new Db;
 
 		$browseby = ' ';
 		$browsebyArr = $this->getBrowseByOptions();
@@ -344,7 +347,7 @@ class Movie
 				if ($bb == 'imdb') {
 					$browseby .= "m.{$bb}id = $bbv AND ";
 				} else {
-					$browseby .= "m.$bb LIKE(".$db->escapeString('%'.$bbv.'%').") AND ";
+					$browseby .= "m.$bb LIKE(".$this->pdo->escapeString('%'.$bbv.'%').") AND ";
 				}
 			}
 		}
@@ -375,10 +378,9 @@ class Movie
 	 */
 	public function update($id, $title, $tagline, $plot, $year, $rating, $genre, $director, $actors, $language, $cover, $backdrop)
 	{
-		$db = new DB();
 
-		$db->queryExec(sprintf("update movieinfo SET title=%s, tagline=%s, plot=%s, year=%s, rating=%s, genre=%s, director=%s, actors=%s, language=%s, cover=%d, backdrop=%d, updateddate=NOW() WHERE imdbid = %d",
-			$db->escapeString($title), $db->escapeString($tagline), $db->escapeString($plot), $db->escapeString($year), $db->escapeString($rating), $db->escapeString($genre), $db->escapeString($director), $db->escapeString($actors), $db->escapeString($language), $cover, $backdrop, $id));
+		$this->pdo->queryExec(sprintf("update movieinfo SET title=%s, tagline=%s, plot=%s, year=%s, rating=%s, genre=%s, director=%s, actors=%s, language=%s, cover=%d, backdrop=%d, updateddate=NOW() WHERE imdbid = %d",
+			$this->pdo->escapeString($title), $this->pdo->escapeString($tagline), $this->pdo->escapeString($plot), $this->pdo->escapeString($year), $this->pdo->escapeString($rating), $this->pdo->escapeString($genre), $this->pdo->escapeString($director), $this->pdo->escapeString($actors), $this->pdo->escapeString($language), $cover, $backdrop, $id));
 	}
 
 	/**
@@ -494,7 +496,6 @@ class Movie
 		}
 		$mov['language'] = html_entity_decode($mov['language'], ENT_QUOTES, 'UTF-8');
 
-		$db = new DB();
 		$query = sprintf("
 			INSERT INTO movieinfo
 				(imdbid, tmdbID, title, rating, tagline, trailer, plot, year, genre, director, actors, language, cover, backdrop, createddate, updateddate)
@@ -502,10 +503,10 @@ class Movie
 				(%d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, %d, NOW(), NOW())
 			ON DUPLICATE KEY UPDATE
 				imdbid=%d, tmdbID=%s, title=%s, rating=%s, tagline=%s, trailer=%s, plot=%s, year=%s, genre=%s, director=%s, actors=%s, language=%s, cover=%d, backdrop=%d, updateddate=NOW()",
-		$mov['imdb_id'], $mov['tmdb_id'], $db->escapeString($mov['title']), $db->escapeString($mov['rating']), $db->escapeString($mov['tagline']), $db->escapeString($mov['trailer']), $db->escapeString($mov['plot']), $db->escapeString($mov['year']), $db->escapeString($mov['genre']), $db->escapeString($mov['director']), $db->escapeString($mov['actors']), $db->escapeString($mov['language']), $mov['cover'], $mov['backdrop'],
-		$mov['imdb_id'], $mov['tmdb_id'], $db->escapeString($mov['title']), $db->escapeString($mov['rating']), $db->escapeString($mov['tagline']), $db->escapeString($mov['trailer']), $db->escapeString($mov['plot']), $db->escapeString($mov['year']), $db->escapeString($mov['genre']), $db->escapeString($mov['director']), $db->escapeString($mov['actors']), $db->escapeString($mov['language']), $mov['cover'], $mov['backdrop']);
+		$mov['imdb_id'], $mov['tmdb_id'], $this->pdo->escapeString($mov['title']), $this->pdo->escapeString($mov['rating']), $this->pdo->escapeString($mov['tagline']), $this->pdo->escapeString($mov['trailer']), $this->pdo->escapeString($mov['plot']), $this->pdo->escapeString($mov['year']), $this->pdo->escapeString($mov['genre']), $this->pdo->escapeString($mov['director']), $this->pdo->escapeString($mov['actors']), $this->pdo->escapeString($mov['language']), $mov['cover'], $mov['backdrop'],
+		$mov['imdb_id'], $mov['tmdb_id'], $this->pdo->escapeString($mov['title']), $this->pdo->escapeString($mov['rating']), $this->pdo->escapeString($mov['tagline']), $this->pdo->escapeString($mov['trailer']), $this->pdo->escapeString($mov['plot']), $this->pdo->escapeString($mov['year']), $this->pdo->escapeString($mov['genre']), $this->pdo->escapeString($mov['director']), $this->pdo->escapeString($mov['actors']), $this->pdo->escapeString($mov['language']), $mov['cover'], $mov['backdrop']);
 
-		$movieId = $db->queryInsert($query);
+		$movieId = $this->pdo->queryInsert($query);
 
 		return $movieId;
 	}
@@ -670,16 +671,15 @@ class Movie
     public function processMovieReleases()
 	{
 		$ret = 0;
-		$db = new DB();
 		$nfo = new Nfo();
 
-		$res = $db->queryDirect(sprintf("SELECT searchname, id from releases where imdbid IS NULL and categoryid in ( select id from category where parentid = %d ) ORDER BY postdate DESC LIMIT 100", Category::CAT_PARENT_MOVIE));
-		if ($db->getNumRows($res) > 0)
+		$res = $this->pdo->queryDirect(sprintf("SELECT searchname, id from releases where imdbid IS NULL and categoryid in ( select id from category where parentid = %d ) ORDER BY postdate DESC LIMIT 100", Category::CAT_PARENT_MOVIE));
+		if ($this->pdo->getNumRows($res) > 0)
 		{
 			if ($this->echooutput)
-				echo "MovProc : Processing " . $db->getNumRows($res) . " movie releases\n";
+				echo "MovProc : Processing " . $this->pdo->getNumRows($res) . " movie releases\n";
 
-			while ($arr = $db->getAssocArray($res))
+			while ($arr = $this->pdo->getAssocArray($res))
 			{
 				$imdbID = false;
 				/* Preliminary IMDB id Detection from NFO file */
@@ -689,7 +689,7 @@ class Movie
 
 				if($imdbID !== false){
 					// Set IMDB (if found in nfo) and move along
-					$db->queryExec(sprintf("update releases set imdbid = %s where id = %d",  $db->escapeString($imdbID), $arr["id"]));
+					$this->pdo->queryExec(sprintf("update releases set imdbid = %s where id = %d",  $this->pdo->escapeString($imdbID), $arr["id"]));
 					//check for existing movie entry
 					$movCheck = $this->getMovieInfo($imdbID);
 					if ($movCheck === false || (isset($movCheck['updateddate']) && (time() - strtotime($movCheck['updateddate'])) > 2592000))
@@ -715,7 +715,7 @@ class Movie
 						if ($imdbId !== false)
 						{
 							//update release with imdb id
-							$db->queryExec(sprintf("update releases SET imdbid = %s WHERE id = %d", $db->escapeString($imdbId), $arr["id"]));
+							$this->pdo->queryExec(sprintf("update releases SET imdbid = %s WHERE id = %d", $this->pdo->escapeString($imdbId), $arr["id"]));
 
 							//check for existing movie entry
 							$movCheck = $this->getMovieInfo($imdbId);
@@ -726,7 +726,7 @@ class Movie
 
 						} else {
 							//no imdb id found, set to all zeros so we dont process again
-							$db->queryExec(sprintf("update releases SET imdbid = %d WHERE id = %d", 0, $arr["id"]));
+							$this->pdo->queryExec(sprintf("update releases SET imdbid = %d WHERE id = %d", 0, $arr["id"]));
 						}
 
 					} else {
@@ -736,7 +736,7 @@ class Movie
 
 				} else {
 					//no valid movie name found, set to all zeros so we dont process again
-					$db->queryExec(sprintf("update releases SET imdbid = %d WHERE id = %d", 0, $arr["id"]));
+					$this->pdo->queryExec(sprintf("update releases SET imdbid = %d WHERE id = %d", 0, $arr["id"]));
 				}
 			}
 		}
@@ -769,9 +769,8 @@ class Movie
 	 */
 	public function getUpcoming($type, $source="rottentomato")
 	{
-		$db = new DB();
-		$sql = sprintf("select * from upcoming where source = %s and typeid = %d", $db->escapeString($source), $type);
-		return $db->queryOneRow($sql);
+		$sql = sprintf("select * from upcoming where source = %s and typeid = %d", $this->pdo->escapeString($source), $type);
+		return $this->pdo->queryOneRow($sql);
 	}
 
 	/**
@@ -812,11 +811,10 @@ class Movie
 	 */
 	public function updateInsUpcoming($source, $type, $info)
 	{
-		$db = new DB();
 
 		$sql = sprintf("INSERT into upcoming (source,typeID,info,updateddate) VALUES (%s, %d, %s, now()) ON DUPLICATE KEY UPDATE info = %s",
-						$db->escapeString($source), $type, $db->escapeString($info), $db->escapeString($info));
-		$db->queryInsert($sql);
+						$this->pdo->escapeString($source), $type, $this->pdo->escapeString($info), $this->pdo->escapeString($info));
+		$this->pdo->queryInsert($sql);
 	}
 
 	/**
