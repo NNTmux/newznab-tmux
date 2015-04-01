@@ -15,6 +15,10 @@ require_once(WWW_DIR . "/lib/ColorCLI.php");
  */
 class Parsing
 {
+	/**
+	 * @var DB
+	 */
+	public $pdo;
 
 	/**
 	 * Default constructor.
@@ -39,6 +43,7 @@ class Parsing
 		$this->cleanup = ['nuke' => [], 'misc' => []];
 		$s = new Sites();
 		$this->site = $s->get();
+		$this->pdo = new DB();
 	}
 
 	/**
@@ -46,8 +51,6 @@ class Parsing
 	 */
 	public function process()
 	{
-
-		$db = new DB();
 
 		// Default query for both full db and last 4 hours.
 		$sql = "SELECT r.searchname, r.name, r.fromname, r.id as rid, r.categoryid, r.guid, r.postdate,
@@ -62,7 +65,7 @@ class Parsing
 		%s
 		GROUP BY r.id";
 
-		$res = $db->query(sprintf($sql, $this->limited ? "AND r.adddate BETWEEN NOW() - INTERVAL 4 HOUR AND NOW()" : ""));
+		$res = $this->pdo->query(sprintf($sql, $this->limited ? "AND r.adddate BETWEEN NOW() - INTERVAL 4 HOUR AND NOW()" : ""));
 		$this->releasestocheck = sizeof($res);
 		if ($res) {
 			echo "PostPrc : Parsing last " . $this->releasestocheck . " releases in the Other-Misc categories\n";
@@ -95,7 +98,7 @@ class Parsing
 				///
 				///Use the Nfo to try to get the proper Releasename.
 				///
-				$nfo = $db->queryOneRow(sprintf("select uncompress(nfo) as nfo from releasenfo where releaseid = %d", $rel['rid']));
+				$nfo = $this->pdo->queryOneRow(sprintf("select uncompress(nfo) as nfo from releasenfo where releaseid = %d", $rel['rid']));
 				if ($nfo && $foundName == "") {
 					$this->nfosprocessed++;
 					$nfo = $nfo['nfo'];
@@ -822,8 +825,7 @@ class Parsing
 				ColorCLI::headerOver(' New Cat: 		') . ColorCLI::primaryOver($categoryID) . PHP_EOL .
 				ColorCLI::headerOver(' Method: 		') . ColorCLI::primaryOver($methodused) . PHP_EOL ;
 			if (!$this->echoonly) {
-				$db = new DB();
-				$db->queryExec(sprintf("update releases SET name = %s, searchname = %s, categoryid = %d, imdbid = NULL, rageid = -1, bookinfoid = NULL, musicinfoid = NULL, consoleinfoid = NULL WHERE releases.id = %d", $db->escapeString($name), $db->escapeString($searchname), $categoryID, $rel['rid']));
+				$this->pdo->queryExec(sprintf("update releases SET name = %s, searchname = %s, categoryid = %d, imdbid = NULL, rageid = -1, bookinfoid = NULL, musicinfoid = NULL, consoleinfoid = NULL WHERE releases.id = %d", $this->pdo->escapeString($name), $this->pdo->escapeString($searchname), $categoryID, $rel['rid']));
 			}
 			$this->numupdated++;
 		}
@@ -835,15 +837,13 @@ class Parsing
 	public function cleanup()
 	{
 		echo "PostPrc : Performing cleanup \n";
-
-		$db = new Db;
 		$catsql = "select id from groups";
-		$res = $db->query($catsql);
+		$res = $this->pdo->query($catsql);
 		foreach ($res as $r2) {
 			$sql = sprintf("select r.id, name, searchname, categoryid, size, totalpart, musicinfoid, preid, groupid, rn.id as nfoid from releases r left outer join releasenfo rn ON rn.releaseid = r.id where groupid = %d", $r2['id']) . " %s ";
-			$unbuf = $db->queryDirect(sprintf($sql, ($this->limited ? " and r.adddate BETWEEN NOW() - INTERVAL 1 DAY AND NOW() " : "")));
+			$unbuf = $this->pdo->queryDirect(sprintf($sql, ($this->limited ? " and r.adddate BETWEEN NOW() - INTERVAL 1 DAY AND NOW() " : "")));
 
-			while ($r = $db->getAssocArray($unbuf)) {
+			while ($r = $this->pdo->getAssocArray($unbuf)) {
 				///
 				///This Section will remove releases based on specific criteria
 				///
@@ -1408,15 +1408,14 @@ class Parsing
 		$this->nummiscd += count($this->cleanup['misc']);
 
 		if (!$this->echoonly) {
-			$releases = new Releases;
-			$db = new Db;
+			$releases = new \Releases(['Settings' => $this->pdo]);
 			foreach (array_keys($this->cleanup['nuke']) as $id) {
 				$releases->delete($id);
 			}
 
 			if (count($this->cleanup['misc'])) {
 				$sql = 'update releases set categoryid = ' . Category::CAT_MISC_OTHER . ' where categoryid != ' . Category::CAT_MISC_OTHER . ' and id in (' . implode(array_keys($this->cleanup['misc']), ',') . ')';
-				$db->queryExec($sql);
+				$this->pdo->queryExec($sql);
 			}
 		}
 
@@ -1428,70 +1427,73 @@ class Parsing
 	 */
 	public function removeSpecial()
 	{
-		$db = new Db;
-
 		$sql = "select id, searchname from releases where 1 = 1 ";
 		$sql .= ($this->limited ? "AND adddate BETWEEN NOW() - INTERVAL 1 DAY AND NOW()" : "");
 		$sql .= " order by postdate desc";
 
-		$res = $db->queryDirect($sql);
-		while ($r = $db->getAssocArray($res)) {
+		$res = $this->pdo->queryDirect($sql);
+		while ($r = $this->pdo->getAssocArray($res)) {
 			$oldname = $r['searchname'];
 
 			if (preg_match('/^(\:|\"|\-| )+/', $r['searchname'])) {
 				while (preg_match('/^(\:|\"|\-| |\_)+/', $r['searchname'])) {
 					$r['searchname'] = substr($r['searchname'], 1);
 				}
-				$this->updateName($db, $r['id'], $oldname, $r['searchname']);
+				$this->updateName($this->pdo, $r['id'], $oldname, $r['searchname']);
 			}
 			if (preg_match('/^000\-/', $r['searchname'])) {
 				while (preg_match('/^000\-/', $r['searchname'])) {
 					$r['searchname'] = substr($r['searchname'], 4);
 				}
-				$this->updateName($db, $r['id'], $oldname, $r['searchname']);
+				$this->updateName($this->pdo, $r['id'], $oldname, $r['searchname']);
 			}
 			if (preg_match('/(\:|\"|\-| |\/)$/', $r['searchname'])) {
 				while (preg_match('/(\:|\"|\-| |\/)$/', $r['searchname'])) {
 					$r['searchname'] = substr($r['searchname'], 0, -1);
 				}
-				$this->updateName($db, $r['id'], $oldname, $r['searchname']);
+				$this->updateName($this->pdo, $r['id'], $oldname, $r['searchname']);
 			}
 			if (preg_match('/\"/', $r['searchname'])) {
 				while (preg_match('/\"/', $r['searchname'])) {
 					$r['searchname'] = str_replace('"', '', $r['searchname']);
 				}
-				$this->updateName($db, $r['id'], $oldname, $r['searchname']);
+				$this->updateName($this->pdo, $r['id'], $oldname, $r['searchname']);
 			}
 			if (preg_match('/\-\d{1}$/', $r['searchname'])) {
 				while (preg_match('/\-\d{1}$/', $r['searchname'])) {
 					$r['searchname'] = preg_replace('/\-\d{1}$/', '', $r['searchname']);
 				}
-				$this->updateName($db, $r['id'], $oldname, $r['searchname']);
+				$this->updateName($this->pdo, $r['id'], $oldname, $r['searchname']);
 			}
 			if (preg_match('/\!+.*?mom.*?\!+/i', $r['searchname'])) {
 				while (preg_match('/\!+.*?mom.*?\!+/i', $r['searchname'])) {
 					$r['searchname'] = preg_replace('/\!+.*?mom.*?\!+/i', '', $r['searchname']);
 				}
-				$this->updateName($db, $r['id'], $oldname, $r['searchname']);
+				$this->updateName($this->pdo, $r['id'], $oldname, $r['searchname']);
 			}
 			if (preg_match('/(\\/)/i', $r['searchname'])) {
 				while (preg_match('/(\\/)/i', $r['searchname'])) {
 					$r['searchname'] = preg_replace('/(\\/)/i', '', $r['searchname']);
 				}
-				$this->updateName($db, $r['id'], $oldname, $r['searchname']);
+				$this->updateName($this->pdo, $r['id'], $oldname, $r['searchname']);
 			}
 		}
 	}
 
 	/**
 	 * update a release name
+	 *
+	 * @param DB $pdo
+	 * @param    $id
+	 * @param    $oldname
+	 * @param    $newname
 	 */
-	private function updateName($db, $id, $oldname, $newname)
+	private function updateName(DB $pdo, $id, $oldname, $newname)
 	{
 		if ($this->verbose)
 			echo sprintf("OLD : %s\nNEW : %s\n\n", $oldname, $newname);
 
 		if (!$this->echoonly)
-			$db->queryExec(sprintf("update releases set name=%s, searchname = %s WHERE id = %d", $db->escapeString($newname), $db->escapeString($newname), $id));
+			$this->pdo->queryExec(sprintf("update releases set name=%s, searchname = %s WHERE id = %d", $this->pdo->escapeString($newname), $this->pdo->escapeString($newname), $id));
 	}
 }

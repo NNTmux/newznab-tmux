@@ -5,9 +5,9 @@ require_once(WWW_DIR."/lib/adminpage.php");
 require_once(WWW_DIR."/lib/releases.php");
 require_once(WWW_DIR."/lib/category.php");
 
-$page = new AdminPage();
-$releases = new Releases();
-$category = new Category();
+$page = new \AdminPage();
+$releases = new \Releases(['Settings' => $this->pdo]);
+$category = new \Category();
 $id = 0;
 
 // set the current action
