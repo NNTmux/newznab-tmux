@@ -699,7 +699,7 @@ class DB extends \PDO
 	/**
 	 * Get the total number of rows in the result set
 	 *
-	 * @param PDOStatement $result
+	 * @param $result
 	 * @return int|PDOStatement
 	 */
 	public function getNumRows($result)
