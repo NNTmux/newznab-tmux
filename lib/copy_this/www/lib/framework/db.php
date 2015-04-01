@@ -969,7 +969,7 @@ class DB extends \PDO
 	 * PHP interpretation of MySQL's from_unixtime method.
 	 * @param int  $utime UnixTime
 	 *
-	 * @return bool|string
+	 * @return string
 	 */
 	public function from_unixtime($utime)
 	{
