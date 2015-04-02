@@ -518,28 +518,6 @@ class Film
 	}
 
 	/**
-	 * Check if a variable is set and not a empty string.
-	 *
-	 * @param $imdbID
-	 *
-	 * @return string
-	 */
-	public function checkBanner($imdbID)
-	{
-		$banner = NN_COVERS . 'movies' . DS . $imdbID . '-banner.jpg';
-		$cover = NN_COVERS . 'movies' . DS . $imdbID . '-cover.jpg';
-		$coverStripped = preg_match('/covers\/([^\/]+?)\/(?:[^\/]+\/)?(.+)/', $cover, $matches);
-		$covpath = $matches[0];
-		if (file_exists($banner)) {
-			$bannerStripped = preg_match('/covers\/([^\/]+?)\/(?:[^\/]+\/)?(.+)/', $banner, $matches);
-			$banpath = $matches[0];
-			var_dump($banpath);
-			return $banpath;
-		}
-		return $covpath;
-	}
-
-	/**
 	 * Fetch IMDB/TMDB info for the movie.
 	 *
 	 * @param $imdbId
