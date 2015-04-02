@@ -116,7 +116,7 @@
 								{if $result.imdbid > 0}
 									<a href="#" name="name{$result.imdbid}" title="View movie info" class="modal_imdb rndbtn" rel="movie" >Cover</a>
 								{/if}
-									{if $result.preID > 0 && $userdata.canpre == 1}<span class="preinfo rndbtn"
+									{if $result.preid > 0 && $userdata.canpre == 1}<span class="preinfo rndbtn"
 																						 title="{$result.searchname}">
 										PreDB</span>{/if}
 									{if $result.prehashid > 0}<span class="prehashinfo rndbtn"

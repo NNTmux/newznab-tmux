@@ -946,7 +946,7 @@ class Sphinx
                           . "LEFT OUTER JOIN category cp "
                           . "ON cp.id = c.parentid "
                           . "LEFT OUTER JOIN predb pre "
-                          . "ON pre.id = releases.preID "
+                          . "ON pre.id = releases.preid "
                           . "WHERE releases.passwordstatus <= (SELECT value "
                           .      "FROM site WHERE setting='showpasswordedrelease') "
                           . "AND releases.id IN (%s)";
@@ -1307,7 +1307,7 @@ class Sphinx
         $lookupQuery = "SELECT predb.*, r.guid "
                      . "FROM predb "
                      . "LEFT OUTER JOIN releases r "
-                     . "ON r.preID = predb.id "
+                     . "ON r.preid = predb.id "
                      . "WHERE predb.id IN (%s) "
                      . "ORDER BY predb.ctime DESC";
         return $this->searchDirect($sphinxQuery, $lookupQuery, 120);

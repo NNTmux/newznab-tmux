@@ -259,7 +259,7 @@
 									<span class="mediainfo rndbtn" title="{$result.guid}">Media</span>
 								{/if}
 								{if $result.preid > 0}
-									<span class="preinfo rndbtn" title="{$result.preID}">PreDB</span>
+									<span class="preinfo rndbtn" title="{$result.preid}">PreDB</span>
 								{/if}
 								{if $result.prehashid > 0}
 									<span class="prehashinfo rndbtn" title="{$result.prehashid}">PreHash</span>
