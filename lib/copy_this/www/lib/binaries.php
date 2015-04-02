@@ -120,7 +120,7 @@ class Binaries
 	 *
 	 * @param array $options Class instances / echo to CLI?
 	 */
-	function Binaries(array $options = [])
+	public function __construct(array $options = [])
 	{
 		$defaults = [
 			'Echo'                => true,
