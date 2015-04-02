@@ -936,7 +936,7 @@ class SpotNab {
 			$offset += $batch;
 
 			foreach ($res as $r){
-				$nzbfile = $nzb->NZBPath($r["guid"]);
+				$nzbfile = $nzb->getNZBPath($r["guid"]);
 				if($nzbfile === Null){
 					continue;
 				}
