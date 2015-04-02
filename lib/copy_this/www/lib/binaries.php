@@ -528,7 +528,7 @@ class Binaries
 			// Check if the non-compression headers have an error.
 			if ($this->_nntp->isError($msgs)) {
 				$this->log(
-					"Code {$msgs->code}: {$msgs->message}\nSkipping group: ${$groupArr['name']}",
+					"Code {$msgs->code}: {$msgs->message}\nSkipping group: {$groupArr['name']}",
 					'scan',
 					\Logger::LOG_WARNING,
 					'error'
