@@ -19,7 +19,7 @@
 			<!--<tr><th>Pre:</th><td>{$predb.ctime|date_format:"%b %e, %Y %T"} ({$predb.ctime|daysago})</td></tr>-->
 			<i class="icon-warning-sign icon-white"></i>
 			{if preg_match('/^(UN)?((MOD)?NUKED?|DELPRE|MOD|LOCAL)$/', $predb.nuketype)}
-				{$predb.nuketype}NUKE:{$predb.nukereason}
+				{$predb.nuketype} : {$predb.nukereason}
 			{else}
 				{$predb.nukereason} [{$predb.nuketype}]
 			{/if}
