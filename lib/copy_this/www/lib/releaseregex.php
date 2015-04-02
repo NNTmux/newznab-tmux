@@ -11,6 +11,10 @@ require_once(WWW_DIR . "/lib/site.php");
  */
 class ReleaseRegex
 {
+	/**
+	 * @var DB
+	 */
+	public $pdo;
 
 	public function __construct()
 	{
