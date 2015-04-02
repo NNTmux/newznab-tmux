@@ -122,6 +122,12 @@ class NZB
 
 	/**
 	 * Builds a full path to the nzb file on disk. nzbs are stored in a subdir of their first char.
+	 *
+	 * @param        $releaseGuid
+	 * @param string $sitenzbpath
+	 * @param bool   $createIfDoesntExist
+	 *
+	 * @return string
 	 */
 	function getNZBPath($releaseGuid, $sitenzbpath = "", $createIfDoesntExist = false)
 	{
