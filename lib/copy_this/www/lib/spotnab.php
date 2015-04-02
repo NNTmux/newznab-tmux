@@ -162,7 +162,7 @@ class SpotNab {
 	public function __construct($post_user = Null, $post_email = Null, $post_group = Null) {
 		$this->_pdo = new DB();
 		$this->_nntp = new NNTP(['Settings' => $this->_pdo]);
-		$this->releaseImage =  new \ReleaseImage($this->_pdo);
+		$this->_releaseImage =  new \ReleaseImage($this->_pdo);
 		$this->nzb = new \NZB($this->_pdo);
 		$s = new Sites();
 		$this->_site = $s->get();
@@ -946,7 +946,7 @@ class SpotNab {
 				{
 					if($delete_broken_releases){
 						$release = new Releases();
-						$release->deleteSingle(['g' => $r['guid'], 'i' => $r['id']], $this->nzb, $this->releaseImage);
+						$release->deleteSingle(['g' => $r['guid'], 'i' => $r['id']], $this->nzb, $this->_releaseImage);
 						// Free the variable in an attempt to recover memory
 						unset($release);
 				        echo '-';
@@ -965,7 +965,7 @@ class SpotNab {
 				if(!$gid){
 					if($delete_broken_releases){
 						$release = new Releases();
-						$release->$release->deleteSingle(['g' => $r['guid'], 'i' => $r['id']], $this->nzb, $this->releaseImage);
+						$release->$release->deleteSingle(['g' => $r['guid'], 'i' => $r['id']], $this->nzb, $this->_releaseImage);
 						unset($release);
 				        echo '-';
 					}else{
