@@ -82,10 +82,6 @@ CREATE TABLE partrepair (
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci;
 
-CREATE TRIGGER delete_collections BEFORE DELETE ON collections FOR EACH ROW
-  BEGIN
-    DELETE FROM binaries WHERE collection_id = OLD.id;
-    DELETE FROM parts WHERE collection_id = OLD.id;
-  END;
+CREATE TRIGGER delete_collections BEFORE DELETE ON collections FOR EACH ROW BEGIN DELETE FROM binaries WHERE collection_id = OLD.id;DELETE FROM parts WHERE collection_id = OLD.id;END;
 
 UPDATE `tmux` SET `value` = '108' WHERE `setting` = 'sqlpatch';
