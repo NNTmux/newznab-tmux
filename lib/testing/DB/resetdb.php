@@ -35,7 +35,7 @@ $arr = [
 		"tvrage", "releasenfo", "releasecomment", 'sharing', 'sharing_sites',
 		"usercart", "usermovies", "userseries", "movieinfo", "musicinfo", "releasefiles",
 		"releaseaudio", "releasesubs", "releasevideo", "releaseextrafull", "parts",
-		"partrepair", "binaries", "releases"
+		"partrepair", "binaries", "collections", "releases"
 ];
 foreach ($arr as &$value) {
 	$rel = $pdo->queryExec("TRUNCATE TABLE $value");
@@ -49,7 +49,7 @@ $sql = "SHOW table status";
 $tables = $pdo->query($sql);
 foreach ($tables as $row) {
 	$tbl = $row['name'];
-	if (preg_match('/binaries_\d+/', $tbl) || preg_match('/parts_\d+/', $tbl) || preg_match('/partrepair_\d+/', $tbl) || preg_match('/\d+_binaries/', $tbl) || preg_match('/\d+_parts/', $tbl) || preg_match('/\d+_partrepair_\d+/', $tbl)) {
+	if (preg_match('/binaries_\d+/', $tbl) || preg_match('/parts_\d+/', $tbl) || preg_match('/collections_\d+/', $tbl) || preg_match('/partrepair_\d+/', $tbl) || preg_match('/\d+_binaries/', $tbl) || preg_match('/\d+_collections/', $tbl) || preg_match('/\d+_parts/', $tbl) || preg_match('/\d+_partrepair_\d+/', $tbl)) {
 		$rel = $pdo->queryDirect(sprintf('DROP TABLE %s', $tbl));
 		if ($rel !== false)
 			echo $pdo->log->primary("Dropping ${tbl} completed.");
