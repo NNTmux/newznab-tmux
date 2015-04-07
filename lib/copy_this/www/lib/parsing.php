@@ -595,6 +595,16 @@ class Parsing
 							$this->determineCategory($rel, $foundName, $methodused);
 						}
 
+						//Reversed name
+						if (preg_match('/[a-z0-9\(\)\'\!\,\.\-\ \_]+(BEW|p027|p0801)[a-z0-9\(\)\,\'\!\ \-\.]+/i', $file, $matches4))
+						{
+							$new1 = preg_match('/( )?(\.m2ts|\.wmv|\.avi|.mp4|\.mkv)/i', $matches4[0], $matched);
+							$new2 = str_replace($matched[0], "", $matches4[0]);
+							$foundName = strrev($new2);
+							$methodused = "Reversed";
+							$this->determineCategory($rel, $foundName, $methodused);
+						}
+
 						//Check rarfile contents for a scene name
 						if (preg_match($sceneRegex, $file, $matches) && $foundName == '') {
 							//Simply Releases Toppers
