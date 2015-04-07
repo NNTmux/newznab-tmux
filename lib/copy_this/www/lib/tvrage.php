@@ -296,7 +296,7 @@ class TvRage
 
 		$xml = $this->fetchCache($lookupUrl);
 		if ($xml === false)
-			$xml = Utility::getUrl(['url' => $lookupUrl]);
+			$xml = Utility::getUrl(['url' => $lookupUrl, 'verifycert' => false]);
 
 		if ($xml !== false)
 		{
@@ -329,7 +329,7 @@ class TvRage
 
 		$page = $this->fetchCache($lookupUrl);
 		if ($page === false)
-			$page = Utility::getUrl([$lookupUrl]);
+			$page = Utility::getUrl(['url' => $lookupUrl, 'verifycert' => false]);
 
 		if ($page !== false)
 		{
@@ -367,7 +367,7 @@ class TvRage
 
 		$xml = $this->fetchCache($lookupUrl);
 		if ($xml === false)
-			$xml = Utility::getUrl([$lookupUrl]);
+			$xml = Utility::getUrl(['url' => $lookupUrl, 'verifycert' => false]);
 
 		if ($xml !== false)
 		{
@@ -623,7 +623,7 @@ class TvRage
 
 		$xml = $this->fetchCache($lookupUrl);
 		if ($xml === false)
-			$xml = Utility::getUrl([$lookupUrl]); //full search gives us the akas
+			$xml = Utility::getUrl(['url' => $lookupUrl, 'verifycert' => false]);
 
 		if ($xml !== false)
 		{
@@ -823,11 +823,9 @@ class TvRage
 	public function fetchCache($key)
 	{
 		$cache = new Cache;
-		if ($cache->enabled && $cache->exists($key))
-		{
-			$ret = $cache->fetch($key);
-			if ($ret !== false)
-				return $ret;
+		$ret = $cache->get($key);
+		if ($ret !== false) {
+			return $ret;
 		}
 		return false;
 	}
@@ -835,8 +833,10 @@ class TvRage
 	public function storeCache($key, $data)
 	{
 		$cache = new Cache;
-		if ($cache->enabled)
-			return $cache->store($key, $data);
+		$ret = $cache->set($key, $data, 900);
+		if ($ret !== false){
+			return $ret;
+		}
 
 		return false;
 	}
