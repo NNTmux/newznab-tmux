@@ -60,6 +60,7 @@ class Tmux
 
 	public function getConnectionsInfo($constants)
 	{
+		$runVar = array();
 		$runVar['connections']['port_a'] = $runVar['connections']['host_a'] = $runVar['connections']['ip_a'] = false;
 
 		if ($constants['nntpproxy'] == 0) {
@@ -73,7 +74,7 @@ class Tmux
 			}
 		} else {
 			$filename = NN_MISC . "update_scripts/nix_scripts/tmux/python/lib/nntpproxy.conf";
-			$fp = fopen($filename, "r") or die("Couldn't open $filename");
+			$fp = fopen($filename, "r") || die("Couldn't open $filename");
 			while (!feof($fp)) {
 				$line = fgets($fp);
 				if (preg_match('/"host": "(.+)",$/', $line, $match)) {
@@ -86,7 +87,7 @@ class Tmux
 			}
 			if ($constants['alternate_nntp']) {
 				$filename = NN_MISC . "update_scripts/nix_scripts/tmux/python/lib/nntpproxy_a.conf";
-				$fp = fopen($filename, "r") or die("Couldn't open $filename");
+				$fp = fopen($filename, "r") || die("Couldn't open $filename");
 				while (!feof($fp)) {
 					$line = fgets($fp);
 					if (preg_match('/"host": "(.+)",$/', $line, $match)) {
@@ -120,6 +121,7 @@ class Tmux
 				$port = 'port';
 				break;
 		}
+		$runVar = array();
 
 		$runVar['conncounts'][$which]['active'] = $runVar['conncounts'][$which]['total'] = 0;
 
@@ -346,6 +348,7 @@ class Tmux
 
 	public function relativeTime($_time)
 	{
+		$d = array();
 		$d[0] = [1, "sec"];
 		$d[1] = [60, "min"];
 		$d[2] = [3600, "hr"];

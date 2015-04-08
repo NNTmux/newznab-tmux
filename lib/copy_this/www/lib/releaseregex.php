@@ -11,21 +11,36 @@ require_once(WWW_DIR . "/lib/site.php");
  */
 class ReleaseRegex
 {
+	/**
+	 * @var DB
+	 */
+	public $pdo;
 
-	public function ReleaseRegex()
+	/**
+	 * @var bool
+	 */
+	public $tablePerGroup;
+
+	public function __construct()
 	{
-		$this->regexes = array();
+		$this->regexes = [];
+		$this->pdo = new DB();
 	}
 
 	/**
 	 * Get all releaseregex rows matching filters.
+	 *
+	 * @param bool   $activeonly
+	 * @param string $groupname
+	 * @param bool   $blnIncludeReleaseCount
+	 * @param null   $userReleaseRegex
+	 *
+	 * @return array
 	 */
 	public function get($activeonly = true, $groupname = "-1", $blnIncludeReleaseCount = false, $userReleaseRegex = null)
 	{
 		if (!empty($this->regexes))
 			return $this->regexes;
-
-		$db = new DB();
 
 		$where = "";
 		if ($activeonly)
@@ -34,7 +49,7 @@ class ReleaseRegex
 		if ($groupname == "all")
 			$where .= " and releaseregex.groupname is null";
 		elseif ($groupname != "-1")
-			$where .= sprintf(" and releaseregex.groupname = %s", $db->escapeString($groupname));
+			$where .= sprintf(" and releaseregex.groupname = %s", $this->pdo->escapeString($groupname));
 
 		if ($userReleaseRegex === true) {
 			$where .= ' AND releaseregex.id >= 100000';
@@ -49,7 +64,7 @@ class ReleaseRegex
 			$relcountjoin = " left outer join (  select regexid, max(adddate) adddate, count(id) as count from releases group by regexid) x on x.regexid = releaseregex.id ";
 		}
 
-		$this->regexes = $db->query("SELECT releaseregex.id, releaseregex.categoryid, category.title as categoryTitle, releaseregex.status, releaseregex.description, releaseregex.groupname AS groupname, releaseregex.regex,
+		$this->regexes = $this->pdo->query("SELECT releaseregex.id, releaseregex.categoryid, category.title as categoryTitle, releaseregex.status, releaseregex.description, releaseregex.groupname AS groupname, releaseregex.regex,
 												groups.id AS groupid, releaseregex.ordinal " . $relcountcol . "
 												FROM releaseregex
 												left outer JOIN groups ON groups.name = releaseregex.groupname
@@ -68,8 +83,7 @@ class ReleaseRegex
 	public function getGroupsForSelect()
 	{
 
-		$db = new DB();
-		$categories = $db->query("SELECT distinct coalesce(groupname,'all') as groupname from releaseregex order by groupname ");
+		$categories = $this->pdo->query("SELECT distinct coalesce(groupname,'all') as groupname from releaseregex order by groupname ");
 		$temp_array = array();
 
 		$temp_array[-1] = "--Please Select--";
@@ -85,9 +99,8 @@ class ReleaseRegex
 	 */
 	public function getByID($id)
 	{
-		$db = new DB();
 
-		return $db->queryOneRow(sprintf("select * from releaseregex where id = %d ", $id));
+		return $this->pdo->queryOneRow(sprintf("select * from releaseregex where id = %d ", $id));
 	}
 
 	/**
@@ -112,12 +125,15 @@ class ReleaseRegex
 
 	/**
 	 * Delete a releaseregex row.
+	 *
+	 * @param $id
+	 *
+	 * @return bool|PDOStatement
 	 */
 	public function delete($id)
 	{
-		$db = new DB();
 
-		return $db->queryExec(sprintf("DELETE from releaseregex where id = %d", $id));
+		return $this->pdo->queryExec(sprintf("DELETE from releaseregex where id = %d", $id));
 	}
 
 	/**
@@ -125,13 +141,12 @@ class ReleaseRegex
 	 */
 	public function update($regex)
 	{
-		$db = new DB();
 
 		$groupname = $regex["groupname"];
 		if ($groupname == "")
 			$groupname = "null";
 		else
-			$groupname = sprintf("%s", $db->escapeString($regex["groupname"]));
+			$groupname = sprintf("%s", $this->pdo->escapeString($regex["groupname"]));
 
 		$catid = $regex["category"];
 		if ($catid == "-1")
@@ -139,24 +154,27 @@ class ReleaseRegex
 		else
 			$catid = sprintf("%d", $regex["category"]);
 
-		$db->queryExec(sprintf("update releaseregex set groupname=%s, regex=%s, ordinal=%d, status=%d, description=%s, categoryid=%s where id = %d ",
-				$groupname, $db->escapeString($regex["regex"]), $regex["ordinal"], $regex["status"], $db->escapeString($regex["description"]), $catid, $regex["id"]
+		$this->pdo->queryExec(sprintf("update releaseregex set groupname=%s, regex=%s, ordinal=%d, status=%d, description=%s, categoryid=%s where id = %d ",
+				$groupname, $this->pdo->escapeString($regex["regex"]), $regex["ordinal"], $regex["status"], $this->pdo->escapeString($regex["description"]), $catid, $regex["id"]
 			)
 		);
 	}
 
 	/**
 	 * Add a releaseregex row.
+	 *
+	 * @param $regex
+	 *
+	 * @return bool|int
 	 */
 	public function add($regex)
 	{
-		$db = new DB();
 
 		$groupname = $regex["groupname"];
 		if ($groupname == "")
 			$groupname = "null";
 		else
-			$groupname = sprintf("%s", $db->escapeString($regex["groupname"]));
+			$groupname = sprintf("%s", $this->pdo->escapeString($regex["groupname"]));
 
 		$catid = $regex["category"];
 		if ($catid == "-1")
@@ -164,8 +182,8 @@ class ReleaseRegex
 		else
 			$catid = sprintf("%d", $regex["category"]);
 
-		return $db->queryInsert(sprintf("insert into releaseregex (groupname, regex, ordinal, status, description, categoryid) values (%s, %s, %d, %d, %s, %s) ",
-				$groupname, $db->escapeString($regex["regex"]), $regex["ordinal"], $regex["status"], $db->escapeString($regex["description"]), $catid
+		return $this->pdo->queryInsert(sprintf("insert into releaseregex (groupname, regex, ordinal, status, description, categoryid) values (%s, %s, %d, %d, %s, %s) ",
+				$groupname, $this->pdo->escapeString($regex["regex"]), $regex["ordinal"], $regex["status"], $this->pdo->escapeString($regex["description"]), $catid
 			)
 		);
 
@@ -178,8 +196,7 @@ class ReleaseRegex
 		$outcome = @preg_match($regexArr["regex"], $binarySubject, $matches);
 		if ($outcome === false) {
 			echo "ERROR: " . ($regexArr["id"] < 10000 ? "System" : "Custom") . " release regex '" . $regexArr["id"] . "' is not a valid regex.\n";
-			$db = new DB();
-			$db->queryExec(sprintf("update releaseregex set status=0 where id = %d and status=1", $regexArr["id"]));
+			$this->pdo->queryExec(sprintf("update releaseregex set status=0 where id = %d and status=1", $regexArr["id"]));
 
 			return $ret;
 		}
@@ -250,13 +267,12 @@ class ReleaseRegex
 
 	public function testRegex($regex, $groupname, $poster, $ignorematched, $matchagainstbins)
 	{
-		$db = new Db();
 		$cat = new Categorize();
 		$s = new Sites();
 		$site = $s->get();
 		$groups = new Groups();
 		$groupID = $groups->getByNameByID($groupname);
-		$group = $groups->getCBPTableNames($site->tablePerGroup, $groupID);
+		$group = $groups->getCBPTableNames($site->tablepergroup, $groupID);
 
 		$catList = $cat->getForSelect();
 		$matches = array();
@@ -265,13 +281,13 @@ class ReleaseRegex
 			$groupname = '.*';
 
 		if ($matchagainstbins !== '')
-			$sql = sprintf("select b.*, '0' as size, '0' as blacklistid, g.name as groupname from %s b left join groups g on g.id = b.groupid where b.groupid IN (select g.id from groups g where g.name REGEXP %s) order by b.date desc", $group['bname'], $db->escapeString('^' . $groupname . '$'));
+			$sql = sprintf("select b.*, '0' as size, '0' as blacklistid, g.name as groupname from %s b left join groups g on g.id = b.groupid where b.groupid IN (select g.id from groups g where g.name REGEXP %s) order by b.date desc", $group['bname'], $this->pdo->escapeString('^' . $groupname . '$'));
 		else
-			$sql = sprintf("select rrt.* from releaseregextesting rrt where rrt.groupname REGEXP %s order by rrt.date desc", $db->escapeString('^' . $groupname . '$'));
+			$sql = sprintf("select rrt.* from releaseregextesting rrt where rrt.groupname REGEXP %s order by rrt.date desc", $this->pdo->escapeString('^' . $groupname . '$'));
 
-		$resbin = $db->queryDirect($sql);
+		$resbin = $this->pdo->queryDirect($sql);
 
-		while ($rowbin = $db->getAssocArray($resbin)) {
+		while ($rowbin = $this->pdo->getAssocArray($resbin)) {
 			if ($ignorematched !== '' && ($rowbin['regexid'] != '' || $rowbin['blacklistid'] == 1))
 				continue;
 
@@ -314,14 +330,13 @@ class ReleaseRegex
 
 	public function fetchTestBinaries($groupname, $numarticles, $clearexistingbins)
 	{
-		$db = new DB();
 		$nntp = new Nntp();
 		$binaries = new Binaries();
 		$groups = new Groups();
 
 		$ret = array();
 		if ($clearexistingbins == true)
-			$db->queryExec('truncate releaseregextesting');
+			$this->pdo->queryExec('truncate releaseregextesting');
 
 		$nntp->doConnect();
 
@@ -342,7 +357,7 @@ class ReleaseRegex
 
 			$group = $groupArr['name'];
 			$data = $nntp->selectGroup($group);
-			if (PEAR::isError($data)) {
+			if (NNTP::isError($data)) {
 				$ret[] = "Could not select group (doesnt exist on USP): {$group}";
 				continue;
 			} else {
@@ -363,7 +378,7 @@ class ReleaseRegex
 
 						$msgs = $nntp->getXOver($rangeStart . "-" . $rangeEnd, true, false);
 
-					if (PEAR::isError($msgs)) {
+					if (NNTP::isError($msgs)) {
 						$ret[] = "Error {$msgs->code}: {$msgs->message} on " . $group;
 						continue 2;
 					}
@@ -455,11 +470,11 @@ class ReleaseRegex
 
 							foreach ($binChunks as $binChunk) {
 								foreach ($binChunk as $chunk) {
-									$binParams[] = sprintf("(%s, %s, FROM_UNIXTIME(%s), %s, %s, %s, %s, %s, %d, %d, now())", $db->escapeString($chunk['name']), $db->escapeString($chunk['fromname']), $db->escapeString($chunk['date']), $db->escapeString($chunk['binaryhash']), $db->escapeString($chunk['groupname']), $chunk['regexid'], $chunk['categoryid'], $chunk['reqid'], $chunk['blacklistid'], $chunk['size']);
+									$binParams[] = sprintf("(%s, %s, FROM_UNIXTIME(%s), %s, %s, %s, %s, %s, %d, %d, now())", $this->pdo->escapeString($chunk['name']), $this->pdo->escapeString($chunk['fromname']), $this->pdo->escapeString($chunk['date']), $this->pdo->escapeString($chunk['binaryhash']), $this->pdo->escapeString($chunk['groupname']), $chunk['regexid'], $chunk['categoryid'], $chunk['reqid'], $chunk['blacklistid'], $chunk['size']);
 								}
 								$binSql = "INSERT IGNORE INTO releaseregextesting (name, fromname, date, binaryhash, groupname, regexid, categoryid, reqid, blacklistid, size, dateadded) VALUES " . implode(', ', $binParams);
 								//echo $binSql;
-								$db->queryExec($binSql);
+								$this->pdo->queryExec($binSql);
 							}
 
 							$ret[] = "Fetched " . number_format($numarticles) . " articles from " . $group;

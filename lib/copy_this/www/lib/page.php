@@ -14,9 +14,9 @@ class Page extends BasePage
 	/**
 	 * Default constructor.
 	 */
-	function Page()
+	public function __construct()
 	{
-		parent::BasePage();
+		parent::__construct();
 
 		$role=Users::ROLE_GUEST;
 		if ($this->userdata != null)

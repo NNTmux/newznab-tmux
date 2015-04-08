@@ -16,17 +16,29 @@ class Console
 	const NUMTOPROCESSPERTIME = 100;
 
 	/**
-	 * Default constructor
+	 * @var DB
 	 */
-	function Console($echooutput=false)
+	public $pdo;
+
+	/**
+	 * @var bool
+	 */
+	public $echooutput;
+
+	/**
+	 * Default constructor
+	 *
+	 * @param bool $echooutput
+	 */
+	public function __construct($echooutput=false)
 	{
-		$this->echooutput = $echooutput;
+		$this->echooutput = (NN_ECHOCLI && $echooutput);
 		$s = new Sites();
 		$site = $s->get();
 		$this->pubkey = $site->amazonpubkey;
 		$this->privkey = $site->amazonprivkey;
 		$this->asstag = $site->amazonassociatetag;
-
+		$this->pdo = new DB();
 		$this->imgSavePath = WWW_DIR.'covers/console/';
 	}
 
@@ -35,8 +47,7 @@ class Console
 	 */
 	public function getConsoleInfo($id)
 	{
-		$db = new DB();
-		return $db->queryOneRow(sprintf("SELECT consoleinfo.*, genres.title as genres FROM consoleinfo left outer join genres on genres.id = consoleinfo.genreID where consoleinfo.id = %d ", $id));
+		return $this->pdo->queryOneRow(sprintf("SELECT consoleinfo.*, genres.title as genres FROM consoleinfo left outer join genres on genres.id = consoleinfo.genreID where consoleinfo.id = %d ", $id));
 	}
 
 	/**
@@ -44,8 +55,7 @@ class Console
 	 */
 	public function getConsoleInfoByName($title, $platform)
 	{
-		$db = new DB();
-		return $db->queryOneRow(sprintf("SELECT * FROM consoleinfo where title like %s and platform like %s", $db->escapeString("%".$title."%"),  $db->escapeString("%".$platform."%")));
+		return $this->pdo->queryOneRow(sprintf("SELECT * FROM consoleinfo where title like %s and platform like %s", $this->pdo->escapeString("%".$title."%"),  $this->pdo->escapeString("%".$platform."%")));
 	}
 
 	/**
@@ -53,14 +63,13 @@ class Console
 	 */
 	public function getRange($start, $num)
 	{
-		$db = new DB();
 
 		if ($start === false)
 			$limit = "";
 		else
 			$limit = " LIMIT ".$start.",".$num;
 
-		return $db->query(" SELECT * FROM consoleinfo ORDER BY createddate DESC".$limit);
+		return $this->pdo->query(" SELECT * FROM consoleinfo ORDER BY createddate DESC".$limit);
 	}
 
 	/**
@@ -68,8 +77,7 @@ class Console
 	 */
 	public function getCount()
 	{
-		$db = new DB();
-		$res = $db->queryOneRow("select count(id) as num from consoleinfo");
+		$res = $this->pdo->queryOneRow("select count(id) as num from consoleinfo");
 		return $res["num"];
 	}
 
@@ -78,7 +86,6 @@ class Console
 	 */
 	public function getConsoleCount($cat, $maxage=-1, $excludedcats=array())
 	{
-		$db = new DB();
 
 		$browseby = $this->getBrowseBy();
 
@@ -120,7 +127,7 @@ class Console
 			$exccatlist = " and r.categoryid not in (".implode(",", $excludedcats).")";
 
 		$sql = sprintf("select count(r.id) as num from releases r inner join consoleinfo con on con.id = r.consoleinfoid and con.title != '' where r.passwordstatus <= (select value from site where setting='showpasswordedrelease') and %s %s %s %s", $browseby, $catsrch, $maxage, $exccatlist);
-		$res = $db->queryOneRow($sql, true);
+		$res = $this->pdo->queryOneRow($sql, true);
 		return $res["num"];
 	}
 
@@ -129,7 +136,6 @@ class Console
 	 */
 	public function getConsoleRange($cat, $start, $num, $orderby, $maxage=-1, $excludedcats=array())
 	{
-		$db = new DB();
 
 		$browseby = $this->getBrowseBy();
 
@@ -176,7 +182,7 @@ class Console
 
 		$order = $this->getConsoleOrder($orderby);
 		$sql = sprintf(" SELECT r.*, r.id as releaseid, con.*, g.title as genre, groups.name as group_name, concat(cp.title, ' > ', c.title) as category_name, concat(cp.id, ',', c.id) as category_ids, rn.id as nfoid from releases r left outer join groups on groups.id = r.groupid inner join consoleinfo con on con.id = r.consoleinfoid left outer join releasenfo rn on rn.releaseid = r.id and rn.nfo is not null left outer join category c on c.id = r.categoryid left outer join category cp on cp.id = c.parentid left outer join genres g on g.id = con.genreID where r.passwordstatus <= (select value from site where setting='showpasswordedrelease') and %s %s %s %s order by %s %s".$limit, $browseby, $catsrch, $maxagesql, $exccatlist, $order[0], $order[1]);
-		return $db->query($sql, true);
+		return $this->pdo->query($sql, true);
 	}
 
 	/**
@@ -238,14 +244,13 @@ class Console
 	 */
 	public function getBrowseBy()
 	{
-		$db = new Db;
 
 		$browseby = ' ';
 		$browsebyArr = $this->getBrowseByOptions();
 		foreach ($browsebyArr as $bbk=>$bbv) {
 			if (isset($_REQUEST[$bbk]) && !empty($_REQUEST[$bbk])) {
 				$bbs = stripslashes($_REQUEST[$bbk]);
-				$browseby .= "con.$bbv LIKE(".$db->escapeString('%'.$bbs.'%').") AND ";
+				$browseby .= "con.$bbv LIKE(".$this->pdo->escapeString('%'.$bbs.'%').") AND ";
 			}
 		}
 		return $browseby;
@@ -256,10 +261,9 @@ class Console
 	 */
 	public function update($id, $title, $asin, $url, $salesrank, $platform, $publisher, $releasedate, $esrb, $cover, $genreID)
 	{
-		$db = new DB();
 
-		$db->queryExec(sprintf("update consoleinfo SET title=%s, asin=%s, url=%s, salesrank=%s, platform=%s, publisher=%s, releasedate='%s', esrb=%s, cover=%d, genreID=%d, updateddate=NOW() WHERE id = %d",
-		$db->escapeString($title), $db->escapeString($asin), $db->escapeString($url), $salesrank, $db->escapeString($platform), $db->escapeString($publisher), $releasedate, $db->escapeString($esrb), $cover, $genreID, $id));
+		$this->pdo->queryExec(sprintf("update consoleinfo SET title=%s, asin=%s, url=%s, salesrank=%s, platform=%s, publisher=%s, releasedate='%s', esrb=%s, cover=%d, genreID=%d, updateddate=NOW() WHERE id = %d",
+		$this->pdo->escapeString($title), $this->pdo->escapeString($asin), $this->pdo->escapeString($url), $salesrank, $this->pdo->escapeString($platform), $this->pdo->escapeString($publisher), $releasedate, $this->pdo->escapeString($esrb), $cover, $genreID, $id));
 	}
 
 	/**
@@ -267,7 +271,6 @@ class Console
 	 */
 	public function updateConsoleInfo($gameInfo)
 	{
-		$db = new DB();
 		$gen = new Genres();
 		$ri = new ReleaseImage();
 
@@ -412,7 +415,7 @@ class Console
 
 		$con['esrb'] = (string) $amaz->Items->Item->ItemAttributes->ESRBAgeRating;
 
-		$con['releasedate'] = $db->escapeString((string) $amaz->Items->Item->ItemAttributes->ReleaseDate);
+		$con['releasedate'] = $this->pdo->escapeString((string) $amaz->Items->Item->ItemAttributes->ReleaseDate);
 		if ($con['releasedate'] == "''")
 			$con['releasedate'] = 'null';
 
@@ -471,7 +474,7 @@ class Console
 		if (in_array(strtolower($genreName), $genreassoc)) {
 			$genreKey = array_search(strtolower($genreName), $genreassoc);
 		} else {
-			$genreKey = $db->queryInsert(sprintf("INSERT INTO genres (`title`, `type`) VALUES (%s, %d)", $db->escapeString($genreName), Genres::CONSOLE_TYPE));
+			$genreKey = $this->pdo->queryInsert(sprintf("INSERT INTO genres (`title`, `type`) VALUES (%s, %d)", $this->pdo->escapeString($genreName), Genres::CONSOLE_TYPE));
 		}
 		$con['consolegenre'] = $genreName;
 		$con['consolegenreID'] = $genreKey;
@@ -480,14 +483,14 @@ class Console
 		INSERT INTO consoleinfo  (`title`, `asin`, `url`, `salesrank`, `platform`, `publisher`, `genreID`, `esrb`, `releasedate`, `review`, `cover`, `createddate`, `updateddate`)
 		VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, now(), now())
 			ON DUPLICATE KEY UPDATE  `title` = %s,  `asin` = %s,  `url` = %s,  `salesrank` = %s,  `platform` = %s,  `publisher` = %s,  `genreID` = %s,  `esrb` = %s,  `releasedate` = %s,  `review` = %s, `cover` = %d,  createddate = now(),  updateddate = now()",
-		$db->escapeString($con['title']), $db->escapeString($con['asin']), $db->escapeString($con['url']),
-		$con['salesrank'], $db->escapeString($con['platform']), $db->escapeString($con['publisher']), ($con['consolegenreID']==-1?"null":$con['consolegenreID']), $db->escapeString($con['esrb']),
-		$con['releasedate'], $db->escapeString($con['review']), $con['cover'],
-		$db->escapeString($con['title']), $db->escapeString($con['asin']), $db->escapeString($con['url']),
-		$con['salesrank'], $db->escapeString($con['platform']), $db->escapeString($con['publisher']), ($con['consolegenreID']==-1?"null":$con['consolegenreID']), $db->escapeString($con['esrb']),
-		$con['releasedate'], $db->escapeString($con['review']), $con['cover'] );
+		$this->pdo->escapeString($con['title']), $this->pdo->escapeString($con['asin']), $this->pdo->escapeString($con['url']),
+		$con['salesrank'], $this->pdo->escapeString($con['platform']), $this->pdo->escapeString($con['publisher']), ($con['consolegenreID']==-1?"null":$con['consolegenreID']), $this->pdo->escapeString($con['esrb']),
+		$con['releasedate'], $this->pdo->escapeString($con['review']), $con['cover'],
+		$this->pdo->escapeString($con['title']), $this->pdo->escapeString($con['asin']), $this->pdo->escapeString($con['url']),
+		$con['salesrank'], $this->pdo->escapeString($con['platform']), $this->pdo->escapeString($con['publisher']), ($con['consolegenreID']==-1?"null":$con['consolegenreID']), $this->pdo->escapeString($con['esrb']),
+		$con['releasedate'], $this->pdo->escapeString($con['review']), $con['cover'] );
 
-		$consoleId = $db->queryInsert($query);
+		$consoleId = $this->pdo->queryInsert($query);
 
 		if ($consoleId)
 		{
@@ -520,16 +523,15 @@ class Console
 	public function processConsoleReleases()
 	{
 		$ret = 0;
-		$db = new DB();
 		$numlookedup = 0;
 
-		$res = $db->queryDirect(sprintf("SELECT searchname, id from releases where consoleinfoid IS NULL and categoryid in ( select id from category where parentid = %d ) ORDER BY postdate DESC LIMIT 100", Category::CAT_PARENT_GAME));
-		if ( $db->getNumRows($res) > 0)
+		$res = $this->pdo->queryDirect(sprintf("SELECT searchname, id from releases where consoleinfoid IS NULL and categoryid in ( select id from category where parentid = %d ) ORDER BY postdate DESC LIMIT 100", Category::CAT_PARENT_GAME));
+		if ( $this->pdo->getNumRows($res) > 0)
 		{
 			if ($this->echooutput)
-				echo "ConsPrc : Processing " . $db->getNumRows($res) . " console releases\n";
+				echo "ConsPrc : Processing " . $this->pdo->getNumRows($res) . " console releases\n";
 
-			while ($arr = $db->getAssocArray($res))
+			while ($arr = $this->pdo->getAssocArray($res))
 			{
 				if ($numlookedup > Console::NUMTOPROCESSPERTIME)
 					return;
@@ -559,12 +561,12 @@ class Console
 					}
 
 					//update release
-					$db->queryExec(sprintf("update releases SET consoleinfoid = %d WHERE id = %d", $gameId, $arr["id"]));
+					$this->pdo->queryExec(sprintf("update releases SET consoleinfoid = %d WHERE id = %d", $gameId, $arr["id"]));
 
 				}
 				else {
 					//could not parse release title
-					$db->queryExec(sprintf("update releases SET consoleinfoid = %d WHERE id = %d", -2, $arr["id"]));
+					$this->pdo->queryExec(sprintf("update releases SET consoleinfoid = %d WHERE id = %d", -2, $arr["id"]));
 				}
 			}
 		}

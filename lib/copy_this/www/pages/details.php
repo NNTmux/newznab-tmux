@@ -168,10 +168,10 @@ if (isset($_GET["id"]))
 	}
 
 	$predbQuery = '';
-	if ($data["preID"] > 0)
+	if ($data["preid"] > 0)
 	{
 		$PreDB = new PreDB();
-		$predbQuery = $PreDB->getByID($data["preID"]);
+		$predbQuery = $PreDB->getByID($data["preid"]);
 	}
 
 	$prehash = new PreHash();

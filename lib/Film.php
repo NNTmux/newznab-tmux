@@ -544,7 +544,7 @@ class Film
 
 		$mov = array();
 
-		$mov['cover'] = $mov['backdrop'] = $movieID = 0;
+		$mov['cover'] = $mov['backdrop'] = $mov['banner'] = $movieID = 0;
 		$mov['type'] = $mov['director'] = $mov['actors'] = $mov['language'] = '';
 
 		$mov['imdbid'] = $imdbId;
@@ -564,6 +564,11 @@ class Film
 			$mov['backdrop'] = $this->releaseImage->saveImage($imdbId . '-backdrop', $fanart['backdrop'], $this->imgSavePath, 1920, 1024);
 		} else if ($this->checkVariable($tmdb['backdrop'])) {
 			$mov['backdrop'] = $this->releaseImage->saveImage($imdbId . '-backdrop', $tmdb['backdrop'], $this->imgSavePath, 1920, 1024);
+		}
+
+		// Banner
+		if ($this->checkVariable($fanart['banner'])) {
+			$mov['banner'] = $this->releaseImage->saveImage($imdbId . '-banner', $fanart['banner'], $this->imgSavePath);
 		}
 
 		$mov['title']   = $this->setTmdbImdbVar($imdb['title']  , $tmdb['title']);
@@ -612,12 +617,12 @@ class Film
 			sprintf("
 				INSERT INTO movieinfo
 					(imdbid, tmdbID, title, rating, tagline, plot, year, genre, type,
-					director, actors, language, cover, backdrop, createddate, updateddate)
+					director, actors, language, cover, backdrop, banner, createddate, updateddate)
 				VALUES
-					(%d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, %d, NOW(), NOW())
+					(%d, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, %d, %d, NOW(), NOW())
 				ON DUPLICATE KEY UPDATE
 					imdbid = %d, tmdbID = %s, title = %s, rating = %s, tagline = %s, plot = %s, year = %s, genre = %s,
-					type = %s, director = %s, actors = %s, language = %s, cover = %d, backdrop = %d, updateddate = NOW()",
+					type = %s, director = %s, actors = %s, language = %s, cover = %d, backdrop = %d, banner = %d, updateddate = NOW()",
 				$mov['imdbid'],
 				$mov['tmdbid'],
 				$this->pdo->escapeString($mov['title']),
@@ -632,6 +637,7 @@ class Film
 				$this->pdo->escapeString(substr($mov['language'], 0, 64)),
 				$mov['cover'],
 				$mov['backdrop'],
+				$mov['banner'],
 				$mov['imdbid'],
 				$mov['tmdbid'],
 				$this->pdo->escapeString($mov['title']),
@@ -645,7 +651,8 @@ class Film
 				$this->pdo->escapeString($mov['actors']),
 				$this->pdo->escapeString(substr($mov['language'], 0, 64)),
 				$mov['cover'],
-				$mov['backdrop']
+				$mov['backdrop'],
+				$mov['banner']
 			)
 		);
 
@@ -684,12 +691,16 @@ class Film
 				$ret = array();
 				if (isset($art['moviebackground'][0]['url'])) {
 					$ret['backdrop'] = $art['moviebackground'][0]['url'];
-				} else if (isset($art['moviethumb'[0]['url']])) {
+				} else if (isset($art['moviethumb'][0]['url'])) {
 					$ret['backdrop'] = $art['moviethumb'][0]['url'];
 				}
 				if (isset($art['movieposter'][0]['url'])) {
 					$ret['cover'] = $art['movieposter'][0]['url'];
 				}
+				if (isset($art['moviebanner'][0]['url'])) {
+					$ret['banner'] = $art['moviebanner'][0]['url'];
+				}
+
 				if (isset($ret['backdrop']) && isset($ret['cover'])) {
 					$ret['title'] = $imdbId;
 					if (isset($art['name'])) {

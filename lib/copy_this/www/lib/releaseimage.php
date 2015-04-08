@@ -177,6 +177,6 @@ class ReleaseImage
 		@unlink($this->jpgSavePath . $thumb);
 
 		// Video folder.
-		@unlink($this->vidSavePath . $guid . '.ogv');
+		@unlink($this->vidSavePath . $guid . '.ogg');
 	}
 }

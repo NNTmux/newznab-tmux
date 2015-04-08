@@ -403,7 +403,7 @@ Class Sharing
 
 				// Check if we already have the comment.
 				$check = $this->pdo->queryOneRow(
-					sprintf('SELECT id FROM releasecomments WHERE shareid = %s',
+					sprintf('SELECT id FROM releasecomment WHERE shareid = %s',
 						$this->pdo->escapeString($matches['sid'])
 					)
 				);

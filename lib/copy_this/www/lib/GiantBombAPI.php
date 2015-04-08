@@ -122,6 +122,7 @@ class GiantBomb
 		curl_setopt($this->ch, CURLOPT_URL, $url);
 
 		// Send the request & save response to $resp
+		$resp = array();
 		$resp["data"] = curl_exec($this->ch);
 		if (curl_errno($this->ch)) {
 			throw new GiantBombException('API call failed: ' . curl_error($this->ch));

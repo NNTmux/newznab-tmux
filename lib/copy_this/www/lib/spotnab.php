@@ -5,6 +5,7 @@ require_once(WWW_DIR."/lib/nzb.php");
 require_once(WWW_DIR."/lib/site.php");
 require_once(WWW_DIR."/lib/releases.php");
 require_once(WWW_DIR."/lib/releasecomments.php");
+require_once(WWW_DIR."/lib/releaseimage.php");
 require_once(WWW_DIR."/lib/nzbinfo.php");
 require_once(WWW_DIR."/lib/util.php");
 require_once(WWW_DIR."/lib/users.php");
@@ -158,9 +159,11 @@ class SpotNab {
 	/* Track the last article scanned when preforming a discovery */
 	private $_discovery_lastarticle;
 
-	public function __construct($post_user=Null, $post_email=Null, $post_group=Null) {
+	public function __construct($post_user = Null, $post_email = Null, $post_group = Null) {
 		$this->_pdo = new DB();
 		$this->_nntp = new NNTP(['Settings' => $this->_pdo]);
+		$this->_releaseImage =  new \ReleaseImage($this->_pdo);
+		$this->_nzb = new \NZB($this->_pdo);
 		$s = new Sites();
 		$this->_site = $s->get();
 		$this->_globals = $this->_site;
@@ -933,7 +936,7 @@ class SpotNab {
 			$offset += $batch;
 
 			foreach ($res as $r){
-				$nzbfile = $nzb->NZBPath($r["guid"]);
+				$nzbfile = $nzb->getNZBPath($r["guid"]);
 				if($nzbfile === Null){
 					continue;
 				}
@@ -943,7 +946,7 @@ class SpotNab {
 				{
 					if($delete_broken_releases){
 						$release = new Releases();
-						$release->delete($r['id']);
+						$release->deleteSingle(['g' => $r['guid'], 'i' => $r['id']], $this->_nzb, $this->_releaseImage);
 						// Free the variable in an attempt to recover memory
 						unset($release);
 				        echo '-';
@@ -962,7 +965,7 @@ class SpotNab {
 				if(!$gid){
 					if($delete_broken_releases){
 						$release = new Releases();
-						$release->delete($r['id']);
+						$release->$release->deleteSingle(['g' => $r['guid'], 'i' => $r['id']], $this->_nzb, $this->_releaseImage);
 						unset($release);
 				        echo '-';
 					}else{
@@ -973,7 +976,7 @@ class SpotNab {
 				}
 
 				// Update DB With Global Identifer
-				$ures = $db->queryExec(sprintf($usql, $gid, $r['id']));
+				$ures = $db->queryExec(sprintf("UPDATE releases SET gid = '%s' WHERE id = %d", $gid, $r['id']));
 				if($ures < 0){
 					printf("\nPostPrc : Failed to update: %s\n", $r['name']);
 				}
@@ -984,18 +987,27 @@ class SpotNab {
 		}
 
 		# Batch update for comment table
-		$usql = 'UPDATE releasecomment, releases '
-				.'SET releasecomment.GID = releases.GID, '
+		/*$usql = 'UPDATE releasecomment, releases '
+				.'SET releasecomment.gid = releases.gid, '
 				.'releasecomment.nzb_guid = releases.nzb_guid '
 				.'WHERE releases.id = releasecomment.releaseid '
-				.'AND releasecomment.GID IS NULL '
+				.'AND releasecomment.gid IS NULL '
 				.'AND releasecomment.nzb_guid = "" '
 				.'AND releases.nzb_guid IS NOT NULL '
-				.'AND releases.GID IS NOT NULL ';
+				.'AND releases.gid IS NOT NULL ';*/
 
-        $affected = $db->exec(sprintf($usql));
-		if($affected > 0)
-			$processed += $affected;
+        $affected = $db->queryExec(sprintf('UPDATE releasecomment, releases SET releasecomment.gid = releases.gid,
+											releasecomment.nzb_guid = releases.nzb_guid
+											WHERE releases.id = releasecomment.releaseid
+											AND releasecomment.gid IS NULL
+											AND releasecomment.nzb_guid = ""
+											AND releases.nzb_guid IS NOT NULL
+											AND releases.gid IS NOT NULL '
+			)
+		);
+		$rows = $affected->rowCount();
+		if($rows > 0)
+			$processed += $rows;
 		return $processed;
 	}
 

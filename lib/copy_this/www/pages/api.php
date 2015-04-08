@@ -574,6 +574,7 @@ function maxAge()
  */
 function categoryid()
 {
+	$categoryID = array();
 	$categoryID[] = -1;
 	if (isset($_GET['cat'])) {
 		$categoryIDs = $_GET['cat'];

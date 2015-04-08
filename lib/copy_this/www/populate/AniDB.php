@@ -174,6 +174,7 @@ class PopulateAniDB
 				foreach ($AniDBAPIXML->episodes->episode AS $episode) {
 					$titleArray = array();
 
+					$episodeArray = array();
 					$episodeArray[$i]['episode_id'] = (int)$episode->attributes()->id[0];
 					$episodeArray[$i]['episode_no'] = (int)$episode->epno;
 					$episodeArray[$i]['airdate']    = (string)$episode->airdate;

@@ -688,21 +688,21 @@ class DB extends \PDO
 	/**
 	 * Fetch a assoc row from a result set
 	 *
-	 * @param PDOStatement $result
-	 * @return array
+	 * @param $result
+	 * @return array|PDOStatement
 	 */
-	public function getAssocArray(PDOStatement $result)
+	public function getAssocArray($result)
 	{
-		return $result->fetch();
+		return $result->fetch(\PDO::FETCH_ASSOC);
 	}
 
 	/**
 	 * Get the total number of rows in the result set
 	 *
-	 * @param PDOStatement $result
-	 * @return int
+	 * @param $result
+	 * @return int|PDOStatement
 	 */
-	public function getNumRows(PDOStatement $result)
+	public function getNumRows($result)
 	{
 		return $result->rowCount();
 	}
@@ -969,7 +969,7 @@ class DB extends \PDO
 	 * PHP interpretation of MySQL's from_unixtime method.
 	 * @param int  $utime UnixTime
 	 *
-	 * @return bool|string
+	 * @return string
 	 */
 	public function from_unixtime($utime)
 	{

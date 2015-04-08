@@ -104,6 +104,15 @@ class SABnzbd
 					$this->apikeytype = $page->userdata['sabapikeytype'];
 				}
 				$this->integrated = self::INTEGRATION_TYPE_USER;
+				switch ((int)$page->userdata['queuetype']) {
+					case 1:
+					case 2:
+						$this->integratedBool = true;
+						break;
+					default:
+						$this->integratedBool = false;
+						break;
+				}
 				break;
 
 			case self::INTEGRATION_TYPE_SITEWIDE:
@@ -114,10 +123,15 @@ class SABnzbd
 					$this->apikeytype = $page->site->sabapikeytype;
 				}
 				$this->integrated = self::INTEGRATION_TYPE_SITEWIDE;
+				$this->integratedBool = true;
 				break;
 
 			case self::INTEGRATION_TYPE_NONE:
 				$this->integrated = self::INTEGRATION_TYPE_NONE;
+				// This is for nzbget.
+				if ($page->userdata['queuetype'] == 2) {
+					$this->integratedBool = true;
+				}
 				break;
 		}
 		// Verify the URL is good, fix it if not.
@@ -146,22 +160,24 @@ class SABnzbd
 	public function sendToSab($guid)
 	{
 		return Utility::getUrl([
-		'url' => $this->url .
-			'api?mode=addurl&priority=' .
-			$this->priority .
-			'&apikey=' .
-			$this->apikey .
-			'&name=' .
-			urlencode(
-				$this->serverurl .
-				'getnzb/' .
-				$guid .
-				'&i=' .
-				$this->uid .
-				'&r=' .
-				$this->rsstoken
-			)
-		]);
+				'url' => $this->url .
+					'api?mode=addurl&priority=' .
+					$this->priority .
+					'&apikey=' .
+					$this->apikey .
+					'&name=' .
+					urlencode(
+						$this->serverurl .
+						'getnzb/' .
+						$guid .
+						'&i=' .
+						$this->uid .
+						'&r=' .
+						$this->rsstoken
+					),
+				'verifypeer' => false,
+			]
+		);
 	}
 
 	/**
@@ -172,10 +188,13 @@ class SABnzbd
 	public function getQueue()
 	{
 		return Utility::getUrl([
-		$this->url .
-			"api?mode=qstatus&output=json&apikey=" .
-			$this->apikey
-		]);
+				'url' =>
+					$this->url .
+					"api?mode=qstatus&output=json&apikey=" .
+					$this->apikey,
+				'verifypeer' => false,
+			]
+		);
 	}
 
 	/**
@@ -186,10 +205,13 @@ class SABnzbd
 	public function getAdvQueue()
 	{
 		return Utility::getUrl([
-		$this->url .
-			"api?mode=queue&start=START&limit=LIMIT&output=json&apikey=" .
-			$this->apikey
-		]);
+				'url' =>
+					$this->url .
+					"api?mode=queue&start=START&limit=LIMIT&output=json&apikey=" .
+					$this->apikey,
+				'verifypeer' => false,
+			]
+		);
 	}
 
 	/**
@@ -206,7 +228,8 @@ class SABnzbd
 			"api?mode=queue&name=delete&value=" .
 			$id .
 			"&apikey=" .
-			$this->apikey
+			$this->apikey,
+			'verifypeer' => false,
 		]);
 	}
 
@@ -224,7 +247,8 @@ class SABnzbd
 			"api?mode=queue&name=pause&value=" .
 			$id .
 			"&apikey=" .
-			$this->apikey
+			$this->apikey,
+			'verifypeer' => false,
 		]);
 	}
 
@@ -242,7 +266,8 @@ class SABnzbd
 			"api?mode=queue&name=resume&value=" .
 			$id .
 			"&apikey=" .
-			$this->apikey
+			$this->apikey,
+			'verifypeer' => false,
 		]);
 	}
 
@@ -257,7 +282,8 @@ class SABnzbd
 		$this->url .
 			"api?mode=pause" .
 			"&apikey=" .
-			$this->apikey
+			$this->apikey,
+			'verifypeer' => false,
 		]);
 	}
 
@@ -272,7 +298,8 @@ class SABnzbd
 		$this->url .
 			"api?mode=resume" .
 			"&apikey=" .
-			$this->apikey
+			$this->apikey,
+			'verifypeer' => false,
 		]);
 	}
 

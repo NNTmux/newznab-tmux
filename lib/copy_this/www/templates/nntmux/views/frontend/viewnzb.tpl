@@ -19,7 +19,7 @@
 			<!--<tr><th>Pre:</th><td>{$predb.ctime|date_format:"%b %e, %Y %T"} ({$predb.ctime|daysago})</td></tr>-->
 			<i class="icon-warning-sign icon-white"></i>
 			{if preg_match('/^(UN)?((MOD)?NUKED?|DELPRE|MOD|LOCAL)$/', $predb.nuketype)}
-				{$predb.nuketype}NUKE:{$predb.nukereason}
+				{$predb.nuketype} : {$predb.nukereason}
 			{else}
 				{$predb.nukereason} [{$predb.nuketype}]
 			{/if}
@@ -40,7 +40,8 @@
 
 <!-- ### -- IMAGE ON RIGHT -->
 {if $rage && $release.rageid > 0 && $rage.imgdata != ""}<img class="img-rounded" src="{$smarty.const.WWW_TOP}/getimage?type=tvrage&amp;id={$rage.id}" width="220" height="auto" alt="{$rage.releasetitle|escape:"htmlall"}" style="float:right;" />{/if}
-{if $movie && $release.rageid < 0 && $movie.cover == 1}<img class="shadow img-thumbnail" src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbid}-cover.jpg" width="220" height="auto" alt="{$movie.title|escape:"htmlall"}" style="float:right;" />{/if}
+{if $movie && $release.rageid < 0 && $movie.banner == 1}<img class="shadow img-thumbnail" src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbid}-banner.jpg" alt="{$movie.title|escape:"htmlall"}" style="vertical-align:top;" />
+	{elseif $movie && $release.rageid < 0 && $movie.cover == 1}<img class="shadow img-thumbnail" src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbid}-cover.jpg" width="220" height="auto" alt="{$movie.title|escape:"htmlall"}" style="float:right;" />{/if}
 {if $game && $game.cover == 1}<img class="img-rounded" src="{$smarty.const.WWW_TOP}/covers/games/{$game.id}.jpg" width="160"
 								   alt="{$con.title|escape:"htmlall"}" style="float:right;" />{/if}
 {if $xxx && $xxx.cover == 1}<img class="img-rounded" src="{$smarty.const.WWW_TOP}/covers/xxx/{$xxx.id}-cover.jpg" width="160"
@@ -527,7 +528,7 @@
 {if $release.videostatus == 1 && $userdata.canpreview == 1}
 	<div class="tab-pane" id="video">
 		<video width="770" controls>
-			<source src="{$smarty.const.WWW_TOP}/covers/video/{$release.guid}.ogv" type="video/ogg">
+			<source src="{$smarty.const.WWW_TOP}/covers/video/{$release.guid}.ogg" type="video/ogg">
 			Your browser does not support the video tag.
 		</video>
 	</div>

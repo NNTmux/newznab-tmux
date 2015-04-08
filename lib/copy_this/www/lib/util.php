@@ -358,6 +358,7 @@ class Utility
 			default:
 				$language = 'en';
 		}
+		$header = array();
 		$header[] = "Accept-Language: " . $language;
 
 		$ch = curl_init();

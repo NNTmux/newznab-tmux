@@ -196,7 +196,7 @@ class AEBN
 					}
 					$i = $i + 1;
 				}
-				if ($i === $count OR $count === 0) {
+				if ($i === $count || $count === 0) {
 					if ($this->_currentSite === "gay") {
 						return false;
 					}

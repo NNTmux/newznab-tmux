@@ -485,7 +485,7 @@ class XXX
 			$xxxID = $check['id'];
 		}
 
-		if($check === false OR $xxxID > 0){
+		if($check === false || $xxxID > 0){
 
 			// Update Current XXX Information - getXXXCovers.php
 			if($xxxID > 0){

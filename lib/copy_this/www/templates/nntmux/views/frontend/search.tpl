@@ -225,9 +225,13 @@
 								{elseif $result.passwordstatus == 10}
 									<img title="RAR/ZIP is Passworded." src="{$smarty.const.WWW_TOP}/templates/nntmux/images/icons/lock.gif" alt="RAR/ZIP is Passworded.">
 								{/if}
-								{if $result.videostatus == 1}
-									<a href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"htmlall"}" title="This release has a video preview." class="model_prev rndbtn" rel="preview">
-										<img src="{$smarty.const.WWW_TOP}/templates/nntmux/images/multimedia/video.png">
+								{if $result.videostatus > 0}
+									<a
+											class="model_prev label label-default"
+											href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"htmlall"}"
+											title="This release has a video preview."
+											rel="preview"
+											><i class="icon-youtube-play"></i>
 									</a>
 								{/if}
 								{if $result.nfoid > 0}
@@ -259,7 +263,7 @@
 									<span class="mediainfo rndbtn" title="{$result.guid}">Media</span>
 								{/if}
 								{if $result.preid > 0}
-									<span class="preinfo rndbtn" title="{$result.preID}">PreDB</span>
+									<span class="preinfo rndbtn" title="{$result.preid}">PreDB</span>
 								{/if}
 								{if $result.prehashid > 0}
 									<span class="prehashinfo rndbtn" title="{$result.prehashid}">PreHash</span>

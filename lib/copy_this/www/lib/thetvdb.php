@@ -11,143 +11,142 @@ class TheTVDB
 	const PROJECT	= 'newznab';
 	const APIKEY	= '5F84ECB91B42D719';
 
-	public function TheTVDB($echooutput=true)
+	/**
+	 * @var DB
+	 */
+	public $pdo;
+
+	/**
+	 * @var bool
+	 */
+	public $echooutput;
+
+	public function __construct($echooutput = true)
 	{
-		$this->echooutput = $echooutput;
+		$this->echooutput = (NN_ECHOCLI && $echooutput);
 		$this->MIRROR = 'http://www.thetvdb.com';
+		$this->pdo = new DB();
 	}
 
 	public function addSeries($TheTVDBAPIArray)
 	{
-		$db = new DB();
 
 		$airstime = $TheTVDBAPIArray['airstime'];
 		if($airstime != "")
-			$airstime = $db->escapeString(date('H:i:s', strtotime($airstime)));
+			$airstime = $this->pdo->escapeString(date('H:i:s', strtotime($airstime)));
 		else
 			$airstime = "null";
 
 		$firstaired = $TheTVDBAPIArray['firstaired'];
 		if ($firstaired != "")
-			$firstaired = $db->escapeString($firstaired);
+			$firstaired = $this->pdo->escapeString($firstaired);
 		else
 			$firstaired = "null";
 
 		$rating = $TheTVDBAPIArray['rating'];
 		if ($rating != "")
-			$rating = $db->escapeString($rating);
+			$rating = $this->pdo->escapeString($rating);
 		else
 			$rating = "null";
 
-		$db->queryInsert(sprintf("INSERT INTO thetvdb
+		$this->pdo->queryInsert(sprintf("INSERT INTO thetvdb
 		(tvdbid, actors, airsday, airstime, contentrating, firstaired, genre, imdbid, network, overview, rating, ratingcount, runtime, seriesname, status, createddate)
 		VALUES (%d, %s, %s, %s, %s, %s, %s, %d, %s, %s, %F, %d, %d, %s, %s, now())",
-				$TheTVDBAPIArray['tvdbid'], $db->escapeString($TheTVDBAPIArray['actors']), $db->escapeString($TheTVDBAPIArray['airsday']),
-				$airstime, $db->escapeString($TheTVDBAPIArray['contentrating']), $firstaired,
-				$db->escapeString($TheTVDBAPIArray['genre']), $TheTVDBAPIArray['imdbid'], $db->escapeString($TheTVDBAPIArray['network']), $db->escapeString($TheTVDBAPIArray['overview']),
-				$rating, $TheTVDBAPIArray['ratingcount'], $TheTVDBAPIArray['runtime'], $db->escapeString($TheTVDBAPIArray['seriesname']),
-				$db->escapeString($TheTVDBAPIArray['status'])));
+				$TheTVDBAPIArray['tvdbid'], $this->pdo->escapeString($TheTVDBAPIArray['actors']), $this->pdo->escapeString($TheTVDBAPIArray['airsday']),
+				$airstime, $this->pdo->escapeString($TheTVDBAPIArray['contentrating']), $firstaired,
+				$this->pdo->escapeString($TheTVDBAPIArray['genre']), $TheTVDBAPIArray['imdbid'], $this->pdo->escapeString($TheTVDBAPIArray['network']), $this->pdo->escapeString($TheTVDBAPIArray['overview']),
+				$rating, $TheTVDBAPIArray['ratingcount'], $TheTVDBAPIArray['runtime'], $this->pdo->escapeString($TheTVDBAPIArray['seriesname']),
+				$this->pdo->escapeString($TheTVDBAPIArray['status'])));
 	}
 
 	public function addEpisodes($TheTVDBAPIArray)
 	{
-		$db = new DB();
 
 		for($i=0; $i < count($TheTVDBAPIArray['episodetvdbID']); $i++) {
 			$airdate = strftime('%Y-%m-%d %H:%M:%S', strtotime($TheTVDBAPIArray['episodefirstaired'][$i].' '.$TheTVDBAPIArray['airstime']));
 			if(!$airdate)
 				continue;
 
-			$db->queryInsert(sprintf('INSERT INTO episodeinfo
+			$this->pdo->queryInsert(sprintf('INSERT INTO episodeinfo
 			(rageid, tvdbid, imdbid, showtitle, airdate, fullep, eptitle, director, gueststars, overview, rating, writer, epabsolute)
 			VALUES (0, %d, %d, %s, %s, %s, %s, %s, %s, %s, %F, %s, %d)
 			ON DUPLICATE KEY UPDATE
 			tvdbid=%1$d, imdbid=%2$d, showtitle=%3$s, airdate=%4$s, fullep=%5$s, eptitle=%6$s, director=%7$s,
 			gueststars=%8$s, overview=%9$s, rating=%10$F, writer=%11$s, epabsolute=%12$s',
-					$TheTVDBAPIArray['episodetvdbID'][$i], $TheTVDBAPIArray['episodeimdbID'][$i], $db->escapeString($TheTVDBAPIArray['seriesname']), $db->escapeString($airdate),
-					$db->escapeString(str_pad($TheTVDBAPIArray['episodeseason'][$i], 2, '0', STR_PAD_LEFT).'x'.str_pad($TheTVDBAPIArray['episodenumber'][$i], 2, '0', STR_PAD_LEFT)),
-					$db->escapeString($TheTVDBAPIArray['episodename'][$i]), $db->escapeString($TheTVDBAPIArray['episodedirector'][$i]),
-					$db->escapeString($TheTVDBAPIArray['episodegueststars'][$i]), $db->escapeString(substr($TheTVDBAPIArray['episodeoverview'][$i],0,10000)),
-					$TheTVDBAPIArray['episoderating'][$i], $db->escapeString($TheTVDBAPIArray['episodewriter'][$i]), $TheTVDBAPIArray['episodeabsolutenumber'][$i]));
+					$TheTVDBAPIArray['episodetvdbID'][$i], $TheTVDBAPIArray['episodeimdbID'][$i], $this->pdo->escapeString($TheTVDBAPIArray['seriesname']), $this->pdo->escapeString($airdate),
+					$this->pdo->escapeString(str_pad($TheTVDBAPIArray['episodeseason'][$i], 2, '0', STR_PAD_LEFT).'x'.str_pad($TheTVDBAPIArray['episodenumber'][$i], 2, '0', STR_PAD_LEFT)),
+					$this->pdo->escapeString($TheTVDBAPIArray['episodename'][$i]), $this->pdo->escapeString($TheTVDBAPIArray['episodedirector'][$i]),
+					$this->pdo->escapeString($TheTVDBAPIArray['episodegueststars'][$i]), $this->pdo->escapeString(substr($TheTVDBAPIArray['episodeoverview'][$i],0,10000)),
+					$TheTVDBAPIArray['episoderating'][$i], $this->pdo->escapeString($TheTVDBAPIArray['episodewriter'][$i]), $TheTVDBAPIArray['episodeabsolutenumber'][$i]));
 		}
 	}
 
 	public function updateSeries($tvdbID, $actors, $airsday, $airstime, $contentrating, $firstaired, $genre, $imdbID, $network, $overview, $rating, $ratingcount, $runtime, $seriesname, $status)
 	{
-		$db = new DB();
 		if ($airstime != "")
-			$airstime = $db->escapeString(date("H:i:s", strtotime($airstime)));
+			$airstime = $this->pdo->escapeString(date("H:i:s", strtotime($airstime)));
 		else
 			$airstime = "null";
 
 		if ($firstaired != "")
-			$firstaired = $db->escapeString($firstaired);
+			$firstaired = $this->pdo->escapeString($firstaired);
 		else
 			$firstaired = "null";
 
 		if ($rating != "")
-			$rating = $db->escapeString($rating);
+			$rating = $this->pdo->escapeString($rating);
 		else
 			$rating = "null";
 
 		$sql = sprintf('UPDATE thetvdb
 		SET actors=%s, airsday=%s, airstime=%s, contentrating=%s, firstaired=%s, genre=%s, imdbid=%d, network=%s,
 		overview=%s, rating=%s, ratingcount=%d, runtime=%d, seriesname=%s, status=%s, createddate=now()
-		WHERE tvdbid = %d', $db->escapeString($actors), $db->escapeString($airsday), $airstime, $db->escapeString($contentrating),
-			$firstaired, $db->escapeString($genre), $imdbID, $db->escapeString($network), $db->escapeString($overview), $rating,
-			$ratingcount, $runtime, $db->escapeString($seriesname), $db->escapeString($status), $tvdbID);
+		WHERE tvdbid = %d', $this->pdo->escapeString($actors), $this->pdo->escapeString($airsday), $airstime, $this->pdo->escapeString($contentrating),
+			$firstaired, $this->pdo->escapeString($genre), $imdbID, $this->pdo->escapeString($network), $this->pdo->escapeString($overview), $rating,
+			$ratingcount, $runtime, $this->pdo->escapeString($seriesname), $this->pdo->escapeString($status), $tvdbID);
 
-		$db->queryExec($sql);
+		$this->pdo->queryExec($sql);
 	}
 
 	public function deleteTitle($tvdbID)
 	{
-		$db = new DB();
-
-		$db->queryExec(sprintf("DELETE FROM thetvdb WHERE tvdbid = %d", $tvdbID));
+		$this->pdo->queryExec(sprintf("DELETE FROM thetvdb WHERE tvdbid = %d", $tvdbID));
 	}
 
 	public function addEmptySeries($seriesname)
 	{
-		$db = new DB();
-
-		$db->queryInsert(sprintf("INSERT INTO thetvdb (tvdbid, seriesname, createddate) VALUES (0, %s, now())", $db->escapeString($seriesname)));
+		$this->pdo->queryInsert(sprintf("INSERT INTO thetvdb (tvdbid, seriesname, createddate) VALUES (0, %s, now())", $this->pdo->escapeString($seriesname)));
 	}
 
 	public function getSeriesInfoByID($tvdbID)
 	{
-		$db = new DB();
-		return $db->queryOneRow(sprintf("SELECT * FROM thetvdb WHERE tvdbid = %d", $tvdbID));
+		return $this->pdo->queryOneRow(sprintf("SELECT * FROM thetvdb WHERE tvdbid = %d", $tvdbID));
 	}
 
 	public function getSeriesInfoByName($seriesname)
 	{
-		$db = new DB();
-		return $db->queryOneRow(sprintf("SELECT * FROM thetvdb WHERE seriesname = %s", $db->escapeString($seriesname)));
+		return $this->pdo->queryOneRow(sprintf("SELECT * FROM thetvdb WHERE seriesname = %s", $this->pdo->escapeString($seriesname)));
 	}
 
 	public function getSeriesRange($start, $num, $seriesname='')
 	{
-		$db = new DB();
-
 		$limit = ($start === false) ? '' : " LIMIT ".$start.",".$num;
 
 		$rsql = '';
 		if ($seriesname != '')
-			$rsql .= sprintf("AND thetvdb.seriesname LIKE %s ", $db->escapeString("%".$seriesname."%"));
+			$rsql .= sprintf("AND thetvdb.seriesname LIKE %s ", $this->pdo->escapeString("%".$seriesname."%"));
 
-		return $db->query(sprintf(" SELECT id, tvdbid, seriesname, overview FROM thetvdb WHERE 1=1 %s AND tvdbid > %d ORDER BY tvdbid ASC".$limit, $rsql, 0));
+		return $this->pdo->query(sprintf(" SELECT id, tvdbid, seriesname, overview FROM thetvdb WHERE 1=1 %s AND tvdbid > %d ORDER BY tvdbid ASC".$limit, $rsql, 0));
 	}
 
 	public function getSeriesCount($seriesname='')
 	{
-		$db = new DB();
 
 		$rsql = '';
 		if ($seriesname != '')
-			$rsql .= sprintf("AND thetvdb.seriesname LIKE %s ", $db->escapeString("%".$seriesname."%"));
+			$rsql .= sprintf("AND thetvdb.seriesname LIKE %s ", $this->pdo->escapeString("%".$seriesname."%"));
 
-		$res = $db->queryOneRow(sprintf("SELECT count(id) AS num FROM thetvdb WHERE 1=1 %s ", $rsql));
+		$res = $this->pdo->queryOneRow(sprintf("SELECT count(id) AS num FROM thetvdb WHERE 1=1 %s ", $rsql));
 
 		return $res["num"];
 	}
@@ -178,32 +177,29 @@ class TheTVDB
 	{
 		if($this->echooutput && $echooutput)
 			echo 'TheTVDB : '.$seriesName.' '.$fullep." Not found\n";
-
-		$db = new DB();
-		$db->queryExec(sprintf('UPDATE releases SET episodeinfoid = -2 WHERE id = %d', $releaseID));
+		$this->pdo->queryExec(sprintf('UPDATE releases SET episodeinfoid = -2 WHERE id = %d', $releaseID));
 	}
 
 	public function processReleases()
 	{
-		$db = new DB();
 
-		$results = $db->queryDirect(sprintf("SELECT id, searchname, rageid, anidbid, seriesfull, season, episode, tvtitle FROM releases WHERE episodeinfoid IS NULL AND categoryid IN ( SELECT id FROM category WHERE parentid = %d ) LIMIT 150", Category::CAT_PARENT_TV));
+		$results = $this->pdo->queryDirect(sprintf("SELECT id, searchname, rageid, anidbid, seriesfull, season, episode, tvtitle FROM releases WHERE episodeinfoid IS NULL AND categoryid IN ( SELECT id FROM category WHERE parentid = %d ) LIMIT 150", Category::CAT_PARENT_TV));
 
-		if ($db->getNumRows($results) > 0)
+		if ($this->pdo->getNumRows($results) > 0)
 		{
 			if ($this->echooutput)
-				echo "TheTVDB : Looking up last ".$db->getNumRows($results)." releases\n";
+				echo "TheTVDB : Looking up last ".$this->pdo->getNumRows($results)." releases\n";
 
-			while ($arr = $db->getAssocArray($results))
+			while ($arr = $this->pdo->getAssocArray($results))
 			{
 				unset($TheTVDBAPIArray, $episodeArray, $fullep, $epabsolute, $additionalSql);
 
 				$seriesName = '';
 				if($arr['rageid'] > 0) {
-					$seriesName = $db->queryOneRow(sprintf('SELECT releasetitle AS seriesName FROM tvrage WHERE rageid = %d', $arr['rageid']));
+					$seriesName = $this->pdo->queryOneRow(sprintf('SELECT releasetitle AS seriesName FROM tvrage WHERE rageid = %d', $arr['rageid']));
 				}
 				elseif($arr['anidbid'] > 0) {
-					$seriesName = $db->queryOneRow(sprintf('SELECT title AS seriesName FROM anidb WHERE anidbid = %d', $arr['anidbid']));
+					$seriesName = $this->pdo->queryOneRow(sprintf('SELECT title AS seriesName FROM anidb WHERE anidbid = %d', $arr['anidbid']));
 				}
 
 				if(empty($seriesName) || !$seriesName)
@@ -289,11 +285,11 @@ class TheTVDB
 				{
 					$additionalSql = sprintf(', season = NULL, episode = %d, tvtitle = %s, tvairdate = %s',
 						$episodeArray['epabsolute'],
-						$db->escapeString($episodeArray['epabsolute'].' - '.str_replace('\'', '`', $episodeArray['eptitle'])),
-						$db->escapeString($episodeArray['airdate']));
+						$this->pdo->escapeString($episodeArray['epabsolute'].' - '.str_replace('\'', '`', $episodeArray['eptitle'])),
+						$this->pdo->escapeString($episodeArray['airdate']));
 				}
 
-				$db->queryExec(sprintf('UPDATE releases SET tvdbid = %d, episodeinfoid = %d %s WHERE id = %d',
+				$this->pdo->queryExec(sprintf('UPDATE releases SET tvdbid = %d, episodeinfoid = %d %s WHERE id = %d',
 						$TheTVDBAPIArray['tvdbid'], $episodeArray['id'], $additionalSql, $arr['id']));
 
 				if($this->echooutput)

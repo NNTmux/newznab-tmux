@@ -70,8 +70,8 @@ switch($action)
 $page->smarty->assign('yesno_ids', array(1,0));
 $page->smarty->assign('yesno_names', array( 'Yes', 'No'));
 
-$page->smarty->assign('passwd_ids', array(2,1,0));
-$page->smarty->assign('passwd_names', array( 'Deep (requires unrar)', 'Shallow', 'None'));
+$page->smarty->assign('passwd_ids', array(1,0));
+$page->smarty->assign('passwd_names', array( 'Deep (requires unrar)', 'None'));
 
 $page->smarty->assign('rottentomatoquality_ids', array('thumbnail', 'profile', 'detailed', 'original'));
 $page->smarty->assign('rottentomatoquality_names', array('Thumbnail', 'Profile', 'Detailed', 'Original'));
@@ -121,8 +121,8 @@ $page->smarty->assign('lookuptv_names', ['Disabled', 'Lookup All TV', 'Lookup Re
 $page->smarty->assign('lookup_reqids_ids', array(0,1,2));
 $page->smarty->assign('lookup_reqids_names', array('Disabled', 'Lookup Request IDs', 'Lookup Request IDs Threaded'));
 
-// return a list of audiobooks, ebooks, technical and foreign books
-$result = $page->settings->query("SELECT id, title FROM category WHERE id in (3030, 7010, 7040, 7060)");
+// return a list of audiobooks, mags, ebooks, technical and foreign books
+$result = $page->settings->query("SELECT id, title FROM category WHERE id in (3030, 7010, 7020, 7040, 7060)");
 
 // setup the display lists for these categories, this could have been static, but then if names changed they would be wrong
 $book_reqids_ids = array();

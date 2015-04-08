@@ -8,17 +8,26 @@ require_once(WWW_DIR . "/lib/nzb.php");
 require_once(WWW_DIR . "/lib/nzbinfo.php");
 require_once(WWW_DIR . "/lib/nntp.php");
 require_once(WWW_DIR . "/lib/rarinfo/par2info.php");
+require_once(WWW_DIR . "/lib/ColorCLI.php");
 
 /**
  * This class handles parsing misc>other releases into real names.
  */
 class Parsing
 {
+	/**
+	 * @var DB
+	 */
+	public $pdo;
 
 	/**
 	 * Default constructor.
+	 *
+	 * @param bool $echoonly
+	 * @param bool $limited
+	 * @param bool $verbose
 	 */
-	function Parsing($echoonly = false, $limited = true, $verbose = false)
+	public function __construct($echoonly = false, $limited = true, $verbose = false)
 	{
 		$this->echoonly = $echoonly;
 		$this->limited = $limited;
@@ -31,9 +40,10 @@ class Parsing
 		$this->nfosprocessed = 0;
 		$this->parsprocessed = 0;
 		$this->releasefilesprocessed = 0;
-		$this->cleanup = array('nuke' => array(), 'misc' => array());
+		$this->cleanup = ['nuke' => [], 'misc' => []];
 		$s = new Sites();
 		$this->site = $s->get();
+		$this->pdo = new DB();
 	}
 
 	/**
@@ -42,10 +52,8 @@ class Parsing
 	public function process()
 	{
 
-		$db = new DB();
-
 		// Default query for both full db and last 4 hours.
-		$sql = "SELECT r.searchname, r.name, r.fromname, r.id as RID, r.categoryid, r.guid, r.postdate,
+		$sql = "SELECT r.searchname, r.name, r.fromname, r.id as rid, r.categoryid, r.guid, r.postdate,
 			   rn.id as nfoid,
 			   g.name as groupname,
 			   GROUP_CONCAT(rf.name) as filenames
@@ -53,11 +61,11 @@ class Parsing
 		LEFT JOIN releasenfo rn ON (rn.releaseid = r.id)
 		LEFT JOIN groups g ON (g.id = r.groupid)
 		LEFT JOIN releasefiles rf ON (rf.releaseid = r.id)
-		WHERE r.categoryid in (" . Category::CAT_TV_OTHER . "," . Category::CAT_MOVIE_OTHER . "," . Category::CAT_MISC_OTHER . "," . Category::CAT_XXX_OTHER . ")
+		WHERE r.categoryid in (' . Category::CAT_TV_OTHER . ',' . Category::CAT_MOVIE_OTHER . ',' . Category::CAT_MISC_OTHER . ',' . Category::CAT_XXX_OTHER . ')
 		%s
 		GROUP BY r.id";
 
-		$res = $db->query(sprintf($sql, $this->limited ? "AND r.adddate BETWEEN NOW() - INTERVAL 4 HOUR AND NOW()" : ""));
+		$res = $this->pdo->query(sprintf($sql, $this->limited ? "AND r.adddate BETWEEN NOW() - INTERVAL 4 HOUR AND NOW()" : ""));
 		$this->releasestocheck = sizeof($res);
 		if ($res) {
 			echo "PostPrc : Parsing last " . $this->releasestocheck . " releases in the Other-Misc categories\n";
@@ -90,7 +98,7 @@ class Parsing
 				///
 				///Use the Nfo to try to get the proper Releasename.
 				///
-				$nfo = $db->queryOneRow(sprintf("select uncompress(nfo) as nfo from releasenfo where releaseid = %d", $rel['RID']));
+				$nfo = $this->pdo->queryOneRow(sprintf("select uncompress(nfo) as nfo from releasenfo where releaseid = %d", $rel['rid']));
 				if ($nfo && $foundName == "") {
 					$this->nfosprocessed++;
 					$nfo = $nfo['nfo'];
@@ -522,8 +530,8 @@ class Parsing
 				if ($rel['filenames'] && $foundName == '') {
 					$this->releasefilesprocessed++;
 					$files = explode(',', $rel['filenames']);
-					if (!array($files)) {
-						$files = array($files);
+					if (![$files]) {
+						$files = [$files];
 					}
 
 					// Scene regex
@@ -587,6 +595,16 @@ class Parsing
 							$this->determineCategory($rel, $foundName, $methodused);
 						}
 
+						//Reversed name
+						if (preg_match('/[a-z0-9\(\)\'\!\,\.\-\ \_]+(BEW|p027|p0801)[a-z0-9\(\)\,\'\!\ \-\.]+/i', $file, $matches4))
+						{
+							$new1 = preg_match('/( )?(\.m2ts|\.wmv|\.avi|.mp4|\.mkv)/i', $matches4[0], $matched);
+							$new2 = str_replace($matched[0], "", $matches4[0]);
+							$foundName = strrev($new2);
+							$methodused = "Reversed";
+							$this->determineCategory($rel, $foundName, $methodused);
+						}
+
 						//Check rarfile contents for a scene name
 						if (preg_match($sceneRegex, $file, $matches) && $foundName == '') {
 							//Simply Releases Toppers
@@ -638,12 +656,12 @@ class Parsing
 					}
 
 					//RAR file contents release name matching
-					/*
-					if (sizeof($files) > 0 && $foundName == '')
+
+					/*if (sizeof($files) > 0 && $foundName == '')
 					{
 						echo "RAR checking\n";
 						//Loop through releaseFiles to find a match
-						foreach($releaseFiles as $rarFile)
+						foreach($files as $rarFile)
 						{
 							//echo "-{$rarFile}\n";
 							if ($foundName == '')
@@ -651,10 +669,10 @@ class Parsing
 								//Lookup name via reqid (filename)
 								if (preg_match('/\.(avi|mkv|mp4|mov|wmv|iso|img|gcm|ps3|wad|ac3|nds|bin|cue|mdf)/i', $rarFile))
 								{
-									$this->site->reqidurl
+									$this->site->reqidurl;
 									$lookupUrl = 'http://allfilled/query.php?t=alt.binaries.srrdb&reqid='.urlencode(basename($rarFile));
 									echo '-lookup: '.$lookupUrl."\n";
-									$xml = getUrl($lookupUrl);
+									$xml = Utility::getUrl(['url' => $lookupUrl]);
 									//$xml = false;
 
 									if ($xml !== false)
@@ -670,15 +688,14 @@ class Parsing
 								}
 							}
 						}
-					}
-					*/
+					}*/
 
 				}
 
 				// do par check if user has elected for downloading extra stuff
 				if ($this->site->unrarpath != '' && $foundName == "") {
 					$nzb = new NZB();
-					$nzbfile = $nzb->getNZBPath($rel['guid'], $this->site->nzbpath, true);
+					$nzbfile = $nzb->NZBPath($rel['guid'], $this->site->nzbpath, true);
 					$nzbInfo = new nzbInfo;
 					$nzbInfo->loadFromFile($nzbfile);
 					if (!empty($nzbInfo->parfiles) && empty($nzbInfo->rarfiles) && empty($nzbInfo->audiofiles)) {
@@ -770,7 +787,7 @@ class Parsing
 				}
 
 				if ($foundName == '' && $this->verbose) {
-					echo "ReleaseID: 		" . $rel["RID"] . "\n" .
+					echo "ReleaseID: 		" . $rel["rid"] . "\n" .
 						" Group: 		" . $rel["groupname"] . "\n" .
 						" Old Name: 		" . $rel["name"] . "\n" .
 						" Old SearchName: 	" . $rel["searchname"] . "\n" .
@@ -806,21 +823,19 @@ class Parsing
 			$foundName = str_replace('&#x27;', '', trim(html_entity_decode($foundName)));
 			$name = str_replace(' ', '_', $foundName);
 			$searchname = str_replace('_', ' ', $foundName);
-			if ($this->verbose) {
-				echo 'ReleaseID: 		' . $rel['RID'] . "\n";
-				echo ' Group: 		' . $rel['groupname'] . "\n";
-				echo ' Old Name: 		' . $rel['name'] . "\n";
-				echo ' Old SearchName: 	' . $rel['searchname'] . "\n";
-				echo ' New Name: 		' . $name . "\n";
-				echo ' New SearchName: 	' . $searchname . "\n";
-				echo ' Old Cat: 		' . $rel['categoryid'] . "\n";
-				echo ' New Cat: 		' . $categoryID . "\n";
-				echo ' Method: 		' . $methodused . "\n";
-				echo " Status: 		Release changed\n\n";
-			}
+			echo
+				PHP_EOL .
+				ColorCLI::headerOver('ReleaseID: 		') . ColorCLI::primaryOver($rel['rid']) . PHP_EOL .
+				ColorCLI::headerOver(' Group: 		') . ColorCLI::primaryOver($rel['groupname']) . PHP_EOL .
+				ColorCLI::headerOver(' Old Name: 		') . ColorCLI::primaryOver($rel['name']) . PHP_EOL .
+				ColorCLI::headerOver(' Old SearchName: 	') . ColorCLI::primaryOver($rel['searchname']) . PHP_EOL .
+				ColorCLI::headerOver(' New Name: 		') . ColorCLI::primaryOver($name) . PHP_EOL .
+				ColorCLI::headerOver(' New SearchName: 	') . ColorCLI::primaryOver($searchname) . PHP_EOL .
+				ColorCLI::headerOver(' Old Cat: 		') . ColorCLI::primaryOver($rel['categoryid']) . PHP_EOL .
+				ColorCLI::headerOver(' New Cat: 		') . ColorCLI::primaryOver($categoryID) . PHP_EOL .
+				ColorCLI::headerOver(' Method: 		') . ColorCLI::primaryOver($methodused) . PHP_EOL ;
 			if (!$this->echoonly) {
-				$db = new DB();
-				$db->queryExec(sprintf("update releases SET name = %s, searchname = %s, categoryid = %d, imdbid = NULL, rageid = -1, bookinfoid = NULL, musicinfoid = NULL, consoleinfoid = NULL WHERE releases.id = %d", $db->escapeString($name), $db->escapeString($searchname), $categoryID, $rel['RID']));
+				$this->pdo->queryExec(sprintf("update releases SET name = %s, searchname = %s, categoryid = %d, imdbid = NULL, rageid = -1, bookinfoid = NULL, musicinfoid = NULL, consoleinfoid = NULL WHERE releases.id = %d", $this->pdo->escapeString($name), $this->pdo->escapeString($searchname), $categoryID, $rel['rid']));
 			}
 			$this->numupdated++;
 		}
@@ -832,15 +847,13 @@ class Parsing
 	public function cleanup()
 	{
 		echo "PostPrc : Performing cleanup \n";
-
-		$db = new Db;
 		$catsql = "select id from groups";
-		$res = $db->query($catsql);
+		$res = $this->pdo->query($catsql);
 		foreach ($res as $r2) {
-			$sql = sprintf("select r.id, name, searchname, categoryid, size, totalpart, musicinfoid, preID, groupid, rn.id as nfoid from releases r left outer join releasenfo rn ON rn.releaseid = r.id where groupid = %d", $r2['id']) . " %s ";
-			$unbuf = $db->queryDirect(sprintf($sql, ($this->limited ? " and r.adddate BETWEEN NOW() - INTERVAL 1 DAY AND NOW() " : "")));
+			$sql = sprintf("select r.id, name, searchname, categoryid, size, totalpart, musicinfoid, preid, groupid, rn.id as nfoid from releases r left outer join releasenfo rn ON rn.releaseid = r.id where groupid = %d", $r2['id']) . " %s ";
+			$unbuf = $this->pdo->queryDirect(sprintf($sql, ($this->limited ? " and r.adddate BETWEEN NOW() - INTERVAL 1 DAY AND NOW() " : "")));
 
-			while ($r = $db->getAssocArray($unbuf)) {
+			while ($r = $this->pdo->getAssocArray($unbuf)) {
 				///
 				///This Section will remove releases based on specific criteria
 				///
@@ -903,7 +916,7 @@ class Parsing
 							$this->handleClean($r, "Modifying Release Due to NDS Size: " . $r['name'] . " - ", true);
 							continue;
 						}
-						if (strlen($r['name']) < 11 && !preg_match('/\([a-z]{2,3}\)/i', $r['name']) && !$r['preID']) {
+						if (strlen($r['name']) < 11 && !preg_match('/\([a-z]{2,3}\)/i', $r['name']) && !$r['preid']) {
 							$this->handleClean($r, "Modifying Release Due to NDS Release Length: " . $r['name'] . " - ");
 							continue;
 						}
@@ -914,7 +927,7 @@ class Parsing
 							$this->handleClean($r, "Modifying Release Due to PSP Size: " . $r['name'] . " - ", true);
 							continue;
 						}
-						if (strlen($r['name']) < 13 && !$r['preID']) {
+						if (strlen($r['name']) < 13 && !$r['preid']) {
 							$this->handleClean($r, "Modifying Release PSP Due to Release Length: " . $r['name'] . " - ");
 							continue;
 						}
@@ -925,7 +938,7 @@ class Parsing
 							$this->handleClean($r, "Modifying Release Wii Size: " . $r['name'] . " - ", true);
 							continue;
 						}
-						if (strlen($r['name']) < 14 && !$r['preID']) {
+						if (strlen($r['name']) < 14 && !$r['preid']) {
 							$this->handleClean($r, "Modifying Release Wii ReleaseLEN: " . $r['name'] . " - ");
 							continue;
 						}
@@ -936,7 +949,7 @@ class Parsing
 							$this->handleClean($r, "Modifying Release Xbox Size: " . $r['name'] . " - ", true);
 							continue;
 						}
-						if (strlen($r['name']) < 14 && !$r['preID']) {
+						if (strlen($r['name']) < 14 && !$r['preid']) {
 							$this->handleClean($r, "Modifying Release Xbox ReleaseLEN: " . $r['name'] . " - ");
 							continue;
 						}
@@ -947,7 +960,7 @@ class Parsing
 							$this->handleClean($r, "Modifying Release Xbox360 Size: " . $r['name'] . " - ", true);
 							continue;
 						}
-						if (strlen($r['name']) < 14 && !$r['preID']) {
+						if (strlen($r['name']) < 14 && !$r['preid']) {
 							$this->handleClean($r, "Modifying Release Xbox360 ReleaseLEN: " . $r['name'] . " - ");
 							continue;
 						}
@@ -958,7 +971,7 @@ class Parsing
 							$this->handleClean($r, "Modifying Release Wiiware Size: " . $r['name'] . " - ", true);
 							continue;
 						}
-						if (strlen($r['name']) < 14 && !$r['preID']) {
+						if (strlen($r['name']) < 14 && !$r['preid']) {
 							$this->handleClean($r, "Modifying Release Wiiware ReleaseLEN: " . $r['name'] . " - ");
 							continue;
 						}
@@ -970,7 +983,7 @@ class Parsing
 							//handleClean($r,true);
 							continue;
 						}
-						if (strlen($r['name']) < 16 && !$r['preID']) {
+						if (strlen($r['name']) < 16 && !$r['preid']) {
 							$this->handleClean($r, "Modifying Release Xbox 360 DLC ReleaseLEN: " . $r['name'] . " - ");
 							continue;
 						}
@@ -981,7 +994,7 @@ class Parsing
 							$this->handleClean($r, "Modifying Release Due to PS3 Size: " . $r['name'] . " - ", true);
 							continue;
 						}
-						if (strlen($r['name']) < 14 && !$r['preID']) {
+						if (strlen($r['name']) < 14 && !$r['preid']) {
 							$this->handleClean($r, "Modifying Release PS3 Due to Release Length: " . $r['name'] . " - ");
 							continue;
 						}
@@ -993,7 +1006,7 @@ class Parsing
 							$this->handleClean($r, "Modifying Release Foreign Movie Size: " . $r['name'] . " - ", true);
 							continue;
 						}
-						if (strlen($r['name']) < 16 && !preg_match('/(fix|pack|\b((19|20)\d{2})\b)/i', $r['name']) && !$r['preID']) {
+						if (strlen($r['name']) < 16 && !preg_match('/(fix|pack|\b((19|20)\d{2})\b)/i', $r['name']) && !$r['preid']) {
 							$this->handleClean($r, "Modifying Release Foreign Movies ReleaseLEN: " . $r['name'] . " - ");
 							continue;
 						}
@@ -1004,7 +1017,7 @@ class Parsing
 							$this->handleClean($r, "Modifying Release Other Movies Size: " . $r['name'] . " - ", true);
 							continue;
 						}
-						if (strlen($r['name']) < 24 && !preg_match('/(fix|pack|\b((19|20)\d{2})\b)/i', $r['name']) && !$r['preID']) {
+						if (strlen($r['name']) < 24 && !preg_match('/(fix|pack|\b((19|20)\d{2})\b)/i', $r['name']) && !$r['preid']) {
 							$this->handleClean($r, "Modifying Release Other Movies ReleaseLEN: " . $r['name'] . " - ");
 							continue;
 						}
@@ -1015,7 +1028,7 @@ class Parsing
 							$this->handleClean($r, "Modifying Release SD Movie Size: " . $r['name'] . " - ", true);
 							continue;
 						}
-						if (strlen($r['name']) < 21 && !preg_match('/(fix|pack|\b((19|20)\d{2})\b)/i', $r['name']) && !$r['preID']) {
+						if (strlen($r['name']) < 21 && !preg_match('/(fix|pack|\b((19|20)\d{2})\b)/i', $r['name']) && !$r['preid']) {
 							$this->handleClean($r, "Modifying Release SD Movies ReleaseLEN: " . $r['name'] . " - ");
 							continue;
 						}
@@ -1026,7 +1039,7 @@ class Parsing
 							$this->handleClean($r, "Modifying Release HD Movie Size: " . $r['name'] . " - ", true);
 							continue;
 						}
-						if (strlen($r['name']) < 21 && !preg_match('/(fix|pack|\b((19|20)\d{2})\b)/i', $r['name']) && !$r['preID']) {
+						if (strlen($r['name']) < 21 && !preg_match('/(fix|pack|\b((19|20)\d{2})\b)/i', $r['name']) && !$r['preid']) {
 							$this->handleClean($r, "Modifying Release HD Movies ReleaseLEN: " . $r['name'] . " - ");
 							continue;
 						}
@@ -1037,7 +1050,7 @@ class Parsing
 							$this->handleClean($r, "Modifying Release Bluray Movie Size: " . $r['name'] . " - ", true);
 							continue;
 						}
-						if (strlen($r['name']) < 21 && !preg_match('/(fix|pack|\b((19|20)\d{2})\b)/i', $r['name']) && !$r['preID']) {
+						if (strlen($r['name']) < 21 && !preg_match('/(fix|pack|\b((19|20)\d{2})\b)/i', $r['name']) && !$r['preid']) {
 							$this->handleClean($r, "Modifying Release Bluray Movies ReleaseLEN: " . $r['name'] . " - ");
 							continue;
 						}
@@ -1048,7 +1061,7 @@ class Parsing
 							$this->handleClean($r, true);
 							continue;
 						}
-						if (strlen($r['name']) < 15 && !preg_match('/(fix|pack|\b((19|20)\d{2})\b)/i', $r['name']) && !$r['preID']) {
+						if (strlen($r['name']) < 15 && !preg_match('/(fix|pack|\b((19|20)\d{2})\b)/i', $r['name']) && !$r['preid']) {
 							$this->handleClean($r, "Modifying Release 3D Movies ReleaseLEN: " . $r['name'] . " - ");
 							continue;
 						}
@@ -1064,7 +1077,7 @@ class Parsing
 							$this->handleClean($r, "Modifying Release Audio MP3 Size: " . $r['name'] . " - ", true);
 							continue;
 						}
-						if (strlen($r['name']) < 25 && !preg_match('/(discography|\b((19|20)\d{2})\b)/i', $r['name']) && $r['musicinfoid'] == '-2' && !$r['preID']) {
+						if (strlen($r['name']) < 25 && !preg_match('/(discography|\b((19|20)\d{2})\b)/i', $r['name']) && $r['musicinfoid'] == '-2' && !$r['preid']) {
 							$this->handleClean($r, "Modifying Release Audio MP3 ReleaseLEN: " . $r['name'] . " - ");
 							continue;
 						}
@@ -1075,7 +1088,7 @@ class Parsing
 							$this->handleClean($r, "Modifying Release Audio Video Size: " . $r['name'] . " - ", true);
 							continue;
 						}
-						if (strlen($r['name']) < 20 && !preg_match('/(discography|\b((19|20)\d{2})\b)/i', $r['name']) && $r['musicinfoid'] == '-2' && !$r['preID']) {
+						if (strlen($r['name']) < 20 && !preg_match('/(discography|\b((19|20)\d{2})\b)/i', $r['name']) && $r['musicinfoid'] == '-2' && !$r['preid']) {
 							//echo "Modifying Release Audio Video ReleaseLEN: ".$r['name']." - ";
 							//handleClean($r); not sure what to
 							continue;
@@ -1087,7 +1100,7 @@ class Parsing
 							$this->handleClean($r, "Modifying Release Audiobook Size: " . $r['name'] . " - ", true);
 							continue;
 						}
-						if (strlen($r['name']) < 20 && !preg_match('/(discography|\b((19|20)\d{2})\b)/i', $r['name']) && $r['musicinfoid'] == '-2' && !$r['preID']) {
+						if (strlen($r['name']) < 20 && !preg_match('/(discography|\b((19|20)\d{2})\b)/i', $r['name']) && $r['musicinfoid'] == '-2' && !$r['preid']) {
 							$this->handleClean($r, "Modifying Release Audiobook ReleaseLEN: " . $r['name'] . " - ");
 							continue;
 						}
@@ -1099,7 +1112,7 @@ class Parsing
 							//handleClean($r,true);
 							continue;
 						}
-						if (strlen($r['name']) < 20 && !preg_match('/(discography|\b((19|20)\d{2})\b)/i', $r['name']) && $r['musicinfoid'] == '-2' && !$r['preID']) {
+						if (strlen($r['name']) < 20 && !preg_match('/(discography|\b((19|20)\d{2})\b)/i', $r['name']) && $r['musicinfoid'] == '-2' && !$r['preid']) {
 							//echo "Modifying Release Audio Lossless ReleaseLEN: ".$r['name']." - ";
 							//handleClean($r);
 							continue;
@@ -1112,7 +1125,7 @@ class Parsing
 							$this->handleClean($r, "Modifying Release PC 0Day Size: " . $r['name'] . " - ", true);
 							continue;
 						}
-						if (strlen($r['name']) < 20 && $r['nfoid'] == null && !$r['preID']) {
+						if (strlen($r['name']) < 20 && $r['nfoid'] == null && !$r['preid']) {
 							$this->handleClean($r, "Modifying Release PC 0Day ReleaseLEN: " . $r['name'] . " - ");
 							continue;
 						}
@@ -1123,7 +1136,7 @@ class Parsing
 							$this->handleClean($r, "Modifying Release PC ISO Size: " . $r['name'] . " - ", true);
 							continue;
 						}
-						if (strlen($r['name']) < 20 && !$r['preID']) {
+						if (strlen($r['name']) < 20 && !$r['preid']) {
 							$this->handleClean($r, "Modifying Release PC ISO ReleaseLEN: " . $r['name'] . " - ");
 							continue;
 						}
@@ -1134,7 +1147,7 @@ class Parsing
 							$this->handleClean($r, "Modifying Release PC Mac Size: " . $r['name'] . " - ", true);
 							continue;
 						}
-						if (strlen($r['name']) < 15 && !$r['preID']) {
+						if (strlen($r['name']) < 15 && !$r['preid']) {
 							//echo "Modifying Release PC Mac ReleaseLEN: ".$r['name']." - ";
 							//handleClean($r); Not sure about this yet
 							continue;
@@ -1146,7 +1159,7 @@ class Parsing
 							$this->handleClean($r, "Modifying Release PC Mobile Other Size: " . $r['name'] . " - ", true);
 							continue;
 						}
-						if (strlen($r['name']) < 20 && !$r['preID']) {
+						if (strlen($r['name']) < 20 && !$r['preid']) {
 							$this->handleClean($r, "Modifying Release PC Mobile Other ReleaseLEN: " . $r['name'] . " - ");
 							continue;
 						}
@@ -1157,7 +1170,7 @@ class Parsing
 							$this->handleClean($r, "Modifying Release PC Games Size: " . $r['name'] . " - ", true);
 							continue;
 						}
-						if (strlen($r['name']) < 15 && !$r['preID']) {
+						if (strlen($r['name']) < 15 && !$r['preid']) {
 							//echo "Modifying Release PC Games ReleaseLEN: ".$r['name']." - ";
 							//handleClean($r); Not sure about this yet
 
@@ -1170,7 +1183,7 @@ class Parsing
 							$this->handleClean($r, "Modifying Release PC Ios Size: " . $r['name'] . " - ", true);
 							continue;
 						}
-						if (strlen($r['name']) < 21 && !$r['preID']) {
+						if (strlen($r['name']) < 21 && !$r['preid']) {
 							$this->handleClean($r, "Modifying Release PC Ios ReleaseLEN: " . $r['name'] . " - ");
 							continue;
 						}
@@ -1181,7 +1194,7 @@ class Parsing
 							$this->handleClean($r, "Modifying Release PC Android Size: " . $r['name'] . " - ", true);
 							continue;
 						}
-						if (strlen($r['name']) < 15 && !$r['preID']) {
+						if (strlen($r['name']) < 15 && !$r['preid']) {
 							//echo "Modifying Release PC Android ReleaseLEN: ".$r['name']." - ";
 							//handleClean($r); Not sure about this yet
 							continue;
@@ -1194,7 +1207,7 @@ class Parsing
 							$this->handleClean($r, "Modifying Release TV Foreign Size: " . $r['name'] . " - ", true);
 							continue;
 						}
-						if (strlen($r['name']) < 18 && !$r['preID']) {
+						if (strlen($r['name']) < 18 && !$r['preid']) {
 							$this->handleClean($r, "Modifying Release TV Foreign ReleaseLEN: " . $r['name'] . " - ");
 							continue;
 						}
@@ -1205,7 +1218,7 @@ class Parsing
 							$this->handleClean($r, "Modifying Release TV SD Size: " . $r['name'] . " - ", true);
 							continue;
 						}
-						if (strlen($r['name']) < 20 && !$r['preID']) {
+						if (strlen($r['name']) < 20 && !$r['preid']) {
 							$this->handleClean($r, "Modifying Release TV SD ReleaseLEN: " . $r['name'] . " - ");
 							continue;
 						}
@@ -1216,7 +1229,7 @@ class Parsing
 							$this->handleClean($r, "Modifying Release TV HD Size: " . $r['name'] . " - ", true);
 							continue;
 						}
-						if (strlen($r['name']) < 15 && !$r['preID']) {
+						if (strlen($r['name']) < 15 && !$r['preid']) {
 							$this->handleClean($r, "Modifying Release TV HD ReleaseLEN: " . $r['name'] . " - ");
 							continue;
 						}
@@ -1227,7 +1240,7 @@ class Parsing
 							$this->handleClean($r, "Modifying Release TV Other Size: " . $r['name'] . " - ", true);
 							continue;
 						}
-						if (strlen($r['name']) < 15 && !$r['preID']) {
+						if (strlen($r['name']) < 15 && !$r['preid']) {
 							$this->handleClean($r, "Modifying Release TV Other ReleaseLEN: " . $r['name'] . " - ");
 							continue;
 						}
@@ -1238,7 +1251,7 @@ class Parsing
 							$this->handleClean($r, "Modifying Release TV Sport Size: " . $r['name'] . " - ", true);
 							continue;
 						}
-						if (strlen($r['name']) < 19 && !$r['preID']) {
+						if (strlen($r['name']) < 19 && !$r['preid']) {
 							$this->handleClean($r, "Modifying Release TV Sport ReleaseLEN: " . $r['name'] . " - ");
 							continue;
 						}
@@ -1249,7 +1262,7 @@ class Parsing
 							$this->handleClean($r, "Modifying Release TV Anime Size: " . $r['name'] . " - ", true);
 							continue;
 						}
-						if (strlen($r['name']) < 15 && !$r['preID']) {
+						if (strlen($r['name']) < 15 && !$r['preid']) {
 							$this->handleClean($r, "Modifying Release TV Anime ReleaseLEN: " . $r['name'] . " - ");
 							continue;
 						}
@@ -1260,7 +1273,7 @@ class Parsing
 							$this->handleClean($r, "Modifying Release TV Docu Size: " . $r['name'] . " - ", true);
 							continue;
 						}
-						if (strlen($r['name']) < 15 && !$r['preID']) {
+						if (strlen($r['name']) < 15 && !$r['preid']) {
 							$this->handleClean($r, "Modifying Release TV Docu ReleaseLEN: " . $r['name'] . " - ");
 							continue;
 						}
@@ -1272,7 +1285,7 @@ class Parsing
 							$this->handleClean($r, "Modifying Release XXX DVD Size: " . $r['name'] . " - ", true);
 							continue;
 						}
-						if (strlen($r['name']) < 20 && !$r['preID']) {
+						if (strlen($r['name']) < 20 && !$r['preid']) {
 							$this->handleClean($r, "Modifying Release XXX DVD ReleaseLEN: " . $r['name'] . " - ");
 							continue;
 						}
@@ -1283,7 +1296,7 @@ class Parsing
 							$this->handleClean($r, "Modifying Release XXX WMV Size: " . $r['name'] . " - ", true);
 							continue;
 						}
-						if (strlen($r['name']) < 20 && !$r['preID']) {
+						if (strlen($r['name']) < 20 && !$r['preid']) {
 							$this->handleClean($r, "Modifying Release XXX WMV ReleaseLEN: " . $r['name'] . " - ");
 							continue;
 						}
@@ -1294,7 +1307,7 @@ class Parsing
 							$this->handleClean($r, "Modifying Release XXX XVID Size: " . $r['name'] . " - ", true);
 							continue;
 						}
-						if (strlen($r['name']) < 14 && !$r['preID']) {
+						if (strlen($r['name']) < 14 && !$r['preid']) {
 							$this->handleClean($r, "Modifying Release XXX XVID ReleaseLEN: " . $r['name'] . " - ");
 							continue;
 						}
@@ -1305,7 +1318,7 @@ class Parsing
 							$this->handleClean($r, "Modifying Release XXX X264 Size: " . $r['name'] . " - ", true);
 							continue;
 						}
-						if (strlen($r['name']) < 15 && !$r['preID']) {
+						if (strlen($r['name']) < 15 && !$r['preid']) {
 							$this->handleClean($r, "Modifying Release XXX X264 ReleaseLEN: " . $r['name'] . " - ");
 							continue;
 						}
@@ -1316,7 +1329,7 @@ class Parsing
 							$this->handleClean($r, "Modifying Release XXX PACK Size: " . $r['name'] . " - ", true);
 							continue;
 						}
-						if (strlen($r['name']) < 15 && !$r['preID']) {
+						if (strlen($r['name']) < 15 && !$r['preid']) {
 							$this->handleClean($r, "Modifying Release XXX PACK ReleaseLEN: " . $r['name'] . " - ");
 							continue;
 						}
@@ -1327,7 +1340,7 @@ class Parsing
 							$this->handleClean($r, "Modifying Release XXX IMAGESET Size: " . $r['name'] . " - ", true);
 							continue;
 						}
-						if (strlen($r['name']) < 15 && !$r['preID']) {
+						if (strlen($r['name']) < 15 && !$r['preid']) {
 							$this->handleClean($r, "Modifying Release XXX IMAGESET ReleaseLEN: " . $r['name'] . " - ");
 							continue;
 						}
@@ -1338,7 +1351,7 @@ class Parsing
 							$this->handleClean($r, "Modifying Release Misc Ebook Size: " . $r['name'] . " - ", true);
 							continue;
 						}
-						if (strlen($r['name']) < 12 && !$r['preID']) {
+						if (strlen($r['name']) < 12 && !$r['preid']) {
 							$this->handleClean($r, "Modifying Release Misc Ebook ReleaseLEN: " . $r['name'] . " - ");
 							continue;
 						}
@@ -1350,7 +1363,7 @@ class Parsing
 							//handleClean($r,true);
 							continue;
 						}
-						if (strlen($r['name']) < 7 && !$r['preID']) {
+						if (strlen($r['name']) < 7 && !$r['preid']) {
 							//echo "Modifying Release MISC Comic ReleaseLEN: ".$r['name']." - ";
 							//handleClean($r);
 							continue;
@@ -1363,7 +1376,7 @@ class Parsing
 							$this->handleClean($r, "Modifying Release Misc Other Size: " . $r['name'] . " - ", true);
 							continue;
 						}
-						if (strlen($r['name']) < 15 && !$r['preID']) {
+						if (strlen($r['name']) < 15 && !$r['preid']) {
 							//echo "Modifying Release MISC Other ReleaseLEN: ".$r['name']." - ";
 							//handleClean($r); Not sure what to do with this
 							continue;
@@ -1405,15 +1418,14 @@ class Parsing
 		$this->nummiscd += count($this->cleanup['misc']);
 
 		if (!$this->echoonly) {
-			$releases = new Releases;
-			$db = new Db;
+			$releases = new \Releases(['Settings' => $this->pdo]);
 			foreach (array_keys($this->cleanup['nuke']) as $id) {
 				$releases->delete($id);
 			}
 
 			if (count($this->cleanup['misc'])) {
 				$sql = 'update releases set categoryid = ' . Category::CAT_MISC_OTHER . ' where categoryid != ' . Category::CAT_MISC_OTHER . ' and id in (' . implode(array_keys($this->cleanup['misc']), ',') . ')';
-				$db->queryExec($sql);
+				$this->pdo->queryExec($sql);
 			}
 		}
 
@@ -1425,70 +1437,73 @@ class Parsing
 	 */
 	public function removeSpecial()
 	{
-		$db = new Db;
-
 		$sql = "select id, searchname from releases where 1 = 1 ";
 		$sql .= ($this->limited ? "AND adddate BETWEEN NOW() - INTERVAL 1 DAY AND NOW()" : "");
 		$sql .= " order by postdate desc";
 
-		$res = $db->queryDirect($sql);
-		while ($r = $db->getAssocArray($res)) {
+		$res = $this->pdo->queryDirect($sql);
+		while ($r = $this->pdo->getAssocArray($res)) {
 			$oldname = $r['searchname'];
 
 			if (preg_match('/^(\:|\"|\-| )+/', $r['searchname'])) {
 				while (preg_match('/^(\:|\"|\-| |\_)+/', $r['searchname'])) {
 					$r['searchname'] = substr($r['searchname'], 1);
 				}
-				$this->updateName($db, $r['id'], $oldname, $r['searchname']);
+				$this->updateName($this->pdo, $r['id'], $oldname, $r['searchname']);
 			}
 			if (preg_match('/^000\-/', $r['searchname'])) {
 				while (preg_match('/^000\-/', $r['searchname'])) {
 					$r['searchname'] = substr($r['searchname'], 4);
 				}
-				$this->updateName($db, $r['id'], $oldname, $r['searchname']);
+				$this->updateName($this->pdo, $r['id'], $oldname, $r['searchname']);
 			}
 			if (preg_match('/(\:|\"|\-| |\/)$/', $r['searchname'])) {
 				while (preg_match('/(\:|\"|\-| |\/)$/', $r['searchname'])) {
 					$r['searchname'] = substr($r['searchname'], 0, -1);
 				}
-				$this->updateName($db, $r['id'], $oldname, $r['searchname']);
+				$this->updateName($this->pdo, $r['id'], $oldname, $r['searchname']);
 			}
 			if (preg_match('/\"/', $r['searchname'])) {
 				while (preg_match('/\"/', $r['searchname'])) {
 					$r['searchname'] = str_replace('"', '', $r['searchname']);
 				}
-				$this->updateName($db, $r['id'], $oldname, $r['searchname']);
+				$this->updateName($this->pdo, $r['id'], $oldname, $r['searchname']);
 			}
 			if (preg_match('/\-\d{1}$/', $r['searchname'])) {
 				while (preg_match('/\-\d{1}$/', $r['searchname'])) {
 					$r['searchname'] = preg_replace('/\-\d{1}$/', '', $r['searchname']);
 				}
-				$this->updateName($db, $r['id'], $oldname, $r['searchname']);
+				$this->updateName($this->pdo, $r['id'], $oldname, $r['searchname']);
 			}
 			if (preg_match('/\!+.*?mom.*?\!+/i', $r['searchname'])) {
 				while (preg_match('/\!+.*?mom.*?\!+/i', $r['searchname'])) {
 					$r['searchname'] = preg_replace('/\!+.*?mom.*?\!+/i', '', $r['searchname']);
 				}
-				$this->updateName($db, $r['id'], $oldname, $r['searchname']);
+				$this->updateName($this->pdo, $r['id'], $oldname, $r['searchname']);
 			}
 			if (preg_match('/(\\/)/i', $r['searchname'])) {
 				while (preg_match('/(\\/)/i', $r['searchname'])) {
 					$r['searchname'] = preg_replace('/(\\/)/i', '', $r['searchname']);
 				}
-				$this->updateName($db, $r['id'], $oldname, $r['searchname']);
+				$this->updateName($this->pdo, $r['id'], $oldname, $r['searchname']);
 			}
 		}
 	}
 
 	/**
 	 * update a release name
+	 *
+	 * @param DB $pdo
+	 * @param    $id
+	 * @param    $oldname
+	 * @param    $newname
 	 */
-	private function updateName($db, $id, $oldname, $newname)
+	private function updateName(DB $pdo, $id, $oldname, $newname)
 	{
 		if ($this->verbose)
 			echo sprintf("OLD : %s\nNEW : %s\n\n", $oldname, $newname);
 
 		if (!$this->echoonly)
-			$db->queryExec(sprintf("update releases set name=%s, searchname = %s WHERE id = %d", $db->escapeString($newname), $db->escapeString($newname), $id));
+			$this->pdo->queryExec(sprintf("update releases set name=%s, searchname = %s WHERE id = %d", $this->pdo->escapeString($newname), $this->pdo->escapeString($newname), $id));
 	}
 }
