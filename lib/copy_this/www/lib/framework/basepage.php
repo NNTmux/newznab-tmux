@@ -87,7 +87,7 @@ class BasePage
 		$this->users = new Users(['Settings' => $this->settings]);
 		if ($this->users->isLoggedIn())
 		{
-			$this->userdata = $$this->users->getById($this->users->currentUserId());
+			$this->userdata = $this->users->getById($this->users->currentUserId());
 
 			//
 			// user can still be logged in but have been disabled by admin, so if they are, log them off
