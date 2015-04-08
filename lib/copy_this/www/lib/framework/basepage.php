@@ -111,9 +111,8 @@ class BasePage
 				$this->smarty->assign('weHasVortex', true);
 
 			$sab = new SABnzbd($this);
-			if ($sab->integrated !== false && $sab->url !='' && $sab->apikey != '')
-			{
-				$this->smarty->assign('sabintegrated', $sab->integrated);
+			$this->smarty->assign('sabintegrated', $sab->integratedBool);
+			if ($sab->integratedBool !== false && $sab->url != '' && $sab->apikey != '') {
 				$this->smarty->assign('sabapikeytype', $sab->apikeytype);
 			}
 			if ($this->userdata["role"] == Users::ROLE_ADMIN)
