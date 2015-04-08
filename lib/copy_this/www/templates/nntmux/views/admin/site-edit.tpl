@@ -1130,7 +1130,7 @@
 			<td>
 				{html_radios id="processvideos" name='processvideos' values=$yesno_ids output=$yesno_names selected=$fsite->processvideos separator='<br />'}
 				<div class="hint">Whether to attempt to process a video sample, these videos are very short 1-3 seconds,
-					100KB on average, in ogv format. You must have ffmpeg for this.<br/></div>
+					100KB on average, in ogg video format. You must have ffmpeg for this.<br/></div>
 			</td>
 		</tr>
 

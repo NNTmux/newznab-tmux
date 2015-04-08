@@ -403,7 +403,7 @@ Class ProcessAdditional
 		$this->_audioFileRegex = '\.(AAC|AIFF|APE|AC3|ASF|DTS|FLAC|MKA|MKS|MP2|MP3|RA|OGG|OGM|W64|WAV|WMA)';
 		$this->_ignoreBookRegex = '/\b(epub|lit|mobi|pdf|sipdf|html)\b.*\.rar(?!.{20,})/i';
 		$this->_supportFileRegex = '/\.(vol\d{1,3}\+\d{1,3}|par2|srs|sfv|nzb';
-		$this->_videoFileRegex = '\.(AVI|F4V|IFO|M1V|M2V|M4V|MKV|MOV|MP4|MPEG|MPG|MPGV|MPV|OGV|QT|RM|RMVB|TS|VOB|WMV)';
+		$this->_videoFileRegex = '\.(AVI|F4V|IFO|M1V|M2V|M4V|MKV|MOV|MP4|MPEG|MPG|MPGV|MPV|OGV|OGG|QT|RM|RMVB|TS|VOB|WMV)';
 	}
 
 	/**
@@ -1498,7 +1498,7 @@ Class ProcessAdditional
 			$iSQL = ', haspreview = 1';
 		}
 
-		if (is_file($this->_releaseImage->vidSavePath . $this->_release['guid'] . '.ogv')) {
+		if (is_file($this->_releaseImage->vidSavePath . $this->_release['guid'] . '.ogg')) {
 			$vSQL = ', videostatus = 1';
 		}
 
@@ -1937,7 +1937,7 @@ Class ProcessAdditional
 		if (is_file($fileLocation)) {
 
 			// Create a filename to store the temp file.
-			$fileName = ($this->tmpPath . 'zzzz' . $this->_release['guid'] . '.ogv');
+			$fileName = ($this->tmpPath . 'zzzz' . $this->_release['guid'] . '.ogg');
 
 			$newMethod = false;
 			// If wanted sample length is less than 60, try to get sample from the end of the video.
@@ -2008,7 +2008,7 @@ Class ProcessAdditional
 			if (is_file($fileName)) {
 
 				// Create a path to where the file should be moved.
-				$newFile = ($this->_releaseImage->vidSavePath . $this->_release['guid'] . '.ogv');
+				$newFile = ($this->_releaseImage->vidSavePath . $this->_release['guid'] . '.ogg');
 
 				// Try to move the file to the new path.
 				$renamed = @rename($fileName, $newFile);
