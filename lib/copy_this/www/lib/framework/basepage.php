@@ -42,12 +42,11 @@ class BasePage
 			$this->floodCheck();
 		}
 
-		if((function_exists("get_magic_quotes_gpc") && get_magic_quotes_gpc()) || ini_get('magic_quotes_sybase'))
-		{
-			foreach($_GET as $k => $v) $_GET[$k] = (is_array($v)) ? array_map("stripslashes", $v) : stripslashes($v);
-			foreach($_POST as $k => $v) $_POST[$k] = (is_array($v)) ? array_map("stripslashes", $v) : stripslashes($v);
-			foreach($_REQUEST as $k => $v) $_REQUEST[$k] = (is_array($v)) ? array_map("stripslashes", $v) : stripslashes($v);
-			foreach($_COOKIE as $k => $v) $_COOKIE[$k] = (is_array($v)) ? array_map("stripslashes", $v) : stripslashes($v);
+		if ((function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc()) || ini_get('magic_quotes_sybase')) {
+			$this->stripSlashes($_GET);
+			$this->stripSlashes($_POST);
+			$this->stripSlashes($_REQUEST);
+			$this->stripSlashes($_COOKIE);
 		}
 
 		// set site variable
@@ -85,25 +84,25 @@ class BasePage
 
 		$this->page = (isset($_GET['page'])) ? $_GET['page'] : 'content';
 
-		$users = new Users();
-		if ($users->isLoggedIn())
+		$this->users = new Users(['Settings' => $this->settings]);
+		if ($this->users->isLoggedIn())
 		{
-			$this->userdata = $users->getById($users->currentUserId());
+			$this->userdata = $$this->users->getById($this->users->currentUserId());
 
 			//
 			// user can still be logged in but have been disabled by admin, so if they are, log them off
 			//
 			if ($this->userdata["role"] == Users::ROLE_DISABLED)
 			{
-				$users->logout();
+				$this->users->logout();
 				$this->show403();
 			}
 
-			$this->userdata["categoryexclusions"] = $users->getCategoryExclusion($users->currentUserId());
+			$this->userdata["categoryexclusions"] = $this->users->getCategoryExclusion($this->users->currentUserId());
 
 			//update lastlogin every 15 mins
 			if (strtotime($this->userdata['now'])-900 > strtotime($this->userdata['lastlogin']))
-				$users->updateSiteAccessed($this->userdata['id']);
+				$this->users->updateSiteAccessed($this->userdata['id']);
 
 			$this->smarty->assign('userdata',$this->userdata);
 			$this->smarty->assign('loggedin',"true");
@@ -138,6 +137,18 @@ class BasePage
 
 		$this->smarty->assign('site', $this->site);
 		$this->smarty->assign('page', $this);
+	}
+
+	/**
+	 * Unquotes quoted strings recursively in an array.
+	 *
+	 * @param $array
+	 */
+	private function stripSlashes(&$array)
+	{
+		foreach ($array as $key => $value) {
+			$array[$key] = (is_array($value) ? array_map('stripslashes', $value) : stripslashes($value));
+		}
 	}
 
 	/**
@@ -176,6 +187,8 @@ class BasePage
 
 	/**
 	 * Done in html here to reduce any smarty processing burden if a large flood is underway.
+	 *
+	 * @param int $seconds
 	 */
 	public function showFloodWarning($seconds = 5)
 	{
