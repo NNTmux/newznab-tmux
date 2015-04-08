@@ -528,7 +528,7 @@
 {if $release.videostatus == 1 && $userdata.canpreview == 1}
 	<div class="tab-pane" id="video">
 		<video width="770" controls>
-			<source src="{$smarty.const.WWW_TOP}/covers/video/{$release.guid}.ogv" type="video/ogg">
+			<source src="{$smarty.const.WWW_TOP}/covers/video/{$release.guid}.ogg" type="video/ogg">
 			Your browser does not support the video tag.
 		</video>
 	</div>

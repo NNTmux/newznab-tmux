@@ -90,16 +90,6 @@
 						<label for="chk{$result.guid|substr:0:7}"><a class="title" title="View details"
 																	 href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"seourl"}">{$result.searchname|escape:"htmlall"|replace:".":" "}</a></label>
 
-						{if $result.passwordstatus == 2}
-							<img title="Passworded Rar Archive"
-								 src="{$smarty.const.WWW_TOP}/templates/nntmux/images/icons/lock.gif"
-								 alt="Passworded Rar Archive"/>
-						{elseif $result.passwordstatus == 1}
-							<img title="Contains .cab/ace/rar Archive"
-								 src="{$smarty.const.WWW_TOP}/templates/nntmux/images/icons/lock.gif"
-								 alt="Contains .cab/ace/rar Archive"/>
-						{/if}
-
 						{if $userdata.canpre == 1 && $result.nuketype != ''}
 							&nbsp;
 							<img title="{$result.nuketype}"
@@ -110,9 +100,22 @@
 						<div class="resextra">
 							<div class="btns" style="float:right">
 								{release_flag($result.searchname, browse)}
-									{if $result.nfoid > 0}<a href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}"
-															 title="View Nfo" class="modal_nfo rndbtn" rel="nfo">
-											Nfo</a>{/if}
+								{if $result.passwordstatus == 1}
+									<span class="icon-stack" title="Potentially Passworded"><i class="icon-check-empty icon-stack-base"></i><i class="icon-unlock-alt"></i></span>
+								{elseif $result.passwordstatus == 2}
+									<span class="icon-stack" title="Broken Post"><i class="icon-check-empty icon-stack-base"></i><i class="icon-unlink"></i></span>
+								{elseif $result.passwordstatus == 10}
+									<span class="icon-stack" title="Passworded Archive"><i class="icon-check-empty icon-stack-base"></i><i class="icon-lock"></i></span>
+								{/if}
+								{if $result.videostatus > 0}
+									<a
+											class="label label-default model_prev"
+											href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"htmlall"}"
+											title="This release has a video preview"
+											rel="preview"
+											><i class="icon-youtube-play"></i></a>
+								{/if}
+								{if $result.nfoid > 0}<a href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}" title="View Nfo" class="modal_nfo rndbtn" rel="nfo"> Nfo</a>{/if}
 								{if $result.imdbid > 0}
 									<a href="#" name="name{$result.imdbid}" title="View movie info" class="modal_imdb rndbtn" rel="movie" >Cover</a>
 								{/if}
@@ -132,12 +135,7 @@
 										href="{$smarty.const.WWW_TOP}/covers/sample/{$result.guid}_thumb.jpg"
 										name="name{$result.guid}"title="Sample of {$result.searchname|escape:"htmlall"}"
 										class="modal_prev rndbtn" rel="preview">Sample</a>{/if}
-									{if $result.videostatus == 1}
-									<a href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"htmlall"}"
-									   title="This release has a video preview." class="modal_prev rndbtn"
-									   rel="preview">
-										<img src="{$smarty.const.WWW_TOP}/templates/nntmux/images/multimedia/video.png"/>
-										</a>{/if}
+
 									{if $result.haspreview == 2 && $userdata.canpreview == 1}<a href="#"
 																								name="audio{$result.guid}"
 																								title="Listen to {$result.searchname|escape:"htmlall"}"
