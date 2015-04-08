@@ -49,7 +49,7 @@ class RequestIDWeb extends RequestID
 				INNER JOIN groups g ON r.groupid = g.id
 				WHERE r.nzbstatus = 1
 				AND r.prehashid = 0
-				AND r.isrequestID = 1
+				AND r.isrequestid = 1
 				AND (
 					r.reqidstatus = %d
 					OR (r.reqidstatus = %d AND r.adddate < NOW() - INTERVAL %d HOUR)
