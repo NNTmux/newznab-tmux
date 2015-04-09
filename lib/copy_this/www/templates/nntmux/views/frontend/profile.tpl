@@ -90,13 +90,12 @@
 
 {if $userdata.role==2 && $downloadlist|@count > 0}
 <div style="padding-top:20px;">
-	<h2>Downloads for User and Host</h2>
+	<h2>Downloads for User</h2>
 
 	<table style="margin-top:10px;" class="data">
 
 		<tr>
 			<th>date</th>
-			<th>hosthash</th>
 			<th>release</th>
 		</tr>
 
@@ -106,8 +105,7 @@
 		{/if}
 		<tr {if $download@iteration >= 10}class="extra" style="display:none;"{/if}>
 			<td width="80" title="{$download.timestamp}">{$download.timestamp|date_format}</td>
-			<td title="{$download.hosthash}">{if $download.hosthash == ""}n/a{else}{$download.hosthash|truncate:10}{/if}</td>
-			<td>{if $download.guid == ""}n/a{else}<a href="{$smarty.const.WWW_TOP}/details/{$download.guid}/{$download.searchname|escape:"seourl"}">{$download.searchname}</a>{/if}</td>
+			<td>{if $download.guid == ""}n/a{else}<a href="{$smarty.const.WWW_TOP}/details/{$download.guid}/{$download.searchname|escape:"htmlall"}">{$download.searchname}</a>{/if}</td>
 		</tr>
 		{/foreach}
 	</table>
