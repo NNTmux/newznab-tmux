@@ -1000,15 +1000,16 @@ class Users
 	{
 		$db = new DB();
 
-		$sql = sprintf("select distinct hosthash from userdownloads where userid = %d and hosthash is not null and hosthash != ''", $userid);
+		/*$sql = sprintf("select distinct hosthash from userdownloads where userid = %d and hosthash is not null and hosthash != ''", $userid);
 		$rows = $db->query($sql);
 		$hashsql = "";
 		foreach ($rows as $row)
 			$hashsql .= sprintf("userdownloads.hosthash = %s or ", $db->escapeString($row["hosthash"]));
 
 		$hashsql .= " 1=2 ";
+		*/
 
-		$sql = sprintf("select userdownloads.*, releases.guid, releases.searchname from userdownloads left outer join releases on releases.id = userdownloads.releaseid where userdownloads.userid = %d or %s order by userdownloads.timestamp desc", $userid, $hashsql);
+		$sql = sprintf("select userdownloads.*, releases.guid, releases.searchname from userdownloads left outer join releases on releases.id = userdownloads.releaseid where userdownloads.userid = %d order by userdownloads.timestamp desc", $userid);
 
 		return $db->query($sql);
 	}
@@ -1020,13 +1021,14 @@ class Users
 	 *
 	 * @return bool|int
 	 */
-	public function addDownloadRequest($userID)
+	public function addDownloadRequest($userID, $releaseID)
 	{
 		$db = new DB();
 		return $db->queryInsert(
 			sprintf(
-				"INSERT INTO userdownloads (userid, timestamp) VALUES (%d, NOW())",
-				$userID
+				"INSERT INTO userdownloads (userid, releaseid, timestamp) VALUES (%d, %d, NOW())",
+				$userID,
+				$releaseID
 			)
 		);
 	}
