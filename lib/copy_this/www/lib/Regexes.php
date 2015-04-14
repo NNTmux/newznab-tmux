@@ -28,7 +28,7 @@ Class Regexes
 	/**
 	 * @param array $options
 	 */
-	public function __construct(array $options = array())
+	public function __construct(array $options = [])
 	{
 		$defaults = [
 			'Settings' => null,
@@ -76,7 +76,7 @@ Class Regexes
 		return (bool)$this->pdo->queryExec(
 			sprintf(
 				'UPDATE %s
-				SET group_regex = %s, regex = %s, status = %d, description = %s, ordinal = %d %s
+				SET group_regex = %s, regex = %s, status = %d, description = %s, ordinal = %d%s
 				WHERE id = %d',
 				$this->tableName,
 				trim($this->pdo->escapeString($data['group_regex'])),
@@ -284,7 +284,7 @@ Class Regexes
 		$this->_fetchRegex($groupName);
 
 		$returnString = '';
-		// If there are no regex, return and try regex in this file.
+		// If there are no regexes, return and try regex in CollectionsCleaning.php
 		if ($this->_regexCache[$groupName]['regex']) {
 			foreach ($this->_regexCache[$groupName]['regex'] as $regex) {
 
@@ -318,7 +318,7 @@ Class Regexes
 		// Get all regex from DB which match the current group name. Cache them for 15 minutes. #CACHEDQUERY#
 		$this->_regexCache[$groupName]['regex'] = $this->pdo->query(
 			sprintf(
-				'SELECT r.regex%s FROM %s r WHERE %s REGEXP r.group_regex AND r.status = 1 ORDER BY r.ordinal ASC, r.group_regex ASC',
+				'SELECT r.ordinal, r.regex%s FROM %s r WHERE %s REGEXP r.group_regex AND r.status = 1 ORDER BY r.ordinal ASC, r.group_regex ASC',
 				($this->tableName === 'category_regexes' ? ', r.category_id' : ''),
 				$this->tableName,
 				$this->pdo->escapeString($groupName)
@@ -347,10 +347,10 @@ Class Regexes
 				ksort($matches);
 				foreach ($matches as $key => $value) {
 					switch ($this->tableName) {
-						case 'collection_naming_regexes': // Put this at the top since it's the most important for performance.
+						case 'collection_regexes': // Put this at the top since it's the most important for performance.
 						case 'release_naming_regexes':
 							// Ignore non-named capture groups. Only named capture groups are important.
-							if (is_int($key) || preg_match('#reqid|parts#i', $key)) {
+							if (is_int($key) || preg_match('/reqid|parts/i', $key)) {
 								continue 2;
 							}
 							$returnString .= $value; // Concatenate the string to return.
