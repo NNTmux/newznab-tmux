@@ -1,4 +1,6 @@
 <?php
+require_once(WWW_DIR."/lib/util.php");
+
 /**
  * TMDb PHP API class - API 'themoviedb.org'
  * API Documentation: http://help.themoviedb.org/kb/api/
@@ -6,12 +8,11 @@
  *
  * @author Jonas De Smet - Glamorous
  * @since 09.11.2009
- * @date 16.11.2012
+ * @date 05.11.2013
  * @copyright Jonas De Smet - Glamorous
- * @version 1.5.1
+ * @version 1.6
  * @license BSD http://www.opensource.org/licenses/bsd-license.php
  */
-
 class TMDb
 {
 	const POST = 'post';
@@ -27,7 +28,14 @@ class TMDb
 	const API_SCHEME = 'http://';
 	const API_SCHEME_SSL = 'https://';
 
-	const VERSION = '1.5.0';
+	const VERSION = '1.6.0';
+	// Request limitation
+	// http://help.themoviedb.org/kb/general/api-request-limits
+	//  30 requests every 10 seconds per IP
+	// http://www.themoviedb.org/talk/512921ea19c2951d8124fb17
+	//  4 requests every 1 second per IP
+	const REQUEST_LIMIT = 4;
+	const REQUEST_TIMESPAN = 1.0;
 
 	/**
 	 * The API-key
@@ -65,17 +73,45 @@ class TMDb
 	protected $_apischeme;
 
 	/**
+	 * Request counter
+	 *
+	 * @var integer
+	 */
+	protected $_requests = 0;
+
+	/**
+	 * Array of request timestamps
+	 *
+	 * @var array of double values
+	 */
+	protected $_timestamps;
+
+	/**
+	 * Oldest timestamp for debugging only
+	 *
+	 * @var double value
+	 */
+	protected $_timestamp;
+
+	/**
+	 * Retry counter
+	 *
+	 * @var integer
+	 */
+	protected $_retries = 0;
+
+	/**
 	 * Default constructor
 	 *
-	 * @param string  $apikey API-key recieved from TMDb
-	 * @param string  $default_lang
-	 * @param boolean $config Load the TMDb-config
-	 * @param string  $scheme
-	 *
-	 * @internal param string $defaultLang Default language (ISO 3166-1)
+	 * @param string $apikey			API-key recieved from TMDb
+	 * @param string $defaultLang		Default language (ISO 3166-1)
+	 * @param boolean $config			Load the TMDb-config
+	 * @return void
 	 */
 	public function __construct($apikey, $default_lang = 'en', $config = FALSE, $scheme = TMDb::API_SCHEME)
 	{
+		$this->_timestamps = array_fill(0, TMDB::REQUEST_LIMIT, 0.0);
+
 		$this->_apikey = (string) $apikey;
 		$this->_apischeme = ($scheme == TMDb::API_SCHEME) ? TMDb::API_SCHEME : TMDb::API_SCHEME_SSL;
 		$this->setLang($default_lang);
@@ -87,17 +123,43 @@ class TMDb
 	}
 
 	/**
+	 * Increment request counter and handle request limitation
+	 *
+	 * @return void
+	 */
+	protected function incRequests(){
+
+		/* Increment request counter */
+		$this->_requests += 1;
+
+		/* Calculate index for the oldest timestamp in the timestamps array */
+		$idx = $this->_requests % TMDB::REQUEST_LIMIT;
+
+		/* Save the oldest timestamp for debugging */
+		$this->_timestamp = $this->_timestamps[ $idx ];
+
+		/* Calculate elapsed time */
+		$timediff = microtime(true) - $this->_timestamp;
+		//$timediff = ( floor(microtime(true)*10) - ceil($this->_timestamp*10) ) / 10;
+
+		/* Compare the elapsed time against the specified timespan */
+		if ( $timediff < TMDB::REQUEST_TIMESPAN ){
+			/* Calculate delay * 1 second and sleep */
+			usleep( (TMDB::REQUEST_TIMESPAN - $timediff) *1000000 );
+		}
+
+		/* Save new timestamp */
+		$this->_timestamps[ $idx ] = microtime(true);
+	}
+
+	/**
 	 * Search a movie by querystring
 	 *
-	 * @param       $query
-	 * @param int   $page  Number of the page with results (default first page)
-	 * @param bool  $adult Whether of not to include adult movies in the results (default FALSE)
-	 * @param null  $year
-	 * @param mixed $lang  Filter the result with a language (ISO 3166-1) other then default, use FALSE to retrieve results from all languages
-	 *
+	 * @param string $text				Query to search after in the TMDb database
+	 * @param int $page					Number of the page with results (default first page)
+	 * @param bool $adult				Whether of not to include adult movies in the results (default FALSE)
+	 * @param mixed $lang				Filter the result with a language (ISO 3166-1) other then default, use FALSE to retrieve results from all languages
 	 * @return TMDb result array
-	 * @throws TMDbException
-	 * @internal param string $text Query to search after in the TMDb database
 	 */
 	public function searchMovie($query, $page = 1, $adult = FALSE, $year = NULL, $lang = NULL)
 	{
@@ -112,15 +174,32 @@ class TMDb
 	}
 
 	/**
+	 * Search a tv show by querystring
+	 *
+	 * @param string $text              Query to search after in the TMDb database
+	 * @param int $page                 Number of the page with results (default first page)
+	 * @param bool $air_date_year       Filter results that have air date with value (default NULL)
+	 * @param mixed $lang               Filter the result with a language (ISO 3166-1) other then default, use FALSE to retrieve results from all languages
+	 * @return TMDb result array
+	 */
+	public function searchTV($query, $page = 1, $air_date_year = NULL, $lang = NULL)
+	{
+		$params = array(
+			'query' => $query,
+			'page' => (int) $page,
+			'language' => ($lang !== NULL) ? $lang : $this->getLang(),
+			'air_date_year' => $air_date_year
+		);
+		return $this->_makeCall('search/tv', $params);
+	}
+
+	/**
 	 * Search a person by querystring
 	 *
-	 * @param      $query
-	 * @param int  $page  Number of the page with results (default first page)
-	 * @param bool $adult Whether of not to include adult movies in the results (default FALSE)
-	 *
+	 * @param string $text				Query to search after in the TMDb database
+	 * @param int $page					Number of the page with results (default first page)
+	 * @param bool $adult				Whether of not to include adult movies in the results (default FALSE)
 	 * @return TMDb result array
-	 * @throws TMDbException
-	 * @internal param string $text Query to search after in the TMDb database
 	 */
 	public function searchPerson($query, $page = 1, $adult = FALSE)
 	{
@@ -135,12 +214,9 @@ class TMDb
 	/**
 	 * Search a company by querystring
 	 *
-	 * @param     $query
-	 * @param int $page Number of the page with results (default first page)
-	 *
+	 * @param string $text				Query to search after in the TMDb database
+	 * @param int $page					Number of the page with results (default first page)
 	 * @return TMDb result array
-	 * @throws TMDbException
-	 * @internal param string $text Query to search after in the TMDb database
 	 */
 	public function searchCompany($query, $page = 1)
 	{
@@ -149,6 +225,120 @@ class TMDb
 			'page' => $page,
 		);
 		return $this->_makeCall('search/company', $params);
+	}
+
+	/**
+	 * Retrieve all basic information for a particular tv show
+	 *
+	 * @param mixed $id                 TMDb-id or IMDB-id
+	 * @param mixed $lang               Filter the result with a language (ISO 3166-1) other then default, use FALSE to retrieve results from all languages
+	 * @return TMDb result array
+	 */
+	public function getTV($id, $lang = NULL)
+	{
+		$params = array(
+			'language' => ($lang !== NULL) ? $lang : $this->getLang(),
+		);
+		return $this->_makeCall('tv/'.$id, $params);
+	}
+
+	/**
+	 * Retrieve all basic information for a particular tv show season
+	 *
+	 * @param mixed $id                 TMDb-id or IMDB-id
+	 * @param int $season_id            Season Id to query
+	 * @param mixed $lang               Filter the result with a language (ISO 3166-1) other then default, use FALSE to retrieve results from all languages
+	 * @return TMDb result array
+	 */
+	public function getTVSeason($id, $season_id, $lang = NULL)
+	{
+		$params = array(
+			'language' => ($lang !== NULL) ? $lang : $this->getLang(),
+		);
+		return $this->_makeCall('tv/'.$id.'/season/'.$season_id, $params);
+	}
+
+	/**
+	 * Retrieve cast and credits for a particular tv show season
+	 *
+	 * @param mixed $id                 TMDb-id or IMDB-id
+	 * @param int $season_id            Season Id to query
+	 * @param mixed $lang               Filter the result with a language (ISO 3166-1) other then default, use FALSE to retrieve results from all languages
+	 * @return TMDb result array
+	 */
+	public function getTVSeasonCredits($id, $season_id, $lang = NULL)
+	{
+		$params = array(
+			'language' => ($lang !== NULL) ? $lang : $this->getLang(),
+		);
+		return $this->_makeCall('tv/'.$id.'/season/'.$season_id.'/credits', $params);
+	}
+
+	/**
+	 * Retrieve images for a particular tv show season
+	 *
+	 * @param mixed $id                 TMDb-id or IMDB-id
+	 * @param int $season_id            Season Id to query
+	 * @param mixed $lang               Filter the result with a language (ISO 3166-1) other then default, use FALSE to retrieve results from all languages
+	 * @return TMDb result array
+	 */
+	public function getTVSeasonImages($id, $season_id, $lang = NULL)
+	{
+		$params = array(
+			'language' => ($lang !== NULL) ? $lang : $this->getLang(),
+		);
+		return $this->_makeCall('tv/'.$id.'/season/'.$season_id.'/images', $params);
+	}
+
+	/**
+	 * Retrieve all basic information for a particular tv show episode
+	 *
+	 * @param mixed $id                 TMDb-id or IMDB-id
+	 * @param int $season_id            Season Id to query
+	 * @param int $episode_id           Episode Id to query
+	 * @param mixed $lang               Filter the result with a language (ISO 3166-1) other then default, use FALSE to retrieve results from all languages
+	 * @return TMDb result array
+	 */
+	public function getTVEpisode($id, $season_id, $episode_id, $lang = NULL)
+	{
+		$params = array(
+			'language' => ($lang !== NULL) ? $lang : $this->getLang(),
+		);
+		return $this->_makeCall('tv/'.$id.'/season/'.$season_id.'/episode/'.$episode_id, $params);
+	}
+
+	/**
+	 * Retrieve cast and credits for a particular tv show episode
+	 *
+	 * @param mixed $id                 TMDb-id or IMDB-id
+	 * @param int $season_id            Season Id to query
+	 * @param int $episode_id           Episode Id to query
+	 * @param mixed $lang               Filter the result with a language (ISO 3166-1) other then default, use FALSE to retrieve results from all languages
+	 * @return TMDb result array
+	 */
+	public function getTVEpisodeCredits($id, $season_id, $episode_id, $lang = NULL)
+	{
+		$params = array(
+			'language' => ($lang !== NULL) ? $lang : $this->getLang(),
+		);
+		return $this->_makeCall('tv/'.$id.'/season/'.$season_id.'/episode/'.$episode_id.'/credits', $params);
+	}
+
+	/**
+	 * Retrieve images for a particular tv show episode
+	 *
+	 * @param mixed $id                 TMDb-id or IMDB-id
+	 * @param int $season_id            Season Id to query
+	 * @param int $episode_id           Episode Id to query
+	 * @param mixed $lang               Filter the result with a language (ISO 3166-1) other then default, use FALSE to retrieve results from all languages
+	 * @return TMDb result array
+	 */
+	public function getTVEpisodeImages($id, $season_id, $episode_id, $lang = NULL)
+	{
+		$params = array(
+			'language' => ($lang !== NULL) ? $lang : $this->getLang(),
+		);
+		return $this->_makeCall('tv/'.$id.'/season/'.$season_id.'/episode/'.$episode_id.'/images', $params);
 	}
 
 	/**
@@ -177,7 +367,6 @@ class TMDb
 	{
 		$params = array(
 			'language' => ($lang !== NULL) ? $lang : $this->getLang(),
-            'append_to_response' => 'releases,trailers',
 		);
 		return $this->_makeCall('movie/'.$id, $params);
 	}
@@ -186,7 +375,7 @@ class TMDb
 	 * Retrieve alternative titles for a particular movie
 	 *
 	 * @param mixed $id					TMDb-id or IMDB-id
-	 * @params string $country			Only include titles for a particular country (ISO 3166-1)
+	 * @param string $country			Only include titles for a particular country (ISO 3166-1)
 	 * @return TMDb result array
 	 */
 	public function getMovieTitles($id, $country = NULL)
@@ -195,6 +384,19 @@ class TMDb
 			'country' => $country,
 		);
 		return $this->_makeCall('movie/'.$id.'/alternative_titles', $params);
+	}
+
+	/**
+	 * Retrieve all of the movie crew information for a particular movie.
+	 *
+	 * @see http://docs.themoviedb.apiary.io/#movies
+	 *
+	 * @param mixed $id					TMDb-id or IMDB-id
+	 * @return array TMDb result
+	 */
+	public function getMovieCredits($id)
+	{
+		return $this->_makeCall('movie/'.$id.'/credits');
 	}
 
 	/**
@@ -331,35 +533,37 @@ class TMDb
 	}
 
 	/**
-	 * Retrieve popular movies (list is updated daily)
+	 * Retrieve popular content (list is updated daily)
 	 *
-	 * @param int $page					Number of the page with results (default first page)
-	 * @param mixed $lang				Filter the result with a language (ISO 3166-1) other then default, use FALSE to retrieve results from all languages
+	 * @param string $type              Type of content to search ('movie' or 'tv'; default movie)
+	 * @param int $page                 Number of the page with results (default first page)
+	 * @param mixed $lang               Filter the result with a language (ISO 3166-1) other then default, use FALSE to retrieve results from all languages
 	 * @return TMDb result array
 	 */
-	public function getPopularMovies($page = 1, $lang = NULL)
+	public function getPopular($type = 'movie', $page = 1, $lang = NULL)
 	{
 		$params = array(
 			'page' => (int) $page,
 			'language' => ($lang !== NULL) ? $lang : $this->getLang(),
 		);
-		return $this->_makeCall('movie/popular', $params);
+		return $this->_makeCall($type.'/popular', $params);
 	}
 
 	/**
-	 * Retrieve top-rated movies
+	 * Retrieve top-rated content
 	 *
-	 * @param int $page					Number of the page with results (default first page)
-	 * @param mixed $lang				Filter the result with a language (ISO 3166-1) other then default, use FALSE to retrieve results from all languages
+	 * @param string $type              Type of content to search ('movie' or 'tv'; default movie)
+	 * @param int $page                 Number of the page with results (default first page)
+	 * @param mixed $lang               Filter the result with a language (ISO 3166-1) other then default, use FALSE to retrieve results from all languages
 	 * @return TMDb result array
 	 */
-	public function getTopRatedMovies($page = 1, $lang = NULL)
+	public function getTopRated($type = 'movie', $page = 1, $lang = NULL)
 	{
 		$params = array(
 			'page' => (int) $page,
 			'language' => ($lang !== NULL) ? $lang : $this->getLang(),
 		);
-		return $this->_makeCall('movie/top_rated', $params);
+		return $this->_makeCall($type.'/top_rated', $params);
 	}
 
 	/**
@@ -405,16 +609,17 @@ class TMDb
 	/**
 	 * Retrieve all cast and crew information for a particular person
 	 *
-	 * @param int $id					TMDb person-id
-	 * @param mixed $lang				Filter the result with a language (ISO 3166-1) other then default, use FALSE to retrieve results from all languages
+	 * @param int $id                   TMDb person-id
+	 * @param string $type              Type of content to search ('combined', movie' or 'tv'; default combined)
+	 * @param mixed $lang               Filter the result with a language (ISO 3166-1) other then default, use FALSE to retrieve results from all languages
 	 * @return TMDb result array
 	 */
-	public function getPersonCredits($id, $lang = NULL)
+	public function getPersonCredits($id, $type = 'combined', $lang = NULL)
 	{
 		$params = array(
 			'language' => ($lang !== NULL) ? $lang : $this->getLang(),
 		);
-		return $this->_makeCall('person/'.$id.'/credits', $params);
+		return $this->_makeCall('person/'.$id.'/'.$type.'_credits', $params);
 	}
 
 	/**
@@ -685,12 +890,10 @@ class TMDb
 	/**
 	 * Add a rating to a movie
 	 *
-	 * @param string    $session_id Set session_id for the account you want to retrieve information from
-	 * @param int       $movie_id   TMDb movie-id
-	 * @param float|int $value      Value between 1 and 10
-	 *
+	 * @param string $session_id		Set session_id for the account you want to retrieve information from
+	 * @param int $movie_id				TMDb movie-id
+	 * @param float $value				Value between 1 and 10
 	 * @return TMDb result array
-	 * @throws TMDbException
 	 */
 	public function addMovieRating($session_id = NULL, $movie_id = 0, $value = 0)
 	{
@@ -721,12 +924,10 @@ class TMDb
 	/**
 	 * Get Image URL
 	 *
-	 * @param string $filepath  Filepath to image
-	 * @param const  $imagetype Image type: TMDb::IMAGE_BACKDROP, TMDb::IMAGE_POSTER, TMDb::IMAGE_PROFILE
-	 * @param string $size      Valid size for the image
-	 *
+	 * @param string $filepath			Filepath to image
+	 * @param const $imagetype			Image type: TMDb::IMAGE_BACKDROP, TMDb::IMAGE_POSTER, TMDb::IMAGE_PROFILE
+	 * @param string $size				Valid size for the image
 	 * @return string
-	 * @throws TMDbException
 	 */
 	public function getImageUrl($filepath, $imagetype, $size)
 	{
@@ -755,10 +956,8 @@ class TMDb
 	/**
 	 * Get available image sizes for a particular image type
 	 *
-	 * @param const $imagetype Image type: TMDb::IMAGE_BACKDROP, TMDb::IMAGE_POSTER, TMDb::IMAGE_PROFILE
-	 *
+	 * @param const $imagetype			Image type: TMDb::IMAGE_BACKDROP, TMDb::IMAGE_POSTER, TMDb::IMAGE_PROFILE
 	 * @return array
-	 * @throws TMDbException
 	 */
 	public function getAvailableImageSizes($imagetype)
 	{
@@ -789,13 +988,11 @@ class TMDb
 	/**
 	 * Makes the call to the API
 	 *
-	 * @param string       $function   API specific function name for in the URL
-	 * @param array        $params     Unencoded parameters for in the URL
-	 * @param string       $session_id Session_id for authentication to the API for specific API methods
-	 * @param const|string $method     TMDb::GET or TMDb:POST (default TMDb::GET)
-	 *
+	 * @param string $function			API specific function name for in the URL
+	 * @param array $params				Unencoded parameters for in the URL
+	 * @param string $session_id		Session_id for authentication to the API for specific API methods
+	 * @param const $method				TMDb::GET or TMDb:POST (default TMDb::GET)
 	 * @return TMDb result array
-	 * @throws TMDbException
 	 */
 	private function _makeCall($function, $params = NULL, $session_id = NULL, $method = TMDb::GET)
 	{
@@ -811,9 +1008,14 @@ class TMDb
 
 		if($method === TMDb::GET)
 		{
-			if(isset($params['language']) && $params['language'] === FALSE)
+			if(isset($params['language']) AND $params['language'] === FALSE)
 			{
 				unset($params['language']);
+			}
+
+			if(isset($params['include_adult']))
+			{
+				$params['include_adult'] = ($params['include_adult'] ? 'true' : 'false');
 			}
 
 			$url .= ( ! empty($params)) ? '&'.http_build_query($params, '', '&') : '';
@@ -848,18 +1050,34 @@ class TMDb
 			curl_setopt($ch, CURLOPT_HEADER, 1);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
+			$this->incRequests();
+			curl_setopt_array($ch, Utility::curlSslContextOptions());
 			$response = curl_exec($ch);
 
 			$header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
 			$header = substr($response, 0, $header_size);
 			$body = substr($response, $header_size);
 
+			$http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 			$error_number = curl_errno($ch);
 			$error_message = curl_error($ch);
 
+			// If temp banned, you need to wait for 10 sec
+			if($http_status == 503 or $http_status == 0)
+			{
+				if ( $this->_retries < 3 )
+				{
+					$this->_retries += 1;
+					echo "\nTMDB limits exceeded, sleeping for 10 seconds.";
+					usleep( 10 *1000*1000 );
+					return $this->_makeCall($function, $params, $session_id, $method);
+				}
+			}
+			$this->_retries = 0;
+
 			if($error_number > 0)
 			{
-				throw new TMDbException('Method failed: '.$function.' - '.$error_message);
+				throw new TMDbException('Method failed: '.$function.' - HTTP Status '.$http_status.' Curl Errno '.$error_number.' Curl Error '.$error_message);
 			}
 
 			curl_close($ch);
@@ -887,7 +1105,7 @@ class TMDb
 		}
 		else
 		{
-			//throw new TMDbException('Server error on "'.$url.'": '.$response);
+			throw new TMDbException('Server error on "'.$url.'": '.$response);
 		}
 	}
 
@@ -972,4 +1190,6 @@ class TMDb
  *
  * @author Jonas De Smet - Glamorous
  */
-class TMDbException extends Exception{}
+class TMDbException extends Exception
+{
+}
