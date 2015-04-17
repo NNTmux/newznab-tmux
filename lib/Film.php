@@ -263,7 +263,7 @@ class Film
 	 *
 	 * @return int
 	 */
-	public function getMovieCount($cat, $maxAge = -1, $excludedCats = array())
+	public function getMovieCount($cat, $maxAge = -1, $excludedCats = [])
 	{
 		$catsrch = '';
 		if (count($cat) > 0 && $cat[0] != -1) {
@@ -304,7 +304,7 @@ class Film
 	 *
 	 * @return bool|PDOStatement
 	 */
-	public function getMovieRange($cat, $start, $num, $orderBy, $maxAge = -1, $excludedCats = array())
+	public function getMovieRange($cat, $start, $num, $orderBy, $maxAge = -1, $excludedCats = [])
 	{
 		$catsrch = '';
 		if (count($cat) > 0 && $cat[0] != -1) {
@@ -427,7 +427,7 @@ class Film
 		}
 
 		$tmpArr = explode(', ', $data[$field]);
-		$newArr = array();
+		$newArr = [];
 		$i = 0;
 		foreach ($tmpArr as $ta) {
 			if ($i > 5) {
@@ -542,7 +542,7 @@ class Film
 		// Check FanArt.tv for background images.
 		$fanart = $this->fetchFanartTVProperties($imdbId);
 
-		$mov = array();
+		$mov = [];
 
 		$mov['cover'] = $mov['backdrop'] = $mov['banner'] = $movieID = 0;
 		$mov['type'] = $mov['director'] = $mov['actors'] = $mov['language'] = '';
@@ -688,7 +688,7 @@ class Film
 				if (isset($art['status']) && $art['status'] === 'error') {
 					return false;
 				}
-				$ret = array();
+				$ret = [];
 				if (isset($art['moviebackground'][0]['url'])) {
 					$ret['backdrop'] = $art['moviebackground'][0]['url'];
 				} elseif (isset($art['moviethumb'][0]['url'])) {
@@ -738,7 +738,7 @@ class Film
 			return false;
 		}
 
-		$ret = array();
+		$ret = [];
 		$ret['title'] = $tmdbLookup['title'];
 
 		if ($this->currentTitle !== '') {
@@ -778,7 +778,7 @@ class Film
 			$ret['year'] = date("Y", strtotime($tmdbLookup['release_date']));
 		}
 		if (isset($tmdbLookup['genres']) && sizeof($tmdbLookup['genres']) > 0) {
-			$genres = array();
+			$genres = [];
 			foreach ($tmdbLookup['genres'] as $genre) {
 				$genres[] = $genre['name'];
 			}
@@ -828,7 +828,7 @@ class Film
 			);
 
 		if ($buffer !== false) {
-			$ret = array();
+			$ret = [];
 			foreach ($imdb_regex as $field => $regex) {
 				if (preg_match($regex, $buffer, $matches)) {
 					$match = $matches[1];
@@ -837,7 +837,7 @@ class Film
 				}
 			}
 
-			$matches = array();
+			$matches = [];
 			foreach ($imdb_regex_multi as $field => $regex) {
 				if (preg_match_all($regex, $buffer, $matches)) {
 					$match2 = $matches[1];

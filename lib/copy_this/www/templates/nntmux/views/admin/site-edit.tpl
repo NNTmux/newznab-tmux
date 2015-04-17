@@ -657,14 +657,6 @@
 		<div class="hint">The url to use to translate allfilled style reqid usenet posts into real release titles. Leave blank to not perform lookup.</div>
 	</td>
 </tr>
-<tr>
-	<td><label for="lookupnfo">Lookup Nfo</label>:</td>
-	<td>
-		{html_radios id="lookupnfo" name='lookupnfo' values=$yesno_ids output=$yesno_names selected=$fsite->lookupnfo separator='<br />'}
-		<div class="hint">Whether to attempt to retrieve the an nfo file from usenet when processing binaries.<br/><strong>NOTE: disabling nfo lookups will disable movie lookups.</strong></div>
-	</td>
-</tr>
-
 	<tr>
 		<td style="width:180px;"><label for="lookuptvrage">Lookup TV:</label></td>
 		<td>
@@ -1265,18 +1257,6 @@
 		</tr>
 
 		<tr>
-			<td style="width:180px;"><label for="maxnfoprocessed">Maximum NFO files per run:</label></td>
-			<td>
-				<input class="short" id="maxnfoprocessed" name="maxnfoprocessed" type="text"
-					   value="{$fsite->maxnfoprocessed}"/>
-
-				<div class="hint">The maximum amount of NFO files to process per run. This uses NNTP an connection, 1
-					per thread. This does not query Amazon.
-				</div>
-			</td>
-		</tr>
-
-		<tr>
 			<td style="width:180px;"><label for="maxrageprocessed">Maximum TVRage per run:</label></td>
 			<td>
 				<input class="short" id="maxrageprocessed" name="maxrageprocessed" type="text"
@@ -1372,6 +1352,51 @@
 
 	</table>
 </fieldset>
+
+	<fieldset id="site_nfoprocessing">
+		<legend>NFO Processing Settings</legend>
+		<table class="input">
+			<tr>
+				<td style="width:180px;"><label for="lookupnfo">Lookup NFO:</label></td>
+				<td>
+					{html_radios id="lookupnfo" name='lookupnfo' values=$yesno_ids output=$yesno_names selected=$fsite->lookupnfo separator='<br />'}
+					<div class="hint">Whether to attempt to retrieve an nfo file from usenet.<br/>
+						<strong>NOTE: disabling nfo lookups will disable movie lookups.</strong>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td style="width:180px;"><label for="maxnfoprocessed">Maximum NFO files per run:</label></td>
+				<td>
+					<input class="short" id="maxnfoprocessed" name="maxnfoprocessed" type="text" value="{$fsite->maxnfoprocessed}"/>
+					<div class="hint">The maximum amount of NFO files to process per run. This uses NNTP an connection, 1
+						per thread. This does not query Amazon.
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td style="width:180px;"><label for="maxsizetoprocessnfo">Maximum Release Size to process NFOs:</label></td>
+				<td>
+					<input class="short" id="maxsizetoprocessnfo" name="maxsizetoprocessnfo" type="text" value="{$fsite->maxsizetoprocessnfo}"/>
+					<div class="hint">The maximum size in gigabytes of a release to process it for NFOs. If set to 0, then ignored.</div>
+				</td>
+			</tr>
+			<tr>
+				<td style="width:180px;"><label for="minsizetoprocessnfo">Minimum Release Size to process NFOs:</label></td>
+				<td>
+					<input class="short" id="minsizetoprocessnfo" name="minsizetoprocessnfo" type="text" value="{$fsite->minsizetoprocessnfo}"/>
+					<div class="hint">The minimum size in megabytes of a release to process it for NFOs. If set to 0, then ignored.</div>
+				</td>
+			</tr>
+			<tr>
+				<td style="width:180px;"><label for="maxnforetries">Maximum amount of times to redownload a NFO:</label></td>
+				<td>
+					<input class="short" id="maxnforetries" name="maxnforetries" type="text" value="{$fsite->maxnforetries}"/>
+					<div class="hint">How many times to retry when a NFO fails to download. If set to 0, we will not retry. The max is 7.</div>
+				</td>
+			</tr>
+		</table>
+	</fieldset>
 
 <fieldset>
 	<legend>Connection Settings</legend>
