@@ -34,11 +34,11 @@ define('NN_MULTI', NN_NIX . 'multiprocessing' . DS);
 //refers to tmux folder
 define('NN_TMUX', NN_NIX . 'tmux' . DS);
 
-// Refers to the covers folder
-define('NN_COVERS', NN_WWW . 'covers' .DS);
-
 // Used to refer to the resources folder
 define('NN_RES', NN_ROOT . 'resources' . DS);
+
+// Refers to the covers folder
+define('NN_COVERS', NN_RES . 'covers' .DS);
 
 // Used to refer to the tmp folder
 define('NN_TMP', NN_RES . 'tmp' . DS);
