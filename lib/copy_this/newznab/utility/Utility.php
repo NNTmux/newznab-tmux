@@ -1025,7 +1025,7 @@ class Utility
 	}
 
 // Convert obj to array.
-	public function objectsIntoArray($arrObjData, $arrSkipIndices = [])
+	public static function objectsIntoArray($arrObjData, $arrSkipIndices = [])
 	{
 		$arrData = [];
 
@@ -1058,7 +1058,7 @@ class Utility
 	 *
 	 * @return array
 	 */
-	public function runCmd($command, $debug = false)
+	public static function runCmd($command, $debug = false)
 	{
 		$nl = PHP_EOL;
 		if (Utility::isWindows() && strpos(phpversion(), "5.2") !== false) {
@@ -1087,12 +1087,12 @@ class Utility
 	 *
 	 * @return string
 	 */
-	public function safeFilename($filename)
+	public static function safeFilename($filename)
 	{
 		return trim(preg_replace('/[^\w\s.-]*/i', '', $filename));
 	}
 
-	public function generateUuid()
+	public static function generateUuid()
 	{
 		$key = sprintf
 		(
@@ -1130,7 +1130,7 @@ class Utility
 		return (substr($haystack, $start) === $needle);
 	}
 
-	public function responseXmlToObject($input)
+	public static function responseXmlToObject($input)
 	{
 		$input = str_replace('<newznab:', '<', $input);
 		$xml = @simplexml_load_string($input);

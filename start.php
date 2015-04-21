@@ -8,7 +8,7 @@
  */
 use newznab\db\DB;
 
-$pdo = new newznab\db\DB();
+$pdo = new DB();
 
 $tmux = new \Tmux();
 $tmux_settings = $tmux->get();
