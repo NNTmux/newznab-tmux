@@ -6,6 +6,8 @@
  *
  * It will start the tmux server and monitoring scripts if needed.
  */
+require_once realpath(__DIR__ . '/../../../../www/config.php');
+
 use newznab\db\DB;
 
 $pdo = new DB();
