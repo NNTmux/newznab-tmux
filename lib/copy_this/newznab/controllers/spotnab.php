@@ -933,7 +933,7 @@ class SpotNab {
 					continue;
 				}
 
-				$nzbInfo = new NzbInfo();
+				$nzbInfo = new NZBInfo();
 				if (!$nzbInfo->loadFromFile($nzbfile))
 				{
 					if($delete_broken_releases){
