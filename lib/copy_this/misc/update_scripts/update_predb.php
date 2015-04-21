@@ -1,5 +1,5 @@
 <?php
-require_once("./config.php");
+require_once("config.php");
 
 $p = new PreDB(true);
 $p->nzpreUpdate();

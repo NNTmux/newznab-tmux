@@ -21,7 +21,7 @@ class PostAniDB
 	public $padb;
 
 	/**
-	 * @var newznab\db\DB
+	 * @var \newznab\db\DB
 	 */
 	public $pdo;
 

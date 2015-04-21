@@ -12,6 +12,9 @@
  * @version 1.6
  * @license BSD http://www.opensource.org/licenses/bsd-license.php
  */
+
+use newznab\utility\Utility;
+
 class TMDb
 {
 	const POST = 'post';

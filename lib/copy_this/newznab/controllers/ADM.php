@@ -2,6 +2,8 @@
 
 require_once NN_LIBS . 'simple_html_dom.php';
 
+use newznab\utility\Utility;
+
 class ADM
 {
 	/**
