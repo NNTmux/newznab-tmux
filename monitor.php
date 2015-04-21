@@ -27,7 +27,7 @@ $show_time = (NN_DEBUG ? "/usr/bin/time" : "");
 $runVar['commands']['_php'] = $show_time . " nice -n{$tmux_niceness} $PHP";
 $runVar['commands']['_phpn'] = "nice -n{$tmux_niceness} $PHP";
 $runVar['commands']['_python'] = $show_time . " nice -n{$tmux_niceness} $PYTHON";
-$runVar['commands']['_sleep'] = "{$runVar['commands']['_phpn']} {$runVar['paths']['lib']}showsleep.php";
+$runVar['commands']['_sleep'] = "{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}update_scripts/nix_scripts/tmux/bin/showsleep.php";
 
 //spawn IRCScraper as soon as possible
 $tRun->runPane('scraper', $runVar);

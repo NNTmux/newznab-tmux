@@ -1,4 +1,5 @@
 <?php
+require_once(dirname(__FILE__)."/../bin/config.php");
 
 use newznab\db\DB;
 
