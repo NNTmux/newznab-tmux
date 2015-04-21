@@ -1,5 +1,4 @@
 <?php
-require_once(WWW_DIR."/lib/util.php");
 
 /**
  * TMDb PHP API class - API 'themoviedb.org'

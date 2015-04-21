@@ -16,7 +16,7 @@ spl_autoload_register(
 
 		foreach ($paths as $path)
 		{
-			$spec = str_replace('\\', DIRECTORY_SEPARATOR, $path . $className . '.php');
+			$spec = str_replace('\\', DIRECTORY_SEPARATOR, $path . strtolower($className) . '.php');
 			if (file_exists($spec)) {
 				require_once $spec;
 				break;

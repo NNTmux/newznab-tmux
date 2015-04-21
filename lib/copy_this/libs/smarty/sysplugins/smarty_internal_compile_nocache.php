@@ -16,28 +16,33 @@
  */
 class Smarty_Internal_Compile_Nocache extends Smarty_Internal_CompileBase
 {
-	/**
-	 * Compiles code for the {nocache} tag
-	 * This tag does not generate compiled output. It only sets a compiler flag.
-	 *
-	 * @param  array  $args     array with attributes from parser
-	 * @param  object $compiler compiler object
-	 *
-	 * @return bool
-	 */
-	public function compile($args, $compiler)
-	{
-		$_attr = $this->getAttributes($compiler, $args);
-		if ($_attr['nocache'] === true) {
-			$compiler->trigger_template_error('nocache option not allowed', $compiler->lex->taglineno);
-		}
-		// enter nocache mode
-		$compiler->nocache = true;
-		// this tag does not return compiled code
-		$compiler->has_code = false;
+    /**
+     * Array of names of valid option flags
+     *
+     * @var array
+     */
+    public $option_flags = array();
 
-		return true;
-	}
+    /**
+     * Compiles code for the {nocache} tag
+     * This tag does not generate compiled output. It only sets a compiler flag.
+     *
+     * @param  array  $args     array with attributes from parser
+     * @param  object $compiler compiler object
+     *
+     * @return bool
+     */
+    public function compile($args, $compiler)
+    {
+        $_attr = $this->getAttributes($compiler, $args);
+        $this->openTag($compiler, 'nocache', array($compiler->nocache));
+        // enter nocache mode
+        $compiler->nocache = true;
+        // this tag does not return compiled code
+        $compiler->has_code = false;
+
+        return true;
+    }
 }
 
 /**
@@ -48,23 +53,23 @@ class Smarty_Internal_Compile_Nocache extends Smarty_Internal_CompileBase
  */
 class Smarty_Internal_Compile_Nocacheclose extends Smarty_Internal_CompileBase
 {
-	/**
-	 * Compiles code for the {/nocache} tag
-	 * This tag does not generate compiled output. It only sets a compiler flag.
-	 *
-	 * @param  array  $args     array with attributes from parser
-	 * @param  object $compiler compiler object
-	 *
-	 * @return bool
-	 */
-	public function compile($args, $compiler)
-	{
-		$_attr = $this->getAttributes($compiler, $args);
-		// leave nocache mode
-		$compiler->nocache = false;
-		// this tag does not return compiled code
-		$compiler->has_code = false;
+    /**
+     * Compiles code for the {/nocache} tag
+     * This tag does not generate compiled output. It only sets a compiler flag.
+     *
+     * @param  array  $args     array with attributes from parser
+     * @param  object $compiler compiler object
+     *
+     * @return bool
+     */
+    public function compile($args, $compiler)
+    {
+        $_attr = $this->getAttributes($compiler, $args);
+        // leave nocache mode
+        list($compiler->nocache) = $this->closeTag($compiler, array('nocache'));
+        // this tag does not return compiled code
+        $compiler->has_code = false;
 
-		return true;
-	}
+        return true;
+    }
 }

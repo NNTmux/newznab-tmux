@@ -1,10 +1,13 @@
 <?php
 namespace newznab\processing\post;
 
+require_once NN_LIBS . 'rarinfo/archiveinfo.php';
+require_once NN_LIBS . 'rarinfo/par2info.php';
+
 use newznab\db\DB;
 use newznab\utility\Utility;
 
-Class ProcessAdditional
+class ProcessAdditional
 {
 	/**
 	 * How many compressed (rar/zip) files to check.
@@ -454,7 +457,7 @@ Class ProcessAdditional
 		}
 
 		if (!is_dir($this->_mainTmpPath)) {
-			throw new \ProcessAdditionalException('Could create the tmpunrar folder (' . $this->_mainTmpPath . ')');
+			throw new ProcessAdditionalException('Could create the tmpunrar folder (' . $this->_mainTmpPath . ')');
 		}
 
 		$this->_clearMainTmpPath();
@@ -697,7 +700,7 @@ Class ProcessAdditional
 		}
 
 		// Sort the files inside the NZB.
-		usort($this->_nzbContents, ['ProcessAdditional', '_sortNZB']);
+		usort($this->_nzbContents, ['\newznab\processing\post\ProcessAdditional', '_sortNZB']);
 
 		return true;
 	}
@@ -2477,7 +2480,7 @@ Class ProcessAdditional
 		$this->_foundSample = (($this->_release['disablepreview'] == 1) ? true : false);
 		$this->_foundPAR2Info = false;
 
-		$this->_passwordStatus = array(Releases::PASSWD_NONE);
+		$this->_passwordStatus = array(\Releases::PASSWD_NONE);
 		$this->_releaseHasPassword = false;
 
 		$this->_releaseGroupName = $this->_groups->getByNameByID($this->_release['groupid']);
@@ -2531,4 +2534,6 @@ Class ProcessAdditional
 	}
 }
 
-class ProcessAdditionalException extends Exception { }
+class ProcessAdditionalException extends \Exception
+{
+}

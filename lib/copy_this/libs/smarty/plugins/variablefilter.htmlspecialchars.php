@@ -15,5 +15,5 @@
  */
 function smarty_variablefilter_htmlspecialchars($source)
 {
-	return htmlspecialchars($source, ENT_QUOTES, Smarty::$_CHARSET);
+    return htmlspecialchars($source, ENT_QUOTES, Smarty::$_CHARSET);
 }

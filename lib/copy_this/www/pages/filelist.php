@@ -1,7 +1,7 @@
 <?php
 
 $releases = new Releases;
-$nzb = new Nzb;
+$nzb = new NZB;
 
 if (!$users->isLoggedIn())
 	$page->show403();
