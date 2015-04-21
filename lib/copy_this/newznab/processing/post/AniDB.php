@@ -1,9 +1,9 @@
 <?php
 namespace newznab\processing\post;
 
-use newznab\db\DB;
+use \newznab\db\DB;
 
-class PostAniDB
+class AniDB
 {
 	const PROC_EXTFAIL = -1; // Release Anime title/episode # could not be extracted from searchname
 	const PROC_NOMATCH = -2; // AniDB id was not found in anidb table using extracted title/episode #
@@ -81,7 +81,7 @@ class PostAniDB
 
 			$this->doRandomSleep();
 
-			$this->padb = new \PopulateAniDB([
+			$this->padb = new \newznab\db\populate\AniDB([
 														   'Echo'     => $this->echooutput,
 														   'Settings' => $this->pdo
 													   ]);

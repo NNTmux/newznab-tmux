@@ -1,10 +1,12 @@
 <?php
+namespace newznab\db\populate;
+
 require_once NN_LIBS . 'simple_html_dom.php';
 
 use newznab\db\DB;
 
 
-class PopulateAniDB
+class AniDB
 {
 	const CLIENT_VERSION = 2;
 

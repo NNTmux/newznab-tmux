@@ -2,7 +2,7 @@
 namespace newznab\processing;
 
 use \newznab\db\DB;
-use \newznab\processing\post\PostAniDB;
+use \newznab\processing\post\AniDB;
 use \newznab\processing\post\ProcessAdditional;
 
 require_once NN_LIBS . 'rarinfo/par2info.php';
@@ -136,7 +136,7 @@ class PProcess
 	public function processAnime()
 	{
 		if ($this->site->lookupanidb != 0) {
-			(new PostAniDB(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processAnimeReleases();
+			(new AniDB(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processAnimeReleases();
 		}
 	}
 
