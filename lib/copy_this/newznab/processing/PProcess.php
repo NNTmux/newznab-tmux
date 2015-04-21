@@ -86,7 +86,7 @@ class PProcess
 		//\\ Various.
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
 		//\\
-		$s = new Sites();
+		$s = new \Sites();
 		$this->site = $s->get();
 		//\\ Class instances.
 		$this->pdo = (($options['Settings'] instanceof DB) ? $options['Settings'] : new DB());
