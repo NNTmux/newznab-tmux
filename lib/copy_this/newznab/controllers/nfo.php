@@ -622,7 +622,7 @@ class Nfo
 	}
 
 	/**
-	 * Process Nfo's
+	 * Process NFO's
 	 */
 	public function processNfoFiles($batch=50)
 	{
