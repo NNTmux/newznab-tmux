@@ -1,10 +1,8 @@
 <?php
 
 require_once(dirname(__FILE__) . "/config.php");
-require_once(WWW_DIR . "/lib/groups.php");
-require_once(WWW_DIR . "/lib/binaries.php");
-require_once(WWW_DIR . "/lib/ColorCLI.php");
-require_once(WWW_DIR . "/lib/ConsoleTools.php");
+
+
 $time = TIME();
 $c = new ColorCLI();
 

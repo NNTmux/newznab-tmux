@@ -1,7 +1,6 @@
 <?php
-require_once(dirname(__FILE__) . "/../../../bin/config.php");
-require_once(WWW_DIR . "/lib/framework/db.php");
-require_once(WWW_DIR . "/lib/util.php");
+
+use newznab\db\DB;
 
 
 $pdo = new DB();

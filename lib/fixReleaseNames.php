@@ -7,12 +7,7 @@
  * If you used the 4th argument yes, but you want to reset the status,
  * there is another script called resetRelnameStatus.php
  */
-require_once("namefixer.php");
-require_once("prehash.php");
-require_once(WWW_DIR . "/lib/ColorCLI.php");
-require_once(WWW_DIR . "/lib/nntp.php");
-require_once(WWW_DIR . "/lib/site.php");
-require_once(WWW_DIR . "/lib/framework/db.php");
+use newznab\db\DB;
 
 
 $n = "\n";

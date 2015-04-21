@@ -1,9 +1,7 @@
 <?php
 //This script downloads covert art for Tv Shows -- it is intended to be run at interval, generally after the TvRage database is populated
-require_once(dirname(__FILE__) . "/../../../bin/config.php");
-require_once (NN_LIB . 'framework' . DS . 'db.php');
-require_once (NN_TMUX . 'lib' . DS . 'TvAnger.php');
-require_once (NN_LIB . 'util.php');
+use newznab\db\DB;
+use newznab\utility\Utility;
 
 
 $pdo = new DB();

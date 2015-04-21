@@ -1,8 +1,4 @@
 <?php
-require_once(WWW_DIR."/lib/releases.php");
-require_once(WWW_DIR."/lib/groups.php");
-require_once(WWW_DIR."/lib/category.php");
-require_once(WWW_DIR."/lib/ReleaseSearch.php");
 
 
 if (!$users->isLoggedIn()) {

@@ -4,9 +4,8 @@
    pre-fetching groupid and other data for faster inclusion in the main query.
 */
 
-require_once(dirname(__FILE__) . "/../../bin/config.php");
-require_once(WWW_DIR."/lib/util.php");
-require_once(WWW_DIR."/lib/framework/db.php");
+use newznab\db\DB;
+use newznab\utility\Utility;
 
 $config = dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR .
 		  'config.php';
@@ -73,7 +72,7 @@ if ($result) {
 	exec('clear');
 	$all_matches = array_unique($all_matches[1]);
 	$total       = count($all_matches);
-	$pdo         = new \DB();
+	$pdo         = new DB();
 
 	if ($argv[1] != 'progress') {
 		$progress['last'] = !is_numeric($argv[1]) ? time() : $argv[1];

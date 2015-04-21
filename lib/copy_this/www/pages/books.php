@@ -1,6 +1,4 @@
 <?php
-require_once(WWW_DIR."/lib/book.php");
-require_once(WWW_DIR."/lib/category.php");
 
 $b = new Book;
 

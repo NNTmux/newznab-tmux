@@ -5,16 +5,11 @@ if (!isset($argv[1])) {
 }
 
 require_once dirname(__FILE__) . '/../../../../../www/config.php';
-require_once(WWW_DIR . "/lib/framework/db.php");
-require_once(WWW_DIR . "/lib/binaries.php");
-require_once(WWW_DIR . "/lib/releases.php");
-require_once(WWW_DIR . "/lib/groups.php");
-require_once(WWW_DIR . "/lib/backfill.php");
-require_once(WWW_DIR . "/lib/nntp.php");
-require_once(WWW_DIR . "/lib/site.php");
-require_once(WWW_DIR . "/processing/ProcessReleases.php");
-require_once(NN_LIB . 'RequestIDLocal.php');
 
+use \newznab\db\DB;
+use \newznab\processing\PProcess;
+use \newznab\processing\ProcessReleases;
+use \newznab\processing\post\ProcessAdditional;
 
 // Are we coming from python or php ? $options[0] => (string): python|php
 // The type of process we want to do: $options[1] => (string): releases
@@ -27,7 +22,7 @@ switch ($options[1]) {
 	// $options[3] => (int)   backfill type from tmux settings. 1 = Backfill interval , 2 = Bakfill all
 	case 'backfill':
 		if (in_array((int)$options[3], [1, 2])) {
-			$pdo = new \DB();
+			$pdo = new DB();
 			$value = $pdo->queryOneRow("SELECT value FROM tmux WHERE setting = 'backfill_qty'");
 			if ($value !== false) {
 				$nntp = nntp($pdo);
@@ -42,7 +37,7 @@ switch ($options[1]) {
 	 * $options[3] => (int)    Quantity of articles to download.
 	 */
 	case 'backfill_all_quantity':
-		$pdo = new \DB();
+		$pdo = new DB();
 		$nntp = nntp($pdo);
 		(new \Backfill())->backfillAllGroups($options[2], $options[3]);
 		break;
@@ -50,7 +45,7 @@ switch ($options[1]) {
 	// BackFill a single group, 10000 parts.
 	// $options[2] => (string)group name, Name of group to work on.
 	case 'backfill_all_quick':
-		$pdo = new \DB();
+		$pdo = new DB();
 		$nntp = nntp($pdo);
 		(new \Backfill())->backfillAllGroups($options[2], 10000, 'normal');
 		break;
@@ -64,7 +59,7 @@ switch ($options[1]) {
 	 * $options[6] => (int)    Number of threads.
 	 */
 	case 'get_range':
-		$pdo = new \DB();
+		$pdo = new DB();
 		$nntp = nntp($pdo);
 		$groups = new \Groups();
 		$s = new Sites();
@@ -131,7 +126,7 @@ switch ($options[1]) {
 	 * $options[2] => (string) Group name.
 	 */
 	case 'part_repair':
-		$pdo = new \DB();
+		$pdo = new DB();
 		$groups = new \Groups(['Settings' => $pdo]);
 		$groupMySQL = $groups->getByName($options[2]);
 		$nntp = nntp($pdo);
@@ -148,7 +143,7 @@ switch ($options[1]) {
 	// Process releases.
 	// $options[2] => (string)groupCount, number of groups terminated by _ | (int)groupid, group to work on
 	case 'releases':
-		$pdo = new \DB();
+		$pdo = new DB();
 		$releases = new ProcessReleases(['Settings' => $pdo]);
 
 		//Runs function that are per group
@@ -188,7 +183,7 @@ switch ($options[1]) {
 	 * $options[2] => (string) Group name.
 	 */
 	case 'update_group_headers':
-		$pdo = new \DB();
+		$pdo = new DB();
 		$nntp = nntp($pdo);
 		$groups = new \Groups();
 		$groupMySQL = $groups->getByName($options[2]);
@@ -201,7 +196,7 @@ switch ($options[1]) {
 	case 'update_per_group':
 		if (is_numeric($options[2])) {
 
-			$pdo = new \DB();
+			$pdo = new DB();
 
 			// Get the group info from MySQL.
 			$groupMySQL = $pdo->queryOneRow(sprintf('SELECT * FROM groups WHERE id = %d', $options[2]));
@@ -224,7 +219,7 @@ switch ($options[1]) {
 			processReleases(new \Releases(['Settings' => $pdo]), $options[2]);
 
 			// Post process the releases.
-			(new \ProcessAdditional(['Echo' => true, 'NNTP' => $nntp, 'Settings' => $pdo]))->start($options[2]);
+			(new ProcessAdditional(['Echo' => true, 'NNTP' => $nntp, 'Settings' => $pdo]))->start($options[2]);
 			(new \Info(['Echo' => true, 'Settings' => $pdo]))->processNfoFiles($nntp, $options[2]);
 
 		}
@@ -235,7 +230,7 @@ switch ($options[1]) {
 	case 'pp_additional':
 	case 'pp_nfo':
 		if (charCheck($options[2])) {
-			$pdo = new \DB();
+			$pdo = new DB();
 
 			// Create the connection here and pass, this is for post processing, so check for alternate.
 			$nntp = nntp($pdo, true);
@@ -243,7 +238,7 @@ switch ($options[1]) {
 			if ($options[1] === 'pp_nfo') {
 				(new \Info(['Echo' => true, 'Settings' => $pdo]))->processNfoFiles($nntp, '', $options[2]);
 			} else {
-				(new \ProcessAdditional(['Echo' => true, 'NNTP' => $nntp, 'Settings' => $pdo]))->start('', $options[2]);
+				(new ProcessAdditional(['Echo' => true, 'NNTP' => $nntp, 'Settings' => $pdo]))->start('', $options[2]);
 			}
 		}
 		break;
@@ -255,8 +250,8 @@ switch ($options[1]) {
 	 */
 	case 'pp_movie':
 		if (charCheck($options[2])) {
-			$pdo = new \DB();
-			(new \PProcess(['Settings' => $pdo]))->processMovies('', $options[2], (isset($options[3]) ? $options[3] : ''));
+			$pdo = new DB();
+			(new PProcess(['Settings' => $pdo]))->processMovies('', $options[2], (isset($options[3]) ? $options[3] : ''));
 		}
 		break;
 
@@ -267,8 +262,8 @@ switch ($options[1]) {
 	 */
 	case 'pp_tv':
 		if (charCheck($options[2])) {
-			$pdo = new \DB();
-			(new \PProcess(['Settings' => $pdo]))->processTv('', $options[2], (isset($options[3]) ? $options[3] : ''));
+			$pdo = new DB();
+			(new PProcess(['Settings' => $pdo]))->processTv('', $options[2], (isset($options[3]) ? $options[3] : ''));
 		}
 		break;
 }
@@ -276,7 +271,7 @@ switch ($options[1]) {
 /**
  * Create / process releases for a groupid.
  *
- * @param \ProcessReleases $releases
+ * @param \newznab\processing\ProcessReleases $releases
  * @param int             $groupID
  */
 function processReleases($releases, $groupID)
@@ -307,7 +302,7 @@ function charCheck($char)
 /**
  * Check if the group should be processed.
  *
- * @param \DB $pdo
+ * @param \newznab\db\DB $pdo
  * @param int                $groupID
  */
 function collectionCheck(&$pdo, $groupID)
@@ -320,7 +315,7 @@ function collectionCheck(&$pdo, $groupID)
 /**
  * Connect to usenet, return NNTP object.
  *
- * @param \DB $pdo
+ * @param \newznab\db\DB $pdo
  * @param bool               $alternate Use alternate NNTP provider.
  *
  * @return NNTP

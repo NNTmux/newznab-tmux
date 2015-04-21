@@ -1,6 +1,4 @@
 <?php
-require_once(dirname(__FILE__) . "/../../bin/config.php");
-require_once(WWW_DIR . "/lib/NZBImport.php");
 $n = PHP_EOL;
 
 // Print usage.

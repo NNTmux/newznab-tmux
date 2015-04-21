@@ -1,9 +1,7 @@
 <?php
 //This script will update all records in the xxxinfo table where there is no cover
-require_once(dirname(__FILE__) . "/../../../bin/config.php");
-require_once(WWW_DIR . "/lib/framework/db.php");
-require_once(WWW_DIR . "/lib/XXX.php");
-require_once(WWW_DIR . "/lib/ColorCLI.php");
+
+use newznab\db\DB;
 
 
 $pdo = new DB();

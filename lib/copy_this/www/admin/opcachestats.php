@@ -3,8 +3,8 @@
 // #newznab-tmux : Denotes modifications done for newznab-tmux integration.
 
 /* #newznab-tmux */
-require_once("config.php");
-require_once(WWW_DIR."/lib/adminpage.php");
+require_once './config.php';
+
 $page = new AdminPage();
 $NNURL = $page->serverurl;
 /* #newznab-tmux */

@@ -1,7 +1,4 @@
 <?php
-require_once(WWW_DIR."/lib/console.php");
-require_once(WWW_DIR."/lib/category.php");
-require_once(WWW_DIR."/lib/genres.php");
 
 $console = new Console;
 $cat = new Category;

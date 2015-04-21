@@ -5,13 +5,7 @@
 if (!isset($_GET['action'])) {
 	exit();
 }
-
-require_once("config.php");
-require_once(WWW_DIR."/lib/adminpage.php");
-require_once(WWW_DIR."/lib/binaries.php");
-require_once(WWW_DIR."/lib/Regexes.php");
-require_once(WWW_DIR."/lib/groups.php");
-require_once(WWW_DIR."/lib/releasecomments.php");
+require_once './config.php';
 
 // Make sure the user is an admin and logged in.
 $admin = new AdminPage;

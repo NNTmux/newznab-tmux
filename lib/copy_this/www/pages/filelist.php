@@ -1,6 +1,4 @@
 <?php
-require_once(WWW_DIR."/lib/releases.php");
-require_once(WWW_DIR."/lib/nzb.php");
 
 $releases = new Releases;
 $nzb = new Nzb;

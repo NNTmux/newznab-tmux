@@ -1,14 +1,7 @@
 <?php
 // TODO: bunch of if/elses need converting to switches
 
-require_once(dirname(__FILE__) . "/../../../bin/config.php");
-require_once(WWW_DIR . "/lib/framework/db.php");
-require_once(WWW_DIR . "/lib/groups.php");
-require_once(WWW_DIR . "/lib/Categorize.php");
-require_once(WWW_DIR . "/lib/ColorCLI.php");
-require_once(WWW_DIR . "/lib/ConsoleTools.php");
-require_once(WWW_DIR . "/lib/releasefiles.php");
-require_once(WWW_DIR . "/lib/ReleaseCleaning.php");
+use newznab\db\DB;
 
 /*
  *

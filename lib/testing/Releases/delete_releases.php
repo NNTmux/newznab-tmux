@@ -3,9 +3,6 @@
 $n = PHP_EOL;
 
 // Include config.php
-require_once(dirname(__FILE__) . "/../../../bin/config.php");
-require_once(WWW_DIR . "/lib/ColorCLI.php");
-require_once(NN_TMUX. 'lib' . DS . 'ReleaseRemover.php');
 
 // ColorCLI class.
 $cli = new \ColorCLI();

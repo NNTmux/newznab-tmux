@@ -27,8 +27,8 @@ if (!isset($argv[1]) || !in_array($argv[1], ['1'])) {
 }
 
 require_once(dirname(__FILE__) . "/../../../bin/config.php");
-require_once(WWW_DIR . "/lib/framework/db.php");
-require_once(WWW_DIR . "/lib/site.php");
+
+use newznab\db\DB;
 
 $pdo = new DB();
 $s = new Sites();

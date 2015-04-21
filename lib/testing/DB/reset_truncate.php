@@ -1,8 +1,8 @@
 <?php
 // This script removes releases with no NZBs, resets all groups, truncates article tables. All other releases are left alone.
 require_once(dirname(__FILE__) . "/../../../bin/config.php");
-require_once(WWW_DIR . "/lib/framework/db.php");
-require_once(WWW_DIR . "/lib/site.php");
+
+use newznab\db\DB;
 
 $pdo = new DB();
 $s = new Sites();

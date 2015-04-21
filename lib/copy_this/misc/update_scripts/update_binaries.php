@@ -1,9 +1,8 @@
 <?php
 
 require_once(dirname(__FILE__) . "/config.php");
-require_once(WWW_DIR."/lib/groups.php");
-require_once(WWW_DIR."/lib/binaries.php");
-require_once(WWW_DIR."/lib/nntp.php");
+
+use newznab\db\DB;
 
 $pdo = new DB();
 

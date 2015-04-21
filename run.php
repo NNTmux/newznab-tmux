@@ -1,10 +1,7 @@
 <?php
-require_once(dirname(__FILE__)."/bin/config.php");
-require_once(WWW_DIR . "lib/framework/db.php");
-require_once (WWW_DIR.'/lib/site.php');
-require_once (WWW_DIR.'/lib/util.php');
-require_once(WWW_DIR. '/lib/Tmux.php');
-require_once(WWW_DIR . "/lib/ColorCLI.php");
+
+use newznab\db\DB;
+use newznab\utility\Utility;
 
 $db = new DB();
 $DIR = NN_TMUX;
@@ -253,7 +250,7 @@ function window_optimize($tmux_session)
 
 function window_sharing($tmux_session)
 {
-	$db = new DB();
+	$db = new newznab\db\DB();
 	$sharing = $db->queryOneRow('SELECT enabled, posting, fetching FROM sharing');
 	$t = new \Tmux();
 	$tmux = $t->get();

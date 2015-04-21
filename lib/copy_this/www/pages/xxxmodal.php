@@ -1,5 +1,4 @@
 <?php
-require_once(WWW_DIR . "/lib/XXX.php");
 
 if (!$page->users->isLoggedIn()) {
 	$page->show403();

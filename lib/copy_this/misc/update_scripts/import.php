@@ -1,15 +1,12 @@
 <?php
 
 define('FS_ROOT', realpath(dirname(__FILE__)));
-require_once(FS_ROOT . "/../../www/lib/framework/db.php");
-require_once(FS_ROOT . "/../../www/lib/releases.php");
-require_once(FS_ROOT . "/../../www/lib/nzbinfo.php");
-require_once(FS_ROOT . "/../../www/lib/util.php");
-require_once(FS_ROOT . "/../../www/lib/nzb.php");
-require_once(FS_ROOT . "/../../www/lib/category.php");
+
+use newznab\db\DB;
+use newznab\utility\Utility;
 
 $releases = new Releases();
-$db = new Db();
+$db = new newznab\db\DB();
 $cat = new Category();
 $releaseRegex = new ReleaseRegex();
 $nzb = new NZB();
@@ -23,7 +20,7 @@ $categoryoverride = -1;
 if (empty($argc) || $argc <= 1) {
 	$path = "./";
 } else {
-	$util = new Utility();
+	$util = new newznab\utility\Utility();
 	$path = (!$util->endsWith($argv[1], "/") ? $argv[1] . "/" : $argv[1]);
 	if (isset($argv[2]))
 		$usefilename = strtolower($argv[2]) == 'true';
@@ -151,7 +148,7 @@ foreach ($filestoprocess as $nzbFile) {
 							$db->escapeString(md5($postFile["subject"] . $postFile["poster"] . $groupID)),
 							$regexMatches['regcatid'],
 							$regexMatches['regexid'], $db->escapeString($regexMatches['reqid']),
-							Releases::PROCSTAT_TITLEMATCHED, $relparts[0], $relparts[1], $db->escapeString(str_replace('_', ' ', $regexMatches['name']))
+							\Releases::PROCSTAT_TITLEMATCHED, $relparts[0], $relparts[1], $db->escapeString(str_replace('_', ' ', $regexMatches['name']))
 						);
 						$binaryId = $db->queryInsert($sql);
 						$numbins++;
