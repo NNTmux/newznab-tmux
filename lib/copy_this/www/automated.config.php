@@ -58,7 +58,7 @@ if (function_exists('ini_set') && function_exists('ini_get')) {
 define('SMARTY_DIR', NN_LIBS . 'smarty' . DS);
 
 //
-// used to refer to the /www/lib class files
+// used to refer to the /www/ class files
 //
 define('WWW_DIR', NN_WWW);
 
