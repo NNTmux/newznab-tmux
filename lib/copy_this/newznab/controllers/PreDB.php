@@ -209,7 +209,6 @@ class PreDB
 	 */
 	public function nzpreUpdate()
 	{
-		require_once(WWW_DIR."/lib/nntp.php");
 
 		$s = new Sites();
 		$site = $s->get();
