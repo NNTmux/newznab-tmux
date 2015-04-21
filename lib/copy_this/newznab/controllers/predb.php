@@ -219,7 +219,7 @@ class PreDB
 		if($this->echooutput)
 			echo "Predb   : Checking for new pre data ";
 
-		$nntp = new Nntp();
+		$nntp = new NNTP();
 
 		if(!$nntp->doConnect()) {
             echo "Failed to get NNTP connection\n";
