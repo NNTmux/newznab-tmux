@@ -1,5 +1,5 @@
 <?php
-require(dirname(__FILE__) . "/config.php");
+require_once dirname(__FILE__) . '/../../../../www/config.php';
 
 use newznab\db\DB;
 use newznab\utility\Utility;
