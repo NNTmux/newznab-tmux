@@ -1,4 +1,5 @@
 <?php
+require_once("./config.php");
 
 $groups = new Groups;
 $groupList = $groups->getActive();

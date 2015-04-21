@@ -1,6 +1,6 @@
 <?php
 
-require("config.php");
+require_once("./config.php");
 
 $releases = new Releases;
 $sphinx = new Sphinx();

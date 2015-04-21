@@ -19,7 +19,7 @@
     => Script will backfill ONLY a.b.games.xbox from May 15, 2011
 */
 
-require("config.php");
+require_once("config.php");
 
 $time = 0;
 
