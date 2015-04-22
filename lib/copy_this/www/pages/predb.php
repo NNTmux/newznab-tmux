@@ -31,5 +31,3 @@ $page->smarty->assign('category', $category);
 
 $page->content = $page->smarty->fetch('viewprelist.tpl');
 $page->render();
-
-

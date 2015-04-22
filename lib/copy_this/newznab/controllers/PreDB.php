@@ -138,7 +138,7 @@ class PreDB
 	/**
 	 * Add/Update predb row.
 	 *
-	 * @param DB $pdo
+	 * @param newznab\db\DB $pdo
 	 * @param    $preArray
 	 * @return bool
 	 */
@@ -146,7 +146,7 @@ class PreDB
 	{
 		if(!preg_match('/^(UN)?((MOD)?NUKED?|DELPRE)$/', $preArray['category']))
 		{
-			$this->pdo->queryExec(sprintf('INSERT INTO predb
+			$pdo->queryExec(sprintf('INSERT INTO predb
 				(ctime, dirname, category, filesize, filecount, filename)
 				VALUES (%d, %s, %s, %F, %d, %s)
 				ON DUPLICATE KEY UPDATE
@@ -167,7 +167,7 @@ class PreDB
 		}
 		else
 		{
-			$this->pdo->queryExec(sprintf("update predb
+			$pdo->queryExec(sprintf("update predb
 				SET nuketype=%s, nukereason=%s, nuketime=%d
 				WHERE dirname = %s",
 				$this->pdo->escapeString($preArray['category']),

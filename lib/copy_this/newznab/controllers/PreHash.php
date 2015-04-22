@@ -7,7 +7,7 @@ use newznab\db\DB;
  * Class for inserting names/categories etc from PreDB sources into the DB,
  * also for matching names on files / subjects.
  *
- * Class PreDb
+ * Class PreHash
  */
 Class PreHash
 {
