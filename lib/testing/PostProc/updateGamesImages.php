@@ -10,7 +10,7 @@ $c = new ColorCLI();
 if ($argc == 1 || $argv[1] != 'true') {
 	exit($c->error("\nThis script will check all images in covers/games and compare to db->gamesinfo.\nTo run:\nphp $argv[0] true\n"));
 }
-$path2covers = WWW_DIR . 'covers/games' . '/';
+$path2covers = NN_COVERS . 'games' . DS;
 
 $dirItr = new RecursiveDirectoryIterator($path2covers);
 $itr = new RecursiveIteratorIterator($dirItr, RecursiveIteratorIterator::LEAVES_ONLY);

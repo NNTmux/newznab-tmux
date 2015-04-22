@@ -4,8 +4,6 @@ require_once(dirname(__FILE__) . "/../../../bin/config.php");
 
 use newznab\db\DB;
 
-
-
 $pdo = new DB();
 
 $movie = new \Film(array('Echo' => true, 'Settings' => $pdo));

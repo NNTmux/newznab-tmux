@@ -12,7 +12,7 @@ if ($argc == 1 || $argv[1] != 'true') {
 	exit($c->error("\nThis script will check all images in covers/xxx and compare to db->xxxinfo.\nTo run:\nphp $argv[0] true\n"));
 }
 
-$path2covers = WWW_DIR . 'covers/xxx/';
+$path2covers = NN_COVERS . 'xxx' . DS;
 
 $dirItr = new RecursiveDirectoryIterator($path2covers);
 $itr = new RecursiveIteratorIterator($dirItr, RecursiveIteratorIterator::LEAVES_ONLY);
