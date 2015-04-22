@@ -2,6 +2,8 @@
 /* This script is designed to gather all show data from anidb and add it to the anidb table for newznab, as part of this process we need the number of PI queries that can be executed max and whether or not we want debuging the first argument if unset will try to do the entire list (a good way to get banned), the second option can be blank or true for debugging.
 * IF you are using this script then then you also want to edit anidb.php in www/lib and locate "604800" and replace it with 1204400, this will make sure it never tries to connect to anidb as this will fail
 */
+require_once(dirname(__FILE__) . "/../../bin/config.php");
+
 use newznab\db\DB;
 
 $pdo = new DB();

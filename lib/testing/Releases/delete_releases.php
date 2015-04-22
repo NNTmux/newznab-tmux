@@ -1,4 +1,5 @@
 <?php
+require_once(dirname(__FILE__) . "/../../../bin/config.php");
 // New line for CLI.
 $n = PHP_EOL;
 

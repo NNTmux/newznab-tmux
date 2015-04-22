@@ -1,4 +1,6 @@
 <?php
+require_once(dirname(__FILE__) . "/../../bin/config.php");
+
 $n = PHP_EOL;
 
 // Print usage.

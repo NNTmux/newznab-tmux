@@ -1,5 +1,7 @@
 <?php
 //This script downloads covert art for Tv Shows -- it is intended to be run at interval, generally after the TvRage database is populated
+require_once(dirname(__FILE__) . "/../../../bin/config.php");
+
 use newznab\db\DB;
 use newznab\utility\Utility;
 
