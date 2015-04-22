@@ -1,5 +1,5 @@
 <?php
-require_once (NN_TMUX . 'lib' . DS . 'Film.php');
+
 if (!$users->isLoggedIn()) {
 	$page->show403();
 }

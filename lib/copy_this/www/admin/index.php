@@ -1,9 +1,8 @@
 <?php
 
-require_once("config.php");
-require_once(WWW_DIR."/lib/adminpage.php");
-require_once(WWW_DIR."/lib/site.php");
-require_once(WWW_DIR."/lib/framework/db.php");
+require_once './config.php';
+
+use newznab\db\DB;
 
 $page = new AdminPage();
 

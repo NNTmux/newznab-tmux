@@ -1,5 +1,6 @@
 <?php
-require_once(WWW_DIR."/lib/util.php");
+
+use newznab\utility\Utility;
 
 if ($users->isLoggedIn())
 	$page->show404();

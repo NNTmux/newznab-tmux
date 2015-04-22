@@ -1,5 +1,6 @@
 <?php
-require_once(WWW_DIR . 'lib' . DS . 'util.php');
+
+use newznab\utility\Utility;
 
 if (isset($_POST["useremail"]))
 {

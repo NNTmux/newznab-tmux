@@ -6,9 +6,9 @@
  *
  * It will start the tmux server and monitoring scripts if needed.
  */
-require_once(dirname(__FILE__)."/bin/config.php");
-require_once(WWW_DIR . "lib/framework/db.php");
-require_once(WWW_DIR. '/lib/Tmux.php');
+require_once realpath(__DIR__ . '/../../../../www/config.php');
+
+use newznab\db\DB;
 
 $pdo = new DB();
 

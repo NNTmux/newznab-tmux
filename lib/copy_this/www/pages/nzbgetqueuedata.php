@@ -1,6 +1,7 @@
 <?php
-require_once(WWW_DIR.'../misc/update_scripts/nix_scripts/tmux/lib/NZBGet.php');
-require_once(WWW_DIR.'lib/util.php');
+
+use newznab\utility\Utility;
+
 if (!$users->isLoggedIn()) {
 	$page->show403();
 }

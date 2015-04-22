@@ -1,7 +1,4 @@
 <?php
-require_once(WWW_DIR . "/lib/releases.php");
-require_once(WWW_DIR . "/lib/users.php");
-require_once(WWW_DIR . "/lib/page.php");
 
 $releases = new Releases(['Settings' => $page->settings]);
 $users = new Users();

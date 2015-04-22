@@ -1,8 +1,5 @@
 <?php
 require_once(dirname(__FILE__)."/../bin/config.php");
-require_once (NN_LIB . 'ColorCLI.php');
-require_once (NN_LIB . 'RequestIDWeb.php');
-require_once (NN_LIB . 'RequestIDLocal.php');
 
 $cli = new \ColorCLI();
 

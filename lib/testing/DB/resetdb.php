@@ -1,10 +1,7 @@
 <?php
 require_once(dirname(__FILE__) . "/../../../bin/config.php");
-require_once(WWW_DIR . "/lib/framework/db.php");
-require_once(WWW_DIR . "/lib/releaseimage.php");
-require_once(WWW_DIR . "/lib/nzb.php");
-require_once(WWW_DIR . "/lib/ConsoleTools.php");
-require_once(WWW_DIR . "/lib/SphinxSearch.php");
+
+use newznab\db\DB;
 
 passthru('clear');
 $pdo = new DB();

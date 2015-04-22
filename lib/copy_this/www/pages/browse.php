@@ -1,6 +1,4 @@
 <?php
-require_once(WWW_DIR."/lib/releases.php");
-require_once(WWW_DIR."/lib/category.php");
 
 $releases = new Releases(['Settings' => $page->settings]);
 

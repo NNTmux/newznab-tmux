@@ -1,8 +1,6 @@
 <?php
-require_once(dirname(__FILE__) . "/../../../bin/config.php");
-require_once(WWW_DIR . "/lib/framework/db.php");
-require_once(WWW_DIR . "/lib/nntp.php");
-require_once(WWW_DIR . "/lib/binaries.php");
+
+use newznab\db\DB;
 
 
 /* This script will update the groups table to get the new article numbers for each group you have activated.

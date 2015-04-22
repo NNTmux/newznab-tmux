@@ -1,8 +1,7 @@
 <?php
 require_once("config.php");
-require_once(WWW_DIR . "/lib/framework/db.php");
-require_once(WWW_DIR."/lib/backfill.php");
-require_once(WWW_DIR . "/lib/nntp.php"); 
+
+use newznab\db\DB;
 
 $pdo = new DB();
 

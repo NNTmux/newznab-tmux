@@ -1,6 +1,6 @@
 <?php
-require_once(WWW_DIR . "/lib/releases.php");
-require_once(WWW_DIR . "/lib/util.php");
+
+use newznab\utility\Utility;
 
 $releases = new Releases;
 
@@ -14,7 +14,7 @@ if (isset($_GET["id"])) {
 		$page->show404();
 
 	$nfo = $releases->getReleaseNfo($rel['id']);
-	$nfo['nfoUTF'] = cp437toUTF($nfo['nfo']);
+	$nfo['nfoUTF'] = Utility::cp437toUTF($nfo['nfo']);
 
 	$page->smarty->assign('rel', $rel);
 	$page->smarty->assign('nfo', $nfo);

@@ -1,9 +1,7 @@
 <?php
-require_once(WWW_DIR."/lib/releases.php");
-require_once(WWW_DIR."/lib/nzb.php");
 
 $releases = new Releases;
-$nzb = new Nzb;
+$nzb = new NZB;
 
 if (!$users->isLoggedIn())
 	$page->show403();

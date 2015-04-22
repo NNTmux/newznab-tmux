@@ -1,5 +1,4 @@
 <?php
-require_once(WWW_DIR."/lib/groups.php");
 if (!$users->isLoggedIn()) {
 	$page->show403();
 }

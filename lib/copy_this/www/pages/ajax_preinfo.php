@@ -1,5 +1,4 @@
 <?php
-require_once(WWW_DIR.'/lib/predb.php');
 
 if(!$users->isLoggedIn() || $page->userdata["canpre"] != 1)
 	$page->show403();

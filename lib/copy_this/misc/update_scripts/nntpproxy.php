@@ -1,8 +1,7 @@
 <?php
 require_once("config.php");
-require_once(WWW_DIR . "/lib/framework/db.php");
-require_once(WWW_DIR . "/lib/Tmux.php");
-require_once(WWW_DIR . "/lib/site.php");
+
+use newznab\db\DB;
 
 passthru("clear");
 

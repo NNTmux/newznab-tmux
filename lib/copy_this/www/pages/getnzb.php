@@ -1,6 +1,4 @@
 <?php
-require_once(WWW_DIR . "/lib/releases.php");
-require_once(WWW_DIR . "/lib/nzb.php");
 
 $nzb = new NZB($page->settings);
 $rel = new Releases(['Settings' => $page->settings]);

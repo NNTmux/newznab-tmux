@@ -1,7 +1,6 @@
 <?php
 
-require_once("config.php");
-require_once(WWW_DIR."/lib/adminpage.php");
+require_once './config.php';
 
 $page = new AdminPage();
 
@@ -19,7 +18,7 @@ unset($s->sabapikey);
 unset($s->sabcompletedir);
 unset($s->sabvdir);
 
-$db = new DB;
+$db = new newznab\db\DB;
 $totalsize = 0;
 $alltables = $db->query("show table status");
 foreach ($alltables as $tablename)

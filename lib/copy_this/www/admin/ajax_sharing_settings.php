@@ -1,12 +1,10 @@
 <?php
 
-require_once("config.php");
-require_once(WWW_DIR."/lib/framework/db.php");
-require_once(WWW_DIR."/lib/adminpage.php");
+require_once './config.php';
 
 // Login check.
 $admin = new AdminPage;
-$db = new DB();
+$db = new newznab\db\DB();
 
 if (isset($_GET['site_ID']) && isset($_GET['site_status'])) {
 	$db->queryExec(sprintf('UPDATE sharing_sites SET enabled = %d WHERE id = %d', $_GET['site_status'], $_GET['site_ID']));

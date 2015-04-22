@@ -1,8 +1,7 @@
 <?php
 //This script converts tables to myisam , innodb dynamic or innodb compressed. Run like this : php convert_mysql_tables.php dinnodb
 
-require_once(dirname(__FILE__) . "/../../../bin/config.php");
-require_once(WWW_DIR . "lib/framework/db.php");
+use newznab\db\DB;
 
 $cli = new \ColorCLI();
 
