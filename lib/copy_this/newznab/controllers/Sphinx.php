@@ -33,7 +33,7 @@ class Sphinx
         $s = new Sites;
 
 		$this->site = $s->get();
-		$this->nzb  = new Nzb;
+		$this->nzb  = new NZB;
 		$this->indexes = array("releases", "releasefiles",
 		                       "releasenfo", "nzbs", "predb");
     }

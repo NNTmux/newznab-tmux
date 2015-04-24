@@ -12,7 +12,7 @@ use newznab\db\DB;
 
 $db = new DB;
 $s = New Sites;
-$nzb = new Nzb;
+$nzb = new NZB;
 
 $items = $db->query("SELECT ID,guid FROM releases WHERE size = 0");
 $total = count($items);

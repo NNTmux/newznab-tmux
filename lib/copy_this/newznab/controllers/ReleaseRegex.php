@@ -318,7 +318,7 @@ class ReleaseRegex
 
 	public function fetchTestBinaries($groupname, $numarticles, $clearexistingbins)
 	{
-		$nntp = new Nntp();
+		$nntp = new NNTP();
 		$binaries = new Binaries();
 		$groups = new Groups();
 

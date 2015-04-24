@@ -329,8 +329,8 @@ class PostProcess
 		if (!file_exists($tmpPath))
 			mkdir($tmpPath, 0766, true);
 
-		$nntp = new Nntp;
-		$nzb = new Nzb;
+		$nntp = new NNTP;
+		$nzb = new NZB;
 
 		//
 		// Get out all releases which have not been checked more than max attempts for password.

@@ -1,5 +1,4 @@
 <?php
-// This script removes releases with no NZBs, resets all groups, truncates article tables. All other releases are left alone.
 require_once(dirname(__FILE__) . "/../../../bin/config.php");
 
 use newznab\db\DB;

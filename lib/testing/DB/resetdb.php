@@ -2,8 +2,9 @@
 require_once(dirname(__FILE__) . "/../../../bin/config.php");
 
 use newznab\db\DB;
+use newznab\utility\Utility;
 
-passthru('clear');
+Utility::clearScreen();
 $pdo = new DB();
 
 if (!isset($argv[1]) || (isset($argv[1]) && $argv[1] !== 'true'))

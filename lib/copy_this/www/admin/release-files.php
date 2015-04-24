@@ -5,7 +5,7 @@ require_once './config.php';
 $page = new AdminPage;
 $users = new Users;
 $releases = new Releases;
-$nzb = new Nzb;
+$nzb = new NZB;
 
 if (!$users->isLoggedIn())
 	$page->show403();

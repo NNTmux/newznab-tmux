@@ -1,5 +1,4 @@
 <?php
-
 namespace newznab\libraries;
 
 /**
@@ -7,8 +6,9 @@ namespace newznab\libraries;
  *
  * Class for connecting to a memcached or redis server to cache data.
  *
+ * @package newznab\libraries
  */
-Class Cache
+class Cache
 {
 	const SERIALIZER_PHP      = 0;
 	const SERIALIZER_IGBINARY = 1;
@@ -19,7 +19,7 @@ Class Cache
 	const TYPE_REDIS     = 2;
 
 	/**
-	 * @var Memcached|Redis
+	 * @var \Memcached|\Redis
 	 */
 	private $server = null;
 
@@ -103,7 +103,7 @@ Class Cache
 	public function delete($key)
 	{
 		if ($this->connected === true && $this->ping() === true) {
-			return (bool) $this->server->delete($key);
+			return (bool)$this->server->delete($key);
 		}
 		return false;
 	}
@@ -180,32 +180,32 @@ Class Cache
 			$this->serializerType = true;
 		}
 
-		switch(NN_CACHE_TYPE) {
+		switch (NN_CACHE_TYPE) {
 
 			case self::TYPE_REDIS:
 				if (!extension_loaded('redis')) {
-					throw new \CacheException('The redis extension is not loaded!');
+					throw new CacheException('The redis extension is not loaded!');
 				}
-				$this->server = new Redis();
+				$this->server = new \Redis();
 				$this->isRedis = true;
 				$this->connect();
 				if ($this->serializerType !== false) {
 					$this->serializerType = $this->verifySerializer();
-					$this->server->setOption(Redis::OPT_SERIALIZER, $this->serializerType);
+					$this->server->setOption(\Redis::OPT_SERIALIZER, $this->serializerType);
 				}
 				break;
 
 			case self::TYPE_MEMCACHED:
 				if (!extension_loaded('memcached')) {
-					throw new \CacheException('The memcached extension is not loaded!');
+					throw new CacheException('The memcached extension is not loaded!');
 				}
 				$this->server = new \Memcached();
 				$this->isRedis = false;
 				if ($this->serializerType !== false) {
 					$this->serializerType = $this->verifySerializer();
-					$this->server->setOption(Memcached::OPT_SERIALIZER, $this->serializerType);
+					$this->server->setOption(\Memcached::OPT_SERIALIZER, $this->serializerType);
 				}
-				$this->server->setOption(Memcached::OPT_COMPRESSION, (defined('NN_CACHE_COMPRESSION') ? NN_CACHE_COMPRESSION : false));
+				$this->server->setOption(\Memcached::OPT_COMPRESSION, (defined('NN_CACHE_COMPRESSION') ? NN_CACHE_COMPRESSION : false));
 				$this->connect();
 				break;
 
@@ -220,7 +220,7 @@ Class Cache
 	 */
 	public function __destruct()
 	{
-		switch(NN_CACHE_TYPE) {
+		switch (NN_CACHE_TYPE) {
 			case self::TYPE_REDIS:
 				$this->server->close();
 				break;
@@ -244,14 +244,14 @@ Class Cache
 				$servers = unserialize(NN_CACHE_HOSTS);
 				foreach ($servers as $server) {
 					if ($this->server->connect($server['host'], $server['port'], (float)NN_CACHE_TIMEOUT) === false) {
-						throw new \CacheException('Error connecting to the Redis server!');
+						throw new CacheException('Error connecting to the Redis server!');
 					} else {
 						$this->connected = true;
 					}
 				}
 			} else {
 				if ($this->server->connect(NN_CACHE_SOCKET_FILE) === false) {
-					throw new \CacheException('Error connecting to the Redis server!');
+					throw new CacheException('Error connecting to the Redis server!');
 				} else {
 					$this->connected = true;
 				}
@@ -259,13 +259,13 @@ Class Cache
 		} else {
 			if ($this->socketFile === false) {
 				if ($this->server->addServers(unserialize(NN_CACHE_HOSTS)) === false) {
-					throw new \CacheException('Error connecting to the Memcached server!');
+					throw new CacheException('Error connecting to the Memcached server!');
 				} else {
 					$this->connected = true;
 				}
 			} else {
 				if ($this->server->addServers(array(array(NN_CACHE_SOCKET_FILE, 'port' => 0))) === false) {
-					throw new \CacheException('Error connecting to the Memcached server!');
+					throw new CacheException('Error connecting to the Memcached server!');
 				} else {
 					$this->connected = true;
 				}
@@ -280,8 +280,8 @@ Class Cache
 	{
 		if ($this->isRedis === true) {
 			try {
-				return (bool) $this->server->ping();
-			} catch (RedisException $error) {
+				return (bool)$this->server->ping();
+			} catch (\RedisException $error) {
 				$this->connect();
 				return $this->connected;
 			}
@@ -298,7 +298,7 @@ Class Cache
 	 */
 	private function verifySerializer()
 	{
-		switch(NN_CACHE_SERIALIZER) {
+		switch (NN_CACHE_SERIALIZER) {
 			case self::SERIALIZER_IGBINARY:
 				if (extension_loaded('igbinary')) {
 					$this->IgBinarySupport = true;
@@ -308,17 +308,17 @@ Class Cache
 						if (\Memcached::HAVE_IGBINARY > 0) {
 							return \Memcached::SERIALIZER_IGBINARY;
 						} else {
-							throw new \CacheException('Error: You have not compiled Memcached with igbinary support!');
+							throw new CacheException('Error: You have not compiled Memcached with igbinary support!');
 						}
 					}
 				} else {
-					throw new \CacheException('Error: The igbinary extension is not loaded!');
+					throw new CacheException('Error: The igbinary extension is not loaded!');
 				}
 			case self::SERIALIZER_NONE:
 				if ($this->isRedis === true) {
 					return \Redis::SERIALIZER_NONE;
 				} else {
-					throw new \CacheException('Error: Disabled serialization is not available on Memcached!');
+					throw new CacheException('Error: Disabled serialization is not available on Memcached!');
 				}
 			case self::SERIALIZER_PHP:
 			default:
@@ -335,5 +335,8 @@ Class Cache
 /**
  * Class CacheException
  *
+ * @package newznab\libraries
  */
-Class CacheException extends Exception {}
+class CacheException extends \Exception
+{
+}

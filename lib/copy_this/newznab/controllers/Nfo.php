@@ -406,7 +406,7 @@ class Nfo
 		//       ),
 		//       ...
 		//  )
-		$nntp = new Nntp();
+		$nntp = new NNTP();
 
 		// Connect to server (we throw an exception if we fail) which
 		// is caught upstairs with the nfo_grab() function

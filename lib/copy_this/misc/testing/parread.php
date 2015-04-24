@@ -8,8 +8,8 @@ $s = new Sites();
 $site = $s->get();
 $releases = new Releases();
 $db = new DB();
-$nzb = new Nzb();
-$nntp = new Nntp;
+$nzb = new NZB();
+$nntp = new NNTP;
 
 // read pars for a release GUID, echo out any that look like a rar
 $relguid = "249f9ec1f0d68d33b5fa85594ba1a47d";

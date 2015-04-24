@@ -332,15 +332,13 @@ class Groups
 	 */
 	function addBulk($groupList, $active = 1, $backfill = 1)
 	{
-		require_once(WWW_DIR . "/lib/binaries.php");
-		require_once(WWW_DIR . "/lib/nntp.php");
 
 		$ret = array();
 
 		if ($groupList == "") {
 			$ret[] = "No group list provided.";
 		} else {
-			$nntp = new Nntp(['Echo' => false]);
+			$nntp = new NNTP(['Echo' => false]);
 			if (!$nntp->doConnect()) {
 				$ret[] = "Failed to get NNTP connection";
 

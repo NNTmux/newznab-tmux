@@ -5,7 +5,7 @@ use newznab\db\DB;
 
 
 $db = new DB();
-$n = new Nzb();
+$n = new NZB();
 $s = New Sites;
 $site = $s->get();
 

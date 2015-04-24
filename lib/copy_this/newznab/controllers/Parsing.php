@@ -691,7 +691,7 @@ class Parsing
 					$nzbInfo = new nzbInfo;
 					$nzbInfo->loadFromFile($nzbfile);
 					if (!empty($nzbInfo->parfiles) && empty($nzbInfo->rarfiles) && empty($nzbInfo->audiofiles)) {
-						$nntp = new Nntp;
+						$nntp = new NNTP;
 						$nntp->doConnect();
 
 						if ($this->verbose) echo "Checking Par\n";
