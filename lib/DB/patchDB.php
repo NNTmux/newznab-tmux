@@ -1,4 +1,5 @@
 <?php
+require_once(dirname(__FILE__)."/../../bin/config.php");
 
 use newznab\db\DB;
 use newznab\utility\Utility;
@@ -73,7 +74,7 @@ function SplitSQL($file, $delimiter = ';')
 
 function BackupDatabase()
 {
-	$db = new newznab\db\DB();
+	$db = new DB();
 	$c = new ColorCLI();
 	$DIR = dirname (__FILE__);
 
@@ -105,7 +106,7 @@ if (isset($os) && $os == "unix") {
 	$currentversion = $tmux->sqlpatch;
 	$patched = 0;
 	$patches = array();
-	$db = new newznab\db\DB();
+	$db = new DB();
 	$backedup = false;
 	$c = new ColorCLI();
     $DIR = dirname (__FILE__);
