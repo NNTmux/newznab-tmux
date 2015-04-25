@@ -379,7 +379,7 @@ class Users
 	public function updatePassword($id, $password)
 	{
 		$db = new DB();
-		$db->exec(sprintf("update users set password = %s, userseed=md5(%s) where id = %d", $db->escapeString($this->hashPassword($password)), $db->escapeString(generateUuid()), $id));
+		$db->exec(sprintf("update users set password = %s, userseed=md5(%s) where id = %d", $db->escapeString($this->hashPassword($password)), $db->escapeString(Utility::generateUuid()), $id));
 
 		return Users::SUCCESS;
 	}
