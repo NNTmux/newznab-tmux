@@ -2,7 +2,7 @@
 
 //This script allows you to delete properly all preview images for a range
 
-define('FS_ROOT', realpath(dirname(__FILE__)));
+require_once dirname(__FILE__) . '/../../www/config.php';
 
 use newznab\db\DB;
 

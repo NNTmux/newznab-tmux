@@ -2,8 +2,9 @@
 require_once("config.php");
 
 use newznab\db\DB;
+use newznab\utility\Utility;
 
-passthru("clear");
+Utility::clearScreen();
 
 $pdo = new DB();
 $t = new \Tmux();
@@ -44,7 +45,7 @@ function window_proxy($tmux_session, $powerline)
 		$tmuxconfig = $DIR . "update_scripts/nix_scripts/tmux/tmux.conf";
 	}
 
-	$nntpproxy = $pdo->getSetting('nntpproxy');
+	$nntpproxy = $site->nntpproxy;
 	if ($nntpproxy === '1') {
 		$DIR = NN_MISC;
 		$nntpproxypy = $DIR . "update_scripts/nix_scripts/_tmux/python/nntpproxy.py";

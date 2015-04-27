@@ -1,7 +1,7 @@
 <?php
 // search tmdb or web for movie from a given name
 
-define('FS_ROOT', realpath(dirname(__FILE__)));
+require_once dirname(__FILE__) . '/../../www/config.php';
 
 $moviename = "Africa Screams";
 $movie = new Movie();

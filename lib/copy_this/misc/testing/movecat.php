@@ -2,7 +2,7 @@
 
 //This script moves releases from one category to another
 
-define('FS_ROOT', realpath(dirname(__FILE__)));
+require_once dirname(__FILE__) . '/../../www/config.php';
 
 use newznab\db\DB;
 

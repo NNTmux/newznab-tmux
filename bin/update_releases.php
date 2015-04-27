@@ -4,8 +4,6 @@ require_once(dirname(__FILE__) . "/config.php");
 use newznab\db\DB;
 use newznab\processing\ProcessReleases;
 
-
-
 $s = new \Sites();
 $site = $s->get();
 $pdo = new DB();

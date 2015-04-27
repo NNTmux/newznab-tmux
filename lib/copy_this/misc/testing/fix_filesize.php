@@ -6,7 +6,7 @@ If after import you have a bunch of zero sized releases run this
 Author: lordgnu <lordgnu@me.com>
 */
 
-define('FS_ROOT', realpath(dirname(__FILE__)));
+require_once dirname(__FILE__) . '/../../www/config.php';
 
 use newznab\db\DB;
 

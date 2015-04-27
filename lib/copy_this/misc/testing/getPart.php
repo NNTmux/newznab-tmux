@@ -1,5 +1,5 @@
 <?php
-define('FS_ROOT', realpath(dirname(__FILE__)));
+require_once dirname(__FILE__) . '/../../www/config.php';
 
 $grp = "a.b.grp";
 $msgid = "2df9e8a3$1$2314$6d4158fb@reader.xsnews.nl";

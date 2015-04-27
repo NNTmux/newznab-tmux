@@ -3,7 +3,7 @@
 //This script allows you to delete properly all releases which match some criteria
 //The nzb, covers and all linked records will be deleted properly.
 
-define('FS_ROOT', realpath(dirname(__FILE__)));
+require_once dirname(__FILE__) . '/../../www/config.php';
 
 use newznab\db\DB;
 

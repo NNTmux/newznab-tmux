@@ -1,6 +1,6 @@
 <?php
 //This Script Verifies your System Time vs Myself Time vs PHP Time
-define('FS_ROOT', realpath(dirname(__FILE__)));
+require_once dirname(__FILE__) . '/../../www/config.php';
 
 use newznab\db\DB;
 $res="";

@@ -172,7 +172,7 @@ SHARING
 		recognize or want to test out the source.
 */
 
-define("FS_ROOT", realpath(dirname(__FILE__)));
+require_once dirname(__FILE__) . '/../../www/config.php';
 
 // Subject Lines will always be a hash key that helps scanning identify whether
 // or not the contents are valid or not.  the hash key contains is built

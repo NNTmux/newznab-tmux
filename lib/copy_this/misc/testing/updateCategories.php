@@ -1,11 +1,11 @@
 <?php
 //This script will rerun all releases against Category.php
-define('FS_ROOT', realpath(dirname(__FILE__)));
+require_once dirname(__FILE__) . '/../../www/config.php';
 
 use newznab\db\DB;
 
 $db = new DB();
-$category = new Category();
+$category = new Categorize();
 $changedcount = 0;
 $rescount = 0;
 

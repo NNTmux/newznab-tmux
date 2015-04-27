@@ -1,6 +1,6 @@
 <?php
 
-define('FS_ROOT', realpath(dirname(__FILE__)));
+require_once dirname(__FILE__) . '/../../www/config.php';
 
 use newznab\db\DB;
 use newznab\utility\Utility;
