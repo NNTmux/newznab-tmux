@@ -22,7 +22,7 @@ $conf
 
 $search = new Search();
 $search->setCategory('VideoGames');
-$search->setKeywords('Gears Of war', 'PC');
+$search->setKeywords('Guilty Gear 2 Oveture');
 $search->setResponseGroup(['Large']);
 $search->setPage(1);
 

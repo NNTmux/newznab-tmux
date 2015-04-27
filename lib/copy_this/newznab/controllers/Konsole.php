@@ -2,7 +2,9 @@
 require_once NN_LIBS . 'AmazonProductAPI.php';
 
 use newznab\db\DB;
-use newznab\utility\Utility;
+use newznab\libraries\ApaiIO\Configuration\GenericConfiguration;
+use newznab\libraries\ApaiIO\Operations\Search;
+use newznab\libraries\ApaiIO\ApaiIO;
 
 
 class Konsole
@@ -67,7 +69,7 @@ class Konsole
 		$options += $defaults;
 
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
-		$this->pdo = ($options['Settings'] instanceof newznab\db\DB ? $options['Settings'] : new newznab\db\DB());
+		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 		$s = new Sites();
 		$this->site = $s->get();
 
@@ -433,7 +435,7 @@ class Konsole
 		return $con;
 	}
 
-	protected function _setConAfterMatch($amaz = array())
+	protected function _setConAfterMatch($amaz)
 	{
 		$con = array();
 		$con['asin'] = (string)$amaz->Items->Item->ASIN;
@@ -465,7 +467,7 @@ class Konsole
 		return $con;
 	}
 
-	protected function _matchGenre($amaz = array())
+	protected function _matchGenre($amaz)
 	{
 
 		$genreName = '';
@@ -662,13 +664,42 @@ class Konsole
 
 	public function fetchAmazonProperties($title, $node)
 	{
-		$obj = new \AmazonProductAPI($this->pubkey, $this->privkey, $this->asstag);
+		$conf = new GenericConfiguration();
 		try {
-			$result = $obj->searchProducts($title, \AmazonProductAPI::GAMES, "NODE", $node);
-		} catch (Exception $e) {
-			$result = false;
+			$conf
+				->setCountry('com')
+				->setAccessKey($this->pubkey)
+				->setSecretKey($this->privkey)
+				->setAssociateTag($this->asstag)
+				->setResponseTransformer('\newznab\libraries\ApaiIO\ResponseTransformer\XmlToSimpleXmlObject');
+		} catch (\Exception $e) {
+			echo $e->getMessage();
 		}
-		return $result;
+
+		$search = new Search();
+		$search->setCategory('VideoGames');
+		$search->setKeywords($title);
+		$search->setBrowseNode($node);
+		$search->setResponseGroup(['Large']);
+
+		$apaiIo = new ApaiIO($conf);
+
+		$response = $apaiIo->runOperation($search);
+		if ($response === false)
+		{
+			throw new \Exception("Could not connect to Amazon");
+		}
+		else
+		{
+			if (isset($response->Items->Item->ItemAttributes->Title))
+			{
+				return $response;
+			}
+			else
+			{
+				return false;
+			}
+		}
 	}
 
 	public function processConsoleReleases()

@@ -61,6 +61,29 @@ class Search extends AbstractOperation
         return $this;
     }
 
+	/**
+	 * Sets the amazon browseNode
+	 *
+	 * @param string $browseNode
+	 *
+	 * @return \newznab\libraries\ApaiIO\Operations\Search
+	 */
+	public function setBrowseNode($browseNode)
+	{
+		if (false === is_numeric($browseNode) || (int)$browseNode < 0) {
+			throw new \InvalidArgumentException(
+				sprintf(
+					'%s is an invalid browseNode value. It has to be numeric and positive',
+					$browseNode
+				)
+			);
+		}
+
+		$this->parameter['BrowseNode'] = $browseNode;
+
+		return $this;
+	}
+
     /**
      * Sets the resultpage to a specified value
      * Allows to browse resultsets which have more than one page

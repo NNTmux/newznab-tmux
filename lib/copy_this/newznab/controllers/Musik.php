@@ -1,9 +1,8 @@
 <?php
-require_once NN_LIBS . 'AmazonProductAPI.php';
-
 use newznab\db\DB;
-
-
+use newznab\libraries\ApaiIO\Configuration\GenericConfiguration;
+use newznab\libraries\ApaiIO\Operations\Search;
+use newznab\libraries\ApaiIO\ApaiIO;
 
 /**
  * Class Musik
@@ -559,49 +558,91 @@ class Musik
 	 * @param $title
 	 *
 	 * @return bool|mixed
+	 * @throws Exception
 	 */
 	public function fetchAmazonProperties($title)
 	{
-		$result = false;
-		$obj = new \AmazonProductAPI($this->pubkey, $this->privkey, $this->asstag);
+		$response = false;
+		$conf = new GenericConfiguration();
+		try {
+			$conf
+				->setCountry('com')
+				->setAccessKey($this->pubkey)
+				->setSecretKey($this->privkey)
+				->setAssociateTag($this->asstag)
+				->setResponseTransformer('\newznab\libraries\ApaiIO\ResponseTransformer\XmlToSimpleXmlObject');
+		} catch (\Exception $e) {
+			echo $e->getMessage();
+		}
+
+		$apaiIo = new ApaiIO($conf);
 		// Try Music category.
 		try {
-			$result = $obj->searchProducts($title, \AmazonProductAPI::MUSIC, "TITLE");
-		} catch (Exception $e) {
+			$search = new Search();
+			$search->setCategory('Music');
+			$search->setKeywords($title);
+			$search->setResponseGroup(['Large']);
+			$response = $apaiIo->runOperation($search);
+		} catch (\Exception $e) {
 			// Empty because we try another method.
 		}
 
 		// Try MP3 category.
-		if ($result === false) {
+		if ($response === false) {
 			usleep(700000);
 			try {
-				$result = $obj->searchProducts($title, \AmazonProductAPI::MP3, "TITLE");
-			} catch (Exception $e) {
+				$search = new Search();
+				$search->setCategory('MP3Downloads');
+				$search->setKeywords($title);
+				$search->setResponseGroup(['Large']);
+				$response = $apaiIo->runOperation($search);
+			} catch (\Exception $e) {
 				// Empty because we try another method.
 			}
 		}
 
 		// Try Digital Music category.
-		if ($result === false) {
+		if ($response === false) {
 			usleep(700000);
 			try {
-				$result = $obj->searchProducts($title, \AmazonProductAPI::DIGITALMUS, "TITLE");
-			} catch (Exception $e) {
+				$search = new Search();
+				$search->setCategory('DigitalMusic');
+				$search->setKeywords($title);
+				$search->setResponseGroup(['Large']);
+				$response = $apaiIo->runOperation($search);
+			} catch (\Exception $e) {
 				// Empty because we try another method.
 			}
 		}
 
 		// Try Music Tracks category.
-		if ($result === false) {
+		if ($response === false) {
 			usleep(700000);
 			try {
-				$result = $obj->searchProducts($title, \AmazonProductAPI::MUSICTRACKS, "TITLE");
-			} catch (Exception $e) {
+				$search = new Search();
+				$search->setCategory('MusicTracks');
+				$search->setKeywords($title);
+				$search->setResponseGroup(['Large']);
+				$response = $apaiIo->runOperation($search);
+			} catch (\Exception $e) {
 				// Empty because we exhausted all possibilities.
 			}
 		}
-
-		return $result;
+		if ($response === false)
+		{
+			throw new \Exception("Could not connect to Amazon");
+		}
+		else
+		{
+			if (isset($response->Items->Item->ItemAttributes->Title))
+			{
+				return $response;
+			}
+			else
+			{
+				return false;
+			}
+		}
 	}
 
 	/**
