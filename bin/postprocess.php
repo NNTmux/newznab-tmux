@@ -73,7 +73,6 @@ if ($args[$argv[1]] === true) {
 }
 
 $postProcess = new PProcess(['Settings' => $pdo, 'Echo' => ($argv[2] === 'true' ? true : false)]);
-$pp = new PostProcess(true);
 
 $charArray = ['a','b','c','d','e','f','0','1','2','3','4','5','6','7','8','9'];
 
@@ -104,7 +103,6 @@ switch ($argv[1]) {
 		break;
 	case 'book':
 		$postProcess->processBooks();
-		$pp->processBooks();
 		break;
 	case 'console':
 		$postProcess->processConsoles();
@@ -120,7 +118,6 @@ switch ($argv[1]) {
 		break;
 	case 'music':
 		$postProcess->processMusic();
-		$pp->processMusic();
 		break;
 	case 'pre':
 		break;
