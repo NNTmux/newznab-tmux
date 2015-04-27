@@ -103,7 +103,7 @@ class Games
 		$this->site = $s->get();
 		$this->echoOutput = ($options['Echo'] && NN_ECHOCLI);
 
-		$this->pdo = ($options['Settings'] instanceof newznab\db\DB ? $options['Settings'] : new newznab\db\DB());
+		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 
 		$this->publicKey = $this->site->giantbombkey;
 		$this->gameQty = ($this->site->maxgamesprocessed != '') ? $this->site->maxgamesprocessed : 150;
