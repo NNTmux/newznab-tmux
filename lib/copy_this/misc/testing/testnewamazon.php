@@ -23,6 +23,7 @@ $conf
 $search = new Search();
 $search->setCategory('VideoGames');
 $search->setKeywords('Gears Of war', 'PC');
+$search->setResponseGroup(['Large']);
 $search->setPage(1);
 
 $apaiIo = new ApaiIO($conf);
