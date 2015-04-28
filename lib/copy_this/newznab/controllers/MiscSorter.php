@@ -38,7 +38,7 @@ class MiscSorter
 		$this->console = new Konsole();
 		$s = new Sites();
 		$this->site = $s->get();
-		$this->book = new Book();
+		$this->book = new Books();
 		$this->c = new ColorCLI();
 	}
 
