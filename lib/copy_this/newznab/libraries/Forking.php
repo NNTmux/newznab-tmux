@@ -878,14 +878,11 @@ class Forking extends \fork_daemon
 	private function processSingle()
 	{
 		$postProcess = new PProcess(['Settings' => $this->pdo, 'ColorCLI' => $this->_colorCLI]);
-		$pp = new \PostProcess(true);
 		//$postProcess->processAnime();
 		$postProcess->processBooks();
-		$pp->processBooks();
 		$postProcess->processConsoles();
 		$postProcess->processGames();
 		$postProcess->processMusic();
-		$pp->processMusic();
 		$postProcess->processXXX();
 	}
 
