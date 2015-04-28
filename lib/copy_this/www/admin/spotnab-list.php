@@ -4,7 +4,7 @@ require_once './config.php';
 
 $page = new AdminPage();
 
-$spotnab = new Spotnab();
+$spotnab = new SpotNab();
 
 // set the current action
 $toggle = isset($_REQUEST['toggle']) ? $_REQUEST['toggle'] : 'view';
