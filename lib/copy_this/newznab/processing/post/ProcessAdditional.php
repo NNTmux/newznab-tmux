@@ -348,13 +348,12 @@ class ProcessAdditional
 
 		// Maximum size of releases in GB.
 		$this->_maxSize =
-			(string)($this->site->maxsizetopostprocess != '') ? $this->site->maxsizetopostprocess : 100;
-		$this->_maxSize = ($this->_maxSize == 0 ? '' : 'AND r.size < ' . ($this->_maxSize * 1073741824));
-
+			($this->site->maxsizetopostprocess != '') ? (int)$this->site->maxsizetopostprocess : 100;
+		$this->_maxSize = ($this->_maxSize > 0 ? ('AND r.size < ' . ($this->_maxSize * 1073741824)) : '');
 		// Minimum size of releases in MB.
 		$this->_minSize =
-			(string)($this->site->minsizetopostprocess != '') ? $this->site->minsizetopostprocess : 1;
-		$this->_minSize = ($this->_minSize == 0 ? '' : 'AND r.size > ' . ($this->_minSize * 1048576));
+			($this->site->minsizetopostprocess != '') ? (int)$this->site->minsizetopostprocess : 100;
+		$this->_minSize = ($this->_minSize > 0 ? ('AND r.size > ' . ($this->_minSize * 1048576)) : '');
 
 		// Use the alternate NNTP provider for downloading Message-ID's ?
 		$this->_alternateNNTP = ($this->site->alternate_nntp == 1 ? true : false);
