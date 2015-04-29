@@ -649,10 +649,10 @@ class Forking extends \fork_daemon
 	{
 		$this->ppAddMinSize =
 			(string)($this->site->minsizetopostprocess != '') ? $this->site->minsizetopostprocess : 1;
-		$this->ppAddMinSize = ($this->ppAddMinSize === 0 ? '' : 'AND r.size > ' . ($this->ppAddMinSize * 1048576));
+		$this->ppAddMinSize = ($this->ppAddMinSize == 0 ? '' : 'AND r.size > ' . ($this->ppAddMinSize * 1048576));
 		$this->ppAddMaxSize =
 			(string)($this->site->maxsizetopostprocess != '') ? $this->site->maxsizetopostprocess : 100;
-		$this->ppAddMaxSize = ($this->ppAddMaxSize === 0 ? '' : 'AND r.size < ' . ($this->ppAddMaxSize * 1073741824));
+		$this->ppAddMaxSize = ($this->ppAddMaxSize == 0 ? '' : 'AND r.size < ' . ($this->ppAddMaxSize * 1073741824));
 		return (
 			$this->pdo->queryOneRow(
 				sprintf('
