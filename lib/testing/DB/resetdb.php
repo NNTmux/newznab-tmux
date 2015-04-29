@@ -33,7 +33,7 @@ $arr = [
 		"tvrage", "releasenfo", "releasecomment", 'sharing', 'sharing_sites',
 		"usercart", "usermovies", "userseries", "movieinfo", "musicinfo", "releasefiles",
 		"releaseaudio", "releasesubs", "releasevideo", "releaseextrafull", "parts",
-		"partrepair", "binaries", "collections", "releases"
+		"partrepair", "binaries", "collections", "releases", "spotnabsources"
 ];
 foreach ($arr as &$value) {
 	$rel = $pdo->queryExec("TRUNCATE TABLE $value");
