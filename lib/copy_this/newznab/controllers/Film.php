@@ -4,7 +4,6 @@ use newznab\db\DB;
 use newznab\utility\Utility;
 use newznab\libraries\Tmdb\TMDB;
 
-
 /**
  * Class Film
  */
@@ -757,7 +756,7 @@ class Film
 		$ImdbID = str_replace('tt', '', $tmdbLookup->get('imdb_id'));
 		$ret['imdb_id'] = $ImdbID;
 		$vote = $tmdbLookup->getVoteAverage();
-		if (isset($va)) {
+		if (isset($vote)) {
 			$ret['rating'] = ($vote == 0) ? '' : $vote;
 		}
 		$overview = $tmdbLookup->get('overview');

@@ -19,13 +19,20 @@ class TheTVDB
 	 */
 	public $echooutput;
 
+	/**
+	 * @param bool $echooutput
+	 */
 	public function __construct($echooutput = true)
 	{
 		$this->echooutput = (NN_ECHOCLI && $echooutput);
 		$this->MIRROR = 'http://www.thetvdb.com';
 		$this->pdo = new DB();
+		$this->echooutput = $echooutput;
 	}
 
+	/**
+	 * @param $TheTVDBAPIArray
+	 */
 	public function addSeries($TheTVDBAPIArray)
 	{
 
@@ -57,6 +64,9 @@ class TheTVDB
 				$this->pdo->escapeString($TheTVDBAPIArray['status'])));
 	}
 
+	/**
+	 * @param $TheTVDBAPIArray
+	 */
 	public function addEpisodes($TheTVDBAPIArray)
 	{
 
@@ -79,6 +89,23 @@ class TheTVDB
 		}
 	}
 
+	/**
+	 * @param $tvdbID
+	 * @param $actors
+	 * @param $airsday
+	 * @param $airstime
+	 * @param $contentrating
+	 * @param $firstaired
+	 * @param $genre
+	 * @param $imdbID
+	 * @param $network
+	 * @param $overview
+	 * @param $rating
+	 * @param $ratingcount
+	 * @param $runtime
+	 * @param $seriesname
+	 * @param $status
+	 */
 	public function updateSeries($tvdbID, $actors, $airsday, $airstime, $contentrating, $firstaired, $genre, $imdbID, $network, $overview, $rating, $ratingcount, $runtime, $seriesname, $status)
 	{
 		if ($airstime != "")
@@ -106,26 +133,49 @@ class TheTVDB
 		$this->pdo->queryExec($sql);
 	}
 
+	/**
+	 * @param $tvdbID
+	 */
 	public function deleteTitle($tvdbID)
 	{
 		$this->pdo->queryExec(sprintf("DELETE FROM thetvdb WHERE tvdbid = %d", $tvdbID));
 	}
 
+	/**
+	 * @param $seriesname
+	 */
 	public function addEmptySeries($seriesname)
 	{
 		$this->pdo->queryInsert(sprintf("INSERT INTO thetvdb (tvdbid, seriesname, createddate) VALUES (0, %s, now())", $this->pdo->escapeString($seriesname)));
 	}
 
+	/**
+	 * @param $tvdbID
+	 *
+	 * @return array|bool
+	 */
 	public function getSeriesInfoByID($tvdbID)
 	{
 		return $this->pdo->queryOneRow(sprintf("SELECT * FROM thetvdb WHERE tvdbid = %d", $tvdbID));
 	}
 
+	/**
+	 * @param $seriesname
+	 *
+	 * @return array|bool
+	 */
 	public function getSeriesInfoByName($seriesname)
 	{
 		return $this->pdo->queryOneRow(sprintf("SELECT * FROM thetvdb WHERE seriesname = %s", $this->pdo->escapeString($seriesname)));
 	}
 
+	/**
+	 * @param        $start
+	 * @param        $num
+	 * @param string $seriesname
+	 *
+	 * @return array
+	 */
 	public function getSeriesRange($start, $num, $seriesname='')
 	{
 		$limit = ($start === false) ? '' : " LIMIT ".$start.",".$num;
@@ -137,6 +187,11 @@ class TheTVDB
 		return $this->pdo->query(sprintf(" SELECT id, tvdbid, seriesname, overview FROM thetvdb WHERE 1=1 %s AND tvdbid > %d ORDER BY tvdbid ASC".$limit, $rsql, 0));
 	}
 
+	/**
+	 * @param string $seriesname
+	 *
+	 * @return mixed
+	 */
 	public function getSeriesCount($seriesname='')
 	{
 
@@ -149,6 +204,11 @@ class TheTVDB
 		return $res["num"];
 	}
 
+	/**
+	 * @param $seriesname
+	 *
+	 * @return bool|int
+	 */
 	public function lookupSeriesID($seriesname)
 	{
 
@@ -171,6 +231,12 @@ class TheTVDB
 		return $seriesid;
 	}
 
+	/**
+	 * @param      $seriesName
+	 * @param      $fullep
+	 * @param      $releaseID
+	 * @param bool $echooutput
+	 */
 	public function notFound($seriesName, $fullep, $releaseID, $echooutput=true)
 	{
 		if($this->echooutput && $echooutput)
@@ -178,6 +244,9 @@ class TheTVDB
 		$this->pdo->queryExec(sprintf('UPDATE releases SET episodeinfoid = -2 WHERE id = %d', $releaseID));
 	}
 
+	/**
+	 *
+	 */
 	public function processReleases()
 	{
 
@@ -298,6 +367,12 @@ class TheTVDB
 		}
 	}
 
+	/**
+	 * @param $seriesid
+	 * @param $seriesName
+	 *
+	 * @return array|bool
+	 */
 	public function TheTVDBAPI($seriesid, $seriesName)
 	{
 		$apiresponse = Utility::getUrl([$this->MIRROR.'/api/'.self::APIKEY.'/series/'.$seriesid.'/all/en.xml']); //.zip?
