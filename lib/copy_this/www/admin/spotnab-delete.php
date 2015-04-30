@@ -5,7 +5,7 @@ $page = new AdminPage();
 
 if (isset($_GET['id']))
 {
-	$spotnab = new Spotnab();
+	$spotnab = new SpotNab();
 	$spotnab->deleteSource($_GET['id']);
 }
 

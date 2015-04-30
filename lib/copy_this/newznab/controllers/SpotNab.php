@@ -34,11 +34,11 @@ function snHandleError($errno, $errstr, $errfile, $errline, array $errcontext){
 		default:
 			break;
 	};
-	throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
+	throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
 }
 
 // Create a NNTP Exception type so we can identify it from others
-class SpotNabException extends Exception { }
+class SpotNabException extends \Exception { }
 
 class SpotNab {
 	// Segment Identifier domain is used to help build segments
@@ -264,7 +264,7 @@ class SpotNab {
 
 	// ***********************************************************************
 	public function auto_clean($max_days=90){
-		$db = new newznab\db\DB();
+		$db = new DB();
 		// automatically sweep old sources lingering that have not shown any
 		// sort of life what-so-ever for more then 90 days
 		$sql = "DELETE FROM spotnabsources WHERE "
@@ -279,16 +279,16 @@ class SpotNab {
 		// this is to address people who do not wish to hold on to
 		// comments they do not have a release for... Makes sense :)
 		$offset = 0;
-		$sql = "SELECT DISTINCT(GID) as GID FROM releasecomment "
+		$sql = "SELECT DISTINCT(gid) as gid FROM releasecomment "
 				."WHERE releaseid = 0 "
 				."AND createddate < NOW() - INTERVAL $max_days DAY "
 				."ORDER BY createddate "
 				."LIMIT %d,%d";
 
-		$sql_rel = "SELECT GID FROM releases WHERE GID IN ('%s') ";
-		$sql_del = "DELETE FROM releasecomment WHERE GID IN ('%s')";
+		$sql_rel = "SELECT gid FROM releases WHERE gid IN ('%s') ";
+		$sql_del = "DELETE FROM releasecomment WHERE gid IN ('%s')";
 		$total_delcnt = 0;
-		$db = new newznab\db\DB();
+		$db = new DB();
 		while(1)
 		{
 			$res = $db->query(sprintf($sql, $offset, $batch));
@@ -298,12 +298,12 @@ class SpotNab {
             $gids_found = array();
             $gids_matched = array();
             foreach($res as $item)
-            	$gids_found[] = $item['GID'];
+            	$gids_found[] = $item['gid'];
 
 			#echo 'B:'.sprintf($sql_rel, implode("','", $gids_found))."\n";
 			$res2 = $db->query(sprintf($sql_rel, implode("','", $gids_found)));
             foreach($res2 as $item)
-            	$gids_matched[] = $item['GID'];
+            	$gids_matched[] = $item['gid'];
 			# Now we want to create an inverted list by eliminating the
 			# matches we just fetched
 			$gids_missing = array_diff($gids_found, $gids_matched);
@@ -333,7 +333,7 @@ class SpotNab {
 		//    using existing sources
 		//  - it has never posted discovery information
 		//  - it has never scanned for existing discoveries
-		$db = new newznab\db\DB();
+		$db = new DB();
 
 		// resets sources so they need to query again
 		$sources = "UPDATE spotnabsources SET "
@@ -367,7 +367,7 @@ class SpotNab {
 
 	// ***********************************************************************
 	public function fetch_discovery($reftime=Null, $retries=3){
-		$db = new newznab\db\DB();
+		$db = new DB();
 		$last = $first = Null;
 
 		// Return Value; Initialize it to Okay
@@ -529,7 +529,7 @@ class SpotNab {
 
 	// ***********************************************************************
 	public function auto_post_discovery($repost_sec=SpotNab::POST_BROADCAST_INTERVAL){
-		$db = new newznab\db\DB();
+		$db = new DB();
 		// performs a post discovery once the time in seconds has elapsed
 		$q = "SELECT updateddate FROM site WHERE "
 			."setting = 'spotnabbroadcast'";
@@ -652,7 +652,7 @@ class SpotNab {
 		* The specified $reftime is presumed to be local *not utc*
 		*/
 
-		$db = new newznab\db\DB();
+		$db = new DB();
 		$last = $first = Null;
 
 		// Return Value; Initialize it to Okay
@@ -905,7 +905,7 @@ class SpotNab {
 	public function processGID($limit=500, $batch=5000, $delete_broken_releases=false){
 		// Process until someone presses cntrl-c
 
-		$db = new newznab\db\DB();
+		$db = new DB();
 		$nzb = new NZB();
 
 		$processed = 0;
@@ -914,8 +914,8 @@ class SpotNab {
 		$offset = 0;
 
 		$fsql = 'SELECT id, name, guid FROM releases '
-				.'WHERE GID IS NULL ORDER BY adddate DESC LIMIT %d,%d';
-		$usql = "UPDATE releases SET GID = '%s' WHERE id = %d";
+				.'WHERE gid IS NULL ORDER BY adddate DESC LIMIT %d,%d';
+		$usql = "UPDATE releases SET gid = '%s' WHERE id = %d";
 
 		while(1){
 			// finish
@@ -1007,7 +1007,7 @@ class SpotNab {
 	public function keygen($print=true, $force_regen=false){
 		// Simply generate a Public/Private Key pair if they don't already
 		// exist
-		$db = new newznab\db\DB();
+		$db = new DB();
 
 		// A small boolean we safely toggle after performing
 		// a few checks first to make sure it's safe to do so
@@ -1330,7 +1330,7 @@ class SpotNab {
 		// Prepare some general SQL Commands for saving later if all goes well
 		//
 
-		$db = new newznab\db\DB();
+		$db = new DB();
 		$rc = new ReleaseComments();
 
 		// Comments
@@ -1553,7 +1553,7 @@ class SpotNab {
 		// Prepare some general SQL Commands for saving later if all goes well
 		//
 
-		$db = new newznab\db\DB();
+		$db = new DB();
 
         // Auto Enable Flag (used for inserts only)
 		$auto_enable = ($this->_auto_enable)?"1":"0";
@@ -1891,7 +1891,7 @@ class SpotNab {
 		{
 			$message['comments'] = $data['comments'];
 
-			$db = new newznab\db\DB();
+			$db = new DB();
 			$sql = sprintf("UPDATE releasecomment "
 					."SET issynced = 1 WHERE id IN (%s)",
 					implode(",", $data['ids']));
@@ -2245,7 +2245,7 @@ class SpotNab {
 		*	but otherwise it's expected format is string "Y-m-d H:i:s"
 		*/
 
-		$db = new newznab\db\DB();
+		$db = new DB();
 
 		// Now we fetch for any new posts since reference point
 		$sql = sprintf("SELECT r.gid, rc.id, rc.text, u.username, "
@@ -2266,8 +2266,8 @@ class SpotNab {
 		$ids = array();
 
 		foreach($res as $comment){
-			// If we don't have a GID then we can't make the post;
-			// the user hasn't set up there database to store the GID's
+			// If we don't have a gid then we can't make the post;
+			// the user hasn't set up there database to store the gid's
 			// correctly
 
 			if(empty($comment['gid']))
@@ -2488,7 +2488,7 @@ class SpotNab {
 
 	public function getSources()
 	{
-		$db = new newznab\db\DB();
+		$db = new DB();
 		return $db->query("SELECT id, lastupdate,lastbroadcast, active, description, "
 					."(SELECT count(id) from releasecomment where sourceid = s.id)"
 					." AS comments FROM spotnabsources s");
@@ -2496,14 +2496,14 @@ class SpotNab {
 
 	public function getSourceById($id)
 	{
-		$db = new newznab\db\DB();
+		$db = new DB();
 		$sql = sprintf("SELECT * FROM spotnabsources WHERE id = %d", $id);
 		return $db->queryOneRow($sql);
 	}
 
 	public function addSource($description,$username,$usermail,$usenetgroup,$publickey)
 	{
-		$db = new newznab\db\DB();
+		$db = new DB();
 		$sql = sprintf("INSERT INTO spotnabsources "
 				."(description, username, useremail,"
 				." usenetgroup, publickey, active) "
@@ -2516,7 +2516,7 @@ class SpotNab {
 
 	public function updateSource($id, $description,$username,$usermail,$usenetgroup,$publickey)
 	{
-		$db = new newznab\db\DB();
+		$db = new DB();
 		return $db->queryExec(
 			sprintf("UPDATE spotnabsources SET "
 				."description = %s, username = %s, useremail = %s,"
@@ -2528,19 +2528,19 @@ class SpotNab {
 
 	public function deleteSource($id)
 	{
-		$db = new newznab\db\DB();
+		$db = new DB();
 		return $db->queryExec(sprintf("DELETE FROM spotnabsources WHERE id = %d", $id));
 	}
 
 	public function toggleSource($id, $active)
 	{
-		$db = new newznab\db\DB();
+		$db = new DB();
 		return $db->queryExec(sprintf("update spotnabsources SET active = %d WHERE id = %d", $active, $id));
 	}
 
 	public function getDefaultValue($table,$field)
 	{
-		$db = new newznab\db\DB();
+		$db = new DB();
 		return $db->query(sprintf("SHOW COLUMNS FROM %s WHERE field = %s", $table, $db->escapeString($field)));
 	}
 }

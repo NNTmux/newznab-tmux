@@ -1,8 +1,8 @@
 <?php
-require_once NN_LIBS . 'TMDb.php';
 
 use newznab\db\DB;
 use newznab\utility\Utility;
+use newznab\libraries\Tmdb\TMDB;
 
 
 /**
@@ -151,8 +151,6 @@ class Film
 		$this->releaseImage = ($options['ReleaseImage'] instanceof \ReleaseImage ? $options['ReleaseImage'] : new \ReleaseImage($this->pdo));
 
 		$this->lookuplanguage = ($this->site->lookuplanguage != '') ? (string)$this->site->lookuplanguage : 'en';
-
-		$this->tmdb = ($options['TMDb'] instanceof \TMDb ? $options['TMDb'] : new \TMDb($this->site->tmdbkey, $this->lookuplanguage));
 
 		$this->fanartapikey = $this->site->fanarttvkey;
 		$this->imdburl = ($this->site->imdburl == 0 ? false : true);
@@ -719,19 +717,20 @@ class Film
 	public function fetchTMDBProperties($imdbId, $text = false)
 	{
 		$lookupId = ($text === false ? 'tt' . $imdbId : $imdbId);
+		$tmdb = new TMDB($this->site->tmdbkey);
 
 		try {
-			$tmdbLookup = $this->tmdb->getMovie($lookupId);
+			$tmdbLookup = $tmdb->getMovie($lookupId);
 		} catch (exception $e) {
 			return false;
 		}
-
-		if (!$tmdbLookup || (isset($tmdbLookup['status_code']) && $tmdbLookup['status_code'] !== 1)) {
+		/*$status = $tmdbLookup->get('status_code');
+		if (!$status || (isset($status) && $status !== 1)) {
 			return false;
-		}
+		}*/
 
 		$ret = [];
-		$ret['title'] = $tmdbLookup['title'];
+		$ret['title'] = $tmdbLookup->get('title');
 
 		if ($this->currentTitle !== '') {
 			// Check the similarity.
@@ -754,33 +753,40 @@ class Film
 			}
 		}
 
-		$ret['tmdbid'] = $tmdbLookup['id'];
-		$ImdbID = str_replace('tt', '', $tmdbLookup['imdb_id']);
+		$ret['tmdbid'] = $tmdbLookup->getID();
+		$ImdbID = str_replace('tt', '', $tmdbLookup->get('imdb_id'));
 		$ret['imdb_id'] = $ImdbID;
-		if (isset($tmdbLookup['vote_average'])) {
-			$ret['rating'] = ($tmdbLookup['vote_average'] == 0) ? '' : $tmdbLookup['vote_average'];
+		$vote = $tmdbLookup->getVoteAverage();
+		if (isset($va)) {
+			$ret['rating'] = ($vote == 0) ? '' : $vote;
 		}
-		if (isset($tmdbLookup['overview'])) {
-			$ret['plot'] = $tmdbLookup['overview'];
+		$overview = $tmdbLookup->get('overview');
+		if (isset($overview)) {
+			$ret['plot'] = $overview;
 		}
-		if (isset($tmdbLookup['tagline'])) {
-			$ret['tagline'] = $tmdbLookup['tagline'];
+		$tagline = $tmdbLookup->getTagline();
+		if (isset($tagline)) {
+			$ret['tagline'] = $tagline;
 		}
-		if (isset($tmdbLookup['release_date'])) {
-			$ret['year'] = date("Y", strtotime($tmdbLookup['release_date']));
+		$released = $tmdbLookup->get('release_date');
+		if (isset($released)) {
+			$ret['year'] = date("Y", strtotime($released));
 		}
-		if (isset($tmdbLookup['genres']) && sizeof($tmdbLookup['genres']) > 0) {
+		$genresa = $tmdbLookup->get('genres');
+		if (isset($genresa) && sizeof($genresa) > 0) {
 			$genres = [];
-			foreach ($tmdbLookup['genres'] as $genre) {
+			foreach ($genresa as $genre) {
 				$genres[] = $genre['name'];
 			}
 			$ret['genre'] = $genres;
 		}
-		if (isset($tmdbLookup['poster_path']) && sizeof($tmdbLookup['poster_path']) > 0) {
-			$ret['cover'] = "http://image.tmdb.org/t/p/w185" . $tmdbLookup['poster_path'];
+		$posterp = $tmdbLookup->getPoster();
+		if (isset($posterp) && sizeof($posterp > 0)) {
+			$ret['cover'] = "http://image.tmdb.org/t/p/w185" . $posterp;
 		}
-		if (isset($tmdbLookup['backdrop_path']) && sizeof($tmdbLookup['backdrop_path']) > 0) {
-			$ret['backdrop'] = "http://image.tmdb.org/t/p/original" . $tmdbLookup['backdrop_path'];
+		$backdrop = $tmdbLookup->get('backdrop_path');
+		if (isset($backdrop) && sizeof($backdrop) > 0) {
+			$ret['backdrop'] = "http://image.tmdb.org/t/p/original" . $backdrop;
 		}
 		if ($this->echooutput) {
 			$this->pdo->log->doEcho($this->pdo->log->primaryOver("TMDb Found ") . $this->pdo->log->headerOver($ret['title']), true);

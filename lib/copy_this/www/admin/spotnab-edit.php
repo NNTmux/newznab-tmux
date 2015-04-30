@@ -3,7 +3,7 @@
 require_once './config.php';
 
 $page = new AdminPage();
-$spotnab = new Spotnab();
+$spotnab = new SpotNab();
 $id = 0;
 
 // set the current action
