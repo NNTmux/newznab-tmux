@@ -1,5 +1,5 @@
 <?php
-require_once './config.php';
+require_once("config.php");
 
 /**
  * All admin pages implement this class. Enforces admin role for requesting user.

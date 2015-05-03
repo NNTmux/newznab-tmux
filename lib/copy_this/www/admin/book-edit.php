@@ -1,6 +1,6 @@
 <?php
 
-require_once './config.php';
+require_once("config.php");
 
 $page = new AdminPage();
 $book = new Book();

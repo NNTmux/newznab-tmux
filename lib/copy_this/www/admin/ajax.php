@@ -5,7 +5,7 @@
 if (!isset($_GET['action'])) {
 	exit();
 }
-require_once './config.php';
+require_once("config.php");
 
 // Make sure the user is an admin and logged in.
 $admin = new AdminPage;

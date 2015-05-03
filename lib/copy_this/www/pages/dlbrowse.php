@@ -1,5 +1,5 @@
 <?php
-require_once './config.php';
+require_once("config.php");
 
 use newznab\db\DB;
 use newznab\utility\Utility;

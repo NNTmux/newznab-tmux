@@ -5,7 +5,7 @@ if (PHP_SAPI === 'cli') {
 	exit('This is a web only script, run misc/testing/nzb-import.php instead.');
 }
 
-require_once './config.php';
+require_once("config.php");
 $page = new AdminPage();
 
 $filesToProcess = [];

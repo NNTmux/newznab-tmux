@@ -1,6 +1,6 @@
 <?php
 
-require_once './config.php';
+require_once 'config.php';
 
 $page = new AdminPage();
 $page->title = "Submit your regex expressions to newznab";
@@ -12,7 +12,7 @@ if (count($regexList))
 {
 	$regexSerialize = serialize($regexList);
 	$regexFilename  = 'releaseregex-' . time() . '.regex';
-	
+
 	// User wants to submit their regex's
 	if (isset($_POST['regex_submit_please']))
 	{
@@ -27,11 +27,11 @@ if (count($regexList))
 		$post = array(
 			"regex" => $regexSerialize
 		);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $post); 
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
 		$response = curl_exec($ch);
-		
+
 		curl_close($ch);
-				
+
 		if ($response == 'OK')
 		{
 			$page->smarty->assign('upload_status', 'OK');
