@@ -1,8 +1,9 @@
 <?php
-require_once(dirname(__FILE__) . "/config.php");
+require_once("config.php");
 
 use newznab\db\DB;
-use newznab\processing\ProcessReleases;
+
+
 
 $s = new \Sites();
 $site = $s->get();
@@ -22,7 +23,7 @@ if ($site->tablepergroup === 1) {
 $groupName = isset($argv[3]) ? $argv[3] : '';
 if (isset($argv[1]) && isset($argv[2])) {
 	$consoletools = new \ConsoleTools(['ColorCLI' => $pdo->log]);
-	$releases = new ProcessReleases(['Settings' => $pdo, 'ConsoleTools' => $consoletools]);
+	$releases = new Releases(['Settings' => $pdo, 'ConsoleTools' => $consoletools]);
 	if ($argv[1] == 1 && $argv[2] == 'true') {
 		$releases->processReleases(1, 1, $groupName, $nntp, true);
 	} else if ($argv[1] == 1 && $argv[2] == 'false') {
