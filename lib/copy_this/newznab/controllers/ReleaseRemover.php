@@ -682,7 +682,7 @@ class ReleaseRemover
 				'SELECT regex, id, groupname, msgcol
 				FROM binaryblacklist
 				WHERE optype = %d %s %s',
-				\Binaries::OPTYPE_BLACKLIST,
+				\Binaries::OPT_BLACKLIST,
 				$this->blacklistID,
 				$status
 			)
@@ -874,7 +874,7 @@ class ReleaseRemover
 				AND optype = %d
 				AND msgcol = %d',
 				\Binaries::BLACKLIST_ENABLED,
-				\Binaries::OPTYPE_BLACKLIST,
+				\Binaries::OPT_BLACKLIST,
 				\Binaries::BLACKLIST_FIELD_SUBJECT
 			)
 		);
