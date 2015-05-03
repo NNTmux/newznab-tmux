@@ -8,7 +8,6 @@ require_once dirname(__FILE__) . '/../../../../../www/config.php';
 
 use \newznab\db\DB;
 use \newznab\processing\PProcess;
-use \newznab\processing\ProcessReleases;
 use \newznab\processing\post\ProcessAdditional;
 
 // Are we coming from python or php ? $options[0] => (string): python|php
@@ -70,7 +69,7 @@ switch ($options[1]) {
 				return;
 			}
 		}
-		$binaries = new \Binaries(['NNTP' => $nntp, 'Settings' => $pdo, 'Groups' => $groups]);
+		$binaries = new \Binaries();
 		$return = $binaries->scan($groupMySQL, $options[4], $options[5], ($site->safepartrepair == 1 ? 'update' : 'backfill'));
 		if (empty($return)) {
 			exit();
@@ -137,22 +136,17 @@ switch ($options[1]) {
 				exit();
 			}
 		}
-		(new \Binaries(['NNTP' => $nntp, 'Groups' => $groups, 'Settings' => $pdo]))->partRepair($groupMySQL);
+		(new \Binaries())->partRepair($groupMySQL);
 		break;
 
 	// Process releases.
 	// $options[2] => (string)groupCount, number of groups terminated by _ | (int)groupid, group to work on
 	case 'releases':
 		$pdo = new DB();
-		$releases = new ProcessReleases(['Settings' => $pdo]);
+		$releases = new \Releases(['Settings' => $pdo]);
 
 		//Runs function that are per group
 		if (is_numeric($options[2])) {
-
-			if ($options[0] === 'python') {
-				collectionCheck($pdo, $options[2]);
-			}
-
 			processReleases($releases, $options[2]);
 
 		} else {
@@ -187,7 +181,7 @@ switch ($options[1]) {
 		$nntp = nntp($pdo);
 		$groups = new \Groups();
 		$groupMySQL = $groups->getByName($options[2]);
-		(new \Binaries(['NNTP' => $nntp, 'Groups' => $groups, 'Settings' => $pdo]))->updateGroup($groupMySQL);
+		(new \Binaries())->updateGroup($groupMySQL);
 		break;
 
 
@@ -271,17 +265,15 @@ switch ($options[1]) {
 /**
  * Create / process releases for a groupid.
  *
- * @param \newznab\processing\ProcessReleases $releases
+ * @param \Releases $releases
  * @param int             $groupID
  */
 function processReleases($releases, $groupID)
 {
-	$releases->processIncompleteCollections($groupID);
-	$releases->processCollectionSizes($groupID);
-	$releases->deleteUnwantedCollections($groupID);
+	$releases->applyRegex($groupID);
+	$releases->processIncompleteBinaries($groupID);
 	$releases->createReleases($groupID);
-	$releases->createNZBs($groupID);
-	$releases->deleteCollections($groupID);
+	$releases->deleteBinaries($groupID);
 }
 
 /**

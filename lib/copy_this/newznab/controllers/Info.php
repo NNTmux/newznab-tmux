@@ -256,7 +256,7 @@ class Info
 		return (
 		sprintf(
 			'AND r.nzbstatus = %d AND r.nfostatus BETWEEN %d AND %d %s %s',
-			NZB::NZB_ADDED,
+			Enzebe::NZB_ADDED,
 			($maxRetries < -8 ? -8 : $maxRetries),
 			self::NFO_UNPROC,
 			(($maxSize != '' && $maxSize > 0) ? ('AND r.size < ' . ($maxSize * 1073741824)) : ''),
@@ -391,7 +391,7 @@ class Info
 				FROM releases r
 				WHERE r.nzbstatus = %d
 				AND r.nfostatus < %d %s %s',
-				NZB::NZB_ADDED,
+				Enzebe::NZB_ADDED,
 				$this->maxRetries,
 				$groupIDQuery,
 				$guidCharQuery
@@ -414,7 +414,7 @@ class Info
 				WHERE r.nzbstatus = %d
 				AND r.nfostatus < %d %s %s',
 				self::NFO_FAILED,
-				NZB::NZB_ADDED,
+				Enzebe::NZB_ADDED,
 				$this->maxRetries,
 				$groupIDQuery,
 				$guidCharQuery

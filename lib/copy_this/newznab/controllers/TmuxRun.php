@@ -1,4 +1,7 @@
 <?php
+
+use newznab\db\DB;
+
 /**
  * Tmux pane shell exec functions for pane respawning
  *
@@ -11,7 +14,7 @@ class TmuxRun extends Tmux
 	/**
 	 * @param newznab\db\DB $pdo
 	 */
-	public function __construct(newznab\db\DB $pdo = null)
+	public function __construct(DB $pdo = null)
 	{
 		parent::__construct($pdo);
 		$this->_dateFormat = '%Y-%m-%d %T';
@@ -305,17 +308,17 @@ class TmuxRun extends Tmux
 	protected function _runNonBackfill(&$runVar)
 	{
 		//run backfill
-		$backsleep = ($runVar['settings']['progressive'] == 1 && floor($runVar['counts']['now']['collections_table'] / 500) > $runVar['settings']['back_timer']
-			? floor($runVar['counts']['now']['collections_table'] / 500)
-			: $runVar['settings']['back_timer']
+		$backsleep = ($runVar['settings']['progressive'] == 1 && floor($runVar['counts']['now']['binaries_table'] / 500) > $runVar['settings']['back_timer']
+					? floor($runVar['counts']['now']['binaries_table'] / 500)
+					: $runVar['settings']['back_timer']
 		);
 
-		if (($runVar['settings']['backfill'] != 0) && ($runVar['killswitch']['coll'] == false) && ($runVar['killswitch']['pp'] == false)) {
+		if (($runVar['settings']['backfill'] != 0) && ($runVar['killswitch']['pp'] == false)) {
 			$log = $this->writelog($runVar['panes']['zero'][3]);
 			shell_exec("tmux respawnp -t{$runVar['constants']['tmux_session']}:0.3 ' \
 				{$runVar['scripts']['backfill']} $log; date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} $backsleep' 2>&1 1> /dev/null"
 			);
-		} else if (($runVar['killswitch']['coll'] == true) || ($runVar['killswitch']['pp'] == true)) {
+		} else if ($runVar['killswitch']['pp'] == true) {
 			$color = $this->get_color($runVar['settings']['colors_start'], $runVar['settings']['colors_end'], $runVar['settings']['colors_exc']);
 			shell_exec("tmux respawnp -k -t{$runVar['constants']['tmux_session']}:0.3 'echo \"\033[38;5;${color}m\n{$runVar['panes']['zero'][3]} has been disabled/terminated by Exceeding Limits\"'");
 		} else {

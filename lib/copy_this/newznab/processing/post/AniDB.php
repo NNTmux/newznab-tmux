@@ -71,7 +71,7 @@ class AniDB
 							AND categoryid = %d
 							ORDER BY postdate DESC
 							LIMIT %d',
-									 \NZB::NZB_ADDED,
+									 \Enzebe::NZB_ADDED,
 									 \Category::CAT_TV_ANIME,
 									 $this->aniqty
 							 )

@@ -217,7 +217,7 @@ class Enzebe
 				$this->pdo->queryExec(
 					sprintf('
 						UPDATE releases SET nzbstatus = %d %s WHERE id = %d',
-						\NZB::NZB_ADDED,
+						\Enzebe::NZB_ADDED,
 						($nzb_guid === '' ? '' : ', nzb_guid = ' . $this->pdo->escapestring(md5($nzb_guid))),
 						$relID
 					)

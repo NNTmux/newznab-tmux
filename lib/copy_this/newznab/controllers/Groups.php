@@ -30,16 +30,37 @@ class Groups
 	/**
 	 * Get all group rows.
 	 */
-	public function getAll()
+	public function getAll($orderby = null)
 	{
-		return $this->pdo->query(
-			"SELECT groups.*,
-			COALESCE(rel.num, 0) AS num_releases
-			FROM groups
-			LEFT OUTER JOIN
-				(SELECT groupid, COUNT(id) AS num FROM releases GROUP BY groupid) rel
-			ON rel.groupid = groups.id
-			ORDER BY groups.name"
+		$order = ($orderby == null) ? 'name_desc' : $orderby;
+		$orderArr = explode("_", $order);
+		switch ($orderArr[0]) {
+			case 'name':
+				$orderfield = 'groups.name';
+				break;
+			case 'description':
+				$orderfield = 'groups.description';
+				break;
+			case 'releases':
+				$orderfield = 'num_releases';
+				break;
+			case 'updated':
+				$orderfield = 'groups.last_updated';
+				break;
+			default:
+				$orderfield = 'groups.name';
+				break;
+		}
+		$ordersort = (isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'desc';
+		$orderby = $orderfield . " " . $ordersort;
+
+
+		return $this->pdo->query(sprintf("SELECT groups.*, COALESCE(rel.num, 0) AS num_releases
+							FROM groups
+							LEFT OUTER JOIN
+							( SELECT groupid, COUNT(id) AS num FROM releases group by groupid ) rel ON rel.groupid = groups.id
+							ORDER BY %s", $orderby
+			)
 		);
 	}
 
@@ -190,7 +211,7 @@ class Groups
 			sprintf(
 				"UPDATE groups
 				SET name = %s, description = %s, backfill_target = %s, first_record = %s, last_record = %s,
-				last_updated = NOW(), active = %s, backfill = %s, %s %s
+				last_updated = NOW(), active = %s, backfill = %s, %s %s, regexmatchonly = %s
 				WHERE id = %d",
 				$this->pdo->escapeString(trim($group["name"])),
 				$this->pdo->escapeString(trim($group["description"])),
@@ -201,6 +222,7 @@ class Groups
 				$this->formatNumberString($group["backfill"]),
 				$minFileString,
 				$minSizeString,
+				$group["regexmatchonly"],
 				$group["id"]
 			)
 		);
@@ -216,19 +238,30 @@ class Groups
 	public function add($group)
 	{
 		$minFileString =
-			($group["minfilestoformrelease"] == '' ? "NULL" : sprintf("%d", $this->formatNumberString($group["minfilestoformrelease"], false))
+			($group["minfilestoformrelease"] == '' ?
+				"NULL" :
+				sprintf("%d", $this->formatNumberString($group["minfilestoformrelease"], false))
 			);
 
 		$minSizeString =
-			($group["minsizetoformrelease"] == '' ? "NULL" : sprintf("%d", $this->formatNumberString($group["minsizetoformrelease"], false))
+			($group["minsizetoformrelease"] == '' ?
+				"NULL" :
+				sprintf("%d", $this->formatNumberString($group["minsizetoformrelease"], false))
 			);
+
+		$regexmatchonly =
+			($group["regexmatchonly"] == '' ?
+				'0' :
+				sprintf("%d", $this->formatNumberString($group["regexmatchonly"], false))
+			);
+
 
 		return $this->pdo->queryInsert(
 			sprintf("
 				INSERT INTO groups
 					(name, description, backfill_target, first_record, last_record, last_updated,
-					active, backfill, minfilestoformrelease, minsizetoformrelease)
-				VALUES (%s, %s, %s, %s, %s, NOW(), %s, %s, %s, %s)",
+					active, backfill, minfilestoformrelease, minsizetoformrelease, regexmatchonly)
+				VALUES (%s, %s, %s, %s, %s, NOW(), %s, %s, %s, %s, %s)",
 				$this->pdo->escapeString(trim($group["name"])),
 				$this->pdo->escapeString(trim($group["description"])),
 				$this->formatNumberString($group["backfill_target"]),
@@ -237,7 +270,8 @@ class Groups
 				$this->formatNumberString($group["active"]),
 				$this->formatNumberString($group["backfill"]),
 				$minFileString,
-				$minSizeString
+				$minSizeString,
+				$regexmatchonly
 			)
 		);
 	}
@@ -282,9 +316,8 @@ class Groups
 		(new \Binaries(['Groups' => $this, 'Settings' => $this->pdo]))->purgeGroup($id);
 
 		// Remove rows from part repair.
-		$this->pdo->queryExec(sprintf("DELETE FROM partrepair WHERE group_id = %d", $id));
+		$this->pdo->queryExec(sprintf("DELETE FROM partrepair WHERE groupid = %d", $id));
 
-		$this->pdo->queryExec(sprintf('DROP TABLE IF EXISTS collections_%d', $id));
 		$this->pdo->queryExec(sprintf('DROP TABLE IF EXISTS binaries_%d', $id));
 		$this->pdo->queryExec(sprintf('DROP TABLE IF EXISTS parts_%d', $id));
 		$this->pdo->queryExec(sprintf('DROP TABLE IF EXISTS partrepair_%d', $id));
@@ -306,13 +339,11 @@ class Groups
 	 */
 	public function resetall()
 	{
-		$this->pdo->queryExec("TRUNCATE TABLE collections");
 		$this->pdo->queryExec("TRUNCATE TABLE binaries");
 		$this->pdo->queryExec("TRUNCATE TABLE parts");
 		$this->pdo->queryExec("TRUNCATE TABLE partrepair");
 		$groups = $this->pdo->query("SELECT id FROM groups");
 		foreach ($groups as $group) {
-			$this->pdo->queryExec('DROP TABLE IF EXISTS collections_' . $group['id']);
 			$this->pdo->queryExec('DROP TABLE IF EXISTS binaries_' . $group['id']);
 			$this->pdo->queryExec('DROP TABLE IF EXISTS parts_' . $group['id']);
 			$this->pdo->queryExec('DROP TABLE IF EXISTS partrepair_' . $group['id']);
@@ -332,13 +363,15 @@ class Groups
 	 */
 	function addBulk($groupList, $active = 1, $backfill = 1)
 	{
+		require_once(WWW_DIR . "/lib/binaries.php");
+		require_once(WWW_DIR . "/lib/nntp.php");
 
 		$ret = array();
 
 		if ($groupList == "") {
 			$ret[] = "No group list provided.";
 		} else {
-			$nntp = new NNTP(['Echo' => false]);
+			$nntp = new Nntp(['Echo' => false]);
 			if (!$nntp->doConnect()) {
 				$ret[] = "Failed to get NNTP connection";
 
@@ -414,8 +447,8 @@ class Groups
 	private $cbppTableNames;
 
 	/**
-	 * Get the names of the collections/binaries/parts/part repair tables.
-	 * If TPG is on, try to create new tables for the group_id, if we fail, log the error and exit.
+	 * Get the names of the binaries/parts/part repair tables.
+	 * If TPG is on, try to create new tables for the groupid, if we fail, log the error and exit.
 	 *
 	 * @param bool $tpgSetting false, tpg is off in site setting, true tpg is on in site setting.
 	 * @param int  $groupID    id of the group.
@@ -432,7 +465,6 @@ class Groups
 		}
 
 		$tables = [];
-		$tables['cname']  = 'collections';
 		$tables['bname']  = 'binaries';
 		$tables['pname']  = 'parts';
 		$tables['prname'] = 'partrepair';
@@ -447,7 +479,6 @@ class Groups
 			}
 
 			$groupEnding = '_' . $groupID;
-			$tables['cname']  .= $groupEnding;
 			$tables['bname']  .= $groupEnding;
 			$tables['pname']  .= $groupEnding;
 			$tables['prname'] .= $groupEnding;
@@ -486,21 +517,21 @@ class Groups
 	 */
 	public function createNewTPGTables($groupID)
 	{
-		foreach (['collections', 'binaries', 'parts', 'partrepair'] as $tableName) {
+		foreach (['binaries', 'parts', 'partrepair'] as $tableName) {
 			if ($this->pdo->queryExec(sprintf('SELECT * FROM %s_%s LIMIT 1', $tableName, $groupID), true) === false) {
 				if ($this->pdo->queryExec(sprintf('CREATE TABLE %s_%s LIKE %s', $tableName, $groupID, $tableName), true) === false) {
 					return false;
-				} else {
-					if ($tableName === 'collections') {
+				} /*else {
+					if ($tableName === 'binaries') {
 						$this->pdo->queryExec(
 							sprintf(
-								'CREATE TRIGGER delete_collections_%s BEFORE DELETE ON collections_%s FOR EACH ROW BEGIN' .
-								' DELETE FROM binaries_%s WHERE collection_id = OLD.id; DELETE FROM parts_%s WHERE collection_id = OLD.id; END',
-								$groupID, $groupID, $groupID, $groupID
+								'CREATE TRIGGER delete_binaries_%s BEFORE DELETE ON binaries_%s FOR EACH ROW BEGIN' .
+								' DELETE FROM parts_%s WHERE binaryid = OLD.id; END',
+								$groupID, $groupID, $groupID
 							)
 						);
 					}
-				}
+				}*/
 			}
 		}
 		return true;

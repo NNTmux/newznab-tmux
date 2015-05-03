@@ -409,7 +409,7 @@ class NZBImport
 					'isrenamed' => $renamed,
 					'reqidstatus' => 0,
 					'prehashid' => 0,
-					'nzbstatus' => \NZB::NZB_ADDED
+					'nzbstatus' => \Enzebe::NZB_ADDED
 				]
 			);
 		} else {

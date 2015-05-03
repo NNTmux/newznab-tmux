@@ -178,7 +178,7 @@ class NameFixer
 					INNER JOIN releasenfo nfo ON (nfo.releaseid = rel.id)
 					WHERE nzbstatus = %d
 					AND prehashid = 0',
-				NZB::NZB_ADDED
+				Enzebe::NZB_ADDED
 			);
 			$cats = 2;
 			$preId = true;
@@ -258,7 +258,7 @@ class NameFixer
 					INNER JOIN releasefiles rf ON (rf.releaseid = rel.id)
 					WHERE nzbstatus = %d
 					AND prehashid = 0',
-				NZB::NZB_ADDED
+				Enzebe::NZB_ADDED
 			);
 			$cats = 2;
 			$preId = true;
@@ -318,7 +318,7 @@ class NameFixer
 					FROM releases rel
 					WHERE nzbstatus = %d
 					AND prehashid = 0',
-				NZB::NZB_ADDED
+				Enzebe::NZB_ADDED
 			);
 			$cats = 2;
 		} else {

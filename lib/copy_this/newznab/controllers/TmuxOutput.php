@@ -1,4 +1,6 @@
 <?php
+
+use newznab\db\DB;
 /**
  * Tmux output functions for printing monitor data
  *
@@ -22,7 +24,7 @@ class TmuxOutput extends Tmux
 	/**
 	 * @param newznab\db\DB $pdo
 	 */
-	public function __construct(newznab\db\DB $pdo = null)
+	public function __construct(DB $pdo = null)
 	{
 		parent::__construct($pdo);
 
@@ -112,7 +114,7 @@ class TmuxOutput extends Tmux
 		$buffer = '';
 		$state = ($this->runVar['settings']['is_running'] == 1) ? 'Running' : 'Disabled';
 		//$version = $this->_tvers . 'r' . $this->_vers;
-		$tversion = '0.6r0205';
+		$tversion = '0.5r01259';
 
 		$buffer .= sprintf($this->tmpMasks[2],
 					"Monitor $state v$tversion @ $this->_tvers [" . $this->_vers ."]: ",
@@ -164,23 +166,6 @@ class TmuxOutput extends Tmux
 					? $this->relativeTime($this->runVar['timers']['newOld']['newestprehash'])
 					: 0)
 			)
-		);
-
-		$buffer .= sprintf($this->tmpMasks[1],
-			sprintf(
-				"Collection Age[%d]:",
-				$this->runVar['constants']['delaytime']
-			),
-			sprintf(
-				"%s ago",
-				(isset($this->runVar['timers']['newOld']['oldestcollection'])
-					? $this->relativeTime($this->runVar['timers']['newOld']['oldestcollection'])
-					: 0)
-			)
-		);
-		$buffer .= sprintf($this->tmpMasks[1],
-			"Parts in Repair:",
-			number_format($this->runVar['counts']['now']['partrepair_table'])
 		);
 
 		if (($this->runVar['settings']['post'] == "1" || $this->runVar['settings']['post'] == "3") && $this->runVar['constants']['sequential'] != 2) {
@@ -494,12 +479,12 @@ class TmuxOutput extends Tmux
 
 	protected function _getTableCounts()
 	{
-		$buffer = sprintf($this->tmpMasks[3], "Collections", "Binaries", "Parts");
+		$buffer = sprintf($this->tmpMasks[3], "Binaries", "Parts", "Parts in repair");
 		$buffer .= $this->_getSeparator();
 		$buffer .= sprintf($this->tmpMasks[5],
-			number_format($this->runVar['counts']['now']['collections_table']),
-			number_format($this->runVar['counts']['now']['binaries_table']),
-			number_format($this->runVar['counts']['now']['parts_table'])
+			   number_format($this->runVar['counts']['now']['binaries_table']),
+			   number_format($this->runVar['counts']['now']['parts_table']),
+				number_format($this->runVar['counts']['now']['partrepair_table'])
 		);
 
 		return $buffer;
