@@ -16,7 +16,7 @@ require_once(NN_LIBS . 'forkdaemon-php' . DS . 'fork_daemon.php');
  * For example, you get all the id's of the active groups in the groups table, you then iterate over them and spawn
  * processes of misc/update_binaries.php passing the group id's.
  *
- * @package newznab\libraries
+ * @package nzedb\libraries
  */
 class Forking extends \fork_daemon
 {
@@ -295,7 +295,7 @@ class Forking extends \fork_daemon
 		foreach ($groups as $group) {
 			$this->_executeCommand(
 				PHP_BINARY . ' ' . NN_UPDATE . 'backfill.php ' .
-			$group['name'] . (isset($group['max']) ? (' ' . $group['max']) : '')
+				$group['name'] . (isset($group['max']) ? (' ' . $group['max']) : '')
 			);
 		}
 	}
@@ -579,7 +579,7 @@ class Forking extends \fork_daemon
 
 			if ($groups instanceof \Traversable) {
 				foreach($groups as $group) {
-					if ($this->pdo->queryOneRow(sprintf('SELECT id FROM collections_%d  LIMIT 1',$group['id'])) !== false) {
+					if ($this->pdo->queryOneRow(sprintf('SELECT id FROM binaries_%d  LIMIT 1',$group['id'])) !== false) {
 						$this->work[] = ['id' => $group['id']];
 					}
 				}
@@ -648,14 +648,14 @@ class Forking extends \fork_daemon
 	private function checkProcessAdditional()
 	{
 		$this->ppAddMinSize =
-			($this->site->minsizetopostprocess != '') ? (int)$this->site->minsizetopostprocess : 1;
-		$this->ppAddMinSize = ($this->ppAddMinSize > 0 ? ('AND r.size > ' . ($this->ppAddMinSize * 1048576)) : '');
+			(string)($this->site->minsizetopostprocess != '') ? $this->site->minsizetopostprocess : 1;
+		$this->ppAddMinSize = ($this->ppAddMinSize === 0 ? '' : 'AND r.size > ' . ($this->ppAddMinSize * 1048576));
 		$this->ppAddMaxSize =
-			($this->site->maxsizetopostprocess != '') ? (int)$this->site->maxsizetopostprocess : 100;
-		$this->ppAddMaxSize = ($this->ppAddMaxSize > 0 ? ('AND r.size < ' . ($this->ppAddMaxSize * 1073741824)) : '');
+			(string)($this->site->maxsizetopostprocess != '') ? $this->site->maxsizetopostprocess : 100;
+		$this->ppAddMaxSize = ($this->ppAddMaxSize === 0 ? '' : 'AND r.size < ' . ($this->ppAddMaxSize * 1073741824));
 		return (
-			$this->pdo->queryOneRow(
-				sprintf('
+		$this->pdo->queryOneRow(
+			sprintf('
 					SELECT r.id
 					FROM releases r
 					LEFT JOIN category c ON c.id = r.categoryid
@@ -665,11 +665,11 @@ class Forking extends \fork_daemon
 					AND c.disablepreview = 0
 					%s %s
 					LIMIT 1',
-					\Enzebe::NZB_ADDED,
-					$this->ppAddMaxSize,
-					$this->ppAddMinSize
-				)
-			) === false ? false : true
+				\Enzebe::NZB_ADDED,
+				$this->ppAddMaxSize,
+				$this->ppAddMinSize
+			)
+		) === false ? false : true
 		);
 	}
 
@@ -712,12 +712,12 @@ class Forking extends \fork_daemon
 		if ($this->site->lookupnfo == 1) {
 			$this->nfoQueryString = \Info::NfoQueryString($this->pdo);
 			return (
-				$this->pdo->queryOneRow(
-					sprintf(
-						'SELECT r.id FROM releases r WHERE 1=1 %s LIMIT 1',
-						$this->nfoQueryString
-					)
-				) === false ? false : true
+			$this->pdo->queryOneRow(
+				sprintf(
+					'SELECT r.id FROM releases r WHERE 1=1 %s LIMIT 1',
+					$this->nfoQueryString
+				)
+			) === false ? false : true
 			);
 		}
 		return false;
@@ -752,8 +752,8 @@ class Forking extends \fork_daemon
 	{
 		if ($this->site->lookupimdb > 0) {
 			return (
-				$this->pdo->queryOneRow(
-					sprintf('
+			$this->pdo->queryOneRow(
+				sprintf('
 						SELECT id
 						FROM releases
 						WHERE nzbstatus = %d
@@ -761,11 +761,11 @@ class Forking extends \fork_daemon
 						AND categoryid BETWEEN 2000 AND 2999
 						%s %s
 						LIMIT 1',
-						\Enzebe::NZB_ADDED,
-						($this->site->lookupimdb == 2 ? 'AND isrenamed = 1' : ''),
-						($this->ppRenamedOnly ? 'AND isrenamed = 1' : '')
-					)
-				) === false ? false : true
+					\Enzebe::NZB_ADDED,
+					($this->site->lookupimdb == 2 ? 'AND isrenamed = 1' : ''),
+					($this->ppRenamedOnly ? 'AND isrenamed = 1' : '')
+				)
+			) === false ? false : true
 			);
 		}
 		return false;
@@ -806,8 +806,8 @@ class Forking extends \fork_daemon
 	{
 		if ($this->site->lookuptvrage > 0) {
 			return (
-				$this->pdo->queryOneRow(
-					sprintf('
+			$this->pdo->queryOneRow(
+				sprintf('
 						SELECT id
 						FROM releases
 						WHERE nzbstatus = %d
@@ -816,11 +816,11 @@ class Forking extends \fork_daemon
 						AND categoryid BETWEEN 5000 AND 5999
 						%s %s
 						LIMIT 1',
-						\Enzebe::NZB_ADDED,
-						($this->site->lookuptvrage == 2 ? 'AND isrenamed = 1' : ''),
-						($this->ppRenamedOnly ? 'AND isrenamed = 1' : '')
-					)
-				) === false ? false : true
+					\Enzebe::NZB_ADDED,
+					($this->site->lookuptvrage == 2 ? 'AND isrenamed = 1' : ''),
+					($this->ppRenamedOnly ? 'AND isrenamed = 1' : '')
+				)
+			) === false ? false : true
 			);
 		}
 		return false;
@@ -878,11 +878,14 @@ class Forking extends \fork_daemon
 	private function processSingle()
 	{
 		$postProcess = new PProcess(['Settings' => $this->pdo, 'ColorCLI' => $this->_colorCLI]);
+		$pp = new PostProcess(true);
 		//$postProcess->processAnime();
 		$postProcess->processBooks();
+		$pp->processBooks();
 		$postProcess->processConsoles();
 		$postProcess->processGames();
 		$postProcess->processMusic();
+		$pp->processMusic();
 		$postProcess->processXXX();
 	}
 

@@ -3,7 +3,6 @@ namespace newznab\libraries;
 
 use newznab\db\DB;
 
-
 /**
  * Class ForkingImportNZB
  *

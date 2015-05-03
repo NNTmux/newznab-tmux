@@ -6,9 +6,10 @@ if (!isset($argv[1])) {
 
 require_once dirname(__FILE__) . '/../../../../../www/config.php';
 
-use \newznab\db\DB;
-use \newznab\processing\PProcess;
-use \newznab\processing\post\ProcessAdditional;
+use newznab\db\DB;
+use newznab\processing\PProcess;
+use newznab\processing\post\ProcessAdditional;
+
 
 // Are we coming from python or php ? $options[0] => (string): python|php
 // The type of process we want to do: $options[1] => (string): releases
@@ -307,7 +308,7 @@ function collectionCheck(&$pdo, $groupID)
 /**
  * Connect to usenet, return NNTP object.
  *
- * @param \newznab\db\DB $pdo
+ * @param \DB $pdo
  * @param bool               $alternate Use alternate NNTP provider.
  *
  * @return NNTP
