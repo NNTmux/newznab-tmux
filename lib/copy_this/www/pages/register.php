@@ -1,5 +1,4 @@
 <?php
-require_once(WWW_DIR."/lib/site.php");
 
 if ($users->isLoggedIn())
 	$page->show404();
@@ -20,7 +19,6 @@ elseif ($page->site->registerstatus == Sites::REGISTER_STATUS_INVITE && (!isset(
 // Use recaptcha?
 if ($page->site->registerrecaptcha == 1)
 {
-	require_once(WWW_DIR."/lib/recaptchalib.php");
 	$page->smarty->assign('recaptcha', recaptcha_get_html($page->site->recaptchapublickey, null, $page->secure_connection));
 }
 

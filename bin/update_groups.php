@@ -1,16 +1,13 @@
 <?php
 
 require_once(dirname(__FILE__).'/config.php');
-require_once(WWW_DIR . "lib/framework/db.php");
-require_once(WWW_DIR . '/lib/nntp.php');
-require_once(WWW_DIR . "/lib/ColorCLI.php");
-require_once(WWW_DIR . "/lib/ConsoleTools.php");
+
+use newznab\db\DB;
 
 
 $start = TIME();
-$c = new ColorCLI();
-$consoleTools = new ConsoleTools();
 $pdo = new DB();
+$consoleTools = new \ConsoleTools(['ColorCLI' => $pdo->log]);
 
 // Create the connection here and pass
 $nntp = new \NNTP(['Settings' => $pdo]);

@@ -1,8 +1,6 @@
 <?php
 
 require_once("config.php");
-require_once(WWW_DIR . "/lib/adminpage.php");
-require_once(WWW_DIR . "/lib/Logger.php");
 
 $page = new AdminPage();
 $page->title = 'View Logs';

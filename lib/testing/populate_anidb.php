@@ -3,8 +3,8 @@
 * IF you are using this script then then you also want to edit anidb.php in www/lib and locate "604800" and replace it with 1204400, this will make sure it never tries to connect to anidb as this will fail
 */
 require_once(dirname(__FILE__) . "/../../bin/config.php");
-require_once(WWW_DIR . "/lib/framework/db.php");
-require_once(WWW_DIR . "/populate/AniDB.php");
+
+use newznab\db\DB;
 
 $pdo = new DB();
 

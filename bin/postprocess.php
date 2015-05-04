@@ -1,16 +1,9 @@
 <?php
 
 require_once(dirname(__FILE__) . '/config.php');
-require_once(WWW_DIR . '/lib/postprocess.php');
-require_once(WWW_DIR . '/lib/framework/db.php');
-require_once(WWW_DIR . '/lib/nntp.php');
-require_once(WWW_DIR . '/lib/site.php');
-require_once(WWW_DIR . '/lib/anidb.php');
-require_once(WWW_DIR . '/lib/thetvdb.php');
-require_once(WWW_DIR . "/lib/ColorCLI.php");
-require_once(dirname(__FILE__) . '/../lib/TvAnger.php');
-require_once(dirname(__FILE__) . '/../lib/Pprocess.php');
-require_once(dirname(__FILE__) . '/../lib/Info.php');
+
+use newznab\db\DB;
+use newznab\processing\PProcess;
 
 $pdo = new DB();
 $s = new Sites();
@@ -80,7 +73,6 @@ if ($args[$argv[1]] === true) {
 }
 
 $postProcess = new PProcess(['Settings' => $pdo, 'Echo' => ($argv[2] === 'true' ? true : false)]);
-$pp = new PostProcess(true);
 
 $charArray = ['a','b','c','d','e','f','0','1','2','3','4','5','6','7','8','9'];
 
@@ -111,7 +103,6 @@ switch ($argv[1]) {
 		break;
 	case 'book':
 		$postProcess->processBooks();
-		$pp->processBooks();
 		break;
 	case 'console':
 		$postProcess->processConsoles();
@@ -127,7 +118,6 @@ switch ($argv[1]) {
 		break;
 	case 'music':
 		$postProcess->processMusic();
-		$pp->processMusic();
 		break;
 	case 'pre':
 		break;
@@ -135,7 +125,7 @@ switch ($argv[1]) {
 		$postProcess->processSharing($nntp);
 		break;
 	case 'spotnab':
-		$postProcess->processSpotnab($nntp);
+		$postProcess->processSpotnab();
 		break;
 	case 'tv':
 		$postProcess->processTV('', (isset($argv[3]) && in_array($argv[3], $charArray) ? $argv[3] : ''));

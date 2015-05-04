@@ -1,29 +1,26 @@
 <?php
-require_once(WWW_DIR."/lib/releases.php");
-require_once(WWW_DIR."/lib/nzb.php");
-require_once(WWW_DIR."/lib/util.php");
 
 $releases = new Releases;
-$nzb = new Nzb;
+$nzb = new NZB;
 
-if (!$users->isLoggedIn()) {
+if (!$users->isLoggedIn())
 	$page->show403();
-}
 
 if (isset($_GET["id"]))
 {
 	$rel = $releases->getByGuid($_GET["id"]);
-	if (!$rel) {
+	if (!$rel)
 		$page->show404();
-	}
 
-	$nzbpath = $nzb->getNZBPath($_GET["id"], $page->site->nzbpath);
+	$nzbpath = $nzb->getNZBPath($_GET["id"]);
 
-	if (!file_exists($nzbpath)) {
+	if (!file_exists($nzbpath))
 		$page->show404();
-	}
 
-	$nzbfile = Utility::unzipGzipFile($nzbpath);
+	ob_start();
+	@readgzfile($nzbpath);
+	$nzbfile = ob_get_contents();
+	ob_end_clean();
 
 	$ret = $nzb->nzbFileList($nzbfile);
 
@@ -44,9 +41,9 @@ if (isset($_GET["id"]))
 
 	$page->content = $page->smarty->fetch('viewfilelist.tpl');
 
-	if ($modal) {
+	if ($modal)
 		echo $page->content;
-	} else {
+	else
 		$page->render();
-	}
 }
+

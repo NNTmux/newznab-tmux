@@ -1,6 +1,8 @@
 <?php
 require_once(dirname(__FILE__) . "/../../../bin/config.php");
-require_once(WWW_DIR . "/lib/framework/db.php");
+
+use newznab\db\DB;
+
 
 
 //	This script can dump all tables or just collections/binaries/parts/partrepair/groups.

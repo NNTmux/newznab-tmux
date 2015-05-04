@@ -1,10 +1,8 @@
 <?php
-require_once(dirname(__FILE__)."/bin/config.php");
-require_once(WWW_DIR . "lib/framework/db.php");
-require_once (WWW_DIR.'/lib/site.php');
-require_once (WWW_DIR.'/lib/util.php');
-require_once(WWW_DIR. '/lib/Tmux.php');
-require_once(WWW_DIR . "/lib/ColorCLI.php");
+require_once dirname(__FILE__) . '/../../../../www/config.php';
+
+use newznab\db\DB;
+use newznab\utility\Utility;
 
 $db = new DB();
 $DIR = NN_TMUX;
@@ -244,7 +242,7 @@ function attach($DIR, $tmux_session)
 	$panes_win_1 = exec("echo `tmux list-panes -t $tmux_session:0 -F '#{pane_title}'`");
 	$panes0 = str_replace("\n", '', explode(" ", $panes_win_1));
 	$log = writelog($panes0[0]);
-	exec("tmux respawnp -t $tmux_session:0.0 '$PHP " . $DIR . "bin/monitor.php $log'");
+	exec("tmux respawnp -t $tmux_session:0.0 '$PHP " . $DIR . "monitor.php $log'");
 	exec("tmux select-window -t $tmux_session:0; tmux attach-session -d -t $tmux_session");
 }
 

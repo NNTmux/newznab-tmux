@@ -1,6 +1,4 @@
 <?php
-require_once(NN_TMUX . 'lib/prehash.php');
-require_once(NN_TMUX . 'lib/IRCScraper.php');
 if (!$users->isLoggedIn()) {
 	$page->show403();
 }

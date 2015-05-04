@@ -1,8 +1,5 @@
 <?php
-require_once(WWW_DIR."/lib/releases.php");
-require_once(WWW_DIR."/lib/category.php");
-require_once(WWW_DIR."/lib/util.php");
-require_once(WWW_DIR."/lib/releasecomments.php");
+use newznab\utility\Utility;
 
 $rc = new ReleaseComments;
 
@@ -115,7 +112,7 @@ if ($uid != '') {
 	}
 }
 
-$releases = new Releases(['Settings' => $page->settings]);
+$releases = new \Releases(['Settings' => $page->settings]);
 
 if (isset($_GET['extended']) && $_GET['extended'] == 1) {
 	$page->smarty->assign('extended', '1');
@@ -199,7 +196,7 @@ switch ($function) {
 		if (!$nfo)
 			showApiError(300);
 
-		$nforaw = cp437toUTF($nfo["nfo"]);
+		$nforaw = Utility::cp437toUTF($nfo["nfo"]);
 		$page->smarty->assign('release',$reldata);
 		$page->smarty->assign('nfo',$nfo);
 		$page->smarty->assign('nfoutf',$nforaw);
@@ -659,10 +656,10 @@ function addCoverURL(&$releases, callable $getCoverURL)
 /**
  * Add language from media info XML to release search names.
  * @param array             $releases
- * @param \DB $settings
+ * @param \newznab\db\DB $settings
  * @return array
  */
-function addLanguage(&$releases, DB $settings)
+function addLanguage(&$releases, \newznab\db\DB $settings)
 {
 	if ($releases && count($releases)) {
 		foreach ($releases as $key => $release) {
