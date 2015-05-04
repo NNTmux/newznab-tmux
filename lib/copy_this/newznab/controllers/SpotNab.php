@@ -969,7 +969,7 @@ class SpotNab {
 
 				// Update DB With Global Identifer
 				$ures = $db->queryExec(sprintf("UPDATE releases SET gid = '%s' WHERE id = %d", $gid, $r['id']));
-				if($ures < 0){
+				if($ures->rowCount() == 0){
 					printf("\nPostPrc : Failed to update: %s\n", $r['name']);
 				}
 				// make noise...
