@@ -1,6 +1,7 @@
 <?php
 
- use newznab\db\DB;
+use newznab\db\DB;
+use newznab\utility\Utility;
 
 /**
  * This class handles storage and retrieval of releases rows and the main processing functions
@@ -1847,7 +1848,7 @@ class Releases
 			//
 			// If nzb successfully written, then load it and get size completion from it
 			//
-			$nzbInfo = new nzbInfo;
+			$nzbInfo = new NZBInfo;
 			if (!$nzbInfo->loadFromFile($nzbfile)) {
 				$this->pdo->log->doEcho($this->pdo->log->primary('Failed to write nzb file (bad perms?) ' . $nzbfile . ''));
 				$this->delete($relid);
