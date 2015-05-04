@@ -36,24 +36,18 @@ class Categorize extends Category
 	public $groupID;
 
 	/**
-	 * @var Regexes
-	 */
-	public $regexes;
-
-	/**
 	 * Construct.
 	 *
 	 * @param array $options Class instances.
 	 */
-	public function __construct(array $options = array())
+	public function __construct(array $options = [])
 	{
 		//parent::__construct($options);
 		$s = new Sites();
 		$this->site = $s->get();
-		$this->pdo = new newznab\db\DB();
+		$this->pdo = new \newznab\db\DB();
 		$this->categorizeForeign = ($this->site->categorizeforeign == "0") ? false : true;
 		$this->catWebDL = ($this->site->catwebdl == "0") ? false : true;
-		$this->regexes = new Regexes(['Settings' => $this->pdo, 'Table_Name' => 'category_regexes']);
 	}
 
 	/**
@@ -69,15 +63,14 @@ class Categorize extends Category
 	public function determineCategory($groupID, $releaseName = '')
 	{
 		$this->releaseName = $releaseName;
-		$this->groupid     = $groupID;
+		$this->groupID     = $groupID;
 		$this->tmpCat      = \Category::CAT_MISC_OTHER;
 
 		switch (true) {
 			case $this->isMisc():
-			// Note that in byGroup() some overrides occur...
-			case $this->databaseRegex():
-			case $this->byGroup(): // Note that in byGroup() some overrides occur...
-			//Try against all functions, if still nothing, return Cat Misc.
+				// Note that in byGroup() some overrides occur...
+			case $this->byGroup():
+				//Try against all functions, if still nothing, return Cat Misc.
 			case $this->isPC():
 			case $this->isXXX():
 			case $this->isTV():
@@ -91,35 +84,15 @@ class Categorize extends Category
 	}
 
 	/**
-	 * Cache of group names for group id's.
-	 * @var array
-	 */
-	private $groups = [];
-
-	/**
-	 * Sets/Gets a group name for the current group id in the buffer.
-	 *
-	 * @return string Group Name.
-	 */
-	private function groupName()
-	{
-		if (!isset($this->groups[$this->groupid])) {
-			$group = $this->pdo->queryOneRow(sprintf('SELECT LOWER(name) AS name FROM groups WHERE id = %d', $this->groupid));
-			$this->groups[$this->groupid] = ($group === false ? false : $group['name']);
-		}
-
-		return $this->groups[$this->groupid];
-	}
-
-	/**
 	 * Determine category by group name.
 	 *
 	 * @return bool
 	 */
 	public function byGroup()
 	{
-		$group = $this->groupName();
+		$group = $this->pdo->queryOneRow(sprintf('SELECT LOWER(name) AS name FROM groups WHERE id = %d', $this->groupID));
 		if ($group !== false) {
+			$group = $group['name'];
 			switch (true) {
 				case $group === 'alt.binaries.0day.stuffz':
 					switch (true) {
@@ -138,34 +111,11 @@ class Categorize extends Category
 				case preg_match('/alt\.binaries\.(multimedia\.erotica\.|cartoons\.french\.|dvd\.|multimedia\.)?anime(\.highspeed|\.repost|s-fansub|\.german)?/', $group):
 					$this->tmpCat = \Category::CAT_TV_ANIME;
 					break;
-				case $group === 'alt.binaries.b4e.erotica':
-					switch (true) {
-						case $this->isTV():
-						case $this->isMovie():
-						case $this->isXxx():
-							break;
-						default:
-							$this->tmpCat = \Category::CAT_XXX_OTHER;
-							break;
-					}
-					break;
 				case $group === 'alt.binaries.british.drama':
 					switch (true) {
 						case $this->isHDTV():
 						case $this->isSDTV():
 						case $this->isPC():
-							break;
-						default:
-							return false;
-					}
-					break;
-				case $group === 'alt.binaries.b4e':
-					switch (true) {
-						case $this->isHDTV():
-						case $this->isSDTV():
-						case $this->isPC():
-						case $this->isMovie():
-						case $this->isXxx():
 							break;
 						default:
 							return false;
@@ -214,7 +164,7 @@ class Categorize extends Category
 						case $this->isMusic():
 						case $this->isPCGame():
 						case $this->isMovie():
-						break;
+							break;
 						default:
 							$this->tmpCat = \Category::CAT_MISC_OTHER;
 							break;
@@ -475,6 +425,9 @@ class Categorize extends Category
 					}
 					$this->tmpCat = \Category::CAT_GAME_PSP;
 					break;
+				case $group === 'alt.binaries.sony.psvita':
+					$this->tmpCat = \Category::CAT_GAME_PSVITA;
+					break;
 				case $group === 'alt.binaries.warez':
 					switch (true) {
 						case $this->isTV():
@@ -502,20 +455,6 @@ class Categorize extends Category
 				default:
 					return false;
 			}
-			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * Try database regexes against a group / release name.
-	 * @return bool
-	 */
-	public function databaseRegex()
-	{
-		$cat = $this->regexes->tryRegex($this->releaseName, $this->groupName());
-		if ($cat) {
-			$this->tmpCat = $cat;
 			return true;
 		}
 		return false;
