@@ -84,6 +84,16 @@ class DB extends \PDO
 	private $cacheEnabled = false;
 
 	/**
+	 * @var string MySQL LOW_PRIORITY DELETE option.
+	 */
+	private $DELETE_LOW_PRIORITY = '';
+
+	/**
+	 * @var string MYSQL QUICK DELETE option.
+	 */
+	private $DELETE_QUICK = '';
+
+	/**
 	 * Constructor. Sets up all necessary properties. Instantiates a \PDO object
 	 * if needed, otherwise returns the current one.
 	 */
@@ -145,6 +155,14 @@ class DB extends \PDO
 
 		if ($this->opts['checkVersion']) {
 			$this->fetchDbVersion();
+		}
+
+		if (defined('NN_SQL_DELETE_LOW_PRIORITY') && NN_SQL_DELETE_LOW_PRIORITY) {
+			$this->DELETE_LOW_PRIORITY = ' LOW_PRIORITY ';
+		}
+
+		if (defined('NN_SQL_DELETE_QUICK') && NN_SQL_DELETE_QUICK) {
+			$this->DELETE_QUICK = ' QUICK ';
 		}
 
 		return $this->pdo;
@@ -447,6 +465,23 @@ class DB extends \PDO
 			$this->debugging->log('DB', "queryInsert", $query, \Logger::LOG_SQL);
 		}
 		return false;
+	}
+
+	/**
+	 * Delete rows from MySQL.
+	 *
+	 * @param string $query
+	 * @param bool   $silent Echo or log errors?
+	 *
+	 * @return bool|\PDOStatement
+	 */
+	public function queryDelete($query, $silent = false)
+	{
+		// Accommodate for chained queries (SELECT 1;DELETE x FROM y)
+		if (preg_match('#(.*?[^a-z0-9]|^)DELETE\s+(.+?)$#is', $query, $matches)) {
+			$query = $matches[1] . 'DELETE ' . $this->DELETE_LOW_PRIORITY . $this->DELETE_QUICK . $matches[2];
+		}
+		return $this->queryExec($query, $silent);
 	}
 
 	/**

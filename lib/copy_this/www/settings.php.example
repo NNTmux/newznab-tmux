@@ -375,6 +375,30 @@ define('NN_QUERY_STRIP_WHITESPACE', false);
  */
 define('NN_USE_SQL_TRANSACTIONS', true);
 
+/**
+ * Allows the use of LOW_PRIORITY in certain DELETE queries.
+ * This prevents table locks by deleting only when no SELECT queries are active on the table.
+ * This works on MyISAM/ARIA, not INNODB.
+ *
+ * @note Does not cause any errors or warnings if enabled on INNODB.
+ * @link https://dev.mysql.com/doc/refman/5.7/en/delete.html
+ * @default false
+ * @version 1
+ */
+define('NN_SQL_DELETE_LOW_PRIORITY', false);
+
+/**
+ * Allows the use QUICK in certain DELETE queries.
+ * This makes DELETE queries faster on MyISAM/ARIA tables by not merging index leaves.
+ * Only supported on MyISAM/ARIA
+ *
+ * @note Does not cause any errors or warnings if enabled on INNODB.
+ * @link https://dev.mysql.com/doc/refman/5.7/en/delete.html
+ * @default false
+ * @version 1
+ */
+define('NN_SQL_DELETE_QUICK', false);
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////// PHPMailer Settings //////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

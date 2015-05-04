@@ -1599,7 +1599,7 @@ class Releases
 			$this->pdo->log->doEcho($this->pdo->log->primary('Complete - ' . $cc . ' rows affected'));
 		} else {
 			$this->pdo->log->doEcho($this->pdo->log->primary('Deleting unused binaries and parts'));
-			$this->pdo->queryExec(sprintf("DELETE %s, %s FROM %s JOIN %s  ON %s.id = %s.binaryid
+			$this->pdo->queryDelete(sprintf("DELETE %s, %s FROM %s JOIN %s  ON %s.id = %s.binaryid
 			WHERE %s.dateadded < %s - INTERVAL %d HOUR",
 					$group['pname'],
 					$group['bname'],
@@ -1834,7 +1834,7 @@ class Releases
 			//
 			// Remove used binaries
 			//
-			$this->pdo->queryExec(sprintf("DELETE %s, %s FROM %s JOIN %s ON %s.id = %s.binaryid WHERE releaseid = %d ",
+			$this->pdo->queryDelete(sprintf("DELETE %s, %s FROM %s JOIN %s ON %s.id = %s.binaryid WHERE releaseid = %d ",
 					$group['pname'],
 					$group['bname'],
 					$group['pname'],
@@ -2198,7 +2198,7 @@ class Releases
 		$this->sphinxSearch->deleteRelease($identifiers, $this->pdo);
 
 		// Delete from DB.
-		$this->pdo->queryExec(
+		$this->pdo->queryDelete(
 			sprintf('
 				DELETE r, rn, rc, uc, rf, ra, rs, rv, re
 				FROM releases r
