@@ -12,7 +12,7 @@ if (isset($_GET["id"]))
 	if (!$rel)
 		$page->show404();
 
-	$nzbpath = $nzb->NZBPath($_GET["id"]);
+	$nzbpath = $nzb->getNZBPath($_GET["id"]);
 
 	if (!file_exists($nzbpath))
 		$page->show404();

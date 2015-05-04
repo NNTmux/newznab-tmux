@@ -186,7 +186,7 @@ class NZBImport
 				if ($inserted) {
 
 					// Try to copy the NZB to the NZB folder.
-					$path = $this->nzb->NZBPath($this->relGuid, '', true);
+					$path = $this->nzb->getNZBPath($this->relGuid, '', true);
 
 					// Try to compress the NZB file in the NZB folder.
 					$fp = gzopen ($path, 'w5');

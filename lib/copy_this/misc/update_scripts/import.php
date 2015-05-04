@@ -100,7 +100,7 @@ foreach ($filestoprocess as $nzbFile) {
 				$relid = $releases->insertRelease($name, $nzbInfo->filecount, $groupID, $relguid, $catId, "", date("Y-m-d H:i:s", $nzbInfo->postedlast), $nzbInfo->poster, "", $page->site);
 				$db->queryExec(sprintf("update releases set totalpart = %d, size = %s, completion = %d, GID=%s where id = %d", $nzbInfo->filecount, $nzbInfo->filesize, $nzbInfo->completion, $db->escapeString($nzbInfo->gid), $relid));
 
-				$nzbfilename = $nzb->NZBPath($relguid, $page->site->nzbpath, true);
+				$nzbfilename = $nzb->getNZBPath($relguid, $page->site->nzbpath, true);
 				$fp = gzopen($nzbfilename, "w");
 				if ($fp) {
 					gzwrite($fp, $nzbInfo->toNzb());

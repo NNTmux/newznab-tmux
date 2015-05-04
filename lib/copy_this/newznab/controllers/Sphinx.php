@@ -570,7 +570,7 @@ class Sphinx
         while ($row = $ndb->getAssocArray($result)) {
             $fileNames = "";
             $fileCount = 0;
-            $nzbpath = $this->nzb->NZBPath($row['guid'], $this->site->nzbpath);
+            $nzbpath = $this->nzb->getNZBPath($row['guid'], $this->site->nzbpath);
             if (file_exists($nzbpath)) {
             	$nzbfile = file_get_contents('compress.zlib://'.$nzbpath);
             	$files = $this->nzb->nzbFileList($nzbfile);

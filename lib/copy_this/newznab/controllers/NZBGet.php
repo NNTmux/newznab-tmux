@@ -110,7 +110,7 @@ class NZBGet
 	{
 		$relData = $this->Releases->getByGuid($guid);
 
-		$string = Utility::unzipGzipFile($this->NZB->NZBPath($guid));
+		$string = Utility::unzipGzipFile($this->NZB->getNZBPath($guid));
 		$string = ($string === false ? '' : $string);
 
 		$header =

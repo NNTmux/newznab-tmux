@@ -140,8 +140,9 @@ class NZBExport
 		// Loop over groups to take less RAM.
 		foreach ($groups as $group) {
 			$currentExport = 0;
+			$cat = '';
 			// Get all the releases based on the parameters.
-			$releases = $this->releases->getForExport($fromDate, $toDate, $group['id']);
+			$releases = $this->releases->getForExport($fromDate, $toDate, $group['id'], $cat);
 			$totalFound = count($releases);
 			if ($totalFound === 0) {
 				if ($this->echoCLI) {
@@ -161,7 +162,7 @@ class NZBExport
 			foreach ($releases as $release) {
 
 				// Get path to the NZB file.
-				$nzbFile = $this->nzb->NZBPath($release["guid"]);
+				$nzbFile = $this->nzb->getNZBPath($release["guid"]);
 				// Check if it exists.
 				if ($nzbFile === false) {
 					if ($this->echoCLI) {

@@ -42,7 +42,7 @@ function create_guids($live, $delete = false)
 		if ($relrecs instanceof \Traversable) {
 			foreach ($relrecs as $relrec) {
 				$reccnt++;
-				$nzbpath = $nzb->NZBPath($relrec['guid']);
+				$nzbpath = $nzb->getNZBPath($relrec['guid']);
 				if ($nzbpath !== false) {
 					$nzbfile = Utility::unzipGzipFile($nzbpath);
 					if ($nzbfile) {
