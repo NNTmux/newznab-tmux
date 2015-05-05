@@ -54,7 +54,7 @@ class Movie
 		$this->apikey = $site->tmdbkey;
 		$this->lookuplanguage = $site->lookuplanguage;
 		$this->pdo = new DB();
-		$this->imgSavePath = WWW_DIR.'covers/movies/';
+		$this->imgSavePath = NN_COVERS . 'movies' . DS;
 	}
 
 	/**
@@ -378,6 +378,9 @@ class Movie
 		$newArr = array();
 		$i = 0;
 		foreach($tmpArr as $ta) {
+			if (trim($ta) == '') {
+				continue;
+			}
 			if ($i > 5) { break; } //only use first 6
 			$newArr[] = '<a href="'.WWW_TOP.'/movies?'.$field.'='.urlencode($ta).'" title="'.$ta.'">'.$ta.'</a>';
 			$i++;
