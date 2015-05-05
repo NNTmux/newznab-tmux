@@ -2,6 +2,7 @@
 
 use newznab\db\DB;
 use newznab\utility\Utility;
+use newznab\processing\PProcess;
 
 /**
  * This class handles storage and retrieval of releases rows and the main processing functions
@@ -1971,11 +1972,11 @@ class Releases
 		// in order of how they should be applied
 		//
 		$group = $this->groups->getCBPTableNames($this->tablePerGroup, $groupID);
-		$groups = $this->groups->getByID($groupID);
+
 		$activeGroups = $this->groups->getActive();
 		$this->releaseRegex->get();
 		$this->pdo->log->doEcho($this->pdo->log->primary('Applying regex to binaries'), true);
-	   foreach($activeGroups as $groupArr) {
+	   	foreach($activeGroups as $groupArr) {
 			//check if regexes have already been applied during update binaries
 			if ($groupArr['regexmatchonly'] == 1)
 				continue;
@@ -2070,6 +2071,11 @@ class Releases
 		return "";
 	}
 
+	/**
+	 * @param $relname
+	 *
+	 * @return mixed
+	 */
 	public function cleanReleaseName($relname)
 	{
 		$cleanArr = array('#', '@', '$', '%', '^', '§', '¨', '©', 'Ö');
@@ -2080,6 +2086,11 @@ class Releases
 		return $relname;
 	}
 
+	/**
+	 * @param array $parameters
+	 *
+	 * @return bool|int
+	 */
 	public function insertRelease(array $parameters = [])
 	{
 
@@ -2216,6 +2227,9 @@ class Releases
 		);
 	}
 
+	/**
+	 * @return array
+	 */
 	public function getTopDownloads()
 	{
 
@@ -2227,6 +2241,9 @@ class Releases
 		);
 	}
 
+	/**
+	 * @return array
+	 */
 	public function getTopComments()
 	{
 
@@ -2238,6 +2255,9 @@ class Releases
 		);
 	}
 
+	/**
+	 * @return array
+	 */
 	public function getRecentlyAdded()
 	{
 
