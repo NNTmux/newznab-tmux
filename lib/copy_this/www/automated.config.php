@@ -73,11 +73,17 @@ define('WWW_TOP', $www_top);
 
 define('NN_VERSIONS', NN_LIB . 'build' . DS . 'newznab.xml');
 
-if (is_file(__DIR__ . DS . 'settings.php')) {
-	require_once(__DIR__ . DS . 'settings.php');
-	// Remove this in the future, here for those not updating settings.php
-	if (!defined('NN_MAX_PAGER_RESULTS')) {
-		define('NN_MAX_PAGER_RESULTS', '125000');
+$settings_file = __DIR__ . DS . 'settings.php';
+if (is_file($settings_file)) {
+	require_once($settings_file);
+	if (php_sapi_name() == 'cli') {
+		$current_settings_file_version = 1; // Update this when updating settings.php.example
+		if (!defined('NN_SETTINGS_FILE_VERSION') || NN_SETTINGS_FILE_VERSION != $current_settings_file_version) {
+			echo ("\033[0;31mNotice: Your $settings_file file is either out of date or you have not updated" .
+				" NN_SETTINGS_FILE_VERSION to $current_settings_file_version in that file.\033[0m" . PHP_EOL
+			);
+		}
+		unset($current_settings_file_version);
 	}
 } else {
 	define('ITEMS_PER_PAGE', '50');
@@ -106,6 +112,7 @@ if (is_file(__DIR__ . DS . 'settings.php')) {
 	define('NN_RELEASE_SEARCH_TYPE', 0);
 	define('NN_MAX_PAGER_RESULTS', '125000');
 }
+unset($settings_file);
 require_once NN_CORE . 'autoloader.php';
 require_once NN_LIBS . 'autoloader.php';
 require_once SMARTY_DIR . 'autoloader.php';
