@@ -260,7 +260,7 @@ class ReleaseRegex
 		$site = $s->get();
 		$groups = new Groups();
 		$groupID = $groups->getByNameByID($groupname);
-		$group = $groups->getCBPTableNames($site->tablePerGroup, $groupID);
+		$group = $groups->getCBPTableNames($site->tablepergroup, $groupID);
 
 		$catList = $cat->getForSelect();
 		$matches = array();
