@@ -1,9 +1,6 @@
 <?php
 
 require_once("config.php");
-use newznab\processing\ProcessReleases;
 
-$releases = new ProcessReleases();
-$sphinx = new Sphinx();
+$releases = new Releases();
 $releases->processReleases(1, 1, $groupName, $nntp, true);
-$sphinx->update();
