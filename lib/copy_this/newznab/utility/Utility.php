@@ -22,7 +22,7 @@ class Utility
 	 *
 	 * @return bool|string True is successful, otherwise the part of the path that failed testing.
 	 */
-	static public function canExecuteRead($path)
+	public static function canExecuteRead($path)
 	{
 		$paths = preg_split('#/#', $path);
 		$fullPath = DS;
