@@ -159,13 +159,13 @@ class Cache
 	public function __construct()
 	{
 		if (!defined('NN_CACHE_HOSTS')) {
-			throw new \CacheException(
+			throw new CacheException(
 				'The NN_CACHE_HOSTS is not defined! Define it in settings.php'
 			);
 		}
 
 		if (!defined('NN_CACHE_TIMEOUT')) {
-			throw new \CacheException(
+			throw new CacheException(
 				'The NN_CACHE_TIMEOUT is not defined! Define it in settings.php, it is the time in seconds to time out from your cache server.'
 			);
 		}
