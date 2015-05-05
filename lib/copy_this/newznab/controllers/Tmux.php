@@ -3,6 +3,9 @@
 use newznab\db\DB;
 
 
+/**
+ * Class Tmux
+ */
 class Tmux
 {
 	/**
@@ -12,6 +15,9 @@ class Tmux
 
 	public $tmux_session;
 
+	/**
+	 * @param newznab\db\DB $pdo
+	 */
 	function __construct(DB $pdo = null)
 	{
 		$this->pdo = (empty($pdo) ? new DB() : $pdo);
