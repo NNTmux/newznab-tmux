@@ -21,7 +21,7 @@ switch($action)
 			{
 				$ret = $reg->update($_POST);
 			}
-		header("Location:".WWW_TOP."/regex-list.php");
+		header("Location:".WWW_TOP."/regex-list.php".($_POST["groupname"] != "" ? "?group=".$_POST["groupname"] : ""));
 		break;
     case 'addtest':
     	if (isset($_GET['regex']) && isset($_GET['groupname'])) {
