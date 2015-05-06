@@ -1362,23 +1362,23 @@ class Film
 
 			switch ($operation) {
 				case 'boxoffice':
-					$data = $rt->getBoxOffice();
+					$data = $rt->getMoviesBoxOffice();
 					$update = \Film::SRC_BOXOFFICE;
 					break;
 				case 'theaters':
-					$data = $rt->getInTheaters();
+					$data = $rt->getMoviesInTheaters();
 					$update = \Film::SRC_INTHEATRE;
 					break;
 				case 'opening':
-					$data = $rt->getOpening();
+					$data = $rt->getOpeningMovies();
 					$update = \Film::SRC_OPENING;
 					break;
 				case 'upcoming':
-					$data = $rt->getUpcoming();
+					$data = $rt->getUpcomingMovies();
 					$update = \Film::SRC_UPCOMING;
 					break;
 				case 'dvd':
-					$data = $rt->getDVDReleases();
+					$data = $rt->getNewDvdReleases();
 					$update = \Film::SRC_DVD;
 					break;
 				default:
@@ -1387,8 +1387,7 @@ class Film
 			}
 
 			if ($data !== false && $data !== '') {
-				$test = @json_decode($data);
-				if (isset($test)) {
+				if (isset($data)) {
 					$count = 2;
 					$check = true;
 				}
