@@ -64,7 +64,7 @@ if (isset($_GET["id"]) && isset($_GET["zip"]) && $_GET["zip"] == "1") {
 		$users->incrementGrabs($uid, count($guids));
 		foreach ($guids as $guid) {
 			$rel->updateGrab($guid);
-			$users->addDownloadRequest($uid, $rel['id']);
+			$users->addDownloadRequest($uid, $guid);
 
 			if (isset($_GET["del"]) && $_GET["del"] == 1) {
 				$users->delCartByUserAndRelease($guid, $uid);
