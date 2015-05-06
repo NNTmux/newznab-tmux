@@ -57,7 +57,7 @@ $page->smarty->assign('saburl', $sab->url);
 $page->smarty->assign('sabapikey', $sab->apikey);
 
 $page->smarty->assign('nzbgeturl', $nzbget->url);
-$page->smarty->assign('nzbgetusername', $nzbget->username);
+$page->smarty->assign('nzbgetusername', $nzbget->userName);
 $page->smarty->assign('nzbgetpassword', $nzbget->password);
 
 
