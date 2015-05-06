@@ -8,13 +8,13 @@ if (isset($site->rottentomatokey))
 {
 	$rt = new RottenTomato($site->rottentomatokey);
 
-	//print_r(json_decode($rt->getBoxOffice()));
-	//print_r(json_decode($rt->getInTheaters()));
-	//print_r(json_decode($rt->getOpening()));
-	//print_r(json_decode($rt->getUpcoming()));
-	//print_r(json_decode($rt->getDVDReleases()));
-	//print_r(json_decode($rt->getMovie("770805418")));
-	//print_r(json_decode($rt->getReviews("770805418")));
-	//print_r(json_decode($rt->getCast("770805418")));
-	print_r(json_decode($rt->searchMovie("moviename")));
+	//print_r($rt->getMoviesBoxOffice());
+	//print_r($rt->getMoviesInTheaters());
+	//print_r($rt->getOpeningMovies());
+	//print_r($rt->getUpcomingMovies());
+	//print_r($rt->getNewDvdReleasess());
+	//print_r($rt->getMovieInfo("770805418"));
+	//print_r($rt->getMovieReviews("770805418"));
+	//print_r($rt->getMovieCast("770805418"));
+	print_r($rt->movieSearch("moviename"));
 }

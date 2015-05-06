@@ -799,23 +799,23 @@ class Movie
 		{
 			$rt = new RottenTomato($site->rottentomatokey);
 
-			$ret = $rt->getBoxOffice();
+			$ret = $rt->getMoviesBoxOffice();
 			if ($ret != "")
 				$this->updateInsUpcoming('rottentomato', Movie::SRC_BOXOFFICE, $ret);
 
-			$ret = $rt->getInTheaters();
+			$ret = $rt->getMoviesInTheaters();
 			if ($ret != "")
 				$this->updateInsUpcoming('rottentomato', Movie::SRC_INTHEATRE, $ret);
 
-			$ret = $rt->getOpening();
+			$ret = $rt->getOpeningMovies();
 			if ($ret != "")
 				$this->updateInsUpcoming('rottentomato', Movie::SRC_OPENING, $ret);
 
-			$ret = $rt->getUpcoming();
+			$ret = $rt->getUpcomingMovies();
 			if ($ret != "")
 				$this->updateInsUpcoming('rottentomato', Movie::SRC_UPCOMING, $ret);
 
-			$ret = $rt->getDVDReleases();
+			$ret = $rt->getNewDvdReleases();
 			if ($ret != "")
 				$this->updateInsUpcoming('rottentomato', Movie::SRC_DVD, $ret);
 		}
