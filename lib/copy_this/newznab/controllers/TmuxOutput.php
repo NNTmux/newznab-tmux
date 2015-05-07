@@ -114,7 +114,7 @@ class TmuxOutput extends Tmux
 		$buffer = '';
 		$state = ($this->runVar['settings']['is_running'] == 1) ? 'Running' : 'Disabled';
 		//$version = $this->_tvers . 'r' . $this->_vers;
-		$tversion = '0.5r01267';
+		$tversion = '0.5r01269';
 
 		$buffer .= sprintf($this->tmpMasks[2],
 					"Monitor $state v$tversion @ $this->_tvers [" . $this->_vers ."]: ",

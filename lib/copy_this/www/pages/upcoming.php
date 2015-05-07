@@ -53,17 +53,19 @@ if ($data["info"] == "") {
 }
 
 /**
- * Replace _tmb.jpg with user setting from site edit.
+ * extract just the cloudfront image url.
  *
  * @param string $imageURL    The url to change.
- * @param string $userSetting The users's setting.
  *
  * @return string
  */
-function replace_quality($imageURL, $userSetting)
+function replace_url($imageURL)
 {
-	$types = array('thumbnail' => '_tmb.', 'profile' => '_pro.', 'detailed' => '_det.', 'original' => '_ori.');
-	return preg_replace("#http://resizing\.flixster\.com(/[\w=+-]+){3}\.cloudfront\.net#i", "https://content8.flixster.com", str_replace('_ori.', $types[$userSetting], $imageURL));
+	return preg_replace(
+		'/^.*?\/[\d]+x[\d]+\//',
+		'https://',
+		$imageURL
+	);
 }
 
 $page->content = $page->smarty->fetch('upcoming.tpl');
