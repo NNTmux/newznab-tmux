@@ -241,6 +241,15 @@ class TMDB {
 	}
 
 	/**
+	 * 	Get upcoming Movies
+	 *
+	 * 	@return array
+	 */
+	public function getUpcomingMovies() {
+		return new Movie($this->_call('movie/upcoming',''));
+	}
+
+	/**
 	 *  Now Playing Movies
 	 *
 	 * 	@param integer $page
