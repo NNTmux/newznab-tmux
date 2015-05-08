@@ -7,7 +7,7 @@ use newznab\utility\Utility;
 
 $releases = new Releases();
 $db = new DB();
-$cat = new Category();
+$cat = new Categorize();
 $releaseRegex = new ReleaseRegex();
 $nzb = new NZB();
 $page = new Page();
