@@ -2,10 +2,9 @@
 
 if ($page->isPostBack())
 {
-	if (!isset($_POST["username"]) || !isset($_POST["password"]))
+	if (!isset($_POST["username"]) || !isset($_POST["password"])){
 		$page->smarty->assign('error', "Please enter your username and password.");
-	else
-	{
+} elseif ($page->captcha->getError() === false) {
 		$username = htmlspecialchars($_POST["username"]);
 		$page->smarty->assign('username', $username);
 		$users = new Users();
