@@ -82,7 +82,7 @@ class RottenTomato
 	 * @return array results
 	 */
 	public function movieSearch($query, $pageLimit = 20, $page = 0) {
-		$params = array();
+		$params = [];
 		$params['q'] = $query;
 		if ($pageLimit)
 			$params['page_limit'] .= $pageLimit;
@@ -104,7 +104,7 @@ class RottenTomato
 	 */
 	public function getMovieReviews($id, $reviewType = self::REVIEW_TYPE_ALL, $pageLimit = 20, $page = 0) {
 		$url = sprintf(self::ROTTEN_TOMATOES_API_MOVIE_REVIEWS, $id);
-		$params = array();
+		$params = [];
 		$params['review_type'] = $reviewType;
 		if ($pageLimit)
 			$params['page_limit'] .= $pageLimit;
@@ -149,7 +149,7 @@ class RottenTomato
 	 * @return array results
 	 */
 	public function getNewDvdReleases($pageLimit = 20, $page = 0) {
-		$params = array();
+		$params = [];
 		if ($pageLimit)
 			$params['page_limit'] .= $pageLimit;
 		if ($page)
@@ -167,7 +167,7 @@ class RottenTomato
 	 * @return array results
 	 */
 	public function getUpcomingMovies($pageLimit = 20, $page = 0) {
-		$params = array();
+		$params = [];
 		if ($pageLimit)
 			$params['page_limit'] .= $pageLimit;
 		if ($page)
@@ -185,7 +185,7 @@ class RottenTomato
 	 * @return array results
 	 */
 	public function getMoviesInTheaters($pageLimit = 5, $page = 0) {
-		$params = array();
+		$params = [];
 		if ($pageLimit)
 			$params['page_limit'] .= $pageLimit;
 		if ($page)
@@ -202,7 +202,7 @@ class RottenTomato
 	 * @return array results
 	 */
 	public function getOpeningMovies($pageLimit = 20) {
-		$params = array();
+		$params = [];
 		if ($pageLimit)
 			$params['page_limit'] .= $pageLimit;
 		$result = $this->getResource(self::ROTTEN_TOMATOES_API_OPENING_MOVIES, $params);
@@ -217,7 +217,7 @@ class RottenTomato
 	 * @return array results
 	 */
 	public function getMoviesBoxOffice($pageLimit = 20) {
-		$params = array();
+		$params = [];
 		if ($pageLimit)
 			$params['page_limit'] .= $pageLimit;
 		$result = $this->getResource(self::ROTTEN_TOMATOES_API_BOX_OFFICE, $params);
@@ -232,7 +232,7 @@ class RottenTomato
 	 * @return array results
 	 */
 	public function getDvdTopRentals($pageLimit = 20) {
-		$params = array();
+		$params = [];
 		if ($pageLimit)
 			$params['page_limit'] .= $pageLimit;
 		$result = $this->getResource(self::ROTTEN_TOMATOES_API_DVD_TOP_RENTALS, $params);
@@ -279,7 +279,7 @@ class RottenTomato
 	 * @param array $params parameters (key/value pairs) for query string
 	 * @return array decoded json response
 	 */
-	protected function getResource($url, $params = array()) {
+	protected function getResource($url, $params = []) {
 		$params['apikey'] = $this->apiKey;
 		$params['country'] = $this->country;
 		$queryString = http_build_query($params);
@@ -316,10 +316,10 @@ class RottenTomato
 	 * @return string|boolean result
 	 */
 	protected function httpRequestFopen($url){
-		$http = array();
+		$http = [];
 		$http['method'] = 'GET';
 		$http['timeout'] = $this->timeoutSeconds;
-		$response = @fopen($url, 'r', false, stream_context_create(array('http' => $http)));
+		$response = @fopen($url, 'r', false, stream_context_create(['http' => $http]));
 		$result = false;
 		if ($response)
 			$result = $response;
