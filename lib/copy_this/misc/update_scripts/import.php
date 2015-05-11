@@ -1,16 +1,13 @@
 <?php
 
-define('FS_ROOT', realpath(dirname(__FILE__)));
-require_once(FS_ROOT . "/../../www/lib/framework/db.php");
-require_once(FS_ROOT . "/../../www/lib/releases.php");
-require_once(FS_ROOT . "/../../www/lib/nzbinfo.php");
-require_once(FS_ROOT . "/../../www/lib/util.php");
-require_once(FS_ROOT . "/../../www/lib/nzb.php");
-require_once(FS_ROOT . "/../../www/lib/category.php");
+require_once dirname(__FILE__) . '/../../www/config.php';
+
+use newznab\db\DB;
+use newznab\utility\Utility;
 
 $releases = new Releases();
-$db = new Db();
-$cat = new Category();
+$db = new DB();
+$cat = new Categorize();
 $releaseRegex = new ReleaseRegex();
 $nzb = new NZB();
 $page = new Page();
@@ -141,7 +138,7 @@ foreach ($filestoprocess as $nzbFile) {
 						$relparts = explode("/", $regexMatches['parts']);
 						$regexMatches['regcatid'] = ($categoryoverride != -1 ? $categoryoverride : $regexMatches['regcatid']);
 
-						$sql = sprintf("INSERT INTO binaries (name, fromname, date, xref, totalparts, groupid, binaryhash, dateadded,
+						$sql = sprintf("INSERT INTO binaries (name, fromname, date, xref, totalParts, groupid, binaryhash, dateadded,
                         categoryid, regexid, reqid, procstat, relpart, reltotalpart, relname)
                         values (%s, %s, %s, %s, %d, %d, %s, NOW(), %s, %d, %s, %d, %d, %d, %s )",
 							$db->escapeString($postFile["subject"]), $db->escapeString($postFile["poster"]),
@@ -151,13 +148,13 @@ foreach ($filestoprocess as $nzbFile) {
 							$db->escapeString(md5($postFile["subject"] . $postFile["poster"] . $groupID)),
 							$regexMatches['regcatid'],
 							$regexMatches['regexid'], $db->escapeString($regexMatches['reqid']),
-							Releases::PROCSTAT_TITLEMATCHED, $relparts[0], $relparts[1], $db->escapeString(str_replace('_', ' ', $regexMatches['name']))
+							\Releases::PROCSTAT_TITLEMATCHED, $relparts[0], $relparts[1], $db->escapeString(str_replace('_', ' ', $regexMatches['name']))
 						);
 						$binaryId = $db->queryInsert($sql);
 						$numbins++;
 
 						if (count($postFile['segments']) > 0) {
-							$sql = "INSERT INTO parts (binaryid, messageid, number, partnumber, size) values ";
+							$sql = "INSERT INTO parts (binaryID, messageID, number, partnumber, size) values ";
 							foreach ($postFile['segments'] as $fileSegmentNum => $fileSegment) {
 								$sql .= sprintf("(%d, %s, 0, %d, %d),", $binaryId, $db->escapeString($fileSegment), $fileSegmentNum, $postFile['segmentbytes'][$fileSegmentNum]);
 								$numparts++;

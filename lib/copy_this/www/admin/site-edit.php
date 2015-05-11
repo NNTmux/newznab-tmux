@@ -1,9 +1,6 @@
 <?php
 
 require_once("config.php");
-require_once(WWW_DIR."/lib/adminpage.php");
-require_once(WWW_DIR."/lib/site.php");
-require_once(WWW_DIR."/lib/sabnzbd.php");
 
 $page = new AdminPage();
 $sites = new Sites();
@@ -72,9 +69,6 @@ $page->smarty->assign('yesno_names', array( 'Yes', 'No'));
 
 $page->smarty->assign('passwd_ids', array(1,0));
 $page->smarty->assign('passwd_names', array( 'Deep (requires unrar)', 'None'));
-
-$page->smarty->assign('rottentomatoquality_ids', array('thumbnail', 'profile', 'detailed', 'original'));
-$page->smarty->assign('rottentomatoquality_names', array('Thumbnail', 'Profile', 'Detailed', 'Original'));
 
 $page->smarty->assign('sabintegrationtype_ids', array(SABnzbd::INTEGRATION_TYPE_USER, SABnzbd::INTEGRATION_TYPE_SITEWIDE, SABnzbd::INTEGRATION_TYPE_NONE));
 $page->smarty->assign('sabintegrationtype_names', array( 'User', 'Site-wide', 'None (Off)'));

@@ -1,8 +1,5 @@
 <?php
 require_once("config.php");
-require_once(WWW_DIR."/lib/adminpage.php");
-require_once(WWW_DIR."/lib/Games.php");
-require_once(WWW_DIR."/lib/genres.php");
 
 $page = new AdminPage();
 $games = new Games(['Settings' => $page->settings]);

@@ -1,6 +1,4 @@
 <?php
-require_once(WWW_DIR.'/lib/releases.php');
-require_once(WWW_DIR.'/lib/anidb.php');
 
 if (!$users->isLoggedIn())
 	$page->show403();

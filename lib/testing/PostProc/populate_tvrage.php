@@ -1,6 +1,7 @@
 <?php
 require_once(dirname(__FILE__) . "/../../../bin/config.php");
-require_once (NN_LIB . 'framework' . DS . 'db.php');
+
+use newznab\db\DB;
 
 
 $pdo = new DB();
@@ -18,7 +19,7 @@ if ($tvshows !== false) {
 	echo "Starting to process file entries...\n";
 	foreach ($tvshows->show as $rage) {
 		echo "RageID: " . $rage->id . ", name: " . $rage->name . " - ";
-		$dupecheck = $pdo->queryOneRow(sprintf('SELECT COUNT(id) AS count FROM tvrage WHERE rageid = %s', $pdo->escapeString($rage->id)));
+		$dupecheck = $pdo->queryOneRow(sprintf('SELECT COUNT(id) AS count FROM tvrage WHERE id = %s', $pdo->escapeString($rage->id)));
 		if (isset($rage->id) && isset($rage->name) && !empty($rage->id) && !empty($rage->name) &&
 			$dupecheck !== false && $dupecheck['count'] == 0) {
 			$pdo->queryInsert(sprintf('INSERT INTO tvrage (rageid, releasetitle, country) VALUES (%s, %s, %s)', $pdo->escapeString($rage->id), $pdo->escapeString($rage->name), $pdo->escapeString($rage->country)));

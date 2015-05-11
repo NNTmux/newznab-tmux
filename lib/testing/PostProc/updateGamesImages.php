@@ -1,7 +1,7 @@
 <?php
 require_once(dirname(__FILE__) . "/../../../bin/config.php");
-require_once(WWW_DIR . "/lib/framework/db.php");
-require_once(WWW_DIR . "/lib/ColorCLI.php");
+
+use newznab\db\DB;
 
 $pdo = new DB();
 $covers = $updated = $deleted = 0;
@@ -10,7 +10,7 @@ $c = new ColorCLI();
 if ($argc == 1 || $argv[1] != 'true') {
 	exit($c->error("\nThis script will check all images in covers/games and compare to db->gamesinfo.\nTo run:\nphp $argv[0] true\n"));
 }
-$path2covers = WWW_DIR . 'covers/games' . '/';
+$path2covers = NN_COVERS . 'games' . DS;
 
 $dirItr = new RecursiveDirectoryIterator($path2covers);
 $itr = new RecursiveIteratorIterator($dirItr, RecursiveIteratorIterator::LEAVES_ONLY);

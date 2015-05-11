@@ -1,14 +1,8 @@
 <?php
-// This script updates all releases with the guid from the nzb file.
-
 require_once(dirname(__FILE__) . "/../../../bin/config.php");
-require_once(WWW_DIR . "/lib/framework/db.php");
-require_once(WWW_DIR . "/lib/ColorCLI.php");
-require_once(WWW_DIR . "/lib/releases.php");
-require_once(WWW_DIR . "/lib/releaseimage.php");
-require_once(WWW_DIR . "/lib/ConsoleTools.php");
-require_once(WWW_DIR . "/lib/nzb.php");
-require_once(WWW_DIR . "/lib/util.php");
+
+use newznab\db\DB;
+use newznab\utility\Utility;
 
 $cli = new \ColorCLI();
 if (isset($argv[1])) {

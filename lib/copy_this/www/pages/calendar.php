@@ -1,5 +1,4 @@
 <?php
-require_once(NN_TMUX. 'lib' . DS . 'TvAnger.php');
 
 if (!$users->isLoggedIn()) {
 	$page->show403();

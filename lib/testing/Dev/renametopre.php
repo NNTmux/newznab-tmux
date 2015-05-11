@@ -1,14 +1,7 @@
 <?php
 // TODO: bunch of if/elses need converting to switches
 
-require_once(dirname(__FILE__) . "/../../../bin/config.php");
-require_once(WWW_DIR . "/lib/framework/db.php");
-require_once(WWW_DIR . "/lib/groups.php");
-require_once(WWW_DIR . "/lib/Categorize.php");
-require_once(WWW_DIR . "/lib/ColorCLI.php");
-require_once(WWW_DIR . "/lib/ConsoleTools.php");
-require_once(WWW_DIR . "/lib/releasefiles.php");
-require_once(NN_TMUX . 'lib' . DS . 'ReleaseCleaner.php');
+use newznab\db\DB;
 
 /*
  *
@@ -102,7 +95,7 @@ function preName($argv, $argc)
 		$consoletools = new \ConsoleTools(['ColorCLI' => $pdo->log]);
 		foreach ($res as $row) {
 			$groupname = $groups->getByNameByID($row['groupid']);
-			$cleanerName = releaseCleaner($row['name'], $row['fromname'], $groupname, $usepre);
+			$cleanerName = releaseCleaner($row['name'], $row['fromname'], $row['size'], $groupname, $usepre);
 			$preid = 0;
 			$predb = $predbfile = $increment = false;
 			if (!is_array($cleanerName)) {
@@ -143,14 +136,14 @@ function preName($argv, $argc)
 						}
 					}
 				}
-					//try to match clean name against predb filename
-					$prefile = $pdo->queryOneRow("SELECT id, title FROM prehash WHERE filename = " . $pdo->escapeString($cleanName));
-					if (isset($prefile['id'])) {
-						$preid = $prefile['id'];
-						$cleanName = $prefile['title'];
-						$predbfile = true;
-						$propername = true;
-					}
+				//try to match clean name against predb filename
+				$prefile = $pdo->queryOneRow("SELECT id, title FROM prehash WHERE filename = " . $pdo->escapeString($cleanName));
+				if (isset($prefile['id'])) {
+					$preid = $prefile['id'];
+					$cleanName = $prefile['title'];
+					$predbfile = true;
+					$propername = true;
+				}
 				if ($cleanName != $row['name'] && $cleanName != $row['searchname']) {
 					if (strlen(utf8_decode($cleanName)) <= 3) {
 					} else {
@@ -296,11 +289,11 @@ function catRelease($type, $where, $echooutput = false)
 	return $relcount;
 }
 
-function releaseCleaner($subject, $fromName, $groupname, $usepre)
+function releaseCleaner($subject, $fromName, $size, $groupname, $usepre)
 {
 	$groups = new \Groups();
 	$releaseCleaning = new \ReleaseCleaning($groups->pdo);
-	$cleanerName = $releaseCleaning->releaseCleaner($subject, $fromName, $groupname, $usepre);
+	$cleanerName = $releaseCleaning->releaseCleaner($subject, $fromName, $size, $groupname, $usepre);
 	if (!is_array($cleanerName) && $cleanerName != false) {
 		return array("cleansubject" => $cleanerName, "properlynamed" => true, "increment" => false);
 	} else {

@@ -1,8 +1,9 @@
 <?php
 //This script will update all records in the consoleinfo table
+
 require_once(dirname(__FILE__) . "/../../../bin/config.php");
-require_once(WWW_DIR . "/lib/framework/db.php");
-require_once(NN_TMUX . 'lib' . DS . 'Konsole.php');
+
+use newznab\db\DB;
 
 
 

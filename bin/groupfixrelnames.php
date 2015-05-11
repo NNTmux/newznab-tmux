@@ -1,12 +1,8 @@
 <?php
 require_once(dirname(__FILE__) . "/config.php");
-require_once(WWW_DIR . "/lib/framework/db.php");
-require_once(WWW_DIR . "/lib/util.php");
-require_once(WWW_DIR . "/lib/ColorCLI.php");
-require_once(dirname(__FILE__) . '/../lib/namefixer.php');
-require_once(dirname(__FILE__) . '/../lib/Info.php');
-require_once(dirname(__FILE__) . '/../lib/nzbcontents.php');
-require_once(dirname(__FILE__) . '/../lib/MiscSorter.php');
+
+use newznab\db\DB;
+use newznab\processing\PProcess;
 
 $pdo = new DB();
 $s = new Sites();

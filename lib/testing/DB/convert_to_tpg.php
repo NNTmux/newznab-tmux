@@ -1,18 +1,15 @@
 <?php
 require_once(dirname(__FILE__) . "/../../../bin/config.php");
-require_once(WWW_DIR . "/lib/framework/db.php");
-require_once(WWW_DIR . "/lib/ColorCLI.php");
-require_once(WWW_DIR . "/lib/groups.php");
-require_once(WWW_DIR . "/lib/ConsoleTools.php");
-require_once(WWW_DIR . "/lib/site.php");
+
+use newznab\db\DB;
 
 
-/* This script will allow you to move from single collections/binaries/parts tables to TPG without having to run reset_truncate.
+/* This script will allow you to move from single binaries/parts tables to TPG without having to run reset_truncate.
   Please STOP all update scripts before running this script.
 
   Use the following options to run:
-  php convert_to_tpg.php true               Convert c/b/p to tpg leaving current collections/binaries/parts tables in-tact.
-  php convert_to_tgp.php true delete        Convert c/b/p to tpg and TRUNCATE current collections/binaries/parts tables.
+  php convert_to_tpg.php true               Convert c/b/p to tpg leaving current binaries/parts tables in-tact.
+  php convert_to_tgp.php true delete        Convert c/b/p to tpg and TRUNCATE current binaries/parts tables.
  */
 $debug = false;
 $pdo = new DB();
@@ -24,7 +21,7 @@ $DoPartRepair = ($site->partrepair == '0') ? false : true;
 
 if ((!isset($argv[1])) || $argv[1] != 'true') {
 	exit($pdo->log->error("\nMandatory argument missing\n\n"
-		. "This script will allow you to move from single collections/binaries/parts tables to TPG without having to run reset_truncate.\n"
+		. "This script will allow you to move from single binaries/parts tables to TPG without having to run reset_truncate.\n"
 		. "Please STOP all update scripts before running this script.\n\n"
 		. "Use the following options to run:\n"
 		. "php $argv[0] true             ...: Convert b/p to tpg leaving current binaries/parts tables in-tact.\n"

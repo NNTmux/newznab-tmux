@@ -41,5 +41,3 @@ if (in_array($argv[1], $start)) {
 	echo "Unrecognised command '{$argv[1]}''\n";
 	exit($message);
 }
-
-?>

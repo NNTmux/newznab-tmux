@@ -1,9 +1,6 @@
 <?php
-require_once(WWW_DIR . "/lib/category.php");
-require_once(WWW_DIR . "/lib/sabnzbd.php");
-require_once(WWW_DIR . "/lib/util.php");
-require_once(WWW_DIR . "/lib/users.php");
-require_once(WWW_DIR . '/../misc/update_scripts/nix_scripts/tmux/lib/NZBGet.php');
+
+use newznab\utility\Utility;
 
 $category = new Category;
 $sab = new SABnzbd($page);
@@ -34,7 +31,7 @@ switch ($action) {
 	case 'submit':
 
 		$data["email"] = $_POST['email'];
-		if (isset($_POST['saburl']) && strlen(trim($_POST['saburl'])) > 0 && !endsWith($_POST['saburl'], "/"))
+		if (isset($_POST['saburl']) && strlen(trim($_POST['saburl'])) > 0 && !Utility::endsWith($_POST['saburl'], "/"))
 			$_POST['saburl'] = $_POST['saburl'] . "/";
 
 		if ($_POST['password'] != "" && $_POST['password'] != $_POST['confirmpassword']) {

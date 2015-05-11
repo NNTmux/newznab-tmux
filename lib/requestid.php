@@ -1,8 +1,5 @@
 <?php
 require_once(dirname(__FILE__)."/../bin/config.php");
-require_once (NN_LIB . 'ColorCLI.php');
-require_once (NN_LIB . 'RequestIDWeb.php');
-require_once (NN_LIB . 'RequestIDLocal.php');
 
 $cli = new \ColorCLI();
 
@@ -24,7 +21,7 @@ if (!isset($argv[1]) || ($argv[1] != "all" && $argv[1] != "full" && $argv[1] != 
 
 if ($argv[1] === 'web') {
 	(new \RequestIDWeb())->lookupRequestIDs(
-		['limit' => $argv[1], 'show' => $argv[2], 'time' => (isset($argv[3]) && is_numeric($argv[3]) && $argv[3] > 0 ? $argv[3] : 0)]
+		['limit' => 1000, 'show' => $argv[2], 'time' => (isset($argv[3]) && is_numeric($argv[3]) && $argv[3] > 0 ? $argv[3] : 0)]
 	);
 } else {
 	(new \RequestIDLocal())->lookupRequestIDs(

@@ -1,27 +1,11 @@
 <?php
-require_once(WWW_DIR."/lib/releases.php");
-require_once(WWW_DIR."/lib/releasefiles.php");
-require_once(WWW_DIR."/lib/releasecomments.php");
-require_once(WWW_DIR."/lib/releaseextra.php");
-require_once(WWW_DIR."/lib/tvrage.php");
-require_once(WWW_DIR."/lib/anidb.php");
-require_once(WWW_DIR."/lib/predb.php");
-require_once(WWW_DIR."/lib/Musik.php");
-require_once(WWW_DIR."/lib/episode.php");
-require_once(WWW_DIR . "/lib/XXX.php");
-require_once(WWW_DIR . "/lib/Games.php");
-require_once(WWW_DIR . "/lib/util.php");
-require_once(WWW_DIR . "../misc/update_scripts/nix_scripts/tmux/lib/Film.php");
-require_once(WWW_DIR . "../misc/update_scripts/nix_scripts/tmux/lib/TraktTv.php");
-require_once(WWW_DIR . "../misc/update_scripts/nix_scripts/tmux/lib/TvAnger.php");
-
 
 if (!$users->isLoggedIn())
 	$page->show403();
 
 if (isset($_GET["id"]))
 {
-	$releases = new Releases;
+	$releases = new Releases(['Settings' => $page->settings]);
 	$rc = new ReleaseComments;
 	$re = new ReleaseExtra;
 	$data = $releases->getByGuid($_GET["id"]);
@@ -99,7 +83,7 @@ if (isset($_GET["id"]))
 				'https://www.youtube.com/v/' . $youtubeM[1] .
 				'" type="application/x-shockwave-flash"></embed>';
 		} else {
-			$mov['trailer'] = imdb_trailers($data['imdbid']);
+			$mov['trailer'] = \newznab\utility\Utility::imdb_trailers($data['imdbid']);
 		}
 
 		if ($mov && isset($mov['title'])) {
@@ -141,21 +125,18 @@ if (isset($_GET["id"]))
 
 	$mus = '';
 	if ($data['musicinfoid'] != '') {
-		require_once(WWW_DIR."/lib/music.php");
 		$music = new Musik(['Settings' => $page->settings]);
 		$mus = $music->getMusicInfo($data['musicinfoid']);
 	}
 
 	$book = '';
 	if ($data['bookinfoid'] != '') {
-		require_once(WWW_DIR."/lib/book.php");
 		$b = new Book();
 		$book = $b->getBookInfo($data['bookinfoid']);
 	}
 
 	$con = '';
 	if ($data['consoleinfoid'] != '') {
-		require_once(WWW_DIR."/lib/console.php");
 		$c = new Console();
 		$con = $c->getConsoleInfo($data['consoleinfoid']);
 	}

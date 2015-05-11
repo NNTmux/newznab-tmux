@@ -1,7 +1,4 @@
 <?php
-require_once(WWW_DIR . "/lib/releases.php");
-require_once(WWW_DIR . "/lib/content.php");
-require_once(WWW_DIR . "/lib/category.php");
 
 if (!$users->isLoggedIn()) {
 	$page->show403();

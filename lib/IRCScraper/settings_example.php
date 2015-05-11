@@ -4,7 +4,7 @@
 $username = '';
 
 // https://www.synirc.net/servers Try another server if you have issues.
-define('SCRAPE_IRC_SERVER', 'contego.ny.us.synirc.net');
+define('SCRAPE_IRC_SERVER', 'irc.synirc.net');
 // Use Port 6697 or 7001 and set SCRAPE_IRC_TLS to true for encryption.
 define('SCRAPE_IRC_PORT', '6667');
 define('SCRAPE_IRC_TLS', false);

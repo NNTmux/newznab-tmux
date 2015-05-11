@@ -1,12 +1,6 @@
 <?php
 
 require_once("config.php");
-require_once(WWW_DIR."/lib/adminpage.php");
-require_once(WWW_DIR."/lib/releaseregex.php");
-require_once(WWW_DIR."/lib/groups.php");
-require_once(WWW_DIR."/lib/category.php");
-
-require_once(WWW_DIR."/lib/nntp.php");
 
 $page = new AdminPage();
 $reg = new ReleaseRegex();
