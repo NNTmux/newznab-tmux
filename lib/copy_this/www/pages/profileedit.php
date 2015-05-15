@@ -79,7 +79,8 @@ switch ($action) {
 					(isset($_POST['nzbvortex_server_url']) ? $_POST['nzbvortex_server_url'] : false),
 					(isset($_POST['nzbvortex_api_key']) ? $_POST['nzbvortex_api_key'] : false),
 					$_POST['cp_url'],
-					$_POST['cp_api']
+					$_POST['cp_api'],
+					$_POST['style']
 				);
 
 				$_POST['exccat'] = (!isset($_POST['exccat']) || !is_array($_POST['exccat'])) ? array() : $_POST['exccat'];
@@ -99,6 +100,16 @@ switch ($action) {
 		break;
 }
 
+// Get the list of themes.
+$themeList[] = 'None';
+$themes = scandir(NN_WWW . '/templates');
+foreach ($themes as $theme) {
+	if (strpos($theme, ".") === false && $theme[0] !== '_' && is_dir(NN_WWW . '/templates/' . $theme)) {
+		$themeList[] = $theme;
+	}
+}
+
+$page->smarty->assign('themelist', $themeList);
 
 $page->smarty->assign('error', $errorStr);
 $page->smarty->assign('user', $data);

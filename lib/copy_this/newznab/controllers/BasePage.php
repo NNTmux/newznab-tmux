@@ -66,13 +66,16 @@ class BasePage
 		$this->smarty = new Smarty();
 		$this->captcha = new Captcha(['Settings' => $this->settings]);
 
-		if ($this->site->style != "default")
-			$this->smarty->addTemplateDir(WWW_DIR.'templates/'.$this->site->style.'/views/frontend', 'style_frontend');
-		$this->smarty->addTemplateDir(WWW_DIR.'templates/default/views/frontend', 'frontend');
+		$this->smarty->setTemplateDir(
+			array(
+				'user_frontend' => NN_WWW . 'templates/' . $this->site->style . '/views/frontend',
+				'frontend' => NN_WWW . 'templates/default/views/frontend'
+			)
+		);
 		$this->smarty->setCompileDir(SMARTY_DIR.'templates_c'.DIRECTORY_SEPARATOR);
 		$this->smarty->setConfigDir(SMARTY_DIR.'configs'.DIRECTORY_SEPARATOR);
 		$this->smarty->setCacheDir(SMARTY_DIR.'cache'.DIRECTORY_SEPARATOR);
-		$this->smarty->error_reporting = (E_ALL - E_NOTICE);
+		$this->smarty->error_reporting = ((NN_DEBUG ? E_ALL : E_ALL - E_NOTICE));
 		$this->secure_connection = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443)) ;
 
 		if (file_exists(WWW_DIR.'templates/'.$this->site->style.'/theme.php'))
@@ -108,6 +111,16 @@ class BasePage
 			}
 
 			$this->userdata["categoryexclusions"] = $this->users->getCategoryExclusion($this->users->currentUserId());
+
+			// Change the theme to user's selected theme if they selected one, else use the admin one.
+			if (isset($this->userdata['style']) && $this->userdata['style'] !== 'None') {
+				$this->smarty->setTemplateDir(
+					array(
+						'user_frontend' => NN_WWW . 'templates/' . $this->userdata['style'] . '/views/frontend',
+						'frontend'      => NN_WWW . 'templates/default/views/frontend'
+					)
+				);
+			}
 
 			//update lastlogin every 15 mins
 			if (strtotime($this->userdata['now'])-900 > strtotime($this->userdata['lastlogin']))

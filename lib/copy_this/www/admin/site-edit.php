@@ -115,6 +115,8 @@ $page->smarty->assign('lookuptv_names', ['Disabled', 'Lookup All TV', 'Lookup Re
 $page->smarty->assign('lookup_reqids_ids', array(0,1,2));
 $page->smarty->assign('lookup_reqids_names', array('Disabled', 'Lookup Request IDs', 'Lookup Request IDs Threaded'));
 
+$page->smarty->assign('coversPath', NN_COVERS);
+
 // return a list of audiobooks, mags, ebooks, technical and foreign books
 $result = $page->settings->query("SELECT id, title FROM category WHERE id in (3030, 7010, 7020, 7040, 7060)");
 
@@ -139,11 +141,13 @@ $books_selected = explode(",", $page->site->book_reqids);
 $books_selected = array_map(create_function('$value', 'return (int)$value;'), $books_selected);
 $page->smarty->assign('book_reqids_selected', $books_selected);
 
-$themelist = array();
-$themes = scandir(WWW_DIR."/templates");
-foreach ($themes as $theme)
-	if (strpos($theme, ".") === false && is_dir(WWW_DIR."/templates/".$theme))
+$themelist = [];
+$themes    = scandir(NN_WWW . "/templates");
+foreach ($themes as $theme) {
+	if (strpos($theme, ".") === false && is_dir(NN_WWW . "/templates/" . $theme)) {
 		$themelist[] = $theme;
+	}
+}
 
 $page->smarty->assign('themelist', $themelist);
 
