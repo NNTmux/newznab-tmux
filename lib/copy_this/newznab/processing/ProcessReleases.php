@@ -660,6 +660,7 @@ class ProcessReleases
 	public function createNZBs($groupID)
 	{
 		$startTime = time();
+		$group = $this->groups->getCBPTableNames($this->tablePerGroup, $groupID);
 
 		if ($this->echoCLI) {
 			$this->pdo->log->doEcho($this->pdo->log->header("Process Releases -> Create the NZB, delete collections/binaries/parts."));
@@ -673,11 +674,11 @@ class ProcessReleases
 				INNER JOIN category c ON r.categoryid = c.id
 				INNER JOIN category cp ON cp.id = c.parentid
 				WHERE %s nzbstatus = 0",
-				(!empty($groupID) ? ' r.group_id = ' . $groupID . ' AND ' : ' ')
+				(!empty($groupID) ? ' r.groupid = ' . $groupID . ' AND ' : ' ')
 			)
 		);
 
-		$nzbCount = 0;
+		$deleted = $nzbCount = 0;
 
 		if ($releases && $releases->rowCount()) {
 			$total = $releases->rowCount();
@@ -688,20 +689,47 @@ class ProcessReleases
 				if ($this->nzb->writeNZBforReleaseId($release['id'], $release['guid'], $release['name'], $release['title']) === true) {
 					$nzbCount++;
 					if ($this->echoCLI) {
-						echo $this->pdo->log->primaryOver("Creating NZBs and deleting Collections:\t" . $nzbCount . '/' . $total . "\r");
+						echo $this->pdo->log->primaryOver("Creating NZBs:\t" . $nzbCount . '/' . $total . "\r");
 					}
 				}
 			}
 		}
 
-		$totalTime = (time() - $startTime);
+		$nzbEnd = time();
+
+		if ($nzbCount > 0) {
+			if ($this->echoCLI) {
+				$this->pdo->log->doEcho(
+					$this->pdo->log->primary(
+						PHP_EOL . 'Deleting collections/binaries/parts, be patient.'
+					)
+				);
+			}
+
+			$deleteQuery = $this->pdo->queryExec(
+				sprintf('
+					DELETE c FROM %s c
+					INNER JOIN releases r ON r.id = c.releaseid
+					WHERE r.nzbstatus = %d
+					AND c.filecheck = %d',
+					$group['cname'],
+					\NZB::NZB_ADDED,
+					self::COLLFC_INSERTED
+				)
+			);
+			if ($deleteQuery !== false) {
+				$deleted = $deleteQuery->rowCount();
+			}
+		}
+
+		$deleteEnd = time();
 
 		if ($this->echoCLI) {
 			$this->pdo->log->doEcho(
 				$this->pdo->log->primary(
-					number_format($nzbCount) . ' NZBs created/Collections deleted in ' .
-					$totalTime . ' seconds.' . PHP_EOL .
-					'Total time: ' . $this->pdo->log->primary($this->consoleTools->convertTime($totalTime))
+					number_format($nzbCount) . ' NZBs created in ' . ($nzbEnd - $startTime) . ' seconds.' . PHP_EOL .
+					'Deleted ' . number_format($deleted) . ' collections in ' . ($deleteEnd - $nzbEnd) . ' seconds.' . PHP_EOL .
+					'Total time: ' . $this->pdo->log->primary($this->consoleTools->convertTime(time() - $startTime))
 				)
 			);
 		}
