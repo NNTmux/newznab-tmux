@@ -36,8 +36,8 @@ if (count($nntpkill) !== 0) {
 }
 
 // Check database patch version
-if ($patch < 118) {
-	exit($c->error("\nYour database is not up to date. Please update.\nphp ${DIR}lib/DB/patchDB.php\n"));
+if ($patch < 119) {
+	exit($c->error("\nYour database is not up to date. Please update.\nphp ${NN_WWW}lib/DB/patchDB.php\n"));
 }
 
 //check if session exists

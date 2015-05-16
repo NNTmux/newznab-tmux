@@ -47,7 +47,7 @@ class Users
 		];
 		$options += $defaults;
 
-		$this->pdo = ($options['Settings'] instanceof newznab\db\DB ? $options['Settings'] : new newznab\db\DB());
+		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
 
 		$this->password_hash_cost = (defined('NN_PASSWORD_HASH_COST') ? NN_PASSWORD_HASH_COST : 11);
 	}
@@ -91,6 +91,19 @@ class Users
 		$db = new DB();
 
 		return $db->query("select * from users");
+	}
+
+	/**
+	 * Get the users selected theme.
+	 *
+	 * @param string|int $userID The id of the user.
+	 *
+	 * @return array|bool The users selected theme.
+	 */
+	public function getStyle($userID)
+	{
+		$row = $this->pdo->queryOneRow(sprintf("SELECT style FROM users WHERE id = %d", $userID));
+		return ($row === false ? 'None' : $row['style']);
 	}
 
 	public function delete($id)
@@ -218,7 +231,7 @@ class Users
 		return $res["num"];
 	}
 
-	public function update($id, $uname, $email, $grabs, $role, $notes, $invites, $movieview, $musicview, $gameview, $xxxview, $consoleview, $bookview, $queueType = '', $nzbgetURL = '', $nzbgetUsername = '', $nzbgetPassword = '', $saburl = '', $sabapikey = '', $sabpriority = '', $sabapikeytype = '', $nzbvortexServerUrl = false, $nzbvortexApiKey = false, $cp_url = false, $cp_api = false)
+	public function update($id, $uname, $email, $grabs, $role, $notes, $invites, $movieview, $musicview, $gameview, $xxxview, $consoleview, $bookview, $queueType = '', $nzbgetURL = '', $nzbgetUsername = '', $nzbgetPassword = '', $saburl = '', $sabapikey = '', $sabpriority = '', $sabapikeytype = '', $nzbvortexServerUrl = false, $nzbvortexApiKey = false, $cp_url = false, $cp_api = false, $style = 'None')
 	{
 		$db = new DB();
 
@@ -255,6 +268,7 @@ class Users
 		$sql[] = sprintf('xxxview = %d', $xxxview);
 		$sql[] = sprintf('consoleview = %d', $consoleview);
 		$sql[] = sprintf('bookview = %d', $bookview);
+		$sql[] = sprintf('style = %s', $this->pdo->escapeString($style));
 
 		if ($queueType !== '') {
 			$sql[] = sprintf('queuetype = %d', $queueType);

@@ -1,4 +1,4 @@
- 
+
 			<h1>{$page->title}</h1>
 			<h2>Getting in touch</h2>
 
@@ -13,7 +13,7 @@
 			<p>
 				Alternatively use our contact form to get in touch.
 			</p>
-			
+
 			<form method="post" action="contact-us">
 				<table>
 					<tr>
@@ -37,6 +37,7 @@
 					<tr>
 						<td></td>
 						<td>
+							{$page->smarty->fetch('captcha.tpl')}
 							<input type="submit" value="Submit" />
 						</td>
 					</tr>
