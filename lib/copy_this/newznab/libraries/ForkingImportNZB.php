@@ -12,9 +12,9 @@ use newznab\db\DB;
 class ForkingImportNZB extends Forking
 {
 	/**
-	 *
+	 * @param array $options
 	 */
-	public function __construct(array $options = array())
+	public function __construct(array $options = [])
 	{
 		$defaults = [
 			'settings' => new DB(),
