@@ -582,9 +582,9 @@ class SpotNab {
 
 		// Fetch some date ranges
 		$last_month = date("Y-m-d",strtotime(
-			date("Y-m-d", mktime()) . " - 30 day"));
+			date("Y-m-d", time()) . " - 30 day"));
 		$last_year = date('Y-m-d',strtotime(
-			date("Y-m-d", mktime()) . " - 365 day"));
+			date("Y-m-d", time()) . " - 365 day"));
 
 		// Header
 		$message = array(
@@ -968,7 +968,7 @@ class SpotNab {
 				}
 
 				// Update DB With Global Identifer
-				$ures = $db->queryExec(sprintf("UPDATE releases SET gid = '%s' WHERE id = %d", $gid, $r['id']));
+				$ures = $db->queryExec(sprintf("UPDATE releases SET gid = %s WHERE id = %d", $db->escapeString($gid), $r['id']));
 				if($ures->rowCount() == 0){
 					printf("\nPostPrc : Failed to update: %s\n", $r['name']);
 				}

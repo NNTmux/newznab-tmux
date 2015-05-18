@@ -1,5 +1,4 @@
 <?php
-require_once NN_LIBS . 'AmazonProductAPI.php';
 
 use newznab\db\DB;
 use newznab\libraries\ApaiIO\Configuration\GenericConfiguration;

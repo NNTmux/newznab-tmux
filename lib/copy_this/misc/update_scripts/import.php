@@ -40,14 +40,14 @@ echo "\nUsage: php import.php [path(string)] [usefilename(true/false)] [dupechec
 
 $filestoprocess = glob($path . "*.{nzb,nzb.gz}", GLOB_BRACE);
 $items = count($filestoprocess);
-$matches = array();
+$matches = [];
 $digits = preg_match_all("/[0-9]/", count($filestoprocess), $matches);
 $dupepath = $path . "dupe/";
 $nogrouppath = $path . "nogroup/";
 $importedpath = $path . "imported/";
 $noregexpath = $path . "noregex/";
 $errorpath = $path . "error/";
-$missinggroups = array();
+$missinggroups = [];
 echo "[Importing " . $items . " *.nzb file" . ($items != 1 ? "s" : "") . " from " . $path . ($usefilename ? " U" : " Not u") . "sing filename, " . ($dupecheck ? "C" : "Not c") . "hecking for duplicates" . ($categoryoverride != -1 ? ", Forcing category to " . $categoryoverride : "") . "]\n\n";
 
 foreach ($filestoprocess as $nzbFile) {
@@ -124,7 +124,7 @@ foreach ($filestoprocess as $nzbFile) {
 				$binaryId = 0;
 				$groupRegexes = $releaseRegex->getForGroup($groupName);
 				foreach ($nzbInfo->nzb as $postFile) {
-					$regexMatches = array();
+					$regexMatches = [];
 
 					foreach ($groupRegexes as $groupRegex) {
 						$regexCheck = $releaseRegex->performMatch($groupRegex, $postFile["subject"]);
