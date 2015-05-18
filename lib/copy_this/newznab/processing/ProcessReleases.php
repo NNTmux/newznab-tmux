@@ -172,8 +172,8 @@ class ProcessReleases
 
 		$totalReleasesAdded = $loops = 0;
 		do {
-			$releasesAdded = $this->createReleases($groupID);
-			$totalReleasesAdded += $releasesAdded;
+			$releasesCount = $this->createReleases($groupID);
+			$totalReleasesAdded += $releasesCount['added'];
 
 			$nzbFilesAdded = $this->createNZBs($groupID);
 			if ($this->processRequestIDs === 0) {
@@ -202,7 +202,7 @@ class ProcessReleases
 			$this->deleteCollections($groupID);
 
 			// This loops as long as there were releases created or 3 loops, otherwise, you could loop indefinately
-		} while (($nzbFilesAdded > 0 || $releasesAdded > 0) && $loops++ < 3);
+		} while (($releasesCount['added'] + $releasesCount['dupes']) >= $this->releaseCreationLimit || $nzbFilesAdded >= $this->releaseCreationLimit);
 
 
 
@@ -646,7 +646,7 @@ class ProcessReleases
 			);
 		}
 
-		return $returnCount;
+		return ['added' => $returnCount, 'dupes' => $duplicate];
 	}
 
 	/**

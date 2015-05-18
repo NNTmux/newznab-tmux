@@ -1044,12 +1044,10 @@
 			</td>
 		</tr>
 		<tr>
-			<td style="width:180px;"><label for="maxnzbsprocessed">Maximum NZBs processed:</label></td>
+			<td style="width:180px;"><label for="maxnzbsprocessed">Maximum NZBs stage5:</label></td>
 			<td>
-				<input class="short" id="maxnzbsprocessed" name="maxnzbsprocessed" type="text"
-					   value="{$fsite->maxnzbsprocessed}"/>
-
-				<div class="hint">The maximum amount of NZB files to create in update_releases.</div>
+				<input class="short" id="maxnzbsprocessed" name="maxnzbsprocessed" type="text" value="{$fsite->maxnzbsprocessed}"/>
+				<div class="hint">The maximum amount of NZB files to create on stage 5 at a time in update_releases. If more are to be created it will loop stage 5 until none remain.</div>
 			</td>
 		</tr>
 

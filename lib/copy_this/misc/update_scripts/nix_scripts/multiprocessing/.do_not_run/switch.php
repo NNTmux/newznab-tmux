@@ -144,6 +144,8 @@ switch ($options[1]) {
 	// $options[2] => (string)groupCount, number of groups terminated by _ | (int)groupid, group to work on
 	case 'releases':
 		$pdo = new DB();
+		$s = new Sites();
+		$site = $s->get();
 		$releases = new ProcessReleases(['Settings' => $pdo]);
 
 		//Runs function that are per group
@@ -153,7 +155,7 @@ switch ($options[1]) {
 				collectionCheck($pdo, $options[2]);
 			}
 
-			processReleases($releases, $options[2]);
+			processReleases($site, $releases, $options[2]);
 
 		} else {
 
@@ -216,7 +218,7 @@ switch ($options[1]) {
 			$backFill->backfillAllGroups($groupMySQL['name'], 20000, 'normal');
 
 			// Create releases.
-			processReleases(new \Releases(['Settings' => $pdo]), $options[2]);
+			processReleases(new ProcessReleases(['Settings' => $pdo]), $options[2]);
 
 			// Post process the releases.
 			(new ProcessAdditional(['Echo' => true, 'NNTP' => $nntp, 'Settings' => $pdo]))->start($options[2]);
@@ -269,18 +271,27 @@ switch ($options[1]) {
 }
 
 /**
- * Create / process releases for a groupid.
+ * Create / process releases for a groupID.
  *
- * @param \newznab\processing\ProcessReleases $releases
+ * @param Sites        $site
+ * @param ProcessReleases $releases
  * @param int             $groupID
  */
-function processReleases($releases, $groupID)
+function processReleases($site, $releases, $groupID)
 {
+	$s = new Sites();
+	$site = $s->get();
+	$releaseCreationLimit = ($site->maxnzbsprocessed != '' ? (int)$site->maxnzbsprocessed : 1000);
 	$releases->processIncompleteCollections($groupID);
 	$releases->processCollectionSizes($groupID);
 	$releases->deleteUnwantedCollections($groupID);
-	$releases->createReleases($groupID);
-	$releases->createNZBs($groupID);
+
+	do {
+		$releasesCount = $releases->createReleases($groupID);
+		$nzbFilesAdded = $releases->createNZBs($groupID);
+
+		// This loops as long as the number of releases or nzbs added was >= the limit (meaning there are more waiting to be created)
+	} while (($releasesCount['added'] + $releasesCount['dupes']) >= $releaseCreationLimit || $nzbFilesAdded >= $releaseCreationLimit);
 	$releases->deleteCollections($groupID);
 }
 
