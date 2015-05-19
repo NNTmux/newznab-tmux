@@ -170,7 +170,7 @@ class ProcessReleases
 		$PYTHON = shell_exec('which python3 2>/dev/null');
 		$PYTHON = (empty($PYTHON) ? 'python -OOu' : 'python3 -OOu');
 
-		$totalReleasesAdded = $loops = 0;
+		$totalReleasesAdded = 0;
 		do {
 			$releasesCount = $this->createReleases($groupID);
 			$totalReleasesAdded += $releasesCount['added'];
