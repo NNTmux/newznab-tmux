@@ -51,13 +51,8 @@ class MiscSorter
 
 		$this->category = new Categorize(['Settings' => $this->pdo]);
 		$this->movie = new Film(['Echo' => $this->echooutput, 'Settings' => $this->pdo]);
-		$this->namefixer = new NameFixer();
-		$this->music = new Musik();
-		$this->console = new Konsole();
 		$s = new Sites();
 		$this->site = $s->get();
-		$this->book = new Books();
-		$this->c = new ColorCLI();
 		$this->pubkey = $this->site->amazonpubkey;
 		$this->privkey = $this->site->amazonprivkey;
 		$this->asstag = $this->site->amazonassociatetag;
@@ -448,7 +443,7 @@ class MiscSorter
 					$ok = $this->_doAmazonVG($response, $id);
 					break;
 				default:
-					echo PHP_EOL . $this->c->error("Amazon category $type could not be parsed for " . $name) . PHP_EOL;
+					echo PHP_EOL . $this->pdo->log->error("Amazon category $type could not be parsed for " . $name) . PHP_EOL;
 			}
 		}
 
