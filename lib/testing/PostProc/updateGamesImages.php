@@ -2,18 +2,25 @@
 require_once(dirname(__FILE__) . "/../../../bin/config.php");
 
 use newznab\db\DB;
+use newznab\utility\Utility;
 
 $pdo = new DB();
 $covers = $updated = $deleted = 0;
-$c = new ColorCLI();
 
 if ($argc == 1 || $argv[1] != 'true') {
-	exit($c->error("\nThis script will check all images in covers/games and compare to db->gamesinfo.\nTo run:\nphp $argv[0] true\n"));
+	exit($pdo->log->error("\nThis script will check all images in covers/games and compare to db->gamesinfo.\nTo run:\nphp $argv[0] true\n"));
+}
+
+$row = $pdo->queryOneRow("SELECT value FROM site WHERE setting = 'coverspath'");
+if ($row !== false) {
+	Utility::setCoversConstant($row['value']);
+} else {
+	die("Unable to set Covers' constant!\n");
 }
 $path2covers = NN_COVERS . 'games' . DS;
 
-$dirItr = new RecursiveDirectoryIterator($path2covers);
-$itr = new RecursiveIteratorIterator($dirItr, RecursiveIteratorIterator::LEAVES_ONLY);
+$dirItr = new \RecursiveDirectoryIterator($path2covers);
+$itr = new \RecursiveIteratorIterator($dirItr, \RecursiveIteratorIterator::LEAVES_ONLY);
 foreach ($itr as $filePath) {
 	if (is_file($filePath) && preg_match('/\d+\.jpg/', $filePath)) {
 		preg_match('/(\d+)\.jpg/', basename($filePath), $match);
@@ -25,7 +32,7 @@ foreach ($itr as $filePath) {
 				} else {
 					$run = $pdo->queryDirect("SELECT id FROM gamesinfo WHERE id = " . $match[1]);
 					if ($run !== false && $run->rowCount() == 0) {
-						echo $c->info($filePath . " not found in db.");
+						echo $pdo->log->info($filePath . " not found in db.");
 					}
 				}
 			}
@@ -34,12 +41,14 @@ foreach ($itr as $filePath) {
 }
 
 $qry = $pdo->queryDirect("SELECT id FROM gamesinfo WHERE cover = 1");
-foreach ($qry as $rows) {
-	if (!is_file($path2covers . $rows['id'] . '.jpg')) {
-		$pdo->queryDirect("UPDATE gamesinfo SET cover = 0 WHERE cover = 1 AND id = " . $rows['id']);
-		echo $c->info($path2covers . $rows['id'] . ".jpg does not exist.");
-		$deleted++;
+if ($qry instanceof \Traversable) {
+	foreach ($qry as $rows) {
+		if (!is_file($path2covers . $rows['id'] . '.jpg')) {
+			$pdo->queryDirect("UPDATE gamesinfo SET cover = 0 WHERE cover = 1 AND id = " . $rows['id']);
+			echo $pdo->log->info($path2covers . $rows['id'] . ".jpg does not exist.");
+			$deleted++;
+		}
 	}
 }
-echo $c->header($covers . " covers set.");
-echo $c->header($deleted . " games unset.");
+echo $pdo->log->header($covers . " covers set.");
+echo $pdo->log->header($deleted . " games unset.");
