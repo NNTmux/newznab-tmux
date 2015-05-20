@@ -19,7 +19,7 @@ if ($type != "g")
     $result = mysql_query("select ID from feed where '".mysql_real_escape_string($type)."' REGEXP code");
     $feedid = -1;
     while ($row = mysql_fetch_assoc($result))
-        $feedid = $row["ID"];
+        $feedid = $row["id"];
 
     $result = mysql_query("select item.*, feed.* from item join ( select ID from item where feedID = '".mysql_real_escape_string($feedid)."' order by adddateunique desc limit ".$limit." ) x on x.ID = item.ID inner join feed on feed.ID = item.feedID inner join access on access.guid = '".mysql_real_escape_string($uid)."' order by item.id desc");
 }

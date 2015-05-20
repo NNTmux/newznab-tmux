@@ -42,7 +42,7 @@ foreach ($res as $regexrow)
       }catch(Exception $e){
          $errcnt++;
          $strerr=str_pad((int) $errcnt,2," ",STR_PAD_LEFT);
-         echo "$strerr. id=".$regexrow["ID"].
+         echo "$strerr. id=".$regexrow["id"].
             ", group=".$regexrow["groupname"]."\n";
          echo "    regex='".$regexrow["regex"]."'\n";
          echo "    error=".$e->getMessage()."\n\n";

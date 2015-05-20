@@ -298,7 +298,7 @@ while($res=get_block($offset, $batch)){
 				# Support letting the user know when there is a bad
 				# regular expression entry abort futher checks
 				$strerr=str_pad((int) $errcnt,2," ",STR_PAD_LEFT);
-				echo "$strerr. id=".$bl["ID"].
+				echo "$strerr. id=".$bl["id"].
 					", group=".$header["groupname"]."\n";
 				echo "	 regex='".$bl["groupname"]."'\n";
 				echo "	 error=".$e->getMessage()."\n\n";
@@ -324,8 +324,8 @@ while($res=get_block($offset, $batch)){
 					# Support letting the user know when there is a bad
 					# regular expression entry abort futher checks
 					$strerr=str_pad((int) $errcnt,2," ",STR_PAD_LEFT);
-                    if(isset($bl["ID"]))
-					   echo "$strerr. id=".$bl["ID"].", ";
+                    if(isset($bl["id"]))
+					   echo "$strerr. id=".$bl["id"].", ";
 				    echo " name=".$header["name"]."\n";
 					echo "	 regex=$regex\n";
 					echo "	 error=".$e->getMessage()."\n\n";

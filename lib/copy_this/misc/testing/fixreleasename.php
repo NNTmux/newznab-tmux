@@ -14,7 +14,7 @@ foreach ($rows as $row)
     preg_match($reg, $row["searchname"], $matches);
     if (isset($matches["name"])) {
         $db->exec(sprintf("update releases set searchname = %s, name = %s where ID = %d",
-                $db->escapeString($matches["name"]), $db->escapeString($matches["name"]), $row["ID"]));
+                $db->escapeString($matches["name"]), $db->escapeString($matches["name"]), $row["id"]));
         echo $matches["name"]."\n";
     }
 }
