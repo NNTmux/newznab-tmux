@@ -271,6 +271,26 @@ class Utility
 		return ($string === '' ? false : $string);
 	}
 
+	public static function setCoversConstant($path)
+	{
+		if (!defined('NN_COVERS')) {
+			switch (true) {
+				case (substr($path, 0, 1) == '/' ||
+					substr($path, 1, 1) == ':' ||
+					substr($path, 0, 1) == '\\'):
+					define('NN_COVERS', self::trailingSlash($path));
+					break;
+				case (strlen($path) > 0 && substr($path, 0, 1) != '/' && substr($path, 1, 1) != ':' &&
+					substr($path, 0, 1) != '\\'):
+					define('NN_COVERS', realpath(NN_ROOT . self::trailingSlash($path)));
+					break;
+				case empty($path): // Default to resources location.
+				default:
+					define('NN_COVERS', NN_RES . 'covers' . DS);
+			}
+		}
+	}
+
 	/**
 	 * Creates an array to be used with stream_context_create() to verify openssl certificates
 	 * when connecting to a tls or ssl connection when using stream functions (fopen/file_get_contents/etc).
