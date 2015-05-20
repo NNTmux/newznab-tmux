@@ -11,7 +11,7 @@ $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view';
 
 //get the user roles
 $userroles = $users->getRoles();
-$roles = array();
+$roles = [];
 $defaultrole = Users::ROLE_USER;
 $defaultinvites = Users::DEFAULT_INVITES;
 foreach ($userroles as $r) {
@@ -24,7 +24,7 @@ foreach ($userroles as $r) {
 
 switch ($action) {
 	case 'add':
-		$user = array();
+		$user = [];
 		$user["role"] = $defaultrole;
 		$user["notes"] = "";
 		$user["invites"] = $defaultinvites;
@@ -44,7 +44,7 @@ switch ($action) {
 				if ($role['id'] == $_POST['role'])
 					$invites = $role['defaultinvites'];
 			}
-			$ret = $users->signup($_POST["username"], $_POST["password"], $_POST["email"], '', $_POST["role"], $_POST["notes"], $invites, "", true, false, false, true);
+			$ret = $users->signup($_POST["username"], $_POST["password"], $_POST["email"], '', $_POST["role"], $_POST["notes"], $invites, "", true);
 		} else {
 			$ret = $users->update($_POST["id"], $_POST["username"], $_POST["email"], $_POST["grabs"], $_POST["role"], $_POST["notes"], $_POST["invites"], (isset($_POST['movieview']) ? "1" : "0"), (isset($_POST['musicview']) ? "1" : "0"), (isset($_POST['gameview']) ? "1" : "0"), (isset($_POST['xxxview']) ? "1" : "0"), (isset($_POST['consoleview']) ? "1" : "0"), (isset($_POST['bookview']) ? "1" : "0"));
 			if ($_POST['password'] != "")
@@ -74,7 +74,7 @@ switch ($action) {
 					$page->smarty->assign('error', "Unknown save error.");
 					break;
 			}
-			$user = array();
+			$user = [];
 			$user["id"] = $_POST["id"];
 			$user["username"] = $_POST["username"];
 			$user["email"] = $_POST["email"];
