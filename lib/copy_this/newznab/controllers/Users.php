@@ -491,7 +491,7 @@ class Users
 		return substr(md5(uniqid()), 0, 8);
 	}
 
-	public function signup($uname, $pass, $email, $host, $role = self::ROLE_USER, $notes, $invites = self::DEFAULT_INVITES, $invitecode = '', $forceinvitemode = false, $recaptcha_challenge = false, $recaptcha_response = false, $skip_recaptcha = false)
+	public function signup($uname, $pass, $email, $host, $role = self::ROLE_USER, $notes, $invites = self::DEFAULT_INVITES, $invitecode = '', $forceinvitemode = false)
 	{
 		$site = new Sites;
 		$s = $site->get();
@@ -518,12 +518,6 @@ class Users
 		if ($res)
 			return Users::ERR_SIGNUP_EMAILINUSE;
 
-		// Check Captcha
-		if (!$skip_recaptcha) {
-			if (!$this->isValidCaptcha($s, $recaptcha_challenge, $recaptcha_response))
-				return Users::ERR_SIGNUP_BADCAPTCHA;
-		}
-
 		//
 		// make sure this is the last check, as if a further validation check failed,
 		// the invite would still have been used up
@@ -544,16 +538,6 @@ class Users
 	public function isValidPassword($pass)
 	{
 		return (strlen($pass) > 5);
-	}
-
-	public function isValidCaptcha($site, $challenge, $response)
-	{
-		if ($site->registerrecaptcha != 1)
-			return true;
-
-		$resp = recaptcha_check_answer($site->recaptchaprivatekey, $_SERVER["REMOTE_ADDR"], $challenge, $response);
-
-		return $resp->is_valid;
 	}
 
 	public function checkAndUseInvite($invitecode)

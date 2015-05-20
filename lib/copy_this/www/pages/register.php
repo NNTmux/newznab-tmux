@@ -16,12 +16,6 @@ elseif ($page->site->registerstatus == Sites::REGISTER_STATUS_INVITE && (!isset(
 	$showregister = 0;
 }
 
-// Use recaptcha? 11.05.2015 - Old code
-/*if ($page->site->registerrecaptcha == 1)
-{
-	$page->smarty->assign('recaptcha', recaptcha_get_html($page->site->recaptchapublickey, null, $page->secure_connection));
-}*/
-
 if ($showregister == 0)
 {
 	$page->smarty->assign('showregister', "0");
@@ -62,7 +56,7 @@ else {
 					//get the default user role
 					$userdefault = $users->getDefaultRole();
 
-					$ret = $users->signup($username, $password, $email, $_SERVER['REMOTE_ADDR'], $userdefault['id'], "", $userdefault['defaultinvites'], $invitecode, false, isset($_POST['recaptcha_challenge_field']) ? $_POST['recaptcha_challenge_field'] : null, isset($_POST['recaptcha_response_field']) ? $_POST['recaptcha_response_field'] : null);
+					$ret = $users->signup($username, $password, $email, $_SERVER['REMOTE_ADDR'], $userdefault['id'], "", $userdefault['defaultinvites'], $invitecode, false);
 					if ($ret > 0) {
 						$users->login($ret, $_SERVER['REMOTE_ADDR']);
 						header("Location: " . WWW_TOP . "/");
@@ -85,9 +79,6 @@ else {
 								break;
 							case Users::ERR_SIGNUP_BADINVITECODE:
 								$page->smarty->assign('error', "Sorry, the invite code is old or has been used.");
-								break;
-							case Users::ERR_SIGNUP_BADCAPTCHA:
-								$page->smarty->assign('error', "Sorry, your captcha code was incorrect.");
 								break;
 							default:
 								$page->smarty->assign('error', "Failed to register.");
