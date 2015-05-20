@@ -272,10 +272,28 @@ class BasePage
 		return (strtoupper($_SERVER["REQUEST_METHOD"]) === "POST");
 	}
 
+	/**
+	 * Show 404 page.
+	 */
 	public function show404()
 	{
-		header("HTTP/1.1 404 Not Found");
-		die();
+		header('HTTP/1.1 404 Not Found');
+		exit(
+		sprintf("
+				<html>
+					<head>
+						<title>404 - File not found.</title>
+					</head>
+					<body>
+						<h1>404 - File not found.</h1>
+						<p>%s%s</p>
+						<p>We could not find the above page on our servers.</p>
+					</body>
+				</html>",
+			$this->serverurl,
+			$this->page
+		)
+		);
 	}
 
 	public function show403($from_admin = false)
@@ -285,27 +303,28 @@ class BasePage
 		die();
 	}
 
-	public function show503($retry='')
+	/**
+	 * Show 503 page.
+	 *
+	 * @param string $message Message to display.
+	 */
+	public function show503($message = 'Your maximum api or download limit has been reached for the day.')
 	{
 		header('HTTP/1.1 503 Service Temporarily Unavailable');
-		header('Status: 503 Service Temporarily Unavailable');
-		if ($retry != '')
-			header('Retry-After: '.$retry);
-
-		echo "
-			<html>
-			<head>
-				<title>Service Unavailable</title>
-			</head>
-
-			<body>
-				<h1>Service Unavailable</h1>
-
-				<p>Your maximum api or download limit has been reached for the day</p>
-
-			</body>
-			</html>";
-		die();
+		exit(
+		sprintf("
+				<html>
+					<head>
+						<title>Service Unavailable.</title>
+					</head>
+					<body>
+						<h1>Service Unavailable.</h1>
+						<p>%s</p>
+					</body>
+				</html>",
+			$message
+		)
+		);
 	}
 
 	public function show429($retry='')
