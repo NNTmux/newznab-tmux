@@ -55,7 +55,7 @@ else
 	}
 	else
 	{
-		$uid = $page->userdata["ID"];
+		$uid = $page->userdata["id"];
 		$rsstoken = $page->userdata["rsstoken"];
 		$maxrequests = $page->userdata['apirequests'];
 	}
