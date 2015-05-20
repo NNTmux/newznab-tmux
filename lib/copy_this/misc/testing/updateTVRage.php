@@ -16,6 +16,6 @@ $rows = $db->query("select ID, releasetitle from tvrage
 echo "Updating ".count($rows)." entries \n";
 
 foreach ($rows as $row) {
-    $t->refreshRageInfo($row["ID"]);
+    $t->refreshRageInfo($row["id"]);
 	echo "Refreshing ".$row["releasetitle"]."\n";
 }

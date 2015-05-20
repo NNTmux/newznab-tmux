@@ -27,8 +27,8 @@ $numarticles = (isset($_REQUEST['numarticles']) && !empty($_REQUEST['numarticles
 $clearexistingbins = isset($_REQUEST['clearexistingbins']) ? true : false;
 foreach($groupList as $grp)
 {
-	$gid[$grp["ID"]] = $grp["ID"];
-	$gnames[$grp["ID"]] = $grp["name"];
+	$gid[$grp["id"]] = $grp["id"];
+	$gnames[$grp["id"]] = $grp["name"];
 }
 
 $group = $groupname;

@@ -17,7 +17,7 @@ if (isset($_REQUEST["add"]))
 		$page->show404();
 
 	foreach($data as $d)
-		$users->addCart($users->currentUserId(), $d["ID"]);
+		$users->addCart($users->currentUserId(), $d["id"]);
 }
 elseif (isset($_REQUEST["delete"]))
 {

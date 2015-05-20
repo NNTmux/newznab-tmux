@@ -18,7 +18,7 @@ if ($type != "g")
     $result = mysql_query("select ID from feed where '".mysql_real_escape_string($type)."' REGEXP code and status = 1");
     $feedid = -1;
     while ($row = mysql_fetch_assoc($result))
-        $feedid = $row["ID"];
+        $feedid = $row["id"];
 
     $result = mysql_query("select * from item inner join feed on feed.ID = item.feedID inner join access on access.guid = '".mysql_real_escape_string($uid)."' where ".$reqstr." and item.feedid = '".mysql_real_escape_string($feedid)."'");
 }
@@ -30,7 +30,7 @@ else
 // build metadata about the item(s)
 //
 $ret = "<items>";
-while ($row = mysql_fetch_assoc($result)) 
+while ($row = mysql_fetch_assoc($result))
 	$ret.="<item reqid=\"".$row["reqid"]."\" link=\"".cleanXML($row["link"])."\" date=\"".$row["pubdate"]."\" title=\"".cleanXML($row["title"])."\" />\n";
 $ret.="</items>";
 
@@ -43,21 +43,21 @@ echo $ret;
 die();
 
 
-function cleanXML($strin) 
+function cleanXML($strin)
 {
 	$strout = null;
 
-	for ($i = 0; $i < strlen($strin); $i++) 
+	for ($i = 0; $i < strlen($strin); $i++)
 	{
 		$ord = ord($strin[$i]);
 
-		if (($ord > 0 && $ord < 32) || ($ord >= 127)) 
+		if (($ord > 0 && $ord < 32) || ($ord >= 127))
 		{
 			$strout .= "&amp;#{$ord};";
 		}
-		else 
+		else
 		{
-			switch ($strin[$i]) 
+			switch ($strin[$i])
 			{
 				case '<':
 					$strout .= '&lt;';

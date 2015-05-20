@@ -14,7 +14,7 @@ elseif (isset($_GET["name"]))
 {
 	$res = $users->getByUsername($_GET["name"]);
 	if ($res)
-		$userid = $res["ID"];
+		$userid = $res["id"];
 }
 else
 	$userid = $users->currentUserId();
