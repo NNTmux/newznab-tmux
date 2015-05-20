@@ -57,7 +57,7 @@ class Musik
 	/**
 	 * @param array $options Class instances/ echo to CLI.
 	 */
-	public function __construct(array $options = array())
+	public function __construct(array $options = [])
 	{
 		$defaults = [
 			'Echo'     => false,
@@ -168,7 +168,7 @@ class Musik
 	 *
 	 * @return mixed
 	 */
-	public function getMusicCount($cat, $maxage = -1, $excludedcats = array())
+	public function getMusicCount($cat, $maxage = -1, $excludedcats = [])
 	{
 
 
@@ -204,7 +204,7 @@ class Musik
 	 *
 	 * @return array
 	 */
-	public function getMusicRange($cat, $start, $num, $orderby, $excludedcats = array())
+	public function getMusicRange($cat, $start, $num, $orderby, $excludedcats = [])
 	{
 
 
@@ -275,7 +275,7 @@ class Musik
 				$orderfield = 'm.year';
 				break;
 			case 'genre':
-				$orderfield = 'm.genreID';
+				$orderfield = 'm.genreid';
 				break;
 			case 'posted':
 			default:
@@ -331,7 +331,7 @@ class Musik
 	public function makeFieldLinks($data, $field)
 	{
 		$tmpArr = explode(', ', $data[$field]);
-		$newArr = array();
+		$newArr = [];
 		$i = 0;
 		foreach ($tmpArr as $ta) {
 			if (trim($ta) == '') {
@@ -389,7 +389,7 @@ class Musik
 		$ri = new \ReleaseImage($this->pdo);
 		$titlepercent = 0;
 
-		$mus = array();
+		$mus = [];
 		if ($title != '') {
 			$amaz = $this->fetchAmazonProperties($title);
 		} else if ($amazdata != null) {
@@ -413,7 +413,7 @@ class Musik
 
 		// Load genres.
 		$defaultGenres = $gen->getGenres(\Genres::MUSIC_TYPE);
-		$genreassoc = array();
+		$genreassoc = [];
 		foreach ($defaultGenres as $dg) {
 			$genreassoc[$dg['id']] = strtolower($dg['title']);
 		}
@@ -722,7 +722,7 @@ class Musik
 	public function parseArtist($releasename)
 	{
 		if (preg_match('/(.+?)(\d{1,2} \d{1,2} )?\(?(19\d{2}|20[0-1][0-9])\b/', $releasename, $name)) {
-			$result = array();
+			$result = [];
 			$result["year"] = $name[3];
 
 			$a = preg_replace('/ (\d{1,2} \d{1,2} )?(Bootleg|Boxset|Clean.+Version|Compiled by.+|\dCD|Digipak|DIRFIX|DVBS|FLAC|(Ltd )?(Deluxe|Limited|Special).+Edition|Promo|PROOF|Reissue|Remastered|REPACK|RETAIL(.+UK)?|SACD|Sampler|SAT|Summer.+Mag|UK.+Import|Deluxe.+Version|VINYL|WEB)/i', ' ', $name[1]);

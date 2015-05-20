@@ -9,7 +9,7 @@ $cat = new Category(['Settings' => $page->settings]);
 $gen = new Genres(['Settings' => $page->settings]);
 
 $musiccats = $cat->getChildren(Category::CAT_PARENT_MUSIC);
-$mtmp = array();
+$mtmp = [];
 foreach ($musiccats as $mcat) {
 	$mtmp[$mcat['id']] = $mcat;
 }
@@ -18,7 +18,7 @@ if (isset($_REQUEST['t']) && array_key_exists($_REQUEST['t'], $mtmp)) {
 	$category = $_REQUEST['t'] + 0;
 }
 
-$catarray = array();
+$catarray = [];
 $catarray[] = $category;
 
 $page->smarty->assign('catlist', $mtmp);
@@ -30,7 +30,7 @@ $offset = (isset($_REQUEST['offset']) && ctype_digit($_REQUEST['offset'])) ? $_R
 $ordering = $music->getMusicOrdering();
 $orderby = isset($_REQUEST['ob']) && in_array($_REQUEST['ob'], $ordering) ? $_REQUEST['ob'] : '';
 
-$results = $musics = array();
+$results = $musics = [];
 $results = $music->getMusicRange($catarray, $offset, ITEMS_PER_COVER_PAGE, $orderby, $page->userdata['categoryexclusions']);
 
 $artist = (isset($_REQUEST['artist']) && !empty($_REQUEST['artist'])) ? stripslashes($_REQUEST['artist']) : '';
@@ -40,7 +40,7 @@ $title = (isset($_REQUEST['title']) && !empty($_REQUEST['title'])) ? stripslashe
 $page->smarty->assign('title', $title);
 
 $genres = $gen->getGenres(Genres::MUSIC_TYPE, true);
-$tmpgnr = array();
+$tmpgnr = [];
 foreach ($genres as $gn) {
 	$tmpgnr[$gn['id']] = $gn['title'];
 }
