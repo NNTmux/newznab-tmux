@@ -36,7 +36,6 @@ switch($action)
 
 			if ($release && $release["imdbid"] != "")
 			{
-				require_once(WWW_DIR."/lib/movie.php");
 				$movie = new Movie();
 				$mov = $movie->getMovieInfo($release['imdbid']);
 				$page->smarty->assign('updatename', $mov["title"]);
@@ -44,7 +43,6 @@ switch($action)
 
 			if ($release && $release["musicinfoid"] != "")
 			{
-				require_once(WWW_DIR."/lib/music.php");
 				$music = new Music();
 				$mus = $music->getMusicInfo($release['musicinfoid']);
 				$page->smarty->assign('updatename', $mus["artist"]." - ".$mus["title"].($mus["year"] != "" ? " - ".$mus["year"] : ""));
