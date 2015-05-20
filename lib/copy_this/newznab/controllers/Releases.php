@@ -1476,10 +1476,10 @@ class Releases
 		$PYTHON = (empty($PYTHON) ? 'python -OOu' : 'python3 -OOu');
 		$processRequestIDs = (int)$page->site->lookup_reqids;
 		$consoleTools = new ConsoleTools(['ColorCLI' => $this->pdo->log]);
-		$totalReleasesAdded = $loops = 0;
+		$totalReleasesAdded = 0;
 		do {
-			$releasesAdded = $this->createReleases($groupID);
-			$totalReleasesAdded += $releasesAdded;
+			$releasesCount = $this->createReleases($groupID);
+			$totalReleasesAdded += $releasesCount['added'];
 
 			if ($processRequestIDs === 0) {
 				$this->processRequestIDs($groupID, 5000, true);
@@ -1505,7 +1505,7 @@ class Releases
 			$this->postProcessReleases($postProcess, $nntp);
 			$this->deleteBinaries($groupID);
 			// This loops as long as there were releases created or 3 loops, otherwise, you could loop indefinately
-		} while ($releasesAdded > 0 && $loops++ < 3);
+		} while (($releasesCount['added'] + $releasesCount['dupes']) >= $this->releaseCreationLimit);
 
 		$this->deletedReleasesByGroup($groupID);
 		$this->deleteReleases();
@@ -1873,9 +1873,9 @@ class Releases
 					$this->pdo->log->doEcho($this->pdo->log->primary('Added release ' . $cleanRelName . ''));
 					$returnCount++;
 
-					/*if ($this->echoCLI) {
+					if ($this->echoCLI) {
 						$this->pdo->log->doEcho($this->pdo->log->primary('Added ' . $returnCount . 'releases.'));
-					}*/
+					}
 
 				}
              }
@@ -1893,7 +1893,7 @@ class Releases
 			);
 		}
 
-		return $returnCount;
+		return ['added' => $returnCount, 'dupes' => $duplicate];
 	}
 	/**
 	 * @param $url

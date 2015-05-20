@@ -70,7 +70,7 @@ switch ($options[1]) {
 				return;
 			}
 		}
-		$binaries = new \Binaries();
+		$binaries = new \Binaries(['NNTP' => $nntp, 'Settings' => $pdo, 'Groups' => $groups]);
 		$return = $binaries->scan($groupMySQL, $options[4], $options[5], ($site->safepartrepair == 1 ? 'update' : 'backfill'));
 		if (empty($return)) {
 			exit();
@@ -144,11 +144,13 @@ switch ($options[1]) {
 	// $options[2] => (string)groupCount, number of groups terminated by _ | (int)groupid, group to work on
 	case 'releases':
 		$pdo = new DB();
+		$s = new Sites();
+		$site = $s->get();
 		$releases = new \Releases(['Settings' => $pdo]);
 
 		//Runs function that are per group
 		if (is_numeric($options[2])) {
-			processReleases($releases, $options[2]);
+			processReleases($site, $releases, $options[2]);
 
 		} else {
 
@@ -182,7 +184,7 @@ switch ($options[1]) {
 		$nntp = nntp($pdo);
 		$groups = new \Groups();
 		$groupMySQL = $groups->getByName($options[2]);
-		(new \Binaries())->updateGroup($groupMySQL);
+		(new \Binaries(['NNTP' => $nntp, 'Groups' => $groups, 'Settings' => $pdo]))->updateGroup($groupMySQL);
 		break;
 
 
@@ -269,11 +271,21 @@ switch ($options[1]) {
  * @param \Releases $releases
  * @param int             $groupID
  */
-function processReleases($releases, $groupID)
+function processReleases($site, $releases, $groupID)
 {
+	$s = new Sites();
+	$site = $s->get();
+	$releaseCreationLimit = ($site->maxnzbsprocessed != '' ? (int)$site->maxnzbsprocessed : 1000);
 	$releases->applyRegex($groupID);
 	$releases->processIncompleteBinaries($groupID);
 	$releases->createReleases($groupID);
+
+
+	do {
+		$releasesCount = $releases->createReleases($groupID);
+
+		// This loops as long as the number of releases or nzbs added was >= the limit (meaning there are more waiting to be created)
+	} while (($releasesCount['added'] + $releasesCount['dupes']) >= $releaseCreationLimit);
 	$releases->deleteBinaries($groupID);
 }
 
