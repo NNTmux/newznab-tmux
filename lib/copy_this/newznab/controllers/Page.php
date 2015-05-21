@@ -42,8 +42,11 @@ class Page extends BasePage
 			$searchStr = (string) $_REQUEST["id"];
 		$this->smarty->assign('header_menu_search',$searchStr);
 
-		if (isset($_REQUEST["t"]))
-			$this->smarty->assign('header_menu_cat',$_REQUEST["t"]);
+		if (isset($_REQUEST["t"])) {
+			$this->smarty->assign('header_menu_cat', $_REQUEST["t"]);
+		} else {
+			$this->smarty->assign('header_menu_cat', '');
+		}
 		$header_menu = $this->smarty->fetch('headermenu.tpl');
 		$this->smarty->assign('header_menu',$header_menu);
 	}
