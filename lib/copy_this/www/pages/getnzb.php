@@ -51,8 +51,12 @@ if ($dlrequests['num'] > $maxdls) {
 }
 
 // User requested a zip of guid,guid,guid releases.
-if (isset($_GET["id"]) && isset($_GET["zip"]) && $_GET["zip"] == "1") {
-	$guids = explode(",", $_GET["id"]);
+if (isset($_REQUEST["id"]) && isset($_GET["zip"]) && $_GET["zip"] == "1")
+{
+        if (isset($_POST['id']) && is_array($_POST['id']))
+                $guids = $_POST['id'];
+        else
+                $guids = explode(",", $_GET["id"]);
 	if ($dlrequests['num'] + sizeof($guids) > $maxdls) {
 		header("X-DNZB-RCode: 503");
 		header("X-DNZB-RText: User has exceeded maximum downloads for the day!");
