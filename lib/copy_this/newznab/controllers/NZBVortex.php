@@ -1,7 +1,4 @@
 <?php
-require_once sprintf('%s/lib/users.php', WWW_DIR);
-require_once sprintf('%s/lib/util.php', WWW_DIR);
-require_once sprintf('%s/lib/page.php', WWW_DIR);
 
 final class NZBVortex
 {
