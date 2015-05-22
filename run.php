@@ -36,7 +36,7 @@ if (count($nntpkill) !== 0) {
 }
 
 // Check database patch version
-if ($patch < 119) {
+if ($patch < 120) {
 	exit($c->error("\nYour database is not up to date. Please update.\nphp ${NN_WWW}lib/DB/patchDB.php\n"));
 }
 
