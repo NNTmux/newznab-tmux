@@ -92,6 +92,14 @@
 	</td>
 </tr>
 
+	<tr>
+		<td><label for="userselstyle">User selectable site theme</label>:</td>
+		<td>
+			{html_radios id="userselstyle" name='userselstyle' values=$yesno_ids output=$yesno_names selected=$fsite->userselstyle separator='<br />'}
+			<div class="hint">Should users be allowed to change their site theme or not..</div>
+		</td>
+	</tr>
+
 <tr>
 	<td><label for="style">Dereferrer Link</label>:</td>
 	<td>
