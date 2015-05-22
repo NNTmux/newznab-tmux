@@ -15,6 +15,16 @@ class ReleaseRegex
 	 */
 	private $tablePerGroup;
 
+	/**
+	 * @var \newznab\db\DB
+	 */
+	public $pdo;
+
+	/**
+	 * @var \newznab\controllers\Sites
+	 */
+	public $site;
+
 	public function __construct()
 	{
 		$this->regexes = [];
