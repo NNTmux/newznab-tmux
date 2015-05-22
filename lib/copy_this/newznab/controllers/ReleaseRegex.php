@@ -8,11 +8,20 @@ use newznab\db\DB;
  */
 class ReleaseRegex
 {
+	/**
+	 * Determines if the site setting table per group is enabled.
+	 * @var bool
+	 * @access private
+	 */
+	private $tablePerGroup;
 
 	public function __construct()
 	{
 		$this->regexes = [];
 		$this->pdo = new DB();
+		$s = new Sites();
+		$this->site = $s->get();
+		$this->tablePerGroup = $this->site->tablepergroup;
 	}
 
 	/**
@@ -72,7 +81,7 @@ class ReleaseRegex
 	{
 
 		$categories = $this->pdo->query("SELECT distinct coalesce(groupname,'all') as groupname from releaseregex order by groupname ");
-		$temp_array = array();
+		$temp_array = [];
 
 		$temp_array[-1] = "--Please Select--";
 
@@ -96,7 +105,7 @@ class ReleaseRegex
 	 */
 	public function getForGroup($groupname)
 	{
-		$ret = array();
+		$ret = [];
 		$groupRegexes = $this->get(true);
 		if ($groupRegexes) {
 			foreach ($groupRegexes as $groupRegex) {
@@ -256,14 +265,12 @@ class ReleaseRegex
 	public function testRegex($regex, $groupname, $poster, $ignorematched, $matchagainstbins)
 	{
 		$cat = new Categorize();
-		$s = new Sites();
-		$site = $s->get();
 		$groups = new Groups();
 		$groupID = $groups->getByNameByID($groupname);
-		$group = $groups->getCBPTableNames($site->tablepergroup, $groupID);
+		$group = $groups->getCBPTableNames($this->tablePerGroup, $groupID);
 
 		$catList = $cat->getForSelect();
-		$matches = array();
+		$matches = [];
 
 		if ($groupname === 0)
 			$groupname = '.*';
@@ -276,7 +283,7 @@ class ReleaseRegex
 		$resbin = $this->pdo->queryDirect($sql);
 
 		while ($rowbin = $this->pdo->getAssocArray($resbin)) {
-			if ($ignorematched !== '' && ($rowbin['regexid'] != '' || $rowbin['blacklistID'] == 1))
+			if ($ignorematched !== '' && ($rowbin['regexid'] != '' || $rowbin['blacklistid'] == 1))
 				continue;
 
 			$regexarr = array("id" => "", 'regex' => $regex, 'poster' => $poster, "categoryid" => "");
@@ -322,13 +329,13 @@ class ReleaseRegex
 		$binaries = new Binaries();
 		$groups = new Groups();
 
-		$ret = array();
+		$ret = [];
 		if ($clearexistingbins == true)
 			$this->pdo->queryExec('truncate releaseregextesting');
 
 		$nntp->doConnect();
 
-		$groupsToFetch = array();
+		$groupsToFetch = [];
 		if (preg_match('/^[a-z]{2,3}(\.[a-z0-9\-]+)+$/', $groupname))
 			$groupsToFetch[] = array('name' => $groupname);
 		elseif ($groupname === 0)
@@ -371,7 +378,7 @@ class ReleaseRegex
 						continue 2;
 					}
 
-					$headers = array();
+					$headers = [];
 					if (is_array($msgs)) {
 						//loop headers, figure out parts
 						foreach ($msgs AS $msg) {
@@ -410,7 +417,7 @@ class ReleaseRegex
 						if (isset($headers) && count($headers)) {
 							$groupRegexes = $this->getForGroup($group);
 
-							$binSetData = array();
+							$binSetData = [];
 
 							foreach ($headers as $subject => $data) {
 								$binData = array(
@@ -422,7 +429,7 @@ class ReleaseRegex
 									'regexid'      => "null",
 									'categoryid'   => "null",
 									'reqid'        => "null",
-									'blacklistID'  => 0,
+									'blacklistid'  => 0,
 									'size'         => $data['Size'],
 									'relname'      => "null",
 									'relpart'      => "null",
@@ -432,11 +439,11 @@ class ReleaseRegex
 								//Filter binaries based on black/white list
 								if ($binaries->isBlackListed($data, $group)) {
 									//binary is blacklisted
-									$binData['blacklistID'] = 1;
+									$binData['blacklistid'] = 1;
 								}
 
 								//Apply Regexes
-								$regexMatches = array();
+								$regexMatches = [];
 								foreach ($groupRegexes as $groupRegex) {
 									$regexCheck = $this->performMatch($groupRegex, $subject, $data['From']);
 									if ($regexCheck !== false) {
@@ -458,9 +465,9 @@ class ReleaseRegex
 
 							foreach ($binChunks as $binChunk) {
 								foreach ($binChunk as $chunk) {
-									$binParams[] = sprintf("(%s, %s, FROM_UNIXTIME(%s), %s, %s, %s, %s, %s, %d, %d, now())", $this->pdo->escapeString($chunk['name']), $this->pdo->escapeString($chunk['fromname']), $this->pdo->escapeString($chunk['date']), $this->pdo->escapeString($chunk['binaryhash']), $this->pdo->escapeString($chunk['groupname']), $chunk['regexid'], $chunk['categoryid'], $chunk['reqid'], $chunk['blacklistID'], $chunk['size']);
+									$binParams[] = sprintf("(%s, %s, FROM_UNIXTIME(%s), %s, %s, %s, %s, %s, %d, %d, now())", $this->pdo->escapeString($chunk['name']), $this->pdo->escapeString($chunk['fromname']), $this->pdo->escapeString($chunk['date']), $this->pdo->escapeString($chunk['binaryhash']), $this->pdo->escapeString($chunk['groupname']), $chunk['regexid'], $chunk['categoryid'], $chunk['reqid'], $chunk['blacklistid'], $chunk['size']);
 								}
-								$binSql = "INSERT IGNORE INTO releaseregextesting (name, fromname, date, binaryhash, groupname, regexid, categoryid, reqid, blacklistID, size, dateadded) VALUES " . implode(', ', $binParams);
+								$binSql = "INSERT IGNORE INTO releaseregextesting (name, fromname, date, binaryhash, groupname, regexid, categoryid, reqid, blacklistid, size, dateadded) VALUES " . implode(', ', $binParams);
 								//echo $binSql;
 								$this->pdo->queryExec($binSql);
 							}
