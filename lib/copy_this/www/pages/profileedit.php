@@ -6,6 +6,8 @@ $category = new Category;
 $sab = new SABnzbd($page);
 $nzbGet = new NZBGet($page);
 $users = new Users();
+$s = new Sites();
+$site = $s->get();
 
 if (!$users->isLoggedIn())
 	$page->show403();
@@ -99,13 +101,14 @@ switch ($action) {
 	default:
 		break;
 }
-
+if ($site->userselstyle ==1) {
 // Get the list of themes.
-$themeList[] = 'None';
-$themes = scandir(NN_WWW . '/templates');
-foreach ($themes as $theme) {
-	if (strpos($theme, ".") === false && $theme[0] !== '_' && is_dir(NN_WWW . '/templates/' . $theme)) {
-		$themeList[] = $theme;
+	$themeList[] = 'None';
+	$themes = scandir(NN_WWW . '/templates');
+	foreach ($themes as $theme) {
+		if (strpos($theme, ".") === false && $theme[0] !== '_' && is_dir(NN_WWW . '/templates/' . $theme)) {
+			$themeList[] = $theme;
+		}
 	}
 }
 
