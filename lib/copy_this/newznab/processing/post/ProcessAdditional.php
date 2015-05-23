@@ -138,6 +138,11 @@ class ProcessAdditional
 	/**
 	 * @var bool
 	 */
+	protected $_processThumbnails;
+
+	/**
+	 * @var bool
+	 */
 	protected $_processSample;
 
 	/**
@@ -362,10 +367,15 @@ class ProcessAdditional
 
 		$this->_addPAR2Files = ($this->site->addpar2 === '0') ? false : true;
 
-		$this->_processSample = ($this->site->ffmpegpath == '' ? false : true);
-		$this->_processVideo = ($this->site->processvideos == 0) ? false : true;
+		if (!$this->site->ffmpegpath) {
+			$this->_processAudioSample = $this->_processThumbnails = $this->_processVideo = false;
+		} else {
+			$this->_processAudioSample = ($this->site->processaudiosample == 0) ? false : true;
+			$this->_processThumbnails = ($this->site->processthumbnails == 0 ? false : true);
+			$this->_processVideo = ($this->site->processvideos == 0) ? false : true;
+		}
+
 		$this->_processJPGSample = ($this->site->processjpg == 0) ? false : true;
-		$this->_processAudioSample = ($this->site->saveaudiopreview == 0) ? false : true;
 		$this->_processMediaInfo = ($this->site->mediainfopath == '') ? false : true;
 		$this->_processAudioInfo = $this->_processMediaInfo;
 		$this->_processPasswords = (
@@ -584,7 +594,7 @@ class ProcessAdditional
 			}
 
 			if ($this->_processPasswords === true ||
-				$this->_processSample === true ||
+				$this->_processThumbnails === true ||
 				$this->_processMediaInfo === true ||
 				$this->_processAudioInfo === true ||
 				$this->_processVideo === true
@@ -761,7 +771,7 @@ class ProcessAdditional
 			}
 
 			// Look for a video sample, make sure it's not an image.
-			if ($this->_processSample === true &&
+			if ($this->_processThumbnails === true &&
 				empty($this->_sampleMessageIDs) &&
 				preg_match('/sample/i', $this->_currentNZBFile['title']) &&
 				!preg_match('/\.jpe?g/i', $this->_currentNZBFile['title'])
@@ -1846,7 +1856,7 @@ class ProcessAdditional
 	 */
 	protected function _getSample($fileLocation)
 	{
-		if (!$this->_processSample) {
+		if (!$this->_processThumbnails) {
 			return false;
 		}
 
@@ -2475,7 +2485,7 @@ class ProcessAdditional
 		$this->_foundAudioInfo = ($this->_processAudioInfo ? false : true);
 		$this->_foundAudioSample = ($this->_processAudioSample ? false : true);
 		$this->_foundJPGSample = ($this->_processJPGSample ? false : true);
-		$this->_foundSample = ($this->_processSample ? false : true);
+		$this->_foundSample = ($this->_processThumbnails ? false : true);
 		$this->_foundSample = (($this->_release['disablepreview'] == 1) ? true : false);
 		$this->_foundPAR2Info = false;
 
