@@ -1154,19 +1154,21 @@ class Binaries
 		$goalTime = time() - (86400 * $days);
 		// The time we want = current unix time (ex. 1395699114) - minus 86400 (seconds in a day)
 		// times days wanted. (ie 1395699114 - 2592000 (30days)) = 1393107114
+
 		// The servers oldest date.
 		$firstDate = $this->postdate($data['first'], $data);
 		if ($goalTime < $firstDate) {
 			// If the date we want is older than the oldest date in the group return the groups oldest article.
 			return $data['first'];
 		}
+
 		// The servers newest date.
 		$lastDate = $this->postdate($data['last'], $data);
 		if ($goalTime > $lastDate) {
 			// If the date we want is newer than the groups newest date, return the groups newest article.
 			return $data['last'];
 		}
-		$totalArticles = (int)($data['last'] - $data['first']);
+
 		if ($this->_echoCLI) {
 			$this->_colorCLI->doEcho(
 				$this->_colorCLI->primary(
@@ -1174,27 +1176,32 @@ class Binaries
 				)
 			);
 		}
+
 		// Pick the middle to start with
 		$wantedArticle = round(($data['last'] + $data['first']) / 2);
 		$aMax = $data['last'];
 		$aMin = $data['first'];
+		$reallyOldArticle = $oldArticle = $articleTime = null;
+
 		while(true) {
 			// Article exists outside of available range, this shouldn't happen
 			if ($wantedArticle <= $data['first'] || $wantedArticle >= $data['last']) {
 				break;
 			}
-			// Keep a note of the last articles we checked
-			$oldArticle = $wantedArticle;
-			$reallyOldArticle = $oldArticle;
 
+			// Keep a note of the last articles we checked
+			$reallyOldArticle = $oldArticle;
+			$oldArticle = $wantedArticle;
 
 			// Get the date of this article
 			$articleTime = $this->postdate($wantedArticle, $data);
+
 			// Article doesn't exist, start again with something random
 			if (!$articleTime) {
 				$wantedArticle = mt_rand($aMin, $aMax);
 				$articleTime = $this->postdate($wantedArticle, $data);
 			}
+
 			if ($articleTime < $goalTime) {
 				// Article is older than we want
 				$aMin = $oldArticle;
@@ -1213,12 +1220,14 @@ class Binaries
 				// Exact match. We did it! (this will likely never happen though)
 				break;
 			}
+
 			// We seem to be flip-flopping between 2 articles, assume we're out of articles to check.
 			// End on an article more recent than our oldest so that we don't miss any releases.
 			if ($reallyOldArticle == $wantedArticle && ($goalTime - $articleTime) <= 0) {
 				break;
 			}
 		}
+
 		$wantedArticle = (int)$wantedArticle;
 		if ($this->_echoCLI) {
 			$this->_colorCLI->doEcho(
@@ -1228,6 +1237,7 @@ class Binaries
 				)
 			);
 		}
+
 		return $wantedArticle;
 	}
 
