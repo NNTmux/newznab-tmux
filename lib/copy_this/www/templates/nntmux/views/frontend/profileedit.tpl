@@ -42,6 +42,7 @@
 	<fieldset>
 		<legend>Site Preferences</legend>
 		<table class="input">
+			{if $page->site->userselstyle == 1}
 			<tr>
 				<th>Site theme:</th>
 				<td>
@@ -49,6 +50,7 @@
 					<span class="help-block">Change the site theme, None will use the theme the administrator set.</span>
 				</td>
 			</tr>
+			{/if}
 			<tr>
 				<th>View Movie Page:</th>
 				<td>
