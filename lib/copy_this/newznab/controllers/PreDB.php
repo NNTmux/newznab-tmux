@@ -1,6 +1,6 @@
 <?php
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 
 /**
@@ -9,7 +9,7 @@ use newznab\db\DB;
 class PreDB
 {
 	/**
-	 * @var newznab\db\DB
+	 * @var newznab\db\Settings
 	 */
 	public $pdo;
 
@@ -26,7 +26,7 @@ class PreDB
 	public function __construct($echooutput = true)
 	{
 		$this->echooutput = (NN_ECHOCLI && $echooutput);
-		$this->pdo = new DB();
+		$this->pdo = new Settings();
 	}
 
 	/**
@@ -138,11 +138,11 @@ class PreDB
 	/**
 	 * Add/Update predb row.
 	 *
-	 * @param newznab\db\DB $pdo
+	 * @param newznab\db\Settings $pdo
 	 * @param    $preArray
 	 * @return bool
 	 */
-	public function updatePreDB(DB $pdo, $preArray)
+	public function updatePreDB(Settings $pdo, $preArray)
 	{
 		if(!preg_match('/^(UN)?((MOD)?NUKED?|DELPRE)$/', $preArray['category']))
 		{

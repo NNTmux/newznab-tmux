@@ -1,10 +1,10 @@
 <?php
 require_once(dirname(__FILE__) . "/config.php");
 
-use newznab\db\DB;
+use newznab\db\Settings;
 use newznab\processing\PProcess;
 
-$pdo = new DB();
+$pdo = new Settings();
 $s = new Sites();
 $site = $s->get();
 

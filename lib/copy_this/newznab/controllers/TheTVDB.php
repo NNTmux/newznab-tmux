@@ -1,6 +1,6 @@
 <?php
 
-use newznab\db\DB;
+use newznab\db\Settings;
 use newznab\utility\Utility;
 
 
@@ -10,7 +10,7 @@ class TheTVDB
 	const APIKEY	= '5F84ECB91B42D719';
 
 	/**
-	 * @var newznab\db\DB
+	 * @var newznab\db\Settings
 	 */
 	public $pdo;
 
@@ -26,7 +26,7 @@ class TheTVDB
 	{
 		$this->echooutput = (NN_ECHOCLI && $echooutput);
 		$this->MIRROR = 'http://www.thetvdb.com';
-		$this->pdo = new DB();
+		$this->pdo = new Settings();
 		$this->echooutput = $echooutput;
 	}
 

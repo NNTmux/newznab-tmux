@@ -1,6 +1,6 @@
 <?php
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 /**
  * This class handles parsing misc>other releases into real names.
@@ -8,7 +8,7 @@ use newznab\db\DB;
 class Parsing
 {
 	/**
-	 * @var newznab\db\DB
+	 * @var newznab\db\Settings
 	 */
 	public $pdo;
 
@@ -35,7 +35,7 @@ class Parsing
 		$this->cleanup = ['nuke' => [], 'misc' => []];
 		$s = new Sites();
 		$this->site = $s->get();
-		$this->pdo = new newznab\db\DB();
+		$this->pdo = new newznab\db\Settings();
 	}
 
 	/**
@@ -661,7 +661,7 @@ class Parsing
 								//Lookup name via reqid (filename)
 								if (preg_match('/\.(avi|mkv|mp4|mov|wmv|iso|img|gcm|ps3|wad|ac3|nds|bin|cue|mdf)/i', $rarFile))
 								{
-									$this->site->reqidurl;
+									$this->pdo->getSetting('reqidurl;
 									$lookupUrl = 'http://allfilled/query.php?t=alt.binaries.srrdb&reqid='.urlencode(basename($rarFile));
 									echo '-lookup: '.$lookupUrl."\n";
 									$xml = Utility::getUrl(['url' => $lookupUrl]);
@@ -685,7 +685,7 @@ class Parsing
 				}
 
 				// do par check if user has elected for downloading extra stuff
-				if ($this->site->unrarpath != '' && $foundName == "") {
+				if ($this->pdo->getSetting('unrarpath') != '' && $foundName == "") {
 					$nzb = new NZB();
 					$nzbfile = $nzb->NZBPath($rel['guid']);
 					$nzbInfo = new nzbInfo;
@@ -1485,12 +1485,12 @@ class Parsing
 	/**
 	 * update a release name
 	 *
-	 * @param DB $pdo
+	 * @param Settings $pdo
 	 * @param    $id
 	 * @param    $oldname
 	 * @param    $newname
 	 */
-	private function updateName(DB $pdo, $id, $oldname, $newname)
+	private function updateName(Settings $pdo, $id, $oldname, $newname)
 	{
 		if ($this->verbose)
 			echo sprintf("OLD : %s\nNEW : %s\n\n", $oldname, $newname);

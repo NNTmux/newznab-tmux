@@ -1,12 +1,12 @@
 <?php
 require_once 'config.php';
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 $page = new AdminPage();
 $page->title = 'Sharing Settings';
 
-$db = new DB();
+$db = new Settings();
 
 $offset = (isset($_GET['offset']) ? $_GET['offset'] : 0);
 

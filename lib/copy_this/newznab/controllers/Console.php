@@ -1,7 +1,7 @@
 <?php
 require_once NN_LIBS . 'AmazonProductAPI.php';
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 /**
  * This class looks up metadata about console releases and handles
@@ -12,7 +12,7 @@ class Console
 	const NUMTOPROCESSPERTIME = 100;
 
 	/**
-	 * @var newznab\db\DB
+	 * @var newznab\db\Settings
 	 */
 	public $pdo;
 
@@ -34,7 +34,7 @@ class Console
 		$this->pubkey = $site->amazonpubkey;
 		$this->privkey = $site->amazonprivkey;
 		$this->asstag = $site->amazonassociatetag;
-		$this->pdo = new newznab\db\DB();
+		$this->pdo = new newznab\db\Settings();
 		$this->imgSavePath = WWW_DIR.'covers/console/';
 	}
 
@@ -122,7 +122,7 @@ class Console
 		if (count($excludedcats) > 0)
 			$exccatlist = " and r.categoryid not in (".implode(",", $excludedcats).")";
 
-		$sql = sprintf("select count(r.id) as num from releases r inner join consoleinfo con on con.id = r.consoleinfoid and con.title != '' where r.passwordstatus <= (select value from site where setting='showpasswordedrelease') and %s %s %s %s", $browseby, $catsrch, $maxage, $exccatlist);
+		$sql = sprintf("select count(r.id) as num from releases r inner join consoleinfo con on con.id = r.consoleinfoid and con.title != '' where r.passwordstatus <= (select value from settings where setting='showpasswordedrelease') and %s %s %s %s", $browseby, $catsrch, $maxage, $exccatlist);
 		$res = $this->pdo->queryOneRow($sql, true);
 		return $res["num"];
 	}
@@ -177,7 +177,7 @@ class Console
 			$exccatlist = " and r.categoryid not in (".implode(",", $excludedcats).")";
 
 		$order = $this->getConsoleOrder($orderby);
-		$sql = sprintf(" SELECT r.*, r.id as releaseid, con.*, g.title as genre, groups.name as group_name, concat(cp.title, ' > ', c.title) as category_name, concat(cp.id, ',', c.id) as category_ids, rn.id as nfoid from releases r left outer join groups on groups.id = r.groupid inner join consoleinfo con on con.id = r.consoleinfoid left outer join releasenfo rn on rn.releaseid = r.id and rn.nfo is not null left outer join category c on c.id = r.categoryid left outer join category cp on cp.id = c.parentid left outer join genres g on g.id = con.genreID where r.passwordstatus <= (select value from site where setting='showpasswordedrelease') and %s %s %s %s order by %s %s".$limit, $browseby, $catsrch, $maxagesql, $exccatlist, $order[0], $order[1]);
+		$sql = sprintf(" SELECT r.*, r.id as releaseid, con.*, g.title as genre, groups.name as group_name, concat(cp.title, ' > ', c.title) as category_name, concat(cp.id, ',', c.id) as category_ids, rn.id as nfoid from releases r left outer join groups on groups.id = r.groupid inner join consoleinfo con on con.id = r.consoleinfoid left outer join releasenfo rn on rn.releaseid = r.id and rn.nfo is not null left outer join category c on c.id = r.categoryid left outer join category cp on cp.id = c.parentid left outer join genres g on g.id = con.genreID where r.passwordstatus <= (select value from settings where setting='showpasswordedrelease') and %s %s %s %s order by %s %s".$limit, $browseby, $catsrch, $maxagesql, $exccatlist, $order[0], $order[1]);
 		return $this->pdo->query($sql, true);
 	}
 

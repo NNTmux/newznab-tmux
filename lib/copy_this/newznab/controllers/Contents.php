@@ -1,6 +1,6 @@
 <?php
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 /**
  * This class looks up site content.
@@ -34,7 +34,7 @@ class Contents
 	 */
 	public function delete($id)
 	{
-		$db = new DB();
+		$db = new Settings();
 		return $db->queryExec(sprintf("DELETE from content where id=%d", $id));
 	}
 
@@ -43,7 +43,7 @@ class Contents
 	 */
 	public function update($content)
 	{
-		$db = new DB();
+		$db = new Settings();
 		$content = $this->validate($content);
 		$db->queryExec(sprintf("update content set	role=%d, title = %s , 	url = %s , 	body = %s , 	metadescription = %s , 	metakeywords = %s , 	contenttype = %d , 	showinmenu = %d , 	status = %d , 	ordinal = %d	where	id = %d ", $content["role"], $db->escapeString($content["title"]), $db->escapeString($content["url"]), $db->escapeString($content["body"]), $db->escapeString($content["metadescription"]), $db->escapeString($content["metakeywords"]), $content["contenttype"], $content["showinmenu"], $content["status"], $content["ordinal"], $content["id"] ));
 	}
@@ -53,7 +53,7 @@ class Contents
 	 */
 	public function add($content)
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		$content = $this->validate($content);
 
@@ -65,7 +65,7 @@ class Contents
 	 */
 	public function get()
 	{
-		$db = new DB();
+		$db = new Settings();
 		return $db->query(sprintf("select * from content where status = 1 order by contenttype, coalesce(ordinal, 1000000)"));
 	}
 
@@ -74,7 +74,7 @@ class Contents
 	 */
 	public function getAll()
 	{
-		$db = new DB();
+		$db = new Settings();
 		return $db->query(sprintf("select * from content order by contenttype, coalesce(ordinal, 1000000)"));
 	}
 
@@ -83,7 +83,7 @@ class Contents
 	 */
 	public function getByID($id, $role)
 	{
-		$db = new DB();
+		$db = new Settings();
 		if ($role == Users::ROLE_ADMIN)
 			$role = "";
 		else
@@ -97,7 +97,7 @@ class Contents
 	 */
 	public function getIndex()
 	{
-		$db = new DB();
+		$db = new Settings();
 		return $db->queryOneRow(sprintf("select * from content where status=1 and contenttype = %d ", Contents::TYPEINDEX), true);
 	}
 
@@ -106,7 +106,7 @@ class Contents
 	 */
 	public function getForMenuByTypeAndRole($id, $role)
 	{
-		$db = new DB();
+		$db = new Settings();
 		if ($role == Users::ROLE_ADMIN)
 			$role = "";
 		else

@@ -1,7 +1,7 @@
 <?php
 require_once(dirname(__FILE__) . "/../../bin/config.php");
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 
 $c = new ColorCLI();
@@ -64,7 +64,7 @@ function reCategorize($argv)
 // Returns the quantity of categorized releases.
 function categorizeRelease($update = true, $where, $echooutput = false)
 {
-	$pdo = new DB();
+	$pdo = new Settings();
 	$cat = new Categorize();
 	$consoletools = new consoleTools();
 	$relcount = $chgcount = 0;

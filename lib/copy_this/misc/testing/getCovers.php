@@ -3,11 +3,11 @@
 
 require_once dirname(__FILE__) . '/../../www/config.php';
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 $movie = new Movie(true);
 
-$db = new DB();
+$db = new Settings();
 
 $movies = $db->query("SELECT imdbID from movieinfo where cover = 0");
 

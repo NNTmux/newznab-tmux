@@ -7,7 +7,7 @@
 //
 require_once dirname(__FILE__) . '/../../www/config.php';
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 function handleError($errno, $errstr, $errfile, $errline, array $errcontext)
 {
@@ -26,7 +26,7 @@ $regs = array(
     "simple" => '"data.mp3',
  );
 
-$db = new DB();
+$db = new Settings();
 # fetch enabled regular expression
 $catsql = "select ID,groupname,regex from releaseregex where status = 1";
 $res = $db->query($catsql);

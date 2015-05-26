@@ -55,7 +55,7 @@ class CollectionsCleaning
 	public $subject = '';
 
 	/**
-	 * @var \newznab\db\DB
+	 * @var \newznab\db\Settings
 	 */
 	public $pdo;
 
@@ -79,7 +79,7 @@ class CollectionsCleaning
 		];
 		$options += $defaults;
 
-		$this->pdo = ($options['Settings'] instanceof newznab\db\DB ? $options['Settings'] : new newznab\db\DB());
+		$this->pdo = ($options['Settings'] instanceof newznab\db\Settings ? $options['Settings'] : new newznab\db\Settings());
 		$this->_regexes = new Regexes(['Settings' => $this->pdo, 'Table_Name' => 'collection_regexes']);
 	}
 

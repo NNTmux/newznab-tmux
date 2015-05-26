@@ -2,10 +2,10 @@
 //This Script Verifies your System Time vs Myself Time vs PHP Time
 require_once dirname(__FILE__) . '/../../www/config.php';
 
-use newznab\db\DB;
+use newznab\db\Settings;
 $res="";
 
-$db = new DB();
+$db = new Settings();
 $res = $db->queryonerow( sprintf("Select now()"));
 foreach($res as $time){
 echo "Mysql Time Is Now ".$time."\n";}

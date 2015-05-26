@@ -1,7 +1,7 @@
 <?php
 require_once NN_LIBS . 'simple_html_dom.php';
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 /**
  * Class for inserting names/categories etc from PreDB sources into the DB,
@@ -30,7 +30,7 @@ Class PreHash
 	protected $echooutput;
 
 	/**
-	 * @var newznab\db\DB
+	 * @var newznab\db\Settings
 	 */
 	protected $pdo;
 
@@ -48,7 +48,7 @@ Class PreHash
 		$options += $defaults;
 
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
-		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
 	}
 
 	/**

@@ -2,7 +2,7 @@
 
 require_once("config.php");
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 $s = new Sites();
 $site = $s->get();
@@ -18,8 +18,8 @@ else
 	{
 		echo "Patchn : Executing patch ".basename($patch)."\n";
 
-		$db = new DB();
-		$rows = $db->query("select * from site");
+		$db = new Settings();
+		$rows = $db->query("select * from settings");
 
 		$dbData = file_get_contents($patch);
 		//fix to remove BOM in UTF8 files

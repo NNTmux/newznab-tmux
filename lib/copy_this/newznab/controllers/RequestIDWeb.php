@@ -33,7 +33,7 @@ class RequestIDWeb extends RequestID
 		parent::__construct($options);
 		$s = new Sites();
 		$this->site = $s->get();
-		$this->_request_hours = ($this->site->request_hours != '') ? (int)$this->site->request_hours : 1;
+		$this->_request_hours = ($this->pdo->getSetting('request_hours') != '') ? (int)$this->pdo->getSetting('request_hours') : 1;
 	}
 
 	/**
@@ -152,7 +152,7 @@ class RequestIDWeb extends RequestID
 
 		// Do a web lookup.
 		$returnXml = Utility::getUrl([
-				'url' => $this->site->request_url,
+				'url' => $this->pdo->getSetting('request_url'),
 				'method' => 'post',
 				'postdata' => 'data=' . serialize($requestArray),
 				'verifycert' => false,

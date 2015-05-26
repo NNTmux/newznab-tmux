@@ -4,10 +4,10 @@
 
 require_once dirname(__FILE__) . '/../../www/config.php';
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 $releases = new Releases();
-$db = new DB;
+$db = new Settings;
 
 //
 // delete all previews over a year old

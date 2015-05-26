@@ -1,4 +1,7 @@
 <?php
+
+use newznab\db\Settings;
+use newznab\utility\Utility;
 /**
  * Tmux output functions for printing monitor data
  *
@@ -6,9 +9,13 @@
  */
 class TmuxOutput extends Tmux
 {
+	/**
+	 * @var \newznab\utility\Git
+	 */
+	protected $_git;
 
 	/**
-	 * @var Versions
+	 * @var \newznab\utility\Versions
 	 */
 	protected $_vers;
 
@@ -20,9 +27,9 @@ class TmuxOutput extends Tmux
 
 
 	/**
-	 * @param newznab\db\DB $pdo
+	 * @param newznab\db\Settings $pdo
 	 */
-	public function __construct(newznab\db\DB $pdo = null)
+	public function __construct(newznab\db\Settings $pdo = null)
 	{
 		parent::__construct($pdo);
 
@@ -30,7 +37,8 @@ class TmuxOutput extends Tmux
 		$site = $s->get();
 		$t = new Tmux();
 		$tmux = $t->get();
-		$this->_vers = $site->dbversion;
+		$this->_git = new \newznab\utility\Git(); // Do not remove the full namespace/ PHP gets confused for some reason without it.
+		$this->_vers = Utility::getValidVersionsFile();
 		$this->_tvers = $tmux->sqlpatch;
 
 
@@ -112,11 +120,12 @@ class TmuxOutput extends Tmux
 		$buffer = '';
 		$state = ($this->runVar['settings']['is_running'] == 1) ? 'Running' : 'Disabled';
 		//$version = $this->_tvers . 'r' . $this->_vers;
+		$version = $this->_vers->versions->git->tag . 'r' . $this->_git->commits();
 		$tversion = '0.6r0255';
 
 		$buffer .= sprintf($this->tmpMasks[2],
-					"Monitor $state v$tversion @ $this->_tvers [" . $this->_vers ."]: ",
-					$this->relativeTime($this->runVar['timers']['timer1'])
+			"Monitor $state v$version [" . $this->runVar['constants']['sqlpatch'] . "]: ",
+			$this->relativeTime($this->runVar['timers']['timer1'])
 		);
 
 		$buffer .= sprintf($this->tmpMasks[1],

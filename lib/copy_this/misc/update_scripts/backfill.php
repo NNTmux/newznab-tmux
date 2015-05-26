@@ -1,9 +1,9 @@
 <?php
 require_once("config.php");
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
-$pdo = new DB();
+$pdo = new Settings();
 
 // Create the connection here and pass
 $nntp = new \NNTP(['Settings' => $pdo]);

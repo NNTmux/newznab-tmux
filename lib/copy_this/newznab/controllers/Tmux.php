@@ -1,27 +1,27 @@
 <?php
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 
 class Tmux
 {
 	/**
-	 * @var \newznab\db\DB
+	 * @var \newznab\db\Settings
 	 */
 	public $pdo;
 
 	public $tmux_session;
 
-	function __construct(DB $pdo = null)
+	function __construct(Settings $pdo = null)
 	{
-		$this->pdo = (empty($pdo) ? new newznab\db\DB() : $pdo);
+		$this->pdo = (empty($pdo) ? new Settings() : $pdo);
 		$s = new Sites;
 		$this->site = $s->get();
 	}
 
 	public function version()
 	{
-		return $this->site->dbversion;
+		return $this->pdo->getSetting('dbversion');
 	}
 
 	public function update($form)
@@ -175,7 +175,7 @@ class Tmux
 	public function getConstantSettings()
 	{
 		$tmuxstr = 'SELECT value FROM tmux WHERE setting =';
-		$settstr = 'SELECT value FROM site WHERE setting =';
+		$settstr = 'SELECT value FROM settings WHERE setting =';
 
 		$sql = sprintf(
 				"SELECT
@@ -196,7 +196,7 @@ class Tmux
 	public function getMonitorSettings()
 	{
 		$tmuxstr = 'SELECT value FROM tmux WHERE setting =';
-		$settstr = 'SELECT value FROM site WHERE setting =';
+		$settstr = 'SELECT value FROM settings WHERE setting =';
 
 		$sql = sprintf(
 				"SELECT
@@ -430,7 +430,7 @@ class Tmux
 						AND (now() - INTERVAL backfill_target DAY) < first_record_postdate
 					) AS backfill_groups_days,
 					(SELECT COUNT(*) FROM groups WHERE first_record IS NOT NULL AND backfill = 1 AND (now() - INTERVAL datediff(curdate(),
-					(SELECT VALUE FROM site WHERE setting = 'safebackfilldate')) DAY) < first_record_postdate) AS backfill_groups_date",
+					(SELECT VALUE FROM settings WHERE setting = 'safebackfilldate')) DAY) < first_record_postdate) AS backfill_groups_date",
 					$this->pdo->escapeString($db_name)
 				);
 			case 6:

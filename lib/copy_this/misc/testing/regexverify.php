@@ -26,7 +26,7 @@ $regs = array(
  );
 
 $releases = new Releases();
-$db = new DB();
+$db = new Settings();
 # fetch enabled regular expression
 $catsql = "select ID,groupname,regex from releaseregex where status = 1";
 $res = $db->query($catsql);

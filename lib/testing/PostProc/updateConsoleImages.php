@@ -1,10 +1,10 @@
 <?php
 require_once(dirname(__FILE__) . "/../../../bin/config.php");
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 
-$pdo = new DB();
+$pdo = new Settings();
 $covers = $updated = $deleted = 0;
 
 if ($argc == 1 || $argv[1] != 'true') {

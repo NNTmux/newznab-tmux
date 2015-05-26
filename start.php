@@ -8,9 +8,9 @@
  */
 require_once realpath(__DIR__ . '/../../../../www/config.php');
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
-$pdo = new DB();
+$pdo = new Settings();
 
 $tmux = new \Tmux();
 $tmux_settings = $tmux->get();

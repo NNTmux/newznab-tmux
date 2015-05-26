@@ -3,7 +3,7 @@
 require_once dirname(__FILE__) . '/../../www/config.php';
 
 
-$db = new \newznab\db\DB();
+$db = new \newznab\db\Settings();
 $sql = "select distinct rageid from tvrage where rageid in (select rageid from tvrage where rageid != -2 group by rageid having count(*) > 1)";
 $rows = $db->query($sql);
 

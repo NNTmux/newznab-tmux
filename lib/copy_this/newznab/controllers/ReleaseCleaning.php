@@ -1,6 +1,6 @@
 <?php
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 /*
  * Cleans names for releases/imports/namefixer.
@@ -57,7 +57,7 @@ class ReleaseCleaning
 	public $groupName = '';
 
 	/**
-	 * @var newznab\db\DB
+	 * @var newznab\db\Settings
 	 */
 	public $pdo;
 
@@ -86,7 +86,7 @@ class ReleaseCleaning
 		$this->e1  = \CollectionsCleaning::REGEX_FILE_EXTENSIONS . \CollectionsCleaning::REGEX_END;
 		$this->e2  = \CollectionsCleaning::REGEX_FILE_EXTENSIONS .
 			\CollectionsCleaning::REGEX_SUBJECT_SIZE . \CollectionsCleaning::REGEX_END;
-		$this->pdo = ($settings instanceof newznab\db\DB ? $settings : new newznab\db\DB());
+		$this->pdo = ($settings instanceof newznab\db\Settings ? $settings : new newznab\db\Settings());
 		$this->_regexes = new Regexes(['Settings' => $this->pdo, 'Table_Name' => 'release_naming_regexes']);
 	}
 

@@ -4,10 +4,10 @@
 // --------------------------------------------------------------
 require_once(dirname(__FILE__) . "/../../../bin/config.php");
 
-use newznab\db\DB;
+use newznab\db\Settings;
 use newznab\utility\Utility;
 
-$pdo = new DB();
+$pdo = new Settings();
 
 $row = $pdo->queryOneRow("SELECT value FROM site WHERE setting = 'coverspath'");
 if ($row !== false) {

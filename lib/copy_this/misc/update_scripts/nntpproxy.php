@@ -1,12 +1,12 @@
 <?php
 require_once("config.php");
 
-use newznab\db\DB;
+use newznab\db\Settings;
 use newznab\utility\Utility;
 
 Utility::clearScreen();
 
-$pdo = new DB();
+$pdo = new Settings();
 $t = new \Tmux();
 $tmux = $t->get();
 $powerline = (isset($tmux->powerline)) ? $tmux->powerline : 0;

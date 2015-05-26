@@ -1,6 +1,6 @@
 <?php
 
-use newznab\db\DB;
+use newznab\db\Settings;
 use newznab\utility\Utility;
 
 /**
@@ -10,7 +10,7 @@ use newznab\utility\Utility;
 class NZBImport
 {
 	/**
-	 * @var \newznab\db\DB
+	 * @var \newznab\db\Settings
 	 * @access protected
 	 */
 	protected $pdo;
@@ -107,7 +107,7 @@ class NZBImport
 		$s = new Sites();
 		$this->site = $s->get();
 		$this->echoCLI = (!$this->browser && NN_ECHOCLI && $options['Echo']);
-		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
 		$this->binaries = ($options['Binaries'] instanceof \Binaries ? $options['Binaries'] : new \Binaries(['Settings' => $this->pdo, 'Echo' => $this->echoCLI]));
 		$this->category = ($options['Categorize'] instanceof \Categorize ? $options['Categorize'] : new \Categorize(['Settings' => $this->pdo]));
 		$this->nzb = ($options['NZB'] instanceof \NZB ? $options['NZB'] : new \NZB($this->pdo));
@@ -116,7 +116,7 @@ class NZBImport
 		$s = new Sites();
 		$this->site = $s->get();
 
-		$this->crossPostt = ($this->site->crossposttime != '') ? $this->site->crossposttime : 2;
+		$this->crossPostt = ($this->pdo->getSetting('crossposttime') != '') ? $this->pdo->getSetting('crossposttime') : 2;
 		$this->browser = $options['Browser'];
 		$this->retVal = '';
 	}
@@ -403,7 +403,7 @@ class NZBImport
 					'postdate' => $this->pdo->escapeString($nzbDetails['postDate']),
 					'fromname' => $escapedFromName,
 					'reqid' => NULL,
-					'passwordstatus' => ($this->site->checkpasswordedrar > 0 ? -1 : 0),
+					'passwordstatus' => ($this->pdo->getSetting('checkpasswordedrar') > 0 ? -1 : 0),
 					'size' => $this->pdo->escapeString($nzbDetails['totalSize']),
 					'categoryid' => $this->category->determineCategory($nzbDetails['groupid'], $cleanName),
 					'isrenamed' => $renamed,

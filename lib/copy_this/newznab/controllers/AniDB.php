@@ -1,11 +1,11 @@
 <?php
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 class AniDB
 {
 	/**
-	 * @var newznab\db\DB
+	 * @var newznab\db\Settings
 	 */
 	public $pdo;
 
@@ -20,7 +20,7 @@ class AniDB
 		];
 		$options += $defaults;
 
-		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
 	}
 
 	/**
@@ -28,6 +28,7 @@ class AniDB
 	 *
 	 * @param int $anidbID
 	 * @param string $type
+	 * @param string $title
 	 * @param string $startdate
 	 * @param string $enddate
 	 * @param string $related
@@ -38,7 +39,7 @@ class AniDB
 	 * @param string $categories
 	 * @param string $characters
 	 */
-	public function updateTitle($anidbID, $type, $startdate, $enddate, $related, $similar, $creators, $description, $rating, $categories, $characters)
+	public function updateTitle($anidbID, $title, $type, $startdate, $enddate, $related, $similar, $creators, $description, $rating, $categories, $characters, $epnos, $airdates, $episodetitles)
 	{
 		// FIXME fix  the missing variables for this query
 		$this->pdo->queryExec(

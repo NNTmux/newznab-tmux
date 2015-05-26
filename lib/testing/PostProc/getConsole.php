@@ -3,11 +3,11 @@
 
 require_once(dirname(__FILE__) . "/../../../bin/config.php");
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 
 
-$pdo = new DB();
+$pdo = new Settings();
 $console = new \Konsole(['Echo' => true, 'Settings' => $pdo]);
 
 $res = $pdo->queryDirect(sprintf("SELECT searchname, id FROM releases WHERE consoleinfoid IS NULL AND categoryid BETWEEN 1000 AND 1999 ORDER BY id DESC" ));

@@ -2,7 +2,7 @@
 
 require_once './config.php';
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 $page = new AdminPage();
 
@@ -18,7 +18,7 @@ $statusmsgs = array();
 //
 // mysql config settings
 //
-$db = new DB();
+$db = new Settings();
 
 $result = $db->queryDirect("SELECT @@group_concat_max_len, @@max_allowed_packet");
 $data = $db->getAssocArray($result);
@@ -42,7 +42,7 @@ if ($page->site->rawretentiondays > 10)
 $s = new Sites();
 if (!property_exists($page->site, "dbversion"))
 {
-	$db = new DB();
+	$db = new Settings();
 	$db->queryInsert('INSERT INTO site (setting, value, updateddate ) VALUES (\'dbversion\', \'$Rev: 2248 $\', now())');
 	$page->site = $s->get();
 }

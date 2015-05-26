@@ -1,7 +1,7 @@
 <?php
 require_once(dirname(__FILE__) . "/../../../bin/config.php");
 
-use newznab\db\DB;
+use newznab\db\Settings;
 use newznab\utility\Utility;
 
 $cli = new \ColorCLI();
@@ -19,7 +19,7 @@ if (isset($argv[1])) {
 
 function create_guids($live, $delete = false)
 {
-	$pdo = new DB();
+	$pdo = new Settings();
 	$consoletools = new \ConsoleTools(['ColorCLI' => $pdo->log]);
 	$timestart = TIME();
 	$relcount = $deleted = $total = 0;

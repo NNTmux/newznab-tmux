@@ -2,11 +2,11 @@
 
 require_once("config.php");
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 $force = ((isset($argv[1]) && ($argv[1] == "true")));
 
-$db = new DB;
+$db = new Settings;
 $ret = $db->optimise($force);
 
 if (count($ret) > 0)

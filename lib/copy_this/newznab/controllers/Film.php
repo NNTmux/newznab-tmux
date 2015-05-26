@@ -1,6 +1,6 @@
 <?php
 
-use newznab\db\DB;
+use newznab\db\Settings;
 use newznab\utility\Utility;
 use newznab\libraries\Tmdb\TMDB;
 
@@ -144,18 +144,18 @@ class Film
 		];
 		$options += $defaults;
 
-		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
 		$s = new Sites();
 		$this->site = $s->get();
 		$this->releaseImage = ($options['ReleaseImage'] instanceof \ReleaseImage ? $options['ReleaseImage'] : new \ReleaseImage($this->pdo));
 
-		$this->lookuplanguage = ($this->site->lookuplanguage != '') ? (string)$this->site->lookuplanguage : 'en';
+		$this->lookuplanguage = ($this->pdo->getSetting('lookuplanguage') != '') ? (string)$this->pdo->getSetting('lookuplanguage') : 'en';
 
-		$this->fanartapikey = $this->site->fanarttvkey;
-		$this->imdburl = ($this->site->imdburl == 0 ? false : true);
-		$this->movieqty = ($this->site->maximdbprocessed != '') ? $this->site->maximdbprocessed : 100;
+		$this->fanartapikey = $this->pdo->getSetting('fanarttvkey');
+		$this->imdburl = ($this->pdo->getSetting('imdburl') == 0 ? false : true);
+		$this->movieqty = ($this->pdo->getSetting('maximdbprocessed') != '') ? $this->pdo->getSetting('maximdbprocessed') : 100;
 		$this->searchEngines = true;
-		$this->showPasswords = ($this->site->showpasswordedrelease != '') ? $this->site->showpasswordedrelease : 0;
+		$this->showPasswords = ($this->pdo->getSetting('showpasswordedrelease') != '') ? $this->pdo->getSetting('showpasswordedrelease') : 0;
 
 		$this->debug = NN_DEBUG;
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI && $this->pdo->cli);
@@ -719,7 +719,7 @@ class Film
 	public function fetchTMDBProperties($imdbId, $text = false)
 	{
 		$lookupId = ($text === false ? 'tt' . $imdbId : $imdbId);
-		$tmdb = new TMDB($this->site->tmdbkey);
+		$tmdb = new TMDB($this->pdo->getSetting('tmdbkey'));
 
 		try {
 			$tmdbLookup = $tmdb->getMovie($lookupId);
@@ -821,7 +821,7 @@ class Film
 		$buffer =
 			Utility::getUrl([
 					'url' => 'http://' . ($this->imdburl === false ? 'www' : 'akas') . '.imdb.com/title/tt' . $imdbId . '/',
-					'language' => (($this->site->lookuplanguage != '') ? $this->site->lookuplanguage : 'en'),
+					'language' => (($this->pdo->getSetting('lookuplanguage') != '') ? $this->pdo->getSetting('lookuplanguage') : 'en'),
 					'useragent' => 'Mozilla/5.0 (iPad; U; CPU OS 3_2 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) ' .
 						'Version/4.0.4 Mobile/7B334b Safari/531.21.102011-10-16 20:23:10', 'foo=bar'
 				]
@@ -1333,7 +1333,7 @@ class Film
 						$this->pdo->log->doEcho($this->pdo->log->header('Updating movie schedule using rotten tomatoes.'));
 					}
 
-		$rt = new \RottenTomato($this->site->rottentomatokey);
+		$rt = new \RottenTomato($this->pdo->getSetting('rottentomatokey'));
 
 		if ($rt instanceof \RottenTomato) {
 

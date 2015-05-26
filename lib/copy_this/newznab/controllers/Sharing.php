@@ -1,6 +1,6 @@
 <?php
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 
 /**
@@ -45,7 +45,7 @@ Class Sharing
 	 */
 
 	/**
-	 * @var \newznab\db\DB
+	 * @var \newznab\db\Settings
 	 */
 	protected $pdo;
 
@@ -83,7 +83,7 @@ Class Sharing
 		];
 		$options += $defaults;
 
-		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
 
 		// Get all sharing info from DB.
 		$check = $this->pdo->queryOneRow('SELECT * FROM sharing');

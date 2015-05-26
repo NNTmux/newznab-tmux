@@ -4,7 +4,7 @@ require_once './config.php';
 
 // Login check.
 $admin = new AdminPage;
-$db = new newznab\db\DB();
+$db = new newznab\db\Settings();
 
 if (isset($_GET['site_ID']) && isset($_GET['site_status'])) {
 	$db->queryExec(sprintf('UPDATE sharing_sites SET enabled = %d WHERE id = %d', $_GET['site_status'], $_GET['site_ID']));

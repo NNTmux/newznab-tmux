@@ -1,7 +1,7 @@
 <?php
 require_once(dirname(__FILE__) . "/../../../bin/config.php");
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 
 /* This script will update the groups table to get the new article numbers for each group you have activated.
@@ -9,7 +9,7 @@ use newznab\db\DB;
  */
 // TODO: Make this threaded so it goes faster.
 
-$pdo = new DB();
+$pdo = new Settings();
 
 if (!isset($argv[1]) || $argv[1] != 'true') {
 	printf($pdo->log->setColor('Yellow') . "This script is used when you have switched UseNet Providers(USP) so you can pickup where you left off, rather than resetting all the groups.\nOnly use this script after you have updated your config.php file with your new USP info!!\nMake sure you " . $pdo->log->setColor('Red', 'Bold') . "DO NOT" . $pdo->log->setcolor('Yellow') . " have any update or postprocess scripts running when running this script!\n\n" . $pdo->log->setColor('Cyan') . "Usage: php change_USP_provider true\n");

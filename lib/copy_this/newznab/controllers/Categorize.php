@@ -50,9 +50,9 @@ class Categorize extends Category
 		//parent::__construct($options);
 		$s = new Sites();
 		$this->site = $s->get();
-		$this->pdo = new newznab\db\DB();
-		$this->categorizeForeign = ($this->site->categorizeforeign == "0") ? false : true;
-		$this->catWebDL = ($this->site->catwebdl == "0") ? false : true;
+		$this->pdo = new newznab\db\Settings();
+		$this->categorizeForeign = ($this->pdo->getSetting('categorizeforeign') == "0") ? false : true;
+		$this->catWebDL = ($this->pdo->getSetting('catwebdl') == "0") ? false : true;
 		$this->regexes = new Regexes(['Settings' => $this->pdo, 'Table_Name' => 'category_regexes']);
 	}
 

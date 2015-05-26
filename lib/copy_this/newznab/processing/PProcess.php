@@ -1,7 +1,7 @@
 <?php
 namespace newznab\processing;
 
-use \newznab\db\DB;
+use \newznab\db\Settings;
 use \newznab\processing\post\AniDB;
 use \newznab\processing\post\ProcessAdditional;
 
@@ -10,7 +10,7 @@ require_once NN_LIBS . 'rarinfo/par2info.php';
 class PProcess
 {
 	/**
-	 * @var \newznab\db\DB
+	 * @var \newznab\db\Settings
 	 */
 	public $pdo;
 
@@ -89,7 +89,7 @@ class PProcess
 		$s = new \Sites();
 		$this->site = $s->get();
 		//\\ Class instances.
-		$this->pdo = (($options['Settings'] instanceof DB) ? $options['Settings'] : new DB());
+		$this->pdo = (($options['Settings'] instanceof Settings) ? $options['Settings'] : new Settings());
 		$this->groups = (($options['Groups'] instanceof \Groups) ? $options['Groups'] : new \Groups());
 		$this->_par2Info = new \Par2Info();
 		$this->debugging = ($options['Logger'] instanceof \Logger ? $options['Logger'] : new \Logger(['ColorCLI' => $this->pdo->log]));
@@ -99,8 +99,8 @@ class PProcess
 		//\\
 
 		//\\ Site settings.
-		$this->addpar2 = ($this->site->addpar2 == 0) ? false : true;
-		$this->alternateNNTP = ($this->site->alternate_nntp == 1 ? true : false);
+		$this->addpar2 = ($this->pdo->getSetting('addpar2') == 0) ? false : true;
+		$this->alternateNNTP = ($this->pdo->getSetting('alternate_nntp') == 1 ? true : false);
 		//\\
 	}
 
@@ -135,7 +135,7 @@ class PProcess
 	 */
 	public function processAnime()
 	{
-		if ($this->site->lookupanidb != 0) {
+		if ($this->pdo->getSetting('lookupanidb') != 0) {
 			(new AniDB(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processAnimeReleases();
 		}
 	}
@@ -147,7 +147,7 @@ class PProcess
 	 */
 	public function processBooks()
 	{
-		if ($this->site->lookupbooks != 0) {
+		if ($this->pdo->getSetting('lookupbooks') != 0) {
 			(new \Books(['Echo' => $this->echooutput, 'Settings' => $this->pdo, ]))->processBookReleases();
 		}
 	}
@@ -159,7 +159,7 @@ class PProcess
 	 */
 	public function processConsoles()
 	{
-		if ($this->site->lookupgames != 0) {
+		if ($this->pdo->getSetting('lookupgames') != 0) {
 			(new \Konsole(['Settings' => $this->pdo, 'Echo' => $this->echooutput]))->processConsoleReleases();
 		}
 	}
@@ -171,7 +171,7 @@ class PProcess
 	 */
 	public function processGames()
 	{
-		if ($this->site->lookupgames != 0) {
+		if ($this->pdo->getSetting('lookupgames') != 0) {
 			(new \Games(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processGamesReleases();
 		}
 	}
@@ -188,7 +188,7 @@ class PProcess
 	 */
 	public function processMovies($groupID = '', $guidChar = '', $processMovies = '')
 	{
-		$processMovies = (is_numeric($processMovies) ? $processMovies : $this->site->lookupimdb);
+		$processMovies = (is_numeric($processMovies) ? $processMovies : $this->pdo->getSetting('lookupimdb'));
 		if ($processMovies > 0) {
 			(new \Film(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processMovieReleases($groupID, $guidChar, $processMovies);
 		}
@@ -201,7 +201,7 @@ class PProcess
 	 */
 	public function processMusic()
 	{
-		if ($this->site->lookupmusic != 0) {
+		if ($this->pdo->getSetting('lookupmusic') != 0) {
 			(new \Musik(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processMusicReleases();
 		}
 	}
@@ -217,8 +217,8 @@ class PProcess
 	 */
 	public function processNfos(&$nntp, $groupID = '', $guidChar = '')
 	{
-		if ($this->site->lookupnfo == 1) {
-			$this->Nfo->processNfoFiles($nntp, $groupID, $guidChar, (int)$this->site->lookupimdb, (int)$this->site->lookuptvrage);
+		if ($this->pdo->getSetting('lookupnfo') == 1) {
+			$this->Nfo->processNfoFiles($nntp, $groupID, $guidChar, (int)$this->pdo->getSetting('lookupimdb'), (int)$this->pdo->getSetting('lookuptvrage'));
 		}
 	}
 
@@ -265,7 +265,7 @@ class PProcess
 	 */
 	public function processTv($groupID = '', $guidChar = '', $processTV = '')
 	{
-		$processTV = (is_numeric($processTV) ? $processTV : $this->site->lookuptvrage);
+		$processTV = (is_numeric($processTV) ? $processTV : $this->pdo->getSetting('lookuptvrage'));
 		if ($processTV > 0) {
 			(new \TvAnger(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processTvReleases($groupID, $guidChar, $processTV);
 		}
@@ -273,7 +273,7 @@ class PProcess
 
 	public function processTvDB()
 	{
-		if ($this->site->lookupthetvdb == 1)
+		if ($this->pdo->getSetting('lookupthetvdb') == 1)
 		{
 			$thetvdb = new \TheTVDB($this->echooutput);
 			$thetvdb->processReleases();
@@ -285,7 +285,7 @@ class PProcess
 	 */
 	public function processXXX()
 	{
-		if ($this->site->lookupxxx == 1) {
+		if ($this->pdo->getSetting('lookupxxx') == 1) {
 			(new \XXX(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processXXXReleases();
 		}
 	}

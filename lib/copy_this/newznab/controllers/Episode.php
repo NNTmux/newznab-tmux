@@ -1,6 +1,6 @@
 <?php
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 /**
  * This class looks up tv episode data.
@@ -12,7 +12,7 @@ class Episode
 	 */
 	public function getEpisodeInfoByID($episodeinfoID)
 	{
-		$db = new DB();
+		$db = new Settings();
 		return $db->queryOneRow(sprintf('SELECT * FROM episodeinfo WHERE id = %d', $episodeinfoID));
 	}
 
@@ -21,7 +21,7 @@ class Episode
 	 */
 	public function getEpisodeInfoByName($showtitle, $fullep, $epabsolute='0')
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		if($epabsolute == '0') //as string - not int.
 			if(!preg_match('/[21]\d{3}\/\d{2}\/\d{2}/', $fullep))

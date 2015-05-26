@@ -9,11 +9,11 @@
  */
 require_once(dirname(__FILE__)."/../bin/config.php");
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 
 $n = "\n";
-$pdo = new DB();
+$pdo = new Settings();
 $namefixer = new \NameFixer(['Settings' => $pdo]);
 $predb = new \PreHash(['Echo' => true, 'Settings' => $pdo]);
 $s = new Sites();

@@ -1,6 +1,6 @@
 <?php
 
-use newznab\db\DB;
+use newznab\db\Settings;
 use newznab\utility\Utility;
 
 /**
@@ -15,7 +15,7 @@ class Releases
 	const PASSWD_RAR       = 10; // Definitely passworded.
 
 	/**
-	 * @var newznab\db\DB
+	 * @var newznab\db\Settings
 	 */
 	public $pdo;
 
@@ -52,10 +52,10 @@ class Releases
 		$s = new Sites();
 		$this->site = $s->get();
 
-		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
 		$this->groups = ($options['Groups'] instanceof \Groups ? $options['Groups'] : new \Groups(['Settings' => $this->pdo]));
-		$this->updategrabs = ($this->site->grabstatus == '0' ? false : true);
-		$this->passwordStatus = ($this->site->checkpasswordedrar == 1 ? -1 : 0);
+		$this->updategrabs = ($this->pdo->getSetting('grabstatus') == '0' ? false : true);
+		$this->passwordStatus = ($this->pdo->getSetting('checkpasswordedrar') == 1 ? -1 : 0);
 		$this->sphinxSearch = new \SphinxSearch();
 		$this->releaseSearch = new \ReleaseSearch($this->pdo, $this->sphinxSearch);
 	}

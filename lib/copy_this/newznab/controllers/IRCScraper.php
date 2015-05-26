@@ -1,6 +1,6 @@
 <?php
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 /**
  * Class IRCScraper
@@ -48,7 +48,7 @@ class IRCScraper extends IRCClient
 	protected $_oldPre;
 
 	/**
-	 * @var newznab\db\DB
+	 * @var newznab\db\Settings
 	 * @access protected
 	 */
 	protected $_pdo;
@@ -118,7 +118,7 @@ class IRCScraper extends IRCClient
 			$this->_titleIgnoreRegex = SCRAPE_IRC_TITLE_IGNORE;
 		}
 
-		$this->_pdo = new DB();
+		$this->_pdo = new Settings();
 		$this->_groupList = array();
 		$this->_silent = $silent;
 		$this->_debug = $debug;

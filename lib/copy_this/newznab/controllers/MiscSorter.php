@@ -1,6 +1,6 @@
 <?php
 
-use newznab\db\DB;
+use newznab\db\Settings;
 use newznab\libraries\ApaiIO\Configuration\GenericConfiguration;
 use newznab\libraries\ApaiIO\ApaiIO;
 use newznab\libraries\ApaiIO\Operations\Lookup;
@@ -47,15 +47,15 @@ class MiscSorter
 		$this->qty = 100;
 		$this->DEBUGGING = NN_DEBUG;
 
-		$this->pdo = ($pdo instanceof DB ? $pdo : new DB());
+		$this->pdo = ($pdo instanceof Settings ? $pdo : new Settings());
 
 		$this->category = new Categorize(['Settings' => $this->pdo]);
 		$this->movie = new Film(['Echo' => $this->echooutput, 'Settings' => $this->pdo]);
 		$s = new Sites();
 		$this->site = $s->get();
-		$this->pubkey = $this->site->amazonpubkey;
-		$this->privkey = $this->site->amazonprivkey;
-		$this->asstag = $this->site->amazonassociatetag;
+		$this->pubkey = $this->pdo->getSetting('amazonpubkey');
+		$this->privkey = $this->pdo->getSetting('amazonprivkey');
+		$this->asstag = $this->pdo->getSetting('amazonassociatetag');
 	}
 
 	// Main function that determines which operation(s) should be run based on the releases NFO file
@@ -378,7 +378,7 @@ class MiscSorter
 			echo $e->getMessage();
 		}
 
-		//$amazon = new AmazonProductAPI($this->site->amazonpubkey, $this->site->amazonprivkey, $this->site->amazonassociatetag);
+		//$amazon = new AmazonProductAPI($this->pdo->getSetting('amazonpubkey, $this->pdo->getSetting('amazonprivkey, $this->pdo->getSetting('amazonassociatetag);
 		$amalookup = new Lookup();
 
 		$apaiIo = new ApaiIO($conf);

@@ -2,7 +2,7 @@
 require_once dirname(__FILE__) . '/../../www/config.php';
 
 
-$db = new \newznab\db\DB();
+$db = new \newznab\db\Settings();
 
 //query to find rough matches
 $rows = $db->query("SELECT ID, searchname from releases where searchname like '%QWERTY%'");

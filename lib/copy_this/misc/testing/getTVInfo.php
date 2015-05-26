@@ -1,11 +1,11 @@
 <?php
 require_once dirname(__FILE__) . '/../../www/config.php';
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 $t = new TvRage;
 
-$db = new DB();
+$db = new Settings();
 
 $shows = $db->query("select name from releases where categoryID IN (select ID from category where parentID = 5000) limit 0, 50");
 

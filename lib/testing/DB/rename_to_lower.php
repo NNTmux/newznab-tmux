@@ -4,7 +4,7 @@ require_once(dirname(__FILE__) . "/../../../bin/config.php");
 
 passthru('clear');
 
-$pdo = new newznab\db\DB();
+$pdo = new newznab\db\Settings();
 
 if (!isset($argv[1]) || (isset($argv[1]) && $argv[1] !== 'true')) {
 	exit($pdo->log->error("\nThis script renames all table columns to lowercase, it can be dangerous. Please BACKUP your database before running this script.\n"

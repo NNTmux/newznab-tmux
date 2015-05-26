@@ -1,7 +1,7 @@
 <?php
 require_once(dirname(__FILE__)."/../../bin/config.php");
 
-use newznab\db\DB;
+use newznab\db\Settings;
 use newznab\utility\Utility;
 
 // Function inspired by : http://stackoverflow.com/questions/1883079/best-practice-import-mysql-file-in-php-split-queries/2011454#2011454
@@ -14,7 +14,7 @@ function SplitSQL($file, $delimiter = ';')
 
 		if (is_resource($file) === true) {
 			$query = array();
-			$db = new DB();
+			$db = new Settings();
 			$dbsys = DB_TYPE;
 			$c = new ColorCLI();
 
@@ -74,7 +74,7 @@ function SplitSQL($file, $delimiter = ';')
 
 function BackupDatabase()
 {
-	$db = new DB();
+	$db = new Settings();
 	$c = new ColorCLI();
 	$DIR = dirname (__FILE__);
 
@@ -106,7 +106,7 @@ if (isset($os) && $os == "unix") {
 	$currentversion = $tmux->sqlpatch;
 	$patched = 0;
 	$patches = array();
-	$db = new DB();
+	$db = new Settings();
 	$backedup = false;
 	$c = new ColorCLI();
     $DIR = dirname (__FILE__);
@@ -190,8 +190,8 @@ if (isset($os) && $os == "unix") {
 }
 
 if ($patched == 0) {
-	exit($c->info("Nothing to patch, you are already on patch version " . $currentversion));
+	exit($c->info("After patch 149 this file is no longer used.Nothing to patch, you are already on patch version " . $currentversion));
 }
 if ($patched > 0) {
-	echo $c->header($patched . " patch(es) applied.");
+	echo $c->header($patched . " patch(es) applied. After patch 149 this file is no longer used");
 }

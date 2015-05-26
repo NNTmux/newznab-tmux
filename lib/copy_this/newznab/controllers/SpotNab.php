@@ -1,6 +1,6 @@
 <?php
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 // Help out those who don't have SSL enabled
 if(!defined('OPENSSL_KEYTYPE_RSA')) {
@@ -152,7 +152,7 @@ class SpotNab {
 	private $_discovery_lastarticle;
 
 	public function __construct($post_user = Null, $post_email = Null, $post_group = Null) {
-		$this->_pdo = new DB();
+		$this->_pdo = new Settings();
 		$this->_nntp = new NNTP(['Settings' => $this->_pdo]);
 		$this->releaseImage =  new \ReleaseImage($this->_pdo);
 		$this->nzb = new \NZB($this->_pdo);
@@ -189,30 +189,30 @@ class SpotNab {
 		}
 
 		// Public Key
-		$this->_ssl_pubkey = trim($this->_globals->spotnabsitepubkey)?
-			$this->_globals->spotnabsitepubkey:false;
+		$this->_ssl_pubkey = trim($this->_pdo->getSetting('spotnabsitepubkey'))?
+			$this->_pdo->getSetting('spotnabsitepubkey') : false;
 		if($this->_ssl_pubkey)
 			$this->_ssl_pubkey = $this->decompstr($this->_ssl_pubkey);
 
 		// Private Key
-		$this->_ssl_prvkey = trim($this->_globals->spotnabsiteprvkey)?
-			$this->_globals->spotnabsiteprvkey:false;
+		$this->_ssl_prvkey = trim($this->_pdo->getSetting('spotnabsiteprivkey'))?
+			$this->_pdo->getSetting('spotnabsiteprivkey') : false;
 		if($this->_ssl_prvkey)
 			$this->_ssl_prvkey = $this->decompstr($this->_ssl_prvkey);
 
 		// Track Discovery Article
-		$this->_discovery_lastarticle = intval($this->_globals->spotnablastarticle);
+		$this->_discovery_lastarticle = intval($this->_pdo->getSetting('spotnablastarticle'));
 
 		// Posting Flag
-		$this->_can_post = (trim($this->_globals->spotnabpost) == 1)?
+		$this->_can_post = (trim($this->_pdo->getSetting('spotnabpost')) == 1)?
 			true:false;
 
 		// Auto Enable Flag
-		$this->_auto_enable = (trim($this->_globals->spotnabautoenable) == 1)?
+		$this->_auto_enable = (trim($this->_pdo->getSetting('spotnabautoenable')) == 1)?
 			true:false;
 
 		// Spotnab Privacy Posting
-		$this->_post_privacy = (trim($this->_globals->spotnabprivacy) == 1)?
+		$this->_post_privacy = (trim($this->_pdo->getSetting('spotnabsiteprivacy')) == 1)?
 			true:false;
 
 		// Auto-Discovery Private Key (used for Posting)
@@ -264,7 +264,7 @@ class SpotNab {
 
 	// ***********************************************************************
 	public function auto_clean($max_days=90){
-		$db = new DB();
+		$db = new Settings();
 		// automatically sweep old sources lingering that have not shown any
 		// sort of life what-so-ever for more then 90 days
 		$sql = "DELETE FROM spotnabsources WHERE "
@@ -288,7 +288,7 @@ class SpotNab {
 		$sql_rel = "SELECT gid FROM releases WHERE gid IN ('%s') ";
 		$sql_del = "DELETE FROM releasecomment WHERE gid IN ('%s')";
 		$total_delcnt = 0;
-		$db = new DB();
+		$db = new Settings();
 		while(1)
 		{
 			$res = $db->query(sprintf($sql, $offset, $batch));
@@ -333,17 +333,17 @@ class SpotNab {
 		//    using existing sources
 		//  - it has never posted discovery information
 		//  - it has never scanned for existing discoveries
-		$db = new DB();
+		$db = new Settings();
 
 		// resets sources so they need to query again
 		$sources = "UPDATE spotnabsources SET "
 			."lastupdate = NULL,"
 			."lastbroadcast = NULL,"
 			."lastarticle = 0";
-		$discovery_a = "UPDATE site SET "
+		$discovery_a = "UPDATE settings SET "
 			."value = '0' "
 			."WHERE setting = 'spotnablastarticle'";
-		$broadcast = "UPDATE site SET "
+		$broadcast = "UPDATE settings SET "
 			."updateddate = '1980-01-01 00:00:00' "
 			."WHERE setting = 'spotnabbroadcast'";
 
@@ -351,11 +351,11 @@ class SpotNab {
 		// by the maximum age a broadcast can be.
 		$reftime = date("Y-m-d H:i:s",
 			time()-(SpotNab::POST_BROADCAST_INTERVAL));
-		$discovery_b = "UPDATE site SET "
+		$discovery_b = "Update settings SET "
 			."updateddate = '1980-01-01 00:00:00' "
 			."WHERE setting = 'spotnabdiscover'";
 
-		$post = "UPDATE site SET "
+		$post = "Update settings SET "
 			."updateddate = '$reftime' "
 			."WHERE setting = 'spotnabpost'";
 		$db->queryExec($sources);
@@ -367,7 +367,7 @@ class SpotNab {
 
 	// ***********************************************************************
 	public function fetch_discovery($reftime=Null, $retries=3){
-		$db = new DB();
+		$db = new Settings();
 		$last = $first = Null;
 
 		// Return Value; Initialize it to Okay
@@ -384,7 +384,7 @@ class SpotNab {
 		}
 
 		if($reftime === Null){
-			$q = "SELECT updateddate FROM site WHERE "
+			$q = "SELECT updateddate FROM settings WHERE "
 				."setting = 'spotnabdiscover'";
 			$res = $db->queryOneRow($q);
 			if($res){
@@ -512,13 +512,13 @@ class SpotNab {
 				continue;
 			}
 		}
-		$sql = sprintf("UPDATE site SET value = '%d' "
+		$sql = sprintf("Update settings SET value = '%d' "
 					."WHERE setting = 'spotnablastarticle'", $last);
 		$db->queryExec($sql);
 		printf("%d new and %d updated source(s).\n", $inserted, $updated);
 
 		// Update reference point
-		$q = "UPDATE site SET updateddate = NOW() WHERE "
+		$q = "Update settings SET updateddate = NOW() WHERE "
 				."setting = 'spotnabdiscover'";
 		$db->queryExec($q);
 
@@ -529,9 +529,9 @@ class SpotNab {
 
 	// ***********************************************************************
 	public function auto_post_discovery($repost_sec=SpotNab::POST_BROADCAST_INTERVAL){
-		$db = new DB();
+		$db = new Settings();
 		// performs a post discovery once the time in seconds has elapsed
-		$q = "SELECT updateddate FROM site WHERE "
+		$q = "SELECT updateddate FROM settings WHERE "
 			."setting = 'spotnabbroadcast'";
 		$res = $db->queryOneRow($q);
 		$then = strtotime($res['updateddate']);
@@ -541,7 +541,7 @@ class SpotNab {
 			if($this->post_discovery())
 			{
 				// Update post time
-				$q = "UPDATE site SET updateddate = NOW() WHERE "
+				$q = "Update settings SET updateddate = NOW() WHERE "
 					."setting = 'spotnabbroadcast'";
 					$res = $db->queryExec($q);
 			}
@@ -652,7 +652,7 @@ class SpotNab {
 		* The specified $reftime is presumed to be local *not utc*
 		*/
 
-		$db = new DB();
+		$db = new Settings();
 		$last = $first = Null;
 
 		// Return Value; Initialize it to Okay
@@ -905,7 +905,7 @@ class SpotNab {
 	public function processGID($limit=500, $batch=5000, $delete_broken_releases=false){
 		// Process until someone presses cntrl-c
 
-		$db = new DB();
+		$db = new Settings();
 		$nzb = new NZB();
 
 		$processed = 0;
@@ -1007,7 +1007,7 @@ class SpotNab {
 	public function keygen($print=true, $force_regen=false){
 		// Simply generate a Public/Private Key pair if they don't already
 		// exist
-		$db = new DB();
+		$db = new Settings();
 
 		// A small boolean we safely toggle after performing
 		// a few checks first to make sure it's safe to do so
@@ -1037,12 +1037,12 @@ class SpotNab {
 			$keys = $this->_keygen();
 			if(is_array($keys)){
 				// Force New Username
-				$sql = sprintf("UPDATE site SET value = %s "
+				$sql = sprintf("Update settings SET value = %s "
 								."WHERE setting = 'spotnabuser'",
 				$db->escapeString(sprintf("nntp-%s",substr(md5($keys['pubkey']), 0, 4))));
 				$db->queryExec($sql);
 				// Force New Email
-				$sql = sprintf("UPDATE site SET value = %s "
+				$sql = sprintf("Update settings SET value = %s "
 								."WHERE setting = 'spotnabemail'",
 				$db->escapeString(sprintf("nntp-%s@%s.com",
 					substr(md5($keys['pubkey']), 4, 8),
@@ -1050,18 +1050,18 @@ class SpotNab {
 				)));
 				$db->queryExec($sql);
 				// Save Keys
-				$sql = sprintf("UPDATE site SET value = %s ".
+				$sql = sprintf("Update settings SET value = %s ".
 						"WHERE setting = 'spotnabsitepubkey'",
 						$db->escapeString($keys['pubkey']));
 				$db->queryExec($sql);
 				//echo $keys['pubkey']."\n";
 
-				$sql = sprintf("UPDATE site SET value = %s ".
+				$sql = sprintf("Update settings SET value = %s ".
 						"WHERE setting = 'spotnabsiteprvkey'",
 						$db->escapeString($keys['prvkey']));
 				$db->queryExec($sql);
 
-				// Update Site Information
+				// Update settings Information
 				$this->_globals = $this->_site;
 				$this->_post_user = trim($this->_globals->spotnabuser);
 				$this->_post_email = trim($this->_globals->spotnabemail);
@@ -1330,7 +1330,7 @@ class SpotNab {
 		// Prepare some general SQL Commands for saving later if all goes well
 		//
 
-		$db = new DB();
+		$db = new Settings();
 		$rc = new ReleaseComments();
 
 		// Comments
@@ -1553,7 +1553,7 @@ class SpotNab {
 		// Prepare some general SQL Commands for saving later if all goes well
 		//
 
-		$db = new DB();
+		$db = new Settings();
 
         // Auto Enable Flag (used for inserts only)
 		$auto_enable = ($this->_auto_enable)?"1":"0";
@@ -1891,7 +1891,7 @@ class SpotNab {
 		{
 			$message['comments'] = $data['comments'];
 
-			$db = new DB();
+			$db = new Settings();
 			$sql = sprintf("UPDATE releasecomment "
 					."SET issynced = 1 WHERE id IN (%s)",
 					implode(",", $data['ids']));
@@ -2245,7 +2245,7 @@ class SpotNab {
 		*	but otherwise it's expected format is string "Y-m-d H:i:s"
 		*/
 
-		$db = new DB();
+		$db = new Settings();
 
 		// Now we fetch for any new posts since reference point
 		$sql = sprintf("SELECT r.gid, rc.id, rc.text, u.username, "
@@ -2488,7 +2488,7 @@ class SpotNab {
 
 	public function getSources()
 	{
-		$db = new DB();
+		$db = new Settings();
 		return $db->query("SELECT id, lastupdate,lastbroadcast, active, description, "
 					."(SELECT count(id) from releasecomment where sourceid = s.id)"
 					." AS comments FROM spotnabsources s");
@@ -2496,14 +2496,14 @@ class SpotNab {
 
 	public function getSourceById($id)
 	{
-		$db = new DB();
+		$db = new Settings();
 		$sql = sprintf("SELECT * FROM spotnabsources WHERE id = %d", $id);
 		return $db->queryOneRow($sql);
 	}
 
 	public function addSource($description,$username,$usermail,$usenetgroup,$publickey)
 	{
-		$db = new DB();
+		$db = new Settings();
 		$sql = sprintf("INSERT INTO spotnabsources "
 				."(description, username, useremail,"
 				." usenetgroup, publickey, active) "
@@ -2516,7 +2516,7 @@ class SpotNab {
 
 	public function updateSource($id, $description,$username,$usermail,$usenetgroup,$publickey)
 	{
-		$db = new DB();
+		$db = new Settings();
 		return $db->queryExec(
 			sprintf("UPDATE spotnabsources SET "
 				."description = %s, username = %s, useremail = %s,"
@@ -2528,19 +2528,19 @@ class SpotNab {
 
 	public function deleteSource($id)
 	{
-		$db = new DB();
+		$db = new Settings();
 		return $db->queryExec(sprintf("DELETE FROM spotnabsources WHERE id = %d", $id));
 	}
 
 	public function toggleSource($id, $active)
 	{
-		$db = new DB();
+		$db = new Settings();
 		return $db->queryExec(sprintf("update spotnabsources SET active = %d WHERE id = %d", $active, $id));
 	}
 
 	public function getDefaultValue($table,$field)
 	{
-		$db = new DB();
+		$db = new Settings();
 		return $db->query(sprintf("SHOW COLUMNS FROM %s WHERE field = %s", $table, $db->escapeString($field)));
 	}
 }
