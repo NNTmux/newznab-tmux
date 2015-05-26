@@ -20,7 +20,6 @@
  */
 require_once realpath(dirname(__DIR__) . '/../www/automated.config.php');
 
-use ColorCLI;
 
 define('NN_GIT', NN_ROOT . '.git' . DS);
 define('NN_HOOKS', NN_GIT . 'hooks' . DS);
