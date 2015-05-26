@@ -1,11 +1,11 @@
 <?php
 require_once dirname(__FILE__) . '/../../www/config.php';
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 $s = new Sites();
 $site = $s->get();
-$db = new DB();
+$db = new Settings();
 $r = new Releases();
 
 //

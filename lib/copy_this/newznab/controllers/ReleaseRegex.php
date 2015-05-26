@@ -1,6 +1,6 @@
 <?php
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 
 /**
@@ -16,7 +16,7 @@ class ReleaseRegex
 	private $tablePerGroup;
 
 	/**
-	 * @var \newznab\db\DB
+	 * @var \newznab\db\Settings
 	 */
 	public $pdo;
 
@@ -28,10 +28,10 @@ class ReleaseRegex
 	public function __construct()
 	{
 		$this->regexes = [];
-		$this->pdo = new DB();
+		$this->pdo = new Settings();
 		$s = new Sites();
 		$this->site = $s->get();
-		$this->tablePerGroup = $this->site->tablepergroup;
+		$this->tablePerGroup = $this->pdo->getSetting('tablepergroup');
 	}
 
 	/**

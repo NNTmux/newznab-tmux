@@ -14,8 +14,8 @@ class AdminPage extends BasePage
 		parent::__construct();
 
 		$tplpaths = [];
-		if ($this->site->style != "default")
-			$tplpaths["style_admin"] = WWW_DIR.'templates/'.$this->site->style.'/views/admin';
+		if ($this->pdo->getSetting('style') != "default")
+			$tplpaths["style_admin"] = WWW_DIR.'templates/'.$this->pdo->getSetting('style').'/views/admin';
 		$tplpaths["admin"] = WWW_DIR.'templates/default/views/admin';
 		$tplpaths["frontend"] = WWW_DIR.'templates/default/views/frontend';
 		$this->smarty->setTemplateDir($tplpaths);

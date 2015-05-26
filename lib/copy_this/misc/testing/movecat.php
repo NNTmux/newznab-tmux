@@ -4,10 +4,10 @@
 
 require_once dirname(__FILE__) . '/../../www/config.php';
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 $releases = new Releases();
-$db = new DB();
+$db = new Settings();
 
 //
 // [1] move mp3 files from other misc into audio mp3

@@ -1,6 +1,6 @@
 <?php
 
-use newznab\db\DB;
+use newznab\db\Settings;
 use newznab\utility\Utility;
 
 /**
@@ -53,7 +53,7 @@ class ReleaseImage
 	{
 		// Creates the NN_COVERS constant
 		if ($pdo === null) {
-			$pdo = new DB();
+			$pdo = new Settings();
 		}
 		//                                                            Table    |  Column
 		$this->audSavePath    = NN_COVERS . 'audiosample' . DS; // releases    guid

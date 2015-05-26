@@ -18,7 +18,7 @@ unset($s->sabapikey);
 unset($s->sabcompletedir);
 unset($s->sabvdir);
 
-$db = new newznab\db\DB;
+$db = new newznab\db\Settings;
 $totalsize = 0;
 $alltables = $db->query("show table status");
 foreach ($alltables as $tablename)

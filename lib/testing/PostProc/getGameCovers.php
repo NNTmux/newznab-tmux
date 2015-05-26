@@ -3,10 +3,10 @@
 
 require_once(dirname(__FILE__) . "/../../../bin/config.php");
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 
-$pdo = new DB();
+$pdo = new Settings();
 $game = new \Games(['Echo' => true, 'Settings' => $pdo]);
 
 $res = $pdo->query(

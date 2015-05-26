@@ -1,10 +1,10 @@
 <?php
 
-use newznab\db\DB;
+use newznab\db\Settings;
 use newznab\utility\Utility;
 
 
-$pdo = new DB();
+$pdo = new Settings();
 $s = new Sites();
 $site = $s->get();
 

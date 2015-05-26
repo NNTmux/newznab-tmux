@@ -1,7 +1,7 @@
 <?php
 namespace newznab\libraries;
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 
 /**
@@ -17,7 +17,7 @@ class ForkingImportNZB extends Forking
 	public function __construct(array $options = [])
 	{
 		$defaults = [
-			'settings' => new DB(),
+			'settings' => new Settings(),
 		];
 		$options += $defaults;
 

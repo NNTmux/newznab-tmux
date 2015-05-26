@@ -2,10 +2,10 @@
 
 require_once dirname(__FILE__) . '/../../www/config.php';
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 $movie = new Movie(true);
-$db = new DB();
+$db = new Settings();
 $movies = array();
 $counter = 1;
 $sleepsecsbetweenscrape = 1;

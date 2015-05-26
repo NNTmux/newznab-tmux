@@ -1,6 +1,6 @@
 <?php
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 /**
  * Class for reading and writing NZB files on the hard disk,
@@ -39,7 +39,7 @@ class NZB
 
 	/**
 	 * Instance of class db.
-	 * @var \newznab\db\DB
+	 * @var \newznab\db\Settings
 	 * @access public
 	 */
 	public $pdo;
@@ -89,20 +89,20 @@ class NZB
 	/**
 	 * Default constructor.
 	 *
-	 * @param \newznab\db\DB $pdo
+	 * @param \newznab\db\Settings $pdo
 	 *
 	 * @access public
 	 */
 	public function __construct(&$pdo = null)
 	{
-		$this->pdo = ($pdo instanceof DB ? $pdo : new DB());
+		$this->pdo = ($pdo instanceof Settings ? $pdo : new Settings());
 
 		$s = new Sites();
 		$this->site = $s->get();
-		$this->tablePerGroup = ($this->site->tablepergroup == 0 ? false : true);
-		$nzbSplitLevel = $this->site->nzbsplitlevel;
+		$this->tablePerGroup = ($this->pdo->getSetting('tablepergroup') == 0 ? false : true);
+		$nzbSplitLevel = $this->pdo->getSetting('nzbsplitlevel');
 		$this->nzbSplitLevel = (empty($nzbSplitLevel) ? 1 : $nzbSplitLevel);
-		$this->siteNzbPath = (string)$this->site->nzbpath;
+		$this->siteNzbPath = (string)$this->pdo->getSetting('nzbpath');
 		if (substr($this->siteNzbPath, -1) !== DS) {
 			$this->siteNzbPath .= DS;
 		}

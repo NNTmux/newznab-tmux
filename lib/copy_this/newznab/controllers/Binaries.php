@@ -1,6 +1,6 @@
 <?php
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 /**
  * Class Binaries
@@ -77,7 +77,7 @@ class Binaries
 	protected $_partRepair;
 
 	/**
-	 * @var newznab\db\DB
+	 * @var newznab\db\Settings
 	 */
 	protected $_pdo;
 
@@ -163,7 +163,7 @@ class Binaries
 
 		$s = new Sites();
 		$this->_site = $s->get();
-		$this->_pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+		$this->_pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
 		$this->_groups = ($options['Groups'] instanceof \Groups ? $options['Groups'] : new \Groups(['Settings' => $this->_pdo]));
 		$this->_colorCLI = ($options['ColorCLI'] instanceof \ColorCLI ? $options['ColorCLI'] : new \ColorCLI());
 		$this->_nntp = ($options['NNTP'] instanceof \NNTP ? $options['NNTP'] : new \NNTP(['Echo' => $this->_colorCLI, 'Settings' => $this->_pdo, 'ColorCLI' => $this->_colorCLI]));

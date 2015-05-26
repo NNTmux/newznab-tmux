@@ -656,10 +656,10 @@ function addCoverURL(&$releases, callable $getCoverURL)
 /**
  * Add language from media info XML to release search names.
  * @param array             $releases
- * @param \newznab\db\DB $settings
+ * @param \newznab\db\Settings $settings
  * @return array
  */
-function addLanguage(&$releases, \newznab\db\DB $settings)
+function addLanguage(&$releases, \newznab\db\Settings $settings)
 {
 	if ($releases && count($releases)) {
 		foreach ($releases as $key => $release) {

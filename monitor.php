@@ -1,11 +1,11 @@
 <?php
 require_once dirname(__FILE__) . '/../../../../www/config.php';
 
-use newznab\db\DB;
+use newznab\db\Settings;
 use newznab\utility\Utility;
 
 
-$pdo = new DB();
+$pdo = new Settings();
 $tRun = new \TmuxRun($pdo);
 $tOut = new \TmuxOutput($pdo);
 
@@ -65,7 +65,7 @@ while ($runVar['counts']['iterations'] > 0) {
 	//check the db connection
 	if ($pdo->ping(true) == false) {
 		unset($pdo);
-		$pdo = new DB();
+		$pdo = new Settings();
 	}
 
 	$timer01 = time();

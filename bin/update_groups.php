@@ -2,11 +2,11 @@
 
 require_once(dirname(__FILE__).'/config.php');
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 
 $start = TIME();
-$pdo = new DB();
+$pdo = new Settings();
 $consoleTools = new \ConsoleTools(['ColorCLI' => $pdo->log]);
 
 // Create the connection here and pass

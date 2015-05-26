@@ -2,7 +2,7 @@
 			<h1>{$page->title}</h1>
 
 			<p>
-				Here you can choose rss feeds from site categories. The feeds will present either decriptions or
+				Here you can choose rss feeds from settings categories. The feeds will present either decriptions or
 				downloads of Nzb files.
 			</p>
 

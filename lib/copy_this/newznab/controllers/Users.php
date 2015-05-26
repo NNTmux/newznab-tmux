@@ -1,6 +1,6 @@
 <?php
 
-use newznab\db\DB;
+use newznab\db\Settings;
 use newznab\utility\Utility;
 
 class Users
@@ -46,10 +46,8 @@ class Users
 			'Settings' => null,
 		];
 		$options += $defaults;
-		$this->site= new Sites();
-		$this->site = $this->site->get();
 
-		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
 
 		$this->password_hash_cost = (defined('NN_PASSWORD_HASH_COST') ? NN_PASSWORD_HASH_COST : 11);
 	}
@@ -344,7 +342,7 @@ class Users
 	{
 		$data = $this->pdo->query(sprintf("select id,email from users WHERE role = %d and rolechangedate < now()", $uprole));
 		foreach ($data as $u) {
-			Utility::sendEmail($u["email"], $msgsubject, $msgbody, $this->site->email);
+			Utility::sendEmail($u["email"], $msgsubject, $msgbody, $this->pdo->getSetting('email'));
 			$this->pdo->queryExec(sprintf("update users SET role = %d, rolechangedate=null WHERE id = %d", $downrole, $u["id"]));
 		}
 
@@ -500,7 +498,7 @@ class Users
 		// the invite would still have been used up
 		//
 		$invitedby = 0;
-		if (($this->site->registerstatus == Sites::REGISTER_STATUS_INVITE) && !$forceinvitemode) {
+		if (($this->pdo->getSetting('registerstatus') == Settings::REGISTER_STATUS_INVITE) && !$forceinvitemode) {
 			if ($invitecode == '')
 				return Users::ERR_SIGNUP_BADINVITECODE;
 
@@ -559,7 +557,7 @@ class Users
 
 		$site = new Sites();
 		$this->site = $site->get();
-		if ($this->site->storeuserips != "1")
+		if ($this->pdo->getSetting('storeuserips') != "1")
 			$host = "";
 
 		if ($invitedby == 0)
@@ -594,7 +592,7 @@ class Users
 		$site = new Sites();
 		$this->site = $site->get();
 
-		if ($this->site->storeuserips != "1")
+		if ($this->pdo->getSetting('storeuserips') != "1")
 			$host = '';
 
 		$this->updateSiteAccessed($uid, $host);
@@ -793,11 +791,11 @@ class Users
 	{
 		$ipsql = "('-1')";
 
-		if ($this->site->userhostexclusion != '') {
+		if ($this->pdo->getSetting('userhostexclusion') != '') {
 			$ipsql = "";
-			$ips = explode(",", $this->site->userhostexclusion);
+			$ips = explode(",", $this->pdo->getSetting('userhostexclusion'));
 			foreach ($ips as $ip) {
-				$ipsql .= $this->pdo->escapeString($this->getHostHash($ip, $this->site->siteseed)) . ",";
+				$ipsql .= $this->pdo->escapeString($this->getHostHash($ip, $this->pdo->getSetting('siteseed'))) . ",";
 			}
 			$ipsql = "(" . $ipsql . " '-1')";
 		}
@@ -821,7 +819,7 @@ class Users
 	public function getHostHash($host, $siteseed = "")
 	{
 		if ($siteseed == "") {
-			$siteseed = $this->site->siteseed;
+			$siteseed = $this->pdo->getSetting('siteseed');
 		}
 
 		return self::hashSHA1($siteseed . $host . $siteseed);

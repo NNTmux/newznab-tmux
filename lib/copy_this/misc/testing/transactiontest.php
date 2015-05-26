@@ -3,7 +3,7 @@
 
 try {
     // Create the first database class instance (which will initialize the PDO connection)
-    $db = new DB();
+    $db = new Settings();
 
     // For debug set the error mode
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -18,7 +18,7 @@ try {
             echo "--[ Insert run: {$i} ]----------------------------------------". PHP_EOL;
 
             // Create a new db class instance (multiple can exist)
-            $newDb = new DB();
+            $newDb = new Settings();
 
             // Check that there is a new db class instance, but no new PDO instance
             var_dump( $newDb, $newDb->getPDO() );

@@ -1,4 +1,5 @@
 <?php
+use newznab\db\Settings;
 use newznab\db\DB;
 
 class SphinxSearch
@@ -24,7 +25,7 @@ class SphinxSearch
 			if (!defined('NN_SPHINXQL_SOCK_FILE')) {
 				define('NN_SPHINXQL_SOCK_FILE', '');
 			}
-			$this->sphinxQL = new newznab\db\DB(
+			$this->sphinxQL = new DB(
 				[
 					'dbname' => '',
 					'dbport' => NN_SPHINXQL_PORT,
@@ -58,9 +59,9 @@ class SphinxSearch
 	/**
 	 * Delete release from Sphinx RT table.
 	 * @param array $identifiers ['g' => Release GUID(mandatory), 'id => ReleaseID(optional, pass false)]
-	 * @param DB $pdo
+	 * @param Settings $pdo
 	 */
-	public function deleteRelease($identifiers, DB $pdo)
+	public function deleteRelease($identifiers, Settings $pdo)
 	{
 		if (!is_null($this->sphinxQL)) {
 			if ($identifiers['i'] === false) {

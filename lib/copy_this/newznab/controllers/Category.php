@@ -1,6 +1,6 @@
 <?php
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 /**
  * This class manages the site wide categories.
@@ -85,7 +85,7 @@ class Category
 	private $tmpCat = 0;
 
 	/**
-	 * @var newznab\db\DB
+	 * @var newznab\db\Settings
 	 */
 	public $pdo;
 
@@ -101,7 +101,7 @@ class Category
 		];
 		$options += $defaults;
 
-		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
 	}
 
 	/**
@@ -143,7 +143,7 @@ class Category
 	 */
 	public function isParent($cid)
 	{
-		$db = new newznab\db\DB();
+		$db = new newznab\db\Settings();
 		$ret = $db->queryOneRow(sprintf("select count(*) as count from category where id = %d and parentid is null", $cid), true);
 		if ($ret['count'])
 			return true;
@@ -156,7 +156,7 @@ class Category
 	 */
 	public function getChildren($cid)
 	{
-		$db = new newznab\db\DB();
+		$db = new newznab\db\Settings();
 
 		return $db->query(sprintf("select c.* from category c where parentid = %d", $cid), true);
 	}
@@ -166,7 +166,7 @@ class Category
 	 */
 	public function getFlat($activeonly = false)
 	{
-		$db = new newznab\db\DB();
+		$db = new newznab\db\Settings();
 		$act = "";
 		if ($activeonly)
 			$act = sprintf(" where c.status = %d ", Category::STATUS_ACTIVE);
@@ -181,7 +181,7 @@ class Category
 	 */
 	public function getEnabledParentNames()
 	{
-		$db = new newznab\db\DB();
+		$db = new newznab\db\Settings();
 
 		return $db->query("SELECT title FROM category WHERE parentid IS NULL AND status = 1");
 	}
@@ -193,7 +193,7 @@ class Category
 	 */
 	public function getDisabledIDs()
 	{
-		$db = new newznab\db\DB();
+		$db = new newznab\db\Settings();
 
 		return $db->query("SELECT id FROM category WHERE status = 2 OR parentid IN (SELECT id FROM category WHERE status = 2 AND parentid IS NULL)");
 	}
@@ -202,14 +202,14 @@ class Category
 	 */
 	public function getById($id)
 	{
-		$db = new newznab\db\DB();
+		$db = new newznab\db\Settings();
 
 		return $db->queryOneRow(sprintf("SELECT c.disablepreview, c.id, c.description, c.minsizetoformrelease, c.maxsizetoformrelease, CONCAT(COALESCE(cp.title,'') , CASE WHEN cp.title IS NULL THEN '' ELSE ' > ' END , c.title) as title, c.status, c.parentid from category c left outer join category cp on cp.id = c.parentid where c.id = %d", $id));
 	}
 
 	public function getSizeRangeById($id)
 	{
-		$db = new newznab\db\DB();
+		$db = new newznab\db\Settings();
 		$res = $db->queryOneRow(sprintf("SELECT c.minsizetoformrelease, c.maxsizetoformrelease, cp.minsizetoformrelease as p_minsizetoformrelease, cp.maxsizetoformrelease as p_maxsizetoformrelease" .
 				" from category c left outer join category cp on cp.id = c.parentid where c.id = %d", $id
 			)
@@ -255,14 +255,14 @@ class Category
 	 */
 	public function getByIds($ids)
 	{
-		$db = new newznab\db\DB();
+		$db = new newznab\db\Settings();
 
 		return $db->query(sprintf("SELECT concat(cp.title, ' > ',c.title) as title from category c inner join category cp on cp.id = c.parentid where c.id in (%s)", implode(',', $ids)));
 	}
 
 	public function getNameByID($ID)
 	{
-		$db = new newznab\db\DB();
+		$db = new newznab\db\Settings();
 		$parent = $db->queryOneRow(sprintf("SELECT title FROM category WHERE id = %d", substr($ID, 0, 1) . "000"));
 		$cat = $db->queryOneRow(sprintf("SELECT title FROM category WHERE id = %d", $ID));
 
@@ -274,7 +274,7 @@ class Category
 	 */
 	public function update($id, $status, $desc, $disablepreview, $minsize, $maxsize)
 	{
-		$db = new newznab\db\DB();
+		$db = new newznab\db\Settings();
 
 		return $db->queryExec(sprintf("update category set disablepreview = %d, status = %d, minsizetoformrelease = %d, maxsizetoformrelease = %d, description = %s where id = %d", $disablepreview, $status, $minsize, $maxsize, $db->escapeString($desc), $id));
 	}
@@ -284,7 +284,7 @@ class Category
 	 */
 	public function getForMenu($excludedcats = array())
 	{
-		$db = new newznab\db\DB();
+		$db = new newznab\db\Settings();
 		$ret = array();
 
 		$exccatlist = "";
@@ -340,7 +340,7 @@ class Category
 	 */
 	public function get($activeonly = false, $excludedcats = array())
 	{
-		$db = new newznab\db\DB();
+		$db = new newznab\db\Settings();
 
 		$exccatlist = "";
 		if (count($excludedcats) > 0)

@@ -1,6 +1,6 @@
 <?php
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 class ReleaseSearch
 {
@@ -9,7 +9,7 @@ class ReleaseSearch
 	const SPHINX   = 2;
 
 	/***
-	 * @var newznab\db\DB
+	 * @var newznab\db\Settings
 	 */
 	public $pdo;
 
@@ -26,9 +26,9 @@ class ReleaseSearch
 	private $fullTextJoinString;
 
 	/**
-	 * @param DB $settings
+	 * @param Settings $settings
 	 */
-	public function __construct(DB $settings)
+	public function __construct(Settings $settings)
 	{
 		switch (NN_RELEASE_SEARCH_TYPE) {
 			case self::LIKE:
@@ -43,7 +43,7 @@ class ReleaseSearch
 				break;
 		}
 
-		$this->pdo = ($settings instanceof newznab\db\DB ? $settings : new newznab\db\DB());
+		$this->pdo = ($settings instanceof newznab\db\Settings ? $settings : new newznab\db\Settings());
 	}
 
 	/**

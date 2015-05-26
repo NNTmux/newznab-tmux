@@ -2,11 +2,11 @@
 //This script downloads covert art for Tv Shows -- it is intended to be run at interval, generally after the TvRage database is populated
 require_once(dirname(__FILE__) . "/../../../bin/config.php");
 
-use newznab\db\DB;
+use newznab\db\Settings;
 use newznab\utility\Utility;
 
 
-$pdo = new DB();
+$pdo = new Settings();
 $tvrage = new \TvAnger(['Settings' => $pdo, 'Echo' => true]);
 
 $shows = $pdo->queryDirect("SELECT rageid FROM tvrage WHERE imgdata IS NULL ORDER BY rageid DESC LIMIT 2000");

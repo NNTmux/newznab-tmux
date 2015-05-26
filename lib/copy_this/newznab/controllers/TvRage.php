@@ -1,6 +1,6 @@
 <?php
 
-use newznab\db\DB;
+use newznab\db\Settings;
 use newznab\utility\Utility;
 use newznab\libraries\Cache;
 
@@ -10,7 +10,7 @@ class TvRage
 	const MATCH_PROBABILITY = 75;
 
 	/**
-	 * @var newznab\db\DB
+	 * @var newznab\db\Settings
 	 */
 	public $pdo;
 
@@ -22,7 +22,7 @@ class TvRage
 	public function __construct($echooutput = false)
 	{
 		$this->echooutput = (NN_ECHOCLI && $echooutput);
-		$this->pdo = new DB();
+		$this->pdo = new Settings();
 
 		$this->xmlFullSearchUrl = "http://services.tvrage.com/feeds/full_search.php?show=";
 		$this->xmlFullShowInfoUrl = "http://services.tvrage.com/feeds/full_show_info.php?sid=";
@@ -389,7 +389,7 @@ class TvRage
 
 	public function updateEpInfo($show, $relid)
 	{
-		$this->pdo = new newznab\db\DB;
+		$this->pdo = new newznab\db\Settings;
 
         if (empty($show['airdate']) || !strtotime($show['airdate'])) {
             $tvairdate = "null";
@@ -429,7 +429,7 @@ class TvRage
 
 	public function updateRageInfo($rageid, $show, $tvrShow, $relid)
 	{
-		$this->pdo = new newznab\db\DB;
+		$this->pdo = new newznab\db\Settings;
 
 		$idCheck = $this->getByRageID($rageid);
 

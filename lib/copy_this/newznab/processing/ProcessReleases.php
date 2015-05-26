@@ -1,7 +1,7 @@
 <?php
 namespace newznab\processing;
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 class ProcessReleases
 {
@@ -58,7 +58,7 @@ class ProcessReleases
 	public $echoCLI;
 
 	/**
-	 * @var \newznab\db\DB
+	 * @var \newznab\db\Settings
 	 */
 	public $pdo;
 
@@ -106,7 +106,7 @@ class ProcessReleases
 
 		$this->echoCLI = ($options['Echo'] && NN_ECHOCLI);
 
-		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
 		$this->consoleTools = ($options['ConsoleTools'] instanceof \ConsoleTools ? $options['ConsoleTools'] : new \ConsoleTools(['ColorCLI' => $this->pdo->log]));
 		$this->groups = ($options['Groups'] instanceof \Groups ? $options['Groups'] : new \Groups(['Settings' => $this->pdo]));
 		$this->nzb = ($options['NZB'] instanceof \NZB ? $options['NZB'] : new \NZB($this->pdo));
@@ -116,12 +116,12 @@ class ProcessReleases
 		$s = new \Sites();
 		$this->site = $s ->get();
 
-		$this->tablePerGroup = ($this->site->tablepergroup == 0 ? false : true);
-		$this->collectionDelayTime = ($this->site->delaytime!= '' ? (int)$this->site->delaytime : 2);
-		$this->crossPostTime = ($this->site->crossposttime!= '' ? (int)$this->site->crossposttime : 2);
-		$this->releaseCreationLimit = ($this->site->maxnzbsprocessed != '' ? (int)$this->site->maxnzbsprocessed : 1000);
-		$this->completion = ($this->site->completionpercent != '' ? (int)$this->site->completionpercent : 0);
-		$this->processRequestIDs = (int)$this->site->lookup_reqids;
+		$this->tablePerGroup = ($this->pdo->getSetting('tablepergroup') == 0 ? false : true);
+		$this->collectionDelayTime = ($this->pdo->getSetting('delaytime') != '' ? (int)$this->pdo->getSetting('delaytime') : 2);
+		$this->crossPostTime = ($this->pdo->getSetting('crossposttime') != '' ? (int)$this->pdo->getSetting('crossposttime') : 2);
+		$this->releaseCreationLimit = ($this->pdo->getSetting('maxnzbsprocessed') != '' ? (int)$this->pdo->getSetting('maxnzbsprocessed') : 1000);
+		$this->completion = ($this->pdo->getSetting('completionpercent') != '' ? (int)$this->pdo->getSetting('completionpercent') : 0);
+		$this->processRequestIDs = (int)$this->pdo->getSetting('lookup_reqids');
 		if ($this->completion > 100) {
 			$this->completion = 100;
 			echo $this->pdo->log->error(PHP_EOL . 'You have an invalid setting for completion. It must be lower than 100.');
@@ -154,9 +154,9 @@ class ProcessReleases
 			$this->pdo->log->doEcho($this->pdo->log->header("Starting release update process (" . date('Y-m-d H:i:s') . ")"), true);
 		}
 
-		if (!file_exists($this->site->nzbpath)) {
+		if (!file_exists($this->pdo->getSetting('nzbpath'))) {
 			if ($this->echoCLI) {
-				$this->pdo->log->doEcho($this->pdo->log->error('Bad or missing nzb directory - ' . $this->site->nzbpath), true);
+				$this->pdo->log->doEcho($this->pdo->log->error('Bad or missing nzb directory - ' . $this->pdo->getSetting('nzbpath')), true);
 			}
 
 			return 0;
@@ -393,9 +393,9 @@ class ProcessReleases
 
 		$minSizeDeleted = $maxSizeDeleted = $minFilesDeleted = 0;
 
-		$maxSizeSetting = $this->site->maxsizetoformrelease;
-		$minSizeSetting = $this->site->minsizetoformrelease;
-		$minFilesSetting = $this->site->minfilestoformrelease;
+		$maxSizeSetting = $this->pdo->getSetting('maxsizetoformrelease');
+		$minSizeSetting = $this->pdo->getSetting('minsizetoformrelease');
+		$minFilesSetting = $this->pdo->getSetting('minfilestoformrelease');
 
 		foreach ($groupIDs as $groupID) {
 			if ($this->pdo->queryOneRow(
@@ -721,7 +721,7 @@ class ProcessReleases
 	 */
 	public function processRequestIDs($groupID = '', $limit = 5000, $local = true)
 	{
-		if ($local === false && $this->site->lookup_reqids == 0) {
+		if ($local === false && $this->pdo->getSetting('lookup_reqids') == 0) {
 			return;
 		}
 
@@ -852,7 +852,7 @@ class ProcessReleases
 			sprintf(
 				'DELETE FROM %s WHERE dateadded < (NOW() - INTERVAL %d HOUR) %s',
 				$group['cname'],
-				$this->site->rawretentiondays,
+				$this->pdo->getSetting('rawretentiondays'),
 				(!empty($groupID) && $this->tablePerGroup === false ? ' AND group_id = ' . $groupID : '')
 			)
 		);
@@ -1028,9 +1028,9 @@ class ProcessReleases
 			$groupIDs = [['id' => $groupID]];
 		}
 
-		$maxSizeSetting = $this->site->maxsizetoformrelease;
-		$minSizeSetting = $this->site->minsizetoformrelease;
-		$minFilesSetting = $this->site->minfilestoformrelease;
+		$maxSizeSetting = $this->pdo->getSetting('maxsizetoformrelease');
+		$minSizeSetting = $this->pdo->getSetting('minsizetoformrelease');
+		$minFilesSetting = $this->pdo->getSetting('minfilestoformrelease');
 
 		foreach ($groupIDs as $groupID) {
 			$releases = $this->pdo->queryDirect(
@@ -1127,11 +1127,11 @@ class ProcessReleases
 		}
 
 		// Releases past retention.
-		if ($this->site->releaseretentiondays != 0) {
+		if ($this->pdo->getSetting('releaseretentiondays') != 0) {
 			$releases = $this->pdo->queryDirect(
 				sprintf(
 					'SELECT id, guid FROM releases WHERE postdate < (NOW() - INTERVAL %d DAY)',
-					$this->site->releaseretentiondays
+					$this->pdo->getSetting('releaseretentiondays')
 				)
 			);
 			if ($releases instanceof \Traversable) {
@@ -1143,7 +1143,7 @@ class ProcessReleases
 		}
 
 		// Passworded releases.
-		if ($this->site->deletepasswordedrelease == 1) {
+		if ($this->pdo->getSetting('deletepasswordedrelease') == 1) {
 			$releases = $this->pdo->queryDirect(
 				sprintf(
 					'SELECT id, guid FROM releases WHERE passwordstatus = %d',
@@ -1159,7 +1159,7 @@ class ProcessReleases
 		}
 
 		// Possibly passworded releases.
-		if ($this->site->deletepossiblerelease == 1) {
+		if ($this->pdo->getSetting('deletepossiblerelease') == 1) {
 			$releases = $this->pdo->queryDirect(
 				sprintf(
 					'SELECT id, guid FROM releases WHERE passwordstatus = %d',
@@ -1277,7 +1277,7 @@ class ProcessReleases
 		}
 
 		// Misc other.
-		if ($this->site->miscotherretentionhours > 0) {
+		if ($this->pdo->getSetting('miscotherretentionhours') > 0) {
 			$releases = $this->pdo->queryDirect(
 				sprintf('
 					SELECT id, guid
@@ -1285,7 +1285,7 @@ class ProcessReleases
 					WHERE categoryid = %d
 					AND adddate <= NOW() - INTERVAL %d HOUR',
 					\Category::CAT_MISC_OTHER,
-					$this->site->miscotherretentionhours
+					$this->pdo->getSetting('miscotherretentionhours')
 				)
 			);
 			if ($releases instanceof \Traversable) {
@@ -1297,7 +1297,7 @@ class ProcessReleases
 		}
 
 		// Misc hashed.
-		if ($this->site->mischashedretentionhours > 0) {
+		if ($this->pdo->getSetting('mischashedretentionhours') > 0) {
 			$releases = $this->pdo->queryDirect(
 				sprintf('
 					SELECT id, guid
@@ -1305,7 +1305,7 @@ class ProcessReleases
 					WHERE categoryid = %d
 					AND adddate <= NOW() - INTERVAL %d HOUR',
 					\Category::CAT_MISC_HASHED,
-					$this->site->mischashedretentionhours
+					$this->pdo->getSetting('mischashedretentionhours')
 				)
 			);
 			if ($releases instanceof \Traversable) {

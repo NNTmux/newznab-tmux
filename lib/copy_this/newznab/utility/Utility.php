@@ -1,6 +1,9 @@
 <?php
 namespace newznab\utility;
 
+use newznab\db\Settings;
+use ColorCLI;
+
 
 /**
  * Class Utility
@@ -138,6 +141,13 @@ class Utility
 		return $files;
 	}
 
+	public static function getValidVersionsFile()
+	{
+		$versions = new Versions();
+
+		return $versions->getValidVersionsFile();
+	}
+
 	/**
 	 * Detect if the command is accessible on the system.
 	 *
@@ -190,6 +200,29 @@ class Utility
 		}
 
 		return ($gzipped);
+	}
+
+	public static function isPatched(Settings $pdo = null)
+	{
+		$versions = self::getValidVersionsFile();
+
+		if (!($pdo instanceof Settings)) {
+			$pdo = new Settings();
+		}
+		$patch = $pdo->getSetting(['section' => '', 'subsection' => '', 'name' => 'sqlpatch']);
+		$ver = $versions->versions->sql->file;
+
+		// Check database patch version
+		if ($patch < $ver) {
+			$message = "\nYour database is not up to date. Reported patch levels\n   Db: $patch\nfile: $ver\nPlease update.\n php " .
+				NN_ROOT . "cli/update_db.php true\n";
+			if (self::isCLI()) {
+				echo (new ColorCLI())->error($message);
+			}
+			throw new \RuntimeException($message);
+		}
+
+		return true;
 	}
 
 	static public function isWin()

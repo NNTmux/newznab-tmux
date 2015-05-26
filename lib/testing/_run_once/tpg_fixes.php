@@ -28,9 +28,9 @@ if (!isset($argv[1]) || !in_array($argv[1], ['1'])) {
 
 require_once(dirname(__FILE__) . "/../../../bin/config.php");
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
-$pdo = new DB();
+$pdo = new Settings();
 $s = new Sites();
 $site = $s->get();
 

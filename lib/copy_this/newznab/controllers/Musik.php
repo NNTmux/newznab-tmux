@@ -1,5 +1,5 @@
 <?php
-use newznab\db\DB;
+use newznab\db\Settings;
 use newznab\libraries\ApaiIO\Configuration\GenericConfiguration;
 use newznab\libraries\ApaiIO\Operations\Search;
 use newznab\libraries\ApaiIO\ApaiIO;
@@ -10,7 +10,7 @@ use newznab\libraries\ApaiIO\ApaiIO;
 class Musik
 {
 	/**
-	 * @var newznab\db\DB
+	 * @var newznab\db\Settings
 	 */
 	public $pdo;
 
@@ -69,15 +69,15 @@ class Musik
 		$s = new Sites();
 		$this->site = $s->get();
 
-		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
-		$this->pubkey = $this->site->amazonpubkey;
-		$this->privkey = $this->site->amazonprivkey;
-		$this->asstag = $this->site->amazonassociatetag;
-		$this->musicqty = ($this->site->maxmusicprocessed != '') ? $this->site->maxmusicprocessed : 150;
-		$this->sleeptime = ($this->site->amazonsleep != '') ? $this->site->amazonsleep : 1000;
+		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
+		$this->pubkey = $this->pdo->getSetting('amazonpubkey');
+		$this->privkey = $this->pdo->getSetting('amazonprivkey');
+		$this->asstag = $this->pdo->getSetting('amazonassociatetag');
+		$this->musicqty = ($this->pdo->getSetting('maxmusicprocessed') != '') ? $this->pdo->getSetting('maxmusicprocessed') : 150;
+		$this->sleeptime = ($this->pdo->getSetting('amazonsleep') != '') ? $this->pdo->getSetting('amazonsleep') : 1000;
 		$this->imgSavePath = NN_COVERS . 'music' . DS;
 		$this->renamed = '';
-		if ($this->site->lookupmusic == 2) {
+		if ($this->pdo->getSetting('lookupmusic') == 2) {
 			$this->renamed = 'AND isrenamed = 1';
 		}
 	}

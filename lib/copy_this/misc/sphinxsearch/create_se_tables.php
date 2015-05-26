@@ -1,7 +1,7 @@
 <?php
 require dirname(__FILE__) . '/../../www/config.php';
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 
 if (NN_RELEASE_SEARCH_TYPE != \ReleaseSearch::SPHINX) {
@@ -12,7 +12,7 @@ if (!isset($argv[1]) || !isset($argv[2]) || !is_numeric($argv[2])) {
 	exit('Argument 1 must the hostname or IP to the Sphinx searchd server, Argument 2 must be the port to the Sphinx searchd server.' . PHP_EOL);
 }
 
-$pdo = new DB();
+$pdo = new Settings();
 
 $sphinxConnection = sprintf('%s:%d', $argv[1], $argv[2]);
 

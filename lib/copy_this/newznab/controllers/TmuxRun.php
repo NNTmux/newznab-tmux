@@ -9,9 +9,9 @@ class TmuxRun extends Tmux
 	protected $_dateFormat;
 
 	/**
-	 * @param newznab\db\DB $pdo
+	 * @param newznab\db\Settings $pdo
 	 */
-	public function __construct(newznab\db\DB $pdo = null)
+	public function __construct(newznab\db\Settings $pdo = null)
 	{
 		parent::__construct($pdo);
 		$this->_dateFormat = '%Y-%m-%d %T';

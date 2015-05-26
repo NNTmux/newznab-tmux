@@ -1,7 +1,7 @@
 <?php
 // TODO: bunch of if/elses need converting to switches
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 /*
  *
@@ -14,7 +14,7 @@ use newznab\db\DB;
  * release has been created
  *
  */
-$pdo = new DB();
+$pdo = new Settings();
 
 if (!(isset($argv[1]) && ($argv[1] == "all" || $argv[1] == "full" || $argv[1] == "preid" || is_numeric($argv[1])))) {
 	exit($pdo->log->error(

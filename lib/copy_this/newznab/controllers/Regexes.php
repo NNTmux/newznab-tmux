@@ -1,11 +1,11 @@
 <?php
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 class Regexes
 {
 	/**
-	 * @var \newznab\db\DB
+	 * @var \newznab\db\Settings
 	 */
 	public $pdo;
 
@@ -35,7 +35,7 @@ class Regexes
 		];
 		$options += $defaults;
 
-		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
 		$this->tableName = $options['Table_Name'];
 	}
 
