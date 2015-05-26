@@ -141,7 +141,7 @@ FETCHING
 
 	3. Consider fetching your own posts back just to test things out...:
 
-			SET @key := (SELECT value FROM site WHERE setting = 'spotnabsitepubkey');
+			SET @key := (SELECT value FROM settings WHERE setting = 'spotnabsitepubkey');
 			INSERT INTO  `spotnabsources` (`ID` , `username`, `useremail` ,
 				`usenetgroup`, `publickey` , `active` ,
 				`description` , `lastupdate` )

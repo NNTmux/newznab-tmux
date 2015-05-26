@@ -244,7 +244,7 @@ class Releases
 		}
 		$setting = $this->pdo->queryOneRow(
 			"SELECT value
-			FROM site
+			FROM settings
 			WHERE setting = 'showpasswordedrelease'"
 		);
 		$passwordStatus = ('= ' . \Releases::PASSWD_NONE);

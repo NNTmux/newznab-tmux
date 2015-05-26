@@ -9,7 +9,7 @@ use newznab\utility\Utility;
 
 $pdo = new Settings();
 
-$row = $pdo->queryOneRow("SELECT value FROM site WHERE setting = 'coverspath'");
+$row = $pdo->queryOneRow("SELECT value FROM settings WHERE setting = 'coverspath'");
 if ($row !== false) {
 	Utility::setCoversConstant($row['value']);
 } else {
