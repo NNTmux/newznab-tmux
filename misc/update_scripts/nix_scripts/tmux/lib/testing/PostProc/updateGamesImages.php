@@ -11,7 +11,7 @@ if ($argc == 1 || $argv[1] != 'true') {
 	exit($pdo->log->error("\nThis script will check all images in covers/games and compare to db->gamesinfo.\nTo run:\nphp $argv[0] true\n"));
 }
 
-$row = $pdo->queryOneRow("SELECT value FROM site WHERE setting = 'coverspath'");
+$row = $pdo->queryOneRow("SELECT value FROM settings WHERE setting = 'coverspath'");
 if ($row !== false) {
 	Utility::setCoversConstant($row['value']);
 } else {

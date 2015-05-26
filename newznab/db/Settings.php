@@ -289,7 +289,7 @@ class Settings extends DB
 	protected function _getFromSites($options)
 	{
 		$setting = empty($options['setting']) ? $options['name'] : $options['setting'];
-		$sql     = 'SELECT value FROM site ';
+		$sql     = 'SELECT value FROM settings ';
 		if (!empty($setting)) {
 			$sql .= "WHERE setting = '$setting'";
 		}

@@ -943,7 +943,7 @@ class Sphinx
                           . "LEFT OUTER JOIN predb pre "
                           . "ON pre.id = releases.preid "
                           . "WHERE releases.passwordstatus <= (SELECT value "
-                          .      "FROM site WHERE setting='showpasswordedrelease') "
+                          .      "FROM settings WHERE setting='showpasswordedrelease') "
                           . "AND releases.id IN (%s)";
         }
 
@@ -1018,7 +1018,7 @@ class Sphinx
                           . "LEFT OUTER JOIN category cp "
                           . "ON cp.id = c.parentid "
                           . "WHERE releases.passwordstatus <= (SELECT value "
-                          .      "FROM site WHERE setting='showpasswordedrelease') "
+                          .      "FROM settings WHERE setting='showpasswordedrelease') "
                           . "AND releases.id IN (%s)";
         }
         $sphinxQuery = $this->buildQuery($search, $cat, $offset, $limit, $order,
@@ -1084,7 +1084,7 @@ class Sphinx
                           . "LEFT OUTER JOIN movieinfo "
                           . "ON releases.imdbid = movieinfo.imdbid "
                           . "WHERE releases.passwordstatus <= (SELECT value "
-                          .      "FROM site WHERE setting='showpasswordedrelease') "
+                          .      "FROM settings WHERE setting='showpasswordedrelease') "
                           . "AND releases.id IN (%s)";
         }
         $sphinxQuery = $this->buildQuery($search, $cat, $offset, $limit, $order,
@@ -1162,7 +1162,7 @@ class Sphinx
                           . "LEFT OUTER JOIN category cp "
                           . "ON cp.id = c.parentid "
                           . "WHERE releases.passwordstatus <= (SELECT value "
-                          .      "FROM site WHERE setting='showpasswordedrelease') "
+                          .      "FROM settings WHERE setting='showpasswordedrelease') "
                           . "AND releases.id IN (%s)";
         }
         $sphinxQuery = $this->buildQuery($search, $cat, $offset, $limit, $order,
@@ -1223,7 +1223,7 @@ class Sphinx
 		                  . "LEFT OUTER JOIN category cp "
 		                  . "ON cp.id = c.parentid "
 		                  . "WHERE releases.passwordstatus <= (SELECT value "
-		                  .     "FROM site WHERE setting='showpasswordedrelease')"
+		                  .     "FROM settings WHERE setting='showpasswordedrelease')"
 		                  . "AND releases.id IN (%s)";
 		}
 
@@ -1275,7 +1275,7 @@ class Sphinx
 			              . "LEFT OUTER JOIN category cp "
 			              . "ON cp.id = c.parentid "
 			              . "WHERE releases.passwordstatus <= (SELECT value "
-			              .     "FROM site WHERE setting='showpasswordedrelease')"
+			              .     "FROM settings WHERE setting='showpasswordedrelease')"
 			              . "AND releases.id IN (%s)";
 		}
 		$sphinxQuery = $this->buildQuery($search, array(-1), $offset, $limit,

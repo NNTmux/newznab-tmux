@@ -151,7 +151,7 @@ class Konsole
 				FROM releases r
 				INNER JOIN consoleinfo con ON con.id = r.consoleinfoid AND con.title != '' AND con.cover = 1
 				WHERE r.nzbstatus = 1
-				AND r.passwordstatus <= (SELECT value FROM site WHERE setting='showpasswordedrelease')
+				AND r.passwordstatus <= (SELECT value FROM settings WHERE setting='showpasswordedrelease')
 				AND %s %s %s %s",
 				$this->getBrowseBy(),
 				$catsrch,
@@ -205,7 +205,7 @@ class Konsole
 				. "INNER JOIN consoleinfo con ON con.id = r.consoleinfoid "
 				. "INNER JOIN genres ON con.genreid = genres.id "
 				. "WHERE r.nzbstatus = 1 AND con.title != '' AND "
-				. "r.passwordstatus <= (SELECT value FROM site WHERE setting='showpasswordedrelease') AND %s %s
+				. "r.passwordstatus <= (SELECT value FROM settings WHERE setting='showpasswordedrelease') AND %s %s
 				%s "
 				. "GROUP BY con.id ORDER BY %s %s" . $limit, $browseby, $catsrch, $exccatlist, $order[0], $order[1]
 			)
