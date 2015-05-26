@@ -2,7 +2,7 @@
 
 if (!isset($argv[1]) || $argv[1] !== 'yes') {
 	exit(
-		'This will verify path permissions for crucial locations in nZEDb for the current user running the script.' . PHP_EOL .
+		'This will verify path permissions for crucial locations in newznab-tmux for the current user running the script.' . PHP_EOL .
 		'If a wrong permission is encountered, you will be alerted.' . PHP_EOL .
 		'IT IS STRONGLY RECOMMENDED you run this against your apache/nginx user, in addition to your normal CLI user.' . PHP_EOL .
 		'On linux you can run it against the apache/nginx user this way: sudo -u www-data php verify_permissions.php yes' . PHP_EOL .
@@ -40,8 +40,6 @@ $folders = [
 	NN_RES										=> [R, W, E],
 	NN_RES . 'db'								=> [R, E],
 	NN_RES . 'db' . DS . 'patches'				=> [R, E],
-	NN_RES . 'db' . DS . 'schema'				=> [R, E],
-	NN_RES . 'db' . DS . 'schema' . DS . 'data'	=> [R, E],
 	NN_RES . 'nzb'								=> [R],
 	NN_LOGS										=> [R, W],
 	NN_TMP										=> [R, W],
