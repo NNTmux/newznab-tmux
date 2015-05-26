@@ -190,8 +190,8 @@ if (isset($os) && $os == "unix") {
 }
 
 if ($patched == 0) {
-	exit($c->info("Nothing to patch, you are already on patch version " . $currentversion));
+	exit($c->info("After patch 149 this file is no longer used.Nothing to patch, you are already on patch version " . $currentversion));
 }
 if ($patched > 0) {
-	echo $c->header($patched . " patch(es) applied.");
+	echo $c->header($patched . " patch(es) applied. After patch 149 this file is no longer used");
 }
