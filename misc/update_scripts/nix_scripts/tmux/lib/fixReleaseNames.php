@@ -7,7 +7,7 @@
  * If you used the 4th argument yes, but you want to reset the status,
  * there is another script called resetRelnameStatus.php
  */
-require_once(dirname(__FILE__)."/../bin/config.php");
+require_once(dirname(__FILE__) . "/../bin/config.php");
 
 use newznab\db\Settings;
 

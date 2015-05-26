@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+# Add changes.
+git add -i
+
+# Edit changelog.
+nano Changelog
+
+# Add changes to changelog.
+git add Changelog
+
+# Commit changes.
+git commit
