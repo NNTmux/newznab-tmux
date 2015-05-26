@@ -98,9 +98,6 @@ class Games
 			'Settings' => null,
 		];
 		$options += $defaults;
-
-		$s = new Sites();
-		$this->site = $s->get();
 		$this->echoOutput = ($options['Echo'] && NN_ECHOCLI);
 
 		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
@@ -175,7 +172,7 @@ class Games
 				WHERE r.nzbstatus = 1
 				AND con.title != ''
 				AND con.cover = 1
-				AND r.passwordstatus <= (SELECT value FROM site WHERE setting='showpasswordedrelease')
+				AND r.passwordstatus <= (SELECT value FROM settings WHERE setting='showpasswordedrelease')
 				AND %s %s %s %s",
 				$this->getBrowseBy(),
 				$catsrch,
@@ -236,7 +233,7 @@ class Games
 				. "LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id "
 				. "INNER JOIN gamesinfo con ON con.id = r.gamesinfo_id "
 				. "WHERE r.nzbstatus = 1 AND con.title != '' AND "
-				. "r.passwordstatus <= (SELECT value FROM site WHERE setting='showpasswordedrelease') AND %s %s %s %s "
+				. "r.passwordstatus <= (SELECT value FROM settings WHERE setting='showpasswordedrelease') AND %s %s %s %s "
 				. "GROUP BY con.id ORDER BY %s %s" . $limit,
 				$browseby,
 				$catsrch,
