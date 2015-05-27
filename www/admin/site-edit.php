@@ -2,6 +2,8 @@
 
 require_once './config.php';
 
+use newznab\db\Settings;
+
 $page = new AdminPage();
 $sites = new Sites();
 $id = 0;
@@ -19,20 +21,20 @@ switch($action)
 				implode(', ', $_POST['book_reqids']) : $_POST['book_reqids'];
 		}
 		$error = "";
-		$ret = $sites->update($_POST);
+		$ret = $page->settings->update($_POST);
 		if (is_int($ret))
 		{
-			if ($ret == Sites::ERR_BADUNRARPATH)
+			if ($ret == Settings::ERR_BADUNRARPATH)
 				$error = "The unrar path does not point to a valid binary";
-			elseif ($ret == Sites::ERR_BADFFMPEGPATH)
+			elseif ($ret == Settings::ERR_BADFFMPEGPATH)
 				$error = "The ffmpeg path does not point to a valid binary";
-			elseif ($ret == Sites::ERR_BADMEDIAINFOPATH)
+			elseif ($ret == Settings::ERR_BADMEDIAINFOPATH)
 				$error = "The mediainfo path does not point to a valid binary";
-			elseif ($ret == Sites::ERR_BADNZBPATH)
+			elseif ($ret == Settings::ERR_BADNZBPATH)
 				$error = "The nzb path does not point to a valid directory";
-			elseif ($ret == Sites::ERR_DEEPNOUNRAR)
+			elseif ($ret == Settings::ERR_DEEPNOUNRAR)
 				$error = "Deep password check requires a valid path to unrar binary";
-			elseif ($ret == Sites::ERR_BADTMPUNRARPATH)
+			elseif ($ret == Settings::ERR_BADTMPUNRARPATH)
 				$error = "The temp unrar path is not a valid directory";
 			elseif ($ret == Sites::ERR_BADLAMEPATH)
 				$error = "The lame path is not a valid directory";
@@ -70,6 +72,21 @@ $page->smarty->assign('yesno_names', array( 'Yes', 'No'));
 $page->smarty->assign('passwd_ids', array(1,0));
 $page->smarty->assign('passwd_names', array( 'Deep (requires unrar)', 'None'));
 
+/*0 = English, 2 = Danish, 3 = French, 1 = German*/
+$page->smarty->assign('langlist_ids', [0, 2, 3, 1]);
+$page->smarty->assign('langlist_names', ['English', 'Danish', 'French', 'German']);
+
+$page->smarty->assign('imdblang_ids',
+	[
+		'en', 'da', 'nl', 'fi', 'fr', 'de', 'it', 'tlh', 'no', 'po', 'ru', 'es',
+		'sv'
+	]);
+$page->smarty->assign('imdblang_names',
+	[
+		'English', 'Danish', 'Dutch', 'Finnish', 'French', 'German', 'Italian',
+		'Klingon', 'Norwegian', 'Polish', 'Russian', 'Spanish', 'Swedish'
+	]);
+
 $page->smarty->assign('sabintegrationtype_ids', array(SABnzbd::INTEGRATION_TYPE_USER, SABnzbd::INTEGRATION_TYPE_SITEWIDE, SABnzbd::INTEGRATION_TYPE_NONE));
 $page->smarty->assign('sabintegrationtype_names', array( 'User', 'Site-wide', 'None (Off)'));
 
@@ -83,7 +100,7 @@ $page->smarty->assign('curlproxytype_names', array( '', 'HTTP', 'SOCKS5'));
 
 $page->smarty->assign('newgroupscan_names', array('Days','Posts'));
 
-$page->smarty->assign('registerstatus_ids', array(Sites::REGISTER_STATUS_API_ONLY, Sites::REGISTER_STATUS_OPEN, Sites::REGISTER_STATUS_INVITE, Sites::REGISTER_STATUS_CLOSED));
+$page->smarty->assign('registerstatus_ids', array(Settings::REGISTER_STATUS_API_ONLY, Settings::REGISTER_STATUS_OPEN, Settings::REGISTER_STATUS_INVITE, Settings::REGISTER_STATUS_CLOSED));
 $page->smarty->assign('registerstatus_names', array('API Only', 'Open', 'Invite', 'Closed'));
 
 $page->smarty->assign('passworded_ids', array(0,1,2));
@@ -134,7 +151,7 @@ $book_reqids_ids = array_map(create_function('$value', 'return (int)$value;'), $
 $page->smarty->assign('book_reqids_ids', $book_reqids_ids);
 $page->smarty->assign('book_reqids_names', $book_reqids_names);
 
-// convert from a list to an array as we need to use an array, but teh sites table only saves strings
+// convert from a list to an array as we need to use an array, but teh Settings table only saves strings
 $books_selected = explode(",", $page->site->book_reqids);
 
 // convert from a string array to an int array
