@@ -1214,6 +1214,7 @@ INSERT INTO `site` (`setting`, `value`) VALUES
   ('lookupxxx', 1),
   ('maxxxxprocessed', 100),
   ('rottentomatoquality', 'profile'),
+  ('sqlpatch', 73),
   ('anidbkey', '');
 
 ALTER TABLE animetitles CHANGE createddate unixtime INT(12) UNSIGNED NOT NULL;
