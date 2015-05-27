@@ -8,9 +8,7 @@ $debug = false;
 $pdo = new Settings();
 $groups = new \Groups(['Settings' => $pdo]);
 $consoletools = new \ConsoleTools(['ColorCLI' => $pdo->log]);
-$s = new Sites();
-$site = $s->get();
-$DoPartRepair = ($site->partrepair == '0') ? false : true;
+$DoPartRepair = ($pdo->getSetting('partrepair') == '0') ? false : true;
 
 if ((!isset($argv[1])) || $argv[1] != 'true') {
 	exit($pdo->log->error("\nMandatory argument missing\n\n"
@@ -151,7 +149,7 @@ if (isset($argv[2]) && $argv[2] == 'delete') {
 	echo "Complete.\n";
 }
 // Update TPG setting in site-edit.
-$pdo->queryExec('UPDATE site SET value = 1 where setting = \'tablepergroup\';');
+$pdo->queryExec('UPDATE settings SET value = 1 where setting = \'tablepergroup\';');
 $pdo->queryExec('UPDATE tmux SET value = 2 where setting = \'releases\';');
 echo "New tables have been created.\nTable Per Group has been set to  to \"TRUE\" in site-edit.\nUpdate Releases has been set to Threaded in tmux-edit.\n";
 
