@@ -14,7 +14,9 @@ CREATE INDEX ix_releasesearch_guid ON releasesearch (guid);
 
 ALTER TABLE `releases`
 ADD `proc_filenames` BIT NOT NULL DEFAULT 0;
-
+DROP TRIGGER IF EXISTS insert_search;
+DROP TRIGGER IF EXISTS update_search;
+DROP TRIGGER IF EXISTS delete_search;
 CREATE TRIGGER insert_search AFTER INSERT ON releases FOR EACH ROW BEGIN INSERT INTO releasesearch (releaseid, guid, name, searchname) VALUES (NEW.id, NEW.guid, NEW.name, NEW.searchname);END;
 CREATE TRIGGER update_search AFTER UPDATE ON releases FOR EACH ROW BEGIN IF NEW.guid != OLD.guid THEN UPDATE releasesearch SET guid = NEW.guid WHERE releaseid = OLD.id; END IF; IF NEW.name != OLD.name THEN UPDATE releasesearch SET name = NEW.name WHERE releaseid = OLD.id; END IF; IF NEW.searchname != OLD.searchname THEN UPDATE releasesearch SET searchname = NEW.searchname WHERE releaseid = OLD.id; END IF;END;
 CREATE TRIGGER delete_search AFTER DELETE ON releases FOR EACH ROW BEGIN DELETE FROM releasesearch WHERE releaseid = OLD.id;END;
