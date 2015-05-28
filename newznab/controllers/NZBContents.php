@@ -1,6 +1,6 @@
 <?php
 
-use newznab\db\DB;
+use newznab\db\Settings;
 use \newznab\processing\PProcess;
 use newznab\utility\Utility;
 
@@ -12,7 +12,7 @@ use newznab\utility\Utility;
 Class NZBContents
 {
 	/**
-	 * @var newznab\db\DB
+	 * @var newznab\db\Settings
 	 * @access protected
 	 */
 	public $pdo;
@@ -68,7 +68,7 @@ Class NZBContents
 	 *         'NNTP'        => NNTP        ; Class NNTP.
 	 *         'Nfo'         => Nfo         ; Class Info.
 	 *         'NZB'         => NZB         ; Class NZB.
-	 *         'Settings'    => DB          ; Class newznab\db\DB.
+	 *         'Settings'    => DB          ; Class newznab\db\Settings.
 	 *         'PostProcess' => PProcess ; Class PProcess.
 	 *     )
 	 *
@@ -87,7 +87,7 @@ Class NZBContents
 		$options += $defaults;
 
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
-		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
 		$this->nntp = ($options['NNTP'] instanceof \NNTP ? $options['NNTP'] : new \NNTP(['Echo' => $this->echooutput, 'Settings' => $this->pdo]));
 		$this->nfo = ($options['Nfo'] instanceof \Info ? $options['Nfo'] : new \Info(['Echo' => $this->echooutput, 'Settings' => $this->pdo]));
 		$this->pp = (
@@ -98,10 +98,8 @@ Class NZBContents
 		$this->nzb = ($options['NZB'] instanceof \NZB ? $options['NZB'] : new \NZB($this->pdo));
 		$t = new Tmux();
 		$this->tmux = $t->get();
-		$s = new Sites();
-		$this->site = $s->get();
 		$this->lookuppar2 = ($this->tmux->lookuppar2 == 1 ? true : false);
-		$this->alternateNNTP = ($this->site->alternate_nntp == 1 ? true : false);
+		$this->alternateNNTP = ($this->pdo->getSetting('alternate_nntp') == 1 ? true : false);
 	}
 
 	/**

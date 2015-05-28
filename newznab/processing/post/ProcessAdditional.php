@@ -4,7 +4,7 @@ namespace newznab\processing\post;
 require_once NN_LIBS . 'rarinfo/archiveinfo.php';
 require_once NN_LIBS . 'rarinfo/par2info.php';
 
-use newznab\db\DB;
+use newznab\db\Settings;
 use newznab\utility\Utility;
 
 class ProcessAdditional
@@ -17,7 +17,7 @@ class ProcessAdditional
 	const maxCompressedFilesToCheck = 20;
 
 	/**
-	 * @var \newznab\db\DB
+	 * @var \newznab\db\Settings
 	 */
 	public $pdo;
 
@@ -284,7 +284,7 @@ class ProcessAdditional
 		$this->_echoCLI = ($options['Echo'] && NN_ECHOCLI && (strtolower(PHP_SAPI) === 'cli'));
 		$this->_echoDebug = NN_DEBUG;
 
-		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
 		$this->_nntp = ($options['NNTP'] instanceof \NNTP ? $options['NNTP'] : new \NNTP(['Echo' => $this->_echoCLI, 'Settings' => $this->pdo]));
 
 		$this->_nzb = ($options['NZB'] instanceof \Enzebe ? $options['NZB'] : new \Enzebe($this->pdo));

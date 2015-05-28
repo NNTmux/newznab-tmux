@@ -2,10 +2,10 @@
 
 require_once("config.php");
 
-use newznab\db\DB;
+use newznab\db\Settings;
 $page = new AdminPage();
 
-$db = new DB;
+$db = new Settings;
 $tablelist = $db->optimise();
 
 $page->title = "DB Table Optimise";

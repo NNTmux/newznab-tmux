@@ -1,11 +1,11 @@
 <?php
 require_once(dirname(__FILE__) . "/../../../bin/config.php");
 
-use newznab\db\DB;
+use newznab\db\Settings;
 use newznab\utility\Utility;
 
 Utility::clearScreen();
-$pdo = new DB();
+$pdo = new Settings();
 
 if (!isset($argv[1]) || (isset($argv[1]) && $argv[1] !== 'true'))
 	exit($pdo->log->error("\nThis script removes all releases and release related files. To run:\nphp resetdb.php true\n"));
@@ -57,7 +57,7 @@ foreach ($tables as $row) {
 (new \SphinxSearch())->truncateRTIndex('releases_rt');
 
 $pdo->optimise(false, 'full');
-$s = new Sites();
+$s = new Settings();
 $site = $s->get();
 
 echo $pdo->log->header("Deleting nzbfiles subfolders.");

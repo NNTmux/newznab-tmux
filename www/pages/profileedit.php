@@ -6,7 +6,7 @@ $category = new Category;
 $sab = new SABnzbd($page);
 $nzbGet = new NZBGet($page);
 $users = new Users();
-$s = new Sites();
+$s = new Settings();
 $site = $s->get();
 
 if (!$users->isLoggedIn())

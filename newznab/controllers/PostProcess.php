@@ -2,7 +2,7 @@
 require_once NN_LIBS . 'rarinfo/par2info.php';
 require_once NN_LIBS . 'rarinfo/archiveinfo.php';
 
-use newznab\db\DB;
+use newznab\db\Settings;
 use newznab\utility\Utility;
 
 /**
@@ -12,7 +12,7 @@ class PostProcess
 {
 
 	/**
-	 * @var newznab\db\DB
+	 * @var newznab\db\Settings
 	 */
 	public $pdo;
 
@@ -29,12 +29,10 @@ class PostProcess
 	public function __construct($echooutput = false)
 	{
 		$this->echooutput = (NN_ECHOCLI && $echooutput);;
-		$s = new \Sites();
-		$this->site = $s->get();
-		$this->pdo = new DB();
+		$this->pdo = new Settings();
 		$this->mediafileregex = 'AVI|VOB|MKV|MP4|TS|WMV|MOV|M4V|F4V|MPG|MPEG|M2TS';
 		$this->audiofileregex = 'MP3|AAC|OGG';
-		$this->mp3SavePath = WWW_DIR.'covers/audio/';
+		$this->mp3SavePath = NN_COVERS .'audio' . DS;
 	}
 
 	/**
@@ -64,7 +62,7 @@ class PostProcess
 		//
 		// Delete any passworded releases
 		//
-		if($this->site->deletepasswordedrelease == 1)
+		if($this->pdo->getSetting('deletepasswordedrelease') == 1)
 		{
 			echo "PostPrc : Removing unwanted releases\n";
 			$result = $this->pdo->query("select id from releases where passwordstatus > 0");
@@ -75,11 +73,11 @@ class PostProcess
 		//
 		// Delete any releases which are older than site's release retention days
 		//
-		if($this->site->releaseretentiondays != 0)
+		if($this->pdo->getSetting('releaseretentiondays') != 0)
 		{
-			echo "PostPrc : Deleting releases older than ".$this->site->releaseretentiondays." days\n";
+			echo "PostPrc : Deleting releases older than ".$this->pdo->getSetting('releaseretentiondays')." days\n";
 
-			$result = $this->pdo->query(sprintf("select id from releases where postdate < %s - interval %d day", $this->pdo->escapeString($currTime_ori["now"]), $this->site->releaseretentiondays));
+			$result = $this->pdo->query(sprintf("select id from releases where postdate < %s - interval %d day", $this->pdo->escapeString($currTime_ori["now"]), $this->pdo->getSetting('releaseretentiondays')));
 			foreach ($result as $row)
 				$r->delete($row["id"]);
 		}
@@ -87,13 +85,13 @@ class PostProcess
 		//
 		// Delete any audiopreviews older than site->audiopreviewprune days
 		//
-		if($this->site->audiopreviewprune > 0)
+		if($this->pdo->getSetting('audiopreviewprune') > 0)
 		{
-			$result = $this->pdo->query(sprintf("select guid from releases where categoryid in (select id from category where parentid = ".Category::CAT_PARENT_MUSIC.") and haspreview = 2 and adddate < %s - interval %d day", $this->pdo->escapeString($currTime_ori["now"]), $this->site->audiopreviewprune));
+			$result = $this->pdo->query(sprintf("select guid from releases where categoryid in (select id from category where parentid = ".Category::CAT_PARENT_MUSIC.") and haspreview = 2 and adddate < %s - interval %d day", $this->pdo->escapeString($currTime_ori["now"]), $this->pdo->getSetting('audiopreviewprune')));
 
             if (sizeof($result) > 0)
             {
-                echo "PostPrc : Deleting ".count($result)." audio previews older than ".$this->site->audiopreviewprune." days\n";
+                echo "PostPrc : Deleting ".count($result)." audio previews older than ".$this->pdo->getSetting('audiopreviewprune')." days\n";
                 foreach ($result as $row)
                 {
                     $r->updateHasPreview($row["guid"], 0);
@@ -105,7 +103,7 @@ class PostProcess
 		//
 		// Delete any releases suspected of being spam/virus
 		//
-		if($this->site->removespam != 0)
+		if($this->pdo->getSetting('removespam') != 0)
 		{
 			$spamIDs = array();
 
@@ -119,9 +117,9 @@ class PostProcess
 			//
 			// all releases containing exe not in permitted categories
 			//
-			if ($this->site->exepermittedcategories != '')
+			if ($this->pdo->getSetting('exepermittedcategories') != '')
 			{
-				$sql = sprintf("select releasefiles.releaseid as id from releasefiles  inner join releases on releases.id = releasefiles.releaseid  left join releasenfo on releasenfo.releaseid = releases.id  where releasefiles.name like '%%.exe'  and releases.categoryid not in (%s)  group by releasefiles.releaseid", $this->site->exepermittedcategories);
+				$sql = sprintf("select releasefiles.releaseid as id from releasefiles  inner join releases on releases.id = releasefiles.releaseid  left join releasenfo on releasenfo.releaseid = releases.id  where releasefiles.name like '%%.exe'  and releases.categoryid not in (%s)  group by releasefiles.releaseid", $this->pdo->getSetting('exepermittedcategories'));
 				$result = $this->pdo->query($sql);
 				$spamIDs = array_merge($result, $spamIDs);
 			}
@@ -161,7 +159,7 @@ class PostProcess
 	 */
 	public function processNfos()
 	{
-		if ($this->site->lookupnfo == 1)
+		if ($this->pdo->getSetting('lookupnfo') == 1)
 		{
 			$nfo = new Nfo($this->echooutput);
 			$nfo->processNfoFiles(500);
@@ -189,7 +187,7 @@ class PostProcess
 	 */
 	public function processMovies()
 	{
-		if ($this->site->lookupimdb == 1)
+		if ($this->pdo->getSetting('lookupimdb') == 1)
 		{
 			$movie = new Movie($this->echooutput);
 			$movie->processMovieReleases();
@@ -201,7 +199,7 @@ class PostProcess
 	 */
 	public function processMusic()
 	{
-		if ($this->site->lookupmusic == 1)
+		if ($this->pdo->getSetting('lookupmusic') == 1)
 		{
 			$music = new Music($this->echooutput);
 			$music->processMusicReleases();
@@ -213,7 +211,7 @@ class PostProcess
 	 */
 	public function processBooks()
 	{
-		if ($this->site->lookupbooks == 1)
+		if ($this->pdo->getSetting('lookupbooks') == 1)
 		{
 			$book = new Book($this->echooutput);
 			$book->processBookReleases();
@@ -225,7 +223,7 @@ class PostProcess
 	 */
 	public function processGames()
 	{
-		if ($this->site->lookupgames == 1)
+		if ($this->pdo->getSetting('lookupgames') == 1)
 		{
 			$console = new Console($this->echooutput);
 			$console->processConsoleReleases();
@@ -261,20 +259,20 @@ class PostProcess
 	 */
 	public function processTv()
 	{
-		if ($this->site->lookupanidb == 1)
+		if ($this->pdo->getSetting('lookupanidb') == 1)
 		{
 			$anidb = new AniDB($this->echooutput);
 			$anidb->animetitlesUpdate();
 			$anidb->processAnimeReleases();
 		}
 
-		if ($this->site->lookuptvrage == 1)
+		if ($this->pdo->getSetting('lookuptvrage') == 1)
 		{
 			$tvrage = new TVRage($this->echooutput);
-			$tvrage->processTvReleases(($this->site->lookuptvrage==1));
+			$tvrage->processTvReleases(($this->pdo->getSetting('lookuptvrage') == 1));
 		}
 
-		if ($this->site->lookupthetvdb == 1)
+		if ($this->pdo->getSetting('lookupthetvdb') == 1)
 		{
 			$thetvdb = new TheTVDB($this->echooutput);
 			$thetvdb->processReleases();
@@ -287,20 +285,20 @@ class PostProcess
 	public function processOtherMiscCategory()
 	{
         $p = null;
-        if($this->site->updatecleanup == 1)
+        if($this->pdo->getSetting('updatecleanup') == 1)
         {
             $p = new Parsing(false, true, false);
             $p->cleanup();
         }
 
-        if($this->site->updateparsing == 1)
+        if($this->pdo->getSetting('updateparsing') == 1)
         {
             if ($p == null)
                 $p = new Parsing(false, true, false);
             $p->process();
         }
 
-        if($this->site->removespecial == 1)
+        if($this->pdo->getSetting('removespecial') == 1)
         {
             if ($p == null)
                 $p = new Parsing(false, true, false);
@@ -315,12 +313,12 @@ class PostProcess
 	{
 
 		$maxattemptstocheckpassworded = 5;
-		$processVideoSample = ($this->site->ffmpegpath != '') ? true : false;
-		$processMediainfo = ($this->site->mediainfopath != '') ? true : false;
-		$processPasswords = ($this->site->unrarpath != '') ? true : false;
-		$processAudioSample = ($this->site->saveaudiopreview == 1) ? true : false;
+		$processVideoSample = ($this->pdo->getSetting('ffmpegpath') != '') ? true : false;
+		$processMediainfo = ($this->pdo->getSetting('mediainfopath') != '') ? true : false;
+		$processPasswords = ($this->pdo->getSetting('unrarpath') != '') ? true : false;
+		$processAudioSample = ($this->pdo->getSetting('saveaudiopreview') == 1) ? true : false;
 
-		$tmpPath = $this->site->tmpunrarpath;
+		$tmpPath = $this->pdo->getSetting('tmpunrarpath');
 		if (substr($tmpPath, -strlen( '/' ) ) != '/')
 		{
 			$tmpPath = $tmpPath.'/';
@@ -368,7 +366,7 @@ class PostProcess
                 // only load nzbs and check for rar files if we are doing something with them.
                 if ($processVideoSample || $processMediainfo || $processPasswords || $processAudioSample)
                 {
-                    $nzbfile = $nzb->getNZBPath($rel['guid'], $this->site->nzbpath);
+                    $nzbfile = $nzb->getNZBPath($rel['guid'], $this->pdo->getSetting('nzbpath'));
                     if (!$nzbInfo->loadFromFile($nzbfile))
                     {
                         continue;
@@ -401,7 +399,7 @@ class PostProcess
 
 						file_put_contents($samplefile, $sampleBinary);
 
-						$blnTookSample = $this->getSample($tmpPath, $this->site->ffmpegpath, $rel['guid']);
+						$blnTookSample = $this->getSample($tmpPath, $this->pdo->getSetting('ffmpegpath'), $rel['guid']);
 						if ($blnTookSample)
 							$this->updateReleaseHasPreview($rel['guid']);
 
@@ -432,13 +430,13 @@ class PostProcess
 
 						if ($processVideoSample && $blnTookSample === false)
 						{
-							$blnTookSample = $this->getSample($tmpPath, $this->site->ffmpegpath, $rel['guid']);
+							$blnTookSample = $this->getSample($tmpPath, $this->pdo->getSetting('ffmpegpath'), $rel['guid']);
 							if ($blnTookSample)
 								$this->updateReleaseHasPreview($rel['guid']);
 						}
 
 						if ($processMediainfo)
-							$blnTookMediainfo = $this->getMediainfo($tmpPath, $this->site->mediainfopath, $rel['id']);
+							$blnTookMediainfo = $this->getMediainfo($tmpPath, $this->pdo->getSetting('mediainfopath'), $rel['id']);
 
 						unlink($mediafile);
 					}
@@ -470,23 +468,23 @@ class PostProcess
 							$this->updateReleaseHasPreview($rel['guid'], 2);
 
 						if ($processMediainfo)
-							$blnTookMediainfo = $this->getMediainfo($tmpPath, $this->site->mediainfopath, $rel['id']);
+							$blnTookMediainfo = $this->getMediainfo($tmpPath, $this->pdo->getSetting('mediainfopath'), $rel['id']);
 
-						if ($this->site->lamepath != "")
-							$this->lameAudioSample($this->site->lamepath, $rel['guid']);
+						if ($this->pdo->getSetting('lamepath') != "")
+							$this->lameAudioSample($this->pdo->getSetting('lamepath'), $rel['guid']);
 
 						unlink($audiofile);
 					}
 					unset($audioBinary);
 				}
 
-				if (!empty($nzbInfo->rarfiles) && ($this->site->checkpasswordedrar > 0 || (($processVideoSample || $processAudioSample) && $blnTookSample === false) || $processMediainfo))
+				if (!empty($nzbInfo->rarfiles) && ($this->pdo->getSetting('checkpasswordedrar') > 0 || (($processVideoSample || $processAudioSample) && $blnTookSample === false) || $processMediainfo))
 				{
 					$mysqlkeepalive = 0;
 					foreach($nzbInfo->rarfiles as $rarFile)
 					{
 						//dont process any more rars if a passworded rar has been detected and the site is set to automatically delete them
-						if ($this->site->deletepasswordedrelease == 1 && max($passStatus) == Releases::PASSWD_RAR)
+						if ($this->pdo->getSetting('deletepasswordedrelease') == 1 && max($passStatus) == Releases::PASSWD_RAR)
 						{
 							echo "-Skipping processing of rar {$rarFile['subject']} as this release has already been marked as passworded.\n";
 							continue;
@@ -510,24 +508,24 @@ class PostProcess
 						{
 							$relFiles = $this->processReleaseFiles($fetchedBinary, $rel['id']);
 
-							if ($this->site->checkpasswordedrar > 0 && $processPasswords)
+							if ($this->pdo->getSetting('checkpasswordedrar') > 0 && $processPasswords)
 							{
-								$passStatus[] = $this->processReleasePasswords($fetchedBinary, $tmpPath, $this->site->unrarpath, $this->site->checkpasswordedrar);
+								$passStatus[] = $this->processReleasePasswords($fetchedBinary, $tmpPath, $this->pdo->getSetting('unrarpath'), $this->pdo->getSetting('checkpasswordedrar'));
 							}
 
 							// we need to unrar the fetched binary if checkpasswordedrar wasnt 2
-							if ($this->site->checkpasswordedrar < 2 && $processPasswords)
+							if ($this->pdo->getSetting('checkpasswordedrar') < 2 && $processPasswords)
 							{
 								$rarfile = $tmpPath.'rarfile.rar';
 								file_put_contents($rarfile, $fetchedBinary);
-								$execstring = '"'.$this->site->unrarpath.'" e -ai -ep -c- -id -r -kb -p- -y -inul "'.$rarfile.'" "'.$tmpPath.'"';
+								$execstring = '"'.$this->pdo->getSetting('unrarpath').'" e -ai -ep -c- -id -r -kb -p- -y -inul "'.$rarfile.'" "'.$tmpPath.'"';
 								$output = Utility::runCmd($execstring, false, true);
 								unlink($rarfile);
 							}
 
 							if ($processVideoSample && $blnTookSample === false)
 							{
-								$blnTookSample = $this->getSample($tmpPath, $this->site->ffmpegpath, $rel['guid']);
+								$blnTookSample = $this->getSample($tmpPath, $this->pdo->getSetting('ffmpegpath'), $rel['guid']);
 								if ($blnTookSample)
 									$this->updateReleaseHasPreview($rel['guid']);
 							}
@@ -545,14 +543,14 @@ class PostProcess
 
 							if ($processMediainfo && $blnTookMediainfo === false)
 							{
-								$blnTookMediainfo = $this->getMediainfo($tmpPath, $this->site->mediainfopath, $rel['id']);
+								$blnTookMediainfo = $this->getMediainfo($tmpPath, $this->pdo->getSetting('mediainfopath'), $rel['id']);
 							}
 
 							//
 							// Has to be done after mediainfo
 							//
-							if ($blnTookAudioSample && $this->site->lamepath != "")
-								$this->lameAudioSample($this->site->lamepath, $rel['guid']);
+							if ($blnTookAudioSample && $this->pdo->getSetting('lamepath') != "")
+								$this->lameAudioSample($this->pdo->getSetting('lamepath'), $rel['guid']);
 
 							if ($mysqlkeepalive % 25 == 0)
 								$this->pdo->query("select 1");
@@ -886,7 +884,7 @@ class PostProcess
         $minacceptableencodefilesize = 10000;
         $samplefile = $this->mp3SavePath.$releaseguid.'.mp3';
         $samplefileogg = $this->mp3SavePath.$releaseguid.'.ogg';
-        $ffmpeginfo = $this->site->ffmpegpath;
+        $ffmpeginfo = $this->pdo->getSetting('ffmpegpath');
 
         if (file_exists($samplefile))
         {
@@ -987,9 +985,9 @@ class PostProcess
 	 */
 	public function processMusicFromMediaInfo()
 	{
-		$processMediainfo = ($this->site->mediainfopath != '') ? true : false;
-		$processAudioSample = ($this->site->saveaudiopreview == 1) ? true : false;
-		$processMusic = ($this->site->lookupmusic == 1) ? true : false;
+		$processMediainfo = ($this->pdo->getSetting('mediainfopath') != '') ? true : false;
+		$processAudioSample = ($this->pdo->getSetting('saveaudiopreview') == 1) ? true : false;
+		$processMusic = ($this->pdo->getSetting('lookupmusic') == 1) ? true : false;
 
 		if ($processMusic && $processMediainfo && $processAudioSample)
 		{

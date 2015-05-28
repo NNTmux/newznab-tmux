@@ -1,6 +1,6 @@
 <?php
 
-use newznab\db\DB;
+use newznab\db\Settings;
 use newznab\utility\Utility;
 
 /**
@@ -23,7 +23,7 @@ class NZBExport
 	protected $retVal;
 
 	/**
-	 * @var \newznab\db\DB
+	 * @var \newznab\db\Settings
 	 * @access protected
 	 */
 	protected $pdo;
@@ -64,7 +64,7 @@ class NZBExport
 
 		$this->browser = $options['Browser'];
 		$this->echoCLI = (!$this->browser && NN_ECHOCLI && $options['Echo']);
-		$this->pdo = ($options['Settings'] instanceof DB ? $options['Setting'] : new DB());
+		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Setting'] : new Settings());
 		$this->releases = ($options['Releases'] instanceof \Releases ? $options['Releases'] : new \Releases(['Settings' => $this->pdo]));
 		$this->nzb = ($options['NZB'] instanceof \NZB ? $options['NZB'] : new \NZB($this->pdo));
 	}

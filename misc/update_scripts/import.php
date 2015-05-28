@@ -2,11 +2,11 @@
 
 require_once dirname(__FILE__) . '/../../www/config.php';
 
-use newznab\db\DB;
+use newznab\db\Settings;
 use newznab\utility\Utility;
 
 $releases = new Releases();
-$db = new DB();
+$db = new Settings();
 $cat = new Categorize();
 $releaseRegex = new ReleaseRegex();
 $nzb = new NZB();

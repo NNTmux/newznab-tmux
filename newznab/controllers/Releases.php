@@ -1,6 +1,6 @@
 <?php
 
-use newznab\db\DB;
+use newznab\db\Settings;
 use newznab\utility\Utility;
 use newznab\processing\PProcess;
 
@@ -58,7 +58,7 @@ class Releases
 	public $sphinxSearch;
 
 	/**
-	 * @var newznab\db\DB
+	 * @var newznab\db\Settings
 	 */
 	public $pdo;
 
@@ -146,25 +146,23 @@ class Releases
 
 		$this->echoCLI = ($options['Echo'] && NN_ECHOCLI);
 
-		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
-		$s = new Sites();
-		$this->site = $s->get();
+		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
 		$this->consoleTools = ($options['ConsoleTools'] instanceof \ConsoleTools ? $options['ConsoleTools'] : new \ConsoleTools(['ColorCLI' => $this->pdo->log]));
 		$this->groups = ($options['Groups'] instanceof \Groups ? $options['Groups'] : new \Groups(['Settings' => $this->pdo]));
 		$this->nzb = ($options['NZB'] instanceof \NZB ? $options['NZB'] : new \NZB());
 		$this->releaseCleaning = ($options['ReleaseCleaning'] instanceof \ReleaseCleaning ? $options['ReleaseCleaning'] : new \ReleaseCleaning($this->pdo));
 		$this->releaseImage = ($options['ReleaseImage'] instanceof \ReleaseImage ? $options['ReleaseImage'] : new \ReleaseImage($this->pdo));
-		$this->updategrabs = ($this->site->grabstatus == '0' ? false : true);
-		$this->passwordStatus = ($this->site->checkpasswordedrar == 1 ? -1 : 0);
+		$this->updategrabs = ($this->pdo->getSetting('grabstatus') == '0' ? false : true);
+		$this->passwordStatus = ($this->pdo->getSetting('checkpasswordedrar') == 1 ? -1 : 0);
 		$this->sphinxSearch = new \SphinxSearch();
 		$this->releaseSearch = new \ReleaseSearch($this->pdo, $this->sphinxSearch);
 		$this->releaseRegex = new \ReleaseRegex();
 
-		$this->tablePerGroup = ($this->site->tablepergroup == 0 ? false : true);
-		$this->crossPostTime = ($this->site->crossposttime != '' ? (int)$this->site->crossposttime : 2);
-		$this->releaseCreationLimit = ($this->site->maxnzbsprocessed != '' ? (int)$this->site->maxnzbsprocessed : 1000);
-		$this->completion = ($this->site->completionpercent != '' ? (int)$this->site->completionpercent : 0);
-		$this->processRequestIDs = (int)$this->site->lookup_reqids;
+		$this->tablePerGroup = ($this->pdo->getSetting('tablepergroup') == 0 ? false : true);
+		$this->crossPostTime = ($this->pdo->getSetting('crossposttime') != '' ? (int)$this->pdo->getSetting('crossposttime') : 2);
+		$this->releaseCreationLimit = ($this->pdo->getSetting('maxnzbsprocessed') != '' ? (int)$this->pdo->getSetting('maxnzbsprocessed') : 1000);
+		$this->completion = ($this->pdo->getSetting('completionpercent') != '' ? (int)$this->pdo->getSetting('completionpercent') : 0);
+		$this->processRequestIDs = (int)$this->pdo->getSetting('lookup_reqids');
 		if ($this->completion > 100) {
 			$this->completion = 100;
 			echo $this->pdo->log->error(PHP_EOL . 'You have an invalid setting for completion. It must be lower than 100.');
@@ -559,7 +557,7 @@ class Releases
 		$anidb = ($anidbid > -1) ? sprintf(" and releases.anidbid = %d ", $anidbid) : '';
 		$airdate = ($airdate > -1) ? sprintf(" and releases.tvairdate >= DATE_SUB(CURDATE(), INTERVAL %d DAY) ", $airdate) : '';
 
-		$sql = sprintf(" SELECT releases.*, rn.id AS nfoid, m.title AS imdbtitle, m.cover, m.imdbid, m.rating, m.plot, m.year, m.genre, m.director, m.actors, g.name AS group_name, concat(cp.title, ' > ', c.title) AS category_name, concat(cp.id, ',', c.id) AS category_ids, coalesce(cp.id,0) AS parentCategoryID, mu.title AS mu_title, mu.url AS mu_url, mu.artist AS mu_artist, mu.publisher AS mu_publisher, mu.releasedate AS mu_releasedate, mu.review AS mu_review, mu.tracks AS mu_tracks, mu.cover AS mu_cover, mug.title AS mu_genre, co.title AS co_title, co.url AS co_url, co.publisher AS co_publisher, co.releasedate AS co_releasedate, co.review AS co_review, co.cover AS co_cover, cog.title AS co_genre,   bo.title AS bo_title, bo.url AS bo_url, bo.publisher AS bo_publisher, bo.author AS bo_author, bo.publishdate AS bo_publishdate, bo.review AS bo_review, bo.cover AS bo_cover  FROM releases LEFT OUTER JOIN category c ON c.id = releases.categoryid LEFT OUTER JOIN category cp ON cp.id = c.parentid LEFT OUTER JOIN groups g ON g.id = releases.groupid LEFT OUTER JOIN releasenfo rn ON rn.releaseid = releases.id AND rn.nfo IS NOT NULL LEFT OUTER JOIN movieinfo m ON m.imdbid = releases.imdbid AND m.title != '' LEFT OUTER JOIN musicinfo mu ON mu.id = releases.musicinfoid LEFT OUTER JOIN genres mug ON mug.id = mu.genreID LEFT OUTER JOIN bookinfo bo ON bo.id = releases.bookinfoid LEFT OUTER JOIN consoleinfo co ON co.id = releases.consoleinfoid LEFT OUTER JOIN genres cog ON cog.id = co.genreID %s WHERE releases.passwordstatus <= (SELECT value FROM site WHERE setting='showpasswordedrelease') %s %s %s %s ORDER BY postdate DESC %s", $cartsrch, $catsrch, $rage, $anidb, $airdate, $limit);
+		$sql = sprintf(" SELECT releases.*, rn.id AS nfoid, m.title AS imdbtitle, m.cover, m.imdbid, m.rating, m.plot, m.year, m.genre, m.director, m.actors, g.name AS group_name, concat(cp.title, ' > ', c.title) AS category_name, concat(cp.id, ',', c.id) AS category_ids, coalesce(cp.id,0) AS parentCategoryID, mu.title AS mu_title, mu.url AS mu_url, mu.artist AS mu_artist, mu.publisher AS mu_publisher, mu.releasedate AS mu_releasedate, mu.review AS mu_review, mu.tracks AS mu_tracks, mu.cover AS mu_cover, mug.title AS mu_genre, co.title AS co_title, co.url AS co_url, co.publisher AS co_publisher, co.releasedate AS co_releasedate, co.review AS co_review, co.cover AS co_cover, cog.title AS co_genre,   bo.title AS bo_title, bo.url AS bo_url, bo.publisher AS bo_publisher, bo.author AS bo_author, bo.publishdate AS bo_publishdate, bo.review AS bo_review, bo.cover AS bo_cover  FROM releases LEFT OUTER JOIN category c ON c.id = releases.categoryid LEFT OUTER JOIN category cp ON cp.id = c.parentid LEFT OUTER JOIN groups g ON g.id = releases.groupid LEFT OUTER JOIN releasenfo rn ON rn.releaseid = releases.id AND rn.nfo IS NOT NULL LEFT OUTER JOIN movieinfo m ON m.imdbid = releases.imdbid AND m.title != '' LEFT OUTER JOIN musicinfo mu ON mu.id = releases.musicinfoid LEFT OUTER JOIN genres mug ON mug.id = mu.genreID LEFT OUTER JOIN bookinfo bo ON bo.id = releases.bookinfoid LEFT OUTER JOIN consoleinfo co ON co.id = releases.consoleinfoid LEFT OUTER JOIN genres cog ON cog.id = co.genreID %s WHERE releases.passwordstatus <= (SELECT value FROM settings WHERE setting='showpasswordedrelease') %s %s %s %s ORDER BY postdate DESC %s", $cartsrch, $catsrch, $rage, $anidb, $airdate, $limit);
 
 		return $this->pdo->query($sql, true);
 	}
@@ -607,7 +605,7 @@ class Releases
 							GROUP BY rageid, season, episode, categoryid
 						) z ON z.id = releases.id
 						WHERE %s %s %s
-						AND releases.passwordstatus <= (SELECT VALUE FROM site WHERE setting='showpasswordedrelease')
+						AND releases.passwordstatus <= (SELECT VALUE FROM settings WHERE setting='showpasswordedrelease')
 						ORDER BY postdate DESC %s", $usql, $usql, $exccatlist, $airdate, $limit
 		);
 
@@ -649,7 +647,7 @@ class Releases
 						LEFT OUTER JOIN groups g ON g.id = releases.groupid
 						LEFT OUTER JOIN movieinfo mi ON mi.imdbid = releases.imdbid
 						WHERE %s %s
-						AND releases.passwordstatus <= (SELECT VALUE FROM site WHERE setting='showpasswordedrelease')
+						AND releases.passwordstatus <= (SELECT VALUE FROM settings WHERE setting='showpasswordedrelease')
 						ORDER BY postdate DESC %s", $usql, $exccatlist, $limit
 		);
 
@@ -691,7 +689,7 @@ class Releases
 			$maxagesql = sprintf(" and releases.postdate > now() - interval %d day ", $maxage);
 
 		$order = $this->getBrowseOrder($orderby);
-		$sql = sprintf(" SELECT releases.*, concat(cp.title, '-', c.title) AS category_name, concat(cp.id, ',', c.id) AS category_ids, groups.name AS group_name, pre.ctime, pre.nuketype, rn.id AS nfoid, re.releaseid AS reID FROM releases LEFT OUTER JOIN releasevideo re ON re.releaseid = releases.id LEFT OUTER JOIN groups ON groups.id = releases.groupid LEFT OUTER JOIN releasenfo rn ON rn.releaseid = releases.id AND rn.nfo IS NOT NULL LEFT OUTER JOIN category c ON c.id = releases.categoryid LEFT OUTER JOIN predb pre ON pre.id = releases.preid LEFT OUTER JOIN category cp ON cp.id = c.parentid WHERE %s %s AND releases.passwordstatus <= (SELECT VALUE FROM site WHERE setting='showpasswordedrelease') %s ORDER BY %s %s" . $limit, $usql, $exccatlist, $maxagesql, $order[0], $order[1]);
+		$sql = sprintf(" SELECT releases.*, concat(cp.title, '-', c.title) AS category_name, concat(cp.id, ',', c.id) AS category_ids, groups.name AS group_name, pre.ctime, pre.nuketype, rn.id AS nfoid, re.releaseid AS reID FROM releases LEFT OUTER JOIN releasevideo re ON re.releaseid = releases.id LEFT OUTER JOIN groups ON groups.id = releases.groupid LEFT OUTER JOIN releasenfo rn ON rn.releaseid = releases.id AND rn.nfo IS NOT NULL LEFT OUTER JOIN category c ON c.id = releases.categoryid LEFT OUTER JOIN predb pre ON pre.id = releases.preid LEFT OUTER JOIN category cp ON cp.id = c.parentid WHERE %s %s AND releases.passwordstatus <= (SELECT VALUE FROM settings WHERE setting='showpasswordedrelease') %s ORDER BY %s %s" . $limit, $usql, $exccatlist, $maxagesql, $order[0], $order[1]);
 
 		return $this->pdo->query($sql, true);
 	}
@@ -731,7 +729,7 @@ class Releases
 		if ($maxage > 0)
 			$maxagesql = sprintf(" and releases.postdate > now() - interval %d day ", $maxage);
 
-		$res = $this->pdo->queryOneRow(sprintf(" SELECT count(releases.id) AS num FROM releases WHERE %s %s AND releases.passwordstatus <= (SELECT VALUE FROM site WHERE setting='showpasswordedrelease') %s", $usql, $exccatlist, $maxagesql), true);
+		$res = $this->pdo->queryOneRow(sprintf(" SELECT count(releases.id) AS num FROM releases WHERE %s %s AND releases.passwordstatus <= (SELECT VALUE FROM settings WHERE setting='showpasswordedrelease') %s", $usql, $exccatlist, $maxagesql), true);
 
 		return $res["num"];
 	}
@@ -988,7 +986,7 @@ class Releases
 	 */
 	public function searchAudio($artist, $album, $label, $track, $year, $genre = array(-1), $offset = 0, $limit = 100, $cat = array(-1), $maxage = -1)
 	{
-		$s = new Sites();
+		$s = new Settings();
 		$site = $s->get();
 		if ($site->sphinxenabled) {
 			$sphinx = new Sphinx();
@@ -1050,7 +1048,7 @@ class Releases
 			$genresql .= "1=2 )";
 		}
 
-		$sql = sprintf("SELECT releases.*, musicinfo.cover AS mi_cover, musicinfo.review AS mi_review, musicinfo.tracks AS mi_tracks, musicinfo.publisher AS mi_publisher, musicinfo.title AS mi_title, musicinfo.artist AS mi_artist, genres.title AS music_genrename, concat(cp.title, ' > ', c.title) AS category_name, concat(cp.id, ',', c.id) AS category_ids, groups.name AS group_name, rn.id AS nfoid FROM releases %s LEFT OUTER JOIN musicinfo ON musicinfo.id = releases.musicinfoid LEFT JOIN genres ON genres.id = musicinfo.genreID LEFT OUTER JOIN groups ON groups.id = releases.groupid LEFT OUTER JOIN category c ON c.id = releases.categoryid LEFT OUTER JOIN releasenfo rn ON rn.releaseid = releases.id AND rn.nfo IS NOT NULL LEFT OUTER JOIN category cp ON cp.id = c.parentid WHERE releases.passwordstatus <= (SELECT VALUE FROM site WHERE setting='showpasswordedrelease') %s %s %s %s ORDER BY postdate DESC LIMIT %d, %d ", $usecatindex, $searchsql, $catsrch, $maxage, $genresql, $offset, $limit);
+		$sql = sprintf("SELECT releases.*, musicinfo.cover AS mi_cover, musicinfo.review AS mi_review, musicinfo.tracks AS mi_tracks, musicinfo.publisher AS mi_publisher, musicinfo.title AS mi_title, musicinfo.artist AS mi_artist, genres.title AS music_genrename, concat(cp.title, ' > ', c.title) AS category_name, concat(cp.id, ',', c.id) AS category_ids, groups.name AS group_name, rn.id AS nfoid FROM releases %s LEFT OUTER JOIN musicinfo ON musicinfo.id = releases.musicinfoid LEFT JOIN genres ON genres.id = musicinfo.genreID LEFT OUTER JOIN groups ON groups.id = releases.groupid LEFT OUTER JOIN category c ON c.id = releases.categoryid LEFT OUTER JOIN releasenfo rn ON rn.releaseid = releases.id AND rn.nfo IS NOT NULL LEFT OUTER JOIN category cp ON cp.id = c.parentid WHERE releases.passwordstatus <= (SELECT VALUE FROM settings WHERE setting='showpasswordedrelease') %s %s %s %s ORDER BY postdate DESC LIMIT %d, %d ", $usecatindex, $searchsql, $catsrch, $maxage, $genresql, $offset, $limit);
 		$orderpos = strpos($sql, "order by");
 		$wherepos = strpos($sql, "where");
 		$sqlcount = "SELECT count(releases.id) AS num FROM releases INNER JOIN musicinfo ON musicinfo.id = releases.musicinfoid " . substr($sql, $wherepos, $orderpos - $wherepos);
@@ -1068,7 +1066,7 @@ class Releases
 	 */
 	public function searchBook($author, $title, $offset = 0, $limit = 100, $maxage = -1)
 	{
-		$s = new Sites();
+		$s = new Settings();
 		$site = $s->get();
 		if ($site->sphinxenabled) {
 			$sphinx = new Sphinx();
@@ -1090,7 +1088,7 @@ class Releases
 		else
 			$maxage = "";
 
-		$sql = sprintf("SELECT releases.*, bookinfo.cover AS bi_cover, bookinfo.review AS bi_review, bookinfo.publisher AS bi_publisher, bookinfo.pages AS bi_pages, bookinfo.publishdate AS bi_publishdate, bookinfo.title AS bi_title, bookinfo.author AS bi_author, genres.title AS book_genrename, concat(cp.title, ' > ', c.title) AS category_name, concat(cp.id, ',', c.id) AS category_ids, groups.name AS group_name, rn.id AS nfoid FROM releases LEFT OUTER JOIN bookinfo ON bookinfo.id = releases.bookinfoid LEFT JOIN genres ON genres.id = bookinfo.genreID LEFT OUTER JOIN groups ON groups.id = releases.groupid LEFT OUTER JOIN category c ON c.id = releases.categoryid LEFT OUTER JOIN releasenfo rn ON rn.releaseid = releases.id AND rn.nfo IS NOT NULL LEFT OUTER JOIN category cp ON cp.id = c.parentid WHERE releases.passwordstatus <= (SELECT value FROM site WHERE setting='showpasswordedrelease') %s %s ORDER BY postdate DESC LIMIT %d, %d ", $searchsql, $maxage, $offset, $limit);
+		$sql = sprintf("SELECT releases.*, bookinfo.cover AS bi_cover, bookinfo.review AS bi_review, bookinfo.publisher AS bi_publisher, bookinfo.pages AS bi_pages, bookinfo.publishdate AS bi_publishdate, bookinfo.title AS bi_title, bookinfo.author AS bi_author, genres.title AS book_genrename, concat(cp.title, ' > ', c.title) AS category_name, concat(cp.id, ',', c.id) AS category_ids, groups.name AS group_name, rn.id AS nfoid FROM releases LEFT OUTER JOIN bookinfo ON bookinfo.id = releases.bookinfoid LEFT JOIN genres ON genres.id = bookinfo.genreID LEFT OUTER JOIN groups ON groups.id = releases.groupid LEFT OUTER JOIN category c ON c.id = releases.categoryid LEFT OUTER JOIN releasenfo rn ON rn.releaseid = releases.id AND rn.nfo IS NOT NULL LEFT OUTER JOIN category cp ON cp.id = c.parentid WHERE releases.passwordstatus <= (SELECT value FROM settings WHERE setting='showpasswordedrelease') %s %s ORDER BY postdate DESC LIMIT %d, %d ", $searchsql, $maxage, $offset, $limit);
 		$orderpos = strpos($sql, "order by");
 		$wherepos = strpos($sql, "where");
 		$sqlcount = "SELECT count(releases.id) AS num FROM releases INNER JOIN bookinfo ON bookinfo.id = releases.bookinfoid " . substr($sql, $wherepos, $orderpos - $wherepos);
@@ -1337,7 +1335,7 @@ class Releases
 	 */
 	public function getZipped($guids)
 	{
-		$s = new Sites();
+		$s = new Settings();
 		$this->nzb = new NZB;
 		$site = $s->get();
 		$zipfile = new zipfile();
@@ -1447,7 +1445,7 @@ class Releases
 		$this->echoCLI = ($echooutput && NN_ECHOCLI);
 		$page = new Page();
 		$groupID = '';
-		$s = new Sites();
+		$s = new Settings();
 		echo $s->getLicense();
 
 		if (!empty($groupName)) {
@@ -1631,7 +1629,7 @@ class Releases
 		$page = new Page();
 		$group = $this->groups->getCBPTableNames($this->tablePerGroup, $groupID);
 		$this->pdo->log->doEcho($this->pdo->log->primary('Marking binaries where all parts are available'));
-		$result = $this->pdo->queryDirect(sprintf("SELECT relname, date, SUM(reltotalpart) AS reltotalpart, groupid, reqid, fromname, SUM(num) AS num, coalesce(g.minfilestoformrelease, s.minfilestoformrelease) AS minfilestoformrelease FROM ( SELECT relname, reltotalpart, groupid, reqid, fromname, max(date) AS date, COUNT(id) AS num FROM %s WHERE procstat = %s GROUP BY relname, reltotalpart, groupid, reqid, fromname ORDER BY NULL ) x LEFT OUTER JOIN groups g ON g.id = x.groupid INNER JOIN ( SELECT value AS minfilestoformrelease FROM site WHERE setting = 'minfilestoformrelease' ) s GROUP BY relname, groupid, reqid, fromname, minfilestoformrelease ORDER BY NULL", $group['bname'], Releases::PROCSTAT_TITLEMATCHED));
+		$result = $this->pdo->queryDirect(sprintf("SELECT relname, date, SUM(reltotalpart) AS reltotalpart, groupid, reqid, fromname, SUM(num) AS num, coalesce(g.minfilestoformrelease, s.minfilestoformrelease) AS minfilestoformrelease FROM ( SELECT relname, reltotalpart, groupid, reqid, fromname, max(date) AS date, COUNT(id) AS num FROM %s WHERE procstat = %s GROUP BY relname, reltotalpart, groupid, reqid, fromname ORDER BY NULL ) x LEFT OUTER JOIN groups g ON g.id = x.groupid INNER JOIN ( SELECT value AS minfilestoformrelease FROM settings WHERE setting = 'minfilestoformrelease' ) s GROUP BY relname, groupid, reqid, fromname, minfilestoformrelease ORDER BY NULL", $group['bname'], Releases::PROCSTAT_TITLEMATCHED));
 
 		while ($row = $this->pdo->getAssocArray($result)) {
 			$retcount++;
@@ -1912,7 +1910,7 @@ class Releases
 					$serverrev = intval($matches[1]);
 					if ($serverrev > $rev) {
 
-						$site = new Sites;
+						$site = new Settings;
 
 						$queries = explode(";", $regfile);
 						$queries = array_map("trim", $queries);
@@ -2137,7 +2135,7 @@ class Releases
 	{
 
 		$users = new Users();
-		$s = new Sites();
+		$s = new Settings();
 		$nfo = new Nfo();
 		$site = $s->get();
 		$rf = new ReleaseFiles();
@@ -2443,7 +2441,7 @@ class Releases
 
 		$echoCLI = NN_ECHOCLI;
 		$groups = new Groups();
-		$s = new Sites();
+		$s = new Settings();
 		$site = $s->get();
 		$consoleTools = new ConsoleTools(['ColorCLI' => $this->pdo->log]);
 		if ($local === false && $site->lookup_reqids == 0) {
@@ -2515,9 +2513,9 @@ class Releases
 			$groupIDs = [['id' => $groupID]];
 		}
 
-		$maxSizeSetting = $this->site->maxsizetoformrelease;
-		$minSizeSetting = $this->site->minsizetoformrelease;
-		$minFilesSetting = $this->site->minfilestoformrelease;
+		$maxSizeSetting = $this->pdo->getSetting('maxsizetoformrelease');
+		$minSizeSetting = $this->pdo->getSetting('minsizetoformrelease');
+		$minFilesSetting = $this->pdo->getSetting('minfilestoformrelease');
 
 		foreach ($groupIDs as $groupID) {
 			$releases = $this->pdo->queryDirect(
@@ -2614,11 +2612,11 @@ class Releases
 		}
 
 		// Releases past retention.
-		if ($this->site->releaseretentiondays != 0) {
+		if ($this->pdo->getSetting('releaseretentiondays') != 0) {
 			$releases = $this->pdo->queryDirect(
 				sprintf(
 					'SELECT id, guid FROM releases WHERE postdate < (NOW() - INTERVAL %d DAY)',
-					$this->site->releaseretentiondays
+					$this->pdo->getSetting('releaseretentiondays')
 				)
 			);
 			if ($releases instanceof \Traversable) {
@@ -2630,7 +2628,7 @@ class Releases
 		}
 
 		// Passworded releases.
-		if ($this->site->deletepasswordedrelease == 1) {
+		if ($this->pdo->getSetting('deletepasswordedrelease') == 1) {
 			$releases = $this->pdo->queryDirect(
 				sprintf(
 					'SELECT id, guid FROM releases WHERE passwordstatus = %d',
@@ -2646,7 +2644,7 @@ class Releases
 		}
 
 		// Possibly passworded releases.
-		if ($this->site->deletepossiblerelease == 1) {
+		if ($this->pdo->getSetting('deletepossiblerelease') == 1) {
 			$releases = $this->pdo->queryDirect(
 				sprintf(
 					'SELECT id, guid FROM releases WHERE passwordstatus = %d',
@@ -2764,7 +2762,7 @@ class Releases
 		}
 
 		// Misc other.
-		if ($this->site->miscotherretentionhours > 0) {
+		if ($this->pdo->getSetting('miscotherretentionhours') > 0) {
 			$releases = $this->pdo->queryDirect(
 				sprintf('
 					SELECT id, guid
@@ -2772,7 +2770,7 @@ class Releases
 					WHERE categoryid = %d
 					AND adddate <= NOW() - INTERVAL %d HOUR',
 					\Category::CAT_MISC_OTHER,
-					$this->site->miscotherretentionhours
+					$this->pdo->getSetting('miscotherretentionhours')
 				)
 			);
 			if ($releases instanceof \Traversable) {
@@ -2784,7 +2782,7 @@ class Releases
 		}
 
 		// Misc hashed.
-		if ($this->site->mischashedretentionhours > 0) {
+		if ($this->pdo->getSetting('mischashedretentionhours') > 0) {
 			$releases = $this->pdo->queryDirect(
 				sprintf('
 					SELECT id, guid
@@ -2792,7 +2790,7 @@ class Releases
 					WHERE categoryid = %d
 					AND adddate <= NOW() - INTERVAL %d HOUR',
 					\Category::CAT_MISC_HASHED,
-					$this->site->mischashedretentionhours
+					$this->pdo->getSetting('mischashedretentionhours')
 				)
 			);
 			if ($releases instanceof \Traversable) {
@@ -2959,7 +2957,7 @@ class Releases
 		}
 		$setting = $this->pdo->queryOneRow(
 			"SELECT value
-			FROM site
+			FROM settings
 			WHERE setting = 'showpasswordedrelease'"
 		);
 		$passwordStatus = ('= ' . \Releases::PASSWD_NONE);

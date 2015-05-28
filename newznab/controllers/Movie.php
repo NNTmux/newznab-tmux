@@ -1,7 +1,7 @@
 <?php
 require_once NN_LIBS . 'TMDb.php';
 
-use newznab\db\DB;
+use newznab\db\Settings;
 use newznab\utility\Utility;
 
 /**
@@ -16,7 +16,7 @@ class Movie
 	const SRC_DVD = 5;
 
 	/**
-	 * @var newznab\db\DB
+	 * @var newznab\db\Settings
 	 */
 	public $pdo;
 
@@ -49,11 +49,9 @@ class Movie
 	public function __construct($echooutput = false)
 	{
 		$this->echooutput = (NN_ECHOCLI && $echooutput);
-		$s = new \Sites();
-		$site = $s->get();
-		$this->apikey = $site->tmdbkey;
-		$this->lookuplanguage = $site->lookuplanguage;
-		$this->pdo = new DB();
+		$this->pdo = new Settings();
+		$this->apikey = $this->pdo->getSetting('tmdbkey');
+		$this->lookuplanguage = $this->pdo->getSetting('lookuplanguage');
 		$this->imgSavePath = NN_COVERS . 'movies' . DS;
 	}
 
@@ -348,7 +346,7 @@ class Movie
 	 */
 	public function getBrowseBy()
 	{
-		$this->pdo = new newznab\db\DB;
+		$this->pdo = new newznab\db\Settings;
 
 		$browseby = ' ';
 		$browsebyArr = $this->getBrowseByOptions();
@@ -793,7 +791,7 @@ class Movie
 	 */
 	public function updateUpcoming()
 	{
-		$s = new Sites();
+		$s = new Settings();
 		$site = $s->get();
 		if (isset($site->rottentomatokey))
 		{

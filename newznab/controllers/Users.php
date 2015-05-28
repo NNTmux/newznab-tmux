@@ -1,6 +1,6 @@
 <?php
 
-use newznab\db\DB;
+use newznab\db\Settings;
 use newznab\utility\Utility;
 
 class Users
@@ -46,10 +46,10 @@ class Users
 			'Settings' => null,
 		];
 		$options += $defaults;
-		$this->site= new Sites();
+		$this->site= new Settings();
 		$this->site = $this->site->get();
 
-		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
 
 		$this->password_hash_cost = (defined('NN_PASSWORD_HASH_COST') ? NN_PASSWORD_HASH_COST : 11);
 	}
@@ -470,7 +470,7 @@ class Users
 
 	public function signup($uname, $pass, $email, $host, $role = self::ROLE_USER, $notes, $invites = self::DEFAULT_INVITES, $invitecode = '', $forceinvitemode = false)
 	{
-		$site = new Sites;
+		$site = new Settings;
 		$this->site = $site->get();
 
 		$uname = trim($uname);
@@ -557,7 +557,7 @@ class Users
 	{
 
 
-		$site = new Sites();
+		$site = new Settings();
 		$this->site = $site->get();
 		if ($this->site->storeuserips != "1")
 			$host = "";
@@ -591,7 +591,7 @@ class Users
 	{
 		$_SESSION['uid'] = $uid;
 
-		$site = new Sites();
+		$site = new Settings();
 		$this->site = $site->get();
 
 		if ($this->site->storeuserips != "1")

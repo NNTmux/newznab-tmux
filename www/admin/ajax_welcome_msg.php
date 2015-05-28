@@ -3,7 +3,7 @@ require_once("config.php");
 
 // login check
 $admin = new AdminPage;
-$s = new Sites();
+$s = new Settings();
 
 if (isset($_GET['action']))
 {

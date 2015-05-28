@@ -24,7 +24,7 @@ class SphinxSearch
 			if (!defined('NN_SPHINXQL_SOCK_FILE')) {
 				define('NN_SPHINXQL_SOCK_FILE', '');
 			}
-			$this->sphinxQL = new newznab\db\DB(
+			$this->sphinxQL = new DB(
 				[
 					'dbname' => '',
 					'dbport' => NN_SPHINXQL_PORT,

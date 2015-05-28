@@ -1,6 +1,6 @@
 <?php
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 /**
  * This class manages creation, storage and retrieval of NZB files.
@@ -10,20 +10,18 @@ class NZB
 	/**
 	 * Default constructor.
 	 *
-	 * @param \newznab\db\DB $pdo
+	 * @param \newznab\db\Settings $pdo
 	 *
 	 * @access public
 	 */
 	public function __construct(&$pdo = null)
 	{
-		$this->pdo = ($pdo instanceof DB ? $pdo : new DB());
-		$s = new Sites();
-		$this->site = $s->get();
+		$this->pdo = ($pdo instanceof Settings ? $pdo : new Settings());
 
-		$this->tablePerGroup = ($this->site->tablepergroup == 0 ? false : true);
-		$nzbSplitLevel = $this->site->nzbsplitlevel;
+		$this->tablePerGroup = ($this->pdo->getSetting('tablepergroup') == 0 ? false : true);
+		$nzbSplitLevel = $this->pdo->getSetting('nzbsplitlevel');
 		$this->nzbSplitLevel = (empty($nzbSplitLevel) ? 1 : $nzbSplitLevel);
-		$this->siteNzbPath = (string)$this->site->nzbpath;
+		$this->siteNzbPath = (string)$this->pdo->getSetting('nzbpath');
 		if (substr($this->siteNzbPath, -1) !== DS) {
 			$this->siteNzbPath .= DS;
 		}
@@ -35,7 +33,7 @@ class NZB
 	 */
 	function writeNZBforReleaseId($relid, $name, $catId, $path, $groupID)
 	{
-		$db = new DB();
+		$db = new Settings();
 		$cat = new Category();
 		$this->groupID = $groupID;
 		// Set table names
@@ -50,7 +48,7 @@ class NZB
 			$pName = 'parts';
 		}
 		$catrow = $cat->getById($catId);
-		$site = new Sites();
+		$site = new Settings();
 
 		$fp = gzopen($path, "w");
 		if ($fp) {
@@ -130,7 +128,7 @@ class NZB
 	function getNZBPath($releaseGuid, $sitenzbpath = "", $createIfDoesntExist = false)
 	{
 		if ($sitenzbpath == "") {
-			$s = new Sites;
+			$s = new Settings;
 			$site = $s->get();
 			$sitenzbpath = $site->nzbpath;
 		}

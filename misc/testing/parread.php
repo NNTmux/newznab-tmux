@@ -2,12 +2,12 @@
 
 require_once dirname(__FILE__) . '/../../www/config.php';
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
-$s = new Sites();
+$s = new Settings();
 $site = $s->get();
 $releases = new Releases();
-$db = new DB();
+$db = new Settings();
 $nzb = new NZB();
 $nntp = new NNTP;
 

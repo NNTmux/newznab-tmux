@@ -1,11 +1,11 @@
 <?php
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 class AniDB
 {
 	/**
-	 * @var newznab\db\DB
+	 * @var newznab\db\Settings
 	 */
 	public $pdo;
 
@@ -20,7 +20,7 @@ class AniDB
 		];
 		$options += $defaults;
 
-		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
 	}
 
 	/**

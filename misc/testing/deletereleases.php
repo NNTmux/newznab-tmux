@@ -5,10 +5,10 @@
 
 require_once dirname(__FILE__) . '/../../www/config.php';
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 $releases = new Releases();
-$db = new DB();
+$db = new Settings();
 
 //
 // [1] delete all releases for a group which only has x number of files

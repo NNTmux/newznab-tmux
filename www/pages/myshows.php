@@ -1,6 +1,6 @@
 <?php
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 if (!$users->isLoggedIn())
 	$page->show403();
@@ -34,7 +34,7 @@ switch($action) {
 		}
 		else
 		{
-			$db = new DB();
+			$db = new Settings();
 			$show = $db->queryOneRow(sprintf("select releasetitle from tvrage where rageID = %d", $rid));
 			if (!$show)
 				$page->show404('Seriously?');

@@ -1,13 +1,13 @@
 <?php
 require_once dirname(__FILE__) . '/../../../../www/config.php';
 
-use newznab\db\DB;
+use newznab\db\Settings;
 use newznab\utility\Utility;
 
-$db = new DB();
+$db = new Settings();
 $DIR = NN_TMUX;
 $c = new ColorCLI();
-$s = new Sites();
+$s = new Settings();
 $site = $s->get();
 $t = new Tmux();
 $tmux = $t->get();
@@ -175,7 +175,7 @@ function window_proxy($tmux_session, $window)
 		}
 	}
 
-	if ($nntpproxy === '1' && ($site->alternate_nntp == '1')) {
+	if ($nntpproxy === '1' && ($this->pdo->getSetting('alternate_nntp') == '1')) {
 		$DIR = NN_TMUX;
 		$nntpproxypy = $DIR . "python/nntpproxy.py";
 		if (file_exists($DIR . "python/lib/nntpproxy_a.conf")) {
@@ -219,7 +219,7 @@ function window_optimize($tmux_session)
 
 function window_sharing($tmux_session)
 {
-	$pdo = new DB();
+	$pdo = new Settings();
 	$sharing = $pdo->queryOneRow('SELECT enabled, posting, fetching FROM sharing');
 	$t = new \Tmux();
 	$tmux = $t->get();

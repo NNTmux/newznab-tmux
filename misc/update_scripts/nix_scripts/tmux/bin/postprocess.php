@@ -2,11 +2,11 @@
 
 require_once(dirname(__FILE__) . '/config.php');
 
-use newznab\db\DB;
+use newznab\db\Settings;
 use newznab\processing\PProcess;
 
-$pdo = new DB();
-$s = new Sites();
+$pdo = new Settings();
+$s = new Settings();
 $site = $s->get();
 /**
 Array with possible arguments for run and
@@ -67,7 +67,7 @@ if (!isset($argv[1]) || !in_array($argv[1], $args) || !isset($argv[2]) || !in_ar
 $nntp = null;
 if ($args[$argv[1]] === true) {
 	$nntp = new NNTP(['Settings' => $pdo]);
-	if (($site->alternate_nntp == 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
+	if (($this->pdo->getSetting('alternate_nntp') == 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
 		exit($pdo->log->error("Unable to connect to usenet." . PHP_EOL));
 	}
 }

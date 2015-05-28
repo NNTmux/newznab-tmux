@@ -1,6 +1,6 @@
 <?php
 
-use newznab\db\DB;
+use newznab\db\Settings;
 /*
  * Cleans names for releases/imports/namefixer.
  * Names of group functions should match between CollectionsCleaning and this file
@@ -80,7 +80,7 @@ class ReleaseCleaning
 		$this->e1  = self::REGEX_FILE_EXTENSIONS . self::REGEX_END;
 		$this->e2  = self::REGEX_FILE_EXTENSIONS .
 			self::REGEX_SUBJECT_SIZE . self::REGEX_END;
-		$this->pdo = ($settings instanceof DB ? $settings : new DB());
+		$this->pdo = ($settings instanceof Settings ? $settings : new Settings());
 	}
 
 	public function releaseCleaner($subject, $fromName, $groupName, $usepre = false)

@@ -1,6 +1,6 @@
 <?php
 
-use newznab\db\DB;
+use newznab\db\Settings;
 use newznab\libraries\ApaiIO\Configuration\GenericConfiguration;
 use newznab\libraries\ApaiIO\Operations\Search;
 use newznab\libraries\ApaiIO\ApaiIO;
@@ -12,7 +12,7 @@ class Konsole
 	const CONS_NTFND = -2;
 
 	/**
-	 * @var newznab\db\DB
+	 * @var newznab\db\Settings
 	 */
 	public $pdo;
 
@@ -68,18 +68,16 @@ class Konsole
 		$options += $defaults;
 
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
-		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
-		$s = new Sites();
-		$this->site = $s->get();
+		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
 
-		$this->pubkey = $this->site->amazonpubkey;
-		$this->privkey = $this->site->amazonprivkey;
-		$this->asstag = $this->site->amazonassociatetag;
-		$this->gameqty = ($this->site->maxgamesprocessed != '') ? $this->site->maxgamesprocessed : 150;
-		$this->sleeptime = ($this->site->amazonsleep != '') ? $this->site->amazonsleep : 1000;
+		$this->pubkey = $this->pdo->getSetting('amazonpubkey');
+		$this->privkey = $this->pdo->getSetting('amazonprivkey');
+		$this->asstag = $this->pdo->getSetting('amazonassociatetag');
+		$this->gameqty = ($this->pdo->getSetting('maxgamesprocessed') != '') ? $this->pdo->getSetting('maxgamesprocessed') : 150;
+		$this->sleeptime = ($this->pdo->getSetting('amazonsleep') != '') ? $this->pdo->getSetting('amazonsleep') : 1000;
 		$this->imgSavePath = NN_COVERS . 'console' . DS;
 		$this->renamed = '';
-		if ($this->site->lookupgames == 2) {
+		if ($this->pdo->getSetting('lookupgames') == 2) {
 			$this->renamed = 'AND isrenamed = 1';
 		}
 		//$this->cleanconsole = ($this->pdo->getSetting('lookupgames') == 2) ? 'AND isrenamed = 1' : '';
@@ -151,7 +149,7 @@ class Konsole
 				FROM releases r
 				INNER JOIN consoleinfo con ON con.id = r.consoleinfoid AND con.title != '' AND con.cover = 1
 				WHERE r.nzbstatus = 1
-				AND r.passwordstatus <= (SELECT value FROM site WHERE setting='showpasswordedrelease')
+				AND r.passwordstatus <= (SELECT value FROM settings WHERE setting='showpasswordedrelease')
 				AND %s %s %s %s",
 				$this->getBrowseBy(),
 				$catsrch,
@@ -205,7 +203,7 @@ class Konsole
 				. "INNER JOIN consoleinfo con ON con.id = r.consoleinfoid "
 				. "INNER JOIN genres ON con.genreid = genres.id "
 				. "WHERE r.nzbstatus = 1 AND con.title != '' AND "
-				. "r.passwordstatus <= (SELECT value FROM site WHERE setting='showpasswordedrelease') AND %s %s
+				. "r.passwordstatus <= (SELECT value FROM settings WHERE setting='showpasswordedrelease') AND %s %s
 				%s "
 				. "GROUP BY con.id ORDER BY %s %s" . $limit, $browseby, $catsrch, $exccatlist, $order[0], $order[1]
 			)

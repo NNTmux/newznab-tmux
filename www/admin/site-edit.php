@@ -3,7 +3,7 @@
 require_once("config.php");
 
 $page = new AdminPage();
-$sites = new Sites();
+$sites = new Settings();
 $id = 0;
 
 // set the current action
@@ -69,6 +69,21 @@ $page->smarty->assign('yesno_names', array( 'Yes', 'No'));
 
 $page->smarty->assign('passwd_ids', array(1,0));
 $page->smarty->assign('passwd_names', array( 'Deep (requires unrar)', 'None'));
+
+/*0 = English, 2 = Danish, 3 = French, 1 = German*/
+$page->smarty->assign('langlist_ids', [0, 2, 3, 1]);
+$page->smarty->assign('langlist_names', ['English', 'Danish', 'French', 'German']);
+
+$page->smarty->assign('imdblang_ids',
+	[
+		'en', 'da', 'nl', 'fi', 'fr', 'de', 'it', 'tlh', 'no', 'po', 'ru', 'es',
+		'sv'
+	]);
+$page->smarty->assign('imdblang_names',
+	[
+		'English', 'Danish', 'Dutch', 'Finnish', 'French', 'German', 'Italian',
+		'Klingon', 'Norwegian', 'Polish', 'Russian', 'Spanish', 'Swedish'
+	]);
 
 $page->smarty->assign('sabintegrationtype_ids', array(SABnzbd::INTEGRATION_TYPE_USER, SABnzbd::INTEGRATION_TYPE_SITEWIDE, SABnzbd::INTEGRATION_TYPE_NONE));
 $page->smarty->assign('sabintegrationtype_names', array( 'User', 'Site-wide', 'None (Off)'));

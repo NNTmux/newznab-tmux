@@ -1,6 +1,6 @@
 <?php
 
-use newznab\db\DB;
+use newznab\db\Settings;
 use newznab\utility\Utility;
 use newznab\libraries\Tmdb\TMDB;
 
@@ -144,18 +144,16 @@ class Film
 		];
 		$options += $defaults;
 
-		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
-		$s = new Sites();
-		$this->site = $s->get();
+		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
 		$this->releaseImage = ($options['ReleaseImage'] instanceof \ReleaseImage ? $options['ReleaseImage'] : new \ReleaseImage($this->pdo));
 
-		$this->lookuplanguage = ($this->site->lookuplanguage != '') ? (string)$this->site->lookuplanguage : 'en';
+		$this->lookuplanguage = ($this->pdo->getSetting('lookuplanguage') != '') ? (string)$this->pdo->getSetting('lookuplanguage') : 'en';
 
-		$this->fanartapikey = $this->site->fanarttvkey;
-		$this->imdburl = ($this->site->imdburl == 0 ? false : true);
-		$this->movieqty = ($this->site->maximdbprocessed != '') ? $this->site->maximdbprocessed : 100;
+		$this->fanartapikey = $this->pdo->getSetting('fanarttvkey');
+		$this->imdburl = ($this->pdo->getSetting('imdburl') == 0 ? false : true);
+		$this->movieqty = ($this->pdo->getSetting('maximdbprocessed') != '') ? $this->pdo->getSetting('maximdbprocessed') : 100;
 		$this->searchEngines = true;
-		$this->showPasswords = ($this->site->showpasswordedrelease != '') ? $this->site->showpasswordedrelease : 0;
+		$this->showPasswords = ($this->pdo->getSetting('showpasswordedrelease') != '') ? $this->pdo->getSetting('showpasswordedrelease') : 0;
 
 		$this->debug = NN_DEBUG;
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI && $this->pdo->cli);

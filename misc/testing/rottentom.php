@@ -1,7 +1,7 @@
 <?php
 require_once dirname(__FILE__) . '/../../www/config.php';
 
-$s = new Sites();
+$s = new Settings();
 $site = $s->get();
 
 if (isset($site->rottentomatokey))

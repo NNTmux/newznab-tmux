@@ -3,11 +3,12 @@ require_once SMARTY_DIR . 'Smarty.class.php';
 require_once NN_LIB . 'utility' . DS . 'SmartyUtils.php';
 
 use newznab\controllers\Captcha;
+use newznab\db\Settings;
 
 class BasePage
 {
 	/**
-	 * @var \newznab\db\DB
+	 * @var \newznab\db\Settings
 	 */
 	public $settings = null;
 
@@ -58,11 +59,10 @@ class BasePage
 		}
 
 		// set site variable
-		$s = new Sites();
-		$this->site = $s->get();
+		$this->pdo = new Settings();
 
 		// Buffer settings/DB connection.
-		$this->settings = new newznab\db\DB();
+		$this->settings = new Settings();
 		$this->smarty = new Smarty();
 		$this->captcha = new Captcha(['Settings' => $this->settings]);
 

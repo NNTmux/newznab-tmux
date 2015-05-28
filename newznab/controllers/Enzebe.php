@@ -1,6 +1,6 @@
 <?php
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 /**
  * Class for reading and writing NZB files on the hard disk,
@@ -36,7 +36,7 @@ class Enzebe
 
 	/**
 	 * Instance of class db.
-	 * @var \newznab\db\DB
+	 * @var \newznab\db\Settings
 	 * @access public
 	 */
 	public $pdo;
@@ -75,14 +75,14 @@ class Enzebe
 	/**
 	 * Default constructor.
 	 *
-	 * @param \DB $pdo
+	 * @param \Settings $pdo
 	 *
 	 * @access public
 	 */
 	public function __construct(&$pdo = null)
 	{
-		$this->pdo = ($pdo instanceof DB ? $pdo : new DB());
-		$s = new Sites();
+		$this->pdo = ($pdo instanceof Settings ? $pdo : new Settings());
+		$s = new Settings();
 		$this->site = $s->get();
 
 		$this->tablePerGroup = ($this->site->tablepergroup == 0 ? false : true);
@@ -104,7 +104,7 @@ class Enzebe
 	public function initiateForWrite($groupID)
 	{
 		$this->groupid = $groupID;
-		$site = new Sites();
+		$site = new Settings();
 		// Set table names
 		if ($this->tablePerGroup === true) {
 			if ($this->groupid == '') {

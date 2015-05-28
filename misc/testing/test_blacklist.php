@@ -10,7 +10,7 @@
 //
 require_once dirname(__FILE__) . '/../../www/config.php';
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 
 # If satisfied with what is matched, set this to true and have
@@ -200,11 +200,11 @@ function get_block($offset, $batch)
 
 	$catsql = "SELECT releases.*,groups.name as groupname FROM "
 		 ."releases LEFT JOIN groups on releases.groupID = groups.ID ";
-	$db = new DB();
+	$db = new Settings();
 	return $db->query($catsql.sprintf(' LIMIT %d,%d', $offset, $batch));
 }
 
-$db = new DB();
+$db = new Settings();
 
 $errcnt=0;
 $total=0;

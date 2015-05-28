@@ -1,17 +1,15 @@
 <?php
 require_once("config.php");
 
-use newznab\db\DB;
+use newznab\db\Settings;
 use newznab\utility\Utility;
 
 Utility::clearScreen();
 
-$pdo = new DB();
+$pdo = new Settings();
 $t = new \Tmux();
 $tmux = $t->get();
 $powerline = (isset($tmux->powerline)) ? $tmux->powerline : 0;
-$s= new Sites();
-$site = $s->get();
 
 $tmux_session = 'NNTPProxy';
 
@@ -21,7 +19,7 @@ function python_module_exist($module)
 	return ($returnCode == 0 ? true : false);
 }
 
-$nntpproxy = $site->nntpproxy;
+$nntpproxy = $pdo->getSetting('nntpproxy');
 if ($nntpproxy === '0') {
 	exit();
 } else {
@@ -36,7 +34,6 @@ if ($nntpproxy === '0') {
 function window_proxy($tmux_session, $powerline)
 {
 	global $pdo;
-	global $site;
 
 	$DIR = NN_MISC;
 	if ($powerline === '1') {
@@ -45,7 +42,7 @@ function window_proxy($tmux_session, $powerline)
 		$tmuxconfig = $DIR . "update_scripts/nix_scripts/tmux/tmux.conf";
 	}
 
-	$nntpproxy = $site->nntpproxy;
+	$nntpproxy = $pdo->getSetting('nntpproxy');
 	if ($nntpproxy === '1') {
 		$DIR = NN_MISC;
 		$nntpproxypy = $DIR . "update_scripts/nix_scripts/_tmux/python/nntpproxy.py";
@@ -55,7 +52,7 @@ function window_proxy($tmux_session, $powerline)
 		}
 	}
 
-	if ($nntpproxy == '1' && ($site->alternate_nntp == '1')) {
+	if ($nntpproxy == '1' && ($pdo->getSetting('alternate_nntp') == '1')) {
 		$DIR = NN_MISC;
 		$nntpproxypy = $DIR . "update_scripts/nix_scripts/tmux/python/nntpproxy.py";
 		if (file_exists($DIR . "update_scripts/nix_scripts/tmux/python/lib/nntpproxy_a.conf")) {

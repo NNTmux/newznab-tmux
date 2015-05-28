@@ -24,7 +24,7 @@ Class TraktTv
 		];
 		$options += $defaults;
 
-		$settings = ($options['Settings'] instanceof Sites ? $options['Settings'] : new Sites());
+		$settings = ($options['Settings'] instanceof Sites ? $options['Settings'] : new Settings());
 		$this->APIKEY = $settings->get()->trakttvkey;
 	}
 

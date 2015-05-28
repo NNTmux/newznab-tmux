@@ -1,6 +1,6 @@
 <?php
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 /**
  * This class handles parsing misc>other releases into real names.
@@ -8,7 +8,7 @@ use newznab\db\DB;
 class Parsing
 {
 	/**
-	 * @var newznab\db\DB
+	 * @var newznab\db\Settings
 	 */
 	public $pdo;
 
@@ -33,9 +33,7 @@ class Parsing
 		$this->parsprocessed = 0;
 		$this->releasefilesprocessed = 0;
 		$this->cleanup = ['nuke' => [], 'misc' => []];
-		$s = new Sites();
-		$this->site = $s->get();
-		$this->pdo = new newznab\db\DB();
+		$this->pdo = new Settings();
 	}
 
 	/**
@@ -1485,12 +1483,12 @@ class Parsing
 	/**
 	 * update a release name
 	 *
-	 * @param DB $pdo
+	 * @param Settings $pdo
 	 * @param    $id
 	 * @param    $oldname
 	 * @param    $newname
 	 */
-	private function updateName(DB $pdo, $id, $oldname, $newname)
+	private function updateName(Settings $pdo, $id, $oldname, $newname)
 	{
 		if ($this->verbose)
 			echo sprintf("OLD : %s\nNEW : %s\n\n", $oldname, $newname);

@@ -1,11 +1,11 @@
 <?php
 
-use newznab\db\DB;
+use newznab\db\Settings;
 use newznab\utility\Utility;
 
 
-$pdo = new DB();
-$s = new Sites();
+$pdo = new Settings();
+$s = new Settings();
 $site = $s->get();
 
 if (isset($argv[1]) && ($argv[1] === "true" || $argv[1] === "delete")) {

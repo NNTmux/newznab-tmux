@@ -1,5 +1,7 @@
 <?php
 
+use newznab\db\Settings;
+
 /**
  * Categorizing of releases by name/group.
  *
@@ -43,11 +45,9 @@ class Categorize extends Category
 	public function __construct(array $options = [])
 	{
 		//parent::__construct($options);
-		$s = new Sites();
-		$this->site = $s->get();
-		$this->pdo = new \newznab\db\DB();
-		$this->categorizeForeign = ($this->site->categorizeforeign == "0") ? false : true;
-		$this->catWebDL = ($this->site->catwebdl == "0") ? false : true;
+		$this->pdo = new Settings();
+		$this->categorizeForeign = ($this->pdo->getSetting('categorizeforeign') == "0") ? false : true;
+		$this->catWebDL = ($this->pdo->getSetting('catwebdl') == "0") ? false : true;
 	}
 
 	/**

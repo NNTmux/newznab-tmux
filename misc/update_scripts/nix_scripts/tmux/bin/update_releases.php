@@ -1,13 +1,13 @@
 <?php
 require_once("config.php");
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 
 
 $s = new \Sites();
 $site = $s->get();
-$pdo = new DB();
+$pdo = new Settings();
 
 if (isset($argv[2]) && $argv[2] === 'true') {
 	// Create the connection here and pass

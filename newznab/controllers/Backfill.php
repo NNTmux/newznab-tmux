@@ -1,13 +1,13 @@
 <?php
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 class Backfill
 {
 	/**
 	 * Instance of class Settings
 	 *
-	 * @var newznab\db\DB
+	 * @var newznab\db\Settings
 	 */
 	public $pdo;
 
@@ -95,12 +95,12 @@ class Backfill
 
 		$this->_echoCLI = ($options['Echo'] && NN_ECHOCLI);
 
-		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
 		$this->_groups = ($options['Groups'] instanceof \Groups ? $options['Groups'] : new \Groups(['Settings' => $this->pdo]));
 		$this->_nntp = ($options['NNTP'] instanceof \NNTP
 			? $options['NNTP'] : new \NNTP(['Settings' => $this->pdo])
 		);
-		$s = new Sites();
+		$s = new Settings();
 		$this->site = $s->get();
 
 		$this->_debug = (NN_LOGGING || NN_DEBUG);

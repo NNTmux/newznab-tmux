@@ -2,9 +2,9 @@
 
 require_once("config.php");
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
-$s = new Sites();
+$s = new Settings();
 $site = $s->get();
 $patches = $s->getUnappliedPatches($site);
 
@@ -18,7 +18,7 @@ else
 	{
 		echo "Patchn : Executing patch ".basename($patch)."\n";
 
-		$db = new DB();
+		$db = new Settings();
 		$rows = $db->query("select * from site");
 
 		$dbData = file_get_contents($patch);

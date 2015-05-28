@@ -18,13 +18,13 @@ conf = info.readConfig()
 cur = info.connect()
 start_time = time.time()
 pathname = os.path.abspath(os.path.dirname(sys.argv[0]))
-cur[0].execute("SELECT value FROM site WHERE setting = 'releasethreads'")
+cur[0].execute("SELECT value FROM settings WHERE setting = 'releasethreads'")
 threads = cur[0].fetchone()
 threads = int(threads[0])
 
 print(bcolors.HEADER + "\nUpdate Per Group Threaded Started at {}".format(datetime.datetime.now().strftime("%H:%M:%S")) + bcolors.ENDC)
 
-cur[0].execute("SELECT value FROM site WHERE setting = 'tablepergroup'")
+cur[0].execute("SELECT value FROM settings WHERE setting = 'tablepergroup'")
 allowed = cur[0].fetchone()
 if int(allowed[0]) == 0:
 	print(bcolors.ERROR + "Table per group not enabled" + bcolors.ENDC)

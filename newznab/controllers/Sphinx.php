@@ -10,6 +10,7 @@
 if (!defined("FS_ROOT")) { define('FS_ROOT', realpath(dirname(__FILE__))); }
 
 use newznab\libraries\Cache;
+use newznab\db\Settings;
 
 // Every day
 define("INDEX_MERGE_FREQ", 1440);
@@ -30,10 +31,8 @@ class Sphinx
      */
     function __construct()
     {
-        $s = new Sites;
-
-		$this->site = $s->get();
 		$this->nzb  = new NZB;
+		$this->pdo = new Settings();
 		$this->indexes = array("releases", "releasefiles",
 		                       "releasenfo", "nzbs", "predb");
     }
@@ -81,8 +80,8 @@ class Sphinx
      */
     public function getNextRebuildDate()
     {
-        $rebuildStr = $this->site->sphinxrebuildfreq_day." "
-                    . $this->site->sphinxrebuildfreq;
+        $rebuildStr = $this->pdo->getSetting('sphinxrebuildfreq_day')." "
+                    . $this->pdo->getSetting('sphinxrebuildfreq');
         $rebuildDate = strtotime($rebuildStr);
         if ($rebuildDate < time(true)) {
             // Date is in the past, pick the next one
@@ -107,7 +106,7 @@ class Sphinx
             return false;
         }
 
-        $db = new newznab\db\DB();
+        $db = new newznab\db\Settings();
 
         if ($lastRebuildDate == 0) {
             $lastRebuildDate = "NOW()";
@@ -145,7 +144,7 @@ class Sphinx
             return false;
         }
 
-        $db = new newznab\db\DB();
+        $db = new newznab\db\Settings();
 
         if ($lastMergedDate == 0) {
             $lastMergedDate = "NOW()";
@@ -253,7 +252,7 @@ class Sphinx
                 $index .= "_delta";
             }
 
-            $handle = fopen($this->site->sphinxconfpath, 'r');
+            $handle = fopen($this->pdo->getSetting('sphinxconfpath'), 'r');
             if ($handle) {
                 $indexPath = "";
                 while ($line = fgets($handle)) {
@@ -305,9 +304,9 @@ class Sphinx
      */
     public function update()
     {
-        $db = new newznab\db\DB();
+        $db = new newznab\db\Settings();
 
-        if (!$this->site->sphinxenabled) {
+        if (!$this->pdo->getSetting('sphinxenabled')) {
             // Sphinx is disabled, so we don't do anything.
             return;
         }
@@ -325,10 +324,10 @@ class Sphinx
             $indexDetails = $this->indexDetails($index);
             $isMergeDueDate = (strtotime($row['nextmergedate']) <= time(true));
             $isMergeDueSize = (intval($indexDetails["total-documents"]) >=
-                               intval($this->site->sphinxmergefreq_count));
+                               intval($this->pdo->getSetting('sphinxmergefreq_count')));
 
             if (strtotime($row['nextrebuilddate']) <= time(true) &&
-                $this->site->sphinxrebuildfreq_day != "")
+				$this->pdo->getSetting('sphinxrebuildfreq_day') != "")
             {
                 // Rebuild required
                 printf("Index '%s' is going to be rebuilt.\n", $index);
@@ -376,8 +375,8 @@ class Sphinx
      */
     public function getSphinxBinPath($bin)
     {
-        $path = rtrim($this->site->sphinxbinpath, DIRECTORY_SEPARATOR);
-        $conf = $this->site->sphinxconfpath;
+        $path = rtrim($this->pdo->getSetting('sphinxbinpath'), DIRECTORY_SEPARATOR);
+        $conf = $this->pdo->getSetting('sphinxconfpath');
 
         if ($path) {
             // $path is a path to a directory.
@@ -399,7 +398,7 @@ class Sphinx
     public function isIndexEnabled($index)
     {
         // Is Sphinx enabled?
-        if (!$this->site->sphinxenabled) {
+        if (!$this->pdo->getSetting('sphinxenabled')) {
             return false;
         }
 
@@ -410,13 +409,13 @@ class Sphinx
             case "releases":
                 return true;    // Always enabled, as long as Sphinx is
             case "releasenfo":
-                return (bool)$this->site->sphinxindexnfos;
+                return (bool)$this->pdo->getSetting('sphinxindexnfos');
             case "releasefiles":
-                return (bool)$this->site->sphinxindexreleasefiles;
+                return (bool)$this->pdo->getSetting('sphinxindexreleasefiles');
             case "nzbs":
-                return (bool)$this->site->sphinxindexnzbs;
+                return (bool)$this->pdo->getSetting('sphinxindexnzbs');
             case "predb":
-                return (bool)$this->site->sphinxindexpredb;
+                return (bool)$this->pdo->getSetting('sphinxindexpredb');
             default:
                 return false;
         }
@@ -533,7 +532,7 @@ class Sphinx
 
         // Get connection to Sphinx's MySQL interface.
         // Connect to Sphinx
-		$hostport = explode (":", $this->site->sphinxserverhost);
+		$hostport = explode (":", $this->pdo->getSetting('sphinxserverhost'));
         $sdb = mysqli_connect($hostport[0], "root", "", "", $hostport[1]);
         if (!$sdb) {
             // Couldn't connect to Sphinx.
@@ -541,7 +540,7 @@ class Sphinx
         }
 
         // Get connection to Newznab's MySQL database
-        $ndb = new newznab\db\DB;
+        $ndb = new newznab\db\Settings;
 
         // Determine which release to start with
         if ($startingID < 0) {
@@ -570,7 +569,7 @@ class Sphinx
         while ($row = $ndb->getAssocArray($result)) {
             $fileNames = "";
             $fileCount = 0;
-            $nzbpath = $this->nzb->getNZBPath($row['guid'], $this->site->nzbpath);
+            $nzbpath = $this->nzb->getNZBPath($row['guid'], $this->pdo->getSetting('nzbpath'));
             if (file_exists($nzbpath)) {
             	$nzbfile = file_get_contents('compress.zlib://'.$nzbpath);
             	$files = $this->nzb->nzbFileList($nzbfile);
@@ -630,7 +629,7 @@ class Sphinx
 		}
 
         // Connect to Sphinx
-        $hostport = explode (":", $this->site->sphinxserverhost);
+        $hostport = explode (":", $this->pdo->getSetting('sphinxserverhost'));
         $sdb = mysqli_connect($hostport[0], "root", "", "", $hostport[1]);
         if (!$sdb) {
             // Couldn't connect to Sphinx.
@@ -675,7 +674,7 @@ class Sphinx
 		}
 
         if ($lookupQuery && count($results) > 0) {
-            $ndb = new newznab\db\DB;
+            $ndb = new newznab\db\Settings;
             $sql = sprintf($lookupQuery, implode(",", $results));
             $result = $ndb->queryDirect($sql);
 			if ($result)
@@ -721,7 +720,7 @@ class Sphinx
                            $indexes=array(), $lookup=true, $where=array(),
                            &$lookupQuery="")
     {
-        $ndb = new newznab\db\DB;
+        $ndb = new newznab\db\Settings;
 
         $offset = intval($offset);
         $limit = intval($limit);
@@ -944,7 +943,7 @@ class Sphinx
                           . "LEFT OUTER JOIN predb pre "
                           . "ON pre.id = releases.preid "
                           . "WHERE releases.passwordstatus <= (SELECT value "
-                          .      "FROM site WHERE setting='showpasswordedrelease') "
+                          .      "FROM settings WHERE setting='showpasswordedrelease') "
                           . "AND releases.id IN (%s)";
         }
 
@@ -970,7 +969,7 @@ class Sphinx
                                    $limit=100, $name="", $cat=array(-1),
                                    $maxage=-1, $indexes=array(), $lookup=true)
     {
-        $db = new newznab\db\DB();
+        $db = new newznab\db\Settings();
         $order = array("postdate", "desc");
         $search = array($name);
         if ($series != "") {
@@ -1019,7 +1018,7 @@ class Sphinx
                           . "LEFT OUTER JOIN category cp "
                           . "ON cp.id = c.parentid "
                           . "WHERE releases.passwordstatus <= (SELECT value "
-                          .      "FROM site WHERE setting='showpasswordedrelease') "
+                          .      "FROM settings WHERE setting='showpasswordedrelease') "
                           . "AND releases.id IN (%s)";
         }
         $sphinxQuery = $this->buildQuery($search, $cat, $offset, $limit, $order,
@@ -1036,7 +1035,7 @@ class Sphinx
                                    $cat=array(-1), $genre="", $maxage=-1,
                                    $indexes=array(), $lookup=true)
     {
-        $db = new newznab\db\DB();
+        $db = new newznab\db\Settings();
         $search = array();
         $order = array("postdate", "desc");
         $where = array();
@@ -1085,7 +1084,7 @@ class Sphinx
                           . "LEFT OUTER JOIN movieinfo "
                           . "ON releases.imdbid = movieinfo.imdbid "
                           . "WHERE releases.passwordstatus <= (SELECT value "
-                          .      "FROM site WHERE setting='showpasswordedrelease') "
+                          .      "FROM settings WHERE setting='showpasswordedrelease') "
                           . "AND releases.id IN (%s)";
         }
         $sphinxQuery = $this->buildQuery($search, $cat, $offset, $limit, $order,
@@ -1103,7 +1102,7 @@ class Sphinx
                                 $cat=array(-1), $maxage=-1, $indexes=array(),
                                 $lookup=true)
     {
-        $db = new newznab\db\DB();
+        $db = new newznab\db\Settings();
         $search = array();
         $where = array();
         $order = array("postdate", "desc");
@@ -1163,7 +1162,7 @@ class Sphinx
                           . "LEFT OUTER JOIN category cp "
                           . "ON cp.id = c.parentid "
                           . "WHERE releases.passwordstatus <= (SELECT value "
-                          .      "FROM site WHERE setting='showpasswordedrelease') "
+                          .      "FROM settings WHERE setting='showpasswordedrelease') "
                           . "AND releases.id IN (%s)";
         }
         $sphinxQuery = $this->buildQuery($search, $cat, $offset, $limit, $order,
@@ -1179,7 +1178,7 @@ class Sphinx
     public function searchBook($author, $title, $offset=0, $limit=100,
                                $maxage=-1, $indexes=array(), $lookup=true)
     {
-        $db = new newznab\db\DB();
+        $db = new newznab\db\Settings();
         $order = array("postdate", "desc");
         $search = array();
         if ($author != "") {
@@ -1224,7 +1223,7 @@ class Sphinx
 		                  . "LEFT OUTER JOIN category cp "
 		                  . "ON cp.id = c.parentid "
 		                  . "WHERE releases.passwordstatus <= (SELECT value "
-		                  .     "FROM site WHERE setting='showpasswordedrelease')"
+		                  .     "FROM settings WHERE setting='showpasswordedrelease')"
 		                  . "AND releases.id IN (%s)";
 		}
 
@@ -1242,7 +1241,7 @@ class Sphinx
                                     $name='', $maxage=-1, $indexes=array(),
                                     $lookup=true)
     {
-        $db = new newznab\db\DB();
+        $db = new newznab\db\Settings();
         $where = array();
         $search = array();
         $order = array("postdate", "desc");
@@ -1276,7 +1275,7 @@ class Sphinx
 			              . "LEFT OUTER JOIN category cp "
 			              . "ON cp.id = c.parentid "
 			              . "WHERE releases.passwordstatus <= (SELECT value "
-			              .     "FROM site WHERE setting='showpasswordedrelease')"
+			              .     "FROM settings WHERE setting='showpasswordedrelease')"
 			              . "AND releases.id IN (%s)";
 		}
 		$sphinxQuery = $this->buildQuery($search, array(-1), $offset, $limit,
@@ -1291,7 +1290,7 @@ class Sphinx
      */
     public function getPreRange($start=0, $num, $dirname='', $category='')
     {
-        $db = new newznab\db\DB();
+        $db = new newznab\db\Settings();
         $dirname = empty($category) ? $dirname : $dirname." @category =".$category;
         $sphinxQuery = sprintf("SELECT id "
                                ."FROM predb, predb_delta "

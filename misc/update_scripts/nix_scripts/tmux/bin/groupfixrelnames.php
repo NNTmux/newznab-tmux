@@ -1,11 +1,11 @@
 <?php
 require_once(dirname(__FILE__) . "/config.php");
 
-use newznab\db\DB;
+use newznab\db\Settings;
 use newznab\processing\PProcess;
 
-$pdo = new DB();
-$s = new Sites();
+$pdo = new Settings();
+$s = new Settings();
 $site = $s->get();
 
 if (!isset($argv[1])) {
@@ -130,7 +130,7 @@ if (!isset($argv[1])) {
 
 			if ($releases instanceof Traversable) {
 				$nntp = new NNTP(['Settings' => $pdo]);
-				if (($site->alternate_nntp == '1' ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
+				if (($this->pdo->getSetting('alternate_nntp') == '1' ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
 					exit($pdo->log->error("Unable to connect to usenet."));
 				}
 

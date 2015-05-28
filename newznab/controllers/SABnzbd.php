@@ -1,6 +1,7 @@
 <?php
 
 use newznab\utility\Utility;
+use newznab\db\Settings;
 
 /**
  * Class SABnzbd
@@ -89,9 +90,10 @@ class SABnzbd
 		$this->uid = $page->userdata['id'];
 		$this->rsstoken = $page->userdata['rsstoken'];
 		$this->serverurl = $page->serverurl;
+		$this->pdo = new Settings();
 
 		// Set up properties.
-		switch ($page->site->sabintegrationtype) {
+		switch ($this->pdo->getSetting('sabintegrationtype')) {
 			case self::INTEGRATION_TYPE_USER:
 				if (!empty($_COOKIE['sabnzbd_' . $this->uid . '__apikey']) && !empty($_COOKIE['sabnzbd_' . $this->uid . '__host'])) {
 					$this->url = $_COOKIE['sabnzbd_' . $this->uid . '__host'];
@@ -117,11 +119,11 @@ class SABnzbd
 				break;
 
 			case self::INTEGRATION_TYPE_SITEWIDE:
-				if (!empty($page->site->sabapikey) && !empty($page->site->saburl)) {
-					$this->url = $page->site->saburl;
-					$this->apikey = $page->site->sabapikey;
-					$this->priority = $page->site->sabpriority;
-					$this->apikeytype = $page->site->sabapikeytype;
+				if (!empty($this->pdo->getSetting('sabapikey')) && !empty($page->settings->saburl)) {
+					$this->url = $page->settings->saburl;
+					$this->apikey = $page->settings->sabapikey;
+					$this->priority = $page->settings->sabpriority;
+					$this->apikeytype = $page->settings->sabapikeytype;
 				}
 				$this->integrated = self::INTEGRATION_TYPE_SITEWIDE;
 				$this->integratedBool = true;

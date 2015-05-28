@@ -1,11 +1,11 @@
 <?php
 require_once(dirname(__FILE__) . "/../../../bin/config.php");
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 $cli = new \ColorCLI();
 
-$pdo = new DB(['checkVersion' => true]);
+$pdo = new Settings(['checkVersion' => true]);
 $ftinnodb = $pdo->isDbVersionAtLeast('5.6');
 
 if (isset($argv[1]) && isset($argv[2]) && $argv[2] == "fmyisam") {

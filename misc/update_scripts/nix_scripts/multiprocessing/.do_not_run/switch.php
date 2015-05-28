@@ -6,7 +6,7 @@ if (!isset($argv[1])) {
 
 require_once dirname(__FILE__) . '/../../../../../www/config.php';
 
-use newznab\db\DB;
+use newznab\db\Settings;
 use newznab\processing\PProcess;
 use newznab\processing\post\ProcessAdditional;
 
@@ -22,7 +22,7 @@ switch ($options[1]) {
 	// $options[3] => (int)   backfill type from tmux settings. 1 = Backfill interval , 2 = Bakfill all
 	case 'backfill':
 		if (in_array((int)$options[3], [1, 2])) {
-			$pdo = new DB();
+			$pdo = new Settings();
 			$value = $pdo->queryOneRow("SELECT value FROM tmux WHERE setting = 'backfill_qty'");
 			if ($value !== false) {
 				$nntp = nntp($pdo);
@@ -37,7 +37,7 @@ switch ($options[1]) {
 	 * $options[3] => (int)    Quantity of articles to download.
 	 */
 	case 'backfill_all_quantity':
-		$pdo = new DB();
+		$pdo = new Settings();
 		$nntp = nntp($pdo);
 		(new \Backfill())->backfillAllGroups($options[2], $options[3]);
 		break;
@@ -45,7 +45,7 @@ switch ($options[1]) {
 	// BackFill a single group, 10000 parts.
 	// $options[2] => (string)group name, Name of group to work on.
 	case 'backfill_all_quick':
-		$pdo = new DB();
+		$pdo = new Settings();
 		$nntp = nntp($pdo);
 		(new \Backfill())->backfillAllGroups($options[2], 10000, 'normal');
 		break;
@@ -59,10 +59,10 @@ switch ($options[1]) {
 	 * $options[6] => (int)    Number of threads.
 	 */
 	case 'get_range':
-		$pdo = new DB();
+		$pdo = new Settings();
 		$nntp = nntp($pdo);
 		$groups = new \Groups();
-		$s = new Sites();
+		$s = new Settings();
 		$site = $s->get();
 		$groupMySQL = $groups->getByName($options[3]);
 		if ($nntp->isError($nntp->selectGroup($groupMySQL['name']))) {
@@ -126,7 +126,7 @@ switch ($options[1]) {
 	 * $options[2] => (string) Group name.
 	 */
 	case 'part_repair':
-		$pdo = new DB();
+		$pdo = new Settings();
 		$groups = new \Groups(['Settings' => $pdo]);
 		$groupMySQL = $groups->getByName($options[2]);
 		$nntp = nntp($pdo);
@@ -143,8 +143,8 @@ switch ($options[1]) {
 	// Process releases.
 	// $options[2] => (string)groupCount, number of groups terminated by _ | (int)groupid, group to work on
 	case 'releases':
-		$pdo = new DB();
-		$s = new Sites();
+		$pdo = new Settings();
+		$s = new Settings();
 		$site = $s->get();
 		$releases = new \Releases(['Settings' => $pdo]);
 
@@ -180,7 +180,7 @@ switch ($options[1]) {
 	 * $options[2] => (string) Group name.
 	 */
 	case 'update_group_headers':
-		$pdo = new DB();
+		$pdo = new Settings();
 		$nntp = nntp($pdo);
 		$groups = new \Groups();
 		$groupMySQL = $groups->getByName($options[2]);
@@ -193,7 +193,7 @@ switch ($options[1]) {
 	case 'update_per_group':
 		if (is_numeric($options[2])) {
 
-			$pdo = new DB();
+			$pdo = new Settings();
 
 			// Get the group info from MySQL.
 			$groupMySQL = $pdo->queryOneRow(sprintf('SELECT * FROM groups WHERE id = %d', $options[2]));
@@ -227,7 +227,7 @@ switch ($options[1]) {
 	case 'pp_additional':
 	case 'pp_nfo':
 		if (charCheck($options[2])) {
-			$pdo = new DB();
+			$pdo = new Settings();
 
 			// Create the connection here and pass, this is for post processing, so check for alternate.
 			$nntp = nntp($pdo, true);
@@ -247,7 +247,7 @@ switch ($options[1]) {
 	 */
 	case 'pp_movie':
 		if (charCheck($options[2])) {
-			$pdo = new DB();
+			$pdo = new Settings();
 			(new PProcess(['Settings' => $pdo]))->processMovies('', $options[2], (isset($options[3]) ? $options[3] : ''));
 		}
 		break;
@@ -259,7 +259,7 @@ switch ($options[1]) {
 	 */
 	case 'pp_tv':
 		if (charCheck($options[2])) {
-			$pdo = new DB();
+			$pdo = new Settings();
 			(new PProcess(['Settings' => $pdo]))->processTv('', $options[2], (isset($options[3]) ? $options[3] : ''));
 		}
 		break;
@@ -273,7 +273,7 @@ switch ($options[1]) {
  */
 function processReleases($site, $releases, $groupID)
 {
-	$s = new Sites();
+	$s = new Settings();
 	$site = $s->get();
 	$releaseCreationLimit = ($site->maxnzbsprocessed != '' ? (int)$site->maxnzbsprocessed : 1000);
 	$releases->applyRegex($groupID);
@@ -307,7 +307,7 @@ function charCheck($char)
 /**
  * Check if the group should be processed.
  *
- * @param \newznab\db\DB $pdo
+ * @param \newznab\db\Settings $pdo
  * @param int                $groupID
  */
 function collectionCheck(&$pdo, $groupID)
@@ -320,7 +320,7 @@ function collectionCheck(&$pdo, $groupID)
 /**
  * Connect to usenet, return NNTP object.
  *
- * @param \DB $pdo
+ * @param \newznab\db\Settings $pdo
  * @param bool               $alternate Use alternate NNTP provider.
  *
  * @return NNTP
@@ -328,9 +328,7 @@ function collectionCheck(&$pdo, $groupID)
 function &nntp(&$pdo, $alternate = false)
 {
 	$nntp = new \NNTP(['Settings' => $pdo]);
-	$s = new Sites();
-	$site = $s->get();
-	if (($alternate && $site->alternate_nntp == 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
+	if (($alternate && $this->pdo->getSetting('alternate_nntp') == 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
 		exit("ERROR: Unable to connect to usenet." . PHP_EOL);
 	}
 

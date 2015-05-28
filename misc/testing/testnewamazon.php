@@ -5,7 +5,7 @@ use newznab\libraries\ApaiIO\Configuration\GenericConfiguration;
 use newznab\libraries\ApaiIO\Operations\Search;
 use newznab\libraries\ApaiIO\ApaiIO;
 
-$s = new Sites();
+$s = new Settings();
 $site = $s->get();
 
 $pubkey = $site->amazonpubkey;

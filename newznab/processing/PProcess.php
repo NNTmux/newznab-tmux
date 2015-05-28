@@ -1,7 +1,7 @@
 <?php
 namespace newznab\processing;
 
-use \newznab\db\DB;
+use \newznab\db\Settings;
 use \newznab\processing\post\AniDB;
 use \newznab\processing\post\ProcessAdditional;
 
@@ -10,7 +10,7 @@ require_once NN_LIBS . 'rarinfo/par2info.php';
 class PProcess
 {
 	/**
-	 * @var \newznab\db\DB
+	 * @var \newznab\db\Settings
 	 */
 	public $pdo;
 
@@ -89,7 +89,7 @@ class PProcess
 		$s = new \Sites();
 		$this->site = $s->get();
 		//\\ Class instances.
-		$this->pdo = (($options['Settings'] instanceof DB) ? $options['Settings'] : new DB());
+		$this->pdo = (($options['Settings'] instanceof Settings) ? $options['Settings'] : new Settings());
 		$this->groups = (($options['Groups'] instanceof \Groups) ? $options['Groups'] : new \Groups());
 		$this->_par2Info = new \Par2Info();
 		$this->debugging = ($options['Logger'] instanceof \Logger ? $options['Logger'] : new \Logger(['ColorCLI' => $this->pdo->log]));

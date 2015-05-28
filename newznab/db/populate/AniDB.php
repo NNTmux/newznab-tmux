@@ -3,7 +3,7 @@ namespace newznab\db\populate;
 
 require_once NN_LIBS . 'simple_html_dom.php';
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 
 class AniDB
@@ -23,7 +23,7 @@ class AniDB
 	public $imgSavePath;
 
 	/**
-	 * @var \newznab\db\DB
+	 * @var \newznab\db\Settings
 	 */
 	public $pdo;
 
@@ -69,7 +69,7 @@ class AniDB
 		$options += $defaults;
 
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
-		$this->pdo        = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+		$this->pdo        = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
 		$s = new \Sites();
 		$this->site = $s->get();
 

@@ -1,12 +1,12 @@
 <?php
 require_once(dirname(__FILE__) . "/../../bin/config.php");
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 
 //	This script can dump all tables or just binaries/parts/partrepair/groups.
 
-$pdo = new DB();
+$pdo = new Settings();
 
 $exportopts = "";
 

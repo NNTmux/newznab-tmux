@@ -1,6 +1,6 @@
 <?php
 
-use newznab\db\DB;
+use newznab\db\Settings;
 use newznab\utility\Utility;
 
 /**
@@ -12,7 +12,7 @@ class TvAnger
 	const MATCH_PROBABILITY = 75;
 
 	/**
-	 * @var newznab\db\DB
+	 * @var newznab\db\Settings
 	 */
 	public $pdo;
 
@@ -36,10 +36,10 @@ class TvAnger
 			'Settings' => null,
 		];
 		$options += $defaults;
-		$s = new Sites();
+		$s = new Settings();
 		$this->site = $s->get();
 
-		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
 		$this->rageqty = ($this->site->maxrageprocessed != '') ? $this->site->maxrageprocessed : 75;
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
 

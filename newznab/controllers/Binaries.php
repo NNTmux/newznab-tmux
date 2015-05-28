@@ -1,6 +1,6 @@
 <?php
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 /**
  * This class manages the downloading of binaries and parts from usenet, and the
@@ -54,7 +54,7 @@ class Binaries
 	protected $_partRepair;
 
 	/**
-	 * @var newznab\db\DB
+	 * @var newznab\db\Settings
 	 */
 	protected $_pdo;
 
@@ -130,7 +130,7 @@ class Binaries
 
 		$this->_colorCLI = ($options['ColorCLI'] instanceof \ColorCLI ? $options['ColorCLI'] : new \ColorCLI());
 		$this->_echoCLI = ($options['Echo'] && NN_ECHOCLI);
-		$this->_pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+		$this->_pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
 		$this->_nntp = ($options['NNTP'] instanceof \NNTP ? $options['NNTP'] : new \NNTP(['Echo' => $this->_colorCLI, 'Settings' => $this->_pdo, 'ColorCLI' => $this->_colorCLI]));
 		$this->_groups = ($options['Groups'] instanceof \Groups ? $options['Groups'] : new \Groups(['Settings' => $this->_pdo]));
 
@@ -145,18 +145,16 @@ class Binaries
 
 		$this->n = "\n";
 
-		$s = new Sites();
-		$site = $s->get();
-		$this->messageBuffer = ($site->maxmssgs != '') ? $site->maxmssgs : 20000;
-		$this->_compressedHeaders = ($site->compressedheaders == "1") ? true : false;
-		$this->MaxMsgsPerRun = (!empty($site->maxmsgsperrun)) ? $site->maxmsgsperrun : 200000;
-		$this->_newGroupScanByDays = ($site->newgroupscanmethod == "1") ? true : false;
-		$this->_newGroupMessagesToScan = (!empty($site->newgroupmsgstoscan)) ? $site->newgroupmsgstoscan : 50000;
-		$this->_newGroupDaysToScan = (!empty($site->newgroupdaystoscan)) ? $site->newgroupdaystoscan : 3;
-		$this->_tablePerGroup = ($site->tablepergroup == 1 ? true : false);
-		$this->_partRepair = ($site->partrepair == 0 ? false : true);
-		$this->_partRepairLimit = ($site->maxpartrepair != '') ? (int)$site->maxpartrepair : 15000;
-		$this->_partRepairMaxTries = ($site->partrepairmaxtries != '' ? (int)$site->partrepairmaxtries : 3);
+		$this->messageBuffer = ($this->_pdo->getSetting('maxmssgs') != '') ? $this->_pdo->getSetting('maxmssgs') : 20000;
+		$this->_compressedHeaders = ($this->_pdo->getSetting('compressedheaders') == "1") ? true : false;
+		$this->MaxMsgsPerRun = (!empty($this->_pdo->getSetting('maxmsgsperrun'))) ? $this->_pdo->getSetting('maxmsgsperrun') : 200000;
+		$this->_newGroupScanByDays = ($this->_pdo->getSetting('newsgroupscanmethod') == "1") ? true : false;
+		$this->_newGroupMessagesToScan = (!empty($this->_pdo->getSetting('newgroupmsgstoscan'))) ? $this->_pdo->getSetting('newgroupmsgstoscan') : 50000;
+		$this->_newGroupDaysToScan = (!empty($this->_pdo->getSetting('newgroupdaystoscan'))) ? $this->_pdo->getSetting('newgroupdaystoscan') : 3;
+		$this->_tablePerGroup = ($this->_pdo->getSetting('tablepergroup') == 1 ? true : false);
+		$this->_partRepair = ($this->_pdo->getSetting('partrepair') == 0 ? false : true);
+		$this->_partRepairLimit = ($this->_pdo->getSetting('maxpartrepair') != '') ? (int)$this->_pdo->getSetting('maxpartrepair') : 15000;
+		$this->_partRepairMaxTries = ($this->_pdo->getSetting('partrepairmaxtries') != '' ? (int)$this->_pdo->getSetting('partrepairmaxtries') : 3);
 
 		$this->blackList = array(); //cache of our black/white list
 		$this->blackList_by_group = array();
@@ -478,7 +476,7 @@ class Binaries
 	 */
 	function scan($groupArr, $first, $last, $type = 'update')
 	{
-		$db = new DB();
+		$db = new Settings();
 		$releaseRegex = new ReleaseRegex;
 		$n = $this->n;
 		// Check if MySQL tables exist, create if they do not, get their names at the same time.
@@ -910,7 +908,7 @@ class Binaries
 	 */
 	private function addMissingParts($numbers, $tablename, $groupID)
 	{
-		$db = new DB();
+		$db = new Settings();
 		$added = false;
 		$insertStr = "INSERT INTO $tablename (numberid, groupid) VALUES ";
 		foreach ($numbers as $number) {
@@ -1011,7 +1009,7 @@ class Binaries
 	 */
 	public function search($search, $limit = 1000, $excludedcats = array())
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		//
 		// if the query starts with a ^ it indicates the search is looking for items which start with the term
@@ -1059,7 +1057,7 @@ class Binaries
 	 */
 	public function getForReleaseId($id)
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		return $db->query(sprintf("select binaries.* from binaries where releaseid = %d order by relpart", $id));
 	}
@@ -1069,7 +1067,7 @@ class Binaries
 	 */
 	public function getById($id)
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		return $db->queryOneRow(sprintf("select binaries.*, groups.name as groupname from binaries left outer join groups on binaries.groupid = groups.id where binaries.id = %d ", $id));
 	}
@@ -1079,7 +1077,7 @@ class Binaries
 	 */
 	public function getBlacklist($activeonly = true)
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		$where = "";
 		if ($activeonly)
@@ -1098,7 +1096,7 @@ class Binaries
 	 */
 	public function getBlacklistByID($id)
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		return $db->queryOneRow(sprintf("select * from binaryblacklist where id = %d ", $id));
 	}
@@ -1108,7 +1106,7 @@ class Binaries
 	 */
 	public function deleteBlacklist($id)
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		return $db->queryExec(sprintf("DELETE from binaryblacklist where id = %d", $id));
 	}
@@ -1118,7 +1116,7 @@ class Binaries
 	 */
 	public function updateBlacklist($regex)
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		$groupname = $regex["groupname"];
 		if ($groupname == "")
@@ -1136,7 +1134,7 @@ class Binaries
 	 */
 	public function addBlacklist($regex)
 	{
-		$db = new DB();
+		$db = new Settings();
 
 		$groupname = $regex["groupname"];
 		if ($groupname == "")
@@ -1157,7 +1155,7 @@ class Binaries
 	 */
 	public function delete($id)
 	{
-		$db = new DB();
+		$db = new Settings();
 		$db->queryExec(sprintf("DELETE from parts where binaryid = %d", $id));
 		$db->queryExec(sprintf("DELETE from binaries where id = %d", $id));
 	}

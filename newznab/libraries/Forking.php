@@ -1,7 +1,7 @@
 <?php
 namespace newznab\libraries;
 
-use \newznab\db\DB;
+use \newznab\db\Settings;
 use \newznab\processing\PProcess;
 
 require_once(NN_LIBS . 'forkdaemon-php' . DS . 'fork_daemon.php');
@@ -92,7 +92,7 @@ class Forking extends \fork_daemon
 		$this->work = [];
 
 		// Init Settings here, as forking causes errors when it's destroyed.
-		$this->pdo = new DB();
+		$this->pdo = new Settings();
 
 		// Process extra work that should not be forked and done before forking.
 		$this->processStartWork();
@@ -307,7 +307,7 @@ class Forking extends \fork_daemon
 	{
 		$this->register_child_run([0 => $this, 1 => 'safeBackfillChildWorker']);
 
-		$run = $this->pdo->query("SELECT (SELECT value FROM tmux WHERE setting = 'backfill_qty') AS qty, (SELECT value FROM tmux WHERE setting = 'backfill') AS backfill, (SELECT value FROM tmux WHERE setting = 'backfill_order') AS orderby, (SELECT value FROM tmux WHERE setting = 'backfill_days') AS days, (SELECT value FROM site WHERE setting = 'maxmssgs') AS maxmsgs");
+		$run = $this->pdo->query("SELECT (SELECT value FROM tmux WHERE setting = 'backfill_qty') AS qty, (SELECT value FROM tmux WHERE setting = 'backfill') AS backfill, (SELECT value FROM tmux WHERE setting = 'backfill_order') AS orderby, (SELECT value FROM tmux WHERE setting = 'backfill_days') AS days, (SELECT value FROM settings WHERE setting = 'maxmssgs') AS maxmsgs");
 		$threads = $this->site->backfillthreads;
 
 		$orderby = "ORDER BY a.last_record ASC";
@@ -1086,7 +1086,7 @@ class Forking extends \fork_daemon
 	private $safeBackfillGroup = '';
 
 	/**
-	 * @var \newznab\db\DB
+	 * @var \newznab\db\Settings
 	 */
 	public $pdo;
 

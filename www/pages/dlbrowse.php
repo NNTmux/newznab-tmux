@@ -1,17 +1,17 @@
 <?php
 require_once("config.php");
 
-use newznab\db\DB;
+use newznab\db\Settings;
 use newznab\utility\Utility;
 
 if (!$users->isLoggedIn())
 	$page->show403();
 
 $r = new Releases();
-$s = new Sites();
+$s = new Settings();
 $site = $s->get();
 
-$db = new DB();
+$db = new Settings();
 
 if ($site->sabvdir == "" || $site->sabcompletedir == "" || !file_exists($site->sabcompletedir))
 	$page->show404();

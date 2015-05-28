@@ -1,7 +1,7 @@
 <?php
 require_once NN_LIBS . 'GiantBombAPI.php';
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 
 class Games
@@ -43,7 +43,7 @@ class Games
 	public $maxHitRequest;
 
 	/**
-	 * @var newznab\db\DB
+	 * @var newznab\db\Settings
 	 */
 	public $pdo;
 
@@ -99,21 +99,19 @@ class Games
 		];
 		$options += $defaults;
 
-		$s = new Sites();
-		$this->site = $s->get();
 		$this->echoOutput = ($options['Echo'] && NN_ECHOCLI);
 
-		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
+		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
 
-		$this->publicKey = $this->site->giantbombkey;
-		$this->gameQty = ($this->site->maxgamesprocessed != '') ? $this->site->maxgamesprocessed : 150;
-		$this->sleepTime = ($this->site->amazonsleep != '') ? $this->site->amazonsleep : 1000;
+		$this->publicKey = $this->pdo->getSetting('giantbombkey');
+		$this->gameQty = ($this->pdo->getSetting('maxgamesprocessed') != '') ? $this->pdo->getSetting('maxgamesprocessed') : 150;
+		$this->sleepTime = ($this->pdo->getSetting('amazonsleep') != '') ? $this->pdo->getSetting('amazonsleep') : 1000;
 		$this->imgSavePath = NN_COVERS . 'games' . DS;
 		$this->renamed = '';
 		$this->matchPercentage = 60;
 		$this->maxHitRequest = false;
 		$this->cookie = NN_TMP . 'xxx.cookie';
-		if ($this->site->lookupgames == 2) {
+		if ($this->pdo->getSetting('lookupgames') == 2) {
 			$this->renamed = 'AND isrenamed = 1';
 		}
 		//$this->cleangames = ($this->site->('lookupgames') == 2) ? 'AND isrenamed = 1' : '';
@@ -175,7 +173,7 @@ class Games
 				WHERE r.nzbstatus = 1
 				AND con.title != ''
 				AND con.cover = 1
-				AND r.passwordstatus <= (SELECT value FROM site WHERE setting='showpasswordedrelease')
+				AND r.passwordstatus <= (SELECT value FROM settings WHERE setting='showpasswordedrelease')
 				AND %s %s %s %s",
 				$this->getBrowseBy(),
 				$catsrch,
@@ -236,7 +234,7 @@ class Games
 				. "LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id "
 				. "INNER JOIN gamesinfo con ON con.id = r.gamesinfo_id "
 				. "WHERE r.nzbstatus = 1 AND con.title != '' AND "
-				. "r.passwordstatus <= (SELECT value FROM site WHERE setting='showpasswordedrelease') AND %s %s %s %s "
+				. "r.passwordstatus <= (SELECT value FROM settings WHERE setting='showpasswordedrelease') AND %s %s %s %s "
 				. "GROUP BY con.id ORDER BY %s %s" . $limit,
 				$browseby,
 				$catsrch,

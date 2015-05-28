@@ -1,6 +1,6 @@
 <?php
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 // Silent Error Handler (used to shut up noisy XML exceptions)
 function nfoHandleError($errno, $errstr, $errfile, $errline, array $errcontext){
@@ -224,7 +224,7 @@ class Nfo
 		// it no good, we need to add it to the skipped array which
 		// must be passed into the function.
 
-		$db = new DB();
+		$db = new Settings();
 		foreach($blobhash as $uid => $blob){
 			$query = sprintf(
 				"REPLACE INTO releasenfo (id, releaseid, binaryID, nfo) ".
@@ -489,7 +489,7 @@ class Nfo
 		// nzb files are further parsed for nfo segments that can
 		// be extracted and applied to the release
 		$nzb = new NZB();
-		$db = new DB();
+		$db = new Settings();
 
 		// How many releases to handle at a time
 		$batch=Nfo::NNTP_BATCH_COUNT;
@@ -587,7 +587,7 @@ class Nfo
 	 */
 	public function deleteReleaseNfo($relid)
 	{
-		$db = new DB();
+		$db = new Settings();
 		return $db->queryExec(sprintf("DELETE from releasenfo where releaseid = %d", $relid));
 	}
 
@@ -596,7 +596,7 @@ class Nfo
 	 */
 	private function setNfoMissing($relid)
 	{
-		$db = new DB();
+		$db = new Settings();
 		$q = sprintf("UPDATE releases SET releasenfoid = %d ".
 					"WHERE id = %d", Nfo::FLAG_NFO_MISSING, $relid);
 		return $db->queryExec($q);
@@ -607,7 +607,7 @@ class Nfo
 	 */
 	public function getNfo($relid, &$nfoout)
 	{
-		$db = new DB();
+		$db = new Settings();
 		// Has NFO Query
 		$mnfo = "SELECT uncompress(rn.nfo) as nfo FROM releases r ".
 			"INNER JOIN releasenfo rn ON rn.releaseid = r.id AND rn.id = r.releasenfoid ".

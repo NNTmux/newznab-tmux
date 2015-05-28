@@ -1,7 +1,7 @@
 <?php
 require_once(dirname(__FILE__) . "/../../../bin/config.php");
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 
 /* This script will allow you to move from single binaries/parts tables to TPG without having to run reset_truncate.
@@ -12,10 +12,10 @@ use newznab\db\DB;
   php convert_to_tgp.php true delete        Convert c/b/p to tpg and TRUNCATE current binaries/parts tables.
  */
 $debug = false;
-$pdo = new DB();
+$pdo = new Settings();
 $groups = new \Groups(['Settings' => $pdo]);
 $consoletools = new \ConsoleTools(['ColorCLI' => $pdo->log]);
-$s = new Sites();
+$s = new Settings();
 $site = $s->get();
 $DoPartRepair = ($site->partrepair == '0') ? false : true;
 

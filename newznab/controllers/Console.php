@@ -1,7 +1,7 @@
 <?php
 require_once NN_LIBS . 'AmazonProductAPI.php';
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 /**
  * This class looks up metadata about console releases and handles
@@ -12,7 +12,7 @@ class Console
 	const NUMTOPROCESSPERTIME = 100;
 
 	/**
-	 * @var newznab\db\DB
+	 * @var newznab\db\Settings
 	 */
 	public $pdo;
 
@@ -29,13 +29,11 @@ class Console
 	public function __construct($echooutput=false)
 	{
 		$this->echooutput = (NN_ECHOCLI && $echooutput);
-		$s = new Sites();
-		$site = $s->get();
-		$this->pubkey = $site->amazonpubkey;
-		$this->privkey = $site->amazonprivkey;
-		$this->asstag = $site->amazonassociatetag;
-		$this->pdo = new newznab\db\DB();
-		$this->imgSavePath = WWW_DIR.'covers/console/';
+		$this->pdo = new Settings();
+		$this->pubkey = $this->pdo->getSetting('amazonpubkey');
+		$this->privkey = $this->pdo->getSetting('amazonprivkey');
+		$this->asstag = $this->pdo->getSetting('amazonassociatetag');
+		$this->imgSavePath = NN_COVERS . 'console' . DS;
 	}
 
 	/**

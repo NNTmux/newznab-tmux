@@ -1,6 +1,6 @@
 <?php
 
-use newznab\db\DB;
+use newznab\db\Settings;
 use newznab\libraries\ApaiIO\Configuration\GenericConfiguration;
 use newznab\libraries\ApaiIO\Operations\Search;
 use newznab\libraries\ApaiIO\ApaiIO;
@@ -11,7 +11,7 @@ use newznab\libraries\ApaiIO\ApaiIO;
 class Books
 {
 	/**
-	 * @var newznab\db\DB
+	 * @var newznab\db\Settings
 	 */
 	public $pdo;
 
@@ -72,15 +72,12 @@ class Books
 		$options += $defaults;
 
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
-		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
-		$s = new Sites();
-		$this->site = $s->get();
-
-		$this->pubkey = $this->site->amazonpubkey;
-		$this->privkey = $this->site->amazonprivkey;
-		$this->asstag = $this->site->amazonassociatetag;
+		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
+		$this->pubkey = $this->pdo->getSetting('amazonpubkey');
+		$this->privkey = $this->pdo->getSetting('amazonprivkey');
+		$this->asstag = $this->pdo->getSetting('amazonassociatetag');
 		$this->bookqty = ($this->site->maxbooksprocessed != '') ? $this->site->maxbooksprocessed : 300;
-		$this->sleeptime = ($this->site->amazonsleep != '') ? $this->site->amazonsleep : 1000;
+		$this->sleeptime = ($this->pdo->getSetting('amazonsleep') != '') ? $this->pdo->getSetting('amazonsleep') : 1000;
 		$this->imgSavePath = NN_COVERS . 'book' . DS;
 		$this->bookreqids = ($this->site->book_reqids == null || $this->site->book_reqids == "") ? 7010 : $this->site->book_reqids;
 		$this->renamed = '';
@@ -171,7 +168,7 @@ class Books
 			sprintf(
 				"SELECT COUNT(DISTINCT r.bookinfoid) AS num FROM releases r "
 				. "INNER JOIN bookinfo boo ON boo.id = r.bookinfoid AND boo.title != '' and boo.cover = 1 "
-				. "WHERE r.nzbstatus = 1 AND  r.passwordstatus <= (SELECT value FROM site WHERE setting='showpasswordedrelease') "
+				. "WHERE r.nzbstatus = 1 AND  r.passwordstatus <= (SELECT value FROM settings WHERE setting='showpasswordedrelease') "
 				. "AND %s %s %s %s", $browseby, $catsrch, $maxage, $exccatlist
 			)
 		);
@@ -224,7 +221,7 @@ class Books
 			. "LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id "
 			. "INNER JOIN bookinfo boo ON boo.id = r.bookinfoid "
 			. "WHERE r.nzbstatus = 1 AND boo.cover = 1 AND boo.title != '' AND "
-			. "r.passwordstatus <= (SELECT value FROM site WHERE setting='showpasswordedrelease') AND %s %s %s %s "
+			. "r.passwordstatus <= (SELECT value FROM settings WHERE setting='showpasswordedrelease') AND %s %s %s %s "
 			. "GROUP BY boo.id ORDER BY %s %s" . $limit, $browseby, $catsrch, $maxage, $exccatlist, $order[0], $order[1]
 		);
 

@@ -9,14 +9,14 @@
  */
 require_once(dirname(__FILE__) . "/../bin/config.php");
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 
 $n = "\n";
-$pdo = new DB();
+$pdo = new Settings();
 $namefixer = new \NameFixer(['Settings' => $pdo]);
 $predb = new \PreHash(['Echo' => true, 'Settings' => $pdo]);
-$s = new Sites();
+$s = new Settings();
 $site = $s->get();
 
 if (isset($argv[1]) && isset($argv[2]) && isset($argv[3]) && isset($argv[4])) {
@@ -37,7 +37,7 @@ if (isset($argv[1]) && isset($argv[2]) && isset($argv[3]) && isset($argv[4])) {
 	$nntp = null;
 	if ($argv[1] == 7 || $argv[1] == 8) {
 		$nntp = new \NNTP(['Settings' => $pdo]);
-		if (($site->alternate_nntp == '1' ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
+		if (($this->pdo->getSetting('alternate_nntp') == '1' ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
 			echo $pdo->log->error("Unable to connect to usenet.\n");
 			return;
 		}

@@ -1,13 +1,13 @@
 <?php
 namespace newznab\controllers;
 
-use newznab\db\DB;
+use newznab\db\Settings;
 use ReCaptcha\ReCaptcha;
 
 
 class Captcha {
 	/**
-	 * @var \newznab\db\DB
+	 * @var \newznab\db\Settings
 	 */
 	private $pdo;
 
@@ -81,9 +81,7 @@ class Captcha {
 		];
 		$options += $defaults;
 
-		$this->pdo = ($options['Settings'] instanceof DB ? $options['Settings'] : new DB());
-		$s = new \Sites();
-		$this->site = $s->get();
+		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
 	}
 
 	/**
@@ -189,8 +187,8 @@ class Captcha {
 			return true;
 		}
 
-		$this->sitekey = $this->site->recaptchapublickey;
-		$this->secretkey = $this->site->recaptchaprivatekey;
+		$this->sitekey = $this->pdo->getSetting('recaptchapublickey');
+		$this->secretkey = $this->pdo->getSetting('recaptchaprivatekey');
 
 		if ($this->sitekey != false && $this->sitekey != '') {
 			if ($this->secretkey != false && $this->secretkey != '') {

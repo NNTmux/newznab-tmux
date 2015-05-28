@@ -1,6 +1,6 @@
 <?php
 
-use newznab\db\DB;
+use newznab\db\Settings;
 /**
  * Tmux output functions for printing monitor data
  *
@@ -22,17 +22,14 @@ class TmuxOutput extends Tmux
 
 
 	/**
-	 * @param newznab\db\DB $pdo
+	 * @param newznab\db\Settings $pdo
 	 */
-	public function __construct(DB $pdo = null)
+	public function __construct(Settings $pdo = null)
 	{
 		parent::__construct($pdo);
-
-		$s = new Sites();
-		$site = $s->get();
 		$t = new Tmux();
 		$tmux = $t->get();
-		$this->_vers = $site->dbversion;
+		$this->_vers = $this->pdo->getSetting('dbversion');
 		$this->_tvers = $tmux->sqlpatch;
 
 

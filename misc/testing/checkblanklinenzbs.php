@@ -1,10 +1,10 @@
 <?php
 require_once dirname(__FILE__) . '/../../www/config.php';
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
 
-$db = new DB();
+$db = new Settings();
 $n = new NZB();
 $s = New Sites;
 $site = $s->get();

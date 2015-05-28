@@ -1,10 +1,10 @@
 <?php
 require_once(dirname(__FILE__) . "/../../../bin/config.php");
 
-use newznab\db\DB;
+use newznab\db\Settings;
 
-$pdo = new DB();
-$s = new Sites();
+$pdo = new Settings();
+$s = new Settings();
 $site = $s->get();
 
 if (isset($argv[1]) && ($argv[1] == "true" || $argv[1] == "drop")) {
