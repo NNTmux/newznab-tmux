@@ -1,6 +1,9 @@
 <?php
 namespace newznab\utility;
 
+use newznab\db\Settings;
+use ColorCLI;
+
 
 /**
  * Class Utility
@@ -138,6 +141,13 @@ class Utility
 		return $files;
 	}
 
+	public static function getValidVersionsFile()
+	{
+		$versions = new Versions();
+
+		return $versions->getValidVersionsFile();
+	}
+
 	/**
 	 * Detect if the command is accessible on the system.
 	 *
@@ -190,6 +200,29 @@ class Utility
 		}
 
 		return ($gzipped);
+	}
+
+	public static function isPatched(Settings $pdo = null)
+	{
+		$versions = self::getValidVersionsFile();
+
+		if (!($pdo instanceof Settings)) {
+			$pdo = new Settings();
+		}
+		$patch = $pdo->getSetting(['section' => '', 'subsection' => '', 'name' => 'sqlpatch']);
+		$ver = $versions->versions->sql->file;
+
+		// Check database patch version
+		if ($patch < $ver) {
+			$message = "\nYour database is not up to date. Reported patch levels\n   Db: $patch\nfile: $ver\nPlease update.\n php " .
+				NN_ROOT . "cli/update_db.php true\n";
+			if (self::isCLI()) {
+				echo (new ColorCLI())->error($message);
+			}
+			throw new \RuntimeException($message);
+		}
+
+		return true;
 	}
 
 	static public function isWin()
@@ -269,6 +302,26 @@ class Utility
 		}
 
 		return ($string === '' ? false : $string);
+	}
+
+	public static function setCoversConstant($path)
+	{
+		if (!defined('NN_COVERS')) {
+			switch (true) {
+				case (substr($path, 0, 1) == '/' ||
+					substr($path, 1, 1) == ':' ||
+					substr($path, 0, 1) == '\\'):
+					define('NN_COVERS', self::trailingSlash($path));
+					break;
+				case (strlen($path) > 0 && substr($path, 0, 1) != '/' && substr($path, 1, 1) != ':' &&
+					substr($path, 0, 1) != '\\'):
+					define('NN_COVERS', realpath(NN_ROOT . self::trailingSlash($path)));
+					break;
+				case empty($path): // Default to resources location.
+				default:
+					define('NN_COVERS', NN_RES . 'covers' . DS);
+			}
+		}
 	}
 
 	/**
