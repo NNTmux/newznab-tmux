@@ -3,7 +3,7 @@
 /*
  * This script deletes releases that match certain criteria, type php removeCrapReleases.php false for details.
  */
-require_once(dirname(__FILE__)."/../bin/config.php");
+require_once(dirname(__FILE__) . "/../bin/config.php");
 
 $cli = new \ColorCLI();
 $n = PHP_EOL;
