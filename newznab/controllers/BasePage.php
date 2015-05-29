@@ -160,7 +160,7 @@ class BasePage
 
 		}
 
-		$this->smarty->assign('site', $this->pdo);
+		$this->smarty->assign('site', $this->settings);
 		$this->smarty->assign('page', $this);
 	}
 
