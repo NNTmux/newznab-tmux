@@ -62,8 +62,6 @@ switch ($options[1]) {
 		$pdo = new Settings();
 		$nntp = nntp($pdo);
 		$groups = new \Groups();
-		$s = new Settings();
-		$site = $s->get();
 		$groupMySQL = $groups->getByName($options[3]);
 		if ($nntp->isError($nntp->selectGroup($groupMySQL['name']))) {
 			if ($nntp->isError($nntp->dataError($nntp, $groupMySQL['name']))) {
@@ -71,7 +69,7 @@ switch ($options[1]) {
 			}
 		}
 		$binaries = new \Binaries(['NNTP' => $nntp, 'Settings' => $pdo, 'Groups' => $groups]);
-		$return = $binaries->scan($groupMySQL, $options[4], $options[5], ($site->safepartrepair == 1 ? 'update' : 'backfill'));
+		$return = $binaries->scan($groupMySQL, $options[4], $options[5], ($pdo->getSetting('safepartrepair') == 1 ? 'update' : 'backfill'));
 		if (empty($return)) {
 			exit();
 		}
@@ -144,13 +142,11 @@ switch ($options[1]) {
 	// $options[2] => (string)groupCount, number of groups terminated by _ | (int)groupid, group to work on
 	case 'releases':
 		$pdo = new Settings();
-		$s = new Settings();
-		$site = $s->get();
 		$releases = new \Releases(['Settings' => $pdo]);
 
 		//Runs function that are per group
 		if (is_numeric($options[2])) {
-			processReleases($site, $releases, $options[2]);
+			processReleases($pdo, $releases, $options[2]);
 
 		} else {
 
@@ -271,11 +267,10 @@ switch ($options[1]) {
  * @param \Releases $releases
  * @param int             $groupID
  */
-function processReleases($site, $releases, $groupID)
+function processReleases($pdo, $releases, $groupID)
 {
-	$s = new Settings();
-	$site = $s->get();
-	$releaseCreationLimit = ($site->maxnzbsprocessed != '' ? (int)$site->maxnzbsprocessed : 1000);
+	$pdo = new Settings();
+	$releaseCreationLimit = ($pdo->getSetting('maxnzbsprocessed') != '' ? (int)$pdo->getSetting('maxnzbsprocessed') : 1000);
 	$releases->applyRegex($groupID);
 	$releases->processIncompleteBinaries($groupID);
 	$releases->createReleases($groupID);

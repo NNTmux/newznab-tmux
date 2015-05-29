@@ -3,20 +3,18 @@ require_once dirname(__FILE__) . '/../../www/config.php';
 
 use newznab\db\Settings;
 
-$s = new Settings();
-$site = $s->get();
-$db = new Settings();
+$pdo = new Settings();
 $r = new Releases();
 
 //
 // Option One - delete all from the database where it exists on disk, but not in the db
 //
 /*
-$it = new RecursiveDirectoryIterator($site->nzbpath);
+$it = new RecursiveDirectoryIterator($pdo->getSetting('nzbpath'));
 foreach(new RecursiveIteratorIterator($it) as $file)
 {
 	$releaseGUID = str_replace(".nzb.gz", "", $file->getFilename());
-	$rel = $db->queryOneRow(sprintf("SELECT ID from releases where guid = %s", $db->escapeString($releaseGUID)));
+	$rel = $db->queryOneRow(sprintf("SELECT ID from releases where guid = %s", $pdo->escapeString($releaseGUID)));
 	if (!$rel)
 	{
 		$r->delete($releaseGUID, true);
@@ -36,7 +34,7 @@ foreach(new RecursiveIteratorIterator($it) as $file)
 	$res = $db->queryDirect("select guid from releases");
 	while ($row = $db->getAssocArray($res))
 	{
-		$nzbpath = $site->nzbpath.substr($row["guid"], 0, 1)."/".$row["guid"].".nzb.gz";
+		$nzbpath = $pdo->getSetting('nzbpath').substr($row["guid"], 0, 1)."/".$row["guid"].".nzb.gz";
 		if (!file_exists($nzbpath))
 		{
 			echo "deleted ".$row["guid"];

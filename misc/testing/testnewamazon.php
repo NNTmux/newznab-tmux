@@ -4,13 +4,13 @@ require_once dirname(__FILE__) . '/../../www/config.php';
 use newznab\libraries\ApaiIO\Configuration\GenericConfiguration;
 use newznab\libraries\ApaiIO\Operations\Search;
 use newznab\libraries\ApaiIO\ApaiIO;
+use newznab\db\Settings;
 
-$s = new Settings();
-$site = $s->get();
+$pdo = new Settings();
 
-$pubkey = $site->amazonpubkey;
-$privkey = $site->amazonprivkey;
-$asstag = $site->amazonassociatetag;
+$pubkey = $pdo->getSetting('amazonpubkey');
+$privkey = $pdo->getSetting('amazonprivkey');
+$asstag = $pdo->getSetting('amazonassociatetag');
 
 $conf = new GenericConfiguration();
 $conf

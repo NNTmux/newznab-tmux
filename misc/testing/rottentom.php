@@ -1,12 +1,14 @@
 <?php
 require_once dirname(__FILE__) . '/../../www/config.php';
 
-$s = new Settings();
-$site = $s->get();
+use newznab\db\Settings;
 
-if (isset($site->rottentomatokey))
+$pdo = new Settings();
+$rtkey = $pdo->getSetting('rottentomatokey');
+
+if (isset($rtkey))
 {
-	$rt = new RottenTomato($site->rottentomatokey);
+	$rt = new RottenTomato($pdo->getSetting('rottentomatokey'));
 
 	//print_r($rt->getMoviesBoxOffice());
 	//print_r($rt->getMoviesInTheaters());

@@ -4,17 +4,15 @@ require_once dirname(__FILE__) . '/../../www/config.php';
 
 use newznab\db\Settings;
 
-$s = new Settings();
-$site = $s->get();
 $releases = new Releases();
-$db = new Settings();
+$pdo = new Settings();
 $nzb = new NZB();
 $nntp = new NNTP;
 
 // read pars for a release GUID, echo out any that look like a rar
 $relguid = "249f9ec1f0d68d33b5fa85594ba1a47d";
 
-$nzbfile = $nzb->getNZBPath($relguid, $site->nzbpath, true);
+$nzbfile = $nzb->getNZBPath($relguid, $pdo->getSetting('nzbpath'), true);
 $nzbInfo = new nzbInfo;
 $nzbInfo->loadFromFile($nzbfile);
 
