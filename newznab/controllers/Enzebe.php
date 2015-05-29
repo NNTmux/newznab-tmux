@@ -82,13 +82,11 @@ class Enzebe
 	public function __construct(&$pdo = null)
 	{
 		$this->pdo = ($pdo instanceof Settings ? $pdo : new Settings());
-		$s = new Settings();
-		$this->site = $s->get();
 
-		$this->tablePerGroup = ($this->site->tablepergroup == 0 ? false : true);
-		$nzbSplitLevel = $this->site->nzbsplitlevel;
+		$this->tablePerGroup = ($this->pdo->getSetting('tablepergroup') == 0 ? false : true);
+		$nzbSplitLevel = $this->pdo->getSetting('nzbsplitlevel');
 		$this->nzbSplitLevel = (empty($nzbSplitLevel) ? 1 : $nzbSplitLevel);
-		$this->siteNzbPath = (string)$this->site->nzbpath;
+		$this->siteNzbPath = (string)$this->pdo->getSetting('nzbpath');
 		if (substr($this->siteNzbPath, -1) !== DS) {
 			$this->siteNzbPath .= DS;
 		}

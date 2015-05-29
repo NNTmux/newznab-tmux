@@ -100,8 +100,6 @@ class Backfill
 		$this->_nntp = ($options['NNTP'] instanceof \NNTP
 			? $options['NNTP'] : new \NNTP(['Settings' => $this->pdo])
 		);
-		$s = new Settings();
-		$this->site = $s->get();
 
 		$this->_debug = (NN_LOGGING || NN_DEBUG);
 		if ($this->_debug) {
@@ -112,10 +110,10 @@ class Backfill
 			}
 		}
 
-		$this->_compressedHeaders = ($this->site->compressedheaders == 1 ? true : false);
-		$this->_safeBackFillDate = ($this->site->safebackfilldate != '') ? (string)$this->site->safebackfilldate : '2008-08-14';
-		$this->_safePartRepair = ($this->site->safepartrepair == 1 ? 'update' : 'backfill');
-		$this->_tablePerGroup = ($this->site->tablepergroup == 1 ? true : false);
+		$this->_compressedHeaders = ($this->pdo->getSetting('compressedheaders') == 1 ? true : false);
+		$this->_safeBackFillDate = ($this->pdo->getSetting('safebackfilldate') != '') ? (string)$this->pdo->getSetting('safebackfilldate') : '2008-08-14';
+		$this->_safePartRepair = ($this->pdo->getSetting('safepartrepair') == 1 ? 'update' : 'backfill');
+		$this->_tablePerGroup = ($this->pdo->getSetting('tablepergroup') == 1 ? true : false);
 	}
 
 	/**

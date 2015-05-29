@@ -298,8 +298,6 @@ class ProcessAdditional
 		$this->_par2Info = new \Par2Info();
 		$this->_nfo = ($options['Nfo'] instanceof \Info ? $options['Nfo'] : new \Info(['Echo' => $this->_echoCLI, 'Settings' => $this->pdo]));
 		$this->sphinx = ($options['SphinxSearch'] instanceof \SphinxSearch ? $options['SphinxSearch'] : new \SphinxSearch());
-		$s = new \Sites();
-		$this->site = $s->get();
 
 		$this->_innerFileBlacklist = ($this->pdo->getSetting('innerfileblacklist') == '' ? false : $this->pdo->getSetting('innerfileblacklist'));
 		$this->_maxNestedLevels = ($this->pdo->getSetting('maxnestedlevels') == 0 ? 3 : $this->pdo->getSetting('maxnestedlevels'));

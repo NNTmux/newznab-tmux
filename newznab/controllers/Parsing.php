@@ -683,7 +683,7 @@ class Parsing
 				}
 
 				// do par check if user has elected for downloading extra stuff
-				if ($this->site->unrarpath != '' && $foundName == "") {
+				if ($this->pdo->getSetting('unrarpath') != '' && $foundName == "") {
 					$nzb = new NZB();
 					$nzbfile = $nzb->getNZBPath($rel['guid']);
 					$nzbInfo = new nzbInfo;

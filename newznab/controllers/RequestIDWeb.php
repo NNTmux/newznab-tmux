@@ -150,7 +150,7 @@ class RequestIDWeb extends RequestID
 
 		// Do a web lookup.
 		$returnXml = Utility::getUrl([
-				'url' => $this->site->request_url,
+				'url' => $this->pdo->getSetting('request_url'),
 				'method' => 'post',
 				'postdata' => 'data=' . serialize($requestArray),
 				'verifycert' => false,

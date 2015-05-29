@@ -71,7 +71,7 @@ class Sphinx
      */
     public function getNextMergeDate()
     {
-        return strtotime("tomorrow ".$this->site->sphinxmergefreq);
+        return strtotime("tomorrow ".$this->pdo->getSetting('sphinxmergefreq'));
     }
 
     /**
@@ -766,7 +766,7 @@ class Sphinx
                         // No field specifiers were found, so use the site-defaults.  This
                         // turns the query for "ubuntu" into something like:
                         //  "@(name,searchname) ubuntu"
-                        $fields = str_replace(" ", "", $this->site->sphinxsearchfields);
+                        $fields = str_replace(" ", "", $this->pdo->getSetting('sphinxsearchfields'));
 
                         // Remove single "-" so that Sphinx doesn't use it as an
                         // exclusion modifier

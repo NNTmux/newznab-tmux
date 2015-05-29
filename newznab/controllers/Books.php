@@ -76,12 +76,12 @@ class Books
 		$this->pubkey = $this->pdo->getSetting('amazonpubkey');
 		$this->privkey = $this->pdo->getSetting('amazonprivkey');
 		$this->asstag = $this->pdo->getSetting('amazonassociatetag');
-		$this->bookqty = ($this->site->maxbooksprocessed != '') ? $this->site->maxbooksprocessed : 300;
+		$this->bookqty = ($this->pdo->getSetting('maxbooksprocessed') != '') ? $this->pdo->getSetting('maxbooksprocessed') : 300;
 		$this->sleeptime = ($this->pdo->getSetting('amazonsleep') != '') ? $this->pdo->getSetting('amazonsleep') : 1000;
 		$this->imgSavePath = NN_COVERS . 'book' . DS;
-		$this->bookreqids = ($this->site->book_reqids == null || $this->site->book_reqids == "") ? 7010 : $this->site->book_reqids;
+		$this->bookreqids = ($this->pdo->getSetting('book_reqids') == null || $this->pdo->getSetting('book_reqids') == "") ? 7010 : $this->pdo->getSetting('book_reqids');
 		$this->renamed = '';
-		if ($this->site->lookupbooks == 2) {
+		if ($this->pdo->getSetting('lookupbooks') == 2) {
 			$this->renamed = 'AND isrenamed = 1';
 		}
 	}
