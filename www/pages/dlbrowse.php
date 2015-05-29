@@ -14,9 +14,9 @@ if ($pdo->getSetting('sabvdir') == "" || $pdo->getSetting('sabcompletedir') == "
 	$page->show404();
 
 if (!Utility::endsWith($pdo->getSetting('sabcompletedir'), "/"))
-	$pdo->getSetting('sabcompletedir').= "/";
+	$pdo->getSetting('sabcompletedir');
 if (!Utility::endsWith($pdo->getSetting('sabvdir'), "/"))
-	$pdo->getSetting('sabvdir').="/";
+	$pdo->getSetting('sabvdir');
 
 
 $basepath = $pdo->getSetting('sabcompletedir');
