@@ -15,9 +15,7 @@ $debug = false;
 $pdo = new Settings();
 $groups = new \Groups(['Settings' => $pdo]);
 $consoletools = new \ConsoleTools(['ColorCLI' => $pdo->log]);
-$s = new Settings();
-$site = $s->get();
-$DoPartRepair = ($site->partrepair == '0') ? false : true;
+$DoPartRepair = ($pdo->getSetting('partrepair') == '0') ? false : true;
 
 if ((!isset($argv[1])) || $argv[1] != 'true') {
 	exit($pdo->log->error("\nMandatory argument missing\n\n"

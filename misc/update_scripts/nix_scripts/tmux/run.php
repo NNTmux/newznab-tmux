@@ -4,11 +4,9 @@ require_once dirname(__FILE__) . '/../../../../www/config.php';
 use newznab\db\Settings;
 use newznab\utility\Utility;
 
-$db = new Settings();
+$pdo = new Settings();
 $DIR = NN_TMUX;
 $c = new ColorCLI();
-$s = new Settings();
-$site = $s->get();
 $t = new Tmux();
 $tmux = $t->get();
 $patch = (isset($tmux->sqlpatch)) ? $tmux->sqlpatch : 0;
@@ -17,8 +15,8 @@ $tmux_session = (isset($tmux->tmux_session)) ? $tmux->tmux_session : 0;
 $seq = (isset($tmux->sequential)) ? $tmux->sequential : 0;
 $powerline = (isset($tmux->powerline)) ? $tmux->powerline : 0;
 $colors = (isset($tmux->colors)) ? $tmux->colors : 0;
-$nntpproxy = $site->nntpproxy;
-$tablepergroup = $site->tablepergroup;
+$nntpproxy = $pdo->getSetting('nntpproxy');
+$tablepergroup = $pdo->getSetting('tablepergroup');
 $tablepergroup = ($tablepergroup != '') ? $tablepergroup : 0;
 
 Utility::clearScreen();
@@ -48,7 +46,7 @@ if (count($session) !== 0) {
 	exit($pdo->log->error("tmux session: '" . $tmux_session . "' is already running, aborting.\n"));
 }
 
-$nntpproxy = $site->nntpproxy;
+$nntpproxy = $pdo->getSetting('nntpproxy');
 if ($nntpproxy == '1') {
 	$modules = ["nntp", "socketpool"];
 	foreach ($modules as &$value) {
@@ -69,15 +67,6 @@ function writelog($pane)
 		return "2>&1 | tee -a $path/$pane-$getdate.log";
 	} else {
 		return "";
-	}
-}
-
-//remove folders from tmpunrar
-if (isset($site->tmpunrarpath)) {
-	$tmpunrar = $site->tmpunrarpath;
-	if ((count(glob("$tmpunrar/*", GLOB_ONLYDIR))) > 0) {
-		echo $c->info("Removing dead folders from " . $tmpunrar);
-		exec("rm -r " . $tmpunrar . "/*");
 	}
 }
 
@@ -102,12 +91,12 @@ function python_module_exist($module)
 	return ($returnCode == 0 ? true : false);
 }
 
-$nntpproxy = $site->nntpproxy;
+$nntpproxy = $pdo->getSetting('nntpproxy');
 if ($nntpproxy == '1') {
 	$modules = array("nntp", "socketpool");
 	foreach ($modules as &$value) {
 		if (!python_module_exist($value)) {
-			exit($db->log->error("\nNNTP Proxy requires " . $value . " python module but it's not installed. Aborting.\n"));
+			exit($pdo->log->error("\nNNTP Proxy requires " . $value . " python module but it's not installed. Aborting.\n"));
 		}
 	}
 }
@@ -164,8 +153,8 @@ function start_apps($tmux_session)
 
 function window_proxy($tmux_session, $window)
 {
-	global $site;
-	$nntpproxy = $site->nntpproxy;
+	global $pdo;
+	$nntpproxy = $pdo->getSetting('nntpproxy');
 	if ($nntpproxy === '1') {
 		$DIR = NN_MISC;
 		$nntpproxypy = $DIR . "update_scripts/nix_scripts/tmux/python/nntpproxy.py";

@@ -6,8 +6,6 @@ use newznab\db\Settings;
 use newznab\processing\PProcess;
 
 $pdo = new Settings();
-$s = new Settings();
-$site = $s->get();
 /**
 Array with possible arguments for run and
 whether or not those methods of operation require NNTP

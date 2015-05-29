@@ -5,8 +5,6 @@ use newznab\db\Settings;
 use newznab\processing\PProcess;
 
 $pdo = new Settings();
-$s = new Settings();
-$site = $s->get();
 
 if (!isset($argv[1])) {
 	exit($pdo->log->error("This script is not intended to be run manually, it is called from groupfixrelnames_threaded.py."));

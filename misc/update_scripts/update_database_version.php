@@ -4,7 +4,7 @@ require_once("config.php");
 
 use newznab\db\Settings;
 
-$s = new Settings();
+$s = new Sites();
 $site = $s->get();
 $patches = $s->getUnappliedPatches($site);
 

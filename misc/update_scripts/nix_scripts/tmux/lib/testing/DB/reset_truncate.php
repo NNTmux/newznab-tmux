@@ -4,8 +4,6 @@ require_once(dirname(__FILE__) . "/../../../bin/config.php");
 use newznab\db\Settings;
 
 $pdo = new Settings();
-$s = new Settings();
-$site = $s->get();
 
 if (isset($argv[1]) && ($argv[1] == "true" || $argv[1] == "drop")) {
 	$pdo->queryExec("UPDATE groups SET first_record = 0, first_record_postdate = NULL, last_record = 0, last_record_postdate = NULL, last_updated = NULL");
@@ -20,7 +18,7 @@ if (isset($argv[1]) && ($argv[1] == "true" || $argv[1] == "drop")) {
 	}
 	unset($value);
 
-	$tpg = $site->tablepergroup;
+	$tpg = $pdo->getSetting('tablepergroup');
 	$tablepergroup = (!empty($tpg)) ? $tpg : 0;
 
 	if ($tablepergroup == 1) {

@@ -16,8 +16,6 @@ $n = "\n";
 $pdo = new Settings();
 $namefixer = new \NameFixer(['Settings' => $pdo]);
 $predb = new \PreHash(['Echo' => true, 'Settings' => $pdo]);
-$s = new Settings();
-$site = $s->get();
 
 if (isset($argv[1]) && isset($argv[2]) && isset($argv[3]) && isset($argv[4])) {
 	$update = ($argv[2] == "true") ? 1 : 2;

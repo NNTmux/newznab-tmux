@@ -31,10 +31,8 @@ require_once(dirname(__FILE__) . "/../../../bin/config.php");
 use newznab\db\Settings;
 
 $pdo = new Settings();
-$s = new Settings();
-$site = $s->get();
 
-if (!$site->tablepergroup) {
+if (!$pdo->getSetting('tablepergroup')) {
 	exit("Tables per groups is not enabled, quitting!");
 }
 

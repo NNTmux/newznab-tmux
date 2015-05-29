@@ -3,10 +3,6 @@ require_once("config.php");
 
 use newznab\db\Settings;
 
-
-
-$s = new \Sites();
-$site = $s->get();
 $pdo = new Settings();
 
 if (isset($argv[2]) && $argv[2] === 'true') {
@@ -16,7 +12,7 @@ if (isset($argv[2]) && $argv[2] === 'true') {
 		exit($pdo->log->error("Unable to connect to usenet."));
 	}
 }
-if ($site->tablepergroup === 1) {
+if ($pdo->getSetting('tablepergroup') === 1) {
 	exit($pdo->log->error("You are using 'tablepergroup', you must use .../misc/update_scripts/nix_scripts/multiprocessing/releases.php"));
 }
 
