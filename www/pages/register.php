@@ -1,16 +1,18 @@
 <?php
 
+use newznab\db\Settings;
+
 if ($users->isLoggedIn())
 	$page->show404();
 
 $showregister = 1;
 
-if ($page->site->registerstatus == Sites::REGISTER_STATUS_CLOSED)
+if ($page->settings->getSetting('registerstatus') == Settings::REGISTER_STATUS_CLOSED)
 {
 	$page->smarty->assign('error', "Registrations are currently disabled.");
 	$showregister = 0;
 }
-elseif ($page->site->registerstatus == Sites::REGISTER_STATUS_INVITE && (!isset($_REQUEST['invitecode']) || empty($_REQUEST['invitecode'])))
+elseif ($page->settings->getSetting('registerstatus') == Settings::REGISTER_STATUS_INVITE && (!isset($_REQUEST['invitecode']) || empty($_REQUEST['invitecode'])))
 {
 	$page->smarty->assign('error', "Registrations are currently invite only.");
 	$showregister = 0;

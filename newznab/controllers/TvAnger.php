@@ -36,11 +36,9 @@ class TvAnger
 			'Settings' => null,
 		];
 		$options += $defaults;
-		$s = new Settings();
-		$this->site = $s->get();
 
 		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
-		$this->rageqty = ($this->site->maxrageprocessed != '') ? $this->site->maxrageprocessed : 75;
+		$this->rageqty = ($this->pdo->getSetting('maxrageprocessed') != '') ? $this->pdo->getSetting('maxrageprocessed') : 75;
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
 
 

@@ -1,7 +1,7 @@
 <?php
-
 require_once("config.php");
 
+use newznab\db\Settings;
 $page = new AdminPage();
 $sites = new Settings();
 $id = 0;
@@ -19,20 +19,20 @@ switch($action)
 				implode(', ', $_POST['book_reqids']) : $_POST['book_reqids'];
 		}
 		$error = "";
-		$ret = $sites->update($_POST);
+		$ret = $page->settings->update($_POST);
 		if (is_int($ret))
 		{
-			if ($ret == Sites::ERR_BADUNRARPATH)
+			if ($ret == Settings::ERR_BADUNRARPATH)
 				$error = "The unrar path does not point to a valid binary";
-			elseif ($ret == Sites::ERR_BADFFMPEGPATH)
+			elseif ($ret == Settings::ERR_BADFFMPEGPATH)
 				$error = "The ffmpeg path does not point to a valid binary";
-			elseif ($ret == Sites::ERR_BADMEDIAINFOPATH)
+			elseif ($ret == Settings::ERR_BADMEDIAINFOPATH)
 				$error = "The mediainfo path does not point to a valid binary";
-			elseif ($ret == Sites::ERR_BADNZBPATH)
+			elseif ($ret == Settings::ERR_BADNZBPATH)
 				$error = "The nzb path does not point to a valid directory";
-			elseif ($ret == Sites::ERR_DEEPNOUNRAR)
+			elseif ($ret == Settings::ERR_DEEPNOUNRAR)
 				$error = "Deep password check requires a valid path to unrar binary";
-			elseif ($ret == Sites::ERR_BADTMPUNRARPATH)
+			elseif ($ret == Settings::ERR_BADTMPUNRARPATH)
 				$error = "The temp unrar path is not a valid directory";
 			elseif ($ret == Sites::ERR_BADLAMEPATH)
 				$error = "The lame path is not a valid directory";
@@ -43,13 +43,13 @@ switch($action)
 		if ($error == "")
 		{
 			$site = $ret;
-			$returnid = $site->id;
+			$returnid = $site['id'];
 			header("Location:".WWW_TOP."/site-edit.php?id=".$returnid);
 		}
 		else
 		{
 			$page->smarty->assign('error', $error);
-			$site = $sites->row2Object($_POST);
+			$page->smarty->assign('settings', $page->settings->rowsToArray($_POST));
 			$page->smarty->assign('fsite', $site);
 		}
 
@@ -58,8 +58,9 @@ switch($action)
 	default:
 
 		$page->title = "Site Edit";
-		$site = $sites->get();
+		$site        = $page->settings;
 		$page->smarty->assign('fsite', $site);
+		$page->smarty->assign('settings', $site->getSettingsAsTree());
 
 		break;
 }
@@ -150,7 +151,7 @@ $page->smarty->assign('book_reqids_ids', $book_reqids_ids);
 $page->smarty->assign('book_reqids_names', $book_reqids_names);
 
 // convert from a list to an array as we need to use an array, but teh sites table only saves strings
-$books_selected = explode(",", $page->site->book_reqids);
+$books_selected = explode(",", $page->settings->book_reqids);
 
 // convert from a string array to an int array
 $books_selected = array_map(create_function('$value', 'return (int)$value;'), $books_selected);

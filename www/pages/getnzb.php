@@ -1,5 +1,7 @@
 <?php
 
+use newznab\db\Settings;
+
 $nzb = new NZB($page->settings);
 $rel = new Releases(['Settings' => $page->settings]);
 $uid = 0;
@@ -10,7 +12,7 @@ if ($users->isLoggedIn()) {
 	$maxdls = $page->userdata["downloadrequests"];
 	$rsstoken = $page->userdata['rsstoken'];
 } else {
-	if ($page->site->registerstatus == Sites::REGISTER_STATUS_API_ONLY) {
+	if ($page->settings->getSetting('registerstatus') == Settings::REGISTER_STATUS_API_ONLY) {
 		$res = $users->getById(0);
 	} else {
 		if ((!isset($_GET["i"]) || !isset($_GET["r"]))) {
@@ -39,8 +41,8 @@ if (isset($_GET['id'])) {
 // A hash of the users ip to record against the download
 //
 $hosthash = "";
-if ($page->site->storeuserips == 1) {
-	$hosthash = $users->getHostHash($_SERVER["REMOTE_ADDR"], $page->site->siteseed);
+if ($page->settings->getSetting('storeuserips') == 1) {
+	$hosthash = $users->getHostHash($_SERVER["REMOTE_ADDR"], $page->settings->getSetting('siteseed'));
 }
 // Check download limit on user role.
 $dlrequests = $users->getDownloadRequests($uid);

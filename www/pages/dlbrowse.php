@@ -8,21 +8,18 @@ if (!$users->isLoggedIn())
 	$page->show403();
 
 $r = new Releases();
-$s = new Settings();
-$site = $s->get();
+$pdo = new Settings();
 
-$db = new Settings();
-
-if ($site->sabvdir == "" || $site->sabcompletedir == "" || !file_exists($site->sabcompletedir))
+if ($pdo->getSetting('sabvdir') == "" || $pdo->getSetting('sabcompletedir') == "" || !file_exists($pdo->getSetting('sabcompletedir')))
 	$page->show404();
 
-if (!Utility::endsWith($site->sabcompletedir, "/"))
-	$site->sabcompletedir.="/";
-if (!Utility::endsWith($site->sabvdir, "/"))
-	$site->sabvdir.="/";
+if (!Utility::endsWith($pdo->getSetting('sabcompletedir'), "/"))
+	$pdo->getSetting('sabcompletedir').= "/";
+if (!Utility::endsWith($pdo->getSetting('sabvdir'), "/"))
+	$pdo->getSetting('sabvdir').="/";
 
 
-$basepath = $site->sabcompletedir;
+$basepath = $pdo->getSetting('sabcompletedir');
 $webpath = $site->sabvdir;
 
 $subpath = "";
@@ -67,7 +64,7 @@ foreach($files as $f)
 if (!$listmode)
 {
 	$relres = $r->getByNames($dirs);
-	while ($rel = $db->getAssocArray($relres))
+	while ($rel = $pdo->getAssocArray($relres))
 	{
 		if (isset($items[$rel["searchname"]]))
 			$items[$rel["searchname"]]["release"] = $rel;

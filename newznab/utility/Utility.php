@@ -593,10 +593,9 @@ class Utility
 				$mail->Password = PHPMAILER_SMTP_PASSWORD;
 			}
 		}
-		$s = new \Sites();
-		$settings = $s->get();
+		$settings = new Settings();
 
-		$site_email = $settings->email;
+		$site_email = $settings->getSetting('email');
 
 		$fromEmail = (PHPMAILER_FROM_EMAIL === '') ? $site_email : PHPMAILER_FROM_EMAIL;
 		$fromName = (PHPMAILER_FROM_NAME === '') ? $settings->title : PHPMAILER_FROM_NAME;
@@ -632,7 +631,7 @@ class Utility
 	static public function fileInfo($path)
 	{
 		$output = '';
-		$magicPath = (new \Sites())->get()->magic_file_path;
+		$magicPath = (new Settings())->getSetting('magic_file_path');
 		if (self::hasCommand('file') && (!self::isWin() || !empty($magicPath))) {
 			$magicSwitch = empty($magicPath) ? '' : " -m $magicPath";
 			$output = Utility::runCmd('file' . $magicSwitch . ' -b "' . $path . '"');

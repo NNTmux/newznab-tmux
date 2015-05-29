@@ -69,10 +69,10 @@ if (isset($_GET["type"]) && $_GET["type"] == "xml")
 }
 else
 {
-	$page->title = $page->site->title. " site map";
-	$page->meta_title = $page->site->title. " site map";
+	$page->title = $page->settings->getSetting('title'). " site map";
+	$page->meta_title = $page->settings->getSetting('title'). " site map";
 	$page->meta_keywords = "sitemap,site,map";
-	$page->meta_description = $page->site->title." site map shows all our pages.";
+	$page->meta_description = $page->settings->getSetting('title')." site map shows all our pages.";
 	$page->content = $page->smarty->fetch('sitemap.tpl');
 	$page->render();
 }

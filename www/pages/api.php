@@ -94,8 +94,8 @@ if ($users->isLoggedIn()) {
 		//
 		// A hash of the users ip to record against the api hit
 		//
-		if ($page->site->storeuserips == 1)
-			$hosthash = $users->getHostHash($_SERVER["REMOTE_ADDR"], $page->site->siteseed);
+		if ($page->settings->getSetting('storeuserips') == 1)
+			$hosthash = $users->getHostHash($_SERVER["REMOTE_ADDR"], $page->settings->getSetting('siteseed'));
 		$maxRequests = $res['apirequests'];
 	}
 }
@@ -440,7 +440,7 @@ switch ($function) {
 	case 'r':
 		verifyEmptyParameter('email');
 
-		if (!in_array((int)$page->site->registerstatus, [Sites::REGISTER_STATUS_OPEN, Sites::REGISTER_STATUS_API_ONLY])) {
+		if (!in_array((int)$page->settings->getSetting('registerstatus'), [Sites::REGISTER_STATUS_OPEN, Sites::REGISTER_STATUS_API_ONLY])) {
 			showApiError(104);
 		}
 

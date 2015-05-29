@@ -1,13 +1,12 @@
 <?php
 
 use newznab\utility\Utility;
+use newznab\db\Settings;
 
 $category = new Category;
 $sab = new SABnzbd($page);
 $nzbGet = new NZBGet($page);
 $users = new Users();
-$s = new Settings();
-$site = $s->get();
 
 if (!$users->isLoggedIn())
 	$page->show403();
@@ -101,7 +100,7 @@ switch ($action) {
 	default:
 		break;
 }
-if ($site->userselstyle ==1) {
+if ($page->settings->getSetting('userselstyle') == 1) {
 // Get the list of themes.
 	$themeList[] = 'None';
 	$themes = scandir(NN_WWW . '/templates');

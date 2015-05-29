@@ -60,13 +60,11 @@ class XXX
 			'Settings'     => null,
 		];
 		$options += $defaults;
-		$s = new Settings();
-		$this->site = $s->get();
 
 		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
 		$this->releaseImage = ($options['ReleaseImage'] instanceof \ReleaseImage ? $options['ReleaseImage'] : new \ReleaseImage($this->pdo));
 
-		$this->movieqty = ($this->site->maxxxxprocessed != '') ? $this->site->maxxxxprocessed : 100;
+		$this->movieqty = ($this->pdo->getSetting('maxxxxprocessed') != '') ? $this->pdo->getSetting('maxxxxprocessed') : 100;
 		$this->showPasswords = ($this->pdo->getSetting('showpasswordedrelease') != '') ? $this->pdo->getSetting('showpasswordedrelease') : 0;
 		$this->debug = NN_DEBUG;
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);

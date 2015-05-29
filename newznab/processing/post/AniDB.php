@@ -48,10 +48,7 @@ class AniDB
 
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
 		$this->pdo        = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
-		$s = new \Sites();
-		$this->site = $s->get();
-
-		$qty          = $this->site->maxanidbprocessed;
+		$qty          = $this->pdo->getSetting('maxanidbprocessed');
 		$this->aniqty = !empty($qty) ? $qty : 100;
 
 		$this->status = 'NULL';
