@@ -25,7 +25,7 @@ class Tmux
 
 	public function version()
 	{
-		return $$this->pdo->getSetting('dbversion');
+		return $this->pdo->getSetting('dbversion');
 	}
 
 	public function update($form)
