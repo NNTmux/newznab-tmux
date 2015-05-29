@@ -20,7 +20,7 @@ if (!Utility::endsWith($pdo->getSetting('sabvdir'), "/"))
 
 
 $basepath = $pdo->getSetting('sabcompletedir');
-$webpath = $site->sabvdir;
+$webpath = $pdo->getSetting('sabvdir');
 
 $subpath = "";
 if (isset($_REQUEST["sp"]))
