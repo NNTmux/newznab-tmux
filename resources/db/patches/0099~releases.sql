@@ -57,4 +57,4 @@ ALTER TABLE releases ADD INDEX ix_releases_postdate_searchname (postdate, search
 ALTER TABLE releases ADD INDEX ix_releases_nzb_guid (nzb_guid);
 ALTER TABLE releases ADD INDEX ix_releases_prehash_searchname (prehashid, searchname);
 
-UPDATE tmux set value = '99' where setting = 'sqlpatch';
+UPDATE `site` SET `value` = '99' where setting = 'sqlpatch';

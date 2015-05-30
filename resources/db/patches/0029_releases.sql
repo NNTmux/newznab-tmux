@@ -8,4 +8,4 @@ UPDATE `releases` SET nzbstatus = 1 WHERE nzbstatus = 0;
 
 
 
-UPDATE `tmux` set `value` = '29' where `setting` = 'sqlpatch';
+UPDATE `site` set `value` = '29' where `setting` = 'sqlpatch';

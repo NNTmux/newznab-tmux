@@ -3,4 +3,4 @@ INSERT IGNORE INTO `site` (`setting`, `value`) VALUES
  ('reqidthreads', '1'),
 ('request_hours', '1'),
 ('request_url',	'http://reqid.nzedb.com/index.php');
-UPDATE `tmux` SET `value` = '83' WHERE `setting` = 'sqlpatch';
+UPDATE `site` SET `value` = '83' WHERE `setting` = 'sqlpatch';

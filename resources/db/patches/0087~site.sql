@@ -3,4 +3,4 @@ INSERT IGNORE INTO `site` (`setting`, `value`) VALUES
   ('maxpartrepair', '15000'),
   ('partrepairmaxtries', '3'),
   ('tablepergroup', '0');
-UPDATE `tmux` SET `value` = '87' WHERE `setting` = 'sqlpatch';
+UPDATE `site` SET `value` = '87' WHERE `setting` = 'sqlpatch';

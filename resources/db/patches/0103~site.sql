@@ -4,4 +4,4 @@ INSERT IGNORE INTO `site` (`setting`, `value`) VALUES
   ('timeoutpath',	''),
   ('timeoutseconds', 0);
 
-UPDATE `tmux` set `value` = '103' where `setting` = 'sqlpatch';
+UPDATE `site` set `value` = '103' where `setting` = 'sqlpatch';

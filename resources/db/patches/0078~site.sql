@@ -48,4 +48,4 @@ INSERT INTO `site` (`setting`, `value`) VALUES
   ('miscotherretentionhours',	'0'),
   ('mischashedretentionhours',	'0');
 
-UPDATE `tmux` SET `value` = '78' WHERE `setting` = 'sqlpatch';
+UPDATE `site` SET `value` = '78' WHERE `setting` = 'sqlpatch';

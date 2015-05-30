@@ -67,4 +67,4 @@ CREATE TABLE anidb_titles (
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci;
 
-UPDATE `tmux` SET `value` = '93' WHERE `setting` = 'sqlpatch';
+UPDATE `site` SET `value` = '93' WHERE `setting` = 'sqlpatch';

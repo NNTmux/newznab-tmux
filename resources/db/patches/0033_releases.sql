@@ -8,4 +8,4 @@ UPDATE releases set isrequestid = 1
 WHERE name REGEXP '^\\[ ?([[:digit:]]{4,6}) ?\\]|^REQ\s*([[:digit:]]{4,6})|^([[:digit:]]{4,6})-[[:digit:]]{1}\\['
 AND isrequestid = 0;
 
-UPDATE `tmux` set `value` = '33' where `setting` = 'sqlpatch';
+UPDATE `site` set `value` = '33' where `setting` = 'sqlpatch';
