@@ -21,5 +21,4 @@ CREATE TRIGGER insert_search AFTER INSERT ON releases FOR EACH ROW BEGIN INSERT 
 CREATE TRIGGER update_search AFTER UPDATE ON releases FOR EACH ROW BEGIN IF NEW.guid != OLD.guid THEN UPDATE releasesearch SET guid = NEW.guid WHERE releaseid = OLD.id; END IF; IF NEW.name != OLD.name THEN UPDATE releasesearch SET name = NEW.name WHERE releaseid = OLD.id; END IF; IF NEW.searchname != OLD.searchname THEN UPDATE releasesearch SET searchname = NEW.searchname WHERE releaseid = OLD.id; END IF;END;
 CREATE TRIGGER delete_search AFTER DELETE ON releases FOR EACH ROW BEGIN DELETE FROM releasesearch WHERE releaseid = OLD.id;END;
 
-UPDATE `tmux` SET value = '38' WHERE `setting` = 'sqlpatch';
-
+UPDATE `site` SET `value` = '38' WHERE `setting` = 'sqlpatch';

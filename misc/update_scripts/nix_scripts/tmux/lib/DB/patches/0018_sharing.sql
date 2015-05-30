@@ -2,4 +2,4 @@ ALTER TABLE sharing ADD COLUMN max_download MEDIUMINT UNSIGNED NOT NULL DEFAULT 
 
 UPDATE sharing SET max_pull = 20000;
 
-UPDATE tmux SET value = '18' WHERE setting = 'sqlpatch';
+UPDATE site SET value = '18' WHERE setting = 'sqlpatch';

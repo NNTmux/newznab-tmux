@@ -14,4 +14,4 @@ CREATE TABLE         tvrageepisodes (
   DEFAULT CHARSET = utf8
   COLLATE         = utf8_unicode_ci
   AUTO_INCREMENT  = 1;
-UPDATE `tmux` SET `value` = '82' WHERE `setting` = 'sqlpatch';
+UPDATE `site` SET `value` = '82' WHERE `setting` = 'sqlpatch';

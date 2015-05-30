@@ -1,2 +1,2 @@
 INSERT INTO site (setting, value) VALUES ('rottentomatoquality', 'profile');
-UPDATE `tmux` SET `value` = '71' WHERE `setting` = 'sqlpatch';
+UPDATE `site` SET `value` = '71' WHERE `setting` = 'sqlpatch';

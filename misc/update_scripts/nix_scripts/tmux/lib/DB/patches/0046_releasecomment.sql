@@ -4,4 +4,4 @@ CREATE TRIGGER insert_MD5 BEFORE INSERT ON releasecomment FOR EACH ROW SET NEW.t
 UPDATE releasecomment
 SET text_hash = MD5(text);
 ALTER IGNORE TABLE releasecomment ADD UNIQUE INDEX ix_releasecomment_hash_releaseID (text_hash, releaseid);
-UPDATE `tmux` SET `value` = '46' WHERE `setting` = 'sqlpatch';
+UPDATE `site` SET `value` = '46' WHERE `setting` = 'sqlpatch';

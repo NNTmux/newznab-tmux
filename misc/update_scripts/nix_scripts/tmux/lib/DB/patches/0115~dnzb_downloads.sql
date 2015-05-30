@@ -10,4 +10,4 @@ CREATE TABLE dnzb_failures (
   COLLATE =utf8_unicode_ci
   AUTO_INCREMENT =1;
   CREATE UNIQUE INDEX ux_dnzb_failures ON dnzb_failures (userid, guid);
-  UPDATE `tmux` set `value` = '115' where `setting` = 'sqlpatch';
+  UPDATE `site` set `value` = '115' where `setting` = 'sqlpatch';

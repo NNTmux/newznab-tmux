@@ -6,4 +6,4 @@ ALTER TABLE `releases` ADD `proc_pp` TINYINT(1) NOT NULL DEFAULT 0;
 ALTER TABLE `releases` ADD `videostatus` TINYINT(1) NOT NULL DEFAULT 0;
 ALTER TABLE `releases` ADD `audiostatus` TINYINT(1) NOT NULL DEFAULT 0;
 
-UPDATE tmux SET value = '26' WHERE setting = 'sqlpatch';
+UPDATE site SET value = '26' WHERE setting = 'sqlpatch';

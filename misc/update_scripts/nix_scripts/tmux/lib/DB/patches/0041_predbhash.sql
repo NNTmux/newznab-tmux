@@ -42,4 +42,4 @@ WHERE pre_id = OLD.id;
 END;
 
 
-UPDATE `tmux` SET value = '41' WHERE `setting` = 'sqlpatch';
+UPDATE `site` SET `value` = '41' WHERE `setting` = 'sqlpatch';

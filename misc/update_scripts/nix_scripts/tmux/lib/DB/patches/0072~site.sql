@@ -22,4 +22,4 @@ CREATE TRIGGER update_search AFTER UPDATE ON releases FOR EACH ROW BEGIN IF NEW.
 CREATE TRIGGER delete_search AFTER DELETE ON releases FOR EACH ROW BEGIN DELETE FROM releasesearch WHERE releaseid = OLD.id; END;
 CREATE TRIGGER insert_MD5 BEFORE INSERT ON releasecomment FOR EACH ROW SET NEW.text_hash = MD5(NEW.text);
 
-UPDATE `tmux` SET `value` = '72' WHERE `setting` = 'sqlpatch';
+UPDATE `site` SET `value` = '72' WHERE `setting` = 'sqlpatch';
