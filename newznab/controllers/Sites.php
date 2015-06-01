@@ -1,6 +1,6 @@
 <?php
 
-use newznab\db\Settings;
+use newznab\db\DB;
 use newznab\libraries\Cache;
 
 class Sites
@@ -26,7 +26,7 @@ class Sites
 
 	public function update($form)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$site = $this->row2Object($form);
 
 		if (substr($site->nzbpath, strlen($site->nzbpath) - 1) != '/')
@@ -79,7 +79,7 @@ class Sites
 			$cache->delete($sql);
 		}
 
-		$db = new Settings();
+		$db = new DB();
 		$rows = $db->query($sql, true, NN_CACHE_EXPIRY_MEDIUM);
 
 		if ($rows === false)
@@ -131,7 +131,7 @@ class Sites
 
 	public function updateItem($setting, $value)
 	{
-		$db = new Settings();
+		$db = new DB();
 		$sql = sprintf("update site set value = %s where setting = %s", $db->escapeString($value), $db->escapeString($setting));
 
 		return $db->exec($sql);
