@@ -1,1 +1,0 @@
-First edit the included config.php and then copy it to your newznab www folder.
