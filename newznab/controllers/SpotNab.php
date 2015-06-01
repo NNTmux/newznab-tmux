@@ -338,10 +338,10 @@ class SpotNab {
 			."lastupdate = NULL,"
 			."lastbroadcast = NULL,"
 			."lastarticle = 0";
-		$discovery_a = "UPDATE site SET "
+		$discovery_a = "UPDATE settings SET "
 			."value = '0' "
 			."WHERE setting = 'spotnablastarticle'";
-		$broadcast = "UPDATE site SET "
+		$broadcast = "Update settings SET "
 			."updateddate = '1980-01-01 00:00:00' "
 			."WHERE setting = 'spotnabbroadcast'";
 
@@ -349,11 +349,11 @@ class SpotNab {
 		// by the maximum age a broadcast can be.
 		$reftime = date("Y-m-d H:i:s",
 			time()-(SpotNab::POST_BROADCAST_INTERVAL));
-		$discovery_b = "UPDATE site SET "
+		$discovery_b = "Update settings SET "
 			."updateddate = '1980-01-01 00:00:00' "
 			."WHERE setting = 'spotnabdiscover'";
 
-		$post = "UPDATE site SET "
+		$post = "Update settings SET "
 			."updateddate = '$reftime' "
 			."WHERE setting = 'spotnabpost'";
 		$db->queryExec($sources);
@@ -510,13 +510,13 @@ class SpotNab {
 				continue;
 			}
 		}
-		$sql = sprintf("UPDATE site SET value = '%d' "
+		$sql = sprintf("Update settings SET value = '%d' "
 					."WHERE setting = 'spotnablastarticle'", $last);
 		$db->queryExec($sql);
 		printf("%d new and %d updated source(s).\n", $inserted, $updated);
 
 		// Update reference point
-		$q = "UPDATE site SET updateddate = NOW() WHERE "
+		$q = "Update settings SET updateddate = NOW() WHERE "
 				."setting = 'spotnabdiscover'";
 		$db->queryExec($q);
 
@@ -539,7 +539,7 @@ class SpotNab {
 			if($this->post_discovery())
 			{
 				// Update post time
-				$q = "UPDATE site SET updateddate = NOW() WHERE "
+				$q = "Update settings SET updateddate = NOW() WHERE "
 					."setting = 'spotnabbroadcast'";
 					$res = $db->queryExec($q);
 			}
@@ -1035,12 +1035,12 @@ class SpotNab {
 			$keys = $this->_keygen();
 			if(is_array($keys)){
 				// Force New Username
-				$sql = sprintf("UPDATE site SET value = %s "
+				$sql = sprintf("Update settings SET value = %s "
 								."WHERE setting = 'spotnabuser'",
 				$db->escapeString(sprintf("nntp-%s",substr(md5($keys['pubkey']), 0, 4))));
 				$db->queryExec($sql);
 				// Force New Email
-				$sql = sprintf("UPDATE site SET value = %s "
+				$sql = sprintf("Update settings SET value = %s "
 								."WHERE setting = 'spotnabemail'",
 				$db->escapeString(sprintf("nntp-%s@%s.com",
 					substr(md5($keys['pubkey']), 4, 8),
@@ -1048,18 +1048,18 @@ class SpotNab {
 				)));
 				$db->queryExec($sql);
 				// Save Keys
-				$sql = sprintf("UPDATE site SET value = %s ".
+				$sql = sprintf("Update settings SET value = %s ".
 						"WHERE setting = 'spotnabsitepubkey'",
 						$db->escapeString($keys['pubkey']));
 				$db->queryExec($sql);
 				//echo $keys['pubkey']."\n";
 
-				$sql = sprintf("UPDATE site SET value = %s ".
+				$sql = sprintf("Update settings SET value = %s ".
 						"WHERE setting = 'spotnabsiteprvkey'",
 						$db->escapeString($keys['prvkey']));
 				$db->queryExec($sql);
 
-				// Update Site Information
+				// Update settings Information
 				$this->_globals = $this->_site;
 				$this->_post_user = trim($this->_globals->spotnabuser);
 				$this->_post_email = trim($this->_globals->spotnabemail);
