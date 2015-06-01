@@ -25,10 +25,12 @@
 					{$result.message|escape:"htmlall"|truncate:200:'...':false:false}
 				</div>
 			</td>
-			<td>
-				<a title="View profile" href="{$smarty.const.WWW_TOP}/profile/?name={$result.username}">{$result.username}</a>
-				<br/>
-				on <span title="{$result.createddate}">{$result.createddate|date_format}</span> <div class="hint">({$result.createddate|timeago})</div>
+			{if !$privateprofiles || $isadmin || $ismod}
+				<a title="View profile" href="{$smarty.const.WWW_TOP}/profile/?name={$result.username}">{$result.username}</a><br>
+			{else}
+				{$result.username}
+			{/if}
+				<span title="{$result.createddate}">{$result.createddate|date_format}</span> <div class="hint">({$result.createddate|timeago})</div>
 			</td>
 			<td>
 				<a href="{$smarty.const.WWW_TOP}/forumpost/{$result.id}#last" title="{$result.updateddate}">{$result.updateddate|date_format}</a> <div class="hint">({$result.updateddate|timeago})</div>

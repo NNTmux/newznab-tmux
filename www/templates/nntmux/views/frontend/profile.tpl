@@ -3,14 +3,14 @@
 
 <table class="data">
 	<tr><th>Username:</th><td>{$user.username|escape:"htmlall"}</td></tr>
-	{if $user.id==$userdata.id || $userdata.role==2}<tr><th title="Not public">Email:</th><td>{$user.email}</td></tr>{/if}
+	{if $isadmin || !$publicview}<tr><th title="Not public">Email:</th><td>{$user.email}</td></tr>{/if}
 	<tr><th>Registered:</th><td title="{$user.createddate}">{$user.createddate|date_format}  ({$user.createddate|timeago} ago)</td></tr>
 	<tr><th>Last Login:</th><td title="{$user.lastlogin}">{$user.lastlogin|date_format}  ({$user.lastlogin|timeago} ago)</td></tr>
 	<tr><th>Role:</th><td>{$user.rolename}</td></tr>
 	<tr><th>Theme:</th><td>{$user.style}</td></tr>
 	{if $userdata.role==2}<tr><th title="Admin Notes">Notes:</th><td>{$user.notes|escape:htmlall}{if $user.notes|count_characters > 0}<br/>{/if}<a href="{$smarty.const.WWW_TOP}/admin/user-edit.php?id={$user.id}#notes">Add/Edit</a></td></tr>{/if}
-	{if $user.id==$userdata.id || $userdata.role==2}<tr><th title="Not public">Site Api/Rss Key:</th><td><a href="{$smarty.const.WWW_TOP}/rss?t=0&amp;dl=1&amp;i={$user.id}&amp;r={$user.rsstoken}">{$user.rsstoken}</a></td></tr>{/if}
-	{if $user.id==$userdata.id || $userdata.role==2}
+	{if $isadmin || !$publicview}<tr><th title="Not public">Site Api/Rss Key:</th><td><a href="{$smarty.const.WWW_TOP}/rss?t=0&amp;dl=1&amp;i={$user.id}&amp;r={$user.rsstoken}">{$user.rsstoken}</a></td></tr>{/if}
+	{if $isadmin || !$publicview}
 	<tr><th>API Hits Today:</th><td><span id="uatd">{$apihits.num}</span> {if $userdata.role==2 && $apihits.num > 0}<a onclick="resetapireq({$user.id}, 'api'); document.getElementById('uatd').innerHTML='0'; return false;" href="#">Reset</a>{/if}</td></tr>
 	<tr><th>Grabs Today:</th><td><span id="ugrtd">{$grabstoday.num}</span> {if $grabstoday.num >= $user.downloadrequests}&nbsp;&nbsp;<small>(Next DL in {($grabstoday.nextdl/3600)|intval}h {($grabstoday.nextdl/60) % 60}m)</small>{/if}{if $userdata.role==2 && $grabstoday.num > 0}<a onclick="resetapireq({$user.id}, 'grabs'); document.getElementById('ugrtd').innerHTML='0'; return false;" href="#">Reset</a>{/if}</td></tr>
 	{/if}
@@ -37,8 +37,17 @@
 	{/if}
 
 	{if $userinvitedby && $userinvitedby.username != ""}
-	<tr><th>Invited By:</th><td><a title="View {$userinvitedby.username}'s profile" href="{$smarty.const.WWW_TOP}/profile?name={$userinvitedby.username}">{$userinvitedby.username}</a></td>
-	{/if}
+		<tr>
+		<th>Invited By:</th>
+		<td>
+			{if $privileged || !$privateprofiles}
+				<a title="View {$userinvitedby.username}'s profile" href="{$smarty.const.WWW_TOP}/profile?name={$userinvitedby.username}">{$userinvitedby.username}</a>
+			{else}
+				{$userinvitedby.username}
+			{/if}
+
+		</td>
+		</tr>{/if}
 
 	<tr><th>UI Preferences:</th>
 		<td>
@@ -50,7 +59,7 @@
 			{if $user.bookview == "1"}View book covers{else}View standard book category{/if}
 		</td>
 	</tr>
-	{if $user.id==$userdata.id || $userdata.role==2}<tr><th title="Not public">Excluded Categories:</th><td>{$exccats|replace:",":"<br/>"}</td></tr>{/if}
+	{if $isadmin || !$publicview}<tr><th title="Not public">Excluded Categories:</th><td>{$exccats|replace:",":"<br/>"}</td></tr>{/if}
 	{if $page->site->sabintegrationtype == 2 && $user.id==$userdata.id}
 		<tr><th>SABnzbd Integration:</th>
 		<td>

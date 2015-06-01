@@ -18,6 +18,7 @@ class Users
 	const ROLE_USER = 1;
 	const ROLE_ADMIN = 2;
 	const ROLE_DISABLED = 3;
+	const ROLE_MODERATOR = 4;
 
 	const DEFAULT_INVITES = 1;
 	const DEFAULT_INVITE_EXPIRY_DAYS = 7;
@@ -434,9 +435,7 @@ class Users
 	public function isDisabled($username)
 	{
 
-		$role = $this->pdo->queryOneRow(sprintf("select role as role from users where username = %s ", $this->pdo->escapeString($username)));
-
-		return ($role["role"] == Users::ROLE_DISABLED);
+		return $this->roleCheck(self::ROLE_DISABLED, $username);
 	}
 
 	public function isValidUrl($url)
@@ -985,5 +984,54 @@ class Users
 	public function delDownloadRequestsForRelease($releaseID)
 	{
 		return $this->pdo->queryInsert(sprintf("delete from userdownloads where releaseid = %d", $releaseID));
+	}
+
+	/**
+	 * Checks if a user is a specific role.
+	 *
+	 * @notes Uses type of $user to denote identifier. if string: username, if int: userid
+	 * @param int $roleID
+	 * @param string|int $user
+	 * @return bool
+	 */
+	public function roleCheck($roleID, $user) {
+
+		if (is_string($user) && strlen($user) > 0) {
+			$user = $this->pdo->escapeString($user);
+			$querySuffix = "username = '$user'";
+		} elseif (is_int($user) && $user >= 0) {
+			$querySuffix = "id = $user";
+		} else {
+			return false;
+		}
+
+		$result = $this->pdo->queryOneRow(
+			sprintf(
+				"SELECT role FROM users WHERE %s",
+				$querySuffix
+			)
+		);
+
+		return ((integer)$result['role'] == (integer) $roleID) ? true : false;
+	}
+
+	/**
+	 * Wrapper for roleCheck specifically for Admins.
+	 *
+	 * @param int $userID
+	 * @return bool
+	 */
+	public function isAdmin($userID) {
+		return $this->roleCheck(self::ROLE_ADMIN, (integer) $userID);
+	}
+
+	/**
+	 * Wrapper for roleCheck specifically for Moderators.
+	 *
+	 * @param int $userId
+	 * @return bool
+	 */
+	public function isModerator($userId) {
+		return $this->roleCheck(self::ROLE_MODERATOR, (integer) $userId);
 	}
 }
