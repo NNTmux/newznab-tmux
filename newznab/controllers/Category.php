@@ -94,7 +94,7 @@ class Category
 	 *
 	 * @param array $options Class instances.
 	 */
-	public function __construct(array $options = array())
+	public function __construct(array $options = [])
 	{
 		$defaults = [
 			'Settings' => null,
@@ -111,7 +111,7 @@ class Category
 	 *
 	 * @return string $catsrch
 	 */
-	public function getCategorySearch($cat = array())
+	public function getCategorySearch($cat = [])
 	{
 		$catsrch = ' (';
 
@@ -282,23 +282,22 @@ class Category
 	/**
 	 * Get the categories in a format for use by the headermenu.tpl.
 	 */
-	public function getForMenu($excludedcats = array())
+	public function getForMenu($excludedcats = [])
 	{
-		$db = new newznab\db\Settings();
-		$ret = array();
+		$ret = [];
 
 		$exccatlist = "";
 		if (count($excludedcats) > 0)
 			$exccatlist = " and id not in (" . implode(",", $excludedcats) . ")";
 
-		$arr = $db->query(sprintf("select * from category where status = %d %s", Category::STATUS_ACTIVE, $exccatlist), true);
+		$arr = $this->pdo->query(sprintf("select * from category where status = %d %s", Category::STATUS_ACTIVE, $exccatlist), true);
 		foreach ($arr as $a)
 			if ($a["parentid"] == "")
 				$ret[] = $a;
 
 		foreach ($ret as $key => $parent) {
-			$subcatlist = array();
-			$subcatnames = array();
+			$subcatlist = [];
+			$subcatnames = [];
 			foreach ($arr as $a) {
 				if ($a["parentid"] == $parent["id"]) {
 					$subcatlist[] = $a;
@@ -323,7 +322,7 @@ class Category
 	public function getForSelect($blnIncludeNoneSelected = true)
 	{
 		$categories = $this->get();
-		$temp_array = array();
+		$temp_array = [];
 
 		if ($blnIncludeNoneSelected) {
 			$temp_array[-1] = "--Please Select--";
@@ -338,7 +337,7 @@ class Category
 	/**
 	 * Get a list of categories.
 	 */
-	public function get($activeonly = false, $excludedcats = array())
+	public function get($activeonly = false, $excludedcats = [])
 	{
 		$db = new newznab\db\Settings();
 

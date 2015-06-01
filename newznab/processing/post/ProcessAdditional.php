@@ -685,7 +685,7 @@ class ProcessAdditional
 	 */
 	protected function _getNZBContents()
 	{
-		$nzbPath = $this->_nzb->NZBPath($this->_release['guid']);
+		$nzbPath = $this->_nzb->getNZBPath($this->_release['guid']);
 		if ($nzbPath === false) {
 
 			$this->_echo('NZB not found for GUID: ' . $this->_release['guid'], 'warning');

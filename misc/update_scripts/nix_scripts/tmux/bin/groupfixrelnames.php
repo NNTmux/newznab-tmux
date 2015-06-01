@@ -128,7 +128,7 @@ if (!isset($argv[1])) {
 
 			if ($releases instanceof Traversable) {
 				$nntp = new NNTP(['Settings' => $pdo]);
-				if (($this->pdo->getSetting('alternate_nntp') == '1' ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
+				if (($pdo->getSetting('alternate_nntp') == '1' ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
 					exit($pdo->log->error("Unable to connect to usenet."));
 				}
 

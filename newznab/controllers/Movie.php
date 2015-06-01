@@ -173,7 +173,7 @@ class Movie
 		if (count($excludedcats) > 0)
 			$exccatlist = " and r.categoryid not in (".implode(",", $excludedcats).")";
 
-		$sql = sprintf("select count(distinct r.imdbid) as num from releases r inner join movieinfo m on m.imdbid = r.imdbid and m.title != '' where r.passwordstatus <= (select value from site where setting='showpasswordedrelease') and %s %s %s %s ", $browseby, $catsrch, $maxage, $exccatlist);
+		$sql = sprintf("select count(distinct r.imdbid) as num from releases r inner join movieinfo m on m.imdbid = r.imdbid and m.title != '' where r.passwordstatus <= (select value from settings where setting='showpasswordedrelease') and %s %s %s %s ", $browseby, $catsrch, $maxage, $exccatlist);
 		$res = $this->pdo->queryOneRow($sql, true);
 		return $res["num"];
 	}
@@ -230,7 +230,7 @@ class Movie
 			$exccatlist = " and r.categoryid not in (".implode(",", $excludedcats).")";
 
 		$order = $this->getMovieOrder($orderby);
-		$sql = sprintf(" SELECT r.imdbid, max(r.postdate) as postdate, m.* from releases r inner join movieinfo m on m.imdbid = r.imdbid where r.passwordstatus <= (select value from site where setting='showpasswordedrelease') and m.title != '' and r.imdbid != 0000000 and %s %s %s %s group by r.imdbid order by %s %s".$limit, $browseby, $catsrch, $maxagesql, $exccatlist, $order[0], $order[1]);
+		$sql = sprintf(" SELECT r.imdbid, max(r.postdate) as postdate, m.* from releases r inner join movieinfo m on m.imdbid = r.imdbid where r.passwordstatus <= (select value from settings where setting='showpasswordedrelease') and m.title != '' and r.imdbid != 0000000 and %s %s %s %s group by r.imdbid order by %s %s".$limit, $browseby, $catsrch, $maxagesql, $exccatlist, $order[0], $order[1]);
 		$rows = $this->pdo->query($sql, true);
 
 		//
@@ -791,11 +791,11 @@ class Movie
 	 */
 	public function updateUpcoming()
 	{
-		$s = new Settings();
-		$site = $s->get();
-		if (isset($site->rottentomatokey))
+		$site = new Settings();
+		$rtkey = $site->getSetting('rottentomatokey');
+		if (isset($rtkey))
 		{
-			$rt = new RottenTomato($site->rottentomatokey);
+			$rt = new RottenTomato($site->getSetting('rottentomatokey'));
 
 			$ret = $rt->getMoviesBoxOffice();
 			if ($ret != "")
