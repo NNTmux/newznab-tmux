@@ -760,7 +760,7 @@ class Movie
 	 */
 	public function parseMovieName($releasename)
 	{
-		$cat = new Category;
+		$cat = new Categorize;
 		if (!$cat->isMovieForeign($releasename))
 		{
 			preg_match('/^(?P<name>.*)[\.\-_\( ](?P<year>19\d{2}|20\d{2})/i', $releasename, $matches);
