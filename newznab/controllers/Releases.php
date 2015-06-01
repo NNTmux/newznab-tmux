@@ -1196,7 +1196,7 @@ class Releases
 
 		$whereSql = sprintf(
 			"%s
-			WHERE r.passwordstatus <= (select value from site where setting='showpasswordedrelease') AND r.nzbstatus = %d %s %s %s %s %s %s %s %s %s %s %s",
+			WHERE r.passwordstatus <= (select value from settings where setting='showpasswordedrelease') AND r.nzbstatus = %d %s %s %s %s %s %s %s %s %s %s %s",
 			$releaseSearch->getFullTextJoinString(),
 			Enzebe::NZB_ADDED,
 			($maxAge > 0 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $maxAge) : ''),

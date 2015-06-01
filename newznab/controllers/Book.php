@@ -90,7 +90,7 @@ class Book
 		else
 			$maxage = "";
 
-		$sql = sprintf("select count(distinct r.bookinfoid) as num from releases r inner join bookinfo b on b.id = r.bookinfoid and b.title != '' where r.passwordstatus <= (select value from site where setting='showpasswordedrelease') %s %s", $browseby, $maxage);
+		$sql = sprintf("select count(distinct r.bookinfoid) as num from releases r inner join bookinfo b on b.id = r.bookinfoid and b.title != '' where r.passwordstatus <= (select value from settings where setting='showpasswordedrelease') %s %s", $browseby, $maxage);
 
 		$res = $this->pdo->queryOneRow($sql, true);
 		return $res["num"];
@@ -113,7 +113,7 @@ class Book
 			$maxagesql = sprintf(" and r.postdate > now() - interval %d day ", $maxage);
 
 		$order = $this->getBrowseOrder($orderby);
-		$sql = sprintf(" SELECT r.bookinfoid, max(postdate), b.* from releases r inner join bookinfo b on b.id = r.bookinfoid and b.title != '' where r.passwordstatus <= (select value from site where setting='showpasswordedrelease') %s %s group by r.bookinfoid order by %s %s".$limit, $browseby, $maxagesql, $order[0], $order[1]);
+		$sql = sprintf(" SELECT r.bookinfoid, max(postdate), b.* from releases r inner join bookinfo b on b.id = r.bookinfoid and b.title != '' where r.passwordstatus <= (select value from settings where setting='showpasswordedrelease') %s %s group by r.bookinfoid order by %s %s".$limit, $browseby, $maxagesql, $order[0], $order[1]);
 		$rows = $this->pdo->query($sql, true);
 
 		//

@@ -120,7 +120,7 @@ class Music
 		if (count($excludedcats) > 0)
 			$exccatlist = " and r.categoryid not in (".implode(",", $excludedcats).")";
 
-		$sql = sprintf("select count(r.id) as num from releases r inner join musicinfo m on m.id = r.musicinfoid and m.title != '' where r.passwordstatus <= (select value from site where setting='showpasswordedrelease') and %s %s %s %s", $browseby, $catsrch, $maxage, $exccatlist);
+		$sql = sprintf("select count(r.id) as num from releases r inner join musicinfo m on m.id = r.musicinfoid and m.title != '' where r.passwordstatus <= (select value from settings where setting='showpasswordedrelease') and %s %s %s %s", $browseby, $catsrch, $maxage, $exccatlist);
 		$res = $this->pdo->queryOneRow($sql, true);
 		return $res["num"];
 	}
@@ -176,7 +176,7 @@ class Music
 
 		$order = $this->getMusicOrder($orderby);
 		// query modified to join to musicinfo after limiting releases as performance issue prevented sane sql.
-		$sql = sprintf(" SELECT r.*, r.id as releaseid, m.*, g.title as genre, groups.name as group_name, concat(cp.title, ' > ', c.title) as category_name, concat(cp.id, ',', c.id) as category_ids, rn.id as nfoid from releases r left outer join groups on groups.id = r.groupid inner join musicinfo m on m.id = r.musicinfoid and m.title != '' left outer join releasenfo rn on rn.releaseid = r.id and rn.nfo is not null left outer join category c on c.id = r.categoryid left outer join category cp on cp.id = c.parentid left outer join genres g on g.id = m.genreID inner join (select r.id from releases r inner join musicinfo m ON m.id = r.musicinfoid and m.title != '' where r.musicinfoid > 0 and r.passwordstatus <= (select value from site where setting='showpasswordedrelease') and %s %s %s %s order by %s %s %s) x on x.id = r.id order by %s %s", $browseby, $catsrch, $maxagesql, $exccatlist, $order[0], $order[1], $limit, $order[0], $order[1]);
+		$sql = sprintf(" SELECT r.*, r.id as releaseid, m.*, g.title as genre, groups.name as group_name, concat(cp.title, ' > ', c.title) as category_name, concat(cp.id, ',', c.id) as category_ids, rn.id as nfoid from releases r left outer join groups on groups.id = r.groupid inner join musicinfo m on m.id = r.musicinfoid and m.title != '' left outer join releasenfo rn on rn.releaseid = r.id and rn.nfo is not null left outer join category c on c.id = r.categoryid left outer join category cp on cp.id = c.parentid left outer join genres g on g.id = m.genreID inner join (select r.id from releases r inner join musicinfo m ON m.id = r.musicinfoid and m.title != '' where r.musicinfoid > 0 and r.passwordstatus <= (select value from settings where setting='showpasswordedrelease') and %s %s %s %s order by %s %s %s) x on x.id = r.id order by %s %s", $browseby, $catsrch, $maxagesql, $exccatlist, $order[0], $order[1], $limit, $order[0], $order[1]);
 		return $this->pdo->query($sql, true);
 	}
 
