@@ -575,14 +575,10 @@
 			{foreach from=$comments|@array_reverse:true item=comment}
 				<tr>
 					<td class="less" title="{$comment.createddate}">
-						{if $comment.role == -1}<i class="icon-globe" title="Syndicated User"></i>
-							{$comment.username}{if $isadmin} @<a href="{$smarty.const.WWW_TOP}/admin/spotnab-edit.php?id={$comment.sourceid}&amp;from={$smarty.server.REQUEST_URI}">{$comment.rolename}</a>{/if}
-						{elseif $comment.role == 2}<i class="icon-font" title="{$comment.rolename}"></i>
-							<strong><a title="View {$comment.username}'s profile" href="{$smarty.const.WWW_TOP}/profile?name={$comment.username}">{$comment.username}</a></strong>
-						{elseif $comment.role == 4}<i class="icon-certificate" title="{$comment.rolename}"></i>
+						{if !$privateprofiles || $isadmin || $ismod}
 							<a title="View {$comment.username}'s profile" href="{$smarty.const.WWW_TOP}/profile?name={$comment.username}">{$comment.username}</a>
-						{else}<i class="icon-user" title="{$comment.username}"></i>
-							<a title="View {$comment.username}'s profile" href="{$smarty.const.WWW_TOP}/profile?name={$comment.username}">{$comment.username}</a>
+						{else}
+							{$comment.username}
 						{/if}
 						<br/>{$comment.createddate|daysago}
 					</td>

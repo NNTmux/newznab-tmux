@@ -19,6 +19,29 @@ elseif (isset($_GET["name"]))
 else
 	$userid = $users->currentUserId();
 
+$privileged = ($users->isAdmin($userid) || $users->isModerator($userid)) ? true : false;
+$privateProfiles = ($page->settings->getSetting('privateprofiles') == 1) ? true : false;
+$publicView = false;
+
+if (!$privateProfiles || $privileged) {
+
+	$altID = (isset($_GET['id']) && $_GET['id'] >= 0) ? (int) $_GET['id'] : false;
+	$altUsername = (isset($_GET['name']) && strlen($_GET['name']) > 0) ? $_GET['name'] : false;
+
+	// If both 'id' and 'name' are specified, 'id' should take precedence.
+	if ($altID === false && $altUsername !== false) {
+		$user = $users->getByUsername($altUsername);
+		if ($user) {
+			$altID = $user['id'];
+		}
+	} else if ($altID !== false) {
+		$userid = $altID;
+		$publicView = true;
+	}
+}
+
+
+
 $data = $users->getById($userid);
 if (!$data)
 	$page->show404();
@@ -31,6 +54,9 @@ $page->smarty->assign('apihits', $users->getApiRequests($userid));
 $page->smarty->assign('grabstoday', $users->getDownloadRequests($userid));
 $page->smarty->assign('userinvitedby',$invitedby);
 $page->smarty->assign('user',$data);
+$page->smarty->assign('privateprofiles', $privateProfiles);
+$page->smarty->assign('publicview', $publicView);
+$page->smarty->assign('privileged', $privileged);
 
 $commentcount = $rc->getCommentCountForUser($userid);
 $offset = isset($_REQUEST["offset"]) ? $_REQUEST["offset"] : 0;
