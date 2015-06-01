@@ -101,9 +101,9 @@ if (isset($argv[1]) && $argv[1] == "safe") {
 }
 
 if (isset($os) && $os == "unix") {
-	$t = new Tmux();
-	$tmux = $t->get();
-	$currentversion = $tmux->sqlpatch;
+	$s = new Sites();
+	$site = $s->get();
+	$currentversion = $site->sqlpatch;
 	$patched = 0;
 	$patches = array();
 	$db = new DB();
@@ -135,7 +135,7 @@ if (isset($os) && $os == "unix") {
 			$filepath = $path . $patch;
 			$file = fopen($filepath, "r");
 			$patch = fread($file, filesize($filepath));
-			if (preg_match('/UPDATE `?tmux`? SET `?value`? = \'?(\d{1,})\'? WHERE `?setting`? = \'sqlpatch\'/i', $patch, $patchnumber)) {
+			if (preg_match('/UPDATE `?site`? SET `?value`? = \'?(\d{1,})\'? WHERE `?setting`? = \'sqlpatch\'/i', $patch, $patchnumber)) {
 				if ($patchnumber['1'] > $currentversion) {
 					if ($safeupgrade == true && $backedup == false) {
 						BackupDatabase();
@@ -148,9 +148,9 @@ if (isset($os) && $os == "unix") {
 		}
 	}
 } else if (isset($os) && $os == "windows") {
-	$t = new Tmux();
-	$tmux = $t->get();
-	$currentversion = $tmux->sqlpatch;
+	$s = new Sites();
+	$site = $s->get();
+	$currentversion = $site->sqlpatch;
 	$patched = 0;
 	$patches = array();
 
@@ -173,7 +173,7 @@ if (isset($os) && $os == "unix") {
 			$filepath = $argv[1] . $patch;
 			$file = fopen($filepath, "r");
 			$patch = fread($file, filesize($filepath));
-			if (preg_match('/UPDATE `?tmux`? SET `?value`? = \'?(\d{1,})\'? WHERE `?setting`? = \'sqlpatch\'/i', $patch, $patchnumber)) {
+			if (preg_match('/UPDATE `?site`? SET `?value`? = \'?(\d{1,})\'? WHERE `?setting`? = \'sqlpatch\'/i', $patch, $patchnumber)) {
 				if ($patchnumber['1'] > $currentversion) {
 					if ($safeupgrade == true && $backedup == false) {
 						BackupDatabase();
