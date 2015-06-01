@@ -156,8 +156,7 @@ class SpotNab {
 		$this->_nntp = new NNTP(['Settings' => $this->_pdo]);
 		$this->releaseImage =  new \ReleaseImage($this->_pdo);
 		$this->nzb = new \NZB($this->_pdo);
-		$s = new Sites();
-		$this->_site = $s->get();
+		$this->_site = $this->_pdo->getSetting();
 		$this->_globals = $this->_site;
 
 		$this->_post_user = $post_user;
@@ -189,30 +188,30 @@ class SpotNab {
 		}
 
 		// Public Key
-		$this->_ssl_pubkey = trim($this->_pdo->getSetting('spotnabsitepubkey'))?
-			$this->_pdo->getSetting('spotnabsitepubkey') : false;
+		$this->_ssl_pubkey = trim($this->_globals->spotnabsitepubkey)?
+			$this->_globals->spotnabsitepubkey:false;
 		if($this->_ssl_pubkey)
 			$this->_ssl_pubkey = $this->decompstr($this->_ssl_pubkey);
 
 		// Private Key
-		$this->_ssl_prvkey = trim($this->_pdo->getSetting('spotnabsiteprivkey'))?
-			$this->_pdo->getSetting('spotnabsiteprivkey') : false;
+		$this->_ssl_prvkey = trim($this->_globals->spotnabsiteprvkey)?
+			$this->_globals->spotnabsiteprvkey:false;
 		if($this->_ssl_prvkey)
 			$this->_ssl_prvkey = $this->decompstr($this->_ssl_prvkey);
 
 		// Track Discovery Article
-		$this->_discovery_lastarticle = intval($this->_pdo->getSetting('spotnablastarticle'));
+		$this->_discovery_lastarticle = intval($this->_globals->spotnablastarticle);
 
 		// Posting Flag
-		$this->_can_post = (trim($this->_pdo->getSetting('spotnabpost')) == 1)?
+		$this->_can_post = (trim($this->_globals->spotnabpost) == 1)?
 			true:false;
 
 		// Auto Enable Flag
-		$this->_auto_enable = (trim($this->_pdo->getSetting('spotnabautoenable')) == 1)?
+		$this->_auto_enable = (trim($this->_globals->spotnabautoenable) == 1)?
 			true:false;
 
 		// Spotnab Privacy Posting
-		$this->_post_privacy = (trim($this->_pdo->getSetting('spotnabsiteprivacy')) == 1)?
+		$this->_post_privacy = (trim($this->_globals->spotnabprivacy) == 1)?
 			true:false;
 
 		// Auto-Discovery Private Key (used for Posting)
@@ -343,7 +342,7 @@ class SpotNab {
 		$discovery_a = "UPDATE settings SET "
 			."value = '0' "
 			."WHERE setting = 'spotnablastarticle'";
-		$broadcast = "UPDATE settings SET "
+		$broadcast = "Update settings SET "
 			."updateddate = '1980-01-01 00:00:00' "
 			."WHERE setting = 'spotnabbroadcast'";
 
@@ -401,7 +400,7 @@ class SpotNab {
 
 		// Connect to server
 		try{
-			if (($this->_site->alternate_nntp == 1 ? $this->_nntp->doConnect(true, true) : $this->_nntp->doConnect()) !== true) {
+			if (($this->_pdo->getSetting('alternate_nntp') == 1 ? $this->_nntp->doConnect(true, true) : $this->_nntp->doConnect()) !== true) {
 				exit($this->_pdo->log->error("Unable to connect to usenet." . PHP_EOL));
 			}
 		}
@@ -770,7 +769,7 @@ class SpotNab {
 
 		// Connect to server
 		try{
-			if (($this->_site->alternate_nntp == 1 ? $this->_nntp->doConnect(true, true) : $this->_nntp->doConnect()) !== true) {
+			if (($this->_pdo->getSetting('alternate_nntp') == 1 ? $this->_nntp->doConnect(true, true) : $this->_nntp->doConnect()) !== true) {
 				exit($this->_pdo->log->error("Unable to connect to usenet." . PHP_EOL));
 			}
 		}
@@ -1063,10 +1062,10 @@ class SpotNab {
 
 				// Update settings Information
 				$this->_globals = $this->_site;
-				$this->_post_user = trim($this->_globals->spotnabuser);
-				$this->_post_email = trim($this->_globals->spotnabemail);
-				$this->_ssl_pubkey = $this->decompstr($this->_globals->spotnabsitepubkey);
-				$this->_ssl_prvkey = $this->decompstr($this->_globals->spotnabsiteprvkey);
+				$this->_post_user = trim($this->_pdo->getSetting('spotnabuser'));
+				$this->_post_email = trim($this->_pdo->getSetting('spotnabemail'));
+				$this->_ssl_pubkey = $this->decompstr($this->_pdo->getSetting('spotnabsitepubkey'));
+				$this->_ssl_prvkey = $this->decompstr($this->_pdo->getSetting('spotnabsiteprvkey'));
 			}else{
 				// echo "Failed.";
 				return false;
@@ -1948,7 +1947,7 @@ class SpotNab {
 		set_error_handler('snHandleError');
 
 		// Connect to server
-		if (($this->_site->alternate_nntp == 1 ? $this->_nntp->doConnect(true, true) : $this->_nntp->doConnect()) !== true) {
+		if (($this->_pdo->getSetting('alternate_nntp') == 1 ? $this->_nntp->doConnect(true, true) : $this->_nntp->doConnect()) !== true) {
 			exit($this->_pdo->log->error("Unable to connect to usenet." . PHP_EOL));
 		}
 		while($retries > 0)
@@ -2046,7 +2045,7 @@ class SpotNab {
 
 		// Attempt to reconnect
 		try{
-			if (($this->_site->alternate_nntp == 1 ? $this->_nntp->doConnect(true, true) : $this->_nntp->doConnect()) !== true) {
+			if (($this->_pdo->getSetting('alternate_nntp') == 1 ? $this->_nntp->doConnect(true, true) : $this->_nntp->doConnect()) !== true) {
 			exit($this->_pdo->log->error("Unable to connect to usenet." . PHP_EOL));
 		}
 		}
@@ -2135,7 +2134,7 @@ class SpotNab {
 		// Assumed to be in Y-m-d H:i:s format or int
 		// convert local time into UTC
 		$reftime = $this->local2utc($reftime, "YmdHis");
-		$s = new Sites();
+		$s = new Settings();
 
 		$msgid = sprintf('<%s.%s.%d@%s>',
 			$this->getRandomStr(30),
