@@ -65,7 +65,7 @@ if (!isset($argv[1]) || !in_array($argv[1], $args) || !isset($argv[2]) || !in_ar
 $nntp = null;
 if ($args[$argv[1]] === true) {
 	$nntp = new NNTP(['Settings' => $pdo]);
-	if (($this->pdo->getSetting('alternate_nntp') == 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
+	if (($pdo->getSetting('alternate_nntp') == 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
 		exit($pdo->log->error("Unable to connect to usenet." . PHP_EOL));
 	}
 }
