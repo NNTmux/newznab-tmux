@@ -1442,7 +1442,7 @@ class Releases
 		$this->echoCLI = ($echooutput && NN_ECHOCLI);
 		$page = new Page();
 		$groupID = '';
-		$s = new Settings();
+		$s = new Sites();
 		echo $s->getLicense();
 
 		if (!empty($groupName)) {
