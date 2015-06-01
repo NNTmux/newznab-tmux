@@ -48,7 +48,7 @@ class NZB
 			$pName = 'parts';
 		}
 		$catrow = $cat->getById($catId);
-		$site = new Settings();
+		$site = new Sites();
 
 		$fp = gzopen($path, "w");
 		if ($fp) {
@@ -69,7 +69,7 @@ class NZB
 					$bName,
 					$relid,
 					$bName));
-			while ($binrow = $db->getAssocArray($result)) {
+			while ($binrow = $this->pdo->getAssocArray($result)) {
 				$groups = array();
 				$groupsRaw = explode(' ', $binrow['xref']);
 				foreach ($groupsRaw as $grp)
@@ -128,9 +128,7 @@ class NZB
 	function getNZBPath($releaseGuid, $sitenzbpath = "", $createIfDoesntExist = false)
 	{
 		if ($sitenzbpath == "") {
-			$s = new Settings;
-			$site = $s->get();
-			$sitenzbpath = $site->nzbpath;
+			$sitenzbpath = $this->pdo->getSetting('nzbpath');
 		}
 
 		$nzbpath = $sitenzbpath . substr($releaseGuid, 0, 1) . "/";

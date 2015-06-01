@@ -1455,13 +1455,13 @@ class Releases
 			$this->pdo->log->doEcho($this->pdo->log->header("Starting release update process (" . date('Y-m-d H:i:s') . ")"), true);
 		}
 
-		if (!file_exists($page->site->nzbpath)) {
-			$this->pdo->log->doEcho($this->pdo->log->primary('Bad or missing nzb directory - ' . $page->site->nzbpath), true);
+		if (!file_exists($page->settings->getSetting('nzbpath'))) {
+			$this->pdo->log->doEcho($this->pdo->log->primary('Bad or missing nzb directory - ' . $page->settings->getSetting('nzbpath')), true);
 
 			return -1;
 		}
 
-		$this->checkRegexesUptoDate($page->site->latestregexurl, $page->site->latestregexrevision, $page->site->newznabID);
+		$this->checkRegexesUptoDate($page->settings->getSetting('latestregexurl'), $page->settings->getSetting('latestregexrevision'), $page->settings->getSetting('newznabID'));
 
 		$this->applyRegex($groupID);
 		$this->processIncompleteBinaries($groupID);
@@ -1469,7 +1469,7 @@ class Releases
 		$DIR = NN_MISC;
 		$PYTHON = shell_exec('which python3 2>/dev/null');
 		$PYTHON = (empty($PYTHON) ? 'python -OOu' : 'python3 -OOu');
-		$processRequestIDs = (int)$page->site->lookup_reqids;
+		$processRequestIDs = (int)$page->settings->getSetting('lookup_reqids');
 		$consoleTools = new ConsoleTools(['ColorCLI' => $this->pdo->log]);
 		$totalReleasesAdded = 0;
 		do {
@@ -1509,7 +1509,7 @@ class Releases
 		// User/Request housekeeping, should ideally move this to its own section, but it needs to be done automatically.
 		//
 		$users = new Users;
-		$users->pruneRequestHistory($page->site->userdownloadpurgedays);
+		$users->pruneRequestHistory($page->settings->getSetting('userdownloadpurgedays'));
 
 		//Print amount of added releases and time it took.
 		if ($this->echoCLI && $this->tablePerGroup === false) {
@@ -1551,7 +1551,7 @@ class Releases
 
 		// Remove the binaries and parts used to form releases, or that are duplicates.
 		//
-		if ($page->site->partsdeletechunks > 0) {
+		if ($page->settings->getSetting('partsdeletechunks') > 0) {
 			$this->pdo->log->doEcho($this->pdo->log->primary('Chunk deleting unused binaries and parts'));
 			$query = sprintf("SELECT p.id AS partsID,b.id AS binariesID FROM %s p
 						LEFT JOIN %s b ON b.id = p.binaryid
@@ -1559,8 +1559,8 @@ class Releases
 				$group['pname'],
 				$group['bname'],
 				$this->pdo->escapeString($currTime_ori["now"]),
-				ceil($page->site->rawretentiondays * 24),
-				$page->site->partsdeletechunks
+				ceil($page->settings->getSetting('rawretentiondays') * 24),
+				$page->settings->getSetting('partsdeletechunks')
 			);
 
 			$cc = 0;
@@ -1605,7 +1605,7 @@ class Releases
 					$group['pname'],
 					$group['bname'],
 					$this->pdo->escapeString($currTime_ori["now"]),
-					ceil($page->site->rawretentiondays * 24)
+					ceil($page->settings->getSetting('rawretentiondays') * 24)
 				)
 			);
 		}
@@ -1687,12 +1687,12 @@ class Releases
 					//
 					// Right number of files, but see if the binary is a allfilled/reqid post, in which case it needs its name looked up
 					//
-					if ($row['reqid'] != '' && $page->site->reqidurl != "") {
+					if ($row['reqid'] != '' && $page->settings->getSetting('reqidurl') != "") {
 						//
 						// Try and get the name using the group
 						//
 						$binGroup = $this->groups->getByNameById($groupID);
-						$newtitle = $this->getReleaseNameForReqId($page->site->reqidurl, $page->site->newznabID, $binGroup, $row["reqid"]);
+						$newtitle = $this->getReleaseNameForReqId($page->settings->getSetting('reqidurl'), $page->settings->getSetting('newznabID'), $binGroup, $row["reqid"]);
 
 						//
 						// if the feed/group wasnt supported by the scraper, then just use the release name as the title.
@@ -1804,7 +1804,7 @@ class Releases
 					'postdate'       => $this->pdo->escapeString($row['date']),
 					'fromname'       => $this->pdo->escapeString($row['fromname']),
 					'reqid'          => $row["reqid"],
-					'passwordstatus' => ($page->site->checkpasswordedrar > 0 ? -1 : 0),
+					'passwordstatus' => ($page->settings->getSetting('checkpasswordedrar') > 0 ? -1 : 0),
 					'nzbstatus'      => \Enzebe::NZB_NONE,
 					'isrenamed'      => ($properName === true ? 1 : 0),
 					'reqidstatus'    => ($isReqID === true ? 1 : 0),
@@ -1824,7 +1824,7 @@ class Releases
 			// Write the nzb to disk
 			//
 			$catId = $cat->determineCategory($groupID, $cleanRelName);
-			$nzbfile = $this->nzb->getNZBPath($relguid, $page->site->nzbpath, true);
+			$nzbfile = $this->nzb->getNZBPath($relguid, $page->settings->getSetting('nzbpath'), true);
 			$this->nzb->writeNZBforreleaseID($relid, $cleanRelName, $catId, $nzbfile, $groupID);
 
 			//
