@@ -18,7 +18,7 @@ switch($action)
 		$success = false;
 		if ($action == 'doedit')
 		{
-			$upd = $releases->updatemulti($_REQUEST["id"], $_REQUEST["category"], $_REQUEST["grabs"], $_REQUEST["rageID"], $_REQUEST["season"], $_REQUEST['imdbID']);
+			$upd = $releases->updatemulti($_REQUEST["id"], $_REQUEST["category"], $_REQUEST["grabs"], $_REQUEST["rageid"], $_REQUEST["season"], $_REQUEST['imdbid']);
 			if ($upd !== false) {
 				$success = true;
 			} else {

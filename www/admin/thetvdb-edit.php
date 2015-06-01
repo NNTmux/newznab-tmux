@@ -13,7 +13,7 @@ switch($action)
 {
 	case 'submit':
 
-		$TheTVDB->updateSeries($_POST['tvdbID'], $_POST['actors'], $_POST['airsday'], $_POST['airstime'], $_POST['contentrating'], $_POST['firstaired'], $_POST['genre'], $_POST['imdbID'], $_POST['network'], $_POST['overview'], $_POST['rating'], $_POST['ratingcount'], $_POST['runtime'], $_POST['seriesname'], $_POST['status']);
+		$TheTVDB->updateSeries($_POST['tvdbid'], $_POST['actors'], $_POST['airsday'], $_POST['airstime'], $_POST['contentrating'], $_POST['firstaired'], $_POST['genre'], $_POST['imdbid'], $_POST['network'], $_POST['overview'], $_POST['rating'], $_POST['ratingcount'], $_POST['runtime'], $_POST['seriesname'], $_POST['status']);
 
 		if(isset($_POST['from']) && !empty($_POST['from']))
 		{

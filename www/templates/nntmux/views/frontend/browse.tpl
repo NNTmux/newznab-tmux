@@ -124,7 +124,7 @@
 										PreDB</span>{/if}
 									{if $result.prehashid > 0}<span class="prehashinfo rndbtn"
 																	title="{$result.prehashid}">Prehash</span>{/if}
-									{if $result.movieinfoID > 0}<a
+									{if $result.movieinfoid > 0}<a
 										href="{$smarty.const.WWW_TOP}/movies?imdb={$result.imdbid}"
 										title="View movie info" class="rndbtn" rel="movie" >Movie</a>{/if}
 									{if $result.haspreview == 1 && $userdata.canpreview == 1}<a
@@ -164,7 +164,7 @@
 															   title="View all episodes">View Anime</a>{/if}
 									{if $result.tvairdate != ""}<span class="seriesinfo rndbtn" title="{$result.guid}">
 										Aired {if $result.tvairdate|strtotime > $smarty.now}in future{else}{$result.tvairdate|daysago}{/if}</span>{/if}
-									{if $result.reID > 0}<span class="mediainfo rndbtn" title="{$result.guid}">
+									{if $result.reid > 0}<span class="mediainfo rndbtn" title="{$result.guid}">
 											Media</span>{/if}
 								{if $result.group_name != ""}
 									<a class="rndbtn" href="{$smarty.const.WWW_TOP}/browse?g={$result.group_name|escape:"htmlall"}" title="Browse {$result.group_name}">{$result.group_name|escape:"htmlall"|replace:"alt.binaries.":"a.b."}</a>

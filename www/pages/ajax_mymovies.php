@@ -72,13 +72,13 @@ else
 				$allmovies = $m->getMovieInfoMultiImdb($imdbids);
 				foreach ($allmovies as $ourmovie)
 					if ($ourmovie["relimdb"] != "")
-						$ourmovieimdbs[$ourmovie["imdbID"]] = $ourmovie["imdbID"];
+						$ourmovieimdbs[$ourmovie["imdbid"]] = $ourmovie["imdbid"];
 			}
 
 			$userimdbs = array();
 			$usermovies = $um->getMovies($users->currentUserId());
 			foreach ($usermovies as $umovie)
-				$userimdbs[$umovie["imdbID"]] = $umovie["imdbID"];
+				$userimdbs[$umovie["imdbid"]] = $umovie["imdbid"];
 
 			$page->smarty->assign('data', $res);
 			$page->smarty->assign('ourmovies', $ourmovieimdbs);
