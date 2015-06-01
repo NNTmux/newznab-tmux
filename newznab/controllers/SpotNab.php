@@ -156,6 +156,7 @@ class SpotNab {
 		$this->_nntp = new NNTP(['Settings' => $this->_pdo]);
 		$this->releaseImage =  new \ReleaseImage($this->_pdo);
 		$this->nzb = new \NZB($this->_pdo);
+		$this->_site = $this->_pdo->getSetting();
 		$this->_globals = $this->_site;
 
 		$this->_post_user = $post_user;
@@ -399,7 +400,7 @@ class SpotNab {
 
 		// Connect to server
 		try{
-			if (($this->_site->alternate_nntp == 1 ? $this->_nntp->doConnect(true, true) : $this->_nntp->doConnect()) !== true) {
+			if (($this->_pdo->getSetting('alternate_nntp') == 1 ? $this->_nntp->doConnect(true, true) : $this->_nntp->doConnect()) !== true) {
 				exit($this->_pdo->log->error("Unable to connect to usenet." . PHP_EOL));
 			}
 		}
@@ -768,7 +769,7 @@ class SpotNab {
 
 		// Connect to server
 		try{
-			if (($this->_site->alternate_nntp == 1 ? $this->_nntp->doConnect(true, true) : $this->_nntp->doConnect()) !== true) {
+			if (($this->_pdo->getSetting('alternate_nntp') == 1 ? $this->_nntp->doConnect(true, true) : $this->_nntp->doConnect()) !== true) {
 				exit($this->_pdo->log->error("Unable to connect to usenet." . PHP_EOL));
 			}
 		}
@@ -1061,10 +1062,10 @@ class SpotNab {
 
 				// Update settings Information
 				$this->_globals = $this->_site;
-				$this->_post_user = trim($this->_globals->spotnabuser);
-				$this->_post_email = trim($this->_globals->spotnabemail);
-				$this->_ssl_pubkey = $this->decompstr($this->_globals->spotnabsitepubkey);
-				$this->_ssl_prvkey = $this->decompstr($this->_globals->spotnabsiteprvkey);
+				$this->_post_user = trim($this->_pdo->getSetting('spotnabuser'));
+				$this->_post_email = trim($this->_pdo->getSetting('spotnabemail'));
+				$this->_ssl_pubkey = $this->decompstr($this->_pdo->getSetting('spotnabsitepubkey'));
+				$this->_ssl_prvkey = $this->decompstr($this->_pdo->getSetting('spotnabsiteprvkey'));
 			}else{
 				// echo "Failed.";
 				return false;
@@ -1946,7 +1947,7 @@ class SpotNab {
 		set_error_handler('snHandleError');
 
 		// Connect to server
-		if (($this->_site->alternate_nntp == 1 ? $this->_nntp->doConnect(true, true) : $this->_nntp->doConnect()) !== true) {
+		if (($this->_pdo->getSetting('alternate_nntp') == 1 ? $this->_nntp->doConnect(true, true) : $this->_nntp->doConnect()) !== true) {
 			exit($this->_pdo->log->error("Unable to connect to usenet." . PHP_EOL));
 		}
 		while($retries > 0)
@@ -2044,7 +2045,7 @@ class SpotNab {
 
 		// Attempt to reconnect
 		try{
-			if (($this->_site->alternate_nntp == 1 ? $this->_nntp->doConnect(true, true) : $this->_nntp->doConnect()) !== true) {
+			if (($this->_pdo->getSetting('alternate_nntp') == 1 ? $this->_nntp->doConnect(true, true) : $this->_nntp->doConnect()) !== true) {
 			exit($this->_pdo->log->error("Unable to connect to usenet." . PHP_EOL));
 		}
 		}
