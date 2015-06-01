@@ -156,8 +156,6 @@ class SpotNab {
 		$this->_nntp = new NNTP(['Settings' => $this->_pdo]);
 		$this->releaseImage =  new \ReleaseImage($this->_pdo);
 		$this->nzb = new \NZB($this->_pdo);
-		$s = new Settings();
-		$this->_site = $s->get();
 		$this->_globals = $this->_site;
 
 		$this->_post_user = $post_user;

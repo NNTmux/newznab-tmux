@@ -10,4 +10,4 @@ ALTER TABLE site
 ADD PRIMARY KEY (section, subsection, name),
 ADD UNIQUE INDEX ui_settings_setting (setting);
 RENAME TABLE site TO settings;
-INSERT IGNORE INTO settings (name, setting, value) VALUES('sqlpatch', 'sqlpatch', 122);
+UPDATE `settings` SET `value` = '122' WHERE `setting` = 'sqlpatch';

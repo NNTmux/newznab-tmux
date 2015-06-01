@@ -9,7 +9,6 @@ $DIR = NN_TMUX;
 $c = new ColorCLI();
 $t = new Tmux();
 $tmux = $t->get();
-$patch = (isset($tmux->sqlpatch)) ? $tmux->sqlpatch : 0;
 $import = (isset($tmux->import)) ? $tmux->import : 0;
 $tmux_session = (isset($tmux->tmux_session)) ? $tmux->tmux_session : 0;
 $seq = (isset($tmux->sequential)) ? $tmux->sequential : 0;
@@ -19,6 +18,8 @@ $nntpproxy = $pdo->getSetting('nntpproxy');
 $tablepergroup = $pdo->getSetting('tablepergroup');
 $tablepergroup = ($tablepergroup != '') ? $tablepergroup : 0;
 
+// Check that Db patch level is current. Also checks nZEDb.xml is valid.
+Utility::isPatched();
 Utility::clearScreen();
 
 echo "Starting Tmux...\n";
@@ -31,11 +32,6 @@ if (count($nntpkill) !== 0) {
 	echo $pdo->log->notice("Found NNTPProxy tmux session and killing it.");
 } else {
 	exec("tmux list-session", $session);
-}
-
-// Check database patch version
-if ($patch < 121) {
-	exit($c->error("\nYour database is not up to date. Please update.\nphp ${NN_WWW}lib/DB/patchDB.php\n"));
 }
 
 //check if session exists

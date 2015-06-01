@@ -987,8 +987,7 @@ class Releases
 	public function searchAudio($artist, $album, $label, $track, $year, $genre = array(-1), $offset = 0, $limit = 100, $cat = array(-1), $maxage = -1)
 	{
 		$s = new Settings();
-		$site = $s->get();
-		if ($site->sphinxenabled) {
+		if ($s->getSetting('sphinxenabled')) {
 			$sphinx = new Sphinx();
 			$results = $sphinx->searchAudio($artist, $album, $label, $track, $year, $genre, $offset, $limit, $cat, $maxage, array(), true);
 			if (is_array($results))
@@ -1067,8 +1066,7 @@ class Releases
 	public function searchBook($author, $title, $offset = 0, $limit = 100, $maxage = -1)
 	{
 		$s = new Settings();
-		$site = $s->get();
-		if ($site->sphinxenabled) {
+		if ($s->getSetting('sphinxenabled')) {
 			$sphinx = new Sphinx();
 			$results = $sphinx->searchBook($author, $title, $offset, $limit, $maxage, array(), true);
 			if (is_array($results))
@@ -1337,11 +1335,10 @@ class Releases
 	{
 		$s = new Settings();
 		$this->nzb = new NZB;
-		$site = $s->get();
 		$zipfile = new zipfile();
 
 		foreach ($guids as $guid) {
-			$nzbpath = $this->nzb->getNZBPath($guid, $site->nzbpath);
+			$nzbpath = $this->nzb->getNZBPath($guid, $s->getSetting('nzbpath'));
 
 			if (file_exists($nzbpath)) {
 				ob_start();
@@ -1910,7 +1907,7 @@ class Releases
 					$serverrev = intval($matches[1]);
 					if ($serverrev > $rev) {
 
-						$site = new Settings;
+						$site = new Sites();
 
 						$queries = explode(";", $regfile);
 						$queries = array_map("trim", $queries);
@@ -2137,7 +2134,6 @@ class Releases
 		$users = new Users();
 		$s = new Settings();
 		$nfo = new Nfo();
-		$site = $s->get();
 		$rf = new ReleaseFiles();
 		$re = new ReleaseExtra();
 		$rc = new ReleaseComments();
@@ -2154,9 +2150,9 @@ class Releases
 
 			$nzbpath = "";
 			if ($isGuid)
-				$nzbpath = $site->nzbpath . substr($identifier, 0, 1) . "/" . $identifier . ".nzb.gz";
+				$nzbpath = $s->getSetting('nzbpath') . substr($identifier, 0, 1) . "/" . $identifier . ".nzb.gz";
 			elseif ($rel)
-				$nzbpath = $site->nzbpath . substr($rel["guid"], 0, 1) . "/" . $rel["guid"] . ".nzb.gz";
+				$nzbpath = $s->getSetting('nzbpath') . substr($rel["guid"], 0, 1) . "/" . $rel["guid"] . ".nzb.gz";
 
 			if ($nzbpath != "" && file_exists($nzbpath))
 				unlink($nzbpath);
@@ -2442,9 +2438,8 @@ class Releases
 		$echoCLI = NN_ECHOCLI;
 		$groups = new Groups();
 		$s = new Settings();
-		$site = $s->get();
 		$consoleTools = new ConsoleTools(['ColorCLI' => $this->pdo->log]);
-		if ($local === false && $site->lookup_reqids == 0) {
+		if ($local === false && $s->getSetting('lookup_reqids') == 0) {
 			return;
 		}
 
