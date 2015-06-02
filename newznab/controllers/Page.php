@@ -18,17 +18,16 @@ class Page extends BasePage
 
 		$content = new Contents(['Settings' => $this->settings]);
 		$f = new Forum();
-		$menu = new Menu();
+		$menu = new Menu($this->settings);
 		$this->smarty->assign('menulist',$menu->get($role, $this->serverurl));
-		$this->smarty->assign('usefulcontentlist',$content->getForMenuByTypeAndRole(Contents::TYPEUSEFUL, $role));
-		$this->smarty->assign('articlecontentlist',$content->getForMenuByTypeAndRole(Contents::TYPEARTICLE, $role));
+		$this->smarty->assign('usefulcontentlist', $content->getForMenuByTypeAndRole(Contents::TYPEUSEFUL, $role));
+		$this->smarty->assign('articlecontentlist', $content->getForMenuByTypeAndRole(Contents::TYPEARTICLE, $role));
 		if ($this->userdata != null)
 			$this->smarty->assign('recentforumpostslist',$f->getRecentPosts($this->settings->getSetting('showrecentforumposts')));
 
 		$this->smarty->assign('main_menu',$this->smarty->fetch('mainmenu.tpl'));
 		$this->smarty->assign('useful_menu',$this->smarty->fetch('usefullinksmenu.tpl'));
 		$this->smarty->assign('article_menu',$this->smarty->fetch('articlesmenu.tpl'));
-		$this->smarty->assign('recentposts_menu',$this->smarty->fetch('recentforumposts.tpl'));
 
 		$category = new Category(['Settings' => $content->pdo]);
 		if ($this->userdata != null)
