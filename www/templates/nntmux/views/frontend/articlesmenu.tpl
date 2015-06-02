@@ -1,4 +1,5 @@
-{if $articlecontentlist|@count > 0}
+{if isset($menu)}
+	$articlecontentlist|@count > 0}
 	<li class="menu_articles">
 		<h2>Articles</h2>
 		<ul>
