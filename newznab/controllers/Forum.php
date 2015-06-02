@@ -7,13 +7,29 @@ use newznab\db\Settings;
  */
 class Forum
 {
+
+	/**
+	 * @var Settings
+	 */
+	public $pdo;
+
+	/**
+	 * @param array $options Class instances.
+	 */
+	public function __construct(array $options = [])
+	{
+		$defaults = [
+			'Settings' => null
+		];
+		$options += $defaults;
+
+		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
+	}
 	/**
 	 * Add a forum post.
 	 */
 	public function add($parentid, $userid, $subject, $message, $locked = 0, $sticky = 0, $replies = 0)
 	{
-		$db = new Settings();
-
 		if ($message == "")
 			return -1;
 
@@ -23,11 +39,11 @@ class Forum
 			if ($par == false)
 				return -1;
 
-			$db->queryExec(sprintf("update forumpost set replies = replies + 1, updateddate = now() where id = %d", $parentid));
+			$this->pdo->queryExec(sprintf("update forumpost set replies = replies + 1, updateddate = now() where id = %d", $parentid));
 		}
 
-		$db->queryInsert(sprintf("INSERT INTO `forumpost` (`forumid`,`parentid`,`userid`,`subject`,`message`, `locked`, `sticky`, `replies`, `createddate`, `updateddate`) VALUES ( 1,  %d, %d,  %s,  %s, %d, %d, %d,NOW(),  NOW())",
-			$parentid, $userid, $db->escapeString($subject)	, $db->escapeString($message), $locked, $sticky, $replies));
+		$this->pdo->queryInsert(sprintf("INSERT INTO forumpost (forumid, parentid, userid, subject, message, locked, sticky, replies, createddate, updateddate) VALUES ( 1,  %d, %d,  %s,  %s, %d, %d, %d,NOW(),  NOW())",
+			$parentid, $userid, $this->pdo->escapeString($subject)	, $this->pdo->escapeString($message), $locked, $sticky, $replies));
 	}
 
 	/**
@@ -35,8 +51,7 @@ class Forum
 	 */
 	public function getParent($parent)
 	{
-		$db = new Settings();
-		return $db->queryOneRow(sprintf(" SELECT forumpost.*, users.username from forumpost left outer join users on users.id = forumpost.userid where forumpost.id = %d ", $parent));
+		return $this->pdo->queryOneRow(sprintf(" SELECT forumpost.*, users.username from forumpost left outer join users on users.id = forumpost.userid where forumpost.id = %d ", $parent));
 	}
 
 	/**
@@ -44,8 +59,7 @@ class Forum
 	 */
 	public function getRecentPosts($limit)
 	{
-		$db = new Settings();
-		return $db->query(sprintf("select forumpost.*, users.username from forumpost join (select case when parentid = 0 then id else parentid end as id, max(createddate) from forumpost group by case when parentid = 0 then id else parentid end order by max(createddate) desc) x on x.id = forumpost.id inner join users on userid = users.id limit %d", $limit));
+		return $this->pdo->query(sprintf("select forumpost.*, users.username from forumpost join (select case when parentid = 0 then id else parentid end as id, max(createddate) from forumpost group by case when parentid = 0 then id else parentid end order by max(createddate) desc) x on x.id = forumpost.id inner join users on userid = users.id limit %d", $limit));
 	}
 
 
@@ -54,8 +68,7 @@ class Forum
 	 */
 	public function getPosts($parent)
 	{
-		$db = new Settings();
-		return $db->query(sprintf(" SELECT forumpost.*, CASE WHEN role=%d THEN 1 ELSE 0 END  AS 'isadmin', users.username from forumpost left outer join users on users.id = forumpost.userid where forumpost.id = %d or parentid = %d order by createddate asc limit 250", Users::ROLE_ADMIN, $parent, $parent));
+		return $this->pdo->query(sprintf(" SELECT forumpost.*, CASE WHEN role=%d THEN 1 ELSE 0 END  AS 'isadmin', users.username from forumpost left outer join users on users.id = forumpost.userid where forumpost.id = %d or parentid = %d order by createddate asc limit 250", Users::ROLE_ADMIN, $parent, $parent));
 	}
 
 	/**
@@ -63,8 +76,7 @@ class Forum
 	 */
 	public function getPost($id)
 	{
-		$db = new Settings();
-		return $db->queryOneRow(sprintf(" SELECT * from forumpost where id = %d", $id));
+		return $this->pdo->queryOneRow(sprintf(" SELECT * from forumpost where id = %d", $id));
 	}
 
 	/**
@@ -72,8 +84,7 @@ class Forum
 	 */
 	public function getBrowseCount()
 	{
-		$db = new Settings();
-		$res = $db->queryOneRow(sprintf("select count(id) as num from forumpost where parentid = 0"));
+		$res = $this->pdo->queryOneRow(sprintf("select count(id) as num from forumpost where parentid = 0"));
 		return $res["num"];
 	}
 
@@ -82,14 +93,13 @@ class Forum
 	 */
 	public function getBrowseRange($start, $num)
 	{
-		$db = new Settings();
 
 		if ($start === false)
 			$limit = "";
 		else
 			$limit = " LIMIT ".$start.",".$num;
 
-		return $db->query(sprintf(" SELECT forumpost.*, users.username from forumpost left outer join users on users.id = forumpost.userid where parentid = 0 order by updateddate desc".$limit ));
+		return $this->pdo->query(sprintf(" SELECT forumpost.*, users.username from forumpost left outer join users on users.id = forumpost.userid where parentid = 0 order by updateddate desc".$limit ));
 	}
 
 	/**
@@ -97,8 +107,7 @@ class Forum
 	 */
 	public function deleteParent($parent)
 	{
-		$db = new Settings();
-		$db->queryExec(sprintf("DELETE from forumpost where id = %d or parentid = %d", $parent, $parent));
+		$this->pdo->queryExec(sprintf("DELETE from forumpost where id = %d or parentid = %d", $parent, $parent));
 	}
 
 	/**
@@ -106,14 +115,13 @@ class Forum
 	 */
 	public function deletePost($id)
 	{
-		$db = new Settings();
 		$post = $this->getPost($id);
 		if ($post)
 		{
 			if ($post["parentid"] == "0")
 				$this->deleteParent($id);
 			else
-				$db->queryExec(sprintf("DELETE from forumpost where id = %d", $id));
+				$this->pdo->queryExec(sprintf("DELETE from forumpost where id = %d", $id));
 		}
 	}
 
@@ -122,8 +130,7 @@ class Forum
 	 */
 	public function deleteUser($id)
 	{
-		$db = new Settings();
-		$db->queryExec(sprintf("DELETE from forumpost where userid = %d", $id));
+		$this->pdo->queryExec(sprintf("DELETE from forumpost where userid = %d", $id));
 	}
 
 	/**
@@ -131,8 +138,7 @@ class Forum
 	 */
 	public function getCountForUser($uid)
 	{
-		$db = new Settings();
-		$res = $db->queryOneRow(sprintf("select count(id) as num from forumpost where userid = %d", $uid));
+		$res = $this->pdo->queryOneRow(sprintf("select count(id) as num from forumpost where userid = %d", $uid));
 		return $res["num"];
 	}
 
@@ -141,13 +147,12 @@ class Forum
 	 */
 	public function getForUserRange($uid, $start, $num)
 	{
-		$db = new Settings();
 
 		if ($start === false)
 			$limit = "";
 		else
 			$limit = " LIMIT ".$start.",".$num;
 
-		return $db->query(sprintf(" SELECT forumpost.*, users.username FROM forumpost LEFT OUTER JOIN users ON users.id = forumpost.userid where userid = %d order by forumpost.createddate desc ".$limit, $uid));
+		return $this->pdo->query(sprintf(" SELECT forumpost.*, users.username FROM forumpost LEFT OUTER JOIN users ON users.id = forumpost.userid where userid = %d order by forumpost.createddate desc ".$limit, $uid));
 	}
 }
