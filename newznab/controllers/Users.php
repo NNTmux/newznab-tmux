@@ -642,19 +642,24 @@ class Users
 		return $this->pdo->query(sprintf("select usercart.*, releases.searchname,releases.guid from usercart inner join releases on releases.id = usercart.releaseid where userid = %d %s", $uid, $releaseid));
 	}
 
-	public function delCartByGuid($guids, $uid)
+	public function delCartByGuid($ids, $userID)
 	{
-		if (!is_array($guids))
+		if (!is_array($ids)) {
 			return false;
-
-		$del = [];
-		foreach ($guids as $id) {
-			$id = sprintf("%s", $this->pdo->escapeString($id));
-			if (!empty($id))
-				$del[] = $id;
 		}
 
-		$this->pdo->query(sprintf("delete from usercart where userid = %d and releaseid IN (select id from releases where guid IN (%s)) ", $uid, implode(',', $del)));
+		$del = [];
+		foreach ($ids as $id) {
+			if (is_numeric($id)) {
+				$del[] = $id;
+			}
+		}
+
+		return (bool)$this->pdo->queryExec(
+			sprintf(
+				"DELETE FROM usercart WHERE id IN (%s) AND userid = %d", implode(',', $del), $userID
+			)
+		);
 	}
 
 	public function delCartByUserAndRelease($guid, $uid)
