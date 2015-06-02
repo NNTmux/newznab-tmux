@@ -65,6 +65,7 @@ $page->smarty->assign('pageroffset',$offset);
 $page->smarty->assign('pageritemsperpage',ITEMS_PER_PAGE);
 $page->smarty->assign('pagerquerybase', "/profile?id=".$userid."&offset=");
 $page->smarty->assign('pagerquerysuffix', "#comments");
+$page->smarty->assign('privateprofiles', ($page->settings->getSetting('privateprofiles') == 1) ? true : false );
 
 $pager = $page->smarty->fetch("pager.tpl");
 $page->smarty->assign('pager', $pager);
