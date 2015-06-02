@@ -36,7 +36,6 @@ class BasePage
 	public $smarty = '';
 	public $userdata = [];
 	public $serverurl = '';
-	public $site = '';
 	public $secure_connection = false;
 
 
@@ -64,10 +63,10 @@ class BasePage
 		$this->captcha = new Captcha(['Settings' => $this->settings]);
 
 		$this->smarty->setTemplateDir(
-			array(
-				'user_frontend' => NN_WWW . 'templates/' . $this->settings->getSetting('style') . '/views/frontend',
+				[
+					'user_frontend' => NN_WWW . 'templates/' . $this->settings->getSetting('style') . '/views/frontend',
 				'frontend' => NN_WWW . 'templates/default/views/frontend'
-			)
+				]
 		);
 		$this->smarty->setCompileDir(SMARTY_DIR.'templates_c'.DIRECTORY_SEPARATOR);
 		$this->smarty->setConfigDir(SMARTY_DIR.'configs'.DIRECTORY_SEPARATOR);
@@ -113,10 +112,10 @@ class BasePage
 			if ($this->settings->getSetting('userselstyle') == 1) {
 				if (isset($this->userdata['style']) && $this->userdata['style'] !== 'None') {
 					$this->smarty->setTemplateDir(
-						array(
-							'user_frontend' => NN_WWW . 'templates/' . $this->userdata['style'] . '/views/frontend',
+							[
+								'user_frontend' => NN_WWW . 'templates/' . $this->userdata['style'] . '/views/frontend',
 							'frontend'      => NN_WWW . 'templates/default/views/frontend'
-						)
+							]
 					);
 				}
 			}
