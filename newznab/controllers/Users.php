@@ -414,10 +414,7 @@ class Users
 
 	public function getById($id)
 	{
-
-		$sql = sprintf("select users.*, userroles.name as rolename, userroles.hideads, userroles.canpreview, userroles.canpre, userroles.apirequests, userroles.downloadrequests, NOW() as now from users inner join userroles on userroles.id = users.role where users.id = %d ", $id);
-
-		return $this->pdo->queryOneRow($sql);
+		return $this->pdo->queryOneRow(sprintf("select users.*, userroles.name as rolename, userroles.hideads, userroles.canpreview, userroles.canpre, userroles.apirequests, userroles.downloadrequests, NOW() as now from users inner join userroles on userroles.id = users.role where users.id = %d ", $id));
 	}
 
 	public function getByRssToken($rsstoken)

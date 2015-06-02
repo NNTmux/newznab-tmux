@@ -156,62 +156,60 @@ class SpotNab {
 		$this->_nntp = new NNTP(['Settings' => $this->_pdo]);
 		$this->releaseImage =  new \ReleaseImage($this->_pdo);
 		$this->nzb = new \NZB($this->_pdo);
-		$this->_site = $this->_pdo->getSetting();
-		$this->_globals = $this->_site;
 
 		$this->_post_user = $post_user;
 		$this->_post_email = $post_email;
 		$this->_post_group = $post_group;
 
 		// Fetch Meta information
-		$this->_post_code = trim($this->_globals->code)?
-			$this->_globals->code:Null;
-		$this->_post_title = trim($this->_globals->title)?
-			$this->_globals->title:Null;
+		$this->_post_code = trim($this->_pdo->getSetting('code'))?
+			$this->_pdo->getSetting('code'):Null;
+		$this->_post_title = trim($this->_pdo->getSetting('title'))?
+			$this->_pdo->getSetting('title'):Null;
 
 		if ($this->_post_user === Null){
 			// Fetch the SpotNab UserID
-			$this->_post_user = trim($this->_globals->spotnabuser)?
-				$this->_globals->spotnabuser:Null;
+			$this->_post_user = trim($this->_pdo->getSetting('spotnabuser'))?
+				$this->_pdo->getSetting('spotnabuser'):Null;
 		}
 
 		if ($this->_post_email === Null){
 			// Fetch the SpotNab EmailID
-			$this->_post_email = trim($this->_globals->spotnabemail)?
-				$this->_globals->spotnabemail:Null;
+			$this->_post_email = trim($this->_pdo->getSetting('spotnabemail'))?
+				$this->_pdo->getSetting('spotnabemail'):Null;
 		}
 
 		if ($this->_post_group === Null){
 			// Fetch the SpotNab Usenet Group
-			$this->_post_group = trim($this->_globals->spotnabgroup)?
-				$this->_globals->spotnabgroup:Null;
+			$this->_post_group = trim($this->_pdo->getSetting('spotnabgroup'))?
+				$this->_pdo->getSetting('spotnabgroup'):Null;
 		}
 
 		// Public Key
-		$this->_ssl_pubkey = trim($this->_globals->spotnabsitepubkey)?
-			$this->_globals->spotnabsitepubkey:false;
+		$this->_ssl_pubkey = trim($this->_pdo->getSetting('spotnabsitepubkey'))?
+			$this->_pdo->getSetting('spotnabsitepubkey'):false;
 		if($this->_ssl_pubkey)
 			$this->_ssl_pubkey = $this->decompstr($this->_ssl_pubkey);
 
 		// Private Key
-		$this->_ssl_prvkey = trim($this->_globals->spotnabsiteprvkey)?
-			$this->_globals->spotnabsiteprvkey:false;
+		$this->_ssl_prvkey = trim($this->_pdo->getSetting('spotnabsiteprvkey'))?
+			$this->_pdo->getSetting('spotnabsiteprvkey'):false;
 		if($this->_ssl_prvkey)
 			$this->_ssl_prvkey = $this->decompstr($this->_ssl_prvkey);
 
 		// Track Discovery Article
-		$this->_discovery_lastarticle = intval($this->_globals->spotnablastarticle);
+		$this->_discovery_lastarticle = intval($this->_pdo->getSetting('spotnablastarticle'));
 
 		// Posting Flag
-		$this->_can_post = (trim($this->_globals->spotnabpost) == 1)?
+		$this->_can_post = (trim($this->_pdo->getSetting('spotnabpost')) == 1)?
 			true:false;
 
 		// Auto Enable Flag
-		$this->_auto_enable = (trim($this->_globals->spotnabautoenable) == 1)?
+		$this->_auto_enable = (trim($this->_pdo->getSetting('spotnabautoenable')) == 1)?
 			true:false;
 
 		// Spotnab Privacy Posting
-		$this->_post_privacy = (trim($this->_globals->spotnabprivacy) == 1)?
+		$this->_post_privacy = (trim($this->_pdo->getSetting('spotnabprivacy')) == 1)?
 			true:false;
 
 		// Auto-Discovery Private Key (used for Posting)
@@ -240,11 +238,11 @@ class SpotNab {
 			."LVDl";
 
 		// Auto-Discovery Flags
-		$this->_can_broadcast = (trim($this->_globals->spotnabbroadcast) == 1)?
+		$this->_can_broadcast = (trim($this->_pdo->getSetting('spotnabbroadcast')) == 1)?
 			true:false;
 		$this->_can_broadcast = ($this->_can_broadcast && $this->_can_post);
 
-		$this->_can_discover = (trim($this->_globals->spotnabdiscover) == 1)?
+		$this->_can_discover = (trim($this->_pdo->getSetting('spotnabdiscover')) == 1)?
 			true:false;
 
 		if (!$this->has_openssl()){
@@ -591,7 +589,7 @@ class SpotNab {
 				// title & code taken out to keep things anonymous for now
 				//'title' => $this->_post_title,
 				//'code' => $this->_post_code,
-				'id' => md5($this->_globals->siteseed),
+				'id' => md5($this->_pdo->getSetting('siteseed')),
 				'users' => $us->getCount()
 			),
 			'posts' => array(
@@ -1061,7 +1059,6 @@ class SpotNab {
 				$db->queryExec($sql);
 
 				// Update settings Information
-				$this->_globals = $this->_site;
 				$this->_post_user = trim($this->_pdo->getSetting('spotnabuser'));
 				$this->_post_email = trim($this->_pdo->getSetting('spotnabemail'));
 				$this->_ssl_pubkey = $this->decompstr($this->_pdo->getSetting('spotnabsitepubkey'));
@@ -1077,12 +1074,12 @@ class SpotNab {
 			printf("SPOTNAB EMAIL : %s\n", $this->_post_email);
 			printf("SPOTNAB GROUP : %s\n", $this->_post_group);
 			printf("SPOTNAB PUBLIC KEY (Begin copy from next line):\n%s\n",
-				$this->_globals->spotnabsitepubkey);
+				$this->_pdo->getSetting('spotnabsitepubkey'));
 		}
 
 		return array(
-			'pubkey' => $this->_globals->spotnabsitepubkey,
-			'prvkey' => $this->_globals->spotnabsiteprvkey
+			'pubkey' => $this->_pdo->getSetting('spotnabsitepubkey'),
+			'prvkey' => $this->_pdo->getSetting('spotnabsiteprvkey')
 		);
 	}
 
@@ -2276,7 +2273,7 @@ class SpotNab {
 			if ($this->_post_privacy)
 				$username = sprintf(
 					"sn-%s",
-					substr(md5($comment['username'].$this->_globals->siteseed), 0, 6)
+					substr(md5($comment['username'].$this->_pdo->getSetting('siteseed')), 0, 6)
 				);
 			else
 				$username = $comment['username'];

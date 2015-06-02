@@ -168,7 +168,7 @@
 						<table>
 							{assign var="msplits" value=","|explode:$result.grp_release_id}
 							{assign var="mguid" value=","|explode:$result.grp_release_guid}
-							{assign var="mnfo" value=","|explode:$result.grp_release_nfoID}
+							{assign var="mnfo" value=","|explode:$result.grp_release_nfoid}
 							{assign var="mgrp" value=","|explode:$result.grp_release_grpname}
 							{assign var="mname" value="#"|explode:$result.grp_release_name}
 							{assign var="mpostdate" value=","|explode:$result.grp_release_postdate}

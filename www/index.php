@@ -14,8 +14,8 @@ require_once 'automated.config.php';
 $page = new Page;
 $users = new Users;
 
-if ($page->site->style != "default" && file_exists(NN_WWW.'pages/'.$page->site->style."/".$page->page.'.php'))
-	include(NN_WWW.'pages/'.$page->site->style."/".$page->page.'.php');
+if ($page->settings->getSetting('style') != "default" && file_exists(NN_WWW.'pages/'.$page->settings->getSetting('style')."/".$page->page.'.php'))
+	include(NN_WWW.'pages/'.$page->settings->getSetting('style')."/".$page->page.'.php');
 elseif (file_exists(WWW_DIR.'pages/'.$page->page.'.php'))
     include(NN_WWW.'pages/'.$page->page.'.php');
 else
