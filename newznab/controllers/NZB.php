@@ -140,51 +140,94 @@ class NZB
 	}
 
 	/**
-	 * Returns a simple file listing from the parts inside the NZB.
+	 * Retrieve various information on a NZB file (the subject, # of pars,
+	 * file extensions, file sizes, file completion, group names, # of parts).
+	 *
+	 * @param string $nzb The NZB contents in a string.
+	 *
+	 * @return array $result Empty if not an NZB or the contents of the NZB.
+	 *
+	 * @access public
 	 */
-	function nzbFileList($nzb)
+	public function nzbFileList($nzb)
 	{
+		$num_pars = $i = 0;
 		$result = array();
 
-		$xml = @simplexml_load_string(str_replace("\x0F", '', $nzb));
-		$num_pars = 0;
-		if (!$xml || strtolower($xml->getName()) != 'nzb')
-			return false;
-
-		$i = 0;
-		foreach ($xml->file as $file) {
-			//subject
-			$title = $file->attributes()->subject;
-			if (preg_match('/\.par2/i', $title))
-				$num_pars++;
-
-			$result[$i]['title'] = "$title";
-
-			if (preg_match('/\.(7z|ai7|srr|srt|sub|aiff|asc|avi|audio|bin|bz2|c|cfc|cfm|chm|class|conf|cpp|cs|css|csv|deb|divx|doc|dot|eml|enc|file|gif|gz|hlp|htm|html|image|iso|jar|java|jpeg|jpg|js|lua|m|mm|mov|mp3|mpg|odc|odf|odg|odi|odp|ods|odt|ogg|pdf|pgp|php|pl|png|ppt|ps|py|ram|rar|rb|rm|rpm|rtf|sig|sql|swf|sxc|sxd|sxi|sxw|tar|tex|tgz|txt|vcf|video|vsd|wav|wma|wmv|xls|xml|xpi|xvid|zip7|rar|par2|mp3|exe|zip|ace|nzb|r\d{2,3}|jpg|txt|nfo|sfv|cue|m3u)[" ]/i', $file->attributes()->subject, $ext)) {
-				if (preg_match('/\.(r\d{2,3})/i', $ext[0], $extrar))
-					$ext[1] = "rar";
-
-				$result[$i]['ext'] = strtolower($ext[1]);
-			} else {
-				$result[$i]['ext'] = "";
-			}
-
-			//filesize
-			$filesize = $numsegs = 0;
-			foreach ($file->segments->segment as $segment) {
-				$filesize += $segment->attributes()->bytes;
-				$numsegs++;
-			}
-			$result[$i]['size'] = $filesize;
-
-			//file completion
-			preg_match('/\((\d+)\/(?P<total>\d+)\)$/', $title, $parts);
-			$result[$i]['partstotal'] = (isset($parts['total']) ? $parts['total'] : 0);
-			$result[$i]['partsactual'] = $numsegs;
-
-			$i++;
+		if (!$nzb) {
+			return $result;
 		}
 
+		$xml = @simplexml_load_string(str_replace("\x0F", '', $nzb));
+		if (!$xml || strtolower($xml->getName()) !== 'nzb') {
+			return $result;
+		}
+
+		foreach ($xml->file as $file) {
+			// Subject.
+			$title = (string)$file->attributes()->subject;
+
+			// Amount of pars.
+			if (stripos($title, '.par2')) {
+				$num_pars++;
+			}
+
+			$result[$i]['title'] = $title;
+
+			// Extensions.
+			if (preg_match(
+				'/\.(\d{2,3}|7z|ace|ai7|srr|srt|sub|aiff|asc|avi|audio|bin|bz2|'
+				. 'c|cfc|cfm|chm|class|conf|cpp|cs|css|csv|cue|deb|divx|doc|dot|'
+				. 'eml|enc|exe|file|gif|gz|hlp|htm|html|image|iso|jar|java|jpeg|'
+				. 'jpg|js|lua|m|m3u|mkv|mm|mov|mp3|mp4|mpg|nfo|nzb|odc|odf|odg|odi|odp|'
+				. 'ods|odt|ogg|par2|parity|pdf|pgp|php|pl|png|ppt|ps|py|r\d{2,3}|'
+				. 'ram|rar|rb|rm|rpm|rtf|sfv|sig|sql|srs|swf|sxc|sxd|sxi|sxw|tar|'
+				. 'tex|tgz|txt|vcf|video|vsd|wav|wma|wmv|xls|xml|xpi|xvid|zip7|zip)'
+				. '[" ](?!(\)|\-))/i',
+				$title, $ext
+			)
+			) {
+
+				if (preg_match('/\.r\d{2,3}/i', $ext[0])) {
+					$ext[1] = 'rar';
+				}
+				$result[$i]['ext'] = strtolower($ext[1]);
+			} else {
+				$result[$i]['ext'] = '';
+			}
+
+			$fileSize = $numSegments = 0;
+
+			// Parts.
+			if (!isset($result[$i]['segments'])) {
+				$result[$i]['segments'] = array();
+			}
+
+			// File size.
+			foreach ($file->segments->segment as $segment) {
+				array_push($result[$i]['segments'], (string) $segment);
+				$fileSize += $segment->attributes()->bytes;
+				$numSegments++;
+			}
+			$result[$i]['size'] = $fileSize;
+
+			// File completion.
+			if (preg_match('/(\d+)\)$/', $title, $parts)) {
+				$result[$i]['partstotal'] = $parts[1];
+			}
+			$result[$i]['partsactual'] = $numSegments;
+
+			// Groups.
+			if (!isset($result[$i]['groups'])) {
+				$result[$i]['groups'] = array();
+			}
+			foreach ($file->groups->group as $g) {
+				array_push($result[$i]['groups'], (string) $g);
+			}
+
+			unset($result[$i]['segments']['@attributes']);
+			$i++;
+		}
 		return $result;
 	}
 }
