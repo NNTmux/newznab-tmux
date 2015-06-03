@@ -3,6 +3,7 @@
 require_once("config.php");
 
 $page = new AdminPage();
+$msgs = $error = false;
 
 // set the current action
 $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view';

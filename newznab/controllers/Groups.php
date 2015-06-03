@@ -363,9 +363,6 @@ class Groups
 	 */
 	function addBulk($groupList, $active = 1, $backfill = 1)
 	{
-		require_once(WWW_DIR . "/lib/binaries.php");
-		require_once(WWW_DIR . "/lib/nntp.php");
-
 		$ret = array();
 
 		if ($groupList == "") {
