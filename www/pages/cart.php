@@ -14,7 +14,7 @@ if (isset($_GET["add"])) {
 	}
 
 	foreach ($data as $d) {
-		$users->addCart($page->users->currentUserId(), $d["id"]);
+		$page->users->addCart($page->users->currentUserId(), $d["id"]);
 	}
 } elseif (isset($_REQUEST["delete"])) {
 	if (isset($_GET['delete']) && !empty($_GET['delete'])) {
@@ -24,7 +24,7 @@ if (isset($_GET["add"])) {
 	}
 
 	if (isset($ids)) {
-		$users->delCartByGuid($ids, $users->currentUserId());
+		$page->users->delCartByGuid($ids, $page->users->currentUserId());
 	}
 
 	if (!isset($_POST['delete'])) {
