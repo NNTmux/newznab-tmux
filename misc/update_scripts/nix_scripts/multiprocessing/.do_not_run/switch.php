@@ -271,11 +271,9 @@ function processReleases($pdo, $releases, $groupID)
 {
 	$pdo = new Settings();
 	$releaseCreationLimit = ($pdo->getSetting('maxnzbsprocessed') != '' ? (int)$pdo->getSetting('maxnzbsprocessed') : 1000);
+	$releases->checkRegexesUptoDate($pdo->getSetting('latestregexurl'), $pdo->getSetting('latestregexrevision'), $pdo->getSetting('newznabID'));
 	$releases->applyRegex($groupID);
 	$releases->processIncompleteBinaries($groupID);
-	$releases->createReleases($groupID);
-
-
 	do {
 		$releasesCount = $releases->createReleases($groupID);
 
