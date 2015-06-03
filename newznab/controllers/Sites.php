@@ -132,7 +132,7 @@ class Sites
 	public function updateItem($setting, $value)
 	{
 		$db = new DB();
-		$sql = sprintf("update site set value = %s where setting = %s", $db->escapeString($value), $db->escapeString($setting));
+		$sql = sprintf("update settings set value = %s where setting = %s", $db->escapeString($value), $db->escapeString($setting));
 
 		return $db->exec($sql);
 	}
