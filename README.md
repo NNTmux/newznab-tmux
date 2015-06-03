@@ -8,6 +8,8 @@ I started adapting some of more interesting scripts from nZEDb, but they require
  CD to the root of your newznab install, ie.  cd /var/www/newznab
  Next steps are very important:
  
+ 		If you are already a tmux user, you need to remove the .git folder from tmux folder. 
+ 
  		git init 
  		git remote add origin https://github.com/DariusIII/newznab-tmux.git
  		git fetch
