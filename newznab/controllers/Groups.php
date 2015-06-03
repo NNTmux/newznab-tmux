@@ -368,7 +368,7 @@ class Groups
 		if ($groupList == "") {
 			$ret[] = "No group list provided.";
 		} else {
-			$nntp = new Nntp(['Echo' => false]);
+			$nntp = new NNTP(['Echo' => false]);
 			if (!$nntp->doConnect()) {
 				$ret[] = "Failed to get NNTP connection";
 
