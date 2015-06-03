@@ -1147,7 +1147,6 @@ class Releases
 	 * @param string $usenetName
 	 * @param string $posterName
 	 * @param string $groupName
-	 * @param array  $cat
 	 * @param int    $sizeFrom
 	 * @param int    $sizeTo
 	 * @param int    $hasNfo
@@ -1158,22 +1157,44 @@ class Releases
 	 * @param int    $limit
 	 * @param string $orderBy
 	 * @param int    $maxAge
-	 * @param array  $excludedCats
+	 * @param integer[] $excludedCats
 	 * @param string $type
+	 * @param array  $cat
 	 *
 	 * @return array
 	 */
 	public function search(
-		$searchName, $usenetName, $posterName, $groupName, $cat = [-1], $sizeFrom,
-		$sizeTo, $hasNfo, $hasComments, $daysNew, $daysOld, $offset = 0, $limit = 1000,
-		$orderBy = '', $maxAge = -1, $excludedCats = [], $type = 'basic'
-	)
-	{
-
-		$sphinxSearch = new SphinxSearch();
-		$releaseSearch = new ReleaseSearch($this->pdo, $sphinxSearch);
-		$sizeRange = range(1, 11);
-		$groups = new Groups();
+		$searchName,
+		$usenetName,
+		$posterName,
+		$groupName,
+		$sizeFrom,
+		$sizeTo,
+		$hasNfo,
+		$hasComments,
+		$daysNew,
+		$daysOld,
+		$offset = 0,
+		$limit = 1000,
+		$orderBy = '',
+		$maxAge = -1,
+		$excludedCats = [],
+		$type = 'basic',
+		$cat = [-1]
+	) {
+		$sizeRange = [
+			1 => 1,
+			2 => 2.5,
+			3 => 5,
+			4 => 10,
+			5 => 20,
+			6 => 30,
+			7 => 40,
+			8 => 80,
+			9 => 160,
+			10 => 320,
+			11 => 640,
+		];
 
 		if ($orderBy == '') {
 			$orderBy = [];
@@ -1196,20 +1217,21 @@ class Releases
 
 		$whereSql = sprintf(
 			"%s
-			WHERE r.passwordstatus <= (select value from settings where setting='showpasswordedrelease') AND r.nzbstatus = %d %s %s %s %s %s %s %s %s %s %s %s",
-			$releaseSearch->getFullTextJoinString(),
+			WHERE r.passwordstatus %s AND r.nzbstatus = %d %s %s %s %s %s %s %s %s %s %s %s",
+			$this->releaseSearch->getFullTextJoinString(),
+			$this->showPasswords(),
 			Enzebe::NZB_ADDED,
 			($maxAge > 0 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $maxAge) : ''),
-			($groupName != -1 ? sprintf(' AND r.groupid = %d ', $groups->getIDByName($groupName)) : ''),
-			(in_array($sizeFrom, $sizeRange) ? ' AND r.size > ' . (string)(104857600 * (int)$sizeFrom) . ' ' : ''),
-			(in_array($sizeTo, $sizeRange) ? ' AND r.size < ' . (string)(104857600 * (int)$sizeTo) . ' ' : ''),
+			($groupName != -1 ? sprintf(' AND r.groupid = %d ', $this->groups->getIDByName($groupName)) : ''),
+			(array_key_exists($sizeFrom, $sizeRange) ? ' AND r.size > ' . (string)(104857600 * (int)$sizeRange[$sizeFrom]) . ' ' : ''),
+			(array_key_exists($sizeTo, $sizeRange) ? ' AND r.size < ' . (string)(104857600 * (int)$sizeRange[$sizeTo]) . ' ' : ''),
 			($hasNfo != 0 ? ' AND r.nfostatus = 1 ' : ''),
 			($hasComments != 0 ? ' AND r.comments > 0 ' : ''),
 			($type !== 'advanced' ? $this->categorySQL($cat) : ($cat[0] != '-1' ? sprintf(' AND (r.categoryid = %d) ', $cat[0]) : '')),
 			($daysNew != -1 ? sprintf(' AND r.postdate < (NOW() - INTERVAL %d DAY) ', $daysNew) : ''),
 			($daysOld != -1 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $daysOld) : ''),
 			(count($excludedCats) > 0 ? ' AND r.categoryid NOT IN (' . implode(',', $excludedCats) . ')' : ''),
-			(count($searchOptions) > 0 ? $releaseSearch->getSearchSQL($searchOptions) : '')
+			(count($searchOptions) > 0 ? $this->releaseSearch->getSearchSQL($searchOptions) : '')
 		);
 
 		$baseSql = sprintf(
@@ -1219,7 +1241,7 @@ class Releases
 				groups.name AS group_name,
 				rn.id AS nfoid,
 				re.releaseid AS reid,
-				cp.id AS categoryParentID
+				cp.id AS categoryparentid
 			FROM releases r
 			LEFT OUTER JOIN releasevideo re ON re.releaseid = r.id
 			LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
@@ -1246,7 +1268,6 @@ class Releases
 		if ($releases && count($releases)) {
 			$releases[0]['_totalrows'] = $this->getPagerCount($baseSql);
 		}
-
 		return $releases;
 	}
 
