@@ -34,9 +34,9 @@
 					{if $category==1000}<div class="btn-group"><a class="btn btn-mini" href="{$smarty.const.WWW_TOP}/console" title="Covers"><i class="icon-picture"></i></a><span class="btn btn-mini disabled"><i class="icon-list"></i></span></div>
 					{elseif $category==2000}<div class="btn-group"><a class="btn btn-mini" href="{$smarty.const.WWW_TOP}/movies" title="Covers"><i class="icon-picture"></i></a><span class="btn btn-mini disabled"><i class="icon-list"></i></span></div>
 					{elseif $category==3000}<div class="btn-group"><a class="btn btn-mini" href="{$smarty.const.WWW_TOP}/music" title="Covers"><i class="icon-picture"></i></a><span class="btn btn-mini disabled"><i class="icon-list"></i></span></div>
-					{elseif $category==4050}<div class="btn-group"><a class="btn btn-mini" href="{$smarty.const.WWW_TOP}/games" title="Covers"><i class="icon-picture"></i></a><span class="btn btn-mini disabled"><i class="icon-list"></i></span></div>
+					{elseif $category==4000}<div class="btn-group"><a class="btn btn-mini" href="{$smarty.const.WWW_TOP}/games" title="Covers"><i class="icon-picture"></i></a><span class="btn btn-mini disabled"><i class="icon-list"></i></span></div>
 					{elseif $category==6000}<div class="btn-group"><a class="btn btn-mini" href="{$smarty.const.WWW_TOP}/xxx" title="Covers"><i class="icon-picture"></i></a><span class="btn btn-mini disabled"><i class="icon-list"></i></span></div>
-					{elseif $category==7020}<div class="btn-group"><a class="btn btn-mini" href="{$smarty.const.WWW_TOP}/books" title="Covers"><i class="icon-picture"></i></a><span class="btn btn-mini disabled"><i class="icon-list"></i></span></div>
+					{elseif $category==7000}<div class="btn-group"><a class="btn btn-mini" href="{$smarty.const.WWW_TOP}/books" title="Covers"><i class="icon-picture"></i></a><span class="btn btn-mini disabled"><i class="icon-list"></i></span></div>
 					{/if}
 				</div>
 			</td>
