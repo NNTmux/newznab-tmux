@@ -4,7 +4,7 @@ require_once './config.php';
 
 $page = new AdminPage();
 
-$s = $page->site;
+$s = $page->settings;
 unset($s->siteseed);
 unset($s->amazonprivkey);
 unset($s->tmdbkey);
