@@ -51,7 +51,7 @@ class NZBExport
 	 *
 	 * @access public
 	 */
-	public function __construct(array $options = array())
+	public function __construct(array $options = [])
 	{
 		$defaults = [
 			'Browser'  => false, // Started from browser?
@@ -65,8 +65,8 @@ class NZBExport
 		$this->browser = $options['Browser'];
 		$this->echoCLI = (!$this->browser && NN_ECHOCLI && $options['Echo']);
 		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Setting'] : new Settings());
-		$this->releases = ($options['Releases'] instanceof \Releases ? $options['Releases'] : new \Releases(['Settings' => $this->pdo]));
-		$this->nzb = ($options['NZB'] instanceof \NZB ? $options['NZB'] : new \NZB($this->pdo));
+		$this->releases = ($options['Releases'] instanceof Releases ? $options['Releases'] : new Releases(['Settings' => $this->pdo]));
+		$this->nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB($this->pdo));
 	}
 
 	/**
@@ -140,9 +140,8 @@ class NZBExport
 		// Loop over groups to take less RAM.
 		foreach ($groups as $group) {
 			$currentExport = 0;
-			$cat = '';
 			// Get all the releases based on the parameters.
-			$releases = $this->releases->getForExport($fromDate, $toDate, $group['id'], $cat);
+			$releases = $this->releases->getForExport($fromDate, $toDate, $group['id']);
 			$totalFound = count($releases);
 			if ($totalFound === 0) {
 				if ($this->echoCLI) {
@@ -182,7 +181,7 @@ class NZBExport
 						}
 						continue;
 					}
-				// If not, decompress it and create a file to store it in.
+					// If not, decompress it and create a file to store it in.
 				} else {
 					$nzbContents = Utility::unzipGzipFile($nzbFile);
 					if (!$nzbContents) {

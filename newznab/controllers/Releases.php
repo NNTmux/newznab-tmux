@@ -441,38 +441,59 @@ class Releases
 	}
 
 	/**
-	 * Get a range of releases. Used in nzb export
+	 * Get list of releases available for export.
+	 *
+	 * @param string $postFrom (optional) Date in this format : 01/01/2014
+	 * @param string $postTo   (optional) Date in this format : 01/01/2014
+	 * @param string $groupID  (optional) Group ID.
+	 *
+	 * @return array
 	 */
-	public function getForExport($postfrom, $postto, $group, $cat)
+	public function getForExport($postFrom = '', $postTo = '', $groupID = '')
 	{
+		return $this->pdo->query(
+			sprintf(
+				"SELECT searchname, guid, groups.name AS gname, CONCAT(cp.title,'_',category.title) AS catName
+				FROM releases r
+				INNER JOIN category ON r.categoryid = category.id
+				INNER JOIN groups ON r.groupid = groups.id
+				INNER JOIN category cp ON cp.id = category.parentid
+				WHERE r.nzbstatus = %d
+				%s %s %s",
+				Enzebe::NZB_ADDED,
+				$this->exportDateString($postFrom),
+				$this->exportDateString($postTo, false),
+				(($groupID != '' && $groupID != '-1') ? sprintf(' AND group_id = %d ', $groupID) : '')
+			)
+		);
+	}
 
-		if ($postfrom != "") {
-			$dateparts = explode("/", $postfrom);
-			if (count($dateparts) == 3)
-				$postfrom = sprintf(" and postdate > %s ", $this->pdo->escapeString($dateparts[2] . "-" . $dateparts[1] . "-" . $dateparts[0] . " 00:00:00"));
-			else
-				$postfrom = "";
+	/**
+	 * Create a date query string for exporting.
+	 *
+	 * @param string $date
+	 * @param bool   $from
+	 *
+	 * @return string
+	 */
+	private function exportDateString($date, $from = true)
+	{
+		if ($date != '') {
+			$dateParts = explode('/', $date);
+			if (count($dateParts) === 3) {
+				$date = sprintf(
+					' AND postdate %s %s ',
+					($from ? '>' : '<'),
+					$this->pdo->escapeString(
+						$dateParts[2] . '-' . $dateParts[1] . '-' . $dateParts[0] .
+						($from ? ' 00:00:00' : ' 23:59:59')
+					)
+				);
+			} else {
+				$date = '';
+			}
 		}
-
-		if ($postto != "") {
-			$dateparts = explode("/", $postto);
-			if (count($dateparts) == 3)
-				$postto = sprintf(" and postdate < %s ", $this->pdo->escapeString($dateparts[2] . "-" . $dateparts[1] . "-" . $dateparts[0] . " 23:59:59"));
-			else
-				$postto = "";
-		}
-
-		if ($group != "" && $group != "-1")
-			$group = sprintf(" and groupid = %d ", $group);
-		else
-			$group = "";
-
-		if ($cat != "" && $cat != "-1")
-			$cat = sprintf(" and categoryid = %d ", $cat);
-		else
-			$cat = "";
-
-		return $this->pdo->queryDirect(sprintf("SELECT searchname, guid, CONCAT(cp.title,'_',category.title) AS catName FROM releases INNER JOIN category ON releases.categoryid = category.id LEFT OUTER JOIN category cp ON cp.id = category.parentid WHERE 1 = 1 %s %s %s %s", $postfrom, $postto, $group, $cat));
+		return $date;
 	}
 
 	/**
