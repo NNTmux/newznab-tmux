@@ -17,10 +17,11 @@
 	{foreach from=$results item=result name=result}
 		<tr class="{cycle values=",alt"}">
 			<td width="15%;">
-				{if $result.isadmin == 1}<strong>{/if}
-				<a {if $smarty.foreach.result.last}id="last"{/if} title="{if $result.isadmin == 1}Admin{else}View profile{/if}" href="{$smarty.const.WWW_TOP}/profile/?name={$result.username}">{$result.username}</a>
-				{if $result.isadmin == 1}</strong>{/if}
-				<br/>
+				{if !$privateprofiles || $isadmin || $ismod}
+					<a {if $smarty.foreach.result.last}id="last"{/if} title="View profile" href="{$smarty.const.WWW_TOP}/profile/?name={$result.username}">{$result.username}</a>
+				{else}
+					{$result.username}
+				{/if}
 				on <span title="{$result.createddate}">{$result.createddate|date_format}</span> <div class="hint">({$result.createddate|timeago})</div>
 				{if $userdata.role==2}
 				<div>

@@ -909,7 +909,6 @@ class Releases
 	 * @param string $usenetName
 	 * @param string $posterName
 	 * @param string $groupName
-	 * @param array  $cat
 	 * @param int    $sizeFrom
 	 * @param int    $sizeTo
 	 * @param int    $hasNfo
@@ -920,18 +919,32 @@ class Releases
 	 * @param int    $limit
 	 * @param string $orderBy
 	 * @param int    $maxAge
-	 * @param array  $excludedCats
+	 * @param integer[] $excludedCats
 	 * @param string $type
+	 * @param array  $cat
 	 *
 	 * @return array
 	 */
 	public function search(
-		$searchName, $usenetName, $posterName, $groupName, $cat = [-1], $sizeFrom,
-		$sizeTo, $hasNfo, $hasComments, $daysNew, $daysOld, $offset = 0, $limit = 1000,
-		$orderBy = '', $maxAge = -1, $excludedCats = [], $type = 'basic'
-	)
-	{
-		$sizeRange = array(
+		$searchName,
+		$usenetName,
+		$posterName,
+		$groupName,
+		$sizeFrom,
+		$sizeTo,
+		$hasNfo,
+		$hasComments,
+		$daysNew,
+		$daysOld,
+		$offset = 0,
+		$limit = 1000,
+		$orderBy = '',
+		$maxAge = -1,
+		$excludedCats = [],
+		$type = 'basic',
+		$cat = [-1]
+	) {
+		$sizeRange = [
 			1 => 1,
 			2 => 2.5,
 			3 => 5,
@@ -943,7 +956,7 @@ class Releases
 			9 => 160,
 			10 => 320,
 			11 => 640,
-		);
+		];
 
 		if ($orderBy == '') {
 			$orderBy = [];

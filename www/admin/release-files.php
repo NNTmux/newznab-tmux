@@ -16,7 +16,7 @@ if (isset($_GET["id"]))
 	if (!$rel)
 		$page->show404();
 
-    $nzbpath = $nzb->getNZBPath($_GET["id"], $page->site->nzbpath);
+    $nzbpath = $nzb->getNZBPath($_GET["id"], $page->settings->getSetting('nzbpath'));
 
     if (!file_exists($nzbpath))
         $page->show404();

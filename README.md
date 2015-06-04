@@ -1,23 +1,31 @@
 I have forked jonnyboys newznab-tmux as he and the dev team have moved to another project (https://github.com/nZEDb/nZEDb). I will try as much as i can to maintain and improve these tmux scripts, where possible and needed, as they are a valuable addendum to newznab+.
 Support is given on irc.synirc.net #tmux channel.
 
-I started adapting some of more interesting scripts from nZEDb, but they require tempering with newznab database, so use them at your own risk. Any update to nn+ db could render them useless. Scripts require PHP version => 5.5 and Python 2.7x or newer.
+I started adapting some of more interesting scripts from nZEDb, but they require tempering with newznab database, so use them at your own risk. By using newznab-tmux you will render your indexer incompatible with newznab (you can revert changes by forcing the svn checkout, it will replace the changed files. Newznab is not aware of the changes in database, so you are safe to leave them as they are). Scripts require PHP version >= 5.5.x and Python 2.7x or newer.
 
-Now, clone my github. These scripts need to run from this location and this is where I was asked to put them. If you have decided to use an alternate location, you will need to edit the file bin/config.php to point to the file newznab/www/config.php. If you do not, these scripts will not run.
+# Steps to have a working tmux install:
 
-  cd /var/www/newznab/misc/update_scripts/nix_scripts/
-  git clone https://github.com/DariusIII/newznab-tmux.git tmux
-  cd tmux
+ CD to the root of your newznab install, ie.  cd /var/www/newznab
+ Next steps are very important:
+ 
+ 		git init 
+ 		git remote add origin https://github.com/DariusIII/newznab-tmux.git
+ 		git fetch
+ 		git reset --hard origin/your_wanted_branch, ie. git reset --hard origin/master
+ 		git checkout -t origin/your_wanted_branch, ie. git checkout -t origin/master
 
-There is a lib folder in main tmux folder. In that folder you will find two folders, /DB/ and /copy_this/. if you are setting up tmux for the first time, import db.sql using cli (mysql -u {┤your username} -p newznab < db.sql).
+	There is a lib folder in main tmux folder. In that folder you will find DB folder. If you are setting up tmux for the first time, import db.sql using cli (mysql -u {┤your username} -p newznab < db.sql).
+	After importing db.sql you need to run the patchDB.php from same folder. After the last patch is applied, you need to manualy apply the next patch labeled XXXX~settings.sql (XXXX is a patch number that is different on dev/master(0122) and regexless branch(0149)).	
+	When you have manualy applied that patch, you can use the new database updater located in /path/to/newznab/cli/ and run update_db.php true and it will apply the rest of the patches (if they exist).
+	After these steps, patchDB is unusable anymore and you need to use the new update_db.php script in cli folder.
 
-1. Copy files from /lib/copy_this/www folder into your newznab installation folder. I have created the nntmux theme where all the settings are available.
+	You need to chmod to 777 following folders now:
+	resources/*
+	libs/smarty/templates_c
+	nzbfiles/ 
 
-2. Copy files from /lib/copy_this/misc folder into your newznab installation folder.
-
-3. Most of the scripts are now threaded.
-
-4. All the required folders are created when you copy files from copy_this folder.
+	You need to add an alias to your apache/nginx conf of your indexer:
+	Alias /covers /path/to/newznab/resources/covers
 
 # yEnc:
 
@@ -37,7 +45,7 @@ There is a lib folder in main tmux folder. In that folder you will find two fold
        cd ~/
        rm -rf simple_php_yenc_decode/
 
-  yydecode
+  yydecode:
 
        cd ~/
        mkdir -p yydecode
@@ -65,14 +73,14 @@ There is a lib folder in main tmux folder. In that folder you will find two fold
 
 # Alternate NNTP provider:
 
-  Newznab-tmux has added support for dual NNTP providers, you need to edit the provided config.php in lib/copy_this/config_edit_before_copy folder
+  Newznab-tmux has added support for dual NNTP providers, you need to edit the provided config.php.example in www folder.
 
 # Sphinx support:
 
-  Newznab-tmux now comes with its own Sphinx support, ported from nZEDb. Installation readme is in misc/sphinxsearch folder, and in copy_this/misc/sphinxsearch folder
+  Newznab-tmux now comes with its own Sphinx support, ported from nZEDb. Installation readme is in misc/sphinxsearch folder.
 
   This version of tmux has many core newznab files modified, use at your own risk.
 
-Tmux is started with start.php (php start.php command). Scripts not used anymore are still available for your use, but you need to run them manualy.
+Tmux is started by following command in cli, from tmux folder: php tmux-ui.php start. Tmux can be gracefuly stopped in similar manner php tmux-ui.php stop.
 
 
