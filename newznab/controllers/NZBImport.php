@@ -28,7 +28,7 @@ class NZBImport
 	protected $releaseCleaner;
 
 	/**
-	 * @var bool|stdClass
+	 * @var bool|\stdClass
 	 * @access protected
 	 */
 	protected $site;
@@ -93,28 +93,24 @@ class NZBImport
 	public function __construct(array $options = [])
 	{
 		$defaults = [
-			'Browser'          => false, // Was this started from the browser?
-			'Echo'             => true,  // Echo to CLI?
-			'Binaries'         => null,
-			'Categorize'       => null,
-			'NZB'              => null,
-			'ReleaseCleaning'  => null,
-			'Releases'         => null,
-			'Settings'         => null,
+			'Browser'         => false,	// Was this started from the browser?
+			'Echo'            => true,	// Echo to CLI?
+			'Binaries'        => null,
+			'Categorize'      => null,
+			'NZB'             => null,
+			'ReleaseCleaning' => null,
+			'Releases'        => null,
+			'Settings'        => null,
 		];
 		$options += $defaults;
 
-		$s = new Sites();
-		$this->site = $s->get();
 		$this->echoCLI = (!$this->browser && NN_ECHOCLI && $options['Echo']);
 		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
-		$this->binaries = ($options['Binaries'] instanceof \Binaries ? $options['Binaries'] : new \Binaries(['Settings' => $this->pdo, 'Echo' => $this->echoCLI]));
-		$this->category = ($options['Categorize'] instanceof \Categorize ? $options['Categorize'] : new \Categorize(['Settings' => $this->pdo]));
-		$this->nzb = ($options['NZB'] instanceof \NZB ? $options['NZB'] : new \NZB($this->pdo));
-		$this->releaseCleaner = ($options['ReleaseCleaning'] instanceof \ReleaseCleaning ? $options['ReleaseCleaning'] : new \ReleaseCleaning($this->pdo));
-		$this->releases = ($options['Releases'] instanceof \Releases ? $options['Releases'] : new \Releases(['settings' => $this->pdo]));
-		$s = new Sites();
-		$this->site = $s->get();
+		$this->binaries = ($options['Binaries'] instanceof Binaries ? $options['Binaries'] : new Binaries(['Settings' => $this->pdo, 'Echo' => $this->echoCLI]));
+		$this->category = ($options['Categorize'] instanceof Categorize ? $options['Categorize'] : new Categorize(['Settings' => $this->pdo]));
+		$this->nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB($this->pdo));
+		$this->releaseCleaner = ($options['ReleaseCleaning'] instanceof ReleaseCleaning ? $options['ReleaseCleaning'] : new ReleaseCleaning($this->pdo));
+		$this->releases = ($options['Releases'] instanceof Releases ? $options['Releases'] : new Releases(['settings' => $this->pdo]));
 
 		$this->crossPostt = ($this->pdo->getSetting('crossposttime') != '') ? $this->pdo->getSetting('crossposttime') : 2;
 		$this->browser = $options['Browser'];
@@ -186,11 +182,11 @@ class NZBImport
 				if ($inserted) {
 
 					// Try to copy the NZB to the NZB folder.
-					$path = $this->nzb->NZBPath($this->relGuid, '', true);
+					$path = $this->nzb->NZBPath($this->relGuid, 0, true);
 
 					// Try to compress the NZB file in the NZB folder.
-					$fp = gzopen ($path, 'w5');
-					gzwrite ($fp, $nzbString);
+					$fp = gzopen($path, 'w5');
+					gzwrite($fp, $nzbString);
 					gzclose($fp);
 
 					if (!is_file($path)) {
@@ -268,25 +264,25 @@ class NZBImport
 			$groupID = -1;
 
 			// Get the nzb info.
-			if ($firstName === false ) {
-				$firstName =(string) $file->attributes()->subject;
+			if ($firstName === false) {
+				$firstName = (string)$file->attributes()->subject;
 			}
 			if ($posterName === false) {
-				$posterName = (string) $file->attributes()->poster;
+				$posterName = (string)$file->attributes()->poster;
 			}
 			if ($postDate === false) {
-				$postDate = date("Y-m-d H:i:s", (string) $file->attributes()->date);
+				$postDate = date("Y-m-d H:i:s", (string)$file->attributes()->date);
 			}
 
 			// Make a fake message array to use to check the blacklist.
-			$msg = ["Subject" => (string) $file->attributes()->subject, "From" => (string) $file->attributes()->poster, "Message-ID" => ""];
+			$msg = ["Subject" => (string)$file->attributes()->subject, "From" => (string)$file->attributes()->poster, "Message-ID" => ""];
 
-			// Get the group names, groupid, check if it's blacklisted.
+			// Get the group names, group_id, check if it's blacklisted.
 			$groupArr = [];
 			foreach ($file->groups->group as $group) {
-				$group = (string) $group;
+				$group = (string)$group;
 
-				// If groupid is -1 try to get a groupid.
+				// If group_id is -1 try to get a group_id.
 				if ($groupID === -1) {
 					if (array_key_exists($group, $this->allGroups)) {
 						$groupID = $this->allGroups[$group];
@@ -334,7 +330,7 @@ class NZBImport
 				'useFName'   => $useNzbName,
 				'postDate'   => (empty($postDate) ? date("Y-m-d H:i:s") : $postDate),
 				'from'       => (empty($posterName) ? '' : $posterName),
-				'groupid'    => $groupID,
+				'group_id'    => $groupID,
 				'groupName'  => $groupName,
 				'totalFiles' => $totalFiles,
 				'totalSize'  => $totalSize
@@ -397,19 +393,16 @@ class NZBImport
 					'name' => $escapedSubject,
 					'searchname' => $escapedSearchName,
 					'totalpart' => $nzbDetails['totalFiles'],
-					'groupid' => $nzbDetails['groupid'],
+					'groupid' => $nzbDetails['group_id'],
 					'guid' => $this->pdo->escapeString($this->relGuid),
-					'regexid' => NULL,
 					'postdate' => $this->pdo->escapeString($nzbDetails['postDate']),
 					'fromname' => $escapedFromName,
-					'reqid' => NULL,
-					'passwordstatus' => ($this->pdo->getSetting('checkpasswordedrar') > 0 ? -1 : 0),
 					'size' => $this->pdo->escapeString($nzbDetails['totalSize']),
-					'categoryid' => $this->category->determineCategory($nzbDetails['groupid'], $cleanName),
+					'categoryid' => $this->category->determineCategory($nzbDetails['group_id'], $cleanName),
 					'isrenamed' => $renamed,
 					'reqidstatus' => 0,
 					'prehashid' => 0,
-					'nzbstatus' => \NZB::NZB_ADDED
+					'nzbstatus' => NZB::NZB_ADDED
 				]
 			);
 		} else {
@@ -423,10 +416,11 @@ class NZBImport
 		}
 		return true;
 	}
+
 	/**
 	 * Get all groups in the DB.
-	 * @return bool
 	 *
+	 * @return bool
 	 * @access protected
 	 */
 	protected function getAllGroups()
@@ -446,7 +440,8 @@ class NZBImport
 
 	/**
 	 * Echo message to browser or CLI.
-	 * @param $message
+	 *
+	 * @param string $message
 	 *
 	 * @access protected
 	 */

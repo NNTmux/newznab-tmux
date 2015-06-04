@@ -6,8 +6,8 @@ use newznab\db\Settings;
 use newznab\utility\Utility;
 
 $releases = new Releases();
-$db = new newznab\db\Settings();
-$cat = new Category();
+$db = new Settings();
+$cat = new Categorize();
 $releaseRegex = new ReleaseRegex();
 $nzb = new NZB();
 $page = new Page();
@@ -20,7 +20,7 @@ $categoryoverride = -1;
 if (empty($argc) || $argc <= 1) {
 	$path = "./";
 } else {
-	$util = new newznab\utility\Utility();
+	$util = new Utility();
 	$path = (!$util->endsWith($argv[1], "/") ? $argv[1] . "/" : $argv[1]);
 	if (isset($argv[2]))
 		$usefilename = strtolower($argv[2]) == 'true';
@@ -97,10 +97,10 @@ foreach ($filestoprocess as $nzbFile) {
 				$relguid = md5(uniqid());
 				$name = $releases->cleanReleaseName(str_replace(".nzb", "", basename($nzbFile)));
 				$catId = $cat->determineCategory($groupName, $name);
-				$relid = $releases->insertRelease($name, $nzbInfo->filecount, $groupID, $relguid, $catId, "", date("Y-m-d H:i:s", $nzbInfo->postedlast), $nzbInfo->poster, "", $page->site);
+				$relid = $releases->insertRelease($name, $nzbInfo->filecount, $groupID, $relguid, $catId, "", date("Y-m-d H:i:s", $nzbInfo->postedlast), $nzbInfo->poster, "", $page->settings);
 				$db->queryExec(sprintf("update releases set totalpart = %d, size = %s, completion = %d, GID=%s where id = %d", $nzbInfo->filecount, $nzbInfo->filesize, $nzbInfo->completion, $db->escapeString($nzbInfo->gid), $relid));
 
-				$nzbfilename = $nzb->NZBPath($relguid, $page->site->nzbpath, true);
+				$nzbfilename = $nzb->getNZBPath($relguid, $page->settings->getSetting('nzbpath'), true);
 				$fp = gzopen($nzbfilename, "w");
 				if ($fp) {
 					gzwrite($fp, $nzbInfo->toNzb());
@@ -154,7 +154,7 @@ foreach ($filestoprocess as $nzbFile) {
 						$numbins++;
 
 						if (count($postFile['segments']) > 0) {
-							$sql = "INSERT INTO parts (binaryID, messageID, number, partnumber, size) values ";
+							$sql = "INSERT INTO parts (binaryid, messageid, number, partnumber, size) values ";
 							foreach ($postFile['segments'] as $fileSegmentNum => $fileSegment) {
 								$sql .= sprintf("(%d, %s, 0, %d, %d),", $binaryId, $db->escapeString($fileSegment), $fileSegmentNum, $postFile['segmentbytes'][$fileSegmentNum]);
 								$numparts++;
