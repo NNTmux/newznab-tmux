@@ -57,7 +57,6 @@ class PreDB
 	{
 	    // Only use Sphinx if this is a search request
 	    if ($dirname) {
-
     		if ($this->pdo->getSetting('sphinxenabled') && $this->pdo->getSetting('sphinxindexpredb')) {
     		    // Search using Sphinx
     		    $sphinx = new Sphinx();
@@ -206,7 +205,6 @@ class PreDB
 	 */
 	public function nzpreUpdate()
 	{
-
 		if(empty($this->pdo->getSetting('nzpregroup')) || empty($this->pdo->getSetting('nzpresubject')) || empty($this->pdo->getSetting('nzpreposter')) || empty($this->pdo->getSetting('nzprefield')) || empty($this->pdo->getSetting('nzprekey')))
 			return false;
 

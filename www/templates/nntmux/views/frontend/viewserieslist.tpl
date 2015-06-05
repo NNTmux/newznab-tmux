@@ -53,7 +53,7 @@
 					<td>{$s.country|escape:"htmlall"}</td>
 					<td>{$s.genre|escape:"htmlall"|replace:'|':', '}</td>
 					<td class="mid"><div class="btn-group">
-							{if $s.userseriesID != ''}
+							{if $s.userseriesid != ''}
 
 								<a class="btn btn-mini" href="{$smarty.const.WWW_TOP}/myshows/delete/{$s.rageid}?from={$smarty.server.REQUEST_URI|escape:"url"}" class="myshows" rel="remove" name="series{$s.rageid}" title="Remove from My Shows"><i class="icon-minus-sign"></i></a>
 								<a class="btn btn-mini" href="{$smarty.const.WWW_TOP}/myshows/edit/{$s.rageid}?from={$smarty.server.REQUEST_URI|escape:"url"}" class="myshows" rel="edit" name="series{$s.rageid}" title="Edit"><i class="icon-edit"></i></a>

@@ -127,8 +127,12 @@ class BasePage
 			$this->smarty->assign('userdata', $this->userdata);
 			$this->smarty->assign('loggedin', "true");
 
-			if (!empty($this->userdata['nzbvortex_api_key']) && (!empty($this->userdata['nzbvortex_server_url'])))
+			if ($this->userdata['nzbvortex_api_key'] != '' && $this->userdata['nzbvortex_server_url'] != '') {
 				$this->smarty->assign('weHasVortex', true);
+			}
+			else{
+				$this->smarty->assign('weHasVortex', false);
+			}
 
 			$sab = new SABnzbd($this);
 			$this->smarty->assign('sabintegrated', $sab->integratedBool);

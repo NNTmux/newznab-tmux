@@ -113,7 +113,7 @@
 										{if $result.tvairdate != ""}<span class="rndbtn"
 																		  title="{$result.tvtitle} Aired on {$result.tvairdate|date_format}">
 											Aired {if $result.tvairdate|strtotime > $smarty.now}in future{else}{$result.tvairdate|daysago}{/if}</span>{/if}
-										{if $result.reID > 0}<span class="mediainfo rndbtn" title="{$result.guid}">
+										{if $result.reid > 0}<span class="mediainfo rndbtn" title="{$result.guid}">
 												Media</span>{/if}
 									</div>
 
