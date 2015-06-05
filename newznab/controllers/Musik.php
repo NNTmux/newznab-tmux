@@ -78,6 +78,8 @@ class Musik
 		if ($this->pdo->getSetting('lookupmusic') == 2) {
 			$this->renamed = 'AND isrenamed = 1';
 		}
+
+		$this->failCache = [];
 	}
 
 	/**
@@ -676,11 +678,18 @@ class Musik
 					// Do a local lookup first
 					$musicCheck = $this->getMusicInfoByName('', $album["name"]);
 
-					if ($musicCheck === false && $local === false) {
-						$albumId = $this->updateMusicInfo($album["name"], $album['year']);
+					if ($musicCheck === false && in_array($album['name'] . $album['year'], $this->failCache)) {
+						// Lookup recently failed, no point trying again
+						if ($this->echooutput) {
+							$this->pdo->log->doEcho($this->pdo->log->headerOver('Cached previous failure. Skipping.') . PHP_EOL);
+						}
+						$albumId = -2;
+					} else if ($musicCheck === false && $local === false) {
+						$albumId = $this->updateMusicInfo($album['name'], $album['year']);
 						$usedAmazon = true;
 						if ($albumId === false) {
 							$albumId = -2;
+							$this->failCache[] = $album['name'] . $album['year'];
 						}
 					} else {
 						$albumId = $musicCheck['id'];
