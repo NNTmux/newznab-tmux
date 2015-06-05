@@ -12,6 +12,19 @@ class Contents
 	const TYPEINDEX = 3;
 
 	/**
+	 * @param array $options Class instances.
+	 */
+	public function __construct(array $options = [])
+	{
+		$defaults = [
+			'Settings' => null,
+		];
+		$options += $defaults;
+
+		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
+	}
+
+	/**
 	 * Validate a content row before insert/update.
 	 */
 	public function validate($content)
@@ -34,8 +47,7 @@ class Contents
 	 */
 	public function delete($id)
 	{
-		$db = new Settings();
-		return $db->queryExec(sprintf("DELETE from content where id=%d", $id));
+		return $this->pdo->queryExec(sprintf("DELETE from content where id=%d", $id));
 	}
 
 	/**
@@ -43,9 +55,8 @@ class Contents
 	 */
 	public function update($content)
 	{
-		$db = new Settings();
 		$content = $this->validate($content);
-		$db->queryExec(sprintf("update content set	role=%d, title = %s , 	url = %s , 	body = %s , 	metadescription = %s , 	metakeywords = %s , 	contenttype = %d , 	showinmenu = %d , 	status = %d , 	ordinal = %d	where	id = %d ", $content["role"], $db->escapeString($content["title"]), $db->escapeString($content["url"]), $db->escapeString($content["body"]), $db->escapeString($content["metadescription"]), $db->escapeString($content["metakeywords"]), $content["contenttype"], $content["showinmenu"], $content["status"], $content["ordinal"], $content["id"] ));
+		$this->pdo->queryExec(sprintf("update content set	role=%d, title = %s , 	url = %s , 	body = %s , 	metadescription = %s , 	metakeywords = %s , 	contenttype = %d , 	showinmenu = %d , 	status = %d , 	ordinal = %d	where	id = %d ", $content["role"], $this->pdo->escapeString($content["title"]), $this->pdo->escapeString($content["url"]), $this->pdo->escapeString($content["body"]), $this->pdo->escapeString($content["metadescription"]), $this->pdo->escapeString($content["metakeywords"]), $content["contenttype"], $content["showinmenu"], $content["status"], $content["ordinal"], $content["id"] ));
 	}
 
 	/**
@@ -53,11 +64,10 @@ class Contents
 	 */
 	public function add($content)
 	{
-		$db = new Settings();
 
 		$content = $this->validate($content);
 
-		return $db->queryInsert(sprintf("insert into content (role, title, url, body, metadescription, metakeywords, 	contenttype, 	showinmenu, 	status, 	ordinal	)	values	(%d, %s, 	%s, 	%s, 	%s, 	%s, 	%d, 	%d, 	%d, 	%d 	)", $content["role"], $db->escapeString($content["title"]),  $db->escapeString($content["url"]),  $db->escapeString($content["body"]),  $db->escapeString($content["metadescription"]),  $db->escapeString($content["metakeywords"]), $content["contenttype"], $content["showinmenu"], $content["status"], $content["ordinal"] ));
+		return $this->pdo->queryInsert(sprintf("insert into content (role, title, url, body, metadescription, metakeywords, 	contenttype, 	showinmenu, 	status, 	ordinal	)	values	(%d, %s, 	%s, 	%s, 	%s, 	%s, 	%d, 	%d, 	%d, 	%d 	)", $content["role"], $this->pdo->escapeString($content["title"]),  $this->pdo->escapeString($content["url"]),  $this->pdo->escapeString($content["body"]),  $this->pdo->escapeString($content["metadescription"]),  $this->pdo->escapeString($content["metakeywords"]), $content["contenttype"], $content["showinmenu"], $content["status"], $content["ordinal"] ));
 	}
 
 	/**
@@ -65,8 +75,7 @@ class Contents
 	 */
 	public function get()
 	{
-		$db = new Settings();
-		return $db->query(sprintf("select * from content where status = 1 order by contenttype, coalesce(ordinal, 1000000)"));
+		return $this->pdo->query(sprintf("select * from content where status = 1 order by contenttype, coalesce(ordinal, 1000000)"));
 	}
 
 	/**
@@ -74,8 +83,7 @@ class Contents
 	 */
 	public function getAll()
 	{
-		$db = new Settings();
-		return $db->query(sprintf("select * from content order by contenttype, coalesce(ordinal, 1000000)"));
+		return $this->pdo->query(sprintf("select * from content order by contenttype, coalesce(ordinal, 1000000)"));
 	}
 
 	/**
@@ -83,13 +91,12 @@ class Contents
 	 */
 	public function getByID($id, $role)
 	{
-		$db = new Settings();
 		if ($role == Users::ROLE_ADMIN)
 			$role = "";
 		else
 			$role = sprintf("and (role=%d or role=0)", $role);
 
-		return $db->queryOneRow(sprintf("select * from content where id = %d %s", $id, $role));
+		return $this->pdo->queryOneRow(sprintf("select * from content where id = %d %s", $id, $role));
 	}
 
 	/**
@@ -97,20 +104,54 @@ class Contents
 	 */
 	public function getIndex()
 	{
-		$db = new Settings();
-		return $db->queryOneRow(sprintf("select * from content where status=1 and contenttype = %d ", Contents::TYPEINDEX), true);
+		return $this->pdo->queryOneRow(sprintf("select * from content where status=1 and contenttype = %d ", Contents::TYPEINDEX), true);
 	}
 
-	/**
-	 * Get all content rows for a role and menu type, ie useful links.
-	 */
 	public function getForMenuByTypeAndRole($id, $role)
 	{
-		$db = new Settings();
-		if ($role == Users::ROLE_ADMIN)
+
+		$arr = [];
+		$rows = $this->data_getForMenuByTypeAndRole($id, $role);
+		if ($rows === false) {
+			return false;
+		}
+
+		foreach ($rows as $row) {
+			$arr[] = $this->row2Object($row);
+		}
+
+		return $arr;
+	}
+
+	public function data_getForMenuByTypeAndRole($id, $role)
+	{
+		if ($role == Users::ROLE_ADMIN) {
 			$role = "";
-		else
-			$role = sprintf("and (role=%d or role=0)", $role);
-		return $db->query(sprintf("select * from content where showinmenu=1 and status=1 and contenttype = %d %s ", $id, $role));
+		} else {
+			$role = sprintf("AND (role = %d OR role = 0)", $role);
+		}
+		return $this->pdo->query(sprintf("SELECT * FROM content WHERE showinmenu = 1 AND status = 1 AND contenttype = %d %s ", $id, $role));
+	}
+
+	public function row2Object($row, $prefix = "")
+	{
+		$obj = new Content();
+		if (isset($row[$prefix . "id"])) {
+			$obj->id = $row[$prefix . "id"];
+		}
+		$obj->title = $row[$prefix . "title"];
+		$obj->url = $row[$prefix . "url"];
+		$obj->body = $row[$prefix . "body"];
+		$obj->metadescription = $row[$prefix . "metadescription"];
+		$obj->metakeywords = $row[$prefix . "metakeywords"];
+		$obj->contenttype = $row[$prefix . "contenttype"];
+		$obj->showinmenu = $row[$prefix . "showinmenu"];
+		$obj->status = $row[$prefix . "status"];
+		$obj->ordinal = $row[$prefix . "ordinal"];
+		if (isset($row[$prefix . "createddate"])) {
+			$obj->createddate = $row[$prefix . "createddate"];
+		}
+		$obj->role = $row[$prefix . "role"];
+		return $obj;
 	}
 }
