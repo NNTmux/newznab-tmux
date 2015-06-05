@@ -2,7 +2,7 @@
 
 {$site->adbrowse}
 
-{if $shows}
+{if isset($shows)}
 	<center>
 		<div class="btn-group">
 			<a class="btn btn-small" href="{$smarty.const.WWW_TOP}/series" title="View available TV series">Series List</a> |
@@ -89,14 +89,6 @@
 					<td class="item">
 						<label for="chk{$result.guid|substr:0:7}"><a class="title" title="View details"
 																	 href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"seourl"}">{$result.searchname|escape:"htmlall"|replace:".":" "}</a></label>
-
-						{if $userdata.canpre == 1 && $result.nuketype != ''}
-							&nbsp;
-							<img title="{$result.nuketype}"
-								 src="{$smarty.const.WWW_TOP}/templates/nntmux/images/icons/nuke.png" width="10"
-								 height="10" alt="{$result.nuketype}"/>
-						{/if}
-
 						<div class="resextra">
 							<div class="btns" style="float:right">
 								{release_flag($result.searchname, browse)}
@@ -124,9 +116,6 @@
 										PreDB</span>{/if}
 									{if $result.prehashid > 0}<span class="prehashinfo rndbtn"
 																	title="{$result.prehashid}">Prehash</span>{/if}
-									{if $result.movieinfoid > 0}<a
-										href="{$smarty.const.WWW_TOP}/movies?imdb={$result.imdbid}"
-										title="View movie info" class="rndbtn" rel="movie" >Movie</a>{/if}
 									{if $result.haspreview == 1 && $userdata.canpreview == 1}<a
 										href="{$smarty.const.WWW_TOP}/covers/preview/{$result.guid}_thumb.jpg"
 										name="name{$result.guid}" title="View Screenshot" class="modal_prev rndbtn"
@@ -164,7 +153,7 @@
 															   title="View all episodes">View Anime</a>{/if}
 									{if $result.tvairdate != ""}<span class="seriesinfo rndbtn" title="{$result.guid}">
 										Aired {if $result.tvairdate|strtotime > $smarty.now}in future{else}{$result.tvairdate|daysago}{/if}</span>{/if}
-									{if $result.reID > 0}<span class="mediainfo rndbtn" title="{$result.guid}">
+									{if $result.reid > 0}<span class="mediainfo rndbtn" title="{$result.guid}">
 											Media</span>{/if}
 								{if $result.group_name != ""}
 									<a class="rndbtn" href="{$smarty.const.WWW_TOP}/browse?g={$result.group_name|escape:"htmlall"}" title="Browse {$result.group_name}">{$result.group_name|escape:"htmlall"|replace:"alt.binaries.":"a.b."}</a>

@@ -102,8 +102,6 @@
 
 			{$useful_menu}
 
-			{$recentposts_menu}
-
 			{if $site->google_adsense_acc != '' && $site->google_adsense_search != ''}
 			{literal}
 				<li>

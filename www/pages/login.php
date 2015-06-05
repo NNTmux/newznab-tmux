@@ -1,5 +1,7 @@
 <?php
 
+$page->smarty->assign(['error' => '', 'username' => '', 'rememberme' => '']);
+
 if ($page->isPostBack())
 {
 	if (!isset($_POST["username"]) || !isset($_POST["password"])){

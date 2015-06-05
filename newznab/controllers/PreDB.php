@@ -57,9 +57,7 @@ class PreDB
 	{
 	    // Only use Sphinx if this is a search request
 	    if ($dirname) {
-	        $s = new Sites();
-    		$site = $s->get();
-    		if ($site->sphinxenabled && $site->sphinxindexpredb) {
+    		if ($this->pdo->getSetting('sphinxenabled') && $this->pdo->getSetting('sphinxindexpredb')) {
     		    // Search using Sphinx
     		    $sphinx = new Sphinx();
     		    $count = $sphinx->getPreCount($dirname, $category);
@@ -84,9 +82,7 @@ class PreDB
 	{
 	    // Only use Sphinx if this is a search request
 	    if ($dirname) {
-	        $s = new Sites();
-    		$site = $s->get();
-			if ($site->sphinxenabled && $site->sphinxindexpredb) {
+			if ($this->pdo->getSetting('sphinxenabled') && $this->pdo->getSetting('sphinxindexpredb')) {
     		    // Search using Sphinx
     		    $sphinx = new Sphinx();
     		    $results = $sphinx->getPreRange($start, $num, $dirname, $category);
@@ -209,11 +205,7 @@ class PreDB
 	 */
 	public function nzpreUpdate()
 	{
-
-		$s = new Sites();
-		$site = $s->get();
-
-		if(empty($site->nzpregroup) || empty($site->nzpresubject) || empty($site->nzpreposter) || empty($site->nzprefield) || empty($site->nzprekey))
+		if(empty($this->pdo->getSetting('nzpregroup')) || empty($this->pdo->getSetting('nzpresubject')) || empty($this->pdo->getSetting('nzpreposter')) || empty($this->pdo->getSetting('nzprefield')) || empty($this->pdo->getSetting('nzprekey')))
 			return false;
 
 		if($this->echooutput)
@@ -226,37 +218,37 @@ class PreDB
 			return false;
 		}
 
-		$ret = $groupData = $nntp->selectGroup($site->nzpregroup);
+		$ret = $groupData = $nntp->selectGroup($this->pdo->getSetting('nzpregroup'));
 		if($nntp->isError($ret)) {
 			echo "Predb   : Error ".$ret->getMessage()."\n";
 			return false;
 		}
 
-		$ret = $groupMsgs = $nntp->getOverview(($groupData['last']-(!empty($site->nzprearticles) ? $site->nzprearticles : 500)).'-'.$groupData['last']);
+		$ret = $groupMsgs = $nntp->getOverview(($groupData['last']-(!empty($this->pdo->getSetting('nzprearticles')) ? $this->pdo->getSetting('nzprearticles') : 500)).'-'.$groupData['last']);
 		if($nntp->isError($ret)) {
 			echo "Predb   : Error ".$ret->getMessage()."\n";
 			return false;
 		}
 
 		$added_updated = 0;
-		$nzprekey = $site->nzprekey;
+		$nzprekey = $this->pdo->getSetting('nzprekey');
 		while(strlen($nzprekey) < 1024)
 			$nzprekey = $nzprekey.$nzprekey;
 
-		$cnt = !empty($site->nzprearticles) ? $site->nzprearticles : 500;
+		$cnt = !empty($this->pdo->getSetting('nzprearticles')) ? $this->pdo->getSetting('nzprearticles') : 500;
 		foreach($groupMsgs as $groupMsg) {
 			if ($cnt%50==0 && $cnt != 0 && $this->echooutput)
 				echo $cnt."..";
 			$cnt--;
 
-			if(preg_match('/^'.$site->nzpresubject.'$/', $groupMsg['Subject']) && preg_match('/^'.$site->nzpreposter.'$/', $groupMsg['From'])) {
+			if(preg_match('/^'.$this->pdo->getSetting('nzpresubject').'$/', $groupMsg['Subject']) && preg_match('/^'.$this->pdo->getSetting('nzpreposter').'$/', $groupMsg['From'])) {
 				$ret = $msgHeader = $nntp->getHeader($groupMsg['Message-ID']);
 				if($nntp->isError($ret))
 					continue;
 
 				for($i=0; $i < count($msgHeader); $i++) {
-					if(preg_match('/^'.$site->nzprefield.': /', $msgHeader[$i])) {
-						if($nzpreParse = $this->nzpreParse(str_replace($site->nzprefield.': ', '', $msgHeader[$i]), $nzprekey))
+					if(preg_match('/^'.$this->pdo->getSetting('nzprefield').': /', $msgHeader[$i])) {
+						if($nzpreParse = $this->nzpreParse(str_replace($this->pdo->getSetting('nzprefield').': ', '', $msgHeader[$i]), $nzprekey))
 						{
 							if ($this->updatePreDB($this->pdo, $nzpreParse))
 							{

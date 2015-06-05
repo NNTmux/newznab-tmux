@@ -35,14 +35,14 @@ switch($action) {
 		else
 		{
 			$db = new Settings();
-			$show = $db->queryOneRow(sprintf("select releasetitle from tvrage where rageID = %d", $rid));
+			$show = $db->queryOneRow(sprintf("select releasetitle from tvrage where rageid = %d", $rid));
 			if (!$show)
 				$page->show404('Seriously?');
 		}
 
 		if ($action == 'doadd')
 		{
-			$category = (isset($_REQUEST['category']) && is_array($_REQUEST['category']) && !empty($_REQUEST['category'])) ? $_REQUEST['category'] : array();
+			$category = (isset($_REQUEST['category']) && is_array($_REQUEST['category']) && !empty($_REQUEST['category'])) ? $_REQUEST['category'] :[];
 			$us->addShow($users->currentUserId(), $rid, $category);
 			if (isset($_REQUEST['from']))
 				header("Location:".$_REQUEST['from']);
@@ -53,14 +53,14 @@ switch($action) {
 		{
 			$cat = new Category;
 			$tmpcats = $cat->getChildren(Category::CAT_PARENT_TV, true, $page->userdata["categoryexclusions"]);
-			$categories = array();
+			$categories =[];
 			foreach($tmpcats as $c)
-				$categories[$c['ID']] = $c['title'];
+				$categories[$c['id']] = $c['title'];
 
 			$page->smarty->assign('type', 'add');
 			$page->smarty->assign('cat_ids', array_keys($categories));
 			$page->smarty->assign('cat_names', $categories);
-			$page->smarty->assign('cat_selected', array());
+			$page->smarty->assign('cat_selected',[]);
 			$page->smarty->assign('rid', $rid);
 			$page->smarty->assign('show', $show);
 			if (isset($_REQUEST['from']))
@@ -78,7 +78,7 @@ switch($action) {
 
 		if ($action == 'doedit')
 		{
-			$category = (isset($_REQUEST['category']) && is_array($_REQUEST['category']) && !empty($_REQUEST['category'])) ? $_REQUEST['category'] : array();
+			$category = (isset($_REQUEST['category']) && is_array($_REQUEST['category']) && !empty($_REQUEST['category'])) ? $_REQUEST['category'] :[];
 			$us->updateShow($users->currentUserId(), $rid, $category);
 			if (isset($_REQUEST['from']))
 				header("Location:".WWW_TOP.$_REQUEST['from']);
@@ -90,14 +90,14 @@ switch($action) {
 			$cat = new Category;
 
 			$tmpcats = $cat->getChildren(Category::CAT_PARENT_TV, true, $page->userdata["categoryexclusions"]);
-			$categories = array();
+			$categories =[];
 			foreach($tmpcats as $c)
-				$categories[$c['ID']] = $c['title'];
+				$categories[$c['id']] = $c['title'];
 
 			$page->smarty->assign('type', 'edit');
 			$page->smarty->assign('cat_ids', array_keys($categories));
 			$page->smarty->assign('cat_names', $categories);
-			$page->smarty->assign('cat_selected', explode('|', $show['categoryID']));
+			$page->smarty->assign('cat_selected', explode('|', $show['categoryid']));
 			$page->smarty->assign('rid', $rid);
 			$page->smarty->assign('show', $show);
 			if (isset($_REQUEST['from']))
@@ -122,7 +122,7 @@ switch($action) {
 		$ordering = $releases->getBrowseOrdering();
 		$orderby = isset($_REQUEST["ob"]) && in_array($_REQUEST['ob'], $ordering) ? $_REQUEST["ob"] : '';
 
-		$results = array();
+		$results =[];
 		$results = $releases->getShowsRange($shows, $offset, ITEMS_PER_PAGE, $orderby, -1, $page->userdata["categoryexclusions"]);
 
 		$page->smarty->assign('pagertotalitems',$browsecount);
@@ -134,8 +134,9 @@ switch($action) {
 		$pager = $page->smarty->fetch("pager.tpl");
 		$page->smarty->assign('pager', $pager);
 
-		foreach($ordering as $ordertype)
-			$page->smarty->assign('orderby'.$ordertype, WWW_TOP."/myshows/browse?ob=".$ordertype."&amp;offset=0");
+		foreach($ordering as $ordertype) {
+			$page->smarty->assign('orderby' . $ordertype, WWW_TOP . "/myshows/browse?ob=" . $ordertype . "&amp;offset=0");
+		}
 
 		$page->smarty->assign('lastvisit',$page->userdata['lastlogin']);
 
@@ -155,18 +156,18 @@ switch($action) {
 
 		$cat = new Category;
 		$tmpcats = $cat->getChildren(Category::CAT_PARENT_TV, true, $page->userdata["categoryexclusions"]);
-		$categories = array();
+		$categories =[];
 		foreach($tmpcats as $c)
-			$categories[$c['ID']] = $c['title'];
+			$categories[$c['id']] = $c['title'];
 
 		$shows = $us->getShows($users->currentUserId());
-		$results = array();
+		$results =[];
 		foreach ($shows as $showk=>$show)
 		{
-			$showcats = explode('|', $show['categoryID']);
+			$showcats = explode('|', $show['categoryid']);
 			if (is_array($showcats) && sizeof($showcats) > 0)
 			{
-				$catarr = array();
+				$catarr =[];
 				foreach ($showcats as $scat)
 				{
 					if (!empty($scat))
