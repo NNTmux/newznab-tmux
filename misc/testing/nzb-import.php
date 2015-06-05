@@ -1,12 +1,12 @@
 <?php
-require_once(dirname(__FILE__) . "/../../bin/config.php");
+require_once dirname(__FILE__) . '/../../www/config.php';
 
 $n = PHP_EOL;
 
 // Print usage.
 if (count($argv) !== 6) {
 	exit(
-		'This will import NZB files(.nzb or .nzb.gz), into your newznab site from a folder recursively(it will go down into sub-folders).'. $n .
+		'This will import NZB files(.nzb or .nzb.gz), into your newznab site from a folder recursively(it will go down into sub-folders).' . $n .
 		'Please use arg5, something sensible like 100k, if you have millions of NZB files the initial scan will be VERY slow otherwise.' . $n . $n .
 		'Usage: ' . $n .
 		$_SERVER['_'] . ' ' . __FILE__ . ' arg1 arg2 arg3 arg4 arg5' . $n . $n .
@@ -23,13 +23,13 @@ if (count($argv) !== 6) {
 if (!is_dir($argv[1])) {
 	exit('Error: arg1 must be a path (you might not have read access to this path)' . $n);
 }
-if (!in_array($argv[2], ['true', 'false'])) {
+if (!in_array($argv[2], array('true', 'false'))) {
 	exit('Error: arg2 must be true or false' . $n);
 }
-if (!in_array($argv[3], ['true', 'false'])) {
+if (!in_array($argv[3], array('true', 'false'))) {
 	exit('Error: arg3 must be true or false' . $n);
 }
-if (!in_array($argv[4], ['true', 'false'])) {
+if (!in_array($argv[4], array('true', 'false'))) {
 	exit('Error: arg4 must be true or false' . $n);
 }
 if (!is_numeric($argv[5])) {
@@ -54,7 +54,7 @@ $files = new \RegexIterator(
 );
 
 $i = 1;
-$nzbFiles = [];
+$nzbFiles = array();
 foreach ($files as $file) {
 	$nzbFiles[] = $file[0];
 	if ($i++ >= $argv[5]) {
@@ -72,7 +72,7 @@ if ($i > 1) {
 	$useNzbName = ($argv[4] == 'true') ? true : false;
 
 	// Create a new instance of NZBImport and send it the file locations.
-	$NZBImport = new \NZBImport();
+	$NZBImport = new NZBImport();
 
 	$NZBImport->beginImport($nzbFiles, $useNzbName, $deleteNZB, $deleteFailedNZB);
 } else {
