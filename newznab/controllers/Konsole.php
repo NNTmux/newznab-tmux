@@ -59,7 +59,7 @@ class Konsole
 	/**
 	 * @param array $options Class instances / Echo to cli.
 	 */
-	public function __construct(array $options = array())
+	public function __construct(array $options =[])
 	{
 		$defaults = [
 			'Echo'     => false,
@@ -83,6 +83,8 @@ class Konsole
 			$this->renamed = 'AND isrenamed = 1';
 		}
 		//$this->cleanconsole = ($this->pdo->getSetting('lookupgames') == 2) ? 'AND isrenamed = 1' : '';
+
+		$this->failCache =[];
 	}
 
 	public function getConsoleInfo($id)
@@ -138,7 +140,7 @@ class Konsole
 		return ($res === false ? 0 : $res['num']);
 	}
 
-	public function getConsoleCount($cat, $maxage = -1, $excludedcats = array())
+	public function getConsoleCount($cat, $maxage = -1, $excludedcats =[])
 	{
 		$catsrch = '';
 		if (count($cat) > 0 && $cat[0] != -1) {
@@ -162,7 +164,7 @@ class Konsole
 		return ($res === false ? 0 : $res["num"]);
 	}
 
-	public function getConsoleRange($cat, $start, $num, $orderby, $excludedcats = array())
+	public function getConsoleRange($cat, $start, $num, $orderby, $excludedcats =[])
 	{
 
 		$browseby = $this->getBrowseBy();
@@ -274,7 +276,7 @@ class Konsole
 	public function makeFieldLinks($data, $field)
 	{
 		$tmpArr = explode(', ', $data[$field]);
-		$newArr = array();
+		$newArr =[];
 		$i = 0;
 		foreach ($tmpArr as $ta) {
 			if (trim($ta) == '') {
@@ -367,7 +369,7 @@ class Konsole
 		return $consoleId;
 	}
 
-	protected function _matchConToGameInfo($gameInfo = array(), $con = array())
+	protected function _matchConToGameInfo($gameInfo =[], $con =[])
 	{
 		$matched = false;
 
@@ -416,7 +418,7 @@ class Konsole
 
 	protected function _setConBeforeMatch($amaz, $gameInfo)
 	{
-		$con = array();
+		$con =[];
 		$con['platform'] = (string)$amaz->Items->Item->ItemAttributes->Platform;
 		if (empty($con['platform'])) {
 			$con['platform'] = $gameInfo['platform'];
@@ -439,7 +441,7 @@ class Konsole
 
 	protected function _setConAfterMatch($amaz)
 	{
-		$con = array();
+		$con =[];
 		$con['asin'] = (string)$amaz->Items->Item->ASIN;
 
 		$con['url'] = (string)$amaz->Items->Item->DetailPageURL;
@@ -540,7 +542,7 @@ class Konsole
 		$gen = new \Genres(['Settings' => $this->pdo]);
 
 		$defaultGenres = $gen->getGenres(\Genres::CONSOLE_TYPE);
-		$genreassoc = array();
+		$genreassoc =[];
 		foreach ($defaultGenres as $dg) {
 			$genreassoc[$dg['id']] = strtolower($dg['title']);
 		}
@@ -614,7 +616,7 @@ class Konsole
 		return $platform;
 	}
 
-	protected function _updateConsoleTable($con = array())
+	protected function _updateConsoleTable($con =[])
 	{
 		$ri = new \ReleaseImage($this->pdo);
 
@@ -748,9 +750,19 @@ class Konsole
 					// Check for existing console entry.
 					$gameCheck = $this->getConsoleInfoByName($gameInfo['title'], $gameInfo['platform']);
 
-					if ($gameCheck === false) {
+					if ($gameCheck === false && in_array($gameInfo['title'] . $gameInfo['platform'], $this->failCache)) {
+						// Lookup recently failed, no point trying again
+						if ($this->echooutput) {
+							$this->pdo->log->doEcho($this->pdo->log->headerOver('Cached previous failure. Skipping.') . PHP_EOL);
+						}
+						$gameId = -2;
+					} else if ($gameCheck === false) {
 						$gameId = $this->updateConsoleInfo($gameInfo);
 						$usedAmazon = true;
+						if ($gameId === false) {
+							$gameId = -2;
+							$this->failCache[] = $gameInfo['title'] . $gameInfo['platform'];
+						}
 					} else {
 						if ($this->echooutput) {
 							$this->pdo->log->doEcho(
@@ -792,7 +804,7 @@ class Konsole
 	function parseTitle($releasename)
 	{
 		$releasename = preg_replace('/\sMulti\d?\s/i', '', $releasename);
-		$result = array();
+		$result =[];
 
 		// Get name of the game from name of release.
 		if (preg_match('/^(.+((abgx360EFNet|EFNet\sFULL|FULL\sabgxEFNet|abgx\sFULL|abgxbox360EFNet)\s|illuminatenboard\sorg|Place2(hom|us)e.net|united-forums? co uk|\(\d+\)))?(?P<title>.*?)[\.\-_ ](v\.?\d\.\d|PAL|NTSC|EUR|USA|JP|ASIA|JAP|JPN|AUS|MULTI(\.?\d{1,2})?|PATCHED|FULLDVD|DVD5|DVD9|DVDRIP|PROPER|REPACK|RETAIL|DEMO|DISTRIBUTION|REGIONFREE|[\. ]RF[\. ]?|READ\.?NFO|NFOFIX|PSX(2PSP)?|PS[2-4]|PSP|PSVITA|WIIU|WII|X\-?BOX|XBLA|X360|3DS|NDS|N64|NGC)/i', $releasename, $matches)) {

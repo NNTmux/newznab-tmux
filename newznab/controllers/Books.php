@@ -63,7 +63,7 @@ class Books
 	/**
 	 * @param array $options Class instances / Echo to cli.
 	 */
-	public function __construct(array $options = array())
+	public function __construct(array $options =[])
 	{
 		$defaults = [
 			'Echo'     => false,
@@ -87,6 +87,8 @@ class Books
 		if ($this->pdo->getSetting('lookupbooks') == 2) {
 			$this->renamed = 'AND isrenamed = 1';
 		}
+
+		$this->failCache = [];
 	}
 
 	public function getBookInfo($id)
@@ -145,7 +147,7 @@ class Books
 		return $res['num'];
 	}
 
-	public function getBookCount($cat, $maxage = -1, $excludedcats = array())
+	public function getBookCount($cat, $maxage = -1, $excludedcats =[])
 	{
 
 		$browseby = $this->getBrowseBy();
@@ -178,7 +180,7 @@ class Books
 		return $res['num'];
 	}
 
-	public function getBookRange($cat, $start, $num, $orderby, $excludedcats = array())
+	public function getBookRange($cat, $start, $num, $orderby, $excludedcats =[])
 	{
 
 		$browseby = $this->getBrowseBy();
@@ -347,7 +349,7 @@ class Books
 	 */
 	public function processBookReleases()
 	{
-		$bookids = array();
+		$bookids =[];
 		if (preg_match('/^\d+$/', $this->bookreqids)) {
 			$bookids[] = $this->bookreqids;
 		} else {
@@ -407,11 +409,18 @@ class Books
 					// Do a local lookup first
 					$bookCheck = $this->getBookInfoByName('', $bookInfo);
 
-					if ($bookCheck === false) {
+					if ($bookCheck === false && in_array($bookInfo, $this->failCache)) {
+						// Lookup recently failed, no point trying again
+						if ($this->echooutput) {
+							$this->pdo->log->doEcho($this->pdo->log->headerOver('Cached previous failure. Skipping.') . PHP_EOL);
+						}
+						$bookId = -2;
+					} else if ($bookCheck === false) {
 						$bookId = $this->updateBookInfo($bookInfo);
 						$usedAmazon = true;
 						if ($bookId === false) {
 							$bookId = -2;
+							$this->failCache[] = $bookInfo;
 						}
 					} else {
 						$bookId = $bookCheck['id'];
@@ -487,7 +496,7 @@ class Books
 	{
 		$ri = new \ReleaseImage($this->pdo);
 
-		$book = array();
+		$book =[];
 
 		$amaz = false;
 		if ($bookInfo != '') {
