@@ -35,7 +35,7 @@ class Smarty_Internal_Compile_Private_Special_Variable extends Smarty_Internal_C
                 case 'foreach':
                     $name = trim($_index[1], "'");
                     $foreachVar = "'__foreach_{$name}'";
-                    return "isset(\$_smarty_tpl->tpl_vars[$foreachVar]->value[{$_index[2]}]) ? \$_smarty_tpl->tpl_vars[$foreachVar]->value[{$_index[2]}] : null";
+                    return "(isset(\$_smarty_tpl->tpl_vars[$foreachVar]->value[{$_index[2]}]) ? \$_smarty_tpl->tpl_vars[$foreachVar]->value[{$_index[2]}] : null)";
                 case 'section':
                     return "\$_smarty_tpl->getVariable('smarty')->value$parameter";
                 case 'capture':
@@ -82,7 +82,7 @@ class Smarty_Internal_Compile_Private_Special_Variable extends Smarty_Internal_C
                         $compiler->trigger_template_error("(secure mode) constants not permitted");
                         break;
                     }
-                    if (strpos($_index[1], '$') === false) {
+                    if (strpos($_index[1], '$') === false && strpos($_index[1], '\'') === false ) {
                         return "@constant('{$_index[1]}')";
                     } else {
                         return "@constant({$_index[1]})";

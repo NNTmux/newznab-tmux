@@ -53,12 +53,12 @@ abstract class Smarty_Resource
      * @var array
      */
     protected static $sysplugins = array(
-        'file'    => true,
-        'string'  => true,
-        'extends' => true,
-        'stream'  => true,
-        'eval'    => true,
-        'php'     => true
+        'file'    => 'smarty_internal_resource_file.php',
+        'string'  => 'smarty_internal_resource_string.php',
+        'extends' => 'smarty_internal_resource_extends.php',
+        'stream'  => 'smarty_internal_resource_stream.php',
+        'eval'    => 'smarty_internal_resource_eval.php',
+        'php'     => 'smarty_internal_resource_php.php'
     );
 
     /**
@@ -171,6 +171,9 @@ abstract class Smarty_Resource
         // try sysplugins dir
         if (isset(self::$sysplugins[$type])) {
             $_resource_class = 'Smarty_Internal_Resource_' . ucfirst($type);
+            if (!class_exists($_resource_class, false)) {
+                require SMARTY_SYSPLUGINS_DIR . self::$sysplugins[$type];
+            }
             return $smarty->_resource_handlers[$type] = new $_resource_class();
         }
 
@@ -218,15 +221,15 @@ abstract class Smarty_Resource
      */
     public static function parseResourceName($resource_name, $default_resource)
     {
-        $parts = explode(':', $resource_name, 2);
-        if (!isset($parts[1]) || !isset($parts[0][1])) {
+         if (preg_match('/^([A-Za-z0-9_\-]{2,})[:]/', $resource_name, $match)) {
+            $type = $match[1];
+            $name = substr($resource_name, strlen($match[0]));
+        } else {
             // no resource given, use default
             // or single character before the colon is not a resource type, but part of the filepath
             $type = $default_resource;
             $name = $resource_name;
-        } else {
-            $type = $parts[0];
-            $name = $parts[1];
+
         }
         return array($name, $type);
     }
