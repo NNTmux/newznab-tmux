@@ -1,5 +1,7 @@
 <?php
 
+require_once NN_LIBS . 'ZipFile.php';
+
 use newznab\db\Settings;
 use newznab\utility\Utility;
 
@@ -15,7 +17,7 @@ class Releases
 	const PASSWD_RAR       = 10; // Definitely passworded.
 
 	/**
-	 * @var newznab\db\Settings
+	 * @var \newznab\db\Settings
 	 */
 	public $pdo;
 
@@ -49,19 +51,17 @@ class Releases
 			'Groups'   => null
 		];
 		$options += $defaults;
-		$s = new Sites();
-		$this->site = $s->get();
 
 		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
-		$this->groups = ($options['Groups'] instanceof \Groups ? $options['Groups'] : new \Groups(['Settings' => $this->pdo]));
+		$this->groups = ($options['Groups'] instanceof Groups ? $options['Groups'] : new Groups(['Settings' => $this->pdo]));
 		$this->updategrabs = ($this->pdo->getSetting('grabstatus') == '0' ? false : true);
 		$this->passwordStatus = ($this->pdo->getSetting('checkpasswordedrar') == 1 ? -1 : 0);
-		$this->sphinxSearch = new \SphinxSearch();
-		$this->releaseSearch = new \ReleaseSearch($this->pdo, $this->sphinxSearch);
+		$this->sphinxSearch = new SphinxSearch();
+		$this->releaseSearch = new ReleaseSearch($this->pdo, $this->sphinxSearch);
 	}
 
 	/**
-	 * Insert a single release returning the id on success or false on failure.
+	 * Insert a single release returning the ID on success or false on failure.
 	 *
 	 * @param array $parameters Insert parameters, must be escaped if string.
 	 *
@@ -235,7 +235,7 @@ class Releases
 	/**
 	 * Return site setting for hiding/showing passworded releases.
 	 *
-	 * @return int
+	 * @return string
 	 */
 	public function showPasswords()
 	{
@@ -243,18 +243,16 @@ class Releases
 			return $this->passwordSettingBuffer;
 		}
 		$setting = $this->pdo->queryOneRow(
-			"SELECT value
-			FROM settings
-			WHERE setting = 'showpasswordedrelease'"
+			"SELECT value FROM settings	WHERE setting = 'showpasswordedrelease'"
 		);
-		$passwordStatus = ('= ' . \Releases::PASSWD_NONE);
+		$passwordStatus = ('= ' . Releases::PASSWD_NONE);
 		if ($setting !== false) {
 			switch ($setting['value']) {
 				case 1:
-					$passwordStatus = ('<= ' . \Releases::PASSWD_POTENTIAL);
+					$passwordStatus = ('<= ' . Releases::PASSWD_POTENTIAL);
 					break;
 				case 10:
-					$passwordStatus = ('<= ' . \Releases::PASSWD_RAR);
+					$passwordStatus = ('<= ' . Releases::PASSWD_RAR);
 					break;
 			}
 		}
@@ -299,7 +297,7 @@ class Releases
 	/**
 	 * Return ordering types usable on site.
 	 *
-	 * @return array
+	 * @return string[]
 	 */
 	public function getBrowseOrdering()
 	{
@@ -324,7 +322,7 @@ class Releases
 	 *
 	 * @param string $postFrom (optional) Date in this format : 01/01/2014
 	 * @param string $postTo   (optional) Date in this format : 01/01/2014
-	 * @param string $groupID  (optional) Group id.
+	 * @param string $groupID  (optional) Group ID.
 	 *
 	 * @return array
 	 */
@@ -437,7 +435,7 @@ class Releases
 	 *
 	 * @return array
 	 */
-	public function getRss($cat, $offset, $userID = 0, $rageID, $aniDbID, $airDate = -1)
+	public function getRss($cat, $offset, $rageID, $aniDbID, $userID = 0, $airDate = -1)
 	{
 		$catSearch = $cartSearch = '';
 
@@ -448,7 +446,7 @@ class Releases
 				$cartSearch = sprintf(' INNER JOIN usercart ON usercart.userid = %d AND usercart.releaseid = r.id ', $userID);
 			} else if ($cat[0] != -1) {
 				$catSearch = ' AND (';
-				$Category = new \Category(['Settings' => $this->pdo]);
+				$Category = new Category(['Settings' => $this->pdo]);
 				foreach ($cat as $category) {
 					if ($category != -1) {
 						if ($Category->isParent($category)) {
@@ -489,9 +487,9 @@ class Releases
 				INNER JOIN groups g ON g.id = r.groupid
 				LEFT OUTER JOIN movieinfo m ON m.imdbid = r.imdbid AND m.title != ''
 				LEFT OUTER JOIN musicinfo mu ON mu.id = r.musicinfoid
-				LEFT OUTER JOIN genres mug ON mug.id = mu.genreID
+				LEFT OUTER JOIN genres mug ON mug.id = mu.genreid
 				LEFT OUTER JOIN consoleinfo co ON co.id = r.consoleinfoid
-				LEFT OUTER JOIN genres cog ON cog.id = co.genreID %s
+				LEFT OUTER JOIN genres cog ON cog.id = co.genreid %s
 				WHERE r.passwordstatus %s
 				AND r.nzbstatus = %d
 				%s %s %s %s
@@ -667,10 +665,10 @@ class Releases
 	}
 
 	/**
-	 * Delete multiple releases, or a single by id.
+	 * Delete multiple releases, or a single by ID.
 	 *
-	 * @param array|int|string $list   Array of GUID or id of releases to delete.
-	 * @param bool             $isGUID Are the identifiers GUID or id?
+	 * @param array|int|string $list   Array of GUID or ID of releases to delete.
+	 * @param bool             $isGUID Are the identifiers GUID or ID?
 	 */
 	public function deleteMultiple($list, $isGUID = false)
 	{
@@ -678,8 +676,8 @@ class Releases
 			$list = [$list];
 		}
 
-		$nzb = new \NZB($this->pdo);
-		$releaseImage = new \ReleaseImage($this->pdo);
+		$nzb = new NZB($this->pdo);
+		$releaseImage = new ReleaseImage($this->pdo);
 
 		foreach ($list as $identifier) {
 			if ($isGUID) {
@@ -697,7 +695,7 @@ class Releases
 	/**
 	 * Deletes a single release by GUID, and all the corresponding files.
 	 *
-	 * @param array        $identifiers ['g' => Release GUID(mandatory), 'id => releaseid(optional, pass false)]
+	 * @param array        $identifiers ['g' => Release GUID(mandatory), 'id => ReleaseID(optional, pass false)]
 	 * @param NZB          $nzb
 	 * @param ReleaseImage $releaseImage
 	 */
@@ -754,10 +752,9 @@ class Releases
 	 * @param int    $imDbID
 	 * @param int    $aniDbID
 	 */
-	public function update(
-		$ID, $name, $searchName, $fromName, $categoryID, $parts, $grabs, $size,
-		$postedDate, $addedDate, $rageID, $seriesFull, $season, $episode, $imDbID, $aniDbID
-	)
+	public function update($ID, $name, $searchName, $fromName, $categoryID, $parts, $grabs, $size,
+						   $postedDate, $addedDate, $rageID, $seriesFull, $season, $episode,
+						   $imDbID, $aniDbID)
 	{
 		$this->pdo->queryExec(
 			sprintf(
@@ -867,7 +864,7 @@ class Releases
 	}
 
 	/**
-	 * Creates part of a query for searches requiring the categoryid's.
+	 * Creates part of a query for searches requiring the categoryID's.
 	 *
 	 * @param array $categories
 	 *
@@ -877,7 +874,7 @@ class Releases
 	{
 		$sql = '';
 		if (count($categories) > 0 && $categories[0] != -1) {
-			$Category = new \Category(['Settings' => $this->pdo]);
+			$Category = new Category(['Settings' => $this->pdo]);
 			$sql = ' AND (';
 			foreach ($categories as $category) {
 				if ($category != -1) {
@@ -1242,11 +1239,11 @@ class Releases
 	{
 		// Get the category for the parent of this release.
 		$currRow = $this->getById($currentID);
-		$catRow = (new \Category(['Settings' => $this->pdo]))->getById($currRow['categoryid']);
+		$catRow = (new Category(['Settings' => $this->pdo]))->getById($currRow['categoryid']);
 		$parentCat = $catRow['parentid'];
 
 		$results = $this->search(
-			$this->getSimilarName($name), -1, -1, -1, [$parentCat], -1, -1, 0, 0, -1, -1, 0, $limit, '', -1, $excludedCats
+			$this->getSimilarName($name), -1, -1, -1, -1, -1, 0, 0, -1, -1, 0, $limit, '', -1, $excludedCats, null, [$parentCat]
 		);
 		if (!$results) {
 			return $results;
@@ -1308,7 +1305,7 @@ class Releases
 	 */
 	public function getZipped($guids)
 	{
-		$nzb = new \NZB($this->pdo);
+		$nzb = new NZB($this->pdo);
 		$zipFile = new \ZipFile();
 
 		foreach ($guids as $guid) {
@@ -1625,7 +1622,7 @@ class Releases
 				b.url,	b.cover, b.title as booktitle, b.author
 			FROM releases r
 			INNER JOIN bookinfo b ON r.bookinfoid = b.id
-			WHERE r.categoryid BETWEEN 8000 AND 8999
+			WHERE r.categoryid BETWEEN 7000 AND 7999
 			OR r.categoryid = 3030
 			AND b.id > 0
 			AND b.cover > 0
@@ -1651,7 +1648,7 @@ class Releases
 			WHERE r.categoryid BETWEEN 5000 AND 5999
 			AND tv.rageid > 0
 			AND length(tv.imgdata) > 0
-			GROUP BY tv.rageid
+			AND r.id in (select max(id) from releases where rageid > 0 group by rageid)
 			ORDER BY r.postdate DESC
 			LIMIT 24"
 		);
@@ -1673,17 +1670,16 @@ class Releases
 		$this->pdo->queryInsert(sprintf("INSERT IGNORE INTO dnzb_failures (userid, guid) VALUES (%d, %s)",
 				$userid,
 				$this->pdo->escapeString($guid)
-				)
+			)
 		);
 
 		$alternate = $this->pdo->queryOneRow(sprintf('SELECT * FROM releases r
 			WHERE r.searchname %s
 			AND r.guid NOT IN (SELECT guid FROM failed_downloads WHERE userid = %d)',
-			$this->pdo->likeString($searchname),
-			$userid
+				$this->pdo->likeString($searchname),
+				$userid
 			)
 		);
 		return $alternate;
 	}
-
 }
