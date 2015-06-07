@@ -2,7 +2,7 @@
 
 use newznab\utility\Utility;
 
-if ($users->isLoggedIn())
+if ($page->users->isLoggedIn())
 	$page->show404();
 
 $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view';
@@ -14,7 +14,7 @@ switch($action) {
 			break;
 		}
 
-		$ret = $users->getByPassResetGuid($_REQUEST['guid']);
+		$ret = $page->users->getByPassResetGuid($_REQUEST['guid']);
 		if (!$ret) {
 			$page->smarty->assign('error', "Bad reset code provided.");
 			break;
@@ -22,14 +22,14 @@ switch($action) {
 			//
 			// reset the password, inform the user, send out the email
 			//
-			$users->updatePassResetGuid($ret["id"], "");
-			$newpass = $users->generatePassword();
-			$users->updatePassword($ret["id"], $newpass);
+			$page->users->updatePassResetGuid($ret["id"], "");
+			$newpass = $page->users->generatePassword();
+			$page->users->updatePassword($ret["id"], $newpass);
 
 			$to = $ret["email"];
-			$subject = $page->site->title . " Password Reset";
+			$subject = $page->settings->getSetting('title') . " Password Reset";
 			$contents = "Your password has been reset to " . $newpass;
-			Utility::sendEmail($to, $subject, $contents, $page->site->email);
+			Utility::sendEmail($to, $subject, $contents, $page->settings->getSetting('email'));
 
 			$page->smarty->assign('confirmed', "true");
 
@@ -48,7 +48,7 @@ switch($action) {
 				//
 				// Check users exists and send an email
 				//
-				$ret = $users->getByEmail($_POST['email']);
+				$ret = $page->users->getByEmail($_POST['email']);
 				if (!$ret) {
 					$page->smarty->assign('error', "The email address is not recognised.");
 					break;
@@ -57,16 +57,16 @@ switch($action) {
 					// Generate a forgottenpassword guid, store it in the user table
 					//
 					$guid = md5(uniqid());
-					$users->updatePassResetGuid($ret["id"], $guid);
+					$page->users->updatePassResetGuid($ret["id"], $guid);
 
 					//
 					// Send the email
 					//
 					$to = $ret["email"];
-					$subject = $page->site->title . " Forgotten Password Request";
+					$subject = $page->settings->getSetting('title') . " Forgotten Password Request";
 					$contents = "Someone has requested a password reset for this email address. To reset the password use the following link.\n\n " . $page->serverurl . "forgottenpassword?action=reset&guid=" . $guid;
 					$page->smarty->assign('sent', "true");
-					Utility::sendEmail($to, $subject, $contents, $page->site->email);
+					Utility::sendEmail($to, $subject, $contents, $page->settings->getSetting('email'));
 					break;
 				}
 			}
@@ -81,4 +81,3 @@ $page->meta_description = "Forgotten Password";
 
 $page->content = $page->smarty->fetch('forgottenpassword.tpl');
 $page->render();
-
