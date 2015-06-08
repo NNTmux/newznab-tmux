@@ -36,7 +36,6 @@ class BasePage
 	public $smarty = '';
 	public $userdata = array();
 	public $serverurl = '';
-	public $site = '';
 	public $secure_connection = false;
 
 
@@ -58,19 +57,14 @@ class BasePage
 			$this->stripSlashes($_COOKIE);
 		}
 
-		// set site variable
-		$s = new Sites();
-		$this->site = $s->get();
-		$this->pdo = new Settings();
-
 		// Buffer settings/DB connection.
-		$this->settings = new newznab\db\Settings();
+		$this->settings = new Settings();
 		$this->smarty = new Smarty();
 		$this->captcha = new Captcha(['Settings' => $this->settings]);
 
 		$this->smarty->setTemplateDir(
 			array(
-				'user_frontend' => NN_WWW . 'templates/' . $this->pdo->getSetting('style') . '/views/frontend',
+				'user_frontend' => NN_WWW . 'templates/' . $this->settings->getSetting('style') . '/views/frontend',
 				'frontend' => NN_WWW . 'templates/default/views/frontend'
 			)
 		);
@@ -80,8 +74,8 @@ class BasePage
 		$this->smarty->error_reporting = ((NN_DEBUG ? E_ALL : E_ALL - E_NOTICE));
 		$this->secure_connection = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443)) ;
 
-		if (file_exists(WWW_DIR.'templates/'.$this->pdo->getSetting('style').'/theme.php'))
-			require_once(WWW_DIR.'templates/'.$this->pdo->getSetting('style').'/theme.php');
+		if (file_exists(WWW_DIR.'templates/'.$this->settings->getSetting('style').'/theme.php'))
+			require_once(WWW_DIR.'templates/'.$this->settings->getSetting('style').'/theme.php');
 		$this->smarty->assign('themevars', (isset($themevars) ? $themevars : null));
 
 		$servername = null;
@@ -105,7 +99,7 @@ class BasePage
 			$this->userdata["categoryexclusions"] = $this->users->getCategoryExclusion($this->users->currentUserId());
 
 			// Change the theme to user's selected theme if they selected one, else use the admin one.
-			if ($this->pdo->getSetting('userselstyle') == 1) {
+			if ($this->settings->getSetting('userselstyle') == 1) {
 				if (isset($this->userdata['style']) && $this->userdata['style'] !== 'None') {
 					$this->smarty->setTemplateDir(
 						array(
@@ -145,9 +139,9 @@ class BasePage
 
 			if ($this->userdata["hideads"] == "1")
 			{
-				$this->pdo->setSetting(['adheader', '']);
-				$this->pdo->setSetting(['adbrowse', '']);
-				$this->pdo->setSetting(['addetail', '']);
+				$this->settings->setSetting(['adheader', '']);
+				$this->settings->setSetting(['adbrowse', '']);
+				$this->settings->setSetting(['addetail', '']);
 			}
 
 			$this->floodCheck($this->userdata["role"]);
@@ -162,7 +156,7 @@ class BasePage
 
 		}
 
-		$this->smarty->assign('site', $this->site);
+		$this->smarty->assign('site', $this->settings);
 		$this->smarty->assign('page', $this);
 	}
 
