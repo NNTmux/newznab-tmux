@@ -141,7 +141,8 @@ switch ($function) {
 
 		if (isset($_GET['q'])) {
 			$relData = $releases->search(
-				$_GET['q'], -1, -1, -1, $categoryID, -1, -1, 0, 0, -1, -1, $offset, $limit, '', $maxAge, $catExclusions
+				$_GET['q'], -1, -1, -1, -1, -1, 0, 0, -1, -1, $offset, $limit, '', $maxAge, $catExclusions,
+				"basic", $categoryID
 			);
 		} else {
 			$totalRows = $releases->getBrowseCount($categoryID, $maxAge, $catExclusions);
