@@ -102,16 +102,6 @@ class BasePage
 		if ($this->users->isLoggedIn())
 		{
 			$this->userdata = $this->users->getById($this->users->currentUserId());
-
-			//
-			// user can still be logged in but have been disabled by admin, so if they are, log them off
-			//
-			if ($this->userdata["role"] == Users::ROLE_DISABLED)
-			{
-				$this->users->logout();
-				$this->show403();
-			}
-
 			$this->userdata["categoryexclusions"] = $this->users->getCategoryExclusion($this->users->currentUserId());
 
 			// Change the theme to user's selected theme if they selected one, else use the admin one.
