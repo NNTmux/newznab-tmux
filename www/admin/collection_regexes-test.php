@@ -5,7 +5,7 @@ $page = new AdminPage();
 
 $page->title = "Collections Regex Test";
 
-$tpg = $page->site->tablepergroup;
+$tpg = $page->settings->getSetting('tablepergroup');
 $page->smarty->assign('tpg', $tpg);
 
 if ($tpg) {
