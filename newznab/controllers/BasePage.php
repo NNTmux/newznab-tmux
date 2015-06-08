@@ -145,8 +145,13 @@ class BasePage
 			if ($sab->integratedBool !== false && $sab->url != '' && $sab->apikey != '') {
 				$this->smarty->assign('sabapikeytype', $sab->apikeytype);
 			}
-			if ($this->userdata["role"] == Users::ROLE_ADMIN)
-				$this->smarty->assign('isadmin',"true");
+			switch ((int)$this->userdata['role']) {
+				case Users::ROLE_ADMIN:
+					$this->smarty->assign('isadmin', 'true');
+					break;
+				case Users::ROLE_MODERATOR:
+					$this->smarty->assign('ismod', 'true');
+			}
 
 			if ($this->userdata["hideads"] == "1")
 			{
@@ -159,8 +164,9 @@ class BasePage
 		}
 		else
 		{
-			$this->smarty->assign('isadmin',"false");
-			$this->smarty->assign('loggedin',"false");
+			$this->smarty->assign('isadmin', 'false');
+			$this->smarty->assign('ismod', 'false');
+			$this->smarty->assign('loggedin', 'false');
 			$this->floodCheck();
 			$this->handleCaptcha();
 

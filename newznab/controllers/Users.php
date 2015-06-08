@@ -404,12 +404,22 @@ class Users
 		$this->pdo->queryExec(sprintf("update users set grabs = grabs + %d where id = %d ", $num, $id));
 	}
 
-	public function getByIdAndRssToken($id, $rsstoken)
+	/**
+	 * Check if the user is in the database, and if their API key is good, return user data if so.
+	 *
+	 * @param int    $userID   ID of the user.
+	 * @param string $rssToken API key.
+	 *
+	 * @return bool|array
+	 */
+	public function getByIdAndRssToken($userID, $rssToken)
 	{
+		$user = $this->getById($userID);
+		if ($user === false) {
+			return false;
+		}
 
-		$res = $this->getById($id);
-
-		return ($res && $res["rsstoken"] == $rsstoken ? $res : null);
+		return ($user['rsstoken'] != $rssToken ? false : $user);
 	}
 
 	public function getById($id)
@@ -569,18 +579,22 @@ class Users
 		return $this->pdo->queryInsert($sql);
 	}
 
+	/**
+	 * Verify if the user is logged in.
+	 *
+	 * @return bool
+	 */
 	public function isLoggedIn()
 	{
 		if (isset($_SESSION['uid'])) {
 			return true;
-		} elseif (isset($_COOKIE['uid']) && isset($_COOKIE['idh'])) {
+		} else if (isset($_COOKIE['uid']) && isset($_COOKIE['idh'])) {
 			$u = $this->getById($_COOKIE['uid']);
 
-			if (($_COOKIE['idh'] == $this->hashSHA1($u["userseed"] . $_COOKIE['uid'])) && ($u["role"] != Users::ROLE_DISABLED)) {
+			if (($_COOKIE['idh'] == $this->hashSHA1($u["userseed"] . $_COOKIE['uid'])) && ($u["role"] != self::ROLE_DISABLED)) {
 				$this->login($_COOKIE['uid'], $_SERVER['REMOTE_ADDR']);
 			}
 		}
-
 		return isset($_SESSION['uid']);
 	}
 
