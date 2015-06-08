@@ -34,8 +34,9 @@ class BasePage
 	public $page = '';
 	public $page_template = '';
 	public $smarty = '';
-	public $userdata = [];
+	public $userdata = array();
 	public $serverurl = '';
+	public $site = '';
 	public $secure_connection = false;
 
 
@@ -57,16 +58,20 @@ class BasePage
 			$this->stripSlashes($_COOKIE);
 		}
 
+		// set site variable
+		$s = new Sites();
+		$this->site = $s->get();
+
 		// Buffer settings/DB connection.
 		$this->settings = new Settings();
 		$this->smarty = new Smarty();
 		$this->captcha = new Captcha(['Settings' => $this->settings]);
 
 		$this->smarty->setTemplateDir(
-				[
-					'user_frontend' => NN_WWW . 'templates/' . $this->settings->getSetting('style') . '/views/frontend',
+			array(
+				'user_frontend' => NN_WWW . 'templates/' . $this->settings->getSetting('style') . '/views/frontend',
 				'frontend' => NN_WWW . 'templates/default/views/frontend'
-				]
+			)
 		);
 		$this->smarty->setCompileDir(SMARTY_DIR.'templates_c'.DIRECTORY_SEPARATOR);
 		$this->smarty->setConfigDir(SMARTY_DIR.'configs'.DIRECTORY_SEPARATOR);
@@ -112,10 +117,10 @@ class BasePage
 			if ($this->settings->getSetting('userselstyle') == 1) {
 				if (isset($this->userdata['style']) && $this->userdata['style'] !== 'None') {
 					$this->smarty->setTemplateDir(
-							[
-								'user_frontend' => NN_WWW . 'templates/' . $this->userdata['style'] . '/views/frontend',
+						array(
+							'user_frontend' => NN_WWW . 'templates/' . $this->userdata['style'] . '/views/frontend',
 							'frontend'      => NN_WWW . 'templates/default/views/frontend'
-							]
+						)
 					);
 				}
 			}
@@ -124,8 +129,8 @@ class BasePage
 			if (strtotime($this->userdata['now'])-900 > strtotime($this->userdata['lastlogin']))
 				$this->users->updateSiteAccessed($this->userdata['id']);
 
-			$this->smarty->assign('userdata', $this->userdata);
-			$this->smarty->assign('loggedin', "true");
+			$this->smarty->assign('userdata',$this->userdata);
+			$this->smarty->assign('loggedin',"true");
 
 			if ($this->userdata['nzbvortex_api_key'] != '' && $this->userdata['nzbvortex_server_url'] != '') {
 				$this->smarty->assign('weHasVortex', true);
@@ -139,34 +144,34 @@ class BasePage
 			if ($sab->integratedBool !== false && $sab->url != '' && $sab->apikey != '') {
 				$this->smarty->assign('sabapikeytype', $sab->apikeytype);
 			}
-			if ($this->userdata["role"] == Users::ROLE_ADMIN) {
-				$this->smarty->assign('isadmin', "true");
-			}
-
-			if ($this->userdata["role"] == Users::ROLE_MODERATOR){
-				$this->smarty->assign('ismod', "true");
+			switch ((int)$this->userdata['role']) {
+				case Users::ROLE_ADMIN:
+					$this->smarty->assign('isadmin', 'true');
+					break;
+				case Users::ROLE_MODERATOR:
+					$this->smarty->assign('ismod', 'true');
 			}
 
 			if ($this->userdata["hideads"] == "1")
 			{
-				$this->settings->adheader = "";
-				$this->settings->adbrowse = "";
-				$this->settings->addetail = "";
+				$this->settings->setSetting(['adheader', '']);
+				$this->settings->setSetting(['adbrowse', '']);
+				$this->settings->setSetting(['addetail', '']);
 			}
 
 			$this->floodCheck($this->userdata["role"]);
 		}
 		else
 		{
-			$this->smarty->assign('isadmin',"false");
+			$this->smarty->assign('isadmin', 'false');
 			$this->smarty->assign('ismod', 'false');
-			$this->smarty->assign('loggedin',"false");
+			$this->smarty->assign('loggedin', 'false');
 			$this->floodCheck();
 			$this->handleCaptcha();
 
 		}
 
-		$this->smarty->assign('site', $this->settings);
+		$this->smarty->assign('site', $this->site);
 		$this->smarty->assign('page', $this);
 	}
 
@@ -280,10 +285,28 @@ class BasePage
 		return (strtoupper($_SERVER["REQUEST_METHOD"]) === "POST");
 	}
 
+	/**
+	 * Show 404 page.
+	 */
 	public function show404()
 	{
-		header("HTTP/1.1 404 Not Found");
-		die();
+		header('HTTP/1.1 404 Not Found');
+		exit(
+		sprintf("
+				<html>
+					<head>
+						<title>404 - File not found.</title>
+					</head>
+					<body>
+						<h1>404 - File not found.</h1>
+						<p>%s%s</p>
+						<p>We could not find the above page on our servers.</p>
+					</body>
+				</html>",
+			$this->serverurl,
+			$this->page
+		)
+		);
 	}
 
 	public function show403($from_admin = false)
@@ -293,27 +316,28 @@ class BasePage
 		die();
 	}
 
-	public function show503($retry='')
+	/**
+	 * Show 503 page.
+	 *
+	 * @param string $message Message to display.
+	 */
+	public function show503($message = 'Your maximum api or download limit has been reached for the day.')
 	{
 		header('HTTP/1.1 503 Service Temporarily Unavailable');
-		header('Status: 503 Service Temporarily Unavailable');
-		if ($retry != '')
-			header('Retry-After: '.$retry);
-
-		echo "
-			<html>
-			<head>
-				<title>Service Unavailable</title>
-			</head>
-
-			<body>
-				<h1>Service Unavailable</h1>
-
-				<p>Your maximum api or download limit has been reached for the day</p>
-
-			</body>
-			</html>";
-		die();
+		exit(
+		sprintf("
+				<html>
+					<head>
+						<title>Service Unavailable.</title>
+					</head>
+					<body>
+						<h1>Service Unavailable.</h1>
+						<p>%s</p>
+					</body>
+				</html>",
+			$message
+		)
+		);
 	}
 
 	public function show429($retry='')
