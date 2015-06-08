@@ -281,9 +281,12 @@ class BasePage
 		$this->body = $this->body." ".$attr;
 	}
 
+	/**
+	 * @return bool
+	 */
 	public function isPostBack()
 	{
-		return (strtoupper($_SERVER["REQUEST_METHOD"]) === "POST");
+		return (strtoupper($_SERVER['REQUEST_METHOD']) === 'POST');
 	}
 
 	/**

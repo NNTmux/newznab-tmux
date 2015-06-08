@@ -9,12 +9,11 @@ if ($page->isPostBack())
 } elseif ($page->captcha->getError() === false) {
 		$username = htmlspecialchars($_POST["username"]);
 		$page->smarty->assign('username', $username);
-		$users = new Users();
-		$res = $users->getByUsername($username);
-		$dis = $users->isDisabled($username);
+		$res = $page->users->getByUsername($username);
+		$dis = $page->users->isDisabled($username);
 
 		if (!$res)
-			$res = $users->getByEmail($username);
+			$res = $page->users->getByEmail($username);
 
 		if ($res)
 		{
@@ -22,10 +21,10 @@ if ($page->isPostBack())
 			{
 				$page->smarty->assign('error', "Your account has been disabled.");
 			}
-			else if ($users->checkPassword($_POST["password"], $res["password"]))
+			else if ($page->users->checkPassword($_POST["password"], $res["password"]))
 			{
 				$rememberMe = (isset($_POST['rememberme']) && $_POST['rememberme'] == 'on') ? 1 : 0;
-				$users->login($res["id"], $_SERVER['REMOTE_ADDR'], $rememberMe);
+				$page->users->login($res["id"], $_SERVER['REMOTE_ADDR'], $rememberMe);
 
 				if (isset($_POST["redirect"]) && $_POST["redirect"] != "")
 					header("Location: ".$_POST["redirect"]);
