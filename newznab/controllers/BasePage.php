@@ -36,7 +36,6 @@ class BasePage
 	public $smarty = '';
 	public $userdata = array();
 	public $serverurl = '';
-	public $site = '';
 	public $secure_connection = false;
 
 
@@ -57,10 +56,6 @@ class BasePage
 			$this->stripSlashes($_REQUEST);
 			$this->stripSlashes($_COOKIE);
 		}
-
-		// set site variable
-		$s = new Sites();
-		$this->site = $s->get();
 
 		// Buffer settings/DB connection.
 		$this->settings = new Settings();
@@ -161,7 +156,7 @@ class BasePage
 
 		}
 
-		$this->smarty->assign('site', $this->site);
+		$this->smarty->assign('site', $this->settings);
 		$this->smarty->assign('page', $this);
 	}
 
