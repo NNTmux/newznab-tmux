@@ -2,7 +2,7 @@
 
 $forum = new Forum;
 
-if (!$users->isLoggedIn())
+if (!$page->users->isLoggedIn())
 	$page->show403();
 
 if ($page->isPostBack())
@@ -12,7 +12,7 @@ if ($page->isPostBack())
 		if (!isset($_POST["addMessage"]) || empty($_POST["addMessage"]))
 			$page->show403();
 
-		$forum->add(0, $users->currentUserId(), $_POST["addSubject"], $_POST["addMessage"]);
+		$forum->add(0, $page->users->currentUserId(), $_POST["addSubject"], $_POST["addMessage"]);
 		header("Location:".WWW_TOP."/forum");
 		die();
 }

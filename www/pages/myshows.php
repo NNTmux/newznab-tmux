@@ -2,7 +2,7 @@
 
 use newznab\db\Settings;
 
-if (!$users->isLoggedIn())
+if (!$page->users->isLoggedIn())
 	$page->show403();
 
 $us = new UserSeries();
@@ -12,12 +12,12 @@ $rid = isset($_REQUEST['subpage']) ? $_REQUEST['subpage'] : '';
 
 switch($action) {
 	case 'delete':
-		$show = $us->getShow($users->currentUserId(), $rid);
+		$show = $us->getShow($page->users->currentUserId(), $rid);
 
 		if (!$show)
 			$page->show404('Not subscribed');
 		else
-			$us->delShow($users->currentUserId(), $rid);
+			$us->delShow($page->users->currentUserId(), $rid);
 
 		if (isset($_REQUEST['from']))
 			header("Location:".WWW_TOP.$_REQUEST['from']);
@@ -26,7 +26,7 @@ switch($action) {
 	break;
 	case 'add':
 	case 'doadd':
-		$show = $us->getShow($users->currentUserId(), $rid);
+		$show = $us->getShow($page->users->currentUserId(), $rid);
 
 		if ($show)
 		{
@@ -43,7 +43,7 @@ switch($action) {
 		if ($action == 'doadd')
 		{
 			$category = (isset($_REQUEST['category']) && is_array($_REQUEST['category']) && !empty($_REQUEST['category'])) ? $_REQUEST['category'] :[];
-			$us->addShow($users->currentUserId(), $rid, $category);
+			$us->addShow($page->users->currentUserId(), $rid, $category);
 			if (isset($_REQUEST['from']))
 				header("Location:".$_REQUEST['from']);
 			else
@@ -71,7 +71,7 @@ switch($action) {
 	break;
 	case 'edit':
 	case 'doedit':
-		$show = $us->getShow($users->currentUserId(), $rid);
+		$show = $us->getShow($page->users->currentUserId(), $rid);
 
 		if (!$show)
 			$page->show404();
@@ -79,7 +79,7 @@ switch($action) {
 		if ($action == 'doedit')
 		{
 			$category = (isset($_REQUEST['category']) && is_array($_REQUEST['category']) && !empty($_REQUEST['category'])) ? $_REQUEST['category'] :[];
-			$us->updateShow($users->currentUserId(), $rid, $category);
+			$us->updateShow($page->users->currentUserId(), $rid, $category);
 			if (isset($_REQUEST['from']))
 				header("Location:".WWW_TOP.$_REQUEST['from']);
 			else
@@ -113,7 +113,7 @@ switch($action) {
 		$page->meta_keywords = "search,add,to,cart,nzb,description,details";
 		$page->meta_description = "Browse Your Shows";
 
-		$shows = $us->getShows($users->currentUserId());
+		$shows = $us->getShows($page->users->currentUserId());
 
 		$releases = new Releases;
 		$browsecount = $releases->getShowsCount($shows, -1, $page->userdata["categoryexclusions"]);
@@ -160,7 +160,7 @@ switch($action) {
 		foreach($tmpcats as $c)
 			$categories[$c['id']] = $c['title'];
 
-		$shows = $us->getShows($users->currentUserId());
+		$shows = $us->getShows($page->users->currentUserId());
 		$results =[];
 		foreach ($shows as $showk=>$show)
 		{

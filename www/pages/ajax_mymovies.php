@@ -1,6 +1,6 @@
 <?php
 
-if (!$users->isLoggedIn())
+if (!$page->users->isLoggedIn())
 	$page->show403();
 
 $um = new UserMovies();
@@ -8,7 +8,7 @@ $um = new UserMovies();
 
 if (isset($_REQUEST["del"]))
 {
-	$usermovies = $um->delMovie($users->currentUserId(), $_REQUEST["del"]);
+	$usermovies = $um->delMovie($page->users->currentUserId(), $_REQUEST["del"]);
 }
 elseif (isset($_REQUEST["add"]))
 {
@@ -24,7 +24,7 @@ elseif (isset($_REQUEST["add"]))
 	if (!$mi)
 		$m->updateMovieInfo($_REQUEST["add"]);
 
-	$usermovies = $um->addMovie($users->currentUserId(), $_REQUEST["add"], $cats);
+	$usermovies = $um->addMovie($page->users->currentUserId(), $_REQUEST["add"], $cats);
 }
 else
 {
@@ -76,7 +76,7 @@ else
 			}
 
 			$userimdbs = array();
-			$usermovies = $um->getMovies($users->currentUserId());
+			$usermovies = $um->getMovies($page->users->currentUserId());
 			foreach ($usermovies as $umovie)
 				$userimdbs[$umovie["imdbID"]] = $umovie["imdbID"];
 

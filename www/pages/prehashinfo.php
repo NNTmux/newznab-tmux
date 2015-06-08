@@ -97,12 +97,12 @@
 
 // You can make this page accessible by all (even people without an API key) by setting this to false :
 if (true) {
-	if (!$users->isLoggedIn()) {
+	if (!$page->users->isLoggedIn()) {
 		if (!isset($_GET['apikey'])) {
 			apiError('Missing parameter (apikey)', 200);
 		}
 
-		if (!$users->getByRssToken($_GET['apikey'])) {
+		if (!$page->users->getByRssToken($_GET['apikey'])) {
 			apiError('Incorrect user credentials (api key is wrong)', 100);
 		}
 	}

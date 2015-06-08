@@ -2,7 +2,7 @@
 
 $PreDB = new PreDB();
 
-if (!$users->isLoggedIn() || $page->userdata["canpre"] != 1)
+if (!$page->users->isLoggedIn() || $page->userdata["canpre"] != 1)
 	$page->show403();
 
 $page->title = 'PreDB';

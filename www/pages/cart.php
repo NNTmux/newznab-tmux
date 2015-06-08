@@ -37,7 +37,7 @@ if (isset($_GET["add"])) {
 	$page->meta_keywords = "search,add,to,cart,nzb,description,details";
 	$page->meta_description = "Manage Your Nzb Cart";
 
-	$results = $users->getCart($page->users->currentUserId());
+	$results = $page->users->getCart($page->users->currentUserId());
 	$page->smarty->assign('results', $results);
 
 	$page->content = $page->smarty->fetch('cart.tpl');

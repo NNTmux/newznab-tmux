@@ -1,6 +1,6 @@
 <?php
 
-if (!$users->isLoggedIn()) {
+if (!$page->users->isLoggedIn()) {
 	$page->show403();
 }
 
@@ -26,7 +26,7 @@ if (isset($_GET["id"]) && ctype_digit($_GET['id'])) {
 	} elseif (!$rel) {
 		$page->smarty->assign("nodata", "No releases for this series.");
 	} else {
-		$myshows = $us->getShow($users->currentUserId(), $rage[0]['rageid']);
+		$myshows = $us->getShow($page->users->currentUserId(), $rage[0]['rageid']);
 
 		// Sort releases by season, episode, date posted.
 		$season = $episode = $posted = array();
@@ -94,7 +94,7 @@ if (isset($_GET["id"]) && ctype_digit($_GET['id'])) {
 		$letter = "";
 	}
 
-	$masterserieslist = $tvrage->getSeriesList($users->currentUserId(), $letter, $ragename);
+	$masterserieslist = $tvrage->getSeriesList($page->users->currentUserId(), $letter, $ragename);
 
 	$page->title = 'Series List';
 	$page->meta_title = "View Series List";

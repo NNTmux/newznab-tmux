@@ -1,6 +1,6 @@
 <?php
 
-if (!$users->isLoggedIn()) {
+if (!$page->users->isLoggedIn()) {
 	$page->show403();
 }
 
@@ -50,7 +50,7 @@ if (!$error) {
 			$getnewestmovies = $releases->getNewestMovies();
 			$page->smarty->assign('newest', $getnewestmovies);
 
-			$user = $users->getById($users->currentUserId());
+			$user = $page->users->getById($page->users->currentUserId());
 			$page->smarty->assign('cpapi', $user['cp_api']);
 			$page->smarty->assign('cpurl', $user['cp_url']);
 			$page->smarty->assign('goto', 'movies');

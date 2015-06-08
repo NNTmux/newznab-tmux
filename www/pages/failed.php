@@ -1,7 +1,7 @@
 <?php
 
 $releases = new Releases(['Settings' => $page->settings]);
-$users = new Users();
+$page->users = new Users();
 $page = new Page();
 
 if (isset($_GET['userid']) && is_numeric($_GET['userid']) && isset($_GET['rsstoken']) && isset($_GET['guid'])) {

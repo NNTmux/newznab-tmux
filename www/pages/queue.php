@@ -1,10 +1,10 @@
 <?php
 
-if (!$users->isLoggedIn()) {
+if (!$page->users->isLoggedIn()) {
 	$page->show403();
 }
 
-$userData = $users->getById($users->currentUserId());
+$userData = $page->users->getById($page->users->currentUserId());
 if (!$userData) {
 	$page->show404();
 }
@@ -78,7 +78,7 @@ if (!is_null($queue)) {
 	}
 }
 
-$page->smarty->assign(array('queueType' => $queueType, 'error' => $error, 'user', $users));
+$page->smarty->assign(array('queueType' => $queueType, 'error' => $error, 'user', $page->users));
 $page->title = "Your $queueType Download Queue";
 $page->meta_title = "View $queueType Queue";
 $page->meta_keywords = "view," . strtolower($queueType) .",queue";

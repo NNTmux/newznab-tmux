@@ -26,10 +26,11 @@ if ($page->isPostBack())
 				$rememberMe = (isset($_POST['rememberme']) && $_POST['rememberme'] == 'on') ? 1 : 0;
 				$page->users->login($res["id"], $_SERVER['REMOTE_ADDR'], $rememberMe);
 
-				if (isset($_POST["redirect"]) && $_POST["redirect"] != "")
-					header("Location: ".$_POST["redirect"]);
-				else
-					header("Location: ".WWW_TOP.$page->site->home_link);
+				if (isset($_POST["redirect"]) && $_POST["redirect"] != "") {
+					header("Location: " . $_POST["redirect"]);
+				} else {
+					header("Location: " . WWW_TOP . $page->settings->getSetting('home_link'));
+				}
 				die();
 			}
 			else

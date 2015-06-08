@@ -4,7 +4,7 @@ $console = new Console;
 $cat = new Category;
 $gen = new Genres;
 
-if (!$users->isLoggedIn())
+if (!$page->users->isLoggedIn())
 	$page->show403();
 
 

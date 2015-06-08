@@ -2,7 +2,7 @@
 
 $releases = new Releases(['Settings' => $page->settings]);
 
-if (!$users->isLoggedIn())
+if (!$page->users->isLoggedIn())
 	$page->show403();
 
 $category = -1;
