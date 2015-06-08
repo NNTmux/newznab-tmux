@@ -920,13 +920,18 @@ class Users
 		return $this->pdo->queryOneRow("select * from userroles where isdefault = 1");
 	}
 
-	public function getApiRequests($userid)
+	/**
+	 * Get the quantity of API requests in the last day for the user_id.
+	 *
+	 * @param int $userID
+	 *
+	 * @return array|bool
+	 */
+	public function getApiRequests($userID)
 	{
-		//clear old requests
-		//$this->pdo->queryExec(sprintf("DELETE FROM userrequests WHERE (userid = %d AND timestamp < DATE_SUB(NOW(), INTERVAL 1 DAY))", $userid));
-		$this->pdo->queryExec(sprintf("DELETE FROM userrequests WHERE timestamp < DATE_SUB(NOW(), INTERVAL 1 DAY)", $userid));
-		$sql = sprintf("select COUNT(id) as num, TIME_TO_SEC(TIMEDIFF(DATE_ADD(MIN(TIMESTAMP), INTERVAL 1 DAY), NOW())) AS nextrequest FROM userrequests WHERE userid = %d AND timestamp > DATE_SUB(NOW(), INTERVAL 1 DAY)", $userid);
-		return $this->pdo->queryOneRow($sql);
+		// Clear old requests.
+		$this->clearApiRequests($userID);
+		return $this->pdo->queryOneRow(sprintf('SELECT COUNT(id) AS num FROM userrequests WHERE userid = %d', $userID));
 	}
 
 	/**
@@ -946,6 +951,29 @@ class Users
 				$this->pdo->escapeString($request)
 			)
 		);
+	}
+
+	/**
+	 * Delete api requests older than a day.
+	 *
+	 * @param int|bool  $userID
+	 *                   int The users ID.
+	 *                   bool false do all user ID's..
+	 *
+	 * @return void
+	 */
+	protected function clearApiRequests($userID)
+	{
+		if ($userID === false) {
+			$this->pdo->queryExec('DELETE FROM userrequests WHERE timestamp < DATE_SUB(NOW(), INTERVAL 1 DAY)');
+		} else {
+			$this->pdo->queryExec(
+				sprintf(
+					'DELETE FROM userrequests WHERE userid = %d AND timestamp < DATE_SUB(NOW(), INTERVAL 1 DAY)',
+					$userID
+				)
+			);
+		}
 	}
 
 	/**
