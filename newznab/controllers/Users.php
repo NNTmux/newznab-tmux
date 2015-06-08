@@ -929,10 +929,23 @@ class Users
 		return $this->pdo->queryOneRow($sql);
 	}
 
-	public function addApiRequest($userid, $request)
+	/**
+	 * If a user accesses the API, log it.
+	 *
+	 * @param int    $userID  ID of the user.
+	 * @param string $request The API request.
+	 *
+	 * @return bool|int
+	 */
+	public function addApiRequest($userID, $request)
 	{
-		$sql = sprintf("insert into userrequests (userid, request, timestamp) VALUES (%d, %s, now())", $userid, $this->pdo->escapeString($request));
-		return $this->pdo->queryInsert($sql);
+		return $this->pdo->queryInsert(
+			sprintf(
+				"INSERT INTO userrequests (userid, request, timestamp) VALUES (%d, %s, NOW())",
+				$userID,
+				$this->pdo->escapeString($request)
+			)
+		);
 	}
 
 	/**
