@@ -28,32 +28,33 @@ class SABnzbd
 	const PRIORITY_FORCE = 2; // Sab is enabled, 1 remote SAB server for the whole site.
 	/**
 	 * URL to the SAB server.
-	 *
-	 * @var string
+	 * @var string|Array|bool
 	 */
-	public $url = ''; // Sab is enabled, every user can use their own SAB server.
+	public $url = '';
+
 	/**
 	 * The SAB API key.
-	 *
-	 * @var string
+	 * @var string|Array|bool
 	 */
 	public $apikey = '';
+
 	/**
 	 * Download priority of the sent NZB file.
-	 *
-	 * @var string
+	 * @var string|Array|bool
 	 */
 	public $priority = '';
+
 	/**
 	 * Type of SAB API key (full/nzb).
-	 *
-	 * @var string
+	 * @var string|Array|bool
 	 */
 	public $apikeytype = '';
+
 	/**
 	 * @var int
 	 */
 	public $integrated = self::INTEGRATION_TYPE_NONE;
+
 	/**
 	 * Is sab integrated into the site or not.
 	 * @var bool
@@ -61,20 +62,19 @@ class SABnzbd
 	public $integratedBool = false;
 
 	/**
-	 * id of the current user, to send to SAB when downloading a NZB.
-	 *
+	 * ID of the current user, to send to SAB when downloading a NZB.
 	 * @var string
 	 */
 	protected $uid = '';
+
 	/**
 	 * User's newznab API key to send to SAB when downloading a NZB.
-	 *
 	 * @var string
 	 */
 	protected $rsstoken = '';
+
 	/**
-	 * newznab Site URL to send to SAB to download the NZB.
-	 *
+	 * nZEDb Site URL to send to SAB to download the NZB.
 	 * @var string
 	 */
 	protected $serverurl = '';
