@@ -598,40 +598,62 @@ class Users
 		return isset($_SESSION['uid']);
 	}
 
-	public function login($uid, $host = "", $remember = "")
+	/**
+	 * Log in a user.
+	 *
+	 * @param int    $userID   ID of the user.
+	 * @param string $host
+	 * @param string $remember Save the user in cookies to keep them logged in.
+	 */
+	public function login($userID, $host = '', $remember = '')
 	{
-		$_SESSION['uid'] = $uid;
+		$_SESSION['uid'] = $userID;
 
-		$site = new Sites();
-		$this->site = $site->get();
-
-		if ($this->pdo->getSetting('storeuserips') != "1")
+		if ($this->pdo->getSetting('storeuserips') != 1) {
 			$host = '';
+		}
 
-		$this->updateSiteAccessed($uid, $host);
+		$this->updateSiteAccessed($userID, $host);
 
-		if ($remember == 1)
-			$this->setCookies($uid);
+		if ($remember == 1) {
+			$this->setCookies($userID);
+		}
 	}
 
-	public function updateSiteAccessed($uid, $host = "")
+	/**
+	 * When a user logs in, update the last time they logged in.
+	 *
+	 * @param int    $userID ID of the user.
+	 * @param string $host
+	 */
+	public function updateSiteAccessed($userID, $host = '')
 	{
-
-		$hostSql = '';
-		if ($host != '')
-			$hostSql = sprintf(', host = %s', $this->pdo->escapeString($host));
-
-		$this->pdo->queryExec(sprintf("update users set lastlogin = now() %s where id = %d ", $hostSql, $uid));
+		$this->pdo->queryExec(
+			sprintf(
+				"UPDATE users SET lastlogin = NOW() %s WHERE id = %d",
+				($host == '' ? '' : (', host = ' . $this->pdo->escapeString($host))),
+				$userID
+			)
+		);
 	}
 
-	public function setCookies($uid)
+	/**
+	 * Set up cookies for a user.
+	 *
+	 * @param int $userID
+	 */
+	public function setCookies($userID)
 	{
-		$u = $this->getById($uid);
-		$idh = $this->hashSHA1($u["userseed"] . $uid);
-		setcookie('uid', $uid, (time() + 2592000), '/', $_SERVER['SERVER_NAME'], (isset($_SERVER['HTTPS']) ? true : false));
-		setcookie('idh', $idh, (time() + 2592000), '/', $_SERVER['SERVER_NAME'], (isset($_SERVER['HTTPS']) ? true : false));
-	}
+		$user = $this->getById($userID);
+		$secure_cookie = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on' ? '1' : '0');
+		setcookie('uid', $userID, (time() + 2592000), '/', null, $secure_cookie, true);
+		setcookie('idh', ($this->hashSHA1($user['userseed'] . $userID)), (time() + 2592000), '/', null, $secure_cookie, true);	}
 
+	/**
+	 * Return the User ID of the user.
+	 *
+	 * @return int
+	 */
 	public function currentUserId()
 	{
 		return (isset($_SESSION['uid']) ? $_SESSION['uid'] : -1);
