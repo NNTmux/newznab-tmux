@@ -659,12 +659,16 @@ class Users
 		return (isset($_SESSION['uid']) ? $_SESSION['uid'] : -1);
 	}
 
+	/**
+	 * Logout the user, destroying his cookies and session.
+	 */
 	public function logout()
 	{
 		session_unset();
 		session_destroy();
-		setcookie('uid', '', (time() - 2592000), '/', $_SERVER['SERVER_NAME'], (isset($_SERVER['HTTPS']) ? true : false));
-		setcookie('idh', '', (time() - 2592000), '/', $_SERVER['SERVER_NAME'], (isset($_SERVER['HTTPS']) ? true : false));
+		$secure_cookie = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on' ? '1' : '0');
+		setcookie('uid', null, -1, '/', null, $secure_cookie, true);
+		setcookie('idh', null, -1, '/', null, $secure_cookie, true);
 	}
 
 	public function updateApiAccessed($uid)
