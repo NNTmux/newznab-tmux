@@ -16,7 +16,7 @@ class Page extends BasePage
 		if ($this->userdata != null)
 			$role = $this->userdata["role"];
 
-		$content = new Contents();
+		$content = new Contents(['Settings' => $this->settings]);
 		$f = new Forum();
 		$menu = new Menu($this->settings);
 		$this->smarty->assign('menulist',$menu->get($role, $this->serverurl));
@@ -29,7 +29,7 @@ class Page extends BasePage
 		$this->smarty->assign('useful_menu',$this->smarty->fetch('usefullinksmenu.tpl'));
 		$this->smarty->assign('article_menu',$this->smarty->fetch('articlesmenu.tpl'));
 
-		$category = new Category();
+		$category = new Category(['Settings' => $content->pdo]);
 		if ($this->userdata != null)
 			$parentcatlist = $category->getForMenu($this->userdata["categoryexclusions"]);
 		else
