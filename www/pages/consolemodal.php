@@ -2,7 +2,7 @@
 
 $console = new Console;
 
-if (!$users->isLoggedIn())
+if (!$page->users->isLoggedIn())
 	$page->show403();
 
 if (isset($_GET["id"]) && ctype_digit($_GET["id"]))

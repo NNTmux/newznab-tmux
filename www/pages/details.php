@@ -1,6 +1,6 @@
 <?php
 
-if (!$users->isLoggedIn())
+if (!$page->users->isLoggedIn())
 	$page->show403();
 
 if (isset($_GET["id"]))
@@ -14,7 +14,7 @@ if (isset($_GET["id"]))
 		$page->show404();
 
 	if ($page->isPostBack())
-		$rc->addComment($data["id"], $data["gid"], $_POST["txtAddComment"], $users->currentUserId(), $_SERVER['REMOTE_ADDR']);
+		$rc->addComment($data["id"], $data["gid"], $_POST["txtAddComment"], $page->users->currentUserId(), $_SERVER['REMOTE_ADDR']);
 
 	$nfo = $releases->getReleaseNfo($data["id"], false);
 	$reVideo = $re->getVideo($data["id"]);

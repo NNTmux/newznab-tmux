@@ -4,7 +4,7 @@ require_once("config.php");
 use newznab\db\Settings;
 use newznab\utility\Utility;
 
-if (!$users->isLoggedIn())
+if (!$page->users->isLoggedIn())
 	$page->show403();
 
 $r = new Releases();

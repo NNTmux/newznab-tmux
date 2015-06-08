@@ -3,7 +3,7 @@
 $releases = new Releases;
 $nzb = new NZB;
 
-if (!$users->isLoggedIn())
+if (!$page->users->isLoggedIn())
 	$page->show403();
 
 if (isset($_GET["id"]))

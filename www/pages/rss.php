@@ -77,7 +77,7 @@ if (!isset($_GET["t"]) && !isset($_GET["rage"]) && !isset($_GET["anidb"])) {
 		$usercat = ($_GET["t"] == 0 ? -1 : $_GET["t"]);
 	}
 
-	$userrage = $useranidb = $userseries = -1;
+	$userrage = $useranidb = $page->userseries = -1;
 	if (isset($_GET["rage"])) {
 		$userrage = ($_GET["rage"] == 0 ? -1 : $_GET["rage"] + 0);
 	} elseif (isset($_GET["anidb"])) {

@@ -4,7 +4,7 @@ use newznab\utility\Utility;
 
 $releases = new Releases;
 
-if (!$users->isLoggedIn())
+if (!$page->users->isLoggedIn())
 	$page->show403();
 
 if (isset($_GET["id"])) {

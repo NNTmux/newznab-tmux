@@ -1,20 +1,21 @@
 <?php
 
 use newznab\utility\Utility;
-use newznab\db\Settings;
 
 $category = new Category;
 $sab = new SABnzbd($page);
 $nzbGet = new NZBGet($page);
-$users = new Users();
+$page->users = new Users();
+$s = new Sites();
+$site = $s->get();
 
-if (!$users->isLoggedIn())
+if (!$page->users->isLoggedIn())
 	$page->show403();
 
 $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view';
 
-$userid = $users->currentUserId();
-$data = $users->getById($userid);
+$userid = $page->users->currentUserId();
+$data = $page->users->getById($userid);
 if (!$data)
 	$page->show404();
 
@@ -22,7 +23,7 @@ $errorStr = '';
 
 switch ($action) {
 	case 'newapikey':
-		$users->updateRssKey($userid);
+		$page->users->updateRssKey($userid);
 		header("Location: profileedit");
 		break;
 	case 'clearcookies':
@@ -37,14 +38,14 @@ switch ($action) {
 
 		if ($_POST['password'] != "" && $_POST['password'] != $_POST['confirmpassword']) {
 			$errorStr = "Password Mismatch";
-		} else if ($_POST['password'] != "" && !$users->isValidPassword($_POST['password'])) {
+		} else if ($_POST['password'] != "" && !$page->users->isValidPassword($_POST['password'])) {
 			$errorStr = "Your password must be longer than five characters.";
 		} else if (isset($_POST['nzbgeturl']) && $nzbGet->verifyURL($_POST['nzbgeturl']) === false) {
 			$errorStr = "The NZBGet URL you entered is invalid!";
-		} else if (!$users->isValidEmail($_POST['email'])) {
+		} else if (!$page->users->isValidEmail($_POST['email'])) {
 			$errorStr = "Your email is not a valid format.";
 		} else {
-			$res = $users->getByEmail($_POST['email']);
+			$res = $page->users->getByEmail($_POST['email']);
 			if ($res && $res["id"] != $userid) {
 				$errorStr = "Sorry, the email is already in use.";
 			} elseif ((empty($_POST['saburl']) && !empty($_POST['sabapikey'])) || (!empty($_POST['saburl']) && empty($_POST['sabapikey']))) {
@@ -55,7 +56,7 @@ switch ($action) {
 					$_POST['saburl'] = $_POST['sabapikey'] = $_POST['sabpriority'] = $_POST['sabapikeytype'] = false;
 				}
 
-				$users->update(
+				$page->users->update(
 					$userid,
 					$data["username"],
 					$_POST['email'],
@@ -85,10 +86,10 @@ switch ($action) {
 				);
 
 				$_POST['exccat'] = (!isset($_POST['exccat']) || !is_array($_POST['exccat'])) ? array() : $_POST['exccat'];
-				$users->addCategoryExclusions($userid, $_POST['exccat']);
+				$page->users->addCategoryExclusions($userid, $_POST['exccat']);
 
 				if ($_POST['password'] != "")
-					$users->updatePassword($userid, $_POST['password']);
+					$page->users->updatePassword($userid, $_POST['password']);
 
 				header("Location:" . WWW_TOP . "/profile");
 				die();
@@ -100,7 +101,7 @@ switch ($action) {
 	default:
 		break;
 }
-if ($page->settings->getSetting('userselstyle') == 1) {
+if ($site->userselstyle ==1) {
 // Get the list of themes.
 	$themeList[] = 'None';
 	$themes = scandir(NN_WWW . '/templates');
@@ -115,7 +116,7 @@ $page->smarty->assign('themelist', $themeList);
 
 $page->smarty->assign('error', $errorStr);
 $page->smarty->assign('user', $data);
-$page->smarty->assign('userexccat', $users->getCategoryExclusion($userid));
+$page->smarty->assign('userexccat', $page->users->getCategoryExclusion($userid));
 
 $page->smarty->assign('saburl_selected', $sab->url);
 $page->smarty->assign('sabapikey_selected', $sab->apikey);

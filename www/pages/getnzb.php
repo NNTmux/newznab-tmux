@@ -1,19 +1,17 @@
 <?php
 
-use newznab\db\Settings;
-
 $nzb = new NZB($page->settings);
 $rel = new Releases(['Settings' => $page->settings]);
 $uid = 0;
 
 // Page is accessible only by the rss token, or logged in users.
-if ($users->isLoggedIn()) {
-	$uid = $users->currentUserId();
+if ($page->users->isLoggedIn()) {
+	$uid = $page->users->currentUserId();
 	$maxdls = $page->userdata["downloadrequests"];
 	$rsstoken = $page->userdata['rsstoken'];
 } else {
-	if ($page->settings->getSetting('registerstatus') == Settings::REGISTER_STATUS_API_ONLY) {
-		$res = $users->getById(0);
+	if ($page->site->registerstatus == Sites::REGISTER_STATUS_API_ONLY) {
+		$res = $page->users->getById(0);
 	} else {
 		if ((!isset($_GET["i"]) || !isset($_GET["r"]))) {
 			header("X-DNZB-RCode: 400");
@@ -21,7 +19,7 @@ if ($users->isLoggedIn()) {
 			$page->show403();
 		}
 
-		$res = $users->getByIdAndRssToken($_GET["i"], $_GET["r"]);
+		$res = $page->users->getByIdAndRssToken($_GET["i"], $_GET["r"]);
 		if (!$res) {
 			header("X-DNZB-RCode: 401");
 			header("X-DNZB-RText: Unauthorised, wrong user ID or rss key!");
@@ -41,11 +39,11 @@ if (isset($_GET['id'])) {
 // A hash of the users ip to record against the download
 //
 $hosthash = "";
-if ($page->settings->getSetting('storeuserips') == 1) {
-	$hosthash = $users->getHostHash($_SERVER["REMOTE_ADDR"], $page->settings->getSetting('siteseed'));
+if ($page->site->storeuserips == 1) {
+	$hosthash = $page->users->getHostHash($_SERVER["REMOTE_ADDR"], $page->site->siteseed);
 }
 // Check download limit on user role.
-$dlrequests = $users->getDownloadRequests($uid);
+$dlrequests = $page->users->getDownloadRequests($uid);
 if ($dlrequests['num'] > $maxdls) {
 	header("X-DNZB-RCode: 503");
 	header("X-DNZB-RText: User has exceeded maximum downloads for the day!");
@@ -53,12 +51,8 @@ if ($dlrequests['num'] > $maxdls) {
 }
 
 // User requested a zip of guid,guid,guid releases.
-if (isset($_REQUEST["id"]) && isset($_GET["zip"]) && $_GET["zip"] == "1")
-{
-        if (isset($_POST['id']) && is_array($_POST['id']))
-                $guids = $_POST['id'];
-        else
-                $guids = explode(",", $_GET["id"]);
+if (isset($_GET["id"]) && isset($_GET["zip"]) && $_GET["zip"] == "1") {
+	$guids = explode(",", $_GET["id"]);
 	if ($dlrequests['num'] + sizeof($guids) > $maxdls) {
 		header("X-DNZB-RCode: 503");
 		header("X-DNZB-RText: User has exceeded maximum downloads for the day!");
@@ -67,13 +61,13 @@ if (isset($_REQUEST["id"]) && isset($_GET["zip"]) && $_GET["zip"] == "1")
 
 	$zip = $rel->getZipped($guids);
 	if (strlen($zip) > 0) {
-		$users->incrementGrabs($uid, count($guids));
+		$page->users->incrementGrabs($uid, count($guids));
 		foreach ($guids as $guid) {
 			$rel->updateGrab($guid);
-			$users->addDownloadRequest($uid, $guid);
+			$page->users->addDownloadRequest($uid, $rel['id']);
 
 			if (isset($_GET["del"]) && $_GET["del"] == 1) {
-				$users->delCartByUserAndRelease($guid, $uid);
+				$page->users->delCartByUserAndRelease($guid, $uid);
 			}
 		}
 
@@ -99,10 +93,10 @@ if (isset($_GET["id"])) {
 
 	if ($reldata) {
 		$rel->updateGrab($_GET["id"]);
-		$users->addDownloadRequest($uid, $reldata['id']);
-		$users->incrementGrabs($uid);
+		$page->users->addDownloadRequest($uid, $reldata['id']);
+		$page->users->incrementGrabs($uid);
 		if (isset($_GET["del"]) && $_GET["del"] == 1) {
-			$users->delCartByUserAndRelease($_GET["id"], $uid);
+			$page->users->delCartByUserAndRelease($_GET["id"], $uid);
 		}
 	} else {
 		header("X-DNZB-RCode: 404");
@@ -116,7 +110,7 @@ if (isset($_GET["id"])) {
 	readgzfile($nzbpath);
 
 	// Set the NZB file name.
-	header("Content-Disposition: attachment; filename=" . str_replace(array(',', ' '), '_', $reldata["searchname"]) . ".nzb");
+	header("Content-Disposition: attachment; filename=" . str_replace([',', ' '], '_', $reldata["searchname"]) . ".nzb");
 	// Get the size of the NZB file.
 	header("Content-Length: " . ob_get_length());
 	header("Content-Type: application/x-nzb");

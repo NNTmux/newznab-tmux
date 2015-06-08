@@ -1,7 +1,7 @@
 <?php
 require_once(WWW_DIR."/lib/nzbget.php");
 
-if (!$users->isLoggedIn())
+if (!$page->users->isLoggedIn())
 	$page->show403();
 
 if (empty($_GET["id"]))

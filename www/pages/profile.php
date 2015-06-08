@@ -4,7 +4,7 @@ $rc = new ReleaseComments;
 $sab = new SABnzbd($page);
 $nzbget = new NZBGet($page);
 
-if (!$users->isLoggedIn())
+if (!$page->users->isLoggedIn())
 	$page->show403();
 
 $userid = 0;
@@ -12,14 +12,14 @@ if (isset($_GET["id"]))
 	$userid = $_GET["id"] + 0;
 elseif (isset($_GET["name"]))
 {
-	$res = $users->getByUsername($_GET["name"]);
+	$res = $page->users->getByUsername($_GET["name"]);
 	if ($res)
 		$userid = $res["id"];
 }
 else
-	$userid = $users->currentUserId();
+	$userid = $page->users->currentUserId();
 
-$privileged = ($users->isAdmin($userid) || $users->isModerator($userid)) ? true : false;
+$privileged = ($page->users->isAdmin($userid) || $page->users->isModerator($userid)) ? true : false;
 $privateProfiles = ($page->settings->getSetting('privateprofiles') == 1) ? true : false;
 $publicView = false;
 
@@ -30,7 +30,7 @@ if (!$privateProfiles || $privileged) {
 
 	// If both 'id' and 'name' are specified, 'id' should take precedence.
 	if ($altID === false && $altUsername !== false) {
-		$user = $users->getByUsername($altUsername);
+		$user = $page->users->getByUsername($altUsername);
 		if ($user) {
 			$altID = $user['id'];
 		}
@@ -42,16 +42,16 @@ if (!$privateProfiles || $privileged) {
 
 
 
-$data = $users->getById($userid);
+$data = $page->users->getById($userid);
 if (!$data)
 	$page->show404();
 
 $invitedby = '';
 if ($data["invitedby"] != "")
-	$invitedby = $users->getById($data["invitedby"]);
+	$invitedby = $page->users->getById($data["invitedby"]);
 
-$page->smarty->assign('apihits', $users->getApiRequests($userid));
-$page->smarty->assign('grabstoday', $users->getDownloadRequests($userid));
+$page->smarty->assign('apihits', $page->users->getApiRequests($userid));
+$page->smarty->assign('grabstoday', $page->users->getDownloadRequests($userid));
 $page->smarty->assign('userinvitedby',$invitedby);
 $page->smarty->assign('user',$data);
 $page->smarty->assign('privateprofiles', $privateProfiles);
@@ -73,11 +73,11 @@ $page->smarty->assign('pager', $pager);
 $commentslist = $rc->getCommentsForUserRange($userid, $offset, ITEMS_PER_PAGE);
 $page->smarty->assign('commentslist',$commentslist);
 
-$downloadlist = $users->getDownloadRequestsForUserAndAllHostHashes($userid);
+$downloadlist = $page->users->getDownloadRequestsForUserAndAllHostHashes($userid);
 $page->smarty->assign('downloadlist',$downloadlist);
 
 
-$exccats = $users->getCategoryExclusionNames($userid);
+$exccats = $page->users->getCategoryExclusionNames($userid);
 $page->smarty->assign('exccats', implode(",", $exccats));
 
 $page->smarty->assign('saburl', $sab->url);

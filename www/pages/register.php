@@ -1,18 +1,16 @@
 <?php
 
-use newznab\db\Settings;
-
-if ($users->isLoggedIn())
+if ($page->users->isLoggedIn())
 	$page->show404();
 
 $showregister = 1;
 
-if ($page->settings->getSetting('registerstatus') == Settings::REGISTER_STATUS_CLOSED)
+if ($page->site->registerstatus == Sites::REGISTER_STATUS_CLOSED)
 {
 	$page->smarty->assign('error', "Registrations are currently disabled.");
 	$showregister = 0;
 }
-elseif ($page->settings->getSetting('registerstatus') == Settings::REGISTER_STATUS_INVITE && (!isset($_REQUEST['invitecode']) || empty($_REQUEST['invitecode'])))
+elseif ($page->site->registerstatus == Sites::REGISTER_STATUS_INVITE && (!isset($_REQUEST['invitecode']) || empty($_REQUEST['invitecode'])))
 {
 	$page->smarty->assign('error', "Registrations are currently invite only.");
 	$showregister = 0;
@@ -56,11 +54,11 @@ else {
 					$page->smarty->assign('error', "Password Mismatch");
 				} else {
 					//get the default user role
-					$userdefault = $users->getDefaultRole();
+					$userdefault = $page->users->getDefaultRole();
 
-					$ret = $users->signup($username, $password, $email, $_SERVER['REMOTE_ADDR'], $userdefault['id'], "", $userdefault['defaultinvites'], $invitecode, false);
+					$ret = $page->users->signup($username, $password, $email, $_SERVER['REMOTE_ADDR'], $userdefault['id'], "", $userdefault['defaultinvites'], $invitecode, false);
 					if ($ret > 0) {
-						$users->login($ret, $_SERVER['REMOTE_ADDR']);
+						$page->users->login($ret, $_SERVER['REMOTE_ADDR']);
 						header("Location: " . WWW_TOP . "/");
 					} else {
 						switch ($ret) {
@@ -96,7 +94,7 @@ else {
 					//
 					// see if it is a valid invite
 					//
-					$invite = $users->getInvite($invitecode);
+					$invite = $page->users->getInvite($invitecode);
 					if (!$invite) {
 						$page->smarty->assign('error', sprintf("Bad or invite code older than %d days.", Users::DEFAULT_INVITE_EXPIRY_DAYS));
 						$page->smarty->assign('showregister', "0");

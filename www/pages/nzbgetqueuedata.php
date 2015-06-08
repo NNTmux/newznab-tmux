@@ -2,7 +2,7 @@
 
 use newznab\utility\Utility;
 
-if (!$users->isLoggedIn()) {
+if (!$page->users->isLoggedIn()) {
 	$page->show403();
 }
 

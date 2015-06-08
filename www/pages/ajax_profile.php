@@ -1,12 +1,12 @@
 <?php
 
-if (!$users->isLoggedIn())
+if (!$page->users->isLoggedIn())
 	$page->show403();
 
 if (isset($_GET['action']) && $_GET['action'] == "1" && isset($_GET['emailto']))
 {
 	$emailto = $_GET['emailto'];
-	$ret = $users->sendInvite($page->settings->title, $page->settings->email, $page->serverurl, $users->currentUserId(), $emailto);
+	$ret = $page->users->sendInvite($page->site->title, $page->site->email, $page->serverurl, $page->users->currentUserId(), $emailto);
 	if (!$ret)
 		print "Invite not sent.";
 	else
