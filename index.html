@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Newznab-tmux by DariusIII</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Newznab-tmux</h1>
+      <h2 class="project-tagline">Greatly improved jonnyboys newznab-tmux with additions from nZEDb (https://github.com/nZEDb/nZEDb)</h2>
+      <a href="https://github.com/DariusIII/newznab-tmux" class="btn">View on GitHub</a>
+      <a href="https://github.com/DariusIII/newznab-tmux/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/DariusIII/newznab-tmux/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <p>I have forked jonnyboys newznab-tmux as he and the dev team have moved to another project (<a href="https://github.com/nZEDb/nZEDb">https://github.com/nZEDb/nZEDb</a>). I will try as much as i can to maintain and improve these tmux scripts, where possible and needed, as they are a valuable addendum to newznab+.
+Support is given on irc.synirc.net #tmux channel.</p>
+
+<p>I started adapting some of more interesting scripts from nZEDb, but they require tempering with newznab database, so use them at your own risk. Any update to nn+ db could render them useless. Scripts require PHP version &gt; 5.3.10 and Python 2.7x or newer.</p>
+
+<p>Now, clone my github. These scripts need to run from this location and this is where I was asked to put them. If you have decided to use an alternate location, you will need to edit the file bin/config.php to point to the file newznab/www/config.php. If you do not, these scripts will not run.</p>
+
+<p>cd /var/www/newznab/misc/update_scripts/nix_scripts/</p>
+
+<p>git clone <a href="https://github.com/DariusIII/newznab-tmux.git">https://github.com/DariusIII/newznab-tmux.git</a> tmux</p>
+
+<p>cd tmux</p>
+
+<p>There is a lib folder in main tmux folder. In that folder you will find two folders, /DB/ and /copy_this/. if you are setting up tmux for the first time, import db.sql using cli (mysql -u {┤your username} -p newznab &lt; db.sql).</p>
+
+<ol>
+<li><p>Copy files from /lib/copy_this/www folder into your newznab installation folder. I have created the nntmux theme where all the settings are available.</p></li>
+<li><p>Copy files from /lib/copy_this/misc folder into your newznab installation folder.</p></li>
+<li><p>Most of the scripts are now threaded.</p></li>
+<li><p>All the required folders are created when you copy files from copy_this folder.</p></li>
+</ol>
+
+<h1>
+<a id="yenc" class="anchor" href="#yenc" aria-hidden="true"><span class="octicon octicon-link"></span></a>yEnc:</h1>
+
+<p>Note: You have 3 choices,
+        you can install simple_php_yenc_decode which offers the best performance,
+        installing yydecode, which offers good performance,
+        or using PHP (no install required) which is very slow.
+        You can change these at any time if you have issues with any of the 3.</p>
+
+<p>simple_php_yenc_decode:</p>
+
+<pre><code>   sudo apt-get install git
+   cd ~/
+   git clone https://github.com/kevinlekiller/simple_php_yenc_decode
+   cd simple_php_yenc_decode/
+   sh ubuntu.sh
+   cd ~/
+   rm -rf simple_php_yenc_decode/
+</code></pre>
+
+<p>yydecode</p>
+
+<pre><code>   cd ~/
+   mkdir -p yydecode
+   cd yydecode/
+   wget http://colocrossing.dl.sourceforge.net/project/yydecode/yydecode/0.2.10/yydecode-0.2.10.tar.gz
+   tar -xzf yydecode-0.2.10.tar.gz
+   cd yydecode-0.2.10/
+   ./configure
+   make
+   sudo make install
+   make clean
+   cd ~/
+   rm -rf yydecode/
+</code></pre>
+
+<p>Note: After installing you can change the yEnc setting in tmux edit accordingly.</p>
+
+<h1>
+<a id="threaded-scripts" class="anchor" href="#threaded-scripts" aria-hidden="true"><span class="octicon octicon-link"></span></a>Threaded Scripts:</h1>
+
+<p>Tmux comes with php threaded scripts, python scripts are still there, but are not used, and will be removed in future</p>
+
+<h1>
+<a id="table-per-group" class="anchor" href="#table-per-group" aria-hidden="true"><span class="octicon octicon-link"></span></a>Table per group:</h1>
+
+<p>Tmux can now be used with TPG ported from nZEDb, you need to run lib/testing/DB/convert_to_tpg.php to convert binaries, parts and partrepair tables, after this you will be able to use
+  threaded releases.php</p>
+
+<h1>
+<a id="alternate-nntp-provider" class="anchor" href="#alternate-nntp-provider" aria-hidden="true"><span class="octicon octicon-link"></span></a>Alternate NNTP provider:</h1>
+
+<p>Newznab-tmux has added support for dual NNTP providers, you need to edit the provided config.php in lib/copy_this/config_edit_before_copy folder</p>
+
+<h1>
+<a id="sphinx-support" class="anchor" href="#sphinx-support" aria-hidden="true"><span class="octicon octicon-link"></span></a>Sphinx support:</h1>
+
+<p>Newznab-tmux now comes with its own Sphinx support, ported from nZEDb. Installation readme is in misc/sphinxsearch folder, and in copy_this/misc/sphinxsearch folder</p>
+
+<p>This version of tmux has many core newznab files modified, use at your own risk.</p>
+
+<p>Tmux is started with start.php (php start.php command). Scripts not used anymore are still available for your use, but you need to run them manualy.</p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/DariusIII/newznab-tmux">Newznab-tmux</a> is maintained by <a href="https://github.com/DariusIII">DariusIII</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
+
