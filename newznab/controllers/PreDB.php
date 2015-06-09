@@ -241,7 +241,7 @@ class PreDB
 				echo $cnt."..";
 			$cnt--;
 
-			if(preg_match('/^'.$this->pdo->getSetting('nzpresubject').'$/', $groupMsg['Subject']) && preg_match('/^'.$this->pdo->getSetting('nzpreposter').'$/', $groupMsg['From'])) {
+			if(preg_match('/^'.$this->pdo->getSetting('nzpresubject').'$/', $groupMsg['Subject']) && preg_match('/^'.$this->pdo->getSetting('nzpreposter').'/', $groupMsg['From'])) {
 				$ret = $msgHeader = $nntp->getHeader($groupMsg['Message-ID']);
 				if($nntp->isError($ret))
 					continue;
