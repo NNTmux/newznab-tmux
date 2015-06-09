@@ -19,6 +19,7 @@
  * @copyright 2014 nZEDb
  */
 require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'www' . DIRECTORY_SEPARATOR . 'config.php';
+require_once SMARTY_DIR . 'Smarty.class.php';
 
 use newznab\db\DbUpdate;
 use newznab\utility\Utility;
