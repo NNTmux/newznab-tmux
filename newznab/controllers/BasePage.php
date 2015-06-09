@@ -24,6 +24,13 @@ class BasePage
 	 */
 	public $users = null;
 
+	/**
+	 * Is the current session HTTPS?
+	 * @var bool
+	 */
+	public $https = false;
+
+
 	public $title = '';
 	public $content = '';
 	public $head = '';
@@ -34,7 +41,7 @@ class BasePage
 	public $page = '';
 	public $page_template = '';
 	public $smarty = '';
-	public $userdata = array();
+	public $userdata = [];
 	public $serverurl = '';
 	public $secure_connection = false;
 
@@ -66,10 +73,10 @@ class BasePage
 		$this->captcha = new Captcha(['Settings' => $this->settings]);
 
 		$this->smarty->setTemplateDir(
-			array(
+			[
 				'user_frontend' => NN_WWW . 'templates/' . $this->settings->getSetting('style') . '/views/frontend',
 				'frontend' => NN_WWW . 'templates/default/views/frontend'
-			)
+			]
 		);
 		$this->smarty->setCompileDir(SMARTY_DIR.'templates_c'.DIRECTORY_SEPARATOR);
 		$this->smarty->setConfigDir(SMARTY_DIR.'configs'.DIRECTORY_SEPARATOR);
@@ -81,10 +88,7 @@ class BasePage
 			require_once(WWW_DIR.'templates/'.$this->settings->getSetting('style').'/theme.php');
 		$this->smarty->assign('themevars', (isset($themevars) ? $themevars : null));
 
-		$servername = null;
-		if (defined('EXTERNAL_PROXY_IP') && defined('EXTERNAL_HOST_NAME') && isset($_SERVER["REMOTE_ADDR"]) && $_SERVER["REMOTE_ADDR"] == EXTERNAL_PROXY_IP)
-			$servername = EXTERNAL_HOST_NAME;
-		elseif (isset($_SERVER['SERVER_NAME'])) {
+		if (isset($_SERVER['SERVER_NAME'])) {
 			$this->serverurl = (
 				($this->https === true ? 'https://' : 'http://') . $_SERVER['SERVER_NAME'] .
 				(($_SERVER['SERVER_PORT'] != '80' && $_SERVER['SERVER_PORT'] != '443') ? ':' . $_SERVER['SERVER_PORT'] : '') .
@@ -105,10 +109,10 @@ class BasePage
 			if ($this->settings->getSetting('userselstyle') == 1) {
 				if (isset($this->userdata['style']) && $this->userdata['style'] !== 'None') {
 					$this->smarty->setTemplateDir(
-						array(
+							[
 							'user_frontend' => NN_WWW . 'templates/' . $this->userdata['style'] . '/views/frontend',
 							'frontend'      => NN_WWW . 'templates/default/views/frontend'
-						)
+						]
 					);
 				}
 			}
