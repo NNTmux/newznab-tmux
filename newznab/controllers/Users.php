@@ -477,9 +477,6 @@ class Users
 
 	public function signup($uname, $pass, $email, $host, $role = self::ROLE_USER, $notes, $invites = self::DEFAULT_INVITES, $invitecode = '', $forceinvitemode = false)
 	{
-		$site = new Sites;
-		$this->site = $site->get();
-
 		$uname = trim($uname);
 		$pass = trim($pass);
 		$email = trim($email);
@@ -563,9 +560,6 @@ class Users
 	public function add($uname, $pass, $email, $role, $notes, $host, $invites = self::DEFAULT_INVITES, $invitedby = 0)
 	{
 
-
-		$site = new Sites();
-		$this->site = $site->get();
 		if ($this->pdo->getSetting('storeuserips') != "1")
 			$host = "";
 
