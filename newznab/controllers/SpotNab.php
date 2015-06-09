@@ -292,8 +292,8 @@ class SpotNab {
 			if(!$res)break;
 
 			# Assemble results into list
-			$gids_found = array();
-			$gids_matched = array();
+			$gids_found = [];
+			$gids_matched = [];
 			foreach($res as $item)
 				$gids_found[] = $item['gid'];
 
@@ -412,7 +412,7 @@ class SpotNab {
 		echo "Spotnab : Discovery ";
 		$summary = $this->_nntp->selectGroup(
 			SpotNab::AUTODISCOVER_POST_GROUP);
-		while(NNTP::isError($summary))
+		/*while(NNTP::isError($summary))
 		{
 			// Reset Connection (This happens first time
 			// around since _nntpReset() will perform
@@ -429,7 +429,7 @@ class SpotNab {
 				restore_error_handler();
 				return false;
 			}
-		}
+		}*/
 
 		$first = $this->_discovery_lastarticle;
 		if($first <= 0 || $first > $summary['last'] ){
@@ -584,28 +584,28 @@ class SpotNab {
 			date("Y-m-d", time()) . " - 365 day"));
 
 		// Header
-		$message = array(
-			'site' => array(
+		$message = [
+			'site' => [
 				// title & code taken out to keep things anonymous for now
 				//'title' => $this->_post_title,
 				//'code' => $this->_post_code,
 				'id' => md5($this->_pdo->getSetting('siteseed')),
 				'users' => $us->getCount()
-			),
-			'posts' => array(
+			],
+			'posts' => [
 				'user' => $this->_post_user,
 				'email' => $this->_post_email,
 				'group' => $this->_post_group,
 				'privacy' => $this->_post_privacy,
 				'public_key' => $this->compstr($this->_ssl_pubkey)
-			),
-			'comments' => array(
+			],
+			'comments' => [
 				'past_month' => $rc->getCommentCount($last_month, true),
 				'past_year' => $rc->getCommentCount($last_year, true),
 				'total' => $rc->getCommentCount(Null, true)
-			),
+			],
 			'postdate_utc' => $this->local2utc($reftime_local),
-		);
+		];
 
 		// DEBUG Post
 		//print_r($message);
@@ -679,9 +679,9 @@ class SpotNab {
 		$sql = "SELECT * FROM spotnabsources WHERE active = 1 ".
 			"ORDER BY usenetgroup,lastupdate DESC";
 		$res = $db->query($sql);
-		$group_hash = array();
-		$group_article_start = array();
-		$id_hash = array();
+		$group_hash = [];
+		$group_article_start = [];
+		$id_hash = [];
 
 		if(!count($res))
 			return true;
@@ -691,13 +691,13 @@ class SpotNab {
 			if(!array_key_exists($ghash, $group_hash)){
 				// Because our results are sorted by group, if we enter
 				// here then we're processing a brand new group...
-				$group_hash[$ghash] = array();
+				$group_hash[$ghash] = [];
 
 				// Initialize our article start point
 				$group_article_start[$ghash] = 0;
 
 				// Initialize id Hash
-				$id_hash[$ghash] = array();
+				$id_hash[$ghash] = [];
 			}
 
 			// Reference time is in UTC on Usenet but local in our database
@@ -731,7 +731,7 @@ class SpotNab {
 			$id_hash[$ghash][] = $source['id'];
 
 			// Store Source Details
-			$group_hash[$ghash][] = array(
+			$group_hash[$ghash][] = [
 				'id' => $source['id'],
 				'key' => $this->decompstr(trim($source['publickey'])),
 				'user' => trim($source['username']),
@@ -742,14 +742,14 @@ class SpotNab {
 
 				// Store last article reference
 				'article' => $article
-			);
+			];
 		}
 
 		// We want to resort the internal arrays by they're ref time
 		// so that the oldest (longest without an update) is processed
 		// first
 		foreach(array_keys($group_hash) as $key){
-			$_ref = array();
+			$_ref = [];
 			foreach($group_hash[$key] as $id => $source){
 				# Source Time (within reason)
 				if($backfill)
@@ -786,24 +786,6 @@ class SpotNab {
 			printf("Spotnab : %d source(s)...", count($hash));
 
 			$summary = $this->_nntp->selectGroup($group);
-			while(NNTP::isError($summary))
-			{
-				// Reset Connection (This happens first time
-				// around since _nntpReset() will perform
-				// the initial connect if it hasn't been already
-				$summary = $this->_nntpReset($group);
-
-				// Track retry attempts
-				$retries--;
-				if($retries <= 0){
-					// Retry Atempts exausted
-					printf("Spotnab : lost connection...");
-					// Restore handler
-					restore_error_handler();
-					return false;
-				}
-			}
-
 			// Get our article id
 			$first = ($backfill)?0:$group_article_start[$group];
 			if($first == 0){
@@ -1077,10 +1059,10 @@ class SpotNab {
 				$this->_pdo->getSetting('spotnabsitepubkey'));
 		}
 
-		return array(
+		return [
 			'pubkey' => $this->_pdo->getSetting('spotnabsitepubkey'),
 			'prvkey' => $this->_pdo->getSetting('spotnabsiteprvkey')
-		);
+		];
 	}
 
 	// ***********************************************************************
@@ -1118,19 +1100,6 @@ class SpotNab {
 
 		while(($retries > 0) && ($interval > 0)){
 			$summary = $this->_nntp->selectGroup($group);
-			if(NNTP::isError($summary))
-			{
-				// Reset Connection
-				$this->_nntpReset();
-
-				// Track retry attempts
-				$retries--;
-				if($retries <= 0){
-					// Retry Atempts exausted
-					break;
-				}
-				continue;
-			}
 
 			$_last = $last = intval($summary['last']);
 			$_first = $first = intval($summary['first']);
@@ -1319,7 +1288,7 @@ class SpotNab {
 
 		if(!count($group_hash)){
 			// Nothing to process
-			return array();
+			return [];
 		}
 
 		//
@@ -1331,14 +1300,14 @@ class SpotNab {
 
 		// Comments
 		$sql_new_cmt = "INSERT INTO releasecomment (".
-			"id, sourceID, username, userid, gid, cid, isvisible, ".
+			"id, sourceid, username, userid, gid, cid, isvisible, ".
 			"releaseid, `text`, createddate, issynced, nzb_guid) VALUES (".
 			"NULL, %d, %s, 0, %s, %s, %d, 0, %s, %s, 1, %s)";
 		$sql_upd_cmt = "UPDATE releasecomment SET ".
 			"isvisible = %d, `text` = %s".
-			"WHERE sourceID = %d AND gid = %s AND cid = %s AND nzb_guid = %s";
+			"WHERE sourceid = %d AND gid = %s AND cid = %s AND nzb_guid = %s";
 		$sql_fnd_cmt = "SELECT count(id) as cnt FROM releasecomment ".
-			"WHERE sourceID = %d AND gid = %s AND cid = %s";
+			"WHERE sourceid = %d AND gid = %s AND cid = %s";
 
 		// Sync Times
 		$sql_sync = "UPDATE spotnabsources SET lastupdate = %s ".
@@ -1520,7 +1489,7 @@ class SpotNab {
 				break;
 			}
 		}
-		return array($inserts, $updates);
+		return [$inserts, $updates];
 	}
 
 	// ***********************************************************************
@@ -1718,7 +1687,7 @@ class SpotNab {
 				}
 			}
 		}
-		return array($inserts, $updates);
+		return [$inserts, $updates];
 	}
 
 	// ***********************************************************************
@@ -1739,27 +1708,9 @@ class SpotNab {
 		do
 		{
 			$raw = $this->_nntp->getBody("<".$id.">", true);
-			if(NNTP::isError($raw))
-			{
-				// Reset Connection (This happens first time
-				// around since _nntpReset() will perform
-				// the initial connect if it hasn't been already
-				$this->_nntpReset($group);
-				// Track retry attempts
-				$retries--;
-				if($retries <= 0){
-					// Retry Atempts exausted
-					printf("%s ERROR - Failed Segment Fetch: %s/%s ...\n",
-						date("Y-m-d H:i:s"), $group, $id);
-					return false;
-				}
-				continue;
-			}
-
 			// Retrieved Data
 			return $raw;
 		}while($retries > 0);
-
 		// Fail
 		return false;
 	}
@@ -1771,7 +1722,7 @@ class SpotNab {
 		*	There is to much involved with fetching article headers
 		*	that bloat and make a lot of code repetative...
 		*	This function returns the headers of the specified range
-		*	in an array() of associative array() always to make life
+		*	in an [] of associative [] always to make life
 		*	easy... alternativly, if this function fails then false
 		*	is returned.
 		*
@@ -1781,33 +1732,23 @@ class SpotNab {
 		*/
 
 		// epoch array is used for sorting fetched results
-		$epoch = array();
+		$epoch = [];
 
 		// Header parsing for associative array returned
-		$min_headers = array('Number', 'Subject', 'From', 'Date',
-							 'Message-ID', 'Bytes', 'Lines');
+		$min_headers = ['Number', 'Subject', 'From', 'Date',
+							 'Message-ID', 'Bytes', 'Lines'
+		];
 		do
 		{
 			$msgs = $this->_nntp->getOverview($range, true, false);
-			if(NNTP::isError($msgs))
-			{
-				$this->_nntpReset($group);
-				// Track retry attempts
-				$retries--;
-				if($retries <= 0){
-					// Retry Atempts exausted
-					break;
-				}
-				continue;
-			}
 			// If we get here, then we fetched the header block okay
 
 			// Clean up bad results but don't mark fetch as a failure
 			// just report what it found.. (nothing). We do this because
 			// NNTP::isError() never threw, so the response has to be valid
 			// even though it's inconsistent
-			if(!$msgs)return array();
-			if(!is_array($msgs))return array();
+			if(!$msgs)return [];
+			if(!is_array($msgs))return [];
 
 			// For whatever reason, we sometimes get an array of
 			// associative array returned, and all other times we just
@@ -1816,7 +1757,7 @@ class SpotNab {
 			// simplify the response and make it esier to work with
 			if((bool)count(array_filter(array_keys($msgs), 'is_string'))){
 				// convert to an array of assocative array
-				$msgs = array($msgs);
+				$msgs = [$msgs];
 			}
 
 			for($i=0;$i<count($msgs);$i++){
@@ -1873,14 +1814,14 @@ class SpotNab {
 			$reftime_local = $this->utc2local();
 		}
 		// Header
-		$message = array(
-			'server' => array(
+		$message = [
+			'server' => [
 				'code' => $this->_post_site,
 				'title' => $this->_post_title,
-			),
+			],
 			'postdate_utc' => $this->local2utc($reftime_local),
-			'comments' => array()
-		);
+			'comments' => []
+		];
 
 		// Store Comments
 		while(($data = $this->unPostedComments()) !== Null)
@@ -2041,19 +1982,14 @@ class SpotNab {
 		{/* do nothing */}
 
 		// Attempt to reconnect
-		try{
-			if (($this->_pdo->getSetting('alternate_nntp') == 1 ? $this->_nntp->doConnect(true, true) : $this->_nntp->doConnect()) !== true) {
-				exit($this->_pdo->log->error("Unable to connect to usenet." . PHP_EOL));
-			}
+		if (($this->_pdo->getSetting('alternate_nntp') == 1 ? $this->_nntp->doConnect(true, true) : $this->_nntp->doConnect()) !== true) {
+			exit($this->_pdo->log->error("Unable to connect to usenet." . PHP_EOL));
 		}
-		catch(Exception $e){return false;}
 
 		if($group !== Null)
 		{
 			// Reselect group if specified
 			$summary = $this->_nntp->selectGroup($this->_post_group);
-			if(NNTP::isError($summary))
-				return false;
 			return $summary;
 		}
 		return true;
@@ -2211,11 +2147,11 @@ class SpotNab {
 		$header .= 'Content-Transfer-Encoding: 8bit' . "\r\n";
 
 		// Assemble Article in structure NNTP expects
-		$article = array($header, $message);
+		$article = [$header, $message];
 
 		if($debug){
 			// Append some debug data to the article
-			$article[] = array(
+			$article[] = [
 				'Number' => 1234,
 				'Subject' => $subject,
 				'From' => sprintf('%s <%s>', $user, $email),
@@ -2226,7 +2162,7 @@ class SpotNab {
 				'Lines' => '1',
 				'Epoch' => strtotime($this->utc2local($reftime)),
 				'Group' => $group
-			);
+			];
 		}
 		return $article;
 	}
@@ -2250,7 +2186,7 @@ class SpotNab {
 			."JOIN releases r ON r.id = rc.releaseid AND rc.releaseid != 0 "
 			."JOIN users u ON rc.userid = u.id AND rc.userid != 0 "
 			."WHERE r.gid IS NOT NULL "
-			."AND sourceID = 0 AND issynced = 0 "
+			."AND sourceid = 0 AND issynced = 0 "
 			."LIMIT %d", $limit);
 
 		$res = $db->query($sql);
@@ -2258,8 +2194,8 @@ class SpotNab {
 			return Null;
 
 		// Now we prepare a comments array to return with
-		$comments = array();
-		$ids = array();
+		$comments = [];
+		$ids = [];
 
 		foreach($res as $comment){
 			// If we don't have a gid then we can't make the post;
@@ -2285,7 +2221,7 @@ class SpotNab {
 			$ids[] = $comment['id'];
 
 			// Build Comment
-			$comments[] = array(
+			$comments[] = [
 				// Release Global id
 				'gid' => $comment['gid'],
 				// Comment id
@@ -2298,12 +2234,12 @@ class SpotNab {
 				'is_visible' => $comment['isvisible'],
 				// Convert createddate to UTC
 				'postdate_utc' => $this->local2utc($comment['createddate'])
-			);
+			];
 		}
 
 		// Return Results if they are present
 		return (count($comments)>0)?
-			array('comments' => $comments, 'ids' => $ids):Null;
+			['comments' => $comments, 'ids' => $ids] :Null;
 	}
 
 	// ***********************************************************************
@@ -2345,11 +2281,11 @@ class SpotNab {
 
 		//Generate Key
 		$res = openssl_pkey_new(
-			array(
+			[
 				'private_key_bits' => $bits,
 				'private_key_type' => $type,
 				'config' => OPENSSL_CFG_PATH
-			)
+			]
 		);
 
 		if ($res === false)
@@ -2360,7 +2296,8 @@ class SpotNab {
 
 		// Get Private Key
 		openssl_pkey_export($res, $prvkey, $passphrase,
-			array('config' => OPENSSL_CFG_PATH));
+			['config' => OPENSSL_CFG_PATH]
+		);
 
 		// Get Public Key
 		$details = openssl_pkey_get_details($res);
@@ -2369,10 +2306,10 @@ class SpotNab {
 		}
 		$pubkey = $details['key'];
 
-		return array(
+		return [
 			'pubkey' => $this->compstr($pubkey),
 			'prvkey' => $this->compstr($prvkey),
-		);
+		];
 	}
 
 	// ***********************************************************************
