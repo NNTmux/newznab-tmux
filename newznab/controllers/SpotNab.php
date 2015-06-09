@@ -7,7 +7,7 @@ if(!defined('OPENSSL_KEYTYPE_RSA')) {
 	// OPENSSL_KEYTYPE_RSA is defined as 0 in php v4 and v5
 	// so just give it a value to silence possible Notice Errors
 	// for Windows Users (and give it the correct value)
-    define('OPENSSL_KEYTYPE_RSA', 0);
+	define('OPENSSL_KEYTYPE_RSA', 0);
 }
 
 // Define OpenSSL Config File
@@ -56,12 +56,12 @@ class SpotNab {
 	// Comment types are always 00
 	const FETCH_COMMENT_TYPE = "00";
 	const FETCH_COMMENT_SUBJECT_REGEX =
-			'/^(?P<checksum>[0-9a-z]{40})-(?P<utcref>[0-9]{14})$/i';
+		'/^(?P<checksum>[0-9a-z]{40})-(?P<utcref>[0-9]{14})$/i';
 
 	// Discovery types are always 01
 	const FETCH_DISCOVERY_TYPE = "01";
 	const FETCH_DISCOVERY_SUBJECT_REGEX =
-			'/^(?P<checksum>[0-9a-z]{40})-(?P<utcref>[0-9]{14})$/i';
+		'/^(?P<checksum>[0-9a-z]{40})-(?P<utcref>[0-9]{14})$/i';
 
 	// The Message id can be parsed as follows
 	const FETCH_MSGID_REGEX =
@@ -277,10 +277,10 @@ class SpotNab {
 		// comments they do not have a release for... Makes sense :)
 		$offset = 0;
 		$sql = "SELECT DISTINCT(gid) as gid FROM releasecomment "
-				."WHERE releaseid = 0 "
-				."AND createddate < NOW() - INTERVAL $max_days DAY "
-				."ORDER BY createddate "
-				."LIMIT %d,%d";
+			."WHERE releaseid = 0 "
+			."AND createddate < NOW() - INTERVAL $max_days DAY "
+			."ORDER BY createddate "
+			."LIMIT %d,%d";
 
 		$sql_rel = "SELECT gid FROM releases WHERE gid IN ('%s') ";
 		$sql_del = "DELETE FROM releasecomment WHERE gid IN ('%s')";
@@ -292,15 +292,15 @@ class SpotNab {
 			if(!$res)break;
 
 			# Assemble results into list
-            $gids_found = array();
-            $gids_matched = array();
-            foreach($res as $item)
-            	$gids_found[] = $item['gid'];
+			$gids_found = [];
+			$gids_matched = [];
+			foreach($res as $item)
+				$gids_found[] = $item['gid'];
 
 			#echo 'B:'.sprintf($sql_rel, implode("','", $gids_found))."\n";
 			$res2 = $db->query(sprintf($sql_rel, implode("','", $gids_found)));
-            foreach($res2 as $item)
-            	$gids_matched[] = $item['gid'];
+			foreach($res2 as $item)
+				$gids_matched[] = $item['gid'];
 			# Now we want to create an inverted list by eliminating the
 			# matches we just fetched
 			$gids_missing = array_diff($gids_found, $gids_matched);
@@ -412,7 +412,7 @@ class SpotNab {
 		echo "Spotnab : Discovery ";
 		$summary = $this->_nntp->selectGroup(
 			SpotNab::AUTODISCOVER_POST_GROUP);
-		while(NNTP::isError($summary))
+		/*while(NNTP::isError($summary))
 		{
 			// Reset Connection (This happens first time
 			// around since _nntpReset() will perform
@@ -429,7 +429,7 @@ class SpotNab {
 				restore_error_handler();
 				return false;
 			}
-		}
+		}*/
 
 		$first = $this->_discovery_lastarticle;
 		if($first <= 0 || $first > $summary['last'] ){
@@ -510,13 +510,13 @@ class SpotNab {
 			}
 		}
 		$sql = sprintf("Update settings SET value = '%d' "
-					."WHERE setting = 'spotnablastarticle'", $last);
+			."WHERE setting = 'spotnablastarticle'", $last);
 		$db->queryExec($sql);
 		printf("%d new and %d updated source(s).\n", $inserted, $updated);
 
 		// Update reference point
 		$q = "Update settings SET updateddate = NOW() WHERE "
-				."setting = 'spotnabdiscover'";
+			."setting = 'spotnabdiscover'";
 		$db->queryExec($q);
 
 		// Restore handler
@@ -540,7 +540,7 @@ class SpotNab {
 				// Update post time
 				$q = "Update settings SET updateddate = NOW() WHERE "
 					."setting = 'spotnabbroadcast'";
-					$res = $db->queryExec($q);
+				$res = $db->queryExec($q);
 			}
 		}
 	}
@@ -584,28 +584,28 @@ class SpotNab {
 			date("Y-m-d", time()) . " - 365 day"));
 
 		// Header
-		$message = array(
-			'site' => array(
+		$message = [
+			'site' => [
 				// title & code taken out to keep things anonymous for now
 				//'title' => $this->_post_title,
 				//'code' => $this->_post_code,
 				'id' => md5($this->_pdo->getSetting('siteseed')),
 				'users' => $us->getCount()
-			),
-			'posts' => array(
+			],
+			'posts' => [
 				'user' => $this->_post_user,
 				'email' => $this->_post_email,
 				'group' => $this->_post_group,
 				'privacy' => $this->_post_privacy,
 				'public_key' => $this->compstr($this->_ssl_pubkey)
-			),
-			'comments' => array(
+			],
+			'comments' => [
 				'past_month' => $rc->getCommentCount($last_month, true),
 				'past_year' => $rc->getCommentCount($last_year, true),
 				'total' => $rc->getCommentCount(Null, true)
-			),
+			],
 			'postdate_utc' => $this->local2utc($reftime_local),
-		);
+		];
 
 		// DEBUG Post
 		//print_r($message);
@@ -677,11 +677,11 @@ class SpotNab {
 		// First we find all active sources and build a hash table we can
 		// use to simplify fetching.
 		$sql = "SELECT * FROM spotnabsources WHERE active = 1 ".
-				"ORDER BY usenetgroup,lastupdate DESC";
+			"ORDER BY usenetgroup,lastupdate DESC";
 		$res = $db->query($sql);
-		$group_hash = array();
-		$group_article_start = array();
-		$id_hash = array();
+		$group_hash = [];
+		$group_article_start = [];
+		$id_hash = [];
 
 		if(!count($res))
 			return true;
@@ -691,13 +691,13 @@ class SpotNab {
 			if(!array_key_exists($ghash, $group_hash)){
 				// Because our results are sorted by group, if we enter
 				// here then we're processing a brand new group...
-				$group_hash[$ghash] = array();
+				$group_hash[$ghash] = [];
 
 				// Initialize our article start point
 				$group_article_start[$ghash] = 0;
 
 				// Initialize id Hash
-				$id_hash[$ghash] = array();
+				$id_hash[$ghash] = [];
 			}
 
 			// Reference time is in UTC on Usenet but local in our database
@@ -731,7 +731,7 @@ class SpotNab {
 			$id_hash[$ghash][] = $source['id'];
 
 			// Store Source Details
-			$group_hash[$ghash][] = array(
+			$group_hash[$ghash][] = [
 				'id' => $source['id'],
 				'key' => $this->decompstr(trim($source['publickey'])),
 				'user' => trim($source['username']),
@@ -742,14 +742,14 @@ class SpotNab {
 
 				// Store last article reference
 				'article' => $article
-			);
+			];
 		}
 
 		// We want to resort the internal arrays by they're ref time
 		// so that the oldest (longest without an update) is processed
 		// first
 		foreach(array_keys($group_hash) as $key){
-			$_ref = array();
+			$_ref = [];
 			foreach($group_hash[$key] as $id => $source){
 				# Source Time (within reason)
 				if($backfill)
@@ -786,24 +786,6 @@ class SpotNab {
 			printf("Spotnab : %d source(s)...", count($hash));
 
 			$summary = $this->_nntp->selectGroup($group);
-			while(NNTP::isError($summary))
-			{
-				// Reset Connection (This happens first time
-				// around since _nntpReset() will perform
-				// the initial connect if it hasn't been already
-				$summary = $this->_nntpReset($group);
-
-				// Track retry attempts
-				$retries--;
-				if($retries <= 0){
-					// Retry Atempts exausted
-					printf("Spotnab : lost connection...");
-					// Restore handler
-					restore_error_handler();
-					return false;
-				}
-			}
-
 			// Get our article id
 			$first = ($backfill)?0:$group_article_start[$group];
 			if($first == 0){
@@ -883,9 +865,9 @@ class SpotNab {
 					$last,
 					implode(",", $id_hash[$group]));*/
 			$db->queryExec(sprintf('UPDATE spotnabsources '
-					.'SET lastarticle = %d WHERE id IN (%s)',
-					$last,
-					implode(",", $id_hash[$group])));
+				.'SET lastarticle = %d WHERE id IN (%s)',
+				$last,
+				implode(",", $id_hash[$group])));
 			echo "\n";
 		}
 		// Restore handler
@@ -911,14 +893,14 @@ class SpotNab {
 		$offset = 0;
 
 		$fsql = 'SELECT id, name, guid FROM releases '
-				.'WHERE gid IS NULL ORDER BY adddate DESC LIMIT %d,%d';
+			.'WHERE gid IS NULL ORDER BY adddate DESC LIMIT %d,%d';
 		$usql = "UPDATE releases SET gid = '%s' WHERE id = %d";
 
 		while(1){
 			// finish
 			if($limit > 0 && $processed >= $limit)
 				break;
-        	$batch=($limit > 0 && $batch > $limit)?$limit:$batch;
+			$batch=($limit > 0 && $batch > $limit)?$limit:$batch;
 			$res = $db->query(sprintf($fsql, $offset, $batch));
 			if(!$res)break;
 			if(count($res) <= 0)break;
@@ -938,9 +920,9 @@ class SpotNab {
 						$release->deleteSingle(['g' => $r['guid'], 'i' => $r['id']], $this->nzb, $this->releaseImage);
 						// Free the variable in an attempt to recover memory
 						unset($release);
-				        echo '-';
+						echo '-';
 					}else{
-					    // Skip over this one for future fetches
+						// Skip over this one for future fetches
 						$offset++;
 					}
 					continue;
@@ -956,9 +938,9 @@ class SpotNab {
 						$release = new Releases();
 						$release->$release->deleteSingle(['g' => $r['guid'], 'i' => $r['id']], $this->nzb, $this->releaseImage);
 						unset($release);
-				        echo '-';
+						echo '-';
 					}else{
-					    // Skip over this one for future fetches
+						// Skip over this one for future fetches
 						$offset++;
 					}
 					continue;
@@ -985,7 +967,7 @@ class SpotNab {
 				.'AND releases.nzb_guid IS NOT NULL '
 				.'AND releases.gid IS NOT NULL ';*/
 
-        $affected = $db->queryExec(sprintf('UPDATE releasecomment, releases SET releasecomment.gid = releases.gid,
+		$affected = $db->queryExec(sprintf('UPDATE releasecomment, releases SET releasecomment.gid = releases.gid,
 											releasecomment.nzb_guid = releases.nzb_guid
 											WHERE releases.id = releasecomment.releaseid
 											AND releasecomment.gid IS NULL
@@ -1035,27 +1017,27 @@ class SpotNab {
 			if(is_array($keys)){
 				// Force New Username
 				$sql = sprintf("Update settings SET value = %s "
-								."WHERE setting = 'spotnabuser'",
-				$db->escapeString(sprintf("nntp-%s",substr(md5($keys['pubkey']), 0, 4))));
+					."WHERE setting = 'spotnabuser'",
+					$db->escapeString(sprintf("nntp-%s",substr(md5($keys['pubkey']), 0, 4))));
 				$db->queryExec($sql);
 				// Force New Email
 				$sql = sprintf("Update settings SET value = %s "
-								."WHERE setting = 'spotnabemail'",
-				$db->escapeString(sprintf("nntp-%s@%s.com",
-					substr(md5($keys['pubkey']), 4, 8),
-					substr(md5($keys['pubkey']), 8, 16)
-				)));
+					."WHERE setting = 'spotnabemail'",
+					$db->escapeString(sprintf("nntp-%s@%s.com",
+						substr(md5($keys['pubkey']), 4, 8),
+						substr(md5($keys['pubkey']), 8, 16)
+					)));
 				$db->queryExec($sql);
 				// Save Keys
 				$sql = sprintf("Update settings SET value = %s ".
-						"WHERE setting = 'spotnabsitepubkey'",
-						$db->escapeString($keys['pubkey']));
+					"WHERE setting = 'spotnabsitepubkey'",
+					$db->escapeString($keys['pubkey']));
 				$db->queryExec($sql);
 				//echo $keys['pubkey']."\n";
 
 				$sql = sprintf("Update settings SET value = %s ".
-						"WHERE setting = 'spotnabsiteprvkey'",
-						$db->escapeString($keys['prvkey']));
+					"WHERE setting = 'spotnabsiteprvkey'",
+					$db->escapeString($keys['prvkey']));
 				$db->queryExec($sql);
 
 				// Update settings Information
@@ -1077,10 +1059,10 @@ class SpotNab {
 				$this->_pdo->getSetting('spotnabsitepubkey'));
 		}
 
-		return array(
+		return [
 			'pubkey' => $this->_pdo->getSetting('spotnabsitepubkey'),
 			'prvkey' => $this->_pdo->getSetting('spotnabsiteprvkey')
-		);
+		];
 	}
 
 	// ***********************************************************************
@@ -1118,19 +1100,6 @@ class SpotNab {
 
 		while(($retries > 0) && ($interval > 0)){
 			$summary = $this->_nntp->selectGroup($group);
-			if(NNTP::isError($summary))
-			{
-				// Reset Connection
-				$this->_nntpReset();
-
-				// Track retry attempts
-				$retries--;
-				if($retries <= 0){
-					// Retry Atempts exausted
-					break;
-				}
-				continue;
-			}
 
 			$_last = $last = intval($summary['last']);
 			$_first = $first = intval($summary['first']);
@@ -1163,12 +1132,12 @@ class SpotNab {
 						echo " ".(abs($last-$lastid))." record(s) back.";
 						return $lastid;
 					}else{
-					    if (($_last-$last) > $limit){
-					    	// We exceeded our maximum header limit
-					    	// adjust accordingly
-					    	$last = $_last - $limit;
-					    }
-					    echo " ".(abs($_last-$last))." record(s) back.";
+						if (($_last-$last) > $limit){
+							// We exceeded our maximum header limit
+							// adjust accordingly
+							$last = $_last - $limit;
+						}
+						echo " ".(abs($_last-$last))." record(s) back.";
 						return $last;
 					}
 				}
@@ -1208,12 +1177,12 @@ class SpotNab {
 						echo " ".(abs($_last-$lastid))." record(s) back.";
 						return $lastid;
 					}else{
-					    if (($_last-$last) > $limit){
-					    	// We exceeded our maximum header limit
-					    	// adjust accordingly
-					    	$last = $_last - $limit;
-					    }
-					    echo " ".(abs($_last-$last))." record(s) back.";
+						if (($_last-$last) > $limit){
+							// We exceeded our maximum header limit
+							// adjust accordingly
+							$last = $_last - $limit;
+						}
+						echo " ".(abs($_last-$last))." record(s) back.";
 						return $last;
 					}
 				}
@@ -1319,7 +1288,7 @@ class SpotNab {
 
 		if(!count($group_hash)){
 			// Nothing to process
-			return array();
+			return [];
 		}
 
 		//
@@ -1331,14 +1300,14 @@ class SpotNab {
 
 		// Comments
 		$sql_new_cmt = "INSERT INTO releasecomment (".
-			"id, sourceID, username, userid, gid, cid, isvisible, ".
+			"id, sourceid, username, userid, gid, cid, isvisible, ".
 			"releaseid, `text`, createddate, issynced, nzb_guid) VALUES (".
 			"NULL, %d, %s, 0, %s, %s, %d, 0, %s, %s, 1, %s)";
 		$sql_upd_cmt = "UPDATE releasecomment SET ".
 			"isvisible = %d, `text` = %s".
-			"WHERE sourceID = %d AND gid = %s AND cid = %s AND nzb_guid = %s";
+			"WHERE sourceid = %d AND gid = %s AND cid = %s AND nzb_guid = %s";
 		$sql_fnd_cmt = "SELECT count(id) as cnt FROM releasecomment ".
-			"WHERE sourceID = %d AND gid = %s AND cid = %s";
+			"WHERE sourceid = %d AND gid = %s AND cid = %s";
 
 		// Sync Times
 		$sql_sync = "UPDATE spotnabsources SET lastupdate = %s ".
@@ -1393,7 +1362,7 @@ class SpotNab {
 
 				// Scan header information for supported matches
 				if(!preg_match('/^(?P<user>[^<]+)<(?P<email>[^>]+)>$/',
-						$header['From'], $matches))
+					$header['From'], $matches))
 					continue;
 
 				// Match against our sources posts
@@ -1413,7 +1382,7 @@ class SpotNab {
 				if($save){
 					// Download Body
 					$body = $this->_get_body($header['Group'],
-								$header['Message-ID']);
+						$header['Message-ID']);
 					if($body === false){
 						continue;
 					}
@@ -1439,7 +1408,7 @@ class SpotNab {
 					// Compare postdate_utc and ensure it matches header
 					// timestamp
 					if(preg_replace('/[^0-9]/', '',
-						$body['postdate_utc']) != $refdate)
+							$body['postdate_utc']) != $refdate)
 						continue;
 
 					// Comment Handling
@@ -1470,14 +1439,14 @@ class SpotNab {
 							if($res && intval($res['cnt'])>0){
 								// Make some noise
 								echo '.';
-                                $updates += ($db->queryExec(sprintf($sql_upd_cmt,
-									$is_visible,
-									$db->escapeString($comment['comment']),
-									$hash['id'],
-									$db->escapeString($comment['gid']),
-									$db->escapeString($comment['cid']),
+								$updates += ($db->queryExec(sprintf($sql_upd_cmt,
+										$is_visible,
+										$db->escapeString($comment['comment']),
+										$hash['id'],
+										$db->escapeString($comment['gid']),
+										$db->escapeString($comment['cid']),
 										$db->escapeString($comment['gid'])
-								))>0)?1:0;
+									))>0)?1:0;
 							}else{
 								// Make some noise
 								echo '+';
@@ -1491,7 +1460,7 @@ class SpotNab {
 									$db->escapeString($comment['comment']),
 									// Convert createddate to Local
 									$db->escapeString($this->utc2local(
-														$comment['postdate_utc'])),
+										$comment['postdate_utc'])),
 									$db->escapeString($comment['gid'])
 								));
 								$inserts += 1;
@@ -1503,8 +1472,8 @@ class SpotNab {
 					// Update spotnabsources table, set lastupdate to the
 					// timestamp parsed from the header.
 					$db->queryExec(sprintf($sql_sync,
-						$db->escapeString(
-							$this->utc2local($body['postdate_utc'])),
+							$db->escapeString(
+								$this->utc2local($body['postdate_utc'])),
 							$hash['id']
 						)
 					);
@@ -1520,7 +1489,7 @@ class SpotNab {
 				break;
 			}
 		}
-		return array($inserts, $updates);
+		return [$inserts, $updates];
 	}
 
 	// ***********************************************************************
@@ -1551,7 +1520,7 @@ class SpotNab {
 
 		$db = new Settings();
 
-        // Auto Enable Flag (used for inserts only)
+		// Auto Enable Flag (used for inserts only)
 		$auto_enable = ($this->_auto_enable)?"1":"0";
 
 		// Spotnab Sources
@@ -1610,7 +1579,7 @@ class SpotNab {
 
 			// Scan header information for supported matches
 			if(!preg_match('/^(?P<user>[^<]+)<(?P<email>[^>]+)>$/',
-					$header['From'], $matches))
+				$header['From'], $matches))
 				continue;
 
 			// Match against our sources posts
@@ -1630,7 +1599,7 @@ class SpotNab {
 			if($save){
 				// Download Body
 				$body = $this->_get_body($header['Group'],
-							$header['Message-ID']);
+					$header['Message-ID']);
 				if($body === false){
 					continue;
 				}
@@ -1664,7 +1633,7 @@ class SpotNab {
 				// Compare postdate_utc and ensure it matches header
 				// timestamp
 				if(preg_replace('/[^0-9]/', '',
-					$body['postdate_utc']) != $refdate)
+						$body['postdate_utc']) != $refdate)
 					continue;
 
 				$posts = $body['posts'];
@@ -1683,9 +1652,9 @@ class SpotNab {
 
 				// Check that comment doesn't already exist
 				$res = $db->queryOneRow(sprintf($sql_fnd_cmt,
-					$db->escapeString($p_user),
-					$db->escapeString($p_email),
-					$db->escapeString($p_group))
+						$db->escapeString($p_user),
+						$db->escapeString($p_email),
+						$db->escapeString($p_group))
 				);
 
 				if(!$res)
@@ -1698,13 +1667,13 @@ class SpotNab {
 					echo '+';
 					// Perform Insert
 					$res = $db->queryInsert(sprintf($sql_new_cmt,
-						$db->escapeString($p_user),
-						$db->escapeString($p_email),
-						$db->escapeString($p_group),
-						$db->escapeString($p_key),
-						// store user as description for now
-						$db->escapeString($p_user),
-						$db->escapeString($this->utc2local($refdate)))
+							$db->escapeString($p_user),
+							$db->escapeString($p_email),
+							$db->escapeString($p_group),
+							$db->escapeString($p_key),
+							// store user as description for now
+							$db->escapeString($p_user),
+							$db->escapeString($this->utc2local($refdate)))
 					);
 					$inserts += 1;
 				}else{
@@ -1718,7 +1687,7 @@ class SpotNab {
 				}
 			}
 		}
-		return array($inserts, $updates);
+		return [$inserts, $updates];
 	}
 
 	// ***********************************************************************
@@ -1739,27 +1708,9 @@ class SpotNab {
 		do
 		{
 			$raw = $this->_nntp->getBody("<".$id.">", true);
-			if(NNTP::isError($raw))
-			{
-				// Reset Connection (This happens first time
-				// around since _nntpReset() will perform
-				// the initial connect if it hasn't been already
-				$this->_nntpReset($group);
-				// Track retry attempts
-				$retries--;
-				if($retries <= 0){
-					// Retry Atempts exausted
-					printf("%s ERROR - Failed Segment Fetch: %s/%s ...\n",
-						date("Y-m-d H:i:s"), $group, $id);
-					return false;
-				}
-				continue;
-			}
-
 			// Retrieved Data
 			return $raw;
 		}while($retries > 0);
-
 		// Fail
 		return false;
 	}
@@ -1771,7 +1722,7 @@ class SpotNab {
 		*	There is to much involved with fetching article headers
 		*	that bloat and make a lot of code repetative...
 		*	This function returns the headers of the specified range
-		*	in an array() of associative array() always to make life
+		*	in an [] of associative [] always to make life
 		*	easy... alternativly, if this function fails then false
 		*	is returned.
 		*
@@ -1781,33 +1732,23 @@ class SpotNab {
 		*/
 
 		// epoch array is used for sorting fetched results
-		$epoch = array();
+		$epoch = [];
 
 		// Header parsing for associative array returned
-		$min_headers = array('Number', 'Subject', 'From', 'Date',
-							'Message-ID', 'Bytes', 'Lines');
+		$min_headers = ['Number', 'Subject', 'From', 'Date',
+							 'Message-ID', 'Bytes', 'Lines'
+		];
 		do
 		{
 			$msgs = $this->_nntp->getOverview($range, true, false);
-			if(NNTP::isError($msgs))
-			{
-				$this->_nntpReset($group);
-				// Track retry attempts
-				$retries--;
-				if($retries <= 0){
-					// Retry Atempts exausted
-					break;
-				}
-				continue;
-			}
 			// If we get here, then we fetched the header block okay
 
 			// Clean up bad results but don't mark fetch as a failure
 			// just report what it found.. (nothing). We do this because
 			// NNTP::isError() never threw, so the response has to be valid
 			// even though it's inconsistent
-			if(!$msgs)return array();
-			if(!is_array($msgs))return array();
+			if(!$msgs)return [];
+			if(!is_array($msgs))return [];
 
 			// For whatever reason, we sometimes get an array of
 			// associative array returned, and all other times we just
@@ -1816,7 +1757,7 @@ class SpotNab {
 			// simplify the response and make it esier to work with
 			if((bool)count(array_filter(array_keys($msgs), 'is_string'))){
 				// convert to an array of assocative array
-				$msgs = array($msgs);
+				$msgs = [$msgs];
 			}
 
 			for($i=0;$i<count($msgs);$i++){
@@ -1873,14 +1814,14 @@ class SpotNab {
 			$reftime_local = $this->utc2local();
 		}
 		// Header
-		$message = array(
-			'server' => array(
+		$message = [
+			'server' => [
 				'code' => $this->_post_site,
 				'title' => $this->_post_title,
-				),
+			],
 			'postdate_utc' => $this->local2utc($reftime_local),
-			'comments' => array()
-		);
+			'comments' => []
+		];
 
 		// Store Comments
 		while(($data = $this->unPostedComments()) !== Null)
@@ -1889,8 +1830,8 @@ class SpotNab {
 
 			$db = new Settings();
 			$sql = sprintf("UPDATE releasecomment "
-					."SET issynced = 1 WHERE id IN (%s)",
-					implode(",", $data['ids']));
+				."SET issynced = 1 WHERE id IN (%s)",
+				implode(",", $data['ids']));
 
 			// Generate keys if one doesn't exist
 			if(!($this->_ssl_prvkey && $this->_ssl_pubkey))
@@ -2041,19 +1982,14 @@ class SpotNab {
 		{/* do nothing */}
 
 		// Attempt to reconnect
-		try{
-			if (($this->_pdo->getSetting('alternate_nntp') == 1 ? $this->_nntp->doConnect(true, true) : $this->_nntp->doConnect()) !== true) {
+		if (($this->_pdo->getSetting('alternate_nntp') == 1 ? $this->_nntp->doConnect(true, true) : $this->_nntp->doConnect()) !== true) {
 			exit($this->_pdo->log->error("Unable to connect to usenet." . PHP_EOL));
 		}
-		}
-		catch(Exception $e){return false;}
 
 		if($group !== Null)
 		{
 			// Reselect group if specified
 			$summary = $this->_nntp->selectGroup($this->_post_group);
-			if(NNTP::isError($summary))
-				return false;
 			return $summary;
 		}
 		return true;
@@ -2110,9 +2046,9 @@ class SpotNab {
 
 	// ***********************************************************************
 	public function encodePost($message, $reftime=Null, $debug=False,
-								$prvkey=Null, $passphrase=Null, $encrypt=True,
-								$msgtype=SpotNab::FETCH_COMMENT_TYPE,
-								$user=Null, $email=Null, $group=Null) {
+							   $prvkey=Null, $passphrase=Null, $encrypt=True,
+							   $msgtype=SpotNab::FETCH_COMMENT_TYPE,
+							   $user=Null, $email=Null, $group=Null) {
 		/*
 
 		Assembles and encodes a message ready to be posted onto
@@ -2145,7 +2081,7 @@ class SpotNab {
 			// it's in it's assembled mixed array format... we
 			// need to convert it to json before proceeding
 			$message = json_encode($message, JSON_HEX_TAG|JSON_HEX_APOS|
-						JSON_HEX_QUOT|JSON_HEX_AMP|JSON_UNESCAPED_UNICODE);
+				JSON_HEX_QUOT|JSON_HEX_AMP|JSON_UNESCAPED_UNICODE);
 			if($message === false){
 				// Fail
 				return false;
@@ -2211,22 +2147,22 @@ class SpotNab {
 		$header .= 'Content-Transfer-Encoding: 8bit' . "\r\n";
 
 		// Assemble Article in structure NNTP expects
-		$article = array($header, $message);
+		$article = [$header, $message];
 
 		if($debug){
 			// Append some debug data to the article
-			$article[] = array(
+			$article[] = [
 				'Number' => 1234,
 				'Subject' => $subject,
 				'From' => sprintf('%s <%s>', $user, $email),
 				'Date' => date(DATE_RFC822, strtotime(
-								$this->utc2local($reftime))),
+					$this->utc2local($reftime))),
 				'Message-ID' => $msgid,
 				'Bytes' => strlen($message),
 				'Lines' => '1',
 				'Epoch' => strtotime($this->utc2local($reftime)),
 				'Group' => $group
-			);
+			];
 		}
 		return $article;
 	}
@@ -2245,21 +2181,21 @@ class SpotNab {
 
 		// Now we fetch for any new posts since reference point
 		$sql = sprintf("SELECT r.gid, rc.id, rc.text, u.username, "
-				."rc.isvisible, rc.createddate, rc.host "
-				."FROM releasecomment rc "
-				."JOIN releases r ON r.id = rc.releaseid AND rc.releaseid != 0 "
-				."JOIN users u ON rc.userid = u.id AND rc.userid != 0 "
-				."WHERE r.gid IS NOT NULL "
-				."AND sourceID = 0 AND issynced = 0 "
-				."LIMIT %d", $limit);
+			."rc.isvisible, rc.createddate, rc.host "
+			."FROM releasecomment rc "
+			."JOIN releases r ON r.id = rc.releaseid AND rc.releaseid != 0 "
+			."JOIN users u ON rc.userid = u.id AND rc.userid != 0 "
+			."WHERE r.gid IS NOT NULL "
+			."AND sourceid = 0 AND issynced = 0 "
+			."LIMIT %d", $limit);
 
 		$res = $db->query($sql);
 		if(!$res)
 			return Null;
 
 		// Now we prepare a comments array to return with
-		$comments = array();
-		$ids = array();
+		$comments = [];
+		$ids = [];
 
 		foreach($res as $comment){
 			// If we don't have a gid then we can't make the post;
@@ -2285,7 +2221,7 @@ class SpotNab {
 			$ids[] = $comment['id'];
 
 			// Build Comment
-			$comments[] = array(
+			$comments[] = [
 				// Release Global id
 				'gid' => $comment['gid'],
 				// Comment id
@@ -2298,12 +2234,12 @@ class SpotNab {
 				'is_visible' => $comment['isvisible'],
 				// Convert createddate to UTC
 				'postdate_utc' => $this->local2utc($comment['createddate'])
-			);
+			];
 		}
 
 		// Return Results if they are present
 		return (count($comments)>0)?
-			array('comments' => $comments, 'ids' => $ids):Null;
+			['comments' => $comments, 'ids' => $ids] :Null;
 	}
 
 	// ***********************************************************************
@@ -2338,18 +2274,18 @@ class SpotNab {
 
 	// ***********************************************************************
 	private function _keygen($passphrase=Null, $bits=1024,
-							$type=OPENSSL_KEYTYPE_RSA)
+							 $type=OPENSSL_KEYTYPE_RSA)
 	{
 		if(!function_exists('openssl_pkey_new'))
 			return false;
 
 		//Generate Key
 		$res = openssl_pkey_new(
-			array(
+			[
 				'private_key_bits' => $bits,
 				'private_key_type' => $type,
 				'config' => OPENSSL_CFG_PATH
-			)
+			]
 		);
 
 		if ($res === false)
@@ -2360,7 +2296,8 @@ class SpotNab {
 
 		// Get Private Key
 		openssl_pkey_export($res, $prvkey, $passphrase,
-			array('config' => OPENSSL_CFG_PATH));
+			['config' => OPENSSL_CFG_PATH]
+		);
 
 		// Get Public Key
 		$details = openssl_pkey_get_details($res);
@@ -2369,10 +2306,10 @@ class SpotNab {
 		}
 		$pubkey = $details['key'];
 
-		return array(
+		return [
 			'pubkey' => $this->compstr($pubkey),
 			'prvkey' => $this->compstr($prvkey),
-		);
+		];
 	}
 
 	// ***********************************************************************
@@ -2466,18 +2403,18 @@ class SpotNab {
 
 	// ***********************************************************************
 	public function compstr ($str){
-	/*
-	*	Compress a string
-	*/
+		/*
+		*	Compress a string
+		*/
 		$str = @gzcompress($str);
 		return base64_encode($str);
 	}
 
 	// ***********************************************************************
 	public function decompstr ($str){
-	/*
-	*	De-compress a string
-	*/
+		/*
+		*	De-compress a string
+		*/
 		$str = base64_decode($str);
 		return @gzuncompress($str);
 	}
@@ -2486,8 +2423,8 @@ class SpotNab {
 	{
 		$db = new Settings();
 		return $db->query("SELECT id, lastupdate,lastbroadcast, active, description, "
-					."(SELECT count(id) from releasecomment where sourceid = s.id)"
-					." AS comments FROM spotnabsources s");
+			."(SELECT count(id) from releasecomment where sourceid = s.id)"
+			." AS comments FROM spotnabsources s");
 	}
 
 	public function getSourceById($id)
@@ -2501,12 +2438,12 @@ class SpotNab {
 	{
 		$db = new Settings();
 		$sql = sprintf("INSERT INTO spotnabsources "
-				."(description, username, useremail,"
-				." usenetgroup, publickey, active) "
-				."VALUES (%s, %s, %s, %s, %s, 0)",
-				$db->escapeString($description), $db->escapeString($username),
-				$db->escapeString($usermail), $db->escapeString($usenetgroup),
-				$db->escapeString($publickey));
+			."(description, username, useremail,"
+			." usenetgroup, publickey, active) "
+			."VALUES (%s, %s, %s, %s, %s, 0)",
+			$db->escapeString($description), $db->escapeString($username),
+			$db->escapeString($usermail), $db->escapeString($usenetgroup),
+			$db->escapeString($publickey));
 		return $db->queryInsert($sql);
 	}
 
