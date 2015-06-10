@@ -173,7 +173,8 @@ class Releases
 				$this->categorySQL($cat),
 				($maxAge > 0 ? (' AND r.postdate > NOW() - INTERVAL ' . $maxAge . ' DAY ') : ''),
 				(count($excludedCats) ? (' AND r.categoryid NOT IN (' . implode(',', $excludedCats) . ')') : '')
-			)
+			),
+			true, NN_CACHE_EXPIRY_MEDIUM
 		);
 	}
 
