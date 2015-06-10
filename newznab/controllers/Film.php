@@ -1311,12 +1311,12 @@ class Film
 	public function getUpcoming($type, $source = 'rottentomato')
 	{
 		$list = $this->pdo->queryOneRow(
-			sprintf('SELECT * FROM upcoming WHERE source = %s AND typeID = %d', $this->pdo->escapeString($source), $type)
+			sprintf('SELECT * FROM upcoming WHERE source = %s AND typeid = %d', $this->pdo->escapeString($source), $type)
 		);
 		if ($list === false) {
 			$this->updateUpcoming();
 			$list = $this->pdo->queryOneRow(
-				sprintf('SELECT * FROM upcoming WHERE source = %s AND typeID = %d', $this->pdo->escapeString($source), $type)
+				sprintf('SELECT * FROM upcoming WHERE source = %s AND typeid = %d', $this->pdo->escapeString($source), $type)
 			);
 		}
 		return $list;
@@ -1333,7 +1333,7 @@ class Film
 
 		$rt = new \RottenTomato($this->pdo->getSetting('rottentomatokey'));
 
-		if ($rt instanceof \RottenTomato) {
+		if ($rt instanceof RottenTomato) {
 
 			$this->_getRTData('boxoffice', $rt);
 			$this->_getRTData('theaters', $rt);
@@ -1423,7 +1423,7 @@ class Film
 	{
 		return $this->pdo->queryExec(
 			sprintf("
-				INSERT INTO upcoming (source, typeID, info, updateddate)
+				INSERT INTO upcoming (source, typeid, info, updateddate)
 				VALUES (%s, %d, %s, NOW())
 				ON DUPLICATE KEY UPDATE info = %s",
 				$this->pdo->escapeString($source),
