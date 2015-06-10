@@ -60,8 +60,6 @@ class XXX
 			'Settings'     => null,
 		];
 		$options += $defaults;
-		$s = new Sites();
-		$this->site = $s->get();
 
 		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
 		$this->releaseImage = ($options['ReleaseImage'] instanceof \ReleaseImage ? $options['ReleaseImage'] : new \ReleaseImage($this->pdo));
