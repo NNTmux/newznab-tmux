@@ -113,7 +113,7 @@ if ($uid != '') {
 	}
 }
 
-$releases = new \Releases(['Settings' => $page->settings]);
+$releases = new Releases(['Settings' => $page->settings]);
 
 if (isset($_GET['extended']) && $_GET['extended'] == 1) {
 	$page->smarty->assign('extended', '1');
