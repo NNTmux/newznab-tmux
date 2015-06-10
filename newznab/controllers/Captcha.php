@@ -12,11 +12,6 @@ class Captcha {
 	private $pdo;
 
 	/**
-	 * @var \Sites
-	 */
-	private $site;
-
-	/**
 	 * ReCaptcha Site Key from the
 	 * settings database.
 	 *
