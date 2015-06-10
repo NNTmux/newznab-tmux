@@ -49,11 +49,9 @@ class Movie
 	public function __construct($echooutput = false)
 	{
 		$this->echooutput = (NN_ECHOCLI && $echooutput);
-		$s = new \Sites();
-		$site = $s->get();
-		$this->apikey = $site->tmdbkey;
-		$this->lookuplanguage = $site->lookuplanguage;
 		$this->pdo = new Settings();
+		$this->apikey = $this->pdo->getSetting('tmdbkey');
+		$this->lookuplanguage = $this->pdo->getSetting('lookuplanguage');
 		$this->imgSavePath = NN_COVERS . 'movies' . DS;
 	}
 
@@ -793,11 +791,10 @@ class Movie
 	 */
 	public function updateUpcoming()
 	{
-		$s = new Sites();
-		$site = $s->get();
-		if (isset($site->rottentomatokey))
+		$rtkey = $this->pdo->getSetting('rottentomatokey');
+		if (isset($rtkey))
 		{
-			$rt = new RottenTomato($site->rottentomatokey);
+			$rt = new RottenTomato($this->pdo->getSetting('rottentomatokey'));
 
 			$ret = $rt->getMoviesBoxOffice();
 			if ($ret != "")

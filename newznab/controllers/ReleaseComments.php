@@ -131,10 +131,7 @@ class ReleaseComments
 			return false;
 
 		$db = new Settings();
-
-		$site = new Sites();
-		$s = $site->get();
-		if ($s->storeuserips != "1")
+		if ($db->getSetting('storeuserips') != "1")
 			$host = "";
 
 		$comid = $db->queryInsert(sprintf("INSERT INTO releasecomment (releaseid, gid, text, userid, createddate, host) VALUES (%d, %s, %s, %d, now(), %s)", $id, $db->escapeString($gid), $db->escapeString($text), $userid, $db->escapeString($host)));

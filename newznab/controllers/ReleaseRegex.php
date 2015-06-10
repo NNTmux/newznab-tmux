@@ -29,8 +29,6 @@ class ReleaseRegex
 	{
 		$this->regexes = [];
 		$this->pdo = new Settings();
-		$s = new Sites();
-		$this->site = $s->get();
 		$this->tablePerGroup = $this->pdo->getSetting('tablepergroup');
 	}
 

@@ -33,8 +33,6 @@ class TmuxOutput extends Tmux
 	{
 		parent::__construct($pdo);
 
-		$s = new Sites();
-		$site = $s->get();
 		$t = new Tmux();
 		$tmux = $t->get();
 		$this->_git = new \newznab\utility\Git(); // Do not remove the full namespace/ PHP gets confused for some reason without it.

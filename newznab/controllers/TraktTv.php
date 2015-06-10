@@ -1,6 +1,7 @@
 <?php
 
 use newznab\utility\Utility;
+use newznab\db\Settings;
 
 /**
  * Class TraktTv
@@ -24,8 +25,8 @@ Class TraktTv
 		];
 		$options += $defaults;
 
-		$settings = ($options['Settings'] instanceof Sites ? $options['Settings'] : new Sites());
-		$this->APIKEY = $settings->get()->trakttvkey;
+		$settings = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
+		$this->APIKEY = $settings->getSetting('trakttvkey');
 	}
 
 	/**

@@ -98,8 +98,6 @@ Class NZBContents
 		$this->nzb = ($options['NZB'] instanceof \NZB ? $options['NZB'] : new \NZB($this->pdo));
 		$t = new Tmux();
 		$this->tmux = $t->get();
-		$s = new Sites();
-		$this->site = $s->get();
 		$this->lookuppar2 = ($this->tmux->lookuppar2 == 1 ? true : false);
 		$this->alternateNNTP = ($this->pdo->getSetting('alternate_nntp') == 1 ? true : false);
 	}

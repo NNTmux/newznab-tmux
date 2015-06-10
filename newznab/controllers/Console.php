@@ -29,12 +29,10 @@ class Console
 	public function __construct($echooutput=false)
 	{
 		$this->echooutput = (NN_ECHOCLI && $echooutput);
-		$s = new Sites();
-		$site = $s->get();
-		$this->pubkey = $site->amazonpubkey;
-		$this->privkey = $site->amazonprivkey;
-		$this->asstag = $site->amazonassociatetag;
-		$this->pdo = new newznab\db\Settings();
+		$this->pdo = new Settings();
+		$this->pubkey = $this->pdo->getSetting('amazonpubkey');
+		$this->privkey = $this->pdo->getSetting('amazonprivkey');
+		$this->asstag = $this->pdo->getSetting('amazonassociatetag');
 		$this->imgSavePath = WWW_DIR.'covers/console/';
 	}
 

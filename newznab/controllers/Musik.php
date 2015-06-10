@@ -72,8 +72,6 @@ class Musik
 		$options += $defaults;
 
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
-		$s = new Sites();
-		$this->site = $s->get();
 
 		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
 		$this->pubkey = $this->pdo->getSetting('amazonpubkey');

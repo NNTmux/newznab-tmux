@@ -31,8 +31,6 @@ class RequestIDWeb extends RequestID
 	public function __construct(array $options = array())
 	{
 		parent::__construct($options);
-		$s = new Sites();
-		$this->site = $s->get();
 		$this->_request_hours = ($this->pdo->getSetting('request_hours') != '') ? (int)$this->pdo->getSetting('request_hours') : 1;
 	}
 

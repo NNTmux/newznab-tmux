@@ -15,8 +15,6 @@ class Tmux
 	function __construct(Settings $pdo = null)
 	{
 		$this->pdo = (empty($pdo) ? new Settings() : $pdo);
-		$s = new Sites;
-		$this->site = $s->get();
 	}
 
 	public function version()

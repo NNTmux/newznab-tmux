@@ -106,8 +106,6 @@ class Backfill
 		$this->_nntp = ($options['NNTP'] instanceof \NNTP
 			? $options['NNTP'] : new \NNTP(['Settings' => $this->pdo])
 		);
-		$s = new Sites();
-		$this->site = $s->get();
 
 		$this->_debug = (NN_LOGGING || NN_DEBUG);
 		if ($this->_debug) {

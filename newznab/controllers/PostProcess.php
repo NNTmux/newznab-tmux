@@ -29,8 +29,6 @@ class PostProcess
 	public function __construct($echooutput = false)
 	{
 		$this->echooutput = (NN_ECHOCLI && $echooutput);;
-		$s = new \Sites();
-		$this->site = $s->get();
 		$this->pdo = new Settings();
 		$this->mediafileregex = 'AVI|VOB|MKV|MP4|TS|WMV|MOV|M4V|F4V|MPG|MPEG|M2TS';
 		$this->audiofileregex = 'MP3|AAC|OGG';

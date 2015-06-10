@@ -145,8 +145,6 @@ class Film
 		$options += $defaults;
 
 		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
-		$s = new Sites();
-		$this->site = $s->get();
 		$this->releaseImage = ($options['ReleaseImage'] instanceof \ReleaseImage ? $options['ReleaseImage'] : new \ReleaseImage($this->pdo));
 
 		$this->lookuplanguage = ($this->pdo->getSetting('lookuplanguage') != '') ? (string)$this->pdo->getSetting('lookuplanguage') : 'en';

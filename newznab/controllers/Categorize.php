@@ -48,8 +48,6 @@ class Categorize extends Category
 	public function __construct(array $options = array())
 	{
 		//parent::__construct($options);
-		$s = new Sites();
-		$this->site = $s->get();
 		$this->pdo = new newznab\db\Settings();
 		$this->categorizeForeign = ($this->pdo->getSetting('categorizeforeign') == "0") ? false : true;
 		$this->catWebDL = ($this->pdo->getSetting('catwebdl') == "0") ? false : true;

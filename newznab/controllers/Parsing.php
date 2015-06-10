@@ -33,8 +33,6 @@ class Parsing
 		$this->parsprocessed = 0;
 		$this->releasefilesprocessed = 0;
 		$this->cleanup = ['nuke' => [], 'misc' => []];
-		$s = new Sites();
-		$this->site = $s->get();
 		$this->pdo = new newznab\db\Settings();
 	}
 

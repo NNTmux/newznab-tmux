@@ -108,8 +108,6 @@ class NNTP extends Net_NNTP_Client
 		$this->_echo = ($options['Echo'] && NN_ECHOCLI);
 
 		$this->pdo = ($options['Settings'] instanceof \newznab\db\Settings ? $options['Settings'] : new \newznab\db\Settings());
-		$s = new Sites();
-		$this->site = $s->get();
 
 		$this->_debugBool = (NN_LOGGING || NN_DEBUG);
 		if ($this->_debugBool) {
