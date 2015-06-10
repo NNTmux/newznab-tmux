@@ -6,8 +6,6 @@ $category = new Category;
 $sab = new SABnzbd($page);
 $nzbGet = new NZBGet($page);
 $page->users = new Users();
-$s = new Sites();
-$site = $s->get();
 
 if (!$page->users->isLoggedIn())
 	$page->show403();
@@ -85,7 +83,7 @@ switch ($action) {
 					$_POST['style']
 				);
 
-				$_POST['exccat'] = (!isset($_POST['exccat']) || !is_array($_POST['exccat'])) ? array() : $_POST['exccat'];
+				$_POST['exccat'] = (!isset($_POST['exccat']) || !is_array($_POST['exccat'])) ? [] : $_POST['exccat'];
 				$page->users->addCategoryExclusions($userid, $_POST['exccat']);
 
 				if ($_POST['password'] != "")
@@ -101,7 +99,7 @@ switch ($action) {
 	default:
 		break;
 }
-if ($site->userselstyle ==1) {
+if ($page->settings->getSetting('userselstyle') ==1) {
 // Get the list of themes.
 	$themeList[] = 'None';
 	$themes = scandir(NN_WWW . '/templates');
@@ -121,34 +119,34 @@ $page->smarty->assign('userexccat', $page->users->getCategoryExclusion($userid))
 $page->smarty->assign('saburl_selected', $sab->url);
 $page->smarty->assign('sabapikey_selected', $sab->apikey);
 
-$page->smarty->assign('sabapikeytype_ids', array(SABnzbd::API_TYPE_NZB, SABnzbd::API_TYPE_FULL));
-$page->smarty->assign('sabapikeytype_names', array('Nzb Api Key', 'Full Api Key'));
+$page->smarty->assign('sabapikeytype_ids', [SABnzbd::API_TYPE_NZB, SABnzbd::API_TYPE_FULL]);
+$page->smarty->assign('sabapikeytype_names', ['Nzb Api Key', 'Full Api Key']);
 $page->smarty->assign('sabapikeytype_selected', ($sab->apikeytype == '') ? SABnzbd::API_TYPE_NZB : $sab->apikeytype);
 
-$page->smarty->assign('sabpriority_ids', array(SABnzbd::PRIORITY_FORCE, SABnzbd::PRIORITY_HIGH, SABnzbd::PRIORITY_NORMAL, SABnzbd::PRIORITY_LOW, SABnzbd::PRIORITY_PAUSED));
-$page->smarty->assign('sabpriority_names', array('Force', 'High', 'Normal', 'Low', 'Paused'));
+$page->smarty->assign('sabpriority_ids', [SABnzbd::PRIORITY_FORCE, SABnzbd::PRIORITY_HIGH, SABnzbd::PRIORITY_NORMAL, SABnzbd::PRIORITY_LOW, SABnzbd::PRIORITY_PAUSED]);
+$page->smarty->assign('sabpriority_names', ['Force', 'High', 'Normal', 'Low', 'Paused']);
 $page->smarty->assign('sabpriority_selected', ($sab->priority == '') ? SABnzbd::PRIORITY_NORMAL : $sab->priority);
 
-$page->smarty->assign('sabsetting_ids', array(1, 2));
-$page->smarty->assign('sabsetting_names', array('Site', 'Cookie'));
+$page->smarty->assign('sabsetting_ids', [1, 2]);
+$page->smarty->assign('sabsetting_names', ['Site', 'Cookie']);
 $page->smarty->assign('sabsetting_selected', ($sab->checkCookie() === true ? 2 : 1));
 
 switch ($sab->integrated) {
 	case SABnzbd::INTEGRATION_TYPE_USER:
-		$queueTypes = array('None', 'Sabnzbd', 'NZBGet');
-		$queueTypeIDs = array(Users::QUEUE_NONE, Users::QUEUE_SABNZBD, Users::QUEUE_NZBGET);
+		$queueTypes = ['None', 'Sabnzbd', 'NZBGet'];
+		$queueTypeIDs = [Users::QUEUE_NONE, Users::QUEUE_SABNZBD, Users::QUEUE_NZBGET];
 		break;
 	case SABnzbd::INTEGRATION_TYPE_SITEWIDE:
 	case SABnzbd::INTEGRATION_TYPE_NONE:
-		$queueTypes = array('None', 'NZBGet');
-		$queueTypeIDs = array(Users::QUEUE_NONE, Users::QUEUE_NZBGET);
+		$queueTypes = ['None', 'NZBGet'];
+		$queueTypeIDs = [Users::QUEUE_NONE, Users::QUEUE_NZBGET];
 		break;
 }
 
-$page->smarty->assign(array(
+$page->smarty->assign([
 		'queuetypes'   => $queueTypes,
 		'queuetypeids' => $queueTypeIDs
-	)
+	]
 );
 
 $page->meta_title = "Edit User Profile";
