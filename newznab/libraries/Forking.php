@@ -1094,5 +1094,3 @@ class Forking extends \fork_daemon
 	private $processMovies = false;     // Should we process Movies?
 	private $processTV = false;         // Should we process TV?
 }
-
-class ForkingException extends \Exception {}

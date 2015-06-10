@@ -87,8 +87,6 @@ class Captcha {
 		$options += $defaults;
 
 		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
-		$s = new \Sites();
-		$this->site = $s->get();
 	}
 
 	/**
