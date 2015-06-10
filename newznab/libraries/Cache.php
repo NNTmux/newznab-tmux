@@ -331,12 +331,3 @@ class Cache
 	}
 
 }
-
-/**
- * Class CacheException
- *
- * @package newznab\libraries
- */
-class CacheException extends \Exception
-{
-}
