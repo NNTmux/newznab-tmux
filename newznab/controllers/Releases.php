@@ -114,8 +114,8 @@ class Releases
 			sprintf(
 				'SELECT r.*, g.name AS group_name, c.title AS category_name
 				FROM releases r
-				INNER JOIN category c ON c.id = r.categoryid
-				INNER JOIN groups g ON g.id = r.groupid
+				LEFT JOIN category c ON c.id = r.categoryid
+				LEFT JOIN groups g ON g.id = r.groupid
 				WHERE r.nzbstatus = %d',
 				NZB::NZB_ADDED
 			)
@@ -136,8 +136,8 @@ class Releases
 			sprintf(
 				"SELECT r.*, CONCAT(cp.title, ' > ', c.title) AS category_name
 				FROM releases r
-				INNER JOIN category c ON c.id = r.categoryid
-				INNER JOIN category cp ON cp.id = c.parentid
+				LEFT JOIN category c ON c.id = r.categoryid
+				LEFT JOIN category cp ON cp.id = c.parentid
 				WHERE r.nzbstatus = %d
 				ORDER BY r.postdate DESC %s",
 				NZB::NZB_ADDED,
@@ -166,7 +166,7 @@ class Releases
 				WHERE r.nzbstatus = %d
 				AND r.passwordstatus %s
 				%s %s %s %s',
-				($groupName != '' ? 'INNER JOIN groups g ON g.id = r.groupid' : ''),
+				($groupName != '' ? 'LEFT JOIN groups g ON g.id = r.groupid' : ''),
 				NZB::NZB_ADDED,
 				$this->showPasswords(),
 				($groupName != '' ? sprintf(' AND g.name = %s', $this->pdo->escapeString($groupName)) : ''),
@@ -193,8 +193,7 @@ class Releases
 	public function getBrowseRange($cat, $start, $num, $orderBy, $maxAge = -1, $excludedCats = [], $groupName = '')
 	{
 		$orderBy = $this->getBrowseOrder($orderBy);
-		return $this->pdo->query(
-			sprintf(
+		$q =	sprintf(
 				"SELECT r.*,
 					CONCAT(cp.title, ' > ', c.title) AS category_name,
 					CONCAT(cp.id, ',', c.id) AS category_ids,
@@ -202,11 +201,11 @@ class Releases
 					rn.id AS nfoid,
 					re.releaseid AS reid
 				FROM releases r
-				STRAIGHT_JOIN groups g ON g.id = r.groupid
-				STRAIGHT_JOIN category c ON c.id = r.categoryid
-				INNER JOIN category cp ON cp.id = c.parentid
-				LEFT OUTER JOIN releasevideo re ON re.releaseid = r.id
-				LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
+				LEFT JOIN groups g ON g.id = r.groupid
+				LEFT JOIN category c ON c.id = r.categoryid
+				LEFT JOIN category cp ON cp.id = c.parentid
+				LEFT JOIN releasevideo re ON re.releaseid = r.id
+				LEFT JOIN releasenfo rn ON rn.releaseid = r.id
 				AND rn.nfo IS NOT NULL
 				WHERE r.nzbstatus = %d
 				AND r.passwordstatus %s
@@ -221,7 +220,10 @@ class Releases
 				$orderBy[0],
 				$orderBy[1],
 				($start === false ? '' : ' LIMIT ' . $num . ' OFFSET ' . $start)
-			),
+			);
+		return $this->pdo->query(
+			$q
+			,
 			true, NN_CACHE_EXPIRY_MEDIUM
 		);
 	}
@@ -332,9 +334,9 @@ class Releases
 			sprintf(
 				"SELECT searchname, guid, groups.name AS gname, CONCAT(cp.title,'_',category.title) AS catName
 				FROM releases r
-				INNER JOIN category ON r.categoryid = category.id
-				INNER JOIN groups ON r.groupid = groups.id
-				INNER JOIN category cp ON cp.id = category.parentid
+				LEFT JOIN category ON r.categoryid = category.id
+				LEFT JOIN groups ON r.groupid = groups.id
+				LEFT JOIN category cp ON cp.id = category.parentid
 				WHERE r.nzbstatus = %d
 				%s %s %s",
 				NZB::NZB_ADDED,
@@ -409,7 +411,7 @@ class Releases
 		$groups = $this->pdo->query(
 			'SELECT DISTINCT g.id, g.name
 			FROM releases r
-			INNER JOIN groups g ON g.id = r.groupid'
+			LEFT JOIN groups g ON g.id = r.groupid'
 		);
 		$temp_array = [];
 
@@ -443,7 +445,7 @@ class Releases
 
 		if (count($cat)) {
 			if ($cat[0] == -2) {
-				$cartSearch = sprintf(' INNER JOIN usercart ON usercart.userid = %d AND usercart.releaseid = r.id ', $userID);
+				$cartSearch = sprintf(' LEFT JOIN usercart ON usercart.userid = %d AND usercart.releaseid = r.id ', $userID);
 			} else if ($cat[0] != -1) {
 				$catSearch = ' AND (';
 				$Category = new Category(['Settings' => $this->pdo]);
@@ -482,14 +484,14 @@ class Releases
 					co.publisher AS co_publisher, co.releasedate AS co_releasedate,
 					co.review AS co_review, co.cover AS co_cover, cog.title AS co_genre
 				FROM releases r
-				INNER JOIN category c ON c.id = r.categoryid
-				INNER JOIN category cp ON cp.id = c.parentid
-				INNER JOIN groups g ON g.id = r.groupid
-				LEFT OUTER JOIN movieinfo m ON m.imdbid = r.imdbid AND m.title != ''
-				LEFT OUTER JOIN musicinfo mu ON mu.id = r.musicinfoid
-				LEFT OUTER JOIN genres mug ON mug.id = mu.genreid
-				LEFT OUTER JOIN consoleinfo co ON co.id = r.consoleinfoid
-				LEFT OUTER JOIN genres cog ON cog.id = co.genreid %s
+				LEFT JOIN category c ON c.id = r.categoryid
+				LEFT JOIN category cp ON cp.id = c.parentid
+				LEFT JOIN groups g ON g.id = r.groupid
+				LEFT   JOIN movieinfo m ON m.imdbid = r.imdbid AND m.title != ''
+				LEFT   JOIN musicinfo mu ON mu.id = r.musicinfoid
+				LEFT   JOIN genres mug ON mug.id = mu.genreid
+				LEFT   JOIN consoleinfo co ON co.id = r.consoleinfoid
+				LEFT   JOIN genres cog ON cog.id = co.genreid %s
 				WHERE r.passwordstatus %s
 				AND r.nzbstatus = %d
 				%s %s %s %s
@@ -525,10 +527,10 @@ class Releases
 					CONCAT(cp.id, ',', c.id) AS category_ids,
 					COALESCE(cp.id,0) AS parentCategoryid
 				FROM releases r
-				INNER JOIN category c ON c.id = r.categoryid
-				INNER JOIN category cp ON cp.id = c.parentid
-				INNER JOIN groups g ON g.id = r.groupid
-				LEFT OUTER JOIN tvrage tvr ON tvr.rageid = r.rageid
+				LEFT JOIN category c ON c.id = r.categoryid
+				LEFT JOIN category cp ON cp.id = c.parentid
+				LEFT JOIN groups g ON g.id = r.groupid
+				LEFT   JOIN tvrage tvr ON tvr.rageid = r.rageid
 				WHERE %s %s %s
 				AND r.nzbstatus = %d
 				AND r.categoryid BETWEEN 5000 AND 5999
@@ -562,10 +564,10 @@ class Releases
 					CONCAT(cp.id, ',', c.id) AS category_ids,
 					COALESCE(cp.id,0) AS parentCategoryid
 				FROM releases r
-				INNER JOIN category c ON c.id = r.categoryid
-				INNER JOIN category cp ON cp.id = c.parentid
-				INNER JOIN groups g ON g.id = r.groupid
-				LEFT OUTER JOIN movieinfo mi ON mi.imdbid = r.imdbid
+				LEFT JOIN category c ON c.id = r.categoryid
+				LEFT JOIN category cp ON cp.id = c.parentid
+				LEFT JOIN groups g ON g.id = r.groupid
+				LEFT   JOIN movieinfo mi ON mi.imdbid = r.imdbid
 				WHERE %s %s
 				AND r.nzbstatus = %d
 				AND r.categoryid BETWEEN 2000 AND 2999
@@ -601,11 +603,11 @@ class Releases
 					CONCAT(cp.id, ',', c.id) AS category_ids, groups.name AS group_name,
 					rn.id AS nfoid, re.releaseid AS reid
 				FROM releases r
-				LEFT OUTER JOIN releasevideo re ON re.releaseid = r.id
-				INNER JOIN groups ON groups.id = r.groupid
-				LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id AND rn.nfo IS NOT NULL
-				INNER JOIN category c ON c.id = r.categoryid
-				INNER JOIN category cp ON cp.id = c.parentid
+				LEFT JOIN releasevideo re ON re.releaseid = r.id
+				LEFT JOIN groups ON groups.id = r.groupid
+				LEFT JOIN releasenfo rn ON rn.releaseid = r.id AND rn.nfo IS NOT NULL
+				LEFT JOIN category c ON c.id = r.categoryid
+				LEFT JOIN category cp ON cp.id = c.parentid
 				WHERE %s %s
 				AND r.nzbstatus = %d
 				AND r.categoryid BETWEEN 5000 AND 5999
@@ -718,14 +720,14 @@ class Releases
 			sprintf('
 				DELETE r, rn, rc, uc, rf, ra, rs, rv, re
 				FROM releases r
-				LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
-				LEFT OUTER JOIN releasecomment rc ON rc.releaseid = r.id
-				LEFT OUTER JOIN usercart uc ON uc.releaseid = r.id
-				LEFT OUTER JOIN releasefiles rf ON rf.releaseid = r.id
-				LEFT OUTER JOIN releaseaudio ra ON ra.releaseid = r.id
-				LEFT OUTER JOIN releasesubs rs ON rs.releaseid = r.id
-				LEFT OUTER JOIN releasevideo rv ON rv.releaseid = r.id
-				LEFT OUTER JOIN releaseextrafull re ON re.releaseid = r.id
+				LEFT   JOIN releasenfo rn ON rn.releaseid = r.id
+				LEFT   JOIN releasecomment rc ON rc.releaseid = r.id
+				LEFT   JOIN usercart uc ON uc.releaseid = r.id
+				LEFT   JOIN releasefiles rf ON rf.releaseid = r.id
+				LEFT   JOIN releaseaudio ra ON ra.releaseid = r.id
+				LEFT   JOIN releasesubs rs ON rs.releaseid = r.id
+				LEFT   JOIN releasevideo rv ON rv.releaseid = r.id
+				LEFT   JOIN releaseextrafull re ON re.releaseid = r.id
 				WHERE r.guid = %s',
 				$this->pdo->escapeString($identifiers['g'])
 			)
@@ -893,7 +895,12 @@ class Releases
 					}
 				}
 			}
-			$sql .= '1=2 )';
+			$sql .= ' )';
+			$sql = substr($sql,0,-6).")";
+
+			//echo $sql;
+			//die();
+			//$sql .= '1=2 )';
 		}
 
 		return $sql;
@@ -1002,11 +1009,11 @@ class Releases
 				re.releaseid AS reid,
 				cp.id AS categoryparentid
 			FROM releases r
-			LEFT OUTER JOIN releasevideo re ON re.releaseid = r.id
-			LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
-			INNER JOIN groups ON groups.id = r.groupid
-			INNER JOIN category c ON c.id = r.categoryid
-			INNER JOIN category cp ON cp.id = c.parentid
+			LEFT   JOIN releasevideo re ON re.releaseid = r.id
+			LEFT   JOIN releasenfo rn ON rn.releaseid = r.id
+			LEFT JOIN groups ON groups.id = r.groupid
+			LEFT JOIN category c ON c.id = r.categoryid
+			LEFT JOIN category cp ON cp.id = c.parentid
 			%s",
 			$whereSql
 		);
@@ -1046,7 +1053,7 @@ class Releases
 	{
 		$whereSql = sprintf(
 			"%s
-			WHERE r.categoryid BETWEEN 5000 AND 5999
+			WHERE r.categoryid > 5000 AND r.categoryid < 5999
 			AND r.nzbstatus = %d
 			AND r.passwordstatus %s %s %s %s %s %s %s",
 			($name !== '' ? $this->releaseSearch->getFullTextJoinString() : ''),
@@ -1068,11 +1075,11 @@ class Releases
 				rn.id AS nfoid,
 				re.releaseid AS reid
 			FROM releases r
-			INNER JOIN category c ON c.id = r.categoryid
-			INNER JOIN groups ON groups.id = r.groupid
-			LEFT OUTER JOIN releasevideo re ON re.releaseid = r.id
-			LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id AND rn.nfo IS NOT NULL
-			INNER JOIN category cp ON cp.id = c.parentid
+			LEFT JOIN category c ON c.id = r.categoryid
+			LEFT JOIN groups ON groups.id = r.groupid
+			LEFT   JOIN releasevideo re ON re.releaseid = r.id
+			LEFT   JOIN releasenfo rn ON rn.releaseid = r.id AND rn.nfo IS NOT NULL
+			LEFT JOIN category cp ON cp.id = c.parentid
 			%s",
 			$whereSql
 		);
@@ -1125,10 +1132,10 @@ class Releases
 				groups.name AS group_name,
 				rn.id AS nfoid
 			FROM releases r
-			INNER JOIN category c ON c.id = r.categoryid
-			INNER JOIN groups ON groups.id = r.groupid
-			LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id AND rn.nfo IS NOT NULL
-			INNER JOIN category cp ON cp.id = c.parentid
+			LEFT JOIN category c ON c.id = r.categoryid
+			LEFT JOIN groups ON groups.id = r.groupid
+			LEFT   JOIN releasenfo rn ON rn.releaseid = r.id AND rn.nfo IS NOT NULL
+			LEFT JOIN category cp ON cp.id = c.parentid
 			%s",
 			$whereSql
 		);
@@ -1182,10 +1189,10 @@ class Releases
 				g.name AS group_name,
 				rn.id AS nfoid
 			FROM releases r
-			INNER JOIN groups g ON g.id = r.groupid
-			INNER JOIN category c ON c.id = r.categoryid
-			LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id AND rn.nfo IS NOT NULL
-			INNER JOIN category cp ON cp.id = c.parentid
+			LEFT JOIN groups g ON g.id = r.groupid
+			LEFT JOIN category c ON c.id = r.categoryid
+			LEFT   JOIN releasenfo rn ON rn.releaseid = r.id AND rn.nfo IS NOT NULL
+			LEFT JOIN category cp ON cp.id = c.parentid
 			%s",
 			$whereSql
 		);
@@ -1287,9 +1294,9 @@ class Releases
 		$sql = sprintf(
 			"SELECT r.*, CONCAT(cp.title, ' > ', c.title) AS category_name, CONCAT(cp.id, ',', c.id) AS category_ids,
 				g.name AS group_name FROM releases r
-			INNER JOIN groups g ON g.id = r.groupid
-			INNER JOIN category c ON c.id = r.categoryid
-			INNER JOIN category cp ON cp.id = c.parentid
+			LEFT JOIN groups g ON g.id = r.groupid
+			LEFT JOIN category c ON c.id = r.categoryid
+			LEFT JOIN category cp ON cp.id = c.parentid
 			WHERE %s",
 			$gSql
 		);
@@ -1358,9 +1365,9 @@ class Releases
 				"SELECT r.*, CONCAT(cp.title, ' > ', c.title) AS category_name,
 				groups.name AS group_name
 				FROM releases r
-				INNER JOIN groups ON groups.id = r.groupid
-				INNER JOIN category c ON c.id = r.categoryid
-				INNER JOIN category cp ON cp.id = c.parentid
+				LEFT JOIN groups ON groups.id = r.groupid
+				LEFT JOIN category c ON c.id = r.categoryid
+				LEFT JOIN category cp ON cp.id = c.parentid
 				WHERE r.categoryid BETWEEN 5000 AND 5999
 				AND r.passwordstatus %s
 				AND rageid = %d %s %s",
@@ -1417,7 +1424,7 @@ class Releases
 			sprintf(
 				'SELECT r.*, g.name AS group_name
 				FROM releases r
-				INNER JOIN groups g ON g.id = r.groupid
+				LEFT JOIN groups g ON g.id = r.groupid
 				WHERE r.id = %d',
 				$id
 			)
@@ -1490,8 +1497,8 @@ class Releases
 		return $this->pdo->query(
 			"SELECT CONCAT(cp.title, ' > ', category.title) AS title, COUNT(*) AS count
 			FROM category
-			INNER JOIN category cp on cp.id = category.parentid
-			INNER JOIN releases r ON r.categoryid = category.id
+			LEFT JOIN category cp on cp.id = category.parentid
+			LEFT JOIN releases r ON r.categoryid = category.id
 			WHERE r.adddate > NOW() - INTERVAL 1 WEEK
 			GROUP BY concat(cp.title, ' > ', category.title)
 			ORDER BY COUNT(*) DESC"
@@ -1510,7 +1517,7 @@ class Releases
 				postdate, categoryid, comments, grabs,
 				m.cover
 			FROM releases r
-			INNER JOIN movieinfo m USING (imdbid)
+			LEFT JOIN movieinfo m USING (imdbid)
 			WHERE r.categoryid BETWEEN 2000 AND 2999
 			AND m.imdbid > 0
 			AND m.cover = 1
@@ -1532,7 +1539,7 @@ class Releases
 				r.postdate, r.categoryid, r.comments, r.grabs,
 				xxx.cover, xxx.title
 			FROM releases r
-			INNER JOIN xxxinfo xxx ON r.xxxinfo_id = xxx.id
+			LEFT JOIN xxxinfo xxx ON r.xxxinfo_id = xxx.id
 			WHERE r.categoryid BETWEEN 6000 AND 6999
 			AND xxx.id > 0
 			AND xxx.cover = 1
@@ -1554,7 +1561,7 @@ class Releases
 				r.postdate, r.categoryid, r.comments, r.grabs,
 				con.cover
 			FROM releases r
-			INNER JOIN consoleinfo con ON r.consoleinfoid = con.id
+			LEFT JOIN consoleinfo con ON r.consoleinfoid = con.id
 			WHERE r.categoryid BETWEEN 1000 AND 1999
 			AND con.id > 0
 			AND con.cover > 0
@@ -1576,7 +1583,7 @@ class Releases
 				r.postdate, r.categoryid, r.comments, r.grabs,
 				gi.cover
 			FROM releases r
-			INNER JOIN gamesinfo gi ON r.gamesinfo_id = gi.id
+			LEFT JOIN gamesinfo gi ON r.gamesinfo_id = gi.id
 			WHERE r.categoryid = 4050
 			AND gi.id > 0
 			AND gi.cover > 0
@@ -1598,7 +1605,7 @@ class Releases
 				r.postdate, r.categoryid, r.comments, r.grabs,
 				m.cover
 			FROM releases r
-			INNER JOIN musicinfo m ON r.musicinfoid = m.id
+			LEFT JOIN musicinfo m ON r.musicinfoid = m.id
 			WHERE r.categoryid BETWEEN 3000 AND 3999
 			AND r.categoryid != 3030
 			AND m.id > 0
@@ -1621,7 +1628,7 @@ class Releases
 				r.postdate, r.categoryid, r.comments, r.grabs,
 				b.url,	b.cover, b.title as booktitle, b.author
 			FROM releases r
-			INNER JOIN bookinfo b ON r.bookinfoid = b.id
+			LEFT JOIN bookinfo b ON r.bookinfoid = b.id
 			WHERE r.categoryid BETWEEN 7000 AND 7999
 			OR r.categoryid = 3030
 			AND b.id > 0
@@ -1644,7 +1651,7 @@ class Releases
 				r.postdate, r.categoryid, r.comments, r.grabs,
 				tv.id as tvid, tv.imgdata, tv.releasetitle as tvtitle
 			FROM releases r
-			INNER JOIN tvrage tv USING (rageid)
+			LEFT JOIN tvrage tv USING (rageid)
 			WHERE r.categoryid BETWEEN 5000 AND 5999
 			AND tv.rageid > 0
 			AND length(tv.imgdata) > 0
