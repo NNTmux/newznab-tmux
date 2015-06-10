@@ -79,6 +79,7 @@ class Books
 
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
 		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
+
 		$this->pubkey = $this->pdo->getSetting('amazonpubkey');
 		$this->privkey = $this->pdo->getSetting('amazonprivkey');
 		$this->asstag = $this->pdo->getSetting('amazonassociatetag');

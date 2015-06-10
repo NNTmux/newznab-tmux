@@ -7,6 +7,9 @@ use newznab\db\Settings;
  */
 class NZB
 {
+
+	const NZB_NONE  = 0; // Release has no NZB file yet.
+	const NZB_ADDED = 1; // Release had an NZB file created.
 	/**
 	 * Default constructor.
 	 *

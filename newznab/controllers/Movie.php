@@ -760,7 +760,7 @@ class Movie
 	 */
 	public function parseMovieName($releasename)
 	{
-		$cat = new Categorize;
+		$cat = new Category;
 		if (!$cat->isMovieForeign($releasename))
 		{
 			preg_match('/^(?P<name>.*)[\.\-_\( ](?P<year>19\d{2}|20\d{2})/i', $releasename, $matches);
@@ -791,11 +791,10 @@ class Movie
 	 */
 	public function updateUpcoming()
 	{
-		$site = new Settings();
-		$rtkey = $site->getSetting('rottentomatokey');
+		$rtkey = $this->pdo->getSetting('rottentomatokey');
 		if (isset($rtkey))
 		{
-			$rt = new RottenTomato($site->getSetting('rottentomatokey'));
+			$rt = new RottenTomato($this->pdo->getSetting('rottentomatokey'));
 
 			$ret = $rt->getMoviesBoxOffice();
 			if ($ret != "")

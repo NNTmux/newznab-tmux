@@ -659,7 +659,7 @@ class Parsing
 								//Lookup name via reqid (filename)
 								if (preg_match('/\.(avi|mkv|mp4|mov|wmv|iso|img|gcm|ps3|wad|ac3|nds|bin|cue|mdf)/i', $rarFile))
 								{
-									$this->site->reqidurl;
+									$this->pdo->getSetting('reqidurl;
 									$lookupUrl = 'http://allfilled/query.php?t=alt.binaries.srrdb&reqid='.urlencode(basename($rarFile));
 									echo '-lookup: '.$lookupUrl."\n";
 									$xml = Utility::getUrl(['url' => $lookupUrl]);

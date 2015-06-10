@@ -33,7 +33,7 @@ class Console
 		$this->pubkey = $this->pdo->getSetting('amazonpubkey');
 		$this->privkey = $this->pdo->getSetting('amazonprivkey');
 		$this->asstag = $this->pdo->getSetting('amazonassociatetag');
-		$this->imgSavePath = NN_COVERS . 'console' . DS;
+		$this->imgSavePath = WWW_DIR.'covers/console/';
 	}
 
 	/**
