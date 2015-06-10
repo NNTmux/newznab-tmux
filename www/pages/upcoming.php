@@ -17,7 +17,7 @@ $page->smarty->assign('cpurl', $cpurl);
 
 $data = $m->getUpcoming($_GET["id"]);
 //print_r(json_decode($data["info"])->movies);die();
-if ($data["info"] == "") {
+if (!$data || $data["info"] == "") {
 	$page->smarty->assign("nodata", "No upcoming data.");
 } else {
 	$data = json_decode($data["info"]);
