@@ -189,7 +189,7 @@ jQuery(function ($) {
             var $sabIcon = $(row).parent().parent().children('td.icons').children('.icon_sab');
             var guid = $(row).val();
             if (guid && !$sabIcon.hasClass('icon_sab_clicked')) {
-                var nzburl = SERVERROOT + "sendtosab/" + guid;
+                var nzburl = SERVERROOT + "sendtoqueue/" + guid;
                 $.post( nzburl, function(resp){
                     $sabIcon.addClass('icon_sab_clicked').attr('title','Added to Queue');
                     $.pnotify({
