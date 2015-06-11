@@ -38,7 +38,7 @@ jQuery(function ($) {
     });
 
     $('.nzb_check_all').change(function () {
-        $('table.browsetable tr td input:checkbox').prop('checked', $(this).prop('checked'));
+        $('table#browsetable tr td input:checkbox').prop('checked', $(this).prop('checked'));
     });
 
     $('.nzb_check_all_season').change(function () {
@@ -155,15 +155,15 @@ jQuery(function ($) {
 
     /* nzb_multi_operations_form */
     $('#nzb_multi_operations_form').submit(function(){return false;});
-    $('button.nzb_multi_operations_download').click(function(){
-        var newFormName = 'nzbmulti' + Math.round(+new Date()/1000);
-        var newForm = $("<form />", {'action': SERVERROOT + 'getnzb?zip=1', 'method':'post', 'target': '_top', 'id':newFormName});
-        $("table.data INPUT[type='checkbox']:checked").each( function(i, row) {
+    $('button.nzb_multi_operations_download').click(function () {
+        var ids = "";
+        $("table.data INPUT[type='checkbox']:checked").each( function (i, row) {
             if ($(row).val()!="on")
-                $("<input />", {'name':'id[]', 'value':$(row).val(), 'type':'hidden'}).appendTo(newForm);
+                ids += $(row).val()+',';
         });
-        newForm.appendTo($('body'));
-        $('#'+newFormName).submit();
+        ids = ids.substring(0,ids.length-1);
+        if (ids)
+            window.location = SERVERROOT + "getnzb?zip=1&id="+ids;
     });
     $('button.nzb_multi_operations_cart').click(function(){
         var guids = new Array();
@@ -180,7 +180,7 @@ jQuery(function ($) {
                     icon: 'fa-icon-info-sign'
                 });
             }
-            $(this).attr('checked', false);
+            $(this).prop('checked', false);
         });
         $.post( SERVERROOT + "cart?add", { 'add': guids });
     });
@@ -249,7 +249,7 @@ jQuery(function ($) {
         var ids = new Array();
         $("table.data INPUT[type='checkbox']:checked").each( function(i, row) {
             if ($(row).val()!="on")
-                ids.push($(row).val());
+                ids += '&id[]='+$(row).val();
         });
         if (ids)
         {
