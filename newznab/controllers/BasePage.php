@@ -84,10 +84,6 @@ class BasePage
 		$this->smarty->error_reporting = ((NN_DEBUG ? E_ALL : E_ALL - E_NOTICE));
 		$this->secure_connection = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443)) ;
 
-		if (file_exists(WWW_DIR.'templates/'.$this->settings->getSetting('style').'/theme.php'))
-			require_once(WWW_DIR.'templates/'.$this->settings->getSetting('style').'/theme.php');
-		$this->smarty->assign('themevars', (isset($themevars) ? $themevars : null));
-
 		if (isset($_SERVER['SERVER_NAME'])) {
 			$this->serverurl = (
 				($this->https === true ? 'https://' : 'http://') . $_SERVER['SERVER_NAME'] .
