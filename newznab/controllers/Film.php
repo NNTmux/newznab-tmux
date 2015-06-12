@@ -1331,7 +1331,7 @@ class Film
 						$this->pdo->log->doEcho($this->pdo->log->header('Updating movie schedule using rotten tomatoes.'));
 					}
 
-		$rt = new \RottenTomato($this->pdo->getSetting('rottentomatokey'));
+		$rt = new RottenTomato($this->pdo->getSetting('rottentomatokey'));
 
 		if ($rt instanceof RottenTomato) {
 
@@ -1361,23 +1361,23 @@ class Film
 			switch ($operation) {
 				case 'boxoffice':
 					$data = $rt->getMoviesBoxOffice();
-					$update = \Film::SRC_BOXOFFICE;
+					$update = Film::SRC_BOXOFFICE;
 					break;
 				case 'theaters':
 					$data = $rt->getMoviesInTheaters();
-					$update = \Film::SRC_INTHEATRE;
+					$update = Film::SRC_INTHEATRE;
 					break;
 				case 'opening':
 					$data = $rt->getOpeningMovies();
-					$update = \Film::SRC_OPENING;
+					$update = Film::SRC_OPENING;
 					break;
 				case 'upcoming':
 					$data = $rt->getUpcomingMovies();
-					$update = \Film::SRC_UPCOMING;
+					$update = Film::SRC_UPCOMING;
 					break;
 				case 'dvd':
 					$data = $rt->getNewDvdReleases();
-					$update = \Film::SRC_DVD;
+					$update = Film::SRC_DVD;
 					break;
 				default:
 					$data = false;
