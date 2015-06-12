@@ -39,7 +39,8 @@ class Groups
 			LEFT OUTER JOIN
 				(SELECT groupid, COUNT(id) AS num FROM releases GROUP BY groupid) rel
 			ON rel.groupid = groups.id
-			ORDER BY groups.name"
+			ORDER BY groups.name",
+			true, NN_CACHE_EXPIRY_LONG
 		);
 	}
 
@@ -49,7 +50,9 @@ class Groups
 	public function getGroupsForSelect()
 	{
 
-		$categories = $this->pdo->query("SELECT * FROM groups WHERE active = 1 ORDER BY name");
+		$categories = $this->pdo->query("SELECT * FROM groups WHERE active = 1 ORDER BY name",
+		true, NN_CACHE_EXPIRY_LONG
+		);
 		$temp_array = array();
 
 		$temp_array[-1] = "--Please Select--";
@@ -76,7 +79,9 @@ class Groups
 	public function getActive()
 	{
 
-		return $this->pdo->query("SELECT * FROM groups WHERE active = 1 ORDER BY name");
+		return $this->pdo->query("SELECT * FROM groups WHERE active = 1 ORDER BY name",
+			true, NN_CACHE_EXPIRY_SHORT
+		);
 	}
 
 	/**
@@ -137,31 +142,37 @@ class Groups
 	}
 
 	/**
-	 * Get groups rows for browse list by limit.
+	 * @param        $start
+	 * @param        $num
+	 * @param string $groupname
+	 *
+	 * @return mixed
 	 */
-	public function getRange($start, $num, $groupname = "", $activeonly = false)
+	public function getRange($start, $num, $groupname = "")
 	{
-
-		if ($start === false)
-			$limit = "";
-		else
-			$limit = " LIMIT " . $start . "," . $num;
-
-		$grpsql = '';
-		if ($groupname != "")
-			$grpsql .= sprintf("and groups.name like %s ", $this->pdo->escapeString("%" . $groupname . "%"));
-		if ($activeonly == true)
-			$grpsql .= "and active=1 ";
-
-		$sql = sprintf("SELECT groups.*, COALESCE(rel.num, 0) AS num_releases
-							FROM groups
-							LEFT OUTER JOIN
-							(
-							SELECT groupid, COUNT(id) AS num FROM releases group by groupid
-							) rel ON rel.groupid = groups.id WHERE 1=1 %s ORDER BY groups.name " . $limit, $grpsql
+		return $this->pdo->query(
+			sprintf("
+				SELECT groups.*,
+				COALESCE(rel.num, 0) AS num_releases
+				FROM groups
+				LEFT OUTER JOIN
+					(SELECT groupid, COUNT(id) AS num
+						FROM releases GROUP BY groupid
+					) rel
+				ON rel.groupid = groups.id
+				WHERE 1 = 1 %s
+				ORDER BY groups.name " .
+				($start === false ? '' : " LIMIT " . $num . " OFFSET " . $start),
+				($groupname !== ''
+					?
+					sprintf(
+						"AND groups.name LIKE %s ",
+						$this->pdo->escapeString("%" . $groupname . "%")
+					)
+					: ''
+				)
+			), true, NN_CACHE_EXPIRY_SHORT
 		);
-
-		return $this->pdo->query($sql);
 	}
 
 	/**
@@ -397,7 +408,9 @@ class Groups
 	 */
 	public function getActiveBackfill()
 	{
-		return $this->pdo->query("SELECT * FROM groups WHERE backfill = 1 AND last_record != 0 ORDER BY name");
+		return $this->pdo->query("SELECT * FROM groups WHERE backfill = 1 AND last_record != 0 ORDER BY name",
+			true, NN_CACHE_EXPIRY_SHORT
+		);
 	}
 
 	/**
@@ -405,7 +418,9 @@ class Groups
 	 */
 	public function getActiveByDateBackfill()
 	{
-		return $this->pdo->query("SELECT * FROM groups WHERE backfill = 1 AND last_record != 0 ORDER BY first_record_postdate DESC");
+		return $this->pdo->query("SELECT * FROM groups WHERE backfill = 1 AND last_record != 0 ORDER BY first_record_postdate DESC",
+			true, NN_CACHE_EXPIRY_SHORT
+		);
 	}
 
 	/**
@@ -464,7 +479,9 @@ class Groups
 	 */
 	public function getActiveIDs()
 	{
-		return $this->pdo->query("SELECT id FROM groups WHERE active = 1 ORDER BY name");
+		return $this->pdo->query("SELECT id FROM groups WHERE active = 1 ORDER BY name",
+			true, NN_CACHE_EXPIRY_SHORT
+		);
 	}
 
 	/**
@@ -592,7 +609,7 @@ class Groups
 	 *
 	 * @return mixed
 	 */
-	public function getRangeActive($start, $num, $groupname="")
+	public function getRangeActive($start, $num, $groupname = "")
 	{
 		return $this->pdo->query(
 			sprintf("
@@ -606,16 +623,17 @@ class Groups
 				ON rel.groupid = groups.id
 				WHERE 1 = 1 %s
 				AND active = 1
-				ORDER BY groups.name " . ($start === false ? '' : " LIMIT " . $num . " OFFSET " .$start),
+				ORDER BY groups.name " .
+				($start === false ? '' : " LIMIT " . $num . " OFFSET " . $start),
 				($groupname !== ''
 					?
 					sprintf(
 						"AND groups.name LIKE %s ",
-						$this->pdo->escapeString("%".$groupname."%")
+						$this->pdo->escapeString("%" . $groupname . "%")
 					)
 					: ''
 				)
-			)
+			), true, NN_CACHE_EXPIRY_SHORT
 		);
 	}
 
@@ -626,7 +644,7 @@ class Groups
 	 *
 	 * @return mixed
 	 */
-	public function getRangeInactive($start, $num, $groupname="")
+	public function getRangeInactive($start, $num, $groupname = "")
 	{
 		return $this->pdo->query(
 			sprintf("
@@ -640,15 +658,16 @@ class Groups
 				ON rel.groupid = groups.id
 				WHERE 1 = 1 %s
 				AND active = 0
-				ORDER BY groups.name " . ($start === false ? '' : " LIMIT ".$num." OFFSET ".$start),
+				ORDER BY groups.name " .
+				($start === false ? '' : " LIMIT " . $num . " OFFSET " . $start),
 				($groupname !== ''
 					? sprintf(
 						"AND groups.name LIKE %s ",
-						$this->pdo->escapeString("%".$groupname."%")
+						$this->pdo->escapeString("%" . $groupname . "%")
 					)
 					: ''
 				)
-			)
+			), true, NN_CACHE_EXPIRY_SHORT
 		);
 	}
 }

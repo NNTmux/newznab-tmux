@@ -233,7 +233,8 @@ class Musik
 		}
 
 		$order = $this->getMusicOrder($orderby);
-		return $this->pdo->query(sprintf("SELECT GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id, "
+		return $this->pdo->query(
+			sprintf("SELECT GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id, "
 					. "GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') as grp_rarinnerfilecount, "
 					. "GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') AS grp_haspreview, "
 					. "GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_password, "
@@ -252,7 +253,9 @@ class Musik
 					. "INNER JOIN musicinfo m ON m.id = r.musicinfoid "
 					. "WHERE r.nzbstatus = 1 AND m.title != '' AND "
 					. "r.passwordstatus <= (SELECT value FROM settings WHERE setting='showpasswordedrelease') AND %s %s %s "
-					. "GROUP BY m.id ORDER BY %s %s" . $limit, $browseby, $catsrch, $exccatlist, $order[0], $order[1]));
+					. "GROUP BY m.id ORDER BY %s %s" . $limit, $browseby, $catsrch, $exccatlist, $order[0], $order[1]),
+			true, NN_CACHE_EXPIRY_MEDIUM
+		);
 	}
 
 	/**

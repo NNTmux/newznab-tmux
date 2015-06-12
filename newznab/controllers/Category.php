@@ -139,64 +139,75 @@ class Category
 	}
 
 	/**
-	 * Determine if a category is a parent.
+	 * Check if category is parent.
+	 *
+	 * @param $cid
+	 *
+	 * @return bool
 	 */
 	public function isParent($cid)
 	{
-		$db = new newznab\db\Settings();
-		$ret = $db->queryOneRow(sprintf("select count(*) as count from category where id = %d and parentid is null", $cid), true);
-		if ($ret['count'])
-			return true;
-		else
-			return false;
+		$ret = $this->pdo->query(
+			sprintf("SELECT id FROM category WHERE id = %d AND parentid IS NULL", $cid),
+			true, NN_CACHE_EXPIRY_LONG
+		);
+		return (isset($ret[0]['id']));
 	}
 
 	/**
-	 * Get a list of all child categories for a parent.
-	 */
-	public function getChildren($cid)
-	{
-		$db = new newznab\db\Settings();
-
-		return $db->query(sprintf("select c.* from category c where parentid = %d", $cid), true);
-	}
-
-	/**
-	 * Get a list of categories and their parents.
+	 * @param bool $activeonly
+	 *
+	 * @return array
 	 */
 	public function getFlat($activeonly = false)
 	{
-		$db = new newznab\db\Settings();
 		$act = "";
-		if ($activeonly)
-			$act = sprintf(" where c.status = %d ", Category::STATUS_ACTIVE);
+		if ($activeonly) {
+			$act = sprintf(" WHERE c.status = %d ", Category::STATUS_ACTIVE);
+		}
+		return $this->pdo->query("SELECT c.*, (SELECT title FROM category WHERE id=c.parentid) AS parentName FROM category c " . $act . " ORDER BY c.id");
+	}
 
-		return $db->query("select c.*, (SELECT title FROM category WHERE id=c.parentid) AS parentName from category c " . $act . " ORDER BY c.id");
+	/**
+	 * Get children of a parent category.
+	 *
+	 * @param $cid
+	 *
+	 * @return array
+	 */
+	public function getChildren($cid)
+	{
+		return $this->pdo->query(
+			sprintf("SELECT c.* FROM category c WHERE parentid = %d", $cid),
+			true, NN_CACHE_EXPIRY_LONG
+		);
 	}
 
 	/**
 	 * Get names of enabled parent categories.
-	 *
 	 * @return array
 	 */
 	public function getEnabledParentNames()
 	{
-		$db = new newznab\db\Settings();
-
-		return $db->query("SELECT title FROM category WHERE parentid IS NULL AND status = 1");
+		return $this->pdo->query(
+			"SELECT title FROM category WHERE parentid IS NULL AND status = 1",
+			true, NN_CACHE_EXPIRY_LONG
+		);
 	}
 
 	/**
-	 * Returns category id's for site disabled categories.
+	 * Returns category ID's for site disabled categories.
 	 *
 	 * @return array
 	 */
 	public function getDisabledIDs()
 	{
-		$db = new newznab\db\Settings();
-
-		return $db->query("SELECT id FROM category WHERE status = 2 OR parentid IN (SELECT id FROM category WHERE status = 2 AND parentid IS NULL)");
+		return $this->pdo->query(
+			"SELECT id FROM category WHERE status = 2 OR parentid IN (SELECT id FROM category WHERE status = 2 AND parentid IS NULL)",
+			true, NN_CACHE_EXPIRY_LONG
+		);
 	}
+
 	/**
 	 * Get a category row by its id.
 	 */
@@ -251,13 +262,26 @@ class Category
 	*/
 
 	/**
-	 * Get a list of categories by an array of IDs.
+	 * Get multiple categories.
+	 *
+	 * @param array $ids
+	 *
+	 * @return array|bool
 	 */
 	public function getByIds($ids)
 	{
-		$db = new newznab\db\Settings();
-
-		return $db->query(sprintf("SELECT concat(cp.title, ' > ',c.title) as title from category c inner join category cp on cp.id = c.parentid where c.id in (%s)", implode(',', $ids)));
+		if (count($ids) > 0) {
+			return $this->pdo->query(
+				sprintf(
+					"SELECT CONCAT(cp.title, ' > ',c.title) AS title
+					FROM category c
+					INNER JOIN category cp ON cp.id = c.parentid
+					WHERE c.id IN (%s)", implode(',', $ids)
+				), true, NN_CACHE_EXPIRY_LONG
+			);
+		} else {
+			return false;
+		}
 	}
 
 	public function getNameByID($ID)
@@ -280,40 +304,46 @@ class Category
 	}
 
 	/**
-	 * Get the categories in a format for use by the headermenu.tpl.
+	 * @param array $excludedcats
+	 *
+	 * @return array
 	 */
-	public function getForMenu($excludedcats = array())
+	public function getForMenu($excludedcats = [])
 	{
-		$db = new newznab\db\Settings();
-		$ret = array();
+		$ret = [];
 
-		$exccatlist = "";
-		if (count($excludedcats) > 0)
-			$exccatlist = " and id not in (" . implode(",", $excludedcats) . ")";
+		$exccatlist = '';
+		if (count($excludedcats) > 0) {
+			$exccatlist = ' AND id NOT IN (' . implode(',', $excludedcats) . ')';
+		}
 
-		$arr = $db->query(sprintf("select * from category where status = %d %s", Category::STATUS_ACTIVE, $exccatlist), true);
-		foreach ($arr as $a)
-			if ($a["parentid"] == "")
+		$arr = $this->pdo->query(
+			sprintf('SELECT * FROM category WHERE status = %d %s', Category::STATUS_ACTIVE, $exccatlist),
+			true, NN_CACHE_EXPIRY_LONG
+		);
+		foreach ($arr as $a) {
+			if ($a['parentid'] == '') {
 				$ret[] = $a;
+			}
+		}
 
 		foreach ($ret as $key => $parent) {
-			$subcatlist = array();
-			$subcatnames = array();
+			$subcatlist = [];
+			$subcatnames = [];
 			foreach ($arr as $a) {
-				if ($a["parentid"] == $parent["id"]) {
+				if ($a['parentid'] == $parent['id']) {
 					$subcatlist[] = $a;
-					$subcatnames[] = $a["title"];
+					$subcatnames[] = $a['title'];
 				}
 			}
 
 			if (count($subcatlist) > 0) {
 				array_multisort($subcatnames, SORT_ASC, $subcatlist);
-				$ret[$key]["subcatlist"] = $subcatlist;
+				$ret[$key]['subcatlist'] = $subcatlist;
 			} else {
 				unset($ret[$key]);
 			}
 		}
-
 		return $ret;
 	}
 
