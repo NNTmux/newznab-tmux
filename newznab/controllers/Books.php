@@ -234,7 +234,7 @@ class Books
 			. "GROUP BY boo.id ORDER BY %s %s" . $limit, $browseby, $catsrch, $maxage, $exccatlist, $order[0], $order[1]
 		);
 
-		return $this->pdo->queryDirect($sql);
+		return $this->pdo->query($sql, true, NN_CACHE_EXPIRY_MEDIUM);
 	}
 
 	public function getBookOrder($orderby)
