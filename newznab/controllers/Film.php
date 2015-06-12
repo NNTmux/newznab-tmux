@@ -1385,7 +1385,8 @@ class Film
 			}
 
 			if ($data !== false && $data !== '') {
-				if (isset($data)) {
+				$test = @json_decode($data);
+				if (isset($test)) {
 					$count = 2;
 					$check = true;
 				}
@@ -1413,11 +1414,11 @@ class Film
 	/**
 	 * Update upcoming table.
 	 *
-	 * @param $source
+	 * @param string $source
 	 * @param $type
-	 * @param $info
+	 * @param string|false $info
 	 *
-	 * @return bool|int
+	 * @return boolean|int
 	 */
 	protected function updateInsUpcoming($source, $type, $info)
 	{
