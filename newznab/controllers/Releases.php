@@ -469,7 +469,7 @@ class Releases
 
 		if (count($cat)) {
 			if ($cat[0] == -2) {
-				$cartSearch = sprintf(' INNER JOIN users_releases ON users_releases.user_id = %d AND users_releases.releaseid = r.id ', $userID);
+				$cartSearch = sprintf(' INNER JOIN usercart ON usercart.userid = %d AND usercart.releaseid = r.id ', $userID);
 			} else if ($cat[0] != -1) {
 				$catSearch = $this->categorySQL($cat);
 			}
@@ -543,7 +543,7 @@ class Releases
 				AND r.passwordstatus %s
 				ORDER BY postdate DESC %s",
 				$this->getConcatenatedCategoryIDs(),
-				$this->uSQL($this->pdo->query(sprintf('SELECT rageid, categoryid FROM user_series WHERE user_id = %d', $userID), true), 'rageid'),
+				$this->uSQL($this->pdo->query(sprintf('SELECT rageid, categoryid FROM userseries WHERE userid = %d', $userID), true), 'rageid'),
 				(count($excludedCats) ? ' AND r.categoryid NOT IN (' . implode(',', $excludedCats) . ')' : ''),
 				($airDate > -1 ? sprintf(' AND r.tvairdate >= DATE_SUB(CURDATE(), INTERVAL %d DAY) ', $airDate) : ''),
 				NZB::NZB_ADDED,
@@ -581,7 +581,7 @@ class Releases
 				AND r.passwordstatus %s
 				ORDER BY postdate DESC %s",
 				$this->getConcatenatedCategoryIDs(),
-				$this->uSQL($this->pdo->query(sprintf('SELECT imdbid, categoryid FROM user_movies WHERE user_id = %d', $userID), true), 'imdbid'),
+				$this->uSQL($this->pdo->query(sprintf('SELECT imdbid, categoryid FROM usermovies WHERE userid = %d', $userID), true), 'imdbid'),
 				(count($excludedCats) ? ' AND r.categoryid NOT IN (' . implode(',', $excludedCats) . ')' : ''),
 				NZB::NZB_ADDED,
 				$this->showPasswords(),
@@ -733,7 +733,7 @@ class Releases
 				FROM releases r
 				LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
 				LEFT OUTER JOIN release_comments rc ON rc.releaseid = r.id
-				LEFT OUTER JOIN users_releases uc ON uc.releaseid = r.id
+				LEFT OUTER JOIN usercart uc ON uc.releaseid = r.id
 				LEFT OUTER JOIN release_files rf ON rf.releaseid = r.id
 				LEFT OUTER JOIN audio_data ra ON ra.releaseid = r.id
 				LEFT OUTER JOIN release_subtitles rs ON rs.releaseid = r.id
