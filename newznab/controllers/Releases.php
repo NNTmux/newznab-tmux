@@ -196,15 +196,27 @@ class Releases
 		return $this->pdo->query(
 			sprintf(
 				"SELECT r.*,
-					CONCAT(cp.title, ' > ', c.title) AS category_name,
-					CONCAT(cp.id, ',', c.id) AS category_ids,
+					#CONCAT(cp.title, ' > ', c.title) AS category_name,
+					#CONCAT(cp.id, ',', c.id) AS category_ids,
+
+				(SELECT 
+					CONCAT(cp.title, ' > ', c.title) 
+				FROM category c 
+				INNER JOIN category cp ON cp.id = c.parentid
+				WHERE c.id = r.categoryid) AS category_name, 
+				(SELECT 
+					CONCAT(cp.id, ',', c.id) 
+				FROM category c 
+				INNER JOIN category cp ON cp.id = c.parentid
+				WHERE c.id = r.categoryid) AS category_ids, 
+
 					g.name AS group_name,
 					rn.id AS nfoid,
 					re.releaseid AS reid
 				FROM releases r
 				STRAIGHT_JOIN groups g ON g.id = r.groupid
-				STRAIGHT_JOIN category c ON c.id = r.categoryid
-				INNER JOIN category cp ON cp.id = c.parentid
+				#STRAIGHT_JOIN category c ON c.id = r.categoryid
+				#INNER JOIN category cp ON cp.id = c.parentid
 				LEFT OUTER JOIN releasevideo re ON re.releaseid = r.id
 				LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
 				AND rn.nfo IS NOT NULL
@@ -597,15 +609,30 @@ class Releases
 		$orderBy = $this->getBrowseOrder($orderBy);
 		return $this->pdo->query(
 			sprintf(
-				"SELECT r.*, CONCAT(cp.title, '-', c.title) AS category_name,
-					CONCAT(cp.id, ',', c.id) AS category_ids, groups.name AS group_name,
+				"SELECT r.*,
+					#CONCAT(cp.title, '-', c.title) AS category_name,
+					#CONCAT(cp.id, ',', c.id) AS category_ids,
+
+				(SELECT 
+					CONCAT(cp.title, ' > ', c.title) 
+				FROM category c 
+				INNER JOIN category cp ON cp.id = c.parentid
+				WHERE c.id = r.categoryid) AS category_name, 
+				(SELECT 
+					CONCAT(cp.id, ',', c.id) 
+				FROM category c 
+				INNER JOIN category cp ON cp.id = c.parentid
+				WHERE c.id = r.categoryid) AS category_ids, 
+ 
+
+					groups.name AS group_name,
 					rn.id AS nfoid, re.releaseid AS reid
 				FROM releases r
 				LEFT OUTER JOIN releasevideo re ON re.releaseid = r.id
 				INNER JOIN groups ON groups.id = r.groupid
 				LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id AND rn.nfo IS NOT NULL
-				INNER JOIN category c ON c.id = r.categoryid
-				INNER JOIN category cp ON cp.id = c.parentid
+				#INNER JOIN category c ON c.id = r.categoryid
+				#INNER JOIN category cp ON cp.id = c.parentid
 				WHERE %s %s
 				AND r.nzbstatus = %d
 				AND r.categoryid BETWEEN 5000 AND 5999
@@ -995,8 +1022,20 @@ class Releases
 
 		$baseSql = sprintf(
 			"SELECT r.*,
-				CONCAT(cp.title, ' > ', c.title) AS category_name,
-				CONCAT(cp.id, ',', c.id) AS category_ids,
+				#CONCAT(cp.title, ' > ', c.title) AS category_name,
+				#CONCAT(cp.id, ',', c.id) AS category_ids,
+
+				(SELECT 
+					CONCAT(cp.title, ' > ', c.title) 
+				FROM category c 
+				INNER JOIN category cp ON cp.id = c.parentid
+				WHERE c.id = r.categoryid) AS category_name, 
+				(SELECT 
+					CONCAT(cp.id, ',', c.id) 
+				FROM category c 
+				INNER JOIN category cp ON cp.id = c.parentid
+				WHERE c.id = r.categoryid) AS category_ids, 
+
 				groups.name AS group_name,
 				rn.id AS nfoid,
 				re.releaseid AS reid,
@@ -1005,8 +1044,8 @@ class Releases
 			LEFT OUTER JOIN releasevideo re ON re.releaseid = r.id
 			LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
 			INNER JOIN groups ON groups.id = r.groupid
-			INNER JOIN category c ON c.id = r.categoryid
-			INNER JOIN category cp ON cp.id = c.parentid
+			#INNER JOIN category c ON c.id = r.categoryid
+			#INNER JOIN category cp ON cp.id = c.parentid
 			%s",
 			$whereSql
 		);
@@ -1062,17 +1101,29 @@ class Releases
 
 		$baseSql = sprintf(
 			"SELECT r.*,
-				concat(cp.title, ' > ', c.title) AS category_name,
-				CONCAT(cp.id, ',', c.id) AS category_ids,
+				#concat(cp.title, ' > ', c.title) AS category_name,
+				#CONCAT(cp.id, ',', c.id) AS category_ids,
+
+				(SELECT 
+					CONCAT(cp.title, ' > ', c.title) 
+				FROM category c 
+				INNER JOIN category cp ON cp.id = c.parentid
+				WHERE c.id = r.categoryid) AS category_name, 
+				(SELECT 
+					CONCAT(cp.id, ',', c.id) 
+				FROM category c 
+				INNER JOIN category cp ON cp.id = c.parentid
+				WHERE c.id = r.categoryid) AS category_ids, 
+
 				groups.name AS group_name,
 				rn.id AS nfoid,
 				re.releaseid AS reid
 			FROM releases r
-			INNER JOIN category c ON c.id = r.categoryid
+			#INNER JOIN category c ON c.id = r.categoryid
 			INNER JOIN groups ON groups.id = r.groupid
 			LEFT OUTER JOIN releasevideo re ON re.releaseid = r.id
 			LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id AND rn.nfo IS NOT NULL
-			INNER JOIN category cp ON cp.id = c.parentid
+			#INNER JOIN category cp ON cp.id = c.parentid
 			%s",
 			$whereSql
 		);
@@ -1120,15 +1171,27 @@ class Releases
 
 		$baseSql = sprintf(
 			"SELECT r.*,
-				CONCAT(cp.title, ' > ', c.title) AS category_name,
-				CONCAT(cp.id, ',', c.id) AS category_ids,
+				#CONCAT(cp.title, ' > ', c.title) AS category_name,
+				#CONCAT(cp.id, ',', c.id) AS category_ids,
+
+				(SELECT 
+					CONCAT(cp.title, ' > ', c.title) 
+				FROM category c 
+				INNER JOIN category cp ON cp.id = c.parentid
+				WHERE c.id = r.categoryid) AS category_name, 
+				(SELECT 
+					CONCAT(cp.id, ',', c.id) 
+				FROM category c 
+				INNER JOIN category cp ON cp.id = c.parentid
+				WHERE c.id = r.categoryid) AS category_ids, 
+
 				groups.name AS group_name,
 				rn.id AS nfoid
 			FROM releases r
-			INNER JOIN category c ON c.id = r.categoryid
+			#INNER JOIN category c ON c.id = r.categoryid
 			INNER JOIN groups ON groups.id = r.groupid
 			LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id AND rn.nfo IS NOT NULL
-			INNER JOIN category cp ON cp.id = c.parentid
+			#INNER JOIN category cp ON cp.id = c.parentid
 			%s",
 			$whereSql
 		);
@@ -1177,15 +1240,27 @@ class Releases
 
 		$baseSql = sprintf(
 			"SELECT r.*,
-				concat(cp.title, ' > ', c.title) AS category_name,
-				CONCAT(cp.id, ',', c.id) AS category_ids,
+				#concat(cp.title, ' > ', c.title) AS category_name,
+				#CONCAT(cp.id, ',', c.id) AS category_ids,
+
+				(SELECT 
+					CONCAT(cp.title, ' > ', c.title) 
+				FROM category c 
+				INNER JOIN category cp ON cp.id = c.parentid
+				WHERE c.id = r.categoryid) AS category_name, 
+				(SELECT 
+					CONCAT(cp.id, ',', c.id) 
+				FROM category c 
+				INNER JOIN category cp ON cp.id = c.parentid
+				WHERE c.id = r.categoryid) AS category_ids, 
+
 				g.name AS group_name,
 				rn.id AS nfoid
 			FROM releases r
 			INNER JOIN groups g ON g.id = r.groupid
-			INNER JOIN category c ON c.id = r.categoryid
+			#INNER JOIN category c ON c.id = r.categoryid
 			LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id AND rn.nfo IS NOT NULL
-			INNER JOIN category cp ON cp.id = c.parentid
+			#INNER JOIN category cp ON cp.id = c.parentid
 			%s",
 			$whereSql
 		);
@@ -1285,11 +1360,25 @@ class Releases
 			$gSql = sprintf('r.guid = %s', $this->pdo->escapeString($guid));
 		}
 		$sql = sprintf(
-			"SELECT r.*, CONCAT(cp.title, ' > ', c.title) AS category_name, CONCAT(cp.id, ',', c.id) AS category_ids,
+			"SELECT r.*, 
+				#CONCAT(cp.title, ' > ', c.title) AS category_name, 
+				#CONCAT(cp.id, ',', c.id) AS category_ids,
+
+				(SELECT 
+					CONCAT(cp.title, ' > ', c.title) 
+				FROM category c 
+				INNER JOIN category cp ON cp.id = c.parentid
+				WHERE c.id = r.categoryid) AS category_name, 
+				(SELECT 
+					CONCAT(cp.id, ',', c.id) 
+				FROM category c 
+				INNER JOIN category cp ON cp.id = c.parentid
+				WHERE c.id = r.categoryid) AS category_ids, 
+
 				g.name AS group_name FROM releases r
 			INNER JOIN groups g ON g.id = r.groupid
-			INNER JOIN category c ON c.id = r.categoryid
-			INNER JOIN category cp ON cp.id = c.parentid
+			#INNER JOIN category c ON c.id = r.categoryid
+			#INNER JOIN category cp ON cp.id = c.parentid
 			WHERE %s",
 			$gSql
 		);
