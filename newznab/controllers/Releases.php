@@ -735,7 +735,7 @@ class Releases
 				LEFT OUTER JOIN releasecomment rc ON rc.releaseid = r.id
 				LEFT OUTER JOIN usercart uc ON uc.releaseid = r.id
 				LEFT OUTER JOIN releasefiles rf ON rf.releaseid = r.id
-				LEFT OUTER JOIN audio_data ra ON ra.releaseid = r.id
+				LEFT OUTER JOIN releaseaudio ra ON ra.releaseid = r.id
 				LEFT OUTER JOIN releasesubs rs ON rs.releaseid = r.id
 				LEFT OUTER JOIN video_data rv ON rv.releaseid = r.id
 				LEFT OUTER JOIN releaseextrafull re ON re.releaseid = r.id

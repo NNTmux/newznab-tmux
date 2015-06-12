@@ -1385,8 +1385,7 @@ class Film
 			}
 
 			if ($data !== false && $data !== '') {
-				$test = @json_decode($data);
-				if (isset($test)) {
+				if (isset($data)) {
 					$count = 2;
 					$check = true;
 				}
