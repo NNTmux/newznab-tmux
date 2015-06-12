@@ -613,7 +613,7 @@ class Releases
 					groups.name AS group_name,
 					rn.id AS nfoid, re.releaseid AS reid
 				FROM releases r
-				LEFT OUTER JOIN video_data re ON re.releaseid = r.id
+				LEFT OUTER JOIN releasevideo re ON re.releaseid = r.id
 				INNER JOIN groups ON groups.id = r.groupid
 				LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id AND rn.nfo IS NOT NULL
 				INNER JOIN category c ON c.id = r.categoryid
@@ -737,7 +737,7 @@ class Releases
 				LEFT OUTER JOIN releasefiles rf ON rf.releaseid = r.id
 				LEFT OUTER JOIN releaseaudio ra ON ra.releaseid = r.id
 				LEFT OUTER JOIN releasesubs rs ON rs.releaseid = r.id
-				LEFT OUTER JOIN video_data rv ON rv.releaseid = r.id
+				LEFT OUTER JOIN releasevideo rv ON rv.releaseid = r.id
 				LEFT OUTER JOIN releaseextrafull re ON re.releaseid = r.id
 				WHERE r.guid = %s',
 				$this->pdo->escapeString($identifiers['g'])
@@ -1015,7 +1015,7 @@ class Releases
 				re.releaseid AS reid,
 				cp.id AS categoryparentid
 			FROM releases r
-			LEFT OUTER JOIN video_data re ON re.releaseid = r.id
+			LEFT OUTER JOIN releasevideo re ON re.releaseid = r.id
 			LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
 			INNER JOIN groups ON groups.id = r.groupid
 			INNER JOIN category c ON c.id = r.categoryid
@@ -1084,7 +1084,7 @@ class Releases
 			FROM releases r
 			INNER JOIN category c ON c.id = r.categoryid
 			INNER JOIN groups ON groups.id = r.groupid
-			LEFT OUTER JOIN video_data re ON re.releaseid = r.id
+			LEFT OUTER JOIN releasevideo re ON re.releaseid = r.id
 			LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id AND rn.nfo IS NOT NULL
 			INNER JOIN category cp ON cp.id = c.parentid
 			%s",
