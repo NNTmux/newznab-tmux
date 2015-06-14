@@ -586,7 +586,7 @@ class Releases
 
 		$sql = sprintf(" SELECT releases.*, rn.id AS nfoid, m.title AS imdbtitle, m.cover, m.imdbid, m.rating, m.plot, m.year, m.genre, m.director, m.actors, g.name AS group_name, concat(cp.title, ' > ', c.title) AS category_name, concat(cp.id, ',', c.id) AS category_ids, coalesce(cp.id,0) AS parentCategoryID, mu.title AS mu_title, mu.url AS mu_url, mu.artist AS mu_artist, mu.publisher AS mu_publisher, mu.releasedate AS mu_releasedate, mu.review AS mu_review, mu.tracks AS mu_tracks, mu.cover AS mu_cover, mug.title AS mu_genre, co.title AS co_title, co.url AS co_url, co.publisher AS co_publisher, co.releasedate AS co_releasedate, co.review AS co_review, co.cover AS co_cover, cog.title AS co_genre,   bo.title AS bo_title, bo.url AS bo_url, bo.publisher AS bo_publisher, bo.author AS bo_author, bo.publishdate AS bo_publishdate, bo.review AS bo_review, bo.cover AS bo_cover  FROM releases LEFT OUTER JOIN category c ON c.id = releases.categoryid LEFT OUTER JOIN category cp ON cp.id = c.parentid LEFT OUTER JOIN groups g ON g.id = releases.groupid LEFT OUTER JOIN releasenfo rn ON rn.releaseid = releases.id AND rn.nfo IS NOT NULL LEFT OUTER JOIN movieinfo m ON m.imdbid = releases.imdbid AND m.title != '' LEFT OUTER JOIN musicinfo mu ON mu.id = releases.musicinfoid LEFT OUTER JOIN genres mug ON mug.id = mu.genreID LEFT OUTER JOIN bookinfo bo ON bo.id = releases.bookinfoid LEFT OUTER JOIN consoleinfo co ON co.id = releases.consoleinfoid LEFT OUTER JOIN genres cog ON cog.id = co.genreID %s WHERE releases.passwordstatus <= (SELECT value FROM settings WHERE setting='showpasswordedrelease') %s %s %s %s ORDER BY postdate DESC %s", $cartsrch, $catsrch, $rage, $anidb, $airdate, $limit);
 
-		return $this->pdo->query($sql, true);
+		return $this->pdo->query($sql, true, NN_CACHE_EXPIRY_MEDIUM);
 	}
 
 	/**
@@ -636,7 +636,7 @@ class Releases
 						ORDER BY postdate DESC %s", $usql, $usql, $exccatlist, $airdate, $limit
 		);
 
-		return $this->pdo->query($sql);
+		return $this->pdo->query($sql, true, NN_CACHE_EXPIRY_MEDIUM);
 	}
 
 	/**
@@ -678,7 +678,7 @@ class Releases
 						ORDER BY postdate DESC %s", $usql, $exccatlist, $limit
 		);
 
-		return $this->pdo->query($sql);
+		return $this->pdo->query($sql, true, NN_CACHE_EXPIRY_MEDIUM);
 	}
 
 	/**
@@ -718,7 +718,7 @@ class Releases
 		$order = $this->getBrowseOrder($orderby);
 		$sql = sprintf(" SELECT releases.*, concat(cp.title, '-', c.title) AS category_name, concat(cp.id, ',', c.id) AS category_ids, groups.name AS group_name, pre.ctime, pre.nuketype, rn.id AS nfoid, re.releaseid AS reID FROM releases LEFT OUTER JOIN releasevideo re ON re.releaseid = releases.id LEFT OUTER JOIN groups ON groups.id = releases.groupid LEFT OUTER JOIN releasenfo rn ON rn.releaseid = releases.id AND rn.nfo IS NOT NULL LEFT OUTER JOIN category c ON c.id = releases.categoryid LEFT OUTER JOIN predb pre ON pre.id = releases.preid LEFT OUTER JOIN category cp ON cp.id = c.parentid WHERE %s %s AND releases.passwordstatus <= (SELECT VALUE FROM settings WHERE setting='showpasswordedrelease') %s ORDER BY %s %s" . $limit, $usql, $exccatlist, $maxagesql, $order[0], $order[1]);
 
-		return $this->pdo->query($sql, true);
+		return $this->pdo->query($sql, true, NN_CACHE_EXPIRY_MEDIUM);
 	}
 
 	/**
