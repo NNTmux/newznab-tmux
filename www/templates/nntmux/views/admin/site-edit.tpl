@@ -849,7 +849,10 @@
 	<td><label for="showpasswordedrelease">Show Passworded Releases</label>:</td>
 	<td>
 		{html_options id="showpasswordedrelease" name='showpasswordedrelease' values=$passworded_ids output=$passworded_names selected=$fsite->showpasswordedrelease}
-		<div class="hint">Whether to show passworded or potentially passworded releases in browse, search, api and rss feeds. Potentially passworded means releases which contain .cab or .ace files which are typically password protected.</div>
+		<div class="hint">Whether to show passworded or potentially passworded releases in browse, search, api and rss
+			feeds. Potentially passworded means releases which contain .cab or .ace files which are
+			typically password protected. (*yes): Unprocessed releases are hidden. (*no): Unprocessed releases are displayed.
+		</div>
 	</td>
 </tr>
 </table>
