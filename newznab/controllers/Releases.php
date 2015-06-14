@@ -128,6 +128,11 @@ class Releases
 	public $releaseImage;
 
 	/**
+	 * @var string
+	 */
+	private $showPasswords;
+
+	/**
 	 * @param array $options Class instances / Echo to cli ?
 	 */
 	public function __construct(array $options = [])
@@ -167,6 +172,7 @@ class Releases
 			$this->completion = 100;
 			echo $this->pdo->log->error(PHP_EOL . 'You have an invalid setting for completion. It must be lower than 100.');
 		}
+		$this->showPasswords = self::showPasswords($this->pdo);
 	}
 
 
@@ -326,7 +332,7 @@ class Releases
 				%s %s %s %s',
 				($groupName != '' ? 'INNER JOIN groups g ON g.id = r.groupid' : ''),
 				Enzebe::NZB_ADDED,
-				$this->showPasswords(),
+				$this->showPasswords,
 				($groupName != '' ? sprintf(' AND g.name = %s', $this->pdo->escapeString($groupName)) : ''),
 				$this->categorySQL($cat),
 				($maxAge > 0 ? (' AND r.postdate > NOW() - INTERVAL ' . $maxAge . ' DAY ') : ''),
@@ -371,7 +377,7 @@ class Releases
 				%s %s %s %s
 				ORDER BY %s %s %s",
 				Enzebe::NZB_ADDED,
-				$this->showPasswords(),
+				$this->showPasswords,
 				$this->categorySQL($cat),
 				($maxAge > 0 ? (" AND postdate > NOW() - INTERVAL " . $maxAge . ' DAY ') : ''),
 				(count($excludedCats) ? (' AND r.categoryid NOT IN (' . implode(',', $excludedCats) . ')') : ''),
@@ -848,7 +854,7 @@ class Releases
 			AND r.passwordstatus %s %s %s %s %s %s %s",
 			($name !== '' ? $this->releaseSearch->getFullTextJoinString() : ''),
 			Enzebe::NZB_ADDED,
-			$this->showPasswords(),
+			$this->showPasswords,
 			($rageId != -1 ? sprintf(' AND rageid = %d ', $rageId) : ''),
 			($series != '' ? sprintf(' AND UPPER(r.season) = UPPER(%s)', $this->pdo->escapeString(((is_numeric($series) && strlen($series) != 4) ? sprintf('S%02d', $series) : $series))) : ''),
 			($episode != '' ? sprintf(' AND r.episode %s', $this->pdo->likeString((is_numeric($episode) ? sprintf('E%02d', $episode) : $episode))) : ''),
@@ -906,7 +912,7 @@ class Releases
 			"%s
 			WHERE r.passwordstatus %s AND r.nzbstatus = %d %s %s %s %s %s",
 			($name !== '' ? $this->releaseSearch->getFullTextJoinString() : ''),
-			$this->showPasswords(),
+			$this->showPasswords,
 			Enzebe::NZB_ADDED,
 			($aniDbID > -1 ? sprintf(' AND anidbid = %d ', $aniDbID) : ''),
 			(is_numeric($episodeNumber) ? sprintf(" AND r.episode '%s' ", $this->pdo->likeString($episodeNumber)) : ''),
@@ -965,7 +971,7 @@ class Releases
 			%s %s %s %s",
 			($name !== '' ? $this->releaseSearch->getFullTextJoinString() : ''),
 			Enzebe::NZB_ADDED,
-			$this->showPasswords(),
+			$this->showPasswords,
 			($name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : ''),
 			(($imDbId != '-1' && is_numeric($imDbId)) ? sprintf(' AND imdbid = %d ', str_pad($imDbId, 7, '0', STR_PAD_LEFT)) : ''),
 			$this->categorySQL($cat),
@@ -1240,7 +1246,7 @@ class Releases
 			"%s
 			WHERE r.passwordstatus %s AND r.nzbstatus = %d %s %s %s %s %s %s %s %s %s %s %s",
 			$this->releaseSearch->getFullTextJoinString(),
-			$this->showPasswords(),
+			$this->showPasswords,
 			Enzebe::NZB_ADDED,
 			($maxAge > 0 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $maxAge) : ''),
 			($groupName != -1 ? sprintf(' AND r.groupid = %d ', $this->groups->getIDByName($groupName)) : ''),
@@ -2977,40 +2983,31 @@ class Releases
 	}
 
 	/**
-	 * Buffer of the password status string to form part of the query.
-	 * @var null|string
-	 */
-	private $passwordSettingBuffer = null;
-
-	/**
 	 * Return site setting for hiding/showing passworded releases.
 	 *
-	 * @return int
+	 * @param Settings $pdo
+	 *
+	 * @return string
 	 */
-	public function showPasswords()
+	public static function showPasswords(Settings $pdo)
 	{
-		if (!is_null($this->passwordSettingBuffer)) {
-			return $this->passwordSettingBuffer;
-		}
-		$setting = $this->pdo->queryOneRow(
-			"SELECT value
-			FROM settings
-			WHERE setting = 'showpasswordedrelease'"
+		$setting = $pdo->query(
+			"SELECT value FROM settings WHERE setting = 'showpasswordedrelease'",
+			true, NN_CACHE_EXPIRY_LONG
 		);
-		$passwordStatus = ('= ' . \Releases::PASSWD_NONE);
-		if ($setting !== false) {
-			switch ($setting['value']) {
-				case 1:
-					$passwordStatus = ('<= ' . \Releases::PASSWD_POTENTIAL);
-					break;
-				case 10:
-					$passwordStatus = ('<= ' . \Releases::PASSWD_RAR);
-					break;
-			}
+		switch ((isset($setting[0]['value']) && is_numeric($setting[0]['value']) ? $setting[0]['value'] : 10)) {
+			case 0: // Show releases that may have passwords (does not hide unprocessed releases).
+				return ('<= ' . Releases::PASSWD_POTENTIAL);
+			case 1: // Show releases that definitely have no passwords (hides unprocessed releases).
+				return ('= ' . Releases::PASSWD_NONE);
+			case 2: // Show releases that definitely have no passwords (does not hide unprocessed releases).
+				return ('<= ' . Releases::PASSWD_NONE);
+			case 10: // Shows everything.
+			default:
+				return ('<= ' . Releases::PASSWD_RAR);
 		}
-		$this->passwordSettingBuffer = $passwordStatus;
-		return $passwordStatus;
 	}
+
 	/**
 	 * Retrieve alternate release with same or similar searchname
 	 *
