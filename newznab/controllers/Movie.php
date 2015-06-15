@@ -796,23 +796,23 @@ class Movie
 		{
 			$rt = new RottenTomato($this->pdo->getSetting('rottentomatokey'));
 
-			$ret = $rt->getMoviesBoxOffice();
+			$ret = $rt->getBoxOffice();
 			if ($ret != "")
 				$this->updateInsUpcoming('rottentomato', Movie::SRC_BOXOFFICE, $ret);
 
-			$ret = $rt->getMoviesInTheaters();
+			$ret = $rt->getInTheaters();
 			if ($ret != "")
 				$this->updateInsUpcoming('rottentomato', Movie::SRC_INTHEATRE, $ret);
 
-			$ret = $rt->getOpeningMovies();
+			$ret = $rt->getOpening();
 			if ($ret != "")
 				$this->updateInsUpcoming('rottentomato', Movie::SRC_OPENING, $ret);
 
-			$ret = $rt->getUpcomingMovies();
+			$ret = $rt->getUpcoming();
 			if ($ret != "")
 				$this->updateInsUpcoming('rottentomato', Movie::SRC_UPCOMING, $ret);
 
-			$ret = $rt->getNewDvdReleases();
+			$ret = $rt->getDvdReleases();
 			if ($ret != "")
 				$this->updateInsUpcoming('rottentomato', Movie::SRC_DVD, $ret);
 		}
