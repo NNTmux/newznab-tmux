@@ -2,7 +2,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////// Copy this file to settings.php and edit the options. //////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/**********************************************************************************************************************/
+///////////////////////////////// Scroll down to the bottom for a change log. //////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**********************************************************************************************************************/
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -14,9 +15,9 @@
  *
  * @note Developers: When updating settings.php.example, up this version
  *                   and $current_settings_file_version in automated.config.php
- * @version 1
+ * @version 3
  */
-define('NN_SETTINGS_FILE_VERSION', 1);
+define('NN_SETTINGS_FILE_VERSION', 3);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////// Web Settings //////////////////////////////////////////////////////////
@@ -46,7 +47,6 @@ define('ITEMS_PER_COVER_PAGE', '20');
  * @default '125000'
  */
 define('NN_MAX_PAGER_RESULTS', '125000');
-
 
 /**
  * If the PRE API page (preinfo) is open to the public or only accessible by registered / api users.
@@ -81,10 +81,12 @@ define('NN_FLOOD_MAX_REQUESTS_PER_SECOND', 5);
 /**
  * The higher this number, the more secure the password algorithm for the website will be, at the cost
  * of server resources.
- * To find a good number for your server, run the misc/testing/Dev/find_password_hash_cost.php script.
+ * To find a good number for your server, run the misc/testing/Various/find_password_hash_cost.php script.
  *
  * @note It is not recommended to set this under 11.
  * @default 11
+ *
+ * @version 2
  */
 define('NN_PASSWORD_HASH_COST', 11);
 
@@ -158,10 +160,14 @@ define('NN_RENAME_MUSIC_MEDIAINFO', true);
  * 0 - disabled   ; No cache server(s) will be used.
  * 1 - memcached  ; Memcached server(s) will be used for caching.
  * 2 - redis      ; Redis server(s) will be used for caching.
+ * 3 - apc/apcu   ; APC or APCu will be used for caching.
  *
- * @note We use the Redis extension by nicolasff.
- * @see https://github.com/nicolasff/phpredis
+ * @note Memcahed: The Memcached PHP extension must be installed.
+ * @note Redis:    We use the Redis PHP extension by nicolasff. https://github.com/nicolasff/phpredis
+ * @note APC:      The APC or APCu PHP extension must be installed.
+ * @note APC:      Ignore these settings: NN_CACHE_HOSTS / NN_CACHE_SOCKET_FILE / NN_CACHE_TIMEOUT
  * @default 0
+ * @version 3
  */
 define('NN_CACHE_TYPE', 0);
 
@@ -215,21 +221,25 @@ define('NN_CACHE_TIMEOUT', 10);
 define('NN_CACHE_COMPRESSION', false);
 
 /**
- * 0 - Use the PHP serializer.
- * 1 - [Requires igbinary] Use igbinary serializer which is faster and uses less memory, works on both Memcached and Redis.
+ * Serialization is a way of converting data in PHP into strings of text which can be stored on the cache server.
+ *
+ * 0 - Use the PHP serializer. Recommended for most people.
+ * 1 - [Requires igbinary] Use igbinary serializer which is faster and uses less memory, works
+ *                         on Memcached / Redis / APC, read the notes below.
  * 2 - [Redis Only] Use no serializer.
  *
  * @note igbinary must be compiled and enabled in php.ini
  * @note Memcached/Redis must be compiled with igbinary support as well to use igbinary.
+ * @note Read the igbinary page how to compile / enable.
  * @see https://github.com/phadej/igbinary
- * @see https://github.com/nicolasff/phpredis
  * @default 0
+ * @version 3
  */
 define('NN_CACHE_SERIALIZER', 0);
 
 /**
  * Amount of time in seconds to expire data from the cache server.
- * The developers of NN decide what should be set as short/medium/long, depending on the type of data.
+ * The developers of nZEDb decide what should be set as short/medium/long, depending on the type of data.
  *
  * @defaults 300/600/900
  */
@@ -277,10 +287,10 @@ define('NN_LOGGING_MAX_LOGS', 20);
 define('NN_LOGGING_MAX_SIZE', 30);
 
 /**
- * The folder to put the log files in. Put quotes, example : '/var/log/NN/'
- * The default is in the NN root folder /resources/logs/
+ * The folder to put the log files in. Put quotes, example : '/var/log/newznab/'
+ * The default is in the nZEDb root folder /resources/logs/
  *
- * @example '/var/log/NN/'
+ * @example '/var/log/newznab/'
  * @default NN_LOGS
  */
 define('NN_LOGGING_LOG_FOLDER', NN_LOGS);
@@ -424,17 +434,8 @@ define('NN_SQL_DELETE_QUICK', false);
 //define('PHPMAILER_ENABLED', true);
 
 /**
- * Should we use a SMTP server to send mail?
- * If false, it will use your default settings from php.ini.
- *
- * @note If set to true, be sure to set the server settings below.
- * @default false
- */
-define('PHPMAILER_USE_SMTP', false);
-
-/**
  * Global "From" Address.
- * This address will be set as the From: address on every email sent by newznab.
+ * This address will be set as the From: address on every email sent by nZEDb.
  *
  * @example 'noreply@example.com'
  * @note Depending on server configurations, it may not respect this value.
@@ -454,7 +455,7 @@ define('PHPMAILER_FROM_NAME', '');
 
 /**
  * Global "Reply-to" Address.
- * This address will be set as the Reply-to: address on every email sent by newznab.
+ * This address will be set as the Reply-to: address on every email sent by nZEDb.
  *
  * @example 'support@example.com'
  * @note It's a good idea to set this to your support email account (if possible)
@@ -471,6 +472,14 @@ define('PHPMAILER_REPLYTO', '');
  */
 define('PHPMAILER_BCC', '');
 
+/**
+ * Should we use a SMTP server to send mail?
+ * If false, it will use your default settings from php.ini.
+ *
+ * @note If set to true, be sure to set the server settings below.
+ * @default false
+ */
+define('PHPMAILER_USE_SMTP', false);
 
 
 /*********************************************************************************
@@ -535,7 +544,11 @@ define('PHPMAILER_SMTP_PASSWORD', '');
 //////////////////////////////////////////////// Change log ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-2015-05-05       v1  Track settings.php.example changes.
+2015-06-11       v3  Add support for APC or APCu extensions for caching data. Search for @version 3 for the changes.
+
+2015-05-10       v2  Update path to find_password_hash_cost.php in comments. Search for @version 2 for the changes.
+
+2015-05-03       v1  Track settings.php.example changes.
                      Add support for quick and low_priority on MySQL DELETE queries.
                      Search for @version 1 in this file to quickly find these additions.
 
