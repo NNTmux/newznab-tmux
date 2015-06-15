@@ -103,7 +103,12 @@ $page->smarty->assign('registerstatus_ids', array(Sites::REGISTER_STATUS_API_ONL
 $page->smarty->assign('registerstatus_names', array('API Only', 'Open', 'Invite', 'Closed'));
 
 $page->smarty->assign('passworded_ids', array(0,1,2));
-$page->smarty->assign('passworded_names', array( 'Dont show passworded or potentially passworded', 'Dont show passworded', 'Show everything'));
+$page->smarty->assign('passworded_names', [
+	'Hide passworded or potentially passworded (*yes)',
+	'Hide passworded or potentially passworded (*no)',
+	'Show non-passworded and potentially passworded (*no)',
+	'Show everything (*no)'
+]);
 
 $page->smarty->assign('sphinxrebuildfreqday_days', array('', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'));
 

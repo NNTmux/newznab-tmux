@@ -173,9 +173,10 @@ class Games
 				WHERE r.nzbstatus = 1
 				AND con.title != ''
 				AND con.cover = 1
-				AND r.passwordstatus <= (SELECT value FROM settings WHERE setting='showpasswordedrelease')
+				AND r.passwordstatus %s
 				AND %s %s %s %s",
 				$this->getBrowseBy(),
+				Releases::showPasswords($this->pdo),
 				$catsrch,
 				($maxage > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxage) : ''),
 				(count($excludedcats) > 0 ? " AND r.categoryid NOT IN (" . implode(",", $excludedcats) . ")" : '')
@@ -234,15 +235,16 @@ class Games
 				. "LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id "
 				. "INNER JOIN gamesinfo con ON con.id = r.gamesinfo_id "
 				. "WHERE r.nzbstatus = 1 AND con.title != '' AND "
-				. "r.passwordstatus <= (SELECT value FROM settings WHERE setting='showpasswordedrelease') AND %s %s %s %s "
+				. "r.passwordstatus %s AND %s %s %s %s "
 				. "GROUP BY con.id ORDER BY %s %s" . $limit,
+				Releases::showPasswords($this->pdo),
 				$browseby,
 				$catsrch,
 				$maxage,
 				$exccatlist,
 				$order[0],
 				$order[1]
-			)
+			), true, NN_CACHE_EXPIRY_MEDIUM
 		);
 	}
 

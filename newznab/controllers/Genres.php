@@ -31,7 +31,7 @@ class Genres
 
 	public function getGenres($type = '', $activeonly = false)
 	{
-		return $this->pdo->query($this->getListQuery($type, $activeonly));
+		return $this->pdo->query($this->getListQuery($type, $activeonly), true,NN_CACHE_EXPIRY_LONG);
 	}
 
 	private function getListQuery($type = '', $activeonly = false)
@@ -126,6 +126,6 @@ class Genres
 
 	public function getDisabledIDs()
 	{
-		return $this->pdo->query("SELECT id FROM genres WHERE disabled = 1");
+		return $this->pdo->query("SELECT id FROM genres WHERE disabled = 1", true, NN_CACHE_EXPIRY_LONG);
 	}
 }
