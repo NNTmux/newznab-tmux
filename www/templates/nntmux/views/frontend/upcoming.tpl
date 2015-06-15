@@ -12,7 +12,7 @@
 </p>
 
 {if isset($nodata)}
-	{$nodata}
+{$nodata}
 {elseif $data|@count > 0}
 	<table style="width:100%;" class="data highlight icons" id="coverstable">
 		<tr>
