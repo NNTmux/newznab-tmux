@@ -1360,23 +1360,23 @@ class Film
 
 			switch ($operation) {
 				case 'boxoffice':
-					$data = $rt->getMoviesBoxOffice();
+					$data = $rt->getBoxOffice();
 					$update = Film::SRC_BOXOFFICE;
 					break;
 				case 'theaters':
-					$data = $rt->getMoviesInTheaters();
+					$data = $rt->getInTheaters();
 					$update = Film::SRC_INTHEATRE;
 					break;
 				case 'opening':
-					$data = $rt->getOpeningMovies();
+					$data = $rt->getOpening();
 					$update = Film::SRC_OPENING;
 					break;
 				case 'upcoming':
-					$data = $rt->getUpcomingMovies();
+					$data = $rt->getUpcoming();
 					$update = Film::SRC_UPCOMING;
 					break;
 				case 'dvd':
-					$data = $rt->getNewDvdReleases();
+					$data = $rt->getDVDReleases();
 					$update = Film::SRC_DVD;
 					break;
 				default:
