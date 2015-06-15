@@ -1,9 +1,9 @@
-INSERT IGNORE INTO settings (section, subsection, name, value, hint, setting)
-VALUES (
-'max',
-'headers',
-'iteration',
-1000000,
-'The maximum number of headers that update binaries sees as the total range. This ensure that a total of no more than this is attempted to be downloaded at one time per group.',
-'max.headers.iteration'
-);
+INSERT INTO settings (section, subsection, name, value, hint, setting)
+  VALUES (
+    'tmux',
+    'running',
+    'exit',
+    0,
+    'Determines if the running tmux monitor script should exit. If 0 nothing changes; if positive the script should exit gracefully (allowing all panes to finish); if negative the script should die as soon as possible.',
+    'tmux.running.exit'
+  );
