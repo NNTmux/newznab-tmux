@@ -1225,6 +1225,124 @@ class Releases
 	}
 
 	/**
+	 * Search for releases by album/artist/musicinfo. Used by API.
+	 */
+	public function searchAudio($artist, $album, $label, $track, $year, $genre = [-1], $offset = 0, $limit = 100, $cat = [-1], $maxage = -1)
+	{
+		$s = new Settings();
+		if ($s->getSetting('sphinxenabled')) {
+			$sphinx = new Sphinx();
+			$results = $sphinx->searchAudio($artist, $album, $label, $track, $year, $genre, $offset, $limit, $cat, $maxage, [], true);
+			if (is_array($results))
+				return $results;
+		}
+
+
+		$searchsql = "";
+
+		if ($artist != "")
+			$searchsql .= sprintf(" and musicinfo.artist like %s ", $this->pdo->escapeString("%" . $artist . "%"));
+		if ($album != "")
+			$searchsql .= sprintf(" and musicinfo.title like %s ", $this->pdo->escapeString("%" . $album . "%"));
+		if ($label != "")
+			$searchsql .= sprintf(" and musicinfo.publisher like %s ", $this->pdo->escapeString("%" . $label . "%"));
+		if ($track != "")
+			$searchsql .= sprintf(" and musicinfo.tracks like %s ", $this->pdo->escapeString("%" . $track . "%"));
+		if ($year != "")
+			$searchsql .= sprintf(" and musicinfo.year = %d ", $year);
+
+
+		$catsrch = "";
+		$usecatindex = "";
+		if (count($cat) > 0 && $cat[0] != -1) {
+			$catsrch = " and (";
+			foreach ($cat as $category) {
+				if ($category != -1) {
+					$categ = new Categorize();
+					if ($categ->isParent($category)) {
+						$children = $categ->getChildren($category);
+						$chlist = "-99";
+						foreach ($children as $child)
+							$chlist .= ", " . $child["id"];
+
+						if ($chlist != "-99")
+							$catsrch .= " releases.categoryid in (" . $chlist . ") or ";
+					} else {
+						$catsrch .= sprintf(" releases.categoryid = %d or ", $category);
+					}
+				}
+			}
+			$catsrch .= "1=2 )";
+			$usecatindex = " use index (ix_releases_categoryID) ";
+		}
+
+		if ($maxage > 0)
+			$maxage = sprintf(" and postdate > now() - interval %d day ", $maxage);
+		else
+			$maxage = "";
+
+		$genresql = "";
+		if (count($genre) > 0 && $genre[0] != -1) {
+			$genresql = " and (";
+			foreach ($genre as $g) {
+				$genresql .= sprintf(" musicinfo.genreID = %d or ", $g);
+			}
+			$genresql .= "1=2 )";
+		}
+
+		$sql = sprintf("SELECT releases.*, musicinfo.cover AS mi_cover, musicinfo.review AS mi_review, musicinfo.tracks AS mi_tracks, musicinfo.publisher AS mi_publisher, musicinfo.title AS mi_title, musicinfo.artist AS mi_artist, genres.title AS music_genrename, concat(cp.title, ' > ', c.title) AS category_name, concat(cp.id, ',', c.id) AS category_ids, groups.name AS group_name, rn.id AS nfoid FROM releases %s LEFT OUTER JOIN musicinfo ON musicinfo.id = releases.musicinfoid LEFT JOIN genres ON genres.id = musicinfo.genreID LEFT OUTER JOIN groups ON groups.id = releases.groupid LEFT OUTER JOIN category c ON c.id = releases.categoryid LEFT OUTER JOIN releasenfo rn ON rn.releaseid = releases.id AND rn.nfo IS NOT NULL LEFT OUTER JOIN category cp ON cp.id = c.parentid WHERE releases.passwordstatus <= (SELECT VALUE FROM settings WHERE setting='showpasswordedrelease') %s %s %s %s ORDER BY postdate DESC LIMIT %d, %d ", $usecatindex, $searchsql, $catsrch, $maxage, $genresql, $offset, $limit);
+		$orderpos = strpos($sql, "order by");
+		$wherepos = strpos($sql, "where");
+		$sqlcount = "SELECT count(releases.id) AS num FROM releases INNER JOIN musicinfo ON musicinfo.id = releases.musicinfoid " . substr($sql, $wherepos, $orderpos - $wherepos);
+
+		$countres = $this->pdo->queryOneRow($sqlcount, true);
+		$res = $this->pdo->query($sql, true);
+		if (count($res) > 0)
+			$res[0]["_totalrows"] = $countres["num"];
+
+		return $res;
+	}
+
+	/**
+	 * Search for releases by author/bookinfo. Used by API.
+	 */
+	public function searchBook($author, $title, $offset = 0, $limit = 100, $maxage = -1)
+	{
+		$s = new Settings();
+		if ($s->getSetting('sphinxenabled')) {
+			$sphinx = new Sphinx();
+			$results = $sphinx->searchBook($author, $title, $offset, $limit, $maxage, [], true);
+			if (is_array($results))
+				return $results;
+		}
+
+
+		$searchsql = "";
+
+		if ($author != "")
+			$searchsql .= sprintf(" and bookinfo.author like %s ", $this->pdo->escapeString("%" . $author . "%"));
+		if ($title != "")
+			$searchsql .= sprintf(" and bookinfo.title like %s ", $this->pdo->escapeString("%" . $title . "%"));
+
+		if ($maxage > 0)
+			$maxage = sprintf(" and postdate > now() - interval %d day ", $maxage);
+		else
+			$maxage = "";
+
+		$sql = sprintf("SELECT releases.*, bookinfo.cover AS bi_cover, bookinfo.review AS bi_review, bookinfo.publisher AS bi_publisher, bookinfo.pages AS bi_pages, bookinfo.publishdate AS bi_publishdate, bookinfo.title AS bi_title, bookinfo.author AS bi_author, genres.title AS book_genrename, concat(cp.title, ' > ', c.title) AS category_name, concat(cp.id, ',', c.id) AS category_ids, groups.name AS group_name, rn.id AS nfoid FROM releases LEFT OUTER JOIN bookinfo ON bookinfo.id = releases.bookinfoid LEFT JOIN genres ON genres.id = bookinfo.genreID LEFT OUTER JOIN groups ON groups.id = releases.groupid LEFT OUTER JOIN category c ON c.id = releases.categoryid LEFT OUTER JOIN releasenfo rn ON rn.releaseid = releases.id AND rn.nfo IS NOT NULL LEFT OUTER JOIN category cp ON cp.id = c.parentid WHERE releases.passwordstatus <= (SELECT value FROM settings WHERE setting='showpasswordedrelease') %s %s ORDER BY postdate DESC LIMIT %d, %d ", $searchsql, $maxage, $offset, $limit);
+		$orderpos = strpos($sql, "order by");
+		$wherepos = strpos($sql, "where");
+		$sqlcount = "SELECT count(releases.id) AS num FROM releases INNER JOIN bookinfo ON bookinfo.id = releases.bookinfoid " . substr($sql, $wherepos, $orderpos - $wherepos);
+
+		$countres = $this->pdo->queryOneRow($sqlcount, true);
+		$res = $this->pdo->query($sql, true);
+		if (count($res) > 0)
+			$res[0]["_totalrows"] = $countres["num"];
+
+		return $res;
+	}
+
+	/**
 	 * Get count of releases for pager.
 	 *
 	 * @param string $query The query to get the count from.
