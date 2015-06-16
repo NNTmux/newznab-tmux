@@ -4,6 +4,9 @@
 {if $error != ''}
 	<div class="error">{$error}</div>
 {/if}
+{if $notice != ''}
+	<div class="info">{$notice}</div>
+{/if}
 
 {if $confirmed == '' && $sent == ''}
 	<p>
