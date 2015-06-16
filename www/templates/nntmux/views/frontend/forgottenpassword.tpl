@@ -28,8 +28,4 @@
 	<p>
 		A password reset request has been sent to your email.
 	</p>
-{else}
-	<p>
-		Your password has been reset and sent to you in an email.
-	</p>
 {/if}
