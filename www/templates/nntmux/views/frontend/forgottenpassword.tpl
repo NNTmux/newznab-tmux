@@ -4,6 +4,9 @@
 {if $error != ''}
 	<div class="error">{$error}</div>
 {/if}
+{if $notice != ''}
+	<div class="info">{$notice}</div>
+{/if}
 
 {if $confirmed == '' && $sent == ''}
 	<p>
@@ -24,9 +27,5 @@
 {elseif $sent != ''}
 	<p>
 		A password reset request has been sent to your email.
-	</p>
-{else}
-	<p>
-		Your password has been reset and sent to you in an email.
 	</p>
 {/if}
