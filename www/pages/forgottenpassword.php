@@ -31,7 +31,7 @@ switch($action) {
 			$contents = "Your password has been reset to " . $newpass;
 			Utility::sendEmail($to, $subject, $contents, $page->settings->getSetting('email'));
 			// Print new password to the screen so users dont have to check e-mail.
-			$page->smarty->assign('error', $contents);
+			$page->smarty->assign('notice',  "Your password has been reset to " . $contents);
 			$page->smarty->assign('confirmed', "true");
 
 			break;
