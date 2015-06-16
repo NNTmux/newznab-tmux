@@ -227,6 +227,7 @@ a.descmore { display: inline; margin: 0px; margin-left:5px;}
 
 
 div.error { padding:20px; padding-left:50px; border:1px solid #BBB; background: #FED0D0 url(../images/icons/warning.png) no-repeat top; background-position: 5px 50%; font-size:1.2em; font-weight:bold; margin-bottom:10px;}
+div.info { padding:20px; padding-left:50px; border:1px solid #BBB; background: #5bc0de url(../images/icons/information.png) no-repeat top; background-position: 5px 50%; font-size:1.2em; font-weight:bold; margin-bottom:10px;}
 div.comments { padding-top:20px; }
 
 .invitesuccess {display:none; font-weight:bold; padding-left:10px; color:green;}
