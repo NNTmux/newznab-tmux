@@ -31,7 +31,7 @@ switch($action) {
 			$contents = "Your password has been reset to " . $newpass;
 			Utility::sendEmail($to, $subject, $contents, $page->settings->getSetting('email'));
 			// Print new password to the screen so users dont have to check e-mail.
-			$page->smarty->assign('notice',  "Your password has been reset to " . $contents);
+			$page->smarty->assign('notice',  "Your password has been reset to " . $newpass);
 			$page->smarty->assign('confirmed', "true");
 
 			break;
@@ -68,6 +68,7 @@ switch($action) {
 					$contents = "Someone has requested a password reset for this email address. To reset the password use the following link.\n\n " . $page->serverurl . "forgottenpassword?action=reset&guid=" . $guid;
 					$page->smarty->assign('sent', "true");
 					Utility::sendEmail($to, $subject, $contents, $page->settings->getSetting('email'));
+					$page->smarty->assign('notice', "A link to reset your password has been sent to your e-mail account.");
 					break;
 				}
 			}
