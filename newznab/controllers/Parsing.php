@@ -33,7 +33,7 @@ class Parsing
 		$this->parsprocessed = 0;
 		$this->releasefilesprocessed = 0;
 		$this->cleanup = ['nuke' => [], 'misc' => []];
-		$this->pdo = new newznab\db\Settings();
+		$this->pdo = new Settings();
 	}
 
 	/**
@@ -1439,43 +1439,43 @@ class Parsing
 				while (preg_match('/^(\:|\"|\-| |\_)+/', $r['searchname'])) {
 					$r['searchname'] = substr($r['searchname'], 1);
 				}
-				$this->updateName($this->pdo, $r['id'], $oldname, $r['searchname']);
+				$this->updateName($r['id'], $oldname, $r['searchname']);
 			}
 			if (preg_match('/^000\-/', $r['searchname'])) {
 				while (preg_match('/^000\-/', $r['searchname'])) {
 					$r['searchname'] = substr($r['searchname'], 4);
 				}
-				$this->updateName($this->pdo, $r['id'], $oldname, $r['searchname']);
+				$this->updateName($r['id'], $oldname, $r['searchname']);
 			}
 			if (preg_match('/(\:|\"|\-| |\/)$/', $r['searchname'])) {
 				while (preg_match('/(\:|\"|\-| |\/)$/', $r['searchname'])) {
 					$r['searchname'] = substr($r['searchname'], 0, -1);
 				}
-				$this->updateName($this->pdo, $r['id'], $oldname, $r['searchname']);
+				$this->updateName($r['id'], $oldname, $r['searchname']);
 			}
 			if (preg_match('/\"/', $r['searchname'])) {
 				while (preg_match('/\"/', $r['searchname'])) {
 					$r['searchname'] = str_replace('"', '', $r['searchname']);
 				}
-				$this->updateName($this->pdo, $r['id'], $oldname, $r['searchname']);
+				$this->updateName($r['id'], $oldname, $r['searchname']);
 			}
 			if (preg_match('/\-\d{1}$/', $r['searchname'])) {
 				while (preg_match('/\-\d{1}$/', $r['searchname'])) {
 					$r['searchname'] = preg_replace('/\-\d{1}$/', '', $r['searchname']);
 				}
-				$this->updateName($this->pdo, $r['id'], $oldname, $r['searchname']);
+				$this->updateName($r['id'], $oldname, $r['searchname']);
 			}
 			if (preg_match('/\!+.*?mom.*?\!+/i', $r['searchname'])) {
 				while (preg_match('/\!+.*?mom.*?\!+/i', $r['searchname'])) {
 					$r['searchname'] = preg_replace('/\!+.*?mom.*?\!+/i', '', $r['searchname']);
 				}
-				$this->updateName($this->pdo, $r['id'], $oldname, $r['searchname']);
+				$this->updateName($r['id'], $oldname, $r['searchname']);
 			}
 			if (preg_match('/(\\/)/i', $r['searchname'])) {
 				while (preg_match('/(\\/)/i', $r['searchname'])) {
 					$r['searchname'] = preg_replace('/(\\/)/i', '', $r['searchname']);
 				}
-				$this->updateName($this->pdo, $r['id'], $oldname, $r['searchname']);
+				$this->updateName($r['id'], $oldname, $r['searchname']);
 			}
 		}
 	}
@@ -1483,12 +1483,11 @@ class Parsing
 	/**
 	 * update a release name
 	 *
-	 * @param Settings $pdo
 	 * @param    $id
 	 * @param    $oldname
 	 * @param    $newname
 	 */
-	private function updateName(Settings $pdo, $id, $oldname, $newname)
+	private function updateName($id, $oldname, $newname)
 	{
 		if ($this->verbose)
 			echo sprintf("OLD : %s\nNEW : %s\n\n", $oldname, $newname);
