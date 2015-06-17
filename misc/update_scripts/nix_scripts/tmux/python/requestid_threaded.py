@@ -15,9 +15,9 @@ except ImportError:
 	import Queue as queue
 
 try:
-    import urllib2
+	import urllib2
 except ImportError:
-    import urllib.request as urllib2
+	import urllib.request as urllib2
 
 import lib.info as info
 from lib.info import bcolors
@@ -25,22 +25,10 @@ conf = info.readConfig()
 cur = info.connect()
 start_time = time.time()
 pathname = os.path.abspath(os.path.dirname(sys.argv[0]))
-threads = 5
-web = None
+cur[0].execute("SELECT value FROM settings WHERE setting = 'reqidthreads'")
+threads = cur[0].fetchone()
+threads = int(threads[0])
 
-try:
-    import urllib
-except ImportError:
-    import urllib.request as httplib
-
-try:
-    r1 = urllib.urlopen("http://reqid.nzedb.com").getcode()
-    if r1 == 200:
-        web = True
-    else:
-        web = False
-except:
-    web = False
 
 print(bcolors.HEADER + "\n\nRequestID Threaded Started at {}".format(datetime.datetime.now().strftime("%H:%M:%S")) + bcolors.ENDC)
 
@@ -102,8 +90,7 @@ def main():
 
 	#now load some arbitrary jobs into the queue
 	for release in datas:
-		time.sleep(.03)
-		my_queue.put("%s                       %s                       %s              %s" % (release[0], release[1], release[2], web))
+		my_queue.put("%s" % (release[0]))
 
 	my_queue.join()
 
