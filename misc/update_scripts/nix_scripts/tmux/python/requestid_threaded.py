@@ -65,7 +65,7 @@ class queue_runner(threading.Thread):
 			else:
 				if my_id:
 					time_of_last_run = time.time()
-					subprocess.call(["php", pathname+"/../../nix_scripts/multiprocessing/.do_not_run/switch.php", "python  requestid  "+my_id])
+					subprocess.call(["php", pathname+"/../../multiprocessing/.do_not_run/switch.php", "python  requestid  "+my_id])
 					time.sleep(.03)
 					self.my_queue.task_done()
 
