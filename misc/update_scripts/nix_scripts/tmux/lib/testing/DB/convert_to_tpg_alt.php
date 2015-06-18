@@ -30,7 +30,7 @@ foreach ($actgroups as $group) {
 
 $collections_rows = $pdo->queryDirect("SELECT group_id FROM collections GROUP BY group_id");
 
-echo $pdo->log->info("Counting parts, this could table a few minutes.");
+echo $pdo->log->info("Counting parts, this could take a few minutes.");
 $parts_count = $pdo->queryOneRow("SELECT COUNT(*) AS cnt FROM parts");
 
 $i = 0;
