@@ -77,7 +77,7 @@ class Binaries
 	protected $_partRepair;
 
 	/**
-	 * @var newznab\db\Settings
+	 * @var \newznab\db\Settings
 	 */
 	protected $_pdo;
 
@@ -162,17 +162,17 @@ class Binaries
 		$this->_echoCLI = ($options['Echo'] && NN_ECHOCLI);
 
 		$this->_pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
-		$this->_groups = ($options['Groups'] instanceof \Groups ? $options['Groups'] : new \Groups(['Settings' => $this->_pdo]));
-		$this->_colorCLI = ($options['ColorCLI'] instanceof \ColorCLI ? $options['ColorCLI'] : new \ColorCLI());
-		$this->_nntp = ($options['NNTP'] instanceof \NNTP ? $options['NNTP'] : new \NNTP(['Echo' => $this->_colorCLI, 'Settings' => $this->_pdo, 'ColorCLI' => $this->_colorCLI]));
-		$this->_collectionsCleaning = ($options['CollectionsCleaning'] instanceof \CollectionsCleaning ? $options['CollectionsCleaning'] : new \CollectionsCleaning(['Settings' => $this->_pdo]));
+		$this->_groups = ($options['Groups'] instanceof Groups ? $options['Groups'] : new Groups(['Settings' => $this->_pdo]));
+		$this->_colorCLI = ($options['ColorCLI'] instanceof ColorCLI ? $options['ColorCLI'] : new ColorCLI());
+		$this->_nntp = ($options['NNTP'] instanceof NNTP ? $options['NNTP'] : new NNTP(['Echo' => $this->_colorCLI, 'Settings' => $this->_pdo, 'ColorCLI' => $this->_colorCLI]));
+		$this->_collectionsCleaning = ($options['CollectionsCleaning'] instanceof CollectionsCleaning ? $options['CollectionsCleaning'] : new CollectionsCleaning(['Settings' => $this->_pdo]));
 
 		$this->_debug = (NN_DEBUG || NN_LOGGING);
 
 		if ($this->_debug) {
 			try {
-				$this->_debugging = ($options['Logger'] instanceof \Logger ? $options['Logger'] : new \Logger(['ColorCLI' => $this->_colorCLI]));
-			} catch (\LoggerException $error) {
+				$this->_debugging = ($options['Logger'] instanceof Logger ? $options['Logger'] : new Logger(['ColorCLI' => $this->_colorCLI]));
+			} catch (LoggerException $error) {
 				$this->_debug = false;
 			}
 		}
@@ -210,7 +210,7 @@ class Binaries
 			$this->log(
 				'Updating: ' . $groupCount . ' group(s) - Using compression? ' . ($this->_compressedHeaders ? 'Yes' : 'No'),
 				'updateAllGroups',
-				\Logger::LOG_INFO,
+				Logger::LOG_INFO,
 				'header'
 			);
 
@@ -219,7 +219,7 @@ class Binaries
 				$this->log(
 					'Starting group ' . $counter . ' of ' . $groupCount,
 					'updateAllGroups',
-					\Logger::LOG_INFO,
+					Logger::LOG_INFO,
 					'header'
 				);
 				$this->updateGroup($group, $maxHeaders);
@@ -229,14 +229,14 @@ class Binaries
 			$this->log(
 				'Updating completed in ' . number_format(microtime(true) - $allTime, 2) . ' seconds.',
 				'updateAllGroups',
-				\Logger::LOG_INFO,
+				Logger::LOG_INFO,
 				'primary'
 			);
 		} else {
 			$this->log(
-				'No groups specified. Ensure groups are added to nZEDb\'s database for updating.',
+				'No groups specified. Ensure groups are added to newznab\'s database for updating.',
 				'updateAllGroups',
-				\Logger::LOG_NOTICE,
+				Logger::LOG_NOTICE,
 				'warning'
 			);
 		}
@@ -544,7 +544,7 @@ class Binaries
 				$this->log(
 					"Code {$headers->code}: {$headers->message}\nSkipping group: {$groupMySQL['name']}",
 					'scan',
-					\Logger::LOG_WARNING,
+					Logger::LOG_WARNING,
 					'error'
 				);
 				return $returnArray;
@@ -654,7 +654,7 @@ class Binaries
 			if (!isset($header['Bytes'])) {
 				$header['Bytes'] = (isset($header[':bytes']) ? $header[':bytes'] : 0);
 			}
-			$header['Bytes'] = (int) $header['Bytes'];
+			$header['Bytes'] = (int)$header['Bytes'];
 
 			// Set up the info for inserting into parts/binaries/collections tables.
 			if (!isset($articles[$matches[1]])) {
@@ -685,6 +685,7 @@ class Binaries
 					$groupMySQL['id'] .
 					$fileCount[3]
 				);
+
 
 				if (!isset($collectionIDs[$header['CollectionKey']])) {
 
@@ -799,7 +800,7 @@ class Binaries
 				);
 			}
 
-			if (((strlen($partsQuery) === strlen($partsCheck)) ? true  : $this->_pdo->queryExec(rtrim($partsQuery, ',')))) {
+			if (((strlen($partsQuery) === strlen($partsCheck)) ? true : $this->_pdo->queryExec(rtrim($partsQuery, ',')))) {
 				$this->_pdo->Commit();
 			} else {
 				if ($addToPartRepair) {
@@ -843,7 +844,7 @@ class Binaries
 				$this->log(
 					$notInsertedCount . ' articles failed to insert!',
 					'scan',
-					\Logger::LOG_WARNING,
+					Logger::LOG_WARNING,
 					'warning'
 				);
 			}
@@ -976,7 +977,7 @@ class Binaries
 				$partList = $range['partlist'];
 
 				if ($this->_echoCLI) {
-					echo chr(rand(45,46)) . "\r";
+					echo chr(rand(45, 46)) . "\r";
 				}
 
 				// Get article headers from newsgroup.
@@ -1044,7 +1045,7 @@ class Binaries
 	 * @param int    $post      The article number to get the time from.
 	 * @param array  $groupData Usenet group info from NNTP selectGroup method.
 	 *
-	 * @return bool|int
+	 * @return int	Timestamp.
 	 */
 	public function postdate($post, array $groupData)
 	{
@@ -1132,7 +1133,7 @@ class Binaries
 				') (' .
 				$this->daysOld($date) .
 				" days old)",
-				\Logger::LOG_INFO
+				Logger::LOG_INFO
 			);
 		}
 
@@ -1256,7 +1257,7 @@ class Binaries
 	 *
 	 * @param array  $numbers   The article numbers of the missing headers.
 	 * @param string $tableName Name of the partrepair table to insert into.
-	 * @param int    $groupID   The id of this groups.
+	 * @param int    $groupID   The ID of this groups.
 	 *
 	 * @return bool
 	 */
@@ -1264,7 +1265,7 @@ class Binaries
 	{
 		$insertStr = 'INSERT INTO ' . $tableName . ' (numberid, group_id) VALUES ';
 		foreach ($numbers as $number) {
-			$insertStr .= '(' . $number . ',' . $groupID .'),';
+			$insertStr .= '(' . $number . ',' . $groupID . '),';
 		}
 		return $this->_pdo->queryInsert((rtrim($insertStr, ',') . ' ON DUPLICATE KEY UPDATE attempts=attempts+1'));
 	}
@@ -1274,7 +1275,7 @@ class Binaries
 	 *
 	 * @param array  $numbers   The article numbers.
 	 * @param string $tableName Name of the part repair table to work on.
-	 * @param int    $groupID   The id of the group.
+	 * @param int    $groupID   The ID of the group.
 	 *
 	 * @return void
 	 */
@@ -1378,10 +1379,10 @@ class Binaries
 				$opType = 'AND binaryblacklist.optype = ' . self::OPTYPE_BLACKLIST;
 				break;
 			case self::OPTYPE_WHITELIST:
-				$opType = 'AND binaryblacklist.optype = ' . self::OPTYPE_WHITELIST;;
+				$opType = 'AND binaryblacklist.optype = ' . self::OPTYPE_WHITELIST;
 				break;
 			default:
-				$opType ='';
+				$opType = '';
 				break;
 		}
 		return $this->_pdo->query(
@@ -1401,11 +1402,10 @@ class Binaries
 		);
 	}
 
-
 	/**
 	 * Return the specified blacklist.
 	 *
-	 * @param int $id The blacklist id.
+	 * @param int $id The blacklist ID.
 	 *
 	 * @return array|bool
 	 */
@@ -1417,7 +1417,7 @@ class Binaries
 	/**
 	 * Delete a blacklist.
 	 *
-	 * @param int $id The id of the blacklist.
+	 * @param int $id The ID of the blacklist.
 	 *
 	 * @return bool
 	 */
@@ -1431,11 +1431,11 @@ class Binaries
 	 *
 	 * @param Array $blacklistArray
 	 *
-	 * @return bool
+	 * @return boolean
 	 */
 	public function updateBlacklist($blacklistArray)
 	{
-		$this->_pdo->queryExec(
+		return $this->_pdo->queryExec(
 			sprintf('
 				UPDATE binaryblacklist
 				SET groupname = %s, regex = %s, status = %d, description = %s, optype = %d, msgcol = %d
@@ -1480,9 +1480,9 @@ class Binaries
 	}
 
 	/**
-	 * Delete Collections/Binaries/Parts for a Collection id.
+	 * Delete Collections/Binaries/Parts for a Collection ID.
 	 *
-	 * @param int $collectionID Collections table id
+	 * @param int $collectionID Collections table ID
 	 *
 	 * @note A trigger automatically deletes the parts/binaries.
 	 *
@@ -1494,9 +1494,9 @@ class Binaries
 	}
 
 	/**
-	 * Delete all Collections/Binaries/Parts for a group id.
+	 * Delete all Collections/Binaries/Parts for a group ID.
 	 *
-	 * @param int $groupID The id of the group.
+	 * @param int $groupID The ID of the group.
 	 *
 	 * @note A trigger automatically deletes the parts/binaries.
 	 *
@@ -1529,9 +1529,13 @@ class Binaries
 	}
 
 	/**
-	 * Check if we should ignore the filecount and return true or false.
+	 * Check if we should ignore the file count and return true or false.
+	 *
+	 * @param string $subject
 	 *
 	 * @access protected
+	 *
+	 * @return boolean
 	 */
 	protected function _ignoreFileCount($groupName, $subject)
 	{
@@ -1545,5 +1549,4 @@ class Binaries
 		}
 		return $ignore;
 	}
-
 }
