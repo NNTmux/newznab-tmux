@@ -431,7 +431,7 @@ class Forking extends \fork_daemon
 
 		if ($groups) {
 			$i = 1;
-			$queue = array();
+			$queue = [];
 			foreach ($groups as $group) {
 				if ($group['our_last'] == 0) {
 					$queue[$i] = sprintf("update_group_headers  %s", $group['groupname']);
@@ -459,7 +459,6 @@ class Forking extends \fork_daemon
 					}
 				}
 			}
-			//var_dump($queue);
 			$this->work = $queue;
 		}
 
