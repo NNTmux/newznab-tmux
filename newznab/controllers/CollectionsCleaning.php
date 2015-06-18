@@ -1,5 +1,7 @@
 <?php
 
+use newznab\db\Settings;
+
 /**
  * Cleans names for collections/imports/namefixer.
  *
@@ -19,7 +21,7 @@ class CollectionsCleaning
 	 * @const
 	 * @string
 	 */
-	const REGEX_FILE_EXTENSIONS = '([-_](proof|sample|thumbs?))*(\.part\d*(\.rar)?|\.rar|\.7z)?(\d{1,3}\.rev"|\.vol.+?"|\.[A-Za-z0-9]{2,4}"|")';
+	const REGEX_FILE_EXTENSIONS = '([-_](proof|sample|thumbs?))*(\.part\d*(\.rar)?|\.rar|\.7z)?(\d{1,3}\.rev"|\.vol\d+\+\d+.+?"|\.[A-Za-z0-9]{2,4}"|")';
 
 	/**
 	 * Used for matching size strings in article subjects.
@@ -67,7 +69,7 @@ class CollectionsCleaning
 	/**
 	 * @param array $options Class instances.
 	 */
-	public function __construct(array $options = array())
+	public function __construct(array $options = [])
 	{
 		// Extensions.
 		$this->e0 = self::REGEX_FILE_EXTENSIONS;
@@ -79,7 +81,7 @@ class CollectionsCleaning
 		];
 		$options += $defaults;
 
-		$this->pdo = ($options['Settings'] instanceof newznab\db\Settings ? $options['Settings'] : new newznab\db\Settings());
+		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
 		$this->_regexes = new Regexes(['Settings' => $this->pdo, 'Table_Name' => 'collection_regexes']);
 	}
 
@@ -107,6 +109,7 @@ class CollectionsCleaning
 			case 'alt.binaries.this.is.an.example':
 				return $this->_example_method_name();
 			*/
+			case null:
 			default:
 				return $this->generic();
 		}
