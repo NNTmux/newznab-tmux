@@ -333,7 +333,7 @@ class NZB
 	 *
 	 * @access public
 	 */
-	public function nzbFileList($nzb, array $options = null)
+	public function nzbFileList($nzb, array $options = [])
 	{
 		$defaults = [
 			'no-file-key' => true,
