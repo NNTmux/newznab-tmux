@@ -77,7 +77,7 @@ class ReleaseCleaning
 	protected $_regexes;
 
 	/**
-	 * @param DB $settings
+	 * @param Settings $settings
 	 */
 	public function __construct($settings = null)
 	{
@@ -86,7 +86,7 @@ class ReleaseCleaning
 		$this->e1  = \CollectionsCleaning::REGEX_FILE_EXTENSIONS . \CollectionsCleaning::REGEX_END;
 		$this->e2  = \CollectionsCleaning::REGEX_FILE_EXTENSIONS .
 			\CollectionsCleaning::REGEX_SUBJECT_SIZE . \CollectionsCleaning::REGEX_END;
-		$this->pdo = ($settings instanceof newznab\db\Settings ? $settings : new newznab\db\Settings());
+		$this->pdo = ($settings instanceof Settings ? $settings : new Settings());
 		$this->_regexes = new Regexes(['Settings' => $this->pdo, 'Table_Name' => 'release_naming_regexes']);
 	}
 
