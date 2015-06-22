@@ -627,20 +627,12 @@ class TvAnger
 		if ($epinfo !== false) {
 			$tvairdate = (!empty($epinfo['airdate'])) ? $this->pdo->escapeString($epinfo['airdate']) : "NULL";
 			$tvtitle = (!empty($epinfo['title'])) ? $this->pdo->escapeString($epinfo['title']) : "NULL";
-			$this->pdo->queryExec(sprintf("UPDATE releases SET tvtitle = %s, tvairdate = %s, rageid = %d WHERE id = %d", $this->pdo->escapeString(trim($tvtitle)), $tvairdate, $traktArray['show']['tvrage_id'], $relid));
+			$this->pdo->queryExec(sprintf("UPDATE releases SET tvtitle = %s, tvairdate = %s, rageid = %d WHERE id = %d", $this->pdo->escapeString(trim($tvtitle)), $tvairdate, $traktArray['ids']['tvrage'], $relid));
 		} else {
-			$this->pdo->queryExec(sprintf("UPDATE releases SET rageid = %d WHERE id = %d", $traktArray['show']['tvrage_id'], $relid));
+			$this->pdo->queryExec(sprintf("UPDATE releases SET rageid = %d WHERE id = %d", $traktArray['ids']['tvrage'], $relid));
 		}
 
-		$genre = '';
-		if (isset($traktArray['show']['genres']) && is_array($traktArray['show']['genres']) && !empty($traktArray['show']['genres'])) {
-			$genre = $traktArray['show']['genres']['0'];
-		}
-
-		$country = '';
-		if (isset($traktArray['show']['country']) && !empty($traktArray['show']['country'])) {
-			$country = $this->countryCode($traktArray['show']['country']);
-		}
+		$genre = $country = '';
 
 		$rInfo = $this->getRageInfoFromPage($rageid);
 		$desc = '';
@@ -683,7 +675,7 @@ class TvAnger
 				%s %s %s
 				ORDER BY r.postdate DESC
 				LIMIT %d",
-				($groupID === '' ? '' : 'AND r.group_id = ' . $groupID),
+				($groupID === '' ? '' : 'AND r.groupid = ' . $groupID),
 				($guidChar === '' ? '' : 'AND r.guid ' . $this->pdo->likeString($guidChar, false, true)),
 				($lookupTvRage == 2 ? 'AND r.isrenamed = 1' : ''),
 				$this->rageqty
@@ -721,13 +713,13 @@ class TvAnger
 						$this->updateRageInfo($tvrShow['showid'], $show, $tvrShow, $arr['id']);
 					} else if ($tvrShow === false) {
 						// If tvrage fails, try trakt.
-						$traktArray = $trakt->traktTVSEsummary($show['name'], $show['season'], $show['episode']);
+						$traktArray = $trakt->episodeSummary($show['name'], $show['season'], $show['episode']);
 						if ($traktArray !== false) {
-							if (isset($traktArray['show']['tvrage_id']) && $traktArray['show']['tvrage_id'] !== 0) {
+							if (isset($traktArray['ids']['tvrage']) && $traktArray['ids']['tvrage'] !== 0) {
 								if ($this->echooutput) {
-									echo $this->pdo->log->primary('Found TVRage ID on trakt:' . $traktArray['show']['tvrage_id']);
+									echo $this->pdo->log->primary('Found TVRage ID on trakt:' . $traktArray['ids']['tvrage']);
 								}
-								$this->updateRageInfoTrakt($traktArray['show']['tvrage_id'], $show, $traktArray, $arr['id']);
+								$this->updateRageInfoTrakt($traktArray['ids']['tvrage'], $show, $traktArray, $arr['id']);
 							}
 							// No match, add to tvrage with rageID = -2 and $show['cleanname'] title only.
 							else {
