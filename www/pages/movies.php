@@ -1,6 +1,6 @@
 <?php
 
-$movie = new Movie;
+$movie = new Film(['Settings' => $page->settings]);
 $cat = new Category(['Settings' => $page->settings]);
 
 if (!$page->users->isLoggedIn())
