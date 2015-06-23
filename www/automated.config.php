@@ -115,7 +115,7 @@ if (is_file($settings_file)) {
 unset($settings_file);
 require_once NN_CORE . 'autoloader.php';
 require_once NN_LIBS . 'autoloader.php';
-require_once SMARTY_DIR . 'autoloader.php';
+require_once SMARTY_DIR . 'Autoloader.php';
 
 define('HAS_WHICH', newznab\utility\Utility::hasWhich() ? true : false);
 
