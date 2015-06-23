@@ -209,7 +209,7 @@ class Binaries
 
 			$this->log(
 				'Updating: ' . $groupCount . ' group(s) - Using compression? ' . ($this->_compressedHeaders ? 'Yes' : 'No'),
-				'updateAllGroups',
+				__FUNCTION__,
 				Logger::LOG_INFO,
 				'header'
 			);
@@ -218,7 +218,7 @@ class Binaries
 			foreach ($groups as $group) {
 				$this->log(
 					'Starting group ' . $counter . ' of ' . $groupCount,
-					'updateAllGroups',
+					__FUNCTION__,
 					Logger::LOG_INFO,
 					'header'
 				);
@@ -228,14 +228,14 @@ class Binaries
 
 			$this->log(
 				'Updating completed in ' . number_format(microtime(true) - $allTime, 2) . ' seconds.',
-				'updateAllGroups',
+				__FUNCTION__,
 				Logger::LOG_INFO,
 				'primary'
 			);
 		} else {
 			$this->log(
 				'No groups specified. Ensure groups are added to newznab\'s database for updating.',
-				'updateAllGroups',
+				__FUNCTION__,
 				Logger::LOG_NOTICE,
 				'warning'
 			);
@@ -541,9 +541,10 @@ class Binaries
 
 			// Check if the non-compression headers have an error.
 			if ($this->_nntp->isError($headers)) {
+				$message = ($headers->code == 0 ? 'Unknown error' : $headers->message);
 				$this->log(
-					"Code {$headers->code}: {$headers->message}\nSkipping group: {$groupMySQL['name']}",
-					'scan',
+					"Code {$headers->code}: {$message}\nSkipping group: {$groupMySQL['name']}",
+					__FUNCTION__,
 					Logger::LOG_WARNING,
 					'error'
 				);
@@ -843,7 +844,7 @@ class Binaries
 
 				$this->log(
 					$notInsertedCount . ' articles failed to insert!',
-					'scan',
+					__FUNCTION__,
 					Logger::LOG_WARNING,
 					'warning'
 				);
@@ -1124,8 +1125,8 @@ class Binaries
 
 		if ($this->_debug) {
 			$this->_debugging->log(
-				'Binaries',
-				"postdate",
+				get_class(),
+				__FUNCTION__,
 				'Article (' .
 				$post .
 				"'s) date is (" .
@@ -1524,7 +1525,7 @@ class Binaries
 		}
 
 		if ($this->_debug) {
-			$this->_debugging->log('Binaries', $method, $message, $level);
+			$this->_debugging->log(get_class(), $method, $message, $level);
 		}
 	}
 
