@@ -1,6 +1,7 @@
 <?php
 
-function Smarty_Autoloader($className)
+spl_autoload_register(
+	function($className)
 	{
 		if ($className == 'Smarty') {
 			$className = 'Smarty.class';
@@ -24,8 +25,6 @@ function Smarty_Autoloader($className)
 			}
 		}
 	}
-spl_autoload_register('Smarty_Autoloader');
-
-
+);
 
 ?>
