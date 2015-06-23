@@ -4,11 +4,11 @@
 {if $error != ''}
 	<div class="error">{$error}</div>
 {/if}
-{if $notice != ''}
+{if isset($notice) && $notice != ''}
 	<div class="info">{$notice}</div>
 {/if}
 
-{if $confirmed == '' && $sent == ''}
+{if isset($confirmed) && $confirmed == '' && isset($sent) && $sent == ''}
 	<p>
 		Please enter the email address you used to register and we will send an email to reset your password. If you cannot remember your email, or no longer have access to it, please <a href="{$smarty.const.WWW_TOP}/contact-us">contact us</a>.
 	</p>
