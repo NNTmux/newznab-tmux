@@ -942,17 +942,20 @@ class Users
 	}
 
 	/**
-	 * Get the quantity of API requests in the last day for the user_id.
+	 * Get the quantity of API requests in the last day for the userid.
 	 *
 	 * @param int $userID
 	 *
-	 * @return array|bool
+	 * @return int
 	 */
 	public function getApiRequests($userID)
 	{
 		// Clear old requests.
 		$this->clearApiRequests($userID);
-		return $this->pdo->queryOneRow(sprintf('SELECT COUNT(id) AS num FROM userrequests WHERE userid = %d', $userID));
+		$requests = $this->pdo->queryOneRow(
+			sprintf('SELECT COUNT(id) AS num FROM userdownloads WHERE userid = %d', $userID)
+		);
+		return (!$requests ? 0 : (int)$requests['num']);
 	}
 
 	/**
