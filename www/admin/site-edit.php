@@ -60,9 +60,9 @@ switch($action)
 	default:
 
 		$page->title = "Site Edit";
-		$site = $sites->get();
+		$site        = $page->settings;
 		$page->smarty->assign('fsite', $site);
-
+		$page->smarty->assign('settings', $site->getSettingsAsTree());
 		break;
 }
 
