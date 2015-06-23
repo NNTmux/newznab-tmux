@@ -351,7 +351,7 @@ class NZBImport
 				'useFName'   => $useNzbName,
 				'postDate'   => (empty($postDate) ? date("Y-m-d H:i:s") : $postDate),
 				'from'       => (empty($posterName) ? '' : $posterName),
-				'group_id'    => $groupID,
+				'groupid'    => $groupID,
 				'groupName'  => $groupName,
 				'totalFiles' => $totalFiles,
 				'totalSize'  => $totalSize
@@ -414,16 +414,16 @@ class NZBImport
 					'name' => $escapedSubject,
 					'searchname' => $escapedSearchName,
 					'totalpart' => $nzbDetails['totalFiles'],
-					'groupid' => $nzbDetails['group_id'],
+					'groupid' => $nzbDetails['groupid'],
 					'guid' => $this->pdo->escapeString($this->relGuid),
 					'postdate' => $this->pdo->escapeString($nzbDetails['postDate']),
 					'fromname' => $escapedFromName,
 					'size' => $this->pdo->escapeString($nzbDetails['totalSize']),
-					'categoryid' => $this->category->determineCategory($nzbDetails['group_id'], $cleanName),
+					'categoryid' => $this->category->determineCategory($nzbDetails['groupid'], $cleanName),
 					'isrenamed' => $renamed,
 					'reqidstatus' => 0,
 					'prehashid' => 0,
-					'nzbstatus' => Enzebe::NZB_ADDED
+					'nzbstatus' => NZB::NZB_ADDED
 				]
 			);
 		} else {
