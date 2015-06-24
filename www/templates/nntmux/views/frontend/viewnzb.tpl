@@ -93,15 +93,17 @@
 	</div> {/if}
 	<div class="btn-group">
 	<a class="btn btn-mini" target="_blank" href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$release.imdbid}/" title="View at IMDB">IMDB</a>
-	{if $movie.tmdbID != ''}<a class="btn btn-mini" target="_blank" href="{$site->dereferrer_link}http://www.themoviedb.org/movie/{$movie.tmdbID}" title="View at TMDb">TMDb</a>{/if}
+	{if isset($movie.tmdbid) && $movie.tmdbid != ''}<a class="btn btn-mini" target="_blank" href="{$site->dereferrer_link}http://www.themoviedb.org/movie/{$movie.tmdbid}" title="View at TMDb">TMDb</a>{/if}
 	<a class="btn btn-mini" href="{$smarty.const.WWW_TOP}/movies?imdb={$release.imdbid}" title="View all versions">Movie View</a>
+	{if isset($cpurl) && $cpurl != '' && isset($cpapi) && $cpapi != ''}
 	<a
 			class="btn btn-mini" target="blackhole"
-			href="javascript:;"
+			href="javascript:"
 			rel="{$site->dereferrer_link}{$cpurl}/api/{$cpapi}/movie.add/?identifier=tt{$release.imdbid}&title={$movie.title}"
 			name="CP{$release.imdbid}" title="Add to CouchPotato">
 		CouchPotato
 	</a>
+	{/if}
 	<a class="btn btn-mini" target="_blank" href="http://www.opensubtitles.org/search/sublanguageid-all/moviename-{$movie.title|replace:" ":"+"}"title="Opensubtitles">OpenSubtitles</a>
 	<a class="btn btn-mini" target="_blank" href="http://www.subtitleseeker.com/search/MOVIE_TITLES/{$movie.title}"title="SubtitleSeeker">SubtitleSeeker</a>
 </div>
@@ -399,7 +401,7 @@
 			{/if}
 			{foreach from=$reAudio item=audio}
 				<tr>
-					<td><strong>Audio {$audio.audioID}</strong></td>
+					<td><strong>Audio {$audio.audioid}</strong></td>
 					<td>Format</td>
 					<td class="right">{$audio.audioformat}</td>
 				</tr>
