@@ -205,7 +205,6 @@ switch ($function) {
 		{
 			$page->smarty->assign('rsstitle',"NFO");
 			$page->smarty->assign('rssdesc',"NFO");
-			$page->smarty->assign('rsshead',$page->smarty->fetch('rssheader.tpl'));
 			$content = trim($page->smarty->fetch('apinfo.tpl'));
 
 			printOutput($relData, $outputXML, $page, $offset);
@@ -230,7 +229,6 @@ switch ($function) {
 		$page->smarty->assign('comments',$reldata);
 		$page->smarty->assign('rsstitle',"API Comments");
 		$page->smarty->assign('rssdesc',"API Comments");
-		$page->smarty->assign('rsshead',$page->smarty->fetch('rssheader.tpl'));
 		$content = trim($page->smarty->fetch('apicomments.tpl'));
 
 		printOutput($relData, $outputXML, $page, $offset);
@@ -297,7 +295,6 @@ switch ($function) {
 
 		$page->smarty->assign('offset',$offset);
 		$page->smarty->assign('releases',$reldata);
-		$page->smarty->assign('rsshead',$page->smarty->fetch('rssheader.tpl'));
 		$output = trim($page->smarty->fetch('apiresult.tpl'));
 
 		printOutput($relData, $outputXML, $page, $offset);
@@ -345,7 +342,6 @@ switch ($function) {
 
 		$page->smarty->assign('offset',$offset);
 		$page->smarty->assign('releases',$reldata);
-		$page->smarty->assign('rsshead',$page->smarty->fetch('rssheader.tpl'));
 		$output = trim($page->smarty->fetch('apiresult.tpl'));
 
 		printOutput($relData, $outputXML, $page, $offset);
@@ -616,7 +612,6 @@ function printOutput($data, $xml = true, $page, $offset = 0)
 	if ($xml) {
 		$page->smarty->assign('offset', $offset);
 		$page->smarty->assign('releases', $data);
-		$page->smarty->assign('rsshead',$page->smarty->fetch('rssheader.tpl'));
 		header('Content-type: text/xml');
 		echo trim($page->smarty->fetch('apiresult.tpl'));
 	} else {

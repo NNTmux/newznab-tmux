@@ -25,16 +25,16 @@
 				<description>{if $api=="1"}{$release.searchname}{else}
 					<![CDATA[{strip}
 					<div>
-						{if $release.cover == 1}
+						{if isset($release_cover) && $release.cover == 1}
 							<img style="margin-left:10px;margin-bottom:10px;float:right;" src="{$serverroot}covers/movies/{$release.imdbid}-cover.jpg" width="120" border="0" alt="{$release.searchname|escape:"htmlall"}" />
 						{/if}
-						{if $release.mu_cover == 1}
+						{if isset($release.mu_cover) && $release.mu_cover == 1}
 							<img style="margin-left:10px;margin-bottom:10px;float:right;" src="{$serverroot}covers/music/{$release.musicinfoid}.jpg" width="120" border="0" alt="{$release.searchname|escape:"htmlall"}" />
 						{/if}
-						{if $release.co_cover == 1}
+						{if isset($release.co_cover) && $release.co_cover == 1}
 							<img style="margin-left:10px;margin-bottom:10px;float:right;" src="{$serverroot}covers/console/{$release.consoleinfoid}.jpg" width="120" border="0" alt="{$release.searchname|escape:"htmlall"}" />
 						{/if}
-						{if $release.bo_cover == 1}
+						{if isset($release.bo_cover) && $release.bo_cover == 1}
 							<img style="margin-left:10px;margin-bottom:10px;float:right;" src="{$serverroot}covers/book/{$release.bookinfoid}.jpg" width="120" border="0" alt="{$release.searchname|escape:"htmlall"}" />
 						{/if}
 						<ul>
@@ -46,10 +46,10 @@
 							<li>Poster: {$release.fromname|escape:"htmlall"}</li>
 							<li>PostDate: {$release.postdate|phpdate_format:"DATE_RSS"}</li>
 							<li>Password: {if $release.passwordstatus == 0}None{elseif $release.passwordstatus == 1}Possibly Passworded Archive{elseif $release.passwordstatus == 2}Probably not viable{elseif $release.passwordstatus == 10}Passworded Archive{else}Unknown{/if}</li>
-							{if $release.nfoid != ""}
+							{if isset($release.nfoid) && $release.nfoid != ""}
 								<li>Nfo: <a href="{$serverroot}api?t=getnfo&amp;id={$release.guid}&amp;raw=1&amp;i={$uid}&amp;r={$rsstoken}">{$release.searchname}.nfo</a></li>
 							{/if}
-							{if $release.parentCategoryid == 2000}
+							{if isset($release.parentCategoryid) && $release.parentCategoryid == 2000}
 								{if $release.imdbid != ""}
 									<li>Imdb Info:
 										<ul>
@@ -64,7 +64,7 @@
 									</li>
 								{/if}
 							{/if}
-							{if $release.parentCategoryid == 3000}
+							{if isset($release.parentCategoryid) && $release.parentCategoryid == 3000}
 								{if $release.musicinfoid > 0}
 									<li>Music Info:
 										<ul>
@@ -88,7 +88,7 @@
 									</li>
 								{/if}
 							{/if}
-							{if $release.parentCategoryid == 1000}
+							{if isset($release.parentCategoryid) && $release.parentCategoryid == 1000}
 								{if $release.consoleinfoid > 0}
 									<li>Console Info:
 										<ul>
