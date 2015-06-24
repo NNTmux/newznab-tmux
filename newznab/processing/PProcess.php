@@ -422,7 +422,7 @@ class PProcess
 
 			// If we found some files.
 			if ($filesAdded > 0) {
-				$this->debugging->log('PostProcess', 'parsePAR2', 'Added ' . $filesAdded . ' releasefiles from PAR2 for ' . $query['searchname'], \Logger::LOG_INFO);
+				$this->debugging->log(get_class(), __FUNCTION__, 'Added ' . $filesAdded . ' releasefiles from PAR2 for ' . $query['searchname'], \Logger::LOG_INFO);
 
 				// Update the file count with the new file count + old file count.
 				$this->pdo->queryExec(

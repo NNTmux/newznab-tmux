@@ -356,7 +356,7 @@ class DB extends \PDO
 	protected function echoError($error, $method, $severity, $exit = false)
 	{
 		if ($this->_debug) {
-			$this->debugging->log('DB', $method, $error, $severity);
+			$this->debugging->log(get_class(), $method, $error, $severity);
 
 			echo(
 			($this->cli ? $this->log->error($error) . PHP_EOL : '<div class="error">' . $error . '</div>')
@@ -462,7 +462,7 @@ class DB extends \PDO
 		}
 		if ($this->_debug) {
 			$this->echoError($error, 'queryInsert', 4);
-			$this->debugging->log('DB', "queryInsert", $query, \Logger::LOG_SQL);
+			$this->debugging->log(get_class(), __FUNCTION__, $query, \Logger::LOG_SQL);
 		}
 		return false;
 	}
@@ -524,7 +524,7 @@ class DB extends \PDO
 		}
 		if ($silent === false && $this->_debug) {
 			$this->echoError($error, 'queryExec', 4);
-			$this->debugging->log('DB', "queryExec", $query, \Logger::LOG_SQL);
+			$this->debugging->log(get_class(), __FUNCTION__, $query, \Logger::LOG_SQL);
 		}
 		return false;
 	}
@@ -623,7 +623,7 @@ class DB extends \PDO
 				$this->echoError($e->getMessage(), 'Exec', 4, false);
 
 				if ($this->_debug) {
-					$this->debugging->log('DB', "Exec", $query, \Logger::LOG_SQL);
+					$this->debugging->log(get_class(), __FUNCTION__, $query, \Logger::LOG_SQL);
 				}
 			}
 
@@ -782,7 +782,7 @@ class DB extends \PDO
 				if ($ignore === false) {
 					$this->echoError($e->getMessage(), 'queryDirect', 4, false);
 					if ($this->_debug) {
-						$this->debugging->log('DB', "queryDirect", $query, \Logger::LOG_SQL);
+						$this->debugging->log(get_class(), __FUNCTION__, $query, \Logger::LOG_SQL);
 					}
 				}
 				$result = false;
@@ -957,7 +957,7 @@ class DB extends \PDO
 
 		}
 		if ($this->_debug) {
-			$this->debugging->log('DB', 'optimise', $message, \Logger::LOG_INFO);
+			$this->debugging->log(get_class(), __FUNCTION__, $message, \Logger::LOG_INFO);
 		}
 	}
 
@@ -1097,7 +1097,7 @@ class DB extends \PDO
 			$PDOstatement = $this->pdo->prepare($query, $options);
 		} catch (\PDOException $e) {
 			if ($this->_debug) {
-				$this->debugging->log('DB', "Prepare", $e->getMessage(), \Logger::LOG_INFO);
+				$this->debugging->log(get_class(), __FUNCTION__, $e->getMessage(), \Logger::LOG_INFO);
 			}
 			echo $this->log->error("\n" . $e->getMessage());
 			$PDOstatement = false;
@@ -1120,7 +1120,7 @@ class DB extends \PDO
 				$result = $this->pdo->getAttribute($attribute);
 			} catch (\PDOException $e) {
 				if ($this->_debug) {
-					$this->debugging->log('DB', "getAttribute", $e->getMessage(), \Logger::LOG_INFO);
+					$this->debugging->log(get_class(), __FUNCTION__, $e->getMessage(), \Logger::LOG_INFO);
 				}
 				echo $this->log->error("\n" . $e->getMessage());
 				$result = false;

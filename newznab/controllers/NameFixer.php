@@ -152,7 +152,7 @@ class NameFixer
 		$this->category = ($options['Categorize'] instanceof Categorize ? $options['Categorize'] : new Categorize(['Settings' => $this->pdo]));
 		$this->utility = ($options['Utility'] instanceof Utility ? $options['Utility'] : new Utility());
 		$this->_groups = ($options['Groups'] instanceof Groups ? $options['Groups'] : new Groups(['Settings' => $this->pdo]));
-		$this->sphinx = ($options['SphinxSearch'] instanceof \SphinxSearch ? $options['SphinxSearch'] : new \SphinxSearch());
+		$this->sphinx = ($options['SphinxSearch'] instanceof SphinxSearch ? $options['SphinxSearch'] : new SphinxSearch());
 	}
 
 	/**
@@ -373,7 +373,7 @@ class NameFixer
 	 * @param int    $cats  1: other categories, 2: all categories
 	 * @param string $query Query to execute.
 	 *
-	 * @return PDOStatement|bool False on failure, PDOStatement with query results on success.
+	 * @return \PDOStatement|bool False on failure, PDOStatement with query results on success.
 	 */
 	protected function _getReleases($time, $cats, $query)
 	{
