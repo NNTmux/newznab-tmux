@@ -150,11 +150,11 @@
 					<td colspan="8" class="left" id="guid{$result.grp_release_guid}">
 						<h2><a class="title" title="View details"
 							   href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}/{$result.grp_release_name|escape:"htmlall"}">{$result.title|stripslashes|escape:"htmlall"}</a></h2>
-						{if $result.genre != ""}<b>Genre:</b>{$result.genre}<br/>{/if}
-						{if $result.esrb != ""}<b>Rating:</b>{$result.esrb}<br/>{/if}
-						{if $result.publisher != ""}<b>Publisher:</b>{$result.publisher}<br/>{/if}
-						{if $result.releasedate != ""}<b>Released:</b>{$result.releasedate|date_format}<br/>{/if}
-						{if $result.review != ""}<b>Review:</b>{$result.review|stripslashes|escape:'htmlall'}<br/>{/if}
+						{if isset($result.genre) && $result.genre != ""}<b>Genre:</b>{$result.genre}<br/>{/if}
+						{if isset($result.esrb) && $result.esrb != ""}<b>Rating:</b>{$result.esrb}<br/>{/if}
+						{if isset($result.publisher) && $result.publisher != ""}<b>Publisher:</b>{$result.publisher}<br/>{/if}
+						{if isset($result.releasedate) && $result.releasedate != ""}<b>Released:</b>{$result.releasedate|date_format}<br/>{/if}
+						{if isset($result.review) && $result.review != ""}<b>Review:</b>{$result.review|stripslashes|escape:'htmlall'}<br/>{/if}
 						<br/>
 
 						<div class="movextra">
