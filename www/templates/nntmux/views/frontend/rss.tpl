@@ -22,7 +22,7 @@
 				<comments>{$serverroot}details/{$release.guid}#comments</comments>
 				<pubDate>{$release.adddate|phpdate_format:"DATE_RSS"}</pubDate>
 				<category>{$release.category_name|escape:html}</category>
-				<description>{if $api=="1"}{$release.searchname}{else}
+				<description>{if isset($api) && $api=="1"}{$release.searchname}{else}
 					<![CDATA[{strip}
 					<div>
 						{if isset($release_cover) && $release.cover == 1}
