@@ -2,7 +2,7 @@
 use newznab\db\Settings;
 
 if(is_file("config.php")) {
-	require_once("config.php");
+	require_once realpath('config.php');
 } else {
 	if(is_dir("install")) {
 		header("location: install");

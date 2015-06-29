@@ -1,5 +1,7 @@
 <?php
-require_once SMARTY_DIR . 'Smarty.class.php';
+require_once SMARTY_DIR . 'Autoloader.php';
+
+Smarty_Autoloader::register();
 require_once NN_LIB . 'utility' . DS . 'SmartyUtils.php';
 
 use newznab\controllers\Captcha;
