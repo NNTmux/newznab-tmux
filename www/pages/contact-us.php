@@ -2,12 +2,14 @@
 
 use newznab\utility\Utility;
 
+$captcha = new Captcha($page);
+
 if (isset($_POST["useremail"])) {
 	//
 	// send the contact info and report back to user.
 	//
 
-	if ($page->captcha->getError() === false) {
+	if ($captcha->getError() === false) {
 		$email = $_POST["useremail"];
 		$mailto = $page->settings->getSetting('email');
 		$mailsubj = "Contact Form Submitted";

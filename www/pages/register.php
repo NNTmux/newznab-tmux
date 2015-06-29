@@ -32,9 +32,11 @@ else {
 		$page->smarty->assign('invite_code_query', '');
 	}
 
+	$captcha = new Captcha($page);
+
 	switch ($action) {
 		case 'submit':
-			if ($page->captcha->getError() === false) {
+			if ($captcha->getError() === false) {
 				$username = htmlspecialchars($_POST['username']);
 				$password = htmlspecialchars($_POST['password']);
 				$confirmpassword = htmlspecialchars($_POST['confirmpassword']);
