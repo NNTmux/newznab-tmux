@@ -124,7 +124,7 @@
 					<td class="mid">
 						<div class="movcover">
 							<a class="title" title="View details"
-							   href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"htmlall"}">
+							   href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}/{$result.grp_release_name|escape:"htmlall"}">
 								<img class="shadow"
 									 src="{$smarty.const.WWW_TOP}/covers/music/{if $result.cover == 1}{$result.musicinfoid}.jpg{else}no-cover.jpg{/if}"
 									 width="120" border="0"
@@ -132,7 +132,7 @@
 							</a>
 
 							<div class="movextra">
-								{if $result.nfoid > 0}<a href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}"
+								{if $result.nfoid > 0}<a href="{$smarty.const.WWW_TOP}/nfo/{$result.grp_release_guid}"
 														 title="View Nfo" class="btn btn-mini modal_nfo" rel="nfo">
 										Nfo</a>{/if}
 								<a class="btn btn-mini" target="_blank" href="{$site->dereferrer_link}{$result.url}"
@@ -142,7 +142,7 @@
 							</div>
 						</div>
 					</td>
-					<td colspan="7" class="left" id="guid{$result.guid}">
+					<td colspan="7" class="left" id="guid{$result.grp_release_guid}">
 						<h2>{$result.artist}{" - "}{$result.title}</h2>
 						{if $result.genreid != ""}
 							<b>Genre:</b>

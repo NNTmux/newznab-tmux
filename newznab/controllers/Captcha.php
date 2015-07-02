@@ -1,15 +1,12 @@
 <?php
-namespace newznab\controllers;
-
-use newznab\db\Settings;
-use ReCaptcha\ReCaptcha;
-
 
 class Captcha {
 	/**
-	 * @var \newznab\db\Settings
+	 * Smarty $page
+	 *
+	 * @var \Page
 	 */
-	private $pdo;
+	private $page;
 
 	/**
 	 * ReCaptcha Site Key from the
@@ -45,25 +42,12 @@ class Captcha {
 
 
 	/**
-	 * List of page routes to apply the captcha.
-	 *
-	 * @todo Find a better way to enumerate this, I hate literals.
-	 * @var array
-	 */
-	private $captcha_pages = [
-		'login',
-		'register',
-		'contact-us',
-		'forgottenpassword'
-	];
-
-	/**
 	 * $_POST key for the user-supplied ReCaptcha response.
 	 */
 	const RECAPTCHA_POSTKEY = 'g-recaptcha-response';
 
 	/**
-	 * Error literal constants.
+	 * Error key literals.
 	 */
 	const RECAPTCHA_ERROR_MISSING_SECRET 	= 'missing-input-secret';
 	const RECAPTCHA_ERROR_INVALID_SECRET 	= 'invalid-input-secret';
@@ -71,32 +55,49 @@ class Captcha {
 	const RECAPTCHA_ERROR_INVALID_RESPONSE 	= 'invalid-input-response';
 
 	/**
-	 * Construct.
-	 *
-	 * @param array $options Class instances.
+	 * Settings key literals
 	 */
-	public function __construct(array $options = []) {
-		$defaults = [
-			'Settings' => null
-		];
-		$options += $defaults;
+	const RECAPTCHA_SETTING_SITEKEY		= 'recaptchapublickey';
+	const RECAPTCHA_SETTING_SECRETKEY 	= 'recaptchaprivatekey';
 
-		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
+	/**
+	 * Construct and decide whether to show the captcha or not.
+	 *
+	 * @note Passing $page by reference to setup smarty vars easily.
+	 * @param \Page $page
+	 */
+	public function __construct(&$page) {
+		if (!$page instanceof \Page) {
+			throw new \InvalidArgumentException('Invalid Page variable provided');
+		}
+
+		$this->page = $page;
+
+		if ($this->shouldDisplay()) {
+			$this->page->smarty->assign('showCaptcha', true);
+			$this->page->smarty->assign('sitekey', $this->sitekey);
+
+			if ($this->page->isPostBack()) {
+				if (!$this->processCaptcha($_POST, $_SERVER['REMOTE_ADDR'])) {
+					$this->page->smarty->assign('error', $this->getError());
+				}
+				//Delete this key after using so it doesn't interfere with normal $_POST
+				//processing. (i.e. contact-us)
+				unset($_POST[Captcha::RECAPTCHA_POSTKEY]);
+			}
+		} else {
+			$this->page->smarty->assign('showCaptcha', false);
+		}
 	}
 
 	/**
 	 * If site admin setup keys properly,
 	 * allow display of recaptcha.
 	 *
-	 * @param string|bool $page
 	 * @return bool
 	 */
-	public function shouldDisplay($page = false) {
-		if ($page !== false) {
-			if (in_array($page, $this->captcha_pages) && $this->_bootstrapCaptcha()) {
-				return true;
-			}
-		} elseif ($this->_bootstrapCaptcha()) {
+	public function shouldDisplay() {
+		if ($this->_bootstrapCaptcha()) {
 			return true;
 		}
 
@@ -110,15 +111,6 @@ class Captcha {
 	 */
 	public function getError() {
 		return $this->error;
-	}
-
-	/**
-	 * Return sitekey for captcha html display.
-	 *
-	 * @return bool|string
-	 */
-	public function getSiteKey() {
-		return $this->sitekey;
 	}
 
 	/**
@@ -183,21 +175,20 @@ class Captcha {
 	 * @return bool
 	 */
 	private function _bootstrapCaptcha() {
-		if ($this->recaptcha instanceof ReCaptcha) {
+		if ($this->recaptcha instanceof \ReCaptcha\ReCaptcha) {
 			return true;
 		}
 
-		$this->sitekey = $this->pdo->getSetting('recaptchapublickey');
-		$this->secretkey = $this->pdo->getSetting('recaptchaprivatekey');
+		$this->sitekey = $this->page->settings->getSetting(self::RECAPTCHA_SETTING_SITEKEY);
+		$this->secretkey = $this->page->settings->getSetting(self::RECAPTCHA_SETTING_SECRETKEY);
 
 		if ($this->sitekey != false && $this->sitekey != '') {
 			if ($this->secretkey != false && $this->secretkey != '') {
-				$this->recaptcha = new ReCaptcha($this->secretkey);
+				$this->recaptcha = new \ReCaptcha\ReCaptcha($this->secretkey);
 				return true;
 			}
 		}
 
 		return false;
 	}
-
 }

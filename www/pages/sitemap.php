@@ -61,7 +61,11 @@ if ($page->userdata != null)
 // echo appropriate site map
 //
 asort($arPages);
-$page->smarty->assign('sitemaps',$arPages);
+$page->smarty->assign([
+		'sitemaps' => $arPages,
+		'last_type' => ''
+	]
+);
 
 if (isset($_GET["type"]) && $_GET["type"] == "xml")
 {

@@ -7,6 +7,8 @@ if ($page->users->isLoggedIn())
 
 $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view';
 
+$captcha = new Captcha($page);
+
 switch($action) {
 	case "reset":
 		if (!isset($_REQUEST['guid'])) {
@@ -39,7 +41,7 @@ switch($action) {
 		break;
 	case 'submit':
 
-		if ($page->captcha->getError() === false) {
+		if ($captcha->getError() === false) {
 			$page->smarty->assign('email', $_POST['email']);
 
 			if ($_POST['email'] == "") {

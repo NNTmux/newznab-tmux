@@ -2,7 +2,7 @@
 use newznab\db\Settings;
 
 if(is_file("config.php")) {
-	require_once("config.php");
+	require_once realpath('config.php');
 } else {
 	if(is_dir("install")) {
 		header("location: install");
@@ -19,6 +19,7 @@ switch ($page->page) {
 	case 'ajax_mediainfo':
 	case 'ajax_mymovies':
 	case 'ajax_preinfo':
+	case 'ajax_prehashinfo':
 	case 'ajax_profile':
 	case 'ajax_release-admin':
 	case 'ajax_rarfilelist':

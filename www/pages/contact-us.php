@@ -2,12 +2,14 @@
 
 use newznab\utility\Utility;
 
+$captcha = new Captcha($page);
+
 if (isset($_POST["useremail"])) {
 	//
 	// send the contact info and report back to user.
 	//
 
-	if ($page->captcha->getError() === false) {
+	if ($captcha->getError() === false) {
 		$email = $_POST["useremail"];
 		$mailto = $page->settings->getSetting('email');
 		$mailsubj = "Contact Form Submitted";
@@ -24,9 +26,10 @@ if (isset($_POST["useremail"])) {
 			Utility::sendEmail($mailto, $mailsubj, $mailbody, $email);
 		}
 
-		$page->smarty->assign("msg", "<h2 style='padding-top:25px;'>Thanks for getting in touch with " . $page->settings->getSetting('title') . ".</h2>");
+		$msg = "<h2 style='text-align:center;'>Thank you for getting in touch with " . $page->settings->getSetting('title') . ".</h2>";
 	}
 }
+$page->smarty->assign("msg", $msg);
 $page->title = "Contact ".$page->settings->getSetting('title');
 $page->meta_title = "Contact ".$page->settings->getSetting('title');
 $page->meta_keywords = "contact us,contact,get in touch,email";

@@ -108,27 +108,18 @@ $page->smarty->assign('rsstoken', $apiKey);
 if ($uid != '') {
 	$page->users->updateApiAccessed($uid);
 	$apiRequests = $page->users->getApiRequests($uid);
-	if ($apiRequests['num'] > $maxRequests) {
-		showApiError(500, 'Request limit reached (' . $apiRequests['num'] . '/' . $maxRequests . ')');
+	if ($apiRequests > $maxRequests) {
+		showApiError(500, 'Request limit reached (' . $apiRequests . '/' . $maxRequests . ')');
 	}
 }
 
 $releases = new \Releases(['Settings' => $page->settings]);
 
-if (isset($_GET['extended']) && $_GET['extended'] == 1) {
-	$page->smarty->assign('extended', '1');
-}
-if (isset($_GET['del']) && $_GET['del'] == 1) {
-	$page->smarty->assign('del', '1');
-}
+$page->smarty->assign('extended', (isset($_GET['extended']) && $_GET['extended'] == 1 ? '1' : '0'));
+$page->smarty->assign('del', (isset($_GET['del']) && $_GET['del'] == 1 ? '1' : '0'));
 
 // Output is either json or xml.
-$outputXML = true;
-if (isset($_GET['o'])) {
-	if ($_GET['o'] == 'json') {
-		$outputXML = false;
-	}
-}
+$outputXML = (isset($_GET['o']) && $_GET['o'] == 'json' ? false : true);
 
 switch ($function) {
 	// Search releases.
@@ -214,7 +205,6 @@ switch ($function) {
 		{
 			$page->smarty->assign('rsstitle',"NFO");
 			$page->smarty->assign('rssdesc',"NFO");
-			$page->smarty->assign('rsshead',$page->smarty->fetch('rssheader.tpl'));
 			$content = trim($page->smarty->fetch('apinfo.tpl'));
 
 			printOutput($relData, $outputXML, $page, $offset);
@@ -239,7 +229,6 @@ switch ($function) {
 		$page->smarty->assign('comments',$reldata);
 		$page->smarty->assign('rsstitle',"API Comments");
 		$page->smarty->assign('rssdesc',"API Comments");
-		$page->smarty->assign('rsshead',$page->smarty->fetch('rssheader.tpl'));
 		$content = trim($page->smarty->fetch('apicomments.tpl'));
 
 		printOutput($relData, $outputXML, $page, $offset);
@@ -306,7 +295,6 @@ switch ($function) {
 
 		$page->smarty->assign('offset',$offset);
 		$page->smarty->assign('releases',$reldata);
-		$page->smarty->assign('rsshead',$page->smarty->fetch('rssheader.tpl'));
 		$output = trim($page->smarty->fetch('apiresult.tpl'));
 
 		printOutput($relData, $outputXML, $page, $offset);
@@ -354,7 +342,6 @@ switch ($function) {
 
 		$page->smarty->assign('offset',$offset);
 		$page->smarty->assign('releases',$reldata);
-		$page->smarty->assign('rsshead',$page->smarty->fetch('rssheader.tpl'));
 		$output = trim($page->smarty->fetch('apiresult.tpl'));
 
 		printOutput($relData, $outputXML, $page, $offset);
@@ -625,7 +612,6 @@ function printOutput($data, $xml = true, $page, $offset = 0)
 	if ($xml) {
 		$page->smarty->assign('offset', $offset);
 		$page->smarty->assign('releases', $data);
-		$page->smarty->assign('rsshead',$page->smarty->fetch('rssheader.tpl'));
 		header('Content-type: text/xml');
 		echo trim($page->smarty->fetch('apiresult.tpl'));
 	} else {

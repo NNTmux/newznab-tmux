@@ -118,14 +118,14 @@
 					<td class="mid">
 						<div class="movcover">
 							<a class="title" title="View details"
-							   href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"seourl"}">
+							   href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}/{$result.grp_release_name|escape:"seourl"}">
 								<img class="shadow"
 									 src="{$smarty.const.WWW_TOP}/covers/console/{if $result.cover == 1}{$result.consoleinfoid}.jpg{else}no-cover.jpg{/if}"
 									 width="120" border="0" alt="{$result.title|escape:"htmlall"}"/>
 							</a>
 
 							<div class="movextra">
-								{if $result.nfoid > 0}<a href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}"
+								{if $result.nfoid > 0}<a href="{$smarty.const.WWW_TOP}/nfo/{$result.grp_release_guid}"
 														 title="View Nfo" class="btn btn-mini modal_nfo" rel="nfo">
 										Nfo</a>{/if}
 								{if $result.url != ""}<a class="btn btn-mini" target="_blank"
@@ -137,42 +137,42 @@
 							</div>
 						</div>
 					</td>
-					<td colspan="8" class="left" id="guid{$result.guid}">
+					<td colspan="8" class="left" id="grp_release_guid{$result.grp_release_guid}">
 						<h2><a class="title" title="View details"
-							   href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"seourl"}">{$result.title|escape:"htmlall"}
+							   href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}/{$result.grp_release_name|escape:"seourl"}">{$result.title|escape:"htmlall"}
 								- {$result.platform|escape:"htmlall"}</a></h2>
-						{if $result.genre != ""}<b>Genre:</b>{$result.genre}<br/>{/if}
-						{if $result.esrb != ""}<b>Rating:</b>{$result.esrb}<br/>{/if}
-						{if $result.publisher != ""}<b>Publisher:</b>{$result.publisher}<br/>{/if}
-						{if $result.releasedate != ""}<b>Released:</b>{$result.releasedate|date_format}<br/>{/if}
-						{if $result.review != ""}<b>Review:</b>{$result.review|escape:'htmlall'}<br/>{/if}
+						{if isset($result.genre) && $result.genre != ""}<b>Genre:</b>{$result.genre}<br/>{/if}
+						{if isset($result.esrb) && $result.esrb != ""}<b>Rating:</b>{$result.esrb}<br/>{/if}
+						{if isset($result.publisher) && $result.publisher != ""}<b>Publisher:</b>{$result.publisher}<br/>{/if}
+						{if isset($result.releasedate) && $result.releasedate != ""}<b>Released:</b>{$result.releasedate|date_format}<br/>{/if}
+						{if isset($result.review) && $result.review != ""}<b>Review:</b>{$result.review|escape:'htmlall'}<br/>{/if}
 						<br/>
 
 						<div class="movextra">
-							<b>{$result.searchname|escape:"htmlall"}</b> <a class="rndbtn"
+							<b>{$result.grp_release_name|escape:"htmlall"}</b> <a class="rndbtn"
 																			href="{$smarty.const.WWW_TOP}/console?platform={$result.platform}"
 																			title="View similar nzbs">Similar</a>
 							{if $isadmin}
 								<a class="rndbtn"
-								   href="{$smarty.const.WWW_TOP}/admin/release-edit.php?id={$result.releaseid}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}"
+								   href="{$smarty.const.WWW_TOP}/admin/release-edit.php?id={$result.grp_release_id}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}"
 								   title="Edit Release">Edit</a>
 								<a class="rndbtn confirm_action"
-								   href="{$smarty.const.WWW_TOP}/admin/release-delete.php?id={$result.releaseid}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}"
+								   href="{$smarty.const.WWW_TOP}/admin/release-delete.php?id={$result.grp_release_id}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}"
 								   title="Delete Release">Del</a>
 							{/if}
 							<br/>
-							<b>Info:</b> {$result.postdate|timeago},  {$result.size|fsize_format:"MB"}, <a
+							<b>Info:</b> {$result.grp_release_postdate|timeago},  {$result.grp_release_size|fsize_format:"MB"}, <a
 									title="View file list"
-									href="{$smarty.const.WWW_TOP}/filelist/{$result.guid}">{$result.totalpart} files</a>,
-							<a title="View comments for {$result.searchname|escape:"htmlall"}"
-							   href="{$smarty.const.WWW_TOP}/details/{$result.guid}/#comments">{$result.comments}
-								cmt{if $result.comments != 1}s{/if}</a>, {$result.grabs}
-							grab{if $result.grabs != 1}s{/if}
+									href="{$smarty.const.WWW_TOP}/filelist/{$result.grp_release_guid}">{$result.grp_release_totalparts} files</a>,
+							<a title="View comments for {$result.grp_release_name|escape:"htmlall"}"
+							   href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}/#comments">{$result.grp_release_comments}
+								cmt{if $result.grp_release_comments != 1}s{/if}</a>, {$result.grp_release_grabs}
+							grab{if $result.grp_release_grabs != 1}s{/if}
 							<br/>
 
-							<div class="icon"><input type="checkbox" class="nzb_check" value="{$result.guid}"/></div>
+							<div class="icon"><input type="checkbox" class="nzb_check" value="{$result.grp_release_guid}"/></div>
 							<div class="icon icon_nzb"><a title="Download Nzb"
-														  href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}/{$result.searchname|escape:"htmlall"}">
+														  href="{$smarty.const.WWW_TOP}/getnzb/{$result.grp_release_guid}/{$result.grp_release_name|escape:"htmlall"}">
 									&nbsp;</a></div>
 							<div class="icon icon_cart" title="Add to Cart"></div>
 							{if $sabintegrated}
