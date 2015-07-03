@@ -90,7 +90,7 @@
 		<table style="width:100%;" class="table table-condensed table-striped">
 			<tr>
 				<th>
-					<input id="chkSelectAll" type="checkbox" class="fa fa-check-square-o nntmux_check_all"/>
+					<input id="chkSelectAll" type="checkbox" class="nntmux_check_all"/>
 					<label for="chkSelectAll" style="display:none;">Select All</label>
 				</th>
 
@@ -149,7 +149,7 @@
 			{assign var="mcatname" value=","|explode:$result.grp_release_categoryName}
 			{foreach from=$msplits item=m}
 				<tr class="{cycle values=",alt"}" id="guid{$mguid[$m@index]}">
-					<td class="check"><input id="chk{$mguid[$m@index]|substr:0:7}" type="checkbox" class="fa fa-check-square-o nzb_check"
+					<td class="check"><input id="chk{$mguid[$m@index]|substr:0:7}" type="checkbox" class="nzb_check"
 											 value="{$mguid[$m@index]}"/></td>
 					<td class="item">
 						<a title="View details"

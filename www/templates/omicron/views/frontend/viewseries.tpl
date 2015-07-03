@@ -143,7 +143,7 @@
 															<th>Name</th>
 															<th><input id="chkSelectAll{$seasonnum}" type="checkbox"
 																	   name="{$seasonnum}"
-																	   class="fa fa-check-square-o nzb_check_all_season"/><label
+																	   class="nzb_check_all_season"/><label
 																		for="chkSelectAll{$seasonnum}"
 																		style="display:none;">Select
 																	All</label></th>
@@ -194,7 +194,7 @@
 																	<td class="check" width="10"><input
 																				id="chk{$result.guid|substr:0:7}"
 																				type="checkbox"
-																				class="fa fa-check-square-o nzb_check" name="{$seasonnum}"
+																				class="nzb_check" name="{$seasonnum}"
 																				value="{$result.guid}"/></td>
 																	<td>
 																		<span class="label label-default">{$result.category_name}</span>

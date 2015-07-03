@@ -11,7 +11,7 @@
 	</div>
 </div>
 
-<form id="nzb_multi_operations_form" action="get" style="width: inherit">
+<form id="nzb_multi_operations_form" action="get">
 		<div class="box-body"
 		<div class="row">
 			<div class="col-xlg-12 portlets">
@@ -55,6 +55,7 @@
 								{$pager}
 							</div>
 						</div>
+						<hr>
 						{foreach $results as $result}
 							<!-- Iteratie: {counter} -->
 							{if isset($result.category_name)}
@@ -255,6 +256,16 @@
 											<input type="button"
 												   class="nzb_multi_operations_nzbget btn btn-sm btn-primary"
 												   value="Send to NZBGet"/>
+										{/if}
+										{if $cpurl != '' && $cpapi != ''}
+											<a
+													class="sendtocouch"
+													target="blackhole"
+													href="javascript:"
+													rel="{$cpurl}/api/{$cpapi}/movie.add/?identifier=tt{$result.imdbid}&title={$result.title}"
+													name="CP{$result.imdbid}"
+													title="Add to CouchPotato"
+													><img src="{$smarty.const.WWW_TOP}/templates/nntmux/images/icons/couch.png"></a>
 										{/if}
 										{if isset($isadmin)}
 											<input type="button"
