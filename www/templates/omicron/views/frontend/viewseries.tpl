@@ -64,9 +64,7 @@
 			for TV Show <i class="fa fa-rss"></i></a>
 	</div>
 	<br/>
-	<div class="row">
-		<div class="box col-md-12">
-			<div class="box-content">
+		<div class="box-body"
 				<form id="nzb_multi_operations_form" action="get">
 
 					<div class="well well-small">
@@ -258,7 +256,4 @@
 										</div>
 									</div>
 				</form>
-			</div>
-		</div>
-	</div>
 {/if}

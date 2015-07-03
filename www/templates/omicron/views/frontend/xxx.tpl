@@ -9,48 +9,10 @@
 		</ol>
 	</div>
 </div>
-<div class="well well-sm">
-	<form name="browseby" action="xxx">
-		<table class="rndbtn" border="0" cellpadding="2" cellspacing="0">
-			<tr>
-				<th class="left"><label for="xxxtitle">Title</label></th>
-				<th class="left"><label for="xxxactors">Actor</label></th>
-				<th class="left"><label for="xxxdirector">Director</label></th>
-				<th class="left"><label for="genre">Genre</label></th>
-				<th class="left"><label for="category">Category</label></th>
-				<th></th>
-			</tr>
-			<tr>
-				<td><input id="xxxtitle" type="text" name="title" value="{$title}" size="15"/></td>
-				<td><input id="xxxactors" type="text" name="actors" value="{$actors}" size="15"/></td>
-				<td><input id="xxxdirector" type="text" name="director" value="{$director}" size="15"/></td>
-				<td>
-					<select id="genre" name="genre">
-						<option class="grouping" value=""></option>
-						{foreach from=$genres item=gen}
-							<option {if $gen==$genre}selected="selected"{/if} value="{$gen}">{$gen}</option>
-						{/foreach}
-					</select>
-				</td>
-				<td>
-					<select id="category" name="t">
-						<option class="grouping" value="6000"></option>
-						{foreach from=$catlist item=ct}
-							<option {if $ct.id==$category}selected="selected"{/if} value="{$ct.id}">{$ct.title}</option>
-						{/foreach}
-					</select>
-				</td>
-				<td><input type="submit" value="Go"/></td>
-			</tr>
-		</table>
-	</form>
-</div>
-<p></p>
+
 {if $results|@count > 0}
 
-<div class="row">
-	<div class="box col-md-12">
-		<div class="box-content">
+	<div class="box-body"
 			<div class="row">
 				<div class="col-xlg-12 portlets">
 					<div class="panel">
@@ -448,6 +410,3 @@
 					</div>
 				</div>
 			</div>
-		</div>
-	</div>
-</div>

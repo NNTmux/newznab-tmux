@@ -13,9 +13,7 @@
 {$site->adbrowse}
 
 {if $results|@count > 0}
-	<div class="row">
-		<div class="box col-md-12">
-			<div class="box-content">
+		<div class="box-body"
 				<form id="nzb_multi_operations_form" action="get">
 					<div class="row">
 						<div class="col-xlg-12 portlets">
@@ -211,7 +209,4 @@
 						</div>
 					</div>
 				</form>
-			</div>
-		</div>
-	</div>
 {/if}

@@ -10,9 +10,7 @@
 	</div>
 </div>
 
-<div class="row">
-	<div class="box col-md-12">
-		<div class="box-content">
+		<div class="box-body">
 			<div class="row">
 				<div class="col-xlg-12 portlets">
 					<div class="panel">
@@ -190,5 +188,3 @@
 				</div>
 			</div>
 		</div>
-	</div>
-</div>
