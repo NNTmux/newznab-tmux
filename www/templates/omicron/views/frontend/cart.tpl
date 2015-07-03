@@ -37,7 +37,7 @@
 					<div class="panel-content pagination2">
 						<table style="width:100%;" class="data table table-condensed table-striped" id="browsetable">
 							<tr>
-								<th width="50"><input id="chkSelectAll" type="checkbox" class="fa fa-check-square-o nzb_check_all"/><label
+								<th width="50"><input id="chkSelectAll" type="checkbox" class="nzb_check_all"/><label
 											for="chkSelectAll" style="display:none;">Select All</label></th>
 								<th>Name</th>
 								<th>Added</th>
@@ -47,7 +47,7 @@
 							{foreach from=$results item=result}
 								<tr class="{cycle values=",alt"}">
 									<td class="check">
-										<input id="chk{$result.guid|substr:0:7}" type="checkbox" class="fa fa-check-square-o nzb_check"
+										<input id="chk{$result.guid|substr:0:7}" type="checkbox" class="nzb_check"
 											   value="{$result.id}"/>
 									</td>
 									<td>

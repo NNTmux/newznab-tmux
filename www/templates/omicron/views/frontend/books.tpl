@@ -10,50 +10,51 @@
 	</div>
 </div>
 
-<div class="row">
-	<div class="box col-md-12">
-		<div class="box-content">
-			<div class="row">
-				<div class="col-xlg-12 portlets">
-					<div class="panel">
-						<div class="panel-content pagination2">
-							<div class="row">
-								<div class="col-md-8">
-									<form id="nzb_multi_operations_form" action="get">
-										<div class="nzb_multi_operations">
-											View: <strong>Covers</strong> | <a
-													href="{$smarty.const.WWW_TOP}/browse?t={$category}">List</a><br/>
-											Check all: <input type="checkbox" class="fa fa-check-square-o nntmux_check_all"/> <br/>
-											With Selected:
-											<div class="btn-group">
-												<input type="button"
-													   class="nntmux_multi_operations_download btn btn-sm btn-success"
-													   value="Download NZBs"/>
-												<input type="button"
-													   class="nntmux_multi_operations_cart btn btn-sm btn-info"
-													   value="Add to Cart"/>
-												{if isset($sabintegrated)}
-													<input type="button"
-														   class="nntmux_multi_operations_sab btn btn-sm btn-primary"
-														   value="Send to Queue"/>
-												{/if}
-												{if isset($nzbgetintegrated)}
-													<input type="button"
-														   class="nntmux_multi_operations_nzbget btn btn-sm btn-primary"
-														   value="Send to NZBGet"/>
-												{/if}
-												{if isset($isadmin)}
-													<input type="button"
-														   class="nntmux_multi_operations_delete btn btn-sm btn-danger"
-														   value="Delete"/>
-												{/if}
-											</div>
-										</div>
-								</div>
-								<div class="col-md-4">
-									{$pager}
+<form id="nzb_multi_operations_form" action="get">
+	<div class="box-body"
+	<div class="row">
+		<div class="col-xlg-12 portlets">
+			<div class="panel">
+				<div class="panel-content pagination2">
+					<div class="row">
+						<div class="col-md-8">
+							<div class="nzb_multi_operations">
+								View: <strong>Covers</strong> | <a
+										href="{$smarty.const.WWW_TOP}/browse?t={$category}">List</a><br/>
+								With Selected:
+								<div class="btn-group">
+									<input type="button"
+										   class="nzb_multi_operations_download btn btn-sm btn-success"
+										   value="Download NZBs"/>
+									<input type="button"
+										   class="nzb_multi_operations_cart btn btn-sm btn-info"
+										   value="Add to Cart"/>
+									{if isset($sabintegrated)}
+										<input type="button"
+											   class="nzb_multi_operations_sab btn btn-sm btn-primary"
+											   value="Send to Queue"/>
+									{/if}
+									{if isset($nzbgetintegrated)}
+										<input type="button"
+											   class="nzb_multi_operations_nzbget btn btn-sm btn-primary"
+											   value="Send to NZBGet"/>
+									{/if}
+									{if isset($isadmin)}
+										<input type="button"
+											   class="nzb_multi_operations_edit btn btn-sm btn-warning"
+											   value="Edit"/>
+										<input type="button"
+											   class="nzb_multi_operations_delete btn btn-sm btn-danger"
+											   value="Delete"/>
+									{/if}
 								</div>
 							</div>
+						</div>
+						<div class="col-md-4">
+							{$pager}
+						</div>
+					</div>
+					<hr>
 							{foreach from=$results item=result}
 								{assign var="msplits" value=","|explode:$result.grp_release_id}
 								{assign var="mguid" value=","|explode:$result.grp_release_guid}
@@ -99,7 +100,7 @@
 													<table>
 														<tr>
 															<td>
-																<input type="checkbox" class="fa fa-check-square-o nzb_check"
+																<input type="checkbox" class="nzb_check"
 																	   value="{$mguid[$m@index]}" id="chksingle"/>
 																<span class="label label-default">{$msize[$m@index]|fsize_format:"MB"}</span>
 																<span class="label label-default">Posted {$mpostdate[$m@index]|timeago}
@@ -147,48 +148,43 @@
 									</div>
 								{/foreach}
 							{/foreach}
-							<div class="row">
-								<div class="col-md-8">
-									<form id="nzb_multi_operations_form" action="get">
-										<div class="nzb_multi_operations">
-											View: <strong>Covers</strong> | <a
-													href="{$smarty.const.WWW_TOP}/browse?t={$category}">List</a><br/>
-											Check all: <input type="checkbox" class="fa fa-check-square-o nntmux_check_all"/> <br/>
-											With Selected:
-											<div class="btn-group">
-												<input type="button"
-													   class="nntmux_multi_operations_download btn btn-sm btn-success"
-													   value="Download NZBs"/>
-												<input type="button"
-													   class="nntmux_multi_operations_cart btn btn-sm btn-info"
-													   value="Add to Cart"/>
-												{if isset($sabintegrated)}
-													<input type="button"
-														   class="nntmux_multi_operations_sab btn btn-sm btn-primary"
-														   value="Send to Queue"/>
-												{/if}
-												{if isset($nzbgetintegrated)}
-													<input type="button"
-														   class="nntmux_multi_operations_nzbget btn btn-sm btn-primary"
-														   value="Send to NZBGet"/>
-												{/if}
-												{if isset($isadmin)}
-													<input type="button"
-														   class="nntmux_multi_operations_delete btn btn-sm btn-danger"
-														   value="Delete"/>
-												{/if}
-											</div>
-										</div>
-								</div>
-								<div class="col-md-4">
-									{$pager}
+					<hr>
+					<div class="row">
+						<div class="col-md-8">
+							<div class="nzb_multi_operations">
+								View: <strong>Covers</strong> | <a
+										href="{$smarty.const.WWW_TOP}/browse?t={$category}">List</a><br/>
+								With Selected:
+								<div class="btn-group">
+									<input type="button"
+										   class="nzb_multi_operations_download btn btn-sm btn-success"
+										   value="Download NZBs"/>
+									<input type="button"
+										   class="nzb_multi_operations_cart btn btn-sm btn-info"
+										   value="Add to Cart"/>
+									{if isset($sabintegrated)}
+										<input type="button"
+											   class="nzb_multi_operations_sab btn btn-sm btn-primary"
+											   value="Send to Queue"/>
+									{/if}
+									{if isset($nzbgetintegrated)}
+										<input type="button"
+											   class="nzb_multi_operations_nzbget btn btn-sm btn-primary"
+											   value="Send to NZBGet"/>
+									{/if}
+									{if isset($isadmin)}
+										<input type="button"
+											   class="nzb_multi_operations_edit btn btn-sm btn-warning"
+											   value="Edit"/>
+										<input type="button"
+											   class="nzb_multi_operations_delete btn btn-sm btn-danger"
+											   value="Delete"/>
+									{/if}
 								</div>
 							</div>
-							</form>
+						</div>
+						<div class="col-md-4">
+							{$pager}
 						</div>
 					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-</div>
+							</form>

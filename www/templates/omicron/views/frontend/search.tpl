@@ -155,7 +155,7 @@
 											   cellspacing="0" cellpadding="0" style="table-layout: auto;">
 											<thead>
 											<tr>
-												<th><input id="chkSelectAll" type="checkbox" class="fa fa-check-square-o nzb_check_all"/>
+												<th><input id="chkSelectAll" type="checkbox" class="nzb_check_all"/>
 												</th>
 												<th>Name
 													<a title="Sort Descending" href="{$orderbyname_desc}">
@@ -175,7 +175,7 @@
 											{foreach from=$results item=result}
 												<tr id="guid{$result.guid}">
 													<td class="check"><input id="chk{$result.guid|substr:0:7}"
-																			 type="checkbox" class="fa fa-check-square-o nzb_check"
+																			 type="checkbox" class="nzb_check"
 																			 name="id[]" value="{$result.guid}"/></td>
 													<td>
 														<a href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"seourl"}">{$result.searchname|escape:"htmlall"|replace:".":" "}</a>
