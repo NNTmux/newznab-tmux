@@ -18,7 +18,7 @@
 	<link href="{$smarty.const.WWW_TOP}/templates/nntmux/styles/posterwall.css" rel="stylesheet" type="text/css" media="screen" />
 	<link href="{$smarty.const.WWW_TOP}/templates/nntmux/styles/style.css" rel="stylesheet" type="text/css" media="screen" />
 	<link href="{$smarty.const.WWW_TOP}/templates/nntmux/styles/jquery.qtip.css" rel="stylesheet" type="text/css" media="screen" />
-{if $site->google_adsense_acc != ''}	<link href="http://www.google.com/cse/api/branding.css" rel="stylesheet" type="text/css" media="screen" />
+{if $site->google_adsense_acc != ''}	<link href="https://www.google.com/cse/api/branding.css" rel="stylesheet" type="text/css" media="screen" />
 {/if}
 	<!-- Manual Adjustment for Search input fields on browse pages. -->
 	<style>

@@ -131,7 +131,7 @@
 										</div>
 									</td>
 									<td class="check"><input id="chk{$result.guid|substr:0:7}" type="checkbox"
-															 class="fa fa-check-square-o nzb_check" name="{$seasonnum}"
+															 class="nzb_check" name="{$seasonnum}"
 															 value="{$result.guid}"/></td>
 									<td><span class="label label-default">{$result.category_name}</span></td>
 									<td width="40" title="{$result.postdate}">{$result.postdate|timeago}</td>

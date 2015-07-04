@@ -16,7 +16,7 @@
 			  href="{$smarty.const.WWW_TOP}/rss?t=0&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}" />{/if}
 
 	{if $site->google_adsense_acc != ''}
-		<link href="http://www.google.com/cse/api/branding.css" rel="stylesheet" type="text/css" media="screen"/>
+		<link href="https://www.google.com/cse/api/branding.css" rel="stylesheet" type="text/css" media="screen"/>
 	{/if}
 	<link href="{$smarty.const.WWW_TOP}/templates/omicron/css/bootstrap-spacelab.min.css" rel="stylesheet"/>
 	<!-- FAVICON -->

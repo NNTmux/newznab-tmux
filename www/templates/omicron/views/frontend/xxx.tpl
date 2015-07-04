@@ -9,114 +9,59 @@
 		</ol>
 	</div>
 </div>
-<div class="well well-sm">
-	<form name="browseby" action="xxx">
-		<table class="rndbtn" border="0" cellpadding="2" cellspacing="0">
-			<tr>
-				<th class="left"><label for="xxxtitle">Title</label></th>
-				<th class="left"><label for="xxxactors">Actor</label></th>
-				<th class="left"><label for="xxxdirector">Director</label></th>
-				<th class="left"><label for="genre">Genre</label></th>
-				<th class="left"><label for="category">Category</label></th>
-				<th></th>
-			</tr>
-			<tr>
-				<td><input id="xxxtitle" type="text" name="title" value="{$title}" size="15"/></td>
-				<td><input id="xxxactors" type="text" name="actors" value="{$actors}" size="15"/></td>
-				<td><input id="xxxdirector" type="text" name="director" value="{$director}" size="15"/></td>
-				<td>
-					<select id="genre" name="genre">
-						<option class="grouping" value=""></option>
-						{foreach from=$genres item=gen}
-							<option {if $gen==$genre}selected="selected"{/if} value="{$gen}">{$gen}</option>
-						{/foreach}
-					</select>
-				</td>
-				<td>
-					<select id="category" name="t">
-						<option class="grouping" value="6000"></option>
-						{foreach from=$catlist item=ct}
-							<option {if $ct.id==$category}selected="selected"{/if} value="{$ct.id}">{$ct.title}</option>
-						{/foreach}
-					</select>
-				</td>
-				<td><input type="submit" value="Go"/></td>
-			</tr>
-		</table>
-	</form>
-</div>
-<p></p>
+
 {if $results|@count > 0}
 
-<div class="row">
-	<div class="box col-md-12">
-		<div class="box-content">
-			<div class="row">
-				<div class="col-xlg-12 portlets">
-					<div class="panel">
-						<div class="panel-content pagination2">
-							<form id="nzb_multi_operations_form" action="get">
-								<div class="row">
-									<div class="col-md-8">
-										<div class="nzb_multi_operations">
-											View: <strong>Covers</strong> | <a
-													href="{$smarty.const.WWW_TOP}/browse?t={$category}">List</a><br/>
-											With Selected:
-											<div class="btn-group">
-												<input type="button"
-													   class="btn btn-sm btn-success nntmux_multi_operations_download"
-													   value="Download NZBs"/>
-												<input type="button"
-													   class="btn btn-sm btn-info nntmux_multi_operations_cart"
-													   value="Add to cart"/>
-												{if isset($sabintegrated)}
-													<input type="button"
-														   class="btn btn-sm btn-primary nntmux_multi_operations_sab"
-														   value="Send to my Queue"/>
-												{/if}
-												{if isset($nzbgetintegrated)}
-													<input type="button" class="btn btn-primary btn-transparent getsend"
-														   value="Send to NZBGet"/>
-												{/if}
-												{if $weHasVortex}
-													<input type="button" class="btn btn-sm btn-primary vortexsend"
-														   value="Send to NZBVortex"/>
-												{/if}
-												{if isset($isadmin)}
-													<input type="button"
-														   class="btn btn-sm nntmux_multi_operations_delete btn-danger"
-														   value="Delete"/>
-													<input type="button"
-														   class="btn btn-sm nntmux_multi_operations_rebuild btn-dark"
-														   value="Rebuild"/>
-												{/if}
-											</div>
-										</div>
-									</div>
-									<div class="col-md-4">
-										{$pager}
+	<form id="nzb_multi_operations_form" action="get">
+		<div class="box-body"
+		<div class="row">
+			<div class="col-xlg-12 portlets">
+				<div class="panel">
+					<div class="panel-content pagination2">
+						<div class="row">
+							<div class="col-md-8">
+								<div class="nzb_multi_operations">
+									View: <strong>Covers</strong> | <a
+											href="{$smarty.const.WWW_TOP}/browse?t={$category}">List</a><br/>
+									With Selected:
+									<div class="btn-group">
+										<input type="button"
+											   class="nzb_multi_operations_download btn btn-sm btn-success"
+											   value="Download NZBs"/>
+										<input type="button"
+											   class="nzb_multi_operations_cart btn btn-sm btn-info"
+											   value="Add to Cart"/>
+										{if isset($sabintegrated)}
+											<input type="button"
+												   class="nzb_multi_operations_sab btn btn-sm btn-primary"
+												   value="Send to Queue"/>
+										{/if}
+										{if isset($nzbgetintegrated)}
+											<input type="button"
+												   class="nzb_multi_operations_nzbget btn btn-sm btn-primary"
+												   value="Send to NZBGet"/>
+										{/if}
+										{if isset($isadmin)}
+											<input type="button"
+												   class="nzb_multi_operations_edit btn btn-sm btn-warning"
+												   value="Edit"/>
+											<input type="button"
+												   class="nzb_multi_operations_delete btn btn-sm btn-danger"
+												   value="Delete"/>
+										{/if}
 									</div>
 								</div>
-
+							</div>
+							<div class="col-md-4">
+								{$pager}
+							</div>
+						</div>
+						<hr>
 
 								<table class="table table-striped table-condensed" id="coverstable">
 									<thead>
 									<tr>
-										<th><input type="checkbox" class="fa fa-check-square-o nzb_check_all"></th>
-										<th>title<a title="Sort Descending" href="{$orderbytitle_desc}"><i
-														class="icon-chevron-down icon-black"></i></a><a
-													title="Sort Ascending" href="{$orderbytitle_asc}"><i
-														class="icon-chevron-up icon-black"></i></a>
-										</th>
-										<th>year<a title="Sort Descending" href="{$orderbyyear_desc}"><i
-														class="icon-chevron-down icon-black"></i></a><a
-													title="Sort Ascending" href="{$orderbyyear_asc}"><i
-														class="icon-chevron-up icon-black"></i></a></th>
-										<th>rating<a title="Sort Descending" href="{$orderbyrating_desc}"><i
-														class="icon-chevron-down icon-black"></i></a><a
-													title="Sort Ascending" href="{$orderbyrating_asc}"><i
-														class="icon-chevron-up icon-black"></i></a>
-										</th>
+										<th><input title="Check all" type="checkbox" class="nzb_check_all"></th>
 									</tr>
 									</thead>
 									<tbody>
@@ -256,7 +201,7 @@
 																{if $m@index > 1}class="mlextra"
 																style="display:none;"{/if}>
 																<td style="width: 27px;">
-																	<input type="checkbox" class="fa fa-check-square-o nzb_check"
+																	<input type="checkbox" class="nzb_check"
 																		   value="{$mguid[$m@index]}"
 																		   id="{$mguid[$m@index]}"/>
 																</td>
@@ -382,49 +327,45 @@
 								</table>
 								<br/>
 
-								<div class="row">
-									<div class="col-md-8">
-										<div class="nzb_multi_operations">
-											View: <strong>Covers</strong> | <a
-													href="{$smarty.const.WWW_TOP}/browse?t={$category}">List</a><br/>
-											With Selected:
-											<div class="btn-group">
-												<input type="button"
-													   class="btn btn-sm btn-success nntmux_multi_operations_download"
-													   value="Download NZBs"/>
-												<input type="button"
-													   class="btn btn-sm btn-info nntmux_multi_operations_cart"
-													   value="Add to cart"/>
-												{if isset($sabintegrated)}
-													<input type="button"
-														   class="btn btn-sm btn-primary nntmux_multi_operations_sab"
-														   value="Send to my Queue"/>
-												{/if}
-												{if isset($nzbgetintegrated)}
-													<input type="button" class="btn btn-primary btn-transparent getsend"
-														   value="Send to NZBGet"/>
-												{/if}
-												{if $weHasVortex}
-													<input type="button" class="btn btn-sm btn-primary vortexsend"
-														   value="Send to NZBVortex"/>
-												{/if}
-												{if isset($isadmin)}
-													<input type="button"
-														   class="btn btn-sm nntmux_multi_operations_delete btn-danger"
-														   value="Delete"/>
-													<input type="button"
-														   class="btn btn-sm nntmux_multi_operations_rebuild btn-dark"
-														   value="Rebuild"/>
-												{/if}
-											</div>
-										</div>
-									</div>
-									<div class="col-md-4">
-										{$pager}
+						<hr>
+						<div class="row">
+							<div class="col-md-8">
+								<div class="nzb_multi_operations">
+									View: <strong>Covers</strong> | <a
+											href="{$smarty.const.WWW_TOP}/browse?t={$category}">List</a><br/>
+									With Selected:
+									<div class="btn-group">
+										<input type="button"
+											   class="nzb_multi_operations_download btn btn-sm btn-success"
+											   value="Download NZBs"/>
+										<input type="button"
+											   class="nzb_multi_operations_cart btn btn-sm btn-info"
+											   value="Add to Cart"/>
+										{if isset($sabintegrated)}
+											<input type="button"
+												   class="nzb_multi_operations_sab btn btn-sm btn-primary"
+												   value="Send to Queue"/>
+										{/if}
+										{if isset($nzbgetintegrated)}
+											<input type="button"
+												   class="nzb_multi_operations_nzbget btn btn-sm btn-primary"
+												   value="Send to NZBGet"/>
+										{/if}
+										{if isset($isadmin)}
+											<input type="button"
+												   class="nzb_multi_operations_edit btn btn-sm btn-warning"
+												   value="Edit"/>
+											<input type="button"
+												   class="nzb_multi_operations_delete btn btn-sm btn-danger"
+												   value="Delete"/>
+										{/if}
 									</div>
 								</div>
-
-							</form>
+							</div>
+							<div class="col-md-4">
+								{$pager}
+							</div>
+						</div>
 							{else}
 							<div class="alert alert-link" style="vertical-align:middle;">
 								<button type="button" class="close" data-dismiss="alert">&times;</button>
@@ -448,6 +389,4 @@
 					</div>
 				</div>
 			</div>
-		</div>
-	</div>
-</div>
+	</form>
