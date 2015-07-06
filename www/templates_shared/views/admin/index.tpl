@@ -1,4 +1,3 @@
-
 <h1>{$page->title}</h1>
 
 <div style="{if $site->showadminwelcome != "1"}display:none;{/if}" id="adminwelcome">
@@ -40,7 +39,7 @@
 				<tr class="{cycle values=",alt"}">
 					<td>{$smarty.foreach.result.iteration}</td>
 					<td>{$result.msg}</td>
-					<td>{if $result.url != ""}<a href="{$result.url}"><img src="{$smarty.const.WWW_TOP}/../templates_sharedimages/icons/{$result.icon}.png"/></a>{/if}</td>
+					<td>{if $result.url != ""}<a href="{$result.url}"><img src="{$smarty.const.WWW_TOP}/../templates/charisma/images/icons/{$result.icon}.png"/></a>{/if}</td>
 				</tr>
 			{/foreach}
 		</table>

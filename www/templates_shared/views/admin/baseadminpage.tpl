@@ -6,14 +6,14 @@
 	<meta name="keywords" content="" />
 	<meta name="description" content="" />
 	<title>{$site->title|default:'newznab'} - {$page->meta_title|default:$page->title}</title>
-	<link href="{$smarty.const.WWW_TOP}/../templates_sharedstyles/style.css" rel="stylesheet" type="text/css" media="screen" />
-	<link href="{$smarty.const.WWW_TOP}/../templates_sharedstyles/admin.css" rel="stylesheet" type="text/css" media="screen" />
-	<link rel="shortcut icon" type="image/ico" href="{$smarty.const.WWW_TOP}/../templates_sharedimages/favicon.ico"/>
+	<link href="{$smarty.const.WWW_TOP}/../templates/charisma/styles/style.css" rel="stylesheet" type="text/css" media="screen" />
+	<link href="{$smarty.const.WWW_TOP}/../templates/charisma/styles/admin.css" rel="stylesheet" type="text/css" media="screen" />
+	<link rel="shortcut icon" type="image/ico" href="{$smarty.const.WWW_TOP}/../templates/charisma/images/favicon.ico"/>
 	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/../templates_sharedscripts/sorttable.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/../templates_sharedscripts/utils-admin.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/../templates_sharedscripts/jquery.multifile.js"></script>
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/../templates_sharedscripts/jquery.autosize-min.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/../templates/charisma/scripts/sorttable.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/../templates/charisma/scripts/utils-admin.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/../templates/charisma/scripts/jquery.multifile.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/../templates/charisma/scripts/jquery.autosize-min.js"></script>
 	<script type="text/javascript">var WWW_TOP = "{$smarty.const.WWW_TOP}/..";</script>
 
 	{$page->head}
