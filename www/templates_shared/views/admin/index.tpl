@@ -1,4 +1,4 @@
- 
+
 <h1>{$page->title}</h1>
 
 <div style="{if $site->showadminwelcome != "1"}display:none;{/if}" id="adminwelcome">
@@ -27,9 +27,9 @@
 <div style="{if $site->showadminwelcome != "0"}display:none;{/if}" id="adminhome">
 
 	<h2>Status Alerts</h2>
-	
+
 	{if $statusmsgs|@count > 0}
-	
+
 		<table class="data" style="width:75%;">
 			<tr>
 				<th style="width:20px" class="left">#</th>
@@ -40,14 +40,14 @@
 				<tr class="{cycle values=",alt"}">
 					<td>{$smarty.foreach.result.iteration}</td>
 					<td>{$result.msg}</td>
-					<td>{if $result.url != ""}<a href="{$result.url}"><img src="{$smarty.const.WWW_TOP}/../templates/nntmux/images/icons/{$result.icon}.png"/></a>{/if}</td>
+					<td>{if $result.url != ""}<a href="{$result.url}"><img src="{$smarty.const.WWW_TOP}/../templates_sharedimages/icons/{$result.icon}.png"/></a>{/if}</td>
 				</tr>
 			{/foreach}
 		</table>
 	{else}
 		<p>There are currently no status alerts.</p>
 	{/if}
-	
+
 	<br/>
 	<a onclick="ajax_welcome_msg(true); return false;" href="#">show welcome message</a>
 </div>
