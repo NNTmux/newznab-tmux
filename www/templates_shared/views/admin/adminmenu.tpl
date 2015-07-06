@@ -21,7 +21,6 @@
             <li><a href="{$smarty.const.WWW_TOP}/book-list.php">View Book List</a></li>
             <li><a href="{$smarty.const.WWW_TOP}/nzb-import.php">Import</a> <a style="padding:0;" href="{$smarty.const.WWW_TOP}/nzb-export.php">Export</a> Nzb's</li>
 			<li><a href="{$smarty.const.WWW_TOP}/opcachestats.php">Opcache Statistics</a></li>
-            <li><a href="{$smarty.const.WWW_TOP}/db-optimise.php">Optimise</a> Tables</li>
             <li><a href="{$smarty.const.WWW_TOP}/comments-list.php">View Comments</a></li>
             <li><a href="{$smarty.const.WWW_TOP}/spotnab-list.php">View</a> <a style="padding:0;" href="{$smarty.const.WWW_TOP}/spotnab-edit.php?action=add">Add</a> Spotnab Sources</li>
             <li><a href="{$smarty.const.WWW_TOP}/sharing.php">Comment Sharing Settings</a></li>
