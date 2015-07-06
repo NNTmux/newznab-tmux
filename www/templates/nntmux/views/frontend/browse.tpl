@@ -23,13 +23,13 @@
 			<td style="text-align:right"><div class="nzb_multi_operations">
 					<small>With selected:</small>
 					<div class="btn-group">
-						<button type="button" class="btn btn-mini nzb_multi_operations_download"><i class="icon-download"></i> Download NZBs</button>
-						<button type="button" class="btn btn-mini nzb_multi_operations_cart"><i class="icon-shopping-cart"></i> Add to cart</button>
-						{if $sabintegrated}<button type="button" class="btn btn-mini nzb_multi_operations_sab"><i class="icon-download-alt"></i> Send to my Queue</button>{/if}
+						<button type="button" class="btn btn-default nzb_multi_operations_download"><i class="fa fa-download"></i> Download NZBs</button>
+						<button type="button" class="btn btn-default nzb_multi_operations_cart"><i class="fa fa-shopping-cart"></i> Add to cart</button>
+						{if $sabintegrated}<button type="button" class="btn btn-default nzb_multi_operations_sab"><i class="fa fa-cloud-download"></i> Send to my Queue</button>{/if}
 						{if $isadmin}
-							<button type="button" class="btn btn-mini btn-inverse nzb_multi_operations_edit"><i class="icon-edit icon-white"></i></button>
-							<button type="button" class="btn btn-mini btn-inverse nzb_multi_operations_delete"><i class="icon-trash icon-white"></i></button>
-							<button type="button" class="btn btn-mini btn-inverse nzb_multi_operations_rebuild"><i class="icon-repeat icon-white"></i></button>
+							<button type="button" class="btn btn-default btn-inverse nzb_multi_operations_edit"><i class="fa fa-edit icon-white"></i></button>
+							<button type="button" class="btn btn-default btn-inverse nzb_multi_operations_delete"><i class="fa fa-trash icon-white"></i></button>
+							<button type="button" class="btn btn-default btn-inverse nzb_multi_operations_rebuild"><i class="fa fa-repeat icon-white"></i></button>
 						{/if}</div>
 					{if $category==1000}<div class="btn-group"><a class="btn btn-mini" href="{$smarty.const.WWW_TOP}/console" title="Covers"><i class="icon-picture"></i></a><span class="btn btn-mini disabled"><i class="icon-list"></i></span></div>
 					{elseif $category==2000}<div class="btn-group"><a class="btn btn-mini" href="{$smarty.const.WWW_TOP}/movies" title="Covers"><i class="icon-picture"></i></a><span class="btn btn-mini disabled"><i class="icon-list"></i></span></div>
@@ -43,7 +43,7 @@
 		</tr>
 	</table>
 
-		<table style="width:100%;" class="data highlight icons" id="browsetable">
+		<table style="width:100%;" class="data table-striped table-responsivehighlight icons" id="browsetable">
 			<tr>
 				<th><input id="chkSelectAll" type="checkbox" class="nzb_check_all"/><label for="chkSelectAll"
 																						   style="display:none;">Select
@@ -200,22 +200,31 @@
 
 		</table>
 
-		<div class="nzb_multi_operations">
-			<small>With Selected:</small>
-			<input type="button" class="rndbtn nzb_multi_operations_download" value="Download NZBs"/>
-			<input type="button" class="rndbtn nzb_multi_operations_cart" value="Add to Cart"/>
-			{if $sabintegrated}
-				<input type="button" class="nzb_multi_operations_sab" value="Send to my Queue" />
-			{/if}
-			{if $isadmin}
-				<input type="button" class="rndbtn nzb_multi_operations_edit" value="Edit"/>
-				<input type="button" class="rndbtn nzb_multi_operations_delete" value="Del"/>
-			{/if}
-		</div>
-
-		<br/>
-
-		{$pager}
+		<table width="100%">
+			<tr>
+				<td>{$pager}</td>
+				<td style="text-align:right"><div class="nzb_multi_operations">
+						<small>With selected:</small>
+						<div class="btn-group">
+							<button type="button" class="btn btn-default nzb_multi_operations_download"><i class="fa fa-download"></i> Download NZBs</button>
+							<button type="button" class="btn btn-default nzb_multi_operations_cart"><i class="fa fa-shopping-cart"></i> Add to cart</button>
+							{if $sabintegrated}<button type="button" class="btn btn-default nzb_multi_operations_sab"><i class="fa fa-cloud-download"></i> Send to my Queue</button>{/if}
+							{if $isadmin}
+								<button type="button" class="btn btn-default btn-inverse nzb_multi_operations_edit"><i class="fa fa-edit icon-white"></i></button>
+								<button type="button" class="btn btn-default btn-inverse nzb_multi_operations_delete"><i class="fa fa-trash icon-white"></i></button>
+								<button type="button" class="btn btn-default btn-inverse nzb_multi_operations_rebuild"><i class="fa fa-repeat icon-white"></i></button>
+							{/if}</div>
+						{if $category==1000}<div class="btn-group"><a class="btn btn-mini" href="{$smarty.const.WWW_TOP}/console" title="Covers"><i class="icon-picture"></i></a><span class="btn btn-mini disabled"><i class="icon-list"></i></span></div>
+						{elseif $category==2000}<div class="btn-group"><a class="btn btn-mini" href="{$smarty.const.WWW_TOP}/movies" title="Covers"><i class="icon-picture"></i></a><span class="btn btn-mini disabled"><i class="icon-list"></i></span></div>
+						{elseif $category==3000}<div class="btn-group"><a class="btn btn-mini" href="{$smarty.const.WWW_TOP}/music" title="Covers"><i class="icon-picture"></i></a><span class="btn btn-mini disabled"><i class="icon-list"></i></span></div>
+						{elseif $category==4000}<div class="btn-group"><a class="btn btn-mini" href="{$smarty.const.WWW_TOP}/games" title="Covers"><i class="icon-picture"></i></a><span class="btn btn-mini disabled"><i class="icon-list"></i></span></div>
+						{elseif $category==6000}<div class="btn-group"><a class="btn btn-mini" href="{$smarty.const.WWW_TOP}/xxx" title="Covers"><i class="icon-picture"></i></a><span class="btn btn-mini disabled"><i class="icon-list"></i></span></div>
+						{elseif $category==7000}<div class="btn-group"><a class="btn btn-mini" href="{$smarty.const.WWW_TOP}/books" title="Covers"><i class="icon-picture"></i></a><span class="btn btn-mini disabled"><i class="icon-list"></i></span></div>
+						{/if}
+					</div>
+				</td>
+			</tr>
+		</table>
 
 	</form>
 {/if}
