@@ -6,7 +6,7 @@
  * reason, it will allow the password hash on the account to be changed.
  * Hopefully that will allow admin access to fix any further problems.
  */
-require_once dirname(__FILE__) . '/../../../www/config.php';
+require_once(dirname(__FILE__) . "/../../../bin/config.php");
 
 use newznab\db\Settings;
 
