@@ -51,10 +51,10 @@ if ($user !== false) {
 	}
 
 	if ($result === false || $hash === false) {
-		echo $pdo->log->error('An error occured during update attempt.' . PHP_EOL . $pdo->errorInfo());
+		$pdo->log->error('An error occured during update attempt.' . PHP_EOL . $pdo->errorInfo());
 	} else {
-		echo $pdo->log->headerOver("Updated {$user['username']}'s password hash to: ") . $pdo->log->primary("$hash");
+		$pdo->log->headerOver("Updated {$user['username']}'s password hash to: ") . $pdo->log->primary("$hash");
 	}
 } else {
-	echo $pdo->log->error("Unable to find {$field} '{$identifier}' in the users. Cannot change password.");
+	$pdo->log->error("Unable to find {$field} '{$identifier}' in the users. Cannot change password.");
 }
