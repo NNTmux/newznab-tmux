@@ -13,12 +13,13 @@
 	<title>{$page->meta_title}{if $page->meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
 {if $loggedin=="true"}	<link rel="alternate" type="application/rss+xml" title="{$site->title} Full Rss Feed" href="{$smarty.const.WWW_TOP}/rss?t=0&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}" />{/if}
 
-	<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
-	<link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/3.2.0/css/font-awesome.css" rel="stylesheet" media="screen">
+	<link href="{$smarty.const.WWW_TOP}/templates/nntmux/bootstrap/css/bootstrap.css" rel="stylesheet" type="text/css" media="screen" />
 	<link href="{$smarty.const.WWW_TOP}/templates/nntmux/styles/posterwall.css" rel="stylesheet" type="text/css" media="screen" />
 	<link href="{$smarty.const.WWW_TOP}/templates/nntmux/styles/style.css" rel="stylesheet" type="text/css" media="screen" />
 	<link href="{$smarty.const.WWW_TOP}/templates/nntmux/styles/jquery.qtip.css" rel="stylesheet" type="text/css" media="screen" />
-{if $site->google_adsense_acc != ''}	<link href="http://www.google.com/cse/api/branding.css" rel="stylesheet" type="text/css" media="screen" />
+	<!-- Font Awesome Icons -->
+	<link href="{$smarty.const.WWW_TOP}/templates/nntmux/bootstrap/css/font-awesome.min.css" rel="stylesheet"
+{if $site->google_adsense_acc != ''}	<link href="https://www.google.com/cse/api/branding.css" rel="stylesheet" type="text/css" media="screen" />
 {/if}
 	<!-- Manual Adjustment for Search input fields on browse pages. -->
 	<style>
@@ -27,11 +28,6 @@
 	</style>
 	<link rel="shortcut icon" type="image/ico" href="{$smarty.const.WWW_TOP}/templates/nntmux/images/favicon.ico"/>
 	<link rel="search" type="application/opensearchdescription+xml" href="{$smarty.const.WWW_TOP}/opensearch" title="{$site->title|escape}" />
-	<link href="//netdna.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-glyphicons.css" rel="stylesheet">
-	<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.3.js"></script>
-	{literal}<script>window.jQuery || document.write('<script src="{/literal}{$smarty.const.WWW_TOP}{literal}/templates/nntmux/scripts/jquery-2.1.3.js"><\/script>')</script>{/literal}
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-	{literal}<script>window.jQuery || document.write('<script src="{/literal}{$smarty.const.WWW_TOP}{literal}/templates/nntmux/scripts/bootstrap.min.js"><\/script>')</script>{/literal}
 	<script type="text/javascript" src="https://code.jquery.com/jquery-migrate-1.2.1.js"></script>
 	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/nntmux/scripts/jquery.colorbox-min.js"></script>
 	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/nntmux/scripts/jquery.autosize-min.js"></script>
