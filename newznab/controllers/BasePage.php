@@ -75,7 +75,7 @@ class BasePage
 		$this->smarty->setTemplateDir(
 			[
 				'user_frontend' => NN_WWW . 'templates/' . $this->settings->getSetting('style') . '/views/frontend',
-				'frontend' => NN_WWW . 'templates/default/views/frontend'
+				'frontend' => NN_WWW . 'templates/nntmux/views/frontend'
 			]
 		);
 		$this->smarty->setCompileDir(SMARTY_DIR.'templates_c'.DIRECTORY_SEPARATOR);
@@ -107,7 +107,7 @@ class BasePage
 					$this->smarty->setTemplateDir(
 							[
 							'user_frontend' => NN_WWW . 'templates/' . $this->userdata['style'] . '/views/frontend',
-							'frontend'      => NN_WWW . 'templates/default/views/frontend'
+							'frontend'      => NN_WWW . 'templates/nntmux/views/frontend'
 						]
 					);
 				}

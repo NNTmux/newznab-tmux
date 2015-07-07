@@ -41,7 +41,7 @@ class Music
 	 */
 	public function getMusicInfo($id)
 	{
-		return $this->pdo->queryOneRow(sprintf("SELECT musicinfo.*, genres.title as genres FROM musicinfo left outer join genres on genres.id = musicinfo.genreID where musicinfo.id = %d ", $id));
+		return $this->pdo->queryOneRow(sprintf("SELECT musicinfo.*, genres.title as genres FROM musicinfo left outer join genres on genres.id = musicinfo.genreid where musicinfo.id = %d ", $id));
 	}
 
 	/**
@@ -176,7 +176,7 @@ class Music
 
 		$order = $this->getMusicOrder($orderby);
 		// query modified to join to musicinfo after limiting releases as performance issue prevented sane sql.
-		$sql = sprintf(" SELECT r.*, r.id as releaseid, m.*, g.title as genre, groups.name as group_name, concat(cp.title, ' > ', c.title) as category_name, concat(cp.id, ',', c.id) as category_ids, rn.id as nfoid from releases r left outer join groups on groups.id = r.groupid inner join musicinfo m on m.id = r.musicinfoid and m.title != '' left outer join releasenfo rn on rn.releaseid = r.id and rn.nfo is not null left outer join category c on c.id = r.categoryid left outer join category cp on cp.id = c.parentid left outer join genres g on g.id = m.genreID inner join (select r.id from releases r inner join musicinfo m ON m.id = r.musicinfoid and m.title != '' where r.musicinfoid > 0 and r.passwordstatus <= (select value from settings where setting='showpasswordedrelease') and %s %s %s %s order by %s %s %s) x on x.id = r.id order by %s %s", $browseby, $catsrch, $maxagesql, $exccatlist, $order[0], $order[1], $limit, $order[0], $order[1]);
+		$sql = sprintf(" SELECT r.*, r.id as releaseid, m.*, g.title as genre, groups.name as group_name, concat(cp.title, ' > ', c.title) as category_name, concat(cp.id, ',', c.id) as category_ids, rn.id as nfoid from releases r left outer join groups on groups.id = r.groupid inner join musicinfo m on m.id = r.musicinfoid and m.title != '' left outer join releasenfo rn on rn.releaseid = r.id and rn.nfo is not null left outer join category c on c.id = r.categoryid left outer join category cp on cp.id = c.parentid left outer join genres g on g.id = m.genreid inner join (select r.id from releases r inner join musicinfo m ON m.id = r.musicinfoid and m.title != '' where r.musicinfoid > 0 and r.passwordstatus <= (select value from settings where setting='showpasswordedrelease') and %s %s %s %s order by %s %s %s) x on x.id = r.id order by %s %s", $browseby, $catsrch, $maxagesql, $exccatlist, $order[0], $order[1], $limit, $order[0], $order[1]);
 		return $this->pdo->query($sql, true);
 	}
 
@@ -204,7 +204,7 @@ class Music
 				$orderfield = 'm.year';
 				break;
 			case 'genre':
-				$orderfield = 'm.genreID';
+				$orderfield = 'm.genreid';
 				break;
 			case 'posted':
 			default:
@@ -228,7 +228,7 @@ class Music
 	 */
 	public function getBrowseByOptions()
 	{
-		return array('artist'=>'artist', 'title'=>'title', 'genre'=>'genreID', 'year'=>'year');
+		return array('artist'=>'artist', 'title'=>'title', 'genre'=>'genreid', 'year'=>'year');
 	}
 
 	/**
@@ -260,7 +260,7 @@ class Music
 	public function update($id, $title, $asin, $url, $salesrank, $artist, $publisher, $releasedate, $year, $tracks, $cover, $genreID)
 	{
 
-		$this->pdo->queryExec(sprintf("update musicinfo SET title=%s, asin=%s, url=%s, salesrank=%s, artist=%s, publisher=%s, releasedate='%s', year=%s, tracks=%s, cover=%d, genreID=%d, updateddate=NOW() WHERE id = %d",
+		$this->pdo->queryExec(sprintf("update musicinfo SET title=%s, asin=%s, url=%s, salesrank=%s, artist=%s, publisher=%s, releasedate='%s', year=%s, tracks=%s, cover=%d, genreid=%d, updateddate=NOW() WHERE id = %d",
 				$this->pdo->escapeString($title), $this->pdo->escapeString($asin), $this->pdo->escapeString($url), $salesrank, $this->pdo->escapeString($artist), $this->pdo->escapeString($publisher), $releasedate, $this->pdo->escapeString($year), $this->pdo->escapeString($tracks), $cover, $genreID, $id));
 	}
 
@@ -628,9 +628,9 @@ class Music
 		}
 
 		$sql = sprintf("
-		INSERT INTO musicinfo  (title, asin, url, salesrank,  artist, publisher, releasedate, review, year, genreID, tracks, cover, createddate, updateddate)
+		INSERT INTO musicinfo  (title, asin, url, salesrank,  artist, publisher, releasedate, review, year, genreid, tracks, cover, createddate, updateddate)
 		VALUES (%s, %s, %s,  %s,  %s, %s, %s, %s, %s,   %s, %s, %d, now(), now())
-			ON DUPLICATE KEY UPDATE  title = %s,  asin = %s,  url = %s,  salesrank = %s,  artist = %s,  publisher = %s,  releasedate = %s,  review = %s,  year = %s,  genreID = %s,  tracks = %s,  cover = %d,  createddate = now(),  updateddate = now()",
+			ON DUPLICATE KEY UPDATE  title = %s,  asin = %s,  url = %s,  salesrank = %s,  artist = %s,  publisher = %s,  releasedate = %s,  review = %s,  year = %s,  genreid = %s,  tracks = %s,  cover = %d,  createddate = now(),  updateddate = now()",
 			$this->pdo->escapeString($title), $this->pdo->escapeString($asin), $this->pdo->escapeString($url),
 			$salesrank, $this->pdo->escapeString($artist), $this->pdo->escapeString($publisher),
 			$releasedate, $this->pdo->escapeString($review), $year,

@@ -30,7 +30,7 @@
 	<link rel="search" type="application/opensearchdescription+xml" href="{$smarty.const.WWW_TOP}/opensearch" title="{$site->title|escape}" />
 	<script type="text/javascript" src="https://code.jquery.com/jquery-migrate-1.2.1.js"></script>
 	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/nntmux/scripts/jquery.colorbox-min.js"></script>
-	<!--<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/nntmux/scripts/jquery.autosize-min.js"></script>-->
+	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/nntmux/scripts/jquery.autosize-min.js"></script>
 	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/nntmux/scripts/jquery.qtip2.js"></script>
 	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/nntmux/scripts/utils.js"></script>
 	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/nntmux/scripts/sorttable.js"></script>

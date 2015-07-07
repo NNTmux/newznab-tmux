@@ -89,10 +89,10 @@
 					<li><a href="{$serverroot}cart"><i class="fa fa-shopping-cart"></i><span> My Cart</span></a></li>
 					<li><a href="{$serverroot}queue"><i class="fa fa-cloud-download"></i><span> My Queue</span></a></li>
 					<li><a href="{$serverroot}mymovies"><i class="fa fa-film"></i><span> My movies</span></a></li>
-					<li><a href="{$serverroot}profileedit"><i class="fa fa-list-alt"></i><span> Account Settings</span></a>
+					<li><a href="{$serverroot}profileedit"><i class="fa fa-cog fa-spin"></i><span> Account Settings</span></a>
 					</li>
 					{if isset($isadmin)}
-						<li><a href="{$serverroot}admin"><i class="fa fa-bullseye"></i><span> Admin</span></a></li>
+						<li><a href="{$serverroot}admin"><i class="fa fa-cogs fa-spin"></i><span> Admin</span></a></li>
 					{/if}
 					<li><a href="{$serverroot}logout"><i class="fa fa-unlock-alt"></i><span> Logout</span></a></li>
 				</ul>
@@ -263,12 +263,18 @@
 	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/charisma/js/jquery.history.js"></script>
 	<!-- Charisma functions -->
 	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/charisma/js/charisma.js"></script>
-	<!-- Newznab utils.js -->
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/charisma/scripts/utils.js"></script>
 
 	<!-- Functions with noty -->
 	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/charisma/js/functions.js"></script>
+	<!-- newznab default scripts, needed for stuff to work -->
+	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/charisma/scripts/jquery.colorbox-min.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/charisma/scripts/jquery.autosize-min.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/charisma/scripts/jquery.qtip2.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/charisma/scripts/sorttable.js"></script>
+	<!-- Newznab utils.js -->
+	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/charisma/scripts/utils.js"></script>
 	</body>
+
 	{* Start Login/Register Page *}
 {elseif $smarty.server.REQUEST_URI == "/register" or $smarty.server.REQUEST_URI eq '/register?action=submit'}
 	{include file="register.tpl"}

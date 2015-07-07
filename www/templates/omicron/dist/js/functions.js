@@ -37,7 +37,7 @@ $('.sabsend').click(function(e){
 
 	$.post(nzburl, function(resp){
 		$(e.target).addClass('icon_sab_clicked').attr('title','Added to Queue');
-		notify('NZB added to queue', 'top');
+		notify('Release added to queue', 'topCenter');
 	});
 	return false;
 });

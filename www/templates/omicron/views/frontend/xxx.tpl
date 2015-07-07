@@ -72,7 +72,7 @@
 													<a target="_blank"
 													   href="{$smarty.const.WWW_TOP}/xxx/?id={$result.id}"
 													   name="name{$result.id}" title="View XXX info" rel="viewxxx">
-														<img src="{if $result.cover == 1}{$smarty.const.WWW_TOP}/covers/xxx/{$result.id}-cover.jpg{else}{$serverroot}templates/nzbtheme/assets/images/nocover.png{/if}"
+														<img src="{if $result.cover == 1}{$smarty.const.WWW_TOP}/covers/xxx/{$result.id}-cover.jpg{else}{$serverroot}templates/omicron/images/nocover.png{/if}"
 															 width="130" border="0"
 															 alt="{$result.title|escape:"htmlall"}">
 													</a>

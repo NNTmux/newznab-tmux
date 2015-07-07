@@ -41,7 +41,7 @@ class Console
 	 */
 	public function getConsoleInfo($id)
 	{
-		return $this->pdo->queryOneRow(sprintf("SELECT consoleinfo.*, genres.title as genres FROM consoleinfo left outer join genres on genres.id = consoleinfo.genreID where consoleinfo.id = %d ", $id));
+		return $this->pdo->queryOneRow(sprintf("SELECT consoleinfo.*, genres.title as genres FROM consoleinfo left outer join genres on genres.id = consoleinfo.genreid where consoleinfo.id = %d ", $id));
 	}
 
 	/**
@@ -175,7 +175,7 @@ class Console
 			$exccatlist = " and r.categoryid not in (".implode(",", $excludedcats).")";
 
 		$order = $this->getConsoleOrder($orderby);
-		$sql = sprintf(" SELECT r.*, r.id as releaseid, con.*, g.title as genre, groups.name as group_name, concat(cp.title, ' > ', c.title) as category_name, concat(cp.id, ',', c.id) as category_ids, rn.id as nfoid from releases r left outer join groups on groups.id = r.groupid inner join consoleinfo con on con.id = r.consoleinfoid left outer join releasenfo rn on rn.releaseid = r.id and rn.nfo is not null left outer join category c on c.id = r.categoryid left outer join category cp on cp.id = c.parentid left outer join genres g on g.id = con.genreID where r.passwordstatus <= (select value from settings where setting='showpasswordedrelease') and %s %s %s %s order by %s %s".$limit, $browseby, $catsrch, $maxagesql, $exccatlist, $order[0], $order[1]);
+		$sql = sprintf(" SELECT r.*, r.id as releaseid, con.*, g.title as genre, groups.name as group_name, concat(cp.title, ' > ', c.title) as category_name, concat(cp.id, ',', c.id) as category_ids, rn.id as nfoid from releases r left outer join groups on groups.id = r.groupid inner join consoleinfo con on con.id = r.consoleinfoid left outer join releasenfo rn on rn.releaseid = r.id and rn.nfo is not null left outer join category c on c.id = r.categoryid left outer join category cp on cp.id = c.parentid left outer join genres g on g.id = con.genreid where r.passwordstatus <= (select value from settings where setting='showpasswordedrelease') and %s %s %s %s order by %s %s".$limit, $browseby, $catsrch, $maxagesql, $exccatlist, $order[0], $order[1]);
 		return $this->pdo->query($sql, true);
 	}
 
@@ -197,7 +197,7 @@ class Console
 				$orderfield = 'con.releasedate';
 			break;
 			case 'genre':
-				$orderfield = 'con.genreID';
+				$orderfield = 'con.genreid';
 			break;
 			case 'size':
 				$orderfield = 'r.size';
@@ -230,7 +230,7 @@ class Console
 	 */
 	public function getBrowseByOptions()
 	{
-		return array('platform'=>'platform', 'title'=>'title', 'genre'=>'genreID');
+		return array('platform'=>'platform', 'title'=>'title', 'genre'=>'genreid');
 	}
 
 	/**
@@ -256,7 +256,7 @@ class Console
 	public function update($id, $title, $asin, $url, $salesrank, $platform, $publisher, $releasedate, $esrb, $cover, $genreID)
 	{
 
-		$this->pdo->queryExec(sprintf("update consoleinfo SET title=%s, asin=%s, url=%s, salesrank=%s, platform=%s, publisher=%s, releasedate='%s', esrb=%s, cover=%d, genreID=%d, updateddate=NOW() WHERE id = %d",
+		$this->pdo->queryExec(sprintf("update consoleinfo SET title=%s, asin=%s, url=%s, salesrank=%s, platform=%s, publisher=%s, releasedate='%s', esrb=%s, cover=%d, genreid=%d, updateddate=NOW() WHERE id = %d",
 		$this->pdo->escapeString($title), $this->pdo->escapeString($asin), $this->pdo->escapeString($url), $salesrank, $this->pdo->escapeString($platform), $this->pdo->escapeString($publisher), $releasedate, $this->pdo->escapeString($esrb), $cover, $genreID, $id));
 	}
 
@@ -474,9 +474,9 @@ class Console
 		$con['consolegenreID'] = $genreKey;
 
 		$query = sprintf("
-		INSERT INTO consoleinfo  (`title`, `asin`, `url`, `salesrank`, `platform`, `publisher`, `genreID`, `esrb`, `releasedate`, `review`, `cover`, `createddate`, `updateddate`)
+		INSERT INTO consoleinfo  (`title`, `asin`, `url`, `salesrank`, `platform`, `publisher`, `genreid`, `esrb`, `releasedate`, `review`, `cover`, `createddate`, `updateddate`)
 		VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, now(), now())
-			ON DUPLICATE KEY UPDATE  `title` = %s,  `asin` = %s,  `url` = %s,  `salesrank` = %s,  `platform` = %s,  `publisher` = %s,  `genreID` = %s,  `esrb` = %s,  `releasedate` = %s,  `review` = %s, `cover` = %d,  createddate = now(),  updateddate = now()",
+			ON DUPLICATE KEY UPDATE  `title` = %s,  `asin` = %s,  `url` = %s,  `salesrank` = %s,  `platform` = %s,  `publisher` = %s,  `genreid` = %s,  `esrb` = %s,  `releasedate` = %s,  `review` = %s, `cover` = %d,  createddate = now(),  updateddate = now()",
 		$this->pdo->escapeString($con['title']), $this->pdo->escapeString($con['asin']), $this->pdo->escapeString($con['url']),
 		$con['salesrank'], $this->pdo->escapeString($con['platform']), $this->pdo->escapeString($con['publisher']), ($con['consolegenreID']==-1?"null":$con['consolegenreID']), $this->pdo->escapeString($con['esrb']),
 		$con['releasedate'], $this->pdo->escapeString($con['review']), $con['cover'],

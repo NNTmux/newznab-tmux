@@ -89,7 +89,7 @@
 
 														<a href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"url"}"><img
 																	class="cover"
-																	src="{if $result.cover == 1}{$serverroot}covers/movies/{$result.imdbid}-cover.jpg{else}{$serverroot}templates/charisma/images/nocover.png{/if}"
+																	src="{if $result.cover == 1}{$serverroot}covers/movies/{$result.imdbid}-cover.jpg{else}{$serverroot}templates/omicron/images/nocover.png{/if}"
 																	width="100" border="0"
 																	alt="{$result.title|escape:"htmlall"}"/></a>
 														<a target="_blank"
@@ -171,7 +171,7 @@
 														{if $smarty.foreach.loop.first}
 														<a href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"url"}"><img
 																	class="cover"
-																	src="{if $result.cover == 1}{$serverroot}covers/movies/{$result.imdbid}-cover.jpg{else}{$serverroot}templates/charisma/images/nocover.png{/if}"
+																	src="{if $result.cover == 1}{$serverroot}covers/movies/{$result.imdbid}-cover.jpg{else}{$serverroot}templates/omicron/images/nocover.png{/if}"
 																	width="100" border="0"
 																	alt="{$result.title|escape:"htmlall"}"/></a>
 														<a target="_blank"

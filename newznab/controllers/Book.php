@@ -41,7 +41,7 @@ class Book
 	 */
 	public function getBookInfo($id)
 	{
-		$query = $this->pdo->queryOneRow(sprintf("SELECT bookinfo.*, genres.title as genres FROM bookinfo left outer join genres on genres.id = bookinfo.genreID where bookinfo.id = %d ", $id));
+		$query = $this->pdo->queryOneRow(sprintf("SELECT bookinfo.*, genres.title as genres FROM bookinfo left outer join genres on genres.id = bookinfo.genreid where bookinfo.id = %d ", $id));
 		return $query;
 	}
 
