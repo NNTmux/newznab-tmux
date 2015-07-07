@@ -108,20 +108,20 @@
 								<!-- Menu Body -->
 								<li class="user-body">
 									<div class="col-xs-12 text-center">
-										<a href="{$serverroot}cart">My Cart</a>
+										<a href="{$serverroot}cart"><i class="fa fa-shopping-cart"></i> My Cart</a>
 									</div>
 									<div class="col-xs-12 text-center">
-										<a href="{$serverroot}queue">My Queue</a>
+										<a href="{$serverroot}queue"><i class="fa fa-list-alt"></i> My Queue</a>
 									</div>
 									<div class="col-xs-12 text-center">
-										<a href="{$serverroot}mymovies">My Movies</a>
+										<a href="{$serverroot}mymovies"><i class="fa fa-film"></i> My Movies</a>
 									</div>
 									<div class="col-xs-12 text-center">
-										<a href="{$serverroot}profileedit">Account Settings</a>
+										<a href="{$serverroot}profileedit"><i class="fa fa-cog fa-spin"></i> Account Settings</a>
 									</div>
 									{if isset($isadmin)}
 										<div class="col-xs-12 text-center">
-											<a href="{$serverroot}admin">Admin</a>
+											<a href="{$serverroot}admin"><i class="fa fa-cogs fa-spin"></i> Admin</a>
 										</div>
 									{/if}
 								</li>
