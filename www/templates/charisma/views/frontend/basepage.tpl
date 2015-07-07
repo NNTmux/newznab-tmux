@@ -263,12 +263,18 @@
 	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/charisma/js/jquery.history.js"></script>
 	<!-- Charisma functions -->
 	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/charisma/js/charisma.js"></script>
-	<!-- Newznab utils.js -->
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/charisma/scripts/utils.js"></script>
 
 	<!-- Functions with noty -->
 	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/charisma/js/functions.js"></script>
+	<!-- newznab default scripts, needed for stuff to work -->
+	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/charisma/scripts/jquery.colorbox-min.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/charisma/scripts/jquery.autosize-min.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/charisma/scripts/jquery.qtip2.js"></script>
+	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/charisma/scripts/sorttable.js"></script>
+	<!-- Newznab utils.js -->
+	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/charisma/scripts/utils.js"></script>
 	</body>
+
 	{* Start Login/Register Page *}
 {elseif $smarty.server.REQUEST_URI == "/register" or $smarty.server.REQUEST_URI eq '/register?action=submit'}
 	{include file="register.tpl"}
