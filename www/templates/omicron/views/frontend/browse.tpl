@@ -129,17 +129,15 @@
 										<br/>
 													<span class="label label-default">{$result.grabs}
 														Grab{if $result.grabs != 1}s{/if}</span>
-										{if $result.nfoid > 0}<span class="label label-default"><a
+										{if $result.nfoid > 0}<span><a
 													href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}"
-													class="text-muted">NFO</a></span>{/if}
-										{if $result.jpgstatus == 1 && $userdata.canpreview == 1}<span
-												class="label label-default"><a
+													class="modal_nfo label label-default" rel="nfo">NFO</a></span>{/if}
+										{if $result.jpgstatus == 1 && $userdata.canpreview == 1}<span><a
 													href="{$smarty.const.WWW_TOP}/covers/sample/{$result.guid}_thumb.jpg"
-													class="text-muted">Sample</a></span>{/if}
-										{if $result.haspreview == 1 && $userdata.canpreview == 1}<span
-												class="label label-default"><a
+													name="name{$result.guid}" class="modal_prev label label-default" rel="preview">Sample</a></span>{/if}
+										{if $result.haspreview == 1 && $userdata.canpreview == 1}<span><a
 													href="{$smarty.const.WWW_TOP}/covers/preview/{$result.guid}_thumb.jpg"
-													class="text-muted">Preview</a></span>{/if}
+													name="name{$result.guid}" class="modal_prev label label-default" rel="preview">Preview</a></span>{/if}
 										{if $result.rageid > 0}<span class="label label-default"><a
 													href="{$smarty.const.WWW_TOP}/series/{$result.rageid}"
 													class="text-muted">View TV</a></span>{/if}
