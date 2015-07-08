@@ -1,12 +1,10 @@
 <?php
+require_once(dirname(__FILE__) . "/../../../bin/config.php");
 
 use newznab\db\Settings;
 use newznab\utility\Utility;
 
-
 $pdo = new Settings();
-$s = new Sites();
-$site = $s->get();
 
 if (isset($argv[1]) && ($argv[1] === "true" || $argv[1] === "delete")) {
 	$releases = new \Releases(['Settings' => $pdo]);
@@ -17,7 +15,7 @@ if (isset($argv[1]) && ($argv[1] === "true" || $argv[1] === "delete")) {
 	$checked = $deleted = 0;
 	$couldbe = $argv[1] === "true" ? $couldbe = "could be " : "were ";
 	echo $pdo->log->header('Getting List of nzbs to check against db.');
-	$dirItr = new \RecursiveDirectoryIterator($site->nzbpath);
+	$dirItr = new \RecursiveDirectoryIterator($pdo->getSetting('nzbpath'));
 	$itr = new \RecursiveIteratorIterator($dirItr, \RecursiveIteratorIterator::LEAVES_ONLY);
 	foreach ($itr as $filePath) {
 		if (is_file($filePath) && preg_match('/([a-f-0-9]+)\.nzb\.gz/', $filePath, $guid)) {

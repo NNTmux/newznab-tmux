@@ -1,5 +1,6 @@
 <?php
 // TODO: bunch of if/elses need converting to switches
+require_once(dirname(__FILE__) . "/../../../bin/config.php");
 
 use newznab\db\Settings;
 
