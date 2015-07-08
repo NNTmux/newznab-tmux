@@ -9,4 +9,12 @@
 	</div>
 </div>
 
+<div class="row">
+	<div class="box col-md-12">
+		<div class="box-content">
+
 <p>{$site->tandc}</p>
+
+		</div>
+		</div>
+	</div>
