@@ -374,6 +374,8 @@
 	</body>
 {elseif $smarty.server.REQUEST_URI == "/register" or $smarty.server.REQUEST_URI eq '/register?action=submit'}
 	{include file="register.tpl"}
+{elseif $smarty.server.REQUEST_URI == "/forgottenpassword" or $smarty.server.REQUEST_URI eq '/forgottenpassword?action=submit'}
+	{include file="forgottenpassword.tpl"}
 {else}
 	{include file="login.tpl"}
 {/if}
