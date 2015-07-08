@@ -372,10 +372,14 @@
 		  user experience. Slimscroll is required when using the
 		  fixed layout. -->
 	</body>
-{elseif $smarty.server.REQUEST_URI == "/register" or $smarty.server.REQUEST_URI eq '/register?action=submit'}
+{elseif $smarty.server.REQUEST_URI == "/register" || $smarty.server.REQUEST_URI eq '/register?action=submit'}
 	{include file="register.tpl"}
-{elseif $smarty.server.REQUEST_URI == "/forgottenpassword" or $smarty.server.REQUEST_URI eq '/forgottenpassword?action=submit'}
+{elseif $smarty.server.REQUEST_URI == "/forgottenpassword" || $smarty.server.REQUEST_URI eq '/forgottenpassword?action=submit'}
 	{include file="forgottenpassword.tpl"}
+{elseif $smarty.server.REQUEST_URI == "/contact-us"}
+	{include file="contact.tpl"}
+{elseif $smarty.server.REQUEST_URI == "/terms-and-conditions"}
+	{include file="terms.tpl"}
 {else}
 	{include file="login.tpl"}
 {/if}
