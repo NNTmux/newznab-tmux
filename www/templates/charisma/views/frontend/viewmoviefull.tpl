@@ -20,7 +20,7 @@
 			{else}
 				<img class="pull-right" style="margin-right:50px; max-height:278px;"
 					 alt="{$result.title|escape:"htmlall"} Logo"
-					 src="{$serverroot}templates/nzbtheme/assets/images/nomoviecover.jpg"/>
+					 src="{$serverroot}templates/charisma/images/nomoviecover.jpg"/>
 			{/if}
 			<span class="h1" style="display:inline;">{$result.title|escape:"htmlall"} ({$result.year})</span><a
 					class="btn btn-transparent btn-primary" target="_blank"
