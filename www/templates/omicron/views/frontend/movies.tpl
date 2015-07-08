@@ -87,7 +87,7 @@
 														{foreach from=$msplits item=m name=loop}
 														{if $smarty.foreach.loop.first}
 
-														<a href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"url"}"><img
+														<a href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}"><img
 																	class="cover"
 																	src="{if $result.cover == 1}{$serverroot}covers/movies/{$result.imdbid}-cover.jpg{else}{$serverroot}templates/omicron/images/nocover.png{/if}"
 																	width="100" border="0"
@@ -101,7 +101,7 @@
 														   name="trakt{$result.imdbid}" title="View Trakt page"
 														   class="label label-default" rel="trakt">TRAKT</a>
 														{if $mnfo[$m@index] > 0}<a
-															href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}/{$mname[$m@index]|escape:"seourl"}"
+															href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}"
 															title="View NFO" class="label label-default"
 															rel="nfo">NFO</a>{/if}
 														<a class="label label-default"
@@ -110,7 +110,7 @@
 													</div>
 													<div class="col-md-9 no-gutter">
 																<span class="release-title"><a class="text-muted"
-																							   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"url"}">{$result.title|escape:"htmlall"}</a></span>
+																							   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}">{$result.title|escape:"htmlall"}</a></span>
 
 														<div class="release-subtitle">{if $result.genre != ''}{$result.genre}, {/if}</div>
 														<div>
@@ -124,11 +124,11 @@
 															<br/><br/><br/>
 
 															<div class="release-name text-muted"><a
-																		href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"url"}">{$mname[$m@index]|escape:"htmlall"}</a>
+																		href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}">{$mname[$m@index]|escape:"htmlall"}</a>
 															</div>
 															<div>
 																<a role="button" class="btn btn-white btn-xs"
-																   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}/{$mname[$m@index]|escape:"url"}"><i
+																   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}"><i
 																			class="fa fa-download"></i><span
 																			class="badge">{$mgrabs[$m@index]}
 																		Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
@@ -169,7 +169,7 @@
 														{assign var="mhaspreview" value=","|explode:$result.grp_haspreview}
 														{foreach from=$msplits item=m name=loop}
 														{if $smarty.foreach.loop.first}
-														<a href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"url"}"><img
+														<a href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}"><img
 																	class="cover"
 																	src="{if $result.cover == 1}{$serverroot}covers/movies/{$result.imdbid}-cover.jpg{else}{$serverroot}templates/omicron/images/nocover.png{/if}"
 																	width="100" border="0"
@@ -183,7 +183,7 @@
 														   name="trakt{$result.imdbid}" title="View Trakt page"
 														   class="label label-default" rel="trakt">TRAKT</a>
 														{if $mnfo[$m@index] > 0}<a
-															href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}/{$mname[$m@index]|escape:"seourl"}"
+															href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}"
 															title="View NFO" class="label label-default"
 															rel="nfo">NFO</a>{/if}
 														<a class="label label-default"
@@ -192,7 +192,7 @@
 													</div>
 													<div class="col-md-9 no-gutter">
 																<span class="release-title"><a class="text-muted"
-																							   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"url"}">{$result.title|escape:"htmlall"}</a></span>
+																							   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}">{$result.title|escape:"htmlall"}</a></span>
 
 														<div class="release-subtitle">{if $result.genre != ''}{$result.genre}, {/if}</div>
 														<div>
@@ -210,7 +210,7 @@
 															</div>
 															<div>
 																<a role="button" class="btn btn-white btn-xs"
-																   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}/{$mname[$m@index]|escape:"url"}"><i
+																   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}"><i
 																			class="fa fa-download"></i><span
 																			class="badge">{$mgrabs[$m@index]}
 																		Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>

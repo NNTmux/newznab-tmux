@@ -165,7 +165,7 @@
 																	{/if}
 																	<td>
 																		<a title="View details"
-																		   href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"seourl"}">{$result.searchname|escape:"htmlall"|replace:".":" "}</a>
+																		   href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"htmlall"}">{$result.searchname|escape:"htmlall"|replace:".":" "}</a>
 
 																		<div>
 																			{if $result.nfoid > 0}<span
@@ -207,7 +207,7 @@
 																	</td>
 																	<td class="icons" style='width:100px;'>
 																		<a title="Download Nzb"
-																		   href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}/{$result.searchname|escape:"url"}"><i
+																		   href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}/{$result.searchname|escape:"htmlall"}"><i
 																					class="fa fa-download text-muted"></i></a>
 																		<a class="fa fa-shopping-cart icon_cart text-muted"
 																		   href="#"

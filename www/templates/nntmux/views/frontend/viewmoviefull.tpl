@@ -40,7 +40,7 @@
 				{assign var="mname" value="#"|explode:$result.grp_release_name}
 				{foreach from=$msplits item=m}
 					{if $mhaspreview[$m@index] == 1}
-						<a href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"seourl"}">
+						<a href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}">
 							<img class="shadow pic"
 								 src="{$smarty.const.WWW_TOP}/covers/preview/{$mguid[$m@index]}_thumb.jpg"/><br/>
 
@@ -132,7 +132,7 @@
 												 value="{$mguid[$m@index]}"/></td>
 						<td class="item">
 							<label for="chk{$mguid[$m@index]|substr:0:7}"><a class="title" title="View details"
-																			 href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"seourl"}">{$mname[$m@index]|escape:"htmlall"|replace:".":" "}</a></label>
+																			 href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}">{$mname[$m@index]|escape:"htmlall"|replace:".":" "}</a></label>
 
 							{if $mpass[$m@index] == 2}
 								<img title="Passworded Rar Archive"
@@ -179,7 +179,7 @@
 							grab{if $mgrabs[$m@index] != 1}s{/if}</td>
 						<td class="icons">
 							<div class="icon icon_nzb"><a title="Download Nzb"
-														  href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}/{$mname[$m@index]|escape:"url"}">
+														  href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}">
 									&nbsp;</a></div>
 							<div class="icon icon_cart" title="Add to Cart"></div>
 							{if $sabintegrated}

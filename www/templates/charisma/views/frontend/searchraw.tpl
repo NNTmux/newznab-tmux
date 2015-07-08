@@ -70,7 +70,7 @@
 												/{$result.totalParts}</span>{else}100%{/if}</td>
 									{/if}
 									<td class="less">{if $result.releaseid > 0}<a title="View Nzb details"
-																				  href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.filename|escape:"seourl"}">
+																				  href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.filename|escape:"htmlall"}">
 												Yes</a>{/if}</td>
 								</tr>
 							{/foreach}

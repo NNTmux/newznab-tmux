@@ -160,7 +160,7 @@
 													<div>
 														<a
 																class="label label-info"
-																href="{$smarty.const.WWW_TOP}/search/{$result.title|escape:"url"}?t=2000"
+																href="{$smarty.const.WWW_TOP}/search/{$result.title|escape:"htmlall"}?t=2000"
 																title="View similar nzbs"
 																>Similar</a>
 													</div>
