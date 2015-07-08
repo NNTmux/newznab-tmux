@@ -29,8 +29,6 @@
 	-->
 	<link href="{$smarty.const.WWW_TOP}/templates/omicron/dist/css/skins/skin-blue.min.css" rel="stylesheet"
 		  type="text/css"/>
-	<!-- Newznab utils.js -->
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/omicron/scripts/utils.js"></script>
 
 	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
