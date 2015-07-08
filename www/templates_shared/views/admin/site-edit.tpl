@@ -75,6 +75,13 @@
 		<div class="hint">A just for fun value shown in debug and not on public pages.</div>
 	</td>
 </tr>
+	<tr>
+		<td style="width: 180px;"><label for="coverspath">Cover&apos;s path:</label></td>
+		<td>
+			<input id="coverspath" class="long" name="coverspath" type="text" value="{$fsite->coverspath}"/>
+			<div class="hint">The absolute path to the place covers will be stored.</div>
+		</td>
+	</tr>
 
 <tr>
 	<td><label for="style">Theme</label>:</td>
