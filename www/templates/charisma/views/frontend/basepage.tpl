@@ -212,14 +212,14 @@
 	</div>
 	<!--/.fluid-container-->
 	<!-- Scripts-->
-	<script type="text/javascript"
-			src="{$smarty.const.WWW_TOP}/templates/charisma/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 	<!-- jQuery -->
 	<script type="text/javascript"
 			src="{$smarty.const.WWW_TOP}/templates/charisma/bower_components/jquery/jquery.min.js"></script>
 	<!-- jQuery migrate script -->
 	<script type="text/javascript"
 			src="{$smarty.const.WWW_TOP}/templates/charisma/js/jquery-migrate-1.2.1.min.js"></script>
+	<script type="text/javascript"
+			src="{$smarty.const.WWW_TOP}/templates/charisma/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 	<!-- Bootstrap hover on mouseover script -->
 	<script type="text/javascript"
 			src="{$smarty.const.WWW_TOP}/templates/charisma/js/bootstrap-hover-dropdown.min.js"></script>
