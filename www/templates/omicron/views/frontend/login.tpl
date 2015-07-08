@@ -6,9 +6,6 @@
 {if isset($notice) && $notice != ''}
 <div class="alert alert-info">{$notice}</div>
 {/if}
-{if isset($sent) && $sent != ''}
-<div class="alert alert-info">A link to reset your password has been sent to your e-mail account.</div>
-{/if}
   <head>
 	  <script type="text/javascript">
 		  /* <![CDATA[ */
@@ -70,26 +67,8 @@
           </div>
         </form>
 
-		  <a href="#">I forgot my password</a><br>
+		  <a href="{$serverroot}forgottenpassword" class="text-center">I forgot my password</a><br>
         <a href="{$serverroot}register" class="text-center">Register a new membership</a>
-
-      </div><!-- /.login-box-body -->
-		<form class="form-password" role="form" method="POST" action="forgottenpassword?action=submit">
-			<h3><strong>Reset</strong> your password</h3>
-			<div class="append-icon m-b-20">
-				<input type="email" name="email" class="form-control form-white password" placeholder="Email" required>
-				<i class="icon-lock"></i>
-			</div>
-
-			<br/>
-			{$page->smarty->fetch('captcha.tpl')}
-			<button type="submit" class="btn btn-lg btn-danger btn-block ladda-button" data-style="expand-left">Send Password Reset Link</button>
-			<div class="clearfix m-t-60">
-				<p class="pull-left m-t-20 m-b-0"><a id="login" href="{$serverroot}">Have an account? Sign In</a></p>
-				<p class="pull-right m-t-20 m-b-0"><a href="{$serverroot}register">New here? Sign up</a></p>
-			</div>
-		</form>
-    </div><!-- /.login-box -->
 
     <!-- jQuery 2.1.4 -->
     <script src="{$smarty.const.WWW_TOP}/templates/omicron/plugins/jQuery/jQuery-2.1.4.min.js"></script>
