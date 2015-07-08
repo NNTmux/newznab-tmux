@@ -124,7 +124,7 @@
 															 type="checkbox" class="nzb_check"
 															 value="{$result.guid}"/></td>
 									<td>
-										<a href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"seourl"}"
+										<a href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"htmlall"}"
 										   class="title">{$result.searchname|escape:"htmlall"|replace:".":" "}</a>
 										<br/>
 													<span class="label label-default">{$result.grabs}
@@ -150,7 +150,7 @@
 									<td>{$result.postdate|timeago}</td>
 									<td>{$result.size|fsize_format:"MB"}</td>
 									<td class="icon_nzb"><a
-												href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}/{$result.searchname|escape:"url"}"><i
+												href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}/{$result.searchname|escape:"htmlall"}"><i
 													class="fa fa-download text-muted"
 													title="Download NZB"></i></a>
 										<a href="{$smarty.const.WWW_TOP}/details/{$result.guid}/#comments"><i

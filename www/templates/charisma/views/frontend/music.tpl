@@ -75,7 +75,7 @@
 												<div class="row">
 													<div class="col-md-2 no-gutter">
 														<a title="View details"
-														   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"seourl"}">
+														   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}">
 															<img src="{$smarty.const.WWW_TOP}/covers/music/{if $result.cover == 1}{$result.musicinfoid}.jpg{else}no-cover.jpg{/if}"
 																 width="140" border="0"
 																 alt="{$result.artist|escape:"htmlall"} - {$result.title|escape:"htmlall"}"/>
@@ -87,7 +87,7 @@
 																				 title="View Amazon page">
 																Amazon</a>{/if}
 														{if $result.nfoid > 0}<a
-															href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}/{$mname[$m@index]|escape:"seourl"}"
+															href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}"
 															title="View NFO" class="label label-default" rel="nfo">
 																NFO</a>{/if}
 														<a class="label label-default"
@@ -96,7 +96,7 @@
 													</div>
 													<div class="col-md-10 no-gutter">
 														<h4><a title="View details"
-															   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"seourl"}">{$result.artist|escape:"htmlall"}
+															   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}">{$result.artist|escape:"htmlall"}
 																- {$result.title|escape:"htmlall"}</a> (<a class="title"
 																										   title="{$result.year}"
 																										   href="{$smarty.const.WWW_TOP}/music?year={$result.year}">{$result.year}</a>)
@@ -131,12 +131,12 @@
 																	{/if}
 																	<div>
 																		<a role="button" class="btn btn-white btn-xs"
-																		   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}/{$mname[$m@index]|escape:"url"}"><i
+																		   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}"><i
 																					class="fa fa-download"></i><span
 																					class="badge">{$mgrabs[$m@index]}
 																				Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
 																		<a role="button" class="btn btn-white btn-xs"
-																		   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"seourl"}#comments"><i
+																		   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}#comments"><i
 																					class="fa fa-comment-o"></i><span
 																					class="badge">{$mcomments[$m@index]}
 																				Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>

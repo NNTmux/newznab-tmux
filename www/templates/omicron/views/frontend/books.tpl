@@ -75,7 +75,7 @@
 											<div class="row">
 												<div class="col-md-2 no-gutter">
 													<a title="View details"
-													   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"seourl"}">
+													   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}">
 														<img src="{$smarty.const.WWW_TOP}/covers/book/{if $result.cover == 1}{$result.bookinfoid}.jpg{else}no-cover.jpg{/if}"
 															 width="140" border="0"
 															 alt="{$result.author|escape:"htmlall"} - {$result.title|escape:"htmlall"}"/>
@@ -95,7 +95,7 @@
 												</div>
 												<div class="col-md-10 no-gutter">
 													<h4><a title="View details"
-														   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"seourl"}">{$result.author|escape:"htmlall"}
+														   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}">{$result.author|escape:"htmlall"}
 															- {$result.title|escape:"htmlall"}</a></h4>
 													<table>
 														<tr>
@@ -129,7 +129,7 @@
 																{/if}
 																<div>
 																	<a role="button" class="btn btn-white btn-xs"
-																	   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}/{$result.searchname|escape:"url"}"><i
+																	   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}/{$result.searchname|escape:"htmlall"}"><i
 																				class="fa fa-download"></i><span
 																				class="badge">{$mgrabs[$m@index]}
 																			Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
