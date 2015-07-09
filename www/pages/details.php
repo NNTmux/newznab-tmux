@@ -184,6 +184,7 @@ if (isset($_GET["id"]))
 	$page->smarty->assign('prehash', $pre);
 	$page->smarty->assign('comments',$comments);
 	$page->smarty->assign('searchname',$releases->getSimilarName($data['searchname']));
+	$page->smarty->assign('similars', $similars);
 	$page->smarty->assign('privateprofiles', ($page->settings->getSetting('privateprofiles') == 1) ? true : false );
 
 	$page->meta_title = "View NZB";
