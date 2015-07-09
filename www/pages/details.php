@@ -21,6 +21,10 @@ if (isset($_GET["id"]))
 	$reAudio = $re->getAudio($data["id"]);
 	$reSubs = $re->getSubs($data["id"]);
 	$comments = $rc->getCommentsByGid($data["gid"]);
+	$similars = $releases->searchSimilar($data['id'],
+		$data['searchname'],
+		6,
+		$page->userdata['categoryexclusions']);
 
 	$rage = '';
 	if ($data["rageid"] != '')
