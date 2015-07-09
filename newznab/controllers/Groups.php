@@ -679,4 +679,16 @@ class Groups
 			)
 		);
 	}
+
+	/**
+	 * @note Disable group that does not exist on USP server
+	 * @param string $groupname
+	 *
+	 * @return string
+	 */
+	public function disableIfNotExist($groupname)
+	{
+		$id = $this->getIDByName($groupname);
+		$this->pdo->queryExec(sprintf("UPDATE groups SET active = 0 WHERE id = %d", $id));
+	}
 }
