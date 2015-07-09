@@ -27,6 +27,7 @@ class Groups
 
 		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
 	}
+
 	/**
 	 * Get all group rows.
 	 */
@@ -51,7 +52,7 @@ class Groups
 	{
 
 		$categories = $this->pdo->query("SELECT * FROM groups WHERE active = 1 ORDER BY name",
-		true, NN_CACHE_EXPIRY_LONG
+			true, NN_CACHE_EXPIRY_LONG
 		);
 		$temp_array = array();
 
@@ -105,6 +106,7 @@ class Groups
 	{
 
 		$res = $this->pdo->queryOneRow(sprintf("SELECT name FROM groups WHERE id = %d ", $id));
+
 		return ($res === false ? '' : $res["name"]);
 	}
 
@@ -119,6 +121,7 @@ class Groups
 	{
 
 		$res = $this->pdo->queryOneRow(sprintf("SELECT id FROM groups WHERE name = %s", $this->pdo->escapeString($name)));
+
 		return ($res === false ? '' : $res["id"]);
 	}
 
@@ -261,7 +264,7 @@ class Groups
 	 *
 	 * @return string|int
 	 */
-	protected function formatNumberString($setting, $escape=true)
+	protected function formatNumberString($setting, $escape = true)
 	{
 		$setting = trim($setting);
 		if ($setting === "0" || !is_numeric($setting)) {
@@ -306,7 +309,8 @@ class Groups
 				UPDATE groups
 				SET backfill_target = 0, first_record = 0, first_record_postdate = NULL, last_record = 0,
 					last_record_postdate = NULL, last_updated = NULL
-				WHERE id = %d", $id)
+				WHERE id = %d", $id
+			)
 		);
 	}
 
@@ -388,6 +392,7 @@ class Groups
 	public function updateGroupStatus($id, $status = 0)
 	{
 		$this->pdo->queryExec(sprintf("UPDATE groups SET active = %d WHERE id = %d", $status, $id));
+
 		return "Group $id has been " . (($status == 0) ? 'deactivated' : 'activated') . '.';
 	}
 
@@ -400,6 +405,7 @@ class Groups
 	public function updateBackfillStatus($id, $status = 0)
 	{
 		$this->pdo->queryExec(sprintf("UPDATE groups SET backfill = %d WHERE id = %d", $status, $id));
+
 		return "Group $id has been " . (($status == 0) ? 'deactivated' : 'activated') . '.';
 	}
 
@@ -439,7 +445,7 @@ class Groups
 	 */
 	public function getCBPTableNames($tpgSetting, $groupID)
 	{
-		$groupKey = ($groupID . '_' . (int) $tpgSetting);
+		$groupKey = ($groupID . '_' . (int)$tpgSetting);
 
 		// Check if buffered and return. Prevents re-querying MySQL when TPG is on.
 		if (isset($this->cbppTableNames[$groupKey])) {
@@ -447,9 +453,9 @@ class Groups
 		}
 
 		$tables = [];
-		$tables['cname']  = 'collections';
-		$tables['bname']  = 'binaries';
-		$tables['pname']  = 'parts';
+		$tables['cname'] = 'collections';
+		$tables['bname'] = 'binaries';
+		$tables['pname'] = 'parts';
 		$tables['prname'] = 'partrepair';
 
 		if ($tpgSetting === true) {
@@ -462,9 +468,9 @@ class Groups
 			}
 
 			$groupEnding = '_' . $groupID;
-			$tables['cname']  .= $groupEnding;
-			$tables['bname']  .= $groupEnding;
-			$tables['pname']  .= $groupEnding;
+			$tables['cname'] .= $groupEnding;
+			$tables['bname'] .= $groupEnding;
+			$tables['pname'] .= $groupEnding;
 			$tables['prname'] .= $groupEnding;
 		}
 
@@ -520,6 +526,7 @@ class Groups
 				}
 			}
 		}
+
 		return true;
 	}
 
@@ -555,7 +562,7 @@ class Groups
 	 *
 	 * @return mixed
 	 */
-	public function getCountActive($groupname="")
+	public function getCountActive($groupname = "")
 	{
 		$res = $this->pdo->queryOneRow(
 			sprintf("
@@ -567,12 +574,13 @@ class Groups
 					?
 					sprintf(
 						"AND groups.name LIKE %s ",
-						$this->pdo->escapeString("%".$groupname."%")
+						$this->pdo->escapeString("%" . $groupname . "%")
 					)
 					: ''
 				)
 			)
 		);
+
 		return $res["num"];
 	}
 
@@ -581,7 +589,7 @@ class Groups
 	 *
 	 * @return mixed
 	 */
-	public function getCountInactive($groupname="")
+	public function getCountInactive($groupname = "")
 	{
 		$res = $this->pdo->queryOneRow(
 			sprintf("
@@ -593,12 +601,13 @@ class Groups
 					?
 					sprintf(
 						"AND groups.name LIKE %s ",
-						$this->pdo->escapeString("%".$groupname."%")
+						$this->pdo->escapeString("%" . $groupname . "%")
 					)
 					: ''
 				)
 			)
 		);
+
 		return $res["num"];
 	}
 
@@ -669,5 +678,17 @@ class Groups
 				)
 			), true, NN_CACHE_EXPIRY_SHORT
 		);
+	}
+
+	/**
+	 * @note Disable group that does not exist on USP server
+	 * @param string $groupname
+	 *
+	 * @return string
+	 */
+	public function disableIfNotExist($groupname)
+	{
+		$id = $this->getIDByName($groupname);
+		$this->pdo->queryExec(sprintf("UPDATE groups SET active = 0 WHERE id = %d", $id));
 	}
 }
