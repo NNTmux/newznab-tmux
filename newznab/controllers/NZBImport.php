@@ -423,6 +423,8 @@ class NZBImport
 					'isrenamed' => $renamed,
 					'reqidstatus' => 0,
 					'prehashid' => 0,
+					'regexid' => 0,
+					'reqid' => 0,
 					'nzbstatus' => NZB::NZB_ADDED,
 					'passwordstatus' => 0
 				]
