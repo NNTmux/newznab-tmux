@@ -956,6 +956,10 @@ class Categorize extends Category
 			$this->tmpCat = \Category::CAT_XXX_CLIPSD;
 			return true;
 		}
+		if (preg_match('/SDX264XXX/i', $this->releaseName)) {
+			$this->tmpCat = \Category::CAT_XXX_CLIPSD;
+			return true;
+		}
 		return false;
 	}
 
