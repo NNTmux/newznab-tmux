@@ -305,6 +305,9 @@ class NZBImport
 							'first_record' => 0,
 							'last_record' => 0,
 							'active' => 0,
+							'minsizetoformrelease' => 0,
+							'minfilestoformrelease' => 0,
+							'regexmatchonly' => 1,
 							'backfill' => 0
 						]);
 						$this->allGroups[$group] = $groupID;
