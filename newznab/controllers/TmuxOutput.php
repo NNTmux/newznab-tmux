@@ -37,7 +37,6 @@ class TmuxOutput extends Tmux
 		$tmux = $t->get();
 		$this->_git = new \newznab\utility\Git(); // Do not remove the full namespace/ PHP gets confused for some reason without it.
 		$this->_vers = Utility::getValidVersionsFile();
-		$this->_tvers = $tmux->sqlpatch;
 
 
 		$this->_setColourMasks();
@@ -117,9 +116,7 @@ class TmuxOutput extends Tmux
 	{
 		$buffer = '';
 		$state = ($this->runVar['settings']['is_running'] == 1) ? 'Running' : 'Disabled';
-		//$version = $this->_tvers . 'r' . $this->_vers;
 		$version = $this->_vers->versions->git->tag . 'r' . $this->_git->commits();
-		$tversion = '0.6r0255';
 
 		$buffer .= sprintf($this->tmpMasks[2],
 			"Monitor $state v$version [" . $this->runVar['constants']['sqlpatch'] . "]: ",
