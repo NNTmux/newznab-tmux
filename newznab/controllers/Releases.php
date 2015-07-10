@@ -2137,10 +2137,10 @@ class Releases
 	public function insertRelease(array $parameters = [])
 	{
 
-		if ($parameters['regexid'] == "")
+		if (isset($parameters['regexid']) && $parameters['regexid'] == "")
 			$parameters['regexid'] = " null ";
 
-		if ($parameters['reqid'] != "")
+		if (isset($parameters['reqid']) && $parameters['reqid'] != "")
 			$parameters['reqid'] = $this->pdo->escapeString($parameters['reqid']);
 		else
 			$parameters['reqid'] = " null ";
