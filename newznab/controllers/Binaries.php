@@ -259,12 +259,7 @@ class Binaries
 		if ($this->_nntp->isError($groupNNTP)) {
 			$groupNNTP = $this->_nntp->dataError($this->_nntp, $groupMySQL['name']);
 			if ($groupNNTP->code == 411) {
-				$this->_groups->disableIfNotExist($groupMySQL['name']);
-				$this->_colorCLI->doEcho(
-					$this->_colorCLI->error(
-						'Group ' . $groupMySQL['name'] . ' does not exist on server, disabling'
-					)
-				);
+				$this->_groups->disableIfNotExist($groupMySQL['id']);
 			}
 			if ($this->_nntp->isError($groupNNTP)) {
 				return;
