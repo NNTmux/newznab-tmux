@@ -14,6 +14,11 @@ class Groups
 	public $pdo;
 
 	/**
+	 * @var ColorCLI
+	 */
+	public $colorCLI;
+
+	/**
 	 * Construct.
 	 *
 	 * @param array $options Class instances.
