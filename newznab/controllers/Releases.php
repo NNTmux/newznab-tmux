@@ -1916,9 +1916,9 @@ class Releases
 					$this->pdo->log->doEcho($this->pdo->log->primary('Added release ' . $cleanRelName . ''));
 					$returnCount++;
 
-					if ($this->echoCLI) {
+					/*if ($this->echoCLI) {
 						$this->pdo->log->doEcho($this->pdo->log->primary('Added ' . $returnCount . 'releases.'));
-					}
+					}*/
 
 				}
              }
