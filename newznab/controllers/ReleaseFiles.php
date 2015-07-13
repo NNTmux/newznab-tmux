@@ -8,12 +8,25 @@ use newznab\db\Settings;
 class ReleaseFiles
 {
 	/**
+	 * @var \newznab\db\Settings
+	 */
+	protected $pdo;
+
+	/**
+	 * @param \newznab\db\Settings $settings
+	 */
+	public function __construct($settings = null)
+	{
+		$this->pdo = ($settings instanceof Settings ? $settings : new Settings());
+	}
+
+
+	/**
 	 * Get releasefiles row by id.
 	 */
 	public function get($id)
 	{
-		$db = new Settings();
-		return $db->query(sprintf("select * from releasefiles where releaseid = %d  order by releasefiles.name ", $id));
+		return $this->pdo->query(sprintf("SELECT * FROM releasefiles WHERE releaseid = %d ORDER BY releasefiles.name ", $id));
 	}
 
 	/**
@@ -21,8 +34,7 @@ class ReleaseFiles
 	 */
 	public function getByGuid($guid)
 	{
-		$db = new Settings();
-		return $db->query(sprintf("select releasefiles.* from releasefiles inner join releases r on r.id = releasefiles.releaseid where r.guid = %s order by releasefiles.name ", $db->escapeString($guid)));
+		return $this->pdo->query(sprintf("SELECT releasefiles.* FROM releasefiles INNER JOIN releases r ON r.id = releasefiles.releaseid WHERE r.guid = %s ORDER BY releasefiles.name ", $this->pdo->escapeString($guid)));
 	}
 
 	/**
@@ -30,8 +42,7 @@ class ReleaseFiles
 	 */
 	public function delete($id)
 	{
-		$db = new Settings();
-		return $db->queryExec(sprintf("DELETE from releasefiles where releaseid = %d", $id));
+		return $this->pdo->queryExec(sprintf("DELETE FROM releasefiles WHERE releaseid = %d", $id));
 	}
 
 	/**
@@ -39,8 +50,11 @@ class ReleaseFiles
 	 */
 	public function add($id, $name, $size, $createddate, $passworded)
 	{
-		$db = new Settings();
-		$sql = sprintf("INSERT INTO releasefiles  (releaseid,   name,   size,   createddate,   passworded) VALUES (%d, %s, %s, from_unixtime(%d), %d)", $id, $db->escapeString($name), $db->escapeString($size), $createddate, $passworded );
-		return $db->queryInsert($sql);
+		return $this->pdo->queryInsert(sprintf("INSERT INTO releasefiles  (releaseid, name, size, createddate, passworded) VALUES
+			(%d, %s, %s, from_unixtime(%d), %d)",
+				$id, $this->pdo->escapeString($name), $this->pdo->escapeString($size),
+				$createddate, $passworded
+			)
+		);
 	}
 }

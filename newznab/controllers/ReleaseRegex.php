@@ -20,11 +20,6 @@ class ReleaseRegex
 	 */
 	public $pdo;
 
-	/**
-	 * @var \newznab\controllers\Sites
-	 */
-	public $site;
-
 	public function __construct()
 	{
 		$this->regexes = [];
@@ -226,7 +221,7 @@ class ReleaseRegex
 
 			if (isset($matches['name']) && isset($matches['parts'])) {
 				if (strpos($matches['parts'], '/') === false) {
-					$matches['parts'] = str_replace(array('-', '~', ' of '), '/', $matches['parts']);
+					$matches['parts'] = str_replace(['-', '~', ' of '], '/', $matches['parts']);
 				}
 
 				$regcatid = "null ";
@@ -294,7 +289,7 @@ class ReleaseRegex
 			if ($ignorematched !== '' && ($rowbin['regexid'] != '' || $rowbin['blacklistid'] == 1))
 				continue;
 
-			$regexarr = array("id" => "", 'regex' => $regex, 'poster' => $poster, "categoryid" => "");
+			$regexarr = ["id" => "", 'regex' => $regex, 'poster' => $poster, "categoryid" => ""];
 			$regexCheck = $this->performMatch($regexarr, $rowbin['name'], $rowbin['fromname']);
 
 			if ($regexCheck !== false) {
@@ -345,14 +340,14 @@ class ReleaseRegex
 
 		$groupsToFetch = [];
 		if (preg_match('/^[a-z]{2,3}(\.[a-z0-9\-]+)+$/', $groupname))
-			$groupsToFetch[] = array('name' => $groupname);
+			$groupsToFetch[] = ['name' => $groupname];
 		elseif ($groupname === 0)
 			$groupsToFetch = $groups->getAll();
 		else {
 			$newsgroups = $nntp->getGroups();
 			foreach ($newsgroups as $ngroup) {
 				if (preg_match('/' . $groupname . '/', $ngroup['group']))
-					$groupsToFetch[] = array('name' => $ngroup['group']);
+					$groupsToFetch[] = ['name' => $ngroup['group']];
 			}
 		}
 
@@ -428,7 +423,7 @@ class ReleaseRegex
 							$binSetData = [];
 
 							foreach ($headers as $subject => $data) {
-								$binData = array(
+								$binData = [
 									'name'         => $subject,
 									'fromname'     => $data['From'],
 									'date'         => $data['Date'],
@@ -442,7 +437,7 @@ class ReleaseRegex
 									'relname'      => "null",
 									'relpart'      => "null",
 									'reltotalpart' => "null"
-								);
+								];
 
 								//Filter binaries based on black/white list
 								if ($binaries->isBlackListed($data, $group)) {

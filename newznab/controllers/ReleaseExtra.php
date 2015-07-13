@@ -14,51 +14,63 @@ class ReleaseExtra
 	const VIDEO_RESOLUTION_1080 = 3;
 
 	/**
+	 * @var \newznab\db\Settings
+	 */
+	public $pdo;
+
+	/**
+	 * @param \newznab\db\Settings $settings
+	 */
+	public function __construct($settings = null)
+	{
+		$this->pdo = ($settings instanceof Settings ? $settings : new Settings());
+	}
+
+	/**
 	 * Convert a codec string to a user friendly format.
 	 */
 	public function makeCodecPretty($codec)
 	{
-		if (preg_match("/DX50|DIVX|DIV3/i", $codec))
-			return "DivX";
-		if (preg_match("/XVID/i", $codec))
-			return "XviD";
-		if (preg_match("/^27$/i", $codec))
-			return "Blu-Ray";
-		if (preg_match("/V_MPEG4\/ISO\/AVC/i", $codec))
-			return "x264";
-		if (preg_match("/wmv|WVC1/i", $codec))
-			return "wmv";
-		if (preg_match("/^2$/i", $codec))
-			return "HD.ts";
-		if (preg_match("/avc1/i", $codec))
-			return "h.264";
-		if (preg_match("/DX50|DIVX|DIV3/i", $codec))
-			return "DivX";
-
+		if (preg_match('/DX50|DIVX|DIV3/i', $codec)) {
+			return 'DivX';
+		}
+		if (preg_match('/XVID/i', $codec)) {
+			return 'XviD';
+		}
+		if (preg_match('/^27$/i', $codec)) {
+			return 'Blu-Ray';
+		}
+		if (preg_match('/V_MPEG4\/ISO\/AVC/i', $codec)) {
+			return 'x264';
+		}
+		if (preg_match('/wmv|WVC1/i', $codec)) {
+			return 'wmv';
+		}
+		if (preg_match('/^2$/i', $codec)) {
+			return 'HD.ts';
+		}
+		if (preg_match('/avc1/i', $codec)) {
+			return 'h.264';
+		}
 		return $codec;
 	}
 
 	public function getAudio($id)
 	{
-		$db = new Settings();
-
-		return $db->query(sprintf("select * from releaseaudio where releaseid = %d order by audioID ASC", $id));
+		return $this->pdo->query(sprintf("select * from releaseaudio where releaseid = %d order by audioid ASC", $id));
 	}
 
 	public function getBriefByGuid($guid)
 	{
-		$db = new Settings();
-
-		return $db->queryOneRow(sprintf("select containerformat,videocodec,videoduration,videoaspect, concat(releasevideo.videowidth,'x',releasevideo.videoheight,' @',format(videoframerate,0),'fps') as size, group_concat(distinct releaseaudio.audiolanguage SEPARATOR ', ') as audio, group_concat(distinct releaseaudio.audiobitrate SEPARATOR ', ') as audiobitrate, group_concat(distinct releaseaudio.audioformat SEPARATOR ', ') as audioformat, group_concat(distinct releaseaudio.audiomode SEPARATOR ', ') as audiomode,  group_concat(distinct releaseaudio.audiobitratemode SEPARATOR ', ') as audiobitratemode, group_concat(distinct releasesubs.subslanguage SEPARATOR ', ') as subs from releaseaudio left outer join releasesubs on releaseaudio.releaseid = releasesubs.releaseid left outer join releasevideo on releasevideo.releaseid = releaseaudio.releaseid inner join releases r on r.id = releaseaudio.releaseid where r.guid = %s group by r.id", $db->escapeString($guid)));
+		return $this->pdo->queryOneRow(sprintf("select containerformat,videocodec,videoduration,videoaspect, concat(releasevideo.videowidth,'x',releasevideo.videoheight,' @',format(videoframerate,0),'fps') as size, group_concat(distinct releaseaudio.audiolanguage SEPARATOR ', ') as audio, group_concat(distinct releaseaudio.audiobitrate SEPARATOR ', ') as audiobitrate, group_concat(distinct releaseaudio.audioformat SEPARATOR ', ') as audioformat, group_concat(distinct releaseaudio.audiomode SEPARATOR ', ') as audiomode,  group_concat(distinct releaseaudio.audiobitratemode SEPARATOR ', ') as audiobitratemode, group_concat(distinct releasesubs.subslanguage SEPARATOR ', ') as subs from releaseaudio left outer join releasesubs on releaseaudio.releaseid = releasesubs.releaseid left outer join releasevideo on releasevideo.releaseid = releaseaudio.releaseid inner join releases r on r.id = releaseaudio.releaseid where r.guid = %s group by r.id", $this->pdo->escapeString($guid)));
 	}
 
 	public function delete($id)
 	{
-		$db = new Settings();
-		$db->queryExec(sprintf("DELETE from releaseaudio where releaseid = %d", $id));
-		$db->queryExec(sprintf("DELETE from releasesubs where releaseid = %d", $id));
-		$db->queryExec(sprintf("DELETE from releaseextrafull where releaseid = %d", $id));
-		$db->queryExec(sprintf("DELETE from releasevideo where releaseid = %d", $id));
+		$this->pdo->queryExec(sprintf("DELETE from releaseaudio where releaseid = %d", $id));
+		$this->pdo->queryExec(sprintf("DELETE from releasesubs where releaseid = %d", $id));
+		$this->pdo->queryExec(sprintf("DELETE from releaseextrafull where releaseid = %d", $id));
+		$this->pdo->queryExec(sprintf("DELETE from releasevideo where releaseid = %d", $id));
 	}
 
 	/**
@@ -165,8 +177,6 @@ class ReleaseExtra
 	 */
 	public function addVideo($releaseID, $containerformat, $overallbitrate, $videoduration, $videoformat, $videocodec, $videowidth, $videoheight, $videoaspect, $videoframerate, $videolibrary)
 	{
-		$db = new Settings();
-
 		$row = $this->getVideo($releaseID);
 		if ($row)
 			return -1;
@@ -176,24 +186,20 @@ class ReleaseExtra
 		else
 			$videoframerate = 0.0;
 
-		$sql = sprintf("insert into releasevideo
+		return $this->pdo->queryInsert(sprintf('INSERT INTO releasevideo
 						(releaseid, containerformat, overallbitrate, videoduration,
 						videoformat, videocodec, videowidth, videoheight,
-						videoaspect, videoframerate, 	videolibrary, definition)
-						values ( %d, %s, %s, %s, %s, %s, %d, %d, %s, %s, %s, %d )",
-			$releaseID, $db->escapeString($containerformat), $db->escapeString($overallbitrate), $db->escapeString($videoduration),
-			$db->escapeString($videoformat), $db->escapeString($videocodec), $videowidth, $videoheight,
-			$db->escapeString($videoaspect), $db->escapeString($videoframerate), $db->escapeString($videolibrary), self::determineVideoResolution($videowidth, $videoheight)
-		);
-
-		return $db->queryInsert($sql);
+						videoaspect, videoframerate, videolibrary, definition)
+						VALUES ( %d, %s, %s, %s, %s, %s, %d, %d, %s, %s, %s, %d )',
+			$releaseID, $this->pdo->escapeString($containerformat), $this->pdo->escapeString($overallbitrate), $this->pdo->escapeString($videoduration),
+			$this->pdo->escapeString($videoformat), $this->pdo->escapeString($videocodec), $videowidth, $videoheight,
+			$this->pdo->escapeString($videoaspect), $this->pdo->escapeString($videoframerate), $this->pdo->escapeString($videolibrary), self::determineVideoResolution($videowidth, $videoheight)
+		));
 	}
 
 	public function getVideo($id)
 	{
-		$db = new Settings();
-
-		return $db->queryOneRow(sprintf("select * from releasevideo where releaseid = %d", $id));
+		return $this->pdo->queryOneRow(sprintf("select * from releasevideo where releaseid = %d", $id));
 	}
 
 	/**
@@ -230,8 +236,6 @@ class ReleaseExtra
 			return self::VIDEO_RESOLUTION_1080; //HD 1080
 		}
 
-		return self::VIDEO_RESOLUTION_NA; //catch all
-
 	}
 
 	/**
@@ -239,71 +243,57 @@ class ReleaseExtra
 	 */
 	public function addAudio($releaseID, $audioID, $audioformat, $audiomode, $audiobitratemode, $audiobitrate, $audiochannels, $audiosamplerate, $audiolibrary, $audiolanguage, $audiotitle)
 	{
-		$db = new Settings();
-
 		$row = $this->getAudioAndChannel($releaseID, $audioID);
 		if ($row)
 			return -1;
 
-		$sql = sprintf("insert into releaseaudio
-						(releaseid,	audioID,audioformat,audiomode, audiobitratemode, audiobitrate,
+		return $this->pdo->queryInsert(sprintf("INSERT INTO releaseaudio
+						(releaseid,	audioid,audioformat,audiomode, audiobitratemode, audiobitrate,
 						audiochannels,audiosamplerate,audiolibrary,audiolanguage,audiotitle)
-						values ( %d, %d, %s, %s, %s, %s, %s, %s, %s, %s, %s )",
-			$releaseID, $audioID, $db->escapeString($audioformat), $db->escapeString($audiomode), $db->escapeString($audiobitratemode),
-			$db->escapeString($audiobitrate), $db->escapeString($audiochannels), $db->escapeString($audiosamplerate), $db->escapeString(substr($audiolibrary, 0, 255)),
-			$db->escapeString(substr($audiolanguage, 0, 255)), $db->escapeString(substr($audiotitle, 0, 255))
-		);
-
-		return $db->queryInsert($sql);
+						VALUES ( %d, %d, %s, %s, %s, %s, %s, %s, %s, %s, %s )",
+			$releaseID, $audioID, $this->pdo->escapeString($audioformat), $this->pdo->escapeString($audiomode), $this->pdo->escapeString($audiobitratemode),
+			$this->pdo->escapeString($audiobitrate), $this->pdo->escapeString($audiochannels), $this->pdo->escapeString($audiosamplerate), $this->pdo->escapeString(substr($audiolibrary, 0, 255)),
+			$this->pdo->escapeString(substr($audiolanguage, 0, 255)), $this->pdo->escapeString(substr($audiotitle, 0, 255))
+		));
 	}
 
 	public function getAudioAndChannel($rid, $aid)
 	{
-		$db = new Settings();
-
-		return $db->queryOneRow(sprintf("select * from releaseaudio where releaseid = %d and audioID = %d", $rid, $aid));
+		return $this->pdo->queryOneRow(sprintf("select * from releaseaudio where releaseid = %d and audioid = %d", $rid, $aid));
 	}
 
 	public function addSubs($releaseID, $subsID, $subslanguage)
 	{
-		$db = new Settings();
 		$row = $this->getSubs($releaseID);
 		if ($row)
 			return -1;
 
-		$sql = sprintf("insert into releasesubs (releaseid,	subsID, subslanguage) values ( %d, %d, %s)", $releaseID, $subsID, $db->escapeString($subslanguage));
+		$sql = sprintf("INSERT INTO releasesubs (releaseid,	subsid, subslanguage) VALUES ( %d, %d, %s)", $releaseID, $subsID, $this->pdo->escapeString($subslanguage));
 
-		return $db->queryInsert($sql);
+		return $this->pdo->queryInsert($sql);
 	}
 
 	public function getSubs($id)
 	{
-		$db = new Settings();
-
-		return $db->queryOneRow(sprintf("SELECT group_concat(subslanguage SEPARATOR ', ') as subs FROM `releasesubs` WHERE `releaseid` = %d ORDER BY `subsID` ASC", $id));
+		return $this->pdo->queryOneRow(sprintf("SELECT group_concat(subslanguage SEPARATOR ', ') as subs FROM releasesubs WHERE releaseid = %d ORDER BY subsid ASC", $id));
 	}
 
 	public function deleteFull($id)
 	{
-		$db = new Settings();
-
-		return $db->queryExec(sprintf("DELETE from releaseextrafull where releaseid = %d", $id));
+		return $this->pdo->queryExec(sprintf("DELETE from releaseextrafull where releaseid = %d", $id));
 	}
 
 	public function addFull($id, $xml)
 	{
-		$db = new Settings();
 		$row = $this->getFull($id);
 		if ($row)
 			return -1;
 
-		return $db->queryInsert(sprintf("insert into releaseextrafull (releaseid, mediainfo) values (%d, %s)", $id, $db->escapeString($xml)));
+		return $this->pdo->queryInsert(sprintf("INSERT INTO releaseextrafull (releaseid, mediainfo) VALUES (%d, %s)", $id, $this->pdo->escapeString($xml)));
 	}
 
 	public function getFull($id)
 	{
-		$db = new Settings();
-
-		return $db->queryOneRow(sprintf("select * from releaseextrafull where releaseid = %d", $id));
+		return $this->pdo->queryOneRow(sprintf("select * from releaseextrafull where releaseid = %d", $id));
 	}
 }

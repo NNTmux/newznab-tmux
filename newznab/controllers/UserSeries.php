@@ -2,57 +2,67 @@
 
 use newznab\db\Settings;
 
+/**
+ * Class UserSeries
+ */
 class UserSeries
 {
-	public function addShow($uid, $rageid, $catid=array())
+	/**
+	 * @var \newznab\db\Settings
+	 */
+	public $pdo;
+
+	/**
+	 * @param array $options Class instances.
+	 */
+	public function __construct(array $options = [])
 	{
-		$db = new Settings();
+		$defaults = [
+			'Settings' => null,
+		];
+		$options += $defaults;
 
-		$catid = (!empty($catid)) ? $db->escapeString(implode('|', $catid)) : "null";
+		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
+	}
 
-		$sql = sprintf("insert into userseries (userid, rageid, categoryid, createddate) values (%d, %d, %s, now())", $uid, $rageid, $catid);
-		return $db->queryInsert($sql);
+	public function addShow($uid, $rageid, $catid= [])
+	{
+
+		$catid = (!empty($catid)) ? $this->pdo->escapeString(implode('|', $catid)) : "null";
+
+		return $this->pdo->queryInsert(sprintf("INSERT INTO userseries (userid, rageid, categoryid, createddate) VALUES (%d, %d, %s, now())", $uid, $rageid, $catid));
 	}
 
 	public function getShows($uid)
 	{
-		$db = new Settings();
-		$sql = sprintf("select userseries.*, tvrage.releasetitle from userseries inner join (SELECT id, releasetitle, rageid FROM tvrage GROUP BY rageid) tvrage on tvrage.rageid = userseries.rageid where userid = %d order by tvrage.releasetitle asc", $uid);
-		return $db->query($sql);
+		return $this->pdo->query(sprintf("SELECT userseries.*, tvrage.releasetitle FROM userseries INNER JOIN (SELECT id, releasetitle, rageid FROM tvrage GROUP BY rageid) tvrage ON tvrage.rageid = userseries.rageid WHERE userid = %d ORDER BY tvrage.releasetitle ASC", $uid));
 	}
 
 	public function delShow($uid, $rageid)
 	{
-		$db = new Settings();
-		$db->queryExec(sprintf("DELETE from userseries where userid = %d and rageid = %d ", $uid, $rageid));
+		$this->pdo->queryExec(sprintf("DELETE FROM userseries WHERE userid = %d AND rageid = %d ", $uid, $rageid));
 	}
 
 	public function getShow($uid, $rageid)
 	{
-		$db = new Settings();
-		$sql = sprintf("select userseries.*, tvrage.releasetitle from userseries left outer join (SELECT id, releasetitle, rageid FROM tvrage GROUP BY rageid) tvrage on tvrage.rageid = userseries.rageid where userseries.userid = %d and userseries.rageid = %d ", $uid, $rageid);
-		return $db->queryOneRow($sql);
+		return $this->pdo->queryOneRow(sprintf("SELECT userseries.*, tvrage.releasetitle FROM userseries LEFT OUTER JOIN (SELECT id, releasetitle, rageid FROM tvrage GROUP BY rageid) tvrage ON tvrage.rageid = userseries.rageid WHERE userseries.userid = %d AND userseries.rageid = %d ", $uid, $rageid));
 	}
 
 	public function delShowForUser($uid)
 	{
-		$db = new Settings();
-		$db->queryExec(sprintf("DELETE from userseries where userid = %d", $uid));
+		$this->pdo->queryExec(sprintf("DELETE FROM userseries WHERE userid = %d", $uid));
 	}
 
 	public function delShowForSeries($sid)
 	{
-		$db = new Settings();
-		$db->queryExec(sprintf("DELETE from userseries where rageid = %d", $sid));
+		$this->pdo->queryExec(sprintf("DELETE FROM userseries WHERE rageid = %d", $sid));
 	}
 
-	public function updateShow($uid, $rageid, $catid=array())
+	public function updateShow($uid, $rageid, $catid= [])
 	{
-		$db = new Settings();
 
-		$catid = (!empty($catid)) ? $db->escapeString(implode('|', $catid)) : "null";
+		$catid = (!empty($catid)) ? $this->pdo->escapeString(implode('|', $catid)) : "null";
 
-		$sql = sprintf("update userseries set categoryid = %s where userid = %d and rageid = %d", $catid, $uid, $rageid);
-		$db->queryExec($sql);
+		$this->pdo->queryExec(sprintf("UPDATE userseries SET categoryid = %s WHERE userid = %d AND rageid = %d", $catid, $uid, $rageid));
 	}
 }
