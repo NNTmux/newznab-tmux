@@ -2,51 +2,61 @@
 
 use newznab\db\Settings;
 
+/**
+ * Class UserMovies
+ */
 class UserMovies
 {
-	public function addMovie($uid, $imdbid, $catid=array())
+	/**
+	 * @var \newznab\db\Settings
+	 */
+	public $pdo;
+
+	/**
+	 * @param array $options Class instances.
+	 */
+	public function __construct(array $options = [])
 	{
-		$db = new Settings();
+		$defaults = [
+			'Settings' => null,
+		];
+		$options += $defaults;
 
-		$catid = (!empty($catid)) ? $db->escapeString(implode('|', $catid)) : "null";
+		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
+	}
 
-		$sql = sprintf("insert into usermovies (userid, imdbid, categoryid, createddate) values (%d, %d, %s, now())", $uid, $imdbid, $catid);
-		return $db->queryInsert($sql);
+	public function addMovie($uid, $imdbid, $catid= [])
+	{
+
+		$catid = (!empty($catid)) ? $this->pdo->escapeString(implode('|', $catid)) : "null";
+
+		return $this->pdo->queryInsert(sprintf("INSERT INTO usermovies (userid, imdbid, categoryid, createddate) VALUES (%d, %d, %s, now())", $uid, $imdbid, $catid));
 	}
 
 	public function getMovies($uid)
 	{
-		$db = new Settings();
-		$sql = sprintf("select usermovies.*, movieinfo.year, movieinfo.plot, movieinfo.cover, movieinfo.title from usermovies left outer join movieinfo on movieinfo.imdbid = usermovies.imdbid where userid = %d order by movieinfo.title asc", $uid);
-		return $db->query($sql);
+		return $this->pdo->query(sprintf("SELECT usermovies.*, movieinfo.year, movieinfo.plot, movieinfo.cover, movieinfo.title FROM usermovies LEFT OUTER JOIN movieinfo ON movieinfo.imdbid = usermovies.imdbid WHERE userid = %d ORDER BY movieinfo.title ASC", $uid));
 	}
 
 	public function delMovie($uid, $imdbid)
 	{
-		$db = new Settings();
-		$db->queryExec(sprintf("DELETE from usermovies where userid = %d and imdbid = %d ", $uid, $imdbid));
+		$this->pdo->queryExec(sprintf("DELETE FROM usermovies WHERE userid = %d AND imdbid = %d ", $uid, $imdbid));
 	}
 
 	public function getMovie($uid, $imdbid)
 	{
-		$db = new Settings();
-		$sql = sprintf("select usermovies.*, movieinfo.title from usermovies left outer join movieinfo on movieinfo.imdbid = usermovies.imdbid where usermovies.userid = %d and usermovies.imdbid = %d ", $uid, $imdbid);
-		return $db->queryOneRow($sql);
+		return $this->pdo->queryOneRow(sprintf("SELECT usermovies.*, movieinfo.title FROM usermovies LEFT OUTER JOIN movieinfo ON movieinfo.imdbid = usermovies.imdbid WHERE usermovies.userid = %d AND usermovies.imdbid = %d ", $uid, $imdbid));
 	}
 
 	public function delMovieForUser($uid)
 	{
-		$db = new Settings();
-		$db->queryExec(sprintf("DELETE from usermovies where userid = %d", $uid));
+		$this->pdo->queryExec(sprintf("DELETE FROM usermovies WHERE userid = %d", $uid));
 	}
 
-	public function updateMovie($uid, $imdbid, $catid=array())
+	public function updateMovie($uid, $imdbid, $catid= [])
 	{
-		$db = new Settings();
 
-		$catid = (!empty($catid)) ? $db->escapeString(implode('|', $catid)) : "null";
-
-		$sql = sprintf("update usermovies set categoryid = %s where userid = %d and imdbid = %d", $catid, $uid, $imdbid);
-		$db->queryExec($sql);
+		$catid = (!empty($catid)) ? $this->pdo->escapeString(implode('|', $catid)) : "null";
+		$this->pdo->queryExec(sprintf("UPDATE usermovies SET categoryid = %s WHERE userid = %d AND imdbid = %d", $catid, $uid, $imdbid));
 	}
 }
