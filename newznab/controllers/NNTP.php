@@ -493,9 +493,9 @@ class NNTP extends Net_NNTP_Client
 			foreach ($overview as $name => $element) {
 				// Strip Xref:
 				if ($element === true) {
-					$header[$iterator] = substr($header[$iterator], 6);
+					@$header[$iterator] = substr($header[$iterator], 6);
 				}
-				$headerArray[$name] = $header[$iterator++];
+				@$headerArray[$name] = $header[$iterator++];
 			}
 			// Add the individual header array back to the return array.
 			$data[$key] = $headerArray;
