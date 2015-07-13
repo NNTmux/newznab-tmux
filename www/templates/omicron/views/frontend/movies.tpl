@@ -127,15 +127,15 @@
 																		href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}">{$mname[$m@index]|escape:"htmlall"}</a>
 															</div>
 															<div>
-																<a role="button" class="btn btn-white btn-xs"
+																<a role="button" class="btn btn-default btn-xs"
 																   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}"><i
 																			class="fa fa-download"></i><span
-																			class="badge">{$mgrabs[$m@index]}
+																			class="badge"> {$mgrabs[$m@index]}
 																		Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
-																<a role="button" class="btn btn-white btn-xs"
+																<a role="button" class="btn btn-default btn-xs"
 																   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/#comments"><i
 																			class="fa fa-comment-o"></i><span
-																			class="badge">{$mcomments[$m@index]}
+																			class="badge"> {$mcomments[$m@index]}
 																		Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
 															</div>
 															{/if}
@@ -209,15 +209,15 @@
 																		href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}">{$mname[$m@index]|escape:"htmlall"}</a>
 															</div>
 															<div>
-																<a role="button" class="btn btn-white btn-xs"
+																<a role="button" class="btn btn-default btn-xs"
 																   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}"><i
 																			class="fa fa-download"></i><span
-																			class="badge">{$mgrabs[$m@index]}
+																			class="badge"> {$mgrabs[$m@index]}
 																		Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
-																<a role="button" class="btn btn-white btn-xs"
+																<a role="button" class="btn btn-default btn-xs"
 																   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/#comments"><i
 																			class="fa fa-comment-o"></i><span
-																			class="badge">{$mcomments[$m@index]}
+																			class="badge"> {$mcomments[$m@index]}
 																		Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
 															</div>
 															{/if}
