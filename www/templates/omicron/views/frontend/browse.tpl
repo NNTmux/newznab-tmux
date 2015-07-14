@@ -33,33 +33,9 @@
 									</p>
 								{/if}
 								<div class="nzb_multi_operations">
-									{if ($category >= '1000' and $category <= '1999')}View:
-										<a href="{$smarty.const.WWW_TOP}/console?t={$category}">Covers</a>
-										|
-										<b>List</b>
-										<br/>
-									{elseif ($category >= '2000' and $category <= '2100')}View:
-										<a href="{$smarty.const.WWW_TOP}/movies?t={$category}">Covers</a>
-										|
-										<b>List</b>
-										<br/>
-									{elseif ($category >= '3000' and $category <= '3999')}View:
-										<a href="{$smarty.const.WWW_TOP}/music?t={$category}">Covers</a>
-										|
-										<b>List</b>
-										<br/>
-									{elseif ($category == '4050')}View:
-										<a href="{$smarty.const.WWW_TOP}/games?t={$category}">Covers</a>
-										|
-										<b>List</b>
-										<br/>
-									{elseif ($category == '6000'  OR '6080' OR '6070' OR '6020' OR '6040')}View:
-										<a href="{$smarty.const.WWW_TOP}/xxx?t={$category}">Covers</a>
-										|
-										<b>List</b>
-										<br/>
-									{elseif $category == '7000'}View:
-										<a href="{$smarty.const.WWW_TOP}/books?t={$category}">Covers</a>
+									{if $covgroup != ''}View:
+										<a href="{$smarty.const.WWW_TOP}/{$covgroup}?t={$category}">Covers
+										</a>
 										|
 										<b>List</b>
 										<br/>
