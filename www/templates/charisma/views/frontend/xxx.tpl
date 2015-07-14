@@ -156,13 +156,6 @@
 													<a class="label label-default"
 													   href="{$smarty.const.WWW_TOP}/browse?g={$result.grp_release_grpname}"
 													   title="Browse releases in {$result.grp_release_grpname|replace:"alt.binaries":"a.b"}">Group</a>
-													<div>
-														<a
-																class="label label-info"
-																href="{$smarty.const.WWW_TOP}/search/{$result.title|escape:"htmlall"}?t=2000"
-																title="View similar nzbs"
-																>Similar</a>
-													</div>
 												</div>
 												<div class="col-md-9 no-gutter">
 																<span class="release-title"><a class="text-muted"
