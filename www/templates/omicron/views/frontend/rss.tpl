@@ -16,7 +16,7 @@
 			<description>Visit {$site->title|escape} - {$site->strapline|escape}</description>
 		</image>
 		{foreach from=$releases item=release}
-			<>
+			<item>
 				<title>{$release.searchname|escape:html}</title>
 				<guid isPermaLink="true">{$serverroot}details/{$release.guid}</guid>
 				<link href="{$serverroot}{if $dl=="1"}getnzb{else}details{/if}/{$release.guid}{if $dl=="1"}.nzb&amp;i={$uid}&amp;r={$rsstoken}{/if}{if $del=="1"}&amp;del=1{/if}"/>
