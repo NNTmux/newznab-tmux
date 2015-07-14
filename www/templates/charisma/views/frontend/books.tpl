@@ -127,12 +127,12 @@
 																	<br/>
 																{/if}
 																<div>
-																	<a role="button" class="btn btn-white btn-xs"
+																	<a role="button" class="btn btn-inverse btn-default btn-xs"
 																	   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}/{$result.searchname|escape:"htmlall"}"><i
 																				class="fa fa-download"></i><span
 																				class="badge">{$mgrabs[$m@index]}
 																			Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
-																	<a role="button" class="btn btn-white btn-xs"
+																	<a role="button" class="btn btn-inverse btn-default btn-xs"
 																	   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/#comments"><i
 																				class="fa fa-comment-o"></i><span
 																				class="badge">{$mcomments[$m@index]}
