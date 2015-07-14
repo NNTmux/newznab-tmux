@@ -1,11 +1,12 @@
-<div class="header">
+<div class="header" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"
+	 xmlns="http://www.w3.org/1999/html">
 	{assign var="catsplit" value=">"|explode:$catname}
-	<h2>Books > <strong>All</strong></h2>
+	<h2>{$catsplit[0]} > <strong>{$catsplit[1]}</strong></h2>
 
 	<div class="breadcrumb-wrapper">
 		<ol class="breadcrumb">
 			<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
-			/ Books
+			/ {$catname|escape:"htmlall"}
 		</ol>
 	</div>
 </div>
@@ -54,6 +55,7 @@
 									{$pager}
 								</div>
 							</div>
+							<hr>
 							{foreach from=$results item=result}
 								{assign var="msplits" value=","|explode:$result.grp_release_id}
 								{assign var="mguid" value=","|explode:$result.grp_release_guid}

@@ -1,11 +1,25 @@
 <?php
 
 $b = new Book;
+$cat = new Category(['Settings' => $page->settings]);
 
 if (!$page->users->isLoggedIn())
 	$page->show403();
 
-$category = Category::CAT_BOOK_EBOOK;
+$boocats = $cat->getChildren(Category::CAT_PARENT_BOOK);
+$btmp = [];
+foreach ($boocats as $bcat) {
+	$btmp[$bcat['id']] = $bcat;
+}
+$category = Category::CAT_PARENT_BOOK;
+if (isset($_REQUEST["t"]) && array_key_exists($_REQUEST['t'], $btmp)) {
+	$category = $_REQUEST["t"] + 0;
+}
+
+$catarray = [];
+$catarray[] = $category;
+
+$page->smarty->assign('catlist', $btmp);
 $page->smarty->assign('category', $category);
 
 $browsecount = $b->getBookCount();
@@ -32,6 +46,18 @@ $page->smarty->assign('pagerquerysuffix', "#results");
 
 $pager = $page->smarty->fetch("pager.tpl");
 $page->smarty->assign('pager', $pager);
+
+if ($category == -1)
+	$page->smarty->assign("catname","All");
+else
+{
+	$cat = new Category();
+	$cdata = $cat->getById($category);
+	if ($cdata)
+		$page->smarty->assign('catname',$cdata["title"]);
+	else
+		$page->show404();
+}
 
 foreach($ordering as $ordertype)
 	$page->smarty->assign('orderby'.$ordertype, WWW_TOP."/books".$browseby_link."&amp;ob=".$ordertype."&amp;offset=0");
