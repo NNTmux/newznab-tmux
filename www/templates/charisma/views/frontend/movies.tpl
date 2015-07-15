@@ -70,7 +70,9 @@
 													<div class="panel-content">
 														<div class="row no-gutter">
 															<div class="col-md-3 no-gutter">
-
+																{foreach from=$result.languages item=movielanguage}
+																	{release_flag($movielanguage, browse)}
+																{/foreach}
 																{assign var="msplits" value=","|explode:$result.grp_release_id}
 																{assign var="mguid" value=","|explode:$result.grp_release_guid}
 																{assign var="mnfo" value=","|explode:$result.grp_release_nfoid}
@@ -112,7 +114,10 @@
 																<span class="release-title"><a class="text-muted"
 																							   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}">{$result.title|escape:"htmlall"}</a></span>
 
-																<div class="release-subtitle">{if $result.genre != ''}{$result.genre}, {/if}</div>
+																<div class="release-subtitle">{if $result.genre != ''}<b>Genre: </b>{$result.genre}, {/if}</div>
+																<div class="release-subtitle">{if $result.plot != ''}{$result.plot} {/if}</div>
+																<div class="release-subtitle">{if $result.director != ''}<b>Director: </b>{$result.director} {/if}</div>
+																<div class="release-subtitle">{if $result.actors != ''}<b>Starring: </b>{$result.actors} {/if}</div>
 																<div>
 																	<span class="label label-primary">{$catsplit[0]}</span>
 																	<span class="label label-danger">{$catsplit[1]}</span>
@@ -154,6 +159,9 @@
 													<div class="panel-content">
 														<div class="row no-gutter">
 															<div class="col-md-3 no-gutter">
+																{foreach from=$result.languages item=movielanguage}
+																	{release_flag($movielanguage, browse)}
+																{/foreach}
 																{assign var="msplits" value=","|explode:$result.grp_release_id}
 																{assign var="mguid" value=","|explode:$result.grp_release_guid}
 																{assign var="mnfo" value=","|explode:$result.grp_release_nfoid}
@@ -194,7 +202,10 @@
 																<span class="release-title"><a class="text-muted"
 																							   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}">{$result.title|escape:"htmlall"}</a></span>
 
-																<div class="release-subtitle">{if $result.genre != ''}{$result.genre}, {/if}</div>
+																<div class="release-subtitle">{if $result.genre != ''}<b>Genre: </b>{$result.genre}, {/if}</div>
+																<div class="release-subtitle">{if $result.plot != ''}{$result.plot} {/if}</div>
+																<div class="release-subtitle">{if $result.director != ''}<b>Director: </b>{$result.director} {/if}</div>
+																<div class="release-subtitle">{if $result.actors != ''}<b>Starring: </b>{$result.actors} {/if}</div>
 																<div>
 																	<span class="label label-primary">{$catsplit[0]}</span>
 																	<span class="label label-danger">{$catsplit[1]}</span>
