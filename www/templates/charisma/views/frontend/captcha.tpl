@@ -1,4 +1,4 @@
-{if $showCaptcha == true}
+{if isset($showCaptcha) && $showCaptcha == true}
 	<div class="g-recaptcha" data-sitekey="{$sitekey}"></div>
 	<script type="text/javascript"
 			src="https://www.google.com/recaptcha/api.js?hl=en">

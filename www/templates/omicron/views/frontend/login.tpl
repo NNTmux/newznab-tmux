@@ -54,7 +54,7 @@
             <div class="col-xs-8">
               <div class="checkbox icheck">
                 <label>
-                  <input id="rememberme" {if $rememberme == 1}checked="checked"{/if} name="rememberme" type="checkbox"> Remember Me
+                  <input id="rememberme" {if isset($rememberme) && $rememberme == 1}checked="checked"{/if} name="rememberme" type="checkbox"> Remember Me
                 </label>
 				  <hr>
 				  {$page->smarty->fetch('captcha.tpl')}

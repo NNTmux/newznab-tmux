@@ -85,9 +85,9 @@
 														{if isset($resulturl) && $result.url != ""}<a
 															class="label label-default" target="_blank"
 															href="{$site->dereferrer_link}{$result.url}"
-															name="amazon{$result.musicinfoid}" title="View amazon page">
+															name="amazon{$result.bookinfoid}" title="View amazon page">
 																Amazon</a>{/if}
-														{if $result.nfoid > 0}<a
+														{if isste($result.nfoid) && $result.nfoid > 0}<a
 															href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}"
 															title="View Nfo" class="label label-default" rel="nfo">
 																NFO</a>{/if}
@@ -132,7 +132,7 @@
 																	<div>
 																		<a role="button"
 																		   class="btn btn-inverse btn-default btn-xs"
-																		   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}/{$result.searchname|escape:"htmlall"}"><i
+																		   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}/{$mname|escape:"htmlall"}"><i
 																					class="fa fa-download"></i><span
 																					class="badge">{$mgrabs[$m@index]}
 																				Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>

@@ -107,7 +107,7 @@
 
 						<div class="input-prepend">
 							<label class="rememberme" for="rememberme"><input id="rememberme"
-																			  {if $rememberme == 1}checked="checked"{/if}
+																			  {if isset($rememberme) && $rememberme == 1}checked="checked"{/if}
 																			  name="rememberme" type="checkbox">
 								Remember me</label>
 						</div>
