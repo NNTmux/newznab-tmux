@@ -135,27 +135,27 @@
 																				   title="Edit release">
 																	Edit</a>{/if}
 															<br/>
-															{if $result.genre != ""}
+															{if isset($result.genre) && $result.genre != ""}
 																<b>Genre:</b>
 																{$result.genre}
 																<br/>
 															{/if}
-															{if $result.esrb != ""}
+															{if isset($result.esrb) && $result.esrb != ""}
 																<b>Rating:</b>
 																{$result.esrb}
 																<br/>
 															{/if}
-															{if $result.publisher != ""}
+															{if isset($result.publisher) && $result.publisher != ""}
 																<b>Publisher:</b>
 																{$result.publisher}
 																<br/>
 															{/if}
-															{if $result.releasedate != ""}
+															{if isset($result.releasedate) && $result.releasedate != ""}
 																<b>Released:</b>
 																{$result.releasedate|date_format}
 																<br/>
 															{/if}
-															{if $result.review != ""}
+															{if isset($result.review) && $result.review != ""}
 																<b>Review:</b>
 																{$result.review|stripslashes|escape:'htmlall'}
 																<br/>
