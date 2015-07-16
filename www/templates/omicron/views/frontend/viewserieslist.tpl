@@ -1,6 +1,5 @@
 
 <div class="header">
-	{assign var="catsplit" value=">"|explode:$catname}
 	<h2>TV Series > <strong>List</strong></h2>
 
 	<div class="breadcrumb-wrapper">
