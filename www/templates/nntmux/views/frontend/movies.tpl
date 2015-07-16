@@ -66,17 +66,17 @@
 				<div class="nzb_multi_operations">
 					<small>With selected:</small>
 					<div class="btn-group">
-						<button type="button" class="btn btn-default nzb_multi_operations_download"><i class="fa fa-download"></i> Download NZBs</button>
-						<button type="button" class="btn btn-default nzb_multi_operations_cart"><i class="fa fa-shopping-cart"></i> Add to cart</button>
-						{if $sabintegrated}<button type="button" class="btn btn-default nzb_multi_operations_sab"><i class="fa fa-download"></i> Send to my Queue</button>{/if}
+						<button type="button" class="btn btn-mini nzb_multi_operations_download"><i class="icon-download"></i> Download NZBs</button>
+						<button type="button" class="btn btn-mini nzb_multi_operations_cart"><i class="icon-shopping-cart"></i> Add to cart</button>
+						{if $sabintegrated}<button type="button" class="btn btn-mini nzb_multi_operations_sab"><i class="icon-download-alt"></i> Send to my Queue</button>{/if}
 						{if $isadmin}
-							<button type="button" class="btn btn-default btn-inverse nzb_multi_operations_edit"><i class="icon-edit icon-white"></i></button>
-							<button type="button" class="btn btn-default btn-inverse nzb_multi_operations_delete"><i class="icon-trash icon-white"></i></button>
-							<button type="button" class="btn btn-default btn-inverse nzb_multi_operations_rebuild"><i class="icon-repeat icon-white"></i></button>
+							<button type="button" class="btn btn-mini btn-inverse nzb_multi_operations_edit"><i class="icon-edit icon-white"></i></button>
+							<button type="button" class="btn btn-mini btn-inverse nzb_multi_operations_delete"><i class="icon-trash icon-white"></i></button>
+							<button type="button" class="btn btn-mini btn-inverse nzb_multi_operations_rebuild"><i class="icon-repeat icon-white"></i></button>
 						{/if}
 					</div>
 					<div class="btn-group">
-						<span class="btn btn-default active"><i class="icon-picture"></i></span><a class="btn btn-default" href="{$smarty.const.WWW_TOP}/browse?t={$category}" title="List"><i class="icon-list"></i></a>
+						<span class="btn btn-mini active"><i class="icon-picture"></i></span><a class="btn btn-mini" href="{$smarty.const.WWW_TOP}/browse?t={$category}" title="List"><i class="icon-list"></i></a>
 					</div>
 				</div>
 			</td>
@@ -120,7 +120,7 @@
 									></a>
 
 						<div class="movextra">
-							{if $result.trailer != ""}<a href="#" name="name{$result.imdbid}" title="View movie trailer" class="btn btn-default modal_imdbtrailer" rel="trailer">Trailer</a>{/if}
+							{if $result.trailer != ""}<a href="#" name="name{$result.imdbid}" title="View movie trailer" class="btn btn-mini modal_imdbtrailer" rel="trailer">Trailer</a>{/if}
 							<a
 									target="_blank"
 									href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{$result.imdbid}/"
@@ -218,7 +218,7 @@
 									</td>
 									<td class="icons">
 										<div class="icon icon_nzb"><a title="Download Nzb"
-																	  href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}">
+																	  href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}/{$mname[$m@index]|escape:"url"}">
 												&nbsp;</a></div>
 										<div class="icon icon_cart" title="Add to Cart"></div>
 										{if $sabintegrated}
@@ -245,9 +245,9 @@
 
 	<div class="nzb_multi_operations">
 		<small>With Selected:</small>
-		<input type="button" class="btn btn-default nzb_multi_operations_download" value="Download NZBs"/>
-		<input type="button" class="btn btn-default nzb_multi_operations_cart" value="Add to Cart"/>
-		{if $sabintegrated}<input type="button" class="btn btn-default nzb_multi_operations_sab" value="Send to my Queue"/>{/if}
+		<input type="button" class="rndbtn nzb_multi_operations_download" value="Download NZBs"/>
+		<input type="button" class="rndbtn nzb_multi_operations_cart" value="Add to Cart"/>
+		{if $sabintegrated}<input type="button" class="rndbtn nzb_multi_operations_sab" value="Send to my Queue"/>{/if}
 	</div>
 
 	<br/>
