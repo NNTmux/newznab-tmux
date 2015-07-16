@@ -1,7 +1,7 @@
 <div class="header" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"
 	 xmlns="http://www.w3.org/1999/html">
 	{assign var="catsplit" value=">"|explode:$catname}
-	<h2>{$catsplit[0]} > <strong>{$catsplit[1]}</strong></h2>
+	<h2>{$catsplit[0]} > <strong>{if isset($catsplit[1])} {$catsplit[1]}{/if}</strong></h2>
 
 	<div class="breadcrumb-wrapper">
 		<ol class="breadcrumb">

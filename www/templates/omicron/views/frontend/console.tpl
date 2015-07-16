@@ -1,6 +1,6 @@
 <div class="header">
 	{assign var="catsplit" value=">"|explode:$catname}
-	<h2>{$catsplit[0]} > <strong>{$catsplit[1]}</strong></h2>
+	<h2>{$catsplit[0]} > <strong>{if isset($catsplit[1])} {$catsplit[1]}{/if}</strong></h2>
 
 	<div class="breadcrumb-wrapper">
 		<ol class="breadcrumb">
@@ -113,27 +113,27 @@
 																				   title="Edit release">
 																	Edit</a>{/if}
 															<br/>
-															{if $result.genre != ""}
+															{if isset($result.genre) && $result.genre != ""}
 																<b>Genre:</b>
 																{$result.genre}
 																<br/>
 															{/if}
-															{if $result.esrb != ""}
+															{if isset($result.esrb) && $result.esrb != ""}
 																<b>Rating:</b>
 																{$result.esrb}
 																<br/>
 															{/if}
-															{if $result.publisher != ""}
+															{if isset($result.publisger) && $result.publisher != ""}
 																<b>Publisher:</b>
 																{$result.publisher}
 																<br/>
 															{/if}
-															{if $result.releasedate != ""}
+															{if isset($result.releasedate) && $result.releasedate != ""}
 																<b>Released:</b>
 																{$result.releasedate|date_format}
 																<br/>
 															{/if}
-															{if $result.review != ""}
+															{if isset($result.review) && $result.review != ""}
 																<b>Review:</b>
 																{$result.review|escape:'htmlall'}
 																<br/>

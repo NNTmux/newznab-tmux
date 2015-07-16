@@ -1,7 +1,7 @@
 <div class="header" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"
 	 xmlns="http://www.w3.org/1999/html">
 	{assign var="catsplit" value=">"|explode:$catname}
-	<h2>{$catsplit[0]} > <strong>{$catsplit[1]}</strong></h2>
+	<h2>{$catsplit[0]} > <strong>{if isset($catsplit[1])} {$catsplit[1]}{/if}</strong></h2>
 
 	<div class="breadcrumb-wrapper">
 		<ol class="breadcrumb">
@@ -163,8 +163,8 @@
 
 													<div class="release-subtitle">{if $result.genre != ''}{$result.genre}, {/if}</div>
 													<div>
-														<span class="label label-primary">{$catsplit[0]}</span>
-														<span class="label label-danger">{$catsplit[1]}</span>
+														<span class="label label-primary">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
+														<span class="label label-danger">{if isset($catsplit[1])} {$catsplit[1]}{/if}</span>
 														<span class="label label-default">{$result.year}</span>
 
 														<span class="label label-default">{$msize[$m@index]|fsize_format:"MB"}</span>
@@ -295,8 +295,8 @@
 
 													<div class="release-subtitle">{if $result.genre != ''}{$result.genre}, {/if}</div>
 													<div>
-														<span class="label label-primary">{$catsplit[0]}</span>
-														<span class="label label-danger">{$catsplit[1]}</span>
+														<span class="label label-primary">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
+														<span class="label label-danger">{if isset($catsplit[1])} {$catsplit[1]}{/if}</span>
 														<span class="label label-default">{$result.year}</span>
 
 														<span class="label label-default">{$msize[$m@index]|fsize_format:"MB"}</span>
