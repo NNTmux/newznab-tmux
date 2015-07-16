@@ -126,10 +126,10 @@ class ReleaseRemover
 		$options += $defaults;
 
 		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
-		$this->consoleTools = ($options['ConsoleTools'] instanceof \ConsoleTools ? $options['ConsoleTools'] : new \ConsoleTools(['ColorCLI' => $this->pdo->log]));
-		$this->releases = ($options['Releases'] instanceof \Releases ? $options['Releases'] : new \Releases(['Settings' => $this->pdo]));
-		$this->nzb = ($options['NZB'] instanceof \NZB ? $options['NZB'] : new \NZB($this->pdo));
-		$this->releaseImage = ($options['ReleaseImage'] instanceof \ReleaseImage ? $options['ReleaseImage'] : new \ReleaseImage($this->pdo));
+		$this->consoleTools = ($options['ConsoleTools'] instanceof ConsoleTools ? $options['ConsoleTools'] : new ConsoleTools(['ColorCLI' => $this->pdo->log]));
+		$this->releases = ($options['Releases'] instanceof Releases ? $options['Releases'] : new Releases(['Settings' => $this->pdo]));
+		$this->nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB($this->pdo));
+		$this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage($this->pdo));
 
 		$this->query = '';
 		$this->error = '';
@@ -348,7 +348,7 @@ class ReleaseRemover
 			AND r.categoryid NOT IN (%d)
 			AND r.searchname REGEXP '^[a-zA-Z0-9]{15,}$'
 			%s",
-			\Category::CAT_MISC_HASHED,
+			Category::CAT_MISC_HASHED,
 			$this->crapTime
 		);
 
@@ -376,7 +376,7 @@ class ReleaseRemover
 			AND r.categoryid NOT IN (%d, %d)
 			AND r.searchname REGEXP '[a-zA-Z0-9]{25,}'
 			%s",
-			\Category::CAT_MISC_OTHER, \Category::CAT_MISC_HASHED, $this->crapTime
+			Category::CAT_MISC_OTHER, Category::CAT_MISC_HASHED, $this->crapTime
 		);
 
 		if ($this->checkSelectQuery() === false) {
@@ -403,7 +403,7 @@ class ReleaseRemover
 			AND r.categoryid NOT IN (%d)
 			AND r.searchname REGEXP '^[a-zA-Z0-9]{0,5}$'
 			%s",
-			\Category::CAT_MISC_OTHER, $this->crapTime
+			Category::CAT_MISC_OTHER, $this->crapTime
 		);
 
 		if ($this->checkSelectQuery() === false) {
@@ -430,12 +430,12 @@ class ReleaseRemover
 			AND r.categoryid NOT IN (%d, %d, %d, %d, %d, %d) %s",
 			"'%.exes%'",
 			"'%.exe%'",
-			\Category::CAT_PC_0DAY,
-			\Category::CAT_PC_GAMES,
-			\Category::CAT_PC_ISO,
-			\Category::CAT_PC_MAC,
-			\Category::CAT_MISC_OTHER,
-			\Category::CAT_MISC_HASHED,
+			Category::CAT_PC_0DAY,
+			Category::CAT_PC_GAMES,
+			Category::CAT_PC_ISO,
+			Category::CAT_PC_MAC,
+			Category::CAT_MISC_OTHER,
+			Category::CAT_MISC_HASHED,
 			$this->crapTime
 		);
 
@@ -522,15 +522,15 @@ class ReleaseRemover
 			"'%recovery%'",
 			"'%reset%'",
 			"'%unlocker%'",
-			\Category::CAT_PC_GAMES,
-			\Category::CAT_PC_0DAY,
-			\Category::CAT_PC_ISO,
-			\Category::CAT_PC_MAC,
-			\Category::CAT_PC_MOBILEANDROID,
-			\Category::CAT_PC_MOBILEIOS,
-			\Category::CAT_PC_MOBILEOTHER,
-			\Category::CAT_MISC_OTHER,
-			\Category::CAT_MISC_HASHED,
+			Category::CAT_PC_GAMES,
+			Category::CAT_PC_0DAY,
+			Category::CAT_PC_ISO,
+			Category::CAT_PC_MAC,
+			Category::CAT_PC_MOBILEANDROID,
+			Category::CAT_PC_MOBILEIOS,
+			Category::CAT_PC_MOBILEOTHER,
+			Category::CAT_MISC_OTHER,
+			Category::CAT_MISC_HASHED,
 			$this->crapTime
 		);
 
@@ -555,17 +555,17 @@ class ReleaseRemover
 			WHERE r.totalpart = 1
 			AND r.size < 2097152
 			AND r.categoryid NOT IN (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) %s",
-			\Category::CAT_MUSIC_MP3,
-			\Category::CAT_BOOK_COMICS,
-			\Category::CAT_BOOK_EBOOK,
-			\Category::CAT_BOOK_FOREIGN,
-			\Category::CAT_BOOK_MAGS,
-			\Category::CAT_BOOK_TECHNICAL,
-			\Category::CAT_BOOK_OTHER,
-			\Category::CAT_PC_0DAY,
-			\Category::CAT_PC_GAMES,
-			\Category::CAT_MISC_OTHER,
-			\Category::CAT_MISC_HASHED,
+			Category::CAT_MUSIC_MP3,
+			Category::CAT_BOOK_COMICS,
+			Category::CAT_BOOK_EBOOK,
+			Category::CAT_BOOK_FOREIGN,
+			Category::CAT_BOOK_MAGS,
+			Category::CAT_BOOK_TECHNICAL,
+			Category::CAT_BOOK_OTHER,
+			Category::CAT_PC_0DAY,
+			Category::CAT_PC_GAMES,
+			Category::CAT_MISC_OTHER,
+			Category::CAT_MISC_HASHED,
 			$this->crapTime
 		);
 
@@ -615,21 +615,21 @@ class ReleaseRemover
 			AND r.name LIKE %s
 			AND r.categoryid IN (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) %s",
 			"'%sample%'",
-			\Category::CAT_TV_ANIME,
-			\Category::CAT_TV_DOCU,
-			\Category::CAT_TV_FOREIGN,
-			\Category::CAT_TV_HD,
-			\Category::CAT_TV_OTHER,
-			\Category::CAT_TV_SD,
-			\Category::CAT_TV_SPORT,
-			\Category::CAT_TV_WEBDL,
-			\Category::CAT_MOVIE_3D,
-			\Category::CAT_MOVIE_BLURAY,
-			\Category::CAT_MOVIE_DVD,
-			\Category::CAT_MOVIE_FOREIGN,
-			\Category::CAT_MOVIE_HD,
-			\Category::CAT_MOVIE_OTHER,
-			\Category::CAT_MOVIE_SD,
+			Category::CAT_TV_ANIME,
+			Category::CAT_TV_DOCU,
+			Category::CAT_TV_FOREIGN,
+			Category::CAT_TV_HD,
+			Category::CAT_TV_OTHER,
+			Category::CAT_TV_SD,
+			Category::CAT_TV_SPORT,
+			Category::CAT_TV_WEBDL,
+			Category::CAT_MOVIE_3D,
+			Category::CAT_MOVIE_BLURAY,
+			Category::CAT_MOVIE_DVD,
+			Category::CAT_MOVIE_FOREIGN,
+			Category::CAT_MOVIE_HD,
+			Category::CAT_MOVIE_OTHER,
+			Category::CAT_MOVIE_SD,
 			$this->crapTime
 		);
 
@@ -671,7 +671,7 @@ class ReleaseRemover
 	 */
 	protected function removeBlacklist()
 	{
-		$status = sprintf('AND status = %d', \Binaries::BLACKLIST_ENABLED);
+		$status = sprintf('AND status = %d', Binaries::BLACKLIST_ENABLED);
 
 		if (isset($this->blacklistID) && $this->blacklistID !== '' && $this->delete === false) {
 			$status = '';
@@ -682,7 +682,7 @@ class ReleaseRemover
 				'SELECT regex, id, groupname, msgcol
 				FROM binaryblacklist
 				WHERE optype = %d %s %s',
-				\Binaries::OPT_BLACKLIST,
+				Binaries::OPT_BLACKLIST,
 				$this->blacklistID,
 				$status
 			)
@@ -774,15 +774,15 @@ class ReleaseRemover
 				}
 
 				switch ((int)$regex['msgcol']) {
-					case \Binaries::BLACKLIST_FIELD_SUBJECT:
+					case Binaries::BLACKLIST_FIELD_SUBJECT:
 						$regexSQL = sprintf("WHERE %s (r.name REGEXP %s OR r.searchname REGEXP %s)", $ftMatch, $dbRegex, $dbRegex);
 						$opTypeName = "Subject";
 						break;
-					case \Binaries::BLACKLIST_FIELD_FROM:
+					case Binaries::BLACKLIST_FIELD_FROM:
 						$regexSQL = "WHERE r.fromname REGEXP " . $dbRegex;
 						$opTypeName = "Poster";
 						break;
-					case \Binaries::BLACKLIST_FIELD_MESSAGEID:
+					case Binaries::BLACKLIST_FIELD_MESSAGEID:
 						break;
 				}
 
@@ -873,9 +873,9 @@ class ReleaseRemover
 				WHERE status = %d
 				AND optype = %d
 				AND msgcol = %d',
-				\Binaries::BLACKLIST_ENABLED,
-				\Binaries::OPT_BLACKLIST,
-				\Binaries::BLACKLIST_FIELD_SUBJECT
+				Binaries::BLACKLIST_ENABLED,
+				Binaries::OPT_BLACKLIST,
+				Binaries::BLACKLIST_FIELD_SUBJECT
 			)
 		);
 
@@ -951,17 +951,17 @@ class ReleaseRemover
 		$nl = '%lees me als de film niet spelen.txt%';
 		$german = '%Lesen Sie mir wenn der Film nicht abgespielt.txt%';
 		$categories = sprintf("r.categoryid IN (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) AND",
-			\Category::CAT_MOVIE_3D,
-			\Category::CAT_MOVIE_BLURAY,
-			\Category::CAT_MOVIE_DVD,
-			\Category::CAT_MOVIE_FOREIGN,
-			\Category::CAT_MOVIE_HD,
-			\Category::CAT_MOVIE_OTHER,
-			\Category::CAT_MOVIE_SD,
-			\Category::CAT_XXX_WMV,
-			\Category::CAT_XXX_X264,
-			\Category::CAT_XXX_XVID,
-			\Category::CAT_XXX_OTHER
+			Category::CAT_MOVIE_3D,
+			Category::CAT_MOVIE_BLURAY,
+			Category::CAT_MOVIE_DVD,
+			Category::CAT_MOVIE_FOREIGN,
+			Category::CAT_MOVIE_HD,
+			Category::CAT_MOVIE_OTHER,
+			Category::CAT_MOVIE_SD,
+			Category::CAT_XXX_WMV,
+			Category::CAT_XXX_X264,
+			Category::CAT_XXX_XVID,
+			Category::CAT_XXX_OTHER
 		);
 		$codeclike = sprintf("UNION SELECT r.guid, r.searchname, r.id FROM releases r
 			LEFT JOIN releasefiles rf ON r.id = rf.releaseid
