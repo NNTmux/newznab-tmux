@@ -118,10 +118,10 @@
 									{if $movie && $release.rageid < 0}{if $movie.trailer != ""}
 										<li><a href="#pane2" data-toggle="tab">Trailer</a></li>
 									{/if}{/if}
-									{if $xxx && $xxx.trailers != ''}
+									{if isset($xxx.trailers) && $xxx.trailers != ''}
 										<li><a href="#pane2" data-toggle="tab">Trailer</a></li>
 									{/if}
-									{if isset($nfo) && $nfo.nfo != ""}
+									{if isset($nfo.nfo) && $nfo.nfo != ""}
 										<li><a href="#pane3" data-toggle="tab">NFO</a></li>
 									{/if}
 									{if isset($similars) && $similars|@count > 1}
