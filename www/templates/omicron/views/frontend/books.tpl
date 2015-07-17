@@ -87,7 +87,7 @@
 															href="{$site->dereferrer_link}{$result.url}"
 															name="amazon{$result.bookinfoid}" title="View amazon page">
 																Amazon</a>{/if}
-														{if isste($result.nfoid) && $result.nfoid > 0}<a
+														{if isset($result.nfoid) && $result.nfoid > 0}<a
 															href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}"
 															title="View Nfo" class="label label-default" rel="nfo">
 																NFO</a>{/if}
