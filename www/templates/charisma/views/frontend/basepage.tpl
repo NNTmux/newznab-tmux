@@ -41,6 +41,8 @@
 	<link href='{$smarty.const.WWW_TOP}/templates/charisma/css/elfinder.theme.css' rel='stylesheet'>
 	<link href='{$smarty.const.WWW_TOP}/templates/charisma/css/jquery.iphone.toggle.css' rel='stylesheet'>
 	<link href='{$smarty.const.WWW_TOP}/templates/charisma/css/animate.min.css' rel='stylesheet'>
+	<!-- Normalize.css -->
+	<link href="{$smarty.const.WWW_TOP}/templates/charisma/css/animate.min.css" rel="stylesheet" type="text/css">
 
 	<!-- The fav icon -->
 	<link rel="shortcut icon" href="{$smarty.const.WWW_TOP}/templates/charisma/img/favicon.ico">
