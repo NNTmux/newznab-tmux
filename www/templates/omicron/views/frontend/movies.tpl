@@ -277,7 +277,7 @@
 												name="CP{$result.imdbid}"
 												title="Add to CouchPotato"
 												><img
-													src="{$smarty.const.WWW_TOP}/templates/nntmux/images/icons/couch.png"></a>
+													src="{$smarty.const.WWW_TOP}/templates/omicron/images/icons/couch.png"></a>
 									{/if}
 									{if isset($isadmin)}
 										<input type="button"
