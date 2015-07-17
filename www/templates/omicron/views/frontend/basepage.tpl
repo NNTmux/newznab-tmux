@@ -20,7 +20,7 @@
 	<link href="{$smarty.const.WWW_TOP}/templates/omicron/bootstrap/css/font-awesome.min.css" rel="stylesheet"
 		  type="text/css"/>
 	<!-- Normalize.css -->
-	<link href="{$smarty.const.WWW_TOP}/templates/charisma/css/animate.min.css" rel="stylesheet" type="text/css">
+	<link href="{$smarty.const.WWW_TOP}/templates_shared/styles/normalize.css" rel="stylesheet" type="text/css">
 	<!-- Ionicons -->
 	<link href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" rel="stylesheet" type="text/css"/>
 	<!-- Theme style -->
