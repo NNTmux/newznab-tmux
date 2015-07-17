@@ -2,24 +2,26 @@
 
 require_once NN_LIBS . 'simple_html_dom.php';
 
+use newznab\utility\Utility;
+
 class IAFD
 {
-
-
-	const ADE = "Adult DVD Empire";
-	const IAFDSEARCHURL = "http://iafd.com.prx.proxyunblocker.org/results.asp?searchtype=title&searchstring=";
-	const IAFDURL = "http://iafd.com.prx.proxyunblocker.org";
-	const HM = "Hot Movies";
 	public $classUsed = "";
 	public $cookie = "";
 	public $directUrl;
 	public $searchTerm = "";
 	public $title = "";
+
+	const ADE = "Adult DVD Empire";
+	const ADM = "AdultDVDMarketplace";
+	const IAFDSEARCHURL = "http://www.iafd.com/results.asp?searchtype=title&searchstring=";
+	const IAFDURL = "http://www.iafd.com";
+
 	protected $_dvdFound = false;
 	protected $_doSearch = false;
 	protected $_getRedirect;
 	protected $_html;
-	protected $_res = array();
+	protected $_res = [];
 	protected $_response;
 
 
@@ -29,48 +31,6 @@ class IAFD
 		if (isset($this->cookie)) {
 			@$this->getUrl();
 		}
-	}
-
-	private function getUrl()
-	{
-		if ($this->_doSearch === true) {
-			$ch = curl_init(self::IAFDSEARCHURL . urlencode($this->searchTerm));
-		} else {
-			if (empty($this->_getRedirect)) {
-				$ch = curl_init(self::IAFDURL);
-			} else {
-				$ch = curl_init($this->_getRedirect);
-			}
-		}
-
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_HEADER, 0);
-		curl_setopt($ch, CURLOPT_VERBOSE, 0);
-		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-		curl_setopt($ch, CURLOPT_USERAGENT, "Firefox/2.0.0.1");
-		curl_setopt($ch, CURLOPT_FAILONERROR, 1);
-		if (isset($this->cookie)) {
-			curl_setopt($ch, CURLOPT_COOKIEJAR, $this->cookie);
-			curl_setopt($ch, CURLOPT_COOKIEFILE, $this->cookie);
-		}
-		$this->_response = curl_exec($ch);
-		if (!empty($this->_getRedirect)) {
-			$this->_getRedirect = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
-			curl_close($ch);
-
-			return $this->_getRedirect;
-		}
-		if (!$this->_response) {
-			curl_close($ch);
-
-			return false;
-		}
-		curl_close($ch);
-		if ($this->_doSearch === true) {
-			$this->_html->load($this->_response);
-			$this->_doSearch = false;
-		}
-		return true;
 	}
 
 	public function __destruct()
@@ -102,12 +62,14 @@ class IAFD
 									$this->_dvdFound = false;
 									break;
 								}
-								if ($compare === self::HM && !empty($compare)) {
-									$this->classUsed = "hm";
+								if ($compare === self::ADM && !empty($compare)) {
+									$this->classUsed = "adm";
 									$this->_getRedirect = self::IAFDURL . trim($alink->href);
 									$this->directUrl = $this->getUrl();
-									$this->directUrl = preg_replace('/\?(.*)/', '', $this->directUrl);
-									$this->directUrl = false;
+									$this->directUrl = preg_replace('/\?(.*)/',
+										'',
+										$this->directUrl);
+									$this->_dvdFound = false;
 									break;
 								}
 							}
@@ -131,7 +93,9 @@ class IAFD
 		if (!isset($this->searchTerm)) {
 			return false;
 		}
+
 		$this->_doSearch = true;
+
 		if ($this->getUrl() === false) {
 			return false;
 		} else {
@@ -155,14 +119,18 @@ class IAFD
 					$secondtitle = preg_replace('/\(([0-9]+)\)/', "", $secondtitle);
 					$secondtitle = preg_replace('/XXX/', '', $secondtitle);
 					$secondtitle = preg_replace('/\(.*?\)|[-._]/i', ' ', $secondtitle);
-					similar_text($this->searchTerm, trim($firsttitle), $p);
+					similar_text(strtolower($this->searchTerm), strtolower(trim($firsttitle)), $p);
 					if ($p >= 90) {
 						$this->title = trim($firsttitle);
+
 						return true;
 					} else {
-						similar_text($this->searchTerm, trim($secondtitle), $p);
+						similar_text(strtolower($this->searchTerm),
+							strtolower(trim($secondtitle)),
+							$p);
 						if ($p >= 90) {
 							$this->title = trim($secondtitle);
+
 							return true;
 						} else {
 							return false;
@@ -177,6 +145,55 @@ class IAFD
 		}
 
 	}
+
+	private function getUrl()
+	{
+		if ($this->_doSearch === true) {
+			$ch = curl_init(self::IAFDSEARCHURL . urlencode($this->searchTerm));
+		} else {
+			if (empty($this->_getRedirect)) {
+				$ch = curl_init(self::IAFDURL);
+			} else {
+				$ch = curl_init($this->_getRedirect);
+			}
+		}
+
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_HEADER, 0);
+		curl_setopt($ch, CURLOPT_VERBOSE, 0);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+		curl_setopt($ch, CURLOPT_USERAGENT, "Firefox/2.0.0.1");
+		curl_setopt($ch, CURLOPT_FAILONERROR, 1);
+
+		if (isset($this->cookie)) {
+			curl_setopt($ch, CURLOPT_COOKIEJAR, $this->cookie);
+			curl_setopt($ch, CURLOPT_COOKIEFILE, $this->cookie);
+		}
+
+		curl_setopt_array($ch, Utility::curlSslContextOptions());
+		$this->_response = curl_exec($ch);
+
+		if (!empty($this->_getRedirect)) {
+			$this->_getRedirect = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
+			curl_close($ch);
+			return $this->_getRedirect;
+		}
+
+		if (!$this->_response) {
+			curl_close($ch);
+
+			return false;
+		}
+		curl_close($ch);
+
+		if ($this->_doSearch === true) {
+			$this->_html->load($this->_response);
+			$this->_doSearch = false;
+		}
+
+		return true;
+	}
+
 
 
 }
