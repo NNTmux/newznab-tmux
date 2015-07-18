@@ -498,7 +498,13 @@
 		<div class="hint">The number of days binary and part data will be retained for use in raw search and release formation.</div>
 	</td>
 </tr>
-
+	<tr>
+		<td style="width:180px;"><label for="partretentionhours">Part Retention Hours:</label></td>
+		<td>
+			<input class="short" id="partretentionhours" name="partretentionhours" type="text" value="{$site->partretentionhours}"/>
+			<div class="hint">The number of hours incomplete parts and binaries will be retained.</div>
+		</td>
+	</tr>
 <tr>
 	<td><label for="releaseretentiondays">Release Retention</label>:</td>
 	<td>

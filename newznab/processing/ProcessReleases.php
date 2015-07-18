@@ -852,7 +852,7 @@ class ProcessReleases
 			sprintf(
 				'DELETE FROM %s WHERE dateadded < (NOW() - INTERVAL %d HOUR) %s',
 				$group['cname'],
-				$this->pdo->getSetting('rawretentiondays'),
+				$this->pdo->getSetting('partretentionhours'),
 				(!empty($groupID) && $this->tablePerGroup === false ? ' AND group_id = ' . $groupID : '')
 			)
 		);
