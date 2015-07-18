@@ -501,7 +501,7 @@
 	<tr>
 		<td style="width:180px;"><label for="partretentionhours">Part Retention Hours:</label></td>
 		<td>
-			<input class="short" id="partretentionhours" name="partretentionhours" type="text" value="{$site->partretentionhours}"/>
+			<input class="short" id="partretentionhours" name="partretentionhours" type="text" value="{$fsite->partretentionhours}"/>
 			<div class="hint">The number of hours incomplete parts and binaries will be retained.</div>
 		</td>
 	</tr>
