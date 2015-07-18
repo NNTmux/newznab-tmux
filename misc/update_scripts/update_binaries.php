@@ -6,7 +6,7 @@ use newznab\db\Settings;
 
 $pdo = new Settings();
 
-$maxHeaders = $pdo->getSetting('maxheadersiteration');
+$maxHeaders = $pdo->getSetting('maxheadersiteration') ?: 1000000;
 
 // Create the connection here and pass
 $nntp = new \NNTP(['Settings' => $pdo]);
