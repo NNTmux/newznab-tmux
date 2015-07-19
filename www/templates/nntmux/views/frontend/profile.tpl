@@ -141,7 +141,7 @@
 		{foreach from=$commentslist item=comment}
 		<tr>
 			<td width="80" title="{$comment.createddate}">{$comment.createddate|date_format}</td>
-			<td><a href="{$smarty.const.WWW_TOP}/details/{$comment.guid}/{$comment.searchname|escape:"seourl"}">{$comment.searchname}</a></td>
+			<td><a href="{$smarty.const.WWW_TOP}/details/{$comment.guid}/{$comment.searchname|escape:"htmlall"}">{$comment.searchname}</a></td>
 			<td>{$comment.text|escape:"htmlall"|nl2br}</td>
 		</tr>
 		{/foreach}

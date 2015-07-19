@@ -1,11 +1,11 @@
 <div class="header">
 	{assign var="catsplit" value=">"|explode:$catname}
-	<h2>{$catsplit[0]} > <strong>{$catsplit[1]}</strong></h2>
+	<h2>{$catsplit[0]} > <strong>{if isset($catsplit[1])} {$catsplit[1]}{/if}</strong></h2>
 
 	<div class="breadcrumb-wrapper">
 		<ol class="breadcrumb">
 			<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
-			/ {$catsplit[0]} / {$catsplit[1]}
+			/ {if isset($catsplit[0])} {$catsplit[0]}{/if} / {if isset($catsplit[1])} {$catsplit[1]}{/if}
 		</ol>
 	</div>
 </div>
@@ -33,33 +33,9 @@
 									</p>
 								{/if}
 								<div class="nzb_multi_operations">
-									{if ($category >= '1000' and $category <= '1999')}View:
-										<a href="{$smarty.const.WWW_TOP}/console?t={$category}">Covers</a>
-										|
-										<b>List</b>
-										<br/>
-									{elseif ($category >= '2000' and $category <= '2100')}View:
-										<a href="{$smarty.const.WWW_TOP}/movies?t={$category}">Covers</a>
-										|
-										<b>List</b>
-										<br/>
-									{elseif ($category >= '3000' and $category <= '3999')}View:
-										<a href="{$smarty.const.WWW_TOP}/music?t={$category}">Covers</a>
-										|
-										<b>List</b>
-										<br/>
-									{elseif ($category == '4050')}View:
-										<a href="{$smarty.const.WWW_TOP}/games?t={$category}">Covers</a>
-										|
-										<b>List</b>
-										<br/>
-									{elseif ($category == '6000'  OR '6080' OR '6070' OR '6020' OR '6040')}View:
-										<a href="{$smarty.const.WWW_TOP}/xxx?t={$category}">Covers</a>
-										|
-										<b>List</b>
-										<br/>
-									{elseif $category == '7000'}View:
-										<a href="{$smarty.const.WWW_TOP}/books?t={$category}">Covers</a>
+									{if $covgroup != ''}View:
+										<a href="{$smarty.const.WWW_TOP}/{$covgroup}?t={$category}">Covers
+										</a>
 										|
 										<b>List</b>
 										<br/>
@@ -124,7 +100,7 @@
 															 type="checkbox" class="nzb_check"
 															 value="{$result.guid}"/></td>
 									<td>
-										<a href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"seourl"}"
+										<a href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"htmlall"}"
 										   class="title">{$result.searchname|escape:"htmlall"|replace:".":" "}</a>
 										<br/>
 													<span class="label label-default">{$result.grabs}
@@ -150,7 +126,7 @@
 									<td>{$result.postdate|timeago}</td>
 									<td>{$result.size|fsize_format:"MB"}</td>
 									<td class="icon_nzb"><a
-												href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}/{$result.searchname|escape:"url"}"><i
+												href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}/{$result.searchname|escape:"htmlall"}"><i
 													class="fa fa-download text-muted"
 													title="Download NZB"></i></a>
 										<a href="{$smarty.const.WWW_TOP}/details/{$result.guid}/#comments"><i

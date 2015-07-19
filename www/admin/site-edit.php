@@ -50,7 +50,7 @@ switch($action)
 		{
 			$page->smarty->assign('error', $error);
 			$page->smarty->assign('settings', $page->settings->rowsToArray($_POST));
-			$page->smarty->assign('fsite', $site);
+			$page->smarty->assign('site', $site);
 		}
 
 		break;
@@ -59,7 +59,7 @@ switch($action)
 
 		$page->title = "Site Edit";
 		$site        = $page->settings;
-		$page->smarty->assign('fsite', $site);
+		$page->smarty->assign('site', $site);
 		$page->smarty->assign('settings', $site->getSettingsAsTree());
 
 		break;

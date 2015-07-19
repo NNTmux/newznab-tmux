@@ -107,7 +107,7 @@
 
 						<div class="input-prepend">
 							<label class="rememberme" for="rememberme"><input id="rememberme"
-																			  {if $rememberme == 1}checked="checked"{/if}
+																			  {if isset($rememberme) && $rememberme == 1}checked="checked"{/if}
 																			  name="rememberme" type="checkbox">
 								Remember me</label>
 						</div>
@@ -122,19 +122,8 @@
 					</fieldset>
 				</form>
 
-				<a href="#" class="text-center">I forgot my password</a><br>
+				<a href="{$serverroot}forgottenpassword" class="text-center">I forgot my password</a><br>
 				<a href="{$serverroot}register" class="text-center">Register a new membership</a>
-				<form class="form-password" role="form" method="POST" action="forgottenpassword?action=submit">
-					<h3><strong>Reset</strong> your password</h3>
-					<div class="append-icon m-b-20">
-						<input type="email" name="email" class="form-control form-white password" placeholder="Email" required>
-						<i class="icon-lock"></i>
-					</div>
-
-					<br/>
-					{$page->smarty->fetch('captcha.tpl')}
-					<button type="submit" class="btn btn-lg btn-danger btn-block ladda-button" data-style="expand-left">Send Password Reset Link</button>
-				</form>
 			</div>
 			<!--/span-->
 		</div>

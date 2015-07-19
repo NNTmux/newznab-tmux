@@ -1,6 +1,5 @@
 
 <div class="header">
-	{assign var="catsplit" value=">"|explode:$catname}
 	<h2>TV Series > <strong>List</strong></h2>
 
 	<div class="breadcrumb-wrapper">
@@ -19,8 +18,8 @@
 	{/foreach}]
 </p>
 <div class="btn-group">
-	<a class="btn btn-white" href="{$smarty.const.WWW_TOP}/myshows" title="List my watched shows">My shows</a>
-	<a class="btn btn-white" href="{$smarty.const.WWW_TOP}/myshows/browse" title="browse your shows">Find all my shows</a>
+	<a class="btn btn-default" href="{$smarty.const.WWW_TOP}/myshows" title="List my watched shows">My shows</a>
+	<a class="btn btn-default" href="{$smarty.const.WWW_TOP}/myshows/browse" title="browse your shows">Find all my shows</a>
 </div>
 {$site->adbrowse}
 

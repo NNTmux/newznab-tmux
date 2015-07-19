@@ -305,6 +305,9 @@ class NZBImport
 							'first_record' => 0,
 							'last_record' => 0,
 							'active' => 0,
+							'minsizetoformrelease' => 0,
+							'minfilestoformrelease' => 0,
+							'regexmatchonly' => 1,
 							'backfill' => 0
 						]);
 						$this->allGroups[$group] = $groupID;
@@ -423,7 +426,10 @@ class NZBImport
 					'isrenamed' => $renamed,
 					'reqidstatus' => 0,
 					'prehashid' => 0,
-					'nzbstatus' => NZB::NZB_ADDED
+					'regexid' => 0,
+					'reqid' => 0,
+					'nzbstatus' => NZB::NZB_ADDED,
+					'passwordstatus' => 0
 				]
 			);
 		} else {

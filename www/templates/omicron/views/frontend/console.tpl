@@ -1,6 +1,6 @@
 <div class="header">
 	{assign var="catsplit" value=">"|explode:$catname}
-	<h2>{$catsplit[0]} > <strong>{$catsplit[1]}</strong></h2>
+	<h2>{$catsplit[0]} > <strong>{if isset($catsplit[1])} {$catsplit[1]}{/if}</strong></h2>
 
 	<div class="breadcrumb-wrapper">
 		<ol class="breadcrumb">
@@ -76,7 +76,7 @@
 										<div class="row">
 											<div class="col-md-2 no-gutter">
 												<a title="View details"
-												   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"seourl"}">
+												   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}">
 													<img src="{$smarty.const.WWW_TOP}/covers/console/{if $result.cover == 1}{$result.consoleinfoid}.jpg{else}no-cover.jpg{/if}"
 														 width="140" border="0"
 														 alt="{$result.title|escape:"htmlall"}"/>
@@ -88,7 +88,7 @@
 																		 title="View Amazon page">
 														Amazon</a>{/if}
 												{if $result.nfoid > 0}<a
-													href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}/{$mname[$m@index]|escape:"seourl"}"
+													href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}"
 													title="View NFO" class="label label-default" rel="nfo">
 														NFO</a>{/if}
 												<a class="label label-default"
@@ -97,7 +97,7 @@
 											</div>
 											<div class="col-md-10 no-gutter">
 												<h4><a title="View details"
-													   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"seourl"}">{$result.title|escape:"htmlall"}</a>
+													   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}">{$result.title|escape:"htmlall"}</a>
 												</h4>
 												<table>
 													<tr>
@@ -113,39 +113,39 @@
 																				   title="Edit release">
 																	Edit</a>{/if}
 															<br/>
-															{if $result.genre != ""}
+															{if isset($result.genre) && $result.genre != ""}
 																<b>Genre:</b>
 																{$result.genre}
 																<br/>
 															{/if}
-															{if $result.esrb != ""}
+															{if isset($result.esrb) && $result.esrb != ""}
 																<b>Rating:</b>
 																{$result.esrb}
 																<br/>
 															{/if}
-															{if $result.publisher != ""}
+															{if isset($result.publisger) && $result.publisher != ""}
 																<b>Publisher:</b>
 																{$result.publisher}
 																<br/>
 															{/if}
-															{if $result.releasedate != ""}
+															{if isset($result.releasedate) && $result.releasedate != ""}
 																<b>Released:</b>
 																{$result.releasedate|date_format}
 																<br/>
 															{/if}
-															{if $result.review != ""}
+															{if isset($result.review) && $result.review != ""}
 																<b>Review:</b>
 																{$result.review|escape:'htmlall'}
 																<br/>
 															{/if}
 															<div>
-																<a role="button" class="btn btn-white btn-xs"
-																   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}/{$mname[$m@index]|escape:"url"}"><i
+																<a role="button" class="btn btn-default btn-xs"
+																   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}"><i
 																			class="fa fa-download"></i><span
 																			class="badge">{$mgrabs[$m@index]}
 																		Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
-																<a role="button" class="btn btn-white btn-xs"
-																   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"seourl"}#comments"><i
+																<a role="button" class="btn btn-default btn-xs"
+																   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}#comments"><i
 																			class="fa fa-comment-o"></i><span
 																			class="badge">{$mcomments[$m@index]}
 																		Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>

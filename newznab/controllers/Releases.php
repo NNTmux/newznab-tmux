@@ -108,22 +108,22 @@ class Releases
 	public $echoCLI;
 
 	/**
-	 * @var \ConsoleTools
+	 * @var ConsoleTools
 	 */
 	public $consoleTools;
 
 	/**
-	 * @var \NZB
+	 * @var NZB
 	 */
 	public $nzb;
 
 	/**
-	 * @var \ReleaseCleaning
+	 * @var ReleaseCleaning
 	 */
 	public $releaseCleaning;
 
 	/**
-	 * @var \ReleaseImage
+	 * @var ReleaseImage
 	 */
 	public $releaseImage;
 
@@ -153,15 +153,15 @@ class Releases
 
 		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
 		$this->consoleTools = ($options['ConsoleTools'] instanceof \ConsoleTools ? $options['ConsoleTools'] : new \ConsoleTools(['ColorCLI' => $this->pdo->log]));
-		$this->groups = ($options['Groups'] instanceof \Groups ? $options['Groups'] : new \Groups(['Settings' => $this->pdo]));
-		$this->nzb = ($options['NZB'] instanceof \NZB ? $options['NZB'] : new \NZB());
-		$this->releaseCleaning = ($options['ReleaseCleaning'] instanceof \ReleaseCleaning ? $options['ReleaseCleaning'] : new \ReleaseCleaning($this->pdo));
-		$this->releaseImage = ($options['ReleaseImage'] instanceof \ReleaseImage ? $options['ReleaseImage'] : new \ReleaseImage($this->pdo));
+		$this->groups = ($options['Groups'] instanceof Groups ? $options['Groups'] : new Groups(['Settings' => $this->pdo]));
+		$this->nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB());
+		$this->releaseCleaning = ($options['ReleaseCleaning'] instanceof ReleaseCleaning ? $options['ReleaseCleaning'] : new ReleaseCleaning($this->pdo));
+		$this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage($this->pdo));
 		$this->updategrabs = ($this->pdo->getSetting('grabstatus') == '0' ? false : true);
 		$this->passwordStatus = ($this->pdo->getSetting('checkpasswordedrar') == 1 ? -1 : 0);
-		$this->sphinxSearch = new \SphinxSearch();
-		$this->releaseSearch = new \ReleaseSearch($this->pdo, $this->sphinxSearch);
-		$this->releaseRegex = new \ReleaseRegex();
+		$this->sphinxSearch = new SphinxSearch();
+		$this->releaseSearch = new ReleaseSearch($this->pdo, $this->sphinxSearch);
+		$this->releaseRegex = new ReleaseRegex();
 
 		$this->tablePerGroup = ($this->pdo->getSetting('tablepergroup') == 0 ? false : true);
 		$this->crossPostTime = ($this->pdo->getSetting('crossposttime') != '' ? (int)$this->pdo->getSetting('crossposttime') : 2);
@@ -184,14 +184,14 @@ class Releases
 
 		$nsql = "1=2";
 		if (count($names) > 0) {
-			$n = array();
+			$n = [];
 			foreach ($names as $nm)
 				$n[] = " searchname = " . $this->pdo->escapeString($nm);
 
 			$nsql = "( " . implode(' or ', $n) . " )";
 		}
 
-		$sql = sprintf(" SELECT releases.*, CONCAT(cp.title, ' > ', c.title) AS category_name,
+		return $this->pdo->queryDirect(sprintf('SELECT releases.*, CONCAT(cp.title, ' > ', c.title) AS category_name,
 							m.id AS movie_id, m.title, m.rating, m.cover, m.plot, m.year, m.genre, m.director, m.actors, m.tagline,
 							mu.id AS music_id, mu.title AS mu_title, mu.cover AS mu_cover, mu.year AS mu_year, mu.artist AS mu_artist, mu.tracks AS mu_tracks, mu.review AS mu_review,
 							ep.id AS ep_id, ep.showtitle AS ep_showtitle, ep.airdate AS ep_airdate, ep.fullep AS ep_fullep, ep.overview AS ep_overview,
@@ -203,10 +203,9 @@ class Releases
 							LEFT OUTER JOIN musicinfo mu ON mu.id = releases.musicinfoid
 							LEFT OUTER JOIN episodeinfo ep ON ep.id = releases.episodeinfoid
 							LEFT OUTER JOIN tvrage ON tvrage.rageid = releases.rageid
-						WHERE %s", $nsql
-		);
-
-		return $this->pdo->queryDirect($sql);
+						WHERE %s', $nsql
+						)
+				);
 	}
 
 	/**
@@ -331,7 +330,7 @@ class Releases
 				AND r.passwordstatus %s
 				%s %s %s %s',
 				($groupName != '' ? 'INNER JOIN groups g ON g.id = r.groupid' : ''),
-				Enzebe::NZB_ADDED,
+				NZB::NZB_ADDED,
 				$this->showPasswords,
 				($groupName != '' ? sprintf(' AND g.name = %s', $this->pdo->escapeString($groupName)) : ''),
 				$this->categorySQL($cat),
@@ -376,7 +375,7 @@ class Releases
 				AND r.passwordstatus %s
 				%s %s %s %s
 				ORDER BY %s %s %s",
-				Enzebe::NZB_ADDED,
+				NZB::NZB_ADDED,
 				$this->showPasswords,
 				$this->categorySQL($cat),
 				($maxAge > 0 ? (" AND postdate > NOW() - INTERVAL " . $maxAge . ' DAY ') : ''),
@@ -420,7 +419,7 @@ class Releases
 		}
 		$ordersort = (isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'desc';
 
-		return array($orderfield, $ordersort);
+		return [$orderfield, $ordersort];
 	}
 
 	/**
@@ -466,7 +465,7 @@ class Releases
 				INNER JOIN category cp ON cp.id = category.parentid
 				WHERE r.nzbstatus = %d
 				%s %s %s",
-				Enzebe::NZB_ADDED,
+				NZB::NZB_ADDED,
 				$this->exportDateString($postFrom),
 				$this->exportDateString($postTo, false),
 				(($groupID != '' && $groupID != '-1') ? sprintf(' AND group_id = %d ', $groupID) : '')
@@ -531,7 +530,7 @@ class Releases
 	{
 
 		$groups = $this->pdo->query("SELECT DISTINCT groups.id, groups.name FROM releases INNER JOIN groups ON groups.id = releases.groupid");
-		$temp_array = array();
+		$temp_array = [];
 
 		if ($blnIncludeAll)
 			$temp_array[-1] = "--All Groups--";
@@ -592,7 +591,7 @@ class Releases
 	/**
 	 * Get releases in users 'my tv show' rss feed
 	 */
-	public function getShowsRss($num, $uid = 0, $excludedcats = array(), $airdate = -1)
+	public function getShowsRss($num, $uid = 0, $excludedcats = [], $airdate = -1)
 	{
 
 
@@ -642,7 +641,7 @@ class Releases
 	/**
 	 * Get releases in users 'my movies' rss feed
 	 */
-	public function getMyMoviesRss($num, $uid = 0, $excludedcats = array())
+	public function getMyMoviesRss($num, $uid = 0, $excludedcats = [])
 	{
 
 
@@ -684,7 +683,7 @@ class Releases
 	/**
 	 * Get range of releases in users 'my tvshows'
 	 */
-	public function getShowsRange($usershows, $start, $num, $orderby, $maxage = -1, $excludedcats = array())
+	public function getShowsRange($usershows, $start, $num, $orderby, $maxage = -1, $excludedcats = [])
 	{
 
 
@@ -730,7 +729,7 @@ class Releases
 	 *
 	 * @return
 	 */
-	public function getShowsCount($usershows, $maxage = -1, $excludedcats = array())
+	public function getShowsCount($usershows, $maxage = -1, $excludedcats = [])
 	{
 
 
@@ -802,16 +801,16 @@ class Releases
 		if (!is_array($guids) || sizeof($guids) < 1)
 			return false;
 
-		$update = array(
+		$update = [
 			'categoryid' => (($category == '-1') ? '' : $category),
 			'grabs'      => $grabs,
 			'rageid'     => $rageid,
 			'season'     => $season,
 			'imdbid'     => $imdbid
-		);
+		];
 
 
-		$updateSql = array();
+		$updateSql = [];
 		foreach ($update as $updk => $updv) {
 			if ($updv != '')
 				$updateSql[] = sprintf($updk . '=%s', $this->pdo->escapeString($updv));
@@ -822,7 +821,7 @@ class Releases
 			return -1;
 		}
 
-		$updateGuids = array();
+		$updateGuids = [];
 		foreach ($guids as $guid) {
 			$updateGuids[] = $this->pdo->escapeString($guid);
 		}
@@ -853,7 +852,7 @@ class Releases
 			AND r.nzbstatus = %d
 			AND r.passwordstatus %s %s %s %s %s %s %s",
 			($name !== '' ? $this->releaseSearch->getFullTextJoinString() : ''),
-			Enzebe::NZB_ADDED,
+			NZB::NZB_ADDED,
 			$this->showPasswords,
 			($rageId != -1 ? sprintf(' AND rageid = %d ', $rageId) : ''),
 			($series != '' ? sprintf(' AND UPPER(r.season) = UPPER(%s)', $this->pdo->escapeString(((is_numeric($series) && strlen($series) != 4) ? sprintf('S%02d', $series) : $series))) : ''),
@@ -913,7 +912,7 @@ class Releases
 			WHERE r.passwordstatus %s AND r.nzbstatus = %d %s %s %s %s %s",
 			($name !== '' ? $this->releaseSearch->getFullTextJoinString() : ''),
 			$this->showPasswords,
-			Enzebe::NZB_ADDED,
+			NZB::NZB_ADDED,
 			($aniDbID > -1 ? sprintf(' AND anidbid = %d ', $aniDbID) : ''),
 			(is_numeric($episodeNumber) ? sprintf(" AND r.episode '%s' ", $this->pdo->likeString($episodeNumber)) : ''),
 			($name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : ''),
@@ -970,7 +969,7 @@ class Releases
 			AND r.passwordstatus %s
 			%s %s %s %s",
 			($name !== '' ? $this->releaseSearch->getFullTextJoinString() : ''),
-			Enzebe::NZB_ADDED,
+			NZB::NZB_ADDED,
 			$this->showPasswords,
 			($name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : ''),
 			(($imDbId != '-1' && is_numeric($imDbId)) ? sprintf(' AND imdbid = %d ', str_pad($imDbId, 7, '0', STR_PAD_LEFT)) : ''),
@@ -1011,12 +1010,12 @@ class Releases
 	/**
 	 * Search for releases by album/artist/musicinfo. Used by API.
 	 */
-	public function searchAudio($artist, $album, $label, $track, $year, $genre = array(-1), $offset = 0, $limit = 100, $cat = array(-1), $maxage = -1)
+	public function searchAudio($artist, $album, $label, $track, $year, $genre = [-1], $offset = 0, $limit = 100, $cat = [-1], $maxage = -1)
 	{
 		$s = new Settings();
 		if ($s->getSetting('sphinxenabled')) {
 			$sphinx = new Sphinx();
-			$results = $sphinx->searchAudio($artist, $album, $label, $track, $year, $genre, $offset, $limit, $cat, $maxage, array(), true);
+			$results = $sphinx->searchAudio($artist, $album, $label, $track, $year, $genre, $offset, $limit, $cat, $maxage, [], true);
 			if (is_array($results))
 				return $results;
 		}
@@ -1095,7 +1094,7 @@ class Releases
 		$s = new Settings();
 		if ($s->getSetting('sphinxenabled')) {
 			$sphinx = new Sphinx();
-			$results = $sphinx->searchBook($author, $title, $offset, $limit, $maxage, array(), true);
+			$results = $sphinx->searchBook($author, $title, $offset, $limit, $maxage, [], true);
 			if (is_array($results))
 				return $results;
 		}
@@ -1247,7 +1246,7 @@ class Releases
 			WHERE r.passwordstatus %s AND r.nzbstatus = %d %s %s %s %s %s %s %s %s %s %s %s",
 			$this->releaseSearch->getFullTextJoinString(),
 			$this->showPasswords,
-			Enzebe::NZB_ADDED,
+			NZB::NZB_ADDED,
 			($maxAge > 0 ? sprintf(' AND r.postdate > (NOW() - INTERVAL %d DAY) ', $maxAge) : ''),
 			($groupName != -1 ? sprintf(' AND r.groupid = %d ', $this->groups->getIDByName($groupName)) : ''),
 			(array_key_exists($sizeFrom, $sizeRange) ? ' AND r.size > ' . (string)(104857600 * (int)$sizeRange[$sizeFrom]) . ' ' : ''),
@@ -1413,7 +1412,7 @@ class Releases
 	{
 
 		if (is_array($guid)) {
-			$tmpguids = array();
+			$tmpguids = [];
 			foreach ($guid as $g)
 				$tmpguids[] = $this->pdo->escapeString($g);
 			$gsql = sprintf('guid in (%s)', implode(',', $tmpguids));
@@ -1601,24 +1600,23 @@ class Releases
 		//
 		if ($page->settings->getSetting('partsdeletechunks') > 0) {
 			$this->pdo->log->doEcho($this->pdo->log->primary('Chunk deleting unused binaries and parts'));
-			$query = sprintf("SELECT p.id AS partsID,b.id AS binariesID FROM %s p
-						LEFT JOIN %s b ON b.id = p.binaryid
-						WHERE b.dateadded < %s - INTERVAL %d HOUR LIMIT 0,%d",
-				$group['pname'],
-				$group['bname'],
-				$this->pdo->escapeString($currTime_ori["now"]),
-				ceil($page->settings->getSetting('rawretentiondays') * 24),
-				$page->settings->getSetting('partsdeletechunks')
-			);
 
 			$cc = 0;
 			$done = false;
 			while (!$done) {
 				$dd = $cc;
-				$result = $this->pdo->query($query);
+				$result = $this->pdo->query(sprintf('SELECT p.id AS partsID,b.id AS binariesID FROM %s p
+						LEFT JOIN %s b ON b.id = p.binaryid
+						WHERE b.dateadded < %s - INTERVAL %d HOUR LIMIT 0,%d',
+					$group['pname'],
+					$group['bname'],
+					$this->pdo->escapeString($currTime_ori["now"]),
+					ceil($page->settings->getSetting('rawretentiondays') * 24),
+					$page->settings->getSetting('partsdeletechunks')
+				));
 				if (count($result) > 0) {
-					$pID = array();
-					$bID = array();
+					$pID = [];
+					$bID = [];
 					foreach ($result as $row) {
 						$pID[] = $row['partsID'];
 						$bID[] = $row['binariesID'];
@@ -1808,7 +1806,7 @@ class Releases
 		//
 		// Get out all distinct relname, group from binaries
 		//
-		$categorize = new \Categorize(['Settings' => $this->pdo]);
+		$categorize = new Categorize(['Settings' => $this->pdo]);
 		$returnCount = $duplicate = 0;
 		$result = $this->pdo->queryDirect(sprintf("SELECT %s.*, g.name AS group_name, count(%s.id) AS parts FROM %s INNER JOIN groups g ON g.id = %s.groupid WHERE %s procstat = %d AND relname IS NOT NULL GROUP BY relname, g.name, groupid, fromname ORDER BY COUNT(%s.id) DESC LIMIT %d", $group['bname'], $group['bname'], $group['bname'], $group['bname'], (!empty($groupID) ? ' groupid = ' . $groupID . ' AND ' : ' '), Releases::PROCSTAT_READYTORELEASE, $group['bname'], $this->releaseCreationLimit));
 		while ($row = $this->pdo->getAssocArray($result)) {
@@ -1853,7 +1851,7 @@ class Releases
 					'fromname'       => $this->pdo->escapeString($row['fromname']),
 					'reqid'          => $row["reqid"],
 					'passwordstatus' => ($page->settings->getSetting('checkpasswordedrar') > 0 ? -1 : 0),
-					'nzbstatus'      => \Enzebe::NZB_NONE,
+					'nzbstatus'      => NZB::NZB_NONE,
 					'isrenamed'      => ($properName === true ? 1 : 0),
 					'reqidstatus'    => ($isReqID === true ? 1 : 0),
 					'prehashid'      => ($prehashID === false ? 0 : $prehashID)
@@ -1916,9 +1914,9 @@ class Releases
 					$this->pdo->log->doEcho($this->pdo->log->primary('Added release ' . $cleanRelName . ''));
 					$returnCount++;
 
-					if ($this->echoCLI) {
+					/*if ($this->echoCLI) {
 						$this->pdo->log->doEcho($this->pdo->log->primary('Added ' . $returnCount . 'releases.'));
-					}
+					}*/
 
 				}
              }
@@ -2029,7 +2027,7 @@ class Releases
 			$this->pdo->log->doEcho($this->pdo->log->primary('Applying ' . sizeof($groupRegexes) . ' regexes to group ' . $groupArr['name']), true);
 
 			// Get out all binaries of STAGE0 for current group
-			$newUnmatchedBinaries = array();
+			$newUnmatchedBinaries = [];
 			$ressql = sprintf('SELECT id, name, date, totalparts, procstat, fromname FROM %s b
  								WHERE groupid = %d AND procstat IN (%d, %d) AND regexid IS NULL ORDER BY b.date ASC',
 								$group['bname'],
@@ -2041,7 +2039,7 @@ class Releases
 
 			$matchedbins = 0;
 			while ($rowbin = $this->pdo->getAssocArray($resbin)) {
-				$regexMatches = array();
+				$regexMatches = [];
 				foreach ($groupRegexes as $groupRegex) {
 					$regexCheck = $this->releaseRegex->performMatch($groupRegex, $rowbin['name']);
 					if ($regexCheck !== false) {
@@ -2121,7 +2119,7 @@ class Releases
 	 */
 	public function cleanReleaseName($relname)
 	{
-		$cleanArr = array('#', '@', '$', '%', '^', '§', '¨', '©', 'Ö');
+		$cleanArr = ['#', '@', '$', '%', '^', '§', '¨', '©', 'Ö'];
 
 		$relname = str_replace($cleanArr, '', $relname);
 		$relname = str_replace('_', ' ', $relname);
@@ -2137,10 +2135,10 @@ class Releases
 	public function insertRelease(array $parameters = [])
 	{
 
-		if ($parameters['regexid'] == "")
+		if (isset($parameters['regexid']) && $parameters['regexid'] == "")
 			$parameters['regexid'] = " null ";
 
-		if ($parameters['reqid'] != "")
+		if (isset($parameters['reqid']) && $parameters['reqid'] != "")
 			$parameters['reqid'] = $this->pdo->escapeString($parameters['reqid']);
 		else
 			$parameters['reqid'] = " null ";
@@ -2188,7 +2186,7 @@ class Releases
 		$ri = new ReleaseImage();
 
 		if (!is_array($id))
-			$id = array($id);
+			$id = [$id];
 
 		foreach ($id as $identifier) {
 			//

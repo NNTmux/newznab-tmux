@@ -684,7 +684,7 @@ class RarInfo extends ArchiveReader
 			'size' => isset($block['unp_size']) ? $block['unp_size'] : 0,
 			'date' => !empty($block['utime']) ? $block['utime'] : (!empty($block['ftime']) ? self::dos2unixtime($block['ftime']) : 0),
 			'pass' => isset($block['has_password']) ? ((int) $block['has_password']) : 0,
-			'compressed' => (int) ($block['method'] != self::METHOD_STORE && $block['method'] != self::R50_METHOD_STORE),
+			'compressed' => isset($block['method']) ? ((int) ($block['method'] != self::METHOD_STORE && $block['method'] != self::R50_METHOD_STORE)): 0,
 			'next_offset' => $block['next_offset'],
 		);
 		if (!empty($block['is_dir'])) {

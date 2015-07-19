@@ -1,8 +1,8 @@
 <?php
+require_once(dirname(__FILE__) . "/../../../bin/config.php");
 
 use newznab\db\Settings;
 use newznab\utility\Utility;
-
 
 $pdo = new Settings();
 

@@ -65,7 +65,7 @@
 						<br/>
 					{/if}
 
-					{if isset ($ourmovies) && $ourmovies[$result->alternate_ids->imdb] != ""}
+					{if isset($ourmovies) && $ourmovies[$result->alternate_ids->imdb] != ""}
 						<a class="rndbtn btn btn-sm btn-success"
 						   href="{$smarty.const.WWW_TOP}/movies?imdb={$result->alternate_ids->imdb}">Download</a>
 					{else}

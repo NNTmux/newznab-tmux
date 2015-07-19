@@ -41,21 +41,8 @@
 	<link href='{$smarty.const.WWW_TOP}/templates/charisma/css/elfinder.theme.css' rel='stylesheet'>
 	<link href='{$smarty.const.WWW_TOP}/templates/charisma/css/jquery.iphone.toggle.css' rel='stylesheet'>
 	<link href='{$smarty.const.WWW_TOP}/templates/charisma/css/animate.min.css' rel='stylesheet'>
-
-	<!-- jQuery -->
-	<script type="text/javascript"
-			src="{$smarty.const.WWW_TOP}/templates/charisma/bower_components/jquery/jquery.min.js"></script>
-	<!-- jQuery migrate script -->
-	<script type="text/javascript"
-			src="{$smarty.const.WWW_TOP}/templates/charisma/js/jquery-migrate-1.2.1.min.js"></script>
-
-	<!-- Newznab utils.js -->
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/charisma/scripts/utils.js"></script>
-
-	<!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
-	<!--[if lt IE 9]>
-	<script type="text/javascript" src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-	<![endif]-->
+	<!-- Normalize.css -->
+	<link href="{$smarty.const.WWW_TOP}/templates_shared/styles/normalize.css" rel="stylesheet" type="text/css">
 
 	<!-- The fav icon -->
 	<link rel="shortcut icon" href="{$smarty.const.WWW_TOP}/templates/charisma/img/favicon.ico">
@@ -227,6 +214,12 @@
 	</div>
 	<!--/.fluid-container-->
 	<!-- Scripts-->
+	<!-- jQuery -->
+	<script type="text/javascript"
+			src="{$smarty.const.WWW_TOP}/templates/charisma/bower_components/jquery/jquery.min.js"></script>
+	<!-- jQuery migrate script -->
+	<script type="text/javascript"
+			src="{$smarty.const.WWW_TOP}/templates/charisma/js/jquery-migrate-1.2.1.min.js"></script>
 	<script type="text/javascript"
 			src="{$smarty.const.WWW_TOP}/templates/charisma/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 	<!-- Bootstrap hover on mouseover script -->
@@ -271,13 +264,25 @@
 	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/charisma/scripts/jquery.autosize-min.js"></script>
 	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/charisma/scripts/jquery.qtip2.js"></script>
 	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/charisma/scripts/sorttable.js"></script>
+
 	<!-- Newznab utils.js -->
 	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/charisma/scripts/utils.js"></script>
+
+	<!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
+	<!--[if lt IE 9]>
+	<script type="text/javascript" src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
 	</body>
 
 	{* Start Login/Register Page *}
-{elseif $smarty.server.REQUEST_URI == "/register" or $smarty.server.REQUEST_URI eq '/register?action=submit'}
+{elseif $smarty.server.REQUEST_URI == "/register" || $smarty.server.REQUEST_URI eq '/register?action=submit'}
 	{include file="register.tpl"}
+{elseif $smarty.server.REQUEST_URI == "/forgottenpassword" || $smarty.server.REQUEST_URI eq '/forgottenpassword?action=submit'}
+	{include file="forgottenpassword.tpl"}
+{elseif $smarty.server.REQUEST_URI == "/contact-us"}
+	{include file="contact.tpl"}
+{elseif $smarty.server.REQUEST_URI == "/terms-and-conditions"}
+	{include file="terms.tpl"}
 {else}
 	{include file="login.tpl"}
 {/if}

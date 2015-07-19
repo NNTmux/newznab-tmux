@@ -20,7 +20,7 @@
 			{else}
 				<img class="pull-right" style="margin-right:50px; max-height:278px;"
 					 alt="{$result.title|escape:"htmlall"} Logo"
-					 src="{$serverroot}templates/nzbtheme/assets/images/nomoviecover.jpg"/>
+					 src="{$serverroot}templates/charisma/images/nomoviecover.jpg"/>
 			{/if}
 			<span class="h1" style="display:inline;">{$result.title|escape:"htmlall"} ({$result.year})</span><a
 					class="btn btn-transparent btn-primary" target="_blank"
@@ -153,7 +153,7 @@
 											 value="{$mguid[$m@index]}"/></td>
 					<td class="item">
 						<a title="View details"
-						   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"seourl"}">{$mname[$m@index]|escape:"htmlall"|replace:".":" "}</a>
+						   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}">{$mname[$m@index]|escape:"htmlall"|replace:".":" "}</a>
 						<br/>
 						<span class="label label-default">{$mgrabs[$m@index]}
 							grab{if $mgrabs[$m@index] != 1}s{/if}</span>
@@ -171,7 +171,7 @@
 					<td class="less right">{$msize[$m@index]|fsize_format:"MB"}</td>
 					<td class="icons">
 						<a title="Download NZB"
-						   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}/{$mname[$m@index]|escape:"url"}"><i
+						   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}"><i
 									class="icon icon_nzb fa fa-download text-muted"></i></a>
 						<a href="#" class="icon_cart text-muted"><i class="fa fa-shopping-cart" title="Add to Cart"></i></a>
 						{if isset($sabintegrated)}<img class="icon_sab"

@@ -55,7 +55,7 @@ class XXX
 	/**
 	 * @param array $options Echo to cli / Class instances.
 	 */
-	public function __construct(array $options = array())
+	public function __construct(array $options = [])
 	{
 		$defaults = [
 			'Echo'         => false,
@@ -65,7 +65,7 @@ class XXX
 		$options += $defaults;
 
 		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
-		$this->releaseImage = ($options['ReleaseImage'] instanceof \ReleaseImage ? $options['ReleaseImage'] : new \ReleaseImage($this->pdo));
+		$this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage($this->pdo));
 
 		$this->movieqty = ($this->pdo->getSetting('maxxxxprocessed') != '') ? $this->pdo->getSetting('maxxxxprocessed') : 100;
 		$this->showPasswords = Releases::showPasswords($this->pdo);
@@ -137,11 +137,11 @@ class XXX
 	 *
 	 * @return int
 	 */
-	public function getXXXCount($cat, $maxAge = -1, $excludedCats = array())
+	public function getXXXCount($cat, $maxAge = -1, $excludedCats = [])
 	{
 		$catsrch = '';
 		if (count($cat) > 0 && $cat[0] != -1) {
-			$catsrch = (new \Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
+			$catsrch = (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
 		}
 
 		$res = $this->pdo->queryOneRow(
@@ -178,11 +178,11 @@ class XXX
 	 *
 	 * @return array
 	 */
-	public function getXXXRange($cat, $start, $num, $orderBy, $maxAge = -1, $excludedCats = array())
+	public function getXXXRange($cat, $start, $num, $orderBy, $maxAge = -1, $excludedCats = [])
 	{
 		$catsrch = '';
 		if (count($cat) > 0 && $cat[0] != -1) {
-			$catsrch = (new \Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
+			$catsrch = (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
 		}
 
 		$order = $this->getXXXOrder($orderBy);
@@ -244,7 +244,7 @@ class XXX
 				break;
 		}
 
-		return array($orderField, ((isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'desc'));
+		return [$orderField, ((isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'desc')];
 	}
 
 	/**
@@ -254,7 +254,7 @@ class XXX
 	 */
 	public function getXXXOrdering()
 	{
-		return array('title_asc', 'title_desc');
+		return ['title_asc', 'title_desc'];
 	}
 
 	/**
@@ -263,7 +263,7 @@ class XXX
 	protected function getBrowseBy()
 	{
 		$browseBy = ' ';
-		$browseByArr = array('title', 'director', 'actors', 'genre', 'id');
+		$browseByArr = ['title', 'director', 'actors', 'genre', 'id'];
 		foreach ($browseByArr as $bb) {
 			if (isset($_REQUEST[$bb]) && !empty($_REQUEST[$bb])) {
 				$bbv = stripslashes($_REQUEST[$bb]);
@@ -295,7 +295,7 @@ class XXX
 		}
 
 		$tmpArr = explode(',', $data[$field]);
-		$newArr = array();
+		$newArr = [];
 		$i = 0;
 		foreach ($tmpArr as $ta) {
 			if (trim($ta) == '') {
@@ -376,14 +376,14 @@ class XXX
 		$res = false;
 		$this->whichclass = '';
 
-		$iafd = new \IAFD();
+		$iafd = new IAFD();
 		$iafd->searchTerm = $xxxmovie;
 
 		if ($iafd->findme() !== false) {
 
 			switch($iafd->classUsed) {
 				case "ade":
-					$mov = new \ADE();
+					$mov = new ADE();
 					$mov->directLink = (string)$iafd->directUrl;
 					$res = $mov->getDirect();
 					$res['title'] = $iafd->title;
@@ -397,21 +397,21 @@ class XXX
 		if ($res === false) {
 
 			$this->whichclass = "aebn";
-			$mov = new \AEBN();
+			$mov = new AEBN();
 			$mov->cookie = $this->cookie;
 			$mov->searchTerm = $xxxmovie;
 			$res = $mov->search();
 
 			if ($res === false) {
 				$this->whichclass = "ade";
-				$mov = new \ADE();
+				$mov = new ADE();
 				$mov->searchTerm = $xxxmovie;
 				$res = $mov->search();
 			}
 
 			if ($res === false) {
 				$this->whichclass = "pop";
-				$mov = new \Popporn();
+				$mov = new Popporn();
 				$mov->cookie = $this->cookie;
 				$mov->searchTerm = $xxxmovie;
 				$res = $mov->search();
@@ -420,7 +420,7 @@ class XXX
 			// Last in list as it doesn't have trailers
 			if ($res === false) {
 				$this->whichclass = "adm";
-				$mov = new \ADM();
+				$mov = new ADM();
 				$mov->cookie = $this->cookie;
 				$mov->searchTerm = $xxxmovie;
 				$res = $mov->search();
@@ -456,7 +456,7 @@ class XXX
 			}
 		}
 
-		$mov = array();
+		$mov = [];
 
 		$mov['trailers'] = (isset($res['trailers'])) ? serialize($res['trailers']) : '';
 		$mov['extras'] = (isset($res['extras'])) ? serialize($res['extras']) : '';
