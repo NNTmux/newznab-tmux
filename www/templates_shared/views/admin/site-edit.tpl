@@ -2,7 +2,7 @@
 
 <form action="{$SCRIPT_NAME}?action=submit" method="post">
 
-{if $error != ''}
+{if isset ($error) && $error != ''}
 	<div class="error">{$error}</div>
 {/if}
 
@@ -606,6 +606,13 @@
         <div class="hint">The maximum number of messages to process for a group in one run of update_binaries.</div>
     </td>
 </tr>
+	<tr>
+		<td><label for="maxheadersiteration">Max headers iteration</label>:</td>
+		<td>
+			<input class="small" id="maxheadersiteration" name="maxheadersiteration" type="text" value="{$site->maxheadersiteration}" />
+			<div class="hint">The maximum number of headers that update binaries sees as the total range. This ensure that a total of no more than this is attempted to be downloaded at one time per group.</div>
+		</td>
+	</tr>
 
 <tr>
 	<td><label for="newgroupscanmethod">Where to start new groups</label>:</td>
