@@ -126,7 +126,7 @@ class Enzebe
 			$bName
 		);
 		$this->_partsQuery = (
-			'SELECT DISTINCT(messageID), size, partnumber FROM ' . $pName . ' WHERE binaryID = %d ORDER BY partnumber'
+			'SELECT DISTINCT(messageid), size, partnumber FROM ' . $pName . ' WHERE binaryid = %d ORDER BY partnumber'
 		);
 
 		$this->_nzbHeadString = (
@@ -183,13 +183,13 @@ class Enzebe
 
 								foreach ($parts as $part) {
 									if ($nzb_guid === '') {
-										$nzb_guid = $part['messageID'];
+										$nzb_guid = $part['messageid'];
 									}
 
 									$string .= (
 										'  <segment bytes="' . $part['size']
 										. '" number="' . $part['partnumber'] . '">'
-										. htmlspecialchars($part['messageID'], ENT_QUOTES, 'utf-8')
+										. htmlspecialchars($part['messageid'], ENT_QUOTES, 'utf-8')
 										. "</segment>\n"
 									);
 								}
