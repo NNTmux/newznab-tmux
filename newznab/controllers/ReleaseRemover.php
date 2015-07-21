@@ -727,7 +727,7 @@ class ReleaseRemover
 							str_replace('nl  subed|bed|s', 'nlsubs|nlsubbed|nlsubed',
 								str_replace('?', '',
 									str_replace('.', ' ',
-										str_replace(array('-', '(', ')'), '',
+										str_replace(['-', '(', ')'], '',
 											substr($dbRegex, $forBegin,
 												strrpos($dbRegex, ')') - $forBegin
 											)
@@ -748,7 +748,7 @@ class ReleaseRemover
 						// Find first bd|dl instance position in Regex, then find last closing parenthesis as this is reversed.
 						$forBegin = strpos($dbRegex, 'bd|dl');
 						$regexMatch =
-							str_replace(array('\\',']','['), '',
+							str_replace(['\\',']','['], '',
 								str_replace('bd|dl)mux', 'bdmux|dlmux',
 									substr($dbRegex, $forBegin,
 										strrpos($dbRegex, ')') - $forBegin
@@ -767,7 +767,7 @@ class ReleaseRemover
 						$regexMatch = str_replace('\'', '', $dbRegex);
 					}
 
-					$ftMatch = (NN_RELEASE_SEARCH_TYPE == \ReleaseSearch::SPHINX
+					$ftMatch = (NN_RELEASE_SEARCH_TYPE == ReleaseSearch::SPHINX
 						? sprintf('rse.query = "@(name,searchname) %s;limit=10000;maxmatches=10000;mode=any" AND', str_replace('|', ' ', str_replace('"', '', $regexMatch)))
 						: sprintf("(MATCH (rs.name) AGAINST ('%1\$s') OR MATCH (rs.searchname) AGAINST ('%1\$s')) AND", str_replace('|', ' ', $regexMatch))
 					);
@@ -950,6 +950,7 @@ class ReleaseRemover
 		$frenchv = '%Lisez moi si le film ne demarre pas.txt%';
 		$nl = '%lees me als de film niet spelen.txt%';
 		$german = '%Lesen Sie mir wenn der Film nicht abgespielt.txt%';
+		$german2 = '%Lesen Sie mir, wenn der Film nicht starten.txt%';
 		$categories = sprintf("r.categoryid IN (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) AND",
 			Category::CAT_MOVIE_3D,
 			Category::CAT_MOVIE_BLURAY,
@@ -965,7 +966,7 @@ class ReleaseRemover
 		);
 		$codeclike = sprintf("UNION SELECT r.guid, r.searchname, r.id FROM releases r
 			LEFT JOIN releasefiles rf ON r.id = rf.releaseid
-			WHERE %s rf.name LIKE '%s' OR rf.name LIKE '%s' OR rf.name LIKE '%s' OR rf.name LIKE '%s' OR rf.name LIKE '%s' OR rf.name LIKE '%s' OR rf.name LIKE '%s'", $categories, $codec, $codec2, $iferror, $ifnotplaying, $frenchv, $nl, $german
+			WHERE %s rf.name LIKE '%s' OR rf.name LIKE '%s' OR rf.name LIKE '%s' OR rf.name LIKE '%s' OR rf.name LIKE '%s' OR rf.name LIKE '%s' OR rf.name LIKE '%s' OR rf.name LIKE '%s'", $categories, $codec, $codec2, $iferror, $ifnotplaying, $frenchv, $nl, $german, $german2
 		);
 		$this->query = sprintf(
 			"SELECT r.guid, r.searchname, r.id FROM releases
