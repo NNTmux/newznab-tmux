@@ -10,7 +10,6 @@
 	</div>
 </div>
 
-<center>
 	<div class="btn-group">
 		<a class="btn btn-sm btn-default" title="View available TV series" href="{$smarty.const.WWW_TOP}/series">View
 			all series</a>
@@ -20,53 +19,54 @@
 		   href="{$smarty.const.WWW_TOP}/rss?t=-3&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">RSS Feed for
 			My Shows <i class="fa fa-rss"></i></a>
 	</div>
-</center>
-<br>
+<hr>
 
 {if $shows|@count > 0}
-<div class="row">
-	<div class="col-lg-12 portlets">
-		<div class="panel">
-			<div class="panel-content pagination2">
-				<table class="table table-striped table-condensed">
-					<tr>
-						<th>Name</th>
-						<th width="80">Category</th>
-						<th width="110">Added</th>
-						<th width="130" class="mid">Options</th>
-					</tr>
+	<div class="box-body">
+		<div class="row">
+			<div class="col-lg-12 portlets">
+				<div class="panel">
+					<div class="panel-content pagination2">
+						<table class="data table table-striped table-condensed table-responsive table-hover">
+							<tr>
+								<th>Name</th>
+								<th width="80">Category</th>
+								<th width="110">Added</th>
+								<th width="130" class="mid">Options</th>
+							</tr>
 
-					{foreach from=$shows item=show}
-						<tr>
-							<td>
-								<a title="View details"
-								   href="{$smarty.const.WWW_TOP}/series/{$show.rageid}{if $show.categoryid != ''}?t={$show.categoryid|replace:"|":","}{/if}">{$show.releasetitle|escape:"htmlall"|wordwrap:75:"\n":true}</a>
-							</td>
-							<td>
-								<span class="label label-default">{if $show.categoryNames != ''}{$show.categoryNames|escape:"htmlall"}{else}All{/if}</span>
-							</td>
-							<td title="Added on {$show.createddate}">{$show.createddate|date_format}</td>
-							<td>
-								<div class="btn-group">
-									<a class="btn btn-xs btn-warning"
-									   href="{$smarty.const.WWW_TOP}/myshows/edit/{$show.rageid}" class="myshows"
-									   rel="edit" name="series{$show.rageid}" title="Edit Categories">Edit</a>
-									<a class="btn btn-xs btn-danger confirm_action"
-									   href="{$smarty.const.WWW_TOP}/myshows/delete/{$show.rageid}" class="myshows"
-									   rel="remove" name="series{$show.rageid}" title="Remove from My Shows">Remove</a>
-								</div>
-							</td>
-						</tr>
-					{/foreach}
+							{foreach from=$shows item=show}
+								<tr>
+									<td>
+										<a title="View details"
+										   href="{$smarty.const.WWW_TOP}/series/{$show.rageid}{if $show.categoryid != ''}?t={$show.categoryid|replace:"|":","}{/if}">{$show.releasetitle|escape:"htmlall"|wordwrap:75:"\n":true}</a>
+									</td>
+									<td>
+										<span class="label label-default">{if $show.categoryNames != ''}{$show.categoryNames|escape:"htmlall"}{else}All{/if}</span>
+									</td>
+									<td title="Added on {$show.createddate}">{$show.createddate|date_format}</td>
+									<td>
+										<div class="btn-group">
+											<a class="btn btn-xs btn-warning myshows"
+											   href="{$smarty.const.WWW_TOP}/myshows/edit/{$show.rageid}"
+											   rel="edit" name="series{$show.rageid}" title="Edit Categories">Edit</a>
+											<a class="btn btn-xs btn-danger confirm_action myshows"
+											   href="{$smarty.const.WWW_TOP}/myshows/delete/{$show.rageid}"
+											   rel="remove" name="series{$show.rageid}"
+											   title="Remove from My Shows">Remove</a>
+										</div>
+									</td>
+								</tr>
+							{/foreach}
 
-				</table>
-
-				{else}
-				<div class="alert alert-danger">
-					<strong>Sorry!</strong> No shows bookmarked yet!
+						</table>
+					</div>
 				</div>
-				{/if}
 			</div>
 		</div>
 	</div>
-</div>
+{else}
+	<div class="alert alert-danger">
+		<strong>Sorry!</strong> No shows bookmarked yet!
+	</div>
+{/if}
