@@ -238,7 +238,7 @@
 													<tbody>
 													<tr valign="top">
 														<td>
-															<table class="table table-condensed table-striped responsive">
+															<table class="data table table-condensed table-striped table-responsive table-hover">
 																<tbody>
 																{if $movie && $release.rageid < 0}
 																	<tr>
@@ -572,7 +572,7 @@
 									</div>
 									<div id="pane5" class="tab-pane">
 										{if $comments|@count > 0}
-											<table class="table table-striped">
+											<table class="tdata table table-condensed table-striped table-responsive table-hover">
 												<tr>
 													<th width="100">User</th>
 													<th>Comment</th>
@@ -626,7 +626,7 @@
 									{if $reVideo.releaseid|@count > 0 || $reAudio|@count > 0}
 										<div id="pane8" class="tab-pane">
 											<table style="width:100%;"
-												   class="table table-striped table-responsive table-hover">
+												   class="data table table-condensed table-striped table-responsive table-hover">
 												<tr>
 													<th width="15%"></th>
 													<th>Property</th>

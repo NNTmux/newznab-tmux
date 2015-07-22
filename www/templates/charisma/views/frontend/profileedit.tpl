@@ -19,7 +19,7 @@
 								<div class="alert alert-danger">{$error}</div>
 							{/if}
 							<ul class="nav nav-tabs nav-primary">
-								<li class="active"><a href="#tab2_1" data-toggle="tab"><i class="fa fa-cogs"></i>
+								<li class="active"><a href="#tab2_1" data-toggle="tab"><i class="fa fa-cogs fa-spin"></i>
 										Settings</a></li>
 								<li><a href="#tab2_3" data-toggle="tab"><i class="fa fa-download"></i> Downloaders</a>
 								</li>
@@ -31,7 +31,7 @@
 											<tbody>
 											<tr valign="top">
 												<td>
-													<table class="table table-condensed table-striped responsive">
+													<table class="data table table-condensed table-striped table-responsive table-hover">
 														<tbody>
 														<tr class="bg-primary">
 															<td colspan="2" style="padding-left: 8px;">
@@ -70,7 +70,7 @@
 														</tr>
 														</tbody>
 													</table>
-													<table class="table table-condensed table-striped responsive">
+													<table class="data table table-condensed table-striped table-responsive table-hover">
 														<tbody>
 														<tr class="bg-primary">
 															<td colspan="2" style="padding-left: 8px;"><strong>Excluded
@@ -84,7 +84,7 @@
 														</tr>
 														</tbody>
 													</table>
-													<table class="table table-condensed table-striped responsive">
+													<table class="data table table-condensed table-striped table-responsive table-hover">
 														<tbody>
 														<tr class="bg-primary">
 															<td colspan="2" style="padding-left: 8px;"><strong>UI
@@ -156,7 +156,7 @@
 													function.
 													<br/>
 													{if $page->settings->getSetting('sabintegrationtype') != 1}
-														<table class="table table-condensed table-striped responsive">
+														<table class="data table table-condensed table-striped table-responsive table-hover">
 															<tbody>
 															<tr class="bg-primary">
 																<td colspan="2" style="padding-left: 8px;"><strong>Queue
@@ -175,7 +175,7 @@
 														</table>
 													{/if}
 													{if $user.queuetype == 1 && $page->settings->getSetting('sabintegrationtype') == 2}
-														<table class="table table-condensed table-striped responsive">
+														<table class="data table table-condensed table-striped table-responsive table-hover">
 															<tbody>
 															<tr class="bg-primary">
 																<td colspan="2" style="padding-left: 8px;"><strong>SABnzbd</strong>
@@ -234,7 +234,7 @@
 														</table>
 													{/if}
 													{if $user.queuetype == 2 && ($page->settings->getSetting('sabintegrationtype') == 0 || $page->settings->getSetting('sabintegrationtype') == 2)}
-														<table class="table table-condensed table-striped responsive">
+														<table class="data table table-condensed table-striped table-responsive table-hover">
 															<tbody>
 															<tr class="bg-primary">
 																<td colspan="2" style="padding-left: 8px;"><strong>NZBget</strong>
@@ -269,7 +269,7 @@
 															</tbody>
 														</table>
 													{/if}
-													<table class="table table-condensed table-striped responsive">
+													<table class="data table table-condensed table-striped table-responsive table-hover">
 														<tbody>
 														<tr class="bg-primary">
 															<td colspan="2" style="padding-left: 8px;"><strong>NZB
@@ -300,9 +300,34 @@
 										</table>
 									</div>
 								</div>
-								<!-- Hidden CP and Style fields because it's crap and doesn't work (YET) -->
-								<input id="cp_api" class="long" name="cp_api" type="hidden" value="{$cp_api_selected}"/>
-								<input id="cp_url" class="long" name="cp_url" type="hidden" value="{$cp_url_selected}"/>
+								<table class="data table table-condensed table-striped table-responsive table-hover">
+									<tbody>
+									<tr class="bg-primary">
+										<td colspan="2" style="padding-left: 8px;"><strong>Couchpotato</strong>
+										</td>
+									</tr>
+									<tr>
+
+										<th width="200">API / URL</th>
+										<td>
+											<div class="form-inline">
+												<input id="cp_api"
+													   placeholder="Couchpotato API key"
+													   class="form-control"
+													   name="cp_api" type="text"
+													   value="{$cp_api_selected}"/>
+												/
+												<input id="cp_url"
+													   placeholder="Couchpotato URL"
+													   class="form-control"
+													   name="cp_url" type="text"
+													   value="{$cp_url_selected}"/>
+											</div>
+										</td>
+
+									</tr>
+									</tbody>
+								</table>
 								{if $page->settings->getSetting('userselstyle') == 1}
 									{html_options id="style" name='style' values=$themelist output=$themelist selected=$user.style}
 								{/if}
