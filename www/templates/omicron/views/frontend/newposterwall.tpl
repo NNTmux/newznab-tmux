@@ -67,13 +67,15 @@
 							</div>
 							<div class="rating-pod" id="guid{$result.guid}">
 								<div class="icons">
-									<div class="icon icon_nzb"><a class="divlink" title="Download Nzb"
-																			 href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}/{$result.searchname|escape:"htmlall"}"><i class="fa fa-arrow-circle-down"></i></a>
+									<div class="icon_nzb text-muted"><a class="divlink" title="Download Nzb"
+																		href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}/{$result.searchname|escape:"htmlall"}"><i class="fa fa-download"></i></a>
 									</div>
-									<div class="icon icon_cart fa fa-shopping-cart" title="Add to Cart">
+									<div class="icon_cart text-muted" title="Add to Cart">
+										<i class="fa fa-shopping-cart"></i>
 									</div>
 									{if isset($sabintegrated)}
-										<div class="icon icon_sab fa fa-send-o" title="Send to my Queue">
+										<div class="icon_sab text-muted" title="Send to my Queue">
+											<i class="fa fa-send-o"></i>
 										</div>
 									{/if}
 								</div>
@@ -81,10 +83,10 @@
 								<hr>
 								<div class="icons">
 									{if $type == 'Console'}
-										<div class="icon icon_ign">
+										<div class="icon_ign">
 											<a class="divlink" title="Find on IGN"
 											   href="{$site->dereferrer_link}http://ign.com/search?q={$result.searchname|escape:"url"}&page=0&count=10&type=object&objectType=game&filter=games&"
-											   target="_blank"></a>
+											   target="_blank"><i class="fa fa-gamepad"></i> </a>
 										</div>
 										<div class="icon icon_gamespot">
 											<a class="divlink" title="Find on Gamespot"
