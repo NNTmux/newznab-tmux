@@ -83,10 +83,10 @@
 								<hr>
 								<div class="icons">
 									{if $type == 'Console'}
-										<div class="icon icon_ign">
+										<div class="icon_ign">
 											<a class="divlink" title="Find on IGN"
 											   href="{$site->dereferrer_link}http://ign.com/search?q={$result.searchname|escape:"url"}&page=0&count=10&type=object&objectType=game&filter=games&"
-											   target="_blank"></a>
+											   target="_blank"><i class="fa fa-gamepad"></i> </a>
 										</div>
 										<div class="icon icon_gamespot">
 											<a class="divlink" title="Find on Gamespot"

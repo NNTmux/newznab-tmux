@@ -25,7 +25,8 @@
 	</script>
 	<meta charset="utf-8">
 	<title>{$page->meta_title}{if $page->meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
-
+	<!-- Newposterwall -->
+	<link href="{$smarty.const.WWW_TOP}/templates/charisma/styles/posterwall.css" rel="stylesheet" type="text/css" media="screen" />
 	<!-- The styles -->
 	<link id="bs-css" href="{$smarty.const.WWW_TOP}/templates/charisma/css/bootstrap-spacelab.min.css" rel="stylesheet">
 
@@ -45,8 +46,7 @@
 	<link href="{$smarty.const.WWW_TOP}/templates_shared/styles/normalize.css" rel="stylesheet" type="text/css">
 	<!-- The fav icon -->
 	<link rel="shortcut icon" href="{$smarty.const.WWW_TOP}/templates/charisma/img/favicon.ico">
-	<!-- Newposterwall -->
-	<link href="{$smarty.const.WWW_TOP}/templates/charisma/styles/posterwall.css" rel="stylesheet" type="text/css" media="screen" />
+
 
 </head>
 {if ($loggedin)=="true"}
