@@ -67,15 +67,13 @@
 							</div>
 							<div class="rating-pod" id="guid{$result.guid}">
 								<div class="icons">
-									<div class="icon_nzb text-muted"><a class="divlink" title="Download Nzb"
-																		href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}/{$result.searchname|escape:"htmlall"}"><i class="fa fa-download"></i></a>
+									<div class="icon icon_nzb"><a class="divlink" title="Download Nzb"
+																			 href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}/{$result.searchname|escape:"htmlall"}"><i class="fa fa-arrow-circle-down"></i></a>
 									</div>
-									<div class="icon_cart text-muted" title="Add to Cart">
-										<i class="fa fa-shopping-cart"></i>
+									<div class="icon icon_cart fa fa-shopping-cart" title="Add to Cart">
 									</div>
 									{if isset($sabintegrated)}
-										<div class="icon_sab text-muted" title="Send to my Queue">
-											<i class="fa fa-send-o"></i>
+										<div class="icon icon_sab fa fa-send-o" title="Send to my Queue">
 										</div>
 									{/if}
 								</div>

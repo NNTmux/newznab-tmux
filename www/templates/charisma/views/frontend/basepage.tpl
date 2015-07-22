@@ -43,9 +43,10 @@
 	<link href='{$smarty.const.WWW_TOP}/templates/charisma/css/animate.min.css' rel='stylesheet'>
 	<!-- Normalize.css -->
 	<link href="{$smarty.const.WWW_TOP}/templates_shared/styles/normalize.css" rel="stylesheet" type="text/css">
-
 	<!-- The fav icon -->
 	<link rel="shortcut icon" href="{$smarty.const.WWW_TOP}/templates/charisma/img/favicon.ico">
+	<!-- Newposterwall -->
+	<link href="{$smarty.const.WWW_TOP}/templates/charisma/styles/posterwall.css" rel="stylesheet" type="text/css" media="screen" />
 
 </head>
 {if ($loggedin)=="true"}
@@ -126,6 +127,8 @@
 							<li class="accordion">
 								<a href="#"><i class="fa fa-list-ol"></i><span> Browse</span></a>
 								<ul class="nav nav-pills nav-stacked">
+									<li><a href="{$serverroot}newposterwall"><i
+													class="fa fa-file-image-o"></i><span> New Releases</span></a></li>
 									<li><a href="{$serverroot}console"><i
 													class="fa fa-gamepad"></i><span> Console</span></a></li>
 									<li><a href="{$serverroot}movies"><i
