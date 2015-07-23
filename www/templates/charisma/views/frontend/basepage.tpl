@@ -61,7 +61,7 @@
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 			</button>
-			<a class="navbar-brand" href="{$serverroot}"> <img alt="newznab-tmux logo"
+			<a class="navbar-brand" href="{$site->home_link}"> <img alt="newznab-tmux logo"
 															   src="{$smarty.const.WWW_TOP}/templates/charisma/img/logo-tmux.png"
 						/></a>
 			{$header_menu}
@@ -122,7 +122,7 @@
 							<!-- /.search form -->
 							<li class="nav-header">Main</li>
 							{if ($loggedin)=="true"}
-							<li><a href="{$serverroot}"><i class="fa fa-home"></i><span> Home</span> <span
+							<li><a href="{$site->home_link}"><i class="fa fa-home"></i><span> Home</span> <span
 											class="fa arrow"></span></a></li>
 							<li class="accordion">
 								<a href="#"><i class="fa fa-list-ol"></i><span> Browse</span></a>
