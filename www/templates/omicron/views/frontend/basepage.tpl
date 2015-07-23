@@ -14,7 +14,7 @@
 	<title>{$page->meta_title}{if $page->meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
 	<meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
 	<!-- Newposterwall -->
-	<link href="{$smarty.const.WWW_TOP}/templates_shared/styles/posterwall.css" rel="stylesheet" type="text/css" media="screen" />
+	<link href="{$smarty.const.WWW_TOP}/templates/omicron/styles/posterwall.css" rel="stylesheet" type="text/css" media="screen" />
 	<!-- Bootstrap 3.3.4 -->
 	<link href="{$smarty.const.WWW_TOP}/templates/omicron/bootstrap/css/bootstrap.min.css" rel="stylesheet"
 		  type="text/css"/>
