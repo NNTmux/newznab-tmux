@@ -8,7 +8,7 @@ if (!$page->users->isLoggedIn())
 
 
 $moviecats = $cat->getChildren(Category::CAT_PARENT_MOVIE);
-$mtmp = array();
+$mtmp = [];
 foreach($moviecats as $mcat) {
 	$mtmp[$mcat['id']] = $mcat;
 }
@@ -23,7 +23,7 @@ $cpurl = $user['cp_url'];
 $page->smarty->assign('cpapi', $cpapi);
 $page->smarty->assign('cpurl', $cpurl);
 
-$catarray = array();
+$catarray = [];
 if ($category != -1) $catarray[] = $category;
 
 $page->smarty->assign('catlist', $mtmp);
@@ -35,7 +35,7 @@ $offset = (isset($_REQUEST["offset"]) && ctype_digit($_REQUEST['offset'])) ? $_R
 $ordering = $movie->getMovieOrdering();
 $orderby = isset($_REQUEST["ob"]) && in_array($_REQUEST['ob'], $ordering) ? $_REQUEST["ob"] : '';
 
-$results = $movies = array();
+$results = $movies = [];
 $results = $movie->getMovieRange($catarray, $offset, ITEMS_PER_COVER_PAGE, $orderby, -1, $page->userdata["categoryexclusions"]);
 foreach($results as $result) {
 	$result['genre'] = $movie->makeFieldLinks($result, 'genre');
@@ -104,7 +104,7 @@ $page->meta_keywords = "browse,nzb,description,details";
 $page->meta_description = "Browse for Nzbs";
 
 if (isset($_GET["imdb"]))
-	$page->content = $page->smarty->fetch('viewmoviefull.tpl');
+	$page->content = $page->smarty->fetch('viewmovie.tpl');
 else
 	$page->content = $page->smarty->fetch('movies.tpl');
 $page->render();

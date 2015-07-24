@@ -31,7 +31,7 @@
 											<tbody>
 											<tr valign="top">
 												<td>
-													<table class="table table-condensed table-striped responsive">
+													<table class="data table table-condensed table-striped table-responsive table-hover">
 														<tbody>
 														<tr class="bg-primary">
 															<td colspan="2" style="padding-left: 8px;">
@@ -70,7 +70,7 @@
 														</tr>
 														</tbody>
 													</table>
-													<table class="table table-condensed table-striped responsive">
+													<table class="data table table-condensed table-striped table-responsive table-hover">
 														<tbody>
 														<tr class="bg-primary">
 															<td colspan="2" style="padding-left: 8px;"><strong>Excluded
@@ -84,7 +84,7 @@
 														</tr>
 														</tbody>
 													</table>
-													<table class="table table-condensed table-striped responsive">
+													<table class="data table table-condensed table-striped table-responsive table-hover">
 														<tbody>
 														<tr class="bg-primary">
 															<td colspan="2" style="padding-left: 8px;"><strong>UI
@@ -156,7 +156,7 @@
 													function.
 													<br/>
 													{if $page->settings->getSetting('sabintegrationtype') != 1}
-														<table class="table table-condensed table-striped responsive">
+														<table class="data table table-condensed table-striped table-responsive table-hover">
 															<tbody>
 															<tr class="bg-primary">
 																<td colspan="2" style="padding-left: 8px;"><strong>Queue
@@ -175,7 +175,7 @@
 														</table>
 													{/if}
 													{if $user.queuetype == 1 && $page->settings->getSetting('sabintegrationtype') == 2}
-														<table class="table table-condensed table-striped responsive">
+														<table class="data table table-condensed table-striped table-responsive table-hover">
 															<tbody>
 															<tr class="bg-primary">
 																<td colspan="2" style="padding-left: 8px;"><strong>SABnzbd</strong>
@@ -234,7 +234,7 @@
 														</table>
 													{/if}
 													{if $user.queuetype == 2 && ($page->settings->getSetting('sabintegrationtype') == 0 || $page->settings->getSetting('sabintegrationtype') == 2)}
-														<table class="table table-condensed table-striped responsive">
+														<table class="data table table-condensed table-striped table-responsive table-hover">
 															<tbody>
 															<tr class="bg-primary">
 																<td colspan="2" style="padding-left: 8px;"><strong>NZBget</strong>
@@ -269,7 +269,7 @@
 															</tbody>
 														</table>
 													{/if}
-													<table class="table table-condensed table-striped responsive">
+													<table class="data table table-condensed table-striped table-responsive table-hover">
 														<tbody>
 														<tr class="bg-primary">
 															<td colspan="2" style="padding-left: 8px;"><strong>NZB
@@ -300,7 +300,7 @@
 										</table>
 									</div>
 								</div>
-								<table class="table table-condensed table-striped responsive">
+								<table class="data table table-condensed table-striped table-responsive table-hover">
 									<tbody>
 									<tr class="bg-primary">
 										<td colspan="2" style="padding-left: 8px;"><strong>Couchpotato</strong>

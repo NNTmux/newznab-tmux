@@ -1,7 +1,8 @@
 <?php
 
-if (!$page->users->isLoggedIn())
+if (!$page->users->isLoggedIn()) {
 	$page->show403();
+}
 
 if (isset($_GET['modal']) && isset($_GET["id"]) && ctype_digit($_GET["id"])) {
 	$movie = new Film(['Settings' => $page->settings]);

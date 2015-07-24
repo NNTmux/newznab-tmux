@@ -135,7 +135,7 @@
 											{foreach $seasons as $seasonnum => $season name=tv}
 												<div class="tab-pane{if $smarty.foreach.tv.first} active{/if} fade in"
 													 id="{$seasonnum}">
-													<table class="tb_{$seasonnum} data table table-condensed table-striped table-layout"
+													<table class="tb_{$seasonnum} data table table-condensed table-bordered table-responsive table-hover"
 														   id="browsetable">
 														<thead>
 														<tr>

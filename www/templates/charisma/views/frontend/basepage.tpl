@@ -25,7 +25,8 @@
 	</script>
 	<meta charset="utf-8">
 	<title>{$page->meta_title}{if $page->meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
-
+	<!-- Newposterwall -->
+	<link href="{$smarty.const.WWW_TOP}/templates/charisma/styles/posterwall.css" rel="stylesheet" type="text/css" media="screen" />
 	<!-- The styles -->
 	<link id="bs-css" href="{$smarty.const.WWW_TOP}/templates/charisma/css/bootstrap-spacelab.min.css" rel="stylesheet">
 
@@ -43,9 +44,9 @@
 	<link href='{$smarty.const.WWW_TOP}/templates/charisma/css/animate.min.css' rel='stylesheet'>
 	<!-- Normalize.css -->
 	<link href="{$smarty.const.WWW_TOP}/templates_shared/styles/normalize.css" rel="stylesheet" type="text/css">
-
 	<!-- The fav icon -->
 	<link rel="shortcut icon" href="{$smarty.const.WWW_TOP}/templates/charisma/img/favicon.ico">
+
 
 </head>
 {if ($loggedin)=="true"}
@@ -60,7 +61,7 @@
 				<span class="icon-bar"></span>
 				<span class="icon-bar"></span>
 			</button>
-			<a class="navbar-brand" href="{$serverroot}"> <img alt="newznab-tmux logo"
+			<a class="navbar-brand" href="{$site->home_link}"> <img alt="newznab-tmux logo"
 															   src="{$smarty.const.WWW_TOP}/templates/charisma/img/logo-tmux.png"
 						/></a>
 			{$header_menu}
@@ -121,11 +122,13 @@
 							<!-- /.search form -->
 							<li class="nav-header">Main</li>
 							{if ($loggedin)=="true"}
-							<li><a href="{$serverroot}"><i class="fa fa-home"></i><span> Home</span> <span
+							<li><a href="{$site->home_link}"><i class="fa fa-home"></i><span> Home</span> <span
 											class="fa arrow"></span></a></li>
 							<li class="accordion">
 								<a href="#"><i class="fa fa-list-ol"></i><span> Browse</span></a>
 								<ul class="nav nav-pills nav-stacked">
+									<li><a href="{$serverroot}newposterwall"><i
+													class="fa fa-file-image-o"></i><span> New Releases</span></a></li>
 									<li><a href="{$serverroot}console"><i
 													class="fa fa-gamepad"></i><span> Console</span></a></li>
 									<li><a href="{$serverroot}movies"><i
