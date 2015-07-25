@@ -8,7 +8,7 @@ use newznab\db\Settings;
 use newznab\utility\Utility;
 
 $config = dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'bin' . DIRECTORY_SEPARATOR .
-		  'config.php';
+	'config.php';
 
 
 if (!is_file($config)) {
@@ -19,13 +19,13 @@ unset($config);
 
 if (!Utility::isWin()) {
 	$fullPath = DS;
-	$paths    = preg_split('#/#', NN_RES);
+	$paths = preg_split('#/#', NN_RES);
 	foreach ($paths as $path) {
 		if ($path !== '') {
 			$fullPath .= $path . DS;
 			if (!is_readable($fullPath) || !is_executable($fullPath)) {
 				exit('The (' . $fullPath . ') folder must be readable and executable by all.' .
-					 PHP_EOL);
+					PHP_EOL);
 			}
 		}
 	}
@@ -43,19 +43,19 @@ if (!isset($argv[1]) || !is_numeric($argv[1]) && $argv[1] != 'progress' || !isse
 	!in_array($argv[3], ['true', 'false'])
 ) {
 	exit('This script quickly imports the daily PreDB dumps.' . PHP_EOL .
-		 'Argument 1: Enter the unix time of the patch to start at.' . PHP_EOL .
-		 'You can find the unix time in the file name of the patch, it\'s the long number.' .
-		 PHP_EOL .
-		 'You can put in 0 to import all the daily PreDB dumps.' . PHP_EOL .
-		 'You can put in progress to track progress of the imports and only import newer ones.' .
-		 PHP_EOL .
-		 'Argument 2: If your MySQL server is local, type local else type remote.' . PHP_EOL .
-		 'Argument 3: Show output of dump_predb.php or not, true | false' . PHP_EOL
+		'Argument 1: Enter the unix time of the patch to start at.' . PHP_EOL .
+		'You can find the unix time in the file name of the patch, it\'s the long number.' .
+		PHP_EOL .
+		'You can put in 0 to import all the daily PreDB dumps.' . PHP_EOL .
+		'You can put in progress to track progress of the imports and only import newer ones.' .
+		PHP_EOL .
+		'Argument 2: If your MySQL server is local, type local else type remote.' . PHP_EOL .
+		'Argument 3: Show output of dump_predb.php or not, true | false' . PHP_EOL
 	);
 }
-$fileName         = '_predb_dump.csv.gz';
-$innerUrl         = 'fb2pffwwriruyco';
-$baseUrl          = 'https://www.dropbox.com/sh/' . $innerUrl;
+$fileName = '_predb_dump.csv.gz';
+$innerUrl = 'fb2pffwwriruyco';
+$baseUrl = 'https://www.dropbox.com/sh/' . $innerUrl;
 $folderUrl['url'] = $baseUrl . '/AACy9Egno_v2kcziVHuvWbbxa';
 
 $result = Utility::getUrl($folderUrl);
@@ -64,15 +64,16 @@ if (!$result) {
 	exit('Error connecting to dropbox.com, try again later?' . PHP_EOL);
 }
 
-$result = preg_match_all('/<a href="https:\/\/www.dropbox.com\/sh\/' . $innerUrl . '\/(\S+\/\d+' .
-						 $fileName . '\?dl=0)"/',
-						 $result,
-						 $all_matches);
+$result = preg_match_all('#<a [\w"=-]+ href="https://www.dropbox.com/sh/' . $innerUrl . '/(\S+/\d+' . $fileName .
+	'\?dl=0)"#',
+	$result,
+	$all_matches
+);
 if ($result) {
 	exec('clear');
 	$all_matches = array_unique($all_matches[1]);
-	$total       = count($all_matches);
-	$pdo         = new Settings();
+	$total = count($all_matches);
+	$pdo = new Settings();
 
 	if ($argv[1] != 'progress') {
 		$progress['last'] = !is_numeric($argv[1]) ? time() : $argv[1];
@@ -98,18 +99,18 @@ if ($result) {
 			// Skip patches the user does not want.
 			if ($match[2] < $timematch) {
 				echo 'Skipping dump ' . $match[2] . ', as your minimum unix time argument is ' .
-					 $timematch . PHP_EOL;
+					$timematch . PHP_EOL;
 				--$total;
 				continue;
 			}
 
 			// Download the dump.
 			$file['url'] = $baseUrl . '/' . $match[1] . '/' . $match[2] . $fileName . '?dl=1';
-			$dump        = Utility::getUrl($file);
+			$dump = Utility::getUrl($file);
 
 			if (!$dump) {
 				echo 'Error downloading dump ' . $match[2] . ' you can try manually importing it.' .
-					 PHP_EOL;
+					PHP_EOL;
 				continue;
 			}
 
@@ -129,7 +130,7 @@ if ($result) {
 
 			// Store the dump.
 			$dumpFile = NN_RES . $match[2] . '_predb_dump.csv';
-			$fetched  = file_put_contents($dumpFile, $dump);
+			$fetched = file_put_contents($dumpFile, $dump);
 			if (!$fetched) {
 				echo 'Error storing dump file ' . $match[2] . ' in (' . NN_RES . ').' . PHP_EOL;
 				continue;
@@ -137,7 +138,7 @@ if ($result) {
 
 			// Make sure it's readable by all.
 			chmod($dumpFile, 0777);
-			$local   = strtolower($argv[2]) == 'local' ? true : false;
+			$local = strtolower($argv[2]) == 'local' ? true : false;
 			$verbose = $argv[3] == true ? true : false;
 			importDump($dumpFile, $local, $verbose);
 
@@ -146,7 +147,7 @@ if ($result) {
 
 			$progress = rw_progress(settings_array($match[2] + 1, $progress), false);
 			echo 'Successfully imported PreDB dump ' . $match[2] . ' ' . (--$total) .
-				 ' dumps remaining to import.' . PHP_EOL;
+				' dumps remaining to import.' . PHP_EOL;
 		}
 	}
 
@@ -173,7 +174,10 @@ function rw_progress($settings, $read = true)
 		file_put_contents(__DIR__ . DS . 'prehash_progress.txt', base64_encode(serialize($settings)));
 	} else {
 		$settings = unserialize(base64_decode(file_get_contents(__DIR__ . DS .
-																'prehash_progress.txt')));
+			'prehash_progress.txt'
+		)
+		)
+		);
 	}
 
 	return $settings;
