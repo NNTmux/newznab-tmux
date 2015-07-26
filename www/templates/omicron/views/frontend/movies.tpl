@@ -142,6 +142,10 @@
 																		class="fa fa-comment-o"></i><span
 																		class="badge"> {$mcomments[$m@index]}
 																	Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
+															<span class="btn btn-hover btn-default btn-xs icon_cart text-muted" title="Add to Cart"><i class="glyphicon glyphicon-shopping-cart"></i></span>
+															{if isset($sabintegrated)}
+																<span class="btn btn-hover btn-default btn-xs icon_sab text-muted" title="Send to my Queue"><i class="glyphicon glyphicon-send"></i></span>
+															{/if}
 														</div>
 														{/if}
 														{/foreach}
@@ -230,6 +234,10 @@
 																		class="fa fa-comment-o"></i><span
 																		class="badge"> {$mcomments[$m@index]}
 																	Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
+															<span class="btn btn-hover btn-default btn-xs icon_cart text-muted" title="Add to Cart"><i class="glyphicon glyphicon-shopping-cart"></i></span>
+															{if isset($sabintegrated)}
+																<span class="btn btn-hover btn-default btn-xs icon_sab text-muted" title="Send to my Queue"><i class="glyphicon glyphicon-send"></i></span>
+															{/if}
 														</div>
 														{/if}
 														{/foreach}
