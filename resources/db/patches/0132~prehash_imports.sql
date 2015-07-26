@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS tmp_pre;
-DROP TABLE IF EXISTS pre????_imports;
-CREATE TABLE pre????_imports (
+DROP TABLE IF EXISTS prehash_imports;
+CREATE TABLE prehash_imports (
   title      VARCHAR(255)
              COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   nfo        VARCHAR(255)
