@@ -121,12 +121,14 @@
 													(<a class="title" title="{$result.year}"
 														href="{$smarty.const.WWW_TOP}/games?year={$result.year}">{$result.year}</a>)
 												</h4>
-												<table>
+												<table class="data table table-responsive">
 													<tr>
-														<td>
-															<input type="checkbox"
-																   class="nzb_check"
-																   value="{$mguid[$m@index]}" id="chksingle"/>
+														<td id="guid{$mguid[$m@index]}">
+															<label>
+																<input type="checkbox"
+																	   class="nzb_check"
+																	   value="{$mguid[$m@index]}" id="chksingle"/>
+															</label>
 															<span class="label label-default">{$msize[$m@index]|fsize_format:"MB"}</span>
 																	<span class="label label-default">Posted {$mpostdate[$m@index]|timeago}
 																		ago</span>
@@ -171,6 +173,14 @@
 																			class="fa fa-comment-o"></i><span
 																			class="badge">{$mcomments[$m@index]}
 																		Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
+																<span class="btn btn-hover btn-default btn-xs icon icon_cart text-muted"
+																	  title="Add to Cart"><i
+																			class="fa fa-shopping-cart"></i></span>
+																{if isset($sabintegrated)}
+																	<span class="btn btn-hover btn-default btn-xs icon icon_sab text-muted"
+																		  title="Send to my Queue"><i
+																				class="fa fa-send"></i></span>
+																{/if}
 															</div>
 														</td>
 													</tr>
