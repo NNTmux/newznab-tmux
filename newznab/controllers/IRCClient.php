@@ -116,7 +116,7 @@ class IRCClient
 	 * @var array
 	 * @access protected
 	 */
-	protected $_channelData = array();
+	protected $_channelData = [];
 
 	/**
 	 * Nick name when we log in.
@@ -478,7 +478,7 @@ class IRCClient
 	 *
 	 * @access public
 	 */
-	public function joinChannels($channels = array())
+	public function joinChannels($channels = [])
 	{
 		$this->_channels = $channels;
 

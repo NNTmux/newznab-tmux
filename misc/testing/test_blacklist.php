@@ -211,7 +211,7 @@ $total=0;
 $offset=0;
 
 # Dictionary
-$pspelldict=array();
+$pspelldict=[];
 
 # Completion Refernece Time in past
 $completionRef = strtotime("-$completionSec seconds");
@@ -246,7 +246,7 @@ while($res=get_block($offset, $batch)){
 		// if a white list is detected we now are required to
 		// only accept the entry if it matches at least 1 whitelist
 		// while a blacklist will over-ride all
-		$whitelist = array();
+		$whitelist = [];
 		$matches_whitelist = false;
 
 		foreach ($blacklist as $bl)
@@ -343,7 +343,7 @@ while($res=get_block($offset, $batch)){
 					}
 					# ensure whitelist flags are off to avoid extra processing
 					# at the end of this loop (Below)
-					$whitelist = array();
+					$whitelist = [];
 					break;
 				}
 
@@ -369,7 +369,7 @@ while($res=get_block($offset, $batch)){
 							}
 							# ensure whitelist flags are off to avoid extra processing
 							# at the end of this loop (Below)
-							$whitelist = array();
+							$whitelist = [];
 							break;
 						}
 					}
@@ -390,7 +390,7 @@ while($res=get_block($offset, $batch)){
 						}
 						# ensure whitelist flags are off to avoid extra processing
 						# at the end of this loop (Below)
-						$whitelist = array();
+						$whitelist = [];
 						break;
 					}
 				}
@@ -435,7 +435,7 @@ while($res=get_block($offset, $batch)){
 						}
 						# ensure whitelist flags are off to avoid extra processing
 						# at the end of this loop (Below)
-						$whitelist = array();
+						$whitelist = [];
 						break;
 					}
 				}

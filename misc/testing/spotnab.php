@@ -435,7 +435,7 @@ if(array_key_exists("t", $options) ||
 				'title' => 'l2g newznab'
 			),
 			'postdate_utc' => $spotnab->local2utc(),
-			'comments' => array()
+			'comments' => []
 		);
 		for($i=0;$i<3000;$i++){
 			// Build large post

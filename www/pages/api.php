@@ -224,7 +224,7 @@ switch ($function) {
 		if ($data)
 			$reldata = $data;
 		else
-			$reldata = array();
+			$reldata = [];
 
 		$page->smarty->assign('comments',$reldata);
 		$page->smarty->assign('rsstitle',"API Comments");
@@ -306,7 +306,7 @@ switch ($function) {
 	case "mu":
 		if (isset($_GET["artist"]) && $_GET["artist"]=="" && isset($_GET["album"]) && $_GET["album"]=="")
 			showApiError(200);
-		$categoryId = array();
+		$categoryId = [];
 		if (isset($_GET["cat"]))
 			$categoryId = explode(",",$_GET["cat"]);
 		else
@@ -323,7 +323,7 @@ switch ($function) {
 				$maxage = $_GET["maxage"];
 		}
 
-		$genreId = array();
+		$genreId = [];
 		if (isset($_GET["genre"]))
 			$genreId = explode(",",$_GET["genre"]);
 		else
@@ -560,7 +560,7 @@ function maxAge()
  */
 function categoryid()
 {
-	$categoryID = array();
+	$categoryID = [];
 	$categoryID[] = -1;
 	if (isset($_GET['cat'])) {
 		$categoryIDs = $_GET['cat'];

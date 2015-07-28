@@ -9,7 +9,7 @@ $cat = new Category(['Settings' => $page->settings]);
 $gen = new Genres(['Settings' => $page->settings]);
 
 $concats = $cat->getChildren(Category::CAT_PARENT_GAME);
-$ctmp = array();
+$ctmp = [];
 foreach ($concats as $ccat) {
 	$ctmp[$ccat['id']] = $ccat;
 }
@@ -18,7 +18,7 @@ if (isset($_REQUEST["t"]) && array_key_exists($_REQUEST['t'], $ctmp)) {
 	$category = $_REQUEST["t"] + 0;
 }
 
-$catarray = array();
+$catarray = [];
 $catarray[] = $category;
 
 $page->smarty->assign('catlist', $ctmp);
@@ -30,7 +30,7 @@ $offset = (isset($_REQUEST["offset"]) && ctype_digit($_REQUEST['offset'])) ? $_R
 $ordering = $console->getConsoleOrdering();
 $orderby = isset($_REQUEST["ob"]) && in_array($_REQUEST['ob'], $ordering) ? $_REQUEST["ob"] : '';
 
-$results = $consoles = array();
+$results = $consoles = [];
 $results = $console->getConsoleRange($catarray, $offset, ITEMS_PER_COVER_PAGE, $orderby, $page->userdata["categoryexclusions"]);
 
 $maxwords = 50;
@@ -52,7 +52,7 @@ $title = (isset($_REQUEST['title']) && !empty($_REQUEST['title'])) ? stripslashe
 $page->smarty->assign('title', $title);
 
 $genres = $gen->getGenres(Genres::CONSOLE_TYPE, true);
-$tmpgnr = array();
+$tmpgnr = [];
 foreach ($genres as $gn) {
 	$tmpgnr[$gn['id']] = $gn['title'];
 }

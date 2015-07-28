@@ -119,7 +119,7 @@ class IRCScraper extends IRCClient
 		}
 
 		$this->_pdo = new Settings();
-		$this->_groupList = array();
+		$this->_groupList = [];
 		$this->_silent = $silent;
 		$this->_debug = $debug;
 		$this->_resetPreVariables();
@@ -441,7 +441,7 @@ class IRCScraper extends IRCClient
 	protected function _resetPreVariables()
 	{
 		$this->_nuked = false;
-		$this->_oldPre = array();
+		$this->_oldPre = [];
 		$this->_curPre =
 			array(
 				'title'    => '',

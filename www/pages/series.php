@@ -15,7 +15,7 @@ if (isset($_GET["id"]) && ctype_digit($_GET['id'])) {
 		$category = $_REQUEST["t"];
 	}
 
-	$catarray = array();
+	$catarray = [];
 	$catarray[] = $category;
 
 	$rel = $releases->searchbyRageId($_GET["id"], '', '', 0, 1000, "", $catarray, -1);
@@ -29,7 +29,7 @@ if (isset($_GET["id"]) && ctype_digit($_GET['id'])) {
 		$myshows = $us->getShow($page->users->currentUserId(), $rage[0]['rageid']);
 
 		// Sort releases by season, episode, date posted.
-		$season = $episode = $posted = array();
+		$season = $episode = $posted = [];
 		foreach ($rel as $rlk => $rlv) {
 			$season[$rlk] = $rlv['season'];
 			$episode[$rlk] = $rlv['episode'];
@@ -37,7 +37,7 @@ if (isset($_GET["id"]) && ctype_digit($_GET['id'])) {
 		}
 		array_multisort($season, SORT_DESC, $episode, SORT_DESC, $posted, SORT_DESC, $rel);
 
-		$seasons = array();
+		$seasons = [];
 		foreach ($rel as $r) {
 			$seasons[$r['season']][$r['episode']][] = $r;
 		}
@@ -47,7 +47,7 @@ if (isset($_GET["id"]) && ctype_digit($_GET['id'])) {
 		$page->smarty->assign('myshows', $myshows);
 
 		//get series name(s), description, country and genre
-		$seriesnames = $seriesdescription = $seriescountry = $seriesgenre = array();
+		$seriesnames = $seriesdescription = $seriescountry = $seriesgenre = [];
 		foreach ($rage as $r) {
 			$seriesnames[] = $r['releasetitle'];
 			if (!empty($r['description'])) {
@@ -101,7 +101,7 @@ if (isset($_GET["id"]) && ctype_digit($_GET['id'])) {
 	$page->meta_keywords = "view,series,tv,show,description,details";
 	$page->meta_description = "View Series List";
 
-	$serieslist = array();
+	$serieslist = [];
 	foreach ($masterserieslist as $s) {
 		if (preg_match('/^[0-9]/', $s['releasetitle'])) {
 			$thisrange = '0-9';

@@ -47,9 +47,9 @@ class Snoopy
 	var $proxy_port		=	"";					// proxy port to use
 	var $agent			=	"Snoopy v1.0";		// agent we masquerade as
 	var	$referer		=	"";					// referer info to pass
-	var $cookies		=	array();			// array of cookies to pass
+	var $cookies		=	[];			// array of cookies to pass
 												// $cookies["username"]="joe";
-	var	$rawheaders		=	array();			// array of raw headers to send
+	var	$rawheaders		=	[];			// array of raw headers to send
 												// $rawheaders["Content-type"]="text/html";
 
 	var $maxredirs		=	5;					// http redirection depth maximum. 0 = disallow
@@ -73,7 +73,7 @@ class Snoopy
 
 	var $error			=	"";					// error messages sent here
 	var	$response_code	=	"";					// response code returned from server
-	var	$headers		=	array();			// headers returned from server sent here
+	var	$headers		=	[];			// headers returned from server sent here
 	var	$maxlength		=	500000;				// max return data length (body)
 	var $read_timeout	=	0;					// timeout on read operations, in seconds
 												// supported only since PHP 4 Beta 4
@@ -107,7 +107,7 @@ class Snoopy
 	var $_mime_boundary	=   "";					// MIME boundary for multipart/form-data submit type
 	var $_redirectaddr	=	false;				// will be set if page fetched is a redirect
 	var $_redirectdepth	=	0;					// increments on an http redirect
-	var $_frameurls		= 	array();			// frame src urls
+	var $_frameurls		= 	[];			// frame src urls
 	var $_framedepth	=	0;					// increments on frame depth
 
 	var $_isproxy		=	false;				// set if using a proxy server
@@ -173,7 +173,7 @@ class Snoopy
 					if($this->_framedepth < $this->maxframes && count($this->_frameurls) > 0)
 					{
 						$frameurls = $this->_frameurls;
-						$this->_frameurls = array();
+						$this->_frameurls = [];
 
 						while(list(,$frameurl) = each($frameurls))
 						{
@@ -232,7 +232,7 @@ class Snoopy
 				if($this->_framedepth < $this->maxframes && count($this->_frameurls) > 0)
 				{
 					$frameurls = $this->_frameurls;
-					$this->_frameurls = array();
+					$this->_frameurls = [];
 
 					while(list(,$frameurl) = each($frameurls))
 					{
@@ -592,7 +592,7 @@ class Snoopy
 		if($this->passcookies && $this->_redirectaddr)
 			$this->setcookies();
 
-		$headers = array();
+		$headers = [];
 
 		$URI_PARTS = parse_url($URI);
 		if(empty($url))

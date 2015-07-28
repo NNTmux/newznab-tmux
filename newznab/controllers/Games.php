@@ -90,7 +90,7 @@ class Games
 	/**
 	 * @param array $options Class instances / Echo to cli.
 	 */
-	public function __construct(array $options = array())
+	public function __construct(array $options = [])
 	{
 		$defaults = [
 			'Echo'     => false,
@@ -158,7 +158,7 @@ class Games
 		return ($res === false ? 0 : $res["num"]);
 	}
 
-	public function getGamesCount($cat, $maxage = -1, $excludedcats = array())
+	public function getGamesCount($cat, $maxage = -1, $excludedcats = [])
 	{
 		$catsrch = '';
 		if (count($cat) > 0 && $cat[0] != -1) {
@@ -186,7 +186,7 @@ class Games
 		return ($res === false ? 0 : $res["num"]);
 	}
 
-	public function getGamesRange($cat, $start, $num, $orderby, $maxage = -1, $excludedcats = array())
+	public function getGamesRange($cat, $start, $num, $orderby, $maxage = -1, $excludedcats = [])
 	{
 		$browseby = $this->getBrowseBy();
 
@@ -318,7 +318,7 @@ class Games
 	public function makeFieldLinks($data, $field)
 	{
 		$tmpArr = explode(', ', $data[$field]);
-		$newArr = array();
+		$newArr = [];
 		$i = 0;
 		foreach ($tmpArr as $ta) {
 			if (trim($ta) == '') {
@@ -386,7 +386,7 @@ class Games
 		$gen = new \Genres(['Settings' => $this->pdo]);
 		$ri = new \ReleaseImage($this->pdo);
 
-		$con = array();
+		$con = [];
 
 		// Process Steam first before giantbomb
 		// Steam has more details
@@ -592,7 +592,7 @@ class Games
 		}
 		// Load genres.
 		$defaultGenres = $gen->getGenres(\Genres::GAME_TYPE);
-		$genreassoc = array();
+		$genreassoc = [];
 		foreach ($defaultGenres as $dg) {
 			$genreassoc[$dg['id']] = strtolower($dg['title']);
 		}
@@ -758,7 +758,7 @@ class Games
 							$result = $result['results'][$i];
 							preg_match('/\/\d+\-(?<asin>\d+)\//', $result['api_detail_url'], $matches);
 							$this->_gameID = (string)$matches['asin'];
-							$result = $this->fetchGiantBombArray();
+							$result = $this->fetchGiantBomb[];
 							$this->_classUsed = "gb";
 							break;
 						}
@@ -783,7 +783,7 @@ class Games
 	 *
 	 * @return bool|mixed
 	 */
-	public function fetchGiantBombArray()
+	public function fetchGiantBomb[]
 	{
 		$obj = new \GiantBomb($this->publicKey);
 		try {
@@ -900,7 +900,7 @@ class Games
 			preg_replace('/\sMulti\d?\s/i', '', $releasename), $matches)) {
 
 			// Replace dots, underscores, colons, or brackets with spaces.
-			$result = array();
+			$result = [];
 			$result['title'] = str_replace(' RF ', ' ', preg_replace('/(\-|\:|\.|_|\%20|\[|\])/', ' ', $matches['title']));
 			// Replace any foreign words at the end of the release
 			$result['title'] = preg_replace('/(brazilian|chinese|croatian|danish|deutsch|dutch|english|estonian|flemish|finnish|french|german|greek|hebrew|icelandic|italian|latin|nordic|norwegian|polish|portuguese|japenese|japanese|russian|serbian|slovenian|spanish|spanisch|swedish|thai|turkish)$/i', '', $result['title']);

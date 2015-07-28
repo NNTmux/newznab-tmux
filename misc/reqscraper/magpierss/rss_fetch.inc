@@ -122,7 +122,7 @@ function fetch_rss ($url) {
 
 
         $cache_status    = 0;       // response of check_cache
-        $request_headers = array(); // HTTP headers to send with fetch
+        $request_headers = []; // HTTP headers to send with fetch
         $rss             = 0;       // parsed RSS object
         $errormsg        = 0;       // errors, if any
 

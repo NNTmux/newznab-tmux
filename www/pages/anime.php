@@ -20,7 +20,7 @@ if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
 		$page->smarty->assign('nodata', 'No releases for this series.');
 	} else {
 		// Sort releases by season, episode, date posted.
-		$season = $episode = $posted = array();
+		$season = $episode = $posted = [];
 
 		foreach ($releases as $rlk => $rlv) {
 			$season[$rlk] = $rlv['season'];
@@ -30,7 +30,7 @@ if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
 
 		array_multisort($episode, SORT_DESC, $posted, SORT_DESC, $releases);
 
-		$seasons = array();
+		$seasons = [];
 		foreach ($releases as $r) {
 			$seasons[$r['season']][$r['episode']][] = $r;
 		}
@@ -38,7 +38,7 @@ if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
 		$page->smarty->assign('seasons', $seasons);
 		$page->smarty->assign('anidb', $anidb);
 
-		$animeEpisodeTitles = array();
+		$animeEpisodeTitles = [];
 		foreach ($releases as $r) {
 			$animeEpisodeTitles[$r['tvtitle']][] = $r;
 		}
@@ -82,7 +82,7 @@ if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
 	$page->meta_keywords = 'view,anime,series,description,details';
 	$page->meta_description = 'View Anime List';
 
-	$animelist = array();
+	$animelist = [];
 	if ($masterserieslist instanceof \Traversable) {
 		foreach ($masterserieslist as $s) {
 			if (preg_match('/^[0-9]/', $s['title'])) {

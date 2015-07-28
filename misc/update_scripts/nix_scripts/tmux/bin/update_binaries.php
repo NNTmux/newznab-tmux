@@ -22,14 +22,14 @@ if (isset($argv[1])) {
 
 function relativeTime($_time)
 {
-	$d = array();
+	$d = [];
 	$d[0] = array(1, "sec");
 	$d[1] = array(60, "min");
 	$d[2] = array(3600, "hr");
 	$d[3] = array(86400, "day");
 	$d[4] = array(31104000, "yr");
 
-	$w = array();
+	$w = [];
 
 	$return = "";
 	$now = TIME();

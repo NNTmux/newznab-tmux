@@ -15,7 +15,7 @@ $numarticlesdefault = 20000;
 $groupList = $groups->getAll();
 array_unshift($groupList, array('id'=>0, 'name'=>'All Groups'));
 
-$gid = $gnames = array();
+$gid = $gnames = [];
 $groupname = (isset($_REQUEST['groupname']) && !empty($_REQUEST['groupname'])) ? $_REQUEST['groupname'] : '';
 $groupID = isset($_REQUEST['groupid']) ? $_REQUEST['groupid'] : '0';
 $regex = (isset($_REQUEST['regex']) && !empty($_REQUEST['regex'])) ? $_REQUEST['regex'] : '/^(?P<name>.*)$/i';

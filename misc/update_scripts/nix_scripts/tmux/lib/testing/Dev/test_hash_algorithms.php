@@ -68,7 +68,7 @@ class HashAlgorithms
 
 		$firstArray = $this->_hashesToArray($this->_inputString);
 
-		$secondArray = array();
+		$secondArray = [];
 		foreach ($firstArray as $key => $value) {
 			if (!$this->_writeToFile) {
 				if (in_array($value, $this->_expectedString)) {
@@ -89,7 +89,7 @@ class HashAlgorithms
 			$secondArray[$key] = $this->_hashesToArray($value);
 		}
 
-		$thirdArray = array();
+		$thirdArray = [];
 		foreach ($secondArray as $key => $value) {
 			foreach ($value as $key2 => $value2) {
 				if (!$this->_writeToFile) {
@@ -171,7 +171,7 @@ class HashAlgorithms
 		);
 
 		$hashTypes = array('md5', 'md4', 'sha1', 'sha256', 'sha512');
-		$tmpArray = array();
+		$tmpArray = [];
 		foreach ($hashTypes as $hash) {
 			foreach ($strings as $key => $value) {
 				$tmpArray[$hash . '_' . $key] = hash($hash, $value, false);

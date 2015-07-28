@@ -415,7 +415,7 @@ class Parsing
 
 				//The Big One
 				if (preg_match_all('/([a-z0-9\ ]+)\.{1,}(\:|\[)(?P<name>.*)(\s{2}|\s{1})/i', $nfo, $matches) && $foundName == "") {
-					$lut = array();
+					$lut = [];
 					foreach ($matches[1] as $key => $k) {
 						$lut[str_replace(' ', '', strtolower(trim($k)))] = trim($matches[3][$key]);
 					}
@@ -1419,7 +1419,7 @@ class Parsing
 			}
 		}
 
-		$this->cleanup = array('nuke' => array(), 'misc' => array());
+		$this->cleanup = array('nuke' => [], 'misc' => []);
 	}
 
 	/**

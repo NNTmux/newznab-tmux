@@ -57,14 +57,14 @@ class Hotmovies
 	 *
 	 * @var array
 	 */
-	protected $_postParams = array();
+	protected $_postParams = [];
 
 	/**
 	 * Results return from some methods
 	 *
 	 * @var array
 	 */
-	protected $_res = array();
+	protected $_res = [];
 
 	/**
 	 * Raw Html from Curl
@@ -169,7 +169,7 @@ class Hotmovies
 	 */
 	public function getAll()
 	{
-		$results = array();
+		$results = [];
 		if (isset($this->_directUrl)) {
 			$results['title'] = $this->_title;
 			$results['directurl'] = $this->_directUrl;
@@ -291,7 +291,7 @@ class Hotmovies
 	 */
 	public function genres()
 	{
-		$genres = array();
+		$genres = [];
 		if ($ret = $this->_html->find('div.categories',0)) {
 			foreach ($ret->find('a') as $e) {
 				if (stristr($e->title, "->")) {

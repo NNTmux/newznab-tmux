@@ -78,7 +78,7 @@ class Console
 	/**
 	 * Get count of all consoleinfo rows for browse list.
 	 */
-	public function getConsoleCount($cat, $maxage=-1, $excludedcats=array())
+	public function getConsoleCount($cat, $maxage=-1, $excludedcats=[])
 	{
 
 		$browseby = $this->getBrowseBy();
@@ -128,7 +128,7 @@ class Console
 	/**
 	 * Get range of consoleinfo rows for browse list.
 	 */
-	public function getConsoleRange($cat, $start, $num, $orderby, $maxage=-1, $excludedcats=array())
+	public function getConsoleRange($cat, $start, $num, $orderby, $maxage=-1, $excludedcats=[])
 	{
 
 		$browseby = $this->getBrowseBy();
@@ -268,14 +268,14 @@ class Console
 		$gen = new Genres();
 		$ri = new ReleaseImage();
 
-		$con = array();
+		$con = [];
 		$amaz = $this->fetchAmazonProperties($gameInfo['title'], $gameInfo['node']);
 		if (!$amaz)
 			return false;
 
 		//load genres
 		$defaultGenres = $gen->getGenres(Genres::CONSOLE_TYPE);
-		$genreassoc = array();
+		$genreassoc = [];
 		foreach($defaultGenres as $dg) {
 			$genreassoc[$dg['id']] = strtolower($dg['title']);
 		}
@@ -571,7 +571,7 @@ class Console
 	 */
 	function parseTitle($releasename)
 	{
-		$result = array();
+		$result = [];
 
 		//get name of the game from name of release
 		preg_match('/^(?P<title>.*?)[\.\-_ ](v\.?\d\.\d|PAL|NTSC|EUR|USA|JP|ASIA|JAP|JPN|AUS|MULTI\.?5|MULTI\.?4|MULTI\.?3|PATCHED|FULLDVD|DVD5|DVD9|DVDRIP|PROPER|REPACK|RETAIL|DEMO|DISTRIBUTION|REGIONFREE|READ\.?NFO|NFOFIX|PS2|PS3|PSP|WII|X\-?BOX|XBLA|X360|NDS|N64|NGC)/i', $releasename, $matches);

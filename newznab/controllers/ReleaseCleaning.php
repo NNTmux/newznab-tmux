@@ -85,7 +85,7 @@ class ReleaseCleaning
 
 	public function releaseCleaner($subject, $fromName, $groupName, $usepre = false)
 	{
-		$match           = $matches = array();
+		$match           = $matches = [];
 		$this->groupName = $groupName;
 		$this->subject   = $subject;
 		$this->fromName  = $fromName;

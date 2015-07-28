@@ -307,7 +307,7 @@ class ProcessAdditional
 		$this->_unrarPath = false;
 
 		// Pass the binary extractors to ArchiveInfo.
-		$clients = array();
+		$clients = [];
 		if ($this->pdo->getSetting('unrarpath') != '') {
 			$clients += array(\ArchiveInfo::TYPE_RAR => $this->pdo->getSetting('unrarpath'));
 			$this->_unrarPath = $this->pdo->getSetting('unrarpath');
@@ -525,7 +525,7 @@ class ProcessAdditional
 		if (is_array($this->_releases)) {
 			$this->_totalReleases = count($this->_releases);
 		} else {
-			$this->_releases = array();
+			$this->_releases = [];
 			$this->_totalReleases = 0;
 		}
 	}
@@ -638,7 +638,7 @@ class ProcessAdditional
 	 * @void
 	 * @access protected
 	 */
-	protected function _recursivePathDelete($path, $ignoredFolders = array())
+	protected function _recursivePathDelete($path, $ignoredFolders = [])
 	{
 		if (is_dir($path)) {
 
@@ -1054,7 +1054,7 @@ class ProcessAdditional
 					break;
 				}
 
-				$fileName = array();
+				$fileName = [];
 				if (preg_match('/[^\/\\\\]*\.[a-zA-Z0-9]*$/', $file['name'], $fileName)) {
 					$fileName = $fileName[0];
 				} else {
@@ -1182,7 +1182,7 @@ class ProcessAdditional
 			$nestedLevels++;
 		}
 
-		$fileType = array();
+		$fileType = [];
 
 		// Get all the remaining files in the temp dir.
 		$files = $this->_getTempDirectoryContents();
@@ -2533,8 +2533,8 @@ class ProcessAdditional
 
 		$this->_NZBHasCompressedFile = false;
 
-		$this->_sampleMessageIDs = $this->_JPGMessageIDs = $this->_MediaInfoMessageIDs = array();
-		$this->_AudioInfoMessageIDs = $this->_RARFileMessageIDs = array();
+		$this->_sampleMessageIDs = $this->_JPGMessageIDs = $this->_MediaInfoMessageIDs = [];
+		$this->_AudioInfoMessageIDs = $this->_RARFileMessageIDs = [];
 		$this->_AudioInfoExtension = '';
 
 		$this->_addedFileInfo = 0;

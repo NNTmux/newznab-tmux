@@ -79,12 +79,12 @@ class Nfo
 		//
 
 		// Array of all possible matches to return
-		$nfo_idx = array();
+		$nfo_idx = [];
 
 		// Search for all entries that have a single segment
 		if (empty($nzbInfo->segmentfiles))
 			// Nothing to Return
-			return array();
+			return [];
 
 		// Fetch Meta Information
 		if (isset($nzbInfo->metadata['name']))
@@ -92,7 +92,7 @@ class Nfo
 		else
 			$name = "";
 
-		$unordered_list=array();
+		$unordered_list=[];
 		foreach($nzbInfo->segmentfiles as $segment){
 			if ($segment['filesize'] > Nfo::NFO_MAX_FILESIZE)
 				continue;
@@ -298,8 +298,8 @@ class Nfo
 		// The function strips indexes that appear invalid
 		// and stores the most ideal match per release
 
-		$parsed_blob = array();
-		$parsed_meta = array();
+		$parsed_blob = [];
+		$parsed_meta = [];
 
 		foreach($nfometa as $uid => $info){
 			$ideal = Null;
@@ -372,7 +372,7 @@ class Nfo
 	}
 
 	private function _nfo_grab($nfometa, &$blobhash){
-		// nfometa should be an array() of segments from nzb file
+		// nfometa should be an [] of segments from nzb file
 		// it will then populate the blobhash which uses the segments
 		// as hash entries for the blob data.
 		// nfometa is an array of arrays simiar to the following
@@ -413,7 +413,7 @@ class Nfo
 		// no error handling is needed here
 		$nntp->doConnect(1, true);
 		foreach($nfometa as $uid => $matches){
-			$blobhash[$uid] = array();
+			$blobhash[$uid] = [];
 			foreach($matches as $idx => $match){
 				$fetched = false;
 				foreach($match["groups"] as $group){
@@ -455,7 +455,7 @@ class Nfo
 		// in a try catch block with a silent exception catcher
 		$retries = nfo::USENET_RETRY_COUNT;
 		set_error_handler('nfoHandleError');
-		$_blobhash = array();
+		$_blobhash = [];
 		while($retries >0){
 			try{
 				$this->_nfo_grab($nfometa, $_blobhash);
@@ -467,7 +467,7 @@ class Nfo
 				// Decrement retry count
 				$retries--;
 				// Reset blobhash
-				$_blobhash = array();
+				$_blobhash = [];
 				continue;
 			}
 		}
@@ -495,7 +495,7 @@ class Nfo
 		$batch=Nfo::NNTP_BATCH_COUNT;
 
 		// Build NFO List
-		$nfometa = array();
+		$nfometa = [];
 
 		// Missing NFO Query (oldest first so they don't expire on us)
 		$mnfo = "SELECT id,guid, name FROM releases r ".
@@ -551,7 +551,7 @@ class Nfo
 
 				if(!($processed%$batch))
 				{
-					$nfoblob = array();
+					$nfoblob = [];
 					if($this->verbose) echo "NfoProc : Retrieval ...";
 					if($this->nfo_grab($nfometa, $nfoblob)){
 						$before = array_keys($nfoblob);
@@ -563,11 +563,11 @@ class Nfo
 					if($this->verbose) echo "\n";
 
 					// Reset nfo list array
-					$nfometa = array();
+					$nfometa = [];
 				}
 			}
 			if(($processed%$batch)){
-				$nfoblob = array();
+				$nfoblob = [];
 				if($this->verbose) echo "NfoProc : Retrieval ...";
 				if($this->nfo_grab($nfometa, $nfoblob)){
 					$before = array_keys($nfoblob);
