@@ -277,21 +277,21 @@ class Games
 		}
 		$ordersort = (isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'desc';
 
-		return array($orderfield, $ordersort);
+		return [$orderfield, $ordersort];
 	}
 
 	public function getGamesOrdering()
 	{
-		return array(
+		return [
 			'title_asc', 'title_desc', 'posted_asc', 'posted_desc', 'size_asc', 'size_desc',
 			'files_asc', 'files_desc', 'stats_asc', 'stats_desc',
 			'releasedate_asc', 'releasedate_desc', 'genre_asc', 'genre_desc'
-		);
+		];
 	}
 
 	public function getBrowseByOptions()
 	{
-		return array('title' => 'title', 'genre' => 'genre_id', 'year' => 'year');
+		return ['title' => 'title', 'genre' => 'genre_id', 'year' => 'year'];
 	}
 
 	public function getBrowseBy()
@@ -737,10 +737,10 @@ class Games
 	{
 		$obj = new \GiantBomb($this->publicKey);
 		try {
-			$fields = array(
+			$fields = [
 				"api_detail_url", "name"
-			);
-			$result = json_decode(json_encode($obj->search($title, $fields, 10, 1, array("game"))), true);
+			];
+			$result = json_decode(json_encode($obj->search($title, $fields, 10, 1, ["game"])), true);
 			// We hit the maximum request.
 			if (empty($result)) {
 				$this->maxHitRequest = true;
@@ -757,7 +757,7 @@ class Games
 							$result = $result['results'][$i];
 							preg_match('/\/\d+\-(?<asin>\d+)\//', $result['api_detail_url'], $matches);
 							$this->_gameID = (string)$matches['asin'];
-							$result = $this->fetchGiantBomb[];
+							$result = $this->fetchGiantBombArray();
 							$this->_classUsed = "gb";
 							break;
 						}
@@ -782,15 +782,15 @@ class Games
 	 *
 	 * @return bool|mixed
 	 */
-	public function fetchGiantBomb[]
+	public function fetchGiantBombArray()
 	{
 		$obj = new \GiantBomb($this->publicKey);
 		try {
-			$fields = array(
+			$fields = [
 				"deck", "description", "original_game_rating", "api_detail_url", "image", "genres",
 				"name", "publishers", "original_release_date", "reviews",
 				"site_detail_url"
-			);
+			];
 			$result = json_decode(json_encode($obj->game($this->_gameID, $fields)), true);
 			$result = $result['results'];
 		} catch (Exception $e) {

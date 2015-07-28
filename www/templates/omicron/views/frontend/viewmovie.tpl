@@ -5,7 +5,7 @@
 	</h2>
 {/if}
 
-{if $movie.backdrop == 1}
+{if isset($movie.backdrop) && $movie.backdrop == 1}
 	<div id="backdrop"><img src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbid}-backdrop.jpg" alt=""/></div>{/if}
 
 <div id="movieinfo">

@@ -19,7 +19,7 @@ else
 	print "<li>Aired on ".date("F j, Y", strtotime($rel["tvairdate"]))."</li>\n";
 	print "</ul>";
 
-	if ($rel["rageID"] > 0)
+	if (isset($rel["rageid"]) && $rel["rageid"] > 0)
 	{
 		$t = new TvRage();
 		$rage = $t->getByRageID($rel["rageid"]);
