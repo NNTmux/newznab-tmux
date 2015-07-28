@@ -370,7 +370,7 @@ class ProcessAdditional
 		if (!$this->pdo->getSetting('ffmpegpath')) {
 			$this->_processAudioSample = $this->_processThumbnails = $this->_processVideo = false;
 		} else {
-			$this->_processAudioSample = ($this->pdo->getSetting('processaudiosample') == 0) ? false : true;
+			$this->_processAudioSample = ($this->pdo->getSetting('saveaudiopreview') == 0) ? false : true;
 			$this->_processThumbnails = ($this->pdo->getSetting('processthumbnails') == 0 ? false : true);
 			$this->_processVideo = ($this->pdo->getSetting('processvideos') == 0) ? false : true;
 		}

@@ -796,15 +796,6 @@
 		<div class="hint">Whether to save a preview of an audio release (requires deep rar inspection enabled).<br/>It is advisable to specify a path to the lame binary to reduce the size of audio previews.</div>
 	</td>
 </tr>
-
-<tr>
-	<td style="width:130px;"><label for="audiopreviewprune">Prune Audio Preview</label>:</td>
-	<td>
-		<input id="audiopreviewprune" class="short" name="audiopreviewprune" type="text" value="{$site->audiopreviewprune}" />
-		<div class="hint">Delete any audio previews older than this number of days.</div>
-	</td>
-</tr>
-
 </table>
 </fieldset>
 <fieldset>
