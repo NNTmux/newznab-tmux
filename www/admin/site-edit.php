@@ -143,8 +143,8 @@ $page->smarty->assign('coversPath', NN_COVERS);
 $result = $page->settings->query("SELECT id, title FROM category WHERE id in (3030, 7010, 7020, 7040, 7060)");
 
 // setup the display lists for these categories, this could have been static, but then if names changed they would be wrong
-$book_reqids_ids = array();
-$book_reqids_names = array();
+$book_reqids_ids = [];
+$book_reqids_names = [];
 foreach ($result as $bookcategory)
 {
 	$book_reqids_ids[]   = $bookcategory["id"];

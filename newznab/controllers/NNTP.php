@@ -1094,7 +1094,7 @@ class NNTP extends Net_NNTP_Client
 	 */
 	function decodeYenc2($yencodedvar)
 	{
-		$input = array();
+		$input = [];
 		preg_match("/^(=ybegin.*=yend[^$]*)$/ims", $yencodedvar, $input);
 		if (isset($input[1])) {
 			$ret = "";

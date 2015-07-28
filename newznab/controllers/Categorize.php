@@ -45,7 +45,7 @@ class Categorize extends Category
 	 *
 	 * @param array $options Class instances.
 	 */
-	public function __construct(array $options = array())
+	public function __construct(array $options = [])
 	{
 		//parent::__construct($options);
 		$this->pdo = new newznab\db\Settings();

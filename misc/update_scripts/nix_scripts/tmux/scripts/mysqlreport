@@ -45,7 +45,7 @@ my ($ib_bp_used, $ib_bp_total, $ib_bp_read_ratio);
 my ($relative_live, $relative_infiles);
 my $real_uptime;
 my (%stats_present, %stats_past); # For relative reports
-      
+
 GetOptions (
    \%op,
    "user=s",
@@ -72,7 +72,7 @@ get_user_mycnf() unless $op{'no-mycnf'};
 # Command line options override ~/.my.cnf
 $mycnf{'host'}   = $op{'host'}   if have_op 'host';
 $mycnf{'port'}   = $op{'port'}   if have_op 'port';
-$mycnf{'socket'} = $op{'socket'} if have_op 'socket'; 
+$mycnf{'socket'} = $op{'socket'} if have_op 'socket';
 $mycnf{'user'}   = $op{'user'}   if have_op 'user';
 
 $mycnf{'user'} ||= $ENV{'USER'};
@@ -138,8 +138,8 @@ $have_innodb_vals = 1; # This might be set to 0 later in get_MySQL_version()
 if(defined $op{'r'})
 {
    if($relative_live)
-   { 
-      print STDERR "mysqlreport is writing relative reports to '$tmpfile'.\n" unless $op{'detach'}; 
+   {
+      print STDERR "mysqlreport is writing relative reports to '$tmpfile'.\n" unless $op{'detach'};
       get_MySQL_version();
       collect_reports();
    }
@@ -434,7 +434,7 @@ sub get_vals
       $query = $dbh->prepare("SHOW STATUS;");
    }
    $query->execute();
-   while(@row = $query->fetchrow_array()) { $stats{$row[0]} = $row[1]; }
+   while(@row = $query->fetchrow_[]) { $stats{$row[0]} = $row[1]; }
 
    $real_uptime = $stats{'Uptime'};
 }
@@ -448,7 +448,7 @@ sub get_vars
    # Get server system variables
    $query = $dbh->prepare("SHOW VARIABLES;");
    $query->execute();
-   while(@row = $query->fetchrow_array()) { $vars{$row[0]} = $row[1]; }
+   while(@row = $query->fetchrow_[]) { $vars{$row[0]} = $row[1]; }
 
    # table_cache was renamed to table_open_cache in MySQL 5.1.3
    if($MySQL_version >= 50103)
@@ -471,7 +471,7 @@ sub read_infile
    $vars{'table_cache'} = 64          if !exists $vars{'table_cache'};
    $vars{'max_connections'} = 100     if !exists $vars{'max_connections'};
    $vars{'key_buffer_size'} = 8388600 if !exists $vars{'key_buffer_size'}; # 8M
-   $vars{'thread_cache_size'} = 0     if !exists $vars{'thread_cache_size'}; 
+   $vars{'thread_cache_size'} = 0     if !exists $vars{'thread_cache_size'};
    $vars{'tmp_table_size'} = 0        if !exists $vars{'tmp_table_size'};
    $vars{'long_query_time'} = '?'     if !exists $vars{'long_query_time'};
    $vars{'log_slow_queries'} = '?'    if !exists $vars{'log_slow_queries'};
@@ -487,7 +487,7 @@ sub read_infile
    {
       last if !defined $_;
 
-      next if /^\+/;  # skip divider lines 
+      next if /^\+/;  # skip divider lines
       next if /^$/;   # skip blank lines
 
       next until /(Aborted_clients|back_log|=)/;
@@ -580,7 +580,7 @@ sub get_MySQL_version
 
       $query = $dbh->prepare("SHOW VARIABLES LIKE 'version';");
       $query->execute();
-      @row = $query->fetchrow_array();
+      @row = $query->fetchrow_[];
       ($major, $minor, $patch) = ($row[1] =~ /(\d{1,2})\.(\d{1,2})\.(\d{1,2})/);
    }
 
@@ -731,8 +731,8 @@ sub write_report
    $~ = 'SLOW_DMS', write;
    write_DMS();
    write_Com();
-   $~ = 'SAS', write; 
-   write_qcache(); 
+   $~ = 'SAS', write;
+   write_qcache();
    $~ = 'REPORT_END', write;
    $~ = 'TAB', write;
 
@@ -757,10 +757,10 @@ sub sec_to_dhms # Seconds to days hours:minutes:seconds
      $h = int $s / 3600;
      $s -= $h * 3600;
    }
-   
+
    $m = int $s / 60;
    $s -= $m * 60;
-   
+
    return "$d $h:$m:$s";
 }
 
@@ -1095,7 +1095,7 @@ $stat_name, make_short($stat_val), t($stat_val), $stat_label, perc($stat_val, $q
 .
 
 format SLOW_DMS =
-Slow @<<<<<<< @>>>>>>  @>>>>>/s          @>>>>>  %DMS: @>>>>>  Log: @>> 
+Slow @<<<<<<< @>>>>>>  @>>>>>/s          @>>>>>  %DMS: @>>>>>  Log: @>>
 $slow_query_t, make_short($stats{'Slow_queries'}), t($stats{'Slow_queries'}), perc($stats{'Slow_queries'}, $questions), perc($stats{'Slow_queries'}, $dms), $vars{'log_slow_queries'}
 DMS         @>>>>>>>>  @>>>>>/s          @>>>>>
 make_short($dms), t($dms), perc($dms, $questions)
@@ -1225,7 +1225,7 @@ make_short($stats{'Innodb_buffer_pool_pages_data'}), perc($stats{'Innodb_buffer_
   $stats{'Innodb_buffer_pool_pages_misc'}, perc($stats{'Innodb_buffer_pool_pages_misc'}, $stats{'Innodb_buffer_pool_pages_total'})
   Latched   @>>>>>>>>                    @>>>>>
 $stats{'Innodb_buffer_pool_pages_latched'}, perc($stats{'Innodb_buffer_pool_pages_latched'}, $stats{'Innodb_buffer_pool_pages_total'})
-Reads       @>>>>>>>>  @>>>>>/s  
+Reads       @>>>>>>>>  @>>>>>/s
 make_short($stats{'Innodb_buffer_pool_read_requests'}), t($stats{'Innodb_buffer_pool_read_requests'})
   From file @>>>>>>>>  @>>>>>/s          @>>>>>
 make_short($stats{'Innodb_buffer_pool_reads'}), t($stats{'Innodb_buffer_pool_reads'}), perc($stats{'Innodb_buffer_pool_reads'}, $stats{'Innodb_buffer_pool_read_requests'})

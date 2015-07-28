@@ -59,7 +59,7 @@ Class Sharing
 	 *
 	 * @var array
 	 */
-	protected $siteSettings = array();
+	protected $siteSettings = [];
 
 	/**
 	 * Group to work in.

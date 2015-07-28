@@ -129,7 +129,7 @@ class Movie
 	/**
 	 * Get count of all movieinfo rows filter by category.
 	 */
-	public function getMovieCount($cat, $maxage=-1, $excludedcats=array())
+	public function getMovieCount($cat, $maxage=-1, $excludedcats=[])
 	{
 
 		$browseby = $this->getBrowseBy();
@@ -181,7 +181,7 @@ class Movie
 	/**
 	 * Get movieinfo rows for browse list by limit.
 	 */
-	public function getMovieRange($cat, $start, $num, $orderby, $maxage=-1, $excludedcats=array())
+	public function getMovieRange($cat, $start, $num, $orderby, $maxage=-1, $excludedcats=[])
 	{
 
 		$browseby = $this->getBrowseBy();
@@ -249,7 +249,7 @@ class Movie
 			//
 			$sql = sprintf("select r.*, releasenfo.id as nfoid, groups.name as grpname, concat(cp.title, ' > ', c.title) as categoryname from releases r left outer join category c on c.id = r.categoryid left outer join category cp on cp.id = c.parentid left outer join releasenfo on releasenfo.releaseid = r.id left outer join groups on groups.id = r.groupid where imdbid in (%s) and %s %s %s order by r.postdate desc", $imdbds, $catsrch, $maxagesql, $exccatlist);
 			$allrows = $this->pdo->query($sql, true);
-			$arr = array();
+			$arr = [];
 
 			//
 			// build array indexed by imdbid
@@ -373,7 +373,7 @@ class Movie
 			return "";
 
 		$tmpArr = explode(', ',$data[$field]);
-		$newArr = array();
+		$newArr = [];
 		$i = 0;
 		foreach($tmpArr as $ta) {
 			if (trim($ta) == '') {
@@ -419,7 +419,7 @@ class Movie
 			return false;
 		}
 
-		$mov = array();
+		$mov = [];
 		$mov['imdb_id'] = $imdbId;
 		$mov['tmdb_id'] = (!isset($tmdb['tmdb_id']) || $tmdb['tmdb_id'] == '') ? "NULL" : $tmdb['tmdb_id'];
 
@@ -540,7 +540,7 @@ class Movie
 		if (!$movie || !is_array($movie)) { return false; }
 		if (isset($movie['status_code']) && $movie['status_code'] > 1) { return false; }
 
-		$ret = array();
+		$ret = [];
 		$ret['title'] = $movie['title'];
 		$ret['tmdb_id'] = $movie['id'];
 		$ret['imdb_id'] = str_replace('tt', '', $movie['imdb_id']);
@@ -552,7 +552,7 @@ class Movie
 			$ret['year'] = date("Y", strtotime($movie['release_date']));
 		if (isset($movie['genres']) && sizeof($movie['genres']) > 0)
 		{
-			$genres = array();
+			$genres = [];
 			foreach($movie['genres'] as $genre)
 			{
 				$genres[] = $genre['name'];
@@ -590,7 +590,7 @@ class Movie
 		}
 		if (!$movies || !isset($movies['results'])) { return false; }
 
-		$ret = array();
+		$ret = [];
 		$c=0;
 		foreach($movies['results'] as $movie)
 		{
@@ -629,7 +629,7 @@ class Movie
         // make sure we got some data
         if ($buffer !== false && strlen($buffer))
         {
-        	$ret = array();
+        	$ret = [];
             foreach ($imdb_regex as $field => $regex)
             {
                 if (preg_match($regex, $buffer, $matches))

@@ -13,7 +13,7 @@ switch($action)
 {
     case 'add':
     		$page->title = "Spotnab Source Add";
-				$source = array();
+				$source = [];
 				$source["description"] = '';
 				$row = $spotnab->getDefaultValue('spotnabsources','username');
 				$source["username"] = $row[0]["Default"];

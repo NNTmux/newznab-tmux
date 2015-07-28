@@ -44,7 +44,7 @@ if ($groups === false) {
 	echo "No active groups. Fix not needed.\n";
 } else {
 
-	$queries = array();
+	$queries = [];
 
 	switch ($argv[1]) {
 		case 1:

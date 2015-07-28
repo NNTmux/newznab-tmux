@@ -8,7 +8,7 @@ $movie = new XXX();
 $cat = new Category();
 
 $moviecats = $cat->getChildren(Category::CAT_PARENT_XXX);
-$mtmp = array();
+$mtmp = [];
 foreach ($moviecats as $mcat) {
 	$mtmp[$mcat['id']] = $mcat;
 }
@@ -16,7 +16,7 @@ $category = Category::CAT_PARENT_XXX;
 if (isset($_REQUEST['t']) && array_key_exists($_REQUEST['t'], $mtmp)) {
 	$category = $_REQUEST['t'] + 0;
 }
-$catarray = array();
+$catarray = [];
 $catarray[] = $category;
 
 $page->smarty->assign('catlist', $mtmp);
@@ -28,7 +28,7 @@ $offset = (isset($_REQUEST['offset']) && ctype_digit($_REQUEST['offset'])) ? $_R
 $ordering = $movie->getXXXOrdering();
 $orderby = isset($_REQUEST['ob']) && in_array($_REQUEST['ob'], $ordering) ? $_REQUEST['ob'] : '';
 
-$results = $movies = array();
+$results = $movies = [];
 $results = $movie->getXXXRange($catarray, $offset, ITEMS_PER_COVER_PAGE, $orderby, -1, $page->userdata['categoryexclusions']);
 foreach ($results as $result) {
 	$result['genre'] = $movie->makeFieldLinks($result, 'genre');

@@ -40,11 +40,11 @@ if (!Utility::startsWith(realpath($path), realpath($basepath)))
 
 $files = glob(preg_replace('/(\*|\?|\[)/', '[$1]', $path)."/*");
 
-$items = array();
-$dirs = array();
+$items = [];
+$dirs = [];
 foreach($files as $f)
 {
-	$i = array();
+	$i = [];
 	$i["name"] = basename($f);
 	$i["isdir"] = (is_dir($f)?1:0);
 	$i["fullname"] = $f;

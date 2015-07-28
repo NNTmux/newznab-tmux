@@ -61,7 +61,7 @@ class Groups
 		$categories = $this->pdo->query("SELECT * FROM groups WHERE active = 1 ORDER BY name",
 			true, NN_CACHE_EXPIRY_LONG
 		);
-		$temp_array = array();
+		$temp_array = [];
 
 		$temp_array[-1] = "--Please Select--";
 
@@ -355,7 +355,7 @@ class Groups
 	function addBulk($groupList, $active = 1, $backfill = 1)
 	{
 
-		$ret = array();
+		$ret = [];
 
 		if ($groupList == "") {
 			$ret[] = "No group list provided.";

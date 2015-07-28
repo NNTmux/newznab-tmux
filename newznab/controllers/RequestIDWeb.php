@@ -28,7 +28,7 @@ class RequestIDWeb extends RequestID
 	 *
 	 * @param array $options Class instances / Echo to cli?
 	 */
-	public function __construct(array $options = array())
+	public function __construct(array $options = [])
 	{
 		parent::__construct($options);
 		$this->_request_hours = ($this->pdo->getSetting('request_hours') != '') ? (int)$this->pdo->getSetting('request_hours') : 1;
@@ -106,7 +106,7 @@ class RequestIDWeb extends RequestID
 	protected function _processReleases()
 	{
 		// Array to store results.
-		$requestArray = array();
+		$requestArray = [];
 
 		if ($this->_releases instanceof \Traversable) {
 			// Loop all the results.

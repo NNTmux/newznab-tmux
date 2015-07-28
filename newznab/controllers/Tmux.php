@@ -57,7 +57,7 @@ class Tmux
 
 	public function getConnectionsInfo($constants)
 	{
-		$runVar = array();
+		$runVar = [];
 		$runVar['connections']['port_a'] = $runVar['connections']['host_a'] = $runVar['connections']['ip_a'] = false;
 
 		if ($constants['nntpproxy'] == 0) {
@@ -118,7 +118,7 @@ class Tmux
 				$port = 'port';
 				break;
 		}
-		$runVar = array();
+		$runVar = [];
 
 		$runVar['conncounts'][$which]['active'] = $runVar['conncounts'][$which]['total'] = 0;
 
@@ -347,7 +347,7 @@ class Tmux
 
 	public function relativeTime($_time)
 	{
-		$d = array();
+		$d = [];
 		$d[0] = [1, "sec"];
 		$d[1] = [60, "min"];
 		$d[2] = [3600, "hr"];

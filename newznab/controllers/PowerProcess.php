@@ -304,7 +304,7 @@ class PowerProcess {
 			$this->InstallSignalHandler();
 
 			// Init the Thread Queue
-			$this->myThreads = array();
+			$this->myThreads = [];
 
 			// Log completion of startup
 			$this->Log("Startup process complete",true);

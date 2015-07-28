@@ -147,7 +147,7 @@ class TvRage
 
 		$countries = $this->pdo->query("select distinct(country) as country from tvrage where country != ''");
 		$showsindb = $this->pdo->query("select distinct(rageid) as rageid from tvrage");
-		$showarray = array();
+		$showarray = [];
 		foreach($showsindb as $show)
 		{
 			$showarray[] = $show['rageid'];
@@ -175,7 +175,7 @@ class TvRage
 			{
 				$tzOffset = 60*60*6;
 				$yesterday = strtotime("-1 day") - $tzOffset;
-				$xmlSchedule = array();
+				$xmlSchedule = [];
 
 				foreach ($sched as $dayObj)
 				{
@@ -232,7 +232,7 @@ class TvRage
 						foreach ($res as $arr)
 						{
 							$prev_ep = $next_ep = "";
-							$query = array();
+							$query = [];
 
 							// previous episode
 							if (isset($epInfo['prev']) && $epInfo['prev']['episode'] != '')
@@ -635,14 +635,14 @@ class TvRage
 			if (isset($arrXml['show']) && is_array($arrXml['show']))
 			{
 				// we got a valid xml response
-				$titleMatches = array();
-				$urlMatches = array();
-				$akaMatches = array();
+				$titleMatches = [];
+				$urlMatches = [];
+				$akaMatches = [];
 
 				if (isset($arrXml['show']['showid']))
 				{
 					// we got exactly 1 match so lets convert it to an array so we can use it in the logic below
-					$newArr = array();
+					$newArr = [];
 					$newArr[] = $arrXml['show'];
 					unset($arrXml);
 					$arrXml['show'] = $newArr;
@@ -988,7 +988,7 @@ class TvRage
 				$showInfo['season'] = sprintf('S%02d', $showInfo['season']);
 				//check for multi episode release
 				if (is_array($showInfo['episode'])) {
-					$tmpArr = array();
+					$tmpArr = [];
 					foreach ($showInfo['episode'] as $ep) {
 						$tmpArr[] = sprintf('E%02d', $ep);
 					}

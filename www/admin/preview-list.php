@@ -13,7 +13,7 @@ $previewcat="-1";
 if (isset($_REQUEST["previewcat"]))
     $previewcat = $_REQUEST["previewcat"];
 
-$catarray = array();
+$catarray = [];
 $catarray[] = $previewcat;
 
 $releasecount = $releases->getPreviewCount($previewtype, $catarray);

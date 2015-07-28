@@ -94,7 +94,7 @@ class Category
 	 *
 	 * @param array $options Class instances.
 	 */
-	public function __construct(array $options = array())
+	public function __construct(array $options = [])
 	{
 		$defaults = [
 			'Settings' => null,
@@ -111,7 +111,7 @@ class Category
 	 *
 	 * @return string $catsrch
 	 */
-	public function getCategorySearch($cat = array())
+	public function getCategorySearch($cat = [])
 	{
 		$catsrch = ' (';
 
@@ -353,7 +353,7 @@ class Category
 	public function getForSelect($blnIncludeNoneSelected = true)
 	{
 		$categories = $this->get();
-		$temp_array = array();
+		$temp_array = [];
 
 		if ($blnIncludeNoneSelected) {
 			$temp_array[-1] = "--Please Select--";
@@ -368,7 +368,7 @@ class Category
 	/**
 	 * Get a list of categories.
 	 */
-	public function get($activeonly = false, $excludedcats = array())
+	public function get($activeonly = false, $excludedcats = [])
 	{
 		$db = new newznab\db\Settings();
 

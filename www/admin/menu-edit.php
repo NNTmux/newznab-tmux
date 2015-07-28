@@ -10,7 +10,7 @@ $id = 0;
 
 //get the user roles
 $userroles = $users->getRoles();
-$roles = array();
+$roles = [];
 foreach ($userroles as $r) {
 	$roles[$r['ID']] = $r['name'];
 }

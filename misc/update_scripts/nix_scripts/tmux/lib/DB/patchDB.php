@@ -13,7 +13,7 @@ function SplitSQL($file, $delimiter = ';')
 		$file = fopen($file, 'r');
 
 		if (is_resource($file) === true) {
-			$query = array();
+			$query = [];
 			$db = new DB();
 			$dbsys = DB_TYPE;
 			$c = new ColorCLI();
@@ -60,7 +60,7 @@ function SplitSQL($file, $delimiter = ';')
 				}
 
 				if (is_string($query) === true) {
-					$query = array();
+					$query = [];
 				}
 			}
 			return fclose($file);
@@ -105,7 +105,7 @@ if (isset($os) && $os == "unix") {
 	$tmux = $t->get();
 	$currentversion = $tmux->sqlpatch;
 	$patched = 0;
-	$patches = array();
+	$patches = [];
 	$db = new DB();
 	$backedup = false;
 	$c = new ColorCLI();
@@ -152,7 +152,7 @@ if (isset($os) && $os == "unix") {
 	$tmux = $t->get();
 	$currentversion = $tmux->sqlpatch;
 	$patched = 0;
-	$patches = array();
+	$patches = [];
 
 	// Open the patch folder.
 	if (!isset($argv[1])) {

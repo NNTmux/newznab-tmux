@@ -33,12 +33,12 @@ class Greenlight
 	/**
 	 * @var array
 	 */
-	protected $_postParams = array();
+	protected $_postParams = [];
 
 	/**
 	 * @var array
 	 */
-	protected $_res = array();
+	protected $_res = [];
 
 	/**
 	 * @var
@@ -130,7 +130,7 @@ class Greenlight
 					$ret = rtrim(trim($ret), ":");
 					if ($ret != "Languages") {
 						if (count($detail->find("a")) > 1) {
-							$ret3 = array();
+							$ret3 = [];
 							foreach ($detail->find("a") as $a) {
 								$ret3[] = trim($a->innertext);
 							}
@@ -206,7 +206,7 @@ class Greenlight
 	 */
 	public function getAll()
 	{
-		$results = array();
+		$results = [];
 		if (!empty($this->_directURL)) {
 			$results['greenlightgameid'] = $this->_greenlightGameID;
 			$results['directurl'] = $this->_directURL;

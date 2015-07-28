@@ -270,7 +270,7 @@ final class NZBVortex
      * sendRequest()
      * @return array
      */
-    protected function sendRequest($path, $params = array())
+    protected function sendRequest($path, $params = [])
     {
         $user = new Users;
         $data = $user->getById($user->currentUserId());

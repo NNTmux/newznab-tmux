@@ -56,7 +56,7 @@ function create_guids($live, $delete = false)
 						}
 						continue;
 					}
-					$binary_names = array();
+					$binary_names = [];
 					foreach ($nzbfile->file as $file) {
 						$binary_names[] = $file["subject"];
 					}

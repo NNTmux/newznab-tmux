@@ -2,7 +2,7 @@
 require_once('config.php');
 
 $type = isset($_GET["t"]) ? $_GET["t"] : "tv";
-$reqid = isset($_GET["reqid"]) ? explode(",",$_GET["reqid"]) : array();
+$reqid = isset($_GET["reqid"]) ? explode(",",$_GET["reqid"]) : [];
 $uid = isset($_GET["newznabID"]) ? $_GET["newznabID"] : "";
 
 //

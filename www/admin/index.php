@@ -8,7 +8,7 @@ $page = new AdminPage();
 
 $page->title = "Admin Hangout";
 
-$statusmsgs = array();
+$statusmsgs = [];
 
 //
 // status messages

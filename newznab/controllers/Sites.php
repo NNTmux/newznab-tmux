@@ -59,7 +59,7 @@ class Sites
 		if ($site->sabcompletedir != "" && !file_exists($site->sabcompletedir))
 			return Sites::ERR_SABCOMPLETEPATH;
 
-		$sql = $sqlKeys = array();
+		$sql = $sqlKeys = [];
 		foreach ($form as $settingK => $settingV) {
 			$sql[] = sprintf("WHEN %s THEN %s", $db->escapeString($settingK), $db->escapeString(trim($settingV)));
 			$sqlKeys[] = $db->escapeString($settingK);
@@ -116,7 +116,7 @@ class Sites
 
 		$patchpath = WWW_DIR . "../db/patch/0.2.3/";
 		$patchfiles = glob($patchpath . "*.sql");
-		$missingpatch = array();
+		$missingpatch = [];
 		foreach ($patchfiles as $file) {
 			$filecontents = file_get_contents($file);
 			if (preg_match("/Rev\: (\d+)/", $filecontents, $matches)) {

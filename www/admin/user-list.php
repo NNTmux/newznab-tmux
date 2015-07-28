@@ -10,7 +10,7 @@ $page->title = "User List";
 
 $usercount = $users->getCount();
 $userroles = $users->getRoles();
-$roles = array();
+$roles = [];
 foreach ($userroles as $r) {
 	$roles[$r['id']] = $r['name'];
 }

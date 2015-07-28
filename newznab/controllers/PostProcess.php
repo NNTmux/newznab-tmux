@@ -105,7 +105,7 @@ class PostProcess
 		//
 		if($this->pdo->getSetting('removespam') != 0)
 		{
-			$spamIDs = array();
+			$spamIDs = [];
 
 			//
 			// all releases where the only file inside the rars is *.exe and they are not in the PC category
@@ -592,7 +592,7 @@ class PostProcess
 	 */
 	public function processReleaseFiles($fetchedBinary, $relid)
 	{
-		$retval = array();
+		$retval = [];
         $rar = new \ArchiveInfo();
 		$rf = new ReleaseFiles;
 
@@ -749,7 +749,7 @@ class PostProcess
 		// returns 1 if encrypted rar
 		// returns 2 if passworded rar
 		// returns array of files in the rar if normal rar
-        $filelist = array();
+        $filelist = [];
 		$rar = new ArchiveInfo;
 		if ($rar->open($rarfile))
 		{

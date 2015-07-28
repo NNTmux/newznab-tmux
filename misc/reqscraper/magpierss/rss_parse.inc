@@ -34,11 +34,11 @@ require_once (MAGPIE_DIR . 'rss_utils.inc');
 class MagpieRSS {
     var $parser;
 
-    var $current_item   = array();  // item currently being parsed
-    var $items          = array();  // collection of parsed items
-    var $channel        = array();  // hash of channel fields
-    var $textinput      = array();
-    var $image          = array();
+    var $current_item   = [];  // item currently being parsed
+    var $items          = [];  // collection of parsed items
+    var $channel        = [];  // hash of channel fields
+    var $textinput      = [];
+    var $image          = [];
     var $feed_type;
     var $feed_version;
     var $encoding       = '';       // output encoding of parsed rss
@@ -54,7 +54,7 @@ class MagpieRSS {
     var $_KNOWN_ENCODINGS    = array('UTF-8', 'US-ASCII', 'ISO-8859-1');
 
     // parser variables, useless if you're not a parser, treat as private
-    var $stack              = array(); // parser stack
+    var $stack              = []; // parser stack
     var $inchannel          = false;
     var $initem             = false;
     var $incontent          = false; // if in Atom <content mode="xml"> field
@@ -279,7 +279,7 @@ class MagpieRSS {
         if ( $el == 'item' or $el == 'entry' )
         {
             $this->items[] = $this->current_item;
-            $this->current_item = array();
+            $this->current_item = [];
             $this->initem = false;
         }
         elseif ($this->feed_type == RSS and $this->current_namespace == '' and $el == 'textinput' )

@@ -34,7 +34,7 @@ if (isset($_GET["id"]))
 		$rageinfo = $tvrage->getByRageID($data["rageid"]);
 		if (count($rageinfo) > 0)
 		{
-			$seriesnames = $seriesdescription = $seriescountry = $seriesgenre = $seriesimg = $seriesid = array();
+			$seriesnames = $seriesdescription = $seriescountry = $seriesgenre = $seriesimg = $seriesid = [];
 			foreach($rageinfo as $r)
 			{
 				$seriesnames[] = $r['releasetitle'];

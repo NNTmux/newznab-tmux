@@ -44,7 +44,7 @@ switch($action)
 			}
 			else
 			{
-				$r = array();
+				$r = [];
 				$r["status"] = 1;
 			}
 			$page->smarty->assign('regex', $r);

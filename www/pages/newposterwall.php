@@ -12,7 +12,7 @@ $error = false;
 // Array with all the possible poster wall types.
 $startTypes = array('Books', 'Console', 'Movies', 'XXX', 'Audio', 'PC', 'TV'/*, 'Recent'*/);
 // Array that will contain the poster wall types (the above array minus whatever they have disabled in admin).
-$types = array();
+$types = [];
 // Get the names of all enabled parent categories.
 $categories = $category->getEnabledParentNames();
 // Loop through our possible ones and check if they are in the enabled categories.

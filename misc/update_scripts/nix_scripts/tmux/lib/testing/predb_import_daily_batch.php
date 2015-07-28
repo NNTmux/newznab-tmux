@@ -36,7 +36,7 @@ if (!is_writable(NN_RES)) {
 	exit('The (' . NN_RES . ') folder must be writable.' . PHP_EOL);
 }
 
-$progress = rw_progress(settings_array());
+$progress = rw_progress(settings_[]);
 
 if (!isset($argv[1]) || !is_numeric($argv[1]) && $argv[1] != 'progress' || !isset($argv[2]) ||
 	!in_array($argv[2], ['local', 'remote']) || !isset($argv[3]) ||
