@@ -311,11 +311,11 @@ class ProcessAdditional
 		// Pass the binary extractors to ArchiveInfo.
 		$clients = [];
 		if ($this->pdo->getSetting('unrarpath') != '') {
-			$clients += array(\ArchiveInfo::TYPE_RAR => $this->pdo->getSetting('unrarpath'));
+			$clients += [\ArchiveInfo::TYPE_RAR => $this->pdo->getSetting('unrarpath')];
 			$this->_unrarPath = $this->pdo->getSetting('unrarpath');
 		}
 		if ($this->pdo->getSetting('zippath') != '') {
-			$clients += array(\ArchiveInfo::TYPE_ZIP => $this->pdo->getSetting('zippath'));
+			$clients += [\ArchiveInfo::TYPE_ZIP => $this->pdo->getSetting('zippath')];
 			$this->_7zipPath = $this->pdo->getSetting('zippath');
 		}
 		$this->_archiveInfo->setExternalClients($clients);
@@ -483,12 +483,12 @@ class ProcessAdditional
 			$this->_recursivePathDelete(
 				$this->_mainTmpPath,
 				// These are folders we don't want to delete.
-				array(
+				[
 					// This is the actual temp folder.
 					$this->_mainTmpPath,
 					// This folder is used by misc/testing/Dev/rename_u4e.php
 					$this->_mainTmpPath . 'u4e'
-				)
+				]
 			);
 		}
 	}
@@ -1717,7 +1717,7 @@ class ProcessAdditional
 									// Echo the changed name.
 									if ($this->_echoCLI) {
 										\NameFixer::echoChangedReleaseName(
-											array(
+											[
 												'new_name' => $newName,
 												'old_name' => $rQuery['searchname'],
 												'new_category' => $newCat,
@@ -1725,7 +1725,7 @@ class ProcessAdditional
 												'group' => $rQuery['groupid'],
 												'release_id' => $this->_release['id'],
 												'method' => 'ProcessAdditional->_getAudioInfo'
-											)
+											]
 										);
 									}
 								}
@@ -2144,7 +2144,7 @@ class ProcessAdditional
 			$releaseInfo['proc_pp'] == 0 &&
 			in_array(
 				((int)$this->_release['categoryid']),
-				array(
+				[
 					\Category::CAT_BOOK_OTHER,
 					\Category::CAT_GAME_OTHER,
 					\Category::CAT_MOVIE_OTHER,
@@ -2154,7 +2154,7 @@ class ProcessAdditional
 					\Category::CAT_MISC_HASHED,
 					\Category::CAT_XXX_OTHER,
 					\Category::CAT_MISC_OTHER
-				)
+				]
 			)
 		) {
 			$foundName = false;
@@ -2305,7 +2305,7 @@ class ProcessAdditional
 					// Echo the changed name to CLI.
 					if ($this->_echoCLI) {
 						\NameFixer::echoChangedReleaseName(
-							array(
+							[
 								'new_name' => $newName,
 								'old_name' => $this->_release['searchname'],
 								'new_category' => $newCategory,
@@ -2313,7 +2313,7 @@ class ProcessAdditional
 								'group' => $this->_release['groupid'],
 								'release_id' => $this->_release['id'],
 								'method' => 'ProcessAdditional->_processU4ETitle'
-							)
+							]
 						);
 					}
 
@@ -2522,7 +2522,7 @@ class ProcessAdditional
 		$this->_foundSample = (($this->_release['disablepreview'] == 1) ? true : false);
 		$this->_foundPAR2Info = false;
 
-		$this->_passwordStatus = array(\Releases::PASSWD_NONE);
+		$this->_passwordStatus = [\Releases::PASSWD_NONE];
 		$this->_releaseHasPassword = false;
 
 		$this->_releaseGroupName = $this->_groups->getByNameByID($this->_release['groupid']);
