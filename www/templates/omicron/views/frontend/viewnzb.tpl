@@ -140,6 +140,9 @@
 									{if $xxx.backdrop == 1}
 										<li><a href="#pane9" data-toggle="tab">Back Cover</a></li>
 									{/if}
+									{if $game.backdrop == 1}
+									<li><a href="#pane10" data-toggle="tab">Screenshot</a></li>
+									{/if}
 
 								</ul>
 								<div class="tab-content">
@@ -776,6 +779,14 @@
 										<div id="pane9" class="tab-pane">
 											<img src="{$smarty.const.WWW_TOP}/covers/xxx/{$xxx.id}-backdrop.jpg"
 												 alt="{$xxx.title|escape:"htmlall"}"
+												 data-toggle="modal"
+												 data-target="#modal-image"/>
+										</div>
+									{/if}
+									{if $game.backdrop == 1}
+										<div id="pane10" class="tab-pane">
+											<img src="{$smarty.const.WWW_TOP}/covers/games/{$game.id}-backdrop.jpg"
+												 alt="{$game.title|escape:"htmlall"}"
 												 data-toggle="modal"
 												 data-target="#modal-image"/>
 										</div>
