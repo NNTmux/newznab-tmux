@@ -4,13 +4,10 @@
 	<!--
 		===
 		This comment should NOT be removed.
-
 		Charisma v2.0.0
-
 		Copyright 2012-2014 Muhammad Usman
 		Licensed under the Apache License v2.0
 		http://www.apache.org/licenses/LICENSE-2.0
-
 		http://usman.it
 		http://twitter.com/halalit_usman
 		===
@@ -29,7 +26,6 @@
 	<link href="{$smarty.const.WWW_TOP}/templates/charisma/styles/posterwall.css" rel="stylesheet" type="text/css" media="screen" />
 	<!-- The styles -->
 	<link id="bs-css" href="{$smarty.const.WWW_TOP}/templates/charisma/css/bootstrap-spacelab.min.css" rel="stylesheet">
-
 	<link href="{$smarty.const.WWW_TOP}/templates/charisma/css/charisma-app.css" rel="stylesheet">
 	<link href='{$smarty.const.WWW_TOP}/templates/charisma/bower_components/chosen/chosen.min.css' rel='stylesheet'>
 	<link href='{$smarty.const.WWW_TOP}/templates/charisma/bower_components/colorbox/example3/colorbox.css'
@@ -46,14 +42,11 @@
 	<link href="{$smarty.const.WWW_TOP}/templates_shared/styles/normalize.css" rel="stylesheet" type="text/css">
 	<!-- The fav icon -->
 	<link rel="shortcut icon" href="{$smarty.const.WWW_TOP}/templates/charisma/img/favicon.ico">
-
-
 </head>
 {if ($loggedin)=="true"}
 	<body>
 	<!-- topbar starts -->
 	<div class="navbar navbar-default" role="navigation">
-
 		<div class="navbar-inner">
 			<button type="button" class="navbar-toggle pull-left animated flip">
 				<span class="sr-only">Toggle navigation</span>
@@ -96,7 +89,6 @@
 				<div class="sidebar-nav">
 					<div class="nav-canvas">
 						<div class="nav-sm nav nav-stacked">
-
 						</div>
 						<ul class="nav nav-pills nav-stacked main-menu">
 							<!-- search form -->
@@ -169,20 +161,15 @@
 			</div>
 			<!--/span-->
 			<!-- left menu ends -->
-
 			<noscript>
 				<div class="alert alert-block col-md-12">
 					<h4 class="alert-heading">Warning!</h4>
-
 					<p>You need to have <a href="http://en.wikipedia.org/wiki/JavaScript" target="_blank">JavaScript</a>
 						enabled to use this site.</p>
 				</div>
 			</noscript>
-
 			<div id="content" class="col-lg-10 col-sm-10">
 				<!-- content starts -->
-
-
 				<div class="row">
 					<div class="box col-md-12">
 						<div class="box-inner">
@@ -194,26 +181,20 @@
 					</div>
 				</div>
 				<!--/row-->
-
-
 				<!-- content ends -->
 			</div>
 			<!--/#content.col-md-0-->
 		</div>
 		<!--/fluid-row-->
-
 		<hr>
-
 		<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
 			 aria-hidden="true">
 		</div>
-
 		<footer class="row">
 			<div class="box col-md-12">
 				<p class="col-md-9 col-sm-9 col-xs-12 copyright">&copy; <i class="fa fa-github-alt"></i><a
 							href="https://github.com/DariusIII/" target="_blank"> DariusIII</a> newznab-tmux {$smarty.now|date_format:"%Y"}</p>
 		</footer>
-
 	</div>
 	<!--/.fluid-container-->
 	<!-- Scripts-->
@@ -259,7 +240,6 @@
 	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/charisma/js/jquery.history.js"></script>
 	<!-- Charisma functions -->
 	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/charisma/js/charisma.js"></script>
-
 	<!-- Functions with noty -->
 	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/charisma/js/functions.js"></script>
 	<!-- newznab default scripts, needed for stuff to work -->
@@ -267,16 +247,13 @@
 	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/charisma/scripts/jquery.autosize-min.js"></script>
 	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/charisma/scripts/jquery.qtip2.js"></script>
 	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/charisma/scripts/sorttable.js"></script>
-
 	<!-- Newznab utils.js -->
 	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/charisma/scripts/utils.js"></script>
-
 	<!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
 	<!--[if lt IE 9]>
 	<script type="text/javascript" src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
 	</body>
-
 	{* Start Login/Register Page *}
 {elseif $smarty.server.REQUEST_URI == "/register" || $smarty.server.REQUEST_URI eq '/register?action=submit'}
 	{include file="register.tpl"}

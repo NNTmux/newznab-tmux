@@ -1,7 +1,6 @@
 <div class="header">
 	{assign var="catsplit" value=">"|explode:$catname}
 	<h2>My > <strong>TV Shows</strong></h2>
-
 	<div class="breadcrumb-wrapper">
 		<ol class="breadcrumb">
 			<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
@@ -9,7 +8,6 @@
 		</ol>
 	</div>
 </div>
-
 	<div class="btn-group">
 		<a class="btn btn-sm btn-default" title="View available TV series" href="{$smarty.const.WWW_TOP}/series">View
 			all series</a>
@@ -20,7 +18,6 @@
 			My Shows <i class="fa fa-rss"></i></a>
 	</div>
 <hr>
-
 {if $shows|@count > 0}
 	<div class="box-body">
 		<div class="row">
@@ -34,7 +31,6 @@
 								<th width="110">Added</th>
 								<th width="130" class="mid">Options</th>
 							</tr>
-
 							{foreach from=$shows item=show}
 								<tr>
 									<td>
@@ -58,7 +54,6 @@
 									</td>
 								</tr>
 							{/foreach}
-
 						</table>
 					</div>
 				</div>
