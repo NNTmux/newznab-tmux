@@ -16,7 +16,7 @@
 		  /* ]]> */
 	  </script>
     <meta charset="UTF-8">
-    <title>Newznab Tmux | Log in</title>
+    <title>{$site->title} | Log in</title>
     <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
     <!-- Bootstrap 3.3.4 -->
     <link href="{$smarty.const.WWW_TOP}/templates/omicron/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
@@ -36,7 +36,7 @@
   <body class="login-page">
     <div class="login-box">
 		<div class="login-logo">
-			<a href="{$serverrroot}"><b>Newznab</b>Tmux</a>
+			<a href="{$serverrroot}"><b>{$site->title}</b></a>
 		</div><!-- /.login-logo -->
       <div class="login-box-body">
         <p class="login-box-msg">Please sign in to access the site</p>
