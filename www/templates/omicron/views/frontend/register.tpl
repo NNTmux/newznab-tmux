@@ -19,7 +19,7 @@
           /* ]]> */
       </script>
     <meta charset="UTF-8">
-    <title>Newznab Tmux | Registration Page</title>
+    <title>{$site->title} | Registration Page</title>
     <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
     <!-- Bootstrap 3.3.4 -->
     <link href="{$smarty.const.WWW_TOP}/templates/omicron/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
@@ -40,7 +40,7 @@
   <body class="register-page">
     <div class="register-box">
       <div class="register-logo">
-        <a href="{$serverroot}"><b>Newznab</b> Tmux</a>
+        <a href="{$serverroot}"><b>{$site->title}</b></a>
       </div>
       <div class="register-box-body">
         <p class="login-box-msg">Register a new membership</p>
