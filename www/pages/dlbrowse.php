@@ -7,22 +7,14 @@ if (!$page->users->isLoggedIn())
 	$page->show403();
 
 $r = new Releases();
-$s = new Sites();
-$site = $s->get();
 
-$db = new Settings();
+$pdo = new Settings();
 
-if ($site->sabvdir == "" || $site->sabcompletedir == "" || !file_exists($site->sabcompletedir))
+if ($pdo->getSetting('sabvdir') == "" || $pdo->getSetting('sabcompletedir') == "" || !file_exists($pdo->getSetting('sabcompletedir')))
 	$page->show404();
 
-if (!Utility::endsWith($site->sabcompletedir, "/"))
-	$site->sabcompletedir.="/";
-if (!Utility::endsWith($site->sabvdir, "/"))
-	$site->sabvdir.="/";
-
-
-$basepath = $site->sabcompletedir;
-$webpath = $site->sabvdir;
+$basepath = $pdo->getSetting('sabcompletedir');
+$webpath = $pdo->getSetting('sabvdir');
 
 $subpath = "";
 if (isset($_REQUEST["sp"]))
@@ -66,7 +58,7 @@ foreach($files as $f)
 if (!$listmode)
 {
 	$relres = $r->getByNames($dirs);
-	while ($rel = $db->getAssocArray($relres))
+	while ($rel = $pdo->getAssocArray($relres))
 	{
 		if (isset($items[$rel["searchname"]]))
 			$items[$rel["searchname"]]["release"] = $rel;

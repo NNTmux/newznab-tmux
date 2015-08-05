@@ -88,6 +88,11 @@ class ProcessReleases
 	public $releaseImage;
 
 	/**
+	* @var int Time (hours) to wait before creating a stuck collection into a release.
+	*/
+	private $collectionTimeout;
+
+	/**
 	 * @param array $options Class instances / Echo to cli ?
 	 */
 	public function __construct(array $options = [])
@@ -113,8 +118,6 @@ class ProcessReleases
 		$this->releaseCleaning = ($options['ReleaseCleaning'] instanceof \ReleaseCleaning ? $options['ReleaseCleaning'] : new \ReleaseCleaning($this->pdo));
 		$this->releases = ($options['Releases'] instanceof \Releases ? $options['Releases'] : new \Releases(['Settings' => $this->pdo, 'Groups' => $this->groups]));
 		$this->releaseImage = ($options['ReleaseImage'] instanceof \ReleaseImage ? $options['ReleaseImage'] : new \ReleaseImage($this->pdo));
-		$s = new \Sites();
-		$this->site = $s ->get();
 
 		$this->tablePerGroup = ($this->pdo->getSetting('tablepergroup') == 0 ? false : true);
 		$this->collectionDelayTime = ($this->pdo->getSetting('delaytime') != '' ? (int)$this->pdo->getSetting('delaytime') : 2);
@@ -126,6 +129,7 @@ class ProcessReleases
 			$this->completion = 100;
 			echo $this->pdo->log->error(PHP_EOL . 'You have an invalid setting for completion. It must be lower than 100.');
 		}
+		$this->collectionTimeout = intval($this->pdo->getSetting('collection_timeout'));
 	}
 
 	/**
@@ -296,6 +300,7 @@ class ProcessReleases
 
 		$where = (!empty($groupID) ? ' AND c.group_id = ' . $groupID . ' ' : ' ');
 
+		$this->processStuckCollections($group, $where);
 		$this->collectionFileCheckStage1($group, $where);
 		$this->collectionFileCheckStage2($group, $where);
 		$this->collectionFileCheckStage3($group, $where);
@@ -1592,6 +1597,33 @@ class ProcessReleases
 				$this->collectionDelayTime,
 				self::COLLFC_DEFAULT,
 				self::COLLFC_COMPCOLL,
+				$where
+			)
+		);
+	}
+
+	/**
+	 * If a collection has been stuck for $this->collectionTimeout hours, force it to become a release.
+	 *
+	 * @param array $group
+	 * @param string $where
+	 *
+	 * @void
+	 * @access private
+	 */
+	private function processStuckCollections(array $group, $where)
+	{
+		$this->pdo->queryExec(
+			sprintf("
+				UPDATE %s c
+				SET c.filecheck = %d
+				WHERE
+					c.date_initial <
+ 					DATE_SUB((SELECT value FROM settings WHERE setting = 'last_run_time'), INTERVAL %d HOUR)
+				%s",
+				$group['cname'],
+				self::COLLFC_COMPCOLL,
+				$this->collectionTimeout,
 				$where
 			)
 		);

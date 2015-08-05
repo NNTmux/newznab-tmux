@@ -6,14 +6,12 @@ use newznab\db\Settings;
 use newznab\processing\PProcess;
 
 $pdo = new Settings();
-$s = new Sites();
-$site = $s->get();
 /**
 Array with possible arguments for run and
 whether or not those methods of operation require NNTP
  **/
 
-$args = array(
+$args = [
 	'additional' => true,
 	'all'        => true,
 	'allinf'     => true,
@@ -31,7 +29,7 @@ $args = array(
 	'tv'         => false,
 	'tvdb'       => false,
 	'xxx'        => false,
-);
+];
 
 $bool = array(
 	'true',
@@ -67,7 +65,7 @@ if (!isset($argv[1]) || !in_array($argv[1], $args) || !isset($argv[2]) || !in_ar
 $nntp = null;
 if ($args[$argv[1]] === true) {
 	$nntp = new NNTP(['Settings' => $pdo]);
-	if (($site->alternate_nntp == 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
+	if (($pdo->getSetting('alternate_nntp') == 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
 		exit($pdo->log->error("Unable to connect to usenet." . PHP_EOL));
 	}
 }

@@ -62,8 +62,6 @@ switch ($options[1]) {
 		$pdo = new Settings();
 		$nntp = nntp($pdo);
 		$groups = new \Groups();
-		$s = new Sites();
-		$site = $s->get();
 		$groupMySQL = $groups->getByName($options[3]);
 		if ($nntp->isError($nntp->selectGroup($groupMySQL['name']))) {
 			if ($nntp->isError($nntp->dataError($nntp, $groupMySQL['name']))) {
@@ -71,7 +69,7 @@ switch ($options[1]) {
 			}
 		}
 		$binaries = new \Binaries(['NNTP' => $nntp, 'Settings' => $pdo, 'Groups' => $groups]);
-		$return = $binaries->scan($groupMySQL, $options[4], $options[5], ($site->safepartrepair == 1 ? 'update' : 'backfill'));
+		$return = $binaries->scan($groupMySQL, $options[4], $options[5], ($pdo->getSetting('safepartrepair') == 1 ? 'update' : 'backfill'));
 		if (empty($return)) {
 			exit();
 		}
@@ -144,8 +142,6 @@ switch ($options[1]) {
 	// $options[2] => (string)groupCount, number of groups terminated by _ | (int)groupid, group to work on
 	case 'releases':
 		$pdo = new Settings();
-		$s = new Sites();
-		$site = $s->get();
 		$releases = new ProcessReleases(['Settings' => $pdo]);
 
 		//Runs function that are per group
@@ -155,7 +151,7 @@ switch ($options[1]) {
 				collectionCheck($pdo, $options[2]);
 			}
 
-			processReleases($site, $releases, $options[2]);
+			processReleases($pdo, $releases, $options[2]);
 
 		} else {
 
@@ -273,15 +269,13 @@ switch ($options[1]) {
 /**
  * Create / process releases for a groupID.
  *
- * @param Sites        $site
+ * @param Settings        $pdo
  * @param ProcessReleases $releases
  * @param int             $groupID
  */
-function processReleases($site, $releases, $groupID)
+function processReleases($pdo, $releases, $groupID)
 {
-	$s = new Sites();
-	$site = $s->get();
-	$releaseCreationLimit = ($site->maxnzbsprocessed != '' ? (int)$site->maxnzbsprocessed : 1000);
+	$releaseCreationLimit = ($pdo->getSetting('maxnzbsprocessed') != '' ? (int)$pdo->getSetting('maxnzbsprocessed') : 1000);
 	$releases->processIncompleteCollections($groupID);
 	$releases->processCollectionSizes($groupID);
 	$releases->deleteUnwantedCollections($groupID);
@@ -334,9 +328,7 @@ function collectionCheck(&$pdo, $groupID)
 function &nntp(&$pdo, $alternate = false)
 {
 	$nntp = new \NNTP(['Settings' => $pdo]);
-	$s = new Sites();
-	$site = $s->get();
-	if (($alternate && $site->alternate_nntp == 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
+	if (($alternate && $pdo->getSetting('alternate_nntp') == 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
 		exit("ERROR: Unable to connect to usenet." . PHP_EOL);
 	}
 

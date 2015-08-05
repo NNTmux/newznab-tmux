@@ -57,12 +57,10 @@ foreach ($tables as $row) {
 (new \SphinxSearch())->truncateRTIndex('releases_rt');
 
 $pdo->optimise(false, 'full');
-$s = new Sites();
-$site = $s->get();
 
 echo $pdo->log->header("Deleting nzbfiles subfolders.");
 try {
-	$files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($site->nzbpath, \RecursiveDirectoryIterator::SKIP_DOTS), \RecursiveIteratorIterator::CHILD_FIRST);
+	$files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($pdo->getSetting('nzbpath'), \RecursiveDirectoryIterator::SKIP_DOTS), \RecursiveIteratorIterator::CHILD_FIRST);
 	foreach ($files as $file) {
 		if (basename($file) != '.gitignore' && basename($file) != 'tmpunrar') {
 			$todo = ($file->isDir() ? 'rmdir' : 'unlink');
