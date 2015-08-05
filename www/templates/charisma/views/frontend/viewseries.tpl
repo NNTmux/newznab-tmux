@@ -204,7 +204,7 @@
 																		</a>
 																		{if isset($sabintegrated)}
 																			<a class="icon icon_sab" href="#" title="Send to my Queue">
-																				<i class="fa fa-send-o">
+																				<i class="fa fa-send-o"></i>
 																			</a>
 																		{/if}
 																		{if $weHasVortex}
@@ -215,6 +215,12 @@
 																					 src="{$smarty.const.WWW_TOP}/templates/omicron/images/icons/vortex/bigsmile.png">
 																			</a>
 																		{/if}
+																		{if isset($nzbgetintegrated)}<a
+																				class="icon icon_nzbget"
+																				title="Send to my Queue"
+																				href="#"><i
+																					class="fa fa-send-o">
+																			</a>{/if}
 																		{if isset($isadmin)}
 																			<br/>
 																			<a class="label label-warning"
