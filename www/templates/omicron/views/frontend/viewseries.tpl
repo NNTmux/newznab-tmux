@@ -203,9 +203,8 @@
 																		   title="Add to Cart">
 																		</a>
 																		{if isset($sabintegrated)}
-																			<a class="icon icon_sab" href="#">
-																				<img class="fa fa-send-o"
-																					 alt="Send to my Queue">
+																			<a class="icon icon_sab" href="#" title="Send to my Queue">
+																				<i class="fa fa-send-o">
 																			</a>
 																		{/if}
 																		{if $weHasVortex}
