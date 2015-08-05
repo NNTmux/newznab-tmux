@@ -204,9 +204,9 @@
 																		</a>
 																		{if isset($sabintegrated)}
 																			<a class="icon icon_sab" href="#"
-																			   title="Send to Sab">
-																				<img class="icon icon_sab"
-																					 alt="Send to my Sabnzbd"
+																			   title="Send to my Queue">
+																				<img class="fa fa-send-o"
+																					 alt="Send to my Queue"
 																					 src="{$smarty.const.WWW_TOP}/templates/omicron/images/icons/sabup.png">
 																			</a>
 																		{/if}
@@ -220,10 +220,10 @@
 																		{/if}
 																		{if isset($nzbgetintegrated)}<a
 																				class="icon icon_nzbget"
-																				title="Send to NZBGet"
+																				title="Send to my Queue"
 																				href="#"><img
-																					class="icon icon_nzbget"
-																					alt="Send to NZBget"
+																					class="fa fa-send-o"
+																					alt="Send to my Queue"
 																					src="{$smarty.const.WWW_TOP}/templates/omicron/images/icons/nzbgetup.png">
 																			</a>{/if}
 																		{if isset($isadmin)}
