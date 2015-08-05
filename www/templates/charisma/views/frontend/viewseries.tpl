@@ -204,10 +204,9 @@
 																		</a>
 																		{if isset($sabintegrated)}
 																			<a class="icon icon_sab" href="#"
-																			   title="Send to Sab">
-																				<img class="icon icon_sab"
-																					 alt="Send to my Sabnzbd"
-																					 src="{$smarty.const.WWW_TOP}/templates/charisma/images/icons/sabup.png">
+																			   title="Send to my Queue">
+																				<img class="fa fa-send-o"
+																					 alt="Send to my Queue">
 																			</a>
 																		{/if}
 																		{if $weHasVortex}
@@ -215,16 +214,16 @@
 																			   title="Send to NZBVortex">
 																				<img class="icon icon_nzbvortex"
 																					 alt="Send to my NZBVortex"
-																					 src="{$smarty.const.WWW_TOP}/templates/charisma/images/icons/vortex/bigsmile.png">
+																					 src="{$smarty.const.WWW_TOP}/templates/omicron/images/icons/vortex/bigsmile.png">
 																			</a>
 																		{/if}
 																		{if isset($nzbgetintegrated)}<a
 																				class="icon icon_nzbget"
-																				title="Send to NZBGet"
+																				title="Send to my Queue"
 																				href="#"><img
-																					class="icon icon_nzbget"
-																					alt="Send to NZBget"
-																					src="{$smarty.const.WWW_TOP}/templates/charisma/images/icons/nzbgetup.png">
+																					class="fa fa-send-o"
+																					alt="Send to my Queue"
+																					src="{$smarty.const.WWW_TOP}/templates/omicron/images/icons/nzbgetup.png">
 																			</a>{/if}
 																		{if isset($isadmin)}
 																			<br/>

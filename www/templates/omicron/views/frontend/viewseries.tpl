@@ -206,8 +206,7 @@
 																			<a class="icon icon_sab" href="#"
 																			   title="Send to my Queue">
 																				<img class="fa fa-send-o"
-																					 alt="Send to my Queue"
-																					 src="{$smarty.const.WWW_TOP}/templates/omicron/images/icons/sabup.png">
+																					 alt="Send to my Queue">
 																			</a>
 																		{/if}
 																		{if $weHasVortex}
