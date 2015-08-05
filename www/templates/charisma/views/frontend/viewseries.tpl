@@ -215,14 +215,6 @@
 																					 src="{$smarty.const.WWW_TOP}/templates/omicron/images/icons/vortex/bigsmile.png">
 																			</a>
 																		{/if}
-																		{if isset($nzbgetintegrated)}<a
-																				class="icon icon_nzbget"
-																				title="Send to my Queue"
-																				href="#"><img
-																					class="fa fa-send-o"
-																					alt="Send to my Queue"
-																					src="{$smarty.const.WWW_TOP}/templates/omicron/images/icons/nzbgetup.png">
-																			</a>{/if}
 																		{if isset($isadmin)}
 																			<br/>
 																			<a class="label label-warning"
