@@ -135,19 +135,19 @@
 										{if isset($sabintegrated)}
 											<a class="icon icon_sab" href="#" title="Send to Sab">
 												<img class="icon icon_sab" alt="Send to my Sabnzbd"
-													 src="{$smarty.const.WWW_TOP}/templates/omicron/images/icons/sabup.png">
+													 src="{$smarty.const.WWW_TOP}/templates_shared/images/icons/sabup.png">
 											</a>
 										{/if}
 										{if $weHasVortex}
 											<a class="icon icon_nzbvortex" href="#" title="Send to NZBVortex">
 												<img class="icon icon_nzbvortex" alt="Send to my NZBVortex"
-													 src="{$smarty.const.WWW_TOP}/templates/omicron/images/icons/vortex/bigsmile.png">
+													 src="{$smarty.const.WWW_TOP}/templates_shared/images/icons/vortex/bigsmile.png">
 											</a>
 										{/if}
 										{if isset($nzbgetintegrated)}<a class="icon icon_nzbget" title="Send to NZBGet"
 																		href="#"><img class="icon icon_nzbget"
 																					  alt="Send to NZBget"
-																					  src="{$smarty.const.WWW_TOP}/templates/omicron/images/icons/nzbgetup.png">
+																					  src="{$smarty.const.WWW_TOP}/templates_shared/images/icons/nzbgetup.png">
 											</a>{/if}
 										{if isset($isadmin)}
 											<br/>
