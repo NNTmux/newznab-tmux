@@ -86,7 +86,7 @@
 							<!-- Menu Toggle Button -->
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 								<!-- The user image in the navbar-->
-								<img src="{$smarty.const.WWW_TOP}/templates/omicron/images/userimage.png"
+								<img src="{$smarty.const.WWW_TOP}/templates_shared/images/userimage.png"
 									 class="user-image" alt="User Image"/>
 								<!-- hidden-xs hides the username on small devices so only the image appears. -->
 								<span class="hidden-xs">{$userdata.username}</span>
@@ -94,7 +94,7 @@
 							<ul class="dropdown-menu">
 								<!-- The user image in the menu -->
 								<li class="user-header">
-									<img src="{$smarty.const.WWW_TOP}/templates/omicron/images/userimage.png"
+									<img src="{$smarty.const.WWW_TOP}/templates_shared/images/userimage.png"
 										 class="img-circle" alt="User Image"/>
 									<p>
 										{$userdata.username}
@@ -145,7 +145,7 @@
 				<!-- Sidebar user panel -->
 				<div class="user-panel">
 					<div class="pull-left image">
-						<img src="{$smarty.const.WWW_TOP}/templates/omicron/images/user-loggedin.png" class="img-circle"
+						<img src="{$smarty.const.WWW_TOP}/templates_shared/images/user-loggedin.png" class="img-circle"
 							 alt="User Image"/>
 					</div>
 					<div class="pull-left info">

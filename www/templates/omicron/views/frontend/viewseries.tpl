@@ -168,7 +168,7 @@
 																					href="{$smarty.const.WWW_TOP}/covers/preview/{$result.guid}_thumb.jpg"
 																					name="name{$result.guid}"
 																					title="View Screenshot"
-																					class="modal_prev label badge halffade"
+																					class="modal_prev label label-default"
 																					rel="preview">Preview</a>{/if}
 																			<span class="label label-default">{$result.grabs}
 																				Grab{if $result.grabs != 1}s{/if}</span>
@@ -177,7 +177,7 @@
 																				title="{$result.tvtitle} Aired on {$result.tvairdate|date_format}">
 																				Aired {if $result.tvairdate|strtotime > $smarty.now}in future{else}{$result.tvairdate|daysago}{/if}</span>{/if}
 																			{if $result.reid > 0}<span
-																				class="mediainfo label badge halffade"
+																				class="mediainfo label label label-default"
 																				title="{$result.guid}">Media</span>{/if}
 																		</div>
 																	</td>
@@ -203,8 +203,9 @@
 																		   title="Add to Cart">
 																		</a>
 																		{if isset($sabintegrated)}
-																			<a class="icon icon_sab" href="#" title="Send to my Queue">
-																				<i class="fa fa-send-o"></i>
+																			<a class="fa fa-send-o icon_sab text-muted"
+																			   href="#"
+																			   title="Send to my Queue">
 																			</a>
 																		{/if}
 																		{if $weHasVortex}
@@ -212,7 +213,7 @@
 																			   title="Send to NZBVortex">
 																				<img class="icon icon_nzbvortex"
 																					 alt="Send to my NZBVortex"
-																					 src="{$smarty.const.WWW_TOP}/templates/omicron/images/icons/vortex/bigsmile.png">
+																					 src="{$smarty.const.WWW_TOP}/templates_shared/images/icons/vortex/bigsmile.png">
 																			</a>
 																		{/if}
 																		{if isset($nzbgetintegrated)}<a
