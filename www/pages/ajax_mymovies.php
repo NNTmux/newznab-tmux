@@ -12,7 +12,7 @@ if (isset($_REQUEST['del'])) {
 	$usermovies = $um->delMovie($page->users->currentUserId(), $_REQUEST['del']);
 } else if (isset($_REQUEST['add'])) {
 	// Derive cats from user preferences.
-	$cats = array();
+	$cats = [];
 	$cats[] = '2030';
 	$cats[] = '2040';
 
@@ -40,7 +40,7 @@ if (isset($_REQUEST['del'])) {
 		$searchm = $tmdb->searchMovie($_REQUEST['id']);
 		if ($searchm !== false) {
 			if (isset($searchm['results'])) {
-				$obj = array();
+				$obj = [];
 				$limit = 0;
 				foreach ($searchm['results'] as $movie) {
 					$limit++;
@@ -55,7 +55,7 @@ if (isset($_REQUEST['del'])) {
 			}
 		}
 	}
-	$imdbids = array();
+	$imdbids = [];
 
 	if (isset($obj) && count($obj) > 0) {
 		foreach ($obj as $movie) {
@@ -67,7 +67,7 @@ if (isset($_REQUEST['del'])) {
 		if (count($imdbids) == 0) {
 			print "<h3 style='padding-top:30px;'>No results found</h3>";
 		} else {
-			$ourmovieimdbs = array();
+			$ourmovieimdbs = [];
 			if (count($imdbids) > 0) {
 				$m = new Film(['Settings' => $page->settings, 'TMDb' => $tmdb]);
 				$allmovies = $m->getMovieInfoMultiImdb($imdbids);
@@ -78,7 +78,7 @@ if (isset($_REQUEST['del'])) {
 				}
 			}
 
-			$userimdbs = array();
+			$userimdbs = [];
 			$usermovies = $um->getMovies($page->users->currentUserId());
 			foreach ($usermovies as $umovie) {
 				$userimdbs[$umovie['imdbid']] = $umovie['imdbid'];

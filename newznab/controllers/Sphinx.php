@@ -47,7 +47,7 @@ class Sphinx
      */
     public function runCmd($cmd, $stdout=true)
     {
-        $output = array();
+        $output = [];
         $handle = popen($cmd, "r");
         while ($line = fgets($handle)) {
             if (\newznab\utility\Utility::startsWith($line, "Sphinx") ||
@@ -241,8 +241,8 @@ class Sphinx
     public function indexDetails($index, $main=False) {
         $details = array(
             "enabled"     => false,
-            "field_list"  => array(),
-            "attr_list"   => array()
+            "field_list"  => [],
+            "attr_list"   => []
         );
 
         if ($this->isIndexEnabled($index)) {
@@ -428,9 +428,9 @@ class Sphinx
      * @param   boolean Whether or not to include the delta indexes as well.
      * @return  array   An array of string of the enabled indexes.
      */
-    public function getAllEnabledIndexes($deltas=false, $exclude=array())
+    public function getAllEnabledIndexes($deltas=false, $exclude=[])
     {
-        $enabled = array();
+        $enabled = [];
         foreach($this->indexes as $index) {
             if ($this->isIndexEnabled($index) && !in_array($index, $exclude)) {
                 $enabled[] = $index;
@@ -651,7 +651,7 @@ class Sphinx
         }
 
         // Get the query metadata.
-        $meta = array();
+        $meta = [];
         $mresult = mysqli_query($sdb,"SHOW META");
         if (!$mresult) {
             return false;
@@ -660,7 +660,7 @@ class Sphinx
             $meta[$row[0]] = $row[1];
         }
 
-        $results = array();
+        $results = [];
 		if ($result)
 		{
 			while($row = mysqli_fetch_assoc($result)) {
@@ -679,7 +679,7 @@ class Sphinx
             $result = $ndb->queryDirect($sql);
 			if ($result)
 			{
-				$results = array();
+				$results = [];
 				while ($row = $ndb->getAssocArray($result)) {
 					$results[] = $row;
 				}
@@ -714,10 +714,10 @@ class Sphinx
      * @param   string  $lookupQuery
      *
      */
-    public function buildQuery($search, $cat=array(), $offset=0, $limit=100,
+    public function buildQuery($search, $cat=[], $offset=0, $limit=100,
                            $order=array("postdate", "desc"), $maxage=-1,
-                           $excludedcats=array(), $grp=array(),
-                           $indexes=array(), $lookup=true, $where=array(),
+                           $excludedcats=[], $grp=[],
+                           $indexes=[], $lookup=true, $where=[],
                            &$lookupQuery="")
     {
         $ndb = new newznab\db\Settings;
@@ -735,7 +735,7 @@ class Sphinx
 
         // Create a comma separated string of indexes, but only of enabled
         // indexes
-        $searchIndexes = array();
+        $searchIndexes = [];
         foreach($indexes as $index) {
             if ($this->isIndexEnabled($index)) {
                 $searchIndexes[] = $index;
@@ -806,7 +806,7 @@ class Sphinx
 
         // Build the category query.  If any of the categories are a "parent"
         // then we need to explicitly include their children as well.
-        $categoryIDs = array();
+        $categoryIDs = [];
         if (count($cat) > 0 && $cat[0] != -1) {
             foreach ($cat as $category) {
                 if ($category != -1) {
@@ -908,10 +908,10 @@ class Sphinx
      * @param   boolean         $lookup         Retrieve latest data from database.
      * @return  array|false
      */
-    public function search($search, $cat=array(), $offset=0, $limit=1000,
+    public function search($search, $cat=[], $offset=0, $limit=1000,
                            $order=array("postdate", "desc"), $maxage=-1,
-                           $excludedcats=array(), $grp=array(),
-                           $indexes=array(), $lookup=true, $minsize=-1, $maxsize=-1)
+                           $excludedcats=[], $grp=[],
+                           $indexes=[], $lookup=true, $minsize=-1, $maxsize=-1)
     {
         if (count($indexes) == 0) {
             // Remove predb from the default list of indexes to search
@@ -947,7 +947,7 @@ class Sphinx
                           . "AND releases.id IN (%s)";
         }
 
-		$where = array();
+		$where = [];
 		if ($minsize != -1) {
 			$where[] = sprintf("size > %d ", $minsize);
 		}
@@ -967,7 +967,7 @@ class Sphinx
      */
     public function searchbyRageId($rageId, $series="", $episode="", $offset=0,
                                    $limit=100, $name="", $cat=array(-1),
-                                   $maxage=-1, $indexes=array(), $lookup=true)
+                                   $maxage=-1, $indexes=[], $lookup=true)
     {
         $db = new newznab\db\Settings();
         $order = array("postdate", "desc");
@@ -989,7 +989,7 @@ class Sphinx
 			$search[] = sprintf("@episode %s", $db->escapeString($episode));
 		}
 
-		$where = array();
+		$where = [];
 		if ($rageId != "-1") {
 		    $where[] = "rageid = ".$rageId;
 		}
@@ -1022,7 +1022,7 @@ class Sphinx
                           . "AND releases.id IN (%s)";
         }
         $sphinxQuery = $this->buildQuery($search, $cat, $offset, $limit, $order,
-                                         $maxage, array(), array(), $indexes,
+                                         $maxage, [], [], $indexes,
                                          $lookup, $where, $lookupQuery);
         return $this->searchDirect($sphinxQuery, $lookupQuery, 180);
     }
@@ -1033,12 +1033,12 @@ class Sphinx
      */
     public function searchbyImdbId($imdbId, $offset=0, $limit=100, $name="",
                                    $cat=array(-1), $genre="", $maxage=-1,
-                                   $indexes=array(), $lookup=true)
+                                   $indexes=[], $lookup=true)
     {
         $db = new newznab\db\Settings();
-        $search = array();
+        $search = [];
         $order = array("postdate", "desc");
-        $where = array();
+        $where = [];
         if ($imdbId != "-1" && is_numeric($imdbId)) {
 			// Pad id with zeros just in case.
 			$imdbId = str_pad($imdbId, 7, "0", STR_PAD_LEFT);
@@ -1088,7 +1088,7 @@ class Sphinx
                           . "AND releases.id IN (%s)";
         }
         $sphinxQuery = $this->buildQuery($search, $cat, $offset, $limit, $order,
-                                         $maxage, array(), array(), $indexes,
+                                         $maxage, [], [], $indexes,
                                          $lookup, $where, $lookupQuery);
         return $this->searchDirect($sphinxQuery, $lookupQuery, 180);
     }
@@ -1099,12 +1099,12 @@ class Sphinx
      */
     public function searchAudio($artist, $album, $label, $track, $year,
                                 $genre=array(-1), $offset=0, $limit=100,
-                                $cat=array(-1), $maxage=-1, $indexes=array(),
+                                $cat=array(-1), $maxage=-1, $indexes=[],
                                 $lookup=true)
     {
         $db = new newznab\db\Settings();
-        $search = array();
-        $where = array();
+        $search = [];
+        $where = [];
         $order = array("postdate", "desc");
         if ($artist != "") {
             $search[] = sprintf("@musicinfo_artist %s", $db->escapeString($artist));
@@ -1166,7 +1166,7 @@ class Sphinx
                           . "AND releases.id IN (%s)";
         }
         $sphinxQuery = $this->buildQuery($search, $cat, $offset, $limit, $order,
-                                         $maxage, array(), array(), $indexes,
+                                         $maxage, [], [], $indexes,
                                          $lookup, $where, $lookupQuery);
         return $this->searchDirect($sphinxQuery, $lookupQuery, 180);
     }
@@ -1176,11 +1176,11 @@ class Sphinx
      * presents the same interface as :php:meth:`Releases::searchBook`.
      */
     public function searchBook($author, $title, $offset=0, $limit=100,
-                               $maxage=-1, $indexes=array(), $lookup=true)
+                               $maxage=-1, $indexes=[], $lookup=true)
     {
         $db = new newznab\db\Settings();
         $order = array("postdate", "desc");
-        $search = array();
+        $search = [];
         if ($author != "") {
             $search[] = sprintf("@bookinfo_author %s", $db->escapeString($author));
         }
@@ -1228,8 +1228,8 @@ class Sphinx
 		}
 
 		$sphinxQuery = $this->buildQuery($search, array(-1), $offset, $limit,
-		                                 $order, $maxage, array(), array(),
-		                                 $indexes, $lookup, array(), $lookupQuery);
+		                                 $order, $maxage, [], [],
+		                                 $indexes, $lookup, [], $lookupQuery);
 		return $this->searchDirect($sphinxQuery, $lookupQuery, 180);
     }
 
@@ -1238,12 +1238,12 @@ class Sphinx
      * presents the same interface as :php:meth:`Releases::searchbyAnidbId`.
      */
     public function searchbyAnidbId($anidbID, $epno='', $offset=0, $limit=100,
-                                    $name='', $maxage=-1, $indexes=array(),
+                                    $name='', $maxage=-1, $indexes=[],
                                     $lookup=true)
     {
         $db = new newznab\db\Settings();
-        $where = array();
-        $search = array();
+        $where = [];
+        $search = [];
         $order = array("postdate", "desc");
         if ($anidbID > -1) {
             $where[] = sprintf("anidbid = %d", $anidbID);
@@ -1279,7 +1279,7 @@ class Sphinx
 			              . "AND releases.id IN (%s)";
 		}
 		$sphinxQuery = $this->buildQuery($search, array(-1), $offset, $limit,
-		                                 $order, $maxage, array(), array(),
+		                                 $order, $maxage, [], [],
 		                                 $indexes, $lookup, $where, $lookupQuery);
 		return $this->searchDirect($sphinxQuery, $lookupQuery, 180);
     }

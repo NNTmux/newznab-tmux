@@ -54,7 +54,7 @@ $files = new \RegexIterator(
 );
 
 $i = 1;
-$nzbFiles = array();
+$nzbFiles = [];
 foreach ($files as $file) {
 	$nzbFiles[] = $file[0];
 	if ($i++ >= $argv[5]) {

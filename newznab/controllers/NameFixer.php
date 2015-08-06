@@ -126,7 +126,7 @@ class NameFixer
 	/**
 	 * @param array $options Class instances / Echo to cli.
 	 */
-	public function __construct(array $options = array())
+	public function __construct(array $options = [])
 	{
 		$defaults = [
 			'Echo'         => true,
@@ -710,7 +710,7 @@ class NameFixer
 		return $join;
 	}
 
-	public function getPreFileNames($args = array())
+	public function getPreFileNames($args = [])
 	{
 		$timestart = time();
 		$counter = $counted = 0;
@@ -955,7 +955,7 @@ class NameFixer
 	//  Look for a TV name.
 	public function tvCheck($release, $echo, $type, $namestatus, $show)
 	{
-		$result = array();
+		$result = [];
 
 		if ($this->done === false && $this->relid !== $release["releaseid"]) {
 
@@ -982,7 +982,7 @@ class NameFixer
 	//  Look for a movie name.
 	public function movieCheck($release, $echo, $type, $namestatus, $show)
 	{
-		$result = array();
+		$result = [];
 
 		if ($this->done === false && $this->relid !== $release["releaseid"]) {
 
@@ -1019,7 +1019,7 @@ class NameFixer
 	//  Look for a game name.
 	public function gameCheck($release, $echo, $type, $namestatus, $show)
 	{
-		$result = array();
+		$result = [];
 
 		if ($this->done === false && $this->relid !== $release["releaseid"]) {
 
@@ -1040,7 +1040,7 @@ class NameFixer
 	//  Look for a app name.
 	public function appCheck($release, $echo, $type, $namestatus, $show)
 	{
-		$result = array();
+		$result = [];
 
 		if ($this->done === false && $this->relid !== $release["releaseid"]) {
 
@@ -1059,7 +1059,7 @@ class NameFixer
 	//  TV.
 	public function nfoCheckTV($release, $echo, $type, $namestatus, $show)
 	{
-		$result = array();
+		$result = [];
 
 		if ($this->done === false && $this->relid !== $release["releaseid"]) {
 
@@ -1074,7 +1074,7 @@ class NameFixer
 	//  Movies.
 	public function nfoCheckMov($release, $echo, $type, $namestatus, $show)
 	{
-		$result = array();
+		$result = [];
 
 		if ($this->done === false && $this->relid !== $release["releaseid"]) {
 
@@ -1091,7 +1091,7 @@ class NameFixer
 	//  Music.
 	public function nfoCheckMus($release, $echo, $type, $namestatus, $show)
 	{
-		$result = array();
+		$result = [];
 
 		if ($this->done === false && $this->relid !== $release["releaseid"]) {
 
@@ -1105,7 +1105,7 @@ class NameFixer
 	//  Title (year)
 	public function nfoCheckTY($release, $echo, $type, $namestatus, $show)
 	{
-		$result = array();
+		$result = [];
 
 		if ($this->done === false && $this->relid !== $release["releaseid"]) {
 			if (preg_match('/(\w[-\w`~!@#$%^&*()_+={}|"<>?\[\]\\;\',.\/ ]+\s?\((19|20)\d\d\))/i', $release["textstring"], $result) && !preg_match('/\.pdf|Audio ?Book/i', $release["textstring"])) {
@@ -1273,7 +1273,7 @@ class NameFixer
 	//  Games.
 	public function nfoCheckG($release, $echo, $type, $namestatus, $show)
 	{
-		$result = array();
+		$result = [];
 
 		if ($this->done === false && $this->relid !== $release["releaseid"]) {
 
@@ -1298,7 +1298,7 @@ class NameFixer
 
 			if (preg_match('/Supplier.+?IGUANA/i', $release["textstring"])) {
 				$releasename = '';
-				$result = array();
+				$result = [];
 				if (preg_match('/\w[-\w`~!@#$%^&*()+={}|:"<>?\[\]\\;\',.\/ ]+\s\((19|20)\d\d\)/i', $release["textstring"], $result)) {
 					$releasename = $result[0];
 				} else if (preg_match('/\s\[\*\] (English|Dutch|French|German|Spanish)\b/i', $release["textstring"], $result)) {
@@ -1329,7 +1329,7 @@ class NameFixer
 
 	public function fileCheck($release, $echo, $type, $namestatus, $show)
 	{
-		$result = array();
+		$result = [];
 
 		if ($this->done === false && $this->relid !== $release["releaseid"]) {
 

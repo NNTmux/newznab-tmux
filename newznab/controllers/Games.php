@@ -90,7 +90,7 @@ class Games
 	/**
 	 * @param array $options Class instances / Echo to cli.
 	 */
-	public function __construct(array $options = array())
+	public function __construct(array $options = [])
 	{
 		$defaults = [
 			'Echo'     => false,
@@ -158,7 +158,7 @@ class Games
 		return ($res === false ? 0 : $res["num"]);
 	}
 
-	public function getGamesCount($cat, $maxage = -1, $excludedcats = array())
+	public function getGamesCount($cat, $maxage = -1, $excludedcats = [])
 	{
 		$catsrch = '';
 		if (count($cat) > 0 && $cat[0] != -1) {
@@ -186,7 +186,7 @@ class Games
 		return ($res === false ? 0 : $res["num"]);
 	}
 
-	public function getGamesRange($cat, $start, $num, $orderby, $maxage = -1, $excludedcats = array())
+	public function getGamesRange($cat, $start, $num, $orderby, $maxage = -1, $excludedcats = [])
 	{
 		$browseby = $this->getBrowseBy();
 
@@ -278,21 +278,21 @@ class Games
 		}
 		$ordersort = (isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'desc';
 
-		return array($orderfield, $ordersort);
+		return [$orderfield, $ordersort];
 	}
 
 	public function getGamesOrdering()
 	{
-		return array(
+		return [
 			'title_asc', 'title_desc', 'posted_asc', 'posted_desc', 'size_asc', 'size_desc',
 			'files_asc', 'files_desc', 'stats_asc', 'stats_desc',
 			'releasedate_asc', 'releasedate_desc', 'genre_asc', 'genre_desc'
-		);
+		];
 	}
 
 	public function getBrowseByOptions()
 	{
-		return array('title' => 'title', 'genre' => 'genre_id', 'year' => 'year');
+		return ['title' => 'title', 'genre' => 'genre_id', 'year' => 'year'];
 	}
 
 	public function getBrowseBy()
@@ -318,7 +318,7 @@ class Games
 	public function makeFieldLinks($data, $field)
 	{
 		$tmpArr = explode(', ', $data[$field]);
-		$newArr = array();
+		$newArr = [];
 		$i = 0;
 		foreach ($tmpArr as $ta) {
 			if (trim($ta) == '') {
@@ -386,7 +386,7 @@ class Games
 		$gen = new \Genres(['Settings' => $this->pdo]);
 		$ri = new \ReleaseImage($this->pdo);
 
-		$con = array();
+		$con = [];
 
 		// Process Steam first before giantbomb
 		// Steam has more details
@@ -592,7 +592,7 @@ class Games
 		}
 		// Load genres.
 		$defaultGenres = $gen->getGenres(\Genres::GAME_TYPE);
-		$genreassoc = array();
+		$genreassoc = [];
 		foreach ($defaultGenres as $dg) {
 			$genreassoc[$dg['id']] = strtolower($dg['title']);
 		}
@@ -738,10 +738,10 @@ class Games
 	{
 		$obj = new \GiantBomb($this->publicKey);
 		try {
-			$fields = array(
+			$fields = [
 				"api_detail_url", "name"
-			);
-			$result = json_decode(json_encode($obj->search($title, $fields, 10, 1, array("game"))), true);
+			];
+			$result = json_decode(json_encode($obj->search($title, $fields, 10, 1, ["game"])), true);
 			// We hit the maximum request.
 			if (empty($result)) {
 				$this->maxHitRequest = true;
@@ -787,11 +787,11 @@ class Games
 	{
 		$obj = new \GiantBomb($this->publicKey);
 		try {
-			$fields = array(
+			$fields = [
 				"deck", "description", "original_game_rating", "api_detail_url", "image", "genres",
 				"name", "publishers", "original_release_date", "reviews",
 				"site_detail_url"
-			);
+			];
 			$result = json_decode(json_encode($obj->game($this->_gameID, $fields)), true);
 			$result = $result['results'];
 		} catch (Exception $e) {
@@ -900,7 +900,7 @@ class Games
 			preg_replace('/\sMulti\d?\s/i', '', $releasename), $matches)) {
 
 			// Replace dots, underscores, colons, or brackets with spaces.
-			$result = array();
+			$result = [];
 			$result['title'] = str_replace(' RF ', ' ', preg_replace('/(\-|\:|\.|_|\%20|\[|\])/', ' ', $matches['title']));
 			// Replace any foreign words at the end of the release
 			$result['title'] = preg_replace('/(brazilian|chinese|croatian|danish|deutsch|dutch|english|estonian|flemish|finnish|french|german|greek|hebrew|icelandic|italian|latin|nordic|norwegian|polish|portuguese|japenese|japanese|russian|serbian|slovenian|spanish|spanisch|swedish|thai|turkish)$/i', '', $result['title']);

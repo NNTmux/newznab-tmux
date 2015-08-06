@@ -1,7 +1,6 @@
 <div class="header">
 	{assign var="catsplit" value=">"|explode:$catname}
 	<h2>{$catsplit[0]} > <strong>{if isset($catsplit[1])} {$catsplit[1]}{/if}</strong></h2>
-
 	<div class="breadcrumb-wrapper">
 		<ol class="breadcrumb">
 			<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
@@ -9,9 +8,7 @@
 		</ol>
 	</div>
 </div>
-
 {$site->adbrowse}
-
 {if $results|@count > 0}
 	<form id="nzb_multi_operations_form" action="get">
 		<div class="box-body"
@@ -115,11 +112,11 @@
 													href="{$smarty.const.WWW_TOP}/covers/preview/{$result.guid}_thumb.jpg"
 													name="name{$result.guid}" class="modal_prev label label-default" rel="preview">Preview</a></span>{/if}
 										{if $result.rageid > 0}<span class="label label-default"><a
-													href="{$smarty.const.WWW_TOP}/series/{$result.rageid}"
-													class="text-muted">View TV</a></span>{/if}
+													href="{$smarty.const.WWW_TOP}/series/{$result.rageid}">View TV</a></span>{/if}
+										{if $result.tvairdate != ""}<span class="label label-default" title="{$result.guid}">
+											Aired {if $result.tvairdate|strtotime > $smarty.now}in future{else}{$result.tvairdate|daysago}{/if}</span>{/if}
 										{if $result.anidbid > 0}<span class="label label-default"><a
-													href="{$smarty.const.WWW_TOP}/anime/{$result.anidbid}"
-													class="text-muted">View Anime</a></span>{/if}
+													href="{$smarty.const.WWW_TOP}/anime/{$result.anidbid}">View Anime</a></span>{/if}
 									</td>
 									<td><span class="label label-default">{$result.category_name}</span>
 									</td>

@@ -19,7 +19,7 @@ class ConsoleTools
 	/**
 	 * Construct.
 	 */
-	public function __construct(array $options = array())
+	public function __construct(array $options = [])
 	{
 		$defaults = [
 			'ColorCLI' => null

@@ -11,7 +11,7 @@ class RequestIDLocal extends RequestID
 	/**
 	 * @param array $options Class instances / Echo to cli?
 	 */
-	public function __construct(array $options = array())
+	public function __construct(array $options = [])
 	{
 		parent::__construct($options);
 	}
@@ -158,7 +158,7 @@ class RequestIDLocal extends RequestID
 				'(avi|jpg|nzb|m3u|mkv|par2|part\d+|nfo|sample|sfv|rar|r?\d{1,3}|\d+|zip)*)\s*\".*/i'
 		;
 
-		$matches = array();
+		$matches = [];
 		switch (true) {
 			case preg_match($regex1, $this->_release['name'], $matches):
 			case preg_match($regex2, $this->_release['name'], $matches):
@@ -189,7 +189,7 @@ class RequestIDLocal extends RequestID
 		return false;
 	}
 
-	private $groupIDCache = array();
+	private $groupIDCache = [];
 
 	/**
 	 * Attempts to remap the release groupid by extracting the new group name from the release usenet name.

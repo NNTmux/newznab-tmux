@@ -6,7 +6,7 @@ use newznab\db\Settings;
 
 $movie = new Movie(true);
 $db = new Settings();
-$movies = array();
+$movies = [];
 $counter = 1;
 $sleepsecsbetweenscrape = 1;
 

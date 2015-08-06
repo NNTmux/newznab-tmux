@@ -16,7 +16,7 @@
 		  /* ]]> */
 	  </script>
     <meta charset="UTF-8">
-    <title>Newznab Tmux | Log in</title>
+    <title>{$site->title} | Log in</title>
     <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
     <!-- Bootstrap 3.3.4 -->
     <link href="{$smarty.const.WWW_TOP}/templates/omicron/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
@@ -26,7 +26,6 @@
     <link href="{$smarty.const.WWW_TOP}/templates/omicron/dist/css/AdminLTE.min.css" rel="stylesheet" type="text/css" />
     <!-- iCheck -->
     <link href="{$smarty.const.WWW_TOP}/templates/omicron/plugins/iCheck/square/blue.css" rel="stylesheet" type="text/css" />
-
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -37,7 +36,7 @@
   <body class="login-page">
     <div class="login-box">
 		<div class="login-logo">
-			<a href="{$serverrroot}"><b>Newznab</b>Tmux</a>
+			<a href="{$serverrroot}"><b>{$site->title}</b></a>
 		</div><!-- /.login-logo -->
       <div class="login-box-body">
         <p class="login-box-msg">Please sign in to access the site</p>
@@ -62,14 +61,11 @@
             </div><!-- /.col -->
             <div class="col-xs-4">
               <button type="submit" class="btn btn-primary btn-block btn-flat">Sign In</button>
-
             </div><!-- /.col -->
           </div>
         </form>
-
 		  <a href="{$serverroot}forgottenpassword" class="text-center">I forgot my password</a><br>
         <a href="{$serverroot}register" class="text-center">Register a new membership</a>
-
     <!-- jQuery 2.1.4 -->
     <script src="{$smarty.const.WWW_TOP}/templates/omicron/plugins/jQuery/jQuery-2.1.4.min.js"></script>
     <!-- Bootstrap 3.3.2 JS -->

@@ -12,7 +12,7 @@ $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view';
 
 //get the user roles
 $userroles = $users->getRoles();
-$roles = array();
+$roles = [];
 foreach ($userroles as $r) {
 	$roles[$r['ID']] = $r['name'];
 }
@@ -21,7 +21,7 @@ switch($action)
 {
     case 'add':
     		$page->title = "User Roles Add";
-				$role = array();
+				$role = [];
 				$role["name"] = '';
 				$role["apirequests"] = '';
 				$role["downloadrequests"] = '';
@@ -43,7 +43,7 @@ switch($action)
 					$ret = $users->updateRole($_POST['id'], $_POST['name'], $_POST['apirequests'], $_POST['downloadrequests'], $_POST['defaultinvites'], $_POST['isdefault'], $_POST['canpreview'], $_POST['canpre'], $_POST['hidetads']);
 					header("Location:".WWW_TOP."/role-list.php");
 
-					$_POST['exccat'] = (!isset($_POST['exccat']) || !is_array($_POST['exccat'])) ? array() : $_POST['exccat'];
+					$_POST['exccat'] = (!isset($_POST['exccat']) || !is_array($_POST['exccat'])) ? [] : $_POST['exccat'];
 					$users->addRoleCategoryExclusions($_POST['id'], $_POST['exccat']);
 				}
 

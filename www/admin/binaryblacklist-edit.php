@@ -55,7 +55,7 @@ switch($action)
 			else
 			{
 				$page->title = "Binary Black/Whitelist Add";
-				$r = array();
+				$r = [];
 				$r["status"] = 1;
 				$r["optype"] = 1;
 				$r["msgcol"] = 1;

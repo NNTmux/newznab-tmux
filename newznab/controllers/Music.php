@@ -78,7 +78,7 @@ class Music
 	/**
 	 * Get count of all musicinfo rows by filter.
 	 */
-	public function getMusicCount($cat, $maxage=-1, $excludedcats=array())
+	public function getMusicCount($cat, $maxage=-1, $excludedcats=[])
 	{
 
 		$browseby = $this->getBrowseBy();
@@ -128,7 +128,7 @@ class Music
 	/**
 	 * Get musicinfo rows for browse list by filters and limit.
 	 */
-	public function getMusicRange($cat, $start, $num, $orderby, $maxage=-1, $excludedcats=array())
+	public function getMusicRange($cat, $start, $num, $orderby, $maxage=-1, $excludedcats=[])
 	{
 
 		$browseby = $this->getBrowseBy();
@@ -272,7 +272,7 @@ class Music
 		$gen = new Genres();
 		$ri = new ReleaseImage();
 
-		$mus = array();
+		$mus = [];
 		$amaz = $this->fetchAmazonProperties($artist." ".$album);
 		if (!$amaz)
 			return false;
@@ -281,7 +281,7 @@ class Music
 
 		//load genres
 		$defaultGenres = $gen->getGenres(Genres::MUSIC_TYPE);
-		$genreassoc = array();
+		$genreassoc = [];
 		foreach($defaultGenres as $dg) {
 			$genreassoc[$dg['id']] = strtolower($dg['title']);
 		}
@@ -485,7 +485,7 @@ class Music
 	 */
 	public function parseArtist($releasename)
 	{
-		$result = array();
+		$result = [];
 		/*TODO: FIX VA lookups
 		if (substr($releasename, 0, 3) == 'VA-') {
 				$releasename = trim(str_replace('VA-', '', $releasename));
@@ -568,7 +568,7 @@ class Music
 			//load genres
 			$gen = new Genres();
 			$defaultGenres = $gen->getGenres(Genres::MUSIC_TYPE);
-			$genreassoc = array();
+			$genreassoc = [];
 			foreach($defaultGenres as $dg)
 				$genreassoc[$dg['id']] = strtolower($dg['title']);
 

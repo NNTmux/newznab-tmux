@@ -6,7 +6,6 @@
 			<div class="vortex-nzb" style="padding: 5px 0 5px 0">
 				<i>{$nzb['uiTitle']}</i>
 				<br/>
-
 				<div style="width: 20px; float: left; margin: 7px 0 0 0">
 					{if $nzb['isPaused'] eq 1}
 						<img src="{$smarty.const.WWW_TOP}/templates/omicron/images/icons/vortex/blah.png"

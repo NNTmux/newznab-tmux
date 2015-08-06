@@ -476,9 +476,9 @@ class TmuxRun extends Tmux
 				$log = $this->writelog($runVar['panes']['one'][3]);
 				shell_exec("tmux respawnp -t{$runVar['constants']['tmux_session']}:1.2 ' \
 						{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}update_scripts/update_theaters.php $log; \
-						{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}update_scripts/nix_scripts/tmux/lib/testing/PostProc/populate_tvrage.php true $log; \
+						{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}testing/PostProc/populate_tvrage.php true $log; \
 						{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}update_scripts/update_tvschedule.php $log; \
-						{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}update_scripts/nix_scripts/tmux/lib/testing/PostProc/updateTvRage.php $log; date +\"{$this->_dateFormat}\"' 2>&1 1> /dev/null"
+						{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}testing/PostProc/updateTvRage.php $log; date +\"{$this->_dateFormat}\"' 2>&1 1> /dev/null"
 				);
 				$runVar['timers']['timer4'] = time();
 				break;
@@ -501,9 +501,9 @@ class TmuxRun extends Tmux
 			$log = $this->writelog($runVar['panes']['one'][0]);
 			shell_exec("tmux respawnp -t{$runVar['constants']['tmux_session']}:1.0 ' \
 				{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}update_scripts/update_theaters.php $log; \
-				{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}update_scripts/nix_scripts/tmux/lib/testing/PostProc/populate_tvrage.php true $log; \
+				{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}testing/PostProc/populate_tvrage.php true $log; \
 				{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}update_scripts/update_tvschedule.php $log; \
-				{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}update_scripts/nix_scripts/tmux/lib/testing/PostProc/updateTvRage.php $log; date +\"{$this->_dateFormat}\"' 2>&1 1> /dev/null"
+				{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}testing/PostProc/updateTvRage.php $log; date +\"{$this->_dateFormat}\"' 2>&1 1> /dev/null"
 			);
 			$runVar['timers']['timer4'] = time();
 
@@ -683,7 +683,7 @@ class TmuxRun extends Tmux
 			if (shell_exec("tmux list-panes -t{$runVar['constants']['tmux_session']}:${pane} | grep ^0 | grep -c dead") == 1) {
 				shell_exec(
 					"tmux respawnp -t{$runVar['constants']['tmux_session']}:${pane}.0 ' \
-					{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}update_scripts/nix_scripts/tmux/lib//IRCScraper/scrape.php true'"
+					{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}testing/IRCScraper/scrape.php true'"
 				);
 			}
 		} else {

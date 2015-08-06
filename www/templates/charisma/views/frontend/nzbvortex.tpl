@@ -1,6 +1,5 @@
 <div class="header">
 	<h2>NZBVortex > <strong>Queue</strong></h2>
-
 	<div class="breadcrumb-wrapper">
 		<ol class="breadcrumb">
 			<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
@@ -8,7 +7,6 @@
 		</ol>
 	</div>
 </div>
-
 {if $weHasVortex}
 	<div id="vortex-error"
 		 style="display: none; background-color: #767A9E; text-align: center; padding: 5px; color: #eee"></div>
@@ -16,7 +14,6 @@
 	</div>
 {literal}
 	<script type="text/javascript">
-
 		var timer = 0;
 		function getOverview() {
 			$.ajax
@@ -33,9 +30,7 @@
 				clearTimeout(timer);
 			});
 		}
-
 		getOverview();
-
 	</script>
 {/literal}
 {else}

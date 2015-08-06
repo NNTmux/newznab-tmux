@@ -12,17 +12,17 @@ if (isset($_REQUEST["del"])) {
 
 $cat = new Category(['Settings' => $page->settings]);
 $tmpcats = $cat->getChildren(Category::CAT_PARENT_MOVIE);
-$categories = array();
+$categories = [];
 foreach ($tmpcats as $c) {
 	$categories[$c['id']] = $c['title'];
 }
 
 $movies = $um->getMovies($page->users->currentUserId());
-$results = array();
+$results = [];
 foreach ($movies as $mov => $m) {
 	$movcats = explode('|', $m['categoryid']);
 	if (is_array($movcats) && sizeof($movcats) > 0) {
-		$catarr = array();
+		$catarr = [];
 		foreach ($movcats as $movcat) {
 			if (!empty($movcat)) {
 				$catarr[] = $categories[$movcat];
