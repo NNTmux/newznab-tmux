@@ -1603,7 +1603,7 @@ class ProcessReleases
 	}
 
 	/**
-	 * If a collection has been stuck for $this->collectionTimeout hours, force it to become a release.
+	 * If a collection has been stuck for $this->collectionTimeout hours, delete it, it's bad.
 	 *
 	 * @param array $group
 	 * @param string $where
@@ -1613,19 +1613,22 @@ class ProcessReleases
 	 */
 	private function processStuckCollections(array $group, $where)
 	{
-		$this->pdo->queryExec(
+		$obj = $this->pdo->queryExec(
 			sprintf("
-				UPDATE %s c
-				SET c.filecheck = %d
+				DELETE c FROM %s c
 				WHERE
 					c.added <
- 					DATE_SUB((SELECT value FROM settings WHERE setting = 'last_run_time'), INTERVAL %d HOUR)
+					DATE_SUB((SELECT value FROM settings WHERE setting = 'last_run_time'), INTERVAL %d HOUR)
 				%s",
 				$group['cname'],
-				self::COLLFC_COMPCOLL,
 				$this->collectionTimeout,
 				$where
 			)
 		);
+		if ($this->echoCLI && $obj->rowCount()) {
+			$this->pdo->log->doEcho(
+				$this->pdo->log->primary('Deleted ' . $obj->rowCount() . ' broken/stuck collections.')
+			);
+		}
 	}
 }
