@@ -1618,7 +1618,7 @@ class ProcessReleases
 				UPDATE %s c
 				SET c.filecheck = %d
 				WHERE
-					c.date_initial <
+					c.added <
  					DATE_SUB((SELECT value FROM settings WHERE setting = 'last_run_time'), INTERVAL %d HOUR)
 				%s",
 				$group['cname'],
