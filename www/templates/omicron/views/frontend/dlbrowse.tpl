@@ -1,7 +1,5 @@
 <h1>Browse Downloads</h1>
-
 <h2>/{$subpath|escape:"htmlall"}</h2>
-
 <div class="nzb_multi_operations">
 	View:
 	{if $lm}<a href="{$smarty.server.REQUEST_URI|replace:"&lm=1":""}&lm=0">Covers</a> |
@@ -19,7 +17,6 @@
 		<th class="mid" width="80">info</th>
 		<th class="mid" width="40">date</th>
 	</tr>
-
 	{if $parentpath != ""}
 		<tr>
 			<td></td>
@@ -28,11 +25,9 @@
 			</td>
 		</tr>
 	{/if}
-
 	{foreach from=$results item=result}
 		<tr class="{cycle values=",alt"}">
-
-			{assign var="icon" value='templates/omicron/images/fileicons/'|cat:$result.pathinfo.extension|cat:".png"}
+			{assign var="icon" value='templates_shared/images/fileicons/'|cat:$result.pathinfo.extension|cat:".png"}
 			{if $result.isdir == "1"}
 				{assign var="icon" value='folder'}
 			{elseif $result.pathinfo.extension == "" || !is_file("$icon")}
@@ -40,16 +35,14 @@
 			{else}
 				{assign var="icon" value=$result.pathinfo.extension}
 			{/if}
-
 			<td><img title=".{$result.pathinfo.extension}" alt="{$result.pathinfo.extension}"
-					 src="{$smarty.const.WWW_TOP}/templates/omicron/images/fileicons/{$icon}.png"/></td>
+					 src="{$smarty.const.WWW_TOP}/templates_shared/images/fileicons/{$icon}.png"/></td>
 			<td class="item">
 				{if $result.isdir == 1}
 					<a href="?sp={$subpath|escape:"url"}{$result.name|escape:"url"}&lm={if $lm}1{else}0{/if}">{$result.name|escape:"htmlall"}</a>
 				{else}
 					<a href="{$result.webpath}">{$result.name|escape:"htmlall"}</a>
 				{/if}
-
 				{if $result.release.movie_id != "" && $result.release.ep_id == ""}
 					<div style="padding-top:10px;">
 						{if $result.release.tagline != ''}<b>{$result.release.tagline}</b><br/>{/if}
@@ -59,7 +52,6 @@
 						{if $result.release.actors != ''}<b>Starring:</b>{$result.release.actors}<br/><br/>{/if}
 					</div>
 				{/if}
-
 				{if $result.release.ep_id != ""}
 					<div style="padding-top:10px;">
 						{if $result.release.ep_showtitle != ''}<b>{$result.release.ep_showtitle}</b><br/>{/if}
@@ -72,7 +64,6 @@
 						{if $result.release.ep_fullep != ''}<b>Episode:</b>{$result.release.ep_fullep}<br/>{/if}
 					</div>
 				{/if}
-
 				{if $result.release.music_id != ""}
 					<div style="padding-top:10px;">
 						{if $result.release.mu_title != ''}<b>{$result.release.mu_title}</b><br/>{/if}
@@ -80,7 +71,6 @@
 						{if $result.release.mu_year != ''}<b>Year:</b>{$result.release.mu_year}<br/>{/if}
 					</div>
 				{/if}
-
 				{if $result.release.music_id == "" && $result.release.ep_id == "" && $result.release.movie_id == ""}
 					<br/>
 				{/if}
@@ -121,7 +111,5 @@
 			<td class="less mid" title="{$result.mtime|date_format:"%d/%m/%Y %H:%M:%S"}">{$result.mtime|timeago}</td>
 		</tr>
 	{/foreach}
-
 </table>
-
 <br/><br/><br/>

@@ -2,8 +2,7 @@
 	{$site->adbrowse}
 {/if}
 <div class="header">
-	<h2>newznab-tmux > <strong>Search</strong></h2>
-
+	<h2>{$site->title} > <strong>Search</strong></h2>
 	<div class="breadcrumb-wrapper">
 		<ol class="breadcrumb">
 			<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
@@ -93,7 +92,6 @@
 						<input type="checkbox" name="searchadvhasnfo" value="1">
 						<input type="hidden" name="searchadvhascomments" value="0">
 						<input type="checkbox" name="searchadvhascomments" value="1">
-
 						<div style="float:right;"><input type="hidden" name="search_type" value="adv" id="search_type">
 							<input id="search_adv_button" type="submit" value="search">
 						</div>
@@ -195,21 +193,20 @@
 						<label for="chk{$result.guid|substr:0:7}">
 							<a class="title" title="View details"
 							   href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"htmlall"}">{$result.searchname|escape:"htmlall"|truncate:150:"...":true}</a></label value="Searchname">
-
 						<div class="resextra">
 							<div class="btns" style="float:right">
 								{release_flag($result.searchname, browse)}
 								{if $result.passwordstatus == 1}
 									<img title="RAR/ZIP Possibly Passworded."
-										 src="{$smarty.const.WWW_TOP}/templates/omicron/images/icons/lock2.png"
+										 src="{$smarty.const.WWW_TOP}/templates_shared/images/icons/lock2.png"
 										 alt="RAR/ZIP Possibly Passworded.">
 								{elseif $result.passwordstatus == 2}
 									<img title="RAR/ZIP Possibly Damaged."
-										 src="{$smarty.const.WWW_TOP}/templates/omicron/images/icons/broken.png"
+										 src="{$smarty.const.WWW_TOP}/templates_shared/images/icons/broken.png"
 										 alt="RAR/ZIP Possibly Damaged.">
 								{elseif $result.passwordstatus == 10}
 									<img title="RAR/ZIP is Passworded."
-										 src="{$smarty.const.WWW_TOP}/templates/omicron/images/icons/lock.gif"
+										 src="{$smarty.const.WWW_TOP}/templates_shared/images/icons/lock.gif"
 										 alt="RAR/ZIP is Passworded.">
 								{/if}
 								{if $result.videostatus > 0}
@@ -290,7 +287,7 @@
 						   href="{$smarty.const.WWW_TOP}/filelist/{$result.guid}">{$result.totalpart}</a>
 						{if $result.rarinnerfilecount > 0}
 							<div class="rarfilelist">
-								<img src="{$smarty.const.WWW_TOP}/templates/omicron/images/icons/magnifier.png"
+								<img src="{$smarty.const.WWW_TOP}/templates_shared/images/icons/magnifier.png"
 									 alt="{$result.guid}">
 							</div>
 						{/if}
@@ -316,7 +313,6 @@
 			{/foreach}
 		</table>
 		<br/>
-
 		<div class="row">
 			<div class="col-md-8">
 				<div class="nzb_multi_operations">

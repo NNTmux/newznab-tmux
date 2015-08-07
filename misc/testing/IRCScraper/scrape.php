@@ -1,7 +1,7 @@
 <?php
 require_once dirname(__FILE__) . '/../../../www/config.php';
 
-if (!is_file(NN_TMUX . 'lib' . DS . 'IRCScraper' .DS . 'settings.php')) {
+if (!is_file(NN_MISC . 'testing' . DS . 'IRCScraper' .DS . 'settings.php')) {
 	exit('Copy settings_example.php to settings.php and change the settings.' . PHP_EOL);
 }
 

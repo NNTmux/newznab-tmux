@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
 {if isset($error) && $error != ''}
 	<div class="alert alert-danger">{$error}</div>
 {/if}
@@ -20,7 +19,7 @@
 		/* ]]> */
 	</script>
 	<meta charset="UTF-8">
-	<title>Newznab Tmux | Password reset</title>
+	<title>{$site->title} | Password reset</title>
 	<meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
 	<!-- Bootstrap 3.3.4 -->
 	<link href="{$smarty.const.WWW_TOP}/templates/omicron/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
@@ -30,7 +29,6 @@
 	<link href="{$smarty.const.WWW_TOP}/templates/omicron/dist/css/AdminLTE.min.css" rel="stylesheet" type="text/css" />
 	<!-- iCheck -->
 	<link href="{$smarty.const.WWW_TOP}/templates/omicron/plugins/iCheck/square/blue.css" rel="stylesheet" type="text/css" />
-
 	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 	<!--[if lt IE 9]>
@@ -38,12 +36,11 @@
 	<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 	<![endif]-->
 </head>
-
 {if $confirmed == '' && $sent == ''}
 <body class="login-page">
 <div class="login-box">
 	<div class="login-logo">
-		<a href="{$serverrroot}"><b>Newznab</b>Tmux</a>
+		<a href="{$serverrroot}"><b{$site->title}</b></a>
 	</div><!-- /.login-logo -->
 	<div class="login-box-body">
 		<p class="login-box-msg">Please enter the email address you used to register and we will send an email to reset your password. If you
@@ -61,12 +58,9 @@
 				<hr>
 				<div class="col-xs-12">
 					<button type="submit" class="btn btn-primary btn-block btn-flat">Request Password Reset</button>
-
 				</div><!-- /.col -->
 			</div>
 		</form>
-
-
 		<!-- jQuery 2.1.4 -->
 		<script src="{$smarty.const.WWW_TOP}/templates/omicron/plugins/jQuery/jQuery-2.1.4.min.js"></script>
 		<!-- Bootstrap 3.3.2 JS -->
@@ -84,4 +78,3 @@
 	</p>
 {/if}
 </html>
-

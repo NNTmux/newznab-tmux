@@ -2,7 +2,6 @@
 	<div class="header">
 		{assign var="catsplit" value=">"|explode:$catname}
 		<h2>View > <strong>TV Series</strong></h2>
-
 		<div class="breadcrumb-wrapper">
 			<ol class="breadcrumb">
 				<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
@@ -19,7 +18,6 @@
 	<div class="header">
 		{assign var="catsplit" value=">"|explode:$catname}
 		<h2>View > <strong>TV Series</strong></h2>
-
 		<div class="breadcrumb-wrapper">
 			<ol class="breadcrumb">
 				<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
@@ -48,7 +46,6 @@
 			{if $seriesGenre != ''}<b>{$seriesgenre}</b><br/>{/if}
 			<span class="descinitial">{$seriesdescription|escape:"htmlall"|nl2br|magicurl}</span>
 		</p>
-
 	</div>
 	<div class="btn-group">
 		{if $rage|@count == 1 && $isadmin}
@@ -66,7 +63,6 @@
 	<br/>
 		<div class="box-body"
 				<form id="nzb_multi_operations_form" action="get">
-
 					<div class="well well-small">
 						<div class="nzb_multi_operations">
 							With Selected:
@@ -80,7 +76,6 @@
 										   value="Send to Queue"/>
 								{/if}
 							</div>
-
 							{if isset($isadmin)}
 								<div class="pull-right">
 									Admin:
@@ -113,11 +108,8 @@
 							</div>
 						</div>
 					</div>
-
 					<br clear="all"/>
-
 					<a id="latest"></a>
-
 					<div class="row">
 						<div class="col-xlg-12 portlets">
 							<div class="panel">
@@ -130,7 +122,6 @@
 															data-toggle="tab">{$seasonnum}</a></li>
 											{/foreach}
 										</ul>
-
 										<div class="tab-content">
 											{foreach $seasons as $seasonnum => $season name=tv}
 												<div class="tab-pane{if $smarty.foreach.tv.first} active{/if} fade in"
@@ -166,7 +157,6 @@
 																	<td>
 																		<a title="View details"
 																		   href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"htmlall"}">{$result.searchname|escape:"htmlall"|replace:".":" "}</a>
-
 																		<div>
 																			{if $result.nfoid > 0}<span
 																					class="label label-default">
@@ -178,7 +168,7 @@
 																					href="{$smarty.const.WWW_TOP}/covers/preview/{$result.guid}_thumb.jpg"
 																					name="name{$result.guid}"
 																					title="View Screenshot"
-																					class="modal_prev label badge halffade"
+																					class="modal_prev label label-default"
 																					rel="preview">Preview</a>{/if}
 																			<span class="label label-default">{$result.grabs}
 																				Grab{if $result.grabs != 1}s{/if}</span>
@@ -187,7 +177,7 @@
 																				title="{$result.tvtitle} Aired on {$result.tvairdate|date_format}">
 																				Aired {if $result.tvairdate|strtotime > $smarty.now}in future{else}{$result.tvairdate|daysago}{/if}</span>{/if}
 																			{if $result.reid > 0}<span
-																				class="mediainfo label badge halffade"
+																				class="mediainfo label label label-default"
 																				title="{$result.guid}">Media</span>{/if}
 																		</div>
 																	</td>
@@ -201,7 +191,6 @@
 																	</td>
 																	<td width="40"
 																		title="{$result.postdate}">{$result.postdate|timeago}</td>
-
 																	<td>
 																		{$result.size|fsize_format:"MB"}
 																	</td>
@@ -214,11 +203,9 @@
 																		   title="Add to Cart">
 																		</a>
 																		{if isset($sabintegrated)}
-																			<a class="icon icon_sab" href="#"
-																			   title="Send to Sab">
-																				<img class="icon icon_sab"
-																					 alt="Send to my Sabnzbd"
-																					 src="{$smarty.const.WWW_TOP}/templates/omicron/images/icons/sabup.png">
+																			<a class="fa fa-send-o icon_sab text-muted"
+																			   href="#"
+																			   title="Send to my Queue">
 																			</a>
 																		{/if}
 																		{if $weHasVortex}
@@ -226,16 +213,14 @@
 																			   title="Send to NZBVortex">
 																				<img class="icon icon_nzbvortex"
 																					 alt="Send to my NZBVortex"
-																					 src="{$smarty.const.WWW_TOP}/templates/omicron/images/icons/vortex/bigsmile.png">
+																					 src="{$smarty.const.WWW_TOP}/templates_shared/images/icons/vortex/bigsmile.png">
 																			</a>
 																		{/if}
 																		{if isset($nzbgetintegrated)}<a
 																				class="icon icon_nzbget"
-																				title="Send to NZBGet"
-																				href="#"><img
-																					class="icon icon_nzbget"
-																					alt="Send to NZBget"
-																					src="{$smarty.const.WWW_TOP}/templates/omicron/images/icons/nzbgetup.png">
+																				title="Send to my Queue"
+																				href="#"><i
+																					class="fa fa-send-o">
 																			</a>{/if}
 																		{if isset($isadmin)}
 																			<br/>
