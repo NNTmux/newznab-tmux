@@ -2,8 +2,8 @@
 <newznab>
 	<versions>
 		<sql>
-			<db>169</db>
-			<file>169</file>
+			<db>171</db>
+			<file>171</file>
 		</sql>
 		<git>
 			<tag>0.4.1</tag>
