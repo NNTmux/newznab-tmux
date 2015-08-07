@@ -1133,7 +1133,6 @@
 					usually on XXX releases.<br/></div>
 			</td>
 		</tr>
-		</tr>
 		<tr>
 			<td style="width:180px;"><label for="processthumbnails">Process Video Thumbnails:</label></td>
 			<td>
@@ -1203,7 +1202,32 @@
 		</tr>
 	</table>
 </fieldset>
-
+	<fieldset id="site_movietrailerset">
+		<legend>Movie Trailer settings</legend>
+		<table class="input">
+			<tr>
+				<td style="width:180px;"><label for="trailers_display">Fetch/Display Movie Trailers:</label></td>
+				<td>
+					{html_radios id="trailers_display" name='trailers_display' values=$yesno_ids output=$yesno_names selected=$site->trailers_display separator='<br />'}
+					<div class="hint">Fetch and display trailers from TraktTV (Requires API key) and/or TrailerAddict on the details page?</div>
+				</td>
+			</tr>
+			<tr>
+				<td style="width:180px;"><label for="trailers_size_x">Trailers width:</label></td>
+				<td>
+					<input class="short" id="trailers_size_x" name="trailers_size_x" type="text" value="{$site->trailers_size_x}"/>
+					<div class="hint">Maximum width in pixels for the trailer window. (Default: 480)</div>
+				</td>
+			</tr>
+			<tr>
+				<td style="width:180px;"><label for="trailers_size_y">Trailers height:</label></td>
+				<td>
+					<input class="short" id="trailers_size_y" name="trailers_size_y" type="text" value="{$site->trailers_size_y}"/>
+					<div class="hint">Maximum height in pixels for the trailer window. (Default: 345)</div>
+				</td>
+			</tr>
+		</table>
+	</fieldset>
 <fieldset id="site_requidset">
 	<legend>RequestID Settings</legend>
 	<table class="input">

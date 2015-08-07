@@ -703,13 +703,12 @@ class Utility
 	 */
 	public static function imdb_trailers($imdbID)
 	{
-		$xml = Utility::getUrl(['http://api.traileraddict.com/?imdb=' . $imdbID]);
+		$xml = Utility::getUrl(['url' => 'http://api.traileraddict.com/?imdb=' . $imdbID]);
 		if ($xml !== false) {
-			if (preg_match('/(<iframe.+?<\/iframe>)/i', $xml, $html)) {
-				return $html[1];
+			if (preg_match('#(v\.traileraddict\.com/\d+)#i', $xml, $html)) {
+				return 'https://' . $html[1];
 			}
 		}
-
 		return '';
 	}
 
