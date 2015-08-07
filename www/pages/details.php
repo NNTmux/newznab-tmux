@@ -72,33 +72,24 @@ if (isset($_GET["id"]))
 
 	$mov = '';
 	if ($data['imdbid'] != '' && $data['imdbid'] != 0000000) {
-		$movie = new Film();
-		$mov = $movie->getMovieInfo($data['imdbid']);
-
-		$trakt = new TraktTv();
-		$traktSummary = $trakt->movieSummary('tt' . $data['imdbid'], 'full');
-		if ($traktSummary !== false &&
-			isset($traktSummary['trailer']) &&
-			$traktSummary['trailer'] !== '' &&
-			preg_match('/[\/?]v[\/\=](\w+)$/i', $traktSummary['trailer'], $youtubeM)
-		) {
-			$mov['trailer'] =
-				'<embed width="480" height="345" src="' .
-				'https://www.youtube.com/v/' . $youtubeM[1] .
-				'" type="application/x-shockwave-flash"></embed>';
-		} else {
-			$mov['trailer'] = \newznab\utility\Utility::imdb_trailers($data['imdbid']);
-		}
-
+		$movie = new Film(['Settings' => $page->settings]);
+		$mov   = $movie->getMovieInfo($data['imdbid']);
 		if ($mov && isset($mov['title'])) {
-			$mov['title'] = str_replace(array('/', '\\'), '', $mov['title']);
-			$mov['actors'] = $movie->makeFieldLinks($mov, 'actors');
-			$mov['genre'] = $movie->makeFieldLinks($mov, 'genre');
+			$mov['title']    = str_replace(['/', '\\'], '', $mov['title']);
+			$mov['actors']   = $movie->makeFieldLinks($mov, 'actors');
+			$mov['genre']    = $movie->makeFieldLinks($mov, 'genre');
 			$mov['director'] = $movie->makeFieldLinks($mov, 'director');
-		} else if ($traktSummary !== false) {
-			$mov['title'] = str_replace(array('/', '\\'), '', $traktSummary['title']);
-		} else {
-			$mov = false;
+			if ($page->settings->getSetting('trailers_display')) {
+				$trailer = (!isset($mov['trailer']) || empty($mov['trailer']) ? $movie->getTrailer($data['imdbid']) : $mov['trailer']);
+				if ($trailer) {
+					$mov['trailer'] = sprintf(
+						"<iframe width=\"%d\" height=\"%d\" src=\"%s\"></iframe>",
+						$page->settings->getSetting('trailers_size_x'),
+						$page->settings->getSetting('trailers_size_y'),
+						$trailer
+					);
+				}
+			}
 		}
 	}
 
