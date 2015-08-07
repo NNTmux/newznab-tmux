@@ -19,7 +19,7 @@ BEGIN
   DECLARE cur1 CURSOR FOR
     SELECT TABLE_NAME FROM INFORMATION_SCHEMA.COLUMNS
     WHERE TABLE_SCHEMA = DATABASE() AND COLUMN_NAME = "binaryhash" AND DATA_TYPE <> "binary"
-    AND (TABLE_NAME LIKE "binaries\_%" OR TABLE_NAME="binaries");
+      AND (TABLE_NAME LIKE "binaries\_%" OR TABLE_NAME = "binaries");
   DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
   OPEN cur1;
     myloop: loop FETCH cur1 INTO _table;
@@ -32,9 +32,8 @@ BEGIN
                           "_tmp (id, name, collection_id, filenumber, totalparts, currentparts, binaryhash, partcheck, partsize) (SELECT id, name, collection_id, filenumber, totalparts, currentparts, UNHEX(binaryhash), partcheck, partsize FROM ",
                           _table, ")");
       SET @sql5 := CONCAT("DROP TABLE IF EXISTS ", _table, "_old");
-      SET @sql6 := CONCAT("RENAME TABLE ", _table," TO ", _table, "_old, ", _table, "_tmp TO ", _table);
+      SET @sql6 := CONCAT("RENAME TABLE ", _table, " TO ", _table, "_old, ", _table, "_tmp TO ", _table);
       SET @sql7 := CONCAT("DROP TABLE IF EXISTS ", _table, "_old");
-
 
       PREPARE _stmt FROM @sql1; EXECUTE _stmt; DROP PREPARE _stmt;
       PREPARE _stmt FROM @sql2; EXECUTE _stmt; DROP PREPARE _stmt;
