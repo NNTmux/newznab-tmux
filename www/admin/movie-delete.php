@@ -5,7 +5,7 @@ $page = new AdminPage();
 
 if (isset($_GET['id']))
 {
-	$m = new Movie();
+	$m = new Film();
 	$m->delete($_GET['id']);
 }
 

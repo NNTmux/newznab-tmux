@@ -36,7 +36,7 @@ switch($action)
 
 			if ($release && $release["imdbid"] != "")
 			{
-				$movie = new Movie();
+				$movie = new Film();
 				$mov = $movie->getMovieInfo($release['imdbid']);
 				$page->smarty->assign('updatename', $mov["title"]);
 			}
