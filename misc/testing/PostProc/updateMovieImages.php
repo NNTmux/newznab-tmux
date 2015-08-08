@@ -2,7 +2,7 @@
 require_once dirname(__FILE__) . '/../../../www/config.php';
 
 use newznab\db\Settings;
-
+use newznab\utility\Utility;
 
 $pdo = new Settings();
 $covers = $updated = $deleted = 0;
@@ -11,6 +11,12 @@ if ($argc == 1 || $argv[1] != 'true') {
 	exit($pdo->log->error("\nThis script will check all images in covers/movies and compare to db->movieinfo.\nTo run:\nphp $argv[0] true\n"));
 }
 
+$row = $pdo->queryOneRow("SELECT value FROM settings WHERE setting = 'coverspath'");
+if ($row !== false) {
+	Utility::setCoversConstant($row['value']);
+} else {
+	die("Unable to set Covers' constant!\n");
+}
 $path2covers = NN_COVERS . 'movies' . DS;
 
 $dirItr = new \RecursiveDirectoryIterator($path2covers);

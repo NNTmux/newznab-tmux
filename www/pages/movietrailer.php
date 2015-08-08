@@ -1,6 +1,6 @@
 <?php
 
-$movie = new Movie;
+$movie = new Film;
 
 if (!$page->users->isLoggedIn())
 	$page->show403();
