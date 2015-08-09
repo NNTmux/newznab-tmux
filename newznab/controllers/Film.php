@@ -702,13 +702,13 @@ class Film
 			'cover'     => $mov['cover'],
 			'director'  => html_entity_decode($mov['director'], ENT_QUOTES, 'UTF-8'),
 			'genre'     => html_entity_decode($mov['genre']   , ENT_QUOTES, 'UTF-8'),
-			'imdbid'    => $mov['imdb_id'],
+			'imdbid'    => $mov['imdbid'],
 			'language'  => html_entity_decode($mov['language'], ENT_QUOTES, 'UTF-8'),
 			'plot'      => html_entity_decode(preg_replace('/\s+See full summary »/', ' ', $mov['plot']), ENT_QUOTES, 'UTF-8'),
 			'rating'    => $mov['rating'],
 			'tagline'   => html_entity_decode($mov['tagline'] , ENT_QUOTES, 'UTF-8'),
 			'title'     => $mov['title'],
-			'tmdbid'    => $mov['tmdb_id'],
+			'tmdbid'    => $mov['tmdbid'],
 			'type'      => html_entity_decode(ucwords(preg_replace('/[\.\_]/', ' ', $mov['type'])), ENT_QUOTES, 'UTF-8'),
 			'year'      => $mov['year']
 		]);
