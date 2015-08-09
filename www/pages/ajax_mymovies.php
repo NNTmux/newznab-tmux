@@ -28,7 +28,7 @@ if (isset($_REQUEST['del'])) {
 		$page->show404();
 	}
 
-	$tmdb = new TMDb($page->settings->getSetting('tmdbkey'), $page->settings->getSetting('imdblanguage'));
+	$tmdb = new TMDB($page->settings->getSetting('tmdbkey'), $page->settings->getSetting('imdblanguage'));
 	$m = new Film(['Settings' => $page->settings, 'TMDb' => $tmdb]);
 
 	if (is_numeric($_REQUEST['id'])) {
