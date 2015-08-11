@@ -112,8 +112,8 @@
 					<a id="latest"></a>
 					<div class="row">
 						<div class="col-xlg-12 portlets">
-							<div class="panel">
-								<div class="panel-content pagination2">
+							<div class="panel panel-default">
+								<div class="panel-body pagination2">
 									<div class="tabbable">
 										<ul class="nav nav-tabs">
 											{foreach $seasons as $seasonnum => $season name="seas"}
