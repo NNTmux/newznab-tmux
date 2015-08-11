@@ -124,7 +124,7 @@ class DbUpdate
 					}
 				} else {
 					echo "Incorrectly formatted filename '$file' (should match " .
-						str_replace('#', '', $options['regex']) . "\n";
+						 str_replace('#', '', $options['regex']) . "\n";
 				}
 			} else {
 				echo $this->log->error("  Unable to read file: '$file'");
@@ -175,8 +175,8 @@ class DbUpdate
 					$current++;
 					$this->pdo->queryExec("UPDATE settings SET value = '$current' WHERE setting = 'sqlpatch';");
 					$newName = $matches['drive'] . $matches['path'] .
-						str_pad($current, 4, '0', STR_PAD_LEFT) . '~' .
-						$matches['table'] . '.sql';
+							   str_pad($current, 4, '0', STR_PAD_LEFT) . '~' .
+							   $matches['table'] . '.sql';
 					rename($matches[0], $newName);
 					$this->git->add($newName);
 					if ($this->git->isCommited($this->git->getBranch() . ':' . $matches[0])) {
@@ -220,8 +220,8 @@ class DbUpdate
 					$patch = (integer)$matches['patch'];
 					$setPatch = true;
 				} else if (preg_match('/UPDATE `?site`? SET `?value`? = \'?(?P<patch>\d+)\'? WHERE `?setting`? = \'sqlpatch\'/i',
-					$patch,
-					$matches)
+									$patch,
+									$matches)
 				) {
 					$patch = (integer)$matches['patch'];
 				} else {
@@ -283,24 +283,44 @@ class DbUpdate
 			if (is_resource($file)) {
 				$query = [];
 
-				$oldDelimiter = '';
+				$delimiter = $options['delimiter'];
 				while (!feof($file)) {
 					$line = fgets($file);
-					// Check for DELIMITER $$, set delimiter to $$ to send query as is to MySQL.
-					if (preg_match('#^\s*DELIMITER\s+(?P<delimiter>.+)\s*$#i', $line, $matches)) {
-						$oldDelimiter = $options['delimiter'];
-						$options['delimiter'] = $matches['delimiter'];
+
+					if ($line === false) {
 						continue;
-					} elseif ($oldDelimiter != '' && $options['delimiter'] != $oldDelimiter
-						&& preg_match('#' . preg_quote($options['delimiter']) . '\s*$#', $line)) {
-						// Replace the last delimiter ($$) with ;
-						$line = str_replace($options['delimiter'], ';', $line);
-						// Reset the delimiter back to ;
-						$options['delimiter'] = $oldDelimiter;
 					}
+
+					// Skip comments.
+					if (preg_match('!^\s*(#|--|//)\s*(.+?)\s*$!', $line, $matches)) {
+						echo $this->pdo->log->info("COMMENT: " . $matches[2]);
+						continue;
+					}
+
+					// Check for non default delimiters ($$ for example).
+					if (preg_match('#^\s*DELIMITER\s+(?P<delimiter>.+)\s*$#i', $line, $matches)) {
+						$delimiter = $matches['delimiter'];
+						if (NN_DEBUG) {
+							echo $this->pdo->log->debug("DEBUG: Delimiter switched to $delimiter");
+						}
+						if ($delimiter != $options['delimiter']) {
+							continue;
+						}
+					}
+
+					// Check if the line has delimiter that is non default ($$ for example).
+					if ($delimiter != $options['delimiter'] && preg_match('#^(.+?)' . preg_quote($delimiter) . '\s*$#', $line, $matches)) {
+						// Check if the line has also the default delimiter (;), remove it.
+						if (preg_match('#^(.+?)' . preg_quote($options['delimiter']) . '\s*$#', $matches[1], $matches2)) {
+							$matches[1] = $matches2[1];
+						}
+						// Change the non default delimiter ($$) to the default one(;).
+						$line = $matches[1] . $options['delimiter'];
+					}
+
 					$query[] = $line;
 
-					if (preg_match('~' . preg_quote($options['delimiter'], '~') . '\s*$~iS', end($query)) == 1) {
+					if (preg_match('~' . preg_quote($delimiter, '~') . '\s*$~iS', $line) == 1) {
 						$query = trim(implode('', $query));
 						if ($options['local'] !== null) {
 							$query = str_replace('{:local:}', $options['local'], $query);
@@ -312,8 +332,7 @@ class DbUpdate
 						try {
 							$qry = $this->pdo->prepare($query);
 							$qry->execute();
-							echo $this->log->alternateOver('SUCCESS: ') .
-								$this->log->primary($query);
+							echo $this->log->alternateOver('SUCCESS: ') . $this->log->primary($query);
 						} catch (\PDOException $e) {
 							// Log the problem and the query.
 							file_put_contents(
@@ -327,25 +346,25 @@ class DbUpdate
 
 							if (
 								in_array($e->errorInfo[1], [1091, 1060, 1061, 1071, 1146]) ||
-								in_array($e->errorInfo[0],
-									[23505, 42701, 42703, '42P07', '42P16'])
+								in_array($e->errorInfo[0], [23505, 42701, 42703, '42P07', '42P16'])
 							) {
 								if ($e->errorInfo[1] == 1060) {
 									echo $this->log->warning(
 										"$query The column already exists - No need to worry \{" .
-										$e->errorInfo[1] . "}.\n");
+										$e->errorInfo[1] . "}.\n"
+									);
 								} else {
 									echo $this->log->warning(
 										"$query Skipped - No need to worry \{" .
-										$e->errorInfo[1] . "}.\n");
+										$e->errorInfo[1] . "}.\n"
+									);
 								}
 							} else {
 								if (preg_match('/ALTER IGNORE/i', $query)) {
 									$this->pdo->queryExec("SET SESSION old_alter_table = 1");
 									try {
 										$this->pdo->exec($query);
-										echo $this->log->alternateOver('SUCCESS: ') .
-											$this->log->primary($query);
+										echo $this->log->alternateOver('SUCCESS: ') . $this->log->primary($query);
 									} catch (\PDOException $e) {
 										exit($this->log->error("$query Failed \{" . $e->errorInfo[1] . "}\n\t" . $e->errorInfo[2]));
 									}
@@ -377,8 +396,8 @@ class DbUpdate
 			'path'	=> 'resources' . DS . 'db' . DS . 'schema' . DS . 'data' . DS,
 			'regex'	=> '#^(?P<section>.*)\t(?P<subsection>.*)\t(?P<name>.*)\t(?P<value>.*)\t(?P<hint>.*)\t(?P<setting>.*)$#',
 			'value'	=> function(array $matches) {
-				return "{$matches['section']}\t{$matches['subsection']}\t{$matches['name']}\t{$matches['value']}\t{$matches['hint']}\t{$matches['setting']}";
-			} // WARNING: leaving this empty will blank not remove lines.
+					return "{$matches['section']}\t{$matches['subsection']}\t{$matches['name']}\t{$matches['value']}\t{$matches['hint']}\t{$matches['setting']}";
+				} // WARNING: leaving this empty will blank not remove lines.
 		];
 		$options += $default;
 
@@ -422,7 +441,9 @@ class DbUpdate
 		}
 
 		system("$PHP " . NN_MISC . 'testing' . DS . 'DB' . DS . $this->_DbSystem .
-			'dump_tables.php db dump');
+			   'dump_tables.php db dump');
 		$this->backedup = true;
 	}
 }
+
+?>
