@@ -181,23 +181,23 @@ switch ($function) {
 
 		$page->users->addApiRequest($uid, $_SERVER['REQUEST_URI'], $hosthash);
 
-		$reldata = $releases->getByGuid($_GET["id"]);
-		if (!$reldata)
+		$relData = $releases->getByGuid($_GET["id"]);
+		if (!$relData)
 			showApiError(300);
 
-		$nfo = $releases->getReleaseNfo($reldata["id"], true);
+		$nfo = $releases->getReleaseNfo($relData["id"], true);
 		if (!$nfo)
 			showApiError(300);
 
 		$nforaw = Utility::cp437toUTF($nfo["nfo"]);
-		$page->smarty->assign('release',$reldata);
+		$page->smarty->assign('release',$relData);
 		$page->smarty->assign('nfo',$nfo);
 		$page->smarty->assign('nfoutf',$nforaw);
 
 		if (isset($_GET["raw"]))
 		{
 			header("Content-type: text/x-nfo");
-			header("Content-Disposition: attachment; filename=".str_replace(" ", "_", $reldata["searchname"]).".nfo");
+			header("Content-Disposition: attachment; filename=".str_replace(" ", "_", $relData["searchname"]).".nfo");
 			echo $nforaw;
 			die();
 		}
@@ -222,11 +222,11 @@ switch ($function) {
 
 		$data = $rc->getCommentsByGuid($_GET["id"]);
 		if ($data)
-			$reldata = $data;
+			$relData = $data;
 		else
-			$reldata = [];
+			$relData = [];
 
-		$page->smarty->assign('comments',$reldata);
+		$page->smarty->assign('comments',$relData);
 		$page->smarty->assign('rsstitle',"API Comments");
 		$page->smarty->assign('rssdesc',"API Comments");
 		$content = trim($page->smarty->fetch('apicomments.tpl'));
@@ -247,10 +247,10 @@ switch ($function) {
 
 		$page->users->addApiRequest($uid, $_SERVER['REQUEST_URI'], $hosthash);
 
-		$reldata = $releases->getByGuid($_GET["id"]);
-		if ($reldata)
+		$relData = $releases->getByGuid($_GET["id"]);
+		if ($relData)
 		{
-			$ret = $rc->addComment($reldata["id"], $reldata["gid"], $_GET["text"], $uid, $_SERVER['REMOTE_ADDR']);
+			$ret = $rc->addComment($relData["id"], $relData["gid"], $_GET["text"], $uid, $_SERVER['REMOTE_ADDR']);
 
 			$content = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
 			$content.= "<commentadd id=\"".$ret."\" />\n";
@@ -291,10 +291,10 @@ switch ($function) {
 		$offset = 0;
 		if (isset($_GET["offset"]) && is_numeric($_GET["offset"]))
 			$offset = $_GET["offset"];
-		$reldata = $releases->searchBook((isset($_GET["author"]) ? $_GET["author"] : ""), (isset($_GET["title"]) ? $_GET["title"] : ""), $offset, $limit, $maxage );
+		$relData = $releases->searchBook((isset($_GET["author"]) ? $_GET["author"] : ""), (isset($_GET["title"]) ? $_GET["title"] : ""), $offset, $limit, $maxage );
 
 		$page->smarty->assign('offset',$offset);
-		$page->smarty->assign('releases',$reldata);
+		$page->smarty->assign('releases',$relData);
 		$output = trim($page->smarty->fetch('apiresult.tpl'));
 
 		printOutput($relData, $outputXML, $page, $offset);
@@ -338,10 +338,10 @@ switch ($function) {
 		$offset = 0;
 		if (isset($_GET["offset"]) && is_numeric($_GET["offset"]))
 			$offset = $_GET["offset"];
-		$reldata = $releases->searchAudio((isset($_GET["artist"]) ? $_GET["artist"] : ""), (isset($_GET["album"]) ? $_GET["album"] : ""), (isset($_GET["label"]) ? $_GET["label"] : ""), (isset($_GET["track"]) ? $_GET["track"] : ""), (isset($_GET["year"]) ? $_GET["year"] : ""), $genreId, $offset, $limit, $categoryId, $maxage );
+		$relData = $releases->searchAudio((isset($_GET["artist"]) ? $_GET["artist"] : ""), (isset($_GET["album"]) ? $_GET["album"] : ""), (isset($_GET["label"]) ? $_GET["label"] : ""), (isset($_GET["track"]) ? $_GET["track"] : ""), (isset($_GET["year"]) ? $_GET["year"] : ""), $genreId, $offset, $limit, $categoryId, $maxage );
 
 		$page->smarty->assign('offset',$offset);
-		$page->smarty->assign('releases',$reldata);
+		$page->smarty->assign('releases',$relData);
 		$output = trim($page->smarty->fetch('apiresult.tpl'));
 
 		printOutput($relData, $outputXML, $page, $offset);

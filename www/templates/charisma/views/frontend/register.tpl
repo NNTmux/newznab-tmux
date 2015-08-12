@@ -13,7 +13,7 @@
 	<script type="text/javascript">
 		/* <![CDATA[ */
 		var WWW_TOP = "{$smarty.const.WWW_TOP}";
-		var SERVERROOT = "{$serverroot}";
+		var SERVERROOT = "{$smarty.const.WWW_TOP}";
 		var UID = "{if $loggedin=="true"}{$userdata.id}{else}{/if}";
 		var RSSTOKEN = "{if $loggedin=="true"}{$userdata.rsstoken}{else}{/if}";
 		/* ]]> */
@@ -108,7 +108,7 @@
 							</p>
 							<button type="submit" class="btn btn-primary">Register</button>
 						</fieldset>
-						<a href="{$serverroot}login" class="text-center">I already have a membership</a>
+						<a href="{$smarty.const.WWW_TOP}login" class="text-center">I already have a membership</a>
 					</form>
 				</div>
 				<!--/span-->

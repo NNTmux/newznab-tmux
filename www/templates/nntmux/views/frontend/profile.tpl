@@ -60,7 +60,7 @@
 		</td>
 	</tr>
 	{if $isadmin || !$publicview}<tr><th title="Not public">Excluded Categories:</th><td>{$exccats|replace:",":"<br/>"}</td></tr>{/if}
-	{if $page->settings->getSetting('sabintegrationtype') == 2 && $user.id==$userdata.id}
+	{if $page->settings->getSetting('sabintegrationtype') == 2 && (!$publicview || $isadmin)}
 		<tr><th>SABnzbd Integration:</th>
 		<td>
 			Url: {if $saburl == ''}N/A{else}{$saburl}{/if}<br/>
@@ -70,14 +70,13 @@
 			Storage: {if $sabsetting == ''}N/A{else}{$sabsetting}{/if}
 		</td>
 	{/if}
+			{if !$publicview || $isadmin}
 	<tr>
 		<th>CouchPotato Integration:</th>
 		<td>
 			Url: {if $user.cp_url == ''}N/A{else}{$user.cp_url}{/if}<br/>
 			Key: {if $user.cp_api == ''}N/A{else}{$user.cp_api}{/if}<br/>
 		</td>
-
-	{if ($user.id==$userdata.id)}
 	<tr>
 	   <th>NZBVortex</th>
         <td>
@@ -86,15 +85,9 @@
             Server URL: <a href="{$user.nzbvortex_server_url}" target="_blank">{$user.nzbvortex_server_url}</a>
         </td>
     </tr>
-	{/if}
-
-	{if $user.id==$userdata.id}
 			<tr><th>My TV Shows:</th><td><a href="{$smarty.const.WWW_TOP}/myshows">Manage my shows</a></td></tr>
 			<tr><th>My Movies:</th><td><a href="{$smarty.const.WWW_TOP}/mymovies">Manage my movies</a></td></tr>
-	{/if}
-
-
-	{if $user.id==$userdata.id}<tr><th></th><td><a href="{$smarty.const.WWW_TOP}/profileedit">Edit</a></td></tr>{/if}
+	<tr><th></th><td><a href="{$smarty.const.WWW_TOP}/profileedit">Edit</a></td></tr>{/if}
 </table>
 
 

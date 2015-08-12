@@ -4,7 +4,7 @@
 	<script type="text/javascript">
 		/* <![CDATA[ */
 		var WWW_TOP = "{$smarty.const.WWW_TOP}";
-		var SERVERROOT = "{$serverroot}";
+		var SERVERROOT = "{$smarty.const.WWW_TOP}";
 		var UID = "{if $loggedin=="true"}{$userdata.id}{else}{/if}";
 		var RSSTOKEN = "{if $loggedin=="true"}{$userdata.rsstoken}{else}{/if}";
 		/* ]]> */
@@ -104,31 +104,31 @@
 								<!-- Menu Body -->
 								<li class="user-body">
 									<div class="col-xs-12 text-center">
-										<a href="{$serverroot}cart"><i class="fa fa-shopping-cart"></i> My Cart</a>
+										<a href="{$smarty.const.WWW_TOP}cart"><i class="fa fa-shopping-cart"></i> My Cart</a>
 									</div>
 									<div class="col-xs-12 text-center">
-										<a href="{$serverroot}queue"><i class="fa fa-list-alt"></i> My Queue</a>
+										<a href="{$smarty.const.WWW_TOP}queue"><i class="fa fa-list-alt"></i> My Queue</a>
 									</div>
 									<div class="col-xs-12 text-center">
-										<a href="{$serverroot}mymovies"><i class="fa fa-film"></i> My Movies</a>
+										<a href="{$smarty.const.WWW_TOP}mymovies"><i class="fa fa-film"></i> My Movies</a>
 									</div>
 									<div class="col-xs-12 text-center">
-										<a href="{$serverroot}profileedit"><i class="fa fa-cog fa-spin"></i> Account Settings</a>
+										<a href="{$smarty.const.WWW_TOP}profileedit"><i class="fa fa-cog fa-spin"></i> Account Settings</a>
 									</div>
 									{if isset($isadmin)}
 										<div class="col-xs-12 text-center">
-											<a href="{$serverroot}admin"><i class="fa fa-cogs fa-spin"></i> Admin</a>
+											<a href="{$smarty.const.WWW_TOP}admin"><i class="fa fa-cogs fa-spin"></i> Admin</a>
 										</div>
 									{/if}
 								</li>
 								<!-- Menu Footer-->
 								<li class="user-footer">
 									<div class="pull-left">
-										<a href="{$serverroot}profile" class="btn btn-default btn-flat"><i
+										<a href="{$smarty.const.WWW_TOP}profile" class="btn btn-default btn-flat"><i
 													class="fa fa-user"></i> Profile</a>
 									</div>
 									<div class="pull-right">
-										<a href="{$serverroot}logout" class="btn btn-default btn-flat"><i
+										<a href="{$smarty.const.WWW_TOP}logout" class="btn btn-default btn-flat"><i
 													class="fa fa-unlock-alt"></i> Sign out</a>
 									</div>
 								</li>
@@ -184,39 +184,39 @@
 					<li class="treeview">
 						<a href="#"><i class="fa fa-list-ol"></i><span> Browse</span></a>
 						<ul class="treeview-menu">
-							<li><a href="{$serverroot}newposterwall"><i
+							<li><a href="{$smarty.const.WWW_TOP}newposterwall"><i
 											class="fa fa-file-image-o"></i><span> New Releases</span></a></li>
-							<li><a href="{$serverroot}console"><i
+							<li><a href="{$smarty.const.WWW_TOP}console"><i
 											class="fa fa-gamepad"></i><span> Console</span></a></li>
-							<li><a href="{$serverroot}movies"><i
+							<li><a href="{$smarty.const.WWW_TOP}movies"><i
 											class="fa fa-film"></i><span> Movies</span></a></li>
-							<li><a href="{$serverroot}music"><i
+							<li><a href="{$smarty.const.WWW_TOP}music"><i
 											class="fa fa-music"></i><span> Music</span></a></li>
-							<li><a href="{$serverroot}games"><i
+							<li><a href="{$smarty.const.WWW_TOP}games"><i
 											class="fa fa-gamepad"></i><span> Games</span></a></li>
-							<li><a href="{$serverroot}xxx"><i class="fa fa-ban"></i><span> XXX</span></a></li>
-							<li><a href="{$serverroot}books"><i class="fa fa-book"></i><span> Books</span></a></li>
-							<li><a href="{$serverroot}browse"><i
+							<li><a href="{$smarty.const.WWW_TOP}xxx"><i class="fa fa-ban"></i><span> XXX</span></a></li>
+							<li><a href="{$smarty.const.WWW_TOP}books"><i class="fa fa-book"></i><span> Books</span></a></li>
+							<li><a href="{$smarty.const.WWW_TOP}browse"><i
 											class="fa fa-list-ul"></i><span> Browse All Releases</span></a></li>
-							<li><a href="{$serverroot}prehash"><i class="fa fa-list-ol"></i><span> PreHash</span></a>
+							<li><a href="{$smarty.const.WWW_TOP}prehash"><i class="fa fa-list-ol"></i><span> PreHash</span></a>
 							</li>
-							<li><a href="{$serverroot}predb"><i class="fa fa-list-alt"></i><span> PreDB</span></a></li>
+							<li><a href="{$smarty.const.WWW_TOP}predb"><i class="fa fa-list-alt"></i><span> PreDB</span></a></li>
 						</ul>
 					</li>
 					<li class="treeview">
 						<a href="#"><i class="fa fa-list-ol"></i><span> Articles & Links</span></a>
 						<ul class="treeview-menu">
-							<li><a href="{$serverroot}contact-us"><i
+							<li><a href="{$smarty.const.WWW_TOP}contact-us"><i
 											class="fa fa-envelope-o"></i><span> Contact</span> <span
 											class="fa arrow"></span></a></li>
-							<li><a href="{$serverroot}search"><i class="fa fa-search"></i> Search</a></li>
-							<li><a href="{$serverroot}rss"><i class="fa fa-rss"></i> RSS Feeds</a></li>
-							<li><a href="{$serverroot}apihelp"><i class="fa fa-cloud"></i> API</a></li>
+							<li><a href="{$smarty.const.WWW_TOP}search"><i class="fa fa-search"></i> Search</a></li>
+							<li><a href="{$smarty.const.WWW_TOP}rss"><i class="fa fa-rss"></i> RSS Feeds</a></li>
+							<li><a href="{$smarty.const.WWW_TOP}apihelp"><i class="fa fa-cloud"></i> API</a></li>
 						</ul>
 					</li>
-					<li><a href="{$serverroot}logout"><i class="fa fa-unlock"></i><span> Sign out</span></a>
+					<li><a href="{$smarty.const.WWW_TOP}logout"><i class="fa fa-unlock"></i><span> Sign out</span></a>
 						{else}
-					<li><a href="{$serverroot}login"><i class="fa fa-lock"></i><span> Login</span></a>
+					<li><a href="{$smarty.const.WWW_TOP}login"><i class="fa fa-lock"></i><span> Login</span></a>
 						{/if}
 					</li>
 				</ul>
