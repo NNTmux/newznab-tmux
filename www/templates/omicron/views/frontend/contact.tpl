@@ -4,7 +4,7 @@
 	<script type="text/javascript">
 		/* <![CDATA[ */
 		var WWW_TOP = "{$smarty.const.WWW_TOP}";
-		var SERVERROOT = "{$serverroot}";
+		var SERVERROOT = "{$smarty.const.WWW_TOP}";
 		/* ]]> */
 	</script>
 	<meta charset="UTF-8">
@@ -67,7 +67,7 @@
 										</div>
 										<div class="row m-b-30">
 											<div class="col-sm-6">
-												<form method="POST" action="{$serverroot}contact-us">
+												<form method="POST" action="{$smarty.const.WWW_TOP}contact-us">
 													<div class="row">
 														<div class="col-sm-6">
 															<label for="username" class="h6">Name</label>

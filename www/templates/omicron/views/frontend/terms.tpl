@@ -4,7 +4,7 @@
 	<script type="text/javascript">
 		/* <![CDATA[ */
 		var WWW_TOP = "{$smarty.const.WWW_TOP}";
-		var SERVERROOT = "{$serverroot}";
+		var SERVERROOT = "{$smarty.const.WWW_TOP}";
 		/* ]]> */
 	</script>
 	<meta charset="UTF-8">
