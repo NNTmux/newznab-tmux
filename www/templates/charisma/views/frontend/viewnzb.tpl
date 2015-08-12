@@ -270,7 +270,7 @@
 																		</th>
 																		<td>{$xxx.actors}</td>
 																	</tr>
-																	{if $xxx.director != ""}
+																	{if isset($xxx.director) && $xxx.director != ""}
 																		<tr>
 																			<th width="140">
 																				Director
@@ -278,7 +278,7 @@
 																			<td>{$xxx.director}</td>
 																		</tr>
 																	{/if}
-																	{if $xxx.genres != ""}
+																	{if isset($xxx.genres) && $xxx.genres != ""}
 																		<tr>
 																			<th width="140">
 																				Genre
