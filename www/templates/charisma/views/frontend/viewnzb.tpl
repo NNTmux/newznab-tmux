@@ -131,10 +131,10 @@
 									{if $reVideo.releaseid|@count > 0 || $reAudio|@count > 0}
 										<li><a href="#pane8" data-toggle="tab">MediaInfo</a></li>
 									{/if}
-									{if $xxx.backdrop == 1}
+									{if isset($xxx.backdrop) && $xxx.backdrop == 1}
 										<li><a href="#pane9" data-toggle="tab">Back Cover</a></li>
 									{/if}
-									{if $game.backdrop == 1}
+									{if isset($game.backdrop) && $game.backdrop == 1}
 									<li><a href="#pane10" data-toggle="tab">Screenshot</a></li>
 									{/if}
 								</ul>
