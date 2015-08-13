@@ -329,8 +329,6 @@ Class Sharing
 					INNER JOIN release_comments rc ON rc.siteid = ss.site_guid
 					SET ss.first_time = rc.createddate
 					WHERE rc.createddate > '2005-01-01'
-					GROUP BY rc.siteid
-					ORDER BY rc.createddate ASC
 				"
 			)
 		);
