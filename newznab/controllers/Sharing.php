@@ -323,20 +323,20 @@ Class Sharing
 		}
 
 		// Update first time seen.
-		$siteTimes = $this->pdo->queryDirect(
-			'SELECT createddate, siteid FROM release_comments WHERE createddate > \'2005-01-01\' GROUP BY siteid ORDER BY createddate ASC'
-		);
-		if ($siteTimes instanceof \Traversable && $siteTimes->rowCount()) {
-			foreach ($siteTimes as $site) {
-				$this->pdo->queryExec(
-					sprintf(
-						'UPDATE sharing_sites SET first_time = %s WHERE site_guid = %s',
-						$this->pdo->escapeString($site['createddate']),
-						$this->pdo->escapeString($site['siteid'])
-					)
-				);
-			}
-		}
+	$this->pdo->queryExec(
+		sprintf("
+					UPDATE sharing_sites ss
+					INNER JOIN
+						(SELECT siteid, createddate
+						FROM release_comments
+						WHERE createddate > '2005-01-01'
+						GROUP BY siteid
+						ORDER BY createddate ASC) rc
+					ON ss.site_guid = rc.siteid
+					SET ss.first_time = rc.createddate
+					WHERE ss.first_time IS NULL OR ss.first_time > rc.createddate"
+		)
+	);
 	}
 
 	/**
