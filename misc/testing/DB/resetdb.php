@@ -30,7 +30,7 @@ $pdo->queryExec("UPDATE groups SET first_record = 0, first_record_postdate = NUL
 echo $pdo->log->primary("Reseting all groups completed.");
 
 $arr = [
-		"tvrage", "releasenfo", "releasecomment", 'sharing', 'sharing_sites',
+		"tvrage", "releasenfo", "release_comments", 'sharing', 'sharing_sites',
 		"usercart", "usermovies", "userseries", "movieinfo", "musicinfo", "releasefiles",
 		"releaseaudio", "releasesubs", "releasevideo", "releaseextrafull", "parts",
 		"partrepair", "binaries", "collections", "releases", "spotnabsources"

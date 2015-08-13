@@ -276,14 +276,14 @@ class SpotNab {
 		// this is to address people who do not wish to hold on to
 		// comments they do not have a release for... Makes sense :)
 		$offset = 0;
-		$sql = "SELECT DISTINCT(gid) as gid FROM releasecomment "
+		$sql = "SELECT DISTINCT(gid) as gid FROM release_comments "
 			."WHERE releaseid = 0 "
 			."AND createddate < NOW() - INTERVAL $max_days DAY "
 			."ORDER BY createddate "
 			."LIMIT %d,%d";
 
 		$sql_rel = "SELECT gid FROM releases WHERE gid IN ('%s') ";
-		$sql_del = "DELETE FROM releasecomment WHERE gid IN ('%s')";
+		$sql_del = "DELETE FROM release_comments WHERE gid IN ('%s')";
 		$total_delcnt = 0;
 		$db = new Settings();
 		while(1)
@@ -958,20 +958,20 @@ class SpotNab {
 		}
 
 		# Batch update for comment table
-		/*$usql = 'UPDATE releasecomment, releases '
-				.'SET releasecomment.gid = releases.gid, '
-				.'releasecomment.nzb_guid = releases.nzb_guid '
-				.'WHERE releases.id = releasecomment.releaseid '
-				.'AND releasecomment.gid IS NULL '
-				.'AND releasecomment.nzb_guid = "" '
+		/*$usql = 'UPDATE release_comments, releases '
+				.'SET release_comments.gid = releases.gid, '
+				.'release_comments.nzb_guid = releases.nzb_guid '
+				.'WHERE releases.id = release_comments.releaseid '
+				.'AND release_comments.gid IS NULL '
+				.'AND release_comments.nzb_guid = "" '
 				.'AND releases.nzb_guid IS NOT NULL '
 				.'AND releases.gid IS NOT NULL ';*/
 
-		$affected = $db->queryExec(sprintf('UPDATE releasecomment, releases SET releasecomment.gid = releases.gid,
-											releasecomment.nzb_guid = releases.nzb_guid
-											WHERE releases.id = releasecomment.releaseid
-											AND releasecomment.gid IS NULL
-											AND releasecomment.nzb_guid = ""
+		$affected = $db->queryExec(sprintf('UPDATE release_comments, releases SET release_comments.gid = releases.gid,
+											release_comments.nzb_guid = releases.nzb_guid
+											WHERE releases.id = release_comments.releaseid
+											AND release_comments.gid IS NULL
+											AND release_comments.nzb_guid = ""
 											AND releases.nzb_guid IS NOT NULL
 											AND releases.gid IS NOT NULL '
 			)
@@ -1299,14 +1299,14 @@ class SpotNab {
 		$rc = new ReleaseComments();
 
 		// Comments
-		$sql_new_cmt = "INSERT INTO releasecomment (".
+		$sql_new_cmt = "INSERT INTO release_comments (".
 			"id, sourceid, username, userid, gid, cid, isvisible, ".
 			"releaseid, `text`, createddate, issynced, nzb_guid) VALUES (".
 			"NULL, %d, %s, 0, %s, %s, %d, 0, %s, %s, 1, %s)";
-		$sql_upd_cmt = "UPDATE releasecomment SET ".
+		$sql_upd_cmt = "UPDATE release_comments SET ".
 			"isvisible = %d, `text` = %s".
 			"WHERE sourceid = %d AND gid = %s AND cid = %s AND nzb_guid = %s";
-		$sql_fnd_cmt = "SELECT count(id) as cnt FROM releasecomment ".
+		$sql_fnd_cmt = "SELECT count(id) as cnt FROM release_comments ".
 			"WHERE sourceid = %d AND gid = %s AND cid = %s";
 
 		// Sync Times
@@ -1829,7 +1829,7 @@ class SpotNab {
 			$message['comments'] = $data['comments'];
 
 			$db = new Settings();
-			$sql = sprintf("UPDATE releasecomment "
+			$sql = sprintf("UPDATE release_comments "
 				."SET issynced = 1 WHERE id IN (%s)",
 				implode(",", $data['ids']));
 
@@ -2182,7 +2182,7 @@ class SpotNab {
 		// Now we fetch for any new posts since reference point
 		$sql = sprintf("SELECT r.gid, rc.id, rc.text, u.username, "
 			."rc.isvisible, rc.createddate, rc.host "
-			."FROM releasecomment rc "
+			."FROM release_comments rc "
 			."JOIN releases r ON r.id = rc.releaseid AND rc.releaseid != 0 "
 			."JOIN users u ON rc.userid = u.id AND rc.userid != 0 "
 			."WHERE r.gid IS NOT NULL "
@@ -2423,7 +2423,7 @@ class SpotNab {
 	{
 		$db = new Settings();
 		return $db->query("SELECT id, lastupdate,lastbroadcast, active, description, "
-			."(SELECT count(id) from releasecomment where sourceid = s.id)"
+			."(SELECT count(id) from release_comments where sourceid = s.id)"
 			." AS comments FROM spotnabsources s");
 	}
 
