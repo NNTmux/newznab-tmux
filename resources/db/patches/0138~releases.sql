@@ -6,7 +6,7 @@
 
 CREATE TABLE releases_tmp LIKE releases;
 ALTER TABLE releases_tmp MODIFY nzb_guid BINARY(16) NULL;
-INSERT INTO releases_tmp (SELECT id, gid, name, searchname, totalpart, groupid, size, postdate, adddate, updatedate, guid, fromname, completion, categoryid, regexid, rageid, tvdbid, seriesfull, season, episode, tvtitle, tvairdate, imdbid, episodeinfoid, xxxinfo_id, musicinfoid, consoleinfoid, gamesinfo_id, bookinfoid, anidbid, reqid, releasenfoid, preid, prehashid, grabs, comments, passwordstatus, rarinnerfilecount, haspreview, nfostatus, jpgstatus, videostatus, audiostatus, dehashstatus, reqidstatus, UNHEX(nzb_guid), nzbstatus, iscategorized, isrenamed, ishashed, isrequestid, proc_pp, proc_sorter, proc_par2, proc_nfo, proc_files FROM releases);
+INSERT INTO releases_tmp (SELECT id, gid, name, searchname, totalpart, groupid, size, postdate, adddate, updatedate, guid, fromname, completion, categoryid, regexid, rageid, tvdbid, seriesfull, season, episode, tvtitle, tvairdate, imdbid, episodeinfoid, musicinfoid, consoleinfoid, bookinfoid, preid, anidbid, reqid, releasenfoid, grabs, comments, passwordstatus, rarinnerfilecount, haspreview, dehashstatus, nfostatus, jpgstatus, audiostatus, videostatus, reqidstatus, prehashid, iscategorized, isrenamed, ishashed, isrequestid, proc_pp, proc_par2, proc_nfo, proc_files, gamesinfo_id, xxxinfo_id, proc_sorter, nzbstatus, UNHEX(nzb_guid) FROM releases);
 
 DROP TABLE releases;
 ALTER TABLE releases_tmp RENAME releases;
