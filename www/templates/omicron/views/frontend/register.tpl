@@ -77,7 +77,7 @@
 			  <hr>
 			  {$page->smarty->fetch('captcha.tpl')}
           </div>
-			<a href="{$smarty.const.WWW_TOP}login" class="text-center">I already have a membership</a>
+			<a href="{$serverroot}login" class="text-center">I already have a membership</a>
         </form>
       </div><!-- /.form-box -->
     </div><!-- /.register-box -->
