@@ -83,6 +83,7 @@ class TraktTv
 	 * @param string $movie Title or IMDB id.
 	 * @param string $type  imdbID:     Return only the IMDB ID (returns string)
 	 *                      full:       Return all extended properties (minus images). (returns array)
+	 *                      images:     Return extended images properties (returns array)
 	 *
 	 * @see http://docs.trakt.apiary.io/#reference/movies/summary/get-a-movie
 	 *
@@ -94,6 +95,7 @@ class TraktTv
 	{
 		switch($type) {
 			case 'full':
+			case 'images':
 				$extended = $type;
 				break;
 			case 'imdbID':
