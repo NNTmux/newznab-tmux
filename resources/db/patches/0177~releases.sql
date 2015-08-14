@@ -1,6 +1,6 @@
-#This patch adds back missing triggers
-#from releases and release_comments tables
-#This will be over fast
+# This patch adds back missing triggers
+# from releases and release_comments tables
+# it will be over fast
 
 DROP TRIGGER IF EXISTS check_insert;
 DROP TRIGGER IF EXISTS check_update;
