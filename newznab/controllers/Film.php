@@ -201,7 +201,7 @@ class Film
 					',,',
 					',',
 					str_replace(
-						array('(,', ' ,', ', )', ',)'),
+						['(,', ' ,', ', )', ',)'],
 						'',
 						implode(',', $imdbIDs)
 					)
@@ -363,7 +363,7 @@ class Film
 				break;
 		}
 
-		return array($orderField, ((isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'desc'));
+		return [$orderField, ((isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'desc')];
 	}
 
 	/**
@@ -373,7 +373,7 @@ class Film
 	 */
 	public function getMovieOrdering()
 	{
-		return array('title_asc', 'title_desc', 'year_asc', 'year_desc', 'rating_asc', 'rating_desc');
+		return ['title_asc', 'title_desc', 'year_asc', 'year_desc', 'rating_asc', 'rating_desc'];
 	}
 
 	/**
@@ -382,7 +382,7 @@ class Film
 	protected function getBrowseBy()
 	{
 		$browseBy = ' ';
-		$browseByArr = array('title', 'director', 'actors', 'genre', 'rating', 'year', 'imdb');
+		$browseByArr = ['title', 'director', 'actors', 'genre', 'rating', 'year', 'imdb'];
 		foreach ($browseByArr as $bb) {
 			if (isset($_REQUEST[$bb]) && !empty($_REQUEST[$bb])) {
 				$bbv = stripslashes($_REQUEST[$bb]);
@@ -694,7 +694,7 @@ class Film
 
 		$mov['title']    = html_entity_decode($mov['title']   , ENT_QUOTES, 'UTF-8');
 
-		$mov['title'] = str_replace(array('/', '\\'), '', $mov['title']);
+		$mov['title'] = str_replace(['/', '\\'], '', $mov['title']);
 		$movieID = $this->update([
 			'actors'    => html_entity_decode($mov['actors']  , ENT_QUOTES, 'UTF-8'),
 			'backdrop'  => $mov['backdrop'],
@@ -867,20 +867,20 @@ class Film
 	 */
 	protected function fetchIMDBProperties($imdbId)
 	{
-		$imdb_regex = array(
+		$imdb_regex = [
 			'title' => '/<title>(.*?)\s?\(.*?<\/title>/i',
 			'tagline' => '/taglines:<\/h4>\s([^<]+)/i',
 			'plot' => '/<p itemprop="description">\s*?(.*?)\s*?<\/p>/i',
 			'rating' => '/"ratingValue">([\d.]+)<\/span>/i',
 			'year' => '/<title>.*?\(.*?(\d{4}).*?<\/title>/i',
 			'cover' => '/<link rel=\'image_src\' href="(http:\/\/ia\.media-imdb\.com.+\.jpg)">/'
-		);
+		];
 
-		$imdb_regex_multi = array(
+		$imdb_regex_multi = [
 			'genre' => '/href="\/genre\/(.*?)\?/i',
 			'language' => '/<a href="\/language\/.+?\'url\'>(.+?)<\/a>/s',
 			'type' => '/<meta property=\'og\:type\' content=\"(.+)\" \/>/i'
-		);
+		];
 
 		$buffer =
 			Utility::getUrl([
@@ -1135,7 +1135,7 @@ class Film
 			$pieces = explode(' ', $this->currentTitle);
 			$tempTitle = '%';
 			foreach ($pieces as $piece) {
-				$tempTitle .= str_replace(array("'", "!", '"'), '', $piece) . '%';
+				$tempTitle .= str_replace(["'", "!", '"'], '', $piece) . '%';
 			}
 			$IMDBCheck = $this->pdo->queryOneRow(
 				sprintf("%s WHERE replace(replace(title, \"'\", ''), '!', '') %s %s",
@@ -1159,7 +1159,7 @@ class Film
 					$pieces = explode(' ', $tempTitle);
 					$tempTitle = '%';
 					foreach ($pieces as $piece) {
-						$tempTitle .= str_replace(array("'", "!", '"'), "", $piece) . '%';
+						$tempTitle .= str_replace(["'", "!", '"'], "", $piece) . '%';
 					}
 					$IMDBCheck = $this->pdo->queryOneRow(
 						sprintf("%s WHERE replace(replace(replace(title, \"'\", ''), '!', ''), '\"', '') %s %s",
@@ -1512,7 +1512,7 @@ class Film
 	 */
 	public function getGenres()
 	{
-		return array(
+		return [
 			'Action',
 			'Adventure',
 			'Animation',
@@ -1539,7 +1539,7 @@ class Film
 			'Thriller',
 			'War',
 			'Western'
-		);
+		];
 	}
 
 }
