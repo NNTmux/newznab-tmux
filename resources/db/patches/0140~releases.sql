@@ -6,3 +6,6 @@ CREATE TRIGGER update_search AFTER UPDATE ON releases FOR EACH ROW BEGIN IF NEW.
 CREATE TRIGGER delete_search AFTER DELETE ON releases FOR EACH ROW BEGIN DELETE FROM releasesearch WHERE releaseid = OLD.id; END;$$
 CREATE TRIGGER insert_MD5 BEFORE INSERT ON release_comments FOR EACH ROW SET NEW.text_hash = MD5(NEW.text);$$
 DELIMITER ;
+
+UPDATE releases set ishashed = 1 WHERE name REGEXP '[a-fA-F0-9]{32}' AND ishashed = 0;
+UPDATE releases SET isrequestid = 1 WHERE name REGEXP  '^\\[ ?([[:digit:]]{4,6}) ?\\]|^REQ\s*([[:digit:]]{4,6})|^([[:digit:]]{4,6})-[[:digit:]]{1}\\[' AND isrequestid =0;
