@@ -34,7 +34,7 @@
 						{/if}
 					{/if}
 					{if $anidb && $release.anidbid > 0}
-						<a class="label label-default" href="{$smarty.const.WWW_TOP}anime/{$release.anidbid}"
+						<a class="label label-default" href="{$serverroot}anime/{$release.anidbid}"
 						   title="View all releases from this anime">View all episodes</a>
 						<a class="label label-default"
 						   href="{$site->dereferrer_link}http://anidb.net/perl-bin/animedb.pl?show=anime&aid={$anidb.anidbid}"
@@ -46,7 +46,7 @@
 					{if $rage && $release.rageid > 0}
 						<a href="{$smarty.const.WWW_TOP}/myshows/add/{$release.rageid}?from={$smarty.server.REQUEST_URI|escape:"url"}"
 						   class="label label-success">Add to My Shows</a>
-						<a class="label label-default" href="{$smarty.const.WWW_TOP}series/{$release.rageid}"
+						<a class="label label-default" href="{$serverroot}series/{$release.rageid}"
 						   title="View all releases for this series">View all episodes</a>
 						<a class="label label-default" target="_blank"
 						   href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$release.rageid}"

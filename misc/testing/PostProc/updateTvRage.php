@@ -7,7 +7,7 @@ use newznab\utility\Utility;
 
 
 $pdo = new Settings();
-$tvrage = new \TvAnger(['Settings' => $pdo, 'Echo' => true]);
+$tvrage = new TvAnger(['Settings' => $pdo, 'Echo' => true]);
 
 $shows = $pdo->queryDirect("SELECT rageid FROM tvrage WHERE imgdata IS NULL ORDER BY rageid DESC LIMIT 2000");
 if ($shows->rowCount() > 0) {
