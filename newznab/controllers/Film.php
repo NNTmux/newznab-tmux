@@ -598,7 +598,7 @@ class Film
 	}
 
 	/**
-	 * Returns a tmdb or imdb variable, the one that is set. Empty string if both not set.
+	 * Returns a tmdb, imdb or trakt variable, the one that is set. Empty string if both not set.
 	 *
 	 * @param string $variable1
 	 * @param string $variable2
