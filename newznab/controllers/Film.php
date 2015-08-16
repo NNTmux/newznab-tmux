@@ -463,6 +463,15 @@ class Film
 			);
 			return $data['trailer'];
 		}
+		$cover = 0;
+		if (is_file($this->imgSavePath . $data['ids']['imdb'] . '-cover.jpg')) {
+			$cover = 1;
+		} else {
+			$link = $this->checkTraktValue($data['images']['poster']['thumb']);
+			if ($link) {
+				$cover = $this->releaseImage->saveImage($data['ids']['imdb'] . '-cover', $link, $this->imgSavePath);
+			}
+		}
 		$this->update([
 			'genres'   => $this->checkTraktValue($data['genres']),
 			'imdbid'   => $this->checkTraktValue(str_ireplace('tt', '', $data['ids']['imdb'])),
@@ -473,7 +482,7 @@ class Film
 			'title'    => $this->checkTraktValue($data['title']),
 			'tmdbid'   => $this->checkTraktValue($data['ids']['tmdb']),
 			'trailer'  => $this->checkTraktValue($data['trailer']),
-			'cover'    => $this->checkTraktValue($data['images']['poster']['thumb']),
+			'cover'    => $cover,
 			'year'     => $this->checkTraktValue($data['year'])
 		]);
 	}
