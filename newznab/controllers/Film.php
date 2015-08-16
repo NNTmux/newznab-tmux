@@ -654,11 +654,11 @@ class Film
 		$mov['imdbid'] = $imdbId;
 		$mov['tmdbid'] = (!isset($tmdb['tmdbid']) || $tmdb['tmdbid'] == '') ? 0 : $tmdb['tmdbid'];
 
-		// Prefer TRAKT cover over Fanart.tv, Fanart.tv over TMDB and  TMDB over IMDB.
-		if ($this->checkVariable($trakt['cover'])) {
-			$mov['cover'] = $this->releaseImage->saveImage($imdbId . '-cover', $trakt['cover'], $this->imgSavePath);
-		} else if ($this->checkVariable($fanart['cover'])) {
+		// Prefer Fanart.tv cover over TRAKT, TRAKT over TMDB and TMDB over IMDB.
+		if ($this->checkVariable($fanart['cover'])) {
 			$mov['cover'] = $this->releaseImage->saveImage($imdbId . '-cover', $fanart['cover'], $this->imgSavePath);
+		} else if ($this->checkVariable($trakt['cover'])) {
+			$mov['cover'] = $this->releaseImage->saveImage($imdbId . '-cover', $trakt['cover'], $this->imgSavePath);
 		} else if ($this->checkVariable($tmdb['cover'])) {
 			$mov['cover'] = $this->releaseImage->saveImage($imdbId . '-cover', $tmdb['cover'], $this->imgSavePath);
 		} else if ($this->checkVariable($imdb['cover'])) {
