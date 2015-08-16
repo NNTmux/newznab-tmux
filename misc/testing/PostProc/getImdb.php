@@ -5,8 +5,8 @@ require_once dirname(__FILE__) . '/../../../www/config.php';
 use newznab\db\Settings;
 
 $pdo = new Settings();
-$c = new \ColorCLI();
-$movie = new \Film(['Echo' => true, 'Settings' => $pdo]);
+$c = new ColorCLI();
+$movie = new Film(['Echo' => true, 'Settings' => $pdo]);
 
 
 $movies = $pdo->queryDirect("SELECT imdbid FROM movieinfo WHERE tmdbid IS NULL ORDER BY id ASC");

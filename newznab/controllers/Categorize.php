@@ -157,6 +157,18 @@ class Categorize extends Category
 							return false;
 					}
 					break;
+				case $group === 'alt.binaries.cd.image':
+					switch (true) {
+						case $this->isISO():
+						case $this->isPCGame():
+						case $this->is0day():
+						case $this->isConsole():
+							break;
+						default:
+							$this->tmpCat = Category::CAT_PC_ISO;
+							break;
+					}
+					break;
 				case $group === 'alt.binaries.b4e':
 					switch (true) {
 						case $this->isHDTV():
@@ -291,6 +303,7 @@ class Categorize extends Category
 					break;
 				case preg_match('/alt.binaries.games.(dox|adventures)/', $group):
 					switch (true) {
+						case $this->isPCGame():
 						case $this->is0day():
 						case $this->isConsole():
 							break;
@@ -301,11 +314,12 @@ class Categorize extends Category
 					break;
 				case preg_match('/alt.binaries.cd.images?.games/', $group):
 					switch (true) {
+						case $this->is0day():
 						case $this->isConsole():
 						case $this->isBook():
 							break;
 						default:
-							$this->tmpCat = \Category::CAT_PC_GAMES;
+							$this->tmpCat = Category::CAT_PC_GAMES;
 							break;
 					}
 					break;
@@ -494,7 +508,7 @@ class Categorize extends Category
 					}
 					$this->tmpCat = \Category::CAT_PC_MOBILEOTHER;
 					break;
-				case $this->categorizeForeign && $group === 'db.binaer.tv':
+				case $this->categorizeForeign && $group === 'dk.binaer.tv':
 					$this->tmpCat = \Category::CAT_TV_FOREIGN;
 					break;
 				default:
@@ -691,8 +705,7 @@ class Categorize extends Category
 		switch (true) {
 			case $this->isConsole():
 				return true;
-			case preg_match('/(danish|flemish|Deutsch|dutch|french|german|nl[-._ ]?sub(bed|s)?|\.NL|norwegian|swedish|swesub|spanish|Staffel)[-._ ]|\(german\)|Multisub/i', $this->releaseName):
-			case preg_match('/Castellano/i', $this->releaseName):
+			case preg_match('/(danish|flemish|Deutsch|dutch|french|german|heb|hebrew|nl[-._ ]?sub|dub(bed|s)?|\.NL|norwegian|swedish|swesub|spanish|Staffel)[-._ ]|\(german\)|Multisub/i', $this->releaseName):			case preg_match('/Castellano/i', $this->releaseName):
 			case preg_match('/(720p|1080p|AC3|AVC|DIVX|DVD(5|9|RIP|R)|XVID)[-._ ](Dutch|French|German|ITA)|\(?(Dutch|French|German|ITA)\)?[-._ ](720P|1080p|AC3|AVC|DIVX|DVD(5|9|RIP|R)|HD[-._ ]|XVID)/i', $this->releaseName):
 				$this->tmpCat = \Category::CAT_MOVIE_FOREIGN;
 				return true;
@@ -808,11 +821,14 @@ class Categorize extends Category
 
 	public function isISO()
 	{
-		if (preg_match('/[-._ ]([a-zA-Z]{2,10})?iso[ _.-]|[-. ]([a-z]{2,10})?iso$/i', $this->releaseName)) {
-			$this->tmpCat = \Category::CAT_PC_ISO;
-			return true;
+		switch (true) {
+			case preg_match('/[-._ ]([a-zA-Z]{2,10})?iso[ _.-]|[-. ]([a-z]{2,10})?iso$/i', $this->releaseName):
+			case preg_match('/[-._ ](DYNAMiCS|INFINITESKILLS|UDEMY|kEISO|PLURALSIGHT|DIGITALTUTORS|TUTSPLUS|OSTraining|PRODEV|CBT\.Nuggets)/i', $this->releaseName):
+				$this->tmpCat = Category::CAT_PC_ISO;
+				return true;
+			default:
+				return false;
 		}
-		return false;
 	}
 
 	public function is0day()
@@ -839,10 +855,11 @@ class Categorize extends Category
 
 	public function isPCGame()
 	{
-		if (preg_match('/[^a-z0-9](0x0007|ALiAS|BACKLASH|BAT|CLONECD|CPY|FAS(DOX|iSO)|FLT([-._ ]|COGENT)|-FLT(DOX)?|PC GAMES?|\(?(Game(s|z)|GAME(S|Z))\)? ?(\((C|c)\))|GENESIS|-GOG|-HATRED|HI2U|INLAWS|JAGUAR|MAZE|MONEY|OUTLAWS|PPTCLASSiCS|PC Game|PROPHET|RAiN|Razor1911|RELOADED|DEViANCE|PLAZA|RiTUELYPOGEiOS|[rR][iI][pP]-[uU][nN][lL][eE][aA][sS][hH][eE][dD]|Steam(\b)?Rip|SKIDROW|TiNYiSO|CODEX)[^a-z0-9]?/', $this->releaseName)) {
-			$this->tmpCat = \Category::CAT_PC_GAMES;
+		if (preg_match('/[^a-z0-9](0x0007|ALiAS|BACKLASH|BAT|CLONECD|CPY|FAS(DOX|iSO)|FLT([-._ ]|COGENT)|FLT(DOX)?|PC GAMES?|\(?(Game(s|z)|GAME(S|Z))\)? ?(\((C|c)\))|GENESIS|-GOG|-HATRED|HI2U|INLAWS|JAGUAR|MAZE|MONEY|OUTLAWS|PPTCLASSiCS|PC Game|PROPHET|RAiN|Razor1911|RELOADED|DEViANCE|PLAZA|RiTUELYPOGEiOS|[rR][iI][pP]-[uU][nN][lL][eE][aA][sS][hH][eE][dD]|Steam(\b)?Rip|SKIDROW|TiNYiSO|CODEX)[^a-z0-9]?/', $this->releaseName)) {
+			$this->tmpCat = Category::CAT_PC_GAMES;
 			return true;
 		}
+
 		return false;
 	}
 
