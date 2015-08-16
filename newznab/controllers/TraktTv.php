@@ -96,6 +96,7 @@ class TraktTv
 		switch($type) {
 			case 'full':
 			case 'images':
+			case 'full,images':
 				$extended = $type;
 				break;
 			case 'imdbID':
