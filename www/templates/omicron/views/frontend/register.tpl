@@ -40,7 +40,7 @@
   <body class="register-page">
     <div class="register-box">
       <div class="register-logo">
-        <a href="{$serverroot}"><b>{$site->title}</b></a>
+        <a href="{$smarty.const.WWW_TOP}"><b>{$site->title}</b></a>
       </div>
       <div class="register-box-body">
         <p class="login-box-msg">Register a new membership</p>
@@ -67,7 +67,7 @@
             <div class="col-xs-8">
               <div class="checkbox icheck">
                 <label>
-                  <input type="checkbox"> I agree to the <a href="{$serverroot}terms-and-conditions">terms</a>
+                  <input type="checkbox"> I agree to the <a href="{$smarty.const.WWW_TOP}terms-and-conditions">terms</a>
                 </label>
               </div>
             </div><!-- /.col -->

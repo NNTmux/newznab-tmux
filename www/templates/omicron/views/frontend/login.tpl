@@ -10,7 +10,6 @@
 	  <script type="text/javascript">
 		  /* <![CDATA[ */
 		  var WWW_TOP = "{$smarty.const.WWW_TOP}";
-		  var SERVERROOT = "{$serverroot}";
 		  var UID = "{if $loggedin=="true"}{$userdata.id}{else}{/if}";
 		  var RSSTOKEN = "{if $loggedin=="true"}{$userdata.rsstoken}{else}{/if}";
 		  /* ]]> */
@@ -64,8 +63,8 @@
             </div><!-- /.col -->
           </div>
         </form>
-		  <a href="{$serverroot}forgottenpassword" class="text-center">I forgot my password</a><br>
-        <a href="{$serverroot}register" class="text-center">Register a new membership</a>
+		  <a href="{$smarty.const.WWW_TOP}forgottenpassword" class="text-center">I forgot my password</a><br>
+        <a href="{$smarty.const.WWW_TOP}register" class="text-center">Register a new membership</a>
     <!-- jQuery 2.1.4 -->
     <script src="{$smarty.const.WWW_TOP}/templates/omicron/plugins/jQuery/jQuery-2.1.4.min.js"></script>
     <!-- Bootstrap 3.3.2 JS -->

@@ -46,7 +46,7 @@
 					{if $rage && $release.rageid > 0}
 						<a href="{$smarty.const.WWW_TOP}/myshows/add/{$release.rageid}?from={$smarty.server.REQUEST_URI|escape:"url"}"
 						   class="label label-success">Add to My Shows</a>
-						<a class="label label-default" href="{$serverroot}series/{$release.rageid}"
+						<a class="label label-default" href="{$serverroor}series/{$release.rageid}"
 						   title="View all releases for this series">View all episodes</a>
 						<a class="label label-default" target="_blank"
 						   href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$release.rageid}"
@@ -131,10 +131,10 @@
 									{if $reVideo.releaseid|@count > 0 || $reAudio|@count > 0}
 										<li><a href="#pane8" data-toggle="tab">MediaInfo</a></li>
 									{/if}
-									{if $xxx.backdrop == 1}
+									{if isset($xxx.backdrop) && $xxx.backdrop == 1}
 										<li><a href="#pane9" data-toggle="tab">Back Cover</a></li>
 									{/if}
-									{if $game.backdrop == 1}
+									{if isset($game.backdrop) && $game.backdrop == 1}
 									<li><a href="#pane10" data-toggle="tab">Screenshot</a></li>
 									{/if}
 								</ul>
@@ -270,7 +270,7 @@
 																		</th>
 																		<td>{$xxx.actors}</td>
 																	</tr>
-																	{if $xxx.director != ""}
+																	{if isset($xxx.director) && $xxx.director != ""}
 																		<tr>
 																			<th width="140">
 																				Director
@@ -278,7 +278,7 @@
 																			<td>{$xxx.director}</td>
 																		</tr>
 																	{/if}
-																	{if $xxx.genres != ""}
+																	{if isset($xxx.genres) && $xxx.genres != ""}
 																		<tr>
 																			<th width="140">
 																				Genre
@@ -577,18 +577,25 @@
 												</tr>
 												{foreach from=$comments item=comment}
 													<tr>
-														<td width="150">{if $comment.sourceid == 0}
+														<td width="150">
+															{if $comment.sourceid == 0}
+															{if !$privateprofiles || $isadmin || $ismod}
 																<a
 																title="View {$comment.username}'s profile"
-																href="{$smarty.const.WWW_TOP}/profile?name={$comment.username}">{$comment.username}</a>{else}{$comment.username}
+																href="{$smarty.const.WWW_TOP}/profile?name={$comment.username}">{$comment.username}</a>
+															{else}
+																{$comment.username}
 																<br/>
 																<span style="color: #ce0000;">(syndicated)</span>
 															{/if}
-															<br/>{$comment.createddate|date_format}
+															<br/>{$comment.createddate|date_format} ({$comment.createddate|timeago} ago)
 														</td>
-														<td>
-															{$comment.text|escape:"htmlall"|nl2br}
-														</td>
+															{if $comment.shared == 2}
+														<td style="color:#6B2447">{$comment.text|escape:"htmlall"|nl2br}</td>
+														{else}
+														<td>{$comment.text|escape:"htmlall"|nl2br}</td>
+														{/if}
+														{/if}
 													</tr>
 												{/foreach}
 											</table>

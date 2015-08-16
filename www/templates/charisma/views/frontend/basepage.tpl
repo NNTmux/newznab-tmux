@@ -55,7 +55,7 @@
 				<span class="icon-bar"></span>
 			</button>
 			<a class="navbar-brand" href="{$site->home_link}"> <img alt="newznab-tmux logo"
-															   src="{$smarty.const.WWW_TOP}/templates/charisma/img/logo-tmux.png"
+																	src="{$smarty.const.WWW_TOP}/templates/charisma/img/logo-tmux.png"
 						/></a>
 			{$header_menu}
 			<!-- user dropdown starts -->

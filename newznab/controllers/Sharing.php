@@ -37,7 +37,7 @@ Class Sharing
 	 *      max_pull      Max articles to download per run.
 	 *
 	 *      -------------------------------------------
-	 *      releasecomments table (modifications)
+	 *      release_comments table (modifications)
 	 *      -------------------------------------------
 	 *      shared        Has this comment been shared or have we received it from another site. (0 not shared, 1 shared, 2 received)
 	 *      shareid       Unique identifier to know if we already have the comment or not.
@@ -170,8 +170,8 @@ Class Sharing
 		// Get all comments that we have not posted yet.
 		$newComments = $this->pdo->query(
 			sprintf(
-				'SELECT rc.text, rc.id, %s, u.username, r.nzb_guid
-				FROM releasecomment rc
+				'SELECT rc.text, rc.id, %s, u.username, HEX(r.nzb_guid) AS nzb_guid
+				FROM release_comments rc
 				INNER JOIN users u ON rc.userid = u.id
 				INNER JOIN releases r on rc.releaseid = r.id
 				WHERE (rc.shared = 0 or issynced = 1) LIMIT %d',
@@ -208,7 +208,7 @@ Class Sharing
 		$newComments = $this->pdo->query(
 			sprintf(
 				'SELECT id, text, UNIX_TIMESTAMP(createddate) AS unix_time,
-				username, nzb_guid FROM releasecomment
+				username, nzb_guid FROM release_comments
 				WHERE issynced = 1 AND shared = 1 AND shareid IS NULL
 				ORDER BY id DESC'
 			)
@@ -244,7 +244,7 @@ Class Sharing
 		$sid = sha1($row['unix_time'] . $row['text'] . $row['nzb_guid']);
 
 		// Check if the comment is already shared.
-		$check = $this->pdo->queryOneRow(sprintf('SELECT id FROM releasecomment WHERE shareid = %s', $this->pdo->escapeString($sid)));
+		$check = $this->pdo->queryOneRow(sprintf('SELECT id FROM release_comments WHERE shareid = %s', $this->pdo->escapeString($sid)));
 		if ($check === false) {
 
 			// Example of a subject.
@@ -272,7 +272,7 @@ Class Sharing
 				// Update DB to say we posted the article.
 				$this->pdo->queryExec(
 					sprintf('
-						UPDATE releasecomment
+						UPDATE release_comments
 						SET shared = 1, shareid = %s
 						WHERE id = %d',
 						$this->pdo->escapeString($sid),
@@ -285,38 +285,58 @@ Class Sharing
 			}
 		} else {
 			// Update the DB to say it's shared.
-			$this->pdo->queryExec(sprintf('UPDATE releasecomment SET shared = 1 WHERE id = %d', $row['id']));
+			$this->pdo->queryExec(sprintf('UPDATE release_comments SET shared = 1 WHERE id = %d', $row['id']));
 		}
 	}
 
 	/**
 	 * Match added comments to releases.
+	 *
+	 * @access protected
 	 */
 	protected function matchComments()
 	{
 		$res = $this->pdo->query('
-			SELECT r.id, r.nzb_guid
-			FROM releases r
-			INNER JOIN releasecomment rc ON rc.nzb_guid = r.nzb_guid
+			SELECT r.id
+			FROM release_comments rc
+			INNER JOIN releases r USING (nzb_guid)
 			WHERE rc.releaseid = 0'
 		);
-
 		$found = count($res);
 		if ($found > 0) {
 			foreach ($res as $row) {
 				$this->pdo->queryExec(
-					sprintf(
-						"UPDATE releasecomment SET releaseid = %d WHERE nzb_guid = %s",
+					sprintf("
+						UPDATE release_comments rc
+						INNER JOIN releases r USING (nzb_guid)
+						SET rc.releaseid = %d, r.comments = r.comments + 1
+						WHERE r.id = %d
+						AND rc.releaseid = 0",
 						$row['id'],
-						$this->pdo->escapeString($row['nzb_guid'])
+						$row['id']
 					)
 				);
-				$this->pdo->queryExec(sprintf('UPDATE releases SET comments = comments + 1 WHERE id = %d', $row['id']));
 			}
-
-			echo '(Sharing) Matched ' . $found . ' comments.' . PHP_EOL;
-
+			if (NN_ECHOCLI) {
+				echo "(Sharing) Matched $found  comments." . PHP_EOL;
+			}
 		}
+
+		// Update first time seen.
+	$this->pdo->queryExec(
+		sprintf("
+					UPDATE sharing_sites ss
+					INNER JOIN
+						(SELECT siteid, createddate
+						FROM release_comments
+						WHERE createddate > '2005-01-01'
+						GROUP BY siteid
+						ORDER BY createddate ASC) rc
+					ON ss.site_guid = rc.siteid
+					SET ss.first_time = rc.createddate
+					WHERE ss.first_time IS NULL OR ss.first_time > rc.createddate"
+		)
+	);
 	}
 
 	/**
@@ -404,7 +424,7 @@ Class Sharing
 
 				// Check if we already have the comment.
 				$check = $this->pdo->queryOneRow(
-					sprintf('SELECT id FROM releasecomment WHERE shareid = %s',
+					sprintf('SELECT id FROM release_comments WHERE shareid = %s',
 						$this->pdo->escapeString($matches['sid'])
 					)
 				);
@@ -532,7 +552,7 @@ Class Sharing
 		// Insert the comment.
 		if ($this->pdo->queryExec(
 			sprintf('
-				INSERT IGNORE INTO releasecomment
+				INSERT IGNORE INTO release_comments
 				(text, createddate, issynced, shareid, cid, gid, nzb_guid, siteid, username, userid, releaseid, shared, host, sourceID)
 				VALUES (%s, %s, 1, %s, %s, %s, %s, %s, %s, 0, 0, 2, "", 999)',
 				$this->pdo->escapeString($body['BODY']),
