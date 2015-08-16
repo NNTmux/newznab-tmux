@@ -81,9 +81,10 @@ class TraktTv
 	 * Accept a title (the-big-lebowski-1998), a IMDB id, or a TMDB id.
 	 *
 	 * @param string $movie Title or IMDB id.
-	 * @param string $type  imdbID:     Return only the IMDB ID (returns string)
-	 *                      full:       Return all extended properties (minus images). (returns array)
-	 *                      images:     Return extended images properties (returns array)
+	 * @param string $type  imdbID:      Return only the IMDB ID (returns string)
+	 *                      full:        Return all extended properties (minus images). (returns array)
+	 *                      images:      Return extended images properties (returns array)
+	 *                      full,images: Return all extended properties (plus images). (returns array)
 	 *
 	 * @see http://docs.trakt.apiary.io/#reference/movies/summary/get-a-movie
 	 *
