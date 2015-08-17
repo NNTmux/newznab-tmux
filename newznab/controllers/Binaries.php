@@ -556,7 +556,7 @@ class Binaries
 			if ($this->_nntp->isError($headers)) {
 				$message = ($headers->code == 0 ? 'Unknown error' : $headers->message);
 				$this->log(
-					"Code {$headers->code}: {$message}\nSkipping group: {$groupMySQL['name']}",
+					"Code {$headers->code}: $message\nSkipping group: {$groupMySQL['name']}",
 					__FUNCTION__,
 					Logger::LOG_WARNING,
 					'error'
@@ -786,7 +786,7 @@ class Binaries
 
 			$partsQuery .=
 				'(' . $binaryID . ',' . $header['Number'] . ',' . rtrim($header['Message-ID'], '>') . "'," .
-				$matches[2] . ',' . $header['Bytes'] . ',' . $collectionID . '),';
+				$matches[2] . ',' . $header['Bytes'] . '),';
 
 		}
 		unset($headers); // Reclaim memory.
