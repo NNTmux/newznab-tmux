@@ -27,6 +27,10 @@
 						<a class="label label-default" target="_blank"
 						   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$release.imdbid}/"
 						   title="View at IMDB">IMDB</a>
+						<a target="_blank"
+						   href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{$release.imdbid}/"
+						   name="trakt{$release.imdbid}" title="View Trakt page"
+						   class="label label-default" rel="trakt">TRAKT</a>
 						{if $movie.tmdbid != ''}
 							<a class="label label-default" target="_blank"
 							   href="{$site->dereferrer_link}http://www.themoviedb.org/movie/{$movie.tmdbid}"
@@ -115,7 +119,7 @@
 									{if isset($xxx.trailers) && $xxx.trailers != ''}
 										<li><a href="#pane2" data-toggle="tab">Trailer</a></li>
 									{/if}
-									{if isset($nfo.nfo) && $nfo.nfo != ""}
+									{if isset($nfo.nfo) && $nfo.nfo != ''}
 										<li><a href="#pane3" data-toggle="tab">NFO</a></li>
 									{/if}
 									{if isset($similars) && $similars|@count > 1}
