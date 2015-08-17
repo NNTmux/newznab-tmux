@@ -516,7 +516,7 @@ class Groups
 	 */
 	public function createNewTPGTables($groupID)
 	{
-		$cbpm = ['collections', 'binaries', 'parts', 'missed_parts'];
+		$cbpm = ['collections', 'binaries', 'parts', 'partrepair'];
 
 		foreach ( $cbpm as $tableName) {
 			if ($this->pdo->queryExec(sprintf('SELECT * FROM %s_%s LIMIT 1', $tableName, $groupID), true) === false) {
