@@ -417,8 +417,8 @@ class Film
 			return false;
 		}
 
-		$trailer = $this->pdo->queryOneRow("SELECT trailer FROM movieinfo WHERE imdbid = 'tt$imdbID'");
-		if ($trailer) {
+		$trailer = $this->pdo->queryOneRow("SELECT trailer FROM movieinfo WHERE imdbid = $imdbID");
+		if ($trailer != '') {
 			return $trailer['trailer'];
 		}
 
