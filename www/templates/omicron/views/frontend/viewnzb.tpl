@@ -22,8 +22,6 @@
 						   title="Delete release">Delete</a>
 					{/if}
 					{if $movie && $release.rageid < 0}
-						<a class="label label-default" href="{$serverroot}movies?imdb={$release.imdbid}"
-						   title="View all releases for this movie">Movie View</a>
 						<a class="label label-default" target="_blank"
 						   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$release.imdbid}/"
 						   title="View at IMDB">IMDB</a>
