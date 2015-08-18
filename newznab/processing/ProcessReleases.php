@@ -522,7 +522,7 @@ class ProcessReleases
 
 		$collections = $this->pdo->queryDirect(
 			sprintf('
-				SELECT %s.*, groups.name AS gname
+				SELECT SQL_NO_CACHE %s.*, groups.name AS gname
 				FROM %s
 				INNER JOIN groups ON %s.group_id = groups.id
 				WHERE %s %s.filecheck = %d
@@ -559,7 +559,7 @@ class ProcessReleases
 				// A 1% variance in size is considered the same size when the subject and poster are the same
 				$dupeCheck = $this->pdo->queryOneRow(
 					sprintf("
-						SELECT id
+						SELECT SQL_NO_CACHE id
 						FROM releases
 						WHERE name = %s
 						AND fromname = %s
@@ -640,9 +640,9 @@ class ProcessReleases
 					// The release was already in the DB, so delete the collection.
 					$this->pdo->queryExec(
 						sprintf('
-							DELETE FROM %s
-							WHERE collectionhash = %s',
-							$group['cname'],
+							DELETE c, b, p FROM %s c INNER JOIN %s b ON(c.id=b.collection_id) INNER JOIN %s p ON(b.id=p.binaryid)
+							WHERE c.collectionhash = %s',
+							$group['cname'], $group['bname'], $group['pname'],
 							$this->pdo->escapeString($collection['collectionhash'])
 						)
 					);
@@ -685,13 +685,13 @@ class ProcessReleases
 
 		$releases = $this->pdo->queryDirect(
 			sprintf("
-				SELECT CONCAT(COALESCE(cp.title,'') , CASE WHEN cp.title IS NULL THEN '' ELSE ' > ' END , c.title) AS title,
+				SELECT SQL_NO_CACHE CONCAT(COALESCE(cp.title,'') , CASE WHEN cp.title IS NULL THEN '' ELSE ' > ' END , c.title) AS title,
 					r.name, r.id, r.guid
 				FROM releases r
 				INNER JOIN category c ON r.categoryid = c.id
 				INNER JOIN category cp ON cp.id = c.parentid
 				WHERE %s nzbstatus = 0",
-				(!empty($groupID) ? ' r.groupid = ' . $groupID . ' AND ' : ' ')
+				(!empty($groupID) ? ' r.group_id = ' . $groupID . ' AND ' : ' ')
 			)
 		);
 
