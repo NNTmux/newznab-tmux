@@ -262,7 +262,7 @@ class Info
 	 * Attempt to find NFO files inside the NZB's of releases.
 	 *
 	 * @param object $nntp           Instance of class NNTP.
-	 * @param string $groupID        (optional) Group id.
+	 * @param string $groupID        (optional) Group ID.
 	 * @param string $guidChar       (optional) First character of the release GUID (used for multi-processing).
 	 * @param int    $processImdb    (optional) Attempt to find IMDB id's in the NZB?
 	 * @param int    $processTvrage  (optional) Attempt to find TvRage id's in the NZB?
@@ -319,7 +319,7 @@ class Info
 						$groupIDQuery
 					)
 				);
-				if ($nfoStats instanceof Traversable) {
+				if ($nfoStats instanceof \Traversable) {
 					$outString = PHP_EOL . 'Available to process';
 					foreach ($nfoStats as $row) {
 						$outString .= ', ' . $row['status'] . ' = ' . number_format($row['count']);
@@ -342,7 +342,7 @@ class Info
 			$tvRage = new TvAnger(['Echo' => $this->echo, 'Settings' => $this->pdo]);
 
 			foreach ($res as $arr) {
-				$fetchedBinary = $nzbContents->getNFOfromNZB($arr['guid'], $arr['id'], $arr['groupid'], $groups->getByNameByID($arr['groupid']));
+				$fetchedBinary = $nzbContents->getNFOfromNZB($arr['guid'], $arr['id'], $arr['groupid'], $groups->getByNameByID($arr['group_id']));
 				if ($fetchedBinary !== false) {
 					// Insert nfo into database.
 					$cp = 'COMPRESS(%s)';
@@ -385,35 +385,31 @@ class Info
 				WHERE r.nzbstatus = %d
 				AND r.nfostatus < %d AND r.nfostatus > %d %s %s',
 				NZB::NZB_ADDED,
-				self::NFO_FAILED,
 				$this->maxRetries,
+				self::NFO_FAILED,
 				$groupIDQuery,
 				$guidCharQuery
 			)
 		);
 
-		if ($releases instanceof Traversable) {
+		if ($releases instanceof \Traversable) {
 			foreach ($releases as $release) {
-				$this->pdo->queryExec(
-					sprintf('DELETE FROM releasenfo WHERE nfo IS NULL AND releaseid = %d', $release['id'])
+				// remove any release_nfos for failed
+				$this->pdo->queryExec(sprintf('
+					DELETE FROM releasenfo WHERE nfo IS NULL AND releaseid = %d',
+						$release['id']
+					)
+				);
+
+				// set release.nfostatus to failed
+				$this->pdo->queryExec(sprintf('
+					UPDATE releases r SET r.nfostatus = %d WHERE r.id = %d',
+						self::NFO_FAILED,
+						$release['id']
+					)
 				);
 			}
 		}
-
-		// Set releases with no NFO.
-		$this->pdo->queryExec(
-			sprintf('
-				UPDATE releases r
-				SET r.nfostatus = %d
-				WHERE r.nzbstatus = %d
-				AND r.nfostatus < %d %s %s',
-				self::NFO_FAILED,
-				NZB::NZB_ADDED,
-				$this->maxRetries,
-				$groupIDQuery,
-				$guidCharQuery
-			)
-		);
 
 		if ($this->echo) {
 			if ($nfoCount > 0) {
