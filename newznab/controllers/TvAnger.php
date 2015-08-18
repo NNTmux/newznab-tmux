@@ -42,7 +42,7 @@ class TvAnger
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
 
 		$this->xmlEpisodeInfoUrl =
-			"http://services.tvrage.com/myfeeds/tvrageepisodes.php?key=" . TvRage::APIKEY;
+			"http://services.tvrage.com/myfeeds/tvrageepisodes.php?key=" . TvAnger::APIKEY;
 	}
 
 	/**
@@ -935,7 +935,7 @@ class TvAnger
 			$matchpct = ($numMatches / $totalMatches) * 100;
 		}
 
-		if ($matchpct >= TvRage::MATCH_PROBABILITY) {
+		if ($matchpct >= TvAnger::MATCH_PROBABILITY) {
 			return $matchpct;
 		} else {
 			return false;

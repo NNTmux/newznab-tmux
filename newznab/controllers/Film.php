@@ -546,7 +546,8 @@ class Film
 	{
 		return [
 			'actors','backdrop','cover','director','genre','imdbid','language',
-			'plot','rating','tagline','title','tmdbid', 'trailer','type','year'
+			'plot','rating','tagline','title','tmdbid', 'trailer','type','year',
+			'traktid'
 		];
 	}
 
@@ -662,6 +663,7 @@ class Film
 
 		$mov['imdbid'] = $imdbId;
 		$mov['tmdbid'] = (!isset($tmdb['tmdbid']) || $tmdb['tmdbid'] == '') ? 0 : $tmdb['tmdbid'];
+		$mov['traktid'] = (!isset($trakt['id']) || $trakt['id'] == '') ? 0 : $trakt['id'];
 
 		// Prefer Fanart.tv cover over TRAKT, TRAKT over TMDB and TMDB over IMDB.
 		if ($this->checkVariable($fanart['cover'])) {
@@ -733,7 +735,8 @@ class Film
 			'title'     => $mov['title'],
 			'tmdbid'    => $mov['tmdbid'],
 			'type'      => html_entity_decode(ucwords(preg_replace('/[\.\_]/', ' ', $mov['type'])), ENT_QUOTES, 'UTF-8'),
-			'year'      => $mov['year']
+			'year'      => $mov['year'],
+			'traktid'   => $mov['traktid']
 		]);
 
 		if ($this->echooutput && $this->service !== '') {
@@ -997,8 +1000,11 @@ class Film
 			if (isset($resp['images']['banner']['full'])) {
 				$ret['banner'] = $resp['images']['banner']['full'];
 			}
+			if (isset($resp['ids']['trakt'])) {
+				$ret['id'] = $resp['ids']['trakt'];
+			}
 
-			if (isset($ret['cover'])) {
+			if (isset($resp['title'])) {
 				$ret['title'] = $resp['title'];
 			}
 			if ($this->echooutput) {
