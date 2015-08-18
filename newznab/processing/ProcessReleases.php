@@ -405,7 +405,7 @@ class ProcessReleases
 		foreach ($groupIDs as $groupID) {
 			if ($this->pdo->queryOneRow(
 					sprintf(
-						'SELECT id FROM %s WHERE filecheck = %d AND filesize > 0 AND group_id = %d LIMIT 1',
+						'SELECT SQL_NO_CACHE id FROM %s WHERE filecheck = %d AND filesize > 0 AND group_id = %d LIMIT 1',
 						$group['cname'],
 						self::COLLFC_SIZED,
 						$groupID['id']
@@ -414,7 +414,9 @@ class ProcessReleases
 			) {
 				$deleteQuery = $this->pdo->queryExec(
 					sprintf('
-						DELETE c FROM %s c
+						DELETE c, b, p FROM %s c
+						INNER JOIN %s b ON (c.id=b.collection_id)
+						INNER JOIN %s p ON (b.id=p.binaryid)
 						INNER JOIN groups g ON g.id = c.group_id
 						WHERE c.group_id = %d
 						AND c.filecheck = %d
@@ -422,6 +424,8 @@ class ProcessReleases
 						AND greatest(IFNULL(g.minsizetoformrelease, 0), %d) > 0
 						AND c.filesize < greatest(IFNULL(g.minsizetoformrelease, 0), %d)',
 						$group['cname'],
+						$group['bname'],
+						$group['pname'],
 						$groupID['id'],
 						self::COLLFC_SIZED,
 						$minSizeSetting,
@@ -436,11 +440,15 @@ class ProcessReleases
 				if ($maxSizeSetting > 0) {
 					$deleteQuery = $this->pdo->queryExec(
 						sprintf('
-							DELETE FROM %s
-							WHERE filecheck = %d
-							AND group_id = %d
-							AND filesize > %d',
+							DELETE c, b, p FROM %s c
+							INNER JOIN %s b ON (c.id=b.collection_id)
+							INNER JOIN %s p ON (b.id=p.binaryid)
+							WHERE c.filecheck = %d
+							AND c.group_id = %d
+							AND c.filesize > %d',
 							$group['cname'],
+							$group['bname'],
+							$group['pname'],
 							self::COLLFC_SIZED,
 							$groupID['id'],
 							$maxSizeSetting
@@ -453,13 +461,17 @@ class ProcessReleases
 
 				$deleteQuery = $this->pdo->queryExec(
 					sprintf('
-						DELETE c FROM %s c
+						DELETE c, b, p FROM %s c
+						INNER JOIN %s b ON (c.id=b.collection_id)
+						INNER JOIN %s p ON (b.id=p.binaryid)
 						INNER JOIN groups g ON g.id = c.group_id
 						WHERE c.group_id = %d
 						AND c.filecheck = %d
 						AND greatest(IFNULL(g.minfilestoformrelease, 0), %d) > 0
 						AND c.totalfiles < greatest(IFNULL(g.minfilestoformrelease, 0), %d)',
 						$group['cname'],
+						$group['bname'],
+						$group['pname'],
 						$groupID['id'],
 						self::COLLFC_SIZED,
 						$minFilesSetting,
@@ -484,6 +496,7 @@ class ProcessReleases
 			);
 		}
 	}
+
 
 	/**
 	 * Create releases from complete collections.
