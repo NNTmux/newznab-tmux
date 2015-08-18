@@ -691,7 +691,7 @@ class ProcessReleases
 				INNER JOIN category c ON r.categoryid = c.id
 				INNER JOIN category cp ON cp.id = c.parentid
 				WHERE %s nzbstatus = 0",
-				(!empty($groupID) ? ' r.group_id = ' . $groupID . ' AND ' : ' ')
+				(!empty($groupID) ? ' r.groupid = ' . $groupID . ' AND ' : ' ')
 			)
 		);
 
