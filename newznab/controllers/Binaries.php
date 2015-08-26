@@ -1080,14 +1080,16 @@ class Binaries
 				$local = $this->_pdo->queryOneRow(
 					sprintf('
 						SELECT c.date AS date
-						FROM %s c, %s p
-						WHERE c.id = p.collection_id
-						AND c.group_id = %s
-						AND p.number = %s LIMIT 1',
+						FROM %s c
+						INNER JOIN %s b ON(c.id=b.collection_id)
+						INNER JOIN %s p ON(b.id=p.binaryid)
+						WHERE p.number = %s
+						%s LIMIT 1',
 						$group['cname'],
+						$group['bname'],
 						$group['pname'],
-						$groupID,
-						$currentPost
+						$currentPost,
+						$this->_tablePerGroup === false ? sprintf('AND c.group_id = %d', $groupID) : ''
 					)
 				);
 				if ($local !== false) {

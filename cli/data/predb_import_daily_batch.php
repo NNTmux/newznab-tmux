@@ -94,7 +94,7 @@ if ($result) {
 
 	foreach ($all_matches as $matches) {
 		if (preg_match('#^(.+)/(\d+)_#', $matches, $match)) {
-			$timematch = -1 + $progress['last'];
+			$timematch = $progress['last'];
 
 			// Skip patches the user does not want.
 			if ($match[2] < $timematch) {
@@ -194,7 +194,7 @@ function importDump($path, $local, $verbose = true, $table = 'prehash')
 		echo $pdo->log->info("Creating temporary table");
 	}
 
-	// TRuncate to clear any old data
+	// Truncate to clear any old data
 	$pdo->queryDirect("TRUNCATE TABLE tmp_pre");
 
 	// Import file into tmp_pre

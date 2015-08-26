@@ -213,7 +213,6 @@ class Releases
 				INNER JOIN category cp ON cp.id = c.parentid
 				LEFT OUTER JOIN releasevideo re ON re.releaseid = r.id
 				LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
-				AND rn.nfo IS NOT NULL
 				WHERE r.nzbstatus = %d
 				AND r.passwordstatus %s
 				%s %s %s %s
@@ -617,7 +616,7 @@ class Releases
 				FROM releases r
 				LEFT OUTER JOIN releasevideo re ON re.releaseid = r.id
 				INNER JOIN groups ON groups.id = r.groupid
-				LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id AND rn.nfo IS NOT NULL
+				LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
 				INNER JOIN category c ON c.id = r.categoryid
 				INNER JOIN category cp ON cp.id = c.parentid
 				WHERE %s %s
@@ -1087,7 +1086,7 @@ class Releases
 			INNER JOIN category c ON c.id = r.categoryid
 			INNER JOIN groups ON groups.id = r.groupid
 			LEFT OUTER JOIN releasevideo re ON re.releaseid = r.id
-			LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id AND rn.nfo IS NOT NULL
+			LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
 			INNER JOIN category cp ON cp.id = c.parentid
 			%s",
 			$this->getConcatenatedCategoryIDs(),
@@ -1144,7 +1143,7 @@ class Releases
 			FROM releases r
 			INNER JOIN category c ON c.id = r.categoryid
 			INNER JOIN groups ON groups.id = r.groupid
-			LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id AND rn.nfo IS NOT NULL
+			LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
 			INNER JOIN category cp ON cp.id = c.parentid
 			%s",
 			$this->getConcatenatedCategoryIDs(),
@@ -1202,7 +1201,7 @@ class Releases
 			FROM releases r
 			INNER JOIN groups g ON g.id = r.groupid
 			INNER JOIN category c ON c.id = r.categoryid
-			LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id AND rn.nfo IS NOT NULL
+			LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
 			INNER JOIN category cp ON cp.id = c.parentid
 			%s",
 			$this->getConcatenatedCategoryIDs(),

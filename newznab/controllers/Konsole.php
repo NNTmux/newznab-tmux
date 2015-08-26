@@ -123,7 +123,7 @@ class Konsole
 				}
 			}
 			$searchwords = trim($searchwords);
-			$searchsql .= sprintf(" MATCH(title, platform) AGAINST(%s IN BOOLEAN MODE)", $this->pdo->escapeString($searchwords));
+			$searchsql .= sprintf(" MATCH(title, platform) AGAINST(%s IN BOOLEAN MODE) AND platform = %s", $this->pdo->escapeString($searchwords), $this->pdo->escapeString($platform));
 		}
 		return $this->pdo->queryOneRow(sprintf("SELECT * FROM consoleinfo WHERE %s", $searchsql));
 	}
@@ -313,7 +313,7 @@ class Konsole
 				$salesrank,
 				$this->pdo->escapeString($platform),
 				$this->pdo->escapeString($publisher),
-				$this->pdo->escapeString($releasedate),
+				($releasedate != "" ? $this->pdo->escapeString($releasedate) : "null"),
 				$this->pdo->escapeString($esrb),
 				$cover,
 				$genreID,
