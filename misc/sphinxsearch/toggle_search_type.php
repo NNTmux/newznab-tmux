@@ -7,7 +7,7 @@ use newznab\db\Settings;
 if (!isset($argv[1]) || !in_array($argv[1], ['sphinx', 'standard'])) {
 	exit('Argument1 (required) is the method of search you would like to optimize for.  Choices are sphinx or standard.' . PHP_EOL .
 		'Argument2 (optional) is the storage engine and row_format you would like the releasesearch table to use. If not entered it will be left default.' . PHP_EOL .
-		'Choices are (c|d)(myisam|innodb) (Compressed|Dynamic)(MyISAM|InnoDB) entered like dinnodb.  This argument has no effect if optimizinf for Sphinx.' . PHP_EOL .
+		'Choices are (c|d)(myisam|innodb) (Compressed|Dynamic)(MyISAM|InnoDB) entered like dinnodb.  This argument has no effect if optimizing for Sphinx.' . PHP_EOL .
 		'Please stop all processing scripts before running this script.' . PHP_EOL);
 }
 
