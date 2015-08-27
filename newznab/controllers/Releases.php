@@ -790,7 +790,7 @@ class Releases
 				$this->pdo->escapeString($name), $this->pdo->escapeString($searchname), $this->pdo->escapeString($fromname), $category, $parts, $grabs, $this->pdo->escapeString($size), $this->pdo->escapeString($posteddate), $this->pdo->escapeString($addeddate), $rageid, $this->pdo->escapeString($seriesfull), $this->pdo->escapeString($season), $this->pdo->escapeString($episode), $imdbid, $anidbid, $tvdbid, $consoleinfoid, $id
 			)
 		);
-		$this->sphinxSearch->updateReleaseSearchName($id, $searchname);
+		$this->sphinxSearch->updateRelease($id, $this->pdo);
 	}
 
 	/**
@@ -1141,8 +1141,7 @@ class Releases
 		$parentCat = $catRow['parentid'];
 
 		$results = $this->search(
-			$this->getSimilarName($name), -1, -1, -1, [$parentCat], -1, -1, 0, 0, -1, -1, 0, $limit, '', -1, $excludedCats
-		);
+			$this->getSimilarName($name), -1, -1, -1, -1, -1, -1, 0, 0, -1, -1, 0, $limit, '', -1, $excludedCats, null, [$parentCat]);
 		if (!$results) {
 			return $results;
 		}
@@ -1172,6 +1171,7 @@ class Releases
 	 * @param string $searchName
 	 * @param string $usenetName
 	 * @param string $posterName
+	 * @param string $fileName
 	 * @param string $groupName
 	 * @param int    $sizeFrom
 	 * @param int    $sizeTo
@@ -1193,6 +1193,7 @@ class Releases
 		$searchName,
 		$usenetName,
 		$posterName,
+		$fileName,
 		$groupName,
 		$sizeFrom,
 		$sizeTo,
@@ -1239,6 +1240,9 @@ class Releases
 		}
 		if ($posterName != -1) {
 			$searchOptions['fromname'] = $posterName;
+		}
+		if ($fileName != -1) {
+			$searchOptions['filename'] = $fileName;
 		}
 
 		$whereSql = sprintf(
