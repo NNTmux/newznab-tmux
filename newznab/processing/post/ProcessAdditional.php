@@ -1077,6 +1077,9 @@ class ProcessAdditional
 
 			$this->_addFileInfo($file);
 		}
+		if ($this->_addedFileInfo > 0) {
+			$this->sphinx->updateRelease($this->_release['id'], $this->pdo);
+		}
 		return ($this->_totalFileInfo > 0 ? true : false);
 	}
 
@@ -1710,7 +1713,7 @@ class ProcessAdditional
 											$this->_release['id']
 										)
 									);
-									$this->sphinx->updateReleaseSearchName($this->_release['id'], $newTitle);
+									$this->sphinx->updateRelease($this->_release['id'], $this->pdo);
 
 									// Echo the changed name.
 									if ($this->_echoCLI) {
@@ -2298,7 +2301,7 @@ class ProcessAdditional
 							$this->_release['id']
 						)
 					);
-					$this->sphinx->updateReleaseSearchName($this->_release['id'], $newTitle);
+					$this->sphinx->updateRelease($this->_release['id'], $this->pdo);
 
 					// Echo the changed name to CLI.
 					if ($this->_echoCLI) {
