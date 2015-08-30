@@ -401,7 +401,7 @@ class Tmux
 					SUM(IF(prehashid > 0 AND nzbstatus = 1 AND isrequestid = 1 AND reqidstatus = 1,1,0)) AS requestid_matched,
 					SUM(IF(prehashid > 0 AND searchname IS NOT NULL,1,0)) AS prehash_matched,
 					SUM(IF(preid > 0 AND searchname IS NOT NULL,1,0)) AS predb_matched,
-					COUNT(DISTINCT(preid)) AS distinct_predb_matched
+					COUNT(DISTINCT(preid)) AS distinct_predb_matched,
 					COUNT(DISTINCT(prehashid)) AS distinct_prehash_matched
 					FROM releases r", $bookreqids, Info::NfoQueryString($this->pdo), $request_hours);
 			case 2:
