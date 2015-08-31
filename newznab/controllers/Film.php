@@ -1000,6 +1000,8 @@ class Film
 
 			if (isset($ret['cover'])) {
 				$ret['title'] = $resp['title'];
+			} else {
+				return false;
 			}
 			if ($this->echooutput) {
 				$this->pdo->log->doEcho($this->pdo->log->alternateOver("Trakt Found ") . $this->pdo->log->headerOver($ret['title']), true);
