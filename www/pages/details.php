@@ -29,7 +29,7 @@ if (isset($_GET["id"]))
 	$rage = '';
 	if ($data["rageid"] != '')
 	{
-		$tvrage = new TvAnger();
+		$tvrage = new TvRage();
 
 		$rageinfo = $tvrage->getByRageID($data["rageid"]);
 		if (count($rageinfo) > 0)

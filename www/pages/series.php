@@ -5,7 +5,7 @@ if (!$page->users->isLoggedIn()) {
 }
 
 $releases = new Releases();
-$tvrage = new TvAnger();
+$tvrage = new TvRage();
 $cat = new Category();
 $us = new UserSeries();
 
