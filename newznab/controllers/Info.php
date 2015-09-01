@@ -339,7 +339,7 @@ class Info
 				]
 			);
 			$movie = new Movie(['Echo' => $this->echo, 'Settings' => $this->pdo]);
-			$tvRage = new TvAnger(['Echo' => $this->echo, 'Settings' => $this->pdo]);
+			$tvRage = new TvRage(['Echo' => $this->echo, 'Settings' => $this->pdo]);
 
 			foreach ($res as $arr) {
 				$fetchedBinary = $nzbContents->getNFOfromNZB($arr['guid'], $arr['id'], $arr['groupid'], $groups->getByNameByID($arr['groupid']));
