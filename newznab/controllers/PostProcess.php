@@ -162,7 +162,7 @@ class PostProcess
 		if ($this->pdo->getSetting('lookupnfo') == 1)
 		{
 			$nfo = new Nfo($this->echooutput);
-			$nfo->processNfoFiles(500);
+			$nfo->processNfoFiles();
 		}
 	}
 
