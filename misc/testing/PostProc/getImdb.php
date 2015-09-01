@@ -6,7 +6,7 @@ use newznab\db\Settings;
 
 $pdo = new Settings();
 $c = new ColorCLI();
-$movie = new Film(['Echo' => true, 'Settings' => $pdo]);
+$movie = new Movie(['Echo' => true, 'Settings' => $pdo]);
 
 
 $movies = $pdo->queryDirect("SELECT imdbid FROM movieinfo WHERE tmdbid = 0 ORDER BY id ASC");

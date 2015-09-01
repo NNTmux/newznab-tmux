@@ -72,7 +72,7 @@ if (isset($_GET["id"]))
 
 	$mov = '';
 	if ($data['imdbid'] != '' && $data['imdbid'] != 0000000) {
-		$movie = new Film(['Settings' => $page->settings]);
+		$movie = new Movie(['Settings' => $page->settings]);
 		$mov   = $movie->getMovieInfo($data['imdbid']);
 		if ($mov && isset($mov['title'])) {
 			$mov['title']    = str_replace(['/', '\\'], '', $mov['title']);

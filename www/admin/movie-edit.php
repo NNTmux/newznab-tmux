@@ -3,7 +3,7 @@
 require_once './config.php';
 
 $page = new AdminPage();
-$movie = new Film();
+$movie = new Movie();
 $id = 0;
 
 // set the current action

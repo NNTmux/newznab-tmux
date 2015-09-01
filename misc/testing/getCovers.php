@@ -9,9 +9,9 @@ $movie = new Movie(true);
 
 $db = new Settings();
 
-$movies = $db->query("SELECT imdbID from movieinfo where cover = 0");
+$movies = $db->query("SELECT imdbid from movieinfo where cover = 0");
 
 foreach ($movies as $mov) {
-	$mov = $movie->updateMovieInfo($mov['imdbID']);
+	$mov = $movie->updateMovieInfo($mov['imdbid']);
 	sleep(1);
 }
