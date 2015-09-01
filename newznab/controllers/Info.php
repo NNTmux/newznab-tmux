@@ -338,7 +338,7 @@ class Info
 					'PostProcess' => new PProcess(['Echo' => $this->echo, 'Nfo' => $this, 'Settings' => $this->pdo])
 				]
 			);
-			$movie = new Film(['Echo' => $this->echo, 'Settings' => $this->pdo]);
+			$movie = new Movie(['Echo' => $this->echo, 'Settings' => $this->pdo]);
 			$tvRage = new TvAnger(['Echo' => $this->echo, 'Settings' => $this->pdo]);
 
 			foreach ($res as $arr) {

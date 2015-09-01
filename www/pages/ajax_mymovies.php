@@ -16,7 +16,7 @@ if (isset($_REQUEST['del'])) {
 	$cats[] = '2030';
 	$cats[] = '2040';
 
-	$m = new Film(['Settings' => $page->settings]);
+	$m = new Movie(['Settings' => $page->settings]);
 	$mi = $m->getMovieInfo($_REQUEST['add']);
 	if (!$mi) {
 		$m->updateMovieInfo($_REQUEST['add']);
@@ -29,7 +29,7 @@ if (isset($_REQUEST['del'])) {
 	}
 
 	$tmdb = new TMDB($page->settings->getSetting('tmdbkey'), $page->settings->getSetting('imdblanguage'));
-	$m = new Film(['Settings' => $page->settings, 'TMDb' => $tmdb]);
+	$m = new Movie(['Settings' => $page->settings, 'TMDb' => $tmdb]);
 
 	if (is_numeric($_REQUEST['id'])) {
 		$movie = $m->fetchTMDBProperties($_REQUEST['id']);
@@ -69,7 +69,7 @@ if (isset($_REQUEST['del'])) {
 		} else {
 			$ourmovieimdbs = [];
 			if (count($imdbids) > 0) {
-				$m = new Film(['Settings' => $page->settings, 'TMDb' => $tmdb]);
+				$m = new Movie(['Settings' => $page->settings, 'TMDb' => $tmdb]);
 				$allmovies = $m->getMovieInfoMultiImdb($imdbids);
 				foreach ($allmovies as $ourmovie) {
 					if ($ourmovie['relimdb'] != '') {

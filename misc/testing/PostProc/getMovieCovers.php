@@ -6,7 +6,7 @@ use newznab\db\Settings;
 
 $pdo = new Settings();
 
-$movie = new Film(['Echo' => true, 'Settings' => $pdo]);
+$movie = new Movie(['Echo' => true, 'Settings' => $pdo]);
 
 $movies = $pdo->queryDirect("SELECT imdbid FROM movieinfo WHERE cover = 0 ORDER BY year ASC, id DESC");
 if ($movies instanceof \Traversable) {

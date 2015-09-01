@@ -50,7 +50,7 @@ class MiscSorter
 		$this->pdo = ($pdo instanceof Settings ? $pdo : new Settings());
 
 		$this->category = new Categorize(['Settings' => $this->pdo]);
-		$this->movie = new Film(['Echo' => $this->echooutput, 'Settings' => $this->pdo]);
+		$this->movie = new Movie(['Echo' => $this->echooutput, 'Settings' => $this->pdo]);
 		$this->pubkey = $this->pdo->getSetting('amazonpubkey');
 		$this->privkey = $this->pdo->getSetting('amazonprivkey');
 		$this->asstag = $this->pdo->getSetting('amazonassociatetag');

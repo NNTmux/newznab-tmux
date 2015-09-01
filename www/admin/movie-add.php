@@ -3,7 +3,7 @@
 require_once("config.php");
 
 $page = new AdminPage();
-$movie = new Film(['Settings' => $page->settings]);
+$movie = new Movie(['Settings' => $page->settings]);
 $id = 0;
 
 $page->title = "Movie Add";

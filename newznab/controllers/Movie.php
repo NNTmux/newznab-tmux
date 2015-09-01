@@ -5,9 +5,9 @@ use newznab\utility\Utility;
 use newznab\libraries\Tmdb\TMDB;
 
 /**
- * Class Film
+ * Class Movie
  */
-class Film
+class Movie
 {
 
 	const SRC_BOXOFFICE = 1;
@@ -1490,23 +1490,23 @@ class Film
 			switch ($operation) {
 				case 'boxoffice':
 					$data = $rt->getBoxOffice();
-					$update = Film::SRC_BOXOFFICE;
+					$update = Movie::SRC_BOXOFFICE;
 					break;
 				case 'theaters':
 					$data = $rt->getInTheaters();
-					$update = Film::SRC_INTHEATRE;
+					$update = Movie::SRC_INTHEATRE;
 					break;
 				case 'opening':
 					$data = $rt->getOpening();
-					$update = Film::SRC_OPENING;
+					$update = Movie::SRC_OPENING;
 					break;
 				case 'upcoming':
 					$data = $rt->getUpcoming();
-					$update = Film::SRC_UPCOMING;
+					$update = Movie::SRC_UPCOMING;
 					break;
 				case 'dvd':
 					$data = $rt->getDVDReleases();
-					$update = Film::SRC_DVD;
+					$update = Movie::SRC_DVD;
 					break;
 				default:
 					$data = false;
