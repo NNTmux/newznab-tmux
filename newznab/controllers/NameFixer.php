@@ -342,7 +342,7 @@ class NameFixer
 				$this->_totalReleases = $total;
 
 				echo $this->pdo->log->primary(number_format($total) . ' releases to process.');
-				$Nfo = new Info(['Echo' => $this->echooutput, 'Settings' => $this->pdo]);
+				$Nfo = new Nfo(['Echo' => $this->echooutput, 'Settings' => $this->pdo]);
 				$nzbContents = new NZBContents(
 					[
 						'Echo'        => $this->echooutput,

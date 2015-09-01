@@ -708,7 +708,7 @@ class Forking extends \fork_daemon
 	private function checkProcessNfo()
 	{
 		if ($this->pdo->getSetting('lookupnfo') == 1) {
-			$this->nfoQueryString = \Info::NfoQueryString($this->pdo);
+			$this->nfoQueryString = \Nfo::NfoQueryString($this->pdo);
 			return (
 			$this->pdo->queryOneRow(
 				sprintf(

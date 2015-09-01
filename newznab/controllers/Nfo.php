@@ -11,7 +11,7 @@ require_once NN_LIBS . 'rarinfo/sfvinfo.php';
  * Class Nfo
  * Class for handling fetching/storing of NFO files.
  */
-class Info
+class Nfo
 {
 	/**
 	 * Instance of class DB
