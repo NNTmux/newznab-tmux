@@ -433,11 +433,11 @@ class Games
 			switch ($this->_classUsed) {
 
 				case "desura":
-					if (isset($this->_gameResults['cover'])) {
+					if (isset($this->_gameResults['cover']) && $this->_gameResults['cover'] != '') {
 						$con['coverurl'] = (string)$this->_gameResults['cover'];
 					}
 
-					if (isset($this->_gameResults['backdrop'])) {
+					if (isset($this->_gameResults['backdrop']) && $this->_gameResults['backdrop'] != '') {
 						$con['backdropurl'] = (string)$this->_gameResults['backdrop'];
 					}
 
@@ -502,7 +502,7 @@ class Games
 					}
 					break;
 				case "gl":
-					if (isset($this->_gameResults['cover'])) {
+					if (isset($this->_gameResults['cover']) && $this->_gameResults['cover'] != '') {
 						$con['coverurl'] = (string)$this->_gameResults['cover'];
 					}
 
@@ -530,11 +530,11 @@ class Games
 					}
 					break;
 				case "steam":
-					if (isset($this->_gameResults['cover'])) {
+					if (isset($this->_gameResults['cover']) && $this->_gameResults['cover'] != '') {
 						$con['coverurl'] = (string)$this->_gameResults['cover'];
 					}
 
-					if (isset($this->_gameResults['backdrop'])) {
+					if (isset($this->_gameResults['backdrop']) && $this->_gameResults['backdrop'] != '') {
 						$con['backdropurl'] = (string)$this->_gameResults['backdrop'];
 					}
 
