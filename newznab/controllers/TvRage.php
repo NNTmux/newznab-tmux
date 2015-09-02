@@ -8,7 +8,7 @@ use newznab\utility\Utility;
  */
 class TvRage
 {
-	const APIKEY = '7FwjZ8loweFcOhHfnU3E';
+	const APIKEY = 'HteDFOVH9aULexqMWWtm';
 	const MATCH_PROBABILITY = 75;
 
 	/**
@@ -42,7 +42,7 @@ class TvRage
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
 
 		$this->xmlEpisodeInfoUrl =
-			"http://services.tvrage.com/myfeeds/tvrageepisodes.php?key=" . TvRage::APIKEY;
+			"http://services.tvrage.com/myfeeds/episodeinfo.php?key=" . TvRage::APIKEY;
 	}
 
 	/**
