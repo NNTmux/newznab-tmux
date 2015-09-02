@@ -24,7 +24,7 @@ Class NZBContents
 	protected $nntp;
 
 	/**
-	 * @var Info
+	 * @var Nfo
 	 * @access protected
 	 */
 	protected $nfo;
@@ -66,7 +66,7 @@ Class NZBContents
 	 *     array(
 	 *         'Echo'        => bool        ; To echo to CLI or not.
 	 *         'NNTP'        => NNTP        ; Class NNTP.
-	 *         'Nfo'         => Nfo         ; Class Info.
+	 *         'Nfo'         => Nfo         ; Class Nfo.
 	 *         'NZB'         => NZB         ; Class NZB.
 	 *         'Settings'    => DB          ; Class newznab\db\Settings.
 	 *         'PostProcess' => PProcess ; Class PProcess.
@@ -139,14 +139,14 @@ Class NZBContents
 				if ($this->echooutput) {
 					echo '-';
 				}
-				$this->pdo->queryExec(sprintf('UPDATE releases SET nfostatus = %d WHERE id = %d', Info::NFO_NONFO, $relID));
+				$this->pdo->queryExec(sprintf('UPDATE releases SET nfostatus = %d WHERE id = %d', Nfo::NFO_NONFO, $relID));
 				$fetchedBinary = false;
 			}
 		} else {
 			if ($this->echooutput) {
 				echo '-';
 			}
-			$this->pdo->queryExec(sprintf('UPDATE releases SET nfostatus = %d WHERE id = %d', Info::NFO_NONFO, $relID));
+			$this->pdo->queryExec(sprintf('UPDATE releases SET nfostatus = %d WHERE id = %d', Nfo::NFO_NONFO, $relID));
 		}
 
 		return $fetchedBinary;
