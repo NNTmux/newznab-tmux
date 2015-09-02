@@ -70,3 +70,12 @@ coding_style:
                 general: lower
             constants:
                 true_false_null: undefined
+
+filter:
+    excluded_paths:
+        - libs/smarty/*
+        - libs/Net_NNTP/*
+        - libs/rarinfo/*
+        - libs/PHPMailer/*
+        - libs/getid3/*
+        - libs/forkdaemon-php/*
