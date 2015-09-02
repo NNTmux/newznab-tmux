@@ -663,7 +663,7 @@ class Movie
 
 		$mov['imdbid'] = $imdbId;
 		$mov['tmdbid'] = (!isset($tmdb['tmdbid']) || $tmdb['tmdbid'] == '') ? 0 : $tmdb['tmdbid'];
-		$mov['traktid'] = (!isset($trakt['id']) || $trakt['id'] == '') ? 0 : $trakt['id'];
+		$mov['traktid'] = $trakt['id'];
 
 		// Prefer Fanart.tv cover over TRAKT, TRAKT over TMDB and TMDB over IMDB.
 		if ($this->checkVariable($fanart['cover'])) {
@@ -994,11 +994,15 @@ class Movie
 		$resp = $this->traktTv->movieSummary('tt' . $imdbId, 'full,images');
 		if ($resp !== false) {
 			$ret = [];
-			if (isset($resp['images']['poster']['thumb'])) {
+			if (isset($resp['images']['poster']['thumb']) && $resp['images']['poster']['thumb'] != '') {
 				$ret['cover'] = $resp['images']['poster']['thumb'];
+			} else {
+				return false;
 			}
-			if (isset($resp['images']['banner']['full'])) {
+			if (isset($resp['images']['banner']['full']) && $resp['images']['banner']['full'] != '') {
 				$ret['banner'] = $resp['images']['banner']['full'];
+			} else {
+				return false;
 			}
 			if (isset($resp['ids']['trakt'])) {
 				$ret['id'] = $resp['ids']['trakt'];
