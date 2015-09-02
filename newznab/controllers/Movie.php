@@ -772,16 +772,22 @@ class Movie
 					return false;
 				}
 				$ret = [];
-				if (isset($art['moviebackground'][0]['url'])) {
+				if (isset($art['moviebackground'][0]['url']) && $art['moviebackground'][0]['url'] != '') {
 					$ret['backdrop'] = $art['moviebackground'][0]['url'];
-				} elseif (isset($art['moviethumb'][0]['url'])) {
+				} else if (isset($art['moviethumb'][0]['url']) && $art['moviethumb'][0]['url'] != '') {
 					$ret['backdrop'] = $art['moviethumb'][0]['url'];
+				} else {
+					return false;
 				}
-				if (isset($art['movieposter'][0]['url'])) {
+				if (isset($art['movieposter'][0]['url']) && $art['movieposter'][0]['url'] != '') {
 					$ret['cover'] = $art['movieposter'][0]['url'];
+				} else {
+					return false;
 				}
-				if (isset($art['moviebanner'][0]['url'])) {
+				if (isset($art['moviebanner'][0]['url']) && $art['moviebanner'][0]['url'] != '') {
 					$ret['banner'] = $art['moviebanner'][0]['url'];
+				} else {
+					return false;
 				}
 
 				if (isset($ret['backdrop']) && isset($ret['cover'])) {
