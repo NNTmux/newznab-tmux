@@ -653,7 +653,7 @@ class Movie
 			return false;
 		}
 
-		// Check FanArt.tv for background images.
+		// Check FanArt.tv for cover nad background images.
 		$fanart = $this->fetchFanartTVProperties($imdbId);
 
 		$mov = [];
@@ -1024,6 +1024,7 @@ class Movie
 			}
 			return $ret;
 		}
+		return false;
 	}
 
 	/**
