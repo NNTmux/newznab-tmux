@@ -399,7 +399,7 @@ class Tmux
 					SUM(IF(preid > 0 AND searchname IS NOT NULL,1,0)) AS predb_matched,
 					COUNT(DISTINCT(preid)) AS distinct_predb_matched,
 					COUNT(DISTINCT(prehashid)) AS distinct_prehash_matched
-					FROM releases r", $bookreqids, Info::NfoQueryString($this->pdo), $request_hours);
+					FROM releases r", $bookreqids, Nfo::NfoQueryString($this->pdo), $request_hours);
 			case 2:
 				return "SELECT
 					(SELECT COUNT(*) FROM releases r
