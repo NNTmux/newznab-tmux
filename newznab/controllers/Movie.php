@@ -201,7 +201,7 @@ class Movie
 					',,',
 					',',
 					str_replace(
-						array('(,', ' ,', ', )', ',)'),
+						['(,', ' ,', ', )', ',)'],
 						'',
 						implode(',', $imdbIDs)
 					)
@@ -363,7 +363,7 @@ class Movie
 				break;
 		}
 
-		return array($orderField, ((isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'desc'));
+		return [$orderField, ((isset($orderArr[1]) && preg_match('/^asc|desc$/i', $orderArr[1])) ? $orderArr[1] : 'desc')];
 	}
 
 	/**
@@ -373,7 +373,7 @@ class Movie
 	 */
 	public function getMovieOrdering()
 	{
-		return array('title_asc', 'title_desc', 'year_asc', 'year_desc', 'rating_asc', 'rating_desc');
+		return ['title_asc', 'title_desc', 'year_asc', 'year_desc', 'rating_asc', 'rating_desc'];
 	}
 
 	/**
@@ -382,7 +382,7 @@ class Movie
 	protected function getBrowseBy()
 	{
 		$browseBy = ' ';
-		$browseByArr = array('title', 'director', 'actors', 'genre', 'rating', 'year', 'imdb');
+		$browseByArr = ['title', 'director', 'actors', 'genre', 'rating', 'year', 'imdb'];
 		foreach ($browseByArr as $bb) {
 			if (isset($_REQUEST[$bb]) && !empty($_REQUEST[$bb])) {
 				$bbv = stripslashes($_REQUEST[$bb]);
@@ -546,7 +546,8 @@ class Movie
 	{
 		return [
 			'actors','backdrop','cover','director','genre','imdbid','language',
-			'plot','rating','tagline','title','tmdbid', 'trailer','type','year'
+			'plot','rating','tagline','title','tmdbid', 'trailer','type','year',
+			'traktid'
 		];
 	}
 
@@ -607,7 +608,7 @@ class Movie
 	}
 
 	/**
-	 * Returns a tmdb or imdb variable, the one that is set. Empty string if both not set.
+	 * Returns a tmdb, imdb or trakt variable, the one that is set. Empty string if both not set.
 	 *
 	 * @param string $variable1
 	 * @param string $variable2
@@ -662,6 +663,7 @@ class Movie
 
 		$mov['imdbid'] = $imdbId;
 		$mov['tmdbid'] = (!isset($tmdb['tmdbid']) || $tmdb['tmdbid'] == '') ? 0 : $tmdb['tmdbid'];
+		$mov['traktid'] = $trakt['id'];
 
 		// Prefer Fanart.tv cover over TRAKT, TRAKT over TMDB and TMDB over IMDB.
 		if ($this->checkVariable($fanart['cover'])) {
@@ -718,7 +720,7 @@ class Movie
 
 		$mov['title']    = html_entity_decode($mov['title']   , ENT_QUOTES, 'UTF-8');
 
-		$mov['title'] = str_replace(array('/', '\\'), '', $mov['title']);
+		$mov['title'] = str_replace(['/', '\\'], '', $mov['title']);
 		$movieID = $this->update([
 			'actors'    => html_entity_decode($mov['actors']  , ENT_QUOTES, 'UTF-8'),
 			'backdrop'  => $mov['backdrop'],
@@ -733,7 +735,8 @@ class Movie
 			'title'     => $mov['title'],
 			'tmdbid'    => $mov['tmdbid'],
 			'type'      => html_entity_decode(ucwords(preg_replace('/[\.\_]/', ' ', $mov['type'])), ENT_QUOTES, 'UTF-8'),
-			'year'      => $mov['year']
+			'year'      => $mov['year'],
+			'traktid'   => $mov['traktid']
 		]);
 
 		if ($this->echooutput && $this->service !== '') {
@@ -891,25 +894,25 @@ class Movie
 	 */
 	protected function fetchIMDBProperties($imdbId)
 	{
-		$imdb_regex = array(
+		$imdb_regex = [
 			'title' => '/<title>(.*?)\s?\(.*?<\/title>/i',
 			'tagline' => '/taglines:<\/h4>\s([^<]+)/i',
 			'plot' => '/<p itemprop="description">\s*?(.*?)\s*?<\/p>/i',
 			'rating' => '/"ratingValue">([\d.]+)<\/span>/i',
 			'year' => '/<title>.*?\(.*?(\d{4}).*?<\/title>/i',
 			'cover' => '/<link rel=\'image_src\' href="(http:\/\/ia\.media-imdb\.com.+\.jpg)">/'
-		);
+		];
 
-		$imdb_regex_multi = array(
+		$imdb_regex_multi = [
 			'genre' => '/href="\/genre\/(.*?)\?/i',
 			'language' => '/<a href="\/language\/.+?\'url\'>(.+?)<\/a>/s',
 			'type' => '/<meta property=\'og\:type\' content=\"(.+)\" \/>/i'
-		);
+		];
 
 		$buffer =
 			Utility::getUrl([
 					'url' => 'http://' . ($this->imdburl === false ? 'www' : 'akas') . '.imdb.com/title/tt' . $imdbId . '/',
-					'language' => (($this->pdo->getSetting('lookuplanguage') != '') ? $this->pdo->getSetting('lookuplanguage') : 'en'),
+					'Accept-Language' => (($this->pdo->getSetting('lookuplanguage') != '') ? $this->pdo->getSetting('lookuplanguage') : 'en'),
 					'useragent' => 'Mozilla/5.0 (iPad; U; CPU OS 3_2 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) ' .
 						'Version/4.0.4 Mobile/7B334b Safari/531.21.102011-10-16 20:23:10', 'foo=bar'
 				]
@@ -991,14 +994,21 @@ class Movie
 		$resp = $this->traktTv->movieSummary('tt' . $imdbId, 'full,images');
 		if ($resp !== false) {
 			$ret = [];
-			if (isset($resp['images']['poster']['thumb'])) {
+			if (isset($resp['images']['poster']['thumb']) && $resp['images']['poster']['thumb'] != '') {
 				$ret['cover'] = $resp['images']['poster']['thumb'];
+			} else {
+				return false;
 			}
-			if (isset($resp['images']['banner']['full'])) {
+			if (isset($resp['images']['banner']['full']) && $resp['images']['banner']['full'] != '') {
 				$ret['banner'] = $resp['images']['banner']['full'];
+			} else {
+				return false;
+			}
+			if (isset($resp['ids']['trakt'])) {
+				$ret['id'] = $resp['ids']['trakt'];
 			}
 
-			if (isset($ret['cover'])) {
+			if (isset($resp['title'])) {
 				$ret['title'] = $resp['title'];
 			} else {
 				return false;
@@ -1193,7 +1203,7 @@ class Movie
 			$pieces = explode(' ', $this->currentTitle);
 			$tempTitle = '%';
 			foreach ($pieces as $piece) {
-				$tempTitle .= str_replace(array("'", "!", '"'), '', $piece) . '%';
+				$tempTitle .= str_replace(["'", "!", '"'], '', $piece) . '%';
 			}
 			$IMDBCheck = $this->pdo->queryOneRow(
 				sprintf("%s WHERE replace(replace(title, \"'\", ''), '!', '') %s %s",
@@ -1217,7 +1227,7 @@ class Movie
 					$pieces = explode(' ', $tempTitle);
 					$tempTitle = '%';
 					foreach ($pieces as $piece) {
-						$tempTitle .= str_replace(array("'", "!", '"'), "", $piece) . '%';
+						$tempTitle .= str_replace(["'", "!", '"'], "", $piece) . '%';
 					}
 					$IMDBCheck = $this->pdo->queryOneRow(
 						sprintf("%s WHERE replace(replace(replace(title, \"'\", ''), '!', ''), '\"', '') %s %s",
@@ -1542,11 +1552,11 @@ class Movie
 	/**
 	 * Update upcoming table.
 	 *
-	 * @param $source
+	 * @param string $source
 	 * @param $type
-	 * @param $info
+	 * @param string|false $info
 	 *
-	 * @return bool|int
+	 * @return boolean|int
 	 */
 	protected function updateInsUpcoming($source, $type, $info)
 	{
@@ -1570,7 +1580,7 @@ class Movie
 	 */
 	public function getGenres()
 	{
-		return array(
+		return [
 			'Action',
 			'Adventure',
 			'Animation',
@@ -1597,7 +1607,7 @@ class Movie
 			'Thriller',
 			'War',
 			'Western'
-		);
+		];
 	}
 
 }
