@@ -154,7 +154,7 @@ switch ($function) {
 		verifyEmptyParameter('season');
 		verifyEmptyParameter('ep');
 		$maxAge = maxAge();
-		$page->users->addApiRequest($uid, $_SERVER['REQUEST_URI'], $hosthash);
+		$page->users->addApiRequest($uid, $_SERVER['REQUEST_URI']);
 		$offset = offset();
 
 		$relData = $releases->searchbyRageId(
@@ -179,7 +179,7 @@ switch ($function) {
 		if (!isset($_GET["id"]))
 			showApiError(200);
 
-		$page->users->addApiRequest($uid, $_SERVER['REQUEST_URI'], $hosthash);
+		$page->users->addApiRequest($uid, $_SERVER['REQUEST_URI']);
 
 		$relData = $releases->getByGuid($_GET["id"]);
 		if (!$relData)
@@ -218,7 +218,7 @@ switch ($function) {
 		if (!isset($_GET["id"]))
 			showApiError(200);
 
-		$page->users->addApiRequest($uid, $_SERVER['REQUEST_URI'], $hosthash);
+		$page->users->addApiRequest($uid, $_SERVER['REQUEST_URI']);
 
 		$data = $rc->getCommentsByGuid($_GET["id"]);
 		if ($data)
@@ -245,7 +245,7 @@ switch ($function) {
 		if (!isset($_GET["text"]))
 			showApiError(200);
 
-		$page->users->addApiRequest($uid, $_SERVER['REQUEST_URI'], $hosthash);
+		$page->users->addApiRequest($uid, $_SERVER['REQUEST_URI']);
 
 		$relData = $releases->getByGuid($_GET["id"]);
 		if ($relData)
@@ -282,7 +282,7 @@ switch ($function) {
 				$maxage = $_GET["maxage"];
 		}
 
-		$page->users->addApiRequest($uid, $_SERVER['REQUEST_URI'], $hosthash);
+		$page->users->addApiRequest($uid, $_SERVER['REQUEST_URI']);
 
 		$limit = 100;
 		if (isset($_GET["limit"]) && is_numeric($_GET["limit"]) && $_GET["limit"] < 100)
@@ -329,7 +329,7 @@ switch ($function) {
 		else
 			$genreId[] = -1;
 
-		$page->users->addApiRequest($uid, $_SERVER['REQUEST_URI'], $hosthash);
+		$page->users->addApiRequest($uid, $_SERVER['REQUEST_URI']);
 
 		$limit = 100;
 		if (isset($_GET["limit"]) && is_numeric($_GET["limit"]) && $_GET["limit"] < 100)
@@ -352,7 +352,7 @@ switch ($function) {
 		verifyEmptyParameter('q');
 		verifyEmptyParameter('imdbid');
 		$maxAge = maxAge();
-		$page->users->addApiRequest($uid, $_SERVER['REQUEST_URI'], $hosthash);
+		$page->users->addApiRequest($uid, $_SERVER['REQUEST_URI']);
 		$offset = offset();
 
 		$imdbId = (isset($_GET['imdbid']) ? $_GET['imdbid'] : '-1');
@@ -406,7 +406,7 @@ switch ($function) {
 			showApiError(200, 'Missing parameter (id is required for downloading an NZB)');
 		}
 
-		$page->users->addApiRequest($uid, $_SERVER['REQUEST_URI'], $hosthash);
+		$page->users->addApiRequest($uid, $_SERVER['REQUEST_URI']);
 		$data = $releases->getByGuid($_GET['id']);
 
 		$relData = [];
@@ -451,7 +451,7 @@ switch ($function) {
 		// Register.
 		$userDefault = $page->users->getDefaultRole();
 		$uid = $page->users->signup(
-			$username, $password, $_GET['email'], $_SERVER['REMOTE_ADDR'], $userDefault['id'], "", $userDefault['defaultinvites'], "", false, false, false, true
+			$username, $password, $_GET['email'], $_SERVER['REMOTE_ADDR'], $userDefault['id'], $userDefault['defaultinvites']
 		);
 
 		// Check if it succeeded.
