@@ -1012,6 +1012,8 @@ class Movie
 			}
 			if (isset($resp['ids']['trakt'])) {
 				$ret['id'] = $resp['ids']['trakt'];
+			} else {
+				$ret['id'] = 0;
 			}
 
 			if (isset($resp['title'])) {
