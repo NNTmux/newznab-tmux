@@ -2,37 +2,37 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"
 	 xmlns:newznab="http://www.newznab.com/DTD/2010/feeds/attributes/" encoding="utf-8">
 	<channel>
-		<atom:link href="{$smarty.const.WWW_TOP}api" rel="self" type="application/rss+xml"/>
+		<atom:link href="{$serverroot}api" rel="self" type="application/rss+xml"/>
 		<title>{$site->title|escape}</title>
 		<description>{$site->title|escape} API Results</description>
-		<link>{$smarty.const.WWW_TOP}</link>
+		<link>{$serverroot}</link>
 		<language>en-gb</language>
 		<webMaster>{$site->email} ({$site->title|escape})</webMaster>
 		<category>{$site->meta_keywords}</category>
 		<image>
-			<url>{$smarty.const.WWW_TOP}templates_shared/images/logo.png</url>
+			<url>{$serverroot}templates_shared/images/logo.png</url>
 			<title>{$site->title|escape}</title>
-			<link>{$smarty.const.WWW_TOP}</link>
+			<link>{$serverroot}</link>
 			<description>Visit {$site->title|escape} - {$site->strapline|escape}</description>
 		</image>
 		<newznab:response offset="{$offset}" total="{if $releases|@count > 0}{$releases[0]._totalrows}{else}0{/if}"/>
 		{foreach from=$releases item=release}
 			<item>
 				<title>{$release.searchname|escape:html}</title>
-				<guid isPermaLink="true">{$smarty.const.WWW_TOP}details/{$release.guid}</guid>
-				<link>{$smarty.const.WWW_TOP}getnzb/{$release.guid}.nzb&amp;i={$uid}&amp;r={$rsstoken}</link>
-				<comments>{$smarty.const.WWW_TOP}details/{$release.guid}#comments</comments>
+				<guid isPermaLink="true">{$serverroot}details/{$release.guid}</guid>
+				<link>{$serverroot}getnzb/{$release.guid}.nzb&amp;i={$uid}&amp;r={$rsstoken}</link>
+				<comments>{$serverroot}details/{$release.guid}#comments</comments>
 				<pubDate>{$release.adddate|phpdate_format:"DATE_RSS"}</pubDate>
 				<category>{$release.category_name|escape:html}</category>
 				<description>{$release.searchname|escape:html}</description>
-				<enclosure url="{$smarty.const.WWW_TOP}getnzb/{$release.guid}.nzb&amp;i={$uid}&amp;r={$rsstoken}"
+				<enclosure url="{$serverroot}getnzb/{$release.guid}.nzb&amp;i={$uid}&amp;r={$rsstoken}"
 						   length="{$release.size}" type="application/x-nzb"/>
 				{foreach from=$release.category_ids|parray:"," item=cat}
 					<newznab:attr name="category" value="{$cat}"/>
 				{/foreach}
 				<newznab:attr name="size" value="{$release.size}"/>
 				{if isset($release.coverurl) && $release.coverurl != ""}
-					<newznab:attr name="coverurl" value="{$smarty.const.WWW_TOP}covers/{$release.coverurl}"/>
+					<newznab:attr name="coverurl" value="{$serverroot}covers/{$release.coverurl}"/>
 				{/if}
 				{if $extended == "1"}
 					<newznab:attr name="files" value="{$release.totalpart}"/>
