@@ -6,8 +6,8 @@ use newznab\utility\Utility;
 
 class TheTVDB
 {
-	const PROJECT	= 'newznab';
-	const APIKEY	= '5F84ECB91B42D719';
+	const PROJECT	= 'newznab-tmux';
+	const APIKEY	= 'E1669B52D4FBFF11';
 
 	/**
 	 * @var newznab\db\Settings
