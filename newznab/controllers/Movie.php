@@ -629,7 +629,7 @@ class Movie
 	}
 
 	/**
-	 * Fetch IMDB/TMDB info for the movie.
+	 * Fetch IMDB/TMDB/TRAKT info for the movie.
 	 *
 	 * @param $imdbId
 	 *
@@ -665,11 +665,11 @@ class Movie
 		$mov['tmdbid'] = (!isset($tmdb['tmdbid']) || $tmdb['tmdbid'] == '') ? 0 : $tmdb['tmdbid'];
 		$mov['traktid'] = $trakt['id'];
 
-		// Prefer TRAKT cover over Fanart.tv, Fanart.tv over TMDB and TMDB over IMDB.
-		if ($this->checkVariable($trakt['cover'])) {
+		// Prefer Fanart.tv cover over TRAKT, TRAKT over TMDB and TMDB over IMDB.
+		if ($this->checkVariable($fanart['cover'])) {
+			$mov['cover'] = $this->releaseImage->saveImage($imdbId . '-cover', $fanart['cover'], $this->imgSavePath);
+		} else if ($this->checkVariable($trakt['cover'])) {
 			$mov['cover'] = $this->releaseImage->saveImage($imdbId . '-cover', $trakt['cover'], $this->imgSavePath);
-		} else if ($this->checkVariable($fanart['cover'])) {
-			 $mov['cover'] = $this->releaseImage->saveImage($imdbId . '-cover', $fanart['cover'], $this->imgSavePath);
 		} else if ($this->checkVariable($tmdb['cover'])) {
 			$mov['cover'] = $this->releaseImage->saveImage($imdbId . '-cover', $tmdb['cover'], $this->imgSavePath);
 		} else if ($this->checkVariable($imdb['cover'])) {
@@ -772,22 +772,16 @@ class Movie
 					return false;
 				}
 				$ret = [];
-				if (isset($art['moviebackground'][0]['url']) && $art['moviebackground'][0]['url'] != '') {
+				if ($this->checkVariable($art['moviebackground'][0]['url'])) {
 					$ret['backdrop'] = $art['moviebackground'][0]['url'];
-				} else if (isset($art['moviethumb'][0]['url']) && $art['moviethumb'][0]['url'] != '') {
+				} else if ($this->checkVariable($art['moviethumb'][0]['url'])) {
 					$ret['backdrop'] = $art['moviethumb'][0]['url'];
-				} else {
-					return false;
 				}
-				if (isset($art['movieposter'][0]['url']) && $art['movieposter'][0]['url'] != '') {
+				if ($this->checkVariable($art['movieposter'][0]['url'])) {
 					$ret['cover'] = $art['movieposter'][0]['url'];
-				} else {
-					return false;
 				}
-				if (isset($art['moviebanner'][0]['url']) && $art['moviebanner'][0]['url'] != '') {
+				if ($this->checkVariable($art['moviebanner'][0]['url'])) {
 					$ret['banner'] = $art['moviebanner'][0]['url'];
-				} else {
-					return false;
 				}
 
 				if (isset($ret['backdrop']) && isset($ret['cover'])) {
@@ -1000,20 +994,14 @@ class Movie
 		$resp = $this->traktTv->movieSummary('tt' . $imdbId, 'full,images');
 		if ($resp !== false) {
 			$ret = [];
-			if (isset($resp['images']['poster']['thumb']) && $resp['images']['poster']['thumb'] != '') {
+			if ($this->checkVariable($resp['images']['poster']['thumb'])) {
 				$ret['cover'] = $resp['images']['poster']['thumb'];
-			} else {
-				return false;
 			}
-			if (isset($resp['images']['banner']['full']) && $resp['images']['banner']['full'] != '') {
+			if ($this->checkVariable($resp['images']['banner']['full'])) {
 				$ret['banner'] = $resp['images']['banner']['full'];
-			} else {
-				return false;
 			}
 			if (isset($resp['ids']['trakt'])) {
 				$ret['id'] = $resp['ids']['trakt'];
-			} else {
-				$ret['id'] = 0;
 			}
 
 			if (isset($resp['title'])) {
