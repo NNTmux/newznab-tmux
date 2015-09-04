@@ -59,7 +59,7 @@
 	<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
 	<!-- The fav icon -->
-	<link rel="shortcut icon" href="{$smarty.const.WWW_TOP}/templates/charisma/img/favicon.ico">
+	<link rel="shortcut icon" href="{$smarty.const.WWW_TOP}/templates_shared/images/favicon.ico">
 </head>
 {if $confirmed == '' && $sent == ''}
 	<div class="ch-container">

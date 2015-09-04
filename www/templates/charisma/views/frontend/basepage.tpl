@@ -41,7 +41,7 @@
 	<!-- Normalize.css -->
 	<link href="{$smarty.const.WWW_TOP}/templates_shared/styles/normalize.css" rel="stylesheet" type="text/css">
 	<!-- The fav icon -->
-	<link rel="shortcut icon" href="{$smarty.const.WWW_TOP}/templates/charisma/img/favicon.ico">
+	<link rel="shortcut icon" href="{$smarty.const.WWW_TOP}/templates_shared/images/favicon.ico">
 </head>
 {if ($loggedin)=="true"}
 	<body>
