@@ -83,7 +83,7 @@
 															<tr>
 																<th>API Hits Today</th>
 																<td>
-																	<span id="uatd">{$apirequests.num}</span>  {if $userdata.role==2 && $apirequests.num > 0}
+																	<span id="uatd">{$apirequests.num}</span>  {if $isadmin && $apirequests.num > 0}
 																		<a
 																		onclick="resetapireq({$user.id}, 'api'); document.getElementById('uatd').innerHTML='0'; return false;"
 																		href="#" class="label label-danger">
@@ -91,12 +91,12 @@
 															</tr>
 															<tr>
 																<th>Downloads Today</th>
-																<td><span id="ugrtd">{$grabstoday.num}</span> /
-																	Unlimited {if $grabstoday.num >= $user.downloadrequests}&nbsp;&nbsp;
+																<td><span id="ugrtd">{$user.grabs}</span> /
+																	Unlimited {if $user.grabs >= $user.downloadrequests}&nbsp;&nbsp;
 																		<small>(Next DL
 																		in {($grabstoday.nextdl/3600)|intval}
 																		h {($grabstoday.nextdl/60) % 60}
-																		m)</small>{/if}{if $userdata.role==2 && $grabstoday.num > 0}
+																		m)</small>{/if}{if $isadmin && $user.grabs > 0}
 																		<a
 																		onclick="resetapireq({$user.id}, 'grabs'); document.getElementById('ugrtd').innerHTML='0'; return false;"
 																		href="#" class="label label-danger">
