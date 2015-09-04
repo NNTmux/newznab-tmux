@@ -8,15 +8,15 @@
 	<tr><th>Last Login:</th><td title="{$user.lastlogin}">{$user.lastlogin|date_format}  ({$user.lastlogin|timeago} ago)</td></tr>
 	<tr><th>Role:</th><td>{$user.rolename}</td></tr>
 	<tr><th>Theme:</th><td>{$user.style}</td></tr>
-	{if $userdata.role==2}<tr><th title="Admin Notes">Notes:</th><td>{$user.notes|escape:htmlall}{if $user.notes|count_characters > 0}<br/>{/if}<a href="{$smarty.const.WWW_TOP}/admin/user-edit.php?id={$user.id}#notes">Add/Edit</a></td></tr>{/if}
+	{if $isadmin}<tr><th title="Admin Notes">Notes:</th><td>{$user.notes|escape:htmlall}{if $user.notes|count_characters > 0}<br/>{/if}<a href="{$smarty.const.WWW_TOP}/admin/user-edit.php?id={$user.id}#notes">Add/Edit</a></td></tr>{/if}
 	{if $isadmin || !$publicview}<tr><th title="Not public">Site Api/Rss Key:</th><td><a href="{$smarty.const.WWW_TOP}/rss?t=0&amp;dl=1&amp;i={$user.id}&amp;r={$user.rsstoken}">{$user.rsstoken}</a></td></tr>{/if}
 	{if $isadmin || !$publicview}
-	<tr><th>API Hits Today:</th><td><span id="uatd">{$apirequests.num}</span> {if $userdata.role==2 && $apirequests.num > 0}<a onclick="resetapireq({$user.id}, 'api'); document.getElementById('uatd').innerHTML='0'; return false;" href="#">Reset</a>{/if}</td></tr>
-	<tr><th>Grabs Today:</th><td><span id="ugrtd">{$grabstoday.num}</span> {if $grabstoday.num >= $user.downloadrequests}&nbsp;&nbsp;<small>(Next DL in {($grabstoday.nextdl/3600)|intval}h {($grabstoday.nextdl/60) % 60}m)</small>{/if}{if $userdata.role==2 && $grabstoday.num > 0}<a onclick="resetapireq({$user.id}, 'grabs'); document.getElementById('ugrtd').innerHTML='0'; return false;" href="#">Reset</a>{/if}</td></tr>
+	<tr><th>API Hits Today:</th><td><span id="uatd">{$apirequests.num}</span> {if $isadmin && $apirequests.num > 0}<a onclick="resetapireq({$user.id}, 'api'); document.getElementById('uatd').innerHTML='0'; return false;" href="#">Reset</a>{/if}</td></tr>
+	<tr><th>Grabs Today:</th><td><span id="ugrtd">{$user.grabs}</span> {if $user.grabs >= $user.downloadrequests}&nbsp;&nbsp;<small>(Next DL in {($grabstoday.nextdl/3600)|intval}h {($grabstoday.nextdl/60) % 60}m)</small>{/if}{if $isadmin && $user.grabs > 0}<a onclick="resetapireq({$user.id}, 'grabs'); document.getElementById('ugrtd').innerHTML='0'; return false;" href="#">Reset</a>{/if}</td></tr>
 	{/if}
 	<tr><th>Grabs Total:</th><td>{$user.grabs}</td></tr>
 
-	{if ($user.id==$userdata.id || $userdata.role==2) && $site->registerstatus==1}
+	{if ($user.id==$userdata.id || $isadmin) && $site->registerstatus==1}
 	<tr>
 		<th title="Not public">Invites:</th>
 		<td>{$user.invites}
@@ -91,7 +91,7 @@
 </table>
 
 
-{if $userdata.role==2 && $downloadlist|@count > 0}
+{if $isadmin && $downloadlist|@count > 0}
 <div style="padding-top:20px;">
 	<h2>Downloads for User</h2>
 
