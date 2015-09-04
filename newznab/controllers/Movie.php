@@ -653,7 +653,7 @@ class Movie
 			return false;
 		}
 
-		// Check FanArt.tv for cover nad background images.
+		// Check FanArt.tv for cover and background images.
 		$fanart = $this->fetchFanartTVProperties($imdbId);
 
 		$mov = [];
@@ -665,11 +665,11 @@ class Movie
 		$mov['tmdbid'] = (!isset($tmdb['tmdbid']) || $tmdb['tmdbid'] == '') ? 0 : $tmdb['tmdbid'];
 		$mov['traktid'] = $trakt['id'];
 
-		// Prefer Fanart.tv cover over TRAKT, TRAKT over TMDB and TMDB over IMDB.
-		if ($this->checkVariable($fanart['cover'])) {
-			$mov['cover'] = $this->releaseImage->saveImage($imdbId . '-cover', $fanart['cover'], $this->imgSavePath);
-		} else if ($this->checkVariable($trakt['cover'])) {
+		// Prefer TRAKT cover over Fanart.tv, Fanart.tv over TMDB and TMDB over IMDB.
+		if ($this->checkVariable($trakt['cover'])) {
 			$mov['cover'] = $this->releaseImage->saveImage($imdbId . '-cover', $trakt['cover'], $this->imgSavePath);
+		} else if ($this->checkVariable($fanart['cover'])) {
+			 $mov['cover'] = $this->releaseImage->saveImage($imdbId . '-cover', $fanart['cover'], $this->imgSavePath);
 		} else if ($this->checkVariable($tmdb['cover'])) {
 			$mov['cover'] = $this->releaseImage->saveImage($imdbId . '-cover', $tmdb['cover'], $this->imgSavePath);
 		} else if ($this->checkVariable($imdb['cover'])) {
