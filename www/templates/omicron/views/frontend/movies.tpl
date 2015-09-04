@@ -88,7 +88,7 @@
 													{if $smarty.foreach.loop.first}
 													<a href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}"><img
 																class="cover"
-																src="{if $result.cover == 1}{$smarty.const.WWW_TOP}covers/movies/{$result.imdbid}-cover.jpg{else}{$smarty.const.WWW_TOP}templates_shared/images/nocover.png{/if}"
+																src="{if $result.cover == 1}{$smarty.const.WWW_TOP}covers/movies/{$result.imdbid}-cover.jpg{else}{$smarty.const.WWW_TOP}templates_shared/images/nocover2.png{/if}"
 																width="100" border="0"
 																alt="{$result.title|escape:"htmlall"}"/></a>
 													<a target="_blank"
@@ -187,7 +187,7 @@
 													{if $smarty.foreach.loop.first}
 													<a href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}"><img
 																class="cover"
-																src="{if $result.cover == 1}{$smarty.const.WWW_TOP}covers/movies/{$result.imdbid}-cover.jpg{else}{$smarty.const.WWW_TOP}templates_shared/images/nocover.png{/if}"
+																src="{if $result.cover == 1}{$smarty.const.WWW_TOP}covers/movies/{$result.imdbid}-cover.jpg{else}{$smarty.const.WWW_TOP}templates_shared/images/nocover2.png{/if}"
 																width="100" border="0"
 																alt="{$result.title|escape:"htmlall"}"/></a>
 													<a target="_blank"
