@@ -83,7 +83,7 @@
 															<tr>
 																<th>API Hits Today</th>
 																<td>
-																	<span id="uatd">{$apihits.num}</span>  {if $userdata.role==2 && $apihits.num > 0}
+																	<span id="uatd">{$apirequests.num}</span>  {if $userdata.role==2 && $apirequests.num > 0}
 																		<a
 																		onclick="resetapireq({$user.id}, 'api'); document.getElementById('uatd').innerHTML='0'; return false;"
 																		href="#" class="label label-danger">
