@@ -1148,7 +1148,7 @@ class Releases
 
 		$ret = [];
 		foreach ($results as $res) {
-			if ($res['id'] != $currentID && $res['categoryParentID'] == $parentCat) {
+			if ($res['id'] != $currentID && $res['categoryparentid'] == $parentCat) {
 				$ret[] = $res;
 			}
 		}
