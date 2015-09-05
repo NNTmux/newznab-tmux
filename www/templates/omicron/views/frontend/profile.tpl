@@ -81,25 +81,25 @@
 																		Downloads</strong></td>
 															</tr>
 															<tr>
-																<th>API Hits Today</th>
+																<th>API Hits last 24 hours</th>
 																<td>
 																	<span id="uatd">{$apirequests}</span>  {if $isadmin && $apirequests > 0}
-																		<a
-																		onclick="resetapireq({$user.id}, 'api'); document.getElementById('uatd').innerHTML='0'; return false;"
-																		href="#" class="label label-danger">
+																	<a
+																			onclick="resetapireq({$user.id}, 'api'); document.getElementById('uatd').innerHTML='0'; return false;"
+																			href="#" class="label label-danger">
 																			Reset</a>{/if}</td>
 															</tr>
 															<tr>
-																<th>Downloads Today</th>
+																<th>Downloads last 24 hours</th>
 																<td><span id="ugrtd">{$grabstoday}</span> /
 																	Unlimited {if $user.grabs >= $user.downloadrequests}&nbsp;&nbsp;
 																		<small>(Next DL
 																		in {($grabstoday.nextdl/3600)|intval}
 																		h {($grabstoday.nextdl/60) % 60}
 																		m)</small>{/if}{if $isadmin && $user.grabs > 0}
-																		<a
-																		onclick="resetapireq({$user.id}, 'grabs'); document.getElementById('ugrtd').innerHTML='0'; return false;"
-																		href="#" class="label label-danger">
+																	<a
+																			onclick="resetapireq({$user.id}, 'grabs'); document.getElementById('ugrtd').innerHTML='0'; return false;"
+																			href="#" class="label label-danger">
 																			Reset</a>{/if}</td>
 															</tr>
 															<tr>
