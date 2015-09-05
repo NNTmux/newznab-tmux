@@ -91,7 +91,7 @@
 															</tr>
 															<tr>
 																<th>Downloads Today</th>
-																<td><span id="ugrtd">{$user.grabs}</span> /
+																<td><span id="ugrtd">{$grabstoday}</span> /
 																	Unlimited {if $user.grabs >= $user.downloadrequests}&nbsp;&nbsp;
 																		<small>(Next DL
 																		in {($grabstoday.nextdl/3600)|intval}
