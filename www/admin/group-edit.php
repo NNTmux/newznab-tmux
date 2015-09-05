@@ -25,18 +25,14 @@ switch($action) {
 	default:
 		if (isset($_GET["id"])) {
 			$page->title = "Newsgroup Edit";
-			$id = $_GET["id"];
-			$group = $groups->getByID($id);
+			$id          = $_GET["id"];
+			$group       = $groups->getByID($id);
 		} else {
-			$page->title = "Newsgroup Add";
-			$group = [];
-			$group["active"] = "0";
-			$group["backfill"] = "0";
-			$group["minfilestoformrelease"] = "0";
-			$group["minsizetoformrelease"] = "0";
-			$group["first_record"] = "0";
-			$group["last_record"] = "0";
-			$group["backfill_target"] = "0";
+			$page->title                    = "Newsgroup Add";
+			$group                          = [
+				'id' => '', 'name' => '', 'description' => '', 'minfilestoformrelease' => 0, 'active' => 0, 'backfill' => 0,
+				'minsizetoformrelease' => 0, 'first_record' => 0, 'last_record' => 0, 'backfill_target' => 0
+			];
 		}
 		$page->smarty->assign('group', $group);
 		break;
