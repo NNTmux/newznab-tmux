@@ -949,7 +949,7 @@ class Users
 		// Clear old requests.
 		$this->clearApiRequests($userID);
 		$requests = $this->pdo->queryOneRow(
-			sprintf('SELECT COUNT(id) AS num FROM userdownloads WHERE userid = %d', $userID)
+			sprintf('SELECT COUNT(id) AS num FROM userrequests WHERE userid = %d', $userID)
 		);
 		return (!$requests ? 0 : (int)$requests['num']);
 	}
