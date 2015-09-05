@@ -83,7 +83,7 @@
 															<tr>
 																<th>API Hits Today</th>
 																<td>
-																	<span id="uatd">{$apirequests.num}</span>  {if $isadmin && $apirequests.num > 0}
+																	<span id="uatd">{$apirequests}</span>  {if $isadmin && $apirequests > 0}
 																		<a
 																		onclick="resetapireq({$user.id}, 'api'); document.getElementById('uatd').innerHTML='0'; return false;"
 																		href="#" class="label label-danger">
@@ -91,7 +91,7 @@
 															</tr>
 															<tr>
 																<th>Downloads Today</th>
-																<td><span id="ugrtd">{$user.grabs}</span> /
+																<td><span id="ugrtd">{$grabstoday}</span> /
 																	Unlimited {if $user.grabs >= $user.downloadrequests}&nbsp;&nbsp;
 																		<small>(Next DL
 																		in {($grabstoday.nextdl/3600)|intval}
