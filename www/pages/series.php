@@ -22,9 +22,9 @@ if (isset($_GET["id"]) && ctype_digit($_GET['id'])) {
 	$rage = $tvrage->getByRageID($_GET['id']);
 
 	if (!$rage) {
-		$page->smarty->assign("nodata", "No tvrage information for this series.");
+		$page->smarty->assign('nodata', 'No tvrage information for this series.');
 	} elseif (!$rel) {
-		$page->smarty->assign("nodata", "No releases for this series.");
+		$page->smarty->assign('nodata', 'No releases for this series.');
 	} else {
 		$myshows = $us->getShow($page->users->currentUserId(), $rage[0]['rageid']);
 
