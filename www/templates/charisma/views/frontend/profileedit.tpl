@@ -322,9 +322,20 @@
 									</tr>
 									</tbody>
 								</table>
-								{if $page->settings->getSetting('userselstyle') == 1}
-									{html_options id="style" name='style' values=$themelist output=$themelist selected=$user.style}
-								{/if}
+								<table class="data table table-condensed table-striped table-responsive">
+									<tbody>
+									<tr class="bg-aqua-active">
+										<td colspan="2" style="padding-left: 8px;"><strong>Site theme</strong></td>
+									</tr>
+									<tr>
+										<td>
+											{if $page->settings->getSetting('userselstyle') == 1}
+												{html_options id="style" name='style' values=$themelist output=$themelist selected=$user.style}
+											{/if}
+										</td>
+									</tr>
+									</tbody>
+								</table>
 								<input type="submit" value="Save" class="btn btn-primary"/>
 							</form>
 						</div>
