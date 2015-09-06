@@ -4,7 +4,7 @@ require_once("config.php");
 
 $page = new AdminPage();
 
-$book = new Book();
+$book = new Books();
 
 $page->title = "Book List";
 

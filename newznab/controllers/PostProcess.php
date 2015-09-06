@@ -213,7 +213,7 @@ class PostProcess
 	{
 		if ($this->pdo->getSetting('lookupbooks') == 1)
 		{
-			$book = new Book($this->echooutput);
+			$book = new Books($this->echooutput);
 			$book->processBookReleases();
 		}
 	}

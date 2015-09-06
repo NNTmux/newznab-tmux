@@ -1,6 +1,6 @@
 <?php
 
-$b = new Book;
+$b = new Books;
 
 if (!$page->users->isLoggedIn())
 	$page->show403();
