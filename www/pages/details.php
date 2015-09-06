@@ -126,7 +126,7 @@ if (isset($_GET["id"]))
 
 	$book = '';
 	if ($data['bookinfoid'] != '') {
-		$b = new Book();
+		$b = new Books();
 		$book = $b->getBookInfo($data['bookinfoid']);
 	}
 

@@ -3,7 +3,7 @@
 require_once './config.php';
 
 $page = new AdminPage();
-$book = new Book();
+$book = new Books();
 $gen = new Genres();
 $id = 0;
 
