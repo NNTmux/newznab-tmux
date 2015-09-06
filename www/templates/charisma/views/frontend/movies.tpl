@@ -150,6 +150,15 @@
 																	  title="Send to my Queue"><i
 																			class="fa fa-send"></i></span>
 															{/if}
+															{if $cpurl != '' && $cpapi != ''}
+																<span class="btn btn-hover btn-default btn-xs sendtocouch text-muted"
+																	  target="blackhole"
+																	  href="javascript:"
+																	  rel="{$cpurl}/api/{$cpapi}/movie.add/?identifier=tt{$result.imdbid}&title={$result.title}"
+																	  name="CP{$result.imdbid}"
+																	  title="Add to CouchPotato"
+																		><i class="fa fa-send-o"></i></span>
+															{/if}
 														</div>
 													</div>
 													{/if}
@@ -248,6 +257,15 @@
 																<span class="btn btn-hover btn-default btn-xs icon icon_sab text-muted"
 																	  title="Send to my Queue"><i
 																			class="fa fa-send"></i></span>
+															{/if}
+															{if $cpurl != '' && $cpapi != ''}
+																<span class="btn btn-hover btn-default btn-xs sendtocouch text-muted"
+																	  target="blackhole"
+																	  href="javascript:"
+																	  rel="{$cpurl}/api/{$cpapi}/movie.add/?identifier=tt{$result.imdbid}&title={$result.title}"
+																	  name="CP{$result.imdbid}"
+																	  title="Add to CouchPotato"
+																		><i class="fa fa-send-o"></i></span>
 															{/if}
 														</div>
 													</div>
