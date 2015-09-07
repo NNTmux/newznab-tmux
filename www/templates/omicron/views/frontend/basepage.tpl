@@ -185,7 +185,7 @@
 						<a href="#"><i class="fa fa-list-ol"></i><span> Browse</span></a>
 						<ul class="treeview-menu">
 							<li><a href="{$serverroot}newposterwall"><i
-											class="fa fa-file-image-o"></i><span> New Releases</span></a></li>
+											class="fa fa-fire"></i><span> New Releases</span></a></li>
 							<li><a href="{$serverroot}console"><i
 											class="fa fa-gamepad"></i><span> Console</span></a></li>
 							<li><a href="{$serverroot}movies"><i
