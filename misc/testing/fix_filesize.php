@@ -13,7 +13,7 @@ use newznab\db\Settings;
 $pdo = new Settings;
 $nzb = new NZB;
 
-$items = $pdo->query("SELECT ID,guid FROM releases WHERE size = 0");
+$items = $pdo->query("SELECT id,guid FROM releases WHERE size = 0");
 $total = count($items);
 $compl = 0;
 echo "Updating file size for " . count($items) . " release(s)\n";
@@ -35,7 +35,7 @@ while ($item = array_pop($items))
 		$filesize = bcadd($filesize, $file['size']);
 	}
 
-	$pdo->exec("UPDATE releases SET size = '{$filesize}' WHERE `ID` = '{$item['ID']}' LIMIT 1");
+	$pdo->queryExec("UPDATE releases SET size = '{$filesize}' WHERE id = '{$item['id']}' LIMIT 1");
 
 	$compl++;
 	echo sprintf("[%6d / %6d] %0.2f",$compl, $total, ($compl/$total) * 100) . '%' . "\n";
