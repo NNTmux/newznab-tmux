@@ -149,7 +149,7 @@
 					<li class="nav-parent">
 						<a href="#" data-toggle="dropdown" data-hover="dropdown" data-close-others="true"
 						   data-delay="30">
-							<i class="fa fa-ban"></i> Adult<i class="fa fa-angle-down"></i>
+							<i class="fa fa-venus-mars"></i> Adult<i class="fa fa-angle-down"></i>
 						</a>
 						<ul class="dropdown-menu">
 							{if $userdata.xxxview == "1"}
