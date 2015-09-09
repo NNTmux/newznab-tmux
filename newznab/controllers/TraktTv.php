@@ -147,7 +147,7 @@ class TraktTv
 	 *                      images:      Return extended images properties (returns array)
 	 *                      full,images: Return all extended properties (plus images). (returns array)
 	 *
-	 * @see http://docs.trakt.apiary.io/#reference/shows/played/get-a-single-show
+	 * @see http://docs.trakt.apiary.io/#reference/shows/summary/get-a-single-show
 	 *
 	 * @return bool|array|string
 	 *
