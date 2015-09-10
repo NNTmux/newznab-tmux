@@ -342,7 +342,7 @@ class NameFixer
 				$this->_totalReleases = $total;
 
 				echo $this->pdo->log->primary(number_format($total) . ' releases to process.');
-				$Nfo = new Info(['Echo' => $this->echooutput, 'Settings' => $this->pdo]);
+				$Nfo = new Nfo(['Echo' => $this->echooutput, 'Settings' => $this->pdo]);
 				$nzbContents = new NZBContents(
 					[
 						'Echo'        => $this->echooutput,
@@ -575,7 +575,7 @@ class NameFixer
 								$release['releaseid']
 							)
 						);
-						$this->sphinx->updateReleaseSearchName($release['releaseid'], $newTitle);
+						$this->sphinx->updateRelease($release['releaseid'], $this->pdo);
 					} else {
 						$newTitle = $this->pdo->escapeString(substr($newName, 0, 255));
 						$this->pdo->queryExec(
@@ -592,7 +592,7 @@ class NameFixer
 								$release['releaseid']
 							)
 						);
-						$this->sphinx->updateReleaseSearchName($release['releaseid'], $newTitle);
+						$this->sphinx->updateRelease($release['releaseid'], $this->pdo);
 					}
 				}
 			}
@@ -689,7 +689,7 @@ class NameFixer
 				$titlematch = \SphinxSearch::escapeString($preTitle);
 				$join = sprintf(
 					'INNER JOIN releases_se rse ON rse.id = r.id
-						WHERE rse.query = "@(name,searchname) %s;mode=extended"',
+					WHERE rse.query = "@(name,searchname,filename) %s;mode=extended"',
 					$titlematch
 				);
 				break;
@@ -852,9 +852,9 @@ class NameFixer
 			sprintf("
 						SELECT p.id AS prehashid, p.title, p.source
 						FROM prehash p INNER JOIN predbhash h ON h.pre_id = p.id
-						WHERE MATCH (h.hashes) AGAINST (%s)
+						WHERE h.hash = UNHEX(%s)
 						LIMIT 1",
-				$pdo->escapeString(strtolower($hash))
+				$pdo->escapeString($hash)
 			)
 		);
 

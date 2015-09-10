@@ -19,7 +19,7 @@
 				{else}
 					<img class="pull-right" style="margin-right:50px; max-height:278px;"
 						 alt="{$result.title|escape:"htmlall"} Logo"
-						 src="{$serverroot}templates/charisma/images/nomoviecover.jpg"/>
+						 src="{$smarty.const.WWW_TOP}templates_shared/images/nomoviecover.jpg"/>
 				{/if}
 				<span class="h1" style="display:inline;">{$result.title|escape:"htmlall"} ({$result.year})</span><a
 						class="btn btn-transparent btn-primary" target="_blank"
@@ -84,8 +84,8 @@
 				</div>
 				<div class="row">
 					<div class="col-xlg-12 portlets">
-						<div class="panel">
-							<div class="panel-content pagination2">
+						<div class="panel panel-default">
+							<div class="panel-body pagination2">
 								<table style="width:100%;"
 									   class="data table table-condensed table-striped table-responsive table-hover">
 									<tr>

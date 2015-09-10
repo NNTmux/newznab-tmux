@@ -4,7 +4,7 @@ if (!$page->users->isLoggedIn()) {
 	$page->show403();
 }
 
-$tvrage = new TvAnger(['Settings' => $page->settings]);
+$tvrage = new TvRage(['Settings' => $page->settings]);
 
 $date = date("Y-m-d");
 if (isset($_GET["date"])) {

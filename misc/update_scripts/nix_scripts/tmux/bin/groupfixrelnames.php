@@ -132,7 +132,7 @@ if (!isset($argv[1])) {
 					exit($pdo->log->error("Unable to connect to usenet."));
 				}
 
-				$Nfo = new Info(['Settings' => $pdo, 'Echo' => true]);
+				$Nfo = new Nfo(['Settings' => $pdo, 'Echo' => true]);
 				$nzbcontents = new NZBContents(
 					array(
 						'Echo' => true, 'NNTP' => $nntp, 'Nfo' => $Nfo, 'Settings' => $pdo,

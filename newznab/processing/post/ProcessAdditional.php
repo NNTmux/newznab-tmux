@@ -296,7 +296,7 @@ class ProcessAdditional
 		$this->_releaseExtra = ($options['ReleaseExtra'] instanceof \ReleaseExtra ? $options['ReleaseExtra'] : new \ReleaseExtra($this->pdo));
 		$this->_releaseImage = ($options['ReleaseImage'] instanceof \ReleaseImage ? $options['ReleaseImage'] : new \ReleaseImage($this->pdo));
 		$this->_par2Info = new \Par2Info();
-		$this->_nfo = ($options['Nfo'] instanceof \Info ? $options['Nfo'] : new \Info(['Echo' => $this->_echoCLI, 'Settings' => $this->pdo]));
+		$this->_nfo = ($options['Nfo'] instanceof \Nfo ? $options['Nfo'] : new \Nfo(['Echo' => $this->_echoCLI, 'Settings' => $this->pdo]));
 		$this->sphinx = ($options['SphinxSearch'] instanceof \SphinxSearch ? $options['SphinxSearch'] : new \SphinxSearch());
 
 		$this->_innerFileBlacklist = ($this->pdo->getSetting('innerfileblacklist') == '' ? false : $this->pdo->getSetting('innerfileblacklist'));
@@ -1077,6 +1077,9 @@ class ProcessAdditional
 
 			$this->_addFileInfo($file);
 		}
+		if ($this->_addedFileInfo > 0) {
+			$this->sphinx->updateRelease($this->_release['id'], $this->pdo);
+		}
 		return ($this->_totalFileInfo > 0 ? true : false);
 	}
 
@@ -1710,7 +1713,7 @@ class ProcessAdditional
 											$this->_release['id']
 										)
 									);
-									$this->sphinx->updateReleaseSearchName($this->_release['id'], $newTitle);
+									$this->sphinx->updateRelease($this->_release['id'], $this->pdo);
 
 									// Echo the changed name.
 									if ($this->_echoCLI) {
@@ -2298,7 +2301,7 @@ class ProcessAdditional
 							$this->_release['id']
 						)
 					);
-					$this->sphinx->updateReleaseSearchName($this->_release['id'], $newTitle);
+					$this->sphinx->updateRelease($this->_release['id'], $this->pdo);
 
 					// Echo the changed name to CLI.
 					if ($this->_echoCLI) {

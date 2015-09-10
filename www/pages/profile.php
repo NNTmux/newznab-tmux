@@ -1,24 +1,13 @@
 <?php
 
+if (!$page->users->isLoggedIn())
+	$page->show403();
+
 $rc = new ReleaseComments;
 $sab = new SABnzbd($page);
 $nzbget = new NZBGet($page);
 
-if (!$page->users->isLoggedIn())
-	$page->show403();
-
-$userID = 0;
-if (isset($_GET["id"]))
-	$userID = $_GET["id"] + 0;
-elseif (isset($_GET["name"]))
-{
-	$res = $page->users->getByUsername($_GET["name"]);
-	if ($res)
-		$userID = $res["id"];
-}
-else
-	$userID = $page->users->currentUserId();
-
+$userID = $page->users->currentUserId();
 $privileged = ($page->users->isAdmin($userID) || $page->users->isModerator($userID)) ? true : false;
 $privateProfiles = ($page->settings->getSetting('privateprofiles') == 1) ? true : false;
 $publicView = false;
@@ -54,6 +43,7 @@ if (!isset($data['style']) || $data['style'] == 'None') {
 $offset       = isset($_REQUEST["offset"]) ? $_REQUEST["offset"] : 0;
 $page->smarty->assign([
 		'apirequests'       => $page->users->getApiRequests($userID),
+		'grabstoday'        => $page->users->getDownloadRequests($userID),
 		'userinvitedby'     => ($data['invitedby'] != '' ? $page->users->getById($data['invitedby']) : ''),
 		'user'              => $data,
 		'privateprofiles'   => $privateProfiles,

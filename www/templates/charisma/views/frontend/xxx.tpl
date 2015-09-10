@@ -13,13 +13,14 @@
 	<div class="box-body"
 	<div class="row">
 		<div class="col-xlg-12 portlets">
-			<div class="panel">
-				<div class="panel-content pagination2">
+			<div class="panel panel-default">
+				<div class="panel-body pagination2">
 					<div class="row">
 						<div class="col-md-8">
 							<div class="nzb_multi_operations">
 								View: <strong>Covers</strong> | <a
 										href="{$smarty.const.WWW_TOP}/browse?t={$category}">List</a><br/>
+								Check all: <input type="checkbox" class="nntmux_check_all"/> <br/>
 								With Selected:
 								<div class="btn-group">
 									<input type="button"
@@ -64,8 +65,8 @@
 							<div class="row">
 								<!-- Left -->
 								<div class="col-md-6 small-gutter-right movie-height">
-									<div class="panel">
-										<div class="panel-content">
+									<div class="panel panel-default">
+										<div class="panel-body">
 											<div class="row no-gutter">
 												<div class="col-md-3 no-gutter">
 													{assign var="msplits" value=","|explode:$result.grp_release_id}
@@ -85,7 +86,7 @@
 													{if $smarty.foreach.loop.first}
 													<a href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}"><img
 																class="cover"
-																src="{if $result.cover == 1}{$serverroot}covers/xxx/{$result.id}-cover.jpg{else}{$serverroot}templates/charisma/images/nocover.png{/if}"
+																src="{if $result.cover == 1}{$smarty.const.WWW_TOP}covers/xxx/{$result.id}-cover.jpg{else}{$smarty.const.WWW_TOP}templates_shared/images/nocover.png{/if}"
 																width="100" border="0"
 																alt="{$result.title|escape:"htmlall"}"/></a>
 													{if $result.classused == "ade"}
@@ -95,7 +96,7 @@
 																name="viewade{$result.title}"
 																title="View AdultdvdEmpire page"
 																><img
-																	src="{$smarty.const.WWW_TOP}/templates/charisma/images/icons/ade.png"></a>
+																	src="{$smarty.const.WWW_TOP}/templates_shared/images/icons/ade.png"></a>
 													{else}
 														<a
 																target="_blank"
@@ -103,7 +104,7 @@
 																name="viewade{$result.title}"
 																title="Search AdultdvdEmpire page"
 																><img
-																	src="{$smarty.const.WWW_TOP}/templates/charisma/images/icons/ade.png"></a>
+																	src="{$smarty.const.WWW_TOP}/templates_shared/images/icons/ade.png"></a>
 													{/if}
 													{if $result.classused == "hm"}
 														<a
@@ -112,7 +113,7 @@
 																name="viewhm{$result.title}"
 																title="View Hot Movies page"
 																><img
-																	src="{$smarty.const.WWW_TOP}/templates/charisma/images/icons/hotmovies.png"></a>
+																	src="{$smarty.const.WWW_TOP}/templates_shared/images/icons/hotmovies.png"></a>
 													{else}
 														<a
 																target="_blank"
@@ -120,7 +121,7 @@
 																name="viewhm{$result.title}"
 																title="Search Hot Movies page"
 																><img
-																	src="{$smarty.const.WWW_TOP}/templates/charisma/images/icons/hotmovies.png"></a>
+																	src="{$smarty.const.WWW_TOP}/templates_shared/images/icons/hotmovies.png"></a>
 													{/if}
 													{if $result.classused == "pop"}
 														<a
@@ -129,7 +130,7 @@
 																name="viewpop{$result.id}"
 																title="View Popporn page"
 																><img
-																	src="{$smarty.const.WWW_TOP}/templates/charisma/images/icons/popporn.png"></a>
+																	src="{$smarty.const.WWW_TOP}/templates_shared/images/icons/popporn.png"></a>
 													{else}
 														<a
 																target="_blank"
@@ -137,7 +138,7 @@
 																name="viewpop{$result.id}"
 																title="Search Popporn page"
 																><img
-																	src="{$smarty.const.WWW_TOP}/templates/charisma/images/icons/popporn.png"></a>
+																	src="{$smarty.const.WWW_TOP}/templates_shared/images/icons/popporn.png"></a>
 													{/if}
 													<a
 															target="_blank"
@@ -145,7 +146,7 @@
 															name="viewiafd{$result.title}"
 															title="Search Internet Adult Film Database"
 															><img
-																src="{$smarty.const.WWW_TOP}/templates/charisma/images/icons/iafd.png"></a>
+																src="{$smarty.const.WWW_TOP}/templates_shared/images/icons/iafd.png"></a>
 													{if $mnfo[$m@index] > 0}<a
 														href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}"
 														title="View NFO" class="label label-default"
@@ -159,6 +160,12 @@
 																							   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}">{$result.title|escape:"htmlall"}</a></span>
 													<div class="release-subtitle">{if $result.genre != ''}{$result.genre}, {/if}</div>
 													<div id="guid{$mguid[$m@index]}">
+														<label>
+															<input type="checkbox"
+																   class="nzb_check"
+																   value="{$mguid[$m@index]}"
+																   id="chksingle"/>
+														</label>
 														<span class="label label-primary">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
 														<span class="label label-danger">{if isset($catsplit[1])} {$catsplit[1]}{/if}</span>
 														<span class="label label-default">{$msize[$m@index]|fsize_format:"MB"}</span>
@@ -200,8 +207,8 @@
 								{else}
 								<!-- Right -->
 								<div class="col-md-6 small-gutter-left movie-height">
-									<div class="panel">
-										<div class="panel-content">
+									<div class="panel panel-default">
+										<div class="panel-body">
 											<div class="row no-gutter">
 												<div class="col-md-3 no-gutter">
 													{assign var="msplits" value=","|explode:$result.grp_release_id}
@@ -221,7 +228,7 @@
 													{if $smarty.foreach.loop.first}
 													<a href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}"><img
 																class="cover"
-																src="{if $result.cover == 1}{$serverroot}covers/xxx/{$result.id}-cover.jpg{else}{$serverroot}templates/charisma/images/nocover.png{/if}"
+																src="{if $result.cover == 1}{$smarty.const.WWW_TOP}covers/xxx/{$result.id}-cover.jpg{else}{$smarty.const.WWW_TOP}templates_shared/images/nocover.png{/if}"
 																width="100" border="0"
 																alt="{$result.title|escape:"htmlall"}"/></a>
 													{if $result.classused == "ade"}
@@ -231,7 +238,7 @@
 																name="viewade{$result.title}"
 																title="View AdultdvdEmpire page"
 																><img
-																	src="{$smarty.const.WWW_TOP}/templates/charisma/images/icons/ade.png"></a>
+																	src="{$smarty.const.WWW_TOP}/templates_shared/images/icons/ade.png"></a>
 													{else}
 														<a
 																target="_blank"
@@ -239,7 +246,7 @@
 																name="viewade{$result.title}"
 																title="Search AdultdvdEmpire page"
 																><img
-																	src="{$smarty.const.WWW_TOP}/templates/charisma/images/icons/ade.png"></a>
+																	src="{$smarty.const.WWW_TOP}/templates_shared/images/icons/ade.png"></a>
 													{/if}
 													{if $result.classused == "hm"}
 														<a
@@ -248,7 +255,7 @@
 																name="viewhm{$result.title}"
 																title="View Hot Movies page"
 																><img
-																	src="{$smarty.const.WWW_TOP}/templates/charisma/images/icons/hotmovies.png"></a>
+																	src="{$smarty.const.WWW_TOP}/templates_shared/images/icons/hotmovies.png"></a>
 													{else}
 														<a
 																target="_blank"
@@ -256,7 +263,7 @@
 																name="viewhm{$result.title}"
 																title="Search Hot Movies page"
 																><img
-																	src="{$smarty.const.WWW_TOP}/templates/charisma/images/icons/hotmovies.png"></a>
+																	src="{$smarty.const.WWW_TOP}/templates_shared/images/icons/hotmovies.png"></a>
 													{/if}
 													{if $result.classused == "pop"}
 														<a
@@ -265,7 +272,7 @@
 																name="viewpop{$result.id}"
 																title="View Popporn page"
 																><img
-																	src="{$smarty.const.WWW_TOP}/templates/charisma/images/icons/popporn.png"></a>
+																	src="{$smarty.const.WWW_TOP}/templates_shared/images/icons/popporn.png"></a>
 													{else}
 														<a
 																target="_blank"
@@ -273,7 +280,7 @@
 																name="viewpop{$result.id}"
 																title="Search Popporn page"
 																><img
-																	src="{$smarty.const.WWW_TOP}/templates/charisma/images/icons/popporn.png"></a>
+																	src="{$smarty.const.WWW_TOP}/templates_shared/images/icons/popporn.png"></a>
 													{/if}
 													<a
 															target="_blank"
@@ -281,7 +288,7 @@
 															name="viewiafd{$result.title}"
 															title="Search Internet Adult Film Database"
 															><img
-																src="{$smarty.const.WWW_TOP}/templates/charisma/images/icons/iafd.png"></a>
+																src="{$smarty.const.WWW_TOP}/templates_shared/images/icons/iafd.png"></a>
 													{if $mnfo[$m@index] > 0}<a
 														href="{$smarty.const.WWW_TOP}/nfo/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}"
 														title="View NFO" class="label label-default"
@@ -295,6 +302,12 @@
 																							   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}">{$result.title|escape:"htmlall"}</a></span>
 													<div class="release-subtitle">{if $result.genre != ''}{$result.genre}, {/if}</div>
 													<div id="guid{$mguid[$m@index]}">
+														<label>
+															<input type="checkbox"
+																   class="nzb_check"
+																   value="{$mguid[$m@index]}"
+																   id="chksingle"/>
+														</label>
 														<span class="label label-primary">{if isset($catsplit[0])} {$catsplit[0]}{/if}</span>
 														<span class="label label-danger">{if isset($catsplit[1])} {$catsplit[1]}{/if}</span>
 														<span class="label label-default">{$msize[$m@index]|fsize_format:"MB"}</span>
@@ -343,6 +356,7 @@
 							<div class="nzb_multi_operations">
 								View: <strong>Covers</strong> | <a
 										href="{$smarty.const.WWW_TOP}/browse?t={$category}">List</a><br/>
+								Check all: <input type="checkbox" class="nntmux_check_all"/> <br/>
 								With Selected:
 								<div class="btn-group">
 									<input type="button"

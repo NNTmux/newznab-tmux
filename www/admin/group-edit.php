@@ -1,6 +1,6 @@
 <?php
 
-require_once("config.php");
+require_once './config.php';
 
 $page = new AdminPage();
 $groups = new Groups(['Settings' => $page->settings]);
@@ -25,26 +25,21 @@ switch($action) {
 	default:
 		if (isset($_GET["id"])) {
 			$page->title = "Newsgroup Edit";
-			$id = $_GET["id"];
-			$group = $groups->getByID($id);
+			$id          = $_GET["id"];
+			$group       = $groups->getByID($id);
 		} else {
-			$page->title = "Newsgroup Add";
-			$group = array();
-			$group["active"] = "0";
-			$group["backfill"] = "0";
-			$group["minfilestoformrelease"] = "0";
-			$group["minsizetoformrelease"] = "0";
-			$group["first_record"] = "0";
-			$group["last_record"] = "0";
-			$group["backfill_target"] = "0";
-			$group["regexmatchonly"] = "1";
+			$page->title                    = "Newsgroup Add";
+			$group                          = [
+				'id' => '', 'name' => '', 'description' => '', 'minfilestoformrelease' => 0, 'active' => 0, 'backfill' => 0,
+				'minsizetoformrelease' => 0, 'first_record' => 0, 'last_record' => 0, 'backfill_target' => 0, 'regexmatchonly' => 1
+			];
 		}
 		$page->smarty->assign('group', $group);
 		break;
 }
 
-$page->smarty->assign('yesno_ids', array(1,0));
-$page->smarty->assign('yesno_names', array( 'Yes', 'No'));
+$page->smarty->assign('yesno_ids', [1,0]);
+$page->smarty->assign('yesno_names', ['Yes', 'No']);
 
 $page->content = $page->smarty->fetch('group-edit.tpl');
 $page->render();

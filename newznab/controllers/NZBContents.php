@@ -24,7 +24,7 @@ Class NZBContents
 	protected $nntp;
 
 	/**
-	 * @var Info
+	 * @var Nfo
 	 * @access protected
 	 */
 	protected $nfo;
@@ -66,7 +66,7 @@ Class NZBContents
 	 *     array(
 	 *         'Echo'        => bool        ; To echo to CLI or not.
 	 *         'NNTP'        => NNTP        ; Class NNTP.
-	 *         'Nfo'         => Nfo         ; Class Info.
+	 *         'Nfo'         => Nfo         ; Class Nfo.
 	 *         'NZB'         => NZB         ; Class NZB.
 	 *         'Settings'    => DB          ; Class newznab\db\Settings.
 	 *         'PostProcess' => PProcess ; Class PProcess.
@@ -89,7 +89,7 @@ Class NZBContents
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
 		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
 		$this->nntp = ($options['NNTP'] instanceof \NNTP ? $options['NNTP'] : new \NNTP(['Echo' => $this->echooutput, 'Settings' => $this->pdo]));
-		$this->nfo = ($options['Nfo'] instanceof \Info ? $options['Nfo'] : new \Info(['Echo' => $this->echooutput, 'Settings' => $this->pdo]));
+		$this->nfo = ($options['Nfo'] instanceof \Nfo ? $options['Nfo'] : new \Nfo(['Echo' => $this->echooutput, 'Settings' => $this->pdo]));
 		$this->pp = (
 		$options['PostProcess'] instanceof PProcess
 			? $options['PostProcess']
@@ -139,14 +139,14 @@ Class NZBContents
 				if ($this->echooutput) {
 					echo '-';
 				}
-				$this->pdo->queryExec(sprintf('UPDATE releases SET nfostatus = %d WHERE id = %d', Info::NFO_NONFO, $relID));
+				$this->pdo->queryExec(sprintf('UPDATE releases SET nfostatus = %d WHERE id = %d', Nfo::NFO_NONFO, $relID));
 				$fetchedBinary = false;
 			}
 		} else {
 			if ($this->echooutput) {
 				echo '-';
 			}
-			$this->pdo->queryExec(sprintf('UPDATE releases SET nfostatus = %d WHERE id = %d', Info::NFO_NONFO, $relID));
+			$this->pdo->queryExec(sprintf('UPDATE releases SET nfostatus = %d WHERE id = %d', Nfo::NFO_NONFO, $relID));
 		}
 
 		return $fetchedBinary;

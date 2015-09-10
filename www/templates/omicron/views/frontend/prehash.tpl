@@ -19,8 +19,8 @@
 	<div class="box-inner">
 	<div class="row">
 		<div class="col-xlg-12 portlets">
-			<div class="panel">
-				<div class="panel-content pagination2">
+			<div class="panel panel-default">
+				<div class="panel-body pagination2">
 					<div class="row">
 						<div class="col-md-8">
 							<table class="data table table-condensed table-striped table-responsive table-hover">
@@ -280,8 +280,8 @@
 														class="requestid"
 														title="{$result.requestid}"
 														href="{$smarty.const.WWW_TOP}/search?searchadvr=&searchadvsubject={$result.requestid}
-						&searchadvposter=&searchadvdaysnew=&searchadvdaysold=&searchadvgroups=-1&searchadvcat=-1
-						&searchadvsizefrom=-1&searchadvsizeto=-1&searchadvhasnfo=0&searchadvhascomments=0&search_type=adv"
+															&searchadvposter=&searchadvdaysnew=&searchadvdaysold=&searchadvgroups=-1&searchadvcat=-1
+															&searchadvsizefrom=-1&searchadvsizeto=-1&searchadvhasnfo=0&searchadvhascomments=0&search_type=adv"
 														>
 													{$result.requestid}
 												</a>
@@ -314,7 +314,7 @@
 													href="{$site->dereferrer_link}http://nzbindex.com/search/?q={$result.title}"
 													target="_blank"
 													>
-												<img src="{$smarty.const.WWW_TOP}/templates/omicron/images/icons/nzbindex.png"/>
+												<img src="{$smarty.const.WWW_TOP}/templates_shared/images/icons/nzbindex.png"/>
 												&nbsp;
 											</a>
 										</td>
@@ -325,7 +325,7 @@
 													href="{$site->dereferrer_link}http://binsearch.info/?q={$result.title}"
 													target="_blank"
 													>
-												<img src="{$smarty.const.WWW_TOP}/templates/omicron/images/icons/binsearch.png"/>
+												<img src="{$smarty.const.WWW_TOP}/templates_shared/images/icons/binsearch.png"/>
 												&nbsp;
 											</a>
 										</td>

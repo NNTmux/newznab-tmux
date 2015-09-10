@@ -108,7 +108,7 @@
 							</p>
 							<button type="submit" class="btn btn-primary">Register</button>
 						</fieldset>
-						<a href="{$serverroot}login" class="text-center">I already have a membership</a>
+						<a href="{$smarty.const.WWW_TOP}login" class="text-center">I already have a membership</a>
 					</form>
 				</div>
 				<!--/span-->

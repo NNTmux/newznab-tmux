@@ -10,8 +10,8 @@
 <div class="box-body">
 	<div class="row">
 		<div class="col-xlg-12 portlets">
-			<div class="panel">
-				<div class="panel-content pagination2">
+			<div class="panel panel-default">
+				<div class="panel-body pagination2">
 					<h1>{$release.searchname|escape:"htmlall"}</h1>
 					{if isset($isadmin)}
 						<a class="label label-warning"
@@ -22,11 +22,13 @@
 						   title="Delete release">Delete</a>
 					{/if}
 					{if $movie && $release.rageid < 0}
-						<a class="label label-default" href="{$serverroot}movies?imdb={$release.imdbid}"
-						   title="View all releases for this movie">Movie View</a>
 						<a class="label label-default" target="_blank"
 						   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$release.imdbid}/"
 						   title="View at IMDB">IMDB</a>
+						<a target="_blank"
+						   href="{$site->dereferrer_link}http://trakt.tv/search/imdb/tt{$release.imdbid}/"
+						   name="trakt{$release.imdbid}" title="View Trakt page"
+						   class="label label-default" rel="trakt">TRAKT</a>
 						{if $movie.tmdbid != ''}
 							<a class="label label-default" target="_blank"
 							   href="{$site->dereferrer_link}http://www.themoviedb.org/movie/{$movie.tmdbid}"
@@ -46,7 +48,7 @@
 					{if $rage && $release.rageid > 0}
 						<a href="{$smarty.const.WWW_TOP}/myshows/add/{$release.rageid}?from={$smarty.server.REQUEST_URI|escape:"url"}"
 						   class="label label-success">Add to My Shows</a>
-						<a class="label label-default" href="{$serverroot}series/{$release.rageid}"
+						<a class="label label-default" href="{$serverroor}series/{$release.rageid}"
 						   title="View all releases for this series">View all episodes</a>
 						<a class="label label-default" target="_blank"
 						   href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$release.rageid}"
@@ -78,9 +80,6 @@
 														   title="View at Hot Movies">HotMovies</a>
 						{/if}
 					{/if}
-					<a class="label label-default"
-					   href="http://www.google.com/search?q={$release.name|escape:"htmlall"}"
-					   target="_blank">Google</a>
 					<p>
 						{if $movie && $release.rageid < 0 && $movie.plot != ''}<span
 								class="descinitial">{$movie.plot|escape:"htmlall"|truncate:500:"...":true}</span>
@@ -115,7 +114,7 @@
 									{if isset($xxx.trailers) && $xxx.trailers != ''}
 										<li><a href="#pane2" data-toggle="tab">Trailer</a></li>
 									{/if}
-									{if isset($nfo.nfo) && $nfo.nfo != ""}
+									{if isset($nfo.nfo) && $nfo.nfo != ''}
 										<li><a href="#pane3" data-toggle="tab">NFO</a></li>
 									{/if}
 									{if isset($similars) && $similars|@count > 1}
@@ -131,10 +130,10 @@
 									{if $reVideo.releaseid|@count > 0 || $reAudio|@count > 0}
 										<li><a href="#pane8" data-toggle="tab">MediaInfo</a></li>
 									{/if}
-									{if $xxx.backdrop == 1}
+									{if isset($xxx.backdrop) && $xxx.backdrop == 1}
 										<li><a href="#pane9" data-toggle="tab">Back Cover</a></li>
 									{/if}
-									{if $game.backdrop == 1}
+									{if isset($game.backdrop) && $game.backdrop == 1}
 									<li><a href="#pane10" data-toggle="tab">Screenshot</a></li>
 									{/if}
 								</ul>
@@ -270,7 +269,7 @@
 																		</th>
 																		<td>{$xxx.actors}</td>
 																	</tr>
-																	{if $xxx.director != ""}
+																	{if isset($xxx.director) && $xxx.director != ""}
 																		<tr>
 																			<th width="140">
 																				Director
@@ -278,7 +277,7 @@
 																			<td>{$xxx.director}</td>
 																		</tr>
 																	{/if}
-																	{if $xxx.genres != ""}
+																	{if isset($xxx.genres) && $xxx.genres != ""}
 																		<tr>
 																			<th width="140">
 																				Genre
@@ -577,18 +576,25 @@
 												</tr>
 												{foreach from=$comments item=comment}
 													<tr>
-														<td width="150">{if $comment.sourceid == 0}
+														<td width="150">
+															{if $comment.sourceid == 0}
+															{if !$privateprofiles || $isadmin || $ismod}
 																<a
 																title="View {$comment.username}'s profile"
-																href="{$smarty.const.WWW_TOP}/profile?name={$comment.username}">{$comment.username}</a>{else}{$comment.username}
+																href="{$smarty.const.WWW_TOP}/profile?name={$comment.username}">{$comment.username}</a>
+															{else}
+																{$comment.username}
 																<br/>
 																<span style="color: #ce0000;">(syndicated)</span>
 															{/if}
-															<br/>{$comment.createddate|date_format}
+															<br/>{$comment.createddate|date_format} ({$comment.createddate|timeago} ago)
 														</td>
-														<td>
-															{$comment.text|escape:"htmlall"|nl2br}
-														</td>
+															{if $comment.shared == 2}
+														<td style="color:#6B2447">{$comment.text|escape:"htmlall"|nl2br}</td>
+														{else}
+														<td>{$comment.text|escape:"htmlall"|nl2br}</td>
+														{/if}
+														{/if}
 													</tr>
 												{/foreach}
 											</table>

@@ -5,7 +5,7 @@ if (!$page->users->isLoggedIn()) {
 }
 
 if (isset($_GET['modal']) && isset($_GET["id"]) && ctype_digit($_GET["id"])) {
-	$movie = new Film(['Settings' => $page->settings]);
+	$movie = new Movie(['Settings' => $page->settings]);
 	$mov = $movie->getMovieInfo($_GET['id']);
 
 	if (!$mov) {

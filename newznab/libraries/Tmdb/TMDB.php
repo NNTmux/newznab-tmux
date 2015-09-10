@@ -1,7 +1,7 @@
 <?php
 /**
  * TMDB API v3 PHP class - wrapper to API version 3 of 'themoviedb.org
- * API Documentation: http://help.themoviedb.org/kb/api/about-3
+ * API Documentation: https://help.themoviedb.org/kb/api/about-3
  * Documentation and usage in README file
  *
  * @pakage TMDB_V3_API_PHP
@@ -53,19 +53,19 @@
  *
  *
  * 	URL LIST:
- *   	configuration		http://api.themoviedb.org/3/configuration
- * 		Image				http://cf2.imgobject.com/t/p/original/IMAGEN.jpg #### echar un ojo ####
- * 		Search Movie		http://api.themoviedb.org/3/search/movie
- * 		Search Person		http://api.themoviedb.org/3/search/person
- * 		Movie Info			http://api.themoviedb.org/3/movie/11
- * 		Casts				http://api.themoviedb.org/3/movie/11/casts
- * 		Posters				http://api.themoviedb.org/3/movie/11/images
- * 		Trailers			http://api.themoviedb.org/3/movie/11/trailers
- * 		translations		http://api.themoviedb.org/3/movie/11/translations
- * 		Alternative titles 	http://api.themoviedb.org/3/movie/11/alternative_titles
+ *   	configuration		https://api.themoviedb.org/3/configuration
+ * 		Image				https://cf2.imgobject.com/t/p/original/IMAGEN.jpg #### echar un ojo ####
+ * 		Search Movie		https://api.themoviedb.org/3/search/movie
+ * 		Search Person		https://api.themoviedb.org/3/search/person
+ * 		Movie Info			https://api.themoviedb.org/3/movie/11
+ * 		Casts				https://api.themoviedb.org/3/movie/11/casts
+ * 		Posters				https://api.themoviedb.org/3/movie/11/images
+ * 		Trailers			https://api.themoviedb.org/3/movie/11/trailers
+ * 		translations		https://api.themoviedb.org/3/movie/11/translations
+ * 		Alternative titles 	https://api.themoviedb.org/3/movie/11/alternative_titles
  *
- * 		// Collection Info 	http://api.themoviedb.org/3/collection/11
- * 		// Person images		http://api.themoviedb.org/3/person/287/images
+ * 		// Collection Info 	https://api.themoviedb.org/3/collection/11
+ * 		// Person images		https://api.themoviedb.org/3/person/287/images
  */
 
 namespace newznab\libraries\Tmdb;
@@ -82,7 +82,7 @@ use newznab\libraries\Tmdb\Data\TVShow;
 class TMDB {
 
 	#@var string url of API TMDB
-	const _API_URL_ = "http://api.themoviedb.org/3/";
+	const _API_URL_ = "https://api.themoviedb.org/3/";
 
 	#@var string Version of this class
 	const VERSION = '0.0.2.1';
@@ -228,6 +228,25 @@ class TMDB {
 	}
 
 	//------------------------------------------------------------------------------
+	// Get Lists of Discover
+	//------------------------------------------------------------------------------
+	/**
+	 * 	Get latest Movie
+	 *	@add by tnsws
+	 *
+	 * 	@return Movie
+	 */
+	public function getDiscoverMovie($page = 1) {
+		$movies = array();
+		$result = $this->_call('discover/movie', 'page='. $page);
+		foreach($result['results'] as $data){
+			$movies[] = new Movie($data);
+		}
+		return $movies;
+	}
+
+
+	//------------------------------------------------------------------------------
 	// Get Lists of Movies
 	//------------------------------------------------------------------------------
 
@@ -238,15 +257,6 @@ class TMDB {
 	 */
 	public function getLatestMovie() {
 		return new Movie($this->_call('movie/latest',''));
-	}
-
-	/**
-	 * 	Get upcoming Movies
-	 *
-	 * 	@return Movie
-	 */
-	public function getUpcomingMovies() {
-		return new Movie($this->_call('movie/upcoming',''));
 	}
 
 	/**
@@ -267,6 +277,38 @@ class TMDB {
 
 		return $movies;
 	}
+
+	/**
+	 *  Top Rated Movies
+	 *	@add by tnsws
+	 *
+	 * 	@param integer $page
+	 * 	@return array
+	 */
+	public function topRatedMovies($page = 1) {
+		$movies = array();
+		$result = $this->_call('movie/top-rated', 'page='. $page);
+		foreach($result['results'] as $data){
+			$movies[] = new Movie($data);
+		}
+		return $movies;
+	}
+	/**
+	 *  Upcoming Movies
+	 *	@add by tnsws
+	 *
+	 * 	@param integer $page
+	 * 	@return array
+	 */
+	public function upcomingMovies($page = 1) {
+		$movies = array();
+		$result = $this->_call('movie/upcoming', 'page='. $page);
+		foreach($result['results'] as $data){
+			$movies[] = new Movie($data);
+		}
+		return $movies;
+	}
+
 
 	//------------------------------------------------------------------------------
 	// Get Lists of Persons

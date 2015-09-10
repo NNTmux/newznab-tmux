@@ -4,7 +4,7 @@ if (!$page->users->isLoggedIn()) {
 	$page->show403();
 }
 
-$m = new Film();
+$m = new Movie();
 
 if (!isset($_GET["id"])) {
 	$_GET["id"] = 1;
@@ -30,19 +30,19 @@ if (!$data || $data["info"] == "") {
 		$page->smarty->assign('data', $data->movies);
 
 		switch ($_GET["id"]) {
-			case Film::SRC_BOXOFFICE;
+			case Movie::SRC_BOXOFFICE;
 				$page->title = "Box Office";
 				break;
-			case Film::SRC_INTHEATRE;
+			case Movie::SRC_INTHEATRE;
 				$page->title = "In Theater";
 				break;
-			case Film::SRC_OPENING;
+			case Movie::SRC_OPENING;
 				$page->title = "Opening";
 				break;
-			case Film::SRC_UPCOMING;
+			case Movie::SRC_UPCOMING;
 				$page->title = "Upcoming";
 				break;
-			case Film::SRC_DVD;
+			case Movie::SRC_DVD;
 				$page->title = "DVD Releases";
 				break;
 		}

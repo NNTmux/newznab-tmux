@@ -87,7 +87,7 @@ else if (isset($_GET['purge_site'])) {
 	if ($guid === false) {
 		print 'Error purging site ' . $_GET['purge_site'] . '!';
 	} else {
-		$ids = $db->query(sprintf('SELECT id FROM releasecomment WHERE siteid = %s', $db->escapeString($guid['site_guid'])));
+		$ids = $db->query(sprintf('SELECT id FROM release_comments WHERE siteid = %s', $db->escapeString($guid['site_guid'])));
 		$total = count($ids);
 		if ($total > 0) {
 			$rc = new ReleaseComments();

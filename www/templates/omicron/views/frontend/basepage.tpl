@@ -86,7 +86,7 @@
 							<!-- Menu Toggle Button -->
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 								<!-- The user image in the navbar-->
-								<img src="{$smarty.const.WWW_TOP}/templates/omicron/images/userimage.png"
+								<img src="{$smarty.const.WWW_TOP}/templates_shared/images/userimage.png"
 									 class="user-image" alt="User Image"/>
 								<!-- hidden-xs hides the username on small devices so only the image appears. -->
 								<span class="hidden-xs">{$userdata.username}</span>
@@ -94,7 +94,7 @@
 							<ul class="dropdown-menu">
 								<!-- The user image in the menu -->
 								<li class="user-header">
-									<img src="{$smarty.const.WWW_TOP}/templates/omicron/images/userimage.png"
+									<img src="{$smarty.const.WWW_TOP}/templates_shared/images/userimage.png"
 										 class="img-circle" alt="User Image"/>
 									<p>
 										{$userdata.username}
@@ -145,7 +145,7 @@
 				<!-- Sidebar user panel -->
 				<div class="user-panel">
 					<div class="pull-left image">
-						<img src="{$smarty.const.WWW_TOP}/templates/omicron/images/user-loggedin.png" class="img-circle"
+						<img src="{$smarty.const.WWW_TOP}/templates_shared/images/user-loggedin.png" class="img-circle"
 							 alt="User Image"/>
 					</div>
 					<div class="pull-left info">
@@ -185,7 +185,7 @@
 						<a href="#"><i class="fa fa-list-ol"></i><span> Browse</span></a>
 						<ul class="treeview-menu">
 							<li><a href="{$serverroot}newposterwall"><i
-											class="fa fa-file-image-o"></i><span> New Releases</span></a></li>
+											class="fa fa-fire"></i><span> New Releases</span></a></li>
 							<li><a href="{$serverroot}console"><i
 											class="fa fa-gamepad"></i><span> Console</span></a></li>
 							<li><a href="{$serverroot}movies"><i
@@ -194,7 +194,9 @@
 											class="fa fa-music"></i><span> Music</span></a></li>
 							<li><a href="{$serverroot}games"><i
 											class="fa fa-gamepad"></i><span> Games</span></a></li>
-							<li><a href="{$serverroot}xxx"><i class="fa fa-ban"></i><span> XXX</span></a></li>
+							<li><a href="{$serverroot}series"><i
+											class="fa fa-television"></i><span> TV</span></a></li>
+							<li><a href="{$serverroot}xxx"><i class="fa fa-venus-mars"></i><span> Adult</span></a></li>
 							<li><a href="{$serverroot}books"><i class="fa fa-book"></i><span> Books</span></a></li>
 							<li><a href="{$serverroot}browse"><i
 											class="fa fa-list-ul"></i><span> Browse All Releases</span></a></li>

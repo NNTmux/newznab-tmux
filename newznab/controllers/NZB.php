@@ -55,6 +55,7 @@ class NZB
 
 		$fp = gzopen($path, "w");
 		if ($fp) {
+			$nzb_guid = '';
 			gzwrite($fp, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 			gzwrite($fp, "<!DOCTYPE nzb PUBLIC \"-//newzBin//DTD NZB 1.1//EN\" \"http://www.newzbin.com/DTD/nzb/nzb-1.1.dtd\">\n");
 			gzwrite($fp, "<nzb xmlns=\"http://www.newzbin.com/DTD/2003/nzb\">\n\n");
@@ -93,6 +94,9 @@ class NZB
 						$pName,
 						$binrow["id"]));
 				while ($partsrow = $db->getAssocArray($resparts)) {
+					if ($nzb_guid === '') {
+						$nzb_guid = $partsrow['messageid'];
+					}
 					gzwrite($fp, "  <segment bytes=\"" . $partsrow["size"] . "\" number=\"" . $partsrow["partnumber"] . "\">" . htmlspecialchars($partsrow["messageid"], ENT_QUOTES, 'utf-8') . "</segment>\n");
 				}
 				gzwrite($fp, " </segments>\n</file>\n");
@@ -101,10 +105,11 @@ class NZB
 			gzclose($fp);
 
 			if (is_file($path)) {
-				$db->queryExec(
+				$this->pdo->queryExec(
 					sprintf('
-						UPDATE releases SET nzbstatus = %d WHERE id = %d',
-						Enzebe::NZB_ADDED,
+						UPDATE releases SET nzbstatus = %d %s WHERE id = %d',
+						NZB::NZB_ADDED,
+						($nzb_guid === '' ? '' : ', nzb_guid = UNHEX( ' . $this->pdo->escapestring(md5($nzb_guid)) . ' )'),
 						$relid
 					)
 				);

@@ -1,3 +1,11 @@
+{if $nodata != ""}
+<div class="header">
+	{assign var="catsplit" value=">"|explode:$catname}
+	<h2>View > <strong>Anime</strong></h2>
+	<p>{$nodata}</p>
+</div>
+{else}
+
 <div class="header">
 	{assign var="catsplit" value=">"|explode:$catname}
 	<h2>View > <strong>Anime</strong></h2>
@@ -9,16 +17,20 @@
 	</div>
 </div>
 <h1>
-	{$animeTitle}{if isset($isadmin)}<a class="btn btn-xs btn-warning" title="Edit AniDB data"
-										href="{$smarty.const.WWW_TOP}/admin/anidb-edit.php?id={$animeanidbid}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}">
-			Edit</a>{/if}
+	{$animeTitle}
+	{if isset($isadmin)}
+		<a class="btn btn-xs btn-warning"
+		   title="Edit AniDB data"
+		   href="{$smarty.const.WWW_TOP}/admin/anidb-edit.php?id={$animeanidbid}&amp;
+					from={$smarty.server.REQUEST_URI|escape:"url"}">Edit</a>
+	{/if}
 </h1>
 {if $catname != ''}<span class="text-info h5">Current category shown: {$catname|escape:"htmlall"}</span>{/if}
 <div>
 	{if animePicture != ""}
 		<center>
 			<img class="shadow img img-polaroid" alt="{$animeTitle} Picture"
-				 src="{$smarty.const.WWW_TOP}/covers/anime/{$animeanidbid}.jpg"/>
+				 src="{$smarty.const.WWW_TOP}/covers/anime/{$animeAnidbID}.jpg"/>
 		</center>
 		<br/>
 	{/if}
@@ -78,8 +90,8 @@
 	</div>
 	<div class="row">
 		<div class="col-xlg-12 portlets">
-			<div class="panel">
-				<div class="panel-content pagination2">
+			<div class="panel panel-default">
+				<div class="panel-body pagination2">
 					<table style="width:100%;" class="data table table-condensed table-striped table-responsive table-hover"
 						   id="browsetable">
 						{foreach $animeEpisodeTitles as $animeEpno => $animeEpisodeTitle}
@@ -135,19 +147,19 @@
 										{if isset($sabintegrated)}
 											<a class="icon icon_sab" href="#" title="Send to Sab">
 												<img class="icon icon_sab" alt="Send to my Sabnzbd"
-													 src="{$smarty.const.WWW_TOP}/templates/omicron/images/icons/sabup.png">
+													 src="{$smarty.const.WWW_TOP}/templates_shared/images/icons/sabup.png">
 											</a>
 										{/if}
 										{if $weHasVortex}
 											<a class="icon icon_nzbvortex" href="#" title="Send to NZBVortex">
 												<img class="icon icon_nzbvortex" alt="Send to my NZBVortex"
-													 src="{$smarty.const.WWW_TOP}/templates/omicron/images/icons/vortex/bigsmile.png">
+													 src="{$smarty.const.WWW_TOP}/templates_shared/images/icons/vortex/bigsmile.png">
 											</a>
 										{/if}
 										{if isset($nzbgetintegrated)}<a class="icon icon_nzbget" title="Send to NZBGet"
 																		href="#"><img class="icon icon_nzbget"
 																					  alt="Send to NZBget"
-																					  src="{$smarty.const.WWW_TOP}/templates/omicron/images/icons/nzbgetup.png">
+																					  src="{$smarty.const.WWW_TOP}/templates_shared/images/icons/nzbgetup.png">
 											</a>{/if}
 										{if isset($isadmin)}
 											<br/>
@@ -164,3 +176,4 @@
 						{/foreach}
 					</table>
 </form>
+{/if}
