@@ -126,7 +126,7 @@ switch ($function) {
 	case 's':
 		verifyEmptyParameter('q');
 		$maxAge = maxAge();
-		$page->users->addApiRequest($uid, $_SERVER['REQUEST_URI'], $hosthash);
+		$page->users->addApiRequest($uid, $_SERVER['REQUEST_URI']);
 		$categoryID = categoryid();
 		$limit = limit();
 		$offset = offset();
