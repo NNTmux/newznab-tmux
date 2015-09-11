@@ -2258,7 +2258,7 @@ class Releases
 				DELETE r, rn, rc, uc, rf, ra, rs, rv, re
 				FROM releases r
 				LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
-				LEFT OUTER JOIN release_comments rc ON rc.releaseid = r.id
+				LEFT OUTER JOIN releasecomments rc ON rc.releaseid = r.id
 				LEFT OUTER JOIN usercart uc ON uc.releaseid = r.id
 				LEFT OUTER JOIN releasefiles rf ON rf.releaseid = r.id
 				LEFT OUTER JOIN releaseaudio ra ON ra.releaseid = r.id
@@ -2269,6 +2269,34 @@ class Releases
 				$this->pdo->escapeString($identifiers['g'])
 			)
 		);
+	}
+
+	/**
+	 * Delete multiple releases, or a single by ID.
+	 *
+	 * @param array|int|string $list   Array of GUID or ID of releases to delete.
+	 * @param bool             $isGUID Are the identifiers GUID or ID?
+	 */
+	public function deleteMultiple($list, $isGUID = false)
+	{
+		if (!is_array($list)) {
+			$list = [$list];
+		}
+
+		$nzb = new NZB($this->pdo);
+		$releaseImage = new ReleaseImage($this->pdo);
+
+		foreach ($list as $identifier) {
+			if ($isGUID) {
+				$this->deleteSingle(['g' => $identifier, 'i' => false], $nzb, $releaseImage);
+			} else {
+				$release = $this->pdo->queryOneRow(sprintf('SELECT guid FROM releases WHERE id = %d', $identifier));
+				if ($release === false) {
+					continue;
+				}
+				$this->deleteSingle(['g' => $release['guid'], 'i' => false], $nzb, $releaseImage);
+			}
+		}
 	}
 
 	/**
