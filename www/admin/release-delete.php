@@ -1,7 +1,7 @@
 <?php
 require_once("config.php");
 
-$page = new AdminPage(true);
+$page = new AdminPage();
 
 if (isset($_GET['id'])) {
 	$releases = new Releases(['Settings' => $page->settings]);
