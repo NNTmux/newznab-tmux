@@ -1,7 +1,7 @@
 
 <h1>Register</h1>
 
-{if $error != ''}
+{if isset($error) && $error != ''}
 	<div class="error">{$error}</div>
 {/if}
 

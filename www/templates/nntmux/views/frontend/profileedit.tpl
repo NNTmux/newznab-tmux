@@ -1,6 +1,6 @@
 <h1>Edit your profile</h1>
 
-{if $error != ''}
+{if isset($error) && $error != ''}
 	<div class="error">{$error}</div>
 {/if}
 

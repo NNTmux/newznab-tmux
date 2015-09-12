@@ -14,7 +14,7 @@
 				<div class="col-xlg-12 portlets">
 					<div class="panel panel-default">
 						<div class="panel-body pagination2">
-							{if $error != ''}
+							{if isset($error) && $error != ''}
 								<div class="alert alert-danger">{$error}</div>
 							{/if}
 							<ul class="nav nav-tabs nav-primary">
