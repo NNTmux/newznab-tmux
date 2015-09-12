@@ -1,5 +1,5 @@
 <h1 xmlns="http://www.w3.org/1999/html">{$page->title}</h1>
-{if $error != ''}
+{if isset($error) && $error != ''}
 	<div class="error">{$error}</div>
 {/if}
 <form action="{$SCRIPT_NAME}?action=submit" method="POST">
