@@ -2258,7 +2258,7 @@ class Releases
 				DELETE r, rn, rc, uc, rf, ra, rs, rv, re
 				FROM releases r
 				LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
-				LEFT OUTER JOIN releasecomments rc ON rc.releaseid = r.id
+				LEFT OUTER JOIN release_comments rc ON rc.releaseid = r.id
 				LEFT OUTER JOIN usercart uc ON uc.releaseid = r.id
 				LEFT OUTER JOIN releasefiles rf ON rf.releaseid = r.id
 				LEFT OUTER JOIN releaseaudio ra ON ra.releaseid = r.id
