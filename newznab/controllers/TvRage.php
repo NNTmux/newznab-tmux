@@ -16,6 +16,11 @@ class TvRage extends TV
 	 */
 	public $pdo;
 
+	/**
+	 * @var array|bool|int|string
+	 */
+	public $catWhere;
+
 	public $echooutput;
 	public $rageqty;
 	public $showInfoUrl         = 'http://www.tvrage.com/shows/id-';
