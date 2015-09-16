@@ -1,6 +1,6 @@
 <?php
 use newznab\db\Settings;
-use \newznab\processing\PProcess;
+use \newznab\processing\PostProcess;
 use newznab\utility\Utility;
 
 require_once NN_LIBS . 'getid3/getid3/getid3.php';
@@ -220,7 +220,7 @@ class Nfo
 						'NNTP' => $nntp,
 						'Nfo'  => $this,
 						'Settings'   => $this->pdo,
-						'PostProcess'   => new PProcess(['Echo' => $this->echo, 'Settings' => $this->pdo, 'Nfo' => $this])
+						'PostProcess'   => new PostProcess(['Echo' => $this->echo, 'Settings' => $this->pdo, 'Nfo' => $this])
 					]
 				);
 				$nzbContents->parseNZB($release['guid'], $release['id'], $release['groupid']);
@@ -335,7 +335,7 @@ class Nfo
 					'NNTP' => $nntp,
 					'Nfo' => $this,
 					'Settings' => $this->pdo,
-					'PostProcess' => new PProcess(['Echo' => $this->echo, 'Nfo' => $this, 'Settings' => $this->pdo])
+					'PostProcess' => new PostProcess(['Echo' => $this->echo, 'Nfo' => $this, 'Settings' => $this->pdo])
 				]
 			);
 			$movie = new Movie(['Echo' => $this->echo, 'Settings' => $this->pdo]);

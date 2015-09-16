@@ -7,7 +7,7 @@ if (!isset($argv[1])) {
 require_once dirname(__FILE__) . '/../../../../../www/config.php';
 
 use \newznab\db\Settings;
-use \newznab\processing\PProcess;
+use \newznab\processing\PostProcess;
 use \newznab\processing\ProcessReleases;
 use \newznab\processing\post\ProcessAdditional;
 
@@ -249,7 +249,7 @@ switch ($options[1]) {
 	case 'pp_movie':
 		if (charCheck($options[2])) {
 			$pdo = new Settings();
-			(new PProcess(['Settings' => $pdo]))->processMovies('', $options[2], (isset($options[3]) ? $options[3] : ''));
+			(new PostProcess(['Settings' => $pdo]))->processMovies('', $options[2], (isset($options[3]) ? $options[3] : ''));
 		}
 		break;
 
@@ -261,7 +261,7 @@ switch ($options[1]) {
 	case 'pp_tv':
 		if (charCheck($options[2])) {
 			$pdo = new Settings();
-			(new PProcess(['Settings' => $pdo]))->processTv('', $options[2], (isset($options[3]) ? $options[3] : ''));
+			(new PostProcess(['Settings' => $pdo]))->processTv('', $options[2], (isset($options[3]) ? $options[3] : ''));
 		}
 		break;
 }

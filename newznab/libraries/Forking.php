@@ -2,7 +2,7 @@
 namespace newznab\libraries;
 
 use \newznab\db\Settings;
-use \newznab\processing\PProcess;
+use \newznab\processing\PostProcess;
 
 require_once(NN_LIBS . 'forkdaemon-php' . DS . 'fork_daemon.php');
 
@@ -863,7 +863,7 @@ class Forking extends \fork_daemon
 		if ($sharing !== false && $sharing['enabled'] == 1) {
 			$nntp = new \NNTP(['Settings' => $this->pdo]);
 			if (($this->pdo->getSetting('alternate_nntp') == 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) === true) {
-				(new PProcess(['Settings' => $this->pdo, 'ColorCLI' => $this->_colorCLI]))->processSharing($nntp);
+				(new PostProcess(['Settings' => $this->pdo, 'ColorCLI' => $this->_colorCLI]))->processSharing($nntp);
 			}
 			return true;
 		}
@@ -875,7 +875,7 @@ class Forking extends \fork_daemon
 	 */
 	private function processSingle()
 	{
-		$postProcess = new PProcess(['Settings' => $this->pdo, 'ColorCLI' => $this->_colorCLI]);
+		$postProcess = new PostProcess(['Settings' => $this->pdo, 'ColorCLI' => $this->_colorCLI]);
 		//$postProcess->processAnime();
 		$postProcess->processBooks();
 		$postProcess->processConsoles();

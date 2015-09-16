@@ -7,7 +7,7 @@ use \newznab\processing\post\ProcessAdditional;
 
 require_once NN_LIBS . 'rarinfo/par2info.php';
 
-class PProcess
+class PostProcess
 {
 	/**
 	 * @var \newznab\db\Settings
