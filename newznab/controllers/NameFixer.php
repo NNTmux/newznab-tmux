@@ -1,7 +1,7 @@
 <?php
 
 use newznab\db\Settings;
-use \newznab\processing\PProcess;
+use \newznab\processing\PostProcess;
 use newznab\utility\Utility;
 
 //This script is ported from nZEDb and adapted for newznab
@@ -349,7 +349,7 @@ class NameFixer
 						'NNTP'        => $nntp,
 						'Nfo'         => $Nfo,
 						'Settings'    => $this->pdo,
-						'PostProcess' => new PProcess(['Settings' => $this->pdo, 'Nfo' => $Nfo])
+						'PostProcess' => new PostProcess(['Settings' => $this->pdo, 'Nfo' => $Nfo])
 					]
 				);
 

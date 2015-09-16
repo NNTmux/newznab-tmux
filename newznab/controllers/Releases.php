@@ -2,7 +2,7 @@
 
 use newznab\db\Settings;
 use newznab\utility\Utility;
-use newznab\processing\PProcess;
+use newznab\processing\PostProcess;
 
 /**
  * This class handles storage and retrieval of releases rows and the main processing functions
@@ -1993,7 +1993,7 @@ class Releases
 	public function postProcessReleases($postProcess, &$nntp)
 	{
 		if ($postProcess == 1) {
-			(new PProcess(['Echo' => $this->echoCLI, 'Settings' => $this->pdo, 'Groups' => $this->groups]))->processAll($nntp);
+			(new PostProcess(['Echo' => $this->echoCLI, 'Settings' => $this->pdo, 'Groups' => $this->groups]))->processAll($nntp);
 		} else {
 			if ($this->echoCLI) {
 				$this->pdo->log->doEcho(
