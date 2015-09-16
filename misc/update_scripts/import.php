@@ -6,6 +6,7 @@ use newznab\db\Settings;
 use newznab\utility\Utility;
 
 $releases = new Releases();
+$releaseImage = new ReleaseImage();
 $db = new Settings();
 $cat = new Categorize();
 $releaseRegex = new ReleaseRegex();
@@ -116,7 +117,7 @@ foreach ($filestoprocess as $nzbFile) {
 						if (!file_exists($errorpath)) mkdir($errorpath);
 						if (!file_exists($errorpath . basename($nzbFile))) rename($nzbFile, $errorpath . basename($nzbFile));
 					}
-					$releases->delete($relid);
+					$releases->deleteSingle(['g' => $relguid, 'i' => $relid], $nzb, $releaseImage);
 				}
 			} else {
 				$numbins = 0;
