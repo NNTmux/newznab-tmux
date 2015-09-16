@@ -1897,13 +1897,13 @@ class Releases
 			$nzbInfo = new NZBInfo;
 			if (!$nzbInfo->loadFromFile($nzbfile)) {
 				$this->pdo->log->doEcho($this->pdo->log->primary('Failed to write nzb file (bad perms?) ' . $nzbfile . ''));
-				$this->delete($relid);
+				$this->deleteSingle(['g' => $relguid, 'i' => $relid], $this->nzb, $this->releaseImage);
 			} else {
 				// Check if gid already exists
 				$dupes = $this->pdo->queryOneRow(sprintf("SELECT EXISTS(SELECT 1 FROM releases WHERE gid = %s) AS total", $this->pdo->escapeString($nzbInfo->gid)));
 				if ($dupes['total'] > 0) {
 					$this->pdo->log->doEcho($this->pdo->log->primary('Duplicate - ' . $cleanRelName . ''));
-					$this->delete($relid);
+					$this->deleteSingle(['g' => $relguid, 'i' => $relid], $this->nzb, $this->releaseImage);
 					$duplicate++;
 				} else {
 					$this->pdo->queryExec(sprintf("UPDATE releases SET totalpart = %d, size = %s, COMPLETION = %d, GID=%s , nzb_guid = %s WHERE id = %d",
@@ -2171,63 +2171,6 @@ class Releases
 		$this->sphinxSearch->insertRelease($parameters);
 
 		return $parameters['id'];
-	}
-
-
-	/**
-	 * @param      $id
-	 * @param bool $isGuid
-	 */
-	public function delete($id, $isGuid = false)
-	{
-
-		$users = new Users();
-		$s = new Settings();
-		$nfo = new Nfo();
-		$rf = new ReleaseFiles();
-		$re = new ReleaseExtra();
-		$rc = new ReleaseComments();
-		$ri = new ReleaseImage();
-
-		if (!is_array($id))
-			$id = [$id];
-
-		foreach ($id as $identifier) {
-			//
-			// delete from disk.
-			//
-			$rel = ($isGuid) ? $this->getByGuid($identifier) : $this->getById($identifier);
-
-			$nzbpath = "";
-			if ($isGuid)
-				$nzbpath = $s->getSetting('nzbpath') . substr($identifier, 0, 1) . "/" . $identifier . ".nzb.gz";
-			elseif ($rel)
-				$nzbpath = $s->getSetting('nzbpath') . substr($rel["guid"], 0, 1) . "/" . $rel["guid"] . ".nzb.gz";
-
-			if ($nzbpath != "" && file_exists($nzbpath))
-				unlink($nzbpath);
-
-			$audiopreviewpath = "";
-			if ($isGuid)
-				$audiopreviewpath = WWW_DIR . 'covers/audio/' . $identifier . ".mp3";
-			elseif ($rel)
-				$audiopreviewpath = WWW_DIR . 'covers/audio/' . $rel["guid"] . ".mp3";
-
-			if ($audiopreviewpath && file_exists($audiopreviewpath))
-				unlink($audiopreviewpath);
-
-			if ($rel) {
-				$nfo->deleteReleaseNfo($rel['id']);
-				$rc->deleteCommentsForRelease($rel['id']);
-				$users->delCartForRelease($rel['id']);
-				$users->delDownloadRequestsForRelease($rel['id']);
-				$rf->delete($rel['id']);
-				$re->delete($rel['id']);
-				$re->deleteFull($rel['id']);
-				$ri->delete($rel['guid']);
-				$this->pdo->queryExec(sprintf("DELETE FROM releases WHERE id = %d", $rel['id']));
-			}
-		}
 	}
 
 	/**
