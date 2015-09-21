@@ -606,14 +606,11 @@ class Utility
 				$mail->Password = PHPMAILER_SMTP_PASSWORD;
 			}
 		}
-		$s = new \Sites();
-		$settings = $s->get();
+		$settings = new Settings();
 
-		$site_email = $settings->email;
-
-		$fromEmail = (PHPMAILER_FROM_EMAIL === '') ? $site_email : PHPMAILER_FROM_EMAIL;
-		$fromName = (PHPMAILER_FROM_NAME === '') ? $settings->title : PHPMAILER_FROM_NAME;
-		$replyTo = (PHPMAILER_REPLYTO === '') ? $site_email : PHPMAILER_REPLYTO;
+		$fromEmail = (PHPMAILER_FROM_EMAIL == '') ? $settings->getSetting('email') : PHPMAILER_FROM_EMAIL;
+		$fromName  = (PHPMAILER_FROM_NAME == '') ? $settings->getSetting('title') : PHPMAILER_FROM_NAME;
+		$replyTo   = (PHPMAILER_REPLYTO == '') ? $from : PHPMAILER_REPLYTO;
 
 		(PHPMAILER_BCC !== '') ? $mail->addBCC(PHPMAILER_BCC) : null;
 
@@ -645,7 +642,7 @@ class Utility
 	static public function fileInfo($path)
 	{
 		$output = '';
-		$magicPath = (new \Sites())->get()->magic_file_path;
+		$magicPath = (new Settings())->getSetting('magic_file_path');
 		if (self::hasCommand('file') && (!self::isWin() || !empty($magicPath))) {
 			$magicSwitch = empty($magicPath) ? '' : " -m $magicPath";
 			$output = Utility::runCmd('file' . $magicSwitch . ' -b "' . $path . '"');
