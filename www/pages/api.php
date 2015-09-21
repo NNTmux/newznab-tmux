@@ -113,7 +113,7 @@ if ($uid != '') {
 	}
 }
 
-$releases = new Releases(['Settings' => $page->settings]);
+$releases = new \Releases(['Settings' => $page->settings]);
 
 $page->smarty->assign('extended', (isset($_GET['extended']) && $_GET['extended'] == 1 ? '1' : '0'));
 $page->smarty->assign('del', (isset($_GET['del']) && $_GET['del'] == 1 ? '1' : '0'));
@@ -616,7 +616,7 @@ function printOutput($data, $xml = true, $page, $offset = 0)
 		header('Content-Length: ' . strlen($response) );
 		echo $response;
 	} else {
-		$response = encodeAsJSON($data);
+		$response = json_encode(utf8ize($data));
 		if ($response != false) {
 			header('Content-type: application/json');
 			header('Content-Length: ' . strlen($response));
@@ -668,11 +668,21 @@ function addLanguage(&$releases, Settings $settings)
 	}
 }
 
-function encodeAsJSON($data)
+/**
+ * @note: Convert non-UTF-8 characters from
+ * xml into UTF-8
+ * Function taken from http://stackoverflow.com/a/19366999
+ * @param $d
+ * @return array|string
+ */
+function utf8ize($d)
 {
-	$json = json_encode(Utility::encodeAsUTF8($data));
-	if ($json === false) {
-		showApiError(201);
+	if (is_array($d)) {
+		foreach ($d as $k => $v) {
+			$d[$k] = utf8ize($v);
+		}
+	} else if (is_string ($d)) {
+		return utf8_encode($d);
 	}
-	return $json;
+	return $d;
 }
