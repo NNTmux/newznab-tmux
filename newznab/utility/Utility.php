@@ -846,7 +846,7 @@ class Utility
 	{
 		if (is_array($data)) {
 			foreach ($data as $key => $value) {
-				$data[$key] = encodeAsUTF8($value);
+				$data[$key] = utf8ize($value);
 			}
 		} else {
 			if (is_string($data)) {
