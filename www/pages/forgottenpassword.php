@@ -2,12 +2,14 @@
 
 use newznab\utility\Utility;
 
-if ($page->users->isLoggedIn())
-	$page->show404();
+if ($page->users->isLoggedIn()) {
+	header('Location: ' . WWW_TOP . '/');
+}
 
 $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view';
 
 $captcha = new Captcha($page);
+$email = $sent = $confirmed = '';
 
 switch($action) {
 	case "reset":
@@ -34,8 +36,7 @@ switch($action) {
 			$onscreen = "Your password has been reset to <strong>" . $newpass ."</strong> and sent to your e-mail address.";
 			Utility::sendEmail($to, $subject, $contents, $page->settings->getSetting('email'));
 			$page->smarty->assign('notice',  $onscreen);
-			$page->smarty->assign('confirmed', "true");
-
+			$confirmed = "true";
 			break;
 		}
 
@@ -43,17 +44,17 @@ switch($action) {
 	case 'submit':
 
 		if ($captcha->getError() === false) {
-			$page->smarty->assign('email', $_POST['email']);
-
-			if ($_POST['email'] == "") {
+			$email = $_POST['email'];
+			if ($email == '') {
 				$page->smarty->assign('error', "Missing Email");
 			} else {
 				//
 				// Check users exists and send an email
 				//
-				$ret = $page->users->getByEmail($_POST['email']);
+				$ret = $page->users->getByEmail($email);
 				if (!$ret) {
 					$page->smarty->assign('error', "The email address is not recognised.");
+					$sent = "true";
 					break;
 				} else {
 					//
@@ -68,14 +69,20 @@ switch($action) {
 					$to = $ret["email"];
 					$subject = $page->settings->getSetting('title') . " Forgotten Password Request";
 					$contents = "Someone has requested a password reset for this email address. To reset the password use the following link.\n\n " . $page->serverurl . "forgottenpassword?action=reset&guid=" . $guid;
-					$page->smarty->assign('sent', "true");
 					Utility::sendEmail($to, $subject, $contents, $page->settings->getSetting('email'));
+					$sent = "true";
 					break;
 				}
 			}
 			break;
 		}
 }
+$page->smarty->assign([
+		'email'     => $email,
+		'confirmed' => $confirmed,
+		'sent'      => $sent
+	]
+);
 
 $page->title = "Forgotten Password";
 $page->meta_title = "Forgotten Password";
