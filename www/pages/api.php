@@ -113,7 +113,7 @@ if ($uid != '') {
 	}
 }
 
-$releases = new \Releases(['Settings' => $page->settings]);
+$releases = new Releases(['Settings' => $page->settings]);
 
 $page->smarty->assign('extended', (isset($_GET['extended']) && $_GET['extended'] == 1 ? '1' : '0'));
 $page->smarty->assign('del', (isset($_GET['del']) && $_GET['del'] == 1 ? '1' : '0'));
@@ -616,10 +616,14 @@ function printOutput($data, $xml = true, $page, $offset = 0)
 		header('Content-Length: ' . strlen($response) );
 		echo $response;
 	} else {
-		$response = json_encode($data);
-		header('Content-type: application/json');
-		header('Content-Length: ' . strlen($response) );
-		echo json_encode($data);
+		$response = encodeAsJSON($data);
+		if ($response != false) {
+			header('Content-type: application/json');
+			header('Content-Length: ' . strlen($response));
+			echo $response;
+		} else {
+			echo 'No data returned or error occured';
+		}
 	}
 }
 
@@ -662,4 +666,13 @@ function addLanguage(&$releases, Settings $settings)
 			}
 		}
 	}
+}
+
+function encodeAsJSON($data)
+{
+	$json = json_encode(Utility::encodeAsUTF8($data));
+	if ($json === false) {
+		showApiError(201);
+	}
+	return $json;
 }
