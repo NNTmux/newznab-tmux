@@ -20,7 +20,6 @@ class TvRage extends TV
 	 */
 	public $catWhere;
 
-	public $echooutput;
 	public $rageqty;
 	public $showInfoUrl         = 'http://www.tvrage.com/shows/id-';
 	public $showQuickInfoURL    = 'http://services.tvrage.com/tools/quickinfo.php?show=';
@@ -37,7 +36,6 @@ class TvRage extends TV
 	{
 		parent::__construct($options);
 		$this->rageqty = ($this->pdo->getSetting('maxrageprocessed') != '') ? $this->pdo->getSetting('maxrageprocessed') : 75;
-		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
 		$this->xmlEpisodeInfoUrl = "http://services.tvrage.com/myfeeds/episodeinfo.php?key=" . TvRage::APIKEY;
 	}
 
