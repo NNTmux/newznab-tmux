@@ -2,6 +2,9 @@
 
 use newznab\db\Settings;
 
+/**
+ * Class RequestID
+ */
 abstract class RequestID
 {
 	// Request id.
