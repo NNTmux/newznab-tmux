@@ -104,8 +104,8 @@
 						<button type="submit" class="btn btn-primary">Login</button>
 					</fieldset>
 				</form>
-				<a href="{$serverroot}}forgottenpassword" class="text-center">I forgot my password</a><br>
-				<a href="{$serverroot}}register" class="text-center">Register a new membership</a>
+				<a href="{$serverroot}forgottenpassword" class="text-center">I forgot my password</a><br>
+				<a href="{$serverroot}register" class="text-center">Register a new membership</a>
 			</div>
 			<!--/span-->
 		</div>
