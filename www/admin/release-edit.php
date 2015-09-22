@@ -2,7 +2,7 @@
 
 require_once("config.php");
 
-$page = new AdminPage(true);
+$page = new AdminPage();
 $releases = new Releases(['Settings' => $page->settings]);
 $category = new Category(['Settings' => $page->settings]);
 $id = 0;
