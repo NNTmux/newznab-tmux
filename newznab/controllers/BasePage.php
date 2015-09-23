@@ -258,7 +258,7 @@ class BasePage
 					<body>
 						<h1>404 - File not found.</h1>
 						<p>%s%s</p>
-						<p>We could not find the above page on our servers.</p>
+						<p>We could not find the above page or file on our servers.</p>
 					</body>
 				</html>",
 			$this->serverurl,
