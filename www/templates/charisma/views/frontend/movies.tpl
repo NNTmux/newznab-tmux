@@ -120,8 +120,8 @@
 								<div class="col-md-6 small-gutter-right movie-height">
 									<div class="panel panel-default">
 										<div class="panel-body">
-											<div class="row">
-												<div class="col-md-3">
+											<div class="row small-gutter-left">
+												<div class="col-md-3 small-gutter-left">
 													{foreach from=$result.languages item=movielanguage}
 														{release_flag($movielanguage, browse)}
 													{/foreach}
@@ -135,6 +135,7 @@
 													{assign var="mtotalparts" value=","|explode:$result.grp_release_totalparts}
 													{assign var="mcomments" value=","|explode:$result.grp_release_comments}
 													{assign var="mgrabs" value=","|explode:$result.grp_release_grabs}
+													{assign var="mfailed" value=","|explode:$result.grp_release_failed}
 													{assign var="mpass" value=","|explode:$result.grp_release_password}
 													{assign var="minnerfiles" value=","|explode:$result.grp_rarinnerfilecount}
 													{assign var="mhaspreview" value=","|explode:$result.grp_haspreview}
@@ -144,7 +145,7 @@
 																class="cover"
 																src="{if $result.cover == 1}{$smarty.const.WWW_TOP}covers/movies/{$result.imdbid}-cover.jpg{else}{$smarty.const.WWW_TOP}templates_shared/images/nocover.png{/if}"
 																width="100" border="0"
-																alt="{$result.title|escape:"htmlall"}"/></a>
+																alt="{$result.title|escape:"htmlall"}"/> {if $mfailed[$m@index]} <i class="fa fa-exclamation-circle" style="color: red" title="This release has failed for some users"></i>{/if}</a>
 													<a target="_blank"
 													   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$result.imdbid}/"
 													   name="imdb{$result.imdbid}" title="View IMDB page"
@@ -161,7 +162,7 @@
 													   href="{$smarty.const.WWW_TOP}/browse?g={$result.grp_release_grpname}"
 													   title="Browse releases in {$result.grp_release_grpname|replace:"alt.binaries":"a.b"}">Group</a>
 												</div>
-												<div class="col-md-9">
+												<div class="col-md-9 small-gutter-left">
 																<span class="release-title"><a class="text-muted"
 																							   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}">{$result.title|escape:"htmlall"}</a></span>
 													<div class="release-subtitle">{if $result.genre != ''}
@@ -219,6 +220,10 @@
 																	  title="Add to CouchPotato"
 																		><i class="fa fa-send-o"></i></span>
 															{/if}
+															{if $mfailed[$m@index] > 0}
+																<span class="btn btn-default btn-xs" title="This release has failed to download for some users">
+																	<i class ="fa fa-thumbs-o-up"></i> {$mgrabs[$m@index]} Grabs / <i class ="fa fa-thumbs-o-down"></i> {$mfailed[$m@index]} Failed Downloads</span>
+															{/if}
 														</div>
 													</div>
 													{/if}
@@ -231,11 +236,11 @@
 								<!-- /Left -->
 								{else}
 								<!-- Right -->
-								<div class="col-md-6 movie-height">
+								<div class="col-md-6 small-gutter-left movie-height">
 									<div class="panel panel-default">
 										<div class="panel-body">
-											<div class="row">
-												<div class="col-md-3">
+											<div class="row small-gutter-left">
+												<div class="col-md-3 small-gutter-left">
 													{foreach from=$result.languages item=movielanguage}
 														{release_flag($movielanguage, browse)}
 													{/foreach}
@@ -249,6 +254,7 @@
 													{assign var="mtotalparts" value=","|explode:$result.grp_release_totalparts}
 													{assign var="mcomments" value=","|explode:$result.grp_release_comments}
 													{assign var="mgrabs" value=","|explode:$result.grp_release_grabs}
+													{assign var="mfailed" value=","|explode:$result.grp_release_failed}
 													{assign var="mpass" value=","|explode:$result.grp_release_password}
 													{assign var="minnerfiles" value=","|explode:$result.grp_rarinnerfilecount}
 													{assign var="mhaspreview" value=","|explode:$result.grp_haspreview}
@@ -258,7 +264,7 @@
 																class="cover"
 																src="{if $result.cover == 1}{$smarty.const.WWW_TOP}covers/movies/{$result.imdbid}-cover.jpg{else}{$smarty.const.WWW_TOP}templates_shared/images/nocover.png{/if}"
 																width="100" border="0"
-																alt="{$result.title|escape:"htmlall"}"/></a>
+																alt="{$result.title|escape:"htmlall"}"/> {if $mfailed[$m@index] > 0} <i class="fa fa-exclamation-circle" style="color: red" title="This release has failed to download for some users"></i>{/if}</a>
 													<a target="_blank"
 													   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$result.imdbid}/"
 													   name="imdb{$result.imdbid}" title="View IMDB page"
@@ -275,7 +281,7 @@
 													   href="{$smarty.const.WWW_TOP}/browse?g={$result.grp_release_grpname}"
 													   title="Browse releases in {$result.grp_release_grpname|replace:"alt.binaries":"a.b"}">Group</a>
 												</div>
-												<div class="col-md-9">
+												<div class="col-md-9 small-gutter-left">
 																<span class="release-title"><a class="text-muted"
 																							   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}">{$result.title|escape:"htmlall"}</a></span>
 													<div class="release-subtitle">{if $result.genre != ''}
@@ -326,13 +332,17 @@
 															{/if}
 															{if $cpurl != '' && $cpapi != ''}
 																<span class="btn btn-hover btn-default btn-xs sendtocouch text-muted"
-																	  target="blackhole"
-																	  href="javascript:"
-																	  rel="{$cpurl}/api/{$cpapi}/movie.add/?identifier=tt{$result.imdbid}&title={$result.title}"
-																	  name="CP{$result.imdbid}"
-																	  title="Add to CouchPotato"
+																		target="blackhole"
+																		href="javascript:"
+																		rel="{$cpurl}/api/{$cpapi}/movie.add/?identifier=tt{$result.imdbid}&title={$result.title}"
+																		name="CP{$result.imdbid}"
+																		title="Add to CouchPotato"
 																		><i class="fa fa-send-o"></i></span>
 															{/if}
+															{if $mfailed[$m@index] > 0}
+																<span class="btn btn-default btn-xs" title="This release has failed to download for some users">
+																	<i class ="fa fa-thumbs-o-up"></i> {$mgrabs[$m@index]} Grabs / <i class ="fa fa-thumbs-o-down"></i> {$mfailed[$m@index]} Failed Downloads</span>
+																{/if}
 														</div>
 													</div>
 													{/if}

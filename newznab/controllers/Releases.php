@@ -2243,6 +2243,16 @@ class Releases
 	}
 
 	/**
+	 * @param string $guid
+	 */
+	public function updateFail($guid)
+	{
+		$this->pdo->queryExec(
+			sprintf('UPDATE releases SET failed = failed + 1 WHERE guid = %s', $this->pdo->escapeString($guid))
+		);
+	}
+
+	/**
 	 * @return array
 	 */
 	public function getTopDownloads()
@@ -2999,6 +3009,8 @@ class Releases
 				$this->pdo->escapeString($guid)
 				)
 		);
+
+		$this->updateFail($guid);
 
 		$alternate = $this->pdo->queryOneRow(sprintf('SELECT * FROM releases r
 			WHERE r.searchname %s

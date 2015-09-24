@@ -5,7 +5,7 @@ require_once dirname(__FILE__) . '/../../www/config.php';
 
 use newznab\db\Settings;
 
-$console = new Console(true);
+$console = new Console(['Echo' => true, 'Settings' => $pdo]);
 
 $db = new Settings();
 
