@@ -127,7 +127,7 @@ switch ($function) {
 		verifyEmptyParameter('q');
 		$maxAge = maxAge();
 		$page->users->addApiRequest($uid, $_SERVER['REQUEST_URI']);
-		$categoryID = categoryid();
+		$categoryID = categoryID();
 		$limit = limit();
 		$offset = offset();
 
@@ -164,7 +164,7 @@ switch ($function) {
 			$offset,
 			limit(),
 			(isset($_GET['q']) ? $_GET['q'] : ''),
-			categoryid(),
+			categoryID(),
 			$maxAge
 		);
 
@@ -362,7 +362,7 @@ switch ($function) {
 			$offset,
 			limit(),
 			(isset($_GET['q']) ? $_GET['q'] : ''),
-			categoryid(),
+			categoryID(),
 			$maxAge
 		);
 
@@ -558,15 +558,14 @@ function maxAge()
  * Verify cat parameter.
  * @return array
  */
-function categoryid()
+function categoryID()
 {
-	$categoryID = [];
 	$categoryID[] = -1;
 	if (isset($_GET['cat'])) {
-		$categoryIDs = $_GET['cat'];
-		// Append Web-DL category id if HD present for SickBeard / NZBDrone compatibility.
-		if (strpos($_GET['cat'], (string)Category::CAT_TV_HD) !== false &&
-			strpos($_GET['cat'], (string)Category::CAT_TV_WEBDL) === false) {
+		$categoryIDs = urldecode($_GET['cat']);
+		// Append Web-DL category ID if HD present for SickBeard / NZBDrone compatibility.
+		if (strpos($categoryIDs, (string)Category::CAT_TV_HD) !== false &&
+			strpos($categoryIDs, (string)Category::CAT_TV_WEBDL) === false) {
 			$categoryIDs .= (',' . Category::CAT_TV_WEBDL);
 		}
 		$categoryID = explode(',', $categoryIDs);
@@ -612,11 +611,19 @@ function printOutput($data, $xml = true, $page, $offset = 0)
 	if ($xml) {
 		$page->smarty->assign('offset', $offset);
 		$page->smarty->assign('releases', $data);
+		$response = trim($page->smarty->fetch('apiresult.tpl'));
 		header('Content-type: text/xml');
-		echo trim($page->smarty->fetch('apiresult.tpl'));
+		header('Content-Length: ' . strlen($response) );
+		echo $response;
 	} else {
-		header('Content-type: application/json');
-		echo json_encode($data);
+		$response = encodeAsJSON($data);
+		if ($response != false) {
+			header('Content-type: application/json');
+			header('Content-Length: ' . strlen($response));
+			echo $response;
+		} else {
+			echo 'No data returned or error occured';
+		}
 	}
 }
 
@@ -644,10 +651,10 @@ function addCoverURL(&$releases, callable $getCoverURL)
 /**
  * Add language from media info XML to release search names.
  * @param array             $releases
- * @param \newznab\db\Settings $settings
+ * @param newznab\db\Settings $settings
  * @return array
  */
-function addLanguage(&$releases, \newznab\db\Settings $settings)
+function addLanguage(&$releases, Settings $settings)
 {
 	if ($releases && count($releases)) {
 		foreach ($releases as $key => $release) {
@@ -659,4 +666,13 @@ function addLanguage(&$releases, \newznab\db\Settings $settings)
 			}
 		}
 	}
+}
+
+function encodeAsJSON($data)
+{
+	$json = json_encode(Utility::encodeAsUTF8($data));
+	if ($json === false) {
+		showApiError(201);
+	}
+	return $json;
 }

@@ -1,7 +1,7 @@
 <?php
 require_once(dirname(__FILE__) . '/config.php');
 
-use newznab\processing\PProcess;
+use newznab\processing\PostProcess;
 
 
 $c = new ColorCLI();
@@ -15,7 +15,7 @@ $torun = $tmux->get()->post;
 
 $pieces = explode('           =+=            ', $argv[1]);
 
-$postprocess = new PProcess(['Echo' => true]);
+$postprocess = new PostProcess(['Echo' => true]);
 if (isset($pieces[6])) {
 	// Create the connection here and pass
 	$nntp = new NNTP();

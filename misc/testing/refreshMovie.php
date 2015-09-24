@@ -4,8 +4,8 @@ require_once dirname(__FILE__) . '/../../www/config.php';
 
 use newznab\db\Settings;
 
-$movie = new Movie(true);
 $db = new Settings();
+$movie = new Movie(['Echo' => true, 'Settings' => $pdo]);
 $movies = [];
 $counter = 1;
 $sleepsecsbetweenscrape = 1;

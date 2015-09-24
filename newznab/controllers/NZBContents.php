@@ -1,7 +1,7 @@
 <?php
 
 use newznab\db\Settings;
-use \newznab\processing\PProcess;
+use \newznab\processing\PostProcess;
 use newznab\utility\Utility;
 
 /**
@@ -30,7 +30,7 @@ Class NZBContents
 	protected $nfo;
 
 	/**
-	 * @var PProcess
+	 * @var PostProcess
 	 * @access protected
 	 */
 	protected $pp;
@@ -69,7 +69,7 @@ Class NZBContents
 	 *         'Nfo'         => Nfo         ; Class Nfo.
 	 *         'NZB'         => NZB         ; Class NZB.
 	 *         'Settings'    => DB          ; Class newznab\db\Settings.
-	 *         'PostProcess' => PProcess ; Class PProcess.
+	 *         'PostProcess' => PostProcess ; Class PostProcess.
 	 *     )
 	 *
 	 * @access public
@@ -91,9 +91,9 @@ Class NZBContents
 		$this->nntp = ($options['NNTP'] instanceof \NNTP ? $options['NNTP'] : new \NNTP(['Echo' => $this->echooutput, 'Settings' => $this->pdo]));
 		$this->nfo = ($options['Nfo'] instanceof \Nfo ? $options['Nfo'] : new \Nfo(['Echo' => $this->echooutput, 'Settings' => $this->pdo]));
 		$this->pp = (
-		$options['PostProcess'] instanceof PProcess
+		$options['PostProcess'] instanceof PostProcess
 			? $options['PostProcess']
-			: new PProcess(['Echo' => $this->echooutput, 'Nfo' => $this->nfo, 'Settings' => $this->pdo])
+			: new PostProcess(['Echo' => $this->echooutput, 'Nfo' => $this->nfo, 'Settings' => $this->pdo])
 		);
 		$this->nzb = ($options['NZB'] instanceof \NZB ? $options['NZB'] : new \NZB($this->pdo));
 		$t = new Tmux();

@@ -608,11 +608,9 @@ class Utility
 		}
 		$settings = new Settings();
 
-		$site_email = $settings->getSetting('email');
-
-		$fromEmail = (PHPMAILER_FROM_EMAIL === '') ? $site_email : PHPMAILER_FROM_EMAIL;
-		$fromName = (PHPMAILER_FROM_NAME === '') ? $settings->title : PHPMAILER_FROM_NAME;
-		$replyTo = (PHPMAILER_REPLYTO === '') ? $site_email : PHPMAILER_REPLYTO;
+		$fromEmail = (PHPMAILER_FROM_EMAIL == '') ? $settings->getSetting('email') : PHPMAILER_FROM_EMAIL;
+		$fromName  = (PHPMAILER_FROM_NAME == '') ? $settings->getSetting('title') : PHPMAILER_FROM_NAME;
+		$replyTo   = (PHPMAILER_REPLYTO == '') ? $from : PHPMAILER_REPLYTO;
 
 		(PHPMAILER_BCC !== '') ? $mail->addBCC(PHPMAILER_BCC) : null;
 
@@ -831,6 +829,29 @@ class Utility
 		$xml = @simplexml_load_string($input);
 
 		return $xml;
+	}
+
+	/**
+	 * @note: Convert non-UTF-8 characters into UTF-8
+	 * Function taken from http://stackoverflow.com/a/19366999
+	 *
+	 * @param $data
+	 *
+	 * @return array|string
+	 */
+	public static function encodeAsUTF8($data)
+	{
+		if (is_array($data)) {
+			foreach ($data as $key => $value) {
+				$data[$key] = Utility::encodeAsUTF8($value);
+			}
+		} else {
+			if (is_string($data)) {
+				return utf8_encode($data);
+			}
+		}
+
+		return $data;
 	}
 
 }

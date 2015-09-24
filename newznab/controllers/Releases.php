@@ -2,7 +2,7 @@
 
 use newznab\db\Settings;
 use newznab\utility\Utility;
-use newznab\processing\PProcess;
+use newznab\processing\PostProcess;
 
 /**
  * This class handles storage and retrieval of releases rows and the main processing functions
@@ -1897,13 +1897,13 @@ class Releases
 			$nzbInfo = new NZBInfo;
 			if (!$nzbInfo->loadFromFile($nzbfile)) {
 				$this->pdo->log->doEcho($this->pdo->log->primary('Failed to write nzb file (bad perms?) ' . $nzbfile . ''));
-				$this->delete($relid);
+				$this->deleteSingle(['g' => $relguid, 'i' => $relid], $this->nzb, $this->releaseImage);
 			} else {
 				// Check if gid already exists
 				$dupes = $this->pdo->queryOneRow(sprintf("SELECT EXISTS(SELECT 1 FROM releases WHERE gid = %s) AS total", $this->pdo->escapeString($nzbInfo->gid)));
 				if ($dupes['total'] > 0) {
 					$this->pdo->log->doEcho($this->pdo->log->primary('Duplicate - ' . $cleanRelName . ''));
-					$this->delete($relid);
+					$this->deleteSingle(['g' => $relguid, 'i' => $relid], $this->nzb, $this->releaseImage);
 					$duplicate++;
 				} else {
 					$this->pdo->queryExec(sprintf("UPDATE releases SET totalpart = %d, size = %s, COMPLETION = %d, GID=%s , nzb_guid = %s WHERE id = %d",
@@ -1993,7 +1993,7 @@ class Releases
 	public function postProcessReleases($postProcess, &$nntp)
 	{
 		if ($postProcess == 1) {
-			(new PProcess(['Echo' => $this->echoCLI, 'Settings' => $this->pdo, 'Groups' => $this->groups]))->processAll($nntp);
+			(new PostProcess(['Echo' => $this->echoCLI, 'Settings' => $this->pdo, 'Groups' => $this->groups]))->processAll($nntp);
 		} else {
 			if ($this->echoCLI) {
 				$this->pdo->log->doEcho(
@@ -2173,63 +2173,6 @@ class Releases
 		return $parameters['id'];
 	}
 
-
-	/**
-	 * @param      $id
-	 * @param bool $isGuid
-	 */
-	public function delete($id, $isGuid = false)
-	{
-
-		$users = new Users();
-		$s = new Settings();
-		$nfo = new Nfo();
-		$rf = new ReleaseFiles();
-		$re = new ReleaseExtra();
-		$rc = new ReleaseComments();
-		$ri = new ReleaseImage();
-
-		if (!is_array($id))
-			$id = [$id];
-
-		foreach ($id as $identifier) {
-			//
-			// delete from disk.
-			//
-			$rel = ($isGuid) ? $this->getByGuid($identifier) : $this->getById($identifier);
-
-			$nzbpath = "";
-			if ($isGuid)
-				$nzbpath = $s->getSetting('nzbpath') . substr($identifier, 0, 1) . "/" . $identifier . ".nzb.gz";
-			elseif ($rel)
-				$nzbpath = $s->getSetting('nzbpath') . substr($rel["guid"], 0, 1) . "/" . $rel["guid"] . ".nzb.gz";
-
-			if ($nzbpath != "" && file_exists($nzbpath))
-				unlink($nzbpath);
-
-			$audiopreviewpath = "";
-			if ($isGuid)
-				$audiopreviewpath = WWW_DIR . 'covers/audio/' . $identifier . ".mp3";
-			elseif ($rel)
-				$audiopreviewpath = WWW_DIR . 'covers/audio/' . $rel["guid"] . ".mp3";
-
-			if ($audiopreviewpath && file_exists($audiopreviewpath))
-				unlink($audiopreviewpath);
-
-			if ($rel) {
-				$nfo->deleteReleaseNfo($rel['id']);
-				$rc->deleteCommentsForRelease($rel['id']);
-				$users->delCartForRelease($rel['id']);
-				$users->delDownloadRequestsForRelease($rel['id']);
-				$rf->delete($rel['id']);
-				$re->delete($rel['id']);
-				$re->deleteFull($rel['id']);
-				$ri->delete($rel['guid']);
-				$this->pdo->queryExec(sprintf("DELETE FROM releases WHERE id = %d", $rel['id']));
-			}
-		}
-	}
-
 	/**
 	 * Deletes a single release by GUID, and all the corresponding files.
 	 *
@@ -2268,6 +2211,44 @@ class Releases
 				WHERE r.guid = %s',
 				$this->pdo->escapeString($identifiers['g'])
 			)
+		);
+	}
+
+	/**
+	 * Delete multiple releases, or a single by ID.
+	 *
+	 * @param array|int|string $list   Array of GUID or ID of releases to delete.
+	 * @param bool             $isGUID Are the identifiers GUID or ID?
+	 */
+	public function deleteMultiple($list, $isGUID = false)
+	{
+		if (!is_array($list)) {
+			$list = [$list];
+		}
+
+		$nzb = new NZB($this->pdo);
+		$releaseImage = new ReleaseImage($this->pdo);
+
+		foreach ($list as $identifier) {
+			if ($isGUID) {
+				$this->deleteSingle(['g' => $identifier, 'i' => false], $nzb, $releaseImage);
+			} else {
+				$release = $this->pdo->queryOneRow(sprintf('SELECT guid FROM releases WHERE id = %d', $identifier));
+				if ($release === false) {
+					continue;
+				}
+				$this->deleteSingle(['g' => $release['guid'], 'i' => false], $nzb, $releaseImage);
+			}
+		}
+	}
+
+	/**
+	 * @param string $guid
+	 */
+	public function updateFail($guid)
+	{
+		$this->pdo->queryExec(
+			sprintf('UPDATE releases SET failed = failed + 1 WHERE guid = %s', $this->pdo->escapeString($guid))
 		);
 	}
 
@@ -3029,9 +3010,11 @@ class Releases
 				)
 		);
 
+		$this->updateFail($guid);
+
 		$alternate = $this->pdo->queryOneRow(sprintf('SELECT * FROM releases r
 			WHERE r.searchname %s
-			AND r.guid NOT IN (SELECT guid FROM failed_downloads WHERE userid = %d)',
+			AND r.guid NOT IN (SELECT guid FROM dnzb_failures WHERE userid = %d)',
 			$this->pdo->likeString($searchname),
 			$userid
 			)

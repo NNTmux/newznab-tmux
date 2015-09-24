@@ -2,7 +2,7 @@
 
 <form action="{$SCRIPT_NAME}?action=submit" method="post">
 
-{if $error != ''}
+{if isset($error) && $error != ''}
 	<div class="error">{$error}</div>
 {/if}
 

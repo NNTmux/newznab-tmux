@@ -1,0 +1,14 @@
+<?php
+
+define('NEWZNAB_URL','http://myhost');
+define('NEWZNAB_HOME','/path/to/newznab');
+define('SHOW_MOVIES','checked');
+define('SHOW_TV','checked');
+define('SHOW_MUSIC','checked');
+define('SHOW_GAMES','checked');
+define('SHOW_PC','checked');
+define('SHOW_OTHER','checked');
+define('SHOW_XXX','checked');
+define('SHOW_PROCESSING','checked');
+define('SHOW_RPC','checked');
+define('SHOW_RPG','checked');

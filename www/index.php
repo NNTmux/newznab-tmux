@@ -78,6 +78,7 @@ switch ($page->page) {
 			break;
 		}
 	case 'api':
+	case 'failed':
 	case 'getnzb':
 	case 'login':
 	case 'preinfo':

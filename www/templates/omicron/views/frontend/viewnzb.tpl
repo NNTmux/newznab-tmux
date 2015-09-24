@@ -12,7 +12,8 @@
 		<div class="col-xlg-12 portlets">
 			<div class="panel panel-default">
 				<div class="panel-body pagination2">
-					<h1>{$release.searchname|escape:"htmlall"}</h1>
+					<h1>{$release.searchname|escape:"htmlall"} {if $release.failed > 0}<span class="btn btn-default btn-xs" title="This release has failed to download for some users">
+							<i class ="fa fa-thumbs-o-up"></i> {$release.grabs} Grabs / <i class ="fa fa-thumbs-o-down"></i> {$release.failed} Failed Downloads</span>{/if}</h1>
 					{if isset($isadmin)}
 						<a class="label label-warning"
 						   href="{$smarty.const.WWW_TOP}/admin/release-edit.php?id={$release.id}&amp;from={$smarty.server.REQUEST_URI}"
@@ -48,7 +49,7 @@
 					{if $rage && $release.rageid > 0}
 						<a href="{$smarty.const.WWW_TOP}/myshows/add/{$release.rageid}?from={$smarty.server.REQUEST_URI|escape:"url"}"
 						   class="label label-success">Add to My Shows</a>
-						<a class="label label-default" href="{$serverroor}series/{$release.rageid}"
+						<a class="label label-default" href="{$serverroot}series/{$release.rageid}"
 						   title="View all releases for this series">View all episodes</a>
 						<a class="label label-default" target="_blank"
 						   href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$release.rageid}"
@@ -139,8 +140,8 @@
 								</ul>
 								<div class="tab-content">
 									<div id="pane1" class="tab-pane active">
-										<div class="row no-gutter">
-											<div class="col-md-3 no-gutter">
+										<div class="row small-gutter-left">
+											<div class="col-md-3 small-gutter-left">
 												{if $movie && $release.rageid < 0 && $movie.cover == 1}
 													<img src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbid}-cover.jpg"
 														 width="185"
@@ -229,7 +230,7 @@
 													<p id="demo"></p>
 												</div>
 											</div>
-											<div class="col-md-9 no-gutter">
+											<div class="col-md-9 small-gutter-left">
 												<table cellpadding="0" cellspacing="0"
 													   width="100%">
 													<tbody>
@@ -448,6 +449,11 @@
 																	<th width="140">Grabs</th>
 																	<td>{$release.grabs}
 																		time{if $release.grabs==1}{else}s{/if}</td>
+																</tr>
+																<tr>
+																	<th width="140">Failed Download</th>
+																	<td>{$release.failed}
+																		time{if $release.failed==1}{else}s{/if}</td>
 																</tr>
 																<tr>
 																	<th width="140">Password

@@ -96,8 +96,7 @@ class BasePage
 		$this->page = (isset($_GET['page'])) ? $_GET['page'] : 'content';
 
 		$this->users = new Users(['Settings' => $this->settings]);
-		if ($this->users->isLoggedIn())
-		{
+		if ($this->users->isLoggedIn()) {
 			$this->userdata = $this->users->getById($this->users->currentUserId());
 			$this->userdata["categoryexclusions"] = $this->users->getCategoryExclusion($this->users->currentUserId());
 
@@ -146,16 +145,12 @@ class BasePage
 				$this->settings->setSetting(['adbrowse', '']);
 				$this->settings->setSetting(['addetail', '']);
 			}
-
-			$this->floodCheck($this->userdata["role"]);
 		}
 		else
 		{
 			$this->smarty->assign('isadmin', 'false');
 			$this->smarty->assign('ismod', 'false');
 			$this->smarty->assign('loggedin', 'false');
-			$this->floodCheck();
-
 		}
 
 		$this->smarty->assign('site', $this->settings);
@@ -263,7 +258,7 @@ class BasePage
 					<body>
 						<h1>404 - File not found.</h1>
 						<p>%s%s</p>
-						<p>We could not find the above page on our servers.</p>
+						<p>We could not find the above page or file on our servers.</p>
 					</body>
 				</html>",
 			$this->serverurl,

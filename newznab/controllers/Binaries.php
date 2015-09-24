@@ -9,8 +9,8 @@ use newznab\db\Settings;
 */
 class Binaries
 {
-	const OPT_BLACKLIST = 1;
-	const OPT_WHITELIST = 2;
+	const OPTYPE_BLACKLIST = 1;
+	const OPTYPE_WHITELIST = 2;
 
 	const BLACKLIST_DISABLED = 0;
 	const BLACKLIST_ENABLED = 1;
@@ -18,6 +18,19 @@ class Binaries
 	const BLACKLIST_FIELD_SUBJECT = 1;
 	const BLACKLIST_FIELD_FROM = 2;
 	const BLACKLIST_FIELD_MESSAGEID = 3;
+
+	/**
+	 * Cache of black list regexes.
+	 *
+	 * @var array
+	 */
+	public $blackList = [];
+
+	/**
+	 * Cache of white list regexes.
+	 * @var array
+	 */
+	public $whiteList = [];
 
 	/**
 	 * How many headers do we download per loop?
@@ -112,6 +125,12 @@ class Binaries
 	protected $_partRepairMaxTries;
 
 	/**
+	 * An array of binaryblacklist IDs that should have their activity date updated
+	 * @var array(int)
+	 */
+	protected $_binaryBlacklistIdsToUpdate = [];
+
+	/**
 	 * Constructor.
 	 *
 	 * @param array $options Class instances / echo to CLI?
@@ -164,6 +183,8 @@ class Binaries
 		$this->startHeaders = microtime(true);
 
 		$this->onlyProcessRegexBinaries = false;
+
+		$this->blackList = $this->whiteList = [];
 	}
 
 	/**
@@ -729,6 +750,16 @@ class Binaries
 						}
 					}
 				}
+
+				if (!empty($this->_binaryBlacklistIdsToUpdate)) {
+					$this->_pdo->queryExec(
+						sprintf('UPDATE binaryblacklist SET last_activity = NOW() WHERE id IN (%s)',
+							implode(',', $this->_binaryBlacklistIdsToUpdate)
+						)
+					);
+					$this->_binaryBlacklistIdsToUpdate = [];
+				}
+
 				//TODO: determine whether to add to missing articles if insert failed
 				if (sizeof($msgsnotinserted) > 0) {
 					echo 'WARNING: ' . count($msgsnotinserted) . ' Parts failed to insert' . $n;
@@ -937,74 +968,79 @@ class Binaries
 	}
 
 	/**
-	 * Return internally cached list of binary blacklist patterns.
+	 * Are white or black lists loaded for a group name?
+	 * @var array
 	 */
-	public function retrieveBlackList()
-	{
-		if (is_array($this->blackList) && !empty($this->blackList)) {
-			return $this->blackList;
-		}
-		$blackList = $this->getBlacklist(true);
-		$this->blackList = $blackList;
+	protected $_listsFound = [];
 
-		return $blackList;
+	/**
+	 * Get blacklist and cache it. Return if already cached.
+	 *
+	 * @param string $groupName
+	 *
+	 * @return void
+	 */
+	protected function _retrieveBlackList($groupName)
+	{
+		if (!isset($this->blackList[$groupName])) {
+			$this->blackList[$groupName] = $this->getBlacklist(true, self::OPTYPE_BLACKLIST, $groupName, true);
+		}
+		if (!isset($this->whiteList[$groupName])) {
+			$this->whiteList[$groupName] = $this->getBlacklist(true, self::OPTYPE_WHITELIST, $groupName, true);
+		}
+		$this->_listsFound[$groupName] = ($this->blackList[$groupName] || $this->whiteList[$groupName]);
 	}
 
 	/**
-	 * Test if a message subject is blacklisted.
+	 * Check if an article is blacklisted.
+	 *
+	 * @param array  $msg       The article header (OVER format).
+	 * @param string $groupName The group name.
+	 *
+	 * @return bool
 	 */
 	public function isBlackListed($msg, $groupName)
 	{
-		if (empty($this->blackList_by_group[$groupName])) {
-			$main_blackList = $this->retrieveBlackList();
-			$this->blackList_by_group[$groupName] = array();
-			foreach ($main_blackList as $blist) {
-				if (preg_match('/^' . $blist['groupname'] . '$/i', $groupName)) {
-					$this->blackList_by_group[$groupName][] = $blist;
+		if (!isset($this->_listsFound[$groupName])) {
+			$this->_retrieveBlackList($groupName);
+		}
+		if (!$this->_listsFound[$groupName]) {
+			return false;
+		}
+
+		$blackListed = false;
+
+		$field = [
+			self::BLACKLIST_FIELD_SUBJECT   => $msg['Subject'],
+			self::BLACKLIST_FIELD_FROM      => $msg['From'],
+			self::BLACKLIST_FIELD_MESSAGEID => $msg['Message-ID']
+		];
+
+		// Try white lists first.
+		if ($this->whiteList[$groupName]) {
+			// There are white lists for this group, so anything that doesn't match a white list should be considered black listed.
+			$blackListed = true;
+			foreach ($this->whiteList[$groupName] as $whiteList) {
+				if (preg_match('/' . $whiteList['regex'] . '/i', $field[$whiteList['msgcol']])) {
+					// This field matched a white list, so it might not be black listed.
+					$blackListed = false;
+					$this->_binaryBlacklistIdsToUpdate[$whiteList['id']] = $whiteList['id'];
+					break;
 				}
 			}
 		}
 
-		$blackList = $this->blackList_by_group[$groupName];
-		$field = array();
-		if (isset($msg["Subject"]))
-			$field[Binaries::BLACKLIST_FIELD_SUBJECT] = $msg["Subject"];
-
-		if (isset($msg["From"]))
-			$field[Binaries::BLACKLIST_FIELD_FROM] = $msg["From"];
-
-		if (isset($msg["Message-ID"]))
-			$field[Binaries::BLACKLIST_FIELD_MESSAGEID] = $msg["Message-ID"];
-
-		// if a white list is detected we now are required to
-		// only accept the entry if it matches at least 1 whitelist
-		// while a blacklist will over-ride all
-		$whitelist = array();
-		$matches_whitelist = false;
-
-		foreach ($blackList as $blist) {
-			//blacklist
-			if ($blist['optype'] == Binaries::OPT_BLACKLIST) {
-				if (preg_match('/' . $blist['regex'] . '/i', $field[$blist['msgcol']])) {
-					return true;
-				}
-			} else if ($blist['optype'] == Binaries::OPT_WHITELIST) {
-				$whitelist[] = $blist['regex'];
-				if (preg_match('/' . $blist['regex'] . '/i', $field[$blist['msgcol']])) {
-					// Flag that we matched the white list
-					$matches_whitelist = true;
+		// Check if the field is black listed.
+		if (!$blackListed && $this->blackList[$groupName]) {
+			foreach ($this->blackList[$groupName] as $blackList) {
+				if (preg_match('/' . $blackList['regex'] . '/i', $field[$blackList['msgcol']])) {
+					$blackListed = true;
+					$this->_binaryBlacklistIdsToUpdate[$blackList['id']] = $blackList['id'];
+					break;
 				}
 			}
 		}
-
-		# We parsed entire matching list entries at this point.. now we need
-		# to handle the whitelist (if it was enabled)
-		if (count($whitelist) > 0 && !$matches_whitelist) {
-			# We failed to match white list
-			return true;
-		}
-
-		return false;
+		return $blackListed;
 	}
 
 	/**
@@ -1076,21 +1112,43 @@ class Binaries
 	}
 
 	/**
-	 * Get list of blacklists from database.
+	 * Return all blacklists.
+	 *
+	 * @param bool   $activeOnly Only display active blacklists ?
+	 * @param int    $opType     Optional, get white or black lists (use Binaries constants).
+	 * @param string $groupName  Optional, group.
+	 * @param bool   $groupRegex Optional Join groups / binaryblacklist using regexp for equals.
+	 *
+	 * @return array
 	 */
-	public function getBlacklist($activeonly = true)
+	public function getBlacklist($activeOnly = true, $opType = -1, $groupName = '', $groupRegex = false)
 	{
-		$db = new Settings();
-
-		$where = "";
-		if ($activeonly)
-			$where = " where binaryblacklist.status = 1 ";
-
-		return $db->query("SELECT binaryblacklist.id, binaryblacklist.optype, binaryblacklist.status, binaryblacklist.description, binaryblacklist.groupname AS groupname, binaryblacklist.regex,
-												groups.id AS groupid, binaryblacklist.msgcol FROM binaryblacklist
-												left outer JOIN groups ON groups.name = binaryblacklist.groupname
-												" . $where . "
-												ORDER BY coalesce(groupname,'zzz')"
+		switch ($opType) {
+			case self::OPTYPE_BLACKLIST:
+				$opType = 'AND binaryblacklist.optype = ' . self::OPTYPE_BLACKLIST;
+				break;
+			case self::OPTYPE_WHITELIST:
+				$opType = 'AND binaryblacklist.optype = ' . self::OPTYPE_WHITELIST;
+				break;
+			default:
+				$opType = '';
+				break;
+		}
+		return $this->_pdo->query(
+			sprintf('
+				SELECT
+					binaryblacklist.id, binaryblacklist.optype, binaryblacklist.status, binaryblacklist.description,
+					binaryblacklist.groupname AS groupname, binaryblacklist.regex, groups.id AS group_id, binaryblacklist.msgcol,
+					binaryblacklist.last_activity as last_activity
+				FROM binaryblacklist
+				LEFT OUTER JOIN groups ON groups.name %s binaryblacklist.groupname
+				WHERE 1=1 %s %s %s
+				ORDER BY coalesce(groupname,\'zzz\')',
+				($groupRegex ? 'REGEXP' : '='),
+				($activeOnly ? 'AND binaryblacklist.status = 1' : ''),
+				$opType,
+				($groupName ? ('AND groups.name REGEXP ' . $this->_pdo->escapeString($groupName)) : '')
+			)
 		);
 	}
 

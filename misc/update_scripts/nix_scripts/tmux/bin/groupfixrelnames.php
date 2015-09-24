@@ -2,7 +2,7 @@
 require_once(dirname(__FILE__) . "/config.php");
 
 use newznab\db\Settings;
-use newznab\processing\PProcess;
+use newznab\processing\PostProcess;
 
 $pdo = new Settings();
 
@@ -136,7 +136,7 @@ if (!isset($argv[1])) {
 				$nzbcontents = new NZBContents(
 					array(
 						'Echo' => true, 'NNTP' => $nntp, 'Nfo' => $Nfo, 'Settings' => $pdo,
-						'PostProcess' => new PProcess(['Settings' => $pdo, 'Nfo' => $Nfo, 'NameFixer' => $namefixer])
+						'PostProcess' => new PostProcess(['Settings' => $pdo, 'Nfo' => $Nfo, 'NameFixer' => $namefixer])
 					)
 				);
 				foreach ($releases as $release) {

@@ -314,6 +314,7 @@ class Movie
 			GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_totalparts,
 			GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_comments,
 			GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grabs,
+			GROUP_CONCAT(r.failed ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_failed,
 			m.*, groups.name AS group_name, rn.id as nfoid FROM releases r
 			LEFT OUTER JOIN groups ON groups.id = r.groupid
 			LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
@@ -1020,7 +1021,7 @@ class Movie
 	/**
 	 * Update a release with a IMDB id.
 	 *
-	 * @param string $buffer       Data to parse a IMDB id from.
+	 * @param string $buffer       Data to parse a IMDB id/Trakt Id from.
 	 * @param string $service      Method that called this method.
 	 * @param int    $id           id of the release.
 	 * @param int    $processImdb  To get IMDB info on this IMDB id or not.
@@ -1032,6 +1033,18 @@ class Movie
 		$imdbID = false;
 		if (is_string($buffer) && preg_match('/(?:imdb.*?)?(?:tt|Title\?)(?P<imdbid>\d{5,7})/i', $buffer, $matches)) {
 			$imdbID = $matches['imdbid'];
+		}
+		$traktID = false;
+		if (is_string($buffer) && preg_match('/(?:trakt.*?)/i', $buffer, $matches)) {
+			$traktID = $matches['trakt'];
+		}
+
+		if ($traktID !== false){
+			if ($this->echooutput && $this->service !== '') {
+				$this->pdo->log->doEcho($this->pdo->log->headerOver($service . ' found Trakt id: ') . $this->pdo->log->primary($traktID));
+			}
+
+			$this->pdo->queryExec(sprintf('UPDATE releases SET traktid = %d WHERE id = %d', $this->pdo->escapeString($traktID), $id));
 		}
 
 		if ($imdbID !== false) {
@@ -1152,6 +1165,12 @@ class Movie
 						if (isset($data['ids']['imdb'])) {
 							$imdbID = $this->doMovieUpdate($data['ids']['imdb'], 'Trakt', $arr['id']);
 							if ($imdbID !== false) {
+								continue;
+							}
+						}
+						if (isset($data['ids']['trakt'])) {
+							$traktID = $this->doMovieUpdate($data['ids']['trakt'], 'Trakt', $arr['id']);
+							if ($traktID !== false) {
 								continue;
 							}
 						}

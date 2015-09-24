@@ -2,11 +2,11 @@
 <newznab>
 	<versions>
 		<sql>
-			<db>141</db>
-			<file>141</file>
+			<db>145</db>
+			<file>145</file>
 		</sql>
 		<git>
-			<tag>0.4.1</tag>
+			<tag>0.4.2</tag>
 			<!-- commit count removed Dec 2014 -->
 			<hooks>
 				<precommit>9</precommit>
