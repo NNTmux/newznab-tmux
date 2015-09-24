@@ -135,6 +135,7 @@
 													{assign var="mtotalparts" value=","|explode:$result.grp_release_totalparts}
 													{assign var="mcomments" value=","|explode:$result.grp_release_comments}
 													{assign var="mgrabs" value=","|explode:$result.grp_release_grabs}
+													{assign var="mfailed" value=","|explode:$result.grp_release_failed}
 													{assign var="mpass" value=","|explode:$result.grp_release_password}
 													{assign var="minnerfiles" value=","|explode:$result.grp_rarinnerfilecount}
 													{assign var="mhaspreview" value=","|explode:$result.grp_haspreview}
@@ -144,7 +145,7 @@
 																class="cover"
 																src="{if $result.cover == 1}{$smarty.const.WWW_TOP}covers/movies/{$result.imdbid}-cover.jpg{else}{$smarty.const.WWW_TOP}templates_shared/images/no-cover.png{/if}"
 																width="100" border="0"
-																alt="{$result.title|escape:"htmlall"}"/></a>
+																alt="{$result.title|escape:"htmlall"}"/> {if $mfailed[$m@index]} <i class="fa fa-exclamation-circle" style="color: red" title="This release has failed for some users"></i>{/if}</a>
 													<a target="_blank"
 													   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$result.imdbid}/"
 													   name="imdb{$result.imdbid}" title="View IMDB page"
@@ -219,6 +220,10 @@
 																	  title="Add to CouchPotato"
 																		><i class="fa fa-send-o"></i></span>
 															{/if}
+															{if $mfailed[$m@index] > 0}
+																<span class="btn btn-default btn-xs" title="This release has failed to download for some users">
+																	<i class ="fa fa-thumbs-o-up"></i> {$mgrabs[$m@index]} Grabs / <i class ="fa fa-thumbs-o-down"></i> {$mfailed[$m@index]} Failed Downloads</span>
+															{/if}
 														</div>
 													</div>
 													{/if}
@@ -249,6 +254,7 @@
 													{assign var="mtotalparts" value=","|explode:$result.grp_release_totalparts}
 													{assign var="mcomments" value=","|explode:$result.grp_release_comments}
 													{assign var="mgrabs" value=","|explode:$result.grp_release_grabs}
+													{assign var="mfailed" value=","|explode:$result.grp_release_failed}
 													{assign var="mpass" value=","|explode:$result.grp_release_password}
 													{assign var="minnerfiles" value=","|explode:$result.grp_rarinnerfilecount}
 													{assign var="mhaspreview" value=","|explode:$result.grp_haspreview}
@@ -258,7 +264,7 @@
 																class="cover"
 																src="{if $result.cover == 1}{$smarty.const.WWW_TOP}covers/movies/{$result.imdbid}-cover.jpg{else}{$smarty.const.WWW_TOP}templates_shared/images/no-cover.png{/if}"
 																width="100" border="0"
-																alt="{$result.title|escape:"htmlall"}"/></a>
+																alt="{$result.title|escape:"htmlall"}"/> {if $mfailed[$m@index] > 0} <i class="fa fa-exclamation-circle" style="color: red" title="This release has failed to download for some users"></i>{/if}</a>
 													<a target="_blank"
 													   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$result.imdbid}/"
 													   name="imdb{$result.imdbid}" title="View IMDB page"
@@ -333,6 +339,10 @@
 																		title="Add to CouchPotato"
 																		><i class="fa fa-send-o"></i></span>
 															{/if}
+															{if $mfailed[$m@index] > 0}
+																<span class="btn btn-default btn-xs" title="This release has failed to download for some users">
+																	<i class ="fa fa-thumbs-o-up"></i> {$mgrabs[$m@index]} Grabs / <i class ="fa fa-thumbs-o-down"></i> {$mfailed[$m@index]} Failed Downloads</span>
+																{/if}
 														</div>
 													</div>
 													{/if}

@@ -102,8 +102,8 @@
 								<div class="col-md-6 small-gutter-right movie-height">
 									<div class="panel panel-default">
 										<div class="panel-body">
-											<div class="row">
-												<div class="col-md-3">
+											<div class="row small-gutter-left">
+												<div class="col-md-3 small-gutter-left">
 													{assign var="msplits" value=","|explode:$result.grp_release_id}
 													{assign var="mguid" value=","|explode:$result.grp_release_guid}
 													{assign var="mnfo" value=","|explode:$result.grp_release_nfoid}
@@ -114,6 +114,7 @@
 													{assign var="mtotalparts" value=","|explode:$result.grp_release_totalparts}
 													{assign var="mcomments" value=","|explode:$result.grp_release_comments}
 													{assign var="mgrabs" value=","|explode:$result.grp_release_grabs}
+													{assign var="mfailed" value=","|explode:$result.grp_release_failed}
 													{assign var="mpass" value=","|explode:$result.grp_release_password}
 													{assign var="minnerfiles" value=","|explode:$result.grp_rarinnerfilecount}
 													{assign var="mhaspreview" value=","|explode:$result.grp_haspreview}
@@ -123,7 +124,7 @@
 																class="cover"
 																src="{if $result.cover == 1}{$smarty.const.WWW_TOP}covers/xxx/{$result.id}-cover.jpg{else}{$smarty.const.WWW_TOP}templates_shared/images/no-cover.png{/if}"
 																width="100" border="0"
-																alt="{$result.title|escape:"htmlall"}"/></a>
+																alt="{$result.title|escape:"htmlall"}"/>{if $mfailed[$m@index] > 0} <i class="fa fa-exclamation-circle" style="color: red" title="This release has failed to download for some users"></i>{/if}</a>
 													{if $result.classused == "ade"}
 														<a
 																target="_blank"
@@ -189,8 +190,12 @@
 													<a class="label label-default"
 													   href="{$smarty.const.WWW_TOP}/browse?g={$result.grp_release_grpname}"
 													   title="Browse releases in {$result.grp_release_grpname|replace:"alt.binaries":"a.b"}">Group</a>
+													{if $mfailed[$m@index] > 0}
+														<span class="btn btn-default btn-xs" title="This release has failed to download for some users">
+																	<i class ="fa fa-thumbs-o-up"></i> {$mgrabs[$m@index]} Grabs / <i class ="fa fa-thumbs-o-down"></i> {$mfailed[$m@index]} Failed Downloads</span>
+													{/if}
 												</div>
-												<div class="col-md-9">
+												<div class="col-md-9 small-gutter-left">
 																<span class="release-title"><a class="text-muted"
 																							   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}">{$result.title|escape:"htmlall"}</a></span>
 													<div class="release-subtitle">{if $result.genre != ''}{$result.genre}, {/if}</div>
@@ -241,11 +246,11 @@
 								<!-- /Left -->
 								{else}
 								<!-- Right -->
-								<div class="col-md-6 movie-height">
+								<div class="col-md-6 small-gutter-left movie-height">
 									<div class="panel panel-default">
 										<div class="panel-body">
-											<div class="row">
-												<div class="col-md-3">
+											<div class="row small-gutter-left">
+												<div class="col-md-3 small-gutter-left">
 													{assign var="msplits" value=","|explode:$result.grp_release_id}
 													{assign var="mguid" value=","|explode:$result.grp_release_guid}
 													{assign var="mnfo" value=","|explode:$result.grp_release_nfoid}
@@ -256,6 +261,7 @@
 													{assign var="mtotalparts" value=","|explode:$result.grp_release_totalparts}
 													{assign var="mcomments" value=","|explode:$result.grp_release_comments}
 													{assign var="mgrabs" value=","|explode:$result.grp_release_grabs}
+													{assign var="mfailed" value=","|explode:$result.grp_release_failed}
 													{assign var="mpass" value=","|explode:$result.grp_release_password}
 													{assign var="minnerfiles" value=","|explode:$result.grp_rarinnerfilecount}
 													{assign var="mhaspreview" value=","|explode:$result.grp_haspreview}
@@ -265,7 +271,7 @@
 																class="cover"
 																src="{if $result.cover == 1}{$smarty.const.WWW_TOP}covers/xxx/{$result.id}-cover.jpg{else}{$smarty.const.WWW_TOP}templates_shared/images/no-cover.png{/if}"
 																width="100" border="0"
-																alt="{$result.title|escape:"htmlall"}"/></a>
+																alt="{$result.title|escape:"htmlall"}"/>{if $mfailed[$m@index] > 0} <i class="fa fa-exclamation-circle" style="color: red" title="This release has failed to download for some users"></i>{/if}</a>
 													{if $result.classused == "ade"}
 														<a
 																target="_blank"
@@ -331,8 +337,12 @@
 													<a class="label label-default"
 													   href="{$smarty.const.WWW_TOP}/browse?g={$result.grp_release_grpname}"
 													   title="Browse releases in {$result.grp_release_grpname|replace:"alt.binaries":"a.b"}">Group</a>
+													{if $mfailed[$m@index] > 0}
+														<span class="btn btn-default btn-xs" title="This release has failed to download for some users">
+																	<i class ="fa fa-thumbs-o-up"></i> {$mgrabs[$m@index]} Grabs / <i class ="fa fa-thumbs-o-down"></i> {$mfailed[$m@index]} Failed Downloads</span>
+													{/if}
 												</div>
-												<div class="col-md-9">
+												<div class="col-md-9 small-gutter-left">
 																<span class="release-title"><a class="text-muted"
 																							   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}">{$result.title|escape:"htmlall"}</a></span>
 													<div class="release-subtitle">{if $result.genre != ''}{$result.genre}, {/if}</div>

@@ -3,7 +3,7 @@
 require_once './config.php';
 
 $page = new AdminPage();
-$console = new Console();
+$console = new Console(['Settings' => $page->settings]);
 $gen = new Genres();
 $id = 0;
 

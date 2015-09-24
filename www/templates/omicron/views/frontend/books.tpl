@@ -79,6 +79,7 @@
 									{assign var="mtotalparts" value=","|explode:$result.grp_release_totalparts}
 									{assign var="mcomments" value=","|explode:$result.grp_release_comments}
 									{assign var="mgrabs" value=","|explode:$result.grp_release_grabs}
+									{assign var="mfailed" value=","|explode:$result.grp_release_failed}
 									{assign var="mpass" value=","|explode:$result.grp_release_password}
 									{assign var="minnerfiles" value=","|explode:$result.grp_rarinnerfilecount}
 									{assign var="mhaspreview" value=","|explode:$result.grp_haspreview}
@@ -91,7 +92,7 @@
 														   href="{$smarty.const.WWW_TOP}/details/{$mguid[$m@index]}/{$mname[$m@index]|escape:"htmlall"}">
 															<img src="{$smarty.const.WWW_TOP}/covers/book/{if $result.cover == 1}{$result.bookinfoid}.jpg{else}no-cover.jpg{/if}"
 																 width="140" border="0"
-																 alt="{$result.author|escape:"htmlall"} - {$result.title|escape:"htmlall"}"/>
+																 alt="{$result.author|escape:"htmlall"} - {$result.title|escape:"htmlall"}"/>{if $mfailed[$m@index] > 0} <i class="fa fa-exclamation-circle" style="color: red" title="This release has failed to download for some users"></i>{/if}
 														</a>
 														{if isset($resulturl) && $result.url != ""}<a
 															class="label label-default" target="_blank"
@@ -105,6 +106,11 @@
 														<a class="label label-default"
 														   href="{$smarty.const.WWW_TOP}/browse?g={$mgrp[$m@index]}"
 														   title="Browse releases in {$mgrp[$m@index]|replace:"alt.binaries":"a.b"}">Group</a>
+														{if $mfailed[$m@index] > 0}
+														<span class="btn btn-hover btn-default btn-xs"><i class="fa fa-thumbs-o-down"></i><span
+																	class="badge"> {$mfailed[$m@index]}
+																Failed Download{if $mfailed[$m@index] != 1}s{/if}</span>
+															{/if}
 													</div>
 													<div class="col-md-10 small-gutter-left">
 														<h4><a title="View details"

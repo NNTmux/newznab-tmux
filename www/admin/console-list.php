@@ -3,8 +3,7 @@
 require_once './config.php';
 
 $page = new AdminPage();
-
-$con = new Console();
+$con  = new Console(['Settings' => $page->settings]);
 
 $page->title = "Console List";
 
