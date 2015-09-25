@@ -340,8 +340,6 @@
 	<script src="{$smarty.const.WWW_TOP}/templates/omicron/plugins/fastclick/fastclick.min.js"></script>
 	<!-- Notification script -->
 	<script src="{$smarty.const.WWW_TOP}/templates/omicron/plugins/noty/packaged/jquery.noty.packaged.min.js"></script>
-	<!-- Custom functions -->
-	<script src="{$smarty.const.WWW_TOP}/templates/omicron/dist/js/functions.js" type="text/javascript"></script>
 	<!-- data table plugin -->
 	<script type="text/javascript"
 			src='{$smarty.const.WWW_TOP}/templates/omicron/dist/js/jquery.dataTables.min.js'></script>
@@ -350,8 +348,8 @@
 	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/omicron/scripts/jquery.autosize-min.js"></script>
 	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/omicron/scripts/jquery.qtip2.js"></script>
 	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/omicron/scripts/sorttable.js"></script>
-	<!-- Newznab utils.js -->
-	<script type="text/javascript" src="{$smarty.const.WWW_TOP}/templates/omicron/scripts/utils.js"></script>
+	<!-- Custom functions -->
+	<script src="{$smarty.const.WWW_TOP}/templates/omicron/dist/js/functions.js" type="text/javascript"></script>
 	<!-- Optionally, you can add Slimscroll and FastClick plugins.
 		  Both of these plugins are recommended to enhance the
 		  user experience. Slimscroll is required when using the
