@@ -1,4 +1,4 @@
-$('head').append('<link rel="stylesheet" href="../css/animate.css" type="text/css" />');
+$('head').append('<link rel="stylesheet" href="templates/charisma/css/animate.min.css" type="text/css" />');
 
 // event bindings
 jQuery(function($){
