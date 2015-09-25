@@ -3,22 +3,6 @@ $('head').append('<link rel="stylesheet" href="../css/animate.css" type="text/cs
 // event bindings
 jQuery(function($){
 
-	function cart_notify() {
-		var n = noty({
-			text        : '<div class="alert alert-info"><p><center>Release added to cart!</center></p></div>',
-			animation: {
-				open: 'animated flipInX', // Animate.css class names
-				close: 'animated flipOutX', // Animate.css class names
-				easing: 'swing', // unavailable - no need
-				speed: 500 // unavailable - no need
-			},
-			layout      : 'topCenter', //or left, right, bottom-right...
-			theme       : 'bootstrap',
-			maxVisible  : 10,
-			timeout: 3000
-		});
-	}
-
 	function notify(message, position) {
 		var n = noty({
 			text        : '<div class="alert alert-info"><p><center>' + message + '</center></p></div>',
@@ -40,7 +24,7 @@ jQuery(function($){
 		var guid = $(".guid").attr('id').substring(4);
 		$.post( SERVERROOT + "cart?add=" + guid, function(resp){
 			$(e.target).addClass('icon_cart_clicked').attr('title','Added to Cart');
-			cart_notify();
+			notify('Release added to cart!', 'topCenter');
 		});
 		return false;
 	});
@@ -136,7 +120,7 @@ jQuery(function($){
 			if (guid && !$cartIcon.hasClass('icon_cart_clicked')){
 				$cartIcon.addClass('icon_cart_clicked').attr('title','Added to Cart');	// consider doing this only upon success
 				guids.push(guid);
-				cart_notify()
+				notify('Release added to cart!', 'topCenter');
 			}
 			$(this).attr('checked', false);
 		});
@@ -287,7 +271,7 @@ jQuery(function($){
 		var guid = $(this).parent().parent().attr('id').substring(4);
 		$.post( SERVERROOT + "cart?add=" + guid, function(resp){
 			$(e.target).addClass('icon_cart_clicked').attr('title',' Release added to Cart');
-			cart_notify();
+			notify('Release added to cart!', 'topCenter');
 		});
 		return false;
 	});
@@ -511,7 +495,7 @@ jQuery(function($){
 			if (guid && !$cartIcon.hasClass('icon_cart_clicked')){
 				$cartIcon.addClass('icon_cart_clicked').attr('title','Added to Cart');
 				guids.push(guid);
-				cart_notify() // consider doing this only upon success and maybe placing it outside of the loop
+				notify('Release added to cart!', 'topCenter'); // consider doing this only upon success and maybe placing it outside of the loop
 			}
 			$(this).attr('checked', false);
 		});
