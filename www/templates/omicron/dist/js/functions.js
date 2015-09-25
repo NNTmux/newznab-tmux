@@ -1,6 +1,7 @@
+$('head').append('<link rel="stylesheet" href="../css/animate.css" type="text/css" />');
 function cart_notify() {
 	var n = noty({
-		text        : '<div class="alert alert-success"><p><center>Release added to cart!</center></p></div>',
+		text        : '<div class="alert alert-info"><p><center>Release added to cart!</center></p></div>',
         animation: {
             open: 'animated flipInX', // Animate.css class names
             close: 'animated flipOutX', // Animate.css class names
@@ -16,7 +17,7 @@ function cart_notify() {
 
 function notify(message, position) {
 	var n = noty({
-		text        : '<div class="alert alert-success"><p><center>' + message + '</center></p></div>',
+		text        : '<div class="alert alert-info"><p><center>' + message + '</center></p></div>',
         animation: {
             open: 'animated flipInX', // Animate.css class names
             close: 'animated flipOutX', // Animate.css class names
