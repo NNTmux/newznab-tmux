@@ -86,14 +86,13 @@ class ReleaseComments
 	}
 
 	/**
-	 * Delete a comment.
+	 * Delete single comment on the site.
 	 */
 	public function deleteComment($id)
 	{
 		$res = $this->getCommentById($id);
-		if ($res)
-		{
-			$this->pdo->queryExec(sprintf("update release_comments SET isvisible = 0 WHERE id = %d", $id));
+		if ($res) {
+			$this->pdo->queryExec(sprintf("DELETE FROM release_comments WHERE id = %d", $id));
 			$this->updateReleaseCommentCount($res["gid"]);
 		}
 	}
@@ -143,19 +142,20 @@ class ReleaseComments
 		$this->updateReleaseCommentCount($gid);
 		return $comid;
 	}
-
 	/**
 	 * Get release_comments rows by limit.
 	 */
 	public function getCommentsRange($start, $num)
 	{
-		if ($start === false)
-			$limit = "";
-		else
-			$limit = " LIMIT ".$start.",".$num;
-
-		$sql = "SELECT rc.id, userid, guid, text, createddate, sourceid, CASE WHEN sourceID = 0 THEN (SELECT username FROM users WHERE id = userid) ELSE username END AS username, CASE WHEN sourceid = 0 THEN (SELECT role FROM users WHERE id = userid) ELSE '-1' END AS role, CASE WHEN sourceid =0 THEN (SELECT r.name AS rolename FROM users AS u LEFT JOIN userroles AS r ON r.id = u.role WHERE u.id = userid) ELSE (SELECT description AS rolename FROM spotnabsources WHERE id = sourceid) END AS rolename FROM release_comments rc LEFT JOIN releases r ON r.gid = rc.gid WHERE isvisible = 1 AND (userid IN (SELECT id FROM users) OR rc.username IS NOT NULL) ORDER BY createddate DESC ".$limit;
-		return $this->pdo->query($sql);
+		return $this->pdo->query(
+			sprintf("
+				SELECT rc.*, r.guid
+				FROM release_comments rc
+				LEFT JOIN releases r on r.gid = rc.gid
+				ORDER BY rc.createddate DESC %s",
+				($start === false ? '' : " LIMIT " . $num . " OFFSET " . $start)
+			)
+		);
 	}
 
 	/**
