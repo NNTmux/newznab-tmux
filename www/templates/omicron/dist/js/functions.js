@@ -1,6 +1,3 @@
-$('head').append('<link rel="stylesheet" href="templates/omicron/dist/css/animate.css" type="text/css" />');
-jQuery.getScript("templates/omicron/plugins/noty/packaged/jquery.noty.packaged.min.js");
-
 // event bindings
 jQuery(function($){
 
