@@ -98,7 +98,7 @@
 															 value="{$result.guid}"/></td>
 									<td>
 										<a href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"htmlall"}"
-										   class="title">{$result.searchname|escape:"htmlall"|replace:".":" "}</a>{if $result.failed > 0} <i class="fa fa-exclamation-circle" style="color: red" title="This release has failed to download for some users"></i>{/if}
+										   class="title">{$result.searchname|escape:"htmlall"|replace:".":" "}</a>{if $failed > 0} <i class="fa fa-exclamation-circle" style="color: red" title="This release has failed to download for some users"></i>{/if}
 										<br/>
 													<span class="label label-default">{$result.grabs}
 														Grab{if $result.grabs != 1}s{/if}</span>
@@ -117,8 +117,8 @@
 											Aired {if $result.tvairdate|strtotime > $smarty.now}in future{else}{$result.tvairdate|daysago}{/if}</span>{/if}
 										{if $result.anidbid > 0}<span class="label label-default"><a
 													href="{$smarty.const.WWW_TOP}/anime/{$result.anidbid}">View Anime</a></span>{/if}
-										{if $result.failed > 0}<span class="label label-default">
-											<i class ="fa fa-thumbs-o-up"></i> {$result.grabs} Grab{if $result.grabs != 1}s{/if} / <i class ="fa fa-thumbs-o-down"></i> {$result.failed} Failed Download{if $result.failed != 1}s{/if}</span>{/if}									</td>
+										{if $failed > 0}<span class="label label-default">
+											<i class ="fa fa-thumbs-o-up"></i> {$result.grabs} Grab{if $result.grabs != 1}s{/if} / <i class ="fa fa-thumbs-o-down"></i> {$failed} Failed Download{if $failed != 1}sresult{/if}</span>{/if}									</td>
 									<td><span class="label label-default">{$result.category_name}</span>
 									</td>
 									<td>{$result.postdate|timeago}</td>

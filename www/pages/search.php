@@ -6,6 +6,7 @@ if (!$page->users->isLoggedIn()) {
 
 $groups      = new Groups(['Settings' => $page->settings]);
 $releases = new Releases(['Groups' => $groups, 'Settings' => $page->settings]);
+$df = new DnzbFailures(['Settings' => $page->settings]);
 
 $page->meta_title       = "Search Nzbs";
 $page->meta_keywords    = "search,nzb,description,details";
@@ -58,6 +59,10 @@ if ((isset($_REQUEST["id"]) || isset($_REQUEST["subject"])) && !isset($_REQUEST[
 		$searchString, -1, -1, -1, -1, -1, -1, 0, 0, -1, -1, $offset, ITEMS_PER_PAGE,
 		$orderBy, -1, $page->userdata["categoryexclusions"], "basic", $categoryID
 	);
+	foreach ($results as $result){
+		$failed = $df->getFailedCount($result['guid']);
+		$page->smarty->assign('failed', $fail);
+	}
 
 	$page->smarty->assign(
 		[
@@ -121,6 +126,11 @@ if (isset($_REQUEST["searchadvr"]) && !isset($_REQUEST["id"]) && !isset($_REQUES
 		$offset, ITEMS_PER_PAGE, $orderBy, -1, $page->userdata["categoryexclusions"], "advanced",
 		[($searchVars['searchadvcat'] == '' ? -1 : $searchVars['searchadvcat'])]
 	);
+	foreach ($results as $result){
+		$failed = $df->getFailedCount($result['guid']);
+		$page->smarty->assign('failed', $fail);
+	}
+
 
 	$page->smarty->assign(
 		[

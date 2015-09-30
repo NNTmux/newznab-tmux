@@ -6,6 +6,7 @@ if (!$page->users->isLoggedIn()) {
 
 $movie = new XXX();
 $cat = new Category();
+$fail = new DnzbFailures(['Settings' => $page->settings]);
 
 $moviecats = $cat->getChildren(Category::CAT_PARENT_XXX);
 $mtmp = [];
@@ -34,6 +35,7 @@ foreach ($results as $result) {
 	$result['genre'] = $movie->makeFieldLinks($result, 'genre');
 	$result['actors'] = $movie->makeFieldLinks($result, 'actors');
 	$result['director'] = $movie->makeFieldLinks($result, 'director');
+	$result['failed'] = $fail->getFailedCount($result['grp_release_guid']);
 	$movies[] = $result;
 }
 $title = (isset($_REQUEST['title']) && !empty($_REQUEST['title'])) ? stripslashes($_REQUEST['title']) : '';

@@ -2,6 +2,7 @@
 
 $movie = new Movie(['Settings' => $page->settings]);
 $cat = new Category(['Settings' => $page->settings]);
+$fail = new DnzbFailures(['Settings' => $page->settings]);
 
 if (!$page->users->isLoggedIn())
 	$page->show403();
@@ -35,13 +36,14 @@ $offset = (isset($_REQUEST["offset"]) && ctype_digit($_REQUEST['offset'])) ? $_R
 $ordering = $movie->getMovieOrdering();
 $orderby = isset($_REQUEST["ob"]) && in_array($_REQUEST['ob'], $ordering) ? $_REQUEST["ob"] : '';
 
-$results = $movies = [];
+$results = $movies = $failure = [];
 $results = $movie->getMovieRange($catarray, $offset, ITEMS_PER_COVER_PAGE, $orderby, -1, $page->userdata["categoryexclusions"]);
-foreach($results as $result) {
+foreach ($results as $result) {
 	$result['genre'] = $movie->makeFieldLinks($result, 'genre');
 	$result['actors'] = $movie->makeFieldLinks($result, 'actors');
 	$result['director'] = $movie->makeFieldLinks($result, 'director');
 	$result['languages'] = explode(", ", $result['language']);
+	$result['failed'] = $fail->getFailedCount($result['grp_release_guid']);
 
 	$movies[] = $result;
 }

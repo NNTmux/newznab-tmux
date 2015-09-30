@@ -1,6 +1,7 @@
 <?php
 
 $releases = new Releases(['Settings' => $page->settings]);
+$fail = new DnzbFailures(['Settings' => $page->settings]);
 
 if (!$page->users->isLoggedIn())
 	$page->show403();
@@ -32,6 +33,12 @@ $page->smarty->assign('pageroffset',$offset);
 $page->smarty->assign('pageritemsperpage',ITEMS_PER_PAGE);
 $page->smarty->assign('pagerquerybase', WWW_TOP . "/browse?t=" . $category . "&amp;g=" . $grp . "&amp;ob=" . $orderby . "&amp;offset=");
 $page->smarty->assign('pagerquerysuffix', "#results");
+
+foreach($results as $result){
+	$failed = $fail->getFailedCount($result["guid"]);
+	$page->smarty->assign('failed', $failed);
+}
+
 
 $pager = $page->smarty->fetch("pager.tpl");
 $page->smarty->assign('pager', $pager);
