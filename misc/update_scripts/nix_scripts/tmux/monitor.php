@@ -87,7 +87,7 @@ while ($runVar['counts']['iterations'] > 0) {
 
 	//assign scripts
 	$runVar['scripts']['releases'] = ($runVar['constants']['tablepergroup'] == 0
-		? "{$runVar['commands']['_php']} {$runVar['paths']['misc']}update_scripts/nix_scripts/tmux/bin/update_releases.php 1 false"
+		? "{$runVar['commands']['_php']} {$runVar['paths']['misc']}update_scripts/update_releases.php 1 false"
 		: "{$runVar['commands']['_php']} {$runVar['paths']['misc']}update_scripts/nix_scripts/multiprocessing/releases.php"
 	);
 

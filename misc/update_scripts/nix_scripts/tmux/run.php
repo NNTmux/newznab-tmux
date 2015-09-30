@@ -281,7 +281,7 @@ function attach($DIR, $tmux_session)
 if ($powerline == 1) {
 	$tmuxconfig = $DIR . "powerline/tmux.conf";
 } else {
-	$tmuxconfig = $DIR . "conf/tmux.conf";
+	$tmuxconfig = $DIR . "tmux.conf";
 }
 
 if ($seq == 1) {
