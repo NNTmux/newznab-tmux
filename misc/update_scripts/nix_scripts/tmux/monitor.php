@@ -84,7 +84,7 @@ while ($runVar['counts']['iterations'] > 0) {
 
 	//assign scripts
 	$runVar['scripts']['releases'] = ($runVar['constants']['tablepergroup'] == 0
-		? "{$runVar['commands']['_php']} {$runVar['paths']['misc']}update_scripts/nix_scripts/tmux/bin/update_releases.php 1 false"
+		? "{$runVar['commands']['_php']} {$runVar['paths']['misc']}update_scripts/update_releases.php 1 false"
 		: "{$runVar['commands']['_php']} {$runVar['paths']['misc']}update_scripts/nix_scripts/multiprocessing/releases.php"
 	);
 
@@ -104,7 +104,7 @@ while ($runVar['counts']['iterations'] > 0) {
 			$runVar['scripts']['backfill'] = "{$runVar['commands']['_php']} {$runVar['paths']['misc']}update_scripts/nix_scripts/multiprocessing/backfill.php";
 			break;
 		case 2:
-			$runVar['scripts']['backfill'] = "{$runVar['commands']['_python']} {$runVar['paths']['misc']}update_scripts/nix_scripts/tmux/python/backfill_threaded.py group";
+			$runVar['scripts']['backfill'] = "{$runVar['commands']['_python']} {$runVar['paths']['misc']}update_scripts/python/backfill_threaded.py group";
 			break;
 		case 4:
 			$runVar['scripts']['backfill'] = "{$runVar['commands']['_php']} {$runVar['paths']['misc']}update_scripts/nix_scripts/multiprocessing/safe.php backfill";

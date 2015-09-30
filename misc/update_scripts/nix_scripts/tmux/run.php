@@ -153,9 +153,9 @@ function window_proxy($tmux_session, $window)
 	$nntpproxy = $pdo->getSetting('nntpproxy');
 	if ($nntpproxy === '1') {
 		$DIR = NN_MISC;
-		$nntpproxypy = $DIR . "update_scripts/nix_scripts/tmux/python/nntpproxy.py";
-		if (file_exists($DIR . "update_scripts/nix_scripts/tmux/python/lib/nntpproxy.conf")) {
-			$nntpproxyconf = $DIR . "update_scripts/nix_scripts/tmux/python/lib/nntpproxy.conf";
+		$nntpproxypy = $DIR . "update_scripts/python/nntpproxy.py";
+		if (file_exists($DIR . "update_scripts/python/lib/nntpproxy.conf")) {
+			$nntpproxyconf = $DIR . "update_scripts/python/lib/nntpproxy.conf";
 			exec("tmux new-window -t $tmux_session -n nntpproxy 'printf \"\033]2;NNTPProxy\033\" && python $nntpproxypy $nntpproxyconf'");
 		}
 	}
@@ -235,7 +235,7 @@ function attach($DIR, $tmux_session)
 if ($powerline == 1) {
 	$tmuxconfig = $DIR . "powerline/tmux.conf";
 } else {
-	$tmuxconfig = $DIR . "conf/tmux.conf";
+	$tmuxconfig = $DIR . "tmux.conf";
 }
 
 if ($seq == 1) {

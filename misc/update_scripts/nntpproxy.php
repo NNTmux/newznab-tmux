@@ -45,18 +45,18 @@ function window_proxy($tmux_session, $powerline)
 	$nntpproxy = $pdo->getSetting('nntpproxy');
 	if ($nntpproxy === '1') {
 		$DIR = NN_MISC;
-		$nntpproxypy = $DIR . "update_scripts/nix_scripts/_tmux/python/nntpproxy.py";
-		if (file_exists($DIR . "update_scripts/nix_scripts/tmux//python/lib/nntpproxy.conf")) {
-			$nntpproxyconf = $DIR . "update_scripts/nix_scripts/tmux/python/lib/nntpproxy.conf";
+		$nntpproxypy = $DIR . "update_scripts/nix_scripts/python/nntpproxy.py";
+		if (file_exists($DIR . "update_scripts/nix_scripts/python/lib/nntpproxy.conf")) {
+			$nntpproxyconf = $DIR . "update_scripts/nix_scripts/python/lib/nntpproxy.conf";
 			shell_exec("cd ${DIR}/update_scripts/nix_scripts/tmux; tmux -f $tmuxconfig attach-session -t $tmux_session || tmux -f $tmuxconfig new-session -d -s $tmux_session -n NNTPProxy 'printf \"\033]2;\"NNTPProxy\"\033\" && python $nntpproxypy $nntpproxyconf'");
 		}
 	}
 
 	if ($nntpproxy == '1' && ($pdo->getSetting('alternate_nntp') == '1')) {
 		$DIR = NN_MISC;
-		$nntpproxypy = $DIR . "update_scripts/nix_scripts/tmux/python/nntpproxy.py";
-		if (file_exists($DIR . "update_scripts/nix_scripts/tmux/python/lib/nntpproxy_a.conf")) {
-			$nntpproxyconf = $DIR . "update_scripts/nix_scripts/tmux/python/lib/nntpproxy_a.conf";
+		$nntpproxypy = $DIR . "update_scripts/nix_scripts/python/nntpproxy.py";
+		if (file_exists($DIR . "update_scripts/nix_scripts/python/lib/nntpproxy_a.conf")) {
+			$nntpproxyconf = $DIR . "update_scripts/nix_scripts/python/lib/nntpproxy_a.conf";
 			shell_exec("tmux selectp -t 0; tmux splitw -t $tmux_session:0 -h -p 50 'printf \"\033]2;NNTPProxy\033\" && python $nntpproxypy $nntpproxyconf'");
 		}
 	}

@@ -1,15 +1,14 @@
 <?php
-
-require_once("config.php");
+require_once(dirname(__FILE__) . "/config.php");
 
 use newznab\db\Settings;
 
 $pdo = new Settings();
 
-$maxHeaders = $pdo->getSetting('maxheadersiteration') ?: 1000000;
+$maxHeaders = $pdo->getSetting('max.headers.iteration') ?: 1000000;
 
 // Create the connection here and pass
-$nntp = new \NNTP(['Settings' => $pdo]);
+$nntp = new NNTP(['Settings' => $pdo]);
 if ($nntp->doConnect() !== true) {
 	exit($pdo->log->error("Unable to connect to usenet."));
 }
