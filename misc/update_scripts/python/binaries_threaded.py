@@ -24,13 +24,12 @@ if len(sys.argv) == 1:
 	print(bcolors.HEADER + "\nThis script will run update_binaries per group."
 		"\nThis script can run on 1 group, an array of groups or all groups.\n"
 		"\nEach group is processed in a single thread, for all groups. For example, 10 groups, 10 threads, upto max threads.\n"
-		"\npython " + sys.argv[0] + " 155              ...: To run against groupid 155."
-		"\npython " + sys.argv[0] + " '(155, 52)'      ...: To run against groupid 155 and 52."
+		"\npython " + sys.argv[0] + " 155              ...: To run against group_id 155."
+		"\npython " + sys.argv[0] + " '(155, 52)'      ...: To run against group_id 155 and 52."
 		"\npython " + sys.argv[0] + " alt.binaries.tv  ...: To run against group alt.binaries.teevee."
 		"\npython " + sys.argv[0] + "                  ...: To run against all active groups." + bcolors.ENDC)
 
 print(bcolors.HEADER + "\nBinaries Threaded Started at {}".format(datetime.datetime.now().strftime("%H:%M:%S")) + bcolors.ENDC)
-
 
 
 #get active groups
@@ -51,17 +50,16 @@ else:
 	datas = cur[0].fetchall()
 
 if len(datas) == 0:
-    print(bcolors.ERROR + "No Active Groups" + bcolors.ENDC)
-    info.disconnect(cur[0], cur[1])
-    sys.exit
+	print(bcolors.ERROR + "No Active Groups" + bcolors.ENDC)
+	info.disconnect(cur[0], cur[1])
+	sys.exit
 
-cur[0].execute("SELECT value FROM tmux WHERE setting = 'binarythreads'")
-dbgrab = cur[0].fetchone()
+cur[0].execute("SELECT (SELECT value FROM settings WHERE setting = 'binarythreads') AS a")
+dbgrab = cur[0].fetchall()
 run_threads = int(dbgrab[0][0])
 
 #close connection to mysql
 info.disconnect(cur[0], cur[1])
-
 
 my_queue = queue.Queue()
 time_of_last_run = time.time()
@@ -83,7 +81,7 @@ class queue_runner(threading.Thread):
 			else:
 				if my_id:
 					time_of_last_run = time.time()
-					subprocess.call(["php", pathname+"/../bin/update_binaries.php", ""+my_id])
+					subprocess.call(["php", pathname+"/../update_binaries.php", ""+my_id])
 					self.my_queue.task_done()
 
 def main():

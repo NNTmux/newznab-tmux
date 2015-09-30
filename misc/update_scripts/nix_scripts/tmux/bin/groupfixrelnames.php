@@ -7,7 +7,7 @@ use newznab\processing\PostProcess;
 $pdo = new Settings();
 
 if (!isset($argv[1])) {
-	exit($pdo->log->error("This script is not intended to be run manually, it is called from groupfixrelnames_threaded.py."));
+	exit($pdo->log->error("This script is not intended to be run manually, it is called from Forking.php."));
 } else if (isset($argv[1])) {
 	$namefixer = new \NameFixer(['Settings' => $pdo]);
 	$pieces = explode(' ', $argv[1]);

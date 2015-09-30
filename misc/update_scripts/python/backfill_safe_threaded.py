@@ -22,23 +22,23 @@ pathname = os.path.abspath(os.path.dirname(sys.argv[0]))
 
 print(bcolors.HEADER + "\nBackfill Safe Threaded Started at {}".format(datetime.datetime.now().strftime("%H:%M:%S")) + bcolors.ENDC)
 
-cur[0].execute("SELECT g.name FROM groups g LEFT JOIN shortgroups ON shortgroups.name = g.name WHERE shortgroups.name IS NULL AND backfill = 1")
+cur[0].execute("SELECT g.name FROM groups g LEFT JOIN short_groups ON short_groups.name = g.name WHERE short_groups.name IS NULL AND backfill = 1")
 dorun = cur[0].fetchone()
 
 #close connection to mysql
 info.disconnect(cur[0], cur[1])
 
 if dorun:
-	#before we get the groups, lets update shortgroups
-	subprocess.call(["php", pathname+"/../bin/update_groups.php", ""])
+	#before we get the groups, lets update short_groups
+	subprocess.call(["php", pathname+"/../nix_scripts/tmux/bin/update_groups.php", ""])
 else:
 	cur = info.connect()
-	cur[0].execute("SELECT name FROM shortgroups")
+	cur[0].execute("SELECT name FROM short_groups")
 	dorun = cur[0].fetchone()
 	info.disconnect(cur[0], cur[1])
 	if len(sys.argv) > 1 and sys.argv[1] not in dorun:
-		#before we get the groups, lets update shortgroups
-		subprocess.call(["php", pathname+"/../bin/update_groups.php", ""])
+		#before we get the groups, lets update short_groups
+		subprocess.call(["php", pathname+"/../nix_scripts/tmux/bin/update_groups.php", ""])
 
 count = 0
 previous = "'alt.binaries.crap'"
@@ -78,13 +78,13 @@ while count < 10000:
 
 	#query to grab backfill groups
 	if len(sys.argv) == 1:
-		if conf['DB_TYPE'] == "mysql":
-			cur[0].execute("SELECT g.name, g.first_record AS our_first, MAX(a.first_record) AS thier_first, MAX(a.last_record) AS their_last FROM groups g INNER JOIN shortgroups a ON g.name = a.name WHERE g.first_record IS NOT NULL AND g.first_record_postdate IS NOT NULL AND g.backfill = 1 AND (NOW() - INTERVAL %s DAY) < g.first_record_postdate AND g.name NOT IN (%s) GROUP BY a.name, a.last_record, g.name, g.first_record %s LIMIT 1" % (backfilldays, previous, group))
-		elif conf['DB_TYPE'] == "pgsql":
-			cur[0].execute("SELECT g.name, g.first_record AS our_first, MAX(a.first_record) AS thier_first, MAX(a.last_record) AS their_last FROM groups g INNER JOIN shortgroups a ON g.name = a.name WHERE g.first_record IS NOT NULL AND g.first_record_postdate IS NOT NULL AND g.backfill = 1 AND (NOW() - INTERVAL '%s DAYS') < g.first_record_postdate GROUP BY a.name, a.last_record, g.name, g.first_record %s LIMIT 1" % (backfilldays, group, groups))
+		if conf['DB_SYSTEM'] == "mysql":
+			cur[0].execute("SELECT g.name, g.first_record AS our_first, MAX(a.first_record) AS thier_first, MAX(a.last_record) AS their_last FROM groups g INNER JOIN short_groups a ON g.name = a.name WHERE g.first_record IS NOT NULL AND g.first_record_postdate IS NOT NULL AND g.backfill = 1 AND (NOW() - INTERVAL %s DAY) < g.first_record_postdate AND g.name NOT IN (%s) GROUP BY a.name, a.last_record, g.name, g.first_record %s LIMIT 1" % (backfilldays, previous, group))
+		elif conf['DB_SYSTEM'] == "pgsql":
+			cur[0].execute("SELECT g.name, g.first_record AS our_first, MAX(a.first_record) AS thier_first, MAX(a.last_record) AS their_last FROM groups g INNER JOIN short_groups a ON g.name = a.name WHERE g.first_record IS NOT NULL AND g.first_record_postdate IS NOT NULL AND g.backfill = 1 AND (NOW() - INTERVAL '%s DAYS') < g.first_record_postdate GROUP BY a.name, a.last_record, g.name, g.first_record %s LIMIT 1" % (backfilldays, group, groups))
 		datas = cur[0].fetchone()
 	else:
-		run = "SELECT g.name, g.first_record AS our_first, MAX(a.first_record) AS thier_first, MAX(a.last_record) AS their_last FROM groups g INNER JOIN shortgroups a ON g.name = a.name WHERE g.name = %s AND g.first_record IS NOT NULL AND g.first_record_postdate IS NOT NULL AND g.backfill = 1 LIMIT 1"
+		run = "SELECT g.name, g.first_record AS our_first, MAX(a.first_record) AS thier_first, MAX(a.last_record) AS their_last FROM groups g INNER JOIN short_groups a ON g.name = a.name WHERE g.name = %s AND g.first_record IS NOT NULL AND g.first_record_postdate IS NOT NULL AND g.backfill = 1 LIMIT 1"
 		cur[0].execute(run, (sys.argv[1]))
 		datas = cur[0].fetchone()
 	if not datas or datas[0] is None:
@@ -119,7 +119,7 @@ while count < 10000:
 		print(bcolors.PRIMARY + "Our oldest post is: {}".format("{:,}".format(datas[1])) + bcolors.ENDC)
 		print(bcolors.PRIMARY + "Available Posts: {}".format("{:,}".format(count)) + bcolors.ENDC)
 		group = ("{}  {}".format(datas[0], count))
-		subprocess.call(["php", pathname+"/../../multiprocessing/.do_not_run/switch.php", "python  backfill_all_quantity  "+str(group)])
+		subprocess.call(["php", pathname+"/../nix_scripts/multiprocessing/.do_not_run/switch.php", "python  backfill_all_quantity  "+str(group)])
 
 #calculate the number of items for queue
 if (count > (backfill_qty * run_threads)):
@@ -147,7 +147,7 @@ class queue_runner(threading.Thread):
 			else:
 				if my_id:
 					time_of_last_run = time.time()
-					subprocess.call(["php", pathname+"/../../multiprocessing/.do_not_run/switch.php", "python  "+my_id])
+					subprocess.call(["php", pathname+"/../nix_scripts/multiprocessing/.do_not_run/switch.php", "python  "+my_id])
 					time.sleep(.03)
 					self.my_queue.task_done()
 
@@ -177,7 +177,7 @@ def main(args):
 	my_queue.join()
 
 	group = ("{}  {}".format(datas[0], 1000))
-	subprocess.call(["php", pathname+"/../../multiprocessing/.do_not_run/switch.php", "python  backfill_all_quantity  "+str(group)])
+	subprocess.call(["php", pathname+"/../nix_scripts/multiprocessing/.do_not_run/switch.php", "python  backfill_all_quantity  "+str(group)])
 	if run_threads <= geteach:
 		print(bcolors.HEADER + "\nWe used {} threads, a queue of {} and grabbed {} headers".format(run_threads, "{:,}".format(geteach), "{:,}".format(geteach * maxmssgs)) + bcolors.ENDC)
 	else:

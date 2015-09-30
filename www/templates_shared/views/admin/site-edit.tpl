@@ -1496,7 +1496,7 @@
 					reduces time for connection setup/teardown. The proxy also takes care of compressed headers for you.
 					To use this featrure you will need to install socketpool (sudo pip install socketpool or sudo easy_install socketpool)
 					(ensure python2 is default) and edit the configuration file (nntpproxy.conf and nntpproxy_a.conf) in the
-					update_scripts/nix_scripts/tmux/python/lib (copy sample) directory and finally edit your www/config.php file
+					update_scripts/python/lib (copy sample) directory and finally edit your www/config.php file
 					to use the proxy (username and password are ignored by the proxy - make then anything you like - the
 					proxy doesn't use ssl either). Make sure you turn off the use compressed headers option here in site
 					preferences (the proxy uses compressed headers by default and passes on decompressed data).

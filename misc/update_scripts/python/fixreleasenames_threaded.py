@@ -22,16 +22,16 @@ pathname = os.path.abspath(os.path.dirname(sys.argv[0]))
 
 if len(sys.argv) == 1:
 	print(bcolors.ERROR + "\nAn argument is required\n\n"
-		+ "python " + sys.argv[0] + " [md5, nfo, filename, par2]     ...: To process all previously unprocessed releases, using [md5, nfo, filename, par2].\n"
+		+ "python " + sys.argv[0] + " [md5, nfo, filename, par2, miscsorter]     ...: To process all previously unprocessed releases, using [md5, nfo, filename, par2, miscsorter].\n"
 		+ "python " + sys.argv[0] + " [nfo, filename, par2] prehashid                ...: To process all releases not matched to prehashid, using [nfo, filename, par2].\n"
 		+ "python " + sys.argv[0] + " nfo clean                                  ...: To process all releases processed by filename, using nfo.\n"
 		+ "python " + sys.argv[0] + " par2 clean                                 ...: To process all releases processed by filename and nfo, using par2.\n"
-		+ "python " + sys.argv[0] + " predbft clean                                  ...: To process all releases using reverse match by PreDB title.\n"
+		+ "python " + sys.argv[0] + " predbft clean                              ...: To process all releases using reverse match by PreDB title.\n"
 		+ bcolors.ENDC)
 	sys.exit()
 
-if sys.argv[1] != "nfo" and sys.argv[1] != "filename" and sys.argv[1] != "md5" and sys.argv[1] != "par2" and sys.argv[1] != "predbft":
-	print(bcolors.ERROR + "\n\An invalid argument was supplied\npostprocess_threaded.py [md5, nfo, filename, par2, predbft]\n" + bcolors.ENDC)
+if sys.argv[1] != "nfo" and sys.argv[1] != "filename" and sys.argv[1] != "md5" and sys.argv[1] != "par2" and sys.argv[1] != "miscsorter" and sys.argv[1] != "predbft":
+	print(bcolors.ERROR + "\n\An invalid argument was supplied\npostprocess_threaded.py [md5, nfo, filename, par2, miscsorter, predbft]\n" + bcolors.ENDC)
 	sys.exit()
 
 if len(sys.argv) == 3 and sys.argv[1] == "nfo" and sys.argv[2] == "clean":
@@ -39,47 +39,48 @@ if len(sys.argv) == 3 and sys.argv[1] == "nfo" and sys.argv[2] == "clean":
 elif len(sys.argv) == 3 and sys.argv[1] == "par2" and sys.argv[2] == "clean":
 	clean = " isrenamed = 0 AND proc_files = 1 AND proc_nfo = 1 "
 elif len(sys.argv) == 3 and sys.argv[1] == "nfo" and sys.argv[2] == "prehashid":
-	clean = " prehashid = IS NULL "
+	clean = " prehashid = 0 "
 elif len(sys.argv) == 3 and sys.argv[1] == "par2" and sys.argv[2] == "prehashid":
-	clean = " prehashid = IS NULL "
+	clean = " prehashid = 0 "
 elif len(sys.argv) == 3 and sys.argv[1] == "filename" and sys.argv[2] == "prehashid":
-	clean = " prehashid = IS NULL "
+	clean = " prehashid = 0 "
 else:
 	clean = " isrenamed = 0 "
 
 print(bcolors.HEADER + "\nfixReleasesNames {} Threaded Started at {}".format(sys.argv[1],datetime.datetime.now().strftime("%H:%M:%S")) + bcolors.ENDC)
 
-cur[0].execute("SELECT value FROM tmux WHERE setting = 'fixnamethreads'")
+cur[0].execute("SELECT value FROM settings WHERE setting = 'fixnamethreads'")
 run_threads = cur[0].fetchone()
-cur[0].execute("SELECT value FROM tmux WHERE setting = 'fixnamesperrun'")
+cur[0].execute("SELECT value FROM settings WHERE setting = 'fixnamesperrun'")
 perrun = cur[0].fetchone()
 
 datas = []
-maxtries = 0
 
 if len(sys.argv) > 1 and sys.argv[1] == "nfo":
-    run = "SELECT DISTINCT id AS releaseid FROM releases WHERE nzbstatus = 1 AND nfostatus = 1 AND proc_nfo = 0 AND" + clean + "ORDER BY postdate DESC LIMIT %s"
-    cur[0].execute(run, (int(perrun[0]) * int(run_threads[0])))
-    datas = cur[0].fetchall()
+	run = "SELECT DISTINCT id AS releaseid FROM releases WHERE nzbstatus = 1 AND nfostatus = 1 AND proc_nfo = 0 AND" + clean + "ORDER BY postdate DESC LIMIT %s"
+	cur[0].execute(run, (int(perrun[0]) * int(run_threads[0])))
+	datas = cur[0].fetchall()
+elif len(sys.argv) > 1 and sys.argv[1] == "miscsorter":
+	run = "SELECT DISTINCT id AS releaseid FROM releases WHERE nzbstatus = 1 AND nfostatus = 1 AND proc_sorter = 0 AND isrenamed = 0 ORDER BY postdate DESC LIMIT %s"
+	cur[0].execute(run, (int(perrun[0]) * int(run_threads[0])))
+	datas = cur[0].fetchall()
 elif len(sys.argv) > 1 and (sys.argv[1] == "filename"):
-    run = "SELECT DISTINCT rel.id AS releaseid FROM releases rel INNER JOIN releasefiles relfiles ON (relfiles.releaseid = rel.id) WHERE categoryid IN (8010, 8020) AND proc_files = 0 AND" + clean + "ORDER BY postdate ASC LIMIT %s"
-    cur[0].execute(run, (int(perrun[0]) * int(run_threads[0])))
-    datas = cur[0].fetchall()
+	run = "SELECT DISTINCT rel.id AS releaseid FROM releases rel INNER JOIN release_files relfiles ON (relfiles.releaseid = rel.id) WHERE nzbstatus = 1 AND proc_files = 0 AND" + clean + "ORDER BY postdate ASC LIMIT %s"
+	cur[0].execute(run, (int(perrun[0]) * int(run_threads[0])))
+	datas = cur[0].fetchall()
 elif len(sys.argv) > 1 and (sys.argv[1] == "md5"):
-    while len(datas) == 0 and maxtries >= -5:
-        run = "SELECT DISTINCT rel.id FROM releases rel INNER JOIN releasefiles rf ON rel.id = rf.releaseid WHERE rel.dehashstatus BETWEEN %s AND 0 AND (rel.ishashed = 1 OR rf.ishashed = 1) AND prehashid = 0 ORDER BY postdate ASC LIMIT %s"
-        cur[0].execute(run, (maxtries, int(perrun[0])*int(run_threads[0])))
-        datas = cur[0].fetchall()
-        maxtries = maxtries - 1
+	run = "SELECT DISTINCT rel.id FROM releases rel LEFT OUTER JOIN release_files rf ON rel.id = rf.releaseid AND rf.ishashed = 1 WHERE nzbstatus = 1 AND rel.dehashstatus BETWEEN -6 AND 0 AND rel.ishashed = 1 AND prehashid = 0 ORDER BY dehashstatus DESC, postdate ASC LIMIT %s"
+	cur[0].execute(run, (int(perrun[0])*int(run_threads[0])))
+	datas = cur[0].fetchall()
 elif len(sys.argv) > 1 and (sys.argv[1] == "par2"):
 	#This one does from oldest posts to newest posts, since nfo pp does same thing but newest to oldest
-    run = "SELECT id AS releaseid, guid, groupid FROM releases WHERE categoryid IN (8010, 8020) AND proc_par2 = 0 AND" + clean + "ORDER BY postdate ASC LIMIT %s"
-    cur[0].execute(run, (int(perrun[0]) * int(run_threads[0])))
-    datas = cur[0].fetchall()
+	run = "SELECT id AS releaseid, guid, group_id FROM releases WHERE nzbstatus = 1 AND proc_par2 = 0 AND" + clean + "ORDER BY postdate ASC LIMIT %s"
+	cur[0].execute(run, (int(perrun[0]) * int(run_threads[0])))
+	datas = cur[0].fetchall()
 elif len(sys.argv) > 1 and (sys.argv[1] == "predbft"):
 	#This one does from oldest posts to newest posts since there are many other more efficient PreDB matching schemes
-	run = "SELECT id AS preid FROM prehash WHERE LENGTH(title) >= 15 AND searched = 0 AND title NOT REGEXP '[\"\<\> ]' ORDER BY predate ASC LIMIT %s"
-	cur[0].execute(run, (int(perrun[0])/10 * int(run_threads[0])))
+	run = "SELECT id AS prehashid FROM prehash WHERE LENGTH(title) >= 15	AND title NOT REGEXP '[\"\<\> ]' AND searched = 0 AND DATEDIFF(NOW(), predate) > 1 ORDER BY predate ASC LIMIT %s"
+	cur[0].execute(run, (int(perrun[0]) * int(run_threads[0])))
 	datas = cur[0].fetchall()
 
 #close connection to mysql
@@ -109,7 +110,7 @@ class queue_runner(threading.Thread):
 			else:
 				if my_id:
 					time_of_last_run = time.time()
-					subprocess.call(["php", pathname+"/../bin/fixreleasenames.php", ""+my_id])
+					subprocess.call(["php", pathname+"/../nix_scripts/tmux/bin/fixreleasenames.php", ""+my_id])
 					time.sleep(.03)
 					self.my_queue.task_done()
 
@@ -117,11 +118,7 @@ def main():
 	global time_of_last_run
 	time_of_last_run = time.time()
 
-	if sys.argv[1] == 'md5':
-		print(bcolors.HEADER + "We will be using a max of {} threads, a queue of {} {} releases. dehashstatus range {} to 0".format(run_threads[0], "{:,}".format(len(datas)), sys.argv[1], maxtries + 1) + bcolors.ENDC)
-	else:
-		print(bcolors.HEADER + "We will be using a max of {} threads, a queue of {} releases using {}".format(run_threads[0], "{:,}".format(len(datas)), sys.argv[1]) + bcolors.ENDC)
-	time.sleep(2)
+	print(bcolors.HEADER + "We will be using a max of {} threads, a queue of {} releases using {}".format(run_threads[0], "{:,}".format(len(datas)), sys.argv[1]) + bcolors.ENDC)
 
 	def signal_handler(signal, frame):
 		sys.exit(0)
@@ -152,6 +149,10 @@ def main():
 		for release in datas:
 			time.sleep(.03)
 			my_queue.put("%s %s %s %s" % ("par2", release[0], release[1], release[2]))
+	elif sys.argv[1] == "miscsorter":
+		for release in datas:
+			time.sleep(.03)
+			my_queue.put("%s %s" % ("miscsorter", release[0]))
 	elif sys.argv[1] == "predbft":
 		for release in datas:
 			time.sleep(.03)

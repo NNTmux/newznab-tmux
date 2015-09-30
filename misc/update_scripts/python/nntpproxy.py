@@ -27,7 +27,7 @@ class NNTPClientConnector(socketpool.Connector, nntp.NNTPClient):
             raise ValueError("Bad backend")
         nntp.NNTPClient.__init__(self, self.host, self.port, username, password, timeout=timeout, use_ssl=use_ssl)
         self.id = self.socket.getsockname()[1]
-        print(bcolors.PRIMARY + "New NNTP connection to %s established with id #%5d" %
+        print(bcolors.PRIMARY + "New NNTP connection to %s established with ID #%5d" %
               (self.host, self.id) + bcolors.ENDC)
         self._connected = True
         self.xfeature_compress_gzip()
@@ -54,7 +54,7 @@ class NNTPClientConnector(socketpool.Connector, nntp.NNTPClient):
         return self._life
 
     def invalidate(self):
-        print(bcolors.PRIMARY + "Disconnecting from NNTP connection id #%5d after %d seconds." %
+        print(bcolors.PRIMARY + "Disconnecting from NNTP connection ID #%5d after %d seconds." %
               (self.id, (time.time() - self._start_time)) + bcolors.ENDC)
         self.close()
         self._connected = False
@@ -68,7 +68,7 @@ class NNTPClientConnector(socketpool.Connector, nntp.NNTPClient):
                 self._pool = None
 
 
-# NNTP proxy request handler for newznab
+# NNTP proxy request handler for nZEDb
 class NNTPProxyRequestHandler(SocketServer.StreamRequestHandler):
 
     def handle(self):
@@ -196,7 +196,7 @@ class NNTPProxyRequestHandler(SocketServer.StreamRequestHandler):
                     self.wfile.write("500 What?\r\n")
 
 
-# NNTP proxy server for newznab
+# NNTP proxy server for nZEDb
 class NNTPProxyServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
 
     allow_reuse_address = True

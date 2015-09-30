@@ -37,13 +37,15 @@ limit = 0
 join = ""
 where = ""
 datelimit = "AND DATEDIFF(NOW(), r.adddate) <= 7"
-groupby = "GROUP BY LEFT(r.guid, 1)"
-orderby = "ORDER BY LEFT(r.guid, 1) ASC"
-rowlimit = "LIMIT 100"
+groupby = "GROUP BY guidchar"
+orderby = "ORDER BY guidchar ASC"
+rowlimit = "LIMIT 16"
+extrawhere = "AND r.prehashid = 0 AND r.nzbstatus = 1"
+select = "DISTINCT LEFT(r.guid, 1) AS guidchar, COUNT(*) AS count"
 
-cur[0].execute("SELECT value FROM tmux WHERE setting = 'fixnamethreads'")
+cur[0].execute("SELECT value FROM settings WHERE setting = 'fixnamethreads'")
 run_threads = cur[0].fetchone()
-cur[0].execute("SELECT value FROM tmux WHERE setting = 'fixnamesperrun'")
+cur[0].execute("SELECT value FROM settings WHERE setting = 'fixnamesperrun'")
 run_perrun = cur[0].fetchone()
 
 threads = int(run_threads[0])
@@ -52,22 +54,23 @@ if threads > 16:
 maxperrun = int(run_perrun[0])
 
 if sys.argv[1] == "md5":
-	join = "LEFT OUTER JOIN releasefiles rf ON r.id = rf.releaseid AND rf.ishashed = 1"
+	join = "LEFT OUTER JOIN release_files rf ON r.id = rf.releaseid AND rf.ishashed = 1"
 	where = "r.ishashed = 1 AND r.dehashstatus BETWEEN -6 AND 0"
 elif sys.argv[1] == "nfo":
 	where = "r.proc_nfo = 0 AND r.nfostatus = 1"
 elif sys.argv[1] == "filename":
-	join = "INNER JOIN releasefiles rf ON r.id = rf.releaseid"
+	join = "INNER JOIN release_files rf ON r.id = rf.releaseid"
 	where = "r.proc_files = 0"
 elif sys.argv[1] == "par2":
 	where = "r.proc_par2 = 0"
 elif sys.argv[1] == "miscsorter":
-	where = "r.nfostatus = 1 AND r.proc_sorter = 0 AND r.isrenamed = 0"
+	where = "r.nfostatus = 1 AND r.proc_nfo = 1 AND r.proc_sorter = 0 AND r.isrenamed = 0"
 elif sys.argv[1] == "predbft":
+	extrawhere = ""
 	where = "1=1"
 	rowlimit = "LIMIT %s" % (threads)
 
-cur[0].execute("SELECT DISTINCT LEFT(r.guid, 1), COUNT(*) AS count FROM releases r %s WHERE %s AND r.prehashid = 0 AND r.nzbstatus = 1 %s %s %s %s" % (join, where, datelimit, groupby, orderby, rowlimit))
+cur[0].execute("SELECT %s FROM releases r %s WHERE %s %s %s %s %s" % (select, join, where, extrawhere, groupby, orderby, rowlimit))
 datas = cur[0].fetchall()
 
 guids = int(len(datas))
@@ -99,7 +102,7 @@ class queue_runner(threading.Thread):
 			else:
 				if my_id:
 					time_of_last_run = time.time()
-					subprocess.call(["php", pathname+"/../bin/groupfixrelnames.php", ""+my_id])
+					subprocess.call(["php", pathname+"/../nix_scripts/tmux/bin/groupfixrelnames.php", ""+my_id])
 					self.my_queue.task_done()
 
 def main():

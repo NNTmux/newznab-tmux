@@ -24,7 +24,7 @@ print(bcolors.HEADER + "\nNZB Import Threaded Started at {}".format(datetime.dat
 #get values from db
 cur[0].execute("SELECT value FROM tmux WHERE setting = 'import'")
 use_true = cur[0].fetchone()
-cur[0].execute("SELECT (SELECT value FROM tmux WHERE setting = 'nzbthreads') AS a, (SELECT value FROM tmux WHERE setting = 'nzbs') AS b")
+cur[0].execute("SELECT (SELECT value FROM settings WHERE setting = 'nzbthreads') AS a, (SELECT value FROM tmux WHERE setting = 'nzbs') AS b")
 dbgrab = cur[0].fetchall()
 run_threads = int(dbgrab[0][0])
 nzbs = dbgrab[0][1]
@@ -57,7 +57,7 @@ class queue_runner(threading.Thread):
 			else:
 				if my_id:
 					time_of_last_run = time.time()
-					subprocess.call(["php", pathname+"/../bin/nzb-import-new.php", ""+my_id])
+					subprocess.call(["php", pathname+"/lib/nzb-import.php", ""+my_id])
 					time.sleep(.03)
 					self.my_queue.task_done()
 
@@ -105,6 +105,8 @@ def main(args):
 
 	my_queue.join()
 
+	final = "true"
+	subprocess.call(["php", pathname+"/../../testing/DB/populate_nzb_guid.php", ""+final])
 	print(bcolors.HEADER + "\nNZB Import Threaded Completed at {}".format(datetime.datetime.now().strftime("%H:%M:%S")) + bcolors.ENDC)
 	print(bcolors.HEADER + "Running time: {}\n\n".format(str(datetime.timedelta(seconds=time.time() - start_time))) + bcolors.ENDC)
 

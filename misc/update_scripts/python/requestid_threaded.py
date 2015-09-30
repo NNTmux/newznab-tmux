@@ -1,16 +1,23 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
 import sys, os, time
 import threading
-try:
-	import queue
-except ImportError:
-	import Queue as queue
 import subprocess
 import string
 import signal
 import datetime
+import re
+try:
+	import queue
+except ImportError:
+	import Queue as queue
+
+try:
+	import urllib2
+except ImportError:
+	import urllib.request as urllib2
 
 import lib.info as info
 from lib.info import bcolors
@@ -18,19 +25,17 @@ conf = info.readConfig()
 cur = info.connect()
 start_time = time.time()
 pathname = os.path.abspath(os.path.dirname(sys.argv[0]))
+cur[0].execute("SELECT value FROM settings WHERE setting = 'reqidthreads'")
+threads = cur[0].fetchone()
+threads = int(threads[0])
 
-print(bcolors.HEADER + "\nUpdate Releases Threaded Started at {}".format(datetime.datetime.now().strftime("%H:%M:%S")) + bcolors.ENDC)
 
-cur[0].execute("SELECT (SELECT value FROM settings WHERE setting = 'tablepergroup') AS a, (SELECT value FROM settings WHERE setting = 'releasethreads') AS b")
-dbgrab = cur[0].fetchall()
-allowed = int(dbgrab[0][0])
-threads = int(dbgrab[0][1])
-if allowed == 0:
-	print(bcolors.ERROR + "Table per group not enabled" + bcolors.ENDC)
-	info.disconnect(cur[0], cur[1])
-	sys.exit()
+print(bcolors.HEADER + "\n\nRequestID Threaded Started at {}".format(datetime.datetime.now().strftime("%H:%M:%S")) + bcolors.ENDC)
 
-cur[0].execute("SELECT table_name FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '"+conf['DB_NAME']+"' AND table_rows > 0 AND table_name LIKE 'binaries_%'")
+cur[0].execute("SELECT value FROM settings WHERE setting = 'request_hours'")
+dbgrab = cur[0].fetchone()
+request_hours = str(dbgrab[0])
+cur[0].execute("SELECT DISTINCT(g.id) FROM releases r INNER JOIN groups g ON r.group_id = g.id WHERE r.nzbstatus = 1 AND r.prehashid = 0 AND r.isrequestid = 1 AND r.reqidstatus in (0, -1) OR (r.reqidstatus = -3 AND r.adddate > NOW() - INTERVAL " + request_hours + " HOUR)")
 datas = cur[0].fetchall()
 
 #close connection to mysql
@@ -60,15 +65,13 @@ class queue_runner(threading.Thread):
 			else:
 				if my_id:
 					time_of_last_run = time.time()
-					subprocess.call(["php", pathname+"/../../multiprocessing/.do_not_run/switch.php", "releases  "+my_id])
+					subprocess.call(["php", pathname+"/../nix_scripts/multiprocessing/.do_not_run/switch.php", "python  requestid  "+my_id])
+					time.sleep(.03)
 					self.my_queue.task_done()
 
 def main():
 	global time_of_last_run
 	time_of_last_run = time.time()
-
-	print(bcolors.HEADER + "We will be using a max of {} threads, a queue of {} groups".format(threads, "{:,}".format(len(datas))) + bcolors.ENDC)
-	time.sleep(2)
 
 	def signal_handler(signal, frame):
 		sys.exit(0)
@@ -76,6 +79,9 @@ def main():
 	signal.signal(signal.SIGINT, signal_handler)
 
 	if True:
+		print(bcolors.HEADER + "We will be using a max of {} threads, a queue of {} items".format(threads, "{:,}".format(len(datas))) + bcolors.ENDC)
+		time.sleep(2)
+
 		#spawn a pool of place worker threads
 		for i in range(threads):
 			p = queue_runner(my_queue)
@@ -83,19 +89,12 @@ def main():
 			p.start()
 
 	#now load some arbitrary jobs into the queue
-	count = 0
 	for release in datas:
-		if count >= threads:
-			count = 0
-		count += 1
-		my_queue.put("%s  %s" % (release[0].replace('binaries_', ''), count))
+		my_queue.put("%s" % (release[0]))
 
 	my_queue.join()
 
-	#stage7b
-	subprocess.call(["php", pathname+"/../../multiprocessing/.do_not_run/switch.php", "python  releases  "+str(count)+"_"])
-
-	print(bcolors.HEADER + "\nUpdate Releases Threaded Completed at {}".format(datetime.datetime.now().strftime("%H:%M:%S")) + bcolors.ENDC)
+	print(bcolors.HEADER + "\nRequestID Threaded Completed at {}".format(datetime.datetime.now().strftime("%H:%M:%S")) + bcolors.ENDC)
 	print(bcolors.HEADER + "Running time: {}\n\n".format(str(datetime.timedelta(seconds=time.time() - start_time))) + bcolors.ENDC)
 
 if __name__ == '__main__':
