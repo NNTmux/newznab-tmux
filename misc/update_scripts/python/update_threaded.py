@@ -18,7 +18,7 @@ conf = info.readConfig()
 cur = info.connect()
 start_time = time.time()
 pathname = os.path.abspath(os.path.dirname(sys.argv[0]))
-cur[0].execute("SELECT value FROM settings WHERE setting = 'releasethreads'")
+cur[0].execute("SELECT value FROM settings WHERE setting = 'releasesthreads'")
 threads = cur[0].fetchone()
 threads = int(threads[0])
 
@@ -61,7 +61,7 @@ class queue_runner(threading.Thread):
 			else:
 				if my_id:
 					time_of_last_run = time.time()
-					subprocess.call(["php", pathname+"/../../multiprocessing/.do_not_run/switch.php", "python  update_per_group  "+my_id])
+					subprocess.call(["php", pathname+"/../nix_scripts/multiprocessing/.do_not_run/switch.php", "python  update_per_group  "+my_id])
 					self.my_queue.task_done()
 
 def main():
@@ -95,7 +95,7 @@ def main():
 
 	#stage7b
 	final = "final"
-	subprocess.call(["php", pathname+"/../../multiprocessing/.do_not_run/switch.php", "python  releases  "+str(count)+"_"])
+	subprocess.call(["php", pathname+"/../nix_scripts/multiprocessing/.do_not_run/switch.php", "python  releases  "+str(count)+"_"])
 
 	print(bcolors.HEADER + "\nUpdate Releases Threaded Completed at {}".format(datetime.datetime.now().strftime("%H:%M:%S")) + bcolors.ENDC)
 	print(bcolors.HEADER + "Running time: {}\n\n".format(str(datetime.timedelta(seconds=time.time() - start_time))) + bcolors.ENDC)

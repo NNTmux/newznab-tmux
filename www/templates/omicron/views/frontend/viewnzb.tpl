@@ -477,8 +477,7 @@
 																	</td>
 																</tr>
 																<tr>
-																	<th width="140">RAR
-																		Contains
+																	<th width="140">RAR Contains
 																	</th>
 																	<td>
 																		<strong>Files:</strong><br/>

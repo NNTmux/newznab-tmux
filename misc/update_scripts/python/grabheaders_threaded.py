@@ -15,27 +15,17 @@ import datetime
 import lib.info as info
 from lib.info import bcolors
 conf = info.readConfig()
-cur = info.connect()
 start_time = time.time()
 pathname = os.path.abspath(os.path.dirname(sys.argv[0]))
+threads = 10
 
-print(bcolors.HEADER + "\nUpdate Releases Threaded Started at {}".format(datetime.datetime.now().strftime("%H:%M:%S")) + bcolors.ENDC)
+print(bcolors.HEADER + "\nGrab Headers Threaded Started at {}".format(datetime.datetime.now().strftime("%H:%M:%S")) + bcolors.ENDC)
 
-cur[0].execute("SELECT (SELECT value FROM settings WHERE setting = 'tablepergroup') AS a, (SELECT value FROM settings WHERE setting = 'releasethreads') AS b")
-dbgrab = cur[0].fetchall()
-allowed = int(dbgrab[0][0])
-threads = int(dbgrab[0][1])
-if allowed == 0:
-	print(bcolors.ERROR + "Table per group not enabled" + bcolors.ENDC)
-	info.disconnect(cur[0], cur[1])
-	sys.exit()
-
-cur[0].execute("SELECT table_name FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '"+conf['DB_NAME']+"' AND table_rows > 0 AND table_name LIKE 'binaries_%'")
-datas = cur[0].fetchall()
-
-#close connection to mysql
-info.disconnect(cur[0], cur[1])
-
+if len(sys.argv) > 1:
+	datas = []
+	datas.append(sys.argv[1])
+else:
+	datas = ("alt.binaries.teevee", "alt.binaries.tv", "alt.binaries.audiobooks", "alt.binaries.moovee", "alt.binaries.e-book",  "alt.binaries.e-book.technical",  "alt.binaries.ebook", "alt.binaries.e-book.magazines")
 if not datas:
 	print(bcolors.HEADER + "No Work to Process" + bcolors.ENDC)
 	sys.exit()
@@ -60,7 +50,7 @@ class queue_runner(threading.Thread):
 			else:
 				if my_id:
 					time_of_last_run = time.time()
-					subprocess.call(["php", pathname+"/../../multiprocessing/.do_not_run/switch.php", "releases  "+my_id])
+					subprocess.call(["php", pathname+"/../../testing/Regex/grabheaders.php", ""+my_id])
 					self.my_queue.task_done()
 
 def main():
@@ -69,7 +59,6 @@ def main():
 
 	print(bcolors.HEADER + "We will be using a max of {} threads, a queue of {} groups".format(threads, "{:,}".format(len(datas))) + bcolors.ENDC)
 	time.sleep(2)
-
 	def signal_handler(signal, frame):
 		sys.exit(0)
 
@@ -84,18 +73,12 @@ def main():
 
 	#now load some arbitrary jobs into the queue
 	count = 0
-	for release in datas:
-		if count >= threads:
-			count = 0
-		count += 1
-		my_queue.put("%s  %s" % (release[0].replace('binaries_', ''), count))
+	for group in datas:
+		my_queue.put(group)
 
 	my_queue.join()
 
-	#stage7b
-	subprocess.call(["php", pathname+"/../../multiprocessing/.do_not_run/switch.php", "python  releases  "+str(count)+"_"])
-
-	print(bcolors.HEADER + "\nUpdate Releases Threaded Completed at {}".format(datetime.datetime.now().strftime("%H:%M:%S")) + bcolors.ENDC)
+	print(bcolors.HEADER + "\nGrab Headers Threaded Completed at {}".format(datetime.datetime.now().strftime("%H:%M:%S")) + bcolors.ENDC)
 	print(bcolors.HEADER + "Running time: {}\n\n".format(str(datetime.timedelta(seconds=time.time() - start_time))) + bcolors.ENDC)
 
 if __name__ == '__main__':

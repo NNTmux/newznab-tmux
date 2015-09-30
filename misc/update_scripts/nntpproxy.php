@@ -39,7 +39,7 @@ function window_proxy($tmux_session, $powerline)
 	if ($powerline === '1') {
 		$tmuxconfig = $DIR . "update_scripts/nix_scripts/tmux/powerline/tmux.conf";
 	} else {
-		$tmuxconfig = $DIR . "update_scripts/nix_scripts/tmux/tmux.conf";
+		$tmuxconfig = $DIR . "update_scripts/nix_scripts/tmux/conf/tmux.conf";
 	}
 
 	$nntpproxy = $pdo->getSetting('nntpproxy');

@@ -175,7 +175,7 @@ class queue_runner(threading.Thread):
 			else:
 				if my_id:
 					time_of_last_run = time.time()
-					subprocess.call(["php", pathname+"/../../multiprocessing/.do_not_run/switch.php", "python  pp_"+my_id])
+					subprocess.call(["php", pathname+"/../nix_scripts/multiprocessing/.do_not_run/switch.php", "python  pp_"+my_id])
 					time.sleep(.02)
 					self.my_queue.task_done()
 
@@ -232,7 +232,7 @@ def main(args):
 		final = cur[0].fetchall()
 		if len(datas) > 0:
 			for item in final:
-				run = "DELETE FROM releasenfo WHERE nfo IS NULL AND releaseid = %s"
+				run = "DELETE FROM release_nfos WHERE nfo IS NULL AND releaseid = %s"
 				cur[0].execute(run, (item[0]))
 				final = cur[0].fetchall()
 

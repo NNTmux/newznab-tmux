@@ -76,7 +76,7 @@ class Tmux
 				$runVar['connections']['ip_a'] = gethostbyname($runVar['connections']['host_a']);
 			}
 		} else {
-			$filename = NN_MISC . "update_scripts/nix_scripts/tmux/python/lib/nntpproxy.conf";
+			$filename = NN_MISC . "update_scripts/python/lib/nntpproxy.conf";
 			$fp = fopen($filename, "r") || die("Couldn't open $filename");
 			while (!feof($fp)) {
 				$line = fgets($fp);
@@ -89,7 +89,7 @@ class Tmux
 				}
 			}
 			if ($constants['alternate_nntp']) {
-				$filename = NN_MISC . "update_scripts/nix_scripts/tmux/python/lib/nntpproxy_a.conf";
+				$filename = NN_MISC . "update_scripts/python/lib/nntpproxy_a.conf";
 				$fp = fopen($filename, "r") || die("Couldn't open $filename");
 				while (!feof($fp)) {
 					$line = fgets($fp);

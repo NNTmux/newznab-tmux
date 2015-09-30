@@ -32,7 +32,6 @@ if len(sys.argv) == 1:
 print(bcolors.HEADER + "\nBinaries Threaded Started at {}".format(datetime.datetime.now().strftime("%H:%M:%S")) + bcolors.ENDC)
 
 
-
 #get active groups
 if len(sys.argv) == 2:
 	try:
@@ -51,17 +50,16 @@ else:
 	datas = cur[0].fetchall()
 
 if len(datas) == 0:
-    print(bcolors.ERROR + "No Active Groups" + bcolors.ENDC)
-    info.disconnect(cur[0], cur[1])
-    sys.exit
+	print(bcolors.ERROR + "No Active Groups" + bcolors.ENDC)
+	info.disconnect(cur[0], cur[1])
+	sys.exit
 
-cur[0].execute("SELECT value FROM tmux WHERE setting = 'binarythreads'")
-dbgrab = cur[0].fetchone()
+cur[0].execute("SELECT (SELECT value FROM settings WHERE setting = 'binarythreads') AS a")
+dbgrab = cur[0].fetchall()
 run_threads = int(dbgrab[0][0])
 
 #close connection to mysql
 info.disconnect(cur[0], cur[1])
-
 
 my_queue = queue.Queue()
 time_of_last_run = time.time()
@@ -83,7 +81,7 @@ class queue_runner(threading.Thread):
 			else:
 				if my_id:
 					time_of_last_run = time.time()
-					subprocess.call(["php", pathname+"/../bin/update_binaries.php", ""+my_id])
+					subprocess.call(["php", pathname+"/../update_binaries.php", ""+my_id])
 					self.my_queue.task_done()
 
 def main():

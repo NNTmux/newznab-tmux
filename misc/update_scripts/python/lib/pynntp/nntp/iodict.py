@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #NOTE: docstrings beed to be added
 
-from collections import OrderedDict
+from binaries import OrderedDict
 
 def _lower(v):
     """assumes that classes that inherit list, tuple or dict have a constructor
