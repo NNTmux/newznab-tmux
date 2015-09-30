@@ -61,7 +61,7 @@ if ((isset($_REQUEST["id"]) || isset($_REQUEST["subject"])) && !isset($_REQUEST[
 	);
 	foreach ($results as $result){
 		$failed = $df->getFailedCount($result['guid']);
-		$page->smarty->assign('failed', $fail);
+		$page->smarty->assign('failed', $failed);
 	}
 
 	$page->smarty->assign(
