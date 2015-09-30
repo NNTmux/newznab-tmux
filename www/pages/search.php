@@ -128,7 +128,7 @@ if (isset($_REQUEST["searchadvr"]) && !isset($_REQUEST["id"]) && !isset($_REQUES
 	);
 	foreach ($results as $result){
 		$failed = $df->getFailedCount($result['guid']);
-		$page->smarty->assign('failed', $fail);
+		$page->smarty->assign('failed', $failed);
 	}
 
 
