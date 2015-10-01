@@ -27,11 +27,6 @@ class Releases
 	public $groups;
 
 	/**
-	 * @var DnzbFailures
-	 */
-	public $failed;
-
-	/**
 	 * @var bool
 	 */
 	public $updategrabs;
@@ -69,7 +64,6 @@ class Releases
 		$this->sphinxSearch = new SphinxSearch();
 		$this->releaseSearch = new ReleaseSearch($this->pdo, $this->sphinxSearch);
 		$this->showPasswords = self::showPasswords($this->pdo);
-		$this->failed = new DnzbFailures(['Settings' => $this->pdo]);
 	}
 
 	/**

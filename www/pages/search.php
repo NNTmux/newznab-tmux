@@ -6,7 +6,6 @@ if (!$page->users->isLoggedIn()) {
 
 $groups      = new Groups(['Settings' => $page->settings]);
 $releases = new Releases(['Groups' => $groups, 'Settings' => $page->settings]);
-$df = new DnzbFailures(['Settings' => $page->settings]);
 
 $page->meta_title       = "Search Nzbs";
 $page->meta_keywords    = "search,nzb,description,details";
@@ -122,7 +121,6 @@ if (isset($_REQUEST["searchadvr"]) && !isset($_REQUEST["id"]) && !isset($_REQUES
 		$offset, ITEMS_PER_PAGE, $orderBy, -1, $page->userdata["categoryexclusions"], "advanced",
 		[($searchVars['searchadvcat'] == '' ? -1 : $searchVars['searchadvcat'])]
 	);
-
 
 	$page->smarty->assign(
 		[

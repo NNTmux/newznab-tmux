@@ -1,7 +1,6 @@
 <?php
 
 $releases = new Releases(['Settings' => $page->settings]);
-$fail = new DnzbFailures(['Settings' => $page->settings]);
 
 if (!$page->users->isLoggedIn())
 	$page->show403();
