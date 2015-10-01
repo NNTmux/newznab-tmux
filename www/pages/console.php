@@ -7,6 +7,7 @@ if (!$page->users->isLoggedIn()) {
 $console = new Konsole(['Settings' => $page->settings]);
 $cat = new Category(['Settings' => $page->settings]);
 $gen = new Genres(['Settings' => $page->settings]);
+$fail = new DnzbFailures(['Settings' => $page->settings]);
 
 $concats = $cat->getChildren(Category::CAT_PARENT_GAME);
 $ctmp = [];
@@ -42,6 +43,7 @@ foreach ($results as $result) {
 			$result['review'] = implode(' ', $newwords) . '...';
 		}
 	}
+	$result['failed'] = $fail->getFailedCount($result['grp_release_guid']);
 	$consoles[] = $result;
 }
 

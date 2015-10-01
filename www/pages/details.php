@@ -8,6 +8,7 @@ if (isset($_GET["id"]))
 	$releases = new Releases(['Settings' => $page->settings]);
 	$rc = new ReleaseComments;
 	$re = new ReleaseExtra;
+	$df = new DnzbFailures(['Settings' => $page->settings]);
 	$data = $releases->getByGuid($_GET["id"]);
 
 	if (!$data)
@@ -25,6 +26,7 @@ if (isset($_GET["id"]))
 		$data['searchname'],
 		6,
 		$page->userdata['categoryexclusions']);
+	$failed = $df->getFailedCount($data['guid']);
 
 	$rage = '';
 	if ($data["rageid"] != '')
@@ -52,14 +54,14 @@ if (isset($_GET["id"]))
 					$seriesid[] = $r['id'];
 				}
 			}
-			$rage = array(
+			$rage = [
 				'releasetitle' => array_shift($seriesnames),
 				'description'  => array_shift($seriesdescription),
 				'country'      => array_shift($seriescountry),
 				'genre'        => array_shift($seriesgenre),
 				'imgdata'      => array_shift($seriesimg),
-				'id'=>array_shift($seriesid)
-			);
+				'id'           => array_shift($seriesid)
+			];
 		}
 	}
 
@@ -177,6 +179,7 @@ if (isset($_GET["id"]))
 	$page->smarty->assign('searchname',$releases->getSimilarName($data['searchname']));
 	$page->smarty->assign('similars', $similars);
 	$page->smarty->assign('privateprofiles', ($page->settings->getSetting('privateprofiles') == 1) ? true : false );
+	$page->smarty->assign('failed', $failed);
 
 	$page->meta_title = "View NZB";
 	$page->meta_keywords = "view,nzb,description,details";

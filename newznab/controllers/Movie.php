@@ -314,7 +314,6 @@ class Movie
 			GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_totalparts,
 			GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_comments,
 			GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grabs,
-			GROUP_CONCAT(r.failed ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_failed,
 			m.*, groups.name AS group_name, rn.id as nfoid FROM releases r
 			LEFT OUTER JOIN groups ON groups.id = r.groupid
 			LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
@@ -654,7 +653,7 @@ class Movie
 			return false;
 		}
 
-		// Check FanArt.tv for cover nad background images.
+		// Check FanArt.tv for cover and background images.
 		$fanart = $this->fetchFanartTVProperties($imdbId);
 
 		$mov = [];

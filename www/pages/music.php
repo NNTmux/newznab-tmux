@@ -7,6 +7,7 @@ if (!$page->users->isLoggedIn()) {
 $music = new Musik(['Settings' => $page->settings]);
 $cat = new Category(['Settings' => $page->settings]);
 $gen = new Genres(['Settings' => $page->settings]);
+$fail = new DnzbFailures(['Settings' => $page->settings]);
 
 $musiccats = $cat->getChildren(Category::CAT_PARENT_MUSIC);
 $mtmp = [];
@@ -47,6 +48,7 @@ foreach ($genres as $gn) {
 
 foreach ($results as $result) {
 	$result['genre'] = $tmpgnr[$result["genreid"]];
+	$result['failed'] = $fail->getFailedCount($result['grp_release_guid']);
 	$musics[] = $result;
 }
 

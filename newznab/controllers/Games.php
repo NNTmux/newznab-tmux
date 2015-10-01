@@ -98,7 +98,6 @@ class Games
 			'Settings' => null,
 		];
 		$options += $defaults;
-
 		$this->echoOutput = ($options['Echo'] && NN_ECHOCLI);
 
 		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
@@ -114,7 +113,7 @@ class Games
 		if ($this->pdo->getSetting('lookupgames') == 2) {
 			$this->renamed = 'AND isrenamed = 1';
 		}
-		//$this->cleangames = ($this->site->('lookupgames') == 2) ? 'AND isrenamed = 1' : '';
+		//$this->cleangames = ($this->pdo->getSetting('('lookupgames') == 2) ? 'AND isrenamed = 1' : '';
 	}
 
 	public function getGamesInfo($id)
@@ -229,7 +228,6 @@ class Games
 				. "GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_totalparts, "
 				. "GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_comments, "
 				. "GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grabs, "
-				. "GROUP_CONCAT(r.failed ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_failed,"
 				. "con.*, YEAR (con.releasedate) as year, r.gamesinfo_id, groups.name AS group_name,
 				rn.id as nfoid FROM releases r "
 				. "LEFT OUTER JOIN groups ON groups.id = r.groupid "
