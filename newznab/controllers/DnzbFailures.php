@@ -25,6 +25,7 @@ class DnzbFailures
 		$options += $defaults;
 
 		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
+		$this->rc = new ReleaseComments(['Settings' => $this->pdo]);
 	}
 
 	/**
@@ -51,6 +52,8 @@ class DnzbFailures
 				$this->pdo->escapeString($guid)
 			)
 		);
+		$rel = $this->pdo->queryOneRow(sprintf('SELECT id, gid FROM releases WHERE guid = %s', $this->pdo->escapeString($guid)));
+		$this->postComment($rel['id'], $rel['gid'], $userid);
 
 		$alternate = $this->pdo->queryOneRow(sprintf('SELECT * FROM releases r
 			WHERE r.searchname %s
@@ -60,5 +63,17 @@ class DnzbFailures
 			)
 		);
 		return $alternate;
+	}
+
+	/**
+	 * @param $relid
+	 * @param $gid
+	 * @param $uid
+	 */
+	public function postComment($relid, $gid, $uid)
+	{
+		$text = 'This release has failed to download properly. It might fail for other users too.
+		This comment is automatically generated.';
+		$this->rc->addComment($relid, $gid, $text, $uid, '');
 	}
 }

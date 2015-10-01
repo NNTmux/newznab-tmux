@@ -129,17 +129,37 @@ class ReleaseComments
 
 	/**
 	 * Add a release_comments row.
+	 *
+	 * @param $id
+	 * @param $gid
+	 * @param $text
+	 * @param $userid
+	 * @param $host
+	 *
+	 * @return bool|int
 	 */
 	public function addComment($id, $gid, $text, $userid, $host)
 	{
-		if(strlen(trim($text)) == 0)
-			return false;
-
-		if ($this->pdo->getSetting('storeuserips') != "1")
+		if ($this->pdo->getSetting('storeuserips') != "1") {
 			$host = "";
+		}
 
-		$comid = $this->pdo->queryInsert(sprintf("INSERT INTO release_comments (releaseid, gid, text, userid, createddate, host) VALUES (%d, %s, %s, %d, now(), %s)", $id, $this->pdo->escapeString($gid), $this->pdo->escapeString($text), $userid, $this->pdo->escapeString($host)));
-		$this->updateReleaseCommentCount($gid);
+		$username = $this->pdo->queryOneRow(sprintf('SELECT username FROM users WHERE id = %d', $userid));
+		$username = ($username === false ? 'ANON' : $username['username']);
+
+		$comid = $this->pdo->queryInsert(
+			sprintf("
+				INSERT INTO release_comments (releaseid, gid, text, userid, createddate, host, username)
+				VALUES (%d, %s, %s, %d, NOW(), %s, %s)",
+				$id,
+				$this->pdo->escapeString($gid),
+				$this->pdo->escapeString($text),
+				$userid,
+				$this->pdo->escapeString($host),
+				$this->pdo->escapeString($username)
+			)
+		);
+		$this->updateReleaseCommentCount($id);
 		return $comid;
 	}
 	/**
