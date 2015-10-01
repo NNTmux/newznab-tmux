@@ -12,8 +12,8 @@
 		<div class="col-xlg-12 portlets">
 			<div class="panel panel-default">
 				<div class="panel-body pagination2">
-					<h1>{$release.searchname|escape:"htmlall"} {if $release.failed > 0}<span class="btn btn-default btn-xs" title="This release has failed to download for some users">
-							<i class ="fa fa-thumbs-o-up"></i> {$release.grabs} Grab{if $release.grabs != 1}s{/if} / <i class ="fa fa-thumbs-o-down"></i> {$release.failed} Failed Download{if $release.failed != 1}s{/if}</span>{/if}</h1>
+					<h1>{$release.searchname|escape:"htmlall"} {if $failed > 0}<span class="btn btn-default btn-xs" title="This release has failed to download for some users">
+							<i class ="fa fa-thumbs-o-up"></i> {$release.grabs} Grab{if $release.grabs != 1}s{/if} / <i class ="fa fa-thumbs-o-down"></i> {$failed} Failed Download{if $failed != 1}s{/if}</span>{/if}</h1>
 					{if isset($isadmin)}
 						<a class="label label-warning"
 						   href="{$smarty.const.WWW_TOP}/admin/release-edit.php?id={$release.id}&amp;from={$smarty.server.REQUEST_URI}"
@@ -452,8 +452,8 @@
 																</tr>
 																<tr>
 																	<th width="140">Failed Download</th>
-																	<td>{$release.failed}
-																		time{if $release.failed==1}{else}s{/if}</td>
+																	<td>{$failed}
+																		time{if $failed==1}{else}s{/if}</td>
 																</tr>
 																<tr>
 																	<th width="140">Password
@@ -477,8 +477,7 @@
 																	</td>
 																</tr>
 																<tr>
-																	<th width="140">RAR
-																		Contains
+																	<th width="140">RAR Contains
 																	</th>
 																	<td>
 																		<strong>Files:</strong><br/>
@@ -581,21 +580,21 @@
 													<th>Comment</th>
 												</tr>
 												{foreach from=$comments|@array_reverse:true item=comment}
-												<tr>
-													<td class="less" title="{$comment.createddate}">
-														{if !$privateprofiles || $isadmin || $ismod}
-															<a title="View {$comment.username}'s profile" href="{$smarty.const.WWW_TOP}/profile?name={$comment.username}">{$comment.username}</a>
+													<tr>
+														<td class="less" title="{$comment.createddate}">
+															{if !$privateprofiles || $isadmin || $ismod}
+																<a title="View {$comment.username}'s profile" href="{$smarty.const.WWW_TOP}/profile?name={$comment.username}">{$comment.username}</a>
+															{else}
+																{$comment.username}
+															{/if}
+															<br/>{$comment.createddate|daysago}
+														</td>
+														{if $comment.shared == 2}
+															<td style="color:#6B2447">{$comment.text|escape:"htmlall"|nl2br}</td>
 														{else}
-															{$comment.username}
+															<td>{$comment.text|escape:"htmlall"|nl2br}</td>
 														{/if}
-														<br/>{$comment.createddate|daysago}
-													</td>
-													{if $comment.shared == 2}
-														<td style="color:#6B2447">{$comment.text|escape:"htmlall"|nl2br}</td>
-													{else}
-														<td>{$comment.text|escape:"htmlall"|nl2br}</td>
-													{/if}
-													{/foreach}
+												{/foreach}
 											</table>
 										{else}
 											<div class="alert alert-info" role="alert">

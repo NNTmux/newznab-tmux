@@ -24,17 +24,11 @@ class DnzbFailures
 
 	/**
 	 * @param string $guid
-	 *
-	 * @return int|bool
 	 */
 	public function getFailedCount($guid)
 	{
-		$failed = $this->pdo->query(sprintf('SELECT COUNT(userid) AS num FROM dnzb_failures WHERE guid = %s', $this->pdo->escapeString($guid)));
-		foreach($failed as $fail ){
-			return $fail['num'];
-		}
-		return false;
-
+		$result = $this->pdo->query(sprintf('SELECT COUNT(userid) AS num FROM dnzb_failures WHERE guid = %s', $this->pdo->escapeString($guid)));
+			return $result[0]['num'];
 	}
 
 	/**

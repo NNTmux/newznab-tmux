@@ -64,6 +64,7 @@ class Releases
 		$this->sphinxSearch = new SphinxSearch();
 		$this->releaseSearch = new ReleaseSearch($this->pdo, $this->sphinxSearch);
 		$this->showPasswords = self::showPasswords($this->pdo);
+		$this->failed = new DnzbFailures(['Settings' => $this->pdo]);
 	}
 
 	/**
@@ -204,6 +205,7 @@ class Releases
 				"SELECT r.*,
 					CONCAT(cp.title, ' > ', c.title) AS category_name,
 					CONCAT(cp.id, ',', c.id) AS category_ids,
+					(SELECT COUNT(userid) FROM dnzb_failures WHERE guid = r.guid) AS failed,
 					g.name AS group_name,
 					rn.id AS nfoid,
 					re.releaseid AS reid
@@ -1016,6 +1018,7 @@ class Releases
 			"SELECT r.*,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
 				%s AS category_ids,
+				(SELECT COUNT(userid) FROM dnzb_failures WHERE guid = r.guid) AS failed,
 				groups.name AS group_name,
 				rn.id AS nfoid,
 				re.releaseid AS reid,

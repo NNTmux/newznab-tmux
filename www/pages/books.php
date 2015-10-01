@@ -6,9 +6,10 @@ if (!$page->users->isLoggedIn()) {
 
 $book = new Books(['Settings' => $page->settings]);
 $cat = new Category(['Settings' => $page->settings]);
+$fail = new DnzbFailures(['Settings' => $page->settings]);
 
 $boocats = $cat->getChildren(Category::CAT_PARENT_BOOK);
-$btmp = array();
+$btmp = [];
 foreach ($boocats as $bcat) {
 	$btmp[$bcat['id']] = $bcat;
 }
@@ -17,7 +18,7 @@ if (isset($_REQUEST["t"]) && array_key_exists($_REQUEST['t'], $btmp)) {
 	$category = $_REQUEST["t"] + 0;
 }
 
-$catarray = array();
+$catarray = [];
 $catarray[] = $category;
 
 $page->smarty->assign('catlist', $btmp);
@@ -29,7 +30,7 @@ $offset = (isset($_REQUEST["offset"]) && ctype_digit($_REQUEST['offset'])) ? $_R
 $ordering = $book->getBookOrdering();
 $orderby = isset($_REQUEST["ob"]) && in_array($_REQUEST['ob'], $ordering) ? $_REQUEST["ob"] : '';
 
-$results = $books = array();
+$results = $books = [];
 $results = $book->getBookRange($catarray, $offset, ITEMS_PER_COVER_PAGE, $orderby, $page->userdata["categoryexclusions"]);
 
 $maxwords = 50;
@@ -41,6 +42,7 @@ foreach ($results as $result) {
 			$result['overview'] = implode(' ', $newwords) . '...';
 		}
 	}
+	$result['failed'] = $fail->getFailedCount($result['grp_release_guid']);
 	$books[] = $result;
 }
 

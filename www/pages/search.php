@@ -59,10 +59,6 @@ if ((isset($_REQUEST["id"]) || isset($_REQUEST["subject"])) && !isset($_REQUEST[
 		$searchString, -1, -1, -1, -1, -1, -1, 0, 0, -1, -1, $offset, ITEMS_PER_PAGE,
 		$orderBy, -1, $page->userdata["categoryexclusions"], "basic", $categoryID
 	);
-	foreach ($results as $result){
-		$failed = $df->getFailedCount($result['guid']);
-		$page->smarty->assign('failed', $failed);
-	}
 
 	$page->smarty->assign(
 		[
@@ -126,10 +122,6 @@ if (isset($_REQUEST["searchadvr"]) && !isset($_REQUEST["id"]) && !isset($_REQUES
 		$offset, ITEMS_PER_PAGE, $orderBy, -1, $page->userdata["categoryexclusions"], "advanced",
 		[($searchVars['searchadvcat'] == '' ? -1 : $searchVars['searchadvcat'])]
 	);
-	foreach ($results as $result){
-		$failed = $df->getFailedCount($result['guid']);
-		$page->smarty->assign('failed', $failed);
-	}
 
 
 	$page->smarty->assign(

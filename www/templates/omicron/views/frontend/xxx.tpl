@@ -115,8 +115,8 @@
 													{assign var="msize" value=","|explode:$result.grp_release_size}
 													{assign var="mtotalparts" value=","|explode:$result.grp_release_totalparts}
 													{assign var="mcomments" value=","|explode:$result.grp_release_comments}
+													{assign var="mgrabs" value=","|explode:$result.grp_release_grabs}
 													{assign var="mfailed" value=","|explode:$result.failed}
-													{assign var="mfailed" value=","|explode:$result.grp_release_failed}
 													{assign var="mpass" value=","|explode:$result.grp_release_password}
 													{assign var="minnerfiles" value=","|explode:$result.grp_rarinnerfilecount}
 													{assign var="mhaspreview" value=","|explode:$result.grp_haspreview}
@@ -267,8 +267,8 @@
 													{assign var="msize" value=","|explode:$result.grp_release_size}
 													{assign var="mtotalparts" value=","|explode:$result.grp_release_totalparts}
 													{assign var="mcomments" value=","|explode:$result.grp_release_comments}
+													{assign var="mgrabs" value=","|explode:$result.grp_release_grabs}
 													{assign var="mfailed" value=","|explode:$result.failed}
-													{assign var="mfailed" value=","|explode:$result.grp_release_failed}
 													{assign var="mpass" value=","|explode:$result.grp_release_password}
 													{assign var="minnerfiles" value=","|explode:$result.grp_rarinnerfilecount}
 													{assign var="mhaspreview" value=","|explode:$result.grp_haspreview}
