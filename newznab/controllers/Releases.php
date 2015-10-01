@@ -27,6 +27,11 @@ class Releases
 	public $groups;
 
 	/**
+	 * @var DnzbFailures
+	 */
+	public $failed;
+
+	/**
 	 * @var bool
 	 */
 	public $updategrabs;
