@@ -10,9 +10,14 @@ use newznab\db\Settings;
 class DnzbFailures
 {
 	/**
-	 * @var \newznab\db\Settings
+	 * @var newznab\db\Settings
 	 */
 	public $pdo;
+
+	/**
+	 * @var ReleaseComments
+	 */
+	public $rc;
 
 	/**
 	 * @var array $options Class instances.
