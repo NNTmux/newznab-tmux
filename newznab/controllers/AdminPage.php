@@ -15,9 +15,9 @@ class AdminPage extends BasePage
 
 		$tplpaths = [];
 		if ($this->settings->getSetting('style') != "default")
-			$tplpaths["style_admin"] = WWW_DIR.'templates_shared/views/admin';
-		$tplpaths["admin"] = WWW_DIR.'templates_shared/views/admin';
-		$tplpaths["frontend"] = WWW_DIR.'templates/nntmux/views/frontend';
+			$tplpaths["style_admin"] = WWW_DIR.'themes_shared/templates/admin';
+		$tplpaths["admin"] = WWW_DIR.'themes_shared/templates/admin';
+		$tplpaths["frontend"] = WWW_DIR.'themes/nntmux/templates/frontend';
 		$this->smarty->setTemplateDir($tplpaths);
 
 		$users = new Users();
