@@ -30,6 +30,7 @@
 			</li>
             <li><a href="{$smarty.const.WWW_TOP}/binaryblacklist-list.php">View</a> <a style="padding:0;" href="{$smarty.const.WWW_TOP}/binaryblacklist-edit.php?action=add">Add</a> Blacklist</li>
             <li><a href="{$smarty.const.WWW_TOP}/release-list.php">View Releases</a></li>
+            <li><a href="{$smarty.const.WWW_TOP}/failrel-list.php">View Failed Releases</a></li>
             <li><a href="{$smarty.const.WWW_TOP}/preview-list.php">View Previews</a></li>
             <li><a href="{$smarty.const.WWW_TOP}/rage-list.php">View</a> <a style="padding:0;" href="{$smarty.const.WWW_TOP}/rage-edit.php?action=add">Add</a> TVRage List</li>
             <li><a href="{$smarty.const.WWW_TOP}/thetvdb-list.php">View TheTVDB List</a></li>
