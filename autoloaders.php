@@ -21,6 +21,7 @@
 
 require_once NN_CORE . 'autoloader.php';
 require_once NN_LIB . 'autoloader.php';
+require_once NN_LIBS . 'autoloader.php';
 
 require_once NN_WWW . '/SPLClassLoader.php';
 
