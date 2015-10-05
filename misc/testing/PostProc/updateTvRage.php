@@ -5,11 +5,10 @@ require_once dirname(__FILE__) . '/../../../www/config.php';
 use newznab\db\Settings;
 use newznab\utility\Utility;
 
-
 $pdo = new Settings();
 $tvrage = new TvRage(['Settings' => $pdo, 'Echo' => true]);
 
-$shows = $pdo->queryDirect("SELECT rageid FROM tvrage WHERE imgdata IS NULL ORDER BY rageid DESC LIMIT 2000");
+$shows = $pdo->queryDirect("SELECT rageid, releasetitle FROM tvrage WHERE hascover = 0 ORDER BY rageid DESC LIMIT 2000");
 if ($shows->rowCount() > 0) {
 	echo "\n";
 	echo $pdo->log->header("Updating " . number_format($shows->rowCount()) . " tv shows.\n");
@@ -18,10 +17,11 @@ if ($shows->rowCount() > 0) {
 	echo $pdo->log->info("All shows in TvRage database have been updated.\n");
 	usleep(5000000);
 }
-$loop = 0;
+
 if ($shows instanceof \Traversable) {
 	foreach ($shows as $show) {
 		$starttime = microtime(true);
+		$showid = $show['id'];
 		$rageid = $show['rageid'];
 		$tvrShow = $tvrage->getRageInfoFromService($rageid);
 		$genre = '';
@@ -43,19 +43,26 @@ if ($shows instanceof \Traversable) {
 			$desc = $rInfo['desc'];
 		}
 
-		$imgbytes = '';
+		$hasCover = 0;
+
 		if (isset($rInfo['imgurl']) && !empty($rInfo['imgurl'])) {
-			$img =Utility::getUrl(['url' => $rInfo['imgurl']]);
-			if ($img !== false) {
-				$im = @imagecreatefromstring($img);
-				if ($im !== false) {
-					$imgbytes = $img;
-				}
-			}
+			$hasCover = (new ReleaseImage($pdo))->saveImage($rageid, $rInfo['imgurl'], $tvrage->imgSavePath, '', '');
 		}
-		$pdo->queryDirect(sprintf("UPDATE tvrage SET description = %s, genre = %s, country = %s, imgdata = %s WHERE rageid = %d", $pdo->escapeString(substr($desc, 0, 10000)), $pdo->escapeString(substr($genre, 0, 64)), $pdo->escapeString($country), $pdo->escapeString($imgbytes), $rageid));
-		$name = $pdo->query("Select releasetitle from tvrage where rageid = " . $rageid);
-		echo $pdo->log->primary("Updated: " . $name[0]['releasetitle']);
+
+		$pdo->queryDirect(
+			sprintf("
+					UPDATE tvrage
+					SET description = %s, genre = %s, country = %s, hascover = %d
+					WHERE rageid = %d",
+				$pdo->escapeString(substr($desc, 0, 10000)),
+				$pdo->escapeString(substr($genre, 0, 64)),
+				$pdo->escapeString($country),
+				$hasCover,
+				$rageid
+			)
+		);
+
+		echo $pdo->log->primary("Updated: " . $show['releasetitle']);
 		$diff = floor((microtime(true) - $starttime) * 1000000);
 		if (1000000 - $diff > 0) {
 			echo $pdo->log->alternate("Sleeping");
