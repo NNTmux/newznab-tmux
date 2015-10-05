@@ -1038,19 +1038,16 @@ class Users
 		return ($value === false ? 0 : (int) $value['num']);
 	}
 
-	public function getDownloadRequestsForUserAndAllHostHashes($userid)
+	public function getDownloadRequestsForUser($userID)
 	{
-		/*$sql = sprintf("select distinct hosthash from userdownloads where userid = %d and hosthash is not null and hosthash != ''", $userid);
-		$rows = $this->pdo->query($sql);
-		$hashsql = "";
-		foreach ($rows as $row)
-			$hashsql .= sprintf("userdownloads.hosthash = %s or ", $this->pdo->escapeString($row["hosthash"]));
-
-		$hashsql .= " 1=2 ";
-		*/
-		$sql = sprintf("select userdownloads.*, releases.guid, releases.searchname from userdownloads left outer join releases on releases.id = userdownloads.releaseid where userdownloads.userid = %d order by userdownloads.timestamp desc", $userid);
-
-		return $this->pdo->query($sql);
+		return $this->pdo->query(sprintf('SELECT u.*, r.guid, r.searchname FROM userdownloads u
+										  LEFT OUTER JOIN releases r ON r.id = u.releaseid
+										  WHERE u.userid = %d
+										  ORDER BY u.timestamp
+										  DESC',
+											$userID
+										)
+									);
 	}
 
 	/**

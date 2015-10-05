@@ -1,5 +1,6 @@
 <div class="header">
 	<h2>Profile > <strong>{$user.username|escape:"htmlall"}</strong></h2>
+
 	<div class="breadcrumb-wrapper">
 		<ol class="breadcrumb">
 			<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
@@ -150,15 +151,38 @@
 																			{$userinvitedby.username}
 																		</td>
 																	{/if}
-																	{/if}
 																</tr>
+																	{/if}
 																</tbody>
 															</table>
+														{/if}
+														{if $isadmin && $downloadlist|@count > 0}
+														<table class="data table table-condensed table-striped table-responsive table-hover">
+															<tbody>
+															<tr class="bg-aqua-active">
+																<td colspan="2" style="padding-left: 8px;"><strong>Downloads for user</strong>
+																</td>
+															</tr>
+															<tr>
+																<th>date</th>
+																<th>release</th>
+															</tr>
+															{foreach from=$downloadlist item=download}
+																{if $download@iteration == 10}
+																	<tr class="more"><td colspan="3"><a onclick="$('tr.extra').toggle();$('tr.more').toggle();return false;" href="#">show all...</a></td></tr>
+																{/if}
+																<tr {if $download@iteration >= 10}class="extra" style="display:none;"{/if}>
+																	<td width="80" title="{$download.timestamp}">{$download.timestamp|date_format}</td>
+																	<td>{if $download.guid == ""}n/a{else}<a href="{$smarty.const.WWW_TOP}/details/{$download.guid}/{$download.searchname|escape:"htmlall"}">{$download.searchname}</a>{/if}</td>
+																</tr>
+															{/foreach}
+														</table>
 														{/if}
 													</td>
 												</tr>
 												</tbody>
 											</table>
+											</div>
 										</div>
 									</div>
 								</div>
@@ -173,4 +197,3 @@
 			</div>
 		</div>
 	</div>
-</div>
