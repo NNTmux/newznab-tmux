@@ -13,6 +13,10 @@ class TVDB extends TV
 	const MATCH_PROBABILITY = 75;
 
 	/**
+	 * @var \libs\Moinax\TVDB\Client
+	 */
+		public $client;
+	/**
 	 * @param array $options Class instances / Echo to cli?
 	 */
 	public function __construct(array $options = [])
