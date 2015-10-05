@@ -94,7 +94,7 @@ View:
 					<img class="shadow" src="{$smarty.const.WWW_TOP}/covers/movies/{if $result.release.cover == 1}{$result.release.imdbid}-cover.jpg{else}no-cover.jpg{/if}" width="120" border="0" alt="{$result.release.title|escape:"htmlall"}" />
 				{/if}
 				{if $result.release.rage_imgdata != ""}
-					<img width="120" class="shadow" alt="{$result.release.showtitle} Logo" src="{$smarty.const.WWW_TOP}/getimage?type=tvrage&amp;id={$result.release.rg_ID}" />
+					<img width="120" class="shadow" alt="{$result.release.showtitle} Logo" src="{$smarty.const.WWW_TOP}/covers/tvrage/{$result.release.rg_ID}.jpg" />
 				{/if}
 				{if $result.release.mu_cover == "1"}
 					<img class="shadow" src="{$smarty.const.WWW_TOP}/covers/music/{if $result.release.mu_cover == 1}{$result.release.music_id}.jpg{else}no-cover.jpg{/if}" width="120" border="0" alt="{$result.release.title|escape:"htmlall"}" />
