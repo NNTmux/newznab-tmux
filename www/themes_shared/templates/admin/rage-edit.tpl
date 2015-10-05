@@ -54,8 +54,8 @@
 <tr>
 	<td><label for="imagedata">Series Image</label>:</td>
 	<td>
-		{if $rage.imgdata != ""}
-			<img style="max-width:200px; display:block;" src="{$smarty.const.WWW_TOP}/../getimage?type=tvrage&id={$rage.id}">
+		{if $rage.hascover != "0"}
+			<img style="max-width:200px; display:block;" src="{$smarty.const.WWW_TOP}/../covers/tvrage/{$rage.id}.jpg">
 		{/if}
 		<input type="file" id="imagedata" name="imagedata">
 		<div class="hint">Shown in the TV series view page.</div>
