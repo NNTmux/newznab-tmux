@@ -106,7 +106,7 @@ $page->meta_keywords = "browse,nzb,description,details";
 $page->meta_description = "Browse for Nzbs";
 
 if (isset($_GET["imdb"]))
-	$page->content = $page->smarty->fetch('viewmovie.tpl');
+	$page->content = $page->smarty->fetch('viewmoviefull.tpl');
 else
 	$page->content = $page->smarty->fetch('movies.tpl');
 $page->render();

@@ -102,9 +102,9 @@ switch ($action) {
 if ($page->settings->getSetting('userselstyle') ==1) {
 // Get the list of themes.
 	$themeList[] = 'None';
-	$themes = scandir(NN_WWW . '/templates');
+	$themes = scandir(NN_WWW . '/themes');
 	foreach ($themes as $theme) {
-		if (strpos($theme, ".") === false && $theme[0] !== '_' && is_dir(NN_WWW . '/templates/' . $theme)) {
+		if (strpos($theme, ".") === false && $theme[0] !== '_' && is_dir(NN_WWW . '/themes/' . $theme)) {
 			$themeList[] = $theme;
 		}
 	}
