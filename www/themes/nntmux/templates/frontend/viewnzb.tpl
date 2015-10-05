@@ -39,7 +39,7 @@
 <br />
 
 <!-- ### -- IMAGE ON RIGHT -->
-{if $rage && $release.rageid > 0 && $rage.imgdata != ""}<img class="img-rounded" src="{$smarty.const.WWW_TOP}/getimage?type=tvrage&amp;id={$rage.id}" width="220" height="auto" alt="{$rage.releasetitle|escape:"htmlall"}" style="float:right;" />{/if}
+{if $rage && $release.rageid > 0 && $rage.imgdata != ""}<img class="img-rounded" src="{$smarty.const.WWW_TOP}/covers/tvrage{$rage.id}.jpg" width="220" height="auto" alt="{$rage.releasetitle|escape:"htmlall"}" style="float:right;" />{/if}
 {if $movie && $release.rageid < 0 && $movie.banner == 1}<img class="shadow img-thumbnail" src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbid}-banner.jpg" alt="{$movie.title|escape:"htmlall"}" style="vertical-align:top;" />
 	{elseif $movie && $release.rageid < 0 && $movie.cover == 1}<img class="shadow img-thumbnail" src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbid}-cover.jpg" width="220" height="auto" alt="{$movie.title|escape:"htmlall"}" style="float:right;" />{/if}
 {if $game && $game.cover == 1}<img class="img-rounded" src="{$smarty.const.WWW_TOP}/covers/games/{$game.id}.jpg" width="160"
