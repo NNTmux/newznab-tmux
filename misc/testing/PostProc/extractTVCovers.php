@@ -26,12 +26,20 @@ if ($shows instanceof \Traversable) {
 			if ($coverSave === false || !is_file($coverPath)) {
 				$failCnt++;
 				echo ".";
-			// Check if the image is formatted properly and useable
+				// Check if the image is formatted properly and useable
 			} else if (imagecreatefromjpeg($coverPath) === false) {
 				@unlink($coverPath);
 				$failCnt++;
 				echo "#";
 			} else {
+				$pdo->queryExec(
+					sprintf("
+							UPDATE tvrage
+							SET hascover = 1
+							WHERE rageid = %d",
+						$show['rageid']
+					)
+				);
 				$succCnt++;
 				echo "!";
 			}
