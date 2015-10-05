@@ -8,6 +8,7 @@
 		</ol>
 	</div>
 </div>
+{$results|@var_dump}
 {if $results|@count > 0}
 	<div class="box-body">
 		{foreach from=$results item=result}

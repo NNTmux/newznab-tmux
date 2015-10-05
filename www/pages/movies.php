@@ -4,8 +4,9 @@ $movie = new Movie(['Settings' => $page->settings]);
 $cat = new Category(['Settings' => $page->settings]);
 $fail = new DnzbFailures(['Settings' => $page->settings]);
 
-if (!$page->users->isLoggedIn())
+if (!$page->users->isLoggedIn()) {
 	$page->show403();
+}
 
 
 $moviecats = $cat->getChildren(Category::CAT_PARENT_MOVIE);
@@ -15,8 +16,9 @@ foreach($moviecats as $mcat) {
 }
 
 $category = (isset($_GET["imdb"]) ? -1 : Category::CAT_PARENT_MOVIE);
-if (isset($_REQUEST["t"]) && array_key_exists($_REQUEST['t'], $mtmp))
+if (isset($_REQUEST["t"]) && array_key_exists($_REQUEST['t'], $mtmp)) {
 	$category = $_REQUEST["t"] + 0;
+}
 
 $user = $page->users->getById($page->users->currentUserId());
 $cpapi = $user['cp_api'];
@@ -25,7 +27,9 @@ $page->smarty->assign('cpapi', $cpapi);
 $page->smarty->assign('cpurl', $cpurl);
 
 $catarray = [];
-if ($category != -1) $catarray[] = $category;
+if ($category != -1) {
+	$catarray[] = $category;
+}
 
 $page->smarty->assign('catlist', $mtmp);
 $page->smarty->assign('category', $category);
@@ -84,20 +88,21 @@ $page->smarty->assign('pagerquerysuffix', "#results");
 $pager = $page->smarty->fetch("pager.tpl");
 $page->smarty->assign('pager', $pager);
 
-if ($category == -1)
-	$page->smarty->assign("catname","All");
-else
-{
+if ($category == -1) {
+	$page->smarty->assign("catname", "All");
+} else {
 	$cat = new Category();
 	$cdata = $cat->getById($category);
-	if ($cdata)
-		$page->smarty->assign('catname',$cdata["title"]);
-	else
+	if ($cdata) {
+		$page->smarty->assign('catname', $cdata["title"]);
+	} else {
 		$page->show404();
+	}
 }
 
-foreach($ordering as $ordertype)
-	$page->smarty->assign('orderby'.$ordertype, WWW_TOP."/movies?t=".$category.$browseby_link."&amp;ob=".$ordertype."&amp;offset=0");
+foreach($ordering as $ordertype) {
+	$page->smarty->assign('orderby' . $ordertype, WWW_TOP . "/movies?t=" . $category . $browseby_link . "&amp;ob=" . $ordertype . "&amp;offset=0");
+}
 
 $page->smarty->assign('results',$movies);
 
@@ -105,8 +110,9 @@ $page->meta_title = "Browse Nzbs";
 $page->meta_keywords = "browse,nzb,description,details";
 $page->meta_description = "Browse for Nzbs";
 
-if (isset($_GET["imdb"]))
-	$page->content = $page->smarty->fetch('viewmovie.tpl');
-else
+if (isset($_GET["imdb"])) {
+	$page->content = $page->smarty->fetch('viewmoviefull.tpl');
+} else {
 	$page->content = $page->smarty->fetch('movies.tpl');
+}
 $page->render();
