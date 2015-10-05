@@ -149,7 +149,7 @@
 														 data-toggle="modal"
 														 data-target="#modal-image"/>
 												{/if}
-												{if $rage && $release.rageid > 0 && $rage.imgdata != ""}
+												{if $rage && $release.rageid > 0 && $rage.hascover != "0"}
 													<img src="{$smarty.const.WWW_TOP}/covers/tvrage/{$rage.id}.jpg"
 														 width="185"
 														 alt="{$rage.releasetitle|escape:"htmlall"}"
@@ -809,7 +809,7 @@
 					<img src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbid}-cover.jpg"
 						 alt="{$movie.title|escape:"htmlall"}">
 				{/if}
-				{if $rage && $release.rageid > 0 && $rage.imgdata != ""}
+				{if $rage && $release.rageid > 0 && $rage.hascover != "0"}
 					<img src="{$smarty.const.WWW_TOP}/covers/tvrage/{$rage.id}.jpg"
 						 alt="{$rage.releasetitle|escape:"htmlall"}"/>
 				{/if}
