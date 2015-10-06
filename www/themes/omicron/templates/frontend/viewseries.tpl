@@ -1,4 +1,4 @@
-{if $nodata != ""}
+{if $nodata}
 	<div class="header">
 		{assign var="catsplit" value=">"|explode:$catname}
 		<h2>View > <strong>TV Series</strong></h2>
@@ -38,7 +38,7 @@
 		{if $rage[0].hascover != 0}
 			<center>
 				<img class="shadow img img-polaroid" style="max-height:300px;" alt="{$rage[0].releasetitle} Logo"
-					 src="{$smarty.const.WWW_TOP}/covers/tvrage/{$rage[0].rageid}"/>
+					 src="{$smarty.const.WWW_TOP}/covers/tvrage/{$rage[0].rageid}.jpg"/>
 			</center>
 			<br/>
 		{/if}
