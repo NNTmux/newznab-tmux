@@ -17,7 +17,7 @@
 
 	</h1>
 	<div class="tvseriesheading">
-		{if $rage[0].imgdata != ""}<img class="shadow" alt="{$rage[0].releasetitle} Logo"
+		{if $rage[0].hascover != "0"}<img class="shadow" alt="{$rage[0].releasetitle} Logo"
 										src="{$smarty.const.WWW_TOP}/covers/tvrage/{$rage[0].id}.jpg" />{/if}
 		<p>
 			{if $seriesgenre != ''}<b>{$seriesgenre}</b><br/>{/if}

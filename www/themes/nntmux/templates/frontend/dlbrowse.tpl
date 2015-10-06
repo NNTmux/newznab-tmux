@@ -93,7 +93,7 @@ View:
 				{if $result.release.movie_id != ""}
 					<img class="shadow" src="{$smarty.const.WWW_TOP}/covers/movies/{if $result.release.cover == 1}{$result.release.imdbid}-cover.jpg{else}no-cover.jpg{/if}" width="120" border="0" alt="{$result.release.title|escape:"htmlall"}" />
 				{/if}
-				{if $result.release.rage_imgdata != ""}
+				{if $result.release.rage_hascover != "0"}
 					<img width="120" class="shadow" alt="{$result.release.showtitle} Logo" src="{$smarty.const.WWW_TOP}/covers/tvrage/{$result.release.rg_ID}.jpg" />
 				{/if}
 				{if $result.release.mu_cover == "1"}
