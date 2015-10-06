@@ -29,39 +29,23 @@ if (isset($_GET["id"]))
 	$failed = $df->getFailedCount($data['guid']);
 
 	$rage = '';
-	if ($data["rageid"] != '')
-	{
-		$tvrage = new TvRage();
-
-		$rageinfo = $tvrage->getByRageID($data["rageid"]);
-		if (count($rageinfo) > 0)
-		{
-			$seriesnames = $seriesdescription = $seriescountry = $seriesgenre = $seriesid = $hascover = [];
-			foreach($rageinfo as $r)
-			{
-				$seriesnames[] = $r['releasetitle'];
-				if (!empty($r['description']))
-					$seriesdescription[] = $r['description'];
-
-				if (!empty($r['country']))
-					$seriescountry[] = $r['country'];
-
-				if (!empty($r['genre']))
-					$seriesgenre[] = $r['genre'];
-
-				if (!empty($r['id'])) {
-					$seriesid[] = $r['id'];
-					$hascover[] = $r['hascover'];
+	if ($data['rageid'] != '') {
+		$rageInfo = (new TvRage(['Settings' => $page->settings]))->getByRageID($data['rageid']);
+		if (count($rageInfo) > 0) {
+			$rage = ['releasetitle' => '', 'description' => '', 'country' => '', 'genre' => '', 'hascover' => '', 'id' => ''];
+			$done = 1;
+			$needed = count($rage);
+			foreach ($rageInfo as $info) {
+				foreach($rage as $key => $value) {
+					if (empty($value) && !empty($info[$key])) {
+						$rage[$key] = $info[$key];
+						$done++;
+					}
+				}
+				if ($done == $needed) {
+					break;
 				}
 			}
-			$rage = [
-				'releasetitle' => array_shift($seriesnames),
-				'description'  => array_shift($seriesdescription),
-				'country'      => array_shift($seriescountry),
-				'genre'        => array_shift($seriesgenre),
-				'hascover'     => array_shift($hascover),
-				'id'           => array_shift($seriesid)
-			];
 		}
 	}
 
