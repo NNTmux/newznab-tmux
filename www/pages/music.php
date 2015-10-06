@@ -4,7 +4,7 @@ if (!$page->users->isLoggedIn()) {
 	$page->show403();
 }
 
-$music = new Musik(['Settings' => $page->settings]);
+$music = new Music(['Settings' => $page->settings]);
 $cat = new Category(['Settings' => $page->settings]);
 $gen = new Genres(['Settings' => $page->settings]);
 $fail = new DnzbFailures(['Settings' => $page->settings]);

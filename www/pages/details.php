@@ -122,7 +122,7 @@ if (isset($_GET["id"]))
 
 	$mus = '';
 	if ($data['musicinfoid'] != '') {
-		$music = new Musik(['Settings' => $page->settings]);
+		$music = new Music(['Settings' => $page->settings]);
 		$mus = $music->getMusicInfo($data['musicinfoid']);
 	}
 
