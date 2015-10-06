@@ -43,7 +43,7 @@
 			<br/>
 		{/if}
 		<p>
-			{if $seriesGenre != ''}<b>{$seriesgenre}</b><br/>{/if}
+			{if $seriesgenre != ''}<b>{$seriesgenre}</b><br/>{/if}
 			<span class="descinitial">{$seriesdescription|escape:"htmlall"|nl2br|magicurl}</span>
 		</p>
 	</div>
