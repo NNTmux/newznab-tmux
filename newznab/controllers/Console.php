@@ -6,7 +6,10 @@ use newznab\libraries\ApaiIO\Operations\Search;
 use newznab\libraries\ApaiIO\ApaiIO;
 
 
-class Konsole
+/**
+ * Class Console
+ */
+class Console
 {
 	const CONS_UPROC = 0; // Release has not been processed.
 	const CONS_NTFND = -2;

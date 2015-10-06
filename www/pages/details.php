@@ -134,7 +134,7 @@ if (isset($_GET["id"]))
 
 	$con = '';
 	if ($data['consoleinfoid'] != '') {
-		$c = new Konsole();
+		$c = new Console();
 		$con = $c->getConsoleInfo($data['consoleinfoid']);
 	}
 
