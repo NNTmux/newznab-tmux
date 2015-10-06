@@ -4,9 +4,9 @@ use newznab\db\Settings;
 use newznab\utility\Utility;
 
 /**
- * Class TvAnger
+ * Class TvRage
  */
-class TvAnger
+class TvRage
 {
 	const APIKEY = '7FwjZ8loweFcOhHfnU3E';
 	const MATCH_PROBABILITY = 75;
@@ -42,7 +42,7 @@ class TvAnger
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
 
 		$this->xmlEpisodeInfoUrl =
-			"http://services.tvrage.com/myfeeds/tvrageepisodes.php?key=" . TvAnger::APIKEY;
+			"http://services.tvrage.com/myfeeds/tvrageepisodes.php?key=" . TvRage::APIKEY;
 	}
 
 	/**
@@ -857,7 +857,7 @@ class TvAnger
 					return $akaMatches[100][0];
 				}
 
-				// No 100% matches, loop through what we got and if our next closest match is more than TvAnger::MATCH_PROBABILITY % of the title lets take it.
+				// No 100% matches, loop through what we got and if our next closest match is more than TvRage::MATCH_PROBABILITY % of the title lets take it.
 				foreach ($titleMatches as $mk => $mv) {
 					// Since its not 100 match if we have country info lets use that to make sure we get the right show.
 					if (isset($showInfo['country']) && !empty($showInfo['country']) && !empty($mv[0]['country'])) {
@@ -935,7 +935,7 @@ class TvAnger
 			$matchpct = ($numMatches / $totalMatches) * 100;
 		}
 
-		if ($matchpct >= TvAnger::MATCH_PROBABILITY) {
+		if ($matchpct >= TvRage::MATCH_PROBABILITY) {
 			return $matchpct;
 		} else {
 			return false;
