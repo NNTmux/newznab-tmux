@@ -18,7 +18,7 @@
 	</h1>
 	<div class="tvseriesheading">
 		{if $rage[0].imgdata != ""}<img class="shadow" alt="{$rage[0].releasetitle} Logo"
-										src="{$smarty.const.WWW_TOP}/covers/tvrage/{$rage[0].id}" />{/if}
+										src="{$smarty.const.WWW_TOP}/covers/tvrage/{$rage[0].id}.jpg" />{/if}
 		<p>
 			{if $seriesgenre != ''}<b>{$seriesgenre}</b><br/>{/if}
 			<span class="descinitial">{$seriesdescription|escape:"htmlall"|nl2br|magicurl|truncate:"1000":" </span><a class=\"descmore\" href=\"#\">more...</a>"}
