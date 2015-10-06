@@ -36,7 +36,7 @@ if (isset($_GET["id"]))
 		$rageinfo = $tvrage->getByRageID($data["rageid"]);
 		if (count($rageinfo) > 0)
 		{
-			$seriesnames = $seriesdescription = $seriescountry = $seriesgenre = $seriesimg = $seriesid = [];
+			$seriesnames = $seriesdescription = $seriescountry = $seriesgenre = $seriesid = $hascover = [];
 			foreach($rageinfo as $r)
 			{
 				$seriesnames[] = $r['releasetitle'];
@@ -49,9 +49,9 @@ if (isset($_GET["id"]))
 				if (!empty($r['genre']))
 					$seriesgenre[] = $r['genre'];
 
-				if (!empty($r['imgdata'])) {
-					$seriesimg[] = $r['imgdata'];
+				if (!empty($r['id'])) {
 					$seriesid[] = $r['id'];
+					$hascover[] = $r['hascover'];
 				}
 			}
 			$rage = [
@@ -59,7 +59,7 @@ if (isset($_GET["id"]))
 				'description'  => array_shift($seriesdescription),
 				'country'      => array_shift($seriescountry),
 				'genre'        => array_shift($seriesgenre),
-				'imgdata'      => array_shift($seriesimg),
+				'hascover'     => array_shift($hascover),
 				'id'           => array_shift($seriesid)
 			];
 		}
