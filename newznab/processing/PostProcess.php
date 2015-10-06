@@ -202,7 +202,7 @@ class PostProcess
 	public function processMusic()
 	{
 		if ($this->pdo->getSetting('lookupmusic') != 0) {
-			(new \Musik(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processMusicReleases();
+			(new \Music(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processMusicReleases();
 		}
 	}
 
