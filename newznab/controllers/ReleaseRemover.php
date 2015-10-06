@@ -767,15 +767,22 @@ class ReleaseRemover
 						$regexMatch = str_replace('\'', '', $dbRegex);
 					}
 
-					$ftMatch = (NN_RELEASE_SEARCH_TYPE == ReleaseSearch::SPHINX
-						? sprintf('rse.query = "@(name,searchname,filename) %s;limit=10000;maxmatches=10000;mode=any" AND', str_replace('|', ' ', str_replace('"', '', $regexMatch)))
-						: sprintf("(MATCH (rs.name) AGAINST ('%1\$s') OR MATCH (rs.searchname) AGAINST ('%1\$s')) AND", str_replace('|', ' ', $regexMatch))
-					);
+					if ($regexMatch !== '') {
+
+						switch (NN_RELEASE_SEARCH_TYPE) {
+							case ReleaseSearch::SPHINX:
+								$ftMatch = sprintf('rse.query = "@(name,searchname) %s;limit=1000000;maxmatches=1000000;mode=any" AND', str_replace('|', ' ', str_replace('"', '', $regexMatch)));
+								break;
+							case ReleaseSearch::FULLTEXT:
+								$ftMatch = sprintf("(MATCH (rs.name) AGAINST ('%1\$s') OR MATCH (rs.searchname) AGAINST ('%1\$s')) AND", str_replace('|', ' ', $regexMatch));
+								break;
+						}
+					}
 				}
 
 				switch ((int)$regex['msgcol']) {
 					case Binaries::BLACKLIST_FIELD_SUBJECT:
-						$regexSQL = sprintf("WHERE %s (r.name REGEXP %s OR r.searchname REGEXP %s)", $ftMatch, $dbRegex, $dbRegex);
+						$regexSQL = sprintf("WHERE %s (r.name REGEXP %s OR r.searchname REGEXP %2\$s)", $ftMatch, $dbRegex);
 						$opTypeName = "Subject";
 						break;
 					case Binaries::BLACKLIST_FIELD_FROM:
