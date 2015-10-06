@@ -5,9 +5,9 @@ use newznab\libraries\ApaiIO\Operations\Search;
 use newznab\libraries\ApaiIO\ApaiIO;
 
 /**
- * Class Musik
+ * Class Music
  */
-class Musik
+class Music
 {
 	/**
 	 * @var newznab\db\Settings
