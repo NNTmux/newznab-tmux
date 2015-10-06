@@ -35,7 +35,9 @@
 								{elseif $type == 'PC'}
 									class="library-games"
 								{elseif $type == 'TV'}
-									class="library-games"
+									class="library-show"
+								{elseif $type == 'Anime'}
+									class="library-show"
 								{/if}
 								>
 							<div class="poster">
@@ -61,14 +63,17 @@
 											 src="{$smarty.const.WWW_TOP}/covers/games/{$result.gamesinfo_id}.jpg"/>
 									{elseif $type == 'TV'}
 										<img height="130px" width="130px" alt=""
-											 src="{$smarty.const.WWW_TOP}/getimage?type=tvrage&amp;id={$result.tvid}"/>
+											 src="{$smarty.const.WWW_TOP}/covers/tvrage/{$result.rageid}.jpg"/>
+									{elseif $type == 'Anime'}
+										<img width="130px" height="130px" alt=""
+											 src="{$smarty.const.WWW_TOP}/covers/anime/{$result.anidbid}.jpg"/>
 									{/if}
 								</a>
 							</div>
 							<div class="rating-pod" id="guid{$result.guid}">
 								<div class="icons divlink col-lg-4">
 									<span class="btn btn-hover btn-default btn-sm icon_nzb text-muted"><a title="Download Nzb"
-																		href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}/{$result.searchname|escape:"htmlall"}">
+																										  href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}">
 											<i class="glyphicon glyphicon-download"></i></a>
 									</span>
 									<span class="btn btn-hover btn-default btn-sm icon_cart text-muted" title="Add to Cart"><i class="glyphicon glyphicon-shopping-cart"></i></span>
