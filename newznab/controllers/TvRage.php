@@ -38,7 +38,6 @@ class TvRage extends TV
 	{
 		parent::__construct($options);
 		$this->rageqty = ($this->pdo->getSetting('maxrageprocessed') != '') ? $this->pdo->getSetting('maxrageprocessed') : 75;
-		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
 		$this->xmlEpisodeInfoUrl = "http://services.tvrage.com/myfeeds/episodeinfo.php?key=" . TvRage::APIKEY;
 		$this->imgSavePath = NN_COVERS . 'tvrage' . DS;
 	}
