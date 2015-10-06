@@ -6,7 +6,7 @@ $tvRage = new TvRage(['Settings' => $page->settings]);
 
 $rage = [
 	'id' => '', 'description' => '', 'releasetitle' => '', 'genre' => '',
-	'rageid' => '', 'country' => '', 'imgdata' => ''
+	'rageid' => '', 'country' => '', 'hascover' => ''
 ];
 
 switch ((isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view')) {

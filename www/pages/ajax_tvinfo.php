@@ -25,8 +25,8 @@ else
 		$rage = $t->getByRageID($rel["rageid"]);
 		if (count($rage) > 0)
 		{
-			if ($rage[0]["imgdata"] != "")
-				print "<img class=\"shadow\" src=\"".WWW_TOP."/getimage?type=tvrage&amp;id=".$rage[0]["id"]."\" width=\"180\"/>";
+			if ($rage[0]["hascover"] != "0")
+				print "<img class=\"shadow\" src=\"".WWW_TOP."/covers/tvrage/$rage[0]['id'].jpg\" width=\"180\"/>";
 		}
 	}
 }

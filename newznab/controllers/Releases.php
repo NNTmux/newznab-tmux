@@ -195,7 +195,7 @@ class Releases
 							m.id AS movie_id, m.title, m.rating, m.cover, m.plot, m.year, m.genre, m.director, m.actors, m.tagline,
 							mu.id AS music_id, mu.title AS mu_title, mu.cover AS mu_cover, mu.year AS mu_year, mu.artist AS mu_artist, mu.tracks AS mu_tracks, mu.review AS mu_review,
 							ep.id AS ep_id, ep.showtitle AS ep_showtitle, ep.airdate AS ep_airdate, ep.fullep AS ep_fullep, ep.overview AS ep_overview,
-							tvrage.imgdata AS rage_imgdata, tvrage.id AS rg_ID
+							tvrage.hascover AS rage_hascover, tvrage.id AS rg_ID
 							FROM releases
 							LEFT OUTER JOIN category c ON c.id = releases.categoryid
 							LEFT OUTER JOIN category cp ON cp.id = c.parentid
