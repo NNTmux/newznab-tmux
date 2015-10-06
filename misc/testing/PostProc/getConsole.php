@@ -8,7 +8,7 @@ use newznab\db\Settings;
 
 
 $pdo = new Settings();
-$console = new \Konsole(['Echo' => true, 'Settings' => $pdo]);
+$console = new \Console(['Echo' => true, 'Settings' => $pdo]);
 
 $res = $pdo->queryDirect(sprintf("SELECT searchname, id FROM releases WHERE consoleinfoid IS NULL AND categoryid BETWEEN 1000 AND 1999 ORDER BY id DESC" ));
 if ($res instanceof \Traversable) {

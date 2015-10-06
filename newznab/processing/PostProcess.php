@@ -160,7 +160,7 @@ class PostProcess
 	public function processConsoles()
 	{
 		if ($this->pdo->getSetting('lookupgames') != 0) {
-			(new \Konsole(['Settings' => $this->pdo, 'Echo' => $this->echooutput]))->processConsoleReleases();
+			(new \Console(['Settings' => $this->pdo, 'Echo' => $this->echooutput]))->processConsoleReleases();
 		}
 	}
 
