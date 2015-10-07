@@ -374,7 +374,7 @@ class ReleaseRegex
 					}
 
 
-						$msgs = $nntp->getXOver($rangeStart . "-" . $rangeEnd, true, false);
+						$msgs = $nntp->getXOVER($rangeStart . "-" . $rangeEnd);
 
 					if (NNTP::isError($msgs)) {
 						$ret[] = "Error {$msgs->code}: {$msgs->message} on " . $group;
