@@ -36,7 +36,7 @@
 		<td title="{$regex.description}">{if $regex.groupname==""}all{else}{$regex.groupname|replace:"alt.binaries":"a.b"}{/if}</td>
 		<td title="Edit regex"><a href="{$smarty.const.WWW_TOP}/regex-edit.php?id={$regex.id}">{$regex.regex|escape:html}</a><br>
 			{$regex.description}</td>
-		<td>{$regex.poster}</td>
+		<td>{if isset($regex.poster)} {$regex.poster}{else}  {/if}</td>
 		<td title="{$regex.categoryid}">{if $regex.categoryid!=""}{$regex.categoryTitle}{/if}</td>
 		<td>{if $regex.status==1}active{else}disabled{/if}</td>
 		<td class="right">{$regex.num_releases}</td>
