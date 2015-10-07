@@ -1,13 +1,12 @@
 <?php
 
-use newznab\db\Settings;
 use newznab\utility\Utility;
 
 /**
  * Class TraktTv
  * Lookup information from trakt.tv using their API.
  */
-class TraktTv
+class TraktTv extends TV
 {
 	/**
 	 * The Trakt.tv API v2 Client ID (SHA256 hash - 64 characters long string). Used for movie and tv lookups.
@@ -32,13 +31,8 @@ class TraktTv
 	 */
 	public function __construct(array $options = [])
 	{
-		$defaults = [
-			'Settings' => null,
-		];
-		$options += $defaults;
-
-		$settings = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
-		$this->clientID = $settings->getSetting('trakttvclientkey');
+		parent::__construct($options);
+		$this->clientID = $this->pdo->getSetting('trakttvclientkey');
 		$this->requestHeaders = [
 			'Content-Type: application/json',
 			'trakt-api-version: 2',
@@ -122,7 +116,7 @@ class TraktTv
 	 * @param string     $start Start date of calendar.Default value is today.
 	 * @param int $days  Number of days to lookup ahead. Default value is 7 days
 	 *
-	 * @return array|bool|string
+	 * @return array|bool
 	 * @see    http://docs.trakt.apiary.io/#reference/calendars/all-shows/get-shows
 	 *
 	 * @access public
@@ -131,6 +125,25 @@ class TraktTv
 	{
 		$array = $this->getJsonArray(
 			'https://api-v2launch.trakt.tv/calendars/all/shows/' . $start . '/' . $days
+		);
+		if (!$array){
+			return false;
+		}
+		return $array;
+	}
+
+	/**
+	 * Fetches weekend box office data from trakt.tv. Data is updated every monday.
+	 *
+	 * @return array|bool
+	 * @see    http://docs.trakt.apiary.io/#reference/movies/box-office/get-the-weekend-box-office
+	 *
+	 * @access public
+	 */
+	public function getBoxOffice()
+	{
+		$array = $this->getJsonArray(
+			'https://api-v2launch.trakt.tv/movies/boxoffice'
 		);
 		if (!$array){
 			return false;
