@@ -15,7 +15,7 @@
 		<input type="text" id="groupname" name="groupname" value="{$groupname|escape:html}" />
 		or
 		<select name="groupid">
-		{html_options values=$gid output=$gnames selected=$groupID}
+		{html_options values=$gid output=$gnames selected=$groupid}
 		</select>
 	</td>
 </tr>
@@ -115,7 +115,7 @@
 		<input type="text" id="groupname" name="groupname" value="{$groupname|escape:html}" />
 		or
 		<select name="groupid">
-		{html_options values=$gid output=$gnames selected=$groupID}
+		{html_options values=$gid output=$gnames selected=$groupid}
 		</select>
 	</td>
 </tr>
