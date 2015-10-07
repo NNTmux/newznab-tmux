@@ -4,6 +4,9 @@
  */
 require_once NN_LIBS . 'Net_NNTP/NNTP/Client.php';
 
+use newznab\db\Settings;
+use newznab\utility\Utility;
+
 
 /**
  * Class for connecting to the usenet, retrieving articles and article headers,
@@ -107,7 +110,7 @@ class NNTP extends Net_NNTP_Client
 
 		$this->_echo = ($options['Echo'] && NN_ECHOCLI);
 
-		$this->pdo = ($options['Settings'] instanceof \newznab\db\Settings ? $options['Settings'] : new \newznab\db\Settings());
+		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
 
 		$this->_debugBool = (NN_LOGGING || NN_DEBUG);
 		if ($this->_debugBool) {
@@ -1153,7 +1156,7 @@ class NNTP extends Net_NNTP_Client
 				$ouFile = $this->_yEncTempOutput . mt_rand(0, 999999);
 				file_put_contents($inFile, $input[1]);
 				file_put_contents($ouFile, '');
-				\newznab\utility\Utility::runCmd(
+				Utility::runCmd(
 					"'" .
 					$this->_yyDecoderPath .
 					"' '" .
@@ -1227,7 +1230,7 @@ class NNTP extends Net_NNTP_Client
 			}
 		} else if ($this->_yyDecoderPath !== false) {
 
-			$this->_yEncSilence    = (\newznab\utility\Utility::isWindows() ? '' : ' > /dev/null 2>&1');
+			$this->_yEncSilence    = (Utility::isWindows() ? '' : ' > /dev/null 2>&1');
 			$this->_yEncTempInput  = NN_TMP . 'yEnc' . DS;
 			$this->_yEncTempOutput = $this->_yEncTempInput . 'output';
 			$this->_yEncTempInput .= 'input';
