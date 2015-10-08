@@ -464,12 +464,12 @@ class Movie
 			return $data['trailer'];
 		}
 		$cover = 0;
-		if (is_file($this->imgSavePath . $data['ids']['imdb'] . '-cover.jpg')) {
+		if (is_file($this->imgSavePath . (str_ireplace('tt', '', $data['ids']['imdb'])) . '-cover.jpg')) {
 			$cover = 1;
 		} else {
 			$link = $this->checkTraktValue($data['images']['poster']['thumb']);
 			if ($link) {
-				$cover = $this->releaseImage->saveImage($data['ids']['imdb'] . '-cover', $link, $this->imgSavePath);
+				$cover = $this->releaseImage->saveImage((str_ireplace('tt', '', $data['ids']['imdb'])) . '-cover', $link, $this->imgSavePath);
 			}
 		}
 		$this->update([
