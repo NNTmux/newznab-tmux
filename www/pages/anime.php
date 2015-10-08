@@ -9,7 +9,7 @@ $AniDB = new AniDB(['Settings' => $page->settings]);
 if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
 
 	# force the category to 5070 as it should be for anime, as $catarray was NULL and we know the category for sure for anime
-	$releases = $Releases->searchbyAnidbId($_GET['id'], '', 0, 1000, '', array('5070'), -1);
+	$releases = $Releases->searchbyAnidbId($_GET['id'], '', 0, 1000, '', ['5070'], -1);
 	$anidb = $AniDB->getAnimeInfo($_GET['id']);
 
 	if (!$releases && !$anidb) {
@@ -64,6 +64,18 @@ if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
 		$page->meta_keywords = 'view,anime,anidb,description,details';
 		$page->meta_description = 'View ' . $anidb['title'] . ' Anime';
 	}
+
+	if ($category == -1) {
+		$page->smarty->assign("catname", "All");
+	} else {
+		$cdata = $cat->getById($category);
+		if ($cdata) {
+			$page->smarty->assign('catname', $cdata["title"]);
+		} else {
+			$page->show404();
+		}
+	}
+
 	$page->content = $page->smarty->fetch('viewanime.tpl');
 	$page->render();
 } else {

@@ -1,4 +1,4 @@
-{if $nodata != ""}
+{if isset($nodata)}
 <div class="header">
 	{assign var="catsplit" value=">"|explode:$catname}
 	<h2>View > <strong>Anime</strong></h2>
@@ -50,12 +50,6 @@
 		<a class="btn btn-sm btn-default"
 		   href="{$site->dereferrer_link}http://anidb.net/perl-bin/animedb.pl?show=anime&amp;aid={$animeanidbid}"
 		   title="View AniDB">View AniDB</a>
-		{if $animetvdbid > 0}<a class="btn btn-sm btn-default" target="_blank"
-								href="{$site->dereferrer_link}http://thetvdb.com/?tab=series&id={$animetvdbid}"
-								title="View TheTVDB">View TheTVDB</a> | {/if}
-		{if $animeimdbid > 0}<a class="btn btn-sm btn-default" target="_blank"
-								href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$animeimdbid}"
-								title="View IMDb">View IMDb</a> | {/if}
 		<a class="btn btn-sm btn-default"
 		   href="{$smarty.const.WWW_TOP}/rss?anidb={$animeanidbid}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">RSS
 			feed for this Anime <i class="fa fa-rss"></i></a>
