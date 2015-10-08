@@ -589,7 +589,7 @@
 															{/if}
 															<br/>{$comment.createddate|daysago}
 														</td>
-														{if $comment.shared == 2}
+														{if isset($comment.shared) && $comment.shared == 2}
 															<td style="color:#6B2447">{$comment.text|escape:"htmlall"|nl2br}</td>
 														{else}
 															<td>{$comment.text|escape:"htmlall"|nl2br}</td>

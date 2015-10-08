@@ -5,12 +5,25 @@ if (!$page->users->isLoggedIn())
 
 $Releases = new Releases(['Settings' => $page->settings]);
 $AniDB = new AniDB(['Settings' => $page->settings]);
+$cat = new Category(['Settings' => $page->settings]);
 
 if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
 
 	# force the category to 5070 as it should be for anime, as $catarray was NULL and we know the category for sure for anime
 	$releases = $Releases->searchbyAnidbId($_GET['id'], '', 0, 1000, '', array('5070'), -1);
 	$anidb = $AniDB->getAnimeInfo($_GET['id']);
+	$category = Category::CAT_TV_ANIME;
+
+	if ($category == -1) {
+		$page->smarty->assign("catname", "All");
+	} else {
+		$cdata = $cat->getById($category);
+		if ($cdata) {
+			$page->smarty->assign('catname', $cdata["title"]);
+		} else {
+			$page->show404();
+		}
+	}
 
 	if (!$releases && !$anidb) {
 		$page->show404();
