@@ -742,8 +742,6 @@ class ReleaseRemover
 			$this->crapTime
 		);
 
-		echo $this->query;
-
 		if ($this->checkSelectQuery() === false) {
 			return $this->returnError();
 		}
