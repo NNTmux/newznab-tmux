@@ -120,7 +120,7 @@
 												{if $result.tvairdate != ""}<span class="label label-success"
 																				  title="{$result.tvtitle} Aired on {$result.tvairdate|date_format}">
 													Aired {if $result.tvairdate|strtotime > $smarty.now}in future{else}{$result.tvairdate|daysago}{/if}</span>{/if}
-												{if $result.reid > 0}<span class="mediainfo label label-default"
+												{if isset($result.reis) && $result.reid > 0}<span class="mediainfo label label-default"
 																		   title="{$result.guid}">Media</span>{/if}
 											</div>
 										</div>

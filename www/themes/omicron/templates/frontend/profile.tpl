@@ -79,15 +79,16 @@
 															<tr>
 																<th>Downloads last 24 hours</th>
 																<td><span id="ugrtd">{$grabstoday}</span> /
-																	Unlimited {if $user.grabs >= $user.downloadrequests}&nbsp;&nbsp;
+																	{if $user.grabs >= $user.downloadrequests}&nbsp;&nbsp;
 																		<small>(Next DL
 																		in {($grabstoday.nextdl/3600)|intval}
 																		h {($grabstoday.nextdl/60) % 60}
-																		m)</small>{/if}{if $isadmin && $grabstoday > 0}
-																	<a
-																			onclick="resetapireq({$user.id}, 'grabs'); document.getElementById('ugrtd').innerHTML='0'; return false;"
+																		m)</small> {else} {$user.downloadrequests} {/if}
+																	{if $isadmin && $grabstoday > 0}
+																		<a onclick="resetapireq({$user.id}, 'grabs'); document.getElementById('ugrtd').innerHTML='0'; return false;"
 																			href="#" class="label label-danger">
-																			Reset</a>{/if}</td>
+																			Reset</a>
+																	{/if}</td>
 															</tr>
 															<tr>
 																<th>Downloads Total</th>
