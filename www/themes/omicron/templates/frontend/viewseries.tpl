@@ -54,8 +54,11 @@
 				From Tv Rage</a>
 		{/if}
 		<a class="btn btn-sm btn-default" target="_blank"
-		   href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$rage[0].rageid}" title="View in TvRage">View
+		   href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$rage[0].rageid}" title="View at TvRage">View
 			in Tv Rage</a>
+		<a class="btn btn-sm btn-default" target="_blank"
+		   href="{$site->dereferrer_link}http://trakt.tv/search/tvrage/{$rage[0].rageid}" title="View at TraktTv">View
+			at TraktTv</a>
 		<a class="btn btn-sm btn-default"
 		   href="{$smarty.const.WWW_TOP}/rss?rage={$rage[0].rageid}{if $category != ''}&amp;t={$category}{/if}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">RSS
 			for TV Show <i class="fa fa-rss"></i></a>

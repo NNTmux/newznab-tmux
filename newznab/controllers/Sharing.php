@@ -255,13 +255,13 @@ Class Sharing
 				self::group,
 				('(_nZEDb_)' . $this->siteSettings['site_name'] . '_' . $this->siteSettings['site_guid'] . ' - [1/1] "' . $sid . '" yEnc (1/1)'),
 				json_encode(
-					array(
+					[
 						'USER' => ($this->siteSettings['hide_users'] ? 'ANON' : $row['username']),
 						'TIME' => $row['unix_time'],
 						'SID'  => $sid,
 						'RID'  => $row['nzb_guid'],
 						'BODY' => $row['text']
-					)
+					]
 				),
 				'<anon@anon.com>'
 			);
