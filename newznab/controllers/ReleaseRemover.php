@@ -2,7 +2,6 @@
 
 use newznab\db\Settings;
 
-
 /**
  * Handles removing of various unwanted releases.
  *
@@ -28,7 +27,7 @@ class ReleaseRemover
 	protected $browser;
 
 	/**
-	 * @var ConsoleTools
+	 * @var \newznab\ConsoleTools
 	 */
 	protected $consoleTools;
 
@@ -72,7 +71,7 @@ class ReleaseRemover
 	protected $method = '';
 
 	/**
-	 * @var newznab\db\Settings
+	 * @var \newznab\db\Settings
 	 */
 	protected $pdo;
 
@@ -249,7 +248,6 @@ class ReleaseRemover
 		}
 
 		$this->deletedCount = 0;
-		$type = strtolower(trim($type));
 		switch ($type) {
 			case 'blacklist':
 				$this->removeBlacklist();
@@ -293,6 +291,9 @@ class ReleaseRemover
 			case 'codec':
 				$this->removeCodecPoster();
 				break;
+			case 'wmv_all':
+				$this->removeWMV();
+				break;
 			case '':
 				$this->removeBlacklist();
 				$this->removeBlacklistFiles();
@@ -334,7 +335,7 @@ class ReleaseRemover
 	/**
 	 * Remove releases with 15 or more letters or numbers, nothing else.
 	 *
-	 * @return bool
+	 * @return boolean|string
 	 */
 	protected function removeGibberish()
 	{
@@ -362,7 +363,7 @@ class ReleaseRemover
 	/**
 	 * Remove releases with 25 or more letters/numbers, probably hashed.
 	 *
-	 * @return bool
+	 * @return boolean|string
 	 */
 	protected function removeHashed()
 	{
@@ -389,7 +390,7 @@ class ReleaseRemover
 	/**
 	 * Remove releases with 5 or less letters/numbers.
 	 *
-	 * @return bool
+	 * @return boolean|string
 	 */
 	protected function removeShort()
 	{
@@ -416,7 +417,7 @@ class ReleaseRemover
 	/**
 	 * Remove releases with an exe file not in other misc or pc apps/games.
 	 *
-	 * @return bool
+	 * @return boolean|string
 	 */
 	protected function removeExecutable()
 	{
@@ -449,17 +450,31 @@ class ReleaseRemover
 	/**
 	 * Remove releases with an install.bin file.
 	 *
-	 * @return bool
+	 * @return boolean|string
 	 */
 	protected function removeInstallBin()
 	{
 		$this->method = 'Install.bin';
+
+		switch (NN_RELEASE_SEARCH_TYPE) {
+			case ReleaseSearch::SPHINX:
+				$rs = new ReleaseSearch($this->pdo);
+				$instbinFT = str_replace('=10000;', '=10000000;', $rs->getSearchSQL(['filename' => 'install<<bin']));
+				$ftJoin = $rs->getFullTextJoinString();
+				break;
+			default:
+				$instbinFT = $ftJoin = '';
+				break;
+		}
+
 		$this->query = sprintf(
 			"SELECT r.guid, r.searchname, r.id
-			FROM releases r
+			FROM releases r %s
 			INNER JOIN releasefiles rf ON rf.releaseid = r.id
-			WHERE rf.name LIKE %s %s",
-			"'%install.bin%'",
+			WHERE rf.name %s %s",
+			$ftJoin,
+			$this->pdo->likeString('install.bin', true, true),
+			$instbinFT,
 			$this->crapTime
 		);
 
@@ -473,17 +488,31 @@ class ReleaseRemover
 	/**
 	 * Remove releases with an password.url file.
 	 *
-	 * @return bool
+	 * @return boolean|string
 	 */
 	protected function removePasswordURL()
 	{
 		$this->method = 'Password.url';
+
+		switch (NN_RELEASE_SEARCH_TYPE) {
+			case ReleaseSearch::SPHINX:
+				$rs = new ReleaseSearch($this->pdo);
+				$passurlFT = str_replace('=10000;', '=10000000;', $rs->getSearchSQL(['filename' => 'password<<url']));
+				$ftJoin = $rs->getFullTextJoinString();
+				break;
+			default:
+				$passurlFT = $ftJoin = '';
+				break;
+		}
+
 		$this->query = sprintf(
 			"SELECT r.guid, r.searchname, r.id
-			FROM releases r
+			FROM releases r %s
 			INNER JOIN releasefiles rf ON rf.releaseid = r.id
-			WHERE rf.name LIKE %s %s",
-			"'%password.url%'",
+			WHERE rf.name %s %s %s",
+			$ftJoin,
+			$this->pdo->likeString('password.url', true, true),
+			$passurlFT,
 			$this->crapTime
 		);
 
@@ -497,31 +526,44 @@ class ReleaseRemover
 	/**
 	 * Remove releases with password in the search name.
 	 *
-	 * @return bool
+	 * @return boolean|string
 	 */
 	protected function removePassworded()
 	{
 		$this->method = 'Passworded';
+
+		switch (NN_RELEASE_SEARCH_TYPE) {
+			case ReleaseSearch::SPHINX:
+				$rs = new ReleaseSearch($this->pdo);
+				$passFT = str_replace('=10000;', '=10000000;', $rs->getSearchSQL(['searchname' => 'passwor*']));
+				$ftJoin = $rs->getFullTextJoinString();
+				break;
+			default:
+				$passFT = $ftJoin = '';
+				break;
+		}
+
 		$this->query = sprintf(
 			"SELECT r.guid, r.searchname, r.id
-			FROM releases r
-			WHERE r.searchname LIKE %s
-			AND r.searchname NOT LIKE %s
-			AND r.searchname NOT LIKE %s
-			AND r.searchname NOT LIKE %s
-			AND r.searchname NOT LIKE %s
-			AND r.searchname NOT LIKE %s
-			AND r.searchname NOT LIKE %s
+			FROM releases r %s
+			WHERE r.searchname %s
+			AND r.searchname NOT %s
+			AND r.searchname NOT %s
+			AND r.searchname NOT %s
+			AND r.searchname NOT %s
+			AND r.searchname NOT %s
+			AND r.searchname NOT %s
 			AND r.nzbstatus = 1
-			AND r.categoryid NOT IN (%d, %d, %d, %d, %d, %d, %d, %d, %d) %s",
+			AND r.categoryid NOT IN (%d, %d, %d, %d, %d, %d, %d, %d, %d) %s %s",
 			// Matches passwort / passworded / etc also.
-			"'%passwor%'",
-			"'%advanced%'",
-			"'%no password%'",
-			"'%not password%'",
-			"'%recovery%'",
-			"'%reset%'",
-			"'%unlocker%'",
+			$ftJoin,
+			$this->pdo->likeString('passwor', true, true),
+			$this->pdo->likeString('advanced', true, true),
+			$this->pdo->likeString('no password', true, true),
+			$this->pdo->likeString('not password', true, true),
+			$this->pdo->likeString('recovery', true, true),
+			$this->pdo->likeString('reset', true, true),
+			$this->pdo->likeString('unlocker', true, true),
 			Category::CAT_PC_GAMES,
 			Category::CAT_PC_0DAY,
 			Category::CAT_PC_ISO,
@@ -531,6 +573,7 @@ class ReleaseRemover
 			Category::CAT_PC_MOBILEOTHER,
 			Category::CAT_MISC_OTHER,
 			Category::CAT_MISC_HASHED,
+			$passFT,
 			$this->crapTime
 		);
 
@@ -544,7 +587,7 @@ class ReleaseRemover
 	/**
 	 * Remove releases smaller than 2MB with 1 part not in MP3/books/misc section.
 	 *
-	 * @return bool
+	 * @return boolean|string
 	 */
 	protected function removeSize()
 	{
@@ -579,7 +622,7 @@ class ReleaseRemover
 	/**
 	 * Remove releases bigger than 200MB with just a single file.
 	 *
-	 * @return bool
+	 * @return boolean|string
 	 */
 	protected function removeHuge()
 	{
@@ -602,19 +645,32 @@ class ReleaseRemover
 	/**
 	 * Remove releases with more than 1 part, less than 40MB, sample in name. TV/Movie sections.
 	 *
-	 * @return bool
+	 * @return boolean|string
 	 */
 	protected function removeSample()
 	{
 		$this->method = 'Sample';
+
+		switch (NN_RELEASE_SEARCH_TYPE) {
+			case ReleaseSearch::SPHINX:
+				$rs = new ReleaseSearch($this->pdo);
+				$sampleFT = str_replace('=10000;', '=10000000;', $rs->getSearchSQL(['name' => 'sample']));
+				$ftJoin = $rs->getFullTextJoinString();
+				break;
+			default:
+				$sampleFT = $ftJoin = '';
+				break;
+		}
+
 		$this->query = sprintf(
 			"SELECT r.guid, r.searchname, r.id
-			FROM releases r
+			FROM releases r %s
 			WHERE r.totalpart > 1
 			AND r.size < 40000000
-			AND r.name LIKE %s
-			AND r.categoryid IN (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) %s",
-			"'%sample%'",
+			AND r.name %s
+			AND r.categoryid IN (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) %s %s",
+			$ftJoin,
+			$this->pdo->likeString('sample', true, true),
 			Category::CAT_TV_ANIME,
 			Category::CAT_TV_DOCU,
 			Category::CAT_TV_FOREIGN,
@@ -630,6 +686,7 @@ class ReleaseRemover
 			Category::CAT_MOVIE_HD,
 			Category::CAT_MOVIE_OTHER,
 			Category::CAT_MOVIE_SD,
+			$sampleFT,
 			$this->crapTime
 		);
 
@@ -643,19 +700,35 @@ class ReleaseRemover
 	/**
 	 * Remove releases with a scr file in the filename/subject.
 	 *
-	 * @return bool
+	 * @return boolean|string
 	 */
 	protected function removeSCR()
 	{
 		$this->method = '.scr';
+
+		switch (NN_RELEASE_SEARCH_TYPE) {
+			case ReleaseSearch::SPHINX:
+				$rs = new ReleaseSearch($this->pdo);
+				$scrFT = str_replace('=10000;', '=10000000;', $rs->getSearchSQL(['(name,filename)' => 'scr']));
+				$ftJoin = $rs->getFullTextJoinString();
+				break;
+			default:
+				$scrFT = $ftJoin = '';
+				break;
+		}
+
 		$this->query = sprintf(
 			"SELECT r.guid, r.searchname, r.id
-			FROM releases r
-			LEFT JOIN releasefiles rf on rf.releaseid = r.id
+			FROM releases r %s
+			LEFT JOIN releasefiles rf ON rf.releaseid = r.id
 			WHERE (rf.name REGEXP '[.]scr[$ \"]' OR r.name REGEXP '[.]scr[$ \"]')
-			%s",
+			%s %s",
+			$ftJoin,
+			$scrFT,
 			$this->crapTime
 		);
+
+		echo $this->query;
 
 		if ($this->checkSelectQuery() === false) {
 			return $this->returnError();
@@ -681,8 +754,12 @@ class ReleaseRemover
 			sprintf(
 				'SELECT regex, id, groupname, msgcol
 				FROM binaryblacklist
-				WHERE optype = %d %s %s',
+				WHERE optype = %d
+				AND msgcol IN (%d, %d) %s %s
+				ORDER BY id ASC',
 				Binaries::OPTYPE_BLACKLIST,
+				Binaries::BLACKLIST_FIELD_SUBJECT,
+				Binaries::BLACKLIST_FIELD_FROM,
 				$this->blacklistID,
 				$status
 			)
@@ -696,79 +773,8 @@ class ReleaseRemover
 				$dbRegex = $this->pdo->escapeString($regex['regex']);
 
 				if ($this->crapTime === '') {
-
-					// Match Regex beginning for long running foreign search
-					if (substr($dbRegex, 2, 17) === 'brazilian|chinese') {
-						// Find first brazilian instance position in Regex, then find first closing parenthesis.
-						// Then substitute all pipes (|) with spaces for FT search and insert into query
-						$forBegin = strpos($dbRegex, 'brazilian');
-						$regexMatch =
-							substr($dbRegex, $forBegin,
-								strpos($dbRegex, ')') - $forBegin
-							);
-					} else if (substr($dbRegex, 7, 11) === 'bl|cz|de|es') {
-						// Find first bl|cz instance position in Regex, then find first closing parenthesis.
-						$forBegin = strpos($dbRegex, 'bl|cz');
-						$regexMatch = '"' .
-							str_replace('|', '" "',
-								substr($dbRegex, $forBegin, strpos($dbRegex, ')') - $forBegin)
-							) . '"';
-					} else if (substr($dbRegex, 8, 5) === '19|20') {
-						// Find first bl|cz instance position in Regex, then find last closing parenthesis as this is reversed.
-						$forBegin = strpos($dbRegex, 'bl|cz');
-						$regexMatch = '"' .
-							str_replace('|', '" "',
-								substr($dbRegex, $forBegin, strrpos($dbRegex, ')') - $forBegin)
-							) . '"';
-					} else if (substr($dbRegex, 7, 14) === 'chinese.subbed') {
-						// Find first brazilian instance position in Regex, then find first closing parenthesis.
-						$forBegin = strpos($dbRegex, 'chinese');
-						$regexMatch =
-							str_replace('nl  subed|bed|s', 'nlsubs|nlsubbed|nlsubed',
-								str_replace('?', '',
-									str_replace('.', ' ',
-										str_replace(['-', '(', ')'], '',
-											substr($dbRegex, $forBegin,
-												strrpos($dbRegex, ')') - $forBegin
-											)
-										)
-									)
-								)
-							);
-					} else if (substr($dbRegex, 8, 2) === '4u') {
-						// Find first 4u\.nl instance position in Regex, then find first closing parenthesis.
-						$forBegin = strpos($dbRegex, '4u');
-						$regexMatch =
-							str_replace('nov[ a]+rip', 'nova',
-								str_replace('4u.nl', '"4u" "nl"',
-									substr($dbRegex, $forBegin, strpos($dbRegex, ')') - $forBegin)
-								)
-							);
-					} else if (substr($dbRegex, 8, 5) === 'bd|dl') {
-						// Find first bd|dl instance position in Regex, then find last closing parenthesis as this is reversed.
-						$forBegin = strpos($dbRegex, 'bd|dl');
-						$regexMatch =
-							str_replace(['\\',']','['], '',
-								str_replace('bd|dl)mux', 'bdmux|dlmux',
-									substr($dbRegex, $forBegin,
-										strrpos($dbRegex, ')') - $forBegin
-									)
-								)
-							);
-					} else if (substr($dbRegex, 7, 9) === 'imageset|') {
-						// Find first imageset| instance position in Regex, then find last closing parenthesis.
-						$forBegin = strpos($dbRegex, 'imageset');
-						$regexMatch = substr($dbRegex, $forBegin, strpos($dbRegex, ')') - $forBegin);
-					} else if (substr($dbRegex, 1, 9) === 'hdnectar|') {
-						// Find first hdnectar| instance position in Regex.
-						$regexMatch = str_replace('\'', '', $dbRegex);
-					} else if (substr($dbRegex, 1, 10) === 'Passworded') {
-						// Find first Passworded instance position in Regex, then find last closing parenthesis.
-						$regexMatch = str_replace('\'', '', $dbRegex);
-					}
-
+					$regexMatch = $this->extractSrchFromRegx($dbRegex);
 					if ($regexMatch !== '') {
-
 						switch (NN_RELEASE_SEARCH_TYPE) {
 							case ReleaseSearch::SPHINX:
 								$ftMatch = sprintf('rse.query = "@(name,searchname) %s;limit=1000000;maxmatches=1000000;mode=any" AND', str_replace('|', ' ', str_replace('"', '', $regexMatch)));
@@ -789,15 +795,13 @@ class ReleaseRemover
 						$regexSQL = "WHERE r.fromname REGEXP " . $dbRegex;
 						$opTypeName = "Poster";
 						break;
-					case Binaries::BLACKLIST_FIELD_MESSAGEID:
-						break;
 				}
 
 				if ($regexSQL === '') {
 					continue;
 				}
 
-				// Get the group id if the regex is set to work against a group.
+				// Get the group ID if the regex is set to work against a group.
 				$groupID = '';
 				if (strtolower($regex['groupname']) !== 'alt.binaries.*') {
 
@@ -829,7 +833,7 @@ class ReleaseRemover
 					$ftUsing = 'Using (' . $regexMatch . ') as interesting words.' . PHP_EOL;
 				} else {
 					$blType = "only REGEXP";
-					$ftUsing = "\n";
+					$ftUsing = PHP_EOL;
 				}
 
 				// Provide useful output of operations
@@ -839,7 +843,7 @@ class ReleaseRemover
 				);
 
 				if ($opTypeName == 'Subject') {
-					$join = (NN_RELEASE_SEARCH_TYPE == \ReleaseSearch::SPHINX ? 'INNER JOIN releases_se rse ON rse.id = r.id' : 'INNER JOIN releasesearch rs ON rs.releaseid = r.id');
+					$join = (NN_RELEASE_SEARCH_TYPE == ReleaseSearch::SPHINX ? 'INNER JOIN releases_se rse ON rse.id = r.id' : 'INNER JOIN release_search_data rs ON rs.releaseid = r.id');
 				} else {
 					$join = '';
 				}
@@ -860,7 +864,7 @@ class ReleaseRemover
 
 			}
 		} else {
-			echo $this->pdo->log->error("No regular expressions were selected for blacklist removal. Make sure you have activated REGEXPs in Site Edit and you're specifying a valid id.\n");
+			echo $this->pdo->log->error("No regular expressions were selected for blacklist removal. Make sure you have activated REGEXPs in Site Edit and you're specifying a valid ID.\n");
 		}
 
 		return true;
@@ -879,7 +883,8 @@ class ReleaseRemover
 				FROM binaryblacklist
 				WHERE status = %d
 				AND optype = %d
-				AND msgcol = %d',
+				AND msgcol = %d
+				ORDER BY id ASC',
 				Binaries::BLACKLIST_ENABLED,
 				Binaries::OPTYPE_BLACKLIST,
 				Binaries::BLACKLIST_FIELD_SUBJECT
@@ -889,8 +894,23 @@ class ReleaseRemover
 		if (count($allRegex) > 0) {
 
 			foreach ($allRegex as $regex) {
+				$dbRegex = $this->pdo->escapeString($regex['regex']);
+				$ftMatch = $ftJoin = $regexMatch = '';
+				if ($this->crapTime === '') {
+					$regexMatch = $this->extractSrchFromRegx($dbRegex);
+					if ($regexMatch !== '') {
+						switch (NN_RELEASE_SEARCH_TYPE) {
+							case ReleaseSearch::SPHINX:
+								$ftMatch = sprintf('AND (rse.query = "@(filename) %s;limit=1000000;maxmatches=1000000;mode=any")', str_replace('|', ' ', str_replace('"', '', $regexMatch)));
+								$ftJoin = "INNER JOIN releases_se rse ON rse.id = r.id";
+								break;
+							default:
+								break;
+						}
+					}
+				}
 
-				$regexSQL = sprintf("LEFT JOIN releasefiles rf ON r.id = rf.releaseid
+				$regexSQL = sprintf("INNER JOIN releasefiles rf ON r.id = rf.releaseid
 				WHERE rf.name REGEXP %s ", $this->pdo->escapeString($regex['regex'])
 				);
 
@@ -898,7 +918,7 @@ class ReleaseRemover
 					continue;
 				}
 
-				// Get the group id if the regex is set to work against a group.
+				// Get the group ID if the regex is set to work against a group.
 				$groupID = '';
 				if (strtolower($regex['groupname']) !== 'alt.binaries.*') {
 					$groupIDs = $this->pdo->query(
@@ -921,10 +941,31 @@ class ReleaseRemover
 					$groupID = ' AND r.groupid in (' . $groupIDs . ') ';
 				}
 
-				$this->method = 'Blacklist ' . $regex['id'];
+				$this->method = 'Blacklist Files ' . $regex['id'];
+
+				// Check if using FT Match and declare for echo
+				if ($ftMatch !== '') {
+					$blType = "FULLTEXT match with REGEXP";
+					$ftUsing = 'Using (' . $regexMatch . ') as interesting words.' . PHP_EOL;
+				} else {
+					$blType = "only REGEXP";
+					$ftUsing = PHP_EOL;
+				}
+
+				// Provide useful output of operations
+				echo $this->pdo->log->header(sprintf("Finding crap releases for %s: Using %s method against release filenames." . PHP_EOL .
+						"%s", $this->method, $blType, $ftUsing
+					)
+				);
+
 				$this->query = sprintf(
-					"SELECT r.guid, r.searchname, r.id
-					FROM releases r %s %s %s", $regexSQL, $groupID, $this->crapTime
+					"SELECT DISTINCT r.id, r.guid, r.searchname
+					FROM releases r %s %s %s %s %s",
+					$ftJoin,
+					$regexSQL,
+					$groupID,
+					$ftMatch,
+					$this->crapTime
 				);
 
 				if ($this->checkSelectQuery() === false) {
@@ -932,7 +973,6 @@ class ReleaseRemover
 				}
 
 				$this->deleteReleases();
-
 			}
 		}
 
@@ -940,25 +980,49 @@ class ReleaseRemover
 	}
 
 	/**
+	 * Remove releases that contain .wmv file, aka that spam poster.
+	 * Thanks to dizant from nZEDb forums for the sql query
+	 *
+	 * @return string|boolean
+	 */
+	protected function removeWMV()
+	{
+		$this->method = 'WMV_ALL';
+		$this->query = "SELECT DISTINCT r.guid, r.searchname
+				FROM releasefiles AS rf
+				INNER JOIN releases r ON (rf.releaseid = r.id)
+				WHERE rf.name REGEXP 'x264.*\.wmv$'"
+		;
+
+		if ($this->checkSelectQuery() === false) {
+			return $this->returnError();
+		}
+
+		return $this->deleteReleases();
+	}
+
+	/**
 	 * Remove releases that contain .wmv files and Codec\Setup.exe files, aka that spam poster.
 	 * Thanks to dizant from nZEDb forums for parts of the sql query
 	 *
-	 * @return bool
+	 * @return string|boolean
 	 */
 	protected function removeCodecPoster()
 	{
 		$this->method = 'Codec Poster';
 		$regex = "rf.name REGEXP 'x264.*\.(wmv|avi)$'";
-		$regex2 = "rf.name REGEXP '\\\\.*((DVDrip|BRRip)[. ].*[. ](R[56]|HQ)|720p[ .](DVDrip|HQ)|Webrip.*[. ](R[56]|Xvid|AC3|US)|720p.*[. ]WEB-DL[. ]Xvid[. ]AC3[. ]US|HDRip.*[. ]Xvid[. ]DD5).*[. ]avi$'";
-		$codec = '%\\Codec%Setup.exe%';
-		$codec2 ='%\\Codec%Installer.exe%';
-		$iferror = '%If_you_get_error.txt%';
-		$ifnotplaying = '%read me if the movie not playing.txt%';
-		$frenchv = '%Lisez moi si le film ne demarre pas.txt%';
-		$nl = '%lees me als de film niet spelen.txt%';
-		$german = '%Lesen Sie mir wenn der Film nicht abgespielt.txt%';
-		$german2 = '%Lesen Sie mir, wenn der Film nicht starten.txt%';
-		$categories = sprintf("r.categoryid IN (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) AND",
+		$regex2 = "rf.name REGEXP '\\\\.*((DVDrip|BRRip)[. ].*[. ](R[56]|HQ)|720p[ .](DVDrip|HQ)|"
+			. "Webrip.*[. ](R[56]|Xvid|AC3|US)|720p.*[. ]WEB-DL[. ]Xvid[. ]AC3[. ]US|"
+			. "HDRip.*[. ]Xvid[. ]DD5).*[. ]avi$'";
+		$codec = '\\Codec%Setup.exe';
+		$codec2 ='\\Codec%Installer.exe';
+		$iferror = 'If_you_get_error.txt';
+		$ifnotplaying = 'read me if the movie not playing.txt';
+		$frenchv = 'Lisez moi si le film ne demarre pas.txt';
+		$nl = 'lees me als de film niet spelen.txt';
+		$german = 'Lesen Sie mir wenn der Film nicht abgespielt.txt';
+		$german2 = 'Lesen Sie mir, wenn der Film nicht starten.txt';
+		$categories = sprintf("r.categoryid IN (%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d)",
 			Category::CAT_MOVIE_3D,
 			Category::CAT_MOVIE_BLURAY,
 			Category::CAT_MOVIE_DVD,
@@ -971,14 +1035,55 @@ class ReleaseRemover
 			Category::CAT_XXX_XVID,
 			Category::CAT_XXX_OTHER
 		);
-		$codeclike = sprintf("UNION SELECT r.guid, r.searchname, r.id FROM releases r
-			LEFT JOIN releasefiles rf ON r.id = rf.releaseid
-			WHERE %s rf.name LIKE '%s' OR rf.name LIKE '%s' OR rf.name LIKE '%s' OR rf.name LIKE '%s' OR rf.name LIKE '%s' OR rf.name LIKE '%s' OR rf.name LIKE '%s' OR rf.name LIKE '%s'", $categories, $codec, $codec2, $iferror, $ifnotplaying, $frenchv, $nl, $german, $german2
+
+		switch (NN_RELEASE_SEARCH_TYPE) {
+			case ReleaseSearch::SPHINX:
+				$rs = new ReleaseSearch($this->pdo);
+				$codecFT1 = str_replace('=10000;', '=1000000;', $rs->getSearchSQL(['filename' => 'x264|wmv|avi|DVDrip|BRRip|R5|R6|HQ|Webrip|Xvid|AC3|HDRip|DD5']));
+				$codecFT2 = str_replace('=10000;', '=1000000;', $rs->getSearchSQL(['filename' => 'Codec|error|txt|installer|vlc']));
+				$ftJoin = $rs->getFullTextJoinString();
+				break;
+			default:
+				$codecFT1 = $codecFT2 = $ftJoin = '';
+				break;
+		}
+
+		$codeclike = sprintf("
+				SELECT r.guid, r.searchname, r.id FROM releases r %s
+				INNER JOIN releasefiles rf ON r.id = rf.releaseid
+				WHERE %s %s AND
+					(rf.name %s OR rf.name %s OR
+					rf.name %s OR rf.name %s OR
+					rf.name %s OR rf.name %s OR
+					rf.name %s OR rf.name %s)
+				%s",
+			$ftJoin,
+			$categories,
+			$codecFT2,
+			$this->pdo->likeString($codec, true, true),
+			$this->pdo->likeString($codec2, true, true),
+			$this->pdo->likeString($iferror, true, true),
+			$this->pdo->likeString($ifnotplaying, true, true),
+			$this->pdo->likeString($frenchv, true, true),
+			$this->pdo->likeString($nl, true, true),
+			$this->pdo->likeString($german, true, true),
+			$this->pdo->likeString($german2, true, true),
+			$this->crapTime
 		);
+
 		$this->query = sprintf(
-			"SELECT r.guid, r.searchname, r.id FROM releases
-			r INNER JOIN releasefiles rf ON (rf.releaseid = r.id)
-			WHERE %s %s OR %s %s %s %s", $categories, $regex, $regex2, $this->crapTime, $codeclike, $this->crapTime
+			"SELECT r.guid, r.searchname, r.id FROM releases r %s
+			INNER JOIN releasefiles rf ON (rf.releaseid = r.id)
+			WHERE %s %s
+			AND (%s OR %s) %s
+			UNION %s",
+			$ftJoin,
+			$categories,
+			$codecFT1,
+			$regex,
+			$regex2,
+			$this->crapTime,
+			$codeclike
 		);
 
 		if ($this->checkSelectQuery() === false) {
@@ -1014,7 +1119,7 @@ class ReleaseRemover
 	/**
 	 * Verify if the query has any results.
 	 *
-	 * @return bool|int False on failure, count of found releases.
+	 * @return boolean False on failure, true on success after setting a count of found releases.
 	 */
 	protected function checkSelectQuery()
 	{
@@ -1039,7 +1144,7 @@ class ReleaseRemover
 	 *
 	 * @param string $argument User argument.
 	 *
-	 * @return bool|string
+	 * @return string|false
 	 */
 	protected function formatCriteriaQuery($argument)
 	{
@@ -1061,7 +1166,7 @@ class ReleaseRemover
 				case 'categoryid':
 					switch ($args[1]) {
 						case 'equals':
-							return ' AND categoryid = ' . $args[2];
+							return ' AND categoryID = ' . $args[2];
 						default:
 							break;
 					}
@@ -1070,10 +1175,9 @@ class ReleaseRemover
 					switch ($args[1]) {
 						case 'equals':
 							if ($args[2] === 'NULL') {
-								return ' AND imdbid IS NULL ';
-							}
-							else {
-								return ' AND imdbid = ' . $args[2];
+								return ' AND imdbID IS NULL ';
+							} else {
+								return ' AND imdbID = ' . $args[2];
 							}
 						default:
 							break;
@@ -1090,7 +1194,7 @@ class ReleaseRemover
 				case 'rageid':
 					switch ($args[1]) {
 						case 'equals':
-							return ' AND rageid = ' . $args[2];
+							return ' AND rageID = ' . $args[2];
 						default:
 							break;
 					}
@@ -1303,6 +1407,84 @@ class ReleaseRemover
 
 			return false;
 		}
+	}
 
+	protected function extractSrchFromRegx($dbRegex = '')
+	{
+		$regexMatch = '';
+
+		// Match Regex beginning for long running foreign search
+		if (substr($dbRegex, 2, 17) === 'brazilian|chinese') {
+			// Find first brazilian instance position in Regex, then find first closing parenthesis.
+			// Then substitute all pipes (|) with spaces for FT search and insert into query
+			$forBegin = strpos($dbRegex, 'brazilian');
+			$regexMatch =
+				substr($dbRegex, $forBegin,
+					strpos($dbRegex, ')') - $forBegin
+				);
+		} else if (substr($dbRegex, 7, 11) === 'bl|cz|de|es') {
+			// Find first bl|cz instance position in Regex, then find first closing parenthesis.
+			$forBegin = strpos($dbRegex, 'bl|cz');
+			$regexMatch = '"' .
+				str_replace('|', '" "',
+					substr($dbRegex, $forBegin, strpos($dbRegex, ')') - $forBegin)
+				) . '"';
+		} else if (substr($dbRegex, 8, 5) === '19|20') {
+			// Find first bl|cz instance position in Regex, then find last closing parenthesis as this is reversed.
+			$forBegin = strpos($dbRegex, 'bl|cz');
+			$regexMatch = '"' .
+				str_replace('|', '" "',
+					substr($dbRegex, $forBegin, strrpos($dbRegex, ')') - $forBegin)
+				) . '"';
+		} else if (substr($dbRegex, 7, 14) === 'chinese.subbed') {
+			// Find first brazilian instance position in Regex, then find first closing parenthesis.
+			$forBegin = strpos($dbRegex, 'chinese');
+			$regexMatch =
+				str_replace('nl  subed|bed|s', 'nlsubs|nlsubbed|nlsubed',
+					str_replace('?', '',
+						str_replace('.', ' ',
+							str_replace(['-', '(', ')'], '',
+								substr($dbRegex, $forBegin,
+									strrpos($dbRegex, ')') - $forBegin
+								)
+							)
+						)
+					)
+				)
+			;
+		} else if (substr($dbRegex, 8, 2) === '4u') {
+			// Find first 4u\.nl instance position in Regex, then find first closing parenthesis.
+			$forBegin = strpos($dbRegex, '4u');
+			$regexMatch =
+				str_replace('nov[ a]+rip', 'nova',
+					str_replace('4u.nl', '"4u" "nl"',
+						substr($dbRegex, $forBegin, strpos($dbRegex, ')') - $forBegin)
+					)
+				)
+			;
+		} else if (substr($dbRegex, 8, 5) === 'bd|dl') {
+			// Find first bd|dl instance position in Regex, then find last closing parenthesis as this is reversed.
+			$forBegin = strpos($dbRegex, 'bd|dl');
+			$regexMatch =
+				str_replace(['\\', ']', '['], '',
+					str_replace('bd|dl)mux', 'bdmux|dlmux',
+						substr($dbRegex, $forBegin,
+							strrpos($dbRegex, ')') - $forBegin
+						)
+					)
+				)
+			;
+		} else if (substr($dbRegex, 7, 9) === 'imageset|') {
+			// Find first imageset| instance position in Regex, then find last closing parenthesis.
+			$forBegin = strpos($dbRegex, 'imageset');
+			$regexMatch = substr($dbRegex, $forBegin, strpos($dbRegex, ')') - $forBegin);
+		} else if (substr($dbRegex, 1, 9) === 'hdnectar|') {
+			// Find first hdnectar| instance position in Regex.
+			$regexMatch = str_replace('\'', '', $dbRegex);
+		} else if (substr($dbRegex, 1, 10) === 'Passworded') {
+			// Find first Passworded instance position esin Regex, then find last closing parenthesis.
+			$regexMatch = str_replace('\'', '', $dbRegex);
+		}
+		return $regexMatch;
 	}
 }
