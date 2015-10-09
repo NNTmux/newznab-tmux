@@ -69,7 +69,9 @@ if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
 		$page->smarty->assign('animeDescription', $anidb['description']);
 		$page->smarty->assign('animeRating', $anidb['rating']);
 		$page->smarty->assign('animeRelated', $anidb['related']);
-		$page->smarty->assign('animeSimilar', $anidb['similar']);
+		if (isset($anidb['similar']) && $anidb['similar'] != '') {
+			$page->smarty->assign('animeSimilar', $anidb['similar']);
+		}
 		$page->smarty->assign('animeCategories', $anidb['categories']);
 
 		$page->title = $anidb['title'];

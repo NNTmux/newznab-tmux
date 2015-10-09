@@ -93,8 +93,8 @@
 								<td style="padding-top:15px;" colspan="10"><h3>{$animeEpno}</h2></td>
 							</tr>
 							<tr>
+								<th><input id="chkSelectAll" type="checkbox" class="nzb_check_all"/></th>
 								<th>Name</th>
-								<th></th>
 								<th>Category</th>
 								<th>Posted</th>
 								<th>Size</th>
@@ -102,6 +102,9 @@
 							</tr>
 							{foreach $animeEpisodeTitle as $result}
 								<tr class="{cycle values=",alt"}" id="guid{$result.guid}">
+									<td class="check"><input id="chk{$result.guid|substr:0:7}"
+															 type="checkbox" class="nzb_check"
+															 value="{$result.guid}"/></td>
 									<td>
 										<a title="View details"
 										   href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"htmlall"}">{$result.searchname|escape:"htmlall"|replace:".":" "}</a>
@@ -125,44 +128,25 @@
 											</div>
 										</div>
 									</td>
-									<td class="check"><input id="chk{$result.guid|substr:0:7}" type="checkbox"
-															 class="nzb_check" name="{$seasonnum}"
-															 value="{$result.guid}"/></td>
 									<td><span class="label label-default">{$result.category_name}</span></td>
 									<td width="40" title="{$result.postdate}">{$result.postdate|timeago}</td>
 									<td>{$result.size|fsize_format:"MB"}</td>
-									<td class="icons" style='width:100px;'>
-										<a title="Download Nzb"
-										   href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}/{$result.searchname|escape:"htmlall"}"><i
-													class="fa fa-download text-muted"></i></a>
-										<a class="fa fa-shopping-cart icon_cart text-muted" href="#"
-										   title="Add to Cart">
-										</a>
+									<td class="icon_nzb"><a
+												href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}/{$result.searchname|escape:"htmlall"}"><i
+													class="fa fa-download text-muted"
+													title="Download NZB"></i></a>
+										<a href="{$smarty.const.WWW_TOP}/details/{$result.guid}/#comments"><i
+													class="fa fa-comments-o text-muted"
+													title="Comments"></i></a>
+										<a href="#" class="icon_cart text-muted"><i
+													class="fa fa-shopping-cart" title="Send to my Cart"></i></a>
 										{if isset($sabintegrated)}
-											<a class="icon icon_sab" href="#" title="Send to Sab">
-												<img class="icon icon_sab" alt="Send to my Sabnzbd"
-													 src="{$smarty.const.WWW_TOP}/themes_shared/images/icons/sabup.png">
-											</a>
+											<a href="#" class="icon_sab text-muted"><i class="fa fa-send-o"
+																					   title="Send to my Queue"></i></a>
 										{/if}
 										{if $weHasVortex}
-											<a class="icon icon_nzbvortex" href="#" title="Send to NZBVortex">
-												<img class="icon icon_nzbvortex" alt="Send to my NZBVortex"
-													 src="{$smarty.const.WWW_TOP}/themes_shared/images/icons/vortex/bigsmile.png">
-											</a>
-										{/if}
-										{if isset($nzbgetintegrated)}<a class="icon icon_nzbget" title="Send to NZBGet"
-																		href="#"><img class="icon icon_nzbget"
-																					  alt="Send to NZBget"
-																					  src="{$smarty.const.WWW_TOP}/themes_shared/images/icons/nzbgetup.png">
-											</a>{/if}
-										{if isset($isadmin)}
-											<br/>
-											<a class="label label-warning"
-											   href="{$smarty.const.WWW_TOP}/admin/release-edit.php?id={$result.id}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}"
-											   title="Edit Release">Edit</a>
-											<a class="label label-danger"
-											   href="{$smarty.const.WWW_TOP}/admin/release-delete.php?id={$result.id}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}"
-											   title="Delete Release">Delete</a>
+											<a href="#" class="icon_vortex text-muted"><i
+														class="fa fa-send-o" title="Send to NZBVortex"></i></a>
 										{/if}
 									</td>
 								</tr>
