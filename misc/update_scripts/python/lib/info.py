@@ -45,7 +45,7 @@ def disconnect(cur, con):
     cur = None
 
 def readConfig():
-	Configfile = pathname+"/../../../../www/config.php"
+	Configfile = pathname+"/../../../www/config.php"
 	file = open( Configfile, "r")
 
 	# Match a config line
