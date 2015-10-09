@@ -209,7 +209,7 @@ Class Sharing
 			sprintf(
 				'SELECT id, text, UNIX_TIMESTAMP(createddate) AS unix_time,
 				username, nzb_guid FROM release_comments
-				WHERE issynced = 1 AND shared = 1 AND shareid IS NULL
+				WHERE issynced = 1 AND shared = 1 AND shareid = ""
 				ORDER BY id DESC'
 			)
 		);
