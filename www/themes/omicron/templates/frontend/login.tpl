@@ -10,6 +10,7 @@
 	  <script type="text/javascript">
 		  /* <![CDATA[ */
 		  var WWW_TOP = "{$smarty.const.WWW_TOP}";
+          var SERVERROOT = "{$serverroot}";
 		  var UID = "{if $loggedin=="true"}{$userdata.id}{else}{/if}";
 		  var RSSTOKEN = "{if $loggedin=="true"}{$userdata.rsstoken}{else}{/if}";
 		  /* ]]> */
