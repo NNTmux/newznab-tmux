@@ -1034,18 +1034,6 @@ class Movie
 		if (is_string($buffer) && preg_match('/(?:imdb.*?)?(?:tt|Title\?)(?P<imdbid>\d{5,7})/i', $buffer, $matches)) {
 			$imdbID = $matches['imdbid'];
 		}
-		$traktID = false;
-		if (is_string($buffer) && preg_match('/(?:trakt.*?)/i', $buffer, $matches)) {
-			$traktID = $matches['trakt'];
-		}
-
-		if ($traktID !== false){
-			if ($this->echooutput && $this->service !== '') {
-				$this->pdo->log->doEcho($this->pdo->log->headerOver($service . ' found Trakt id: ') . $this->pdo->log->primary($traktID));
-			}
-
-			$this->pdo->queryExec(sprintf('UPDATE releases SET traktid = %d WHERE id = %d', $this->pdo->escapeString($traktID), $id));
-		}
 
 		if ($imdbID !== false) {
 			$this->service = $service;
