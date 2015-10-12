@@ -1168,12 +1168,6 @@ class Movie
 								continue;
 							}
 						}
-						if (isset($data['ids']['trakt'])) {
-							$traktID = $this->doMovieUpdate($data['ids']['trakt'], 'Trakt', $arr['id']);
-							if ($traktID !== false) {
-								continue;
-							}
-						}
 					}
 
 					// Try on search engines.
