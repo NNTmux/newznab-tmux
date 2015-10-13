@@ -922,7 +922,7 @@ class SpotNab {
 		}
 
 		$affected = $this->_pdo->queryExec(sprintf('UPDATE release_comments, releases SET release_comments.gid = releases.gid,
-											UNHEX(release_comments.nzb_guid) = UNHEX(releases.nzb_guid)
+											release_comments.nzb_guid = UNHEX(releases.nzb_guid)
 											WHERE releases.id = release_comments.releaseid
 											AND release_comments.gid IS NULL
 											AND UNHEX(release_comments.nzb_guid) = ""
