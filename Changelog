@@ -1,4 +1,6 @@
 2015-10-13 DariusIII
+	Fix: improve speed by replacing str_ireplace with strpos.
+2015-10-13 DariusIII
 	???: Have no idea what is wrong
 2015-10-13 DariusIII
 	Bug: Fix porting errors.
