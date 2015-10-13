@@ -463,7 +463,7 @@ class Movie
 			);
 			return $data['trailer'];
 		}
-		$imdbid = str_ireplace('tt', '', $data['ids']['imdb']);
+		$imdbid = (strpos($data['ids']['imdb'], 'tt') === 0) ? substr($data['ids']['imdb'], 2) : $data['ids']['imdb'];
 		$cover = 0;
 		if (is_file($this->imgSavePath . $imdbid) . '-cover.jpg') {
 			$cover = 1;
