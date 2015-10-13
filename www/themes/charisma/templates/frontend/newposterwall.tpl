@@ -35,9 +35,7 @@
 								{elseif $type == 'PC'}
 									class="library-games"
 								{elseif $type == 'TV'}
-									class="library-show"
-								{elseif $type == 'Anime'}
-									class="library-show"
+									class="library-games"
 								{/if}
 								>
 							<div class="poster">

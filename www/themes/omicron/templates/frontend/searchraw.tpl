@@ -11,7 +11,7 @@
 	<div class="col-xlg-12 portlets">
 		<div class="panel panel-default">
 			<div class="panel-body pagination2">
-				<form method="get" action="{$smarty.const.WWW_TOP}searchraw">
+				<form method="get" action="{$serverroot}searchraw">
 					<div style="text-align:center;">
 						<label for="search" style="display:none;">Search</label>
 						<input id="search" name="search" value="{$search|escape:'htmlall'}" type="text"/>
@@ -34,7 +34,7 @@
 				{elseif $search == ""}
 				{else}
 					{$site->adbrowse}
-					<form method="post" id="dl" name="dl" action="{$smarty.const.WWW_TOP}searchraw">
+					<form method="post" id="dl" name="dl" action="{$serverroot}searchraw">
 						<table style="width:100%;" class="data" id="browsetable">
 							<tr>
 								<!--<th width="10"></th>-->
@@ -64,7 +64,7 @@
 												/{$result.totalParts}</span>{else}100%{/if}</td>
 									{/if}
 									<td class="less">{if $result.releaseid > 0}<a title="View Nzb details"
-																				  href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.filename|escape:"htmlall"}">
+																				  href="{$smarty.const.WWW_TOP}/details/{$result.guid}">
 												Yes</a>{/if}</td>
 								</tr>
 							{/foreach}
