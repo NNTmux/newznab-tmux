@@ -19,13 +19,13 @@
  * @copyright 2015 nZEDb
  */
 
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'indexer.php';
+require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'www' . DIRECTORY_SEPARATOR . 'config.php';
 
-use nzedb\db\DbUpdate;
-use nzedb\utility\Git;
-use nzedb\utility\Misc;
+use newznab\db\DbUpdate;
+use newznab\utility\Git;
+use newznab\utility\Utility;
 
-if (!Misc::isCLI()) {
+if (!Utility::isCLI()) {
 	exit;
 }
 
@@ -47,5 +47,3 @@ if (in_array($branch, $git->mainBranches())) {
 }
 
 exit($error);
-
-?>
