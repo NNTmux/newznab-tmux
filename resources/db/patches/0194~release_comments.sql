@@ -1,4 +1,4 @@
-# This patch will remove column and index added by patch 383
+# This patch will remove column, trigger and index
 
 #Drop the trigger
 DROP TRIGGER IF EXISTS insert_MD5;
