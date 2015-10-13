@@ -1247,11 +1247,11 @@ class SpotNab {
 		// Comments
 		$sql_new_cmt = "INSERT INTO release_comments (".
 			"id, sourceid, username, userid, gid, cid, isvisible, ".
-			"releaseid, `text`, createddate, issynced, UNXEX(nzb_guid)) VALUES (".
-			"NULL, %d, %s, 0, %s, %s, %d, 0, %s, %s, 1, %s)";
+			"releaseid, `text`, createddate, issynced, nzb_guid) VALUES (".
+			"NULL, %d, %s, 0, %s, %s, %d, 0, %s, %s, 1, UNHEX(%s))";
 		$sql_upd_cmt = "UPDATE release_comments SET ".
 			"isvisible = %d, `text` = %s".
-			"WHERE sourceid = %d AND gid = %s AND cid = %s AND UNHEX(nzb_guid) = %s";
+			"WHERE sourceid = %d AND gid = %s AND cid = %s AND nzb_guid = UNHEX(%s)";
 		$sql_fnd_cmt = "SELECT count(id) as cnt FROM release_comments ".
 			"WHERE sourceid = %d AND gid = %s AND cid = %s";
 
