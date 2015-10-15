@@ -257,7 +257,7 @@ define('NN_CACHE_EXPIRY_LONG', 900);
 define('NN_DEBUG', false);
 
 /**
- * Log debug messages to nzedb/resources/debug.log
+ * Log debug messages to newznab/resources/debug.log
  *
  * @default false
  */
@@ -298,9 +298,9 @@ define('NN_LOGGING_LOG_FOLDER', NN_LOGS);
  * The name of the log file.
  * Must be alphanumeric (a-z 0-9) and contain no file extensions.
  *
- * @default 'nzedb'
+ * @default 'newznab'
  */
-define('NN_LOGGING_LOG_NAME', 'nzedb');
+define('NN_LOGGING_LOG_NAME', 'newznab');
 
 /**
  * Display memory usage in log file and debug message output?
