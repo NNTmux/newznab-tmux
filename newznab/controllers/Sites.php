@@ -115,7 +115,7 @@ class Sites
 		preg_match("/\d+/", $site->dbversion, $matches);
 		$currentrev = $matches[0];
 
-		$patchpath = WWW_DIR . "../db/patch/0.2.3/";
+		$patchpath = NN_WWW . "../db/patch/0.2.3/";
 		$patchfiles = glob($patchpath . "*.sql");
 		$missingpatch = [];
 		foreach ($patchfiles as $file) {
