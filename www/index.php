@@ -2,6 +2,7 @@
 require_once 'smarty.php';
 
 use newznab\db\Settings;
+use newznab\controllers\Page;
 
 $page = new Page;
 

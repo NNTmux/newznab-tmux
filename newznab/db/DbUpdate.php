@@ -178,6 +178,7 @@ class DbUpdate
 					echo $this->log->header('Processing patch file: ' . $file);
 					$this->splitSQL($file, ['local' => $local, 'data' => $options['data']]);
 					$current = (integer)$this->settings->getSetting('sqlpatch');
+					var_dump($current);
 					$current++;
 					$this->pdo->queryExec("UPDATE settings SET value = '$current' WHERE setting = 'sqlpatch';");
 					$newName = $matches['drive'] . $matches['path'] .

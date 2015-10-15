@@ -1,5 +1,7 @@
+
 2015-10-15 DariusIII
 	Fix: Add back the patch
+	Fix: Add missing use statements.
 2015-10-15 DariusIII
 	Bug: remove tvrage patch
 2015-10-15 DariusIII
