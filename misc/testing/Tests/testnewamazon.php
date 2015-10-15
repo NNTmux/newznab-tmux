@@ -1,16 +1,16 @@
 <?php
-require_once dirname(__FILE__) . '/../../../www/config.php';
+require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
 use newznab\libraries\ApaiIO\Configuration\GenericConfiguration;
 use newznab\libraries\ApaiIO\Operations\Search;
 use newznab\libraries\ApaiIO\ApaiIO;
+use newznab\db\Settings;
 
-$s = new Sites();
-$site = $s->get();
+$s = new Settings();
 
-$pubkey = $site->amazonpubkey;
-$privkey = $site->amazonprivkey;
-$asstag = $site->amazonassociatetag;
+$pubkey = $s->getSetting('amazonpubkey');
+$privkey = $s->getSetting('amazonprivkey');
+$asstag = $s->getSetting('amazonassociatetag');
 
 $conf = new GenericConfiguration();
 $conf

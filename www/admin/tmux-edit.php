@@ -1,6 +1,9 @@
 <?php
 require_once './config.php';
 
+use newznab\controllers\AdminPage;
+use newznab\controllers\Tmux;
+
 $page = new AdminPage();
 $tmux = new Tmux();
 $id = 0;

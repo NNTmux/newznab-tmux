@@ -1,4 +1,5 @@
 <?php
+namespace newznab\controllers;
 
 require_once NN_LIBS . 'simple_html_dom.php';
 
@@ -48,7 +49,7 @@ class Hotmovies
 	/**
 	 * Simple Html Dom Object
 	 *
-	 * @var simple_html_dom
+	 * @var \simple_html_dom
 	 */
 	protected $_html;
 

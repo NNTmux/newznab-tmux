@@ -1,12 +1,12 @@
 <?php
 //This Script Verifies your System Time vs Myself Time vs PHP Time
-require_once dirname(__FILE__) . '/../../../www/config.php';
+require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
 use newznab\db\Settings;
 $res="";
 
 $db = new Settings();
-$res = $db->queryonerow( sprintf("Select now()"));
+$res = $db->queryOneRow( sprintf("Select now()"));
 foreach($res as $time){
 echo "Mysql Time Is Now ".$time."\n";}
 $res="";

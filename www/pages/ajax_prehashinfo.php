@@ -1,4 +1,6 @@
 <?php
+
+use newznab\controllers\PreHash;
 if (!$page->users->isLoggedIn()) {
 	$page->show403();
 }

@@ -1,4 +1,5 @@
 <?php
+namespace newznab\controllers;
 
 use newznab\db\Settings;
 
@@ -9,7 +10,7 @@ use newznab\db\Settings;
 class XXX
 {
 	/**
-	 * @var newznab\db\Settings
+	 * @var \newznab\db\Settings
 	 */
 	public $pdo;
 
@@ -77,8 +78,8 @@ class XXX
 		if (NN_DEBUG || NN_LOGGING) {
 			$this->debug = true;
 			try {
-				$this->debugging = new \Logger();
-			} catch (\LoggerException $error) {
+				$this->debugging = new Logger();
+			} catch (LoggerException $error) {
 				$this->_debug = false;
 			}
 		}

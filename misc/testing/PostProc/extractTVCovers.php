@@ -1,11 +1,11 @@
 <?php
-//This script extracts TV covers from the database (tvrage.imgdata) and saves them to the tvrage covers directory
-require_once dirname(__FILE__) . '/../../../www/config.php';
+//This script extracts TV covers from the database (tvrage_titles.imgdata) and saves them to the tvrage covers directory
+require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
 use newznab\db\Settings;
 
 $pdo = new Settings();
-$shows = $pdo->queryDirect("SELECT rageid, imgdata FROM tvrage WHERE rageid > 0");
+$shows = $pdo->queryDirect("SELECT rageid, imgdata FROM tvrage_titles WHERE rageid > 0");
 
 if ($shows instanceof \Traversable) {
 	echo "\n";
@@ -34,7 +34,7 @@ if ($shows instanceof \Traversable) {
 			} else {
 				$pdo->queryExec(
 					sprintf("
-							UPDATE tvrage
+							UPDATE tvrage_titles
 							SET hascover = 1
 							WHERE rageid = %d",
 						$show['rageid']

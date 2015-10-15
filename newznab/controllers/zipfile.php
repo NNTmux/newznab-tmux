@@ -1,4 +1,6 @@
 <?php
+namespace newznab\controllers;
+
 /* vim: set expandtab sw=4 ts=4 sts=4: */
 /**
  *
@@ -61,9 +63,9 @@ class zipfile
      * Converts an Unix timestamp to a four byte DOS date and time format (date
      * in high two bytes, time in low two bytes allowing magnitude comparison).
      *
-     * @param  integer  the current Unix timestamp
+     * @param  integer  current Unix timestamp
      *
-     * @return integer  the current date in a four byte DOS format
+     * @return integer  current date in a four byte DOS format
      *
      * @access private
      */

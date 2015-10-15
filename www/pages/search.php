@@ -1,5 +1,8 @@
 <?php
 
+use newznab\controllers\Groups;
+use newznab\controllers\Releases;
+
 if (!$page->users->isLoggedIn()) {
 	$page->show403();
 }

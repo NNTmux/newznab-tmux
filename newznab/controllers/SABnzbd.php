@@ -1,4 +1,5 @@
 <?php
+namespace newznab\controllers;
 
 use newznab\utility\Utility;
 

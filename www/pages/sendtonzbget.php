@@ -1,5 +1,6 @@
 <?php
-require_once(WWW_DIR."/lib/nzbget.php");
+
+use newznab\controllers\NZBGet;
 
 if (!$page->users->isLoggedIn())
 	$page->show403();

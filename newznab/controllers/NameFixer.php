@@ -1,4 +1,5 @@
 <?php
+namespace newznab\controllers;
 
 use newznab\db\Settings;
 use \newznab\processing\PostProcess;
@@ -94,7 +95,7 @@ class NameFixer
 	protected $fullall;
 
 	/**
-	 * @var newznab\db\Settings
+	 * @var \newznab\db\Settings
 	 */
 	public $pdo;
 
@@ -686,7 +687,7 @@ class NameFixer
 	{
 		switch (NN_RELEASE_SEARCH_TYPE) {
 			case \ReleaseSearch::SPHINX:
-				$titlematch = \SphinxSearch::escapeString($preTitle);
+				$titlematch = SphinxSearch::escapeString($preTitle);
 				$join = sprintf(
 					'INNER JOIN releases_se rse ON rse.id = r.id
 					WHERE rse.query = "@(name,searchname,filename) %s;mode=extended"',

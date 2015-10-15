@@ -1,8 +1,10 @@
 <?php
-require_once(dirname(__FILE__) . "/../../bin/config.php");
+require_once dirname(__FILE__) . '/../../../../config.php';
 
 use newznab\db\DB;
 use newznab\utility\Utility;
+use newznab\controllers\ColorCLI;
+use newznab\controllers\Tmux;
 
 // Function inspired by : http://stackoverflow.com/questions/1883079/best-practice-import-mysql-file-in-php-split-queries/2011454#2011454
 function SplitSQL($file, $delimiter = ';')

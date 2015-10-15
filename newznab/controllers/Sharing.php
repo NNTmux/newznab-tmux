@@ -1,4 +1,5 @@
 <?php
+namespace newznab\controllers;
 
 use newznab\db\Settings;
 
@@ -98,7 +99,7 @@ Class Sharing
 			return;
 		}
 
-		$this->nntp = ($options['NNTP'] instanceof \NNTP ? $options['NNTP'] : new \NNTP(['Settings' => $this->pdo]));
+		$this->nntp = ($options['NNTP'] instanceof NNTP ? $options['NNTP'] : new NNTP(['Settings' => $this->pdo]));
 
 		// Cache sharing settings.
 		$this->siteSettings = $check;

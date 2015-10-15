@@ -3,9 +3,12 @@
 /*
  * This script deletes releases that match certain criteria, type php removeCrapReleases.php false for details.
  */
-require_once(dirname(__FILE__) . "/../bin/config.php");
+require_once dirname(__FILE__) . '/../../../config.php';
 
-$cli = new \ColorCLI();
+use newznab\controllers\ColorCLI;
+use newznab\controllers\ReleaseRemover;
+
+$cli = new ColorCLI();
 $n = PHP_EOL;
 
 $argCnt = count($argv);
@@ -65,5 +68,5 @@ if (isset($argv[3]) && $argv[3] === 'blacklist' && isset($argv[4])) {
 	$blacklistID = $argv[4];
 }
 
-$RR = new \ReleaseRemover();
+$RR = new ReleaseRemover();
 $RR->removeCrap(($argv[1] === 'true' ? true : false), $argv[2], (isset($argv[3]) ? $argv[3] : ''), (isset($blacklistID) ? $argv[4] : ''));

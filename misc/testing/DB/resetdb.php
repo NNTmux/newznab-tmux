@@ -1,8 +1,12 @@
 <?php
-require_once dirname(__FILE__) . '/../../../www/config.php';
+require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
 use newznab\db\Settings;
 use newznab\utility\Utility;
+use newznab\controllers\ReleaseImage;
+use newznab\controllers\NZB;
+use newznab\controllers\ConsoleTools;
+use newznab\controllers\SphinxSearch;
 
 Utility::clearScreen();
 $pdo = new Settings();
@@ -22,15 +26,15 @@ echo $pdo->log->header("Thank you, continuing...\n\n");
 
 $timestart = time();
 $relcount = 0;
-$ri = new \ReleaseImage($pdo);
-$nzb = new \NZB($pdo);
-$consoletools = new \ConsoleTools(['ColorCLI' => $pdo->log]);
+$ri = new ReleaseImage($pdo);
+$nzb = new NZB($pdo);
+$consoletools = new ConsoleTools(['ColorCLI' => $pdo->log]);
 
 $pdo->queryExec("UPDATE groups SET first_record = 0, first_record_postdate = NULL, last_record = 0, last_record_postdate = NULL, last_updated = NULL");
 echo $pdo->log->primary("Reseting all groups completed.");
 
 $arr = [
-		"tvrage", "releasenfo", "release_comments", 'sharing', 'sharing_sites',
+		"tvrage_titles", "releasenfo", "release_comments", 'sharing', 'sharing_sites',
 		"usercart", "usermovies", "userseries", "movieinfo", "musicinfo", "releasefiles",
 		"releaseaudio", "releasesubs", "releasevideo", "releaseextrafull", "parts",
 		"partrepair", "binaries", "collections", "releases", "spotnabsources"
@@ -54,7 +58,7 @@ foreach ($tables as $row) {
 	}
 }
 
-(new \SphinxSearch())->truncateRTIndex('releases_rt');
+(new SphinxSearch())->truncateRTIndex('releases_rt');
 
 $pdo->optimise(false, 'full');
 
@@ -89,7 +93,7 @@ $tvshows = @simplexml_load_file('http://services.tvrage.com/feeds/show_list.php'
 if ($tvshows !== false) {
 	foreach ($tvshows->show as $rage) {
 		if (isset($rage->id) && isset($rage->name) && !empty($rage->id) && !empty($rage->name))
-			$pdo->queryInsert(sprintf('INSERT INTO tvrage (rageid, releasetitle, country) VALUES (%s, %s, %s)', $pdo->escapeString($rage->id), $pdo->escapeString($rage->name), $pdo->escapeString($rage->country)));
+			$pdo->queryInsert(sprintf('INSERT INTO tvrage_titles (rageid, releasetitle, country) VALUES (%s, %s, %s)', $pdo->escapeString($rage->id), $pdo->escapeString($rage->name), $pdo->escapeString($rage->country)));
 	}
 } else {
 	echo $pdo->log->error("TVRage site has a hard limit of 400 concurrent api requests. At the moment, they have reached that limit. Please wait before retrying again.");

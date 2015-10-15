@@ -1,4 +1,5 @@
 <?php
+namespace newznab\controllers;
 
 use newznab\db\Settings;
 
@@ -7,7 +8,7 @@ class Backfill
 	/**
 	 * Instance of class Settings
 	 *
-	 * @var newznab\db\Settings
+	 * @var \newznab\db\Settings
 	 */
 	public $pdo;
 
@@ -111,7 +112,7 @@ class Backfill
 		if ($this->_debug) {
 			try {
 				$this->_debugging = ($options['Logger'] instanceof Logger ? $options['Logger'] : new Logger(['ColorCLI' => $this->pdo->log]));
-			} catch (\LoggerException $error) {
+			} catch (LoggerException $error) {
 				$this->_debug = false;
 			}
 		}

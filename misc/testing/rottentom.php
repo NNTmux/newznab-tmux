@@ -1,12 +1,16 @@
 <?php
-require_once dirname(__FILE__) . '/../../www/config.php';
+require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-$s = new Sites();
-$site = $s->get();
+use newznab\db\Settings;
+use newznab\controllers\RottenTomato;
 
-if (isset($site->rottentomatokey))
+$s = new Settings();
+$rtkey = $s->getSetting('rottentomatokey');
+$rt = new RottenTomato($rtkey);
+
+if (isset($rtkey) && $rtkey !='')
 {
-	$rt = new RottenTomato($site->rottentomatokey);
+	$rt = new RottenTomato($rtkey);
 
 	//print_r($rt->getMoviesBoxOffice());
 	//print_r($rt->getMoviesInTheaters());

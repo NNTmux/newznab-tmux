@@ -1,5 +1,7 @@
 <?php
 
+use newznab\controllers\Books;
+
 $b = new Books;
 
 if (!$page->users->isLoggedIn())

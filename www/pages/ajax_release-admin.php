@@ -1,4 +1,7 @@
 <?php
+use newznab\controllers\AdminPage;
+use newznab\controllers\Releases;
+use newznab\controllers\Category;
 
 $page = new AdminPage();
 $releases = new Releases();

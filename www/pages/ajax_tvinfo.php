@@ -1,5 +1,8 @@
 <?php
 
+use newznab\controllers\Releases;
+use newznab\controllers\TvRage;
+
 if (!$page->users->isLoggedIn())
 	$page->show403();
 

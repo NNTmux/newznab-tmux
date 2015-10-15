@@ -1,4 +1,5 @@
 <?php
+namespace newznab\controllers;
 
 use newznab\db\Settings;
 
@@ -85,7 +86,7 @@ class Category
 	private $tmpCat = 0;
 
 	/**
-	 * @var newznab\db\Settings
+	 * @var \newznab\db\Settings
 	 */
 	public $pdo;
 
@@ -213,15 +214,13 @@ class Category
 	 */
 	public function getById($id)
 	{
-		$db = new newznab\db\Settings();
 
-		return $db->queryOneRow(sprintf("SELECT c.disablepreview, c.id, c.description, c.minsizetoformrelease, c.maxsizetoformrelease, CONCAT(COALESCE(cp.title,'') , CASE WHEN cp.title IS NULL THEN '' ELSE ' > ' END , c.title) as title, c.status, c.parentid from category c left outer join category cp on cp.id = c.parentid where c.id = %d", $id));
+		return $this->pdo->queryOneRow(sprintf("SELECT c.disablepreview, c.id, c.description, c.minsizetoformrelease, c.maxsizetoformrelease, CONCAT(COALESCE(cp.title,'') , CASE WHEN cp.title IS NULL THEN '' ELSE ' > ' END , c.title) as title, c.status, c.parentid from category c left outer join category cp on cp.id = c.parentid where c.id = %d", $id));
 	}
 
 	public function getSizeRangeById($id)
 	{
-		$db = new newznab\db\Settings();
-		$res = $db->queryOneRow(sprintf("SELECT c.minsizetoformrelease, c.maxsizetoformrelease, cp.minsizetoformrelease as p_minsizetoformrelease, cp.maxsizetoformrelease as p_maxsizetoformrelease" .
+		$res = $this->pdo->queryOneRow(sprintf("SELECT c.minsizetoformrelease, c.maxsizetoformrelease, cp.minsizetoformrelease as p_minsizetoformrelease, cp.maxsizetoformrelease as p_maxsizetoformrelease" .
 				" from category c left outer join category cp on cp.id = c.parentid where c.id = %d", $id
 			)
 		);
@@ -286,9 +285,8 @@ class Category
 
 	public function getNameByID($ID)
 	{
-		$db = new newznab\db\Settings();
-		$parent = $db->queryOneRow(sprintf("SELECT title FROM category WHERE id = %d", substr($ID, 0, 1) . "000"));
-		$cat = $db->queryOneRow(sprintf("SELECT title FROM category WHERE id = %d", $ID));
+		$parent = $this->pdo->queryOneRow(sprintf("SELECT title FROM category WHERE id = %d", substr($ID, 0, 1) . "000"));
+		$cat = $this->pdo->queryOneRow(sprintf("SELECT title FROM category WHERE id = %d", $ID));
 
 		return $parent["title"] . " " . $cat["title"];
 	}
@@ -298,9 +296,7 @@ class Category
 	 */
 	public function update($id, $status, $desc, $disablepreview, $minsize, $maxsize)
 	{
-		$db = new newznab\db\Settings();
-
-		return $db->queryExec(sprintf("update category set disablepreview = %d, status = %d, minsizetoformrelease = %d, maxsizetoformrelease = %d, description = %s where id = %d", $disablepreview, $status, $minsize, $maxsize, $db->escapeString($desc), $id));
+		return $this->pdo->queryExec(sprintf("update category set disablepreview = %d, status = %d, minsizetoformrelease = %d, maxsizetoformrelease = %d, description = %s where id = %d", $disablepreview, $status, $minsize, $maxsize, $this->pdo->escapeString($desc), $id));
 	}
 
 	/**
@@ -370,8 +366,6 @@ class Category
 	 */
 	public function get($activeonly = false, $excludedcats = [])
 	{
-		$db = new newznab\db\Settings();
-
 		$exccatlist = "";
 		if (count($excludedcats) > 0)
 			$exccatlist = " and c.id not in (" . implode(",", $excludedcats) . ")";
@@ -383,7 +377,7 @@ class Category
 		if ($exccatlist != "")
 			$act .= $exccatlist;
 
-		return $db->query("select c.id, concat(cp.title, ' > ',c.title) as title, cp.id as parentid, c.status from category c inner join category cp on cp.id = c.parentid " . $act . " ORDER BY c.id", true);
+		return $this->pdo->query("select c.id, concat(cp.title, ' > ',c.title) as title, cp.id as parentid, c.status from category c inner join category cp on cp.id = c.parentid " . $act . " ORDER BY c.id", true);
 	}
 
 }

@@ -1,4 +1,5 @@
 <?php
+namespace newznab\controllers;
 use newznab\db\Settings;
 use \newznab\processing\PostProcess;
 use newznab\utility\Utility;
@@ -15,7 +16,7 @@ class Nfo
 {
 	/**
 	 * Instance of class DB
-	 * @var newznab\db\Settings
+	 * @var \newznab\db\Settings
 	 * @access private
 	 */
 	public $pdo;
@@ -159,18 +160,18 @@ class Nfo
 			}
 
 			// If above checks couldn't  make a categorical identification, Use GetId3 to check if it's an image/video/rar/zip etc..
-			$getid3 = new getid3();
+			$getid3 = new \getid3();
 			$check = $getid3->analyze($tmpPath);
 			@unlink($tmpPath);
 			if (isset($check['error'])) {
 
 				// Check if it's a par2.
-				$par2info = new Par2Info();
+				$par2info = new \Par2Info();
 				$par2info->setData($possibleNFO);
 				if ($par2info->error) {
 
 					// Check if it's an SFV.
-					$sfv = new SfvInfo();
+					$sfv = new \SfvInfo();
 					$sfv->setData($possibleNFO);
 					if ($sfv->error) {
 						return true;

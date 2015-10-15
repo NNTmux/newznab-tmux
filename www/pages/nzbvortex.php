@@ -2,6 +2,7 @@
 
 if (!$page->users->isLoggedIn())
     $page->show403();
+use newznab\controllers\NZBVortex;
 
 try
 {

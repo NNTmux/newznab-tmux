@@ -1,4 +1,5 @@
 <?php
+namespace newznab\controllers;
 
 use newznab\db\Settings;
 
@@ -9,7 +10,7 @@ class ReleaseSearch
 	const SPHINX   = 2;
 
 	/***
-	 * @var newznab\db\Settings
+	 * @var \newznab\db\Settings
 	 */
 	public $pdo;
 
@@ -44,7 +45,7 @@ class ReleaseSearch
 		}
 
 		$this->sphinxQueryOpt = ";limit=10000;maxmatches=10000;sort=relevance;mode=extended";
-		$this->pdo = ($settings instanceof newznab\db\Settings ? $settings : new newznab\db\Settings());
+		$this->pdo = ($settings instanceof Settings ? $settings : new Settings());
 	}
 
 	/**

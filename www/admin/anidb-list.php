@@ -2,6 +2,10 @@
 
 require_once './config.php';
 
+use newznab\controllers\AdminPage;
+use newznab\controllers\AniDB;
+
+
 $page = new AdminPage();
 
 $AniDB = new AniDB();

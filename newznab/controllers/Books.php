@@ -1,4 +1,5 @@
 <?php
+namespace newznab\controllers;
 
 use newznab\db\Settings;
 use newznab\libraries\ApaiIO\Configuration\GenericConfiguration;
@@ -11,7 +12,7 @@ use newznab\libraries\ApaiIO\ApaiIO;
 class Books
 {
 	/**
-	 * @var newznab\db\Settings
+	 * @var \newznab\db\Settings
 	 */
 	public $pdo;
 
@@ -182,7 +183,7 @@ class Books
 
 		$catsrch = '';
 		if (count($cat) > 0 && $cat[0] != -1) {
-			$catsrch = (new \Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
+			$catsrch = (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
 		}
 
 		$maxage = '';
@@ -485,7 +486,7 @@ class Books
 
 	public function updateBookInfo($bookInfo = '', $amazdata = null)
 	{
-		$ri = new \ReleaseImage($this->pdo);
+		$ri = new ReleaseImage($this->pdo);
 
 		$book =[];
 

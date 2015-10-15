@@ -2,6 +2,9 @@
 
 require_once './config.php';
 
+use newznab\controllers\AdminPage;
+use newznab\db\Settings;
+
 $page = new AdminPage();
 
 $s = $page->settings;
@@ -18,7 +21,7 @@ unset($s->sabapikey);
 unset($s->sabcompletedir);
 unset($s->sabvdir);
 
-$db = new newznab\db\Settings;
+$db = new Settings();
 $totalsize = 0;
 $alltables = $db->query("show table status");
 foreach ($alltables as $tablename)

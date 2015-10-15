@@ -2,6 +2,9 @@
 
 require_once './config.php';
 
+use newznab\controllers\AdminPage;
+use newznab\controllers\Groups;
+
 $page = new AdminPage();
 
 // set the current action

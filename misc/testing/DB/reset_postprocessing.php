@@ -1,10 +1,11 @@
 <?php
-require_once dirname(__FILE__) . '/../../../www/config.php';
+require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
 use newznab\db\Settings;
+use newznab\controllers\ConsoleTools;
 
 $pdo = new Settings();
-$consoletools = new \ConsoleTools(['ColorCLI' => $pdo->log]);
+$consoletools = new ConsoleTools(['ColorCLI' => $pdo->log]);
 $ran = false;
 
 if (isset($argv[1]) && $argv[1] === "all") {
@@ -181,7 +182,7 @@ if (isset($argv[1]) && ($argv[1] === "misc" || $argv[1] === "all")) {
 if (isset($argv[1]) && ($argv[1] === "tv" || $argv[1] === "all")) {
 	$ran = true;
 	if (isset($argv[3]) && $argv[3] === "truncate") {
-		$pdo->queryExec("TRUNCATE TABLE tvrage");
+		$pdo->queryExec("TRUNCATE TABLE tvrage_titles");
 	}
 	if (isset($argv[2]) && $argv[2] === "true") {
 		echo $pdo->log->header("Resetting all TV postprocessing");

@@ -1,4 +1,5 @@
 <?php
+namespace newznab\controllers;
 
 use newznab\db\Settings;
 use newznab\utility\Utility;
@@ -10,7 +11,7 @@ class TheTVDB
 	const APIKEY	= 'E1669B52D4FBFF11';
 
 	/**
-	 * @var newznab\db\Settings
+	 * @var \newznab\db\Settings
 	 */
 	public $pdo;
 
@@ -263,7 +264,7 @@ class TheTVDB
 
 				$seriesName = '';
 				if($arr['rageid'] > 0) {
-					$seriesName = $this->pdo->queryOneRow(sprintf('SELECT releasetitle AS seriesName FROM tvrage WHERE rageid = %d', $arr['rageid']));
+					$seriesName = $this->pdo->queryOneRow(sprintf('SELECT releasetitle AS seriesName FROM tvrage_titles WHERE rageid = %d', $arr['rageid']));
 				}
 				elseif($arr['anidbid'] > 0) {
 					$seriesName = $this->pdo->queryOneRow(sprintf('SELECT title AS seriesName FROM anidb WHERE anidbid = %d', $arr['anidbid']));

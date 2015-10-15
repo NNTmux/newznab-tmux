@@ -1,4 +1,5 @@
 <?php
+namespace newznab\controllers;
 
 use newznab\db\Settings;
 use newznab\utility\Utility;
@@ -145,7 +146,7 @@ class Movie
 		$options += $defaults;
 
 		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
-		$this->releaseImage = ($options['ReleaseImage'] instanceof \ReleaseImage ? $options['ReleaseImage'] : new \ReleaseImage($this->pdo));
+		$this->releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage($this->pdo));
 
 		$this->lookuplanguage = ($this->pdo->getSetting('lookuplanguage') != '') ? (string)$this->pdo->getSetting('lookuplanguage') : 'en';
 
@@ -163,8 +164,8 @@ class Movie
 		if (NN_DEBUG || NN_LOGGING) {
 			$this->debug = true;
 			try {
-				$this->debugging = new \Logger();
-			} catch (\LoggerException $error) {
+				$this->debugging = new Logger();
+			} catch (LoggerException $error) {
 				$this->_debug = false;
 			}
 		}
@@ -254,7 +255,7 @@ class Movie
 	{
 		$catsrch = '';
 		if (count($cat) > 0 && $cat[0] != -1) {
-			$catsrch = (new \Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
+			$catsrch = (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
 		}
 
 		$res = $this->pdo->queryOneRow(
@@ -289,13 +290,13 @@ class Movie
 	 * @param       $maxAge
 	 * @param array $excludedCats
 	 *
-	 * @return bool|PDOStatement
+	 * @return bool PDOStatement
 	 */
 	public function getMovieRange($cat, $start, $num, $orderBy, $maxAge = -1, $excludedCats = [])
 	{
 		$catsrch = '';
 		if (count($cat) > 0 && $cat[0] != -1) {
-			$catsrch = (new \Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
+			$catsrch = (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
 		}
 
 		$order = $this->getMovieOrder($orderBy);
@@ -815,7 +816,7 @@ class Movie
 
 		try {
 			$tmdbLookup = $tmdb->getMovie($lookupId);
-		} catch (exception $e) {
+		} catch (\Exception $e) {
 			return false;
 		}
 		/*$status = $tmdbLookup->get('status_code');
@@ -840,7 +841,7 @@ class Movie
 						$percent .
 						'% similar to (' .
 						$this->currentTitle . ')',
-						\Logger::LOG_INFO
+						Logger::LOG_INFO
 					);
 				}
 				return false;
@@ -952,7 +953,7 @@ class Movie
 							$percent .
 							'% similar to (' .
 							$this->currentTitle . ')',
-							\Logger::LOG_INFO
+							Logger::LOG_INFO
 						);
 					}
 					return false;

@@ -1,4 +1,6 @@
 <?php
+namespace newznab\controllers;
+
 require_once NN_LIBS . 'simple_html_dom.php';
 
 use newznab\utility\Utility;
@@ -48,7 +50,7 @@ class Steam
 	protected $_editHtml;
 
 	/**
-	 * @var simple_html_dom
+	 * @var \simple_html_dom
 	 */
 	protected $_html;
 
@@ -99,8 +101,8 @@ class Steam
 
 	public function __construct()
 	{
-		$this->_html = new simple_html_dom();
-		$this->_editHtml = new simple_html_dom();
+		$this->_html = new \simple_html_dom();
+		$this->_editHtml = new \simple_html_dom();
 		if (isset($this->cookie)) {
 			$this->getUrl(self::STEAMURL);
 		}

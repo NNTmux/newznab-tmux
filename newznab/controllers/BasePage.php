@@ -1,10 +1,15 @@
 <?php
-require_once SMARTY_DIR . 'Autoloader.php';
+namespace newznab\controllers;
+
+use newznab\db\Settings;
+use Smarty;
+use Smarty_Autoloader;
+
+require_once SMARTY_DIR . DS . 'Autoloader.php';
+
 
 Smarty_Autoloader::register();
 require_once NN_LIB . 'utility' . DS . 'SmartyUtils.php';
-
-use newznab\db\Settings;
 
 class BasePage
 {
@@ -16,7 +21,7 @@ class BasePage
 	/**
 	 * Public access to Captcha object for error checking.
 	 *
-	 * @var \Captcha
+	 * @var Captcha
 	 */
 	public $captcha;
 

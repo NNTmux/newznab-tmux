@@ -1,5 +1,7 @@
 <?php
 use newznab\libraries\Tmdb\TMDB;
+use newznab\controllers\UserMovies;
+use newznab\controllers\Movie;
 
 
 if (!$page->users->isLoggedIn()) {

@@ -1,5 +1,8 @@
 <?php
 
+use newznab\controllers\Captcha;
+use newznab\controllers\Logging;
+
 $page->smarty->assign(['error' => '', 'username' => '', 'rememberme' => '']);
 
 $captcha = new Captcha($page);

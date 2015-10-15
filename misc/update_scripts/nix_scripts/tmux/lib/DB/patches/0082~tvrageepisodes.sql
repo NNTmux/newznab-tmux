@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS tvrageepisodes;
-CREATE TABLE         tvrageepisodes (
+DROP TABLE IF EXISTS tvrage_episodes;
+CREATE TABLE         tvrage_episodes (
   id        INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
   rageid    INT(11) UNSIGNED NOT NULL,
   showtitle VARCHAR(255)     DEFAULT NULL,

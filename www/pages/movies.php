@@ -1,5 +1,9 @@
 <?php
 
+use newznab\controllers\Movie;
+use newznab\controllers\Category;
+use newznab\controllers\DnzbFailures;
+
 $movie = new Movie(['Settings' => $page->settings]);
 $cat = new Category(['Settings' => $page->settings]);
 $fail = new DnzbFailures(['Settings' => $page->settings]);

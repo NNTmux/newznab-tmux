@@ -1,4 +1,5 @@
 <?php
+namespace newznab\controllers;
 
 use newznab\db\Settings;
 
@@ -27,7 +28,7 @@ class ReleaseRemover
 	protected $browser;
 
 	/**
-	 * @var \newznab\ConsoleTools
+	 * @var ConsoleTools
 	 */
 	protected $consoleTools;
 

@@ -1,6 +1,8 @@
 <?php
 use newznab\utility\Utility;
 use newznab\db\Settings;
+use newznab\controllers\ReleaseComments;
+use newznab\controllers\Releases;
 
 $rc = new ReleaseComments;
 

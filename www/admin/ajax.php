@@ -1,5 +1,12 @@
 <?php
 
+use newznab\controllers\AdminPage;
+use newznab\controllers\Binaries;
+use newznab\controllers\Regexes;
+use newznab\controllers\Groups;
+use newznab\controllers\Sharing;
+use newznab\controllers\ReleaseComments;
+
 // This script waits for ajax queries from the web.
 
 if (!isset($_GET['action'])) {

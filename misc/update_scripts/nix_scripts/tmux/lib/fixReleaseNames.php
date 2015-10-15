@@ -7,15 +7,18 @@
  * If you used the 4th argument yes, but you want to reset the status,
  * there is another script called resetRelnameStatus.php
  */
-require_once(dirname(__FILE__) . "/../bin/config.php");
+require_once dirname(__FILE__) . '/../../../config.php';
 
 use newznab\db\Settings;
+use newznab\controllers\NameFixer;
+use newznab\controllers\PreHash;
+use newznab\controllers\NNTP;
 
 
 $n = "\n";
 $pdo = new Settings();
-$namefixer = new \NameFixer(['Settings' => $pdo]);
-$predb = new \PreHash(['Echo' => true, 'Settings' => $pdo]);
+$namefixer = new NameFixer(['Settings' => $pdo]);
+$predb = new PreHash(['Echo' => true, 'Settings' => $pdo]);
 
 if (isset($argv[1]) && isset($argv[2]) && isset($argv[3]) && isset($argv[4])) {
 	$update = ($argv[2] == "true") ? 1 : 2;
@@ -34,7 +37,7 @@ if (isset($argv[1]) && isset($argv[2]) && isset($argv[3]) && isset($argv[4])) {
 
 	$nntp = null;
 	if ($argv[1] == 7 || $argv[1] == 8) {
-		$nntp = new \NNTP(['Settings' => $pdo]);
+		$nntp = new NNTP(['Settings' => $pdo]);
 		if (($pdo->getSetting('alternate_nntp') == '1' ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
 			echo $pdo->log->error("Unable to connect to usenet.\n");
 			return;

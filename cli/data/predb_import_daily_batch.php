@@ -7,14 +7,7 @@
 use newznab\db\Settings;
 use newznab\utility\Utility;
 
-$config = dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'www' . DIRECTORY_SEPARATOR .
-	'config.php';
-
-
-if (!is_file($config)) {
-	exit('Place this script in the testing folder of tmux.' . PHP_EOL);
-}
-require_once dirname(__FILE__) . '/../../www/config.php';
+require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
 unset($config);
 
 if (!Utility::isWin()) {

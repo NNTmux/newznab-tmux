@@ -1,4 +1,5 @@
 <?php
+use newznab\controllers\Forum;
 
 $forum = new Forum;
 

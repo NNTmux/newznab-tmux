@@ -1,4 +1,5 @@
 <?php
+namespace newznab\controllers;
 
 use newznab\db\Settings;
 
@@ -128,7 +129,7 @@ class ReleaseRegex
 	 *
 	 * @param $id
 	 *
-	 * @return bool|PDOStatement
+	 * @return bool PDOStatement
 	 */
 	public function delete($id)
 	{

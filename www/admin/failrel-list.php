@@ -2,6 +2,9 @@
 
 require_once("config.php");
 
+use newznab\controllers\AdminPage;
+use newznab\controllers\DnzbFailures;
+
 $page = new AdminPage();
 
 $failed = new DnzbFailures(['Settings' => $page->settings]);

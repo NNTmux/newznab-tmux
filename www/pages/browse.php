@@ -1,5 +1,8 @@
 <?php
 
+use newznab\controllers\Releases;
+use newznab\controllers\Category;
+
 $releases = new Releases(['Settings' => $page->settings]);
 
 if (!$page->users->isLoggedIn())

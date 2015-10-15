@@ -1,5 +1,10 @@
 <?php
 
+use newznab\controllers\Games;
+use newznab\controllers\Category;
+use newznab\controllers\Genres;
+use newznab\controllers\DnzbFailures;
+
 if (!$page->users->isLoggedIn()) {
 	$page->show403();
 }

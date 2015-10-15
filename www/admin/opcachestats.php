@@ -5,6 +5,8 @@
 /* #newznab-tmux */
 require_once './config.php';
 
+use newznab\controllers\AdminPage;
+
 $page = new AdminPage();
 $NNURL = $page->serverurl;
 /* #newznab-tmux */

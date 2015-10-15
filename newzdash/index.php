@@ -1,7 +1,5 @@
 
 <?php
-require_once('../www/automated.config.php');
-
 
 if (!file_exists(NN_WWW . DS . 'config.php'))
 {

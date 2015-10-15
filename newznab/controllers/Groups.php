@@ -1,4 +1,5 @@
 <?php
+namespace newznab\controllers;
 
 use newznab\db\Settings;
 
@@ -9,7 +10,7 @@ class Groups
 {
 
 	/**
-	 * @var newznab\db\Settings
+	 * @var \newznab\db\Settings
 	 */
 	public $pdo;
 
@@ -548,8 +549,8 @@ class Groups
 
 		if ($releaseArray instanceof \Traversable) {
 			$releases = new \Releases(['Settings' => $this->pdo, 'Groups' => $this]);
-			$nzb = new \NZB($this->pdo);
-			$releaseImage = new \ReleaseImage($this->pdo);
+			$nzb = new NZB($this->pdo);
+			$releaseImage = new ReleaseImage($this->pdo);
 			foreach ($releaseArray as $release) {
 				$releases->deleteSingle(['g' => $release['guid'], 'i' => $release['id']], $nzb, $releaseImage);
 			}

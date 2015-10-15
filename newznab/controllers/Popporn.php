@@ -1,6 +1,9 @@
 <?php
+namespace newznab\controllers;
 
 require_once NN_LIBS . 'simple_html_dom.php';
+
+use newznab\utility\Utility;
 
 class Popporn
 {
@@ -35,7 +38,7 @@ class Popporn
 	/**
 	 * Simple Html Dom Object
 	 *
-	 * @var simple_html_dom
+	 * @var \simple_html_dom
 	 */
 	protected $_html;
 
@@ -383,7 +386,7 @@ class Popporn
 			curl_setopt($ch, CURLOPT_COOKIEJAR, $this->cookie);
 			curl_setopt($ch, CURLOPT_COOKIEFILE, $this->cookie);
 		}
-		curl_setopt_array($ch, newznab\utility\Utility::curlSslContextOptions());
+		curl_setopt_array($ch, Utility::curlSslContextOptions());
 		$this->_response = curl_exec($ch);
 		if (!$this->_response) {
 			curl_close($ch);

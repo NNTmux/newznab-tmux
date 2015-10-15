@@ -1,6 +1,9 @@
 <?php
 require_once './config.php';
 
+use newznab\controllers\AdminPage;
+use newznab\controllers\TheTVDB;
+
 $page = new AdminPage();
 
 if (isset($_GET['id']))

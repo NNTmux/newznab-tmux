@@ -3,6 +3,8 @@ if (!$page->users->isLoggedIn()) {
 	$page->show403();
 }
 
+use newznab\controllers\Groups;
+
 $groups = new Groups(['Settings' => $page->settings]);
 
 $grouplist = $groups->getAll();

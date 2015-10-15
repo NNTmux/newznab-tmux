@@ -1,4 +1,5 @@
 <?php
+namespace newznab\controllers;
 
 use newznab\db\Settings;
 use \newznab\processing\PostProcess;
@@ -12,7 +13,7 @@ use newznab\utility\Utility;
 Class NZBContents
 {
 	/**
-	 * @var newznab\db\Settings
+	 * @var \newznab\db\Settings
 	 * @access protected
 	 */
 	public $pdo;
@@ -42,7 +43,7 @@ Class NZBContents
 	protected $nzb;
 
 	/**
-	 * @var bool|stdClass
+	 * @var bool stdClass
 	 * @access protected
 	 */
 	protected $site;
@@ -88,14 +89,14 @@ Class NZBContents
 
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
 		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
-		$this->nntp = ($options['NNTP'] instanceof \NNTP ? $options['NNTP'] : new \NNTP(['Echo' => $this->echooutput, 'Settings' => $this->pdo]));
-		$this->nfo = ($options['Nfo'] instanceof \Nfo ? $options['Nfo'] : new \Nfo(['Echo' => $this->echooutput, 'Settings' => $this->pdo]));
+		$this->nntp = ($options['NNTP'] instanceof NNTP ? $options['NNTP'] : new NNTP(['Echo' => $this->echooutput, 'Settings' => $this->pdo]));
+		$this->nfo = ($options['Nfo'] instanceof Nfo ? $options['Nfo'] : new Nfo(['Echo' => $this->echooutput, 'Settings' => $this->pdo]));
 		$this->pp = (
 		$options['PostProcess'] instanceof PostProcess
 			? $options['PostProcess']
 			: new PostProcess(['Echo' => $this->echooutput, 'Nfo' => $this->nfo, 'Settings' => $this->pdo])
 		);
-		$this->nzb = ($options['NZB'] instanceof \NZB ? $options['NZB'] : new \NZB($this->pdo));
+		$this->nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB($this->pdo));
 		$t = new Tmux();
 		$this->tmux = $t->get();
 		$this->lookuppar2 = ($this->tmux->lookuppar2 == 1 ? true : false);
@@ -237,7 +238,7 @@ Class NZBContents
 	 *
 	 * @param string $guid Release guid.
 	 *
-	 * @return bool|SimpleXMLElement
+	 * @return bool SimpleXMLElement
 	 *
 	 * @access public
 	 */

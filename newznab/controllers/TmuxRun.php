@@ -1,4 +1,8 @@
 <?php
+namespace newznab\controllers;
+
+use newznab\db\Settings;
+
 /**
  * Tmux pane shell exec functions for pane respawning
  *
@@ -9,9 +13,9 @@ class TmuxRun extends Tmux
 	protected $_dateFormat;
 
 	/**
-	 * @param newznab\db\Settings $pdo
+	 * @param \newznab\db\Settings $pdo
 	 */
-	public function __construct(newznab\db\Settings $pdo = null)
+	public function __construct(Settings $pdo = null)
 	{
 		parent::__construct($pdo);
 		$this->_dateFormat = '%Y-%m-%d %T';
@@ -680,7 +684,7 @@ class TmuxRun extends Tmux
 			if (shell_exec("tmux list-panes -t{$runVar['constants']['tmux_session']}:${pane} | grep ^0 | grep -c dead") == 1) {
 				shell_exec(
 					"tmux respawnp -t{$runVar['constants']['tmux_session']}:${pane}.0 ' \
-					{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}testing/IRCScraper/scrape.php true'"
+					{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}IRCScraper/scrape.php true'"
 				);
 			}
 		} else {

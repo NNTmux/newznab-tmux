@@ -1,5 +1,8 @@
 <?php
 
+use newznab\controllers\SABnzbd;
+use newznab\controllers\NZBGet;
+
 if (!$page->users->isLoggedIn()) {
 	$page->show403();
 }

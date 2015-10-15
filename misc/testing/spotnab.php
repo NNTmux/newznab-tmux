@@ -172,7 +172,9 @@ SHARING
 		recognize or want to test out the source.
 */
 
-require_once dirname(__FILE__) . '/../../www/config.php';
+require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
+
+use newznab\controllers\SpotNab;
 
 // Subject Lines will always be a hash key that helps scanning identify whether
 // or not the contents are valid or not.  the hash key contains is built

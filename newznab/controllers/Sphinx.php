@@ -1,4 +1,6 @@
 <?php
+namespace newznab\controllers;
+
 /**
  *
  * Sphinx search extension for Newznab.
@@ -11,6 +13,7 @@ if (!defined("FS_ROOT")) { define('FS_ROOT', realpath(dirname(__FILE__))); }
 
 use newznab\libraries\Cache;
 use newznab\db\Settings;
+use newznab\utility\Utility;
 
 // Every day
 define("INDEX_MERGE_FREQ", 1440);
@@ -50,9 +53,9 @@ class Sphinx
         $output = [];
         $handle = popen($cmd, "r");
         while ($line = fgets($handle)) {
-            if (\newznab\utility\Utility::startsWith($line, "Sphinx") ||
-                \newznab\utility\Utility::startsWith($line, "Copyright") ||
-                \newznab\utility\Utility::startsWith($line, "\n") || startsWith($line, "using config"))
+            if (Utility::startsWith($line, "Sphinx") ||
+                Utility::startsWith($line, "Copyright") ||
+                Utility::startsWith($line, "\n") || Utility::startsWith($line, "using config"))
             {
                 continue;
             }
@@ -106,15 +109,13 @@ class Sphinx
             return false;
         }
 
-        $db = new newznab\db\Settings();
-
         if ($lastRebuildDate == 0) {
             $lastRebuildDate = "NOW()";
         } else {
             $lastRebuildDate = sprintf("FROM_UNIXTIME(%d)", $lastRebuildDate);
         }
 
-        $index = $db->escapeString($index);
+        $index = $this->pdo->escapeString($index);
         $nextRebuildDate = sprintf("FROM_UNIXTIME(%d)",
                                                 $this->getNextRebuildDate());
 
@@ -122,7 +123,7 @@ class Sphinx
              . "SET lastrebuilddate = %s, "
              . "nextrebuilddate = %s "
              . "WHERE name = %s";
-        $db->queryDirect(sprintf($sql, $lastRebuildDate, $nextRebuildDate,
+        $this->pdo->queryDirect(sprintf($sql, $lastRebuildDate, $nextRebuildDate,
                                  $index));
         return true;
     }
@@ -144,15 +145,13 @@ class Sphinx
             return false;
         }
 
-        $db = new newznab\db\Settings();
-
         if ($lastMergedDate == 0) {
             $lastMergedDate = "NOW()";
         } else {
             $lastMergedDate = sprintf("FROM_UNIXTIME(%d)", $lastMergedDate);
         }
 
-        $index = $db->escapeString($index);
+        $index = $this->pdo->escapeString($index);
         $nextMergeDate = sprintf("FROM_UNIXTIME(%d)",
                                             $this->getNextMergeDate());
 
@@ -160,7 +159,7 @@ class Sphinx
              . "SET lastmergedate = %s, "
              . "nextmergedate = %s "
              . "WHERE name = %s";
-        $db->queryDirect(sprintf($sql, $lastMergedDate, $nextMergeDate,
+        $this->pdo->queryDirect(sprintf($sql, $lastMergedDate, $nextMergeDate,
                                  $index));
         return true;
     }
@@ -304,8 +303,6 @@ class Sphinx
      */
     public function update()
     {
-        $db = new newznab\db\Settings();
-
         if (!$this->pdo->getSetting('sphinxenabled')) {
             // Sphinx is disabled, so we don't do anything.
             return;
@@ -313,8 +310,8 @@ class Sphinx
 
         // Loop over the enabled indexes and see what operations are due
         $sql = "SELECT * FROM sphinx";
-        $res = $db->queryDirect($sql);
-        while ($row = $db->getAssocArray($res)) {
+        $res = $this->pdo->queryDirect($sql);
+        while ($row = $this->pdo->getAssocArray($res)) {
             $index = $row["name"];
 
             if (!$this->isIndexEnabled($row["name"])) {
@@ -540,7 +537,6 @@ class Sphinx
         }
 
         // Get connection to Newznab's MySQL database
-        $ndb = new newznab\db\Settings;
 
         // Determine which release to start with
         if ($startingID < 0) {
@@ -674,7 +670,6 @@ class Sphinx
 		}
 
         if ($lookupQuery && count($results) > 0) {
-            $ndb = new newznab\db\Settings;
             $sql = sprintf($lookupQuery, implode(",", $results));
             $result = $ndb->queryDirect($sql);
 			if ($result)
@@ -720,8 +715,6 @@ class Sphinx
                            $indexes=[], $lookup=true, $where=[],
                            &$lookupQuery="")
     {
-        $ndb = new newznab\db\Settings;
-
         $offset = intval($offset);
         $limit = intval($limit);
 
@@ -969,7 +962,6 @@ class Sphinx
                                    $limit=100, $name="", $cat=array(-1),
                                    $maxage=-1, $indexes=[], $lookup=true)
     {
-        $db = new newznab\db\Settings();
         $order = array("postdate", "desc");
         $search = array($name);
         if ($series != "") {
@@ -979,14 +971,14 @@ class Sphinx
 			if (is_numeric($series) && strlen($series) != 4) {
 			    $series = sprintf('S%02d', $series);
 			}
-			$search[] = sprintf("@season %s", $db->escapeString($series));
+			$search[] = sprintf("@season %s", $this->pdo->escapeString($series));
 		}
 
 		if ($episode != "") {
 			if (is_numeric($episode)) {
 			    $episode = sprintf('E%02d', $episode);
 			}
-			$search[] = sprintf("@episode %s", $db->escapeString($episode));
+			$search[] = sprintf("@episode %s", $this->pdo->escapeString($episode));
 		}
 
 		$where = [];
@@ -1035,7 +1027,6 @@ class Sphinx
                                    $cat=array(-1), $genre="", $maxage=-1,
                                    $indexes=[], $lookup=true)
     {
-        $db = new newznab\db\Settings();
         $search = [];
         $order = array("postdate", "desc");
         $where = [];
@@ -1048,7 +1039,7 @@ class Sphinx
 		}
 
 		if ($genre != "") {
-		    $search[] = sprintf("@movieinfo_genre %s", $db->escapeString($genre));
+		    $search[] = sprintf("@movieinfo_genre %s", $this->pdo->escapeString($genre));
 		}
 
 		if (count($indexes) == 0) {
@@ -1102,24 +1093,23 @@ class Sphinx
                                 $cat=array(-1), $maxage=-1, $indexes=[],
                                 $lookup=true)
     {
-        $db = new newznab\db\Settings();
         $search = [];
         $where = [];
         $order = array("postdate", "desc");
         if ($artist != "") {
-            $search[] = sprintf("@musicinfo_artist %s", $db->escapeString($artist));
+            $search[] = sprintf("@musicinfo_artist %s", $this->pdo->escapeString($artist));
         }
 
 		if ($album != "") {
-		    $search[] = sprintf("@musicinfo_title %s", $db->escapeString($album));
+		    $search[] = sprintf("@musicinfo_title %s", $this->pdo->escapeString($album));
 		}
 
 		if ($label != "") {
-		    $search[] = sprintf("@musicinfo_publisher %s", $db->escapeString($label));
+		    $search[] = sprintf("@musicinfo_publisher %s", $this->pdo->escapeString($label));
 		}
 
 		if ($track != "") {
-		    $search[] = sprintf("@musicinfo_tracks %s", $db->escapeString($track));
+		    $search[] = sprintf("@musicinfo_tracks %s", $this->pdo->escapeString($track));
 		}
 
 		if ($year != "") {
@@ -1178,15 +1168,14 @@ class Sphinx
     public function searchBook($author, $title, $offset=0, $limit=100,
                                $maxage=-1, $indexes=[], $lookup=true)
     {
-        $db = new newznab\db\Settings();
         $order = array("postdate", "desc");
         $search = [];
         if ($author != "") {
-            $search[] = sprintf("@bookinfo_author %s", $db->escapeString($author));
+            $search[] = sprintf("@bookinfo_author %s", $this->pdo->escapeString($author));
         }
 
 		if ($title != "") {
-		    $search[] = sprintf("@bookinfo_title %s", $db->escapeString($title));
+		    $search[] = sprintf("@bookinfo_title %s", $this->pdo->escapeString($title));
 		}
 
 		if (count($indexes) == 0) {
@@ -1241,7 +1230,6 @@ class Sphinx
                                     $name='', $maxage=-1, $indexes=[],
                                     $lookup=true)
     {
-        $db = new newznab\db\Settings();
         $where = [];
         $search = [];
         $order = array("postdate", "desc");
@@ -1250,7 +1238,7 @@ class Sphinx
         }
 
         if (is_numeric($epno)) {
-			$search[] = sprintf("@episode %s", $db->escapeString($epno));
+			$search[] = sprintf("@episode %s", $this->pdo->escapeString($epno));
 		}
 
 		if (count($indexes) == 0) {
@@ -1290,14 +1278,13 @@ class Sphinx
      */
     public function getPreRange($start=0, $num, $dirname='', $category='')
     {
-        $db = new newznab\db\Settings();
         $dirname = empty($category) ? $dirname : $dirname." @category =".$category;
         $sphinxQuery = sprintf("SELECT id "
                                ."FROM predb, predb_delta "
                                ."WHERE MATCH(%s) "
                                ."ORDER BY ctime DESC "
                                ."LIMIT %d,%d",
-                               $db->escapeString($dirname),
+                               $this->pdo->escapeString($dirname),
                                $start, $num);
         $lookupQuery = "SELECT predb.*, r.guid "
                      . "FROM predb "

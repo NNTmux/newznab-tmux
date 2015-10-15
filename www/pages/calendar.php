@@ -4,6 +4,8 @@ if (!$page->users->isLoggedIn()) {
 	$page->show403();
 }
 
+use newznab\controllers\TvRage;
+
 $tvrage = new TvRage(['Settings' => $page->settings]);
 
 $date = date("Y-m-d");

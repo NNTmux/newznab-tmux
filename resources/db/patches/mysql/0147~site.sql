@@ -1,0 +1,1 @@
+INSERT INTO `site` (`setting`, `value`) VALUES ('userselstyle', '0');

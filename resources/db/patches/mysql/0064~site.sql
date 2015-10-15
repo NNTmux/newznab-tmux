@@ -1,0 +1,1 @@
+INSERT INTO `site` (`setting`, `value`) VALUES ('maxxxxprocessed', 100);
