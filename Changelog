@@ -7,6 +7,7 @@
 	Fix: More errors.
 	Fix: even more errors.
 	Fix: Fix missing Releases fatal error in ProcessAdditional.
+	Fix: Error in PostProcess.php
 2015-10-15 DariusIII
 	Bug: remove tvrage patch
 2015-10-15 DariusIII
