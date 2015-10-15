@@ -1,4 +1,5 @@
 2015-10-15 DariusIII
+	Fix: PreDB error in update_predb
 	Fix: Add back the patch
 	Fix: Add missing use statements.
 	Fix: Missing exception error in Logger.php

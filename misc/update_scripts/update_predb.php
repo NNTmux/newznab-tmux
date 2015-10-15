@@ -1,6 +1,8 @@
 <?php
 require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
 
+use newznab\controllers\PreDB;
+
 $p = new PreDB(true);
 $p->nzpreUpdate();
 if(isset($argv[1]) && $argv[1] == true)

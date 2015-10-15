@@ -261,7 +261,7 @@ class PostProcess
 	/**
 	 * Process comments.
 	 *
-	 * @param \NNTP $nntp
+	 * @param NNTP $nntp
 	 */
 	public function processSharing(&$nntp)
 	{
