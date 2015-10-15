@@ -1,4 +1,5 @@
 2015-10-15 DariusIII
+	Fix: Change Misc to Utility
 	Chg: Move patches to mysql subdir
 	Fix: Path to scrape.php in TmuxRun.php
 	Fix: Book categories in headermenu
