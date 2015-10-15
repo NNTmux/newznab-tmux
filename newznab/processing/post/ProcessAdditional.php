@@ -18,6 +18,7 @@ use newznab\controllers\NameFixer;
 use newznab\controllers\SphinxSearch;
 use newznab\controllers\Releases;
 use newznab\controllers\Category;
+
 class ProcessAdditional
 {
 	/**
