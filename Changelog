@@ -1,4 +1,6 @@
 2015-10-15 DariusIII
+	Fix: Add back the patch
+2015-10-15 DariusIII
 	Bug: remove tvrage patch
 2015-10-15 DariusIII
 	Upd: Update DbUpdate.php
