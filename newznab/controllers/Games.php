@@ -391,7 +391,7 @@ class Games
 		// Process Steam first before giantbomb
 		// Steam has more details
 		$this->_gameResults = [];
-		$this->_getGame = new \Steam();
+		$this->_getGame = new Steam();
 		$this->_classUsed = "steam";
 		$this->_getGame->cookie = $this->cookie;
 		$this->_getGame->searchTerm = $gameInfo['title'];
@@ -399,7 +399,7 @@ class Games
 			$this->_gameResults = $this->_getGame->getAll();
 		}
 		if (count($this->_gameResults) < 1) {
-			$this->_getGame = new \Desura();
+			$this->_getGame = new Desura();
 			$this->_classUsed = "desura";
 			$this->_getGame->cookie = $this->cookie;
 			$this->_getGame->searchTerm = $gameInfo['title'];
@@ -408,7 +408,7 @@ class Games
 			}
 		}
 		if (count($this->_gameResults) < 1) {
-			$this->_getGame = new \Greenlight();
+			$this->_getGame = new Greenlight();
 			$this->_classUsed = "gl";
 			$this->_getGame->cookie = $this->cookie;
 			$this->_getGame->searchTerm = $gameInfo['title'];
@@ -771,7 +771,7 @@ class Games
 					return false;
 				}
 			}
-		} catch (Exception $e) {
+		} catch (\Exception $e) {
 			$result = false;
 		}
 
@@ -794,7 +794,7 @@ class Games
 			];
 			$result = json_decode(json_encode($obj->game($this->_gameID, $fields)), true);
 			$result = $result['results'];
-		} catch (Exception $e) {
+		} catch (\Exception $e) {
 			$result = false;
 		}
 

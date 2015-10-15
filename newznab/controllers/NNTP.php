@@ -14,7 +14,7 @@ use newznab\utility\Utility;
  * decoding yEnc articles, decompressing article headers.
  * Extends PEAR's Net_NNTP_Client class, overrides some functions.
  */
-class NNTP extends Net_NNTP_Client
+class NNTP extends \Net_NNTP_Client
 {
 	public $pdo;
 

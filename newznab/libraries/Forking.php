@@ -4,6 +4,10 @@ namespace newznab\libraries;
 use \newznab\db\Settings;
 use \newznab\processing\PostProcess;
 use newznab\controllers\ColorCLI;
+use newznab\controllers\NZB;
+use newznab\controllers\RequestID;
+use newznab\controllers\NNTP;
+use newznab\controllers\Nfo;
 
 require_once(NN_LIBS . 'forkdaemon-php' . DS . 'fork_daemon.php');
 
