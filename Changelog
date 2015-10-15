@@ -4,6 +4,7 @@
 	Fix: Missing exception error in Logger.php
 	Fix: Change instantiation of classes
 	Fix: Define missing NN_TMUX folder.
+	Fix: More errors.
 2015-10-15 DariusIII
 	Bug: remove tvrage patch
 2015-10-15 DariusIII
