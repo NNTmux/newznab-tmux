@@ -1,4 +1,6 @@
 2015-10-15 DariusIII
+	Upd: Update DbUpdate.php
+2015-10-15 DariusIII
 	Chg: Add tvrage_titles and tvrage_episodes tables for historic reference, they are emtpy and useless, but hell.
 		Remove references to automated.confiog.php.
 2015-10-15 DariusIII
