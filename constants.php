@@ -27,6 +27,9 @@ define('NN_UPDATE', NN_MISC . 'update_scripts' . DS);
 // /misc/update/nix/
 define('NN_NIX', NN_UPDATE . 'nix_scripts' . DS);
 
+// /misc/update/nix/tmux/
+define('NN_TMUX', NN_UPDATE . 'nix_scripts' . DS . 'tmux'. DS);
+
 // /misc/update/nix/multiprocessing/
 define('NN_MULTIPROCESSING', NN_NIX . 'multiprocessing' . DS);
 
