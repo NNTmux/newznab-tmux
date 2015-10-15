@@ -70,8 +70,8 @@ if ($file !== false) {
 $page->smarty->assign(
 	array(
 		'data' => $data,
-		'types' => array('all', 'info', 'notice', 'warning', 'error', 'fatal', 'sql'),
-		'path' => NN_WWW . 'automated.config.php'
+		'types' => ['all', 'info', 'notice', 'warning', 'error', 'fatal', 'sql'],
+		'path'  => NN_WWW . 'smarty.php'
 	)
 );
 

@@ -9,7 +9,7 @@ $t = new TvRage();
 
 //
 // all rage entries with a blank description
-$rows = $db->query("select ID, releasetitle from tvrage
+$rows = $db->query("select ID, releasetitle from tvrage_titles
                             where description is null
                             and rageID in (select distinct rageID from releases)
                             order by ID desc");

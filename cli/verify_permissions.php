@@ -1,4 +1,6 @@
 <?php
+use newznab\controllers\ReleaseImage;
+use newznab\utility\Utility;
 
 if (!isset($argv[1]) || $argv[1] !== 'yes') {
 	exit(
@@ -50,7 +52,7 @@ foreach ([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'a', 'b', 'c', 'd', 'e', 'f'] as $identi
 }
 
 // Add covers paths.
-foreach (['anime', 'audio', 'audiosample', 'book', 'console', 'games', 'movies', 'music', 'preview', 'sample', 'tvrage', 'video', 'xxx'] as $identifier) {
+foreach (['anime', 'audio', 'audiosample', 'book', 'console', 'games', 'movies', 'music', 'preview', 'sample', 'tvrage_titles', 'video', 'xxx'] as $identifier) {
 	$nzbFolder = NN_RES . 'covers' . DS . $identifier . DS;
 	$folders[$nzbFolder] = [R, W];
 }
@@ -88,7 +90,7 @@ foreach ($folders as $folder => $check) {
 
 echo 'Your permissions seem right for this user. Note, this script does not verify all paths, only the most important ones.' . PHP_EOL;
 
-if (!newznab\utility\Utility::isWin()) {
+if (!Utility::isWin()) {
 	$user = posix_getpwuid(posix_geteuid());
 	if ($user['name'] !== 'www-data') {
 		echo 'If you have not already done so, please rerun this script using the www-data user: sudo -u www-data php verify_permissions.php yes' . PHP_EOL;

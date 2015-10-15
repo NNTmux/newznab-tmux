@@ -44,7 +44,7 @@ class TvRage extends TV
 		return $this->pdo->queryOneRow(
 			sprintf("
 							SELECT *
-							FROM tvrage
+							FROM tvrage_titles
 							WHERE id = %d",
 				$id
 			)
@@ -63,7 +63,7 @@ class TvRage extends TV
 		return $this->pdo->query(
 			sprintf("
 						SELECT *
-						FROM tvrage
+						FROM tvrage_titles
 						WHERE rageid = %d",
 				$id
 			)
@@ -145,7 +145,7 @@ class TvRage extends TV
 			return $this->pdo->queryOneRow(
 				sprintf("
 							SELECT rageid
-							FROM tvrage
+							FROM tvrage_titles
 							WHERE releasetitle = %s",
 					$this->pdo->escapeString($title)
 				)
@@ -160,7 +160,7 @@ class TvRage extends TV
 			return $this->pdo->queryOneRow(
 				sprintf("
 							SELECT rageid
-							FROM tvrage
+							FROM tvrage_titles
 							WHERE REPLACE(REPLACE(releasetitle, %s, ''), '!', '') LIKE %s",
 					$string,
 					$this->pdo->escapeString($title . '%')
@@ -216,7 +216,7 @@ class TvRage extends TV
 		if (!isset($ckid['id'])) {
 			$this->pdo->queryExec(
 				sprintf('
-						INSERT INTO tvrage (rageid, releasetitle, description, genre, country, createddate, hascover)
+						INSERT INTO tvrage_titles (rageid, releasetitle, description, genre, country, createddate, hascover)
 						VALUES (%s, %s, %s, %s, %s, NOW(), %d)',
 					$rageid,
 					$this->pdo->escapeString($releasename),
@@ -241,7 +241,7 @@ class TvRage extends TV
 
 		$this->pdo->queryExec(
 			sprintf('
-					UPDATE tvrage
+					UPDATE tvrage_titles
 					SET rageid = %d, releasetitle = %s, description = %s, genre = %s, country = %s %s
 					WHERE id = %d',
 				$rageid,
@@ -260,7 +260,7 @@ class TvRage extends TV
 		return $this->pdo->queryExec(
 			sprintf("
 						DELETE
-						FROM tvrage
+						FROM tvrage_titles
 						WHERE id = %d",
 				$id
 			)
@@ -358,13 +358,13 @@ class TvRage extends TV
 
 		$rsql = '';
 		if ($ragename != "") {
-			$rsql .= sprintf("AND tvrage.releasetitle LIKE %s ", $this->pdo->escapeString("%" . $ragename . "%"));
+			$rsql .= sprintf("AND tvrage_titles.releasetitle LIKE %s ", $this->pdo->escapeString("%" . $ragename . "%"));
 		}
 
 		return $this->pdo->query(
 			sprintf("
 						SELECT id, rageid, releasetitle, description, createddate
-						FROM tvrage
+						FROM tvrage_titles
 						WHERE 1=1 %s
 						ORDER BY rageid ASC %s",
 				$rsql,
@@ -377,13 +377,13 @@ class TvRage extends TV
 	{
 		$rsql = '';
 		if ($ragename != "") {
-			$rsql .= sprintf("AND tvrage.releasetitle LIKE %s ", $this->pdo->escapeString("%" . $ragename . "%"));
+			$rsql .= sprintf("AND tvrage_titles.releasetitle LIKE %s ", $this->pdo->escapeString("%" . $ragename . "%"));
 		}
 
 		$res = $this->pdo->queryOneRow(
 			sprintf("
 						SELECT COUNT(id) AS num
-						FROM tvrage
+						FROM tvrage_titles
 						WHERE 1=1 %s",
 				$rsql
 			)
@@ -399,7 +399,7 @@ class TvRage extends TV
 		$sql = $this->pdo->queryDirect(
 			sprintf("
 						SELECT *
-						FROM tvrageepisodes
+						FROM tvrage_episodes
 						WHERE DATE(airdate) = %s
 						ORDER BY airdate ASC",
 				$this->pdo->escapeString($date)
@@ -416,29 +416,29 @@ class TvRage extends TV
 				$letter = '[0-9]';
 			}
 
-			$rsql .= sprintf("AND tvrage.releasetitle REGEXP %s", $this->pdo->escapeString('^' . $letter));
+			$rsql .= sprintf("AND tvrage_titles.releasetitle REGEXP %s", $this->pdo->escapeString('^' . $letter));
 		}
 		$tsql = '';
 		if ($ragename != '') {
-			$tsql .= sprintf("AND tvrage.releasetitle LIKE %s", $this->pdo->escapeString("%" . $ragename . "%"));
+			$tsql .= sprintf("AND tvrage_titles.releasetitle LIKE %s", $this->pdo->escapeString("%" . $ragename . "%"));
 		}
 
 		return $this->pdo->query(
 			sprintf("
-				SELECT tvrage.id, tvrage.rageid, tvrage.releasetitle, tvrage.genre, tvrage.country,
-					tvrage.createddate, tvrage.prevdate, tvrage.nextdate,
+				SELECT tvrage_titles.id, tvrage_titles.rageid, tvrage_titles.releasetitle, tvrage_titles.genre, tvrage_titles.country,
+					tvrage_titles.createddate, tvrage_titles.prevdate, tvrage_titles.nextdate,
 					userseries.id AS userseriesid
-				FROM tvrage
+				FROM tvrage_titles
 				LEFT OUTER JOIN userseries ON userseries.userid = %d
-					AND userseries.rageid = tvrage.rageid
-				WHERE tvrage.rageid IN (
+					AND userseries.rageid = tvrage_titles.rageid
+				WHERE tvrage_titles.rageid IN (
 								SELECT DISTINCT rageid
 								FROM releases
 								WHERE %s
 								AND rageid > 0)
-				AND tvrage.rageid > 0 %s %s
-				GROUP BY tvrage.rageid
-				ORDER BY tvrage.releasetitle ASC",
+				AND tvrage_titles.rageid > 0 %s %s
+				GROUP BY tvrage_titles.rageid
+				ORDER BY tvrage_titles.releasetitle ASC",
 				$this->catWhere,
 				$uid,
 				$rsql,
@@ -451,12 +451,12 @@ class TvRage extends TV
 	{
 		$countries = $this->pdo->query("
 						SELECT DISTINCT(country) AS country
-						FROM tvrage
+						FROM tvrage_titles
 						WHERE country != ''"
 		);
 		$showsindb = $this->pdo->query("
 						SELECT DISTINCT(rageid) AS rageid
-						FROM tvrage"
+						FROM tvrage_titles"
 		);
 		$showarray = [];
 		foreach ($showsindb as $show) {
@@ -504,7 +504,7 @@ class TvRage extends TV
 							if (in_array($currShowId, $showarray)) {
 								$this->pdo->queryExec(
 									sprintf("
-											INSERT INTO tvrageepisodes (rageid, showtitle, fullep, airdate, link, eptitle)
+											INSERT INTO tvrage_episodes (rageid, showtitle, fullep, airdate, link, eptitle)
 											VALUES (%d, %s, %s, %s, %s, %s)
 											ON DUPLICATE KEY UPDATE
 												showtitle = %2\$s, airdate = %4\$s, link = %5\$s ,eptitle = %6\$s",
@@ -523,7 +523,7 @@ class TvRage extends TV
 				}
 				// Update series info.
 				foreach ($xmlSchedule as $showId => $epInfo) {
-					$res = $this->pdo->query(sprintf("SELECT * FROM tvrage WHERE rageid = %d", $showId));
+					$res = $this->pdo->query(sprintf("SELECT * FROM tvrage_titles WHERE rageid = %d", $showId));
 					if (sizeof($res) > 0) {
 						foreach ($res as $arr) {
 							$prev_ep = $next_ep = "";
@@ -544,7 +544,7 @@ class TvRage extends TV
 									&& strtotime(date('Y-m-d', strtotime($arr["nextdate"]))) < $yesterday) {
 									$this->pdo->queryExec(
 										sprintf("
-												UPDATE tvrage
+												UPDATE tvrage_titles
 												SET prevdate = nextdate, previnfo = nextinfo
 												WHERE id = %d",
 											$arr['id']
@@ -584,7 +584,7 @@ class TvRage extends TV
 								$sqlQry = join(", ", $query);
 								$this->pdo->queryExec(
 									sprintf("
-											UPDATE tvrage
+											UPDATE tvrage_titles
 											SET %s
 											WHERE id = %d",
 										$sqlQry,

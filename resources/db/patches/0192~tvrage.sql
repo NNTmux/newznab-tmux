@@ -5,4 +5,4 @@
 #	A follow on patch will be issued to remove imgdata.  Obviously
 #	it cannot be done until the user runs the extract script
 
-ALTER TABLE tvrage ADD COLUMN hascover TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'Does series have cover art?' AFTER imgdata;
+ALTER TABLE tvrage_titles ADD COLUMN hascover TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'Does series have cover art?' AFTER imgdata;

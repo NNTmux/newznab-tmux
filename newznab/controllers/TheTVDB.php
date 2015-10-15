@@ -264,7 +264,7 @@ class TheTVDB
 
 				$seriesName = '';
 				if($arr['rageid'] > 0) {
-					$seriesName = $this->pdo->queryOneRow(sprintf('SELECT releasetitle AS seriesName FROM tvrage WHERE rageid = %d', $arr['rageid']));
+					$seriesName = $this->pdo->queryOneRow(sprintf('SELECT releasetitle AS seriesName FROM tvrage_titles WHERE rageid = %d', $arr['rageid']));
 				}
 				elseif($arr['anidbid'] > 0) {
 					$seriesName = $this->pdo->queryOneRow(sprintf('SELECT title AS seriesName FROM anidb WHERE anidbid = %d', $arr['anidbid']));

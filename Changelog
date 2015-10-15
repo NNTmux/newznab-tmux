@@ -1,4 +1,7 @@
 2015-10-15 DariusIII
+	Chg: Add tvrage_titles and tvrage_episodes tables for historic reference, they are emtpy and useless, but hell.
+		Remove references to automated.confiog.php.
+2015-10-15 DariusIII
 	Fix: Rename nzedb references to newznab in settings.example.php
 2015-10-15 DariusIII
 	Chg: Move all the configs into newznab/config/ folder.

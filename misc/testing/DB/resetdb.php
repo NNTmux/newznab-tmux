@@ -34,7 +34,7 @@ $pdo->queryExec("UPDATE groups SET first_record = 0, first_record_postdate = NUL
 echo $pdo->log->primary("Reseting all groups completed.");
 
 $arr = [
-		"tvrage", "releasenfo", "release_comments", 'sharing', 'sharing_sites',
+		"tvrage_titles", "releasenfo", "release_comments", 'sharing', 'sharing_sites',
 		"usercart", "usermovies", "userseries", "movieinfo", "musicinfo", "releasefiles",
 		"releaseaudio", "releasesubs", "releasevideo", "releaseextrafull", "parts",
 		"partrepair", "binaries", "collections", "releases", "spotnabsources"
@@ -93,7 +93,7 @@ $tvshows = @simplexml_load_file('http://services.tvrage.com/feeds/show_list.php'
 if ($tvshows !== false) {
 	foreach ($tvshows->show as $rage) {
 		if (isset($rage->id) && isset($rage->name) && !empty($rage->id) && !empty($rage->name))
-			$pdo->queryInsert(sprintf('INSERT INTO tvrage (rageid, releasetitle, country) VALUES (%s, %s, %s)', $pdo->escapeString($rage->id), $pdo->escapeString($rage->name), $pdo->escapeString($rage->country)));
+			$pdo->queryInsert(sprintf('INSERT INTO tvrage_titles (rageid, releasetitle, country) VALUES (%s, %s, %s)', $pdo->escapeString($rage->id), $pdo->escapeString($rage->name), $pdo->escapeString($rage->country)));
 	}
 } else {
 	echo $pdo->log->error("TVRage site has a hard limit of 400 concurrent api requests. At the moment, they have reached that limit. Please wait before retrying again.");

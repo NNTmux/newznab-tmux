@@ -36,7 +36,7 @@ class UserSeries
 
 	public function getShows($uid)
 	{
-		return $this->pdo->query(sprintf("SELECT userseries.*, tvrage.releasetitle FROM userseries INNER JOIN (SELECT id, releasetitle, rageid FROM tvrage GROUP BY rageid) tvrage ON tvrage.rageid = userseries.rageid WHERE userid = %d ORDER BY tvrage.releasetitle ASC", $uid));
+		return $this->pdo->query(sprintf("SELECT userseries.*, tvrage_titles.releasetitle FROM userseries INNER JOIN (SELECT id, releasetitle, rageid FROM tvrage_titles GROUP BY rageid) tvrage_titles ON tvrage_titles.rageid = userseries.rageid WHERE userid = %d ORDER BY tvrage_titles.releasetitle ASC", $uid));
 	}
 
 	public function delShow($uid, $rageid)
@@ -46,7 +46,7 @@ class UserSeries
 
 	public function getShow($uid, $rageid)
 	{
-		return $this->pdo->queryOneRow(sprintf("SELECT userseries.*, tvrage.releasetitle FROM userseries LEFT OUTER JOIN (SELECT id, releasetitle, rageid FROM tvrage GROUP BY rageid) tvrage ON tvrage.rageid = userseries.rageid WHERE userseries.userid = %d AND userseries.rageid = %d ", $uid, $rageid));
+		return $this->pdo->queryOneRow(sprintf("SELECT userseries.*, tvrage_titles.releasetitle FROM userseries LEFT OUTER JOIN (SELECT id, releasetitle, rageid FROM tvrage_titles GROUP BY rageid) tvrage_titles ON tvrage_titles.rageid = userseries.rageid WHERE userseries.userid = %d AND userseries.rageid = %d ", $uid, $rageid));
 	}
 
 	public function delShowForUser($uid)

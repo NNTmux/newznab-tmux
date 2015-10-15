@@ -539,7 +539,7 @@ class Releases
 				INNER JOIN category c ON c.id = r.categoryid
 				INNER JOIN category cp ON cp.id = c.parentid
 				INNER JOIN groups g ON g.id = r.groupid
-				LEFT OUTER JOIN tvrage tvr ON tvr.rageid = r.rageid
+				LEFT OUTER JOIN tvrage_titles tvr ON tvr.rageid = r.rageid
 				WHERE %s %s %s
 				AND r.nzbstatus = %d
 				AND r.categoryid BETWEEN 5000 AND 5999
@@ -1788,7 +1788,7 @@ class Releases
 				r.postdate, r.categoryid, r.comments, r.grabs,
 				tv.id AS tvid, tv.releasetitle AS tvtitle, tv.hascover
 			FROM releases r
-			INNER JOIN tvrage tv USING (rageid)
+			INNER JOIN tvrage_titles tv USING (rageid)
 			WHERE r.categoryid BETWEEN 5000 AND 5999
 			AND tv.rageid > 0
 			AND tv.hascover = 1

@@ -30,7 +30,7 @@ switch((string)$argv[1]) {
 // This function checks for TV shows in tvrage missing covers and tries to grab them
 function updateTvImages($pdo, $tvrage)
 {
-	$shows = $pdo->queryDirect("SELECT rageid, releasetitle FROM tvrage WHERE hascover = 0 ORDER BY rageid DESC LIMIT 2000");
+	$shows = $pdo->queryDirect("SELECT rageid, releasetitle FROM tvrage_titles WHERE hascover = 0 ORDER BY rageid DESC LIMIT 2000");
 
 	if ($shows->rowCount() > 0) {
 		echo "\n";
@@ -73,7 +73,7 @@ function updateTvImages($pdo, $tvrage)
 
 			$pdo->queryDirect(
 				sprintf("
-						UPDATE tvrage
+						UPDATE tvrage_titles
 						SET description = %s, genre = %s, country = %s, hascover = %d
 						WHERE rageid = %d",
 					$pdo->escapeString(substr($desc, 0, 10000)),
@@ -122,7 +122,7 @@ function checkTvImages($pdo, $tvrage)
 				if ($check['hascover'] == 0) {
 					$pdo->queryExec(
 						sprintf(
-							"UPDATE tvrage
+							"UPDATE tvrage_titles
 										SET hascover = 1
 										WHERE id = %d",
 							$check['id']

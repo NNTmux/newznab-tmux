@@ -37,7 +37,7 @@ switch($action) {
 		else
 		{
 			$db = new Settings();
-			$show = $db->queryOneRow(sprintf("select releasetitle from tvrage where rageid = %d", $rid));
+			$show = $db->queryOneRow(sprintf("select releasetitle from tvrage_titles where rageid = %d", $rid));
 			if (!$show)
 				$page->show404('Seriously?');
 		}
