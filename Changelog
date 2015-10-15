@@ -6,6 +6,7 @@
 	Fix: Define missing NN_TMUX folder.
 	Fix: More errors.
 	Fix: even more errors.
+	Fix: Fix missing Releases fatal error in ProcessAdditional.
 2015-10-15 DariusIII
 	Bug: remove tvrage patch
 2015-10-15 DariusIII

@@ -16,6 +16,7 @@ use newznab\controllers\ReleaseExtra;
 use newznab\controllers\ReleaseImage;
 use newznab\controllers\NameFixer;
 use newznab\controllers\SphinxSearch;
+use newznab\controllers\Releases;
 
 class ProcessAdditional
 {
@@ -982,7 +983,7 @@ class ProcessAdditional
 		if (!empty($this->_archiveInfo->isEncrypted) || (isset($dataSummary['is_encrypted']) && $dataSummary['is_encrypted'] != 0)) {
 			$this->_debug('ArchiveInfo: Compressed file has a password.');
 			$this->_releaseHasPassword = true;
-			$this->_passwordStatus[] = \Releases::PASSWD_RAR;
+			$this->_passwordStatus[] = Releases::PASSWD_RAR;
 			return false;
 		}
 
@@ -1054,13 +1055,13 @@ class ProcessAdditional
 
 				if ($file['pass'] == true) {
 					$this->_releaseHasPassword = true;
-					$this->_passwordStatus[] = \Releases::PASSWD_RAR;
+					$this->_passwordStatus[] = Releases::PASSWD_RAR;
 					break;
 				}
 
 				if ($this->_innerFileBlacklist !== false && preg_match($this->_innerFileBlacklist, $file['name'])) {
 					$this->_releaseHasPassword = true;
-					$this->_passwordStatus[] = \Releases::PASSWD_POTENTIAL;
+					$this->_passwordStatus[] = Releases::PASSWD_POTENTIAL;
 					break;
 				}
 
@@ -1140,7 +1141,7 @@ class ProcessAdditional
 					) {
 						$this->_debug('Codec spam found, setting release to potentially passworded.' . PHP_EOL);
 						$this->_releaseHasPassword = true;
-						$this->_passwordStatus[] = \Releases::PASSWD_POTENTIAL;
+						$this->_passwordStatus[] = Releases::PASSWD_POTENTIAL;
 					} //Run a PreDB filename check on insert to try and match the release
 					else if (strpos($file['name'], '.') != 0 && strlen($file['name']) > 0) {
 						$this->_release['filename'] = $file['name'];
@@ -1578,7 +1579,7 @@ class ProcessAdditional
 				UPDATE releases
 				SET passwordstatus = %d, rarinnerfilecount = %d %s %s %s
 				WHERE id = %d',
-				($this->_processPasswords === true ? $this->_passwordStatus : \Releases::PASSWD_NONE),
+				($this->_processPasswords === true ? $this->_passwordStatus : Releases::PASSWD_NONE),
 				$releaseFiles['count'],
 				$iSQL,
 				$vSQL,
@@ -2533,7 +2534,7 @@ class ProcessAdditional
 		$this->_foundSample = (($this->_release['disablepreview'] == 1) ? true : false);
 		$this->_foundPAR2Info = false;
 
-		$this->_passwordStatus = [\Releases::PASSWD_NONE];
+		$this->_passwordStatus = [Releases::PASSWD_NONE];
 		$this->_releaseHasPassword = false;
 
 		$this->_releaseGroupName = $this->_groups->getByNameByID($this->_release['groupid']);
