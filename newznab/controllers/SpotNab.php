@@ -22,23 +22,6 @@ if(!defined('JSON_HEX_APOS')) define('JSON_HEX_APOS', 4);
 if(!defined('JSON_HEX_QUOT')) define('JSON_HEX_QUOT', 8);
 if(!defined('JSON_UNESCAPED_UNICODE')) define('JSON_UNESCAPED_UNICODE', 256);
 
-// Silent Error Handler (used to shut up noisy XML exceptions)
-// we use the silent error handler for remote connection failures as well
-function snHandleError($errno, $errstr, $errfile, $errline, array $errcontext){
-	if (0 === error_reporting())
-		return false;
-	if(!defined('E_STRICT'))define('E_STRICT', 2048);
-	switch($errno){
-		case E_WARNING:
-		case E_NOTICE:
-		case E_STRICT:
-			return;
-		default:
-			break;
-	};
-	throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
-}
-
 // Create a NNTP \Exception type so we can identify it from others
 class SpotNabException extends \Exception { }
 
@@ -391,9 +374,6 @@ class SpotNab {
 			}
 		}
 
-		// Now we fetch headers
-		set_error_handler('snHandleError');
-
 		// Connect to server
 		try{
 			if (($this->_pdo->getSetting('alternate_nntp') == 1 ? $this->_nntp->doConnect(true, true) : $this->_nntp->doConnect()) !== true) {
@@ -734,7 +714,6 @@ class SpotNab {
 		}
 
 		// Now we fetch headers
-		set_error_handler('snHandleError');
 
 		// Connect to server
 		try{
@@ -1816,8 +1795,6 @@ class SpotNab {
 		}
 
 		$msg_id = $matches['id'];
-
-		set_error_handler('snHandleError');
 
 		// Connect to server
 		if (($this->_pdo->getSetting('alternate_nntp') == 1 ? $this->_nntp->doConnect(true, true) : $this->_nntp->doConnect()) !== true) {

@@ -1,4 +1,5 @@
 2015-10-15 DariusIII
+	Chg: Remove snHandleerror from SpotNab.
 	Add: Example config file
 	Fix: Change Misc to Utility
 	Chg: Move patches to mysql subdir
