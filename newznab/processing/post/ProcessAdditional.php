@@ -17,7 +17,7 @@ use newznab\controllers\ReleaseImage;
 use newznab\controllers\NameFixer;
 use newznab\controllers\SphinxSearch;
 use newznab\controllers\Releases;
-
+use newznab\controllers\Category;
 class ProcessAdditional
 {
 	/**
@@ -1240,7 +1240,7 @@ class ProcessAdditional
 					} // Check if it's alt.binaries.u4e file.
 					else if (in_array($this->_releaseGroupName, ['alt.binaries.u4e', 'alt.binaries.mom']) &&
 						preg_match('/Linux_2rename\.sh/i', $file) &&
-						($this->_release['categoryid'] == \Category::CAT_MISC_HASHED || $this->_release['categoryid'] == \Category::CAT_MISC_OTHER)
+						($this->_release['categoryid'] == Category::CAT_MISC_HASHED || $this->_release['categoryid'] == Category::CAT_MISC_OTHER)
 					) {
 						$this->_processU4ETitle($file);
 					}
@@ -1656,14 +1656,14 @@ class ProcessAdditional
 			)
 		);
 
-		$musicParent = (string)\Category::CAT_PARENT_MUSIC;
+		$musicParent = (string)Category::CAT_PARENT_MUSIC;
 		if ($rQuery === false || !preg_match(
 				sprintf(
 					'/%d\d{3}|%d|%d|%d/',
 					$musicParent[0],
-					\Category::CAT_MISC_OTHER,
-					\Category::CAT_MOVIE_OTHER,
-					\Category::CAT_TV_OTHER
+					Category::CAT_MISC_OTHER,
+					Category::CAT_MOVIE_OTHER,
+					Category::CAT_TV_OTHER
 				),
 				$rQuery['id']
 			)
@@ -1704,9 +1704,9 @@ class ProcessAdditional
 
 									// Get the category or try to determine it.
 									if ($ext === 'MP3') {
-										$newCat = \Category::CAT_MUSIC_MP3;
+										$newCat = Category::CAT_MUSIC_MP3;
 									} else if ($ext === 'FLAC') {
-										$newCat = \Category::CAT_MUSIC_LOSSLESS;
+										$newCat = Category::CAT_MUSIC_LOSSLESS;
 									} else {
 										$newCat = $this->_categorize->determineCategory($rQuery['groupid'],$newName);
 									}
@@ -1728,7 +1728,7 @@ class ProcessAdditional
 
 									// Echo the changed name.
 									if ($this->_echoCLI) {
-										\NameFixer::echoChangedReleaseName(
+										NameFixer::echoChangedReleaseName(
 											[
 												'new_name' => $newName,
 												'old_name' => $rQuery['searchname'],
@@ -2157,15 +2157,15 @@ class ProcessAdditional
 			in_array(
 				((int)$this->_release['categoryid']),
 				[
-					\Category::CAT_BOOK_OTHER,
-					\Category::CAT_GAME_OTHER,
-					\Category::CAT_MOVIE_OTHER,
-					\Category::CAT_MUSIC_OTHER,
-					\Category::CAT_PC_MOBILEOTHER,
-					\Category::CAT_TV_OTHER,
-					\Category::CAT_MISC_HASHED,
-					\Category::CAT_XXX_OTHER,
-					\Category::CAT_MISC_OTHER
+					Category::CAT_BOOK_OTHER,
+					Category::CAT_GAME_OTHER,
+					Category::CAT_MOVIE_OTHER,
+					Category::CAT_MUSIC_OTHER,
+					Category::CAT_PC_MOBILEOTHER,
+					Category::CAT_TV_OTHER,
+					Category::CAT_MISC_HASHED,
+					Category::CAT_XXX_OTHER,
+					Category::CAT_MISC_OTHER
 				]
 			)
 		) {
@@ -2316,7 +2316,7 @@ class ProcessAdditional
 
 					// Echo the changed name to CLI.
 					if ($this->_echoCLI) {
-						\NameFixer::echoChangedReleaseName(
+						NameFixer::echoChangedReleaseName(
 							[
 								'new_name' => $newName,
 								'old_name' => $this->_release['searchname'],
