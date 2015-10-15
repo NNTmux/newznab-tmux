@@ -60,5 +60,3 @@ INSERT INTO collection_regexes (id, group_regex, regex, status, description, ord
     't2EI3CdWdF0hi5b8L9tkx[08/52] - "t2EI3CdWdF0hi5b8L9tkx.part07.rar" yEnc',
     5
 );
-
-UPDATE `tmux` SET `value` = '114' WHERE `setting` = 'sqlpatch';

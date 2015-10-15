@@ -1,16 +1,18 @@
 <?php
 
-require_once(dirname(__FILE__) . '/config.php');
+require_once dirname(__FILE__) . '/../../../config.php';
 
 use newznab\db\Settings;
+use newznab\controllers\ConsoleTools;
+use newznab\controllers\NNTP;
 
 
 $start = TIME();
 $pdo = new Settings();
-$consoleTools = new \ConsoleTools(['ColorCLI' => $pdo->log]);
+$consoleTools = new ConsoleTools(['ColorCLI' => $pdo->log]);
 
 // Create the connection here and pass
-$nntp = new \NNTP(['Settings' => $pdo]);
+$nntp = new NNTP(['Settings' => $pdo]);
 if ($nntp->doConnect() !== true) {
 	exit($pdo->log->error("Unable to connect to usenet."));
 }

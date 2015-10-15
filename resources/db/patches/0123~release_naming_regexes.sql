@@ -14,4 +14,3 @@ VALUES (
   '//(Navy CIS - Drei Folgen) [35/63] - "NCIS.part34.rar" yEnc',
   10
 );
-UPDATE `tmux` set `value` = '123' where `setting` = 'sqlpatch';

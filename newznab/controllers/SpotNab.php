@@ -1,4 +1,5 @@
 <?php
+namespace newznab\controllers;
 
 use newznab\db\Settings;
 
@@ -921,11 +922,11 @@ class SpotNab {
 			}
 		}
 
-		$affected = $this->_pdo->queryExec(sprintf('UPDATE release_comments, releases SET release_comments.gid = releases.gid,
+		$affected = $this->_pdo->queryExec(sprintf('UPDATE release_comments, releases SET release_comments.gid = UNHEX(releases.nzb_guid),
 											release_comments.nzb_guid = UNHEX(releases.nzb_guid)
 											WHERE releases.id = release_comments.releaseid
 											AND release_comments.gid IS NULL
-											AND UNHEX(release_comments.nzb_guid) = ""
+											AND UNHEX(release_comments.nzb_guid) = "0"
 											AND UNHEX(releases.nzb_guid) IS NOT NULL
 											AND releases.gid IS NOT NULL '
 			)
@@ -1247,10 +1248,10 @@ class SpotNab {
 		// Comments
 		$sql_new_cmt = "INSERT INTO release_comments (".
 			"id, sourceid, username, userid, gid, cid, isvisible, ".
-			"releaseid, `text`, createddate, issynced, nzb_guid) VALUES (".
+			"releaseid, text, createddate, issynced, nzb_guid) VALUES (".
 			"NULL, %d, %s, 0, %s, %s, %d, 0, %s, %s, 1, UNHEX(%s))";
 		$sql_upd_cmt = "UPDATE release_comments SET ".
-			"isvisible = %d, `text` = %s".
+			"isvisible = %d, text = %s".
 			"WHERE sourceid = %d AND gid = %s AND cid = %s AND nzb_guid = UNHEX(%s)";
 		$sql_fnd_cmt = "SELECT count(id) as cnt FROM release_comments ".
 			"WHERE sourceid = %d AND gid = %s AND cid = %s";

@@ -7841,4 +7841,3 @@ INSERT INTO release_naming_regexes (id, group_regex, regex, status, description,
     '//[ TOWN ]-[ www.town.ag ]-[ ANIME ] [01/17] - "[Chyuu] Nanatsu no Taizai - 12 [720p][D1F49539].par2" - 585,03 MB yEnc',
     105
 );
-UPDATE `tmux` set `value` = '120' where `setting` = 'sqlpatch';

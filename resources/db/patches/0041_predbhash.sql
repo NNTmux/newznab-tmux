@@ -26,5 +26,3 @@ CREATE TRIGGER update_hashes AFTER UPDATE ON prehash FOR EACH ROW BEGIN IF NEW.t
 
 DROP TRIGGER IF EXISTS delete_hashes;
 CREATE TRIGGER delete_hashes AFTER DELETE ON prehash FOR EACH ROW BEGIN DELETE FROM predbhash WHERE pre_id = OLD.id;END;
-
-UPDATE `tmux` SET value = '41' WHERE `setting` = 'sqlpatch';

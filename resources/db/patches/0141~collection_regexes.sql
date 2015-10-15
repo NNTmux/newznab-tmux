@@ -29,4 +29,3 @@ VALUES (
   'JN Dutplanet.net - [02/16] - "JN Dutplanet.net Foreigner - I Want To Know What Love Is - The Ballads [2014]FLAC.part1.rar" yEnc',
   5
 );
-UPDATE `tmux` SET `value` = '141' WHERE `setting` = 'sqlpatch';

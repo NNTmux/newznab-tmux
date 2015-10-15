@@ -4048,4 +4048,3 @@ VALUES (
   '//Store.Boligdroemme.S02E06.DANiS H.HDTV.x264-TVBYEN - [01/28] - "store.boligdroemme.s02e06.danis h.hdtv.x264-tvbyen.nfo" yEnc',
   5
 );
-UPDATE `tmux` set `value` = '121' where `setting` = 'sqlpatch';

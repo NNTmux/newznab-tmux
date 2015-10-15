@@ -493,5 +493,3 @@ INSERT IGNORE INTO `genres` (`id`, `title`, `type`, `disabled`) VALUES
 (632, 'Parody', 6000, 0),
 (633, 'Racing', 4000, 0),
 (634, 'Double Penetration (Dp)', 6000, 0);
-
-UPDATE `tmux` SET `value` = '66' WHERE `setting` = 'sqlpatch';

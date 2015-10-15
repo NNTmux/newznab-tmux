@@ -1,9 +1,11 @@
 <?php
 //This script downloads covert art for Tv Shows -- it is intended to be run at interval, generally after the TvRage database is populated
-require_once dirname(__FILE__) . '/../../../www/config.php';
+require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
 use newznab\db\Settings;
 use newznab\utility\Utility;
+use newznab\controllers\TvRage;
+use newznab\controllers\ReleaseImage;
 
 $pdo = new Settings();
 

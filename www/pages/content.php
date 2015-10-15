@@ -1,5 +1,7 @@
 <?php
 
+use newznab\controllers\Contents;
+
 $contents = new Contents(['Settings' => $page->settings]);
 
 $role = 0;

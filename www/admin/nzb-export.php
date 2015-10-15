@@ -1,6 +1,10 @@
 <?php
 require_once './config.php';
 
+use newznab\controllers\AdminPage;
+use newznab\controllers\Releases;
+use newznab\controllers\NZBExport;
+
 
 if (\newznab\utility\Utility::isCLI()) {
 	exit ('This script is only for exporting from the web, use the script in misc/testing' .

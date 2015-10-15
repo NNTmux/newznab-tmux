@@ -1,4 +1,5 @@
 <?php
+namespace newznab\controllers;
 
 use newznab\db\Settings;
 use \newznab\processing\PostProcess;
@@ -12,7 +13,7 @@ use newznab\utility\Utility;
 Class NZBContents
 {
 	/**
-	 * @var newznab\db\Settings
+	 * @var \newznab\db\Settings
 	 * @access protected
 	 */
 	public $pdo;

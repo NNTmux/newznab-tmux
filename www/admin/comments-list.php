@@ -2,6 +2,9 @@
 
 require_once './config.php';
 
+use newznab\controllers\AdminPage;
+use newznab\controllers\ReleaseComments;
+
 $page = new AdminPage();
 
 $releases = new ReleaseComments($page->settings);

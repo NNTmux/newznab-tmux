@@ -1,5 +1,5 @@
 <?php
-require_once './config.php';
+namespace newznab\controllers;
 
 /**
  * All admin pages implement this class. Enforces admin role for requesting user.

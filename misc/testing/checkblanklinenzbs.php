@@ -1,12 +1,14 @@
 <?php
-require_once dirname(__FILE__) . '/../../www/config.php';
+require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
 
 use newznab\db\Settings;
+use newznab\controllers\NZB;
+use newznab\controllers\Sites;
 
 
 $db = new Settings();
 $n = new NZB();
-$s = New Sites;
+$s = new Sites;
 $site = $s->get();
 
 $items = $db->query("SELECT guid FROM releases");

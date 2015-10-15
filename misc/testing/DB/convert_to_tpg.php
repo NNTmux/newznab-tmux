@@ -1,13 +1,15 @@
 <?php
-require_once dirname(__FILE__) . '/../../../www/config.php';
+require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
 use newznab\db\Settings;
+use newznab\controllers\Groups;
+use newznab\controllers\ConsoleTools;
 
 
 $debug = false;
 $pdo = new Settings();
-$groups = new \Groups(['Settings' => $pdo]);
-$consoletools = new \ConsoleTools(['ColorCLI' => $pdo->log]);
+$groups = new Groups(['Settings' => $pdo]);
+$consoletools = new ConsoleTools(['ColorCLI' => $pdo->log]);
 $DoPartRepair = ($pdo->getSetting('partrepair') == '0') ? false : true;
 
 if ((!isset($argv[1])) || $argv[1] != 'true') {

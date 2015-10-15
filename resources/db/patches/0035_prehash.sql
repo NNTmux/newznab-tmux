@@ -10,5 +10,3 @@ CREATE TRIGGER check_rfinsert BEFORE INSERT ON releasefiles FOR EACH ROW BEGIN I
 CREATE TRIGGER check_rfupdate BEFORE UPDATE ON releasefiles FOR EACH ROW BEGIN IF NEW.name REGEXP '[a-fA-F0-9]{32}' THEN SET NEW.ishashed = 1; END IF; END;
 
 UPDATE `releasefiles` SET ishashed = 1 WHERE name REGEXP '[a-fA-F0-9]{32}';
-
-UPDATE `tmux` SET value = '35' WHERE `setting` = 'sqlpatch';

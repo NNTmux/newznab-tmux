@@ -7,4 +7,3 @@ VALUES (
 	'Uploader.Presents-Black.Sails.S02E02.Die.schwarze.Flagge.GERMAN.DUBBED.BLURAYRiP.x264-SOF [00/23]"sof-black-sails-s02e02.nzb" yEnc',
 	10
 );
-UPDATE `tmux` SET `value` = '135' WHERE `setting` = 'sqlpatch';

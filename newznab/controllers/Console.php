@@ -1,4 +1,5 @@
 <?php
+namespace newznab\controllers;
 
 use newznab\db\Settings;
 use newznab\libraries\ApaiIO\Configuration\GenericConfiguration;
@@ -15,7 +16,7 @@ class Console
 	const CONS_NTFND = -2;
 
 	/**
-	 * @var newznab\db\Settings
+	 * @var \newznab\db\Settings
 	 */
 	public $pdo;
 

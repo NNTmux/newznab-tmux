@@ -1,5 +1,9 @@
 <?php
 
+use newznab\controllers\XXX;
+use newznab\controllers\Category;
+use newznab\controllers\DnzbFailures;
+
 if (!$page->users->isLoggedIn()) {
 	$page->show403();
 }

@@ -1,4 +1,5 @@
 <?php
+namespace newznab\controllers;
 
 /**
  * Categorizing of releases by name/group.

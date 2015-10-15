@@ -1,4 +1,8 @@
 <?php
+namespace newznab\controllers;
+
+use newznab\db\Settings;
+
 /**
  * Tmux pane shell exec functions for pane respawning
  *
@@ -9,9 +13,9 @@ class TmuxRun extends Tmux
 	protected $_dateFormat;
 
 	/**
-	 * @param newznab\db\Settings $pdo
+	 * @param \newznab\db\Settings $pdo
 	 */
-	public function __construct(newznab\db\Settings $pdo = null)
+	public function __construct(Settings $pdo = null)
 	{
 		parent::__construct($pdo);
 		$this->_dateFormat = '%Y-%m-%d %T';

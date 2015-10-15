@@ -4,6 +4,10 @@ namespace newznab\db;
 use \newznab\utility\Utility;
 use \newznab\libraries\Cache;
 use \newznab\libraries\CacheException;
+use newznab\controllers\ConsoleTools;
+use newznab\controllers\ColorCLI;
+use newznab\controllers\Logger;
+use newznab\controllers\LoggerException;
 
 
 /**
@@ -31,7 +35,7 @@ class DB extends \PDO
 	public $ct;
 
 	/**
-	 * @var \ColorCLI	Instance variable for logging object. Currently only ColorCLI supported,
+	 * @var ColorCLI	Instance variable for logging object. Currently only ColorCLI supported,
 	 * but expanding for full logging with agnostic API planned.
 	 */
 	public $log;
@@ -94,7 +98,7 @@ class DB extends \PDO
 		$defaults = [
 			'checkVersion'	=> false,
 			'createDb'		=> false, // create dbname if it does not exist?
-			'ct'			=> new \ConsoleTools(),
+			'ct'			=> new ConsoleTools(),
 			'dbhost'		=> defined('DB_HOST') ? DB_HOST : '',
 			'dbname' 		=> defined('DB_NAME') ? DB_NAME : '',
 			'dbpass' 		=> defined('DB_PASSWORD') ? DB_PASSWORD : '',
@@ -102,7 +106,7 @@ class DB extends \PDO
 			'dbsock'		=> defined('DB_SOCKET') ? DB_SOCKET : '',
 			'dbtype'		=> defined('DB_TYPE') ? DB_TYPE : '',
 			'dbuser' 		=> defined('DB_USER') ? DB_USER : '',
-			'log'			=> new \ColorCLI(),
+			'log'			=> new ColorCLI(),
 			'persist'		=> false,
 		];
 		$options += $defaults;
@@ -137,8 +141,8 @@ class DB extends \PDO
 		$this->_debug = (NN_DEBUG || NN_LOGGING);
 		if ($this->_debug) {
 			try {
-				$this->debugging = new \Logger(['ColorCLI' => $this->log]);
-			} catch (\LoggerException $error) {
+				$this->debugging = new Logger(['ColorCLI' => $this->log]);
+			} catch (LoggerException $error) {
 				$this->_debug = false;
 			}
 		}
@@ -222,8 +226,8 @@ class DB extends \PDO
 	{
 		$this->_debug = true;
 		try {
-			$this->debugging = new \Logger(['ColorCLI' => $this->log]);
-		} catch (\LoggerException $error) {
+			$this->debugging = new Logger(['ColorCLI' => $this->log]);
+		} catch (LoggerException $error) {
 			$this->_debug = false;
 		}
 	}
@@ -444,7 +448,7 @@ class DB extends \PDO
 		}
 		if ($this->_debug) {
 			$this->echoError($error, 'queryInsert', 4);
-			$this->debugging->log(get_class(), __FUNCTION__, $query, \Logger::LOG_SQL);
+			$this->debugging->log(get_class(), __FUNCTION__, $query, Logger::LOG_SQL);
 		}
 		return false;
 	}
@@ -489,7 +493,7 @@ class DB extends \PDO
 		}
 		if ($silent === false && $this->_debug) {
 			$this->echoError($error, 'queryExec', 4);
-			$this->debugging->log(get_class(), __FUNCTION__, $query, \Logger::LOG_SQL);
+			$this->debugging->log(get_class(), __FUNCTION__, $query, Logger::LOG_SQL);
 		}
 		return false;
 	}
@@ -588,7 +592,7 @@ class DB extends \PDO
 				$this->echoError($e->getMessage(), 'Exec', 4, false);
 
 				if ($this->_debug) {
-					$this->debugging->log(get_class(), __FUNCTION__, $query, \Logger::LOG_SQL);
+					$this->debugging->log(get_class(), __FUNCTION__, $query, Logger::LOG_SQL);
 				}
 			}
 
@@ -747,7 +751,7 @@ class DB extends \PDO
 				if ($ignore === false) {
 					$this->echoError($e->getMessage(), 'queryDirect', 4, false);
 					if ($this->_debug) {
-						$this->debugging->log(get_class(), __FUNCTION__, $query, \Logger::LOG_SQL);
+						$this->debugging->log(get_class(), __FUNCTION__, $query, Logger::LOG_SQL);
 					}
 				}
 				$result = false;
@@ -922,7 +926,7 @@ class DB extends \PDO
 
 		}
 		if ($this->_debug) {
-			$this->debugging->log(get_class(), __FUNCTION__, $message, \Logger::LOG_INFO);
+			$this->debugging->log(get_class(), __FUNCTION__, $message, Logger::LOG_INFO);
 		}
 	}
 
@@ -1062,7 +1066,7 @@ class DB extends \PDO
 			$PDOstatement = $this->pdo->prepare($query, $options);
 		} catch (\PDOException $e) {
 			if ($this->_debug) {
-				$this->debugging->log(get_class(), __FUNCTION__, $e->getMessage(), \Logger::LOG_INFO);
+				$this->debugging->log(get_class(), __FUNCTION__, $e->getMessage(), Logger::LOG_INFO);
 			}
 			echo $this->log->error("\n" . $e->getMessage());
 			$PDOstatement = false;
@@ -1085,7 +1089,7 @@ class DB extends \PDO
 				$result = $this->pdo->getAttribute($attribute);
 			} catch (\PDOException $e) {
 				if ($this->_debug) {
-					$this->debugging->log(get_class(), __FUNCTION__, $e->getMessage(), \Logger::LOG_INFO);
+					$this->debugging->log(get_class(), __FUNCTION__, $e->getMessage(), Logger::LOG_INFO);
 				}
 				echo $this->log->error("\n" . $e->getMessage());
 				$result = false;

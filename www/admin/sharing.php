@@ -2,6 +2,7 @@
 require_once 'config.php';
 
 use newznab\db\Settings;
+use newznab\controllers\AdminPage;
 
 $page = new AdminPage();
 $page->title = 'Sharing Settings';

@@ -2,6 +2,10 @@
 
 require_once './config.php';
 
+use newznab\controllers\AdminPage;
+use newznab\controllers\Sites;
+use newznab\controllers\SABnzbd;
+
 use newznab\db\Settings;
 
 $page = new AdminPage();

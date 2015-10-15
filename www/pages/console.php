@@ -4,6 +4,11 @@ if (!$page->users->isLoggedIn()) {
 	$page->show403();
 }
 
+use newznab\controllers\Console;
+use newznab\controllers\Category;
+use newznab\controllers\Genres;
+use newznab\controllers\DnzbFailures;
+
 $console = new Console(['Settings' => $page->settings]);
 $cat = new Category(['Settings' => $page->settings]);
 $gen = new Genres(['Settings' => $page->settings]);

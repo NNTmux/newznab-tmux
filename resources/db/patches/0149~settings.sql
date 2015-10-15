@@ -10,5 +10,4 @@ ALTER TABLE site
 ADD PRIMARY KEY (section, subsection, name),
 ADD UNIQUE INDEX ui_settings_setting (setting);
 RENAME TABLE site TO settings;
-UPDATE settings SET value = 149 WHERE setting = 'sqlpatch';
 

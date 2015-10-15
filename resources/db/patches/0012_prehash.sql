@@ -6,5 +6,3 @@ ALTER TABLE prehash ADD COLUMN nukereason VARCHAR(255) NULL;
 
 /* How many files does this pre have ? */
 ALTER TABLE prehash ADD COLUMN files VARCHAR(50) NULL;
-
-UPDATE tmux SET value = '12' WHERE setting = 'sqlpatch';

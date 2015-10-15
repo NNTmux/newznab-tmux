@@ -2,6 +2,11 @@
 
 require_once './config.php';
 
+use newznab\controllers\AdminPage;
+use newznab\controllers\Releases;
+use newznab\controllers\Users;
+use newznab\controllers\NZB;
+
 $page = new AdminPage;
 $users = new Users;
 $releases = new Releases;

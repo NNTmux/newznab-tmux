@@ -1,4 +1,5 @@
 <?php
+namespace newznab\controllers;
 
 /**
  * Class ConsoleTools

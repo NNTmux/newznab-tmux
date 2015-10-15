@@ -1,4 +1,5 @@
 <?php
+namespace newznab\controllers;
 
 /**
  * This class represents every normal user page in the site.
@@ -12,7 +13,7 @@ class Page extends BasePage
 	{
 		parent::__construct();
 
-		$role=Users::ROLE_GUEST;
+		$role = Users::ROLE_GUEST;
 		if ($this->userdata != null)
 			$role = $this->userdata["role"];
 

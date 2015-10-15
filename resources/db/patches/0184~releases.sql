@@ -43,7 +43,6 @@ ALTER TABLE releases
 	ADD INDEX ix_releases_postdate_searchname (postdate,searchname),
 	ADD INDEX ix_releases_guid (guid),
 	ADD INDEX ix_releases_nzb_guid (nzb_guid),
-	ADD INDEX ix_releases_rageid (rageid),
 	ADD INDEX ix_releases_imdbid (imdbid),
 	ADD INDEX ix_releases_xxxinfo_id (xxxinfo_id),
 	ADD INDEX ix_releases_musicinfoid (musicinfoid,passwordstatus),

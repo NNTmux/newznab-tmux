@@ -14,4 +14,3 @@ VALUES (
   'Dragonlance Second Generation - Dragons of Summer Flame (NMR 32 kbps)  "Dragonlance Second Generation - Dragons of Summer Flame.nzb" 000/141 yEnc',
   85
 );
-UPDATE `tmux` SET `value` = '143' WHERE `setting` = 'sqlpatch';

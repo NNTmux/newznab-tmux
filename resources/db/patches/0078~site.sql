@@ -47,5 +47,3 @@ INSERT INTO `site` (`setting`, `value`) VALUES
 ('innerfileblacklist', ''),
   ('miscotherretentionhours',	'0'),
   ('mischashedretentionhours',	'0');
-
-UPDATE `tmux` SET `value` = '78' WHERE `setting` = 'sqlpatch';

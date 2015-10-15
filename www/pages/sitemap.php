@@ -1,5 +1,8 @@
 <?php
 
+use newznab\controllers\Contents;
+use newznab\controllers\Sitemap;
+
 $te = $page->smarty;
 
 $arPages = array();

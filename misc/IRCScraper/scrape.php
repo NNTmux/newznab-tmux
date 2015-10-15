@@ -1,13 +1,28 @@
 <?php
-require_once dirname(__FILE__) . '/../../../www/config.php';
+require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-if (!is_file(NN_MISC . 'testing' . DS . 'IRCScraper' .DS . 'settings.php')) {
-	exit('Copy settings_example.php to settings.php and change the settings.' . PHP_EOL);
+use newznab\controllers\IRCScraper;
+
+if (!defined('IRC_SCRAPER_CONFIG')) {
+	define('IRC_SCRAPER_CONFIG', NN_CONFIGS . 'ircscraper_settings.php');
 }
 
-if (!isset($argv[1]) || $argv[1] !== 'true') {
+switch (true) {
+	case is_file(IRC_SCRAPER_CONFIG):
+		break;
+	case is_file(NN_ROOT . 'misc/testing/IRCScraper/settings.php'):
+		rename(NN_ROOT . 'misc/testing/IRCScraper/settings.php', IRC_SCRAPER_CONFIG);
+		break;
+	default:
+		exit(
+			'Copy ' . NN_CONFIGS . 'ircscraper_settings_example.php to ' .
+			IRC_SCRAPER_CONFIG . ' and change the settings.' . PHP_EOL
+		);
+}
+
+if (!isset($argv[1]) || $argv[1] != 'true') {
 	exit(
-		'Argument 1: false|true             ; false prints this help screen, true runs the scraper.' . PHP_EOL .
+		'Argument 1: (required) false|true  ; false prints this help screen, true runs the scraper.' . PHP_EOL .
 		'Argument 2: (optional) false|true  ; true runs in silent mode (no text output)' . PHP_EOL .
 		'Argument 3: (optional) false|true  ; true turns on debug (shows sent/received messages from the socket)' . PHP_EOL .
 		'examples:' . PHP_EOL .
@@ -18,7 +33,7 @@ if (!isset($argv[1]) || $argv[1] !== 'true') {
 	);
 }
 
-require_once (NN_MISC . 'testing' . DS . 'IRCScraper' .DS . 'settings.php');
+require_once IRC_SCRAPER_CONFIG;
 
 if (!defined('SCRAPE_IRC_NICKNAME')) {
 	exit('ERROR! You must update settings.php using settings_example.php.');

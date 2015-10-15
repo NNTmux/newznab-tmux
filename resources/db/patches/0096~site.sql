@@ -5,5 +5,3 @@ INSERT IGNORE INTO `site` (`setting`, `value`) VALUES
   ('grabstatus', 0),
   ('nzbsplitlevel', 1),
   ('maxsizetoformrelease', 0);
-
-UPDATE `tmux` set `value` = '96' where `setting` = 'sqlpatch';

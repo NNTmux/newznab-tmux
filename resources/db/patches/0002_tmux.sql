@@ -7,5 +7,3 @@ INSERT IGNORE INTO `tmux` (`setting`, `value`) VALUES ('sphinx', '0'),
     ('sphinx_timer', '600'),
     ('delete_parts', '0'),
     ('delete_timer', '43200');
-
-UPDATE `tmux` set `value` = '2' where `setting` = 'sqlpatch';

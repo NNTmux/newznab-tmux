@@ -1,4 +1,5 @@
 <?php
+namespace newznab\controllers;
 require_once NN_LIBS . 'GiantBombAPI.php';
 
 use newznab\db\Settings;
@@ -43,7 +44,7 @@ class Games
 	public $maxHitRequest;
 
 	/**
-	 * @var newznab\db\Settings
+	 * @var \newznab\db\Settings
 	 */
 	public $pdo;
 

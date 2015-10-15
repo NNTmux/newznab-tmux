@@ -1,2 +1,1 @@
 INSERT INTO groups (name, description) VALUES ('alt.binaries.fz', 'This group contains german Movies and TV.') ON DUPLICATE KEY UPDATE name = 'alt.binaries.fz';
-UPDATE `tmux` SET `value` = '137' WHERE `setting` = 'sqlpatch';

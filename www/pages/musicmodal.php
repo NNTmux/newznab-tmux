@@ -1,5 +1,7 @@
 <?php
 
+use newznab\controllers\Music;
+
 $music = new Music;
 
 if (!$page->users->isLoggedIn())

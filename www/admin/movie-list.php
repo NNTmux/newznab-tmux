@@ -2,6 +2,9 @@
 
 require_once './config.php';
 
+use newznab\controllers\AdminPage;
+use newznab\controllers\Movie;
+
 $page  = new AdminPage();
 $movie = new Movie(['Settings' => $page->settings]);
 

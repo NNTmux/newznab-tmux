@@ -1,6 +1,9 @@
 <?php
 require_once("config.php");
 
+use newznab\controllers\AdminPage;
+use newznab\controllers\Contents;
+
 
 $page        = new AdminPage();
 $contents    = new Contents(['Settings' => $page->settings]);

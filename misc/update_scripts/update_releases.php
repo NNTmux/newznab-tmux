@@ -1,8 +1,10 @@
 <?php
-require_once(dirname(__FILE__) . "/config.php");
+require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
 
 use newznab\db\Settings;
 use newznab\processing\ProcessReleases;
+use newznab\controllers\NNTP;
+Use newznab\controllers\ConsoleTools;
 
 $pdo = new Settings();
 

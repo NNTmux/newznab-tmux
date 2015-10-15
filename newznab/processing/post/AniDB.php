@@ -2,6 +2,8 @@
 namespace newznab\processing\post;
 
 use \newznab\db\Settings;
+use newznab\controllers\NZB;
+use newznab\controllers\Category;
 
 class AniDB
 {
@@ -48,8 +50,6 @@ class AniDB
 
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
 		$this->pdo        = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
-		$s = new \Sites();
-		$this->site = $s->get();
 
 		$qty          = $this->pdo->getSetting('maxanidbprocessed');
 		$this->aniqty = !empty($qty) ? $qty : 100;
@@ -71,8 +71,8 @@ class AniDB
 							AND categoryid = %d
 							ORDER BY postdate DESC
 							LIMIT %d',
-									 \NZB::NZB_ADDED,
-									 \Category::CAT_TV_ANIME,
+									 NZB::NZB_ADDED,
+									 Category::CAT_TV_ANIME,
 									 $this->aniqty
 							 )
 		);

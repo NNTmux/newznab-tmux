@@ -13,4 +13,3 @@ ALTER TABLE releases CHANGE COLUMN proc_nfo proc_nfo TINYINT(1) NOT NULL DEFAULT
 ALTER TABLE releases CHANGE COLUMN proc_files proc_files TINYINT(1) NOT NULL DEFAULT 0;
 
 UPDATE releases set isrequestid = 1 WHERE name REGEXP '^\\[ ?([[:digit:]]{4,6}) ?\\]|^REQ\s*([[:digit:]]{4,6})|^([[:digit:]]{4,6})-[[:digit:]]{1}\\[' AND isrequestid = 0;
-UPDATE `tmux` SET `value` = '95' WHERE `setting` = 'sqlpatch';

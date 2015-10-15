@@ -1,8 +1,10 @@
 <?php
-require_once dirname(__FILE__) . '/../../../../www/config.php';
+require_once realpath(dirname(dirname(dirname(dirname(__DIR__)))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
 use newznab\db\Settings;
 use newznab\utility\Utility;
+use newznab\controllers\Tmux;
+use newznab\controllers\ColorCLI;
 
 $pdo = new Settings();
 $DIR = NN_TMUX;
@@ -252,7 +254,7 @@ function window_sharing($tmux_session)
 {
 	$pdo = new newznab\db\Settings();
 	$sharing = $pdo->queryOneRow('SELECT enabled, posting, fetching FROM sharing');
-	$t = new \Tmux();
+	$t = new Tmux();
 	$tmux = $t->get();
 	$tmux_share = (isset($tmux->run_sharing)) ? $tmux->run_sharing : 0;
 

@@ -6,6 +6,10 @@ if (PHP_SAPI === 'cli') {
 }
 
 require_once './config.php';
+
+use newznab\controllers\AdminPage;
+use newznab\controllers\NZBImport;
+
 $page = new AdminPage();
 
 $filesToProcess = [];

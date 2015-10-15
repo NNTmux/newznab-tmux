@@ -1,4 +1,5 @@
 <?php
+namespace newznab\controllers;
 
 /**
  * Structure for holding data during install.

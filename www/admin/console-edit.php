@@ -2,6 +2,10 @@
 
 require_once './config.php';
 
+use newznab\controllers\AdminPage;
+use newznab\controllers\Console;
+use newznab\controllers\Genres;
+
 $page = new AdminPage();
 $console = new Console(['Settings' => $page->settings]);
 $gen = new Genres();

@@ -1,6 +1,8 @@
 <?php
 
 use newznab\db\Settings;
+use newznab\controllers\UserSeries;
+use newznab\controllers\Category;
 
 if (!$page->users->isLoggedIn())
 	$page->show403();

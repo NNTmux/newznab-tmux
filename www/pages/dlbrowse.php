@@ -2,6 +2,7 @@
 
 use newznab\db\Settings;
 use newznab\utility\Utility;
+use newznab\controllers\Releases;
 
 if (!$page->users->isLoggedIn())
 	$page->show403();

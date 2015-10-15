@@ -1,4 +1,6 @@
 <?php
+namespace newznab\controllers;
+
 use newznab\db\Settings;
 use newznab\libraries\ApaiIO\Configuration\GenericConfiguration;
 use newznab\libraries\ApaiIO\Operations\Search;
@@ -10,7 +12,7 @@ use newznab\libraries\ApaiIO\ApaiIO;
 class Music
 {
 	/**
-	 * @var newznab\db\Settings
+	 * @var \newznab\db\Settings
 	 */
 	public $pdo;
 

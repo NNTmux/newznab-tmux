@@ -1,5 +1,10 @@
 <?php
 
+use newznab\controllers\Releases;
+use newznab\controllers\TvRage;
+use newznab\controllers\Category;
+use newznab\controllers\UserSeries;
+
 if (!$page->users->isLoggedIn()) {
 	$page->show403();
 }

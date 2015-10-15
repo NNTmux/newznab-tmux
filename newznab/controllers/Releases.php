@@ -1,4 +1,5 @@
 <?php
+namespace newznab\controllers;
 
 require_once NN_LIBS . 'ZipFile.php';
 

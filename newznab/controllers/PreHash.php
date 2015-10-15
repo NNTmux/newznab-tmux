@@ -1,4 +1,6 @@
 <?php
+namespace newznab\controllers;
+
 require_once NN_LIBS . 'simple_html_dom.php';
 
 use newznab\db\Settings;
@@ -30,7 +32,7 @@ Class PreHash
 	protected $echooutput;
 
 	/**
-	 * @var newznab\db\Settings
+	 * @var \newznab\db\Settings
 	 */
 	protected $pdo;
 

@@ -1,35 +1,35 @@
-ALTER TABLE `releases`
-ADD `dehashstatus` TINYINT(1) NOT NULL DEFAULT 0,
-ADD `nfostatus` TINYINT NOT NULL DEFAULT 0,
-ADD `jpgstatus` TINYINT(1) NOT NULL DEFAULT 0,
-ADD `audiostatus` TINYINT(1) NOT NULL DEFAULT 0,
-ADD `videostatus` TINYINT(1) NOT NULL DEFAULT 0,
-ADD `reqidstatus` TINYINT(1) NOT NULL DEFAULT 0,
-ADD `prehashid` INT UNSIGNED NOT NULL DEFAULT 0,
-ADD `iscategorized` BIT NOT NULL DEFAULT 0,
-ADD `isrenamed` BIT NOT NULL DEFAULT 0,
-ADD `ishashed` BIT NOT NULL DEFAULT 0,
-ADD `isrequestid` BIT NOT NULL DEFAULT 0,
-ADD `proc_pp` TINYINT(1) NOT NULL DEFAULT 0,
-ADD `proc_par2` BIT NOT NULL DEFAULT 0,
-ADD `proc_nfo` BIT NOT NULL DEFAULT 0,
-ADD `proc_files` BIT NOT NULL DEFAULT 0,
-ADD `gamesinfo_id` INT SIGNED NOT NULL DEFAULT '0',
-ADD `xxxinfo_id` INT SIGNED NOT NULL DEFAULT '0',
-ADD `nzbstatus` TINYINT(1) NOT NULL DEFAULT 0,
-ADD `proc_sorter` TINYINT(1) NOT NULL DEFAULT '0';
-CREATE INDEX `ix_releases_nfostatus` ON `releases` (`nfostatus` ASC) USING HASH;
-CREATE INDEX `ix_releases_reqidstatus` ON `releases` (`reqidstatus` ASC) USING HASH;
-CREATE INDEX `ix_releases_passwordstatus` ON `releases` (`passwordstatus`);
-CREATE INDEX `ix_releases_releasenfoID` ON `releases` (`releasenfoid`);
-CREATE INDEX `ix_releases_dehashstatus` ON `releases` (`dehashstatus`);
-CREATE INDEX `ix_releases_haspreview` ON `releases` (`haspreview` ASC) USING HASH;
-CREATE INDEX `ix_releases_postdate_name` ON `releases` (`postdate`, `name`);
-CREATE INDEX `ix_releases_prehashid_searchname` ON `releases` (`prehashid`, `searchname`);
-CREATE INDEX `ix_releases_gamesinfo_id` ON `releases` (`gamesinfo_id`);
-CREATE INDEX `ix_releases_xxxinfo_id` ON `releases` (`xxxinfo_id`);
-CREATE INDEX `ix_releases_status` ON `releases` (`nzbstatus`, `iscategorized`, `isrenamed`, `nfostatus`, `ishashed`, `passwordstatus`, `dehashstatus`, `releasenfoid`, `musicinfoid`, `consoleinfoid`, `bookinfoid`, `haspreview`, `categoryid`, `imdbid');
-UPDATE releases SET `nzbstatus` = 1 WHERE `nzbstatus` = 0;
+ALTER TABLE releases
+ADD dehashstatus TINYINT(1) NOT NULL DEFAULT 0,
+ADD nfostatus TINYINT NOT NULL DEFAULT 0,
+ADD jpgstatus TINYINT(1) NOT NULL DEFAULT 0,
+ADD audiostatus TINYINT(1) NOT NULL DEFAULT 0,
+ADD videostatus TINYINT(1) NOT NULL DEFAULT 0,
+ADD reqidstatus TINYINT(1) NOT NULL DEFAULT 0,
+ADD prehashid INT UNSIGNED NOT NULL DEFAULT 0,
+ADD iscategorized BIT NOT NULL DEFAULT 0,
+ADD isrenamed BIT NOT NULL DEFAULT 0,
+ADD ishashed BIT NOT NULL DEFAULT 0,
+ADD isrequestid BIT NOT NULL DEFAULT 0,
+ADD proc_pp TINYINT(1) NOT NULL DEFAULT 0,
+ADD proc_par2 BIT NOT NULL DEFAULT 0,
+ADD proc_nfo BIT NOT NULL DEFAULT 0,
+ADD proc_files BIT NOT NULL DEFAULT 0,
+ADD gamesinfo_id INT SIGNED NOT NULL DEFAULT '0',
+ADD xxxinfo_id INT SIGNED NOT NULL DEFAULT '0',
+ADD nzbstatus TINYINT(1) NOT NULL DEFAULT 0,
+ADD proc_sorter TINYINT(1) NOT NULL DEFAULT '0';
+CREATE INDEX ix_releases_nfostatus ON releases (nfostatus ASC) USING HASH;
+CREATE INDEX ix_releases_reqidstatus ON releases (reqidstatus ASC) USING HASH;
+CREATE INDEX ix_releases_passwordstatus ON releases (passwordstatus);
+CREATE INDEX ix_releases_releasenfoID ON releases (releasenfoid);
+CREATE INDEX ix_releases_dehashstatus ON releases (dehashstatus);
+CREATE INDEX ix_releases_haspreview ON releases (haspreview ASC) USING HASH;
+CREATE INDEX ix_releases_postdate_name ON releases (postdate, name);
+CREATE INDEX ix_releases_prehashid_searchname ON releases (prehashid, searchname);
+CREATE INDEX ix_releases_gamesinfo_id ON releases (gamesinfo_id);
+CREATE INDEX ix_releases_xxxinfo_id ON releases (xxxinfo_id);
+CREATE INDEX ix_releases_status ON releases (nzbstatus, iscategorized, isrenamed, nfostatus, ishashed, passwordstatus, dehashstatus, releasenfoid, musicinfoid, consoleinfoid, bookinfoid, haspreview, categoryid, imdbid);
+UPDATE releases SET nzbstatus = 1 WHERE nzbstatus = 0;
 
 ALTER TABLE users ADD COLUMN gameview INT AFTER consoleview;
 ALTER TABLE users ADD COLUMN xxxview INT AFTER consoleview;
@@ -56,20 +56,20 @@ CREATE TABLE prehash (
   searched   TINYINT(1)       NOT NULL DEFAULT '0',
   PRIMARY KEY (id)
 )
-  ENGINE =INNODB
+  ENGINE =MyISAM
   DEFAULT CHARACTER SET utf8
   COLLATE utf8_unicode_ci
   AUTO_INCREMENT =1;
 
-CREATE INDEX `ix_prehash_filename` ON `prehash` (`filename`);
-CREATE UNIQUE INDEX `ix_prehash_title` ON `prehash` (`title`);
-CREATE INDEX `ix_prehash_nfo` ON `prehash` (`nfo`);
-CREATE INDEX `ix_prehash_predate` ON `prehash` (`predate`);
-CREATE INDEX `ix_prehash_source` ON `prehash` (`source`);
-CREATE INDEX `ix_prehash_requestid` ON `prehash` (`requestid`, `groupid`);
-CREATE INDEX `ix_prehash_size` ON `prehash` (`size`);
-CREATE INDEX `ix_prehash_category` ON `prehash` (`category`);
-CREATE INDEX `ix_prehash_searched` ON `prehash` (`searched`);
+CREATE INDEX ix_prehash_filename ON prehash (filename);
+CREATE UNIQUE INDEX ix_prehash_title ON prehash (title);
+CREATE INDEX ix_prehash_nfo ON prehash (nfo);
+CREATE INDEX ix_prehash_predate ON prehash (predate);
+CREATE INDEX ix_prehash_source ON prehash (source);
+CREATE INDEX ix_prehash_requestid ON prehash (requestid, groupid);
+CREATE INDEX ix_prehash_size ON prehash (size);
+CREATE INDEX ix_prehash_category ON prehash (category);
+CREATE INDEX ix_prehash_searched ON prehash (searched);
 
 DROP TABLE IF EXISTS tmux;
 CREATE TABLE tmux (
@@ -82,7 +82,7 @@ CREATE TABLE tmux (
   PRIMARY KEY (id),
   UNIQUE KEY setting (setting)
 )
-  ENGINE =INNODB
+  ENGINE =MyISAM
   DEFAULT CHARSET =utf8
   COLLATE =utf8_unicode_ci;
 
@@ -232,7 +232,7 @@ CREATE TABLE country (
   code CHAR(2)      NOT NULL DEFAULT "",
   PRIMARY KEY (id)
 )
-  ENGINE =INNODB
+  ENGINE =MyISAM
   DEFAULT CHARACTER SET utf8
   COLLATE utf8_unicode_ci
   AUTO_INCREMENT =1;
@@ -292,7 +292,7 @@ INSERT INTO country (code, name) VALUES ('AF', 'Afghanistan'),
 ('CG', 'Congo the'),
 ('CK', 'Cook Islands'),
 ('CR', 'Costa Rica'),
-('CI', 'Cote d\'Ivoire'),
+('CI', 'Cote d Ivoire'),
 ('HR', 'Croatia'),
 ('CU', 'Cuba'),
 ('CY', 'Cyprus'),
@@ -498,7 +498,7 @@ CREATE TABLE         gamesinfo (
   PRIMARY KEY                    (id),
   UNIQUE INDEX ix_gamesinfo_asin (asin)
 )
-  ENGINE          = InnoDB
+  ENGINE          = MyISAM
   DEFAULT CHARSET = utf8
   COLLATE         = utf8_unicode_ci
   AUTO_INCREMENT  = 1;
@@ -524,21 +524,21 @@ CREATE TABLE         xxxinfo (
   PRIMARY KEY                      (id),
   INDEX        ix_xxxinfo_title  (title)
 )
-  ENGINE          = InnoDB
+  ENGINE          = MyISAM
   DEFAULT CHARSET = utf8
   COLLATE         = utf8_unicode_ci
   AUTO_INCREMENT  = 1;
 
-DROP TABLE IF EXISTS `genres`;
-CREATE TABLE IF NOT EXISTS `genres` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `title` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `type` int(4) DEFAULT NULL,
-  `disabled` tinyint(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC AUTO_INCREMENT=635;
+DROP TABLE IF EXISTS genres;
+CREATE TABLE IF NOT EXISTS genres (
+  id int(11) NOT NULL AUTO_INCREMENT,
+  title varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  type int(4) DEFAULT NULL,
+  disabled tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (id)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC AUTO_INCREMENT=635;
 
-INSERT IGNORE INTO `genres` (`id`, `title`, `type`, `disabled`) VALUES
+INSERT IGNORE INTO genres (id, title, type, disabled) VALUES
   (150, 'Blues', 3000, 0),
   (151, 'Classic Rock', 3000, 0),
   (152, 'Country', 3000, 0),
@@ -1034,7 +1034,7 @@ CREATE TABLE shortgroups (
   updated      DATETIME DEFAULT NULL,
   PRIMARY KEY (id)
 )
-  ENGINE =InnoDB
+  ENGINE =MyISAM
   DEFAULT CHARACTER SET utf8
   COLLATE utf8_unicode_ci
   AUTO_INCREMENT =1;
@@ -1042,19 +1042,19 @@ CREATE TABLE shortgroups (
 CREATE INDEX ix_shortgroups_id ON shortgroups (id);
 CREATE INDEX ix_shortgroups_name ON shortgroups (name);
 
-DROP TABLE IF EXISTS `category`;
+DROP TABLE IF EXISTS category;
 CREATE TABLE category
 (
-  `id`                   INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `title`                VARCHAR(255)    NOT NULL,
-  `parentid`             INT             NULL,
-  `status`               INT             NOT NULL DEFAULT '1',
-  `minsizetoformrelease` BIGINT UNSIGNED NOT NULL DEFAULT '0',
-  `maxsizetoformrelease` BIGINT UNSIGNED NOT NULL DEFAULT '0',
-  `description`          VARCHAR(255)    NULL,
-  `disablepreview`       TINYINT(1)      NOT NULL DEFAULT '0'
+  id                   INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  title                VARCHAR(255)    NOT NULL,
+  parentid             INT             NULL,
+  status               INT             NOT NULL DEFAULT '1',
+  minsizetoformrelease BIGINT UNSIGNED NOT NULL DEFAULT '0',
+  maxsizetoformrelease BIGINT UNSIGNED NOT NULL DEFAULT '0',
+  description          VARCHAR(255)    NULL,
+  disablepreview       TINYINT(1)      NOT NULL DEFAULT '0'
 )
-  ENGINE =INNODB
+  ENGINE =MyISAM
   DEFAULT CHARACTER SET utf8
   COLLATE utf8_unicode_ci
   AUTO_INCREMENT =100000;
@@ -1144,7 +1144,7 @@ CREATE TABLE sharing_sites (
   comments   MEDIUMINT UNSIGNED NOT NULL DEFAULT '0',
   PRIMARY KEY (id)
 )
-  ENGINE =InnoDB
+  ENGINE =MyISAM
   DEFAULT CHARACTER SET utf8
   COLLATE utf8_unicode_ci
   AUTO_INCREMENT =1;
@@ -1165,7 +1165,7 @@ CREATE TABLE sharing (
   max_download   MEDIUMINT UNSIGNED NOT NULL DEFAULT '150',
   PRIMARY KEY (site_guid)
 )
-  ENGINE =InnoDB
+  ENGINE =MyISAM
   DEFAULT CHARACTER SET utf8
   COLLATE utf8_unicode_ci;
 
@@ -1179,9 +1179,9 @@ UPDATE releasecomment
 SET text_hash = MD5(text);
 ALTER IGNORE TABLE releasecomment ADD UNIQUE INDEX ix_releasecomment_hash_gid (text_hash, gid);
 
-ALTER TABLE `releasefiles` ADD COLUMN `ishashed` TINYINT(1) NOT NULL DEFAULT '0'
-AFTER `size`;
-CREATE INDEX `ix_releasefiles_ishashed` ON `releasefiles` (`ishashed`);
+ALTER TABLE releasefiles ADD COLUMN ishashed TINYINT(1) NOT NULL DEFAULT '0'
+AFTER size;
+CREATE INDEX ix_releasefiles_ishashed ON releasefiles (ishashed);
 
 DROP TABLE IF EXISTS predbhash;
 CREATE TABLE predbhash (
@@ -1207,7 +1207,7 @@ VALUES ('prehash', 'Prehash',
         'Prehash', 1, 68);
 INSERT INTO menu (href, title, tooltip, role, ordinal ) VALUES ('newposterwall', 'New Releases', "Newest Releases Poster Wall", 1, 11);
 
-INSERT INTO `site` (`setting`, `value`) VALUES
+INSERT INTO site (setting, value) VALUES
   ('categorizeforeign',	'1'),
   ('catwebdl',	'0'),
   ('giantbombkey', ''),

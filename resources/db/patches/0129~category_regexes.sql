@@ -9,4 +9,3 @@ INSERT INTO category_regexes (id, group_regex, regex, status, description, ordin
     50,
     1120
 );
-UPDATE `tmux` SET `value` = '129' WHERE `setting` = 'sqlpatch';

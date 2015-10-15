@@ -1,5 +1,7 @@
 <?php
 
+use newznab\controllers\Movie;
+
 $movie = new Movie;
 
 if (!$page->users->isLoggedIn())

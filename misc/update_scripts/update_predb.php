@@ -1,5 +1,5 @@
 <?php
-require_once("config.php");
+require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
 
 $p = new PreDB(true);
 $p->nzpreUpdate();

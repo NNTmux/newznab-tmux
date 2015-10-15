@@ -1,6 +1,9 @@
 <?php
 require_once './config.php';
 
+use newznab\controllers\AdminPage;
+use newznab\controllers\Groups;
+
 $admin = new AdminPage;
 $group  = new Groups(['Settings' => $admin->settings]);
 

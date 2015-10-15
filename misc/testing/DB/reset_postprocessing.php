@@ -1,10 +1,11 @@
 <?php
-require_once dirname(__FILE__) . '/../../../www/config.php';
+require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
 use newznab\db\Settings;
+use newznab\controllers\ConsoleTools;
 
 $pdo = new Settings();
-$consoletools = new \ConsoleTools(['ColorCLI' => $pdo->log]);
+$consoletools = new ConsoleTools(['ColorCLI' => $pdo->log]);
 $ran = false;
 
 if (isset($argv[1]) && $argv[1] === "all") {

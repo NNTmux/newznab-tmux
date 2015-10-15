@@ -1,3 +1,11 @@
+2015-10-15 DariusIII
+	Chg: Move all the configs into newznab/config/ folder.
+		Adjust patches and scripts to the new change, adapt patches for nn+ new releases table structure.
+2015-10-14 DariusIII
+	Chg: Change location of config files(located now in newznab/config folder) update scripts
+		to accomodate this change.
+2015-10-14 DariusIII
+	Fix: Possible fix for NULL nzb_guid values.
 2015-10-13 DariusIII
 	Fix: Wrong edits, still working on commit management
 2015-10-13 DariusIII

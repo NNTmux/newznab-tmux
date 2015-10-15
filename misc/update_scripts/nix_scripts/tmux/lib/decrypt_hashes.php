@@ -1,7 +1,9 @@
 <?php
-require_once(dirname(__FILE__) . "/../bin/config.php");
+require_once dirname(__FILE__) . '/../../../config.php';
 
 use newznab\db\Settings;
+use newznab\controllers\ConsoleTools;
+use newznab\controllers\NameFixer;
 
 $pdo = new Settings();
 

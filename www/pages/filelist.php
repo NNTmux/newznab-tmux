@@ -1,5 +1,8 @@
 <?php
 
+use newznab\controllers\Releases;
+use newznab\controllers\NZB;
+
 $releases = new Releases;
 $nzb = new NZB;
 

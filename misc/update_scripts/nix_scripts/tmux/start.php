@@ -6,13 +6,14 @@
  *
  * It will start the tmux server and monitoring scripts if needed.
  */
-require_once realpath(__DIR__ . '/../../../../www/config.php');
+require_once realpath(dirname(dirname(dirname(dirname(__DIR__)))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
 use newznab\db\Settings;
+use newznab\controllers\Tmux;
 
 $pdo = new Settings();
 
-$tmux = new \Tmux();
+$tmux = new Tmux();
 $tmux_settings = $tmux->get();
 $tmux_session = (isset($tmux_settings->tmux_session)) ? $tmux_settings->tmux_session : 0;
 $path = __DIR__;

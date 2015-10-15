@@ -5,5 +5,3 @@ ALTER TABLE prehash MODIFY COLUMN md5 VARCHAR(32) NOT NULL DEFAULT '';
 
 UPDATE prehash SET sha1 = sha1(title);
 CREATE UNIQUE INDEX ix_prehash_sha1 ON prehash(sha1);
-
-UPDATE tmux SET value = '27' WHERE setting = 'sqlpatch';

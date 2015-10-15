@@ -67,5 +67,3 @@ INSERT INTO release_naming_regexes (id, group_regex, regex, status, description,
     '[17319]-[FULL]-[#a.b.teevee@EFNet]-[ CSI.New.York.S05E22.720p.HDTV.X264-DIMENSION ]-[01/34] "csi.new.york.522.720p-dimension.nfo" (1/1) (1/1',
     35
 );
-
-UPDATE `tmux` set `value` = '118' where `setting` = 'sqlpatch';

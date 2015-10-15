@@ -1,11 +1,14 @@
 <?php
-require_once("config.php");
+require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-$groups = new \Groups;
+use newznab\controllers\Groups;
+
+
+$groups = new Groups;
 $groupList = $groups->getActive();
 unset($groups);
 
-$ps = new \PowerProcess;
+$ps = new PowerProcess;
 $ps->RegisterCallback('psUpdateComplete');
 $ps->maxThreads = 10;
 $ps->tickCount = 10000;	// value in usecs. change this to 1000000 (one second) to reduce cpu use

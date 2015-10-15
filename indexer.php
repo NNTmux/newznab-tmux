@@ -16,17 +16,17 @@
  *
  * @link <http://www.gnu.org/licenses/>.
  * @author niel
- * @copyright 2014 nZEDb
+ * @copyright 2015 nZEDb
  */
+require_once 'constants.php';
+require_once 'autoloader.php';
+require_once 'libs/autoloader.php';
 
-require_once NN_CORE . 'autoloader.php';
-require_once NN_LIB . 'autoloader.php';
-require_once NN_LIBS . 'autoloader.php';
+use newznab\config\Configure;
+use newznab\utility\Utility;
 
-require_once NN_WWW . '/SPLClassLoader.php';
+$config = new Configure('indexer');
 
-$paths = [NN_ROOT, NN_WWW . 'pages', SMARTY_DIR, SMARTY_DIR . 'plugins', SMARTY_DIR . 'sysplugins'];
-$classLoader = new \SplClassLoader(null, $paths);
-$classLoader->register();
+define('HAS_WHICH', Utility::hasWhich() ? true : false);
 
 ?>

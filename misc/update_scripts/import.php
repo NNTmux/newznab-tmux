@@ -1,9 +1,15 @@
 <?php
 
-require_once dirname(__FILE__) . '/../../www/config.php';
+require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
 
 use newznab\db\Settings;
 use newznab\utility\Utility;
+use newznab\controllers\Releases;
+use newznab\controllers\ReleaseImage;
+use newznab\controllers\Categorize;
+use newznab\controllers\NZB;
+use newznab\controllers\ReleaseRegex;
+use newznab\controllers\Page;
 
 $releases = new Releases();
 $releaseImage = new ReleaseImage();

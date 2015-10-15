@@ -8,4 +8,3 @@ VALUES (
   '//[27849]-[altbinEFNet]-[Full]- "ppt-sogz.001" - 7,62 GB - yEnc ::: //[27925]--[altbinEFNet]-[Full]- "unl_p2rd.par2" yEnc ::: //[27608]-[FULL]-[#altbin@EFNet]-[007/136] "27608-1.005" yEnc ::: //[30605]-[altbinEFNet]-[FULL]- [10/165] - "plaza-the.witcher.3.wild.hunt.r09" yEnc ::: //[]-[#altbin@EFNet]-[Full]-[ACE.LIGHTNING.PLUS.6.TRAINER-DEViANCE]-[0/8] - "deviance.nfo" yEnc',
   5
 );
-UPDATE `tmux` SET `value` = '146' WHERE `setting` = 'sqlpatch';

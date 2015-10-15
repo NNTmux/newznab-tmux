@@ -6,6 +6,16 @@ require_once NN_LIBS . 'rarinfo/par2info.php';
 
 use newznab\db\Settings;
 use newznab\utility\Utility;
+use newznab\controllers\NZB;
+use newznab\controllers\Groups;
+use newznab\controllers\NNTP;
+use newznab\controllers\Categorize;
+use newznab\controllers\Nfo;
+use newznab\controllers\ReleaseFiles;
+use newznab\controllers\ReleaseExtra;
+use newznab\controllers\ReleaseImage;
+use newznab\controllers\NameFixer;
+use newznab\controllers\SphinxSearch;
 
 class ProcessAdditional
 {
@@ -45,7 +55,7 @@ class ProcessAdditional
 	protected $_release;
 
 	/**
-	 * @var \NZB
+	 * @var NZB
 	 */
 	protected $_nzb;
 
@@ -56,7 +66,7 @@ class ProcessAdditional
 	protected $_nzbContents;
 
 	/**
-	 * @var \Groups
+	 * @var Groups
 	 */
 	protected $_groups;
 
@@ -161,37 +171,37 @@ class ProcessAdditional
 	protected $_echoCLI;
 
 	/**
-	 * @var \NNTP
+	 * @var NNTP
 	 */
 	protected $_nntp;
 
 	/**
-	 * @var \ReleaseFiles
+	 * @var ReleaseFiles
 	 */
 	protected $_releaseFiles;
 
 	/**
-	 * @var \Categorize
+	 * @var Categorize
 	 */
 	protected $_categorize;
 
 	/**
-	 * @var \NameFixer
+	 * @var NameFixer
 	 */
 	protected $_nameFixer;
 
 	/**
-	 * @var \ReleaseExtra
+	 * @var ReleaseExtra
 	 */
 	protected $_releaseExtra;
 
 	/**
-	 * @var \ReleaseImage
+	 * @var ReleaseImage
 	 */
 	protected $_releaseImage;
 
 	/**
-	 * @var \Nfo
+	 * @var Nfo
 	 */
 	protected $_nfo;
 
@@ -285,21 +295,19 @@ class ProcessAdditional
 		$this->_echoDebug = NN_DEBUG;
 
 		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
-		$this->_nntp = ($options['NNTP'] instanceof \NNTP ? $options['NNTP'] : new \NNTP(['Echo' => $this->_echoCLI, 'Settings' => $this->pdo]));
+		$this->_nntp = ($options['NNTP'] instanceof NNTP ? $options['NNTP'] : new NNTP(['Echo' => $this->_echoCLI, 'Settings' => $this->pdo]));
 
-		$this->_nzb = ($options['NZB'] instanceof \NZB ? $options['NZB'] : new \NZB($this->pdo));
-		$this->_groups = ($options['Groups'] instanceof \Groups ? $options['Groups'] : new \Groups(['Settings' => $this->pdo]));
+		$this->_nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB($this->pdo));
+		$this->_groups = ($options['Groups'] instanceof Groups ? $options['Groups'] : new Groups(['Settings' => $this->pdo]));
 		$this->_archiveInfo = new \ArchiveInfo();
-		$this->_releaseFiles = ($options['ReleaseFiles'] instanceof \ReleaseFiles ? $options['ReleaseFiles'] : new \ReleaseFiles($this->pdo));
-		$this->_categorize = ($options['Categorize'] instanceof \Categorize ? $options['Categorize'] : new \Categorize(['Settings' => $this->pdo]));
-		$this->_nameFixer = ($options['NameFixer'] instanceof \NameFixer ? $options['NameFixer'] : new \NameFixer(['Echo' =>$this->_echoCLI, 'Groups' => $this->_groups, 'Settings' => $this->pdo, 'Categorize' => $this->_categorize]));
-		$this->_releaseExtra = ($options['ReleaseExtra'] instanceof \ReleaseExtra ? $options['ReleaseExtra'] : new \ReleaseExtra($this->pdo));
-		$this->_releaseImage = ($options['ReleaseImage'] instanceof \ReleaseImage ? $options['ReleaseImage'] : new \ReleaseImage($this->pdo));
+		$this->_releaseFiles = ($options['ReleaseFiles'] instanceof ReleaseFiles ? $options['ReleaseFiles'] : new ReleaseFiles($this->pdo));
+		$this->_categorize = ($options['Categorize'] instanceof Categorize ? $options['Categorize'] : new Categorize(['Settings' => $this->pdo]));
+		$this->_nameFixer = ($options['NameFixer'] instanceof NameFixer ? $options['NameFixer'] : new NameFixer(['Echo' =>$this->_echoCLI, 'Groups' => $this->_groups, 'Settings' => $this->pdo, 'Categorize' => $this->_categorize]));
+		$this->_releaseExtra = ($options['ReleaseExtra'] instanceof ReleaseExtra ? $options['ReleaseExtra'] : new ReleaseExtra($this->pdo));
+		$this->_releaseImage = ($options['ReleaseImage'] instanceof ReleaseImage ? $options['ReleaseImage'] : new ReleaseImage($this->pdo));
 		$this->_par2Info = new \Par2Info();
-		$this->_nfo = ($options['Nfo'] instanceof \Nfo ? $options['Nfo'] : new \Nfo(['Echo' => $this->_echoCLI, 'Settings' => $this->pdo]));
-		$this->sphinx = ($options['SphinxSearch'] instanceof \SphinxSearch ? $options['SphinxSearch'] : new \SphinxSearch());
-		$s = new \Sites();
-		$this->site = $s->get();
+		$this->_nfo = ($options['Nfo'] instanceof Nfo ? $options['Nfo'] : new Nfo(['Echo' => $this->_echoCLI, 'Settings' => $this->pdo]));
+		$this->sphinx = ($options['SphinxSearch'] instanceof SphinxSearch ? $options['SphinxSearch'] : new SphinxSearch());
 
 		$this->_innerFileBlacklist = ($this->pdo->getSetting('innerfileblacklist') == '' ? false : $this->pdo->getSetting('innerfileblacklist'));
 		$this->_maxNestedLevels = ($this->pdo->getSetting('maxnestedlevels') == 0 ? 3 : $this->pdo->getSetting('maxnestedlevels'));
