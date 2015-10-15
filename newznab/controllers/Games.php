@@ -162,7 +162,7 @@ class Games
 	{
 		$catsrch = '';
 		if (count($cat) > 0 && $cat[0] != -1) {
-			$catsrch = (new \Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
+			$catsrch = (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
 		}
 
 		$res = $this->pdo->queryOneRow(
@@ -198,7 +198,7 @@ class Games
 
 		$catsrch = '';
 		if (count($cat) > 0 && $cat[0] != -1) {
-			$catsrch = (new \Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
+			$catsrch = (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
 		}
 
 		if ($maxage > 0) {
@@ -383,8 +383,8 @@ class Games
 	 */
 	public function updateGamesInfo($gameInfo)
 	{
-		$gen = new \Genres(['Settings' => $this->pdo]);
-		$ri = new \ReleaseImage($this->pdo);
+		$gen = new Genres(['Settings' => $this->pdo]);
+		$ri = new ReleaseImage($this->pdo);
 
 		$con = [];
 
@@ -591,7 +591,7 @@ class Games
 			return false;
 		}
 		// Load genres.
-		$defaultGenres = $gen->getGenres(\Genres::GAME_TYPE);
+		$defaultGenres = $gen->getGenres(Genres::GAME_TYPE);
 		$genreassoc = [];
 		foreach ($defaultGenres as $dg) {
 			$genreassoc[$dg['id']] = strtolower($dg['title']);
@@ -638,7 +638,7 @@ class Games
 					INSERT INTO genres (title, type)
 					VALUES (%s, %d)",
 					$this->pdo->escapeString($genreName),
-					\Genres::GAME_TYPE
+					Genres::GAME_TYPE
 				)
 			);
 		}

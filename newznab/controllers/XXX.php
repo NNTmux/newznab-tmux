@@ -78,8 +78,8 @@ class XXX
 		if (NN_DEBUG || NN_LOGGING) {
 			$this->debug = true;
 			try {
-				$this->debugging = new \Logger();
-			} catch (\LoggerException $error) {
+				$this->debugging = new Logger();
+			} catch (LoggerException $error) {
 				$this->_debug = false;
 			}
 		}

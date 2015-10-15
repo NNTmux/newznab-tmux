@@ -83,10 +83,10 @@ class ReleaseCleaning
 	public function __construct($settings = null)
 	{
 		// Extensions.
-		$this->e0  = \CollectionsCleaning::REGEX_FILE_EXTENSIONS;
-		$this->e1  = \CollectionsCleaning::REGEX_FILE_EXTENSIONS . \CollectionsCleaning::REGEX_END;
-		$this->e2  = \CollectionsCleaning::REGEX_FILE_EXTENSIONS .
-			\CollectionsCleaning::REGEX_SUBJECT_SIZE . \CollectionsCleaning::REGEX_END;
+		$this->e0  = CollectionsCleaning::REGEX_FILE_EXTENSIONS;
+		$this->e1  = CollectionsCleaning::REGEX_FILE_EXTENSIONS . CollectionsCleaning::REGEX_END;
+		$this->e2  = CollectionsCleaning::REGEX_FILE_EXTENSIONS .
+			CollectionsCleaning::REGEX_SUBJECT_SIZE . CollectionsCleaning::REGEX_END;
 		$this->pdo = ($settings instanceof Settings ? $settings : new Settings());
 		$this->_regexes = new Regexes(['Settings' => $this->pdo, 'Table_Name' => 'release_naming_regexes']);
 	}

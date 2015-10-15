@@ -116,8 +116,8 @@ class NNTP extends Net_NNTP_Client
 		$this->_debugBool = (NN_LOGGING || NN_DEBUG);
 		if ($this->_debugBool) {
 			try {
-				$this->_debugging = ($options['Logger'] instanceof \Logger ? $options['Logger'] : new \Logger(['ColorCLI' => $this->pdo->log]));
-			} catch (\LoggerException $error) {
+				$this->_debugging = ($options['Logger'] instanceof Logger ? $options['Logger'] : new Logger(['ColorCLI' => $this->pdo->log]));
+			} catch (LoggerException $error) {
 				$this->_debugBool = false;
 			}
 		}

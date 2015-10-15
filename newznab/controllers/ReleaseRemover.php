@@ -28,7 +28,7 @@ class ReleaseRemover
 	protected $browser;
 
 	/**
-	 * @var \newznab\ConsoleTools
+	 * @var ConsoleTools
 	 */
 	protected $consoleTools;
 

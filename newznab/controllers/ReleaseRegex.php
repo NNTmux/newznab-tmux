@@ -129,7 +129,7 @@ class ReleaseRegex
 	 *
 	 * @param $id
 	 *
-	 * @return bool|PDOStatement
+	 * @return bool PDOStatement
 	 */
 	public function delete($id)
 	{

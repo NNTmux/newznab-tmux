@@ -38,7 +38,7 @@ function snHandleError($errno, $errstr, $errfile, $errline, array $errcontext){
 	throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
 }
 
-// Create a NNTP Exception type so we can identify it from others
+// Create a NNTP \Exception type so we can identify it from others
 class SpotNabException extends \Exception { }
 
 class SpotNab {
@@ -155,8 +155,8 @@ class SpotNab {
 	public function __construct($post_user = NULL, $post_email = NULL, $post_group = NULL) {
 		$this->_pdo = new Settings();
 		$this->_nntp = new NNTP(['Settings' => $this->_pdo]);
-		$this->releaseImage =  new \ReleaseImage($this->_pdo);
-		$this->nzb = new \NZB($this->_pdo);
+		$this->releaseImage =  new ReleaseImage($this->_pdo);
+		$this->nzb = new NZB($this->_pdo);
 
 		$this->_post_user = $post_user;
 		$this->_post_email = $post_email;
@@ -399,7 +399,7 @@ class SpotNab {
 				exit($this->_pdo->log->error("Unable to connect to usenet." . PHP_EOL));
 			}
 		}
-		catch(Exception $e){
+		catch(\Exception $e){
 			printf("Failed to connect to Usenet\n");
 			// Restore handler
 			restore_error_handler();
@@ -474,7 +474,7 @@ class SpotNab {
 					//print_r($headers);
 				}
 
-			}catch(Exception $e){
+			}catch(\Exception $e){
 				// Reset Connection
 				$fetch_okay = $this->_nntpReset(SpotNab::AUTODISCOVER_POST_GROUP);
 
@@ -741,7 +741,7 @@ class SpotNab {
 				exit($this->_pdo->log->error("Unable to connect to usenet." . PHP_EOL));
 			}
 		}
-		catch(Exception $e){
+		catch(\Exception $e){
 			printf("Failed to connect to Usenet");
 			// Restore handler
 			restore_error_handler();
@@ -816,7 +816,7 @@ class SpotNab {
 						//print_r($headers);
 					}
 
-				}catch(Exception $e){
+				}catch(\Exception $e){
 					// Reset Connection
 					$fetch_okay = $this->_nntpReset($group);
 
@@ -841,7 +841,7 @@ class SpotNab {
 
 		// Ensure We're not connected
 		try{$this->_nntp->doQuit();}
-		catch(Exception $e)
+		catch(\Exception $e)
 		{/* do nothing */}
 
 		return $inserted + $updated;
@@ -1843,10 +1843,10 @@ class SpotNab {
 				// Actually send the article
 				$_err = $this->_nntp->cmdPost2($article);
 
-			}catch(Exception $e){
+			}catch(\Exception $e){
 				// Ensure We're not connected
 				try{$this->_nntp->doQuit();}
-				catch(Exception $e)
+				catch(\Exception $e)
 				{/* do nothing */}
 
 				// Post failed
@@ -1878,7 +1878,7 @@ class SpotNab {
 	{
 		// Reset Connection
 		try{$this->_nntp->doQuit();}
-		catch(Exception $e)
+		catch(\Exception $e)
 		{/* do nothing */}
 
 		// Attempt to reconnect

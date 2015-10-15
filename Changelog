@@ -3,6 +3,7 @@
 	Fix: Add back the patch
 	Fix: Add missing use statements.
 	Fix: Missing exception error in Logger.php
+	Fix: Change instantiation of classes
 2015-10-15 DariusIII
 	Bug: remove tvrage patch
 2015-10-15 DariusIII

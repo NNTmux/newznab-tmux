@@ -1,6 +1,6 @@
 <?php
 namespace newznab\controllers;
-require_once NN_LIBS . 'smarty/Smarty.class.php';
+require_once NN_LIBS . DS . 'smarty/Smarty.class.php';
 
 /**
  * This class represents each page during installation.
@@ -22,7 +22,7 @@ class Installpage
 	{
 		@session_start();
 
-		$this->smarty = new Smarty();
+		$this->smarty = new \Smarty();
 
 		$this->smarty->setTemplateDir(realpath('../install/views/'));
 		$this->smarty->setCompileDir(realpath('../lib/smarty/templates_c/'));

@@ -217,7 +217,7 @@ class Music
 
 		$catsrch = '';
 		if (count($cat) > 0 && $cat[0] != -1) {
-			$catsrch = (new \Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
+			$catsrch = (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
 		}
 
 		$exccatlist = "";
@@ -389,8 +389,8 @@ class Music
 	 */
 	public function updateMusicInfo($title, $year, $amazdata = null)
 	{
-		$gen = new \Genres(['Settings' => $this->pdo]);
-		$ri = new \ReleaseImage($this->pdo);
+		$gen = new Genres(['Settings' => $this->pdo]);
+		$ri = new ReleaseImage($this->pdo);
 		$titlepercent = 0;
 
 		$mus = [];
@@ -416,7 +416,7 @@ class Music
 		}
 
 		// Load genres.
-		$defaultGenres = $gen->getGenres(\Genres::MUSIC_TYPE);
+		$defaultGenres = $gen->getGenres(Genres::MUSIC_TYPE);
 		$genreassoc = [];
 		foreach ($defaultGenres as $dg) {
 			$genreassoc[$dg['id']] = strtolower($dg['title']);
@@ -505,7 +505,7 @@ class Music
 										INSERT INTO genres (title, type)
 										VALUES (%s, %d)",
 										$this->pdo->escapeString($genreName),
-										\Genres::MUSIC_TYPE
+										Genres::MUSIC_TYPE
 									)
 				);
 			}
