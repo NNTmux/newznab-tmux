@@ -1,3 +1,5 @@
+2015-10-16 DariusIII
+	Fix: Missing use statements.
 2015-10-15 DariusIII 
 	Chg: Remove snHandleerror from SpotNab.
 	Add: Example config file

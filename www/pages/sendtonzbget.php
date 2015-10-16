@@ -21,5 +21,5 @@ if (empty($nzbget->password))
 
 $guid = $_GET["id"];
 
-$nzbget->sendToNZBGet($guid);
+$nzbget->sendURLToNZBGet($guid);
 

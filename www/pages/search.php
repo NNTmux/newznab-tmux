@@ -2,6 +2,8 @@
 
 use newznab\controllers\Groups;
 use newznab\controllers\Releases;
+use newznab\controllers\ReleaseSearch;
+use newznab\controllers\Category;
 
 if (!$page->users->isLoggedIn()) {
 	$page->show403();
