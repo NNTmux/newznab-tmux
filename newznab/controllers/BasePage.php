@@ -5,7 +5,7 @@ use newznab\db\Settings;
 use Smarty;
 use Smarty_Autoloader;
 
-require_once SMARTY_DIR . DS . 'Autoloader.php';
+require_once SMARTY_DIR . 'Autoloader.php';
 
 
 Smarty_Autoloader::register();

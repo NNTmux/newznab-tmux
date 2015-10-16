@@ -1,4 +1,5 @@
 2015-10-16 DariusIII
+	Fix: Path to smarty dir
 	Fix: Instantiation issues in NameFixer.php
 2015-10-16 DariusIII
 	Fix: Missing use statements.
