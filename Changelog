@@ -1,4 +1,6 @@
 2015-10-16 DariusIII
+	Fix: Instantiation issues in NameFixer.php
+2015-10-16 DariusIII
 	Fix: Missing use statements.
 2015-10-15 DariusIII 
 	Chg: Remove snHandleerror from SpotNab.
