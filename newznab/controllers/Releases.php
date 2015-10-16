@@ -461,6 +461,39 @@ class Releases
 	}
 
 	/**
+	 * Get a range of releases. used in admin manage list
+	 */
+	public function getPreviewRange($previewtype, $cat, $start, $num)
+	{
+		$catsrch = "";
+		if (count($cat) > 0 && $cat[0] != -1) {
+			$catsrch = " and (";
+			foreach ($cat as $category) {
+				if ($category != -1) {
+					$categ = new Categorize();
+					if ($categ->isParent($category)) {
+						$children = $categ->getChildren($category);
+						$chlist = "-99";
+						foreach ($children as $child)
+							$chlist .= ", " . $child["id"];
+						if ($chlist != "-99")
+							$catsrch .= " releases.categoryid in (" . $chlist . ") or ";
+					} else {
+						$catsrch .= sprintf(" releases.categoryid = %d or ", $category);
+					}
+				}
+			}
+			$catsrch .= "1=2 )";
+		}
+		if ($start === false)
+			$limit = "";
+		else
+			$limit = " LIMIT " . $start . "," . $num;
+		$sql = sprintf(" SELECT releases.*, concat(cp.title, ' > ', c.title) AS category_name FROM releases LEFT OUTER JOIN category c ON c.id = releases.categoryid LEFT OUTER JOIN category cp ON cp.id = c.parentid WHERE haspreview = %d %s ORDER BY postdate DESC %s", $previewtype, $catsrch, $limit);
+		return $this->pdo->query($sql);
+	}
+
+	/**
 	 * Cache of concatenated category ID's used in queries.
 	 * @var null|array
 	 */
