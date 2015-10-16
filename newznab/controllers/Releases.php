@@ -428,6 +428,39 @@ class Releases
 	}
 
 	/**
+	 * Get a count of previews for pager. used in admin manage list
+	 */
+	public function getPreviewCount($previewtype, $cat)
+	{
+		$catsrch = "";
+		if (count($cat) > 0 && $cat[0] != -1) {
+			$catsrch = " and (";
+			foreach ($cat as $category) {
+				if ($category != -1) {
+					$categ = new Categorize();
+					if ($categ->isParent($category)) {
+						$children = $categ->getChildren($category);
+						$chlist = "-99";
+						foreach ($children as $child)
+							$chlist .= ", " . $child["id"];
+
+						if ($chlist != "-99")
+							$catsrch .= " releases.categoryid in (" . $chlist . ") or ";
+					} else {
+						$catsrch .= sprintf(" releases.categoryid = %d or ", $category);
+					}
+				}
+			}
+			$catsrch .= "1=2 )";
+		}
+
+		$sql = sprintf("SELECT count(id) AS num FROM releases WHERE haspreview = %d %s ", $previewtype, $catsrch);
+		$res = $this->pdo->queryOneRow($sql);
+
+		return $res["num"];
+	}
+
+	/**
 	 * Cache of concatenated category ID's used in queries.
 	 * @var null|array
 	 */
