@@ -220,7 +220,7 @@ switch ($options[1]) {
 			$backFill->backfillAllGroups($groupMySQL['name'], 20000, 'normal');
 
 			// Create releases.
-			processReleases(new ProcessReleases(['Settings' => $pdo]), $options[2]);
+			processReleases($pdo, new ProcessReleases(['Settings' => $pdo]), $options[2]);
 
 			// Post process the releases.
 			(new ProcessAdditional(['Echo' => true, 'NNTP' => $nntp, 'Settings' => $pdo]))->start($options[2]);

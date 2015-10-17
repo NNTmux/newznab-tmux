@@ -1,4 +1,5 @@
 2015-10-17 DariusIII
+	Fix: Missing use statements
 	Fix: update_releases script and path to it in Forking.php
 	Fix: Autoloading and api errors
 2015-10-16 DariusIII

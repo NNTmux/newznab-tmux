@@ -14,6 +14,7 @@ use newznab\controllers\RequestIDLocal;
 use newznab\controllers\RequestIDWeb;
 use newznab\controllers\PreHash;
 use newznab\controllers\Genres;
+use newznab\controllers\NNTP;
 
 class ProcessReleases
 {
