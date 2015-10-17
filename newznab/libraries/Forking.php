@@ -603,7 +603,7 @@ class Forking extends \fork_daemon
 				);
 			} else {
 				$this->_executeCommand(
-					PHP_BINARY . ' ' . NN_TMUX . 'bin' . DS . 'update_releases.php 1 false ' . $group['name']
+					PHP_BINARY . ' ' . NN_UPDATE . 'update_releases.php 1 false ' . $group['name']
 				);
 			}
 		}
