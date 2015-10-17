@@ -1,3 +1,5 @@
+2015-10-17 DariusIII
+	Fix: Autoloading and api errors
 2015-10-16 DariusIII
 	Fix: Add getPreviewCount and getPreviewRange functions used in admin preview list
 	Fix: Path to smarty dir

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PSR-0 compliant autoloader for libs
  *
