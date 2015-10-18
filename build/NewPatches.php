@@ -32,7 +32,6 @@ if (!Utility::isCLI()) {
 $error = false;
 $git = new Git();
 $branch = $git->active_branch();
-
 if (in_array($branch, $git->mainBranches())) {
 	// Only update patches, etc. on specific branches to lessen conflicts
 	try {
