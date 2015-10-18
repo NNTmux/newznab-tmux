@@ -45,5 +45,3 @@ define('NN_SSL_VERIFY_PEER', '0');
 define('NN_SSL_VERIFY_HOST', '0');
 /* Allow self signed certificates. Note this does not work on CURL as CURL does not have this option. */
 define('NN_SSL_ALLOW_SELF_SIGNED', '1');
-
-require_once 'automated.config.php';
