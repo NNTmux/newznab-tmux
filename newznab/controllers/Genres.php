@@ -1,4 +1,5 @@
 <?php
+namespace newznab\controllers;
 
 use newznab\db\Settings;
 
@@ -12,7 +13,7 @@ class Genres
 	const STATUS_DISABLED = 1;
 
 	/**
-	 * @var newznab\db\Settings;
+	 * @var \newznab\db\Settings;
 	 */
 	public $pdo;
 

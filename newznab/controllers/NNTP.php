@@ -1,4 +1,5 @@
 <?php
+namespace newznab\controllers;
 /**
  * Attempt to include PEAR's nntp class if it has not already been included.
  */

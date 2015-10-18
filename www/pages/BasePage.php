@@ -1,10 +1,14 @@
 <?php
+
 require_once SMARTY_DIR . 'Autoloader.php';
 
 Smarty_Autoloader::register();
 require_once NN_LIB . 'utility' . DS . 'SmartyUtils.php';
 
 use newznab\db\Settings;
+use newznab\controllers\Captcha;
+use newznab\controllers\Users;
+use newznab\controllers\SABnzbd;
 
 class BasePage
 {
@@ -16,7 +20,7 @@ class BasePage
 	/**
 	 * Public access to Captcha object for error checking.
 	 *
-	 * @var \Captcha
+	 * @var Captcha
 	 */
 	public $captcha;
 
@@ -75,7 +79,7 @@ class BasePage
 		$this->smarty->setTemplateDir(
 			[
 				'user_frontend' => NN_WWW . 'themes/' . $this->settings->getSetting('style') . '/templates/frontend',
-				'frontend' => NN_WWW . 'themes/nntmux/templates/frontend'
+				'frontend' => NN_WWW . 'themes/omicron/templates/frontend'
 			]
 		);
 		$this->smarty->setCompileDir(SMARTY_DIR.'templates_c'.DIRECTORY_SEPARATOR);
@@ -106,7 +110,7 @@ class BasePage
 					$this->smarty->setTemplateDir(
 							[
 							'user_frontend' => NN_WWW . 'themes/' . $this->userdata['style'] . '/templates/frontend',
-							'frontend'      => NN_WWW . 'themes/nntmux/templates/frontend'
+							'frontend'      => NN_WWW . 'themes/omicron/templates/frontend'
 						]
 					);
 				}

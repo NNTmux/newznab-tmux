@@ -1,4 +1,7 @@
 <?php
+namespace newznab\controllers;
+
+use Page;
 
 final class NZBVortex
 {
@@ -268,7 +271,12 @@ final class NZBVortex
 
     /**
      * sendRequest()
+     *
+     * @param       $path
+     * @param array $params
+     *
      * @return array
+     * @throws \Exception
      */
     protected function sendRequest($path, $params = [])
     {
@@ -298,7 +306,7 @@ final class NZBVortex
         switch ($status)
         {
             case 0:
-                throw new Exception(sprintf('Unable to connect. Is NZBVortex running? Is your API key correct? Is something blocking ports? (Err: %s)', $error));
+                throw new \Exception(sprintf('Unable to connect. Is NZBVortex running? Is your API key correct? Is something blocking ports? (Err: %s)', $error));
                 break;
 
             case 200:
@@ -306,11 +314,11 @@ final class NZBVortex
                 break;
 
             case 403:
-                throw new Exception('Unable to login. Is your API key correct?');
+                throw new \Exception('Unable to login. Is your API key correct?');
                 break;
 
             default:
-                throw new Exception(sprintf("%s (%s): %s", $path, $status, $response['result']));
+                throw new \Exception(sprintf("%s (%s): %s", $path, $status, $response['result']));
                 break;
         }
     }

@@ -1,8 +1,12 @@
 <?php
+namespace newznab\controllers;
 
 use newznab\db\Settings;
 use newznab\utility\Utility;
 use newznab\processing\PostProcess;
+use newznab\controllers\Category;
+use newznab\controllers\Categorize;
+use Page;
 
 /**
  * This class handles storage and retrieval of releases rows and the main processing functions
@@ -58,7 +62,7 @@ class Releases
 	public $sphinxSearch;
 
 	/**
-	 * @var newznab\db\Settings
+	 * @var \newznab\db\Settings
 	 */
 	public $pdo;
 
@@ -152,7 +156,7 @@ class Releases
 		$this->echoCLI = ($options['Echo'] && NN_ECHOCLI);
 
 		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
-		$this->consoleTools = ($options['ConsoleTools'] instanceof \ConsoleTools ? $options['ConsoleTools'] : new \ConsoleTools(['ColorCLI' => $this->pdo->log]));
+		$this->consoleTools = ($options['ConsoleTools'] instanceof ConsoleTools ? $options['ConsoleTools'] : new ConsoleTools(['ColorCLI' => $this->pdo->log]));
 		$this->groups = ($options['Groups'] instanceof Groups ? $options['Groups'] : new Groups(['Settings' => $this->pdo]));
 		$this->nzb = ($options['NZB'] instanceof NZB ? $options['NZB'] : new NZB());
 		$this->releaseCleaning = ($options['ReleaseCleaning'] instanceof ReleaseCleaning ? $options['ReleaseCleaning'] : new ReleaseCleaning($this->pdo));
@@ -1138,7 +1142,7 @@ class Releases
 	{
 		// Get the category for the parent of this release.
 		$currRow = $this->getById($currentID);
-		$catRow = (new \Category(['Settings' => $this->pdo]))->getById($currRow['categoryid']);
+		$catRow = (new Category(['Settings' => $this->pdo]))->getById($currRow['categoryid']);
 		$parentCat = $catRow['parentid'];
 
 		$results = $this->search(
@@ -1338,7 +1342,7 @@ class Releases
 	{
 		$sql = '';
 		if (count($categories) > 0 && $categories[0] != -1) {
-			$Category = new \Category(['Settings' => $this->pdo]);
+			$Category = new Category(['Settings' => $this->pdo]);
 			$sql = ' AND (';
 			foreach ($categories as $category) {
 				if ($category != -1) {
@@ -2644,8 +2648,8 @@ class Releases
 	public function deleteReleases()
 	{
 		$startTime = time();
-		$category = new \Category(['Settings' => $this->pdo]);
-		$genres = new \Genres(['Settings' => $this->pdo]);
+		$category = new Category(['Settings' => $this->pdo]);
+		$genres = new Genres(['Settings' => $this->pdo]);
 		$passwordDeleted = $duplicateDeleted = $retentionDeleted = $completionDeleted = $disabledCategoryDeleted = 0;
 		$disabledGenreDeleted = $miscRetentionDeleted = $miscHashedDeleted = $categoryMinSizeDeleted = 0;
 
@@ -2675,7 +2679,7 @@ class Releases
 			$releases = $this->pdo->queryDirect(
 				sprintf(
 					'SELECT id, guid FROM releases WHERE passwordstatus = %d',
-					\Releases::PASSWD_RAR
+					Releases::PASSWD_RAR
 				)
 			);
 			if ($releases instanceof \Traversable) {
@@ -2691,7 +2695,7 @@ class Releases
 			$releases = $this->pdo->queryDirect(
 				sprintf(
 					'SELECT id, guid FROM releases WHERE passwordstatus = %d',
-					\Releases::PASSWD_POTENTIAL
+					Releases::PASSWD_POTENTIAL
 				)
 			);
 			if ($releases instanceof \Traversable) {
@@ -2812,7 +2816,7 @@ class Releases
 					FROM releases
 					WHERE categoryid = %d
 					AND adddate <= NOW() - INTERVAL %d HOUR',
-					\Category::CAT_MISC_OTHER,
+					Category::CAT_MISC_OTHER,
 					$this->pdo->getSetting('miscotherretentionhours')
 				)
 			);
@@ -2832,7 +2836,7 @@ class Releases
 					FROM releases
 					WHERE categoryid = %d
 					AND adddate <= NOW() - INTERVAL %d HOUR',
-					\Category::CAT_MISC_HASHED,
+					Category::CAT_MISC_HASHED,
 					$this->pdo->getSetting('mischashedretentionhours')
 				)
 			);
@@ -2898,7 +2902,7 @@ class Releases
 	 */
 	public function categorizeRelease($type, $where = '')
 	{
-		$cat = new \Categorize(['Settings' => $this->pdo]);
+		$cat = new Categorize(['Settings' => $this->pdo]);
 		$categorized = $total = 0;
 		$releases = $this->pdo->queryDirect(sprintf('SELECT id, %s, groupid FROM releases %s', $type, $where));
 		if ($releases && $releases->rowCount()) {
@@ -2969,7 +2973,7 @@ class Releases
 	public function resetCategorize($where = '')
 	{
 		$this->pdo->queryExec(
-			sprintf('UPDATE releases SET categoryid = %d, iscategorized = 0 %s', \Category::CAT_MISC_OTHER, $where)
+			sprintf('UPDATE releases SET categoryid = %d, iscategorized = 0 %s', Category::CAT_MISC_OTHER, $where)
 		);
 	}
 

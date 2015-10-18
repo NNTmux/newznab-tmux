@@ -1,4 +1,5 @@
 <?php
+namespace newznab\controllers;
 
 use newznab\db\Settings;
 
@@ -48,7 +49,7 @@ class IRCScraper extends IRCClient
 	protected $_oldPre;
 
 	/**
-	 * @var newznab\db\Settings
+	 * @var \newznab\db\Settings
 	 * @access protected
 	 */
 	protected $_pdo;

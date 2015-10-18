@@ -1,4 +1,5 @@
 <?php
+namespace newznab\controllers;
 
 use newznab\db\Settings;
 use newznab\libraries\ApaiIO\Configuration\GenericConfiguration;
@@ -11,7 +12,7 @@ use newznab\libraries\ApaiIO\ApaiIO;
 class Books
 {
 	/**
-	 * @var newznab\db\Settings
+	 * @var \newznab\db\Settings
 	 */
 	public $pdo;
 

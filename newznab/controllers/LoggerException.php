@@ -1,4 +1,5 @@
 <?php
+namespace newznab\controllers;
 /**
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,17 +17,11 @@
  *
  * @link <http://www.gnu.org/licenses/>.
  * @author niel
- * @copyright 2014 nZEDb
+ * @copyright 2015 nZEDb
  */
 
-require_once NN_CORE . 'autoloader.php';
-require_once NN_LIB . 'autoloader.php';
-require_once NN_LIBS . 'autoloader.php';
 
-require_once NN_WWW . '/SPLClassLoader.php';
+class LoggerException extends \Exception
+{
 
-$paths = [NN_ROOT, NN_WWW . 'pages', SMARTY_DIR, SMARTY_DIR . 'plugins', SMARTY_DIR . 'sysplugins'];
-$classLoader = new \SplClassLoader(null, $paths);
-$classLoader->register();
-
-?>
+}

@@ -1,4 +1,5 @@
 <?php
+namespace newznab\controllers;
 use newznab\db\Settings;
 use \newznab\processing\PostProcess;
 use newznab\utility\Utility;
@@ -15,7 +16,7 @@ class Nfo
 {
 	/**
 	 * Instance of class DB
-	 * @var newznab\db\Settings
+	 * @var \newznab\db\Settings
 	 * @access private
 	 */
 	public $pdo;

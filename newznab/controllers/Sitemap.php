@@ -1,4 +1,5 @@
 <?php
+namespace newznab\controllers;
 class Sitemap
 {
 	public $type = '';
@@ -6,7 +7,7 @@ class Sitemap
 	public $loc = '';
 	public $priority = '';
 	public $changefreq = '';
-	
+
 	function Sitemap($t, $n, $l, $p, $c)
 	{
 		$this->type = $t;

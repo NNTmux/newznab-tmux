@@ -1,11 +1,12 @@
 <?php
+namespace newznab\controllers;
 
 use newznab\db\Settings;
 
 class AniDB
 {
 	/**
-	 * @var newznab\db\Settings
+	 * @var \newznab\db\Settings
 	 */
 	public $pdo;
 

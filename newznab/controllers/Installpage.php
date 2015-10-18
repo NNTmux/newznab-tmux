@@ -1,5 +1,7 @@
 <?php
-require_once NN_LIBS . 'smarty/Smarty.class.php';
+namespace newznab\controllers;
+
+require_once NN_LIBS . 'Smarty.class.php';
 
 /**
  * This class represents each page during installation.

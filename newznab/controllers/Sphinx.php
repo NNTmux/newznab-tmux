@@ -1,4 +1,5 @@
 <?php
+namespace newznab\controllers;
 /**
  *
  * Sphinx search extension for Newznab.

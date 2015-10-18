@@ -1,4 +1,5 @@
 <?php
+namespace newznab\controllers;
 
 /**
  * Attempts to find a PRE name for a release using a request id from our local pre database,

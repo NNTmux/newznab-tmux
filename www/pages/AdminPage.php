@@ -1,5 +1,6 @@
 <?php
-require_once("config.php");
+
+use newznab\controllers\Users;
 
 /**
  * All admin pages implement this class. Enforces admin role for requesting user.
@@ -15,9 +16,9 @@ class AdminPage extends BasePage
 
 		$tplpaths = [];
 		if ($this->settings->getSetting('style') != "default")
-			$tplpaths["style_admin"] = WWW_DIR.'themes_shared/templates/admin';
-		$tplpaths["admin"] = WWW_DIR.'themes_shared/templates/admin';
-		$tplpaths["frontend"] = WWW_DIR.'themes/nntmux/templates/frontend';
+			$tplpaths["style_admin"] = NN_WWW.'themes_shared/templates/admin';
+		$tplpaths["admin"] = NN_WWW.'themes_shared/templates/admin';
+		$tplpaths["frontend"] = NN_WWW.'themes/nntmux/templates/frontend';
 		$this->smarty->setTemplateDir($tplpaths);
 
 		$users = new Users();

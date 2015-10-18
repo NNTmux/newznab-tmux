@@ -1,4 +1,5 @@
 <?php
+namespace newznab\controllers;
 
 /**
  * Structure for holding data during install.
@@ -77,12 +78,12 @@ class Install
 	 */
 	public function __construct()
 	{
-		$this->WWW_DIR = dirname(realpath('.'));
-		$this->SMARTY_DIR = $this->WWW_DIR.'/lib/smarty';
+		$this->NN_WWW = dirname(realpath('.'));
+		$this->SMARTY_DIR = $this->NN_WWW.'/lib/smarty';
 		$this->DB_DIR = dirname(realpath('..')).'/db';
 		$this->MISC_DIR = dirname(realpath('..')).'/misc';
 		$this->NZB_PATH = str_replace('\\', '/', dirname(realpath('..'))).'/nzbfiles/';
-		$this->INSTALL_DIR = $this->WWW_DIR.'/install';
+		$this->INSTALL_DIR = $this->NN_WWW.'/install';
 	}
 
 	/**
@@ -157,7 +158,7 @@ class Install
 		$tmpCfg = str_replace('%%CACHEOPT_METHOD%%', $this->CACHE_TYPE, $tmpCfg);
 
 		$this->COMPILED_CONFIG = $tmpCfg;
-		return @file_put_contents($this->WWW_DIR.'/config.php', $tmpCfg);
+		return @file_put_contents($this->NN_WWW.'/config.php', $tmpCfg);
 	}
 
 	/**

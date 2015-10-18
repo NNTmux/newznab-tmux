@@ -1,4 +1,5 @@
 2015-10-18 DariusIII
+	Chg: Move config files into newznab/config folder. Move BasePage, AdminPage and page to www/pages folder where they belong.
 	Fix: Fix processReleases call in switch.php and instantiation of classes
 2015-10-13 DariusIII
 	Fix: improve speed by replacing str_ireplace with strpos.Pushing again.

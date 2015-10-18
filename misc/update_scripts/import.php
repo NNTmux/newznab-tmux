@@ -4,6 +4,12 @@ require_once dirname(__FILE__) . '/../../www/config.php';
 
 use newznab\db\Settings;
 use newznab\utility\Utility;
+use newznab\controllers\Releases;
+use newznab\controllers\ReleaseImage;
+use newznab\controllers\Categorize;
+use newznab\controllers\ReleaseRegex;
+use newznab\controllers\NZB;
+use newznab\controllers\NZBInfo;
 
 $releases = new Releases();
 $releaseImage = new ReleaseImage();
@@ -149,7 +155,7 @@ foreach ($filestoprocess as $nzbFile) {
 							$db->escapeString(md5($postFile["subject"] . $postFile["poster"] . $groupID)),
 							$regexMatches['regcatid'],
 							$regexMatches['regexid'], $db->escapeString($regexMatches['reqid']),
-							\Releases::PROCSTAT_TITLEMATCHED, $relparts[0], $relparts[1], $db->escapeString(str_replace('_', ' ', $regexMatches['name']))
+							Releases::PROCSTAT_TITLEMATCHED, $relparts[0], $relparts[1], $db->escapeString(str_replace('_', ' ', $regexMatches['name']))
 						);
 						$binaryId = $db->queryInsert($sql);
 						$numbins++;

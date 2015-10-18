@@ -1,4 +1,5 @@
 <?php
+namespace newznab\controllers;
 
 use newznab\db\Settings;
 use newznab\utility\Utility;
@@ -10,7 +11,7 @@ class TheTVDB
 	const APIKEY	= 'E1669B52D4FBFF11';
 
 	/**
-	 * @var newznab\db\Settings
+	 * @var \newznab\db\Settings
 	 */
 	public $pdo;
 

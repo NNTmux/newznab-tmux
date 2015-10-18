@@ -1,4 +1,5 @@
 <?php
+namespace newznab\controllers;
 
 use newznab\db\Settings;
 
@@ -11,7 +12,7 @@ if(!defined('OPENSSL_KEYTYPE_RSA')) {
 }
 
 // Define OpenSSL Config File
-define('OPENSSL_CFG_PATH', WWW_DIR.'/lib/openssl/openssl.cnf');
+define('OPENSSL_CFG_PATH', NN_WWW.'/lib/openssl/openssl.cnf');
 
 // JSON Encode Support (for those missing the constants)
 if(!defined('JSON_HEX_TAG')) define('JSON_HEX_TAG', 1);

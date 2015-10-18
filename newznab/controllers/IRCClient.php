@@ -1,4 +1,5 @@
 <?php
+namespace newznab\controllers;
 
 /**
  * Basic IRC client for fetching IRCScraper.

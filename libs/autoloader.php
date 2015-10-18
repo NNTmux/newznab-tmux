@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PSR-0 compliant autoloader for libs
  *
@@ -58,5 +59,3 @@ spl_autoload_register(
 		}
 	}
 );
-
-?>
