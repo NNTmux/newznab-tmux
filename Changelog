@@ -1,4 +1,5 @@
 2015-10-18 DariusIII
+	Fix: Use queryExec and not queryDelete in Releases.php
 	Chg: Remove require for automated.config.php
 	Chg: Move config files into newznab/config folder. Move BasePage, AdminPage and page to www/pages folder where they belong.
 	Fix: Fix processReleases call in switch.php and instantiation of classes

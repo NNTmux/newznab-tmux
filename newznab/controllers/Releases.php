@@ -4,8 +4,6 @@ namespace newznab\controllers;
 use newznab\db\Settings;
 use newznab\utility\Utility;
 use newznab\processing\PostProcess;
-use newznab\controllers\Category;
-use newznab\controllers\Categorize;
 use Page;
 
 /**
@@ -1651,7 +1649,7 @@ class Releases
 			$this->pdo->log->doEcho($this->pdo->log->primary('Complete - ' . $cc . ' rows affected'));
 		} else {
 			$this->pdo->log->doEcho($this->pdo->log->primary('Deleting unused binaries and parts'));
-			$this->pdo->queryDelete(sprintf("DELETE %s, %s FROM %s JOIN %s  ON %s.id = %s.binaryid
+			$this->pdo->queryExec(sprintf("DELETE %s, %s FROM %s JOIN %s  ON %s.id = %s.binaryid
 			WHERE %s.dateadded < %s - INTERVAL %d HOUR",
 					$group['pname'],
 					$group['bname'],
@@ -1874,7 +1872,7 @@ class Releases
 					$group['bname'], Releases::PROCSTAT_RELEASED, $relid, $this->pdo->escapeString($row["relname"]), Releases::PROCSTAT_READYTORELEASE, (!empty($groupID) ? ' groupid = ' . $groupID . ' AND ' : ' '), $this->pdo->escapeString($row["fromname"])
 				)
 			);
-		$cat = new \Categorize(['Settings' => $this->pdo]);
+		$cat = new Categorize(['Settings' => $this->pdo]);
 
 			//
 			// Write the nzb to disk
@@ -1886,7 +1884,7 @@ class Releases
 			//
 			// Remove used binaries
 			//
-			$this->pdo->queryDelete(sprintf("DELETE %s, %s FROM %s JOIN %s ON %s.id = %s.binaryid WHERE releaseid = %d ",
+			$this->pdo->querExec(sprintf("DELETE %s, %s FROM %s JOIN %s ON %s.id = %s.binaryid WHERE releaseid = %d ",
 					$group['pname'],
 					$group['bname'],
 					$group['pname'],
@@ -2202,7 +2200,7 @@ class Releases
 		$this->sphinxSearch->deleteRelease($identifiers, $this->pdo);
 
 		// Delete from DB.
-		$this->pdo->queryDelete(
+		$this->pdo->queryExec(
 			sprintf('
 				DELETE r, rn, rc, uc, rf, ra, rs, rv, re, df
 				FROM releases r
