@@ -1,4 +1,4 @@
-INSERT IGNORE INTO site (setting, value) VALUES
+INSERT IGNORE INTO settings (setting, value) VALUES
 ('lookup_reqids',	'1'),
 ('reqidthreads', '1'),
 ('request_hours', '1'),

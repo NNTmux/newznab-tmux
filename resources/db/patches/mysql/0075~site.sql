@@ -1,1 +1,1 @@
-INSERT IGNORE INTO site (setting, value) VALUE ('alternate_nntp', '0');
+INSERT IGNORE INTO settings (setting, value) VALUE ('alternate_nntp', '0');

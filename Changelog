@@ -1,4 +1,5 @@
 2015-10-19 DariusIII
+	Fix: references to site replaced with settings
 	Chg: Moved db.sql into resources/db/schema folder, patchDB does not need to be used anymore. Will be removed in next patch
 	Upd: Fix tmux paths for moved files.
 	Upd: Refactor branch completely.

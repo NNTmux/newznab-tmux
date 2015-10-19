@@ -1,1 +1,1 @@
-INSERT IGNORE INTO site (setting, value) VALUE  ('safebackfilldate', '2012-06-24');
+INSERT IGNORE INTO settings (setting, value) VALUE  ('safebackfilldate', '2012-06-24');

@@ -1,3 +1,3 @@
-INSERT IGNORE INTO site (setting, value) VALUES
+INSERT IGNORE INTO settings (setting, value) VALUES
  ('timeoutpath', ''),
  ('timeoutseconds', '0');

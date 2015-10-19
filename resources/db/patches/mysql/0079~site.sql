@@ -1,1 +1,1 @@
-INSERT IGNORE INTO site (setting, value) VALUE ('maxnforetries', '5');
+INSERT IGNORE INTO settings (setting, value) VALUE ('maxnforetries', '5');

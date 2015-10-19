@@ -1,2 +1,2 @@
-INSERT IGNORE INTO site (setting, value) VALUE
+INSERT IGNORE INTO settings (setting, value) VALUE
 ('nntpproxy','0');

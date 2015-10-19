@@ -1,4 +1,4 @@
-INSERT IGNORE INTO site (setting, value) VALUES
+INSERT IGNORE INTO settings (setting, value) VALUES
   ('grabstatus', 1),
   ('crossposttime',	2),
   ('deletepossiblerelease', 0),
