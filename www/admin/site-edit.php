@@ -2,6 +2,9 @@
 require_once("config.php");
 
 use newznab\db\Settings;
+use newznab\Sites;
+use newznab\SABnzbd;
+
 $page = new AdminPage();
 $sites = new Settings();
 $id = 0;
