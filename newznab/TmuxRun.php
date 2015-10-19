@@ -140,7 +140,7 @@ class TmuxRun extends Tmux
 			case 1:
 				$log = $this->writelog($runVar['panes']['one'][3]);
 				shell_exec("tmux respawnp -t{$runVar['constants']['tmux_session']}:1.3 ' \
-					{$runVar['commands']['_php']} {$runVar['paths']['misc']}update_scripts/nix_scripts/tmux/lib/decrypt_hashes.php 1000 $log; \
+					{$runVar['commands']['_php']} {$runVar['paths']['misc']}update_scripts/decrypt_hashes.php 1000 $log; \
 					date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} {$runVar['settings']['dehash_timer']}' 2>&1 1> /dev/null"
 				);
 				break;
@@ -148,7 +148,7 @@ class TmuxRun extends Tmux
 				$log = $this->writelog($runVar['panes']['one'][3]);
 				shell_exec("tmux respawnp -t{$runVar['constants']['tmux_session']}:1.3 ' \
 					{$runVar['commands']['_php']} {$runVar['paths']['misc']}update_scripts/update_predb.php true $log; \
-					{$runVar['commands']['_php']} {$runVar['paths']['misc']}update_scripts/nix_scripts/tmux/lib/postprocess_pre.php {$runVar['constants']['pre_lim']} $log; \
+					{$runVar['commands']['_php']} {$runVar['paths']['misc']}update_scripts/postprocess_pre.php {$runVar['constants']['pre_lim']} $log; \
 					date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} {$runVar['settings']['dehash_timer']}' 2>&1 1> /dev/null"
 				);
 				break;
@@ -156,8 +156,8 @@ class TmuxRun extends Tmux
 				$log = $this->writelog($runVar['panes']['one'][3]);
 				shell_exec("tmux respawnp -t{$runVar['constants']['tmux_session']}:1.3 ' \
 					{$runVar['commands']['_php']} {$runVar['paths']['misc']}update_scripts/update_predb.php true $log; \
-					{$runVar['commands']['_php']} {$runVar['paths']['misc']}update_scripts/nix_scripts/tmux/lib/postprocess_pre.php {$runVar['constants']['pre_lim']} $log; \
-					{$runVar['commands']['_php']} {$runVar['paths']['misc']}update_scripts/nix_scripts/tmux/lib/decrypt_hashes.php 1000 $log; \
+					{$runVar['commands']['_php']} {$runVar['paths']['misc']}update_scripts/postprocess_pre.php {$runVar['constants']['pre_lim']} $log; \
+					{$runVar['commands']['_php']} {$runVar['paths']['misc']}update_scripts/decrypt_hashes.php 1000 $log; \
 					date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} {$runVar['settings']['dehash_timer']}' 2>&1 1> /dev/null"
 				);
 				break;
@@ -420,7 +420,7 @@ class TmuxRun extends Tmux
 			case 'All':
 				$log = $this->writelog($runVar['panes']['one'][1]);
 				shell_exec("tmux respawnp -t{$runVar['constants']['tmux_session']}:1.1 ' \
-						{$runVar['commands']['_php']} {$runVar['paths']['misc']}update_scripts/nix_scripts/tmux/lib/removeCrapReleases.php true 2 $log; \
+						{$runVar['commands']['_php']} {$runVar['paths']['misc']}testing/Releases/removeCrapReleases.php true 2 $log; \
 						date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} {$runVar['settings']['crap_timer']}' 2>&1 1> /dev/null"
 				);
 				break;
@@ -446,7 +446,7 @@ class TmuxRun extends Tmux
 						// Run remove crap releases.
 						shell_exec("tmux respawnp -t{$runVar['constants']['tmux_session']}:1.1 ' \
 							echo \"Running removeCrapReleases for {$runVar['modsettings']['fix_crap'][$runVar['modsettings']['fc']['num']]}\"; \
-							{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}update_scripts/nix_scripts/tmux/lib/removeCrapReleases.php true  \
+							{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}testing/Releases/removeCrapReleases.php true  \
 							{$runVar['modsettings']['fc']['time']} {$runVar['modsettings']['fix_crap'][$runVar['modsettings']['fc']['num']]} $log; \
 							date +\"{$this->_dateFormat}\"; {$runVar['commands']['_sleep']} {$runVar['settings']['crap_timer']}' 2>&1 1> /dev/null"
 						);
@@ -684,7 +684,7 @@ class TmuxRun extends Tmux
 			if (shell_exec("tmux list-panes -t{$runVar['constants']['tmux_session']}:${pane} | grep ^0 | grep -c dead") == 1) {
 				shell_exec(
 					"tmux respawnp -t{$runVar['constants']['tmux_session']}:${pane}.0 ' \
-					{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}testing/IRCScraper/scrape.php true'"
+					{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}IRCScraper/scrape.php true'"
 				);
 			}
 		} else {
