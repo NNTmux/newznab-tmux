@@ -1,4 +1,5 @@
 2015-10-19 DariusIII
+	Fix: Fix book and misc menu in omicron template
 	Upd: Many small changes to classes
 	Chg: InnoDB to MYISAM in patches
 	Fix: Wrong path to indexer.php
