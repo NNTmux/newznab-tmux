@@ -1,5 +1,10 @@
 <?php
 
+use newznab\Binaries;
+use newznab\Groups;
+use newznab\Sharing;
+use newznab\ReleaseComments;
+
 // This script waits for ajax queries from the web.
 
 if (!isset($_GET['action'])) {

@@ -1,5 +1,7 @@
 <?php
 
+use newznab\Music;
+
 $music = new Music;
 
 if (!$page->users->isLoggedIn())

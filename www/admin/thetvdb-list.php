@@ -2,6 +2,8 @@
 
 require_once("config.php");
 
+use newznab\TheTVDB;
+
 $page = new AdminPage();
 
 $TheTVDB = new TheTVDB();

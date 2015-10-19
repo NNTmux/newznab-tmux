@@ -18,7 +18,10 @@
  * @author niel
  * @copyright 2014 nZEDb
  */
-require_once realpath(dirname(__DIR__) . '/../www/automated.config.php');
+require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
+
+use newznab\ColorCLI;
+use newznab\utility\Versions;
 
 
 define('NN_GIT', NN_ROOT . '.git' . DS);
@@ -48,7 +51,7 @@ if (preg_match('/^(?P<key>#version=)(?P<value>.*)$/', $file[1], $match)) {
 
 $out = new ColorCLI();
 
-$versions = new \newznab\utility\Versions();
+$versions = new Versions();
 $version = $versions->getGitHookPrecommit();
 if ($version > $current) {
 	copy($source, $target);

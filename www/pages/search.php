@@ -1,5 +1,10 @@
 <?php
 
+use newznab\Groups;
+use newznab\Releases;
+use newznab\ReleaseSearch;
+use newznab\Category;
+
 if (!$page->users->isLoggedIn()) {
 	$page->show403();
 }

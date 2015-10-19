@@ -2,6 +2,9 @@
 
 require_once("config.php");
 
+use newznab\Releases;
+use newznab\Category;
+
 $page = new AdminPage();
 $releases = new Releases(['Settings' => $page->settings]);
 $category = new Category(['Settings' => $page->settings]);

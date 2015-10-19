@@ -6,9 +6,9 @@ Smarty_Autoloader::register();
 require_once NN_LIB . 'utility' . DS . 'SmartyUtils.php';
 
 use newznab\db\Settings;
-use newznab\controllers\Captcha;
-use newznab\controllers\Users;
-use newznab\controllers\SABnzbd;
+use newznab\Captcha;
+use newznab\Users;
+use newznab\SABnzbd;
 
 class BasePage
 {

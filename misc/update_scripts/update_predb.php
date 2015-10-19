@@ -1,5 +1,6 @@
 <?php
 require_once("config.php");
+use newznab\PreDB;
 
 $p = new PreDB(true);
 $p->nzpreUpdate();

@@ -1,11 +1,13 @@
 <?php
-require_once dirname(__FILE__) . '/../../../../www/config.php';
+require_once realpath(dirname(dirname(dirname(dirname(__DIR__)))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
 use newznab\db\Settings;
 use newznab\utility\Utility;
+use newznab\ColorCLI;
+use newznab\Tmux;
 
 $pdo = new Settings();
-$DIR = NN_TMUX;
+$DIR = NN_MISC;
 $c = new ColorCLI();
 $t = new Tmux();
 $tmux = $t->get();
@@ -161,10 +163,10 @@ function window_proxy($tmux_session, $window)
 	}
 
 	if ($nntpproxy === '1' && ($this->pdo->getSetting('alternate_nntp') == '1')) {
-		$DIR = NN_TMUX;
-		$nntpproxypy = $DIR . "python/nntpproxy.py";
-		if (file_exists($DIR . "python/lib/nntpproxy_a.conf")) {
-			$nntpproxyconf = $DIR . "python/lib/nntpproxy_a.conf";
+		$DIR = NN_MISC;
+		$nntpproxypy = $DIR . "update_scripts/python/nntpproxy.py";
+		if (file_exists($DIR . "update_scripts/python/lib/nntpproxy_a.conf")) {
+			$nntpproxyconf = $DIR . "update_scripts/python/lib/nntpproxy_a.conf";
 			exec("tmux selectp -t $tmux_session:$window.0; tmux splitw -t $tmux_session:$window -h -p 50 'printf \"\033]2;NNTPProxy\033\" && python $nntpproxypy $nntpproxyconf'");
 		}
 	}
@@ -227,19 +229,19 @@ function attach($DIR, $tmux_session)
 	$panes_win_1 = exec("echo `tmux list-panes -t $tmux_session:0 -F '#{pane_title}'`");
 	$panes0 = str_replace("\n", '', explode(" ", $panes_win_1));
 	$log = writelog($panes0[0]);
-	exec("tmux respawnp -t $tmux_session:0.0 '$PHP " . $DIR . "monitor.php $log'");
+	exec("tmux respawnp -t $tmux_session:0.0 '$PHP " . $DIR . "update_scripts/nix_scripts/tmux/monitor.php $log'");
 	exec("tmux select-window -t $tmux_session:0; tmux attach-session -d -t $tmux_session");
 }
 
 //create tmux session
 if ($powerline == 1) {
-	$tmuxconfig = $DIR . "powerline/tmux.conf";
+	$tmuxconfig = $DIR . "update_scripts/nix_scripts/tmux/powerline/tmux.conf";
 } else {
-	$tmuxconfig = $DIR . "tmux.conf";
+	$tmuxconfig = $DIR . "update_scripts/nix_scripts/tmux/tmux.conf";
 }
 
 if ($seq == 1) {
-	exec("cd ${DIR}; tmux -f $tmuxconfig new-session -d -s $tmux_session -n Monitor 'printf \"\033]2;\"Monitor\"\033\"'");
+	exec("cd ${DIR}/update_scripts/nix_scripts/tmux; tmux -f $tmuxconfig new-session -d -s $tmux_session -n Monitor 'printf \"\033]2;\"Monitor\"\033\"'");
 	exec("tmux selectp -t $tmux_session:0.0; tmux splitw -t $tmux_session:0 -h -p 67 'printf \"\033]2;update_releases\033\"'");
 	exec("tmux selectp -t $tmux_session:0.0; tmux splitw -t $tmux_session:0 -v -p 25 'printf \"\033]2;nzb-import\033\"'");
 
@@ -256,7 +258,7 @@ if ($seq == 1) {
 	start_apps($tmux_session);
 	attach($DIR, $tmux_session);
 } else if ($seq == 2) {
-	exec("cd ${DIR}; tmux -f $tmuxconfig new-session -d -s $tmux_session -n Monitor 'printf \"\033]2;\"Monitor\"\033\"'");
+	exec("cd ${DIR}/update_scripts/nix_scripts/tmux; tmux -f $tmuxconfig new-session -d -s $tmux_session -n Monitor 'printf \"\033]2;\"Monitor\"\033\"'");
 	exec("tmux selectp -t $tmux_session:0.0; tmux splitw -t $tmux_session:0 -h -p 67 'printf \"\033]2;sequential\033\"'");
 	exec("tmux selectp -t $tmux_session:0.0; tmux splitw -t $tmux_session:0 -v -p 25 'printf \"\033]2;nzb-import\033\"'");
 
@@ -273,7 +275,7 @@ if ($seq == 1) {
 	start_apps($tmux_session);
 	attach($DIR, $tmux_session);
 } else {
-	exec("cd ${DIR}; tmux -f $tmuxconfig new-session -d -s $tmux_session -n Monitor 'printf \"\033]2;Monitor\033\"'");
+	exec("cd ${DIR}/update_scripts/nix_scripts/tmux; tmux -f $tmuxconfig new-session -d -s $tmux_session -n Monitor 'printf \"\033]2;Monitor\033\"'");
 	exec("tmux selectp -t $tmux_session:0.0; tmux splitw -t $tmux_session:0 -h -p 67 'printf \"\033]2;update_binaries\033\"'");
 	exec("tmux selectp -t $tmux_session:0.0; tmux splitw -t $tmux_session:0 -v -p 25 'printf \"\033]2;nzb-import\033\"'");
 	exec("tmux selectp -t $tmux_session:0.2; tmux splitw -t $tmux_session:0 -v -p 67 'printf \"\033]2;backfill\033\"'");

@@ -2,6 +2,8 @@
 
 require_once("config.php");
 
+use newznab\Music;
+
 $page = new AdminPage();
 
 $m = new Music();

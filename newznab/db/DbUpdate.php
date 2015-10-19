@@ -22,7 +22,7 @@ namespace newznab\db;
 
 use newznab\utility\Git;
 use newznab\utility\Utility;
-use ColorCLI;
+use newznab\ColorCLI;
 
 
 class DbUpdate

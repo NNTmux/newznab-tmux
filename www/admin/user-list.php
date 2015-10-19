@@ -2,6 +2,8 @@
 
 require_once("config.php");
 
+use newznab\Users;
+
 $page = new AdminPage();
 
 $users = new Users();

@@ -2,6 +2,8 @@
 
 require_once("config.php");
 
+use newznab\Groups;
+
 $page = new AdminPage();
 $msgs = $error = false;
 

@@ -2,6 +2,8 @@
 
 require_once("config.php");
 
+use newznab\TvRage;
+
 $page = new AdminPage();
 
 $tvrage = new TvRage();

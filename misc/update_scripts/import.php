@@ -1,15 +1,15 @@
 <?php
 
-require_once dirname(__FILE__) . '/../../www/config.php';
+require_once("config.php");
 
 use newznab\db\Settings;
 use newznab\utility\Utility;
-use newznab\controllers\Releases;
-use newznab\controllers\ReleaseImage;
-use newznab\controllers\Categorize;
-use newznab\controllers\ReleaseRegex;
-use newznab\controllers\NZB;
-use newznab\controllers\NZBInfo;
+use newznab\Releases;
+use newznab\ReleaseImage;
+use newznab\Categorize;
+use newznab\ReleaseRegex;
+use newznab\NZB;
+use newznab\NZBInfo;
 
 $releases = new Releases();
 $releaseImage = new ReleaseImage();

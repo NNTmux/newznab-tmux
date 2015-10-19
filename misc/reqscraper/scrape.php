@@ -1,7 +1,7 @@
 <?php
 
 require_once('magpierss/rss_fetch.inc');
-require_once('config.php');
+require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
 
 //
 // retrieve a list of feeds to be scraped

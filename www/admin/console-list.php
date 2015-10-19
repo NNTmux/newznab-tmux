@@ -2,6 +2,8 @@
 
 require_once("config.php");
 
+use newznab\Console;
+
 $page = new AdminPage();
 $con  = new Console(['Settings' => $page->settings]);
 

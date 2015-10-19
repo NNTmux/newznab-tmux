@@ -26,7 +26,7 @@ if (!isset($argv[1]) || !in_array($argv[1], ['1'])) {
 	);
 }
 
-require_once dirname(__FILE__) . '/../../../www/config.php';
+require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
 
 use newznab\db\Settings;
 

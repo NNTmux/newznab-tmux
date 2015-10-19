@@ -1,5 +1,6 @@
 <?php
 require_once("config.php");
+use newznab\ReleaseRegex;
 
 // login check
 $admin = new AdminPage;

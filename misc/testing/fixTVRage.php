@@ -1,9 +1,11 @@
 <?php
 
-require_once dirname(__FILE__) . '/../../www/config.php';
+require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
+
+use newznab\db\Settings;
 
 
-$db = new \newznab\db\Settings();
+$db = new Settings();
 $sql = "select distinct rageid from tvrage where rageid in (select rageid from tvrage where rageid != -2 group by rageid having count(*) > 1)";
 $rows = $db->query($sql);
 

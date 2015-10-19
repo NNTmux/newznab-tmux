@@ -1,3 +1,5 @@
+2015-10-19 DariusIII
+	Upd: Refactor branch completely.
 2015-10-18 DariusIII
 	Fix: Use queryExec and not queryDelete in Releases.php
 	Chg: Remove require for automated.config.php

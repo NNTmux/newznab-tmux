@@ -1,6 +1,9 @@
 <?php
 use newznab\utility\Utility;
 use newznab\db\Settings;
+use newznab\ReleaseComments;
+use newznab\Releases;
+use newznab\Category;
 
 $rc = new ReleaseComments;
 
@@ -113,7 +116,7 @@ if ($uid != '') {
 	}
 }
 
-$releases = new \Releases(['Settings' => $page->settings]);
+$releases = new Releases(['Settings' => $page->settings]);
 
 $page->smarty->assign('extended', (isset($_GET['extended']) && $_GET['extended'] == 1 ? '1' : '0'));
 $page->smarty->assign('del', (isset($_GET['del']) && $_GET['del'] == 1 ? '1' : '0'));

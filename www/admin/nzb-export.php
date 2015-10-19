@@ -1,8 +1,12 @@
 <?php
 require_once("config.php");
 
+use newznab\NZBExport;
+use newznab\Releases;
+use newznab\utility\Utility;
 
-if (\newznab\utility\Utility::isCLI()) {
+
+if (Utility::isCLI()) {
 	exit ('This script is only for exporting from the web, use the script in misc/testing' .
 		PHP_EOL);
 }

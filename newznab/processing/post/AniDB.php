@@ -1,7 +1,9 @@
 <?php
 namespace newznab\processing\post;
 
-use \newznab\db\Settings;
+use newznab\db\Settings;
+use newznab\Enzebe;
+use newznab\Category;
 
 class AniDB
 {
@@ -16,7 +18,7 @@ class AniDB
 	public $echooutput;
 
 	/**
-	 * @var \AniDB
+	 * @var \newznab\db\populate\AniDB
 	 */
 	public $padb;
 
@@ -68,8 +70,8 @@ class AniDB
 							AND categoryid = %d
 							ORDER BY postdate DESC
 							LIMIT %d',
-									 \Enzebe::NZB_ADDED,
-									 \Category::CAT_TV_ANIME,
+									 Enzebe::NZB_ADDED,
+									 Category::CAT_TV_ANIME,
 									 $this->aniqty
 							 )
 		);

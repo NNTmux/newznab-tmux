@@ -1,5 +1,8 @@
 <?php
 
+use newznab\Releases;
+use newznab\Category;
+
 $page = new AdminPage();
 $releases = new Releases();
 $category = new Category();

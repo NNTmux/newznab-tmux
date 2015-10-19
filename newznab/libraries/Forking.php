@@ -1,8 +1,13 @@
 <?php
 namespace newznab\libraries;
 
-use \newznab\db\Settings;
-use \newznab\processing\PostProcess;
+use newznab\db\Settings;
+use newznab\processing\PostProcess;
+use newznab\ColorCLI;
+use newznab\NNTP;
+use newznab\Enzebe;
+use newznab\RequestID;
+use newznab\Nfo;
 
 require_once(NN_LIBS . 'forkdaemon-php' . DS . 'fork_daemon.php');
 
@@ -31,7 +36,7 @@ class Forking extends \fork_daemon
 	{
 		parent::__construct();
 
-		$this->_colorCLI = new \ColorCLI();
+		$this->_colorCLI = new ColorCLI();
 
 		$this->register_logging(
 			[0 => $this, 1 => 'logger'],
@@ -68,7 +73,7 @@ class Forking extends \fork_daemon
 			}
 		}
 
-		$this->dnr_path = PHP_BINARY . ' ' . NN_MULTI . '.do_not_run' . DS . 'switch.php "php  ';
+		$this->dnr_path = PHP_BINARY . ' ' . NN_MULTIPROCESSING . '.do_not_run' . DS . 'switch.php "php  ';
 	}
 
 	/**
@@ -598,7 +603,7 @@ class Forking extends \fork_daemon
 				);
 			} else {
 				$this->_executeCommand(
-					PHP_BINARY . ' ' . NN_TMUX . 'bin' . DS . 'update_releases.php 1 false ' . $group['name']
+					PHP_BINARY . ' ' . NN_MISC . 'update_scripts' . DS . 'update_releases.php 1 false ' . $group['name']
 				);
 			}
 		}
@@ -663,7 +668,7 @@ class Forking extends \fork_daemon
 					AND c.disablepreview = 0
 					%s %s
 					LIMIT 1',
-				\Enzebe::NZB_ADDED,
+				Enzebe::NZB_ADDED,
 				$this->ppAddMaxSize,
 				$this->ppAddMinSize
 			)
@@ -689,7 +694,7 @@ class Forking extends \fork_daemon
 					%s %s
 					GROUP BY LEFT(r.guid, 1)
 					LIMIT 16',
-					\Enzebe::NZB_ADDED,
+					Enzebe::NZB_ADDED,
 					$this->ppAddMaxSize,
 					$this->ppAddMinSize
 				)
@@ -708,7 +713,7 @@ class Forking extends \fork_daemon
 	private function checkProcessNfo()
 	{
 		if ($this->pdo->getSetting('lookupnfo') == 1) {
-			$this->nfoQueryString = \Nfo::NfoQueryString($this->pdo);
+			$this->nfoQueryString = Nfo::NfoQueryString($this->pdo);
 			return (
 			$this->pdo->queryOneRow(
 				sprintf(
@@ -759,7 +764,7 @@ class Forking extends \fork_daemon
 						AND categoryid BETWEEN 2000 AND 2999
 						%s %s
 						LIMIT 1',
-					\Enzebe::NZB_ADDED,
+					Enzebe::NZB_ADDED,
 					($this->pdo->getSetting('lookupimdb') == 2 ? 'AND isrenamed = 1' : ''),
 					($this->ppRenamedOnly ? 'AND isrenamed = 1' : '')
 				)
@@ -786,7 +791,7 @@ class Forking extends \fork_daemon
 					GROUP BY LEFT(guid, 1)
 					LIMIT 16',
 					($this->ppRenamedOnly ? 2 : 1),
-					\Enzebe::NZB_ADDED,
+					Enzebe::NZB_ADDED,
 					($this->pdo->getSetting('lookupimdb') == 2 ? 'AND isrenamed = 1' : ''),
 					($this->ppRenamedOnly ? 'AND isrenamed = 1' : '')
 				)
@@ -814,7 +819,7 @@ class Forking extends \fork_daemon
 						AND categoryid BETWEEN 5000 AND 5999
 						%s %s
 						LIMIT 1',
-					\Enzebe::NZB_ADDED,
+					Enzebe::NZB_ADDED,
 					($this->pdo->getSetting('lookuptvrage') == 2 ? 'AND isrenamed = 1' : ''),
 					($this->ppRenamedOnly ? 'AND isrenamed = 1' : '')
 				)
@@ -842,7 +847,7 @@ class Forking extends \fork_daemon
 					GROUP BY LEFT(guid, 1)
 					LIMIT 16',
 					($this->ppRenamedOnly ? 2 : 1),
-					\Enzebe::NZB_ADDED,
+					Enzebe::NZB_ADDED,
 					($this->pdo->getSetting('lookuptvrage') == 2 ? 'AND isrenamed = 1' : ''),
 					($this->ppRenamedOnly ? 'AND isrenamed = 1' : '')
 				)
@@ -861,7 +866,7 @@ class Forking extends \fork_daemon
 	{
 		$sharing = $this->pdo->queryOneRow('SELECT enabled FROM sharing');
 		if ($sharing !== false && $sharing['enabled'] == 1) {
-			$nntp = new \NNTP(['Settings' => $this->pdo]);
+			$nntp = new NNTP(['Settings' => $this->pdo]);
 			if (($this->pdo->getSetting('alternate_nntp') == 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) === true) {
 				(new PostProcess(['Settings' => $this->pdo, 'ColorCLI' => $this->_colorCLI]))->processSharing($nntp);
 			}
@@ -901,8 +906,8 @@ class Forking extends \fork_daemon
 				AND r.prehashid = 0
 				AND r.isrequestid = 1
 				AND r.reqidstatus = %d',
-				\Enzebe::NZB_ADDED,
-				\RequestID::REQID_UPROC
+				Enzebe::NZB_ADDED,
+				RequestID::REQID_UPROC
 			)
 		);
 		return $this->pdo->getSetting('reqidthreads');

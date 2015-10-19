@@ -1,5 +1,8 @@
 <?php
 
+use newznab\SABnzbd;
+use newznab\NZBGet;
+
 if (!$page->users->isLoggedIn()) {
 	$page->show403();
 }

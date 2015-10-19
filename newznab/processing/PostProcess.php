@@ -1,9 +1,27 @@
 <?php
 namespace newznab\processing;
 
-use \newznab\db\Settings;
-use \newznab\processing\post\AniDB;
-use \newznab\processing\post\ProcessAdditional;
+use newznab\db\Settings;
+use newznab\processing\post\AniDB;
+use newznab\processing\post\ProcessAdditional;
+use newznab\Logger;
+use newznab\NameFixer;
+use newznab\Groups;
+use newznab\Nfo;
+use newznab\ReleaseFiles;
+use newznab\Books;
+use newznab\Console;
+use newznab\Games;
+use newznab\Movie;
+use newznab\Music;
+use newznab\XXX;
+use newznab\TvRage;
+use newznab\TheTVDB;
+use newznab\NNTP;
+use newznab\Category;
+use newznab\SpotNab;
+use newznab\Sharing;
+
 
 require_once NN_LIBS . 'rarinfo/par2info.php';
 
@@ -17,13 +35,13 @@ class PostProcess
 	/**
 	 * Class instance of debugging.
 	 *
-	 * @var \Logger
+	 * @var Logger
 	 */
 	protected $debugging;
 
 	/**
 	 * Instance of NameFixer.
-	 * @var \NameFixer
+	 * @var NameFixer
 	 */
 	protected $nameFixer;
 
@@ -51,17 +69,17 @@ class PostProcess
 	private $echooutput;
 
 	/**
-	 * @var \Groups
+	 * @var Groups
 	 */
 	private $groups;
 
 	/**
-	 * @var \Nfo
+	 * @var Nfo
 	 */
 	private $Nfo;
 
 	/**
-	 * @var \ReleaseFiles
+	 * @var ReleaseFiles
 	 */
 	private $releaseFiles;
 
@@ -88,12 +106,12 @@ class PostProcess
 		//\\
 		//\\ Class instances.
 		$this->pdo = (($options['Settings'] instanceof Settings) ? $options['Settings'] : new Settings());
-		$this->groups = (($options['Groups'] instanceof \Groups) ? $options['Groups'] : new \Groups());
+		$this->groups = (($options['Groups'] instanceof Groups) ? $options['Groups'] : new Groups());
 		$this->_par2Info = new \Par2Info();
-		$this->debugging = ($options['Logger'] instanceof \Logger ? $options['Logger'] : new \Logger(['ColorCLI' => $this->pdo->log]));
-		$this->nameFixer = (($options['NameFixer'] instanceof \NameFixer) ? $options['NameFixer'] : new \NameFixer(['Echo' => $this->echooutput, 'Settings' => $this->pdo, 'Groups' => $this->groups]));
-		$this->Nfo = (($options['Nfo'] instanceof \Nfo ) ? $options['Nfo'] : new \Nfo(['Echo' => $this->echooutput, 'Settings' => $this->pdo]));
-		$this->releaseFiles = (($options['ReleaseFiles'] instanceof \ReleaseFiles) ? $options['ReleaseFiles'] : new \ReleaseFiles($this->pdo));
+		$this->debugging = ($options['Logger'] instanceof Logger ? $options['Logger'] : new Logger(['ColorCLI' => $this->pdo->log]));
+		$this->nameFixer = (($options['NameFixer'] instanceof NameFixer) ? $options['NameFixer'] : new NameFixer(['Echo' => $this->echooutput, 'Settings' => $this->pdo, 'Groups' => $this->groups]));
+		$this->Nfo = (($options['Nfo'] instanceof Nfo ) ? $options['Nfo'] : new Nfo(['Echo' => $this->echooutput, 'Settings' => $this->pdo]));
+		$this->releaseFiles = (($options['ReleaseFiles'] instanceof ReleaseFiles) ? $options['ReleaseFiles'] : new ReleaseFiles($this->pdo));
 		//\\
 
 		//\\ Site settings.
@@ -146,7 +164,7 @@ class PostProcess
 	public function processBooks()
 	{
 		if ($this->pdo->getSetting('lookupbooks') != 0) {
-			(new \Books(['Echo' => $this->echooutput, 'Settings' => $this->pdo, ]))->processBookReleases();
+			(new Books(['Echo' => $this->echooutput, 'Settings' => $this->pdo, ]))->processBookReleases();
 		}
 	}
 
@@ -158,7 +176,7 @@ class PostProcess
 	public function processConsoles()
 	{
 		if ($this->pdo->getSetting('lookupgames') != 0) {
-			(new \Console(['Settings' => $this->pdo, 'Echo' => $this->echooutput]))->processConsoleReleases();
+			(new Console(['Settings' => $this->pdo, 'Echo' => $this->echooutput]))->processConsoleReleases();
 		}
 	}
 
@@ -170,7 +188,7 @@ class PostProcess
 	public function processGames()
 	{
 		if ($this->pdo->getSetting('lookupgames') != 0) {
-			(new \Games(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processGamesReleases();
+			(new Games(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processGamesReleases();
 		}
 	}
 
@@ -188,7 +206,7 @@ class PostProcess
 	{
 		$processMovies = (is_numeric($processMovies) ? $processMovies : $this->pdo->getSetting('lookupimdb'));
 		if ($processMovies > 0) {
-			(new \Movie(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processMovieReleases($groupID, $guidChar, $processMovies);
+			(new Movie(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processMovieReleases($groupID, $guidChar, $processMovies);
 		}
 	}
 
@@ -200,14 +218,14 @@ class PostProcess
 	public function processMusic()
 	{
 		if ($this->pdo->getSetting('lookupmusic') != 0) {
-			(new \Music(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processMusicReleases();
+			(new Music(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processMusicReleases();
 		}
 	}
 
 	/**
 	 * Process nfo files.
 	 *
-	 * @param \NNTP   $nntp
+	 * @param NNTP   $nntp
 	 * @param string $groupID  (Optional) id of a group to work on.
 	 * @param string $guidChar (Optional) First letter of a release GUID to use to get work.
 	 *
@@ -225,7 +243,7 @@ class PostProcess
 	 */
 	public function processSpotnab()
 	{
-		$spotnab = new \SpotNab();
+		$spotnab = new SpotNab();
 		$processed = $spotnab->processGID(500);
 		if ($processed > 0) {
 			if ($this->echooutput) {
@@ -244,11 +262,11 @@ class PostProcess
 	/**
 	 * Process comments.
 	 *
-	 * @param \NNTP $nntp
+	 * @param NNTP $nntp
 	 */
 	public function processSharing(&$nntp)
 	{
-		(new \Sharing(['Settings' => $this->pdo, 'NNTP' => $nntp]))->start();
+		(new Sharing(['Settings' => $this->pdo, 'NNTP' => $nntp]))->start();
 	}
 
 	/**
@@ -265,7 +283,7 @@ class PostProcess
 	{
 		$processTV = (is_numeric($processTV) ? $processTV : $this->pdo->getSetting('lookuptvrage'));
 		if ($processTV > 0) {
-			(new \TvRage(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processTvReleases($groupID, $guidChar, $processTV);
+			(new TvRage(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processTvReleases($groupID, $guidChar, $processTV);
 		}
 	}
 
@@ -273,7 +291,7 @@ class PostProcess
 	{
 		if ($this->pdo->getSetting('lookupthetvdb') == 1)
 		{
-			$thetvdb = new \TheTVDB($this->echooutput);
+			$thetvdb = new TheTVDB($this->echooutput);
 			$thetvdb->processReleases();
 		}
 	}
@@ -284,7 +302,7 @@ class PostProcess
 	public function processXXX()
 	{
 		if ($this->pdo->getSetting('lookupxxx') == 1) {
-			(new \XXX(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processXXXReleases();
+			(new XXX(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processXXXReleases();
 		}
 	}
 
@@ -293,7 +311,7 @@ class PostProcess
 	 *
 	 * @note Called externally by tmux/bin/update_per_group and update/postprocess.php
 	 *
-	 * @param \NNTP       $nntp    Class NNTP
+	 * @param NNTP       $nntp    Class NNTP
 	 * @param int|string $groupID  (Optional) id of a group to work on.
 	 * @param string     $guidChar (Optional) First char of release GUID, can be used to select work.
 	 *
@@ -312,7 +330,7 @@ class PostProcess
 	 * @param string $messageID MessageID from NZB file.
 	 * @param int    $relID     id of the release.
 	 * @param int    $groupID   Group id of the release.
-	 * @param \NNTP   $nntp      Class NNTP
+	 * @param NNTP   $nntp      Class NNTP
 	 * @param int    $show      Only show result or apply iy.
 	 *
 	 * @return bool
@@ -342,15 +360,15 @@ class PostProcess
 		if (!in_array(
 			(int)$query['categoryid'],
 			array(
-				\Category::CAT_BOOK_OTHER,
-				\Category::CAT_GAME_OTHER,
-				\Category::CAT_MOVIE_OTHER,
-				\Category::CAT_MUSIC_OTHER,
-				\Category::CAT_PC_MOBILEOTHER,
-				\Category::CAT_TV_OTHER,
-				\Category::CAT_MISC_HASHED,
-				\Category::CAT_XXX_OTHER,
-				\Category::CAT_MISC_OTHER
+				Category::CAT_BOOK_OTHER,
+				Category::CAT_GAME_OTHER,
+				Category::CAT_MOVIE_OTHER,
+				Category::CAT_MUSIC_OTHER,
+				Category::CAT_PC_MOBILEOTHER,
+				Category::CAT_TV_OTHER,
+				Category::CAT_MISC_HASHED,
+				Category::CAT_XXX_OTHER,
+				Category::CAT_MISC_OTHER
 			)
 		)
 		) {
@@ -422,7 +440,7 @@ class PostProcess
 
 			// If we found some files.
 			if ($filesAdded > 0) {
-				$this->debugging->log(get_class(), __FUNCTION__, 'Added ' . $filesAdded . ' releasefiles from PAR2 for ' . $query['searchname'], \Logger::LOG_INFO);
+				$this->debugging->log(get_class(), __FUNCTION__, 'Added ' . $filesAdded . ' releasefiles from PAR2 for ' . $query['searchname'], Logger::LOG_INFO);
 
 				// Update the file count with the new file count + old file count.
 				$this->pdo->queryExec(

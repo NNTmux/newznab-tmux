@@ -1,5 +1,22 @@
 <?php
 
+use newznab\Releases;
+use newznab\ReleaseComments;
+use newznab\ReleaseExtra;
+use newznab\DnzbFailures;
+use newznab\TvRage;
+use newznab\Episode;
+use newznab\Movie;
+use newznab\XXX;
+use newznab\Games;
+use newznab\Books;
+use newznab\Console;
+use newznab\Music;
+use newznab\AniDB;
+use newznab\PreDB;
+use newznab\PreHash;
+use newznab\ReleaseFiles;
+
 if (!$page->users->isLoggedIn())
 	$page->show403();
 

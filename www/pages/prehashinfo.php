@@ -1,5 +1,7 @@
 <?php
 
+use newznab\db\Settings;
+
 /**
  * This page prints an XML (or JSON, see extras) on the browser with predb data based on criteria.
  *
@@ -175,7 +177,7 @@ if (isset($_GET['type'])) {
 		case 't':
 		case 'title':
 			if (isset($_GET['title'])) {
-				$db = new newznab\db\Settings();
+				$db = new Settings();
 				$preData = $db->query(
 					sprintf('SELECT * FROM prehash p WHERE p.title %s %s %s LIKE %s LIMIT %d OFFSET %d',
 						$newer,
@@ -193,7 +195,7 @@ if (isset($_GET['type'])) {
 		case 'm':
 		case 'md5':
 			if (isset($_GET['md5']) && strlen($_GET['title']) === 32) {
-				$db = new newznab\db\Settings();
+				$db = new Settings();
 				$preData = $db->query(
 					sprintf('SELECT * FROM prehash p INNER JOIN predbhash ph ON ph.pre_id = p.id WHERE MATCH(hashes) AGAINST (%s) %s %s %s LIMIT %d OFFSET %d',
 						$db->escapeString($_GET['md5']),
@@ -210,7 +212,7 @@ if (isset($_GET['type'])) {
 		case 's':
 		case 'sha1':
 			if (isset($_GET['sha1']) && strlen($_GET['sha1']) === 40) {
-				$db = new newznab\db\Settings();
+				$db = new Settings();
 				$preData = $db->query(
 					sprintf('SELECT * FROM prehash p INNER JOIN predbhash ph ON ph.pre_id = p.id WHERE MATCH(hashes) AGAINST (%s) %s %s %s LIMIT %d OFFSET %d',
 						$db->escapeString($_GET['sha1']),
@@ -226,7 +228,7 @@ if (isset($_GET['type'])) {
 
 		case 'a':
 		case 'all':
-			$db = new newznab\db\Settings();
+			$db = new Settings();
 			$preData = $db->query(
 				sprintf('SELECT * FROM prehash p WHERE 1=1 %s %s %s ORDER BY p.predate DESC LIMIT %d OFFSET %d',
 					$newer,

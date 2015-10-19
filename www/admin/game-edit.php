@@ -1,6 +1,9 @@
 <?php
 require_once("config.php");
 
+use newznab\Games;
+use newznab\Genres;
+
 $page = new AdminPage();
 $games = new Games(['Settings' => $page->settings]);
 $gen = new Genres(['Settings' => $page->settings]);
@@ -42,7 +45,7 @@ if (isset($_REQUEST["id"])) {
 		default:
 			$page->title = "Game Edit";
 			$page->smarty->assign('game', $game);
-			$page->smarty->assign('genres', $gen->getGenres(\Genres::GAME_TYPE));
+			$page->smarty->assign('genres', $gen->getGenres(Genres::GAME_TYPE));
 		break;
 	}
 }

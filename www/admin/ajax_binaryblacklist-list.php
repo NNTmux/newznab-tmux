@@ -1,6 +1,8 @@
 <?php
 require_once("config.php");
 
+use newznab\Binaries;
+
 // login check
 $admin = new AdminPage;
 $bin  = new Binaries();

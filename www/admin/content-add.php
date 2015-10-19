@@ -1,6 +1,10 @@
 <?php
 require_once './config.php';
 
+use newznab\Contents;
+use newznab\Content;
+use newznab\Users;
+
 
 $page     = new AdminPage();
 $contents = new Contents(['Settings' => $page->settings]);

@@ -4,11 +4,18 @@ if (!isset($argv[1])) {
 	exit("This script is not intended to be run manually." . PHP_EOL);
 }
 
-require_once dirname(__FILE__) . '/../../../../../www/config.php';
+require_once realpath(dirname(dirname(dirname(dirname(dirname(__DIR__))))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
 use newznab\db\Settings;
 use newznab\processing\PostProcess;
 use newznab\processing\post\ProcessAdditional;
+use newznab\Releases;
+use newznab\Backfill;
+use newznab\NNTP;
+use newznab\Groups;
+use newznab\RequestIDLocal;
+use newznab\Binaries;
+use newznab\Nfo;
 
 
 // Are we coming from python or php ? $options[0] => (string): python|php
@@ -294,19 +301,6 @@ function charCheck($char)
 		return true;
 	}
 	return false;
-}
-
-/**
- * Check if the group should be processed.
- *
- * @param \newznab\db\Settings $pdo
- * @param int                $groupID
- */
-function collectionCheck(&$pdo, $groupID)
-{
-	if ($pdo->queryOneRow(sprintf('SELECT id FROM collections_%d LIMIT 1', $groupID)) === false) {
-		exit();
-	}
 }
 
 /**

@@ -2,6 +2,8 @@
 
 require_once("config.php");
 
+use newznab\Releases;
+
 $page = new AdminPage();
 
 $releases = new Releases();

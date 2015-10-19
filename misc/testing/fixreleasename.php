@@ -1,8 +1,10 @@
 <?php
-require_once dirname(__FILE__) . '/../../www/config.php';
+require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
+
+use newznab\db\Settings;
 
 
-$db = new \newznab\db\Settings();
+$db = new Settings();
 
 //query to find rough matches
 $rows = $db->query("SELECT ID, searchname from releases where searchname like '%QWERTY%'");

@@ -1,6 +1,12 @@
 <?php
-require_once(dirname(__FILE__) . "/config.php");
+/* Argument 1 is optional string, group name. Or numeric, number of header max to download.
+ * Argument 2 is optional int, max number of headers to download.
+ */
+require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
 
+use newznab\Binaries;
+use newznab\Groups;
+use newznab\NNTP;
 use newznab\db\Settings;
 
 $pdo = new Settings();
@@ -28,3 +34,4 @@ if (isset($argv[1]) && !is_numeric($argv[1])) {
 	$binaries->updateAllGroups((isset($argv[1]) && is_numeric($argv[1]) && $argv[1] > 0 ? $argv[1] :
 		$maxHeaders));
 }
+?>

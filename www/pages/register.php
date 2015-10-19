@@ -1,6 +1,8 @@
 <?php
 
 use newznab\db\Settings;
+use newznab\Captcha;
+use newznab\Users;
 
 
 if ($page->users->isLoggedIn()) {

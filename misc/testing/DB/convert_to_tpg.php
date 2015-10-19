@@ -1,7 +1,9 @@
 <?php
-require_once dirname(__FILE__) . '/../../../www/config.php';
+require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
 
 use newznab\db\Settings;
+use newznab\Groups;
+use newznab\ConsoleTools;
 
 
 /* This script will allow you to move from single binaries/parts tables to TPG without having to run reset_truncate.
@@ -13,8 +15,8 @@ use newznab\db\Settings;
  */
 $debug = false;
 $pdo = new Settings();
-$groups = new \Groups(['Settings' => $pdo]);
-$consoletools = new \ConsoleTools(['ColorCLI' => $pdo->log]);
+$groups = new Groups(['Settings' => $pdo]);
+$consoletools = new ConsoleTools(['ColorCLI' => $pdo->log]);
 $DoPartRepair = ($pdo->getSetting('partrepair') == '0') ? false : true;
 
 if ((!isset($argv[1])) || $argv[1] != 'true') {

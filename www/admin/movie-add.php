@@ -2,6 +2,8 @@
 
 require_once("config.php");
 
+use newznab\Movie;
+
 $page = new AdminPage();
 $movie = new Movie(['Settings' => $page->settings]);
 $id = 0;

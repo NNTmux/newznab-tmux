@@ -1,16 +1,20 @@
 <?php
-require_once dirname(__FILE__) . '/../../../www/config.php';
+require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
 
 use newznab\db\Settings;
 use newznab\utility\Utility;
+use newznab\Releases;
+use newznab\NZB;
+use newznab\ReleaseImage;
+use newznab\ConsoleTools;
 
 $pdo = new Settings();
 
 if (isset($argv[1]) && ($argv[1] === "true" || $argv[1] === "delete")) {
-	$releases = new \Releases(['Settings' => $pdo]);
-	$nzb = new \NZB($pdo);
-	$releaseImage = new \ReleaseImage($pdo);
-	$consoletools = new \ConsoleTools(['ColorCLI' => $pdo->log]);
+	$releases = new Releases(['Settings' => $pdo]);
+	$nzb = new NZB($pdo);
+	$releaseImage = new ReleaseImage($pdo);
+	$consoletools = new ConsoleTools(['ColorCLI' => $pdo->log]);
 	$timestart = time();
 	$checked = $deleted = 0;
 	$couldbe = $argv[1] === "true" ? $couldbe = "could be " : "were ";

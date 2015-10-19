@@ -225,7 +225,6 @@ class AniDB
 
 	/**
 	 * @param \SimpleXMLElement $element
-	 * @param string            $item
 	 * @param string            $property
 	 *
 	 * @return string

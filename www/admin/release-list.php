@@ -1,5 +1,7 @@
 <?php
 
+use newznab\Releases;
+
 require_once("config.php");
 
 $page = new AdminPage();

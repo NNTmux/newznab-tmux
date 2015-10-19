@@ -1,5 +1,7 @@
 <?php
 
+use newznab\Releases;
+
 if (!$page->users->isLoggedIn()) {
 	$page->show403();
 }

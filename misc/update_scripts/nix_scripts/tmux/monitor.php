@@ -1,13 +1,16 @@
 <?php
-require_once dirname(__FILE__) . '/../../../../www/config.php';
+require_once realpath(dirname(dirname(dirname(dirname(__DIR__)))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
 use newznab\db\Settings;
 use newznab\utility\Utility;
+use newznab\TmuxRun;
+use newznab\TmuxOutput;
+use newznab\Category;
 
 
 $pdo = new Settings();
-$tRun = new \TmuxRun($pdo);
-$tOut = new \TmuxOutput($pdo);
+$tRun = new TmuxRun($pdo);
+$tOut = new TmuxOutput($pdo);
 
 $runVar['paths']['misc'] = NN_MISC;
 $runVar['paths']['lib'] = NN_LIB;
@@ -74,7 +77,7 @@ while ($runVar['counts']['iterations'] > 0) {
 	$runVar['timers']['query']['tmux_time'] = (time() - $timer01);
 
 	$runVar['settings']['book_reqids'] = (!empty($runVar['settings']['book_reqids'])
-		? $runVar['settings']['book_reqids'] : \Category::CAT_PARENT_BOOK);
+		? $runVar['settings']['book_reqids'] : Category::CAT_PARENT_BOOK);
 
 	//get usenet connection info
 	$runVar['connections'] = $tOut->getConnectionsInfo($runVar['constants']);

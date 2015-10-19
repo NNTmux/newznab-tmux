@@ -1,16 +1,20 @@
 <?php
 
-require_once(dirname(__FILE__) . "/config.php");
+require_once dirname(__FILE__) . '/../../../config.php';
 
 use newznab\db\Settings;
 use newznab\processing\PostProcess;
+use newznab\ColorCLI;
+use newznab\NameFixer;
+use newznab\NNTP;
+use newznab\NZBContents;
 
 $c = new ColorCLI();
 if (!isset($argv[1])) {
 	exit($c->error("This script is not intended to be run manually, it is called from fixreleasenames_threaded.py."));
 } else if (isset($argv[1])) {
 	$db = new Settings();
-	$namefixer = new \NameFixer(['Settings' => $pdo]);
+	$namefixer = new NameFixer(['Settings' => $pdo]);
 	$pieces = explode(' ', $argv[1]);
 	if (isset($pieces[1]) && $pieces[0] == 'nfo') {
 		$release = $pieces[1];

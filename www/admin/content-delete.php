@@ -2,6 +2,8 @@
 
 require_once("config.php");
 
+use newznab\Contents;
+
 $page = new AdminPage();
 
 if (isset($_GET['id']))

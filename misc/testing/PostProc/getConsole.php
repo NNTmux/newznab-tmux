@@ -1,14 +1,15 @@
 <?php
 //This script will update all records in the consoleinfo table
 
-require_once dirname(__FILE__) . '/../../../www/config.php';
+require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
 
 use newznab\db\Settings;
+use newznab\Console;
 
 
 
 $pdo = new Settings();
-$console = new \Console(['Echo' => true, 'Settings' => $pdo]);
+$console = new Console(['Echo' => true, 'Settings' => $pdo]);
 
 $res = $pdo->queryDirect(sprintf("SELECT searchname, id FROM releases WHERE consoleinfoid IS NULL AND categoryid BETWEEN 1000 AND 1999 ORDER BY id DESC" ));
 if ($res instanceof \Traversable) {

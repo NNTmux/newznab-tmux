@@ -1,6 +1,6 @@
 <?php
 
-use newznab\controllers\Users;
+use newznab\Users;
 
 /**
  * All admin pages implement this class. Enforces admin role for requesting user.

@@ -2,6 +2,9 @@
 
 require_once("config.php");
 
+use newznab\Music;
+use newznab\Genres;
+
 $page = new AdminPage();
 $music = new Music();
 $gen = new Genres();
@@ -21,8 +24,8 @@ if (isset($_REQUEST["id"]))
 
 	switch($action)
 	{
-	    case 'submit':
-	    	$coverLoc = WWW_DIR."covers/music/".$id.'.jpg';
+		case 'submit':
+			$coverLoc = NN_WWW."covers/music/".$id.'.jpg';
 
 			if($_FILES['cover']['size'] > 0)
 			{

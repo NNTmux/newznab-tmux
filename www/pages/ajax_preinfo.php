@@ -1,5 +1,7 @@
 <?php
 
+use newznab\PreDB;
+
 if(!$page->users->isLoggedIn() || $page->userdata["canpre"] != 1)
 	$page->show403();
 

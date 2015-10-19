@@ -1,4 +1,6 @@
 <?php
+
+use newznab\PreHash;
 if (!$page->users->isLoggedIn()) {
 	$page->show403();
 }

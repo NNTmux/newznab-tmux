@@ -1,10 +1,10 @@
 <?php
 
-use newznab\controllers\Users;
-use newznab\controllers\Forum;
-use newznab\controllers\Menu;
-use newznab\controllers\Contents;
-use newznab\controllers\Category;
+use newznab\Users;
+use newznab\Forum;
+use newznab\Menu;
+use newznab\Contents;
+use newznab\Category;
 
 /**
  * This class represents every normal user page in the site.

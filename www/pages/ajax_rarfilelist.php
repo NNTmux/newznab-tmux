@@ -1,4 +1,5 @@
 <?php
+use newznab\ReleaseFiles;
 
 if (!$page->users->isLoggedIn())
 	$page->show403();

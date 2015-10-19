@@ -1,4 +1,7 @@
 <?php
+use newznab\Books;
+use newznab\Category;
+use newznab\DnzbFailures;
 
 if (!$page->users->isLoggedIn()) {
 	$page->show403();

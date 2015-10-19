@@ -1,5 +1,7 @@
 <?php
 
+use newznab\Releases;
+
 use newznab\utility\Utility;
 
 $releases = new Releases;

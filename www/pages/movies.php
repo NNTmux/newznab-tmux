@@ -1,4 +1,7 @@
 <?php
+use newznab\Movie;
+use newznab\Category;
+use newznab\DnzbFailures;
 
 $movie = new Movie(['Settings' => $page->settings]);
 $cat = new Category(['Settings' => $page->settings]);

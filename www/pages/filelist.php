@@ -1,5 +1,8 @@
 <?php
 
+use newznab\Releases;
+use newznab\NZB;
+
 $releases = new Releases;
 $nzb = new NZB;
 
