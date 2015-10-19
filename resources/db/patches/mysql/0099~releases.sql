@@ -40,7 +40,6 @@ PARTITION books VALUES LESS THAN (8000),
 PARTITION misc VALUES LESS THAN (9000) );
 
 ALTER TABLE releases ADD INDEX ix_releases_adddate (adddate);
-ALTER TABLE releases ADD INDEX ix_releases_rageid (rageid);
 ALTER TABLE releases ADD INDEX ix_releases_imdbid (imdbid);
 ALTER TABLE releases ADD INDEX ix_releases_guid (guid);
 ALTER TABLE releases ADD INDEX ix_releases_name (name);
@@ -52,7 +51,7 @@ ALTER TABLE releases ADD INDEX ix_releases_musicinfoid (musicinfoid);
 ALTER TABLE releases ADD INDEX ix_releases_consoleinfoid (consoleinfoid);
 ALTER TABLE releases ADD INDEX ix_releases_bookinfoid (bookinfoid);
 ALTER TABLE releases ADD INDEX ix_releases_haspreview_passwordstatus (haspreview, passwordstatus);
-ALTER TABLE releases ADD INDEX ix_releases_status (nzbstatus, iscategorized, isrenamed, nfostatus, ishashed, isrequestid, passwordstatus, dehashstatus, reqidstatus, musicinfoid, consoleinfoid, bookinfoid, haspreview, categoryid, imdbid, rageid);
+ALTER TABLE releases ADD INDEX ix_releases_status (nzbstatus, iscategorized, isrenamed, nfostatus, ishashed, isrequestid, passwordstatus, dehashstatus, reqidstatus, musicinfoid, consoleinfoid, bookinfoid, haspreview, categoryid, imdbid);
 ALTER TABLE releases ADD INDEX ix_releases_postdate_searchname (postdate, searchname);
 ALTER TABLE releases ADD INDEX ix_releases_nzb_guid (nzb_guid);
 ALTER TABLE releases ADD INDEX ix_releases_prehash_searchname (prehashid, searchname);
