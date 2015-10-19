@@ -1,4 +1,5 @@
 2015-10-19 DariusIII
+	Fix: Missing Tmux class
 	Fix: Error for undefined stdClass
 	Fix: LoggerException erro.
 	Fix: Remove references to www/config.php in Settings.php

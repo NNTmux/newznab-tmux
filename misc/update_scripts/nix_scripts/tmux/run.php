@@ -208,7 +208,7 @@ function window_sharing($tmux_session)
 {
 	$pdo = new Settings();
 	$sharing = $pdo->queryOneRow('SELECT enabled, posting, fetching FROM sharing');
-	$t = new \Tmux();
+	$t = new Tmux();
 	$tmux = $t->get();
 	$tmux_share = (isset($tmux->run_sharing)) ? $tmux->run_sharing : 0;
 
