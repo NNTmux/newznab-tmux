@@ -1,4 +1,5 @@
 2015-10-19 DariusIII
+	Chg: InnoDB to MYISAM in patches
 	Fix: Wrong path to indexer.php
 	Fix: Instantiation of Logger class in DB.php
 	Chg: Add tmux 2.0.3 packages

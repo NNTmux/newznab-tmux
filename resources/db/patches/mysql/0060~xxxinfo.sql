@@ -19,7 +19,7 @@ CREATE TABLE         xxxinfo (
   PRIMARY KEY                      (id),
   INDEX        ix_xxxinfo_title  (title)
 )
-  ENGINE          = InnoDB
+  ENGINE          = MYISAM
   DEFAULT CHARSET = utf8
   COLLATE         = utf8_unicode_ci
   AUTO_INCREMENT  = 1;

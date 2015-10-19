@@ -12,7 +12,7 @@ CREATE TABLE anidb_episodes (
   airdate       DATE                    NOT NULL,
   PRIMARY KEY (anidbid, episodeid)
 )
-  ENGINE = InnoDB
+  ENGINE = MYISAM
   DEFAULT CHARSET =utf8
   COLLATE =utf8_unicode_ci;
 
@@ -45,7 +45,7 @@ CREATE TABLE anidb_info (
   PRIMARY KEY (anidbid),
   KEY ix_anidb_info_datetime (startdate, enddate, updated)
 )
-  ENGINE = InnoDB
+  ENGINE = MYISAM
   DEFAULT CHARSET =utf8
   COLLATE =utf8_unicode_ci;
 
@@ -63,6 +63,6 @@ CREATE TABLE anidb_titles (
           COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (anidbid, type, lang, title)
 )
-  ENGINE = InnoDB
+  ENGINE = MYISAM
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci;

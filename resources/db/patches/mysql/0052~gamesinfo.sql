@@ -16,7 +16,7 @@ CREATE TABLE         gamesinfo (
   PRIMARY KEY                    (id),
   UNIQUE INDEX ix_gamesinfo_asin (asin)
 )
-  ENGINE          = InnoDB
+  ENGINE          = MYISAM
   DEFAULT CHARSET = utf8
   COLLATE         = utf8_unicode_ci
   AUTO_INCREMENT  = 1;
