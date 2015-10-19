@@ -25,7 +25,7 @@ class BasePage
 	public $captcha;
 
 	/**
-	 * @var Users
+	 * @var newznab\Users
 	 */
 	public $users = null;
 
