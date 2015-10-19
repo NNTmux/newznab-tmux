@@ -20,9 +20,9 @@
  */
 namespace newznab\db;
 
+use newznab\ColorCLI;
 use newznab\utility\Git;
 use newznab\utility\Utility;
-use newznab\ColorCLI;
 
 
 class DbUpdate
@@ -93,12 +93,16 @@ class DbUpdate
 		];
 		$options += $defaults;
 
+		$show = (Utility::isCLI() || NN_DEBUG);
+
 		$files = empty($options['files']) ? Utility::getDirFiles($options) : $options['files'];
 		natsort($files);
 		$local = $this->pdo->isLocalDb() ? '' : 'LOCAL ';
 		$sql = 'LOAD DATA ' . $local . 'INFILE "%s" IGNORE INTO TABLE `%s` FIELDS TERMINATED BY "\t" OPTIONALLY ENCLOSED BY "\"" IGNORE 1 LINES (%s)';
 		foreach ($files as $file) {
-			echo "File: $file\n";
+			if ($show === true) {
+				echo "File: $file\n";
+			}
 
 			if (is_readable($file)) {
 				if (preg_match($options['regex'], $file, $matches)) {
@@ -114,7 +118,9 @@ class DbUpdate
 						}
 						$fields = trim($line);
 
-						echo "Inserting data into table: '$table'\n";
+						if ($show === true) {
+							echo "Inserting data into table: '$table'\n";
+						}
 						if (Utility::isWin()) {
 							$file = str_replace("\\", '\/', $file);
 						}
@@ -124,7 +130,7 @@ class DbUpdate
 					}
 				} else {
 					echo "Incorrectly formatted filename '$file' (should match " .
-						 str_replace('#', '', $options['regex']) . "\n";
+						str_replace('#', '', $options['regex']) . "\n";
 				}
 			} else {
 				echo $this->log->error("  Unable to read file: '$file'");
@@ -147,7 +153,7 @@ class DbUpdate
 		$defaults = [
 			'data'	=> NN_RES . 'db' . DS . 'schema' . DS . 'data' . DS,
 			'ext'	=> 'sql',
-			'path'	=> NN_RES . 'db' . DS . 'patches' . DS,
+			'path'	=> NN_RES . 'db' . DS . 'patches' . DS . $this->_DbSystem,
 			'regex'	=> '#^' . Utility::PATH_REGEX . '\+(?P<order>\d+)~(?P<table>\w+)\.sql$#',
 			'safe'	=> true,
 		];
@@ -175,11 +181,11 @@ class DbUpdate
 					$current++;
 					$this->pdo->queryExec("UPDATE settings SET value = '$current' WHERE setting = 'sqlpatch';");
 					$newName = $matches['drive'] . $matches['path'] .
-							   str_pad($current, 4, '0', STR_PAD_LEFT) . '~' .
-							   $matches['table'] . '.sql';
+						str_pad($current, 4, '0', STR_PAD_LEFT) . '~' .
+						$matches['table'] . '.sql';
 					rename($matches[0], $newName);
 					$this->git->add($newName);
-					if ($this->git->isCommited($this->git->getBranch() . ':' . $matches[0])) {
+					if ($this->git->isCommited($this->git->getBranch() . ':' . str_replace(NN_ROOT, '',$matches[0]))) {
 						$this->git->add(" -u {$matches[0]}"); // remove old filename from the index.
 					}
 				}
@@ -193,7 +199,7 @@ class DbUpdate
 		$defaults = [
 			'data'	=> NN_RES . 'db' . DS . 'schema' . DS . 'data' . DS,
 			'ext'	=> 'sql',
-			'path'	=> NN_RES . 'db' . DS . 'patches' . DS,
+			'path'	=> NN_RES . 'db' . DS . 'patches' . DS . $this->_DbSystem,
 			'regex'	=> '#^' . Utility::PATH_REGEX . '(?P<patch>\d{4})~(?P<table>\w+)\.sql$#',
 			'safe'	=> true,
 		];
@@ -220,8 +226,8 @@ class DbUpdate
 					$patch = (integer)$matches['patch'];
 					$setPatch = true;
 				} else if (preg_match('/UPDATE `?site`? SET `?value`? = \'?(?P<patch>\d+)\'? WHERE `?setting`? = \'sqlpatch\'/i',
-									$patch,
-									$matches)
+					$patch,
+					$matches)
 				) {
 					$patch = (integer)$matches['patch'];
 				} else {
@@ -396,8 +402,8 @@ class DbUpdate
 			'path'	=> 'resources' . DS . 'db' . DS . 'schema' . DS . 'data' . DS,
 			'regex'	=> '#^(?P<section>.*)\t(?P<subsection>.*)\t(?P<name>.*)\t(?P<value>.*)\t(?P<hint>.*)\t(?P<setting>.*)$#',
 			'value'	=> function(array $matches) {
-					return "{$matches['section']}\t{$matches['subsection']}\t{$matches['name']}\t{$matches['value']}\t{$matches['hint']}\t{$matches['setting']}";
-				} // WARNING: leaving this empty will blank not remove lines.
+				return "{$matches['section']}\t{$matches['subsection']}\t{$matches['name']}\t{$matches['value']}\t{$matches['hint']}\t{$matches['setting']}";
+			} // WARNING: leaving this empty will blank not remove lines.
 		];
 		$options += $default;
 
@@ -441,9 +447,7 @@ class DbUpdate
 		}
 
 		system("$PHP " . NN_MISC . 'testing' . DS . 'DB' . DS . $this->_DbSystem .
-			   'dump_tables.php db dump');
+			'dump_tables.php db dump');
 		$this->backedup = true;
 	}
 }
-
-?>
