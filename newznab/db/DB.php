@@ -786,7 +786,7 @@ class DB extends \PDO
 				if ($ignore === false) {
 					$this->echoError($e->getMessage(), 'queryDirect', 4, false);
 					if ($this->_debug) {
-						$this->debugging->log(get_class(), __FUNCTION__, $query, \Logger::LOG_SQL);
+						$this->debugging->log(get_class(), __FUNCTION__, $query, Logger::LOG_SQL);
 					}
 				}
 				$result = false;

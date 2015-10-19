@@ -1,4 +1,5 @@
 2015-10-19 DariusIII
+	Fix: Instantiation of Logger class in DB.php
 	Chg: Add tmux 2.0.3 packages
 	Fix: Missing Tmux class
 	Fix: Error for undefined stdClass
