@@ -144,8 +144,7 @@ class Category
 	 */
 	public function isParent($cid)
 	{
-		$db = new newznab\db\Settings();
-		$ret = $db->queryOneRow(sprintf("select count(*) as count from category where id = %d and parentid is null", $cid), true);
+		$ret = $this->pdo->queryOneRow(sprintf("select count(*) as count from category where id = %d and parentid is null", $cid), true);
 		if ($ret['count'])
 			return true;
 		else
@@ -157,9 +156,7 @@ class Category
 	 */
 	public function getChildren($cid)
 	{
-		$db = new newznab\db\Settings();
-
-		return $db->query(sprintf("select c.* from category c where parentid = %d", $cid), true);
+		return $this->pdo->query(sprintf("select c.* from category c where parentid = %d", $cid), true);
 	}
 
 	/**
@@ -167,12 +164,10 @@ class Category
 	 */
 	public function getFlat($activeonly = false)
 	{
-		$db = new newznab\db\Settings();
 		$act = "";
 		if ($activeonly)
 			$act = sprintf(" where c.status = %d ", Category::STATUS_ACTIVE);
-
-		return $db->query("select c.*, (SELECT title FROM category WHERE id=c.parentid) AS parentName from category c " . $act . " ORDER BY c.id");
+		return $this->pdo->query("select c.*, (SELECT title FROM category WHERE id=c.parentid) AS parentName from category c " . $act . " ORDER BY c.id");
 	}
 
 	/**
@@ -182,9 +177,7 @@ class Category
 	 */
 	public function getEnabledParentNames()
 	{
-		$db = new newznab\db\Settings();
-
-		return $db->query("SELECT title FROM category WHERE parentid IS NULL AND status = 1");
+		return $this->pdo->query("SELECT title FROM category WHERE parentid IS NULL AND status = 1");
 	}
 
 	/**
@@ -194,24 +187,19 @@ class Category
 	 */
 	public function getDisabledIDs()
 	{
-		$db = new newznab\db\Settings();
-
-		return $db->query("SELECT id FROM category WHERE status = 2 OR parentid IN (SELECT id FROM category WHERE status = 2 AND parentid IS NULL)");
+		return $this->pdo->query("SELECT id FROM category WHERE status = 2 OR parentid IN (SELECT id FROM category WHERE status = 2 AND parentid IS NULL)");
 	}
 	/**
 	 * Get a category row by its id.
 	 */
 	public function getById($id)
 	{
-		$db = new newznab\db\Settings();
-
-		return $db->queryOneRow(sprintf("SELECT c.disablepreview, c.id, c.description, c.minsizetoformrelease, c.maxsizetoformrelease, CONCAT(COALESCE(cp.title,'') , CASE WHEN cp.title IS NULL THEN '' ELSE ' > ' END , c.title) as title, c.status, c.parentid from category c left outer join category cp on cp.id = c.parentid where c.id = %d", $id));
+		return $this->pdo->queryOneRow(sprintf("SELECT c.disablepreview, c.id, c.description, c.minsizetoformrelease, c.maxsizetoformrelease, CONCAT(COALESCE(cp.title,'') , CASE WHEN cp.title IS NULL THEN '' ELSE ' > ' END , c.title) as title, c.status, c.parentid from category c left outer join category cp on cp.id = c.parentid where c.id = %d", $id));
 	}
 
 	public function getSizeRangeById($id)
 	{
-		$db = new newznab\db\Settings();
-		$res = $db->queryOneRow(sprintf("SELECT c.minsizetoformrelease, c.maxsizetoformrelease, cp.minsizetoformrelease as p_minsizetoformrelease, cp.maxsizetoformrelease as p_maxsizetoformrelease" .
+		$res = $this->pdo->queryOneRow(sprintf("SELECT c.minsizetoformrelease, c.maxsizetoformrelease, cp.minsizetoformrelease as p_minsizetoformrelease, cp.maxsizetoformrelease as p_maxsizetoformrelease" .
 				" from category c left outer join category cp on cp.id = c.parentid where c.id = %d", $id
 			)
 		);
@@ -256,16 +244,13 @@ class Category
 	 */
 	public function getByIds($ids)
 	{
-		$db = new newznab\db\Settings();
-
-		return $db->query(sprintf("SELECT concat(cp.title, ' > ',c.title) as title from category c inner join category cp on cp.id = c.parentid where c.id in (%s)", implode(',', $ids)));
+		return $this->pdo->query(sprintf("SELECT concat(cp.title, ' > ',c.title) as title from category c inner join category cp on cp.id = c.parentid where c.id in (%s)", implode(',', $ids)));
 	}
 
 	public function getNameByID($ID)
 	{
-		$db = new newznab\db\Settings();
-		$parent = $db->queryOneRow(sprintf("SELECT title FROM category WHERE id = %d", substr($ID, 0, 1) . "000"));
-		$cat = $db->queryOneRow(sprintf("SELECT title FROM category WHERE id = %d", $ID));
+		$parent = $this->pdo->queryOneRow(sprintf("SELECT title FROM category WHERE id = %d", substr($ID, 0, 1) . "000"));
+		$cat = $this->pdo->queryOneRow(sprintf("SELECT title FROM category WHERE id = %d", $ID));
 
 		return $parent["title"] . " " . $cat["title"];
 	}
@@ -275,9 +260,7 @@ class Category
 	 */
 	public function update($id, $status, $desc, $disablepreview, $minsize, $maxsize)
 	{
-		$db = new newznab\db\Settings();
-
-		return $db->queryExec(sprintf("update category set disablepreview = %d, status = %d, minsizetoformrelease = %d, maxsizetoformrelease = %d, description = %s where id = %d", $disablepreview, $status, $minsize, $maxsize, $db->escapeString($desc), $id));
+		return $this->pdo->queryExec(sprintf("update category set disablepreview = %d, status = %d, minsizetoformrelease = %d, maxsizetoformrelease = %d, description = %s where id = %d", $disablepreview, $status, $minsize, $maxsize, $this->pdo->escapeString($desc), $id));
 	}
 
 	/**
@@ -340,8 +323,6 @@ class Category
 	 */
 	public function get($activeonly = false, $excludedcats = [])
 	{
-		$db = new newznab\db\Settings();
-
 		$exccatlist = "";
 		if (count($excludedcats) > 0)
 			$exccatlist = " and c.id not in (" . implode(",", $excludedcats) . ")";
@@ -353,7 +334,7 @@ class Category
 		if ($exccatlist != "")
 			$act .= $exccatlist;
 
-		return $db->query("select c.id, concat(cp.title, ' > ',c.title) as title, cp.id as parentid, c.status from category c inner join category cp on cp.id = c.parentid " . $act . " ORDER BY c.id", true);
+		return $this->pdo->query("select c.id, concat(cp.title, ' > ',c.title) as title, cp.id as parentid, c.status from category c inner join category cp on cp.id = c.parentid " . $act . " ORDER BY c.id", true);
 	}
 
 }

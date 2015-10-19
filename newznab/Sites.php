@@ -91,7 +91,7 @@ class Sites
 
 	public function rows2Object($rows)
 	{
-		$obj = new stdClass;
+		$obj = new \stdClass;
 		foreach ($rows as $row)
 			$obj->{$row['setting']} = $row['value'];
 
@@ -102,7 +102,7 @@ class Sites
 
 	public function row2Object($row)
 	{
-		$obj = new stdClass;
+		$obj = new \stdClass;
 		$rowKeys = array_keys($row);
 		foreach ($rowKeys as $key)
 			$obj->{$key} = $row[$key];

@@ -13,7 +13,7 @@ class TmuxRun extends Tmux
 	protected $_dateFormat;
 
 	/**
-	 * @param newznab\db\Settings $pdo
+	 * @param Settings $pdo
 	 */
 	public function __construct(Settings $pdo = null)
 	{

@@ -3,6 +3,7 @@ namespace newznab;
 
 use newznab\db\Settings;
 use newznab\utility\Utility;
+use newznab\utility\Git;
 /**
  * Tmux output functions for printing monitor data
  *
@@ -29,12 +30,12 @@ class TmuxOutput extends Tmux
 
 
 	/**
-	 * @param newznab\db\Settings $pdo
+	 * @param Settings $pdo
 	 */
 	public function __construct(Settings $pdo = null)
 	{
 		parent::__construct($pdo);
-		$this->_git = new \newznab\utility\Git(); // Do not remove the full namespace/ PHP gets confused for some reason without it.
+		$this->_git = new Git(); // Do not remove the full namespace/ PHP gets confused for some reason without it.
 		$this->_vers = Utility::getValidVersionsFile();
 
 

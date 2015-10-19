@@ -160,18 +160,18 @@ class Nfo
 			}
 
 			// If above checks couldn't  make a categorical identification, Use GetId3 to check if it's an image/video/rar/zip etc..
-			$getid3 = new getid3();
+			$getid3 = new \getid3();
 			$check = $getid3->analyze($tmpPath);
 			@unlink($tmpPath);
 			if (isset($check['error'])) {
 
 				// Check if it's a par2.
-				$par2info = new Par2Info();
+				$par2info = new \Par2Info();
 				$par2info->setData($possibleNFO);
 				if ($par2info->error) {
 
 					// Check if it's an SFV.
-					$sfv = new SfvInfo();
+					$sfv = new \SfvInfo();
 					$sfv->setData($possibleNFO);
 					if ($sfv->error) {
 						return true;
@@ -320,7 +320,7 @@ class Nfo
 						$groupIDQuery
 					)
 				);
-				if ($nfoStats instanceof Traversable) {
+				if ($nfoStats instanceof \Traversable) {
 					$outString = PHP_EOL . 'Available to process';
 					foreach ($nfoStats as $row) {
 						$outString .= ', ' . $row['status'] . ' = ' . number_format($row['count']);
@@ -392,7 +392,7 @@ class Nfo
 			)
 		);
 
-		if ($releases instanceof Traversable) {
+		if ($releases instanceof \Traversable) {
 			foreach ($releases as $release) {
 				$this->pdo->queryExec(
 					sprintf('DELETE FROM releasenfo WHERE nfo IS NULL AND releaseid = %d', $release['id'])
@@ -425,5 +425,4 @@ class Nfo
 		}
 		return $ret;
 	}
-
 }

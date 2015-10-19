@@ -2,6 +2,7 @@
 namespace newznab;
 
 require_once NN_LIBS . 'Smarty.class.php';
+use Smarty;
 
 /**
  * This class represents each page during installation.

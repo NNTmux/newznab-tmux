@@ -22,7 +22,7 @@ Class PreHash
 	const PRE_OLDNUKE = 5; // Pre is nuked for being old.
 
 	/**
-	 * @var bool|stdClass
+	 * @var bool stdClass
 	 */
 	protected $site;
 
@@ -88,7 +88,7 @@ Class PreHash
 			$total = $res->rowCount();
 			echo $this->pdo->log->primary(number_format($total) . ' releases to match.');
 
-			if ($res instanceof Traversable) {
+			if ($res instanceof \Traversable) {
 				foreach ($res as $row) {
 					$this->pdo->queryExec(
 						sprintf('UPDATE releases SET prehashid = %d WHERE id = %d', $row['prehashid'], $row['releaseid'])
@@ -202,7 +202,7 @@ Class PreHash
 		$res = $this->pdo->queryDirect($query);
 		$total = $res->rowCount();
 		echo $this->pdo->log->primary(number_format($total) . " releases to process.");
-		if ($res instanceof Traversable) {
+		if ($res instanceof \Traversable) {
 			foreach ($res as $row) {
 				if (preg_match('/[a-fA-F0-9]{32,40}/i', $row['name'], $matches)) {
 					$updated = $updated + $namefixer->matchPredbHash($matches[0], $row, $echo, $namestatus, $this->echooutput, $show);
@@ -296,5 +296,4 @@ Class PreHash
 	{
 		return $this->pdo->queryOneRow(sprintf('SELECT * FROM prehash WHERE id = %d', $preID));
 	}
-
 }

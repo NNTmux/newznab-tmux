@@ -14,7 +14,7 @@ use newznab\utility\Utility;
  * decoding yEnc articles, decompressing article headers.
  * Extends PEAR's Net_NNTP_Client class, overrides some functions.
  */
-class NNTP extends Net_NNTP_Client
+class NNTP extends \Net_NNTP_Client
 {
 	public $pdo;
 
@@ -116,8 +116,8 @@ class NNTP extends Net_NNTP_Client
 		$this->_debugBool = (NN_LOGGING || NN_DEBUG);
 		if ($this->_debugBool) {
 			try {
-				$this->_debugging = ($options['Logger'] instanceof \Logger ? $options['Logger'] : new \Logger(['ColorCLI' => $this->pdo->log]));
-			} catch (\LoggerException $error) {
+				$this->_debugging = ($options['Logger'] instanceof Logger ? $options['Logger'] : new Logger(['ColorCLI' => $this->pdo->log]));
+			} catch (LoggerException $error) {
 				$this->_debugBool = false;
 			}
 		}
@@ -1614,5 +1614,4 @@ class NNTP extends Net_NNTP_Client
 		}
 		return $retVal;
 	}
-
 }

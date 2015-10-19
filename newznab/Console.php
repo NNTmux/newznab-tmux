@@ -152,7 +152,7 @@ class Console
 	{
 		$catsrch = '';
 		if (count($cat) > 0 && $cat[0] != -1) {
-			$catsrch = (new \Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
+			$catsrch = (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
 		}
 
 		$res = $this->pdo->queryOneRow(
@@ -186,7 +186,7 @@ class Console
 
 		$catsrch = '';
 		if (count($cat) > 0 && $cat[0] != -1) {
-			$catsrch = (new \Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
+			$catsrch = (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
 		}
 
 		$exccatlist = "";
@@ -564,7 +564,9 @@ class Console
 	 *
 	 * @param string $platform
 	 *
-	 **/
+	 *
+	 * @return string
+	 */
 	protected function _replacePlatform($platform)
 	{
 		switch (strtoupper($platform)) {
@@ -628,7 +630,7 @@ class Console
 
 	protected function _updateConsoleTable($con =[])
 	{
-		$ri = new \ReleaseImage($this->pdo);
+		$ri = new ReleaseImage($this->pdo);
 
 		$check = $this->pdo->queryOneRow(
 			sprintf('
@@ -727,7 +729,7 @@ class Console
 							AND categoryid BETWEEN 1000 AND 1999
 							ORDER BY postdate DESC
 							LIMIT %d',
-				\Enzebe::NZB_ADDED,
+				NZB::NZB_ADDED,
 				$this->renamed,
 				$this->gameqty
 			)
@@ -1017,6 +1019,4 @@ class Console
 
 		return ($str != '') ? $str : false;
 	}
-
-
 }

@@ -1487,7 +1487,7 @@ class Releases
 	 * @param int    $categorize
 	 * @param int    $postProcess
 	 * @param string $groupName (optional)
-	 * @param \NNTP   $nntp
+	 * @param NNTP   $nntp
 	 * @param bool   $echooutput
 	 *
 	 * @return int
@@ -2508,7 +2508,7 @@ class Releases
 
 		if ($local === true) {
 			$foundRequestIDs = (
-			new \RequestIDLocal(
+			new RequestIDLocal(
 				['Echo'   => $echoCLI, 'ConsoleTools' => $consoleTools,
 				 'Groups' => $groups, 'Settings' => $this->pdo
 				]
@@ -2516,7 +2516,7 @@ class Releases
 			)->lookupRequestIDs(['GroupID' => $groupID, 'limit' => $limit, 'time' => 168]);
 		} else {
 			$foundRequestIDs = (
-			new \RequestIDWeb(
+			new RequestIDWeb(
 				['Echo'   => $echoCLI, 'ConsoleTools' => $consoleTools,
 				 'Groups' => $groups, 'Settings' => $this->pdo
 				]

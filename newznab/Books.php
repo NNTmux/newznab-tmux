@@ -183,7 +183,7 @@ class Books
 
 		$catsrch = '';
 		if (count($cat) > 0 && $cat[0] != -1) {
-			$catsrch = (new \Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
+			$catsrch = (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
 		}
 
 		$maxage = '';
@@ -321,7 +321,7 @@ class Books
 		$response = $apaiIo->runOperation($search);
 		if ($response === false)
 		{
-			throw new Exception("Could not connect to Amazon");
+			throw new \Exception("Could not connect to Amazon");
 		}
 		else
 		{
@@ -486,7 +486,7 @@ class Books
 
 	public function updateBookInfo($bookInfo = '', $amazdata = null)
 	{
-		$ri = new \ReleaseImage($this->pdo);
+		$ri = new ReleaseImage($this->pdo);
 
 		$book =[];
 

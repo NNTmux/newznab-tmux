@@ -755,5 +755,4 @@ class Logger
 				return false;
 		}
 	}
-
 }

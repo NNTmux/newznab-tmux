@@ -112,7 +112,7 @@ class Backfill
 		if ($this->_debug) {
 			try {
 				$this->_debugging = ($options['Logger'] instanceof Logger ? $options['Logger'] : new Logger(['ColorCLI' => $this->pdo->log]));
-			} catch (\LoggerException $error) {
+			} catch (LoggerException $error) {
 				$this->_debug = false;
 			}
 		}

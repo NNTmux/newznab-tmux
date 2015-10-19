@@ -179,7 +179,7 @@ class NameFixer
 					INNER JOIN releasenfo nfo ON (nfo.releaseid = rel.id)
 					WHERE nzbstatus = %d
 					AND prehashid = 0',
-				Enzebe::NZB_ADDED
+				NZB::NZB_ADDED
 			);
 			$cats = 2;
 			$preId = true;
@@ -198,7 +198,7 @@ class NameFixer
 
 		$releases = $this->_getReleases($time, $cats, $query);
 
-		if ($releases instanceof Traversable && $releases !== false) {
+		if ($releases instanceof \Traversable && $releases !== false) {
 			$total = $releases->rowCount();
 
 			if ($total > 0) {
@@ -259,7 +259,7 @@ class NameFixer
 					INNER JOIN releasefiles rf ON (rf.releaseid = rel.id)
 					WHERE nzbstatus = %d
 					AND prehashid = 0',
-				Enzebe::NZB_ADDED
+				NZB::NZB_ADDED
 			);
 			$cats = 2;
 			$preId = true;
@@ -278,7 +278,7 @@ class NameFixer
 		}
 
 		$releases = $this->_getReleases($time, $cats, $query);
-		if ($releases instanceof Traversable && $releases !== false) {
+		if ($releases instanceof \Traversable && $releases !== false) {
 
 			$total = $releases->rowCount();
 			if ($total > 0) {
@@ -319,7 +319,7 @@ class NameFixer
 					FROM releases rel
 					WHERE nzbstatus = %d
 					AND prehashid = 0',
-				Enzebe::NZB_ADDED
+				NZB::NZB_ADDED
 			);
 			$cats = 2;
 		} else {
@@ -336,7 +336,7 @@ class NameFixer
 
 		$releases = $this->_getReleases($time, $cats, $query);
 
-		if ($releases instanceof Traversable && $releases !== false) {
+		if ($releases instanceof \Traversable && $releases !== false) {
 
 			$total = $releases->rowCount();
 			if ($total > 0) {
@@ -668,7 +668,7 @@ class NameFixer
 		}
 
 		// Run if row count is positive, but do not run if row count exceeds 10 (as this is likely a failed title match)
-		if ($total > 0 && $total <= 15 && $res instanceof Traversable) {
+		if ($total > 0 && $total <= 15 && $res instanceof \Traversable) {
 			foreach ($res as $row) {
 				if ($pre['title'] !== $row['searchname']) {
 					$this->updateRelease($row, $pre['title'], $method = "Title Match source: " . $pre['source'], $echo, "PreDB FT Exact, ", $namestatus, $show, $pre['prehashid']);
@@ -686,8 +686,8 @@ class NameFixer
 	protected function _preFTsearchQuery($preTitle)
 	{
 		switch (NN_RELEASE_SEARCH_TYPE) {
-			case \ReleaseSearch::SPHINX:
-				$titlematch = \SphinxSearch::escapeString($preTitle);
+			case ReleaseSearch::SPHINX:
+				$titlematch = SphinxSearch::escapeString($preTitle);
 				$join = sprintf(
 					'INNER JOIN releases_se rse ON rse.id = r.id
 					WHERE rse.query = "@(name,searchname,filename) %s;mode=extended"',
@@ -746,7 +746,7 @@ class NameFixer
 
 			$total = $query->rowCount();
 
-			if ($total > 0 && $query instanceof Traversable) {
+			if ($total > 0 && $query instanceof \Traversable) {
 
 				echo $this->pdo->log->header("\n" . number_format($total) . ' releases to process.');
 

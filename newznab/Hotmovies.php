@@ -49,7 +49,7 @@ class Hotmovies
 	/**
 	 * Simple Html Dom Object
 	 *
-	 * @var simple_html_dom
+	 * @var \simple_html_dom
 	 */
 	protected $_html;
 

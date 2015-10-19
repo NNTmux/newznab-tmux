@@ -76,7 +76,7 @@ class Enzebe
 	/**
 	 * Default constructor.
 	 *
-	 * @param newznab\db\Settings $pdo
+	 * @param \newznab\db\Settings $pdo
 	 *
 	 * @access public
 	 */

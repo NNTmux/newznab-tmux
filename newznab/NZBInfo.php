@@ -83,7 +83,7 @@ class NZBInfo
                         $loc = 'compress.zlib://'.$loc;
                         break;
                     case 'zip':
-                        $zip = new ZipArchive;
+                        $zip = new \ZipArchive;
                         if ($zip->open($loc) === true && $zip->numFiles == 1)
                             return $this->loadFromString($zip->getFromIndex(0), $loadAllVars);
                         else

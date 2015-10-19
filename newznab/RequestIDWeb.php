@@ -304,7 +304,7 @@ class RequestIDWeb extends RequestID
 		$this->sphinx->updateRelease($this->_release['id'], $this->pdo);
 
 		if ($this->echoOutput) {
-			\NameFixer::echoChangedReleaseName(array(
+			NameFixer::echoChangedReleaseName(array(
 					'new_name' => $this->_newTitle['title'],
 					'old_name' => $this->_release['searchname'],
 					'new_category' => $this->category->getNameByID($determinedCategory),

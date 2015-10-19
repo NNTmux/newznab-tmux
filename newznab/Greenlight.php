@@ -28,7 +28,7 @@ class Greenlight
 	protected $_directURL = '';
 
 	/**
-	 * @var simple_html_dom
+	 * @var \simple_html_dom
 	 */
 	protected $_html;
 
@@ -64,7 +64,7 @@ class Greenlight
 
 	public function __construct()
 	{
-		$this->_html = new simple_html_dom();
+		$this->_html = new \simple_html_dom();
 		if (isset($this->cookie)) {
 			$this->getUrl(self::GREENLIGHTURL);
 		}

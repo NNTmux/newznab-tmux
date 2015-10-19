@@ -77,7 +77,7 @@ class NZBGet
 	 * Construct.
 	 * Set up full URL.
 	 *
-	 * @var BasePage $page
+	 * @var \BasePage $page
 	 *
 	 * @access public
 	 */
@@ -94,8 +94,8 @@ class NZBGet
 		}
 
 		$this->fullURL = $this->verifyURL($this->url);
-		$this->Releases = new \Releases();
-		$this->NZB = new \NZB();
+		$this->Releases = new Releases();
+		$this->NZB = new NZB();
 	}
 
 	/**

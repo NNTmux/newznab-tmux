@@ -27,7 +27,7 @@ class ReleaseSearch
 	private $fullTextJoinString;
 
 	/**
-	 * @param newznab\db\Settings $settings
+	 * @param Settings $settings
 	 */
 	public function __construct(Settings $settings)
 	{
@@ -45,7 +45,7 @@ class ReleaseSearch
 		}
 
 		$this->sphinxQueryOpt = ";limit=10000;maxmatches=10000;sort=relevance;mode=extended";
-		$this->pdo = ($settings instanceof newznab\db\Settings ? $settings : new newznab\db\Settings());
+		$this->pdo = ($settings instanceof Settings ? $settings : new Settings());
 	}
 
 	/**

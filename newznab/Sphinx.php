@@ -12,6 +12,7 @@ if (!defined("FS_ROOT")) { define('FS_ROOT', realpath(dirname(__FILE__))); }
 
 use newznab\libraries\Cache;
 use newznab\db\Settings;
+use newznab\utility\Utility;
 
 // Every day
 define("INDEX_MERGE_FREQ", 1440);
@@ -51,9 +52,9 @@ class Sphinx
         $output = [];
         $handle = popen($cmd, "r");
         while ($line = fgets($handle)) {
-            if (\newznab\utility\Utility::startsWith($line, "Sphinx") ||
-                \newznab\utility\Utility::startsWith($line, "Copyright") ||
-                \newznab\utility\Utility::startsWith($line, "\n") || startsWith($line, "using config"))
+            if (Utility::startsWith($line, "Sphinx") ||
+                Utility::startsWith($line, "Copyright") ||
+                Utility::startsWith($line, "\n") || Utility::startsWith($line, "using config"))
             {
                 continue;
             }
@@ -107,7 +108,7 @@ class Sphinx
             return false;
         }
 
-        $db = new newznab\db\Settings();
+        $db = new Settings();
 
         if ($lastRebuildDate == 0) {
             $lastRebuildDate = "NOW()";
@@ -145,7 +146,7 @@ class Sphinx
             return false;
         }
 
-        $db = new newznab\db\Settings();
+        $db = new Settings();
 
         if ($lastMergedDate == 0) {
             $lastMergedDate = "NOW()";
@@ -305,7 +306,7 @@ class Sphinx
      */
     public function update()
     {
-        $db = new newznab\db\Settings();
+        $db = new Settings();
 
         if (!$this->pdo->getSetting('sphinxenabled')) {
             // Sphinx is disabled, so we don't do anything.
@@ -541,7 +542,7 @@ class Sphinx
         }
 
         // Get connection to Newznab's MySQL database
-        $ndb = new newznab\db\Settings;
+        $ndb = new Settings;
 
         // Determine which release to start with
         if ($startingID < 0) {
@@ -675,7 +676,7 @@ class Sphinx
 		}
 
         if ($lookupQuery && count($results) > 0) {
-            $ndb = new newznab\db\Settings;
+            $ndb = new Settings;
             $sql = sprintf($lookupQuery, implode(",", $results));
             $result = $ndb->queryDirect($sql);
 			if ($result)
@@ -698,6 +699,7 @@ class Sphinx
 
         return $results;
     }
+
     /**
      * Constructs a SphinxQL query.
      *
@@ -714,6 +716,7 @@ class Sphinx
      * @param   array   $where
      * @param   string  $lookupQuery
      *
+     * @return mixed|string
      */
     public function buildQuery($search, $cat=[], $offset=0, $limit=100,
                            $order=array("postdate", "desc"), $maxage=-1,
@@ -721,7 +724,7 @@ class Sphinx
                            $indexes=[], $lookup=true, $where=[],
                            &$lookupQuery="")
     {
-        $ndb = new newznab\db\Settings;
+        $ndb = new Settings;
 
         $offset = intval($offset);
         $limit = intval($limit);
@@ -970,7 +973,7 @@ class Sphinx
                                    $limit=100, $name="", $cat=array(-1),
                                    $maxage=-1, $indexes=[], $lookup=true)
     {
-        $db = new newznab\db\Settings();
+        $db = new Settings();
         $order = array("postdate", "desc");
         $search = array($name);
         if ($series != "") {
@@ -1036,7 +1039,7 @@ class Sphinx
                                    $cat=array(-1), $genre="", $maxage=-1,
                                    $indexes=[], $lookup=true)
     {
-        $db = new newznab\db\Settings();
+        $db = new Settings();
         $search = [];
         $order = array("postdate", "desc");
         $where = [];
@@ -1103,7 +1106,7 @@ class Sphinx
                                 $cat=array(-1), $maxage=-1, $indexes=[],
                                 $lookup=true)
     {
-        $db = new newznab\db\Settings();
+        $db = new Settings();
         $search = [];
         $where = [];
         $order = array("postdate", "desc");
@@ -1179,7 +1182,7 @@ class Sphinx
     public function searchBook($author, $title, $offset=0, $limit=100,
                                $maxage=-1, $indexes=[], $lookup=true)
     {
-        $db = new newznab\db\Settings();
+        $db = new Settings();
         $order = array("postdate", "desc");
         $search = [];
         if ($author != "") {
@@ -1242,7 +1245,7 @@ class Sphinx
                                     $name='', $maxage=-1, $indexes=[],
                                     $lookup=true)
     {
-        $db = new newznab\db\Settings();
+        $db = new Settings();
         $where = [];
         $search = [];
         $order = array("postdate", "desc");
@@ -1291,7 +1294,7 @@ class Sphinx
      */
     public function getPreRange($start=0, $num, $dirname='', $category='')
     {
-        $db = new newznab\db\Settings();
+        $db = new Settings();
         $dirname = empty($category) ? $dirname : $dirname." @category =".$category;
         $sphinxQuery = sprintf("SELECT id "
                                ."FROM predb, predb_delta "

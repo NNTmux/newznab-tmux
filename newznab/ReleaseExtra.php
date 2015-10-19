@@ -2,6 +2,7 @@
 namespace newznab;
 
 use newznab\db\Settings;
+use newznab\utility\Utility;
 
 /**
  * This class handles storage and retrieval of releaseextrafull/releasevideo/audio/subs data.
@@ -80,7 +81,7 @@ class ReleaseExtra
 	public function addFromXml($releaseID, $xml)
 	{
 		$xmlObj = @simplexml_load_string($xml);
-		$arrXml = \newznab\utility\Utility::objectsIntoArray($xmlObj);
+		$arrXml = Utility::objectsIntoArray($xmlObj);
 		$containerformat = "";
 		$overallbitrate = "";
 

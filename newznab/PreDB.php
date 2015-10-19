@@ -135,7 +135,7 @@ class PreDB
 	/**
 	 * Add/Update predb row.
 	 *
-	 * @param newznab\db\Settings $pdo
+	 * @param Settings $pdo
 	 * @param    $preArray
 	 * @return bool
 	 */
@@ -262,7 +262,6 @@ class PreDB
 				}
 			}
 		}
-
 		$nntp->disconnect();
 
 		if($this->echooutput)

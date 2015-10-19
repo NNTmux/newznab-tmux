@@ -7,7 +7,7 @@ class SphinxSearch
 {
 	/**
 	 * SphinxQL connection.
-	 * @var newznab\db\DB
+	 * @var \newznab\db\DB
 	 */
 	public $sphinxQL = null;
 
@@ -16,7 +16,7 @@ class SphinxSearch
 	 */
 	public function __construct()
 	{
-		if (NN_RELEASE_SEARCH_TYPE == \ReleaseSearch::SPHINX) {
+		if (NN_RELEASE_SEARCH_TYPE == ReleaseSearch::SPHINX) {
 			if (!defined('NN_SPHINXQL_HOST_NAME')) {
 				define('NN_SPHINXQL_HOST_NAME', '0');
 			}

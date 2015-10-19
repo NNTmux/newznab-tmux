@@ -21,23 +21,6 @@ if(!defined('JSON_HEX_APOS')) define('JSON_HEX_APOS', 4);
 if(!defined('JSON_HEX_QUOT')) define('JSON_HEX_QUOT', 8);
 if(!defined('JSON_UNESCAPED_UNICODE')) define('JSON_UNESCAPED_UNICODE', 256);
 
-// Silent Error Handler (used to shut up noisy XML exceptions)
-// we use the silent error handler for remote connection failures as well
-function snHandleError($errno, $errstr, $errfile, $errline, array $errcontext){
-	if (0 === error_reporting())
-		return false;
-	if(!defined('E_STRICT'))define('E_STRICT', 2048);
-	switch($errno){
-		case E_WARNING:
-		case E_NOTICE:
-		case E_STRICT:
-			return;
-		default:
-			break;
-	};
-	throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
-}
-
 // Create a NNTP Exception type so we can identify it from others
 class SpotNabException extends \Exception { }
 
@@ -155,8 +138,8 @@ class SpotNab {
 	public function __construct($post_user = NULL, $post_email = NULL, $post_group = NULL) {
 		$this->_pdo = new Settings();
 		$this->_nntp = new NNTP(['Settings' => $this->_pdo]);
-		$this->releaseImage =  new \ReleaseImage($this->_pdo);
-		$this->nzb = new \NZB($this->_pdo);
+		$this->releaseImage =  new ReleaseImage($this->_pdo);
+		$this->nzb = new NZB($this->_pdo);
 
 		$this->_post_user = $post_user;
 		$this->_post_email = $post_email;
@@ -390,16 +373,13 @@ class SpotNab {
 			}
 		}
 
-		// Now we fetch headers
-		set_error_handler('snHandleError');
-
 		// Connect to server
 		try{
 			if (($this->_pdo->getSetting('alternate_nntp') == 1 ? $this->_nntp->doConnect(true, true) : $this->_nntp->doConnect()) !== true) {
 				exit($this->_pdo->log->error("Unable to connect to usenet." . PHP_EOL));
 			}
 		}
-		catch(Exception $e){
+		catch(\Exception $e){
 			printf("Failed to connect to Usenet\n");
 			// Restore handler
 			restore_error_handler();
@@ -474,7 +454,7 @@ class SpotNab {
 					//print_r($headers);
 				}
 
-			}catch(Exception $e){
+			}catch(\Exception $e){
 				// Reset Connection
 				$fetch_okay = $this->_nntpReset(SpotNab::AUTODISCOVER_POST_GROUP);
 
@@ -731,17 +711,13 @@ class SpotNab {
 			// Sort results (oldest in time first)
 			array_multisort($_ref, SORT_ASC, $group_hash[$key]);
 		}
-
-		// Now we fetch headers
-		set_error_handler('snHandleError');
-
 		// Connect to server
 		try{
 			if (($this->_pdo->getSetting('alternate_nntp') == 1 ? $this->_nntp->doConnect(true, true) : $this->_nntp->doConnect()) !== true) {
 				exit($this->_pdo->log->error("Unable to connect to usenet." . PHP_EOL));
 			}
 		}
-		catch(Exception $e){
+		catch(\Exception $e){
 			printf("Failed to connect to Usenet");
 			// Restore handler
 			restore_error_handler();
@@ -816,7 +792,7 @@ class SpotNab {
 						//print_r($headers);
 					}
 
-				}catch(Exception $e){
+				}catch(\Exception $e){
 					// Reset Connection
 					$fetch_okay = $this->_nntpReset($group);
 
@@ -841,7 +817,7 @@ class SpotNab {
 
 		// Ensure We're not connected
 		try{$this->_nntp->doQuit();}
-		catch(Exception $e)
+		catch(\Exception $e)
 		{/* do nothing */}
 
 		return $inserted + $updated;
@@ -1248,10 +1224,10 @@ class SpotNab {
 		// Comments
 		$sql_new_cmt = "INSERT INTO release_comments (".
 			"id, sourceid, username, userid, gid, cid, isvisible, ".
-			"releaseid, `text`, createddate, issynced, nzb_guid) VALUES (".
+			"releaseid, text, createddate, issynced, nzb_guid) VALUES (".
 			"NULL, %d, %s, 0, %s, %s, %d, 0, %s, %s, 1, UNHEX(%s))";
 		$sql_upd_cmt = "UPDATE release_comments SET ".
-			"isvisible = %d, `text` = %s".
+			"isvisible = %d, text = %s".
 			"WHERE sourceid = %d AND gid = %s AND cid = %s AND nzb_guid = UNHEX(%s)";
 		$sql_fnd_cmt = "SELECT count(id) as cnt FROM release_comments ".
 			"WHERE sourceid = %d AND gid = %s AND cid = %s";
@@ -1843,10 +1819,10 @@ class SpotNab {
 				// Actually send the article
 				$_err = $this->_nntp->cmdPost2($article);
 
-			}catch(Exception $e){
+			}catch(\Exception $e){
 				// Ensure We're not connected
 				try{$this->_nntp->doQuit();}
-				catch(Exception $e)
+				catch(\Exception $e)
 				{/* do nothing */}
 
 				// Post failed
@@ -1878,7 +1854,7 @@ class SpotNab {
 	{
 		// Reset Connection
 		try{$this->_nntp->doQuit();}
-		catch(Exception $e)
+		catch(\Exception $e)
 		{/* do nothing */}
 
 		// Attempt to reconnect

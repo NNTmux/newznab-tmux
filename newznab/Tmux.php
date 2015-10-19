@@ -397,8 +397,7 @@ class Tmux
 					SUM(IF(nzbstatus = 1 AND categoryid BETWEEN 6000 AND 6040 AND xxxinfo_id = 0,1,0)) AS processxxx,
 					SUM(IF(1=1 %s,1,0)) AS processnfo,
 					SUM(IF(nzbstatus = 1 AND nfostatus = 1,1,0)) AS nfo,
-					SUM(IF(nzbstatus = 1 AND isrequestid = 1 AND prehashid = 0 AND
-						((reqidstatus = 0) OR (reqidstatus = -1) OR (reqidstatus = -3 AND adddate > NOW() - INTERVAL %s HOUR)),1,0)) AS requestid_inprogress,
+					SUM(IF(nzbstatus = 1 AND isrequestid = 1 AND prehashid = 0 AND ((reqidstatus = 0) OR (reqidstatus = -1) OR (reqidstatus = -3 AND adddate > NOW() - INTERVAL %s HOUR)),1,0)) AS requestid_inprogress,
 					SUM(IF(prehashid > 0 AND nzbstatus = 1 AND isrequestid = 1 AND reqidstatus = 1,1,0)) AS requestid_matched,
 					SUM(IF(prehashid > 0 AND searchname IS NOT NULL,1,0)) AS prehash_matched,
 					SUM(IF(preid > 0 AND searchname IS NOT NULL,1,0)) AS predb_matched,

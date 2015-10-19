@@ -194,7 +194,4 @@ class IAFD
 
 		return true;
 	}
-
-
-
 }

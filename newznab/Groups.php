@@ -321,7 +321,7 @@ class Groups
 	public function reset($id)
 	{
 		// Remove rows from collections / binaries / parts.
-		(new \Binaries(['Groups' => $this, 'Settings' => $this->pdo]))->purgeGroup($id);
+		(new Binaries(['Groups' => $this, 'Settings' => $this->pdo]))->purgeGroup($id);
 
 		// Remove rows from part repair.
 		$this->pdo->queryExec(sprintf("DELETE FROM partrepair WHERE groupid = %d", $id));
@@ -560,9 +560,9 @@ class Groups
 		);
 
 		if ($releaseArray instanceof \Traversable) {
-			$releases = new \Releases(['Settings' => $this->pdo, 'Groups' => $this]);
-			$nzb = new \NZB($this->pdo);
-			$releaseImage = new \ReleaseImage($this->pdo);
+			$releases = new Releases(['Settings' => $this->pdo, 'Groups' => $this]);
+			$nzb = new NZB($this->pdo);
+			$releaseImage = new ReleaseImage($this->pdo);
 			foreach ($releaseArray as $release) {
 				$releases->deleteSingle(['g' => $release['guid'], 'i' => $release['id']], $nzb, $releaseImage);
 			}
