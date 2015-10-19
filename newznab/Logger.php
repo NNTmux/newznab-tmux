@@ -757,5 +757,3 @@ class Logger
 	}
 
 }
-
-class LoggerException extends Exception {}

@@ -1,4 +1,5 @@
 2015-10-19 DariusIII
+	Fix: LoggerException erro.
 	Fix: Remove references to www/config.php in Settings.php
 	Upd: small update to XXX class.
 	Fix: @var Users in BasePage.php
