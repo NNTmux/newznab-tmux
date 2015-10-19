@@ -28,7 +28,7 @@ class XXX
 	protected $currentTitle = '';
 
 	/**
-	 * @var Logger
+	 * @var \newznab\Logger
 	 */
 	protected $debugging;
 
@@ -38,7 +38,7 @@ class XXX
 	protected $debug;
 
 	/**
-	 * @var ReleaseImage
+	 * @var \newznab\ReleaseImage
 	 */
 	protected $releaseImage;
 
@@ -78,8 +78,8 @@ class XXX
 		if (NN_DEBUG || NN_LOGGING) {
 			$this->debug = true;
 			try {
-				$this->debugging = new \Logger();
-			} catch (\LoggerException $error) {
+				$this->debugging = new Logger();
+			} catch (LoggerException $error) {
 				$this->_debug = false;
 			}
 		}
