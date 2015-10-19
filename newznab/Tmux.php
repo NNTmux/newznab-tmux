@@ -17,7 +17,7 @@ class Tmux
 	public $tmux_session;
 
 	/**
-	 * @param newznab\db\Settings $pdo
+	 * @param Settings $pdo
 	 */
 	function __construct(Settings $pdo = null)
 	{
@@ -269,7 +269,7 @@ class Tmux
 
 	public function rows2Object($rows)
 	{
-		$obj = new stdClass;
+		$obj = new \stdClass;
 		foreach ($rows as $row) {
 			$obj->{$row['setting']} = $row['value'];
 		}
@@ -280,7 +280,7 @@ class Tmux
 
 	public function row2Object($row)
 	{
-		$obj = new stdClass;
+		$obj = new \stdClass;
 		$rowKeys = array_keys($row);
 		foreach ($rowKeys as $key) {
 			$obj->{$key} = $row[$key];
