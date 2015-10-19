@@ -1,4 +1,5 @@
 2015-10-19 DariusIII
+	Fix: update_db error.
 	Fix: More script adjustments
 	Fix: Fix book and misc menu in omicron template
 	Upd: Many small changes to classes

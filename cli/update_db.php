@@ -19,13 +19,13 @@
  * @copyright 2014 nZEDb
  */
 require_once realpath(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'indexer.php');
-require_once SMARTY_DIR . 'Smarty.class.php';
+require_once NN_LIBS . DIRECTORY_SEPARATOR . 'smarty' . DIRECTORY_SEPARATOR . 'Smarty.class.php';
 
 use newznab\db\DbUpdate;
 use newznab\utility\Utility;
 
 if (!Utility::isCLI()) {
-	exit;
+	exit("This utility can only be run from a shell\n");
 }
 
 if (isset($argc) && $argc > 1 && isset($argv[1]) && $argv[1] == true) {
@@ -47,5 +47,7 @@ if (isset($argc) && $argc > 1 && isset($argv[1]) && $argv[1] == true) {
 		$updater->log->info($msg);
 	}
 } else {
-	echo "Usage: php update_db.php true";
+	echo "Usage: php update_db.php true\n";
 }
+
+?>
