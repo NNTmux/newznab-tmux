@@ -1,6 +1,6 @@
 <?php
 //This script downloads covert art for Tv Shows -- it is intended to be run at interval, generally after the TvRage database is populated
-require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
+require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
 use newznab\db\Settings;
 use newznab\utility\Utility;

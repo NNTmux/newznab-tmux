@@ -1,5 +1,5 @@
 <?php
-require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
+require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
 use newznab\libraries\ApaiIO\Configuration\GenericConfiguration;
 use newznab\libraries\ApaiIO\Operations\Search;
