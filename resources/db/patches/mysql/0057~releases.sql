@@ -1,0 +1,1 @@
+ALTER TABLE releases ADD COLUMN proc_sorter TINYINT(1) NOT NULL DEFAULT '0';
