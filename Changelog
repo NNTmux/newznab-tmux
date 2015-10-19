@@ -1,4 +1,5 @@
 2015-10-20 DariusIII
+	Chg: Change rageid into tvinfoid as temporary solution in Tmux.php
 	Upd: update patches - remove rageid.
 2015-10-19 DariusIII
 	Upd: Update the DbUpdate class
