@@ -20,6 +20,7 @@ ALTER TABLE releasecomment ADD COLUMN shareid  VARCHAR(40) NOT NULL DEFAULT '';
 ALTER TABLE releasecomment ADD COLUMN siteid   VARCHAR(40) NOT NULL DEFAULT '';
 ALTER TABLE releasecomment ADD COLUMN nzb_guid VARCHAR(32) NOT NULL DEFAULT '';
 ALTER TABLE releasecomment ADD COLUMN text_hash VARCHAR(32) NOT NULL DEFAULT '';
+ALTER TABLE releasefiles ADD COLUMN ishashed TINYINT(1) NOT NULL DEFAULT '0';
 
 INSERT INTO site (setting, value) VALUES
 ('sqlpatch',	'0'),
