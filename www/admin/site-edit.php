@@ -118,7 +118,7 @@ $page->smarty->assign('curlproxytype_names', array( '', 'HTTP', 'SOCKS5'));
 
 $page->smarty->assign('newgroupscan_names', array('Days','Posts'));
 
-$page->smarty->assign('registerstatus_ids', array(Sites::REGISTER_STATUS_API_ONLY, Sites::REGISTER_STATUS_OPEN, Sites::REGISTER_STATUS_INVITE, Sites::REGISTER_STATUS_CLOSED));
+$page->smarty->assign('registerstatus_ids', array(Settings::REGISTER_STATUS_API_ONLY, Settings::REGISTER_STATUS_OPEN, Settings::REGISTER_STATUS_INVITE, Settings::REGISTER_STATUS_CLOSED));
 $page->smarty->assign('registerstatus_names', array('API Only', 'Open', 'Invite', 'Closed'));
 
 $page->smarty->assign('passworded_ids', array(0,1,2));
@@ -174,7 +174,7 @@ $book_reqids_ids = array_map(create_function('$value', 'return (int)$value;'), $
 $page->smarty->assign('book_reqids_ids', $book_reqids_ids);
 $page->smarty->assign('book_reqids_names', $book_reqids_names);
 
-// convert from a list to an array as we need to use an array, but teh sites table only saves strings
+// convert from a list to an array as we need to use an array, but teh Settings table only saves strings
 $books_selected = explode(",", $page->settings->book_reqids);
 
 // convert from a string array to an int array
