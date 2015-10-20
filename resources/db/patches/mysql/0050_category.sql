@@ -10,7 +10,7 @@ CREATE TABLE category
   description          VARCHAR(255)    NULL,
   disablepreview       TINYINT(1)      NOT NULL DEFAULT '0'
 )
-  ENGINE =INNODB
+  ENGINE =MYISAM
   DEFAULT CHARACTER SET utf8
   COLLATE utf8_unicode_ci
   AUTO_INCREMENT =100000;

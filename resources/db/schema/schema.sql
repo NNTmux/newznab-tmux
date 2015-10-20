@@ -607,7 +607,7 @@ CREATE TABLE sharing (
 	site_name      VARCHAR(255)       NOT NULL DEFAULT '',
 	enabled        TINYINT(1)         NOT NULL DEFAULT '0',
 	posting        TINYINT(1)         NOT NULL DEFAULT '0',
-    start_position TINYINT(1)         NOT NULL DEFAULT '0',
+  start_position TINYINT(1)         NOT NULL DEFAULT '0',
 	fetching       TINYINT(1)         NOT NULL DEFAULT '1',
 	auto_enable    TINYINT(1)         NOT NULL DEFAULT '1',
 	hide_users     TINYINT(1)         NOT NULL DEFAULT '1',
