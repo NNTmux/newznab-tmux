@@ -1594,7 +1594,6 @@ class Releases
 	public function deleteBinaries($groupID)
 	{
 		$group = $this->groups->getCBPTableNames($this->tablePerGroup, $groupID);
-		$page = new Page();
 		$currTime_ori = $this->pdo->queryOneRow("SELECT NOW() as now");
 		//
 		// aggregate the releasefiles upto the releases.
@@ -1675,7 +1674,6 @@ class Releases
 		//
 		$retcount = 0;
 		$currTime_ori = $this->pdo->queryOneRow("SELECT NOW() as now");
-		$page = new Page();
 		$group = $this->groups->getCBPTableNames($this->tablePerGroup, $groupID);
 		$this->pdo->log->doEcho($this->pdo->log->primary('Marking binaries where all parts are available'));
 		$result = $this->pdo->queryDirect(sprintf("SELECT relname, date, SUM(reltotalpart) AS reltotalpart, groupid, reqid, fromname, SUM(num) AS num, coalesce(g.minfilestoformrelease, s.minfilestoformrelease) AS minfilestoformrelease FROM ( SELECT relname, reltotalpart, groupid, reqid, fromname, max(date) AS date, COUNT(id) AS num FROM %s WHERE procstat = %s GROUP BY relname, reltotalpart, groupid, reqid, fromname ORDER BY NULL ) x LEFT OUTER JOIN groups g ON g.id = x.groupid INNER JOIN ( SELECT value AS minfilestoformrelease FROM settings WHERE setting = 'minfilestoformrelease' ) s GROUP BY relname, groupid, reqid, fromname, minfilestoformrelease ORDER BY NULL", $group['bname'], Releases::PROCSTAT_TITLEMATCHED));
@@ -1805,7 +1803,6 @@ class Releases
 	{
 		$startTime = time();
 		$group = $this->groups->getCBPTableNames($this->tablePerGroup, $groupID);
-		$page = new Page();
 		$this->pdo->log->doEcho($this->pdo->log->primary('Creating releases from complete binaries'));
 
 		$this->pdo->ping(true);
