@@ -202,6 +202,9 @@ INSERT INTO tmux (setting, value) VALUES
 ('sharing_timer', '60'),
 ('optimize', '0'),
 ('optimize_timer', '86400'),
+('colors_start', '1'),
+('colors_end', '250'),
+('colors_exc', '4, 8, 9, 11, 15, 16, 17, 18, 19, 46, 47, 48, 49, 50, 51, 52, 53, 59, 60'),
 ('import_count', '50000');
 
 DROP TABLE IF EXISTS prehash;
