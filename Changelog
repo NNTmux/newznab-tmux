@@ -1,4 +1,5 @@
 2015-10-20 DariusIII
+	Chg: Change description on ircscraper.
 	Fix: Schema and ircscraper settings in tmux.
 	Fix: Typo in queryExec
 	Fix: Add missing posprocess_pre script, change references to Page in Releases.php

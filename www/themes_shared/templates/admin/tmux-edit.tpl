@@ -571,8 +571,7 @@
 			<td>
 				{html_radios id="run_ircscraper" name='run_ircscraper' values=$yesno_ids output=$yesno_names
 				selected=$ftmux->run_ircscraper separator='<br />'}
-				<div class="hint">Choose to run IRCScraper on irc channels. Setting SCRAPE_IRC_C_Z_BOOL parameter to
-					true or false in settings.php will toggle between the servers. The pane for this can not be
+				<div class="hint">Choose to run IRCScraper on irc channels. The pane for this can not be
 					created after tmux starts.
 				</div>
 			</td>
@@ -580,8 +579,8 @@
 		<tr>
 			<td style="width:180px;"><label for="explain">Information:</label></td>
 			<td>
-				<div class="explanation">IRC Scraper will scrape several predb channels from the enabled servers.<br/>
-					Copy ircscraper_settings.example.php to ircscraper_settings.php in /misc/IRCScraper and change the settings.<br/>
+				<div class="explanation">IRC Scraper will scrape newznab-tmux's own pre channel on synIRC for pre info.<br/>
+					Copy ircscraper_settings.example.php to ircscraper_settings.php in /newznab/config/ folder and change the settings.<br/>
 					As a minimum you should set the username and make sure it is unique.
 				</div>
 			</td>
