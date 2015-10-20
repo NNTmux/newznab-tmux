@@ -186,7 +186,7 @@ class Tmux
 				"SELECT
 					(%1\$s 'sequential') AS sequential,
 					(%1\$s 'tmux_session') AS tmux_session,
-					(%1\$s 'scrape') AS run_ircscraper,
+					(%1\$s 'run_ircscraper') AS run_ircscraper,
 					(%2\$s 'sqlpatch') AS sqlpatch,
 					(%2\$s 'alternate_nntp') AS alternate_nntp,
 					(%2\$s 'tablepergroup') AS tablepergroup,
