@@ -8,6 +8,7 @@ INSERT INTO site (setting, value) VALUES
 ('anidbkey', ''),
 ('alternate_nntp', '0'),
 ('amazonsleep', '1000'),
+('request_hours', '1'),
 ('maxaddprocessed', '25'),
 ('maxnfoprocessed', '100'),
 ('maxrageprocessed', '75'),
@@ -172,7 +173,6 @@ INSERT INTO tmux (setting, value) VALUES
 ('spotnab_timer', '600'),
 ('predb', '0'),
 ('predb_timer', '600'),
-('request_hours', '1'),
 ('lastpretime', '0'),
 ('run_sharing', '0'),
 ('sharing_timer', '60'),
@@ -486,3 +486,9 @@ ALTER TABLE releases ADD COLUMN proc_par2 TINYINT(1) NOT NULL DEFAULT '0';
 ALTER TABLE releases ADD COLUMN proc_nfo TINYINT(1) NOT NULL DEFAULT '0';
 ALTER TABLE releases ADD COLUMN proc_files TINYINT(1) NOT NULL DEFAULT '0';
 ALTER TABLE releases ADD COLUMN prehashid INT UNSIGNED NOT NULL DEFAULT '0';
+
+ALTER TABLE releasecomment ADD COLUMN shared   TINYINT(1)  NOT NULL DEFAULT '1';
+ALTER TABLE releasecomment ADD COLUMN shareid  VARCHAR(40) NOT NULL DEFAULT '';
+ALTER TABLE releasecomment ADD COLUMN siteid   VARCHAR(40) NOT NULL DEFAULT '';
+ALTER TABLE releasecomment ADD COLUMN nzb_guid VARCHAR(32) NOT NULL DEFAULT '';
+ALTER TABLE releasecomment ADD COLUMN text_hash VARCHAR(32) NOT NULL DEFAULT '';

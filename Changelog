@@ -1,4 +1,5 @@
 2015-10-20 DariusIII
+	Fix: Again patches and schema
 	Fix: Fix patches and schema
 	Fix: Typo in schema.sql
 	Chg: Update patches, update db.sql and rename it to schema.sql.
