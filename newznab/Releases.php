@@ -1879,7 +1879,7 @@ class Releases
 			//
 			// Remove used binaries
 			//
-			$this->pdo->querExec(sprintf("DELETE %s, %s FROM %s JOIN %s ON %s.id = %s.binaryid WHERE releaseid = %d ",
+			$this->pdo->queryExec(sprintf("DELETE %s, %s FROM %s JOIN %s ON %s.id = %s.binaryid WHERE releaseid = %d ",
 					$group['pname'],
 					$group['bname'],
 					$group['pname'],
