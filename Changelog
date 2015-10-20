@@ -1,4 +1,5 @@
 2015-10-20 DariusIII
+	Chg: Hopefully last addition to schema
 	Chg: Change description on ircscraper.
 	Fix: Schema and ircscraper settings in tmux.
 	Fix: Typo in queryExec

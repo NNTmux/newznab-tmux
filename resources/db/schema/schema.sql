@@ -616,3 +616,72 @@ CREATE TABLE sharing (
 	max_pull       INT UNSIGNED       NOT NULL DEFAULT '200',
 	PRIMARY KEY    (site_guid)
 ) ENGINE=MYISAM DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+
+DROP TABLE IF EXISTS predbhash;
+CREATE TABLE predbhash (
+  pre_id INT(11) UNSIGNED NOT NULL DEFAULT '0',
+  hash VARBINARY(20)      NOT NULL DEFAULT '',
+  PRIMARY KEY (hash)
+)
+  ENGINE = MYISAM
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
+
+
+DROP TABLE IF EXISTS predb_imports;
+CREATE TABLE predb_imports (
+  title      VARCHAR(255)
+               COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  nfo        VARCHAR(255)
+               COLLATE utf8_unicode_ci          DEFAULT NULL,
+  size       VARCHAR(50)
+               COLLATE utf8_unicode_ci          DEFAULT NULL,
+  category   VARCHAR(255)
+               COLLATE utf8_unicode_ci          DEFAULT NULL,
+  predate    DATETIME                         DEFAULT NULL,
+  source     VARCHAR(50)
+               COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  requestid  INT(10) UNSIGNED        NOT NULL DEFAULT '0',
+  group_id   INT(10) UNSIGNED        NOT NULL DEFAULT '0'
+    COMMENT 'FK to groups',
+  nuked      TINYINT(1)              NOT NULL DEFAULT '0'
+    COMMENT 'Is this pre nuked? 0 no 2 yes 1 un nuked 3 mod nuked',
+  nukereason VARCHAR(255)
+               COLLATE utf8_unicode_ci          DEFAULT NULL
+  COMMENT 'If this pre is nuked, what is the reason?',
+  files      VARCHAR(50)
+               COLLATE utf8_unicode_ci          DEFAULT NULL
+  COMMENT 'How many files does this pre have ?',
+  filename   VARCHAR(255)
+               COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  searched   TINYINT(1)              NOT NULL DEFAULT '0',
+  groupname  VARCHAR(255)
+               COLLATE utf8_unicode_ci          DEFAULT NULL
+)
+  ENGINE =MYISAM
+  DEFAULT CHARSET =utf8
+  COLLATE =utf8_unicode_ci;
+
+INSERT INTO predbhash (pre_id, hash) (SELECT id, CONCAT_WS(',', MD5(title), MD5(MD5(title)), SHA1(title)) FROM prehash);
+
+DELIMITER $$
+CREATE TRIGGER insert_hashes AFTER INSERT ON prehash FOR EACH ROW
+  BEGIN
+    INSERT INTO predbhash (hash, pre_id) VALUES (UNHEX(MD5(NEW.title)), NEW.id), (UNHEX(MD5(MD5(NEW.title))), NEW.id), ( UNHEX(SHA1(NEW.title)), NEW.id);
+  END; $$
+
+CREATE TRIGGER update_hashes AFTER UPDATE ON prehash FOR EACH ROW
+  BEGIN
+    IF NEW.title != OLD.title
+      THEN
+         DELETE FROM predbhash WHERE hash IN ( UNHEX(md5(OLD.title)), UNHEX(md5(md5(OLD.title))), UNHEX(sha1(OLD.title)) ) AND pre_id = OLD.id;
+         INSERT INTO predbhash (hash, pre_id) VALUES ( UNHEX(MD5(NEW.title)), NEW.id ), ( UNHEX(MD5(MD5(NEW.title))), NEW.id ), ( UNHEX(SHA1(NEW.title)), NEW.id );
+    END IF;
+  END; $$
+
+CREATE TRIGGER delete_hashes AFTER DELETE ON prehash FOR EACH ROW
+  BEGIN
+    DELETE FROM predbhash WHERE hash IN ( UNHEX(md5(OLD.title)), UNHEX(md5(md5(OLD.title))), UNHEX(sha1(OLD.title)) ) AND pre_id = OLD.id;
+  END; $$
+
+DELIMITER ;
