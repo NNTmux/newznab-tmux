@@ -1,4 +1,5 @@
 2015-10-20 DariusIII
+	Fix: Again some fixes for schema and site-edit.php
 	Fix: Schema.sql
 	Fix: ffs
 	Fix: Again patches and schema
