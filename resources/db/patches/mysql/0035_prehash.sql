@@ -1,6 +1,6 @@
 ALTER TABLE prehash ADD COLUMN filename varchar(255) NOT NULL DEFAULT '';
 ALTER TABLE prehash ADD INDEX ix_prehash_filename (filename);
-ALTER TABLE releasefiles ADD COLUMN ishashed tinyint(1) NOT NULL DEFAULT '0' AFTER size;
+ALTER TABLE releasefiles ADD COLUMN ishashed tinyint(1) NOT NULL DEFAULT '0';
 ALTER TABLE releasefiles ADD INDEX ix_releasefiles_ishashed (ishashed);
 
 DROP TRIGGER IF EXISTS check_rfinsert;

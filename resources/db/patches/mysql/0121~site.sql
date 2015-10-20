@@ -5,4 +5,4 @@ VALUES (
 	'processthumbnails'
 );
 
-UPDATE settings SET value = 1 WHERE setting = 'processthumbnails' AND (SELECT * FROM (SELECT value FROM settings WHERE setting = 'ffmpegpath')) != '';
+UPDATE settings SET value = 1 WHERE setting = 'processthumbnails' AND (SELECT * FROM (SELECT value FROM settings WHERE setting = 'ffmpegpath') s) != '';
