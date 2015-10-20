@@ -1,4 +1,5 @@
 2015-10-20 DariusIII
+	Chg: Update patches, update db.sql and rename it to schema.sql.
 	Fix: Another class use fix
 	Chg: Change rageid into tvinfoid as temporary solution in Tmux.php
 	Upd: update patches - remove rageid.

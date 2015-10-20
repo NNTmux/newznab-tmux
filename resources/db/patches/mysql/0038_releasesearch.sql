@@ -12,8 +12,7 @@ CREATE FULLTEXT INDEX ix_releasesearch_name_searchname_ft ON releasesearch (name
 CREATE INDEX ix_releasesearch_releaseid ON releasesearch (releaseid);
 CREATE INDEX ix_releasesearch_guid ON releasesearch (guid);
 
-ALTER TABLE releases
-ADD proc_filenames BIT NOT NULL DEFAULT 0;
+ALTER TABLE releases ADD proc_filenames BIT NOT NULL DEFAULT 0;
 DROP TRIGGER IF EXISTS insert_search;
 DROP TRIGGER IF EXISTS update_search;
 DROP TRIGGER IF EXISTS delete_search;
