@@ -178,7 +178,7 @@ INSERT INTO tmux (setting, value) VALUES
 ('sharing_timer', '60'),
 ('optimize', '0'),
 ('optimize_timer', '86400'),
-('import_count', '50000'),
+('import_count', '50000');
 
 DROP TABLE IF EXISTS prehash;
 CREATE TABLE prehash (
