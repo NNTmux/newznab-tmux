@@ -540,7 +540,7 @@ class Console
 									INSERT INTO genres (title, type)
 									VALUES (%s, %d)",
 					$this->pdo->escapeString($genreName),
-					\Genres::CONSOLE_TYPE
+					Genres::CONSOLE_TYPE
 				)
 			);
 		}
@@ -549,9 +549,9 @@ class Console
 
 	protected function _loadGenres()
 	{
-		$gen = new \Genres(['Settings' => $this->pdo]);
+		$gen = new Genres(['Settings' => $this->pdo]);
 
-		$defaultGenres = $gen->getGenres(\Genres::CONSOLE_TYPE);
+		$defaultGenres = $gen->getGenres(Genres::CONSOLE_TYPE);
 		$genreassoc =[];
 		foreach ($defaultGenres as $dg) {
 			$genreassoc[$dg['id']] = strtolower($dg['title']);
