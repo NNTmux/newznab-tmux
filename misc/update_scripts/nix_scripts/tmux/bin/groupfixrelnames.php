@@ -3,11 +3,11 @@ require_once dirname(__FILE__) . '/../../../config.php';
 
 use newznab\db\Settings;
 use newznab\processing\PostProcess;
-use newznab\controllers\NameFixer;
-use newznab\controllers\NNTP;
-use newznab\controllers\NZBContents;
-use newznab\controllers\Nfo;
-use newznab\controllers\MiscSorter;
+use newznab\NameFixer;
+use newznab\NNTP;
+use newznab\NZBContents;
+use newznab\Nfo;
+use newznab\MiscSorter;
 
 $pdo = new Settings();
 

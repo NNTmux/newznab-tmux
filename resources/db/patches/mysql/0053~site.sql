@@ -1,1 +1,1 @@
-INSERT INTO `site` (`setting`, `value`) VALUES ('giantbombkey', '');
+INSERT IGNORE INTO settings (setting, value) VALUES ('giantbombkey', '');

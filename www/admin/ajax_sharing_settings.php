@@ -2,10 +2,10 @@
 
 require_once './config.php';
 
-use newznab\controllers\AdminPage;
+use newznab\AdminPage;
 use newznab\db\Settings;
-use newznab\controllers\Sharing;
-use newznab\controllers\ReleaseComments;
+use newznab\Sharing;
+use newznab\ReleaseComments;
 
 // Login check.
 $admin = new AdminPage;

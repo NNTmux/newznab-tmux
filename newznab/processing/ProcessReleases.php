@@ -2,19 +2,19 @@
 namespace newznab\processing;
 
 use newznab\db\Settings;
-use newznab\controllers\Groups;
-use newznab\controllers\ConsoleTools;
-use newznab\controllers\Releases;
-use newznab\controllers\ReleaseCleaning;
-use newznab\controllers\ReleaseImage;
-use newznab\controllers\NZB;
-use newznab\controllers\Categorize;
-use newznab\controllers\Category;
-use newznab\controllers\RequestIDLocal;
-use newznab\controllers\RequestIDWeb;
-use newznab\controllers\PreHash;
-use newznab\controllers\Genres;
-use newznab\controllers\NNTP;
+use newznab\Groups;
+use newznab\ConsoleTools;
+use newznab\Releases;
+use newznab\ReleaseCleaning;
+use newznab\ReleaseImage;
+use newznab\NZB;
+use newznab\Categorize;
+use newznab\Category;
+use newznab\RequestIDLocal;
+use newznab\RequestIDWeb;
+use newznab\PreHash;
+use newznab\Genres;
+use newznab\NNTP;
 
 class ProcessReleases
 {

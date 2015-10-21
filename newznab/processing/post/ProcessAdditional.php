@@ -6,18 +6,18 @@ require_once NN_LIBS . 'rarinfo/par2info.php';
 
 use newznab\db\Settings;
 use newznab\utility\Utility;
-use newznab\controllers\NZB;
-use newznab\controllers\Groups;
-use newznab\controllers\NNTP;
-use newznab\controllers\Categorize;
-use newznab\controllers\Nfo;
-use newznab\controllers\ReleaseFiles;
-use newznab\controllers\ReleaseExtra;
-use newznab\controllers\ReleaseImage;
-use newznab\controllers\NameFixer;
-use newznab\controllers\SphinxSearch;
-use newznab\controllers\Releases;
-use newznab\controllers\Category;
+use newznab\NZB;
+use newznab\Groups;
+use newznab\NNTP;
+use newznab\Categorize;
+use newznab\Nfo;
+use newznab\ReleaseFiles;
+use newznab\ReleaseExtra;
+use newznab\ReleaseImage;
+use newznab\NameFixer;
+use newznab\SphinxSearch;
+use newznab\Releases;
+use newznab\Category;
 
 class ProcessAdditional
 {

@@ -1,1 +1,1 @@
-INSERT INTO site (setting, value) VALUES ('rottentomatoquality', 'profile');
+INSERT IGNORE INTO settings (setting, value) VALUES ('rottentomatoquality', 'profile');

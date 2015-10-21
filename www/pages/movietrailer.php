@@ -1,6 +1,6 @@
 <?php
 
-use newznab\controllers\Movie;
+use newznab\Movie;
 
 $movie = new Movie;
 

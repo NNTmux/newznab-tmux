@@ -3,7 +3,7 @@
 require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
 
 use newznab\db\Settings;
-use newznab\controllers\Categorize;
+use newznab\Categorize;
 
 $db = new Settings();
 $category = new Categorize();

@@ -2,9 +2,9 @@
 require_once dirname(__FILE__) . '/../../../config.php';
 
 use newznab\processing\PostProcess;
-use newznab\controllers\ColorCLI;
-use newznab\controllers\Tmux;
-use newznab\controllers\NNTP;
+use newznab\ColorCLI;
+use newznab\Tmux;
+use newznab\NNTP;
 
 
 $c = new ColorCLI();

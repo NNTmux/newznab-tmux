@@ -2,8 +2,8 @@
 
 require_once './config.php';
 
-use newznab\controllers\AdminPage;
-use newznab\controllers\Binaries;
+use newznab\AdminPage;
+use newznab\Binaries;
 
 
 $page = new AdminPage();

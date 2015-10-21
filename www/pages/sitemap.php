@@ -1,7 +1,7 @@
 <?php
 
-use newznab\controllers\Contents;
-use newznab\controllers\Sitemap;
+use newznab\Contents;
+use newznab\Sitemap;
 
 $te = $page->smarty;
 

@@ -2,9 +2,9 @@
 
 require_once './config.php';
 
-use newznab\controllers\AdminPage;
-use newznab\controllers\Binaries;
-use newznab\controllers\Category;
+use newznab\AdminPage;
+use newznab\Binaries;
+use newznab\Category;
 
 $page = new AdminPage();
 $bin = new Binaries();

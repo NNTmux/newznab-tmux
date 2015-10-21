@@ -2,8 +2,8 @@
 namespace newznab\processing\post;
 
 use \newznab\db\Settings;
-use newznab\controllers\NZB;
-use newznab\controllers\Category;
+use newznab\NZB;
+use newznab\Category;
 
 class AniDB
 {

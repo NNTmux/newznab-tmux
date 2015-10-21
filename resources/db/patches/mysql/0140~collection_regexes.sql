@@ -1,5 +1,5 @@
 DELETE FROM collection_regexes WHERE id BETWEEN 586 AND 589;
-INSERT INTO collection_regexes (id, group_regex, regex, status, description, ordinal)
+INSERT IGNORE INTO collection_regexes (id, group_regex, regex, status, description, ordinal)
 VALUES (
   586,
   '^alt\\.binaries\\.sounds\\.(flac|lossless)$',

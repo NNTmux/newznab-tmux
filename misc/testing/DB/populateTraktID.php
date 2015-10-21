@@ -3,7 +3,7 @@
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
 use newznab\db\Settings;
-use newznab\controllers\TraktTv;
+use newznab\TraktTv;
 
 $pdo = new Settings();
 $trakt = new TraktTv(['Settings' => $pdo]);

@@ -2,8 +2,8 @@
 require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
 
 use newznab\db\Settings;
-use newznab\controllers\NNTP;
-use newznab\controllers\Backfill;
+use newznab\NNTP;
+use newznab\Backfill;
 
 $pdo = new Settings();
 

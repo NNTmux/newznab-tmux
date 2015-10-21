@@ -1,7 +1,7 @@
 <?php
 
 use newznab\utility\Utility;
-use newznab\controllers\Captcha;
+use newznab\Captcha;
 
 if ($page->users->isLoggedIn()) {
 	header('Location: ' . WWW_TOP . '/');

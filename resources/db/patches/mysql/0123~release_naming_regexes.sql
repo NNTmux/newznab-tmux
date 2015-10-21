@@ -1,4 +1,4 @@
-INSERT INTO release_naming_regexes (id, group_regex, regex, status, description, ordinal)
+INSERT IGNORE INTO release_naming_regexes (id, group_regex, regex, status, description, ordinal)
 VALUES (
 1128,
   'alt\\.binaries\\.b4e\\.erotica',

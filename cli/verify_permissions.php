@@ -1,5 +1,5 @@
 <?php
-use newznab\controllers\ReleaseImage;
+use newznab\ReleaseImage;
 use newznab\utility\Utility;
 
 if (!isset($argv[1]) || $argv[1] !== 'yes') {

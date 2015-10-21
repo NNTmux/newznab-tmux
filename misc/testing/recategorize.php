@@ -2,9 +2,9 @@
 require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
 
 use newznab\db\Settings;
-use newznab\controllers\ColorCLI;
-use newznab\controllers\ConsoleTools;
-use newznab\controllers\Categorize;
+use newznab\ColorCLI;
+use newznab\ConsoleTools;
+use newznab\Categorize;
 
 
 $c = new ColorCLI();

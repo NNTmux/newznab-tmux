@@ -5,7 +5,7 @@ if (!defined('GIT_PRE_COMMIT')) {
 	define('GIT_PRE_COMMIT', false);
 }
 
-use newznab\controllers\ColorCLI;
+use newznab\ColorCLI;
 
 class Versions
 {

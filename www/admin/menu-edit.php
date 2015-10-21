@@ -2,9 +2,9 @@
 
 require_once './config.php';
 
-use newznab\controllers\AdminPage;
-use newznab\controllers\Menu;
-use newznab\controllers\Users;
+use newznab\AdminPage;
+use newznab\Menu;
+use newznab\Users;
 
 $page = new AdminPage();
 $page->title = "Menu Add";

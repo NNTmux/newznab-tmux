@@ -2,8 +2,8 @@
 
 require_once './config.php';
 
-use newznab\controllers\AdminPage;
-use newznab\controllers\Menu;
+use newznab\AdminPage;
+use newznab\Menu;
 
 $page = new AdminPage();
 

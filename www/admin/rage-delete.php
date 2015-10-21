@@ -1,8 +1,8 @@
 <?php
 require_once './config.php';
 
-use newznab\controllers\AdminPage;
-use newznab\controllers\TvRage;
+use newznab\AdminPage;
+use newznab\TvRage;
 
 $page = new AdminPage();
 

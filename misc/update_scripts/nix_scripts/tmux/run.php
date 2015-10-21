@@ -3,8 +3,8 @@ require_once realpath(dirname(dirname(dirname(dirname(__DIR__)))) . DIRECTORY_SE
 
 use newznab\db\Settings;
 use newznab\utility\Utility;
-use newznab\controllers\Tmux;
-use newznab\controllers\ColorCLI;
+use newznab\Tmux;
+use newznab\ColorCLI;
 
 $pdo = new Settings();
 $DIR = NN_TMUX;

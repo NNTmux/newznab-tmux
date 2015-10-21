@@ -1,8 +1,8 @@
 <?php
 
 use newznab\db\Settings;
-use newznab\controllers\NZB;
-use newznab\controllers\Releases;
+use newznab\NZB;
+use newznab\Releases;
 
 $nzb = new NZB($page->settings);
 $rel = new Releases(['Settings' => $page->settings]);

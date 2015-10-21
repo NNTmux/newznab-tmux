@@ -1,1 +1,1 @@
-DELETE FROM `tmux` WHERE `setting` = 'alternate_nntp';
+DELETE FROM tmux WHERE setting = 'alternate_nntp';

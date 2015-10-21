@@ -4,8 +4,8 @@ require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR .
 
 use newznab\db\Settings;
 use newznab\utility\Utility;
-use newznab\controllers\TvRage;
-use newznab\controllers\ReleaseImage;
+use newznab\TvRage;
+use newznab\ReleaseImage;
 
 $pdo = new Settings();
 

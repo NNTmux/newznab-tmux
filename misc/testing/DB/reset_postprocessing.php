@@ -2,7 +2,7 @@
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
 use newznab\db\Settings;
-use newznab\controllers\ConsoleTools;
+use newznab\ConsoleTools;
 
 $pdo = new Settings();
 $consoletools = new ConsoleTools(['ColorCLI' => $pdo->log]);

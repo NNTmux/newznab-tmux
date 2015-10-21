@@ -1,8 +1,8 @@
 <?php
 require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use newznab\controllers\ConsoleTools;
-use newznab\controllers\NNTP;
+use newznab\ConsoleTools;
+use newznab\NNTP;
 use newznab\db\Settings;
 use newznab\processing\ProcessReleases;
 

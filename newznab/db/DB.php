@@ -4,10 +4,10 @@ namespace newznab\db;
 use \newznab\utility\Utility;
 use \newznab\libraries\Cache;
 use \newznab\libraries\CacheException;
-use newznab\controllers\ConsoleTools;
-use newznab\controllers\ColorCLI;
-use newznab\controllers\Logger;
-use newznab\controllers\LoggerException;
+use newznab\ConsoleTools;
+use newznab\ColorCLI;
+use newznab\Logger;
+use newznab\LoggerException;
 
 
 /**

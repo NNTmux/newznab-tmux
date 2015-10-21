@@ -1,10 +1,10 @@
 <?php
 use newznab\utility\Utility;
 use newznab\db\Settings;
-use newznab\controllers\ReleaseComments;
-use newznab\controllers\Releases;
-use newznab\controllers\Category;
-use newznab\controllers\BasePage;
+use newznab\ReleaseComments;
+use newznab\Releases;
+use newznab\Category;
+use newznab\BasePage;
 
 $rc = new ReleaseComments;
 

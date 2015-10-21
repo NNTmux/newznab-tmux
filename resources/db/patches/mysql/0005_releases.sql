@@ -1,1 +1,1 @@
-ALTER TABLE `releases` DROP COLUMN `nzbstatus`;
+ALTER TABLE releases DROP COLUMN nzbstatus;

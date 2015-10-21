@@ -1,6 +1,6 @@
 <?php
 
-use newznab\controllers\Forum;
+use newznab\Forum;
 
 if (!$page->users->isLoggedIn())
 	$page->show403();

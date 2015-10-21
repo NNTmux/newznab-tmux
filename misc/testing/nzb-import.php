@@ -1,7 +1,7 @@
 <?php
 require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use newznab\controllers\NZBImport;
+use newznab\NZBImport;
 
 $n = PHP_EOL;
 

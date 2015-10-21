@@ -1,6 +1,6 @@
 <?php
-use newznab\controllers\AdminPage;
-use newznab\controllers\Users;
+use newznab\AdminPage;
+use newznab\Users;
 
 $page = new AdminPage();
 $u = new Users();

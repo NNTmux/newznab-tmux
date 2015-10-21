@@ -16,7 +16,7 @@ CREATE TABLE collection_regexes (
   COLLATE         = utf8_unicode_ci
   AUTO_INCREMENT  = 100000;
 
-INSERT INTO collection_regexes (id, group_regex, regex, status, description, ordinal)
+INSERT IGNORE INTO collection_regexes (id, group_regex, regex, status, description, ordinal)
   VALUES (
     1,
     'alt\\.binaries\\.teevee',

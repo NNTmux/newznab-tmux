@@ -1,8 +1,8 @@
 <?php
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use newznab\controllers\ColorCLI;
-use newznab\controllers\ReleaseRemover;
+use newznab\ColorCLI;
+use newznab\ReleaseRemover;
 // New line for CLI.
 $n = PHP_EOL;
 

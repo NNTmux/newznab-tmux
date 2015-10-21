@@ -2,9 +2,9 @@
 
 require_once './config.php';
 
-use newznab\controllers\AdminPage;
-use newznab\controllers\Console;
-use newznab\controllers\Genres;
+use newznab\AdminPage;
+use newznab\Console;
+use newznab\Genres;
 
 $page = new AdminPage();
 $console = new Console(['Settings' => $page->settings]);

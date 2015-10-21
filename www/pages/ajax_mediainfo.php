@@ -1,6 +1,6 @@
 <?php
 
-use newznab\controllers\ReleaseExtra;
+use newznab\ReleaseExtra;
 
 if (!$page->users->isLoggedIn()) {
 	$page->show403();

@@ -1,4 +1,6 @@
 2015-10-17 DariusIII
+	Chg: Move classes into newznab folder, adjust rest of the files accordingly.
+		Remove tmux/lib/folder completely, redo db as schena,sql in resources/db/schema folder.
 	Fix: Missing use statements
 	Fix: update_releases script and path to it in Forking.php
 	Fix: Autoloading and api errors
@@ -8,7 +10,7 @@
 	Fix: Instantiation issues in NameFixer.php
 2015-10-16 DariusIII
 	Fix: Missing use statements.
-2015-10-15 DariusIII 
+2015-10-15 DariusIII
 	Chg: Remove snHandleerror from SpotNab.
 	Add: Example config file
 	Fix: Change Misc to Utility

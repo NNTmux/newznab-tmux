@@ -1,5 +1,5 @@
 <?php
-use newznab\controllers\ReleaseFiles;
+use newznab\ReleaseFiles;
 
 if (!$page->users->isLoggedIn())
 	$page->show403();

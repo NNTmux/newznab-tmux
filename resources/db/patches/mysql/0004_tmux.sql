@@ -1,1 +1,1 @@
-INSERT IGNORE INTO `tmux` (`setting`, `value`) VALUES ('partrepair', 1);
+INSERT IGNORE INTO tmux (setting, value) VALUES ('partrepair', 1);

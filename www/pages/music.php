@@ -1,9 +1,9 @@
 <?php
 
-use newznab\controllers\Music;
-use newznab\controllers\Category;
-use newznab\controllers\Genres;
-use newznab\controllers\DnzbFailures;
+use newznab\Music;
+use newznab\Category;
+use newznab\Genres;
+use newznab\DnzbFailures;
 
 if (!$page->users->isLoggedIn()) {
 	$page->show403();

@@ -1,1 +1,1 @@
-INSERT INTO `site` (`setting`, `value`) VALUES ('coverspath', './resources/covers');
+INSERT IGNORE INTO settings (setting, value) VALUES ('coverspath', './resources/covers');

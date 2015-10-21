@@ -1,9 +1,9 @@
 <?php
 require_once './config.php';
 
-use newznab\controllers\AdminPage;
-use newznab\controllers\Regexes;
-use newznab\controllers\Category;
+use newznab\AdminPage;
+use newznab\Regexes;
+use newznab\Category;
 
 $page    = new AdminPage();
 $regexes = new Regexes(['Settings' => $page->settings, 'Table_Name' => 'collection_regexes']);

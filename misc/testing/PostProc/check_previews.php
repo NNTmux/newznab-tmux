@@ -6,10 +6,10 @@ require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR .
 
 use newznab\db\Settings;
 use newznab\utility\Utility;
-use newznab\controllers\Releases;
-use newznab\controllers\NZB;
-use newznab\controllers\ReleaseImage;
-use newznab\controllers\ConsoleTools;
+use newznab\Releases;
+use newznab\NZB;
+use newznab\ReleaseImage;
+use newznab\ConsoleTools;
 
 $pdo = new Settings();
 

@@ -1,8 +1,8 @@
 <?php
 require_once './config.php';
 
-use newznab\controllers\AdminPage;
-use newznab\controllers\ReleaseRegex;
+use newznab\AdminPage;
+use newznab\ReleaseRegex;
 
 // login check
 $admin = new AdminPage;

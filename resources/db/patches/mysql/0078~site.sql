@@ -1,4 +1,4 @@
-INSERT INTO `site` (`setting`, `value`) VALUES
+INSERT IGNORE INTO settings (setting, value) VALUES
 ('amazonsleep', '1000'),
 ('maxaddprocessed', '25'),
 ('maxnfoprocessed', '100'),

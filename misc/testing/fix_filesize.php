@@ -9,7 +9,7 @@ Author: lordgnu <lordgnu@me.com>
 require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
 
 use newznab\db\Settings;
-use newznab\controllers\NZB;
+use newznab\NZB;
 
 $pdo = new Settings;
 $nzb = new NZB;

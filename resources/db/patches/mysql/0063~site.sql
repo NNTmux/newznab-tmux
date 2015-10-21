@@ -1,1 +1,1 @@
-INSERT INTO `site` (`setting`, `value`) VALUES ('lookupxxx', 1);
+INSERT IGNORE INTO settings (setting, value) VALUES ('lookupxxx', 1);

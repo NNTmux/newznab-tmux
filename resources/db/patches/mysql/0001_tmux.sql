@@ -1,1 +1,1 @@
-DELETE FROM `tmux` WHERE `setting` = 'releases_threaded';
+DELETE FROM tmux WHERE setting = 'releases_threaded';

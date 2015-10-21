@@ -2,8 +2,8 @@
 
 require_once("config.php");
 
-use newznab\controllers\AdminPage;
-use newznab\controllers\DnzbFailures;
+use newznab\AdminPage;
+use newznab\DnzbFailures;
 
 $page = new AdminPage();
 

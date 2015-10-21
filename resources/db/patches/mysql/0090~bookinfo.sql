@@ -1,1 +1,1 @@
-ALTER TABLE `bookinfo` ADD  `salesrank` INT(10) UNSIGNED DEFAULT NULL;
+ALTER TABLE bookinfo ADD  salesrank INT(10) UNSIGNED DEFAULT NULL;

@@ -3,9 +3,9 @@ require_once realpath(dirname(dirname(dirname(dirname(__DIR__)))) . DIRECTORY_SE
 
 use newznab\db\Settings;
 use newznab\utility\Utility;
-use newznab\controllers\TmuxOutput;
-use newznab\controllers\TmuxRun;
-use newznab\controllers\Category;
+use newznab\TmuxOutput;
+use newznab\TmuxRun;
+use newznab\Category;
 
 
 $pdo = new Settings();

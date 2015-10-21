@@ -1,8 +1,8 @@
 <?php
 require_once './config.php';
 
-use newznab\controllers\AdminPage;
-use newznab\controllers\Sites;
+use newznab\AdminPage;
+use newznab\Sites;
 
 // login check
 $admin = new AdminPage;

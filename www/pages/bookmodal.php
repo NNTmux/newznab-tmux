@@ -1,6 +1,6 @@
 <?php
 
-use newznab\controllers\Books;
+use newznab\Books;
 
 $b = new Books;
 

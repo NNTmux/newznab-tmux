@@ -1,5 +1,5 @@
 DELETE FROM collection_regexes WHERE id = 413;
-INSERT INTO collection_regexes (id, group_regex, regex, status, description, ordinal)
+INSERT IGNORE INTO collection_regexes (id, group_regex, regex, status, description, ordinal)
 VALUES (
   413,
   '^alt\\.binaries\\.moovee$',

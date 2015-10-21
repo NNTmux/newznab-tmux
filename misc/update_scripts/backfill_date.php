@@ -21,7 +21,7 @@
 
 require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use newznab\controllers\Backfill;
+use newznab\Backfill;
 
 $time = 0;
 

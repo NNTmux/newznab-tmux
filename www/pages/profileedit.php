@@ -1,10 +1,10 @@
 <?php
 
 use newznab\utility\Utility;
-use newznab\controllers\Category;
-use newznab\controllers\SABnzbd;
-use newznab\controllers\NZBGet;
-use newznab\controllers\Users;
+use newznab\Category;
+use newznab\SABnzbd;
+use newznab\NZBGet;
+use newznab\Users;
 
 $category = new Category;
 $sab = new SABnzbd($page);

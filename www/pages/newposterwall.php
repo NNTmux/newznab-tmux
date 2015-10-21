@@ -4,9 +4,9 @@ if (!$page->users->isLoggedIn()) {
 	$page->show403();
 }
 
-use newznab\controllers\Releases;
-use newznab\controllers\Contents;
-use newznab\controllers\Category;
+use newznab\Releases;
+use newznab\Contents;
+use newznab\Category;
 
 $releases = new Releases(['Settings' => $page->settings]);
 $contents = new Contents(['Settings' => $page->settings]);

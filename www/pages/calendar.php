@@ -4,7 +4,7 @@ if (!$page->users->isLoggedIn()) {
 	$page->show403();
 }
 
-use newznab\controllers\TvRage;
+use newznab\TvRage;
 
 $tvrage = new TvRage(['Settings' => $page->settings]);
 

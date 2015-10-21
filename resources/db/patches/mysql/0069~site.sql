@@ -1,1 +1,1 @@
-INSERT INTO `site` (`setting`, `value`) VALUES ('anidbkey', '');
+INSERT IGNORE INTO settings (setting, value) VALUES ('anidbkey', '');

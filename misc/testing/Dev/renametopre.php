@@ -3,13 +3,13 @@
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
 use newznab\db\Settings;
-use newznab\controllers\Groups;
-use newznab\controllers\Categorize;
-use newznab\controllers\ColorCLI;
-use newznab\controllers\ReleaseFiles;
-use newznab\controllers\ConsoleTools;
-use newznab\controllers\NameFixer;
-use newznab\controllers\ReleaseCleaning;
+use newznab\Groups;
+use newznab\Categorize;
+use newznab\ColorCLI;
+use newznab\ReleaseFiles;
+use newznab\ConsoleTools;
+use newznab\NameFixer;
+use newznab\ReleaseCleaning;
 
 /*
  *

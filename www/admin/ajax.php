@@ -1,11 +1,11 @@
 <?php
 
-use newznab\controllers\AdminPage;
-use newznab\controllers\Binaries;
-use newznab\controllers\Regexes;
-use newznab\controllers\Groups;
-use newznab\controllers\Sharing;
-use newznab\controllers\ReleaseComments;
+use newznab\AdminPage;
+use newznab\Binaries;
+use newznab\Regexes;
+use newznab\Groups;
+use newznab\Sharing;
+use newznab\ReleaseComments;
 
 // This script waits for ajax queries from the web.
 

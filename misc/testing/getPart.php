@@ -1,7 +1,7 @@
 <?php
 require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use newznab\controllers\NNTP;
+use newznab\NNTP;
 
 $grp = "a.b.grp";
 $msgid = "2df9e8a3$1$2314$6d4158fb@reader.xsnews.nl";

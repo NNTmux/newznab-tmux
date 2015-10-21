@@ -4,9 +4,9 @@ if (!$page->users->isLoggedIn()) {
 	$page->show403();
 }
 
-use newznab\controllers\Books;
-use newznab\controllers\Category;
-use newznab\controllers\DnzbFailures;
+use newznab\Books;
+use newznab\Category;
+use newznab\DnzbFailures;
 
 $book = new Books(['Settings' => $page->settings]);
 $cat = new Category(['Settings' => $page->settings]);

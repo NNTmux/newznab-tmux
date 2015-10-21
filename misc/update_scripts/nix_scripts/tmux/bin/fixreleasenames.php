@@ -4,10 +4,10 @@ require_once dirname(__FILE__) . '/../../../config.php';
 
 use newznab\db\Settings;
 use newznab\processing\PostProcess;
-use newznab\controllers\ColorCLI;
-use newznab\controllers\NameFixer;
-use newznab\controllers\NNTP;
-use newznab\controllers\NZBContents;
+use newznab\ColorCLI;
+use newznab\NameFixer;
+use newznab\NNTP;
+use newznab\NZBContents;
 
 $c = new ColorCLI();
 if (!isset($argv[1])) {

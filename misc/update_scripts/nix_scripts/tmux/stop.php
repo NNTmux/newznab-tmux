@@ -1,6 +1,6 @@
 <?php
 require_once realpath(dirname(dirname(dirname(dirname(__DIR__)))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use newznab\controllers\Tmux;
+use newznab\Tmux;
 
 $restart = (new Tmux())->stopIfRunning();

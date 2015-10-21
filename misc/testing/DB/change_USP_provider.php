@@ -2,8 +2,8 @@
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
 use newznab\db\Settings;
-use newznab\controllers\NNTP;
-use newznab\controllers\Binaries;
+use newznab\NNTP;
+use newznab\Binaries;
 
 
 /* This script will update the groups table to get the new article numbers for each group you have activated.

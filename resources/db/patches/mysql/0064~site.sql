@@ -1,1 +1,1 @@
-INSERT INTO `site` (`setting`, `value`) VALUES ('maxxxxprocessed', 100);
+INSERT IGNORE INTO settings (setting, value) VALUES ('maxxxxprocessed', 100);

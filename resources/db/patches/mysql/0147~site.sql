@@ -1,1 +1,1 @@
-INSERT INTO `site` (`setting`, `value`) VALUES ('userselstyle', '0');
+INSERT IGNORE INTO settings (setting, value) VALUES ('userselstyle', '0');

@@ -1,9 +1,9 @@
 <?php
 
-use newznab\controllers\Releases;
-use newznab\controllers\TvRage;
-use newznab\controllers\Category;
-use newznab\controllers\UserSeries;
+use newznab\Releases;
+use newznab\TvRage;
+use newznab\Category;
+use newznab\UserSeries;
 
 if (!$page->users->isLoggedIn()) {
 	$page->show403();

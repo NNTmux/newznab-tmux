@@ -1,9 +1,9 @@
 <?php
 require_once './config.php';
 
-use newznab\controllers\AdminPage;
-use newznab\controllers\Games;
-use newznab\controllers\Genres;
+use newznab\AdminPage;
+use newznab\Games;
+use newznab\Genres;
 
 $page = new AdminPage();
 $games = new Games(['Settings' => $page->settings]);

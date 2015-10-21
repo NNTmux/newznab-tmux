@@ -2,9 +2,9 @@
 
 require_once './config.php';
 
-use newznab\controllers\AdminPage;
-use newznab\controllers\Music;
-use newznab\controllers\Genres;
+use newznab\AdminPage;
+use newznab\Music;
+use newznab\Genres;
 
 $page = new AdminPage();
 $music = new Music();

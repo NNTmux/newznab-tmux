@@ -3,11 +3,11 @@
 require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
 
 use newznab\db\Settings;
-use newznab\controllers\Sites;
-use newznab\controllers\Releases;
-use newznab\controllers\NZB;
-use newznab\controllers\NNTP;
-use newznab\controllers\NZBInfo;
+use newznab\Sites;
+use newznab\Releases;
+use newznab\NZB;
+use newznab\NNTP;
+use newznab\NZBInfo;
 
 $releases = new Releases();
 $db = new Settings();

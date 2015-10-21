@@ -1,6 +1,6 @@
 <?php
 
-use newznab\controllers\Contents;
+use newznab\Contents;
 
 $contents = new Contents(['Settings' => $page->settings]);
 

@@ -1,4 +1,4 @@
-INSERT INTO collection_regexes (id, group_regex, regex, status, description, ordinal)
+INSERT IGNORE INTO collection_regexes (id, group_regex, regex, status, description, ordinal)
 VALUES (
   586,
   '^alt\\.binaries\\.sounds\\.(flac|lossless)$',

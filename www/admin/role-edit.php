@@ -2,9 +2,9 @@
 
 require_once './config.php';
 
-use newznab\controllers\AdminPage;
-use newznab\controllers\Users;
-use newznab\controllers\Category;
+use newznab\AdminPage;
+use newznab\Users;
+use newznab\Category;
 
 $page = new AdminPage();
 $users = new Users();

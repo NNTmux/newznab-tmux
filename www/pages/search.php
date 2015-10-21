@@ -1,9 +1,9 @@
 <?php
 
-use newznab\controllers\Groups;
-use newznab\controllers\Releases;
-use newznab\controllers\ReleaseSearch;
-use newznab\controllers\Category;
+use newznab\Groups;
+use newznab\Releases;
+use newznab\ReleaseSearch;
+use newznab\Category;
 
 if (!$page->users->isLoggedIn()) {
 	$page->show403();

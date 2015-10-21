@@ -7,7 +7,7 @@
 //
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use newznab\controllers\Releases;
+use newznab\Releases;
 use newznab\db\Settings;
 
 

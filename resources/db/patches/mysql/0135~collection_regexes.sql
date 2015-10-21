@@ -1,4 +1,4 @@
-INSERT INTO collection_regexes (id, group_regex, regex, status, description, ordinal)
+INSERT IGNORE INTO collection_regexes (id, group_regex, regex, status, description, ordinal)
 VALUES (
 	585,
 	'^alt\\.binaries\\.fz$',

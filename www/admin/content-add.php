@@ -1,10 +1,10 @@
 <?php
 require_once './config.php';
 
-use newznab\controllers\AdminPage;
-use newznab\controllers\Contents;
-use newznab\controllers\Content;
-use newznab\controllers\Users;
+use newznab\AdminPage;
+use newznab\Contents;
+use newznab\Content;
+use newznab\Users;
 
 
 $page     = new AdminPage();

@@ -3,8 +3,8 @@
 require_once dirname(__FILE__) . '/../../../config.php';
 
 use newznab\db\Settings;
-use newznab\controllers\ConsoleTools;
-use newznab\controllers\NNTP;
+use newznab\ConsoleTools;
+use newznab\NNTP;
 
 
 $start = TIME();

@@ -2,7 +2,7 @@
 namespace newznab\utility;
 
 use newznab\db\Settings;
-use newznab\controllers\ColorCLI;
+use newznab\ColorCLI;
 use PHPMailer;
 
 

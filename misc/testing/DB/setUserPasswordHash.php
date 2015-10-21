@@ -9,7 +9,7 @@
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
 use newznab\db\Settings;
-use newznab\controllers\Users;
+use newznab\Users;
 
 $pdo = new Settings();
 

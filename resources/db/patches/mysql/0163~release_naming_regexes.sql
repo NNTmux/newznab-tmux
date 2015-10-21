@@ -1,6 +1,6 @@
 DELETE FROM release_naming_regexes
 WHERE id = 218;
-INSERT INTO release_naming_regexes (id, group_regex, regex, status, description, ordinal)
+INSERT IGNORE INTO release_naming_regexes (id, group_regex, regex, status, description, ordinal)
 VALUES (
   218,
   '^alt\\.binaries\\.comics\\.dcp$',

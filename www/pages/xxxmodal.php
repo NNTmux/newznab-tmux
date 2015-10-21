@@ -1,6 +1,6 @@
 <?php
 
-use newznab\controllers\XXX;
+use newznab\XXX;
 
 if (!$page->users->isLoggedIn()) {
 	$page->show403();

@@ -3,10 +3,10 @@ require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR .
 
 use newznab\db\Settings;
 use newznab\utility\Utility;
-use newznab\controllers\ReleaseImage;
-use newznab\controllers\NZB;
-use newznab\controllers\ConsoleTools;
-use newznab\controllers\SphinxSearch;
+use newznab\ReleaseImage;
+use newznab\NZB;
+use newznab\ConsoleTools;
+use newznab\SphinxSearch;
 
 Utility::clearScreen();
 $pdo = new Settings();

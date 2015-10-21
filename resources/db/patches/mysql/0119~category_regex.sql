@@ -23,7 +23,7 @@ CREATE TABLE category_regexes (
   DEFAULT CHARSET = utf8
   COLLATE         = utf8_unicode_ci
   AUTO_INCREMENT  = 100000;
-INSERT INTO category_regexes (id, group_regex, regex, status, description, ordinal, category_id)
+INSERT IGNORE INTO category_regexes (id, group_regex, regex, status, description, ordinal, category_id)
   VALUES (
     1,
     'alt\\.binaries\\.sony\\.psvita',

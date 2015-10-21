@@ -2,10 +2,10 @@
 
 require_once './config.php';
 
-use newznab\controllers\AdminPage;
-use newznab\controllers\ReleaseRegex;
-use newznab\controllers\Groups;
-use newznab\controllers\Category;
+use newznab\AdminPage;
+use newznab\ReleaseRegex;
+use newznab\Groups;
+use newznab\Category;
 
 
 $page = new AdminPage();

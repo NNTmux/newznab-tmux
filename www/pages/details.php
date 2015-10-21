@@ -1,21 +1,21 @@
 <?php
 
-use newznab\controllers\Console;
-use newznab\controllers\ReleaseComments;
-use newznab\controllers\ReleaseExtra;
-use newznab\controllers\ReleaseFiles;
-use newznab\controllers\DnzbFailures;
-use newznab\controllers\Releases;
-use newznab\controllers\TvRage;
-use newznab\controllers\Episode;
-use newznab\controllers\Movie;
-use newznab\controllers\XXX;
-use newznab\controllers\Games;
-use newznab\controllers\Music;
-use newznab\controllers\AniDB;
-use newznab\controllers\Books;
-use newznab\controllers\PreHash;
-use newznab\controllers\PreDB;
+use newznab\Console;
+use newznab\ReleaseComments;
+use newznab\ReleaseExtra;
+use newznab\ReleaseFiles;
+use newznab\DnzbFailures;
+use newznab\Releases;
+use newznab\TvRage;
+use newznab\Episode;
+use newznab\Movie;
+use newznab\XXX;
+use newznab\Games;
+use newznab\Music;
+use newznab\AniDB;
+use newznab\Books;
+use newznab\PreHash;
+use newznab\PreDB;
 
 if (!$page->users->isLoggedIn())
 	$page->show403();

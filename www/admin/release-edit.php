@@ -2,9 +2,9 @@
 
 require_once './config.php';
 
-use newznab\controllers\AdminPage;
-use newznab\controllers\Releases;
-use newznab\controllers\Category;
+use newznab\AdminPage;
+use newznab\Releases;
+use newznab\Category;
 
 $page = new AdminPage();
 $releases = new Releases(['Settings' => $page->settings]);

@@ -1,6 +1,6 @@
 <?php
 
-use newznab\controllers\Music;
+use newznab\Music;
 
 $music = new Music;
 

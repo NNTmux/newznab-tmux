@@ -10,12 +10,12 @@ use \newznab\db\Settings;
 use \newznab\processing\PostProcess;
 use \newznab\processing\ProcessReleases;
 use \newznab\processing\post\ProcessAdditional;
-use newznab\controllers\Backfill;
-use newznab\controllers\Binaries;
-use newznab\controllers\Groups;
-use newznab\controllers\Nfo;
-use newznab\controllers\NNTP;
-use newznab\controllers\RequestIDLocal;
+use newznab\Backfill;
+use newznab\Binaries;
+use newznab\Groups;
+use newznab\Nfo;
+use newznab\NNTP;
+use newznab\RequestIDLocal;
 
 // Are we coming from python or php ? $options[0] => (string): python|php
 // The type of process we want to do: $options[1] => (string): releases

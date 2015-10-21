@@ -1,8 +1,8 @@
 <?php
 require_once './config.php';
 
-use newznab\controllers\AdminPage;
-use newznab\controllers\TheTVDB;
+use newznab\AdminPage;
+use newznab\TheTVDB;
 
 $page = new AdminPage();
 

@@ -3,11 +3,11 @@ require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR .
 
 use newznab\db\Settings;
 use newznab\utility\Utility;
-use newznab\controllers\ColorCLI;
-use newznab\controllers\ConsoleTools;
-use newznab\controllers\Releases;
-use newznab\controllers\NZB;
-use newznab\controllers\ReleaseImage;
+use newznab\ColorCLI;
+use newznab\ConsoleTools;
+use newznab\Releases;
+use newznab\NZB;
+use newznab\ReleaseImage;
 
 $cli = new ColorCLI();
 if (isset($argv[1])) {

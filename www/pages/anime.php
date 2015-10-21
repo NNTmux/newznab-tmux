@@ -1,8 +1,8 @@
 <?php
 
-use newznab\controllers\Releases;
-use newznab\controllers\AniDB;
-use newznab\controllers\Category;
+use newznab\Releases;
+use newznab\AniDB;
+use newznab\Category;
 
 if (!$page->users->isLoggedIn())
 	$page->show403();

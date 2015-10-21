@@ -4,7 +4,7 @@ if (!$page->users->isLoggedIn()) {
 	$page->show403();
 }
 
-use newznab\controllers\Releases;
+use newznab\Releases;
 
 if (isset($_GET["add"])) {
 	$releases = new Releases(['Settings' => $page->settings]);

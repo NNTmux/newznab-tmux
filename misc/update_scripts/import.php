@@ -4,12 +4,12 @@ require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer
 
 use newznab\db\Settings;
 use newznab\utility\Utility;
-use newznab\controllers\Releases;
-use newznab\controllers\ReleaseImage;
-use newznab\controllers\Categorize;
-use newznab\controllers\NZB;
-use newznab\controllers\ReleaseRegex;
-use newznab\controllers\Page;
+use newznab\Releases;
+use newznab\ReleaseImage;
+use newznab\Categorize;
+use newznab\NZB;
+use newznab\ReleaseRegex;
+use newznab\Page;
 
 $releases = new Releases();
 $releaseImage = new ReleaseImage();

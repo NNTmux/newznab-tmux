@@ -4,7 +4,7 @@ require_once dirname(__FILE__) . '/../../../config.php';
 
 use newznab\db\Settings;
 use newznab\processing\PostProcess;
-use newznab\controllers\NNTP;
+use newznab\NNTP;
 
 $pdo = new Settings();
 /**

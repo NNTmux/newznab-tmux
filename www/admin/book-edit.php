@@ -2,9 +2,9 @@
 
 require_once './config.php';
 
-use newznab\controllers\AdminPage;
-use newznab\controllers\Books;
-use newznab\controllers\Genres;
+use newznab\AdminPage;
+use newznab\Books;
+use newznab\Genres;
 
 $page = new AdminPage();
 $book = new Books();

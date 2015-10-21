@@ -1,1 +1,1 @@
-DELETE FROM `tmux` WHERE `setting` = 'colors';
+DELETE FROM tmux WHERE setting = 'colors';

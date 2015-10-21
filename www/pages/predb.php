@@ -1,6 +1,6 @@
 <?php
 
-use newznab\controllers\PreDB;
+use newznab\PreDB;
 
 $PreDB = new PreDB();
 

@@ -20,7 +20,7 @@
  */
 namespace newznab\db;
 
-use newznab\controllers\ColorCLI;
+use newznab\ColorCLI;
 use newznab\utility\Git;
 use newznab\utility\Utility;
 

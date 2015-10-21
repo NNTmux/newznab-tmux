@@ -1,1 +1,1 @@
-ALTER TABLE  `movieinfo` ADD  `type` VARCHAR( 32 ) NOT NULL AFTER  `genre` ;
+ALTER TABLE  movieinfo ADD  type VARCHAR( 32 ) NOT NULL AFTER  genre ;

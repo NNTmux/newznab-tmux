@@ -1,1 +1,1 @@
-ALTER TABLE `predb` drop `MD5`;
+ALTER TABLE predb drop MD5;

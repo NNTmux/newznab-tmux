@@ -1,4 +1,4 @@
-INSERT INTO settings (section, subsection, name, value, hint, setting)
+INSERT IGNORE INTO settings (section, subsection, name, value, hint, setting)
   VALUES (
     'tmux',
     'running',

@@ -1,1 +1,1 @@
-INSERT INTO `site` (`setting`, `value`) VALUES ('processthumbnails', '0');
+INSERT IGNORE INTO settings (setting, value) VALUES ('processthumbnails', '0');

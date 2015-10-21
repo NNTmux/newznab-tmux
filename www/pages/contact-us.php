@@ -1,7 +1,7 @@
 <?php
 
 use newznab\utility\Utility;
-use newznab\controllers\Captcha;
+use newznab\Captcha;
 
 $captcha = new Captcha($page);
 
