@@ -160,7 +160,7 @@
 		<li>episode</li>
 		<li>videos_id</li>
 		<li>tvtitle</li>
-		<li>tvairdate</li>
+		<li>firstaired</li>
 		<li>video</li>
 		<li>audio</li>
 		<li>resolution</li>

@@ -46,8 +46,8 @@
 					{if $release.tvtitle != ""}
 						<newznab:attr name="tvtitle" value="{$release.tvtitle|escape:html}"/>
 					{/if}
-					{if $release.tvairdate != ""}
-						<newznab:attr name="tvairdate" value="{$release.tvairdate|phpdate_format:"DATE_RSS"}"/>
+					{if $release.firstaired != ""}
+						<newznab:attr name="firstaired" value="{$release.firstaired|phpdate_format:"DATE_RSS"}"/>
 					{/if}
 				{/if}
 				{if $release.imdbid != ""}

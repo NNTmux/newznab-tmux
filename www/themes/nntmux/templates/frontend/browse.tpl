@@ -151,8 +151,8 @@
 									{if $result.anidbid > 0}<a class="rndbtn"
 															   href="{$smarty.const.WWW_TOP}/anime/{$result.anidbid}"
 															   title="View all episodes">View Anime</a>{/if}
-									{if $result.tvairdate != ""}<span class="seriesinfo rndbtn" title="{$result.guid}">
-										Aired {if $result.tvairdate|strtotime > $smarty.now}in future{else}{$result.tvairdate|daysago}{/if}</span>{/if}
+									{if $result.firstaired != ""}<span class="seriesinfo rndbtn" title="{$result.guid}">
+										Aired {if $result.firstaired|strtotime > $smarty.now}in future{else}{$result.firstaired|daysago}{/if}</span>{/if}
 									{if $result.reid > 0}<span class="mediainfo rndbtn" title="{$result.guid}">
 											Media</span>{/if}
 								{if $result.group_name != ""}

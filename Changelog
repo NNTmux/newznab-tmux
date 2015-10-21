@@ -1,4 +1,5 @@
 2015-10-21 DariusIII
+	Fix: Adjust templates
 	Add: Adjust more scripts and adjust templates for new tv processing
 	Fix: First batch of changes to charisma/omicron templates to accommodate tv changes
 	Fix: Properly fix trakt in Movie.php

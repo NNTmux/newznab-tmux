@@ -277,9 +277,9 @@
 									   href="{$smarty.const.WWW_TOP}/anime/{$result.anidbid}" title="View all episodes">View
 										Anime</a>
 								{/if}
-								{if $result.tvairdate != ""}
+								{if $result.firstaired != ""}
 									<span class="seriesinfo label label-default"
-										  title="{$result.guid}">Aired {if $result.tvairdate|strtotime > $smarty.now}in future{else}{$result.tvairdate|daysago}{/if}</span>
+										  title="{$result.guid}">Aired {if $result.firstaired|strtotime > $smarty.now}in future{else}{$result.firstaired|daysago}{/if}</span>
 								{/if}
 								{if $result.group_name != ""}
 									<a class="label label-default"

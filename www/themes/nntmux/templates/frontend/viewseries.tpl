@@ -110,9 +110,9 @@
 											href="{$smarty.const.WWW_TOP}/covers/preview/{$result.guid}_thumb.jpg"
 											name="name{$result.guid}" title="View Screenshot" class="modal_prev rndbtn"
 											rel="preview">Preview</a>{/if}
-										{if $result.tvairdate != ""}<span class="rndbtn"
-																		  title="{$result.tvtitle} Aired on {$result.tvairdate|date_format}">
-											Aired {if $result.tvairdate|strtotime > $smarty.now}in future{else}{$result.tvairdate|daysago}{/if}</span>{/if}
+										{if $result.firstaired != ""}<span class="rndbtn"
+																		  title="{$result.tvtitle} Aired on {$result.firstaired|date_format}">
+											Aired {if $result.firstaired|strtotime > $smarty.now}in future{else}{$result.firstaired|daysago}{/if}</span>{/if}
 										{if $result.reid > 0}<span class="mediainfo rndbtn" title="{$result.guid}">
 												Media</span>{/if}
 									</div>

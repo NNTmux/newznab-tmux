@@ -57,7 +57,7 @@
 	<strong>{if $release.tvtitle != ""}{$release.tvtitle|escape:"htmlall"} - {/if}{$release.seriesfull|replace:"S":"Season "|replace:"E":" Episode "}</strong><br />
 	{if $rage.description != ""}<span class="descinitial">{$rage.description|escape:"htmlall"|nl2br|magicurl|truncate:"350":"</span><a class=\"descmore\" href=\"#\">more...</a>"}{if $rage.description|strlen > 350}<span class="descfull">{$rage.description|escape:"htmlall"|nl2br|magicurl}</span>{else}{/if}<br /><br />{/if}
 {if $rage.genre != ""}<strong>Genre:</strong> {$rage.genre|escape:"htmlall"|replace:"|":", "}<br />{/if}
-{if $release.tvairdate != ""}<strong>Aired:</strong> {$release.tvairdate|date_format}<br/>{/if}
+{if $release.firstaired != ""}<strong>Aired:</strong> {$release.firstaired|date_format}<br/>{/if}
 {if $rage.country != ""}<strong>Country:</strong> {$rage.country}<br/>{/if}
 {if $episode && $release.episodeinfoid > 0}
 {if $episode.overview != ""}<strong>Overview:</strong> <span class="descinitial">{$episode.overview|escape:"htmlall"|nl2br|magicurl|truncate:"350":"</span><a class=\"descmore\" href=\"#\">more...</a>"}{if $episode.overview|strlen > 350}<span class="descfull">{$episode.overview|escape:"htmlall"|nl2br|magicurl}</span>{else}{/if}<br /><br />{/if}
@@ -114,7 +114,7 @@
     <strong>{if $release.tvtitle != ""}{$release.tvtitle|escape:"htmlall"}{/if}</strong><br />
 {if $anidb.description != ""}<span class="descinitial">{$anidb.description|escape:"htmlall"|nl2br|magicurl|truncate:"350":"</span><a class=\"descmore\" href=\"#\">more...</a>"}{if $anidb.description|strlen > 350}<span class="descfull">{$anidb.description|escape:"htmlall"|nl2br|magicurl}</span>{else}{/if}<br /><br />{/if}
 {if $anidb.categories != ""}<strong>Categories:</strong> {$anidb.categories|escape:"htmlall"|replace:"|":", "}<br />{/if}
-{if $release.tvairdate != "0000-00-00 00:00:00"}<strong>Aired:</strong> {$release.tvairdate|date_format}<br/>{/if}
+{if $release.firstaired != "0000-00-00 00:00:00"}<strong>Aired:</strong> {$release.firstaired|date_format}<br/>{/if}
 {if $episode && $release.episodeinfoid > 0}
 	{if $episode.overview != ""}<strong>Overview:</strong> {$episode.overview}{/if}
 				{if $episode.rating > 0}<strong>Rating:</strong> {$episode.rating}{/if}
