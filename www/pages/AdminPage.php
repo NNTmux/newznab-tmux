@@ -21,8 +21,7 @@ class AdminPage extends BasePage
 		$tplpaths["frontend"] = NN_WWW.'themes/omicron/templates/frontend';
 		$this->smarty->setTemplateDir($tplpaths);
 
-		$users = new Users();
-		if (!$page->users->isLoggedIn() || !isset($this->userdata["role"]) || $this->userdata["role"] != Users::ROLE_ADMIN)
+		if (!$this->users->isLoggedIn() || !isset($this->userdata["role"]) || $this->userdata["role"] != Users::ROLE_ADMIN)
 			$this->show403(true);
 
 	}
