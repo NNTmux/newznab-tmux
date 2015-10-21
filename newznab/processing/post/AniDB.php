@@ -2,7 +2,7 @@
 namespace newznab\processing\post;
 
 use newznab\db\Settings;
-use newznab\Enzebe;
+use newznab\NZB;
 use newznab\Category;
 
 class AniDB
@@ -70,9 +70,9 @@ class AniDB
 							AND categoryid = %d
 							ORDER BY postdate DESC
 							LIMIT %d',
-									 NZB::NZB_ADDED,
-									 Category::CAT_TV_ANIME,
-									 $this->aniqty
+								 	NZB::NZB_ADDED,
+									Category::CAT_TV_ANIME,
+									$this->aniqty
 							 )
 		);
 

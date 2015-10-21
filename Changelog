@@ -1,4 +1,5 @@
 2015-10-21 DariusIII
+	Fix: NZB error in processing/post/AniDB
 	Fix: Instantiation of Genres class in Console.php and path to postprocess_pre in TmuxRun.php
 	Fix: Reported errors in Forking and settings.example.php
 	Fix: Rename rageid into tvinfoid
