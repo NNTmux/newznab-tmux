@@ -251,7 +251,7 @@ class TheTVDB
 	public function processReleases()
 	{
 
-		$results = $this->pdo->queryDirect(sprintf("SELECT id, searchname, rageid, anidbid, seriesfull, season, episode, tvtitle FROM releases WHERE episodeinfoid IS NULL AND categoryid IN ( SELECT id FROM category WHERE parentid = %d ) LIMIT 150", Category::CAT_PARENT_TV));
+		$results = $this->pdo->queryDirect(sprintf("SELECT id, searchname, tvinfoid, anidbid, seriesfull, season, episode, tvtitle FROM releases WHERE episodeinfoid IS NULL AND categoryid IN ( SELECT id FROM category WHERE parentid = %d ) LIMIT 150", Category::CAT_PARENT_TV));
 
 		if ($this->pdo->getNumRows($results) > 0)
 		{

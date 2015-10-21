@@ -564,7 +564,7 @@ class NameFixer
 						$this->pdo->queryExec(
 							sprintf('
 								UPDATE releases
-								SET rageid = -1, seriesfull = NULL, season = NULL, episode = NULL,
+								SET tvinfoid = -1, seriesfull = NULL, season = NULL, episode = NULL,
 									tvtitle = NULL, tvairdate = NULL, imdbid = NULL, musicinfoid = NULL,
 									consoleinfoid = NULL, bookinfoid = NULL, anidbid = NULL, prehashid = %d,
 									searchname = %s, %s categoryid = %d
@@ -582,7 +582,7 @@ class NameFixer
 						$this->pdo->queryExec(
 							sprintf('
 								UPDATE releases
-								SET rageid = -1, seriesfull = NULL, season = NULL, episode = NULL,
+								SET tvinfoid = -1, seriesfull = NULL, season = NULL, episode = NULL,
 									tvtitle = NULL, tvairdate = NULL, imdbid = NULL, musicinfoid = NULL,
 									consoleinfoid = NULL, bookinfoid = NULL, anidbid = NULL, prehashid = %d,
 									searchname = %s, iscategorized = 1, categoryid = %d
