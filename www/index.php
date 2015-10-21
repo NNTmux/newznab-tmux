@@ -22,7 +22,6 @@ switch ($page->page) {
 	case 'books':
 	case 'browse':
 	case 'browsegroup':
-	case 'calendar':
 	case 'cart':
 	case 'console':
 	case 'consolemodal':

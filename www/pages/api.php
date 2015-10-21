@@ -4,7 +4,6 @@ use newznab\db\Settings;
 use newznab\ReleaseComments;
 use newznab\Releases;
 use newznab\Category;
-use newznab\BasePage;
 
 $rc = new ReleaseComments;
 
@@ -161,7 +160,7 @@ switch ($function) {
 		$page->users->addApiRequest($uid, $_SERVER['REQUEST_URI']);
 		$offset = offset();
 
-		$relData = $releases->searchbyRageId(
+		$relData = $releases->searchbyVideoId(
 			(isset($_GET['rid']) ? $_GET['rid'] : '-1'),
 			(isset($_GET['season']) ? $_GET['season'] : ''),
 			(isset($_GET['ep']) ? $_GET['ep'] : ''),
