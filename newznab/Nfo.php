@@ -340,7 +340,6 @@ class Nfo
 				]
 			);
 			$movie = new Movie(['Echo' => $this->echo, 'Settings' => $this->pdo]);
-			$tvRage = new TvRage(['Echo' => $this->echo, 'Settings' => $this->pdo]);
 
 			foreach ($res as $arr) {
 				$fetchedBinary = $nzbContents->getNFOfromNZB($arr['guid'], $arr['id'], $arr['groupid'], $groups->getByNameByID($arr['groupid']));
@@ -357,8 +356,8 @@ class Nfo
 					$ret++;
 					$movie->doMovieUpdate($fetchedBinary, 'nfo', $arr['id'], $processImdb);
 
-					// If set scan for tvrage info.
-					if ($processTvrage == 1) {
+					// If set scan for tvrage info. Needs to be replaced with another method.
+					/*if ($processTvrage == 1) {
 						$rageId = $this->parseRageId($fetchedBinary);
 						if ($rageId !== false) {
 							$show = $tvRage->parseNameEpSeason($arr['name']);
@@ -366,14 +365,14 @@ class Nfo
 								// Update release with season, ep, and air date info (if available) from release title.
 								$tvRage->updateEpInfo($show, $arr['id']);
 
-								$rid = $tvRage->getByRageID($rageId);
+								$rid = $tvRage->getByVideoID($rageId);
 								if (!$rid) {
 									$tvrShow = $tvRage->getRageInfoFromService($rageId);
 									$tvRage->updateRageInfo($rageId, $show, $tvrShow, $arr['id']);
 								}
 							}
 						}
-					}
+					}*/
 				}
 			}
 		}

@@ -1,4 +1,5 @@
 2015-10-21 DariusIII
+	Chg: Disable rage checking in Nfo until new method is added
 	Fix: one extra argument in query
 	Fix: class text does not exist in nntmux
 	Chg: move TraktAPI to newznab/libraries, aport changes from nZEDb dev-tv branch.
