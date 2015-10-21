@@ -2,20 +2,26 @@
 namespace newznab\processing\tv;
 
 use newznab\db\Settings;
+use newznab\processing\Videos;
 
 /**
  * Class TV
  */
-class TV
+abstract class TV extends Videos
 {
-	const SOURCE_NONE   = 0; // No Scrape source
-	const SOURCE_TVDB   = 1; // Scrape source was TVDB
-	const SOURCE_TRAKT  = 2; // Scrape source was TraktTV
-	const SOURCE_TVRAGE = 3; // Scrape source was TvRage
-	const SOURCE_TVMAZE = 4; // Scrape source was TVMAZE
-	const SOURCE_IMDB   = 5; // Scrape source was IMDB
-	const SOURCE_TMDB   = 6; // Scrape source was TMDB
+	// Television Sources
+	const SOURCE_NONE    = 0; // No Scrape source
+	const SOURCE_TVDB    = 1; // Scrape source was TVDB
+	const SOURCE_TRAKT   = 2; // Scrape source was TraktTV
+	const SOURCE_TVRAGE  = 3; // Scrape source was TvRage
+	const SOURCE_TVMAZE  = 4; // Scrape source was TVMAZE
+	const SOURCE_IMDB    = 5; // Scrape source was IMDB
+	const SOURCE_TMDB    = 6; // Scrape source was TMDB
 
+	// Anime Sources
+	const SOURCE_ANIDB   = 10; // Scrape source was AniDB
+
+	// Processing signifiers
 	const PROCESS_TVDB   =  0; // Process TVDB First
 	const PROCESS_TRAKT  = -1; // Process Trakt Second
 	const PROCESS_TVRAGE = -2; // Process TvRage Third
@@ -24,10 +30,10 @@ class TV
 	const PROCESS_TMDB   = -5; // Process TMDB Sixth
 	const NO_MATCH_FOUND = -6; // Failed All Methods
 
-	/**
-	 * @var \newznab\db\Settings
-	 */
-	public $pdo;
+	// Video Type Identifiers
+	const TYPE_TV        =  0; // Type of video is a TV Show
+	const TYPE_FILM      =  1; // Type of video is a TV Show
+	const TYPE_ANIME     =  2; // Type of video is a TV Show
 
 	/**
 	 * @var bool
@@ -44,16 +50,49 @@ class TV
 	 */
 	public function __construct(array $options = [])
 	{
+		parent::__construct($options);
 		$defaults = [
 			'Echo'     => false,
 			'Settings' => null,
 		];
 		$options += $defaults;
-		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
+
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
-		$this->catWhere = 'categoryid BETWEEN 5000 AND 5999';
+		$this->catWhere = 'categoryid BETWEEN 5000 AND 5999 AND categoryid NOT IN (5070)';
 		$this->tvqty = ($this->pdo->getSetting('maxrageprocessed') != '') ? $this->pdo->getSetting('maxrageprocessed') : 75;
 	}
+
+	abstract protected function getBanner($videoID, $siteId);
+
+	/**
+	 * Retrieve info of TV episode from site using its API.
+	 *
+	 * @param integer	$siteId
+	 * @param integer	$series
+	 * @param integer	$episode
+	 *
+	 * @return array|false    False on failure, an array of information fields otherwise.
+	 */
+	abstract protected function getEpisodeInfo($siteId, $series, $episode);
+
+	/**
+	 * Retrieve poster image for TV episode from site using its API.
+	 *
+	 * @param integer $videoId ID from videos table.
+	 * @param integer $siteId  ID that this site uses for the programme.
+	 *
+	 * @return null
+	 */
+	abstract protected function getPoster($videoId, $siteId);
+
+	/**
+	 * Retrieve info of TV programme from site using it's API.
+	 *
+	 * @param string $name		Title of programme to look up. Usually a cleaned up version from releases table.
+	 *
+	 * @return array|false	False on failure, an array of information fields otherwise.
+	 */
+	abstract protected function getShowInfo($name);
 
 	/**
 	 * @param string $groupID
@@ -140,11 +179,12 @@ class TV
 	 * @param     $started
 	 * @param     $publisher
 	 * @param     $source
-	 * @param int $hasCover
+	 *
+	 * @param int $imdbId
 	 *
 	 * @return int
 	 */
-	public function add($column, $siteId, $title, $summary, $country, $started, $publisher, $source, $hasCover = 0)
+	public function add($column, $siteId, $title, $summary, $country, $started, $publisher, $source, $imdbId = 0)
 	{
 		if ($country !== '') {
 			$country = $this->countryCode($country);
@@ -153,7 +193,7 @@ class TV
 		// Check if video already exists based on site info
 		// if that fails be sure we're not inserting duplicates by checking the title
 
-		$videoId = $this->getBySiteId($column, $siteId);
+		$videoId = $this->getVideoIDFromSiteID($column, $siteId);
 
 		if ($videoId === false) {
 			$videoId = $this->getByTitleQuery($title);
@@ -162,28 +202,28 @@ class TV
 		if ($videoId === false) {
 			$videoId = $this->pdo->queryInsert(
 										sprintf('
-											INSERT INTO videos (%s, type, title, countries_id, started, source)
-											VALUES (%s, 0, %s, %s, %s, %d)',
+											INSERT INTO videos (%s, type, title, countries_id, started, source, imdb)
+											VALUES (%s, 0, %s, %s, %s, %d, %d)',
 											$column,
 											$siteId,
 											$this->pdo->escapeString($title),
 											$this->pdo->escapeString((isset($country) ? $country : '')),
 											$this->pdo->escapeString($started),
-											$source
+											$source,
+											$imdbId
 										)
 			);
 			$this->pdo->queryInsert(
 					sprintf("
-						INSERT INTO tv_info (videos_id, summary, publisher, image)
+						INSERT INTO tv_info (videos_id, summary, publisher)
 						VALUES (%d, %s, %s, %d)",
 						$videoId,
 						$this->pdo->escapeString($summary),
-						$this->pdo->escapeString($publisher),
-						$hasCover
+						$this->pdo->escapeString($publisher)
 					)
 			);
 		} else {
-			$this->update($videoId, $column, $siteId, $country);
+			$this->update($videoId, $column, $siteId, $country, $imdbId);
 		}
 		return (int)$videoId;
 	}
@@ -227,9 +267,9 @@ class TV
 	 * @param        $column
 	 * @param        $siteId
 	 * @param string $country
-	 * @param int    $hascover
+	 * @param        $imdbId
 	 */
-	public function update($videoId, $column, $siteId, $country = '', $hascover = 0)
+	public function update($videoId, $column, $siteId, $country = '', $imdbId = 0)
 	{
 		if ($country !== '') {
 			$country = $this->countryCode($country);
@@ -238,11 +278,12 @@ class TV
 		$this->pdo->queryExec(
 				sprintf('
 					UPDATE videos
-					SET %s = %d, countries_id = %s
+					SET %s = %d, countries_id = %s, imdb = %d
 					WHERE id = %d',
 					$column,
 					$siteId,
 					$this->pdo->escapeString((isset($country) ? $country : '')),
+					($imdbId > 0 ? $imdbId : 0),
 					$videoId
 				)
 		);
@@ -257,8 +298,10 @@ class TV
 	{
 		return $this->pdo->queryExec(
 				sprintf("
-					DELETE
-					FROM videos
+					DELETE v, tvi, tve
+					FROM videos v
+					LEFT JOIN tv_info tvi ON v.id = tvi.videos_id
+					LEFT JOIN tv_episodes tve ON v.id = tve.videos_id
 					WHERE id = %d",
 					$id
 				)
@@ -384,32 +427,10 @@ class TV
 							WHERE REPLACE(REPLACE(title, %s, ''), '!', '') %s
 							AND type = 0",
 							$string,
-							$this->pdo->likeString($title, false, true)
+							$this->pdo->likeString(rtrim($title, '%'), false, false)
 						)
 			);
 		}
-	}
-
-	/**
-	 * Get video info from a Site ID and column.
-	 *
-	 * @param string $column
-	 * @param int $id
-	 *
-	 * @return array|bool
-	 */
-	public function getBySiteID($column, $id)
-	{
-		$videoArr = $this->pdo->queryOneRow(
-						sprintf("
-							SELECT id
-							FROM videos
-							WHERE %s = %d",
-							$column,
-							$id
-						)
-		);
-		return (isset($videoArr['id']) ? $videoArr['id'] : false);
 	}
 
 	/**
@@ -484,6 +505,24 @@ class TV
 			}
 		}
 		return '';
+	}
+
+	/**
+	 * @param $videoID
+	 *
+	 * @return array|bool
+	 */
+	public function checkIfNoEpisodes($videoId)
+	{
+		$count = $this->pdo->queryOneRow(
+					sprintf('
+						SELECT count(id) AS num
+						FROM tv_episodes
+						WHERE videos_id = %d',
+						$videoId
+					)
+		);
+		return (isset($count['num']) && (int)$count['num'] > 0 ? true : false);
 	}
 
 	/**

@@ -107,7 +107,7 @@ class TVDB extends TV
 						}
 
 						// Get the show from TVDB
-						$tvdbShow = $this->getTVDBShow((string)$release['cleanname']);
+						$tvdbShow = $this->getShowInfo((string)$release['cleanname']);
 
 						if (is_array($tvdbShow)) {
 							$tvdbShow['country']  = (isset($release['country']) && strlen($release['country']) == 2
@@ -123,7 +123,8 @@ class TVDB extends TV
 										$tvdbShow['country'],
 										$tvdbShow['started'],
 										$tvdbShow['publisher'],
-										$tvdbShow['source']
+										$tvdbShow['source'],
+										$tvdbShow['imdbid']
 							);
 							$tvdbid = (int)$tvdbShow['siteid'];
 						}
@@ -135,18 +136,23 @@ class TVDB extends TV
 
 					if (is_numeric($videoId) && $videoId > 0 && is_numeric($tvdbid) && $tvdbid > 0) {
 						// Now that we have valid video and tvdb ids, try to get the poster
-						$this->getTVDBPoster($videoId, $tvdbid);
+						$this->getPoster($videoId, $tvdbid);
 
 						$seasonNo = preg_replace('/^S0*/', '', $release['season']);
 						$episodeNo = preg_replace('/^E0*/', '', $release['episode']);
 
-						// Check first if we have the episode for this video ID
+						// Download all episodes if new show to reduce API/bandwidth usage
+						if ($this->checkIfNoEpisodes($videoId) === false) {
+							$this->getEpisodeInfo($tvdbid, -1, -1, '', $videoId);
+						}
+
+						// Check if we have the episode for this video ID
 						$episode = $this->getBySeasonEp($videoId, $seasonNo, $episodeNo, $release['airdate']);
 
-						if ($episode === false && $lookupSetting) {
 
+						if ($episode === false && $lookupSetting) {
 							// Send the request for the episode to TVDB
-							$tvdbEpisode = $this->getTVDBEpisode(
+							$tvdbEpisode = $this->getEpisodeInfo(
 										$tvdbid,
 										$seasonNo,
 										$episodeNo,
@@ -181,17 +187,22 @@ class TVDB extends TV
 		}
 	}
 
+	protected function getBanner($videoID, $siteId)
+	{
+		return false;
+	}
+
 	/**
 	 * @param $cleanName
 	 *
 	 * @return array|bool
 	 */
-	private function getTVDBShow($cleanName)
+	protected function getShowInfo($cleanName)
 	{
 		$return = $response = false;
 		$highestMatch = 0;
 		try {
-			$response = (array)$this->client->getSeries($cleanName);
+			$response = (array)$this->client->getSeries($cleanName, 'en');
 		} catch (\Exception $error) { }
 
 		sleep(1);
@@ -237,8 +248,10 @@ class TVDB extends TV
 	/**
 	 * @param $videoId
 	 * @param $showId
+	 *
+	 * @return null
 	 */
-	private function getTVDBPoster($videoId, $showId)
+	protected function getPoster($videoId, $showId)
 	{
 		$hascover = (new ReleaseImage($this->pdo))->saveImage(
 							$videoId,
@@ -253,21 +266,26 @@ class TVDB extends TV
 	}
 
 	/**
-	 * @param        $tvdbid
-	 * @param        $season
-	 * @param        $episode
-	 *
-	 * @param string $airdate
+	 * @param integer	$tvdbid
+	 * @param integer	$season
+	 * @param integer	$episode
+	 * @param string	$airdate
+	 * @param integer	$videoId
 	 *
 	 * @return array|bool
 	 */
-	private function getTVDBEpisode($tvdbid, $season, $episode, $airdate = '')
+	protected function getEpisodeInfo($tvdbid, $season, $episode, $airdate = '', $videoId = 0)
 	{
 		$return = $response = false;
 
 		if ($airdate !== '') {
 			try {
 				$response = $this->client->getEpisodeByAirDate($tvdbid, $airdate);
+			} catch (\Exception $error) {
+			}
+		} else if ($videoId > 0) {
+			try {
+				$response = $this->client->getSerieEpisodes($tvdbid, 'en');
 			} catch (\Exception $error) {
 			}
 		} else {
@@ -283,6 +301,21 @@ class TVDB extends TV
 			if ($this->checkRequired($response, 2)) {
 				$return = $this->formatEpisodeArr($response);
 			}
+		} else if (is_array($response) && isset($response['episodes']) && $videoId > 0) {
+			foreach($response['episodes'] as $singleEpisode) {
+				if ($this->checkRequired($singleEpisode, 2)) {
+					$newEpisode = $this->formatEpisodeArr($singleEpisode);
+					$this->addEpisode(
+						$videoId,
+						$newEpisode['season'],
+						$newEpisode['episode'],
+						$newEpisode['se_complete'],
+						$newEpisode['title'],
+						$newEpisode['firstaired'],
+						$newEpisode['summary']
+					);
+				}
+			}
 		}
 		return $return;
 	}
@@ -295,6 +328,7 @@ class TVDB extends TV
 	private function formatShowArr($show)
 	{
 		$show->firstAired->setTimezone($this->timeZone);
+		preg_match('/tt(?P<imdbid>\d{7})$/i', $show->imdbId, $imdb);
 
 		return	[
 					'column'    => (string)'tvdb',
@@ -303,7 +337,8 @@ class TVDB extends TV
 					'summary'   => (string)$show->overview,
 					'started'   => (string)$show->firstAired->format($this->timeFormat),
 					'publisher' => (string)$show->network,
-					'source'    => (int)parent::SOURCE_TVDB
+					'source'    => (int)parent::SOURCE_TVDB,
+					'imdbid'    => (int)(isset($imdb['imdbid']) ? $imdb['imdbid'] : 0)
 				];
 	}
 

@@ -66,15 +66,38 @@ Class Videos
 
 		return $this->pdo->query(
 			sprintf("
-						SELECT v.id, v.tvrage, v.title, tvi.summary, v.started
+						SELECT v.*,
+							tvi.summary, tvi.publisher, tvi.image
 						FROM videos v
 						INNER JOIN tv_info tvi ON v.id = tvi.videos_id
 						WHERE 1=1 %s
-						ORDER BY v.tvrage ASC %s",
+						ORDER BY v.id ASC %s",
 				$rsql,
 				$limit
 			)
 		);
+	}
+
+	/**
+	 * @param string $showname
+	 *
+	 * @return mixed
+	 */
+	public function getCount($showname = "")
+	{
+		$rsql = '';
+		if ($showname != "") {
+			$rsql .= sprintf("AND v.title LIKE %s ", $this->pdo->escapeString("%" . $showname . "%"));
+		}
+		$res = $this->pdo->queryOneRow(
+			sprintf("
+						SELECT COUNT(v.id) AS num
+						FROM videos v
+						WHERE 1=1 %s",
+				$rsql
+			)
+		);
+		return $res["num"];
 	}
 
 	/**
@@ -110,8 +133,7 @@ Class Videos
 					INNER JOIN releases r ON r.videos_id = v.id
 					INNER JOIN tv_info tvi ON r.videos_id = tvi.videos_id
 					INNER JOIN tv_episodes tve ON v.id = tve.videos_id
-					LEFT OUTER JOIN userseries us ON us.userid = %d
-						AND us.rageid = v.tvrage
+					LEFT OUTER JOIN user_series us ON us.user_id = %d
 					WHERE %s
 					%s %s
 					ORDER BY tve.firstaired DESC) v

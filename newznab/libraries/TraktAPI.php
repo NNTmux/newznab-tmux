@@ -1,5 +1,5 @@
 <?php
-namespace libs;
+namespace newznab\libraries;
 
 use newznab\utility\Utility;
 
@@ -218,10 +218,10 @@ Class TraktAPI {
 	 *                         'min'         Returns enough info to match locally. (Default)
 	 *                         'images'      Minimal info and all images.
 	 *                         'full'        Complete info for an item.
-	 *                         'full,images' Complete info and all images.
-	 *
-	 * @return bool|mixed
-	 */
+	*                         'full,images' Complete info and all images.
+	*
+	* @return bool|mixed
+	*/
 	private function getJsonArray($URI, $extended = 'min')
 	{
 		if ($extended === '') {

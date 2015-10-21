@@ -1088,7 +1088,7 @@ class Releases
 					v.title, v.countries_id, v.started, v.imdb, v.tmdb, v.tvmaze, v.tvrage, v.source,
 					tvi.summary, tvi.publisher, tvi.image,
 					tve.series, tve.episode, tve.se_complete, tve.title, tve.firstaired, tve.summary,
-					concat(cp.title, ' > ', c.title) AS category_name,
+					CONCAT(cp.title, ' > ', c.title) AS category_name,
 				%s AS category_ids,
 				groups.name AS group_name,
 				rn.id AS nfoid,
@@ -1318,11 +1318,20 @@ class Releases
 			$gSql = sprintf('r.guid = %s', $this->pdo->escapeString($guid));
 		}
 		$sql = sprintf(
-			"SELECT r.*, CONCAT(cp.title, ' > ', c.title) AS category_name, CONCAT(cp.id, ',', c.id) AS category_ids,
-				g.name AS group_name FROM releases r
+			"SELECT r.*,
+				CONCAT(cp.title, ' > ', c.title) AS category_name,
+				CONCAT(cp.id, ',', c.id) AS category_ids,
+				g.name AS group_name,
+				v.title AS showtitle, v.tvdb, v.trakt, v.tvrage, v.source,
+				tvi.summary, tvi.image,
+				tve.title, tve.firstaired, tve.se_complete
+				FROM releases r
 			INNER JOIN groups g ON g.id = r.groupid
 			INNER JOIN category c ON c.id = r.categoryid
 			INNER JOIN category cp ON cp.id = c.parentid
+			LEFT OUTER JOIN videos v ON r.videos_id = v.id
+			LEFT OUTER JOIN tv_info tvi ON r.videos_id = tvi.videos_id
+			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
 			WHERE %s",
 			$gSql
 		);

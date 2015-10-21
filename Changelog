@@ -1,4 +1,5 @@
 2015-10-21 DariusIII
+	Chg: move TraktAPI to newznab/libraries, aport changes from nZEDb dev-tv branch.
 	Chg: Add tv_episodes_id to Tmux and Forking
 	Add: Changes for TV processing ported from nZEDb dev-tv branch
 	Fix: path to removeCrapReleases in TmuxRun.
