@@ -19,7 +19,7 @@
  * @copyright 2015 nZEDb
  */
 
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'www' . DIRECTORY_SEPARATOR . 'config.php';
+require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'indexer.php';
 
 use newznab\db\DbUpdate;
 use newznab\utility\Git;

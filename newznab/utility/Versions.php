@@ -5,7 +5,7 @@ if (!defined('GIT_PRE_COMMIT')) {
 	define('GIT_PRE_COMMIT', false);
 }
 
-use ColorCLI;
+use newznab\ColorCLI;
 
 class Versions
 {
@@ -23,7 +23,7 @@ class Versions
 	public $git;
 
 	/**
-	 * @var object newznab\controllers\ColorCLI
+	 * @var object newznab\ColorCLI
 	 */
 	public $out;
 

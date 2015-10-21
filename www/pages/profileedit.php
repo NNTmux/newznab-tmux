@@ -1,4 +1,8 @@
 <?php
+use newznab\Category;
+use newznab\SABnzbd;
+use newznab\NZBGet;
+use newznab\Users;
 
 use newznab\utility\Utility;
 

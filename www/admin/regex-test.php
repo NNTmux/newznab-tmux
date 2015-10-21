@@ -2,6 +2,10 @@
 
 require_once("config.php");
 
+use newznab\ReleaseRegex;
+use newznab\Groups;
+use newznab\Category;
+
 $page = new AdminPage();
 $reg = new ReleaseRegex();
 $groups = new Groups();

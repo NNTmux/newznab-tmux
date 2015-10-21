@@ -1,5 +1,7 @@
 <?php
 
+use newznab\XXX;
+
 if (!$page->users->isLoggedIn()) {
 	$page->show403();
 }

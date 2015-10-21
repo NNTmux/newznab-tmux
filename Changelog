@@ -1,4 +1,46 @@
+2015-10-20 DariusIII
+	Upd: Update schema, change or remove some patches-
+	Upd: Update patch 56
+	Upd: Update patch 83
+	Chg: Hopefully last addition to schema
+	Chg: Change description on ircscraper.
+	Fix: Schema and ircscraper settings in tmux.
+	Fix: Typo in queryExec
+	Fix: Add missing posprocess_pre script, change references to Page in Releases.php
+	Fix: Again some fixes for schema and site-edit.php
+	Fix: Schema.sql
+	Fix: ffs
+	Fix: Again patches and schema
+	Fix: Fix patches and schema
+	Fix: Typo in schema.sql
+	Chg: Update patches, update db.sql and rename it to schema.sql.
+	Fix: Another class use fix
+	Chg: Change rageid into tvinfoid as temporary solution in Tmux.php
+	Upd: update patches - remove rageid.
+2015-10-19 DariusIII
+	Upd: Update the DbUpdate class
+	Fix: update_db error.
+	Fix: More script adjustments
+	Fix: Fix book and misc menu in omicron template
+	Upd: Many small changes to classes
+	Chg: InnoDB to MYISAM in patches
+	Fix: Wrong path to indexer.php
+	Fix: Instantiation of Logger class in DB.php
+	Chg: Add tmux 2.0.3 packages
+	Fix: Missing Tmux class
+	Fix: Error for undefined stdClass
+	Fix: LoggerException erro.
+	Fix: Remove references to www/config.php in Settings.php
+	Upd: small update to XXX class.
+	Fix: @var Users in BasePage.php
+	Fix: references to site replaced with settings
+	Chg: Moved db.sql into resources/db/schema folder, patchDB does not need to be used anymore. Will be removed in next patch
+	Upd: Fix tmux paths for moved files.
+	Upd: Refactor branch completely.
 2015-10-18 DariusIII
+	Fix: Use queryExec and not queryDelete in Releases.php
+	Chg: Remove require for automated.config.php
+	Chg: Move config files into newznab/config folder. Move BasePage, AdminPage and page to www/pages folder where they belong.
 	Fix: Fix processReleases call in switch.php and instantiation of classes
 2015-10-13 DariusIII
 	Fix: improve speed by replacing str_ireplace with strpos.Pushing again.

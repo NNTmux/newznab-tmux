@@ -1,5 +1,7 @@
 <?php
 
+use newznab\Captcha;
+
 use newznab\utility\Utility;
 
 if ($page->users->isLoggedIn()) {

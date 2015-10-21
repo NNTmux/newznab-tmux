@@ -1,6 +1,9 @@
 <?php
 
 use newznab\db\Settings;
+use newznab\UserSeries;
+use newznab\Category;
+use newznab\Releases;
 
 if (!$page->users->isLoggedIn())
 	$page->show403();

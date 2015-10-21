@@ -2,6 +2,9 @@
 
 require_once("config.php");
 
+use newznab\Category;
+use newznab\ReleaseRegex;
+
 $page = new AdminPage();
 $category = new Category();
 $reg = new ReleaseRegex();

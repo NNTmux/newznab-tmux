@@ -18,7 +18,7 @@
  * @author niel
  * @copyright 2014 nZEDb
  */
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'www' . DIRECTORY_SEPARATOR . 'config.php';
+require_once realpath(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'indexer.php');
 
 use newznab\utility\Utility;
 use newznab\utility\Versions;

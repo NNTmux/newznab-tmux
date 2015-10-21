@@ -2,6 +2,9 @@
 
 require_once("config.php");
 
+use newznab\Users;
+use newznab\Category;
+
 $page = new AdminPage();
 $users = new Users();
 $category = new Category();

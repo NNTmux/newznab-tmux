@@ -1,6 +1,8 @@
 <?php
 require_once("config.php");
 
+use newznab\Games;
+
 $page = new AdminPage();
 $game = new Games(['Settings' => $page->settings]);
 

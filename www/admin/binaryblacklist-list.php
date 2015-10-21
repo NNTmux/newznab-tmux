@@ -2,6 +2,8 @@
 
 require_once("config.php");
 
+use newznab\Binaries;
+
 $page = new AdminPage();
 
 $bin = new Binaries();

@@ -2,6 +2,8 @@
 
 require_once("config.php");
 
+use newznab\Movie;
+
 $page = new AdminPage();
 $movie = new Movie();
 $id = 0;
@@ -21,8 +23,8 @@ if (isset($_REQUEST["id"]))
 	switch($action)
 	{
 	    case 'submit':
-	    	$coverLoc = WWW_DIR."covers/movies/".$id.'-cover.jpg';
-	    	$backdropLoc = WWW_DIR."covers/movies/".$id.'-backdrop.jpg';
+			$coverLoc = NN_WWW."covers/movies/".$id.'-cover.jpg';
+			$backdropLoc = NN_WWW."covers/movies/".$id.'-backdrop.jpg';
 
 			if($_FILES['cover']['size'] > 0)
 			{

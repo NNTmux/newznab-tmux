@@ -1,5 +1,10 @@
 <?php
 
+use newznab\Console;
+use newznab\Category;
+use newznab\Genres;
+use newznab\DnzbFailures;
+
 if (!$page->users->isLoggedIn()) {
 	$page->show403();
 }

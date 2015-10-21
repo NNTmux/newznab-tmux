@@ -3,6 +3,8 @@
 require_once("config.php");
 
 use newznab\db\Settings;
+use newznab\Sharing;
+use newznab\ReleaseComments;
 
 // Login check.
 $admin = new AdminPage;

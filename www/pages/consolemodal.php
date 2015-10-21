@@ -1,5 +1,7 @@
 <?php
 
+use newznab\Console;
+
 if (!$page->users->isLoggedIn())
 	$page->show403();
 

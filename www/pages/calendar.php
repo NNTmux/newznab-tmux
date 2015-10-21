@@ -1,5 +1,7 @@
 <?php
 
+use newznab\TvRage;
+
 if (!$page->users->isLoggedIn()) {
 	$page->show403();
 }

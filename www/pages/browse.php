@@ -1,4 +1,6 @@
 <?php
+use newznab\Releases;
+use newznab\Category;
 
 $releases = new Releases(['Settings' => $page->settings]);
 

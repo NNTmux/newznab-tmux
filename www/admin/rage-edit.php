@@ -1,6 +1,8 @@
 <?php
 require_once './config.php';
 
+use newznab\TvRage;
+
 $page   = new AdminPage();
 $tvRage = new TvRage(['Settings' => $page->settings]);
 

@@ -1,5 +1,7 @@
 <?php
 
+use newznab\Forum;
+
 $forum = new Forum;
 
 if (!$page->users->isLoggedIn())

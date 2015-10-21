@@ -1,5 +1,8 @@
 <?php
 
+use newznab\UserMovies;
+use newznab\Category;
+
 
 if (!$page->users->isLoggedIn()) {
 	$page->show403();

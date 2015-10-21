@@ -1,5 +1,8 @@
 <?php
 
+use newznab\Contents;
+use newznab\Sitemap;
+
 $te = $page->smarty;
 
 $arPages = array();

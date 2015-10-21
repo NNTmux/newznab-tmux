@@ -1,5 +1,9 @@
 <?php
 
+use newznab\Releases;
+use newznab\Contents;
+use newznab\Category;
+
 if (!$page->users->isLoggedIn()) {
 	$page->show403();
 }

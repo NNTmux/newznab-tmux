@@ -1,15 +1,20 @@
 <?php
-require_once(dirname(__FILE__) . "/config.php");
+require_once dirname(__FILE__) . '/../../../config.php';
 
 use newznab\db\Settings;
 use newznab\processing\PostProcess;
+use newznab\MiscSorter;
+use newznab\NameFixer;
+use newznab\Nfo;
+use newznab\NZBContents;
+use newznab\NNTP;
 
 $pdo = new Settings();
 
 if (!isset($argv[1])) {
 	exit($pdo->log->error("This script is not intended to be run manually, it is called from Forking.php."));
 } else if (isset($argv[1])) {
-	$namefixer = new \NameFixer(['Settings' => $pdo]);
+	$namefixer = new NameFixer(['Settings' => $pdo]);
 	$pieces = explode(' ', $argv[1]);
 	$guidChar = $pieces[1];
 	$maxperrun = $pieces[2];

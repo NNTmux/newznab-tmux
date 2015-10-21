@@ -1,7 +1,8 @@
 <?php
-require_once dirname(__FILE__) . '/../../www/config.php';
+require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use newznab\db\Settings;
+use newznab\db\DB;
+use newznab\ReleaseSearch;
 
 
 if (!isset($argv[1]) || !in_array($argv[1], ['sphinx', 'standard'])) {
@@ -13,14 +14,14 @@ if (!isset($argv[1]) || !in_array($argv[1], ['sphinx', 'standard'])) {
 
 switch ($argv[1]) {
 	case 'sphinx':
-		if (NN_RELEASE_SEARCH_TYPE == \ReleaseSearch::SPHINX) {
-			optimizeForSphinx(new Settings());
+		if (NN_RELEASE_SEARCH_TYPE == ReleaseSearch::SPHINX) {
+			optimizeForSphinx(new DB());
 		} else {
 			echo PHP_EOL . $pdo->log->error('Error, NN_RELEASE_SEARCH_TYPE in www/settings.php must be set to SPHINX to optimize for Sphinx!' . PHP_EOL);
 		}
 		break;
 	case 'standard':
-		revertToStandard(new Settings());
+		revertToStandard(new DB());
 		break;
 }
 

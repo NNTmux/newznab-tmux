@@ -2,9 +2,11 @@
 require_once("config.php");
 
 use newznab\db\Settings;
-$page = new AdminPage();
-$sites = new Settings();
-$id = 0;
+use newznab\SABnzbd;
+
+$page  = new AdminPage();
+$id    = 0;
+$error = '';
 
 // set the current action
 $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view';
@@ -18,45 +20,62 @@ switch($action)
 			$_POST['book_reqids'] = is_array($_POST['book_reqids']) ?
 				implode(', ', $_POST['book_reqids']) : $_POST['book_reqids'];
 		}
-		$error = "";
 		$ret = $page->settings->update($_POST);
-		if (is_int($ret))
-		{
-			if ($ret == Settings::ERR_BADUNRARPATH)
+		if (is_int($ret)) {
+			// TODO convert to switch
+			if ($ret == Settings::ERR_BADUNRARPATH) {
 				$error = "The unrar path does not point to a valid binary";
-			elseif ($ret == Settings::ERR_BADFFMPEGPATH)
-				$error = "The ffmpeg path does not point to a valid binary";
-			elseif ($ret == Settings::ERR_BADMEDIAINFOPATH)
-				$error = "The mediainfo path does not point to a valid binary";
-			elseif ($ret == Settings::ERR_BADNZBPATH)
-				$error = "The nzb path does not point to a valid directory";
-			elseif ($ret == Settings::ERR_DEEPNOUNRAR)
-				$error = "Deep password check requires a valid path to unrar binary";
-			elseif ($ret == Settings::ERR_BADTMPUNRARPATH)
-				$error = "The temp unrar path is not a valid directory";
-			elseif ($ret == Sites::ERR_BADLAMEPATH)
-				$error = "The lame path is not a valid directory";
-			elseif ($ret == Sites::ERR_SABCOMPLETEPATH)
-				$error = "The sab complete path is not a valid directory";
+			} else {
+				if ($ret == Settings::ERR_BADFFMPEGPATH) {
+					$error = "The ffmpeg path does not point to a valid binary";
+				} else {
+					if ($ret == Settings::ERR_BADMEDIAINFOPATH) {
+						$error = "The mediainfo path does not point to a valid binary";
+					} else {
+						if ($ret == Settings::ERR_BADNZBPATH) {
+							$error = "The nzb path does not point to an existing directory";
+						} else {
+							if ($ret == Settings::ERR_DEEPNOUNRAR) {
+								$error = "Deep password check requires a valid path to unrar binary";
+							} else {
+								if ($ret == Settings::ERR_BADTMPUNRARPATH) {
+									$error = "The temp unrar path is not a valid directory";
+								} else {
+									if ($ret == Settings::ERR_BADNZBPATH_UNREADABLE) {
+										$error = "The nzb path cannot be read from. Check the permissions.";
+									} else {
+										if ($ret == Settings::ERR_BADNZBPATH_UNSET) {
+											$error = "The nzb path is required, please set it.";
+										} else {
+											if ($ret == Settings::ERR_BAD_COVERS_PATH) {
+												$error = 'The covers&apos; path is required and must exist. Please set it.';
+											} else {
+												if ($ret == Settings::ERR_BAD_YYDECODER_PATH) {
+													$error = 'The yydecoder&apos;s path must exist. Please set it or leave it empty.';
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 
-		if ($error == "")
-		{
-			$site = $ret;
+		if ($error == "") {
+			$site     = $ret;
 			$returnid = $site['id'];
-			header("Location:".WWW_TOP."/site-edit.php?id=".$returnid);
-		}
-		else
-		{
+			header("Location:" . WWW_TOP . "/site-edit.php?id=" . $returnid);
+		} else {
 			$page->smarty->assign('error', $error);
 			$page->smarty->assign('settings', $page->settings->rowsToArray($_POST));
-			$page->smarty->assign('site', $site);
 		}
-
 		break;
+
 	case 'view':
 	default:
-
 		$page->title = "Site Edit";
 		$site        = $page->settings;
 		$page->smarty->assign('site', $site);
@@ -99,7 +118,7 @@ $page->smarty->assign('curlproxytype_names', array( '', 'HTTP', 'SOCKS5'));
 
 $page->smarty->assign('newgroupscan_names', array('Days','Posts'));
 
-$page->smarty->assign('registerstatus_ids', array(Sites::REGISTER_STATUS_API_ONLY, Sites::REGISTER_STATUS_OPEN, Sites::REGISTER_STATUS_INVITE, Sites::REGISTER_STATUS_CLOSED));
+$page->smarty->assign('registerstatus_ids', array(Settings::REGISTER_STATUS_API_ONLY, Settings::REGISTER_STATUS_OPEN, Settings::REGISTER_STATUS_INVITE, Settings::REGISTER_STATUS_CLOSED));
 $page->smarty->assign('registerstatus_names', array('API Only', 'Open', 'Invite', 'Closed'));
 
 $page->smarty->assign('passworded_ids', array(0,1,2));
@@ -155,7 +174,7 @@ $book_reqids_ids = array_map(create_function('$value', 'return (int)$value;'), $
 $page->smarty->assign('book_reqids_ids', $book_reqids_ids);
 $page->smarty->assign('book_reqids_names', $book_reqids_names);
 
-// convert from a list to an array as we need to use an array, but teh sites table only saves strings
+// convert from a list to an array as we need to use an array, but teh Settings table only saves strings
 $books_selected = explode(",", $page->settings->book_reqids);
 
 // convert from a string array to an int array

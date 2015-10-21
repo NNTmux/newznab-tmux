@@ -2,6 +2,8 @@
 
 require_once("config.php");
 
+use newznab\ReleaseRegex;
+
 $page = new AdminPage();
 
 $reg = new ReleaseRegex();

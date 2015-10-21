@@ -2,6 +2,9 @@
 
 require_once("config.php");
 
+use newznab\Menu;
+use newznab\Users;
+
 $page = new AdminPage();
 $page->title = "Menu Add";
 $menu = new Menu();

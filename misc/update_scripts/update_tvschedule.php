@@ -1,6 +1,7 @@
 <?php
-
 // Run this once per day.
-require_once("config.php");
+require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-(new \TvRage(['Echo' => true]))->updateSchedule();
+use newznab\TvRage;
+
+(new TvRage(['Echo' => true]))->updateSchedule();

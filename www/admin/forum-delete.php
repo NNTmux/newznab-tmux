@@ -1,5 +1,6 @@
 <?php
 require_once("config.php");
+use newznab\Forum;
 
 $page = new AdminPage();
 

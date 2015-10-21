@@ -2,6 +2,8 @@
 
 require_once("config.php");
 
+use newznab\ReleaseComments;
+
 $page = new AdminPage();
 
 $releases = new ReleaseComments($page->settings);
