@@ -120,9 +120,9 @@
 													class="label label-default" rel="preview">Preview</a>{/if}
 												<span class="label label-default">{$result.grabs}
 													Grab{if $result.grabs != 1}s{/if}</span>
-												{if $result.firstaired != ""}<span class="label label-success"
-																				  title="{$result.tvtitle} Aired on {$result.firstaired|date_format}">
-													Aired {if $result.firstaired|strtotime > $smarty.now}in future{else}{$result.firstaired|daysago}{/if}</span>{/if}
+												{if $release.firstaired != ""}<span class="label label-success"
+																				  title="{$result.tvtitle} Aired on {$release.firstaired|date_format}">
+													Aired {if $release.firstaired|strtotime > $smarty.now}in future{else}{$release.firstaired|daysago}{/if}</span>{/if}
 												{if isset($result.reis) && $result.reid > 0}<span class="mediainfo label label-default"
 																		   title="{$result.guid}">Media</span>{/if}
 											</div>
