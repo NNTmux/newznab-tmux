@@ -1,3 +1,5 @@
+2015-10-21 DariusIII
+	Fix: missing Page in index.php
 2015-10-17 DariusIII
 	Chg: Move classes into newznab folder, adjust rest of the files accordingly.
 		Remove tmux/lib/folder completely, redo db as schena,sql in resources/db/schema folder.
