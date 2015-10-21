@@ -1,7 +1,6 @@
 <?php
 namespace newznab\processing\tv;
 
-use newznab\db\Settings;
 use newznab\processing\Videos;
 
 /**

@@ -4,6 +4,7 @@ namespace newznab;
 use newznab\db\Settings;
 use newznab\utility\Utility;
 use newznab\libraries\Tmdb\TMDB;
+use newznab\libraries\TraktAPI;
 
 /**
  * Class Movie
@@ -401,7 +402,7 @@ class Movie
 	}
 
 	/**
-	 * @var null|TraktTv
+	 * @var null|TraktAPI
 	 */
 	public $traktTv = null;
 
@@ -424,7 +425,7 @@ class Movie
 		}
 
 		if (is_null($this->traktTv)) {
-			$this->traktTv = new TraktTv(['Settings' => $this->pdo]);
+			$this->traktTv = new TraktAPI(['Settings' => $this->pdo]);
 		}
 
 		$data = $this->traktTv->movieSummary('tt' . $imdbID, 'full,images');
@@ -991,7 +992,7 @@ class Movie
 	protected function fetchTraktTVProperties($imdbId)
 	{
 		if (is_null($this->traktTv)) {
-			$this->traktTv = new TraktTv(['Settings' => $this->pdo]);
+			$this->traktTv = new TraktAPI(['Settings' => $this->pdo]);
 		}
 		$resp = $this->traktTv->movieSummary('tt' . $imdbId, 'full,images');
 		if ($resp !== false) {
@@ -1090,7 +1091,7 @@ class Movie
 
 		if ($movieCount > 0) {
 			if (is_null($this->traktTv)) {
-				$this->traktTv = new TraktTv(['Settings' => $this->pdo]);
+				$this->traktTv = new TraktAPI(['Settings' => $this->pdo]);
 			}
 			if ($this->echooutput && $movieCount > 1) {
 				$this->pdo->log->doEcho($this->pdo->log->header("Processing " . $movieCount . " movie releases."));
