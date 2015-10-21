@@ -809,21 +809,21 @@ class Forking extends \fork_daemon
 	{
 		if ($this->pdo->getSetting('lookuptvrage') > 0) {
 			return (
-				$this->pdo->queryOneRow(
-					sprintf('
+			$this->pdo->queryOneRow(
+				sprintf('
 						SELECT id
 						FROM releases
 						WHERE nzbstatus = %d
 						AND size > 1048576
-						AND rageid = -1
+						AND tv_episodes_id BETWEEN -2 AND 0
 						AND categoryid BETWEEN 5000 AND 5999
 						%s %s
 						LIMIT 1',
-						NZB::NZB_ADDED,
-						($this->pdo->getSetting('lookuptvrage') == 2 ? 'AND isrenamed = 1' : ''),
-						($this->ppRenamedOnly ? 'AND isrenamed = 1' : '')
-					)
-				) === false ? false : true
+					NZB::NZB_ADDED,
+					($this->pdo->getSetting('lookuptvrage') == 2 ? 'AND isrenamed = 1' : ''),
+					($this->ppRenamedOnly ? 'AND isrenamed = 1' : '')
+				)
+			) === false ? false : true
 			);
 		}
 		return false;
@@ -840,7 +840,7 @@ class Forking extends \fork_daemon
 					SELECT LEFT(guid, 1) AS id, %d AS renamed
 					FROM releases
 					WHERE nzbstatus = %d
-					AND rageid = -1
+					AND tv_episodes_id BETWEEN -2 AND 0
 					AND size > 1048576
 					AND categoryid BETWEEN 5000 AND 5999
 					%s %s
