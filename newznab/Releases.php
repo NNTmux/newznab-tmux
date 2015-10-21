@@ -213,7 +213,7 @@ class Releases
 				STRAIGHT_JOIN groups g ON g.id = r.groupid
 				STRAIGHT_JOIN category c ON c.id = r.categoryid
 				INNER JOIN category cp ON cp.id = c.parentid
-				LEFT OUTER JOIN video_data re ON re.releaseid = r.id
+				LEFT OUTER JOIN releasevideo re ON re.releaseid = r.id
 				LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
 				WHERE r.nzbstatus = %d
 				AND r.passwordstatus %s
