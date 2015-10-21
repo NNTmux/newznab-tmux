@@ -26,9 +26,9 @@
 				<td colspan="10">
 					<h2>{$sletter}...</h2>
 					<form class="form pull-right" style="margin-top:-35px;">
-						<form name="ragesearch" class="navbar-form" action="" method="get">
+						<form name="showsearch" class="navbar-form" action="" method="get">
 							<div class="input-append">
-								<input class="form-control" style="width: 150px;" id="title appendedInputButton" type="text" name="title" value="{$ragename}" placeholder="Search here"/>
+								<input class="form-control" style="width: 150px;" id="title appendedInputButton" type="text" name="title" value="{$showname}" placeholder="Search here"/>
 								<button type="submit" class="btn btn-default">GO</button>
 							</div>
 						</form>

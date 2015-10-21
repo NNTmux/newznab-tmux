@@ -2587,7 +2587,3 @@ class ProcessAdditional
 		}
 	}
 }
-
-class ProcessAdditionalException extends \Exception
-{
-}
