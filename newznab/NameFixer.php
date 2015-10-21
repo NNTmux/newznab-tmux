@@ -3,7 +3,7 @@ namespace newznab;
 
 use newznab\db\Settings;
 use newznab\processing\PostProcess;
-use newznab\utility\Text;
+use newznab\utility\Utility;
 
 /**
  * Class NameFixer
@@ -108,7 +108,7 @@ class NameFixer
 	public $category;
 
 	/**
-	 * @var \newznab\utility\Text
+	 * @var \newznab\utility\Utility
 	 */
 	public $text;
 
@@ -149,7 +149,7 @@ class NameFixer
 		$this->done = $this->matched = false;
 		$this->consoletools = ($options['ConsoleTools'] instanceof ConsoleTools ? $options['ConsoleTools'] : new ConsoleTools(['ColorCLI' => $this->pdo->log]));
 		$this->category = ($options['Categorize'] instanceof Categorize ? $options['Categorize'] : new Categorize(['Settings' => $this->pdo]));
-		$this->text = ($options['Misc'] instanceof Text ? $options['Misc'] : new Text());
+		$this->text = ($options['Misc'] instanceof Utility ? $options['Misc'] : new Utility());
 		$this->_groups = ($options['Groups'] instanceof Groups ? $options['Groups'] : new Groups(['Settings' => $this->pdo]));
 		$this->sphinx = ($options['SphinxSearch'] instanceof SphinxSearch ? $options['SphinxSearch'] : new SphinxSearch());
 	}
