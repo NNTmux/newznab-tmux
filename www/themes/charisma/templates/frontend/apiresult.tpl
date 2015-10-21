@@ -43,14 +43,14 @@
 					{if $release.episode != ""}
 						<newznab:attr name="episode" value="{$release.episode}"/>
 					{/if}
-					{if $release.videos_id != "-1" && $release.videos_id != "-2"}
-						<newznab:attr name="rageid" value="{$release.videos_id}"/>
+					{if $result.videos_id != "-1" && $result.videos_id != "-2"}
+						<newznab:attr name="rageid" value="{$result.videos_id}"/>
 					{/if}
 					{if $release.title != ""}
 						<newznab:attr name="title" value="{$release.title|escape:html}"/>
 					{/if}
-					{if $release.firstaired != ""}
-						<newznab:attr name="firstaired" value="{$release.firstaired|phpdate_format:"DATE_RSS"}"/>
+					{if $result.firstaired != ""}
+						<newznab:attr name="firstaired" value="{$result.firstaired|phpdate_format:"DATE_RSS"}"/>
 					{/if}
 					{if $release.imdbid != ""}
 						<newznab:attr name="imdb" value="{$release.imdbid}"/>

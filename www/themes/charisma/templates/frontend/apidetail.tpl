@@ -46,8 +46,8 @@
 					{if $release.title != ""}
 						<newznab:attr name="title" value="{$release.title|escape:html}"/>
 					{/if}
-					{if $release.firstaired != ""}
-						<newznab:attr name="firstaired" value="{$release.firstaired|phpdate_format:"DATE_RSS"}"/>
+					{if $result.firstaired != ""}
+						<newznab:attr name="firstaired" value="{$result.firstaired|phpdate_format:"DATE_RSS"}"/>
 					{/if}
 				{/if}
 				{if $release.imdbid != ""}

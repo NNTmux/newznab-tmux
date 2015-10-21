@@ -153,8 +153,8 @@
 				<newznab:attr name="size" value="{$release.size}"/>
 				<newznab:attr name="files" value="{$release.totalpart}"/>
 				<newznab:attr name="poster" value="{$release.fromname|escape:html}"/>
-				{if $release.videos_id > 0}
-					<newznab:attr name="videos_id" value="{$release.videos_id}" />
+				{if $result.videos_id > 0}
+					<newznab:attr name="videos_id" value="{$result.videos_id}" />
 				{/if}
 				{if $release.tv_episodes_id > 0}
 					<newznab:attr name="episode" value="{$release.tv_episodes_id}" />

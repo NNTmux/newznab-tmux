@@ -22,7 +22,7 @@
 						   href="{$smarty.const.WWW_TOP}/admin/release-delete.php?id={$release.id}&amp;from={$smarty.server.HTTP_REFERER}"
 						   title="Delete release">Delete</a>
 					{/if}
-					{if $movie && $release.videos_id < 0}
+					{if $movie && $result.videos_id < 0}
 						<a class="label label-default" target="_blank"
 						   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$release.imdbid}/"
 						   title="View at IMDB">IMDB</a>
@@ -46,13 +46,13 @@
 						   href="{$smarty.const.WWW_TOP}/rss?anidb={$release.anidbid}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">Anime
 							RSS Feed</a>
 					{/if}
-					{if $show && $release.videos_id > 0}
-						<a href="{$smarty.const.WWW_TOP}/myshows/add/{$release.videos_id}?from={$smarty.server.REQUEST_URI|escape:"url"}"
+					{if $show && $result.videos_id > 0}
+						<a href="{$smarty.const.WWW_TOP}/myshows/add/{$result.videos_id}?from={$smarty.server.REQUEST_URI|escape:"url"}"
 						   class="label label-success">Add to My Shows</a>
-						<a class="label label-default" href="{$serverroot}series/{$release.videos_id}"
+						<a class="label label-default" href="{$serverroot}series/{$result.videos_id}"
 						   title="View all releases for this series">View all episodes</a>
 						<a class="label label-default" target="_blank"
-						   href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$release.videos_id}"
+						   href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$result.videos_id}"
 						   title="View at TV Rage">TV Rage</a>
 						{if $release.tvdb > 0}<a class="label label-default" target="_blank"
 												   href="{$site->dereferrer_link}http://thetvdb.com/?tab=series&id={$release.tvdb}&lid=7"
@@ -82,12 +82,12 @@
 						{/if}
 					{/if}
 					<p>
-						{if $movie && $release.videos_id < 0 && $movie.plot != ''}<span
+						{if $movie && $result.videos_id < 0 && $movie.plot != ''}<span
 								class="descinitial">{$movie.plot|escape:"htmlall"|truncate:500:"...":true}</span>
 							{if $movie.plot|strlen > 500}
 								<a class="descmore" href="#">more...</a>
 								<span class="descfull">{$movie.plot|escape:"htmlall"|nl2br|magicurl}</span>{/if}{/if}
-						{if $show && $release.videos_id > 0 && $show.summary != ""}<span
+						{if $show && $result.videos_id > 0 && $show.summary != ""}<span
 								class="descinitial">{$show.summary|escape:"htmlall"|nl2br|magicurl|truncate:500:"...":true}</span>
 							{if $show.summary|strlen > 500}
 								<a class="descmore" href="#">more...</a>
@@ -109,7 +109,7 @@
 								<ul class="nav nav-tabs nav-primary">
 									<li class="active"><a href="#pane1"
 														  data-toggle="tab">Info</a></li>
-									{if $movie && $release.videos_id < 0}{if $movie.trailer != ""}
+									{if $movie && $result.videos_id < 0}{if $movie.trailer != ""}
 										<li><a href="#pane2" data-toggle="tab">Trailer</a></li>
 									{/if}{/if}
 									{if isset($xxx.trailers) && $xxx.trailers != ''}
@@ -142,15 +142,15 @@
 									<div id="pane1" class="tab-pane active">
 										<div class="row small-gutter-left">
 											<div class="col-md-3 small-gutter-left">
-												{if $movie && $release.videos_id < 0 && $movie.cover == 1}
+												{if $movie && $result.videos_id < 0 && $movie.cover == 1}
 													<img src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbid}-cover.jpg"
 														 width="185"
 														 alt="{$movie.title|escape:"htmlall"}"
 														 data-toggle="modal"
 														 data-target="#modal-image"/>
 												{/if}
-												{if $show && $release.videos_id > 0 && $show.image != "0"}
-													<img src="{$smarty.const.WWW_TOP}/covers/tvrage/{$release.videos_id}.jpg"
+												{if $show && $result.videos_id > 0 && $show.image != "0"}
+													<img src="{$smarty.const.WWW_TOP}/covers/tvrage/{$result.videos_id}.jpg"
 														 width="185"
 														 alt="{$show.title|escape:"htmlall"}"
 														 data-toggle="modal"
@@ -238,14 +238,14 @@
 														<td>
 															<table class="data table table-condensed table-striped table-responsive table-hover">
 																<tbody>
-																{if $movie && $release.videos_id < 0}
+																{if $movie && $result.videos_id < 0}
 																	<tr>
 																		<th width="140">Name
 																		</th>
 																		<td>{$movie.title|escape:"htmlall"}</td>
 																	</tr>
 																{/if}
-																{if $show && $release.videos_id > 0}
+																{if $show && $result.videos_id > 0}
 																	<tr>
 																		<th width="140">Name
 																		</th>
@@ -287,7 +287,7 @@
 																		</tr>
 																	{/if}
 																{/if}
-																{if $movie && $release.videos_id < 0}
+																{if $movie && $result.videos_id < 0}
 																	<tr>
 																		<th width="140">
 																			Starring
@@ -315,13 +315,13 @@
 																		</td>
 																	</tr>
 																{/if}
-																{if $show && $release.videos_id > 0}
-																	{if $release.firstaired != ""}
+																{if $show && $result.videos_id > 0}
+																	{if $result.firstaired != ""}
 																		<tr>
 																			<th width="140">
 																				Aired
 																			</th>
-																			<td>{$release.firstaired|date_format}</td>
+																			<td>{$result.firstaired|date_format}</td>
 																		</tr>
 																	{/if}
 																	{if $show.countries_id != ""}
@@ -537,7 +537,7 @@
 												{$xxx.trailers}
 											{/if}
 										{/if}
-										{if $movie && $release.videos_id < 0}
+										{if $movie && $result.videos_id < 0}
 											{if $movie.trailer != ''}
 												{$movie.trailer}
 											{/if}
@@ -797,12 +797,12 @@
 							class="icons-office-52"></i></button>
 			</div>
 			<div class="modal-body">
-				{if $movie && $release.videos_id < 0 && $movie.cover == 1}
+				{if $movie && $result.videos_id < 0 && $movie.cover == 1}
 					<img src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbid}-cover.jpg"
 						 alt="{$movie.title|escape:"htmlall"}">
 				{/if}
-				{if $show && $release.videos_id > 0 && $show.image != "0"}
-					<img src="{$smarty.const.WWW_TOP}/covers/tvrage/{$release.videos_id}.jpg"
+				{if $show && $result.videos_id > 0 && $show.image != "0"}
+					<img src="{$smarty.const.WWW_TOP}/covers/tvrage/{$result.videos_id}.jpg"
 						 alt="{$show.title|escape:"htmlall"}"/>
 				{/if}
 				{if $anidb && $release.anidbid > 0 && $anidb.picture != ""}
