@@ -7,7 +7,7 @@ if (PHP_SAPI === 'cli') {
 
 require_once './config.php';
 
-use newznab\AdminPage;
+
 use newznab\NZBImport;
 
 $page = new AdminPage();

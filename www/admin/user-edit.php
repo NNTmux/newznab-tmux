@@ -2,7 +2,7 @@
 
 require_once './config.php';
 
-use newznab\AdminPage;
+
 use newznab\Users;
 
 $page = new AdminPage();

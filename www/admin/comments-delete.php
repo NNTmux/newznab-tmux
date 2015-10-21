@@ -1,7 +1,7 @@
 <?php
 require_once './config.php';
 
-use newznab\AdminPage;
+
 use newznab\ReleaseComments;
 
 $page = new AdminPage();

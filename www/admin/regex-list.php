@@ -2,7 +2,7 @@
 
 require_once './config.php';
 
-use newznab\AdminPage;
+
 use newznab\ReleaseRegex;
 
 $page = new AdminPage();

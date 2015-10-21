@@ -1,4 +1,5 @@
 2015-10-21 DariusIII
+	Fix: remove AdminPage use statement
 	Fix: wrong $page usage
 	Fix: missing Page in index.php
 2015-10-17 DariusIII

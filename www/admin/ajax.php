@@ -1,6 +1,5 @@
 <?php
 
-use newznab\AdminPage;
 use newznab\Binaries;
 use newznab\Regexes;
 use newznab\Groups;
