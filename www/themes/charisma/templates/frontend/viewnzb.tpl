@@ -22,7 +22,7 @@
 						   href="{$smarty.const.WWW_TOP}/admin/release-delete.php?id={$release.id}&amp;from={$smarty.server.HTTP_REFERER}"
 						   title="Delete release">Delete</a>
 					{/if}
-					{if $movie && $release.rageid < 0}
+					{if $movie && $release.videos_id < 0}
 						<a class="label label-default" target="_blank"
 						   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$release.imdbid}/"
 						   title="View at IMDB">IMDB</a>
@@ -54,8 +54,8 @@
 						<a class="label label-default" target="_blank"
 						   href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$release.videos_id}"
 						   title="View at TV Rage">TV Rage</a>
-						{if $release.tvdbid > 0}<a class="label label-default" target="_blank"
-												   href="{$site->dereferrer_link}http://thetvdb.com/?tab=series&id={$release.tvdbid}&lid=7"
+						{if $release.tvdb > 0}<a class="label label-default" target="_blank"
+												   href="{$site->dereferrer_link}http://thetvdb.com/?tab=series&id={$release.tvdb}&lid=7"
 												   title="View at TheTVDB">TheTVDB</a>{/if}
 					{/if}
 					{if $con && $con.url != ""}<a href="{$site->dereferrer_link}{$con.url}/"
@@ -149,10 +149,10 @@
 														 data-toggle="modal"
 														 data-target="#modal-image"/>
 												{/if}
-												{if $show && $release.videos_id > 0 && $show.hascover != "0"}
+												{if $show && $release.videos_id > 0 && $show.image != "0"}
 													<img src="{$smarty.const.WWW_TOP}/covers/tvrage/{$release.videos_id}.jpg"
 														 width="185"
-														 alt="{$show.releasetitle|escape:"htmlall"}"
+														 alt="{$show.title|escape:"htmlall"}"
 														 data-toggle="modal"
 														 data-target="#modal-image"/>
 												{/if}
@@ -801,9 +801,9 @@
 					<img src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbid}-cover.jpg"
 						 alt="{$movie.title|escape:"htmlall"}">
 				{/if}
-				{if $show && $release.videos_id > 0 && $show.hascover != "0"}
+				{if $show && $release.videos_id > 0 && $show.image != "0"}
 					<img src="{$smarty.const.WWW_TOP}/covers/tvrage/{$release.videos_id}.jpg"
-						 alt="{$show.releasetitle|escape:"htmlall"}"/>
+						 alt="{$show.title|escape:"htmlall"}"/>
 				{/if}
 				{if $anidb && $release.anidbid > 0 && $anidb.picture != ""}
 					<img src="{$smarty.const.WWW_TOP}/covers/anime/{$anidb.anidbid}.jpg"

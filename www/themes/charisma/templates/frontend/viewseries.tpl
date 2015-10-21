@@ -26,8 +26,8 @@
 		</div>
 	</div>
 	<h1>
-		{foreach $rage as $r}
-			{$r.releasetitle}
+		{foreach $show as $r}
+			{$r.title}
 			{if !$r@last} / {/if}
 		{/foreach}{if isset($isadmin)}<a class="btn btn-xs btn-warning" title="Edit TV Rage Data"
 										 href="{$smarty.const.WWW_TOP}/admin/rage-edit.php?id={$r.id}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}">
@@ -35,10 +35,10 @@
 	</h1>
 	{if $catname != ''}<span class="text-info h5">Current category shown: {$catname|escape:"htmlall"}</span>{/if}
 	<div class="tvseriesheading">
-		{if $rage[0].hascover != 0}
+		{if $show.image != 0}
 			<center>
-				<img class="shadow img img-polaroid" style="max-height:300px;" alt="{$rage[0].releasetitle} Logo"
-					 src="{$smarty.const.WWW_TOP}/covers/tvrage/{$rage[0].rageid}.jpg"/>
+				<img class="shadow img img-polaroid" style="max-height:300px;" alt="{$show.title} Logo"
+					 src="{$smarty.const.WWW_TOP}/covers/tvrage/{$show.videos_id}.jpg"/>
 			</center>
 			<br/>
 		{/if}
@@ -48,16 +48,16 @@
 		</p>
 	</div>
 	<div class="btn-group">
-		{if $rage|@count == 1 && $isadmin}
+		{if $show|@count == 1 && $isadmin}
 			<a class="btn btn-sm btn-default"
 			   href="{$smarty.const.WWW_TOP}/admin/rage-edit.php?id={$r.id}&amp;action=update&amp;from={$smarty.server.REQUEST_URI|escape:"url"}">Update
 				From Tv Rage</a>
 		{/if}
 		<a class="btn btn-sm btn-default" target="_blank"
-		   href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$rage[0].rageid}" title="View in TvRage">View
+		   href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$show.videos_id}" title="View in TvRage">View
 			in Tv Rage</a>
 		<a class="btn btn-sm btn-default"
-		   href="{$smarty.const.WWW_TOP}/rss?rage={$rage[0].rageid}{if $category != ''}&amp;t={$category}{/if}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">RSS
+		   href="{$smarty.const.WWW_TOP}/rss?rage={$show.videos_id}{if $category != ''}&amp;t={$category}{/if}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">RSS
 			for TV Show <i class="fa fa-rss"></i></a>
 	</div>
 	<br/>
@@ -93,17 +93,17 @@
 				<div class="btn-group">
 					{if $myshows.id != ''}
 						<a class="btn btn-sm btn-warning"
-						   href="{$smarty.const.WWW_TOP}/myshows/edit/{$rage[0].rageid}?from={$smarty.server.REQUEST_URI|escape:"url"}"
-						   class="myshows" rel="edit" name="series{$rage[0].rageid}"
+						   href="{$smarty.const.WWW_TOP}/myshows/edit/{$show.videos_id}?from={$smarty.server.REQUEST_URI|escape:"url"}"
+						   class="myshows" rel="edit" name="series{$show.videos_id}"
 						   title="Edit Categories for this show">Edit</a>
 						<a class="btn btn-sm btn-danger"
-						   href="{$smarty.const.WWW_TOP}/myshows/delete/{$rage[0].rageid}?from={$smarty.server.REQUEST_URI|escape:"url"}"
-						   class="myshows" rel="remove" name="series{$rage[0].rageid}"
+						   href="{$smarty.const.WWW_TOP}/myshows/delete/{$show.videos_id}?from={$smarty.server.REQUEST_URI|escape:"url"}"
+						   class="myshows" rel="remove" name="series{$show.videos_id}"
 						   title="Remove from My Shows">Remove</a>
 					{else}
 						<a class="btn btn-sm btn-success"
-						   href="{$smarty.const.WWW_TOP}/myshows/add/{$rage[0].rageid}?from={$smarty.server.REQUEST_URI|escape:"url"}"
-						   class="myshows" rel="add" name="series{$rage[0].rageid}" title="Add to My Shows">Add</a>
+						   href="{$smarty.const.WWW_TOP}/myshows/add/{$show.videos_id}?from={$smarty.server.REQUEST_URI|escape:"url"}"
+						   class="myshows" rel="add" name="series{$show.videos_id}" title="Add to My Shows">Add</a>
 					{/if}
 				</div>
 			</div>

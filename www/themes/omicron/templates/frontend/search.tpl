@@ -267,9 +267,9 @@
 									<a href="#" name="name{$result.consoleinfoid}" title="View console info"
 									   class="modal_console label label-default" rel="console">Cover</a>
 								{/if}
-								{if $result.rageid > 0}
+								{if $result.videos_id > 0}
 									<a class="label label-default"
-									   href="{$smarty.const.WWW_TOP}/series/{$result.rageid}" title="View all episodes">View
+									   href="{$smarty.const.WWW_TOP}/series/{$result.videos_id}" title="View all episodes">View
 										Series</a>
 								{/if}
 								{if $result.anidbid > 0}
