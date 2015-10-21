@@ -254,7 +254,7 @@ class NameFixer
 					SELECT rf.name AS textstring, rel.categoryid, rel.name, rel.searchname, rel.groupid,
 						rf.releaseid AS fileid, rel.id AS releaseid
 					FROM releases rel
-					INNER JOIN release_files rf ON (rf.releaseid = rel.id)
+					INNER JOIN releasefiles rf ON (rf.releaseid = rel.id)
 					WHERE nzbstatus = %d
 					AND preid = 0',
 					NZB::NZB_ADDED
@@ -266,7 +266,7 @@ class NameFixer
 					SELECT rf.name AS textstring, rel.categoryid, rel.name, rel.searchname, rel.groupid,
 						rf.releaseid AS fileid, rel.id AS releaseid
 					FROM releases rel
-					INNER JOIN release_files rf ON (rf.releaseid = rel.id)
+					INNER JOIN releasefiles rf ON (rf.releaseid = rel.id)
 					WHERE (isrenamed = %d OR rel.categoryid = %d)
 					AND proc_files = %d',
 					self::IS_RENAMED_NONE,
@@ -720,7 +720,7 @@ class NameFixer
 		}
 
 		echo $this->pdo->log->header("\nMatch PreFiles (${args[1]}) Started at " . date('g:i:s'));
-		echo $this->pdo->log->primary("Matching predb filename to cleaned release_files.name.\n");
+		echo $this->pdo->log->primary("Matching predb filename to cleaned releasefiles.name.\n");
 
 		$query = $this->pdo->queryDirect(
 						sprintf('
@@ -728,7 +728,7 @@ class NameFixer
 								r.groupid, r.categoryid,
 								rf.name AS filename
 							FROM releases r
-							INNER JOIN release_files rf ON r.id = rf.releaseid
+							INNER JOIN releasefiles rf ON r.id = rf.releaseid
 							AND rf.name IS NOT NULL
 							WHERE r.prehashid = 0
 							GROUP BY r.id

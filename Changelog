@@ -1,4 +1,5 @@
 2015-10-21 DariusIII
+	Fix: Rename release_files to releasefiles
 	Fix: Add back spotnab processing to PostProcess
 	Chg: Disable rage checking in Nfo until new method is added
 	Fix: one extra argument in query
