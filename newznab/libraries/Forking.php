@@ -5,7 +5,7 @@ use newznab\db\Settings;
 use newznab\processing\PostProcess;
 use newznab\ColorCLI;
 use newznab\NNTP;
-use newznab\Enzebe;
+use newznab\NZB;
 use newznab\RequestID;
 use newznab\Nfo;
 
