@@ -19,6 +19,7 @@ use newznab\ReleaseFiles;
 use newznab\db\Settings;
 use newznab\processing\post\AniDB;
 use newznab\processing\post\ProcessAdditional;
+use newznab\SpotNab;
 use newznab\utility;
 
 require_once NN_LIBS . 'rarinfo/par2info.php';
@@ -128,6 +129,7 @@ class PostProcess
 		$this->processAdditional($nntp);
 		$this->processNfos($nntp);
 		$this->processSharing($nntp);
+		$this->processSpotnab();
 		$this->processMovies();
 		$this->processMusic();
 		$this->processConsoles();
@@ -259,6 +261,27 @@ class PostProcess
 			(new TVDB(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processTVDB($groupID, $guidChar, $processTV);
 			//(new TvRage(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processTvRage($groupID, $guidChar, $processTV);
 		}
+	}
+
+	/**
+	 * Process Global IDs
+	 */
+	public function processSpotnab()
+	{
+		$spotnab = new SpotNab();
+		$processed = $spotnab->processGID(500);
+		if ($processed > 0) {
+			if ($this->echooutput) {
+				$this->pdo->log->doEcho(
+					$this->pdo->log->primary('Updating GID in releases table ' . $processed . ' release(s) updated')
+				);
+			}
+		}
+		$spotnab->auto_post_discovery();
+		$spotnab->fetch_discovery();
+		$spotnab->fetch();
+		$spotnab->post();
+		$spotnab->auto_clean();
 	}
 
 	/**
