@@ -1,4 +1,5 @@
 2015-10-22 DariusIII
+	Fix: wrong path pointer in rss
 	Fix: Remove catname from my shows
 	Upd: Adjust series and details view.
 2015-10-21 DariusIII
