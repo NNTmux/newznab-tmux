@@ -45,7 +45,7 @@ if (isset($_GET["id"]))
 		$page->userdata['categoryexclusions']);
 	$failed = $df->getFailedCount($data['guid']);
 
-	$criteria = $mov = $xxx = '';
+	$criteria = '';
 	if ($data['videos_id'] != 0) {
 		$showInfo = (new Videos(['Settings' => $page->settings]))->getByVideoID($data['videos_id']);
 		if (count($showInfo) > 0) {
@@ -72,7 +72,7 @@ if (isset($_GET["id"]))
 		$episode = new Episode();
 		$episodeArray = $episode->getEpisodeInfoByID($data['episodeinfoid']);
 	}
-
+	$mov = '';
 	if ($data['imdbid'] != '' && $data['imdbid'] != 0000000) {
 		$movie = new Movie(['Settings' => $page->settings]);
 		$mov   = $movie->getMovieInfo($data['imdbid']);
@@ -95,6 +95,7 @@ if (isset($_GET["id"]))
 		}
 	}
 
+	$xxx = '';
 	if ($data['xxxinfo_id'] != '' && $data['xxxinfo_id'] != 0) {
 		$x = new XXX();
 		$xxx = $x->getXXXInfo($data['xxxinfo_id']);
