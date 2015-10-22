@@ -1,4 +1,4 @@
-{if isset($nodata) && $nodata != ''}
+{if isset($nodata) && $nodata != ""}
 	<div class="header">
 		{assign var="catsplit" value=">"|explode:$catname}
 		<h2>View > <strong>TV Series</strong></h2>
@@ -27,17 +27,15 @@
 	</div>
 	<h1>
 		{foreach $show as $r}
-			{$r.seriestitles}
+			{$r.title}
 			{if !$r@last} / {/if}
 		{/foreach}
-		{if isset($isadmin)}<a class="btn btn-xs btn-warning" title="Edit TV Rage Data"
-										 href="{$smarty.const.WWW_TOP}/admin/rage-edit.php?id={$r.id}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}"> Edit</a>{/if}
 	</h1>
 	{if $catname != ''}<span class="text-info h5">Current category shown: {$catname|escape:"htmlall"}</span>{/if}
 	<div class="tvseriesheading">
 		{if $show.image != 0}
 			<center>
-				<img class="shadow img img-polaroid" style="max-height:300px;" alt="{$show.seriestitles} Logo"
+				<img class="shadow img img-polaroid" style="max-height:300px;" alt="{$show.title} Logo"
 					 src="{$smarty.const.WWW_TOP}/covers/tvshows/{$show.id}.jpg"/>
 			</center>
 			<br/>
