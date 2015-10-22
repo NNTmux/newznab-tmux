@@ -31,7 +31,7 @@
 			{if !$r@last} / {/if}
 		{/foreach}
 		{if isset($isadmin)}<a class="btn btn-xs btn-warning" title="Edit TV Rage Data"
-										 href="{$smarty.const.WWW_TOP}/admin/rage-edit.php?id={$r.id}&amp;from={$smarty.serve.REQUEST_URI|escape:"url"}"> Edit</a>{/if}
+										 href="{$smarty.const.WWW_TOP}/admin/rage-edit.php?id={$r.id}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}"> Edit</a>{/if}
 	</h1>
 	{if $catname != ''}<span class="text-info h5">Current category shown: {$catname|escape:"htmlall"}</span>{/if}
 	<div class="tvseriesheading">
