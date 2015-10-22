@@ -26,16 +26,13 @@
 		</div>
 	</div>
 	<h1>
-		{foreach $show as $r}
-			{$r.title}
-			{if !$r@last} / {/if}
-		{/foreach}
+		{$seriestitle}
 	</h1>
 	{if $catname != ''}<span class="text-info h5">Current category shown: {$catname|escape:"htmlall"}</span>{/if}
 	<div class="tvseriesheading">
 		{if $show.image != 0}
 			<center>
-				<img class="shadow img img-polaroid" style="max-height:300px;" alt="{$show.title} Logo"
+				<img class="shadow img img-polaroid" style="max-height:300px;" alt="{$seriestitle} Logo"
 					 src="{$smarty.const.WWW_TOP}/covers/tvshows/{$show.id}.jpg"/>
 			</center>
 			<br/>
