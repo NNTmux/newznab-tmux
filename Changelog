@@ -1,4 +1,5 @@
 2015-10-22 DariusIII
+	Fix: List of releases for specific show in myshows
 	Fix: Occurence of rageid
 	Chg: Switch array to short syntax
 	Fix: Missed one change (releasetitle to title)
