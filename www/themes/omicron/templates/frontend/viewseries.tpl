@@ -41,8 +41,16 @@
 	</div>
 	<div class="btn-group">
 		<a class="btn btn-sm btn-default"
-		   href="{$smarty.const.WWW_TOP}/rss?show={$show.id}{if $category != ''}&amp;t={$category}{/if}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">RSS
-			for TV Show <i class="fa fa-rss"></i></a>
+		   href="{$smarty.const.WWW_TOP}/rss?show={$show.id}{if $category != ''}&amp;t={$category}{/if}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">RSS for TV Show <i class="fa fa-rss"></i></a>
+		{if $result.source = 1}
+			{if $result.tvdb > 0}<a class="label label-default" target="_blank"
+									 href="{$site->dereferrer_link}http://thetvdb.com/?tab=series&id={$release.tvdb}&lid=7"
+									 title="View at TheTVDB">TheTVDB</a>{/if}
+		{elseif $result.source = 3}
+			<a class="label label-default" target="_blank"
+			   href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$result.videos_id}"
+			   title="View at TV Rage">TV Rage</a>
+		{/if}
 	</div>
 	<br/>
 	<div class="box-body"
@@ -136,7 +144,7 @@
 														{if $result@total>1 && $result@index == 0}
 															<td rowspan="{$result@total}" width="30">
 																<h4>{$episodes@key}</h4></td>
-														{else if $result@total == 1}
+														{elseif $result@total == 1}
 															<td><h4>{$episodes@key}</h4></td>
 														{/if}
 														<td>
@@ -149,7 +157,7 @@
 																	<a href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}"
 																	   class="text-muted">NFO</a>
 																	</span>{/if}
-																{if $result.haspreview == 1 && $userdata.canpreview == 1}
+																{if $result.image == 1 && $userdata.canpreview == 1}
 																<a
 																		href="{$smarty.const.WWW_TOP}/covers/preview/{$result.guid}_thumb.jpg"
 																		name="name{$result.guid}"
