@@ -65,7 +65,11 @@ if (isset($_GET["id"]) && ctype_digit($_GET['id'])) {
 
 		$seriestitles = implode('/', array_map("trim", $seriestitles));
 		$page->smarty->assign('seriestitles', $seriestitles);
-		$page->smarty->assign('seriessummary', array_shift($seriessummary));
+		if (is_array($show['summary'])){
+			$page->smarty->assign('seriessummary', array_shift($show['summary']));
+		} else {
+			$page->smarty->assign('seriessummary', $show['summary']);
+		}
 		$page->smarty->assign('seriescountry', array_shift($seriescountry));
 
 		$page->title = "Series";
