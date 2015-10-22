@@ -1,4 +1,5 @@
 2015-10-22 DariusIII
+	Fix: port updates from nZEDb, fix serieslist, add links to the tvdb and tvrage in series view
 	Chg: Add tvdb and rage links to series view
 	Fix: declare releases and pdo properties in RSS
 	Fix: use usage of images from other templates
