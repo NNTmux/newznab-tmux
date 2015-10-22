@@ -38,7 +38,7 @@
 		{if $show.image != 0}
 			<center>
 				<img class="shadow img img-polaroid" style="max-height:300px;" alt="{$show.title} Logo"
-					 src="{$smarty.const.WWW_TOP}/covers/tvrage/{$show.videos_id}.jpg"/>
+					 src="{$smarty.const.WWW_TOP}/covers/tvshows/{$show.videos_id}.jpg"/>
 			</center>
 			<br/>
 		{/if}

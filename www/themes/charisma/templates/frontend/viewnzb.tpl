@@ -150,7 +150,7 @@
 														 data-target="#modal-image"/>
 												{/if}
 												{if $show && $release.videos_id > 0 && $show.image != "0"}
-													<img src="{$smarty.const.WWW_TOP}/covers/tvrage/{$release.videos_id}.jpg"
+													<img src="{$smarty.const.WWW_TOP}/covers/tvshows/{$release.videos_id}.jpg"
 														 width="185"
 														 alt="{$show.title|escape:"htmlall"}"
 														 data-toggle="modal"
@@ -802,7 +802,7 @@
 						 alt="{$movie.title|escape:"htmlall"}">
 				{/if}
 				{if $show && $release.videos_id > 0 && $show.image != "0"}
-					<img src="{$smarty.const.WWW_TOP}/covers/tvrage/{$release.videos_id}.jpg"
+					<img src="{$smarty.const.WWW_TOP}/covers/tvshows/{$release.videos_id}.jpg"
 						 alt="{$show.title|escape:"htmlall"}"/>
 				{/if}
 				{if $anidb && $release.anidbid > 0 && $anidb.picture != ""}
