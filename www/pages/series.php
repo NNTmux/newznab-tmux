@@ -79,6 +79,7 @@ if (isset($_GET["id"]) && ctype_digit($_GET['id'])) {
 		} else {
 			$cdata = array('title' => '');
 			$catid = '';
+			$page->smarty->assign("catname", "All");
 		}
 		$page->smarty->assign('catname', $cdata['title']);
 		$page->smarty->assign('category', $catid);
