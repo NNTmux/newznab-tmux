@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:newznab="{$serverrot}rss-info/">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:newznab="{$serverroot}rss-info/">
 	<channel>
-		<atom:link href="{$serverrot}{$smarty.server.REQUEST_URI|escape:"htmlall"|substr:1}" rel="self"
+		<atom:link href="{$serverroot}{$smarty.server.REQUEST_URI|escape:"htmlall"|substr:1}" rel="self"
 				   type="application/rss+xml"/>
 		<title>{$site->title|escape}</title>
 		<description>{$site->title|escape} Nzb Feed</description>
-		<link>{$serverrot}</link>
+		<link>{$serverroot}</link>
 		<language>en-gb</language>
 		<webMaster>{$site->email} ({$site->title|escape})</webMaster>
 		<category>{$site->meta_keywords}</category>
 		<image>
-			<url>{$serverrot}themes_shared/images/logo.png</url>
+			<url>{$serverroot}themes_shared/images/logo.png</url>
 			<title>{$site->title|escape}</title>
-			<link href="{$serverrot}"/>
+			<link href="{$serverroot}"/>
 			<description>Visit {$site->title|escape} - {$site->strapline|escape}</description>
 		</image>
 		{foreach from=$releases item=release}
 			<item>
 				<title>{$release.searchname|escape:html}</title>
-				<guid isPermaLink="true">{$serverrot}details/{$release.guid}</guid>
-				<link href="{$serverrot}{if $dl=="1"}getnzb{else}details{/if}/{$release.guid}{if $dl=="1"}.nzb&amp;i={$uid}&amp;r={$rsstoken}{/if}{if $del=="1"}&amp;del=1{/if}"/>
-				<comments>{$serverrot}details/{$release.guid}#comments</comments>
+				<guid isPermaLink="true">{$serverroot}details/{$release.guid}</guid>
+				<link href="{$serverroot}{if $dl=="1"}getnzb{else}details{/if}/{$release.guid}{if $dl=="1"}.nzb&amp;i={$uid}&amp;r={$rsstoken}{/if}{if $del=="1"}&amp;del=1{/if}"/>
+				<comments>{$serverroot}details/{$release.guid}#comments</comments>
 				<pubDate>{$release.adddate|phpdate_format:"DATE_RSS"}</pubDate>
 				<category>{$release.category_name|escape:html}</category>
 				<description>{if isset($api) && $api=="1"}{$release.searchname}{else}
@@ -28,32 +28,32 @@
 					<div>
 						{if isset($release_cover) && $release.cover == 1}
 							<img style="margin-left:10px;margin-bottom:10px;float:right;"
-								 src="{$serverrot}covers/movies/{$release.imdbid}-cover.jpg" width="120" border="0"
+								 src="{$serverroot}covers/movies/{$release.imdbid}-cover.jpg" width="120" border="0"
 								 alt="{$release.searchname|escape:"htmlall"}"/>
 						{/if}
 						{if isset($release.mu_cover) && $release.mu_cover == 1}
 							<img style="margin-left:10px;margin-bottom:10px;float:right;"
-								 src="{$serverrot}covers/music/{$release.musicinfoid}.jpg" width="120" border="0"
+								 src="{$serverroot}covers/music/{$release.musicinfoid}.jpg" width="120" border="0"
 								 alt="{$release.searchname|escape:"htmlall"}"/>
 						{/if}
 						{if isset($release.co_cover) && $release.co_cover == 1}
 							<img style="margin-left:10px;margin-bottom:10px;float:right;"
-								 src="{$serverrot}covers/console/{$release.consoleinfoid}.jpg" width="120" border="0"
+								 src="{$serverroot}covers/console/{$release.consoleinfoid}.jpg" width="120" border="0"
 								 alt="{$release.searchname|escape:"htmlall"}"/>
 						{/if}
 						{if isset($release.bo_cover) && $release.bo_cover == 1}
 							<img style="margin-left:10px;margin-bottom:10px;float:right;"
-								 src="{$serverrot}covers/book/{$release.bookinfoid}.jpg" width="120" border="0"
+								 src="{$serverroot}covers/book/{$release.bookinfoid}.jpg" width="120" border="0"
 								 alt="{$release.searchname|escape:"htmlall"}"/>
 						{/if}
 						<ul>
-							<li>ID: <a href="{$serverrot}details/{$release.guid}">{$release.guid}</a></li>
+							<li>ID: <a href="{$serverroot}details/{$release.guid}">{$release.guid}</a></li>
 							<li>Name: {$release.searchname}</li>
 							<li>Size: {$release.size|fsize_format:"MB"} </li>
 							<li>Attributes: Category - <a
-										href="{$serverrot}browse?t={$release.categoryid}">{$release.category_name}</a>
+										href="{$serverroot}browse?t={$release.categoryid}">{$release.category_name}</a>
 							</li>
-							<li>Groups: <a href="{$serverrot}browse?g={$release.group_name}">{$release.group_name}</a>
+							<li>Groups: <a href="{$serverroot}browse?g={$release.group_name}">{$release.group_name}</a>
 							</li>
 							<li>Poster: {$release.fromname|escape:"htmlall"}</li>
 							<li>PostDate: {$release.postdate|phpdate_format:"DATE_RSS"}</li>
@@ -61,7 +61,7 @@
 								Password: {if $release.passwordstatus == 0}None{elseif $release.passwordstatus == 1}Possibly Passworded Archive{elseif $release.passwordstatus == 2}Probably not viable{elseif $release.passwordstatus == 10}Passworded Archive{else}Unknown{/if}</li>
 							{if isset($release.nfoid) && $release.nfoid != ""}
 								<li>Nfo:
-									<a href="{$serverrot}api?t=getnfo&amp;id={$release.guid}&amp;raw=1&amp;i={$uid}&amp;r={$rsstoken}">{$release.searchname}
+									<a href="{$serverroot}api?t=getnfo&amp;id={$release.guid}&amp;raw=1&amp;i={$uid}&amp;r={$rsstoken}">{$release.searchname}
 										.nfo</a></li>
 							{/if}
 							{if isset($release.parentCategoryid) && $release.parentCategoryid == 2000}
@@ -145,7 +145,7 @@
 				</description>
 				{if $dl=="1"}
 					<enclosure
-					url="{$serverrot}getnzb/{$release.guid}.nzb&amp;i={$uid}&amp;r={$rsstoken}{if $del=="1"}&amp;del=1{/if}"
+					url="{$serverroot}getnzb/{$release.guid}.nzb&amp;i={$uid}&amp;r={$rsstoken}{if $del=="1"}&amp;del=1{/if}"
 					length="{$release.size}" type="application/x-nzb" />{/if}
 				{foreach from=$release.category_ids|parray:"," item=cat}
 					<newznab:attr name="category" value="{$cat}"/>
