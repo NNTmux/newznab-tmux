@@ -22,7 +22,7 @@
 						   href="{$smarty.const.WWW_TOP}/admin/release-delete.php?id={$release.id}&amp;from={$smarty.server.HTTP_REFERER}"
 						   title="Delete release">Delete</a>
 					{/if}
-					{if $movie && $release.videos_id < 0}
+					{if $movie && $release.videos_id <= 0}
 						<a class="label label-default" target="_blank"
 						   href="{$site->dereferrer_link}http://www.imdb.com/title/tt{$release.imdbid}/"
 						   title="View at IMDB">IMDB</a>
@@ -82,7 +82,7 @@
 						{/if}
 					{/if}
 					<p>
-						{if $movie && $release.videos_id < 0 && $movie.plot != ''}<span
+						{if $movie && $release.videos_id <= 0 && $movie.plot != ''}<span
 								class="descinitial">{$movie.plot|escape:"htmlall"|truncate:500:"...":true}</span>
 							{if $movie.plot|strlen > 500}
 								<a class="descmore" href="#">more...</a>
@@ -109,7 +109,7 @@
 								<ul class="nav nav-tabs nav-primary">
 									<li class="active"><a href="#pane1"
 														  data-toggle="tab">Info</a></li>
-									{if $movie && $release.videos_id < 0}{if $movie.trailer != ""}
+									{if $movie && $release.videos_id <= 0}{if $movie.trailer != ""}
 										<li><a href="#pane2" data-toggle="tab">Trailer</a></li>
 									{/if}{/if}
 									{if isset($xxx.trailers) && $xxx.trailers != ''}
@@ -142,7 +142,7 @@
 									<div id="pane1" class="tab-pane active">
 										<div class="row small-gutter-left">
 											<div class="col-md-3 small-gutter-left">
-												{if $movie && $release.videos_id < 0 && $movie.cover == 1}
+												{if $movie && $release.videos_id <= 0 && $movie.cover == 1}
 													<img src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbid}-cover.jpg"
 														 width="185"
 														 alt="{$movie.title|escape:"htmlall"}"
@@ -238,7 +238,7 @@
 														<td>
 															<table class="data table table-condensed table-striped table-responsive table-hover">
 																<tbody>
-																{if $movie && $release.videos_id < 0}
+																{if $movie && $release.videos_id <= 0}
 																	<tr>
 																		<th width="140">Name
 																		</th>
@@ -281,7 +281,7 @@
 																		</tr>
 																	{/if}
 																{/if}
-																{if $movie && $release.videos_id < 0}
+																{if $movie && $release.videos_id <= 0}
 																	<tr>
 																		<th width="140">
 																			Starring
@@ -531,7 +531,7 @@
 												{$xxx.trailers}
 											{/if}
 										{/if}
-										{if $movie && $release.videos_id < 0}
+										{if $movie && $release.videos_id <= 0}
 											{if $movie.trailer != ''}
 												{$movie.trailer}
 											{/if}
@@ -791,7 +791,7 @@
 							class="icons-office-52"></i></button>
 			</div>
 			<div class="modal-body">
-				{if $movie && $release.videos_id < 0 && $movie.cover == 1}
+				{if $movie && $release.videos_id <= 0 && $movie.cover == 1}
 					<img src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbid}-cover.jpg"
 						 alt="{$movie.title|escape:"htmlall"}">
 				{/if}
