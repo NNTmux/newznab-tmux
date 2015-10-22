@@ -180,7 +180,7 @@ class DashData
 		(consoleinfoid IS NULL AND isrenamed = 0 AND proc_pp = 0 AND proc_par2 = 0 AND proc_nfo = 0 AND proc_files = 0 AND proc_sorter = 0 and categoryid in ( select id from category where parentid = 1000 AND categoryid != 1050)) OR
 		(imdbid IS NULL AND isrenamed = 0 AND proc_pp = 0 AND proc_par2 = 0 AND proc_nfo = 0 AND proc_files = 0 AND proc_sorter = 0 and categoryid in ( select id from category where parentid = 2000 AND categoryid != 2020)) OR
 		(musicinfoid IS NULL AND isrenamed = 0 AND proc_pp = 0 AND proc_par2 = 0 AND proc_nfo = 0 AND proc_files = 0 AND proc_sorter = 0 and categoryid in ( select id from category where parentid = 3000 AND categoryid != 3050)) OR
-		(videos_id = -1 AND isrenamed = 0 AND proc_pp = 0 AND proc_par2 = 0 AND proc_nfo = 0 AND proc_files = 0 AND proc_sorter = 0 and categoryid in ( select id from category where parentid = 5000  AND categoryid != 5050)) OR
+		(videos_id = 0 AND isrenamed = 0 AND proc_pp = 0 AND proc_par2 = 0 AND proc_nfo = 0 AND proc_files = 0 AND proc_sorter = 0 and categoryid in ( select id from category where parentid = 5000  AND categoryid != 5050)) OR
 		(xxxinfo_id = 0 AND isrenamed = 0 AND proc_pp = 0 AND proc_par2 = 0 AND proc_nfo = 0 AND proc_files = 0 AND proc_sorter = 0 and categoryid in (select id from category where parentid = 6000 AND categoryid != 6070)) OR
 		(gamesinfo_id = 0 AND isrenamed = 0 AND proc_pp = 0 AND proc_par2 = 0 AND proc_nfo = 0 AND proc_files = 0 AND proc_sorter = 0 and categoryid = 4050)');
 
