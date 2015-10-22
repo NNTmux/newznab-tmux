@@ -484,7 +484,7 @@ class Releases
 				%s
 				ORDER BY %s %s %s",
 				$this->getConcatenatedCategoryIDs(),
-				$this->uSQL($userShows, 'rageid'),
+				$this->uSQL($userShows, 'videos_id'),
 				(count($excludedCats) ? ' AND r.categoryid NOT IN (' . implode(',', $excludedCats) . ')' : ''),
 				NZB::NZB_ADDED,
 				$this->showPasswords,
