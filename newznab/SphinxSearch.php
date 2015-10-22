@@ -8,7 +8,7 @@ class SphinxSearch
 {
 	/**
 	 * SphinxQL connection.
-	 * @var newznab\db\DB
+	 * @var \newznab\db\DB
 	 */
 	public $sphinxQL = null;
 

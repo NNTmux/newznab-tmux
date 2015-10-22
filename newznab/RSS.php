@@ -12,6 +12,16 @@ use newznab\db\Settings;
 Class RSS
 {
 	/**
+	 * @var Releases
+	 */
+	public $releases;
+
+	/**
+	 * @var \newznab\db\Settings
+	 */
+	public $pdo;
+
+	/**
 	 * @param array $options
 	 */
 	public function __construct(array $options = [])

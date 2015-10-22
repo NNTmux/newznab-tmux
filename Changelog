@@ -1,4 +1,5 @@
 2015-10-22 DariusIII
+	Fix: declare releases and pdo properties in RSS
 	Fix: use usage of images from other templates
 	Chg: Show buttond based on source
 	Fix: Center the show name
