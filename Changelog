@@ -1,4 +1,5 @@
 2015-10-22 DariusIII
+	Upd: Way how failed releases are counted
 	Fix: covgroup and failed notices
 	Fix: List of releases for specific show in myshows
 	Fix: Occurence of rageid
