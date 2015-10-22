@@ -40,7 +40,7 @@
 	<div class="btn-group">
 		{if $rage|@count == 1 && $isadmin}<a class="btn btn-mini btn-inverse" href="{$smarty.const.WWW_TOP}/admin/rage-edit.php?id={$r.id}&amp;action=update&amp;from={$smarty.server.REQUEST_URI|escape:"url"}">Update From Tv Rage</a> | {/if}
 		<a class="btn btn-mini" target="_blank" href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$rage[0].rageid}" title="View in TvRage">View in Tv Rage</a> |
-		<a class="btn btn-mini" href="{$smarty.const.WWW_TOP}/rss?rage={$rage[0].rageid}{if $category != ''}&amp;t={$category}{/if}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">Series RSS <i class="fa-icon-rss"></i></a>
+		<a class="btn btn-mini" href="{$smarty.const.WWW_TOP}/rss?show={$rage[0].rageid}{if $category != ''}&amp;t={$category}{/if}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">Series RSS <i class="fa-icon-rss"></i></a>
 	</div>
 	<form id="nzb_multi_operations_form" action="get">
 

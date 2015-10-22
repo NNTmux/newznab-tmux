@@ -44,23 +44,23 @@
 			</tr>
 			{foreach $series as $s}
 				<tr>
-					<td><a class="title" title="View series" href="{$smarty.const.WWW_TOP}/series/{$s.rageid}">{$s.releasetitle|escape:"htmlall"}</a>{if $s.prevdate != ''}<br /><span class="label label-info">Last: {$s.previnfo|escape:"htmlall"} aired {$s.prevdate|date_format}</span>{/if}</td>
+					<td><a class="title" title="View series" href="{$smarty.const.WWW_TOP}/series/{$s.videos_id}">{$s.releasetitle|escape:"htmlall"}</a>{if $s.prevdate != ''}<br /><span class="label label-info">Last: {$s.previnfo|escape:"htmlall"} aired {$s.prevdate|date_format}</span>{/if}</td>
 					<td>{$s.country|escape:"htmlall"}</td>
 					<td>{$s.genre|escape:"htmlall"|replace:'|':', '}</td>
 					<td class="mid">
 						{if $s.userseriesid != ''}
-							<a href="{$smarty.const.WWW_TOP}/myshows/edit/{$s.rageid}?from={$smarty.server.REQUEST_URI|escape:"url"}" class="myshows btn btn-sm btn-warning" rel="edit" name="series{$s.rageid}" title="Edit">Edit</a>
+							<a href="{$smarty.const.WWW_TOP}/myshows/edit/{$s.videos_id}?from={$smarty.server.REQUEST_URI|escape:"url"}" class="myshows btn btn-sm btn-warning" rel="edit" name="series{$s.videos_id}" title="Edit">Edit</a>
 							<br />
-							<a href="{$smarty.const.WWW_TOP}/myshows/delete/{$s.rageid}?from={$smarty.server.REQUEST_URI|escape:"url"}" class="myshows btn btn-sm btn-danger" rel="remove" name="series{$s.rageid}" title="Remove from My Shows">Remove</a>
+							<a href="{$smarty.const.WWW_TOP}/myshows/delete/{$s.videos_id}?from={$smarty.server.REQUEST_URI|escape:"url"}" class="myshows btn btn-sm btn-danger" rel="remove" name="series{$s.videos_id}" title="Remove from My Shows">Remove</a>
 						{else}
-							<a href="{$smarty.const.WWW_TOP}/myshows/add/{$s.rageid}?from={$smarty.server.REQUEST_URI|escape:"url"}" class="myshows btn btn-sm btn-primary" rel="add" name="series{$s.rageid}" title="Add to My Shows">Add</a>
+							<a href="{$smarty.const.WWW_TOP}/myshows/add/{$s.videos_id}?from={$smarty.server.REQUEST_URI|escape:"url"}" class="myshows btn btn-sm btn-primary" rel="add" name="series{$s.videos_id}" title="Add to My Shows">Add</a>
 						{/if}
 					</td>
 					<td class="mid">
-						<a title="View series" href="{$smarty.const.WWW_TOP}/series/{$s.rageid}">Series</a><br />
-						{if $s.rageid > 0}
-							<a title="View at TVRage" target="_blank" href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$s.rageid}">TVRage</a>&nbsp;&nbsp;
-							<a title="RSS Feed for {$s.releasetitle|escape:"htmlall"}" href="{$smarty.const.WWW_TOP}/rss?rage={$s.rageid}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}"><i class="fa fa-rss"></i></a>
+						<a title="View series" href="{$smarty.const.WWW_TOP}/series/{$s.videos_id}">Series</a><br />
+						{if $s.videos_id > 0}
+							<a title="View at TVRage" target="_blank" href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$s.videos_id}">TVRage</a>&nbsp;&nbsp;
+							<a title="RSS Feed for {$s.title|escape:"htmlall"}" href="{$smarty.const.WWW_TOP}/rss?show={$s.videos_id}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}"><i class="fa fa-rss"></i></a>
 						{/if}
 					</td>
 				</tr>

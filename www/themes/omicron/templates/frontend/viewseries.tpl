@@ -57,7 +57,7 @@
 		   href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$show.videos_id}" title="View in TvRage">View
 			in Tv Rage</a>
 		<a class="btn btn-sm btn-default"
-		   href="{$smarty.const.WWW_TOP}/rss?rage={$show.videos_id}{if $category != ''}&amp;t={$category}{/if}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">RSS
+		   href="{$smarty.const.WWW_TOP}/rss?show={$show.videos_id}{if $category != ''}&amp;t={$category}{/if}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">RSS
 			for TV Show <i class="fa fa-rss"></i></a>
 	</div>
 	<br/>

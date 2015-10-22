@@ -251,12 +251,6 @@
 																		</th>
 																		<td>{$release.title|escape:"htmlall"}</td>
 																	</tr>
-																	<tr>
-																		<th width="140">Season /
-																			Episode
-																		</th>
-																		<td>{$release.seriesfull|replace:"S":"Season "|replace:"E":" Episode "}</td>
-																	</tr>
 																{/if}
 																{if $xxx}
 																	<tr>
