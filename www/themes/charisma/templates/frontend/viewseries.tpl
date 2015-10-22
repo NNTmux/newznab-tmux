@@ -1,6 +1,5 @@
 {if isset($nodata) && $nodata != ""}
 	<div class="header">
-		{assign var="catsplit" value=">"|explode:$catname}
 		<h2>View > <strong>TV Series</strong></h2>
 		<div class="breadcrumb-wrapper">
 			<ol class="breadcrumb">
@@ -16,7 +15,6 @@
 	</div>
 {else}
 	<div class="header">
-		{assign var="catsplit" value=">"|explode:$catname}
 		<h2>View > <strong>TV Series</strong></h2>
 		<div class="breadcrumb-wrapper">
 			<ol class="breadcrumb">

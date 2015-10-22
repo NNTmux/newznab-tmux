@@ -1,5 +1,4 @@
 <div class="header">
-	{assign var="catsplit" value=">"|explode:$catname}
 	<h2>View > <strong>Movie</strong></h2>
 	<div class="breadcrumb-wrapper">
 		<ol class="breadcrumb">
@@ -19,7 +18,7 @@
 				{else}
 					<img class="pull-right" style="margin-right:50px; max-height:278px;"
 						 alt="{$result.title|escape:"htmlall"} Logo"
-						 src="{$smarty.const.WWW_TOP}themes_shared/images/nomoviecover.jpg"/>
+						 src="{$serverroot}themes/omicron/images/nomoviecover.jpg"/>
 				{/if}
 				<span class="h1" style="display:inline;">{$result.title|escape:"htmlall"} ({$result.year})</span><a
 						class="btn btn-transparent btn-primary" target="_blank"
@@ -172,12 +171,12 @@
 											<td class="less right">{$msize[$m@index]|fsize_format:"MB"}</td>
 											<td class="icons">
 												<a title="Download NZB"
-												   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}|escape:"htmlall"}"><i
+												   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}"><i
 															class="icon icon_nzb fa fa-download text-muted"></i></a>
 												<a href="#" class="icon_cart text-muted"><i class="fa fa-shopping-cart"
 																							title="Add to Cart"></i></a>
 												{if isset($sabintegrated)}<img class="icon_sab"
-																			   src="{$smarty.const.WWW_TOP}/templates/baffi/images/icons/sabup.png"/>{/if}
+																			   src="{$smarty.const.WWW_TOP}/themes/baffi/images/icons/sabup.png"/>{/if}
 											</td>
 										</tr>
 									{/foreach}
