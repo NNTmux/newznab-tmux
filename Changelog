@@ -1,4 +1,5 @@
 2015-10-22 DariusIII
+	Fix: covgroup and failed notices
 	Fix: List of releases for specific show in myshows
 	Fix: Occurence of rageid
 	Chg: Switch array to short syntax
