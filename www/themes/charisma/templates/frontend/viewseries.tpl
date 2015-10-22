@@ -44,7 +44,7 @@
 		   href="{$smarty.const.WWW_TOP}/rss?show={$show.id}{if $category != ''}&amp;t={$category}{/if}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">RSS for TV Show <i class="fa fa-rss"></i></a>
 		{if $result.source = 1}
 			{if $result.tvdb > 0}<a class="label label-default" target="_blank"
-									 href="{$site->dereferrer_link}http://thetvdb.com/?tab=series&id={$release.tvdb}&lid=7"
+									 href="{$site->dereferrer_link}http://thetvdb.com/?tab=series&id={$result.tvdb}&lid=7"
 									 title="View at TheTVDB">TheTVDB</a>{/if}
 		{elseif $result.source = 3}
 			<a class="label label-default" target="_blank"
