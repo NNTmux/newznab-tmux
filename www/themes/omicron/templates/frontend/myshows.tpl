@@ -34,7 +34,7 @@
 								<tr>
 									<td>
 										<a title="View details"
-										   href="{$smarty.const.WWW_TOP}/series/{$show.id}">{$show.title|escape:"htmlall"|wordwrap:75:"\n":true}</a>
+										   href="{$smarty.const.WWW_TOP}/series/{$show.videos_id}">{$show.title|escape:"htmlall"|wordwrap:75:"\n":true}</a>
 									</td>
 									<td>
 										<span class="label label-default">{if $show.categoryNames != ''}{$show.categoryNames|escape:"htmlall"}{else}All{/if}</span>
@@ -43,11 +43,11 @@
 									<td>
 										<div class="btn-group">
 											<a class="btn btn-xs btn-warning myshows"
-											   href="{$smarty.const.WWW_TOP}/myshows/edit/{$show.id}"
-											   rel="edit" name="series{$show.id}" title="Edit Categories">Edit</a>
+											   href="{$smarty.const.WWW_TOP}/myshows/edit/{$show.videos_id}"
+											   rel="edit" name="series{$show.videos_id}" title="Edit Categories">Edit</a>
 											<a class="btn btn-xs btn-danger confirm_action myshows"
-											   href="{$smarty.const.WWW_TOP}/myshows/delete/{$show.id}"
-											   rel="remove" name="series{$show.id}"
+											   href="{$smarty.const.WWW_TOP}/myshows/delete/{$show.videos_id}"
+											   rel="remove" name="series{$show.videos_id}"
 											   title="Remove from My Shows">Remove</a>
 										</div>
 									</td>
