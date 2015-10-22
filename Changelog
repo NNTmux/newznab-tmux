@@ -1,4 +1,6 @@
 2015-10-21 DariusIII
+	Upd: api, rss, login, series
+2015-10-21 DariusIII
 	Fix: Revert some of the template changes
 	Fix: Wrong table name
 	Fix: Adjust templates

@@ -618,23 +618,21 @@ class Releases
 	 * @param int    $size
 	 * @param string $postedDate
 	 * @param string $addedDate
-	 * @param int    $rageID
-	 * @param string $seriesFull
-	 * @param string $season
-	 * @param string $episode
+	 * @param        $videoId
+	 * @param        $episodeId
 	 * @param int    $imDbID
 	 * @param int    $aniDbID
+	 *
 	 */
 	public function update($ID, $name, $searchName, $fromName, $categoryID, $parts, $grabs, $size,
-						   $postedDate, $addedDate, $rageID, $seriesFull, $season, $episode,
-						   $imDbID, $aniDbID)
+						   $postedDate, $addedDate, $videoId, $episodeId, $imDbID, $aniDbID)
 	{
 		$this->pdo->queryExec(
 			sprintf(
 				'UPDATE releases
 				SET name = %s, searchname = %s, fromname = %s, categoryid = %d,
-					totalpart = %d, grabs = %d, size = %s, postdate = %s, adddate = %s, rageid = %d,
-					seriesfull = %s, season = %s, episode = %s, imdbid = %d, anidbid = %d
+					totalpart = %d, grabs = %d, size = %s, postdate = %s, adddate = %s, videos_id = %d,
+					tv_episodes_id = %s, imdbid = %d, anidbid = %d
 				WHERE id = %d',
 				$this->pdo->escapeString($name),
 				$this->pdo->escapeString($searchName),
@@ -645,10 +643,8 @@ class Releases
 				$this->pdo->escapeString($size),
 				$this->pdo->escapeString($postedDate),
 				$this->pdo->escapeString($addedDate),
-				$rageID,
-				$this->pdo->escapeString($seriesFull),
-				$this->pdo->escapeString($season),
-				$this->pdo->escapeString($episode),
+				$videoId,
+				$episodeId,
 				$imDbID,
 				$aniDbID,
 				$ID
@@ -660,16 +656,17 @@ class Releases
 	/**
 	 * Used for updating releases on site.
 	 *
-	 * @param array  $guids
-	 * @param int    $category
-	 * @param int    $grabs
-	 * @param int    $rageID
-	 * @param string $season
-	 * @param int  $imdDbID
+	 * @param array $guids
+	 * @param int   $category
+	 * @param int   $grabs
+	 * @param int   $videoId
+	 * @param       $episodeId
+	 * @param int   $imdDbID
 	 *
 	 * @return array|bool|int
+	 * @internal param string $season
 	 */
-	public function updatemulti($guids, $category, $grabs, $rageID, $season, $imdDbID)
+	public function updatemulti($guids, $category, $grabs, $videoId, $episodeId, $imdDbID)
 	{
 		if (!is_array($guids) || count($guids) < 1) {
 			return false;
@@ -678,8 +675,8 @@ class Releases
 		$update = [
 			'categoryid' => (($category == '-1') ? '' : $category),
 			'grabs'      => $grabs,
-			'rageid'     => $rageID,
-			'season'     => $season,
+			'videos_id'     => $videoId,
+			'tv_episodes_id'     => $episodeId,
 			'imdbid'     => $imdDbID
 		];
 
@@ -912,6 +909,12 @@ class Releases
 
 	/**
 	 * @param        $videosId
+	 * @param        $tvdbId
+	 * @param        $traktId
+	 * @param        $tvrageId
+	 * @param        $tvmazeId
+	 * @param        $imdbId
+	 * @param        $tmdbId
 	 * @param string $series
 	 * @param string $episode
 	 * @param int    $offset
@@ -921,22 +924,28 @@ class Releases
 	 * @param int    $maxAge
 	 *
 	 * @return array
-	 * @internal param $rageId
 	 */
-	public function searchbyVideoId($videosId, $series = '', $episode = '', $offset = 0, $limit = 100, $name = '', $cat = [-1], $maxAge = -1)
+	public function searchShows($videosId, $tvdbId, $traktId, $tvrageId, $tvmazeId, $imdbId, $tmdbId, $series = '',
+								$episode = '', $offset = 0, $limit = 100, $name = '', $cat = [-1], $maxAge = -1)
 	{
 		$whereSql = sprintf(
 			"%s
 			WHERE r.categoryid BETWEEN 5000 AND 5999
 			AND v.type = 0
 			AND r.nzbstatus = %d
-			AND r.passwordstatus %s %s %s %s %s %s %s",
+			AND r.passwordstatus %s %s %s %s %s %s %s %s %s %s %s %s %s",
 			($name !== '' ? $this->releaseSearch->getFullTextJoinString() : ''),
 			NZB::NZB_ADDED,
 			$this->showPasswords,
-			($videosId != -1 ? sprintf(' AND v.id = %d ', $videosId) : ''),
-			($series != '' ? sprintf(' AND UPPER(tve.series) = UPPER(%s)', $this->pdo->escapeString(((is_numeric($series) && strlen($series) != 4) ? sprintf('S%02d', $series) : $series))) : ''),
-			($episode != '' ? sprintf(' AND tve.episode = %s', $episode) : ''),
+			($videosId > 0 ? sprintf(' AND v.id = %d ', $videosId) : ''),
+			($tvdbId > 0 ? sprintf(' AND v.tvdb = %d ', $tvdbId) : ''),
+			($traktId > 0 ? sprintf(' AND v.trakt = %d ', $traktId) : ''),
+			($tvrageId > 0 ? sprintf(' AND v.tvrage = %d ', $tvrageId) : ''),
+			($tvmazeId > 0 ? sprintf(' AND v.tvmaze = %d ', $tvmazeId) : ''),
+			($imdbId > 0 ? sprintf(' AND v.imdb = %d ', $imdbId) : ''),
+			($tmdbId > 0 ? sprintf(' AND v.tmdb = %d ', $tmdbId) : ''),
+			($series != '' ? sprintf(' AND tve.series = %d', (int)preg_replace('/^s0*/i', '', $series)): ''),
+			($episode != '' ? sprintf(' AND tve.episode = %d', (int)preg_replace('/^e0*/i', '', $episode)): ''),
 			($name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : ''),
 			$this->categorySQL($cat),
 			($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : '')
@@ -944,10 +953,10 @@ class Releases
 
 		$baseSql = sprintf(
 			"SELECT r.*,
-					v.title, v.countries_id, v.started, v.imdb, v.tmdb, v.tvmaze, v.tvrage, v.source,
-					tvi.summary, tvi.publisher, tvi.image,
-					tve.series, tve.episode, tve.se_complete, tve.title, tve.firstaired, tve.summary,
-					CONCAT(cp.title, ' > ', c.title) AS category_name,
+				v.title, v.countries_id, v.started, v.imdb, v.tmdb, v.tvmaze, v.tvrage, v.source,
+				tvi.summary, tvi.publisher, tvi.image,
+				tve.series, tve.episode, tve.se_complete, tve.title, tve.firstaired, tve.summary,
+				CONCAT(cp.title, ' > ', c.title) AS category_name,
 				%s AS category_ids,
 				groups.name AS group_name,
 				rn.id AS nfoid,
