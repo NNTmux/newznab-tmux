@@ -30,17 +30,17 @@
 	<div class="btn-group">
 		<a class="btn btn-small" title="Manage your shows" href="{$smarty.const.WWW_TOP}/myshows">My Shows</a>
 		{if $myshows.id != ''}
-			<a class="btn btn-small" href="{$smarty.const.WWW_TOP}/myshows/delete/{$rage[0].rageid}?from={$smarty.server.REQUEST_URI|escape:"url"}" class="myshows" rel="remove" name="series{$rage[0].rageid}" title="Remove from My Shows"><i class="icon-minus-sign"></i></a>
-			<a class="btn btn-small" href="{$smarty.const.WWW_TOP}/myshows/edit/{$rage[0].rageid}?from={$smarty.server.REQUEST_URI|escape:"url"}" class="myshows" rel="edit" name="series{$rage[0].rageid}" title="Edit Categories for this show"><i class="icon-edit"></i></a>
+			<a class="btn btn-small" href="{$smarty.const.WWW_TOP}/myshows/delete/{$rage[0].videos_id}?from={$smarty.server.REQUEST_URI|escape:"url"}" class="myshows" rel="remove" name="series{$rage[0].videos_id}" title="Remove from My Shows"><i class="icon-minus-sign"></i></a>
+			<a class="btn btn-small" href="{$smarty.const.WWW_TOP}/myshows/edit/{$rage[0].videos_id}?from={$smarty.server.REQUEST_URI|escape:"url"}" class="myshows" rel="edit" name="series{$rage[0].videos_id}" title="Edit Categories for this show"><i class="icon-edit"></i></a>
 		{else}
-			<a class="btn btn-small" href="{$smarty.const.WWW_TOP}/myshows/add/{$rage[0].rageid}?from={$smarty.server.REQUEST_URI|escape:"url"}" class="myshows" rel="add" name="series{$rage[0].rageid}" title="Add to My Shows"><i class="icon-plus-sign"></i></a>
+			<a class="btn btn-small" href="{$smarty.const.WWW_TOP}/myshows/add/{$rage[0].videos_id}?from={$smarty.server.REQUEST_URI|escape:"url"}" class="myshows" rel="add" name="series{$rage[0].videos_id}" title="Add to My Shows"><i class="icon-plus-sign"></i></a>
 		{/if}
 	</div>
  <form id="nzb_multi_operations_form" action="get">
 	<div class="btn-group">
 		{if $rage|@count == 1 && $isadmin}<a class="btn btn-mini btn-inverse" href="{$smarty.const.WWW_TOP}/admin/rage-edit.php?id={$r.id}&amp;action=update&amp;from={$smarty.server.REQUEST_URI|escape:"url"}">Update From Tv Rage</a> | {/if}
-		<a class="btn btn-mini" target="_blank" href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$rage[0].rageid}" title="View in TvRage">View in Tv Rage</a> |
-		<a class="btn btn-mini" href="{$smarty.const.WWW_TOP}/rss?show={$rage[0].rageid}{if $category != ''}&amp;t={$category}{/if}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">Series RSS <i class="fa-icon-rss"></i></a>
+		<a class="btn btn-mini" target="_blank" href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$rage[0].videos_id}" title="View in TvRage">View in Tv Rage</a> |
+		<a class="btn btn-mini" href="{$smarty.const.WWW_TOP}/rss?show={$rage[0].videos_id}{if $category != ''}&amp;t={$category}{/if}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">Series RSS <i class="fa-icon-rss"></i></a>
 	</div>
 	<form id="nzb_multi_operations_form" action="get">
 
@@ -131,7 +131,7 @@
 							<td class="check"><input id="chk{$result.guid|substr:0:7}" type="checkbox" class="nzb_check"
 													 name="{$seasonnum}" value="{$result.guid}"/></td>
 							<td class="less"><a title="This series in {$result.category_name}"
-												href="{$smarty.const.WWW_TOP}/series/{$result.rageid}?t={$result.categoryid}">{$result.category_name}</a>
+												href="{$smarty.const.WWW_TOP}/series/{$result.videos_id}?t={$result.categoryid}">{$result.category_name}</a>
 							</td>
 							<td class="less mid" width="40" title="{$result.postdate}">{$result.postdate|timeago}</td>
 							<td width="40"

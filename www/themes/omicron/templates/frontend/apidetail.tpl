@@ -42,7 +42,7 @@
 					<newznab:attr name="episode" value="{$release.episode}"/>
 				{/if}
 				{if $release.videos_id != "-1" && $release.videos_id != "-2"}
-					<newznab:attr name="rageid" value="{$release.videos_id}"/>
+					<newznab:attr name="videos_id" value="{$release.videos_id}"/>
 					{if $release.title != ""}
 						<newznab:attr name="title" value="{$release.title|escape:html}"/>
 					{/if}

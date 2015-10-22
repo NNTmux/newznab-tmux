@@ -36,7 +36,7 @@
 {/if}
 {if $release.episode != ""}	<newznab:attr name="episode" value="{$release.episode}" />
 {/if}
-{if $release.rageid != "-1" && $release.rageid != "-2"}	<newznab:attr name="rageid" value="{$release.rageid}" />
+{if $release.videos_id != "-1" && $release.videos_id != "-2"}	<newznab:attr name="videos_id" value="{$release.videos_id}" />
 {if $release.tvtitle != ""}	<newznab:attr name="tvtitle" value="{$release.tvtitle|escape:html}" />
 {/if}
 {if $result.firstaired != ""}	<newznab:attr name="firstaired" value="{$result.firstaired|phpdate_format:"DATE_RSS"}" />

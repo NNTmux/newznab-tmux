@@ -176,7 +176,7 @@
 									{elseif $type == 'TV'}
 										<div class="icon icon_tvrage">
 											<a class="divlink" title="View in TvRage"
-											   href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$result.rageid}"
+											   href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$result.videos_id}"
 											   target="_blank"></a>
 										</div>
 									{/if}

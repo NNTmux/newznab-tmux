@@ -145,8 +145,8 @@
 									{if $result.bookinfoid > 0}<a href="#" name="name{$result.bookinfoid}"
 																  title="View book info" class="modal_book rndbtn"
 																  rel="console" >Cover</a>{/if}
-									{if $result.rageid > 0}<a class="rndbtn"
-															  href="{$smarty.const.WWW_TOP}/series/{$result.rageid}"
+									{if $result.videos_id > 0}<a class="rndbtn"
+															  href="{$smarty.const.WWW_TOP}/series/{$result.videos_id}"
 															  title="View all episodes">View Series</a>{/if}
 									{if $result.anidbid > 0}<a class="rndbtn"
 															   href="{$smarty.const.WWW_TOP}/anime/{$result.anidbid}"
