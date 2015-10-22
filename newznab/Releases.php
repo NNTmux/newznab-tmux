@@ -516,7 +516,7 @@ class Releases
 				AND r.categoryid BETWEEN 5000 AND 5999
 				AND r.passwordstatus %s
 				%s',
-				$this->uSQL($userShows, 'rageid'),
+				$this->uSQL($userShows, 'video_id'),
 				(count($excludedCats) ? ' AND r.categoryid NOT IN (' . implode(',', $excludedCats) . ')' : ''),
 				NZB::NZB_ADDED,
 				$this->showPasswords,
