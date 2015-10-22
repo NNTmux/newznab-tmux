@@ -27,7 +27,7 @@
 	</div>
 	<h1>
 		{foreach $show as $r}
-			{$r.title}
+			{$r.seriestitles}
 			{if !$r@last} / {/if}
 		{/foreach}
 		{if isset($isadmin)}<a class="btn btn-xs btn-warning" title="Edit TV Rage Data"
@@ -37,14 +37,13 @@
 	<div class="tvseriesheading">
 		{if $show.image != 0}
 			<center>
-				<img class="shadow img img-polaroid" style="max-height:300px;" alt="{$show.title} Logo"
+				<img class="shadow img img-polaroid" style="max-height:300px;" alt="{$show.seriestitles} Logo"
 					 src="{$smarty.const.WWW_TOP}/covers/tvshows/{$show.id}.jpg"/>
 			</center>
 			<br/>
 		{/if}
 		<p>
-			{if $seriesgenre != ''}<b>{$seriesgenre}</b><br/>{/if}
-			<span class="descinitial">{$seriesdescription|escape:"htmlall"|nl2br|magicurl}</span>
+			<span class="descinitial">{$seriessummary|escape:"htmlall"|nl2br|magicurl}</span>
 		</p>
 	</div>
 	<div class="btn-group">
@@ -168,7 +167,7 @@
 																	Grab{if $result.grabs != 1}s{/if}</span>
 																{if $result.firstaired != ""}<span
 																	class="label label-success"
-																	title="{$result.tvtitle} Aired on {$result.firstaired|date_format}">
+																	title="{$result.title} Aired on {$result.firstaired|date_format}">
 																	Aired {if $result.firstaired|strtotime > $smarty.now}in future{else}{$result.firstaired|daysago}{/if}</span>{/if}
 																{if $result.reid > 0}<span
 																	class="mediainfo label label-default"
