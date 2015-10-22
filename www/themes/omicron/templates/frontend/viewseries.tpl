@@ -1,6 +1,5 @@
 {if isset($nodata) && $nodata != ""}
 	<div class="header">
-		<h2>View > <strong>TV Series</strong></h2>
 		<div class="breadcrumb-wrapper">
 			<ol class="breadcrumb">
 				<li><a href="{$smarty.const.WWW_TOP}{$site->home_link}">Home</a></li>
