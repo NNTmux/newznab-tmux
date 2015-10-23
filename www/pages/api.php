@@ -4,8 +4,12 @@ use newznab\db\Settings;
 use newznab\ReleaseComments;
 use newznab\Releases;
 use newznab\Category;
+use newznab\Groups;
+use newznab\Genres;
 
 $rc = new ReleaseComments;
+$groups = new Groups();
+$genres = new Genres();
 
 
 // API functions.
@@ -436,6 +440,10 @@ switch ($function) {
 	case 'c':
 		$category = new Category(['Settings' => $page->settings]);
 		$page->smarty->assign('parentcatlist', $category->getForMenu());
+		$group = $groups->getActive();
+		$page->smarty->assign('grps', $group);
+		$genre = $genres->getGenres('', true);
+		$page->smarty->assign('genres', $genre);
 		header('Content-type: text/xml');
 		echo $page->smarty->fetch('apicaps.tpl');
 		break;
