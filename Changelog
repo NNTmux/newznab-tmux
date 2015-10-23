@@ -1,4 +1,5 @@
 2015-10-23 DariusIII
+	Chg: Revert the failed releases query in search
 	Fix: Array notice in series.php
 	Fix: Wrong table names in RSS class
 2015-10-22 DariusIII

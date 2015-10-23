@@ -879,12 +879,12 @@ class Releases
 			"SELECT r.*,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
 				%s AS category_ids,
+				(SELECT COUNT(userid) FROM dnzb_failures WHERE guid = r.guid) AS failed,
 				groups.name AS group_name,
 				rn.id AS nfoid,
 				re.releaseid AS reid,
 				cp.id AS categoryparentid,
 				tve.firstaired,
-				COUNT(df.id) AS failed
 			FROM releases r
 			LEFT OUTER JOIN releasevideo re ON re.releaseid = r.id
 			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
@@ -892,7 +892,6 @@ class Releases
 			INNER JOIN groups ON groups.id = r.groupid
 			INNER JOIN category c ON c.id = r.categoryid
 			INNER JOIN category cp ON cp.id = c.parentid
-			LEFT OUTER JOIN dnzb_failures df ON df.guid = r.guid
 			%s",
 			$this->getConcatenatedCategoryIDs(),
 			$whereSql
