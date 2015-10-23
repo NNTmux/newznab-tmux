@@ -56,7 +56,7 @@ Class RSS
 
 		if (count($cat)) {
 			if ($cat[0] == -2) {
-				$cartSearch = sprintf(' INNER JOIN userdownloads ON userdownloads.user_id = %d AND userdownloads.releaseid = r.id ', $userID);
+				$cartSearch = sprintf(' INNER JOIN userdownloads ON userdownloads.userid = %d AND userdownloads.releaseid = r.id ', $userID);
 			} else if ($cat[0] != -1) {
 				$catSearch = $this->releases->categorySQL($cat);
 			}
@@ -81,9 +81,9 @@ Class RSS
 				INNER JOIN groups g ON g.id = r.groupid
 				LEFT OUTER JOIN movieinfo m ON m.imdbid = r.imdbid AND m.title != ''
 				LEFT OUTER JOIN musicinfo mu ON mu.id = r.musicinfoid
-				LEFT OUTER JOIN genres mug ON mug.id = mu.genre_id
+				LEFT OUTER JOIN genres mug ON mug.id = mu.genreid
 				LEFT OUTER JOIN consoleinfo co ON co.id = r.consoleinfoid
-				LEFT OUTER JOIN genres cog ON cog.id = co.genre_id %s
+				LEFT OUTER JOIN genres cog ON cog.id = co.genreid %s
 				LEFT OUTER JOIN tv_episodes tve ON tve.id = r.tv_episodes_id
 				WHERE r.passwordstatus %s
 				AND r.nzbstatus = %d
@@ -133,7 +133,7 @@ Class RSS
 				AND r.passwordstatus %s
 				ORDER BY postdate DESC %s",
 				$this->releases->getConcatenatedCategoryIDs(),
-				$this->releases->uSQL($this->pdo->query(sprintf('SELECT videos_id, categoryid FROM userseries WHERE user_id = %d', $userID), true), 'videos_id'),
+				$this->releases->uSQL($this->pdo->query(sprintf('SELECT videos_id, categoryid FROM userseries WHERE userid = %d', $userID), true), 'videos_id'),
 				(count($excludedCats) ? ' AND r.categoryid NOT IN (' . implode(',', $excludedCats) . ')' : ''),
 				($airDate > -1 ? sprintf(' AND tve.firstaired >= DATE_SUB(CURDATE(), INTERVAL %d DAY) ', $airDate) : ''),
 				NZB::NZB_ADDED,
@@ -171,7 +171,7 @@ Class RSS
 				AND r.passwordstatus %s
 				ORDER BY postdate DESC %s",
 				$this->releases->getConcatenatedCategoryIDs(),
-				$this->releases->uSQL($this->pdo->query(sprintf('SELECT imdbid, categoryid FROM usermovies WHERE user_id = %d', $userID), true), 'imdbid'),
+				$this->releases->uSQL($this->pdo->query(sprintf('SELECT imdbid, categoryid FROM usermovies WHERE userid = %d', $userID), true), 'imdbid'),
 				(count($excludedCats) ? ' AND r.categoryid NOT IN (' . implode(',', $excludedCats) . ')' : ''),
 				NZB::NZB_ADDED,
 				$this->releases->showPasswords,

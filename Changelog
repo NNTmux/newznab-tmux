@@ -1,3 +1,5 @@
+2015-10-23 DariusIII
+	Fix: Wrong table names in RSS class
 2015-10-22 DariusIII
 	Upd: Temporary fix for array errors
 	Fix: Fix notices in my shows
