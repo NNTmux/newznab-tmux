@@ -1,18 +1,17 @@
 <?php
-
 require_once './config.php';
 
-
-use newznab\Releases;
 use newznab\Category;
+use newznab\Releases;
 
-$page = new AdminPage();
+$page = new AdminPage(true);
 $releases = new Releases(['Settings' => $page->settings]);
 $category = new Category(['Settings' => $page->settings]);
 $id = 0;
 
 // Set the current action.
-$action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view';
+$action = (isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view');
+$from = (isset($_POST['from']) ? $_POST['from'] : WWW_TOP . "/release-list.php");
 
 switch ($action) {
 	case 'submit':
@@ -30,11 +29,7 @@ switch ($action) {
 			$_POST["tv_episodes_id"],
 			$_POST["imdbid"],
 			$_POST["anidbid"]);
-		if (isset($_POST['from']) && !empty($_POST['from'])) {
-			header("Location:" . $_POST['from']);
-			exit;
-		}
-		header("Location:" . WWW_TOP . "/release-list.php");
+		header("Location:" . $from);
 		break;
 
 	case 'view':
@@ -48,6 +43,7 @@ switch ($action) {
 		break;
 }
 
+$page->smarty->assign('from', $from);
 $page->smarty->assign('yesno_ids', [1, 0]);
 $page->smarty->assign('yesno_names', ['Yes', 'No']);
 $page->smarty->assign('catlist', $category->getForSelect(false));

@@ -181,8 +181,6 @@ if (isset($_GET["id"]))
 	$page->smarty->assign('privateprofiles', ($page->settings->getSetting('privateprofiles') == 1) ? true : false );
 	$page->smarty->assign('failed', $failed);
 
-	$page->smarty->assign('rage', $criteria);
-
 	$page->meta_title = "View NZB";
 	$page->meta_keywords = "view,nzb,description,details";
 	$page->meta_description = "View NZB for".$data["searchname"] ;

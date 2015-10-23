@@ -1,4 +1,4 @@
-# This patch will make the necessary changes to the userseries
+# This patch will make the necessary changes to the user_series
 # table to support the new videos implementation
 # At this time, we're not sure if we can preserve the users shows
 # data as the tvrage data is largely useless due to the title insert bug
