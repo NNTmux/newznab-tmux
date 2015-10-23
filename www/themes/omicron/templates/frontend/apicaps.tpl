@@ -6,9 +6,9 @@
 	<limits max="100" default="100"/>
 	<registration available="yes" open="{if $site->registerstatus == 0}yes{else}no{/if}"/>
 	<searching>
-		<search available="yes"/>
-		<tv-search available="yes"/>
-		<movie-search available="yes"/>
+		<search available="yes" supportedParams="q" />
+		<tv-search available="yes" supportedParams="q, vid, tvdbid, traktid, rid, tvmazeid, imdbid, tmdbid, season, ep" />
+		<movie-search available="yes" supportedParams="q" />
 		<audio-search available="yes"/>
 	</searching>
 	<categories>

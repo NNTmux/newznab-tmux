@@ -1293,20 +1293,20 @@ class Releases
 	}
 
 	/**
-	 * @param int $rageID
+	 * @param $videoId
 	 *
-	 * @return int
+	 * @return bool|\PDOStatement
 	 */
-	public function removeRageIdFromReleases($rageID)
+	public function removeVideoIdFromReleases($videoId)
 	{
-		$res = $this->pdo->queryOneRow(
-			sprintf('SELECT COUNT(r.id) AS num FROM releases r WHERE rageid = %d', $rageID)
+		return $this->pdo->queryExec(
+			sprintf('
+					UPDATE releases
+					SET videos_id = 0, tv_episodes_id = 0
+					WHERE videos_id = %d',
+				$videoId
+			)
 		);
-		$this->pdo->queryExec(
-			sprintf('UPDATE releases SET rageid = -1, seriesfull = NULL, season = NULL, episode = NULL WHERE rageid = %d', $rageID)
-		);
-
-		return ($res === false ? 0 : $res['num']);
 	}
 
 	/**

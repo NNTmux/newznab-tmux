@@ -6,6 +6,7 @@ use newznab\Releases;
 use newznab\Category;
 use newznab\Groups;
 use newznab\Genres;
+use newznab\Capabilities;
 
 $rc = new ReleaseComments;
 $groups = new Groups();
@@ -445,7 +446,21 @@ switch ($function) {
 		$genre = $genres->getGenres('', true);
 		$page->smarty->assign('genres', $genre);
 		header('Content-type: text/xml');
-		echo $page->smarty->fetch('apicaps.tpl');
+		if ($outputXML) { //use apicaps.tpl if xml is requested
+			$response = $page->smarty->fetch('apicaps.tpl');
+			header('Content-type: text/xml');
+			header('Content-Length: ' . strlen($response) );
+			echo $response;
+		} else { //otherwise construct array of capabilities and categories
+			//get capabilities
+			$caps = (new Capabilities(['Settings' => $page->settings]))->getForMenu();
+			$caps['categories'] = $cats;
+			//use json_encode
+			$response = encodeAsJSON($caps);
+			header('Content-type: application/json');
+			header('Content-Length: ' . strlen($response) );
+			echo $response;
+		}
 		break;
 
 	// Register request.

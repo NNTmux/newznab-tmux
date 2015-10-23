@@ -1,4 +1,5 @@
 2015-10-23 DariusIII
+	Upd: Update api, Releases, anime etc
 	Chg: Add missing genres and groups output to api
 	Chg: Add the fixes from nZEDb/dev-tv branch
 	Chg: Revert the failed releases query in search
