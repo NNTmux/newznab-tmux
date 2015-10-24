@@ -257,7 +257,7 @@ switch ($function) {
 		} else { //otherwise construct array of capabilities and categories
 			//get capabilities
 			$caps = (new Capabilities(['Settings' => $page->settings]))->getForMenu();
-			$caps['categories'] = $cats;
+			$caps['categories'] = $category->getForMenu();
 			//use json_encode
 			$response = encodeAsJSON($caps);
 			header('Content-type: application/json');
