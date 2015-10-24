@@ -62,13 +62,10 @@ class Capabilities
 				'open'      => $this->pdo->getSetting('registerstatus') == 0 ? 'yes' : 'no'
 			],
 			'searching' => [
-				['search'       => 'yes'],
-				['supportedParams' => 'q'],
-				['tv-search'    => 'yes'],
-				['supportedParams' => 'q, vid, tvdbid, traktid, rid, tvmazeid, imdbid, tmdbid, season, ep'],
-				['movie-search' => 'yes'],
-				['supportedParams' => 'q'],
-				['audio-search' => 'yes']
+				'search'       => ['available' => 'yes', 'supportedParams' => 'q'],
+				'tv-search'    => ['available' => 'yes', 'supportedParams' => 'q,vid,tvdbid,traktid,rid,tvmazeid,imdbid,tmdbid,season,ep'],
+				'movie-search' => ['available' => 'yes', 'supportedParams' => 'q,imdbid'],
+				'audio-search' => ['available' => 'no',  'supportedParams' => '']
 			]
 		];
 	}

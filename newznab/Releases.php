@@ -209,11 +209,13 @@ class Releases
 					g.name AS group_name,
 					rn.id AS nfoid,
 					re.releaseid AS reid,
+					v.tvdb, v.trakt, v.tvrage, v.tvmaze, v.imdb, v.tmdb,
 					tve.title, tve.firstaired
 				FROM releases r
 				STRAIGHT_JOIN groups g ON g.id = r.groupid
 				STRAIGHT_JOIN category c ON c.id = r.categoryid
 				INNER JOIN category cp ON cp.id = c.parentid
+				LEFT OUTER JOIN videos v ON r.videos_id = v.id
 				LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
 				LEFT OUTER JOIN releasevideo re ON re.releaseid = r.id
 				LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
@@ -885,9 +887,11 @@ class Releases
 				rn.id AS nfoid,
 				re.releaseid AS reid,
 				cp.id AS categoryparentid,
-				tve.firstaired,
+				v.tvdb, v.trakt, v.tvrage, v.tvmaze, v.imdb, v.tmdb,
+				tve.firstaired
 			FROM releases r
 			LEFT OUTER JOIN releasevideo re ON re.releaseid = r.id
+			LEFT OUTER JOIN videos v ON r.videos_id = v.id
 			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
 			LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
 			INNER JOIN groups ON groups.id = r.groupid
@@ -918,15 +922,10 @@ class Releases
 	}
 
 	/**
-	 * @param        $videosId
-	 * @param        $tvdbId
-	 * @param        $traktId
-	 * @param        $tvrageId
-	 * @param        $tvmazeId
-	 * @param        $imdbId
-	 * @param        $tmdbId
+	 * @param array  $siteIdArr
 	 * @param string $series
 	 * @param string $episode
+	 * @param string $airdate
 	 * @param int    $offset
 	 * @param int    $limit
 	 * @param string $name
@@ -935,35 +934,45 @@ class Releases
 	 *
 	 * @return array
 	 */
-	public function searchShows($videosId, $tvdbId, $traktId, $tvrageId, $tvmazeId, $imdbId, $tmdbId, $series = '',
-								$episode = '', $offset = 0, $limit = 100, $name = '', $cat = [-1], $maxAge = -1)
+	public function searchShows($siteIdArr = array(), $series = '', $episode = '', $airdate = '', $offset = 0,
+								$limit = 100, $name = '', $cat = [-1], $maxAge = -1)
 	{
+		$siteSQL = array();
+
+		if (is_array($siteIdArr)) {
+			foreach ($siteIdArr as $column => $Id) {
+				if ($Id > 0) {
+					$siteSQL[] = sprintf('v.%s = %d', $column, $Id);
+				}
+			}
+		}
+
+		$siteCount = count($siteSQL);
+
 		$whereSql = sprintf(
 			"%s
 			WHERE r.categoryid BETWEEN 5000 AND 5999
 			AND v.type = 0
 			AND r.nzbstatus = %d
-			AND r.passwordstatus %s %s %s %s %s %s %s %s %s %s %s %s %s",
+			AND r.passwordstatus %s
+			AND (%s)
+			%s %s %s %s %s %s",
 			($name !== '' ? $this->releaseSearch->getFullTextJoinString() : ''),
 			NZB::NZB_ADDED,
 			$this->showPasswords,
-			($videosId > 0 ? sprintf(' AND v.id = %d ', $videosId) : ''),
-			($tvdbId > 0 ? sprintf(' AND v.tvdb = %d ', $tvdbId) : ''),
-			($traktId > 0 ? sprintf(' AND v.trakt = %d ', $traktId) : ''),
-			($tvrageId > 0 ? sprintf(' AND v.tvrage = %d ', $tvrageId) : ''),
-			($tvmazeId > 0 ? sprintf(' AND v.tvmaze = %d ', $tvmazeId) : ''),
-			($imdbId > 0 ? sprintf(' AND v.imdb = %d ', $imdbId) : ''),
-			($tmdbId > 0 ? sprintf(' AND v.tmdb = %d ', $tmdbId) : ''),
-			($series != '' ? sprintf(' AND tve.series = %d', (int)preg_replace('/^s0*/i', '', $series)): ''),
-			($episode != '' ? sprintf(' AND tve.episode = %d', (int)preg_replace('/^e0*/i', '', $episode)): ''),
+			($siteCount > 0 ? implode(' OR ', $siteSQL) : '1=1'),
+			($series != '' ? sprintf('AND tve.series = %d', (int)preg_replace('/^s0*/i', '', $series)): ''),
+			($episode != '' ? sprintf('AND tve.episode = %d', (int)preg_replace('/^e0*/i', '', $episode)): ''),
+			($airdate != '' ? sprintf('AND DATE(tve.firstaired) = %s', $this->pdo->escapeString($airdate)) : ''),
 			($name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : ''),
 			$this->categorySQL($cat),
-			($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : '')
+			($maxAge > 0 ? sprintf('AND r.postdate > NOW() - INTERVAL %d DAY', $maxAge) : '')
 		);
 
 		$baseSql = sprintf(
 			"SELECT r.*,
-				v.title, v.countries_id, v.started, v.imdb, v.tmdb, v.tvmaze, v.tvrage, v.source,
+				v.title, v.countries_id, v.started, v.tvdb, v.trakt,
+					v.imdb, v.tmdb, v.tvmaze, v.tvrage, v.source,
 				tvi.summary, tvi.publisher, tvi.image,
 				tve.series, tve.episode, tve.se_complete, tve.title, tve.firstaired, tve.summary,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
@@ -1310,20 +1319,20 @@ class Releases
 	}
 
 	/**
-	 * @param int $anidbID
+	 * @param $anidbID
 	 *
-	 * @return mixed
+	 * @return bool|\PDOStatement
 	 */
 	public function removeAnidbIdFromReleases($anidbID)
 	{
-		$res = $this->pdo->queryOneRow(
-			sprintf('SELECT COUNT(r.id) AS num FROM releases r WHERE anidbid = %d', $anidbID)
+		return	$this->pdo->queryExec(
+			sprintf('
+						UPDATE releases
+						SET anidbid = -1
+						WHERE anidbid = %d',
+				$anidbID
+			)
 		);
-		$this->pdo->queryExec(
-			sprintf('UPDATE releases SET anidbid = -1, episode = NULL, tvtitle = NULL, tvairdate = NULL WHERE anidbid = %d', $anidbID)
-		);
-
-		return ($res === false ? 0 : $res['num']);
 	}
 
 	/**

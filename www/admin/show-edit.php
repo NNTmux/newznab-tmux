@@ -1,11 +1,11 @@
 <?php
 require_once './config.php';
+require_once NN_WWW . 'pages/smartyTV.php';
 
-use newznab\processing\tv\TVDB;
 use newznab\Videos;
 
 $page   = new AdminPage();
-$tv = new TVDB(['Settings' => $page->settings]);
+$tv = new smartyTV(['Settings' => $page->settings]);
 $video = new Videos(['Settings' => $page->settings]);
 
 switch ((isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view')) {

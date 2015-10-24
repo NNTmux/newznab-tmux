@@ -5,7 +5,7 @@ use libs\Moinax\TVDB\Client;
 use newznab\ReleaseImage;
 
 /**
- * Class TVDB
+ * Class TVDB -- functions used to post process releases against TVDB
  */
 class TVDB extends TV
 {
@@ -59,6 +59,9 @@ class TVDB extends TV
 	}
 
 	/**
+	 * Main processing director function for TVDB
+	 * Calls work query function and initiates processing
+	 *
 	 * @param            $groupID
 	 * @param            $guidChar
 	 * @param            $processTV
@@ -111,22 +114,25 @@ class TVDB extends TV
 
 						if (is_array($tvdbShow)) {
 							$tvdbShow['country']  = (isset($release['country']) && strlen($release['country']) == 2
-												? (string)$release['country']
-												: ''
+								? (string)$release['country']
+								: ''
 							);
 
 							$videoId = $this->add(
-										$tvdbShow['column'],
-										$tvdbShow['siteid'],
-										$tvdbShow['title'],
-										$tvdbShow['summary'],
-										$tvdbShow['country'],
-										$tvdbShow['started'],
-										$tvdbShow['publisher'],
-										$tvdbShow['source'],
-										$tvdbShow['imdbid']
+								$tvdbShow['title'],
+								$tvdbShow['column'],
+								$tvdbShow['siteid'],
+								$tvdbShow['summary'],
+								$tvdbShow['country'],
+								$tvdbShow['started'],
+								$tvdbShow['publisher'],
+								$tvdbShow['source'],
+								$tvdbShow['tvdbid'],
+								0, 0, 0,
+								$tvdbShow['imdbid'],
+								0
 							);
-							$tvdbid = (int)$tvdbShow['siteid'];
+							$tvdbid = (int)$tvdbShow['tvdbid'];
 						}
 					} else if ($this->echooutput) {
 							echo $this->pdo->log->primaryOver("Video ID for ") .
@@ -142,32 +148,31 @@ class TVDB extends TV
 						$episodeNo = preg_replace('/^E0*/', '', $release['episode']);
 
 						// Download all episodes if new show to reduce API/bandwidth usage
-						if ($this->checkIfNoEpisodes($videoId) === false) {
+						if ($this->countEpsByVideoID($videoId) === false) {
 							$this->getEpisodeInfo($tvdbid, -1, -1, '', $videoId);
 						}
 
 						// Check if we have the episode for this video ID
 						$episode = $this->getBySeasonEp($videoId, $seasonNo, $episodeNo, $release['airdate']);
 
-
 						if ($episode === false && $lookupSetting) {
 							// Send the request for the episode to TVDB
 							$tvdbEpisode = $this->getEpisodeInfo(
-										$tvdbid,
-										$seasonNo,
-										$episodeNo,
-										$release['airdate']
+								$tvdbid,
+								$seasonNo,
+								$episodeNo,
+								$release['airdate']
 							);
 
 							if ($tvdbEpisode) {
 								$episode = $this->addEpisode(
-												$videoId,
-												$tvdbEpisode['season'],
-												$tvdbEpisode['episode'],
-												$tvdbEpisode['se_complete'],
-												$tvdbEpisode['title'],
-												$tvdbEpisode['firstaired'],
-												$tvdbEpisode['summary']
+									$videoId,
+									$tvdbEpisode['season'],
+									$tvdbEpisode['episode'],
+									$tvdbEpisode['se_complete'],
+									$tvdbEpisode['title'],
+									$tvdbEpisode['firstaired'],
+									$tvdbEpisode['summary']
 								);
 							}
 						}
@@ -176,7 +181,7 @@ class TVDB extends TV
 							// Mark the releases video and episode IDs
 							$this->setVideoIdFound($videoId, $row['id'], $episode);
 							if ($this->echooutput) {
-								echo	$this->pdo->log->primary("Found TVDB Match!");
+								echo $this->pdo->log->primary("Found TVDB Match!");
 							}
 							continue;
 						}
@@ -187,12 +192,23 @@ class TVDB extends TV
 		}
 	}
 
+	/**
+	 * Placeholder for Videos getBanner
+	 *
+	 * @param $videoID
+	 * @param $siteId
+	 *
+	 * @return bool
+	 */
 	protected function getBanner($videoID, $siteId)
 	{
 		return false;
 	}
 
 	/**
+	 * Calls the API to perform initial show name match to TVDB title
+	 * Returns a formatted array of show data or false if no match
+	 *
 	 * @param $cleanName
 	 *
 	 * @return array|bool
@@ -217,21 +233,24 @@ class TVDB extends TV
 					}
 
 					// Check each show title for similarity and then find the highest similar value
-					similar_text($show->name, $cleanName, $matchProb);
+					$matchPercent = $this->checkMatch($show->name, $cleanName, self::MATCH_PROBABILITY);
 
 					if (NN_DEBUG) {
-						echo PHP_EOL . sprintf('Match Percentage: %d percent between %s and %s', $matchProb, $show->name, $cleanName) . PHP_EOL;
+						echo PHP_EOL . sprintf('Match Percentage: %d percent between %s and %s', $matchPercent, $show->name, $cleanName) . PHP_EOL;
 					}
 
-					if ($matchProb >= self::MATCH_PROBABILITY && $matchProb > $highestMatch) {
-						$highestMatch = $matchProb;
+					// If new match has a higher percentage, set as new matched title
+					if ($matchPercent > $highestMatch) {
+						$highestMatch = $matchPercent;
 						$highest = $show;
 					}
+
+					// Check for show aliases and try match those too
 					if (is_array($show->aliasNames) && !empty($show->aliasNames)) {
 						foreach ($show->aliasNames as $key => $name) {
-							similar_text($name, $cleanName, $matchProb);
-							if ($matchProb >= self::MATCH_PROBABILITY && $matchProb > $highestMatch) {
-								$highestMatch = $matchProb;
+							$matchPercent = $this->CheckMatch($name, $cleanName, $matchPercent);
+							if ($matchPercent > $highestMatch) {
+								$highestMatch = $matchPercent;
 								$highest = $show;
 							}
 						}
@@ -246,6 +265,8 @@ class TVDB extends TV
 	}
 
 	/**
+	 * Retrieves the poster art for the processed show
+	 *
 	 * @param $videoId
 	 * @param $showId
 	 *
@@ -254,11 +275,11 @@ class TVDB extends TV
 	protected function getPoster($videoId, $showId)
 	{
 		$hascover = (new ReleaseImage($this->pdo))->saveImage(
-							$videoId,
-							sprintf($this->posterUrl, $showId),
-							$this->imgSavePath,
-							'',
-							''
+			$videoId,
+			sprintf($this->posterUrl, $showId),
+			$this->imgSavePath,
+			'',
+			''
 		);
 		if ($hascover == 1) {
 			$this->setCoverFound($videoId);
@@ -266,6 +287,9 @@ class TVDB extends TV
 	}
 
 	/**
+	 * Gets the specific episode info for the parsed release after match
+	 * Returns a formatted array of episode data or false if no match
+	 *
 	 * @param integer	$tvdbid
 	 * @param integer	$season
 	 * @param integer	$episode
@@ -321,6 +345,9 @@ class TVDB extends TV
 	}
 
 	/**
+	 * Assigns API show response values to a formatted array for insertion
+	 * Returns the formatted array
+	 *
 	 * @param $show
 	 *
 	 * @return array
@@ -328,21 +355,25 @@ class TVDB extends TV
 	private function formatShowArr($show)
 	{
 		$show->firstAired->setTimezone($this->timeZone);
-		preg_match('/tt(?P<imdbid>\d{7})$/i', $show->imdbId, $imdb);
+		preg_match('/tt(?P<imdbid>\d{6,7})$/i', $show->imdbId, $imdb);
 
 		return	[
-					'column'    => (string)'tvdb',
-					'siteid'    => (int)$show->id,
-					'title'     => (string)$show->name,
-					'summary'   => (string)$show->overview,
-					'started'   => (string)$show->firstAired->format($this->timeFormat),
-					'publisher' => (string)$show->network,
-					'source'    => (int)parent::SOURCE_TVDB,
-					'imdbid'    => (int)(isset($imdb['imdbid']) ? $imdb['imdbid'] : 0)
-				];
+			'tvdbid'    => (int)$show->id,
+			'column'    => 'tvdb',
+			'siteid'    => (int)$show->id,
+			'title'     => (string)$show->name,
+			'summary'   => (string)$show->overview,
+			'started'   => (string)$show->firstAired->format($this->timeFormat),
+			'publisher' => (string)$show->network,
+			'source'    => (int)parent::SOURCE_TVDB,
+			'imdbid'    => (int)(isset($imdb['imdbid']) ? $imdb['imdbid'] : 0)
+		];
 	}
 
 	/**
+	 * Assigns API episode response values to a formatted array for insertion
+	 * Returns the formatted array
+	 *
 	 * @param $episode
 	 *
 	 * @return array
@@ -362,6 +393,9 @@ class TVDB extends TV
 	}
 
 	/**
+	 * Checks API response returns have all REQUIRED attributes set
+	 * Returns true or false
+	 *
 	 * @param $array
 	 * @param $type
 	 *

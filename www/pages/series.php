@@ -20,10 +20,10 @@ if (isset($_GET["id"]) && ctype_digit($_GET['id'])) {
 		$category = $_REQUEST["t"];
 	}
 
-	$catarray = [];
+	$catarray = array();
 	$catarray[] = $category;
 
-	$rel = $releases->searchShows($_GET["id"], 0, 0, 0, 0, 0, 0, '', '', 0, 1000, "", $catarray, -1);
+	$rel = $releases->searchShows(['id' => $_GET["id"]], '', '', '', 0, 1000, '', $catarray, -1);
 	$show = $tvshow->getByVideoID($_GET['id']);
 
 	if (!$show) {
@@ -34,7 +34,7 @@ if (isset($_GET["id"]) && ctype_digit($_GET['id'])) {
 		$myshows = $us->getShow($page->users->currentUserId(), $show['id']);
 
 		// Sort releases by season, episode, date posted.
-		$series = $episode = $posted = [];
+		$series = $episode = $posted = array();
 		foreach ($rel as $rlk => $rlv) {
 			$series[$rlk] = $rlv['series'];
 			$episode[$rlk] = $rlv['episode'];
@@ -42,7 +42,7 @@ if (isset($_GET["id"]) && ctype_digit($_GET['id'])) {
 		}
 		array_multisort($series, SORT_DESC, $episode, SORT_DESC, $posted, SORT_DESC, $rel);
 
-		$series = [];
+		$series = array();
 		foreach ($rel as $r) {
 			$series[$r['series']][$r['episode']][] = $r;
 		}
@@ -52,13 +52,11 @@ if (isset($_GET["id"]) && ctype_digit($_GET['id'])) {
 		$page->smarty->assign('myshows', $myshows);
 
 		//get series name(s), description, country and genre
-		$seriestitles = $seriesdescription = $seriescountry = [];
+		$seriestitles = $seriesdescription = $seriescountry = array();
 		$seriestitles[] = $show['title'];
 
-		if (is_array($show['summary']) && !empty($show['summary'])) {
-			$seriessummary = $show['summary'][0];
-		} else {
-			$seriessummary = $show['summary'];
+		if (!empty($show['summary'])) {
+			$seriessummary[] = $show['summary'];
 		}
 
 		if (!empty($show['countries_id'])) {
@@ -67,7 +65,7 @@ if (isset($_GET["id"]) && ctype_digit($_GET['id'])) {
 
 		$seriestitles = implode('/', array_map("trim", $seriestitles));
 		$page->smarty->assign('seriestitles', $seriestitles);
-		$page->smarty->assign('seriessummary', $seriessummary);
+		$page->smarty->assign('seriessummary', array_shift($seriessummary));
 		$page->smarty->assign('seriescountry', array_shift($seriescountry));
 
 		$page->title = "Series";
@@ -81,7 +79,6 @@ if (isset($_GET["id"]) && ctype_digit($_GET['id'])) {
 		} else {
 			$cdata = array('title' => '');
 			$catid = '';
-			$page->smarty->assign("catname", "All");
 		}
 		$page->smarty->assign('catname', $cdata['title']);
 		$page->smarty->assign('category', $catid);

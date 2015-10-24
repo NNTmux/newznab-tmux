@@ -1,17 +1,10 @@
 <?php
-use newznab\utility\Utility;
-use newznab\db\Settings;
-use newznab\ReleaseComments;
-use newznab\Releases;
-use newznab\Category;
-use newznab\Groups;
-use newznab\Genres;
+
 use newznab\Capabilities;
-
-$rc = new ReleaseComments;
-$groups = new Groups();
-$genres = new Genres();
-
+use newznab\Category;
+use newznab\Releases;
+use newznab\db\Settings;
+use newznab\utility\Utility;
 
 // API functions.
 $function = 's';
@@ -33,26 +26,6 @@ if (isset($_GET['t'])) {
 		case 'caps':
 			$function = 'c';
 			break;
-		case 'gn':
-		case 'getnfo':
-			$function = 'gn';
-			break;
-		case 'comm':
-		case 'comments':
-			$function = 'co';
-			break;
-		case 'commadd':
-		case 'commentadd':
-			$function = 'ca';
-			break;
-		case 'b':
-		case 'book':
-			$function = 'b';
-			break;
-		case 'mu':
-			case 'music':
-			$function = 'mu';
-			break;
 		case 'tv':
 		case 'tvsearch':
 			$function = 'tv';
@@ -60,10 +33,6 @@ if (isset($_GET['t'])) {
 		case 'm':
 		case 'movie':
 			$function = 'm';
-			break;
-		case 'u':
-		case 'user':
-			$function = 'u';
 			break;
 		case 'r':
 		case 'register':
@@ -77,7 +46,6 @@ if (isset($_GET['t'])) {
 }
 
 $uid = $apiKey = '';
-$hosthash = '';
 $catExclusions = [];
 $maxRequests = 0;
 // Page is accessible only by the apikey, or logged in users.
@@ -90,22 +58,18 @@ if ($page->users->isLoggedIn()) {
 	if ($function != 'c' && $function != 'r') {
 		if (!isset($_GET['apikey'])) {
 			showApiError(200, 'Missing parameter (apikey)');
-		}
-		$res = $page->users->getByRssToken($_GET['apikey']);
-		$apiKey = $_GET['apikey'];
+		} else {
+			$res    = $page->users->getByRssToken($_GET['apikey']);
+			$apiKey = $_GET['apikey'];
 
-		if (!$res) {
-			showApiError(100, 'Incorrect user credentials (wrong API key)');
-		}
+			if (!$res) {
+				showApiError(100, 'Incorrect user credentials (wrong API key)');
+			}
 
-		$uid = $res['id'];
-		$catExclusions = $page->users->getCategoryExclusion($uid);
-		//
-		// A hash of the users ip to record against the api hit
-		//
-		if ($page->settings->getSetting('storeuserips') == 1)
-			$hosthash = $page->users->getHostHash($_SERVER["REMOTE_ADDR"], $page->settings->getSetting('siteseed'));
-		$maxRequests = $res['apirequests'];
+			$uid           = $res['id'];
+			$catExclusions = $page->users->getCategoryExclusion($uid);
+			$maxRequests   = $res['apirequests'];
+		}
 	}
 }
 
@@ -171,16 +135,30 @@ switch ($function) {
 		$page->users->addApiRequest($uid, $_SERVER['REQUEST_URI']);
 		$offset = offset();
 
+		$siteIdArr = 	[
+			'id'     => (isset($_GET['vid']) ? $_GET['vid'] : '0'),
+			'tvdb'   => (isset($_GET['tvdbid']) ? $_GET['tvdbid'] : '0'),
+			'trakt'  => (isset($_GET['traktid']) ? $_GET['traktid'] : '0'),
+			'tvrage' => (isset($_GET['rid']) ? $_GET['rid'] : '0'),
+			'tvmaze' => (isset($_GET['tvmazeid']) ? $_GET['tvmazeid'] : '0'),
+			'imdb'   => (isset($_GET['imdbid']) ? $_GET['imdbid'] : '0'),
+			'tmdb'   => (isset($_GET['tmdbid']) ? $_GET['tmdbid'] : '0')
+		];
+
+		if (isset($_GET['season']) && isset($_GET['ep'])) {
+			if (preg_match('#\d{4}#i', $_GET['season'], $year) && stripos($_GET['ep'], '/') !== false) {
+				$airdate = $year[0] . '/' . $_GET['ep'];
+			} else {
+				$series = $_GET['season'];
+				$episode = $_GET['ep'];
+			}
+		}
+
 		$relData = $releases->searchShows(
-			(isset($_GET['vid']) ? $_GET['vid'] : '0'),
-			(isset($_GET['tvdbid']) ? $_GET['tvdbid'] : '0'),
-			(isset($_GET['traktid']) ? $_GET['traktid'] : '0'),
-			(isset($_GET['rid']) ? $_GET['rid'] : '0'),
-			(isset($_GET['tvmazeid']) ? $_GET['tvmazeid'] : '0'),
-			(isset($_GET['imdbid']) ? $_GET['imdbid'] : '0'),
-			(isset($_GET['tmdbid']) ? $_GET['tmdbid'] : '0'),
-			(isset($_GET['season']) ? $_GET['season'] : ''),
-			(isset($_GET['ep']) ? $_GET['ep'] : ''),
+			$siteIdArr,
+			(isset($series) ? $series : ''),
+			(isset($episode) ? $episode : ''),
+			(isset($airdate) ? $airdate : ''),
 			$offset,
 			limit(),
 			(isset($_GET['q']) ? $_GET['q'] : ''),
@@ -189,181 +167,6 @@ switch ($function) {
 		);
 
 		addLanguage($relData, $page->settings);
-		printOutput($relData, $outputXML, $page, $offset);
-		break;
-
-	//
-	// get nfo
-	//
-	case "gn":
-		if (!isset($_GET["id"]))
-			showApiError(200);
-
-		$page->users->addApiRequest($uid, $_SERVER['REQUEST_URI']);
-
-		$relData = $releases->getByGuid($_GET["id"]);
-		if (!$relData)
-			showApiError(300);
-
-		$nfo = $releases->getReleaseNfo($relData["id"], true);
-		if (!$nfo)
-			showApiError(300);
-
-		$nforaw = Utility::cp437toUTF($nfo["nfo"]);
-		$page->smarty->assign('release',$relData);
-		$page->smarty->assign('nfo',$nfo);
-		$page->smarty->assign('nfoutf',$nforaw);
-
-		if (isset($_GET["raw"]))
-		{
-			header("Content-type: text/x-nfo");
-			header("Content-Disposition: attachment; filename=".str_replace(" ", "_", $relData["searchname"]).".nfo");
-			echo $nforaw;
-			die();
-		}
-		else
-		{
-			$page->smarty->assign('rsstitle',"NFO");
-			$page->smarty->assign('rssdesc',"NFO");
-			$content = trim($page->smarty->fetch('apinfo.tpl'));
-
-			printOutput($relData, $outputXML, $page, $offset);
-		}
-		break;
-
-	//
-	// get comments
-	//
-	case "co":
-		if (!isset($_GET["id"]))
-			showApiError(200);
-
-		$page->users->addApiRequest($uid, $_SERVER['REQUEST_URI']);
-
-		$data = $rc->getCommentsByGuid($_GET["id"]);
-		if ($data)
-			$relData = $data;
-		else
-			$relData = [];
-
-		$page->smarty->assign('comments',$relData);
-		$page->smarty->assign('rsstitle',"API Comments");
-		$page->smarty->assign('rssdesc',"API Comments");
-		$content = trim($page->smarty->fetch('apicomments.tpl'));
-
-		printOutput($relData, $outputXML, $page, $offset);
-
-		break;
-
-	//
-	// add comment
-	//
-	case "ca":
-		if (!isset($_GET["id"]))
-			showApiError(200);
-
-		if (!isset($_GET["text"]))
-			showApiError(200);
-
-		$page->users->addApiRequest($uid, $_SERVER['REQUEST_URI']);
-
-		$relData = $releases->getByGuid($_GET["id"]);
-		if ($relData)
-		{
-			$ret = $rc->addComment($relData["id"], $relData["gid"], $_GET["text"], $uid, $_SERVER['REMOTE_ADDR']);
-
-			$content = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
-			$content.= "<commentadd id=\"".$ret."\" />\n";
-
-			printOutput($content, $outputXML, $page);
-		}
-		else
-		{
-			showApiError(300);
-		}
-
-		break;
-
-	//
-	// search book releases
-	//
-	case "b":
-		if (isset($_GET["author"]) && $_GET["author"]=="" && isset($_GET["title"]) && $_GET["title"]=="")
-			showApiError(200);
-
-		$maxage = -1;
-		if (isset($_GET["maxage"]))
-		{
-			if ($_GET["maxage"]=="")
-				showApiError(200);
-			elseif (!is_numeric($_GET["maxage"]))
-				showApiError(201);
-			else
-				$maxage = $_GET["maxage"];
-		}
-
-		$page->users->addApiRequest($uid, $_SERVER['REQUEST_URI']);
-
-		$limit = 100;
-		if (isset($_GET["limit"]) && is_numeric($_GET["limit"]) && $_GET["limit"] < 100)
-			$limit = $_GET["limit"];
-
-		$offset = 0;
-		if (isset($_GET["offset"]) && is_numeric($_GET["offset"]))
-			$offset = $_GET["offset"];
-		$relData = $releases->searchBook((isset($_GET["author"]) ? $_GET["author"] : ""), (isset($_GET["title"]) ? $_GET["title"] : ""), $offset, $limit, $maxage );
-
-		$page->smarty->assign('offset',$offset);
-		$page->smarty->assign('releases',$relData);
-		$output = trim($page->smarty->fetch('apiresult.tpl'));
-
-		printOutput($relData, $outputXML, $page, $offset);
-		break;
-
-	//
-	// search music releases
-	//
-	case "mu":
-		if (isset($_GET["artist"]) && $_GET["artist"]=="" && isset($_GET["album"]) && $_GET["album"]=="")
-			showApiError(200);
-		$categoryId = [];
-		if (isset($_GET["cat"]))
-			$categoryId = explode(",",$_GET["cat"]);
-		else
-			$categoryId[] = -1;
-
-		$maxage = -1;
-		if (isset($_GET["maxage"]))
-		{
-			if ($_GET["maxage"]=="")
-				showApiError(200);
-			elseif (!is_numeric($_GET["maxage"]))
-				showApiError(201);
-			else
-				$maxage = $_GET["maxage"];
-		}
-
-		$genreId = [];
-		if (isset($_GET["genre"]))
-			$genreId = explode(",",$_GET["genre"]);
-		else
-			$genreId[] = -1;
-
-		$page->users->addApiRequest($uid, $_SERVER['REQUEST_URI']);
-
-		$limit = 100;
-		if (isset($_GET["limit"]) && is_numeric($_GET["limit"]) && $_GET["limit"] < 100)
-			$limit = $_GET["limit"];
-
-		$offset = 0;
-		if (isset($_GET["offset"]) && is_numeric($_GET["offset"]))
-			$offset = $_GET["offset"];
-		$relData = $releases->searchAudio((isset($_GET["artist"]) ? $_GET["artist"] : ""), (isset($_GET["album"]) ? $_GET["album"] : ""), (isset($_GET["label"]) ? $_GET["label"] : ""), (isset($_GET["track"]) ? $_GET["track"] : ""), (isset($_GET["year"]) ? $_GET["year"] : ""), $genreId, $offset, $limit, $categoryId, $maxage );
-
-		$page->smarty->assign('offset',$offset);
-		$page->smarty->assign('releases',$relData);
-		$output = trim($page->smarty->fetch('apiresult.tpl'));
-
 		printOutput($relData, $outputXML, $page, $offset);
 		break;
 
@@ -387,7 +190,7 @@ switch ($function) {
 		);
 
 		addCoverURL($relData,
-			function ($release) {
+			function($release) {
 				return Utility::getCoverURL(['type' => 'movies', 'id' => $release['imdbid']]);
 			}
 		);
@@ -439,13 +242,13 @@ switch ($function) {
 
 	// Capabilities request.
 	case 'c':
+		//get categories
 		$category = new Category(['Settings' => $page->settings]);
-		$page->smarty->assign('parentcatlist', $category->getForMenu());
-		$group = $groups->getActive();
-		$page->smarty->assign('grps', $group);
-		$genre = $genres->getGenres('', true);
-		$page->smarty->assign('genres', $genre);
-		header('Content-type: text/xml');
+		$cats = $category->getForMenu();
+
+		//insert cats into template variable
+		$page->smarty->assign('parentcatlist', $cats);
+
 		if ($outputXML) { //use apicaps.tpl if xml is requested
 			$response = $page->smarty->fetch('apicaps.tpl');
 			header('Content-type: text/xml');
@@ -462,7 +265,6 @@ switch ($function) {
 			echo $response;
 		}
 		break;
-
 	// Register request.
 	case 'r':
 		verifyEmptyParameter('email');
@@ -488,7 +290,7 @@ switch ($function) {
 
 		// Register.
 		$userDefault = $page->users->getDefaultRole();
-		$uid = $page->users->signup(
+		$uid = $page->users->signUp(
 			$username, $password, $_GET['email'], $_SERVER['REMOTE_ADDR'], $userDefault['id'], $userDefault['defaultinvites']
 		);
 
@@ -498,13 +300,15 @@ switch ($function) {
 			showApiError(107);
 		}
 
-		header('Content-type: text/xml');
-		echo
+		$response =
 			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" .
 			'<register username="' . $username .
 			'" password="' . $password .
 			'" apikey="' . $userdata['rsstoken'] .
 			"\"/>\n";
+		header('Content-type: text/xml');
+		header('Content-Length: ' . strlen($response) );
+		echo $response;
 		break;
 }
 
@@ -568,9 +372,14 @@ function showApiError($errorCode = 900, $errorText = '')
 		}
 	}
 
+	$response =
+		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" .
+		'<error code="' . $errorCode .  '" description="' . $errorText . "\"/>\n";
 	header('Content-type: text/xml');
-	header('X-newznab: API ERROR [' . $errorCode . '] ' . $errorText);
-	exit("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<error code=\"$errorCode\" description=\"$errorText\"/>\n");
+	header('Content-Length: ' . strlen($response) );
+	header('X-nZEDb: API ERROR [' . $errorCode . '] ' . $errorText);
+
+	exit($response);
 }
 
 /**
@@ -601,7 +410,7 @@ function categoryID()
 	$categoryID[] = -1;
 	if (isset($_GET['cat'])) {
 		$categoryIDs = urldecode($_GET['cat']);
-		// Append Web-DL category ID if HD present for SickBeard / NZBDrone compatibility.
+		// Append Web-DL category ID if HD present for SickBeard / Sonarr compatibility.
 		if (strpos($categoryIDs, (string)Category::CAT_TV_HD) !== false &&
 			strpos($categoryIDs, (string)Category::CAT_TV_WEBDL) === false) {
 			$categoryIDs .= (',' . Category::CAT_TV_WEBDL);
@@ -655,13 +464,9 @@ function printOutput($data, $xml = true, $page, $offset = 0)
 		echo $response;
 	} else {
 		$response = encodeAsJSON($data);
-		if ($response != false) {
-			header('Content-type: application/json');
-			header('Content-Length: ' . strlen($response));
-			echo $response;
-		} else {
-			echo 'No data returned or error occured';
-		}
+		header('Content-type: application/json');
+		header('Content-Length: ' . strlen($response));
+		echo $response;
 	}
 }
 

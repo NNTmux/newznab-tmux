@@ -1,12 +1,11 @@
 <?php
 require_once './config.php';
-
-use newznab\processing\tv\TVDB;
+require_once NN_WWW . 'pages/smartyTV.php';
 
 $page = new AdminPage();
 
 if (isset($_GET['id'])) {
-	(new TVDB(['Settings' => $page->settings]))->delete($_GET['id']);
+	(new smartyTV(['Settings' => $page->settings]))->delete($_GET['id']);
 }
 
 $referrer = $_SERVER['HTTP_REFERER'];
