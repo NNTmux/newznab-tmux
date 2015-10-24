@@ -6,7 +6,6 @@
 {else}
 
 <div class="header">
-	{assign var="catsplit" value=">"|explode:$catname}
 	<h2>View > <strong>Anime</strong></h2>
 	<div class="breadcrumb-wrapper">
 		<ol class="breadcrumb">
