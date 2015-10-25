@@ -87,7 +87,7 @@
 						   id="browsetable">
 						{foreach $animeEpisodeTitles as $result}
 							<tr>
-								<td style="padding-top:15px;" colspan="10"><h2>{$animeEpno}</h2></td>
+								<td style="padding-top:15px;" colspan="10"><h2>{$result}</h2></td>
 							</tr>
 							<tr>
 								<th><input id="chkSelectAll" type="checkbox" class="nzb_check_all"/></th>
@@ -116,9 +116,9 @@
 													class="label label-default" rel="preview">Preview</a>{/if}
 												<span class="label label-default">{$result.grabs}
 													Grab{if $result.grabs != 1}s{/if}</span>
-												{if $result.animeStartDate != ""}<span class="label label-success"
-																				  title="{$result.title} Aired on {$result.animeStartDate|date_format}">
-													Aired {if $result.animeStartDate|strtotime > $smarty.now}in future{else}{$result.animeStartDate|daysago}{/if}</span>{/if}
+												{if $result.firstAired != ""}<span class="label label-success"
+																				  title="{$result.title} Aired on {$result.firstAired|date_format}">
+													Aired {if $result.firstAired|strtotime > $smarty.now}in future{else}{$result.firstAired|daysago}{/if}</span>{/if}
 												{if isset($result.reis) && $result.reid > 0}<span class="mediainfo label label-default"
 																		   title="{$result.guid}">Media</span>{/if}
 											</div>
