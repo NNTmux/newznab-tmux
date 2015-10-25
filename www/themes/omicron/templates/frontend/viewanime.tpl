@@ -97,6 +97,7 @@
 								<th>Size</th>
 								<th>Action</th>
 							</tr>
+							{$animeEpisodeTitle|@var_dump}
 							{foreach $animeEpisodeTitle as $result}
 								<tr class="{cycle values=",alt"}" id="guid{$result.guid}">
 									<td class="check"><input id="chk{$result.guid|substr:0:7}"
