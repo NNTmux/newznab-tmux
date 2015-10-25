@@ -1,4 +1,5 @@
 2015-10-24 DariusIII
+	Upd: Change some fields in patches to utf8mb4, fix notices
 	Upd: Add latest changes from nZEDb/dev-tv branch
 	Fix: Remove catname from anime page.
 	Upd: Add latest changes from nZEDb/dev-tv branch
