@@ -85,9 +85,9 @@
 				<div class="panel-body pagination2">
 					<table style="width:100%;" class="data table table-condensed table-striped table-responsive table-hover"
 						   id="browsetable">
-						{foreach $animeEpisodeTitles as $result}
+						{foreach $animeEpisodeTitles as $animeEpno => $animeEpisodeTitle}
 							<tr>
-								<td style="padding-top:15px;" colspan="10"><h2>{$result}</h2></td>
+								<td style="padding-top:15px;" colspan="10"><h2>{$animeEpno}</h2></td>
 							</tr>
 							<tr>
 								<th><input id="chkSelectAll" type="checkbox" class="nzb_check_all"/></th>
@@ -97,6 +97,7 @@
 								<th>Size</th>
 								<th>Action</th>
 							</tr>
+							{foreach $animeEpisodeTitle as $result}
 								<tr class="{cycle values=",alt"}" id="guid{$result.guid}">
 									<td class="check"><input id="chk{$result.guid|substr:0:7}"
 															 type="checkbox" class="nzb_check"
@@ -106,20 +107,17 @@
 										   href="{$smarty.const.WWW_TOP}/details/{$result.guid}"></a>
 										<div>
 											<div>
-												{if $result.nfoid > 0}<span class="label label-default"><a
+												{if isset($result.nfoid) && $result.nfoid > 0}<span class="label label-default"><a
 															href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}"
 															class="text-muted">NFO</a></span>{/if}
-												{if $result.haspreview == 1 && $userdata.canpreview == 1}<a
+												{if isset($result.haspreview) && $result.haspreview == 1 && $userdata.canpreview == 1}<a
 													href="{$smarty.const.WWW_TOP}/covers/preview/{$result.guid}_thumb.jpg"
 													name="name{$result.guid}"
 													title="Screenshot of {$result.animeTitle|escape:"htmlall"}"
 													class="label label-default" rel="preview">Preview</a>{/if}
-												<span class="label label-default">{$result.grabs}
-													Grab{if $result.grabs != 1}s{/if}</span>
-												{if $result.firstAired != ""}<span class="label label-success"
-																				  title="{$result.title} Aired on {$result.firstAired|date_format}">
-													Aired {if $result.firstAired|strtotime > $smarty.now}in future{else}{$result.firstAired|daysago}{/if}</span>{/if}
-												{if isset($result.reis) && $result.reid > 0}<span class="mediainfo label label-default"
+												{if isset($result.grabs)}<span class="label label-default">{$result.grabs}
+													Grab{if $result.grabs != 1}s{/if}</span>{/if}
+												{if isset($result.reid) && $result.reid > 0}<span class="mediainfo label label-default"
 																		   title="{$result.guid}">Media</span>{/if}
 											</div>
 										</div>
@@ -146,6 +144,7 @@
 										{/if}
 									</td>
 								</tr>
+							{/foreach}
 						{/foreach}
 					</table>
 </form>
