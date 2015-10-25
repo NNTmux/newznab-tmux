@@ -98,6 +98,7 @@
 								<th>Action</th>
 							</tr>
 							{foreach $animeEpisodeTitle as $result}
+								{$result|@var_dump}
 								<tr class="{cycle values=",alt"}" id="guid{$result.guid}">
 									<td class="check"><input id="chk{$result.guid|substr:0:7}"
 															 type="checkbox" class="nzb_check"
