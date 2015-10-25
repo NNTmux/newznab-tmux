@@ -1207,7 +1207,7 @@ class ReleaseRemover
 				case 'videos_id':
 					switch ($args[1]) {
 						case 'equals':
-							return ' AND rageID = ' . $args[2];
+							return ' AND videos_id = ' . $args[2];
 						default:
 							break;
 					}
