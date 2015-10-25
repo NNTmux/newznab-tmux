@@ -85,7 +85,7 @@
 				<div class="panel-body pagination2">
 					<table style="width:100%;" class="data table table-condensed table-striped table-responsive table-hover"
 						   id="browsetable">
-						{foreach $animeEpisodeTitles as $animeEpno => $animeEpisodeTitle}
+						{foreach $animeEpisodeTitles as $result}
 							<tr>
 								<td style="padding-top:15px;" colspan="10"><h2>{$animeEpno}</h2></td>
 							</tr>
