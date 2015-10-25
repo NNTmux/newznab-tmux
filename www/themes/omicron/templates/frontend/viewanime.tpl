@@ -86,66 +86,40 @@
 					<table style="width:100%;" class="data table table-condensed table-striped table-responsive table-hover"
 						   id="browsetable">
 						{foreach $animeEpisodeTitles as $result}
-							<tr>
-								<td style="padding-top:15px;" colspan="10"><h2>{$result}</h2></td>
-							</tr>
-							<tr>
-								<th><input id="chkSelectAll" type="checkbox" class="nzb_check_all"/></th>
-								<th>Name</th>
-								<th>Category</th>
-								<th>Posted</th>
-								<th>Size</th>
-								<th>Action</th>
-							</tr>
-								<tr class="{cycle values=",alt"}" id="guid{$result.guid}">
-									<td class="check"><input id="chk{$result.guid|substr:0:7}"
-															 type="checkbox" class="nzb_check"
-															 value="{$result.guid}"/></td>
-									<td>
-										<a title="View details"
-										   href="{$smarty.const.WWW_TOP}/details/{$result.guid}"></a>
-										<div>
-											<div>
-												{if $result.nfoid > 0}<span class="label label-default"><a
-															href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}"
-															class="text-muted">NFO</a></span>{/if}
-												{if $result.haspreview == 1 && $userdata.canpreview == 1}<a
-													href="{$smarty.const.WWW_TOP}/covers/preview/{$result.guid}_thumb.jpg"
-													name="name{$result.guid}"
-													title="Screenshot of {$result.animeTitle|escape:"htmlall"}"
-													class="label label-default" rel="preview">Preview</a>{/if}
-												<span class="label label-default">{$result.grabs}
-													Grab{if $result.grabs != 1}s{/if}</span>
-												{if $result.firstAired != ""}<span class="label label-success"
-																				  title="{$result.title} Aired on {$result.firstAired|date_format}">
-													Aired {if $result.firstAired|strtotime > $smarty.now}in future{else}{$result.firstAired|daysago}{/if}</span>{/if}
-												{if isset($result.reis) && $result.reid > 0}<span class="mediainfo label label-default"
-																		   title="{$result.guid}">Media</span>{/if}
-											</div>
+							<tr id="guid{$result.guid}">
+								<td>
+									<a title="View details" href="{$smarty.const.WWW_TOP}/details/{$result.guid}">{$result.searchname|escape:"htmlall"|replace:".":" "}</a>
+									<div class="resextra">
+										<div class="btns pull-left">
+											{if $result.nfoid > 0}<span class="label label-default"><a href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}" title="View Nfo" class="modal_nfo " rel="nfo">Nfo</a></span> {/if}
+											{if $result.haspreview == 1 && $userdata.canpreview == 1}<span class="label label-default"><a href="{$smarty.const.WWW_TOP}/covers/preview/{$result.guid}_thumb.jpg" name="name{$result.guid}" title="Screenshot of {$result.searchname|escape:"htmlall"}" class="modal_prev " rel="preview">Preview</a></span> {/if}
+											{if $result.reid > 0}<span class="mediainfo label label-default" title="{$result.guid}">Media</span>{/if}
 										</div>
-									</td>
-									<td><span class="label label-default">{$result.category_name}</span></td>
-									<td width="40" title="{$result.postdate}">{$result.postdate|timeago}</td>
-									<td>{$result.size|fsize_format:"MB"}</td>
-									<td class="icon_nzb"><a
-												href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}/{$result.animeTitle|escape:"htmlall"}"><i
-													class="fa fa-download text-muted"
-													title="Download NZB"></i></a>
-										<a href="{$smarty.const.WWW_TOP}/details/{$result.guid}/#comments"><i
-													class="fa fa-comments-o text-muted"
-													title="Comments"></i></a>
-										<a href="#" class="icon_cart text-muted"><i
-													class="fa fa-shopping-cart" title="Send to my Cart"></i></a>
-										{if isset($sabintegrated)}
-											<a href="#" class="icon_sab text-muted"><i class="fa fa-send-o"
-																					   title="Send to my Queue"></i></a>
+										{if $isadmin || $ismod}
+											<div class="admin pull-right">
+												<span class="label label-warning"><a class="" href="{$smarty.const.WWW_TOP}/admin/release-edit.php?id={$result.id}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}" title="Edit Release">Edit</a></span> <span class="label label-danger"><a class=" confirm_action" href="{$smarty.const.WWW_TOP}/admin/release-delete.php?id={$result.id}&amp;from={$smarty.server.REQUEST_URI|escape:"url"}" title="Delete Release">Del</a></span>
+											</div>
 										{/if}
-										{if $weHasVortex}
-											<a href="#" class="icon_vortex text-muted"><i
-														class="fa fa-send-o" title="Send to NZBVortex"></i></a>
-										{/if}
-									</td>
-								</tr>
+									</div>
+								</td>
+								<td style="text-align:center;"><a title="This anime in {$result.category_name}" href="{$smarty.const.WWW_TOP}/anime/{$result.anidbid}?t={$result.categoryid}">{$result.category_name}</a></td>
+								<td style="text-align:center;" title="{$result.postdate}">{$result.postdate|timeago}</td>
+								<td style="text-align:center;">{$result.size|fsize_format:"MB"}{if $result.completion > 0}<br>{if $result.completion < 100}<span class="warning">{$result.completion}%</span>{else}{$result.completion}%{/if}{/if}</td>
+								<td style="text-align:center;">
+									<a title="View file list" href="{$smarty.const.WWW_TOP}/filelist/{$result.guid}">{$result.totalpart}</a>
+									{if $result.rarinnerfilecount > 0}
+										<div class="rarfilelist">
+											<img src="{$smarty.const.WWW_TOP}/themes_shared/images/icons/magnifier.png" alt="{$result.guid}" class="tooltip">
+										</div>
+									{/if}
+								</td>
+								<td style="text-align:center;"><a title="View comments for {$result.searchname|escape:"htmlall"}" href="{$smarty.const.WWW_TOP}/details/{$result.guid}#comments">{$result.comments} cmt{if $result.comments != 1}s{/if}</a><br/>{$result.grabs} grab{if $result.grabs != 1}s{/if}</td>
+								<td class="icons" style="text-align:center;">
+									<div class="icon icon_nzb"><a title="Download Nzb" href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}">&nbsp;</a></div>
+									{if $sabintegrated}<div class="icon icon_sab" title="Send to my Queue"></div>{/if}
+									<div class="icon icon_cart" title="Add to Cart"></div>
+								</td>
+							</tr>
 						{/foreach}
 					</table>
 </form>
