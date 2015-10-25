@@ -27,7 +27,7 @@
 	{if animePicture != ""}
 		<center>
 			<img class="shadow img img-polaroid" alt="{$animeTitle} Picture"
-				 src="{$smarty.const.WWW_TOP}/covers/anime/{$animeAnidbID}.jpg"/>
+				 src="{$smarty.const.WWW_TOP}/covers/anime/{$animeAnidbid}.jpg"/>
 		</center>
 		<br/>
 	{/if}
@@ -104,7 +104,7 @@
 															 value="{$result.guid}"/></td>
 									<td>
 										<a title="View details"
-										   href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.animeTitle|escape:"htmlall"}">{$result.animeTitle|escape:"htmlall"|replace:".":" "}</a>
+										   href="{$smarty.const.WWW_TOP}/details/{$result.guid}"></a>
 										<div>
 											<div>
 												{if $result.nfoid > 0}<span class="label label-default"><a
@@ -118,7 +118,7 @@
 												<span class="label label-default">{$result.grabs}
 													Grab{if $result.grabs != 1}s{/if}</span>
 												{if $result.animeStartDate != ""}<span class="label label-success"
-																				  title="{$result.tvtitle} Aired on {$result.animeStartDate|date_format}">
+																				  title="{$result.title} Aired on {$result.animeStartDate|date_format}">
 													Aired {if $result.animeStartDate|strtotime > $smarty.now}in future{else}{$result.animeStartDate|daysago}{/if}</span>{/if}
 												{if isset($result.reis) && $result.reid > 0}<span class="mediainfo label label-default"
 																		   title="{$result.guid}">Media</span>{/if}
