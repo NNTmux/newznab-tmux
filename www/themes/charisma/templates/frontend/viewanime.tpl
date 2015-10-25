@@ -6,7 +6,6 @@
 {else}
 
 <div class="header">
-	{assign var="catsplit" value=">"|explode:$catname}
 	<h2>View > <strong>Anime</strong></h2>
 	<div class="breadcrumb-wrapper">
 		<ol class="breadcrumb">
@@ -20,11 +19,10 @@
 	{if isset($isadmin)}
 		<a class="btn btn-xs btn-warning"
 		   title="Edit AniDB data"
-		   href="{$smarty.const.WWW_TOP}/admin/anidb-edit.php?id={$animeanidbid}&amp;
+		   href="{$smarty.const.WWW_TOP}/admin/anidb-edit.php?id={$animeAnidbid}&amp;
 					from={$smarty.server.REQUEST_URI|escape:"url"}">Edit</a>
 	{/if}
 </h1>
-{if $catname != ''}<span class="text-info h5">Current category shown: {$catname|escape:"htmlall"}</span>{/if}
 <div>
 	{if animePicture != ""}
 		<center>
@@ -47,10 +45,10 @@
 <center>
 	<div class="btn-group">
 		<a class="btn btn-sm btn-default"
-		   href="{$site->dereferrer_link}http://anidb.net/perl-bin/animedb.pl?show=anime&amp;aid={$animeanidbid}"
+		   href="{$site->dereferrer_link}http://anidb.net/perl-bin/animedb.pl?show=anime&amp;aid={$animeAnidbid}"
 		   title="View AniDB">View AniDB</a>
 		<a class="btn btn-sm btn-default"
-		   href="{$smarty.const.WWW_TOP}/rss?anidb={$animeanidbid}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">RSS
+		   href="{$smarty.const.WWW_TOP}/rss?anidb={$animeAnidbid}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">RSS
 			feed for this Anime <i class="fa fa-rss"></i></a>
 	</div>
 </center>
@@ -89,7 +87,7 @@
 						   id="browsetable">
 						{foreach $animeEpisodeTitles as $animeEpno => $animeEpisodeTitle}
 							<tr>
-								<td style="padding-top:15px;" colspan="10"><h3>{$animeEpno}</h2></td>
+								<td style="padding-top:15px;" colspan="10"><h2>{$animeEpno}</h2></td>
 							</tr>
 							<tr>
 								<th><input id="chkSelectAll" type="checkbox" class="nzb_check_all"/></th>
@@ -106,7 +104,7 @@
 															 value="{$result.guid}"/></td>
 									<td>
 										<a title="View details"
-										   href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.searchname|escape:"htmlall"}">{$result.searchname|escape:"htmlall"|replace:".":" "}</a>
+										   href="{$smarty.const.WWW_TOP}/details/{$result.guid}/{$result.animeTitle|escape:"htmlall"}">{$result.animeTitle|escape:"htmlall"|replace:".":" "}</a>
 										<div>
 											<div>
 												{if $result.nfoid > 0}<span class="label label-default"><a
@@ -115,13 +113,13 @@
 												{if $result.haspreview == 1 && $userdata.canpreview == 1}<a
 													href="{$smarty.const.WWW_TOP}/covers/preview/{$result.guid}_thumb.jpg"
 													name="name{$result.guid}"
-													title="Screenshot of {$result.searchname|escape:"htmlall"}"
+													title="Screenshot of {$result.animeTitle|escape:"htmlall"}"
 													class="label label-default" rel="preview">Preview</a>{/if}
 												<span class="label label-default">{$result.grabs}
 													Grab{if $result.grabs != 1}s{/if}</span>
-												{if $result.firstaired != ""}<span class="label label-success"
-																				  title="{$result.tvtitle} Aired on {$result.firstaired|date_format}">
-													Aired {if $result.firstaired|strtotime > $smarty.now}in future{else}{$result.firstaired|daysago}{/if}</span>{/if}
+												{if $result.animeStartDate != ""}<span class="label label-success"
+																				  title="{$result.tvtitle} Aired on {$result.animeStartDate|date_format}">
+													Aired {if $result.animeStartDate|strtotime > $smarty.now}in future{else}{$result.animeStartDate|daysago}{/if}</span>{/if}
 												{if isset($result.reis) && $result.reid > 0}<span class="mediainfo label label-default"
 																		   title="{$result.guid}">Media</span>{/if}
 											</div>
@@ -131,7 +129,7 @@
 									<td width="40" title="{$result.postdate}">{$result.postdate|timeago}</td>
 									<td>{$result.size|fsize_format:"MB"}</td>
 									<td class="icon_nzb"><a
-												href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}/{$result.searchname|escape:"htmlall"}"><i
+												href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}/{$result.animeTitle|escape:"htmlall"}"><i
 													class="fa fa-download text-muted"
 													title="Download NZB"></i></a>
 										<a href="{$smarty.const.WWW_TOP}/details/{$result.guid}/#comments"><i
