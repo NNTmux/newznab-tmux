@@ -3,6 +3,8 @@ namespace newznab;
 
 use newznab\db\Settings;
 use newznab\libraries\Cache;
+use newznab\utility\Versions;
+
 
 class Sites
 {
@@ -20,6 +22,38 @@ class Sites
 	const ERR_BADLAMEPATH = -7;
 	const ERR_SABCOMPLETEPATH = -8;
 
+	/**
+	 * @var \newznab\db\Settings
+	 */
+	protected $_db;
+
+	/**
+	 * @var \newznab\utility\Versions|bool
+	 */
+	protected $_versions = false;
+
+	/**
+	 * @param array $options Class instances.
+	 */
+	public function __construct(array $options = [])
+	{
+		$defaults = [
+			'Settings' => null,
+		];
+		$options += $defaults;
+
+		$this->_db = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
+
+		if (defined('NN_VERSIONS')) {
+			try {
+				$this->_versions = new Versions(NN_VERSIONS);
+			} catch (\Exception $e) {
+				$this->_versions = false;
+			}
+		}
+	}
+
+
 	public function version()
 	{
 		return "0.4.1 nn-tmux-regexless";
@@ -27,7 +61,6 @@ class Sites
 
 	public function update($form)
 	{
-		$db = new Settings();
 		$site = $this->row2Object($form);
 
 		if (substr($site->nzbpath, strlen($site->nzbpath) - 1) != '/')
@@ -62,26 +95,25 @@ class Sites
 
 		$sql = $sqlKeys = [];
 		foreach ($form as $settingK => $settingV) {
-			$sql[] = sprintf("WHEN %s THEN %s", $db->escapeString($settingK), $db->escapeString(trim($settingV)));
-			$sqlKeys[] = $db->escapeString($settingK);
+			$sql[] = sprintf("WHEN %s THEN %s", $this->_db->escapeString($settingK), $this->_db->escapeString(trim($settingV)));
+			$sqlKeys[] = $this->_db->escapeString($settingK);
 		}
 
-		$db->exec(sprintf("update site SET value = CASE setting %s END WHERE setting IN (%s)", implode(' ', $sql), implode(', ', $sqlKeys)));
+		$this->_db->exec(sprintf("update site SET value = CASE setting %s END WHERE setting IN (%s)", implode(' ', $sql), implode(', ', $sqlKeys)));
 
 		return $this->get(true);
 	}
 
 	public function get($refresh = false)
 	{
-		$sql = "select * from settings";
+		$sql = "select * from site";
 
 		if ($refresh) {
 			$cache = new Cache();
 			$cache->delete($sql);
 		}
 
-		$db = new Settings();
-		$rows = $db->query($sql, true, NN_CACHE_EXPIRY_MEDIUM);
+		$rows = $this->_db->query($sql, true, NN_CACHE_EXPIRY_MEDIUM);
 
 		if ($rows === false)
 			return false;
@@ -91,7 +123,7 @@ class Sites
 
 	public function rows2Object($rows)
 	{
-		$obj = new stdClass;
+		$obj = new \stdClass;
 		foreach ($rows as $row)
 			$obj->{$row['setting']} = $row['value'];
 
@@ -102,7 +134,7 @@ class Sites
 
 	public function row2Object($row)
 	{
-		$obj = new stdClass;
+		$obj = new \stdClass;
 		$rowKeys = array_keys($row);
 		foreach ($rowKeys as $key)
 			$obj->{$key} = $row[$key];
@@ -132,10 +164,9 @@ class Sites
 
 	public function updateItem($setting, $value)
 	{
-		$db = new Settings();
-		$sql = sprintf("update site set value = %s where setting = %s", $db->escapeString($value), $db->escapeString($setting));
+		$sql = sprintf("update settings set value = %s where setting = %s", $this->_db->escapeString($value), $this->_db->escapeString($setting));
 
-		return $db->exec($sql);
+		return $this->_db->exec($sql);
 	}
 
 	public function updateLatestRegexRevision($rev)
