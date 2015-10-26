@@ -173,7 +173,7 @@ class Stats
 							and categoryid = 4050;";
 		/////////////amount of tv left to do/////////
 		$tvrage_query = "SELECT count(*) as todo from releases
-							where (rageid = -1 AND isrenamed = 0 AND proc_pp = 0 AND proc_par2 = 0 AND proc_nfo = 0 AND proc_files = 0 AND proc_sorter = 0)
+							where (videos_id = 0 AND isrenamed = 0 AND proc_pp = 0 AND proc_par2 = 0 AND proc_nfo = 0 AND proc_files = 0 AND proc_sorter = 0)
 							and categoryid in ( select id from category where parentid = 5000  AND categoryid != 5050);";
 		/////////////amount of XXX left to do/////////
 		$xxx_query = "SELECT count(*) as todo from releases

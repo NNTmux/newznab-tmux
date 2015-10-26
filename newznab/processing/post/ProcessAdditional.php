@@ -2303,8 +2303,7 @@ class ProcessAdditional
 						sprintf(
 							'
 							UPDATE releases
-							SET rageid = -1, seriesfull = NULL, season = NULL, episode = NULL,
-								tvtitle = NULL, tvairdate = NULL, imdbid = NULL, musicinfoid = NULL,
+								SET videos_id = 0, tv_episodes_id = 0, imdbid = NULL, musicinfoid = NULL,
 								consoleinfoid = NULL, bookinfoid = NULL, anidbid = NULL, prehashid = 0,
 								searchname = %s, isrenamed = 1, iscategorized = 1, proc_files = 1, categoryid = %d
 							WHERE id = %d',
@@ -2587,8 +2586,4 @@ class ProcessAdditional
 			$this->_echo('DEBUG: ' . $string, 'debug', $newline);
 		}
 	}
-}
-
-class ProcessAdditionalException extends \Exception
-{
 }

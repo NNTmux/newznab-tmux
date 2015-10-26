@@ -22,7 +22,6 @@ switch ($page->page) {
 	case 'books':
 	case 'browse':
 	case 'browsegroup':
-	case 'calendar':
 	case 'cart':
 	case 'console':
 	case 'consolemodal':
@@ -52,7 +51,6 @@ switch ($page->page) {
 	case 'profileedit':
 	case 'queue':
 	case 'register':
-	case 'rss-info':
 	case 'sabqueuedata':
 	case 'search':
 	case 'sendtoqueue':

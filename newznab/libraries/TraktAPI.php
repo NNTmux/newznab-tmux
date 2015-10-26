@@ -1,27 +1,15 @@
 <?php
-namespace newznab;
+namespace newznab\libraries;
 
 use newznab\utility\Utility;
 
 /**
- * Class TraktTv
- * Lookup information from trakt.tv using their API.
+ * Class TraktAPI
+ * Retrive info from the Trakt API.
  */
-class TraktTv extends TV
-{
-	/**
-	 * The Trakt.tv API v2 Client ID (SHA256 hash - 64 characters long string). Used for movie and tv lookups.
-	 * Create one here: https://trakt.tv/oauth/applications/new
-	 * @var array|bool|string
-	 */
-	private $clientID;
+Class TraktAPI {
 
-	/**
-	 * List of headers to send to Trakt.tv when making a request.
-	 * @see http://docs.trakt.apiary.io/#introduction/required-headers
-	 * @var array
-	 */
-	private $requestHeaders;
+	const API_URL = 'https://api-v2launch.trakt.tv/';
 
 	/**
 	 * Construct. Set up API key.
@@ -32,13 +20,14 @@ class TraktTv extends TV
 	 */
 	public function __construct(array $options = [])
 	{
-		parent::__construct($options);
-		$this->clientID = $this->pdo->getSetting('trakttvclientkey');
-		$this->requestHeaders = [
-			'Content-Type: application/json',
-			'trakt-api-version: 2',
-			'trakt-api-key: ' . $this->clientID
+		$defaults = [
+			'clientID' => '',
+			'headers'  => ''
 		];
+		$options += $defaults;
+
+		$this->clientID = $options['clientID'];
+		$this->requestHeaders = $options['headers'];
 	}
 
 	/**
@@ -67,7 +56,7 @@ class TraktTv extends TV
 		}
 
 		$array = $this->getJsonArray(
-			'https://api-v2launch.trakt.tv/shows/' .
+			self::API_URL . 'shows/' .
 			str_replace([' ', '_', '.'], '-', $title) .
 			'/seasons/' .
 			str_replace(['S', 's'], '', $season) .
@@ -110,7 +99,7 @@ class TraktTv extends TV
 				$extended = 'min';
 		}
 		$array = $this->getJsonArray(
-			'https://api-v2launch.trakt.tv/movies/' . str_replace([' ', '_', '.'], '-', str_replace(['(', ')'], '', $movie)),
+			self::API_URL . 'movies/' . str_replace([' ', '_', '.'], '-', str_replace(['(', ')'], '', $movie)),
 			$extended
 		);
 		if (!$array) {
@@ -124,7 +113,7 @@ class TraktTv extends TV
 	/**
 	 * Fetches shows calendar from trakt.tv .
 	 *
-	 * @param string     $start Start date of calendar.Default value is today.
+	 * @param string     $start Start date of calendar ie. 2015-09-01.Default value is today.
 	 * @param int $days  Number of days to lookup ahead. Default value is 7 days
 	 *
 	 * @return array|bool
@@ -135,16 +124,16 @@ class TraktTv extends TV
 	public function getCalendar($start = '', $days = 7)
 	{
 		$array = $this->getJsonArray(
-			'https://api-v2launch.trakt.tv/calendars/all/shows/' . $start . '/' . $days
+			self::API_URL . 'calendars/all/shows/' . $start . '/' . $days
 		);
-		if (!$array){
+		if (!$array) {
 			return false;
 		}
 		return $array;
 	}
 
 	/**
-	 * Fetches weekend box office data from trakt.tv. Data is updated every monday.
+	 * Fetches weekend box office data from trakt.tv, updated every monday.
 	 *
 	 * @return array|bool
 	 * @see    http://docs.trakt.apiary.io/#reference/movies/box-office/get-the-weekend-box-office
@@ -154,9 +143,9 @@ class TraktTv extends TV
 	public function getBoxOffice()
 	{
 		$array = $this->getJsonArray(
-			'https://api-v2launch.trakt.tv/movies/boxoffice'
+			self::API_URL . 'movies/boxoffice'
 		);
-		if (!$array){
+		if (!$array) {
 			return false;
 		}
 		return $array;
@@ -179,20 +168,42 @@ class TraktTv extends TV
 	 */
 	public function showSummary($show = '', $type = 'full')
 	{
+		$showUrl = self::API_URL . 'shows/' . str_replace([' ', '_', '.'], '-', str_replace(['(', ')'], '', $show));
+
 		switch($type) {
-			case 'full':
 			case 'images':
 			case 'full,images':
 				$extended = $type;
 				break;
+			case 'full':
 			default:
 				$extended = 'full';
 		}
-		$array = $this->getJsonArray(
-			'https://api-v2launch.trakt.tv/shows/' . str_replace([' ', '_', '.'], '-', str_replace(['(', ')'], '', $show)),
-			$extended
-		);
-		if (!$array){
+		$array = $this->getJsonArray($showUrl, $extended);
+		if (!$array) {
+			return false;
+		}
+		return $array;
+	}
+
+	/**
+	 * Fetches summary from trakt.tv for the show by doing a search.
+	 * Accepts a search string
+	 *
+	 * @param string $show title
+	 * @param string $type show
+	 *
+	 * @see http://docs.trakt.apiary.io/#reference/search/get-text-query-results
+	 *
+	 * @return bool|array|string
+	 *
+	 * @access public
+	 */
+	public function showSearch($show = '', $type = 'show')
+	{
+		$searchUrl = self::API_URL . 'search?query=' . str_replace([' ', '_', '.'], '-', str_replace(['(', ')'], '', $show)) . '&type=' . $type;
+		$array = $this->getJsonArray($searchUrl, '');
+		if (!$array) {
 			return false;
 		}
 		return $array;
@@ -207,18 +218,25 @@ class TraktTv extends TV
 	 *                         'min'         Returns enough info to match locally. (Default)
 	 *                         'images'      Minimal info and all images.
 	 *                         'full'        Complete info for an item.
-	 *                         'full,images' Complete info and all images.
-	 *
-	 * @return bool|mixed
-	 */
+	*                         'full,images' Complete info and all images.
+	*
+	* @return bool|mixed
+	*/
 	private function getJsonArray($URI, $extended = 'min')
 	{
+		if ($extended === '') {
+			$extendedString = '';
+		} else {
+			$extendedString = "?extended=" . $extended;
+		}
+
 		if (!empty($this->clientID)) {
 			$json = Utility::getUrl([
-					'url'            => $URI . "?extended=$extended",
+					'url'            => $URI . $extendedString,
 					'requestheaders' => $this->requestHeaders
 				]
 			);
+
 			if ($json !== false) {
 				$json = json_decode($json, true);
 				if (!is_array($json) || (isset($json['status']) && $json['status'] === 'failure')) {

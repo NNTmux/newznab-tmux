@@ -273,8 +273,7 @@ class RequestIDLocal extends RequestID
 			$this->pdo->queryExec(
 				sprintf('
 					UPDATE releases SET
-						rageid = -1, seriesfull = NULL, season = NULL, episode = NULL, tvtitle = NULL,
-						tvairdate = NULL, imdbid = NULL, musicinfoid = NULL, consoleinfoid = NULL,
+							SET videos_id = 0, tv_episodes_id = 0, imdbid = NULL, musicinfoid = NULL, consoleinfoid = NULL,
 						bookinfoid = NULL, anidbid = NULL, prehashid = %d, reqidstatus = %d, isrenamed = 1,
 						iscategorized = 1, searchname = %s, categoryid = %d
 					WHERE id = %d',
@@ -289,7 +288,7 @@ class RequestIDLocal extends RequestID
 		}
 
 		if ($this->_release['name'] !== $this->_newTitle['title'] && $this->_show == 1) {
-			\NameFixer::echoChangedReleaseName(
+			NameFixer::echoChangedReleaseName(
 				array(
 					'new_name'     => $this->_newTitle['title'],
 					'old_name'     => $this->_release['name'],

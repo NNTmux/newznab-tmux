@@ -476,10 +476,7 @@ class TmuxRun extends Tmux
 			case ($runVar['settings']['update_tv'] == 1 && (time() - $runVar['timers']['timer4'] >= $runVar['settings']['tv_timer'])) || ($runVar['counts']['iterations'] == 1):
 				$log = $this->writelog($runVar['panes']['one'][3]);
 				shell_exec("tmux respawnp -t{$runVar['constants']['tmux_session']}:1.2 ' \
-						{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}update_scripts/update_theaters.php $log; \
-						{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}testing/PostProc/populate_tvrage.php true $log; \
-						{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}update_scripts/update_tvschedule.php $log; \
-						{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}testing/PostProc/updateTvRage.php update $log; date +\"{$this->_dateFormat}\"' 2>&1 1> /dev/null"
+						{$runVar['commands']['_phpn']} {$runVar['paths']['misc']}update_scripts/update_theaters.php $log; date +\"{$this->_dateFormat}\"' 2>&1 1> /dev/null"
 				);
 				$runVar['timers']['timer4'] = time();
 				break;

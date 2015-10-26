@@ -39,9 +39,9 @@
 <br />
 
 <!-- ### -- IMAGE ON RIGHT -->
-{if $rage && $release.rageid > 0 && $rage.hascover != "0"}<img class="img-rounded" src="{$smarty.const.WWW_TOP}/covers/tvrage{$rage.id}.jpg" width="220" height="auto" alt="{$rage.releasetitle|escape:"htmlall"}" style="float:right;" />{/if}
-{if $movie && $release.rageid < 0 && $movie.banner == 1}<img class="shadow img-thumbnail" src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbid}-banner.jpg" alt="{$movie.title|escape:"htmlall"}" style="vertical-align:top;" />
-	{elseif $movie && $release.rageid < 0 && $movie.cover == 1}<img class="shadow img-thumbnail" src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbid}-cover.jpg" width="220" height="auto" alt="{$movie.title|escape:"htmlall"}" style="float:right;" />{/if}
+{if $rage && $release.videos_id > 0 && $rage.hascover != "0"}<img class="img-rounded" src="{$smarty.const.WWW_TOP}/covers/tvshows{$rage.id}.jpg" width="220" height="auto" alt="{$rage.releasetitle|escape:"htmlall"}" style="float:right;" />{/if}
+{if $movie && $release.videos_id < 0 && $movie.banner == 1}<img class="shadow img-thumbnail" src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbid}-banner.jpg" alt="{$movie.title|escape:"htmlall"}" style="vertical-align:top;" />
+	{elseif $movie && $release.videos_id < 0 && $movie.cover == 1}<img class="shadow img-thumbnail" src="{$smarty.const.WWW_TOP}/covers/movies/{$movie.imdbid}-cover.jpg" width="220" height="auto" alt="{$movie.title|escape:"htmlall"}" style="float:right;" />{/if}
 {if $game && $game.cover == 1}<img class="img-rounded" src="{$smarty.const.WWW_TOP}/covers/games/{$game.id}.jpg" width="160"
 								   alt="{$con.title|escape:"htmlall"}" style="float:right;" />{/if}
 {if $xxx && $xxx.cover == 1}<img class="img-rounded" src="{$smarty.const.WWW_TOP}/covers/xxx/{$xxx.id}-cover.jpg" width="160"
@@ -52,12 +52,12 @@
 {if $book && $book.cover == 1}<img class="img-rounded" src="{$smarty.const.WWW_TOP}/covers/book/{$book.id}.jpg" width="220" alt="{$book.title|escape:"htmlall"}" style="float:right;" />{/if}
 
 <!-- ### -- MEDIA DESCRIPTION -->
-{if $rage && $release.rageid > 0}
+{if $rage && $release.videos_id > 0}
 	<!-- TV Info -->
 	<strong>{if $release.tvtitle != ""}{$release.tvtitle|escape:"htmlall"} - {/if}{$release.seriesfull|replace:"S":"Season "|replace:"E":" Episode "}</strong><br />
 	{if $rage.description != ""}<span class="descinitial">{$rage.description|escape:"htmlall"|nl2br|magicurl|truncate:"350":"</span><a class=\"descmore\" href=\"#\">more...</a>"}{if $rage.description|strlen > 350}<span class="descfull">{$rage.description|escape:"htmlall"|nl2br|magicurl}</span>{else}{/if}<br /><br />{/if}
 {if $rage.genre != ""}<strong>Genre:</strong> {$rage.genre|escape:"htmlall"|replace:"|":", "}<br />{/if}
-{if $release.tvairdate != ""}<strong>Aired:</strong> {$release.tvairdate|date_format}<br/>{/if}
+{if $result.firstaired != ""}<strong>Aired:</strong> {$result.firstaired|date_format}<br/>{/if}
 {if $rage.country != ""}<strong>Country:</strong> {$rage.country}<br/>{/if}
 {if $episode && $release.episodeinfoid > 0}
 {if $episode.overview != ""}<strong>Overview:</strong> <span class="descinitial">{$episode.overview|escape:"htmlall"|nl2br|magicurl|truncate:"350":"</span><a class=\"descmore\" href=\"#\">more...</a>"}{if $episode.overview|strlen > 350}<span class="descfull">{$episode.overview|escape:"htmlall"|nl2br|magicurl}</span>{else}{/if}<br /><br />{/if}
@@ -68,12 +68,12 @@
 {if $episode.writer != ""}<strong>Writer:</strong> {$episode.writer|escape:"htmlall"|replace:"|":", "}{/if}
 {if $episode.gueststars != ""}<strong>Guest Stars:</strong> {$episode.gueststars|escape:"htmlall"|replace:"|":", "}{/if}
 {/if}<br /><div class="btn-group">
-	<a class="btn btn-mini" title="View all episodes from this series" href="{$smarty.const.WWW_TOP}/series/{$release.rageid}">All Episodes</a>
-	<a class="btn btn-mini" target="_blank" href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$release.rageid}" title="View at TV Rage">TV Rage</a>
+	<a class="btn btn-mini" title="View all episodes from this series" href="{$smarty.const.WWW_TOP}/series/{$release.videos_id}">All Episodes</a>
+	<a class="btn btn-mini" target="_blank" href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$release.videos_id}" title="View at TV Rage">TV Rage</a>
 	{if $release.tvdbid > 0}<a class="btn btn-mini" target="_blank" href="{$site->dereferrer_link}http://thetvdb.com/?tab=series&id={$release.tvdbid}&lid=7" title="View at TheTVDB">TheTVDB</a>{/if}
-	<a class="btn btn-mini" href="{$smarty.const.WWW_TOP}/rss?rage={$release.rageid}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}" title="Rss feed for this series">Series Rss Feed</a></div>
+	<a class="btn btn-mini" href="{$smarty.const.WWW_TOP}/rss?show={$release.videos_id}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}" title="Rss feed for this series">Series Rss Feed</a></div>
 {/if}
-{if $movie && $release.rageid < 0}
+{if $movie && $release.videos_id < 0}
 	<!-- Movie Info -->
 	<strong>{$movie.title|escape:"htmlall"} ({$movie.year})</strong>
 	{if $movie.tagline != ''}<br />{$movie.tagline|escape:"htmlall"}{/if}
@@ -114,7 +114,7 @@
     <strong>{if $release.tvtitle != ""}{$release.tvtitle|escape:"htmlall"}{/if}</strong><br />
 {if $anidb.description != ""}<span class="descinitial">{$anidb.description|escape:"htmlall"|nl2br|magicurl|truncate:"350":"</span><a class=\"descmore\" href=\"#\">more...</a>"}{if $anidb.description|strlen > 350}<span class="descfull">{$anidb.description|escape:"htmlall"|nl2br|magicurl}</span>{else}{/if}<br /><br />{/if}
 {if $anidb.categories != ""}<strong>Categories:</strong> {$anidb.categories|escape:"htmlall"|replace:"|":", "}<br />{/if}
-{if $release.tvairdate != "0000-00-00 00:00:00"}<strong>Aired:</strong> {$release.tvairdate|date_format}<br/>{/if}
+{if $result.firstaired != "0000-00-00 00:00:00"}<strong>Aired:</strong> {$result.firstaired|date_format}<br/>{/if}
 {if $episode && $release.episodeinfoid > 0}
 	{if $episode.overview != ""}<strong>Overview:</strong> {$episode.overview}{/if}
 				{if $episode.rating > 0}<strong>Rating:</strong> {$episode.rating}{/if}

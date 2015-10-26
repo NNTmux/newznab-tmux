@@ -289,8 +289,7 @@ class RequestIDWeb extends RequestID
 		$this->pdo->queryExec(
 			sprintf('
 				UPDATE releases
-				SET rageid = -1, seriesfull = NULL, season = NULL, episode = NULL, tvtitle = NULL,
-				tvairdate = NULL, imdbid = NULL, musicinfoid = NULL, consoleinfoid = NULL, bookinfoid = NULL, anidbid = NULL,
+					SET videos_id = 0, tv_episodes_id = 0, imdbid = NULL, musicinfoid = NULL, consoleinfoid = NULL, bookinfoid = NULL, anidbid = NULL,
 				reqidstatus = %d, isrenamed = 1, proc_files = 1, searchname = %s, categoryid = %d,
 				prehashid = %d
 				WHERE id = %d',
@@ -304,7 +303,7 @@ class RequestIDWeb extends RequestID
 		$this->sphinx->updateRelease($this->_release['id'], $this->pdo);
 
 		if ($this->echoOutput) {
-			\NameFixer::echoChangedReleaseName(array(
+			NameFixer::echoChangedReleaseName(array(
 					'new_name' => $this->_newTitle['title'],
 					'old_name' => $this->_release['searchname'],
 					'new_category' => $this->category->getNameByID($determinedCategory),

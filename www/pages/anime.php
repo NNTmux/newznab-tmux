@@ -1,33 +1,20 @@
 <?php
 
-use newznab\Releases;
 use newznab\AniDB;
-use newznab\Category;
+use newznab\Releases;
 
-if (!$page->users->isLoggedIn())
+if (!$page->users->isLoggedIn()) {
 	$page->show403();
+}
 
 $Releases = new Releases(['Settings' => $page->settings]);
 $AniDB = new AniDB(['Settings' => $page->settings]);
-$cat = new Category(['Settings' => $page->settings]);
 
 if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
 
 	# force the category to 5070 as it should be for anime, as $catarray was NULL and we know the category for sure for anime
 	$releases = $Releases->searchbyAnidbId($_GET['id'], '', 0, 1000, '', ['5070'], -1);
 	$anidb = $AniDB->getAnimeInfo($_GET['id']);
-	$category = Category::CAT_TV_ANIME;
-
-	if ($category == -1) {
-		$page->smarty->assign("catname", "All");
-	} else {
-		$cdata = $cat->getById($category);
-		if ($cdata) {
-			$page->smarty->assign('catname', $cdata["title"]);
-		} else {
-			$page->show404();
-		}
-	}
 
 	if (!$releases && !$anidb) {
 		$page->show404();
@@ -36,32 +23,10 @@ if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
 	} elseif (!$releases) {
 		$page->smarty->assign('nodata', 'No releases for this series.');
 	} else {
-		// Sort releases by season, episode, date posted.
-		$season = $episode = $posted = [];
 
-		foreach ($releases as $rlk => $rlv) {
-			$season[$rlk] = $rlv['season'];
-			$episode[$rlk] = $rlv['episode'];
-			$posted[$rlk] = $rlv['postdate'];
-		}
-
-		array_multisort($episode, SORT_DESC, $posted, SORT_DESC, $releases);
-
-		$seasons = [];
-		foreach ($releases as $r) {
-			$seasons[$r['season']][$r['episode']][] = $r;
-		}
-
-		$page->smarty->assign('seasons', $seasons);
 		$page->smarty->assign('anidb', $anidb);
-
-		$animeEpisodeTitles = [];
-		foreach ($releases as $r) {
-			$animeEpisodeTitles[$r['tvtitle']][] = $r;
-		}
-
-		$page->smarty->assign('animeEpisodeTitlesSize', count($animeEpisodeTitles));
-		$page->smarty->assign('animeEpisodeTitles', $animeEpisodeTitles);
+		$page->smarty->assign('animeEpisodeTitlesSize', count($releases));
+		$page->smarty->assign('animeEpisodeTitles', $releases);
 		$page->smarty->assign('animeAnidbID', $anidb['anidbid']);
 		# case is off on old variable this resolves that, I do not think the other is ever used, but left if anyways
 		$page->smarty->assign('animeAnidbid', $anidb['anidbid']);
@@ -73,28 +38,16 @@ if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
 		$page->smarty->assign('animeDescription', $anidb['description']);
 		$page->smarty->assign('animeRating', $anidb['rating']);
 		$page->smarty->assign('animeRelated', $anidb['related']);
-		if (isset($anidb['similar']) && $anidb['similar'] != '') {
-			$page->smarty->assign('animeSimilar', $anidb['similar']);
-		}
+		$page->smarty->assign('animeSimilar', $anidb['similar']);
 		$page->smarty->assign('animeCategories', $anidb['categories']);
+
+		$page->smarty->assign('nodata', '');
 
 		$page->title = $anidb['title'];
 		$page->meta_title = 'View Anime ' . $anidb['title'];
 		$page->meta_keywords = 'view,anime,anidb,description,details';
 		$page->meta_description = 'View ' . $anidb['title'] . ' Anime';
 	}
-
-	if ($category == -1) {
-		$page->smarty->assign("catname", "All");
-	} else {
-		$cdata = $cat->getById($category);
-		if ($cdata) {
-			$page->smarty->assign('catname', $cdata["title"]);
-		} else {
-			$page->show404();
-		}
-	}
-
 	$page->content = $page->smarty->fetch('viewanime.tpl');
 	$page->render();
 } else {
@@ -113,7 +66,7 @@ if (isset($_GET['id']) && ctype_digit($_GET['id'])) {
 	$page->meta_keywords = 'view,anime,series,description,details';
 	$page->meta_description = 'View Anime List';
 
-	$animelist = [];
+	$animelist = array();
 	if ($masterserieslist instanceof \Traversable) {
 		foreach ($masterserieslist as $s) {
 			if (preg_match('/^[0-9]/', $s['title'])) {
