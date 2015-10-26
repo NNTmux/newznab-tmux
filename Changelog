@@ -1,3 +1,5 @@
+2015-10-27 DariusIII
+	Upd: Pull latest changes from nZEDb (fix trakt, speedup show search etc)
 2015-10-26 DariusIII
 	Upd: Sites class, add default constructor
 	Upd: Refactor TV support
