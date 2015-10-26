@@ -499,11 +499,14 @@ abstract class TV extends Videos
 	 */
 	public function getBySeasonEp($id, $series, $episode, $airdate = '')
 	{
-		if ($airdate === '') {
+		if ($episode > 0) {
 			$queryString = sprintf('series = %d AND episode = %d', $series, $episode);
+		} else if (!empty($airdate) && $airdate !== '') {
+			$queryString = sprintf('DATE(firstaired) = %s', $this->pdo->escapeString(date('Y-m-d', $airdate)));
 		} else {
-			$queryString = sprintf('DATE(firstaired) = %s', $this->pdo->escapeString($airdate));
+			return false;
 		}
+
 		$episodeArr = $this->pdo->queryOneRow(
 			sprintf("
 				SELECT id
@@ -740,21 +743,14 @@ abstract class TV extends Videos
 					$showInfo['year'] = $yearMatch[1] . $yearMatch[2];
 				}
 
-				$showInfo['season'] = sprintf('S%02d', $showInfo['season']);
 				// Check for multi episode release.
 				if (is_array($showInfo['episode'])) {
-					$tmpArr = [];
-					foreach ($showInfo['episode'] as $ep) {
-						$tmpArr[] = sprintf('E%02d', $ep);
-					}
-					$showInfo['episode'] = implode('', $tmpArr);
-				} else {
-					$showInfo['episode'] = sprintf('E%02d', $showInfo['episode']);
+					$showInfo['episode'] = $showInfo['episode'][0];
 				}
 
-				$showInfo['seriesfull'] = $showInfo['season'] . $showInfo['episode'];
+				$showInfo['seriesfull'] = sprintf('S02%d', $showInfo['season']) . sprintf('E02%d', $showInfo['episode']);
 			}
-			$showInfo['airdate'] = (!empty($showInfo['airdate']) ? $showInfo['airdate'] : '');
+			$showInfo['airdate'] = (isset($showInfo['airdate']) && !empty($showInfo['airdate']) ? $showInfo['airdate'] : '');
 			return $showInfo;
 		}
 		return false;
