@@ -1,4 +1,5 @@
 2015-10-26 DariusIII
+	Upd: Sites class, add default constructor
 	Upd: Refactor TV support
 2015-10-21 DariusIII
 	Fix: NZB error in processing/post/AniDB
