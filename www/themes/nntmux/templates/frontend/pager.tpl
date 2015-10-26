@@ -1,44 +1,11 @@
-{assign var="pages" value=($pagertotalitems/$pageritemsperpage)|roundup}
-{assign var="currentpage" value=($pageroffset+$pageritemsperpage)/$pageritemsperpage}
-{assign var="upperhalfwaypoint" value=((($pages-$currentpage)/2)|roundup)+$currentpage}
- 
-{if $pages > 1}
-{strip} 
-<div class="pager">
-	{if $currentpage > 1}
-		<a title="Goto page 1" href="{$pagerquerybase}0{$pagerquerysuffix}">1</a>&nbsp;
+{strip}
+	{if $pagertotalitems > $pageritemsperpage}
+		<div class="pager">
+			{section name=pager loop=$pagertotalitems start=0 step=$pageritemsperpage}
+				{if $pageroffset == $smarty.section.pager.index}<span class="current" title="Current page {$smarty.section.pager.iteration}">{$smarty.section.pager.iteration}</span>&nbsp;
+				{elseif $pageroffset-$smarty.section.pager.index == $pageritemsperpage || $pageroffset+$pageritemsperpage == $smarty.section.pager.index}<a title="Goto page {$smarty.section.pager.iteration}" href="{$pagerquerybase}{$smarty.section.pager.index}{$pagerquerysuffix}">{$smarty.section.pager.iteration}</a>&nbsp;{elseif ($pagertotalitems-($smarty.section.pager.index+$pageritemsperpage)) < 0}... <a title="Goto last page" href="{$pagerquerybase}{$smarty.section.pager.index}{$pagerquerysuffix}">{$smarty.section.pager.iteration}</a>
+				{elseif $smarty.section.pager.index > (($pagertotalitems/2)+$pageroffset+1)  && $smarty.section.pager.index < (($pagertotalitems/2)+$pageroffset)+50}... <a title="Goto page {$smarty.section.pager.iteration}" href="{$pagerquerybase}{$smarty.section.pager.index}{$pagerquerysuffix}">{$smarty.section.pager.iteration}</a>&nbsp;{elseif ($pagertotalitems-($smarty.section.pager.index+$pageritemsperpage)) < 0}... <a title="Goto last page" href="{$pagerquerybase}{$smarty.section.pager.index}{$pagerquerysuffix}">{$smarty.section.pager.iteration}</a>
+				{elseif ($smarty.section.pager.iteration == 1)}<a title="Goto first page" href="{$pagerquerybase}0{$pagerquerysuffix}">1</a> ... {/if}{/section}
+		</div>
 	{/if}
-
-	{if $currentpage > 3}
-		<span class="step">...</span>
-	{/if}
-
-	{if $currentpage > 2}
-		<a title="Goto page {$currentpage-1}" href="{$pagerquerybase}{$pageroffset-$pageritemsperpage}{$pagerquerysuffix}">{$currentpage-1}</a>&nbsp;
-	{/if}	
-
-	<span class="current" title="Current page {$currentpage}">{$currentpage}</span>
-
-	{if ($currentpage+1) < $pages}
-		&nbsp;<a title="Goto page {$currentpage+1}" href="{$pagerquerybase}{$pageroffset+$pageritemsperpage}{$pagerquerysuffix}">{$currentpage+1}</a>
-	{/if}	
-
-	{if ($currentpage+1) < ($pages-1) && ($currentpage+2) < $upperhalfwaypoint}
-		<span class="step">&nbsp;...</span>
-	{/if}	
-
-	{if $upperhalfwaypoint != $pages && $upperhalfwaypoint != ($currentpage+1)}
-		&nbsp;<a title="Goto page {$upperhalfwaypoint}" href="{$pagerquerybase}{$upperhalfwaypoint*$pageritemsperpage}{$pagerquerysuffix}">{$upperhalfwaypoint}</a>
-	{/if}	
-
-	{if ($upperhalfwaypoint+1) < $pages}
-		<span class="step">&nbsp;...</span>
-	{/if}	
-
-	{if $pages > $currentpage}
-		&nbsp;<a title="Goto page {$pages}" href="{$pagerquerybase}{($pages*$pageritemsperpage)-$pageritemsperpage}{$pagerquerysuffix}">{$pages}</a>
-	{/if}			
-
-</div>
 {/strip}
-{/if}

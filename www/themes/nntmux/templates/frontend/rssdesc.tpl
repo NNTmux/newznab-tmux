@@ -2,7 +2,7 @@
 			<h1>{$page->title}</h1>
 
 			<p>
-				Here you can choose rss feeds from site categories. The feeds will present either decriptions or
+				Here you can choose rss feeds from settings categories. The feeds will present either decriptions or
 				downloads of Nzb files.
 			</p>
 
@@ -87,11 +87,11 @@
 			<ul style="text-align: left;">
 				<li>
 					Tv Series (Use the TVRage id)<br/>
-					<a href="{$smarty.const.WWW_TOP}/rss?rage=1234&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">{$smarty.const.WWW_TOP}/rss/?rage=1234&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}</a>
+					<a href="{$smarty.const.WWW_TOP}/rss?show=1234&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">{$smarty.const.WWW_TOP}/rss/?rage=1234&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}</a>
 				</li>
 				<li>
 					Tv Series aired in last seven days (Using the TVRage id and airdate)<br/>
-					<a href="{$smarty.const.WWW_TOP}/rss?rage=1234&amp;airdate=7&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">{$smarty.const.WWW_TOP}/rss/?rage=1234&amp;airdate=7&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}</a>
+					<a href="{$smarty.const.WWW_TOP}/rss?show=1234&amp;airdate=7&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">{$smarty.const.WWW_TOP}/rss/?rage=1234&amp;airdate=7&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}</a>
 				</li>
 				<li>
 					Anime Feed (Use the AniDB id)<br/>

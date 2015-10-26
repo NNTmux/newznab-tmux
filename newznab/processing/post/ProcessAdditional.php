@@ -6,18 +6,18 @@ require_once NN_LIBS . 'rarinfo/par2info.php';
 
 use newznab\db\Settings;
 use newznab\utility\Utility;
-use newznab\Releases;
 use newznab\NZB;
 use newznab\Groups;
 use newznab\NNTP;
-use newznab\ReleaseFiles;
 use newznab\Categorize;
-use newznab\Category;
-use newznab\NameFixer;
+use newznab\Nfo;
+use newznab\ReleaseFiles;
 use newznab\ReleaseExtra;
 use newznab\ReleaseImage;
-use newznab\Nfo;
+use newznab\NameFixer;
 use newznab\SphinxSearch;
+use newznab\Releases;
+use newznab\Category;
 
 class ProcessAdditional
 {
@@ -702,7 +702,7 @@ class ProcessAdditional
 	 */
 	protected function _getNZBContents()
 	{
-		$nzbPath = $this->_nzb->getNZBPath($this->_release['guid']);
+		$nzbPath = $this->_nzb->NZBPath($this->_release['guid']);
 		if ($nzbPath === false) {
 
 			$this->_echo('NZB not found for GUID: ' . $this->_release['guid'], 'warning');
@@ -2303,8 +2303,7 @@ class ProcessAdditional
 						sprintf(
 							'
 							UPDATE releases
-							SET tvinfoid = -1, seriesfull = NULL, season = NULL, episode = NULL,
-								tvtitle = NULL, tvairdate = NULL, imdbid = NULL, musicinfoid = NULL,
+								SET videos_id = 0, tv_episodes_id = 0, imdbid = NULL, musicinfoid = NULL,
 								consoleinfoid = NULL, bookinfoid = NULL, anidbid = NULL, prehashid = 0,
 								searchname = %s, isrenamed = 1, iscategorized = 1, proc_files = 1, categoryid = %d
 							WHERE id = %d',

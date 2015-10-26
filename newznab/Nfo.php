@@ -98,20 +98,27 @@ class Nfo
 	}
 
 	/**
-	 * Look for a TvRage id in a string.
+	 * Look for a TV Show ID in a string. TODO: Add other scrape sources
 	 *
-	 * @param string  $str   The string with a TvRage id.
-	 * @return string The TVRage id on success.
+	 * @param string  $str   The string with a Show ID.
 	 *
-	 * @return bool   False on failure.
+	 * @return array|bool   Return array with show ID and site source or false on failure.
 	 *
 	 * @access public
 	 */
-	public function parseRageId($str) {
+	public function parseShowId($str)
+	{
+		$return = false;
+
 		if (preg_match('/tvrage\.com\/shows\/id-(\d{1,6})/i', $str, $matches)) {
-			return trim($matches[1]);
+			$return = (
+			[
+				'showid' => trim($matches[1]),
+				'site'   => 'tvrage'
+			]
+			);
 		}
-		return false;
+		return $return;
 	}
 
 	/**
@@ -263,7 +270,7 @@ class Nfo
 	 * Attempt to find NFO files inside the NZB's of releases.
 	 *
 	 * @param object $nntp           Instance of class NNTP.
-	 * @param string $groupID        (optional) Group id.
+	 * @param string $groupID        (optional) Group ID.
 	 * @param string $guidChar       (optional) First character of the release GUID (used for multi-processing).
 	 * @param int    $processImdb    (optional) Attempt to find IMDB id's in the NZB?
 	 * @param int    $processTvrage  (optional) Attempt to find TvRage id's in the NZB?
@@ -340,7 +347,6 @@ class Nfo
 				]
 			);
 			$movie = new Movie(['Echo' => $this->echo, 'Settings' => $this->pdo]);
-			$tvRage = new TvRage(['Echo' => $this->echo, 'Settings' => $this->pdo]);
 
 			foreach ($res as $arr) {
 				$fetchedBinary = $nzbContents->getNFOfromNZB($arr['guid'], $arr['id'], $arr['groupid'], $groups->getByNameByID($arr['groupid']));
@@ -357,22 +363,22 @@ class Nfo
 					$ret++;
 					$movie->doMovieUpdate($fetchedBinary, 'nfo', $arr['id'], $processImdb);
 
-					// If set scan for tvrage info.
+					// If set scan for tvrage info. Disabled for now while TvRage is down. TODO: Add Other Scraper Checks
 					if ($processTvrage == 1) {
-						$rageId = $this->parseRageId($fetchedBinary);
-						if ($rageId !== false) {
+						/*$tvRage = new TvRage(['Echo' => $this->echo, 'Settings' => $this->pdo]);
+						$showId = $this->parseShowId($fetchedBinary);
+						if ($showId !== false) {
 							$show = $tvRage->parseNameEpSeason($arr['name']);
 							if (is_array($show) && $show['name'] != '') {
 								// Update release with season, ep, and air date info (if available) from release title.
 								$tvRage->updateEpInfo($show, $arr['id']);
-
 								$rid = $tvRage->getByRageID($rageId);
 								if (!$rid) {
 									$tvrShow = $tvRage->getRageInfoFromService($rageId);
 									$tvRage->updateRageInfo($rageId, $show, $tvrShow, $arr['id']);
 								}
 							}
-						}
+						}*/
 					}
 				}
 			}
@@ -384,9 +390,10 @@ class Nfo
 				'SELECT r.id
 				FROM releases r
 				WHERE r.nzbstatus = %d
-				AND r.nfostatus < %d %s %s',
+				AND r.nfostatus < %d AND r.nfostatus > %d %s %s',
 				NZB::NZB_ADDED,
 				$this->maxRetries,
+				self::NFO_FAILED,
 				$groupIDQuery,
 				$guidCharQuery
 			)
@@ -394,26 +401,22 @@ class Nfo
 
 		if ($releases instanceof \Traversable) {
 			foreach ($releases as $release) {
-				$this->pdo->queryExec(
-					sprintf('DELETE FROM releasenfo WHERE nfo IS NULL AND releaseid = %d', $release['id'])
+				// remove any release_nfos for failed
+				$this->pdo->queryExec(sprintf('
+					DELETE FROM releasenfo WHERE nfo IS NULL AND releaseid = %d',
+						$release['id']
+					)
+				);
+
+				// set release.nfostatus to failed
+				$this->pdo->queryExec(sprintf('
+					UPDATE releases r SET r.nfostatus = %d WHERE r.id = %d',
+						self::NFO_FAILED,
+						$release['id']
+					)
 				);
 			}
 		}
-
-		// Set releases with no NFO.
-		$this->pdo->queryExec(
-			sprintf('
-				UPDATE releases r
-				SET r.nfostatus = %d
-				WHERE r.nzbstatus = %d
-				AND r.nfostatus < %d %s %s',
-				self::NFO_FAILED,
-				NZB::NZB_ADDED,
-				$this->maxRetries,
-				$groupIDQuery,
-				$guidCharQuery
-			)
-		);
 
 		if ($this->echo) {
 			if ($nfoCount > 0) {
@@ -425,4 +428,5 @@ class Nfo
 		}
 		return $ret;
 	}
+
 }
