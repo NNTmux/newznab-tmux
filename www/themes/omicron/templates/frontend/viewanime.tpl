@@ -86,9 +86,6 @@
 						   id="browsetable">
 						{foreach $animeEpisodeTitles as $result}
 							<tr>
-								<td style="padding-top:15px;" colspan="10"><h2>{$result.searchname}</h2></td>
-							</tr>
-							<tr>
 								<th><input id="chkSelectAll" type="checkbox" class="nzb_check_all"/></th>
 								<th>Name</th>
 								<th>Category</th>

@@ -1,4 +1,5 @@
 2015-10-27 DariusIII
+	Upd: Remove searchname header from anime page
 	Chg: Change anime view page
 	Upd: Update the Readme.md for latest changes
 	Upd: Pull latest changes from nZEDb (fix trakt, speedup show search etc)
