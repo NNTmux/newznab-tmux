@@ -21,6 +21,8 @@
 
 require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
 
+use newznab\ColorCLI;
+
 define('NN_GIT', NN_ROOT . '.git' . DS);
 define('NN_HOOKS', NN_GIT . 'hooks' . DS);
 define('PRE_COMMIT_HOOK', 'pre-commit');
