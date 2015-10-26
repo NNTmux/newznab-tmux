@@ -61,7 +61,7 @@
 											 src="{$smarty.const.WWW_TOP}/covers/games/{$result.gamesinfo_id}.jpg"/>
 									{elseif $type == 'TV'}
 										<img height="130px" width="130px" alt=""
-											 src="{$smarty.const.WWW_TOP}/covers/tvrage/{$result.tvid}.jpg"/>
+											 src="{$smarty.const.WWW_TOP}/covers/tvshows/{$result.tvid}.jpg"/>
 									{/if}
 								</a>
 							</div>
@@ -176,7 +176,7 @@
 									{elseif $type == 'TV'}
 										<div class="icon icon_tvrage">
 											<a class="divlink" title="View in TvRage"
-											   href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$result.rageid}"
+											   href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$result.videos_id}"
 											   target="_blank"></a>
 										</div>
 									{/if}

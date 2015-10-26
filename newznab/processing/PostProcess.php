@@ -1,27 +1,26 @@
 <?php
 namespace newznab\processing;
 
+use newznab\Books;
+use newznab\Category;
+use newznab\Console;
+use newznab\Games;
+use newznab\Groups;
+use newznab\Logger;
+use newznab\Movie;
+use newznab\Music;
+use newznab\NameFixer;
+use newznab\Nfo;
+use newznab\Sharing;
+//use newznab\processing\tv\TvRage;
+use newznab\processing\tv\TVDB;
+use newznab\XXX;
+use newznab\ReleaseFiles;
 use newznab\db\Settings;
 use newznab\processing\post\AniDB;
 use newznab\processing\post\ProcessAdditional;
-use newznab\Logger;
-use newznab\NameFixer;
-use newznab\Groups;
-use newznab\Nfo;
-use newznab\ReleaseFiles;
-use newznab\Books;
-use newznab\Console;
-use newznab\Games;
-use newznab\Movie;
-use newznab\Music;
-use newznab\XXX;
-use newznab\TvRage;
-use newznab\TheTVDB;
-use newznab\NNTP;
-use newznab\Category;
 use newznab\SpotNab;
-use newznab\Sharing;
-
+use newznab\utility;
 
 require_once NN_LIBS . 'rarinfo/par2info.php';
 
@@ -69,12 +68,12 @@ class PostProcess
 	private $echooutput;
 
 	/**
-	 * @var Groups
+	 * @var \newznab\Groups
 	 */
 	private $groups;
 
 	/**
-	 * @var Nfo
+	 * @var \newznab\Nfo
 	 */
 	private $Nfo;
 
@@ -101,23 +100,21 @@ class PostProcess
 		];
 		$options += $defaults;
 
-		//\\ Various.
+		// Various.
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
-		//\\
-		//\\ Class instances.
+
+		// Class instances.
 		$this->pdo = (($options['Settings'] instanceof Settings) ? $options['Settings'] : new Settings());
-		$this->groups = (($options['Groups'] instanceof Groups) ? $options['Groups'] : new Groups());
+		$this->groups = (($options['Groups'] instanceof Groups) ? $options['Groups'] : new Groups(['Settings' => $this->pdo]));
 		$this->_par2Info = new \Par2Info();
 		$this->debugging = ($options['Logger'] instanceof Logger ? $options['Logger'] : new Logger(['ColorCLI' => $this->pdo->log]));
 		$this->nameFixer = (($options['NameFixer'] instanceof NameFixer) ? $options['NameFixer'] : new NameFixer(['Echo' => $this->echooutput, 'Settings' => $this->pdo, 'Groups' => $this->groups]));
-		$this->Nfo = (($options['Nfo'] instanceof Nfo ) ? $options['Nfo'] : new Nfo(['Echo' => $this->echooutput, 'Settings' => $this->pdo]));
+		$this->Nfo = (($options['Nfo'] instanceof Nfo) ? $options['Nfo'] : new Nfo(['Echo' => $this->echooutput, 'Settings' => $this->pdo]));
 		$this->releaseFiles = (($options['ReleaseFiles'] instanceof ReleaseFiles) ? $options['ReleaseFiles'] : new ReleaseFiles($this->pdo));
-		//\\
 
-		//\\ Site settings.
+		// Site settings.
 		$this->addpar2 = ($this->pdo->getSetting('addpar2') == 0) ? false : true;
 		$this->alternateNNTP = ($this->pdo->getSetting('alternate_nntp') == 1 ? true : false);
-		//\\
 	}
 
 	/**
@@ -131,15 +128,14 @@ class PostProcess
 	{
 		$this->processAdditional($nntp);
 		$this->processNfos($nntp);
-		$this->processSpotnab();
 		$this->processSharing($nntp);
+		$this->processSpotnab();
 		$this->processMovies();
 		$this->processMusic();
 		$this->processConsoles();
 		$this->processGames();
 		$this->processAnime();
 		$this->processTv();
-		$this->processTvDB();
 		$this->processXXX();
 		$this->processBooks();
 	}
@@ -195,7 +191,7 @@ class PostProcess
 	/**
 	 * Lookup imdb if enabled.
 	 *
-	 * @param string     $groupID       (Optional) id of a group to work on.
+	 * @param string     $groupID       (Optional) ID of a group to work on.
 	 * @param string     $guidChar      (Optional) First letter of a release GUID to use to get work.
 	 * @param int|string $processMovies (Optional) 0 Don't process, 1 process all releases,
 	 *                                             2 process renamed releases only, '' check site setting
@@ -225,8 +221,8 @@ class PostProcess
 	/**
 	 * Process nfo files.
 	 *
-	 * @param NNTP   $nntp
-	 * @param string $groupID  (Optional) id of a group to work on.
+	 * @param \newznab\NNTP   $nntp
+	 * @param string $groupID  (Optional) ID of a group to work on.
 	 * @param string $guidChar (Optional) First letter of a release GUID to use to get work.
 	 *
 	 * @return void
@@ -235,6 +231,35 @@ class PostProcess
 	{
 		if ($this->pdo->getSetting('lookupnfo') == 1) {
 			$this->Nfo->processNfoFiles($nntp, $groupID, $guidChar, (int)$this->pdo->getSetting('lookupimdb'), (int)$this->pdo->getSetting('lookuptvrage'));
+		}
+	}
+
+	/**
+	 * Process comments.
+	 *
+	 * @param \newznab\NNTP $nntp
+	 */
+	public function processSharing(&$nntp)
+	{
+		(new Sharing(['Settings' => $this->pdo, 'NNTP' => $nntp]))->start();
+	}
+
+	/**
+	 * Process all TV related releases which will assign their series/episode/rage data.
+	 *
+	 * @param string     $groupID   (Optional) ID of a group to work on.
+	 * @param string     $guidChar  (Optional) First letter of a release GUID to use to get work.
+	 * @param string|int $processTV (Optional) 0 Don't process, 1 process all releases,
+	 *                                         2 process renamed releases only, '' check site setting
+	 *
+	 * @return void
+	 */
+	public function processTv($groupID = '', $guidChar = '', $processTV = '')
+	{
+		$processTV = (is_numeric($processTV) ? $processTV : $this->pdo->getSetting('lookuptvrage'));
+		if ($processTV > 0) {
+			(new TVDB(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processTVDB($groupID, $guidChar, $processTV);
+			//(new TvRage(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processTvRage($groupID, $guidChar, $processTV);
 		}
 	}
 
@@ -260,43 +285,6 @@ class PostProcess
 	}
 
 	/**
-	 * Process comments.
-	 *
-	 * @param NNTP $nntp
-	 */
-	public function processSharing(&$nntp)
-	{
-		(new Sharing(['Settings' => $this->pdo, 'NNTP' => $nntp]))->start();
-	}
-
-	/**
-	 * Process all TV related releases which will assign their series/episode/rage data.
-	 *
-	 * @param string     $groupID   (Optional) id of a group to work on.
-	 * @param string     $guidChar  (Optional) First letter of a release GUID to use to get work.
-	 * @param string|int $processTV (Optional) 0 Don't process, 1 process all releases,
-	 *                                         2 process renamed releases only, '' check site setting
-	 *
-	 * @return void
-	 */
-	public function processTv($groupID = '', $guidChar = '', $processTV = '')
-	{
-		$processTV = (is_numeric($processTV) ? $processTV : $this->pdo->getSetting('lookuptvrage'));
-		if ($processTV > 0) {
-			(new TvRage(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processTvReleases($groupID, $guidChar, $processTV);
-		}
-	}
-
-	public function processTvDB()
-	{
-		if ($this->pdo->getSetting('lookupthetvdb') == 1)
-		{
-			$thetvdb = new TheTVDB($this->echooutput);
-			$thetvdb->processReleases();
-		}
-	}
-
-	/**
 	 * Lookup xxx if enabled.
 	 */
 	public function processXXX()
@@ -311,8 +299,8 @@ class PostProcess
 	 *
 	 * @note Called externally by tmux/bin/update_per_group and update/postprocess.php
 	 *
-	 * @param NNTP       $nntp    Class NNTP
-	 * @param int|string $groupID  (Optional) id of a group to work on.
+	 * @param \newznab\NNTP       $nntp    Class NNTP
+	 * @param int|string $groupID  (Optional) ID of a group to work on.
 	 * @param string     $guidChar (Optional) First char of release GUID, can be used to select work.
 	 *
 	 * @return void
@@ -328,9 +316,9 @@ class PostProcess
 	 * @note Called from NZBContents.php
 	 *
 	 * @param string $messageID MessageID from NZB file.
-	 * @param int    $relID     id of the release.
-	 * @param int    $groupID   Group id of the release.
-	 * @param NNTP   $nntp      Class NNTP
+	 * @param int    $relID     ID of the release.
+	 * @param int    $groupID   Group ID of the release.
+	 * @param \newznab\NNTP   $nntp      Class NNTP
 	 * @param int    $show      Only show result or apply iy.
 	 *
 	 * @return bool
@@ -359,7 +347,7 @@ class PostProcess
 		$foundName = true;
 		if (!in_array(
 			(int)$query['categoryid'],
-			array(
+			[
 				Category::CAT_BOOK_OTHER,
 				Category::CAT_GAME_OTHER,
 				Category::CAT_MOVIE_OTHER,
@@ -369,7 +357,7 @@ class PostProcess
 				Category::CAT_MISC_HASHED,
 				Category::CAT_XXX_OTHER,
 				Category::CAT_MISC_OTHER
-			)
+			]
 		)
 		) {
 			$foundName = false;

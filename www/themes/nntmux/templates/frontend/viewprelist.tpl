@@ -10,7 +10,7 @@
 	</form>
 </div>
 
-{$site->adbrowse}	
+{$site->adbrowse}
 
 {if $results|@count > 0}
 
@@ -32,7 +32,7 @@
 				<a title="View details" href="{$smarty.const.WWW_TOP}/details/{$pre.guid}/{$pre.dirname}">{$pre.dirname|wordwrap:80:"\n":true}</a>
 				{else}
 				{$pre.dirname|wordwrap:80:"\n":true}
-				{if $pre.nuketype != '' && $pre.nukereason != ''}</br style="font-size: 12px"><sub>({$pre.nuketype}: {$pre.nukereason})</sub>{/if}
+				{if $pre.nuketype != '' && $pre.nukereason != ''} style="font-size: 12px"><sub>({$pre.nuketype}: {$pre.nukereason})</sub>{/if}
 				{/if}
 			</td>
 			<td class="mid"><a href="{$smarty.const.WWW_TOP}/predb?c={$pre.category}">{$pre.category}</a></td>

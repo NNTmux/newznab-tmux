@@ -12,7 +12,6 @@
 							<li><a href="{$smarty.const.WWW_TOP}/browse?t={$parentcat.id}">TV</a></li>
 							<hr>
 							<li><a href="{$smarty.const.WWW_TOP}/series">TV Series</a></li>
-							<li><a href="{$smarty.const.WWW_TOP}/calendar">TV Calendar</a></li>
 							<li><a href="{$smarty.const.WWW_TOP}/anime">Anime Series</a></li>
 							<li><a href="{$smarty.const.WWW_TOP}/myshows">My Shows</a></li>
 							<hr>
@@ -137,7 +136,7 @@
 							{if $userdata.bookview == "1"}
 								<li><a href="{$smarty.const.WWW_TOP}/books">{$parentcat.title}</a></li>
 							{elseif $userdata.bookview != "1"}
-								<li><a href="{$smarty.const.WWW_TOP}/browse?t=7000">{$parentcat.title}</a></li>
+								<li><a href="{$smarty.const.WWW_TOP}/browse?t=8000">{$parentcat.title}</a></li>
 							{/if}
 							<hr>
 							{foreach from=$parentcat.subcatlist item=subcat}
