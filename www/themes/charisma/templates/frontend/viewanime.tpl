@@ -84,16 +84,15 @@
 				<div class="panel-body pagination2">
 					<table style="width:100%;" class="data table table-condensed table-striped table-responsive table-hover"
 						   id="browsetable">
+						<tr>
+							<th><input id="chkSelectAll" type="checkbox" class="nzb_check_all"/></th>
+							<th>Name</th>
+							<th>Category</th>
+							<th>Posted</th>
+							<th>Size</th>
+							<th>Action</th>
+						</tr>
 						{foreach $animeEpisodeTitles as $result}
-							<tr>
-								<th><input id="chkSelectAll" type="checkbox" class="nzb_check_all"/></th>
-								<th>Name</th>
-								<th>Category</th>
-								<th>Posted</th>
-								<th>Size</th>
-								<th>Action</th>
-							</tr>
-
 								<tr class="{cycle values=",alt"}" id="guid{$result.guid}">
 									<td class="check"><input id="chk{$result.guid|substr:0:7}"
 															 type="checkbox" class="nzb_check"
