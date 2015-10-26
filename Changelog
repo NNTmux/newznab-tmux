@@ -1,3 +1,5 @@
+2015-10-26 DariusIII
+	Upd: Refactor TV support
 2015-10-21 DariusIII
 	Fix: NZB error in processing/post/AniDB
 	Fix: Instantiation of Genres class in Console.php and path to postprocess_pre in TmuxRun.php
