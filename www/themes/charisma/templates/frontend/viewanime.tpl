@@ -84,7 +84,7 @@
 				<div class="panel-body pagination2">
 					<table style="width:100%;" class="data table table-condensed table-striped table-responsive table-hover"
 						   id="browsetable">
-						{foreach $animeEpisodeTitles as $animeEpno => $animeEpisodeTitle}
+						{foreach $animeEpisodeTitles as $result}
 							<tr>
 								<td style="padding-top:15px;" colspan="10"><h2>{$animeEpisodeTitle}</h2></td>
 							</tr>
@@ -96,7 +96,7 @@
 								<th>Size</th>
 								<th>Action</th>
 							</tr>
-							{foreach $animeEpisodeTitle as $result}
+
 								<tr class="{cycle values=",alt"}" id="guid{$result.guid}">
 									<td class="check"><input id="chk{$result.guid|substr:0:7}"
 															 type="checkbox" class="nzb_check"
@@ -144,7 +144,6 @@
 									</td>
 								</tr>
 							{/foreach}
-						{/foreach}
 					</table>
 </form>
 {/if}
