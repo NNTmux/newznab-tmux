@@ -206,7 +206,6 @@ class Releases
 					CONCAT(cp.title, ' > ', c.title) AS category_name,
 					CONCAT(cp.id, ',', c.id) AS category_ids,
 					COUNT(df.id) AS failed,
-					g.name AS group_name,
 					rn.id AS nfoid,
 					re.releaseid AS reid,
 					v.tvdb, v.trakt, v.tvrage, v.tvmaze, v.imdb, v.tmdb,
