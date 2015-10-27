@@ -9,7 +9,7 @@ use newznab\ReleaseImage;
 use newznab\Categorize;
 use newznab\NZB;
 use newznab\ReleaseRegex;
-use newznab\Page;
+use newznab\NZBInfo;
 
 $releases = new Releases();
 $releaseImage = new ReleaseImage();
@@ -61,7 +61,7 @@ foreach ($filestoprocess as $nzbFile) {
 	$groupID = -1;
 	$groupName = "";
 	$num++;
-	$nzbInfo = new nzbInfo;
+	$nzbInfo = new NZBInfo();
 
 	if (!$nzbInfo->loadFromFile($nzbFile, true)) {
 		echo "Failed to load nzb from disk " . $nzbFile . "\n";
