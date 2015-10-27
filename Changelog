@@ -1,4 +1,5 @@
 2015-10-27 DariusIII
+	Fix: remove rss functions from Releases.php, fix python scripts looking for DB_SYSTEM constant
 	Upd: Monitor and Tmux for irc scraper
 	Upd: Change the name of versions file to nntmux.xml
 	Chg: Change tvinfoid to rageid in patch 138

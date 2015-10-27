@@ -63,9 +63,9 @@ if len(sys.argv) > 1 and sys.argv[1] == "all":
 	# removing the % before the variables at the end of the query adds quotes/escapes strings
 	cur[0].execute("SELECT name, first_record FROM groups WHERE first_record != 0 AND backfill = 1 %s" % (group))
 else:
-	if conf['DB_SYSTEM'] == "mysql":
+	if conf['DB_TYPE'] == "mysql":
 		cur[0].execute("SELECT name, first_record FROM groups WHERE first_record != 0 AND first_record_postdate IS NOT NULL AND backfill = 1 AND (NOW() - interval %s DAY) < first_record_postdate %s LIMIT %s" % (backfilldays, group, groups))
-	elif conf['DB_SYSTEM'] == "pgsql":
+	elif conf['DB_TYPE'] == "pgsql":
 		cur[0].execute("SELECT name, first_record FROM groups WHERE first_record != 0 AND first_record_postdate IS NOT NULL AND backfill = 1 AND (NOW() - interval '%s DAYS') < first_record_postdate %s LIMIT %s" % (backfilldays, group, groups))
 
 datas = cur[0].fetchall()
