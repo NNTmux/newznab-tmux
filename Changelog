@@ -1,3 +1,5 @@
+2015-10-28 DariusIII
+	Fix: Improve non-cover browse speed, fix undefined offset in Tv.php regex processing
 2015-10-27 DariusIII
 	Fix: Fix the anime pages in charisma/omicron templates
 	Upd: Update the readme for latest changes
