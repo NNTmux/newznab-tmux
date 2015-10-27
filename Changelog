@@ -1,4 +1,5 @@
 2015-10-28 DariusIII
+	Upd: Update monitor, tmux and fix patches and schema
 	Fix: Wrong name of DB_TYPE constant
 	Chg: Rename scrape into irc_scraper
 	Upd: Change the name of the versions file to nntmux.xml
