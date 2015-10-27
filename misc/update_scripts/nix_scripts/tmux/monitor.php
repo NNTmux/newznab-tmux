@@ -14,6 +14,9 @@ $tOut = new TmuxOutput($pdo);
 
 $runVar['paths']['misc'] = NN_MISC;
 $runVar['paths']['lib'] = NN_LIB;
+$runVar['paths']['cli'] = NN_ROOT . 'cli/';
+$runVar['paths']['scraper'] = NN_MISC . 'IRCScraper' . DS . 'scrape.php';
+
 $db_name = DB_NAME;
 $dbtype = DB_TYPE;
 $tmux = $tRun->get('niceness');
