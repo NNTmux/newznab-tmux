@@ -363,7 +363,6 @@ class Releases
 					CONCAT(cp.title, ' > ', c.title) AS category_name,
 					CONCAT(cp.id, ',', c.id) AS category_ids,
 					COUNT(df.id) AS failed,
-					g.name AS group_name,
 					rn.id AS nfoid,
 					re.releaseid AS reid,
 					v.tvdb, v.trakt, v.tvrage, v.tvmaze, v.imdb, v.tmdb,
@@ -385,7 +384,8 @@ class Releases
 				LEFT OUTER JOIN releasevideo re ON re.releaseid = r.id
 				LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
 				LEFT OUTER JOIN dnzb_failures df ON df.guid = r.guid
-				GROUP BY r.id",
+				GROUP BY r.id
+				ORDER BY %7\$s %8\$s",
 			NZB::NZB_ADDED,
 			$this->showPasswords,
 			$this->categorySQL($cat),
