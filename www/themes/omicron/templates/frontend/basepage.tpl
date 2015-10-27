@@ -115,7 +115,7 @@
 										<a href="{$serverroot}mymovies"><i class="fa fa-film"></i> My Movies</a>
 									</div>
 									<div class="col-xs-12 text-center">
-										<a href="{$serverroot}/myshows"><i class="fa fa-television" My Shows</a>
+										<a href="{$serverroot}/myshows"><i class="fa fa-television"></i> My Shows</a>
 									</div>
 									<div class="col-xs-12 text-center">
 										<a href="{$serverroot}profileedit"><i class="fa fa-cog fa-spin"></i> Account Settings</a>
