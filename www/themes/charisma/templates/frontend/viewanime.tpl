@@ -4,7 +4,6 @@
 	<p>{$nodata}</p>
 </div>
 {else}
-
 <div class="header">
 	<h2>View > <strong>Anime</strong></h2>
 	<div class="breadcrumb-wrapper">
@@ -24,7 +23,7 @@
 	{/if}
 </h1>
 <div>
-	{if animePicture != ""}
+	{if animePicture != ''}
 		<center>
 			<img class="shadow img img-polaroid" alt="{$animeTitle} Picture"
 				 src="{$smarty.const.WWW_TOP}/covers/anime/{$animeAnidbid}.jpg"/>
@@ -85,39 +84,35 @@
 				<div class="panel-body pagination2">
 					<table style="width:100%;" class="data table table-condensed table-striped table-responsive table-hover"
 						   id="browsetable">
-						{foreach $animeEpisodeTitles as $animeEpno => $animeEpisodeTitle}
-							<tr>
-								<td style="padding-top:15px;" colspan="10"><h2>{$animeEpno}</h2></td>
-							</tr>
-							<tr>
-								<th><input id="chkSelectAll" type="checkbox" class="nzb_check_all"/></th>
-								<th>Name</th>
-								<th>Category</th>
-								<th>Posted</th>
-								<th>Size</th>
-								<th>Action</th>
-							</tr>
-							{foreach $animeEpisodeTitle as $result}
+						<tr>
+							<th><input id="chkSelectAll" type="checkbox" class="nzb_check_all"/></th>
+							<th>Name</th>
+							<th>Category</th>
+							<th>Posted</th>
+							<th>Size</th>
+							<th>Action</th>
+						</tr>
+						{foreach $animeEpisodeTitles as $result}
 								<tr class="{cycle values=",alt"}" id="guid{$result.guid}">
 									<td class="check"><input id="chk{$result.guid|substr:0:7}"
 															 type="checkbox" class="nzb_check"
 															 value="{$result.guid}"/></td>
 									<td>
 										<a title="View details"
-										   href="{$smarty.const.WWW_TOP}/details/{$result.guid}"></a>
+										   href="{$smarty.const.WWW_TOP}/details/{$result.guid}">{$result.searchname|escape:"htmlall"|replace:".":" "}</a>
 										<div>
 											<div>
-												{if isset($result.nfoid) && $result.nfoid > 0}<span class="label label-default"><a
+												{if $result.nfoid > 0}<span class="label label-default"><a
 															href="{$smarty.const.WWW_TOP}/nfo/{$result.guid}"
 															class="text-muted">NFO</a></span>{/if}
-												{if isset($result.haspreview) && $result.haspreview == 1 && $userdata.canpreview == 1}<a
+												{if $result.haspreview == 1 && $userdata.canpreview == 1}<a
 													href="{$smarty.const.WWW_TOP}/covers/preview/{$result.guid}_thumb.jpg"
 													name="name{$result.guid}"
 													title="Screenshot of {$result.animeTitle|escape:"htmlall"}"
 													class="label label-default" rel="preview">Preview</a>{/if}
-												{if isset($result.grabs)}<span class="label label-default">{$result.grabs}
-													Grab{if $result.grabs != 1}s{/if}</span>{/if}
-												{if isset($result.reid) && $result.reid > 0}<span class="mediainfo label label-default"
+												<span class="label label-default">{$result.grabs}
+													Grab{if $result.grabs != 1}s{/if}</span>
+												{if $result.reid > 0}<span class="mediainfo label label-default"
 																		   title="{$result.guid}">Media</span>{/if}
 											</div>
 										</div>
@@ -145,7 +140,6 @@
 									</td>
 								</tr>
 							{/foreach}
-						{/foreach}
 					</table>
 </form>
 {/if}

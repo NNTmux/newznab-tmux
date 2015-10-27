@@ -49,12 +49,7 @@ class TraktTv extends TV
 			'trakt-api-version: 2',
 			'trakt-api-key: ' . $this->clientID
 		];
-		$this->client = new TraktAPI(
-				[
-					'headers' => $this->requestHeaders,
-					'clientID' => $this->clientID
-				]
-		);
+		$this->client = new TraktAPI(['clientID' => $this->pdo->getSetting('trakttvclientkey')]);
 	}
 
 	public function getBanner($videoId, $siteID)
