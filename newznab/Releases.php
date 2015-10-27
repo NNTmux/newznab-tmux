@@ -1417,8 +1417,7 @@ class Releases
 	}
 
 	/**
-	 * @param int    $aniDbID
-	 * @param string $episodeNumber
+	 * @param        $aniDbID
 	 * @param int    $offset
 	 * @param int    $limit
 	 * @param string $name
@@ -1427,16 +1426,17 @@ class Releases
 	 *
 	 * @return array
 	 */
-	public function searchbyAnidbId($aniDbID, $episodeNumber = '', $offset = 0, $limit = 100, $name = '', $cat = [-1], $maxAge = -1)
+	public function searchbyAnidbId($aniDbID, $offset = 0, $limit = 100, $name = '', $cat = [-1], $maxAge = -1)
 	{
 		$whereSql = sprintf(
 			"%s
-			WHERE r.passwordstatus %s AND r.nzbstatus = %d %s %s %s %s %s",
+			WHERE r.passwordstatus %s
+			AND r.nzbstatus = %d
+			%s %s %s %s",
 			($name !== '' ? $this->releaseSearch->getFullTextJoinString() : ''),
 			$this->showPasswords,
 			NZB::NZB_ADDED,
 			($aniDbID > -1 ? sprintf(' AND anidbid = %d ', $aniDbID) : ''),
-			(is_numeric($episodeNumber) ? sprintf(" AND r.episode '%s' ", $this->pdo->likeString($episodeNumber)) : ''),
 			($name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : ''),
 			$this->categorySQL($cat),
 			($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : '')
@@ -1447,11 +1447,13 @@ class Releases
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
 				%s AS category_ids,
 				groups.name AS group_name,
-				rn.id AS nfoid
+				rn.id AS nfoid,
+				re.releaseid AS reid
 			FROM releases r
 			INNER JOIN category c ON c.id = r.categoryid
 			INNER JOIN groups ON groups.id = r.groupid
 			LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
+			LEFT OUTER JOIN releaseextrafull re ON re.releaseid = r.id
 			INNER JOIN category cp ON cp.id = c.parentid
 			%s",
 			$this->getConcatenatedCategoryIDs(),
