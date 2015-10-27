@@ -32,7 +32,6 @@ INSERT IGNORE INTO settings (setting, value) VALUES
 ('fixnamesperrun', '1'),
 ('zippath', ''),
 ('processjpg', '1'),
-('run_ircscraper', '0'),
 ('nntpretries', '10'),
 ('imdburl', '0'),
 ('yydecoderpath', ''),
