@@ -1,5 +1,5 @@
 2015-10-28 DariusIII
-	Chg: Start adding TvMaze and update Trakt support
+	Upd: Add missing TraktAPI class, remove classes from newznab folder, fix porting errors
 2015-10-27 DariusIII
 	Fix: Scrape countries properly
 	Fix: remove rss functions from Releases.php, fix python scripts looking for DB_SYSTEM constant
