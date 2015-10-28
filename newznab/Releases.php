@@ -961,7 +961,6 @@ class Releases
 		$wherepos = strpos($sql, "where");
 		$sqlcount = "SELECT count(releases.id) AS num FROM releases INNER JOIN musicinfo ON musicinfo.id = releases.musicinfoid " . substr($sql, $wherepos, $orderpos - $wherepos);
 
-		$countres = $this->pdo->queryOneRow($sqlcount, true);
 		$res = $this->pdo->query($sql, true);
 
 		return $res;
@@ -998,7 +997,6 @@ class Releases
 		$wherepos = strpos($sql, "where");
 		$sqlcount = "SELECT count(releases.id) AS num FROM releases INNER JOIN bookinfo ON bookinfo.id = releases.bookinfoid " . substr($sql, $wherepos, $orderpos - $wherepos);
 
-		$countres = $this->pdo->queryOneRow($sqlcount, true);
 		$res = $this->pdo->query($sql, true);
 
 		return $res;
