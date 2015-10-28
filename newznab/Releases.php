@@ -829,69 +829,6 @@ class Releases
 		return $sql;
 	}
 
-
-	/**
-	 * @param        $rageId
-	 * @param string $series
-	 * @param string $episode
-	 * @param int    $offset
-	 * @param int    $limit
-	 * @param string $name
-	 * @param array  $cat
-	 * @param int    $maxAge
-	 *
-	 * @return array
-	 */
-	public function searchbyRageId($rageId, $series = '', $episode = '', $offset = 0, $limit = 100, $name = '', $cat = [-1], $maxAge = -1)
-	{
-		$whereSql = sprintf(
-			"%s
-			WHERE r.categoryid BETWEEN 5000 AND 5999
-			AND r.nzbstatus = %d
-			AND r.passwordstatus %s %s %s %s %s %s %s",
-			($name !== '' ? $this->releaseSearch->getFullTextJoinString() : ''),
-			NZB::NZB_ADDED,
-			$this->showPasswords,
-			($rageId != -1 ? sprintf(' AND tvinfoid = %d ', $rageId) : ''),
-			($series != '' ? sprintf(' AND UPPER(r.season) = UPPER(%s)', $this->pdo->escapeString(((is_numeric($series) && strlen($series) != 4) ? sprintf('S%02d', $series) : $series))) : ''),
-			($episode != '' ? sprintf(' AND r.episode %s', $this->pdo->likeString((is_numeric($episode) ? sprintf('E%02d', $episode) : $episode))) : ''),
-			($name !== '' ? $this->releaseSearch->getSearchSQL(['searchname' => $name]) : ''),
-			$this->categorySQL($cat),
-			($maxAge > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxAge) : '')
-		);
-
-		$baseSql = sprintf(
-			"SELECT r.*,
-				concat(cp.title, ' > ', c.title) AS category_name,
-				CONCAT(cp.id, ',', c.id) AS category_ids,
-				groups.name AS group_name,
-				rn.id AS nfoid,
-				re.releaseid AS reid
-			FROM releases r
-			INNER JOIN category c ON c.id = r.categoryid
-			INNER JOIN groups ON groups.id = r.groupid
-			LEFT OUTER JOIN releasevideo re ON re.releaseid = r.id
-			LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id AND rn.nfo IS NOT NULL
-			INNER JOIN category cp ON cp.id = c.parentid
-			%s",
-			$whereSql
-		);
-
-		$sql = sprintf(
-			"%s
-			ORDER BY postdate DESC
-			LIMIT %d OFFSET %d",
-			$baseSql,
-			$limit,
-			$offset
-		);
-		$releases = $this->pdo->query($sql);
-		if ($releases && count($releases)) {
-			$releases[0]['_totalrows'] = $this->getPagerCount($baseSql);
-		}
-		return $releases;
-	}
-
 	/**
 	 * Search for releases by album/artist/musicinfo. Used by API.
 	 */
@@ -2299,9 +2236,9 @@ class Releases
 		else
 			$parameters['reqid'] = " null ";
 
-		$parameters['id'] = $this->pdo->queryInsert(sprintf("INSERT INTO releases (name, searchname, totalpart, groupid, adddate, guid, categoryid, regexid, tvinfoid, postdate, fromname, size, reqid, passwordstatus, completion, haspreview, nfostatus, nzbstatus,
+		$parameters['id'] = $this->pdo->queryInsert(sprintf("INSERT INTO releases (name, searchname, totalpart, groupid, adddate, guid, categoryid, regexid, videos_id, postdate, fromname, size, reqid, passwordstatus, completion, haspreview, nfostatus, nzbstatus,
 					isrenamed, iscategorized, reqidstatus, prehashid)
-                    VALUES (%s, %s, %d, %d, now(), %s, %d, %s, -1, %s, %s, 0, %s, %d, 100,-1, -1, %d, %d, 1, %d, %d)",
+                    VALUES (%s, %s, %d, %d, now(), %s, %d, %s, 0, %s, %s, 0, %s, %d, 100,-1, -1, %d, %d, 1, %d, %d)",
 				$parameters['name'],
 				$parameters['searchname'],
 				$parameters['totalpart'],
