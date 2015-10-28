@@ -10,10 +10,10 @@
 		{if $result['imdb_id'] != ""}
 		<tr class="{cycle values=",alt"}">
 			<td class="mid">
-			
+
 				<div class="movcover">
-				
-					<img class="shadow" src="{if $result['cover'] ==""}{$smarty.const.WWW_TOP}/covers/movies/no-cover.jpg{else}{$result['cover']}{/if}" width="120" border="0" alt="{$result['title']|escape:"htmlall"}" />
+
+					<img class="shadow" src="{if $result['cover'] ==""}{$smarty.const.WWW_TOP}/covers/movies/{$smarty.const.WWW_TOP}themes_shared/images/no-cover.png{else}{$result['cover']}{/if}" width="120" border="0" alt="{$result['title']|escape:"htmlall"}" />
 					<div class="movextra">
 						{if $ourmovies[$result['imdb_id']] != ""}
 						<a href="#" name="name{$result['imdb_id']}" title="View movie info" class="rndbtn modal_imdb" rel="movie" >Cover</a>
@@ -24,11 +24,11 @@
 			</td>
 			<td colspan="3" class="left">
 				<h2>
-				<a href="{$smarty.const.WWW_TOP}/movies?title={$result['title']}">{$result['title']|escape:"htmlall"}</a> 
+				<a href="{$smarty.const.WWW_TOP}/movies?title={$result['title']}">{$result['title']|escape:"htmlall"}</a>
 				{if $result['year'] != ""}(<a class="title" href="{$smarty.const.WWW_TOP}/movies?year={$result['year']}">{$result['year']}</a>){/if}
 				{if $result['rating'] > 0}{$result['rating']}/10{/if}
-				</h2>				
-				
+				</h2>
+
 				{$result['plot']}
 
 				<br/><br/>
