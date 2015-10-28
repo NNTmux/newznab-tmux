@@ -1,4 +1,5 @@
 2015-10-28 DariusIII
+	Add: Add .idea folder to gitignore
 	Fix: Scrape countries properly
 	Fix: Fix the patches again
 	Upd: Update monitor, tmux and fix patches and schema
