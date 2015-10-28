@@ -1,4 +1,5 @@
 2015-10-28 DariusIII
+	Upd: Make scrutinizer happy
 	Upd: Remove totalrows count ffrom some functions and api
 	Add: Add .idea folder to gitignore
 	Fix: Scrape countries properly
