@@ -126,7 +126,7 @@
 							<a class="title" title="View details"
 							   href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}/{$result.grp_release_name|escape:"htmlall"}">
 								<img class="shadow"
-									 src="{$smarty.const.WWW_TOP}/covers/music/{if $result.cover == 1}{$result.musicinfoid}.jpg{else}no-cover.jpg{/if}"
+									 src="{$smarty.const.WWW_TOP}/covers/music/{if $result.cover == 1}{$result.musicinfoid}.jpg{else}{$smarty.const.WWW_TOP}themes_shared/images/no-cover.png{/if}"
 									 width="120" border="0"
 									 alt="{$result.artist|escape:"htmlall"} - {$result.title|escape:"htmlall"}"/>
 							</a>
