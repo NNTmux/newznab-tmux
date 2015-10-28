@@ -569,8 +569,8 @@
 		<tr>
 			<td style="width:180px;"><label for="scrape_cz">Scrape Irc Channels:</label></td>
 			<td>
-				{html_radios id="scrape" name='scrape' values=$yesno_ids output=$yesno_names
-				selected=$ftmux->scrape separator='<br />'}
+				{html_radios id="run_ircscraper" name='run_ircscraper' values=$yesno_ids output=$yesno_names
+				selected=$ftmux->run_ircscraper separator='<br />'}
 				<div class="hint">Choose to run IRCScraper on irc channels. Setting SCRAPE_IRC_C_Z_BOOL parameter to
 					true or false in settings.php will toggle between the servers. The pane for this can not be
 					created after tmux starts.

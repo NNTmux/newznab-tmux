@@ -65,7 +65,6 @@ INSERT INTO site (setting, value) VALUES
 ('fixnamesperrun', '1'),
 ('zippath', ''),
 ('processjpg', '1'),
-('scrape', '1'),
 ('nntpretries', '10'),
 ('imdburl', '0'),
 ('yydecoderpath', ''),

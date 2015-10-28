@@ -1,5 +1,10 @@
 2015-10-28 DariusIII
-	Upd: Add .idea folder to .gitignore
+	Add: Add .idea folder to gitignore
+	Fix: Scrape countries properly
+	Fix: Fix the patches again
+	Upd: Update monitor, tmux and fix patches and schema
+	Fix: Wrong name of DB_TYPE constant
+	Chg: Rename scrape into irc_scraper
 	Upd: Change the name of the versions file to nntmux.xml
 	Upd: Move My Shows link from TV to Account area. Update import.
 	Fix: Fix the query again
