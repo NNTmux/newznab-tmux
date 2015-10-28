@@ -691,7 +691,6 @@ class Sphinx
         $count = 0;
         if ( count($results) > 0 && array_key_exists("total", $meta) ) {
             $count = (int)$meta["total_found"];
-            $results[0]["_totalrows"] = ($count > MAX_MATCHES) ? MAX_MATCHES : $count;
         }
 
         if ($useCache !== false && $cache->enabled)
@@ -1324,10 +1323,8 @@ class Sphinx
     public function getPreCount($dirname='', $category='')
     {
         $results = $this->getPreRange(0, 1, $dirname, $category);
-        if (is_array($results)) {
-            return $results[0]['_totalrows'];
-        }
-        return -1;
+
+        return $results;
     }
 
     /**
