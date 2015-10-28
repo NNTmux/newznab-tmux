@@ -4,6 +4,7 @@ namespace newznab;
 use newznab\db\Settings;
 use newznab\utility\Utility;
 use newznab\libraries\Tmdb\TMDB;
+use newznab\processing\tv\TraktTv;
 
 /**
  * Class Movie
@@ -427,7 +428,7 @@ class Movie
 			$this->traktTv = new TraktTv(['Settings' => $this->pdo]);
 		}
 
-		$data = $this->traktTv->movieSummary('tt' . $imdbID, 'full,images');
+		$data = $this->traktTv->client->movieSummary('tt' . $imdbID, 'full,images');
 		if ($data) {
 			$this->parseTraktTv($data);
 			if (isset($data['trailer']) && !empty($data['trailer'])) {
@@ -993,7 +994,7 @@ class Movie
 		if (is_null($this->traktTv)) {
 			$this->traktTv = new TraktTv(['Settings' => $this->pdo]);
 		}
-		$resp = $this->traktTv->movieSummary('tt' . $imdbId, 'full,images');
+		$resp = $this->traktTv->client->movieSummary('tt' . $imdbId, 'full,images');
 		if ($resp !== false) {
 			$ret = [];
 			if ($this->checkVariable($resp['images']['poster']['thumb'])) {
@@ -1148,7 +1149,7 @@ class Movie
 					}
 
 					// Check on trakt.
-					$data = $this->traktTv->movieSummary($movieName, 'full,images');
+					$data = $this->traktTv->client->movieSummary($movieName, 'full,images');
 					if ($data !== false) {
 						$this->parseTraktTv($data);
 						if (isset($data['ids']['imdb'])) {
