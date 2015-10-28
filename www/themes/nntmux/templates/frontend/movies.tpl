@@ -115,7 +115,7 @@
 								class="modal_imdb thumbnail" rel="movie"
 								><img
 									class="img-rounded" style="margin: 3px 0;"
-									src="{$smarty.const.WWW_TOP}/covers/movies/{if $result.cover == 1}{$result.imdbid}-cover.jpg{else}no-cover.jpg{/if}"
+									src="{$smarty.const.WWW_TOP}/covers/movies/{if $result.cover == 1}{$result.imdbid}-cover.jpg{else}{$smarty.const.WWW_TOP}themes_shared/images/no-cover.png{/if}"
 									width="120" border="0" alt="{$result.title|escape:"htmlall"}"
 									></a>
 

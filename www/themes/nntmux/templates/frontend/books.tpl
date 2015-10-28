@@ -76,7 +76,7 @@
 						<div class="movcover">
 							<a class="title" href="{$site->dereferrer_link}{$result.url}">
 								<img class="shadow"
-									 src="{$smarty.const.WWW_TOP}/covers/book/{if $result.cover == 1}{$result.bookinfoid}.jpg{else}no-cover.jpg{/if}"
+									 src="{$smarty.const.WWW_TOP}/covers/book/{if $result.cover == 1}{$result.bookinfoid}.jpg{else}{$smarty.const.WWW_TOP}themes_shared/images/no-cover.png{/if}"
 									 width="120" border="0"
 									 alt="{$result.author|escape:"htmlall"} - {$result.title|escape:"htmlall"}"/>
 							</a>

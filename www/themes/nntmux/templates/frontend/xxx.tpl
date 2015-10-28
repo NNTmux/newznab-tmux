@@ -99,7 +99,7 @@
 						class="modal_xxx thumbnail" rel="viewxxx"
 						><img
 							class="shadow" style="margin: 3px 0;"
-							src="{$smarty.const.WWW_TOP}/covers/xxx/{if $result.cover == 1}{$result.id}-cover.jpg{else}no-cover.jpg{/if}"
+							src="{$smarty.const.WWW_TOP}/covers/xxx/{if $result.cover == 1}{$result.id}-cover.jpg{else}{$smarty.const.WWW_TOP}themes_shared/images/no-cover.png{/if}"
 							width="130" border="0" alt="{$result.title|escape:"htmlall"}"
 							></a>
 
