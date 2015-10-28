@@ -1,4 +1,5 @@
 2015-10-28 DariusIII
+	Fix: Fix the no cover image
 	Fix: Remove unused $countres
 	Upd: Remove totalrows count to speed up site
 	Fix: Fix the typo in releasesearch tablename

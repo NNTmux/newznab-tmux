@@ -120,7 +120,7 @@
 							<a class="title" title="View details"
 							   href="{$smarty.const.WWW_TOP}/details/{$result.grp_release_guid}/{$result.grp_release_name|escape:"htmlall"}">
 								<img class="shadow"
-									 src="{$smarty.const.WWW_TOP}/covers/console/{if $result.cover == 1}{$result.consoleinfoid}.jpg{else}no-cover.jpg{/if}"
+									 src="{$smarty.const.WWW_TOP}/covers/console/{if $result.cover == 1}{$result.consoleinfoid}.jpg{else}{$smarty.const.WWW_TOP}themes_shared/images/no-cover.png{/if}"
 									 width="120" border="0" alt="{$result.title|escape:"htmlall"}"/>
 							</a>
 
