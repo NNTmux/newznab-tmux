@@ -51,15 +51,23 @@
 						   class="label label-success">Add to My Shows</a>
 						<a class="label label-default" href="{$serverroot}series/{$release.videos_id}"
 						   title="View all releases for this series">View all episodes</a>
-					{if $release.source = 1}
-						{if $release.tvdb > 0}<a class="label label-default" target="_blank"
-												href="{$site->dereferrer_link}http://thetvdb.com/?tab=series&id={$release.tvdb}&lid=7"
-												title="View at TheTVDB">TheTVDB</a>{/if}
-					{elseif $release.source = 3}
-						<a class="label label-default" target="_blank"
-						   href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$release.videos_id}"
-						   title="View at TV Rage">TV Rage</a>
-					{/if}
+						{if show.source == 1}
+							<a class="label label-default" target="_blank"
+							   href="{$site->dereferrer_link}http://thetvdb.com/?tab=series&id={$s.tvdb}">
+								title="View at TheTVDB">TheTVDB</a>
+						{elseif $show.source == 2}
+							<a class="label label-default" target="_blank"
+							   href="{$site->dereferrer_link}http://www.trakt.tv/shows/{$s.trakt}">
+								title="View at TraktTv">Trakt</a>
+						{elseif $show.source == 3}
+							<a class="label label-default" target="_blank"
+							   href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$s.tvrage}"
+							   title="View at TV Rage">TV Rage</a>
+						{elseif $show.source == 4}
+							<a class="label label-default" target="_blank"
+							   href="{$site->dereferrer_link}http://tvmaze.com/shows/{$s.tvmaze}"
+							   title="View at TVMaze">TVMaze</a>
+						{/if}
 					{/if}
 					{if $con && $con.url != ""}<a href="{$site->dereferrer_link}{$con.url}/"
 												  class="label label-default" target="_blank">Amazon</a>{/if}
@@ -138,7 +146,7 @@
 										<li><a href="#pane9" data-toggle="tab">Back Cover</a></li>
 									{/if}
 									{if isset($game.backdrop) && $game.backdrop == 1}
-									<li><a href="#pane10" data-toggle="tab">Screenshot</a></li>
+										<li><a href="#pane10" data-toggle="tab">Screenshot</a></li>
 									{/if}
 								</ul>
 								<div class="tab-content">
@@ -569,21 +577,21 @@
 													<th>Comment</th>
 												</tr>
 												{foreach from=$comments|@array_reverse:true item=comment}
-													<tr>
-														<td class="less" title="{$comment.createddate}">
-															{if !$privateprofiles || $isadmin || $ismod}
-																<a title="View {$comment.username}'s profile" href="{$smarty.const.WWW_TOP}/profile?name={$comment.username}">{$comment.username}</a>
-															{else}
-																{$comment.username}
-															{/if}
-															<br/>{$comment.createddate|daysago}
-														</td>
-														{if isset($comment.shared) && $comment.shared == 2}
-															<td style="color:#6B2447">{$comment.text|escape:"htmlall"|nl2br}</td>
+												<tr>
+													<td class="less" title="{$comment.createddate}">
+														{if !$privateprofiles || $isadmin || $ismod}
+															<a title="View {$comment.username}'s profile" href="{$smarty.const.WWW_TOP}/profile?name={$comment.username}">{$comment.username}</a>
 														{else}
-															<td>{$comment.text|escape:"htmlall"|nl2br}</td>
+															{$comment.username}
 														{/if}
-												{/foreach}
+														<br/>{$comment.createddate|daysago}
+													</td>
+													{if isset($comment.shared) && $comment.shared == 2}
+														<td style="color:#6B2447">{$comment.text|escape:"htmlall"|nl2br}</td>
+													{else}
+														<td>{$comment.text|escape:"htmlall"|nl2br}</td>
+													{/if}
+													{/foreach}
 											</table>
 										{else}
 											<div class="alert alert-info" role="alert">

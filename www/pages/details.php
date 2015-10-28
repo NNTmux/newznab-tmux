@@ -45,25 +45,9 @@ if (isset($_GET["id"]))
 		$page->userdata['categoryexclusions']);
 	$failed = $df->getFailedCount($data['guid']);
 
-	$criteria = '';
-	if ($data['videos_id'] != 0) {
+	$$showInfo = '';
+	if ($data['videos_id'] > 0) {
 		$showInfo = (new Videos(['Settings' => $page->settings]))->getByVideoID($data['videos_id']);
-		if (count($showInfo) > 0) {
-			$criteria = ['title' => '', 'summary' => '', 'countries_id' => '', 'image' => '', 'id' => ''];
-			$done = 1;
-			$needed = count($criteria);
-			foreach ($showInfo as $info) {
-				foreach($criteria as $key => $value) {
-					if (empty($value) && !empty($info[$key])) {
-						$criteria[$key] = $info[$key];
-						$done++;
-					}
-				}
-				if ($done == $needed) {
-					break;
-				}
-			}
-		}
 	}
 
 	$episodeArray = '';
@@ -164,7 +148,7 @@ if (isset($_GET["id"]))
 	$page->smarty->assign('reAudio',$reAudio);
 	$page->smarty->assign('reSubs',$reSubs);
 	$page->smarty->assign('nfo',$nfo);
-	$page->smarty->assign('show',$criteria);
+	$page->smarty->assign('show',$showInfo);
 	$page->smarty->assign('movie',$mov);
 	$page->smarty->assign('xxx', $xxx);
 	$page->smarty->assign('episode',$episodeArray);
