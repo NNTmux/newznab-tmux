@@ -886,9 +886,7 @@ class Releases
 			$offset
 		);
 		$releases = $this->pdo->query($sql);
-		if ($releases && count($releases)) {
-			$releases[0]['_totalrows'] = $this->getPagerCount($baseSql);
-		}
+
 		return $releases;
 	}
 
@@ -965,8 +963,6 @@ class Releases
 
 		$countres = $this->pdo->queryOneRow($sqlcount, true);
 		$res = $this->pdo->query($sql, true);
-		if (count($res) > 0)
-			$res[0]["_totalrows"] = $countres["num"];
 
 		return $res;
 	}
@@ -1004,8 +1000,6 @@ class Releases
 
 		$countres = $this->pdo->queryOneRow($sqlcount, true);
 		$res = $this->pdo->query($sql, true);
-		if (count($res) > 0)
-			$res[0]["_totalrows"] = $countres["num"];
 
 		return $res;
 	}
@@ -1332,9 +1326,7 @@ class Releases
 			$offset
 		);
 		$releases = $this->pdo->query($sql, true, NN_CACHE_EXPIRY_MEDIUM);
-		if ($releases && count($releases)) {
-			$releases[0]['_totalrows'] = $this->getPagerCount($baseSql);
-		}
+
 		return $releases;
 	}
 
@@ -1390,9 +1382,7 @@ class Releases
 			$offset
 		);
 		$releases = $this->pdo->query($sql, true, NN_CACHE_EXPIRY_MEDIUM);
-		if ($releases && count($releases)) {
-			$releases[0]['_totalrows'] = $this->getPagerCount($baseSql);
-		}
+
 		return $releases;
 	}
 
