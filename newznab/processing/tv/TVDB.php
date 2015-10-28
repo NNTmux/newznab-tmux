@@ -111,28 +111,25 @@ class TVDB extends TV
 						// If it doesnt exist locally and lookups are allowed lets try to get it.
 						if ($this->echooutput) {
 							echo	$this->pdo->log->primaryOver("Video ID for ") .
-								$this->pdo->log->headerOver($release['cleanname']) .
-								$this->pdo->log->primary(" not found in local db, checking web.");
+									$this->pdo->log->headerOver($release['cleanname']) .
+									$this->pdo->log->primary(" not found in local db, checking web.");
 						}
 
-						// Check if we have a valid country and set it in the array
-						$country = (isset($release['country']) && strlen($release['country']) == 2
-							? (string)$release['country']
-							: ''
-						);
-
 						// Get the show from TVDB
-						$tvdbShow = $this->getShowInfo((string)$release['cleanname'], $country);
+						$tvdbShow = $this->getShowInfo((string)$release['cleanname']);
 
 						if (is_array($tvdbShow)) {
-							$tvdbShow['country']  = $country;
+							$tvdbShow['country']  = (isset($release['country']) && strlen($release['country']) == 2
+								? (string)$release['country']
+								: ''
+							);
 							$videoId = $this->add($tvdbShow);
 							$tvdbid = (int)$tvdbShow['tvdbid'];
 						}
 					} else if ($this->echooutput) {
-						echo $this->pdo->log->primaryOver("Video ID for ") .
-							$this->pdo->log->headerOver($release['cleanname']) .
-							$this->pdo->log->primary(" found in local db, attempting episode match.");
+							echo $this->pdo->log->primaryOver("Video ID for ") .
+								 $this->pdo->log->headerOver($release['cleanname']) .
+								 $this->pdo->log->primary(" found in local db, attempting episode match.");
 					}
 
 					if (is_numeric($videoId) && $videoId > 0 && is_numeric($tvdbid) && $tvdbid > 0) {
@@ -203,25 +200,17 @@ class TVDB extends TV
 	 * Calls the API to perform initial show name match to TVDB title
 	 * Returns a formatted array of show data or false if no match
 	 *
-	 * @param string $cleanName
-	 *
-	 * @param string $country
+	 * @param $cleanName
 	 *
 	 * @return array|bool
 	 */
-	protected function getShowInfo($cleanName, $country = '')
+	protected function getShowInfo($cleanName)
 	{
 		$return = $response = false;
 		$highestMatch = 0;
 		try {
 			$response = (array)$this->client->getSeries($cleanName, 'en');
 		} catch (\Exception $error) { }
-
-		if ($response === false && $country !== '') {
-			try {
-				$response = (array)$this->client->getSeries(rtrim(str_replace($country, '', $cleanName)), 'en');
-			} catch (\Exception $error) { }
-		}
 
 		sleep(1);
 

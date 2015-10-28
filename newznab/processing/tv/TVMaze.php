@@ -1,24 +1,23 @@
 <?php
 namespace newznab\processing\tv;
-
-use newznab\libraries\TraktAPI;
+use \libs\JPinkney\TVMaze\Client;
 
 /**
- * Class TraktTv
+ * Class TVMaze
  *
- * Process information retrieved from the Trakt API.
+ * Process information retrieved from the TVMaze API.
  */
-class TraktTv extends TV
+class TVMaze extends TV
 {
 	/**
-	 * Client for Trakt API
+	 * Client for TVMaze API
 	 *
-	 * @var \newznab\libraries\TraktAPI
+	 * @var \libs\JPinkney\TVMaze\Client
 	 */
 	public $client;
 
 	/**
-	 * Construct. Set up API key.
+	 * Construct. Instanciate TVMaze Client Class
 	 *
 	 * @param array $options Class instances.
 	 *
@@ -27,7 +26,7 @@ class TraktTv extends TV
 	public function __construct(array $options = [])
 	{
 		parent::__construct($options);
-		$this->client = new TraktAPI(['clientID' => $this->pdo->getSetting('trakttvclientkey')]);
+		$this->client = new Client();
 	}
 
 	/**
@@ -54,12 +53,7 @@ class TraktTv extends TV
 	 */
 	public function getEpisodeInfo($siteId, $series, $episode)
 	{
-		;
-	}
-
-	public function getMovieInfo()
-	{
-
+		return false;
 	}
 
 	/**
@@ -72,7 +66,7 @@ class TraktTv extends TV
 	 */
 	public function getPoster($videoId, $siteId)
 	{
-		;
+		return false;
 	}
 
 	/**
@@ -84,6 +78,6 @@ class TraktTv extends TV
 	 */
 	public function getShowInfo($name)
 	{
-		;
+		return false;
 	}
 }
