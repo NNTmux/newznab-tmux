@@ -1,4 +1,5 @@
 2015-10-29 DariusIII
+	Chg: Remove debug output from TraktTv
 	Fix: SCR removal in ReleaseRemover and update queries
 	Fix: TV count in Tmux (still off as other scrapers need to be added)
 	Fix: Add network to nzb dettails page

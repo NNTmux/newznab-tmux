@@ -157,13 +157,11 @@ HEADERS;
 	 */
 	private function getJsonArray($URI, $extended = 'min')
 	{
-		var_dump($extended);
 		if ($extended === '') {
 			$extendedString = '';
 		} else {
 			$extendedString = "?extended=" . $extended;
 		}
-		var_dump($URI . $extendedString);
 		if (!empty($this->clientId)) {
 			$json = Utility::getUrl([
 									 'url'            => $URI . $extendedString,
