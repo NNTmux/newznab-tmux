@@ -2287,9 +2287,9 @@ class Releases
 		else
 			$parameters['reqid'] = " null ";
 
-		$parameters['id'] = $this->pdo->queryInsert(sprintf("INSERT INTO releases (name, searchname, totalpart, groupid, adddate, guid, categoryid, regexid, tvinfoid, postdate, fromname, size, reqid, passwordstatus, completion, haspreview, nfostatus, nzbstatus,
+		$parameters['id'] = $this->pdo->queryInsert(sprintf("INSERT INTO releases (name, searchname, totalpart, groupid, adddate, guid, categoryid, regexid, postdate, fromname, size, reqid, passwordstatus, completion, haspreview, nfostatus, nzbstatus,
 					isrenamed, iscategorized, reqidstatus, prehashid)
-                    VALUES (%s, %s, %d, %d, now(), %s, %d, %s, -1, %s, %s, 0, %s, %d, 100,-1, -1, %d, %d, 1, %d, %d)",
+                    VALUES (%s, %s, %d, %d, now(), %s, %d, %s, %s, %s, 0, %s, %d, 100,-1, -1, %d, %d, 1, %d, %d)",
 				$parameters['name'],
 				$parameters['searchname'],
 				$parameters['totalpart'],
