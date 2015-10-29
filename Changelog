@@ -1,4 +1,5 @@
 2015-10-29 DariusIII
+	Fix: Fix the firstaired request
 	Chg: Remove debug output from TraktTv
 	Fix: SCR removal in ReleaseRemover and update queries
 	Fix: TV count in Tmux (still off as other scrapers need to be added)
