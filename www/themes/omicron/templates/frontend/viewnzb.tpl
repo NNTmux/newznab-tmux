@@ -51,7 +51,7 @@
 						   class="label label-success">Add to My Shows</a>
 						<a class="label label-default" href="{$serverroot}series/{$release.videos_id}"
 						   title="View all releases for this series">View all episodes</a>
-						{if show.source == 1}
+						{if $show.source == 1}
 							<a class="label label-default" target="_blank"
 							   href="{$site->dereferrer_link}http://thetvdb.com/?tab=series&id={$s.tvdb}">
 								title="View at TheTVDB">TheTVDB</a>

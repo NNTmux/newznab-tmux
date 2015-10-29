@@ -45,7 +45,7 @@ if (isset($_GET["id"]))
 		$page->userdata['categoryexclusions']);
 	$failed = $df->getFailedCount($data['guid']);
 
-	$$showInfo = '';
+	$showInfo = '';
 	if ($data['videos_id'] > 0) {
 		$showInfo = (new Videos(['Settings' => $page->settings]))->getByVideoID($data['videos_id']);
 	}
