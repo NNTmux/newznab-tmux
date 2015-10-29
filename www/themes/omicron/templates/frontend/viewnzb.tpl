@@ -329,6 +329,14 @@
 																			<td>{$release.firstaired|date_format}</td>
 																		</tr>
 																	{/if}
+																	{if $show.publisher != ""}
+																		<tr>
+																			<th width="140">
+																				Network
+																			</th>
+																			<td>{$show.publisher}</td>
+																		</tr>
+																	{/if}
 																	{if $show.countries_id != ""}
 																		<tr>
 																			<th width="140">
