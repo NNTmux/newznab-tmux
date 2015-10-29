@@ -1,4 +1,7 @@
 2015-10-29 DariusIII
+	Fix: SCR removal in ReleaseRemover and update queries
+	Fix: TV count in Tmux (still off as other scrapers need to be added)
+	Fix: Add network to nzb dettails page
 	Upd: Update the Versions.php
 2015-10-28 DariusIII
 	Fix: Fix the no cover image

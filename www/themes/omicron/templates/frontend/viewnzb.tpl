@@ -53,7 +53,7 @@
 						   title="View all releases for this series">View all episodes</a>
 					{if $show.source == 1}
 						<a class="label label-default" target="_blank"
-						   href="{$site->dereferrer_link}http://thetvdb.com/?tab=series&id={$s.tvdb}">
+						   href="{$site->dereferrer_link}http://thetvdb.com/?tab=series&id={$s.tvdb}"
 						   title="View at TheTVDB">TheTVDB</a>
 					{elseif $show.source == 2}
 						<a class="label label-default" target="_blank"
