@@ -1,3 +1,5 @@
+2015-10-29 DariusIII
+	Upd: Add patch to rename scrape into run_ircscraper in tmux table
 2015-10-28 DariusIII
 	Fix: Missing TraktTv
 	Fix: Fix the no cover image
