@@ -48,6 +48,7 @@ class BasePage
 	public $userdata = [];
 	public $serverurl = '';
 	public $secure_connection = false;
+	public $show_desktop_mode = false;
 
 
 	/**
@@ -59,7 +60,7 @@ class BasePage
 
 		session_set_cookie_params(0, '/', '', $this->https, true);
 		@session_start();
-		if($_GET['show_desktop_mode'] == 'true') {
+		if(isset($_GET['show_desktop_mode']) && $_GET['show_desktop_mode'] == 'true') {
 			$_SESSION['desktopmode'] = 'true';
 		}
 		$this->smarty->assign('desktopmode', $_SESSION['desktopmode']);
