@@ -75,7 +75,7 @@ class ResponseTransformerFactory
             throw new \InvalidArgumentException(sprintf("Responsetransformerclass not found: %s", $class));
         }
 
-        if ($reflectionClass->implementsInterface('\\newznab\\libraries\\ApaiIO\\ResponseTransformer\\ResponseTransformerInterface')) {
+        if ($reflectionClass->implementsInterface('\\libs\\ApaiIO\\ResponseTransformer\\ResponseTransformerInterface')) {
             $responseTransformer = new $class();
 
             return self::$responseTransformerObjects[$class] = self::applyCallback(

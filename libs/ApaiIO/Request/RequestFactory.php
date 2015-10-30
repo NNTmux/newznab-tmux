@@ -82,7 +82,7 @@ class RequestFactory
             throw new \InvalidArgumentException(sprintf("Requestclass not found: %s", $class));
         }
 
-        if ($reflectionClass->implementsInterface('\\newznab\\libraries\\ApaiIO\\Request\\RequestInterface')) {
+        if ($reflectionClass->implementsInterface('\\libs\\ApaiIO\\Request\\RequestInterface')) {
             $request = new $class();
             $request->setConfiguration($configuration);
 
