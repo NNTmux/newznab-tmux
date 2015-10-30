@@ -104,7 +104,7 @@
 									</p>
 								</li>
 								<!-- Menu Body -->
-								< class="user-body">
+								<li class="user-body">
 									<div class="col-xs-12 text-center">
 										<a href="{$serverroot}cart"><i class="fa fa-shopping-cart"></i> My Cart</a>
 									</div>
