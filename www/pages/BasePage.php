@@ -63,7 +63,6 @@ class BasePage
 		if(isset($_GET['show_desktop_mode']) && $_GET['show_desktop_mode'] == 'true') {
 			$_SESSION['desktopmode'] = 'true';
 		}
-		$this->smarty->assign('desktopmode', $_SESSION['desktopmode']);
 
 		if (NN_FLOOD_CHECK) {
 			$this->floodCheck();
