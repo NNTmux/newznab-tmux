@@ -7,7 +7,8 @@ use newznab\Users;
 
 $page = new AdminPage();
 $users = new Users();
-$id = 0;
+
+$user = ['id' => '', 'username' => '', 'email' => '', 'password' => ''];
 
 // set the current action
 $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view';
@@ -27,16 +28,17 @@ foreach ($userroles as $r) {
 
 switch ($action) {
 	case 'add':
-		$user = [];
-		$user["role"] = $defaultrole;
-		$user["notes"] = "";
-		$user["invites"] = $defaultinvites;
-		$user["movieview"] = "1";
-		$user["musicview"] = "1";
-		$user["gameview"] = "1";
-		$user["xxxview"] = "1";
-		$user["consoleview"] = "1";
-		$user["bookview"] = "1";
+		$user                += [
+			'role'        => $defaultRole,
+			'notes'       => '',
+			'invites'     => $defaultInvites,
+			'movieview'   => '1',
+			'xxxview'     => '1',
+			'musicview'   => '1',
+			'consoleview' => '1',
+			'gameview'    => '1',
+			'bookview'    => '1'
+		];
 		$page->smarty->assign('user', $user);
 		break;
 	case 'submit':
@@ -77,16 +79,17 @@ switch ($action) {
 					$page->smarty->assign('error', "Unknown save error.");
 					break;
 			}
-			$user = [];
-			$user["id"] = $_POST["id"];
-			$user["username"] = $_POST["username"];
-			$user["email"] = $_POST["email"];
-			$user["grabs"] = (isset($_POST["grabs"]) ? $_POST["grabs"] : "0");
-			$user["role"] = $_POST["role"];
-			$user["notes"] = $_POST["notes"];
-			$user["invites"] = (isset($_POST["invites"]) ? $_POST["invites"] : "0");
-			$user["movieview"] = $_POST["movieview"];
-			$user["bookview"] = $_POST["bookview"];
+			$user = [
+				'id'        => $_POST["id"],
+				'username'  => $_POST["username"],
+				'email'     => $_POST["email"],
+				'notes'     => $_POST["notes"],
+				'grabs'     => (isset($_POST["grabs"]) ? $_POST["grabs"] : '0'),
+				'role'      => $_POST["role"],
+				'invites'   => (isset($_POST["invites"]) ? $_POST["invites"] : '0'),
+				'movieview' => $_POST["movieview"],
+				'bookview' => $_POST["bookview"]
+			];
 			$page->smarty->assign('user', $user);
 		}
 		break;
