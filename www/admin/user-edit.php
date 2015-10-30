@@ -16,8 +16,8 @@ $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view';
 //get the user roles
 $userroles = $users->getRoles();
 $roles = [];
-$defaultrole = Users::ROLE_USER;
-$defaultinvites = Users::DEFAULT_INVITES;
+$defaultRole = Users::ROLE_USER;
+$defaultInvites = Users::DEFAULT_INVITES;
 foreach ($userroles as $r) {
 	$roles[$r['id']] = $r['name'];
 	if ($r['isdefault'] == 1) {
