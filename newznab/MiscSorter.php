@@ -2,9 +2,9 @@
 namespace newznab;
 
 use newznab\db\Settings;
-use newznab\libraries\ApaiIO\Configuration\GenericConfiguration;
-use newznab\libraries\ApaiIO\ApaiIO;
-use newznab\libraries\ApaiIO\Operations\Lookup;
+use libs\ApaiIO\Configuration\GenericConfiguration;
+use libs\ApaiIO\ApaiIO;
+use libs\ApaiIO\Operations\Lookup;
 
 
 /**
@@ -372,7 +372,7 @@ class MiscSorter
 				->setAccessKey($this->pubkey)
 				->setSecretKey($this->privkey)
 				->setAssociateTag($this->asstag)
-				->setResponseTransformer('\newznab\libraries\ApaiIO\ResponseTransformer\XmlToSimpleXmlObject');
+				->setResponseTransformer('\libs\ApaiIO\ResponseTransformer\XmlToSimpleXmlObject');
 		} catch (\Exception $e) {
 			echo $e->getMessage();
 		}

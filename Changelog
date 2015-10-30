@@ -1,4 +1,5 @@
 2015-10-30 DariusIII
+	Chg: Move ApaiIO and Tmdb libraries into libs folder
 	Chg: Simplify the is_array
 	Chg: Change admin/user-edit
 	Upd: searchId function in TraktAPI
