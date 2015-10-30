@@ -93,7 +93,6 @@ class TVShow extends TVProduction{
 	function __construct($show_data){
 		parent::__construct($show_data);
 		$this->type = $show_data['type'];
-		$this->episodes = $show_data['_embedded']['episodes'];
 		$this->language = $show_data['language'];
 		$this->genres = $show_data['genres'];
 		$this->status = $show_data['status'];
@@ -110,7 +109,7 @@ class TVShow extends TVProduction{
 		$this->akas = (isset($show_data['_embedded']['akas']) ? $show_data['_embedded']['akas'] : null);
 
 		$current_date = date("Y-m-d");
-		foreach($this->episodes as $episode){
+		foreach($show_data['_embedded']['episodes'] as $episode){
 			if($episode['airdate'] >= $current_date){
 				$this->nextAirDate = $episode['airdate'];
 				$this->airTime = date("g:i A", $episode['airtime']);

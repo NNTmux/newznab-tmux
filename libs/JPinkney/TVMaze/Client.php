@@ -37,7 +37,6 @@ class Client {
 		$url = self::APIURL . "/search/shows?q=" . urlencode($show_name);
 
 		$shows = $this->getFile($url);
-		var_dump($shows);
 
 		$relevant_shows = array();
 		foreach($shows as $series) {
