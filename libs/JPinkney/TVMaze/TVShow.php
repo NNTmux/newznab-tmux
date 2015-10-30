@@ -111,7 +111,7 @@ class TVShow extends TVProduction{
 
 		$current_date = date("Y-m-d");
 
-		if (is_array($this->episodes) || $this->episodes instanceof \Traversable) {
+		if (is_array($this->episodes)) {
 			foreach ($this->episodes as $episode) {
 				if ($episode['airdate'] >= $current_date) {
 					$this->nextAirDate = $episode['airdate'];
