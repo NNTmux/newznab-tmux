@@ -111,7 +111,7 @@
 								<!-- Menu Body -->
 								<li class="user-body">
 									<div class="col-xs-12 text-center">
-									<a href="{serverroot}?show_desktop_mode=true"><i class="fa fa-desktop"></i> Switch to desktop mode</a>
+									<a href="{$serverroot}?show_desktop_mode=true"><i class="fa fa-desktop"></i> Switch to desktop mode</a>
 									</div>
 									<div class="col-xs-12 text-center">
 										<a href="{$serverroot}cart"><i class="fa fa-shopping-cart"></i> My Cart</a>
