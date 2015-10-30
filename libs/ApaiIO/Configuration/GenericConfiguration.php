@@ -60,7 +60,7 @@ class GenericConfiguration implements ConfigurationInterface
      *
      * @var string
      */
-    protected $request = "\\newznab\\libraries\\ApaiIO\\Request\\Rest\\Request";
+    protected $request = "\\libs\\ApaiIO\\Request\\Rest\\Request";
 
     /**
      * A callback which is called before returning the request by the factory
