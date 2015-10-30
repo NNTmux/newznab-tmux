@@ -53,19 +53,19 @@
 						   title="View all releases for this series">View all episodes</a>
 						{if $show.source == 1}
 							<a class="label label-default" target="_blank"
-							   href="{$site->dereferrer_link}http://thetvdb.com/?tab=series&id={$s.tvdb}"
+							   href="{$site->dereferrer_link}http://thetvdb.com/?tab=series&id={$show.tvdb}"
 							   title="View at TheTVDB">TheTVDB</a>
 						{elseif $show.source == 2}
 							<a class="label label-default" target="_blank"
-							   href="{$site->dereferrer_link}http://tvmaze.com/shows/{$s.tvmaze}"
+							   href="{$site->dereferrer_link}http://tvmaze.com/shows/{$show.tvmaze}"
 							   title="View at TVMaze">TVMaze</a>
 						{elseif $show.source == 3}
 							<a class="label label-default" target="_blank"
-							   href="{$site->dereferrer_link}http://www.trakt.tv/shows/{$s.trakt}"
+							   href="{$site->dereferrer_link}http://www.trakt.tv/shows/{$show.trakt}"
 							   title="View at TraktTv">Trakt</a>
 						{elseif $show.source == 6}
 							<a class="label label-default" target="_blank"
-							   href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$s.tvrage}"
+							   href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$show.tvrage}"
 							   title="View at TV Rage">TV Rage</a>
 						{/if}
 					{/if}

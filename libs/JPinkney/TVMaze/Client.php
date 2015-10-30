@@ -39,9 +39,11 @@ class Client {
 		$shows = $this->getFile($url);
 
 		$relevant_shows = array();
-		foreach($shows as $series) {
-			$TVShow = new TVShow($series['show']);
-			array_push($relevant_shows, $TVShow);
+		if (is_array($shows) || $shows instanceof \Traversable){
+			foreach ($shows as $series) {
+				$TVShow = new TVShow($series['show']);
+				array_push($relevant_shows, $TVShow);
+			}
 		}
 		return $relevant_shows;
 	}
@@ -60,10 +62,12 @@ class Client {
 		$shows = $this->getFile($url);
 
 		$episode_list = array();
-		foreach($shows['_embedded']['episodes'] as $episode) {
-			$ep = new Episode($episode);
-			print_r($episode);
-			array_push($episode_list, $ep);
+		if (is_array($shows) || $shows instanceof \Traversable) {
+			foreach ($shows['_embedded']['episodes'] as $episode) {
+				$ep = new Episode($episode);
+				print_r($episode);
+				array_push($episode_list, $ep);
+			}
 		}
 
 		$TVShow = new TVShow($shows);
