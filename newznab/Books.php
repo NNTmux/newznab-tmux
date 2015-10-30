@@ -321,7 +321,7 @@ class Books
 		$response = $apaiIo->runOperation($search);
 		if ($response === false)
 		{
-			throw new Exception("Could not connect to Amazon");
+			throw new \Exception("Could not connect to Amazon");
 		}
 		else
 		{
