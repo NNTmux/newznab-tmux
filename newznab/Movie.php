@@ -3,7 +3,7 @@ namespace newznab;
 
 use newznab\db\Settings;
 use newznab\utility\Utility;
-use newznab\libraries\Tmdb\TMDB;
+use libs\Tmdb\TMDB;
 use newznab\processing\tv\TraktTv;
 
 /**
