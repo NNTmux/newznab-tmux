@@ -1,3 +1,5 @@
+2015-10-30 DariusIII
+	Chg: Move My Shows link to user account dropdown
 2015-10-29 DariusIII
 	Add: Add fixes from dev-regexless-tv branch
 	Fix: Remove tvinfoid from insertReleases function
