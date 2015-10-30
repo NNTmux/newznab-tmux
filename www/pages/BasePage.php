@@ -59,6 +59,10 @@ class BasePage
 
 		session_set_cookie_params(0, '/', '', $this->https, true);
 		@session_start();
+		if($_GET['show_desktop_mode'] == 'true') {
+			$_SESSION['desktopmode'] = 'true';
+		}
+		$this->smarty->assign('desktopmode', $_SESSION['desktopmode']);
 
 		if (NN_FLOOD_CHECK) {
 			$this->floodCheck();

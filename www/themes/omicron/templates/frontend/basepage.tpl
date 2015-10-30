@@ -11,7 +11,12 @@
 	</script>
 	<meta charset="UTF-8">
 	<title>{$page->meta_title}{if $page->meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
-	<meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=yes' name='viewport'>
+
+	{if($desktopmode == 'true')}
+	<meta name="viewport" content="width=1024">
+	{else}
+	<meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
+	{/if}
 	<!-- Newposterwall -->
 	<link href="{$smarty.const.WWW_TOP}/themes_shared/styles/posterwall.css" rel="stylesheet" type="text/css" media="screen" />
 	<!-- Bootstrap 3.3.4 -->
@@ -105,6 +110,9 @@
 								</li>
 								<!-- Menu Body -->
 								<li class="user-body">
+									<div class="col-xs-12 text-center">
+									<a href="{serverroot}?show_desktop_mode=true"><i class="fa fa-desktop"></i> Switch to desktop mode</a>
+									</div>
 									<div class="col-xs-12 text-center">
 										<a href="{$serverroot}cart"><i class="fa fa-shopping-cart"></i> My Cart</a>
 									</div>
