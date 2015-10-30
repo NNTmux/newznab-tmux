@@ -68,7 +68,7 @@
  * 		// Person images		https://api.themoviedb.org/3/person/287/images
  */
 
-namespace libs\Tmdb;
+namespace newznab\libraries;
 
 use libs\Tmdb\Data\Collection;
 use libs\Tmdb\Data\Episode;
@@ -79,7 +79,7 @@ use libs\Tmdb\Data\TVShow;
 /**
  * Class TMDB
  */
-class TMDB {
+class TmdbAPI {
 
 	#@var string url of API TMDB
 	const _API_URL_ = "https://api.themoviedb.org/3/";

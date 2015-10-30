@@ -3,7 +3,7 @@ namespace newznab;
 
 use newznab\db\Settings;
 use newznab\utility\Utility;
-use libs\Tmdb\TMDB;
+use newznab\processing\tv\TMDB;
 use newznab\processing\tv\TraktTv;
 
 /**
@@ -813,10 +813,10 @@ class Movie
 	public function fetchTMDBProperties($imdbId, $text = false)
 	{
 		$lookupId = ($text === false ? 'tt' . $imdbId : $imdbId);
-		$tmdb = new TMDB($this->pdo->getSetting('tmdbkey'));
+		$tmdb = new TMDB();
 
 		try {
-			$tmdbLookup = $tmdb->getMovie($lookupId);
+			$tmdbLookup = $tmdb->client->getMovie($lookupId);
 		} catch (\Exception $e) {
 			return false;
 		}
