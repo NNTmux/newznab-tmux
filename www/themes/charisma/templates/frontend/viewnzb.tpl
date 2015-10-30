@@ -57,17 +57,17 @@
 								title="View at TheTVDB">TheTVDB</a>
 						{elseif $show.source == 2}
 							<a class="label label-default" target="_blank"
-							   href="{$site->dereferrer_link}http://www.trakt.tv/shows/{$s.trakt}"
-								title="View at TraktTv">Trakt</a>
-						{elseif $show.source == 3}
-							<a class="label label-default" target="_blank"
-							   href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$s.tvrage}"
-							   title="View at TV Rage">TV Rage</a>
-						{elseif $show.source == 4}
-							<a class="label label-default" target="_blank"
 							   href="{$site->dereferrer_link}http://tvmaze.com/shows/{$s.tvmaze}"
 							   title="View at TVMaze">TVMaze</a>
 						{/if}
+						{elseif $show.source == 3}
+							<a class="label label-default" target="_blank"
+							   href="{$site->dereferrer_link}http://www.trakt.tv/shows/{$s.trakt}"
+								title="View at TraktTv">Trakt</a>
+						{elseif $show.source == 6}
+							<a class="label label-default" target="_blank"
+							   href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$s.tvrage}"
+							   title="View at TV Rage">TV Rage</a>
 					{/if}
 					{if $con && $con.url != ""}<a href="{$site->dereferrer_link}{$con.url}/"
 												  class="label label-default" target="_blank">Amazon</a>{/if}
