@@ -29,11 +29,6 @@ class TVDB extends TV
 	public $fanartUrl;
 
 	/**
-	 * @string Path to Save Images
-	 */
-	public $imgSavePath;
-
-	/**
 	 * @string The Timestamp of the TVDB Server
 	 */
 	private $serverTime;
@@ -57,7 +52,6 @@ class TVDB extends TV
 		$this->client = new Client(self::TVDB_URL, self::TVDB_API_KEY);
 		$this->posterUrl = self::TVDB_URL . DS . 'banners/_cache/posters/%s-1.jpg';
 		$this->fanartUrl = self::TVDB_URL . DS . 'banners/_cache/fanart/original/%s-1.jpg';
-		$this->imgSavePath = NN_COVERS . 'tvshows' . DS;
 
 		$this->serverTime = $this->client->getServerTime();
 		$this->timeZone = new \DateTimeZone('UTC');
@@ -73,7 +67,7 @@ class TVDB extends TV
 	 * @param            $processTV
 	 * @param bool|false $local
 	 */
-	public function processTVDB ($groupID, $guidChar, $processTV, $local = false)
+	public function processTVDB($groupID, $guidChar, $processTV, $local = false)
 	{
 		$res = $this->getTvReleases($groupID, $guidChar, $processTV, parent::PROCESS_TVDB);
 
@@ -110,22 +104,19 @@ class TVDB extends TV
 
 						// If it doesnt exist locally and lookups are allowed lets try to get it.
 						if ($this->echooutput) {
-							echo	$this->pdo->log->primaryOver("Video ID for ") .
+							echo $this->pdo->log->primaryOver("Video ID for ") .
 								$this->pdo->log->headerOver($release['cleanname']) .
 								$this->pdo->log->primary(" not found in local db, checking web.");
 						}
 
-						// Check if we have a valid country and set it in the array
-						$country = (isset($release['country']) && strlen($release['country']) == 2
-							? (string)$release['country']
-							: ''
-						);
-
 						// Get the show from TVDB
-						$tvdbShow = $this->getShowInfo((string)$release['cleanname'], $country);
+						$tvdbShow = $this->getShowInfo((string)$release['cleanname']);
 
 						if (is_array($tvdbShow)) {
-							$tvdbShow['country']  = $country;
+							$tvdbShow['country'] = (isset($release['country']) && $release['country'] !== 2
+								? (string)$release['country']
+								: ''
+							);
 							$videoId = $this->add($tvdbShow);
 							$tvdbid = (int)$tvdbShow['tvdbid'];
 						}
@@ -203,31 +194,24 @@ class TVDB extends TV
 	 * Calls the API to perform initial show name match to TVDB title
 	 * Returns a formatted array of show data or false if no match
 	 *
-	 * @param string $cleanName
-	 *
-	 * @param string $country
+	 * @param $cleanName
 	 *
 	 * @return array|bool
 	 */
-	protected function getShowInfo($cleanName, $country = '')
+	protected function getShowInfo($cleanName)
 	{
 		$return = $response = false;
 		$highestMatch = 0;
 		try {
 			$response = (array)$this->client->getSeries($cleanName, 'en');
-		} catch (\Exception $error) { }
-
-		if ($response === false && $country !== '') {
-			try {
-				$response = (array)$this->client->getSeries(rtrim(str_replace($country, '', $cleanName)), 'en');
-			} catch (\Exception $error) { }
+		} catch (\Exception $error) {
 		}
 
 		sleep(1);
 
 		if (is_array($response)) {
 			foreach ($response as $show) {
-				if ($this->checkRequired($show, 1)) {
+				if ($this->checkRequired($show, 'tvdbS')) {
 					// Check for exact title match first and then terminate if found
 					if ($show->name === $cleanName) {
 						$highest = $show;
@@ -259,6 +243,7 @@ class TVDB extends TV
 				$return = $this->formatShowArr($highest);
 			}
 		}
+
 		return $return;
 	}
 
@@ -266,7 +251,7 @@ class TVDB extends TV
 	 * Retrieves the poster art for the processed show
 	 *
 	 * @param int $videoId -- the local Video ID
-	 * @param int $showId -- the TVDB ID
+	 * @param int $showId  -- the TVDB ID
 	 *
 	 * @return null
 	 */
@@ -291,11 +276,11 @@ class TVDB extends TV
 	 * Gets the specific episode info for the parsed release after match
 	 * Returns a formatted array of episode data or false if no match
 	 *
-	 * @param integer	$tvdbid
-	 * @param integer	$season
-	 * @param integer	$episode
-	 * @param string	$airdate
-	 * @param integer	$videoId
+	 * @param integer $tvdbid
+	 * @param integer $season
+	 * @param integer $episode
+	 * @param string  $airdate
+	 * @param integer $videoId
 	 *
 	 * @return array|bool
 	 */
@@ -323,16 +308,17 @@ class TVDB extends TV
 		sleep(1);
 
 		if (is_object($response)) {
-			if ($this->checkRequired($response, 2)) {
+			if ($this->checkRequired($response, 'tvdbE')) {
 				$return = $this->formatEpisodeArr($response);
 			}
 		} else if (is_array($response) && isset($response['episodes']) && $videoId > 0) {
-			foreach($response['episodes'] as $singleEpisode) {
-				if ($this->checkRequired($singleEpisode, 2)) {
+			foreach ($response['episodes'] as $singleEpisode) {
+				if ($this->checkRequired($singleEpisode, 'tvdbE')) {
 					$this->addEpisode($videoId, $this->formatEpisodeArr($singleEpisode));
 				}
 			}
 		}
+
 		return $return;
 	}
 
@@ -349,7 +335,7 @@ class TVDB extends TV
 		$show->firstAired->setTimezone($this->timeZone);
 		preg_match('/tt(?P<imdbid>\d{6,7})$/i', $show->imdbId, $imdb);
 
-		return	[
+		return [
 			'tvdbid'    => (int)$show->id,
 			'column'    => 'tvdb',
 			'siteid'    => (int)$show->id,
@@ -359,10 +345,10 @@ class TVDB extends TV
 			'publisher' => (string)$show->network,
 			'source'    => (int)parent::SOURCE_TVDB,
 			'imdbid'    => (int)(isset($imdb['imdbid']) ? $imdb['imdbid'] : 0),
-			'traktid'  => 0,
-			'tvrageid' => 0,
-			'tvmazeid' => 0,
-			'tmdbid'   => 0
+			'traktid'   => 0,
+			'tvrageid'  => 0,
+			'tvmazeid'  => 0,
+			'tmdbid'    => 0
 		];
 	}
 
@@ -386,37 +372,5 @@ class TVDB extends TV
 			'firstaired'  => (string)$episode->firstAired->format($this->timeFormat),
 			'summary'     => (string)$episode->overview
 		];
-	}
-
-	/**
-	 * Checks API response returns have all REQUIRED attributes set
-	 * Returns true or false
-	 *
-	 * @param array $array
-	 * @param int $type
-	 *
-	 * @return bool
-	 */
-	private function checkRequired($array = array(), $type)
-	{
-		$required = false;
-
-		switch ($type) {
-			case 1:
-				$required = ['id', 'name', 'overview', 'firstAired'];
-				break;
-			case 2:
-				$required = ['name', 'season', 'number', 'firstAired', 'overview'];
-				break;
-		}
-
-		if (is_array($required)) {
-			foreach ($required as $req) {
-				if (!isset($array->$req)) {
-					return false;
-				}
-			}
-		}
-		return true;
 	}
 }

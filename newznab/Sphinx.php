@@ -994,7 +994,7 @@ class Sphinx
 
 		$where = [];
 		if ($rageId != "-1") {
-		    $where[] = "tvinfoid = ".$rageId;
+		    $where[] = "videos_id = ".$rageId;
 		}
 
 		if (count($indexes) == 0) {

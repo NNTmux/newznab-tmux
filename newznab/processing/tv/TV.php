@@ -38,7 +38,12 @@ abstract class TV extends Videos
 	/**
 	 * @var int
 	 */
-	public $rageqty;
+	public $tvqty;
+
+	/**
+	 * @string Path to Save Images
+	 */
+	public $imgSavePath;
 
 	/**
 	 * @param array $options Class instances / Echo to CLI.
@@ -55,6 +60,7 @@ abstract class TV extends Videos
 		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
 		$this->catWhere = 'categoryid BETWEEN 5000 AND 5999 AND categoryid NOT IN (5070)';
 		$this->tvqty = ($this->pdo->getSetting('maxrageprocessed') != '') ? $this->pdo->getSetting('maxrageprocessed') : 75;
+		$this->imgSavePath = NN_COVERS . 'tvshows' . DS;
 	}
 
 	/**
@@ -191,7 +197,7 @@ abstract class TV extends Videos
 	 */
 	public function add($showArr = array())
 	{
-		if ($showArr['country'] !== '') {
+		if ($showArr['country'] !== '' && strlen($showArr['country']) > 2) {
 			$showArr['country'] = $this->countryCode($showArr['country']);
 		}
 
@@ -534,8 +540,7 @@ abstract class TV extends Videos
 				sprintf('
 					SELECT id
 					FROM countries
-					WHERE country = %s
-					OR iso3 = %1\$s',
+					WHERE country = %1\$s',
 					$this->pdo->escapeString($country)
 				)
 			);
@@ -619,7 +624,7 @@ abstract class TV extends Videos
 		];
 		$matches = '';
 
-		$following = 	'[^a-z0-9](\d\d-\d\d|\d{1,3}x\d{2,3}|\(?(19|20)\d{2}\)?|(480|720|1080)[ip]|AAC2?|BD-?Rip|Blu-?Ray|D0?\d' .
+		$following = 	'[^a-z0-9](\d\d-\d\d|\d{1,2}x\d{2,3}|\(?(19|20)\d{2}\)?|(480|720|1080)[ip]|AAC2?|BD-?Rip|Blu-?Ray|D0?\d' .
 			'|DD5|DiVX|DLMux|DTS|DVD(-?Rip)?|E\d{2,3}|[HX][-_. ]?26[45]|ITA(-ENG)?|HEVC|[HPS]DTV|PROPER|REPACK|Season|Episode|' .
 			'S\d+[^a-z0-9]?(E\d+)?|WEB[-_. ]?(DL|Rip)|XViD)[^a-z0-9]';
 
@@ -677,7 +682,7 @@ abstract class TV extends Videos
 			// 01.01.09
 			else if (preg_match('/^(.*?)[^a-z0-9](\d{2})[^a-z0-9](\d{2})[^a-z0-9](\d{2})[^a-z0-9]/i', $relname, $matches)) {
 				// Add extra logic to capture the proper YYYY year
-				$showInfo['season'] = $matches[4] = ($matches[4] <= 99 && $matches[4] > 15) ? '19' . $matches[4] : '20' . $matches[4];
+				$showInfo['season'] = $matches[4] = ($matches[4] <= 99 && $matches[4] > 15) ? '19' . $matches[4] : '20' . $matches[5];
 				$showInfo['episode'] = $matches[2] . '/' . $matches[3];
 				$tmpAirdate = $showInfo['season'] . '/' . $showInfo['episode'];
 				$showInfo['airdate'] = date('Y-m-d', strtotime(preg_replace('/[^0-9]/i', '/', $tmpAirdate))); //yyyy-mm-dd
@@ -716,7 +721,7 @@ abstract class TV extends Videos
 
 			$countryMatch = $yearMatch = '';
 			// Country or origin matching.
-			if (preg_match('/(US|UK|AU|NZ|CA|NL|Canada|Australia|America|United[^a-z0-9]States|United[^a-z0-9]Kingdom)$/i', $showInfo['name'], $countryMatch)) {
+			if (preg_match('/\W(US|UK|AU|NZ|CA|NL|Canada|Australia|America|United[^a-z0-9]States|United[^a-z0-9]Kingdom)\W/', $showInfo['name'], $countryMatch)) {
 				$currentCountry = strtolower($countryMatch[1]);
 				if ($currentCountry == 'canada') {
 					$showInfo['country'] = 'CA';
@@ -742,7 +747,6 @@ abstract class TV extends Videos
 				if (preg_match('/[^a-z0-9](19|20)(\d{2})/i', $relname, $yearMatch)) {
 					$showInfo['year'] = $yearMatch[1] . $yearMatch[2];
 				}
-
 				// Check for multi episode release.
 				if (is_array($showInfo['episode'])) {
 					$showInfo['episode'] = $showInfo['episode'][0];
@@ -836,6 +840,7 @@ abstract class TV extends Videos
 		}
 	}
 
+	//
 	/**
 	 * Convert 2012-24-07 to 2012-07-24, there is probably a better way
 	 *
@@ -858,5 +863,43 @@ abstract class TV extends Videos
 			$date = null;
 		}
 		return $date;
+	}
+
+	/**
+	 * Checks API response returns have all REQUIRED attributes set
+	 * Returns true or false
+	 *
+	 * @param array $array
+	 * @param int $type
+	 *
+	 * @return bool
+	 */
+	public function checkRequired($array = array(), $type)
+	{
+		$required = ['failedToMatchType'];
+
+		switch ($type) {
+			case 'tvdbS':
+				$required = ['id', 'name', 'overview', 'firstAired'];
+				break;
+			case 'tvdbE':
+				$required = ['name', 'season', 'number', 'firstAired', 'overview'];
+				break;
+			case 'tvmazeS':
+				$required = ['id', 'name', 'summary', 'premiered', 'country'];
+				break;
+			case 'tvmazeE':
+				$required = ['name', 'season', 'number', 'airdate', 'summary'];
+				break;
+		}
+
+		if (is_array($required)) {
+			foreach ($required as $req) {
+				if (!isset($array->$req)) {
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 }

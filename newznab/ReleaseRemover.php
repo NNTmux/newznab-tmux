@@ -427,7 +427,7 @@ class ReleaseRemover
 		switch (NN_RELEASE_SEARCH_TYPE) {
 			case ReleaseSearch::SPHINX:
 				$rs = new ReleaseSearch($this->pdo);
-				$execFT = str_replace('=10000;', '=10000000;', $rs->getSearchSQL(['filename' => 'exe']));
+				$execFT = str_replace('=10000;', '=1000000;', $rs->getSearchSQL(['filename' => '-exes* -exec* exe']));
 				$ftJoin = $rs->getFullTextJoinString();
 				break;
 			default:
@@ -438,7 +438,7 @@ class ReleaseRemover
 		$this->query = sprintf(
 			"SELECT r.guid, r.searchname, r.id
 			FROM releases r %s
-			INNER JOIN releasefiles rf ON rf.releaseid = r.id
+			STRAIGHT_JOIN releasefiles rf ON r.id = rf.releaseid
 			WHERE r.searchname NOT REGEXP %s
 			AND rf.name %s
 			AND r.categoryid NOT IN (%d, %d, %d, %d, %d, %d) %s %s",
@@ -485,7 +485,7 @@ class ReleaseRemover
 		$this->query = sprintf(
 			"SELECT r.guid, r.searchname, r.id
 			FROM releases r %s
-			INNER JOIN releasefiles rf ON rf.releaseid = r.id
+			STRAIGHT_JOIN releasefiles rf ON r.id = rf.releaseid
 			WHERE rf.name %s %s",
 			$ftJoin,
 			$this->pdo->likeString('install.bin', true, true),
@@ -523,7 +523,7 @@ class ReleaseRemover
 		$this->query = sprintf(
 			"SELECT r.guid, r.searchname, r.id
 			FROM releases r %s
-			INNER JOIN releasefiles rf ON rf.releaseid = r.id
+			STRAIGHT_JOIN releasefiles rf ON r.id = rf.releaseid
 			WHERE rf.name %s %s %s",
 			$ftJoin,
 			$this->pdo->likeString('password.url', true, true),
@@ -735,7 +735,7 @@ class ReleaseRemover
 		$this->query = sprintf(
 			"SELECT r.guid, r.searchname, r.id
 			FROM releases r %s
-			LEFT JOIN releasefiles rf ON rf.releaseid = r.id
+			STRAIGHT_JOIN releasefiles rf ON r.id = rf.releaseid
 			WHERE (rf.name REGEXP '[.]scr[$ \"]' OR r.name REGEXP '[.]scr[$ \"]')
 			%s %s",
 			$ftJoin,
@@ -856,7 +856,7 @@ class ReleaseRemover
 				);
 
 				if ($opTypeName == 'Subject') {
-					$join = (NN_RELEASE_SEARCH_TYPE == ReleaseSearch::SPHINX ? 'INNER JOIN releases_se rse ON rse.id = r.id' : 'INNER JOIN releasesearch rs ON rs.releaseid = r.id');
+					$join = (NN_RELEASE_SEARCH_TYPE == ReleaseSearch::SPHINX ? 'INNER JOIN releases_se rse ON rse.id = r.id' : 'INNER JOIN release_search_data rs ON rs.releaseid = r.id');
 				} else {
 					$join = '';
 				}
@@ -1063,7 +1063,7 @@ class ReleaseRemover
 
 		$codeclike = sprintf("
 				SELECT r.guid, r.searchname, r.id FROM releases r %s
-				INNER JOIN releasefiles rf ON r.id = rf.releaseid
+				STRAIGHT_JOIN releasefiles rf ON r.id = rf.releaseid
 				WHERE %s %s AND
 					(rf.name %s OR rf.name %s OR
 					rf.name %s OR rf.name %s OR
@@ -1086,7 +1086,7 @@ class ReleaseRemover
 
 		$this->query = sprintf(
 			"SELECT r.guid, r.searchname, r.id FROM releases r %s
-			INNER JOIN releasefiles rf ON (rf.releaseid = r.id)
+			STRAIGHT JOIN releasefiles rf ON (r.id = rf.releaseid)
 			WHERE %s %s
 			AND (%s OR %s) %s
 			UNION %s",
