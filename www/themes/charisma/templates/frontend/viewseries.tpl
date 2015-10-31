@@ -22,7 +22,7 @@
 		</div>
 	</div>
 	<h1>
-		<center>{$seriestitles}</center>
+		<center>{$seriestitles} ({$show.publisher})</center>
 	</h1>
 	{if $catname != ''}<span class="text-info h5">Current category shown: {$catname|escape:"htmlall"}</span>{/if}
 	<div class="tvseriesheading">
