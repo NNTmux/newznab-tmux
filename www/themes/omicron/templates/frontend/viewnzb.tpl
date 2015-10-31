@@ -51,31 +51,26 @@
 						   class="label label-success">Add to My Shows</a>
 						<a class="label label-default" href="{$serverroot}series/{$release.videos_id}"
 						   title="View all releases for this series">View all episodes</a>
-						{if $show.source == 1}
 							{if $show.tvdb > 0}
 							<a class="label label-default" target="_blank"
 							   href="{$site->dereferrer_link}http://thetvdb.com/?tab=series&id={$show.tvdb}"
 							   title="View at TheTVDB">TheTVDB</a>
 							{/if}
-						{elseif $show.source == 2}
 							{if $show.tvmaze > 0}
 							<a class="label label-default" target="_blank"
 							   href="{$site->dereferrer_link}http://tvmaze.com/shows/{$show.tvmaze}"
 							   title="View at TVMaze">TVMaze</a>
 								{/if}
-						{elseif $show.source == 3}
 							{if $show.trakt > 0}
 							<a class="label label-default" target="_blank"
 							   href="{$site->dereferrer_link}http://www.trakt.tv/shows/{$show.trakt}"
 							   title="View at TraktTv">Trakt</a>
 								{/if}
-						{elseif $show.source == 6}
 							{if $show.tvrage > 0}
 							<a class="label label-default" target="_blank"
 							   href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$show.tvrage}"
 							   title="View at TV Rage">TV Rage</a>
 								{/if}
-						{/if}
 					{/if}
 					{if $con && $con.url != ""}<a href="{$site->dereferrer_link}{$con.url}/"
 												  class="label label-default" target="_blank">Amazon</a>{/if}
