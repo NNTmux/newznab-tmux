@@ -81,7 +81,7 @@ class TVMaze extends TV
 				if (is_array($release) && $release['name'] != '') {
 
 					// Find the Video ID if it already exists by checking the title.
-					$videoId = $this->getByTitle($release['cleanname']);
+					$videoId = $this->getByTitle($release['cleanname'], parent::TYPE_TV);
 
 					if ($videoId !== false) {
 						$tvmazeid = $this->getSiteByID('tvmaze', $videoId);
@@ -108,7 +108,7 @@ class TVMaze extends TV
 
 						if (is_array($tvmazeShow)) {
 							$videoId = $this->add($tvmazeShow);
-							$tvmazeid = (int)$tvmazeShow['tvmazeid'];
+							$tvmazeid = (int)$tvmazeShow['tvmaze'];
 						}
 					} else if ($this->echooutput) {
 						echo $this->pdo->log->primaryOver("Video ID for ") .
@@ -162,7 +162,7 @@ class TVMaze extends TV
 						}
 					}
 				} //Processing failed, set the episode ID to the next processing group
-				$this->setVideoNotFound(parent::PROCESS_IMDB, $row['id']);
+				$this->setVideoNotFound(parent::PROCESS_TRAKT, $row['id']);
 			}
 		}
 	}
@@ -347,20 +347,20 @@ class TVMaze extends TV
 		$this->posterUrl = (string)(isset($show->mediumImage) ? $show->mediumImage : '');
 
 		return [
-			'tvmazeid'    => (int)$show->id,
-			'column'    => 'tvmaze',
-			'siteid'    => (int)$show->id,
+			'type'      => (int)parent::TYPE_TV,
 			'title'     => (string)$show->name,
 			'summary'   => (string)$show->summary,
 			'started'   => (string)$show->premiered,
 			'publisher' => (string)$show->network,
 			'country'   => (string)$show->country,
 			'source'    => (int)parent::SOURCE_TVMAZE,
-			'imdbid'    => 0,
-			'tvdbid'    => (int)(isset($show->externalIDs['thetvdb']) ? $show->externalIDs['thetvdb'] : 0),
-			'traktid'   => 0,
-			'tvrageid'  => (int)(isset($show->externalIDs['tvrage']) ? $show->externalIDs['tvrage'] : 0),
-			'tmdbid'    => 0
+			'imdb'      => 0,
+			'tvdb'      => (int)(isset($show->externalIDs['thetvdb']) ? $show->externalIDs['thetvdb'] : 0),
+			'tvmaze'    => (int)$show->id,
+			'trakt'     => 0,
+			'tvrage'    => (int)(isset($show->externalIDs['tvrage']) ? $show->externalIDs['tvrage'] : 0),
+			'tmdb'      => 0,
+			'aliases'   => (is_array($show->akas) ? $show->akas : '')
 		];
 	}
 
