@@ -41,21 +41,29 @@
 		<a class="btn btn-sm btn-default"
 		   href="{$smarty.const.WWW_TOP}/rss?show={$show.id}{if $category != ''}&amp;t={$category}{/if}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">RSS for TV Show <i class="fa fa-rss"></i></a>
 		{if $show.source == 1}
-			<a class="btn btn-sm btn-info" target="_blank"
-			   href="{$site->dereferrer_link}http://thetvdb.com/?tab=series&id={$show.tvdb}"
-			   title="View at TheTVDB">TheTVDB</a>
+			{if $show.tvdb > 0}
+				<a class="label label-default" target="_blank"
+				   href="{$site->dereferrer_link}http://thetvdb.com/?tab=series&id={$show.tvdb}"
+				   title="View at TheTVDB">TheTVDB</a>
+			{/if}
 		{elseif $show.source == 2}
-			<a class="btn btn-sm btn-info" target="_blank"
-			   href="{$site->dereferrer_link}http://tvmaze.com/shows/{$show.tvmaze}"
-			   title="View at TVMaze">TVMaze</a>
+			{if $show.tvmaze > 0}
+				<a class="label label-default" target="_blank"
+				   href="{$site->dereferrer_link}http://tvmaze.com/shows/{$show.tvmaze}"
+				   title="View at TVMaze">TVMaze</a>
+			{/if}
 		{elseif $show.source == 3}
-			<a class="btn btn-sm btn-info" target="_blank"
-			   href="{$site->dereferrer_link}http://www.trakt.tv/shows/{$show.trakt}"
-			   title="View at TraktTv">Trakt</a>
+			{if $show.trakt > 0}
+				<a class="label label-default" target="_blank"
+				   href="{$site->dereferrer_link}http://www.trakt.tv/shows/{$show.trakt}"
+				   title="View at TraktTv">Trakt</a>
+			{/if}
 		{elseif $show.source == 6}
-			<a class="btn btn-sm btn-info" target="_blank"
-			   href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$show.tvrage}"
-			   title="View at TV Rage">TV Rage</a>
+			{if $show.tvrage > 0}
+				<a class="label label-default" target="_blank"
+				   href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$show.tvrage}"
+				   title="View at TV Rage">TV Rage</a>
+			{/if}
 		{/if}
 	</div>
 	<br/>
