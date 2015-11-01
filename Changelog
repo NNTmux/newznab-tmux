@@ -1,9 +1,11 @@
+2015-11-01 DariusIII
+	Fix: Fix some offset errors, fix akas processing, remove debug info
 2015-10-31 DariusIII
-	Add all the  proxessing to tv
+	Add all the processing to tv
 2015-10-30 DariusIII
 	Fix: ApaiIO errors
 	Chg: Move ApaiIO and Tmdb libraries to libs folder
-	Fix: Fix the oredring in templates and some of the errors
+	Fix: Fix the ordering in templates and some of the errors
 	Chg: Change the order of sources processing, move TvRage to the end, TVMaze to second place
 	Chg: Move My Shows link to user account dropdown
 2015-10-29 DariusIII

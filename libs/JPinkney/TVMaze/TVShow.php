@@ -107,21 +107,6 @@ class TVShow extends TVProduction{
 		$this->externalIDs = $show_data['externals'];
 		$this->summary = strip_tags($show_data['summary']);
 		$this->akas = (isset($show_data['_embedded']['akas']) ? $show_data['_embedded']['akas'] : null);
-		$this->episodes = (isset($show_data['_embedded']['episodes']) ? $show_data['_embedded']['episodes'] : null);
-
-		$current_date = date("Y-m-d");
-
-		if (is_array($this->episodes) || $this->episodes instanceof \Traversable) {
-			foreach ($this->episodes as $episode) {
-				if ($episode['airdate'] >= $current_date) {
-					$this->nextAirDate = $episode['airdate'];
-					$this->airTime = date("g:i A", $episode['airtime']);
-					$this->airDay = date('l', strtotime($episode['airdate']));
-					break;
-				}
-			}
-		}
-
 	}
 
 	/*

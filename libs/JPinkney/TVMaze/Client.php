@@ -34,12 +34,13 @@ class Client {
 	 */
 	function search($show_name)
 	{
+		$relevant_shows = false;
 		$url = self::APIURL . "/search/shows?q=" . urlencode($show_name);
 
 		$shows = $this->getFile($url);
 
-		$relevant_shows = array();
-		if (is_array($shows) || $shows instanceof \Traversable){
+		if (is_array($shows)) {
+			$relevant_shows = array();
 			foreach ($shows as $series) {
 				$TVShow = new TVShow($series['show']);
 				array_push($relevant_shows, $TVShow);
@@ -58,21 +59,14 @@ class Client {
 	 */
 	function singleSearch($show_name)
 	{
+		$TVShow = false;
 		$url = self::APIURL . "/singlesearch/shows?q=" . urlencode($show_name) . '&embed=akas';
 		$shows = $this->getFile($url);
 
-		$episode_list = array();
-		if (is_array($shows) || $shows instanceof \Traversable) {
-			foreach ($shows['_embedded']['episodes'] as $episode) {
-				$ep = new Episode($episode);
-				print_r($episode);
-				array_push($episode_list, $ep);
-			}
+		if (is_array($shows)) {
+			$TVShow = new TVShow($shows);
 		}
-
-		$TVShow = new TVShow($shows);
-
-		return array($TVShow, $episode_list);
+		return array($TVShow);
 	}
 
 	/**
@@ -190,11 +184,12 @@ class Client {
 		$episodes = $this->getFile($url);
 
 		$allEpisodes = array();
-		foreach($episodes as $episode) {
-			$ep = new Episode($episode);
-			array_push($allEpisodes, $ep);
+		if (is_array($episodes)) {
+			foreach ($episodes as $episode) {
+				$ep = new Episode($episode);
+				array_push($allEpisodes, $ep);
+			}
 		}
-
 		return $allEpisodes;
 	}
 
@@ -209,20 +204,21 @@ class Client {
 	 */
 	function getEpisodeByNumber($ID, $season, $episode)
 	{
+		$ep = false;
 		$url = self::APIURL . '/shows/' . $ID . '/episodebynumber?season='. $season . '&number=' . $episode;
-		$episode = $this->getFile($url);
+		$response = $this->getFile($url);
 
-		$episode = new Episode($episode);
-
-		return $episode;
+		if (is_array($episode)) {
+			$ep = new Episode($response);
+		}
+		return $ep;
 	}
 
 	/**
 	 * Returns episodes for a given show ID and ISO 8601 airdate
 	 *
 	 * @param $ID
-	 * @param $season
-	 * @param $episode
+	 * @param $airdate
 	 *
 	 * @return Episode|mixed
 	 */
@@ -232,11 +228,12 @@ class Client {
 		$episodes = $this->getFile($url);
 
 		$allEpisodes = array();
-		foreach($episodes as $episode) {
-			$ep = new Episode($episode);
-			array_push($allEpisodes, $ep);
+		if (is_array($episodes)) {
+			foreach ($episodes as $episode) {
+				$ep = new Episode($episode);
+				array_push($allEpisodes, $ep);
+			}
 		}
-
 		return $allEpisodes;
 	}
 
@@ -361,7 +358,7 @@ class Client {
 
 		$response = json_decode($result, TRUE);
 
-		if ($response) {
+		if (is_array($response) && count($response) > 0 && !isset($response['status'])) {
 			return $response;
 		} else {
 			return false;
