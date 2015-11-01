@@ -324,7 +324,7 @@ class TVMaze extends TV
 						$this->addEpisode($videoId, $this->formatEpisodeArr($singleEpisode));
 					}
 				}
-			//Handle airdate lookups -- return first response
+				//Handle airdate lookups -- return first response
 			} else {
 				if ($this->checkRequired($response[0], 'tvmazeE')) {
 					$return = $this->formatEpisodeArr($response[0]);
@@ -360,7 +360,7 @@ class TVMaze extends TV
 			'trakt'     => 0,
 			'tvrage'    => (int)(isset($show->externalIDs['tvrage']) ? $show->externalIDs['tvrage'] : 0),
 			'tmdb'      => 0,
-			'aliases'   => (is_array($show->akas) ? $show->akas : '')
+			'aliases'   => (!empty($show->akas) ? (array)$show->akas : '')
 		];
 	}
 
