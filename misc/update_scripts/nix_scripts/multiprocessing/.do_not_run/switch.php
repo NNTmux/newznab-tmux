@@ -4,11 +4,18 @@ if (!isset($argv[1])) {
 	exit("This script is not intended to be run manually." . PHP_EOL);
 }
 
-require_once dirname(__FILE__) . '/../../../../../www/config.php';
+require_once realpath(dirname(dirname(dirname(dirname(dirname(__DIR__))))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
 use newznab\db\Settings;
 use newznab\processing\PostProcess;
 use newznab\processing\post\ProcessAdditional;
+use newznab\Releases;
+use newznab\Backfill;
+use newznab\NNTP;
+use newznab\Groups;
+use newznab\RequestIDLocal;
+use newznab\Binaries;
+use newznab\Nfo;
 
 
 // Are we coming from python or php ? $options[0] => (string): python|php
@@ -26,7 +33,7 @@ switch ($options[1]) {
 			$value = $pdo->queryOneRow("SELECT value FROM tmux WHERE setting = 'backfill_qty'");
 			if ($value !== false) {
 				$nntp = nntp($pdo);
-				(new \Backfill())->backfillAllGroups($options[2], ($options[3] == 1 ? '' : $value['value']));
+				(new Backfill())->backfillAllGroups($options[2], ($options[3] == 1 ? '' : $value['value']));
 			}
 		}
 		break;
@@ -39,7 +46,7 @@ switch ($options[1]) {
 	case 'backfill_all_quantity':
 		$pdo = new Settings();
 		$nntp = nntp($pdo);
-		(new \Backfill())->backfillAllGroups($options[2], $options[3]);
+		(new Backfill())->backfillAllGroups($options[2], $options[3]);
 		break;
 
 	// BackFill a single group, 10000 parts.
@@ -47,7 +54,7 @@ switch ($options[1]) {
 	case 'backfill_all_quick':
 		$pdo = new Settings();
 		$nntp = nntp($pdo);
-		(new \Backfill())->backfillAllGroups($options[2], 10000, 'normal');
+		(new Backfill())->backfillAllGroups($options[2], 10000, 'normal');
 		break;
 
 	/* Get a range of article headers for a group.
@@ -61,14 +68,14 @@ switch ($options[1]) {
 	case 'get_range':
 		$pdo = new Settings();
 		$nntp = nntp($pdo);
-		$groups = new \Groups();
+		$groups = new Groups();
 		$groupMySQL = $groups->getByName($options[3]);
 		if ($nntp->isError($nntp->selectGroup($groupMySQL['name']))) {
 			if ($nntp->isError($nntp->dataError($nntp, $groupMySQL['name']))) {
 				return;
 			}
 		}
-		$binaries = new \Binaries(['NNTP' => $nntp, 'Settings' => $pdo, 'Groups' => $groups]);
+		$binaries = new Binaries(['NNTP' => $nntp, 'Settings' => $pdo, 'Groups' => $groups]);
 		$return = $binaries->scan($groupMySQL, $options[4], $options[5], ($pdo->getSetting('safepartrepair') == 1 ? 'update' : 'backfill'));
 		if (empty($return)) {
 			exit();
@@ -125,7 +132,7 @@ switch ($options[1]) {
 	 */
 	case 'part_repair':
 		$pdo = new Settings();
-		$groups = new \Groups(['Settings' => $pdo]);
+		$groups = new Groups(['Settings' => $pdo]);
 		$groupMySQL = $groups->getByName($options[2]);
 		$nntp = nntp($pdo);
 		// Select group, here, only once
@@ -135,14 +142,14 @@ switch ($options[1]) {
 				exit();
 			}
 		}
-		(new \Binaries())->partRepair($groupMySQL);
+		(new Binaries())->partRepair($groupMySQL);
 		break;
 
 	// Process releases.
 	// $options[2] => (string)groupCount, number of groups terminated by _ | (int)groupid, group to work on
 	case 'releases':
 		$pdo = new Settings();
-		$releases = new \Releases(['Settings' => $pdo]);
+		$releases = new Releases(['Settings' => $pdo]);
 
 		//Runs function that are per group
 		if (is_numeric($options[2])) {
@@ -167,7 +174,7 @@ switch ($options[1]) {
 	// $options[2] => (int)groupid, group to work on
 	case 'requestid':
 		if (is_numeric($options[2])) {
-			(new \RequestIDLocal(['Echo' => true]))->lookupRequestIDs(['GroupID' => $options[2], 'limit' => 5000]);
+			(new RequestIDLocal(['Echo' => true]))->lookupRequestIDs(['GroupID' => $options[2], 'limit' => 5000]);
 		}
 		break;
 
@@ -178,9 +185,9 @@ switch ($options[1]) {
 	case 'update_group_headers':
 		$pdo = new Settings();
 		$nntp = nntp($pdo);
-		$groups = new \Groups();
+		$groups = new Groups();
 		$groupMySQL = $groups->getByName($options[2]);
-		(new \Binaries(['NNTP' => $nntp, 'Groups' => $groups, 'Settings' => $pdo]))->updateGroup($groupMySQL);
+		(new Binaries(['NNTP' => $nntp, 'Groups' => $groups, 'Settings' => $pdo]))->updateGroup($groupMySQL);
 		break;
 
 
@@ -200,20 +207,20 @@ switch ($options[1]) {
 
 			// Connect to NNTP.
 			$nntp = nntp($pdo);
-			$backFill = new \Backfill();
+			$backFill = new Backfill();
 
 			// Update the group for new binaries.
-			(new \Binaries())->updateGroup($groupMySQL);
+			(new Binaries())->updateGroup($groupMySQL);
 
 			// BackFill the group with 20k articles.
 			$backFill->backfillAllGroups($groupMySQL['name'], 20000, 'normal');
 
 			// Create releases.
-			processReleases(new \Releases(['Settings' => $pdo]), $options[2]);
+			processReleases($pdo, new Releases(['Settings' => $pdo]), $options[2]);
 
 			// Post process the releases.
 			(new ProcessAdditional(['Echo' => true, 'NNTP' => $nntp, 'Settings' => $pdo]))->start($options[2]);
-			(new \Nfo(['Echo' => true, 'Settings' => $pdo]))->processNfoFiles($nntp, $options[2]);
+			(new Nfo(['Echo' => true, 'Settings' => $pdo]))->processNfoFiles($nntp, $options[2]);
 
 		}
 		break;
@@ -229,7 +236,7 @@ switch ($options[1]) {
 			$nntp = nntp($pdo, true);
 
 			if ($options[1] === 'pp_nfo') {
-				(new \Nfo(['Echo' => true, 'Settings' => $pdo]))->processNfoFiles($nntp, '', $options[2]);
+				(new Nfo(['Echo' => true, 'Settings' => $pdo]))->processNfoFiles($nntp, '', $options[2]);
 			} else {
 				(new ProcessAdditional(['Echo' => true, 'NNTP' => $nntp, 'Settings' => $pdo]))->start('', $options[2]);
 			}
@@ -263,13 +270,12 @@ switch ($options[1]) {
 
 /**
  * Create / process releases for a groupid.
- *
- * @param \Releases $releases
+ * @param Settings $pdo
+ * @param Releases $releases
  * @param int             $groupID
  */
 function processReleases($pdo, $releases, $groupID)
 {
-	$pdo = new Settings();
 	$releaseCreationLimit = ($pdo->getSetting('maxnzbsprocessed') != '' ? (int)$pdo->getSetting('maxnzbsprocessed') : 1000);
 	$releases->checkRegexesUptoDate($pdo->getSetting('latestregexurl'), $pdo->getSetting('latestregexrevision'), $pdo->getSetting('newznabID'));
 	$releases->applyRegex($groupID);
@@ -298,19 +304,6 @@ function charCheck($char)
 }
 
 /**
- * Check if the group should be processed.
- *
- * @param \newznab\db\Settings $pdo
- * @param int                $groupID
- */
-function collectionCheck(&$pdo, $groupID)
-{
-	if ($pdo->queryOneRow(sprintf('SELECT id FROM collections_%d LIMIT 1', $groupID)) === false) {
-		exit();
-	}
-}
-
-/**
  * Connect to usenet, return NNTP object.
  *
  * @param \newznab\db\Settings $pdo
@@ -320,7 +313,7 @@ function collectionCheck(&$pdo, $groupID)
  */
 function &nntp(&$pdo, $alternate = false)
 {
-	$nntp = new \NNTP(['Settings' => $pdo]);
+	$nntp = new NNTP(['Settings' => $pdo]);
 	if (($alternate && $pdo->getSetting('alternate_nntp') == 1 ? $nntp->doConnect(true, true) : $nntp->doConnect()) !== true) {
 		exit("ERROR: Unable to connect to usenet." . PHP_EOL);
 	}

@@ -171,3 +171,4 @@ function smarty_function_html_options_multiple_optgroup($key, $values, $selected
 	$optgroup_html .= "</optgroup>\n";
 	return $optgroup_html;
 }
+?>

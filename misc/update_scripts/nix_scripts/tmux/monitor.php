@@ -1,16 +1,22 @@
 <?php
-require_once dirname(__FILE__) . '/../../../../www/config.php';
+require_once realpath(dirname(dirname(dirname(dirname(__DIR__)))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
 use newznab\db\Settings;
 use newznab\utility\Utility;
+use newznab\TmuxRun;
+use newznab\TmuxOutput;
+use newznab\Category;
 
 
 $pdo = new Settings();
-$tRun = new \TmuxRun($pdo);
-$tOut = new \TmuxOutput($pdo);
+$tRun = new TmuxRun($pdo);
+$tOut = new TmuxOutput($pdo);
 
 $runVar['paths']['misc'] = NN_MISC;
 $runVar['paths']['lib'] = NN_LIB;
+$runVar['paths']['cli'] = NN_ROOT . 'cli/';
+$runVar['paths']['scraper'] = NN_MISC . 'IRCScraper' . DS . 'scrape.php';
+
 $db_name = DB_NAME;
 $dbtype = DB_TYPE;
 $tmux = $tRun->get('niceness');
@@ -74,7 +80,7 @@ while ($runVar['counts']['iterations'] > 0) {
 	$runVar['timers']['query']['tmux_time'] = (time() - $timer01);
 
 	$runVar['settings']['book_reqids'] = (!empty($runVar['settings']['book_reqids'])
-		? $runVar['settings']['book_reqids'] : \Category::CAT_PARENT_BOOK);
+		? $runVar['settings']['book_reqids'] : Category::CAT_PARENT_BOOK);
 
 	//get usenet connection info
 	$runVar['connections'] = $tOut->getConnectionsInfo($runVar['constants']);
@@ -84,7 +90,7 @@ while ($runVar['counts']['iterations'] > 0) {
 
 	//assign scripts
 	$runVar['scripts']['releases'] = ($runVar['constants']['tablepergroup'] == 0
-		? "{$runVar['commands']['_php']} {$runVar['paths']['misc']}update_scripts/nix_scripts/tmux/bin/update_releases.php 1 false"
+		? "{$runVar['commands']['_php']} {$runVar['paths']['misc']}update_scripts/update_releases.php 1 false"
 		: "{$runVar['commands']['_php']} {$runVar['paths']['misc']}update_scripts/nix_scripts/multiprocessing/releases.php"
 	);
 
@@ -104,7 +110,7 @@ while ($runVar['counts']['iterations'] > 0) {
 			$runVar['scripts']['backfill'] = "{$runVar['commands']['_php']} {$runVar['paths']['misc']}update_scripts/nix_scripts/multiprocessing/backfill.php";
 			break;
 		case 2:
-			$runVar['scripts']['backfill'] = "{$runVar['commands']['_python']} {$runVar['paths']['misc']}update_scripts/nix_scripts/tmux/python/backfill_threaded.py group";
+			$runVar['scripts']['backfill'] = "{$runVar['commands']['_python']} {$runVar['paths']['misc']}update_scripts/python/backfill_threaded.py group";
 			break;
 		case 4:
 			$runVar['scripts']['backfill'] = "{$runVar['commands']['_php']} {$runVar['paths']['misc']}update_scripts/nix_scripts/multiprocessing/safe.php backfill";

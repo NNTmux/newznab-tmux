@@ -1,4 +1,7 @@
 <?php
+use newznab\ReleaseComments;
+use newznab\SABnzbd;
+use newznab\NZBGet;
 
 if (!$page->users->isLoggedIn())
 	$page->show403();
@@ -29,7 +32,8 @@ if (!$privateProfiles || $privileged) {
 	}
 }
 
-
+$downloadlist = $page->users->getDownloadRequestsForUser($userID);
+$page->smarty->assign('downloadlist',$downloadlist);
 
 $data = $page->users->getById($userID);
 if (!$data)

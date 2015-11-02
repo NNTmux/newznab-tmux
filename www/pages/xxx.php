@@ -1,11 +1,16 @@
 <?php
 
+use newznab\XXX;
+use newznab\Category;
+use newznab\DnzbFailures;
+
 if (!$page->users->isLoggedIn()) {
 	$page->show403();
 }
 
 $movie = new XXX();
 $cat = new Category();
+$fail = new DnzbFailures(['Settings' => $page->settings]);
 
 $moviecats = $cat->getChildren(Category::CAT_PARENT_XXX);
 $mtmp = [];
@@ -34,6 +39,7 @@ foreach ($results as $result) {
 	$result['genre'] = $movie->makeFieldLinks($result, 'genre');
 	$result['actors'] = $movie->makeFieldLinks($result, 'actors');
 	$result['director'] = $movie->makeFieldLinks($result, 'director');
+	$result['failed'] = $fail->getFailedCount($result['grp_release_guid']);
 	$movies[] = $result;
 }
 $title = (isset($_REQUEST['title']) && !empty($_REQUEST['title'])) ? stripslashes($_REQUEST['title']) : '';

@@ -2,6 +2,8 @@
 
 require_once("config.php");
 
+use newznab\Menu;
+
 $page = new AdminPage();
 
 $menu = new Menu();

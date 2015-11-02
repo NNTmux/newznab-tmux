@@ -16,10 +16,10 @@ I started adapting some of more interesting scripts from nZEDb, but they require
  		git reset --hard origin/your_wanted_branch, ie. git reset --hard origin/master
  		git checkout -t origin/your_wanted_branch, ie. git checkout -t origin/master
 
-	There is a lib folder in main tmux folder. In that folder you will find DB folder. If you are setting up tmux for the first time, import db.sql using cli (mysql -u {┤your username} -p newznab < db.sql).
-	After importing db.sql you need to run the patchDB.php from same folder. After the last patch is applied, you need to manualy apply the next patch labeled XXXX~settings.sql (XXXX is a patch number that is different on dev/master(0122) and regexless branch(0149)).	
-	When you have manualy applied that patch, you can use the new database updater located in /path/to/newznab/cli/ and run update_db.php true and it will apply the rest of the patches (if they exist).
-	After these steps, patchDB is unusable anymore and you need to use the new update_db.php script in cli folder.
+	Schema for first database update is located in resources/db/schema/ folder. Import it to your database.
+	If you are updating from latest newznab svn (aka tvmaze version), you need to rename back tvinfoID columns into rageid
+	(located in releases and userseries tables, maybe some more), before you import the schema.sql.
+	After that you update your database by running update_db.php from cli folder (ie. php cli/update_db.php true)
 
 	You need to chmod to 777 following folders now:
 	resources/*

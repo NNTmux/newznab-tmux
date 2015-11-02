@@ -1,17 +1,20 @@
 <?php
-require_once("config.php");
+require_once './config.php';
+
+
+use newznab\Releases;
 
 $page = new AdminPage();
 
-if (isset($_GET['id'])) {
+if (isset($_GET['id']))
+{
 	$releases = new Releases(['Settings' => $page->settings]);
 	$releases->deleteMultiple($_GET['id']);
 }
 
-if (isset($_GET['from'])) {
+if (isset($_GET['from']))
 	$referrer = $_GET['from'];
-} else {
+else
 	$referrer = $_SERVER['HTTP_REFERER'];
-}
 header("Location: " . $referrer);
 

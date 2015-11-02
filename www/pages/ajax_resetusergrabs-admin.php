@@ -1,5 +1,7 @@
 <?php
 
+use newznab\Users;
+
 $page = new AdminPage();
 $u = new Users();
 

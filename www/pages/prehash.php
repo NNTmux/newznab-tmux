@@ -1,5 +1,7 @@
 <?php
 
+use newznab\PreHash;
+
 if (!$page->users->isLoggedIn()) {
 	$page->show403();
 }
@@ -21,6 +23,7 @@ $page->smarty->assign('pageroffset', $offset);
 $page->smarty->assign('pageritemsperpage', ITEMS_PER_PAGE);
 $page->smarty->assign('pagerquerybase', WWW_TOP . "/prehash/&amp;offset=");
 $page->smarty->assign('pagerquerysuffix', "#results");
+$page->smarty->assign('lastSearch', $lastSearch);
 
 $pager = $page->smarty->fetch("pager.tpl");
 $page->smarty->assign('pager', $pager);

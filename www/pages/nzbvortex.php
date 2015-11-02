@@ -1,5 +1,7 @@
 <?php
 
+use newznab\NZBVortex;
+
 if (!$page->users->isLoggedIn())
     $page->show403();
 

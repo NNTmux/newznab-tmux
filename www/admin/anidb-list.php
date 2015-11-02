@@ -1,6 +1,10 @@
 <?php
 
-require_once("config.php");
+require_once './config.php';
+
+
+use newznab\AniDB;
+
 
 $page = new AdminPage();
 

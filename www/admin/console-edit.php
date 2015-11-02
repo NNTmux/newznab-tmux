@@ -2,6 +2,9 @@
 
 require_once("config.php");
 
+use newznab\Console;
+use newznab\Genres;
+
 $page = new AdminPage();
 $console = new Console(['Settings' => $page->settings]);
 $gen = new Genres();
@@ -21,8 +24,8 @@ if (isset($_REQUEST["id"]))
 
 	switch($action)
 	{
-	    case 'submit':
-	    	$coverLoc = WWW_DIR."covers/console/".$id.'.jpg';
+		case 'submit':
+			$coverLoc = NN_WWW."covers/console/".$id.'.jpg';
 
 			if($_FILES['cover']['size'] > 0)
 			{

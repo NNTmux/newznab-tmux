@@ -1,8 +1,12 @@
 <?php
 
-require_once dirname(__FILE__) . '/../../www/config.php';
+require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
 
 use newznab\db\Settings;
+use newznab\Releases;
+use newznab\NZB;
+use newznab\NNTP;
+use newznab\NZBInfo;
 
 $releases = new Releases();
 $pdo = new Settings();
@@ -13,7 +17,7 @@ $nntp = new NNTP;
 $relguid = "249f9ec1f0d68d33b5fa85594ba1a47d";
 
 $nzbfile = $nzb->getNZBPath($relguid, $pdo->getSetting('nzbpath'), true);
-$nzbInfo = new nzbInfo;
+$nzbInfo = new NZBInfo;
 $nzbInfo->loadFromFile($nzbfile);
 
 $nntp->doConnect();

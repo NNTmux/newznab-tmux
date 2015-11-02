@@ -1,12 +1,18 @@
 <?php
 
+use newznab\Music;
+use newznab\Category;
+use newznab\Genres;
+use newznab\DnzbFailures;
+
 if (!$page->users->isLoggedIn()) {
 	$page->show403();
 }
 
-$music = new Musik(['Settings' => $page->settings]);
+$music = new Music(['Settings' => $page->settings]);
 $cat = new Category(['Settings' => $page->settings]);
 $gen = new Genres(['Settings' => $page->settings]);
+$fail = new DnzbFailures(['Settings' => $page->settings]);
 
 $musiccats = $cat->getChildren(Category::CAT_PARENT_MUSIC);
 $mtmp = [];
@@ -47,6 +53,7 @@ foreach ($genres as $gn) {
 
 foreach ($results as $result) {
 	$result['genre'] = $tmpgnr[$result["genreid"]];
+	$result['failed'] = $fail->getFailedCount($result['grp_release_guid']);
 	$musics[] = $result;
 }
 

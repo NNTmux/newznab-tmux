@@ -2,6 +2,9 @@
 
 require_once("config.php");
 
+use newznab\Binaries;
+use newznab\Category;
+
 $page = new AdminPage();
 $bin = new Binaries();
 $id = 0;

@@ -1,0 +1,95 @@
+2015-11-02 DariusIII
+	Fix: Manualy update xml version
+	Fix: TVMaze processing
+2015-11-01 DariusIII
+	Fix: Fix some offset errors, fix akas processing, remove debug info
+2015-10-31 DariusIII
+	Add all the processing to tv
+2015-10-30 DariusIII
+	Fix: ApaiIO errors
+	Chg: Move ApaiIO and Tmdb libraries to libs folder
+	Fix: Fix the ordering in templates and some of the errors
+	Chg: Change the order of sources processing, move TvRage to the end, TVMaze to second place
+	Chg: Move My Shows link to user account dropdown
+2015-10-29 DariusIII
+	Add: Add fixes from dev-regexless-tv branch
+	Fix: Remove tvinfoid from insertReleases function
+	Upd: Add patch to rename scrape into run_ircscraper in tmux table
+2015-10-28 DariusIII
+	Fix: Missing TraktTv
+	Fix: Fix the no cover image
+	Fix: Remove unused $countres
+	Upd: Remove totalrows count to speed up site
+	Fix: Fix the typo in releasesearch tablename
+	Upd: Add missing TraktAPI class, remove classes from newznab folder, fix porting errors
+2015-10-27 DariusIII
+	Fix: Scrape countries properly
+	Fix: remove rss functions from Releases.php, fix python scripts looking for DB_SYSTEM constant
+	Upd: Monitor and Tmux for irc scraper
+	Upd: Change the name of versions file to nntmux.xml
+	Chg: Change tvinfoid to rageid in patch 138
+	Fix: Fix notices on anime pages
+2015-10-26 DariusIII
+	Upd: Sites class, add default constructor
+	Upd: Refactor TV support
+2015-10-21 DariusIII
+	Fix: NZB error in processing/post/AniDB
+	Fix: Instantiation of Genres class in Console.php and path to postprocess_pre in TmuxRun.php
+	Fix: Reported errors in Forking and settings.example.php
+	Fix: Rename rageid into tvinfoid
+2015-10-20 DariusIII
+	Upd: Update schema, change or remove some patches-
+	Upd: Update patch 56
+	Upd: Update patch 83
+	Chg: Hopefully last addition to schema
+	Chg: Change description on ircscraper.
+	Fix: Schema and ircscraper settings in tmux.
+	Fix: Typo in queryExec
+	Fix: Add missing posprocess_pre script, change references to Page in Releases.php
+	Fix: Again some fixes for schema and site-edit.php
+	Fix: Schema.sql
+	Fix: ffs
+	Fix: Again patches and schema
+	Fix: Fix patches and schema
+	Fix: Typo in schema.sql
+	Chg: Update patches, update db.sql and rename it to schema.sql.
+	Fix: Another class use fix
+	Chg: Change rageid into tvinfoid as temporary solution in Tmux.php
+	Upd: update patches - remove rageid.
+2015-10-19 DariusIII
+	Upd: Update the DbUpdate class
+	Fix: update_db error.
+	Fix: More script adjustments
+	Fix: Fix book and misc menu in omicron template
+	Upd: Many small changes to classes
+	Chg: InnoDB to MYISAM in patches
+	Fix: Wrong path to indexer.php
+	Fix: Instantiation of Logger class in DB.php
+	Chg: Add tmux 2.0.3 packages
+	Fix: Missing Tmux class
+	Fix: Error for undefined stdClass
+	Fix: LoggerException erro.
+	Fix: Remove references to www/config.php in Settings.php
+	Upd: small update to XXX class.
+	Fix: @var Users in BasePage.php
+	Fix: references to site replaced with settings
+	Chg: Moved db.sql into resources/db/schema folder, patchDB does not need to be used anymore. Will be removed in next patch
+	Upd: Fix tmux paths for moved files.
+	Upd: Refactor branch completely.
+2015-10-18 DariusIII
+	Fix: Use queryExec and not queryDelete in Releases.php
+	Chg: Remove require for automated.config.php
+	Chg: Move config files into newznab/config folder. Move BasePage, AdminPage and page to www/pages folder where they belong.
+	Fix: Fix processReleases call in switch.php and instantiation of classes
+2015-10-13 DariusIII
+	Fix: improve speed by replacing str_ireplace with strpos.Pushing again.
+2015-10-13 DariusIII
+	???: Have no idea what is wrong
+2015-10-13 DariusIII
+	Bug: Fix porting errors.
+2015-10-13 DariusIII
+	Fix: Port fixes for omicron/charisma themes from nZEDb (white spaces), again.Was copied from wrong branch.
+2015-10-13 DariusIII
+	Add: add build/NewPatches.php
+2015-10-13 DariusIII
+	Change permissions on files

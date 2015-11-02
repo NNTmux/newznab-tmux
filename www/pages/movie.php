@@ -1,5 +1,7 @@
 <?php
 
+use newznab\Movie;
+
 if (!$page->users->isLoggedIn()) {
 	$page->show403();
 }
@@ -24,7 +26,7 @@ if (isset($_GET['modal']) && isset($_GET["id"]) && ctype_digit($_GET["id"])) {
 	$page->meta_description = "";
 	$page->smarty->registerPlugin('modifier', 'ss', 'stripslashes');
 
-	$page->content = $page->smarty->fetch('viewmovie.tpl');
+	$page->content = $page->smarty->fetch('viewmoviefull.tpl');
 
 	echo $page->content;
 } else {

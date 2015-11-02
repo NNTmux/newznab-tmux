@@ -21,6 +21,8 @@
 
 require_once("config.php");
 
+use newznab\Backfill;
+
 $time = 0;
 
 if (isset($argv[1]))

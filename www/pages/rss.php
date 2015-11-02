@@ -1,26 +1,43 @@
 <?php
 
+use newznab\Category;
+use newznab\RSS;
 use newznab\db\Settings;
 
 $category = new Category(['Settings' => $page->settings]);
-$releases = new Releases(['Settings' => $page->settings]);
+$rss = new RSS(['Settings' => $page->settings]);
 
 // If no content id provided then show user the rss selection page.
-if (!isset($_GET["t"]) && !isset($_GET["rage"]) && !isset($_GET["anidb"])) {
+if (!isset($_GET["t"]) && !isset($_GET["show"]) && !isset($_GET["anidb"])) {
 	// User has to either be logged in, or using rsskey.
 	if (!$page->users->isLoggedIn()) {
 		if ($page->settings->getSetting('registerstatus') != Settings::REGISTER_STATUS_API_ONLY) {
-			header('X-newznab: ERROR: You must be logged in or provide a valid User ID and API key!');
+			header('X-nntmux: ERROR: You must be logged in or provide a valid User ID and API key!');
 			$page->show403();
 		} else {
 			header("Location: " . $page->settings->getSetting('code'));
 		}
 	}
 
-	$page->title = "Rss Feeds";
-	$page->meta_title = "Rss Nzb Feeds";
+	$page->title = "Rss Info";
+	$page->meta_title = "Rss Nzb Info";
 	$page->meta_keywords = "view,nzb,description,details,rss,atom";
-	$page->meta_description = "View available Rss Nzb feeds.";
+	$page->meta_description = "View information about nntmux RSS Feeds.";
+
+	$firstShow = $rss->getFirstInstance('id', 'videos');
+	$firstAni = $rss->getFirstInstance('anidbid', 'releases');
+
+	if (isset($firstShow['id'])) {
+		$page->smarty->assign('show', $firstShow['id']);
+	} else {
+		$page->smarty->assign('show', 1);
+	}
+
+	if (isset($firstAni['anidb'])) {
+		$page->smarty->assign('anidb', $firstAni['id']);
+	} else {
+		$page->smarty->assign('anidb', 1);
+	}
 
 	$page->smarty->assign([
 			'categorylist'       => $category->get(true, $page->userdata["categoryexclusions"]),
@@ -42,7 +59,7 @@ if (!isset($_GET["t"]) && !isset($_GET["rage"]) && !isset($_GET["anidb"])) {
 			$res = $page->users->getById(0);
 		} else {
 			if (!isset($_GET["i"]) || !isset($_GET["r"])) {
-				header('X-newznab: ERROR: Both the User ID and API key are required for viewing the RSS!');
+				header('X-nntmux: ERROR: Both the User ID and API key are required for viewing the RSS!');
 				$page->show403();
 			}
 
@@ -50,7 +67,7 @@ if (!isset($_GET["t"]) && !isset($_GET["rage"]) && !isset($_GET["anidb"])) {
 		}
 
 		if (!$res) {
-			header('X-newznab: ERROR: Invalid API key or User ID!');
+			header('X-nntmux: ERROR: Invalid API key or User ID!');
 			$page->show403();
 		}
 
@@ -60,16 +77,16 @@ if (!isset($_GET["t"]) && !isset($_GET["rage"]) && !isset($_GET["anidb"])) {
 	}
 
 	if ($page->users->getApiRequests($uid) > $maxRequests) {
-		header('X-newznab: ERROR: You have reached your daily limit for API requests!');
+		header('X-nntmux: ERROR: You have reached your daily limit for API requests!');
 		$page->show503();
 	} else {
 		$page->users->addApiRequest($uid, $_SERVER['REQUEST_URI']);
 	}
 	// Valid or logged in user, get them the requested feed.
 
-	$userRage = $userAnidb = -1;
-	if (isset($_GET["rage"])) {
-		$userRage = ($_GET["rage"] == 0 ? -1 : $_GET["rage"] + 0);
+	$userShow = $userAnidb = -1;
+	if (isset($_GET["show"])) {
+		$userShow = ($_GET["show"] == 0 ? -1 : $_GET["show"] + 0);
 	} elseif (isset($_GET["anidb"])) {
 		$userAnidb = ($_GET["anidb"] == 0 ? -1 : $_GET["anidb"] + 0);
 	}
@@ -87,14 +104,16 @@ if (!isset($_GET["t"]) && !isset($_GET["rage"]) && !isset($_GET["anidb"])) {
 	);
 
 	if ($userCat == -3) {
-		$relData = $releases->getShowsRss($userNum, $uid, $page->users->getCategoryExclusion($uid), $userAirDate);
+		$relData = $rss->getShowsRss($userNum, $uid, $page->users->getCategoryExclusion($uid), $userAirDate);
 	} elseif ($userCat == -4) {
-		$relData = $releases->getMyMoviesRss($userNum, $uid, $page->users->getCategoryExclusion($uid));
+		$relData = $rss->getMyMoviesRss($userNum, $uid, $page->users->getCategoryExclusion($uid));
 	} else {
-		$relData = $releases->getRss(explode(',', $userCat), $userNum, $uid, $userRage, $userAnidb, $userAirDate);
+		$relData = $rss->getRss(explode(',', $userCat), $userNum, $userShow, $userAnidb, $uid, $userAirDate);
 	}
 
 	$page->smarty->assign('releases', $relData);
+	$response = trim($page->smarty->fetch('rss.tpl'));
 	header("Content-type: text/xml");
-	echo trim($page->smarty->fetch('rss.tpl'));
+	header('Content-Length: ' . strlen($response) );
+	echo $response;
 }

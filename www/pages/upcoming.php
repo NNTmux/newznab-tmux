@@ -1,5 +1,7 @@
 <?php
 
+use newznab\Movie;
+
 if (!$page->users->isLoggedIn()) {
 	$page->show403();
 }

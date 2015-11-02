@@ -116,7 +116,7 @@ function release_flag ($x, $t)
 		}
 
 		return
-			'<img title=' . $d . ' src="' . $www . 'templates/nntmux/images/flags/' . $y . '.png" />';
+			'<img title=' . $d . ' src="' . $www . 'themes_shared/images/flags/' . $y . '.png" />';
 	} else if ($t == "search") {
 		if ($y == "") {
 			return false;

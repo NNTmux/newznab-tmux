@@ -1,5 +1,22 @@
 <?php
 
+use newznab\Console;
+use newznab\ReleaseComments;
+use newznab\ReleaseExtra;
+use newznab\ReleaseFiles;
+use newznab\DnzbFailures;
+use newznab\Releases;
+use newznab\Videos;
+use newznab\Episode;
+use newznab\Movie;
+use newznab\XXX;
+use newznab\Games;
+use newznab\Music;
+use newznab\AniDB;
+use newznab\Books;
+use newznab\PreHash;
+use newznab\PreDB;
+
 if (!$page->users->isLoggedIn())
 	$page->show403();
 
@@ -8,6 +25,7 @@ if (isset($_GET["id"]))
 	$releases = new Releases(['Settings' => $page->settings]);
 	$rc = new ReleaseComments;
 	$re = new ReleaseExtra;
+	$df = new DnzbFailures(['Settings' => $page->settings]);
 	$data = $releases->getByGuid($_GET["id"]);
 
 	if (!$data)
@@ -25,42 +43,11 @@ if (isset($_GET["id"]))
 		$data['searchname'],
 		6,
 		$page->userdata['categoryexclusions']);
+	$failed = $df->getFailedCount($data['guid']);
 
-	$rage = '';
-	if ($data["rageid"] != '')
-	{
-		$tvrage = new TvRage();
-
-		$rageinfo = $tvrage->getByRageID($data["rageid"]);
-		if (count($rageinfo) > 0)
-		{
-			$seriesnames = $seriesdescription = $seriescountry = $seriesgenre = $seriesimg = $seriesid = [];
-			foreach($rageinfo as $r)
-			{
-				$seriesnames[] = $r['releasetitle'];
-				if (!empty($r['description']))
-					$seriesdescription[] = $r['description'];
-
-				if (!empty($r['country']))
-					$seriescountry[] = $r['country'];
-
-				if (!empty($r['genre']))
-					$seriesgenre[] = $r['genre'];
-
-				if (!empty($r['imgdata'])) {
-					$seriesimg[] = $r['imgdata'];
-					$seriesid[] = $r['id'];
-				}
-			}
-			$rage = array(
-				'releasetitle' => array_shift($seriesnames),
-				'description'  => array_shift($seriesdescription),
-				'country'      => array_shift($seriescountry),
-				'genre'        => array_shift($seriesgenre),
-				'imgdata'      => array_shift($seriesimg),
-				'id'=>array_shift($seriesid)
-			);
-		}
+	$showInfo = '';
+	if ($data['videos_id'] > 0) {
+		$showInfo = (new Videos(['Settings' => $page->settings]))->getByVideoID($data['videos_id']);
 	}
 
 	$episodeArray = '';
@@ -69,7 +56,6 @@ if (isset($_GET["id"]))
 		$episode = new Episode();
 		$episodeArray = $episode->getEpisodeInfoByID($data['episodeinfoid']);
 	}
-
 	$mov = '';
 	if ($data['imdbid'] != '' && $data['imdbid'] != 0000000) {
 		$movie = new Movie(['Settings' => $page->settings]);
@@ -120,7 +106,7 @@ if (isset($_GET["id"]))
 
 	$mus = '';
 	if ($data['musicinfoid'] != '') {
-		$music = new Musik(['Settings' => $page->settings]);
+		$music = new Music(['Settings' => $page->settings]);
 		$mus = $music->getMusicInfo($data['musicinfoid']);
 	}
 
@@ -132,7 +118,7 @@ if (isset($_GET["id"]))
 
 	$con = '';
 	if ($data['consoleinfoid'] != '') {
-		$c = new Konsole();
+		$c = new Console();
 		$con = $c->getConsoleInfo($data['consoleinfoid']);
 	}
 
@@ -162,7 +148,7 @@ if (isset($_GET["id"]))
 	$page->smarty->assign('reAudio',$reAudio);
 	$page->smarty->assign('reSubs',$reSubs);
 	$page->smarty->assign('nfo',$nfo);
-	$page->smarty->assign('rage',$rage);
+	$page->smarty->assign('show',$showInfo);
 	$page->smarty->assign('movie',$mov);
 	$page->smarty->assign('xxx', $xxx);
 	$page->smarty->assign('episode',$episodeArray);
@@ -177,6 +163,7 @@ if (isset($_GET["id"]))
 	$page->smarty->assign('searchname',$releases->getSimilarName($data['searchname']));
 	$page->smarty->assign('similars', $similars);
 	$page->smarty->assign('privateprofiles', ($page->settings->getSetting('privateprofiles') == 1) ? true : false );
+	$page->smarty->assign('failed', $failed);
 
 	$page->meta_title = "View NZB";
 	$page->meta_keywords = "view,nzb,description,details";

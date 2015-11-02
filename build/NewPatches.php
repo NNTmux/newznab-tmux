@@ -19,7 +19,7 @@
  * @copyright 2015 nZEDb
  */
 
-require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'www' . DIRECTORY_SEPARATOR . 'config.php';
+require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'indexer.php';
 
 use newznab\db\DbUpdate;
 use newznab\utility\Git;
@@ -32,7 +32,6 @@ if (!Utility::isCLI()) {
 $error = false;
 $git = new Git();
 $branch = $git->active_branch();
-
 if (in_array($branch, $git->mainBranches())) {
 	// Only update patches, etc. on specific branches to lessen conflicts
 	try {

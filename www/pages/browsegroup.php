@@ -1,4 +1,7 @@
 <?php
+
+use newznab\Groups;
+
 if (!$page->users->isLoggedIn()) {
 	$page->show403();
 }

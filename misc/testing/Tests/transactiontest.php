@@ -25,8 +25,8 @@ try {
 
             // Insert some data
             $sql = sprintf("
-                INSERT INTO `testdata`
-                (`id` ,`field1` ,`field2` ,`field3` ,`field4`)
+                INSERT INTO testdata
+                (id ,field1 ,field2 ,field3 ,field4)
                 VALUES
                 ('%s', '%s', '%s', '%s', '%s')", $i, $i, $i, $i, $i
             );

@@ -2,6 +2,10 @@
 
 require_once("config.php");
 
+use newznab\Users;
+use newznab\Releases;
+use newznab\NZB;
+
 $page = new AdminPage;
 $users = new Users;
 $releases = new Releases;

@@ -2,6 +2,10 @@
 
 require_once("config.php");
 
+use newznab\ReleaseRegex;
+use newznab\Groups;
+use newznab\Category;
+
 $page = new AdminPage();
 $reg = new ReleaseRegex();
 $groups = new Groups();
@@ -13,7 +17,7 @@ $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view';
 
 $numarticlesdefault = 20000;
 $groupList = $groups->getAll();
-array_unshift($groupList, array('id'=>0, 'name'=>'All Groups'));
+array_unshift($groupList, ['id'=>0, 'name'=>'All Groups']);
 
 $gid = $gnames = [];
 $groupname = (isset($_REQUEST['groupname']) && !empty($_REQUEST['groupname'])) ? $_REQUEST['groupname'] : '';

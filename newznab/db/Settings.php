@@ -20,10 +20,6 @@
  */
 namespace newznab\db;
 
-if (!defined('NN_INSTALLER')) {
-	require_once dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'www' . DIRECTORY_SEPARATOR . 'config.php';
-}
-
 use newznab\utility\Utility;
 use newznab\utility\Versions;
 
@@ -234,7 +230,7 @@ class Settings extends DB
 		try {
 			$ver = (new Versions())->getTagVersion();
 		} catch (\Exception $e) {
-			$ver = '0.0.0';
+			$ver = '0.4.2';
 		}
 		return $ver;
 	}

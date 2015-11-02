@@ -5,7 +5,7 @@ if (!defined('GIT_PRE_COMMIT')) {
 	define('GIT_PRE_COMMIT', false);
 }
 
-use ColorCLI;
+use newznab\ColorCLI;
 
 class Versions
 {
@@ -23,7 +23,7 @@ class Versions
 	public $git;
 
 	/**
-	 * @var object newznab\controllers\ColorCLI
+	 * @var object newznab\ColorCLI
 	 */
 	public $out;
 
@@ -137,8 +137,8 @@ class Versions
 		$ver = preg_match('#v(\d+\.\d+\.\d+).*#', $latest, $matches) ? $matches[1] : $latest;
 
 		if ($this->git->getBranch() === 'dev') {
-			if (version_compare($this->_vers->git->tag, '0.0.0', '!=')) {
-				$this->_vers->git->tag = '0.0.0';
+			if (version_compare($this->_vers->git->tag, '0.4.2', '!=')) {
+				$this->_vers->git->tag = '0.4.2';
 				$this->_changes |= self::UPDATED_GIT_TAG;
 			}
 			return $this->_vers->git->tag;

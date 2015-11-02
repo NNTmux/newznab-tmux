@@ -1,16 +1,20 @@
 <?php
 
+use newznab\Releases;
+use newznab\Contents;
+use newznab\Category;
+
 if (!$page->users->isLoggedIn()) {
 	$page->show403();
 }
 
-$releases = new Releases();
-$contents = new Contents();
-$category = new Category();
-$error = false;
+$releases = new Releases(['Settings' => $page->settings]);
+$contents = new Contents(['Settings' => $page->settings]);
+$category = new Category(['Settings' => $page->settings]);
+$error    = false;
 
 // Array with all the possible poster wall types.
-$startTypes = array('Books', 'Console', 'Movies', 'XXX', 'Audio', 'PC', 'TV'/*, 'Recent'*/);
+$startTypes = array('Books', 'Console', 'Movies', 'XXX', 'Audio', 'PC', 'TV', 'Anime'/*, 'Recent'*/);
 // Array that will contain the poster wall types (the above array minus whatever they have disabled in admin).
 $types = [];
 // Get the names of all enabled parent categories.
@@ -20,6 +24,9 @@ if (count($categories) > 0) {
 	foreach ($categories as $pType) {
 		if (in_array($pType['title'], $startTypes)) {
 			$types[] = $pType['title'];
+			if ($pType['title'] == 'TV') {
+				$types[] = 'Anime';
+			}
 		}
 	}
 } else {
@@ -90,6 +97,12 @@ if (!$error) {
 			$getnewesttv = $releases->getNewestTV();
 			$page->smarty->assign('newest', $getnewesttv);
 			$page->smarty->assign('goto', 'tv');
+			break;
+
+		case 'Anime':
+			$getnewestanime = $releases->getNewestAnime();
+			$page->smarty->assign('newest', $getnewestanime);
+			$page->smarty->assign('goto', 'anime');
 			break;
 
 		case 'Recent':

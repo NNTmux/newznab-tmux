@@ -1,5 +1,7 @@
 <?php
 
+use newznab\Forum;
+
 if (!$page->users->isLoggedIn())
 	$page->show403();
 
