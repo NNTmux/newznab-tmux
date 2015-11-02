@@ -48,6 +48,7 @@ class BasePage
 	public $userdata = [];
 	public $serverurl = '';
 	public $secure_connection = false;
+	public $show_desktop_mode = false;
 
 
 	/**
