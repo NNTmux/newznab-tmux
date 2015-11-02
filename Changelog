@@ -1,4 +1,5 @@
 2015-11-02 DariusIII
+	Fix: Manualy update xml version
 	Fix: TVMaze processing
 2015-11-01 DariusIII
 	Fix: Fix some offset errors, fix akas processing, remove debug info
