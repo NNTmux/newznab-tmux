@@ -472,6 +472,7 @@ class TmdbAPI {
 		$movies = array();
 
 		$result = $this->_call('search/movie', 'query='. urlencode($movieTitle), $this->getLang());
+		var_dump($result);
 
 		foreach($result['results'] as $data){
 			$movies[] = new Movie($data);
@@ -491,6 +492,7 @@ class TmdbAPI {
 		$tvShows = array();
 
 		$result = $this->_call('search/tv', 'query='. urlencode($tvShowTitle), $this->getLang());
+		var_dump($result);
 
 		foreach($result['results'] as $data){
 			$tvShows[] = new TVShow($data);
@@ -529,6 +531,7 @@ class TmdbAPI {
 		$collections = array();
 
 		$result = $this->_call('search/collection', 'query='. urlencode($collectionName), $this->getLang());
+		var_dump($result);
 
 		foreach($result['results'] as $data){
 			$collections[] = new Collection($data);
