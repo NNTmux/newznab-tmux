@@ -23,7 +23,7 @@ if (!empty($argv[1]) && is_numeric($argv[2]) && is_numeric($argv[3])) {
 
 		print_r($series[0]);
 
-		if ($season > 0 AND $episode > 0) {
+		if ($season > 0 && $episode > 0) {
 			$episodeObj = $tmdb->client->getEpisode($series[0]->_data['id'], $season, $episode);
 			if ($episodeObj) {
 				print_r($episodeObj);
@@ -36,11 +36,11 @@ if (!empty($argv[1]) && is_numeric($argv[2]) && is_numeric($argv[3])) {
 				}
 			}
 		} else {
-			exit($c->error("Invalid episode data returned from TVMaze API."));
+			exit($c->error("Invalid episode data returned from TMDB API."));
 		}
 
 	} else {
-		exit($c->error("Invalid show data returned from TVMaze API."));
+		exit($c->error("Invalid show data returned from TMDB API."));
 	}
 
 } else {
