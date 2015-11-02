@@ -256,7 +256,7 @@ abstract class TV extends Videos
 				)
 			);
 			// If we have AKAs\aliases, insert those as well
-			if (is_array($showArr['aliases'])) {
+			if (!empty($showArr['aliases'])) {
 				$this->addAliases($videoId, $showArr['aliases']);
 			}
 		} else {
@@ -334,6 +334,9 @@ abstract class TV extends Videos
 				$videoId
 			)
 		);
+		if (!empty($showArr['aliases'])) {
+			$this->addAliases($videoId, $showArr['aliases']);
+		}
 	}
 
 	/**
@@ -386,6 +389,7 @@ abstract class TV extends Videos
 	 */
 	public function getSiteByID($column, $id)
 	{
+		$return = false;
 		$videoArr = $this->pdo->queryOneRow(
 			sprintf("
 				SELECT %s
@@ -395,7 +399,12 @@ abstract class TV extends Videos
 				$id
 			)
 		);
-		return (isset($videoArr[$column]) ? $videoArr[$column] : false);
+		if ($column === '*') {
+			$return = $videoArr;
+		} else if ($column !== '*' && isset($videoArr[$column])) {
+			$return = $videoArr[$column];
+		}
+		return $return;
 	}
 
 	/**
