@@ -425,17 +425,6 @@ class TmdbAPI {
 	/**
 	 * 	Get a Episode
 	 *
-	 *  @param int $idEpisode The Episode id
-	 * 	@param string $appendToResponse The extra append of the request, by default all
-	 * 	@return Episode
-	 */
-	/*public function getEpisode($idEpisode, $appendToResponse = 'append_to_response=trailers,images,casts,translations'){
-		return new Episode($this->_call('tv/season/episode/' . $idEpisode, $appendToResponse));
-	}*/
-
-	/**
-	 * 	Get a Episode
-	 *
 	 *  @param int $idTVShow The TVShow id
 	 *  @param int $numSeason The Season number
 	 *  @param int $numEpisode the Episode number

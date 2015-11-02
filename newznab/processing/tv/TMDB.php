@@ -69,7 +69,7 @@ class TMDB extends TV
 				if (is_array($release) && $release['name'] != '') {
 
 					// Find the Video ID if it already exists by checking the title.
-					$videoId = $this->getByTitle($release['cleanname']);
+					$videoId = $this->getByTitle($release['cleanname'], parent::TYPE_TV);
 
 					if ($videoId !== false) {
 						$tmdbid = $this->getSiteByID('tmdb', $videoId);
@@ -150,7 +150,7 @@ class TMDB extends TV
 						}
 					}
 				} //Processing failed, set the episode ID to the next processing group
-				$this->setVideoNotFound(parent::PROCESS_TVRAGE, $row['id']);
+				$this->setVideoNotFound(parent::PROCESS_TRAKT, $row['id']);
 			}
 		}
 	}
@@ -168,7 +168,7 @@ class TMDB extends TV
 
 		try {
 			//Try for the best match with AKAs embedded
-			$response = $this->client->singleSearch($cleanName);
+			$response = $this->client->searchTVShow($cleanName);
 		} catch (\Exception $error) {
 		}
 
@@ -180,7 +180,7 @@ class TMDB extends TV
 		if ($return === false) {
 			try {
 				//Try for the best match via full search (no AKAs can be returned)
-				$response = $this->client->search($cleanName);
+				$response = $this->client->searchCollection($cleanName);
 			} catch (\Exception $error) {
 			}
 			if (is_array($response)) {
@@ -280,19 +280,14 @@ class TMDB extends TV
 	{
 		$return = $response = false;
 
-		if ($airdate !== '') {
+		if ($videoId > 0) {
 			try {
-				$response = $this->client->getEpisodesByAirdate($tmdbid, $airdate);
-			} catch (\Exception $error) {
-			}
-		} else if ($videoId > 0) {
-			try {
-				$response = $this->client->getEpisodesByShowID($tmdbid);
+				$response = $this->client->getTVShow($tmdbid);
 			} catch (\Exception $error) {
 			}
 		} else {
 			try {
-				$response = $this->client->getEpisodeByNumber($tmdbid, $season, $episode);
+				$response = $this->client->getEpisode($tmdbid, $season, $episode);
 			} catch (\Exception $error) {
 			}
 		}
@@ -332,22 +327,22 @@ class TMDB extends TV
 	 */
 	private function formatShowArr($show)
 	{
-		$this->posterUrl = (string)(isset($show->mediumImage) ? $show->mediumImage : '');
+		$this->posterUrl = (string)(isset($show->_data['poster_path']) ? $show->_data['poster_path'] : '');
 
 		return [
-			'tmdbid'    => (int)$show->id,
+			'tmdbid'    => (int)$show->_data['id'],
 			'column'    => 'tmdb',
-			'siteid'    => (int)$show->id,
-			'title'     => (string)$show->name,
-			'summary'   => (string)$show->summary,
-			'started'   => (string)$show->premiered,
-			'publisher' => (string)$show->network,
-			'country'   => (string)$show->country,
+			'siteid'    => (int)$show->_data['id'],
+			'title'     => (string)$show->_data['name'],
+			'summary'   => (string)$show->_data['overview'],
+			'started'   => (string)$show->_data['first_air_date'],
+			'publisher' => (string)$show->_data['networks']->name,
+			'country'   => (string)$show->_data['origin_country'],
 			'source'    => (int)parent::SOURCE_TMDB,
 			'imdbid'    => 0,
-			'tvdbid'    => (int)(isset($show->externalIDs['thetvdb']) ? $show->externalIDs['thetvdb'] : 0),
+			'tvdbid'    => 0,
 			'traktid'   => 0,
-			'tvrageid'  => (int)(isset($show->externalIDs['tvrage']) ? $show->externalIDs['tvrage'] : 0),
+			'tvrageid'  => 0,
 			'tvmazeid'    => 0
 		];
 	}
@@ -363,12 +358,12 @@ class TMDB extends TV
 	private function formatEpisodeArr($episode)
 	{
 		return [
-			'title'       => (string)$episode->name,
-			'series'      => (int)$episode->season,
-			'episode'     => (int)$episode->number,
-			'se_complete' => (string)'S' . sprintf('%02d', $episode->season) . 'E' . sprintf('%02d', $episode->number),
-			'firstaired'  => (string)$episode->airdate,
-			'summary'     => (string)$episode->summary
+			'title'       => (string)$episode->_data['name'],
+			'series'      => (int)$episode->_data['season_number'],
+			'episode'     => (int)$episode->_data['episode_number'],
+			'se_complete' => (string)'S' . sprintf('%02d', $episode->_data['season_number']) . 'E' . sprintf('%02d', $episode->_data['episode_number']),
+			'firstaired'  => (string)$episode->_data['air_date'],
+			'summary'     => (string)$episode->_data['overview']
 		];
 	}
 }

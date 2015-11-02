@@ -23,7 +23,7 @@ class Season{
     // Class Variables
     //------------------------------------------------------------------------------
 
-    private $_data;
+    public $_data;
     private $_idTVShow;
 
     /**
@@ -147,7 +147,7 @@ class Season{
      *  Reload the content of this class.<br>
      *  Could be used to update or complete the information.
      *
-     *  @param \libs\Tmdb\TMDB $tmdb An instance of the API handler, necesary to make the API call.
+     *  @param \newznab\libraries\Tmdb $tmdb An instance of the API handler, necesary to make the API call.
      */
     public function reload($tmdb) {
         $tmdb->getSeason($this->getTVShowID(), $this->getSeasonNumber());

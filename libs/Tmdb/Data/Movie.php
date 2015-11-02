@@ -24,7 +24,7 @@ class Movie{
 	// Class Variables
 	//------------------------------------------------------------------------------
 
-	private $_data;
+	public $_data;
 	private $_tmdb;
 
 	/**
