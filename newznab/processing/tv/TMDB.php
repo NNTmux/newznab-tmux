@@ -165,6 +165,7 @@ class TMDB extends TV
 	protected function getShowInfo($cleanName)
 	{
 		$return = $response = false;
+		var_dump($cleanName);
 
 		try {
 			//Try for the best match with AKAs embedded
