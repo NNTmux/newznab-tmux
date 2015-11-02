@@ -1,4 +1,5 @@
 2015-11-02 DariusIII
+	Fix: Descriptions in TV.php
 	Fix: Ensure that returned results are array and not empty
 2015-11-01 DariusIII
 	Upd: Fix TVMaze
