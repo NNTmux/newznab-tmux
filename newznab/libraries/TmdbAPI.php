@@ -239,8 +239,11 @@ class TmdbAPI {
 	public function getDiscoverMovie($page = 1) {
 		$movies = array();
 		$result = $this->_call('discover/movie', 'page='. $page);
-		foreach($result['results'] as $data){
-			$movies[] = new Movie($data);
+
+		if (is_array($result) && !empty($result)) {
+			foreach ($result['results'] as $data) {
+				$movies[] = new Movie($data);
+			}
 		}
 		return $movies;
 	}
@@ -271,8 +274,10 @@ class TmdbAPI {
 
 		$result = $this->_call('movie/now-playing', 'page='. $page);
 
-		foreach($result['results'] as $data){
-			$movies[] = new Movie($data);
+		if (is_array($result) && !empty($result)) {
+			foreach ($result['results'] as $data) {
+				$movies[] = new Movie($data);
+			}
 		}
 
 		return $movies;
@@ -288,8 +293,11 @@ class TmdbAPI {
 	public function topRatedMovies($page = 1) {
 		$movies = array();
 		$result = $this->_call('movie/top-rated', 'page='. $page);
-		foreach($result['results'] as $data){
-			$movies[] = new Movie($data);
+
+		if (is_array($result) && !empty($result)) {
+			foreach ($result['results'] as $data) {
+				$movies[] = new Movie($data);
+			}
 		}
 		return $movies;
 	}
@@ -303,8 +311,11 @@ class TmdbAPI {
 	public function upcomingMovies($page = 1) {
 		$movies = array();
 		$result = $this->_call('movie/upcoming', 'page='. $page);
-		foreach($result['results'] as $data){
-			$movies[] = new Movie($data);
+
+		if (is_array($result) && !empty($result)) {
+			foreach ($result['results'] as $data) {
+				$movies[] = new Movie($data);
+			}
 		}
 		return $movies;
 	}
@@ -333,8 +344,10 @@ class TmdbAPI {
 
 		$result = $this->_call('person/popular','page='. $page);
 
-		foreach($result['results'] as $data){
-			$persons[] = new Person($data);
+		if (is_array($result) && !empty($result)) {
+			foreach ($result['results'] as $data) {
+				$persons[] = new Person($data);
+			}
 		}
 
 		return $persons;
@@ -484,8 +497,10 @@ class TmdbAPI {
 
 		$result = $this->_call('search/movie', 'query='. urlencode($movieTitle), $this->getLang());
 
-		foreach($result['results'] as $data){
-			$movies[] = new Movie($data);
+		if (is_array($result) && !empty($result)) {
+			foreach ($result['results'] as $data) {
+				$movies[] = new Movie($data);
+			}
 		}
 
 		return $movies;
@@ -497,14 +512,17 @@ class TmdbAPI {
 	 * 	@param string $tvShowTitle The title of a TVShow
 	 * 	@return TVShow[]
 	 */
-	public function searchTVShow($tvShowTitle){
+	public function searchTVShow($tvShowTitle)
+	{
 
 		$tvShows = array();
 
-		$result = $this->_call('search/tv', 'query='. urlencode($tvShowTitle), $this->getLang());
+		$result = $this->_call('search/tv', 'query=' . urlencode($tvShowTitle), $this->getLang());
 
-		foreach($result['results'] as $data){
-			$tvShows[] = new TVShow($data);
+		if (is_array($result) && !empty($result)) {
+			foreach ($result['results'] as $data) {
+				$tvShows[] = new TVShow($data);
+			}
 		}
 
 		return $tvShows;
@@ -522,8 +540,10 @@ class TmdbAPI {
 
 		$result = $this->_call('search/person', 'query='. urlencode($personName), $this->getLang());
 
-		foreach($result['results'] as $data){
-			$persons[] = new Person($data);
+		if (is_array($result) && !empty($result)) {
+			foreach ($result['results'] as $data) {
+				$persons[] = new Person($data);
+			}
 		}
 
 		return $persons;
@@ -541,8 +561,10 @@ class TmdbAPI {
 
 		$result = $this->_call('search/collection', 'query='. urlencode($collectionName), $this->getLang());
 
-		foreach($result['results'] as $data){
-			$collections[] = new Collection($data);
+		if (is_array($result) && !empty($result)) {
+			foreach ($result['results'] as $data) {
+				$collections[] = new Collection($data);
+			}
 		}
 
 		return $collections;

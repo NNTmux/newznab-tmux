@@ -1,3 +1,5 @@
+2015-11-02 DariusIII
+	Fix: Ensure that returned results are array and not empty
 2015-11-01 DariusIII
 	Upd: Fix TVMaze
 	Fix: Fix akas processing, fix offset errors
