@@ -87,7 +87,7 @@ class TVDB extends TV
 				if (is_array($release) && $release['name'] != '') {
 
 					// Find the Video ID if it already exists by checking the title.
-					$videoId = $this->getByTitle($release['cleanname']);
+					$videoId = $this->getByTitle($release['cleanname'], parent::TYPE_TV);
 
 					if ($videoId !== false) {
 						$tvdbid = $this->getSiteByID('tvdb', $videoId);
@@ -109,17 +109,21 @@ class TVDB extends TV
 								$this->pdo->log->primary(" not found in local db, checking web.");
 						}
 
+						// Check if we have a valid country and set it in the array
+						$country = (isset($release['country']) && strlen($release['country']) == 2
+							? (string)$release['country']
+							: ''
+						);
+
 						// Get the show from TVDB
-						$tvdbShow = $this->getShowInfo((string)$release['cleanname']);
+						$tvdbShow = $this->getShowInfo((string)$release['cleanname'], $country);
 
 						if (is_array($tvdbShow)) {
-							$tvdbShow['country'] = (isset($release['country']) && $release['country'] !== 2
-								? (string)$release['country']
-								: ''
-							);
+							$tvdbShow['country'] = $country;
 							$videoId = $this->add($tvdbShow);
-							$tvdbid = (int)$tvdbShow['tvdbid'];
+							$tvdbid = (int)$tvdbShow['tvdb'];
 						}
+
 					} else if ($this->echooutput) {
 						echo $this->pdo->log->primaryOver("Video ID for ") .
 							$this->pdo->log->headerOver($release['cleanname']) .
@@ -172,7 +176,7 @@ class TVDB extends TV
 						}
 					}
 				} //Processing failed, set the episode ID to the next processing group
-				$this->setVideoNotFound(parent::PROCESS_TRAKT, $row['id']);
+				$this->setVideoNotFound(parent::PROCESS_TVMAZE, $row['id']);
 			}
 		}
 	}
@@ -194,17 +198,25 @@ class TVDB extends TV
 	 * Calls the API to perform initial show name match to TVDB title
 	 * Returns a formatted array of show data or false if no match
 	 *
-	 * @param $cleanName
+	 * @param string $cleanName
+	 *
+	 * @param string $country
 	 *
 	 * @return array|bool
 	 */
-	protected function getShowInfo($cleanName)
+	protected function getShowInfo($cleanName, $country = '')
 	{
 		$return = $response = false;
 		$highestMatch = 0;
 		try {
 			$response = (array)$this->client->getSeries($cleanName, 'en');
 		} catch (\Exception $error) {
+		}
+
+		if ($response === false && $country !== '') {
+			try {
+				$response = (array)$this->client->getSeries(rtrim(str_replace($country, '', $cleanName)), 'en');
+			} catch (\Exception $error) { }
 		}
 
 		sleep(1);
@@ -228,7 +240,7 @@ class TVDB extends TV
 					}
 
 					// Check for show aliases and try match those too
-					if (is_array($show->aliasNames) && !empty($show->aliasNames)) {
+					if (!empty($show->aliasNames)) {
 						foreach ($show->aliasNames as $key => $name) {
 							$matchPercent = $this->CheckMatch($name, $cleanName, $matchPercent);
 							if ($matchPercent > $highestMatch) {
@@ -336,19 +348,19 @@ class TVDB extends TV
 		preg_match('/tt(?P<imdbid>\d{6,7})$/i', $show->imdbId, $imdb);
 
 		return [
-			'tvdbid'    => (int)$show->id,
-			'column'    => 'tvdb',
-			'siteid'    => (int)$show->id,
+			'type'      => (int)parent::TYPE_TV,
 			'title'     => (string)$show->name,
 			'summary'   => (string)$show->overview,
 			'started'   => (string)$show->firstAired->format($this->timeFormat),
 			'publisher' => (string)$show->network,
 			'source'    => (int)parent::SOURCE_TVDB,
-			'imdbid'    => (int)(isset($imdb['imdbid']) ? $imdb['imdbid'] : 0),
-			'traktid'   => 0,
-			'tvrageid'  => 0,
-			'tvmazeid'  => 0,
-			'tmdbid'    => 0
+			'imdb'      => (int)(isset($imdb['imdbid']) ? $imdb['imdbid'] : 0),
+			'tvdb'      => (int)$show->id,
+			'trakt'     => 0,
+			'tvrage'    => 0,
+			'tvmaze'    => 0,
+			'tmdb'      => 0,
+			'aliases'   => (!empty($show->aliasNames) ? (array)$show->aliasNames : '')
 		];
 	}
 

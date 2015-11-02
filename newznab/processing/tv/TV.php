@@ -46,6 +46,11 @@ abstract class TV extends Videos
 	public $imgSavePath;
 
 	/**
+	 * @var array Site ID columns for TV
+	 */
+	public $siteColumns;
+
+	/**
 	 * @param array $options Class instances / Echo to CLI.
 	 */
 	public function __construct(array $options = [])
@@ -61,6 +66,7 @@ abstract class TV extends Videos
 		$this->catWhere = 'categoryid BETWEEN 5000 AND 5999 AND categoryid NOT IN (5070)';
 		$this->tvqty = ($this->pdo->getSetting('maxrageprocessed') != '') ? $this->pdo->getSetting('maxrageprocessed') : 75;
 		$this->imgSavePath = NN_COVERS . 'tvshows' . DS;
+		$this->siteColumns = ['tvdb', 'trakt', 'tvrage', 'tvmaze', 'imdb', 'tmdb'];
 	}
 
 	/**
@@ -197,37 +203,49 @@ abstract class TV extends Videos
 	 */
 	public function add($showArr = array())
 	{
+		$videoId = false;
+
+		// Check if the country is not a proper code and retrieve if not
 		if ($showArr['country'] !== '' && strlen($showArr['country']) > 2) {
 			$showArr['country'] = $this->countryCode($showArr['country']);
 		}
 
-		// Check if video already exists based on site info
+		// Check if video already exists based on site ID info
 		// if that fails be sure we're not inserting duplicates by checking the title
-
-		$videoId = $this->getVideoIDFromSiteID($showArr['column'], $showArr['siteid']);
-
-		if ($videoId === false) {
-			$videoId = $this->getByTitleQuery($showArr['title']);
+		foreach ($this->siteColumns AS $column) {
+			if ($showArr[$column] > 0) {
+				$videoId = $this->getVideoIDFromSiteID($column, $showArr[$column]);
+			}
+			if ($videoId !== false) {
+				break;
+			}
 		}
 
 		if ($videoId === false) {
+			$videoId = $this->getByTitleQuery($showArr['title'], $showArr['type']);
+		}
+
+		if ($videoId === false) {
+			// Insert the Show
 			$videoId = $this->pdo->queryInsert(
 				sprintf('
 					INSERT INTO videos
 					(type, title, countries_id, started, source, tvdb, trakt, tvrage, tvmaze, imdb, tmdb)
-					VALUES (0, %s, %s, %s, %d, %d, %d, %d, %d, %d, %d)',
+					VALUES (%d, %s, %s, %s, %d, %d, %d, %d, %d, %d, %d)',
+					$showArr['type'],
 					$this->pdo->escapeString($showArr['title']),
 					$this->pdo->escapeString((isset($showArr['country']) ? $showArr['country'] : '')),
 					$this->pdo->escapeString($showArr['started']),
 					$showArr['source'],
-					$showArr['tvdbid'],
-					$showArr['traktid'],
-					$showArr['tvrageid'],
-					$showArr['tvmazeid'],
-					$showArr['imdbid'],
-					$showArr['tmdbid']
+					$showArr['tvdb'],
+					$showArr['trakt'],
+					$showArr['tvrage'],
+					$showArr['tvmaze'],
+					$showArr['imdb'],
+					$showArr['tmdb']
 				)
 			);
+			// Insert the supplementary show info
 			$this->pdo->queryInsert(
 				sprintf("
 					INSERT INTO tv_info (videos_id, summary, publisher)
@@ -237,7 +255,12 @@ abstract class TV extends Videos
 					$this->pdo->escapeString($showArr['publisher'])
 				)
 			);
+			// If we have AKAs\aliases, insert those as well
+			if (!empty($showArr['aliases'])) {
+				$this->addAliases($videoId, $showArr['aliases']);
+			}
 		} else {
+			// If a local match was found, just update missing video info
 			$this->update($videoId, $showArr);
 		}
 		return (int)$videoId;
@@ -275,8 +298,6 @@ abstract class TV extends Videos
 		return $episodeId;
 	}
 
-	// If the video already exists, update the site specific column to collect its ID for that scrape
-
 	/**
 	 * Updates the show info with data from the supplied array
 	 * Only called when a duplicate show is found during insert
@@ -290,23 +311,32 @@ abstract class TV extends Videos
 			$showArr['country'] = $this->countryCode($showArr['country']);
 		}
 
-		$ifString = 'IF(%s = 0, %s, %s)';
+		$ifStringID = 'IF(%s = 0, %s, %s)';
+		$ifStringInfo = "IF(%s = '', %s, %s)";
 
 		$this->pdo->queryExec(
 			sprintf('
-				UPDATE videos
-				SET countries_id = %s, tvdb = %s, trakt = %s, tvrage = %s, tvmaze = %s, imdb = %s, tmdb = %s
-				WHERE id = %d',
-				$this->pdo->escapeString((isset($showArr['country']) ? $showArr['country'] : '')),
-				sprintf($ifString, 'tvdb', $showArr['tvdbid'], 'tvdb'),
-				sprintf($ifString, 'trakt', $showArr['traktid'], 'trakt'),
-				sprintf($ifString, 'tvrage', $showArr['tvrageid'], 'tvrage'),
-				sprintf($ifString, 'tvmaze', $showArr['tvmazeid'], 'tvmaze'),
-				sprintf($ifString, 'imdb', $showArr['imdbid'], 'imdb'),
-				sprintf($ifString, 'tmdb', $showArr['tmdbid'], 'tmdb'),
+				UPDATE videos v
+				LEFT JOIN tv_info tvi ON v.id = tvi.videos_id
+				SET v.countries_id = %s, v.tvdb = %s, v.trakt = %s, v.tvrage = %s,
+					v.tvmaze = %s, v.imdb = %s, v.tmdb = %s,
+					tvi.summary = %s, tvi.publisher = %s
+				WHERE v.id = %d',
+				sprintf($ifStringInfo, 'v.countries_id', $this->pdo->escapeString($showArr['country']), 'v.countries_id'),
+				sprintf($ifStringID, 'v.tvdb', $showArr['tvdb'], 'v.tvdb'),
+				sprintf($ifStringID, 'v.trakt', $showArr['trakt'], 'v.trakt'),
+				sprintf($ifStringID, 'v.tvrage', $showArr['tvrage'], 'v.tvrage'),
+				sprintf($ifStringID, 'v.tvmaze', $showArr['tvmaze'], 'v.tvmaze'),
+				sprintf($ifStringID, 'v.imdb', $showArr['imdb'], 'v.imdb'),
+				sprintf($ifStringID, 'v.tmdb', $showArr['tmdb'], 'v.tmdb'),
+				sprintf($ifStringInfo, 'tvi.summary', $this->pdo->escapeString($showArr['summary']), 'tvi.summary'),
+				sprintf($ifStringInfo, 'tvi.publisher', $this->pdo->escapeString($showArr['publisher']), 'tvi.publisher'),
 				$videoId
 			)
 		);
+		if (!empty($showArr['aliases'])) {
+			$this->addAliases($videoId, $showArr['aliases']);
+		}
 	}
 
 	/**
@@ -324,6 +354,7 @@ abstract class TV extends Videos
 				FROM videos v
 				LEFT JOIN tv_info tvi ON v.id = tvi.videos_id
 				LEFT JOIN tv_episodes tve ON v.id = tve.videos_id
+				LEFT JOIN videos_akas va ON v.id = va.videos_id
 				WHERE v.id = %d",
 				$id
 			)
@@ -348,126 +379,6 @@ abstract class TV extends Videos
 	}
 
 	/**
-	 * Attempt a local lookup via the title first by exact match and then by like.
-	 * Returns a false for no match or the Video ID of the match.
-	 *
-	 * @param $title
-	 *
-	 * @return bool
-	 */
-	public function getByTitle($title)
-	{
-		// Check if we already have an entry for this show.
-		$res = $this->getByTitleQuery($title);
-		if (isset($res['id'])) {
-			return $res['id'];
-		}
-
-		$title2 = str_replace(' and ', ' & ', $title);
-		if ($title != $title2) {
-			$res = $this->getByTitleQuery($title2);
-			if (isset($res['id'])) {
-				return $res['id'];
-			}
-			$pieces = explode(' ', $title2);
-			$title4 = '%';
-			foreach ($pieces as $piece) {
-				$title4 .= str_replace(["'", "!"], "", $piece) . '%';
-			}
-			$res = $this->getByTitleLikeQuery($title4 . '%');
-			if (isset($res['id'])) {
-				return $res['id'];
-			}
-		}
-
-		// Some words are spelled correctly 2 ways
-		// example theatre and theater
-		$title3 = str_replace('er', 're', $title);
-		if ($title != $title3) {
-			$res = $this->getByTitleQuery($title3);
-			if (isset($res['id'])) {
-				return $res['id'];
-			}
-			$pieces = explode(' ', $title3);
-			$title4 = '%';
-			foreach ($pieces as $piece) {
-				$title4 .= str_replace(["'", "!"], "", $piece) . '%';
-			}
-			$res = $this->getByTitleLikeQuery($title4);
-			if (isset($res['id'])) {
-				return $res['id'];
-			}
-		}
-
-		// If there was not an exact title match, look for title with missing chars
-		// example release name :Zorro 1990, tvrage name Zorro (1990)
-		// Only search if the title contains more than one word to prevent incorrect matches
-		$pieces = explode(' ', $title);
-		if (count($pieces) > 1) {
-			$title4 = '%';
-			foreach ($pieces as $piece) {
-				$title4 .= str_replace(["'", "!"], "", $piece) . '%';
-			}
-			$res = $this->getByTitleLikeQuery($title4);
-			if (isset($res['id'])) {
-				return $res['id'];
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * Supplementary function for getByTitle that queries for exact match
-	 *
-	 *
-	 * @param $title
-	 *
-	 * @return array|bool
-	 */
-	public function getByTitleQuery($title)
-	{
-		$return = false;
-		if ($title) {
-			$return = $this->pdo->queryOneRow(
-				sprintf("
-					SELECT id
-					FROM videos
-					WHERE title = %s
-					AND type = 0",
-					$this->pdo->escapeString($title)
-				)
-			);
-		}
-		return $return;
-	}
-
-	/**
-	 * Supplementary function for getByTitle that queries for a like match
-	 *
-	 * @param $title
-	 *
-	 * @return array|bool
-	 */
-	public function getByTitleLikeQuery($title)
-	{
-		$return = false;
-		$string = '"\'"';
-		if ($title) {
-			$return = $this->pdo->queryOneRow(
-				sprintf("
-					SELECT id
-					FROM videos
-					WHERE REPLACE(REPLACE(title, %s, ''), '!', '') %s
-					AND type = 0",
-					$string,
-					$this->pdo->likeString(rtrim($title, '%'), false, false)
-				)
-			);
-		}
-		return $return;
-	}
-
-	/**
 	 * Get site ID from a Video ID and the site's respective column.
 	 * Returns the ID value or false if none found
 	 *
@@ -478,6 +389,7 @@ abstract class TV extends Videos
 	 */
 	public function getSiteByID($column, $id)
 	{
+		$return = false;
 		$videoArr = $this->pdo->queryOneRow(
 			sprintf("
 				SELECT %s
@@ -487,7 +399,12 @@ abstract class TV extends Videos
 				$id
 			)
 		);
-		return (isset($videoArr[$column]) ? $videoArr[$column] : false);
+		if ($column === '*') {
+			$return = $videoArr;
+		} else if ($column !== '*' && isset($videoArr[$column])) {
+			$return = $videoArr[$column];
+		}
+		return $return;
 	}
 
 	/**
@@ -524,31 +441,6 @@ abstract class TV extends Videos
 			)
 		);
 		return (isset($episodeArr['id']) ? $episodeArr['id'] : false);
-	}
-
-	/**
-	 * Get a country code for a country name.
-	 *
-	 * @param string $country
-	 *
-	 * @return mixed
-	 */
-	public function countryCode($country)
-	{
-		if (!is_array($country) && strlen($country) > 2) {
-			$code = $this->pdo->queryOneRow(
-				sprintf('
-					SELECT id
-					FROM countries
-					WHERE country = %1\$s',
-					$this->pdo->escapeString($country)
-				)
-			);
-			if (isset($code['id'])) {
-				return $code['id'];
-			}
-		}
-		return '';
 	}
 
 	/**
@@ -624,9 +516,9 @@ abstract class TV extends Videos
 		];
 		$matches = '';
 
-		$following = 	'[^a-z0-9](\d\d-\d\d|\d{1,2}x\d{2,3}|\(?(19|20)\d{2}\)?|(480|720|1080)[ip]|AAC2?|BD-?Rip|Blu-?Ray|D0?\d' .
+		$following = 	'[^a-z0-9](\d\d-\d\d|\d{1,3}x\d{2,3}|\(?(19|20)\d{2}\)?|(480|720|1080)[ip]|AAC2?|BD-?Rip|Blu-?Ray|D0?\d' .
 			'|DD5|DiVX|DLMux|DTS|DVD(-?Rip)?|E\d{2,3}|[HX][-_. ]?26[45]|ITA(-ENG)?|HEVC|[HPS]DTV|PROPER|REPACK|Season|Episode|' .
-			'S\d+[^a-z0-9]?(E\d+)?|WEB[-_. ]?(DL|Rip)|XViD)[^a-z0-9]';
+			'S\d+[^a-z0-9]?(E\d+)?[ab]?|WEB[-_. ]?(DL|Rip)|XViD)[^a-z0-9]';
 
 		// For names that don't start with the title.
 		if (preg_match('/[^a-z0-9]{2,}(?P<name>[\w .-]*?)' . $following . '/i', $relname, $matches)) {
@@ -682,7 +574,7 @@ abstract class TV extends Videos
 			// 01.01.09
 			else if (preg_match('/^(.*?)[^a-z0-9](\d{2})[^a-z0-9](\d{2})[^a-z0-9](\d{2})[^a-z0-9]/i', $relname, $matches)) {
 				// Add extra logic to capture the proper YYYY year
-				$showInfo['season'] = $matches[4] = ($matches[4] <= 99 && $matches[4] > 15) ? '19' . $matches[4] : '20' . $matches[5];
+				$showInfo['season'] = $matches[4] = ($matches[4] <= 99 && $matches[4] > 15) ? '19' . $matches[4] : '20' . $matches[4];
 				$showInfo['episode'] = $matches[2] . '/' . $matches[3];
 				$tmpAirdate = $showInfo['season'] . '/' . $showInfo['episode'];
 				$showInfo['airdate'] = date('Y-m-d', strtotime(preg_replace('/[^0-9]/i', '/', $tmpAirdate))); //yyyy-mm-dd
@@ -721,7 +613,7 @@ abstract class TV extends Videos
 
 			$countryMatch = $yearMatch = '';
 			// Country or origin matching.
-			if (preg_match('/\W(US|UK|AU|NZ|CA|NL|Canada|Australia|America|United[^a-z0-9]States|United[^a-z0-9]Kingdom)\W/', $showInfo['name'], $countryMatch)) {
+			if (preg_match('/[^a-z0-9](US|UK|AU|NZ|CA|NL|Canada|Australia|America|United[^a-z0-9]States|United[^a-z0-9]Kingdom)[^a-z0-9]/i', $showInfo['name'], $countryMatch)) {
 				$currentCountry = strtolower($countryMatch[1]);
 				if ($currentCountry == 'canada') {
 					$showInfo['country'] = 'CA';
@@ -734,6 +626,8 @@ abstract class TV extends Videos
 				} else {
 					$showInfo['country'] = strtoupper($countryMatch[1]);
 				}
+			} else {
+				$showInfo['country'] = '';
 			}
 
 			// Clean show name.
@@ -758,61 +652,6 @@ abstract class TV extends Videos
 			return $showInfo;
 		}
 		return false;
-	}
-
-	/**
-	 * This function turns a roman numeral into an integer
-	 *
-	 * @param string $string
-	 *
-	 * @return int $e
-	 */
-	private function convertRomanToInt($string) {
-		switch ($string) {
-			case 'i': $e = 1;
-				break;
-			case 'ii': $e = 2;
-				break;
-			case 'iii': $e = 3;
-				break;
-			case 'iv': $e = 4;
-				break;
-			case 'v': $e = 5;
-				break;
-			case 'vi': $e = 6;
-				break;
-			case 'vii': $e = 7;
-				break;
-			case 'viii': $e = 8;
-				break;
-			case 'ix': $e = 9;
-				break;
-			case 'x': $e = 10;
-				break;
-			case 'xi': $e = 11;
-				break;
-			case 'xii': $e = 12;
-				break;
-			case 'xiii': $e = 13;
-				break;
-			case 'xiv': $e = 14;
-				break;
-			case 'xv': $e = 15;
-				break;
-			case 'xvi': $e = 16;
-				break;
-			case 'xvii': $e = 17;
-				break;
-			case 'xviii': $e = 18;
-				break;
-			case 'xix': $e = 19;
-				break;
-			case 'xx': $e = 20;
-				break;
-			default:
-				$e = 0;
-		}
-		return $e;
 	}
 
 	/**

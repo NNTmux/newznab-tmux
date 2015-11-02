@@ -22,7 +22,7 @@
 		</div>
 	</div>
 	<h1>
-		<center>{$seriestitles}</center>
+		<center>{$seriestitles} ({$show.publisher})</center>
 	</h1>
 	{if $catname != ''}<span class="text-info h5">Current category shown: {$catname|escape:"htmlall"}</span>{/if}
 	<div class="tvseriesheading">
@@ -40,19 +40,22 @@
 	<div class="btn-group">
 		<a class="btn btn-sm btn-default"
 		   href="{$smarty.const.WWW_TOP}/rss?show={$show.id}{if $category != ''}&amp;t={$category}{/if}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">RSS for TV Show <i class="fa fa-rss"></i></a>
-		{if $show.source == 1}
+		{if $show.tvdb > 0}
 			<a class="btn btn-sm btn-info" target="_blank"
 			   href="{$site->dereferrer_link}http://thetvdb.com/?tab=series&id={$show.tvdb}"
 			   title="View at TheTVDB">TheTVDB</a>
-		{elseif $show.source == 2}
+		{/if}
+		{if $show.tvmaze > 0}
 			<a class="btn btn-sm btn-info" target="_blank"
 			   href="{$site->dereferrer_link}http://tvmaze.com/shows/{$show.tvmaze}"
 			   title="View at TVMaze">TVMaze</a>
-		{elseif $show.source == 3}
+		{/if}
+		{if $show.trakt > 0}
 			<a class="btn btn-sm btn-info" target="_blank"
 			   href="{$site->dereferrer_link}http://www.trakt.tv/shows/{$show.trakt}"
 			   title="View at TraktTv">Trakt</a>
-		{elseif $show.source == 6}
+		{/if}
+		{if $show.tvrage > 0}
 			<a class="btn btn-sm btn-info" target="_blank"
 			   href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$show.tvrage}"
 			   title="View at TV Rage">TV Rage</a>
