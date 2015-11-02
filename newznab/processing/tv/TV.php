@@ -389,6 +389,7 @@ abstract class TV extends Videos
 	 */
 	public function getSiteByID($column, $id)
 	{
+		$return = false;
 		$videoArr = $this->pdo->queryOneRow(
 			sprintf("
 				SELECT %s
@@ -398,7 +399,12 @@ abstract class TV extends Videos
 				$id
 			)
 		);
-		return (isset($videoArr[$column]) ? $videoArr[$column] : false);
+		if ($column === '*') {
+			$return = $videoArr;
+		} else if ($column !== '*' && isset($videoArr[$column])) {
+			$return = $videoArr[$column];
+		}
+		return $return;
 	}
 
 	/**
@@ -511,14 +517,14 @@ abstract class TV extends Videos
 		$matches = '';
 
 		$following = 	'[^a-z0-9](\d\d-\d\d|\d{1,3}x\d{2,3}|\(?(19|20)\d{2}\)?|(480|720|1080)[ip]|AAC2?|BD-?Rip|Blu-?Ray|D0?\d' .
-				'|DD5|DiVX|DLMux|DTS|DVD(-?Rip)?|E\d{2,3}|[HX][-_. ]?26[45]|ITA(-ENG)?|HEVC|[HPS]DTV|PROPER|REPACK|Season|Episode|' .
-				'S\d+[^a-z0-9]?(E\d+)?[ab]?|WEB[-_. ]?(DL|Rip)|XViD)[^a-z0-9]';
+			'|DD5|DiVX|DLMux|DTS|DVD(-?Rip)?|E\d{2,3}|[HX][-_. ]?26[45]|ITA(-ENG)?|HEVC|[HPS]DTV|PROPER|REPACK|Season|Episode|' .
+			'S\d+[^a-z0-9]?(E\d+)?[ab]?|WEB[-_. ]?(DL|Rip)|XViD)[^a-z0-9]';
 
 		// For names that don't start with the title.
 		if (preg_match('/[^a-z0-9]{2,}(?P<name>[\w .-]*?)' . $following . '/i', $relname, $matches)) {
 			$showInfo['name'] = $matches[1];
 		} else if (preg_match('/^(?P<name>[a-z0-9][\w .-]*?)' . $following . '/i', $relname, $matches)) {
-		// For names that start with the title.
+			// For names that start with the title.
 			$showInfo['name'] = $matches[1];
 		}
 
