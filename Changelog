@@ -1,4 +1,5 @@
 2015-11-03 DariusIII
+	Chg: Move TmdbAPI back to libs/Tmdb folder
 	Fix: Possible fix for release edit problem
 2015-11-02 DariusIII
 	Fix: Descriptions in TV.php

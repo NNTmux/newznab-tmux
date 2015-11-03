@@ -1,7 +1,7 @@
 <?php
 namespace newznab\processing\tv;
 
-use newznab\libraries\TmdbAPI;
+use libs\Tmdb\TmdbAPI;
 use newznab\ReleaseImage;
 
 class TMDB extends TV
