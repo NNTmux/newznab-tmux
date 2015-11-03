@@ -11,6 +11,7 @@ use newznab\Movie;
 use newznab\Music;
 use newznab\NameFixer;
 use newznab\Nfo;
+use newznab\processing\tv\TMDB;
 use newznab\Sharing;
 //use newznab\processing\tv\TvRage;
 use newznab\processing\tv\TVDB;
@@ -261,6 +262,7 @@ class PostProcess
 		if ($processTV > 0) {
 			(new TVDB(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processTVDB($groupID, $guidChar, $processTV);
 			(new TVMaze(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processTVMaze($groupID, $guidChar, $processTV);
+			(new TMDB(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processTMDB($groupID, $guidChar, $processTV);
 			//(new TvRage(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processTvRage($groupID, $guidChar, $processTV);
 		}
 	}

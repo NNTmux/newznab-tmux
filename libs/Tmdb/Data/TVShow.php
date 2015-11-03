@@ -22,7 +22,7 @@ class TVShow{
     // Class Variables
     //------------------------------------------------------------------------------
 
-    private $_data;
+    public $_data;
 
     /**
      * 	Construct Class
