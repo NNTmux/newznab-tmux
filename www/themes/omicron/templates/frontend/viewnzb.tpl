@@ -71,6 +71,11 @@
 							   href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$show.tvrage}"
 							   title="View at TV Rage">TV Rage</a>
 								{/if}
+							{if $show.tmdb > 0}
+							<a class="label label-default" target="_blank"
+							   href="{$site->dereferrer_link}https://www.themoviedb.org/tv/{$show.tmdb}"
+							   title="View at TheMovieDB">Trakt</a>
+						{/if}
 					{/if}
 					{if $con && $con.url != ""}<a href="{$site->dereferrer_link}{$con.url}/"
 												  class="label label-default" target="_blank">Amazon</a>{/if}

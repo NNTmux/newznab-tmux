@@ -25,7 +25,7 @@ class Person{
     // Class Variables
     //------------------------------------------------------------------------------
 
-    private $_data;
+    public $_data;
 
     /**
      * 	Construct Class
