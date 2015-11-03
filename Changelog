@@ -1,3 +1,5 @@
+2015-11-03 DariusIII
+	Fix: Possible fix for release edit problem
 2015-11-02 DariusIII
 	Fix: Descriptions in TV.php
 	Fix: Ensure that returned results are array and not empty
