@@ -273,7 +273,7 @@ HEADERS;
 	public function showSearch($show = '', $type = 'show')
 	{
 		$searchUrl = self::API_URL . 'search?query=' .
-					 str_replace([' ', '_', '.'], '-', str_replace(['(', ')'], '', $show)) .
+					 $this->slugify($show) .
 					 '&type=' . $type;
 
 		return $this->getJsonArray($searchUrl, '');
@@ -312,7 +312,6 @@ HEADERS;
 			default:
 				$extended = '';
 		}
-
 		return $this->getJsonArray($showUrl, $extended);
 	}
 
