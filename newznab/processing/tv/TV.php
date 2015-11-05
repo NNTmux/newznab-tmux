@@ -310,6 +310,7 @@ abstract class TV extends Videos
 		if ($showArr['country'] !== '') {
 			$showArr['country'] = $this->countryCode($showArr['country']);
 		}
+		var_dump($showArr);
 
 		$ifStringID = 'IF(%s = 0, %s, %s)';
 		$ifStringInfo = "IF(%s = '', %s, %s)";
