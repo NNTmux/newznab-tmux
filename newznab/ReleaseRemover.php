@@ -1086,7 +1086,7 @@ class ReleaseRemover
 
 		$this->query = sprintf(
 			"SELECT r.guid, r.searchname, r.id FROM releases r %s
-			STRAIGHT JOIN releasefiles rf ON (r.id = rf.releaseid)
+			STRAIGHT_JOIN releasefiles rf ON r.id = rf.releaseid
 			WHERE %s %s
 			AND (%s OR %s) %s
 			UNION %s",

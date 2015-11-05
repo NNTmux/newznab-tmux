@@ -1,4 +1,5 @@
 2015-11-05 DariusIII
+	Fix: Typo in ReleaseRemover that caused errors
 	Upd: Add Trakt to processing
 	Fix: Change some variables in TMDB and TRAKT
 	Fix: Fix ADM processing
