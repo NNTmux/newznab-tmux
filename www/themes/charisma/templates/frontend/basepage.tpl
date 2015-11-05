@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/html">
 <head>
+	{literal}
+	<script>
+		/* <![CDATA[ */
+		var WWW_TOP = "{/literal}{$smarty.const.WWW_TOP}{literal}";
+		var SERVERROOT = "{/literal}{$serverroot}{literal}";
+		var UID = "{/literal}{if $loggedin=="true"}{$userdata.id}{else}{/if}{literal}";
+		var RSSTOKEN = "{/literal}{if $loggedin=="true"}{$userdata.rsstoken}{else}{/if}{literal}";
+		/* ]]> */
+	</script>
+	{/literal}
 	<!--
 		===
 		This comment should NOT be removed.
@@ -12,14 +22,6 @@
 		http://twitter.com/halalit_usman
 		===
 	-->
-	<script type="text/javascript">
-		/* <![CDATA[ */
-		var WWW_TOP = "{$smarty.const.WWW_TOP}";
-		var SERVERROOT = "{$serverroot}";
-		var UID = "{if $loggedin=="true"}{$userdata.id}{else}{/if}";
-		var RSSTOKEN = "{if $loggedin=="true"}{$userdata.rsstoken}{else}{/if}";
-		/* ]]> */
-	</script>
 	<meta charset="utf-8">
 	<title>{$page->meta_title}{if $page->meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
 	<!-- Newposterwall -->
