@@ -10,8 +10,20 @@ $video = new Videos(['Settings' => $page->settings]);
 
 switch ((isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view')) {
 	case 'submit':
-		$tv->update($_POST["id"], $_POST["title"],
-			$_POST["summary"], $_POST['countries_id']
+		$tv->update(
+				$_POST["id"],
+				[
+						$_POST["title"] => 'title',
+						$_POST["summary"] => 'summary',
+						$_POST["publisher"] => 'publisher',
+						$_POST["tvdb"] => 'tvdb',
+						$_POST["tvmaze"] => 'tvmaze',
+						$_POST["tmdb"] => 'tmdb',
+						$_POST["trakt"] => 'trakt',
+						$_POST["imdb"] => 'imdb',
+						$_POST["tvrage"] => 'tvrage',
+						$_POST['countries_id'] => 'country'
+				]
 		);
 
 		if (isset($_POST['from']) && !empty($_POST['from'])) {

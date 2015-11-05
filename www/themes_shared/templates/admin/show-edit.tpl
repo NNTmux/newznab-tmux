@@ -19,11 +19,35 @@
 			</td>
 		</tr>
 		<tr>
+			<td><label for="tvmaze">TVMaze Id:</label></td>
+			<td>
+				<input id="tmaze" class="short" name="tvmaze" type="text" value="{$show.tvmaze}" />
+				<input type="hidden" name="tvmaze" value="{$show.tvmaze}" />
+				<div class="hint">The numeric TVMaze Show Id.</div>
+			</td>
+		</tr>
+		<tr>
+			<td><label for="tmdb">TMDB Id:</label></td>
+			<td>
+				<input id="tmdb" class="short" name="tmdb" type="text" value="{$show.tmdb}" />
+				<input type="hidden" name="tmdb" value="{$show.tmdb}" />
+				<div class="hint">The numeric The MovieDB Show Id.</div>
+			</td>
+		</tr>
+		<tr>
 			<td><label for="trakt">Trakt Id:</label></td>
 			<td>
 				<input id="trakt" class="short" name="trakt" type="text" value="{$show.trakt}" />
 				<input type="hidden" name="trakt" value="{$show.trakt}" />
 				<div class="hint">The numeric Trakt Show Id.</div>
+			</td>
+		</tr>
+		<tr>
+			<td><label for="imdb">Imdb Id:</label></td>
+			<td>
+				<input id="imdb" class="short" name="imdb" type="text" value="{$show.imdb}" />
+				<input type="hidden" name="imdb" value="{$show.imdb}" />
+				<div class="hint">The numeric Imdb Show Id.</div>
 			</td>
 		</tr>
 		<tr>
