@@ -13,16 +13,16 @@ switch ((isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view')) {
 		$tv->update(
 				$_POST["id"],
 				[
-						$_POST["title"] => 'title',
-						$_POST["summary"] => 'summary',
-						$_POST["publisher"] => 'publisher',
-						$_POST["tvdb"] => 'tvdb',
-						$_POST["tvmaze"] => 'tvmaze',
-						$_POST["tmdb"] => 'tmdb',
-						$_POST["trakt"] => 'trakt',
-						$_POST["imdb"] => 'imdb',
-						$_POST["tvrage"] => 'tvrage',
-						$_POST['countries_id'] => 'country'
+						'title'		=> $_POST["title"],
+						'summary'	=> $_POST["summary"],
+						'publisher' => $_POST["publisher"],
+						'tvdb'		=> $_POST["tvdb"],
+						'tvmaze'	=> $_POST["tvmaze"],
+						'tmdb' 		=> $_POST["tmdb"],
+						'trakt'		=> $_POST["trakt"],
+						'imdb' 		=> $_POST["imdb"],
+						'tvrage'	=> $_POST["tvrage"],
+						'country'	=> $_POST['countries_id']
 				]
 		);
 

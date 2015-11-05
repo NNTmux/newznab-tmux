@@ -305,7 +305,7 @@ abstract class TV extends Videos
 	 * @param int $videoId
 	 * @param array $showArr
 	 */
-	public function update($videoId, $showArr = array())
+	public function update($videoId, $showArr = [])
 	{
 		if ($showArr['country'] !== '') {
 			$showArr['country'] = $this->countryCode($showArr['country']);
