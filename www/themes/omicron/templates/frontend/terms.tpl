@@ -1,12 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<script type="text/javascript">
-		/* <![CDATA[ */
-		var WWW_TOP = "{$smarty.const.WWW_TOP}";
-		var SERVERROOT = "{$serverroot}";
-		/* ]]> */
-	</script>
 	<meta charset="UTF-8">
 	<title>{$page->meta_title}{if $page->meta_title != "" && $site->metatitle != ""} - {/if}{$site->metatitle}</title>
 	<meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>

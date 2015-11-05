@@ -1,4 +1,5 @@
 2015-11-05 DariusIII
+	Fix: serverroot errors
 	Fix: Typo in ReleaseRemover that caused errors
 	Fix: port more fixes for ADM from nZEDb
 2015-11-04 DariusIII

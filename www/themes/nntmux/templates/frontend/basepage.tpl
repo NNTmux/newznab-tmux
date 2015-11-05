@@ -44,14 +44,16 @@
 	<script>window.html5 || document.write('<script src="{$smarty.const.WWW_TOP}/themes/nntmux/scripts/html5shiv.js"><\/script>')</script>
 	<![endif]-->
 
-	<script type="text/javascript">
+	{literal}
+	<script>
 		/* <![CDATA[ */
-		var WWW_TOP = "{$smarty.const.WWW_TOP}";
-		var SERVERROOT = "{$serverroot}";
-		var UID = "{if $loggedin=="true"}{$userdata.id}{else}{/if}";
-		var RSSTOKEN = "{if $loggedin=="true"}{$userdata.rsstoken}{else}{/if}";
+		var WWW_TOP = "{/literal}{$smarty.const.WWW_TOP}{literal}";
+		var SERVERROOT = "{/literal}{$serverroot}{literal}";
+		var UID = "{/literal}{if $loggedin=="true"}{$userdata.id}{else}{/if}{literal}";
+		var RSSTOKEN = "{/literal}{if $loggedin=="true"}{$userdata.rsstoken}{else}{/if}{literal}";
 		/* ]]> */
 	</script>
+	{/literal}
 	{$page->head}
 </head>
 <body {$page->body}>
