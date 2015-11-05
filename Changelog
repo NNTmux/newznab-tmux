@@ -1,4 +1,5 @@
 2015-11-05 DariusIII
+	Add: Add check_previews script from nZEDb
 	Fix: serverroot errors
 	Fix: Typo in ReleaseRemover that caused errors
 	Fix: port more fixes for ADM from nZEDb
