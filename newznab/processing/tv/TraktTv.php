@@ -21,6 +21,16 @@ class TraktTv extends TV
 	public $client;
 
 	/**
+	 * @string DateTimeZone Object - UTC
+	 */
+	private $timeZone;
+
+	/**
+	 * @string MySQL DATETIME Format
+	 */
+	private $timeFormat;
+
+	/**
 	 * Construct. Set up API key.
 	 *
 	 * @param array $options Class instances.
@@ -134,8 +144,7 @@ class TraktTv extends TV
 							$traktEpisode = $this->getEpisodeInfo(
 									$traktid,
 									$seasonNo,
-									$episodeNo,
-									$release['airdate']
+									$episodeNo
 							);
 
 							if ($traktEpisode) {
@@ -317,21 +326,21 @@ class TraktTv extends TV
 	private function formatShowArr($show)
 	{
 		$show->firstAired->setTimezone($this->timeZone);
-		preg_match('/tt(?P<imdbid>\d{6,7})$/i', $show->imdbId, $imdb);
+		preg_match('/tt(?P<imdbid>\d{6,7})$/i', $show->ids->imdb, $imdb);
 
 		return [
 				'type'      => (int)parent::TYPE_TV,
-				'title'     => (string)$show->name,
+				'title'     => (string)$show->title,
 				'summary'   => (string)$show->overview,
-				'started'   => (string)$show->firstAired->format($this->timeFormat),
+				'started'   => (string)$show->first_aired->format($this->timeFormat),
 				'publisher' => (string)$show->network,
 				'source'    => (int)parent::SOURCE_TRAKT,
 				'imdb'      => (int)(isset($imdb['imdbid']) ? $imdb['imdbid'] : 0),
 				'tvdb'      => 0,
-				'trakt'     => (int)$show->id,
-				'tvrage'    => (int)(isset($tvrage['tvaregid']) ? $tvrage['tvrageid'] : 0),
+				'trakt'     => (int)$show->ids->trakt,
+				'tvrage'    => (int)(isset($show->ids->tvrage) ? $show->ids->tvrage : 0),
 				'tvmaze'    => 0,
-				'tmdb'      => (int)(isset($tmdb['tmdbid']) ? $tmdb['tmdbid'] : 0),
+				'tmdb'      => (int)(isset($show->ids->tmdb) ? $show->ids->tmdb : 0),
 				'aliases'   => (!empty($show->aliasNames) ? (array)$show->aliasNames : '')
 		];
 	}
@@ -349,11 +358,11 @@ class TraktTv extends TV
 		$episode->firstAired->setTimezone($this->timeZone);
 
 		return [
-				'title'       => (string)$episode->name,
+				'title'       => (string)$episode->title,
 				'series'      => (int)$episode->season,
 				'episode'     => (int)$episode->number,
 				'se_complete' => (string)'S' . sprintf('%02d', $episode->season) . 'E' . sprintf('%02d', $episode->number),
-				'firstaired'  => (string)$episode->firstAired->format($this->timeFormat),
+				'firstaired'  => (string)$episode->first_aired->format($this->timeFormat),
 				'summary'     => (string)$episode->overview
 		];
 	}

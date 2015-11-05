@@ -1,4 +1,6 @@
 2015-11-05 DariusIII
+	Upd: Add Trakt to processing
+	Fix: Change some variables in TMDB and TRAKT
 	Fix: Fix ADM processing
 2015-11-04 DariusIII
 	Upd: Change countries table
