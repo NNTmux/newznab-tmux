@@ -26,10 +26,10 @@ switch ((isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view')) {
 				]
 		);
 
-		if (isset($_POST['from']) && !empty($_POST['from'])) {
+		/*if (isset($_POST['from']) && !empty($_POST['from'])) {
 			header("Location: " . $_POST['from']);
 			exit;
-		}
+		}*/
 
 		header("Location: " . WWW_TOP . "/show-list.php");
 		break;
