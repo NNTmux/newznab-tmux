@@ -183,8 +183,11 @@ class Client {
 		$akas = $this->getFile($url);
 
 		$AKA = new AKA($akas);
+		if (!empty($akas['name'])) {
 
-		return $AKA;
+			return $AKA;
+		}
+		return false;
 	}
 
 	/**
