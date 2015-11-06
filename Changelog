@@ -1,3 +1,5 @@
+2015-11-06 DariusIII
+	Fix: Fix cart RSS feed, role-edit.
 2015-11-05 DariusIII
 	Upd: Change show edit in admin
 	Fix: Typo in ReleaseRemover that caused errors
