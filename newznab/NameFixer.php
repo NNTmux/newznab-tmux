@@ -189,7 +189,7 @@ class NameFixer
 					WHERE (isrenamed = %d OR rel.categoryid = %d)
 					AND proc_nfo = %d',
 					self::IS_RENAMED_NONE,
-					Category::CAT_MISC,
+					Category::CAT_MISC_OTHER,
 					self::PROC_NFO_NONE
 			);
 		}
@@ -270,7 +270,7 @@ class NameFixer
 					WHERE (isrenamed = %d OR rel.categoryid = %d)
 					AND proc_files = %d',
 					self::IS_RENAMED_NONE,
-					Category::CAT_MISC,
+					Category::CAT_MISC_OTHER,
 					self::PROC_FILES_NONE
 			);
 		}
@@ -327,7 +327,7 @@ class NameFixer
 					WHERE (isrenamed = %d OR rel.categoryid = %d)
 					AND proc_par2 = %d',
 					self::IS_RENAMED_NONE,
-					Category::CAT_MISC,
+					Category::CAT_MISC_OTHER,
 					self::PROC_PAR2_NONE
 			);
 		}
