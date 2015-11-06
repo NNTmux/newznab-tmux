@@ -1,6 +1,7 @@
 2015-11-06 DariusIII
 	Fix: Cart RSS feed, admin user role edit
 2015-11-05 DariusIII
+	Add: Add check_previews script from nZEDb
 	Fix: serverroot errors
 	Fix: Typo in ReleaseRemover that caused errors
 	Fix: port more fixes for ADM from nZEDb
