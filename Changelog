@@ -1,3 +1,5 @@
+2015-11-06 DariusIII
+	Fix: Cart RSS feed, admin user role edit
 2015-11-05 DariusIII
 	Fix: serverroot errors
 	Fix: Typo in ReleaseRemover that caused errors
