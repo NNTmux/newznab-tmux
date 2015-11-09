@@ -1,3 +1,16 @@
+2015-11-09 DariusIII
+	Add: Add new PreDb class for prehash imports, update predb_import_daily_batch to use the new nZEDb github repo.
+	Add: Add new collection and release_naming regexes from nZEDb
+2015-11-06 DariusIII
+	Fix: Wrong column name in NameFixer
+	     Wrong cat name
+	Fix: Fix cart RSS feed, role-edit.
+2015-11-05 DariusIII
+	Upd: Change show edit in admin
+	Fix: Typo in ReleaseRemover that caused errors
+	Upd: Add Trakt to processing
+	Fix: Change some variables in TMDB and TRAKT
+	Fix: Fix ADM processing
 2015-11-04 DariusIII
 	Upd: Change countries table
 	Fix: Fix patch 202

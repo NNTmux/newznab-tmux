@@ -40,7 +40,7 @@ class ProcessAdditional
 
 	/**
 	 * Releases to work on.
-	 * @var Array
+	 * @var array
 	 */
 	protected $_releases;
 
@@ -52,7 +52,7 @@ class ProcessAdditional
 
 	/**
 	 * Current release we are working on.
-	 * @var Array
+	 * @var array
 	 */
 	protected $_release;
 

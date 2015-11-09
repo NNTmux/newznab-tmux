@@ -22,6 +22,7 @@ $count = $regexes->getCount($group);
 $page->smarty->assign('pagertotalitems', $count);
 $page->smarty->assign('pageroffset', $offset);
 $page->smarty->assign('pageritemsperpage', ITEMS_PER_PAGE);
+$page->smarty->assign('pagerquerysuffix', '');
 
 $page->smarty->assign('pagerquerybase', WWW_TOP . "/release_naming_regexes-list.php?" . $group . "offset=");
 $page->smarty->assign('pager', $page->smarty->fetch("pager.tpl"));

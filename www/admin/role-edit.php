@@ -18,7 +18,7 @@ $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : 'view';
 $userroles = $users->getRoles();
 $roles = [];
 foreach ($userroles as $r) {
-	$roles[$r['ID']] = $r['name'];
+	$roles[$r['id']] = $r['name'];
 }
 
 switch($action)
@@ -67,8 +67,8 @@ switch($action)
       break;
 }
 
-$page->smarty->assign('yesno_ids', array(1,0));
-$page->smarty->assign('yesno_names', array( 'Yes', 'No'));
+$page->smarty->assign('yesno_ids', [1, 0]);
+$page->smarty->assign('yesno_names', ['Yes', 'No']);
 
 $page->smarty->assign('catlist',$category->getForSelect(false));
 
@@ -78,4 +78,3 @@ if (isset($_GET["id"]))
 }
 $page->content = $page->smarty->fetch('role-edit.tpl');
 $page->render();
-

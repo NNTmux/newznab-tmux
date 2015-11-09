@@ -176,7 +176,7 @@ class NameFixer
 					FROM releases rel
 					INNER JOIN release_nfos nfo ON (nfo.releaseid = rel.id)
 					WHERE nzbstatus = %d
-					AND preid = 0',
+					AND prehashid = 0',
 					NZB::NZB_ADDED
 			);
 			$cats = 2;
@@ -189,7 +189,7 @@ class NameFixer
 					WHERE (isrenamed = %d OR rel.categoryid = %d)
 					AND proc_nfo = %d',
 					self::IS_RENAMED_NONE,
-					Category::CAT_MISC,
+					Category::CAT_MISC_OTHER,
 					self::PROC_NFO_NONE
 			);
 		}
@@ -256,7 +256,7 @@ class NameFixer
 					FROM releases rel
 					INNER JOIN releasefiles rf ON (rf.releaseid = rel.id)
 					WHERE nzbstatus = %d
-					AND preid = 0',
+					AND prehashid = 0',
 					NZB::NZB_ADDED
 			);
 			$cats = 2;
@@ -270,7 +270,7 @@ class NameFixer
 					WHERE (isrenamed = %d OR rel.categoryid = %d)
 					AND proc_files = %d',
 					self::IS_RENAMED_NONE,
-					Category::CAT_MISC,
+					Category::CAT_MISC_OTHER,
 					self::PROC_FILES_NONE
 			);
 		}
@@ -316,7 +316,7 @@ class NameFixer
 					SELECT rel.id AS releaseid, rel.guid, rel.groupid
 					FROM releases rel
 					WHERE nzbstatus = %d
-					AND preid = 0',
+					AND prehashid = 0',
 					NZB::NZB_ADDED
 			);
 			$cats = 2;
@@ -327,7 +327,7 @@ class NameFixer
 					WHERE (isrenamed = %d OR rel.categoryid = %d)
 					AND proc_par2 = %d',
 					self::IS_RENAMED_NONE,
-					Category::CAT_MISC,
+					Category::CAT_MISC_OTHER,
 					self::PROC_PAR2_NONE
 			);
 		}
@@ -563,7 +563,7 @@ class NameFixer
 							sprintf('
 								UPDATE releases
 								SET videos_id = 0, tv_episodes_id = 0, imdbid = NULL, musicinfoid = NULL,
-									consoleinfoid = NULL, bookinfoid = NULL, anidbid = NULL, preid = %d,
+									consoleinfoid = NULL, bookinfoid = NULL, anidbid = NULL, prehashid = %d,
 									searchname = %s, %s categoryid = %d
 								WHERE id = %d',
 								$preId,
@@ -580,7 +580,7 @@ class NameFixer
 							sprintf('
 								UPDATE releases
 								SET videos_id = 0, tv_episodes_id = 0, imdbid = NULL, musicinfoid = NULL,
-									consoleinfoid = NULL, bookinfoid = NULL, anidbid = NULL, preid = %d,
+									consoleinfoid = NULL, bookinfoid = NULL, anidbid = NULL, prehashid = %d,
 									searchname = %s, iscategorized = 1, categoryid = %d
 								WHERE id = %d',
 								$preId,
@@ -652,7 +652,7 @@ class NameFixer
 							FROM releases r
 							%1\$s
 							AND (r.name %2\$s OR r.searchname %2\$s)
-							AND r.preid = 0
+							AND r.prehashid = 0
 							LIMIT 21",
 							$join,
 							$this->pdo->likeString($pre['title'], true, true)
@@ -667,10 +667,10 @@ class NameFixer
 		if ($total > 0 && $total <= 15 && $res instanceof \Traversable) {
 			foreach ($res as $row) {
 					if ($pre['title'] !== $row['searchname']) {
-						$this->updateRelease($row, $pre['title'], $method = "Title Match source: " . $pre['source'], $echo, "PreDB FT Exact, ", $namestatus, $show, $pre['preid']);
+						$this->updateRelease($row, $pre['title'], $method = "Title Match source: " . $pre['source'], $echo, "PreDB FT Exact, ", $namestatus, $show, $pre['prehashid']);
 						$matching++;
 					} else {
-						$this->_updateSingleColumn('preid', $pre['preid'], $row['releaseid']);
+						$this->_updateSingleColumn('prehashid', $pre['prehashid'], $row['releaseid']);
 					}
 			}
 		} elseif ($total >= 16) {
