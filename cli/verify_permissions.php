@@ -52,7 +52,7 @@ foreach ([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'a', 'b', 'c', 'd', 'e', 'f'] as $identi
 }
 
 // Add covers paths.
-foreach (['anime', 'audio', 'audiosample', 'book', 'console', 'games', 'movies', 'music', 'preview', 'sample', 'tvrage_titles', 'video', 'xxx'] as $identifier) {
+foreach (['anime', 'audio', 'audiosample', 'book', 'console', 'games', 'movies', 'music', 'preview', 'sample', 'tvrage', 'video', 'xxx', 'tvshow'] as $identifier) {
 	$nzbFolder = NN_RES . 'covers' . DS . $identifier . DS;
 	$folders[$nzbFolder] = [R, W];
 }
