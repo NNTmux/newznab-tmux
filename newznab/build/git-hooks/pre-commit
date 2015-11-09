@@ -33,7 +33,7 @@ do
     echo ${PROJECT}/${FILE} >> ${FILE_LIST}
 done
 
-#nZEDb hook - run hooks
+#newznab hook - run hooks
 # placeholder for script to add command with correct path ;-)
 
 EXIT_STATUS=$?
