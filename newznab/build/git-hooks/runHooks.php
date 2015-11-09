@@ -19,6 +19,7 @@
  * @copyright 2014 nZEDb
  */
 define('GIT_PRE_COMMIT', true);
+
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
 use newznab\db\DbUpdate;
@@ -30,7 +31,7 @@ echo "Running pre-commit hooks\n";
 $error = false;
 
 // TODO Add code here to check permissions on staged files.
-//$files = file(nZEDb_ROOT . 'nzedb/build/git-hooks'), FILE_IGNORE_NEW_LINES);
+//$files = file(NN_ROOT . 'newznab/build/git-hooks'), FILE_IGNORE_NEW_LINES);
 //foreach ($files as $file) {
 //	echo "Filename: $file\n";
 //}
@@ -53,6 +54,7 @@ if ($error === false) {
 			} catch (\Exception $e) {
 				$error = 1;
 				echo "Error while checking versions!\n";
+				echo $e->getMessage() . "\n";
 			}
 		}
 	} else {
@@ -63,3 +65,4 @@ if ($error === false) {
 }
 
 exit($error);
+?>
