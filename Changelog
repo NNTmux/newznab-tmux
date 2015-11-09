@@ -1,3 +1,5 @@
+2015-11-09 DariusIII
+	Fix: group list pager not working
 2015-11-06 DariusIII
 	Fix: Wrong column name in NameFixer
 	Fix: Cart RSS feed, admin user role edit
