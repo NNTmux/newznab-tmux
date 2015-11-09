@@ -1,4 +1,4 @@
-DELETE FROM collection_regexes WHERE id = 600;
+DELETE FROM collection_regexes WHERE id = 602;
 INSERT INTO collection_regexes (id, group_regex, regex, status, description, ordinal)
 VALUES (
   602,
