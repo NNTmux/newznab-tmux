@@ -1,4 +1,5 @@
 2015-11-09 DariusIII
+	Fix: Collection naming regex patches
 	Add: Add new PreDb class for prehash imports, update predb_import_daily_batch to use the new nZEDb github repo.
 	Add: Add new collection and release_naming regexes from nZEDb
 2015-11-06 DariusIII
