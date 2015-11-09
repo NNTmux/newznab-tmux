@@ -1,7 +1,7 @@
-DELETE FROM collection_regexes WHERE id = 600;
+DELETE FROM collection_regexes WHERE id = 602;
 INSERT INTO collection_regexes (id, group_regex, regex, status, description, ordinal)
 VALUES (
-  600,
+  602,
   '^alt\\.binaries\\.cores$',
   '/^(?P<match0>.+?) - \\[\\d+\\/\\d+\\] - ".+?" yEnc$/',
   1,
