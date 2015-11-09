@@ -1,4 +1,5 @@
 2015-11-09 DariusIII
+	Fix: Fix the path to patches in Versions.php
 	Add: Add trigger, unique index to release_comments table
 	Fix: group list pager not working
 2015-11-06 DariusIII
