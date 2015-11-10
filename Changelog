@@ -1,3 +1,5 @@
+2015-11-10 DariusIII
+	Chg: Change how failed releases are tracked
 2015-11-09 DariusIII
 	Fix: pre-commit hooks
 	Add: Add back trigger and unique index to release_comments table

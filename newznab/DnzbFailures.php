@@ -35,12 +35,14 @@ class DnzbFailures
 	}
 
 	/**
+	 * @note Read failed downloads count for requested guid
+	 *
 	 * @param string $guid
 	 */
 	public function getFailedCount($guid)
 	{
-		$result = $this->pdo->query(sprintf('SELECT COUNT(userid) AS num FROM dnzb_failures WHERE guid = %s', $this->pdo->escapeString($guid)));
-			return $result[0]['num'];
+		$result = $this->pdo->query(sprintf('SELECT failed AS num FROM dnzb_failures WHERE guid = %s', $this->pdo->escapeString($guid)));
+		return $result[0]['num'];
 	}
 
 	/**
@@ -53,7 +55,7 @@ class DnzbFailures
 	}
 
 	/**
-	 * Get a range of releases. used in admin manage list
+	 * @note Get a range of releases. Used in admin manage list
 	 *
 	 * @param $start
 	 * @param $num
@@ -78,7 +80,8 @@ class DnzbFailures
 	}
 
 	/**
-	 * Retrieve alternate release with same or similar searchname
+	 * @note Retrieve alternate release with same or similar searchname,
+	 *       update failed count while doing it
 	 *
 	 * @param string $guid
 	 * @param string $searchname
@@ -88,35 +91,53 @@ class DnzbFailures
 	public function getAlternate($guid, $searchname, $userid)
 	{
 		$this->pdo->queryInsert(sprintf("INSERT IGNORE INTO dnzb_failures (userid, guid) VALUES (%d, %s)",
-				$userid,
-				$this->pdo->escapeString($guid)
-			)
+						$userid,
+						$this->pdo->escapeString($guid)
+				)
 		);
-		$rel = $this->pdo->queryOneRow(sprintf('SELECT id, gid FROM releases WHERE guid = %s', $this->pdo->escapeString($guid)));
+
+		$this->updateFailed($guid);
+		$rel = $this->pdo->queryOneRow(sprintf('SELECT id FROM releases WHERE guid = %s', $this->pdo->escapeString($guid)));
 		$this->postComment($rel['id'], $rel['gid'], $userid);
 
 		$alternate = $this->pdo->queryOneRow(sprintf('SELECT * FROM releases r
 			WHERE r.searchname %s
 			AND r.guid NOT IN (SELECT guid FROM dnzb_failures WHERE userid = %d)',
-				$this->pdo->likeString($searchname),
-				$userid
-			)
+						$this->pdo->likeString($searchname),
+						$userid
+				)
 		);
 		return $alternate;
 	}
 
 	/**
+	 * @note  Post comment for the release if that release has no comment for failure.
+	 *        Only one user is allowed to post comment for that release, rest will just
+	 *        update the failed count in dnzb_failures table
+	 *
 	 * @param $relid
-	 * @param $gid
+	 * @param gid
 	 * @param $uid
 	 */
 	public function postComment($relid, $gid, $uid)
 	{
 		$text = 'This release has failed to download properly. It might fail for other users too.
 		This comment is automatically generated.';
-		$dbl = $this->pdo->queryOneRow(sprintf('SELECT text FROM release_comments WHERE releaseid = %d AND gid = %s AND userid = %d', $relid, $this->pdo->escapeString($gid), $uid));
+		$dbl = $this->pdo->queryOneRow(sprintf('SELECT text FROM release_comments WHERE releaseid = %d', $relid));
 		if ($dbl['text'] != $text){
 			$this->rc->addComment($relid, $gid, $text, $uid, '');
 		}
+	}
+
+	/**
+	 * @note Update count of failed downloads for guid
+	 *
+	 * @param string $guid
+	 */
+	public function updateFailed($guid)
+	{
+		$this->pdo->queryExec(
+				sprintf('UPDATE dnzb_failures SET failed = failed + 1 WHERE guid = %s', $this->pdo->escapeString($guid))
+		);
 	}
 }

@@ -205,7 +205,7 @@ class Releases
 			"SELECT r.*,
 					CONCAT(cp.title, ' > ', c.title) AS category_name,
 					CONCAT(cp.id, ',', c.id) AS category_ids,
-					COUNT(df.id) AS failed,
+					SELECT df.failed AS failed,
 					rn.id AS nfoid,
 					re.releaseid AS reid,
 					v.tvdb, v.trakt, v.tvrage, v.tvmaze, v.imdb, v.tmdb,
@@ -483,7 +483,7 @@ class Releases
 					groups.name AS group_name,
 					rn.id AS nfoid, re.releaseid AS reid,
 					tve.firstaired,
-					COUNT(df.id) AS failed
+					SELECT df.failed AS failed
 				FROM releases r
 				LEFT OUTER JOIN releasevideo re ON re.releaseid = r.id
 				INNER JOIN groups ON groups.id = r.groupid
@@ -886,7 +886,7 @@ class Releases
 			"SELECT r.*,
 				CONCAT(cp.title, ' > ', c.title) AS category_name,
 				%s AS category_ids,
-				(SELECT COUNT(userid) FROM dnzb_failures WHERE guid = r.guid) AS failed,
+				(SELECT failed FROM dnzb_failures WHERE guid = r.guid) AS failed,
 				groups.name AS group_name,
 				rn.id AS nfoid,
 				re.releaseid AS reid,
@@ -985,9 +985,9 @@ class Releases
 				rn.id AS nfoid,
 				re.releaseid AS reid
 			FROM releases r
-			INNER JOIN videos v ON r.videos_id = v.id
-			INNER JOIN tv_info tvi ON v.id = tvi.videos_id
-			INNER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
+			LEFT OUTER JOIN videos v ON r.videos_id = v.id
+			LEFT OUTER JOIN tv_info tvi ON v.id = tvi.videos_id
+			LEFT OUTER JOIN tv_episodes tve ON r.tv_episodes_id = tve.id
 			INNER JOIN category c ON c.id = r.categoryid
 			INNER JOIN groups ON groups.id = r.groupid
 			LEFT OUTER JOIN releasevideo re ON re.releaseid = r.id
