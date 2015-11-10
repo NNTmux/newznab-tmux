@@ -61,24 +61,17 @@ class TraktTv extends TV
 		$tvcount = $res->rowCount();
 
 		if ($this->echooutput && $tvcount > 1) {
-			echo $this->pdo->log->header("Processing TRAKT lookup for " . number_format($tvcount) . " release(s).");
+			echo $this->pdo->log->header("Processing Trakt lookup for " . number_format($tvcount) . " release(s).");
 		}
 
 		if ($res instanceof \Traversable) {
 			foreach ($res as $row) {
 
-				$traktid = false;
+				$this->posterUrl = '';
 
 				// Clean the show name for better match probability
 				$release = $this->parseNameEpSeason($row['searchname']);
 				if (is_array($release) && $release['name'] != '') {
-
-					// Find the Video ID if it already exists by checking the title.
-					$videoId = $this->getByTitle($release['cleanname'], parent::TYPE_TV);
-
-					if ($videoId !== false) {
-						$traktid = $this->getSiteByID('trakt', $videoId);
-					}
 
 					// Force local lookup only
 					if ($local == true) {
@@ -87,78 +80,73 @@ class TraktTv extends TV
 						$lookupSetting = true;
 					}
 
-					if ($traktid === false && $lookupSetting) {
-
-						// If it doesnt exist locally and lookups are allowed lets try to get it.
+					// If lookups are allowed lets try to get it.
+					if ($lookupSetting) {
 						if ($this->echooutput) {
-							echo $this->pdo->log->primaryOver("Video ID for ") .
+							echo $this->pdo->log->primaryOver("Checking TRAKT for previously failed title: ") .
 									$this->pdo->log->headerOver($release['cleanname']) .
-									$this->pdo->log->primary(" not found in local db, checking web.");
+									$this->pdo->log->primary(".");
 						}
 
-						// Check if we have a valid country and set it in the array
-						$country = (isset($release['country']) && strlen($release['country']) == 2
-								? (string)$release['country']
-								: ''
-						);
-
-						// Get the show from TRAKT
+						// Get the show from Trakt
 						$traktShow = $this->getShowInfo((string)$release['cleanname']);
 
 						if (is_array($traktShow)) {
-							$traktShow['country'] = $country;
-							$videoId = $this->add($traktShow);
-							$traktid = (int)$traktShow['ids']['trakt'];
-						}
-
-					} else if ($this->echooutput) {
-						echo $this->pdo->log->primaryOver("Video ID for ") .
-								$this->pdo->log->headerOver($release['cleanname']) .
-								$this->pdo->log->primary(" found in local db, attempting episode match.");
-					}
-
-					if (is_numeric($videoId) && $videoId > 0 && is_numeric($traktid) && $traktid > 0) {
-						// Now that we have valid video and trakt ids, try to get the poster
-						$this->getPoster($videoId, $traktid);
-
-						$seasonNo = preg_replace('/^S0*/i', '', $release['season']);
-						$episodeNo = preg_replace('/^E0*/i', '', $release['episode']);
-
-						if ($episodeNo === 'all') {
-							// Set the video ID and leave episode 0
-							$this->setVideoIdFound($videoId, $row['id'], 0);
-							echo $this->pdo->log->primary("Found TRAKT Match for Full Season!");
-							continue;
-						}
-
-						// Download all episodes if new show to reduce API/bandwidth usage
-						if ($this->countEpsByVideoID($videoId) === false) {
-							$this->getEpisodeInfo($traktid, -1, -1, '', $videoId);
-						}
-
-						// Check if we have the episode for this video ID
-						$episode = $this->getBySeasonEp($videoId, $seasonNo, $episodeNo, $release['airdate']);
-
-						if ($episode === false && $lookupSetting) {
-							// Send the request for the episode to TRAKT
-							$traktEpisode = $this->getEpisodeInfo(
-									$traktid,
-									$seasonNo,
-									$episodeNo
-							);
-
-							if ($traktEpisode) {
-								$episode = $this->addEpisode($videoId, $traktEpisode);
+							// Check if we have the Trakt ID already, if we do use that Video ID
+							$dupeCheck = $this->getVideoIDFromSiteID('trakt', $traktShow['trakt']);
+							if ($dupeCheck === false) {
+								$videoId = $this->add($traktShow);
+							} else {
+								$videoId = $dupeCheck;
 							}
-						}
 
-						if ($episode !== false && is_numeric($episode) && $episode > 0) {
-							// Mark the releases video and episode IDs
-							$this->setVideoIdFound($videoId, $row['id'], $episode);
-							if ($this->echooutput) {
-								echo $this->pdo->log->primary("Found TRAKT Match!");
+							$traktid = (int)$traktShow['trakt'];
+
+							if (is_numeric($videoId) && $videoId > 0 && is_numeric($traktid) && $traktid > 0) {
+								// Now that we have valid video and trakt ids, try to get the poster
+								$this->getPoster($videoId, $traktid);
+
+								$seasonNo = preg_replace('/^S0*/i', '', $release['season']);
+								$episodeNo = preg_replace('/^E0*/i', '', $release['episode']);
+
+								if ($episodeNo === 'all') {
+									// Set the video ID and leave episode 0
+									$this->setVideoIdFound($videoId, $row['id'], 0);
+									echo $this->pdo->log->primary("Found TVDB Match for Full Season!");
+									continue;
+								}
+
+								// Download all episodes if new show to reduce API usage
+								if ($this->countEpsByVideoID($videoId) === false) {
+									$this->getEpisodeInfo($traktid, -1, -1, '', $videoId);
+								}
+
+								// Check if we have the episode for this video ID
+								$episode = $this->getBySeasonEp($videoId, $seasonNo, $episodeNo, $release['airdate']);
+
+								if ($episode === false) {
+									// Send the request for the episode to TVMaze
+									$traktEpisode = $this->getEpisodeInfo(
+											$traktid,
+											$seasonNo,
+											$episodeNo,
+											$release['airdate']
+									);
+
+									if ($traktEpisode) {
+										$episode = $this->addEpisode($videoId, $traktEpisode);
+									}
+								}
+
+								if ($episode !== false && is_numeric($episode) && $episode > 0) {
+									// Mark the releases video and episode IDs
+									$this->setVideoIdFound($videoId, $row['id'], $episode);
+									if ($this->echooutput) {
+										echo $this->pdo->log->primary("Found TVMaze Match!");
+									}
+									continue;
+								}
 							}
-							continue;
 						}
 					}
 				} //Processing failed, set the episode ID to the next processing group
@@ -166,7 +154,6 @@ class TraktTv extends TV
 			}
 		}
 	}
-
 	/**
 	 * Fetch banner from site.
 	 *

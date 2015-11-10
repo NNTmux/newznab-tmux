@@ -222,10 +222,6 @@ abstract class TV extends Videos
 		}
 
 		if ($videoId === false) {
-			$videoId = $this->getByTitleQuery($showArr['title'], $showArr['type']);
-		}
-
-		if ($videoId === false) {
 			// Insert the Show
 			$videoId = $this->pdo->queryInsert(
 				sprintf('
@@ -305,7 +301,7 @@ abstract class TV extends Videos
 	 * @param int $videoId
 	 * @param array $showArr
 	 */
-	public function update($videoId, $showArr = [])
+	public function update($videoId, $showArr = array())
 	{
 		if ($showArr['country'] !== '') {
 			$showArr['country'] = $this->countryCode($showArr['country']);
