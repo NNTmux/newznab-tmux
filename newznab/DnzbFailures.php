@@ -44,7 +44,7 @@ class DnzbFailures
 	public function getFailedCount($guid)
 	{
 		$result = $this->pdo->query(sprintf('SELECT failed AS num FROM dnzb_failures WHERE guid = %s', $this->pdo->escapeString($guid)));
-		if (is_array($result)) {
+		if (is_array($result) && !empty($result)) {
 			return $result[0]['num'];
 		}
 		return false;
