@@ -43,7 +43,7 @@ class DnzbFailures
 	{
 		$result = $this->pdo->query(sprintf('SELECT failed AS num FROM dnzb_failures WHERE guid = %s', $this->pdo->escapeString($guid)));
 		var_dump($result);
-		return $result['num'];
+		return $result[0]['num'];
 	}
 
 	/**
