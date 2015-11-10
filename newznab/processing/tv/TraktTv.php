@@ -112,7 +112,7 @@ class TraktTv extends TV
 								if ($episodeNo === 'all') {
 									// Set the video ID and leave episode 0
 									$this->setVideoIdFound($videoId, $row['id'], 0);
-									echo $this->pdo->log->primary("Found TVDB Match for Full Season!");
+									echo $this->pdo->log->primary("Found TRAKT Match for Full Season!");
 									continue;
 								}
 
@@ -125,7 +125,7 @@ class TraktTv extends TV
 								$episode = $this->getBySeasonEp($videoId, $seasonNo, $episodeNo, $release['airdate']);
 
 								if ($episode === false) {
-									// Send the request for the episode to TVMaze
+									// Send the request for the episode to Trakt
 									$traktEpisode = $this->getEpisodeInfo(
 											$traktid,
 											$seasonNo,
@@ -142,7 +142,7 @@ class TraktTv extends TV
 									// Mark the releases video and episode IDs
 									$this->setVideoIdFound($videoId, $row['id'], $episode);
 									if ($this->echooutput) {
-										echo $this->pdo->log->primary("Found TVMaze Match!");
+										echo $this->pdo->log->primary("Found Trakt Match!");
 									}
 									continue;
 								}

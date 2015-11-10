@@ -68,7 +68,7 @@ class TMDB extends TV
 		$tvcount = $res->rowCount();
 
 		if ($this->echooutput && $tvcount > 1) {
-			echo $this->pdo->log->header("Processing TVMaze lookup for " . number_format($tvcount) . " release(s).");
+			echo $this->pdo->log->header("Processing TMDB lookup for " . number_format($tvcount) . " release(s).");
 		}
 
 		if ($res instanceof \Traversable) {
@@ -99,7 +99,7 @@ class TMDB extends TV
 						$tmdbShow = $this->getShowInfo((string)$release['cleanname']);
 
 						if (is_array($tmdbShow)) {
-							// Check if we have the TVDB ID already, if we do use that Video ID
+							// Check if we have the TMDB ID already, if we do use that Video ID
 							$dupeCheck = $this->getVideoIDFromSiteID('tmdb', $tmdbShow['tmdb']);
 							if ($dupeCheck === false) {
 								$videoId = $this->add($tmdbShow);
@@ -119,7 +119,7 @@ class TMDB extends TV
 								if ($episodeNo === 'all') {
 									// Set the video ID and leave episode 0
 									$this->setVideoIdFound($videoId, $row['id'], 0);
-									echo $this->pdo->log->primary("Found TVDB Match for Full Season!");
+									echo $this->pdo->log->primary("Found TMDB Match for Full Season!");
 									continue;
 								}
 
@@ -132,7 +132,7 @@ class TMDB extends TV
 								$episode = $this->getBySeasonEp($videoId, $seasonNo, $episodeNo, $release['airdate']);
 
 								if ($episode === false) {
-									// Send the request for the episode to TVMaze
+									// Send the request for the episode to TMDB
 									$tmdbEpisode = $this->getEpisodeInfo(
 											$tmdbid,
 											$seasonNo,
@@ -149,7 +149,7 @@ class TMDB extends TV
 									// Mark the releases video and episode IDs
 									$this->setVideoIdFound($videoId, $row['id'], $episode);
 									if ($this->echooutput) {
-										echo $this->pdo->log->primary("Found TVMaze Match!");
+										echo $this->pdo->log->primary("Found TMDB Match!");
 									}
 									continue;
 								}

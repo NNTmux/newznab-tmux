@@ -1,4 +1,5 @@
 2015-11-10 DariusIII
+	Fix: Typos
 	Upd: Update TV support, fix TV processing logic
 	Fix: undefined offset error
 	Chg: Change how failed releases are tracked
