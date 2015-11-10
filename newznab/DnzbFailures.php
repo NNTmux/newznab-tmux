@@ -38,11 +38,16 @@ class DnzbFailures
 	 * @note Read failed downloads count for requested guid
 	 *
 	 * @param string $guid
+	 *
+	 * @return array|bool
 	 */
 	public function getFailedCount($guid)
 	{
 		$result = $this->pdo->query(sprintf('SELECT failed AS num FROM dnzb_failures WHERE guid = %s', $this->pdo->escapeString($guid)));
-		return $result[0]['num'];
+		if (is_array($result) && !empty($result)) {
+			return $result[0]['num'];
+		}
+		return false;
 	}
 
 	/**
