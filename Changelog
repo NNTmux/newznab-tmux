@@ -1,3 +1,5 @@
+2015-11-10 DariusIII
+	Chg: Change the way failed releases are counted
 2015-11-09 DariusIII
 	Fix: pre-commit file
 	Fix: Fix the path to patches in Versions.php
