@@ -19,8 +19,6 @@ Class TraktAPI {
 	 */
 	private $clientId;
 
-	private $clientPin = 53246463;
-
 	/**
 	 * List of headers to send to Trakt.tv when making a request.
 	 *
@@ -168,6 +166,7 @@ HEADERS;
 									 'requestheaders' => $this->requestHeaders
 								 ]
 			);
+			var_dump($json);
 
 			if ($json !== false) {
 				$json = json_decode($json, true);
@@ -317,11 +316,15 @@ HEADERS;
 
 	/**
 	 * Generate and return a slug for a given ``$phrase``.
+	 *
+	 * @param string $phrase
+	 *
+	 * @return mixed
 	 */
 	public function slugify($phrase)
 	{
-		$result = preg_replace('#[^a-z0-9\s-]#', '', strtolower($phrase));
-		$result = preg_replace('#\s#', '-', trim(preg_replace('#[\s-]+#', ' ', $result)));
+		$result = preg_replace('#[^a-z0-9\s-]#', '-', strtolower($phrase));
+		$result = preg_replace('#\s#', '-', trim(preg_replace('#[\s-]+#', '-', $result)));
 
 		return $result;
 	}
