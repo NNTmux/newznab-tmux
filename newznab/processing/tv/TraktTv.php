@@ -56,22 +56,27 @@ class TraktTv extends TV
 	 */
 	public function processTrakt($groupID, $guidChar, $processTV, $local = false)
 	{
-		$res = $this->getTvReleases($groupID, $guidChar, $processTV, parent::PROCESS_TRAKT);
+		$res = $this->getTvReleases($groupID, $guidChar, $processTV, parent::PROCESS_TMDB);
 
 		$tvcount = $res->rowCount();
 
 		if ($this->echooutput && $tvcount > 1) {
-			echo $this->pdo->log->header("Processing Trakt lookup for " . number_format($tvcount) . " release(s).");
+			echo $this->pdo->log->header("Processing TRAKT lookup for " . number_format($tvcount) . " release(s).");
 		}
 
 		if ($res instanceof \Traversable) {
 			foreach ($res as $row) {
 
 				$this->posterUrl = '';
+				$traktid = false;
 
 				// Clean the show name for better match probability
-				$release = $this->parseNameEpSeason($row['searchname']);
+				$release = $this->parseShowInfo($row['searchname']);
+
 				if (is_array($release) && $release['name'] != '') {
+
+					// Find the Video ID if it already exists by checking the title against stored TMDB titles
+					$videoId = $this->getByTitle($release['cleanname'], parent::TYPE_TV, parent::SOURCE_TRAKT);
 
 					// Force local lookup only
 					if ($local == true) {
@@ -81,72 +86,81 @@ class TraktTv extends TV
 					}
 
 					// If lookups are allowed lets try to get it.
-					if ($lookupSetting) {
+					if ($videoId === false && $lookupSetting) {
 						if ($this->echooutput) {
 							echo $this->pdo->log->primaryOver("Checking TRAKT for previously failed title: ") .
 									$this->pdo->log->headerOver($release['cleanname']) .
 									$this->pdo->log->primary(".");
 						}
 
-						// Get the show from Trakt
+						// Get the show from TRAKT
 						$traktShow = $this->getShowInfo((string)$release['cleanname']);
 
 						if (is_array($traktShow)) {
-							// Check if we have the Trakt ID already, if we do use that Video ID
-							$dupeCheck = $this->getVideoIDFromSiteID('trakt', $traktShow['trakt']);
+							// Check if we have the TVDB ID already, if we do use that Video ID
+							$dupeCheck = $this->getVideoIDFromSiteID('tvdb', $traktShow['tvdb']);
 							if ($dupeCheck === false) {
 								$videoId = $this->add($traktShow);
+								$traktid = $traktShow['trakt'];
 							} else {
 								$videoId = $dupeCheck;
+								// Update any missing fields and add site IDs
+								$this->update($videoId, $traktShow);
+								$traktid = $this->getSiteIDFromVideoID('trakt', $videoId);
 							}
+						}
+					} else {
+						if ($this->echooutput) {
+							echo $this->pdo->log->primaryOver("Found local TRAKT match for: ") .
+									$this->pdo->log->headerOver($release['cleanname']) .
+									$this->pdo->log->primary(".  Attempting episode lookup!");
+						}
+						$traktid = $this->getSiteIDFromVideoID('trakt', $videoId);
+					}
 
-							$traktid = (int)$traktShow['trakt'];
+					if (is_numeric($videoId) && $videoId > 0 && is_numeric($traktid) && $traktid > 0) {
+						// Now that we have valid video and tmdb ids, try to get the poster
+						$this->getPoster($videoId, $traktid);
 
-							if (is_numeric($videoId) && $videoId > 0 && is_numeric($traktid) && $traktid > 0) {
-								// Now that we have valid video and trakt ids, try to get the poster
-								$this->getPoster($videoId, $traktid);
+						$seasonNo = preg_replace('/^S0*/i', '', $release['season']);
+						$episodeNo = preg_replace('/^E0*/i', '', $release['episode']);
 
-								$seasonNo = preg_replace('/^S0*/i', '', $release['season']);
-								$episodeNo = preg_replace('/^E0*/i', '', $release['episode']);
+						if ($episodeNo === 'all') {
+							// Set the video ID and leave episode 0
+							$this->setVideoIdFound($videoId, $row['id'], 0);
+							echo $this->pdo->log->primary("Found TRAKT Match for Full Season!");
+							continue;
+						}
 
-								if ($episodeNo === 'all') {
-									// Set the video ID and leave episode 0
-									$this->setVideoIdFound($videoId, $row['id'], 0);
-									echo $this->pdo->log->primary("Found TRAKT Match for Full Season!");
-									continue;
-								}
+						// Download all episodes if new show to reduce API usage
+						if ($this->countEpsByVideoID($videoId) === false) {
+							$this->getEpisodeInfo($traktid, -1, -1, '', $videoId);
+						}
 
-								// Download all episodes if new show to reduce API usage
-								if ($this->countEpsByVideoID($videoId) === false) {
-									$this->getEpisodeInfo($traktid, -1, -1, '', $videoId);
-								}
+						// Check if we have the episode for this video ID
+						$episode = $this->getBySeasonEp($videoId, $seasonNo, $episodeNo, $release['airdate']);
 
-								// Check if we have the episode for this video ID
-								$episode = $this->getBySeasonEp($videoId, $seasonNo, $episodeNo, $release['airdate']);
+						if ($episode === false) {
+							// Send the request for the episode to TRAKT
+							$tmdbEpisode = $this->getEpisodeInfo(
+									$traktid,
+									$seasonNo,
+									$episodeNo,
+									$release['airdate']
+							);
 
-								if ($episode === false) {
-									// Send the request for the episode to Trakt
-									$traktEpisode = $this->getEpisodeInfo(
-											$traktid,
-											$seasonNo,
-											$episodeNo,
-											$release['airdate']
-									);
-
-									if ($traktEpisode) {
-										$episode = $this->addEpisode($videoId, $traktEpisode);
-									}
-								}
-
-								if ($episode !== false && is_numeric($episode) && $episode > 0) {
-									// Mark the releases video and episode IDs
-									$this->setVideoIdFound($videoId, $row['id'], $episode);
-									if ($this->echooutput) {
-										echo $this->pdo->log->primary("Found Trakt Match!");
-									}
-									continue;
-								}
+							if ($tmdbEpisode) {
+								$episode = $this->addEpisode($videoId, $tmdbEpisode);
 							}
+						}
+
+						if ($episode !== false && is_numeric($episode) && $episode > 0) {
+							// Mark the releases video and episode IDs
+							$this->setVideoIdFound($videoId, $row['id'], $episode);
+							if ($this->echooutput) {
+								echo $this->pdo->log->primary("Found TRAKT Match!");
+							}
+							continue;
 						}
 					}
 				} //Processing failed, set the episode ID to the next processing group
@@ -154,6 +168,7 @@ class TraktTv extends TV
 			}
 		}
 	}
+
 	/**
 	 * Fetch banner from site.
 	 *
@@ -322,7 +337,7 @@ class TraktTv extends TV
 				'started'   => (string)$show->first_aired->format($this->timeFormat),
 				'publisher' => (string)$show->network,
 				'source'    => (int)parent::SOURCE_TRAKT,
-				'imdb'      => (int)(isset($imdb['imdbid']) ? $imdb['imdbid'] : 0),
+				'imdb'      => (int)(isset($show->ids->imdb) ? $show->ids->imdb : 0),
 				'tvdb'      => 0,
 				'trakt'     => (int)$show->ids->trakt,
 				'tvrage'    => (int)(isset($show->ids->tvrage) ? $show->ids->tvrage : 0),
