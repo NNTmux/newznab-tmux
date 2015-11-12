@@ -31,6 +31,11 @@ class TraktTv extends TV
 	private $timeFormat;
 
 	/**
+	 * @var string The URL for the image for poster
+	 */
+	private $posterUrl;
+
+	/**
 	 * Construct. Set up API key.
 	 *
 	 * @param array $options Class instances.
@@ -56,7 +61,7 @@ class TraktTv extends TV
 	 */
 	public function processTrakt($groupID, $guidChar, $processTV, $local = false)
 	{
-		$res = $this->getTvReleases($groupID, $guidChar, $processTV, parent::PROCESS_TMDB);
+		$res = $this->getTvReleases($groupID, $guidChar, $processTV, parent::PROCESS_TRAKT);
 
 		$tvcount = $res->rowCount();
 
@@ -119,7 +124,7 @@ class TraktTv extends TV
 					}
 
 					if (is_numeric($videoId) && $videoId > 0 && is_numeric($traktid) && $traktid > 0) {
-						// Now that we have valid video and tmdb ids, try to get the poster
+						// Now that we have valid video and trakt ids, try to get the poster
 						$this->getPoster($videoId, $traktid);
 
 						$seasonNo = preg_replace('/^S0*/i', '', $release['season']);
@@ -142,15 +147,15 @@ class TraktTv extends TV
 
 						if ($episode === false) {
 							// Send the request for the episode to TRAKT
-							$tmdbEpisode = $this->getEpisodeInfo(
+							$traktEpisode = $this->getEpisodeInfo(
 									$traktid,
 									$seasonNo,
 									$episodeNo,
 									$release['airdate']
 							);
 
-							if ($tmdbEpisode) {
-								$episode = $this->addEpisode($videoId, $tmdbEpisode);
+							if ($traktEpisode) {
+								$episode = $this->addEpisode($videoId, $traktEpisode);
 							}
 						}
 
