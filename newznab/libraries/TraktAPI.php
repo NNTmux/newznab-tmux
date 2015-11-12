@@ -166,7 +166,6 @@ HEADERS;
 									 'requestheaders' => $this->requestHeaders
 								 ]
 			);
-			var_dump($json);
 
 			if ($json !== false) {
 				$json = json_decode($json, true);
