@@ -35,11 +35,6 @@ class TVDB extends TV
 	private $serverTime;
 
 	/**
-	 * @string DateTimeZone Object - UTC
-	 */
-	private $timeZone;
-
-	/**
 	 * @string MySQL DATETIME Format
 	 */
 	private $timeFormat;
@@ -55,7 +50,6 @@ class TVDB extends TV
 		$this->fanartUrl = self::TVDB_URL . DS . 'banners/_cache/fanart/original/%s-1.jpg';
 
 		$this->serverTime = $this->client->getServerTime();
-		$this->timeZone = new \DateTimeZone('UTC');
 		$this->timeFormat = 'Y-m-d H:i:s';
 	}
 
@@ -74,7 +68,7 @@ class TVDB extends TV
 
 		$tvcount = $res->rowCount();
 
-		if ($this->echooutput && $tvcount > 1) {
+		if ($this->echooutput && $tvcount > 0) {
 			echo $this->pdo->log->header("Processing TVDB lookup for " . number_format($tvcount) . " release(s).");
 		}
 
@@ -84,7 +78,7 @@ class TVDB extends TV
 				$tvdbid = false;
 
 				// Clean the show name for better match probability
-				$release = $this->parseNameEpSeason($row['searchname']);
+				$release = $this->parseShowInfo($row['searchname']);
 				if (is_array($release) && $release['name'] != '') {
 
 					// Find the Video ID if it already exists by checking the title.
@@ -233,13 +227,13 @@ class TVDB extends TV
 			foreach ($response as $show) {
 				if ($this->checkRequired($show, 'tvdbS')) {
 					// Check for exact title match first and then terminate if found
-					if ($show->name === $cleanName) {
+					if (strtolower($show->name) === strtolower($cleanName)) {
 						$highest = $show;
 						break;
 					}
 
 					// Check each show title for similarity and then find the highest similar value
-					$matchPercent = $this->checkMatch($show->name, $cleanName, self::MATCH_PROBABILITY);
+					$matchPercent = $this->checkMatch(strtolower($show->name), strtolower($cleanName), self::MATCH_PROBABILITY);
 
 					// If new match has a higher percentage, set as new matched title
 					if ($matchPercent > $highestMatch) {
@@ -250,7 +244,7 @@ class TVDB extends TV
 					// Check for show aliases and try match those too
 					if (!empty($show->aliasNames)) {
 						foreach ($show->aliasNames as $key => $name) {
-							$matchPercent = $this->CheckMatch($name, $cleanName, $matchPercent);
+							$matchPercent = $this->CheckMatch(strtolower($name), strtolower($cleanName), $matchPercent);
 							if ($matchPercent > $highestMatch) {
 								$highestMatch = $matchPercent;
 								$highest = $show;
@@ -361,7 +355,6 @@ class TVDB extends TV
 	 */
 	private function formatShowArr($show)
 	{
-		$show->firstAired->setTimezone($this->timeZone);
 		preg_match('/tt(?P<imdbid>\d{6,7})$/i', $show->imdbId, $imdb);
 
 		return [
@@ -391,8 +384,6 @@ class TVDB extends TV
 	 */
 	private function formatEpisodeArr($episode)
 	{
-		$episode->firstAired->setTimezone($this->timeZone);
-
 		return [
 			'title'       => (string)$episode->name,
 			'series'      => (int)$episode->season,

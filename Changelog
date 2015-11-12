@@ -1,4 +1,11 @@
+2015-11-12 DariusIII
+	Fix: Remove timeZone as tmdb is already UTC
+	Upd: Update TV episodes parsing
+	Fix: Fix Typo for TMDB in series view
+	Upd: TV processing. Parse TV show properly, update Trakt support
 2015-11-10 DariusIII
+	Fix: Typos
+	Upd: Update TV support, fix TV processing logic
 	Fix: undefined offset error
 	Chg: Change how failed releases are tracked
 2015-11-09 DariusIII
