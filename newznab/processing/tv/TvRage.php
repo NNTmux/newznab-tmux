@@ -94,7 +94,7 @@ class TvRage extends TV
 		if ($res instanceof \Traversable) {
 			foreach ($res as $arr) {
 				$this->rageId = $this->rageId = false;
-				$show = $this->parseNameEpSeason($arr['searchname']);
+				$show = $this->parseShowInfo($arr['searchname']);
 				if (is_array($show) && $show['name'] != '') {
 					// Find the Video ID if it already exists by checking the title.
 					$this->videoId = $this->getByTitle($show['cleanname'], parent::TYPE_TV);
@@ -108,8 +108,8 @@ class TvRage extends TV
 						// If it doesnt exist locally and lookups are allowed lets try to get it.
 						if ($this->echooutput) {
 							echo $this->pdo->log->primaryOver("Video ID for ") .
-								 $this->pdo->log->headerOver($show['cleanname']) .
-								 $this->pdo->log->primary(" not found in local db, checking web.");
+									$this->pdo->log->headerOver($show['cleanname']) .
+									$this->pdo->log->primary(" not found in local db, checking web.");
 						}
 						$tvrShow = $this->getShowInfo($show);
 						if ($tvrShow !== false && is_array($tvrShow)) {
@@ -123,8 +123,8 @@ class TvRage extends TV
 					if ($this->videoId > 0) {
 						if ($this->echooutput) {
 							echo $this->pdo->log->primaryOver("Video ID for ") .
-								 $this->pdo->log->headerOver($show['cleanname']) .
-								 $this->pdo->log->primary(" found in local db, setting tvrage ID and attempting episode lookup.");
+									$this->pdo->log->headerOver($show['cleanname']) .
+									$this->pdo->log->primary(" found in local db, setting tvrage ID and attempting episode lookup.");
 						}
 						$episodeId = $this->getBySeasonEp($this->videoId,  $show['season'], $show['episode']);
 						if ($episodeId === false) {
@@ -134,24 +134,24 @@ class TvRage extends TV
 								$tvtitle = $this->pdo->escapeString(trim($epinfo['title']));
 								$seComplete = 'S' . sprintf('%02s', $show['season']) . 'E' . sprintf('%02s', $show['episode']);
 								$episodeId = $this->addEpisode($this->videoId,
-									[
-										'series'      => $show['season'],
-										'episode'     => $show['episode'],
-										'se_complete' => $seComplete,
-										'firstaired'  => $tvairdate,
-										'title'       => $tvtitle,
-										'summary'     => ''
-									]
+										[
+												'series'      => $show['season'],
+												'episode'     => $show['episode'],
+												'se_complete' => $seComplete,
+												'firstaired'  => $tvairdate,
+												'title'       => $tvtitle,
+												'summary'     => ''
+										]
 								);
 							}
 						}
 						echo $this->pdo->log->primary("Found TV Rage Match!");
 						$this->setVideoIdFound($this->videoId, $arr['id'], $episodeId);
-					// Cant find videos_id, so set tv_episodes_id to PROCESS_TVMAZE.
+						// Cant find videos_id, so set tv_episodes_id to PROCESS_TVMAZE.
 					} else {
 						$this->setVideoNotFound(parent::NO_MATCH_FOUND, $arr['id']);
 					}
-				// Not a tv episode, so set videos_id to n/a.
+					// Not a tv episode, so set videos_id to n/a.
 				} else {
 					$this->setVideoNotFound(parent::NO_MATCH_FOUND, $arr['id']);
 				}
@@ -183,11 +183,11 @@ class TvRage extends TV
 	protected function getPoster($videoId, $siteId)
 	{
 		$hascover = (new ReleaseImage($this->pdo))->saveImage(
-			$videoId,
-			$this->posterUrl,
-			$this->imgSavePath,
-			'',
-			''
+				$videoId,
+				$this->posterUrl,
+				$this->imgSavePath,
+				'',
+				''
 		);
 		if ($hascover == 1) {
 			$this->setCoverFound($videoId);
@@ -214,24 +214,24 @@ class TvRage extends TV
 			$summary = $rInfo['desc'];
 		}
 		$this->videoId = $this->add(
-			[
-				'type'      => parent::TYPE_TV,
-				'title'     => $tvrShow['title'],
-				'column'    => 'tvrage',
-				'siteid'    => $rageid,
-				'summary'   => $summary,
-				'country'   => $country,
-				'started'   => $tvrShow['started'],
-				'publisher' => $tvrShow['publisher'],
-				'source'    => parent::SOURCE_TVRAGE,
-				'tvdbid'    => 0,
-				'traktid'   => 0,
-				'tvrageid'  => $rageid,
-				'tvmazeid'  => 0,
-				'imdbid'    => 0,
-				'tmdbid'    => 0,
-				'aliases'   => $tvrShow['aliases']
-			]
+				[
+						'type'      => parent::TYPE_TV,
+						'title'     => $tvrShow['title'],
+						'column'    => 'tvrage',
+						'siteid'    => $rageid,
+						'summary'   => $summary,
+						'country'   => $country,
+						'started'   => $tvrShow['started'],
+						'publisher' => $tvrShow['publisher'],
+						'source'    => parent::SOURCE_TVRAGE,
+						'tvdbid'    => 0,
+						'traktid'   => 0,
+						'tvrageid'  => $rageid,
+						'tvmazeid'  => 0,
+						'imdbid'    => 0,
+						'tmdbid'    => 0,
+						'aliases'   => $tvrShow['aliases']
+				]
 		);
 		if (isset($rInfo['imgurl']) && !empty($rInfo['imgurl'])) {
 			$this->posterUrl = $rInfo['imgurl'];
@@ -422,21 +422,21 @@ class TvRage extends TV
 	private function formatShowArr($show)
 	{
 		return [
-			'type'      => (int)parent::TYPE_TV,
-			'title'     => (string)$show['name'],
-			'summary'   => (string)'',
-			'started'   => (string)date('Y-m-d', strtotime($show['started'])),
-			'publisher' => (string)$show['network'],
-			'country'   => (string)$show['country'],
-			'source'    => (int)parent::SOURCE_TVRAGE,
-			'imdb'      => 0,
-			'tvdb'      => 0,
-			'trakt'     => 0,
-			'tvrage'    => (int)$show['showid'],
-			'tvmaze'    => 0,
-			'tmdb'      => 0,
-			'aliases'   => (!empty($show['akas']['aka']) ? (array)$show['akas']['aka'] : ''),
-			'tvr'       => $show
+				'type'      => (int)parent::TYPE_TV,
+				'title'     => (string)$show['name'],
+				'summary'   => (string)'',
+				'started'   => (string)date('Y-m-d', strtotime($show['started'])),
+				'publisher' => (string)$show['network'],
+				'country'   => (string)$show['country'],
+				'source'    => (int)parent::SOURCE_TVRAGE,
+				'imdb'      => 0,
+				'tvdb'      => 0,
+				'trakt'     => 0,
+				'tvrage'    => (int)$show['showid'],
+				'tvmaze'    => 0,
+				'tmdb'      => 0,
+				'aliases'   => (!empty($show['akas']['aka']) ? (array)$show['akas']['aka'] : ''),
+				'tvr'       => $show
 		];
 	}
 }

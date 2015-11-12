@@ -19,8 +19,6 @@ Class TraktAPI {
 	 */
 	private $clientId;
 
-	private $clientPin = 53246463;
-
 	/**
 	 * List of headers to send to Trakt.tv when making a request.
 	 *
@@ -44,7 +42,7 @@ Class TraktAPI {
 	public function __construct(array $options = [])
 	{
 		$defaults = [
-			'clientId' => '',
+				'clientId' => '',
 		];
 		$options += $defaults;
 
@@ -53,12 +51,12 @@ Class TraktAPI {
 			return null;
 		}
 		$this->clientId = $options['clientId'];
-		$this->requestHeaders = <<<HEADERS
-Content-Type: application/json
-trakt-api-version: 2
-trakt-api-key: $this->clientId
-Content-Length: 0
-HEADERS;
+		$this->requestHeaders = [
+				'Content-Type: application/json',
+				'trakt-api-version: 2',
+				'trakt-api-key: ' . $this->clientId,
+				'Content-Lenghth: 0'
+		];
 	}
 
 	/**
@@ -87,11 +85,11 @@ HEADERS;
 		}
 
 		$array = $this->getJsonArray(
-			self::API_URL . 'shows/' .
-			$this->slugify($title) .
-			'/seasons/' . str_replace(['S', 's'], '', $season) .
-			'/episodes/' . str_replace(['E', 'e'], '', $ep),
-			$extended
+				self::API_URL . 'shows/' .
+				$this->slugify($title) .
+				'/seasons/' . str_replace(['S', 's'], '', $season) .
+				'/episodes/' . str_replace(['E', 'e'], '', $ep),
+				$extended
 		);
 		if (!$array) {
 			return false;
@@ -110,7 +108,7 @@ HEADERS;
 	public function getBoxOffice()
 	{
 		$array = $this->getJsonArray(
-			self::API_URL . 'movies/boxoffice'
+				self::API_URL . 'movies/boxoffice'
 		);
 		if (!$array) {
 			return false;
@@ -133,7 +131,7 @@ HEADERS;
 	public function getCalendar($start = '', $days = 7)
 	{
 		$array = $this->getJsonArray(
-			self::API_URL . 'calendars/all/shows/' . $start . '/' . $days
+				self::API_URL . 'calendars/all/shows/' . $start . '/' . $days
 		);
 		if (!$array) {
 			return false;
@@ -164,9 +162,9 @@ HEADERS;
 		}
 		if (!empty($this->clientId)) {
 			$json = Utility::getUrl([
-					'url'            => $URI . $extendedString,
-					'requestheaders' => $this->requestHeaders
-				]
+							'url'            => $URI . $extendedString,
+							'requestheaders' => $this->requestHeaders
+					]
 			);
 
 			if ($json !== false) {
@@ -226,21 +224,34 @@ HEADERS;
 	 * Search for entry using on of the supported site IDs.
 	 *
 	 * @param integer	$id		The ID to look for.
-	 * @param string	$type	Site whose ID should be searched for.
+	 * @param string	$site	One of the supported sites ('imdb', 'tmdb', 'trakt', 'tvdb', 'tvrage')
+	 * @param integer	$type	videos.type flag (-1 for episodes).
 	 *
 	 * @return bool
 	 */
-	public function searchId($id, $type = 'trakt')
+	public function searchId($id, $site = 'trakt', $type = 0)
 	{
-		if (!in_array($type, $this->types) || !ctype_digit($id)) {
-			return false;
-		}
-
-		if ($type == 'imdb') {
+		if (!in_array($site, $this->types) || !ctype_digit($id)) {
+			return null;
+		} else if ($site == 'imdb') {
 			$id = 'tt' . $id;
 		}
 
+		switch (true) {
+			case $site == 'trakt' && ($type == 0 || $type == 2):
+				$type = $site . '-show';
+				break;
+			case $site == 'trakt' && $type == 1:
+				$type = $site . '-movie';
+				break;
+			case $site == 'trakt' && $type == -1:
+				$type = $site . '-episode';
+				break;
+			default:
+		}
+
 		$url = self::API_URL . "search?id_type=$type&id=$id";
+
 		return $this->getJsonArray($url, '');
 	}
 
@@ -260,8 +271,8 @@ HEADERS;
 	public function showSearch($show = '', $type = 'show')
 	{
 		$searchUrl = self::API_URL . 'search?query=' .
-			str_replace([' ', '_', '.'], '-', str_replace(['(', ')'], '', $show)) .
-			'&type=' . $type;
+				$this->slugify($show) .
+				'&type=' . $type;
 
 		return $this->getJsonArray($searchUrl, '');
 	}
@@ -299,19 +310,20 @@ HEADERS;
 			default:
 				$extended = '';
 		}
-
 		return $this->getJsonArray($showUrl, $extended);
 	}
 
 	/**
 	 * Generate and return a slug for a given ``$phrase``.
+	 *
+	 * @param string $phrase
+	 *
+	 * @return mixed
 	 */
 	public function slugify($phrase)
 	{
-		$result = strtolower($phrase);
-		$result = preg_replace('#[^a-z0-9\s-]#', '', $result);
-		$result = trim(preg_replace('#[\s-]+#', ' ', $result));
-		$result = preg_replace('#\s#', '-', $result);
+		$result = preg_replace('#[^a-z0-9\s-]#', '-', strtolower($phrase));
+		$result = preg_replace('#\s#', '-', trim(preg_replace('#[\s-]+#', '-', $result)));
 
 		return $result;
 	}

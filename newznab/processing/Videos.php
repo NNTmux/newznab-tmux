@@ -48,8 +48,8 @@ abstract class Videos
 	public function __construct(array $options = [])
 	{
 		$defaults = [
-			'Echo'     => false,
-			'Settings' => null,
+				'Echo'     => false,
+				'Settings' => null,
 		];
 		$options += $defaults;
 
@@ -84,14 +84,14 @@ abstract class Videos
 	 * @param string	$siteColumn
 	 * @param integer	$siteID
 	 *
-	 * @return array|false	False if invalid site, or ID not found; video.id value otherwise.
+	 * @return int|false	False if invalid site, or ID not found; video.id value otherwise.
 	 */
 	protected function getVideoIDFromSiteID($siteColumn, $siteID)
 	{
 		if (in_array($siteColumn, $this->sites)) {
 			$result = $this->pdo->queryOneRow("SELECT id FROM videos WHERE $siteColumn = $siteID");
 
-			return isset($result['id']) ? $result['id'] : false;
+			return isset($result['id']) ? (int)$result['id'] : false;
 		}
 		return false;
 	}
@@ -100,22 +100,23 @@ abstract class Videos
 	 * Attempt a local lookup via the title first by exact match and then by like.
 	 * Returns a false for no match or the Video ID of the match.
 	 *
-	 * @param $title
-	 * @param $type
+	 * @param        $title
+	 * @param        $type
+	 * @param int    $source
 	 *
 	 * @return bool
 	 */
-	public function getByTitle($title, $type)
+	public function getByTitle($title, $type, $source = 0)
 	{
 		// Check if we already have an entry for this show.
-		$res = $this->getByTitleQuery($title, $type);
+		$res = $this->getByTitleQuery($title, $type, $source);
 		if (isset($res['id'])) {
 			return $res['id'];
 		}
 
 		$title2 = str_replace(' and ', ' & ', $title);
 		if ($title != $title2) {
-			$res = $this->getByTitleQuery($title2, $type);
+			$res = $this->getByTitleQuery($title2, $type, $source);
 			if (isset($res['id'])) {
 				return $res['id'];
 			}
@@ -124,7 +125,7 @@ abstract class Videos
 			foreach ($pieces as $piece) {
 				$title4 .= str_replace(["'", "!"], "", $piece) . '%';
 			}
-			$res = $this->getByTitleLikeQuery($title4, $type);
+			$res = $this->getByTitleLikeQuery($title4, $type, $source);
 			if (isset($res['id'])) {
 				return $res['id'];
 			}
@@ -134,7 +135,7 @@ abstract class Videos
 		// example theatre and theater
 		$title3 = str_replace('er', 're', $title);
 		if ($title != $title3) {
-			$res = $this->getByTitleQuery($title3, $type);
+			$res = $this->getByTitleQuery($title3, $type, $source);
 			if (isset($res['id'])) {
 				return $res['id'];
 			}
@@ -143,7 +144,7 @@ abstract class Videos
 			foreach ($pieces as $piece) {
 				$title4 .= str_replace(["'", "!"], "", $piece) . '%';
 			}
-			$res = $this->getByTitleLikeQuery($title4, $type);
+			$res = $this->getByTitleLikeQuery($title4, $type, $source);
 			if (isset($res['id'])) {
 				return $res['id'];
 			}
@@ -158,7 +159,7 @@ abstract class Videos
 			foreach ($pieces as $piece) {
 				$title4 .= str_replace(["'", "!"], "", $piece) . '%';
 			}
-			$res = $this->getByTitleLikeQuery($title4, $type);
+			$res = $this->getByTitleLikeQuery($title4, $type, $source);
 			if (isset($res['id'])) {
 				return $res['id'];
 			}
@@ -169,25 +170,27 @@ abstract class Videos
 	/**
 	 * Supplementary function for getByTitle that queries for exact match
 	 *
-	 * @param $title
-	 * @param $type
+	 * @param        $title
+	 * @param        $type
+	 * @param int    $source
 	 *
 	 * @return array|bool
 	 */
-	public function getByTitleQuery($title, $type)
+	public function getByTitleQuery($title, $type, $source = 0)
 	{
 		$return = false;
 		if ($title) {
 			$return = $this->pdo->queryOneRow(
-				sprintf("
+					sprintf("
 					SELECT v.id
 					FROM videos v
 					LEFT JOIN videos_akas va ON v.id = va.videos_id
 					WHERE (v.title = %1\$s OR va.title = %1\$s)
-					AND v.type = %d",
-					$this->pdo->escapeString($title),
-					$type
-				)
+					AND v.type = %2\$d %3\$s",
+							$this->pdo->escapeString($title),
+							$type,
+							($source > 0 ? 'AND v.source = ' . $source : '')
+					)
 			);
 		}
 		return $return;
@@ -196,26 +199,29 @@ abstract class Videos
 	/**
 	 * Supplementary function for getByTitle that queries for a like match
 	 *
-	 * @param $title
-	 * @param $type
+	 * @param        $title
+	 * @param        $type
+	 * @param int    $source
 	 *
 	 * @return array|bool
 	 */
-	public function getByTitleLikeQuery($title, $type)
+	public function getByTitleLikeQuery($title, $type, $source = 0)
 	{
 		$return = false;
-		$string = '"\'"';
+
 		if ($title) {
 			$return = $this->pdo->queryOneRow(
-				sprintf("
-					SELECT id
-					FROM videos
-					WHERE REPLACE(REPLACE(title, %s, ''), '!', '') %s
-					AND type = %d",
-					$string,
-					$this->pdo->likeString(rtrim($title, '%'), false, false),
-					$type
-				)
+					sprintf("
+					SELECT v.id
+					FROM videos v
+					LEFT JOIN videos_akas va ON v.id = va.videos_id
+					WHERE (v.title %1\$s
+					OR va.title %1\$s)
+					AND type = %2\$d %3\$s",
+							$this->pdo->likeString(rtrim($title, '%'), false, false),
+							$type,
+							($source > 0 ? 'AND v.source = ' . $source : '')
+					)
 			);
 		}
 		return $return;
@@ -236,13 +242,13 @@ abstract class Videos
 
 				if ($check === false) {
 					$this->pdo->queryInsert(
-						sprintf('
+							sprintf('
 							INSERT INTO videos_akas
 							(videos_id, title)
 							VALUES (%d, %s)',
-							$videoId,
-							$this->pdo->escapeString($title)
-						)
+									$videoId,
+									$this->pdo->escapeString($title)
+							)
 					);
 				}
 			}
@@ -264,7 +270,7 @@ abstract class Videos
 
 		if ($videoId > 0) {
 			$sql = 'videos_id = ' . $videoId;
-		} elseif ($alias !== '') {
+		} else if ($alias !== '') {
 			$sql = 'title = ' . $this->pdo->escapeString($alias);
 		}
 
@@ -272,10 +278,10 @@ abstract class Videos
 			$return = $this->pdo->query('
 				SELECT *
 				FROM videos_akas
-				WHERE ' . $sql
+				WHERE ' . $sql, true
 			);
 		}
-		return $return;
+		return (empty($return) ? false : $return);
 	}
 
 	/**
@@ -344,12 +350,12 @@ abstract class Videos
 	{
 		if (!is_array($country) && strlen($country) > 2) {
 			$code = $this->pdo->queryOneRow(
-				sprintf('
+					sprintf('
 					SELECT id
 					FROM countries
 					WHERE country = %s',
-					$this->pdo->escapeString($country)
-				)
+							$this->pdo->escapeString($country)
+					)
 			);
 			if (isset($code['id'])) {
 				return $code['id'];

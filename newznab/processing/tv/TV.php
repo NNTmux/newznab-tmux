@@ -13,9 +13,9 @@ abstract class TV extends Videos
 	const SOURCE_NONE    = 0; // No Scrape source
 	const SOURCE_TVDB    = 1; // Scrape source was TVDB
 	const SOURCE_TVMAZE  = 2; // Scrape source was TVMAZE
-	const SOURCE_TRAKT   = 3; // Scrape source was TraktTV
-	const SOURCE_IMDB    = 4; // Scrape source was IMDB
-	const SOURCE_TMDB    = 5; // Scrape source was TMDB
+	const SOURCE_TMDB    = 3; // Scrape source was TMDB
+	const SOURCE_TRAKT   = 4; // Scrape source was Trakt
+	const SOURCE_IMDB    = 5; // Scrape source was IMDB
 	const SOURCE_TVRAGE  = 6; // Scrape source was TvRage
 
 	// Anime Sources
@@ -24,9 +24,9 @@ abstract class TV extends Videos
 	// Processing signifiers
 	const PROCESS_TVDB   =  0; // Process TVDB First
 	const PROCESS_TVMAZE = -1; // Process TVMaze Second
-	const PROCESS_TRAKT  = -2; // Process Trakt Third
-	const PROCESS_IMDB   = -3; // Process IMDB Fourth
-	const PROCESS_TMDB   = -4; // Process TMDB Fifth
+	const PROCESS_TMDB   = -2; // Process TMDB Third
+	const PROCESS_TRAKT  = -3; // Process Trakt Fourth
+	const PROCESS_IMDB   = -4; // Process IMDB Fifth
 	const PROCESS_TVRAGE = -5; // Process TvRage Sixth
 	const NO_MATCH_FOUND = -6; // Failed All Methods
 
@@ -57,8 +57,8 @@ abstract class TV extends Videos
 	{
 		parent::__construct($options);
 		$defaults = [
-			'Echo'     => false,
-			'Settings' => null,
+				'Echo'     => false,
+				'Settings' => null,
 		];
 		$options += $defaults;
 
@@ -128,7 +128,7 @@ abstract class TV extends Videos
 		}
 
 		$res = $this->pdo->queryDirect(
-			sprintf("
+				sprintf("
 				SELECT SQL_NO_CACHE r.searchname, r.id
 				FROM releases r
 				WHERE r.nzbstatus = 1
@@ -139,13 +139,13 @@ abstract class TV extends Videos
 				%s %s %s
 				ORDER BY r.postdate DESC
 				LIMIT %d",
-				$status,
-				$this->catWhere,
-				($groupID === '' ? '' : 'AND r.groupid = ' . $groupID),
-				($guidChar === '' ? '' : 'AND r.guid ' . $this->pdo->likeString($guidChar, false, true)),
-				($lookupSetting == 2 ? 'AND r.isrenamed = 1' : ''),
-				$this->tvqty
-			)
+						$status,
+						$this->catWhere,
+						($groupID === '' ? '' : 'AND r.groupid = ' . $groupID),
+						($guidChar === '' ? '' : 'AND r.guid ' . $this->pdo->likeString($guidChar, false, true)),
+						($lookupSetting == 2 ? 'AND r.isrenamed = 1' : ''),
+						$this->tvqty
+				)
 		);
 		return $res;
 	}
@@ -159,16 +159,16 @@ abstract class TV extends Videos
 	 */
 	public function setVideoIdFound($videoId, $releaseId, $episodeId) {
 		$this->pdo->queryExec(
-			sprintf('
+				sprintf('
 				UPDATE releases
 				SET videos_id = %d, tv_episodes_id = %d
 				WHERE %s
 				AND id = %d',
-				$videoId,
-				$episodeId,
-				$this->catWhere,
-				$releaseId
-			)
+						$videoId,
+						$episodeId,
+						$this->catWhere,
+						$releaseId
+				)
 		);
 	}
 
@@ -181,15 +181,15 @@ abstract class TV extends Videos
 	public function setVideoNotFound($status, $Id)
 	{
 		$this->pdo->queryExec(
-			sprintf('
+				sprintf('
 				UPDATE releases
 				SET tv_episodes_id = %d
 				WHERE %s
 				AND id = %d',
-				$status,
-				$this->catWhere,
-				$Id
-			)
+						$status,
+						$this->catWhere,
+						$Id
+				)
 		);
 	}
 
@@ -222,38 +222,34 @@ abstract class TV extends Videos
 		}
 
 		if ($videoId === false) {
-			$videoId = $this->getByTitleQuery($showArr['title'], $showArr['type']);
-		}
-
-		if ($videoId === false) {
 			// Insert the Show
 			$videoId = $this->pdo->queryInsert(
-				sprintf('
+					sprintf('
 					INSERT INTO videos
 					(type, title, countries_id, started, source, tvdb, trakt, tvrage, tvmaze, imdb, tmdb)
 					VALUES (%d, %s, %s, %s, %d, %d, %d, %d, %d, %d, %d)',
-					$showArr['type'],
-					$this->pdo->escapeString($showArr['title']),
-					$this->pdo->escapeString((isset($showArr['country']) ? $showArr['country'] : '')),
-					$this->pdo->escapeString($showArr['started']),
-					$showArr['source'],
-					$showArr['tvdb'],
-					$showArr['trakt'],
-					$showArr['tvrage'],
-					$showArr['tvmaze'],
-					$showArr['imdb'],
-					$showArr['tmdb']
-				)
+							$showArr['type'],
+							$this->pdo->escapeString($showArr['title']),
+							$this->pdo->escapeString((isset($showArr['country']) ? $showArr['country'] : '')),
+							$this->pdo->escapeString($showArr['started']),
+							$showArr['source'],
+							$showArr['tvdb'],
+							$showArr['trakt'],
+							$showArr['tvrage'],
+							$showArr['tvmaze'],
+							$showArr['imdb'],
+							$showArr['tmdb']
+					)
 			);
 			// Insert the supplementary show info
 			$this->pdo->queryInsert(
-				sprintf("
+					sprintf("
 					INSERT INTO tv_info (videos_id, summary, publisher)
 					VALUES (%d, %s, %s)",
-					$videoId,
-					$this->pdo->escapeString($showArr['summary']),
-					$this->pdo->escapeString($showArr['publisher'])
-				)
+							$videoId,
+							$this->pdo->escapeString($showArr['summary']),
+							$this->pdo->escapeString($showArr['publisher'])
+					)
 			);
 			// If we have AKAs\aliases, insert those as well
 			if (!empty($showArr['aliases'])) {
@@ -280,19 +276,19 @@ abstract class TV extends Videos
 
 		if ($episodeId === false) {
 			$episodeId = $this->pdo->queryInsert(
-				sprintf('
+					sprintf('
 					INSERT INTO tv_episodes (videos_id, series, episode, se_complete, title, firstaired, summary)
 					VALUES (%d, %d, %d, %s, %s, %s, %s)
 					ON DUPLICATE KEY update se_complete = %s',
-					$videoId,
-					$episodeArr['series'],
-					$episodeArr['episode'],
-					$this->pdo->escapeString($episodeArr['se_complete']),
-					$this->pdo->escapeString($episodeArr['title']),
-					$this->pdo->escapeString($episodeArr['firstaired']),
-					$this->pdo->escapeString($episodeArr['summary']),
-					$this->pdo->escapeString($episodeArr['se_complete'])
-				)
+							$videoId,
+							$episodeArr['series'],
+							$episodeArr['episode'],
+							$this->pdo->escapeString($episodeArr['se_complete']),
+							$this->pdo->escapeString($episodeArr['title']),
+							$this->pdo->escapeString($episodeArr['firstaired']),
+							$this->pdo->escapeString($episodeArr['summary']),
+							$this->pdo->escapeString($episodeArr['se_complete'])
+					)
 			);
 		}
 		return $episodeId;
@@ -315,24 +311,24 @@ abstract class TV extends Videos
 		$ifStringInfo = "IF(%s = '', %s, %s)";
 
 		$this->pdo->queryExec(
-			sprintf('
+				sprintf('
 				UPDATE videos v
 				LEFT JOIN tv_info tvi ON v.id = tvi.videos_id
 				SET v.countries_id = %s, v.tvdb = %s, v.trakt = %s, v.tvrage = %s,
 					v.tvmaze = %s, v.imdb = %s, v.tmdb = %s,
 					tvi.summary = %s, tvi.publisher = %s
 				WHERE v.id = %d',
-				sprintf($ifStringInfo, 'v.countries_id', $this->pdo->escapeString($showArr['country']), 'v.countries_id'),
-				sprintf($ifStringID, 'v.tvdb', $showArr['tvdb'], 'v.tvdb'),
-				sprintf($ifStringID, 'v.trakt', $showArr['trakt'], 'v.trakt'),
-				sprintf($ifStringID, 'v.tvrage', $showArr['tvrage'], 'v.tvrage'),
-				sprintf($ifStringID, 'v.tvmaze', $showArr['tvmaze'], 'v.tvmaze'),
-				sprintf($ifStringID, 'v.imdb', $showArr['imdb'], 'v.imdb'),
-				sprintf($ifStringID, 'v.tmdb', $showArr['tmdb'], 'v.tmdb'),
-				sprintf($ifStringInfo, 'tvi.summary', $this->pdo->escapeString($showArr['summary']), 'tvi.summary'),
-				sprintf($ifStringInfo, 'tvi.publisher', $this->pdo->escapeString($showArr['publisher']), 'tvi.publisher'),
-				$videoId
-			)
+						sprintf($ifStringInfo, 'v.countries_id', $this->pdo->escapeString($showArr['country']), 'v.countries_id'),
+						sprintf($ifStringID, 'v.tvdb', $showArr['tvdb'], 'v.tvdb'),
+						sprintf($ifStringID, 'v.trakt', $showArr['trakt'], 'v.trakt'),
+						sprintf($ifStringID, 'v.tvrage', $showArr['tvrage'], 'v.tvrage'),
+						sprintf($ifStringID, 'v.tvmaze', $showArr['tvmaze'], 'v.tvmaze'),
+						sprintf($ifStringID, 'v.imdb', $showArr['imdb'], 'v.imdb'),
+						sprintf($ifStringID, 'v.tmdb', $showArr['tmdb'], 'v.tmdb'),
+						sprintf($ifStringInfo, 'tvi.summary', $this->pdo->escapeString($showArr['summary']), 'tvi.summary'),
+						sprintf($ifStringInfo, 'tvi.publisher', $this->pdo->escapeString($showArr['publisher']), 'tvi.publisher'),
+						$videoId
+				)
 		);
 		if (!empty($showArr['aliases'])) {
 			$this->addAliases($videoId, $showArr['aliases']);
@@ -349,15 +345,15 @@ abstract class TV extends Videos
 	public function delete($id)
 	{
 		return $this->pdo->queryExec(
-			sprintf("
+				sprintf("
 				DELETE v, tvi, tve
 				FROM videos v
 				LEFT JOIN tv_info tvi ON v.id = tvi.videos_id
 				LEFT JOIN tv_episodes tve ON v.id = tve.videos_id
 				LEFT JOIN videos_akas va ON v.id = va.videos_id
 				WHERE v.id = %d",
-				$id
-			)
+						$id
+				)
 		);
 	}
 
@@ -369,12 +365,12 @@ abstract class TV extends Videos
 	public function setCoverFound($videoId)
 	{
 		$this->pdo->queryExec(
-			sprintf("
+				sprintf("
 				UPDATE tv_info
 				SET image = 1
 				WHERE videos_id = %d",
-				$videoId
-			)
+						$videoId
+				)
 		);
 	}
 
@@ -391,13 +387,13 @@ abstract class TV extends Videos
 	{
 		$return = false;
 		$videoArr = $this->pdo->queryOneRow(
-			sprintf("
+				sprintf("
 				SELECT %s
 				FROM videos
 				WHERE id = %d",
-				$column,
-				$id
-			)
+						$column,
+						$id
+				)
 		);
 		if ($column === '*') {
 			$return = $videoArr;
@@ -431,14 +427,14 @@ abstract class TV extends Videos
 		}
 
 		$episodeArr = $this->pdo->queryOneRow(
-			sprintf("
+				sprintf("
 				SELECT id
 				FROM tv_episodes
 				WHERE videos_id = %d
 				AND %s",
-				$id,
-				$queryString
-			)
+						$id,
+						$queryString
+				)
 		);
 		return (isset($episodeArr['id']) ? $episodeArr['id'] : false);
 	}
@@ -453,18 +449,214 @@ abstract class TV extends Videos
 	public function countEpsByVideoID($videoId)
 	{
 		$count = $this->pdo->queryOneRow(
-			sprintf('
+				sprintf('
 				SELECT count(id) AS num
 				FROM tv_episodes
 				WHERE videos_id = %d',
-				$videoId
-			)
+						$videoId
+				)
 		);
 		return (isset($count['num']) && (int)$count['num'] > 0 ? true : false);
 	}
 
 	/**
-	 * Supplementary to parseNameEpSeason
+	 * Parses a release searchname for specific TV show data
+	 * Returns an array of show data
+	 *
+	 * @param $relname
+	 *
+	 * @return array|bool
+	 */
+	public function parseShowInfo($relname)
+	{
+		$showInfo['name'] = $this->parseShowName($relname);
+
+		if (!empty($showInfo['name'])) {
+
+			// Retrieve the country from the cleaned name
+			$showInfo['country'] = $this->parseShowCountry($showInfo['name']);
+
+			// Clean show name.
+			$showInfo['cleanname'] = preg_replace('/ - \d{1,}$/i', '', $this->cleanName($showInfo['name']));
+
+			// Get the Season/Episode/Airdate
+			$showInfo += $this->parseShowSeasonEp($relname);
+
+			if ((isset($showInfo['season']) && isset($showInfo['episode'])) || !empty($showInfo['airdate'])) {
+				// Check for dates instead of seasons.
+				if (!isset($showInfo['airdate']) && !empty($showInfo['airdate'])) {
+					// If year is present in the release name, add it to the cleaned name for title search
+					if (preg_match('/[^a-z0-9](?P<year>(19|20)(\d{2}))[^a-z0-9]/i', $relname, $yearMatch)) {
+						$showInfo['cleanname'] .= ' (' . $yearMatch['year'] . ')';
+					}
+					// Check for multi episode release.
+					if (is_array($showInfo['episode'])) {
+						$showInfo['episode'] = $showInfo['episode'][0];
+					}
+					$showInfo['airdate'] = '';
+				}
+
+				return $showInfo;
+			}
+		}
+		if (NN_DEBUG) {
+			$this->pdo->log->doEcho('Failed to parse release: ' . $relname, true);
+		}
+		return false;
+	}
+
+	/**
+	 * Parses the release searchname and returns a show title
+	 *
+	 * @param string $relname
+	 *
+	 * @return string
+	 */
+	private function parseShowName($relname)
+	{
+		$showName = '';
+
+		$following = 	'[^a-z0-9](\d\d-\d\d|\d{1,3}x\d{2,3}|\(?(19|20)\d{2}\)?|(480|720|1080)[ip]|AAC2?|BD-?Rip|Blu-?Ray|D0?\d' .
+				'|DD5|DiVX|DLMux|DTS|DVD(-?Rip)?|E\d{2,3}|[HX][-_. ]?26[45]|ITA(-ENG)?|HEVC|[HPS]DTV|PROPER|REPACK|Season|Episode|' .
+				'S\d+[^a-z0-9]?((E\d+)[ab]?)*|WEB[-_. ]?(DL|Rip)|XViD)[^a-z0-9]';
+
+		// For names that don't start with the title.
+		if (preg_match('/([^a-z0-9]{2,}|(sample|proof)-)(?P<name>[\w .-]*?)' . $following . '/i', $relname, $matches)) {
+			$showName = $matches['name'];
+		} else if (preg_match('/^(?P<name>[a-z0-9][\w .-]*?)' . $following . '/i', $relname, $matches)) {
+			// For names that start with the title.
+			$showName = $matches['name'];
+		}
+		return $showName;
+	}
+
+	/**
+	 * Parses the release searchname for the season/episode/airdate information
+	 *
+	 * @param $relname
+	 *
+	 * @return array
+	 */
+	private function parseShowSeasonEp($relname)
+	{
+		$episodeArr['airdate'] = '';
+
+		// S01E01-E02 and S01E01-02
+		if (preg_match('/^(.*?)[^a-z0-9]s(\d{1,2})[^a-z0-9]?e(\d{1,3})(?:[e-])(\d{1,3})[^a-z0-9]/i', $relname, $matches)) {
+			$episodeArr['season'] = intval($matches[2]);
+			$episodeArr['episode'] = intval($matches[3]);
+		}
+		//S01E0102 and S01E01E02 - lame no delimit numbering, regex would collide if there was ever 1000 ep season.
+		else if (preg_match('/^(.*?)[^a-z0-9]s(\d{2})[^a-z0-9]?e(\d{2})e?(\d{2})[^a-z0-9]/i', $relname, $matches)) {
+			$episodeArr['season'] = intval($matches[2]);
+			$episodeArr['episode'] = [intval($matches[3]), intval($matches[4])];
+		}
+		// S01E01 and S01.E01
+		else if (preg_match('/^(.*?)[^a-z0-9]s(\d{1,2})[^a-z0-9]?e(\d{1,3})[ab]?[^a-z0-9]/i', $relname, $matches)) {
+			$episodeArr['season'] = intval($matches[2]);
+			$episodeArr['episode'] = intval($matches[3]);
+		}
+		// S01
+		else if (preg_match('/^(.*?)[^a-z0-9]s(\d{1,2})[^a-z0-9]/i', $relname, $matches)) {
+			$episodeArr['season'] = intval($matches[2]);
+			$episodeArr['episode'] = 'all';
+		}
+		// S01D1 and S1D1
+		else if (preg_match('/^(.*?)[^a-z0-9]s(\d{1,2})[^a-z0-9]?d\d{1}[^a-z0-9]/i', $relname, $matches)) {
+			$episodeArr['season'] = intval($matches[2]);
+			$episodeArr['episode'] = 'all';
+		}
+		// 1x01 and 101
+		else if (preg_match('/^(.*?)[^a-z0-9](\d{1,2})x?(\d{1,3})[^a-z0-9]/i', $relname, $matches)) {
+			$episodeArr['season'] = intval($matches[2]);
+			$episodeArr['episode'] = intval($matches[3]);
+		}
+		// 2009.01.01 and 2009-01-01
+		else if (preg_match('/^(.*?)[^a-z0-9](?P<airdate>(19|20)(\d{2})[.\/-](\d{2})[.\/-](\d{2}))[^a-z0-9]/i', $relname, $matches)) {
+			$episodeArr['season'] = $matches[4] . $matches[5];
+			$episodeArr['episode'] = $matches[5] . '/' . $matches[6];
+			$episodeArr['airdate'] = date('Y-m-d', strtotime(preg_replace('/[^0-9]/i', '/', $matches['airdate']))); //yyyy-mm-dd
+		}
+		// 01.01.2009
+		else if (preg_match('/^(.*?)[^a-z0-9](?P<airdate>(\d{2})[^a-z0-9](\d{2})[^a-z0-9](19|20)(\d{2}))[^a-z0-9]/i', $relname, $matches)) {
+			$episodeArr['season'] = $matches[5] . $matches[6];
+			$episodeArr['episode'] = $matches[3] . '/' . $matches[4];
+			$episodeArr['airdate'] = date('Y-m-d', strtotime(preg_replace('/[^0-9]/i', '/', $matches['airdate']))); //yyyy-mm-dd
+		}
+		// 01.01.09
+		else if (preg_match('/^(.*?)[^a-z0-9](\d{2})[^a-z0-9](\d{2})[^a-z0-9](\d{2})[^a-z0-9]/i', $relname, $matches)) {
+			// Add extra logic to capture the proper YYYY year
+			$episodeArr['season'] = $matches[4] = ($matches[4] <= 99 && $matches[4] > 15) ? '19' . $matches[4] : '20' . $matches[4];
+			$episodeArr['episode'] = $matches[2] . '/' . $matches[3];
+			$tmpAirdate = $episodeArr['season'] . '/' . $episodeArr['episode'];
+			$episodeArr['airdate'] = date('Y-m-d', strtotime(preg_replace('/[^0-9]/i', '/', $tmpAirdate))); //yyyy-mm-dd
+		}
+		// 2009.E01
+		else if (preg_match('/^(.*?)[^a-z0-9]20(\d{2})[^a-z0-9](\d{1,3})[^a-z0-9]/i', $relname, $matches)) {
+			$episodeArr['season'] = '20' . $matches[2];
+			$episodeArr['episode'] = intval($matches[3]);
+		}
+		// 2009.Part1
+		else if (preg_match('/^(.*?)[^a-z0-9](19|20)(\d{2})[^a-z0-9]Part(\d{1,2})[^a-z0-9]/i', $relname, $matches)) {
+			$episodeArr['season'] = $matches[2] . $matches[3];
+			$episodeArr['episode'] = intval($matches[4]);
+		}
+		// Part1/Pt1
+		else if (preg_match('/^(.*?)[^a-z0-9](?:Part|Pt)[^a-z0-9](\d{1,2})[^a-z0-9]/i', $relname, $matches)) {
+			$episodeArr['season'] = 1;
+			$episodeArr['episode'] = intval($matches[2]);
+		}
+		//The.Pacific.Pt.VI.HDTV.XviD-XII / Part.IV
+		else if (preg_match('/^(.*?)[^a-z0-9](?:Part|Pt)[^a-z0-9]([ivx]+)/i', $relname, $matches)) {
+			$episodeArr['season'] = 1;
+			$epLow = strtolower($matches[2]);
+			$episodeArr['episode'] = $this->convertRomanToInt($epLow);
+		}
+		// Band.Of.Brothers.EP06.Bastogne.DVDRiP.XviD-DEiTY
+		else if (preg_match('/^(.*?)[^a-z0-9]EP?[^a-z0-9]?(\d{1,3})/i', $relname, $matches)) {
+			$episodeArr['season'] = 1;
+			$episodeArr['episode'] = intval($matches[2]);
+		}
+		// Season.1
+		else if (preg_match('/^(.*?)[^a-z0-9]Seasons?[^a-z0-9]?(\d{1,2})/i', $relname, $matches)) {
+			$episodeArr['season'] = intval($matches[2]);
+			$episodeArr['episode'] = 'all';
+		}
+		return $episodeArr;
+	}
+
+	/**
+	 * Parses the cleaned release name to determine if it has a country appended
+	 *
+	 * @param string $showName
+	 *
+	 * @return string
+	 */
+	private function parseShowCountry($showName)
+	{
+		$countryMatch = $yearMatch = '';
+		// Country or origin matching.
+		if (preg_match('/[^a-z0-9](US|UK|AU|NZ|CA|NL|Canada|Australia|America|United[^a-z0-9]States|United[^a-z0-9]Kingdom)/i', $showName, $countryMatch)) {
+			$currentCountry = strtolower($countryMatch[1]);
+			if ($currentCountry == 'canada') {
+				$country = 'CA';
+			} else if ($currentCountry == 'australia') {
+				$country = 'AU';
+			} else if ($currentCountry == 'america' || $currentCountry == 'united states') {
+				$country = 'US';
+			} else if ($currentCountry == 'united kingdom') {
+				$country = 'UK';
+			} else {
+				$country = strtoupper($countryMatch[1]);
+			}
+		} else {
+			$country = '';
+		}
+		return $country;
+	}
+
+	/**
+	 * Supplementary to parseShowInfo
 	 * Cleans a derived local 'showname' for better matching probability
 	 * Returns the cleaned string
 	 *
@@ -492,166 +684,6 @@ abstract class TV extends Videos
 
 		$str = trim($str, '\"');
 		return trim($str);
-	}
-
-	/**
-	 * Parses a release searchname for specific TV show data
-	 * Returns an array of show data
-	 *
-	 * @param $relname
-	 *
-	 * @return array|bool
-	 */
-	public function parseNameEpSeason($relname)
-	{
-		$showInfo = [
-			'name'       => '',
-			'season'     => '',
-			'episode'    => '',
-			'seriesfull' => '',
-			'airdate'    => '',
-			'country'    => '',
-			'year'       => '',
-			'cleanname'  => ''
-		];
-		$matches = '';
-
-		$following = 	'[^a-z0-9](\d\d-\d\d|\d{1,3}x\d{2,3}|\(?(19|20)\d{2}\)?|(480|720|1080)[ip]|AAC2?|BD-?Rip|Blu-?Ray|D0?\d' .
-			'|DD5|DiVX|DLMux|DTS|DVD(-?Rip)?|E\d{2,3}|[HX][-_. ]?26[45]|ITA(-ENG)?|HEVC|[HPS]DTV|PROPER|REPACK|Season|Episode|' .
-			'S\d+[^a-z0-9]?(E\d+)?[ab]?|WEB[-_. ]?(DL|Rip)|XViD)[^a-z0-9]';
-
-		// For names that don't start with the title.
-		if (preg_match('/[^a-z0-9]{2,}(?P<name>[\w .-]*?)' . $following . '/i', $relname, $matches)) {
-			$showInfo['name'] = $matches[1];
-		} else if (preg_match('/^(?P<name>[a-z0-9][\w .-]*?)' . $following . '/i', $relname, $matches)) {
-			// For names that start with the title.
-			$showInfo['name'] = $matches[1];
-		}
-
-		if (!empty($showInfo['name'])) {
-			// S01E01-E02 and S01E01-02
-			if (preg_match('/^(.*?)[^a-z0-9]s(\d{1,2})[^a-z0-9]?e(\d{1,3})(?:[e-])(\d{1,3})[^a-z0-9]/i', $relname, $matches)) {
-				$showInfo['season'] = intval($matches[2]);
-				$showInfo['episode'] = [intval($matches[3]), intval($matches[4])];
-			}
-			//S01E0102 - lame no delimit numbering, regex would collide if there was ever 1000 ep season.
-			else if (preg_match('/^(.*?)[^a-z0-9]s(\d{2})[^a-z0-9]?e(\d{2})(\d{2})[^a-z0-9]/i', $relname, $matches)) {
-				$showInfo['season'] = intval($matches[2]);
-				$showInfo['episode'] = [intval($matches[3]), intval($matches[4])];
-			}
-			// S01E01 and S01.E01
-			else if (preg_match('/^(.*?)[^a-z0-9]s(\d{1,2})[^a-z0-9]?e(\d{1,3})[ab]?[^a-z0-9]/i', $relname, $matches)) {
-				$showInfo['season'] = intval($matches[2]);
-				$showInfo['episode'] = intval($matches[3]);
-			}
-			// S01
-			else if (preg_match('/^(.*?)[^a-z0-9]s(\d{1,2})[^a-z0-9]/i', $relname, $matches)) {
-				$showInfo['season'] = intval($matches[2]);
-				$showInfo['episode'] = 'all';
-			}
-			// S01D1 and S1D1
-			else if (preg_match('/^(.*?)[^a-z0-9]s(\d{1,2})[^a-z0-9]?d\d{1}[^a-z0-9]/i', $relname, $matches)) {
-				$showInfo['season'] = intval($matches[2]);
-				$showInfo['episode'] = 'all';
-			}
-			// 1x01
-			else if (preg_match('/^(.*?)[^a-z0-9](\d{1,2})x(\d{1,3})[^a-z0-9]/i', $relname, $matches)) {
-				$showInfo['season'] = intval($matches[2]);
-				$showInfo['episode'] = intval($matches[3]);
-			}
-			// 2009.01.01 and 2009-01-01
-			else if (preg_match('/^(.*?)[^a-z0-9](?P<airdate>(19|20)(\d{2})[.\/-](\d{2})[.\/-](\d{2}))[^a-z0-9]/i', $relname, $matches)) {
-				$showInfo['season'] = $matches[4] . $matches[5];
-				$showInfo['episode'] = $matches[5] . '/' . $matches[6];
-				$showInfo['airdate'] = date('Y-m-d', strtotime(preg_replace('/[^0-9]/i', '/', $matches['airdate']))); //yyyy-mm-dd
-			}
-			// 01.01.2009
-			else if (preg_match('/^(.*?)[^a-z0-9](?P<airdate>(\d{2})[^a-z0-9](\d{2})[^a-z0-9](19|20)(\d{2}))[^a-z0-9]/i', $relname, $matches)) {
-				$showInfo['season'] = $matches[5] . $matches[6];
-				$showInfo['episode'] = $matches[3] . '/' . $matches[4];
-				$showInfo['airdate'] = date('Y-m-d', strtotime(preg_replace('/[^0-9]/i', '/', $matches['airdate']))); //yyyy-mm-dd
-			}
-			// 01.01.09
-			else if (preg_match('/^(.*?)[^a-z0-9](\d{2})[^a-z0-9](\d{2})[^a-z0-9](\d{2})[^a-z0-9]/i', $relname, $matches)) {
-				// Add extra logic to capture the proper YYYY year
-				$showInfo['season'] = $matches[4] = ($matches[4] <= 99 && $matches[4] > 15) ? '19' . $matches[4] : '20' . $matches[4];
-				$showInfo['episode'] = $matches[2] . '/' . $matches[3];
-				$tmpAirdate = $showInfo['season'] . '/' . $showInfo['episode'];
-				$showInfo['airdate'] = date('Y-m-d', strtotime(preg_replace('/[^0-9]/i', '/', $tmpAirdate))); //yyyy-mm-dd
-			}
-			// 2009.E01
-			else if (preg_match('/^(.*?)[^a-z0-9]20(\d{2})[^a-z0-9](\d{1,3})[^a-z0-9]/i', $relname, $matches)) {
-				$showInfo['season'] = '20' . $matches[2];
-				$showInfo['episode'] = intval($matches[3]);
-			}
-			// 2009.Part1
-			else if (preg_match('/^(.*?)[^a-z0-9](19|20)(\d{2})[^a-z0-9]Part(\d{1,2})[^a-z0-9]/i', $relname, $matches)) {
-				$showInfo['season'] = $matches[2] . $matches[3];
-				$showInfo['episode'] = intval($matches[4]);
-			}
-			// Part1/Pt1
-			else if (preg_match('/^(.*?)[^a-z0-9](?:Part|Pt)[^a-z0-9](\d{1,2})[^a-z0-9]/i', $relname, $matches)) {
-				$showInfo['season'] = 1;
-				$showInfo['episode'] = intval($matches[2]);
-			}
-			//The.Pacific.Pt.VI.HDTV.XviD-XII / Part.IV
-			else if (preg_match('/^(.*?)[^a-z0-9](?:Part|Pt)[^a-z0-9]([ivx]+)/i', $relname, $matches)) {
-				$showInfo['season'] = 1;
-				$epLow = strtolower($matches[2]);
-				$showInfo['episode'] = $this->convertRomanToInt($epLow);
-			}
-			// Band.Of.Brothers.EP06.Bastogne.DVDRiP.XviD-DEiTY
-			else if (preg_match('/^(.*?)[^a-z0-9]EP?[^a-z0-9]?(\d{1,3})/i', $relname, $matches)) {
-				$showInfo['season'] = 1;
-				$showInfo['episode'] = intval($matches[2]);
-			}
-			// Season.1
-			else if (preg_match('/^(.*?)[^a-z0-9]Seasons?[^a-z0-9]?(\d{1,2})/i', $relname, $matches)) {
-				$showInfo['season'] = intval($matches[2]);
-				$showInfo['episode'] = 'all';
-			}
-
-			$countryMatch = $yearMatch = '';
-			// Country or origin matching.
-			if (preg_match('/[^a-z0-9](US|UK|AU|NZ|CA|NL|Canada|Australia|America|United[^a-z0-9]States|United[^a-z0-9]Kingdom)[^a-z0-9]/i', $showInfo['name'], $countryMatch)) {
-				$currentCountry = strtolower($countryMatch[1]);
-				if ($currentCountry == 'canada') {
-					$showInfo['country'] = 'CA';
-				} else if ($currentCountry == 'australia') {
-					$showInfo['country'] = 'AU';
-				} else if ($currentCountry == 'america' || $currentCountry == 'united states') {
-					$showInfo['country'] = 'US';
-				} else if ($currentCountry == 'united kingdom') {
-					$showInfo['country'] = 'UK';
-				} else {
-					$showInfo['country'] = strtoupper($countryMatch[1]);
-				}
-			} else {
-				$showInfo['country'] = '';
-			}
-
-			// Clean show name.
-			$showInfo['cleanname'] = preg_replace('/ - \d{1,}$/i', '', $this->cleanName($showInfo['name']));
-
-			// Check for dates instead of seasons.
-			if (strlen($showInfo['season']) == 4) {
-				$showInfo['seriesfull'] = $showInfo['season'] . "/" . $showInfo['episode'];
-			} else {
-				// Get year if present (not for releases with dates as seasons).
-				if (preg_match('/[^a-z0-9](19|20)(\d{2})/i', $relname, $yearMatch)) {
-					$showInfo['year'] = $yearMatch[1] . $yearMatch[2];
-				}
-				// Check for multi episode release.
-				if (is_array($showInfo['episode'])) {
-					$showInfo['episode'] = $showInfo['episode'][0];
-				}
-
-				$showInfo['seriesfull'] = sprintf('S02%d', $showInfo['season']) . sprintf('E02%d', $showInfo['episode']);
-			}
-			$showInfo['airdate'] = (isset($showInfo['airdate']) && !empty($showInfo['airdate']) ? $showInfo['airdate'] : '');
-			return $showInfo;
-		}
-		return false;
 	}
 
 	/**
@@ -730,12 +762,30 @@ abstract class TV extends Videos
 			case 'tvmazeE':
 				$required = ['name', 'season', 'number', 'airdate', 'summary'];
 				break;
+			case 'tmdbS':
+				$required = ['id', 'original_name', 'overview', 'first_air_date', 'origin_country'];
+				break;
+			case 'tmdbE':
+				$required = ['name', 'season_number', 'episode_number', 'air_date', 'overview'];
+				break;
+			case 'traktS':
+				$required = ['ids', 'title', 'overview', 'first_aired', 'country'];
+				break;
+			case 'traktE':
+				$required = ['title', 'season', 'number', 'airs', 'overview'];
+				break;
 		}
 
 		if (is_array($required)) {
 			foreach ($required as $req) {
-				if (!isset($array->$req)) {
-					return false;
+				if (!in_array($type, ['tmdbS', 'tmdbE'])){
+					if (!isset($array->$req)) {
+						return false;
+					}
+				} else {
+					if (!isset($array[$req])) {
+						return false;
+					}
 				}
 			}
 		}
