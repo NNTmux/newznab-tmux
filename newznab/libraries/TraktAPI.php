@@ -51,12 +51,12 @@ Class TraktAPI {
 			return null;
 		}
 		$this->clientId = $options['clientId'];
-		$this->requestHeaders = <<<HEADERS
-Content-Type: application/json
-trakt-api-version: 2
-trakt-api-key: $this->clientId
-Content-Length: 0
-HEADERS;
+		$this->requestHeaders = [
+				'Content-Type: application/json',
+				'trakt-api-version: 2',
+				'trakt-api-key: ' . $this->clientId,
+				'Content-Lenghth: 0'
+		];
 	}
 
 	/**
