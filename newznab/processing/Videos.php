@@ -40,10 +40,19 @@ abstract class Videos
 	public $pdo;
 
 	/**
+	 * @var bool
+	 */
+	public $echooutput;
+
+	/**
 	 * @var array	sites	The sites that we have an ID columns for in our video table.
 	 */
 	private $sites = ['imdb', 'tmdb', 'trakt', 'tvdb', 'tvmaze', 'tvrage'];
 
+	/**
+	 * @var array Temp Array of cached failed lookups
+	 */
+	public $titleCache;
 
 	public function __construct(array $options = [])
 	{
@@ -54,10 +63,23 @@ abstract class Videos
 		$options += $defaults;
 
 		// Sets the default timezone for this script (and its children).
-		date_default_timezone_set('UTC');
+		//date_default_timezone_set('UTC'); TODO: Make this a DTO instead and use as needed
 
+		$this->echooutput = ($options['Echo'] && NN_ECHOCLI);
 		$this->pdo = ($options['Settings'] instanceof Settings ? $options['Settings'] : new Settings());
+		$this->titleCache = [];
 	}
+
+	/**
+	 * Main processing director function for scrapers
+	 * Calls work query function and initiates processing
+	 *
+	 * @param      $groupID
+	 * @param      $guidChar
+	 * @param      $process
+	 * @param bool $local
+	 */
+	abstract protected function processSite($groupID, $guidChar, $process, $local = false);
 
 	/**
 	 * Get video info from a Site ID and column.
@@ -104,28 +126,28 @@ abstract class Videos
 	 * @param        $type
 	 * @param int    $source
 	 *
-	 * @return bool
+	 * @return false|int
 	 */
 	public function getByTitle($title, $type, $source = 0)
 	{
 		// Check if we already have an entry for this show.
-		$res = $this->getByTitleQuery($title, $type, $source);
+		$res = $this->getTitleExact($title, $type, $source);
 		if (isset($res['id'])) {
 			return $res['id'];
 		}
 
 		$title2 = str_replace(' and ', ' & ', $title);
 		if ($title != $title2) {
-			$res = $this->getByTitleQuery($title2, $type, $source);
+			$res = $this->getTitleExact($title2, $type, $source);
 			if (isset($res['id'])) {
 				return $res['id'];
 			}
 			$pieces = explode(' ', $title2);
-			$title4 = '%';
+			$title2 = '%';
 			foreach ($pieces as $piece) {
-				$title4 .= str_replace(["'", "!"], "", $piece) . '%';
+				$title2 .= str_replace(["'", "!"], "", $piece) . '%';
 			}
-			$res = $this->getByTitleLikeQuery($title4, $type, $source);
+			$res = $this->getTitleLoose($title2, $type, $source);
 			if (isset($res['id'])) {
 				return $res['id'];
 			}
@@ -133,18 +155,18 @@ abstract class Videos
 
 		// Some words are spelled correctly 2 ways
 		// example theatre and theater
-		$title3 = str_replace('er', 're', $title);
-		if ($title != $title3) {
-			$res = $this->getByTitleQuery($title3, $type, $source);
+		$title2 = str_replace('er', 're', $title);
+		if ($title != $title2) {
+			$res = $this->getTitleExact($title2, $type, $source);
 			if (isset($res['id'])) {
 				return $res['id'];
 			}
-			$pieces = explode(' ', $title3);
-			$title4 = '%';
+			$pieces = explode(' ', $title2);
+			$title2 = '%';
 			foreach ($pieces as $piece) {
-				$title4 .= str_replace(["'", "!"], "", $piece) . '%';
+				$title2 .= str_replace(["'", "!"], "", $piece) . '%';
 			}
-			$res = $this->getByTitleLikeQuery($title4, $type, $source);
+			$res = $this->getTitleLoose($title2, $type, $source);
 			if (isset($res['id'])) {
 				return $res['id'];
 			}
@@ -155,11 +177,11 @@ abstract class Videos
 		// Only search if the title contains more than one word to prevent incorrect matches
 		$pieces = explode(' ', $title);
 		if (count($pieces) > 1) {
-			$title4 = '%';
+			$title2 = '%';
 			foreach ($pieces as $piece) {
-				$title4 .= str_replace(["'", "!"], "", $piece) . '%';
+				$title2 .= str_replace(["'", "!"], "", $piece) . '%';
 			}
-			$res = $this->getByTitleLikeQuery($title4, $type, $source);
+			$res = $this->getTitleLoose($title2, $type, $source);
 			if (isset($res['id'])) {
 				return $res['id'];
 			}
@@ -174,17 +196,17 @@ abstract class Videos
 	 * @param        $type
 	 * @param int    $source
 	 *
-	 * @return array|bool
+	 * @return array|false
 	 */
-	public function getByTitleQuery($title, $type, $source = 0)
+	public function getTitleExact($title, $type, $source = 0)
 	{
 		$return = false;
-		if ($title) {
+		if (!empty($title)) {
 			$return = $this->pdo->queryOneRow(
 				sprintf("
 					SELECT v.id
 					FROM videos v
-					LEFT JOIN videos_akas va ON v.id = va.videos_id
+					LEFT JOIN videos_aliases va ON v.id = va.videos_id
 					WHERE (v.title = %1\$s OR va.title = %1\$s)
 					AND v.type = %2\$d %3\$s",
 					$this->pdo->escapeString($title),
@@ -203,18 +225,18 @@ abstract class Videos
 	 * @param        $type
 	 * @param int    $source
 	 *
-	 * @return array|bool
+	 * @return array|false
 	 */
-	public function getByTitleLikeQuery($title, $type, $source = 0)
+	public function getTitleLoose($title, $type, $source = 0)
 	{
 		$return = false;
 
-		if ($title) {
+		if (!empty($title)) {
 			$return = $this->pdo->queryOneRow(
 				sprintf("
 					SELECT v.id
 					FROM videos v
-					LEFT JOIN videos_akas va ON v.id = va.videos_id
+					LEFT JOIN videos_aliases va ON v.id = va.videos_id
 					WHERE (v.title %1\$s
 					OR va.title %1\$s)
 					AND type = %2\$d %3\$s",
@@ -231,19 +253,19 @@ abstract class Videos
 	 * Inserts aliases for videos
 	 *
 	 * @param       $videoId
-	 * @param array $aliasArr
+	 * @param array $aliases
 	 */
-	public function addAliases($videoId, $aliasArr = array())
+	public function addAliases($videoId, array $aliases = [])
 	{
-		if (!empty($aliasArr) && $videoId > 0) {
-			foreach ($aliasArr AS $key => $title) {
+		if (!empty($aliases) && $videoId > 0) {
+			foreach ($aliases AS $key => $title) {
 				// Check if we have the AKA already
 				$check = $this->getAliases(0, $title);
 
 				if ($check === false) {
 					$this->pdo->queryInsert(
 						sprintf('
-							INSERT INTO videos_akas
+							INSERT IGNORE INTO videos_aliases
 							(videos_id, title)
 							VALUES (%d, %s)',
 							$videoId,
@@ -261,7 +283,7 @@ abstract class Videos
 	 * @param int    $videoId
 	 * @param string $alias
 	 *
-	 * @return bool|\PDOStatement
+	 * @return \PDOStatement|false
 	 */
 	public function getAliases($videoId = 0, $alias = '')
 	{
@@ -277,90 +299,10 @@ abstract class Videos
 		if ($sql !== '') {
 			$return = $this->pdo->query('
 				SELECT *
-				FROM videos_akas
-				WHERE ' . $sql, true
+				FROM videos_aliases
+				WHERE ' . $sql, true, NN_CACHE_EXPIRY_MEDIUM
 			);
 		}
 		return (empty($return) ? false : $return);
-	}
-
-	/**
-	 * This function turns a roman numeral into an integer
-	 *
-	 * @param string $string
-	 *
-	 * @return int $e
-	 */
-	public function convertRomanToInt($string) {
-		switch ($string) {
-			case 'i': $e = 1;
-				break;
-			case 'ii': $e = 2;
-				break;
-			case 'iii': $e = 3;
-				break;
-			case 'iv': $e = 4;
-				break;
-			case 'v': $e = 5;
-				break;
-			case 'vi': $e = 6;
-				break;
-			case 'vii': $e = 7;
-				break;
-			case 'viii': $e = 8;
-				break;
-			case 'ix': $e = 9;
-				break;
-			case 'x': $e = 10;
-				break;
-			case 'xi': $e = 11;
-				break;
-			case 'xii': $e = 12;
-				break;
-			case 'xiii': $e = 13;
-				break;
-			case 'xiv': $e = 14;
-				break;
-			case 'xv': $e = 15;
-				break;
-			case 'xvi': $e = 16;
-				break;
-			case 'xvii': $e = 17;
-				break;
-			case 'xviii': $e = 18;
-				break;
-			case 'xix': $e = 19;
-				break;
-			case 'xx': $e = 20;
-				break;
-			default:
-				$e = 0;
-		}
-		return $e;
-	}
-
-	/**
-	 * Get a country code for a country name.
-	 *
-	 * @param string $country
-	 *
-	 * @return mixed
-	 */
-	public function countryCode($country)
-	{
-		if (!is_array($country) && strlen($country) > 2) {
-			$code = $this->pdo->queryOneRow(
-				sprintf('
-					SELECT id
-					FROM countries
-					WHERE country = %s',
-					$this->pdo->escapeString($country)
-				)
-			);
-			if (isset($code['id'])) {
-				return $code['id'];
-			}
-		}
-		return '';
 	}
 }
