@@ -3,6 +3,7 @@ namespace newznab\processing\tv;
 
 use libs\Moinax\TVDB\Client;
 use libs\Moinax\TVDB\CurlException;
+use libs\Moinax\TVDB\XmlException;
 use newznab\ReleaseImage;
 
 /**
@@ -35,9 +36,9 @@ class TVDB extends TV
 	private $serverTime;
 
 	/**
-	 * @string MySQL DATETIME Format
+	 * @bool Do a local lookup only if server is down
 	 */
-	private $timeFormat;
+	private $local;
 
 	/**
 	 * @param array $options Class instances / Echo to cli?
@@ -48,23 +49,37 @@ class TVDB extends TV
 		$this->client = new Client(self::TVDB_URL, self::TVDB_API_KEY);
 		$this->posterUrl = self::TVDB_URL . DS . 'banners/_cache/posters/%s-1.jpg';
 		$this->fanartUrl = self::TVDB_URL . DS . 'banners/_cache/fanart/original/%s-1.jpg';
+		$this->local = false;
 
-		$this->serverTime = $this->client->getServerTime();
-		$this->timeFormat = 'Y-m-d H:i:s';
+		// Check if we can get the time for API status
+		// If we can't then we set local to true
+		try {
+			$this->serverTime = $this->client->getServerTime();
+		} catch (CurlException $error) {
+			if (strpos($error->getMessage(), 'Cannot fetch') === 0) {
+				echo $this->pdo->log->warning('Could not reach TVDB API.  Running in local mode only!');
+				$this->local = true;
+			}
+		} catch (XmlException $error) {
+			if (strpos($error->getMessage(), 'Error in file') === 0) {
+				echo $this->pdo->log->warning('Could not reach TVDB API.  Running in local mode only!');
+				$this->local = true;
+			}
+		}
 	}
 
 	/**
-	 * Main processing director function for TVDB
+	 * Main processing director function for scrapers
 	 * Calls work query function and initiates processing
 	 *
-	 * @param            $groupID
-	 * @param            $guidChar
-	 * @param            $processTV
-	 * @param bool|false $local
+	 * @param      $groupID
+	 * @param      $guidChar
+	 * @param      $process
+	 * @param bool $local
 	 */
-	public function processTVDB($groupID, $guidChar, $processTV, $local = false)
+	public function processSite($groupID, $guidChar, $process, $local = false)
 	{
-		$res = $this->getTvReleases($groupID, $guidChar, $processTV, parent::PROCESS_TVDB);
+		$res = $this->getTvReleases($groupID, $guidChar, $process, parent::PROCESS_TVDB);
 
 		$tvcount = $res->rowCount();
 
@@ -73,13 +88,26 @@ class TVDB extends TV
 		}
 
 		if ($res instanceof \Traversable) {
+
+			$this->titleCache = [];
+
 			foreach ($res as $row) {
 
 				$tvdbid = false;
 
 				// Clean the show name for better match probability
-				$release = $this->parseShowInfo($row['searchname']);
+				$release = $this->parseInfo($row['searchname']);
 				if (is_array($release) && $release['name'] != '') {
+
+					if (in_array($release['cleanname'], $this->titleCache)) {
+						if ($this->echooutput) {
+							echo $this->pdo->log->headerOver("Title: ") .
+									$this->pdo->log->warningOver('"' . $release['cleanname'] . '"') .
+									$this->pdo->log->header(" already failed lookup for this site.  Skipping.");
+						}
+						$this->setVideoNotFound(parent::PROCESS_TVMAZE, $row['id']);
+						continue;
+					}
 
 					// Find the Video ID if it already exists by checking the title.
 					$videoId = $this->getByTitle($release['cleanname'], parent::TYPE_TV);
@@ -89,7 +117,7 @@ class TVDB extends TV
 					}
 
 					// Force local lookup only
-					if ($local == true) {
+					if ($local === true || $this->local === true) {
 						$lookupSetting = false;
 					} else {
 						$lookupSetting = true;
@@ -167,11 +195,21 @@ class TVDB extends TV
 							if ($this->echooutput) {
 								echo $this->pdo->log->primary("Found TVDB Match!");
 							}
-							continue;
+						} else {
+							//Processing failed, set the episode ID to the next processing group
+							$this->setVideoNotFound(parent::PROCESS_TVMAZE, $row['id']);
+							$this->titleCache[] = $release['cleanname'];
 						}
+					} else {
+						//Processing failed, set the episode ID to the next processing group
+						$this->setVideoNotFound(parent::PROCESS_TVMAZE, $row['id']);
+						$this->titleCache[] = $release['cleanname'];
 					}
-				} //Processing failed, set the episode ID to the next processing group
-				$this->setVideoNotFound(parent::PROCESS_TVMAZE, $row['id']);
+				} else {
+					//Parsing failed, take it out of the queue for examination
+					$this->setVideoNotFound(parent::FAILED_PARSE, $row['id']);
+					$this->titleCache[] = $release['cleanname'];
+				}
 			}
 		}
 	}
@@ -197,7 +235,7 @@ class TVDB extends TV
 	 *
 	 * @param string $country
 	 *
-	 * @return array|bool
+	 * @return array|false
 	 */
 	protected function getShowInfo($cleanName, $country = '')
 	{
@@ -225,7 +263,7 @@ class TVDB extends TV
 
 		if (is_array($response)) {
 			foreach ($response as $show) {
-				if ($this->checkRequired($show, 'tvdbS')) {
+				if ($this->checkRequiredAttr($show, 'tvdbS')) {
 					// Check for exact title match first and then terminate if found
 					if (strtolower($show->name) === strtolower($cleanName)) {
 						$highest = $show;
@@ -254,7 +292,7 @@ class TVDB extends TV
 				}
 			}
 			if (isset($highest)) {
-				$return = $this->formatShowArr($highest);
+				$return = $this->formatShowInfo($highest);
 			}
 		}
 
@@ -296,7 +334,7 @@ class TVDB extends TV
 	 * @param string  $airdate
 	 * @param integer $videoId
 	 *
-	 * @return array|bool
+	 * @return array|false
 	 */
 	protected function getEpisodeInfo($tvdbid, $season, $episode, $airdate = '', $videoId = 0)
 	{
@@ -331,13 +369,13 @@ class TVDB extends TV
 		sleep(1);
 
 		if (is_object($response)) {
-			if ($this->checkRequired($response, 'tvdbE')) {
-				$return = $this->formatEpisodeArr($response);
+			if ($this->checkRequiredAttr($response, 'tvdbE')) {
+				$return = $this->formatEpisodeInfo($response);
 			}
 		} else if (is_array($response) && isset($response['episodes']) && $videoId > 0) {
 			foreach ($response['episodes'] as $singleEpisode) {
-				if ($this->checkRequired($singleEpisode, 'tvdbE')) {
-					$this->addEpisode($videoId, $this->formatEpisodeArr($singleEpisode));
+				if ($this->checkRequiredAttr($singleEpisode, 'tvdbE')) {
+					$this->addEpisode($videoId, $this->formatEpisodeInfo($singleEpisode));
 				}
 			}
 		}
@@ -353,7 +391,7 @@ class TVDB extends TV
 	 *
 	 * @return array
 	 */
-	private function formatShowArr($show)
+	protected function formatShowInfo($show)
 	{
 		preg_match('/tt(?P<imdbid>\d{6,7})$/i', $show->imdbId, $imdb);
 
@@ -361,7 +399,7 @@ class TVDB extends TV
 				'type'      => (int)parent::TYPE_TV,
 				'title'     => (string)$show->name,
 				'summary'   => (string)$show->overview,
-				'started'   => (string)$show->firstAired->format($this->timeFormat),
+				'started'   => (string)$show->firstAired,
 				'publisher' => (string)$show->network,
 				'source'    => (int)parent::SOURCE_TVDB,
 				'imdb'      => (int)(isset($imdb['imdbid']) ? $imdb['imdbid'] : 0),
@@ -382,14 +420,14 @@ class TVDB extends TV
 	 *
 	 * @return array
 	 */
-	private function formatEpisodeArr($episode)
+	protected function formatEpisodeInfo($episode)
 	{
 		return [
 				'title'       => (string)$episode->name,
 				'series'      => (int)$episode->season,
 				'episode'     => (int)$episode->number,
 				'se_complete' => (string)'S' . sprintf('%02d', $episode->season) . 'E' . sprintf('%02d', $episode->number),
-				'firstaired'  => (string)$episode->firstAired->format($this->timeFormat),
+				'firstaired'  => (string)$episode->firstAired,
 				'summary'     => (string)$episode->overview
 		];
 	}

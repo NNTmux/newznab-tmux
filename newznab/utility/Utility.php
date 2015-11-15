@@ -67,11 +67,11 @@ class Utility
 		// Strip leading/trailing white space.
 		return trim(
 		// Replace 2 or more white space for a single space.
-			preg_replace('/\s{2,}/',
-				' ',
-				// Replace new lines and carriage returns. DO NOT try removing '\r' or '\n' as they are valid in queries which uses this method.
-				str_replace(["\n", "\r"], ' ', $text)
-			)
+				preg_replace('/\s{2,}/',
+						' ',
+						// Replace new lines and carriage returns. DO NOT try removing '\r' or '\n' as they are valid in queries which uses this method.
+						str_replace(["\n", "\r"], ' ', $text)
+				)
 		);
 	}
 
@@ -114,10 +114,10 @@ class Utility
 	static public function getDirFiles(array $options = null)
 	{
 		$defaults = [
-			'dir'   => false,
-			'ext'   => '', // no full stop (period) separator should be used.
-			'path'  => '',
-			'regex' => '',
+				'dir'   => false,
+				'ext'   => '', // no full stop (period) separator should be used.
+				'path'  => '',
+				'regex' => '',
 		];
 		$options += $defaults;
 
@@ -216,7 +216,7 @@ class Utility
 		// Check database patch version
 		if ($patch < $ver) {
 			$message = "\nYour database is not up to date. Reported patch levels\n   Db: $patch\nfile: $ver\nPlease update.\n php " .
-				NN_ROOT . "cli/update_db.php true\n";
+					NN_ROOT . "cli/update_db.php true\n";
 			if (self::isCLI()) {
 				echo (new ColorCLI())->error($message);
 			}
@@ -252,10 +252,10 @@ class Utility
 	static public function stripNonPrintingChars(&$text)
 	{
 		$lowChars = [
-			"\x00", "\x01", "\x02", "\x03", "\x04", "\x05", "\x06", "\x07",
-			"\x08", "\x09", "\x0A", "\x0B", "\x0C", "\x0D", "\x0E", "\x0F",
-			"\x10", "\x11", "\x12", "\x13", "\x14", "\x15", "\x16", "\x17",
-			"\x18", "\x19", "\x1A", "\x1B", "\x1C", "\x1D", "\x1E", "\x1F",
+				"\x00", "\x01", "\x02", "\x03", "\x04", "\x05", "\x06", "\x07",
+				"\x08", "\x09", "\x0A", "\x0B", "\x0C", "\x0D", "\x0E", "\x0F",
+				"\x10", "\x11", "\x12", "\x13", "\x14", "\x15", "\x16", "\x17",
+				"\x18", "\x19", "\x1A", "\x1B", "\x1C", "\x1D", "\x1E", "\x1F",
 		];
 		$text = str_replace($lowChars, '', $text);
 
@@ -310,12 +310,12 @@ class Utility
 		if (!defined('NN_COVERS')) {
 			switch (true) {
 				case (substr($path, 0, 1) == '/' ||
-					substr($path, 1, 1) == ':' ||
-					substr($path, 0, 1) == '\\'):
+						substr($path, 1, 1) == ':' ||
+						substr($path, 0, 1) == '\\'):
 					define('NN_COVERS', self::trailingSlash($path));
 					break;
 				case (strlen($path) > 0 && substr($path, 0, 1) != '/' && substr($path, 1, 1) != ':' &&
-					substr($path, 0, 1) != '\\'):
+						substr($path, 0, 1) != '\\'):
 					define('NN_COVERS', realpath(NN_ROOT . self::trailingSlash($path)));
 					break;
 				case empty($path): // Default to resources location.
@@ -339,15 +339,15 @@ class Utility
 	{
 		if (empty(NN_SSL_CAFILE) && empty(NN_SSL_CAPATH)) {
 			$options = [
-				'verify_peer'       => false,
-				'verify_peer_name'  => false,
-				'allow_self_signed' => true,
+					'verify_peer'       => false,
+					'verify_peer_name'  => false,
+					'allow_self_signed' => true,
 			];
 		} else {
 			$options = [
-				'verify_peer'       => ($forceIgnore ? false : (bool)NN_SSL_VERIFY_PEER),
-				'verify_peer_name'  => ($forceIgnore ? false : (bool)NN_SSL_VERIFY_HOST),
-				'allow_self_signed' => ($forceIgnore ? true : (bool)NN_SSL_ALLOW_SELF_SIGNED),
+					'verify_peer'       => ($forceIgnore ? false : (bool)NN_SSL_VERIFY_PEER),
+					'verify_peer_name'  => ($forceIgnore ? false : (bool)NN_SSL_VERIFY_HOST),
+					'allow_self_signed' => ($forceIgnore ? true : (bool)NN_SSL_ALLOW_SELF_SIGNED),
 			];
 			if (!empty(NN_SSL_CAFILE)) {
 				$options['cafile'] = NN_SSL_CAFILE;
@@ -378,8 +378,8 @@ class Utility
 		$options = [];
 		if ($verify && NN_SSL_VERIFY_HOST && (!empty(NN_SSL_CAFILE) || !empty(NN_SSL_CAPATH))) {
 			$options += [
-				CURLOPT_SSL_VERIFYPEER => (bool)NN_SSL_VERIFY_PEER,
-				CURLOPT_SSL_VERIFYHOST => (NN_SSL_VERIFY_HOST ? 2 : 0),
+					CURLOPT_SSL_VERIFYPEER => (bool)NN_SSL_VERIFY_PEER,
+					CURLOPT_SSL_VERIFYHOST => (NN_SSL_VERIFY_HOST ? 2 : 0),
 			];
 			if (!empty(NN_SSL_CAFILE)) {
 				$options += [CURLOPT_CAINFO => NN_SSL_CAFILE];
@@ -389,8 +389,8 @@ class Utility
 			}
 		} else {
 			$options += [
-				CURLOPT_SSL_VERIFYPEER => false,
-				CURLOPT_SSL_VERIFYHOST => 0,
+					CURLOPT_SSL_VERIFYPEER => false,
+					CURLOPT_SSL_VERIFYHOST => 0,
 			];
 		}
 
@@ -409,18 +409,18 @@ class Utility
 	public static function getUrl(array $options = [])
 	{
 		$defaults = [
-			'url'            => '',    // String ; The URL to download.
-			'method'         => 'get', // String ; Http method, get/post/etc..
-			'postdata'       => '',    // String ; Data to send on post method.
-			'language'       => '',    // String ; Language in request header string.
-			'debug'          => false, // Bool   ; Show curl debug information.
-			'useragent'      => '',    // String ; User agent string.
-			'cookie'         => '',    // String ; Cookie string.
-			'requestheaders' => [],    // Array  ; List of request headers.
-			//          Example: ["Content-Type: application/json", "DNT: 1"]
-			'verifycert'     => true,  // Bool   ; Verify certificate authenticity?
-			//          Since curl does not have a verify self signed certs option,
-			//          you should use this instead if your cert is self signed.
+				'url'            => '',    // String ; The URL to download.
+				'method'         => 'get', // String ; Http method, get/post/etc..
+				'postdata'       => '',    // String ; Data to send on post method.
+				'language'       => '',    // String ; Language in request header string.
+				'debug'          => false, // Bool   ; Show curl debug information.
+				'useragent'      => '',    // String ; User agent string.
+				'cookie'         => '',    // String ; Cookie string.
+				'requestheaders' => [],    // Array  ; List of request headers.
+				//          Example: ["Content-Type: application/json", "DNT: 1"]
+				'verifycert'     => true,  // Bool   ; Verify certificate authenticity?
+				//          Since curl does not have a verify self signed certs option,
+				//          you should use this instead if your cert is self signed.
 		];
 
 		$options += $defaults;
@@ -457,11 +457,11 @@ class Utility
 		$ch = curl_init();
 
 		$context = [
-			CURLOPT_URL            => $options['url'],
-			CURLOPT_HTTPHEADER     => $header,
-			CURLOPT_RETURNTRANSFER => 1,
-			CURLOPT_FOLLOWLOCATION => 1,
-			CURLOPT_TIMEOUT        => 15
+				CURLOPT_URL            => $options['url'],
+				CURLOPT_HTTPHEADER     => $header,
+				CURLOPT_RETURNTRANSFER => 1,
+				CURLOPT_FOLLOWLOCATION => 1,
+				CURLOPT_TIMEOUT        => 15
 		];
 		$context += self::curlSslContextOptions($options['verifycert']);
 		if (!empty($options['useragent'])) {
@@ -472,16 +472,16 @@ class Utility
 		}
 		if ($options['method'] === 'post') {
 			$context += [
-				CURLOPT_POST       => 1,
-				CURLOPT_POSTFIELDS => $options['postdata']
+					CURLOPT_POST       => 1,
+					CURLOPT_POSTFIELDS => $options['postdata']
 			];
 		}
 		if ($options['debug']) {
 			$context += [
-				CURLOPT_HEADER      => true,
-				CURLINFO_HEADER_OUT => true,
-				CURLOPT_NOPROGRESS  => false,
-				CURLOPT_VERBOSE     => true
+					CURLOPT_HEADER      => true,
+					CURLINFO_HEADER_OUT => true,
+					CURLOPT_NOPROGRESS  => false,
+					CURLOPT_VERBOSE     => true
 			];
 		}
 		curl_setopt_array($ch, $context);
@@ -519,21 +519,21 @@ class Utility
 	public static function getCoverURL(array $options = [])
 	{
 		$defaults = [
-			'id'     => null,
-			'suffix' => '-cover.jpg',
-			'type'   => '',
+				'id'     => null,
+				'suffix' => '-cover.jpg',
+				'type'   => '',
 		];
 		$options += $defaults;
 		$fileSpecTemplate = '%s/%s%s';
 		$fileSpec = '';
 
 		if (!empty($options['id']) && in_array($options['type'],
-				['anime', 'audio', 'audiosample', 'book', 'console', 'games', 'movies', 'music', 'preview', 'sample', 'tvrage', 'video', 'xxx']
-			)
+						['anime', 'audio', 'audiosample', 'book', 'console', 'games', 'movies', 'music', 'preview', 'sample', 'tvrage', 'video', 'xxx']
+				)
 		) {
 			$fileSpec = sprintf($fileSpecTemplate, $options['type'], $options['id'], $options['suffix']);
 			$fileSpec = file_exists(NN_COVERS . $fileSpec) ? $fileSpec :
-				sprintf($fileSpecTemplate, $options['type'], 'no', $options['suffix']);
+					sprintf($fileSpecTemplate, $options['type'], 'no', $options['suffix']);
 		}
 
 		return $fileSpec;
@@ -570,20 +570,20 @@ class Utility
 		// Check to make sure the user has their settings correct.
 		if (PHPMAILER_USE_SMTP == true) {
 			if ((!defined('PHPMAILER_SMTP_HOST') || PHPMAILER_SMTP_HOST === '') ||
-				(!defined('PHPMAILER_SMTP_PORT') || PHPMAILER_SMTP_PORT === '')
+					(!defined('PHPMAILER_SMTP_PORT') || PHPMAILER_SMTP_PORT === '')
 			) {
 				throw new \phpmailerException(
-					'You opted to use SMTP but the PHPMAILER_SMTP_HOST and/or PHPMAILER_SMTP_PORT is/are not defined correctly! Either fix the missing/incorrect values or change PHPMAILER_USE_SMTP to false in the www/settings.php'
+						'You opted to use SMTP but the PHPMAILER_SMTP_HOST and/or PHPMAILER_SMTP_PORT is/are not defined correctly! Either fix the missing/incorrect values or change PHPMAILER_USE_SMTP to false in the www/settings.php'
 				);
 			}
 
 			// If the user enabled SMTP & Auth but did not setup credentials, throw an exception.
 			if (defined('PHPMAILER_SMTP_AUTH') && PHPMAILER_SMTP_AUTH == true) {
 				if ((!defined('PHPMAILER_SMTP_USER') || PHPMAILER_SMTP_USER === '') ||
-					(!defined('PHPMAILER_SMTP_PASSWORD') || PHPMAILER_SMTP_PASSWORD === '')
+						(!defined('PHPMAILER_SMTP_PASSWORD') || PHPMAILER_SMTP_PASSWORD === '')
 				) {
 					throw new \phpmailerException(
-						'You opted to use SMTP and SMTP Auth but the PHPMAILER_SMTP_USER and/or PHPMAILER_SMTP_PASSWORD is/are not defined correctly. Please set them in www/settings.php'
+							'You opted to use SMTP and SMTP Auth but the PHPMAILER_SMTP_USER and/or PHPMAILER_SMTP_PASSWORD is/are not defined correctly. Please set them in www/settings.php'
 					);
 				}
 			}
@@ -789,20 +789,20 @@ class Utility
 	{
 		$key = sprintf
 		(
-			'%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-			// 32 bits for "time_low"
-			mt_rand(0, 0xffff), mt_rand(0, 0xffff),
-			// 16 bits for "time_mid"
-			mt_rand(0, 0xffff),
-			// 16 bits for "time_hi_and_version",
-			// four most significant bits holds version number 4
-			mt_rand(0, 0x0fff) | 0x4000,
-			// 16 bits, 8 bits for "clk_seq_hi_res",
-			// 8 bits for "clk_seq_low",
-			// two most significant bits holds zero and one for variant DCE1.1
-			mt_rand(0, 0x3fff) | 0x8000,
-			// 48 bits for "node"
-			mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+				'%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+				// 32 bits for "time_low"
+				mt_rand(0, 0xffff), mt_rand(0, 0xffff),
+				// 16 bits for "time_mid"
+				mt_rand(0, 0xffff),
+				// 16 bits for "time_hi_and_version",
+				// four most significant bits holds version number 4
+				mt_rand(0, 0x0fff) | 0x4000,
+				// 16 bits, 8 bits for "clk_seq_hi_res",
+				// 8 bits for "clk_seq_low",
+				// two most significant bits holds zero and one for variant DCE1.1
+				mt_rand(0, 0x3fff) | 0x8000,
+				// 48 bits for "node"
+				mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
 		);
 
 		return $key;
@@ -854,4 +854,58 @@ class Utility
 		return $data;
 	}
 
+	/**
+	 * This function turns a roman numeral into an integer
+	 *
+	 * @param string $string
+	 *
+	 * @return int $e
+	 */
+	public static function convertRomanToInt($string) {
+		switch (strtolower($string)) {
+			case 'i': $e = 1;
+				break;
+			case 'ii': $e = 2;
+				break;
+			case 'iii': $e = 3;
+				break;
+			case 'iv': $e = 4;
+				break;
+			case 'v': $e = 5;
+				break;
+			case 'vi': $e = 6;
+				break;
+			case 'vii': $e = 7;
+				break;
+			case 'viii': $e = 8;
+				break;
+			case 'ix': $e = 9;
+				break;
+			case 'x': $e = 10;
+				break;
+			case 'xi': $e = 11;
+				break;
+			case 'xii': $e = 12;
+				break;
+			case 'xiii': $e = 13;
+				break;
+			case 'xiv': $e = 14;
+				break;
+			case 'xv': $e = 15;
+				break;
+			case 'xvi': $e = 16;
+				break;
+			case 'xvii': $e = 17;
+				break;
+			case 'xviii': $e = 18;
+				break;
+			case 'xix': $e = 19;
+				break;
+			case 'xx': $e = 20;
+				break;
+			default:
+				$e = 0;
+		}
+		return $e;
+	}
 }
