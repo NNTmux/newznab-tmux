@@ -1,3 +1,5 @@
+2015-11-15 DariusIII
+	Chg: Numerous TV related fixes ported from nZEDb
 2015-11-12 DariusIII
 	Fix: Remove timeZone as tmdb is already UTC
 	Upd: Update TV episodes parsing

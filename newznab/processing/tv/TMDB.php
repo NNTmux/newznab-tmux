@@ -8,17 +8,6 @@ class TMDB extends TV
 {
 	const MATCH_PROBABILITY = 75;
 
-
-	/**
-	 * @string DateTimeZone Object - UTC
-	 */
-	private $timeZone;
-
-	/**
-	 * @string MySQL DATETIME Format
-	 */
-	private $timeFormat;
-
 	/**
 	 * @var string The URL for the image for poster
 	 */
@@ -35,8 +24,6 @@ class TMDB extends TV
 	{
 		parent::__construct($options);
 		$this->client = new TmdbAPI($this->pdo->getSetting('tmdbkey'));
-		$this->timeZone = new \DateTimeZone('UTC');
-		$this->timeFormat = 'Y-m-d H:i:s';
 	}
 
 	/**
@@ -56,14 +43,14 @@ class TMDB extends TV
 	 * Main processing director function for TMDB
 	 * Calls work query function and initiates processing
 	 *
-	 * @param            $groupID
-	 * @param            $guidChar
-	 * @param            $processTV
-	 * @param bool|false $local
+	 * @param      $groupID
+	 * @param      $guidChar
+	 * @param      $process
+	 * @param bool $local
 	 */
-	public function processTMDB ($groupID, $guidChar, $processTV, $local = false)
+	public function processSite ($groupID, $guidChar, $process, $local = false)
 	{
-		$res = $this->getTvReleases($groupID, $guidChar, $processTV, parent::PROCESS_TMDB);
+		$res = $this->getTvReleases($groupID, $guidChar, $process, parent::PROCESS_TMDB);
 
 		$tvcount = $res->rowCount();
 
@@ -72,15 +59,28 @@ class TMDB extends TV
 		}
 
 		if ($res instanceof \Traversable) {
+
+			$this->titleCache = [];
+
 			foreach ($res as $row) {
 
 				$this->posterUrl = '';
 				$tmdbid = false;
 
 				// Clean the show name for better match probability
-				$release = $this->parseShowInfo($row['searchname']);
+				$release = $this->parseInfo($row['searchname']);
 
 				if (is_array($release) && $release['name'] != '') {
+
+					if (in_array($release['cleanname'], $this->titleCache)) {
+						if ($this->echooutput) {
+							echo $this->pdo->log->headerOver("Title: ") .
+									$this->pdo->log->warningOver('"' . $release['cleanname'] . '"') .
+									$this->pdo->log->header(" already failed lookup for this site.  Skipping.");
+						}
+						$this->setVideoNotFound(parent::PROCESS_TRAKT, $row['id']);
+						continue;
+					}
 
 					// Find the Video ID if it already exists by checking the title against stored TMDB titles
 					$videoId = $this->getByTitle($release['cleanname'], parent::TYPE_TV, parent::SOURCE_TMDB);
@@ -104,7 +104,7 @@ class TMDB extends TV
 						$tmdbShow = $this->getShowInfo((string)$release['cleanname']);
 
 						if (is_array($tmdbShow)) {
-							// Check if we have the TVDB ID already, if we do use that Video ID
+							// Check if we have the TMDB ID already, if we do use that Video ID
 							$dupeCheck = $this->getVideoIDFromSiteID('tvdb', $tmdbShow['tvdb']);
 							if ($dupeCheck === false) {
 								$videoId = $this->add($tmdbShow);
@@ -168,10 +168,21 @@ class TMDB extends TV
 								echo $this->pdo->log->primary("Found TMDB Match!");
 							}
 							continue;
+						} else {
+							//Processing failed, set the episode ID to the next processing group
+							$this->setVideoNotFound(parent::PROCESS_TRAKT, $row['id']);
+							$this->titleCache[] = $release['cleanname'];
 						}
+					} else {
+						//Processing failed, set the episode ID to the next processing group
+						$this->setVideoNotFound(parent::PROCESS_TRAKT, $row['id']);
+						$this->titleCache[] = $release['cleanname'];
 					}
-				} //Processing failed, set the episode ID to the next processing group
-				$this->setVideoNotFound(parent::PROCESS_TRAKT, $row['id']);
+				} else{
+					//Processing failed, set the episode ID to the next processing group
+					$this->setVideoNotFound(parent::PROCESS_TRAKT, $row['id']);
+					$this->titleCache[] = $release['cleanname'];
+				}
 			}
 		}
 	}
@@ -182,7 +193,7 @@ class TMDB extends TV
 	 *
 	 * @param $cleanName
 	 *
-	 * @return array|bool
+	 * @return array|false
 	 */
 	protected function getShowInfo($cleanName)
 	{
@@ -199,18 +210,18 @@ class TMDB extends TV
 	}
 
 	/**
-	 * @param $showArr
+	 * @param $shows
 	 * @param $cleanName
 	 *
-	 * @return array|bool
+	 * @return array|false
 	 */
-	private function matchShowInfo($showArr, $cleanName)
+	private function matchShowInfo($shows, $cleanName)
 	{
 		$return = false;
 		$highestMatch = 0;
 
-		foreach ($showArr AS $show) {
-			if ($this->checkRequired($show->_data, 'tmdbS')) {
+		foreach ($shows AS $show) {
+			if ($this->checkRequiredAttr($show->_data, 'tmdbS')) {
 				// Check for exact title match first and then terminate if found
 				if (strtolower($show->_data['name']) === strtolower($cleanName)) {
 					$highest = $show;
@@ -229,14 +240,14 @@ class TMDB extends TV
 		}
 		if (isset($highest)) {
 			$showAppends = $this->client->getTVShow($highest->_data['id'], 'append_to_response=alternative_titles,external_ids');
-			if ($showAppends) {
+			if (isset($showAppends->_data['alternative_titles']['results']) && is_array($showAppends->_data['alternative_titles']['results'])) {
 				foreach ($showAppends->_data['alternative_titles']['results'] AS $aka) {
 					$highest->_data['alternative_titles'][] = $aka['title'];
 				}
 				$highest->_data['network'] = (isset($showAppends->_data['networks'][0]['name']) ? $showAppends->_data['networks'][0]['name'] : '');
 				$highest->_data['external_ids'] = $showAppends->_data['external_ids'];
 			}
-			$return = $this->formatShowArr($highest);
+			$return = $this->formatShowInfo($highest);
 		}
 		return $return;
 	}
@@ -284,8 +295,8 @@ class TMDB extends TV
 
 		//Handle Single Episode Lookups
 		if (is_object($response)) {
-			if ($this->checkRequired($response->_data, 'tmdbE')) {
-				$return = $this->formatEpisodeArr($response);
+			if ($this->checkRequiredAttr($response->_data, 'tmdbE')) {
+				$return = $this->formatEpisodeInfo($response);
 			}
 		}
 		return $return;
@@ -299,7 +310,7 @@ class TMDB extends TV
 	 *
 	 * @return array
 	 */
-	private function formatShowArr($show)
+	protected function formatShowInfo($show)
 	{
 		$this->posterUrl = $this->client->getImageURL() . (string)(isset($show->_data['poster_path']) ? $show->_data['poster_path'] : '');
 
@@ -313,7 +324,7 @@ class TMDB extends TV
 				'summary'   => (string)$show->_data['overview'],
 				'started'   => (string)$show->_data['first_air_date'],
 				'publisher' => (isset($show->_data['network']) ? (string)$show->_data['network'] : ''),
-				'country'   => (string)$show->_data['origin_country'][0],
+				'country'   => (string)(isset($show->_data['origin_country'][0]) ? $show->_data['origin_country'][0] : ''),
 				'source'    => (int)parent::SOURCE_TMDB,
 				'imdb'      => (isset($imdb['imdbid']) ? (int)$imdb['imdbid'] : 0),
 				'tvdb'      => (isset($show->_data['external_ids']['tvdb_id']) ? (int)$show->_data['external_ids']['tvdb_id'] : 0),
@@ -333,7 +344,7 @@ class TMDB extends TV
 	 *
 	 * @return array
 	 */
-	private function formatEpisodeArr($episode)
+	protected function formatEpisodeInfo($episode)
 	{
 		return [
 				'title'       => (string)$episode->_data['name'],
