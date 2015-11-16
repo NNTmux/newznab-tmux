@@ -40,31 +40,26 @@
 	<div class="btn-group">
 		<a class="btn btn-sm btn-default"
 		   href="{$smarty.const.WWW_TOP}/rss?show={$show.id}{if $category != ''}&amp;t={$category}{/if}&amp;dl=1&amp;i={$userdata.id}&amp;r={$userdata.rsstoken}">RSS for TV Show <i class="fa fa-rss"></i></a>
-			{if $show.tvdb > 0}
-				<a class="btn btn-sm btn-info" target="_blank"
-				   href="{$site->dereferrer_link}http://thetvdb.com/?tab=series&id={$show.tvdb}"
-				   title="View at TheTVDB">TheTVDB</a>
-			{/if}
-			{if $show.tvmaze > 0}
-				<a class="btn btn-sm btn-info" target="_blank"
-				   href="{$site->dereferrer_link}http://tvmaze.com/shows/{$show.tvmaze}"
-				   title="View at TVMaze">TVMaze</a>
-			{/if}
-			{if $show.trakt > 0}
-				<a class="btn btn-sm btn-info" target="_blank"
-				   href="{$site->dereferrer_link}http://www.trakt.tv/shows/{$show.trakt}"
-				   title="View at TraktTv">Trakt</a>
-			{/if}
-			{if $show.tvrage > 0}
-				<a class="btn btn-sm btn-info" target="_blank"
-				   href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$show.tvrage}"
-				   title="View at TV Rage">TV Rage</a>
-			{/if}
-			{if $show.tmdb > 0}
-				<a class="btn btn-sm btn-info" target="_blank"
-				   href="{$site->dereferrer_link}https://www.themoviedb.org/tv/{$show.tmdb}"
-				   title="View at TheMovieDB">TMDB</a>
-			{/if}
+		{if $show.tvdb > 0}
+			<a class="btn btn-sm btn-info" target="_blank"
+			   href="{$site->dereferrer_link}http://thetvdb.com/?tab=series&id={$show.tvdb}"
+			   title="View at TheTVDB">TheTVDB</a>
+		{/if}
+		{if $show.tvmaze > 0}
+			<a class="btn btn-sm btn-info" target="_blank"
+			   href="{$site->dereferrer_link}http://tvmaze.com/shows/{$show.tvmaze}"
+			   title="View at TVMaze">TVMaze</a>
+		{/if}
+		{if $show.trakt > 0}
+			<a class="btn btn-sm btn-info" target="_blank"
+			   href="{$site->dereferrer_link}http://www.trakt.tv/shows/{$show.trakt}"
+			   title="View at TraktTv">Trakt</a>
+		{/if}
+		{if $show.tvrage > 0}
+			<a class="btn btn-sm btn-info" target="_blank"
+			   href="{$site->dereferrer_link}http://www.tvrage.com/shows/id-{$show.tvrage}"
+			   title="View at TV Rage">TV Rage</a>
+		{/if}
 	</div>
 	<br/>
 	<div class="box-body"
@@ -131,6 +126,7 @@
 							</ul>
 							<div class="tab-content">
 								{foreach $seasons as $seasonnum => $season name = "tv"}
+									{if empty($seasonnum)}{$seasonnum = 'Packs'}{/if}
 									<div class="tab-pane{if $smarty.foreach.tv.first} active{/if} fade in"
 										 id="{$seasonnum}">
 										<table class="tb_{$seasonnum} data table table-condensed table-bordered table-responsive table-hover"

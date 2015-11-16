@@ -1,4 +1,5 @@
-2015-11-15 DariusIII
+2015-11-16 DariusIII
+	Upd: Change how season packs are displayed
 	Chg: Remove spotnab from tmux
 	Upd: Speed up cover view browsing, optimize SpotNab
 	Chg: Numerous TV related fixes ported from nZEDb
