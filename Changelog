@@ -1,3 +1,5 @@
+2015-11-16 DariusIII
+	Upd: Add new PreDb class, update predb_import_daily_batch.
 2015-11-15 DariusIII
 	Chg: Remove spotnab processing from tmux
 	Upd: Speed up cover browsing, optimize SpotNab
