@@ -382,8 +382,6 @@ class SpotNab {
 		}
 		catch(\Exception $e){
 			printf("Failed to connect to Usenet\n");
-			// Restore handler
-			restore_error_handler();
 			return false;
 		}
 
@@ -403,7 +401,6 @@ class SpotNab {
 		if($first === false){
 			// Fail
 			echo "Failed\n";
-			restore_error_handler();
 			return false;
 		}
 
@@ -479,8 +476,6 @@ class SpotNab {
 			."setting = 'spotnabdiscover'";
 		$this->_pdo->queryExec($q);
 
-		// Restore handler
-		restore_error_handler();
 		return $inserted + $updated;
 	}
 
@@ -593,15 +588,20 @@ class SpotNab {
 	}
 
 	// ***********************************************************************
-	public function fetch($reftime = NULL, $retries=3){
-		/*
-		* This function queries all enabled sources and fetches any content
-		* they are sharing.
 
-		* The specified $reftime is presumed to be local *not utc*
-		*/
+	/**
+	 * This function queries all enabled sources and fetches any content
+	 * they are sharing.
+	 * The specified $reftime is presumed to be local *not utc*
+	 *
+	 * @param null $reftime
+	 * @param int  $retries
+	 *
+	 * @return int
+	 */
+	public function fetch($reftime = NULL, $retries = 3) {
 
-		$last = $first = NULL;
+		$first = NULL;
 
 		// Return Value; Initialize it to Okay
 		// we'll change it to false if we have to.
@@ -627,9 +627,7 @@ class SpotNab {
 
 		// First we find all active sources and build a hash table we can
 		// use to simplify fetching.
-		$sql = "SELECT * FROM spotnabsources WHERE active = 1 ".
-			"ORDER BY usenetgroup,lastupdate DESC";
-		$res = $this->_pdo->query($sql);
+		$res = $this->_pdo->query('SELECT * FROM spotnabsources WHERE active = 1 ORDER BY usenetgroup,lastupdate DESC');
 		$group_hash = [];
 		$group_article_start = [];
 		$id_hash = [];
@@ -723,8 +721,6 @@ class SpotNab {
 		}
 		catch(\Exception $e){
 			printf("Failed to connect to Usenet");
-			// Restore handler
-			restore_error_handler();
 			return false;
 		}
 
@@ -810,14 +806,11 @@ class SpotNab {
 					continue;
 				}
 			}
-			$this->_pdo->queryExec(sprintf('UPDATE spotnabsources '
-				.'SET lastarticle = %d WHERE id IN (%s)',
+			$this->_pdo->queryExec(sprintf('UPDATE spotnabsources SET lastarticle = %d WHERE id IN (%s)',
 				$last,
 				implode(",", $id_hash[$group])));
 			echo "\n";
 		}
-		// Restore handler
-		restore_error_handler();
 
 		// Ensure We're not connected
 		try{$this->_nntp->doQuit();}
@@ -1036,7 +1029,7 @@ class SpotNab {
 			$summary = $this->_nntp->selectGroup($group);
 
 			$_last = $last = intval($summary['last']);
-			$_first = $first = intval($summary['first']);
+			$first = intval($summary['first']);
 
 			$curdate = $lastdate = NULL;
 			$curid = $lastid = $first;
@@ -1840,14 +1833,9 @@ class SpotNab {
 			// taking up to 20 min for the post to show... so checking
 			// right after posting was failing for this group.
 
-			// Restore handler
-			restore_error_handler();
-
 			// We're done
 			return true;
 		}
-		// Restore handler
-		restore_error_handler();
 		return false;
 	}
 

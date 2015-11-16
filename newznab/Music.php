@@ -176,22 +176,26 @@ class Music
 	 *
 	 * @return mixed
 	 */
-	public function getMusicCount($cat, $maxage = -1, $excludedcats = [])
+	public function getMusicCount($cat, $maxage = -1, array $excludedcats = [])
 	{
-		$res = $this->pdo->queryOneRow(
-			sprintf(
-				"SELECT COUNT(DISTINCT r.musicinfoid) AS num
+		$res = $this->pdo->query(
+				sprintf("
+				SELECT COUNT(DISTINCT r.musicinfoid) AS num
 				FROM releases r
-				INNER JOIN musicinfo m ON m.id = r.musicinfoid AND m.title != '' AND m.cover = 1
-				WHERE nzbstatus = 1 AND r.passwordstatus %s AND %s %s %s %s",
-				Releases::showPasswords($this->pdo),
-				$this->getBrowseBy(),
-				(count($cat) > 0 && $cat[0] != -1 ? (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat) : ''),
-				($maxage > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxage) : ''),
-				(count($excludedcats) > 0 ? " AND r.categoryid NOT IN (" . implode(",", $excludedcats) . ")" : '')
-			)
+				INNER JOIN musicinfo m ON m.id = r.musicinfoid
+				AND m.title != ''
+				AND m.cover = 1
+				WHERE nzbstatus = 1
+				AND r.passwordstatus %s
+				AND %s %s %s %s",
+						Releases::showPasswords($this->pdo),
+						$this->getBrowseBy(),
+						(count($cat) > 0 && $cat[0] != -1 ? (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat) : ''),
+						($maxage > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxage) : ''),
+						(count($excludedcats) > 0 ? " AND r.categoryid NOT IN (" . implode(",", $excludedcats) . ")" : '')
+				), true, NN_CACHE_EXPIRY_MEDIUM
 		);
-		return $res["num"];
+		return (isset($res[0]["num"]) ? $res[0]["num"] : 0);
 	}
 
 	/**

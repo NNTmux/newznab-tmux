@@ -148,41 +148,36 @@ class Console
 		return ($res === false ? 0 : $res['num']);
 	}
 
-	public function getConsoleCount($cat, $maxage = -1, $excludedcats =[])
+	public function getConsoleCount($cat, $maxage = -1, $excludedcats = [])
 	{
 		$catsrch = '';
 		if (count($cat) > 0 && $cat[0] != -1) {
 			$catsrch = (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
 		}
 
-		$res = $this->pdo->queryOneRow(
-			sprintf("
+		$res = $this->pdo->query(
+				sprintf("
 				SELECT COUNT(DISTINCT r.consoleinfoid) AS num
 				FROM releases r
 				INNER JOIN consoleinfo con ON con.id = r.consoleinfoid AND con.title != '' AND con.cover = 1
 				WHERE r.nzbstatus = 1
 				AND r.passwordstatus %s
+				AND con.title != ''
 				AND %s %s %s %s",
-				Releases::showPasswords($this->pdo),
-				$this->getBrowseBy(),
-				$catsrch,
-				($maxage > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxage) : ''),
-				(count($excludedcats) > 0 ? (' AND r.categoryid NOT IN (' . implode(',', $excludedcats) . ')') : '')
-			)
+						Releases::showPasswords($this->pdo),
+						$this->getBrowseBy(),
+						$catsrch,
+						($maxage > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxage) : ''),
+						(count($excludedcats) > 0 ? (' AND r.categoryid NOT IN (' . implode(',', $excludedcats) . ')') : '')
+				), true, NN_CACHE_EXPIRY_MEDIUM
 		);
-		return ($res === false ? 0 : $res["num"]);
+		return (isset($res[0]["num"]) ? $res[0]["num"] : 0);
 	}
 
-	public function getConsoleRange($cat, $start, $num, $orderby, $excludedcats =[])
+	public function getConsoleRange($cat, $start, $num, $orderby, $excludedcats = [])
 	{
 
 		$browseby = $this->getBrowseBy();
-
-		if ($start === false) {
-			$limit = "";
-		} else {
-			$limit = " LIMIT " . $num . " OFFSET " . $start;
-		}
 
 		$catsrch = '';
 		if (count($cat) > 0 && $cat[0] != -1) {
@@ -195,32 +190,79 @@ class Console
 		}
 
 		$order = $this->getConsoleOrder($orderby);
+
+		$consoles = $this->pdo->query(
+				sprintf("
+				SELECT con.id
+				FROM consoleinfo con
+				LEFT JOIN releases r ON con.id = r.consoleinfoid
+				WHERE r.nzbstatus = 1
+				AND con.title != ''
+				AND con.cover = 1
+				AND r.passwordstatus %s
+				AND %s %s %s
+				GROUP BY con.id
+				ORDER BY %s %s %s",
+						Releases::showPasswords($this->pdo),
+						$browseby,
+						$catsrch,
+						$exccatlist,
+						$order[0],
+						$order[1],
+						($start === false ? '' : ' LIMIT ' . $num . ' OFFSET ' . $start)
+				), true, NN_CACHE_EXPIRY_MEDIUM
+		);
+
+		$consoleIDs = false;
+
+		if (is_array($consoles)) {
+			foreach ($consoles AS $console => $id) {
+				$consoleIDs[] = $id['id'];
+			}
+		}
+
 		return $this->pdo->query(
-			sprintf(
-				"SELECT GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id, "
-				. "GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') as grp_rarinnerfilecount, "
-				. "GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') AS grp_haspreview, "
-				. "GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_password, "
-				. "GROUP_CONCAT(r.guid ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_guid, "
-				. "GROUP_CONCAT(rn.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_nfoid, "
-				. "GROUP_CONCAT(groups.name ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grpname, "
-				. "GROUP_CONCAT(r.searchname ORDER BY r.postdate DESC SEPARATOR '#') AS grp_release_name, "
-				. "GROUP_CONCAT(r.postdate ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_postdate, "
-				. "GROUP_CONCAT(r.size ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_size, "
-				. "GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_totalparts, "
-				. "GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_comments, "
-				. "GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grabs, "
-				. "con.*, r.consoleinfoid, groups.name AS group_name, rn.id as nfoid FROM releases r "
-				. "LEFT OUTER JOIN groups ON groups.id = r.groupid "
-				. "LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id "
-				. "INNER JOIN consoleinfo con ON con.id = r.consoleinfoid "
-				. "INNER JOIN genres ON con.genreid = genres.id "
-				. "WHERE r.nzbstatus = 1 AND con.title != '' AND "
-				. "r.passwordstatus %s AND %s %s %s "
-				. "GROUP BY con.id ORDER BY %s %s" . $limit,
-				Releases::showPasswords($this->pdo),
-				$browseby, $catsrch, $exccatlist, $order[0], $order[1]
-			), true, NN_CACHE_EXPIRY_MEDIUM
+				sprintf("
+				SELECT
+					GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id,
+					GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') as grp_rarinnerfilecount,
+					GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') AS grp_haspreview,
+					GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_password,
+					GROUP_CONCAT(r.guid ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_guid,
+					GROUP_CONCAT(rn.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_nfoid,
+					GROUP_CONCAT(g.name ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grpname,
+					GROUP_CONCAT(r.searchname ORDER BY r.postdate DESC SEPARATOR '#') AS grp_release_name,
+					GROUP_CONCAT(r.postdate ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_postdate,
+					GROUP_CONCAT(r.size ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_size,
+					GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_totalparts,
+					GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_comments,
+					GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grabs,
+				con.*,
+				r.consoleinfoid,
+				g.name AS group_name,
+				genres.title AS genre,
+				rn.id AS nfoid
+				FROM releases r
+				LEFT OUTER JOIN groups g ON g.id = r.groupid
+				LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
+				INNER JOIN consoleinfo con ON con.id = r.consoleinfoid
+				INNER JOIN genres ON con.genreid = genres.id
+				WHERE r.nzbstatus = 1
+				AND con.id IN (%s)
+				AND con.title != ''
+				AND con.cover = 1
+				AND r.passwordstatus %s
+				AND %s %s %s
+				GROUP BY con.id
+				ORDER BY %s %s",
+						(is_array($consoleIDs) ? implode(',', $consoleIDs) : -1),
+						Releases::showPasswords($this->pdo),
+						$browseby,
+						$catsrch,
+						$exccatlist,
+						$order[0],
+						$order[1]
+				), true, NN_CACHE_EXPIRY_MEDIUM
 		);
 	}
 

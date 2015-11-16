@@ -259,26 +259,24 @@ class Movie
 			$catsrch = (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
 		}
 
-		$res = $this->pdo->queryOneRow(
-			sprintf("
+		$res = $this->pdo->query(
+				sprintf("
 				SELECT COUNT(DISTINCT r.imdbid) AS num
 				FROM releases r
 				INNER JOIN movieinfo m ON m.imdbid = r.imdbid
 				WHERE r.nzbstatus = 1
 				AND r.imdbid != '0000000'
-				AND m.cover = 1
 				AND m.title != ''
 				AND r.passwordstatus %s
 				AND %s %s %s %s ",
-				$this->showPasswords,
-				$this->getBrowseBy(),
-				$catsrch,
-				($maxAge > 0 ? 'AND r.postdate > NOW() - INTERVAL ' . $maxAge . ' DAY' : ''),
-				(count($excludedCats) > 0 ? ' AND r.categoryid NOT IN (' . implode(',', $excludedCats) . ')' : '')
-			)
+						$this->showPasswords,
+						$this->getBrowseBy(),
+						$catsrch,
+						($maxAge > 0 ? 'AND r.postdate > NOW() - INTERVAL ' . $maxAge . ' DAY' : ''),
+						(count($excludedCats) > 0 ? ' AND r.categoryid NOT IN (' . implode(',', $excludedCats) . ')' : '')
+				), true, NN_CACHE_EXPIRY_MEDIUM
 		);
-
-		return ($res === false ? 0 : $res['num']);
+		return (isset($res[0]["num"]) ? $res[0]["num"] : 0);
 	}
 
 	/**
