@@ -1,4 +1,5 @@
 2015-11-16 DariusIII
+	Upd: Change series packs are displayed in Omicron/Charisma templates
 	Fix: Rename TMDB.php to TmdbAPI.php
 	Fix: Add missing AKA processing from JPinkney/TVMaze
 	Upd: Add new PreDb class, update predb_import_daily_batch.
