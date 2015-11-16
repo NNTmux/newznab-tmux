@@ -1,4 +1,6 @@
 2015-11-16 DariusIII
+	Fix: Use rawurlencode in JPinkney/TVMaze/Client.php
+	Fix: Add covers path to constants.php
 	Fix: Change $_data from private to public in Tmdb
 	Upd: Change series packs are displayed in Omicron/Charisma templates
 	Fix: Rename TMDB.php to TmdbAPI.php
