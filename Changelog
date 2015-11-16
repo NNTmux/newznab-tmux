@@ -1,4 +1,5 @@
 2015-11-16 DariusIII
+	Fix: Use rawurlencode in TVMaze/Client.php
 	Upd: Change how season packs are displayed
 	Chg: Remove spotnab from tmux
 	Upd: Speed up cover view browsing, optimize SpotNab
