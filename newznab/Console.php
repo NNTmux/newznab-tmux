@@ -72,8 +72,8 @@ class Console
 	public function __construct(array $options =[])
 	{
 		$defaults = [
-			'Echo'     => false,
-			'Settings' => null,
+				'Echo'     => false,
+				'Settings' => null,
 		];
 		$options += $defaults;
 
@@ -98,10 +98,10 @@ class Console
 	public function getConsoleInfo($id)
 	{
 		return $this->pdo->queryOneRow(
-			sprintf(
-				"SELECT consoleinfo.*, genres.title AS genres FROM consoleinfo LEFT OUTER JOIN genres ON genres.id = consoleinfo.genreid WHERE consoleinfo.id = %d ",
-				$id
-			)
+				sprintf(
+						"SELECT consoleinfo.*, genres.title AS genres FROM consoleinfo LEFT OUTER JOIN genres ON genres.id = consoleinfo.genreid WHERE consoleinfo.id = %d ",
+						$id
+				)
 		);
 	}
 
@@ -127,7 +127,7 @@ class Console
 				}
 			}
 			$searchwords = trim($searchwords);
-			$searchsql .= sprintf(" MATCH(title, platform) AGAINST(%s IN BOOLEAN MODE)", $this->pdo->escapeString($searchwords));
+			$searchsql .= sprintf(" MATCH(title, platform) AGAINST(%s IN BOOLEAN MODE) AND platform = %s", $this->pdo->escapeString($searchwords), $this->pdo->escapeString($platform));
 		}
 		return $this->pdo->queryOneRow(sprintf("SELECT * FROM consoleinfo WHERE %s", $searchsql));
 	}
@@ -135,10 +135,10 @@ class Console
 	public function getRange($start, $num)
 	{
 		return $this->pdo->query(
-			sprintf(
-				"SELECT * FROM consoleinfo ORDER BY createddate DESC %s",
-				($start === false ? '' : ('LIMIT ' . $num . ' OFFSET ' . $start))
-			)
+				sprintf(
+						"SELECT * FROM consoleinfo ORDER BY createddate DESC %s",
+						($start === false ? '' : ('LIMIT ' . $num . ' OFFSET ' . $start))
+				)
 		);
 	}
 
@@ -148,41 +148,36 @@ class Console
 		return ($res === false ? 0 : $res['num']);
 	}
 
-	public function getConsoleCount($cat, $maxage = -1, $excludedcats =[])
+	public function getConsoleCount($cat, $maxage = -1, $excludedcats = [])
 	{
 		$catsrch = '';
 		if (count($cat) > 0 && $cat[0] != -1) {
 			$catsrch = (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat);
 		}
 
-		$res = $this->pdo->queryOneRow(
-			sprintf("
+		$res = $this->pdo->query(
+				sprintf("
 				SELECT COUNT(DISTINCT r.consoleinfoid) AS num
 				FROM releases r
 				INNER JOIN consoleinfo con ON con.id = r.consoleinfoid AND con.title != '' AND con.cover = 1
 				WHERE r.nzbstatus = 1
 				AND r.passwordstatus %s
+				AND con.title != ''
 				AND %s %s %s %s",
-				Releases::showPasswords($this->pdo),
-				$this->getBrowseBy(),
-				$catsrch,
-				($maxage > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxage) : ''),
-				(count($excludedcats) > 0 ? (' AND r.categoryid NOT IN (' . implode(',', $excludedcats) . ')') : '')
-			)
+						Releases::showPasswords($this->pdo),
+						$this->getBrowseBy(),
+						$catsrch,
+						($maxage > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxage) : ''),
+						(count($excludedcats) > 0 ? (' AND r.categoryid NOT IN (' . implode(',', $excludedcats) . ')') : '')
+				), true, NN_CACHE_EXPIRY_MEDIUM
 		);
-		return ($res === false ? 0 : $res["num"]);
+		return (isset($res[0]["num"]) ? $res[0]["num"] : 0);
 	}
 
-	public function getConsoleRange($cat, $start, $num, $orderby, $excludedcats =[])
+	public function getConsoleRange($cat, $start, $num, $orderby, $excludedcats = [])
 	{
 
 		$browseby = $this->getBrowseBy();
-
-		if ($start === false) {
-			$limit = "";
-		} else {
-			$limit = " LIMIT " . $num . " OFFSET " . $start;
-		}
 
 		$catsrch = '';
 		if (count($cat) > 0 && $cat[0] != -1) {
@@ -195,32 +190,79 @@ class Console
 		}
 
 		$order = $this->getConsoleOrder($orderby);
+
+		$consoles = $this->pdo->query(
+				sprintf("
+				SELECT con.id
+				FROM consoleinfo con
+				LEFT JOIN releases r ON con.id = r.consoleinfoid
+				WHERE r.nzbstatus = 1
+				AND con.title != ''
+				AND con.cover = 1
+				AND r.passwordstatus %s
+				AND %s %s %s
+				GROUP BY con.id
+				ORDER BY %s %s %s",
+						Releases::showPasswords($this->pdo),
+						$browseby,
+						$catsrch,
+						$exccatlist,
+						$order[0],
+						$order[1],
+						($start === false ? '' : ' LIMIT ' . $num . ' OFFSET ' . $start)
+				), true, NN_CACHE_EXPIRY_MEDIUM
+		);
+
+		$consoleIDs = false;
+
+		if (is_array($consoles)) {
+			foreach ($consoles AS $console => $id) {
+				$consoleIDs[] = $id['id'];
+			}
+		}
+
 		return $this->pdo->query(
-			sprintf(
-				"SELECT GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id, "
-				. "GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') as grp_rarinnerfilecount, "
-				. "GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') AS grp_haspreview, "
-				. "GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_password, "
-				. "GROUP_CONCAT(r.guid ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_guid, "
-				. "GROUP_CONCAT(rn.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_nfoid, "
-				. "GROUP_CONCAT(groups.name ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grpname, "
-				. "GROUP_CONCAT(r.searchname ORDER BY r.postdate DESC SEPARATOR '#') AS grp_release_name, "
-				. "GROUP_CONCAT(r.postdate ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_postdate, "
-				. "GROUP_CONCAT(r.size ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_size, "
-				. "GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_totalparts, "
-				. "GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_comments, "
-				. "GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grabs, "
-				. "con.*, r.consoleinfoid, groups.name AS group_name, rn.id as nfoid FROM releases r "
-				. "LEFT OUTER JOIN groups ON groups.id = r.groupid "
-				. "LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id "
-				. "INNER JOIN consoleinfo con ON con.id = r.consoleinfoid "
-				. "INNER JOIN genres ON con.genreid = genres.id "
-				. "WHERE r.nzbstatus = 1 AND con.title != '' AND "
-				. "r.passwordstatus %s AND %s %s %s "
-				. "GROUP BY con.id ORDER BY %s %s" . $limit,
-				Releases::showPasswords($this->pdo),
-				$browseby, $catsrch, $exccatlist, $order[0], $order[1]
-			), true, NN_CACHE_EXPIRY_MEDIUM
+				sprintf("
+				SELECT
+					GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id,
+					GROUP_CONCAT(r.rarinnerfilecount ORDER BY r.postdate DESC SEPARATOR ',') as grp_rarinnerfilecount,
+					GROUP_CONCAT(r.haspreview ORDER BY r.postdate DESC SEPARATOR ',') AS grp_haspreview,
+					GROUP_CONCAT(r.passwordstatus ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_password,
+					GROUP_CONCAT(r.guid ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_guid,
+					GROUP_CONCAT(rn.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_nfoid,
+					GROUP_CONCAT(g.name ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grpname,
+					GROUP_CONCAT(r.searchname ORDER BY r.postdate DESC SEPARATOR '#') AS grp_release_name,
+					GROUP_CONCAT(r.postdate ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_postdate,
+					GROUP_CONCAT(r.size ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_size,
+					GROUP_CONCAT(r.totalpart ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_totalparts,
+					GROUP_CONCAT(r.comments ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_comments,
+					GROUP_CONCAT(r.grabs ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_grabs,
+				con.*,
+				r.consoleinfoid,
+				g.name AS group_name,
+				genres.title AS genre,
+				rn.id AS nfoid
+				FROM releases r
+				LEFT OUTER JOIN groups g ON g.id = r.groupid
+				LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
+				INNER JOIN consoleinfo con ON con.id = r.consoleinfoid
+				INNER JOIN genres ON con.genreid = genres.id
+				WHERE r.nzbstatus = 1
+				AND con.id IN (%s)
+				AND con.title != ''
+				AND con.cover = 1
+				AND r.passwordstatus %s
+				AND %s %s %s
+				GROUP BY con.id
+				ORDER BY %s %s",
+						(is_array($consoleIDs) ? implode(',', $consoleIDs) : -1),
+						Releases::showPasswords($this->pdo),
+						$browseby,
+						$catsrch,
+						$exccatlist,
+						$order[0],
+						$order[1]
+				), true, NN_CACHE_EXPIRY_MEDIUM
 		);
 	}
 
@@ -305,25 +347,25 @@ class Console
 	public function update($id, $title, $asin, $url, $salesrank, $platform, $publisher, $releasedate, $esrb, $cover, $genreID, $review = 'review')
 	{
 		$this->pdo->queryExec(
-			sprintf("
+				sprintf("
 				UPDATE consoleinfo
 				SET
 					title = %s, asin = %s, url = %s, salesrank = %s, platform = %s, publisher = %s,
 					releasedate= %s, esrb = %s, cover = %d, genreid = %d, review = %s, updateddate = NOW()
 				WHERE id = %d",
-				$this->pdo->escapeString($title),
-				$this->pdo->escapeString($asin),
-				$this->pdo->escapeString($url),
-				$salesrank,
-				$this->pdo->escapeString($platform),
-				$this->pdo->escapeString($publisher),
-				$this->pdo->escapeString($releasedate),
-				$this->pdo->escapeString($esrb),
-				$cover,
-				$genreID,
-				($review == 'review' ? $review : $this->pdo->escapeString(substr($review, 0, 3000))),
-				$id
-			)
+						$this->pdo->escapeString($title),
+						$this->pdo->escapeString($asin),
+						$this->pdo->escapeString($url),
+						$salesrank,
+						$this->pdo->escapeString($platform),
+						$this->pdo->escapeString($publisher),
+						($releasedate != "" ? $this->pdo->escapeString($releasedate) : "null"),
+						$this->pdo->escapeString($esrb),
+						$cover,
+						$genreID,
+						($review == 'review' ? $review : $this->pdo->escapeString(substr($review, 0, 3000))),
+						$id
+				)
 		);
 	}
 
@@ -364,13 +406,13 @@ class Console
 				if ($this->echooutput) {
 					if ($consoleId !== -2) {
 						$this->pdo->log->doEcho(
-							$this->pdo->log->header("Added/updated game: ") .
-							$this->pdo->log->alternateOver("   Title:    ") .
-							$this->pdo->log->primary($con['title']) .
-							$this->pdo->log->alternateOver("   Platform: ") .
-							$this->pdo->log->primary($con['platform']) .
-							$this->pdo->log->alternateOver("   Genre: ") .
-							$this->pdo->log->primary($con['consolegenre'])
+								$this->pdo->log->header("Added/updated game: ") .
+								$this->pdo->log->alternateOver("   Title:    ") .
+								$this->pdo->log->primary($con['title']) .
+								$this->pdo->log->alternateOver("   Platform: ") .
+								$this->pdo->log->primary($con['platform']) .
+								$this->pdo->log->alternateOver("   Genre: ") .
+								$this->pdo->log->primary($con['consolegenre'])
 						);
 					}
 				}
@@ -536,12 +578,12 @@ class Console
 			$genreKey = array_search(strtolower($genreName), $genreassoc);
 		} else {
 			$genreKey = $this->pdo->queryInsert(
-				sprintf("
+					sprintf("
 									INSERT INTO genres (title, type)
 									VALUES (%s, %d)",
-					$this->pdo->escapeString($genreName),
-					Genres::CONSOLE_TYPE
-				)
+							$this->pdo->escapeString($genreName),
+							Genres::CONSOLE_TYPE
+					)
 			);
 		}
 		return $genreKey;
@@ -633,31 +675,31 @@ class Console
 		$ri = new ReleaseImage($this->pdo);
 
 		$check = $this->pdo->queryOneRow(
-			sprintf('
+				sprintf('
 							SELECT id
 							FROM consoleinfo
 							WHERE asin = %s',
-				$this->pdo->escapeString($con['asin'])
-			)
+						$this->pdo->escapeString($con['asin'])
+				)
 		);
 
 		if ($check === false) {
 			$consoleId = $this->pdo->queryInsert(
-				sprintf(
-					"INSERT INTO consoleinfo (title, asin, url, salesrank, platform, publisher, genreid, esrb, releasedate, review, cover, createddate, updateddate)
+					sprintf(
+							"INSERT INTO consoleinfo (title, asin, url, salesrank, platform, publisher, genreid, esrb, releasedate, review, cover, createddate, updateddate)
 					VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %d, NOW(), NOW())",
-					$this->pdo->escapeString($con['title']),
-					$this->pdo->escapeString($con['asin']),
-					$this->pdo->escapeString($con['url']),
-					$con['salesrank'],
-					$this->pdo->escapeString($con['platform']),
-					$this->pdo->escapeString($con['publisher']),
-					($con['consolegenreid'] == -1 ? "null" : $con['consolegenreid']),
-					$this->pdo->escapeString($con['esrb']),
-					($con['releasedate'] != "" ? $this->pdo->escapeString($con['releasedate']) : "null"),
-					$this->pdo->escapeString(substr($con['review'], 0, 3000)),
-					$con['cover']
-				)
+							$this->pdo->escapeString($con['title']),
+							$this->pdo->escapeString($con['asin']),
+							$this->pdo->escapeString($con['url']),
+							$con['salesrank'],
+							$this->pdo->escapeString($con['platform']),
+							$this->pdo->escapeString($con['publisher']),
+							($con['consolegenreid'] == -1 ? "null" : $con['consolegenreid']),
+							$this->pdo->escapeString($con['esrb']),
+							($con['releasedate'] != "" ? $this->pdo->escapeString($con['releasedate']) : "null"),
+							$this->pdo->escapeString(substr($con['review'], 0, 3000)),
+							$con['cover']
+					)
 			);
 			if($con['cover'] === 1){
 				$con['cover'] = $ri->saveImage($consoleId, $con['coverurl'], $this->imgSavePath, 250, 250);
@@ -670,9 +712,9 @@ class Console
 			}
 
 			$this->update(
-				$consoleId, $con['title'], $con['asin'], $con['url'], $con['salesrank'],
-				$con['platform'], $con['publisher'], (isset($con['releasedate']) ? $con['releasedate']: null), $con['esrb'],
-				$con['cover'], $con['consolegenreid'], (isset($con['review']) ? $con['review'] : null)
+					$consoleId, $con['title'], $con['asin'], $con['url'], $con['salesrank'],
+					$con['platform'], $con['publisher'], (isset($con['releasedate']) ? $con['releasedate']: null), $con['esrb'],
+					$con['cover'], $con['consolegenreid'], (isset($con['review']) ? $con['review'] : null)
 			);
 		}
 		return $consoleId;
@@ -683,11 +725,11 @@ class Console
 		$conf = new GenericConfiguration();
 		try {
 			$conf
-				->setCountry('com')
-				->setAccessKey($this->pubkey)
-				->setSecretKey($this->privkey)
-				->setAssociateTag($this->asstag)
-				->setResponseTransformer('\libs\ApaiIO\ResponseTransformer\XmlToSimpleXmlObject');
+					->setCountry('com')
+					->setAccessKey($this->pubkey)
+					->setSecretKey($this->privkey)
+					->setAssociateTag($this->asstag)
+					->setResponseTransformer('\libs\ApaiIO\ResponseTransformer\XmlToSimpleXmlObject');
 		} catch (\Exception $e) {
 			echo $e->getMessage();
 		}
@@ -721,7 +763,7 @@ class Console
 	public function processConsoleReleases()
 	{
 		$res = $this->pdo->queryDirect(
-			sprintf('
+				sprintf('
 							SELECT searchname, id
 							FROM releases
 							WHERE nzbstatus = %d %s
@@ -729,10 +771,10 @@ class Console
 							AND categoryid BETWEEN 1000 AND 1999
 							ORDER BY postdate DESC
 							LIMIT %d',
-				NZB::NZB_ADDED,
-				$this->renamed,
-				$this->gameqty
-			)
+						NZB::NZB_ADDED,
+						$this->renamed,
+						$this->gameqty
+				)
 		);
 
 		if ($res instanceof \Traversable && $res->rowCount() > 0) {
@@ -750,12 +792,12 @@ class Console
 				if ($gameInfo !== false) {
 					if ($this->echooutput) {
 						$this->pdo->log->doEcho(
-							$this->pdo->log->headerOver('Looking up: ') .
-							$this->pdo->log->primary(
-								$gameInfo['title'] .
-								' (' .
-								$gameInfo['platform'] . ')'
-							)
+								$this->pdo->log->headerOver('Looking up: ') .
+								$this->pdo->log->primary(
+										$gameInfo['title'] .
+										' (' .
+										$gameInfo['platform'] . ')'
+								)
 						);
 					}
 
@@ -778,9 +820,9 @@ class Console
 					} else {
 						if ($this->echooutput) {
 							$this->pdo->log->doEcho(
-								$this->pdo->log->headerOver("Found Local: ") .
-								$this->pdo->log->primary("{$gameCheck['title']} - {$gameCheck['platform']}") .
-								PHP_EOL
+									$this->pdo->log->headerOver("Found Local: ") .
+									$this->pdo->log->primary("{$gameCheck['title']} - {$gameCheck['platform']}") .
+									PHP_EOL
 							);
 						}
 						$gameId = $gameCheck['id'];
@@ -792,13 +834,13 @@ class Console
 
 				// Update release.
 				$this->pdo->queryExec(
-					sprintf('
+						sprintf('
 								UPDATE releases
 								SET consoleinfoid = %d
 								WHERE id = %d',
-						$gameId,
-						$arr['id']
-					)
+								$gameId,
+								$arr['id']
+						)
 				);
 
 				// Sleep to not flood amazon.
@@ -1019,4 +1061,6 @@ class Console
 
 		return ($str != '') ? $str : false;
 	}
+
+
 }
