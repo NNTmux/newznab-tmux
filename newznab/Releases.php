@@ -609,7 +609,7 @@ class Releases
 				LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
 				LEFT OUTER JOIN release_comments rc ON rc.releaseid = r.id
 				LEFT OUTER JOIN userdownloads uc ON uc.releaseid = r.id
-				LEFT OUTER JOIN releasefiles rf ON rf.releaseid = r.id
+				LEFT OUTER JOIN release_files rf ON rf.releaseid = r.id
 				LEFT OUTER JOIN releaseaudio ra ON ra.releaseid = r.id
 				LEFT OUTER JOIN releasesubs rs ON rs.releaseid = r.id
 				LEFT OUTER JOIN releasevideo rv ON rv.releaseid = r.id

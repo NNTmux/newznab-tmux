@@ -38,7 +38,7 @@ if (!isset($argv[1])) {
 		$release = $pieces[1];
 		if ($res = $db->queryOneRow(sprintf('SELECT relfiles.name AS textstring, rel.categoryid, rel.searchname, '
 				. 'rel.groupid, relfiles.releaseid AS fileid, rel.id AS releaseid, rel.name FROM releases rel '
-				. 'INNER JOIN releasefiles relfiles ON (relfiles.releaseid = rel.id) WHERE rel.id = %d', $release))) {
+				. 'INNER JOIN release_files relfiles ON (relfiles.releaseid = rel.id) WHERE rel.id = %d', $release))) {
 			$namefixer->done = $namefixer->matched = false;
 			if ($namefixer->checkName($res, true, 'Filenames, ', 1, 1) !== true) {
 				echo '.';
@@ -47,7 +47,7 @@ if (!isset($argv[1])) {
 		}
 	} else if (isset($pieces[1]) && $pieces[0] == 'md5') {
 		$release = $pieces[1];
-		if ($res = $db->queryOneRow(sprintf('SELECT r.id AS releaseid, r.name, r.searchname, r.categoryid, r.groupid, dehashstatus, rf.name AS filename FROM releases r LEFT JOIN releasefiles rf ON r.id = rf.releaseid WHERE r.id = %d', $release))) {
+		if ($res = $db->queryOneRow(sprintf('SELECT r.id AS releaseid, r.name, r.searchname, r.categoryid, r.groupid, dehashstatus, rf.name AS filename FROM releases r LEFT JOIN release_files rf ON r.id = rf.releaseid WHERE r.id = %d', $release))) {
 			if (preg_match('/[a-fA-F0-9]{32,40}/i', $res['name'], $matches)) {
 				$namefixer->matchPredbHash($matches[0], $res, 1, 1, true, 1);
 			} else if (preg_match('/[a-fA-F0-9]{32,40}/i', $res['filename'], $matches)) {

@@ -23,7 +23,7 @@ function populate_rt($table = '')
 		case 'releases_rt':
 			$pdo->queryDirect('SET SESSION group_concat_max_len=8192');
 			$rows = $pdo->queryExec('SELECT r.id, r.name, r.searchname, r.fromname, IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename
-				FROM releases r LEFT JOIN releasefiles rf ON(r.id=rf.releaseid) GROUP BY r.id'
+				FROM releases r LEFT JOIN release_files rf ON(r.id=rf.releaseid) GROUP BY r.id'
 			);
 			$rtvalues = '(id, name, searchname, fromname, filename)';
 			break;

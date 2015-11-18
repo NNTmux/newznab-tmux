@@ -36,7 +36,7 @@ class Sphinx
     {
         $this->pdo = new Settings();
 		$this->nzb  = new NZB;
-		$this->indexes = array("releases", "releasefiles",
+		$this->indexes = array("releases", "release_files",
 		                       "releasenfo", "nzbs", "predb");
     }
 
@@ -407,7 +407,7 @@ class Sphinx
                 return true;    // Always enabled, as long as Sphinx is
             case "releasenfo":
                 return (bool)$this->pdo->getSetting('sphinxindexnfos');
-            case "releasefiles":
+            case "release_files":
                 return (bool)$this->pdo->getSetting('sphinxindexreleasefiles');
             case "nzbs":
                 return (bool)$this->pdo->getSetting('sphinxindexnzbs');

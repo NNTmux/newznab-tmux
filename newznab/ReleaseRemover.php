@@ -438,7 +438,7 @@ class ReleaseRemover
 		$this->query = sprintf(
 			"SELECT r.guid, r.searchname, r.id
 			FROM releases r %s
-			STRAIGHT_JOIN releasefiles rf ON r.id = rf.releaseid
+			STRAIGHT_JOIN release_files rf ON r.id = rf.releaseid
 			WHERE r.searchname NOT REGEXP %s
 			AND rf.name %s
 			AND r.categoryid NOT IN (%d, %d, %d, %d, %d, %d) %s %s",
@@ -485,7 +485,7 @@ class ReleaseRemover
 		$this->query = sprintf(
 			"SELECT r.guid, r.searchname, r.id
 			FROM releases r %s
-			STRAIGHT_JOIN releasefiles rf ON r.id = rf.releaseid
+			STRAIGHT_JOIN release_files rf ON r.id = rf.releaseid
 			WHERE rf.name %s %s",
 			$ftJoin,
 			$this->pdo->likeString('install.bin', true, true),
@@ -523,7 +523,7 @@ class ReleaseRemover
 		$this->query = sprintf(
 			"SELECT r.guid, r.searchname, r.id
 			FROM releases r %s
-			STRAIGHT_JOIN releasefiles rf ON r.id = rf.releaseid
+			STRAIGHT_JOIN release_files rf ON r.id = rf.releaseid
 			WHERE rf.name %s %s %s",
 			$ftJoin,
 			$this->pdo->likeString('password.url', true, true),
@@ -735,7 +735,7 @@ class ReleaseRemover
 		$this->query = sprintf(
 			"SELECT r.guid, r.searchname, r.id
 			FROM releases r %s
-			STRAIGHT_JOIN releasefiles rf ON r.id = rf.releaseid
+			STRAIGHT_JOIN release_files rf ON r.id = rf.releaseid
 			WHERE (rf.name REGEXP '[.]scr[$ \"]' OR r.name REGEXP '[.]scr[$ \"]')
 			%s %s",
 			$ftJoin,
@@ -923,7 +923,7 @@ class ReleaseRemover
 					}
 				}
 
-				$regexSQL = sprintf("INNER JOIN releasefiles rf ON r.id = rf.releaseid
+				$regexSQL = sprintf("INNER JOIN release_files rf ON r.id = rf.releaseid
 				WHERE rf.name REGEXP %s ", $this->pdo->escapeString($regex['regex'])
 				);
 
@@ -1002,7 +1002,7 @@ class ReleaseRemover
 	{
 		$this->method = 'WMV_ALL';
 		$this->query = "SELECT DISTINCT r.guid, r.searchname
-				FROM releasefiles AS rf
+				FROM release_files AS rf
 				INNER JOIN releases r ON (rf.releaseid = r.id)
 				WHERE rf.name REGEXP 'x264.*\.wmv$'"
 		;
@@ -1063,7 +1063,7 @@ class ReleaseRemover
 
 		$codeclike = sprintf("
 				SELECT r.guid, r.searchname, r.id FROM releases r %s
-				STRAIGHT_JOIN releasefiles rf ON r.id = rf.releaseid
+				STRAIGHT_JOIN release_files rf ON r.id = rf.releaseid
 				WHERE %s %s AND
 					(rf.name %s OR rf.name %s OR
 					rf.name %s OR rf.name %s OR
@@ -1086,7 +1086,7 @@ class ReleaseRemover
 
 		$this->query = sprintf(
 			"SELECT r.guid, r.searchname, r.id FROM releases r %s
-			STRAIGHT_JOIN releasefiles rf ON r.id = rf.releaseid
+			STRAIGHT_JOIN release_files rf ON r.id = rf.releaseid
 			WHERE %s %s
 			AND (%s OR %s) %s
 			UNION %s",

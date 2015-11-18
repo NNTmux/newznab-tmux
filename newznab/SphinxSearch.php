@@ -109,7 +109,7 @@ class SphinxSearch
 				sprintf('
 							SELECT r.id, r.name, r.searchname, r.fromname, IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename
 							FROM releases r
-							LEFT JOIN releasefiles rf ON (r.id=rf.releaseid)
+							LEFT JOIN release_files rf ON (r.id=rf.releaseid)
 							WHERE r.id = %d
 							GROUP BY r.id LIMIT 1',
 					$releaseID
