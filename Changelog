@@ -1,3 +1,5 @@
+2015-11-18 DariusIII
+	Fix: TVMaze processing
 2015-11-16 DariusIII
 	Fix: Use rawurlencode in JPinkney/TVMaze/Client.php
 	Fix: Add covers path to constants.php
