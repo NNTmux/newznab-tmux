@@ -18,7 +18,7 @@ CREATE PROCEDURE update_collections()
       IF done
       THEN LEAVE alter_loop; END IF;
       SET @SQL := CONCAT("ALTER IGNORE TABLE ", tname,
-                       " ADD noise CHAR(32) NOT NULL DEFAULT '' AFTER releaseid COMMENT 'FK to collections table'");
+                       " ADD noise CHAR(32) NOT NULL DEFAULT '' COMMENT 'FK to collections table' AFTER releaseid");
       PREPARE _stmt FROM @SQL;
       EXECUTE _stmt;
       DEALLOCATE PREPARE _stmt;
