@@ -404,8 +404,8 @@ class PostProcess
 					if ($filesAdded < 11 &&
 							$this->pdo->queryOneRow(
 									sprintf('
-								SELECT id
-								FROM releasefiles
+								SELECT releaseid
+								FROM release_files
 								WHERE releaseid = %d
 								AND name = %s',
 											$relID,

@@ -1,5 +1,6 @@
 <?php
 namespace newznab;
+
 /**
  *
  * Sphinx search extension for Newznab.
@@ -33,10 +34,10 @@ class Sphinx
      */
     function __construct()
     {
-		$this->nzb  = new NZB;
-		$this->pdo = new Settings();
-		$this->indexes = array("releases", "releasefiles",
-		                       "releasenfo", "nzbs", "predb");
+        $this->pdo = new Settings();
+        $this->nzb  = new NZB;
+        $this->indexes = array("releases", "release_files",
+                               "releasenfo", "nzbs", "predb");
     }
 
     /**
@@ -83,7 +84,7 @@ class Sphinx
     public function getNextRebuildDate()
     {
         $rebuildStr = $this->pdo->getSetting('sphinxrebuildfreq_day')." "
-                    . $this->pdo->getSetting('sphinxrebuildfreq');
+            . $this->pdo->getSetting('sphinxrebuildfreq');
         $rebuildDate = strtotime($rebuildStr);
         if ($rebuildDate < time(true)) {
             // Date is in the past, pick the next one
@@ -108,24 +109,22 @@ class Sphinx
             return false;
         }
 
-        $db = new Settings();
-
         if ($lastRebuildDate == 0) {
             $lastRebuildDate = "NOW()";
         } else {
             $lastRebuildDate = sprintf("FROM_UNIXTIME(%d)", $lastRebuildDate);
         }
 
-        $index = $db->escapeString($index);
+        $index = $this->pdo->escapeString($index);
         $nextRebuildDate = sprintf("FROM_UNIXTIME(%d)",
-                                                $this->getNextRebuildDate());
+            $this->getNextRebuildDate());
 
         $sql = "UPDATE sphinx "
-             . "SET lastrebuilddate = %s, "
-             . "nextrebuilddate = %s "
-             . "WHERE name = %s";
-        $db->queryDirect(sprintf($sql, $lastRebuildDate, $nextRebuildDate,
-                                 $index));
+            . "SET lastrebuilddate = %s, "
+            . "nextrebuilddate = %s "
+            . "WHERE name = %s";
+        $this->pdo->queryDirect(sprintf($sql, $lastRebuildDate, $nextRebuildDate,
+            $index));
         return true;
     }
 
@@ -146,24 +145,22 @@ class Sphinx
             return false;
         }
 
-        $db = new Settings();
-
         if ($lastMergedDate == 0) {
             $lastMergedDate = "NOW()";
         } else {
             $lastMergedDate = sprintf("FROM_UNIXTIME(%d)", $lastMergedDate);
         }
 
-        $index = $db->escapeString($index);
+        $index = $this->pdo->escapeString($index);
         $nextMergeDate = sprintf("FROM_UNIXTIME(%d)",
-                                            $this->getNextMergeDate());
+            $this->getNextMergeDate());
 
         $sql = "UPDATE sphinx "
-             . "SET lastmergedate = %s, "
-             . "nextmergedate = %s "
-             . "WHERE name = %s";
-        $db->queryDirect(sprintf($sql, $lastMergedDate, $nextMergeDate,
-                                 $index));
+            . "SET lastmergedate = %s, "
+            . "nextmergedate = %s "
+            . "WHERE name = %s";
+        $this->pdo->queryDirect(sprintf($sql, $lastMergedDate, $nextMergeDate,
+            $index));
         return true;
     }
 
@@ -221,7 +218,7 @@ class Sphinx
         }
         $indexer = $this->getSphinxBinPath("indexer");
         $cmd = sprintf("%s --rotate --merge %s %s", $indexer, $index,
-                                                    $index."_delta");
+            $index."_delta");
         $this->runCmd($cmd);
 
         if ($updateDates) {
@@ -268,7 +265,7 @@ class Sphinx
                 if ($indexPath) {
                     $indexer = $this->getSphinxBinPath("indextool");
                     $cmd = sprintf("%s --dumpheader %s.sph", $indexer,
-                                        $indexPath);
+                        $indexPath);
                     foreach($this->runCmd($cmd, false) as $line) {
                         preg_match("/^[ ]*(?P<key>[\d\w- ]+)[ ]*:[ ]*(?P<value>.+)$/", $line, $matches);
                         if ($matches) {
@@ -306,8 +303,6 @@ class Sphinx
      */
     public function update()
     {
-        $db = new Settings();
-
         if (!$this->pdo->getSetting('sphinxenabled')) {
             // Sphinx is disabled, so we don't do anything.
             return;
@@ -315,8 +310,8 @@ class Sphinx
 
         // Loop over the enabled indexes and see what operations are due
         $sql = "SELECT * FROM sphinx";
-        $res = $db->queryDirect($sql);
-        while ($row = $db->getAssocArray($res)) {
+        $res = $this->pdo->queryDirect($sql);
+        while ($row = $this->pdo->getAssocArray($res)) {
             $index = $row["name"];
 
             if (!$this->isIndexEnabled($row["name"])) {
@@ -326,10 +321,10 @@ class Sphinx
             $indexDetails = $this->indexDetails($index);
             $isMergeDueDate = (strtotime($row['nextmergedate']) <= time(true));
             $isMergeDueSize = (intval($indexDetails["total-documents"]) >=
-                               intval($this->pdo->getSetting('sphinxmergefreq_count')));
+                intval($this->pdo->getSetting('sphinxmergefreq_count')));
 
             if (strtotime($row['nextrebuilddate']) <= time(true) &&
-				$this->pdo->getSetting('sphinxrebuildfreq_day') != "")
+                $this->pdo->getSetting('sphinxrebuildfreq_day') != "")
             {
                 // Rebuild required
                 printf("Index '%s' is going to be rebuilt.\n", $index);
@@ -342,8 +337,8 @@ class Sphinx
                     printf("Index '%s_delta' is due for merging.\n", $index);
                 } else if ($isMergeDueSize) {
                     printf("Index '%s_delta' has grown above critical size ".
-                           "and will be merged (contains %s records).\n",
-                           $index, $indexDetails["total-documents"]);
+                        "and will be merged (contains %s records).\n",
+                        $index, $indexDetails["total-documents"]);
                 }
 
                 if ($this->mergeIndex($index)) {
@@ -387,7 +382,7 @@ class Sphinx
         $path .= $bin;
 
         // The '-c' sets the config file (sphinx.conf).
-		$path = sprintf("\"%s\" -c \"%s\"", trim($path), $conf);
+        $path = sprintf("\"%s\" -c \"%s\"", trim($path), $conf);
         return $path;
     }
 
@@ -412,7 +407,7 @@ class Sphinx
                 return true;    // Always enabled, as long as Sphinx is
             case "releasenfo":
                 return (bool)$this->pdo->getSetting('sphinxindexnfos');
-            case "releasefiles":
+            case "release_files":
                 return (bool)$this->pdo->getSetting('sphinxindexreleasefiles');
             case "nzbs":
                 return (bool)$this->pdo->getSetting('sphinxindexnzbs');
@@ -534,7 +529,7 @@ class Sphinx
 
         // Get connection to Sphinx's MySQL interface.
         // Connect to Sphinx
-		$hostport = explode (":", $this->pdo->getSetting('sphinxserverhost'));
+        $hostport = explode (":", $this->pdo->getSetting('sphinxserverhost'));
         $sdb = mysqli_connect($hostport[0], "root", "", "", $hostport[1]);
         if (!$sdb) {
             // Couldn't connect to Sphinx.
@@ -542,7 +537,6 @@ class Sphinx
         }
 
         // Get connection to Newznab's MySQL database
-        $ndb = new Settings;
 
         // Determine which release to start with
         if ($startingID < 0) {
@@ -565,13 +559,13 @@ class Sphinx
         printf("starting from id %d\n", $startingID);
         $numIndexed = 0;
         $sql = "SELECT id, guid FROM releases "
-             . "WHERE id >= %d ORDER BY id ASC";
+            . "WHERE id >= %d ORDER BY id ASC";
         $result = $ndb->queryDirect(sprintf($sql, $startingID));
         $startTime = microtime(true);
         while ($row = $ndb->getAssocArray($result)) {
             $fileNames = "";
             $fileCount = 0;
-            $nzbpath = $this->nzb->getNZBPath($row['guid'], $this->pdo->getSetting('nzbpath'));
+            $nzbpath = $this->nzb->NZBPath($row['guid'], $this->pdo->getSetting('nzbpath'));
             if (file_exists($nzbpath)) {
                 $nzbfile = file_get_contents('compress.zlib://'.$nzbpath);
                 $files = $this->nzb->nzbFileList($nzbfile);
@@ -583,8 +577,8 @@ class Sphinx
                 }
             }
             $sql = sprintf("REPLACE INTO nzbs VALUES (%d, %s, %d)",
-                            $row['id'], $ndb->escapeString($fileNames),
-                            $fileCount);
+                $row['id'], $ndb->escapeString($fileNames),
+                $fileCount);
             if (!mysqli_query($sdb, $sql)) {
                 printf("error indexing NZB: %s\n", mysqli_error($sdb));
                 continue;
@@ -623,12 +617,12 @@ class Sphinx
     public function searchDirect($sphinxQuery, $lookupQuery="", $useCache=false)
     {
         $cache = new Cache;
-		if ($useCache !== false && $cache->enabled && $cache->exists($sphinxQuery))
-		{
-			$ret = $cache->fetch($sphinxQuery);
-			if ($ret !== false)
-				return $ret;
-		}
+        if ($useCache !== false && $cache->enabled && $cache->exists($sphinxQuery))
+        {
+            $ret = $cache->fetch($sphinxQuery);
+            if ($ret !== false)
+                return $ret;
+        }
 
         // Connect to Sphinx
         $hostport = explode (":", $this->pdo->getSetting('sphinxserverhost'));
@@ -639,10 +633,10 @@ class Sphinx
         }
 
         // Get the results from Sphinx.
-		$lev = error_reporting();
-		error_reporting(0);
+        $lev = error_reporting();
+        error_reporting(0);
         $result = mysqli_query($sdb, $sphinxQuery);
-		error_reporting($lev);
+        error_reporting($lev);
 
         $error = mysqli_error($sdb);
         // A 1064 error means that the query is invalid, so we don't care
@@ -663,42 +657,41 @@ class Sphinx
         }
 
         $results = [];
-		if ($result)
-		{
-			while($row = mysqli_fetch_assoc($result)) {
-				if ($lookupQuery) {
-					// Save the IDs for a batch lookup.
-					$results[] = $row["id"];
-				} else {
-					$results[] = $row;
-				}
-			}
-		}
+        if ($result)
+        {
+            while($row = mysqli_fetch_assoc($result)) {
+                if ($lookupQuery) {
+                    // Save the IDs for a batch lookup.
+                    $results[] = $row["id"];
+                } else {
+                    $results[] = $row;
+                }
+            }
+        }
 
         if ($lookupQuery && count($results) > 0) {
-            $ndb = new Settings;
             $sql = sprintf($lookupQuery, implode(",", $results));
             $result = $ndb->queryDirect($sql);
-			if ($result)
-			{
-				$results = [];
-				while ($row = $ndb->getAssocArray($result)) {
-					$results[] = $row;
-				}
-			}
+            if ($result)
+            {
+                $results = [];
+                while ($row = $ndb->getAssocArray($result)) {
+                    $results[] = $row;
+                }
+            }
         }
 
         $count = 0;
         if ( count($results) > 0 && array_key_exists("total", $meta) ) {
             $count = (int)$meta["total_found"];
+            $results[0]["_totalrows"] = ($count > MAX_MATCHES) ? MAX_MATCHES : $count;
         }
 
         if ($useCache !== false && $cache->enabled)
-			$cache->store($sphinxQuery, $results, $useCache);
+            $cache->store($sphinxQuery, $results, $useCache);
 
         return $results;
     }
-
     /**
      * Constructs a SphinxQL query.
      *
@@ -715,16 +708,13 @@ class Sphinx
      * @param   array   $where
      * @param   string  $lookupQuery
      *
-     * @return mixed|string
      */
     public function buildQuery($search, $cat=[], $offset=0, $limit=100,
-                           $order=array("postdate", "desc"), $maxage=-1,
-                           $excludedcats=[], $grp=[],
-                           $indexes=[], $lookup=true, $where=[],
-                           &$lookupQuery="")
+                               $order=array("postdate", "desc"), $maxage=-1,
+                               $excludedcats=[], $grp=[],
+                               $indexes=[], $lookup=true, $where=[],
+                               &$lookupQuery="")
     {
-        $ndb = new Settings;
-
         $offset = intval($offset);
         $limit = intval($limit);
 
@@ -779,8 +769,8 @@ class Sphinx
                         // but Sphinx uses "-" as a the exclusion modifier
                         $q = str_replace("--", "-", $q);
 
-						// always add on * to Season based searches
-						$q = preg_replace('/([\. ]S\d{2})( |$)/i', '\1*\2', $q);
+                        // always add on * to Season based searches
+                        $q = preg_replace('/([\. ]S\d{2})( |$)/i', '\1*\2', $q);
 
                         // Construct the basic query
                         $search[$i] = sprintf("@(%s) ", $fields).$q;
@@ -825,7 +815,7 @@ class Sphinx
                             if (!in_array($child["id"], $categoryIDs)) {
                                 $categoryIDs[] = $child["id"];
                             }
-						}
+                        }
                     }
                 }
             }
@@ -845,7 +835,7 @@ class Sphinx
         // Categories to exclude.
         if (count($excludedcats) > 0) {
             $where[] = sprintf("categoryid NOT IN (%s)", implode(",",
-                                                            $excludedcats));
+                $excludedcats));
         }
 
         // Usenet groups to include.
@@ -853,9 +843,9 @@ class Sphinx
             foreach($grp as $i => $g) {
                 if (strpos($g, "a.b.") !== false) {
                     $sql = sprintf("SELECT id FROM groups "
-                                   ."WHERE name = %s",
-                                   $ndb->escapeString(str_replace("a.b.",
-                                                        "alt.binaries.", $g)));
+                        ."WHERE name = %s",
+                        $ndb->escapeString(str_replace("a.b.",
+                            "alt.binaries.", $g)));
                     $row = $ndb->queryOneRow($sql);
                     $grp[$i] = $row["id"];
                 }
@@ -877,8 +867,8 @@ class Sphinx
 
         // Build the full query.
         $q = sprintf("SELECT %s FROM %s ".(!empty($where)?"WHERE ":"")." %s %s LIMIT %d,%d",
-                        $select, $from, implode(" AND ", $where), $orderby,
-                        $offset, $limit);
+            $select, $from, implode(" AND ", $where), $orderby,
+            $offset, $limit);
 
         // Sphinx imposes a 1000 result limit (max_matches) by default, so in
         // order to access results beyond this, we need to tell it to do so
@@ -924,43 +914,43 @@ class Sphinx
         $lookupQuery = "";
         if ($lookup) {
             $lookupQuery .= "SELECT releases.*, "
-                          . "CONCAT(cp.title, ' > ', c.title) AS category_name, "
-                          . "CONCAT(cp.id, ',', c.id) AS category_ids, "
-                          . "groups.name as group_name, rn.id AS nfoid, "
-                          . "re.releaseid as reid, cp.id AS categoryParentID, "
-                          . "pre.ctime, pre.nuketype, "
-                          . "COALESCE(movieinfo.id, 0) AS movieinfoid "
-                          . "FROM releases "
-                          . "LEFT OUTER JOIN movieinfo "
-                          . "ON movieinfo.imdbid = releases.imdbid "
-                          . "LEFT OUTER JOIN releasevideo re "
-                          . "ON re.releaseid = releases.id "
-                          . "LEFT OUTER JOIN releasenfo rn "
-                          . "ON rn.releaseid = releases.id AND rn.nfo IS NOT NULL "
-                          . "LEFT OUTER JOIN groups "
-                          . "ON groups.id = releases.groupid "
-                          . "LEFT OUTER JOIN category c "
-                          . "ON c.id = releases.categoryid "
-                          . "LEFT OUTER JOIN category cp "
-                          . "ON cp.id = c.parentid "
-                          . "LEFT OUTER JOIN predb pre "
-                          . "ON pre.id = releases.preid "
-                          . "WHERE releases.passwordstatus <= (SELECT value "
-                          .      "FROM settings WHERE setting='showpasswordedrelease') "
-                          . "AND releases.id IN (%s)";
+                . "CONCAT(cp.title, ' > ', c.title) AS category_name, "
+                . "CONCAT(cp.id, ',', c.id) AS category_ids, "
+                . "groups.name as group_name, rn.id AS nfoid, "
+                . "re.releaseid as reid, cp.id AS categoryParentID, "
+                . "pre.ctime, pre.nuketype, "
+                . "COALESCE(movieinfo.id, 0) AS movieinfoid "
+                . "FROM releases "
+                . "LEFT OUTER JOIN movieinfo "
+                . "ON movieinfo.imdbid = releases.imdbid "
+                . "LEFT OUTER JOIN releasevideo re "
+                . "ON re.releaseid = releases.id "
+                . "LEFT OUTER JOIN releasenfo rn "
+                . "ON rn.releaseid = releases.id AND rn.nfo IS NOT NULL "
+                . "LEFT OUTER JOIN groups "
+                . "ON groups.id = releases.groupid "
+                . "LEFT OUTER JOIN category c "
+                . "ON c.id = releases.categoryid "
+                . "LEFT OUTER JOIN category cp "
+                . "ON cp.id = c.parentid "
+                . "LEFT OUTER JOIN predb pre "
+                . "ON pre.id = releases.preid "
+                . "WHERE releases.passwordstatus <= (SELECT value "
+                .      "FROM settings WHERE setting='showpasswordedrelease') "
+                . "AND releases.id IN (%s)";
         }
 
-		$where = [];
-		if ($minsize != -1) {
-			$where[] = sprintf("size > %d ", $minsize);
-		}
-		if ($maxsize != -1) {
-		   $where[] = sprintf("size < %d ", $maxsize);
-		}
+        $where = [];
+        if ($minsize != -1) {
+            $where[] = sprintf("size > %d ", $minsize);
+        }
+        if ($maxsize != -1) {
+            $where[] = sprintf("size < %d ", $maxsize);
+        }
 
         $sphinxQuery = $this->buildQuery(array($search), $cat, $offset, $limit,
-                                         $order, $maxage, $excludedcats, $grp,
-                                         $indexes, $lookup, $where, $lookupQuery);
+            $order, $maxage, $excludedcats, $grp,
+            $indexes, $lookup, $where, $lookupQuery);
         return $this->searchDirect($sphinxQuery, $lookupQuery, 180);
     }
 
@@ -972,32 +962,31 @@ class Sphinx
                                    $limit=100, $name="", $cat=array(-1),
                                    $maxage=-1, $indexes=[], $lookup=true)
     {
-        $db = new Settings();
         $order = array("postdate", "desc");
         $search = array($name);
         if ($series != "") {
-			//
-			// Exclude four digit series, which will be the year 2010 etc
-			//
-			if (is_numeric($series) && strlen($series) != 4) {
-			    $series = sprintf('S%02d', $series);
-			}
-			$search[] = sprintf("@season %s", $db->escapeString($series));
-		}
+            //
+            // Exclude four digit series, which will be the year 2010 etc
+            //
+            if (is_numeric($series) && strlen($series) != 4) {
+                $series = sprintf('S%02d', $series);
+            }
+            $search[] = sprintf("@season %s", $this->pdo->escapeString($series));
+        }
 
-		if ($episode != "") {
-			if (is_numeric($episode)) {
-			    $episode = sprintf('E%02d', $episode);
-			}
-			$search[] = sprintf("@episode %s", $db->escapeString($episode));
-		}
+        if ($episode != "") {
+            if (is_numeric($episode)) {
+                $episode = sprintf('E%02d', $episode);
+            }
+            $search[] = sprintf("@episode %s", $this->pdo->escapeString($episode));
+        }
 
-		$where = [];
-		if ($rageId != "-1") {
-		    $where[] = "videos_id = ".$rageId;
-		}
+        $where = [];
+        if ($rageId != "-1") {
+            $where[] = "rageid = ".$rageId;
+        }
 
-		if (count($indexes) == 0) {
+        if (count($indexes) == 0) {
             // Remove predb from the default list of indexes to search
             $indexes = $this->getAllEnabledIndexes(true, array('predb'));
         }
@@ -1005,28 +994,28 @@ class Sphinx
         $lookupQuery = "";
         if ($lookup) {
             $lookupQuery .= "SELECT releases.*, "
-                          . "CONCAT(cp.title, ' > ', c.title) AS category_name, "
-                          . "CONCAT(cp.id, ',', c.id) AS category_ids, "
-                          . "groups.name AS group_name, rn.id AS nfoid, "
-                          . "re.releaseid AS reid "
-                          . "FROM releases "
-                          . "LEFT OUTER JOIN category c "
-                          . "ON c.id = releases.categoryid "
-                          . "LEFT OUTER JOIN groups "
-                          . "ON groups.id = releases.groupid "
-                          . "LEFT OUTER JOIN releasevideo re "
-                          . "ON re.releaseid = releases.id "
-                          . "LEFT OUTER JOIN releasenfo rn "
-                          . "ON rn.releaseid = releases.id AND rn.nfo IS NOT NULL "
-                          . "LEFT OUTER JOIN category cp "
-                          . "ON cp.id = c.parentid "
-                          . "WHERE releases.passwordstatus <= (SELECT value "
-                          .      "FROM settings WHERE setting='showpasswordedrelease') "
-                          . "AND releases.id IN (%s)";
+                . "CONCAT(cp.title, ' > ', c.title) AS category_name, "
+                . "CONCAT(cp.id, ',', c.id) AS category_ids, "
+                . "groups.name AS group_name, rn.id AS nfoid, "
+                . "re.releaseid AS reid "
+                . "FROM releases "
+                . "LEFT OUTER JOIN category c "
+                . "ON c.id = releases.categoryid "
+                . "LEFT OUTER JOIN groups "
+                . "ON groups.id = releases.groupid "
+                . "LEFT OUTER JOIN releasevideo re "
+                . "ON re.releaseid = releases.id "
+                . "LEFT OUTER JOIN releasenfo rn "
+                . "ON rn.releaseid = releases.id AND rn.nfo IS NOT NULL "
+                . "LEFT OUTER JOIN category cp "
+                . "ON cp.id = c.parentid "
+                . "WHERE releases.passwordstatus <= (SELECT value "
+                .      "FROM settings WHERE setting='showpasswordedrelease') "
+                . "AND releases.id IN (%s)";
         }
         $sphinxQuery = $this->buildQuery($search, $cat, $offset, $limit, $order,
-                                         $maxage, [], [], $indexes,
-                                         $lookup, $where, $lookupQuery);
+            $maxage, [], [], $indexes,
+            $lookup, $where, $lookupQuery);
         return $this->searchDirect($sphinxQuery, $lookupQuery, 180);
     }
 
@@ -1038,23 +1027,22 @@ class Sphinx
                                    $cat=array(-1), $genre="", $maxage=-1,
                                    $indexes=[], $lookup=true)
     {
-        $db = new Settings();
         $search = [];
         $order = array("postdate", "desc");
         $where = [];
         if ($imdbId != "-1" && is_numeric($imdbId)) {
-			// Pad id with zeros just in case.
-			$imdbId = str_pad($imdbId, 7, "0", STR_PAD_LEFT);
-			$where[] = sprintf("imdbid = %d", $imdbId);
-		} else {
-			$where[] = sprintf("imdbid != 0", $imdbId);
-		}
+            // Pad id with zeros just in case.
+            $imdbId = str_pad($imdbId, 7, "0", STR_PAD_LEFT);
+            $where[] = sprintf("imdbid = %d", $imdbId);
+        } else {
+            $where[] = sprintf("imdbid != 0", $imdbId);
+        }
 
-		if ($genre != "") {
-		    $search[] = sprintf("@movieinfo_genre %s", $db->escapeString($genre));
-		}
+        if ($genre != "") {
+            $search[] = sprintf("@movieinfo_genre %s", $this->pdo->escapeString($genre));
+        }
 
-		if (count($indexes) == 0) {
+        if (count($indexes) == 0) {
             // Remove predb from the default list of indexes to search
             $indexes = $this->getAllEnabledIndexes(true, array('predb'));
         }
@@ -1062,37 +1050,37 @@ class Sphinx
         $lookupQuery = "";
         if ($lookup) {
             $lookupQuery .= "SELECT releases.*, "
-                          . "movieinfo.title AS moi_title, "
-                          . "movieinfo.tagline AS moi_tagline, "
-                          . "movieinfo.rating AS moi_rating, "
-                          . "movieinfo.plot AS moi_plot, "
-                          . "movieinfo.year AS moi_year, "
-                          . "movieinfo.genre AS moi_genre, "
-                          . "movieinfo.director AS moi_director, "
-                          . "movieinfo.actors AS moi_actors, "
-                          . "movieinfo.cover AS moi_cover, "
-                          . "movieinfo.backdrop AS moi_backdrop, "
-                          . "CONCAT(cp.title, ' > ', c.title) AS category_name, "
-                          . "CONCAT(cp.id, ',', c.id) AS category_ids, "
-                          . "groups.name AS group_name, "
-                          . "rn.id AS nfoid FROM releases "
-                          . "LEFT OUTER JOIN groups "
-                          . "ON groups.id = releases.groupid "
-                          . "LEFT OUTER JOIN category c "
-                          . "ON c.id = releases.categoryid "
-                          . "LEFT OUTER JOIN releasenfo rn "
-                          . "ON rn.releaseid = releases.id AND rn.nfo IS NOT NULL "
-                          . "LEFT OUTER JOIN category cp "
-                          . "ON cp.id = c.parentid "
-                          . "LEFT OUTER JOIN movieinfo "
-                          . "ON releases.imdbid = movieinfo.imdbid "
-                          . "WHERE releases.passwordstatus <= (SELECT value "
-                          .      "FROM settings WHERE setting='showpasswordedrelease') "
-                          . "AND releases.id IN (%s)";
+                . "movieinfo.title AS moi_title, "
+                . "movieinfo.tagline AS moi_tagline, "
+                . "movieinfo.rating AS moi_rating, "
+                . "movieinfo.plot AS moi_plot, "
+                . "movieinfo.year AS moi_year, "
+                . "movieinfo.genre AS moi_genre, "
+                . "movieinfo.director AS moi_director, "
+                . "movieinfo.actors AS moi_actors, "
+                . "movieinfo.cover AS moi_cover, "
+                . "movieinfo.backdrop AS moi_backdrop, "
+                . "CONCAT(cp.title, ' > ', c.title) AS category_name, "
+                . "CONCAT(cp.id, ',', c.id) AS category_ids, "
+                . "groups.name AS group_name, "
+                . "rn.id AS nfoid FROM releases "
+                . "LEFT OUTER JOIN groups "
+                . "ON groups.id = releases.groupid "
+                . "LEFT OUTER JOIN category c "
+                . "ON c.id = releases.categoryid "
+                . "LEFT OUTER JOIN releasenfo rn "
+                . "ON rn.releaseid = releases.id AND rn.nfo IS NOT NULL "
+                . "LEFT OUTER JOIN category cp "
+                . "ON cp.id = c.parentid "
+                . "LEFT OUTER JOIN movieinfo "
+                . "ON releases.imdbid = movieinfo.imdbid "
+                . "WHERE releases.passwordstatus <= (SELECT value "
+                .      "FROM settings WHERE setting='showpasswordedrelease') "
+                . "AND releases.id IN (%s)";
         }
         $sphinxQuery = $this->buildQuery($search, $cat, $offset, $limit, $order,
-                                         $maxage, [], [], $indexes,
-                                         $lookup, $where, $lookupQuery);
+            $maxage, [], [], $indexes,
+            $lookup, $where, $lookupQuery);
         return $this->searchDirect($sphinxQuery, $lookupQuery, 180);
     }
 
@@ -1105,35 +1093,34 @@ class Sphinx
                                 $cat=array(-1), $maxage=-1, $indexes=[],
                                 $lookup=true)
     {
-        $db = new Settings();
         $search = [];
         $where = [];
         $order = array("postdate", "desc");
         if ($artist != "") {
-            $search[] = sprintf("@musicinfo_artist %s", $db->escapeString($artist));
+            $search[] = sprintf("@musicinfo_artist %s", $this->pdo->escapeString($artist));
         }
 
-		if ($album != "") {
-		    $search[] = sprintf("@musicinfo_title %s", $db->escapeString($album));
-		}
+        if ($album != "") {
+            $search[] = sprintf("@musicinfo_title %s", $this->pdo->escapeString($album));
+        }
 
-		if ($label != "") {
-		    $search[] = sprintf("@musicinfo_publisher %s", $db->escapeString($label));
-		}
+        if ($label != "") {
+            $search[] = sprintf("@musicinfo_publisher %s", $this->pdo->escapeString($label));
+        }
 
-		if ($track != "") {
-		    $search[] = sprintf("@musicinfo_tracks %s", $db->escapeString($track));
-		}
+        if ($track != "") {
+            $search[] = sprintf("@musicinfo_tracks %s", $this->pdo->escapeString($track));
+        }
 
-		if ($year != "") {
-		    $where[] = sprintf("musicinfo_year = %d", $year);
-		}
+        if ($year != "") {
+            $where[] = sprintf("musicinfo_year = %d", $year);
+        }
 
-		if (count($genre) > 0 && $genre[0] != -1) {
-		    $where[] = sprintf("musicinfo_genreID IN (%s)", implode(",", $genre));
-		}
+        if (count($genre) > 0 && $genre[0] != -1) {
+            $where[] = sprintf("musicinfo_genreID IN (%s)", implode(",", $genre));
+        }
 
-		if (count($indexes) == 0) {
+        if (count($indexes) == 0) {
             // Remove predb from the default list of indexes to search
             $indexes = $this->getAllEnabledIndexes(true, array('predb'));
         }
@@ -1141,36 +1128,36 @@ class Sphinx
         $lookupQuery = "";
         if ($lookup) {
             $lookupQuery .= "SELECT releases.*, "
-                          . "musicinfo.cover AS mi_cover, "
-                          . "musicinfo.review AS mi_review, "
-                          . "musicinfo.tracks AS mi_tracks, "
-                          . "musicinfo.publisher AS mi_publisher, "
-                          . "musicinfo.title AS mi_title, "
-                          . "musicinfo.artist AS mi_artist, "
-                          . "genres.title AS music_genrename, "
-                          . "CONCAT(cp.title, ' > ', c.title) AS category_name, "
-                          . "CONCAT(cp.id, ',', c.id) AS category_ids, "
-                          . "groups.name AS group_name, "
-                          . "rn.id AS nfoid FROM releases "
-                          . "LEFT OUTER JOIN musicinfo "
-                          . "ON musicinfo.id = releases.musicinfoid "
-                          . "LEFT JOIN genres "
-                          . "ON genres.id = musicinfo.genreid "
-                          . "LEFT OUTER JOIN groups "
-                          . "ON groups.id = releases.groupid "
-                          . "LEFT OUTER JOIN category c "
-                          . "ON c.id = releases.categoryid "
-                          . "LEFT OUTER JOIN releasenfo rn "
-                          . "ON rn.releaseid = releases.id AND rn.nfo IS NOT NULL "
-                          . "LEFT OUTER JOIN category cp "
-                          . "ON cp.id = c.parentid "
-                          . "WHERE releases.passwordstatus <= (SELECT value "
-                          .      "FROM settings WHERE setting='showpasswordedrelease') "
-                          . "AND releases.id IN (%s)";
+                . "musicinfo.cover AS mi_cover, "
+                . "musicinfo.review AS mi_review, "
+                . "musicinfo.tracks AS mi_tracks, "
+                . "musicinfo.publisher AS mi_publisher, "
+                . "musicinfo.title AS mi_title, "
+                . "musicinfo.artist AS mi_artist, "
+                . "genres.title AS music_genrename, "
+                . "CONCAT(cp.title, ' > ', c.title) AS category_name, "
+                . "CONCAT(cp.id, ',', c.id) AS category_ids, "
+                . "groups.name AS group_name, "
+                . "rn.id AS nfoid FROM releases "
+                . "LEFT OUTER JOIN musicinfo "
+                . "ON musicinfo.id = releases.musicinfoid "
+                . "LEFT JOIN genres "
+                . "ON genres.id = musicinfo.genreID "
+                . "LEFT OUTER JOIN groups "
+                . "ON groups.id = releases.groupid "
+                . "LEFT OUTER JOIN category c "
+                . "ON c.id = releases.categoryid "
+                . "LEFT OUTER JOIN releasenfo rn "
+                . "ON rn.releaseid = releases.id AND rn.nfo IS NOT NULL "
+                . "LEFT OUTER JOIN category cp "
+                . "ON cp.id = c.parentid "
+                . "WHERE releases.passwordstatus <= (SELECT value "
+                .      "FROM settings WHERE setting='showpasswordedrelease') "
+                . "AND releases.id IN (%s)";
         }
         $sphinxQuery = $this->buildQuery($search, $cat, $offset, $limit, $order,
-                                         $maxage, [], [], $indexes,
-                                         $lookup, $where, $lookupQuery);
+            $maxage, [], [], $indexes,
+            $lookup, $where, $lookupQuery);
         return $this->searchDirect($sphinxQuery, $lookupQuery, 180);
     }
 
@@ -1181,59 +1168,58 @@ class Sphinx
     public function searchBook($author, $title, $offset=0, $limit=100,
                                $maxage=-1, $indexes=[], $lookup=true)
     {
-        $db = new Settings();
         $order = array("postdate", "desc");
         $search = [];
         if ($author != "") {
-            $search[] = sprintf("@bookinfo_author %s", $db->escapeString($author));
+            $search[] = sprintf("@bookinfo_author %s", $this->pdo->escapeString($author));
         }
 
-		if ($title != "") {
-		    $search[] = sprintf("@bookinfo_title %s", $db->escapeString($title));
-		}
+        if ($title != "") {
+            $search[] = sprintf("@bookinfo_title %s", $this->pdo->escapeString($title));
+        }
 
-		if (count($indexes) == 0) {
+        if (count($indexes) == 0) {
             // Remove predb from the default list of indexes to search
             $indexes = $this->getAllEnabledIndexes(true, array('predb'));
         }
 
-		$lookupQuery = "";
-		if ($lookup) {
-		    $lookupQuery .= "SELECT releases.*, "
-		                  . "bookinfo.cover AS bi_cover, "
-		                  . "bookinfo.review AS bi_review, "
-		                  . "bookinfo.publisher AS bi_publisher, "
-		                  . "bookinfo.pages AS bi_pages, "
-		                  . "bookinfo.publishdate AS bi_publishdate, "
-		                  . "bookinfo.title AS bi_title, "
-		                  . "bookinfo.author AS bi_author, "
-		                  . "genres.title AS book_genrename, "
-		                  . "concat(cp.title, ' > ', c.title) AS category_name, "
-		                  . "concat(cp.id, ',', c.id) AS category_ids, "
-		                  . "groups.name AS group_name, "
-		                  . "rn.id AS nfoid "
-		                  . "FROM releases "
-		                  . "LEFT OUTER JOIN bookinfo "
-		                  . "ON bookinfo.id = releases.bookinfoid "
-		                  . "LEFT JOIN genres "
-		                  . "ON genres.id = bookinfo.genreid "
-		                  . "LEFT OUTER JOIN groups "
-		                  . "ON groups.id = releases.groupid "
-		                  . "LEFT OUTER JOIN category c "
-		                  . "ON c.id = releases.categoryid "
-		                  . "LEFT OUTER JOIN releasenfo rn "
-		                  . "ON rn.releaseid = releases.id AND rn.nfo IS NOT NULL "
-		                  . "LEFT OUTER JOIN category cp "
-		                  . "ON cp.id = c.parentid "
-		                  . "WHERE releases.passwordstatus <= (SELECT value "
-		                  .     "FROM settings WHERE setting='showpasswordedrelease')"
-		                  . "AND releases.id IN (%s)";
-		}
+        $lookupQuery = "";
+        if ($lookup) {
+            $lookupQuery .= "SELECT releases.*, "
+                . "bookinfo.cover AS bi_cover, "
+                . "bookinfo.review AS bi_review, "
+                . "bookinfo.publisher AS bi_publisher, "
+                . "bookinfo.pages AS bi_pages, "
+                . "bookinfo.publishdate AS bi_publishdate, "
+                . "bookinfo.title AS bi_title, "
+                . "bookinfo.author AS bi_author, "
+                . "genres.title AS book_genrename, "
+                . "concat(cp.title, ' > ', c.title) AS category_name, "
+                . "concat(cp.id, ',', c.id) AS category_ids, "
+                . "groups.name AS group_name, "
+                . "rn.id AS nfoid "
+                . "FROM releases "
+                . "LEFT OUTER JOIN bookinfo "
+                . "ON bookinfo.id = releases.bookinfoid "
+                . "LEFT JOIN genres "
+                . "ON genres.id = bookinfo.genreID "
+                . "LEFT OUTER JOIN groups "
+                . "ON groups.id = releases.groupid "
+                . "LEFT OUTER JOIN category c "
+                . "ON c.id = releases.categoryid "
+                . "LEFT OUTER JOIN releasenfo rn "
+                . "ON rn.releaseid = releases.id AND rn.nfo IS NOT NULL "
+                . "LEFT OUTER JOIN category cp "
+                . "ON cp.id = c.parentid "
+                . "WHERE releases.passwordstatus <= (SELECT value "
+                .     "FROM settings WHERE setting='showpasswordedrelease')"
+                . "AND releases.id IN (%s)";
+        }
 
-		$sphinxQuery = $this->buildQuery($search, array(-1), $offset, $limit,
-		                                 $order, $maxage, [], [],
-		                                 $indexes, $lookup, [], $lookupQuery);
-		return $this->searchDirect($sphinxQuery, $lookupQuery, 180);
+        $sphinxQuery = $this->buildQuery($search, array(-1), $offset, $limit,
+            $order, $maxage, [], [],
+            $indexes, $lookup, [], $lookupQuery);
+        return $this->searchDirect($sphinxQuery, $lookupQuery, 180);
     }
 
     /**
@@ -1244,7 +1230,6 @@ class Sphinx
                                     $name='', $maxage=-1, $indexes=[],
                                     $lookup=true)
     {
-        $db = new Settings();
         $where = [];
         $search = [];
         $order = array("postdate", "desc");
@@ -1253,38 +1238,38 @@ class Sphinx
         }
 
         if (is_numeric($epno)) {
-			$search[] = sprintf("@episode %s", $db->escapeString($epno));
-		}
+            $search[] = sprintf("@episode %s", $this->pdo->escapeString($epno));
+        }
 
-		if (count($indexes) == 0) {
+        if (count($indexes) == 0) {
             // Remove predb from the default list of indexes to search
             $indexes = $this->getAllEnabledIndexes(true, array('predb'));
         }
 
-		$lookupQuery = "";
-		if ($lookup) {
-		    $lookupQuery .= "SELECT releases.*, "
-		                  . "CONCAT(cp.title, ' > ', c.title) AS category_name, "
-		                  . "CONCAT(cp.id, ',', c.id) AS category_ids, "
-		                  . "groups.name AS group_name, "
-		                  . "rn.id AS nfoid "
-			              . "FROM releases "
-			              . "LEFT OUTER JOIN category c "
-			              . "ON c.id = releases.categoryid "
-			              . "LEFT OUTER JOIN groups "
-			              . "ON groups.id = releases.groupid "
-			              . "LEFT OUTER JOIN releasenfo rn "
-			              . "ON rn.releaseid = releases.id AND rn.nfo IS NOT NULL "
-			              . "LEFT OUTER JOIN category cp "
-			              . "ON cp.id = c.parentid "
-			              . "WHERE releases.passwordstatus <= (SELECT value "
-			              .     "FROM settings WHERE setting='showpasswordedrelease')"
-			              . "AND releases.id IN (%s)";
-		}
-		$sphinxQuery = $this->buildQuery($search, array(-1), $offset, $limit,
-		                                 $order, $maxage, [], [],
-		                                 $indexes, $lookup, $where, $lookupQuery);
-		return $this->searchDirect($sphinxQuery, $lookupQuery, 180);
+        $lookupQuery = "";
+        if ($lookup) {
+            $lookupQuery .= "SELECT releases.*, "
+                . "CONCAT(cp.title, ' > ', c.title) AS category_name, "
+                . "CONCAT(cp.id, ',', c.id) AS category_ids, "
+                . "groups.name AS group_name, "
+                . "rn.id AS nfoid "
+                . "FROM releases "
+                . "LEFT OUTER JOIN category c "
+                . "ON c.id = releases.categoryid "
+                . "LEFT OUTER JOIN groups "
+                . "ON groups.id = releases.groupid "
+                . "LEFT OUTER JOIN releasenfo rn "
+                . "ON rn.releaseid = releases.id AND rn.nfo IS NOT NULL "
+                . "LEFT OUTER JOIN category cp "
+                . "ON cp.id = c.parentid "
+                . "WHERE releases.passwordstatus <= (SELECT value "
+                .     "FROM settings WHERE setting='showpasswordedrelease')"
+                . "AND releases.id IN (%s)";
+        }
+        $sphinxQuery = $this->buildQuery($search, array(-1), $offset, $limit,
+            $order, $maxage, [], [],
+            $indexes, $lookup, $where, $lookupQuery);
+        return $this->searchDirect($sphinxQuery, $lookupQuery, 180);
     }
 
     /**
@@ -1293,21 +1278,20 @@ class Sphinx
      */
     public function getPreRange($start=0, $num, $dirname='', $category='')
     {
-        $db = new Settings();
         $dirname = empty($category) ? $dirname : $dirname." @category =".$category;
         $sphinxQuery = sprintf("SELECT id "
-                               ."FROM predb, predb_delta "
-                               ."WHERE MATCH(%s) "
-                               ."ORDER BY ctime DESC "
-                               ."LIMIT %d,%d",
-                               $db->escapeString($dirname),
-                               $start, $num);
+            ."FROM predb, predb_delta "
+            ."WHERE MATCH(%s) "
+            ."ORDER BY ctime DESC "
+            ."LIMIT %d,%d",
+            $this->pdo->escapeString($dirname),
+            $start, $num);
         $lookupQuery = "SELECT predb.*, r.guid "
-                     . "FROM predb "
-                     . "LEFT OUTER JOIN releases r "
-                     . "ON r.preid = predb.id "
-                     . "WHERE predb.id IN (%s) "
-                     . "ORDER BY predb.ctime DESC";
+            . "FROM predb "
+            . "LEFT OUTER JOIN releases r "
+            . "ON r.preid = predb.id "
+            . "WHERE predb.id IN (%s) "
+            . "ORDER BY predb.ctime DESC";
         return $this->searchDirect($sphinxQuery, $lookupQuery, 120);
     }
 
@@ -1323,8 +1307,10 @@ class Sphinx
     public function getPreCount($dirname='', $category='')
     {
         $results = $this->getPreRange(0, 1, $dirname, $category);
-
-        return $results;
+        if (is_array($results)) {
+            return $results[0]['_totalrows'];
+        }
+        return -1;
     }
 
     /**
@@ -1338,11 +1324,12 @@ class Sphinx
     public function secs_to_h($secs)
     {
         $units = array(
-                "week"   => 7*24*3600,
-                "day"    =>   24*3600,
-                "hour"   =>      3600,
-                "minute" =>        60,
+            "week"   => 7*24*3600,
+            "day"    =>   24*3600,
+            "hour"   =>      3600,
+            "minute" =>        60,
         );
+
         // specifically handle zero
         if ( $secs == 0 ) return "0 seconds";
         $s = "";

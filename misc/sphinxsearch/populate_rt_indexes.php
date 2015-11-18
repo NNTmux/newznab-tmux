@@ -3,7 +3,6 @@ require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer
 
 use newznab\db\DB;
 use newznab\ReleaseSearch;
-use newznab\SphinxSearch;
 
 if (NN_RELEASE_SEARCH_TYPE != ReleaseSearch::SPHINX) {
 	exit('Error, NN_RELEASE_SEARCH_TYPE in www/settings.php must be set to SPHINX!' . PHP_EOL);
@@ -24,7 +23,7 @@ function populate_rt($table = '')
 		case 'releases_rt':
 			$pdo->queryDirect('SET SESSION group_concat_max_len=8192');
 			$rows = $pdo->queryExec('SELECT r.id, r.name, r.searchname, r.fromname, IFNULL(GROUP_CONCAT(rf.name SEPARATOR " "),"") filename
-				FROM releases r LEFT JOIN releasefiles rf ON(r.id=rf.releaseid) GROUP BY r.id'
+				FROM releases r LEFT JOIN release_files rf ON(r.id=rf.releaseid) GROUP BY r.id'
 			);
 			$rtvalues = '(id, name, searchname, fromname, filename)';
 			break;
@@ -43,12 +42,12 @@ function populate_rt($table = '')
 			switch ($table) {
 				case 'releases_rt':
 					$tempString .= sprintf(
-						'(%d, %s, %s, %s, %s),',
-						$row['id'],
-						$sphinx->sphinxQL->escapeString($row['name']),
-						$sphinx->sphinxQL->escapeString($row['searchname']),
-						$sphinx->sphinxQL->escapeString($row['fromname']),
-						$sphinx->sphinxQL->escapeString($row['filename'])
+							'(%d, %s, %s, %s, %s),',
+							$row['id'],
+							$sphinx->sphinxQL->escapeString($row['name']),
+							$sphinx->sphinxQL->escapeString($row['searchname']),
+							$sphinx->sphinxQL->escapeString($row['fromname']),
+							$sphinx->sphinxQL->escapeString($row['filename'])
 					);
 					break;
 			}

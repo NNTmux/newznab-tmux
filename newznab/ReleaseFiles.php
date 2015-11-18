@@ -33,7 +33,7 @@ class ReleaseFiles
 	 */
 	public function get($id)
 	{
-		return $this->pdo->query(sprintf("SELECT * FROM releasefiles WHERE releaseid = %d ORDER BY releasefiles.name ", $id));
+		return $this->pdo->query(sprintf("SELECT * FROM release_files WHERE releaseid = %d ORDER BY release_files.name ", $id));
 	}
 
 	/**
@@ -41,7 +41,7 @@ class ReleaseFiles
 	 */
 	public function getByGuid($guid)
 	{
-		return $this->pdo->query(sprintf("SELECT releasefiles.* FROM releasefiles INNER JOIN releases r ON r.id = releasefiles.releaseid WHERE r.guid = %s ORDER BY releasefiles.name ", $this->pdo->escapeString($guid)));
+		return $this->pdo->query(sprintf("SELECT release_files.* FROM release_files INNER JOIN releases r ON r.id = release_files.releaseid WHERE r.guid = %s ORDER BY release_files.name ", $this->pdo->escapeString($guid)));
 	}
 
 	/**
@@ -49,7 +49,7 @@ class ReleaseFiles
 	 */
 	public function delete($id)
 	{
-		$res = $this->pdo->queryExec(sprintf("DELETE FROM releasefiles WHERE releaseid = %d", $id));
+		$res = $this->pdo->queryExec(sprintf("DELETE FROM release_files WHERE releaseid = %d", $id));
 		$this->sphinxSearch->updateRelease($id, $this->pdo);
 		return $res;
 	}
@@ -70,28 +70,28 @@ class ReleaseFiles
 		$insert = 0;
 
 		$duplicateCheck = $this->pdo->queryOneRow(
-			sprintf('
-				SELECT id
-				FROM releasefiles
+				sprintf('
+				SELECT releaseid
+				FROM release_files
 				WHERE releaseid = %d AND name = %s',
-				$id,
-				$this->pdo->escapeString(utf8_encode($name))
-			)
+						$id,
+						$this->pdo->escapeString(utf8_encode($name))
+				)
 		);
 
 		if ($duplicateCheck === false) {
 			$insert = $this->pdo->queryInsert(
-				sprintf("
-						INSERT INTO releasefiles
+					sprintf("
+						INSERT INTO release_files
 						(releaseid, name, size, createddate, passworded)
 						VALUES
 						(%d, %s, %s, %s, %d)",
-					$id,
-					$this->pdo->escapeString(utf8_encode($name)),
-					$this->pdo->escapeString($size),
-					$this->pdo->from_unixtime($createdTime),
-					$hasPassword
-				)
+							$id,
+							$this->pdo->escapeString(utf8_encode($name)),
+							$this->pdo->escapeString($size),
+							$this->pdo->from_unixtime($createdTime),
+							$hasPassword
+					)
 			);
 		}
 		return $insert;

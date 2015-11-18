@@ -1740,7 +1740,7 @@ class Releases
 		// aggregate the releasefiles upto the releases.
 		//
 		$this->pdo->log->doEcho($this->pdo->log->primary('Aggregating Files'));
-		$this->pdo->queryExec("UPDATE releases INNER JOIN (SELECT releaseid, COUNT(id) AS num FROM releasefiles GROUP BY releaseid) b ON b.releaseid = releases.id AND releases.rarinnerfilecount = 0 SET rarinnerfilecount = b.num");
+		$this->pdo->queryExec("UPDATE releases INNER JOIN (SELECT releaseid, COUNT(id) AS num FROM release_files GROUP BY releaseid) b ON b.releaseid = releases.id AND releases.rarinnerfilecount = 0 SET rarinnerfilecount = b.num");
 
 		// Remove the binaries and parts used to form releases, or that are duplicates.
 		//
@@ -2343,7 +2343,7 @@ class Releases
 				LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
 				LEFT OUTER JOIN release_comments rc ON rc.releaseid = r.id
 				LEFT OUTER JOIN usercart uc ON uc.releaseid = r.id
-				LEFT OUTER JOIN releasefiles rf ON rf.releaseid = r.id
+				LEFT OUTER JOIN release_files rf ON rf.releaseid = r.id
 				LEFT OUTER JOIN releaseaudio ra ON ra.releaseid = r.id
 				LEFT OUTER JOIN releasesubs rs ON rs.releaseid = r.id
 				LEFT OUTER JOIN releasevideo rv ON rv.releaseid = r.id

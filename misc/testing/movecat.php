@@ -16,7 +16,7 @@ $db = new Settings();
 /*
 $sql = "update releases inner join (
 select distinct rf.releaseID
-from releasefiles rf
+from release_files rf
 inner join releases r on r.ID = rf.releaseID
 where rf.name like '%.mp3'
 and r.categoryID like '7%') x on x.releaseID = releases.ID
