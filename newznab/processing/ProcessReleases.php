@@ -821,8 +821,10 @@ class ProcessReleases
 		}
 		$this->categorizeRelease(
 			$type,
-			(!empty($groupID) ? 'WHERE iscategorized = 0 AND groupid = ' . $groupID : 'WHERE iscategorized = 0')
-		);
+			(!empty($groupID)
+					? 'WHERE categoryid = ' . Category::CAT_MISC_OTHER . ' AND iscategorized = 0 AND groupid = ' . $groupID
+					: 'WHERE categoryid = ' . Category::CAT_MISC_OTHER . ' AND iscategorized = 0')
+	);
 
 		if ($this->echoCLI) {
 			$this->pdo->log->doEcho($this->pdo->log->primary($this->consoleTools->convertTime(time() - $startTime)), true);

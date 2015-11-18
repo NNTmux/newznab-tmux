@@ -1,4 +1,5 @@
 2015-11-18 DariusIII
+	Fix: Fix release categorization to use proper partition
 	Chg: Remove newzdash from tmux, not worth the space
 	Fix: Fix patch 0111 and remove patch 0149 as it is now in schema.sql
 	Chg: Use releaseid instead of id from releasefiles table, rename releasefiles table to release_files
