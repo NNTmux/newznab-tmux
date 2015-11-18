@@ -183,10 +183,12 @@ class Client {
 		$akas = $this->getFile($url);
 
 		$AKA = new AKA($akas);
+
 		if (!empty($akas['name'])) {
 
 			return $AKA;
 		}
+
 		return false;
 	}
 
@@ -228,8 +230,7 @@ class Client {
 		$ep = false;
 		$url = self::APIURL . '/shows/' . $ID . '/episodebynumber?season='. $season . '&number=' . $episode;
 		$response = $this->getFile($url);
-
-		if (is_array($episode)) {
+		if (is_array($response)) {
 			$ep = new Episode($response);
 		}
 		return $ep;
@@ -378,8 +379,7 @@ class Client {
 		curl_close($ch);
 
 		$response = json_decode($result, TRUE);
-
-		if (is_array($response) && count($response) > 0 && !isset($response['status'])) {
+		if (is_array($response) && count($response) > 0 && (!isset($response['status']) || $response['status'] != '404')) {
 			return $response;
 		} else {
 			return false;

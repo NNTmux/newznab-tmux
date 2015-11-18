@@ -1,3 +1,5 @@
+2015-11-18 DariusIII
+	Fix: TVMaze AKA processing and some other bugs
 2015-11-16 DariusIII
 	Fix: Use rawurlencode in TVMaze/Client.php
 	Upd: Change how season packs are displayed
