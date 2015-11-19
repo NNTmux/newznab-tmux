@@ -230,7 +230,7 @@ class Console
 				LEFT OUTER JOIN groups g ON g.id = r.groupid
 				LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
 				INNER JOIN consoleinfo con ON con.id = r.consoleinfoid
-				INNER JOIN genres ON con.genre_id = genres.id
+				INNER JOIN genres ON con.genreid = genres.id
 				WHERE con.id IN (%s)
 				AND r.id IN (%s)
 				AND %s
