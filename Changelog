@@ -1,4 +1,5 @@
 2015-11-19 DariusIII
+	Upd: Add queryCalc function to DB class
 	Upd: Add nfo to api
 2015-11-18 DariusIII
 	Fix: Fix release categorization to use proper partition
