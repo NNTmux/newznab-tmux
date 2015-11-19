@@ -152,28 +152,15 @@ class Books
 		return $res['num'];
 	}
 
-	public function getBookCount($cat, $maxage = -1, $excludedcats = [])
-	{
-		$res = $this->pdo->query(
-				sprintf("
-				SELECT COUNT(DISTINCT r.bookinfoid) AS num
-				FROM releases r
-				INNER JOIN bookinfo boo ON boo.id = r.bookinfoid
-				WHERE r.nzbstatus = 1
-				AND  r.passwordstatus %s
-				AND boo.title != ''
-				AND boo.cover = 1
-				AND %s %s %s %s",
-						Releases::showPasswords($this->pdo),
-						$this->getBrowseBy(),
-						(count($cat) > 0 && $cat[0] != -1 ? (new Category(['Settings' => $this->pdo]))->getCategorySearch($cat) : ''),
-						($maxage > 0 ? sprintf(' AND r.postdate > NOW() - INTERVAL %d DAY ', $maxage) : ''),
-						(count($excludedcats) > 0 ? ' AND r.categoryid NOT IN (' . implode(',', $excludedcats) . ')' : '')
-				), true, NN_CACHE_EXPIRY_MEDIUM
-		);
-		return (isset($res[0]["num"]) ? $res[0]["num"] : 0);
-	}
-
+	/**
+	 * @param       $cat
+	 * @param       $start
+	 * @param       $num
+	 * @param       $orderby
+	 * @param array $excludedcats
+	 *
+	 * @return array
+	 */
 	public function getBookRange($cat, $start, $num, $orderby, $excludedcats = [])
 	{
 
@@ -196,18 +183,19 @@ class Books
 
 		$order = $this->getBookOrder($orderby);
 
-		$books = $this->pdo->query(
+		$books = $this->pdo->queryCalc(
 				sprintf("
-					SELECT boo.id
-					FROM bookinfo boo
-					LEFT JOIN releases r ON boo.id = r.bookinfoid
-					WHERE r.nzbstatus = 1
-					AND boo.cover = 1
-					AND boo.title != ''
-					AND r.passwordstatus %s
-					AND %s %s %s %s
-					GROUP BY boo.id
-					ORDER BY %s %s %s",
+				SELECT SQL_CALC_FOUND_ROWS boo.id,
+					GROUP_CONCAT(r.id ORDER BY r.postdate DESC SEPARATOR ',') AS grp_release_id
+				FROM bookinfo boo
+				LEFT JOIN releases r ON boo.id = r.bookinfoid
+				WHERE r.nzbstatus = 1
+				AND boo.cover = 1
+				AND boo.title != ''
+				AND r.passwordstatus %s
+				AND %s %s %s %s
+				GROUP BY boo.id
+				ORDER BY %s %s %s",
 						Releases::showPasswords($this->pdo),
 						$browseby,
 						$catsrch,
@@ -219,11 +207,12 @@ class Books
 				), true, NN_CACHE_EXPIRY_MEDIUM
 		);
 
-		$bookIDs = false;
+		$bookIDs = $releaseIDs = false;
 
-		if (is_array($books)) {
-			foreach ($books AS $book => $id) {
+		if (is_array($books['result'])) {
+			foreach ($books['result'] AS $book => $id) {
 				$bookIDs[] = $id['id'];
+				$releaseIDs[] = $id['grp_release_id'];
 			}
 		}
 
@@ -250,25 +239,20 @@ class Books
 			LEFT OUTER JOIN groups g ON g.id = r.groupid
 			LEFT OUTER JOIN releasenfo rn ON rn.releaseid = r.id
 			INNER JOIN bookinfo boo ON boo.id = r.bookinfoid
-			WHERE r.nzbstatus = 1
-			AND boo.id IN (%s)
-			AND boo.cover = 1
-			AND boo.title != ''
-			AND r.passwordstatus %s
-			AND %s %s %s %s
+			WHERE boo.id IN (%s)
+			AND r.id IN (%s)
+			AND %s
 			GROUP BY boo.id
 			ORDER BY %s %s",
 				(is_array($bookIDs) ? implode(',', $bookIDs) : -1),
-				Releases::showPasswords($this->pdo),
-				$browseby,
+				(is_array($releaseIDs) ? implode(',', $releaseIDs) : -1),
 				$catsrch,
-				$maxage,
-				$exccatlist,
 				$order[0],
 				$order[1]
 		);
-
-		return $this->pdo->query($sql, true, NN_CACHE_EXPIRY_MEDIUM);
+		$return = $this->pdo->query($sql, true, NN_CACHE_EXPIRY_MEDIUM);
+		$return[0]['_totalcount'] = (isset($books['total']) ? $books['total'] : 0);
+		return $return;
 	}
 
 
