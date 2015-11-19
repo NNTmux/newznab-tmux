@@ -10,14 +10,6 @@
 	<div class="alert alert-info">A link to reset your password has been sent to your e-mail account.</div>
 {/if}
 <head>
-	<script type="text/javascript">
-		/* <![CDATA[ */
-		var WWW_TOP = "{$smarty.const.WWW_TOP}";
-		var SERVERROOT = "{$serverroot}";
-		var UID = "{if $loggedin=="true"}{$userdata.id}{else}{/if}";
-		var RSSTOKEN = "{if $loggedin=="true"}{$userdata.rsstoken}{else}{/if}";
-		/* ]]> */
-	</script>
 	<!--
 		===
 		This comment should NOT be removed.

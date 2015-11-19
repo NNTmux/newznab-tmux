@@ -35,7 +35,7 @@ echo $pdo->log->primary("Reseting all groups completed.");
 
 $arr = [
 		"videos", "tv_episodes", "tv_info", "releasenfo", "release_comments", 'sharing', 'sharing_sites',
-		"usercart", "usermovies", "userseries", "movieinfo", "musicinfo", "releasefiles",
+		"usercart", "usermovies", "userseries", "movieinfo", "musicinfo", "release_files",
 		"releaseaudio", "releasesubs", "releasevideo", "releaseextrafull", "parts",
 		"partrepair", "binaries", "releases", "spotnabsources",  "anidb_titles", "anidb_info", "anidb_episodes"
 ];

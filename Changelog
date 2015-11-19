@@ -1,3 +1,41 @@
+2015-11-19 DariusIII
+	Chg: Remove newzdash, add schema for fresh newznab+ installs
+	Upd: Rework book, console and movie queries, use ceil instead of round in pager.tpl
+	Fix: change to getNZBPath in ProcessAdditional
+2015-11-18 DariusIII
+	Fix: Wrong coulm used in releases
+	Fix: Release categorization now uses proper partition
+	Chg: Use releaseid from releasefiles, rename releasefiles table to release_files
+	Fix: TVMaze processing
+2015-11-16 DariusIII
+	Fix: Use rawurlencode in JPinkney/TVMaze/Client.php
+	Fix: Add covers path to constants.php
+	Fix: Change $_data from private to public in Tmdb
+	Upd: Change series packs are displayed in Omicron/Charisma templates
+	Fix: Rename TMDB.php to TmdbAPI.php
+	Fix: Add missing AKA processing from JPinkney/TVMaze
+	Upd: Add new PreDb class, update predb_import_daily_batch.
+2015-11-15 DariusIII
+	Chg: Remove spotnab processing from tmux
+	Upd: Speed up cover browsing, optimize SpotNab
+	Chg: Add many fixes ported from nZEDb
+2015-11-12 DariusIII
+	Upd: Update TV processing, add TMDB and Trakt.
+2015-11-10 DariusIII
+	Chg: Change the way failed releases are counted
+2015-11-09 DariusIII
+	Fix: pre-commit file
+	Fix: Fix the path to patches in Versions.php
+	Add: Add trigger, unique index to release_comments table
+	Fix: group list pager not working
+2015-11-06 DariusIII
+	Fix: Wrong column name in NameFixer
+	Fix: Cart RSS feed, admin user role edit
+2015-11-05 DariusIII
+	Add: Add check_previews script from nZEDb
+	Fix: serverroot errors
+	Fix: Typo in ReleaseRemover that caused errors
+	Fix: port more fixes for ADM from nZEDb
 2015-11-04 DariusIII
 	Fix: Fix patch 157
 2015-11-03 DariusIII

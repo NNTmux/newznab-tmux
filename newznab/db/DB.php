@@ -4,8 +4,8 @@ namespace newznab\db;
 use \newznab\utility\Utility;
 use \newznab\libraries\Cache;
 use \newznab\libraries\CacheException;
-use newznab\ColorCLI;
 use newznab\ConsoleTools;
+use newznab\ColorCLI;
 use newznab\Logger;
 use newznab\LoggerException;
 
@@ -88,16 +88,6 @@ class DB extends \PDO
 	private $cacheEnabled = false;
 
 	/**
-	 * @var string MySQL LOW_PRIORITY DELETE option.
-	 */
-	private $DELETE_LOW_PRIORITY = '';
-
-	/**
-	 * @var string MYSQL QUICK DELETE option.
-	 */
-	private $DELETE_QUICK = '';
-
-	/**
 	 * Constructor. Sets up all necessary properties. Instantiates a \PDO object
 	 * if needed, otherwise returns the current one.
 	 */
@@ -106,18 +96,18 @@ class DB extends \PDO
 		$this->cli = Utility::isCLI();
 
 		$defaults = [
-			'checkVersion'	=> false,
-			'createDb'		=> false, // create dbname if it does not exist?
-			'ct'			=> new ConsoleTools(),
-			'dbhost'		=> defined('DB_HOST') ? DB_HOST : '',
-			'dbname' 		=> defined('DB_NAME') ? DB_NAME : '',
-			'dbpass' 		=> defined('DB_PASSWORD') ? DB_PASSWORD : '',
-			'dbport'		=> defined('DB_PORT') ? DB_PORT : '',
-			'dbsock'		=> defined('DB_SOCKET') ? DB_SOCKET : '',
-			'dbtype'		=> defined('DB_TYPE') ? DB_TYPE : '',
-			'dbuser' 		=> defined('DB_USER') ? DB_USER : '',
-			'log'			=> new ColorCLI(),
-			'persist'		=> false,
+				'checkVersion'	=> false,
+				'createDb'		=> false, // create dbname if it does not exist?
+				'ct'			=> new ConsoleTools(),
+				'dbhost'		=> defined('DB_HOST') ? DB_HOST : '',
+				'dbname' 		=> defined('DB_NAME') ? DB_NAME : '',
+				'dbpass' 		=> defined('DB_PASSWORD') ? DB_PASSWORD : '',
+				'dbport'		=> defined('DB_PORT') ? DB_PORT : '',
+				'dbsock'		=> defined('DB_SOCKET') ? DB_SOCKET : '',
+				'dbtype'		=> defined('DB_TYPE') ? DB_TYPE : '',
+				'dbuser' 		=> defined('DB_USER') ? DB_USER : '',
+				'log'			=> new ColorCLI(),
+				'persist'		=> false,
 		];
 		$options += $defaults;
 
@@ -161,14 +151,6 @@ class DB extends \PDO
 			$this->fetchDbVersion();
 		}
 
-		if (defined('NN_SQL_DELETE_LOW_PRIORITY') && NN_SQL_DELETE_LOW_PRIORITY) {
-			$this->DELETE_LOW_PRIORITY = ' LOW_PRIORITY ';
-		}
-
-		if (defined('NN_SQL_DELETE_QUICK') && NN_SQL_DELETE_QUICK) {
-			$this->DELETE_QUICK = ' QUICK ';
-		}
-
 		return $this->pdo;
 	}
 
@@ -205,11 +187,11 @@ class DB extends \PDO
 	public function checkIndex($table, $index)
 	{
 		$result = $this->pdo->query(
-			sprintf(
-				"SHOW INDEX FROM %s WHERE key_name = '%s'",
-				trim($table),
-				trim($index)
-			)
+				sprintf(
+						"SHOW INDEX FROM %s WHERE key_name = '%s'",
+						trim($table),
+						trim($index)
+				)
 		);
 		if ($result === false) {
 			return false;
@@ -221,11 +203,11 @@ class DB extends \PDO
 	public function checkColumnIndex($table, $column)
 	{
 		$result = $this->pdo->query(
-			sprintf(
-				"SHOW INDEXES IN %s WHERE non_unique = 0 AND column_name = '%s'",
-				trim($table),
-				trim($column)
-			)
+				sprintf(
+						"SHOW INDEXES IN %s WHERE non_unique = 0 AND column_name = '%s'",
+						trim($table),
+						trim($column)
+				)
 		);
 		if ($result === false) {
 			return false;
@@ -295,11 +277,11 @@ class DB extends \PDO
 		$dsn .= ';charset=utf8';
 
 		$options = [
-			\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-			\PDO::ATTR_TIMEOUT => 180,
-			\PDO::ATTR_PERSISTENT => $this->opts['persist'],
-			\PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8",
-			\PDO::MYSQL_ATTR_LOCAL_INFILE => true
+				\PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+				\PDO::ATTR_TIMEOUT => 180,
+				\PDO::ATTR_PERSISTENT => $this->opts['persist'],
+				\PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8",
+				\PDO::MYSQL_ATTR_LOCAL_INFILE => true
 		];
 
 		$this->dsn = $dsn;
@@ -336,10 +318,10 @@ class DB extends \PDO
 		// In case \PDO is not set to produce exceptions (PHP's default behaviour).
 		if ($this->pdo === false) {
 			$this->echoError(
-				"Unable to create connection to the Database!",
-				'initialiseDatabase',
-				1,
-				true
+					"Unable to create connection to the Database!",
+					'initialiseDatabase',
+					1,
+					true
 			);
 		}
 
@@ -408,12 +390,12 @@ class DB extends \PDO
 	public function likeString($str, $left=true, $right=true)
 	{
 		return (
-			'LIKE ' .
-			$this->escapeString(
-				($left  ? '%' : '') .
-				$str .
-				($right ? '%' : '')
-			)
+				'LIKE ' .
+				$this->escapeString(
+						($left  ? '%' : '') .
+						$str .
+						($right ? '%' : '')
+				)
 		);
 	}
 
@@ -469,23 +451,6 @@ class DB extends \PDO
 			$this->debugging->log(get_class(), __FUNCTION__, $query, Logger::LOG_SQL);
 		}
 		return false;
-	}
-
-	/**
-	 * Delete rows from MySQL.
-	 *
-	 * @param string $query
-	 * @param bool   $silent Echo or log errors?
-	 *
-	 * @return bool|\PDOStatement
-	 */
-	public function queryDelete($query, $silent = false)
-	{
-		// Accommodate for chained queries (SELECT 1;DELETE x FROM y)
-		if (preg_match('#(.*?[^a-z0-9]|^)DELETE\s+(.+?)$#is', $query, $matches)) {
-			$query = $matches[1] . 'DELETE ' . $this->DELETE_LOW_PRIORITY . $this->DELETE_QUICK . $matches[2];
-		}
-		return $this->queryExec($query, $silent);
 	}
 
 	/**
@@ -557,10 +522,10 @@ class DB extends \PDO
 		} catch (\PDOException $e) {
 			// Deadlock or lock wait timeout, try 10 times.
 			if (
-				$e->errorInfo[1] == 1213 ||
-				$e->errorInfo[0] == 40001 ||
-				$e->errorInfo[1] == 1205 ||
-				$e->getMessage() == 'SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction'
+					$e->errorInfo[1] == 1213 ||
+					$e->errorInfo[0] == 40001 ||
+					$e->errorInfo[1] == 1205 ||
+					$e->getMessage() == 'SQLSTATE[40001]: Serialization failure: 1213 Deadlock found when trying to get lock; try restarting transaction'
 			) {
 				return ['deadlock' => true, 'message' => $e->getMessage()];
 			}
@@ -673,6 +638,49 @@ class DB extends \PDO
 		}
 
 		return ($result === false) ? [] : $result;
+	}
+
+	/**
+	 * Returns a multidimensional array of result of the query function return and the count of found rows
+	 * Note: Query passed to this function SHOULD include SQL_CALC_FOUND_ROWS
+	 * Optional: Pass true to cache the result with a cache server.
+	 *
+	 * @param string $query       SQL to execute.
+	 * @param bool   $cache       Indicates if the query result should be cached.
+	 * @param int    $cacheExpiry The time in seconds before deleting the query result from the cache server.
+	 *
+	 * @return array Array of results (possibly empty) on success, empty array on failure.
+	 */
+	public function queryCalc($query, $cache = false, $cacheExpiry = 600)
+	{
+		$data = $this->query($query, $cache, $cacheExpiry);
+
+		if (strpos($query, 'SQL_CALC_FOUND_ROWS') === false) {
+			return $data;
+		}
+
+		if ($cache === true && $this->cacheEnabled === true ) {
+			try {
+				$count = $this->cacheServer->get($this->cacheServer->createKey($query . 'count'));
+				if ($count !== false) {
+					return ['total' => $count, 'result' => $data];
+				}
+			} catch (CacheException $error) {
+				$this->echoError($error->getMessage(), 'queryCalc', 4);
+			}
+		}
+
+		$result = $this->queryOneRow('SELECT FOUND_ROWS() AS total');
+
+		if ($result !== false && $cache === true && $this->cacheEnabled === true) {
+			$this->cacheServer->set($this->cacheServer->createKey($query . 'count'), $result['total'], $cacheExpiry);
+		}
+
+		return
+				[
+						'total' => ($result === false ? 0 : $result['total']),
+						'result' => $data
+				];
 	}
 
 	/**
@@ -1049,15 +1057,15 @@ class DB extends \PDO
 	public function uuid()
 	{
 		return sprintf(
-			'%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-			mt_rand(0, 0xffff),
-			mt_rand(0, 0xffff),
-			mt_rand(0, 0xffff),
-			mt_rand(0, 0x0fff) | 0x4000,
-			mt_rand(0, 0x3fff) | 0x8000,
-			mt_rand(0, 0xffff),
-			mt_rand(0, 0xffff),
-			mt_rand(0, 0xffff)
+				'%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+				mt_rand(0, 0xffff),
+				mt_rand(0, 0xffff),
+				mt_rand(0, 0xffff),
+				mt_rand(0, 0x0fff) | 0x4000,
+				mt_rand(0, 0x3fff) | 0x8000,
+				mt_rand(0, 0xffff),
+				mt_rand(0, 0xffff),
+				mt_rand(0, 0xffff)
 		);
 	}
 

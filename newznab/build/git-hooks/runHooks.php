@@ -19,6 +19,7 @@
  * @copyright 2014 nZEDb
  */
 define('GIT_PRE_COMMIT', true);
+
 require_once realpath(dirname(dirname(dirname(__DIR__))) . DIRECTORY_SEPARATOR . 'indexer.php');
 
 use newznab\db\DbUpdate;
@@ -30,7 +31,7 @@ echo "Running pre-commit hooks\n";
 $error = false;
 
 // TODO Add code here to check permissions on staged files.
-//$files = file(nZEDb_ROOT . 'nzedb/build/git-hooks'), FILE_IGNORE_NEW_LINES);
+//$files = file(NN_ROOT . 'newznab/build/git-hooks'), FILE_IGNORE_NEW_LINES);
 //foreach ($files as $file) {
 //	echo "Filename: $file\n";
 //}
@@ -42,16 +43,7 @@ if ($error === false) {
 	$git = new Git();
 	$branch = $git->active_branch();
 	if (in_array($branch, $git->mainBranches())) {
-		// Only update versions, patches, etc. on specific branches to lessen conflicts
-		try {
-			// Run DbUpdates to make sure we're up to date.
-			$DbUpdater = new DbUpdate(['git' => $git]);
-			$DbUpdater->newPatches(['safe' => false]);
-		} catch (\Exception $e) {
-			$error = 1;
-			echo "Error while checking patches!\n";
-			echo $e->getMessage() . "\n";
-		}
+		// Only update versions, etc. on specific branches to lessen conflicts
 
 		if ($error === false) {
 			try {
@@ -62,6 +54,7 @@ if ($error === false) {
 			} catch (\Exception $e) {
 				$error = 1;
 				echo "Error while checking versions!\n";
+				echo $e->getMessage() . "\n";
 			}
 		}
 	} else {
@@ -72,3 +65,4 @@ if ($error === false) {
 }
 
 exit($error);
+?>

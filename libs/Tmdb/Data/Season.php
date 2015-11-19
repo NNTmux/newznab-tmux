@@ -23,7 +23,7 @@ class Season{
     // Class Variables
     //------------------------------------------------------------------------------
 
-    private $_data;
+    public $_data;
     private $_idTVShow;
 
     /**

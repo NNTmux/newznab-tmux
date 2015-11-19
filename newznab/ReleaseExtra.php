@@ -2,7 +2,6 @@
 namespace newznab;
 
 use newznab\db\Settings;
-use newznab\utility\Utility;
 
 /**
  * This class handles storage and retrieval of releaseextrafull/releasevideo/audio/subs data.
@@ -33,27 +32,34 @@ class ReleaseExtra
 	 */
 	public function makeCodecPretty($codec)
 	{
-		if (preg_match('/DX50|DIVX|DIV3/i', $codec)) {
-			return 'DivX';
+		switch (true) {
+			case preg_match('#(?:^36$|HEVC)#i', $codec):
+				$codec = 'HEVC';
+				break;
+			case preg_match('#(?:^(?:7|27|H264)$|AVC)#i', $codec);
+				$codec = 'h.264';
+				break;
+			case preg_match('#(?:^(?:20|FMP4|MP42|MP43|MPG4)$|ASP)#i', $codec):
+				$codec = 'MPEG-4';
+				break;
+			case preg_match('#^2$#i', $codec);
+				$codec = 'MPEG-2';
+				break;
+			case preg_match('#^MPEG$#', $codec);
+				$codec = 'MPEG-1';
+				break;
+			case preg_match('#DX50|DIVX|DIV3#i', $codec):
+				$codec = 'DivX';
+				break;
+			case preg_match('#XVID#i', $codec):
+				$codec = 'XviD';
+				break;
+			case preg_match('#(?:wmv|WVC1)#i', $codec);
+				$codec = 'wmv';
+				break;
+			default;
 		}
-		if (preg_match('/XVID/i', $codec)) {
-			return 'XviD';
-		}
-		if (preg_match('/^27$/i', $codec)) {
-			return 'Blu-Ray';
-		}
-		if (preg_match('/V_MPEG4\/ISO\/AVC/i', $codec)) {
-			return 'x264';
-		}
-		if (preg_match('/wmv|WVC1/i', $codec)) {
-			return 'wmv';
-		}
-		if (preg_match('/^2$/i', $codec)) {
-			return 'HD.ts';
-		}
-		if (preg_match('/avc1/i', $codec)) {
-			return 'h.264';
-		}
+
 		return $codec;
 	}
 
@@ -81,7 +87,7 @@ class ReleaseExtra
 	public function addFromXml($releaseID, $xml)
 	{
 		$xmlObj = @simplexml_load_string($xml);
-		$arrXml = Utility::objectsIntoArray($xmlObj);
+		$arrXml = \newznab\utility\Utility::objectsIntoArray($xmlObj);
 		$containerformat = "";
 		$overallbitrate = "";
 
@@ -124,8 +130,8 @@ class ReleaseExtra
 							$videolibrary = $track["Writing_library"];
 						$viddata = $track;
 						$this->addVideo($releaseID, $containerformat, $overallbitrate, $videoduration,
-							$videoformat, $videocodec, $videowidth, $videoheight,
-							$videoaspect, $videoframerate, $videolibrary
+								$videoformat, $videocodec, $videowidth, $videoheight,
+								$videoaspect, $videoframerate, $videolibrary
 						);
 					} elseif ($track["@attributes"]["type"] == "Audio") {
 						$audioID = 1;
@@ -193,9 +199,9 @@ class ReleaseExtra
 						videoformat, videocodec, videowidth, videoheight,
 						videoaspect, videoframerate, videolibrary, definition)
 						VALUES ( %d, %s, %s, %s, %s, %s, %d, %d, %s, %s, %s, %d )',
-			$releaseID, $this->pdo->escapeString($containerformat), $this->pdo->escapeString($overallbitrate), $this->pdo->escapeString($videoduration),
-			$this->pdo->escapeString($videoformat), $this->pdo->escapeString($videocodec), $videowidth, $videoheight,
-			$this->pdo->escapeString($videoaspect), $this->pdo->escapeString($videoframerate), $this->pdo->escapeString($videolibrary), self::determineVideoResolution($videowidth, $videoheight)
+				$releaseID, $this->pdo->escapeString($containerformat), $this->pdo->escapeString($overallbitrate), $this->pdo->escapeString($videoduration),
+				$this->pdo->escapeString($videoformat), $this->pdo->escapeString($videocodec), $videowidth, $videoheight,
+				$this->pdo->escapeString($videoaspect), $this->pdo->escapeString($videoframerate), $this->pdo->escapeString($videolibrary), self::determineVideoResolution($videowidth, $videoheight)
 		));
 	}
 
@@ -253,9 +259,9 @@ class ReleaseExtra
 						(releaseid,	audioid,audioformat,audiomode, audiobitratemode, audiobitrate,
 						audiochannels,audiosamplerate,audiolibrary,audiolanguage,audiotitle)
 						VALUES ( %d, %d, %s, %s, %s, %s, %s, %s, %s, %s, %s )",
-			$releaseID, $audioID, $this->pdo->escapeString($audioformat), $this->pdo->escapeString($audiomode), $this->pdo->escapeString($audiobitratemode),
-			$this->pdo->escapeString($audiobitrate), $this->pdo->escapeString($audiochannels), $this->pdo->escapeString($audiosamplerate), $this->pdo->escapeString(substr($audiolibrary, 0, 255)),
-			$this->pdo->escapeString(substr($audiolanguage, 0, 255)), $this->pdo->escapeString(substr($audiotitle, 0, 255))
+				$releaseID, $audioID, $this->pdo->escapeString($audioformat), $this->pdo->escapeString($audiomode), $this->pdo->escapeString($audiobitratemode),
+				$this->pdo->escapeString($audiobitrate), $this->pdo->escapeString($audiochannels), $this->pdo->escapeString($audiosamplerate), $this->pdo->escapeString(substr($audiolibrary, 0, 255)),
+				$this->pdo->escapeString(substr($audiolanguage, 0, 255)), $this->pdo->escapeString(substr($audiotitle, 0, 255))
 		));
 	}
 

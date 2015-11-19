@@ -23,6 +23,12 @@ if (isset($argv[1]) && $argv[1] === "all") {
 			$pdo->queryExec("TRUNCATE TABLE releasenfo");
 			$pdo->queryExec("TRUNCATE TABLE releaseextrafull");
 			$pdo->queryExec("TRUNCATE TABLE xxxinfo");
+			$pdo->queryExec("TRUNCATE TABLE videos");
+			$pdo->queryExec("TRUNCATE TABLE videos_aliases");
+			$pdo->queryExec("TRUNCATE TABLE tv_info");
+			$pdo->queryExec("TRUNCATE TABLE tv_episodes");
+			$pdo->queryExec("TRUNCATE TABLE anidb_info");
+			$pdo->queryExec("TRUNCATE TABLE anidb_episodes");
 		}
 		echo $pdo->log->header("Resetting all postprocessing");
 		$qry = $pdo->queryDirect("SELECT id FROM releases");
@@ -31,14 +37,14 @@ if (isset($argv[1]) && $argv[1] === "all") {
 			$total = $qry->rowCount();
 			foreach ($qry as $releases) {
 				$pdo->queryExec(
-					sprintf("
+						sprintf("
 						UPDATE releases
 						SET consoleinfoid = NULL, gamesinfo_id = 0, imdbid = NULL, musicinfoid = NULL,
 							bookinfoid = NULL, videos_id = 0, tv_episodes_id = 0, xxxinfo_id = 0, passwordstatus = -1, haspreview = -1,
 							jpgstatus = 0, videostatus = 0, audiostatus = 0, nfostatus = -1
 						WHERE id = %d",
-						$releases['id']
-					)
+								$releases['id']
+						)
 				);
 				$consoletools->overWritePrimary("Resetting Releases:  " . $consoletools->percentString(++$affected, $total));
 			}
@@ -182,7 +188,7 @@ if (isset($argv[1]) && ($argv[1] === "misc" || $argv[1] === "all")) {
 if (isset($argv[1]) && ($argv[1] === "tv" || $argv[1] === "all")) {
 	$ran = true;
 	if (isset($argv[3]) && $argv[3] === "truncate") {
-		$pdo->queryExec("DELETE FROM videos WHERE type = 0");
+		$pdo->queryExec("DELETE v, va FROM videos v INNER JOIN videos_aliases va ON v.id = va.videos_id WHERE type = 0");
 		$pdo->queryExec("TRUNCATE TABLE tv_info");
 		$pdo->queryExec("TRUNCATE TABLE tv_episodes");
 	}
@@ -282,7 +288,7 @@ if (isset($argv[1]) && ($argv[1] === "xxx" || $argv[1] === "all")) {
 		foreach ($qry as $releases) {
 			$pdo->queryExec("UPDATE releases SET xxxinfo_id = 0 WHERE id = " . $releases['id']);
 			$consoletools->overWritePrimary("Resetting XXX Releases:  " . $consoletools->percentString(++$concount,
-					$total));
+							$total));
 		}
 	}
 	echo $pdo->log->header("\n" . number_format($concount) . " xxxinfo_ID's reset.");
@@ -314,7 +320,7 @@ if (isset($argv[1]) && ($argv[1] === "nfos" || $argv[1] === "all")) {
 
 if ($ran === false) {
 	exit(
-		$pdo->log->error(
+	$pdo->log->error(
 			"\nThis script will reset postprocessing per category. It can also truncate the associated tables."
 			. "\nTo reset only those that have previously failed, those without covers, samples, previews, etc. use the "
 			. "second argument false.\n"
@@ -331,7 +337,7 @@ if ($ran === false) {
 			. "php reset_postprocessing.php xxx true         ...: To reset all xxx.\n"
 			. "php reset_postprocessing.php nfos true        ...: To reset all nfos.\n"
 			. "php reset_postprocessing.php all true         ...: To reset everything.\n"
-		)
+	)
 	);
 } else {
 	echo "\n";

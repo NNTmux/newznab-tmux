@@ -15,6 +15,8 @@ use newznab\Sharing;
 //use newznab\processing\tv\TvRage;
 use newznab\processing\tv\TVDB;
 use newznab\processing\tv\TVMaze;
+use newznab\processing\tv\TMDB;
+use newznab\processing\tv\TraktTv;
 use newznab\XXX;
 use newznab\ReleaseFiles;
 use newznab\db\Settings;
@@ -91,13 +93,13 @@ class PostProcess
 	public function __construct(array $options = [])
 	{
 		$defaults = [
-			'Echo'         => true,
-			'Logger'       => null,
-			'Groups'       => null,
-			'NameFixer'    => null,
-			'Nfo'          => null,
-			'ReleaseFiles' => null,
-			'Settings'     => null,
+				'Echo'         => true,
+				'Logger'       => null,
+				'Groups'       => null,
+				'NameFixer'    => null,
+				'Nfo'          => null,
+				'ReleaseFiles' => null,
+				'Settings'     => null,
 		];
 		$options += $defaults;
 
@@ -259,9 +261,11 @@ class PostProcess
 	{
 		$processTV = (is_numeric($processTV) ? $processTV : $this->pdo->getSetting('lookuptvrage'));
 		if ($processTV > 0) {
-			(new TVDB(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processTVDB($groupID, $guidChar, $processTV);
+			(new TVDB(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processSite($groupID, $guidChar, $processTV);
+			(new TVMaze(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processSite($groupID, $guidChar, $processTV);
+			(new TMDB(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processSite($groupID, $guidChar, $processTV);
+			//(new TraktTv(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processTrakt($groupID, $guidChar, $processTV);
 			//(new TvRage(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processTvRage($groupID, $guidChar, $processTV);
-			(new TVMaze(['Echo' => $this->echooutput, 'Settings' => $this->pdo]))->processTVMaze($groupID, $guidChar, $processTV);
 		}
 	}
 
@@ -275,7 +279,7 @@ class PostProcess
 		if ($processed > 0) {
 			if ($this->echooutput) {
 				$this->pdo->log->doEcho(
-					$this->pdo->log->primary('Updating GID in releases table ' . $processed . ' release(s) updated')
+						$this->pdo->log->primary('Updating GID in releases table ' . $processed . ' release(s) updated')
 				);
 			}
 		}
@@ -332,13 +336,13 @@ class PostProcess
 		}
 
 		$query = $this->pdo->queryOneRow(
-			sprintf('
+				sprintf('
 				SELECT id, groupid, categoryid, name, searchname, UNIX_TIMESTAMP(postdate) AS post_date, id AS releaseid
 				FROM releases
 				WHERE isrenamed = 0
 				AND id = %d',
-				$relID
-			)
+						$relID
+				)
 		);
 
 		if ($query === false) {
@@ -348,18 +352,18 @@ class PostProcess
 		// Only get a new name if the category is OTHER.
 		$foundName = true;
 		if (!in_array(
-			(int)$query['categoryid'],
-			[
-				Category::CAT_BOOK_OTHER,
-				Category::CAT_GAME_OTHER,
-				Category::CAT_MOVIE_OTHER,
-				Category::CAT_MUSIC_OTHER,
-				Category::CAT_PC_MOBILEOTHER,
-				Category::CAT_TV_OTHER,
-				Category::CAT_MISC_HASHED,
-				Category::CAT_XXX_OTHER,
-				Category::CAT_MISC_OTHER
-			]
+				(int)$query['categoryid'],
+				[
+						Category::CAT_BOOK_OTHER,
+						Category::CAT_GAME_OTHER,
+						Category::CAT_MOVIE_OTHER,
+						Category::CAT_MUSIC_OTHER,
+						Category::CAT_PC_MOBILEOTHER,
+						Category::CAT_TV_OTHER,
+						Category::CAT_MISC_HASHED,
+						Category::CAT_XXX_OTHER,
+						Category::CAT_MISC_OTHER
+				]
 		)
 		) {
 			$foundName = false;
@@ -398,16 +402,16 @@ class PostProcess
 				if ($this->addpar2) {
 					// Add to release files.
 					if ($filesAdded < 11 &&
-						$this->pdo->queryOneRow(
-							sprintf('
-								SELECT id
-								FROM releasefiles
+							$this->pdo->queryOneRow(
+									sprintf('
+								SELECT releaseid
+								FROM release_files
 								WHERE releaseid = %d
 								AND name = %s',
-								$relID,
-								$this->pdo->escapeString($file['name'])
-							)
-						) === false
+											$relID,
+											$this->pdo->escapeString($file['name'])
+									)
+							) === false
 					) {
 
 						// Try to add the files to the DB.
@@ -434,13 +438,13 @@ class PostProcess
 
 				// Update the file count with the new file count + old file count.
 				$this->pdo->queryExec(
-					sprintf('
+						sprintf('
 						UPDATE releases
 						SET rarinnerfilecount = rarinnerfilecount + %d
 						WHERE id = %d',
-						$filesAdded,
-						$relID
-					)
+								$filesAdded,
+								$relID
+						)
 				);
 			}
 			if ($foundName === true) {

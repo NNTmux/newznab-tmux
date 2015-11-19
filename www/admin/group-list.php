@@ -21,6 +21,8 @@ $page->smarty->assign('groupname',$groupname);
 $page->smarty->assign('pagertotalitems',$groupcount);
 $page->smarty->assign('pageroffset',$offset);
 $page->smarty->assign('pageritemsperpage',ITEMS_PER_PAGE);
+$page->smarty->assign('pagerquerysuffix', '');
+
 
 $groupsearch = ($gname != "") ? 'groupname='.$gname.'&amp;' : '';
 $page->smarty->assign('pagerquerybase', WWW_TOP."/group-list.php?".$groupsearch."offset=");

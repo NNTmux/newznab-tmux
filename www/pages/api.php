@@ -34,6 +34,11 @@ if (isset($_GET['t'])) {
 		case 'movie':
 			$function = 'm';
 			break;
+		case 'n':
+		case 'nfo':
+		case 'info':
+			$function = 'n';
+			break;
 		case 'r':
 		case 'register':
 			$function = 'r';
@@ -105,8 +110,8 @@ switch ($function) {
 
 		if (isset($_GET['q'])) {
 			$relData = $releases->search(
-				$_GET['q'], -1, -1, -1, -1, -1, -1, 0, 0, -1, -1, $offset, $limit, '', $maxAge, $catExclusions,
-				"basic", $categoryID
+					$_GET['q'], -1, -1, -1, -1, -1, -1, 0, 0, -1, -1, $offset, $limit, '', $maxAge, $catExclusions,
+					"basic", $categoryID
 			);
 		} else {
 			$totalRows = $releases->getBrowseCount($categoryID, $maxAge, $catExclusions);
@@ -133,13 +138,13 @@ switch ($function) {
 		$offset = offset();
 
 		$siteIdArr = 	[
-			'id'     => (isset($_GET['vid']) ? $_GET['vid'] : '0'),
-			'tvdb'   => (isset($_GET['tvdbid']) ? $_GET['tvdbid'] : '0'),
-			'trakt'  => (isset($_GET['traktid']) ? $_GET['traktid'] : '0'),
-			'tvrage' => (isset($_GET['rid']) ? $_GET['rid'] : '0'),
-			'tvmaze' => (isset($_GET['tvmazeid']) ? $_GET['tvmazeid'] : '0'),
-			'imdb'   => (isset($_GET['imdbid']) ? $_GET['imdbid'] : '0'),
-			'tmdb'   => (isset($_GET['tmdbid']) ? $_GET['tmdbid'] : '0')
+				'id'     => (isset($_GET['vid']) ? $_GET['vid'] : '0'),
+				'tvdb'   => (isset($_GET['tvdbid']) ? $_GET['tvdbid'] : '0'),
+				'trakt'  => (isset($_GET['traktid']) ? $_GET['traktid'] : '0'),
+				'tvrage' => (isset($_GET['rid']) ? $_GET['rid'] : '0'),
+				'tvmaze' => (isset($_GET['tvmazeid']) ? $_GET['tvmazeid'] : '0'),
+				'imdb'   => (isset($_GET['imdbid']) ? $_GET['imdbid'] : '0'),
+				'tmdb'   => (isset($_GET['tmdbid']) ? $_GET['tmdbid'] : '0')
 		];
 
 		if (isset($_GET['season']) && isset($_GET['ep'])) {
@@ -152,15 +157,15 @@ switch ($function) {
 		}
 
 		$relData = $releases->searchShows(
-			$siteIdArr,
-			(isset($series) ? $series : ''),
-			(isset($episode) ? $episode : ''),
-			(isset($airdate) ? $airdate : ''),
-			$offset,
-			limit(),
-			(isset($_GET['q']) ? $_GET['q'] : ''),
-			categoryID(),
-			$maxAge
+				$siteIdArr,
+				(isset($series) ? $series : ''),
+				(isset($episode) ? $episode : ''),
+				(isset($airdate) ? $airdate : ''),
+				$offset,
+				limit(),
+				(isset($_GET['q']) ? $_GET['q'] : ''),
+				categoryID(),
+				$maxAge
 		);
 
 		addLanguage($relData, $page->settings);
@@ -178,18 +183,18 @@ switch ($function) {
 		$imdbId = (isset($_GET['imdbid']) ? $_GET['imdbid'] : '-1');
 
 		$relData = $releases->searchbyImdbId(
-			$imdbId,
-			$offset,
-			limit(),
-			(isset($_GET['q']) ? $_GET['q'] : ''),
-			categoryID(),
-			$maxAge
+				$imdbId,
+				$offset,
+				limit(),
+				(isset($_GET['q']) ? $_GET['q'] : ''),
+				categoryID(),
+				$maxAge
 		);
 
 		addCoverURL($relData,
-			function($release) {
-				return Utility::getCoverURL(['type' => 'movies', 'id' => $release['imdbid']]);
-			}
+				function($release) {
+					return Utility::getCoverURL(['type' => 'movies', 'id' => $release['imdbid']]);
+				}
 		);
 
 		addLanguage($relData, $page->settings);
@@ -205,15 +210,15 @@ switch ($function) {
 		$relData = $releases->getByGuid($_GET['id']);
 		if ($relData) {
 			header(
-				'Location:' .
-				WWW_TOP .
-				'/getnzb?i=' .
-				$uid .
-				'&r=' .
-				$apiKey .
-				'&id=' .
-				$relData['guid'] .
-				((isset($_GET['del']) && $_GET['del'] == '1') ? '&del=1' : '')
+					'Location:' .
+					WWW_TOP .
+					'/getnzb?i=' .
+					$uid .
+					'&r=' .
+					$apiKey .
+					'&id=' .
+					$relData['guid'] .
+					((isset($_GET['del']) && $_GET['del'] == '1') ? '&del=1' : '')
 			);
 		} else {
 			showApiError(300, 'No such item (the guid you provided has no release in our database)');
@@ -236,6 +241,35 @@ switch ($function) {
 
 		printOutput($relData, $outputXML, $page, offset());
 		break;
+
+	// Get an NFO file for an individual release.
+	case 'n':
+		if (!isset($_GET['id'])) {
+			showApiError(200, 'Missing parameter (id is required for retrieving an NFO)');
+		}
+
+		$page->users->addApiRequest($uid, $_SERVER['REQUEST_URI']);
+		$rel = $releases->getByGuid($_GET["id"]);
+		$data = $releases->getReleaseNfo($rel['id']);
+
+		if ($rel !== false && !empty($rel)) {
+			if ($data !== false) {
+				if (isset($_GET['o']) && $_GET['o'] == 'file') {
+					header("Content-type: application/octet-stream");
+					header("Content-disposition: attachment; filename={$rel['searchname']}.nfo");
+					exit($data['nfo']);
+				} else {
+					echo nl2br(Utility::cp437toUTF($data['nfo']));
+				}
+			} else {
+				showApiError(300, 'Release does not have an NFO file associated.');
+			}
+		} else {
+			showApiError(300, 'Release does not exist.');
+		}
+
+		break;
+
 
 	// Capabilities request.
 	case 'c':
@@ -288,7 +322,7 @@ switch ($function) {
 		// Register.
 		$userDefault = $page->users->getDefaultRole();
 		$uid = $page->users->signUp(
-			$username, $password, $_GET['email'], $_SERVER['REMOTE_ADDR'], $userDefault['id'], $userDefault['defaultinvites']
+				$username, $password, $_GET['email'], $_SERVER['REMOTE_ADDR'], $userDefault['id'], $userDefault['defaultinvites']
 		);
 
 		// Check if it succeeded.
@@ -298,11 +332,11 @@ switch ($function) {
 		}
 
 		$response =
-			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" .
-			'<register username="' . $username .
-			'" password="' . $password .
-			'" apikey="' . $userdata['rsstoken'] .
-			"\"/>\n";
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" .
+				'<register username="' . $username .
+				'" password="' . $password .
+				'" apikey="' . $userdata['rsstoken'] .
+				"\"/>\n";
 		header('Content-type: text/xml');
 		header('Content-Length: ' . strlen($response) );
 		echo $response;
@@ -370,8 +404,8 @@ function showApiError($errorCode = 900, $errorText = '')
 	}
 
 	$response =
-		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" .
-		'<error code="' . $errorCode .  '" description="' . $errorText . "\"/>\n";
+			"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" .
+			'<error code="' . $errorCode .  '" description="' . $errorText . "\"/>\n";
 	header('Content-type: text/xml');
 	header('Content-Length: ' . strlen($response) );
 	header('X-nZEDb: API ERROR [' . $errorCode . '] ' . $errorText);
@@ -409,7 +443,7 @@ function categoryID()
 		$categoryIDs = urldecode($_GET['cat']);
 		// Append Web-DL category ID if HD present for SickBeard / Sonarr compatibility.
 		if (strpos($categoryIDs, (string)Category::CAT_TV_HD) !== false &&
-			strpos($categoryIDs, (string)Category::CAT_TV_WEBDL) === false) {
+				strpos($categoryIDs, (string)Category::CAT_TV_WEBDL) === false) {
 			$categoryIDs .= (',' . Category::CAT_TV_WEBDL);
 		}
 		$categoryID = explode(',', $categoryIDs);
@@ -499,7 +533,12 @@ function addLanguage(&$releases, Settings $settings)
 	if ($releases && count($releases)) {
 		foreach ($releases as $key => $release) {
 			if (isset($release['id'])) {
-				$language = $settings->queryOneRow(sprintf('SELECT audiolanguage FROM releaseaudio WHERE releaseid = %d', $release['id']));
+				$language = $settings->queryOneRow('
+					SELECT audiolanguage
+					FROM releaseaudio
+					WHERE releaseid = ' .
+						$release['id']
+				);
 				if ($language !== false) {
 					$releases[$key]['searchname'] = $releases[$key]['searchname'] . ' ' . $language['audiolanguage'];
 				}

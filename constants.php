@@ -36,6 +36,9 @@ define('NN_WWW', NN_ROOT . 'www' . DS);
 // Used to refer to the resources folder
 define('NN_RES', NN_ROOT . 'resources' . DS);
 
+// Used to refer to the covers folder
+define('NN_COVERS', NN_RES . 'covers' . DS);
+
 // Used to refer to the tmp folder
 define('NN_TMP', NN_RES . 'tmp' . DS);
 

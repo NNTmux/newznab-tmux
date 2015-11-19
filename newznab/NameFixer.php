@@ -128,13 +128,13 @@ class NameFixer
 	public function __construct(array $options = [])
 	{
 		$defaults = [
-			'Echo'         => true,
-			'Categorize'   => null,
-			'ConsoleTools' => null,
-			'Groups'       => null,
-			'Misc'      => null,
-			'Settings'     => null,
-			'SphinxSearch' => null,
+				'Echo'         => true,
+				'Categorize'   => null,
+				'ConsoleTools' => null,
+				'Groups'       => null,
+				'Misc'      => null,
+				'Settings'     => null,
+				'SphinxSearch' => null,
 		];
 		$options += $defaults;
 
@@ -176,7 +176,7 @@ class NameFixer
 					FROM releases rel
 					INNER JOIN release_nfos nfo ON (nfo.releaseid = rel.id)
 					WHERE nzbstatus = %d
-					AND preid = 0',
+					AND prehashid = 0',
 					NZB::NZB_ADDED
 			);
 			$cats = 2;
@@ -189,7 +189,7 @@ class NameFixer
 					WHERE (isrenamed = %d OR rel.categoryid = %d)
 					AND proc_nfo = %d',
 					self::IS_RENAMED_NONE,
-					Category::CAT_MISC,
+					Category::CAT_MISC_OTHER,
 					self::PROC_NFO_NONE
 			);
 		}
@@ -205,14 +205,14 @@ class NameFixer
 
 				foreach ($releases as $rel) {
 					$releaseRow = $this->pdo->queryOneRow(
-						sprintf('
+							sprintf('
 							SELECT nfo.releaseid AS nfoid, rel.groupid, rel.categoryid, rel.name, rel.searchname,
 								UNCOMPRESS(nfo) AS textstring, rel.id AS releaseid
 							FROM releases rel
 							INNER JOIN release_nfos nfo ON (nfo.releaseid = rel.id)
 							WHERE rel.id = %d',
-							$rel['releaseid']
-						)
+									$rel['releaseid']
+							)
 					);
 
 					$this->checked++;
@@ -254,9 +254,9 @@ class NameFixer
 					SELECT rf.name AS textstring, rel.categoryid, rel.name, rel.searchname, rel.groupid,
 						rf.releaseid AS fileid, rel.id AS releaseid
 					FROM releases rel
-					INNER JOIN releasefiles rf ON (rf.releaseid = rel.id)
+					INNER JOIN release_files rf ON (rf.releaseid = rel.id)
 					WHERE nzbstatus = %d
-					AND preid = 0',
+					AND prehashid = 0',
 					NZB::NZB_ADDED
 			);
 			$cats = 2;
@@ -266,11 +266,11 @@ class NameFixer
 					SELECT rf.name AS textstring, rel.categoryid, rel.name, rel.searchname, rel.groupid,
 						rf.releaseid AS fileid, rel.id AS releaseid
 					FROM releases rel
-					INNER JOIN releasefiles rf ON (rf.releaseid = rel.id)
+					INNER JOIN release_files rf ON (rf.releaseid = rel.id)
 					WHERE (isrenamed = %d OR rel.categoryid = %d)
 					AND proc_files = %d',
 					self::IS_RENAMED_NONE,
-					Category::CAT_MISC,
+					Category::CAT_MISC_OTHER,
 					self::PROC_FILES_NONE
 			);
 		}
@@ -316,7 +316,7 @@ class NameFixer
 					SELECT rel.id AS releaseid, rel.guid, rel.groupid
 					FROM releases rel
 					WHERE nzbstatus = %d
-					AND preid = 0',
+					AND prehashid = 0',
 					NZB::NZB_ADDED
 			);
 			$cats = 2;
@@ -327,7 +327,7 @@ class NameFixer
 					WHERE (isrenamed = %d OR rel.categoryid = %d)
 					AND proc_par2 = %d',
 					self::IS_RENAMED_NONE,
-					Category::CAT_MISC,
+					Category::CAT_MISC_OTHER,
 					self::PROC_PAR2_NONE
 			);
 		}
@@ -343,13 +343,13 @@ class NameFixer
 				echo $this->pdo->log->primary(number_format($total) . ' releases to process.');
 				$Nfo = new Nfo(['Echo' => $this->echooutput, 'Settings' => $this->pdo]);
 				$nzbContents = new NZBContents(
-					[
-						'Echo'        => $this->echooutput,
-						'NNTP'        => $nntp,
-						'Nfo'         => $Nfo,
-						'Settings'    => $this->pdo,
-						'PostProcess' => new PostProcess(['Settings' => $this->pdo, 'Nfo' => $Nfo])
-					]
+						[
+								'Echo'        => $this->echooutput,
+								'NNTP'        => $nntp,
+								'Nfo'         => $Nfo,
+								'Settings'    => $this->pdo,
+								'PostProcess' => new PostProcess(['Settings' => $this->pdo, 'Nfo' => $Nfo])
+						]
 				);
 
 				foreach ($releases as $release) {
@@ -408,19 +408,19 @@ class NameFixer
 	{
 		if ($echo == 1) {
 			echo $this->pdo->log->header(
-				PHP_EOL .
-				number_format($this->fixed) .
-				' releases have had their names changed out of: ' .
-				number_format($this->checked) .
-				$type . '.'
+					PHP_EOL .
+					number_format($this->fixed) .
+					' releases have had their names changed out of: ' .
+					number_format($this->checked) .
+					$type . '.'
 			);
 		} else {
 			echo $this->pdo->log->header(
-				PHP_EOL .
-				number_format($this->fixed) .
-				' releases could have their names changed. ' .
-				number_format($this->checked) .
-				$type . ' were checked.'
+					PHP_EOL .
+					number_format($this->fixed) .
+					' releases could have their names changed. ' .
+					number_format($this->checked) .
+					$type . ' were checked.'
 			);
 		}
 	}
@@ -432,11 +432,11 @@ class NameFixer
 	protected function _echoStartMessage($time, $type)
 	{
 		echo $this->pdo->log->header(
-			sprintf(
-				'Fixing search names %s using %s.',
-				($time == 1 ? 'in the past 6 hours' : 'since the beginning'),
-				$type
-			)
+				sprintf(
+						'Fixing search names %s using %s.',
+						($time == 1 ? 'in the past 6 hours' : 'since the beginning'),
+						$type
+				)
 		);
 
 	}
@@ -452,10 +452,10 @@ class NameFixer
 
 		if ($show === 2) {
 			$this->consoletools->overWritePrimary(
-				'Renamed Releases: [' .
-				number_format($this->fixed) .
-				'] ' .
-				$this->consoletools->percentString($this->checked, $this->_totalReleases)
+					'Renamed Releases: [' .
+					number_format($this->fixed) .
+					'] ' .
+					$this->consoletools->percentString($this->checked, $this->_totalReleases)
 			);
 		}
 	}
@@ -505,26 +505,26 @@ class NameFixer
 					}
 
 					echo
-						$this->pdo->log->headerOver("\nNew name:  ") .
-						$this->pdo->log->primary(substr($newName, 0, 255)) .
-						$this->pdo->log->headerOver("Old name:  ") .
-						$this->pdo->log->primary($release["searchname"]) .
-						$this->pdo->log->headerOver("Use name:  ") .
-						$this->pdo->log->primary($release["name"]) .
-						$this->pdo->log->headerOver("New cat:   ") .
-						$this->pdo->log->primary($newCatName) .
-						$this->pdo->log->headerOver("Old cat:   ") .
-						$this->pdo->log->primary($oldCatName) .
-						$this->pdo->log->headerOver("Group:     ") .
-						$this->pdo->log->primary($groupName) .
-						$this->pdo->log->headerOver("Method:    ") .
-						$this->pdo->log->primary($type . $method) .
-						$this->pdo->log->headerOver("ReleaseID: ") .
-						$this->pdo->log->primary($release["releaseid"]);
+							$this->pdo->log->headerOver("\nNew name:  ") .
+							$this->pdo->log->primary(substr($newName, 0, 255)) .
+							$this->pdo->log->headerOver("Old name:  ") .
+							$this->pdo->log->primary($release["searchname"]) .
+							$this->pdo->log->headerOver("Use name:  ") .
+							$this->pdo->log->primary($release["name"]) .
+							$this->pdo->log->headerOver("New cat:   ") .
+							$this->pdo->log->primary($newCatName) .
+							$this->pdo->log->headerOver("Old cat:   ") .
+							$this->pdo->log->primary($oldCatName) .
+							$this->pdo->log->headerOver("Group:     ") .
+							$this->pdo->log->primary($groupName) .
+							$this->pdo->log->headerOver("Method:    ") .
+							$this->pdo->log->primary($type . $method) .
+							$this->pdo->log->headerOver("ReleaseID: ") .
+							$this->pdo->log->primary($release["releaseid"]);
 					if (isset($release['filename']) && $release['filename'] != "") {
 						echo
-							$this->pdo->log->headerOver("Filename:  ") .
-							$this->pdo->log->primary($release["filename"]);
+								$this->pdo->log->headerOver("Filename:  ") .
+								$this->pdo->log->primary($release["filename"]);
 					}
 
 					if ($type !== "PAR2, ") {
@@ -560,34 +560,34 @@ class NameFixer
 								break;
 						}
 						$this->pdo->queryExec(
-							sprintf('
+								sprintf('
 								UPDATE releases
 								SET videos_id = 0, tv_episodes_id = 0, imdbid = NULL, musicinfoid = NULL,
-									consoleinfoid = NULL, bookinfoid = NULL, anidbid = NULL, preid = %d,
+									consoleinfoid = NULL, bookinfoid = NULL, anidbid = NULL, prehashid = %d,
 									searchname = %s, %s categoryid = %d
 								WHERE id = %d',
-								$preId,
-								$newTitle,
-								$status,
-								$determinedCategory,
-								$release['releaseid']
-							)
+										$preId,
+										$newTitle,
+										$status,
+										$determinedCategory,
+										$release['releaseid']
+								)
 						);
 						$this->sphinx->updateRelease($release['releaseid'], $this->pdo);
 					} else {
 						$newTitle = $this->pdo->escapeString(substr($newName, 0, 255));
 						$this->pdo->queryExec(
-							sprintf('
+								sprintf('
 								UPDATE releases
 								SET videos_id = 0, tv_episodes_id = 0, imdbid = NULL, musicinfoid = NULL,
-									consoleinfoid = NULL, bookinfoid = NULL, anidbid = NULL, preid = %d,
+									consoleinfoid = NULL, bookinfoid = NULL, anidbid = NULL, prehashid = %d,
 									searchname = %s, iscategorized = 1, categoryid = %d
 								WHERE id = %d',
-								$preId,
-								$newTitle,
-								$determinedCategory,
-								$release['releaseid']
-							)
+										$preId,
+										$newTitle,
+										$determinedCategory,
+										$release['releaseid']
+								)
 						);
 						$this->sphinx->updateRelease($release['releaseid'], $this->pdo);
 					}
@@ -616,25 +616,25 @@ class NameFixer
 	 * @void
 	 */
 	public static function echoChangedReleaseName(array $data =
-		[
-			'new_name'     => '',
-			'old_name'     => '',
-			'new_category' => '',
-			'old_category' => '',
-			'group'        => '',
-			'release_id'   => 0,
-			'method'       => ''
-		]
+												  [
+														  'new_name'     => '',
+														  'old_name'     => '',
+														  'new_category' => '',
+														  'old_category' => '',
+														  'group'        => '',
+														  'release_id'   => 0,
+														  'method'       => ''
+												  ]
 	) {
 		echo
-			PHP_EOL .
-			ColorCLI::headerOver('New name:     ') . ColorCLI::primaryOver($data['new_name']) . PHP_EOL .
-			ColorCLI::headerOver('Old name:     ') . ColorCLI::primaryOver($data['old_name']) . PHP_EOL .
-			ColorCLI::headerOver('New category: ') . ColorCLI::primaryOver($data['new_category']) . PHP_EOL .
-			ColorCLI::headerOver('Old category: ') . ColorCLI::primaryOver($data['old_category']) . PHP_EOL .
-			ColorCLI::headerOver('Group:        ') . ColorCLI::primaryOver($data['group']) . PHP_EOL .
-			ColorCLI::headerOver('Release ID:   ') . ColorCLI::primaryOver($data['release_id']) . PHP_EOL .
-			ColorCLI::headerOver('Method:       ') . ColorCLI::primaryOver($data['method']) . PHP_EOL;
+				PHP_EOL .
+				ColorCLI::headerOver('New name:     ') . ColorCLI::primaryOver($data['new_name']) . PHP_EOL .
+				ColorCLI::headerOver('Old name:     ') . ColorCLI::primaryOver($data['old_name']) . PHP_EOL .
+				ColorCLI::headerOver('New category: ') . ColorCLI::primaryOver($data['new_category']) . PHP_EOL .
+				ColorCLI::headerOver('Old category: ') . ColorCLI::primaryOver($data['old_category']) . PHP_EOL .
+				ColorCLI::headerOver('Group:        ') . ColorCLI::primaryOver($data['group']) . PHP_EOL .
+				ColorCLI::headerOver('Release ID:   ') . ColorCLI::primaryOver($data['release_id']) . PHP_EOL .
+				ColorCLI::headerOver('Method:       ') . ColorCLI::primaryOver($data['method']) . PHP_EOL;
 	}
 
 	// Match a PreDB title to a release name or searchname using an exact full-text match
@@ -646,17 +646,17 @@ class NameFixer
 
 		//Find release matches with fulltext and then identify exact matches with cleaned LIKE string
 		$res = $this->pdo->queryDirect(
-						sprintf("
+				sprintf("
 							SELECT r.id AS releaseid, r.name, r.searchname,
 								r.groupid, r.categoryid
 							FROM releases r
 							%1\$s
 							AND (r.name %2\$s OR r.searchname %2\$s)
-							AND r.preid = 0
+							AND r.prehashid = 0
 							LIMIT 21",
-							$join,
-							$this->pdo->likeString($pre['title'], true, true)
-						)
+						$join,
+						$this->pdo->likeString($pre['title'], true, true)
+				)
 		);
 
 		if ($res !== false) {
@@ -666,12 +666,12 @@ class NameFixer
 		// Run if row count is positive, but do not run if row count exceeds 10 (as this is likely a failed title match)
 		if ($total > 0 && $total <= 15 && $res instanceof \Traversable) {
 			foreach ($res as $row) {
-					if ($pre['title'] !== $row['searchname']) {
-						$this->updateRelease($row, $pre['title'], $method = "Title Match source: " . $pre['source'], $echo, "PreDB FT Exact, ", $namestatus, $show, $pre['preid']);
-						$matching++;
-					} else {
-						$this->_updateSingleColumn('preid', $pre['preid'], $row['releaseid']);
-					}
+				if ($pre['title'] !== $row['searchname']) {
+					$this->updateRelease($row, $pre['title'], $method = "Title Match source: " . $pre['source'], $echo, "PreDB FT Exact, ", $namestatus, $show, $pre['prehashid']);
+					$matching++;
+				} else {
+					$this->_updateSingleColumn('prehashid', $pre['prehashid'], $row['releaseid']);
+				}
 			}
 		} elseif ($total >= 16) {
 			$matching = -1;
@@ -720,22 +720,22 @@ class NameFixer
 		}
 
 		echo $this->pdo->log->header("\nMatch PreFiles (${args[1]}) Started at " . date('g:i:s'));
-		echo $this->pdo->log->primary("Matching predb filename to cleaned releasefiles.name.\n");
+		echo $this->pdo->log->primary("Matching predb filename to cleaned release_files.name.\n");
 
 		$query = $this->pdo->queryDirect(
-						sprintf('
+				sprintf('
 							SELECT r.id AS releaseid, r.name, r.searchname,
 								r.groupid, r.categoryid,
 								rf.name AS filename
 							FROM releases r
-							INNER JOIN releasefiles rf ON r.id = rf.releaseid
+							INNER JOIN release_files rf ON r.id = rf.releaseid
 							AND rf.name IS NOT NULL
 							WHERE r.prehashid = 0
 							GROUP BY r.id
 							%s %s',
-							$orderby,
-							$limit
-						)
+						$orderby,
+						$limit
+				)
 		);
 
 		if ($query !== false) {
@@ -779,13 +779,13 @@ class NameFixer
 
 		if ($this->_fileName !== '') {
 			$pre = $this->pdo->queryOneRow(
-						sprintf('
+					sprintf('
 							SELECT id AS prehashid, title, source
 							FROM prehash
 							WHERE filename = %s
 							OR title = %1$s',
 							$this->pdo->escapeString($this->_fileName)
-						)
+					)
 			);
 		}
 
@@ -866,19 +866,19 @@ class NameFixer
 		}
 
 		$row = $pdo->queryOneRow(
-					sprintf("
+				sprintf("
 						SELECT p.id AS prehashid, p.title, p.source
 						FROM prehash p INNER JOIN predbhash h ON h.pre_id = p.id
 						WHERE h.hash = UNHEX(%s)
 						LIMIT 1",
 						$pdo->escapeString($hash)
-					)
+				)
 		);
 
 		if ($row !== false) {
 			if ($row["title"] !== $release["searchname"]) {
-					$this->updateRelease($release, $row["title"], $method = "predb hash release name: " . $row["source"], $echo, $hashtype, $namestatus, $show, $row['prehashid']);
-					$matching++;
+				$this->updateRelease($release, $row["title"], $method = "predb hash release name: " . $row["source"], $echo, $hashtype, $namestatus, $show, $row['prehashid']);
+				$matching++;
 			}
 		} else {
 			$this->_updateSingleColumn('dehashstatus', $release['dehashstatus'] - 1, $release['releaseid']);
@@ -968,14 +968,14 @@ class NameFixer
 	{
 		if ($column !== '' && $id !== 0) {
 			$this->pdo->queryExec(
-						sprintf('
+					sprintf('
 							UPDATE releases
 							SET %s = %s
 							WHERE id = %d',
 							$column,
 							(is_numeric($status) ? $status : $this->pdo->escapeString($status)),
 							$id
-						)
+					)
 			);
 		}
 	}
@@ -1460,7 +1460,7 @@ class NameFixer
 			} else if (preg_match('/^(.+?IMAGESET.+?)\\\\.+/i', $release["textstring"], $result)) {
 				$this->updateRelease($release, $result["1"], $method = "fileCheck: XXX Imagesets", $echo, $type, $namestatus, $show);
 			} else if (preg_match('/^VIDEOOT-[A-Z0-9]+\\\\([\w!.,& ()\[\]\'\`-]{8,}?\b.?)([-_](proof|sample|thumbs?))*(\.part\d*(\.rar)?|\.rar|\.7z)?(\d{1,3}\.rev|\.vol.+?|\.mp4)/', $release["textstring"], $result)) {
-					$this->updateRelease($release, $result["1"] . " XXX DVDRIP XviD-VIDEOOT", $method = "fileCheck: XXX XviD VIDEOOT", $echo, $type, $namestatus, $show);
+				$this->updateRelease($release, $result["1"] . " XXX DVDRIP XviD-VIDEOOT", $method = "fileCheck: XXX XviD VIDEOOT", $echo, $type, $namestatus, $show);
 			} else if (preg_match('/\w[-\w.\',;& ]+1080i[._ -]DD5[._ -]1[._ -]MPEG2-R&C(?=\.ts)/i', $release["textstring"], $result)) {
 				$result = str_replace("MPEG2", "MPEG2.HDTV", $result["0"]);
 				$this->updateRelease($release, $result, $method = "fileCheck: R&C", $echo, $type, $namestatus, $show);

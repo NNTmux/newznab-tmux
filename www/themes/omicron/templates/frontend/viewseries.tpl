@@ -126,6 +126,7 @@
 							</ul>
 							<div class="tab-content">
 								{foreach $seasons as $seasonnum => $season name = "tv"}
+									{if empty($seasonnum)}{$seasonnum = 'Packs'}{/if}
 									<div class="tab-pane{if $smarty.foreach.tv.first} active{/if} fade in"
 										 id="{$seasonnum}">
 										<table class="tb_{$seasonnum} data table table-condensed table-bordered table-responsive table-hover"
