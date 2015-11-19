@@ -1,4 +1,5 @@
 2015-11-19 DariusIII
+	Add: Add schema for fresh newznab+ installs
 	Chg: Remove option to postprocess properly renamed releases, useless option that caused too much problems
 	Upd: Rework book, movie, console queries, use ceil instead of round in pager
 	Upd: Add queryCalc function to DB class
