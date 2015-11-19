@@ -1,3 +1,5 @@
+2015-11-19 DariusIII
+	Fix: change to getNZBPath in ProcessAdditional
 2015-11-18 DariusIII
 	Fix: Wrong coulm used in releases
 	Fix: Release categorization now uses proper partition
