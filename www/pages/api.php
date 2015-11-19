@@ -34,6 +34,11 @@ if (isset($_GET['t'])) {
 		case 'movie':
 			$function = 'm';
 			break;
+		case 'n':
+		case 'nfo':
+		case 'info':
+			$function = 'n';
+			break;
 		case 'r':
 		case 'register':
 			$function = 'r';
@@ -236,6 +241,27 @@ switch ($function) {
 
 		printOutput($relData, $outputXML, $page, offset());
 		break;
+
+	// Get an NFO file for an individual release.
+	case 'n':
+		if (!isset($_GET['id'])) {
+			showApiError(200, 'Missing parameter (id is required for retrieving an NFO)');
+		}
+
+		$page->users->addApiRequest($uid, $_SERVER['REQUEST_URI']);
+		$rel = $releases->getByGuid($_GET["id"]);
+		$data = $releases->getReleaseNfo($rel['id']);
+
+		if (isset($_GET['o']) && $_GET['o'] == 'file') {
+			header("Content-type: application/octet-stream");
+			header("Content-disposition: attachment; filename={$rel['searchname']}.nfo");
+			exit($data['nfo']);
+		} else {
+			echo nl2br(Utility::cp437toUTF($data['nfo']));
+		}
+
+		break;
+
 
 	// Capabilities request.
 	case 'c':
@@ -491,7 +517,7 @@ function addCoverURL(&$releases, callable $getCoverURL)
 /**
  * Add language from media info XML to release search names.
  * @param array             $releases
- * @param newznab\db\Settings $settings
+ * @param nzedb\db\Settings $settings
  * @return array
  */
 function addLanguage(&$releases, Settings $settings)
@@ -499,7 +525,12 @@ function addLanguage(&$releases, Settings $settings)
 	if ($releases && count($releases)) {
 		foreach ($releases as $key => $release) {
 			if (isset($release['id'])) {
-				$language = $settings->queryOneRow(sprintf('SELECT audiolanguage FROM releaseaudio WHERE releaseid = %d', $release['id']));
+				$language = $settings->queryOneRow('
+					SELECT audiolanguage
+					FROM releaseaudio
+					WHERE releaseid = ' .
+						$release['id']
+				);
 				if ($language !== false) {
 					$releases[$key]['searchname'] = $releases[$key]['searchname'] . ' ' . $language['audiolanguage'];
 				}

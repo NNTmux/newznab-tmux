@@ -1,3 +1,5 @@
+2015-11-19 DariusIII
+	Upd: Add nfo to api
 2015-11-18 DariusIII
 	Fix: Fix release categorization to use proper partition
 	Chg: Remove newzdash from tmux, not worth the space
