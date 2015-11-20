@@ -1,3 +1,5 @@
+2015-11-20 DariusIII
+	Chg: Remove reference to database from nntmux_fi_schema.sql
 2015-11-19 DariusIII
 	Fix: Missing use statement in populate_rt_indexes
 	Add: Add schema for fresh newznab+ installs
