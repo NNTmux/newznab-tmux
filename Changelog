@@ -1,4 +1,5 @@
 2015-11-20 DariusIII
+	Fix: Fix the sites theme scan folder
 	Chg: Remove version tag
 	Fix: Fix aka processing in TVMaze, remove leading year from TV releases before processing them
 	Fix: Fix the schema for new installs
