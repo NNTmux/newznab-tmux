@@ -1,6 +1,7 @@
 2015-11-20 DariusIII
 	Chg: Remove reference to database from nntmux_fi_schema.sql
 2015-11-19 DariusIII
+	Fix: Add missing SphinxSearch class to populate_rt_indexes
 	Chg: Remove newzdash, add schema for fresh newznab+ installs
 	Upd: Rework book, console and movie queries, use ceil instead of round in pager.tpl
 	Fix: change to getNZBPath in ProcessAdditional
