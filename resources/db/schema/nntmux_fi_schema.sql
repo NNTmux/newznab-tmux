@@ -1,6 +1,3 @@
-CREATE DATABASE IF NOT EXISTS `newznab` DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-USE `newznab`;
-
 DROP TABLE IF EXISTS `anidb`;
 CREATE TABLE IF NOT EXISTS `anidb` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
