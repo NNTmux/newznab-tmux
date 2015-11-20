@@ -1,94 +1,110 @@
-DROP TABLE IF EXISTS `anidb`;
-CREATE TABLE IF NOT EXISTS `anidb` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `anidbid` int(7) unsigned DEFAULT NULL,
-  `title` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `type` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
-  `startdate` date NOT NULL,
-  `enddate` date NOT NULL,
-  `related` varchar(1024) COLLATE utf8_unicode_ci NOT NULL,
-  `creators` varchar(1024) COLLATE utf8_unicode_ci NOT NULL,
-  `description` text COLLATE utf8_unicode_ci NOT NULL,
-  `rating` varchar(5) COLLATE utf8_unicode_ci NOT NULL,
-  `picture` varchar(16) COLLATE utf8_unicode_ci NOT NULL,
-  `categories` varchar(1024) COLLATE utf8_unicode_ci NOT NULL,
-  `characters` varchar(1024) COLLATE utf8_unicode_ci NOT NULL,
-  `epnos` varchar(2048) COLLATE utf8_unicode_ci NOT NULL,
-  `airdates` text COLLATE utf8_unicode_ci NOT NULL,
-  `episodetitles` text COLLATE utf8_unicode_ci NOT NULL,
-  `createddate` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `anidbid` (`anidbid`)
-) ENGINE=MYISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+DROP TABLE IF EXISTS anidb;
+CREATE TABLE IF NOT EXISTS anidb (
+  id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  anidbid INT(7) UNSIGNED DEFAULT NULL,
+  title VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+  type VARCHAR(32) COLLATE utf8_unicode_ci NOT NULL,
+  startdate DATE NOT NULL,
+  enddate DATE NOT NULL,
+  related VARCHAR(1024) COLLATE utf8_unicode_ci NOT NULL,
+  creators VARCHAR(1024) COLLATE utf8_unicode_ci NOT NULL,
+  description TEXT COLLATE utf8_unicode_ci NOT NULL,
+  rating VARCHAR(5) COLLATE utf8_unicode_ci NOT NULL,
+  picture VARCHAR(16) COLLATE utf8_unicode_ci NOT NULL,
+  categories VARCHAR(1024) COLLATE utf8_unicode_ci NOT NULL,
+  characters VARCHAR(1024) COLLATE utf8_unicode_ci NOT NULL,
+  epnos VARCHAR(2048) COLLATE utf8_unicode_ci NOT NULL,
+  airdates TEXT COLLATE utf8_unicode_ci NOT NULL,
+  episodetitles TEXT COLLATE utf8_unicode_ci NOT NULL,
+  createddate DATETIME DEFAULT NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY anidbid (anidbid)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 1;
 
-DROP TABLE IF EXISTS `anidb_episodes`;
-CREATE TABLE IF NOT EXISTS `anidb_episodes` (
-  `anidbid` int(10) unsigned NOT NULL COMMENT 'id of title from AniDB',
-  `episodeid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'anidb id for this episode',
-  `episode_no` smallint(5) unsigned NOT NULL COMMENT 'Numeric version of episode (leave 0 for combined episodes).',
-  `episode_title` varchar(255) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Title of the episode (en, x-jat)',
-  `airdate` date NOT NULL,
-  PRIMARY KEY (`anidbid`,`episodeid`)
-) ENGINE=MYISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ;
+DROP TABLE IF EXISTS anidb_episodes;
+CREATE TABLE IF NOT EXISTS anidb_episodes (
+  anidbid INT(10) UNSIGNED NOT NULL COMMENT 'id of title from AniDB',
+  episodeid INT(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'anidb id for this episode',
+  episode_no SMALLINT(5) UNSIGNED NOT NULL COMMENT 'Numeric version of episode (leave 0 for combined episodes).',
+  episode_title VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL COMMENT 'Title of the episode (en, x-jat)',
+  airdate DATE NOT NULL,
+  PRIMARY KEY (anidbid,episodeid)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci;
 
-DROP TABLE IF EXISTS `anidb_info`;
-CREATE TABLE IF NOT EXISTS `anidb_info` (
-  `anidbid` int(10) unsigned NOT NULL COMMENT 'id of title from AniDB',
-  `type` varchar(32) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `startdate` date DEFAULT NULL,
-  `enddate` date DEFAULT NULL,
-  `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `related` varchar(1024) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `similar` varchar(1024) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `creators` varchar(1024) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `description` text COLLATE utf8_unicode_ci,
-  `rating` varchar(5) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `picture` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `categories` varchar(1024) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `characters` varchar(1024) COLLATE utf8_unicode_ci DEFAULT NULL,
-  PRIMARY KEY (`anidbid`),
-  KEY `ix_anidb_info_datetime` (`startdate`,`enddate`,`updated`)
-) ENGINE=MYISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ;
+DROP TABLE IF EXISTS anidb_info;
+CREATE TABLE IF NOT EXISTS anidb_info (
+  anidbid INT(10) UNSIGNED NOT NULL COMMENT 'id of title from AniDB',
+  type VARCHAR(32) COLLATE utf8_unicode_ci DEFAULT NULL,
+  startdate DATE DEFAULT NULL,
+  enddate DATE DEFAULT NULL,
+  updated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  related VARCHAR(1024) COLLATE utf8_unicode_ci DEFAULT NULL,
+  similar VARCHAR(1024) COLLATE utf8_unicode_ci DEFAULT NULL,
+  creators VARCHAR(1024) COLLATE utf8_unicode_ci DEFAULT NULL,
+  description TEXT COLLATE utf8_unicode_ci,
+  rating VARCHAR(5) COLLATE utf8_unicode_ci DEFAULT NULL,
+  picture VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  categories VARCHAR(1024) COLLATE utf8_unicode_ci DEFAULT NULL,
+  characters VARCHAR(1024) COLLATE utf8_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (anidbid),
+  KEY ix_anidb_info_datetime (startdate,enddate,updated)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci;
 
-DROP TABLE IF EXISTS `anidb_titles`;
-CREATE TABLE IF NOT EXISTS `anidb_titles` (
-  `anidbid` int(10) unsigned NOT NULL COMMENT 'id of title from AniDB',
-  `type` varchar(25) COLLATE utf8_unicode_ci NOT NULL COMMENT 'type of title.',
-  `lang` varchar(25) COLLATE utf8_unicode_ci NOT NULL,
-  `title` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  PRIMARY KEY (`anidbid`,`type`,`lang`,`title`)
-) ENGINE=MYISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ;
+DROP TABLE IF EXISTS anidb_titles;
+CREATE TABLE IF NOT EXISTS anidb_titles (
+  anidbid INT(10) UNSIGNED NOT NULL COMMENT 'id of title from AniDB',
+  type VARCHAR(25) COLLATE utf8_unicode_ci NOT NULL COMMENT 'type of title.',
+  lang VARCHAR(25) COLLATE utf8_unicode_ci NOT NULL,
+  title VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY (anidbid,type,lang,title)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci;
 
-DROP TABLE IF EXISTS `animetitles`;
-CREATE TABLE IF NOT EXISTS `animetitles` (
-  `anidbid` int(7) unsigned DEFAULT NULL,
-  `title` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `unixtime` int(12) unsigned NOT NULL,
-  UNIQUE KEY `title` (`title`)
-) ENGINE=MYISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ;
+DROP TABLE IF EXISTS animetitles;
+CREATE TABLE IF NOT EXISTS animetitles (
+  anidbid INT(7) UNSIGNED DEFAULT NULL,
+  title VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+  unixtime INT(12) UNSIGNED NOT NULL,
+  UNIQUE KEY title (title)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci;
 
 DROP TABLE IF EXISTS binaries;
 CREATE TABLE IF NOT EXISTS binaries (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(512) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  fromname varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `date` datetime DEFAULT NULL,
-  xref varchar(1024) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  totalParts int(11) unsigned NOT NULL DEFAULT '0',
-  groupid int(11) unsigned NOT NULL DEFAULT '0',
-  procstat int(11) DEFAULT '0',
-  categoryid int(11) DEFAULT NULL,
-  regexid int(11) DEFAULT NULL,
-  reqid varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  relpart int(11) DEFAULT '0',
-  reltotalpart int(11) DEFAULT '0',
-  binaryhash varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  relname varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  releaseid int(11) DEFAULT NULL,
-  dateadded datetime DEFAULT NULL,
-  PRIMARY KEY (`ID`),
+  id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  name VARCHAR(512) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  fromname VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  date DATETIME DEFAULT NULL,
+  xref VARCHAR(1024) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  totalParts INT(11) UNSIGNED NOT NULL DEFAULT '0',
+  groupid INT(11) UNSIGNED NOT NULL DEFAULT '0',
+  procstat INT(11) DEFAULT '0',
+  categoryid INT(11) DEFAULT NULL,
+  regexid INT(11) DEFAULT NULL,
+  reqid VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  relpart INT(11) DEFAULT '0',
+  reltotalpart INT(11) DEFAULT '0',
+  binaryhash VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+  relname VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  releaseid INT(11) DEFAULT NULL,
+  dateadded DATETIME DEFAULT NULL,
+  PRIMARY KEY (ID),
   KEY fromname (fromname),
-  KEY `date` (`date`),
+  KEY date (date),
   KEY groupid (groupid),
   KEY ix_binary_relname (relname),
   KEY ix_binary_releaseid (releaseid),
@@ -96,22 +112,30 @@ CREATE TABLE IF NOT EXISTS binaries (
   KEY ix_binary_binaryhash (binaryhash),
   KEY ix_binary_releaseid_relpart (releaseid,relpart),
   KEY ix_binary_procstat (procstat)
-) ENGINE=MYISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 1;
 
-DROP TABLE IF EXISTS `binaryblacklist`;
-CREATE TABLE IF NOT EXISTS `binaryblacklist` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `groupname` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `regex` varchar(2000) COLLATE utf8_unicode_ci NOT NULL,
-  `msgcol` int(11) unsigned NOT NULL DEFAULT '1',
-  `optype` int(11) unsigned NOT NULL DEFAULT '1',
-  `status` int(11) unsigned NOT NULL DEFAULT '1',
-  `description` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `last_activity` date DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MYISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=100001 ;
+DROP TABLE IF EXISTS binaryblacklist;
+CREATE TABLE IF NOT EXISTS binaryblacklist (
+  id INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  groupname VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  regex VARCHAR(2000) COLLATE utf8_unicode_ci NOT NULL,
+  msgcol INT(11) UNSIGNED NOT NULL DEFAULT '1',
+  optype INT(11) UNSIGNED NOT NULL DEFAULT '1',
+  status INT(11) UNSIGNED NOT NULL DEFAULT '1',
+  description VARCHAR(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  last_activity DATE DEFAULT NULL,
+  PRIMARY KEY (id)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 100001;
 
-INSERT INTO `binaryblacklist` (`id`, `groupname`, `regex`, `msgcol`, `optype`, `status`, `description`, `last_activity`) VALUES
+INSERT INTO binaryblacklist (id, groupname, regex, msgcol, optype, status, description, last_activity) VALUES
 (1, 'alt.binaries.*', 'german|danish|flemish|dutch|french|swedish|swesub|deutsch|nl\\.?sub|norwegian|\\.ita\\.', 1, 1, 0, 'do not index non-english language binaries', NULL),
 (12, '^alt\\.binaries\\.teevee$', '^\\[KoreanTV\\]', 1, 1, 0, 'Blocks posts by koreantv.', NULL),
 (13, '^alt\\.binaries\\.(kenpsx|frogs)$', '^\\s*([a-f0-9]{16})\\s\\[\\d+\\/\\d+\\]\\s-\\s"\\1"\\s+yEnc$', 1, 1, 1, 'Block 16 character hash floods in kenpsx, frogs.', NULL),
@@ -121,46 +145,54 @@ INSERT INTO `binaryblacklist` (`id`, `groupname`, `regex`, `msgcol`, `optype`, `
 (17, '^korea\\.binaries\\.movies$', '^(top@top.t \\(top\\)|shit@xxxxxxxxaa.com \\(shit\\)|none@nonemail.com \\(none\\))$', 2, 1, 1, 'incomplete cryptic releases', NULL),
 (18, '^korea\\.binaries\\.movies$', '^filzilla6@web\\.de \\(Baruth\\)$', 2, 1, 1, 'Virus Poster', NULL);
 
-DROP TABLE IF EXISTS `bookinfo`;
-CREATE TABLE IF NOT EXISTS `bookinfo` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `title` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `asin` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `url` varchar(1000) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `author` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `publisher` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `publishdate` datetime DEFAULT NULL,
-  `review` varchar(10000) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `genreid` int(10) DEFAULT NULL,
-  `dewey` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `ean` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `isbn` varchar(20) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `pages` int(10) DEFAULT NULL,
-  `cover` tinyint(1) unsigned NOT NULL DEFAULT '0',
-  `createddate` datetime NOT NULL,
-  `updateddate` datetime NOT NULL,
-  `salesrank` int(10) unsigned DEFAULT NULL,
-  `overview` varchar(3000) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `genre` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `ix_bookinfo_title` (`title`),
-  FULLTEXT KEY `ix_bookinfo_author_title_ft` (`author`,`title`)
-) ENGINE=MYISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+DROP TABLE IF EXISTS bookinfo;
+CREATE TABLE IF NOT EXISTS bookinfo (
+  id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  title VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+  asin VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  url VARCHAR(1000) COLLATE utf8_unicode_ci DEFAULT NULL,
+  author VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  publisher VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  publishdate DATETIME DEFAULT NULL,
+  review VARCHAR(10000) COLLATE utf8_unicode_ci DEFAULT NULL,
+  genreid INT(10) DEFAULT NULL,
+  dewey VARCHAR(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  ean VARCHAR(20) COLLATE utf8_unicode_ci DEFAULT NULL,
+  isbn VARCHAR(20) COLLATE utf8_unicode_ci DEFAULT NULL,
+  pages INT(10) DEFAULT NULL,
+  cover TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
+  createddate DATETIME NOT NULL,
+  updateddate DATETIME NOT NULL,
+  salesrank INT(10) UNSIGNED DEFAULT NULL,
+  overview VARCHAR(3000) COLLATE utf8_unicode_ci DEFAULT NULL,
+  genre VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY (id),
+  KEY ix_bookinfo_title (title),
+  FULLTEXT KEY ix_bookinfo_author_title_ft (author,title)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 1;
 
-DROP TABLE IF EXISTS `category`;
-CREATE TABLE IF NOT EXISTS `category` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `title` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `parentid` int(11) DEFAULT NULL,
-  `status` int(11) NOT NULL DEFAULT '1',
-  `minsizetoformrelease` bigint(20) unsigned NOT NULL DEFAULT '0',
-  `maxsizetoformrelease` bigint(20) unsigned NOT NULL DEFAULT '0',
-  `description` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `disablepreview` tinyint(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
-) ENGINE=MYISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT = 1000001;
+DROP TABLE IF EXISTS category;
+CREATE TABLE IF NOT EXISTS category (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  title VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+  parentid INT(11) DEFAULT NULL,
+  status INT(11) NOT NULL DEFAULT '1',
+  minsizetoformrelease BIGINT(20) UNSIGNED NOT NULL DEFAULT '0',
+  maxsizetoformrelease BIGINT(20) UNSIGNED NOT NULL DEFAULT '0',
+  description VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  disablepreview TINYINT(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (id)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT  =  1000001;
 
-INSERT INTO `category` (`id`, `title`, `parentid`, `status`, `minsizetoformrelease`, `maxsizetoformrelease`, `description`, `disablepreview`) VALUES
+INSERT INTO category (id, title, parentid, status, minsizetoformrelease, maxsizetoformrelease, description, disablepreview) VALUES
 (1000, 'Console', NULL, 1, 0, 0, NULL, 0),
 (1010, 'NDS', 1000, 1, 0, 0, NULL, 0),
 (1020, 'PSP', 1000, 1, 0, 0, NULL, 0),
@@ -232,54 +264,65 @@ INSERT INTO `category` (`id`, `title`, `parentid`, `status`, `minsizetoformrelea
 (8010, 'Misc', 8000, 1, 0, 0, NULL, 0),
 (8020, 'Hashed', 8000, 1, 0, 0, NULL, 0);
 
-DROP TABLE IF EXISTS `consoleinfo`;
-CREATE TABLE IF NOT EXISTS `consoleinfo` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `title` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `asin` varchar(128) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `url` varchar(1000) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `salesrank` int(10) unsigned DEFAULT NULL,
-  `platform` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `publisher` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `genreid` int(10) DEFAULT NULL,
-  `esrb` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `releasedate` datetime DEFAULT NULL,
-  `review` varchar(10000) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `cover` tinyint(1) unsigned NOT NULL DEFAULT '0',
-  `createddate` datetime NOT NULL,
-  `updateddate` datetime NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `ix_consoleinfo_title` (`title`),
-  FULLTEXT KEY `ix_consoleinfo_title_platform_ft` (`title`,`platform`)
-) ENGINE=MYISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+DROP TABLE IF EXISTS consoleinfo;
+CREATE TABLE IF NOT EXISTS consoleinfo (
+  id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  title VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+  asin VARCHAR(128) COLLATE utf8_unicode_ci DEFAULT NULL,
+  url VARCHAR(1000) COLLATE utf8_unicode_ci DEFAULT NULL,
+  salesrank INT(10) UNSIGNED DEFAULT NULL,
+  platform VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  publisher VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  genreid INT(10) DEFAULT NULL,
+  esrb VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  releasedate DATETIME DEFAULT NULL,
+  review VARCHAR(10000) COLLATE utf8_unicode_ci DEFAULT NULL,
+  cover TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
+  createddate DATETIME NOT NULL,
+  updateddate DATETIME NOT NULL,
+  PRIMARY KEY (id),
+  KEY ix_consoleinfo_title (title),
+  FULLTEXT KEY ix_consoleinfo_title_platform_ft (title,platform)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 1;
 
-DROP TABLE IF EXISTS `content`;
-CREATE TABLE IF NOT EXISTS `content` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `title` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `url` varchar(2000) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `body` text COLLATE utf8_unicode_ci,
-  `metadescription` varchar(1000) COLLATE utf8_unicode_ci NOT NULL,
-  `metakeywords` varchar(1000) COLLATE utf8_unicode_ci NOT NULL,
-  `contenttype` int(11) NOT NULL,
-  `showinmenu` int(11) NOT NULL,
-  `status` int(11) NOT NULL,
-  `ordinal` int(11) DEFAULT NULL,
-  `role` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
-) ENGINE=MYISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT = 1000001; ;
+DROP TABLE IF EXISTS content;
+CREATE TABLE IF NOT EXISTS content (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  title VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+  url VARCHAR(2000) COLLATE utf8_unicode_ci DEFAULT NULL,
+  body TEXT COLLATE utf8_unicode_ci,
+  metadescription VARCHAR(1000) COLLATE utf8_unicode_ci NOT NULL,
+  metakeywords VARCHAR(1000) COLLATE utf8_unicode_ci NOT NULL,
+  contenttype INT(11) NOT NULL,
+  showinmenu INT(11) NOT NULL,
+  status INT(11) NOT NULL,
+  ordinal INT(11) DEFAULT NULL,
+  role INT(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (id)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT  =  1000001;;
 
-DROP TABLE IF EXISTS `countries`;
-CREATE TABLE IF NOT EXISTS `countries` (
-  `id` char(2) COLLATE utf8_unicode_ci NOT NULL COMMENT '2 character code.',
-  `iso3` char(3) COLLATE utf8_unicode_ci NOT NULL COMMENT '3 character code.',
-  `country` varchar(180) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Name of the country.',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `code3` (`iso3`),
-  UNIQUE KEY `country` (`country`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+DROP TABLE IF EXISTS countries;
+CREATE TABLE IF NOT EXISTS countries (
+  id CHAR(2) COLLATE utf8_unicode_ci NOT NULL COMMENT '2 character code.',
+  iso3 CHAR(3) COLLATE utf8_unicode_ci NOT NULL COMMENT '3 character code.',
+  country VARCHAR(180) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Name of the country.',
+  PRIMARY KEY (id),
+  UNIQUE KEY code3 (iso3),
+  UNIQUE KEY country (country)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci;
 
-INSERT INTO `countries` (`id`, `iso3`, `country`) VALUES
+INSERT INTO countries (id, iso3, country) VALUES
 ('AF', 'AFG', 'Islamic Republic of Afghanistan'),
 ('AX', 'ALA', 'Åland Islands'),
 ('AL', 'ALB', 'Republic of Albania'),
@@ -531,92 +574,112 @@ INSERT INTO `countries` (`id`, `iso3`, `country`) VALUES
 ('ZM', 'ZMB', 'Republic of Zambia'),
 ('ZW', 'ZWE', 'Republic of Zimbabwe');
 
-DROP TABLE IF EXISTS `dnzb_failures`;
-CREATE TABLE IF NOT EXISTS `dnzb_failures` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `userid` int(11) unsigned NOT NULL,
-  `guid` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `failed` int(10) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `ux_dnzb_failures` (`userid`,`guid`)
-) ENGINE=MYISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+DROP TABLE IF EXISTS dnzb_failures;
+CREATE TABLE IF NOT EXISTS dnzb_failures (
+  id INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  userid INT(11) UNSIGNED NOT NULL,
+  guid VARCHAR(50) COLLATE utf8_unicode_ci NOT NULL,
+  failed INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  PRIMARY KEY (id),
+  UNIQUE KEY ux_dnzb_failures (userid,guid)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 1;
 
-DROP TABLE IF EXISTS `episodeinfo`;
-CREATE TABLE IF NOT EXISTS `episodeinfo` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `rageid` int(11) unsigned DEFAULT NULL,
-  `tvdbid` int(11) unsigned DEFAULT NULL,
-  `imdbid` mediumint(7) unsigned zerofill DEFAULT NULL,
-  `showtitle` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `airdate` datetime NOT NULL,
-  `link` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `fullep` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
-  `eptitle` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `director` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `gueststars` varchar(1024) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `overview` varchar(10000) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `rating` float DEFAULT NULL,
-  `writer` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `epabsolute` int(6) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `fullep` (`showtitle`,`fullep`),
-  KEY `ix_episodeinfo_rageid` (`rageid`),
-  KEY `ix_episodeinfo_tvdbid` (`tvdbid`),
-  KEY `ix_episodeinfo_imdbid` (`imdbid`)
-) ENGINE=MYISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+DROP TABLE IF EXISTS episodeinfo;
+CREATE TABLE IF NOT EXISTS episodeinfo (
+  id INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  rageid INT(11) UNSIGNED DEFAULT NULL,
+  tvdbid INT(11) UNSIGNED DEFAULT NULL,
+  imdbid MEDIUMINT(7) UNSIGNED zerofill DEFAULT NULL,
+  showtitle VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  airdate DATETIME NOT NULL,
+  link VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  fullep VARCHAR(20) COLLATE utf8_unicode_ci NOT NULL,
+  eptitle VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  director VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  gueststars VARCHAR(1024) COLLATE utf8_unicode_ci DEFAULT NULL,
+  overview VARCHAR(10000) COLLATE utf8_unicode_ci DEFAULT NULL,
+  rating FLOAT DEFAULT NULL,
+  writer VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  epabsolute INT(6) DEFAULT NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY fullep (showtitle,fullep),
+  KEY ix_episodeinfo_rageid (rageid),
+  KEY ix_episodeinfo_tvdbid (tvdbid),
+  KEY ix_episodeinfo_imdbid (imdbid)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 1;
 
-DROP TABLE IF EXISTS `forumpost`;
-CREATE TABLE IF NOT EXISTS `forumpost` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `forumid` int(11) DEFAULT NULL,
-  `parentid` int(11) DEFAULT NULL,
-  `userid` int(11) unsigned DEFAULT NULL,
-  `subject` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `message` text COLLATE utf8_unicode_ci NOT NULL,
-  `locked` tinyint(1) unsigned NOT NULL DEFAULT '0',
-  `sticky` tinyint(1) unsigned NOT NULL DEFAULT '0',
-  `replies` int(11) unsigned NOT NULL DEFAULT '0',
-  `createddate` datetime NOT NULL,
-  `updateddate` datetime NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `parentid` (`parentid`),
-  KEY `userid` (`userid`),
-  KEY `createddate` (`createddate`),
-  KEY `updateddate` (`updateddate`)
-) ENGINE=MYISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+DROP TABLE IF EXISTS forumpost;
+CREATE TABLE IF NOT EXISTS forumpost (
+  id INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  forumid INT(11) DEFAULT NULL,
+  parentid INT(11) DEFAULT NULL,
+  userid INT(11) UNSIGNED DEFAULT NULL,
+  subject VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+  message TEXT COLLATE utf8_unicode_ci NOT NULL,
+  locked TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
+  sticky TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
+  replies INT(11) UNSIGNED NOT NULL DEFAULT '0',
+  createddate DATETIME NOT NULL,
+  updateddate DATETIME NOT NULL,
+  PRIMARY KEY (id),
+  KEY parentid (parentid),
+  KEY userid (userid),
+  KEY createddate (createddate),
+  KEY updateddate (updateddate)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 1;
 
-DROP TABLE IF EXISTS `gamesinfo`;
-CREATE TABLE IF NOT EXISTS `gamesinfo` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `title` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `asin` varchar(128) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `url` varchar(1000) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `platform` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `publisher` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `genre_id` int(10) DEFAULT NULL,
-  `esrb` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `releasedate` datetime DEFAULT NULL,
-  `review` varchar(3000) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `cover` tinyint(1) unsigned NOT NULL DEFAULT '0',
-  `backdrop` tinyint(1) DEFAULT '0',
-  `trailer` varchar(1000) COLLATE utf8_unicode_ci DEFAULT '',
-  `classused` varchar(10) COLLATE utf8_unicode_ci DEFAULT 'steam',
-  `createddate` datetime NOT NULL,
-  `updateddate` datetime NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `ix_gamesinfo_asin` (`asin`)
-) ENGINE=MYISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+DROP TABLE IF EXISTS gamesinfo;
+CREATE TABLE IF NOT EXISTS gamesinfo (
+  id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  title VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+  asin VARCHAR(128) COLLATE utf8_unicode_ci DEFAULT NULL,
+  url VARCHAR(1000) COLLATE utf8_unicode_ci DEFAULT NULL,
+  platform VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  publisher VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  genre_id INT(10) DEFAULT NULL,
+  esrb VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  releasedate DATETIME DEFAULT NULL,
+  review VARCHAR(3000) COLLATE utf8_unicode_ci DEFAULT NULL,
+  cover TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
+  backdrop TINYINT(1) DEFAULT '0',
+  trailer VARCHAR(1000) COLLATE utf8_unicode_ci DEFAULT '',
+  classused VARCHAR(10) COLLATE utf8_unicode_ci DEFAULT 'steam',
+  createddate DATETIME NOT NULL,
+  updateddate DATETIME NOT NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY ix_gamesinfo_asin (asin)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 1;
 
-DROP TABLE IF EXISTS `genres`;
-CREATE TABLE IF NOT EXISTS `genres` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `title` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `type` int(4) DEFAULT NULL,
-  `disabled` tinyint(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
-) ENGINE=MYISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT = 1000001;
+DROP TABLE IF EXISTS genres;
+CREATE TABLE IF NOT EXISTS genres (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  title VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+  type INT(4) DEFAULT NULL,
+  disabled TINYINT(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (id)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT  =  1000001;
 
-INSERT INTO `genres` (`id`, `title`, `type`, `disabled`) VALUES
+INSERT INTO genres (id, title, type, disabled) VALUES
 (150, 'Blues', 3000, 0),
 (151, 'Classic Rock', 3000, 0),
 (152, 'Country', 3000, 0),
@@ -1220,28 +1283,32 @@ INSERT INTO `genres` (`id`, `title`, `type`, `disabled`) VALUES
 (750, 'Genital Punishment', 6000, 0),
 (751, 'Holiday', 6000, 0);
 
-DROP TABLE IF EXISTS `groups`;
-CREATE TABLE IF NOT EXISTS `groups` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `backfill_target` int(4) NOT NULL DEFAULT '1',
-  `first_record` bigint(20) unsigned NOT NULL DEFAULT '0',
-  `first_record_postdate` datetime DEFAULT NULL,
-  `last_record` bigint(20) unsigned NOT NULL DEFAULT '0',
-  `last_record_postdate` datetime DEFAULT NULL,
-  `last_updated` datetime DEFAULT NULL,
-  `minfilestoformrelease` int(4) DEFAULT NULL,
-  `minsizetoformrelease` bigint(20) DEFAULT NULL,
-  `regexmatchonly` tinyint(1) NOT NULL DEFAULT '1',
-  `active` tinyint(1) NOT NULL DEFAULT '0',
-  `backfill` tinyint(1) NOT NULL DEFAULT '0',
-  `description` varchar(255) COLLATE utf8_unicode_ci DEFAULT '',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `name` (`name`),
-  KEY `active` (`active`)
-) ENGINE=MYISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=100001 ;
+DROP TABLE IF EXISTS groups;
+CREATE TABLE IF NOT EXISTS groups (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  name VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  backfill_target INT(4) NOT NULL DEFAULT '1',
+  first_record BIGINT(20) UNSIGNED NOT NULL DEFAULT '0',
+  first_record_postdate DATETIME DEFAULT NULL,
+  last_record BIGINT(20) UNSIGNED NOT NULL DEFAULT '0',
+  last_record_postdate DATETIME DEFAULT NULL,
+  last_updated DATETIME DEFAULT NULL,
+  minfilestoformrelease INT(4) DEFAULT NULL,
+  minsizetoformrelease BIGINT(20) DEFAULT NULL,
+  regexmatchonly TINYINT(1) NOT NULL DEFAULT '1',
+  active TINYINT(1) NOT NULL DEFAULT '0',
+  backfill TINYINT(1) NOT NULL DEFAULT '0',
+  description VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT '',
+  PRIMARY KEY (id),
+  UNIQUE KEY name (name),
+  KEY active (active)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 100001;
 
-INSERT INTO `groups` (`id`, `name`, `backfill_target`, `first_record`, `first_record_postdate`, `last_record`, `last_record_postdate`, `last_updated`, `minfilestoformrelease`, `minsizetoformrelease`, `regexmatchonly`, `active`, `backfill`, `description`) VALUES
+INSERT INTO groups (id, name, backfill_target, first_record, first_record_postdate, last_record, last_record_postdate, last_updated, minfilestoformrelease, minsizetoformrelease, regexmatchonly, active, backfill, description) VALUES
 (1, 'alt.binaries.cd.image.linux', 0, 0, NULL, 0, NULL, NULL, NULL, NULL, 1, 0, 0, ''),
 (2, 'alt.binaries.linux.iso', 0, 0, NULL, 0, NULL, NULL, NULL, NULL, 1, 0, 0, ''),
 (3, 'comp.os.linux.development.apps', 0, 0, NULL, 0, NULL, NULL, NULL, NULL, 1, 0, 0, ''),
@@ -1457,29 +1524,37 @@ INSERT INTO `groups` (`id`, `name`, `backfill_target`, `first_record`, `first_re
 (213, 'alt.binaries.squaresoft', 0, 0, NULL, 0, NULL, NULL, 0, 0, 1, 0, 0, ''),
 (214, 'alt.binaries.illuminaten', 0, 0, NULL, 0, NULL, NULL, 0, 0, 1, 0, 0, '');
 
-DROP TABLE IF EXISTS `logging`;
-CREATE TABLE IF NOT EXISTS `logging` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `time` datetime DEFAULT NULL,
-  `username` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `host` varchar(40) COLLATE utf8_unicode_ci DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+DROP TABLE IF EXISTS logging;
+CREATE TABLE IF NOT EXISTS logging (
+  id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  time DATETIME DEFAULT NULL,
+  username VARCHAR(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  host VARCHAR(40) COLLATE utf8_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (id)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 1;
 
-DROP TABLE IF EXISTS `menu`;
-CREATE TABLE IF NOT EXISTS `menu` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `href` varchar(2000) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `title` varchar(2000) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `newwindow` int(1) unsigned NOT NULL DEFAULT '0',
-  `tooltip` varchar(2000) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `role` int(11) unsigned NOT NULL,
-  `ordinal` int(11) unsigned NOT NULL,
-  `menueval` varchar(2000) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  PRIMARY KEY (`id`)
-) ENGINE=MYISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT = 1000001;
+DROP TABLE IF EXISTS menu;
+CREATE TABLE IF NOT EXISTS menu (
+  id INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  href VARCHAR(2000) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  title VARCHAR(2000) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  newwindow INT(1) UNSIGNED NOT NULL DEFAULT '0',
+  tooltip VARCHAR(2000) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  role INT(11) UNSIGNED NOT NULL,
+  ordinal INT(11) UNSIGNED NOT NULL,
+  menueval VARCHAR(2000) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  PRIMARY KEY (id)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT  =  1000001;
 
-INSERT INTO `menu` (`id`, `href`, `title`, `newwindow`, `tooltip`, `role`, `ordinal`, `menueval`) VALUES
+INSERT INTO menu (id, href, title, newwindow, tooltip, role, ordinal, menueval) VALUES
 (1, 'search', 'Search', 0, 'Search for Nzbs', 1, 10, ''),
 (2, 'browse', 'Browse', 0, 'Browse for Nzbs', 1, 20, ''),
 (3, 'browsegroup', 'Browse Groups', 0, 'Browse by Group', 1, 25, ''),
@@ -1505,477 +1580,527 @@ INSERT INTO `menu` (`id`, `href`, `title`, `newwindow`, `tooltip`, `role`, `ordi
 (24, 'prehash', 'Prehash', 0, 'Prehash', 1, 68, ''),
 (25, 'newposterwall', 'New Releases', 0, 'Newest Releases Poster Wall', 1, 11, '');
 
-DROP TABLE IF EXISTS `movieinfo`;
-CREATE TABLE IF NOT EXISTS `movieinfo` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `imdbid` mediumint(7) unsigned zerofill DEFAULT NULL,
-  `tmdbid` int(10) unsigned NOT NULL DEFAULT '0',
-  `title` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `tagline` varchar(1024) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `rating` varchar(4) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `plot` varchar(1024) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `year` varchar(4) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `genre` varchar(64) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `type` varchar(32) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `director` varchar(64) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `actors` varchar(2000) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `language` varchar(64) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `cover` tinyint(1) unsigned NOT NULL DEFAULT '0',
-  `backdrop` tinyint(1) unsigned NOT NULL DEFAULT '0',
-  `trailer` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `createddate` datetime NOT NULL,
-  `updateddate` datetime NOT NULL,
-  `banner` tinyint(1) unsigned NOT NULL DEFAULT '0',
-  `traktid` int(10) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `imdbid` (`imdbid`),
-  KEY `ix_movieinfo_title` (`title`)
-) ENGINE=MYISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+DROP TABLE IF EXISTS movieinfo;
+CREATE TABLE IF NOT EXISTS movieinfo (
+  id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  imdbid MEDIUMINT(7) UNSIGNED zerofill DEFAULT NULL,
+  tmdbid INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  title VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  tagline VARCHAR(1024) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  rating VARCHAR(4) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  plot VARCHAR(1024) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  year VARCHAR(4) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  genre VARCHAR(64) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  type VARCHAR(32) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  director VARCHAR(64) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  actors VARCHAR(2000) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  language VARCHAR(64) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  cover TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
+  backdrop TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
+  trailer VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  createddate DATETIME NOT NULL,
+  updateddate DATETIME NOT NULL,
+  banner TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
+  traktid INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  PRIMARY KEY (id),
+  UNIQUE KEY imdbid (imdbid),
+  KEY ix_movieinfo_title (title)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 1;
 
-DROP TABLE IF EXISTS `musicinfo`;
-CREATE TABLE IF NOT EXISTS `musicinfo` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `title` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `asin` varchar(128) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `url` varchar(1000) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `salesrank` int(10) unsigned DEFAULT NULL,
-  `artist` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `publisher` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `releasedate` datetime DEFAULT NULL,
-  `review` varchar(10000) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `year` varchar(4) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `genreid` int(10) DEFAULT NULL,
-  `tracks` varchar(3000) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `cover` tinyint(1) unsigned NOT NULL DEFAULT '0',
-  `createddate` datetime NOT NULL,
-  `updateddate` datetime NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `ix_musicinfo_title` (`title`),
-  FULLTEXT KEY `ix_musicinfo_artist_title_ft` (`artist`,`title`)
-) ENGINE=MYISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+DROP TABLE IF EXISTS musicinfo;
+CREATE TABLE IF NOT EXISTS musicinfo (
+  id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  title VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+  asin VARCHAR(128) COLLATE utf8_unicode_ci DEFAULT NULL,
+  url VARCHAR(1000) COLLATE utf8_unicode_ci DEFAULT NULL,
+  salesrank INT(10) UNSIGNED DEFAULT NULL,
+  artist VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  publisher VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  releasedate DATETIME DEFAULT NULL,
+  review VARCHAR(10000) COLLATE utf8_unicode_ci DEFAULT NULL,
+  year VARCHAR(4) COLLATE utf8_unicode_ci DEFAULT NULL,
+  genreid INT(10) DEFAULT NULL,
+  tracks VARCHAR(3000) COLLATE utf8_unicode_ci DEFAULT NULL,
+  cover TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
+  createddate DATETIME NOT NULL,
+  updateddate DATETIME NOT NULL,
+  PRIMARY KEY (id),
+  KEY ix_musicinfo_title (title),
+  FULLTEXT KEY ix_musicinfo_artist_title_ft (artist,title)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 1;
 
 DROP TABLE IF EXISTS partrepair;
 CREATE TABLE IF NOT EXISTS partrepair (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  numberid bigint(20) unsigned NOT NULL,
-  groupid int(11) unsigned NOT NULL,
-  attempts tinyint(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`ID`),
+  id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  numberid BIGINT(20) UNSIGNED NOT NULL,
+  groupid INT(11) UNSIGNED NOT NULL,
+  attempts TINYINT(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (ID),
   UNIQUE KEY ix_partrepair_numberID_groupID (numberID,groupID)
-) ENGINE=MYISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 1;
 
 DROP TABLE IF EXISTS parts;
 CREATE TABLE IF NOT EXISTS parts (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  binaryid bigint(20) unsigned NOT NULL DEFAULT '0',
-  messageid varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `number` bigint(20) unsigned NOT NULL DEFAULT '0',
-  partnumber int(10) unsigned NOT NULL DEFAULT '0',
-  size bigint(20) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`),
+  id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  binaryid BIGINT(20) UNSIGNED NOT NULL DEFAULT '0',
+  messageid VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  number BIGINT(20) UNSIGNED NOT NULL DEFAULT '0',
+  partnumber INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  size BIGINT(20) UNSIGNED NOT NULL DEFAULT '0',
+  PRIMARY KEY (id),
   KEY binaryid (binaryID),
-  KEY ix_parts_number (`number`)
-) ENGINE=MYISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+  KEY ix_parts_number (number)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 1;
 
-DROP TABLE IF EXISTS `predb`;
-CREATE TABLE IF NOT EXISTS `predb` (
-  `id` int(12) NOT NULL AUTO_INCREMENT,
-  `ctime` int(12) NOT NULL,
-  `dirname` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `category` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
-  `nuketype` varchar(20) COLLATE utf8_unicode_ci DEFAULT '',
-  `nukereason` varchar(255) COLLATE utf8_unicode_ci DEFAULT '',
-  `nuketime` int(12) DEFAULT '0',
-  `filesize` float DEFAULT '0',
-  `filecount` int(6) DEFAULT '0',
-  `filename` varchar(255) COLLATE utf8_unicode_ci DEFAULT '',
-  `updatedate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `dirname` (`dirname`),
-  KEY `ix_predb_ctime` (`ctime`),
-  KEY `ix_predb_updatedate` (`updatedate`),
-  KEY `ix_predb_filename` (`filename`)
-) ENGINE=MYISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+DROP TABLE IF EXISTS predb;
+CREATE TABLE IF NOT EXISTS predb (
+  id INT(12) NOT NULL AUTO_INCREMENT,
+  ctime INT(12) NOT NULL,
+  dirname VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+  category VARCHAR(20) COLLATE utf8_unicode_ci NOT NULL,
+  nuketype VARCHAR(20) COLLATE utf8_unicode_ci DEFAULT '',
+  nukereason VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT '',
+  nuketime INT(12) DEFAULT '0',
+  filesize FLOAT DEFAULT '0',
+  filecount INT(6) DEFAULT '0',
+  filename VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT '',
+  updatedate TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY dirname (dirname),
+  KEY ix_predb_ctime (ctime),
+  KEY ix_predb_updatedate (updatedate),
+  KEY ix_predb_filename (filename)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 1;
 
-DROP TABLE IF EXISTS `predbhash`;
-CREATE TABLE IF NOT EXISTS `predbhash` (
-  `hash` varbinary(20) NOT NULL DEFAULT '',
-  `pre_id` int(11) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`hash`)
-) ENGINE=MYISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ;
+DROP TABLE IF EXISTS predbhash;
+CREATE TABLE IF NOT EXISTS predbhash (
+  hash varbinary(20) NOT NULL DEFAULT '',
+  pre_id INT(11) UNSIGNED NOT NULL DEFAULT '0',
+  PRIMARY KEY (hash)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
 
-DROP TABLE IF EXISTS `prehash`;
-CREATE TABLE IF NOT EXISTS `prehash` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `filename` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `title` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `nfo` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `size` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `category` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `predate` datetime DEFAULT NULL,
-  `source` varchar(50) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `requestid` int(10) unsigned NOT NULL DEFAULT '0',
-  `groupid` int(10) unsigned NOT NULL DEFAULT '0',
-  `nuked` tinyint(1) NOT NULL DEFAULT '0',
-  `nukereason` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `files` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `searched` tinyint(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `ix_prehash_title` (`title`),
-  KEY `ix_prehash_filename` (`filename`),
-  KEY `ix_prehash_nfo` (`nfo`),
-  KEY `ix_prehash_predate` (`predate`),
-  KEY `ix_prehash_source` (`source`),
-  KEY `ix_prehash_requestid` (`requestid`,`groupid`),
-  KEY `ix_prehash_size` (`size`),
-  KEY `ix_prehash_category` (`category`),
-  KEY `ix_prehash_searched` (`searched`)
-) ENGINE=MYISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
-DROP TRIGGER IF EXISTS `delete_hashes`;
+DROP TABLE IF EXISTS prehash;
+CREATE TABLE IF NOT EXISTS prehash (
+  id INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  filename VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  title VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  nfo VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  size VARCHAR(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  category VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  predate DATETIME DEFAULT NULL,
+  source VARCHAR(50) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  requestid INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  groupid INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  nuked TINYINT(1) NOT NULL DEFAULT '0',
+  nukereason VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  files VARCHAR(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  searched TINYINT(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (id),
+  UNIQUE KEY ix_prehash_title (title),
+  KEY ix_prehash_filename (filename),
+  KEY ix_prehash_nfo (nfo),
+  KEY ix_prehash_predate (predate),
+  KEY ix_prehash_source (source),
+  KEY ix_prehash_requestid (requestid,groupid),
+  KEY ix_prehash_size (size),
+  KEY ix_prehash_category (category),
+  KEY ix_prehash_searched (searched)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 1;
+
+DROP TRIGGER IF EXISTS delete_hashes;
+DROP TRIGGER IF EXISTS insert_hashes;
+DROP TRIGGER IF EXISTS update_hashes;
+
 DELIMITER $$
-CREATE TRIGGER `delete_hashes` AFTER DELETE ON `prehash`
- FOR EACH ROW BEGIN
-    DELETE FROM predbhash WHERE hash IN ( UNHEX(md5(OLD.title)), UNHEX(md5(md5(OLD.title))), UNHEX(sha1(OLD.title)) ) AND pre_id = OLD.id;
-  END
-$$
-DELIMITER ;
-DROP TRIGGER IF EXISTS `insert_hashes`;
-DELIMITER $$
-CREATE TRIGGER `insert_hashes` AFTER INSERT ON `prehash`
- FOR EACH ROW BEGIN
-    INSERT INTO predbhash (hash, pre_id) VALUES (UNHEX(MD5(NEW.title)), NEW.id), (UNHEX(MD5(MD5(NEW.title))), NEW.id), ( UNHEX(SHA1(NEW.title)), NEW.id);
-  END
-$$
-DELIMITER ;
-DROP TRIGGER IF EXISTS `update_hashes`;
-DELIMITER $$
-CREATE TRIGGER `update_hashes` AFTER UPDATE ON `prehash`
- FOR EACH ROW BEGIN
-    IF NEW.title != OLD.title
-    THEN
-      DELETE FROM predbhash WHERE hash IN ( UNHEX(md5(OLD.title)), UNHEX(md5(md5(OLD.title))), UNHEX(sha1(OLD.title)) ) AND pre_id = OLD.id;
-      INSERT INTO predbhash (hash, pre_id) VALUES ( UNHEX(MD5(NEW.title)), NEW.id ), ( UNHEX(MD5(MD5(NEW.title))), NEW.id ), ( UNHEX(SHA1(NEW.title)), NEW.id );
-    END IF;
-  END
-$$
-DELIMITER ;
 
-DROP TABLE IF EXISTS `prehash_imports`;
-CREATE TABLE IF NOT EXISTS `prehash_imports` (
-  `title` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `nfo` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `size` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `category` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `predate` datetime DEFAULT NULL,
-  `source` varchar(50) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `requestid` int(10) unsigned NOT NULL DEFAULT '0',
-  `groupid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'FK to groups',
-  `nuked` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Is this pre nuked? 0 no 2 yes 1 un nuked 3 mod nuked',
-  `nukereason` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'If this pre is nuked, what is the reason?',
-  `files` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'How many files does this pre have ?',
-  `filename` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `searched` tinyint(1) NOT NULL DEFAULT '0',
-  `groupname` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL
-) ENGINE=MYISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ;
+CREATE TRIGGER delete_hashes AFTER DELETE ON prehash FOR EACH ROW BEGIN DELETE FROM predbhash WHERE hash IN ( UNHEX(md5(OLD.title)), UNHEX(md5(md5(OLD.title))), UNHEX(sha1(OLD.title)) ) AND pre_id  =  OLD.id; END $$
+CREATE TRIGGER insert_hashes AFTER INSERT ON prehash FOR EACH ROW BEGIN INSERT INTO predbhash (hash, pre_id) VALUES (UNHEX(MD5(NEW.title)), NEW.id), (UNHEX(MD5(MD5(NEW.title))), NEW.id), ( UNHEX(SHA1(NEW.title)), NEW.id); END $$
+CREATE TRIGGER update_hashes AFTER UPDATE ON prehash FOR EACH ROW BEGIN IF NEW.title !=  OLD.title THEN DELETE FROM predbhash WHERE hash IN ( UNHEX(md5(OLD.title)), UNHEX(md5(md5(OLD.title))), UNHEX(sha1(OLD.title)) ) AND pre_id  =  OLD.id; INSERT INTO predbhash (hash, pre_id) VALUES ( UNHEX(MD5(NEW.title)), NEW.id ), ( UNHEX(MD5(MD5(NEW.title))), NEW.id ), ( UNHEX(SHA1(NEW.title)), NEW.id );END IF;END $$
 
-DROP TABLE IF EXISTS `releaseaudio`;
-CREATE TABLE IF NOT EXISTS `releaseaudio` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `releaseid` int(11) unsigned DEFAULT NULL,
-  `audioid` int(2) unsigned DEFAULT NULL,
-  `audioformat` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `audiomode` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `audiobitratemode` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `audiobitrate` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `audiochannels` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `audiosamplerate` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `audiolibrary` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `audiolanguage` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `audiotitle` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `releaseid` (`releaseid`,`audioid`)
-) ENGINE=MYISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
-
-DROP TABLE IF EXISTS `releaseextrafull`;
-CREATE TABLE IF NOT EXISTS `releaseextrafull` (
-  `releaseid` int(11) unsigned NOT NULL DEFAULT '0',
-  `mediainfo` text COLLATE utf8_unicode_ci,
-  PRIMARY KEY (`releaseid`)
-) ENGINE=MYISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ;
-
-DROP TABLE IF EXISTS `releasenfo`;
-CREATE TABLE IF NOT EXISTS `releasenfo` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `releaseid` int(11) unsigned DEFAULT NULL,
-  `binaryid` int(11) unsigned DEFAULT NULL,
-  `nfo` blob,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `ix_releasenfo_releaseid` (`releaseid`),
-  KEY `ix_releasenfo_binaryid` (`binaryid`)
-) ENGINE=MYISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
-
-DROP TABLE IF EXISTS `releaseregex`;
-CREATE TABLE IF NOT EXISTS `releaseregex` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `groupname` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `regex` varchar(2000) COLLATE utf8_unicode_ci NOT NULL,
-  `ordinal` int(11) unsigned NOT NULL,
-  `status` int(11) unsigned NOT NULL DEFAULT '1',
-  `description` varchar(1000) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `categoryid` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MYISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
-
-DROP TABLE IF EXISTS `releaseregextesting`;
-CREATE TABLE IF NOT EXISTS `releaseregextesting` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(512) COLLATE utf8_unicode_ci NOT NULL,
-  `fromname` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `date` datetime NOT NULL,
-  `binaryhash` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `groupname` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `regexid` int(11) unsigned DEFAULT NULL,
-  `categoryid` int(11) unsigned DEFAULT NULL,
-  `reqid` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `blacklistid` int(11) DEFAULT NULL,
-  `size` bigint(20) NOT NULL,
-  `dateadded` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `ix_releaseregextesting_binaryhash` (`binaryhash`)
-) ENGINE=MYISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
-
-DROP TABLE IF EXISTS `releases`;
-CREATE TABLE IF NOT EXISTS `releases` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `gid` varchar(32) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `searchname` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `totalpart` int(11) DEFAULT '0',
-  `groupid` int(10) unsigned DEFAULT NULL,
-  `size` bigint(20) unsigned NOT NULL DEFAULT '0',
-  `postdate` datetime DEFAULT NULL,
-  `adddate` datetime DEFAULT NULL,
-  `updatedate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `guid` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `fromname` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `completion` float NOT NULL DEFAULT '0',
-  `categoryid` int(11) NOT NULL DEFAULT '0',
-  `videos_id` mediumint(11) unsigned NOT NULL DEFAULT '0' COMMENT 'FK to videos.id of the parent series.',
-  `tv_episodes_id` mediumint(11) NOT NULL DEFAULT '0' COMMENT 'FK to tv_episodes.id of the episode',
-  `regexid` int(11) DEFAULT NULL,
-  `tvdbid` int(11) unsigned DEFAULT NULL,
-  `imdbid` mediumint(7) unsigned zerofill DEFAULT NULL,
-  `episodeinfoid` int(11) DEFAULT NULL,
-  `musicinfoid` int(11) DEFAULT NULL,
-  `consoleinfoid` int(11) DEFAULT NULL,
-  `bookinfoid` int(11) DEFAULT NULL,
-  `preid` int(12) DEFAULT NULL,
-  `anidbid` int(11) DEFAULT NULL,
-  `reqid` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `releasenfoid` int(11) DEFAULT NULL,
-  `grabs` int(10) unsigned NOT NULL DEFAULT '0',
-  `comments` int(11) NOT NULL DEFAULT '0',
-  `passwordstatus` int(11) NOT NULL DEFAULT '0',
-  `rarinnerfilecount` int(11) NOT NULL DEFAULT '0',
-  `haspreview` int(11) NOT NULL DEFAULT '0',
-  `dehashstatus` tinyint(1) NOT NULL DEFAULT '0',
-  `nfostatus` tinyint(4) NOT NULL DEFAULT '0',
-  `jpgstatus` tinyint(1) NOT NULL DEFAULT '0',
-  `audiostatus` tinyint(1) NOT NULL DEFAULT '0',
-  `videostatus` tinyint(1) NOT NULL DEFAULT '0',
-  `reqidstatus` tinyint(1) NOT NULL DEFAULT '0',
-  `prehashid` int(10) unsigned NOT NULL DEFAULT '0',
-  `iscategorized` tinyint(1) NOT NULL DEFAULT '0',
-  `isrenamed` tinyint(1) NOT NULL DEFAULT '0',
-  `ishashed` tinyint(1) NOT NULL DEFAULT '0',
-  `isrequestid` tinyint(1) NOT NULL DEFAULT '0',
-  `proc_pp` tinyint(1) NOT NULL DEFAULT '0',
-  `proc_par2` tinyint(1) NOT NULL DEFAULT '0',
-  `proc_nfo` tinyint(1) NOT NULL DEFAULT '0',
-  `proc_files` tinyint(1) NOT NULL DEFAULT '0',
-  `gamesinfo_id` int(10) NOT NULL DEFAULT '0',
-  `xxxinfo_id` int(10) NOT NULL DEFAULT '0',
-  `proc_sorter` tinyint(1) NOT NULL DEFAULT '0',
-  `nzbstatus` tinyint(1) NOT NULL DEFAULT '0',
-  `nzb_guid` binary(16) DEFAULT NULL,
-  `traktid` int(10) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`,`categoryid`),
-  KEY `ix_releases_name` (`name`),
-  KEY `ix_releases_group_id` (`groupid`,`passwordstatus`),
-  KEY `ix_releases_postdate_searchname` (`postdate`,`searchname`),
-  KEY `ix_releases_guid` (`guid`),
-  KEY `ix_releases_nzb_guid` (`nzb_guid`),
-  KEY `ix_releases_imdbid` (`imdbid`),
-  KEY `ix_releases_xxxinfo_id` (`xxxinfo_id`),
-  KEY `ix_releases_musicinfoid` (`musicinfoid`,`passwordstatus`),
-  KEY `ix_releases_consoleinfoid` (`consoleinfoid`),
-  KEY `ix_releases_gamesinfo_id` (`gamesinfo_id`),
-  KEY `ix_releases_bookinfoid` (`bookinfoid`),
-  KEY `ix_releases_anidbid` (`anidbid`),
-  KEY `ix_releases_preid_searchname` (`prehashid`,`searchname`),
-  KEY `ix_releases_haspreview_passwordstatus` (`haspreview`,`passwordstatus`),
-  KEY `ix_releases_passwordstatus` (`passwordstatus`),
-  KEY `ix_releases_nfostatus` (`nfostatus`,`size`),
-  KEY `ix_releases_dehashstatus` (`dehashstatus`,`ishashed`),
-  KEY `ix_releases_reqidstatus` (`adddate`,`reqidstatus`,`isrequestid`),
-  KEY `ix_releases_gid` (`gid`) COMMENT 'Index releases.gid column',
-  KEY `ix_releases_videos_id` (`videos_id`),
-  KEY `ix_releases_tv_episodes_id` (`tv_episodes_id`)
-) ENGINE=MYISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci
-/*!50100 PARTITION BY RANGE (categoryid)
-(PARTITION unused VALUES LESS THAN (1000) ENGINE = MYISAM,
- PARTITION console VALUES LESS THAN (2000) ENGINE = MYISAM,
- PARTITION movies VALUES LESS THAN (3000) ENGINE = MYISAM,
- PARTITION audio VALUES LESS THAN (4000) ENGINE = MYISAM,
- PARTITION pc VALUES LESS THAN (5000) ENGINE = MYISAM,
- PARTITION tv VALUES LESS THAN (6000) ENGINE = MYISAM,
- PARTITION xxx VALUES LESS THAN (7000) ENGINE = MYISAM,
- PARTITION books VALUES LESS THAN (8000) ENGINE = MYISAM,
- PARTITION misc VALUES LESS THAN (9000) ENGINE = MYISAM) */ AUTO_INCREMENT=1 ;
-DROP TRIGGER IF EXISTS `check_insert`;
-DELIMITER $$
-CREATE TRIGGER `check_insert` BEFORE INSERT ON `releases`
- FOR EACH ROW BEGIN IF NEW.searchname REGEXP '[a-fA-F0-9]{32}' OR NEW.name REGEXP '[a-fA-F0-9]{32}' THEN SET NEW.ishashed = 1;ELSEIF NEW.name REGEXP '^\[ ?([[:digit:]]{4,6}) ?\]|^REQs*([[:digit:]]{4,6})|^([[:digit:]]{4,6})-[[:digit:]]{1}\[' THEN SET NEW.isrequestid = 1; END IF; END
-$$
-DELIMITER ;
-DROP TRIGGER IF EXISTS `check_update`;
-DELIMITER $$
-CREATE TRIGGER `check_update` BEFORE UPDATE ON `releases`
- FOR EACH ROW BEGIN IF NEW.searchname REGEXP '[a-fA-F0-9]{32}' OR NEW.name REGEXP '[a-fA-F0-9]{32}' THEN SET NEW.ishashed = 1;ELSEIF NEW.name REGEXP '^\[ ?([[:digit:]]{4,6}) ?\]|^REQs*([[:digit:]]{4,6})|^([[:digit:]]{4,6})-[[:digit:]]{1}\[' THEN SET NEW.isrequestid = 1;END IF;END
-$$
-DELIMITER ;
-DROP TRIGGER IF EXISTS `delete_search`;
-DELIMITER $$
-CREATE TRIGGER `delete_search` AFTER DELETE ON `releases`
- FOR EACH ROW BEGIN DELETE FROM releasesearch WHERE releaseid = OLD.id; END
-$$
-DELIMITER ;
-DROP TRIGGER IF EXISTS `insert_search`;
-DELIMITER $$
-CREATE TRIGGER `insert_search` AFTER INSERT ON `releases`
- FOR EACH ROW BEGIN INSERT INTO releasesearch (releaseid, guid, name, searchname) VALUES (NEW.id, NEW.guid, NEW.name, NEW.searchname);END
-$$
-DELIMITER ;
-DROP TRIGGER IF EXISTS `update_search`;
-DELIMITER $$
-CREATE TRIGGER `update_search` AFTER UPDATE ON `releases`
- FOR EACH ROW BEGIN IF NEW.guid != OLD.guid THEN UPDATE releasesearch SET guid = NEW.guid WHERE releaseid = OLD.id; END IF;IF NEW.name != OLD.name THEN UPDATE releasesearch SET name = NEW.name WHERE releaseid = OLD.id; END IF; IF NEW.searchname != OLD.searchname THEN UPDATE releasesearch SET searchname = NEW.searchname WHERE releaseid = OLD.id; END IF;END
-$$
 DELIMITER ;
 
-DROP TABLE IF EXISTS `releasesearch`;
-CREATE TABLE IF NOT EXISTS `releasesearch` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `releaseid` int(11) unsigned NOT NULL,
-  `guid` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `searchname` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `fromname` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `ix_releasesearch_releaseid` (`releaseid`),
-  KEY `ix_releasesearch_guid` (`guid`),
-  FULLTEXT KEY `ix_releasesearch_name_ft` (`name`),
-  FULLTEXT KEY `ix_releasesearch_searchname_ft` (`searchname`),
-  FULLTEXT KEY `ix_releasesearch_fromname_ft` (`fromname`)
-) ENGINE=MYISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+DROP TABLE IF EXISTS prehash_imports;
+CREATE TABLE IF NOT EXISTS prehash_imports (
+  title VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  nfo VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  size VARCHAR(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  category VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  predate DATETIME DEFAULT NULL,
+  source VARCHAR(50) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  requestid INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  groupid INT(10) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'FK to groups',
+  nuked TINYINT(1) NOT NULL DEFAULT '0' COMMENT 'Is this pre nuked? 0 no 2 yes 1 un nuked 3 mod nuked',
+  nukereason VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'If this pre is nuked, what is the reason?',
+  files VARCHAR(50) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'How many files does this pre have ?',
+  filename VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  searched TINYINT(1) NOT NULL DEFAULT '0',
+  groupname VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci;
 
-DROP TABLE IF EXISTS `releasesubs`;
-CREATE TABLE IF NOT EXISTS `releasesubs` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `releaseid` int(11) unsigned DEFAULT NULL,
-  `subsid` int(2) unsigned DEFAULT NULL,
-  `subslanguage` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `releaseid` (`releaseid`,`subsid`)
-) ENGINE=MYISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+DROP TABLE IF EXISTS releaseaudio;
+CREATE TABLE IF NOT EXISTS releaseaudio (
+  id INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  releaseid INT(11) UNSIGNED DEFAULT NULL,
+  audioid INT(2) UNSIGNED DEFAULT NULL,
+  audioformat VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  audiomode VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  audiobitratemode VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  audiobitrate VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  audiochannels VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  audiosamplerate VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  audiolibrary VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  audiolanguage VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  audiotitle VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY releaseid (releaseid,audioid)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 1;
 
-DROP TABLE IF EXISTS `releasevideo`;
-CREATE TABLE IF NOT EXISTS `releasevideo` (
-  `releaseid` int(11) unsigned NOT NULL DEFAULT '0',
-  `containerformat` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `overallbitrate` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `videoduration` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `videoformat` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `videocodec` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `videowidth` int(10) DEFAULT NULL,
-  `videoheight` int(10) DEFAULT NULL,
-  `videoaspect` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `videoframerate` float(7,4) DEFAULT NULL,
-  `videolibrary` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `definition` int(10) DEFAULT NULL,
-  PRIMARY KEY (`releaseid`)
-) ENGINE=MYISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ;
+DROP TABLE IF EXISTS releaseextrafull;
+CREATE TABLE IF NOT EXISTS releaseextrafull (
+  releaseid INT(11) UNSIGNED NOT NULL DEFAULT '0',
+  mediainfo TEXT COLLATE utf8_unicode_ci,
+  PRIMARY KEY (releaseid)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci;
 
-DROP TABLE IF EXISTS `release_comments`;
-CREATE TABLE IF NOT EXISTS `release_comments` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `sourceid` bigint(20) unsigned DEFAULT NULL,
-  `gid` varchar(32) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `cid` varchar(32) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `releaseid` int(11) unsigned DEFAULT NULL,
-  `text` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `isvisible` tinyint(1) DEFAULT '1',
-  `issynced` tinyint(1) DEFAULT '0',
-  `userid` int(11) unsigned DEFAULT NULL,
-  `username` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `createddate` datetime DEFAULT NULL,
-  `host` varchar(40) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `shared` tinyint(1) NOT NULL DEFAULT '1',
-  `shareid` varchar(40) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `siteid` varchar(40) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `nzb_guid` binary(16) NOT NULL DEFAULT '0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0',
-  `text_hash` varchar(32) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `ux_text_hash_siteid_nzb_guid` (`text_hash`,`siteid`,`nzb_guid`),
-  UNIQUE KEY `ux_text_siteid_nzb_guid` (`text`,`siteid`,`nzb_guid`),
-  KEY `ix_releasecomment_releaseid` (`releaseid`),
-  KEY `ix_releasecomment_userid` (`userid`),
-  KEY `ix_releasecomment_cid` (`cid`),
-  KEY `ix_releasecomment_gid` (`gid`)
-) ENGINE=MYISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
-DROP TRIGGER IF EXISTS `insert_MD5`;
+DROP TABLE IF EXISTS releasenfo;
+CREATE TABLE IF NOT EXISTS releasenfo (
+  id INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  releaseid INT(11) UNSIGNED DEFAULT NULL,
+  binaryid INT(11) UNSIGNED DEFAULT NULL,
+  nfo blob,
+  PRIMARY KEY (id),
+  UNIQUE KEY ix_releasenfo_releaseid (releaseid),
+  KEY ix_releasenfo_binaryid (binaryid)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 1;
+
+DROP TABLE IF EXISTS releaseregex;
+CREATE TABLE IF NOT EXISTS releaseregex (
+  id INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  groupname VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  regex VARCHAR(2000) COLLATE utf8_unicode_ci NOT NULL,
+  ordinal INT(11) UNSIGNED NOT NULL,
+  status INT(11) UNSIGNED NOT NULL DEFAULT '1',
+  description VARCHAR(1000) COLLATE utf8_unicode_ci DEFAULT NULL,
+  categoryid INT(11) DEFAULT NULL,
+  PRIMARY KEY (id)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 1;
+
+DROP TABLE IF EXISTS releaseregextesting;
+CREATE TABLE IF NOT EXISTS releaseregextesting (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  name VARCHAR(512) COLLATE utf8_unicode_ci NOT NULL,
+  fromname VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+  date DATETIME NOT NULL,
+  binaryhash VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+  groupname VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+  regexid INT(11) UNSIGNED DEFAULT NULL,
+  categoryid INT(11) UNSIGNED DEFAULT NULL,
+  reqid VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  blacklistid INT(11) DEFAULT NULL,
+  size BIGINT(20) NOT NULL,
+  dateadded TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY ix_releaseregextesting_binaryhash (binaryhash)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 1;
+
+DROP TABLE IF EXISTS releases;
+CREATE TABLE IF NOT EXISTS releases (
+  id INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  gid VARCHAR(32) COLLATE utf8_unicode_ci DEFAULT NULL,
+  name VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  searchname VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  totalpart INT(11) DEFAULT '0',
+  groupid INT(10) UNSIGNED DEFAULT NULL,
+  size BIGINT(20) UNSIGNED NOT NULL DEFAULT '0',
+  postdate DATETIME DEFAULT NULL,
+  adddate DATETIME DEFAULT NULL,
+  updatedate TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  guid VARCHAR(50) COLLATE utf8_unicode_ci NOT NULL,
+  fromname VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  completion FLOAT NOT NULL DEFAULT '0',
+  categoryid INT(11) NOT NULL DEFAULT '0',
+  videos_id MEDIUMINT(11) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'FK to videos.id of the parent series.',
+  tv_episodes_id MEDIUMINT(11) NOT NULL DEFAULT '0' COMMENT 'FK to tv_episodes.id of the episode',
+  regexid INT(11) DEFAULT NULL,
+  tvdbid INT(11) UNSIGNED DEFAULT NULL,
+  imdbid MEDIUMINT(7) UNSIGNED zerofill DEFAULT NULL,
+  episodeinfoid INT(11) DEFAULT NULL,
+  musicinfoid INT(11) DEFAULT NULL,
+  consoleinfoid INT(11) DEFAULT NULL,
+  bookinfoid INT(11) DEFAULT NULL,
+  preid INT(12) DEFAULT NULL,
+  anidbid INT(11) DEFAULT NULL,
+  reqid VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  releasenfoid INT(11) DEFAULT NULL,
+  grabs INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  comments INT(11) NOT NULL DEFAULT '0',
+  passwordstatus INT(11) NOT NULL DEFAULT '0',
+  rarinnerfilecount INT(11) NOT NULL DEFAULT '0',
+  haspreview INT(11) NOT NULL DEFAULT '0',
+  dehashstatus TINYINT(1) NOT NULL DEFAULT '0',
+  nfostatus TINYINT(4) NOT NULL DEFAULT '0',
+  jpgstatus TINYINT(1) NOT NULL DEFAULT '0',
+  audiostatus TINYINT(1) NOT NULL DEFAULT '0',
+  videostatus TINYINT(1) NOT NULL DEFAULT '0',
+  reqidstatus TINYINT(1) NOT NULL DEFAULT '0',
+  prehashid INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  iscategorized TINYINT(1) NOT NULL DEFAULT '0',
+  isrenamed TINYINT(1) NOT NULL DEFAULT '0',
+  ishashed TINYINT(1) NOT NULL DEFAULT '0',
+  isrequestid TINYINT(1) NOT NULL DEFAULT '0',
+  proc_pp TINYINT(1) NOT NULL DEFAULT '0',
+  proc_par2 TINYINT(1) NOT NULL DEFAULT '0',
+  proc_nfo TINYINT(1) NOT NULL DEFAULT '0',
+  proc_files TINYINT(1) NOT NULL DEFAULT '0',
+  gamesinfo_id INT(10) NOT NULL DEFAULT '0',
+  xxxinfo_id INT(10) NOT NULL DEFAULT '0',
+  proc_sorter TINYINT(1) NOT NULL DEFAULT '0',
+  nzbstatus TINYINT(1) NOT NULL DEFAULT '0',
+  nzb_guid BINARY(16) DEFAULT NULL,
+  traktid INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  PRIMARY KEY (id,categoryid),
+  KEY ix_releases_name (name),
+  KEY ix_releases_group_id (groupid,passwordstatus),
+  KEY ix_releases_postdate_searchname (postdate,searchname),
+  KEY ix_releases_guid (guid),
+  KEY ix_releases_nzb_guid (nzb_guid),
+  KEY ix_releases_imdbid (imdbid),
+  KEY ix_releases_xxxinfo_id (xxxinfo_id),
+  KEY ix_releases_musicinfoid (musicinfoid,passwordstatus),
+  KEY ix_releases_consoleinfoid (consoleinfoid),
+  KEY ix_releases_gamesinfo_id (gamesinfo_id),
+  KEY ix_releases_bookinfoid (bookinfoid),
+  KEY ix_releases_anidbid (anidbid),
+  KEY ix_releases_preid_searchname (prehashid,searchname),
+  KEY ix_releases_haspreview_passwordstatus (haspreview,passwordstatus),
+  KEY ix_releases_passwordstatus (passwordstatus),
+  KEY ix_releases_nfostatus (nfostatus,size),
+  KEY ix_releases_dehashstatus (dehashstatus,ishashed),
+  KEY ix_releases_reqidstatus (adddate,reqidstatus,isrequestid),
+  KEY ix_releases_gid (gid) COMMENT 'Index releases.gid column',
+  KEY ix_releases_videos_id (videos_id),
+  KEY ix_releases_tv_episodes_id (tv_episodes_id)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 1
+  PARTITION BY RANGE (categoryid)(
+  PARTITION unused VALUES LESS THAN (1000),
+  PARTITION console VALUES LESS THAN (2000),
+  PARTITION movies VALUES LESS THAN (3000),
+  PARTITION audio VALUES LESS THAN (4000),
+  PARTITION pc VALUES LESS THAN (5000),
+  PARTITION tv VALUES LESS THAN (6000),
+  PARTITION xxx VALUES LESS THAN (7000),
+  PARTITION books VALUES LESS THAN (8000),
+  PARTITION misc VALUES LESS THAN (9000)
+  );
+
+DROP TRIGGER IF EXISTS check_insert;
+DROP TRIGGER IF EXISTS check_update;
+DROP TRIGGER IF EXISTS delete_search;
+DROP TRIGGER IF EXISTS insert_search;
+DROP TRIGGER IF EXISTS update_search;
+
 DELIMITER $$
-CREATE TRIGGER `insert_MD5` BEFORE INSERT ON `release_comments`
- FOR EACH ROW SET NEW.text_hash = MD5(NEW.text);
-$$
+
+CREATE TRIGGER check_insert BEFORE INSERT ON releases FOR EACH ROW BEGIN IF NEW.searchname REGEXP '[a-fA-F0-9]{32}' OR NEW.name REGEXP '[a-fA-F0-9]{32}' THEN SET NEW.ishashed  =  1;ELSEIF NEW.name REGEXP '^\[ ?([[:digit:]]{4,6}) ?\]|^REQs*([[:digit:]]{4,6})|^([[:digit:]]{4,6})-[[:digit:]]{1}\[' THEN SET NEW.isrequestid  =  1; END IF; END $$
+CREATE TRIGGER check_update BEFORE UPDATE ON releases FOR EACH ROW BEGIN IF NEW.searchname REGEXP '[a-fA-F0-9]{32}' OR NEW.name REGEXP '[a-fA-F0-9]{32}' THEN SET NEW.ishashed  =  1;ELSEIF NEW.name REGEXP '^\[ ?([[:digit:]]{4,6}) ?\]|^REQs*([[:digit:]]{4,6})|^([[:digit:]]{4,6})-[[:digit:]]{1}\[' THEN SET NEW.isrequestid  =  1;END IF;END $$
+CREATE TRIGGER delete_search AFTER DELETE ON releases FOR EACH ROW BEGIN DELETE FROM releasesearch WHERE releaseid  =  OLD.id; END $$
+CREATE TRIGGER insert_search AFTER INSERT ON releases FOR EACH ROW BEGIN INSERT INTO releasesearch (releaseid, guid, name, searchname) VALUES (NEW.id, NEW.guid, NEW.name, NEW.searchname);END $$
+CREATE TRIGGER update_search AFTER UPDATE ON releases FOR EACH ROW BEGIN IF NEW.guid !=  OLD.guid THEN UPDATE releasesearch SET guid  =  NEW.guid WHERE releaseid  =  OLD.id; END IF;IF NEW.name !=  OLD.name THEN UPDATE releasesearch SET name  =  NEW.name WHERE releaseid  =  OLD.id; END IF; IF NEW.searchname !=  OLD.searchname THEN UPDATE releasesearch SET searchname  =  NEW.searchname WHERE releaseid  =  OLD.id; END IF;END $$
+
 DELIMITER ;
 
-DROP TABLE IF EXISTS `release_files`;
-CREATE TABLE IF NOT EXISTS `release_files` (
-  `releaseid` int(11) unsigned NOT NULL,
-  `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `size` bigint(20) unsigned NOT NULL DEFAULT '0',
-  `ishashed` tinyint(1) NOT NULL DEFAULT '0',
-  `createddate` datetime DEFAULT NULL,
-  `passworded` tinyint(1) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`releaseid`,`name`),
-  KEY `ix_releasefiles_ishashed` (`ishashed`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+DROP TABLE IF EXISTS releasesearch;
+CREATE TABLE IF NOT EXISTS releasesearch (
+  id INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  releaseid INT(11) UNSIGNED NOT NULL,
+  guid VARCHAR(50) COLLATE utf8_unicode_ci NOT NULL,
+  name VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  searchname VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  fromname VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (id),
+  KEY ix_releasesearch_releaseid (releaseid),
+  KEY ix_releasesearch_guid (guid),
+  FULLTEXT KEY ix_releasesearch_name_ft (name),
+  FULLTEXT KEY ix_releasesearch_searchname_ft (searchname),
+  FULLTEXT KEY ix_releasesearch_fromname_ft (fromname)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 1;
 
-DROP TABLE IF EXISTS `roleexcat`;
-CREATE TABLE IF NOT EXISTS `roleexcat` (
-  `id` int(16) unsigned NOT NULL AUTO_INCREMENT,
-  `role` int(11) NOT NULL,
-  `categoryid` int(11) DEFAULT NULL,
-  `createddate` datetime NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `ix_roleexcat_rolecat` (`role`,`categoryid`)
-) ENGINE=MYISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+DROP TABLE IF EXISTS releasesubs;
+CREATE TABLE IF NOT EXISTS releasesubs (
+  id INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  releaseid INT(11) UNSIGNED DEFAULT NULL,
+  subsid INT(2) UNSIGNED DEFAULT NULL,
+  subslanguage VARCHAR(50) COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY releaseid (releaseid,subsid)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 1;
 
-DROP TABLE IF EXISTS `settings`;
-CREATE TABLE IF NOT EXISTS `settings` (
-  `setting` varchar(64) COLLATE utf8_unicode_ci NOT NULL,
-  `value` varchar(19000) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `updateddate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `section` varchar(25) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `subsection` varchar(25) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `name` varchar(25) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `hint` text COLLATE utf8_unicode_ci NOT NULL,
-  PRIMARY KEY (`section`,`subsection`,`name`),
-  UNIQUE KEY `ui_settings_setting` (`setting`)
-) ENGINE=MYISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ;
+DROP TABLE IF EXISTS releasevideo;
+CREATE TABLE IF NOT EXISTS releasevideo (
+  releaseid INT(11) UNSIGNED NOT NULL DEFAULT '0',
+  containerformat VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  overallbitrate VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  videoduration VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  videoformat VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  videocodec VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  videowidth INT(10) DEFAULT NULL,
+  videoheight INT(10) DEFAULT NULL,
+  videoaspect VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  videoframerate FLOAT(7,4) DEFAULT NULL,
+  videolibrary VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  definition INT(10) DEFAULT NULL,
+  PRIMARY KEY (releaseid)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci;
 
-INSERT INTO `settings` (`setting`, `value`, `section`, `subsection`, `name`, `hint`) VALUES
+DROP TABLE IF EXISTS release_comments;
+CREATE TABLE IF NOT EXISTS release_comments (
+  id INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  sourceid BIGINT(20) UNSIGNED DEFAULT NULL,
+  gid VARCHAR(32) COLLATE utf8_unicode_ci DEFAULT NULL,
+  cid VARCHAR(32) COLLATE utf8_unicode_ci DEFAULT NULL,
+  releaseid INT(11) UNSIGNED DEFAULT NULL,
+  text VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  isvisible TINYINT(1) DEFAULT '1',
+  issynced TINYINT(1) DEFAULT '0',
+  userid INT(11) UNSIGNED DEFAULT NULL,
+  username VARCHAR(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  createddate DATETIME DEFAULT NULL,
+  host VARCHAR(40) COLLATE utf8_unicode_ci DEFAULT NULL,
+  shared TINYINT(1) NOT NULL DEFAULT '1',
+  shareid VARCHAR(40) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  siteid VARCHAR(40) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  nzb_guid BINARY(16) NOT NULL DEFAULT '0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0',
+  text_hash VARCHAR(32) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  PRIMARY KEY (id),
+  UNIQUE KEY ux_text_hash_siteid_nzb_guid (text_hash,siteid,nzb_guid),
+  UNIQUE KEY ux_text_siteid_nzb_guid (text,siteid,nzb_guid),
+  KEY ix_releasecomment_releaseid (releaseid),
+  KEY ix_releasecomment_userid (userid),
+  KEY ix_releasecomment_cid (cid),
+  KEY ix_releasecomment_gid (gid)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 1;
+
+DROP TRIGGER IF EXISTS insert_MD5;
+DELIMITER $$
+
+CREATE TRIGGER insert_MD5 BEFORE INSERT ON release_comments FOR EACH ROW SET NEW.text_hash  =  MD5(NEW.text);$$
+
+DELIMITER ;
+
+DROP TABLE IF EXISTS release_files;
+CREATE TABLE IF NOT EXISTS release_files (
+  releaseid INT(11) UNSIGNED NOT NULL,
+  name VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  size BIGINT(20) UNSIGNED NOT NULL DEFAULT '0',
+  ishashed TINYINT(1) NOT NULL DEFAULT '0',
+  createddate DATETIME DEFAULT NULL,
+  passworded TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
+  PRIMARY KEY (releaseid,name),
+  KEY ix_releasefiles_ishashed (ishashed)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci;
+
+DROP TABLE IF EXISTS roleexcat;
+CREATE TABLE IF NOT EXISTS roleexcat (
+  id INT(16) UNSIGNED NOT NULL AUTO_INCREMENT,
+  role INT(11) NOT NULL,
+  categoryid INT(11) DEFAULT NULL,
+  createddate DATETIME NOT NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY ix_roleexcat_rolecat (role,categoryid)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 1;
+
+DROP TABLE IF EXISTS settings;
+CREATE TABLE IF NOT EXISTS settings (
+  setting VARCHAR(64) COLLATE utf8_unicode_ci NOT NULL,
+  value VARCHAR(19000) COLLATE utf8_unicode_ci DEFAULT NULL,
+  updateddate TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  section VARCHAR(25) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  subsection VARCHAR(25) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  name VARCHAR(25) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  hint TEXT COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY (section,subsection,name),
+  UNIQUE KEY ui_settings_setting (setting)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci;
+
+INSERT INTO settings (setting, value, section, subsection, name, hint) VALUES
 ('adbrowse', '', '', '', 'adbrowse', ''),
 ('addetail', '', '', '', 'addetail', ''),
 ('addpar2', '1', '', '', 'addpar2', ''),
@@ -2068,7 +2193,7 @@ INSERT INTO `settings` (`setting`, `value`, `section`, `subsection`, `name`, `hi
 ('mediainfopath', '', '', '', 'mediainfopath', ''),
 ('metadescription', 'Newznab a usenet indexing website with community features','', '', 'metadescription', ''),
 ('metakeywords', 'usenet,nzbs,newznab,cms,community','', '', 'metakeywords', ''),
-('metatitle', 'newznab - A great usenet indexer', '2015-06-07 01:25:54', '', '', 'metatitle', ''),
+('metatitle', 'newznab - A great usenet indexer', '', '', 'metatitle', ''),
 ('minfilestoformrelease', '1','', '', 'minfilestoformrelease', ''),
 ('minsizetoformrelease', '0', '', '', 'minsizetoformrelease', ''),
 ('minsizetopostprocess', '0', '', '', 'minsizetopostprocess', ''),
@@ -2116,7 +2241,7 @@ INSERT INTO `settings` (`setting`, `value`, `section`, `subsection`, `name`, `hi
 ('removespam', '1','', '', 'removespam', ''),
 ('removespecial', '1','', '', 'removespecial', ''),
 ('reqidthreads', '10', '', '', 'reqidthreads', ''),
-('reqidurl', 'http://allfilled.newznab.com/query.php?t=[GROUP]&reqid=[REQID]','', '', 'reqidurl', ''),
+('reqidurl', 'http://allfilled.newznab.com/query.php?t = [GROUP]&reqid = [REQID]','', '', 'reqidurl', ''),
 ('request_hours', '1','', '', 'request_hours', ''),
 ('request_url', 'http://reqid.newznab-tmux.pw/', '', '', 'request_url', ''),
 ('rottentomatokey', '', '', '', 'rottentomatokey', ''),
@@ -2190,88 +2315,111 @@ INSERT INTO `settings` (`setting`, `value`, `section`, `subsection`, `name`, `hi
 ('trailers_size_y', '345', 'site', 'trailers', 'trailers_size_y', 'Height of the displayed trailer. 345 by default.'),
 ('tmux.running.exit', '0', 'tmux', 'running', 'exit', 'Determines if the running tmux monitor script should exit. If 0 nothing changes; if positive the script should exit gracefully (allowing all panes to finish); if negative the script should die as soon as possible.');
 
-DROP TABLE IF EXISTS `sharing`;
-CREATE TABLE IF NOT EXISTS `sharing` (
-  `site_guid` varchar(40) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `site_name` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `enabled` tinyint(1) NOT NULL DEFAULT '0',
-  `posting` tinyint(1) NOT NULL DEFAULT '0',
-  `start_position` tinyint(1) NOT NULL DEFAULT '0',
-  `fetching` tinyint(1) NOT NULL DEFAULT '1',
-  `auto_enable` tinyint(1) NOT NULL DEFAULT '1',
-  `hide_users` tinyint(1) NOT NULL DEFAULT '1',
-  `last_article` bigint(20) unsigned NOT NULL DEFAULT '0',
-  `max_push` mediumint(8) unsigned NOT NULL DEFAULT '40',
-  `max_pull` int(10) unsigned NOT NULL DEFAULT '200',
-  `max_download` mediumint(8) unsigned NOT NULL DEFAULT '150',
-  PRIMARY KEY (`site_guid`)
-) ENGINE=MYISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ;
+DROP TABLE IF EXISTS sharing;
+CREATE TABLE IF NOT EXISTS sharing (
+  site_guid VARCHAR(40) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  site_name VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  enabled TINYINT(1) NOT NULL DEFAULT '0',
+  posting TINYINT(1) NOT NULL DEFAULT '0',
+  start_position TINYINT(1) NOT NULL DEFAULT '0',
+  fetching TINYINT(1) NOT NULL DEFAULT '1',
+  auto_enable TINYINT(1) NOT NULL DEFAULT '1',
+  hide_users TINYINT(1) NOT NULL DEFAULT '1',
+  last_article BIGINT(20) UNSIGNED NOT NULL DEFAULT '0',
+  max_push MEDIUMINT(8) UNSIGNED NOT NULL DEFAULT '40',
+  max_pull INT(10) UNSIGNED NOT NULL DEFAULT '200',
+  max_download MEDIUMINT(8) UNSIGNED NOT NULL DEFAULT '150',
+  PRIMARY KEY (site_guid)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci;
 
-DROP TABLE IF EXISTS `sharing_sites`;
-CREATE TABLE IF NOT EXISTS `sharing_sites` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `site_name` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `site_guid` varchar(40) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `last_time` datetime DEFAULT NULL,
-  `first_time` datetime DEFAULT NULL,
-  `enabled` tinyint(1) NOT NULL DEFAULT '0',
-  `comments` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
-) ENGINE=MYISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+DROP TABLE IF EXISTS sharing_sites;
+CREATE TABLE IF NOT EXISTS sharing_sites (
+  id INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  site_name VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  site_guid VARCHAR(40) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  last_time DATETIME DEFAULT NULL,
+  first_time DATETIME DEFAULT NULL,
+  enabled TINYINT(1) NOT NULL DEFAULT '0',
+  comments MEDIUMINT(8) UNSIGNED NOT NULL DEFAULT '0',
+  PRIMARY KEY (id)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 1;
 
-DROP TABLE IF EXISTS `shortgroups`;
-CREATE TABLE IF NOT EXISTS `shortgroups` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `first_record` bigint(20) unsigned NOT NULL DEFAULT '0',
-  `last_record` bigint(20) unsigned NOT NULL DEFAULT '0',
-  `updated` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `ix_shortgroups_id` (`id`),
-  KEY `ix_shortgroups_name` (`name`)
-) ENGINE=MYISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+DROP TABLE IF EXISTS shortgroups;
+CREATE TABLE IF NOT EXISTS shortgroups (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  name VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  first_record BIGINT(20) UNSIGNED NOT NULL DEFAULT '0',
+  last_record BIGINT(20) UNSIGNED NOT NULL DEFAULT '0',
+  updated DATETIME DEFAULT NULL,
+  PRIMARY KEY (id),
+  KEY ix_shortgroups_id (id),
+  KEY ix_shortgroups_name (name)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 1;
 
-DROP TABLE IF EXISTS `sphinx`;
-CREATE TABLE IF NOT EXISTS `sphinx` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
-  `maxid` int(11) DEFAULT NULL,
-  `updatedate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `lastmergedate` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `nextmergedate` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `lastrebuilddate` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `nextrebuilddate` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
-  PRIMARY KEY (`id`)
-) ENGINE=MYISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+DROP TABLE IF EXISTS sphinx;
+CREATE TABLE IF NOT EXISTS sphinx (
+  id INT(11) NOT NULL AUTO_INCREMENT,
+  name VARCHAR(20) COLLATE utf8_unicode_ci NOT NULL,
+  maxid INT(11) DEFAULT NULL,
+  updatedate TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  lastmergedate TIMESTAMP NOT NULL DEFAULT '0000-00-00 00:00:00',
+  nextmergedate TIMESTAMP NOT NULL DEFAULT '0000-00-00 00:00:00',
+  lastrebuilddate TIMESTAMP NOT NULL DEFAULT '0000-00-00 00:00:00',
+  nextrebuilddate TIMESTAMP NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (id)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 1;
 
-DROP TABLE IF EXISTS `spotnabsources`;
-CREATE TABLE IF NOT EXISTS `spotnabsources` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `username` varchar(64) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'nntp',
-  `useremail` varchar(128) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'spot@nntp.com',
-  `usenetgroup` varchar(64) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'alt.binaries.backup',
-  `publickey` varchar(512) COLLATE utf8_unicode_ci NOT NULL,
-  `active` tinyint(1) NOT NULL DEFAULT '0',
-  `description` varchar(255) COLLATE utf8_unicode_ci DEFAULT '',
-  `lastupdate` datetime DEFAULT NULL,
-  `lastbroadcast` datetime DEFAULT NULL,
-  `lastarticle` bigint(20) unsigned NOT NULL DEFAULT '0',
-  `dateadded` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `spotnabsources_ix1` (`username`,`useremail`,`usenetgroup`)
-) ENGINE=MYISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+DROP TABLE IF EXISTS spotnabsources;
+CREATE TABLE IF NOT EXISTS spotnabsources (
+  id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  username VARCHAR(64) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'nntp',
+  useremail VARCHAR(128) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'spot@nntp.com',
+  usenetgroup VARCHAR(64) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'alt.binaries.backup',
+  publickey VARCHAR(512) COLLATE utf8_unicode_ci NOT NULL,
+  active TINYINT(1) NOT NULL DEFAULT '0',
+  description VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT '',
+  lastupdate DATETIME DEFAULT NULL,
+  lastbroadcast DATETIME DEFAULT NULL,
+  lastarticle BIGINT(20) UNSIGNED NOT NULL DEFAULT '0',
+  dateadded DATETIME DEFAULT NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY spotnabsources_ix1 (username,useremail,usenetgroup)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 1;
 
-DROP TABLE IF EXISTS `tmux`;
-CREATE TABLE IF NOT EXISTS `tmux` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `setting` varchar(64) COLLATE utf8_unicode_ci NOT NULL,
-  `value` varchar(19000) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `updateddate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `setting` (`setting`)
-) ENGINE=MYISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+DROP TABLE IF EXISTS tmux;
+CREATE TABLE IF NOT EXISTS tmux (
+  id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  setting VARCHAR(64) COLLATE utf8_unicode_ci NOT NULL,
+  value VARCHAR(19000) COLLATE utf8_unicode_ci DEFAULT NULL,
+  updateddate TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY setting (setting)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 1;
 
-INSERT INTO `tmux` (`setting`, `value`) VALUES
+INSERT INTO tmux (setting, value) VALUES
 ('defrag_cache', '900'),
 ('monitor_delay', '30'),
 ('tmux_session', 'newznab'),
@@ -2394,226 +2542,284 @@ INSERT INTO `tmux` (`setting`, `value`) VALUES
 ('collections_kill', '0'),
 ('run_ircscraper', '1');
 
-DROP TABLE IF EXISTS `tv_episodes`;
-CREATE TABLE IF NOT EXISTS `tv_episodes` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `videos_id` mediumint(11) unsigned NOT NULL COMMENT 'FK to videos.id of the parent series.',
-  `series` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'Number of series/season.',
-  `episode` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'Number of episode within series',
-  `se_complete` varchar(10) COLLATE utf8_unicode_ci NOT NULL COMMENT 'String version of Series/Episode as taken from release subject (i.e. S02E21+22).',
-  `title` varchar(180) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Title of the episode.',
-  `firstaired` date DEFAULT NULL,
-  `summary` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Description/summary of the episode.',
-  PRIMARY KEY (`id`),
-  KEY `ux_videoid_series_episode_aired` (`videos_id`,`series`,`episode`,`firstaired`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+DROP TABLE IF EXISTS tv_episodes;
+CREATE TABLE IF NOT EXISTS tv_episodes (
+  id INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  videos_id MEDIUMINT(11) UNSIGNED NOT NULL COMMENT 'FK to videos.id of the parent series.',
+  series SMALLINT(5) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'Number of series/season.',
+  episode SMALLINT(5) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'Number of episode within series',
+  se_complete VARCHAR(10) COLLATE utf8_unicode_ci NOT NULL COMMENT 'String version of Series/Episode as taken from release subject (i.e. S02E21+22).',
+  title VARCHAR(180) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Title of the episode.',
+  firstaired DATE DEFAULT NULL,
+  summary TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Description/summary of the episode.',
+  PRIMARY KEY (id),
+  KEY ux_videoid_series_episode_aired (videos_id,series,episode,firstaired)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 1;
 
-DROP TABLE IF EXISTS `tv_info`;
-CREATE TABLE IF NOT EXISTS `tv_info` (
-  `videos_id` mediumint(11) unsigned NOT NULL DEFAULT '0' COMMENT 'FK to video.id',
-  `summary` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Description/summary of the show.',
-  `publisher` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'The channel/network of production/release (ABC, BBC, Showtime, etc.).',
-  `image` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT 'Does the video have a cover image?',
-  PRIMARY KEY (`videos_id`),
-  KEY `ix_tv_info_image` (`image`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+DROP TABLE IF EXISTS tv_info;
+CREATE TABLE IF NOT EXISTS tv_info (
+  videos_id MEDIUMINT(11) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'FK to video.id',
+  summary TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Description/summary of the show.',
+  publisher VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'The channel/network of production/release (ABC, BBC, Showtime, etc.).',
+  image TINYINT(1) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'Does the video have a cover image?',
+  PRIMARY KEY (videos_id),
+  KEY ix_tv_info_image (image)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci;
 
-DROP TABLE IF EXISTS `upcoming`;
-CREATE TABLE IF NOT EXISTS `upcoming` (
-  `id` int(10) NOT NULL AUTO_INCREMENT,
-  `source` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
-  `typeid` int(10) DEFAULT NULL,
-  `info` text COLLATE utf8_unicode_ci,
-  `updateddate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `source` (`source`,`typeid`)
-) ENGINE=MYISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+DROP TABLE IF EXISTS upcoming;
+CREATE TABLE IF NOT EXISTS upcoming (
+  id INT(10) NOT NULL AUTO_INCREMENT,
+  source VARCHAR(20) COLLATE utf8_unicode_ci NOT NULL,
+  typeid INT(10) DEFAULT NULL,
+  info TEXT COLLATE utf8_unicode_ci,
+  updateddate TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY source (source,typeid)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 1;
 
-DROP TABLE IF EXISTS `usercart`;
-CREATE TABLE IF NOT EXISTS `usercart` (
-  `id` int(16) unsigned NOT NULL AUTO_INCREMENT,
-  `userid` int(11) DEFAULT NULL,
-  `releaseid` int(11) DEFAULT NULL,
-  `createddate` datetime NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `ix_usercart_userrelease` (`userid`,`releaseid`)
-) ENGINE=MYISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+DROP TABLE IF EXISTS usercart;
+CREATE TABLE IF NOT EXISTS usercart (
+  id INT(16) UNSIGNED NOT NULL AUTO_INCREMENT,
+  userid INT(11) DEFAULT NULL,
+  releaseid INT(11) DEFAULT NULL,
+  createddate DATETIME NOT NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY ix_usercart_userrelease (userid,releaseid)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 1;
 
-DROP TABLE IF EXISTS `userdownloads`;
-CREATE TABLE IF NOT EXISTS `userdownloads` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `userid` int(16) DEFAULT NULL,
-  `hosthash` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `timestamp` datetime NOT NULL,
-  `releaseid` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `userid` (`userid`),
-  KEY `hosthash` (`hosthash`),
-  KEY `timestamp` (`timestamp`),
-  KEY `releaseid` (`releaseid`)
-) ENGINE=MYISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+DROP TABLE IF EXISTS userdownloads;
+CREATE TABLE IF NOT EXISTS userdownloads (
+  id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  userid INT(16) DEFAULT NULL,
+  hosthash VARCHAR(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  TIMESTAMP DATETIME NOT NULL,
+  releaseid INT(11) DEFAULT NULL,
+  PRIMARY KEY (id),
+  KEY userid (userid),
+  KEY hosthash (hosthash),
+  KEY TIMESTAMP (TIMESTAMP),
+  KEY releaseid (releaseid)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 1;
 
-DROP TABLE IF EXISTS `userexcat`;
-CREATE TABLE IF NOT EXISTS `userexcat` (
-  `id` int(16) unsigned NOT NULL AUTO_INCREMENT,
-  `userid` int(11) DEFAULT NULL,
-  `categoryid` int(11) DEFAULT NULL,
-  `createddate` datetime NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `ix_userexcat_usercat` (`userid`,`categoryid`)
-) ENGINE=MYISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+DROP TABLE IF EXISTS userexcat;
+CREATE TABLE IF NOT EXISTS userexcat (
+  id INT(16) UNSIGNED NOT NULL AUTO_INCREMENT,
+  userid INT(11) DEFAULT NULL,
+  categoryid INT(11) DEFAULT NULL,
+  createddate DATETIME NOT NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY ix_userexcat_usercat (userid,categoryid)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 1;
 
-DROP TABLE IF EXISTS `userinvite`;
-CREATE TABLE IF NOT EXISTS `userinvite` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `guid` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `userid` int(11) unsigned DEFAULT NULL,
-  `createddate` datetime NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MYISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+DROP TABLE IF EXISTS userinvite;
+CREATE TABLE IF NOT EXISTS userinvite (
+  id INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  guid VARCHAR(50) COLLATE utf8_unicode_ci NOT NULL,
+  userid INT(11) UNSIGNED DEFAULT NULL,
+  createddate DATETIME NOT NULL,
+  PRIMARY KEY (id)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 1;
 
-DROP TABLE IF EXISTS `usermovies`;
-CREATE TABLE IF NOT EXISTS `usermovies` (
-  `id` int(16) unsigned NOT NULL AUTO_INCREMENT,
-  `userid` int(16) DEFAULT NULL,
-  `imdbid` mediumint(7) unsigned zerofill DEFAULT NULL,
-  `categoryid` varchar(64) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `createddate` datetime NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `ix_usermovies_userid` (`userid`,`imdbid`)
-) ENGINE=MYISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+DROP TABLE IF EXISTS usermovies;
+CREATE TABLE IF NOT EXISTS usermovies (
+  id INT(16) UNSIGNED NOT NULL AUTO_INCREMENT,
+  userid INT(16) DEFAULT NULL,
+  imdbid MEDIUMINT(7) UNSIGNED zerofill DEFAULT NULL,
+  categoryid VARCHAR(64) COLLATE utf8_unicode_ci DEFAULT NULL,
+  createddate DATETIME NOT NULL,
+  PRIMARY KEY (id),
+  KEY ix_usermovies_userid (userid,imdbid)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 1;
 
-DROP TABLE IF EXISTS `userrequests`;
-CREATE TABLE IF NOT EXISTS `userrequests` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `userid` int(16) DEFAULT NULL,
-  `request` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `hosthash` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `timestamp` datetime NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `userid` (`userid`),
-  KEY `hosthash` (`hosthash`),
-  KEY `timestamp` (`timestamp`)
-) ENGINE=MYISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+DROP TABLE IF EXISTS userrequests;
+CREATE TABLE IF NOT EXISTS userrequests (
+  id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  userid INT(16) DEFAULT NULL,
+  request VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+  hosthash VARCHAR(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  TIMESTAMP DATETIME NOT NULL,
+  PRIMARY KEY (id),
+  KEY userid (userid),
+  KEY hosthash (hosthash),
+  KEY TIMESTAMP (TIMESTAMP)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 1;
 
-DROP TABLE IF EXISTS `userroles`;
-CREATE TABLE IF NOT EXISTS `userroles` (
-  `id` int(10) NOT NULL AUTO_INCREMENT,
-  `name` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
-  `apirequests` int(10) unsigned NOT NULL,
-  `downloadrequests` int(10) unsigned NOT NULL,
-  `defaultinvites` int(10) unsigned NOT NULL,
-  `isdefault` tinyint(1) unsigned NOT NULL DEFAULT '0',
-  `canpreview` tinyint(1) unsigned NOT NULL DEFAULT '0',
-  `canpre` tinyint(1) unsigned NOT NULL DEFAULT '0',
-  `hideads` tinyint(1) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
-) ENGINE=MYISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+DROP TABLE IF EXISTS userroles;
+CREATE TABLE IF NOT EXISTS userroles (
+  id INT(10) NOT NULL AUTO_INCREMENT,
+  name VARCHAR(32) COLLATE utf8_unicode_ci NOT NULL,
+  apirequests INT(10) UNSIGNED NOT NULL,
+  downloadrequests INT(10) UNSIGNED NOT NULL,
+  defaultinvites INT(10) UNSIGNED NOT NULL,
+  isdefault TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
+  canpreview TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
+  canpre TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
+  hideads TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
+  PRIMARY KEY (id)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 1;
 
-DROP TABLE IF EXISTS `users`;
-CREATE TABLE IF NOT EXISTS `users` (
-  `id` int(16) unsigned NOT NULL AUTO_INCREMENT,
-  `username` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `email` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `password` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `role` int(11) NOT NULL DEFAULT '1',
-  `host` varchar(40) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `grabs` int(11) NOT NULL DEFAULT '0',
-  `rsstoken` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
-  `createddate` datetime NOT NULL,
-  `resetguid` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `lastlogin` datetime DEFAULT NULL,
-  `apiaccess` datetime DEFAULT NULL,
-  `invites` int(11) NOT NULL DEFAULT '0',
-  `invitedby` int(11) DEFAULT NULL,
-  `movieview` int(11) NOT NULL DEFAULT '1',
-  `musicview` int(11) NOT NULL DEFAULT '0',
-  `consoleview` int(11) NOT NULL DEFAULT '0',
-  `xxxview` int(11) DEFAULT NULL,
-  `gameview` int(11) DEFAULT NULL,
-  `bookview` int(11) NOT NULL DEFAULT '0',
-  `saburl` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `sabapikey` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `sabapikeytype` tinyint(1) DEFAULT NULL,
-  `sabpriority` tinyint(1) DEFAULT NULL,
-  `nzbgeturl` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `nzbgetusername` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `nzbgetpassword` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `kindleid` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `userseed` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `notes` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `rolechangedate` datetime DEFAULT NULL,
-  `nzbvortex_api_key` varchar(10) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `nzbvortex_server_url` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `cp_api` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `cp_url` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `queuetype` tinyint(1) NOT NULL DEFAULT '1',
-  `style` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MYISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+DROP TABLE IF EXISTS users;
+CREATE TABLE IF NOT EXISTS users (
+  id INT(16) UNSIGNED NOT NULL AUTO_INCREMENT,
+  username VARCHAR(50) COLLATE utf8_unicode_ci NOT NULL,
+  email VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+  password VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+  role INT(11) NOT NULL DEFAULT '1',
+  host VARCHAR(40) COLLATE utf8_unicode_ci DEFAULT NULL,
+  grabs INT(11) NOT NULL DEFAULT '0',
+  rsstoken VARCHAR(32) COLLATE utf8_unicode_ci NOT NULL,
+  createddate DATETIME NOT NULL,
+  resetguid VARCHAR(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  lastlogin DATETIME DEFAULT NULL,
+  apiaccess DATETIME DEFAULT NULL,
+  invites INT(11) NOT NULL DEFAULT '0',
+  invitedby INT(11) DEFAULT NULL,
+  movieview INT(11) NOT NULL DEFAULT '1',
+  musicview INT(11) NOT NULL DEFAULT '0',
+  consoleview INT(11) NOT NULL DEFAULT '0',
+  xxxview INT(11) DEFAULT NULL,
+  gameview INT(11) DEFAULT NULL,
+  bookview INT(11) NOT NULL DEFAULT '0',
+  saburl VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  sabapikey VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  sabapikeytype TINYINT(1) DEFAULT NULL,
+  sabpriority TINYINT(1) DEFAULT NULL,
+  nzbgeturl VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  nzbgetusername VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  nzbgetpassword VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  kindleid VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  userseed VARCHAR(50) COLLATE utf8_unicode_ci NOT NULL,
+  notes VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  rolechangedate DATETIME DEFAULT NULL,
+  nzbvortex_api_key VARCHAR(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  nzbvortex_server_url VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  cp_api VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  cp_url VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  queuetype TINYINT(1) NOT NULL DEFAULT '1',
+  style VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (id)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 1;
 
-DROP TABLE IF EXISTS `userseries`;
-CREATE TABLE IF NOT EXISTS `userseries` (
-  `id` int(16) unsigned NOT NULL AUTO_INCREMENT,
-  `userid` int(16) DEFAULT NULL,
-  `videos_id` int(16) NOT NULL COMMENT 'FK to videos.id',
-  `categoryid` varchar(64) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `createddate` datetime NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `ix_userseries_videos_id` (`userid`,`videos_id`)
-) ENGINE=MYISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+DROP TABLE IF EXISTS userseries;
+CREATE TABLE IF NOT EXISTS userseries (
+  id INT(16) UNSIGNED NOT NULL AUTO_INCREMENT,
+  userid INT(16) DEFAULT NULL,
+  videos_id INT(16) NOT NULL COMMENT 'FK to videos.id',
+  categoryid VARCHAR(64) COLLATE utf8_unicode_ci DEFAULT NULL,
+  createddate DATETIME NOT NULL,
+  PRIMARY KEY (id),
+  KEY ix_userseries_videos_id (userid,videos_id)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 1;
 
-DROP TABLE IF EXISTS `videos`;
-CREATE TABLE IF NOT EXISTS `videos` (
-  `id` mediumint(11) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Show''s ID to be used in other tables as reference.',
-  `type` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0 = TV, 1 = Film, 2 = Anime',
-  `title` varchar(180) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Name of the video.',
-  `countries_id` char(2) COLLATE utf8_unicode_ci NOT NULL DEFAULT '' COMMENT 'Two character country code (FK to countries table).',
-  `started` datetime NOT NULL COMMENT 'Date (UTC) of production''s first airing.',
-  `anidb` mediumint(11) unsigned NOT NULL DEFAULT '0' COMMENT 'ID number for anidb site',
-  `imdb` mediumint(11) unsigned NOT NULL DEFAULT '0' COMMENT 'ID number for IMDB site (without the ''tt'' prefix).',
-  `tmdb` mediumint(11) unsigned NOT NULL DEFAULT '0' COMMENT 'ID number for TMDB site.',
-  `trakt` mediumint(11) unsigned NOT NULL DEFAULT '0' COMMENT 'ID number for TraktTV site.',
-  `tvdb` mediumint(11) unsigned NOT NULL DEFAULT '0' COMMENT 'ID number for TVDB site',
-  `tvmaze` mediumint(11) unsigned NOT NULL DEFAULT '0' COMMENT 'ID number for TVMaze site.',
-  `tvrage` mediumint(11) unsigned NOT NULL DEFAULT '0' COMMENT 'ID number for TVRage site.',
-  `source` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT 'Which site did we use for info?',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `ix_videos_title` (`title`,`type`,`started`,`countries_id`),
-  KEY `ix_videos_imdb` (`imdb`),
-  KEY `ix_videos_tmdb` (`tmdb`),
-  KEY `ix_videos_trakt` (`trakt`),
-  KEY `ix_videos_tvdb` (`tvdb`),
-  KEY `ix_videos_tvmaze` (`tvmaze`),
-  KEY `ix_videos_tvrage` (`tvrage`),
-  KEY `ix_videos_type_source` (`type`,`source`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+DROP TABLE IF EXISTS videos;
+CREATE TABLE IF NOT EXISTS videos (
+  id MEDIUMINT(11) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Show''s ID to be used in other tables as reference.',
+  type TINYINT(1) UNSIGNED NOT NULL DEFAULT '0' COMMENT '0  =  TV, 1  =  Film, 2  =  Anime',
+  title VARCHAR(180) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Name of the video.',
+  countries_id CHAR(2) COLLATE utf8_unicode_ci NOT NULL DEFAULT '' COMMENT 'Two character country code (FK to countries table).',
+  started DATETIME NOT NULL COMMENT 'Date (UTC) of production''s first airing.',
+  anidb MEDIUMINT(11) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'ID number for anidb site',
+  imdb MEDIUMINT(11) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'ID number for IMDB site (without the ''tt'' prefix).',
+  tmdb MEDIUMINT(11) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'ID number for TMDB site.',
+  trakt MEDIUMINT(11) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'ID number for TraktTV site.',
+  tvdb MEDIUMINT(11) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'ID number for TVDB site',
+  tvmaze MEDIUMINT(11) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'ID number for TVMaze site.',
+  tvrage MEDIUMINT(11) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'ID number for TVRage site.',
+  source TINYINT(1) UNSIGNED NOT NULL DEFAULT '0' COMMENT 'Which site did we use for info?',
+  PRIMARY KEY (id),
+  UNIQUE KEY ix_videos_title (title,type,started,countries_id),
+  KEY ix_videos_imdb (imdb),
+  KEY ix_videos_tmdb (tmdb),
+  KEY ix_videos_trakt (trakt),
+  KEY ix_videos_tvdb (tvdb),
+  KEY ix_videos_tvmaze (tvmaze),
+  KEY ix_videos_tvrage (tvrage),
+  KEY ix_videos_type_source (type,source)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 1;
 
-DROP TABLE IF EXISTS `videos_aliases`;
-CREATE TABLE IF NOT EXISTS `videos_aliases` (
-  `videos_id` mediumint(11) unsigned NOT NULL COMMENT 'FK to videos.id of the parent title.',
-  `title` varchar(180) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'AKA of the video.',
-  PRIMARY KEY (`videos_id`,`title`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+DROP TABLE IF EXISTS videos_aliases;
+CREATE TABLE IF NOT EXISTS videos_aliases (
+  videos_id MEDIUMINT(11) UNSIGNED NOT NULL COMMENT 'FK to videos.id of the parent title.',
+  title VARCHAR(180) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'AKA of the video.',
+  PRIMARY KEY (videos_id,title)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci;
 
-DROP TABLE IF EXISTS `xxxinfo`;
-CREATE TABLE IF NOT EXISTS `xxxinfo` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `title` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `tagline` varchar(1024) COLLATE utf8_unicode_ci NOT NULL,
-  `plot` blob,
-  `genre` varchar(64) COLLATE utf8_unicode_ci NOT NULL,
-  `director` varchar(64) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `actors` varchar(2000) COLLATE utf8_unicode_ci NOT NULL,
-  `extras` text COLLATE utf8_unicode_ci,
-  `productinfo` text COLLATE utf8_unicode_ci,
-  `trailers` text COLLATE utf8_unicode_ci,
-  `directurl` varchar(2000) COLLATE utf8_unicode_ci NOT NULL,
-  `classused` varchar(4) COLLATE utf8_unicode_ci DEFAULT 'ade',
-  `cover` tinyint(1) unsigned NOT NULL DEFAULT '0',
-  `backdrop` tinyint(1) unsigned NOT NULL DEFAULT '0',
-  `createddate` datetime NOT NULL,
-  `updateddate` datetime NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `ix_xxxinfo_title` (`title`)
-) ENGINE=MYISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+DROP TABLE IF EXISTS xxxinfo;
+CREATE TABLE IF NOT EXISTS xxxinfo (
+  id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  title VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+  tagline VARCHAR(1024) COLLATE utf8_unicode_ci NOT NULL,
+  plot blob,
+  genre VARCHAR(64) COLLATE utf8_unicode_ci NOT NULL,
+  director VARCHAR(64) COLLATE utf8_unicode_ci DEFAULT NULL,
+  actors VARCHAR(2000) COLLATE utf8_unicode_ci NOT NULL,
+  extras TEXT COLLATE utf8_unicode_ci,
+  productinfo TEXT COLLATE utf8_unicode_ci,
+  trailers TEXT COLLATE utf8_unicode_ci,
+  directurl VARCHAR(2000) COLLATE utf8_unicode_ci NOT NULL,
+  classused VARCHAR(4) COLLATE utf8_unicode_ci DEFAULT 'ade',
+  cover TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
+  backdrop TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
+  createddate DATETIME NOT NULL,
+  updateddate DATETIME NOT NULL,
+  PRIMARY KEY (id),
+  KEY ix_xxxinfo_title (title)
+)
+  ENGINE = MyISAM
+  DEFAULT CHARSET = utf8
+  COLLATE = utf8_unicode_ci
+  AUTO_INCREMENT = 1;
