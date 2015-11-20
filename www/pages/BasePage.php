@@ -17,22 +17,14 @@ class BasePage
 	public $settings = null;
 
 	/**
-	 * Public access to Captcha object for error checking.
-	 *
-	 * @var Captcha
-	 */
-	public $captcha;
-
-	/**
 	 * @var newznab\Users
 	 */
 	public $users = null;
 
 	/**
-	 * Is the current session HTTPS?
-	 * @var bool
+	 * @var Smarty
 	 */
-	public $https = false;
+	public $smarty = null;
 
 
 	public $title = '';
@@ -42,13 +34,47 @@ class BasePage
 	public $meta_keywords = '';
 	public $meta_title = '';
 	public $meta_description = '';
-	public $page = '';
-	public $page_template = '';
-	public $smarty = '';
-	public $userdata = [];
-	public $serverurl = '';
 	public $secure_connection = false;
 	public $show_desktop_mode = false;
+
+	/**
+	 * Current page the user is browsing. ie browse
+	 * @var string
+	 */
+	public $page = '';
+
+	public $page_template = '';
+
+	/**
+	 * User settings from the MySQL DB.
+	 * @var array|bool
+	 */
+	public $userdata = [];
+
+	/**
+	 * URL of the server. ie http://localhost/
+	 * @var string
+	 */
+	public $serverurl = '';
+
+	/**
+	 * Whether to trim white space before rendering the page or not.
+	 * @var bool
+	 */
+	public $trimWhiteSpace = true;
+
+	/**
+	 * Is the current session HTTPS?
+	 * @var bool
+	 */
+	public $https = false;
+
+	/**
+	 * Public access to Captcha object for error checking.
+	 *
+	 * @var \newznab\Captcha
+	 */
+	public $captcha;
 
 
 	/**

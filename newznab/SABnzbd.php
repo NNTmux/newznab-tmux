@@ -29,25 +29,25 @@ class SABnzbd
 	const PRIORITY_FORCE = 2; // Sab is enabled, 1 remote SAB server for the whole site.
 	/**
 	 * URL to the SAB server.
-	 * @var string|Array|bool
+	 * @var string|array|bool
 	 */
 	public $url = '';
 
 	/**
 	 * The SAB API key.
-	 * @var string|Array|bool
+	 * @var string|array|bool
 	 */
 	public $apikey = '';
 
 	/**
 	 * Download priority of the sent NZB file.
-	 * @var string|Array|bool
+	 * @var string|array|bool
 	 */
 	public $priority = '';
 
 	/**
 	 * Type of SAB API key (full/nzb).
-	 * @var string|Array|bool
+	 * @var string|array|bool
 	 */
 	public $apikeytype = '';
 
@@ -83,7 +83,7 @@ class SABnzbd
 	/**
 	 * Construct.
 	 *
-	 * @param BasePage $page
+	 * @param \BasePage $page
 	 */
 	public function __construct(&$page)
 	{
