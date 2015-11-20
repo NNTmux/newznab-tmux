@@ -137,8 +137,8 @@ class Versions
 		$ver = preg_match('#v(\d+\.\d+\.\d+).*#', $latest, $matches) ? $matches[1] : $latest;
 
 		if ($this->git->getBranch() === 'dev') {
-			if (version_compare($this->_vers->git->tag, '0.4.2', '!=')) {
-				$this->_vers->git->tag = '0.4.2';
+			if (version_compare($this->_vers->git->tag, '0.0.0', '!=')) {
+				$this->_vers->git->tag = '0.0.0';
 				$this->_changes |= self::UPDATED_GIT_TAG;
 			}
 			return $this->_vers->git->tag;

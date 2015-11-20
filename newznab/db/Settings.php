@@ -230,7 +230,7 @@ class Settings extends DB
 		try {
 			$ver = (new Versions())->getTagVersion();
 		} catch (\Exception $e) {
-			$ver = '0.4.2';
+			$ver = '0.0.0';
 		}
 		return $ver;
 	}
