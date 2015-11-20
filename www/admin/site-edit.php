@@ -182,9 +182,9 @@ $books_selected = array_map(create_function('$value', 'return (int)$value;'), $b
 $page->smarty->assign('book_reqids_selected', $books_selected);
 
 $themelist = [];
-$themes    = scandir(NN_WWW . "/templates");
+$themes    = scandir(NN_WWW . "/themes");
 foreach ($themes as $theme) {
-	if (strpos($theme, ".") === false && is_dir(NN_WWW . "/templates/" . $theme)) {
+	if (strpos($theme, ".") === false && is_dir(NN_WWW . "/themes/" . $theme)) {
 		$themelist[] = $theme;
 	}
 }

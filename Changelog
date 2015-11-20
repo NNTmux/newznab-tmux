@@ -1,4 +1,5 @@
 2015-11-20 DariusIII
+	Fix: Fix the site themes scan folder
 	Fix: Fix aka processing in TVMaze, remove leading year from TV releases before processing them
 	Fix: Fix the schema for clean installs
 	Chg: Remove reference to database from nntmux_fi_schema.sql
