@@ -29,25 +29,25 @@ class SABnzbd
 	const PRIORITY_FORCE = 2; // Sab is enabled, 1 remote SAB server for the whole site.
 	/**
 	 * URL to the SAB server.
-	 * @var string|Array|bool
+	 * @var string|array|bool
 	 */
 	public $url = '';
 
 	/**
 	 * The SAB API key.
-	 * @var string|Array|bool
+	 * @var string|array|bool
 	 */
 	public $apikey = '';
 
 	/**
 	 * Download priority of the sent NZB file.
-	 * @var string|Array|bool
+	 * @var string|array|bool
 	 */
 	public $priority = '';
 
 	/**
 	 * Type of SAB API key (full/nzb).
-	 * @var string|Array|bool
+	 * @var string|array|bool
 	 */
 	public $apikeytype = '';
 
@@ -162,23 +162,23 @@ class SABnzbd
 	public function sendToSab($guid)
 	{
 		return Utility::getUrl([
-				'url' => $this->url .
-					'api?mode=addurl&priority=' .
-					$this->priority .
-					'&apikey=' .
-					$this->apikey .
-					'&name=' .
-					urlencode(
-						$this->serverurl .
-						'getnzb/' .
-						$guid .
-						'&i=' .
-						$this->uid .
-						'&r=' .
-						$this->rsstoken
-					),
-				'verifypeer' => false,
-			]
+						'url' => $this->url .
+								'api?mode=addurl&priority=' .
+								$this->priority .
+								'&apikey=' .
+								$this->apikey .
+								'&name=' .
+								urlencode(
+										$this->serverurl .
+										'getnzb/' .
+										$guid .
+										'&i=' .
+										$this->uid .
+										'&r=' .
+										$this->rsstoken
+								),
+						'verifypeer' => false,
+				]
 		);
 	}
 
@@ -190,12 +190,12 @@ class SABnzbd
 	public function getQueue()
 	{
 		return Utility::getUrl([
-				'url' =>
-					$this->url .
-					"api?mode=qstatus&output=json&apikey=" .
-					$this->apikey,
-				'verifypeer' => false,
-			]
+						'url' =>
+								$this->url .
+								"api?mode=qstatus&output=json&apikey=" .
+								$this->apikey,
+						'verifypeer' => false,
+				]
 		);
 	}
 
@@ -207,12 +207,12 @@ class SABnzbd
 	public function getAdvQueue()
 	{
 		return Utility::getUrl([
-				'url' =>
-					$this->url .
-					"api?mode=queue&start=START&limit=LIMIT&output=json&apikey=" .
-					$this->apikey,
-				'verifypeer' => false,
-			]
+						'url' =>
+								$this->url .
+								"api?mode=queue&start=START&limit=LIMIT&output=json&apikey=" .
+								$this->apikey,
+						'verifypeer' => false,
+				]
 		);
 	}
 
@@ -226,12 +226,12 @@ class SABnzbd
 	public function delFromQueue($id)
 	{
 		return Utility::getUrl([
-		$this->url .
-			"api?mode=queue&name=delete&value=" .
-			$id .
-			"&apikey=" .
-			$this->apikey,
-			'verifypeer' => false,
+				$this->url .
+				"api?mode=queue&name=delete&value=" .
+				$id .
+				"&apikey=" .
+				$this->apikey,
+				'verifypeer' => false,
 		]);
 	}
 
@@ -245,12 +245,12 @@ class SABnzbd
 	public function pauseFromQueue($id)
 	{
 		return Utility::getUrl([
-		$this->url .
-			"api?mode=queue&name=pause&value=" .
-			$id .
-			"&apikey=" .
-			$this->apikey,
-			'verifypeer' => false,
+				$this->url .
+				"api?mode=queue&name=pause&value=" .
+				$id .
+				"&apikey=" .
+				$this->apikey,
+				'verifypeer' => false,
 		]);
 	}
 
@@ -264,12 +264,12 @@ class SABnzbd
 	public function resumeFromQueue($id)
 	{
 		return Utility::getUrl([
-		$this->url .
-			"api?mode=queue&name=resume&value=" .
-			$id .
-			"&apikey=" .
-			$this->apikey,
-			'verifypeer' => false,
+				$this->url .
+				"api?mode=queue&name=resume&value=" .
+				$id .
+				"&apikey=" .
+				$this->apikey,
+				'verifypeer' => false,
 		]);
 	}
 
@@ -281,11 +281,11 @@ class SABnzbd
 	public function pauseAll()
 	{
 		return Utility::getUrl([
-		$this->url .
-			"api?mode=pause" .
-			"&apikey=" .
-			$this->apikey,
-			'verifypeer' => false,
+				$this->url .
+				"api?mode=pause" .
+				"&apikey=" .
+				$this->apikey,
+				'verifypeer' => false,
 		]);
 	}
 
@@ -297,11 +297,11 @@ class SABnzbd
 	public function resumeAll()
 	{
 		return Utility::getUrl([
-		$this->url .
-			"api?mode=resume" .
-			"&apikey=" .
-			$this->apikey,
-			'verifypeer' => false,
+				$this->url .
+				"api?mode=resume" .
+				"&apikey=" .
+				$this->apikey,
+				'verifypeer' => false,
 		]);
 	}
 

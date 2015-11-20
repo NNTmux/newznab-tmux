@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS site;
 DROP TABLE IF EXISTS anidb;
 CREATE TABLE IF NOT EXISTS anidb (
   id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -307,7 +308,12 @@ CREATE TABLE IF NOT EXISTS content (
   ENGINE = MyISAM
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
-  AUTO_INCREMENT  =  1000001;;
+  AUTO_INCREMENT  =  1000001;
+
+   INSERT INTO `content` (`id`, `title`, `url`, `body`, `metadescription`, `metakeywords`, `contenttype`, `showinmenu`, `status`, `ordinal`, `role`) VALUES
+(1, 'welcome to newznab', '/', '<div class="alert alert-info">\r\n<h4><i class="fa fa-info"></i>  This is Newznab-tmux testing site</h4>\r\n<p> It is reset from time to time , so don''t be mad :) </p>\r\n</div>', '', '', 3, 0, 1, 0, 0),
+(2, 'Example Content', '/great/seo/content/page/', '<p>this is an example content page</p><p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p><p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>', '', '', 2, 1, 1, NULL, 0),
+(3, 'Another Example', '/another/great/seo/content/page/', '<p>this is another example content page</p><p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p><p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>', '', '', 2, 1, 1, NULL, 0);
 
 DROP TABLE IF EXISTS countries;
 CREATE TABLE IF NOT EXISTS countries (
@@ -2695,7 +2701,18 @@ CREATE TABLE IF NOT EXISTS userroles (
   ENGINE = MyISAM
   DEFAULT CHARSET = utf8
   COLLATE = utf8_unicode_ci
-  AUTO_INCREMENT = 1;
+  AUTO_INCREMENT = 4;
+
+INSERT INTO userroles (id, name, apirequests, downloadrequests, defaultinvites, isdefault, canpreview)
+  VALUES
+  (1, 'Guest', 0, 0, 0, 0, 0),
+  (2, 'User', 10, 10, 1, 1, 0),
+  (3, 'Admin', 1000, 1000, 1000, 0, 1),
+  (4, 'Disabled', 0, 0, 0, 0, 0),
+  (5, 'Moderator', 1000, 1000, 1000, 0, 1),
+  (6, 'Friend', 100, 100, 5, 0, 1);
+
+UPDATE userroles SET id =  id - 1;
 
 DROP TABLE IF EXISTS users;
 CREATE TABLE IF NOT EXISTS users (
