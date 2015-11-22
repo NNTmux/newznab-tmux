@@ -1,3 +1,5 @@
+2015-11-22 DariusIII
+	Fix: Fix the query in search function
 2015-11-20 DariusIII
 	Fix: Fix the site themes scan folder
 	Fix: Fix aka processing in TVMaze, remove leading year from TV releases before processing them
