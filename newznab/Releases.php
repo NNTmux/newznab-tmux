@@ -2234,7 +2234,7 @@ class Releases
 		}
 
 
-		$xml = Utility::getUrl([$url]);
+		$xml = Utility::getUrl(['url' => $url, 'verifycert'=> false]);
 
 		if ($xml === false || preg_match('/no feed/i', $xml))
 			return "no feed";
