@@ -7,10 +7,8 @@ use newznab\db\Settings;
 use newznab\Categorize;
 use newznab\Releases;
 
-$consoletools = new ConsoleTools(['ColorCLI' => $pdo->log]);
-$releases = new Releases(['Settings' => $pdo, 'ConsoleTools' => $consoletools]);
-
 $pdo = new Settings();
+$consoletools = new ConsoleTools(['ColorCLI' => $pdo->log]);
 $cat = new Categorize(['Settings' => $pdo]);
 $releases = new Releases(['Settings' => $pdo]);
 
@@ -20,6 +18,15 @@ $limit = 200;
 $delay = 3;
 $outputOnly = true;
 
+if(isset($argv[0])
+{
+	$delay = $argv[0];
+}
+
+if(isset($argv[1])
+{
+	$outputOnly = $argv[1];
+}
 
 echo $pdo->log->primary("Started backfill request id lookups (remote)\n");
 
