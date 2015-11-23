@@ -1,4 +1,5 @@
 2015-11-23 DariusIII
+	Fix: Security issues in dnzb failed downloads
 	Fix: Broken queries in DnzbFailures and Releases classes. Fix TV processing
 	Fix: Change dnzb_failures table
 	Chg: Add spotnab processing back to tmux
