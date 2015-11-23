@@ -1,4 +1,5 @@
 2015-11-23 DariusIII
+	Chg: Add back spotnab processing to tmux
 	Fix: Rework dnzb_failures and improve speed in queries related to it
 2015-11-22 DariusIII
 	Fix: Do not cache local failure for TV processing
