@@ -136,7 +136,7 @@ class DnzbFailures
 	}
 
 	/**
-	 * @note Update count of failed downloads for guid
+	 * @note Update count of failed downloads for releaseid
 	 *
 	 * @param string $relId
 	 */
