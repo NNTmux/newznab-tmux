@@ -43,7 +43,7 @@ if (isset($_GET["id"]))
 		$data['searchname'],
 		6,
 		$page->userdata['categoryexclusions']);
-	$failed = $df->getFailedCount($data['guid']);
+	$failed = $df->getFailedCount($data['id']);
 
 	$showInfo = '';
 	if ($data['videos_id'] > 0) {

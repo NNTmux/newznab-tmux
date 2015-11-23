@@ -1,4 +1,5 @@
 2015-11-23 DariusIII
+	Fix: Count of failed releases
 	Fix: Broken queries, TV processing, security for failed downloads
 	Fix: Fix broken queries in DnzbFailures and Releases classes
 	Chg: Revert binaries discarding
