@@ -143,7 +143,7 @@ class DnzbFailures
 	public function updateFailed($relId)
 	{
 		$this->pdo->queryExec(
-				sprintf('UPDATE dnzb_failures SET failed = failed + 1 WHERE releaseid = %s', $this->pdo->escapeString($relId))
+				sprintf('UPDATE dnzb_failures SET failed = failed + 1 WHERE releaseid = %s', $relId)
 		);
 	}
 }
