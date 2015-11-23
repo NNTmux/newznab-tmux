@@ -26,7 +26,7 @@ class DnzbFailures
 	public function __construct(array $options = [])
 	{
 		$defaults = [
-			'Settings' => null
+				'Settings' => null
 		];
 		$options += $defaults;
 
@@ -35,15 +35,22 @@ class DnzbFailures
 	}
 
 	/**
-	 * @note Read failed downloads count for requested guid
+	 * @note Read failed downloads count for requested release_id
 	 *
-	 * @param string $guid
+	 * @param string $relId
 	 *
 	 * @return array|bool
 	 */
-	public function getFailedCount($guid)
+	public function getFailedCount($relId)
 	{
-		$result = $this->pdo->query(sprintf('SELECT failed AS num FROM dnzb_failures WHERE guid = %s', $this->pdo->escapeString($guid)));
+		$result = $this->pdo->query(
+				sprintf('
+				SELECT failed AS num
+				FROM dnzb_failures
+				WHERE release_id = %s',
+						$relId
+				)
+		);
 		if (is_array($result) && !empty($result)) {
 			return $result[0]['num'];
 		}
@@ -55,12 +62,15 @@ class DnzbFailures
 	 */
 	public function getCount()
 	{
-		$res = $this->pdo->queryOneRow("SELECT count(id) AS num FROM dnzb_failures");
+		$res = $this->pdo->queryOneRow("
+			SELECT COUNT(release_id) AS num
+			FROM dnzb_failures"
+		);
 		return $res["num"];
 	}
 
 	/**
-	 * @note Get a range of releases. Used in admin manage list
+	 * Get a range of releases. used in admin manage list
 	 *
 	 * @param $start
 	 * @param $num
@@ -75,18 +85,18 @@ class DnzbFailures
 			$limit = ' LIMIT ' . $start . ',' . $num;
 		}
 
-		return $this->pdo->query("SELECT r.*, concat(cp.title, ' > ', c.title) AS category_name
-									FROM releases r
-									RIGHT JOIN dnzb_failures df ON df.releaseid = r.id
-									LEFT OUTER JOIN category c ON c.id = r.categoryid
-									LEFT OUTER JOIN category cp ON cp.id = c.parentid
-									ORDER BY postdate DESC" . $limit
+		return $this->pdo->query("
+			SELECT r.*, concat(cp.title, ' > ', c.title) AS category_name
+			FROM releases r
+			RIGHT JOIN dnzb_failures df ON df.release_id = r.id
+			LEFT OUTER JOIN category c ON c.id = r.categoryid
+			LEFT OUTER JOIN category cp ON cp.id = c.parentid
+			ORDER BY postdate DESC" . $limit
 		);
 	}
 
 	/**
-	 * @note Retrieve alternate release with same or similar searchname,
-	 *       update failed count while doing it
+	 * Retrieve alternate release with same or similar searchname
 	 *
 	 * @param string $guid
 	 * @param string $searchname
@@ -95,21 +105,42 @@ class DnzbFailures
 	 */
 	public function getAlternate($guid, $searchname, $userid)
 	{
-		$rel = $this->pdo->queryOneRow(sprintf('SELECT id FROM releases WHERE guid = %s', $this->pdo->escapeString($guid)));
-
-		$this->pdo->queryInsert(sprintf("INSERT IGNORE INTO dnzb_failures (userid, releaseid) VALUES (%d, %d)",
-						$userid,
-						$rel['id']
+		$rel = $this->pdo->queryOneRow(
+				sprintf('
+				SELECT id, gid, categoryid
+				FROM releases
+				WHERE guid = %s',
+						$this->pdo->escapeString($guid)
 				)
 		);
 
-		$this->updateFailed($rel['id']);
-		$this->postComment($rel['id'], $rel['gid'], $userid);
+		// Specifying LAST_INSERT_ID on releaseid will return the releaseid
+		// if the row was actually inserted and not updated
+		$insert = $this->pdo->queryInsert(
+				sprintf('
+				INSERT INTO dnzb_failures (release_id, userid, failed)
+				VALUES (LAST_INSERT_ID(%d), %d, 1)
+				ON DUPLICATE KEY UPDATE failed = failed + 1',
+						$rel['id'],
+						$userid
+				)
+		);
 
-		$alternate = $this->pdo->queryOneRow(sprintf('SELECT * FROM releases r
-			WHERE r.searchname %s
-			AND r.id NOT IN (SELECT releaseid FROM dnzb_failures WHERE userid = %d)',
-						$this->pdo->likeString($searchname),
+		// If we didn't actually insert the row, don't add a comment
+		if ((int)$insert > 0) {
+			$this->postComment($rel['id'], $rel['gid'], $userid);
+		}
+
+		$alternate = $this->pdo->queryOneRow(
+				sprintf('
+				SELECT r.*
+				FROM releases r
+				LEFT JOIN dnzb_failures df ON r.id = df.release_id
+				AND df.release_id IS NULL
+				WHERE r.searchname %s
+				AND r.categoryid = %d',
+						$this->pdo->likeString($searchname, true, true),
+						$rel['categoryid'],
 						$userid
 				)
 		);
@@ -122,28 +153,33 @@ class DnzbFailures
 	 *        update the failed count in dnzb_failures table
 	 *
 	 * @param $relid
-	 * @param gid
 	 * @param $uid
 	 */
 	public function postComment($relid, $gid, $uid)
 	{
+		$dupe = 0;
 		$text = 'This release has failed to download properly. It might fail for other users too.
 		This comment is automatically generated.';
-		$dbl = $this->pdo->queryOneRow(sprintf('SELECT text FROM release_comments WHERE releaseid = %d', $relid));
-		if ($dbl['text'] != $text){
+
+		$check = $this->pdo->queryDirect(
+				sprintf('
+				SELECT text
+				FROM release_comments
+				WHERE releaseid = %d',
+						$relid
+				)
+		);
+
+		if ($check instanceof \Traversable) {
+			foreach ($check AS $dbl) {
+				if ($dbl['text'] == $text) {
+					$dupe = 1;
+					break;
+				}
+			}
+		}
+		if ($dupe === 0) {
 			$this->rc->addComment($relid, $gid, $text, $uid, '');
 		}
-	}
-
-	/**
-	 * @note Update count of failed downloads for releaseid
-	 *
-	 * @param string $relId
-	 */
-	public function updateFailed($relId)
-	{
-		$this->pdo->queryExec(
-				sprintf('UPDATE dnzb_failures SET failed = failed + 1 WHERE releaseid = %s', $relId)
-		);
 	}
 }
