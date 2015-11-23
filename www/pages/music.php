@@ -53,7 +53,7 @@ foreach ($genres as $gn) {
 
 foreach ($results as $result) {
 	$result['genre'] = $tmpgnr[$result["genreid"]];
-	$result['failed'] = $fail->getFailedCount($result['grp_release_guid']);
+	$result['failed'] = $fail->getFailedCount($result['grp_release_id']);
 	$musics[] = $result;
 }
 
