@@ -1,4 +1,5 @@
 2015-11-23 DariusIII
+	Fix: Fix broken queries in DnzbFailures and Releases classes
 	Chg: Revert binaries discarding
 	Chg: Change the dnzb_failures table layout
 	Fix: Add back missing regex-edit.php
