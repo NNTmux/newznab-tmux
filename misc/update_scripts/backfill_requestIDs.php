@@ -18,12 +18,12 @@ $limit = 200;
 $delay = 3;
 $outputOnly = true;
 
-if(isset($argv[0])
+if(isset($argv[0]))
 {
 	$delay = $argv[0];
 }
 
-if(isset($argv[1])
+if(isset($argv[1]))
 {
 	$outputOnly = $argv[1];
 }
@@ -31,7 +31,7 @@ if(isset($argv[1])
 echo $pdo->log->primary("Started backfill request id lookups (remote)\n");
 
 $sql = 	sprintf ('
-SELECT r.id, r.name, r.searchname, r.guid, r.fromname, r.reqid, r.groupid, g.name AS groupname, r.groupid, r.categoryid
+SELECT r.id, r.name, r.searchname, r.guid, r.fromname, r.reqid, r.groupid, g.name AS groupname, r.categoryid
 FROM releases r
 INNER JOIN groups g ON r.groupid = g.id
 WHERE r.nzbstatus = 1
