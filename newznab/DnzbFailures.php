@@ -77,7 +77,7 @@ class DnzbFailures
 
 		return $this->pdo->query("SELECT r.*, concat(cp.title, ' > ', c.title) AS category_name
 									FROM releases r
-									RIGHT JOIN dnzb_failures df ON df.guid = r.guid
+									RIGHT JOIN dnzb_failures df ON df.releaseid = r.id
 									LEFT OUTER JOIN category c ON c.id = r.categoryid
 									LEFT OUTER JOIN category cp ON cp.id = c.parentid
 									ORDER BY postdate DESC" . $limit
