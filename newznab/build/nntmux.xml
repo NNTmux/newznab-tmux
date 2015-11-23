@@ -2,17 +2,16 @@
 <newznab>
 	<versions>
 		<sql>
-			<db>223</db>
-			<file>223</file>
+			<db>224</db>
+			<file>224</file>
 		</sql>
 		<git>
-			<tag>0.0.0
-</tag>
+			<tag>0.4.2</tag>
 			<!-- commit count removed -->
 			<hooks>
 				<precommit>9</precommit>
 				<!-- this is the version of the pre-commit file in githooks NOT the files it calls -->
 			</hooks>
-		<commit>4421</commit></git>
+		<commit>4427</commit></git>
 	</versions>
 </newznab>
