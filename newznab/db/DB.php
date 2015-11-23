@@ -1177,19 +1177,4 @@ class DB extends \PDO
 			$this->dbVersion = $dummy[0];
 		}
 	}
-
-	/**
-	 * @param $data
-	 * @param $keycol
-	 *
-	 * @return array
-	 */
-	public function getLookupAsArray($data, $keycol)
-	{
-		$ret = array();
-		foreach ($data as $item) {
-			$ret[$item[$keycol]][] = $item;
-		}
-		return $ret;
-	}
 }

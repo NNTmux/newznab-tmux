@@ -73,14 +73,6 @@ class Groups
 	}
 
 	/**
-	 * Get all group rows.
-	 */
-	public function getAllNoReleases()
-	{
-		return $this->pdo->query('SELECT * FROM groups');
-	}
-
-	/**
 	 * Get all group rows for use in a select list.
 	 */
 	public function getGroupsForSelect()

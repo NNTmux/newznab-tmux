@@ -1,4 +1,5 @@
 2015-11-23 DariusIII
+	Chg: Revert binaries discarding
 	Chg: Change the dnzb_failures table layout
 	Fix: Add back missing regex-edit.php
 	Upd: Port binaries discarding based on set sizes from nn+
