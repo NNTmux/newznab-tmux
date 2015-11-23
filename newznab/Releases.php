@@ -2349,7 +2349,7 @@ class Releases
 				LEFT OUTER JOIN releasesubs rs ON rs.releaseid = r.id
 				LEFT OUTER JOIN releasevideo rv ON rv.releaseid = r.id
 				LEFT OUTER JOIN releaseextrafull re ON re.releaseid = r.id
-				LEFT OUTER JOIN dnzb_failures df ON df.guid = r.guid
+				LEFT OUTER JOIN dnzb_failures df ON df.release_id = r.id
 				WHERE r.guid = %s',
 				$this->pdo->escapeString($identifiers['g'])
 			)
