@@ -1248,10 +1248,11 @@ DROP TABLE IF EXISTS dnzb_failures;
 CREATE TABLE IF NOT EXISTS dnzb_failures (
   id INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
   userid INT(11) UNSIGNED NOT NULL,
-  guid VARCHAR(50) COLLATE utf8_unicode_ci NOT NULL,
+  releaseid INT(11) UNSIGNED NOT NULL,
   failed INT(10) UNSIGNED NOT NULL DEFAULT '0',
   PRIMARY KEY (id),
-  UNIQUE KEY ux_dnzb_failures (userid,guid)
+  UNIQUE INDEX ux_dnzb_failures (userid,releaseid),
+  INDEX ix_dnzb_releaseid(releaseid)
 )
   ENGINE = MyISAM
   DEFAULT CHARSET = utf8
