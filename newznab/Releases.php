@@ -1944,7 +1944,11 @@ class Releases
 	public function createReleases($groupID)
 	{
 		$startTime = time();
+		$cat = new Categorize(['Settings' => $this->pdo]);
+		$activeCategories = $cat->get();
 		$group = $this->groups->getCBPTableNames($this->tablePerGroup, $groupID);
+		$groupbasedminsizes = $this->pdo->getLookupAsArray($this->groups->getAllNoReleases(), 'id');
+		$catbasedsizes = $this->pdo->getLookupAsArray($activeCategories, 'id');
 		$this->pdo->log->doEcho($this->pdo->log->primary('Creating releases from complete binaries'));
 
 		$this->pdo->ping(true);
@@ -1956,129 +1960,178 @@ class Releases
 		$result = $this->pdo->queryDirect(sprintf("SELECT %s.*, g.name AS group_name, count(%s.id) AS parts FROM %s INNER JOIN groups g ON g.id = %s.groupid WHERE %s procstat = %d AND relname IS NOT NULL GROUP BY relname, g.name, groupid, fromname ORDER BY COUNT(%s.id) DESC LIMIT %d", $group['bname'], $group['bname'], $group['bname'], $group['bname'], (!empty($groupID) ? ' groupid = ' . $groupID . ' AND ' : ' '), Releases::PROCSTAT_READYTORELEASE, $group['bname'], $this->releaseCreationLimit));
 		while ($row = $this->pdo->getAssocArray($result)) {
 			$relguid = $this->createGUID();
-			// Clean release name
-			$releaseCleaning = new ReleaseCleaning();
-			$cleanRelName = $this->cleanReleaseName($row['relname']);
-			$cleanedName = $releaseCleaning->releaseCleaner(
-				$row['relname'], $row['fromname'], $row['group_name']
-			);
-
-			if (is_array($cleanedName)) {
-				$properName = $cleanedName['properlynamed'];
-				$prehashID = (isset($cleanerName['predb']) ? $cleanerName['predb'] : false);
-				$isReqID = (isset($cleanerName['requestid']) ? $cleanerName['requestid'] : false);
-				$cleanedName = $cleanedName['cleansubject'];
-			} else {
-				$properName = true;
-				$isReqID = $prehashID = false;
+			//
+			// Get categoryID if one has been allocated to this
+			//
+			if ($row['categoryid'] != '') {
+				$catId = $row['categoryid'];
 			}
-
-			if ($prehashID === false && $cleanedName !== '') {
-				// try to match the cleaned searchname to predb title or filename here
-				$preHash = new PreHash();
-				$preMatch = $preHash->matchPre($cleanedName);
-				if ($preMatch !== false) {
-					$cleanedName = $preMatch['title'];
-					$prehashID = $preMatch['prehashid'];
-					$properName = true;
-				}
+			else {
+				$catId = $cat->determineCategory($row["group_name"], $row["relname"]);
 			}
-			$relid = $this->insertRelease(
-				[
-					'name'           => $this->pdo->escapeString($cleanRelName),
-					'searchname'     => $this->pdo->escapeString(utf8_encode($cleanedName)),
-					'totalpart'      => $row["parts"],
-					'groupid'        => $row["groupid"],
-					'guid'           => $this->pdo->escapeString($relguid),
-					'categoryid'     => $categorize->determineCategory($groupID, $cleanedName),
-					'regexid'        => $row["regexid"],
-					'postdate'       => $this->pdo->escapeString($row['date']),
-					'fromname'       => $this->pdo->escapeString($row['fromname']),
-					'reqid'          => $row["reqid"],
-					'passwordstatus' => ($this->pdo->getSetting('checkpasswordedrar') > 0 ? -1 : 0),
-					'nzbstatus'      => NZB::NZB_NONE,
-					'isrenamed'      => ($properName === true ? 1 : 0),
-					'reqidstatus'    => ($isReqID === true ? 1 : 0),
-					'prehashid'      => ($prehashID === false ? 0 : $prehashID)
-				]
-			);
 			//
-			// Tag every binary for this release with its parent release id
+			// Determine if size matches permitted boundaries and discard here if not.
 			//
-			$this->pdo->queryExec(sprintf("UPDATE %s SET procstat = %d, releaseid = %d WHERE relname = %s AND procstat = %d AND %s fromname=%s",
-					$group['bname'], Releases::PROCSTAT_RELEASED, $relid, $this->pdo->escapeString($row["relname"]), Releases::PROCSTAT_READYTORELEASE, (!empty($groupID) ? ' groupid = ' . $groupID . ' AND ' : ' '), $this->pdo->escapeString($row["fromname"])
-				)
-			);
-		$cat = new Categorize(['Settings' => $this->pdo]);
+			$gsize = $groupbasedminsizes[$row["groupid"]][0]["minsizetoformrelease"];
+			if ($gsize == "" || $gsize == 0) $gsize = $row["size"];
+			$ssize = $this->pdo->getSetting('minsizetoformrelease');
+			if ($ssize == ""|| $ssize == 0) $ssize = $row["size"];
+			$csize = $catbasedsizes[$catId][0]["minsizetoformrelease"];
+			if ($csize == "" || $csize == 0) $csize = $row["size"];
+			$cpsize = $catbasedsizes[$catId][0]["parentminsizetoformrelease"];
+			if ($cpsize == "" || $cpsize == 0) $cpsize = $row["size"];
+			$cmaxsize = $catbasedsizes[$catId][0]["maxsizetoformrelease"];
+			if ($cmaxsize == "" || $cmaxsize == 0) $cmaxsize = $row["size"];
+			$cpmaxsize = $catbasedsizes[$catId][0]["parentmaxsizetoformrelease"];
+			if ($cpmaxsize == "" || $cpmaxsize == 0) $cpmaxsize = $row["size"];
+			$overallminsize = max($gsize, $ssize, $csize, $cpsize);
+			$overallmaxsize = min($cmaxsize, $cpmaxsize);
 
-			//
-			// Write the nzb to disk
-			//
-			$catId = $cat->determineCategory($groupID, $cleanRelName);
-			$nzbfile = $this->nzb->getNZBPath($relguid, $this->pdo->getSetting('nzbpath'), true);
-			$this->nzb->writeNZBforreleaseID($relid, $cleanRelName, $catId, $nzbfile, $groupID);
+			if ($row["size"] < $overallminsize || $row["size"] > $overallmaxsize) {
+				echo sprintf("Stage 3 : Discarding - %s (Size %s outside permitted range of %s%s)\n", $row["relname"], Utility::bytesToSizeString($row["size"]), $overallminsize!=$row["size"]?Utility::bytesToSizeString($overallminsize):"", $overallmaxsize!=$row["size"]?Utility::bytesToSizeString($overallmaxsize):"");
 
-			//
-			// Remove used binaries
-			//
-			$this->pdo->queryExec(sprintf("DELETE %s, %s FROM %s JOIN %s ON %s.id = %s.binaryid WHERE releaseid = %d ",
-					$group['pname'],
-					$group['bname'],
-					$group['pname'],
-					$group['bname'],
-					$group['bname'],
-					$group['pname'],
-					$relid
-				)
-			);
-
-			//
-			// If nzb successfully written, then load it and get size completion from it
-			//
-			$nzbInfo = new NZBInfo;
-			if (!$nzbInfo->loadFromFile($nzbfile)) {
-				$this->pdo->log->doEcho($this->pdo->log->primary('Failed to write nzb file (bad perms?) ' . $nzbfile . ''));
-				$this->deleteSingle(['g' => $relguid, 'i' => $relid], $this->nzb, $this->releaseImage);
+				$this->pdo->queryExec(sprintf(
+						"DELETE %s, %s
+						FROM %s
+						JOIN %s
+						ON %s.id = %s.binaryid
+						WHERE relname = %s
+						AND groupid = %d
+						AND fromname = %s
+						AND procstat = %d",
+						$group['pname'],
+						$group['bname'],
+						$group['pname'],
+						$group['bname'],
+						$group['bname'],
+						$group['pname'],
+						$this->pdo->escapeString($row["relname"]),
+						$row["groupid"],
+						$this->pdo->escapeString($row["fromname"]),
+						Releases::PROCSTAT_READYTORELEASE));
 			} else {
-				// Check if gid already exists
-				$dupes = $this->pdo->queryOneRow(sprintf("SELECT EXISTS(SELECT 1 FROM releases WHERE gid = %s) AS total", $this->pdo->escapeString($nzbInfo->gid)));
-				if ($dupes['total'] > 0) {
-					$this->pdo->log->doEcho($this->pdo->log->primary('Duplicate - ' . $cleanRelName . ''));
-					$this->deleteSingle(['g' => $relguid, 'i' => $relid], $this->nzb, $this->releaseImage);
-					$duplicate++;
+				// Clean release name
+				$releaseCleaning = new ReleaseCleaning();
+				$cleanRelName = $this->cleanReleaseName($row['relname']);
+				$cleanedName = $releaseCleaning->releaseCleaner(
+						$row['relname'], $row['fromname'], $row['group_name']
+				);
+
+				if (is_array($cleanedName)) {
+					$properName = $cleanedName['properlynamed'];
+					$prehashID = (isset($cleanerName['predb']) ? $cleanerName['predb'] : false);
+					$isReqID = (isset($cleanerName['requestid']) ? $cleanerName['requestid'] : false);
+					$cleanedName = $cleanedName['cleansubject'];
 				} else {
-					$this->pdo->queryExec(sprintf("UPDATE releases SET totalpart = %d, size = %s, COMPLETION = %d, GID=%s , nzb_guid = %s WHERE id = %d",
-							$nzbInfo->filecount,
-							$nzbInfo->filesize,
-							$nzbInfo->completion,
-							$this->pdo->escapeString($nzbInfo->gid),
-							$this->pdo->escapeString($nzbInfo->gid),
-							$relid
-						)
-					);
-					$this->pdo->log->doEcho($this->pdo->log->primary('Added release ' . $cleanRelName . ''));
-					$returnCount++;
-
-					/*if ($this->echoCLI) {
-						$this->pdo->log->doEcho($this->pdo->log->primary('Added ' . $returnCount . 'releases.'));
-					}*/
-
+					$properName = true;
+					$isReqID = $prehashID = false;
 				}
-             }
+
+				if ($prehashID === false && $cleanedName !== '') {
+					// try to match the cleaned searchname to predb title or filename here
+					$preHash = new PreHash();
+					$preMatch = $preHash->matchPre($cleanedName);
+					if ($preMatch !== false) {
+						$cleanedName = $preMatch['title'];
+						$prehashID = $preMatch['prehashid'];
+						$properName = true;
+					}
+				}
+				$relid = $this->insertRelease(
+						[
+								'name'           => $this->pdo->escapeString($cleanRelName),
+								'searchname'     => $this->pdo->escapeString(utf8_encode($cleanedName)),
+								'totalpart'      => $row["parts"],
+								'groupid'        => $row["groupid"],
+								'guid'           => $this->pdo->escapeString($relguid),
+								'categoryid'     => $categorize->determineCategory($groupID, $cleanedName),
+								'regexid'        => $row["regexid"],
+								'postdate'       => $this->pdo->escapeString($row['date']),
+								'fromname'       => $this->pdo->escapeString($row['fromname']),
+								'reqid'          => $row["reqid"],
+								'passwordstatus' => ($this->pdo->getSetting('checkpasswordedrar') > 0 ? -1 : 0),
+								'nzbstatus'      => NZB::NZB_NONE,
+								'isrenamed'      => ($properName === true ? 1 : 0),
+								'reqidstatus'    => ($isReqID === true ? 1 : 0),
+								'prehashid'      => ($prehashID === false ? 0 : $prehashID)
+						]
+				);
+				//
+				// Tag every binary for this release with its parent release id
+				//
+				$this->pdo->queryExec(sprintf("UPDATE %s SET procstat = %d, releaseid = %d WHERE relname = %s AND procstat = %d AND %s fromname=%s",
+								$group['bname'], Releases::PROCSTAT_RELEASED, $relid, $this->pdo->escapeString($row["relname"]), Releases::PROCSTAT_READYTORELEASE, (!empty($groupID) ? ' groupid = ' . $groupID . ' AND ' : ' '), $this->pdo->escapeString($row["fromname"])
+						)
+				);
+
+				//
+				// Write the nzb to disk
+				//
+				$catId = $cat->determineCategory($groupID, $cleanRelName);
+				$nzbfile = $this->nzb->getNZBPath($relguid, $this->pdo->getSetting('nzbpath'), true);
+				$this->nzb->writeNZBforreleaseID($relid, $cleanRelName, $catId, $nzbfile, $groupID);
+
+				//
+				// Remove used binaries
+				//
+				$this->pdo->queryExec(sprintf("DELETE %s, %s FROM %s JOIN %s ON %s.id = %s.binaryid WHERE releaseid = %d ",
+								$group['pname'],
+								$group['bname'],
+								$group['pname'],
+								$group['bname'],
+								$group['bname'],
+								$group['pname'],
+								$relid
+						)
+				);
+
+				//
+				// If nzb successfully written, then load it and get size completion from it
+				//
+				$nzbInfo = new NZBInfo;
+				if (!$nzbInfo->loadFromFile($nzbfile)) {
+					$this->pdo->log->doEcho($this->pdo->log->primary('Failed to write nzb file (bad perms?) ' . $nzbfile . ''));
+					$this->deleteSingle(['g' => $relguid, 'i' => $relid], $this->nzb, $this->releaseImage);
+				} else {
+					// Check if gid already exists
+					$dupes = $this->pdo->queryOneRow(sprintf("SELECT EXISTS(SELECT 1 FROM releases WHERE gid = %s) AS total", $this->pdo->escapeString($nzbInfo->gid)));
+					if ($dupes['total'] > 0) {
+						$this->pdo->log->doEcho($this->pdo->log->primary('Duplicate - ' . $cleanRelName . ''));
+						$this->deleteSingle(['g' => $relguid, 'i' => $relid], $this->nzb, $this->releaseImage);
+						$duplicate++;
+					} else {
+						$this->pdo->queryExec(sprintf("UPDATE releases SET totalpart = %d, size = %s, COMPLETION = %d, GID=%s , nzb_guid = %s WHERE id = %d",
+										$nzbInfo->filecount,
+										$nzbInfo->filesize,
+										$nzbInfo->completion,
+										$this->pdo->escapeString($nzbInfo->gid),
+										$this->pdo->escapeString($nzbInfo->gid),
+										$relid
+								)
+						);
+						$this->pdo->log->doEcho($this->pdo->log->primary('Added release ' . $cleanRelName . ''));
+						$returnCount++;
+
+						/*if ($this->echoCLI) {
+							$this->pdo->log->doEcho($this->pdo->log->primary('Added ' . $returnCount . 'releases.'));
+						}*/
+
+					}
+				}
+			}
 		}
 		if ($this->echoCLI) {
 			$this->pdo->log->doEcho(
-				$this->pdo->log->primary(
-					PHP_EOL .
-					number_format($returnCount) .
-					' Releases added and ' .
-					number_format($duplicate) .
-					' duplicate releases deleted in ' .
-					$this->consoleTools->convertTime(time() - $startTime)
-				), true
+					$this->pdo->log->primary(
+							PHP_EOL .
+							number_format($returnCount) .
+							' Releases added and ' .
+							number_format($duplicate) .
+							' duplicate releases deleted in ' .
+							$this->consoleTools->convertTime(time() - $startTime)
+					), true
 			);
 		}
-
 		return ['added' => $returnCount, 'dupes' => $duplicate];
 	}
 	/**
