@@ -6,7 +6,7 @@
 # index
 ALTER TABLE dnzb_failures
   MODIFY COLUMN id INT(11) UNSIGNED NOT NULL,
-  CHANGE COLUMN releaseid release_id INT(11) UNSIGNED  NOT NULL,
+  CHANGE COLUMN releaseid release_id INT(11) UNSIGNED  NOT NULL after id,
   DROP INDEX ux_dnzb_failures,
   DROP PRIMARY KEY,
   ADD PRIMARY KEY (release_id, userid),
