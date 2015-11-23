@@ -136,8 +136,8 @@ class DnzbFailures
 				SELECT r.*
 				FROM releases r
 				LEFT JOIN dnzb_failures df ON r.id = df.release_id
-				AND df.release_id IS NULL
 				WHERE r.searchname %s
+				AND df.release_id IS NULL
 				AND r.categoryid = %d',
 						$this->pdo->likeString($searchname, true, true),
 						$rel['categoryid'],
