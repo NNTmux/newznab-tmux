@@ -1,4 +1,5 @@
 2015-11-23 DariusIII
+	Fix: Change dnzb_failures table
 	Chg: Add spotnab processing back to tmux
 	Fix: Change dnzb_failure queries to use releaseid for speed improvements, add index to releaseid.
 2015-11-22 DariusIII

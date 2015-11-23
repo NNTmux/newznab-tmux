@@ -2,8 +2,8 @@
 <newznab>
 	<versions>
 		<sql>
-			<db>224</db>
-			<file>224</file>
+			<db>225</db>
+			<file>225</file>
 		</sql>
 		<git>
 			<tag>0.4.2</tag>
@@ -12,6 +12,6 @@
 				<precommit>9</precommit>
 				<!-- this is the version of the pre-commit file in githooks NOT the files it calls -->
 			</hooks>
-		<commit>4429</commit></git>
+		<commit>4430</commit></git>
 	</versions>
 </newznab>
