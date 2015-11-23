@@ -16,19 +16,21 @@ $releases = new Releases(['Settings' => $pdo]);
 $group = 'alt.binaries.erotica';
 $limit = 200;
 $delay = 3;
-$outputOnly = true;
-
-if(isset($argv[0]))
-{
-	$delay = $argv[0];
-}
-
-if(isset($argv[1]))
-{
-	$outputOnly = $argv[1];
-}
+$outputOnly = false;
 
 echo $pdo->log->primary("Started backfill request id lookups (remote)\n");
+
+if(isset($argv[1]) && !empty($argv[1]))
+{
+	$delay = (int)$argv[1];
+	echo $pdo->log->primary("Request delay manually set to: " . $delay);
+}
+
+if(isset($argv[2]) && !empty($argv[2]))
+{
+	$outputOnly = $argv[2];
+	echo $pdo->log->primary("Output only manually set to: " . $outputOnly);
+}
 
 $sql = 	sprintf ('
 SELECT r.id, r.name, r.searchname, r.guid, r.fromname, r.reqid, r.groupid, g.name AS groupname, r.categoryid
