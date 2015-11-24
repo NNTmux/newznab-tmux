@@ -7,5 +7,7 @@ php:
 env:
   - DB=mysql
 
+sudo: false
+
 notifications:
   irc: "irc.synirc.net#TmuxAnnounce"
