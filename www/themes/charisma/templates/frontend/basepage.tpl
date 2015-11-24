@@ -69,7 +69,7 @@
 				</button>
 				<ul class="dropdown-menu">
 					<li><a href="{$serverroot}profile"><i class="fa fa-user"></i><span> My Profile</span></a></li>
-					<li><a href="{$serverroot}cart"><i class="fa fa-shopping-basket"></i><span> My Cart</span></a></li>
+					<li><a href="{$serverroot}cart"><i class="fa fa-shopping-basket"></i><span> My Download Basket</span></a></li>
 					<li><a href="{$serverroot}queue"><i class="fa fa-cloud-download"></i><span> My Queue</span></a></li>
 					<li><a href="{$serverroot}mymovies"><i class="fa fa-film"></i><span> My movies</span></a></li>
 					<li><a href="{$serverroot}/myshows"><i class="fa fa-television"></i> My Shows</a></li>

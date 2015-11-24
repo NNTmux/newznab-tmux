@@ -71,7 +71,7 @@
 					<input type="button" class="nzb_multi_operations_download btn btn-sm btn-success"
 						   value="Download NZBs"/>
 					<input type="button" class="nzb_multi_operations_cart btn btn-sm btn-info"
-						   value="Add to Cart"/>
+						   value="Send to my Download Basket"/>
 					{if isset($sabintegrated)}
 						<input type="button" class="nzb_multi_operations_sab btn btn-sm btn-primary"
 							   value="Send to Queue"/>
@@ -204,7 +204,7 @@
 																		class="fa fa-cloud-download text-muted"></i></a>
 															<a class="fa fa-shopping-basket icon_cart text-muted"
 															   href="#"
-															   title="Add to Cart">
+															   title="Send to my Download Basket">
 															</a>
 															{if isset($sabintegrated)}
 																<a class="fa fa-share icon_sab text-muted"

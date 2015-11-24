@@ -42,7 +42,7 @@
 													   value="Download NZBs"/>
 												<input type="button"
 													   class="nntmux_multi_operations_cart btn btn-sm btn-info"
-													   value="Add to Cart"/>
+													   value="Send to my Download Basket"/>
 												{if isset($sabintegrated)}
 													<input type="button"
 														   class="nntmux_multi_operations_sab btn btn-sm btn-primary"
@@ -160,7 +160,7 @@
 																					class="badge">{$mcomments[$m@index]}
 																				Comment{if $mcomments[$m@index] != 1}s{/if}</span></a>
 																		<span class="btn btn-hover btn-default btn-xs icon icon_cart text-muted"
-																			  title="Add to Cart"><i
+																			  title="Send to my Download Basket"><i
 																					class="fa fa-shopping-basket"></i></span>
 																		{if isset($sabintegrated)}
 																			<span class="btn btn-hover btn-default btn-xs icon icon_sab text-muted"
@@ -191,7 +191,7 @@
 														   value="Download NZBs"/>
 													<input type="button"
 														   class="nntmux_multi_operations_cart btn btn-sm btn-info"
-														   value="Add to Cart"/>
+														   value="Send to my Download Basket"/>
 													{if isset($sabintegrated)}
 														<input type="button"
 															   class="nntmux_multi_operations_sab btn btn-sm btn-primary"
