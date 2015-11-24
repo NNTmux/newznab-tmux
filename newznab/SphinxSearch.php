@@ -1,8 +1,8 @@
 <?php
 namespace newznab;
 
-use newznab\db\Settings;
 use newznab\db\DB;
+use newznab\db\Settings;
 
 class SphinxSearch
 {
