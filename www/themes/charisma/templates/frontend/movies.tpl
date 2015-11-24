@@ -193,7 +193,7 @@
 														<div>
 															<a role="button" class="btn btn-default btn-xs"
 															   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}|escape:"htmlall"}"><i
-																		class="fa fa-download"></i><span
+																		class="fa fa-cloud-download"></i><span
 																		class="badge"> {$mgrabs[$m@index]}
 																	Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
 															<a role="button" class="btn btn-default btn-xs"
@@ -216,7 +216,7 @@
 																	  rel="{$cpurl}/api/{$cpapi}/movie.add/?identifier=tt{$result.imdbid}&title={$result.title}"
 																	  name="CP{$result.imdbid}"
 																	  title="Add to CouchPotato"
-																		><i class="fa fa-send-o"></i></span>
+																		><i class="fa fa-share"></i></span>
 															{/if}
 															{if $mfailed[$m@index] > 0}
 																<span class="btn btn-default btn-xs" title="This release has failed to download for some users">
@@ -311,7 +311,7 @@
 														<div>
 															<a role="button" class="btn btn-default btn-xs"
 															   href="{$smarty.const.WWW_TOP}/getnzb/{$mguid[$m@index]}|escape:"htmlall"}"><i
-																		class="fa fa-download"></i><span
+																		class="fa fa-cloud-download"></i><span
 																		class="badge"> {$mgrabs[$m@index]}
 																	Grab{if $mgrabs[$m@index] != 1}s{/if}</span></a>
 															<a role="button" class="btn btn-default btn-xs"
@@ -334,7 +334,7 @@
 																		rel="{$cpurl}/api/{$cpapi}/movie.add/?identifier=tt{$result.imdbid}&title={$result.title}"
 																		name="CP{$result.imdbid}"
 																		title="Add to CouchPotato"
-																		><i class="fa fa-send-o"></i></span>
+																		><i class="fa fa-share"></i></span>
 															{/if}
 															{if $mfailed[$m@index] > 0}
 																<span class="btn btn-default btn-xs" title="This release has failed to download for some users">

@@ -63,4 +63,3 @@ $page->smarty->assign('catlist',$category->getForSelect(true));
 
 $page->content = $page->smarty->fetch('regex-edit.tpl');
 $page->render();
-
