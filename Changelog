@@ -1,4 +1,5 @@
 2015-11-24 DariusIII
+	Rmv: Remove travis, PITA to set up
 	Add: Add travis-ci .travis.yml to newznab-tmux
 	Upd: Update populate and create sphinx scripts
 	Fix: Fix release files indexing with sphinx
