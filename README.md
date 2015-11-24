@@ -1,4 +1,6 @@
-[![Code Climate](https://codeclimate.com/github/DariusIII/newznab-tmux/badges/gpa.svg)](https://codeclimate.com/github/DariusIII/newznab-tmux)
+[![Code Climate](https://codeclimate.com/github/DariusIII/newznab-tmux/badges/gpa.svg)](https://codeclimate.com/github/DariusIII/newznab-tmux)  [![Build Status](https://scrutinizer-ci.com/g/DariusIII/newznab-tmux/badges/build.png?b=master)](https://scrutinizer-ci.com/g/DariusIII/newznab-tmux/build-status/master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/DariusIII/newznab-tmux/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/DariusIII/newznab-tmux/?branch=master)
+
+
 I have forked jonnyboys newznab-tmux as he and the dev team have moved to another project (https://github.com/nZEDb/nZEDb). I will try as much as i can to maintain and improve these tmux scripts, where possible and needed, as they are a valuable addendum to newznab+.
 Support is given on irc.synirc.net #tmux channel.
 
