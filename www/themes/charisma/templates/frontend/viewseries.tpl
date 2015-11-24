@@ -202,7 +202,7 @@
 															<a title="Download Nzb"
 															   href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}"><i
 																		class="fa fa-download text-muted"></i></a>
-															<a class="fa fa-shopping-cart icon_cart text-muted"
+															<a class="fa fa-shopping-basket icon_cart text-muted"
 															   href="#"
 															   title="Add to Cart">
 															</a>
