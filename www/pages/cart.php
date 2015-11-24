@@ -35,9 +35,9 @@ if (isset($_GET["add"])) {
 
 	exit();
 } else {
-	$page->meta_title = "My Nzb Cart";
-	$page->meta_keywords = "search,add,to,cart,nzb,description,details";
-	$page->meta_description = "Manage Your Nzb Cart";
+	$page->meta_title = "My Download Basket";
+	$page->meta_keywords = "search,add,to,cart,download,basket,nzb,description,details";
+	$page->meta_description = "Manage Your Download Basket";
 
 	$results = $page->users->getCart($page->users->currentUserId());
 	$page->smarty->assign('results', $results);
