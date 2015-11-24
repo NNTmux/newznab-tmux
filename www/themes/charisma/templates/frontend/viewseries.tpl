@@ -201,13 +201,13 @@
 														<td class="icons" style='width:100px;'>
 															<a title="Download Nzb"
 															   href="{$smarty.const.WWW_TOP}/getnzb/{$result.guid}"><i
-																		class="fa fa-download text-muted"></i></a>
+																		class="fa fa-cloud-download text-muted"></i></a>
 															<a class="fa fa-shopping-basket icon_cart text-muted"
 															   href="#"
 															   title="Add to Cart">
 															</a>
 															{if isset($sabintegrated)}
-																<a class="fa fa-send-o icon_sab text-muted"
+																<a class="fa fa-share icon_sab text-muted"
 																   href="#"
 																   title="Send to my Queue">
 																</a>
