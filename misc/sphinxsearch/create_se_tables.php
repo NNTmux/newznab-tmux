@@ -1,12 +1,11 @@
 <?php
 require_once realpath(dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'indexer.php');
 
-use newznab\db\DB;
 use newznab\ReleaseSearch;
-
+use newznab\db\DB;
 
 if (NN_RELEASE_SEARCH_TYPE != ReleaseSearch::SPHINX) {
-	exit('Error, NN_RELEASE_SEARCH_TYPE in www/settings.php must be set to SPHINX!' . PHP_EOL);
+	exit('Error, NN_RELEASE_SEARCH_TYPE in newznab/config/settings.php must be set to SPHINX!' . PHP_EOL);
 }
 
 $sphinxConnection = '';
@@ -20,7 +19,7 @@ if ($argc == 3 && is_numeric($argv[2])) {
 		$sphinxConnection = sprintf('unix://%s:', $socket);
 	}
 } else {
-	exit("Argument 1 must the hostname or IP to the Sphinx searchd server, Argument 2 must be the port to the Sphinx searchd server.\nAlternatively, Argument 1 can be a unix domain socket." . PHP_EOL);
+	exit("Argument 1 must the hostname or IP to the Sphinx searchd server ('sphinx' protocol), Argument 2 must be the port to the Sphinx searchd server ('sphinx' protocol) (the default is 9312).\nAlternatively, Argument 1 can be a unix domain socket." . PHP_EOL);
 }
 
 $pdo = new DB();
