@@ -1,5 +1,6 @@
 language: PHP
 
+ php:
   # aliased to a recent 5.5.x version
   - 5.5
   # aliased to a recent 5.6.x version
